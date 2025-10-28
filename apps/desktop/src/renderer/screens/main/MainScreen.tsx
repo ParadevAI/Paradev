@@ -121,10 +121,21 @@ export function MainScreen() {
 			wt.id === worktreeId ? updatedWorktree : wt,
 		);
 
-		setCurrentWorkspace({
+		const updatedCurrentWorkspace = {
 			...currentWorkspace,
 			worktrees: updatedWorktrees,
-		});
+		};
+
+		setCurrentWorkspace(updatedCurrentWorkspace);
+
+		// Also update the workspaces array so the carousel renders the updated data
+		if (workspaces) {
+			setWorkspaces(
+				workspaces.map((ws) =>
+					ws.id === currentWorkspace.id ? updatedCurrentWorkspace : ws,
+				),
+			);
+		}
 	};
 
 	const loadAllWorkspaces = async () => {

@@ -215,6 +215,8 @@ export function Sidebar({
 							onToggleWorktree={toggleWorktree}
 							onTabSelect={onTabSelect}
 							onTabGroupSelect={onTabGroupSelect}
+							onReload={() => onWorktreeCreated?.()}
+							onUpdateWorktree={onUpdateWorktree}
 							selectedTabId={selectedTabId}
 							selectedTabGroupId={selectedTabGroupId}
 						/>
