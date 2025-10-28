@@ -314,7 +314,7 @@ export default function TerminalComponent({
 				}
 			}
 
-			// Terminal process lifecycle is managed by TerminalLayout
+			// Terminal process lifecycle is managed by ScreenLayout
 			// Don't kill it here to avoid conflicts
 		};
 

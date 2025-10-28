@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import TerminalLayout from "renderer/components/TerminalLayout";
+import ScreenLayout from "renderer/components/ScreenLayout";
 import type { Workspace } from "shared/types";
 import { AppFrame } from "./components/AppFrame";
 import { Background } from "./components/Background";
@@ -287,7 +287,7 @@ export function MainScreen() {
 							selectedTabGroup &&
 							selectedWorktree &&
 							currentWorkspace && (
-								<TerminalLayout
+								<ScreenLayout
 									tabGroup={selectedTabGroup}
 									workingDirectory={
 										selectedWorktree.path || currentWorkspace.repoPath

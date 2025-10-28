@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Tab, TabGroup } from "shared/types";
 import Terminal from "./Terminal";
 
-interface TerminalLayoutProps {
+interface ScreenLayoutProps {
 	tabGroup: TabGroup;
 	workingDirectory: string;
 	workspaceId?: string;
@@ -46,7 +46,7 @@ function TerminalInstance({
 
 				if (!initialCwd) {
 					console.error(
-						"[TerminalLayout] No CWD available for tab",
+						"[ScreenLayout] No CWD available for tab",
 						tab.id,
 					);
 					return;
@@ -123,14 +123,14 @@ function TerminalInstance({
 	);
 }
 
-export default function TerminalLayout({
+export default function ScreenLayout({
 	tabGroup,
 	workingDirectory,
 	workspaceId,
 	worktreeId,
 	selectedTabId,
 	onTabFocus,
-}: TerminalLayoutProps) {
+}: ScreenLayoutProps) {
 	// Safety check: ensure tabGroup has tabs
 	if (!tabGroup || !tabGroup.tabs || !Array.isArray(tabGroup.tabs)) {
 		return (
