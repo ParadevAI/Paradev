@@ -131,6 +131,9 @@ export default function ScreenLayout({
 	selectedTabId,
 	onTabFocus,
 }: ScreenLayoutProps) {
+	const [, forceUpdate] = useState({});
+	const prevTabOrderRef = useRef<string>("");
+
 	// Safety check: ensure tabGroup has tabs
 	if (!tabGroup || !tabGroup.tabs || !Array.isArray(tabGroup.tabs)) {
 		return (
@@ -145,8 +148,26 @@ export default function ScreenLayout({
 		);
 	}
 
+	// Create a unique key that changes when tabs are reordered
+	const tabOrderKey = tabGroup.tabs
+		.map((t) => `${t.id}:${t.row}:${t.col}`)
+		.join("|");
+
+	// Force re-render when order changes
+	useEffect(() => {
+		if (prevTabOrderRef.current !== tabOrderKey && prevTabOrderRef.current !== "") {
+			// Order has changed, force update after a brief delay
+			const timer = setTimeout(() => {
+				forceUpdate({});
+			}, 50);
+			return () => clearTimeout(timer);
+		}
+		prevTabOrderRef.current = tabOrderKey;
+	}, [tabOrderKey]);
+
 	return (
 		<div
+			key={tabOrderKey}
 			className="w-full h-full gap-1 p-1"
 			style={{
 				display: "grid",

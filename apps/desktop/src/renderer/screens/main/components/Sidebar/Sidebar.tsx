@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { Workspace } from "shared/types";
+import type { Worktree, Workspace } from "shared/types";
 import {
 	SidebarHeader,
 	WorktreeList,
@@ -16,6 +16,7 @@ interface SidebarProps {
 	onTabGroupSelect: (worktreeId: string, tabGroupId: string) => void;
 	onWorktreeCreated?: () => void;
 	onWorkspaceSelect: (workspaceId: string) => void;
+	onUpdateWorktree: (worktreeId: string, updatedWorktree: Worktree) => void;
 	selectedTabId?: string;
 	selectedTabGroupId?: string;
 }
@@ -28,6 +29,7 @@ export function Sidebar({
 	onTabGroupSelect,
 	onWorktreeCreated,
 	onWorkspaceSelect,
+	onUpdateWorktree,
 	selectedTabId,
 	selectedTabGroupId,
 }: SidebarProps) {
@@ -200,6 +202,7 @@ export function Sidebar({
 					onTabSelect={onTabSelect}
 					onTabGroupSelect={onTabGroupSelect}
 					onReload={() => onWorktreeCreated?.()}
+					onUpdateWorktree={onUpdateWorktree}
 					selectedTabId={selectedTabId}
 					selectedTabGroupId={selectedTabGroupId}
 				/>

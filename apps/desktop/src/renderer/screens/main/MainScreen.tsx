@@ -116,6 +116,20 @@ export function MainScreen() {
 		}
 	};
 
+	const handleUpdateWorktree = (worktreeId: string, updatedWorktree: any) => {
+		// Optimistically update the worktree in the current workspace
+		if (!currentWorkspace) return;
+
+		const updatedWorktrees = currentWorkspace.worktrees.map((wt) =>
+			wt.id === worktreeId ? updatedWorktree : wt,
+		);
+
+		setCurrentWorkspace({
+			...currentWorkspace,
+			worktrees: updatedWorktrees,
+		});
+	};
+
 	const loadAllWorkspaces = async () => {
 		try {
 			const allWorkspaces = (await window.ipcRenderer.invoke(
@@ -232,6 +246,7 @@ export function MainScreen() {
 						onTabGroupSelect={handleTabGroupSelect}
 						onWorktreeCreated={handleWorktreeCreated}
 						onWorkspaceSelect={handleWorkspaceSelect}
+					onUpdateWorktree={handleUpdateWorktree}
 						selectedTabId={selectedTabId ?? undefined}
 						selectedTabGroupId={selectedTabGroupId ?? undefined}
 						onCollapse={() => setIsSidebarOpen(false)}

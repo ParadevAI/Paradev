@@ -157,6 +157,7 @@ interface WorktreeItemProps {
 	onTabSelect: (worktreeId: string, tabGroupId: string, tabId: string) => void;
 	onTabGroupSelect: (worktreeId: string, tabGroupId: string) => void;
 	onReload: () => void;
+	onUpdateWorktree: (updatedWorktree: Worktree) => void;
 	selectedTabId?: string;
 	selectedTabGroupId?: string;
 }
@@ -169,6 +170,7 @@ export function WorktreeItem({
 	onTabSelect,
 	onTabGroupSelect,
 	onReload,
+	onUpdateWorktree,
 	selectedTabId,
 	selectedTabGroupId,
 }: WorktreeItemProps) {
@@ -247,80 +249,184 @@ export function WorktreeItem({
 			return;
 		}
 
-		// Handle tab reordering within the same tab group
-		if (
-			overData?.type === "tab" &&
-			activeData.tabGroupId === overData.tabGroupId
-		) {
-			const tabGroup = worktree.tabGroups.find(
-				(tg) => tg.id === activeData.tabGroupId,
-			);
-			if (!tabGroup) return;
+		try {
+			// Handle tab reordering within the same tab group
+			if (
+				overData?.type === "tab" &&
+				activeData.tabGroupId === overData.tabGroupId
+			) {
+				const tabGroup = worktree.tabGroups.find(
+					(tg) => tg.id === activeData.tabGroupId,
+				);
+				if (!tabGroup) return;
 
-			const oldIndex = tabGroup.tabs.findIndex((t) => t.id === active.id);
-			const newIndex = tabGroup.tabs.findIndex((t) => t.id === over.id);
+				const oldIndex = tabGroup.tabs.findIndex((t) => t.id === active.id);
+				const newIndex = tabGroup.tabs.findIndex((t) => t.id === over.id);
 
-			const newOrder = arrayMove(
-				tabGroup.tabs.map((t) => t.id),
-				oldIndex,
-				newIndex,
-			);
+				// Optimistic update: update the local state immediately
+				const reorderedTabs = arrayMove(tabGroup.tabs, oldIndex, newIndex);
 
-			// Update via IPC
-			await window.ipcRenderer.invoke(
-				"tab-reorder",
-				workspaceId,
-				worktree.id,
-				activeData.tabGroupId,
-				newOrder,
-			);
+				// Recalculate grid positions based on new array order
+				const tabsWithUpdatedPositions = reorderedTabs.map((tab, index) => {
+					const row = Math.floor(index / tabGroup.cols);
+					const col = index % tabGroup.cols;
+					return { ...tab, row, col };
+				});
 
-			onReload();
-		}
-		// Handle moving tab to a different tab group
-		else if (
-			overData?.type === "tab-group" &&
-			activeData.tabGroupId !== over.id
-		) {
-			// Moving to a different tab group
-			const targetTabGroup = worktree.tabGroups.find((tg) => tg.id === over.id);
-			if (!targetTabGroup) return;
+				const updatedTabGroup = { ...tabGroup, tabs: tabsWithUpdatedPositions };
+				const updatedTabGroups = worktree.tabGroups.map((tg) =>
+					tg.id === activeData.tabGroupId ? updatedTabGroup : tg,
+				);
+				const updatedWorktree = { ...worktree, tabGroups: updatedTabGroups };
+				onUpdateWorktree(updatedWorktree);
 
-			await window.ipcRenderer.invoke(
-				"tab-move-to-group",
-				workspaceId,
-				worktree.id,
-				active.id as string,
-				activeData.tabGroupId,
-				over.id as string,
-				targetTabGroup.tabs.length,
-			);
+				// Save to backend
+				const newOrder = reorderedTabs.map((t) => t.id);
+				const result = await window.ipcRenderer.invoke(
+					"tab-reorder",
+					workspaceId,
+					worktree.id,
+					activeData.tabGroupId,
+					newOrder,
+				);
 
-			onReload();
-		}
-		// Handle moving tab between tabs in different groups
-		else if (
-			overData?.type === "tab" &&
-			activeData.tabGroupId !== overData.tabGroupId
-		) {
-			const targetTabGroup = worktree.tabGroups.find(
-				(tg) => tg.id === overData.tabGroupId,
-			);
-			if (!targetTabGroup) return;
+				if (!result.success) {
+					console.error("Failed to reorder tabs:", result.error);
+					// Revert on failure
+					onReload();
+				}
+			}
+			// Handle moving tab to a different tab group
+			else if (
+				overData?.type === "tab-group" &&
+				activeData.tabGroupId !== over.id
+			) {
+				// Moving to a different tab group
+				const sourceTabGroup = worktree.tabGroups.find(
+					(tg) => tg.id === activeData.tabGroupId,
+				);
+				const targetTabGroup = worktree.tabGroups.find(
+					(tg) => tg.id === over.id,
+				);
+				if (!sourceTabGroup || !targetTabGroup) return;
 
-			const targetIndex = targetTabGroup.tabs.findIndex((t) => t.id === over.id);
+				const tabToMove = sourceTabGroup.tabs.find((t) => t.id === active.id);
+				if (!tabToMove) return;
 
-			await window.ipcRenderer.invoke(
-				"tab-move-to-group",
-				workspaceId,
-				worktree.id,
-				active.id as string,
-				activeData.tabGroupId,
-				overData.tabGroupId,
-				targetIndex,
-			);
+				// Optimistic update
+				const updatedSourceTabs = sourceTabGroup.tabs
+					.filter((t) => t.id !== active.id)
+					.map((tab, index) => {
+						const row = Math.floor(index / sourceTabGroup.cols);
+						const col = index % sourceTabGroup.cols;
+						return { ...tab, row, col };
+					});
 
-			onReload();
+				const updatedTargetTabs = [...targetTabGroup.tabs, tabToMove].map(
+					(tab, index) => {
+						const row = Math.floor(index / targetTabGroup.cols);
+						const col = index % targetTabGroup.cols;
+						return { ...tab, row, col };
+					},
+				);
+
+				const updatedTabGroups = worktree.tabGroups.map((tg) => {
+					if (tg.id === activeData.tabGroupId) {
+						return { ...tg, tabs: updatedSourceTabs };
+					}
+					if (tg.id === over.id) {
+						return { ...tg, tabs: updatedTargetTabs };
+					}
+					return tg;
+				});
+
+				const updatedWorktree = { ...worktree, tabGroups: updatedTabGroups };
+				onUpdateWorktree(updatedWorktree);
+
+				// Save to backend
+				const result = await window.ipcRenderer.invoke(
+					"tab-move-to-group",
+					workspaceId,
+					worktree.id,
+					active.id as string,
+					activeData.tabGroupId,
+					over.id as string,
+					targetTabGroup.tabs.length,
+				);
+
+				if (!result.success) {
+					console.error("Failed to move tab:", result.error);
+					onReload();
+				}
+			}
+			// Handle moving tab between tabs in different groups
+			else if (
+				overData?.type === "tab" &&
+				activeData.tabGroupId !== overData.tabGroupId
+			) {
+				const sourceTabGroup = worktree.tabGroups.find(
+					(tg) => tg.id === activeData.tabGroupId,
+				);
+				const targetTabGroup = worktree.tabGroups.find(
+					(tg) => tg.id === overData.tabGroupId,
+				);
+				if (!sourceTabGroup || !targetTabGroup) return;
+
+				const tabToMove = sourceTabGroup.tabs.find((t) => t.id === active.id);
+				if (!tabToMove) return;
+
+				const targetIndex = targetTabGroup.tabs.findIndex(
+					(t) => t.id === over.id,
+				);
+
+				// Optimistic update
+				const updatedSourceTabs = sourceTabGroup.tabs
+					.filter((t) => t.id !== active.id)
+					.map((tab, index) => {
+						const row = Math.floor(index / sourceTabGroup.cols);
+						const col = index % sourceTabGroup.cols;
+						return { ...tab, row, col };
+					});
+
+				const updatedTargetTabsTemp = [...targetTabGroup.tabs];
+				updatedTargetTabsTemp.splice(targetIndex, 0, tabToMove);
+				const updatedTargetTabs = updatedTargetTabsTemp.map((tab, index) => {
+					const row = Math.floor(index / targetTabGroup.cols);
+					const col = index % targetTabGroup.cols;
+					return { ...tab, row, col };
+				});
+
+				const updatedTabGroups = worktree.tabGroups.map((tg) => {
+					if (tg.id === activeData.tabGroupId) {
+						return { ...tg, tabs: updatedSourceTabs };
+					}
+					if (tg.id === overData.tabGroupId) {
+						return { ...tg, tabs: updatedTargetTabs };
+					}
+					return tg;
+				});
+
+				const updatedWorktree = { ...worktree, tabGroups: updatedTabGroups };
+				onUpdateWorktree(updatedWorktree);
+
+				// Save to backend
+				const result = await window.ipcRenderer.invoke(
+					"tab-move-to-group",
+					workspaceId,
+					worktree.id,
+					active.id as string,
+					activeData.tabGroupId,
+					overData.tabGroupId,
+					targetIndex,
+				);
+
+				if (!result.success) {
+					console.error("Failed to move tab:", result.error);
+					onReload();
+				}
+			}
+		} catch (error) {
+			console.error("Error during drag end:", error);
 		}
 	};
 

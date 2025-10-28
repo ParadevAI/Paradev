@@ -23,8 +23,9 @@ export interface Tab {
 	name: string;
 	command?: string | null;
 	cwd?: string; // Current working directory
-	row: number;
-	col: number;
+	order: number; // Explicit ordering - position in the grid (0, 1, 2, 3, ...)
+	row: number; // Derived from order: floor(order / cols)
+	col: number; // Derived from order: order % cols
 	rowSpan?: number;
 	colSpan?: number;
 	createdAt: string;

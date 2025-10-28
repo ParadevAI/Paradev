@@ -18,36 +18,41 @@ import worktreeManager from "./worktree-manager";
 // Function to create default tabs for a 2x2 grid layout
 function createDefaultTabs(): Tab[] {
 	const now = new Date().toISOString();
+	const cols = 2; // 2x2 grid
 	return [
 		{
 			id: randomUUID(),
 			name: "Terminal 1",
-			row: 0,
-			col: 0,
+			order: 0,
+			row: 0, // floor(0 / 2) = 0
+			col: 0, // 0 % 2 = 0
 			command: null,
 			createdAt: now,
 		},
 		{
 			id: randomUUID(),
 			name: "Terminal 2",
-			row: 0,
-			col: 1,
+			order: 1,
+			row: 0, // floor(1 / 2) = 0
+			col: 1, // 1 % 2 = 1
 			command: null,
 			createdAt: now,
 		},
 		{
 			id: randomUUID(),
 			name: "Terminal 3",
-			row: 1,
-			col: 0,
+			order: 2,
+			row: 1, // floor(2 / 2) = 1
+			col: 0, // 2 % 2 = 0
 			command: null,
 			createdAt: now,
 		},
 		{
 			id: randomUUID(),
 			name: "Terminal 4",
-			row: 1,
-			col: 1,
+			order: 3,
+			row: 1, // floor(3 / 2) = 1
+			col: 1, // 3 % 2 = 1
 			command: null,
 			createdAt: now,
 		},
@@ -597,7 +602,14 @@ class WorkspaceManager {
 				return { success: false, error: "Invalid tab order" };
 			}
 
-			tabGroup.tabs = reorderedTabs;
+			// Recalculate grid positions based on new order
+			const tabsWithUpdatedPositions = reorderedTabs.map((tab, index) => {
+				const row = Math.floor(index / tabGroup.cols);
+				const col = index % tabGroup.cols;
+				return { ...tab, row, col };
+			});
+
+			tabGroup.tabs = tabsWithUpdatedPositions;
 			workspace.updatedAt = new Date().toISOString();
 
 			// Save to config
@@ -711,6 +723,19 @@ class WorkspaceManager {
 
 			// Insert tab into target group at specified index
 			targetTabGroup.tabs.splice(targetIndex, 0, tab);
+
+			// Recalculate grid positions for both groups
+			sourceTabGroup.tabs = sourceTabGroup.tabs.map((t, index) => {
+				const row = Math.floor(index / sourceTabGroup.cols);
+				const col = index % sourceTabGroup.cols;
+				return { ...t, row, col };
+			});
+
+			targetTabGroup.tabs = targetTabGroup.tabs.map((t, index) => {
+				const row = Math.floor(index / targetTabGroup.cols);
+				const col = index % targetTabGroup.cols;
+				return { ...t, row, col };
+			});
 
 			workspace.updatedAt = new Date().toISOString();
 
