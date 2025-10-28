@@ -145,4 +145,9 @@
 		height: 100% !important;
 		width: 100% !important;
 	}
+
+	/* Hide scrollbar for workspace carousel */
+	.hide-scrollbar::-webkit-scrollbar {
+		display: none;
+	}
 }

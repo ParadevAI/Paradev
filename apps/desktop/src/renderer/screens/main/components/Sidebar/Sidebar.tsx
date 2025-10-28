@@ -1,11 +1,13 @@
+import type { MotionValue } from "framer-motion";
 import { useEffect, useState } from "react";
 import type { Worktree, Workspace } from "shared/types";
 import {
-	SidebarHeader,
-	WorktreeList,
 	CreateWorktreeButton,
-	WorkspaceSwitcher,
 	CreateWorktreeModal,
+	SidebarHeader,
+	WorkspaceCarousel,
+	WorkspaceSwitcher,
+	WorktreeList,
 } from "./components";
 
 interface SidebarProps {
@@ -40,6 +42,11 @@ export function Sidebar({
 	const [isScanningWorktrees, setIsScanningWorktrees] = useState(false);
 	const [showWorktreeModal, setShowWorktreeModal] = useState(false);
 	const [branchName, setBranchName] = useState("");
+	const [scrollProgress, setScrollProgress] = useState<
+		MotionValue<number> | undefined
+	>();
+
+	console.log(currentWorkspace, workspaces)
 
 	// Auto-expand worktree if it contains the selected tab group
 	useEffect(() => {
@@ -194,26 +201,33 @@ export function Sidebar({
 				hasWorkspace={!!currentWorkspace}
 			/>
 
-			<div className="flex-1 overflow-y-auto px-3 py-2 space-y-1">
-				<WorktreeList
-					currentWorkspace={currentWorkspace}
-					expandedWorktrees={expandedWorktrees}
-					onToggleWorktree={toggleWorktree}
-					onTabSelect={onTabSelect}
-					onTabGroupSelect={onTabGroupSelect}
-					onReload={() => onWorktreeCreated?.()}
-					onUpdateWorktree={onUpdateWorktree}
-					selectedTabId={selectedTabId}
-					selectedTabGroupId={selectedTabGroupId}
-				/>
+			<WorkspaceCarousel
+				workspaces={workspaces}
+				currentWorkspace={currentWorkspace}
+				onWorkspaceSelect={onWorkspaceSelect}
+				onScrollProgress={setScrollProgress}
+			>
+				{(workspace, isActive) => (
+					<>
+						<WorktreeList
+							currentWorkspace={workspace}
+							expandedWorktrees={expandedWorktrees}
+							onToggleWorktree={toggleWorktree}
+							onTabSelect={onTabSelect}
+							onTabGroupSelect={onTabGroupSelect}
+							selectedTabId={selectedTabId}
+							selectedTabGroupId={selectedTabGroupId}
+						/>
 
-				{currentWorkspace && (
-					<CreateWorktreeButton
-						onClick={handleCreateWorktree}
-						isCreating={isCreatingWorktree}
-					/>
+						{workspace && (
+							<CreateWorktreeButton
+								onClick={handleCreateWorktree}
+								isCreating={isCreatingWorktree}
+							/>
+						)}
+					</>
 				)}
-			</div>
+			</WorkspaceCarousel>
 
 			<WorkspaceSwitcher
 				workspaces={workspaces}
@@ -221,6 +235,7 @@ export function Sidebar({
 				onWorkspaceSelect={onWorkspaceSelect}
 				onAddWorkspace={handleAddWorkspace}
 				onRemoveWorkspace={handleRemoveWorkspace}
+				scrollProgress={scrollProgress}
 			/>
 
 			<CreateWorktreeModal

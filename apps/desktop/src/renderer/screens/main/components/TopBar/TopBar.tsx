@@ -1,3 +1,5 @@
+import { Button } from "@superset/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import {
 	Folder,
 	GitBranch,
@@ -5,8 +7,6 @@ import {
 	PanelLeftOpen,
 	Plus,
 } from "lucide-react";
-import { Button } from "@superset/ui/button";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 
 interface TopBarProps {
 	isSidebarOpen: boolean;

@@ -9,7 +9,7 @@ import { TopBar } from "./components/TopBar";
 
 export function MainScreen() {
 	const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-	const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
+	const [workspaces, setWorkspaces] = useState<Workspace[] | null>(null);
 	const [currentWorkspace, setCurrentWorkspace] = useState<Workspace | null>(
 		null,
 	);
@@ -229,7 +229,7 @@ export function MainScreen() {
 
 			{/* App Frame - continuous border + sidebar + topbar */}
 			<AppFrame>
-				{isSidebarOpen && (
+				{isSidebarOpen && workspaces && (
 					<Sidebar
 						workspaces={workspaces}
 						currentWorkspace={currentWorkspace}
@@ -281,7 +281,9 @@ export function MainScreen() {
 
 						{!loading && !error && currentWorkspace && !selectedTabGroup && (
 							<div className="flex flex-col items-center justify-center h-full text-neutral-400 bg-neutral-950/40 backdrop-blur-xl rounded-2xl">
-								<p className="mb-4">Select a worktree and tab to view terminals</p>
+								<p className="mb-4">
+									Select a worktree and tab to view terminals
+								</p>
 								<p className="text-sm text-neutral-500">
 									Create a worktree from the sidebar to get started
 								</p>

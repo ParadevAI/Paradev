@@ -1,1 +1,1 @@
-export { WORKSPACE_ICONS, getWorkspaceIcon } from "./workspace-icons";
+export { getWorkspaceIcon, WORKSPACE_ICONS } from "./workspace-icons";

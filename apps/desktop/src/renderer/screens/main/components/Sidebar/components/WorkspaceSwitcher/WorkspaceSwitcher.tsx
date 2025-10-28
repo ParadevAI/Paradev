@@ -1,5 +1,3 @@
-import { Plus } from "lucide-react";
-import type { Workspace } from "shared/types";
 import { Button } from "@superset/ui/button";
 import {
 	ContextMenu,
@@ -9,6 +7,14 @@ import {
 } from "@superset/ui/context-menu";
 import { ScrollArea, ScrollBar } from "@superset/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
+import {
+	type MotionValue,
+	motion,
+	useMotionValue,
+	useTransform,
+} from "framer-motion";
+import { Plus } from "lucide-react";
+import type { Workspace } from "shared/types";
 import { getWorkspaceIcon } from "../../utils";
 
 interface WorkspaceSwitcherProps {
@@ -17,6 +23,7 @@ interface WorkspaceSwitcherProps {
 	onWorkspaceSelect: (workspaceId: string) => void;
 	onAddWorkspace: () => void;
 	onRemoveWorkspace: (workspaceId: string, workspaceName: string) => void;
+	scrollProgress?: MotionValue<number>;
 }
 
 export function WorkspaceSwitcher({
@@ -25,11 +32,33 @@ export function WorkspaceSwitcher({
 	onWorkspaceSelect,
 	onAddWorkspace,
 	onRemoveWorkspace,
+	scrollProgress,
 }: WorkspaceSwitcherProps) {
+	// Create a default motion value initialized to current workspace index
+	const currentIndex = workspaces.findIndex((w) => w.id === currentWorkspaceId);
+	const initialIndex = currentIndex >= 0 ? currentIndex : 0;
+	const defaultProgress = useMotionValue(initialIndex);
+	const progressToUse = scrollProgress || defaultProgress;
+
+	// Calculate sliding background position from scroll progress
+	// Button size: 32px (size-8), Gap: 8px (gap-2), Total spacing: 40px per workspace
+	const backgroundX = useTransform(progressToUse, (value) => value * 40);
 	return (
 		<div className="flex w-full">
 			<ScrollArea className="flex-1 min-w-0" orientation="horizontal">
-				<div className="flex items-center gap-2 px-2 py-2 w-max">
+				<div className="relative flex items-center gap-2 px-2 py-2 w-max">
+					{/* Sliding background indicator */}
+					<motion.div
+						className="absolute w-8 h-8 bg-neutral-800 rounded-md"
+						style={{ x: backgroundX }}
+						initial={false}
+						transition={{
+							type: "spring",
+							stiffness: 300,
+							damping: 30,
+						}}
+					/>
+
 					{workspaces.map((ws) => {
 						const Icon = getWorkspaceIcon(ws.id);
 						return (
@@ -41,9 +70,7 @@ export function WorkspaceSwitcher({
 												variant="ghost"
 												size="icon-sm"
 												onClick={() => onWorkspaceSelect(ws.id)}
-												className={
-													currentWorkspaceId === ws.id ? "bg-neutral-800" : ""
-												}
+												className="relative z-10"
 											>
 												<Icon size={18} />
 											</Button>

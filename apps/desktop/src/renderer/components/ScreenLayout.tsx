@@ -49,10 +49,7 @@ function TerminalInstance({
 				const initialCwd = tab.cwd || workingDirectory;
 
 				if (!initialCwd) {
-					console.error(
-						"[ScreenLayout] No CWD available for tab",
-						tab.id,
-					);
+					console.error("[ScreenLayout] No CWD available for tab", tab.id);
 					return;
 				}
 
