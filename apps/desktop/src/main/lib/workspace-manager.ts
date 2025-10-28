@@ -23,6 +23,7 @@ function createDefaultTabs(): Tab[] {
 		{
 			id: randomUUID(),
 			name: "Terminal 1",
+			type: "terminal",
 			order: 0,
 			row: 0, // floor(0 / 2) = 0
 			col: 0, // 0 % 2 = 0
@@ -32,6 +33,7 @@ function createDefaultTabs(): Tab[] {
 		{
 			id: randomUUID(),
 			name: "Terminal 2",
+			type: "terminal",
 			order: 1,
 			row: 0, // floor(1 / 2) = 0
 			col: 1, // 1 % 2 = 1
@@ -41,6 +43,7 @@ function createDefaultTabs(): Tab[] {
 		{
 			id: randomUUID(),
 			name: "Terminal 3",
+			type: "terminal",
 			order: 2,
 			row: 1, // floor(2 / 2) = 1
 			col: 0, // 2 % 2 = 0
@@ -50,6 +53,7 @@ function createDefaultTabs(): Tab[] {
 		{
 			id: randomUUID(),
 			name: "Terminal 4",
+			type: "terminal",
 			order: 3,
 			row: 1, // floor(3 / 2) = 1
 			col: 1, // 3 % 2 = 1
@@ -288,10 +292,15 @@ class WorkspaceManager {
 				return { success: false, error: "Tab group not found" };
 			}
 
+			// Calculate order based on row/col and grid dimensions
+			const order = input.row * tabGroup.cols + input.col;
+
 			const tab: Tab = {
 				id: randomUUID(),
 				name: input.name,
+				type: input.type || "terminal", // Default to terminal if not specified
 				command: input.command,
+				order,
 				row: input.row,
 				col: input.col,
 				rowSpan: input.rowSpan,
