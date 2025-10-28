@@ -61,10 +61,18 @@ In your IPC handler file (e.g., `src/main/lib/workspace-ipcs.ts`):
 ```typescript
 import type { CreateWorktreeInput } from "shared/types";
 
+// ✅ CORRECT: Accept object parameter
 ipcMain.handle("worktree-create", async (_event, input: CreateWorktreeInput) => {
   return await workspaceManager.createWorktree(input);
 });
+
+// ❌ WRONG: Don't use positional parameters
+ipcMain.handle("worktree-create", async (_event, workspaceId, branch, createBranch) => {
+  // This won't match the typed renderer calls!
+});
 ```
+
+**Important:** Always accept **object parameters** (not positional), matching your type definition.
 
 ### 3. Call from Renderer (Type-Safe!)
 
@@ -252,16 +260,45 @@ await window.ipcRenderer.invoke("workspace-list", undefined);
 await window.ipcRenderer.invoke("workspace-list");
 ```
 
+### Error: IPC calls work but functionality fails silently
+
+**Symptom:** Type checking passes, but operations like reordering don't work.
+
+**Cause:** Handler expects object parameters but receives positional parameters (or vice versa).
+
+**Solution:** Ensure handlers accept **object parameters** matching the type definition:
+
+```typescript
+// ❌ WRONG: Positional parameters
+ipcMain.handle("tab-reorder", async (_event, workspaceId, worktreeId, tabGroupId, tabIds) => {
+  // Renderer sends: { workspaceId, worktreeId, tabGroupId, tabIds }
+  // Handler receives: workspaceId = { workspaceId, worktreeId, ... }
+  // Result: worktreeId, tabGroupId, tabIds are undefined!
+});
+
+// ✅ CORRECT: Object parameter
+ipcMain.handle("tab-reorder", async (_event, input: { workspaceId, worktreeId, tabGroupId, tabIds }) => {
+  return await workspaceManager.reorderTabs(
+    input.workspaceId,
+    input.worktreeId,
+    input.tabGroupId,
+    input.tabIds,
+  );
+});
+```
+
 ## Best Practices
 
 1. **Always define types in shared/ipc-channels.ts first** before implementing handlers
-2. **Use descriptive channel names** with kebab-case (e.g., `workspace-create`, not `ws-c`)
-3. **Keep request/response types simple** - use types from `shared/types.ts`
-4. **Document complex channels** with JSDoc comments in the interface
-5. **Use IpcResponse wrapper** for operations that can fail:
+2. **Use object parameters, not positional** - Handlers must accept a single object parameter that matches the request type
+3. **Use descriptive channel names** with kebab-case (e.g., `workspace-create`, not `ws-c`)
+4. **Keep request/response types simple** - use types from `shared/types.ts`
+5. **Document complex channels** with JSDoc comments in the interface
+6. **Use IpcResponse wrapper** for operations that can fail:
    ```typescript
    response: IpcResponse<Workspace>; // { success, data?, error? }
    ```
+7. **Test after adding channels** - Verify the handler receives the correct parameters
 
 ## Future Improvements
 

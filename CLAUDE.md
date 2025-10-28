@@ -7,7 +7,7 @@ Guidelines for agents and developers working in this repository.
 Bun + Turbo monorepo with:
 - **Apps**:
   - `apps/website` - Main website application
-  - `apps/desktop` - Electron desktop application
+  - `apps/desktop` - Electron desktop application (see [Desktop App Guide](#desktop-app-electron) below)
   - `apps/docs` - Documentation site
   - `apps/blog` - Blog site
 - **Packages**:
@@ -85,3 +85,72 @@ All components in `packages/ui`:
 - Schema in `packages/db/src/`
 - Use Drizzle ORM for all database operations
 - **DO NOT run `db:gen`** - reserved for maintainers
+
+## Desktop App (Electron)
+
+### Architecture
+
+The desktop app uses:
+- **Electron** - Main process, renderer process, preload scripts
+- **IPC Communication** - Type-safe IPC system (see below)
+- **Terminal Management** - node-pty for terminal sessions
+- **Workspace/Worktree System** - Git worktree-based workspace management
+
+### Type-Safe IPC System
+
+**All IPC communication is fully type-safe.** See `apps/desktop/docs/TYPE_SAFE_IPC.md` for complete documentation.
+
+#### Quick Reference
+
+**1. Define channel types** in `apps/desktop/src/shared/ipc-channels.ts`:
+```typescript
+export interface IpcChannels {
+  "my-channel": {
+    request: { param1: string; param2: number };
+    response: { success: boolean; data?: any };
+  };
+}
+```
+
+**2. Implement handler** in `apps/desktop/src/main/lib/*.ts`:
+```typescript
+// ✅ CORRECT: Accept object parameter
+ipcMain.handle("my-channel", async (_event, input: { param1: string; param2: number }) => {
+  return { success: true, data: someResult };
+});
+
+// ❌ WRONG: Don't use positional parameters
+ipcMain.handle("my-channel", async (_event, param1, param2) => {
+  // This won't match the typed renderer calls!
+});
+```
+
+**3. Call from renderer** in `apps/desktop/src/renderer/**/*.tsx`:
+```typescript
+// Type-safe - no manual type assertions needed!
+const result = await window.ipcRenderer.invoke("my-channel", {
+  param1: "value",
+  param2: 123,
+});
+// TypeScript knows the exact response type
+```
+
+#### IPC Rules
+
+1. **Always use object parameters** - Handlers must accept a single object, not positional params
+2. **Define types first** - Add to `ipc-channels.ts` before implementing
+3. **No manual type assertions** - Let TypeScript infer types from the definitions
+4. **Test after adding channels** - Verify parameters are received correctly
+
+### File Structure
+
+- `src/main/` - Main process (Node.js environment)
+  - `lib/workspace-ipcs.ts` - Workspace/worktree IPC handlers
+  - `lib/terminal-ipcs.ts` - Terminal IPC handlers
+  - `lib/workspace-manager.ts` - Workspace business logic
+  - `lib/worktree-manager.ts` - Git worktree operations
+- `src/renderer/` - Renderer process (Browser environment)
+- `src/preload/` - Preload scripts (Context bridge, type-safe IPC wrapper)
+- `src/shared/` - Shared types and constants
+  - `types.ts` - Data models
+  - `ipc-channels.ts` - IPC type definitions
