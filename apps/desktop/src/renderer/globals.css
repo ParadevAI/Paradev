@@ -134,4 +134,15 @@
 		-webkit-app-region: no-drag;
 		-webkit-font-smoothing: antialiased;
 	}
+
+	/* Ensure xterm terminal fills container height */
+	.xterm {
+		height: 100% !important;
+		width: 100% !important;
+	}
+
+	.xterm-screen {
+		height: 100% !important;
+		width: 100% !important;
+	}
 }
