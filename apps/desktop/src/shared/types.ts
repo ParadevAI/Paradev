@@ -18,11 +18,16 @@ export interface WindowCreationByIPC {
 }
 
 // Workspace types - Tab-based Grid Layout
+
+// Tab types that can be displayed
+export type TabType = "terminal" | "editor" | "browser" | "preview";
+
 export interface Tab {
 	id: string;
 	name: string;
-	command?: string | null;
-	cwd?: string; // Current working directory
+	type: TabType; // Type of content to display
+	command?: string | null; // For terminal tabs
+	cwd?: string; // Current working directory (for terminal tabs)
 	order: number; // Explicit ordering - position in the grid (0, 1, 2, 3, ...)
 	row: number; // Derived from order: floor(order / cols)
 	col: number; // Derived from order: order % cols
@@ -89,6 +94,7 @@ export interface CreateTabInput {
 	worktreeId: string;
 	tabGroupId: string;
 	name: string;
+	type?: TabType; // Optional - defaults to "terminal"
 	command?: string | null;
 	row: number;
 	col: number;
