@@ -9,14 +9,18 @@
 		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
+		"@react-three/drei": "^10.7.6",
+		"@react-three/fiber": "^9.4.0",
 		"@superset/ui": "workspace:*",
+		"framer-motion": "^12.23.24",
 		"geist": "^1.5.1",
 		"next": "^15.1.6",
 		"nextra": "^4.6.0",
 		"nextra-theme-blog": "^4.6.0",
 		"nextra-theme-docs": "^4.6.0",
 		"react": "^19.1.1",
-		"react-dom": "^19.1.1"
+		"react-dom": "^19.1.1",
+		"three": "^0.180.0"
 	},
 	"devDependencies": {
 		"@superset/typescript": "workspace:*",
