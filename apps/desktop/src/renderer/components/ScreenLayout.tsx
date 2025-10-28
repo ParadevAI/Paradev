@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import type { Tab, TabGroup } from "shared/types";
 import Terminal from "./Terminal";
 
@@ -20,7 +20,7 @@ interface TerminalInstanceProps {
 	onTabFocus: (tabId: string) => void;
 }
 
-function TerminalInstance({
+const TerminalInstance = memo(function TerminalInstance({
 	tab,
 	workingDirectory,
 	workspaceId,
@@ -30,13 +30,25 @@ function TerminalInstance({
 }: TerminalInstanceProps) {
 	// Use the stable tab.id as the terminal ID
 	const terminalId = tab.id;
+	// Track if we've attempted to create this terminal in this mount
 	const terminalCreatedRef = useRef(false);
+	// Trigger fit when position changes
+	const [fitTrigger, setFitTrigger] = useState(0);
+
+	console.log(`[TerminalInstance] Rendering tab ${tab.id} at position (${tab.row}, ${tab.col})`);
 
 	useEffect(() => {
-		// Prevent double creation - only create once per tab.id
+		console.log(`[TerminalInstance] useEffect triggered for tab ${tab.id}, created: ${terminalCreatedRef.current}`);
+
+		// Prevent double creation - only create once per component mount
 		if (terminalCreatedRef.current) {
+			console.log(`[TerminalInstance] Skipping creation for tab ${tab.id} - already created`);
 			return;
 		}
+
+		// Mark that we're creating/have created the terminal
+		terminalCreatedRef.current = true;
+		console.log(`[TerminalInstance] Creating terminal for tab ${tab.id}`);
 
 		// Create terminal instance with the tab.id as the terminal ID
 		const createTerminal = async () => {
@@ -53,13 +65,14 @@ function TerminalInstance({
 					return;
 				}
 
-				terminalCreatedRef.current = true;
-
 				// Pass the stable tab.id as the terminal ID
-				await window.ipcRenderer.invoke("terminal-create", {
+				// If terminal already exists in backend, it will reuse it
+				console.log(`[TerminalInstance] Invoking terminal-create for tab ${tab.id}`);
+				const result = await window.ipcRenderer.invoke("terminal-create", {
 					id: tab.id, // Use tab.id as the stable terminal identifier
 					cwd: initialCwd,
 				});
+				console.log(`[TerminalInstance] Terminal created/reused for tab ${tab.id}, result:`, result);
 
 				// Execute startup command if specified
 				if (tab.command) {
@@ -77,12 +90,9 @@ function TerminalInstance({
 
 		createTerminal();
 
-		// Cleanup - only kill terminal when component truly unmounts
-		return () => {
-			// Reset the ref so it can be recreated if mounted again
-			terminalCreatedRef.current = false;
-			window.ipcRenderer.invoke("terminal-kill", tab.id);
-		};
+		// No cleanup function - terminals persist in the backend
+		// They will only be killed when explicitly removed from the config
+		// This prevents terminals from being killed during reordering
 	}, [tab.id]);
 
 	// Listen for CWD changes from the main process
@@ -114,16 +124,45 @@ function TerminalInstance({
 		};
 	}, [terminalId, tab.id, workspaceId, worktreeId, tabGroupId]);
 
+	// Trigger fit when tab position changes (row or col)
+	useEffect(() => {
+		console.log(`[TerminalInstance] Position changed for tab ${tab.id}, triggering fit`);
+		setFitTrigger((prev) => prev + 1);
+	}, [tab.row, tab.col]);
+
 	const handleFocus = () => {
 		onTabFocus(tab.id);
 	};
 
 	return (
 		<div className="w-full h-full">
-			<Terminal terminalId={terminalId} onFocus={handleFocus} />
+			<Terminal terminalId={terminalId} onFocus={handleFocus} triggerFit={fitTrigger} />
 		</div>
 	);
-}
+}, (prevProps, nextProps) => {
+	// Return true if props are equal (skip re-render)
+	// Return false if props are different (do re-render)
+	// We need to re-render when row/col changes to trigger fit
+	const isEqual = (
+		prevProps.tab.id === nextProps.tab.id &&
+		prevProps.tab.row === nextProps.tab.row &&
+		prevProps.tab.col === nextProps.tab.col &&
+		prevProps.workspaceId === nextProps.workspaceId &&
+		prevProps.worktreeId === nextProps.worktreeId &&
+		prevProps.tabGroupId === nextProps.tabGroupId
+	);
+
+	console.log(`[TerminalInstance] memo comparison for tab ${nextProps.tab.id}:`, {
+		isEqual,
+		idChanged: prevProps.tab.id !== nextProps.tab.id,
+		rowChanged: prevProps.tab.row !== nextProps.tab.row,
+		colChanged: prevProps.tab.col !== nextProps.tab.col,
+		prevPos: `(${prevProps.tab.row}, ${prevProps.tab.col})`,
+		nextPos: `(${nextProps.tab.row}, ${nextProps.tab.col})`,
+	});
+
+	return isEqual;
+});
 
 export default function ScreenLayout({
 	tabGroup,

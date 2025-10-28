@@ -1,5 +1,5 @@
 import { type ITheme, Terminal as XTerm } from "@xterm/xterm";
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import "@xterm/xterm/css/xterm.css";
 import { FitAddon } from "@xterm/addon-fit";
 import { SearchAddon } from "@xterm/addon-search";
@@ -11,6 +11,7 @@ interface TerminalProps {
 	hidden?: boolean;
 	className?: string;
 	onFocus?: () => void;
+	triggerFit?: number; // Change this value to trigger a re-fit
 }
 
 interface TerminalMessage {
@@ -66,22 +67,36 @@ const TERMINAL_THEME: Record<"LIGHT" | "DARK", ITheme> = {
 	},
 };
 
-export default function TerminalComponent({
+const TerminalComponent = memo(function TerminalComponent({
 	terminalId,
 	hidden = false,
 	className = "",
 	onFocus,
+	triggerFit,
 }: TerminalProps) {
 	const terminalRef = useRef<HTMLDivElement>(null);
 	const [terminal, setTerminal] = useState<XTerm | null>(null);
 	const [theme] = useState<"light" | "dark">("dark"); // Can be connected to theme provider later
 	const terminalIdRef = useRef<string | null>(null);
 	const onFocusRef = useRef(onFocus);
+	const fitFunctionRef = useRef<(() => void) | null>(null);
 
 	// Update the ref when onFocus changes
 	useEffect(() => {
 		onFocusRef.current = onFocus;
 	}, [onFocus]);
+
+	// Trigger fit when triggerFit prop changes
+	useEffect(() => {
+		console.log(`[Terminal] triggerFit changed to ${triggerFit} for terminal ${terminalId}`);
+		if (triggerFit !== undefined && fitFunctionRef.current) {
+			// Small delay to ensure DOM has updated
+			setTimeout(() => {
+				console.log(`[Terminal] Calling fit for terminal ${terminalId}`);
+				fitFunctionRef.current?.();
+			}, 50);
+		}
+	}, [triggerFit, terminalId]);
 
 	useEffect(() => {
 		if (terminal) {
@@ -91,21 +106,28 @@ export default function TerminalComponent({
 	}, [theme, terminal]);
 
 	useEffect(() => {
+		console.log(`[Terminal] useEffect triggered for terminal ${terminalId}, has terminal: ${!!terminal}`);
+
 		if (!terminalRef.current || terminal || !terminalId) {
+			console.log(`[Terminal] Skipping init for terminal ${terminalId} - ref: ${!!terminalRef.current}, terminal: ${!!terminal}, id: ${terminalId}`);
 			return;
 		}
 
-		const { term, terminalDataListener, cleanup } = initTerminal(
+		console.log(`[Terminal] Initializing XTerm for terminal ${terminalId}`);
+		const { term, terminalDataListener, cleanup, fit } = initTerminal(
 			terminalRef.current,
 			theme,
 			onFocusRef,
 		);
 		setTerminal(term);
+		fitFunctionRef.current = fit;
+		console.log(`[Terminal] XTerm initialized for terminal ${terminalId}`);
 
 		return () => {
-			term.dispose();
-			setTerminal(null);
-			cleanup();
+			console.log(`[Terminal] Cleanup called for terminal ${terminalId} - NOT disposing (preserving XTerm state)`);
+			// Don't dispose XTerm or cleanup on unmount
+			// XTerm instances should persist through reordering
+			// They will only be cleaned up when the tab is removed from config
 		};
 	}, [theme, terminalId]);
 
@@ -318,7 +340,7 @@ export default function TerminalComponent({
 			// Don't kill it here to avoid conflicts
 		};
 
-		return { term, terminalDataListener, cleanup };
+		return { term, terminalDataListener, cleanup, fit: customFit };
 	}
 
 	return (
@@ -327,4 +349,22 @@ export default function TerminalComponent({
 			className={`h-full w-full transition-opacity duration-200 text-start ${hidden ? "opacity-0" : "opacity-100 delay-300"}`}
 		/>
 	);
-}
+}, (prevProps, nextProps) => {
+	// Only re-render if terminalId or triggerFit changes
+	// Don't re-render for onFocus changes (use ref instead)
+	const isEqual = (
+		prevProps.terminalId === nextProps.terminalId &&
+		prevProps.triggerFit === nextProps.triggerFit &&
+		prevProps.hidden === nextProps.hidden
+	);
+	console.log(`[Terminal] memo comparison for terminal ${nextProps.terminalId}:`, {
+		isEqual,
+		terminalIdChanged: prevProps.terminalId !== nextProps.terminalId,
+		triggerFitChanged: prevProps.triggerFit !== nextProps.triggerFit,
+		prevTriggerFit: prevProps.triggerFit,
+		nextTriggerFit: nextProps.triggerFit,
+	});
+	return isEqual;
+});
+
+export default TerminalComponent;
