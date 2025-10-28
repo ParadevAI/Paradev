@@ -16,22 +16,51 @@ export function MainScreen() {
 	const [selectedWorktreeId, setSelectedWorktreeId] = useState<string | null>(
 		null,
 	);
-	const [selectedScreenId, setSelectedScreenId] = useState<string | null>(null);
+	const [selectedTabGroupId, setSelectedTabGroupId] = useState<string | null>(
+		null,
+	);
+	const [selectedTabId, setSelectedTabId] = useState<string | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
-	// Get selected screen details
-	const selectedScreen = currentWorkspace?.worktrees
+	// Get selected tab group details (contains all tabs in the grid)
+	const selectedTabGroup = currentWorkspace?.worktrees
 		?.find((wt) => wt.id === selectedWorktreeId)
-		?.screens.find((s) => s.id === selectedScreenId);
+		?.tabGroups.find((tg) => tg.id === selectedTabGroupId);
 
 	const selectedWorktree = currentWorkspace?.worktrees?.find(
 		(wt) => wt.id === selectedWorktreeId,
 	);
 
-	const handleScreenSelect = (worktreeId: string, screenId: string) => {
+	const handleTabSelect = (
+		worktreeId: string,
+		tabGroupId: string,
+		tabId: string,
+	) => {
 		setSelectedWorktreeId(worktreeId);
-		setSelectedScreenId(screenId);
+		setSelectedTabGroupId(tabGroupId);
+		setSelectedTabId(tabId);
+		// Save active selection
+		window.ipcRenderer.invoke(
+			"workspace-set-active-selection",
+			worktreeId,
+			tabGroupId,
+			tabId,
+		);
+	};
+
+	const handleTabGroupSelect = (worktreeId: string, tabGroupId: string) => {
+		setSelectedWorktreeId(worktreeId);
+		setSelectedTabGroupId(tabGroupId);
+		// Clear individual tab selection when selecting a tab group
+		setSelectedTabId(null);
+		// Save active selection
+		window.ipcRenderer.invoke(
+			"workspace-set-active-selection",
+			worktreeId,
+			tabGroupId,
+			null,
+		);
 	};
 
 	const handleWorkspaceSelect = async (workspaceId: string) => {
@@ -43,9 +72,10 @@ export function MainScreen() {
 
 			if (workspace) {
 				setCurrentWorkspace(workspace);
-				// Reset screen selection when switching workspaces
+				// Reset tab selection when switching workspaces
 				setSelectedWorktreeId(null);
-				setSelectedScreenId(null);
+				setSelectedTabGroupId(null);
+				setSelectedTabId(null);
 			}
 		} catch (error) {
 			console.error("Failed to load workspace:", error);
@@ -128,6 +158,21 @@ export function MainScreen() {
 					setCurrentWorkspace(workspace);
 					// Scan for existing worktrees
 					await scanWorktrees(workspace.id);
+
+					// Restore active selection
+					const activeSelection = (await window.ipcRenderer.invoke(
+						"workspace-get-active-selection",
+					)) as {
+						worktreeId: string | null;
+						tabGroupId: string | null;
+						tabId: string | null;
+					};
+
+					if (activeSelection.worktreeId && activeSelection.tabGroupId) {
+						setSelectedWorktreeId(activeSelection.worktreeId);
+						setSelectedTabGroupId(activeSelection.tabGroupId);
+						setSelectedTabId(activeSelection.tabId);
+					}
 				}
 			} catch (err) {
 				setError(err instanceof Error ? err.message : String(err));
@@ -169,10 +214,12 @@ export function MainScreen() {
 					<Sidebar
 						workspaces={workspaces}
 						currentWorkspace={currentWorkspace}
-						onScreenSelect={handleScreenSelect}
+						onTabSelect={handleTabSelect}
+						onTabGroupSelect={handleTabGroupSelect}
 						onWorktreeCreated={handleWorktreeCreated}
 						onWorkspaceSelect={handleWorkspaceSelect}
-						selectedScreenId={selectedScreenId ?? undefined}
+						selectedTabId={selectedTabId ?? undefined}
+						selectedTabGroupId={selectedTabGroupId ?? undefined}
 						onCollapse={() => setIsSidebarOpen(false)}
 					/>
 				)}
@@ -212,11 +259,9 @@ export function MainScreen() {
 							</div>
 						)}
 
-						{!loading && !error && currentWorkspace && !selectedScreen && (
+						{!loading && !error && currentWorkspace && !selectedTabGroup && (
 							<div className="flex flex-col items-center justify-center h-full text-neutral-400 bg-neutral-950/40 backdrop-blur-xl rounded-2xl">
-								<p className="mb-4">
-									Select a worktree and screen to view terminals
-								</p>
+								<p className="mb-4">Select a worktree and tab to view terminals</p>
 								<p className="text-sm text-neutral-500">
 									Create a worktree from the sidebar to get started
 								</p>
@@ -225,17 +270,16 @@ export function MainScreen() {
 
 						{!loading &&
 							!error &&
-							selectedScreen &&
+							selectedTabGroup &&
 							selectedWorktree &&
 							currentWorkspace && (
 								<TerminalLayout
-									layout={selectedScreen.layout}
+									tabGroup={selectedTabGroup}
 									workingDirectory={
 										selectedWorktree.path || currentWorkspace.repoPath
 									}
 									workspaceId={currentWorkspace.id}
 									worktreeId={selectedWorktreeId ?? undefined}
-									screenId={selectedScreenId ?? undefined}
 								/>
 							)}
 					</div>

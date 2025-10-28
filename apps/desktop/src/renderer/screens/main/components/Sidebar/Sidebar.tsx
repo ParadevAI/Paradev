@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Workspace } from "shared/types";
 import {
 	SidebarHeader,
@@ -12,20 +12,24 @@ interface SidebarProps {
 	workspaces: Workspace[];
 	currentWorkspace: Workspace | null;
 	onCollapse: () => void;
-	onScreenSelect: (worktreeId: string, screenId: string) => void;
+	onTabSelect: (worktreeId: string, tabGroupId: string, tabId: string) => void;
+	onTabGroupSelect: (worktreeId: string, tabGroupId: string) => void;
 	onWorktreeCreated?: () => void;
 	onWorkspaceSelect: (workspaceId: string) => void;
-	selectedScreenId?: string;
+	selectedTabId?: string;
+	selectedTabGroupId?: string;
 }
 
 export function Sidebar({
 	workspaces,
 	currentWorkspace,
 	onCollapse,
-	onScreenSelect,
+	onTabSelect,
+	onTabGroupSelect,
 	onWorktreeCreated,
 	onWorkspaceSelect,
-	selectedScreenId,
+	selectedTabId,
+	selectedTabGroupId,
 }: SidebarProps) {
 	const [expandedWorktrees, setExpandedWorktrees] = useState<Set<string>>(
 		new Set(),
@@ -34,6 +38,25 @@ export function Sidebar({
 	const [isScanningWorktrees, setIsScanningWorktrees] = useState(false);
 	const [showWorktreeModal, setShowWorktreeModal] = useState(false);
 	const [branchName, setBranchName] = useState("");
+
+	// Auto-expand worktree if it contains the selected tab group
+	useEffect(() => {
+		if (currentWorkspace && selectedTabGroupId) {
+			// Find which worktree contains the selected tab group
+			const worktreeWithSelectedTabGroup = currentWorkspace.worktrees?.find(
+				(worktree) =>
+					worktree.tabGroups?.some((tg) => tg.id === selectedTabGroupId),
+			);
+
+			if (worktreeWithSelectedTabGroup) {
+				setExpandedWorktrees((prev) => {
+					const next = new Set(prev);
+					next.add(worktreeWithSelectedTabGroup.id);
+					return next;
+				});
+			}
+		}
+	}, [currentWorkspace, selectedTabGroupId]);
 
 	const toggleWorktree = (worktreeId: string) => {
 		setExpandedWorktrees((prev) => {
@@ -174,8 +197,10 @@ export function Sidebar({
 					currentWorkspace={currentWorkspace}
 					expandedWorktrees={expandedWorktrees}
 					onToggleWorktree={toggleWorktree}
-					onScreenSelect={onScreenSelect}
-					selectedScreenId={selectedScreenId}
+					onTabSelect={onTabSelect}
+					onTabGroupSelect={onTabGroupSelect}
+					selectedTabId={selectedTabId}
+					selectedTabGroupId={selectedTabGroupId}
 				/>
 
 				{currentWorkspace && (

@@ -1,12 +1,14 @@
 import { BrowserWindow, dialog, ipcMain } from "electron";
 
 import type {
-	CreateScreenInput,
+	CreateTabGroupInput,
+	CreateTabInput,
 	CreateWorkspaceInput,
 	CreateWorktreeInput,
 	UpdateWorkspaceInput,
 } from "shared/types";
 
+import configManager from "./config-manager";
 import workspaceManager from "./workspace-manager";
 
 export function registerWorkspaceIPCs() {
@@ -123,9 +125,17 @@ export function registerWorkspaceIPCs() {
 		},
 	);
 
-	// Create screen
-	ipcMain.handle("screen-create", async (_event, input: CreateScreenInput) => {
-		return await workspaceManager.createScreen(input);
+	// Create tab group
+	ipcMain.handle(
+		"tab-group-create",
+		async (_event, input: CreateTabGroupInput) => {
+			return await workspaceManager.createTabGroup(input);
+		},
+	);
+
+	// Create tab
+	ipcMain.handle("tab-create", async (_event, input: CreateTabInput) => {
+		return await workspaceManager.createTab(input);
 	});
 
 	// Scan and import existing worktrees
@@ -133,6 +143,24 @@ export function registerWorkspaceIPCs() {
 		"workspace-scan-worktrees",
 		async (_event, workspaceId: string) => {
 			return await workspaceManager.scanAndImportWorktrees(workspaceId);
+		},
+	);
+
+	// Get active selection
+	ipcMain.handle("workspace-get-active-selection", async () => {
+		return configManager.getActiveSelection();
+	});
+
+	// Set active selection
+	ipcMain.handle(
+		"workspace-set-active-selection",
+		async (
+			_event,
+			worktreeId: string | null,
+			tabGroupId: string | null,
+			tabId: string | null,
+		) => {
+			return configManager.setActiveSelection(worktreeId, tabGroupId, tabId);
 		},
 	);
 }
