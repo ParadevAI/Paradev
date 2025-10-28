@@ -8,7 +8,10 @@ export function registerTerminalIPCs(mainWindow: BrowserWindow) {
 	// Create terminal
 	ipcMain.handle(
 		"terminal-create",
-		async (_event, options: { cols?: number; rows?: number; cwd?: string }) => {
+		async (
+			_event,
+			options: { id?: string; cols?: number; rows?: number; cwd?: string },
+		) => {
 			return await terminalManager.create(options);
 		},
 	);

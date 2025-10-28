@@ -27,12 +27,20 @@ class TerminalManager {
 	}
 
 	async create(options?: {
+		id?: string;
 		cwd?: string;
 		cols?: number;
 		rows?: number;
 	}): Promise<string> {
 		try {
-			const id = randomUUID();
+			// Use provided id (stable tab.id) or generate a new one
+			const id = options?.id || randomUUID();
+
+			// If terminal with this ID already exists, return the existing ID
+			if (this.processes.has(id)) {
+				console.log(`[TerminalManager] Terminal ${id} already exists, reusing`);
+				return id;
+			}
 			// Use user's configured shell from environment
 			const shell =
 				os.platform() === "win32"

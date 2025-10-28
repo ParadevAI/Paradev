@@ -28,7 +28,8 @@ function TerminalInstance({
 	tabGroupId,
 	onTabFocus,
 }: TerminalInstanceProps) {
-	const [terminalId, setTerminalId] = useState<string | null>(null);
+	// Use the stable tab.id as the terminal ID
+	const terminalId = tab.id;
 	const terminalCreatedRef = useRef(false);
 
 	useEffect(() => {
@@ -37,7 +38,7 @@ function TerminalInstance({
 			return;
 		}
 
-		// Create terminal instance
+		// Create terminal instance with the tab.id as the terminal ID
 		const createTerminal = async () => {
 			try {
 				// Use saved CWD if available, otherwise use workingDirectory
@@ -54,16 +55,17 @@ function TerminalInstance({
 
 				terminalCreatedRef.current = true;
 
-				const id = (await window.ipcRenderer.invoke("terminal-create", {
+				// Pass the stable tab.id as the terminal ID
+				await window.ipcRenderer.invoke("terminal-create", {
+					id: tab.id, // Use tab.id as the stable terminal identifier
 					cwd: initialCwd,
-				})) as string;
-				setTerminalId(id);
+				});
 
 				// Execute startup command if specified
-				if (tab.command && id) {
+				if (tab.command) {
 					setTimeout(() => {
 						window.ipcRenderer.invoke("terminal-execute-command", {
-							id,
+							id: tab.id,
 							command: tab.command,
 						});
 					}, 500); // Small delay to ensure terminal is ready
@@ -75,13 +77,13 @@ function TerminalInstance({
 
 		createTerminal();
 
-		// Cleanup
+		// Cleanup - only kill terminal when component truly unmounts
 		return () => {
-			if (terminalId) {
-				window.ipcRenderer.invoke("terminal-kill", terminalId);
-			}
+			// Reset the ref so it can be recreated if mounted again
+			terminalCreatedRef.current = false;
+			window.ipcRenderer.invoke("terminal-kill", tab.id);
 		};
-	}, [workingDirectory, tab.command, tab.cwd, tab.id]);
+	}, [tab.id]);
 
 	// Listen for CWD changes from the main process
 	useEffect(() => {
@@ -131,9 +133,6 @@ export default function ScreenLayout({
 	selectedTabId,
 	onTabFocus,
 }: ScreenLayoutProps) {
-	const [, forceUpdate] = useState({});
-	const prevTabOrderRef = useRef<string>("");
-
 	// Safety check: ensure tabGroup has tabs
 	if (!tabGroup || !tabGroup.tabs || !Array.isArray(tabGroup.tabs)) {
 		return (
@@ -148,26 +147,8 @@ export default function ScreenLayout({
 		);
 	}
 
-	// Create a unique key that changes when tabs are reordered
-	const tabOrderKey = tabGroup.tabs
-		.map((t) => `${t.id}:${t.row}:${t.col}`)
-		.join("|");
-
-	// Force re-render when order changes
-	useEffect(() => {
-		if (prevTabOrderRef.current !== tabOrderKey && prevTabOrderRef.current !== "") {
-			// Order has changed, force update after a brief delay
-			const timer = setTimeout(() => {
-				forceUpdate({});
-			}, 50);
-			return () => clearTimeout(timer);
-		}
-		prevTabOrderRef.current = tabOrderKey;
-	}, [tabOrderKey]);
-
 	return (
 		<div
-			key={tabOrderKey}
 			className="w-full h-full gap-1 p-1"
 			style={{
 				display: "grid",
