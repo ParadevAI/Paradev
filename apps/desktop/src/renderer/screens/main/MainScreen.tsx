@@ -63,6 +63,20 @@ export function MainScreen() {
 		);
 	};
 
+	const handleTabFocus = (tabId: string) => {
+		// When a terminal gets focus, find its worktree and tab group
+		if (!currentWorkspace || !selectedWorktreeId || !selectedTabGroupId) return;
+
+		setSelectedTabId(tabId);
+		// Save active selection
+		window.ipcRenderer.invoke(
+			"workspace-set-active-selection",
+			selectedWorktreeId,
+			selectedTabGroupId,
+			tabId,
+		);
+	};
+
 	const handleWorkspaceSelect = async (workspaceId: string) => {
 		try {
 			const workspace = (await window.ipcRenderer.invoke(
@@ -280,6 +294,8 @@ export function MainScreen() {
 									}
 									workspaceId={currentWorkspace.id}
 									worktreeId={selectedWorktreeId ?? undefined}
+									selectedTabId={selectedTabId ?? undefined}
+									onTabFocus={handleTabFocus}
 								/>
 							)}
 					</div>

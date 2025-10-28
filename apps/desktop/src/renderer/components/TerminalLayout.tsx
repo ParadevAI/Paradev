@@ -7,6 +7,8 @@ interface TerminalLayoutProps {
 	workingDirectory: string;
 	workspaceId?: string;
 	worktreeId?: string;
+	selectedTabId?: string;
+	onTabFocus: (tabId: string) => void;
 }
 
 interface TerminalInstanceProps {
@@ -15,6 +17,7 @@ interface TerminalInstanceProps {
 	workspaceId?: string;
 	worktreeId?: string;
 	tabGroupId: string;
+	onTabFocus: (tabId: string) => void;
 }
 
 function TerminalInstance({
@@ -23,6 +26,7 @@ function TerminalInstance({
 	workspaceId,
 	worktreeId,
 	tabGroupId,
+	onTabFocus,
 }: TerminalInstanceProps) {
 	const [terminalId, setTerminalId] = useState<string | null>(null);
 	const terminalCreatedRef = useRef(false);
@@ -108,9 +112,13 @@ function TerminalInstance({
 		};
 	}, [terminalId, tab.id, workspaceId, worktreeId, tabGroupId]);
 
+	const handleFocus = () => {
+		onTabFocus(tab.id);
+	};
+
 	return (
 		<div className="w-full h-full">
-			<Terminal terminalId={terminalId} />
+			<Terminal terminalId={terminalId} onFocus={handleFocus} />
 		</div>
 	);
 }
@@ -120,6 +128,8 @@ export default function TerminalLayout({
 	workingDirectory,
 	workspaceId,
 	worktreeId,
+	selectedTabId,
+	onTabFocus,
 }: TerminalLayoutProps) {
 	// Safety check: ensure tabGroup has tabs
 	if (!tabGroup || !tabGroup.tabs || !Array.isArray(tabGroup.tabs)) {
@@ -144,24 +154,32 @@ export default function TerminalLayout({
 				gridTemplateColumns: `repeat(${tabGroup.cols}, 1fr)`,
 			}}
 		>
-			{tabGroup.tabs.map((tab) => (
-				<div
-					key={tab.id}
-					className="overflow-hidden rounded border border-neutral-800"
-					style={{
-						gridRow: `${tab.row + 1} / span ${tab.rowSpan || 1}`,
-						gridColumn: `${tab.col + 1} / span ${tab.colSpan || 1}`,
-					}}
-				>
-					<TerminalInstance
-						tab={tab}
-						workingDirectory={workingDirectory}
-						workspaceId={workspaceId}
-						worktreeId={worktreeId}
-						tabGroupId={tabGroup.id}
-					/>
-				</div>
-			))}
+			{tabGroup.tabs.map((tab) => {
+				const isActive = selectedTabId === tab.id;
+				return (
+					<div
+						key={tab.id}
+						className={`overflow-hidden rounded border ${
+							isActive
+								? "border-blue-500 ring-2 ring-blue-500/50"
+								: "border-neutral-800"
+						}`}
+						style={{
+							gridRow: `${tab.row + 1} / span ${tab.rowSpan || 1}`,
+							gridColumn: `${tab.col + 1} / span ${tab.colSpan || 1}`,
+						}}
+					>
+						<TerminalInstance
+							tab={tab}
+							workingDirectory={workingDirectory}
+							workspaceId={workspaceId}
+							worktreeId={worktreeId}
+							tabGroupId={tabGroup.id}
+							onTabFocus={onTabFocus}
+						/>
+					</div>
+				);
+			})}
 		</div>
 	);
 }

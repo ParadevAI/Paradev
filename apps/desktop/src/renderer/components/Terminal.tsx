@@ -10,6 +10,7 @@ interface TerminalProps {
 	terminalId?: string | null;
 	hidden?: boolean;
 	className?: string;
+	onFocus?: () => void;
 }
 
 interface TerminalMessage {
@@ -69,11 +70,18 @@ export default function TerminalComponent({
 	terminalId,
 	hidden = false,
 	className = "",
+	onFocus,
 }: TerminalProps) {
 	const terminalRef = useRef<HTMLDivElement>(null);
 	const [terminal, setTerminal] = useState<XTerm | null>(null);
 	const [theme] = useState<"light" | "dark">("dark"); // Can be connected to theme provider later
 	const terminalIdRef = useRef<string | null>(null);
+	const onFocusRef = useRef(onFocus);
+
+	// Update the ref when onFocus changes
+	useEffect(() => {
+		onFocusRef.current = onFocus;
+	}, [onFocus]);
 
 	useEffect(() => {
 		if (terminal) {
@@ -90,6 +98,7 @@ export default function TerminalComponent({
 		const { term, terminalDataListener, cleanup } = initTerminal(
 			terminalRef.current,
 			theme,
+			onFocusRef,
 		);
 		setTerminal(term);
 
@@ -103,6 +112,7 @@ export default function TerminalComponent({
 	function initTerminal(
 		container: HTMLDivElement,
 		currentTheme: "light" | "dark",
+		focusCallbackRef: React.MutableRefObject<(() => void) | undefined>,
 	) {
 		const term = new XTerm({
 			cursorBlink: true,
@@ -247,6 +257,19 @@ export default function TerminalComponent({
 
 		window.ipcRenderer.on("terminal-on-data", terminalDataListener);
 
+		// Handle terminal focus to make it the active tab
+		// XTerm doesn't have onFocus, but we can listen to the textarea element
+		const textarea = term.textarea;
+		const handleFocus = () => {
+			if (focusCallbackRef.current) {
+				focusCallbackRef.current();
+			}
+		};
+
+		if (textarea) {
+			textarea.addEventListener("focus", handleFocus);
+		}
+
 		const cleanup = () => {
 			isDisposed = true;
 
@@ -258,6 +281,11 @@ export default function TerminalComponent({
 
 			// Disconnect resize observer
 			resizeObserver.disconnect();
+
+			// Remove focus listener
+			if (textarea) {
+				textarea.removeEventListener("focus", handleFocus);
+			}
 
 			window.ipcRenderer.off("terminal-on-data", terminalDataListener);
 			window.removeEventListener("resize", handleResize);
