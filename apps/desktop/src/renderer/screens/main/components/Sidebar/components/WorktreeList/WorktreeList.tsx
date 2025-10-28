@@ -7,6 +7,7 @@ interface WorktreeListProps {
 	onToggleWorktree: (worktreeId: string) => void;
 	onTabSelect: (worktreeId: string, tabGroupId: string, tabId: string) => void;
 	onTabGroupSelect: (worktreeId: string, tabGroupId: string) => void;
+	onReload: () => void;
 	selectedTabId?: string;
 	selectedTabGroupId?: string;
 }
@@ -17,6 +18,7 @@ export function WorktreeList({
 	onToggleWorktree,
 	onTabSelect,
 	onTabGroupSelect,
+	onReload,
 	selectedTabId,
 	selectedTabGroupId,
 }: WorktreeListProps) {
@@ -42,10 +44,12 @@ export function WorktreeList({
 				<WorktreeItem
 					key={worktree.id}
 					worktree={worktree}
+					workspaceId={currentWorkspace.id}
 					isExpanded={expandedWorktrees.has(worktree.id)}
 					onToggle={onToggleWorktree}
 					onTabSelect={onTabSelect}
 					onTabGroupSelect={onTabGroupSelect}
+					onReload={onReload}
 					selectedTabId={selectedTabId}
 					selectedTabGroupId={selectedTabGroupId}
 				/>

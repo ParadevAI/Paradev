@@ -163,4 +163,63 @@ export function registerWorkspaceIPCs() {
 			return configManager.setActiveSelection(worktreeId, tabGroupId, tabId);
 		},
 	);
+
+	// Reorder tabs within a tab group
+	ipcMain.handle(
+		"tab-reorder",
+		async (
+			_event,
+			workspaceId: string,
+			worktreeId: string,
+			tabGroupId: string,
+			tabIds: string[],
+		) => {
+			return await workspaceManager.reorderTabs(
+				workspaceId,
+				worktreeId,
+				tabGroupId,
+				tabIds,
+			);
+		},
+	);
+
+	// Reorder tab groups within a worktree
+	ipcMain.handle(
+		"tab-group-reorder",
+		async (
+			_event,
+			workspaceId: string,
+			worktreeId: string,
+			tabGroupIds: string[],
+		) => {
+			return await workspaceManager.reorderTabGroups(
+				workspaceId,
+				worktreeId,
+				tabGroupIds,
+			);
+		},
+	);
+
+	// Move tab to another tab group
+	ipcMain.handle(
+		"tab-move-to-group",
+		async (
+			_event,
+			workspaceId: string,
+			worktreeId: string,
+			tabId: string,
+			sourceTabGroupId: string,
+			targetTabGroupId: string,
+			targetIndex: number,
+		) => {
+			return await workspaceManager.moveTabToGroup(
+				workspaceId,
+				worktreeId,
+				tabId,
+				sourceTabGroupId,
+				targetTabGroupId,
+				targetIndex,
+			);
+		},
+	);
 }

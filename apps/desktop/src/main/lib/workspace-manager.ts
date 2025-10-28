@@ -560,6 +560,176 @@ class WorkspaceManager {
 			};
 		}
 	}
+
+	/**
+	 * Reorder tabs within a tab group
+	 */
+	async reorderTabs(
+		workspaceId: string,
+		worktreeId: string,
+		tabGroupId: string,
+		tabIds: string[],
+	): Promise<{ success: boolean; error?: string }> {
+		try {
+			const config = configManager.read();
+			const workspace = config.workspaces.find((ws) => ws.id === workspaceId);
+			if (!workspace) {
+				return { success: false, error: "Workspace not found" };
+			}
+
+			const worktree = workspace.worktrees.find((wt) => wt.id === worktreeId);
+			if (!worktree) {
+				return { success: false, error: "Worktree not found" };
+			}
+
+			const tabGroup = worktree.tabGroups.find((tg) => tg.id === tabGroupId);
+			if (!tabGroup) {
+				return { success: false, error: "Tab group not found" };
+			}
+
+			// Reorder tabs based on tabIds array
+			const reorderedTabs = tabIds
+				.map((id) => tabGroup.tabs.find((t) => t.id === id))
+				.filter((t): t is Tab => t !== undefined);
+
+			// Verify all tabs are accounted for
+			if (reorderedTabs.length !== tabGroup.tabs.length) {
+				return { success: false, error: "Invalid tab order" };
+			}
+
+			tabGroup.tabs = reorderedTabs;
+			workspace.updatedAt = new Date().toISOString();
+
+			// Save to config
+			const index = config.workspaces.findIndex((ws) => ws.id === workspaceId);
+			if (index !== -1) {
+				config.workspaces[index] = workspace;
+				configManager.write(config);
+			}
+
+			return { success: true };
+		} catch (error) {
+			console.error("Failed to reorder tabs:", error);
+			return {
+				success: false,
+				error: error instanceof Error ? error.message : String(error),
+			};
+		}
+	}
+
+	/**
+	 * Reorder tab groups within a worktree
+	 */
+	async reorderTabGroups(
+		workspaceId: string,
+		worktreeId: string,
+		tabGroupIds: string[],
+	): Promise<{ success: boolean; error?: string }> {
+		try {
+			const config = configManager.read();
+			const workspace = config.workspaces.find((ws) => ws.id === workspaceId);
+			if (!workspace) {
+				return { success: false, error: "Workspace not found" };
+			}
+
+			const worktree = workspace.worktrees.find((wt) => wt.id === worktreeId);
+			if (!worktree) {
+				return { success: false, error: "Worktree not found" };
+			}
+
+			// Reorder tab groups based on tabGroupIds array
+			const reorderedTabGroups = tabGroupIds
+				.map((id) => worktree.tabGroups.find((tg) => tg.id === id))
+				.filter((tg): tg is TabGroup => tg !== undefined);
+
+			// Verify all tab groups are accounted for
+			if (reorderedTabGroups.length !== worktree.tabGroups.length) {
+				return { success: false, error: "Invalid tab group order" };
+			}
+
+			worktree.tabGroups = reorderedTabGroups;
+			workspace.updatedAt = new Date().toISOString();
+
+			// Save to config
+			const index = config.workspaces.findIndex((ws) => ws.id === workspaceId);
+			if (index !== -1) {
+				config.workspaces[index] = workspace;
+				configManager.write(config);
+			}
+
+			return { success: true };
+		} catch (error) {
+			console.error("Failed to reorder tab groups:", error);
+			return {
+				success: false,
+				error: error instanceof Error ? error.message : String(error),
+			};
+		}
+	}
+
+	/**
+	 * Move a tab from one tab group to another
+	 */
+	async moveTabToGroup(
+		workspaceId: string,
+		worktreeId: string,
+		tabId: string,
+		sourceTabGroupId: string,
+		targetTabGroupId: string,
+		targetIndex: number,
+	): Promise<{ success: boolean; error?: string }> {
+		try {
+			const config = configManager.read();
+			const workspace = config.workspaces.find((ws) => ws.id === workspaceId);
+			if (!workspace) {
+				return { success: false, error: "Workspace not found" };
+			}
+
+			const worktree = workspace.worktrees.find((wt) => wt.id === worktreeId);
+			if (!worktree) {
+				return { success: false, error: "Worktree not found" };
+			}
+
+			const sourceTabGroup = worktree.tabGroups.find(
+				(tg) => tg.id === sourceTabGroupId,
+			);
+			const targetTabGroup = worktree.tabGroups.find(
+				(tg) => tg.id === targetTabGroupId,
+			);
+
+			if (!sourceTabGroup || !targetTabGroup) {
+				return { success: false, error: "Tab group not found" };
+			}
+
+			// Find and remove tab from source group
+			const tabIndex = sourceTabGroup.tabs.findIndex((t) => t.id === tabId);
+			if (tabIndex === -1) {
+				return { success: false, error: "Tab not found in source group" };
+			}
+
+			const [tab] = sourceTabGroup.tabs.splice(tabIndex, 1);
+
+			// Insert tab into target group at specified index
+			targetTabGroup.tabs.splice(targetIndex, 0, tab);
+
+			workspace.updatedAt = new Date().toISOString();
+
+			// Save to config
+			const index = config.workspaces.findIndex((ws) => ws.id === workspaceId);
+			if (index !== -1) {
+				config.workspaces[index] = workspace;
+				configManager.write(config);
+			}
+
+			return { success: true };
+		} catch (error) {
+			console.error("Failed to move tab to group:", error);
+			return {
+				success: false,
+				error: error instanceof Error ? error.message : String(error),
+			};
+		}
+	}
 }
 
 export default WorkspaceManager.getInstance();
