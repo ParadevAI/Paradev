@@ -107,8 +107,11 @@ export function registerWorkspaceIPCs() {
 	// Delete workspace
 	ipcMain.handle(
 		"workspace-delete",
-		async (_event, id: string, removeWorktree = false) => {
-			return await workspaceManager.delete(id, removeWorktree);
+		async (_event, input: { id: string; removeWorktree?: boolean }) => {
+			return await workspaceManager.delete(
+				input.id,
+				input.removeWorktree ?? false,
+			);
 		},
 	);
 
@@ -156,11 +159,17 @@ export function registerWorkspaceIPCs() {
 		"workspace-set-active-selection",
 		async (
 			_event,
-			worktreeId: string | null,
-			tabGroupId: string | null,
-			tabId: string | null,
+			input: {
+				worktreeId: string | null;
+				tabGroupId: string | null;
+				tabId: string | null;
+			},
 		) => {
-			return configManager.setActiveSelection(worktreeId, tabGroupId, tabId);
+			return configManager.setActiveSelection(
+				input.worktreeId,
+				input.tabGroupId,
+				input.tabId,
+			);
 		},
 	);
 
@@ -169,16 +178,18 @@ export function registerWorkspaceIPCs() {
 		"tab-reorder",
 		async (
 			_event,
-			workspaceId: string,
-			worktreeId: string,
-			tabGroupId: string,
-			tabIds: string[],
+			input: {
+				workspaceId: string;
+				worktreeId: string;
+				tabGroupId: string;
+				tabIds: string[];
+			},
 		) => {
 			return await workspaceManager.reorderTabs(
-				workspaceId,
-				worktreeId,
-				tabGroupId,
-				tabIds,
+				input.workspaceId,
+				input.worktreeId,
+				input.tabGroupId,
+				input.tabIds,
 			);
 		},
 	);
@@ -188,14 +199,16 @@ export function registerWorkspaceIPCs() {
 		"tab-group-reorder",
 		async (
 			_event,
-			workspaceId: string,
-			worktreeId: string,
-			tabGroupIds: string[],
+			input: {
+				workspaceId: string;
+				worktreeId: string;
+				tabGroupIds: string[];
+			},
 		) => {
 			return await workspaceManager.reorderTabGroups(
-				workspaceId,
-				worktreeId,
-				tabGroupIds,
+				input.workspaceId,
+				input.worktreeId,
+				input.tabGroupIds,
 			);
 		},
 	);
@@ -205,20 +218,45 @@ export function registerWorkspaceIPCs() {
 		"tab-move-to-group",
 		async (
 			_event,
-			workspaceId: string,
-			worktreeId: string,
-			tabId: string,
-			sourceTabGroupId: string,
-			targetTabGroupId: string,
-			targetIndex: number,
+			input: {
+				workspaceId: string;
+				worktreeId: string;
+				tabId: string;
+				sourceTabGroupId: string;
+				targetTabGroupId: string;
+				targetIndex: number;
+			},
 		) => {
 			return await workspaceManager.moveTabToGroup(
-				workspaceId,
-				worktreeId,
-				tabId,
-				sourceTabGroupId,
-				targetTabGroupId,
-				targetIndex,
+				input.workspaceId,
+				input.worktreeId,
+				input.tabId,
+				input.sourceTabGroupId,
+				input.targetTabGroupId,
+				input.targetIndex,
+			);
+		},
+	);
+
+	// Update terminal CWD in workspace config
+	ipcMain.handle(
+		"workspace-update-terminal-cwd",
+		async (
+			_event,
+			input: {
+				workspaceId: string;
+				worktreeId: string;
+				tabGroupId: string;
+				tabId: string;
+				cwd: string;
+			},
+		) => {
+			return workspaceManager.updateTerminalCwd(
+				input.workspaceId,
+				input.worktreeId,
+				input.tabGroupId,
+				input.tabId,
+				input.cwd,
 			);
 		},
 	);

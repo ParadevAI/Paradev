@@ -89,11 +89,12 @@ export function Sidebar({
 		setIsCreatingWorktree(true);
 
 		try {
-			const result = (await window.ipcRenderer.invoke("worktree-create", {
+			// Type-safe IPC call - no need for type assertion!
+			const result = await window.ipcRenderer.invoke("worktree-create", {
 				workspaceId: currentWorkspace.id,
 				branch: branchName.trim(),
 				createBranch: true,
-			})) as { success: boolean; error?: string };
+			});
 
 			if (result.success) {
 				console.log("[Sidebar] Worktree created successfully");
@@ -134,11 +135,10 @@ export function Sidebar({
 		if (!confirmed) return;
 
 		try {
-			const result = await window.ipcRenderer.invoke(
-				"workspace-delete",
-				workspaceId,
-				false,
-			);
+			const result = await window.ipcRenderer.invoke("workspace-delete", {
+				id: workspaceId,
+				removeWorktree: false,
+			});
 			if (result.success) {
 				// If we deleted the current workspace, clear selection
 				if (currentWorkspace?.id === workspaceId) {

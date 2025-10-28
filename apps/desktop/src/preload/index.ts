@@ -1,4 +1,9 @@
 import { contextBridge, ipcRenderer } from "electron";
+import type {
+	IpcChannelName,
+	IpcRequest,
+	IpcResponse_,
+} from "shared/ipc-channels";
 
 declare global {
 	interface Window {
@@ -15,10 +20,31 @@ const API = {
 // Store mapping of user listeners to wrapped listeners for proper cleanup
 const listenerMap = new WeakMap<Function, Function>();
 
+/**
+ * Type-safe IPC renderer API
+ */
 const ipcRendererAPI = {
-	invoke: (channel: string, ...args: any[]) =>
+	/**
+	 * Type-safe invoke method for IPC calls
+	 * @example
+	 * const workspace = await window.ipcRenderer.invoke("workspace-get", workspaceId);
+	 */
+	invoke: <T extends IpcChannelName>(
+		channel: T,
+		...args: IpcRequest<T> extends void ? [] : [IpcRequest<T>]
+	): Promise<IpcResponse_<T>> => {
+		return ipcRenderer.invoke(channel, ...args);
+	},
+
+	/**
+	 * Legacy untyped invoke for backwards compatibility
+	 * @deprecated Use typed invoke instead
+	 */
+	invokeUntyped: (channel: string, ...args: any[]) =>
 		ipcRenderer.invoke(channel, ...args),
+
 	send: (channel: string, ...args: any[]) => ipcRenderer.send(channel, ...args),
+
 	on: (channel: string, listener: (...args: any[]) => void) => {
 		const wrappedListener = (_event: any, ...args: any[]) => {
 			listener(...args);
@@ -26,10 +52,11 @@ const ipcRendererAPI = {
 		listenerMap.set(listener, wrappedListener);
 		ipcRenderer.on(channel, wrappedListener);
 	},
+
 	off: (channel: string, listener: (...args: any[]) => void) => {
 		const wrappedListener = listenerMap.get(listener);
 		if (wrappedListener) {
-			ipcRenderer.removeListener(channel, wrappedListener);
+			ipcRenderer.removeListener(channel, wrappedListener as any);
 			listenerMap.delete(listener);
 		}
 	},

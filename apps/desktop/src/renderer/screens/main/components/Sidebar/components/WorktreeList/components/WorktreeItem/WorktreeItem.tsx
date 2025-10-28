@@ -282,13 +282,12 @@ export function WorktreeItem({
 
 				// Save to backend
 				const newOrder = reorderedTabs.map((t) => t.id);
-				const result = await window.ipcRenderer.invoke(
-					"tab-reorder",
+				const result = await window.ipcRenderer.invoke("tab-reorder", {
 					workspaceId,
-					worktree.id,
-					activeData.tabGroupId,
-					newOrder,
-				);
+					worktreeId: worktree.id,
+					tabGroupId: activeData.tabGroupId,
+					tabIds: newOrder,
+				});
 
 				if (!result.success) {
 					console.error("Failed to reorder tabs:", result.error);
@@ -344,15 +343,14 @@ export function WorktreeItem({
 				onUpdateWorktree(updatedWorktree);
 
 				// Save to backend
-				const result = await window.ipcRenderer.invoke(
-					"tab-move-to-group",
+				const result = await window.ipcRenderer.invoke("tab-move-to-group", {
 					workspaceId,
-					worktree.id,
-					active.id as string,
-					activeData.tabGroupId,
-					over.id as string,
-					targetTabGroup.tabs.length,
-				);
+					worktreeId: worktree.id,
+					tabId: active.id as string,
+					sourceTabGroupId: activeData.tabGroupId,
+					targetTabGroupId: over.id as string,
+					targetIndex: targetTabGroup.tabs.length,
+				});
 
 				if (!result.success) {
 					console.error("Failed to move tab:", result.error);
@@ -410,15 +408,14 @@ export function WorktreeItem({
 				onUpdateWorktree(updatedWorktree);
 
 				// Save to backend
-				const result = await window.ipcRenderer.invoke(
-					"tab-move-to-group",
+				const result = await window.ipcRenderer.invoke("tab-move-to-group", {
 					workspaceId,
-					worktree.id,
-					active.id as string,
-					activeData.tabGroupId,
-					overData.tabGroupId,
+					worktreeId: worktree.id,
+					tabId: active.id as string,
+					sourceTabGroupId: activeData.tabGroupId,
+					targetTabGroupId: overData.tabGroupId,
 					targetIndex,
-				);
+				});
 
 				if (!result.success) {
 					console.error("Failed to move tab:", result.error);

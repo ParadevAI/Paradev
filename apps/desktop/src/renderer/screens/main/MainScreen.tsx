@@ -41,12 +41,11 @@ export function MainScreen() {
 		setSelectedTabGroupId(tabGroupId);
 		setSelectedTabId(tabId);
 		// Save active selection
-		window.ipcRenderer.invoke(
-			"workspace-set-active-selection",
+		window.ipcRenderer.invoke("workspace-set-active-selection", {
 			worktreeId,
 			tabGroupId,
 			tabId,
-		);
+		});
 	};
 
 	const handleTabGroupSelect = (worktreeId: string, tabGroupId: string) => {
@@ -55,12 +54,11 @@ export function MainScreen() {
 		// Clear individual tab selection when selecting a tab group
 		setSelectedTabId(null);
 		// Save active selection
-		window.ipcRenderer.invoke(
-			"workspace-set-active-selection",
+		window.ipcRenderer.invoke("workspace-set-active-selection", {
 			worktreeId,
 			tabGroupId,
-			null,
-		);
+			tabId: null,
+		});
 	};
 
 	const handleTabFocus = (tabId: string) => {
@@ -69,20 +67,19 @@ export function MainScreen() {
 
 		setSelectedTabId(tabId);
 		// Save active selection
-		window.ipcRenderer.invoke(
-			"workspace-set-active-selection",
-			selectedWorktreeId,
-			selectedTabGroupId,
+		window.ipcRenderer.invoke("workspace-set-active-selection", {
+			worktreeId: selectedWorktreeId,
+			tabGroupId: selectedTabGroupId,
 			tabId,
-		);
+		});
 	};
 
 	const handleWorkspaceSelect = async (workspaceId: string) => {
 		try {
-			const workspace = (await window.ipcRenderer.invoke(
+			const workspace = await window.ipcRenderer.invoke(
 				"workspace-get",
 				workspaceId,
-			)) as Workspace | null;
+			);
 
 			if (workspace) {
 				setCurrentWorkspace(workspace);
@@ -101,10 +98,10 @@ export function MainScreen() {
 		if (!currentWorkspace) return;
 
 		try {
-			const refreshedWorkspace = (await window.ipcRenderer.invoke(
+			const refreshedWorkspace = await window.ipcRenderer.invoke(
 				"workspace-get",
 				currentWorkspace.id,
-			)) as Workspace | null;
+			);
 
 			if (refreshedWorkspace) {
 				setCurrentWorkspace(refreshedWorkspace);
@@ -132,9 +129,7 @@ export function MainScreen() {
 
 	const loadAllWorkspaces = async () => {
 		try {
-			const allWorkspaces = (await window.ipcRenderer.invoke(
-				"workspace-list",
-			)) as Workspace[];
+			const allWorkspaces = await window.ipcRenderer.invoke("workspace-list");
 
 			setWorkspaces(allWorkspaces);
 		} catch (error) {
@@ -145,18 +140,18 @@ export function MainScreen() {
 	// Scan for existing worktrees when workspace is opened
 	const scanWorktrees = async (workspaceId: string) => {
 		try {
-			const result = (await window.ipcRenderer.invoke(
+			const result = await window.ipcRenderer.invoke(
 				"workspace-scan-worktrees",
 				workspaceId,
-			)) as { success: boolean; imported?: number; error?: string };
+			);
 
-			if (result.success && result.imported && result.imported > 0) {
-				console.log("[MainScreen] Imported worktrees:", result.imported);
+			if (result.success && result.data?.imported && result.data.imported > 0) {
+				console.log("[MainScreen] Imported worktrees:", result.data.imported);
 				// Refresh workspace data
-				const refreshedWorkspace = (await window.ipcRenderer.invoke(
+				const refreshedWorkspace = await window.ipcRenderer.invoke(
 					"workspace-get",
 					workspaceId,
-				)) as Workspace | null;
+				);
 
 				if (refreshedWorkspace) {
 					setCurrentWorkspace(refreshedWorkspace);
@@ -178,9 +173,9 @@ export function MainScreen() {
 				await loadAllWorkspaces();
 
 				// Load last opened workspace
-				const workspace = (await window.ipcRenderer.invoke(
+				const workspace = await window.ipcRenderer.invoke(
 					"workspace-get-last-opened",
-				)) as Workspace | null;
+				);
 
 				if (workspace) {
 					setCurrentWorkspace(workspace);
@@ -188,13 +183,9 @@ export function MainScreen() {
 					await scanWorktrees(workspace.id);
 
 					// Restore active selection
-					const activeSelection = (await window.ipcRenderer.invoke(
+					const activeSelection = await window.ipcRenderer.invoke(
 						"workspace-get-active-selection",
-					)) as {
-						worktreeId: string | null;
-						tabGroupId: string | null;
-						tabId: string | null;
-					};
+					);
 
 					if (activeSelection.worktreeId && activeSelection.tabGroupId) {
 						setSelectedWorktreeId(activeSelection.worktreeId);
