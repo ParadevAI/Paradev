@@ -433,11 +433,13 @@ export function WorktreeItem({
             ? ` into "${targetBranch}"`
             : " into the active worktree";
 
-        if (
-            confirm(
-                `Are you sure you want to merge "${worktree.branch}"${branchText}?`,
-            )
-        ) {
+        // Build confirmation message with warning if there are uncommitted changes
+        let confirmMessage = `Are you sure you want to merge "${worktree.branch}"${branchText}?`;
+        if (canMergeResult.hasUncommittedChanges) {
+            confirmMessage += "\n\nWarning: The target worktree has uncommitted changes. The merge will proceed anyway.";
+        }
+
+        if (confirm(confirmMessage)) {
             const result = await window.ipcRenderer.invoke("worktree-merge", {
                 workspaceId,
                 worktreeId: worktree.id,

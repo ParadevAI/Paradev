@@ -100,6 +100,7 @@ export interface IpcChannels {
             canMerge: boolean;
             reason?: string;
             isActiveWorktree?: boolean;
+            hasUncommittedChanges?: boolean;
         };
     };
     "worktree-merge": {

@@ -208,6 +208,15 @@ class WorktreeManager {
 				return { canMerge: false, reason: "Branch does not exist" };
 			}
 
+			// Check if there's an ongoing merge
+			const mergeHeadPath = path.join(targetWorktreePath, ".git", "MERGE_HEAD");
+			if (existsSync(mergeHeadPath)) {
+				return {
+					canMerge: false,
+					reason: "Target worktree has unresolved merge conflicts",
+				};
+			}
+
 			// Check if there are uncommitted changes in target worktree
 			const status = execSync("git status --porcelain", {
 				cwd: targetWorktreePath,
