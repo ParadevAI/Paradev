@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { existsSync } from "node:fs";
 
 import type {
 	CreateTabGroupInput,
@@ -510,11 +511,29 @@ class WorkspaceManager {
 			// Get all git worktrees from the repository
 			const gitWorktrees = worktreeManager.listWorktrees(workspace.repoPath);
 
-			// Include all worktrees (including main repo)
-			const allWorktrees = gitWorktrees.filter((wt) => !wt.bare);
+			// Include all worktrees (including main repo) that actually exist on filesystem
+			const allWorktrees = gitWorktrees.filter(
+				(wt) => !wt.bare && existsSync(wt.path),
+			);
+
+			// Create a set of valid worktree paths for quick lookup
+			const validWorktreePaths = new Set(allWorktrees.map((wt) => wt.path));
 
 			let importedCount = 0;
+			let configChanged = false;
 			const now = new Date().toISOString();
+
+			// Remove worktrees that no longer exist (either not in git or not on filesystem)
+			const initialWorktreeCount = workspace.worktrees.length;
+			workspace.worktrees = workspace.worktrees.filter((wt) => {
+				// Remove if not in git's worktree list OR if path doesn't exist on filesystem
+				if (!validWorktreePaths.has(wt.path) || !existsSync(wt.path)) {
+					configChanged = true;
+					return false;
+				}
+				return true;
+			});
+			const removedCount = initialWorktreeCount - workspace.worktrees.length;
 
 			for (const gitWorktree of allWorktrees) {
 				// Get the actual current branch for this worktree path
@@ -532,6 +551,7 @@ class WorkspaceManager {
 					if (existingWorktree.branch !== currentBranch) {
 						existingWorktree.branch = currentBranch;
 						importedCount++;
+						configChanged = true;
 					}
 				} else {
 					// Create default tabs for 2x2 layout
@@ -558,10 +578,11 @@ class WorkspaceManager {
 
 					workspace.worktrees.push(worktree);
 					importedCount++;
+					configChanged = true;
 				}
 			}
 
-			if (importedCount > 0) {
+			if (configChanged) {
 				workspace.updatedAt = now;
 
 				// Save to config
@@ -573,6 +594,10 @@ class WorkspaceManager {
 					config.workspaces[index] = workspace;
 					configManager.write(config);
 				}
+			}
+
+			if (removedCount > 0) {
+				console.log(`Removed ${removedCount} deleted worktree(s) from config`);
 			}
 
 			return { success: true, imported: importedCount };
