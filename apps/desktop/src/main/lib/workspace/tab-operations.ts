@@ -13,6 +13,7 @@ import {
 	findParentTab,
 	findTab,
 	isValidParentTab,
+	removeTabFromMosaicTree,
 	removeTabRecursive,
 } from "./tab-helpers";
 
@@ -105,6 +106,7 @@ export async function createTab(
 
 /**
  * Delete a tab from a worktree
+ * Also removes the tab from the parent group's mosaic tree if applicable
  */
 export async function deleteTab(
 	workspace: Workspace,
@@ -121,8 +123,21 @@ export async function deleteTab(
 			return { success: false, error: "Worktree not found" };
 		}
 
+		// Find the parent tab (if this tab is inside a group)
+		const parentTab = findParentTab(worktree.tabs, input.tabId);
+
+		// Remove from the tabs array
 		if (!removeTabRecursive(worktree.tabs, input.tabId)) {
 			return { success: false, error: "Tab not found" };
+		}
+
+		// If the tab was inside a group, update the parent's mosaic tree
+		if (parentTab && parentTab.type === "group" && parentTab.mosaicTree) {
+			const updatedTree = removeTabFromMosaicTree(
+				parentTab.mosaicTree,
+				input.tabId,
+			);
+			parentTab.mosaicTree = updatedTree === null ? undefined : updatedTree;
 		}
 
 		workspace.updatedAt = new Date().toISOString();

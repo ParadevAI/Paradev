@@ -104,6 +104,22 @@ export default function ScreenLayout({
 		return null;
 	});
 
+	// Helper function to get all tab IDs from a mosaic tree
+	const getTabIdsFromTree = (tree: MosaicNode<string> | null): Set<string> => {
+		const ids = new Set<string>();
+		if (!tree) return ids;
+
+		if (typeof tree === "string") {
+			ids.add(tree);
+		} else {
+			const firstIds = getTabIdsFromTree(tree.first);
+			const secondIds = getTabIdsFromTree(tree.second);
+			firstIds.forEach((id) => ids.add(id));
+			secondIds.forEach((id) => ids.add(id));
+		}
+		return ids;
+	};
+
 	// Save mosaic tree changes to backend
 	const handleMosaicChange = useCallback(
 		async (newTree: MosaicNode<string> | null) => {
@@ -111,7 +127,24 @@ export default function ScreenLayout({
 
 			if (!worktreeId) return;
 
+			// Detect which tabs were removed from the mosaic tree
+			const oldTabIds = getTabIdsFromTree(mosaicTree);
+			const newTabIds = getTabIdsFromTree(newTree);
+			const removedTabIds = Array.from(oldTabIds).filter(
+				(id) => !newTabIds.has(id),
+			);
+
 			try {
+				// First, delete any tabs that were removed from the mosaic
+				for (const removedTabId of removedTabIds) {
+					await window.ipcRenderer.invoke("tab-delete", {
+						workspaceId,
+						worktreeId,
+						tabId: removedTabId,
+					});
+				}
+
+				// Then update the mosaic tree
 				await window.ipcRenderer.invoke("tab-update-mosaic-tree", {
 					workspaceId,
 					worktreeId,
@@ -122,7 +155,7 @@ export default function ScreenLayout({
 				console.error("Failed to save mosaic tree:", error);
 			}
 		},
-		[workspaceId, worktreeId, groupTab.id],
+		[workspaceId, worktreeId, groupTab.id, mosaicTree],
 	);
 
 	// Trigger resize on mosaic change

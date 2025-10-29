@@ -177,14 +177,6 @@ export function WorktreeItem({
 		return result;
 	};
 
-	// Helper: recalculate positions after reorder
-	const recalculatePositions = (tabs: Tab[], cols: number): Tab[] => {
-		return tabs.map((tab, index) => {
-			const row = Math.floor(index / cols);
-			const col = index % cols;
-			return { ...tab, order: index, row, col };
-		});
-	};
 
 	// Check if merge should be disabled on mount and get target branch
 	useEffect(() => {
@@ -273,7 +265,6 @@ export function WorktreeItem({
 
 				// If no parent, we're reordering top-level tabs
 				const tabsArray = parentTab?.tabs || tabs;
-				const cols = parentTab?.cols || 2;
 
 				const oldIndex = tabsArray.findIndex((t) => t.id === active.id);
 				const newIndex = tabsArray.findIndex((t) => t.id === over.id);
@@ -282,10 +273,6 @@ export function WorktreeItem({
 
 				// Optimistic update
 				const reorderedTabs = arrayMove(tabsArray, oldIndex, newIndex);
-				const tabsWithUpdatedPositions = recalculatePositions(
-					reorderedTabs,
-					cols,
-				);
 
 				// Update worktree state
 				let updatedWorktree: Worktree;
@@ -294,7 +281,7 @@ export function WorktreeItem({
 					const updateTabsRecursive = (tabs: Tab[]): Tab[] => {
 						return tabs.map((tab) => {
 							if (tab.id === parentTab.id) {
-								return { ...tab, tabs: tabsWithUpdatedPositions };
+								return { ...tab, tabs: reorderedTabs };
 							}
 							if (tab.type === "group" && tab.tabs) {
 								return { ...tab, tabs: updateTabsRecursive(tab.tabs) };
@@ -308,7 +295,7 @@ export function WorktreeItem({
 					};
 				} else {
 					// Update top-level tabs
-					updatedWorktree = { ...worktree, tabs: tabsWithUpdatedPositions };
+					updatedWorktree = { ...worktree, tabs: reorderedTabs };
 				}
 
 				onUpdateWorktree(updatedWorktree);
@@ -420,26 +407,13 @@ export function WorktreeItem({
 	const handleAddTab = async () => {
 		// Get the first top-level group tab
 		const firstGroupTab = worktree.tabs.find((t) => t.type === "group");
-		if (!firstGroupTab || !firstGroupTab.tabs) {
-			console.error("No group tab found for worktree");
-			return;
-		}
-
-		// Calculate next tab position in grid
-		const nextOrder = firstGroupTab.tabs.length;
-		const cols = firstGroupTab.cols || 2;
-		const row = Math.floor(nextOrder / cols);
-		const col = nextOrder % cols;
-
 		try {
 			const result = await window.ipcRenderer.invoke("tab-create", {
 				workspaceId,
 				worktreeId: worktree.id,
-				parentTabId: firstGroupTab.id,
-				name: `Terminal ${firstGroupTab.tabs.length + 1}`,
+				// No parentTabId - create at worktree level
+				name: `Terminal ${worktree.tabs.length + 1}`,
 				type: "terminal",
-				row,
-				col,
 			});
 
 			if (result.success) {

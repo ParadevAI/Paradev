@@ -1,4 +1,4 @@
-import type { Tab } from "shared/types";
+import type { MosaicNode, Tab } from "shared/types";
 
 /**
  * Helper functions for working with tabs
@@ -63,4 +63,66 @@ export function removeTabRecursive(tabs: Tab[], tabId: string): boolean {
  */
 export function isValidParentTab(tab: Tab | null): boolean {
 	return tab !== null && tab.type === "group";
+}
+
+/**
+ * Remove a tab ID from a mosaic tree
+ * Returns the updated tree, or null if the tree becomes empty
+ */
+export function removeTabFromMosaicTree(
+	tree: MosaicNode<string> | null | undefined,
+	tabId: string,
+): MosaicNode<string> | null {
+	if (!tree) return null;
+
+	// If the tree is just a single tab ID
+	if (typeof tree === "string") {
+		return tree === tabId ? null : tree;
+	}
+
+	// Tree is a parent node with splits
+	const firstResult = removeTabFromMosaicTree(tree.first, tabId);
+	const secondResult = removeTabFromMosaicTree(tree.second, tabId);
+
+	// If both sides are removed, return null
+	if (firstResult === null && secondResult === null) {
+		return null;
+	}
+
+	// If first side is removed, return second side
+	if (firstResult === null) {
+		return secondResult;
+	}
+
+	// If second side is removed, return first side
+	if (secondResult === null) {
+		return firstResult;
+	}
+
+	// Both sides still exist, return updated tree
+	return {
+		...tree,
+		first: firstResult,
+		second: secondResult,
+	};
+}
+
+/**
+ * Get all tab IDs from a mosaic tree
+ */
+export function getTabIdsFromMosaicTree(
+	tree: MosaicNode<string> | null | undefined,
+): string[] {
+	if (!tree) return [];
+
+	// If the tree is just a single tab ID
+	if (typeof tree === "string") {
+		return [tree];
+	}
+
+	// Tree is a parent node with splits
+	return [
+		...getTabIdsFromMosaicTree(tree.first),
+		...getTabIdsFromMosaicTree(tree.second),
+	];
 }
