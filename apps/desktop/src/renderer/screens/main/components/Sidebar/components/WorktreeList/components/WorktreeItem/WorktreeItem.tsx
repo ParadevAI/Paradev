@@ -524,11 +524,11 @@ export function WorktreeItem({
 
 			if (result.success) {
 				const newTabId = result.tab?.id;
-				onReload();
-				// Auto-select the new tab if we have its ID
+				// Auto-select the new tab first (before reload)
 				if (newTabId) {
 					handleTabSelect(worktree.id, newTabId, false);
 				}
+				onReload();
 			} else {
 				console.error("Failed to create tab:", result.error);
 			}
