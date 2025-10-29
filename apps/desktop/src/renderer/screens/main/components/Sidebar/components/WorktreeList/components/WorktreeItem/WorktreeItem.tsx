@@ -441,70 +441,6 @@ export function WorktreeItem({
 		}
 	};
 
-	// Helper: Delete group tab if it's empty (must be called after backend sync)
-	const deleteEmptyGroupTabAfterReload = async (
-		groupTabId: string,
-	): Promise<boolean> => {
-		try {
-			// Fetch the latest workspace state from backend to check if group is empty
-			const workspace = await window.ipcRenderer.invoke(
-				"workspace-get",
-				workspaceId,
-			);
-
-			if (!workspace) {
-				console.error("Failed to fetch workspace");
-				return false;
-			}
-
-			// Find the worktree and group tab in the fresh data
-			const currentWorktree = workspace.worktrees.find(
-				(wt: Worktree) => wt.id === worktree.id,
-			);
-
-			if (!currentWorktree) {
-				console.error("Worktree not found in workspace");
-				return false;
-			}
-
-			// Helper to find tab in fresh data
-			const findTabInFreshData = (tabs: Tab[], tabId: string): Tab | null => {
-				for (const tab of tabs) {
-					if (tab.id === tabId) return tab;
-					if (tab.type === "group" && tab.tabs) {
-						const found = findTabInFreshData(tab.tabs, tabId);
-						if (found) return found;
-					}
-				}
-				return null;
-			};
-
-			const groupTab = findTabInFreshData(currentWorktree.tabs, groupTabId);
-
-			// Check if group exists, is a group type, and has no children
-			if (
-				groupTab &&
-				groupTab.type === "group" &&
-				(!groupTab.tabs || groupTab.tabs.length === 0)
-			) {
-				const result = await window.ipcRenderer.invoke("tab-delete", {
-					workspaceId,
-					worktreeId: worktree.id,
-					tabId: groupTabId,
-				});
-
-				if (result.success) {
-					return true;
-				}
-				console.error("Failed to delete empty group:", result.error);
-			}
-			return false;
-		} catch (error) {
-			console.error("Error deleting empty group:", error);
-			return false;
-		}
-	};
-
 	// Handle moving a tab out of its group
 	const handleMoveOutOfGroup = async (tabId: string, parentTabId: string) => {
 		try {
@@ -547,16 +483,12 @@ export function WorktreeItem({
 				});
 			}
 
-			// Delete the parent group if it's now empty (after backend updates)
-			const groupDeleted = await deleteEmptyGroupTabAfterReload(parentTabId);
-
 			// Reload to show the updated structure
+			// Note: Backend automatically cleans up empty groups via cleanupEmptyGroupsInWorktree()
 			onReload();
 
-			// Select the moved tab (or nothing if group was deleted)
-			if (!groupDeleted) {
-				onTabSelect(worktree.id, tabId);
-			}
+			// Select the moved tab
+			onTabSelect(worktree.id, tabId);
 		} catch (error) {
 			console.error("Error moving tab out of group:", error);
 		}
@@ -1009,9 +941,6 @@ export function WorktreeItem({
 
 	const handleTabRemove = async (tabId: string) => {
 		try {
-			// Find the parent group before deleting (so we can clean it up if empty)
-			const parentGroup = findParentGroupTab(tabs, tabId);
-
 			const result = await window.ipcRenderer.invoke("tab-delete", {
 				workspaceId,
 				worktreeId: worktree.id,
@@ -1019,11 +948,7 @@ export function WorktreeItem({
 			});
 
 			if (result.success) {
-				// If this tab was in a group, check if the group is now empty
-				if (parentGroup) {
-					await deleteEmptyGroupTabAfterReload(parentGroup.id);
-				}
-
+				// Backend automatically cleans up empty groups via cleanupEmptyGroupsInWorktree()
 				onReload(); // Refresh the workspace to show the updated tab list
 			} else {
 				console.error("Failed to delete tab:", result.error);

@@ -298,6 +298,9 @@ export async function moveTab(
 		// Insert into target at specified index
 		targetTabs.splice(input.targetIndex, 0, tab);
 
+		// Clean up any empty groups that may have been left behind
+		cleanupEmptyGroupsInWorktree(workspace, input.worktreeId);
+
 		workspace.updatedAt = new Date().toISOString();
 
 		// Save
