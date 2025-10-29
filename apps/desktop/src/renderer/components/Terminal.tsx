@@ -84,7 +84,6 @@ export default function TerminalComponent({
 		onFocusRef.current = onFocus;
 	}, [onFocus]);
 
-
 	useEffect(() => {
 		if (terminal) {
 			terminal.options.theme =
@@ -219,7 +218,10 @@ export default function TerminalComponent({
 				.then((history: string | undefined) => {
 					if (history) {
 						// Debug: log the last characters of history
-						console.log("History last 50 chars:", JSON.stringify(history.slice(-50)));
+						console.log(
+							"History last 50 chars:",
+							JSON.stringify(history.slice(-50)),
+						);
 						// Write history without triggering convertEol by writing directly
 						// The history already has proper line endings from PTY
 						term.write(history);

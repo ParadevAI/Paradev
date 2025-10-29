@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
 	Mosaic,
 	type MosaicBranch,
@@ -57,6 +57,31 @@ export default function ScreenLayout({
 		},
 	);
 
+	// Sync mosaic tree when groupTab.mosaicTree changes externally
+	useEffect(() => {
+		if (groupTab.mosaicTree) {
+			setMosaicTree(groupTab.mosaicTree as MosaicNode<string>);
+		} else if (groupTab.tabs && groupTab.tabs.length > 0) {
+			// Reconstruct tree if it was cleared but tabs exist
+			if (groupTab.tabs.length === 1) {
+				setMosaicTree(groupTab.tabs[0].id);
+			} else {
+				setMosaicTree({
+					direction: "row",
+					first: groupTab.tabs[0].id,
+					second:
+						groupTab.tabs.length === 2
+							? groupTab.tabs[1].id
+							: {
+									direction: "column",
+									first: groupTab.tabs[1].id,
+									second: groupTab.tabs[2]?.id || groupTab.tabs[1].id,
+								},
+				});
+			}
+		}
+	}, [groupTab.mosaicTree, groupTab.tabs]);
+
 	// Helper function to get all tab IDs from a mosaic tree
 	const getTabIdsFromTree = (tree: MosaicNode<string> | null): Set<string> => {
 		const ids = new Set<string>();
@@ -76,8 +101,6 @@ export default function ScreenLayout({
 	// Save mosaic tree changes to backend
 	const handleMosaicChange = useCallback(
 		async (newTree: MosaicNode<string> | null) => {
-			setMosaicTree(newTree);
-
 			if (!worktreeId) return;
 
 			// Detect which tabs were removed from the mosaic tree
@@ -104,6 +127,9 @@ export default function ScreenLayout({
 					tabId: groupTab.id,
 					mosaicTree: newTree,
 				});
+
+				// Update local state after successful backend update
+				setMosaicTree(newTree);
 			} catch (error) {
 				console.error("Failed to save mosaic tree:", error);
 			}
