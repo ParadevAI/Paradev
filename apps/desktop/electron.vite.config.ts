@@ -12,77 +12,77 @@ const [nodeModules, devFolder] = normalize(dirname(main)).split(/\/|\\/g);
 const devPath = [nodeModules, devFolder].join("/");
 
 const tsconfigPaths = tsconfigPathsPlugin({
-	projects: [resolve("tsconfig.json")],
+    projects: [resolve("tsconfig.json")],
 });
 
 export default defineConfig({
-	main: {
-		plugins: [tsconfigPaths, externalizeDepsPlugin()],
+    main: {
+        plugins: [tsconfigPaths, externalizeDepsPlugin()],
 
-		build: {
-			rollupOptions: {
-				input: {
-					index: resolve("src/main/index.ts"),
-				},
+        build: {
+            rollupOptions: {
+                input: {
+                    index: resolve("src/main/index.ts"),
+                },
 
-				output: {
-					dir: resolve(devPath, "main"),
-				},
-			},
-		},
-	},
+                output: {
+                    dir: resolve(devPath, "main"),
+                },
+            },
+        },
+    },
 
-	preload: {
-		plugins: [tsconfigPaths, externalizeDepsPlugin()],
+    preload: {
+        plugins: [tsconfigPaths, externalizeDepsPlugin()],
 
-		build: {
-			outDir: resolve(devPath, "preload"),
-		},
-	},
+        build: {
+            outDir: resolve(devPath, "preload"),
+        },
+    },
 
-	renderer: {
-		define: {
-			"process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
-			"process.platform": JSON.stringify(process.platform),
-		},
+    renderer: {
+        define: {
+            "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
+            "process.platform": JSON.stringify(process.platform),
+        },
 
-		server: {
-			port: settings.port,
-		},
+        server: {
+            port: settings.port,
+        },
 
-		plugins: [
-			tsconfigPaths,
-			tailwindcss(),
-			reactPlugin(),
+        plugins: [
+            tsconfigPaths,
+            tailwindcss(),
+            reactPlugin(),
 
-			codeInspectorPlugin({
-				bundler: "vite",
-				hotKeys: ["altKey"],
-				hideConsole: true,
-			}),
-		],
+            codeInspectorPlugin({
+                bundler: "vite",
+                hotKeys: ["altKey"],
+                hideConsole: true,
+            }),
+        ],
 
-		publicDir: resolve(resources, "public"),
+        publicDir: resolve(resources, "public"),
 
-		build: {
-			outDir: resolve(devPath, "renderer"),
+        build: {
+            outDir: resolve(devPath, "renderer"),
 
-			rollupOptions: {
-				plugins: [
-					injectProcessEnvPlugin({
-						NODE_ENV: "production",
-						platform: process.platform,
-					}),
-				],
+            rollupOptions: {
+                plugins: [
+                    injectProcessEnvPlugin({
+                        NODE_ENV: "production",
+                        platform: process.platform,
+                    }),
+                ],
 
-				input: {
-					index: resolve("src/renderer/index.html"),
-				},
+                input: {
+                    index: resolve("src/renderer/index.html"),
+                },
 
-				output: {
-					dir: resolve(devPath, "renderer"),
-				},
-			},
-		},
-	},
+                output: {
+                    dir: resolve(devPath, "renderer"),
+                },
+            },
+        },
+    },
 });
