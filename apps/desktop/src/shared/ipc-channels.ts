@@ -104,6 +104,16 @@ export interface IpcChannels {
 		};
 		response: IpcResponse;
 	};
+	"tab-group-update-grid-sizes": {
+		request: {
+			workspaceId: string;
+			worktreeId: string;
+			tabGroupId: string;
+			rowSizes?: number[];
+			colSizes?: number[];
+		};
+		response: IpcResponse;
+	};
 
 	// Tab operations
 	"tab-create": {
@@ -204,6 +214,7 @@ export function isValidChannel(channel: string): channel is IpcChannelName {
 		"worktree-create",
 		"tab-group-create",
 		"tab-group-reorder",
+		"tab-group-update-grid-sizes",
 		"tab-create",
 		"tab-reorder",
 		"tab-move-to-group",

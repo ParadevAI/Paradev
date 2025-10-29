@@ -231,6 +231,29 @@ export function registerWorkspaceIPCs() {
 		},
 	);
 
+	// Update tab group grid sizes
+	ipcMain.handle(
+		"tab-group-update-grid-sizes",
+		async (
+			_event,
+			input: {
+				workspaceId: string;
+				worktreeId: string;
+				tabGroupId: string;
+				rowSizes?: number[];
+				colSizes?: number[];
+			},
+		) => {
+			return await workspaceManager.updateTabGroupGridSizes(
+				input.workspaceId,
+				input.worktreeId,
+				input.tabGroupId,
+				input.rowSizes,
+				input.colSizes,
+			);
+		},
+	);
+
 	// Move tab to another tab group
 	ipcMain.handle(
 		"tab-move-to-group",

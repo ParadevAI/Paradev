@@ -727,6 +727,60 @@ class WorkspaceManager {
 	}
 
 	/**
+	 * Update tab group grid sizes (row and column sizes)
+	 */
+	async updateTabGroupGridSizes(
+		workspaceId: string,
+		worktreeId: string,
+		tabGroupId: string,
+		rowSizes?: number[],
+		colSizes?: number[],
+	): Promise<{ success: boolean; error?: string }> {
+		try {
+			const config = configManager.read();
+			const workspace = config.workspaces.find((ws) => ws.id === workspaceId);
+			if (!workspace) {
+				return { success: false, error: "Workspace not found" };
+			}
+
+			const worktree = workspace.worktrees.find((wt) => wt.id === worktreeId);
+			if (!worktree) {
+				return { success: false, error: "Worktree not found" };
+			}
+
+			const tabGroup = worktree.tabGroups.find((tg) => tg.id === tabGroupId);
+			if (!tabGroup) {
+				return { success: false, error: "Tab group not found" };
+			}
+
+			// Update grid sizes
+			if (rowSizes !== undefined) {
+				tabGroup.rowSizes = rowSizes;
+			}
+			if (colSizes !== undefined) {
+				tabGroup.colSizes = colSizes;
+			}
+
+			workspace.updatedAt = new Date().toISOString();
+
+			// Save to config
+			const index = config.workspaces.findIndex((ws) => ws.id === workspaceId);
+			if (index !== -1) {
+				config.workspaces[index] = workspace;
+				configManager.write(config);
+			}
+
+			return { success: true };
+		} catch (error) {
+			console.error("Failed to update tab group grid sizes:", error);
+			return {
+				success: false,
+				error: error instanceof Error ? error.message : String(error),
+			};
+		}
+	}
+
+	/**
 	 * Move a tab from one tab group to another
 	 */
 	async moveTabToGroup(

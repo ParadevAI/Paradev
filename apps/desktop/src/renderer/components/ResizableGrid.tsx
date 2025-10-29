@@ -6,6 +6,9 @@ interface ResizableGridProps {
 	children: React.ReactNode;
 	className?: string;
 	onResize?: () => void;
+	initialRowSizes?: number[];
+	initialColSizes?: number[];
+	onSizesChange?: (rowSizes: number[], colSizes: number[]) => void;
 }
 
 interface DragState {
@@ -21,27 +24,44 @@ export default function ResizableGrid({
 	children,
 	className = "",
 	onResize,
+	initialRowSizes,
+	initialColSizes,
+	onSizesChange,
 }: ResizableGridProps) {
 	// Track custom sizes for rows and columns
-	// Initialize with equal fractions
-	const [rowSizes, setRowSizes] = useState<number[]>(
-		() => Array(rows).fill(1 / rows),
-	);
-	const [colSizes, setColSizes] = useState<number[]>(
-		() => Array(cols).fill(1 / cols),
-	);
+	// Initialize with persisted sizes if available, otherwise equal fractions
+	const [rowSizes, setRowSizes] = useState<number[]>(() => {
+		if (initialRowSizes && initialRowSizes.length === rows) {
+			return initialRowSizes;
+		}
+		return Array(rows).fill(1 / rows);
+	});
+	const [colSizes, setColSizes] = useState<number[]>(() => {
+		if (initialColSizes && initialColSizes.length === cols) {
+			return initialColSizes;
+		}
+		return Array(cols).fill(1 / cols);
+	});
 
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [dragState, setDragState] = useState<DragState | null>(null);
 
 	// Reset sizes when grid dimensions change
 	useEffect(() => {
-		setRowSizes(Array(rows).fill(1 / rows));
-	}, [rows]);
+		if (initialRowSizes && initialRowSizes.length === rows) {
+			setRowSizes(initialRowSizes);
+		} else {
+			setRowSizes(Array(rows).fill(1 / rows));
+		}
+	}, [rows, initialRowSizes]);
 
 	useEffect(() => {
-		setColSizes(Array(cols).fill(1 / cols));
-	}, [cols]);
+		if (initialColSizes && initialColSizes.length === cols) {
+			setColSizes(initialColSizes);
+		} else {
+			setColSizes(Array(cols).fill(1 / cols));
+		}
+	}, [cols, initialColSizes]);
 
 	const handleMouseDown = useCallback(
 		(
@@ -128,7 +148,11 @@ export default function ResizableGrid({
 		if (onResize) {
 			onResize();
 		}
-	}, [onResize]);
+		// Notify parent of size changes
+		if (onSizesChange) {
+			onSizesChange(rowSizes, colSizes);
+		}
+	}, [onResize, onSizesChange, rowSizes, colSizes]);
 
 	// Add/remove global mouse event listeners
 	useEffect(() => {

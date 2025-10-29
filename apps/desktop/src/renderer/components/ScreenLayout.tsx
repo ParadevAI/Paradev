@@ -79,6 +79,23 @@ export default function ScreenLayout({
         setResizeTrigger((prev) => prev + 1);
     };
 
+    const handleSizesChange = async (rowSizes: number[], colSizes: number[]) => {
+        // Save the grid sizes to the workspace config
+        if (!worktreeId) return;
+
+        try {
+            await window.ipcRenderer.invoke("tab-group-update-grid-sizes", {
+                workspaceId,
+                worktreeId,
+                tabGroupId: tabGroup.id,
+                rowSizes,
+                colSizes,
+            });
+        } catch (error) {
+            console.error("Failed to save grid sizes:", error);
+        }
+    };
+
     // Safety check: ensure tabGroup has tabs
     if (!tabGroup || !tabGroup.tabs || !Array.isArray(tabGroup.tabs)) {
         return (
@@ -99,6 +116,9 @@ export default function ScreenLayout({
             cols={tabGroup.cols}
             className="w-full h-full p-1"
             onResize={handleGridResize}
+            initialRowSizes={tabGroup.rowSizes}
+            initialColSizes={tabGroup.colSizes}
+            onSizesChange={handleSizesChange}
         >
             {tabGroup.tabs.map((tab) => {
                 const isActive = selectedTabId === tab.id;

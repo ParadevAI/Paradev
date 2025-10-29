@@ -42,6 +42,8 @@ export interface TabGroup {
 	tabs: Tab[];
 	rows: number;
 	cols: number;
+	rowSizes?: number[]; // Custom row sizes as fractions (e.g., [0.3, 0.7])
+	colSizes?: number[]; // Custom column sizes as fractions (e.g., [0.5, 0.5])
 	createdAt: string;
 }
 
