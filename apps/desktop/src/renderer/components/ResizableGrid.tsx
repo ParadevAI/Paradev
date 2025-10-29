@@ -174,6 +174,9 @@ export default function ResizableGrid({
 		.map((size) => `${(size * 100).toFixed(2)}%`)
 		.join(" ");
 
+	const GAP_SIZE = 8;
+	const HANDLE_SIZE = 6;
+
 	return (
 		<div
 			ref={containerRef}
@@ -182,18 +185,16 @@ export default function ResizableGrid({
 				display: "grid",
 				gridTemplateRows,
 				gridTemplateColumns,
-				gap: "4px",
+				gap: `${GAP_SIZE}px`,
 			}}
 		>
 			{children}
 
 			{/* Row resize handles */}
 			{Array.from({ length: rows - 1 }).map((_, index) => {
-				// Calculate the position based on accumulated sizes
-				const position = rowSizes
-					.slice(0, index + 1)
-					.reduce((sum, size) => sum + size, 0);
-
+				const cellsSize = rowSizes.slice(0, index + 1).reduce((sum, size) => sum + size, 0);
+				const gapsSize = (index + 0.5) * GAP_SIZE;
+				const handleOffset = HANDLE_SIZE / 2;
 				const isActive = dragState?.type === "row" && dragState?.index === index;
 
 				return (
@@ -201,16 +202,14 @@ export default function ResizableGrid({
 						key={`row-handle-${index}`}
 						className="absolute left-0 right-0 z-10 cursor-row-resize group"
 						style={{
-							top: `calc(${(position * 100).toFixed(2)}% - 2px)`,
-							height: "4px",
+							top: `calc(${(cellsSize * 100).toFixed(2)}% + ${gapsSize - handleOffset}px)`,
+							height: `${HANDLE_SIZE}px`,
 						}}
 						onMouseDown={(e) => handleMouseDown(e, "row", index)}
 					>
 						<div
 							className={`w-full h-full transition-colors ${
-								isActive
-									? "bg-blue-500"
-									: "group-hover:bg-blue-500/50"
+								isActive ? "bg-blue-500" : "group-hover:bg-blue-500/30"
 							}`}
 						/>
 					</div>
@@ -219,10 +218,9 @@ export default function ResizableGrid({
 
 			{/* Column resize handles */}
 			{Array.from({ length: cols - 1 }).map((_, index) => {
-				const position = colSizes
-					.slice(0, index + 1)
-					.reduce((sum, size) => sum + size, 0);
-
+				const cellsSize = colSizes.slice(0, index + 1).reduce((sum, size) => sum + size, 0);
+				const gapsSize = (index + 0.5) * GAP_SIZE;
+				const handleOffset = HANDLE_SIZE / 2;
 				const isActive = dragState?.type === "col" && dragState?.index === index;
 
 				return (
@@ -230,16 +228,14 @@ export default function ResizableGrid({
 						key={`col-handle-${index}`}
 						className="absolute top-0 bottom-0 z-10 cursor-col-resize group"
 						style={{
-							left: `calc(${(position * 100).toFixed(2)}% - 2px)`,
-							width: "4px",
+							left: `calc(${(cellsSize * 100).toFixed(2)}% + ${gapsSize - handleOffset}px)`,
+							width: `${HANDLE_SIZE}px`,
 						}}
 						onMouseDown={(e) => handleMouseDown(e, "col", index)}
 					>
 						<div
 							className={`w-full h-full transition-colors ${
-								isActive
-									? "bg-blue-500"
-									: "group-hover:bg-blue-500/50"
+								isActive ? "bg-blue-500" : "group-hover:bg-blue-500/30"
 							}`}
 						/>
 					</div>
