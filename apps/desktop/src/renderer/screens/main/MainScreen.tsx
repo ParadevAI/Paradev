@@ -17,67 +17,44 @@ export function MainScreen() {
 	const [selectedWorktreeId, setSelectedWorktreeId] = useState<string | null>(
 		null,
 	);
-	const [selectedTabGroupId, setSelectedTabGroupId] = useState<string | null>(
-		null,
-	);
-	const [selectedTabId, setSelectedTabId] = useState<string | null>(null);
+	const [selectedTabId, setSelectedTabId] = useState<string | null>(null); // Can be a group tab or any tab
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
-
-	// Get selected tab group details (contains all tabs in the grid)
-	const selectedTabGroup = currentWorkspace?.worktrees
-		?.find((wt) => wt.id === selectedWorktreeId)
-		?.tabGroups.find((tg) => tg.id === selectedTabGroupId);
 
 	const selectedWorktree = currentWorkspace?.worktrees?.find(
 		(wt) => wt.id === selectedWorktreeId,
 	);
 
+	// Get selected tab (can be a group tab that contains other tabs)
+	const selectedTab = selectedWorktree?.tabs?.find(
+		(tab) => tab.id === selectedTabId,
+	);
+
 	const handleTabSelect = (
 		worktreeId: string,
-		tabGroupId: string,
 		tabId: string,
 	) => {
 		setSelectedWorktreeId(worktreeId);
-		setSelectedTabGroupId(tabGroupId);
 		setSelectedTabId(tabId);
 		// Save active selection
 		if (currentWorkspace) {
 			window.ipcRenderer.invoke("workspace-set-active-selection", {
 				workspaceId: currentWorkspace.id,
 				worktreeId,
-				tabGroupId,
 				tabId,
 			});
 		}
 	};
 
-	const handleTabGroupSelect = (worktreeId: string, tabGroupId: string) => {
-		setSelectedWorktreeId(worktreeId);
-		setSelectedTabGroupId(tabGroupId);
-		// Clear individual tab selection when selecting a tab group
-		setSelectedTabId(null);
-		// Save active selection
-		if (currentWorkspace) {
-			window.ipcRenderer.invoke("workspace-set-active-selection", {
-				workspaceId: currentWorkspace.id,
-				worktreeId,
-				tabGroupId,
-				tabId: null,
-			});
-		}
-	};
-
 	const handleTabFocus = (tabId: string) => {
-		// When a terminal gets focus, find its worktree and tab group
-		if (!currentWorkspace || !selectedWorktreeId || !selectedTabGroupId) return;
+		// When a terminal gets focus, update the selected tab
+		if (!currentWorkspace || !selectedWorktreeId) return;
 
 		setSelectedTabId(tabId);
 		// Save active selection
 		window.ipcRenderer.invoke("workspace-set-active-selection", {
 			workspaceId: currentWorkspace.id,
 			worktreeId: selectedWorktreeId,
-			tabGroupId: selectedTabGroupId,
 			tabId,
 		});
 	};
@@ -102,14 +79,12 @@ export function MainScreen() {
 					workspaceId,
 				);
 
-				if (activeSelection?.worktreeId && activeSelection?.tabGroupId) {
+				if (activeSelection?.worktreeId && activeSelection?.tabId) {
 					setSelectedWorktreeId(activeSelection.worktreeId);
-					setSelectedTabGroupId(activeSelection.tabGroupId);
 					setSelectedTabId(activeSelection.tabId);
 				} else {
 					// No saved selection, reset
 					setSelectedWorktreeId(null);
-					setSelectedTabGroupId(null);
 					setSelectedTabId(null);
 				}
 			}
@@ -181,8 +156,8 @@ export function MainScreen() {
 				workspaceId,
 			);
 
-			if (result.success && result.data?.imported && result.data.imported > 0) {
-				console.log("[MainScreen] Imported worktrees:", result.data.imported);
+			if (result.success && result.imported && result.imported > 0) {
+				console.log("[MainScreen] Imported worktrees:", result.imported);
 				// Refresh workspace data
 				const refreshedWorkspace = await window.ipcRenderer.invoke(
 					"workspace-get",
@@ -238,9 +213,8 @@ export function MainScreen() {
 							workspaceId,
 						);
 
-						if (activeSelection?.worktreeId && activeSelection?.tabGroupId) {
+						if (activeSelection?.worktreeId && activeSelection?.tabId) {
 							setSelectedWorktreeId(activeSelection.worktreeId);
-							setSelectedTabGroupId(activeSelection.tabGroupId);
 							setSelectedTabId(activeSelection.tabId);
 						}
 					}
@@ -291,12 +265,10 @@ export function MainScreen() {
 						workspaces={workspaces}
 						currentWorkspace={currentWorkspace}
 						onTabSelect={handleTabSelect}
-						onTabGroupSelect={handleTabGroupSelect}
 						onWorktreeCreated={handleWorktreeCreated}
 						onWorkspaceSelect={handleWorkspaceSelect}
 						onUpdateWorktree={handleUpdateWorktree}
 						selectedTabId={selectedTabId ?? undefined}
-						selectedTabGroupId={selectedTabGroupId ?? undefined}
 						onCollapse={() => setIsSidebarOpen(false)}
 					/>
 				)}
@@ -316,16 +288,16 @@ export function MainScreen() {
 						{loading ||
 						error ||
 						!currentWorkspace ||
-						!selectedTabGroup ||
+						!selectedTab ||
 						!selectedWorktree ? (
 							<PlaceholderState
 								loading={loading}
 								error={error}
 								hasWorkspace={!!currentWorkspace}
 							/>
-						) : (
+						) : selectedTab.type === "group" ? (
 							<ScreenLayout
-								tabGroup={selectedTabGroup}
+								groupTab={selectedTab}
 								workingDirectory={
 									selectedWorktree.path || currentWorkspace.repoPath
 								}
@@ -334,6 +306,10 @@ export function MainScreen() {
 								selectedTabId={selectedTabId ?? undefined}
 								onTabFocus={handleTabFocus}
 							/>
+						) : (
+							<div className="w-full h-full flex items-center justify-center text-gray-400">
+								<p>Please select a group tab to display</p>
+							</div>
 						)}
 					</div>
 				</div>

@@ -6,12 +6,10 @@
  */
 
 import type {
-	CreateTabGroupInput,
 	CreateTabInput,
 	CreateWorkspaceInput,
 	CreateWorktreeInput,
 	Tab,
-	TabGroup,
 	UpdateWorkspaceInput,
 	Workspace,
 	Worktree,
@@ -63,7 +61,6 @@ export interface IpcChannels {
 		request: string; // workspace ID
 		response: {
 			worktreeId: string | null;
-			tabGroupId: string | null;
 			tabId: string | null;
 		} | null;
 	};
@@ -71,7 +68,6 @@ export interface IpcChannels {
 		request: {
 			workspaceId: string;
 			worktreeId: string | null;
-			tabGroupId: string | null;
 			tabId: string | null;
 		};
 		response: boolean;
@@ -112,30 +108,6 @@ export interface IpcChannels {
 		response: string | null;
 	};
 
-	// Tab group operations
-	"tab-group-create": {
-		request: CreateTabGroupInput;
-		response: { success: boolean; tabGroup?: TabGroup; error?: string };
-	};
-	"tab-group-reorder": {
-		request: {
-			workspaceId: string;
-			worktreeId: string;
-			tabGroupIds: string[];
-		};
-		response: IpcResponse;
-	};
-	"tab-group-update-grid-sizes": {
-		request: {
-			workspaceId: string;
-			worktreeId: string;
-			tabGroupId: string;
-			rowSizes?: number[];
-			colSizes?: number[];
-		};
-		response: IpcResponse;
-	};
-
 	// Tab operations
 	"tab-create": {
 		request: CreateTabInput;
@@ -153,19 +125,29 @@ export interface IpcChannels {
 		request: {
 			workspaceId: string;
 			worktreeId: string;
-			tabGroupId: string;
+			parentTabId?: string; // Optional parent tab ID (for reordering within a group)
 			tabIds: string[];
 		};
 		response: IpcResponse;
 	};
-	"tab-move-to-group": {
+	"tab-move": {
 		request: {
 			workspaceId: string;
 			worktreeId: string;
 			tabId: string;
-			sourceTabGroupId: string;
-			targetTabGroupId: string;
+			sourceParentTabId?: string; // Optional source parent tab ID
+			targetParentTabId?: string; // Optional target parent tab ID
 			targetIndex: number;
+		};
+		response: IpcResponse;
+	};
+	"tab-update-grid-sizes": {
+		request: {
+			workspaceId: string;
+			worktreeId: string;
+			tabId: string; // The group tab ID
+			rowSizes?: number[];
+			colSizes?: number[];
 		};
 		response: IpcResponse;
 	};
@@ -194,7 +176,6 @@ export interface IpcChannels {
 		request: {
 			workspaceId: string;
 			worktreeId: string;
-			tabGroupId: string;
 			tabId: string;
 			cwd: string;
 		};
@@ -245,13 +226,11 @@ export function isValidChannel(channel: string): channel is IpcChannelName {
 		"worktree-can-merge",
 		"worktree-merge",
 		"worktree-get-path",
-		"tab-group-create",
-		"tab-group-reorder",
-		"tab-group-update-grid-sizes",
 		"tab-create",
 		"tab-delete",
 		"tab-reorder",
-		"tab-move-to-group",
+		"tab-move",
+		"tab-update-grid-sizes",
 		"terminal-create",
 		"terminal-execute-command",
 		"terminal-get-history",

@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import type { Tab, TabGroup } from "shared/types";
+import type { Tab } from "shared/types";
 import TabContent from "./TabContent";
 import ResizableGrid from "./ResizableGrid";
 
 interface ScreenLayoutProps {
-	tabGroup: TabGroup;
+	groupTab: Tab; // A tab with type: "group"
 	workingDirectory: string;
 	workspaceId: string;
 	worktreeId: string | undefined;
@@ -17,7 +17,7 @@ interface TabInstanceProps {
 	workingDirectory: string;
 	workspaceId: string;
 	worktreeId: string | undefined;
-	tabGroupId: string;
+	groupTabId: string; // ID of the parent group tab
 	onTabFocus: (tabId: string) => void;
 	resizeTrigger?: number;
 }
@@ -31,7 +31,7 @@ function TabInstance({
 	workingDirectory,
 	workspaceId,
 	worktreeId,
-	tabGroupId,
+	groupTabId,
 	onTabFocus,
 	resizeTrigger = 0,
 }: TabInstanceProps) {
@@ -56,7 +56,7 @@ function TabInstance({
 			workingDirectory={workingDirectory}
 			workspaceId={workspaceId}
 			worktreeId={worktreeId}
-			tabGroupId={tabGroupId}
+			groupTabId={groupTabId}
 			onTabFocus={onTabFocus}
 			triggerFit={fitTrigger}
 		/>
@@ -64,7 +64,7 @@ function TabInstance({
 }
 
 export default function ScreenLayout({
-	tabGroup,
+	groupTab,
 	workingDirectory,
 	workspaceId,
 	worktreeId,
@@ -84,10 +84,10 @@ export default function ScreenLayout({
 		if (!worktreeId) return;
 
 		try {
-			await window.ipcRenderer.invoke("tab-group-update-grid-sizes", {
+			await window.ipcRenderer.invoke("tab-update-grid-sizes", {
 				workspaceId,
 				worktreeId,
-				tabGroupId: tabGroup.id,
+				tabId: groupTab.id,
 				rowSizes,
 				colSizes,
 			});
@@ -96,14 +96,14 @@ export default function ScreenLayout({
 		}
 	};
 
-	// Safety check: ensure tabGroup has tabs
-	if (!tabGroup || !tabGroup.tabs || !Array.isArray(tabGroup.tabs)) {
+	// Safety check: ensure groupTab is a group type with tabs
+	if (!groupTab || groupTab.type !== "group" || !groupTab.tabs || !Array.isArray(groupTab.tabs)) {
 		return (
 			<div className="w-full h-full flex items-center justify-center text-gray-400">
 				<div className="text-center">
-					<p>Invalid tab group structure</p>
+					<p>Invalid group tab structure</p>
 					<p className="text-sm text-gray-500 mt-2">
-						Please rescan worktrees or create a new tab group
+						Please rescan worktrees or create a new tab
 					</p>
 				</div>
 			</div>
@@ -112,15 +112,15 @@ export default function ScreenLayout({
 
 	return (
 		<ResizableGrid
-			rows={tabGroup.rows}
-			cols={tabGroup.cols}
+			rows={groupTab.rows || 2}
+			cols={groupTab.cols || 2}
 			className="w-full h-full p-1"
 			onResize={handleGridResize}
-			initialRowSizes={tabGroup.rowSizes}
-			initialColSizes={tabGroup.colSizes}
+			initialRowSizes={groupTab.rowSizes}
+			initialColSizes={groupTab.colSizes}
 			onSizesChange={handleSizesChange}
 		>
-			{tabGroup.tabs.map((tab) => {
+			{groupTab.tabs.map((tab) => {
 				const isActive = selectedTabId === tab.id;
 				return (
 					<div
@@ -131,8 +131,8 @@ export default function ScreenLayout({
 								: "border-neutral-800"
 						}`}
 						style={{
-							gridRow: `${tab.row + 1} / span ${tab.rowSpan || 1}`,
-							gridColumn: `${tab.col + 1} / span ${tab.colSpan || 1}`,
+							gridRow: `${(tab.row || 0) + 1} / span ${tab.rowSpan || 1}`,
+							gridColumn: `${(tab.col || 0) + 1} / span ${tab.colSpan || 1}`,
 						}}
 					>
 						<TabInstance
@@ -140,7 +140,7 @@ export default function ScreenLayout({
 							workingDirectory={workingDirectory}
 							workspaceId={workspaceId}
 							worktreeId={worktreeId}
-							tabGroupId={tabGroup.id}
+							groupTabId={groupTab.id}
 							onTabFocus={onTabFocus}
 							resizeTrigger={resizeTrigger}
 						/>

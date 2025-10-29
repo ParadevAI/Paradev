@@ -70,21 +70,16 @@ class ConfigManager {
 				);
 				if (workspace) {
 					workspace.activeWorktreeId = oldConfig.activeWorktreeId || null;
-					workspace.activeTabGroupId = oldConfig.activeTabGroupId || null;
-					workspace.activeTabId = oldConfig.activeTabId || null;
+						workspace.activeTabId = oldConfig.activeTabId || null;
 				}
 				// Clean up old fields
 				delete oldConfig.activeWorktreeId;
-				delete oldConfig.activeTabGroupId;
 				delete oldConfig.activeTabId;
 			}
 			// Ensure all workspaces have active selection fields
 			for (const workspace of config.workspaces) {
 				if (workspace.activeWorktreeId === undefined) {
 					workspace.activeWorktreeId = null;
-				}
-				if (workspace.activeTabGroupId === undefined) {
-					workspace.activeTabGroupId = null;
 				}
 				if (workspace.activeTabId === undefined) {
 					workspace.activeTabId = null;
@@ -129,7 +124,6 @@ class ConfigManager {
 
 	getActiveSelection(workspaceId: string): {
 		worktreeId: string | null;
-		tabGroupId: string | null;
 		tabId: string | null;
 	} | null {
 		const config = this.read();
@@ -138,25 +132,8 @@ class ConfigManager {
 
 		return {
 			worktreeId: workspace.activeWorktreeId,
-			tabGroupId: workspace.activeTabGroupId,
 			tabId: workspace.activeTabId,
 		};
-	}
-
-	setActiveSelection(
-		workspaceId: string,
-		worktreeId: string | null,
-		tabGroupId: string | null,
-		tabId: string | null,
-	): boolean {
-		const config = this.read();
-		const workspace = config.workspaces.find((ws) => ws.id === workspaceId);
-		if (!workspace) return false;
-
-		workspace.activeWorktreeId = worktreeId;
-		workspace.activeTabGroupId = tabGroupId;
-		workspace.activeTabId = tabId;
-		return this.write(config);
 	}
 
 	getActiveWorkspaceId(): string | null {

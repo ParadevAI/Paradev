@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import type { Tab } from "shared/types";
 import Terminal from "./Terminal";
+import ScreenLayout from "./ScreenLayout";
 
 interface TabContentProps {
 	tab: Tab;
 	workingDirectory: string;
 	workspaceId: string;
 	worktreeId: string | undefined;
-	tabGroupId: string;
+	groupTabId: string; // ID of the parent group tab
 	onTabFocus: (tabId: string) => void;
 	triggerFit?: number; // For terminal resizing
 }
@@ -26,7 +27,7 @@ export default function TabContent({
 	workingDirectory,
 	workspaceId,
 	worktreeId,
-	tabGroupId,
+	groupTabId,
 	onTabFocus,
 	triggerFit = 0,
 }: TabContentProps) {
@@ -36,6 +37,19 @@ export default function TabContent({
 
 	// Render based on tab type
 	switch (tab.type) {
+		case "group":
+			// Recursively render a nested ScreenLayout for group tabs
+			return (
+				<ScreenLayout
+					groupTab={tab}
+					workingDirectory={workingDirectory}
+					workspaceId={workspaceId}
+					worktreeId={worktreeId}
+					selectedTabId={undefined} // Group tabs don't track their own selection
+					onTabFocus={onTabFocus}
+				/>
+			);
+
 		case "terminal":
 			return (
 				<TerminalTabContent
@@ -43,7 +57,7 @@ export default function TabContent({
 					workingDirectory={workingDirectory}
 					workspaceId={workspaceId}
 					worktreeId={worktreeId}
-					tabGroupId={tabGroupId}
+					groupTabId={groupTabId}
 					onFocus={handleFocus}
 					triggerFit={triggerFit}
 				/>
@@ -95,7 +109,7 @@ interface TerminalTabContentProps {
 	workingDirectory: string;
 	workspaceId?: string;
 	worktreeId?: string;
-	tabGroupId: string;
+	groupTabId: string; // ID of the parent group tab
 	onFocus: () => void;
 	triggerFit: number;
 }
@@ -105,7 +119,7 @@ function TerminalTabContent({
 	workingDirectory,
 	workspaceId,
 	worktreeId,
-	tabGroupId,
+	groupTabId,
 	onFocus,
 	triggerFit,
 }: TerminalTabContentProps) {
@@ -165,7 +179,7 @@ function TerminalTabContent({
 
 	// Listen for CWD changes from the main process
 	useEffect(() => {
-		if (!terminalId || !workspaceId || !worktreeId || !tabGroupId) return;
+		if (!terminalId || !workspaceId || !worktreeId) return;
 
 		const handleCwdChange = async (data: { id: string; cwd: string }) => {
 			// Only handle changes for this terminal
@@ -176,7 +190,6 @@ function TerminalTabContent({
 				await window.ipcRenderer.invoke("workspace-update-terminal-cwd", {
 					workspaceId,
 					worktreeId,
-					tabGroupId,
 					tabId: tab.id,
 					cwd: data.cwd,
 				});
@@ -190,7 +203,7 @@ function TerminalTabContent({
 		return () => {
 			window.ipcRenderer.off("terminal-cwd-changed", handleCwdChange);
 		};
-	}, [terminalId, tab.id, workspaceId, worktreeId, tabGroupId]);
+	}, [terminalId, tab.id, workspaceId, worktreeId]);
 
 	return (
 		<div className="w-full h-full">

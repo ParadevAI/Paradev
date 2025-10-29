@@ -1,7 +1,6 @@
 import { BrowserWindow, dialog, ipcMain } from "electron";
 
 import type {
-	CreateTabGroupInput,
 	CreateTabInput,
 	CreateWorkspaceInput,
 	CreateWorktreeInput,
@@ -128,14 +127,6 @@ export function registerWorkspaceIPCs() {
 		},
 	);
 
-	// Create tab group
-	ipcMain.handle(
-		"tab-group-create",
-		async (_event, input: CreateTabGroupInput) => {
-			return await workspaceManager.createTabGroup(input);
-		},
-	);
-
 	// Create tab
 	ipcMain.handle("tab-create", async (_event, input: CreateTabInput) => {
 		return await workspaceManager.createTab(input);
@@ -176,14 +167,12 @@ export function registerWorkspaceIPCs() {
 			input: {
 				workspaceId: string;
 				worktreeId: string | null;
-				tabGroupId: string | null;
 				tabId: string | null;
 			},
 		) => {
-			return configManager.setActiveSelection(
+			return await workspaceManager.setActiveSelection(
 				input.workspaceId,
 				input.worktreeId,
-				input.tabGroupId,
 				input.tabId,
 			);
 		},
@@ -191,18 +180,18 @@ export function registerWorkspaceIPCs() {
 
 	// Get active workspace ID
 	ipcMain.handle("workspace-get-active-workspace-id", async () => {
-		return configManager.getActiveWorkspaceId();
+		return await workspaceManager.getActiveWorkspaceId();
 	});
 
 	// Set active workspace ID
 	ipcMain.handle(
 		"workspace-set-active-workspace-id",
 		async (_event, workspaceId: string) => {
-			return configManager.setActiveWorkspaceId(workspaceId);
+			return await workspaceManager.setActiveWorkspaceId(workspaceId);
 		},
 	);
 
-	// Reorder tabs within a tab group
+	// Reorder tabs within a parent tab or at worktree level
 	ipcMain.handle(
 		"tab-reorder",
 		async (
@@ -210,47 +199,53 @@ export function registerWorkspaceIPCs() {
 			input: {
 				workspaceId: string;
 				worktreeId: string;
-				tabGroupId: string;
+				parentTabId?: string;
 				tabIds: string[];
 			},
 		) => {
 			return await workspaceManager.reorderTabs(
 				input.workspaceId,
 				input.worktreeId,
-				input.tabGroupId,
+				input.parentTabId,
 				input.tabIds,
 			);
 		},
 	);
 
-	// Reorder tab groups within a worktree
+	// Move tab between parents
 	ipcMain.handle(
-		"tab-group-reorder",
+		"tab-move",
 		async (
 			_event,
 			input: {
 				workspaceId: string;
 				worktreeId: string;
-				tabGroupIds: string[];
+				tabId: string;
+				sourceParentTabId?: string;
+				targetParentTabId?: string;
+				targetIndex: number;
 			},
 		) => {
-			return await workspaceManager.reorderTabGroups(
+			return await workspaceManager.moveTab(
 				input.workspaceId,
 				input.worktreeId,
-				input.tabGroupIds,
+				input.tabId,
+				input.sourceParentTabId,
+				input.targetParentTabId,
+				input.targetIndex,
 			);
 		},
 	);
 
-	// Update tab group grid sizes
+	// Update grid sizes for a group tab
 	ipcMain.handle(
-		"tab-group-update-grid-sizes",
+		"tab-update-grid-sizes",
 		async (
 			_event,
 			input: {
 				workspaceId: string;
 				worktreeId: string;
-				tabGroupId: string;
+				tabId: string;
 				rowSizes?: number[];
 				colSizes?: number[];
 			},
@@ -258,34 +253,9 @@ export function registerWorkspaceIPCs() {
 			return await workspaceManager.updateTabGroupGridSizes(
 				input.workspaceId,
 				input.worktreeId,
-				input.tabGroupId,
+				input.tabId,
 				input.rowSizes,
 				input.colSizes,
-			);
-		},
-	);
-
-	// Move tab to another tab group
-	ipcMain.handle(
-		"tab-move-to-group",
-		async (
-			_event,
-			input: {
-				workspaceId: string;
-				worktreeId: string;
-				tabId: string;
-				sourceTabGroupId: string;
-				targetTabGroupId: string;
-				targetIndex: number;
-			},
-		) => {
-			return await workspaceManager.moveTabToGroup(
-				input.workspaceId,
-				input.worktreeId,
-				input.tabId,
-				input.sourceTabGroupId,
-				input.targetTabGroupId,
-				input.targetIndex,
 			);
 		},
 	);
@@ -298,7 +268,6 @@ export function registerWorkspaceIPCs() {
 			input: {
 				workspaceId: string;
 				worktreeId: string;
-				tabGroupId: string;
 				tabId: string;
 				cwd: string;
 			},
@@ -306,7 +275,6 @@ export function registerWorkspaceIPCs() {
 			return workspaceManager.updateTerminalCwd(
 				input.workspaceId,
 				input.worktreeId,
-				input.tabGroupId,
 				input.tabId,
 				input.cwd,
 			);
