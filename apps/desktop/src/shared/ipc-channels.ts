@@ -57,7 +57,7 @@ export interface IpcChannels {
 	};
 	"workspace-scan-worktrees": {
 		request: string; // workspace ID
-		response: IpcResponse<{ imported: number }>;
+		response: { success: boolean; imported?: number; error?: string };
 	};
 	"workspace-get-active-selection": {
 		request: string; // workspace ID
@@ -88,13 +88,13 @@ export interface IpcChannels {
 	// Worktree operations
 	"worktree-create": {
 		request: CreateWorktreeInput;
-		response: IpcResponse<Worktree>;
+		response: { success: boolean; worktree?: Worktree; error?: string };
 	};
 
 	// Tab group operations
 	"tab-group-create": {
 		request: CreateTabGroupInput;
-		response: IpcResponse<TabGroup>;
+		response: { success: boolean; tabGroup?: TabGroup; error?: string };
 	};
 	"tab-group-reorder": {
 		request: {
@@ -118,7 +118,7 @@ export interface IpcChannels {
 	// Tab operations
 	"tab-create": {
 		request: CreateTabInput;
-		response: IpcResponse<Tab>;
+		response: { success: boolean; tab?: Tab; error?: string };
 	};
 	"tab-delete": {
 		request: {

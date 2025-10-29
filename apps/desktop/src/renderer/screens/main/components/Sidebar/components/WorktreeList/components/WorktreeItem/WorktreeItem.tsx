@@ -349,8 +349,6 @@ export function WorktreeItem({
 
 			if (result.success) {
 				const newTabId = result.tab?.id;
-				console.log("Created tab:", result.tab);
-				console.log("New tab ID:", newTabId);
 				onReload();
 				// Auto-select the new tab if we have its ID
 				if (newTabId) {
