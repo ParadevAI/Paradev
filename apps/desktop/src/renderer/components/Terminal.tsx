@@ -11,7 +11,6 @@ interface TerminalProps {
 	hidden?: boolean;
 	className?: string;
 	onFocus?: () => void;
-	triggerFit?: number; // Change this value to trigger a re-fit
 }
 
 interface TerminalMessage {
@@ -72,7 +71,6 @@ export default function TerminalComponent({
 	hidden = false,
 	className = "",
 	onFocus,
-	triggerFit,
 }: TerminalProps) {
 	const terminalRef = useRef<HTMLDivElement>(null);
 	const [terminal, setTerminal] = useState<XTerm | null>(null);
@@ -86,17 +84,6 @@ export default function TerminalComponent({
 		onFocusRef.current = onFocus;
 	}, [onFocus]);
 
-	// Trigger fit when triggerFit prop changes
-	useEffect(() => {
-		if (triggerFit !== undefined && triggerFit > 0 && fitFunctionRef.current) {
-			// Debounce the fit to prevent multiple rapid calls
-			const timeout = setTimeout(() => {
-				fitFunctionRef.current?.();
-			}, 100);
-
-			return () => clearTimeout(timeout);
-		}
-	}, [triggerFit]);
 
 	useEffect(() => {
 		if (terminal) {

@@ -10,7 +10,6 @@ interface TabContentProps {
 	worktreeId: string | undefined;
 	groupTabId: string; // ID of the parent group tab
 	onTabFocus: (tabId: string) => void;
-	triggerFit?: number; // For terminal resizing
 }
 
 /**
@@ -29,7 +28,6 @@ export default function TabContent({
 	worktreeId,
 	groupTabId,
 	onTabFocus,
-	triggerFit = 0,
 }: TabContentProps) {
 	const handleFocus = () => {
 		onTabFocus(tab.id);
@@ -59,7 +57,6 @@ export default function TabContent({
 					worktreeId={worktreeId}
 					groupTabId={groupTabId}
 					onFocus={handleFocus}
-					triggerFit={triggerFit}
 				/>
 			);
 
@@ -111,7 +108,6 @@ interface TerminalTabContentProps {
 	worktreeId?: string;
 	groupTabId: string; // ID of the parent group tab
 	onFocus: () => void;
-	triggerFit: number;
 }
 
 function TerminalTabContent({
@@ -121,7 +117,6 @@ function TerminalTabContent({
 	worktreeId,
 	groupTabId,
 	onFocus,
-	triggerFit,
 }: TerminalTabContentProps) {
 	const terminalId = tab.id;
 	const terminalCreatedRef = useRef(false);
@@ -207,11 +202,7 @@ function TerminalTabContent({
 
 	return (
 		<div className="w-full h-full">
-			<Terminal
-				terminalId={terminalId}
-				onFocus={onFocus}
-				triggerFit={triggerFit}
-			/>
+			<Terminal terminalId={terminalId} onFocus={onFocus} />
 		</div>
 	);
 }

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import {
 	Mosaic,
 	type MosaicBranch,
@@ -18,52 +18,6 @@ interface ScreenLayoutProps {
 	onTabFocus: (tabId: string) => void;
 }
 
-interface TabInstanceProps {
-	tab: Tab;
-	workingDirectory: string;
-	workspaceId: string;
-	worktreeId: string | undefined;
-	groupTabId: string; // ID of the parent group tab
-	onTabFocus: (tabId: string) => void;
-	resizeTrigger?: number;
-}
-
-/**
- * TabInstance - Wrapper for individual tabs in the mosaic layout
- * Handles resize triggers and delegates rendering to TabContent
- */
-function TabInstance({
-	tab,
-	workingDirectory,
-	workspaceId,
-	worktreeId,
-	groupTabId,
-	onTabFocus,
-	resizeTrigger = 0,
-}: TabInstanceProps) {
-	// Trigger fit when mosaic is resized (for terminal resizing)
-	const [fitTrigger, setFitTrigger] = useState(0);
-
-	// Trigger fit when mosaic pane is resized
-	useEffect(() => {
-		if (resizeTrigger > 0) {
-			setFitTrigger((prev) => prev + 1);
-		}
-	}, [resizeTrigger]);
-
-	return (
-		<TabContent
-			tab={tab}
-			workingDirectory={workingDirectory}
-			workspaceId={workspaceId}
-			worktreeId={worktreeId}
-			groupTabId={groupTabId}
-			onTabFocus={onTabFocus}
-			triggerFit={fitTrigger}
-		/>
-	);
-}
-
 export default function ScreenLayout({
 	groupTab,
 	workingDirectory,
@@ -72,9 +26,6 @@ export default function ScreenLayout({
 	selectedTabId,
 	onTabFocus,
 }: ScreenLayoutProps) {
-	// Trigger fit for all terminals when mosaic is resized
-	const [resizeTrigger, setResizeTrigger] = useState(0);
-
 	// Initialize mosaic tree from groupTab or create a default tree
 	const [mosaicTree, setMosaicTree] = useState<MosaicNode<string> | null>(
 		() => {
@@ -160,11 +111,6 @@ export default function ScreenLayout({
 		[workspaceId, worktreeId, groupTab.id, mosaicTree],
 	);
 
-	// Trigger resize on mosaic change
-	const handleRelease = useCallback(() => {
-		setResizeTrigger((prev) => prev + 1);
-	}, []);
-
 	// Create a map of tab IDs to Tab objects for easy lookup
 	const tabsById = new Map(groupTab.tabs?.map((tab) => [tab.id, tab]) || []);
 
@@ -189,14 +135,13 @@ export default function ScreenLayout({
 					className={isActive ? "active-mosaic-window" : ""}
 					toolbarControls={<div />}
 				>
-					<TabInstance
+					<TabContent
 						tab={tab}
 						workingDirectory={workingDirectory}
 						workspaceId={workspaceId}
 						worktreeId={worktreeId}
 						groupTabId={groupTab.id}
 						onTabFocus={onTabFocus}
-						resizeTrigger={resizeTrigger}
 					/>
 				</MosaicWindow>
 			);
@@ -209,7 +154,6 @@ export default function ScreenLayout({
 			worktreeId,
 			groupTab.id,
 			onTabFocus,
-			resizeTrigger,
 		],
 	);
 
@@ -252,7 +196,6 @@ export default function ScreenLayout({
 				renderTile={renderTile}
 				value={mosaicTree}
 				onChange={handleMosaicChange}
-				onRelease={handleRelease}
 				className="mosaic-theme-dark"
 			/>
 			<style>{`
