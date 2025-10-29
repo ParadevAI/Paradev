@@ -5,7 +5,7 @@ import {
 	ContextMenuItem,
 	ContextMenuTrigger,
 } from "@superset/ui/context-menu";
-import { FolderTree, SquareTerminal, X } from "lucide-react";
+import { FolderTree, FolderOutput, SquareTerminal, X } from "lucide-react";
 import type { Tab } from "shared/types";
 
 interface TabItemProps {
@@ -13,9 +13,11 @@ interface TabItemProps {
 	worktreeId: string;
 	selectedTabId: string | undefined;
 	selectedTabIds: Set<string>;
+	parentTabId?: string; // The parent group tab ID (if this tab is inside a group)
 	onTabSelect: (worktreeId: string, tabId: string, shiftKey: boolean) => void;
 	onTabRemove?: (tabId: string) => void;
 	onGroupTabs?: (tabIds: string[]) => void;
+	onMoveOutOfGroup?: (tabId: string, parentTabId: string) => void;
 }
 
 export function TabItem({
@@ -23,9 +25,11 @@ export function TabItem({
 	worktreeId,
 	selectedTabId,
 	selectedTabIds,
+	parentTabId,
 	onTabSelect,
 	onTabRemove,
 	onGroupTabs,
+	onMoveOutOfGroup,
 }: TabItemProps) {
 	const handleRemove = (e: React.MouseEvent) => {
 		e.stopPropagation();
@@ -42,9 +46,16 @@ export function TabItem({
 		}
 	};
 
+	const handleMoveOut = () => {
+		if (onMoveOutOfGroup && parentTabId) {
+			onMoveOutOfGroup(tab.id, parentTabId);
+		}
+	};
+
 	const isSelected = selectedTabId === tab.id;
 	const isMultiSelected = selectedTabIds.has(tab.id);
 	const showMultiSelectHighlight = isMultiSelected && selectedTabIds.size > 1;
+	const isInsideGroup = !!parentTabId;
 
 	return (
 		<ContextMenu>
@@ -75,6 +86,12 @@ export function TabItem({
 				</button>
 			</ContextMenuTrigger>
 			<ContextMenuContent>
+				{isInsideGroup && (
+					<ContextMenuItem onClick={handleMoveOut}>
+						<FolderOutput size={14} className="mr-2" />
+						Move Out of Group
+					</ContextMenuItem>
+				)}
 				{selectedTabIds.size > 1 && (
 					<ContextMenuItem onClick={handleGroupSelected}>
 						<FolderTree size={14} className="mr-2" />

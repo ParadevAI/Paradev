@@ -1,6 +1,7 @@
 import {
 	closestCenter,
 	DndContext,
+	DragOverlay,
 	type DragEndEvent,
 	type DragOverEvent,
 	type DragStartEvent,
@@ -51,6 +52,7 @@ function SortableTab({
 	onTabSelect,
 	onTabRemove,
 	onGroupTabs,
+	onMoveOutOfGroup,
 }: {
 	tab: Tab;
 	worktreeId: string;
@@ -60,6 +62,7 @@ function SortableTab({
 	onTabSelect: (worktreeId: string, tabId: string, shiftKey: boolean) => void;
 	onTabRemove: (tabId: string) => void;
 	onGroupTabs: (tabIds: string[]) => void;
+	onMoveOutOfGroup: (tabId: string, parentTabId: string) => void;
 }) {
 	const {
 		attributes,
@@ -87,11 +90,13 @@ function SortableTab({
 			<TabItem
 				tab={tab}
 				worktreeId={worktreeId}
+				parentTabId={parentTabId}
 				selectedTabId={selectedTabId}
 				selectedTabIds={selectedTabIds}
 				onTabSelect={onTabSelect}
 				onTabRemove={onTabRemove}
 				onGroupTabs={onGroupTabs}
+				onMoveOutOfGroup={onMoveOutOfGroup}
 			/>
 		</div>
 	);
@@ -436,6 +441,58 @@ export function WorktreeItem({
 		}
 	};
 
+	// Handle moving a tab out of its group
+	const handleMoveOutOfGroup = async (tabId: string, parentTabId: string) => {
+		try {
+			const tab = findTabById(tabs, tabId);
+			const parentTab = findTabById(tabs, parentTabId);
+
+			if (!tab || !parentTab || parentTab.type !== "group") {
+				console.error("Invalid tab or parent group");
+				return;
+			}
+
+			// Move the tab to worktree level
+			const moveResult = await window.ipcRenderer.invoke("tab-move", {
+				workspaceId,
+				worktreeId: worktree.id,
+				tabId,
+				sourceParentTabId: parentTabId,
+				targetParentTabId: undefined, // Move to worktree level
+				targetIndex: tabs.length, // Add to end of worktree tabs
+			});
+
+			if (!moveResult.success) {
+				console.error("Failed to move tab out of group:", moveResult.error);
+				onReload();
+				return;
+			}
+
+			// Update the parent group's mosaic tree to remove this tab
+			if (parentTab.mosaicTree) {
+				const updatedMosaicTree = removeTabFromMosaicTree(
+					parentTab.mosaicTree,
+					tabId,
+				);
+
+				await window.ipcRenderer.invoke("tab-update-mosaic-tree", {
+					workspaceId,
+					worktreeId: worktree.id,
+					tabId: parentTabId,
+					mosaicTree: updatedMosaicTree,
+				});
+			}
+
+			// Reload to show the updated structure
+			onReload();
+
+			// Select the moved tab
+			onTabSelect(worktree.id, tabId);
+		} catch (error) {
+			console.error("Error moving tab out of group:", error);
+		}
+	};
+
 	// Check if merge should be disabled on mount and get target branch
 	useEffect(() => {
 		const checkMergeStatus = async () => {
@@ -517,6 +574,41 @@ export function WorktreeItem({
 		return {
 			...tree,
 			second: addTabToMosaicTree(tree.second, tabId),
+		};
+	};
+
+	// Helper: Remove tab ID from mosaic tree
+	const removeTabFromMosaicTree = (
+		tree: MosaicNode<string>,
+		tabId: string,
+	): MosaicNode<string> | null => {
+		if (typeof tree === "string") {
+			// If this is the tab to remove, return null
+			return tree === tabId ? null : tree;
+		}
+
+		// Recursively remove from branches
+		const newFirst = removeTabFromMosaicTree(tree.first, tabId);
+		const newSecond = removeTabFromMosaicTree(tree.second, tabId);
+
+		// If both branches are gone, return null
+		if (!newFirst && !newSecond) {
+			return null;
+		}
+
+		// If one branch is gone, return the other
+		if (!newFirst) {
+			return newSecond;
+		}
+		if (!newSecond) {
+			return newFirst;
+		}
+
+		// Both branches exist, return the updated tree
+		return {
+			...tree,
+			first: newFirst,
+			second: newSecond,
 		};
 	};
 
@@ -933,6 +1025,7 @@ export function WorktreeItem({
 					onTabSelect={handleTabSelect}
 					onTabRemove={handleTabRemove}
 					onGroupTabs={handleGroupTabs}
+					onMoveOutOfGroup={handleMoveOutOfGroup}
 				/>
 			</div>
 		);
@@ -1024,12 +1117,14 @@ export function WorktreeItem({
 				)}
 			</div>
 
-			{/* Drag Overlay */}
-			{activeItem && (
-				<div className="bg-neutral-800 border border-neutral-700 rounded px-3 py-2 text-sm opacity-90">
-					{activeItem.name}
-				</div>
-			)}
+			{/* Drag Overlay - follows the cursor */}
+			<DragOverlay>
+				{activeItem ? (
+					<div className="bg-neutral-800 border border-neutral-700 rounded px-3 py-2 text-sm opacity-90 cursor-grabbing">
+						{activeItem.name}
+					</div>
+				) : null}
+			</DragOverlay>
 		</DndContext>
 	);
 }
