@@ -88,11 +88,13 @@ export default function TerminalComponent({
 
 	// Trigger fit when triggerFit prop changes
 	useEffect(() => {
-		if (triggerFit !== undefined && fitFunctionRef.current) {
-			// Small delay to ensure DOM has updated
-			setTimeout(() => {
+		if (triggerFit !== undefined && triggerFit > 0 && fitFunctionRef.current) {
+			// Debounce the fit to prevent multiple rapid calls
+			const timeout = setTimeout(() => {
 				fitFunctionRef.current?.();
-			}, 50);
+			}, 100);
+
+			return () => clearTimeout(timeout);
 		}
 	}, [triggerFit]);
 
@@ -179,10 +181,8 @@ export default function TerminalComponent({
 					return; // Skip if container has no dimensions yet
 				}
 
-				// Use FitAddon's fit which calculates based on font metrics
-				fitAddon.fit();
-
-				// Get the computed dimensions after fit
+				// Use proposeDimensions to calculate optimal size without applying it
+				// Then manually resize to ensure PTY gets the correct dimensions
 				const dimensions = fitAddon.proposeDimensions();
 				if (dimensions) {
 					term.resize(dimensions.cols, dimensions.rows);
@@ -206,6 +206,7 @@ export default function TerminalComponent({
 		// Listen for container resize to auto-fit terminal
 		// Use ResizeObserver to detect when the container size changes
 		// Debounce resize to prevent excessive fit calls that cause terminal corruption
+		// Each terminal gets its own independent debounce timeout
 		let resizeTimeout: ReturnType<typeof setTimeout> | null = null;
 		const handleResize = () => {
 			if (resizeTimeout) {
@@ -216,7 +217,7 @@ export default function TerminalComponent({
 					customFit();
 				}
 				resizeTimeout = null;
-			}, 100);
+			}, 150);
 		};
 
 		// Observe container size changes
