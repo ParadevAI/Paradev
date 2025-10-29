@@ -132,6 +132,8 @@ export default function TerminalComponent({
 
 		// Track if terminal is disposed to prevent operations on disposed terminal
 		let isDisposed = false;
+		// Track if this is the initial setup to prevent resize events during reconnection
+		let isInitialSetup = true;
 
 		// Load addons
 		// 1. WebLinks - Makes URLs clickable and open in default browser
@@ -179,13 +181,6 @@ export default function TerminalComponent({
 			}
 		};
 
-		// Delay initial fit to ensure renderer is ready
-		setTimeout(() => {
-			if (!isDisposed) {
-				customFit();
-			}
-		}, 100);
-
 		// 4. SearchAddon - Enable text searching (Ctrl+F or Cmd+F)
 		const searchAddon = new SearchAddon();
 		term.loadAddon(searchAddon);
@@ -223,12 +218,37 @@ export default function TerminalComponent({
 				.invoke("terminal-get-history", terminalId)
 				.then((history: string | undefined) => {
 					if (history) {
+						// Debug: log the last characters of history
+						console.log("History last 50 chars:", JSON.stringify(history.slice(-50)));
+						// Write history without triggering convertEol by writing directly
+						// The history already has proper line endings from PTY
 						term.write(history);
+
+						// Delay initial fit AFTER writing history to prevent resize events
+						// from triggering the shell to redraw the prompt
+						setTimeout(() => {
+							if (!isDisposed) {
+								customFit();
+								// Mark initial setup as complete after first fit
+								isInitialSetup = false;
+							}
+						}, 100);
 					}
 				})
 				.catch((error: Error) => {
 					console.error("Failed to get terminal history:", error);
+					// Mark initial setup as complete even on error
+					isInitialSetup = false;
 				});
+		} else {
+			// Delay initial fit to ensure renderer is ready (for new terminals)
+			setTimeout(() => {
+				if (!isDisposed) {
+					customFit();
+					// Mark initial setup as complete after first fit
+					isInitialSetup = false;
+				}
+			}, 100);
 		}
 
 		// Set up event listeners
@@ -242,6 +262,11 @@ export default function TerminalComponent({
 		});
 
 		term.onResize(({ cols, rows }) => {
+			// Skip resize events during initial setup to prevent shell from redrawing prompt
+			// when reconnecting to an existing terminal
+			if (isInitialSetup) {
+				return;
+			}
 			if (terminalIdRef.current) {
 				window.ipcRenderer.send("terminal-resize", {
 					id: terminalIdRef.current,
