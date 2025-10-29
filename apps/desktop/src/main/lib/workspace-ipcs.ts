@@ -301,4 +301,48 @@ export function registerWorkspaceIPCs() {
 			);
 		},
 	);
+
+	// Remove worktree
+	ipcMain.handle(
+		"worktree-remove",
+		async (_event, input: { workspaceId: string; worktreeId: string }) => {
+			return await workspaceManager.removeWorktree(
+				input.workspaceId,
+				input.worktreeId,
+			);
+		},
+	);
+
+	// Check if worktree can be merged
+	ipcMain.handle(
+		"worktree-can-merge",
+		async (_event, input: { workspaceId: string; worktreeId: string }) => {
+			return await workspaceManager.canMergeWorktree(
+				input.workspaceId,
+				input.worktreeId,
+			);
+		},
+	);
+
+	// Merge worktree
+	ipcMain.handle(
+		"worktree-merge",
+		async (_event, input: { workspaceId: string; worktreeId: string }) => {
+			return await workspaceManager.mergeWorktree(
+				input.workspaceId,
+				input.worktreeId,
+			);
+		},
+	);
+
+	// Get worktree path
+	ipcMain.handle(
+		"worktree-get-path",
+		async (_event, input: { workspaceId: string; worktreeId: string }) => {
+			return await workspaceManager.getWorktreePath(
+				input.workspaceId,
+				input.worktreeId,
+			);
+		},
+	);
 }

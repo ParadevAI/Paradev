@@ -1,5 +1,12 @@
 import { Button } from "@superset/ui/button";
-import { ChevronRight, FolderOpen, GitBranch } from "lucide-react";
+import {
+	ContextMenu,
+	ContextMenuContent,
+	ContextMenuItem,
+	ContextMenuSeparator,
+	ContextMenuTrigger,
+} from "@superset/ui/context-menu";
+import { ChevronRight, Clipboard, FolderOpen, GitBranch, GitMerge, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { Tab, TabGroup, Worktree } from "shared/types";
 import {
@@ -435,6 +442,64 @@ export function WorktreeItem({
 			worktree.tabGroups.find((tg) => tg.id === activeId)
 		: null;
 
+	// Context menu handlers
+	const handleCopyPath = async () => {
+		const path = await window.ipcRenderer.invoke("worktree-get-path", {
+			workspaceId,
+			worktreeId: worktree.id,
+		});
+		if (path) {
+			navigator.clipboard.writeText(path);
+		}
+	};
+
+	const handleRemoveWorktree = async () => {
+		if (confirm(`Are you sure you want to remove the worktree "${worktree.branch}"?`)) {
+			const result = await window.ipcRenderer.invoke("worktree-remove", {
+				workspaceId,
+				worktreeId: worktree.id,
+			});
+
+			if (result.success) {
+				onReload();
+			} else {
+				alert(`Failed to remove worktree: ${result.error}`);
+			}
+		}
+	};
+
+	const handleMergeWorktree = async () => {
+		// Check if can merge first
+		const canMergeResult = await window.ipcRenderer.invoke("worktree-can-merge", {
+			workspaceId,
+			worktreeId: worktree.id,
+		});
+
+		if (!canMergeResult.success) {
+			alert(`Error: ${canMergeResult.error}`);
+			return;
+		}
+
+		if (!canMergeResult.canMerge) {
+			alert(`Cannot merge: ${canMergeResult.reason}`);
+			return;
+		}
+
+		if (confirm(`Are you sure you want to merge "${worktree.branch}" into the current branch?`)) {
+			const result = await window.ipcRenderer.invoke("worktree-merge", {
+				workspaceId,
+				worktreeId: worktree.id,
+			});
+
+			if (result.success) {
+				alert("Merge successful!");
+				onReload();
+			} else {
+				alert(`Failed to merge: ${result.error}`);
+			}
+		}
+	};
+
 	return (
 		<DndContext
 			sensors={sensors}
@@ -445,20 +510,39 @@ export function WorktreeItem({
 		>
 			<div className="space-y-1">
 				{/* Worktree Header */}
-				<Button
-					variant="ghost"
-					size="sm"
-					onClick={() => onToggle(worktree.id)}
-					className="w-full h-8 px-3 pb-1 font-normal"
-					style={{ justifyContent: "flex-start" }}
-				>
-					<ChevronRight
-						size={12}
-						className={`transition-transform ${isExpanded ? "rotate-90" : ""}`}
-					/>
-					<GitBranch size={14} className="opacity-70" />
-					<span className="truncate flex-1 text-left">{worktree.branch}</span>
-				</Button>
+				<ContextMenu>
+					<ContextMenuTrigger asChild>
+						<Button
+							variant="ghost"
+							size="sm"
+							onClick={() => onToggle(worktree.id)}
+							className="w-full h-8 px-3 pb-1 font-normal"
+							style={{ justifyContent: "flex-start" }}
+						>
+							<ChevronRight
+								size={12}
+								className={`transition-transform ${isExpanded ? "rotate-90" : ""}`}
+							/>
+							<GitBranch size={14} className="opacity-70" />
+							<span className="truncate flex-1 text-left">{worktree.branch}</span>
+						</Button>
+					</ContextMenuTrigger>
+					<ContextMenuContent>
+						<ContextMenuItem onClick={handleMergeWorktree}>
+							<GitMerge size={14} className="mr-2" />
+							Merge Worktree
+						</ContextMenuItem>
+						<ContextMenuItem onClick={handleCopyPath}>
+							<Clipboard size={14} className="mr-2" />
+							Copy Path
+						</ContextMenuItem>
+						<ContextMenuSeparator />
+						<ContextMenuItem onClick={handleRemoveWorktree} className="text-red-500">
+							<Trash2 size={14} className="mr-2" />
+							Remove Worktree
+						</ContextMenuItem>
+					</ContextMenuContent>
+				</ContextMenu>
 
 				{/* Tab Groups and Tabs List */}
 				{isExpanded && (

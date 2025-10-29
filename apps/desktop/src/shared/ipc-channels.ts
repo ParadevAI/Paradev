@@ -90,6 +90,22 @@ export interface IpcChannels {
 		request: CreateWorktreeInput;
 		response: IpcResponse<Worktree>;
 	};
+	"worktree-remove": {
+		request: { workspaceId: string; worktreeId: string };
+		response: IpcResponse;
+	};
+	"worktree-can-merge": {
+		request: { workspaceId: string; worktreeId: string };
+		response: IpcResponse<{ canMerge: boolean; reason?: string }>;
+	};
+	"worktree-merge": {
+		request: { workspaceId: string; worktreeId: string };
+		response: IpcResponse;
+	};
+	"worktree-get-path": {
+		request: { workspaceId: string; worktreeId: string };
+		response: string | null;
+	};
 
 	// Tab group operations
 	"tab-group-create": {
@@ -212,6 +228,10 @@ export function isValidChannel(channel: string): channel is IpcChannelName {
 		"workspace-set-active-workspace-id",
 		"workspace-update-terminal-cwd",
 		"worktree-create",
+		"worktree-remove",
+		"worktree-can-merge",
+		"worktree-merge",
+		"worktree-get-path",
 		"tab-group-create",
 		"tab-group-reorder",
 		"tab-group-update-grid-sizes",

@@ -856,6 +856,145 @@ class WorkspaceManager {
 			};
 		}
 	}
+
+	/**
+	 * Remove a worktree
+	 */
+	async removeWorktree(
+		workspaceId: string,
+		worktreeId: string,
+	): Promise<{ success: boolean; error?: string }> {
+		try {
+			const workspace = await this.get(workspaceId);
+			if (!workspace) {
+				return { success: false, error: "Workspace not found" };
+			}
+
+			const worktree = workspace.worktrees.find((wt) => wt.id === worktreeId);
+			if (!worktree) {
+				return { success: false, error: "Worktree not found" };
+			}
+
+			// Remove git worktree
+			await worktreeManager.removeWorktree(workspace.repoPath, worktree.path);
+
+			// Remove from workspace
+			workspace.worktrees = workspace.worktrees.filter(
+				(wt) => wt.id !== worktreeId,
+			);
+			workspace.updatedAt = new Date().toISOString();
+
+			// Save to config
+			const config = configManager.read();
+			const index = config.workspaces.findIndex((ws) => ws.id === workspace.id);
+			if (index !== -1) {
+				config.workspaces[index] = workspace;
+				configManager.write(config);
+			}
+
+			return { success: true };
+		} catch (error) {
+			console.error("Failed to remove worktree:", error);
+			return {
+				success: false,
+				error: error instanceof Error ? error.message : String(error),
+			};
+		}
+	}
+
+	/**
+	 * Check if a worktree can be merged
+	 */
+	async canMergeWorktree(
+		workspaceId: string,
+		worktreeId: string,
+	): Promise<{
+		success: boolean;
+		canMerge?: boolean;
+		reason?: string;
+		error?: string;
+	}> {
+		try {
+			const workspace = await this.get(workspaceId);
+			if (!workspace) {
+				return { success: false, error: "Workspace not found" };
+			}
+
+			const worktree = workspace.worktrees.find((wt) => wt.id === worktreeId);
+			if (!worktree) {
+				return { success: false, error: "Worktree not found" };
+			}
+
+			const canMerge = await worktreeManager.canMerge(
+				workspace.repoPath,
+				worktree.branch,
+			);
+
+			return {
+				success: true,
+				canMerge: canMerge.canMerge,
+				reason: canMerge.reason,
+			};
+		} catch (error) {
+			console.error("Failed to check if worktree can be merged:", error);
+			return {
+				success: false,
+				error: error instanceof Error ? error.message : String(error),
+			};
+		}
+	}
+
+	/**
+	 * Merge a worktree into the main branch
+	 */
+	async mergeWorktree(
+		workspaceId: string,
+		worktreeId: string,
+	): Promise<{ success: boolean; error?: string }> {
+		try {
+			const workspace = await this.get(workspaceId);
+			if (!workspace) {
+				return { success: false, error: "Workspace not found" };
+			}
+
+			const worktree = workspace.worktrees.find((wt) => wt.id === worktreeId);
+			if (!worktree) {
+				return { success: false, error: "Worktree not found" };
+			}
+
+			// Merge worktree
+			const result = await worktreeManager.merge(
+				workspace.repoPath,
+				worktree.branch,
+			);
+
+			if (!result.success) {
+				return { success: false, error: result.error };
+			}
+
+			return { success: true };
+		} catch (error) {
+			console.error("Failed to merge worktree:", error);
+			return {
+				success: false,
+				error: error instanceof Error ? error.message : String(error),
+			};
+		}
+	}
+
+	/**
+	 * Get the path of a worktree
+	 */
+	async getWorktreePath(
+		workspaceId: string,
+		worktreeId: string,
+	): Promise<string | null> {
+		const workspace = await this.get(workspaceId);
+		if (!workspace) return null;
+
+		const worktree = workspace.worktrees.find((wt) => wt.id === worktreeId);
+		return worktree?.path || null;
+	}
 }
 
 export default WorkspaceManager.getInstance();

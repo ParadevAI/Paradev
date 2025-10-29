@@ -184,6 +184,81 @@ class WorktreeManager {
 			return null;
 		}
 	}
+
+	/**
+	 * Check if a branch can be merged
+	 */
+	async canMerge(
+		repoPath: string,
+		branch: string,
+	): Promise<{ canMerge: boolean; reason?: string }> {
+		try {
+			// Check if branch exists
+			const branchExists = execSync(`git rev-parse --verify ${branch}`, {
+				cwd: repoPath,
+				stdio: "pipe",
+				encoding: "utf-8",
+			}).trim();
+
+			if (!branchExists) {
+				return { canMerge: false, reason: "Branch does not exist" };
+			}
+
+			// Check if there are uncommitted changes
+			const status = execSync("git status --porcelain", {
+				cwd: repoPath,
+				encoding: "utf-8",
+			}).trim();
+
+			if (status) {
+				return {
+					canMerge: false,
+					reason: "Working directory has uncommitted changes",
+				};
+			}
+
+			return { canMerge: true };
+		} catch (error) {
+			console.error("Failed to check if branch can be merged:", error);
+			return {
+				canMerge: false,
+				reason: error instanceof Error ? error.message : String(error),
+			};
+		}
+	}
+
+	/**
+	 * Merge a branch into the current branch
+	 */
+	async merge(
+		repoPath: string,
+		branch: string,
+	): Promise<{ success: boolean; error?: string }> {
+		try {
+			// Check if we can merge first
+			const canMergeResult = await this.canMerge(repoPath, branch);
+			if (!canMergeResult.canMerge) {
+				return {
+					success: false,
+					error: canMergeResult.reason || "Cannot merge branch",
+				};
+			}
+
+			// Execute merge
+			execSync(`git merge ${branch}`, {
+				cwd: repoPath,
+				stdio: "pipe",
+			});
+
+			return { success: true };
+		} catch (error) {
+			console.error("Failed to merge branch:", error);
+			return {
+				success: false,
+				error: error instanceof Error ? error.message : String(error),
+			};
+		}
+	}
 }
 
 export default WorktreeManager.getInstance();
