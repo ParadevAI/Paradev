@@ -191,7 +191,11 @@ class WorktreeManager {
 	async canMerge(
 		targetWorktreePath: string,
 		sourceBranch: string,
-	): Promise<{ canMerge: boolean; reason?: string }> {
+	): Promise<{
+		canMerge: boolean;
+		reason?: string;
+		hasUncommittedChanges?: boolean;
+	}> {
 		try {
 			// Check if source branch exists
 			try {
@@ -210,9 +214,11 @@ class WorktreeManager {
 				encoding: "utf-8",
 			}).trim();
 
+			// Allow merge but warn about uncommitted changes
 			if (status) {
 				return {
-					canMerge: false,
+					canMerge: true,
+					hasUncommittedChanges: true,
 					reason: "Target worktree has uncommitted changes",
 				};
 			}

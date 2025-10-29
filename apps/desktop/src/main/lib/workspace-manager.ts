@@ -978,6 +978,7 @@ class WorkspaceManager {
 		reason?: string;
 		error?: string;
 		isActiveWorktree?: boolean;
+		hasUncommittedChanges?: boolean;
 	}> {
 		try {
 			const workspace = await this.get(workspaceId);
@@ -1022,6 +1023,7 @@ class WorkspaceManager {
 				success: true,
 				canMerge: canMerge.canMerge,
 				reason: canMerge.reason,
+				hasUncommittedChanges: canMerge.hasUncommittedChanges,
 				isActiveWorktree: false,
 			};
 		} catch (error) {
