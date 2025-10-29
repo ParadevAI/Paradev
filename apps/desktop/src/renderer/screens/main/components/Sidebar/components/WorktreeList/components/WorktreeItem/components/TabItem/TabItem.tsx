@@ -22,7 +22,7 @@ export function TabItem({
 			variant="ghost"
 			size="sm"
 			onClick={() => onTabSelect(worktreeId, tabGroupId, tab.id)}
-			className={`w-full h-8 px-3 font-normal ${
+			className={`w-full h-8 px-3 font-normal [transition:all_0.2s,border_0s] ${
 				selectedTabId === tab.id
 					? "bg-neutral-800 border border-neutral-700"
 					: ""

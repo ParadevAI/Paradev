@@ -150,9 +150,12 @@ export function registerWorkspaceIPCs() {
 	);
 
 	// Get active selection
-	ipcMain.handle("workspace-get-active-selection", async () => {
-		return configManager.getActiveSelection();
-	});
+	ipcMain.handle(
+		"workspace-get-active-selection",
+		async (_event, workspaceId: string) => {
+			return configManager.getActiveSelection(workspaceId);
+		},
+	);
 
 	// Set active selection
 	ipcMain.handle(
@@ -160,16 +163,31 @@ export function registerWorkspaceIPCs() {
 		async (
 			_event,
 			input: {
+				workspaceId: string;
 				worktreeId: string | null;
 				tabGroupId: string | null;
 				tabId: string | null;
 			},
 		) => {
 			return configManager.setActiveSelection(
+				input.workspaceId,
 				input.worktreeId,
 				input.tabGroupId,
 				input.tabId,
 			);
+		},
+	);
+
+	// Get active workspace ID
+	ipcMain.handle("workspace-get-active-workspace-id", async () => {
+		return configManager.getActiveWorkspaceId();
+	});
+
+	// Set active workspace ID
+	ipcMain.handle(
+		"workspace-set-active-workspace-id",
+		async (_event, workspaceId: string) => {
+			return configManager.setActiveWorkspaceId(workspaceId);
 		},
 	);
 

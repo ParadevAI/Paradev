@@ -60,19 +60,28 @@ export interface IpcChannels {
 		response: IpcResponse<{ imported: number }>;
 	};
 	"workspace-get-active-selection": {
-		request: void;
+		request: string; // workspace ID
 		response: {
 			worktreeId: string | null;
 			tabGroupId: string | null;
 			tabId: string | null;
-		};
+		} | null;
 	};
 	"workspace-set-active-selection": {
 		request: {
+			workspaceId: string;
 			worktreeId: string | null;
 			tabGroupId: string | null;
 			tabId: string | null;
 		};
+		response: boolean;
+	};
+	"workspace-get-active-workspace-id": {
+		request: void;
+		response: string | null;
+	};
+	"workspace-set-active-workspace-id": {
+		request: string; // workspace ID
 		response: boolean;
 	};
 
@@ -189,6 +198,8 @@ export function isValidChannel(channel: string): channel is IpcChannelName {
 		"workspace-scan-worktrees",
 		"workspace-get-active-selection",
 		"workspace-set-active-selection",
+		"workspace-get-active-workspace-id",
+		"workspace-set-active-workspace-id",
 		"workspace-update-terminal-cwd",
 		"worktree-create",
 		"tab-group-create",

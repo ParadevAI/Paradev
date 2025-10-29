@@ -115,6 +115,9 @@ class WorkspaceManager {
 				repoPath: input.repoPath,
 				branch: input.branch,
 				worktrees: [],
+				activeWorktreeId: null,
+				activeTabGroupId: null,
+				activeTabId: null,
 				createdAt: now,
 				updatedAt: now,
 			};
