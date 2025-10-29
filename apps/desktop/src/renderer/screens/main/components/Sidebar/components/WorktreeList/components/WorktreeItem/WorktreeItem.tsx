@@ -498,22 +498,31 @@ export function WorktreeItem({
 	const renderTab = (tab: Tab, parentTabId?: string, level = 0) => {
 		if (tab.type === "group") {
 			const isExpanded = expandedGroupTabs.has(tab.id);
+			const isSelected = selectedTabId === tab.id;
 			return (
 				<div key={tab.id} className="space-y-1">
 					{/* Group Tab Header */}
-					<Button
-						variant="ghost"
-						size="sm"
-						onClick={() => toggleGroupTab(tab.id)}
-						className="w-full h-8 px-3 pb-1 font-normal"
-						style={{ justifyContent: "flex-start", paddingLeft: `${level * 12 + 12}px` }}
+					<button
+						type="button"
+						onClick={() => {
+							// Select the group tab
+							onTabSelect(worktree.id, tab.id);
+							// Also toggle expansion
+							toggleGroupTab(tab.id);
+						}}
+						className={`group flex items-center gap-1 w-full h-8 px-3 text-sm rounded-md [transition:all_0.2s,border_0s] ${
+							isSelected
+								? "bg-neutral-800 border border-neutral-700"
+								: "hover:bg-neutral-800/50"
+						}`}
+						style={{ paddingLeft: `${level * 12 + 12}px` }}
 					>
 						<ChevronRight
 							size={12}
 							className={`transition-transform ${isExpanded ? "rotate-90" : ""}`}
 						/>
 						<span className="truncate flex-1 text-left">{tab.name}</span>
-					</Button>
+					</button>
 
 					{/* Nested Tabs */}
 					{isExpanded && tab.tabs && (
