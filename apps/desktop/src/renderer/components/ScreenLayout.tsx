@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import {
 	Mosaic,
-	MosaicWindow,
 	type MosaicBranch,
 	type MosaicNode,
+	MosaicWindow,
 } from "react-mosaic-component";
 import "react-mosaic-component/react-mosaic-component.css";
 import type { Tab } from "shared/types";
@@ -76,33 +76,35 @@ export default function ScreenLayout({
 	const [resizeTrigger, setResizeTrigger] = useState(0);
 
 	// Initialize mosaic tree from groupTab or create a default tree
-	const [mosaicTree, setMosaicTree] = useState<MosaicNode<string> | null>(() => {
-		if (groupTab.mosaicTree) {
-			return groupTab.mosaicTree as MosaicNode<string>;
-		}
-
-		// If no mosaic tree exists but tabs exist, create a default layout
-		if (groupTab.tabs && groupTab.tabs.length > 0) {
-			if (groupTab.tabs.length === 1) {
-				return groupTab.tabs[0].id;
+	const [mosaicTree, setMosaicTree] = useState<MosaicNode<string> | null>(
+		() => {
+			if (groupTab.mosaicTree) {
+				return groupTab.mosaicTree as MosaicNode<string>;
 			}
-			// Create a simple row split for 2+ tabs
-			return {
-				direction: "row",
-				first: groupTab.tabs[0].id,
-				second:
-					groupTab.tabs.length === 2
-						? groupTab.tabs[1].id
-						: {
-								direction: "column",
-								first: groupTab.tabs[1].id,
-								second: groupTab.tabs[2]?.id || groupTab.tabs[1].id,
-						  },
-			};
-		}
 
-		return null;
-	});
+			// If no mosaic tree exists but tabs exist, create a default layout
+			if (groupTab.tabs && groupTab.tabs.length > 0) {
+				if (groupTab.tabs.length === 1) {
+					return groupTab.tabs[0].id;
+				}
+				// Create a simple row split for 2+ tabs
+				return {
+					direction: "row",
+					first: groupTab.tabs[0].id,
+					second:
+						groupTab.tabs.length === 2
+							? groupTab.tabs[1].id
+							: {
+									direction: "column",
+									first: groupTab.tabs[1].id,
+									second: groupTab.tabs[2]?.id || groupTab.tabs[1].id,
+								},
+				};
+			}
+
+			return null;
+		},
+	);
 
 	// Helper function to get all tab IDs from a mosaic tree
 	const getTabIdsFromTree = (tree: MosaicNode<string> | null): Set<string> => {

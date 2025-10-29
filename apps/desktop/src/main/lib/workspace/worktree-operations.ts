@@ -11,6 +11,7 @@ import type {
 
 import configManager from "../config-manager";
 import worktreeManager from "../worktree-manager";
+import { cleanupEmptyGroupsInAllWorktrees } from "./group-cleanup";
 
 // Function to create default tabs with mosaic layout
 function createDefaultTabsWithMosaic(): {
@@ -358,8 +359,7 @@ export async function scanAndImportWorktrees(
 				}
 			} else {
 				// Create default tabs with mosaic layout (2x2 grid equivalent)
-				const { tabs: defaultTabs, mosaicTree } =
-					createDefaultTabsWithMosaic();
+				const { tabs: defaultTabs, mosaicTree } = createDefaultTabsWithMosaic();
 
 				// Create default group tab with 4 tabs in mosaic layout
 				const defaultGroupTab: Tab = {
@@ -384,6 +384,15 @@ export async function scanAndImportWorktrees(
 				importedCount++;
 				configChanged = true;
 			}
+		}
+
+		// Clean up any empty group tabs across all worktrees
+		const worktreesWithCleanup = cleanupEmptyGroupsInAllWorktrees(workspace);
+		if (worktreesWithCleanup > 0) {
+			configChanged = true;
+			console.log(
+				`Cleaned up empty group tabs in ${worktreesWithCleanup} worktree(s)`,
+			);
 		}
 
 		if (configChanged) {

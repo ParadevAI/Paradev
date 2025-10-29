@@ -9,6 +9,7 @@ import type {
 } from "shared/types";
 
 import configManager from "../config-manager";
+import { cleanupEmptyGroupsInWorktree } from "./group-cleanup";
 import {
 	findParentTab,
 	findTab,
@@ -139,6 +140,9 @@ export async function deleteTab(
 			);
 			parentTab.mosaicTree = updatedTree === null ? undefined : updatedTree;
 		}
+
+		// Clean up any empty group tabs (including the parent if it became empty)
+		cleanupEmptyGroupsInWorktree(workspace, input.worktreeId);
 
 		workspace.updatedAt = new Date().toISOString();
 
