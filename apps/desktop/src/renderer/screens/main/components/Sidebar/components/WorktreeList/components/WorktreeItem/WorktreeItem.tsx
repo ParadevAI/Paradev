@@ -223,11 +223,11 @@ export function WorktreeItem({
 
 			if (
 				canMergeResult.success &&
-				canMergeResult.data?.isActiveWorktree
+				canMergeResult.isActiveWorktree
 			) {
 				setIsMergeDisabled(true);
 				setMergeDisabledReason(
-					canMergeResult.data.reason || "Active worktree",
+					canMergeResult.reason || "Active worktree",
 				);
 			} else {
 				setIsMergeDisabled(false);
@@ -528,8 +528,8 @@ export function WorktreeItem({
 			return;
 		}
 
-		if (!canMergeResult.data?.canMerge) {
-			alert(`Cannot merge: ${canMergeResult.data?.reason || "Unknown error"}`);
+		if (!canMergeResult.canMerge) {
+			alert(`Cannot merge: ${canMergeResult.reason || "Unknown error"}`);
 			return;
 		}
 
