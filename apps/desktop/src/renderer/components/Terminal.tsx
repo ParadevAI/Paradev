@@ -135,6 +135,8 @@ export default function TerminalComponent({
 		// Track if this is the initial setup to prevent resize events during reconnection
 		let isInitialSetup = true;
 
+		// Initial fit will be called after addons are loaded and dimensions are stable
+
 		// Load addons
 		// 1. WebLinks - Makes URLs clickable and open in default browser
 		const webLinksAddon = new WebLinksAddon((event, uri) => {
@@ -184,6 +186,10 @@ export default function TerminalComponent({
 		// 4. SearchAddon - Enable text searching (Ctrl+F or Cmd+F)
 		const searchAddon = new SearchAddon();
 		term.loadAddon(searchAddon);
+
+		// Perform initial fit to size terminal correctly on first render
+		// This ensures the terminal has correct dimensions when it first appears
+		customFit();
 
 		// Listen for container resize to auto-fit terminal
 		// Use ResizeObserver to detect when the container size changes
@@ -241,11 +247,10 @@ export default function TerminalComponent({
 					isInitialSetup = false;
 				});
 		} else {
-			// Delay initial fit to ensure renderer is ready (for new terminals)
+			// Mark initial setup as complete for new terminals
+			// Initial fit was already performed above
 			setTimeout(() => {
 				if (!isDisposed) {
-					customFit();
-					// Mark initial setup as complete after first fit
 					isInitialSetup = false;
 				}
 			}, 100);
