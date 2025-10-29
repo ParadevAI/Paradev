@@ -1,81 +1,14 @@
 import { randomUUID } from "node:crypto";
 import { existsSync } from "node:fs";
 
-import type {
-	CreateWorktreeInput,
-	MosaicNode,
-	Tab,
-	Workspace,
-	Worktree,
-} from "shared/types";
+import type { CreateWorktreeInput, Workspace, Worktree } from "shared/types";
 
 import configManager from "../config-manager";
 import worktreeManager from "../worktree-manager";
 import { cleanupEmptyGroupsInAllWorktrees } from "./group-cleanup";
 
-// Function to create default tabs with mosaic layout
-function createDefaultTabsWithMosaic(): {
-	tabs: Tab[];
-	mosaicTree: MosaicNode<string>;
-} {
-	const now = new Date().toISOString();
-	const tab1 = randomUUID();
-	const tab2 = randomUUID();
-	const tab3 = randomUUID();
-	const tab4 = randomUUID();
-
-	return {
-		tabs: [
-			{
-				id: tab1,
-				name: "Terminal 1",
-				type: "terminal",
-				command: null,
-				createdAt: now,
-			},
-			{
-				id: tab2,
-				name: "Terminal 2",
-				type: "terminal",
-				command: null,
-				createdAt: now,
-			},
-			{
-				id: tab3,
-				name: "Terminal 3",
-				type: "terminal",
-				command: null,
-				createdAt: now,
-			},
-			{
-				id: tab4,
-				name: "Terminal 4",
-				type: "terminal",
-				command: null,
-				createdAt: now,
-			},
-		],
-		mosaicTree: {
-			direction: "row",
-			first: {
-				direction: "column",
-				first: tab1,
-				second: tab3,
-				splitPercentage: 50,
-			},
-			second: {
-				direction: "column",
-				first: tab2,
-				second: tab4,
-				splitPercentage: 50,
-			},
-			splitPercentage: 50,
-		},
-	};
-}
-
 /**
- * Create a new worktree with a default tab group and tabs
+ * Create a new worktree
  */
 export async function createWorktree(
 	workspace: Workspace,
@@ -96,26 +29,13 @@ export async function createWorktree(
 			};
 		}
 
-		// Create default tabs with mosaic layout (2x2 grid equivalent)
+		// Create worktree object with empty tabs
 		const now = new Date().toISOString();
-		const { tabs: defaultTabs, mosaicTree } = createDefaultTabsWithMosaic();
-
-		// Create default group tab with 4 terminal tabs in mosaic layout
-		const defaultGroupTab: Tab = {
-			id: randomUUID(),
-			name: "Default",
-			type: "group",
-			tabs: defaultTabs,
-			mosaicTree,
-			createdAt: now,
-		};
-
-		// Create worktree object
 		const worktree: Worktree = {
 			id: randomUUID(),
 			branch: input.branch,
 			path: worktreeResult.path!,
-			tabs: [defaultGroupTab],
+			tabs: [],
 			createdAt: now,
 		};
 
@@ -358,25 +278,12 @@ export async function scanAndImportWorktrees(
 					configChanged = true;
 				}
 			} else {
-				// Create default tabs with mosaic layout (2x2 grid equivalent)
-				const { tabs: defaultTabs, mosaicTree } = createDefaultTabsWithMosaic();
-
-				// Create default group tab with 4 tabs in mosaic layout
-				const defaultGroupTab: Tab = {
-					id: randomUUID(),
-					name: "Default",
-					type: "group",
-					tabs: defaultTabs,
-					mosaicTree,
-					createdAt: now,
-				};
-
-				// Create worktree object
+				// Create worktree object with empty tabs
 				const worktree: Worktree = {
 					id: randomUUID(),
 					branch: currentBranch,
 					path: gitWorktree.path,
-					tabs: [defaultGroupTab],
+					tabs: [],
 					createdAt: now,
 				};
 
