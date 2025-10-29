@@ -592,7 +592,7 @@ export function WorktreeItem({
 							{isMergeDisabled
 								? `Merge Worktree (${mergeDisabledReason})`
 								: targetBranch
-									? `Merge into Active (${targetBranch})`
+									? `Merge into (${targetBranch})`
 									: "Merge into Active Worktree"}
 						</ContextMenuItem>
 						<ContextMenuItem onClick={handleCopyPath}>
