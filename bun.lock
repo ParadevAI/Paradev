@@ -14,6 +14,7 @@
       "version": "0.1.0",
       "dependencies": {
         "@superset/ui": "workspace:*",
+        "framer-motion": "^12.23.24",
         "geist": "^1.5.1",
         "next": "^15.1.6",
         "nextra": "^4.6.0",
@@ -82,6 +83,7 @@
       "version": "0.1.0",
       "dependencies": {
         "@superset/ui": "workspace:*",
+        "framer-motion": "^12.23.24",
         "geist": "^1.5.1",
         "next": "^15.1.6",
         "nextra": "^4.6.0",

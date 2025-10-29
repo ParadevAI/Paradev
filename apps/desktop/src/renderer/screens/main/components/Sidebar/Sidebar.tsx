@@ -1,4 +1,4 @@
-import type { MotionValue } from "framer-motion";
+import { type MotionValue, useMotionValue } from "framer-motion";
 import { useEffect, useState } from "react";
 import type { Worktree, Workspace } from "shared/types";
 import {
@@ -16,11 +16,11 @@ interface SidebarProps {
 	onCollapse: () => void;
 	onTabSelect: (worktreeId: string, tabGroupId: string, tabId: string) => void;
 	onTabGroupSelect: (worktreeId: string, tabGroupId: string) => void;
-	onWorktreeCreated?: () => void;
+	onWorktreeCreated: () => void;
 	onWorkspaceSelect: (workspaceId: string) => void;
 	onUpdateWorktree: (worktreeId: string, updatedWorktree: Worktree) => void;
-	selectedTabId?: string;
-	selectedTabGroupId?: string;
+	selectedTabId: string | undefined;
+	selectedTabGroupId: string | undefined;
 }
 
 export function Sidebar({
@@ -42,9 +42,16 @@ export function Sidebar({
 	const [isScanningWorktrees, setIsScanningWorktrees] = useState(false);
 	const [showWorktreeModal, setShowWorktreeModal] = useState(false);
 	const [branchName, setBranchName] = useState("");
-	const [scrollProgress, setScrollProgress] = useState<
-		MotionValue<number> | undefined
-	>();
+
+	// Initialize with current workspace index
+	const currentIndex = workspaces.findIndex(
+		(w) => w.id === currentWorkspace?.id,
+	);
+	const initialIndex = currentIndex >= 0 ? currentIndex : 0;
+	const defaultScrollProgress = useMotionValue(initialIndex);
+	const [scrollProgress, setScrollProgress] = useState<MotionValue<number>>(
+		defaultScrollProgress,
+	);
 
 	console.log(currentWorkspace, workspaces)
 
@@ -107,7 +114,7 @@ export function Sidebar({
 				console.log("[Sidebar] Worktree created successfully");
 				setShowWorktreeModal(false);
 				setBranchName("");
-				onWorktreeCreated?.();
+				onWorktreeCreated();
 			} else {
 				console.error("[Sidebar] Failed to create worktree:", result.error);
 				alert(`Failed to create worktree: ${result.error || "Unknown error"}`);
@@ -180,7 +187,7 @@ export function Sidebar({
 			if (result.success) {
 				console.log("[Sidebar] Scan completed, imported:", result.imported);
 				if (result.imported && result.imported > 0) {
-					onWorktreeCreated?.();
+					onWorktreeCreated();
 				}
 			} else {
 				console.error("[Sidebar] Failed to scan worktrees:", result.error);
@@ -215,7 +222,7 @@ export function Sidebar({
 							onToggleWorktree={toggleWorktree}
 							onTabSelect={onTabSelect}
 							onTabGroupSelect={onTabGroupSelect}
-							onReload={() => onWorktreeCreated?.()}
+							onReload={onWorktreeCreated}
 							onUpdateWorktree={onUpdateWorktree}
 							selectedTabId={selectedTabId}
 							selectedTabGroupId={selectedTabGroupId}

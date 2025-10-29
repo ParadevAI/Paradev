@@ -5,8 +5,8 @@ import Terminal from "./Terminal";
 interface TabContentProps {
 	tab: Tab;
 	workingDirectory: string;
-	workspaceId?: string;
-	worktreeId?: string;
+	workspaceId: string;
+	worktreeId: string | undefined;
 	tabGroupId: string;
 	onTabFocus: (tabId: string) => void;
 	triggerFit?: number; // For terminal resizing

@@ -10,7 +10,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import {
 	type MotionValue,
 	motion,
-	useMotionValue,
 	useTransform,
 } from "framer-motion";
 import { Plus } from "lucide-react";
@@ -23,7 +22,7 @@ interface WorkspaceSwitcherProps {
 	onWorkspaceSelect: (workspaceId: string) => void;
 	onAddWorkspace: () => void;
 	onRemoveWorkspace: (workspaceId: string, workspaceName: string) => void;
-	scrollProgress?: MotionValue<number>;
+	scrollProgress: MotionValue<number>;
 }
 
 export function WorkspaceSwitcher({
@@ -34,15 +33,9 @@ export function WorkspaceSwitcher({
 	onRemoveWorkspace,
 	scrollProgress,
 }: WorkspaceSwitcherProps) {
-	// Create a default motion value initialized to current workspace index
-	const currentIndex = workspaces.findIndex((w) => w.id === currentWorkspaceId);
-	const initialIndex = currentIndex >= 0 ? currentIndex : 0;
-	const defaultProgress = useMotionValue(initialIndex);
-	const progressToUse = scrollProgress || defaultProgress;
-
 	// Calculate sliding background position from scroll progress
 	// Button size: 32px (size-8), Gap: 8px (gap-2), Total spacing: 40px per workspace
-	const backgroundX = useTransform(progressToUse, (value) => value * 40);
+	const backgroundX = useTransform(scrollProgress, (value) => value * 40);
 	return (
 		<div className="flex w-full">
 			<ScrollArea className="flex-1 min-w-0" orientation="horizontal">

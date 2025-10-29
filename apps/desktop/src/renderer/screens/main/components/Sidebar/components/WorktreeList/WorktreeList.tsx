@@ -9,8 +9,8 @@ interface WorktreeListProps {
 	onTabGroupSelect: (worktreeId: string, tabGroupId: string) => void;
 	onReload: () => void;
 	onUpdateWorktree: (worktreeId: string, updatedWorktree: Worktree) => void;
-	selectedTabId?: string;
-	selectedTabGroupId?: string;
+	selectedTabId: string | undefined;
+	selectedTabGroupId: string | undefined;
 }
 
 export function WorktreeList({

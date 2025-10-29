@@ -6,7 +6,7 @@ interface TabItemProps {
 	tab: Tab;
 	worktreeId: string;
 	tabGroupId: string;
-	selectedTabId?: string;
+	selectedTabId: string | undefined;
 	onTabSelect: (worktreeId: string, tabGroupId: string, tabId: string) => void;
 }
 

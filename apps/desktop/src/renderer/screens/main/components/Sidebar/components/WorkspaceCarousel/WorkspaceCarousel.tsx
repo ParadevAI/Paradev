@@ -13,7 +13,7 @@ interface WorkspaceCarouselProps {
 	currentWorkspace: Workspace | null;
 	onWorkspaceSelect: (workspaceId: string) => void;
 	children: (workspace: Workspace | null, isActive: boolean) => ReactNode;
-	onScrollProgress?: (progress: MotionValue<number>) => void;
+	onScrollProgress: (progress: MotionValue<number>) => void;
 }
 
 export function WorkspaceCarousel({
@@ -78,9 +78,7 @@ export function WorkspaceCarousel({
 
 	// Expose scroll progress to parent
 	useEffect(() => {
-		if (onScrollProgress) {
-			onScrollProgress(workspaceProgress);
-		}
+		onScrollProgress(workspaceProgress);
 	}, [onScrollProgress, workspaceProgress]);
 
 	// Scroll to current workspace when it changes externally (e.g., clicking WorkspaceSwitcher)

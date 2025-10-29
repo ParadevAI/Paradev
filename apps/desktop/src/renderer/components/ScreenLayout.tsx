@@ -5,17 +5,17 @@ import TabContent from "./TabContent";
 interface ScreenLayoutProps {
     tabGroup: TabGroup;
     workingDirectory: string;
-    workspaceId?: string;
-    worktreeId?: string;
-    selectedTabId?: string;
+    workspaceId: string;
+    worktreeId: string | undefined;
+    selectedTabId: string | undefined;
     onTabFocus: (tabId: string) => void;
 }
 
 interface TabInstanceProps {
     tab: Tab;
     workingDirectory: string;
-    workspaceId?: string;
-    worktreeId?: string;
+    workspaceId: string;
+    worktreeId: string | undefined;
     tabGroupId: string;
     onTabFocus: (tabId: string) => void;
 }
