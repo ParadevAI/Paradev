@@ -17,9 +17,7 @@ export function PlaceholderState({
 	}
 
 	if (error) {
-		return (
-			<div className={`${baseClasses} text-red-400`}>Error: {error}</div>
-		);
+		return <div className={`${baseClasses} text-red-400`}>Error: {error}</div>;
 	}
 
 	if (!hasWorkspace) {

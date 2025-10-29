@@ -6,206 +6,206 @@
  */
 
 import type {
-    CreateTabGroupInput,
-    CreateTabInput,
-    CreateWorkspaceInput,
-    CreateWorktreeInput,
-    Tab,
-    TabGroup,
-    UpdateWorkspaceInput,
-    Workspace,
-    Worktree,
+	CreateTabGroupInput,
+	CreateTabInput,
+	CreateWorkspaceInput,
+	CreateWorktreeInput,
+	Tab,
+	TabGroup,
+	UpdateWorkspaceInput,
+	Workspace,
+	Worktree,
 } from "./types";
 
 /**
  * Standard response format for operations
  */
 export interface IpcResponse<T = void> {
-    success: boolean;
-    data?: T;
-    error?: string;
+	success: boolean;
+	data?: T;
+	error?: string;
 }
 
 /**
  * Define all IPC channels with their request and response types
  */
 export interface IpcChannels {
-    // Workspace operations
-    "workspace-list": {
-        request: void;
-        response: Workspace[];
-    };
-    "workspace-get": {
-        request: string; // workspace ID
-        response: Workspace | null;
-    };
-    "workspace-create": {
-        request: CreateWorkspaceInput;
-        response: IpcResponse<Workspace>;
-    };
-    "workspace-update": {
-        request: UpdateWorkspaceInput;
-        response: IpcResponse<Workspace>;
-    };
-    "workspace-delete": {
-        request: { id: string; removeWorktree?: boolean };
-        response: IpcResponse;
-    };
-    "workspace-get-last-opened": {
-        request: void;
-        response: Workspace | null;
-    };
-    "workspace-scan-worktrees": {
-        request: string; // workspace ID
-        response: { success: boolean; imported?: number; error?: string };
-    };
-    "workspace-get-active-selection": {
-        request: string; // workspace ID
-        response: {
-            worktreeId: string | null;
-            tabGroupId: string | null;
-            tabId: string | null;
-        } | null;
-    };
-    "workspace-set-active-selection": {
-        request: {
-            workspaceId: string;
-            worktreeId: string | null;
-            tabGroupId: string | null;
-            tabId: string | null;
-        };
-        response: boolean;
-    };
-    "workspace-get-active-workspace-id": {
-        request: void;
-        response: string | null;
-    };
-    "workspace-set-active-workspace-id": {
-        request: string; // workspace ID
-        response: boolean;
-    };
+	// Workspace operations
+	"workspace-list": {
+		request: void;
+		response: Workspace[];
+	};
+	"workspace-get": {
+		request: string; // workspace ID
+		response: Workspace | null;
+	};
+	"workspace-create": {
+		request: CreateWorkspaceInput;
+		response: IpcResponse<Workspace>;
+	};
+	"workspace-update": {
+		request: UpdateWorkspaceInput;
+		response: IpcResponse<Workspace>;
+	};
+	"workspace-delete": {
+		request: { id: string; removeWorktree?: boolean };
+		response: IpcResponse;
+	};
+	"workspace-get-last-opened": {
+		request: void;
+		response: Workspace | null;
+	};
+	"workspace-scan-worktrees": {
+		request: string; // workspace ID
+		response: { success: boolean; imported?: number; error?: string };
+	};
+	"workspace-get-active-selection": {
+		request: string; // workspace ID
+		response: {
+			worktreeId: string | null;
+			tabGroupId: string | null;
+			tabId: string | null;
+		} | null;
+	};
+	"workspace-set-active-selection": {
+		request: {
+			workspaceId: string;
+			worktreeId: string | null;
+			tabGroupId: string | null;
+			tabId: string | null;
+		};
+		response: boolean;
+	};
+	"workspace-get-active-workspace-id": {
+		request: void;
+		response: string | null;
+	};
+	"workspace-set-active-workspace-id": {
+		request: string; // workspace ID
+		response: boolean;
+	};
 
-    // Worktree operations
-    "worktree-create": {
-        request: CreateWorktreeInput;
-        response: { success: boolean; worktree?: Worktree; error?: string };
-    };
-    "worktree-remove": {
-        request: { workspaceId: string; worktreeId: string };
-        response: IpcResponse;
-    };
-    "worktree-can-merge": {
-        request: { workspaceId: string; worktreeId: string };
-        response: {
-            canMerge: boolean;
-            reason?: string;
-            isActiveWorktree?: boolean;
-            hasUncommittedChanges?: boolean;
-        };
-    };
-    "worktree-merge": {
-        request: { workspaceId: string; worktreeId: string };
-        response: IpcResponse;
-    };
-    "worktree-get-path": {
-        request: { workspaceId: string; worktreeId: string };
-        response: string | null;
-    };
+	// Worktree operations
+	"worktree-create": {
+		request: CreateWorktreeInput;
+		response: { success: boolean; worktree?: Worktree; error?: string };
+	};
+	"worktree-remove": {
+		request: { workspaceId: string; worktreeId: string };
+		response: IpcResponse;
+	};
+	"worktree-can-merge": {
+		request: { workspaceId: string; worktreeId: string };
+		response: {
+			canMerge: boolean;
+			reason?: string;
+			isActiveWorktree?: boolean;
+			hasUncommittedChanges?: boolean;
+		};
+	};
+	"worktree-merge": {
+		request: { workspaceId: string; worktreeId: string };
+		response: IpcResponse;
+	};
+	"worktree-get-path": {
+		request: { workspaceId: string; worktreeId: string };
+		response: string | null;
+	};
 
-    // Tab group operations
-    "tab-group-create": {
-        request: CreateTabGroupInput;
-        response: { success: boolean; tabGroup?: TabGroup; error?: string };
-    };
-    "tab-group-reorder": {
-        request: {
-            workspaceId: string;
-            worktreeId: string;
-            tabGroupIds: string[];
-        };
-        response: IpcResponse;
-    };
-    "tab-group-update-grid-sizes": {
-        request: {
-            workspaceId: string;
-            worktreeId: string;
-            tabGroupId: string;
-            rowSizes?: number[];
-            colSizes?: number[];
-        };
-        response: IpcResponse;
-    };
+	// Tab group operations
+	"tab-group-create": {
+		request: CreateTabGroupInput;
+		response: { success: boolean; tabGroup?: TabGroup; error?: string };
+	};
+	"tab-group-reorder": {
+		request: {
+			workspaceId: string;
+			worktreeId: string;
+			tabGroupIds: string[];
+		};
+		response: IpcResponse;
+	};
+	"tab-group-update-grid-sizes": {
+		request: {
+			workspaceId: string;
+			worktreeId: string;
+			tabGroupId: string;
+			rowSizes?: number[];
+			colSizes?: number[];
+		};
+		response: IpcResponse;
+	};
 
-    // Tab operations
-    "tab-create": {
-        request: CreateTabInput;
-        response: { success: boolean; tab?: Tab; error?: string };
-    };
-    "tab-delete": {
-        request: {
-            workspaceId: string;
-            worktreeId: string;
-            tabId: string;
-        };
-        response: IpcResponse;
-    };
-    "tab-reorder": {
-        request: {
-            workspaceId: string;
-            worktreeId: string;
-            tabGroupId: string;
-            tabIds: string[];
-        };
-        response: IpcResponse;
-    };
-    "tab-move-to-group": {
-        request: {
-            workspaceId: string;
-            worktreeId: string;
-            tabId: string;
-            sourceTabGroupId: string;
-            targetTabGroupId: string;
-            targetIndex: number;
-        };
-        response: IpcResponse;
-    };
+	// Tab operations
+	"tab-create": {
+		request: CreateTabInput;
+		response: { success: boolean; tab?: Tab; error?: string };
+	};
+	"tab-delete": {
+		request: {
+			workspaceId: string;
+			worktreeId: string;
+			tabId: string;
+		};
+		response: IpcResponse;
+	};
+	"tab-reorder": {
+		request: {
+			workspaceId: string;
+			worktreeId: string;
+			tabGroupId: string;
+			tabIds: string[];
+		};
+		response: IpcResponse;
+	};
+	"tab-move-to-group": {
+		request: {
+			workspaceId: string;
+			worktreeId: string;
+			tabId: string;
+			sourceTabGroupId: string;
+			targetTabGroupId: string;
+			targetIndex: number;
+		};
+		response: IpcResponse;
+	};
 
-    // Terminal operations
-    "terminal-create": {
-        request: {
-            id?: string;
-            cols?: number;
-            rows?: number;
-            cwd?: string;
-        };
-        response: { id: string; pid: number };
-    };
-    "terminal-execute-command": {
-        request: { id: string; command: string };
-        response: void;
-    };
-    "terminal-get-history": {
-        request: string; // terminal ID
-        response: string | undefined;
-    };
+	// Terminal operations
+	"terminal-create": {
+		request: {
+			id?: string;
+			cols?: number;
+			rows?: number;
+			cwd?: string;
+		};
+		response: { id: string; pid: number };
+	};
+	"terminal-execute-command": {
+		request: { id: string; command: string };
+		response: void;
+	};
+	"terminal-get-history": {
+		request: string; // terminal ID
+		response: string | undefined;
+	};
 
-    // Update terminal CWD in workspace config
-    "workspace-update-terminal-cwd": {
-        request: {
-            workspaceId: string;
-            worktreeId: string;
-            tabGroupId: string;
-            tabId: string;
-            cwd: string;
-        };
-        response: boolean;
-    };
+	// Update terminal CWD in workspace config
+	"workspace-update-terminal-cwd": {
+		request: {
+			workspaceId: string;
+			worktreeId: string;
+			tabGroupId: string;
+			tabId: string;
+			cwd: string;
+		};
+		response: boolean;
+	};
 
-    // External operations
-    "open-external": {
-        request: string; // URL
-        response: void;
-    };
+	// External operations
+	"open-external": {
+		request: string; // URL
+		response: void;
+	};
 }
 
 /**
@@ -227,35 +227,35 @@ export type IpcResponse_<T extends IpcChannelName> = IpcChannels[T]["response"];
  * Type guard to check if a channel name is valid
  */
 export function isValidChannel(channel: string): channel is IpcChannelName {
-    const validChannels: IpcChannelName[] = [
-        "workspace-list",
-        "workspace-get",
-        "workspace-create",
-        "workspace-update",
-        "workspace-delete",
-        "workspace-get-last-opened",
-        "workspace-scan-worktrees",
-        "workspace-get-active-selection",
-        "workspace-set-active-selection",
-        "workspace-get-active-workspace-id",
-        "workspace-set-active-workspace-id",
-        "workspace-update-terminal-cwd",
-        "worktree-create",
-        "worktree-remove",
-        "worktree-can-merge",
-        "worktree-merge",
-        "worktree-get-path",
-        "tab-group-create",
-        "tab-group-reorder",
-        "tab-group-update-grid-sizes",
-        "tab-create",
-        "tab-delete",
-        "tab-reorder",
-        "tab-move-to-group",
-        "terminal-create",
-        "terminal-execute-command",
-        "terminal-get-history",
-        "open-external",
-    ];
-    return validChannels.includes(channel as IpcChannelName);
+	const validChannels: IpcChannelName[] = [
+		"workspace-list",
+		"workspace-get",
+		"workspace-create",
+		"workspace-update",
+		"workspace-delete",
+		"workspace-get-last-opened",
+		"workspace-scan-worktrees",
+		"workspace-get-active-selection",
+		"workspace-set-active-selection",
+		"workspace-get-active-workspace-id",
+		"workspace-set-active-workspace-id",
+		"workspace-update-terminal-cwd",
+		"worktree-create",
+		"worktree-remove",
+		"worktree-can-merge",
+		"worktree-merge",
+		"worktree-get-path",
+		"tab-group-create",
+		"tab-group-reorder",
+		"tab-group-update-grid-sizes",
+		"tab-create",
+		"tab-delete",
+		"tab-reorder",
+		"tab-move-to-group",
+		"terminal-create",
+		"terminal-execute-command",
+		"terminal-get-history",
+		"open-external",
+	];
+	return validChannels.includes(channel as IpcChannelName);
 }

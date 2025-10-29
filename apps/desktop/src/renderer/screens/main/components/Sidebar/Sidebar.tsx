@@ -53,7 +53,7 @@ export function Sidebar({
 		defaultScrollProgress,
 	);
 
-	console.log(currentWorkspace, workspaces)
+	console.log(currentWorkspace, workspaces);
 
 	// Auto-expand worktree if it contains the selected tab group
 	useEffect(() => {

@@ -71,8 +71,7 @@ export default function ResizableGrid({
 		) => {
 			e.preventDefault();
 			const startPos = type === "row" ? e.clientY : e.clientX;
-			const startSize =
-				type === "row" ? rowSizes[index] : colSizes[index];
+			const startSize = type === "row" ? rowSizes[index] : colSizes[index];
 
 			setDragState({ type, index, startPos, startSize });
 		},
@@ -86,15 +85,12 @@ export default function ResizableGrid({
 			const container = containerRef.current;
 			const containerRect = container.getBoundingClientRect();
 
-			const currentPos =
-				dragState.type === "row" ? e.clientY : e.clientX;
+			const currentPos = dragState.type === "row" ? e.clientY : e.clientX;
 			const delta = currentPos - dragState.startPos;
 
 			// Calculate delta as fraction of container size
 			const containerSize =
-				dragState.type === "row"
-					? containerRect.height
-					: containerRect.width;
+				dragState.type === "row" ? containerRect.height : containerRect.width;
 			const deltaFraction = delta / containerSize;
 
 			if (dragState.type === "row") {
@@ -192,10 +188,13 @@ export default function ResizableGrid({
 
 			{/* Row resize handles */}
 			{Array.from({ length: rows - 1 }).map((_, index) => {
-				const cellsSize = rowSizes.slice(0, index + 1).reduce((sum, size) => sum + size, 0);
+				const cellsSize = rowSizes
+					.slice(0, index + 1)
+					.reduce((sum, size) => sum + size, 0);
 				const gapsSize = (index + 0.5) * GAP_SIZE;
 				const handleOffset = HANDLE_SIZE / 2;
-				const isActive = dragState?.type === "row" && dragState?.index === index;
+				const isActive =
+					dragState?.type === "row" && dragState?.index === index;
 
 				return (
 					<div
@@ -218,10 +217,13 @@ export default function ResizableGrid({
 
 			{/* Column resize handles */}
 			{Array.from({ length: cols - 1 }).map((_, index) => {
-				const cellsSize = colSizes.slice(0, index + 1).reduce((sum, size) => sum + size, 0);
+				const cellsSize = colSizes
+					.slice(0, index + 1)
+					.reduce((sum, size) => sum + size, 0);
 				const gapsSize = (index + 0.5) * GAP_SIZE;
 				const handleOffset = HANDLE_SIZE / 2;
-				const isActive = dragState?.type === "col" && dragState?.index === index;
+				const isActive =
+					dragState?.type === "col" && dragState?.index === index;
 
 				return (
 					<div

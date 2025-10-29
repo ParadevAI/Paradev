@@ -294,7 +294,7 @@ export function MainScreen() {
 						onTabGroupSelect={handleTabGroupSelect}
 						onWorktreeCreated={handleWorktreeCreated}
 						onWorkspaceSelect={handleWorkspaceSelect}
-					onUpdateWorktree={handleUpdateWorktree}
+						onUpdateWorktree={handleUpdateWorktree}
 						selectedTabId={selectedTabId ?? undefined}
 						selectedTabGroupId={selectedTabGroupId ?? undefined}
 						onCollapse={() => setIsSidebarOpen(false)}

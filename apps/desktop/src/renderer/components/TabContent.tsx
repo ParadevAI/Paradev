@@ -194,7 +194,11 @@ function TerminalTabContent({
 
 	return (
 		<div className="w-full h-full">
-			<Terminal terminalId={terminalId} onFocus={onFocus} triggerFit={triggerFit} />
+			<Terminal
+				terminalId={terminalId}
+				onFocus={onFocus}
+				triggerFit={triggerFit}
+			/>
 		</div>
 	);
 }
@@ -208,7 +212,11 @@ interface PlaceholderContentProps {
 	onFocus: () => void;
 }
 
-function PlaceholderContent({ type, message, onFocus }: PlaceholderContentProps) {
+function PlaceholderContent({
+	type,
+	message,
+	onFocus,
+}: PlaceholderContentProps) {
 	return (
 		<div
 			className="w-full h-full flex items-center justify-center bg-neutral-950"
