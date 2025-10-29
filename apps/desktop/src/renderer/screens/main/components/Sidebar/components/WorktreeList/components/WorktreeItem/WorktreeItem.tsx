@@ -43,15 +43,19 @@ function SortableTab({
 	worktreeId,
 	parentTabId,
 	selectedTabId,
+	selectedTabIds,
 	onTabSelect,
 	onTabRemove,
+	onGroupTabs,
 }: {
 	tab: Tab;
 	worktreeId: string;
 	parentTabId?: string; // Optional parent group tab ID
 	selectedTabId?: string;
-	onTabSelect: (worktreeId: string, tabId: string) => void;
+	selectedTabIds: Set<string>;
+	onTabSelect: (worktreeId: string, tabId: string, shiftKey: boolean) => void;
 	onTabRemove: (tabId: string) => void;
+	onGroupTabs: (tabIds: string[]) => void;
 }) {
 	const {
 		attributes,
@@ -80,8 +84,10 @@ function SortableTab({
 				tab={tab}
 				worktreeId={worktreeId}
 				selectedTabId={selectedTabId}
+				selectedTabIds={selectedTabIds}
 				onTabSelect={onTabSelect}
 				onTabRemove={onTabRemove}
+				onGroupTabs={onGroupTabs}
 			/>
 		</div>
 	);
@@ -110,12 +116,16 @@ export function WorktreeItem({
 }: WorktreeItemProps) {
 	// Track active drag state
 	const [activeId, setActiveId] = useState<string | null>(null);
-	const [overId, setOverId] = useState<string | null>(null);
+	const [_overId, setOverId] = useState<string | null>(null);
 
 	// Track expanded group tabs
 	const [expandedGroupTabs, setExpandedGroupTabs] = useState<Set<string>>(
 		new Set(),
 	);
+
+	// Track multi-selected tabs
+	const [selectedTabIds, setSelectedTabIds] = useState<Set<string>>(new Set());
+	const [lastClickedTabId, setLastClickedTabId] = useState<string | null>(null);
 
 	// Track if merge is disabled (when this is the active worktree)
 	const [isMergeDisabled, setIsMergeDisabled] = useState(false);
@@ -123,6 +133,7 @@ export function WorktreeItem({
 	const [targetBranch, setTargetBranch] = useState<string>("");
 
 	// Auto-expand group tabs that contain the selected tab
+	// biome-ignore lint/correctness/useExhaustiveDependencies: findParentGroupTab is stable
 	useEffect(() => {
 		if (!selectedTabId) return;
 
@@ -177,6 +188,101 @@ export function WorktreeItem({
 		return result;
 	};
 
+	// Helper: get all non-group tabs at the same level (for shift-click range selection)
+	const getTabsAtSameLevel = (
+		tabs: Tab[],
+		targetTabId: string,
+		_parentTabId?: string,
+	): Tab[] => {
+		// Find which level the target tab is at
+		for (const tab of tabs) {
+			if (tab.id === targetTabId) {
+				// Found at current level - return all tabs at this level (excluding groups)
+				return tabs.filter((t) => t.type !== "group");
+			}
+			if (tab.type === "group" && tab.tabs) {
+				const found = getTabsAtSameLevel(tab.tabs, targetTabId, tab.id);
+				if (found.length > 0) return found;
+			}
+		}
+		return [];
+	};
+
+	// Handle tab selection with shift-click support
+	const handleTabSelect = (
+		worktreeId: string,
+		tabId: string,
+		shiftKey: boolean,
+	) => {
+		if (shiftKey && lastClickedTabId) {
+			// Shift-click: select range
+			const tabsAtLevel = getTabsAtSameLevel(tabs, tabId);
+			const lastIndex = tabsAtLevel.findIndex((t) => t.id === lastClickedTabId);
+			const currentIndex = tabsAtLevel.findIndex((t) => t.id === tabId);
+
+			if (lastIndex !== -1 && currentIndex !== -1) {
+				const start = Math.min(lastIndex, currentIndex);
+				const end = Math.max(lastIndex, currentIndex);
+				const rangeTabIds = tabsAtLevel.slice(start, end + 1).map((t) => t.id);
+
+				setSelectedTabIds(new Set(rangeTabIds));
+			}
+		} else {
+			// Normal click: single selection
+			setSelectedTabIds(new Set([tabId]));
+			setLastClickedTabId(tabId);
+		}
+
+		// Always update the main selected tab
+		onTabSelect(worktreeId, tabId);
+	};
+
+	// Handle grouping selected tabs
+	const handleGroupTabs = async (tabIds: string[]) => {
+		try {
+			// Create a new group tab
+			const result = await window.ipcRenderer.invoke("tab-create", {
+				workspaceId,
+				worktreeId: worktree.id,
+				name: `Tab Group`,
+				type: "group",
+			});
+
+			if (!result.success || !result.tab) {
+				console.error("Failed to create group tab:", result.error);
+				return;
+			}
+
+			const groupTabId = result.tab.id;
+
+			// Move each selected tab into the group
+			for (const tabId of tabIds) {
+				const tab = findTabById(tabs, tabId);
+				if (!tab || tab.type === "group") continue; // Skip group tabs
+
+				// Use tab-move to move the tab into the group
+				await window.ipcRenderer.invoke("tab-move", {
+					workspaceId,
+					worktreeId: worktree.id,
+					tabId,
+					targetParentTabId: groupTabId,
+					targetIndex: 0, // Add to end
+				});
+			}
+
+			// Reload to show the updated structure
+			onReload();
+
+			// Select the new group tab
+			onTabSelect(worktree.id, groupTabId);
+
+			// Clear selection
+			setSelectedTabIds(new Set());
+			setLastClickedTabId(null);
+		} catch (error) {
+			console.error("Error grouping tabs:", error);
+		}
+	};
 
 	// Check if merge should be disabled on mount and get target branch
 	useEffect(() => {
@@ -406,7 +512,7 @@ export function WorktreeItem({
 
 	const handleAddTab = async () => {
 		// Get the first top-level group tab
-		const firstGroupTab = worktree.tabs.find((t) => t.type === "group");
+		const _firstGroupTab = worktree.tabs.find((t) => t.type === "group");
 		try {
 			const result = await window.ipcRenderer.invoke("tab-create", {
 				workspaceId,
@@ -421,7 +527,7 @@ export function WorktreeItem({
 				onReload();
 				// Auto-select the new tab if we have its ID
 				if (newTabId) {
-					onTabSelect(worktree.id, newTabId);
+					handleTabSelect(worktree.id, newTabId, false);
 				}
 			} else {
 				console.error("Failed to create tab:", result.error);
@@ -478,9 +584,9 @@ export function WorktreeItem({
 					{/* Group Tab Header */}
 					<button
 						type="button"
-						onClick={() => {
+						onClick={(e) => {
 							// Select the group tab
-							onTabSelect(worktree.id, tab.id);
+							handleTabSelect(worktree.id, tab.id, e.shiftKey);
 							// Also toggle expansion
 							toggleGroupTab(tab.id);
 						}}
@@ -512,17 +618,16 @@ export function WorktreeItem({
 
 		// Regular tab (terminal, editor, etc.)
 		return (
-			<div
-				key={tab.id}
-				style={{ paddingLeft: `${level * 12}px` }}
-			>
+			<div key={tab.id} style={{ paddingLeft: `${level * 12}px` }}>
 				<SortableTab
 					tab={tab}
 					worktreeId={worktree.id}
 					parentTabId={parentTabId}
 					selectedTabId={selectedTabId}
-					onTabSelect={onTabSelect}
+					selectedTabIds={selectedTabIds}
+					onTabSelect={handleTabSelect}
 					onTabRemove={handleTabRemove}
+					onGroupTabs={handleGroupTabs}
 				/>
 			</div>
 		);
