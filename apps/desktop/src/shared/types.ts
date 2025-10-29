@@ -17,10 +17,22 @@ export interface WindowCreationByIPC {
 	callback(window: BrowserWindow, event: IpcMainInvokeEvent): void;
 }
 
-// Workspace types - Tab-based Grid Layout
+// Workspace types - React Mosaic Layout
 
 // Tab types that can be displayed
 export type TabType = "terminal" | "editor" | "browser" | "preview" | "group";
+
+// Mosaic tree node types
+export type MosaicDirection = "row" | "column";
+
+export type MosaicNode<T> = MosaicParent<T> | T;
+
+export interface MosaicParent<T> {
+	direction: MosaicDirection;
+	first: MosaicNode<T>;
+	second: MosaicNode<T>;
+	splitPercentage?: number;
+}
 
 export interface Tab {
 	id: string;
@@ -29,18 +41,9 @@ export interface Tab {
 	// Terminal-specific properties
 	command?: string | null; // For terminal tabs
 	cwd?: string; // Current working directory (for terminal tabs)
-	// Grid layout properties (used when type === "group")
-	tabs?: Tab[]; // Child tabs when type is "group"
-	rows?: number; // Number of rows in the grid (for group tabs)
-	cols?: number; // Number of columns in the grid (for group tabs)
-	rowSizes?: number[]; // Custom row sizes as fractions (e.g., [0.3, 0.7])
-	colSizes?: number[]; // Custom column sizes as fractions (e.g., [0.5, 0.5])
-	// Position properties (for tabs inside a group)
-	order?: number; // Explicit ordering - position in the grid (0, 1, 2, 3, ...)
-	row?: number; // Derived from order: floor(order / cols)
-	col?: number; // Derived from order: order % cols
-	rowSpan?: number;
-	colSpan?: number;
+	// Mosaic layout properties (used when type === "group")
+	tabs?: Tab[]; // Child tabs when type is "group" (NOTE: cannot contain nested group tabs)
+	mosaicTree?: MosaicNode<string>; // Mosaic tree structure (tab IDs as leaf nodes)
 	createdAt: string;
 }
 
@@ -90,14 +93,8 @@ export interface CreateTabInput {
 	name: string;
 	type?: TabType; // Optional - defaults to "terminal"
 	command?: string | null;
-	// Grid properties (for group tabs)
-	rows?: number;
-	cols?: number;
-	// Position properties (for tabs inside a group)
-	row?: number;
-	col?: number;
-	rowSpan?: number;
-	colSpan?: number;
+	// For copying tab content when splitting
+	copyFromTabId?: string;
 }
 
 export interface UpdateWorkspaceInput {

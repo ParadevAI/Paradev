@@ -1,13 +1,18 @@
 import { randomUUID } from "node:crypto";
 
-import type { CreateTabInput, Tab, Workspace, Worktree } from "shared/types";
+import type {
+	CreateTabInput,
+	MosaicNode,
+	Tab,
+	Workspace,
+	Worktree,
+} from "shared/types";
 
 import configManager from "../config-manager";
 import {
 	findParentTab,
 	findTab,
 	isValidParentTab,
-	recalculateTabPositions,
 	removeTabRecursive,
 } from "./tab-helpers";
 
@@ -38,11 +43,22 @@ export async function createTab(
 			tab.command = input.command;
 		} else if (tab.type === "group") {
 			tab.tabs = [];
-			tab.rows = input.rows || 2;
-			tab.cols = input.cols || 2;
+			tab.mosaicTree = undefined; // Will be set when tabs are added
 		}
 
-		// Position properties (for tabs inside a group)
+		// Handle copying from existing tab (for split operations)
+		if (input.copyFromTabId) {
+			const sourceTab = findTab(worktree.tabs, input.copyFromTabId);
+			if (sourceTab && sourceTab.type === tab.type) {
+				// Copy relevant properties based on type
+				if (tab.type === "terminal") {
+					tab.command = sourceTab.command;
+					tab.cwd = sourceTab.cwd;
+				}
+			}
+		}
+
+		// Add tab to parent or worktree
 		if (input.parentTabId) {
 			const parentTab = findTab(worktree.tabs, input.parentTabId);
 			if (!isValidParentTab(parentTab)) {
@@ -52,17 +68,13 @@ export async function createTab(
 				};
 			}
 
-			if (
-				input.row !== undefined &&
-				input.col !== undefined &&
-				parentTab?.cols
-			) {
-				tab.order = input.row * parentTab.cols + input.col;
-				tab.row = input.row;
-				tab.col = input.col;
+			// Validate: prevent nested group tabs
+			if (tab.type === "group") {
+				return {
+					success: false,
+					error: "Cannot create group tab inside another group tab",
+				};
 			}
-			tab.rowSpan = input.rowSpan;
-			tab.colSpan = input.colSpan;
 
 			parentTab!.tabs = parentTab!.tabs || [];
 			parentTab!.tabs.push(tab);
@@ -135,6 +147,8 @@ export async function deleteTab(
 
 /**
  * Reorder tabs within a parent tab or at worktree level
+ * Note: With mosaic layout, the visual layout is handled by the mosaicTree property.
+ * This function just reorders the tabs array for sidebar display purposes.
  */
 export async function reorderTabs(
 	workspace: Workspace,
@@ -153,7 +167,6 @@ export async function reorderTabs(
 		}
 
 		let tabs: Tab[];
-		let cols: number;
 
 		if (input.parentTabId) {
 			// Reorder tabs inside a parent group
@@ -165,11 +178,9 @@ export async function reorderTabs(
 				};
 			}
 			tabs = parentTab!.tabs || [];
-			cols = parentTab!.cols || 2;
 		} else {
 			// Reorder tabs at worktree level
 			tabs = worktree.tabs;
-			cols = 2; // Default cols for worktree level
 		}
 
 		// Reorder tabs based on tabIds array
@@ -182,15 +193,12 @@ export async function reorderTabs(
 			return { success: false, error: "Tab count mismatch during reorder" };
 		}
 
-		// Recalculate positions
-		const updatedTabs = recalculateTabPositions(reorderedTabs, cols);
-
 		// Update the tabs array
 		if (input.parentTabId) {
 			const parentTab = findTab(worktree.tabs, input.parentTabId);
-			parentTab!.tabs = updatedTabs;
+			parentTab!.tabs = reorderedTabs;
 		} else {
-			worktree.tabs = updatedTabs;
+			worktree.tabs = reorderedTabs;
 		}
 
 		workspace.updatedAt = new Date().toISOString();
@@ -215,6 +223,8 @@ export async function reorderTabs(
 
 /**
  * Move a tab from one parent to another
+ * Note: With mosaic layout, the visual layout is handled by the mosaicTree property.
+ * This function just moves tabs between arrays for organizational purposes.
  */
 export async function moveTab(
 	workspace: Workspace,
@@ -237,8 +247,6 @@ export async function moveTab(
 		// Find source and target tab arrays
 		let sourceTabs: Tab[];
 		let targetTabs: Tab[];
-		let sourceCols: number;
-		let targetCols: number;
 
 		if (input.sourceParentTabId) {
 			const sourceParent = findTab(worktree.tabs, input.sourceParentTabId);
@@ -246,10 +254,8 @@ export async function moveTab(
 				return { success: false, error: "Source parent tab not found" };
 			}
 			sourceTabs = sourceParent!.tabs || [];
-			sourceCols = sourceParent!.cols || 2;
 		} else {
 			sourceTabs = worktree.tabs;
-			sourceCols = 2;
 		}
 
 		if (input.targetParentTabId) {
@@ -258,10 +264,8 @@ export async function moveTab(
 				return { success: false, error: "Target parent tab not found" };
 			}
 			targetTabs = targetParent!.tabs || [];
-			targetCols = targetParent!.cols || 2;
 		} else {
 			targetTabs = worktree.tabs;
-			targetCols = 2;
 		}
 
 		// Find and remove the tab from source
@@ -274,21 +278,6 @@ export async function moveTab(
 
 		// Insert into target at specified index
 		targetTabs.splice(input.targetIndex, 0, tab);
-
-		// Recalculate positions for both source and target
-		if (input.sourceParentTabId) {
-			const sourceParent = findTab(worktree.tabs, input.sourceParentTabId);
-			sourceParent!.tabs = recalculateTabPositions(sourceTabs, sourceCols);
-		} else {
-			worktree.tabs = recalculateTabPositions(sourceTabs, sourceCols);
-		}
-
-		if (input.targetParentTabId) {
-			const targetParent = findTab(worktree.tabs, input.targetParentTabId);
-			targetParent!.tabs = recalculateTabPositions(targetTabs, targetCols);
-		} else {
-			worktree.tabs = recalculateTabPositions(targetTabs, targetCols);
-		}
 
 		workspace.updatedAt = new Date().toISOString();
 
@@ -311,15 +300,14 @@ export async function moveTab(
 }
 
 /**
- * Update grid sizes for a group tab
+ * Update mosaic tree for a group tab
  */
-export async function updateTabGridSizes(
+export async function updateTabMosaicTree(
 	workspace: Workspace,
 	input: {
 		worktreeId: string;
 		tabId: string;
-		rowSizes?: number[];
-		colSizes?: number[];
+		mosaicTree: MosaicNode<string> | null | undefined;
 	},
 ): Promise<{ success: boolean; error?: string }> {
 	try {
@@ -339,13 +327,8 @@ export async function updateTabGridSizes(
 			return { success: false, error: "Tab is not a group" };
 		}
 
-		// Update sizes
-		if (input.rowSizes !== undefined) {
-			tab.rowSizes = input.rowSizes;
-		}
-		if (input.colSizes !== undefined) {
-			tab.colSizes = input.colSizes;
-		}
+		// Update mosaic tree
+		tab.mosaicTree = input.mosaicTree || undefined;
 
 		workspace.updatedAt = new Date().toISOString();
 
@@ -359,7 +342,7 @@ export async function updateTabGridSizes(
 
 		return { success: true };
 	} catch (error) {
-		console.error("Failed to update tab grid sizes:", error);
+		console.error("Failed to update tab mosaic tree:", error);
 		return {
 			success: false,
 			error: error instanceof Error ? error.message : String(error),

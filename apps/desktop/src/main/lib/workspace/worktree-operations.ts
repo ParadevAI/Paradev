@@ -3,6 +3,7 @@ import { existsSync } from "node:fs";
 
 import type {
 	CreateWorktreeInput,
+	MosaicNode,
 	Tab,
 	Workspace,
 	Worktree,
@@ -11,52 +12,65 @@ import type {
 import configManager from "../config-manager";
 import worktreeManager from "../worktree-manager";
 
-// Function to create default tabs for a 2x2 grid layout
-function createDefaultTabs(): Tab[] {
+// Function to create default tabs with mosaic layout
+function createDefaultTabsWithMosaic(): {
+	tabs: Tab[];
+	mosaicTree: MosaicNode<string>;
+} {
 	const now = new Date().toISOString();
-	const cols = 2; // 2x2 grid
-	return [
-		{
-			id: randomUUID(),
-			name: "Terminal 1",
-			type: "terminal",
-			order: 0,
-			row: 0, // floor(0 / 2) = 0
-			col: 0, // 0 % 2 = 0
-			command: null,
-			createdAt: now,
+	const tab1 = randomUUID();
+	const tab2 = randomUUID();
+	const tab3 = randomUUID();
+	const tab4 = randomUUID();
+
+	return {
+		tabs: [
+			{
+				id: tab1,
+				name: "Terminal 1",
+				type: "terminal",
+				command: null,
+				createdAt: now,
+			},
+			{
+				id: tab2,
+				name: "Terminal 2",
+				type: "terminal",
+				command: null,
+				createdAt: now,
+			},
+			{
+				id: tab3,
+				name: "Terminal 3",
+				type: "terminal",
+				command: null,
+				createdAt: now,
+			},
+			{
+				id: tab4,
+				name: "Terminal 4",
+				type: "terminal",
+				command: null,
+				createdAt: now,
+			},
+		],
+		mosaicTree: {
+			direction: "row",
+			first: {
+				direction: "column",
+				first: tab1,
+				second: tab3,
+				splitPercentage: 50,
+			},
+			second: {
+				direction: "column",
+				first: tab2,
+				second: tab4,
+				splitPercentage: 50,
+			},
+			splitPercentage: 50,
 		},
-		{
-			id: randomUUID(),
-			name: "Terminal 2",
-			type: "terminal",
-			order: 1,
-			row: 0, // floor(1 / 2) = 0
-			col: 1, // 1 % 2 = 1
-			command: null,
-			createdAt: now,
-		},
-		{
-			id: randomUUID(),
-			name: "Terminal 3",
-			type: "terminal",
-			order: 2,
-			row: 1, // floor(2 / 2) = 1
-			col: 0, // 2 % 2 = 0
-			command: null,
-			createdAt: now,
-		},
-		{
-			id: randomUUID(),
-			name: "Terminal 4",
-			type: "terminal",
-			order: 3,
-			row: 1, // floor(3 / 2) = 1
-			col: 1, // 3 % 2 = 1
-			command: null,
-			createdAt: now,
-		},
-	];
+	};
 }
 
 /**
@@ -81,18 +95,17 @@ export async function createWorktree(
 			};
 		}
 
-		// Create default tabs for 2x2 layout
+		// Create default tabs with mosaic layout (2x2 grid equivalent)
 		const now = new Date().toISOString();
-		const defaultTabs = createDefaultTabs();
+		const { tabs: defaultTabs, mosaicTree } = createDefaultTabsWithMosaic();
 
-		// Create default group tab with 4 terminal tabs in 2x2 grid
+		// Create default group tab with 4 terminal tabs in mosaic layout
 		const defaultGroupTab: Tab = {
 			id: randomUUID(),
 			name: "Default",
 			type: "group",
 			tabs: defaultTabs,
-			rows: 2,
-			cols: 2,
+			mosaicTree,
 			createdAt: now,
 		};
 
@@ -344,17 +357,17 @@ export async function scanAndImportWorktrees(
 					configChanged = true;
 				}
 			} else {
-				// Create default tabs for 2x2 layout
-				const defaultTabs = createDefaultTabs();
+				// Create default tabs with mosaic layout (2x2 grid equivalent)
+				const { tabs: defaultTabs, mosaicTree } =
+					createDefaultTabsWithMosaic();
 
-				// Create default group tab with 4 tabs in 2x2 grid
+				// Create default group tab with 4 tabs in mosaic layout
 				const defaultGroupTab: Tab = {
 					id: randomUUID(),
 					name: "Default",
 					type: "group",
 					tabs: defaultTabs,
-					rows: 2,
-					cols: 2,
+					mosaicTree,
 					createdAt: now,
 				};
 

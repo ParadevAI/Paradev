@@ -1,6 +1,12 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import {
+	Mosaic,
+	MosaicWindow,
+	type MosaicBranch,
+	type MosaicNode,
+} from "react-mosaic-component";
+import "react-mosaic-component/react-mosaic-component.css";
 import type { Tab } from "shared/types";
-import ResizableGrid from "./ResizableGrid";
 import TabContent from "./TabContent";
 
 interface ScreenLayoutProps {
@@ -23,8 +29,8 @@ interface TabInstanceProps {
 }
 
 /**
- * TabInstance - Wrapper for individual tabs in the grid layout
- * Handles position-based resize triggers and delegates rendering to TabContent
+ * TabInstance - Wrapper for individual tabs in the mosaic layout
+ * Handles resize triggers and delegates rendering to TabContent
  */
 function TabInstance({
 	tab,
@@ -35,15 +41,10 @@ function TabInstance({
 	onTabFocus,
 	resizeTrigger = 0,
 }: TabInstanceProps) {
-	// Trigger fit when position changes (for terminal resizing)
+	// Trigger fit when mosaic is resized (for terminal resizing)
 	const [fitTrigger, setFitTrigger] = useState(0);
 
-	// Trigger fit when tab position changes (row or col)
-	useEffect(() => {
-		setFitTrigger((prev) => prev + 1);
-	}, [tab.row, tab.col]);
-
-	// Trigger fit when grid is resized
+	// Trigger fit when mosaic pane is resized
 	useEffect(() => {
 		if (resizeTrigger > 0) {
 			setFitTrigger((prev) => prev + 1);
@@ -71,44 +72,139 @@ export default function ScreenLayout({
 	selectedTabId,
 	onTabFocus,
 }: ScreenLayoutProps) {
-	// Trigger fit for all terminals when grid is resized
+	// Trigger fit for all terminals when mosaic is resized
 	const [resizeTrigger, setResizeTrigger] = useState(0);
 
-	const handleGridResize = () => {
-		// Increment to trigger terminal re-fit in all TabInstances
-		setResizeTrigger((prev) => prev + 1);
-	};
-
-	const handleSizesChange = async (rowSizes: number[], colSizes: number[]) => {
-		// Save the grid sizes to the workspace config
-		if (!worktreeId) return;
-
-		try {
-			await window.ipcRenderer.invoke("tab-update-grid-sizes", {
-				workspaceId,
-				worktreeId,
-				tabId: groupTab.id,
-				rowSizes,
-				colSizes,
-			});
-		} catch (error) {
-			console.error("Failed to save grid sizes:", error);
+	// Initialize mosaic tree from groupTab or create a default tree
+	const [mosaicTree, setMosaicTree] = useState<MosaicNode<string> | null>(() => {
+		if (groupTab.mosaicTree) {
+			return groupTab.mosaicTree as MosaicNode<string>;
 		}
-	};
+
+		// If no mosaic tree exists but tabs exist, create a default layout
+		if (groupTab.tabs && groupTab.tabs.length > 0) {
+			if (groupTab.tabs.length === 1) {
+				return groupTab.tabs[0].id;
+			}
+			// Create a simple row split for 2+ tabs
+			return {
+				direction: "row",
+				first: groupTab.tabs[0].id,
+				second:
+					groupTab.tabs.length === 2
+						? groupTab.tabs[1].id
+						: {
+								direction: "column",
+								first: groupTab.tabs[1].id,
+								second: groupTab.tabs[2]?.id || groupTab.tabs[1].id,
+						  },
+			};
+		}
+
+		return null;
+	});
+
+	// Save mosaic tree changes to backend
+	const handleMosaicChange = useCallback(
+		async (newTree: MosaicNode<string> | null) => {
+			setMosaicTree(newTree);
+
+			if (!worktreeId) return;
+
+			try {
+				await window.ipcRenderer.invoke("tab-update-mosaic-tree", {
+					workspaceId,
+					worktreeId,
+					tabId: groupTab.id,
+					mosaicTree: newTree,
+				});
+			} catch (error) {
+				console.error("Failed to save mosaic tree:", error);
+			}
+		},
+		[workspaceId, worktreeId, groupTab.id],
+	);
+
+	// Trigger resize on mosaic change
+	const handleRelease = useCallback(() => {
+		setResizeTrigger((prev) => prev + 1);
+	}, []);
+
+	// Create a map of tab IDs to Tab objects for easy lookup
+	const tabsById = new Map(groupTab.tabs?.map((tab) => [tab.id, tab]) || []);
+
+	// Render individual mosaic tile
+	const renderTile = useCallback(
+		(id: string, path: MosaicBranch[]) => {
+			const tab = tabsById.get(id);
+			if (!tab) {
+				return (
+					<div className="w-full h-full flex items-center justify-center text-gray-400">
+						Tab not found: {id}
+					</div>
+				);
+			}
+
+			const isActive = selectedTabId === id;
+
+			return (
+				<MosaicWindow<string>
+					path={path}
+					title={tab.name}
+					className={isActive ? "active-mosaic-window" : ""}
+					toolbarControls={<div />}
+				>
+					<TabInstance
+						tab={tab}
+						workingDirectory={workingDirectory}
+						workspaceId={workspaceId}
+						worktreeId={worktreeId}
+						groupTabId={groupTab.id}
+						onTabFocus={onTabFocus}
+						resizeTrigger={resizeTrigger}
+					/>
+				</MosaicWindow>
+			);
+		},
+		[
+			tabsById,
+			selectedTabId,
+			workingDirectory,
+			workspaceId,
+			worktreeId,
+			groupTab.id,
+			onTabFocus,
+			resizeTrigger,
+		],
+	);
 
 	// Safety check: ensure groupTab is a group type with tabs
 	if (
 		!groupTab ||
 		groupTab.type !== "group" ||
 		!groupTab.tabs ||
-		!Array.isArray(groupTab.tabs)
+		!Array.isArray(groupTab.tabs) ||
+		groupTab.tabs.length === 0
 	) {
 		return (
 			<div className="w-full h-full flex items-center justify-center text-gray-400">
 				<div className="text-center">
-					<p>Invalid group tab structure</p>
+					<p>No tabs in this group</p>
 					<p className="text-sm text-gray-500 mt-2">
-						Please rescan worktrees or create a new tab
+						Create a new tab to get started
+					</p>
+				</div>
+			</div>
+		);
+	}
+
+	if (!mosaicTree) {
+		return (
+			<div className="w-full h-full flex items-center justify-center text-gray-400">
+				<div className="text-center">
+					<p>Invalid mosaic layout</p>
+					<p className="text-sm text-gray-500 mt-2">
+						Please rescan worktrees or recreate the group
 					</p>
 				</div>
 			</div>
@@ -116,42 +212,46 @@ export default function ScreenLayout({
 	}
 
 	return (
-		<ResizableGrid
-			rows={groupTab.rows || 2}
-			cols={groupTab.cols || 2}
-			className="w-full h-full p-1"
-			onResize={handleGridResize}
-			initialRowSizes={groupTab.rowSizes}
-			initialColSizes={groupTab.colSizes}
-			onSizesChange={handleSizesChange}
-		>
-			{groupTab.tabs.map((tab) => {
-				const isActive = selectedTabId === tab.id;
-				return (
-					<div
-						key={tab.id}
-						className={`overflow-hidden rounded border ${
-							isActive
-								? "border-blue-500 ring-2 ring-blue-500/50"
-								: "border-neutral-800"
-						}`}
-						style={{
-							gridRow: `${(tab.row || 0) + 1} / span ${tab.rowSpan || 1}`,
-							gridColumn: `${(tab.col || 0) + 1} / span ${tab.colSpan || 1}`,
-						}}
-					>
-						<TabInstance
-							tab={tab}
-							workingDirectory={workingDirectory}
-							workspaceId={workspaceId}
-							worktreeId={worktreeId}
-							groupTabId={groupTab.id}
-							onTabFocus={onTabFocus}
-							resizeTrigger={resizeTrigger}
-						/>
-					</div>
-				);
-			})}
-		</ResizableGrid>
+		<div className="w-full h-full mosaic-container">
+			<Mosaic<string>
+				renderTile={renderTile}
+				value={mosaicTree}
+				onChange={handleMosaicChange}
+				onRelease={handleRelease}
+				className="mosaic-theme-dark"
+			/>
+			<style>{`
+				.mosaic-container {
+					background: #1a1a1a;
+				}
+				.mosaic-theme-dark .mosaic-window {
+					background: #1a1a1a;
+					border: 1px solid #333;
+				}
+				.mosaic-theme-dark .mosaic-window .mosaic-window-toolbar {
+					background: #262626;
+					border-bottom: 1px solid #333;
+					height: 32px;
+					padding: 0 8px;
+				}
+				.mosaic-theme-dark .mosaic-window .mosaic-window-title {
+					color: #e5e5e5;
+					font-size: 12px;
+				}
+				.mosaic-theme-dark .mosaic-window-body {
+					background: #1a1a1a;
+				}
+				.mosaic-theme-dark .mosaic-split {
+					background: #333;
+				}
+				.mosaic-theme-dark .mosaic-split:hover {
+					background: #444;
+				}
+				.active-mosaic-window .mosaic-window {
+					border: 1px solid #3b82f6 !important;
+					box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+				}
+			`}</style>
+		</div>
 	);
 }

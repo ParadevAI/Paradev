@@ -9,6 +9,7 @@ import type {
 	CreateTabInput,
 	CreateWorkspaceInput,
 	CreateWorktreeInput,
+	MosaicNode,
 	Tab,
 	UpdateWorkspaceInput,
 	Workspace,
@@ -141,13 +142,12 @@ export interface IpcChannels {
 		};
 		response: IpcResponse;
 	};
-	"tab-update-grid-sizes": {
+	"tab-update-mosaic-tree": {
 		request: {
 			workspaceId: string;
 			worktreeId: string;
 			tabId: string; // The group tab ID
-			rowSizes?: number[];
-			colSizes?: number[];
+			mosaicTree: MosaicNode<string> | null | undefined;
 		};
 		response: IpcResponse;
 	};
@@ -230,7 +230,7 @@ export function isValidChannel(channel: string): channel is IpcChannelName {
 		"tab-delete",
 		"tab-reorder",
 		"tab-move",
-		"tab-update-grid-sizes",
+		"tab-update-mosaic-tree",
 		"terminal-create",
 		"terminal-execute-command",
 		"terminal-get-history",

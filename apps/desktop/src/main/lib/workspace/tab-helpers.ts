@@ -37,17 +37,6 @@ export function findParentTab(tabs: Tab[], tabId: string): Tab | null {
 }
 
 /**
- * Recalculate grid positions for tabs in a group
- */
-export function recalculateTabPositions(tabs: Tab[], cols: number): Tab[] {
-	return tabs.map((tab, index) => {
-		const row = Math.floor(index / cols);
-		const col = index % cols;
-		return { ...tab, order: index, row, col };
-	});
-}
-
-/**
  * Remove a tab from a tab tree recursively
  * Returns true if the tab was found and removed
  */
@@ -62,10 +51,6 @@ export function removeTabRecursive(tabs: Tab[], tabId: string): boolean {
 	for (const tab of tabs) {
 		if (tab.type === "group" && tab.tabs) {
 			if (removeTabRecursive(tab.tabs, tabId)) {
-				// Recalculate grid positions for remaining tabs
-				if (tab.cols) {
-					tab.tabs = recalculateTabPositions(tab.tabs, tab.cols);
-				}
 				return true;
 			}
 		}

@@ -2,6 +2,7 @@ import type {
 	CreateTabInput,
 	CreateWorkspaceInput,
 	CreateWorktreeInput,
+	MosaicNode,
 	Tab,
 	UpdateWorkspaceInput,
 	Workspace,
@@ -284,24 +285,22 @@ class WorkspaceManager {
 	}
 
 	/**
-	 * Update grid sizes for a group tab
+	 * Update mosaic tree for a group tab
 	 */
-	async updateTabGridSizes(
+	async updateTabMosaicTree(
 		workspaceId: string,
 		worktreeId: string,
 		tabId: string,
-		rowSizes?: number[],
-		colSizes?: number[],
+		mosaicTree: MosaicNode<string> | null | undefined,
 	): Promise<{ success: boolean; error?: string }> {
 		const workspace = await this.get(workspaceId);
 		if (!workspace) {
 			return { success: false, error: "Workspace not found" };
 		}
-		return tabOps.updateTabGridSizes(workspace, {
+		return tabOps.updateTabMosaicTree(workspace, {
 			worktreeId,
 			tabId,
-			rowSizes,
-			colSizes,
+			mosaicTree,
 		});
 	}
 

@@ -4,6 +4,7 @@ import type {
 	CreateTabInput,
 	CreateWorkspaceInput,
 	CreateWorktreeInput,
+	MosaicNode,
 	UpdateWorkspaceInput,
 } from "shared/types";
 
@@ -237,25 +238,23 @@ export function registerWorkspaceIPCs() {
 		},
 	);
 
-	// Update grid sizes for a group tab
+	// Update mosaic tree for a group tab
 	ipcMain.handle(
-		"tab-update-grid-sizes",
+		"tab-update-mosaic-tree",
 		async (
 			_event,
 			input: {
 				workspaceId: string;
 				worktreeId: string;
 				tabId: string;
-				rowSizes?: number[];
-				colSizes?: number[];
+				mosaicTree: MosaicNode<string> | null | undefined;
 			},
 		) => {
-			return await workspaceManager.updateTabGridSizes(
+			return await workspaceManager.updateTabMosaicTree(
 				input.workspaceId,
 				input.worktreeId,
 				input.tabId,
-				input.rowSizes,
-				input.colSizes,
+				input.mosaicTree,
 			);
 		},
 	);
