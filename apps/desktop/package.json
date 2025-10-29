@@ -22,8 +22,11 @@
 		"make:release": "tsx ./src/lib/electron-app/release/modules/release.ts",
 		"release": "electron-builder --publish always",
 		"clean:dev": "rimraf ./node_modules/.dev",
+		"typecheck": "tsc --noEmit",
 		"lint": "biome check --no-errors-on-unmatched",
-		"lint:fix": "biome check --write --no-errors-on-unmatched --assist-enabled=true"
+		"lint:fix": "biome check --write --no-errors-on-unmatched --assist-enabled=true",
+		"format": "biome format --write --no-errors-on-unmatched",
+		"format:check": "biome format --no-errors-on-unmatched"
 	},
 	"dependencies": {
 		"@dnd-kit/core": "^6.3.1",
