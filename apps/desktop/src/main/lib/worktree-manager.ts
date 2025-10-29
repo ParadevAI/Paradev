@@ -186,34 +186,34 @@ class WorktreeManager {
 	}
 
 	/**
-	 * Check if a branch can be merged
+	 * Check if a branch can be merged into a target worktree
 	 */
 	async canMerge(
-		repoPath: string,
-		branch: string,
+		targetWorktreePath: string,
+		sourceBranch: string,
 	): Promise<{ canMerge: boolean; reason?: string }> {
 		try {
-			// Check if branch exists
-			const branchExists = execSync(`git rev-parse --verify ${branch}`, {
-				cwd: repoPath,
-				stdio: "pipe",
-				encoding: "utf-8",
-			}).trim();
-
-			if (!branchExists) {
+			// Check if source branch exists
+			try {
+				execSync(`git rev-parse --verify ${sourceBranch}`, {
+					cwd: targetWorktreePath,
+					stdio: "pipe",
+					encoding: "utf-8",
+				});
+			} catch {
 				return { canMerge: false, reason: "Branch does not exist" };
 			}
 
-			// Check if there are uncommitted changes
+			// Check if there are uncommitted changes in target worktree
 			const status = execSync("git status --porcelain", {
-				cwd: repoPath,
+				cwd: targetWorktreePath,
 				encoding: "utf-8",
 			}).trim();
 
 			if (status) {
 				return {
 					canMerge: false,
-					reason: "Working directory has uncommitted changes",
+					reason: "Target worktree has uncommitted changes",
 				};
 			}
 
@@ -228,15 +228,18 @@ class WorktreeManager {
 	}
 
 	/**
-	 * Merge a branch into the current branch
+	 * Merge a source branch into the target worktree's current branch
 	 */
 	async merge(
-		repoPath: string,
-		branch: string,
+		targetWorktreePath: string,
+		sourceBranch: string,
 	): Promise<{ success: boolean; error?: string }> {
 		try {
 			// Check if we can merge first
-			const canMergeResult = await this.canMerge(repoPath, branch);
+			const canMergeResult = await this.canMerge(
+				targetWorktreePath,
+				sourceBranch,
+			);
 			if (!canMergeResult.canMerge) {
 				return {
 					success: false,
@@ -245,8 +248,8 @@ class WorktreeManager {
 			}
 
 			// Execute merge
-			execSync(`git merge ${branch}`, {
-				cwd: repoPath,
+			execSync(`git merge ${sourceBranch}`, {
+				cwd: targetWorktreePath,
 				stdio: "pipe",
 			});
 

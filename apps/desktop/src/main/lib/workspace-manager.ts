@@ -903,7 +903,7 @@ class WorkspaceManager {
 	}
 
 	/**
-	 * Check if a worktree can be merged
+	 * Check if a worktree can be merged into the active worktree
 	 */
 	async canMergeWorktree(
 		workspaceId: string,
@@ -913,6 +913,7 @@ class WorkspaceManager {
 		canMerge?: boolean;
 		reason?: string;
 		error?: string;
+		isActiveWorktree?: boolean;
 	}> {
 		try {
 			const workspace = await this.get(workspaceId);
@@ -925,8 +926,31 @@ class WorkspaceManager {
 				return { success: false, error: "Worktree not found" };
 			}
 
+			// Check if this is the active worktree
+			if (workspace.activeWorktreeId === worktreeId) {
+				return {
+					success: true,
+					canMerge: false,
+					reason: "Cannot merge the active worktree into itself",
+					isActiveWorktree: true,
+				};
+			}
+
+			// Find the active worktree
+			const activeWorktree = workspace.worktrees.find(
+				(wt) => wt.id === workspace.activeWorktreeId,
+			);
+			if (!activeWorktree) {
+				return {
+					success: true,
+					canMerge: false,
+					reason: "No active worktree found",
+				};
+			}
+
+			// Check if the source branch can be merged into the active worktree
 			const canMerge = await worktreeManager.canMerge(
-				workspace.repoPath,
+				activeWorktree.path,
 				worktree.branch,
 			);
 
@@ -934,6 +958,7 @@ class WorkspaceManager {
 				success: true,
 				canMerge: canMerge.canMerge,
 				reason: canMerge.reason,
+				isActiveWorktree: false,
 			};
 		} catch (error) {
 			console.error("Failed to check if worktree can be merged:", error);
@@ -945,7 +970,7 @@ class WorkspaceManager {
 	}
 
 	/**
-	 * Merge a worktree into the main branch
+	 * Merge a worktree into the active worktree
 	 */
 	async mergeWorktree(
 		workspaceId: string,
@@ -962,9 +987,25 @@ class WorkspaceManager {
 				return { success: false, error: "Worktree not found" };
 			}
 
-			// Merge worktree
+			// Check if this is the active worktree
+			if (workspace.activeWorktreeId === worktreeId) {
+				return {
+					success: false,
+					error: "Cannot merge the active worktree into itself",
+				};
+			}
+
+			// Find the active worktree
+			const activeWorktree = workspace.worktrees.find(
+				(wt) => wt.id === workspace.activeWorktreeId,
+			);
+			if (!activeWorktree) {
+				return { success: false, error: "No active worktree found" };
+			}
+
+			// Merge the source branch into the active worktree
 			const result = await worktreeManager.merge(
-				workspace.repoPath,
+				activeWorktree.path,
 				worktree.branch,
 			);
 

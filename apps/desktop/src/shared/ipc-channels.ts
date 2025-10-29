@@ -96,7 +96,11 @@ export interface IpcChannels {
 	};
 	"worktree-can-merge": {
 		request: { workspaceId: string; worktreeId: string };
-		response: IpcResponse<{ canMerge: boolean; reason?: string }>;
+		response: IpcResponse<{
+			canMerge: boolean;
+			reason?: string;
+			isActiveWorktree?: boolean;
+		}>;
 	};
 	"worktree-merge": {
 		request: { workspaceId: string; worktreeId: string };

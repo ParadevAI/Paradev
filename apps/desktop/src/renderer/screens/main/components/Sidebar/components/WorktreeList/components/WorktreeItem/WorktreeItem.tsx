@@ -190,6 +190,54 @@ export function WorktreeItem({
 	const [activeId, setActiveId] = useState<string | null>(null);
 	const [overId, setOverId] = useState<string | null>(null);
 
+	// Track if merge is disabled (when this is the active worktree)
+	const [isMergeDisabled, setIsMergeDisabled] = useState(false);
+	const [mergeDisabledReason, setMergeDisabledReason] = useState<string>("");
+	const [targetBranch, setTargetBranch] = useState<string>("");
+
+	// Check if merge should be disabled on mount and get target branch
+	useEffect(() => {
+		const checkMergeStatus = async () => {
+			// Get the workspace to find the active worktree
+			const workspace = await window.ipcRenderer.invoke(
+				"workspace-get",
+				workspaceId,
+			);
+
+			if (workspace) {
+				const activeWorktree = workspace.worktrees.find(
+					(wt: { id: string }) => wt.id === workspace.activeWorktreeId,
+				);
+				if (activeWorktree) {
+					setTargetBranch(activeWorktree.branch);
+				}
+			}
+
+			const canMergeResult = await window.ipcRenderer.invoke(
+				"worktree-can-merge",
+				{
+					workspaceId,
+					worktreeId: worktree.id,
+				},
+			);
+
+			if (
+				canMergeResult.success &&
+				canMergeResult.data?.isActiveWorktree
+			) {
+				setIsMergeDisabled(true);
+				setMergeDisabledReason(
+					canMergeResult.data.reason || "Active worktree",
+				);
+			} else {
+				setIsMergeDisabled(false);
+				setMergeDisabledReason("");
+			}
+		};
+
+		checkMergeStatus();
+	}, [workspaceId, worktree.id]);
+
 	// Auto-expand tab group if it's selected or contains the selected tab
 	useEffect(() => {
 		if (selectedTabGroupId) {
@@ -480,12 +528,20 @@ export function WorktreeItem({
 			return;
 		}
 
-		if (!canMergeResult.canMerge) {
-			alert(`Cannot merge: ${canMergeResult.reason}`);
+		if (!canMergeResult.data?.canMerge) {
+			alert(`Cannot merge: ${canMergeResult.data?.reason || "Unknown error"}`);
 			return;
 		}
 
-		if (confirm(`Are you sure you want to merge "${worktree.branch}" into the current branch?`)) {
+		const branchText = targetBranch
+			? ` into "${targetBranch}"`
+			: " into the active worktree";
+
+		if (
+			confirm(
+				`Are you sure you want to merge "${worktree.branch}"${branchText}?`,
+			)
+		) {
 			const result = await window.ipcRenderer.invoke("worktree-merge", {
 				workspaceId,
 				worktreeId: worktree.id,
@@ -528,16 +584,26 @@ export function WorktreeItem({
 						</Button>
 					</ContextMenuTrigger>
 					<ContextMenuContent>
-						<ContextMenuItem onClick={handleMergeWorktree}>
+						<ContextMenuItem
+							onClick={handleMergeWorktree}
+							disabled={isMergeDisabled}
+						>
 							<GitMerge size={14} className="mr-2" />
-							Merge Worktree
+							{isMergeDisabled
+								? `Merge Worktree (${mergeDisabledReason})`
+								: targetBranch
+									? `Merge into Active (${targetBranch})`
+									: "Merge into Active Worktree"}
 						</ContextMenuItem>
 						<ContextMenuItem onClick={handleCopyPath}>
 							<Clipboard size={14} className="mr-2" />
 							Copy Path
 						</ContextMenuItem>
 						<ContextMenuSeparator />
-						<ContextMenuItem onClick={handleRemoveWorktree} className="text-red-500">
+						<ContextMenuItem
+							onClick={handleRemoveWorktree}
+							variant="destructive"
+						>
 							<Trash2 size={14} className="mr-2" />
 							Remove Worktree
 						</ContextMenuItem>
