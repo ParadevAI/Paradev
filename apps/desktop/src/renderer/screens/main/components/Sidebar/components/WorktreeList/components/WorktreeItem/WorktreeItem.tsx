@@ -3,7 +3,6 @@ import {
 	DndContext,
 	type DragEndEvent,
 	type DragOverEvent,
-	DragOverlay,
 	type DragStartEvent,
 	KeyboardSensor,
 	PointerSensor,
@@ -29,30 +28,29 @@ import {
 import {
 	ChevronRight,
 	Clipboard,
-	FolderOpen,
 	GitBranch,
 	GitMerge,
 	Plus,
 	Trash2,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import type { Tab, TabGroup, Worktree } from "shared/types";
+import type { Tab, Worktree } from "shared/types";
 import { TabItem } from "./components/TabItem";
 
 // Sortable wrapper for tabs
 function SortableTab({
 	tab,
 	worktreeId,
-	tabGroupId,
+	parentTabId,
 	selectedTabId,
 	onTabSelect,
 	onTabRemove,
 }: {
 	tab: Tab;
 	worktreeId: string;
-	tabGroupId: string;
+	parentTabId?: string; // Optional parent group tab ID
 	selectedTabId?: string;
-	onTabSelect: (worktreeId: string, tabGroupId: string, tabId: string) => void;
+	onTabSelect: (worktreeId: string, tabId: string) => void;
 	onTabRemove: (tabId: string) => void;
 }) {
 	const {
@@ -66,7 +64,7 @@ function SortableTab({
 		id: tab.id,
 		data: {
 			type: "tab",
-			tabGroupId,
+			parentTabId,
 		},
 	});
 
@@ -81,7 +79,6 @@ function SortableTab({
 			<TabItem
 				tab={tab}
 				worktreeId={worktreeId}
-				tabGroupId={tabGroupId}
 				selectedTabId={selectedTabId}
 				onTabSelect={onTabSelect}
 				onTabRemove={onTabRemove}
@@ -95,7 +92,7 @@ interface WorktreeItemProps {
 	workspaceId: string;
 	isExpanded: boolean;
 	onToggle: (worktreeId: string) => void;
-	onTabSelect: (worktreeId: string, tabGroupId: string, tabId: string) => void;
+	onTabSelect: (worktreeId: string, tabId: string) => void;
 	onReload: () => void;
 	onUpdateWorktree: (updatedWorktree: Worktree) => void;
 	selectedTabId: string | undefined;
@@ -119,6 +116,54 @@ export function WorktreeItem({
 	const [isMergeDisabled, setIsMergeDisabled] = useState(false);
 	const [mergeDisabledReason, setMergeDisabledReason] = useState<string>("");
 	const [targetBranch, setTargetBranch] = useState<string>("");
+
+	// Helper: recursively find a tab by ID
+	const findTabById = (tabs: Tab[], tabId: string): Tab | null => {
+		for (const tab of tabs) {
+			if (tab.id === tabId) return tab;
+			if (tab.type === "group" && tab.tabs) {
+				const found = findTabById(tab.tabs, tabId);
+				if (found) return found;
+			}
+		}
+		return null;
+	};
+
+	// Helper: recursively find parent group tab containing a specific tab
+	const findParentGroupTab = (tabs: Tab[], tabId: string): Tab | null => {
+		for (const tab of tabs) {
+			if (tab.type === "group" && tab.tabs) {
+				if (tab.tabs.some((t) => t.id === tabId)) return tab;
+				const found = findParentGroupTab(tab.tabs, tabId);
+				if (found) return found;
+			}
+		}
+		return null;
+	};
+
+	// Helper: recursively get all tabs as flat array with their parent IDs
+	const getAllTabs = (
+		tabs: Tab[],
+		parentTabId?: string,
+	): Array<{ tab: Tab; parentTabId?: string }> => {
+		const result: Array<{ tab: Tab; parentTabId?: string }> = [];
+		for (const tab of tabs) {
+			result.push({ tab, parentTabId });
+			if (tab.type === "group" && tab.tabs) {
+				result.push(...getAllTabs(tab.tabs, tab.id));
+			}
+		}
+		return result;
+	};
+
+	// Helper: recalculate positions after reorder
+	const recalculatePositions = (tabs: Tab[], cols: number): Tab[] => {
+		return tabs.map((tab, index) => {
+			const row = Math.floor(index / cols);
+			const col = index % cols;
+			return { ...tab, order: index, row, col };
+		});
+	};
 
 	// Check if merge should be disabled on mount and get target branch
 	useEffect(() => {
@@ -146,7 +191,7 @@ export function WorktreeItem({
 				},
 			);
 
-			if (canMergeResult.success && canMergeResult.isActiveWorktree) {
+			if (canMergeResult.isActiveWorktree) {
 				setIsMergeDisabled(true);
 				setMergeDisabledReason(canMergeResult.reason || "Active worktree");
 			} else {
@@ -190,40 +235,61 @@ export function WorktreeItem({
 		const activeData = active.data.current;
 		const overData = over.data.current;
 
-		// Only handle tab dragging (not tab groups)
+		// Only handle tab dragging
 		if (activeData?.type !== "tab") {
 			return;
 		}
 
 		try {
-			// Handle tab reordering within the same tab group
-			if (
-				overData?.type === "tab" &&
-				activeData.tabGroupId === overData.tabGroupId
-			) {
-				const tabGroup = worktree.tabGroups.find(
-					(tg) => tg.id === activeData.tabGroupId,
+			const activeParentTabId = activeData.parentTabId;
+			const overParentTabId = overData?.parentTabId;
+
+			// Reordering within the same parent group
+			if (overData?.type === "tab" && activeParentTabId === overParentTabId) {
+				const parentTab = activeParentTabId
+					? findTabById(worktree.tabs, activeParentTabId)
+					: null;
+
+				// If no parent, we're reordering top-level tabs
+				const tabsArray = parentTab?.tabs || worktree.tabs;
+				const cols = parentTab?.cols || 2;
+
+				const oldIndex = tabsArray.findIndex((t) => t.id === active.id);
+				const newIndex = tabsArray.findIndex((t) => t.id === over.id);
+
+				if (oldIndex === -1 || newIndex === -1) return;
+
+				// Optimistic update
+				const reorderedTabs = arrayMove(tabsArray, oldIndex, newIndex);
+				const tabsWithUpdatedPositions = recalculatePositions(
+					reorderedTabs,
+					cols,
 				);
-				if (!tabGroup) return;
 
-				const oldIndex = tabGroup.tabs.findIndex((t) => t.id === active.id);
-				const newIndex = tabGroup.tabs.findIndex((t) => t.id === over.id);
+				// Update worktree state
+				let updatedWorktree: Worktree;
+				if (parentTab) {
+					// Update nested tabs
+					const updateTabsRecursive = (tabs: Tab[]): Tab[] => {
+						return tabs.map((tab) => {
+							if (tab.id === parentTab.id) {
+								return { ...tab, tabs: tabsWithUpdatedPositions };
+							}
+							if (tab.type === "group" && tab.tabs) {
+								return { ...tab, tabs: updateTabsRecursive(tab.tabs) };
+							}
+							return tab;
+						});
+					};
+					updatedWorktree = {
+						...worktree,
+						tabs: updateTabsRecursive(worktree.tabs),
+					};
+				} else {
+					// Update top-level tabs
+					updatedWorktree = { ...worktree, tabs: tabsWithUpdatedPositions };
+				}
 
-				// Optimistic update: update the local state immediately
-				const reorderedTabs = arrayMove(tabGroup.tabs, oldIndex, newIndex);
-
-				// Recalculate grid positions based on new array order
-				const tabsWithUpdatedPositions = reorderedTabs.map((tab, index) => {
-					const row = Math.floor(index / tabGroup.cols);
-					const col = index % tabGroup.cols;
-					return { ...tab, row, col };
-				});
-
-				const updatedTabGroup = { ...tabGroup, tabs: tabsWithUpdatedPositions };
-				const updatedTabGroups = worktree.tabGroups.map((tg) =>
-					tg.id === activeData.tabGroupId ? updatedTabGroup : tg,
-				);
-				const updatedWorktree = { ...worktree, tabGroups: updatedTabGroups };
 				onUpdateWorktree(updatedWorktree);
 
 				// Save to backend
@@ -231,142 +297,25 @@ export function WorktreeItem({
 				const result = await window.ipcRenderer.invoke("tab-reorder", {
 					workspaceId,
 					worktreeId: worktree.id,
-					tabGroupId: activeData.tabGroupId,
+					parentTabId: activeParentTabId,
 					tabIds: newOrder,
 				});
 
 				if (!result.success) {
 					console.error("Failed to reorder tabs:", result.error);
-					// Revert on failure
 					onReload();
 				}
 			}
-			// Handle moving tab to a different tab group
-			else if (
-				overData?.type === "tab-group" &&
-				activeData.tabGroupId !== over.id
-			) {
-				// Moving to a different tab group
-				const sourceTabGroup = worktree.tabGroups.find(
-					(tg) => tg.id === activeData.tabGroupId,
-				);
-				const targetTabGroup = worktree.tabGroups.find(
-					(tg) => tg.id === over.id,
-				);
-				if (!sourceTabGroup || !targetTabGroup) return;
-
-				const tabToMove = sourceTabGroup.tabs.find((t) => t.id === active.id);
-				if (!tabToMove) return;
-
-				// Optimistic update
-				const updatedSourceTabs = sourceTabGroup.tabs
-					.filter((t) => t.id !== active.id)
-					.map((tab, index) => {
-						const row = Math.floor(index / sourceTabGroup.cols);
-						const col = index % sourceTabGroup.cols;
-						return { ...tab, row, col };
-					});
-
-				const updatedTargetTabs = [...targetTabGroup.tabs, tabToMove].map(
-					(tab, index) => {
-						const row = Math.floor(index / targetTabGroup.cols);
-						const col = index % targetTabGroup.cols;
-						return { ...tab, row, col };
-					},
-				);
-
-				const updatedTabGroups = worktree.tabGroups.map((tg) => {
-					if (tg.id === activeData.tabGroupId) {
-						return { ...tg, tabs: updatedSourceTabs };
-					}
-					if (tg.id === over.id) {
-						return { ...tg, tabs: updatedTargetTabs };
-					}
-					return tg;
-				});
-
-				const updatedWorktree = { ...worktree, tabGroups: updatedTabGroups };
-				onUpdateWorktree(updatedWorktree);
-
-				// Save to backend
-				const result = await window.ipcRenderer.invoke("tab-move-to-group", {
-					workspaceId,
-					worktreeId: worktree.id,
-					tabId: active.id as string,
-					sourceTabGroupId: activeData.tabGroupId,
-					targetTabGroupId: over.id as string,
-					targetIndex: targetTabGroup.tabs.length,
-				});
-
-				if (!result.success) {
-					console.error("Failed to move tab:", result.error);
-					onReload();
-				}
-			}
-			// Handle moving tab between tabs in different groups
+			// Moving to a different parent group
 			else if (
 				overData?.type === "tab" &&
-				activeData.tabGroupId !== overData.tabGroupId
+				activeParentTabId !== overParentTabId
 			) {
-				const sourceTabGroup = worktree.tabGroups.find(
-					(tg) => tg.id === activeData.tabGroupId,
+				// For now, we'll just trigger a reload instead of implementing complex cross-group moves
+				// This can be enhanced later if needed
+				console.log(
+					"Cross-group tab movement not yet supported in sidebar drag-and-drop",
 				);
-				const targetTabGroup = worktree.tabGroups.find(
-					(tg) => tg.id === overData.tabGroupId,
-				);
-				if (!sourceTabGroup || !targetTabGroup) return;
-
-				const tabToMove = sourceTabGroup.tabs.find((t) => t.id === active.id);
-				if (!tabToMove) return;
-
-				const targetIndex = targetTabGroup.tabs.findIndex(
-					(t) => t.id === over.id,
-				);
-
-				// Optimistic update
-				const updatedSourceTabs = sourceTabGroup.tabs
-					.filter((t) => t.id !== active.id)
-					.map((tab, index) => {
-						const row = Math.floor(index / sourceTabGroup.cols);
-						const col = index % sourceTabGroup.cols;
-						return { ...tab, row, col };
-					});
-
-				const updatedTargetTabsTemp = [...targetTabGroup.tabs];
-				updatedTargetTabsTemp.splice(targetIndex, 0, tabToMove);
-				const updatedTargetTabs = updatedTargetTabsTemp.map((tab, index) => {
-					const row = Math.floor(index / targetTabGroup.cols);
-					const col = index % targetTabGroup.cols;
-					return { ...tab, row, col };
-				});
-
-				const updatedTabGroups = worktree.tabGroups.map((tg) => {
-					if (tg.id === activeData.tabGroupId) {
-						return { ...tg, tabs: updatedSourceTabs };
-					}
-					if (tg.id === overData.tabGroupId) {
-						return { ...tg, tabs: updatedTargetTabs };
-					}
-					return tg;
-				});
-
-				const updatedWorktree = { ...worktree, tabGroups: updatedTabGroups };
-				onUpdateWorktree(updatedWorktree);
-
-				// Save to backend
-				const result = await window.ipcRenderer.invoke("tab-move-to-group", {
-					workspaceId,
-					worktreeId: worktree.id,
-					tabId: active.id as string,
-					sourceTabGroupId: activeData.tabGroupId,
-					targetTabGroupId: overData.tabGroupId,
-					targetIndex,
-				});
-
-				if (!result.success) {
-					console.error("Failed to move tab:", result.error);
-					onReload();
-				}
 			}
 		} catch (error) {
 			console.error("Error during drag end:", error);
@@ -374,12 +323,7 @@ export function WorktreeItem({
 	};
 
 	// Get active item for drag overlay
-	const activeItem = activeId
-		? worktree.tabGroups
-				.flatMap((tg) => tg.tabs)
-				.find((t) => t.id === activeId) ||
-			worktree.tabGroups.find((tg) => tg.id === activeId)
-		: null;
+	const activeItem = activeId ? findTabById(worktree.tabs, activeId) : null;
 
 	// Context menu handlers
 	const handleCopyPath = async () => {
@@ -421,11 +365,6 @@ export function WorktreeItem({
 			},
 		);
 
-		if (!canMergeResult.success) {
-			alert(`Error: ${canMergeResult.error}`);
-			return;
-		}
-
 		if (!canMergeResult.canMerge) {
 			alert(`Cannot merge: ${canMergeResult.reason || "Unknown error"}`);
 			return;
@@ -458,24 +397,25 @@ export function WorktreeItem({
 	};
 
 	const handleAddTab = async () => {
-		// Get the first tab group (or use a default if none exist)
-		const tabGroup = worktree.tabGroups[0];
-		if (!tabGroup) {
-			console.error("No tab group found for worktree");
+		// Get the first top-level group tab
+		const firstGroupTab = worktree.tabs.find((t) => t.type === "group");
+		if (!firstGroupTab || !firstGroupTab.tabs) {
+			console.error("No group tab found for worktree");
 			return;
 		}
 
 		// Calculate next tab position in grid
-		const nextOrder = tabGroup.tabs.length;
-		const row = Math.floor(nextOrder / tabGroup.cols);
-		const col = nextOrder % tabGroup.cols;
+		const nextOrder = firstGroupTab.tabs.length;
+		const cols = firstGroupTab.cols || 2;
+		const row = Math.floor(nextOrder / cols);
+		const col = nextOrder % cols;
 
 		try {
 			const result = await window.ipcRenderer.invoke("tab-create", {
 				workspaceId,
 				worktreeId: worktree.id,
-				tabGroupId: tabGroup.id,
-				name: `Terminal ${tabGroup.tabs.length + 1}`,
+				parentTabId: firstGroupTab.id,
+				name: `Terminal ${firstGroupTab.tabs.length + 1}`,
 				type: "terminal",
 				row,
 				col,
@@ -486,7 +426,7 @@ export function WorktreeItem({
 				onReload();
 				// Auto-select the new tab if we have its ID
 				if (newTabId) {
-					onTabSelect(worktree.id, tabGroup.id, newTabId);
+					onTabSelect(worktree.id, newTabId);
 				}
 			} else {
 				console.error("Failed to create tab:", result.error);
@@ -513,6 +453,10 @@ export function WorktreeItem({
 			console.error("Error deleting tab:", error);
 		}
 	};
+
+	// Get all tabs for sortable context (including nested)
+	const allTabsFlat = getAllTabs(worktree.tabs);
+	const allTabIds = allTabsFlat.map((item) => item.tab.id);
 
 	return (
 		<DndContext
@@ -573,26 +517,22 @@ export function WorktreeItem({
 				{/* Tabs List */}
 				{isExpanded && (
 					<div className="ml-6 space-y-1">
-						{/* Render all tabs from all tab groups */}
+						{/* Render all tabs recursively */}
 						<SortableContext
-							items={worktree.tabGroups.flatMap((tg) =>
-								tg.tabs.map((t) => t.id),
-							)}
+							items={allTabIds}
 							strategy={verticalListSortingStrategy}
 						>
-							{worktree.tabGroups.flatMap((tabGroup) =>
-								tabGroup.tabs.map((tab) => (
-									<SortableTab
-										key={tab.id}
-										tab={tab}
-										worktreeId={worktree.id}
-										tabGroupId={tabGroup.id}
-										selectedTabId={selectedTabId}
-										onTabSelect={onTabSelect}
-										onTabRemove={handleTabRemove}
-									/>
-								)),
-							)}
+							{allTabsFlat.map(({ tab, parentTabId }) => (
+								<SortableTab
+									key={tab.id}
+									tab={tab}
+									worktreeId={worktree.id}
+									parentTabId={parentTabId}
+									selectedTabId={selectedTabId}
+									onTabSelect={onTabSelect}
+									onTabRemove={handleTabRemove}
+								/>
+							))}
 						</SortableContext>
 
 						{/* New Tab Button */}
@@ -610,13 +550,12 @@ export function WorktreeItem({
 				)}
 			</div>
 
-			<DragOverlay>
-				{activeItem ? (
-					<div className="bg-neutral-800 border border-neutral-700 rounded px-3 py-2 text-sm opacity-90">
-						{"name" in activeItem ? activeItem.name : "Tab Group"}
-					</div>
-				) : null}
-			</DragOverlay>
+			{/* Drag Overlay */}
+			{activeItem && (
+				<div className="bg-neutral-800 border border-neutral-700 rounded px-3 py-2 text-sm opacity-90">
+					{activeItem.name}
+				</div>
+			)}
 		</DndContext>
 	);
 }

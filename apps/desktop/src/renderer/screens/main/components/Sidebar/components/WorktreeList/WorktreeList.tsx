@@ -1,16 +1,14 @@
-import type { Worktree, Workspace } from "shared/types";
+import type { Workspace, Worktree } from "shared/types";
 import { WorktreeItem } from "./components/WorktreeItem";
 
 interface WorktreeListProps {
 	currentWorkspace: Workspace | null;
 	expandedWorktrees: Set<string>;
 	onToggleWorktree: (worktreeId: string) => void;
-	onTabSelect: (worktreeId: string, tabGroupId: string, tabId: string) => void;
-	onTabGroupSelect: (worktreeId: string, tabGroupId: string) => void;
+	onTabSelect: (worktreeId: string, tabId: string) => void;
 	onReload: () => void;
 	onUpdateWorktree: (worktreeId: string, updatedWorktree: Worktree) => void;
 	selectedTabId: string | undefined;
-	selectedTabGroupId: string | undefined;
 }
 
 export function WorktreeList({
@@ -18,11 +16,9 @@ export function WorktreeList({
 	expandedWorktrees,
 	onToggleWorktree,
 	onTabSelect,
-	onTabGroupSelect,
 	onReload,
 	onUpdateWorktree,
 	selectedTabId,
-	selectedTabGroupId,
 }: WorktreeListProps) {
 	if (!currentWorkspace) {
 		return (
@@ -50,13 +46,11 @@ export function WorktreeList({
 					isExpanded={expandedWorktrees.has(worktree.id)}
 					onToggle={onToggleWorktree}
 					onTabSelect={onTabSelect}
-					onTabGroupSelect={onTabGroupSelect}
 					onReload={onReload}
 					onUpdateWorktree={(updatedWorktree) =>
 						onUpdateWorktree(worktree.id, updatedWorktree)
 					}
 					selectedTabId={selectedTabId}
-					selectedTabGroupId={selectedTabGroupId}
 				/>
 			))}
 		</>

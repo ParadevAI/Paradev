@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { Tab } from "shared/types";
-import TabContent from "./TabContent";
 import ResizableGrid from "./ResizableGrid";
+import TabContent from "./TabContent";
 
 interface ScreenLayoutProps {
 	groupTab: Tab; // A tab with type: "group"
@@ -97,7 +97,12 @@ export default function ScreenLayout({
 	};
 
 	// Safety check: ensure groupTab is a group type with tabs
-	if (!groupTab || groupTab.type !== "group" || !groupTab.tabs || !Array.isArray(groupTab.tabs)) {
+	if (
+		!groupTab ||
+		groupTab.type !== "group" ||
+		!groupTab.tabs ||
+		!Array.isArray(groupTab.tabs)
+	) {
 		return (
 			<div className="w-full h-full flex items-center justify-center text-gray-400">
 				<div className="text-center">

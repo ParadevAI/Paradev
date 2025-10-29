@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { Tab } from "shared/types";
-import Terminal from "./Terminal";
 import ScreenLayout from "./ScreenLayout";
+import Terminal from "./Terminal";
 
 interface TabContentProps {
 	tab: Tab;

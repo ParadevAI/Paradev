@@ -250,7 +250,7 @@ export function registerWorkspaceIPCs() {
 				colSizes?: number[];
 			},
 		) => {
-			return await workspaceManager.updateTabGroupGridSizes(
+			return await workspaceManager.updateTabGridSizes(
 				input.workspaceId,
 				input.worktreeId,
 				input.tabId,

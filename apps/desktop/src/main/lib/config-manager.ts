@@ -70,7 +70,7 @@ class ConfigManager {
 				);
 				if (workspace) {
 					workspace.activeWorktreeId = oldConfig.activeWorktreeId || null;
-						workspace.activeTabId = oldConfig.activeTabId || null;
+					workspace.activeTabId = oldConfig.activeTabId || null;
 				}
 				// Clean up old fields
 				delete oldConfig.activeWorktreeId;

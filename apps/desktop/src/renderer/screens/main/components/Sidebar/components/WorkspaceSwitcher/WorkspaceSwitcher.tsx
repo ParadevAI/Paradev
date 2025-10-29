@@ -34,7 +34,7 @@ export function WorkspaceSwitcher({
 	const backgroundX = useTransform(scrollProgress, (value) => value * 40);
 	return (
 		<div className="flex w-full">
-			<ScrollArea className="flex-1 min-w-0" orientation="horizontal">
+			<ScrollArea className="flex-1 min-w-0">
 				<div className="relative flex items-center gap-2 px-2 py-2 w-max">
 					{/* Sliding background indicator */}
 					<motion.div
@@ -68,7 +68,7 @@ export function WorkspaceSwitcher({
 									<TooltipContent side="top">
 										<p>{ws.name}</p>
 									</TooltipContent>
-									<ContextMenuContent side="top">
+									<ContextMenuContent>
 										<ContextMenuItem
 											className="text-red-400 focus:text-red-400"
 											onClick={() => onRemoveWorkspace(ws.id, ws.name)}

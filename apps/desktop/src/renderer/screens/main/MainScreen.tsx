@@ -30,10 +30,7 @@ export function MainScreen() {
 		(tab) => tab.id === selectedTabId,
 	);
 
-	const handleTabSelect = (
-		worktreeId: string,
-		tabId: string,
-	) => {
+	const handleTabSelect = (worktreeId: string, tabId: string) => {
 		setSelectedWorktreeId(worktreeId);
 		setSelectedTabId(tabId);
 		// Save active selection

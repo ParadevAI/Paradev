@@ -5,16 +5,14 @@ import type { Tab } from "shared/types";
 interface TabItemProps {
 	tab: Tab;
 	worktreeId: string;
-	tabGroupId: string;
 	selectedTabId: string | undefined;
-	onTabSelect: (worktreeId: string, tabGroupId: string, tabId: string) => void;
+	onTabSelect: (worktreeId: string, tabId: string) => void;
 	onTabRemove?: (tabId: string) => void;
 }
 
 export function TabItem({
 	tab,
 	worktreeId,
-	tabGroupId,
 	selectedTabId,
 	onTabSelect,
 	onTabRemove,
@@ -32,7 +30,7 @@ export function TabItem({
 					? "bg-neutral-800 border border-neutral-700"
 					: ""
 			}`}
-			onClick={() => onTabSelect(worktreeId, tabGroupId, tab.id)}
+			onClick={() => onTabSelect(worktreeId, tab.id)}
 		>
 			<div className="flex items-center gap-2 flex-1">
 				<SquareTerminal size={14} />

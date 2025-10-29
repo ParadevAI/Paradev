@@ -1,6 +1,6 @@
 import { type MotionValue, useMotionValue } from "framer-motion";
 import { useEffect, useState } from "react";
-import type { Worktree, Workspace } from "shared/types";
+import type { Workspace, Worktree } from "shared/types";
 import {
 	CreateWorktreeButton,
 	CreateWorktreeModal,
@@ -14,13 +14,11 @@ interface SidebarProps {
 	workspaces: Workspace[];
 	currentWorkspace: Workspace | null;
 	onCollapse: () => void;
-	onTabSelect: (worktreeId: string, tabGroupId: string, tabId: string) => void;
-	onTabGroupSelect: (worktreeId: string, tabGroupId: string) => void;
+	onTabSelect: (worktreeId: string, tabId: string) => void;
 	onWorktreeCreated: () => void;
 	onWorkspaceSelect: (workspaceId: string) => void;
 	onUpdateWorktree: (worktreeId: string, updatedWorktree: Worktree) => void;
 	selectedTabId: string | undefined;
-	selectedTabGroupId: string | undefined;
 }
 
 export function Sidebar({
@@ -28,12 +26,10 @@ export function Sidebar({
 	currentWorkspace,
 	onCollapse,
 	onTabSelect,
-	onTabGroupSelect,
 	onWorktreeCreated,
 	onWorkspaceSelect,
 	onUpdateWorktree,
 	selectedTabId,
-	selectedTabGroupId,
 }: SidebarProps) {
 	const [expandedWorktrees, setExpandedWorktrees] = useState<Set<string>>(
 		new Set(),
@@ -55,24 +51,36 @@ export function Sidebar({
 
 	console.log(currentWorkspace, workspaces);
 
-	// Auto-expand worktree if it contains the selected tab group
+	// Auto-expand worktree if it contains the selected tab
 	useEffect(() => {
-		if (currentWorkspace && selectedTabGroupId) {
-			// Find which worktree contains the selected tab group
-			const worktreeWithSelectedTabGroup = currentWorkspace.worktrees?.find(
-				(worktree) =>
-					worktree.tabGroups?.some((tg) => tg.id === selectedTabGroupId),
-			);
+		if (currentWorkspace && selectedTabId) {
+			// Find which worktree contains the selected tab (recursively search through tabs)
+			const findWorktreeWithTab = (tabId: string) => {
+				return currentWorkspace.worktrees?.find((worktree) => {
+					const searchTabs = (tabs: any[]): boolean => {
+						for (const tab of tabs) {
+							if (tab.id === tabId) return true;
+							if (tab.type === "group" && tab.tabs) {
+								if (searchTabs(tab.tabs)) return true;
+							}
+						}
+						return false;
+					};
+					return searchTabs(worktree.tabs || []);
+				});
+			};
 
-			if (worktreeWithSelectedTabGroup) {
+			const worktreeWithSelectedTab = findWorktreeWithTab(selectedTabId);
+
+			if (worktreeWithSelectedTab) {
 				setExpandedWorktrees((prev) => {
 					const next = new Set(prev);
-					next.add(worktreeWithSelectedTabGroup.id);
+					next.add(worktreeWithSelectedTab.id);
 					return next;
 				});
 			}
 		}
-	}, [currentWorkspace, selectedTabGroupId]);
+	}, [currentWorkspace, selectedTabId]);
 
 	const toggleWorktree = (worktreeId: string) => {
 		setExpandedWorktrees((prev) => {
@@ -221,11 +229,9 @@ export function Sidebar({
 							expandedWorktrees={expandedWorktrees}
 							onToggleWorktree={toggleWorktree}
 							onTabSelect={onTabSelect}
-							onTabGroupSelect={onTabGroupSelect}
 							onReload={onWorktreeCreated}
 							onUpdateWorktree={onUpdateWorktree}
 							selectedTabId={selectedTabId}
-							selectedTabGroupId={selectedTabGroupId}
 						/>
 
 						{workspace && (

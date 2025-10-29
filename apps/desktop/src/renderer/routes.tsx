@@ -25,7 +25,9 @@ function ErrorPage() {
 							Error Message
 						</h2>
 						<pre className="overflow-auto rounded-lg bg-neutral-900 border border-neutral-800 p-4 text-base">
-							<code className="text-red-400 select-all">{error?.toString()}</code>
+							<code className="text-red-400 select-all">
+								{error?.toString()}
+							</code>
 						</pre>
 					</div>
 
@@ -35,7 +37,9 @@ function ErrorPage() {
 								Stack Trace
 							</h2>
 							<pre className="max-h-96 overflow-auto rounded-lg bg-neutral-900 border border-neutral-800 p-4 text-sm font-mono">
-								<code className="text-neutral-300 select-all">{error.stack}</code>
+								<code className="text-neutral-300 select-all">
+									{error.stack}
+								</code>
 							</pre>
 						</div>
 					)}

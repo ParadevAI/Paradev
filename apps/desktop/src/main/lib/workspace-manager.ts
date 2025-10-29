@@ -9,8 +9,8 @@ import type {
 } from "shared/types";
 
 import * as tabOps from "./workspace/tab-operations";
-import * as worktreeOps from "./workspace/worktree-operations";
 import * as workspaceOps from "./workspace/workspace-operations";
+import * as worktreeOps from "./workspace/worktree-operations";
 
 /**
  * Main WorkspaceManager class that coordinates all workspace operations
@@ -286,7 +286,7 @@ class WorkspaceManager {
 	/**
 	 * Update grid sizes for a group tab
 	 */
-	async updateTabGroupGridSizes(
+	async updateTabGridSizes(
 		workspaceId: string,
 		worktreeId: string,
 		tabId: string,

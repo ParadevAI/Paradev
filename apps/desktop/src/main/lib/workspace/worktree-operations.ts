@@ -1,7 +1,12 @@
 import { randomUUID } from "node:crypto";
 import { existsSync } from "node:fs";
 
-import type { CreateWorktreeInput, Tab, Workspace, Worktree } from "shared/types";
+import type {
+	CreateWorktreeInput,
+	Tab,
+	Workspace,
+	Worktree,
+} from "shared/types";
 
 import configManager from "../config-manager";
 import worktreeManager from "../worktree-manager";
@@ -373,9 +378,7 @@ export async function scanAndImportWorktrees(
 
 			// Save to config
 			const config = configManager.read();
-			const index = config.workspaces.findIndex(
-				(ws) => ws.id === workspace.id,
-			);
+			const index = config.workspaces.findIndex((ws) => ws.id === workspace.id);
 			if (index !== -1) {
 				config.workspaces[index] = workspace;
 				configManager.write(config);
