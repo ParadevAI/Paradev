@@ -120,6 +120,14 @@ export interface IpcChannels {
 		request: CreateTabInput;
 		response: IpcResponse<Tab>;
 	};
+	"tab-delete": {
+		request: {
+			workspaceId: string;
+			worktreeId: string;
+			tabId: string;
+		};
+		response: IpcResponse;
+	};
 	"tab-reorder": {
 		request: {
 			workspaceId: string;
@@ -216,6 +224,7 @@ export function isValidChannel(channel: string): channel is IpcChannelName {
 		"tab-group-reorder",
 		"tab-group-update-grid-sizes",
 		"tab-create",
+		"tab-delete",
 		"tab-reorder",
 		"tab-move-to-group",
 		"terminal-create",

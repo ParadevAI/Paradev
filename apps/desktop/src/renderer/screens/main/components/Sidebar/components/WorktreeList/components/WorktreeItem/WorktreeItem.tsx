@@ -19,84 +19,10 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Button } from "@superset/ui/button";
-import { ChevronRight, FolderOpen, GitBranch, Plus } from "lucide-react";
-import { useEffect, useState } from "react";
-import type { Tab, TabGroup, Worktree } from "shared/types";
+import { ChevronRight, GitBranch, Plus } from "lucide-react";
+import { useState } from "react";
+import type { Tab, Worktree } from "shared/types";
 import { TabItem } from "./components/TabItem";
-
-// Non-sortable wrapper for tab groups (only tabs are draggable)
-function TabGroupSection({
-	tabGroup,
-	worktree,
-	isExpanded,
-	isSelected,
-	onToggle,
-	selectedTabId,
-	onTabSelect,
-}: {
-	tabGroup: TabGroup;
-	worktree: Worktree;
-	isExpanded: boolean;
-	isSelected: boolean;
-	onToggle: () => void;
-	selectedTabId?: string;
-	onTabSelect: (worktreeId: string, tabGroupId: string, tabId: string) => void;
-}) {
-	const { setNodeRef, isOver } = useSortable({
-		id: tabGroup.id,
-		data: {
-			type: "tab-group",
-		},
-		// Disable dragging for tab groups
-		disabled: true,
-	});
-
-	return (
-		<div
-			ref={setNodeRef}
-			className={`space-y-1 ${isOver ? "bg-neutral-800/50 rounded" : ""}`}
-		>
-			{/* Tab Group Header */}
-			<Button
-				variant="ghost"
-				size="sm"
-				onClick={onToggle}
-				className={`w-full h-8 px-3 font-normal ${
-					isSelected ? "bg-neutral-800 border border-neutral-700" : ""
-				}`}
-				style={{ justifyContent: "flex-start" }}
-			>
-				<ChevronRight
-					size={12}
-					className={`transition-transform ${isExpanded ? "rotate-90" : ""}`}
-				/>
-				<FolderOpen size={14} className="opacity-70" />
-				<span className="truncate">{tabGroup.name}</span>
-			</Button>
-
-			{/* Tabs List */}
-			{isExpanded && (
-				<div className="ml-6 space-y-1">
-					<SortableContext
-						items={tabGroup.tabs.map((t) => t.id)}
-						strategy={verticalListSortingStrategy}
-					>
-						{tabGroup.tabs.map((tab) => (
-							<SortableTab
-								key={tab.id}
-								tab={tab}
-								worktreeId={worktree.id}
-								tabGroupId={tabGroup.id}
-								selectedTabId={selectedTabId}
-								onTabSelect={onTabSelect}
-							/>
-						))}
-					</SortableContext>
-				</div>
-			)}
-		</div>
-	);
-}
 
 // Sortable wrapper for tabs
 function SortableTab({
@@ -105,12 +31,14 @@ function SortableTab({
 	tabGroupId,
 	selectedTabId,
 	onTabSelect,
+	onTabRemove,
 }: {
 	tab: Tab;
 	worktreeId: string;
 	tabGroupId: string;
 	selectedTabId?: string;
 	onTabSelect: (worktreeId: string, tabGroupId: string, tabId: string) => void;
+	onTabRemove: (tabId: string) => void;
 }) {
 	const {
 		attributes,
@@ -141,6 +69,7 @@ function SortableTab({
 				tabGroupId={tabGroupId}
 				selectedTabId={selectedTabId}
 				onTabSelect={onTabSelect}
+				onTabRemove={onTabRemove}
 			/>
 		</div>
 	);
@@ -152,11 +81,9 @@ interface WorktreeItemProps {
 	isExpanded: boolean;
 	onToggle: (worktreeId: string) => void;
 	onTabSelect: (worktreeId: string, tabGroupId: string, tabId: string) => void;
-	onTabGroupSelect: (worktreeId: string, tabGroupId: string) => void;
 	onReload: () => void;
 	onUpdateWorktree: (updatedWorktree: Worktree) => void;
 	selectedTabId: string | undefined;
-	selectedTabGroupId: string | undefined;
 }
 
 export function WorktreeItem({
@@ -165,49 +92,13 @@ export function WorktreeItem({
 	isExpanded,
 	onToggle,
 	onTabSelect,
-	onTabGroupSelect,
 	onReload,
 	onUpdateWorktree,
 	selectedTabId,
-	selectedTabGroupId,
 }: WorktreeItemProps) {
-	// Track which tab groups are expanded
-	const [expandedTabGroups, setExpandedTabGroups] = useState<Set<string>>(
-		new Set(),
-	);
-
 	// Track active drag state
 	const [activeId, setActiveId] = useState<string | null>(null);
 	const [_overId, setOverId] = useState<string | null>(null);
-
-	// Auto-expand tab group if it's selected or contains the selected tab
-	useEffect(() => {
-		if (selectedTabGroupId) {
-			// Check if this tab group is selected or contains the selected tab
-			const tabGroup = worktree.tabGroups.find(
-				(tg) => tg.id === selectedTabGroupId,
-			);
-			if (tabGroup) {
-				setExpandedTabGroups((prev) => {
-					const next = new Set(prev);
-					next.add(selectedTabGroupId);
-					return next;
-				});
-			}
-		}
-	}, [selectedTabGroupId, worktree.tabGroups]);
-
-	const toggleTabGroup = (tabGroupId: string) => {
-		setExpandedTabGroups((prev) => {
-			const next = new Set(prev);
-			if (next.has(tabGroupId)) {
-				next.delete(tabGroupId);
-			} else {
-				next.add(tabGroupId);
-			}
-			return next;
-		});
-	};
 
 	// Configure sensors for drag-and-drop
 	const sensors = useSensors(
@@ -432,9 +323,7 @@ export function WorktreeItem({
 			worktree.tabGroups.find((tg) => tg.id === activeId)
 		: null;
 
-	const handleAddTab = async (e: React.MouseEvent) => {
-		e.stopPropagation(); // Prevent toggling the worktree
-
+	const handleAddTab = async () => {
 		// Get the first tab group (or use a default if none exist)
 		const tabGroup = worktree.tabGroups[0];
 		if (!tabGroup) {
@@ -459,12 +348,37 @@ export function WorktreeItem({
 			});
 
 			if (result.success) {
-				onReload(); // Refresh the workspace to show the new tab
+				const newTabId = result.tab?.id;
+				console.log("Created tab:", result.tab);
+				console.log("New tab ID:", newTabId);
+				onReload();
+				// Auto-select the new tab if we have its ID
+				if (newTabId) {
+					onTabSelect(worktree.id, tabGroup.id, newTabId);
+				}
 			} else {
 				console.error("Failed to create tab:", result.error);
 			}
 		} catch (error) {
 			console.error("Error creating tab:", error);
+		}
+	};
+
+	const handleTabRemove = async (tabId: string) => {
+		try {
+			const result = await window.ipcRenderer.invoke("tab-delete", {
+				workspaceId,
+				worktreeId: worktree.id,
+				tabId,
+			});
+
+			if (result.success) {
+				onReload(); // Refresh the workspace to show the updated tab list
+			} else {
+				console.error("Failed to delete tab:", result.error);
+			}
+		} catch (error) {
+			console.error("Error deleting tab:", error);
 		}
 	};
 
@@ -478,52 +392,57 @@ export function WorktreeItem({
 		>
 			<div className="space-y-1">
 				{/* Worktree Header */}
-				<div className="flex items-center gap-1">
-					<Button
-						variant="ghost"
-						size="sm"
-						onClick={() => onToggle(worktree.id)}
-						className="flex-1 h-8 px-3 pb-1 font-normal"
-						style={{ justifyContent: "flex-start" }}
-					>
-						<ChevronRight
-							size={12}
-							className={`transition-transform ${isExpanded ? "rotate-90" : ""}`}
-						/>
-						<GitBranch size={14} className="opacity-70" />
-						<span className="truncate flex-1 text-left">{worktree.branch}</span>
-					</Button>
-					<Button
-						variant="ghost"
-						size="sm"
-						onClick={handleAddTab}
-						className="h-8 w-8 p-0 opacity-70 hover:opacity-100"
-						title="Add terminal tab"
-					>
-						<Plus size={14} />
-					</Button>
-				</div>
+				<Button
+					variant="ghost"
+					size="sm"
+					onClick={() => onToggle(worktree.id)}
+					className="w-full h-8 px-3 pb-1 font-normal"
+					style={{ justifyContent: "flex-start" }}
+				>
+					<ChevronRight
+						size={12}
+						className={`transition-transform ${isExpanded ? "rotate-90" : ""}`}
+					/>
+					<GitBranch size={14} className="opacity-70" />
+					<span className="truncate flex-1 text-left">{worktree.branch}</span>
+				</Button>
 
-				{/* Tab Groups and Tabs List */}
+				{/* Tabs List */}
 				{isExpanded && (
 					<div className="ml-6 space-y-1">
-						{(worktree.tabGroups || []).map((tabGroup) => (
-							<TabGroupSection
-								key={tabGroup.id}
-								tabGroup={tabGroup}
-								worktree={worktree}
-								isExpanded={expandedTabGroups.has(tabGroup.id)}
-								isSelected={
-									selectedTabGroupId === tabGroup.id && !selectedTabId
-								}
-								onToggle={() => {
-									onTabGroupSelect(worktree.id, tabGroup.id);
-									toggleTabGroup(tabGroup.id);
-								}}
-								selectedTabId={selectedTabId}
-								onTabSelect={onTabSelect}
-							/>
-						))}
+						{/* Render all tabs from all tab groups */}
+						<SortableContext
+							items={worktree.tabGroups.flatMap((tg) =>
+								tg.tabs.map((t) => t.id),
+							)}
+							strategy={verticalListSortingStrategy}
+						>
+							{worktree.tabGroups.flatMap((tabGroup) =>
+								tabGroup.tabs.map((tab) => (
+									<SortableTab
+										key={tab.id}
+										tab={tab}
+										worktreeId={worktree.id}
+										tabGroupId={tabGroup.id}
+										selectedTabId={selectedTabId}
+										onTabSelect={onTabSelect}
+										onTabRemove={handleTabRemove}
+									/>
+								)),
+							)}
+						</SortableContext>
+
+						{/* New Tab Button */}
+						<Button
+							variant="ghost"
+							size="sm"
+							onClick={handleAddTab}
+							className="w-full h-8 px-3 font-normal opacity-70 hover:opacity-100"
+							style={{ justifyContent: "flex-start" }}
+						>
+							<Plus size={14} />
+							<span className="truncate">New Tab</span>
+						</Button>
 					</div>
 				)}
 			</div>

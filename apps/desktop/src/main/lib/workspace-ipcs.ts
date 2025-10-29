@@ -141,6 +141,17 @@ export function registerWorkspaceIPCs() {
 		return await workspaceManager.createTab(input);
 	});
 
+	// Delete tab
+	ipcMain.handle(
+		"tab-delete",
+		async (
+			_event,
+			input: { workspaceId: string; worktreeId: string; tabId: string },
+		) => {
+			return await workspaceManager.deleteTab(input);
+		},
+	);
+
 	// Scan and import existing worktrees
 	ipcMain.handle(
 		"workspace-scan-worktrees",

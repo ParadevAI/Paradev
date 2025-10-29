@@ -333,6 +333,70 @@ class WorkspaceManager {
 		}
 	}
 
+	async deleteTab(input: {
+		workspaceId: string;
+		worktreeId: string;
+		tabId: string;
+	}): Promise<{ success: boolean; error?: string }> {
+		try {
+			const workspace = await this.get(input.workspaceId);
+			if (!workspace) {
+				return { success: false, error: "Workspace not found" };
+			}
+
+			const worktree = workspace.worktrees.find(
+				(wt) => wt.id === input.worktreeId,
+			);
+			if (!worktree) {
+				return { success: false, error: "Worktree not found" };
+			}
+
+			// Find the tab group that contains the tab
+			let tabGroup: TabGroup | undefined;
+			let tabIndex = -1;
+
+			for (const tg of worktree.tabGroups) {
+				tabIndex = tg.tabs.findIndex((t) => t.id === input.tabId);
+				if (tabIndex !== -1) {
+					tabGroup = tg;
+					break;
+				}
+			}
+
+			if (!tabGroup || tabIndex === -1) {
+				return { success: false, error: "Tab not found" };
+			}
+
+			// Remove the tab
+			tabGroup.tabs.splice(tabIndex, 1);
+
+			// Recalculate grid positions for remaining tabs
+			tabGroup.tabs = tabGroup.tabs.map((tab, index) => {
+				const row = Math.floor(index / tabGroup.cols);
+				const col = index % tabGroup.cols;
+				return { ...tab, order: index, row, col };
+			});
+
+			workspace.updatedAt = new Date().toISOString();
+
+			// Save
+			const config = configManager.read();
+			const index = config.workspaces.findIndex((ws) => ws.id === workspace.id);
+			if (index !== -1) {
+				config.workspaces[index] = workspace;
+				configManager.write(config);
+			}
+
+			return { success: true };
+		} catch (error) {
+			console.error("Failed to delete tab:", error);
+			return {
+				success: false,
+				error: error instanceof Error ? error.message : String(error),
+			};
+		}
+	}
+
 	/**
 	 * Get the last opened workspace
 	 */
