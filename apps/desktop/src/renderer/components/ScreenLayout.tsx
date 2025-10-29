@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { Tab, TabGroup } from "shared/types";
 import TabContent from "./TabContent";
+import ResizableGrid from "./ResizableGrid";
 
 interface ScreenLayoutProps {
     tabGroup: TabGroup;
@@ -18,6 +19,7 @@ interface TabInstanceProps {
     worktreeId: string | undefined;
     tabGroupId: string;
     onTabFocus: (tabId: string) => void;
+    resizeTrigger?: number;
 }
 
 /**
@@ -31,6 +33,7 @@ function TabInstance({
     worktreeId,
     tabGroupId,
     onTabFocus,
+    resizeTrigger = 0,
 }: TabInstanceProps) {
     // Trigger fit when position changes (for terminal resizing)
     const [fitTrigger, setFitTrigger] = useState(0);
@@ -39,6 +42,13 @@ function TabInstance({
     useEffect(() => {
         setFitTrigger((prev) => prev + 1);
     }, [tab.row, tab.col]);
+
+    // Trigger fit when grid is resized
+    useEffect(() => {
+        if (resizeTrigger > 0) {
+            setFitTrigger((prev) => prev + 1);
+        }
+    }, [resizeTrigger]);
 
     return (
         <TabContent
@@ -61,6 +71,14 @@ export default function ScreenLayout({
     selectedTabId,
     onTabFocus,
 }: ScreenLayoutProps) {
+    // Trigger fit for all terminals when grid is resized
+    const [resizeTrigger, setResizeTrigger] = useState(0);
+
+    const handleGridResize = () => {
+        // Increment to trigger terminal re-fit in all TabInstances
+        setResizeTrigger((prev) => prev + 1);
+    };
+
     // Safety check: ensure tabGroup has tabs
     if (!tabGroup || !tabGroup.tabs || !Array.isArray(tabGroup.tabs)) {
         return (
@@ -76,13 +94,11 @@ export default function ScreenLayout({
     }
 
     return (
-        <div
-            className="w-full h-full gap-1 p-1"
-            style={{
-                display: "grid",
-                gridTemplateRows: `repeat(${tabGroup.rows}, 1fr)`,
-                gridTemplateColumns: `repeat(${tabGroup.cols}, 1fr)`,
-            }}
+        <ResizableGrid
+            rows={tabGroup.rows}
+            cols={tabGroup.cols}
+            className="w-full h-full p-1"
+            onResize={handleGridResize}
         >
             {tabGroup.tabs.map((tab) => {
                 const isActive = selectedTabId === tab.id;
@@ -105,10 +121,11 @@ export default function ScreenLayout({
                             worktreeId={worktreeId}
                             tabGroupId={tabGroup.id}
                             onTabFocus={onTabFocus}
+                            resizeTrigger={resizeTrigger}
                         />
                     </div>
                 );
             })}
-        </div>
+        </ResizableGrid>
     );
 }
