@@ -167,6 +167,7 @@ export default function ScreenLayout({
 						workspaceId={workspaceId}
 						worktreeId={worktreeId}
 						groupTabId={groupTab.id}
+						selectedTabId={selectedTabId}
 						onTabFocus={onTabFocus}
 					/>
 				</MosaicWindow>

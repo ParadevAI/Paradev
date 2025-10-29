@@ -184,6 +184,10 @@ export default function TerminalComponent({
 		const searchAddon = new SearchAddon();
 		term.loadAddon(searchAddon);
 
+		// Perform initial fit to size terminal correctly on first render
+		// This ensures the terminal has correct dimensions when it first appears
+		customFit();
+
 		// Listen for container resize to auto-fit terminal
 		// Use ResizeObserver to detect when the container size changes
 		// Debounce resize to prevent excessive fit calls that cause terminal corruption
@@ -243,11 +247,10 @@ export default function TerminalComponent({
 					isInitialSetup = false;
 				});
 		} else {
-			// Delay initial fit to ensure renderer is ready (for new terminals)
+			// Mark initial setup as complete for new terminals
+			// Initial fit was already performed above
 			setTimeout(() => {
 				if (!isDisposed) {
-					customFit();
-					// Mark initial setup as complete after first fit
 					isInitialSetup = false;
 				}
 			}, 100);

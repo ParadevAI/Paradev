@@ -354,8 +354,8 @@ export function MainScreen() {
 									workspaceId={currentWorkspace.id}
 									worktreeId={selectedWorktreeId ?? undefined}
 									groupTabId="" // No parent group
+									selectedTabId={selectedTabId ?? undefined}
 									onTabFocus={handleTabFocus}
-									triggerFit={0}
 								/>
 							</div>
 						)}

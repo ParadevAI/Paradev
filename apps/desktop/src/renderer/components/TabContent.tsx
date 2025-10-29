@@ -9,6 +9,7 @@ interface TabContentProps {
 	workspaceId: string;
 	worktreeId: string | undefined;
 	groupTabId: string; // ID of the parent group tab
+	selectedTabId?: string; // Currently selected tab ID
 	onTabFocus: (tabId: string) => void;
 }
 
@@ -27,6 +28,7 @@ export default function TabContent({
 	workspaceId,
 	worktreeId,
 	groupTabId,
+	selectedTabId,
 	onTabFocus,
 }: TabContentProps) {
 	const handleFocus = () => {
@@ -43,7 +45,7 @@ export default function TabContent({
 					workingDirectory={workingDirectory}
 					workspaceId={workspaceId}
 					worktreeId={worktreeId}
-					selectedTabId={undefined} // Group tabs don't track their own selection
+					selectedTabId={selectedTabId}
 					onTabFocus={onTabFocus}
 				/>
 			);
@@ -202,7 +204,7 @@ function TerminalTabContent({
 
 	return (
 		<div className="w-full h-full">
-			<Terminal terminalId={terminalId} onFocus={onFocus} />
+			<Terminal key={terminalId} terminalId={terminalId} onFocus={onFocus} />
 		</div>
 	);
 }
