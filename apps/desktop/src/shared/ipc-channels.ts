@@ -75,6 +75,14 @@ export interface IpcChannels {
 		};
 		response: boolean;
 	};
+	"workspace-get-active-workspace-id": {
+		request: void;
+		response: string | null;
+	};
+	"workspace-set-active-workspace-id": {
+		request: string; // workspace ID
+		response: boolean;
+	};
 
 	// Worktree operations
 	"worktree-create": {
@@ -189,6 +197,8 @@ export function isValidChannel(channel: string): channel is IpcChannelName {
 		"workspace-scan-worktrees",
 		"workspace-get-active-selection",
 		"workspace-set-active-selection",
+		"workspace-get-active-workspace-id",
+		"workspace-set-active-workspace-id",
 		"workspace-update-terminal-cwd",
 		"worktree-create",
 		"tab-group-create",

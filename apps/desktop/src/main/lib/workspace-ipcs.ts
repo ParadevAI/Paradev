@@ -173,6 +173,19 @@ export function registerWorkspaceIPCs() {
 		},
 	);
 
+	// Get active workspace ID
+	ipcMain.handle("workspace-get-active-workspace-id", async () => {
+		return configManager.getActiveWorkspaceId();
+	});
+
+	// Set active workspace ID
+	ipcMain.handle(
+		"workspace-set-active-workspace-id",
+		async (_event, workspaceId: string) => {
+			return configManager.setActiveWorkspaceId(workspaceId);
+		},
+	);
+
 	// Reorder tabs within a tab group
 	ipcMain.handle(
 		"tab-reorder",

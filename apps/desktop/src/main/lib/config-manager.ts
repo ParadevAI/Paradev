@@ -33,6 +33,7 @@ class ConfigManager {
 			const defaultConfig: WorkspaceConfig = {
 				workspaces: [],
 				lastOpenedWorkspaceId: null,
+				activeWorkspaceId: null,
 				activeWorktreeId: null,
 				activeTabGroupId: null,
 				activeTabId: null,
@@ -53,6 +54,9 @@ class ConfigManager {
 			if (config.lastOpenedWorkspaceId === undefined) {
 				config.lastOpenedWorkspaceId = null;
 			}
+			if (config.activeWorkspaceId === undefined) {
+				config.activeWorkspaceId = null;
+			}
 			if (config.activeWorktreeId === undefined) {
 				config.activeWorktreeId = null;
 			}
@@ -69,6 +73,7 @@ class ConfigManager {
 			return {
 				workspaces: [],
 				lastOpenedWorkspaceId: null,
+				activeWorkspaceId: null,
 				activeWorktreeId: null,
 				activeTabGroupId: null,
 				activeTabId: null,
@@ -123,6 +128,17 @@ class ConfigManager {
 		config.activeWorktreeId = worktreeId;
 		config.activeTabGroupId = tabGroupId;
 		config.activeTabId = tabId;
+		return this.write(config);
+	}
+
+	getActiveWorkspaceId(): string | null {
+		const config = this.read();
+		return config.activeWorkspaceId;
+	}
+
+	setActiveWorkspaceId(id: string | null): boolean {
+		const config = this.read();
+		config.activeWorkspaceId = id;
 		return this.write(config);
 	}
 }
