@@ -275,6 +275,9 @@ export function WorktreeItem({
             // Reload to show the updated structure
             onReload();
 
+            // Expand the new group tab to show its contents
+            setExpandedGroupTabs((prev) => new Set(prev).add(groupTabId));
+
             // Select the new group tab
             onTabSelect(worktree.id, groupTabId);
 
