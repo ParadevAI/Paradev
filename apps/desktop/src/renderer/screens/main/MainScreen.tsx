@@ -41,11 +41,14 @@ export function MainScreen() {
 		setSelectedTabGroupId(tabGroupId);
 		setSelectedTabId(tabId);
 		// Save active selection
-		window.ipcRenderer.invoke("workspace-set-active-selection", {
-			worktreeId,
-			tabGroupId,
-			tabId,
-		});
+		if (currentWorkspace) {
+			window.ipcRenderer.invoke("workspace-set-active-selection", {
+				workspaceId: currentWorkspace.id,
+				worktreeId,
+				tabGroupId,
+				tabId,
+			});
+		}
 	};
 
 	const handleTabGroupSelect = (worktreeId: string, tabGroupId: string) => {
@@ -54,11 +57,14 @@ export function MainScreen() {
 		// Clear individual tab selection when selecting a tab group
 		setSelectedTabId(null);
 		// Save active selection
-		window.ipcRenderer.invoke("workspace-set-active-selection", {
-			worktreeId,
-			tabGroupId,
-			tabId: null,
-		});
+		if (currentWorkspace) {
+			window.ipcRenderer.invoke("workspace-set-active-selection", {
+				workspaceId: currentWorkspace.id,
+				worktreeId,
+				tabGroupId,
+				tabId: null,
+			});
+		}
 	};
 
 	const handleTabFocus = (tabId: string) => {
@@ -68,6 +74,7 @@ export function MainScreen() {
 		setSelectedTabId(tabId);
 		// Save active selection
 		window.ipcRenderer.invoke("workspace-set-active-selection", {
+			workspaceId: currentWorkspace.id,
 			worktreeId: selectedWorktreeId,
 			tabGroupId: selectedTabGroupId,
 			tabId,
@@ -88,16 +95,22 @@ export function MainScreen() {
 					"workspace-set-active-workspace-id",
 					workspaceId,
 				);
-				// Reset tab selection when switching workspaces
-				setSelectedWorktreeId(null);
-				setSelectedTabGroupId(null);
-				setSelectedTabId(null);
-				// Clear active selection since we're switching workspaces
-				await window.ipcRenderer.invoke("workspace-set-active-selection", {
-					worktreeId: null,
-					tabGroupId: null,
-					tabId: null,
-				});
+				// Restore the active selection for this workspace
+				const activeSelection = await window.ipcRenderer.invoke(
+					"workspace-get-active-selection",
+					workspaceId,
+				);
+
+				if (activeSelection?.worktreeId && activeSelection?.tabGroupId) {
+					setSelectedWorktreeId(activeSelection.worktreeId);
+					setSelectedTabGroupId(activeSelection.tabGroupId);
+					setSelectedTabId(activeSelection.tabId);
+				} else {
+					// No saved selection, reset
+					setSelectedWorktreeId(null);
+					setSelectedTabGroupId(null);
+					setSelectedTabId(null);
+				}
 			}
 		} catch (error) {
 			console.error("Failed to load workspace:", error);
@@ -218,12 +231,13 @@ export function MainScreen() {
 						// Scan for existing worktrees
 						await scanWorktrees(workspace.id);
 
-						// Restore active selection
+						// Restore active selection for this workspace
 						const activeSelection = await window.ipcRenderer.invoke(
 							"workspace-get-active-selection",
+							workspaceId,
 						);
 
-						if (activeSelection.worktreeId && activeSelection.tabGroupId) {
+						if (activeSelection?.worktreeId && activeSelection?.tabGroupId) {
 							setSelectedWorktreeId(activeSelection.worktreeId);
 							setSelectedTabGroupId(activeSelection.tabGroupId);
 							setSelectedTabId(activeSelection.tabId);

@@ -60,15 +60,16 @@ export interface IpcChannels {
 		response: IpcResponse<{ imported: number }>;
 	};
 	"workspace-get-active-selection": {
-		request: void;
+		request: string; // workspace ID
 		response: {
 			worktreeId: string | null;
 			tabGroupId: string | null;
 			tabId: string | null;
-		};
+		} | null;
 	};
 	"workspace-set-active-selection": {
 		request: {
+			workspaceId: string;
 			worktreeId: string | null;
 			tabGroupId: string | null;
 			tabId: string | null;

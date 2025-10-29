@@ -59,6 +59,10 @@ export interface Workspace {
 	repoPath: string;
 	branch: string;
 	worktrees: Worktree[];
+	// Active selection for this workspace
+	activeWorktreeId: string | null;
+	activeTabGroupId: string | null;
+	activeTabId: string | null;
 	createdAt: string;
 	updatedAt: string;
 }
@@ -66,10 +70,7 @@ export interface Workspace {
 export interface WorkspaceConfig {
 	workspaces: Workspace[];
 	lastOpenedWorkspaceId: string | null;
-	activeWorkspaceId: string | null; // Currently active workspace (not just last opened)
-	activeWorktreeId: string | null;
-	activeTabGroupId: string | null;
-	activeTabId: string | null;
+	activeWorkspaceId: string | null; // Currently active workspace
 }
 
 export interface CreateWorkspaceInput {
