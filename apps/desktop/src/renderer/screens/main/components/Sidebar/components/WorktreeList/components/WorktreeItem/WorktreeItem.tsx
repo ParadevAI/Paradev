@@ -112,10 +112,31 @@ export function WorktreeItem({
 	const [activeId, setActiveId] = useState<string | null>(null);
 	const [overId, setOverId] = useState<string | null>(null);
 
+	// Track expanded group tabs
+	const [expandedGroupTabs, setExpandedGroupTabs] = useState<Set<string>>(
+		new Set(),
+	);
+
 	// Track if merge is disabled (when this is the active worktree)
 	const [isMergeDisabled, setIsMergeDisabled] = useState(false);
 	const [mergeDisabledReason, setMergeDisabledReason] = useState<string>("");
 	const [targetBranch, setTargetBranch] = useState<string>("");
+
+	// Auto-expand group tabs that contain the selected tab
+	useEffect(() => {
+		if (!selectedTabId) return;
+
+		const tabs = Array.isArray(worktree.tabs) ? worktree.tabs : [];
+		const parentGroupTab = findParentGroupTab(tabs, selectedTabId);
+
+		if (parentGroupTab) {
+			setExpandedGroupTabs((prev) => {
+				const next = new Set(prev);
+				next.add(parentGroupTab.id);
+				return next;
+			});
+		}
+	}, [selectedTabId, worktree.tabs]);
 
 	// Helper: recursively find a tab by ID
 	const findTabById = (tabs: Tab[], tabId: string): Tab | null => {
@@ -247,11 +268,11 @@ export function WorktreeItem({
 			// Reordering within the same parent group
 			if (overData?.type === "tab" && activeParentTabId === overParentTabId) {
 				const parentTab = activeParentTabId
-					? findTabById(worktree.tabs, activeParentTabId)
+					? findTabById(tabs, activeParentTabId)
 					: null;
 
 				// If no parent, we're reordering top-level tabs
-				const tabsArray = parentTab?.tabs || worktree.tabs;
+				const tabsArray = parentTab?.tabs || tabs;
 				const cols = parentTab?.cols || 2;
 
 				const oldIndex = tabsArray.findIndex((t) => t.id === active.id);
@@ -455,8 +476,74 @@ export function WorktreeItem({
 	};
 
 	// Get all tabs for sortable context (including nested)
-	const allTabsFlat = getAllTabs(worktree.tabs);
+	// Defensive: ensure worktree.tabs exists and is an array
+	const tabs = Array.isArray(worktree.tabs) ? worktree.tabs : [];
+	const allTabsFlat = getAllTabs(tabs);
 	const allTabIds = allTabsFlat.map((item) => item.tab.id);
+
+	// Toggle group tab expansion
+	const toggleGroupTab = (groupTabId: string) => {
+		setExpandedGroupTabs((prev) => {
+			const next = new Set(prev);
+			if (next.has(groupTabId)) {
+				next.delete(groupTabId);
+			} else {
+				next.add(groupTabId);
+			}
+			return next;
+		});
+	};
+
+	// Render a single tab or group tab with nesting
+	const renderTab = (tab: Tab, parentTabId?: string, level = 0) => {
+		if (tab.type === "group") {
+			const isExpanded = expandedGroupTabs.has(tab.id);
+			return (
+				<div key={tab.id} className="space-y-1">
+					{/* Group Tab Header */}
+					<Button
+						variant="ghost"
+						size="sm"
+						onClick={() => toggleGroupTab(tab.id)}
+						className="w-full h-8 px-3 pb-1 font-normal"
+						style={{ justifyContent: "flex-start", paddingLeft: `${level * 12 + 12}px` }}
+					>
+						<ChevronRight
+							size={12}
+							className={`transition-transform ${isExpanded ? "rotate-90" : ""}`}
+						/>
+						<span className="truncate flex-1 text-left">{tab.name}</span>
+					</Button>
+
+					{/* Nested Tabs */}
+					{isExpanded && tab.tabs && (
+						<div className="space-y-1">
+							{tab.tabs.map((childTab) =>
+								renderTab(childTab, tab.id, level + 1),
+							)}
+						</div>
+					)}
+				</div>
+			);
+		}
+
+		// Regular tab (terminal, editor, etc.)
+		return (
+			<div
+				key={tab.id}
+				style={{ paddingLeft: `${level * 12}px` }}
+			>
+				<SortableTab
+					tab={tab}
+					worktreeId={worktree.id}
+					parentTabId={parentTabId}
+					selectedTabId={selectedTabId}
+					onTabSelect={onTabSelect}
+					onTabRemove={handleTabRemove}
+				/>
+			</div>
+		);
+	};
 
 	return (
 		<DndContext
@@ -517,22 +604,12 @@ export function WorktreeItem({
 				{/* Tabs List */}
 				{isExpanded && (
 					<div className="ml-6 space-y-1">
-						{/* Render all tabs recursively */}
+						{/* Render tabs with collapsible groups */}
 						<SortableContext
 							items={allTabIds}
 							strategy={verticalListSortingStrategy}
 						>
-							{allTabsFlat.map(({ tab, parentTabId }) => (
-								<SortableTab
-									key={tab.id}
-									tab={tab}
-									worktreeId={worktree.id}
-									parentTabId={parentTabId}
-									selectedTabId={selectedTabId}
-									onTabSelect={onTabSelect}
-									onTabRemove={handleTabRemove}
-								/>
-							))}
+							{tabs.map((tab) => renderTab(tab, undefined, 0))}
 						</SortableContext>
 
 						{/* New Tab Button */}
