@@ -72,8 +72,7 @@ export function PortIndicator({
 								<span className="text-green-500 font-medium">
 									{activeProxies.map((p, i) => (
 										<span key={p.canonical}>
-											{i > 0 && ", "}
-											:{p.canonical}→:{p.target}
+											{i > 0 && ", "}:{p.canonical}→:{p.target}
 											{p.service && ` (${p.service})`}
 										</span>
 									))}

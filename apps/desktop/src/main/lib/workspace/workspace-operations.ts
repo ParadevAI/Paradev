@@ -69,8 +69,8 @@ export async function createWorkspace(
 			};
 		}
 
-		// Set as last opened workspace
-		configManager.setLastOpenedWorkspaceId(workspace.id);
+		// Set as active workspace
+		configManager.setActiveWorkspaceId(workspace.id);
 
 		return {
 			success: true,
@@ -86,12 +86,12 @@ export async function createWorkspace(
 }
 
 /**
- * Get the last opened workspace
+ * Get the active workspace
  */
 export function getLastOpenedWorkspace(): Workspace | null {
-	const lastId = configManager.getLastOpenedWorkspaceId();
-	if (!lastId) return null;
-	return getWorkspace(lastId);
+	const activeId = configManager.getActiveWorkspaceId();
+	if (!activeId) return null;
+	return getWorkspace(activeId);
 }
 
 /**
@@ -248,7 +248,10 @@ export function setActiveSelection(
 /**
  * Start monitoring all terminals in a worktree
  */
-function startMonitoringWorktree(workspace: Workspace, worktreeId: string): void {
+function startMonitoringWorktree(
+	workspace: Workspace,
+	worktreeId: string,
+): void {
 	const worktree = workspace.worktrees.find((wt) => wt.id === worktreeId);
 	if (!worktree) return;
 
@@ -376,47 +379,9 @@ export function updateDetectedPorts(
 		worktree.detectedPorts = detectedPorts;
 		workspace.updatedAt = new Date().toISOString();
 
-		// Sync port tabs with detected ports
-		syncPortTabs(worktree, detectedPorts);
-
 		return configManager.write(config);
 	} catch (error) {
 		console.error("Failed to update detected ports:", error);
 		return false;
-	}
-}
-
-/**
- * Sync port tabs with detected ports
- * Creates/updates a single "Ports" tab with all detected ports
- */
-function syncPortTabs(
-	worktree: Worktree,
-	detectedPorts: Record<string, number>,
-): void {
-	// Find existing "Ports" tab
-	let portsTab = worktree.tabs.find(
-		(tab) => tab.type === "port" && tab.name === "Ports",
-	);
-
-	const portEntries = Object.entries(detectedPorts);
-
-	// If no ports detected, remove the tab if it exists
-	if (portEntries.length === 0) {
-		if (portsTab) {
-			worktree.tabs = worktree.tabs.filter((tab) => tab.id !== portsTab.id);
-		}
-		return;
-	}
-
-	// Create the tab if it doesn't exist
-	if (!portsTab) {
-		portsTab = {
-			id: `ports-${worktree.id}`,
-			name: "Ports",
-			type: "port",
-			createdAt: new Date().toISOString(),
-		};
-		worktree.tabs.push(portsTab);
 	}
 }

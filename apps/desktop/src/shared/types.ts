@@ -78,7 +78,6 @@ export interface Workspace {
 
 export interface WorkspaceConfig {
 	workspaces: Workspace[];
-	lastOpenedWorkspaceId: string | null;
 	activeWorkspaceId: string | null; // Currently active workspace
 }
 

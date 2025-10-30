@@ -40,8 +40,8 @@ import {
 import { useEffect, useState } from "react";
 import type { MosaicNode } from "react-mosaic-component";
 import type { Tab, Worktree } from "shared/types";
-import { PortIndicator } from "../PortIndicator";
 import { TabItem } from "./components/TabItem";
+import { WorktreePortsList } from "../WorktreePortsList";
 
 // Sortable wrapper for tabs
 function SortableTab({
@@ -1115,6 +1115,10 @@ export function WorktreeItem({
 					</ContextMenuContent>
 				</ContextMenu>
 
+				{/* Ports List - shown inline if port forwarding is configured */}
+				{isExpanded && hasPortForwarding && (
+					<WorktreePortsList worktree={worktree} workspaceId={workspaceId} />
+				)}
 
 				{/* Tabs List */}
 				{isExpanded && (

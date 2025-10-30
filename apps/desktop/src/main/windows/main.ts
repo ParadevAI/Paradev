@@ -99,16 +99,6 @@ export async function MainWindow() {
 	// Create application menu
 	createApplicationMenu(window);
 
-	// Register shell-open-external handler
-	ipcMain.handle("shell-open-external", async (_event, url: string) => {
-		try {
-			await shell.openExternal(url);
-		} catch (error) {
-			console.error("Failed to open external URL:", error);
-			throw error;
-		}
-	});
-
 	window.webContents.on("did-finish-load", async () => {
 		window.show();
 
@@ -123,9 +113,7 @@ export async function MainWindow() {
 					console.log(
 						`[Main] Initializing proxy for workspace: ${activeWorkspace.name}`,
 					);
-					await workspaceManager.initializeProxyForWorkspace(
-						activeWorkspaceId,
-					);
+					await workspaceManager.initializeProxyForWorkspace(activeWorkspaceId);
 				}
 			}
 		} catch (error) {

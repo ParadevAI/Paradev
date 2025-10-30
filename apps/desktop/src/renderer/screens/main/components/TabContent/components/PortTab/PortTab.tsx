@@ -40,9 +40,7 @@ export function PortTab({ tab, worktree, workspaceId }: PortTabProps) {
 
 	// Get active proxies
 	const activeProxies = proxyStatus.filter((p) => p.active && p.target);
-	const proxyMap = new Map(
-		activeProxies.map((p) => [p.target, p.canonical]),
-	);
+	const proxyMap = new Map(activeProxies.map((p) => [p.target, p.canonical]));
 
 	const handleOpenPort = (port: number) => {
 		const canonicalPort = proxyMap.get(port);
@@ -50,16 +48,14 @@ export function PortTab({ tab, worktree, workspaceId }: PortTabProps) {
 			? `http://localhost:${canonicalPort}`
 			: `http://localhost:${port}`;
 
-		window.ipcRenderer.invoke("shell-open-external", url);
+		window.ipcRenderer.invoke("open-external", url);
 	};
 
 	if (portEntries.length === 0) {
 		return (
 			<div className="flex flex-col items-center justify-center h-full text-gray-500">
 				<p className="text-sm">No ports detected</p>
-				<p className="text-xs mt-1">
-					Start a dev server to see detected ports
-				</p>
+				<p className="text-xs mt-1">Start a dev server to see detected ports</p>
 			</div>
 		);
 	}
@@ -68,9 +64,7 @@ export function PortTab({ tab, worktree, workspaceId }: PortTabProps) {
 		<div className="flex flex-col h-full p-4 overflow-auto">
 			<div className="mb-4">
 				<h2 className="text-lg font-semibold mb-1">Detected Ports</h2>
-				<p className="text-xs text-gray-500">
-					Click to open in your browser
-				</p>
+				<p className="text-xs text-gray-500">Click to open in your browser</p>
 			</div>
 
 			<div className="space-y-2">
