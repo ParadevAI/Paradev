@@ -28,18 +28,8 @@ export function SidebarHeader({
 		>
 			<div
 				style={{ WebkitAppRegion: "no-drag" } as React.CSSProperties}
-				className="flex items-center gap-1"
+				className="flex items-center gap-1 ml-auto"
 			>
-				<Tooltip>
-					<TooltipTrigger asChild>
-						<Button variant="ghost" size="icon-sm" onClick={onCollapse}>
-							<PanelLeftClose size={16} />
-						</Button>
-					</TooltipTrigger>
-					<TooltipContent side="bottom">
-						<p>Collapse sidebar</p>
-					</TooltipContent>
-				</Tooltip>
 				<Tooltip>
 					<TooltipTrigger asChild>
 						<Button
