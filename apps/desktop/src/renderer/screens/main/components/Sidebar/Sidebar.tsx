@@ -244,7 +244,6 @@ export function Sidebar({
 	return (
 		<div className="flex flex-col h-full w-64 select-none text-neutral-300">
 			<SidebarHeader
-				onCollapse={onCollapse}
 				onScanWorktrees={handleScanWorktrees}
 				isScanningWorktrees={isScanningWorktrees}
 				hasWorkspace={!!currentWorkspace}

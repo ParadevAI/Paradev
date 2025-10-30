@@ -1,16 +1,14 @@
 import { Button } from "@superset/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
-import { PanelLeftClose, RefreshCw } from "lucide-react";
+import { RefreshCw } from "lucide-react";
 
 interface SidebarHeaderProps {
-	onCollapse: () => void;
 	onScanWorktrees: () => void;
 	isScanningWorktrees: boolean;
 	hasWorkspace: boolean;
 }
 
 export function SidebarHeader({
-	onCollapse,
 	onScanWorktrees,
 	isScanningWorktrees,
 	hasWorkspace,
@@ -28,18 +26,8 @@ export function SidebarHeader({
 		>
 			<div
 				style={{ WebkitAppRegion: "no-drag" } as React.CSSProperties}
-				className="flex items-center gap-1"
+				className="flex items-center gap-1 ml-auto"
 			>
-				<Tooltip>
-					<TooltipTrigger asChild>
-						<Button variant="ghost" size="icon-sm" onClick={onCollapse}>
-							<PanelLeftClose size={16} />
-						</Button>
-					</TooltipTrigger>
-					<TooltipContent side="bottom">
-						<p>Collapse sidebar</p>
-					</TooltipContent>
-				</Tooltip>
 				<Tooltip>
 					<TooltipTrigger asChild>
 						<Button
