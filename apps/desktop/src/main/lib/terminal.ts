@@ -166,6 +166,10 @@ class TerminalManager {
 	getHistory(id: string): string | undefined {
 		return this.outputHistory.get(id);
 	}
+
+	getProcess(id: string): pty.IPty | undefined {
+		return this.processes.get(id);
+	}
 }
 
 export default TerminalManager.getInstance();

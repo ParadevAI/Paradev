@@ -130,6 +130,12 @@ export class PortDetector extends EventEmitter {
 			(port) => !currentPorts.has(port),
 		);
 
+		// Update last detected ports FIRST before emitting events
+		monitored.lastDetectedPorts = currentPorts;
+
+		// Update cache BEFORE emitting events so handlers can read updated cache
+		this.updateWorktreePortsCache(monitored.worktreeId);
+
 		// Emit events for new ports
 		for (const port of newPorts) {
 			const service = this.detectServiceName(monitored.cwd);
@@ -162,12 +168,6 @@ export class PortDetector extends EventEmitter {
 				`[PortDetector] Port ${port} closed in terminal ${terminalId}`,
 			);
 		}
-
-		// Update last detected ports
-		monitored.lastDetectedPorts = currentPorts;
-
-		// Update cache
-		this.updateWorktreePortsCache(monitored.worktreeId);
 	}
 
 	/**
@@ -175,23 +175,35 @@ export class PortDetector extends EventEmitter {
 	 */
 	private async getPortsForPID(pid: number): Promise<number[]> {
 		try {
-			// Use lsof to find all listening TCP ports for this PID
-			// -Pan: Disables conversion of port numbers to names, shows network addresses
-			// -p: Filter by PID
-			// -i4TCP: IPv4 TCP connections only
-			// -sTCP:LISTEN: Only show listening sockets
-			const { stdout } = await execAsync(
-				`lsof -Pan -p ${pid} -i4TCP -sTCP:LISTEN 2>/dev/null | awk 'NR>1 {print $9}' | sed 's/.*://' || true`,
-			);
+			// Get all descendant PIDs recursively (using pstree-like approach)
+			const allPids = await this.getAllDescendantPIDs(pid);
 
-			const ports = stdout
-				.trim()
-				.split("\n")
-				.filter(Boolean)
-				.map((p) => Number.parseInt(p, 10))
-				.filter((p) => !Number.isNaN(p) && p > 0 && p <= 65535);
+			const allPorts: number[] = [];
 
-			return [...new Set(ports)]; // Deduplicate
+			// Check each PID for listening ports
+			for (const checkPid of allPids) {
+				if (Number.isNaN(checkPid)) continue;
+
+				try {
+					const { stdout } = await execAsync(
+						`lsof -Pan -p ${checkPid} -i4TCP -sTCP:LISTEN 2>/dev/null | awk 'NR>1 {print $9}' | sed 's/.*://' || true`,
+					);
+
+					const ports = stdout
+						.trim()
+						.split("\n")
+						.filter(Boolean)
+						.map((p) => Number.parseInt(p, 10))
+						.filter((p) => !Number.isNaN(p) && p > 0 && p <= 65535);
+
+					allPorts.push(...ports);
+				} catch (error) {
+					// Skip PIDs that error
+					continue;
+				}
+			}
+
+			return [...new Set(allPorts)]; // Deduplicate
 		} catch (error) {
 			// lsof may fail if process has no listening ports, which is expected
 			return [];
@@ -199,13 +211,55 @@ export class PortDetector extends EventEmitter {
 	}
 
 	/**
+	 * Recursively get all descendant PIDs (children, grandchildren, etc.)
+	 */
+	private async getAllDescendantPIDs(pid: number): Promise<number[]> {
+		const allPids = [pid];
+		const toProcess = [pid];
+
+		while (toProcess.length > 0) {
+			const currentPid = toProcess.shift();
+			if (currentPid === undefined) break;
+
+			try {
+				const { stdout: childPids } = await execAsync(
+					`pgrep -P ${currentPid} || true`,
+				);
+
+				const children = childPids
+					.trim()
+					.split("\n")
+					.filter(Boolean)
+					.map((p) => Number.parseInt(p, 10))
+					.filter((p) => !Number.isNaN(p));
+
+				for (const childPid of children) {
+					if (!allPids.includes(childPid)) {
+						allPids.push(childPid);
+						toProcess.push(childPid);
+					}
+				}
+			} catch (error) {
+				// No children or error, continue
+				continue;
+			}
+		}
+
+		return allPids;
+	}
+
+	/**
 	 * Detect service name from terminal working directory
 	 */
 	private detectServiceName(cwd?: string): string | undefined {
-		if (!cwd) return undefined;
+		if (!cwd) {
+			console.log("[PortDetector] No CWD provided for service detection");
+			return undefined;
+		}
 
 		// Extract service name from path
-		// Example: ~/.superset/worktrees/superset/main/apps/website -> "website"
+		// Example: ~/.superset/worktrees/website/main/apps/docs -> "docs"
+		// Example: ~/.superset/worktrees/website/test -> "website"
 		// Example: /path/to/repo/apps/docs -> "docs"
 
 		const parts = cwd.split("/");
@@ -213,16 +267,39 @@ export class PortDetector extends EventEmitter {
 		// Check for common monorepo patterns
 		const appsIndex = parts.lastIndexOf("apps");
 		if (appsIndex !== -1 && appsIndex < parts.length - 1) {
-			return parts[appsIndex + 1];
+			const serviceName = parts[appsIndex + 1];
+			console.log(
+				`[PortDetector] Detected service "${serviceName}" from CWD: ${cwd}`,
+			);
+			return serviceName;
 		}
 
 		const packagesIndex = parts.lastIndexOf("packages");
 		if (packagesIndex !== -1 && packagesIndex < parts.length - 1) {
-			return parts[packagesIndex + 1];
+			const serviceName = parts[packagesIndex + 1];
+			console.log(
+				`[PortDetector] Detected service "${serviceName}" from CWD: ${cwd}`,
+			);
+			return serviceName;
+		}
+
+		// Check if this is a worktree path: ~/.superset/worktrees/{repo}/{branch}
+		const worktreesIndex = parts.lastIndexOf("worktrees");
+		if (worktreesIndex !== -1 && worktreesIndex < parts.length - 2) {
+			// Use repo name (one level after 'worktrees'), not branch name
+			const serviceName = parts[worktreesIndex + 1];
+			console.log(
+				`[PortDetector] Detected service "${serviceName}" from worktree path: ${cwd}`,
+			);
+			return serviceName;
 		}
 
 		// Fallback: use the last directory name
-		return parts[parts.length - 1];
+		const serviceName = parts[parts.length - 1];
+		console.log(
+			`[PortDetector] Detected service "${serviceName}" (fallback) from CWD: ${cwd}`,
+		);
+		return serviceName;
 	}
 
 	/**
@@ -258,20 +335,36 @@ export class PortDetector extends EventEmitter {
 
 	/**
 	 * Get detected ports as a map of service name to port
+	 * For ports without a service name, the port number itself is used as the key
 	 */
 	getDetectedPortsMap(worktreeId: string): Record<string, number> {
 		const ports = this.getDetectedPorts(worktreeId);
+		console.log(
+			`[PortDetector] getDetectedPortsMap for worktree ${worktreeId}: found ${ports.length} ports`,
+			ports,
+		);
+
 		const map: Record<string, number> = {};
 
 		for (const detected of ports) {
 			if (detected.service) {
-				// If multiple terminals have the same service, use the first one
+				// Named service: use service name as key
 				if (!map[detected.service]) {
 					map[detected.service] = detected.port;
+				}
+			} else {
+				// No service name: use port number as key (e.g., "3000" → 3000)
+				const portKey = detected.port.toString();
+				if (!map[portKey]) {
+					map[portKey] = detected.port;
+					console.log(
+						`[PortDetector] Added unnamed port ${detected.port} with key "${portKey}"`,
+					);
 				}
 			}
 		}
 
+		console.log(`[PortDetector] Returning map:`, map);
 		return map;
 	}
 

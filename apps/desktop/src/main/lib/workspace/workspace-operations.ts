@@ -8,6 +8,9 @@ import type {
 
 import configManager from "../config-manager";
 import worktreeManager from "../worktree-manager";
+import { portDetector } from "../port-detector";
+import { proxyManager } from "../proxy-manager";
+import terminalManager from "../terminal";
 
 /**
  * Get all workspaces
@@ -213,6 +216,8 @@ export function setActiveSelection(
 		const workspace = config.workspaces.find((ws) => ws.id === workspaceId);
 		if (!workspace) return false;
 
+		const previousWorktreeId = workspace.activeWorktreeId;
+
 		workspace.activeWorktreeId = worktreeId;
 		workspace.activeTabId = tabId;
 		workspace.updatedAt = new Date().toISOString();
@@ -220,7 +225,14 @@ export function setActiveSelection(
 		const index = config.workspaces.findIndex((ws) => ws.id === workspaceId);
 		if (index !== -1) {
 			config.workspaces[index] = workspace;
-			return configManager.write(config);
+			const saved = configManager.write(config);
+
+			if (saved && worktreeId && worktreeId !== previousWorktreeId) {
+				// Active worktree changed - start monitoring and update proxy
+				startMonitoringWorktree(workspace, worktreeId);
+			}
+
+			return saved;
 		}
 
 		return false;
@@ -228,6 +240,55 @@ export function setActiveSelection(
 		console.error("Failed to set active selection:", error);
 		return false;
 	}
+}
+
+/**
+ * Start monitoring all terminals in a worktree
+ */
+function startMonitoringWorktree(workspace: Workspace, worktreeId: string): void {
+	const worktree = workspace.worktrees.find((wt) => wt.id === worktreeId);
+	if (!worktree) return;
+
+	console.log(
+		`[WorkspaceOps] Starting port monitoring for worktree ${worktree.branch}`,
+	);
+
+	// Find all terminal tabs in this worktree
+	const terminalTabs = findTerminalTabs(worktree.tabs);
+
+	// Start monitoring each terminal
+	for (const tab of terminalTabs) {
+		const ptyProcess = terminalManager.getProcess(tab.id);
+		if (ptyProcess) {
+			// Use tab.cwd if available, otherwise fall back to worktree path
+			const cwd = tab.cwd || worktree.path;
+			portDetector.startMonitoring(tab.id, worktreeId, ptyProcess, cwd);
+			console.log(
+				`[WorkspaceOps] Monitoring terminal ${tab.name} (${tab.id}) with CWD: ${cwd}`,
+			);
+		}
+	}
+
+	// Update proxy targets based on detected ports
+	proxyManager.updateTargets(workspace);
+}
+
+/**
+ * Recursively find all terminal tabs
+ */
+function findTerminalTabs(tabs: any[]): any[] {
+	const terminals: any[] = [];
+
+	for (const tab of tabs) {
+		if (tab.type === "terminal") {
+			terminals.push(tab);
+		} else if (tab.type === "group" && tab.tabs) {
+			// Recursively search in group tabs
+			terminals.push(...findTerminalTabs(tab.tabs));
+		}
+	}
+
+	return terminals;
 }
 
 /**
@@ -244,11 +305,44 @@ export function getActiveWorkspaceId(): string | null {
 export function setActiveWorkspaceId(workspaceId: string): boolean {
 	try {
 		const config = configManager.read();
+		const previousWorkspaceId = config.activeWorkspaceId;
 		config.activeWorkspaceId = workspaceId;
-		return configManager.write(config);
+		const saved = configManager.write(config);
+
+		if (saved && workspaceId && workspaceId !== previousWorkspaceId) {
+			// Workspace changed - initialize proxies
+			initializeWorkspaceProxies(workspaceId);
+		}
+
+		return saved;
 	} catch (error) {
 		console.error("Failed to set active workspace ID:", error);
 		return false;
+	}
+}
+
+/**
+ * Initialize proxies and monitoring for a workspace
+ */
+async function initializeWorkspaceProxies(workspaceId: string): Promise<void> {
+	const workspace = getWorkspace(workspaceId);
+	if (!workspace || !workspace.ports) {
+		console.log(
+			`[WorkspaceOps] No ports configured for workspace ${workspaceId}`,
+		);
+		return;
+	}
+
+	console.log(
+		`[WorkspaceOps] Initializing proxies for workspace ${workspace.name}`,
+	);
+
+	// Initialize proxy manager
+	await proxyManager.initialize(workspace);
+
+	// Start monitoring active worktree if any
+	if (workspace.activeWorktreeId) {
+		startMonitoringWorktree(workspace, workspace.activeWorktreeId);
 	}
 }
 

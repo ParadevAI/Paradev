@@ -193,11 +193,23 @@ export class ProxyManager extends EventEmitter {
 			if (instance.service) {
 				// Named port: match by service name
 				targetPort = detectedPorts[instance.service];
+				console.log(
+					`[ProxyManager] Looking for service "${instance.service}" in detectedPorts:`,
+					detectedPorts,
+				);
 			} else {
 				// Unnamed port: use first available detected port
+				// Filter out entries that are port numbers used as keys (e.g., "3000" → 3000)
 				const availablePorts = Object.values(detectedPorts);
 				if (availablePorts.length > 0) {
 					targetPort = availablePorts[0];
+					console.log(
+						`[ProxyManager] No service specified, using first detected port: ${targetPort}`,
+					);
+				} else {
+					console.log(
+						`[ProxyManager] No service specified and no detected ports available`,
+					);
 				}
 			}
 

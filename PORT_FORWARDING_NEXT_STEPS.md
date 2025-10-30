@@ -1,8 +1,12 @@
 # Port Forwarding - Next Steps
 
+## ✅ UPDATE: Monitoring is Now Connected!
+
+**As of 2025-10-29:** Port monitoring now automatically starts when you switch between worktrees!
+
 ## What's Been Completed
 
-The core infrastructure for port detection and proxy routing is complete:
+The core infrastructure AND the integration for port detection and proxy routing is complete:
 
 1. **Port Detection System** (`apps/desktop/src/main/lib/port-detector.ts`)
    - PID-based port detection using `lsof`
@@ -31,87 +35,39 @@ The core infrastructure for port detection and proxy routing is complete:
    - workspace-operations has port detection persistence
    - IPCs registered in main process
 
+6. **Automatic Monitoring** ✅ NEW!
+   - Port monitoring starts automatically when active worktree changes
+   - Event listeners update detected ports in config
+   - Proxy targets update automatically
+   - Proxies initialize when workspace loads
+
 ## What Needs to Be Done
 
-### 1. Connect PortDetector to Terminals ⚠️ CRITICAL
+### 1. ~~Connect PortDetector to Terminals~~ ✅ DONE!
 
-**Current Issue:** The PortDetector is created but never actually starts monitoring terminals.
+**Status:** Port detection now automatically starts when you switch to a worktree!
 
-**What to do:**
+**What was done:**
+- Modified `setActiveSelection()` in `workspace-operations.ts` to start monitoring all terminals in a worktree when it becomes active
+- Added `getProcess()` method to `TerminalManager` to access PTY processes
+- Added event listeners in `main.ts` for `port-detected` and `port-closed` events
+- Events automatically update workspace config and proxy targets
+- Added `initializeWorkspaceProxies()` that runs when workspace ID changes
 
-a) Find where terminals are created with worktree context (likely in `tab-operations.ts` or similar)
+**Files modified:**
+- `apps/desktop/src/main/lib/workspace/workspace-operations.ts` - Added monitoring logic
+- `apps/desktop/src/main/lib/terminal.ts` - Added `getProcess()` method
+- `apps/desktop/src/main/windows/main.ts` - Added event listeners
 
-b) When a terminal tab is created, call:
-```typescript
-import { portDetector } from '../port-detector';
+### 2. ~~Initialize Proxies on Workspace Load~~ ✅ DONE!
 
-// In terminal creation code:
-const ptyProcess = terminalManager.processes.get(terminalId);
-portDetector.startMonitoring(terminalId, worktreeId, ptyProcess, cwd);
-```
+**Status:** Proxies automatically initialize when you switch workspaces!
 
-c) When a terminal is destroyed, call:
-```typescript
-portDetector.stopMonitoring(terminalId);
-```
-
-d) Listen to port detection events and update workspace config:
-```typescript
-import { portDetector } from './port-detector';
-import { workspaceManager } from './workspace-manager';
-import * as workspaceOps from './workspace/workspace-operations';
-
-// Set up listeners (probably in main.ts or workspace initialization)
-portDetector.on('port-detected', async ({ worktreeId, port, service }) => {
-  // Get current detected ports
-  const detectedPorts = portDetector.getDetectedPortsMap(worktreeId);
-
-  // Find workspace that contains this worktree
-  const workspaces = await workspaceManager.list();
-  for (const workspace of workspaces) {
-    const worktree = workspace.worktrees.find(wt => wt.id === worktreeId);
-    if (worktree) {
-      // Update detected ports in config
-      workspaceOps.updateDetectedPorts(workspace.id, worktreeId, detectedPorts);
-
-      // Update proxy if this is the active worktree
-      if (workspace.activeWorktreeId === worktreeId) {
-        await workspaceManager.updateProxyTargets(workspace.id);
-      }
-      break;
-    }
-  }
-});
-```
-
-**Files to modify:**
-- `apps/desktop/src/main/lib/workspace/tab-operations.ts` (or wherever terminals are created)
-- `apps/desktop/src/main/windows/main.ts` (set up port detection listeners)
-
-### 2. Initialize Proxies on Workspace Load
-
-**What to do:**
-
-When a workspace is loaded/opened, initialize the proxy manager:
-
-```typescript
-// In workspace-operations.ts or wherever workspaces are loaded
-export async function loadWorkspace(workspaceId: string) {
-  const workspace = getWorkspace(workspaceId);
-  if (!workspace) return null;
-
-  // Initialize proxy if ports are configured
-  if (workspace.ports) {
-    await workspaceManager.initializeProxyForWorkspace(workspaceId);
-  }
-
-  return workspace;
-}
-```
-
-**Files to modify:**
-- Find where workspaces are "activated" or "loaded" in the UI
-- Add proxy initialization call there
+**What was done:**
+- Modified `setActiveWorkspaceId()` to call `initializeWorkspaceProxies()`
+- Proxies initialize if workspace has `ports` configured
+- Monitoring starts for the active worktree's terminals
+- Proxy targets update based on detected ports
 
 ### 3. Add UI Indicator
 
