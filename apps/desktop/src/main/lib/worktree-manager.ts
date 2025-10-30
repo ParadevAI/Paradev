@@ -1,7 +1,10 @@
-import { execSync } from "node:child_process";
+import { exec, execSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { promisify } from "node:util";
+
+const execAsync = promisify(exec);
 
 export interface WorktreeInfo {
 	path: string;
@@ -70,10 +73,9 @@ class WorktreeManager {
 				command += ` ${branch}`;
 			}
 
-			// Execute command
-			execSync(command, {
+			// Execute command asynchronously
+			await execAsync(command, {
 				cwd: repoPath,
-				stdio: "pipe",
 			});
 
 			return {
@@ -139,9 +141,8 @@ class WorktreeManager {
 		worktreePath: string,
 	): Promise<{ success: boolean; error?: string }> {
 		try {
-			execSync(`git worktree remove "${worktreePath}"`, {
+			await execAsync(`git worktree remove "${worktreePath}"`, {
 				cwd: repoPath,
-				stdio: "pipe",
 			});
 
 			return { success: true };
