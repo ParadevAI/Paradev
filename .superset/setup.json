@@ -1,0 +1,6 @@
+{
+  "copy": [],
+  "commands": [
+    "bun i"
+  ]
+}

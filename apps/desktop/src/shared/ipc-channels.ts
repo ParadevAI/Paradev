@@ -85,7 +85,12 @@ export interface IpcChannels {
 	// Worktree operations
 	"worktree-create": {
 		request: CreateWorktreeInput;
-		response: { success: boolean; worktree?: Worktree; error?: string };
+		response: {
+			success: boolean;
+			worktree?: Worktree;
+			setupResult?: import("./types").SetupResult;
+			error?: string;
+		};
 	};
 	"worktree-remove": {
 		request: { workspaceId: string; worktreeId: string };

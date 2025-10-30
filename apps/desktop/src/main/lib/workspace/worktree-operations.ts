@@ -1,9 +1,15 @@
 import { randomUUID } from "node:crypto";
 import { existsSync } from "node:fs";
 
-import type { CreateWorktreeInput, Workspace, Worktree } from "shared/types";
+import type {
+	CreateWorktreeInput,
+	SetupResult,
+	Workspace,
+	Worktree,
+} from "shared/types";
 
 import configManager from "../config-manager";
+import { executeSetup } from "../setup-executor";
 import worktreeManager from "../worktree-manager";
 import { cleanupEmptyGroupsInAllWorktrees } from "./group-cleanup";
 
@@ -13,7 +19,12 @@ import { cleanupEmptyGroupsInAllWorktrees } from "./group-cleanup";
 export async function createWorktree(
 	workspace: Workspace,
 	input: CreateWorktreeInput,
-): Promise<{ success: boolean; worktree?: Worktree; error?: string }> {
+): Promise<{
+	success: boolean;
+	worktree?: Worktree;
+	setupResult?: SetupResult;
+	error?: string;
+}> {
 	try {
 		// Create git worktree
 		const worktreeResult = await worktreeManager.createWorktree(
@@ -51,7 +62,14 @@ export async function createWorktree(
 			configManager.write(config);
 		}
 
-		return { success: true, worktree };
+		// Execute setup script if it exists
+		const setupResult = await executeSetup(
+			workspace.repoPath,
+			worktree.path,
+			input.branch,
+		);
+
+		return { success: true, worktree, setupResult };
 	} catch (error) {
 		console.error("Failed to create worktree:", error);
 		return {
