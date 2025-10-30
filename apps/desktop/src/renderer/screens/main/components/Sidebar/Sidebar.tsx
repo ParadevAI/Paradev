@@ -113,10 +113,12 @@ export function Sidebar({
 		setSetupOutput(undefined);
 
 		// Listen for setup progress events
-		const progressHandler = (_: any, data: { status: string; output: string }) => {
-			console.log("[Renderer] Received progress event:", data.status, data.output.length, "chars");
-			setSetupStatus(data.status);
-			setSetupOutput(data.output);
+		const progressHandler = (data: any) => {
+			console.log("[Renderer] Received progress event:", data);
+			if (data && data.status !== undefined && data.output !== undefined) {
+				setSetupStatus(data.status);
+				setSetupOutput(data.output);
+			}
 		};
 		window.ipcRenderer.on("worktree-setup-progress", progressHandler);
 
