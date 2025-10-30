@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import type { Tab } from "shared/types";
+import type { Tab, Worktree } from "shared/types";
+import { PortTab } from "../TabContent/components/PortTab";
 import TabGroup from "./TabGroup";
 import Terminal from "./Terminal";
 
@@ -8,6 +9,7 @@ interface TabContentProps {
 	workingDirectory: string;
 	workspaceId: string;
 	worktreeId: string | undefined;
+	worktree?: Worktree;
 	groupTabId: string; // ID of the parent group tab
 	selectedTabId?: string; // Currently selected tab ID
 	onTabFocus: (tabId: string) => void;
@@ -27,6 +29,7 @@ export default function TabContent({
 	workingDirectory,
 	workspaceId,
 	worktreeId,
+	worktree,
 	groupTabId,
 	selectedTabId,
 	onTabFocus,
@@ -60,6 +63,22 @@ export default function TabContent({
 					groupTabId={groupTabId}
 					onFocus={handleFocus}
 				/>
+			);
+
+		case "port":
+			if (!worktree) {
+				return (
+					<PlaceholderContent
+						type="port"
+						message="Worktree data not available"
+						onFocus={handleFocus}
+					/>
+				);
+			}
+			return (
+				<div className="w-full h-full" onClick={handleFocus}>
+					<PortTab tab={tab} worktree={worktree} workspaceId={workspaceId} />
+				</div>
 			);
 
 		case "editor":

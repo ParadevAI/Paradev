@@ -20,7 +20,13 @@ export interface WindowCreationByIPC {
 // Workspace types - React Mosaic Layout
 
 // Tab types that can be displayed
-export type TabType = "terminal" | "editor" | "browser" | "preview" | "group";
+export type TabType =
+	| "terminal"
+	| "editor"
+	| "browser"
+	| "preview"
+	| "group"
+	| "port";
 
 // Mosaic tree node types
 export type MosaicDirection = "row" | "column";
@@ -72,7 +78,6 @@ export interface Workspace {
 
 export interface WorkspaceConfig {
 	workspaces: Workspace[];
-	lastOpenedWorkspaceId: string | null;
 	activeWorkspaceId: string | null; // Currently active workspace
 }
 

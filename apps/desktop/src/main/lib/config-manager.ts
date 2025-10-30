@@ -32,7 +32,6 @@ class ConfigManager {
 		if (!existsSync(this.configPath)) {
 			const defaultConfig: WorkspaceConfig = {
 				workspaces: [],
-				lastOpenedWorkspaceId: null,
 				activeWorkspaceId: null,
 			};
 			writeFileSync(
@@ -46,14 +45,21 @@ class ConfigManager {
 	read(): WorkspaceConfig {
 		try {
 			const content = readFileSync(this.configPath, "utf-8");
-			const config = JSON.parse(content) as WorkspaceConfig;
-			// Ensure fields exist for backwards compatibility
-			if (config.lastOpenedWorkspaceId === undefined) {
-				config.lastOpenedWorkspaceId = null;
+			const config = JSON.parse(content) as WorkspaceConfig & {
+				lastOpenedWorkspaceId?: string | null;
+			};
+
+			// Migrate lastOpenedWorkspaceId to activeWorkspaceId if needed
+			if (config.lastOpenedWorkspaceId !== undefined) {
+				config.activeWorkspaceId = config.lastOpenedWorkspaceId;
+				delete config.lastOpenedWorkspaceId;
 			}
+
+			// Ensure activeWorkspaceId exists for backwards compatibility
 			if (config.activeWorkspaceId === undefined) {
 				config.activeWorkspaceId = null;
 			}
+
 			// Migrate old global active selection to workspace-specific
 			const oldConfig = config as WorkspaceConfig & {
 				activeWorktreeId?: string | null;
@@ -62,11 +68,11 @@ class ConfigManager {
 			};
 			if (
 				oldConfig.activeWorktreeId !== undefined &&
-				config.lastOpenedWorkspaceId
+				config.activeWorkspaceId
 			) {
 				// Migrate to workspace-specific selection
 				const workspace = config.workspaces.find(
-					(ws) => ws.id === config.lastOpenedWorkspaceId,
+					(ws) => ws.id === config.activeWorkspaceId,
 				);
 				if (workspace) {
 					workspace.activeWorktreeId = oldConfig.activeWorktreeId || null;
@@ -91,7 +97,6 @@ class ConfigManager {
 			// Return default config if read fails
 			return {
 				workspaces: [],
-				lastOpenedWorkspaceId: null,
 				activeWorkspaceId: null,
 			};
 		}
@@ -109,17 +114,6 @@ class ConfigManager {
 
 	getConfigPath(): string {
 		return this.configPath;
-	}
-
-	getLastOpenedWorkspaceId(): string | null {
-		const config = this.read();
-		return config.lastOpenedWorkspaceId;
-	}
-
-	setLastOpenedWorkspaceId(id: string | null): boolean {
-		const config = this.read();
-		config.lastOpenedWorkspaceId = id;
-		return this.write(config);
 	}
 
 	getActiveSelection(workspaceId: string): {

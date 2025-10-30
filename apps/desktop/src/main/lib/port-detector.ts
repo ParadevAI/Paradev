@@ -63,10 +63,7 @@ export class PortDetector extends EventEmitter {
 		// Start polling
 		monitored.intervalId = setInterval(() => {
 			this.pollTerminalPorts(terminalId).catch((error) => {
-				console.error(
-					`Error polling ports for terminal ${terminalId}:`,
-					error,
-				);
+				console.error(`Error polling ports for terminal ${terminalId}:`, error);
 			});
 		}, this.POLL_INTERVAL);
 

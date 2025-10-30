@@ -1,5 +1,5 @@
 import { join } from "node:path";
-import { BrowserWindow, screen } from "electron";
+import { BrowserWindow, screen, shell, ipcMain } from "electron";
 
 import { createWindow } from "lib/electron-app/factories/windows/create";
 import { ENVIRONMENT } from "shared/constants";
@@ -113,9 +113,7 @@ export async function MainWindow() {
 					console.log(
 						`[Main] Initializing proxy for workspace: ${activeWorkspace.name}`,
 					);
-					await workspaceManager.initializeProxyForWorkspace(
-						activeWorkspaceId,
-					);
+					await workspaceManager.initializeProxyForWorkspace(activeWorkspaceId);
 				}
 			}
 		} catch (error) {

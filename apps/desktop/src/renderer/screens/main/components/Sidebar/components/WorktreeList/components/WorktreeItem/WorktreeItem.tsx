@@ -40,13 +40,15 @@ import {
 import { useEffect, useState } from "react";
 import type { MosaicNode } from "react-mosaic-component";
 import type { Tab, Worktree } from "shared/types";
-import { PortIndicator } from "../PortIndicator";
 import { TabItem } from "./components/TabItem";
+import { WorktreePortsList } from "../WorktreePortsList";
 
 // Sortable wrapper for tabs
 function SortableTab({
 	tab,
 	worktreeId,
+	worktree,
+	workspaceId,
 	parentTabId,
 	selectedTabId,
 	selectedTabIds,
@@ -57,6 +59,8 @@ function SortableTab({
 }: {
 	tab: Tab;
 	worktreeId: string;
+	worktree: Worktree;
+	workspaceId: string;
 	parentTabId?: string; // Optional parent group tab ID
 	selectedTabId?: string;
 	selectedTabIds: Set<string>;
@@ -91,6 +95,8 @@ function SortableTab({
 			<TabItem
 				tab={tab}
 				worktreeId={worktreeId}
+				worktree={worktree}
+				workspaceId={workspaceId}
 				parentTabId={parentTabId}
 				selectedTabId={selectedTabId}
 				selectedTabIds={selectedTabIds}
@@ -221,6 +227,7 @@ interface WorktreeItemProps {
 	onReload: () => void;
 	onUpdateWorktree: (updatedWorktree: Worktree) => void;
 	selectedTabId: string | undefined;
+	hasPortForwarding?: boolean;
 }
 
 export function WorktreeItem({
@@ -233,6 +240,7 @@ export function WorktreeItem({
 	onReload,
 	onUpdateWorktree,
 	selectedTabId,
+	hasPortForwarding = false,
 }: WorktreeItemProps) {
 	// Track active drag state
 	const [activeId, setActiveId] = useState<string | null>(null);
@@ -251,6 +259,16 @@ export function WorktreeItem({
 	const [isMergeDisabled, setIsMergeDisabled] = useState(false);
 	const [mergeDisabledReason, setMergeDisabledReason] = useState<string>("");
 	const [targetBranch, setTargetBranch] = useState<string>("");
+
+	// Track if this worktree is active
+	const isActive = activeWorktreeId === worktree.id;
+
+	// Effect: Log when worktree becomes active/inactive
+	useEffect(() => {
+		console.log(
+			`[WorktreeItem] Worktree ${worktree.branch} (${worktree.id}) active state: ${isActive}`,
+		);
+	}, [isActive, worktree.branch, worktree.id]);
 
 	// Auto-expand group tabs that contain the selected tab
 	// biome-ignore lint/correctness/useExhaustiveDependencies: findParentGroupTab is stable
@@ -1023,6 +1041,8 @@ export function WorktreeItem({
 				<SortableTab
 					tab={tab}
 					worktreeId={worktree.id}
+					worktree={worktree}
+					workspaceId={workspaceId}
 					parentTabId={parentTabId}
 					selectedTabId={selectedTabId}
 					selectedTabIds={selectedTabIds}
@@ -1095,14 +1115,10 @@ export function WorktreeItem({
 					</ContextMenuContent>
 				</ContextMenu>
 
-				{/* Port Indicator */}
-				<div className="ml-6 px-2">
-					<PortIndicator
-						worktree={worktree}
-						workspaceId={workspaceId}
-						isActive={activeWorktreeId === worktree.id}
-					/>
-				</div>
+				{/* Ports List - shown inline if port forwarding is configured */}
+				{isExpanded && hasPortForwarding && (
+					<WorktreePortsList worktree={worktree} workspaceId={workspaceId} />
+				)}
 
 				{/* Tabs List */}
 				{isExpanded && (

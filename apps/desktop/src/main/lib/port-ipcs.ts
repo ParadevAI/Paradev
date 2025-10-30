@@ -10,9 +10,17 @@ export function registerPortIpcs(): void {
 	// Set ports configuration for a workspace
 	ipcMain.handle(
 		"workspace-set-ports",
-		async (_event, input: { workspaceId: string; ports: Array<number | { name: string; port: number }> }) => {
+		async (
+			_event,
+			input: {
+				workspaceId: string;
+				ports: Array<number | { name: string; port: number }>;
+			},
+		) => {
 			try {
-				const workspace = await workspaceManager.getWorkspace(input.workspaceId);
+				const workspace = await workspaceManager.getWorkspace(
+					input.workspaceId,
+				);
 				if (!workspace) {
 					return {
 						success: false,

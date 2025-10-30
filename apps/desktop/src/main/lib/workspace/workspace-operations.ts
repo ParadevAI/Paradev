@@ -69,8 +69,8 @@ export async function createWorkspace(
 			};
 		}
 
-		// Set as last opened workspace
-		configManager.setLastOpenedWorkspaceId(workspace.id);
+		// Set as active workspace
+		configManager.setActiveWorkspaceId(workspace.id);
 
 		return {
 			success: true,
@@ -86,12 +86,12 @@ export async function createWorkspace(
 }
 
 /**
- * Get the last opened workspace
+ * Get the active workspace
  */
 export function getLastOpenedWorkspace(): Workspace | null {
-	const lastId = configManager.getLastOpenedWorkspaceId();
-	if (!lastId) return null;
-	return getWorkspace(lastId);
+	const activeId = configManager.getActiveWorkspaceId();
+	if (!activeId) return null;
+	return getWorkspace(activeId);
 }
 
 /**
@@ -248,7 +248,10 @@ export function setActiveSelection(
 /**
  * Start monitoring all terminals in a worktree
  */
-function startMonitoringWorktree(workspace: Workspace, worktreeId: string): void {
+function startMonitoringWorktree(
+	workspace: Workspace,
+	worktreeId: string,
+): void {
 	const worktree = workspace.worktrees.find((wt) => wt.id === worktreeId);
 	if (!worktree) return;
 

@@ -6,11 +6,13 @@ import {
 	ContextMenuTrigger,
 } from "@superset/ui/context-menu";
 import { FolderOutput, FolderTree, SquareTerminal, X } from "lucide-react";
-import type { Tab } from "shared/types";
+import type { Tab, Worktree } from "shared/types";
 
 interface TabItemProps {
 	tab: Tab;
 	worktreeId: string;
+	worktree?: Worktree;
+	workspaceId?: string;
 	selectedTabId: string | undefined;
 	selectedTabIds: Set<string>;
 	parentTabId?: string; // The parent group tab ID (if this tab is inside a group)
@@ -23,6 +25,8 @@ interface TabItemProps {
 export function TabItem({
 	tab,
 	worktreeId,
+	worktree,
+	workspaceId,
 	selectedTabId,
 	selectedTabIds,
 	parentTabId,
