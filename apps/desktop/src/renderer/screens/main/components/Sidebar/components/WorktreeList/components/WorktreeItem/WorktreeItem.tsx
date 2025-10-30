@@ -887,8 +887,7 @@ export function WorktreeItem({
 		let confirmMessage = `Are you sure you want to merge "${worktree.branch}"${branchText}?`;
 		if (canMergeResult.hasUncommittedChanges) {
 			const targetBranchText = targetBranch ? ` (${targetBranch})` : "";
-			confirmMessage +=
-				`\n\nWarning: The target worktree ${targetBranchText}has uncommitted changes. The merge will proceed anyway.`;
+			confirmMessage += `\n\nWarning: The target worktree ${targetBranchText}has uncommitted changes. The merge will proceed anyway.`;
 		}
 
 		if (confirm(confirmMessage)) {

@@ -1,8 +1,8 @@
 import { existsSync, readFileSync } from "node:fs";
 import { copyFile, mkdir } from "node:fs/promises";
 import * as path from "node:path";
-import * as pty from "node-pty";
 import fg from "fast-glob";
+import * as pty from "node-pty";
 import type { SetupConfig, SetupResult } from "../../shared/types";
 
 /**
@@ -127,7 +127,10 @@ async function executeCommands(
 
 		await new Promise<void>((resolve) => {
 			// Determine the shell based on platform
-			const shell = process.platform === "win32" ? "powershell.exe" : process.env.SHELL || "/bin/bash";
+			const shell =
+				process.platform === "win32"
+					? "powershell.exe"
+					: process.env.SHELL || "/bin/bash";
 
 			// Use node-pty to create a pseudo-terminal
 			const ptyProcess = pty.spawn(shell, [], {
@@ -141,7 +144,7 @@ async function executeCommands(
 				},
 			});
 
-			let hasError = false;
+			const hasError = false;
 
 			// Stream output in real-time
 			ptyProcess.onData((data) => {
@@ -169,10 +172,7 @@ async function executeCommands(
 /**
  * Progress callback for setup execution
  */
-export type SetupProgressCallback = (
-	status: string,
-	output: string,
-) => void;
+export type SetupProgressCallback = (status: string, output: string) => void;
 
 /**
  * Executes the setup script for a newly created worktree

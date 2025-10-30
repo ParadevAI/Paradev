@@ -125,10 +125,7 @@ export function registerWorkspaceIPCs() {
 		"worktree-create",
 		async (event, input: CreateWorktreeInput) => {
 			// Pass webContents to send progress events
-			return await workspaceManager.createWorktree(
-				input,
-				event.sender,
-			);
+			return await workspaceManager.createWorktree(input, event.sender);
 		},
 	);
 
