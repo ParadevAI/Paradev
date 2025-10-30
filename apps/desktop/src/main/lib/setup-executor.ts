@@ -1,12 +1,9 @@
-import { exec } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { copyFile, mkdir } from "node:fs/promises";
 import * as path from "node:path";
-import { promisify } from "node:util";
+import * as pty from "node-pty";
 import fg from "fast-glob";
 import type { SetupConfig, SetupResult } from "../../shared/types";
-
-const execAsync = promisify(exec);
 
 /**
  * Reads and parses the setup configuration from .superset/setup.json
@@ -120,49 +117,53 @@ async function executeCommands(
 	env: Record<string, string>,
 	onProgress?: (output: string) => void,
 ): Promise<{ output: string; errors: string[] }> {
-	const outputs: string[] = [];
+	let fullOutput = "";
 	const errors: string[] = [];
 
 	for (const command of commands) {
-		try {
-			const commandHeader = `\n$ ${command}`;
-			outputs.push(commandHeader);
-			onProgress?.(outputs.join("\n"));
+		const commandHeader = `\n$ ${command}\n`;
+		fullOutput += commandHeader;
+		onProgress?.(fullOutput);
 
-			const { stdout, stderr } = await execAsync(command, {
+		await new Promise<void>((resolve) => {
+			// Determine the shell based on platform
+			const shell = process.platform === "win32" ? "powershell.exe" : process.env.SHELL || "/bin/bash";
+
+			// Use node-pty to create a pseudo-terminal
+			const ptyProcess = pty.spawn(shell, [], {
+				name: "xterm-color",
+				cols: 80,
+				rows: 30,
 				cwd: worktreePath,
 				env: {
 					...process.env,
 					...env,
 				},
-				maxBuffer: 10 * 1024 * 1024, // 10MB buffer
 			});
 
-			if (stdout) {
-				outputs.push(stdout.trim());
-				onProgress?.(outputs.join("\n"));
-			}
-			if (stderr) {
-				outputs.push(stderr.trim());
-				onProgress?.(outputs.join("\n"));
-			}
-		} catch (execError) {
-			const error =
-				execError instanceof Error ? execError : new Error(String(execError));
-			errors.push(`Command failed: ${command}\n${error.message}`);
-			// Include stdout/stderr from failed command if available
-			if ("stdout" in error && error.stdout) {
-				outputs.push(String(error.stdout));
-				onProgress?.(outputs.join("\n"));
-			}
-			if ("stderr" in error && error.stderr) {
-				outputs.push(String(error.stderr));
-				onProgress?.(outputs.join("\n"));
-			}
-		}
+			let hasError = false;
+
+			// Stream output in real-time
+			ptyProcess.onData((data) => {
+				fullOutput += data;
+				onProgress?.(fullOutput);
+			});
+
+			ptyProcess.onExit(({ exitCode }) => {
+				if (exitCode !== 0 && !hasError) {
+					errors.push(`Command failed with exit code ${exitCode}: ${command}`);
+				}
+				resolve();
+			});
+
+			// Write the command to the PTY
+			ptyProcess.write(`${command}\n`);
+			// Exit the shell after command completes
+			ptyProcess.write("exit\n");
+		});
 	}
 
-	return { output: outputs.join("\n"), errors };
+	return { output: fullOutput, errors };
 }
 
 /**
@@ -244,18 +245,16 @@ export async function executeSetup(
 				WORKTREE_BRANCH: branch,
 			};
 
+			// Build the base output (everything before commands)
+			const baseOutput = outputs.join("\n");
+
 			const { output, errors } = await executeCommands(
 				worktreePath,
 				config.commands,
 				env,
 				(cmdOutput) => {
-					// Update outputs array with latest command output
-					const lastOutputIndex = outputs.lastIndexOf("\n📦 Running setup commands...");
-					if (lastOutputIndex !== -1) {
-						outputs.length = lastOutputIndex + 1;
-						outputs.push(cmdOutput);
-					}
-					onProgress?.("Running setup commands...", outputs.join("\n"));
+					// Send combined output: base + command output
+					onProgress?.("Running setup commands...", baseOutput + cmdOutput);
 				},
 			);
 
