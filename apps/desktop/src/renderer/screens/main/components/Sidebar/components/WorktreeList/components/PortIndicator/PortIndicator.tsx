@@ -1,6 +1,12 @@
 import { Circle } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { Worktree } from "shared/types";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from "@superset/ui/tooltip";
 
 interface PortIndicatorProps {
 	worktree: Worktree;
@@ -56,30 +62,41 @@ export function PortIndicator({
 	}
 
 	return (
-		<div className="flex items-center gap-1 text-xs">
-			{isActive && activeProxies.length > 0 ? (
-				<>
-					<Circle size={8} className="fill-green-500 text-green-500" />
-					<span className="text-green-500 font-medium">
-						{activeProxies.map((p, i) => (
-							<span key={p.canonical}>
-								{i > 0 && ", "}
-								:{p.canonical}→:{p.target}
-								{p.service && ` (${p.service})`}
-							</span>
-						))}
-					</span>
-				</>
-			) : hasDetectedPorts ? (
-				<>
-					<Circle size={8} className="fill-gray-500 text-gray-500" />
-					<span className="text-gray-500">
-						{Object.entries(detectedPorts)
-							.map(([service, port]) => `${service}:${port}`)
-							.join(", ")}
-					</span>
-				</>
-			) : null}
-		</div>
+		<TooltipProvider delayDuration={700}>
+			<Tooltip>
+				<TooltipTrigger asChild>
+					<div className="flex items-center gap-1 text-xs">
+						{isActive && activeProxies.length > 0 ? (
+							<>
+								<Circle size={8} className="fill-green-500 text-green-500" />
+								<span className="text-green-500 font-medium">
+									{activeProxies.map((p, i) => (
+										<span key={p.canonical}>
+											{i > 0 && ", "}
+											:{p.canonical}→:{p.target}
+											{p.service && ` (${p.service})`}
+										</span>
+									))}
+								</span>
+							</>
+						) : hasDetectedPorts ? (
+							<>
+								<Circle size={8} className="fill-gray-500 text-gray-500" />
+								<span className="text-gray-500">
+									{Object.entries(detectedPorts)
+										.map(([service, port]) => `${service}:${port}`)
+										.join(", ")}
+								</span>
+							</>
+						) : null}
+					</div>
+				</TooltipTrigger>
+				<TooltipContent>
+					{isActive && activeProxies.length > 0
+						? "Port forwarded"
+						: "Port detected"}
+				</TooltipContent>
+			</Tooltip>
+		</TooltipProvider>
 	);
 }
