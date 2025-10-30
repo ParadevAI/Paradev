@@ -71,15 +71,12 @@ export async function createWorktree(
 			(status, output) => {
 				// Send progress event to renderer
 				if (webContents && !webContents.isDestroyed()) {
-					console.log("[Main] Sending progress event:", status, output.length, "chars");
 					webContents.send("worktree-setup-progress", {
 						workspaceId: workspace.id,
 						worktreeId: worktree.id,
 						status,
 						output,
 					});
-				} else {
-					console.log("[Main] WebContents not available or destroyed");
 				}
 			},
 		);

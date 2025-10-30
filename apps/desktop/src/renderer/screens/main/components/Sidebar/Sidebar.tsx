@@ -114,7 +114,6 @@ export function Sidebar({
 
 		// Listen for setup progress events
 		const progressHandler = (data: any) => {
-			console.log("[Renderer] Received progress event:", data);
 			if (data && data.status !== undefined && data.output !== undefined) {
 				setSetupStatus(data.status);
 				setSetupOutput(data.output);
