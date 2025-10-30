@@ -229,6 +229,9 @@ export function setActiveSelection(
 
 			if (saved && worktreeId && worktreeId !== previousWorktreeId) {
 				// Active worktree changed - start monitoring and update proxy
+				console.log(
+					`[WorkspaceOps] Active worktree changed from ${previousWorktreeId} to ${worktreeId}`,
+				);
 				startMonitoringWorktree(workspace, worktreeId);
 			}
 

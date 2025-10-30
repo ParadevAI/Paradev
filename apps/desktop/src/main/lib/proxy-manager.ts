@@ -167,6 +167,9 @@ export class ProxyManager extends EventEmitter {
 	 */
 	updateTargets(workspace: Workspace): void {
 		if (!this.initialized || !workspace.ports) {
+			console.log(
+				`[ProxyManager] Cannot update targets - initialized: ${this.initialized}, has ports: ${!!workspace.ports}`,
+			);
 			return;
 		}
 
@@ -183,8 +186,9 @@ export class ProxyManager extends EventEmitter {
 		const detectedPorts = activeWorktree.detectedPorts || {};
 
 		console.log(
-			`[ProxyManager] Updating targets for active worktree ${activeWorktree.branch}`,
+			`[ProxyManager] Updating targets for active worktree ${activeWorktree.branch} (${workspace.activeWorktreeId})`,
 		);
+		console.log(`[ProxyManager] Detected ports:`, detectedPorts);
 
 		// Update each proxy
 		for (const [canonical, instance] of this.proxies) {
