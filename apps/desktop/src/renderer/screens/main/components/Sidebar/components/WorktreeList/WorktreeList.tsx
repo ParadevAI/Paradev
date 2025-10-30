@@ -36,6 +36,10 @@ export function WorktreeList({
 		);
 	}
 
+	// Check if workspace has port forwarding configured
+	const hasPortForwarding =
+		currentWorkspace.ports && currentWorkspace.ports.length > 0;
+
 	return (
 		<>
 			{currentWorkspace.worktrees.map((worktree) => (
@@ -52,6 +56,7 @@ export function WorktreeList({
 						onUpdateWorktree(worktree.id, updatedWorktree)
 					}
 					selectedTabId={selectedTabId}
+					hasPortForwarding={hasPortForwarding}
 				/>
 			))}
 		</>

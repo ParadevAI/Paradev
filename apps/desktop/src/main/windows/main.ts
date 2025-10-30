@@ -1,5 +1,5 @@
 import { join } from "node:path";
-import { BrowserWindow, screen } from "electron";
+import { BrowserWindow, screen, shell, ipcMain } from "electron";
 
 import { createWindow } from "lib/electron-app/factories/windows/create";
 import { ENVIRONMENT } from "shared/constants";
@@ -98,6 +98,16 @@ export async function MainWindow() {
 
 	// Create application menu
 	createApplicationMenu(window);
+
+	// Register shell-open-external handler
+	ipcMain.handle("shell-open-external", async (_event, url: string) => {
+		try {
+			await shell.openExternal(url);
+		} catch (error) {
+			console.error("Failed to open external URL:", error);
+			throw error;
+		}
+	});
 
 	window.webContents.on("did-finish-load", async () => {
 		window.show();

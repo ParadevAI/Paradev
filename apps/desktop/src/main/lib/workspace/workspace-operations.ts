@@ -388,117 +388,35 @@ export function updateDetectedPorts(
 
 /**
  * Sync port tabs with detected ports
- * Creates/updates a "Ports" tab group with port tabs
+ * Creates/updates a single "Ports" tab with all detected ports
  */
 function syncPortTabs(
 	worktree: Worktree,
 	detectedPorts: Record<string, number>,
 ): void {
-	// Find or create "Ports" tab group
-	let portsGroup = worktree.tabs.find(
-		(tab) => tab.type === "group" && tab.name === "Ports",
+	// Find existing "Ports" tab
+	let portsTab = worktree.tabs.find(
+		(tab) => tab.type === "port" && tab.name === "Ports",
 	);
 
 	const portEntries = Object.entries(detectedPorts);
 
-	// If no ports detected, remove the group if it exists
+	// If no ports detected, remove the tab if it exists
 	if (portEntries.length === 0) {
-		if (portsGroup) {
-			worktree.tabs = worktree.tabs.filter((tab) => tab.id !== portsGroup.id);
+		if (portsTab) {
+			worktree.tabs = worktree.tabs.filter((tab) => tab.id !== portsTab.id);
 		}
 		return;
 	}
 
-	// Create the group if it doesn't exist
-	if (!portsGroup) {
-		portsGroup = {
+	// Create the tab if it doesn't exist
+	if (!portsTab) {
+		portsTab = {
 			id: `ports-${worktree.id}`,
 			name: "Ports",
-			type: "group",
-			tabs: [],
+			type: "port",
 			createdAt: new Date().toISOString(),
 		};
-		worktree.tabs.push(portsGroup);
+		worktree.tabs.push(portsTab);
 	}
-
-	// Ensure tabs array exists
-	if (!portsGroup.tabs) {
-		portsGroup.tabs = [];
-	}
-
-	// Get existing port tab IDs
-	const existingPortTabs = new Set(
-		portsGroup.tabs
-			.filter((tab) => tab.type === "port")
-			.map((tab) => tab.id),
-	);
-
-	// Track which ports we've processed
-	const processedPortIds = new Set<string>();
-
-	// Add or update port tabs
-	for (const [service, port] of portEntries) {
-		const portTabId = `port-${service}-${port}`;
-		processedPortIds.add(portTabId);
-
-		const existingTab = portsGroup.tabs.find((tab) => tab.id === portTabId);
-
-		if (!existingTab) {
-			// Create new port tab
-			portsGroup.tabs.push({
-				id: portTabId,
-				name: `${service}:${port}`,
-				type: "port",
-				createdAt: new Date().toISOString(),
-			});
-		} else {
-			// Update existing tab name if needed
-			existingTab.name = `${service}:${port}`;
-		}
-	}
-
-	// Remove port tabs that are no longer detected
-	portsGroup.tabs = portsGroup.tabs.filter(
-		(tab) => tab.type !== "port" || processedPortIds.has(tab.id),
-	);
-
-	// Update mosaic tree to show all port tabs
-	if (portsGroup.tabs.length > 0) {
-		portsGroup.mosaicTree = buildMosaicTreeForTabs(
-			portsGroup.tabs.map((t) => t.id),
-		);
-	}
-}
-
-/**
- * Build a balanced mosaic tree from tab IDs
- */
-function buildMosaicTreeForTabs(
-	tabIds: string[],
-): import("../../shared/types").MosaicNode<string> {
-	if (tabIds.length === 0) {
-		throw new Error("Cannot build mosaic tree with no tabs");
-	}
-
-	if (tabIds.length === 1) {
-		return tabIds[0];
-	}
-
-	// Split tabs into two groups and create a row split
-	const mid = Math.ceil(tabIds.length / 2);
-	const firstHalf = tabIds.slice(0, mid);
-	const secondHalf = tabIds.slice(mid);
-
-	return {
-		direction: "row",
-		first:
-			firstHalf.length === 1
-				? firstHalf[0]
-				: buildMosaicTreeForTabs(firstHalf),
-		second:
-			secondHalf.length === 1
-				? secondHalf[0]
-				: buildMosaicTreeForTabs(secondHalf),
-		splitPercentage: 50,
-	};
 }

@@ -6,6 +6,7 @@ import {
 	CreateWorktreeModal,
 	SidebarHeader,
 	WorkspaceCarousel,
+	WorkspacePortIndicator,
 	WorkspaceSwitcher,
 	WorktreeList,
 } from "./components";
@@ -263,6 +264,7 @@ export function Sidebar({
 								<div className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">
 									{workspace.name}
 								</div>
+								<WorkspacePortIndicator workspace={workspace} />
 							</div>
 						)}
 
