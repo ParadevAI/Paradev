@@ -12,6 +12,7 @@ import type {
 import * as tabOps from "./workspace/tab-operations";
 import * as workspaceOps from "./workspace/workspace-operations";
 import * as worktreeOps from "./workspace/worktree-operations";
+import { proxyManager } from "./proxy-manager";
 
 /**
  * Main WorkspaceManager class that coordinates all workspace operations
@@ -323,6 +324,48 @@ class WorkspaceManager {
 			});
 		});
 	}
+
+	// ============================================================================
+	// Port Management Operations
+	// ============================================================================
+
+	/**
+	 * Initialize proxy manager for a workspace
+	 */
+	async initializeProxyForWorkspace(workspaceId: string): Promise<void> {
+		const workspace = await this.get(workspaceId);
+		if (!workspace || !workspace.ports) {
+			return;
+		}
+		await proxyManager.initialize(workspace);
+		proxyManager.updateTargets(workspace);
+	}
+
+	/**
+	 * Update proxy targets when active worktree changes
+	 */
+	async updateProxyTargets(workspaceId: string): Promise<void> {
+		const workspace = await this.get(workspaceId);
+		if (!workspace) {
+			return;
+		}
+		proxyManager.updateTargets(workspace);
+	}
+
+	/**
+	 * Get workspace by ID (exposed for external use)
+	 */
+	getWorkspace(workspaceId: string): Promise<Workspace | null> {
+		return this.get(workspaceId);
+	}
+
+	/**
+	 * Save config (exposed for external use)
+	 */
+	async saveConfig(): Promise<void> {
+		await workspaceOps.saveConfig();
+	}
 }
 
-export default WorkspaceManager.getInstance();
+export const workspaceManager = WorkspaceManager.getInstance();
+export default workspaceManager;

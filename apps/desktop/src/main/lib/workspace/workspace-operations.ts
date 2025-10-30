@@ -251,3 +251,37 @@ export function setActiveWorkspaceId(workspaceId: string): boolean {
 		return false;
 	}
 }
+
+/**
+ * Save current config to disk
+ */
+export function saveConfig(): boolean {
+	const config = configManager.read();
+	return configManager.write(config);
+}
+
+/**
+ * Update detected ports for a worktree
+ */
+export function updateDetectedPorts(
+	workspaceId: string,
+	worktreeId: string,
+	detectedPorts: Record<string, number>,
+): boolean {
+	try {
+		const config = configManager.read();
+		const workspace = config.workspaces.find((ws) => ws.id === workspaceId);
+		if (!workspace) return false;
+
+		const worktree = workspace.worktrees.find((wt) => wt.id === worktreeId);
+		if (!worktree) return false;
+
+		worktree.detectedPorts = detectedPorts;
+		workspace.updatedAt = new Date().toISOString();
+
+		return configManager.write(config);
+	} catch (error) {
+		console.error("Failed to update detected ports:", error);
+		return false;
+	}
+}

@@ -7,6 +7,7 @@ import { displayName } from "~/package.json";
 import { createApplicationMenu } from "../lib/menu";
 import { registerTerminalIPCs } from "../lib/terminal-ipcs";
 import { registerWorkspaceIPCs } from "../lib/workspace-ipcs";
+import { registerPortIpcs } from "../lib/port-ipcs";
 
 export async function MainWindow() {
 	const { width, height } = screen.getPrimaryDisplay().workAreaSize;
@@ -34,6 +35,7 @@ export async function MainWindow() {
 	// Register IPC handlers
 	const cleanupTerminal = registerTerminalIPCs(window);
 	registerWorkspaceIPCs();
+	registerPortIpcs();
 
 	// Create application menu
 	createApplicationMenu(window);

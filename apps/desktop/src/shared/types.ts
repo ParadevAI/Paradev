@@ -53,6 +53,7 @@ export interface Worktree {
 	path: string;
 	tabs: Tab[]; // Changed from tabGroups to tabs
 	createdAt: string;
+	detectedPorts?: Record<string, number>; // Map of service name to detected port
 }
 
 export interface Workspace {
@@ -66,6 +67,7 @@ export interface Workspace {
 	activeTabId: string | null; // Unified tab selection (no more activeTabGroupId)
 	createdAt: string;
 	updatedAt: string;
+	ports?: Array<number | { name: string; port: number }>; // Port configuration for proxy routing
 }
 
 export interface WorkspaceConfig {
@@ -112,4 +114,12 @@ export interface SetupResult {
 	success: boolean;
 	output: string; // Combined stdout/stderr
 	error?: string; // Error message if failed
+}
+
+// Port detection types
+export interface DetectedPort {
+	port: number;
+	service?: string;
+	terminalId: string;
+	detectedAt: string;
 }

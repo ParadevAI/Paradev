@@ -192,6 +192,28 @@ export interface IpcChannels {
 		request: string; // URL
 		response: void;
 	};
+
+	// Port detection and proxy operations
+	"workspace-set-ports": {
+		request: {
+			workspaceId: string;
+			ports: Array<number | { name: string; port: number }>;
+		};
+		response: IpcResponse;
+	};
+	"workspace-get-detected-ports": {
+		request: { worktreeId: string };
+		response: Record<string, number>;
+	};
+	"proxy-get-status": {
+		request: void;
+		response: Array<{
+			canonical: number;
+			target?: number;
+			service?: string;
+			active: boolean;
+		}>;
+	};
 }
 
 /**
@@ -240,6 +262,9 @@ export function isValidChannel(channel: string): channel is IpcChannelName {
 		"terminal-execute-command",
 		"terminal-get-history",
 		"open-external",
+		"workspace-set-ports",
+		"workspace-get-detected-ports",
+		"proxy-get-status",
 	];
 	return validChannels.includes(channel as IpcChannelName);
 }
