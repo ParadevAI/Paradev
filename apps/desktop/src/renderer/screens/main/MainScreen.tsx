@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import TabContent from "renderer/components/TabContent";
-import TabGroup from "renderer/components/TabGroup";
 import type { Tab, Workspace } from "shared/types";
 import { AppFrame } from "./components/AppFrame";
 import { Background } from "./components/Background";
+import TabContent from "./components/MainContent/TabContent";
+import TabGroup from "./components/MainContent/TabGroup";
 import { PlaceholderState } from "./components/PlaceholderState";
 import { Sidebar } from "./components/Sidebar";
 import { TopBar } from "./components/TopBar";
