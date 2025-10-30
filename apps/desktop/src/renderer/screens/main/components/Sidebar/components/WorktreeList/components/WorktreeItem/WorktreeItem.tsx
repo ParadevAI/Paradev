@@ -215,6 +215,7 @@ function DroppableGroupArea({
 interface WorktreeItemProps {
 	worktree: Worktree;
 	workspaceId: string;
+	activeWorktreeId: string | null;
 	isExpanded: boolean;
 	onToggle: (worktreeId: string) => void;
 	onTabSelect: (worktreeId: string, tabId: string) => void;
@@ -226,6 +227,7 @@ interface WorktreeItemProps {
 export function WorktreeItem({
 	worktree,
 	workspaceId,
+	activeWorktreeId,
 	isExpanded,
 	onToggle,
 	onTabSelect,
@@ -530,7 +532,7 @@ export function WorktreeItem({
 		};
 
 		checkMergeStatus();
-	}, [workspaceId, worktree.id]);
+	}, [workspaceId, worktree.id, activeWorktreeId]);
 
 	// Configure sensors for drag-and-drop
 	const sensors = useSensors(

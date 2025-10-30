@@ -43,6 +43,7 @@ export function WorktreeList({
 					key={worktree.id}
 					worktree={worktree}
 					workspaceId={currentWorkspace.id}
+					activeWorktreeId={currentWorkspace.activeWorktreeId}
 					isExpanded={expandedWorktrees.has(worktree.id)}
 					onToggle={onToggleWorktree}
 					onTabSelect={onTabSelect}

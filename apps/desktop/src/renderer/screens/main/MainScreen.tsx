@@ -59,12 +59,18 @@ export function MainScreen() {
     const handleTabSelect = (worktreeId: string, tabId: string) => {
         setSelectedWorktreeId(worktreeId);
         setSelectedTabId(tabId);
-        // Save active selection
+        // Save active selection and update workspace state
         if (currentWorkspace) {
             window.ipcRenderer.invoke("workspace-set-active-selection", {
                 workspaceId: currentWorkspace.id,
                 worktreeId,
                 tabId,
+            });
+            // Update the current workspace state to reflect the new active selection
+            setCurrentWorkspace({
+                ...currentWorkspace,
+                activeWorktreeId: worktreeId,
+                activeTabId: tabId,
             });
         }
     };
@@ -74,11 +80,17 @@ export function MainScreen() {
         if (!currentWorkspace || !selectedWorktreeId) return;
 
         setSelectedTabId(tabId);
-        // Save active selection
+        // Save active selection and update workspace state
         window.ipcRenderer.invoke("workspace-set-active-selection", {
             workspaceId: currentWorkspace.id,
             worktreeId: selectedWorktreeId,
             tabId,
+        });
+        // Update the current workspace state to reflect the new active selection
+        setCurrentWorkspace({
+            ...currentWorkspace,
+            activeWorktreeId: selectedWorktreeId,
+            activeTabId: tabId,
         });
     };
 
