@@ -112,6 +112,13 @@ export function Sidebar({
 		setSetupStatus("Creating git worktree...");
 		setSetupOutput(undefined);
 
+		// Listen for setup progress events
+		const progressHandler = (_: any, data: { status: string; output: string }) => {
+			setSetupStatus(data.status);
+			setSetupOutput(data.output);
+		};
+		window.ipcRenderer.on("worktree-setup-progress", progressHandler);
+
 		try {
 			// Type-safe IPC call - no need for type assertion!
 			const result = await window.ipcRenderer.invoke("worktree-create", {
@@ -153,6 +160,8 @@ export function Sidebar({
 			setSetupOutput(error instanceof Error ? error.message : String(error));
 			// Don't close modal on error so user can see what went wrong
 		} finally {
+			// Clean up event listener
+			window.ipcRenderer.off("worktree-setup-progress", progressHandler);
 			setIsCreatingWorktree(false);
 		}
 	};

@@ -19,6 +19,7 @@ import { cleanupEmptyGroupsInAllWorktrees } from "./group-cleanup";
 export async function createWorktree(
 	workspace: Workspace,
 	input: CreateWorktreeInput,
+	webContents?: Electron.WebContents,
 ): Promise<{
 	success: boolean;
 	worktree?: Worktree;
@@ -67,6 +68,15 @@ export async function createWorktree(
 			workspace.repoPath,
 			worktree.path,
 			input.branch,
+			(status, output) => {
+				// Send progress event to renderer
+				webContents?.send("worktree-setup-progress", {
+					workspaceId: workspace.id,
+					worktreeId: worktree.id,
+					status,
+					output,
+				});
+			},
 		);
 
 		return { success: true, worktree, setupResult };

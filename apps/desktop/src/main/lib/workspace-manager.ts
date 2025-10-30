@@ -126,12 +126,13 @@ class WorkspaceManager {
 	 */
 	async createWorktree(
 		input: CreateWorktreeInput,
+		webContents?: Electron.WebContents,
 	): Promise<{ success: boolean; worktree?: Worktree; error?: string }> {
 		const workspace = await this.get(input.workspaceId);
 		if (!workspace) {
 			return { success: false, error: "Workspace not found" };
 		}
-		return worktreeOps.createWorktree(workspace, input);
+		return worktreeOps.createWorktree(workspace, input, webContents);
 	}
 
 	/**

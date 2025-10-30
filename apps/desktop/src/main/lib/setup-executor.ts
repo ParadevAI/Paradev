@@ -111,19 +111,23 @@ async function copyFiles(
  * @param worktreePath Working directory for commands
  * @param commands Array of shell commands to execute
  * @param env Environment variables to pass to commands
+ * @param onProgress Optional callback for progress updates
  * @returns Combined output and any errors
  */
 async function executeCommands(
 	worktreePath: string,
 	commands: string[],
 	env: Record<string, string>,
+	onProgress?: (output: string) => void,
 ): Promise<{ output: string; errors: string[] }> {
 	const outputs: string[] = [];
 	const errors: string[] = [];
 
 	for (const command of commands) {
 		try {
-			outputs.push(`\n$ ${command}`);
+			const commandHeader = `\n$ ${command}`;
+			outputs.push(commandHeader);
+			onProgress?.(outputs.join("\n"));
 
 			const { stdout, stderr } = await execAsync(command, {
 				cwd: worktreePath,
@@ -136,9 +140,11 @@ async function executeCommands(
 
 			if (stdout) {
 				outputs.push(stdout.trim());
+				onProgress?.(outputs.join("\n"));
 			}
 			if (stderr) {
 				outputs.push(stderr.trim());
+				onProgress?.(outputs.join("\n"));
 			}
 		} catch (execError) {
 			const error =
@@ -147,9 +153,11 @@ async function executeCommands(
 			// Include stdout/stderr from failed command if available
 			if ("stdout" in error && error.stdout) {
 				outputs.push(String(error.stdout));
+				onProgress?.(outputs.join("\n"));
 			}
 			if ("stderr" in error && error.stderr) {
 				outputs.push(String(error.stderr));
+				onProgress?.(outputs.join("\n"));
 			}
 		}
 	}
@@ -158,16 +166,26 @@ async function executeCommands(
 }
 
 /**
+ * Progress callback for setup execution
+ */
+export type SetupProgressCallback = (
+	status: string,
+	output: string,
+) => void;
+
+/**
  * Executes the setup script for a newly created worktree
  * @param mainRepoPath Path to the main repository
  * @param worktreePath Path to the newly created worktree
  * @param branch Branch name of the worktree
+ * @param onProgress Optional callback for progress updates
  * @returns Setup result with output and success status
  */
 export async function executeSetup(
 	mainRepoPath: string,
 	worktreePath: string,
 	branch: string,
+	onProgress?: SetupProgressCallback,
 ): Promise<SetupResult> {
 	const outputs: string[] = [];
 	const allErrors: string[] = [];
@@ -184,10 +202,13 @@ export async function executeSetup(
 		}
 
 		outputs.push("🔧 Running setup script...\n");
+		onProgress?.("Running setup script...", outputs.join("\n"));
 
 		// Copy files if specified
 		if (config.copy && config.copy.length > 0) {
 			outputs.push("📋 Copying files from main repository...");
+			onProgress?.("Copying files...", outputs.join("\n"));
+
 			const { copied, errors } = await copyFiles(
 				mainRepoPath,
 				worktreePath,
@@ -199,6 +220,7 @@ export async function executeSetup(
 				for (const file of copied) {
 					outputs.push(`  - ${file}`);
 				}
+				onProgress?.("Files copied", outputs.join("\n"));
 			}
 
 			if (errors.length > 0) {
@@ -207,12 +229,14 @@ export async function executeSetup(
 				for (const error of errors) {
 					outputs.push(`  - ${error}`);
 				}
+				onProgress?.("Copy completed with warnings", outputs.join("\n"));
 			}
 		}
 
 		// Execute commands if specified
 		if (config.commands && config.commands.length > 0) {
 			outputs.push("\n📦 Running setup commands...");
+			onProgress?.("Running setup commands...", outputs.join("\n"));
 
 			const env = {
 				MAIN_REPO_PATH: mainRepoPath,
@@ -224,6 +248,15 @@ export async function executeSetup(
 				worktreePath,
 				config.commands,
 				env,
+				(cmdOutput) => {
+					// Update outputs array with latest command output
+					const lastOutputIndex = outputs.lastIndexOf("\n📦 Running setup commands...");
+					if (lastOutputIndex !== -1) {
+						outputs.length = lastOutputIndex + 1;
+						outputs.push(cmdOutput);
+					}
+					onProgress?.("Running setup commands...", outputs.join("\n"));
+				},
 			);
 
 			outputs.push(output);
@@ -238,11 +271,13 @@ export async function executeSetup(
 
 		if (success) {
 			outputs.push("\n✅ Setup complete!");
+			onProgress?.("Setup complete!", outputs.join("\n"));
 		} else {
 			outputs.push("\n❌ Setup completed with errors:");
 			for (const error of allErrors) {
 				outputs.push(`  - ${error}`);
 			}
+			onProgress?.("Setup completed with errors", outputs.join("\n"));
 		}
 
 		return {
