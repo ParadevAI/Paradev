@@ -16,6 +16,7 @@ import {
 import {
 	ChevronRight,
 	Clipboard,
+	Edit2,
 	ExternalLink,
 	FolderOpen,
 	GitBranch,
@@ -24,7 +25,7 @@ import {
 	Settings,
 	Trash2,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { MosaicNode } from "react-mosaic-component";
 import {
 	Dialog,
@@ -51,6 +52,7 @@ function SortableTab({
 	onTabRemove,
 	onGroupTabs,
 	onMoveOutOfGroup,
+	onTabRename,
 }: {
 	tab: Tab;
 	worktreeId: string;
@@ -63,6 +65,7 @@ function SortableTab({
 	onTabRemove: (tabId: string) => void;
 	onGroupTabs: (tabIds: string[]) => void;
 	onMoveOutOfGroup: (tabId: string, parentTabId: string) => void;
+	onTabRename: (tabId: string, newName: string) => void;
 }) {
 	const {
 		attributes,
@@ -100,6 +103,7 @@ function SortableTab({
 				onTabRemove={onTabRemove}
 				onGroupTabs={onGroupTabs}
 				onMoveOutOfGroup={onMoveOutOfGroup}
+				onTabRename={onTabRename}
 			/>
 		</div>
 	);
@@ -109,24 +113,32 @@ function SortableTab({
 function DroppableGroupTab({
 	tab,
 	worktreeId,
+	workspaceId,
 	selectedTabId,
 	isExpanded,
 	level,
 	onToggle,
 	onTabSelect,
 	onUngroupTab,
+	onRenameGroup,
 	isOver,
 }: {
 	tab: Tab;
 	worktreeId: string;
+	workspaceId: string;
 	selectedTabId?: string;
 	isExpanded: boolean;
 	level: number;
 	onToggle: (groupTabId: string) => void;
 	onTabSelect: (worktreeId: string, tabId: string, shiftKey: boolean) => void;
 	onUngroupTab: (groupTabId: string) => void;
+	onRenameGroup: (groupTabId: string, newName: string) => void;
 	isOver: boolean;
 }) {
+	const [isEditing, setIsEditing] = useState(false);
+	const [editName, setEditName] = useState(tab.name);
+	const inputRef = useRef<HTMLInputElement>(null);
+
 	const { setNodeRef } = useDroppable({
 		id: `group-${tab.id}`,
 		data: {
@@ -135,7 +147,50 @@ function DroppableGroupTab({
 		},
 	});
 
+	// Focus input when entering edit mode
+	useEffect(() => {
+		if (isEditing && inputRef.current) {
+			inputRef.current.focus();
+			inputRef.current.select();
+		}
+	}, [isEditing]);
+
 	const isSelected = selectedTabId === tab.id;
+
+	const handleClick = (e: React.MouseEvent) => {
+		if (!isEditing) {
+			onTabSelect(worktreeId, tab.id, e.shiftKey);
+			onToggle(tab.id);
+		}
+	};
+
+	const handleStartRename = () => {
+		setEditName(tab.name);
+		setIsEditing(true);
+	};
+
+	const handleSaveRename = () => {
+		const trimmedName = editName.trim();
+		if (trimmedName !== "" && trimmedName !== tab.name) {
+			onRenameGroup(tab.id, trimmedName);
+		}
+		setIsEditing(false);
+	};
+
+	const handleCancelRename = () => {
+		setEditName(tab.name);
+		setIsEditing(false);
+	};
+
+	const handleKeyDown = (e: React.KeyboardEvent) => {
+		if (e.key === "Enter") {
+			e.preventDefault();
+			handleSaveRename();
+		} else if (e.key === "Escape") {
+			e.preventDefault();
+			handleCancelRename();
+		}
+	};
 
 	return (
 		<div ref={setNodeRef}>
@@ -143,27 +198,40 @@ function DroppableGroupTab({
 				<ContextMenuTrigger asChild>
 					<button
 						type="button"
-						onClick={(e) => {
-							onTabSelect(worktreeId, tab.id, e.shiftKey);
-							onToggle(tab.id);
-						}}
-						className={`group flex items-center gap-1 w-full h-8 px-3 text-sm rounded-md [transition:all_0.2s,border_0s] ${
-							isSelected
-								? "bg-neutral-800 border border-neutral-700"
-								: isOver
-									? "bg-blue-900/50 border border-blue-500"
-									: "hover:bg-neutral-800/50"
-						}`}
+						onClick={handleClick}
+						className={`group flex items-center gap-1 w-full h-8 px-3 text-sm rounded-md [transition:all_0.2s,border_0s] ${isSelected
+							? "bg-neutral-800 border border-neutral-700"
+							: isOver
+								? "bg-blue-900/50 border border-blue-500"
+								: "hover:bg-neutral-800/50"
+							}`}
 						style={{ paddingLeft: `${level * 12 + 12}px` }}
 					>
 						<ChevronRight
 							size={12}
-							className={`transition-transform ${isExpanded ? "rotate-90" : ""}`}
+							className={`transition-transform ${isExpanded ? "rotate-90" : ""} shrink-0`}
 						/>
-						<span className="truncate flex-1 text-left">{tab.name}</span>
+						{isEditing ? (
+							<input
+								ref={inputRef}
+								type="text"
+								value={editName}
+								onChange={(e) => setEditName(e.target.value)}
+								onBlur={handleSaveRename}
+								onKeyDown={handleKeyDown}
+								onClick={(e) => e.stopPropagation()}
+								className="flex-1 bg-neutral-700 text-white px-2 py-0.5 rounded-sm text-sm outline-none focus:ring-1 focus:ring-blue-500 min-w-0"
+							/>
+						) : (
+							<span className="truncate flex-1 text-left">{tab.name}</span>
+						)}
 					</button>
 				</ContextMenuTrigger>
 				<ContextMenuContent>
+					<ContextMenuItem onClick={handleStartRename}>
+						<Edit2 size={14} className="mr-2" />
+						Rename
+					</ContextMenuItem>
 					<ContextMenuItem onClick={() => onUngroupTab(tab.id)}>
 						<FolderOpen size={14} className="mr-2" />
 						Ungroup Tabs
@@ -195,9 +263,8 @@ function DroppableGroupArea({
 	return (
 		<div
 			ref={setNodeRef}
-			className={`relative ${
-				isOver ? "bg-blue-900/20 border-l-2 border-blue-500 rounded-r-md" : ""
-			}`}
+			className={`relative ${isOver ? "bg-blue-900/20 border-l-2 border-blue-500 rounded-r-md" : ""
+				}`}
 			style={{
 				minHeight: "40px",
 				transition: "all 0.2s",
@@ -495,6 +562,30 @@ export function WorktreeItem({
 		}
 	};
 
+	// Handle renaming a group tab
+	const handleRenameGroup = async (groupTabId: string, newName: string) => {
+		try {
+			const result = await window.ipcRenderer.invoke("tab-update-name", {
+				workspaceId,
+				worktreeId: worktree.id,
+				tabId: groupTabId,
+				name: newName,
+			});
+
+			if (result.success) {
+				// Optimistically update the local worktree data
+				const updatedTabs = updateTabNameRecursive(worktree.tabs, groupTabId, newName);
+				const updatedWorktree = { ...worktree, tabs: updatedTabs };
+				onUpdateWorktree(updatedWorktree);
+			} else {
+				alert(`Failed to rename group: ${result.error}`);
+			}
+		} catch (error) {
+			console.error("Error renaming group:", error);
+			alert("Failed to rename group");
+		}
+	};
+
 	// Handle moving a tab out of its group
 	const handleMoveOutOfGroup = async (tabId: string, parentTabId: string) => {
 		try {
@@ -615,7 +706,7 @@ export function WorktreeItem({
 			setErrorTitle("Failed to Remove Worktree");
 			setErrorMessage(
 				result.error ||
-					"An unknown error occurred while removing the worktree.",
+				"An unknown error occurred while removing the worktree.",
 			);
 			setShowErrorDialog(true);
 		}
@@ -693,7 +784,7 @@ export function WorktreeItem({
 			setErrorTitle("Failed to Check Settings");
 			setErrorMessage(
 				checkResult.error ||
-					"An unknown error occurred while checking settings.",
+				"An unknown error occurred while checking settings.",
 			);
 			setShowErrorDialog(true);
 			return;
@@ -763,6 +854,42 @@ export function WorktreeItem({
 		}
 	};
 
+	const handleTabRename = async (tabId: string, newName: string) => {
+		try {
+			const result = await window.ipcRenderer.invoke("tab-update-name", {
+				workspaceId,
+				worktreeId: worktree.id,
+				tabId,
+				name: newName,
+			});
+
+			if (result.success) {
+				// Optimistically update the local worktree data
+				const updatedTabs = updateTabNameRecursive(worktree.tabs, tabId, newName);
+				const updatedWorktree = { ...worktree, tabs: updatedTabs };
+				onUpdateWorktree(updatedWorktree);
+			} else {
+				alert(`Failed to rename tab: ${result.error}`);
+			}
+		} catch (error) {
+			console.error("Error renaming tab:", error);
+			alert("Failed to rename tab");
+		}
+	};
+
+	// Helper to recursively update tab name
+	const updateTabNameRecursive = (tabs: Tab[], tabId: string, newName: string): Tab[] => {
+		return tabs.map(tab => {
+			if (tab.id === tabId) {
+				return { ...tab, name: newName };
+			}
+			if (tab.type === "group" && tab.tabs) {
+				return { ...tab, tabs: updateTabNameRecursive(tab.tabs, tabId, newName) };
+			}
+			return tab;
+		});
+	};
+
 	// Get all tabs for sortable context (including nested)
 	// Defensive: ensure worktree.tabs exists and is an array
 	const tabs = Array.isArray(worktree.tabs) ? worktree.tabs : [];
@@ -792,12 +919,14 @@ export function WorktreeItem({
 					<DroppableGroupTab
 						tab={tab}
 						worktreeId={worktree.id}
+						workspaceId={workspaceId}
 						selectedTabId={selectedTabId}
 						isExpanded={isExpanded}
 						level={level}
 						onToggle={toggleGroupTab}
 						onTabSelect={handleTabSelect}
 						onUngroupTab={handleUngroupTab}
+						onRenameGroup={handleRenameGroup}
 						isOver={false}
 					/>
 
@@ -830,6 +959,7 @@ export function WorktreeItem({
 					onTabRemove={handleTabRemove}
 					onGroupTabs={handleGroupTabs}
 					onMoveOutOfGroup={handleMoveOutOfGroup}
+					onTabRename={handleTabRename}
 				/>
 			</div>
 		);
