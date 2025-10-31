@@ -12,6 +12,7 @@ import {
 	SquareTerminal,
 	X,
 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import type { Tab, Worktree } from "shared/types";
 
 interface TabItemProps {
@@ -26,6 +27,7 @@ interface TabItemProps {
 	onTabRemove?: (tabId: string) => void;
 	onGroupTabs?: (tabIds: string[]) => void;
 	onMoveOutOfGroup?: (tabId: string, parentTabId: string) => void;
+	onTabRename?: (tabId: string, newName: string) => void;
 }
 
 export function TabItem({
@@ -40,14 +42,29 @@ export function TabItem({
 	onTabRemove,
 	onGroupTabs,
 	onMoveOutOfGroup,
+	onTabRename,
 }: TabItemProps) {
+	const [isEditing, setIsEditing] = useState(false);
+	const [editName, setEditName] = useState(tab.name);
+	const inputRef = useRef<HTMLInputElement>(null);
+
+	// Focus input when entering edit mode
+	useEffect(() => {
+		if (isEditing && inputRef.current) {
+			inputRef.current.focus();
+			inputRef.current.select();
+		}
+	}, [isEditing]);
+
 	const handleRemove = (e: React.MouseEvent) => {
 		e.stopPropagation();
 		onTabRemove?.(tab.id);
 	};
 
 	const handleClick = (e: React.MouseEvent) => {
-		onTabSelect(worktreeId, tab.id, e.shiftKey);
+		if (!isEditing) {
+			onTabSelect(worktreeId, tab.id, e.shiftKey);
+		}
 	};
 
 	const handleGroupSelected = () => {
@@ -62,29 +79,31 @@ export function TabItem({
 		}
 	};
 
-	const handleRename = async () => {
-		if (!workspaceId) {
-			console.error("Cannot rename tab: workspaceId is undefined");
-			return;
+	const handleRename = () => {
+		setEditName(tab.name);
+		setIsEditing(true);
+	};
+
+	const handleSaveRename = () => {
+		const trimmedName = editName.trim();
+		if (trimmedName !== "" && trimmedName !== tab.name) {
+			onTabRename?.(tab.id, trimmedName);
 		}
+		setIsEditing(false);
+	};
 
-		const newName = prompt("Enter new name for the tab:", tab.name);
-		if (newName && newName.trim() !== "" && newName !== tab.name) {
-			try {
-				const result = await window.ipcRenderer.invoke("tab-update-name", {
-					workspaceId,
-					worktreeId,
-					tabId: tab.id,
-					name: newName.trim(),
-				});
+	const handleCancelRename = () => {
+		setEditName(tab.name);
+		setIsEditing(false);
+	};
 
-				if (!result.success) {
-					alert(`Failed to rename tab: ${result.error}`);
-				}
-			} catch (error) {
-				console.error("Error renaming tab:", error);
-				alert("Failed to rename tab");
-			}
+	const handleKeyDown = (e: React.KeyboardEvent) => {
+		if (e.key === "Enter") {
+			e.preventDefault();
+			handleSaveRename();
+		} else if (e.key === "Escape") {
+			e.preventDefault();
+			handleCancelRename();
 		}
 	};
 
@@ -107,18 +126,33 @@ export function TabItem({
 					}`}
 					onClick={handleClick}
 				>
-					<div className="flex items-center gap-2 flex-1">
-						<SquareTerminal size={14} />
-						<span className="truncate">{tab.name}</span>
+					<div className="flex items-center gap-2 flex-1 min-w-0">
+						<SquareTerminal size={14} className="flex-shrink-0" />
+						{isEditing ? (
+							<input
+								ref={inputRef}
+								type="text"
+								value={editName}
+								onChange={(e) => setEditName(e.target.value)}
+								onBlur={handleSaveRename}
+								onKeyDown={handleKeyDown}
+								onClick={(e) => e.stopPropagation()}
+								className="flex-1 bg-neutral-700 text-white px-2 py-0.5 rounded text-sm outline-none focus:ring-1 focus:ring-blue-500 min-w-0"
+							/>
+						) : (
+							<span className="truncate">{tab.name}</span>
+						)}
 					</div>
-					<Button
-						variant="ghost"
-						size="icon"
-						onClick={handleRemove}
-						className="h-5 w-5 p-0 opacity-0 group-hover:opacity-70 hover:opacity-100 hover:bg-neutral-700"
-					>
-						<X size={12} />
-					</Button>
+					{!isEditing && (
+						<Button
+							variant="ghost"
+							size="icon"
+							onClick={handleRemove}
+							className="h-5 w-5 p-0 opacity-0 group-hover:opacity-70 hover:opacity-100 hover:bg-neutral-700"
+						>
+							<X size={12} />
+						</Button>
+					)}
 				</button>
 			</ContextMenuTrigger>
 			<ContextMenuContent>
