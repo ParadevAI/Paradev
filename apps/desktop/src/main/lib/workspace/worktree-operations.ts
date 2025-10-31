@@ -6,6 +6,7 @@ import { shell } from "electron";
 import type {
 	CreateWorktreeInput,
 	SetupResult,
+	Tab,
 	Workspace,
 	Worktree,
 } from "shared/types";
@@ -14,6 +15,7 @@ import configManager from "../config-manager";
 import { executeSetup } from "../setup-executor";
 import worktreeManager from "../worktree-manager";
 import { cleanupEmptyGroupsInAllWorktrees } from "./group-cleanup";
+import { cloneTabsWithNewIds } from "./tab-helpers";
 
 /**
  * Create a new worktree
@@ -43,13 +45,24 @@ export async function createWorktree(
 			};
 		}
 
-		// Create worktree object with empty tabs
+		// Clone tabs from source worktree if specified
+		let tabs: Tab[] = [];
+		if (input.cloneTabsFromWorktreeId) {
+			const sourceWorktree = workspace.worktrees.find(
+				(wt) => wt.id === input.cloneTabsFromWorktreeId,
+			);
+			if (sourceWorktree) {
+				tabs = cloneTabsWithNewIds(sourceWorktree.tabs);
+			}
+		}
+
+		// Create worktree object with cloned or empty tabs
 		const now = new Date().toISOString();
 		const worktree: Worktree = {
 			id: randomUUID(),
 			branch: input.branch,
 			path: worktreeResult.path!,
-			tabs: [],
+			tabs,
 			createdAt: now,
 		};
 
