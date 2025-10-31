@@ -30,11 +30,16 @@ export default {
 		output: `dist/v${version}`,
 	},
 
+	npmRebuild: false,
+	buildDependenciesFromSource: false,
+	nodeGypRebuild: false,
+
 	mac: {
 		artifactName,
 		icon: `${resources}/build/icons/icon.icns`,
 		category: "public.app-category.utilities",
 		target: ["zip", "dmg", "dir"],
+		notarize: false,
 	},
 
 	linux: {
