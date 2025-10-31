@@ -652,9 +652,7 @@ export function WorktreeItem({
 		}
 	};
 
-	const handleOpenSettings = async (e: React.MouseEvent) => {
-		e.stopPropagation(); // Prevent worktree toggle
-
+	const handleOpenSettings = async () => {
 		// First, check if settings folder exists
 		const checkResult = await window.ipcRenderer.invoke(
 			"worktree-check-settings",
@@ -832,14 +830,6 @@ export function WorktreeItem({
 							<span className="truncate flex-1 text-left">
 								{worktree.branch}
 							</span>
-							<button
-								type="button"
-								onClick={handleOpenSettings}
-								className="opacity-0 group-hover:opacity-70 hover:opacity-100 transition-opacity p-0.5 rounded hover:bg-neutral-700"
-								title="Open settings folder in Cursor"
-							>
-								<Settings size={12} />
-							</button>
 						</Button>
 					</ContextMenuTrigger>
 					<ContextMenuContent>
@@ -861,6 +851,10 @@ export function WorktreeItem({
 						<ContextMenuItem onClick={handleOpenInCursor}>
 							<ExternalLink size={14} className="mr-2" />
 							Open in Cursor
+						</ContextMenuItem>
+						<ContextMenuItem onClick={handleOpenSettings}>
+							<Settings size={14} className="mr-2" />
+							Open Settings
 						</ContextMenuItem>
 						<ContextMenuSeparator />
 						<ContextMenuItem
