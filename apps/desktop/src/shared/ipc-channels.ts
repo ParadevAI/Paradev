@@ -81,6 +81,10 @@ export interface IpcChannels {
 		request: string; // workspace ID
 		response: boolean;
 	};
+	"workspace-list-branches": {
+		request: string; // workspace ID
+		response: { branches: string[]; currentBranch: string | null };
+	};
 
 	// Worktree operations
 	"worktree-create": {
@@ -112,6 +116,18 @@ export interface IpcChannels {
 	"worktree-get-path": {
 		request: { workspaceId: string; worktreeId: string };
 		response: string | null;
+	};
+	"worktree-check-settings": {
+		request: { workspaceId: string; worktreeId: string };
+		response: { success: boolean; exists?: boolean; error?: string };
+	};
+	"worktree-open-settings": {
+		request: {
+			workspaceId: string;
+			worktreeId: string;
+			createIfMissing?: boolean;
+		};
+		response: { success: boolean; created?: boolean; error?: string };
 	};
 
 	// Tab operations
@@ -192,6 +208,10 @@ export interface IpcChannels {
 		request: string; // URL
 		response: void;
 	};
+	"open-app-settings": {
+		request: void;
+		response: { success: boolean; error?: string };
+	};
 
 	// Port detection and proxy operations
 	"workspace-set-ports": {
@@ -247,12 +267,16 @@ export function isValidChannel(channel: string): channel is IpcChannelName {
 		"workspace-set-active-selection",
 		"workspace-get-active-workspace-id",
 		"workspace-set-active-workspace-id",
+		"workspace-list-branches",
 		"workspace-update-terminal-cwd",
 		"worktree-create",
 		"worktree-remove",
 		"worktree-can-merge",
 		"worktree-merge",
 		"worktree-get-path",
+		"worktree-check-settings",
+		"worktree-open-settings",
+		"open-app-settings",
 		"tab-create",
 		"tab-delete",
 		"tab-reorder",

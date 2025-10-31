@@ -91,6 +91,7 @@ export interface CreateWorktreeInput {
 	workspaceId: string;
 	branch: string;
 	createBranch?: boolean;
+	sourceBranch?: string; // Optional source branch to create from (defaults to current branch)
 }
 
 export interface CreateTabInput {

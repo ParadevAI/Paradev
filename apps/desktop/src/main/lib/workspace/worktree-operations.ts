@@ -1,5 +1,7 @@
 import { randomUUID } from "node:crypto";
-import { existsSync } from "node:fs";
+import { existsSync, mkdirSync } from "node:fs";
+import path from "node:path";
+import { shell } from "electron";
 
 import type {
 	CreateWorktreeInput,
@@ -32,6 +34,7 @@ export async function createWorktree(
 			workspace.repoPath,
 			input.branch,
 			input.createBranch || false,
+			input.sourceBranch,
 		);
 
 		if (!worktreeResult.success) {
@@ -351,6 +354,74 @@ export async function scanAndImportWorktrees(
 		return { success: true, imported: importedCount };
 	} catch (error) {
 		console.error("Failed to scan and import worktrees:", error);
+		return {
+			success: false,
+			error: error instanceof Error ? error.message : String(error),
+		};
+	}
+}
+
+/**
+ * Check if worktree settings folder exists
+ */
+export function checkWorktreeSettings(
+	workspace: Workspace,
+	worktreeId: string,
+): { success: boolean; exists?: boolean; error?: string } {
+	try {
+		const worktreePath = getWorktreePath(workspace, worktreeId);
+		if (!worktreePath) {
+			return { success: false, error: "Worktree not found" };
+		}
+
+		const settingsPath = path.join(worktreePath, ".superset");
+		const settingsExists = existsSync(settingsPath);
+
+		return { success: true, exists: settingsExists };
+	} catch (error) {
+		console.error("Failed to check worktree settings:", error);
+		return {
+			success: false,
+			error: error instanceof Error ? error.message : String(error),
+		};
+	}
+}
+
+/**
+ * Open worktree settings folder in Cursor
+ * Creates .superset folder if createIfMissing is true
+ */
+export async function openWorktreeSettings(
+	workspace: Workspace,
+	worktreeId: string,
+	createIfMissing = true,
+): Promise<{ success: boolean; created?: boolean; error?: string }> {
+	try {
+		const worktreePath = getWorktreePath(workspace, worktreeId);
+		if (!worktreePath) {
+			return { success: false, error: "Worktree not found" };
+		}
+
+		const settingsPath = path.join(worktreePath, ".superset");
+		const settingsExists = existsSync(settingsPath);
+
+		// Create .superset folder if it doesn't exist and we're allowed to
+		if (!settingsExists) {
+			if (!createIfMissing) {
+				return {
+					success: false,
+					error: "Settings folder does not exist and createIfMissing is false",
+				};
+			}
+			mkdirSync(settingsPath, { recursive: true });
+		}
+
+		// Open in Cursor using cursor://file protocol
+		await shell.openExternal(`cursor://file/${settingsPath}`);
+
+		return { success: true, created: !settingsExists };
+	} catch (error) {
+		console.error("Failed to open worktree settings:", error);
 		return {
 			success: false,
 			error: error instanceof Error ? error.message : String(error),

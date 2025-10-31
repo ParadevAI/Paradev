@@ -1,4 +1,4 @@
-import { BrowserWindow, dialog, ipcMain } from "electron";
+import { BrowserWindow, dialog, ipcMain, shell } from "electron";
 
 import type {
 	CreateTabInput,
@@ -193,6 +193,23 @@ export function registerWorkspaceIPCs() {
 		},
 	);
 
+	// List branches for a workspace
+	ipcMain.handle(
+		"workspace-list-branches",
+		async (_event, workspaceId: string) => {
+			const workspace = await workspaceManager.get(workspaceId);
+			if (!workspace) {
+				return { branches: [], currentBranch: null };
+			}
+
+			const worktreeManager = (await import("./worktree-manager")).default;
+			const branches = worktreeManager.listBranches(workspace.repoPath);
+			const currentBranch = worktreeManager.getCurrentBranch(workspace.repoPath);
+
+			return { branches, currentBranch };
+		},
+	);
+
 	// Reorder tabs within a parent tab or at worktree level
 	ipcMain.handle(
 		"tab-reorder",
@@ -324,4 +341,50 @@ export function registerWorkspaceIPCs() {
 			);
 		},
 	);
+
+	// Check worktree settings folder
+	ipcMain.handle(
+		"worktree-check-settings",
+		async (_event, input: { workspaceId: string; worktreeId: string }) => {
+			return await workspaceManager.checkWorktreeSettings(
+				input.workspaceId,
+				input.worktreeId,
+			);
+		},
+	);
+
+	// Open worktree settings folder
+	ipcMain.handle(
+		"worktree-open-settings",
+		async (
+			_event,
+			input: {
+				workspaceId: string;
+				worktreeId: string;
+				createIfMissing?: boolean;
+			},
+		) => {
+			return await workspaceManager.openWorktreeSettings(
+				input.workspaceId,
+				input.worktreeId,
+				input.createIfMissing,
+			);
+		},
+	);
+
+	// Open app settings in Cursor
+	ipcMain.handle("open-app-settings", async () => {
+		try {
+			const configPath = configManager.getConfigPath();
+			// Open in Cursor using cursor://file protocol
+			await shell.openExternal(`cursor://file/${configPath}`);
+			return { success: true };
+		} catch (error) {
+			console.error("Failed to open app settings:", error);
+			return {
+				success: false,
+				error: error instanceof Error ? error.message : String(error),
+			};
+		}
+	});
 }

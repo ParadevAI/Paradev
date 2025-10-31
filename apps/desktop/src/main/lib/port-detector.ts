@@ -1,6 +1,6 @@
 import { exec } from "node:child_process";
-import { promisify } from "node:util";
 import { EventEmitter } from "node:events";
+import { promisify } from "node:util";
 import type { IPty } from "node-pty";
 
 const execAsync = promisify(exec);
@@ -194,10 +194,7 @@ export class PortDetector extends EventEmitter {
 						.filter((p) => !Number.isNaN(p) && p > 0 && p <= 65535);
 
 					allPorts.push(...ports);
-				} catch (error) {
-					// Skip PIDs that error
-					continue;
-				}
+				} catch (error) {}
 			}
 
 			return [...new Set(allPorts)]; // Deduplicate
@@ -236,10 +233,7 @@ export class PortDetector extends EventEmitter {
 						toProcess.push(childPid);
 					}
 				}
-			} catch (error) {
-				// No children or error, continue
-				continue;
-			}
+			} catch (error) {}
 		}
 
 		return allPids;

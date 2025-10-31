@@ -1,18 +1,18 @@
 import { join } from "node:path";
-import { BrowserWindow, screen, shell, ipcMain } from "electron";
+import { BrowserWindow, ipcMain, screen, shell } from "electron";
 
 import { createWindow } from "lib/electron-app/factories/windows/create";
 import { ENVIRONMENT } from "shared/constants";
 import { displayName } from "~/package.json";
 import { createApplicationMenu } from "../lib/menu";
-import { registerTerminalIPCs } from "../lib/terminal-ipcs";
-import { registerWorkspaceIPCs } from "../lib/workspace-ipcs";
-import { registerPortIpcs } from "../lib/port-ipcs";
 import { portDetector } from "../lib/port-detector";
+import { registerPortIpcs } from "../lib/port-ipcs";
+import { registerTerminalIPCs } from "../lib/terminal-ipcs";
 import {
-	updateDetectedPorts,
 	getActiveWorkspaceId,
+	updateDetectedPorts,
 } from "../lib/workspace/workspace-operations";
+import { registerWorkspaceIPCs } from "../lib/workspace-ipcs";
 import workspaceManager from "../lib/workspace-manager";
 
 export async function MainWindow() {

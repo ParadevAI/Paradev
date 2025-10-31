@@ -21,13 +21,14 @@ import {
 	GitBranch,
 	GitMerge,
 	Plus,
+	Settings,
 	Trash2,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { MosaicNode } from "react-mosaic-component";
 import type { Tab, Worktree } from "shared/types";
-import { TabItem } from "./components/TabItem";
 import { WorktreePortsList } from "../WorktreePortsList";
+import { TabItem } from "./components/TabItem";
 
 // Sortable wrapper for tabs
 function SortableTab({
@@ -651,6 +652,48 @@ export function WorktreeItem({
 		}
 	};
 
+	const handleOpenSettings = async (e: React.MouseEvent) => {
+		e.stopPropagation(); // Prevent worktree toggle
+
+		// First, check if settings folder exists
+		const checkResult = await window.ipcRenderer.invoke(
+			"worktree-check-settings",
+			{
+				workspaceId,
+				worktreeId: worktree.id,
+			},
+		);
+
+		if (!checkResult.success) {
+			alert(`Failed to check settings: ${checkResult.error}`);
+			return;
+		}
+
+		// If folder doesn't exist, ask user if they want to create it
+		if (!checkResult.exists) {
+			const shouldCreate = confirm(
+				`The .superset settings folder does not exist for worktree "${worktree.branch}".\n\nWould you like to create it and open it in Cursor?`,
+			);
+
+			if (!shouldCreate) {
+				return;
+			}
+		}
+
+		// Open (and create if needed)
+		const result = await window.ipcRenderer.invoke("worktree-open-settings", {
+			workspaceId,
+			worktreeId: worktree.id,
+			createIfMissing: true,
+		});
+
+		if (result.success && result.created) {
+			console.log(".superset folder created and opened in Cursor");
+		} else if (!result.success) {
+			alert(`Failed to open settings: ${result.error}`);
+		}
+	};
+
 	const handleAddTab = async () => {
 		// Get the first top-level group tab
 		const _firstGroupTab = worktree.tabs.find((t) => t.type === "group");
@@ -778,7 +821,7 @@ export function WorktreeItem({
 							variant="ghost"
 							size="sm"
 							onClick={() => onToggle(worktree.id)}
-							className="w-full h-8 px-3 pb-1 font-normal"
+							className="group w-full h-8 px-3 pb-1 font-normal relative"
 							style={{ justifyContent: "flex-start" }}
 						>
 							<ChevronRight
@@ -789,6 +832,14 @@ export function WorktreeItem({
 							<span className="truncate flex-1 text-left">
 								{worktree.branch}
 							</span>
+							<button
+								type="button"
+								onClick={handleOpenSettings}
+								className="opacity-0 group-hover:opacity-70 hover:opacity-100 transition-opacity p-0.5 rounded hover:bg-neutral-700"
+								title="Open settings folder in Cursor"
+							>
+								<Settings size={12} />
+							</button>
 						</Button>
 					</ContextMenuTrigger>
 					<ContextMenuContent>

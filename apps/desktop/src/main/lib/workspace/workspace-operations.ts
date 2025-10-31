@@ -7,10 +7,10 @@ import type {
 } from "shared/types";
 
 import configManager from "../config-manager";
-import worktreeManager from "../worktree-manager";
 import { portDetector } from "../port-detector";
 import { proxyManager } from "../proxy-manager";
 import terminalManager from "../terminal";
+import worktreeManager from "../worktree-manager";
 
 /**
  * Get all workspaces
