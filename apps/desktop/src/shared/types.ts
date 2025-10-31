@@ -91,11 +91,8 @@ export interface CreateWorktreeInput {
 	workspaceId: string;
 	branch: string;
 	createBranch?: boolean;
-<<<<<<< HEAD
-	cloneTabsFromWorktreeId?: string // Optional worktree ID to clone tab setup from
-=======
-	sourceBranch?: string // Optional source branch to create from (defaults to current branch)
->>>>>>> main
+	cloneTabsFromWorktreeId?: string; // Optional worktree ID to clone tab setup from
+	sourceBranch?: string; // Optional source branch to create from (defaults to current branch)
 }
 
 export interface CreateTabInput {
