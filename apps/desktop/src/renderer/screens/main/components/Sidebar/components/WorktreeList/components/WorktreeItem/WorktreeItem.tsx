@@ -202,7 +202,7 @@ function DroppableGroupTab({
 					>
 						<ChevronRight
 							size={12}
-							className={`transition-transform ${isExpanded ? "rotate-90" : ""} flex-shrink-0`}
+							className={`transition-transform ${isExpanded ? "rotate-90" : ""} shrink-0`}
 						/>
 						{isEditing ? (
 							<input
@@ -213,7 +213,7 @@ function DroppableGroupTab({
 								onBlur={handleSaveRename}
 								onKeyDown={handleKeyDown}
 								onClick={(e) => e.stopPropagation()}
-								className="flex-1 bg-neutral-700 text-white px-2 py-0.5 rounded text-sm outline-none focus:ring-1 focus:ring-blue-500 min-w-0"
+								className="flex-1 bg-neutral-700 text-white px-2 py-0.5 rounded-sm text-sm outline-none focus:ring-1 focus:ring-blue-500 min-w-0"
 							/>
 						) : (
 							<span className="truncate flex-1 text-left">{tab.name}</span>
