@@ -43,6 +43,7 @@ export function Sidebar({
 	const [branchName, setBranchName] = useState("");
 	const [branches, setBranches] = useState<string[]>([]);
 	const [sourceBranch, setSourceBranch] = useState("");
+	const [cloneTabsFromWorktreeId, setCloneTabsFromWorktreeId] = useState("");
 	const [setupStatus, setSetupStatus] = useState<string | undefined>(undefined);
 	const [setupOutput, setSetupOutput] = useState<string | undefined>(undefined);
 
@@ -148,6 +149,7 @@ export function Sidebar({
 				branch: branchName.trim(),
 				createBranch: true,
 				sourceBranch: sourceBranch,
+				...(cloneTabsFromWorktreeId && { cloneTabsFromWorktreeId }),
 			});
 
 			if (result.success) {
@@ -168,6 +170,7 @@ export function Sidebar({
 
 				setShowWorktreeModal(false);
 				setBranchName("");
+				setCloneTabsFromWorktreeId("");
 				setSetupStatus(undefined);
 				setSetupOutput(undefined);
 				onWorktreeCreated();
@@ -192,6 +195,7 @@ export function Sidebar({
 	const handleCancelWorktree = () => {
 		setShowWorktreeModal(false);
 		setBranchName("");
+		setCloneTabsFromWorktreeId("");
 		setSetupStatus(undefined);
 		setSetupOutput(undefined);
 	};
@@ -328,6 +332,9 @@ export function Sidebar({
 				branches={branches}
 				sourceBranch={sourceBranch}
 				onSourceBranchChange={setSourceBranch}
+				worktrees={currentWorkspace?.worktrees || []}
+				cloneTabsFromWorktreeId={cloneTabsFromWorktreeId}
+				onCloneTabsFromWorktreeIdChange={setCloneTabsFromWorktreeId}
 				setupStatus={setupStatus}
 				setupOutput={setupOutput}
 			/>

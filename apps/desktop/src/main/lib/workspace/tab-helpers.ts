@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import type { MosaicNode, Tab } from "shared/types";
 
 /**
@@ -125,4 +126,61 @@ export function getTabIdsFromMosaicTree(
 		...getTabIdsFromMosaicTree(tree.first),
 		...getTabIdsFromMosaicTree(tree.second),
 	];
+}
+
+/**
+ * Clone tabs with new unique IDs
+ * This is used when cloning tab setup to a new worktree
+ */
+export function cloneTabsWithNewIds(tabs: Tab[]): Tab[] {
+	// Map to track old ID -> new ID mappings
+	const idMap = new Map<string, string>();
+
+	/**
+	 * Recursively clone a single tab and all its children
+	 */
+	function cloneTab(tab: Tab): Tab {
+		const newId = randomUUID();
+		idMap.set(tab.id, newId);
+
+		const clonedTab: Tab = {
+			...tab,
+			id: newId,
+			createdAt: new Date().toISOString(),
+		};
+
+		// Clone child tabs recursively if this is a group
+		if (tab.type === "group" && tab.tabs) {
+			clonedTab.tabs = tab.tabs.map((childTab) => cloneTab(childTab));
+
+			// Update mosaic tree with new IDs
+			if (tab.mosaicTree) {
+				clonedTab.mosaicTree = updateMosaicTreeIds(tab.mosaicTree, idMap);
+			}
+		}
+
+		return clonedTab;
+	}
+
+	/**
+	 * Update all tab IDs in a mosaic tree using the ID map
+	 */
+	function updateMosaicTreeIds(
+		tree: MosaicNode<string>,
+		idMapping: Map<string, string>,
+	): MosaicNode<string> {
+		// If the tree is just a single tab ID
+		if (typeof tree === "string") {
+			return idMapping.get(tree) || tree;
+		}
+
+		// Tree is a parent node with splits
+		return {
+			...tree,
+			first: updateMosaicTreeIds(tree.first, idMapping),
+			second: updateMosaicTreeIds(tree.second, idMapping),
+		};
+	}
+
+	return tabs.map((tab) => cloneTab(tab));
 }
