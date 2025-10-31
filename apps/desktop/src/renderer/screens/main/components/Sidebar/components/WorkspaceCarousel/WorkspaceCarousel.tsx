@@ -140,7 +140,13 @@ export function WorkspaceCarousel({
 				clearTimeout(scrollTimeoutRef.current);
 			}
 		};
-	}, [workspaces, currentWorkspace, onWorkspaceSelect, scrollContainer, isDragging]);
+	}, [
+		workspaces,
+		currentWorkspace,
+		onWorkspaceSelect,
+		scrollContainer,
+		isDragging,
+	]);
 
 	// If only one workspace or no workspaces, disable carousel
 	if (workspaces.length <= 1) {

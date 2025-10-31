@@ -172,6 +172,15 @@ export interface IpcChannels {
 		};
 		response: IpcResponse;
 	};
+	"tab-update-name": {
+		request: {
+			workspaceId: string;
+			worktreeId: string;
+			tabId: string;
+			name: string;
+		};
+		response: IpcResponse;
+	};
 
 	// Terminal operations
 	"terminal-create": {
@@ -282,6 +291,7 @@ export function isValidChannel(channel: string): channel is IpcChannelName {
 		"tab-reorder",
 		"tab-move",
 		"tab-update-mosaic-tree",
+		"tab-update-name",
 		"terminal-create",
 		"terminal-execute-command",
 		"terminal-get-history",

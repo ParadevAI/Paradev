@@ -16,6 +16,7 @@ import {
 import {
 	ChevronRight,
 	Clipboard,
+	Edit2,
 	ExternalLink,
 	FolderOpen,
 	GitBranch,
@@ -24,8 +25,16 @@ import {
 	Settings,
 	Trash2,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { MosaicNode } from "react-mosaic-component";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+} from "renderer/components/ui/dialog";
 import type { Tab, Worktree } from "shared/types";
 import { WorktreePortsList } from "../WorktreePortsList";
 import { TabItem } from "./components/TabItem";
@@ -43,6 +52,7 @@ function SortableTab({
 	onTabRemove,
 	onGroupTabs,
 	onMoveOutOfGroup,
+	onTabRename,
 }: {
 	tab: Tab;
 	worktreeId: string;
@@ -55,6 +65,7 @@ function SortableTab({
 	onTabRemove: (tabId: string) => void;
 	onGroupTabs: (tabIds: string[]) => void;
 	onMoveOutOfGroup: (tabId: string, parentTabId: string) => void;
+	onTabRename: (tabId: string, newName: string) => void;
 }) {
 	const {
 		attributes,
@@ -92,6 +103,7 @@ function SortableTab({
 				onTabRemove={onTabRemove}
 				onGroupTabs={onGroupTabs}
 				onMoveOutOfGroup={onMoveOutOfGroup}
+				onTabRename={onTabRename}
 			/>
 		</div>
 	);
@@ -101,24 +113,32 @@ function SortableTab({
 function DroppableGroupTab({
 	tab,
 	worktreeId,
+	workspaceId,
 	selectedTabId,
 	isExpanded,
 	level,
 	onToggle,
 	onTabSelect,
 	onUngroupTab,
+	onRenameGroup,
 	isOver,
 }: {
 	tab: Tab;
 	worktreeId: string;
+	workspaceId: string;
 	selectedTabId?: string;
 	isExpanded: boolean;
 	level: number;
 	onToggle: (groupTabId: string) => void;
 	onTabSelect: (worktreeId: string, tabId: string, shiftKey: boolean) => void;
 	onUngroupTab: (groupTabId: string) => void;
+	onRenameGroup: (groupTabId: string, newName: string) => void;
 	isOver: boolean;
 }) {
+	const [isEditing, setIsEditing] = useState(false);
+	const [editName, setEditName] = useState(tab.name);
+	const inputRef = useRef<HTMLInputElement>(null);
+
 	const { setNodeRef } = useDroppable({
 		id: `group-${tab.id}`,
 		data: {
@@ -127,7 +147,50 @@ function DroppableGroupTab({
 		},
 	});
 
+	// Focus input when entering edit mode
+	useEffect(() => {
+		if (isEditing && inputRef.current) {
+			inputRef.current.focus();
+			inputRef.current.select();
+		}
+	}, [isEditing]);
+
 	const isSelected = selectedTabId === tab.id;
+
+	const handleClick = (e: React.MouseEvent) => {
+		if (!isEditing) {
+			onTabSelect(worktreeId, tab.id, e.shiftKey);
+			onToggle(tab.id);
+		}
+	};
+
+	const handleStartRename = () => {
+		setEditName(tab.name);
+		setIsEditing(true);
+	};
+
+	const handleSaveRename = () => {
+		const trimmedName = editName.trim();
+		if (trimmedName !== "" && trimmedName !== tab.name) {
+			onRenameGroup(tab.id, trimmedName);
+		}
+		setIsEditing(false);
+	};
+
+	const handleCancelRename = () => {
+		setEditName(tab.name);
+		setIsEditing(false);
+	};
+
+	const handleKeyDown = (e: React.KeyboardEvent) => {
+		if (e.key === "Enter") {
+			e.preventDefault();
+			handleSaveRename();
+		} else if (e.key === "Escape") {
+			e.preventDefault();
+			handleCancelRename();
+		}
+	};
 
 	return (
 		<div ref={setNodeRef}>
@@ -135,27 +198,40 @@ function DroppableGroupTab({
 				<ContextMenuTrigger asChild>
 					<button
 						type="button"
-						onClick={(e) => {
-							onTabSelect(worktreeId, tab.id, e.shiftKey);
-							onToggle(tab.id);
-						}}
-						className={`group flex items-center gap-1 w-full h-8 px-3 text-sm rounded-md [transition:all_0.2s,border_0s] ${
-							isSelected
-								? "bg-neutral-800 border border-neutral-700"
-								: isOver
-									? "bg-blue-900/50 border border-blue-500"
-									: "hover:bg-neutral-800/50"
-						}`}
+						onClick={handleClick}
+						className={`group flex items-center gap-1 w-full h-8 px-3 text-sm rounded-md [transition:all_0.2s,border_0s] ${isSelected
+							? "bg-neutral-800 border border-neutral-700"
+							: isOver
+								? "bg-blue-900/50 border border-blue-500"
+								: "hover:bg-neutral-800/50"
+							}`}
 						style={{ paddingLeft: `${level * 12 + 12}px` }}
 					>
 						<ChevronRight
 							size={12}
-							className={`transition-transform ${isExpanded ? "rotate-90" : ""}`}
+							className={`transition-transform ${isExpanded ? "rotate-90" : ""} shrink-0`}
 						/>
-						<span className="truncate flex-1 text-left">{tab.name}</span>
+						{isEditing ? (
+							<input
+								ref={inputRef}
+								type="text"
+								value={editName}
+								onChange={(e) => setEditName(e.target.value)}
+								onBlur={handleSaveRename}
+								onKeyDown={handleKeyDown}
+								onClick={(e) => e.stopPropagation()}
+								className="flex-1 bg-neutral-700 text-white px-2 py-0.5 rounded-sm text-sm outline-none focus:ring-1 focus:ring-blue-500 min-w-0"
+							/>
+						) : (
+							<span className="truncate flex-1 text-left">{tab.name}</span>
+						)}
 					</button>
 				</ContextMenuTrigger>
 				<ContextMenuContent>
+					<ContextMenuItem onClick={handleStartRename}>
+						<Edit2 size={14} className="mr-2" />
+						Rename
+					</ContextMenuItem>
 					<ContextMenuItem onClick={() => onUngroupTab(tab.id)}>
 						<FolderOpen size={14} className="mr-2" />
 						Ungroup Tabs
@@ -187,9 +263,8 @@ function DroppableGroupArea({
 	return (
 		<div
 			ref={setNodeRef}
-			className={`relative ${
-				isOver ? "bg-blue-900/20 border-l-2 border-blue-500 rounded-r-md" : ""
-			}`}
+			className={`relative ${isOver ? "bg-blue-900/20 border-l-2 border-blue-500 rounded-r-md" : ""
+				}`}
 			style={{
 				minHeight: "40px",
 				transition: "all 0.2s",
@@ -243,6 +318,14 @@ export function WorktreeItem({
 	const [isMergeDisabled, setIsMergeDisabled] = useState(false);
 	const [mergeDisabledReason, setMergeDisabledReason] = useState<string>("");
 	const [targetBranch, setTargetBranch] = useState<string>("");
+
+	// Dialog states
+	const [showRemoveDialog, setShowRemoveDialog] = useState(false);
+	const [showMergeDialog, setShowMergeDialog] = useState(false);
+	const [showErrorDialog, setShowErrorDialog] = useState(false);
+	const [errorMessage, setErrorMessage] = useState("");
+	const [errorTitle, setErrorTitle] = useState("");
+	const [mergeWarning, setMergeWarning] = useState("");
 
 	// Track if this worktree is active
 	const isActive = activeWorktreeId === worktree.id;
@@ -479,6 +562,30 @@ export function WorktreeItem({
 		}
 	};
 
+	// Handle renaming a group tab
+	const handleRenameGroup = async (groupTabId: string, newName: string) => {
+		try {
+			const result = await window.ipcRenderer.invoke("tab-update-name", {
+				workspaceId,
+				worktreeId: worktree.id,
+				tabId: groupTabId,
+				name: newName,
+			});
+
+			if (result.success) {
+				// Optimistically update the local worktree data
+				const updatedTabs = updateTabNameRecursive(worktree.tabs, groupTabId, newName);
+				const updatedWorktree = { ...worktree, tabs: updatedTabs };
+				onUpdateWorktree(updatedWorktree);
+			} else {
+				alert(`Failed to rename group: ${result.error}`);
+			}
+		} catch (error) {
+			console.error("Error renaming group:", error);
+			alert("Failed to rename group");
+		}
+	};
+
 	// Handle moving a tab out of its group
 	const handleMoveOutOfGroup = async (tabId: string, parentTabId: string) => {
 		try {
@@ -581,22 +688,27 @@ export function WorktreeItem({
 		}
 	};
 
-	const handleRemoveWorktree = async () => {
-		if (
-			confirm(
-				`Are you sure you want to remove the worktree "${worktree.branch}"?`,
-			)
-		) {
-			const result = await window.ipcRenderer.invoke("worktree-remove", {
-				workspaceId,
-				worktreeId: worktree.id,
-			});
+	const handleRemoveWorktree = () => {
+		setShowRemoveDialog(true);
+	};
 
-			if (result.success) {
-				onReload();
-			} else {
-				alert(`Failed to remove worktree: ${result.error}`);
-			}
+	const confirmRemoveWorktree = async () => {
+		setShowRemoveDialog(false);
+
+		const result = await window.ipcRenderer.invoke("worktree-remove", {
+			workspaceId,
+			worktreeId: worktree.id,
+		});
+
+		if (result.success) {
+			onReload();
+		} else {
+			setErrorTitle("Failed to Remove Worktree");
+			setErrorMessage(
+				result.error ||
+				"An unknown error occurred while removing the worktree.",
+			);
+			setShowErrorDialog(true);
 		}
 	};
 
@@ -611,33 +723,39 @@ export function WorktreeItem({
 		);
 
 		if (!canMergeResult.canMerge) {
-			alert(`Cannot merge: ${canMergeResult.reason || "Unknown error"}`);
+			setErrorTitle("Cannot Merge");
+			setErrorMessage(canMergeResult.reason || "Unknown error");
+			setShowErrorDialog(true);
 			return;
 		}
 
-		const branchText = targetBranch
-			? ` into "${targetBranch}"`
-			: " into the active worktree";
-
-		// Build confirmation message with warning if there are uncommitted changes
-		let confirmMessage = `Are you sure you want to merge "${worktree.branch}"${branchText}?`;
+		// Build warning message if there are uncommitted changes
+		let warning = "";
 		if (canMergeResult.hasUncommittedChanges) {
 			const targetBranchText = targetBranch ? ` (${targetBranch})` : "";
-			confirmMessage += `\n\nWarning: The target worktree ${targetBranchText}has uncommitted changes. The merge will proceed anyway.`;
+			warning = `Warning: The target worktree${targetBranchText} has uncommitted changes. The merge will proceed anyway.`;
 		}
+		setMergeWarning(warning);
+		setShowMergeDialog(true);
+	};
 
-		if (confirm(confirmMessage)) {
-			const result = await window.ipcRenderer.invoke("worktree-merge", {
-				workspaceId,
-				worktreeId: worktree.id,
-			});
+	const confirmMergeWorktree = async () => {
+		setShowMergeDialog(false);
+		setMergeWarning("");
 
-			if (result.success) {
-				alert("Merge successful!");
-				onReload();
-			} else {
-				alert(`Failed to merge: ${result.error}`);
-			}
+		const result = await window.ipcRenderer.invoke("worktree-merge", {
+			workspaceId,
+			worktreeId: worktree.id,
+		});
+
+		if (result.success) {
+			onReload();
+		} else {
+			setErrorTitle("Failed to Merge");
+			setErrorMessage(
+				result.error || "An unknown error occurred while merging the worktree.",
+			);
+			setShowErrorDialog(true);
 		}
 	};
 
@@ -663,19 +781,13 @@ export function WorktreeItem({
 		);
 
 		if (!checkResult.success) {
-			alert(`Failed to check settings: ${checkResult.error}`);
-			return;
-		}
-
-		// If folder doesn't exist, ask user if they want to create it
-		if (!checkResult.exists) {
-			const shouldCreate = confirm(
-				`The .superset settings folder does not exist for worktree "${worktree.branch}".\n\nWould you like to create it and open it in Cursor?`,
+			setErrorTitle("Failed to Check Settings");
+			setErrorMessage(
+				checkResult.error ||
+				"An unknown error occurred while checking settings.",
 			);
-
-			if (!shouldCreate) {
-				return;
-			}
+			setShowErrorDialog(true);
+			return;
 		}
 
 		// Open (and create if needed)
@@ -688,7 +800,11 @@ export function WorktreeItem({
 		if (result.success && result.created) {
 			console.log(".superset folder created and opened in Cursor");
 		} else if (!result.success) {
-			alert(`Failed to open settings: ${result.error}`);
+			setErrorTitle("Failed to Open Settings");
+			setErrorMessage(
+				result.error || "An unknown error occurred while opening settings.",
+			);
+			setShowErrorDialog(true);
 		}
 	};
 
@@ -738,6 +854,42 @@ export function WorktreeItem({
 		}
 	};
 
+	const handleTabRename = async (tabId: string, newName: string) => {
+		try {
+			const result = await window.ipcRenderer.invoke("tab-update-name", {
+				workspaceId,
+				worktreeId: worktree.id,
+				tabId,
+				name: newName,
+			});
+
+			if (result.success) {
+				// Optimistically update the local worktree data
+				const updatedTabs = updateTabNameRecursive(worktree.tabs, tabId, newName);
+				const updatedWorktree = { ...worktree, tabs: updatedTabs };
+				onUpdateWorktree(updatedWorktree);
+			} else {
+				alert(`Failed to rename tab: ${result.error}`);
+			}
+		} catch (error) {
+			console.error("Error renaming tab:", error);
+			alert("Failed to rename tab");
+		}
+	};
+
+	// Helper to recursively update tab name
+	const updateTabNameRecursive = (tabs: Tab[], tabId: string, newName: string): Tab[] => {
+		return tabs.map(tab => {
+			if (tab.id === tabId) {
+				return { ...tab, name: newName };
+			}
+			if (tab.type === "group" && tab.tabs) {
+				return { ...tab, tabs: updateTabNameRecursive(tab.tabs, tabId, newName) };
+			}
+			return tab;
+		});
+	};
+
 	// Get all tabs for sortable context (including nested)
 	// Defensive: ensure worktree.tabs exists and is an array
 	const tabs = Array.isArray(worktree.tabs) ? worktree.tabs : [];
@@ -767,12 +919,14 @@ export function WorktreeItem({
 					<DroppableGroupTab
 						tab={tab}
 						worktreeId={worktree.id}
+						workspaceId={workspaceId}
 						selectedTabId={selectedTabId}
 						isExpanded={isExpanded}
 						level={level}
 						onToggle={toggleGroupTab}
 						onTabSelect={handleTabSelect}
 						onUngroupTab={handleUngroupTab}
+						onRenameGroup={handleRenameGroup}
 						isOver={false}
 					/>
 
@@ -805,6 +959,7 @@ export function WorktreeItem({
 					onTabRemove={handleTabRemove}
 					onGroupTabs={handleGroupTabs}
 					onMoveOutOfGroup={handleMoveOutOfGroup}
+					onTabRename={handleTabRename}
 				/>
 			</div>
 		);
@@ -812,90 +967,156 @@ export function WorktreeItem({
 
 	return (
 		<div className="space-y-1">
-				{/* Worktree Header */}
-				<ContextMenu>
-					<ContextMenuTrigger asChild>
+			{/* Worktree Header */}
+			<ContextMenu>
+				<ContextMenuTrigger asChild>
+					<Button
+						variant="ghost"
+						size="sm"
+						onClick={() => onToggle(worktree.id)}
+						className="group w-full h-8 px-3 pb-1 font-normal relative"
+						style={{ justifyContent: "flex-start" }}
+					>
+						<ChevronRight
+							size={12}
+							className={`transition-transform ${isExpanded ? "rotate-90" : ""}`}
+						/>
+						<GitBranch size={14} className="opacity-70" />
+						<span className="truncate flex-1 text-left">{worktree.branch}</span>
+					</Button>
+				</ContextMenuTrigger>
+				<ContextMenuContent>
+					<ContextMenuItem
+						onClick={handleMergeWorktree}
+						disabled={isMergeDisabled}
+					>
+						<GitMerge size={14} className="mr-2" />
+						{isMergeDisabled
+							? `Merge Worktree (${mergeDisabledReason})`
+							: targetBranch
+								? `Merge into (${targetBranch})`
+								: "Merge into Active Worktree"}
+					</ContextMenuItem>
+					<ContextMenuItem onClick={handleCopyPath}>
+						<Clipboard size={14} className="mr-2" />
+						Copy Path
+					</ContextMenuItem>
+					<ContextMenuItem onClick={handleOpenInCursor}>
+						<ExternalLink size={14} className="mr-2" />
+						Open in Cursor
+					</ContextMenuItem>
+					<ContextMenuItem onClick={handleOpenSettings}>
+						<Settings size={14} className="mr-2" />
+						Open Settings
+					</ContextMenuItem>
+					<ContextMenuSeparator />
+					<ContextMenuItem onClick={handleRemoveWorktree} variant="destructive">
+						<Trash2 size={14} className="mr-2" />
+						Remove Worktree
+					</ContextMenuItem>
+				</ContextMenuContent>
+			</ContextMenu>
+
+			{/* Ports List - shown inline if port forwarding is configured */}
+			{isExpanded && hasPortForwarding && (
+				<WorktreePortsList worktree={worktree} workspaceId={workspaceId} />
+			)}
+
+			{/* Tabs List */}
+			{isExpanded && (
+				<div className="ml-6 space-y-1">
+					{/* Render tabs with collapsible groups */}
+					<SortableContext
+						items={allTabIds}
+						strategy={verticalListSortingStrategy}
+					>
+						{tabs.map((tab) => renderTab(tab, undefined, 0))}
+					</SortableContext>
+
+					{/* New Tab Button */}
+					<Button
+						variant="ghost"
+						size="sm"
+						onClick={handleAddTab}
+						className="w-full h-8 px-3 font-normal opacity-70 hover:opacity-100"
+						style={{ justifyContent: "flex-start" }}
+					>
+						<Plus size={14} />
+						<span className="truncate">New Tab</span>
+					</Button>
+				</div>
+			)}
+
+			{/* Remove Worktree Confirmation Dialog */}
+			<Dialog open={showRemoveDialog} onOpenChange={setShowRemoveDialog}>
+				<DialogContent>
+					<DialogHeader>
+						<DialogTitle>Remove Worktree</DialogTitle>
+						<DialogDescription>
+							Are you sure you want to remove the worktree "{worktree.branch}"?
+							This action cannot be undone.
+						</DialogDescription>
+					</DialogHeader>
+					<DialogFooter>
+						<Button variant="ghost" onClick={() => setShowRemoveDialog(false)}>
+							Cancel
+						</Button>
+						<Button variant="destructive" onClick={confirmRemoveWorktree}>
+							Remove
+						</Button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
+
+			{/* Merge Worktree Confirmation Dialog */}
+			<Dialog open={showMergeDialog} onOpenChange={setShowMergeDialog}>
+				<DialogContent>
+					<DialogHeader>
+						<DialogTitle>Merge Worktree</DialogTitle>
+						<DialogDescription>
+							Are you sure you want to merge "{worktree.branch}"
+							{targetBranch
+								? ` into "${targetBranch}"`
+								: " into the active worktree"}
+							?
+							{mergeWarning && (
+								<div className="mt-3 p-3 bg-yellow-500/10 border border-yellow-500/30 rounded text-yellow-200 text-sm">
+									{mergeWarning}
+								</div>
+							)}
+						</DialogDescription>
+					</DialogHeader>
+					<DialogFooter>
 						<Button
 							variant="ghost"
-							size="sm"
-							onClick={() => onToggle(worktree.id)}
-							className="group w-full h-8 px-3 pb-1 font-normal relative"
-							style={{ justifyContent: "flex-start" }}
+							onClick={() => {
+								setShowMergeDialog(false);
+								setMergeWarning("");
+							}}
 						>
-							<ChevronRight
-								size={12}
-								className={`transition-transform ${isExpanded ? "rotate-90" : ""}`}
-							/>
-							<GitBranch size={14} className="opacity-70" />
-							<span className="truncate flex-1 text-left">
-								{worktree.branch}
-							</span>
+							Cancel
 						</Button>
-					</ContextMenuTrigger>
-					<ContextMenuContent>
-						<ContextMenuItem
-							onClick={handleMergeWorktree}
-							disabled={isMergeDisabled}
-						>
-							<GitMerge size={14} className="mr-2" />
-							{isMergeDisabled
-								? `Merge Worktree (${mergeDisabledReason})`
-								: targetBranch
-									? `Merge into (${targetBranch})`
-									: "Merge into Active Worktree"}
-						</ContextMenuItem>
-						<ContextMenuItem onClick={handleCopyPath}>
-							<Clipboard size={14} className="mr-2" />
-							Copy Path
-						</ContextMenuItem>
-						<ContextMenuItem onClick={handleOpenInCursor}>
-							<ExternalLink size={14} className="mr-2" />
-							Open in Cursor
-						</ContextMenuItem>
-						<ContextMenuItem onClick={handleOpenSettings}>
-							<Settings size={14} className="mr-2" />
-							Open Settings
-						</ContextMenuItem>
-						<ContextMenuSeparator />
-						<ContextMenuItem
-							onClick={handleRemoveWorktree}
-							variant="destructive"
-						>
-							<Trash2 size={14} className="mr-2" />
-							Remove Worktree
-						</ContextMenuItem>
-					</ContextMenuContent>
-				</ContextMenu>
+						<Button onClick={confirmMergeWorktree}>Merge</Button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
 
-				{/* Ports List - shown inline if port forwarding is configured */}
-				{isExpanded && hasPortForwarding && (
-					<WorktreePortsList worktree={worktree} workspaceId={workspaceId} />
-				)}
-
-				{/* Tabs List */}
-				{isExpanded && (
-					<div className="ml-6 space-y-1">
-						{/* Render tabs with collapsible groups */}
-						<SortableContext
-							items={allTabIds}
-							strategy={verticalListSortingStrategy}
-						>
-							{tabs.map((tab) => renderTab(tab, undefined, 0))}
-						</SortableContext>
-
-						{/* New Tab Button */}
-						<Button
-							variant="ghost"
-							size="sm"
-							onClick={handleAddTab}
-							className="w-full h-8 px-3 font-normal opacity-70 hover:opacity-100"
-							style={{ justifyContent: "flex-start" }}
-						>
-							<Plus size={14} />
-							<span className="truncate">New Tab</span>
-						</Button>
-					</div>
-				)}
-			</div>
+			{/* Error Dialog */}
+			<Dialog open={showErrorDialog} onOpenChange={setShowErrorDialog}>
+				<DialogContent>
+					<DialogHeader>
+						<DialogTitle>{errorTitle}</DialogTitle>
+						<DialogDescription>
+							<div className="mt-2 p-3 bg-red-500/10 border border-red-500/30 rounded text-red-200 text-sm">
+								{errorMessage}
+							</div>
+						</DialogDescription>
+					</DialogHeader>
+					<DialogFooter>
+						<Button onClick={() => setShowErrorDialog(false)}>Close</Button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
+		</div>
 	);
 }

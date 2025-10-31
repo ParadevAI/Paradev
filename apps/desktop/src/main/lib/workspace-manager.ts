@@ -340,6 +340,26 @@ class WorkspaceManager {
 	}
 
 	/**
+	 * Update tab name
+	 */
+	async updateTabName(
+		workspaceId: string,
+		worktreeId: string,
+		tabId: string,
+		name: string,
+	): Promise<{ success: boolean; error?: string }> {
+		const workspace = await this.get(workspaceId);
+		if (!workspace) {
+			return { success: false, error: "Workspace not found" };
+		}
+		return tabOps.updateTabName(workspace, {
+			worktreeId,
+			tabId,
+			name,
+		});
+	}
+
+	/**
 	 * Update terminal CWD
 	 */
 	updateTerminalCwd(

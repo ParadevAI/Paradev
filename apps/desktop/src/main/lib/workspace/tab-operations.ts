@@ -413,3 +413,48 @@ export async function updateTerminalCwd(
 		return false;
 	}
 }
+
+/**
+ * Update tab name
+ */
+export async function updateTabName(
+	workspace: Workspace,
+	input: {
+		worktreeId: string;
+		tabId: string;
+		name: string;
+	},
+): Promise<{ success: boolean; error?: string }> {
+	try {
+		const worktree = workspace.worktrees.find(
+			(wt) => wt.id === input.worktreeId,
+		);
+		if (!worktree) {
+			return { success: false, error: "Worktree not found" };
+		}
+
+		const tab = findTab(worktree.tabs, input.tabId);
+		if (!tab) {
+			return { success: false, error: "Tab not found" };
+		}
+
+		tab.name = input.name;
+		workspace.updatedAt = new Date().toISOString();
+
+		// Save
+		const config = configManager.read();
+		const index = config.workspaces.findIndex((ws) => ws.id === workspace.id);
+		if (index !== -1) {
+			config.workspaces[index] = workspace;
+			configManager.write(config);
+		}
+
+		return { success: true };
+	} catch (error) {
+		console.error("Failed to update tab name:", error);
+		return {
+			success: false,
+			error: error instanceof Error ? error.message : String(error),
+		};
+	}
+}

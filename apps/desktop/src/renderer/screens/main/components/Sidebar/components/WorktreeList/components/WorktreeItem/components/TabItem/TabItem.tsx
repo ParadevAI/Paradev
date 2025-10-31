@@ -5,7 +5,14 @@ import {
 	ContextMenuItem,
 	ContextMenuTrigger,
 } from "@superset/ui/context-menu";
-import { FolderOutput, FolderTree, SquareTerminal, X } from "lucide-react";
+import {
+	Edit2,
+	FolderOutput,
+	FolderTree,
+	SquareTerminal,
+	X,
+} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import type { Tab, Worktree } from "shared/types";
 
 interface TabItemProps {
@@ -20,6 +27,7 @@ interface TabItemProps {
 	onTabRemove?: (tabId: string) => void;
 	onGroupTabs?: (tabIds: string[]) => void;
 	onMoveOutOfGroup?: (tabId: string, parentTabId: string) => void;
+	onTabRename?: (tabId: string, newName: string) => void;
 }
 
 export function TabItem({
@@ -34,14 +42,37 @@ export function TabItem({
 	onTabRemove,
 	onGroupTabs,
 	onMoveOutOfGroup,
+	onTabRename,
 }: TabItemProps) {
+	const [isEditing, setIsEditing] = useState(false);
+	const [editName, setEditName] = useState(tab.name);
+	const inputRef = useRef<HTMLInputElement>(null);
+
+	// Focus input when entering edit mode
+	useEffect(() => {
+		if (isEditing && inputRef.current) {
+			inputRef.current.focus();
+			inputRef.current.select();
+		}
+	}, [isEditing]);
+
 	const handleRemove = (e: React.MouseEvent) => {
 		e.stopPropagation();
 		onTabRemove?.(tab.id);
 	};
 
 	const handleClick = (e: React.MouseEvent) => {
-		onTabSelect(worktreeId, tab.id, e.shiftKey);
+		if (!isEditing) {
+			onTabSelect(worktreeId, tab.id, e.shiftKey);
+		}
+	};
+
+	const handleDoubleClick = (e: React.MouseEvent) => {
+		e.preventDefault();
+		e.stopPropagation();
+		if (!isEditing) {
+			handleRename();
+		}
 	};
 
 	const handleGroupSelected = () => {
@@ -53,6 +84,34 @@ export function TabItem({
 	const handleMoveOut = () => {
 		if (onMoveOutOfGroup && parentTabId) {
 			onMoveOutOfGroup(tab.id, parentTabId);
+		}
+	};
+
+	const handleRename = () => {
+		setEditName(tab.name);
+		setIsEditing(true);
+	};
+
+	const handleSaveRename = () => {
+		const trimmedName = editName.trim();
+		if (trimmedName !== "" && trimmedName !== tab.name) {
+			onTabRename?.(tab.id, trimmedName);
+		}
+		setIsEditing(false);
+	};
+
+	const handleCancelRename = () => {
+		setEditName(tab.name);
+		setIsEditing(false);
+	};
+
+	const handleKeyDown = (e: React.KeyboardEvent) => {
+		if (e.key === "Enter") {
+			e.preventDefault();
+			handleSaveRename();
+		} else if (e.key === "Escape") {
+			e.preventDefault();
+			handleCancelRename();
 		}
 	};
 
@@ -74,22 +133,42 @@ export function TabItem({
 								: ""
 					}`}
 					onClick={handleClick}
+					onDoubleClick={handleDoubleClick}
 				>
-					<div className="flex items-center gap-2 flex-1">
-						<SquareTerminal size={14} />
-						<span className="truncate">{tab.name}</span>
+					<div className="flex items-center gap-2 flex-1 min-w-0">
+						<SquareTerminal size={14} className="shrink-0" />
+						{isEditing ? (
+							<input
+								ref={inputRef}
+								type="text"
+								value={editName}
+								onChange={(e) => setEditName(e.target.value)}
+								onBlur={handleSaveRename}
+								onKeyDown={handleKeyDown}
+								onClick={(e) => e.stopPropagation()}
+								className="flex-1 bg-neutral-700 text-white px-2 py-0.5 rounded-sm text-sm outline-none focus:ring-1 focus:ring-blue-500 min-w-0"
+							/>
+						) : (
+							<span className="truncate">{tab.name}</span>
+						)}
 					</div>
-					<Button
-						variant="ghost"
-						size="icon"
-						onClick={handleRemove}
-						className="h-5 w-5 p-0 opacity-0 group-hover:opacity-70 hover:opacity-100 hover:bg-neutral-700"
-					>
-						<X size={12} />
-					</Button>
+					{!isEditing && (
+						<Button
+							variant="ghost"
+							size="icon"
+							onClick={handleRemove}
+							className="h-5 w-5 p-0 opacity-0 group-hover:opacity-70 hover:opacity-100 hover:bg-neutral-700"
+						>
+							<X size={12} />
+						</Button>
+					)}
 				</button>
 			</ContextMenuTrigger>
 			<ContextMenuContent>
+				<ContextMenuItem onClick={handleRename}>
+					<Edit2 size={14} className="mr-2" />
+					Rename
+				</ContextMenuItem>
 				{isInsideGroup && (
 					<ContextMenuItem onClick={handleMoveOut}>
 						<FolderOutput size={14} className="mr-2" />
