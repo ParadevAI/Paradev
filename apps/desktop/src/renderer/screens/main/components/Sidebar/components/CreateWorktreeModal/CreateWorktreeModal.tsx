@@ -11,6 +11,7 @@ import {
 } from "renderer/components/ui/dialog";
 import { Input } from "renderer/components/ui/input";
 import { Label } from "renderer/components/ui/label";
+import type { Worktree } from "shared/types";
 
 interface CreateWorktreeModalProps {
 	isOpen: boolean;
@@ -22,6 +23,9 @@ interface CreateWorktreeModalProps {
 	branches: string[];
 	sourceBranch: string;
 	onSourceBranchChange: (value: string) => void;
+	worktrees: Worktree[];
+	cloneTabsFromWorktreeId: string;
+	onCloneTabsFromWorktreeIdChange: (value: string) => void;
 	setupStatus?: string;
 	setupOutput?: string;
 }
@@ -36,11 +40,15 @@ export function CreateWorktreeModal({
 	branches,
 	sourceBranch,
 	onSourceBranchChange,
+	worktrees,
+	cloneTabsFromWorktreeId,
+	onCloneTabsFromWorktreeIdChange,
 	setupStatus,
 	setupOutput,
 }: CreateWorktreeModalProps) {
 	const inputId = useId();
 	const sourceBranchId = useId();
+	const cloneTabsId = useId();
 
 	return (
 		<Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -71,6 +79,24 @@ export function CreateWorktreeModal({
 							{branches.map((branch) => (
 								<option key={branch} value={branch}>
 									{branch}
+								</option>
+							))}
+						</select>
+					</div>
+
+					<div className="space-y-2">
+						<Label htmlFor={cloneTabsId}>Clone Tabs From</Label>
+						<select
+							id={cloneTabsId}
+							value={cloneTabsFromWorktreeId}
+							onChange={(e) => onCloneTabsFromWorktreeIdChange(e.target.value)}
+							disabled={isCreating}
+							className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+						>
+							<option value="">Don't clone tabs</option>
+							{worktrees.map((worktree) => (
+								<option key={worktree.id} value={worktree.id}>
+									{worktree.branch} ({worktree.tabs.length} tab{worktree.tabs.length !== 1 ? 's' : ''})
 								</option>
 							))}
 						</select>
