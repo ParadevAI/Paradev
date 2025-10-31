@@ -5,7 +5,13 @@ import {
 	ContextMenuItem,
 	ContextMenuTrigger,
 } from "@superset/ui/context-menu";
-import { FolderOutput, FolderTree, SquareTerminal, X } from "lucide-react";
+import {
+	Edit2,
+	FolderOutput,
+	FolderTree,
+	SquareTerminal,
+	X,
+} from "lucide-react";
 import type { Tab, Worktree } from "shared/types";
 
 interface TabItemProps {
@@ -56,6 +62,32 @@ export function TabItem({
 		}
 	};
 
+	const handleRename = async () => {
+		if (!workspaceId) {
+			console.error("Cannot rename tab: workspaceId is undefined");
+			return;
+		}
+
+		const newName = prompt("Enter new name for the tab:", tab.name);
+		if (newName && newName.trim() !== "" && newName !== tab.name) {
+			try {
+				const result = await window.ipcRenderer.invoke("tab-update-name", {
+					workspaceId,
+					worktreeId,
+					tabId: tab.id,
+					name: newName.trim(),
+				});
+
+				if (!result.success) {
+					alert(`Failed to rename tab: ${result.error}`);
+				}
+			} catch (error) {
+				console.error("Error renaming tab:", error);
+				alert("Failed to rename tab");
+			}
+		}
+	};
+
 	const isSelected = selectedTabId === tab.id;
 	const isMultiSelected = selectedTabIds.has(tab.id);
 	const showMultiSelectHighlight = isMultiSelected && selectedTabIds.size > 1;
@@ -90,6 +122,10 @@ export function TabItem({
 				</button>
 			</ContextMenuTrigger>
 			<ContextMenuContent>
+				<ContextMenuItem onClick={handleRename}>
+					<Edit2 size={14} className="mr-2" />
+					Rename
+				</ContextMenuItem>
 				{isInsideGroup && (
 					<ContextMenuItem onClick={handleMoveOut}>
 						<FolderOutput size={14} className="mr-2" />

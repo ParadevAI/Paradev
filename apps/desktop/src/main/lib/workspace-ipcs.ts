@@ -279,6 +279,27 @@ export function registerWorkspaceIPCs() {
 		},
 	);
 
+	// Update tab name
+	ipcMain.handle(
+		"tab-update-name",
+		async (
+			_event,
+			input: {
+				workspaceId: string;
+				worktreeId: string;
+				tabId: string;
+				name: string;
+			},
+		) => {
+			return await workspaceManager.updateTabName(
+				input.workspaceId,
+				input.worktreeId,
+				input.tabId,
+				input.name,
+			);
+		},
+	);
+
 	// Update terminal CWD in workspace config
 	ipcMain.handle(
 		"workspace-update-terminal-cwd",

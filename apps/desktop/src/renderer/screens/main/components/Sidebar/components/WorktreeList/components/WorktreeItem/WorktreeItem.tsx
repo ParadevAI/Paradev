@@ -16,6 +16,7 @@ import {
 import {
 	ChevronRight,
 	Clipboard,
+	Edit2,
 	ExternalLink,
 	FolderOpen,
 	GitBranch,
@@ -101,22 +102,26 @@ function SortableTab({
 function DroppableGroupTab({
 	tab,
 	worktreeId,
+	workspaceId,
 	selectedTabId,
 	isExpanded,
 	level,
 	onToggle,
 	onTabSelect,
 	onUngroupTab,
+	onRenameGroup,
 	isOver,
 }: {
 	tab: Tab;
 	worktreeId: string;
+	workspaceId: string;
 	selectedTabId?: string;
 	isExpanded: boolean;
 	level: number;
 	onToggle: (groupTabId: string) => void;
 	onTabSelect: (worktreeId: string, tabId: string, shiftKey: boolean) => void;
 	onUngroupTab: (groupTabId: string) => void;
+	onRenameGroup: (groupTabId: string, currentName: string) => void;
 	isOver: boolean;
 }) {
 	const { setNodeRef } = useDroppable({
@@ -156,6 +161,10 @@ function DroppableGroupTab({
 					</button>
 				</ContextMenuTrigger>
 				<ContextMenuContent>
+					<ContextMenuItem onClick={() => onRenameGroup(tab.id, tab.name)}>
+						<Edit2 size={14} className="mr-2" />
+						Rename
+					</ContextMenuItem>
 					<ContextMenuItem onClick={() => onUngroupTab(tab.id)}>
 						<FolderOpen size={14} className="mr-2" />
 						Ungroup Tabs
@@ -479,6 +488,30 @@ export function WorktreeItem({
 		}
 	};
 
+	// Handle renaming a group tab
+	const handleRenameGroup = async (groupTabId: string, currentName: string) => {
+		const newName = prompt("Enter new name for the group:", currentName);
+		if (newName && newName.trim() !== "" && newName !== currentName) {
+			try {
+				const result = await window.ipcRenderer.invoke("tab-update-name", {
+					workspaceId,
+					worktreeId: worktree.id,
+					tabId: groupTabId,
+					name: newName.trim(),
+				});
+
+				if (result.success) {
+					onReload();
+				} else {
+					alert(`Failed to rename group: ${result.error}`);
+				}
+			} catch (error) {
+				console.error("Error renaming group:", error);
+				alert("Failed to rename group");
+			}
+		}
+	};
+
 	// Handle moving a tab out of its group
 	const handleMoveOutOfGroup = async (tabId: string, parentTabId: string) => {
 		try {
@@ -767,12 +800,14 @@ export function WorktreeItem({
 					<DroppableGroupTab
 						tab={tab}
 						worktreeId={worktree.id}
+						workspaceId={workspaceId}
 						selectedTabId={selectedTabId}
 						isExpanded={isExpanded}
 						level={level}
 						onToggle={toggleGroupTab}
 						onTabSelect={handleTabSelect}
 						onUngroupTab={handleUngroupTab}
+						onRenameGroup={handleRenameGroup}
 						isOver={false}
 					/>
 
@@ -812,90 +847,85 @@ export function WorktreeItem({
 
 	return (
 		<div className="space-y-1">
-				{/* Worktree Header */}
-				<ContextMenu>
-					<ContextMenuTrigger asChild>
-						<Button
-							variant="ghost"
-							size="sm"
-							onClick={() => onToggle(worktree.id)}
-							className="group w-full h-8 px-3 pb-1 font-normal relative"
-							style={{ justifyContent: "flex-start" }}
-						>
-							<ChevronRight
-								size={12}
-								className={`transition-transform ${isExpanded ? "rotate-90" : ""}`}
-							/>
-							<GitBranch size={14} className="opacity-70" />
-							<span className="truncate flex-1 text-left">
-								{worktree.branch}
-							</span>
-						</Button>
-					</ContextMenuTrigger>
-					<ContextMenuContent>
-						<ContextMenuItem
-							onClick={handleMergeWorktree}
-							disabled={isMergeDisabled}
-						>
-							<GitMerge size={14} className="mr-2" />
-							{isMergeDisabled
-								? `Merge Worktree (${mergeDisabledReason})`
-								: targetBranch
-									? `Merge into (${targetBranch})`
-									: "Merge into Active Worktree"}
-						</ContextMenuItem>
-						<ContextMenuItem onClick={handleCopyPath}>
-							<Clipboard size={14} className="mr-2" />
-							Copy Path
-						</ContextMenuItem>
-						<ContextMenuItem onClick={handleOpenInCursor}>
-							<ExternalLink size={14} className="mr-2" />
-							Open in Cursor
-						</ContextMenuItem>
-						<ContextMenuItem onClick={handleOpenSettings}>
-							<Settings size={14} className="mr-2" />
-							Open Settings
-						</ContextMenuItem>
-						<ContextMenuSeparator />
-						<ContextMenuItem
-							onClick={handleRemoveWorktree}
-							variant="destructive"
-						>
-							<Trash2 size={14} className="mr-2" />
-							Remove Worktree
-						</ContextMenuItem>
-					</ContextMenuContent>
-				</ContextMenu>
+			{/* Worktree Header */}
+			<ContextMenu>
+				<ContextMenuTrigger asChild>
+					<Button
+						variant="ghost"
+						size="sm"
+						onClick={() => onToggle(worktree.id)}
+						className="group w-full h-8 px-3 pb-1 font-normal relative"
+						style={{ justifyContent: "flex-start" }}
+					>
+						<ChevronRight
+							size={12}
+							className={`transition-transform ${isExpanded ? "rotate-90" : ""}`}
+						/>
+						<GitBranch size={14} className="opacity-70" />
+						<span className="truncate flex-1 text-left">{worktree.branch}</span>
+					</Button>
+				</ContextMenuTrigger>
+				<ContextMenuContent>
+					<ContextMenuItem
+						onClick={handleMergeWorktree}
+						disabled={isMergeDisabled}
+					>
+						<GitMerge size={14} className="mr-2" />
+						{isMergeDisabled
+							? `Merge Worktree (${mergeDisabledReason})`
+							: targetBranch
+								? `Merge into (${targetBranch})`
+								: "Merge into Active Worktree"}
+					</ContextMenuItem>
+					<ContextMenuItem onClick={handleCopyPath}>
+						<Clipboard size={14} className="mr-2" />
+						Copy Path
+					</ContextMenuItem>
+					<ContextMenuItem onClick={handleOpenInCursor}>
+						<ExternalLink size={14} className="mr-2" />
+						Open in Cursor
+					</ContextMenuItem>
+					<ContextMenuItem onClick={handleOpenSettings}>
+						<Settings size={14} className="mr-2" />
+						Open Settings
+					</ContextMenuItem>
+					<ContextMenuSeparator />
+					<ContextMenuItem onClick={handleRemoveWorktree} variant="destructive">
+						<Trash2 size={14} className="mr-2" />
+						Remove Worktree
+					</ContextMenuItem>
+				</ContextMenuContent>
+			</ContextMenu>
 
-				{/* Ports List - shown inline if port forwarding is configured */}
-				{isExpanded && hasPortForwarding && (
-					<WorktreePortsList worktree={worktree} workspaceId={workspaceId} />
-				)}
+			{/* Ports List - shown inline if port forwarding is configured */}
+			{isExpanded && hasPortForwarding && (
+				<WorktreePortsList worktree={worktree} workspaceId={workspaceId} />
+			)}
 
-				{/* Tabs List */}
-				{isExpanded && (
-					<div className="ml-6 space-y-1">
-						{/* Render tabs with collapsible groups */}
-						<SortableContext
-							items={allTabIds}
-							strategy={verticalListSortingStrategy}
-						>
-							{tabs.map((tab) => renderTab(tab, undefined, 0))}
-						</SortableContext>
+			{/* Tabs List */}
+			{isExpanded && (
+				<div className="ml-6 space-y-1">
+					{/* Render tabs with collapsible groups */}
+					<SortableContext
+						items={allTabIds}
+						strategy={verticalListSortingStrategy}
+					>
+						{tabs.map((tab) => renderTab(tab, undefined, 0))}
+					</SortableContext>
 
-						{/* New Tab Button */}
-						<Button
-							variant="ghost"
-							size="sm"
-							onClick={handleAddTab}
-							className="w-full h-8 px-3 font-normal opacity-70 hover:opacity-100"
-							style={{ justifyContent: "flex-start" }}
-						>
-							<Plus size={14} />
-							<span className="truncate">New Tab</span>
-						</Button>
-					</div>
-				)}
-			</div>
+					{/* New Tab Button */}
+					<Button
+						variant="ghost"
+						size="sm"
+						onClick={handleAddTab}
+						className="w-full h-8 px-3 font-normal opacity-70 hover:opacity-100"
+						style={{ justifyContent: "flex-start" }}
+					>
+						<Plus size={14} />
+						<span className="truncate">New Tab</span>
+					</Button>
+				</div>
+			)}
+		</div>
 	);
 }
