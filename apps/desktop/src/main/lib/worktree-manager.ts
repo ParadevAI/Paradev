@@ -204,7 +204,10 @@ class WorktreeManager {
 
 			if (!output) return [];
 
-			return output.split("\n").map(branch => branch.trim()).filter(Boolean);
+			return output
+				.split("\n")
+				.map((branch) => branch.trim())
+				.filter(Boolean);
 		} catch (error) {
 			console.error("Failed to list branches:", error);
 			return [];

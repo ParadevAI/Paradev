@@ -204,7 +204,9 @@ export function registerWorkspaceIPCs() {
 
 			const worktreeManager = (await import("./worktree-manager")).default;
 			const branches = worktreeManager.listBranches(workspace.repoPath);
-			const currentBranch = worktreeManager.getCurrentBranch(workspace.repoPath);
+			const currentBranch = worktreeManager.getCurrentBranch(
+				workspace.repoPath,
+			);
 
 			return { branches, currentBranch };
 		},

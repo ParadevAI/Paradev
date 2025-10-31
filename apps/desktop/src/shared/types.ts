@@ -92,9 +92,9 @@ export interface CreateWorktreeInput {
 	branch: string;
 	createBranch?: boolean;
 <<<<<<< HEAD
-	cloneTabsFromWorktreeId?: string; // Optional worktree ID to clone tab setup from
+	cloneTabsFromWorktreeId?: string // Optional worktree ID to clone tab setup from
 =======
-	sourceBranch?: string; // Optional source branch to create from (defaults to current branch)
+	sourceBranch?: string // Optional source branch to create from (defaults to current branch)
 >>>>>>> main
 }
 
