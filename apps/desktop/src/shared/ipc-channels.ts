@@ -113,6 +113,18 @@ export interface IpcChannels {
 		request: { workspaceId: string; worktreeId: string };
 		response: string | null;
 	};
+	"worktree-check-settings": {
+		request: { workspaceId: string; worktreeId: string };
+		response: { success: boolean; exists?: boolean; error?: string };
+	};
+	"worktree-open-settings": {
+		request: {
+			workspaceId: string;
+			worktreeId: string;
+			createIfMissing?: boolean;
+		};
+		response: { success: boolean; created?: boolean; error?: string };
+	};
 
 	// Tab operations
 	"tab-create": {
@@ -192,6 +204,10 @@ export interface IpcChannels {
 		request: string; // URL
 		response: void;
 	};
+	"open-app-settings": {
+		request: void;
+		response: { success: boolean; error?: string };
+	};
 
 	// Port detection and proxy operations
 	"workspace-set-ports": {
@@ -253,6 +269,9 @@ export function isValidChannel(channel: string): channel is IpcChannelName {
 		"worktree-can-merge",
 		"worktree-merge",
 		"worktree-get-path",
+		"worktree-check-settings",
+		"worktree-open-settings",
+		"open-app-settings",
 		"tab-create",
 		"tab-delete",
 		"tab-reorder",

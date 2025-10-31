@@ -1,12 +1,12 @@
-import { Circle } from "lucide-react";
-import { useEffect, useState } from "react";
-import type { Workspace } from "shared/types";
 import {
 	Tooltip,
 	TooltipContent,
 	TooltipProvider,
 	TooltipTrigger,
 } from "@superset/ui/tooltip";
+import { Circle } from "lucide-react";
+import { useEffect, useState } from "react";
+import type { Workspace } from "shared/types";
 
 interface WorkspacePortIndicatorProps {
 	workspace: Workspace;

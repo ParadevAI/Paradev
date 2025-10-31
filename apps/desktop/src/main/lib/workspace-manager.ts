@@ -8,11 +8,10 @@ import type {
 	Workspace,
 	Worktree,
 } from "shared/types";
-
+import { proxyManager } from "./proxy-manager";
 import * as tabOps from "./workspace/tab-operations";
 import * as workspaceOps from "./workspace/workspace-operations";
 import * as worktreeOps from "./workspace/worktree-operations";
-import { proxyManager } from "./proxy-manager";
 
 /**
  * Main WorkspaceManager class that coordinates all workspace operations
@@ -208,6 +207,40 @@ class WorkspaceManager {
 			return { success: false, error: "Workspace not found" };
 		}
 		return worktreeOps.scanAndImportWorktrees(workspace);
+	}
+
+	/**
+	 * Check if worktree settings folder exists
+	 */
+	checkWorktreeSettings(
+		workspaceId: string,
+		worktreeId: string,
+	): Promise<{ success: boolean; exists?: boolean; error?: string }> {
+		return this.get(workspaceId).then((workspace) => {
+			if (!workspace) {
+				return { success: false, error: "Workspace not found" };
+			}
+			return worktreeOps.checkWorktreeSettings(workspace, worktreeId);
+		});
+	}
+
+	/**
+	 * Open worktree settings folder in Cursor
+	 */
+	async openWorktreeSettings(
+		workspaceId: string,
+		worktreeId: string,
+		createIfMissing = true,
+	): Promise<{ success: boolean; created?: boolean; error?: string }> {
+		const workspace = await this.get(workspaceId);
+		if (!workspace) {
+			return { success: false, error: "Workspace not found" };
+		}
+		return worktreeOps.openWorktreeSettings(
+			workspace,
+			worktreeId,
+			createIfMissing,
+		);
 	}
 
 	// ============================================================================

@@ -1,4 +1,4 @@
-import { BrowserWindow, dialog, ipcMain } from "electron";
+import { BrowserWindow, dialog, ipcMain, shell } from "electron";
 
 import type {
 	CreateTabInput,
@@ -324,4 +324,50 @@ export function registerWorkspaceIPCs() {
 			);
 		},
 	);
+
+	// Check worktree settings folder
+	ipcMain.handle(
+		"worktree-check-settings",
+		async (_event, input: { workspaceId: string; worktreeId: string }) => {
+			return await workspaceManager.checkWorktreeSettings(
+				input.workspaceId,
+				input.worktreeId,
+			);
+		},
+	);
+
+	// Open worktree settings folder
+	ipcMain.handle(
+		"worktree-open-settings",
+		async (
+			_event,
+			input: {
+				workspaceId: string;
+				worktreeId: string;
+				createIfMissing?: boolean;
+			},
+		) => {
+			return await workspaceManager.openWorktreeSettings(
+				input.workspaceId,
+				input.worktreeId,
+				input.createIfMissing,
+			);
+		},
+	);
+
+	// Open app settings in Cursor
+	ipcMain.handle("open-app-settings", async () => {
+		try {
+			const configPath = configManager.getConfigPath();
+			// Open in Cursor using cursor://file protocol
+			await shell.openExternal(`cursor://file/${configPath}`);
+			return { success: true };
+		} catch (error) {
+			console.error("Failed to open app settings:", error);
+			return {
+				success: false,
+				error: error instanceof Error ? error.message : String(error),
+			};
+		}
+	});
 }

@@ -1,7 +1,7 @@
-import httpProxy from "http-proxy";
-import http from "node:http";
-import type { Workspace } from "../../shared/types";
 import { EventEmitter } from "node:events";
+import http from "node:http";
+import httpProxy from "http-proxy";
+import type { Workspace } from "../../shared/types";
 
 interface ProxyInstance {
 	canonical: number;

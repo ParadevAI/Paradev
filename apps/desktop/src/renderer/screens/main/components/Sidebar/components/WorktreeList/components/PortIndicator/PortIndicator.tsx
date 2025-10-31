@@ -1,12 +1,12 @@
-import { Circle } from "lucide-react";
-import { useEffect, useState } from "react";
-import type { Worktree } from "shared/types";
 import {
 	Tooltip,
 	TooltipContent,
 	TooltipProvider,
 	TooltipTrigger,
 } from "@superset/ui/tooltip";
+import { Circle } from "lucide-react";
+import { useEffect, useState } from "react";
+import type { Worktree } from "shared/types";
 
 interface PortIndicatorProps {
 	worktree: Worktree;
