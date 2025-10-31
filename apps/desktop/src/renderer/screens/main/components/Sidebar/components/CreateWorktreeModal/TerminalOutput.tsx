@@ -1,5 +1,5 @@
-import { Terminal } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
+import { Terminal } from "@xterm/xterm";
 import "@xterm/xterm/css/xterm.css";
 import { useEffect, useRef } from "react";
 
@@ -28,7 +28,8 @@ export function TerminalOutput({ output, className }: TerminalOutputProps) {
 					foreground: "#d4d4d4", // neutral-300
 				},
 				fontSize: 12,
-				fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace',
+				fontFamily:
+					'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace',
 			});
 
 			const fitAddon = new FitAddon();
