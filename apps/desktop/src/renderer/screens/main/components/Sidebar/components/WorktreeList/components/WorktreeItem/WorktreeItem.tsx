@@ -1,20 +1,6 @@
+import { useDroppable } from "@dnd-kit/core";
 import {
-	closestCenter,
-	DndContext,
-	type DragEndEvent,
-	type DragOverEvent,
-	DragOverlay,
-	type DragStartEvent,
-	KeyboardSensor,
-	PointerSensor,
-	useDroppable,
-	useSensor,
-	useSensors,
-} from "@dnd-kit/core";
-import {
-	arrayMove,
 	SortableContext,
-	sortableKeyboardCoordinates,
 	useSortable,
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
@@ -81,6 +67,7 @@ function SortableTab({
 		data: {
 			type: "tab",
 			parentTabId,
+			worktreeId,
 		},
 	});
 
@@ -242,10 +229,6 @@ export function WorktreeItem({
 	selectedTabId,
 	hasPortForwarding = false,
 }: WorktreeItemProps) {
-	// Track active drag state
-	const [activeId, setActiveId] = useState<string | null>(null);
-	const [_overId, setOverId] = useState<string | null>(null);
-
 	// Track expanded group tabs
 	const [expandedGroupTabs, setExpandedGroupTabs] = useState<Set<string>>(
 		new Set(),
@@ -309,6 +292,41 @@ export function WorktreeItem({
 			}
 		}
 		return null;
+	};
+
+	// Helper: Remove tab ID from mosaic tree
+	const removeTabFromMosaicTree = (
+		tree: MosaicNode<string>,
+		tabId: string,
+	): MosaicNode<string> | null => {
+		if (typeof tree === "string") {
+			// If this is the tab to remove, return null
+			return tree === tabId ? null : tree;
+		}
+
+		// Recursively remove from branches
+		const newFirst = removeTabFromMosaicTree(tree.first, tabId);
+		const newSecond = removeTabFromMosaicTree(tree.second, tabId);
+
+		// If both branches are gone, return null
+		if (!newFirst && !newSecond) {
+			return null;
+		}
+
+		// If one branch is gone, return the other
+		if (!newFirst) {
+			return newSecond;
+		}
+		if (!newSecond) {
+			return newFirst;
+		}
+
+		// Both branches exist, return the updated tree
+		return {
+			...tree,
+			first: newFirst,
+			second: newSecond,
+		};
 	};
 
 	// Helper: recursively get all tabs as flat array with their parent IDs
@@ -551,308 +569,6 @@ export function WorktreeItem({
 		checkMergeStatus();
 	}, [workspaceId, worktree.id, activeWorktreeId]);
 
-	// Configure sensors for drag-and-drop
-	const sensors = useSensors(
-		useSensor(PointerSensor, {
-			activationConstraint: {
-				distance: 8,
-			},
-		}),
-		useSensor(KeyboardSensor, {
-			coordinateGetter: sortableKeyboardCoordinates,
-		}),
-	);
-
-	const handleDragStart = (event: DragStartEvent) => {
-		setActiveId(event.active.id as string);
-	};
-
-	const handleDragOver = (event: DragOverEvent) => {
-		setOverId(event.over?.id as string | null);
-	};
-
-	// Helper: Add tab ID to mosaic tree
-	const addTabToMosaicTree = (
-		tree: MosaicNode<string> | null | undefined,
-		tabId: string,
-	): MosaicNode<string> => {
-		if (!tree) {
-			return tabId;
-		}
-
-		if (typeof tree === "string") {
-			// Single tab - create a split
-			return {
-				direction: "row",
-				first: tree,
-				second: tabId,
-				splitPercentage: 50,
-			};
-		}
-
-		// Tree node - add to the second branch
-		return {
-			...tree,
-			second: addTabToMosaicTree(tree.second, tabId),
-		};
-	};
-
-	// Helper: Remove tab ID from mosaic tree
-	const removeTabFromMosaicTree = (
-		tree: MosaicNode<string>,
-		tabId: string,
-	): MosaicNode<string> | null => {
-		if (typeof tree === "string") {
-			// If this is the tab to remove, return null
-			return tree === tabId ? null : tree;
-		}
-
-		// Recursively remove from branches
-		const newFirst = removeTabFromMosaicTree(tree.first, tabId);
-		const newSecond = removeTabFromMosaicTree(tree.second, tabId);
-
-		// If both branches are gone, return null
-		if (!newFirst && !newSecond) {
-			return null;
-		}
-
-		// If one branch is gone, return the other
-		if (!newFirst) {
-			return newSecond;
-		}
-		if (!newSecond) {
-			return newFirst;
-		}
-
-		// Both branches exist, return the updated tree
-		return {
-			...tree,
-			first: newFirst,
-			second: newSecond,
-		};
-	};
-
-	const handleDragEnd = async (event: DragEndEvent) => {
-		const { active, over } = event;
-		setActiveId(null);
-		setOverId(null);
-
-		if (!over || active.id === over.id) {
-			return;
-		}
-
-		const activeData = active.data.current;
-		const overData = over.data.current;
-
-		// Only handle tab dragging
-		if (activeData?.type !== "tab") {
-			return;
-		}
-
-		try {
-			const activeParentTabId = activeData.parentTabId;
-			const overParentTabId = overData?.parentTabId;
-
-			// Dropping onto a group tab or group area
-			if (overData?.type === "group" || overData?.type === "group-area") {
-				const draggedTabId = active.id as string;
-				const groupTabId = overData.groupTabId as string;
-
-				// Don't allow dropping a tab onto its own parent
-				if (activeParentTabId === groupTabId) {
-					return;
-				}
-
-				// Get the dragged tab and group tab
-				const draggedTab = findTabById(tabs, draggedTabId);
-				const groupTab = findTabById(tabs, groupTabId);
-
-				if (!draggedTab || !groupTab || groupTab.type !== "group") {
-					console.error("Invalid tab or group tab");
-					return;
-				}
-
-				// Move the tab into the group
-				const moveResult = await window.ipcRenderer.invoke("tab-move", {
-					workspaceId,
-					worktreeId: worktree.id,
-					tabId: draggedTabId,
-					sourceParentTabId: activeParentTabId,
-					targetParentTabId: groupTabId,
-					targetIndex: groupTab.tabs?.length || 0,
-				});
-
-				if (!moveResult.success) {
-					console.error("Failed to move tab:", moveResult.error);
-					onReload();
-					return;
-				}
-
-				// Update the mosaic tree to include the new tab
-				const updatedMosaicTree = addTabToMosaicTree(
-					groupTab.mosaicTree,
-					draggedTabId,
-				);
-
-				const treeResult = await window.ipcRenderer.invoke(
-					"tab-update-mosaic-tree",
-					{
-						workspaceId,
-						worktreeId: worktree.id,
-						tabId: groupTabId,
-						mosaicTree: updatedMosaicTree,
-					},
-				);
-
-				if (!treeResult.success) {
-					console.error("Failed to update mosaic tree:", treeResult.error);
-				}
-
-				// Reload to show the updated structure
-				onReload();
-
-				// Expand the group tab to show the newly added tab
-				setExpandedGroupTabs((prev) => new Set(prev).add(groupTabId));
-
-				// Select the group tab to show the mosaic layout
-				onTabSelect(worktree.id, groupTabId);
-
-				return;
-			}
-
-			// Reordering within the same parent group
-			if (overData?.type === "tab" && activeParentTabId === overParentTabId) {
-				const parentTab = activeParentTabId
-					? findTabById(tabs, activeParentTabId)
-					: null;
-
-				// If no parent, we're reordering top-level tabs
-				const tabsArray = parentTab?.tabs || tabs;
-
-				const oldIndex = tabsArray.findIndex((t) => t.id === active.id);
-				const newIndex = tabsArray.findIndex((t) => t.id === over.id);
-
-				if (oldIndex === -1 || newIndex === -1) return;
-
-				// Optimistic update
-				const reorderedTabs = arrayMove(tabsArray, oldIndex, newIndex);
-
-				// Update worktree state
-				let updatedWorktree: Worktree;
-				if (parentTab) {
-					// Update nested tabs
-					const updateTabsRecursive = (tabs: Tab[]): Tab[] => {
-						return tabs.map((tab) => {
-							if (tab.id === parentTab.id) {
-								return { ...tab, tabs: reorderedTabs };
-							}
-							if (tab.type === "group" && tab.tabs) {
-								return { ...tab, tabs: updateTabsRecursive(tab.tabs) };
-							}
-							return tab;
-						});
-					};
-					updatedWorktree = {
-						...worktree,
-						tabs: updateTabsRecursive(worktree.tabs),
-					};
-				} else {
-					// Update top-level tabs
-					updatedWorktree = { ...worktree, tabs: reorderedTabs };
-				}
-
-				onUpdateWorktree(updatedWorktree);
-
-				// Save to backend
-				const newOrder = reorderedTabs.map((t) => t.id);
-				const result = await window.ipcRenderer.invoke("tab-reorder", {
-					workspaceId,
-					worktreeId: worktree.id,
-					parentTabId: activeParentTabId,
-					tabIds: newOrder,
-				});
-
-				if (!result.success) {
-					console.error("Failed to reorder tabs:", result.error);
-					onReload();
-				}
-			}
-			// Moving to a different parent group (dragging into a group by hovering over its child tabs)
-			else if (
-				overData?.type === "tab" &&
-				activeParentTabId !== overParentTabId
-			) {
-				const draggedTabId = active.id as string;
-				const targetParentTabId = overParentTabId;
-
-				// If dropping onto a child of a group, move into that group
-				if (targetParentTabId) {
-					const draggedTab = findTabById(tabs, draggedTabId);
-					const targetGroupTab = findTabById(tabs, targetParentTabId);
-
-					if (
-						!draggedTab ||
-						!targetGroupTab ||
-						targetGroupTab.type !== "group"
-					) {
-						console.error("Invalid tab or target group");
-						return;
-					}
-
-					// Move the tab into the group
-					const moveResult = await window.ipcRenderer.invoke("tab-move", {
-						workspaceId,
-						worktreeId: worktree.id,
-						tabId: draggedTabId,
-						sourceParentTabId: activeParentTabId,
-						targetParentTabId: targetParentTabId,
-						targetIndex: targetGroupTab.tabs?.length || 0,
-					});
-
-					if (!moveResult.success) {
-						console.error("Failed to move tab:", moveResult.error);
-						onReload();
-						return;
-					}
-
-					// Update the mosaic tree to include the new tab
-					const updatedMosaicTree = addTabToMosaicTree(
-						targetGroupTab.mosaicTree,
-						draggedTabId,
-					);
-
-					const treeResult = await window.ipcRenderer.invoke(
-						"tab-update-mosaic-tree",
-						{
-							workspaceId,
-							worktreeId: worktree.id,
-							tabId: targetParentTabId,
-							mosaicTree: updatedMosaicTree,
-						},
-					);
-
-					if (!treeResult.success) {
-						console.error("Failed to update mosaic tree:", treeResult.error);
-					}
-
-					// Reload to show the updated structure
-					onReload();
-
-					// Expand the group tab to show the newly added tab
-					setExpandedGroupTabs((prev) => new Set(prev).add(targetParentTabId));
-
-					// Select the group tab to show the mosaic layout
-					onTabSelect(worktree.id, targetParentTabId);
-				}
-			}
-		} catch (error) {
-			console.error("Error during drag end:", error);
-		}
-	};
-
-	// Get active item for drag overlay
-	const activeItem = activeId ? findTabById(worktree.tabs, activeId) : null;
-
 	// Context menu handlers
 	const handleCopyPath = async () => {
 		const path = await window.ipcRenderer.invoke("worktree-get-path", {
@@ -1004,8 +720,6 @@ export function WorktreeItem({
 	const renderTab = (tab: Tab, parentTabId?: string, level = 0) => {
 		if (tab.type === "group") {
 			const isExpanded = expandedGroupTabs.has(tab.id);
-			const isOver = _overId === `group-${tab.id}`;
-			const isAreaOver = _overId === `group-area-${tab.id}`;
 			return (
 				<div key={tab.id} className="space-y-1">
 					{/* Group Tab Header */}
@@ -1018,12 +732,12 @@ export function WorktreeItem({
 						onToggle={toggleGroupTab}
 						onTabSelect={handleTabSelect}
 						onUngroupTab={handleUngroupTab}
-						isOver={isOver}
+						isOver={false}
 					/>
 
 					{/* Nested Tabs - Make the entire area droppable */}
 					{isExpanded && tab.tabs && (
-						<DroppableGroupArea groupTabId={tab.id} isOver={isAreaOver}>
+						<DroppableGroupArea groupTabId={tab.id} isOver={false}>
 							<div className="space-y-1">
 								{tab.tabs.map((childTab) =>
 									renderTab(childTab, tab.id, level + 1),
@@ -1056,14 +770,7 @@ export function WorktreeItem({
 	};
 
 	return (
-		<DndContext
-			sensors={sensors}
-			collisionDetection={closestCenter}
-			onDragStart={handleDragStart}
-			onDragOver={handleDragOver}
-			onDragEnd={handleDragEnd}
-		>
-			<div className="space-y-1">
+		<div className="space-y-1">
 				{/* Worktree Header */}
 				<ContextMenu>
 					<ContextMenuTrigger asChild>
@@ -1145,15 +852,5 @@ export function WorktreeItem({
 					</div>
 				)}
 			</div>
-
-			{/* Drag Overlay - follows the cursor */}
-			<DragOverlay>
-				{activeItem ? (
-					<div className="bg-neutral-800 border border-neutral-700 rounded px-3 py-2 text-sm opacity-90 cursor-grabbing">
-						{activeItem.name}
-					</div>
-				) : null}
-			</DragOverlay>
-		</DndContext>
 	);
 }
