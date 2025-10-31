@@ -38,18 +38,23 @@ export default function TabGroup({
 				if (groupTab.tabs.length === 1) {
 					return groupTab.tabs[0].id;
 				}
-				// Create a simple row split for 2+ tabs
+				if (groupTab.tabs.length === 2) {
+					// Simple row split for 2 tabs
+					return {
+						direction: "row",
+						first: groupTab.tabs[0].id,
+						second: groupTab.tabs[1].id,
+					};
+				}
+				// For 3+ tabs, create nested layout
 				return {
 					direction: "row",
 					first: groupTab.tabs[0].id,
-					second:
-						groupTab.tabs.length === 2
-							? groupTab.tabs[1].id
-							: {
-									direction: "column",
-									first: groupTab.tabs[1].id,
-									second: groupTab.tabs[2]?.id || groupTab.tabs[1].id,
-								},
+					second: {
+						direction: "column",
+						first: groupTab.tabs[1].id,
+						second: groupTab.tabs[2].id,
+					},
 				};
 			}
 
@@ -65,38 +70,50 @@ export default function TabGroup({
 			// Reconstruct tree if it was cleared but tabs exist
 			if (groupTab.tabs.length === 1) {
 				setMosaicTree(groupTab.tabs[0].id);
-			} else {
+			} else if (groupTab.tabs.length === 2) {
+				// Simple row split for 2 tabs
 				setMosaicTree({
 					direction: "row",
 					first: groupTab.tabs[0].id,
-					second:
-						groupTab.tabs.length === 2
-							? groupTab.tabs[1].id
-							: {
-									direction: "column",
-									first: groupTab.tabs[1].id,
-									second: groupTab.tabs[2]?.id || groupTab.tabs[1].id,
-								},
+					second: groupTab.tabs[1].id,
+				});
+			} else {
+				// For 3+ tabs, create nested layout
+				setMosaicTree({
+					direction: "row",
+					first: groupTab.tabs[0].id,
+					second: {
+						direction: "column",
+						first: groupTab.tabs[1].id,
+						second: groupTab.tabs[2].id,
+					},
 				});
 			}
 		}
 	}, [groupTab.mosaicTree, groupTab.tabs]);
 
 	// Helper function to get all tab IDs from a mosaic tree
-	const getTabIdsFromTree = (tree: MosaicNode<string> | null): Set<string> => {
-		const ids = new Set<string>();
-		if (!tree) return ids;
+	const getTabIdsFromTree = useCallback(
+		(tree: MosaicNode<string> | null): Set<string> => {
+			const ids = new Set<string>();
+			if (!tree) return ids;
 
-		if (typeof tree === "string") {
-			ids.add(tree);
-		} else {
-			const firstIds = getTabIdsFromTree(tree.first);
-			const secondIds = getTabIdsFromTree(tree.second);
-			firstIds.forEach((id) => ids.add(id));
-			secondIds.forEach((id) => ids.add(id));
-		}
-		return ids;
-	};
+			if (typeof tree === "string") {
+				ids.add(tree);
+			} else {
+				const firstIds = getTabIdsFromTree(tree.first);
+				const secondIds = getTabIdsFromTree(tree.second);
+				firstIds.forEach((id) => {
+					ids.add(id);
+				});
+				secondIds.forEach((id) => {
+					ids.add(id);
+				});
+			}
+			return ids;
+		},
+		[],
+	);
 
 	// Save mosaic tree changes to backend
 	const handleMosaicChange = useCallback(
@@ -134,7 +151,7 @@ export default function TabGroup({
 				console.error("Failed to save mosaic tree:", error);
 			}
 		},
-		[workspaceId, worktreeId, groupTab.id, mosaicTree],
+		[workspaceId, worktreeId, groupTab.id, mosaicTree, getTabIdsFromTree],
 	);
 
 	// Create a map of tab IDs to Tab objects for easy lookup

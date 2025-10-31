@@ -776,6 +776,7 @@ export function MainScreen() {
 						onUpdateWorktree={handleUpdateWorktree}
 						selectedTabId={selectedTabId ?? undefined}
 						onCollapse={() => setIsSidebarOpen(false)}
+						isDragging={!!activeId}
 					/>
 				)}
 

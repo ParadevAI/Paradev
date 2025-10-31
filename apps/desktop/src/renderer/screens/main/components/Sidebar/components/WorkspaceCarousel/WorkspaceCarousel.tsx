@@ -14,6 +14,7 @@ interface WorkspaceCarouselProps {
 	onWorkspaceSelect: (workspaceId: string) => void;
 	children: (workspace: Workspace | null, isActive: boolean) => ReactNode;
 	onScrollProgress: (progress: MotionValue<number>) => void;
+	isDragging?: boolean;
 }
 
 export function WorkspaceCarousel({
@@ -22,6 +23,7 @@ export function WorkspaceCarousel({
 	onWorkspaceSelect,
 	children,
 	onScrollProgress,
+	isDragging = false,
 }: WorkspaceCarouselProps) {
 	const scrollTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 	const isInitialMount = useRef(true);
@@ -102,7 +104,7 @@ export function WorkspaceCarousel({
 
 	// Detect when user finishes scrolling and update current workspace
 	useEffect(() => {
-		if (!scrollContainer) return;
+		if (!scrollContainer || isDragging) return;
 
 		const handleScroll = () => {
 			// Clear existing timeout
@@ -138,7 +140,7 @@ export function WorkspaceCarousel({
 				clearTimeout(scrollTimeoutRef.current);
 			}
 		};
-	}, [workspaces, currentWorkspace, onWorkspaceSelect, scrollContainer]);
+	}, [workspaces, currentWorkspace, onWorkspaceSelect, scrollContainer, isDragging]);
 
 	// If only one workspace or no workspaces, disable carousel
 	if (workspaces.length <= 1) {
@@ -154,10 +156,11 @@ export function WorkspaceCarousel({
 			ref={scrollContainerRef}
 			className="flex-1 overflow-x-scroll overflow-y-hidden hide-scrollbar"
 			style={{
-				scrollSnapType: "x mandatory",
+				scrollSnapType: isDragging ? "none" : "x mandatory",
 				WebkitOverflowScrolling: "touch",
 				scrollbarWidth: "none",
 				msOverflowStyle: "none",
+				pointerEvents: isDragging ? "none" : "auto",
 			}}
 		>
 			<div

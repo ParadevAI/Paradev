@@ -20,6 +20,7 @@ interface SidebarProps {
 	onWorkspaceSelect: (workspaceId: string) => void;
 	onUpdateWorktree: (worktreeId: string, updatedWorktree: Worktree) => void;
 	selectedTabId: string | undefined;
+	isDragging?: boolean;
 }
 
 export function Sidebar({
@@ -31,6 +32,7 @@ export function Sidebar({
 	onWorkspaceSelect,
 	onUpdateWorktree,
 	selectedTabId,
+	isDragging = false,
 }: SidebarProps) {
 	const [expandedWorktrees, setExpandedWorktrees] = useState<Set<string>>(
 		new Set(),
@@ -274,6 +276,7 @@ export function Sidebar({
 				currentWorkspace={currentWorkspace}
 				onWorkspaceSelect={onWorkspaceSelect}
 				onScrollProgress={setScrollProgress}
+				isDragging={isDragging}
 			>
 				{(workspace, isActive) => (
 					<>
