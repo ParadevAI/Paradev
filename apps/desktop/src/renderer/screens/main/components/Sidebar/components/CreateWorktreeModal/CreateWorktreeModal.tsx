@@ -11,6 +11,7 @@ import {
 } from "renderer/components/ui/dialog";
 import { Input } from "renderer/components/ui/input";
 import { Label } from "renderer/components/ui/label";
+import { TerminalOutput } from "./TerminalOutput";
 
 interface CreateWorktreeModalProps {
 	isOpen: boolean;
@@ -99,10 +100,11 @@ export function CreateWorktreeModal({
 							</div>
 
 							{setupOutput && (
-								<div className="flex-1 bg-neutral-900 rounded border border-neutral-700 p-3 overflow-y-auto">
-									<pre className="text-xs text-neutral-300 whitespace-pre-wrap font-mono">
-										{setupOutput}
-									</pre>
+								<div className="flex-1 bg-neutral-900 rounded border border-neutral-700 overflow-hidden">
+									<TerminalOutput
+										output={setupOutput}
+										className="w-full h-full"
+									/>
 								</div>
 							)}
 						</div>
