@@ -12,6 +12,11 @@ import {
 	useSensors,
 } from "@dnd-kit/core";
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
+import {
+	ResizableHandle,
+	ResizablePanel,
+	ResizablePanelGroup,
+} from "@superset/ui/resizable";
 import { useEffect, useState } from "react";
 import type { MosaicNode, Tab, Workspace } from "shared/types";
 import { AppFrame } from "./components/AppFrame";
@@ -763,85 +768,96 @@ export function MainScreen() {
 
 				{/* App Frame - continuous border + sidebar + topbar */}
 				<AppFrame>
-					{isSidebarOpen && workspaces && (
-						<Sidebar
-							workspaces={workspaces}
-							currentWorkspace={currentWorkspace}
-							onTabSelect={handleTabSelect}
-							onWorktreeCreated={handleWorktreeCreated}
-							onWorkspaceSelect={handleWorkspaceSelect}
-							onUpdateWorktree={handleUpdateWorktree}
-							selectedTabId={selectedTabId ?? undefined}
-							onCollapse={() => setIsSidebarOpen(false)}
-							isDragging={!!activeId}
-						/>
-					)}
-
-					{/* Main Content Area */}
-					<div className="flex-1 flex flex-col overflow-hidden">
-						{/* Top Bar */}
-						{/* <TopBar
-						isSidebarOpen={isSidebarOpen}
-						onOpenSidebar={() => setIsSidebarOpen(true)}
-						workspaceName={currentWorkspace?.name}
-						currentBranch={currentWorkspace?.branch}
-					/> */}
-
-						{/* Content Area */}
-						<DroppableMainContent isOver={isOverMainContent}>
-							{loading ||
-							error ||
-							!currentWorkspace ||
-							!selectedTab ||
-							!selectedWorktree ? (
-								<PlaceholderState
-									loading={loading}
-									error={error}
-									hasWorkspace={!!currentWorkspace}
-								/>
-							) : parentGroupTab ? (
-								// Selected tab is a sub-tab of a group → display the parent group's mosaic
-								<TabGroup
-									groupTab={parentGroupTab}
-									workingDirectory={
-										selectedWorktree.path || currentWorkspace.repoPath
-									}
-									workspaceId={currentWorkspace.id}
-									worktreeId={selectedWorktreeId ?? undefined}
+					<ResizablePanelGroup direction="horizontal" autoSaveId="main-layout">
+						<ResizablePanel
+							defaultSize={20}
+							minSize={15}
+							maxSize={40}
+							collapsible={true}
+						>
+							{isSidebarOpen && workspaces && (
+								<Sidebar
+									workspaces={workspaces}
+									currentWorkspace={currentWorkspace}
+									onTabSelect={handleTabSelect}
+									onWorktreeCreated={handleWorktreeCreated}
+									onWorkspaceSelect={handleWorkspaceSelect}
+									onUpdateWorktree={handleUpdateWorktree}
 									selectedTabId={selectedTabId ?? undefined}
-									onTabFocus={handleTabFocus}
+									onCollapse={() => setIsSidebarOpen(false)}
+									isDragging={!!activeId}
 								/>
-							) : selectedTab.type === "group" ? (
-								// Selected tab is a group tab → display its mosaic layout
-								<TabGroup
-									groupTab={selectedTab}
-									workingDirectory={
-										selectedWorktree.path || currentWorkspace.repoPath
-									}
-									workspaceId={currentWorkspace.id}
-									worktreeId={selectedWorktreeId ?? undefined}
-									selectedTabId={selectedTabId ?? undefined}
-									onTabFocus={handleTabFocus}
-								/>
-							) : (
-								// Base level tab (not inside a group) → display full width/height
-								<div className="w-full h-full">
-									<TabContent
-										tab={selectedTab}
-										workingDirectory={
-											selectedWorktree.path || currentWorkspace.repoPath
-										}
-										workspaceId={currentWorkspace.id}
-										worktreeId={selectedWorktreeId ?? undefined}
-										worktree={selectedWorktree}
-										groupTabId="" // No parent group
-										selectedTabId={selectedTabId ?? undefined}
-										onTabFocus={handleTabFocus}
-									/>
-								</div>
 							)}
-						</DroppableMainContent>
-					</div>
+						</ResizablePanel>
+						<ResizableHandle withHandle />
+						{/* Main Content Area */}
+						<ResizablePanel minSize={30}>
+							<div className="flex flex-col h-full overflow-hidden">
+								{/* Top Bar */}
+								{/* <TopBar
+							isSidebarOpen={isSidebarOpen}
+							onOpenSidebar={() => setIsSidebarOpen(true)}
+							workspaceName={currentWorkspace?.name}
+							currentBranch={currentWorkspace?.branch}
+						/> */}
+
+								{/* Content Area */}
+								<DroppableMainContent isOver={isOverMainContent}>
+									{loading ||
+									error ||
+									!currentWorkspace ||
+									!selectedTab ||
+									!selectedWorktree ? (
+										<PlaceholderState
+											loading={loading}
+											error={error}
+											hasWorkspace={!!currentWorkspace}
+										/>
+									) : parentGroupTab ? (
+										// Selected tab is a sub-tab of a group → display the parent group's mosaic
+										<TabGroup
+											groupTab={parentGroupTab}
+											workingDirectory={
+												selectedWorktree.path || currentWorkspace.repoPath
+											}
+											workspaceId={currentWorkspace.id}
+											worktreeId={selectedWorktreeId ?? undefined}
+											selectedTabId={selectedTabId ?? undefined}
+											onTabFocus={handleTabFocus}
+										/>
+									) : selectedTab.type === "group" ? (
+										// Selected tab is a group tab → display its mosaic layout
+										<TabGroup
+											groupTab={selectedTab}
+											workingDirectory={
+												selectedWorktree.path || currentWorkspace.repoPath
+											}
+											workspaceId={currentWorkspace.id}
+											worktreeId={selectedWorktreeId ?? undefined}
+											selectedTabId={selectedTabId ?? undefined}
+											onTabFocus={handleTabFocus}
+										/>
+									) : (
+										// Base level tab (not inside a group) → display full width/height
+										<div className="w-full h-full">
+											<TabContent
+												tab={selectedTab}
+												workingDirectory={
+													selectedWorktree.path || currentWorkspace.repoPath
+												}
+												workspaceId={currentWorkspace.id}
+												worktreeId={selectedWorktreeId ?? undefined}
+												worktree={selectedWorktree}
+												groupTabId="" // No parent group
+												selectedTabId={selectedTabId ?? undefined}
+												onTabFocus={handleTabFocus}
+											/>
+										</div>
+									)}
+								</DroppableMainContent>
+							</div>
+						</ResizablePanel>
+					</ResizablePanelGroup>
 				</AppFrame>
 			</div>
 
