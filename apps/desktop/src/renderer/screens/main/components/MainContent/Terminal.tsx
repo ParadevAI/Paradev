@@ -4,7 +4,8 @@ import "@xterm/xterm/css/xterm.css";
 import { FitAddon } from "@xterm/addon-fit";
 import { SearchAddon } from "@xterm/addon-search";
 import { WebLinksAddon } from "@xterm/addon-web-links";
-import { WebglAddon } from "@xterm/addon-webgl";
+// WebglAddon disabled due to cursor positioning issues with autocomplete
+// import { WebglAddon } from "@xterm/addon-webgl";
 
 interface TerminalProps {
 	terminalId?: string | null;
@@ -124,6 +125,10 @@ export default function TerminalComponent({
 				currentTheme === "light" ? TERMINAL_THEME.LIGHT : TERMINAL_THEME.DARK,
 			allowTransparency: true,
 			disableStdin: false,
+			// Add scrollback configuration for better history handling
+			scrollback: 10000,
+			// Enable alternate screen for better full-screen app support
+			altClickMovesCursor: false,
 		});
 
 		term.open(container);
@@ -132,6 +137,9 @@ export default function TerminalComponent({
 		let isDisposed = false;
 		// Track if this is the initial setup to prevent resize events during reconnection
 		let isInitialSetup = true;
+		// Buffer to queue writes during resize operations to prevent cursor desync
+		let isResizing = false;
+		let writeQueue: string[] = [];
 
 		// Add iTerm2-like keyboard shortcuts
 		term.attachCustomKeyEventHandler((event: KeyboardEvent) => {
@@ -162,14 +170,17 @@ export default function TerminalComponent({
 		});
 		term.loadAddon(webLinksAddon);
 
-		// 2. WebGL Renderer - Better performance for rendering
-		let webglAddon: WebglAddon | null = null;
-		try {
-			webglAddon = new WebglAddon();
-			term.loadAddon(webglAddon);
-		} catch (e) {
-			console.warn("WebGL addon failed to load, falling back to canvas:", e);
-		}
+		// 2. WebGL Renderer - DISABLED due to cursor positioning issues with autocomplete
+		// WebGL can cause cursor desynchronization when shell sends rapid escape sequences
+		// Canvas renderer is more stable for autocomplete and dynamic content
+		// Uncomment the lines below to re-enable WebGL if needed
+		// const webglAddon: WebglAddon | null = null;
+		// try {
+		// 	webglAddon = new WebglAddon();
+		// 	term.loadAddon(webglAddon);
+		// } catch (e) {
+		// 	console.warn("WebGL addon failed to load, falling back to canvas:", e);
+		// }
 
 		// 3. FitAddon - Automatically fit terminal to container
 		const fitAddon = new FitAddon();
@@ -204,6 +215,16 @@ export default function TerminalComponent({
 		const searchAddon = new SearchAddon();
 		term.loadAddon(searchAddon);
 
+		// Function to process queued writes after resize completes
+		const processWriteQueue = () => {
+			if (isResizing || writeQueue.length === 0) {
+				return;
+			}
+			const data = writeQueue.join("");
+			writeQueue = [];
+			term.write(data);
+		};
+
 		// Perform initial fit to size terminal correctly on first render
 		// This ensures the terminal has correct dimensions when it first appears
 		customFit();
@@ -217,9 +238,17 @@ export default function TerminalComponent({
 			if (resizeTimeout) {
 				clearTimeout(resizeTimeout);
 			}
+			// Mark as resizing to queue incoming writes
+			isResizing = true;
+
 			resizeTimeout = setTimeout(() => {
 				if (!isDisposed) {
 					customFit();
+					// Small delay to allow PTY to receive resize before processing writes
+					setTimeout(() => {
+						isResizing = false;
+						processWriteQueue();
+					}, 50);
 				}
 				resizeTimeout = null;
 			}, 150);
@@ -285,12 +314,24 @@ export default function TerminalComponent({
 			}
 		});
 
+		// Store current dimensions to detect actual changes
+		let currentDimensions = { cols: 80, rows: 30 };
+
 		term.onResize(({ cols, rows }) => {
 			// Skip resize events during initial setup to prevent shell from redrawing prompt
 			// when reconnecting to an existing terminal
 			if (isInitialSetup) {
 				return;
 			}
+
+			// Only send resize if dimensions actually changed
+			// This prevents redundant resize events that can cause cursor issues
+			if (currentDimensions.cols === cols && currentDimensions.rows === rows) {
+				return;
+			}
+
+			currentDimensions = { cols, rows };
+
 			if (terminalIdRef.current) {
 				window.ipcRenderer.send("terminal-resize", {
 					id: terminalIdRef.current,
@@ -302,7 +343,12 @@ export default function TerminalComponent({
 
 		const terminalDataListener = (message: TerminalMessage) => {
 			if (message?.id === terminalIdRef.current) {
-				term.write(message.data);
+				// If we're in the middle of a resize, queue the write
+				if (isResizing) {
+					writeQueue.push(message.data);
+				} else {
+					term.write(message.data);
+				}
 			}
 		};
 
@@ -357,13 +403,14 @@ export default function TerminalComponent({
 			} catch (e) {
 				console.warn("WebLinksAddon disposal failed:", e);
 			}
-			if (webglAddon) {
-				try {
-					webglAddon.dispose();
-				} catch (e) {
-					console.warn("WebglAddon disposal failed:", e);
-				}
-			}
+			// WebGL addon disposal removed (addon disabled)
+			// if (webglAddon) {
+			// 	try {
+			// 		webglAddon.dispose();
+			// 	} catch (e) {
+			// 		console.warn("WebglAddon disposal failed:", e);
+			// 	}
+			// }
 
 			// Terminal process lifecycle is managed by ScreenLayout
 			// Don't kill it here to avoid conflicts
