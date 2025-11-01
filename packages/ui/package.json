@@ -13,6 +13,7 @@
 		"./tooltip": "./src/components/tooltip.tsx",
 		"./context-menu": "./src/components/context-menu.tsx",
 		"./scroll-area": "./src/components/scroll-area.tsx",
+		"./resizable": "./src/components/resizable.tsx",
 		"./utils": "./src/lib/utils.ts",
 		"./hooks": "./src/hooks/index.ts",
 		"./globals.css": "./src/globals.css"
@@ -28,6 +29,7 @@
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
 		"lucide-react": "^0.548.0",
+		"react-resizable-panels": "^3.0.6",
 		"tailwind-merge": "^2.6.0"
 	},
 	"devDependencies": {

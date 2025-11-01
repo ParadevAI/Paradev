@@ -268,7 +268,7 @@ export function Sidebar({
 	};
 
 	return (
-		<div className="flex flex-col h-full w-64 select-none text-neutral-300">
+		<div className="flex flex-col h-full w-full select-none text-neutral-300">
 			<SidebarHeader
 				onScanWorktrees={handleScanWorktrees}
 				isScanningWorktrees={isScanningWorktrees}
