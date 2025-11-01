@@ -155,6 +155,7 @@ class WorkspaceManager {
 	async canMergeWorktree(
 		workspaceId: string,
 		worktreeId: string,
+		targetWorktreeId?: string,
 	): Promise<{
 		success: boolean;
 		canMerge?: boolean;
@@ -167,21 +168,22 @@ class WorkspaceManager {
 		if (!workspace) {
 			return { success: false, error: "Workspace not found" };
 		}
-		return worktreeOps.canMergeWorktree(workspace, worktreeId);
+		return worktreeOps.canMergeWorktree(workspace, worktreeId, targetWorktreeId);
 	}
 
 	/**
-	 * Merge a worktree into the active worktree
+	 * Merge a worktree into a target worktree
 	 */
 	async mergeWorktree(
 		workspaceId: string,
 		worktreeId: string,
+		targetWorktreeId?: string,
 	): Promise<{ success: boolean; error?: string }> {
 		const workspace = await this.get(workspaceId);
 		if (!workspace) {
 			return { success: false, error: "Workspace not found" };
 		}
-		return worktreeOps.mergeWorktree(workspace, worktreeId);
+		return worktreeOps.mergeWorktree(workspace, worktreeId, targetWorktreeId);
 	}
 
 	/**

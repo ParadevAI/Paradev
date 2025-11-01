@@ -232,15 +232,41 @@ class WorktreeManager {
 	}
 
 	/**
+	 * Check if a branch has been merged into another branch
+	 */
+	isBranchMerged(repoPath: string, branch: string, targetBranch: string): boolean {
+		try {
+			// Use git branch --merged to check if branch is fully merged into targetBranch
+			const output = execSync(`git branch --merged ${targetBranch}`, {
+				cwd: repoPath,
+				encoding: "utf-8",
+			}).trim();
+
+			// Parse branch names from output (remove leading * and whitespace)
+			const mergedBranches = output
+				.split("\n")
+				.map((line) => line.trim().replace(/^\*\s*/, ""))
+				.filter(Boolean);
+
+			return mergedBranches.includes(branch);
+		} catch (error) {
+			console.error("Failed to check if branch is merged:", error);
+			return false;
+		}
+	}
+
+	/**
 	 * Check if a branch can be merged into a target worktree
 	 */
 	async canMerge(
 		targetWorktreePath: string,
 		sourceBranch: string,
+		sourceWorktreePath?: string,
 	): Promise<{
 		canMerge: boolean;
 		reason?: string;
-		hasUncommittedChanges?: boolean;
+		targetHasUncommittedChanges?: boolean;
+		sourceHasUncommittedChanges?: boolean;
 	}> {
 		try {
 			// Check if source branch exists
@@ -264,17 +290,37 @@ class WorktreeManager {
 			}
 
 			// Check if there are uncommitted changes in target worktree
-			const status = execSync("git status --porcelain", {
+			const targetStatus = execSync("git status --porcelain", {
 				cwd: targetWorktreePath,
 				encoding: "utf-8",
 			}).trim();
 
+			// Check if there are uncommitted changes in source worktree
+			let sourceStatus = "";
+			if (sourceWorktreePath) {
+				sourceStatus = execSync("git status --porcelain", {
+					cwd: sourceWorktreePath,
+					encoding: "utf-8",
+				}).trim();
+			}
+
 			// Allow merge but warn about uncommitted changes
-			if (status) {
+			const targetHasUncommittedChanges = !!targetStatus;
+			const sourceHasUncommittedChanges = !!sourceStatus;
+
+			if (targetHasUncommittedChanges || sourceHasUncommittedChanges) {
+				const warnings = [];
+				if (targetHasUncommittedChanges) {
+					warnings.push("target worktree has uncommitted changes");
+				}
+				if (sourceHasUncommittedChanges) {
+					warnings.push("source worktree has uncommitted changes");
+				}
 				return {
 					canMerge: true,
-					hasUncommittedChanges: true,
-					reason: "Target worktree has uncommitted changes",
+					targetHasUncommittedChanges,
+					sourceHasUncommittedChanges,
+					reason: warnings.join(", "),
 				};
 			}
 

@@ -335,10 +335,11 @@ export function registerWorkspaceIPCs() {
 	// Check if worktree can be merged
 	ipcMain.handle(
 		"worktree-can-merge",
-		async (_event, input: { workspaceId: string; worktreeId: string }) => {
+		async (_event, input: { workspaceId: string; worktreeId: string; targetWorktreeId?: string }) => {
 			return await workspaceManager.canMergeWorktree(
 				input.workspaceId,
 				input.worktreeId,
+				input.targetWorktreeId,
 			);
 		},
 	);
@@ -346,10 +347,11 @@ export function registerWorkspaceIPCs() {
 	// Merge worktree
 	ipcMain.handle(
 		"worktree-merge",
-		async (_event, input: { workspaceId: string; worktreeId: string }) => {
+		async (_event, input: { workspaceId: string; worktreeId: string; targetWorktreeId?: string }) => {
 			return await workspaceManager.mergeWorktree(
 				input.workspaceId,
 				input.worktreeId,
+				input.targetWorktreeId,
 			);
 		},
 	);
