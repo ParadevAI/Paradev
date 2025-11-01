@@ -9,6 +9,8 @@
 		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
+		"@react-three/drei": "^10.7.6",
+		"@react-three/fiber": "^9.4.0",
 		"@superset/ui": "workspace:*",
 		"framer-motion": "^12.23.24",
 		"geist": "^1.5.1",
@@ -17,7 +19,8 @@
 		"nextra-theme-blog": "^4.6.0",
 		"nextra-theme-docs": "^4.6.0",
 		"react": "^19.1.1",
-		"react-dom": "^19.1.1"
+		"react-dom": "^19.1.1",
+		"three": "^0.180.0"
 	},
 	"devDependencies": {
 		"@superset/typescript": "workspace:*",
@@ -26,6 +29,7 @@
 		"@types/node": "^24.9.1",
 		"@types/react": "^19.1.11",
 		"@types/react-dom": "^19.1.7",
+		"@types/three": "^0.180.0",
 		"tailwindcss": "^4.0.9",
 		"typescript": "^5.9.3"
 	}
