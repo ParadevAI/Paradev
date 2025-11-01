@@ -768,8 +768,13 @@ export function MainScreen() {
 
 				{/* App Frame - continuous border + sidebar + topbar */}
 				<AppFrame>
-					<ResizablePanelGroup direction="horizontal">
-						<ResizablePanel defaultSize={20}>
+					<ResizablePanelGroup direction="horizontal" autoSaveId="main-layout">
+						<ResizablePanel
+							defaultSize={20}
+							minSize={15}
+							maxSize={40}
+							collapsible={true}
+						>
 							{isSidebarOpen && workspaces && (
 								<Sidebar
 									workspaces={workspaces}
@@ -786,7 +791,7 @@ export function MainScreen() {
 						</ResizablePanel>
 						<ResizableHandle withHandle />
 						{/* Main Content Area */}
-						<ResizablePanel>
+						<ResizablePanel minSize={30}>
 							<div className="flex flex-col h-full overflow-hidden">
 								{/* Top Bar */}
 								{/* <TopBar
