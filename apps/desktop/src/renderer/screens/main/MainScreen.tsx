@@ -768,33 +768,25 @@ export function MainScreen() {
 
 				{/* App Frame - continuous border + sidebar + topbar */}
 				<AppFrame>
-					<ResizablePanelGroup direction="horizontal" autoSaveId="main-layout">
-						{isSidebarOpen && workspaces && (
-							<>
-								<ResizablePanel
-									defaultSize={20}
-									minSize={15}
-									maxSize={40}
-									id="sidebar"
-								>
-									<Sidebar
-										workspaces={workspaces}
-										currentWorkspace={currentWorkspace}
-										onTabSelect={handleTabSelect}
-										onWorktreeCreated={handleWorktreeCreated}
-										onWorkspaceSelect={handleWorkspaceSelect}
-										onUpdateWorktree={handleUpdateWorktree}
-										selectedTabId={selectedTabId ?? undefined}
-										onCollapse={() => setIsSidebarOpen(false)}
-										isDragging={!!activeId}
-									/>
-								</ResizablePanel>
-								<ResizableHandle withHandle />
-							</>
-						)}
-
+					<ResizablePanelGroup direction="horizontal">
+						<ResizablePanel defaultSize={20}>
+							{isSidebarOpen && workspaces && (
+								<Sidebar
+									workspaces={workspaces}
+									currentWorkspace={currentWorkspace}
+									onTabSelect={handleTabSelect}
+									onWorktreeCreated={handleWorktreeCreated}
+									onWorkspaceSelect={handleWorkspaceSelect}
+									onUpdateWorktree={handleUpdateWorktree}
+									selectedTabId={selectedTabId ?? undefined}
+									onCollapse={() => setIsSidebarOpen(false)}
+									isDragging={!!activeId}
+								/>
+							)}
+						</ResizablePanel>
+						<ResizableHandle withHandle />
 						{/* Main Content Area */}
-						<ResizablePanel defaultSize={80} minSize={30}>
+						<ResizablePanel>
 							<div className="flex flex-col h-full overflow-hidden">
 								{/* Top Bar */}
 								{/* <TopBar
