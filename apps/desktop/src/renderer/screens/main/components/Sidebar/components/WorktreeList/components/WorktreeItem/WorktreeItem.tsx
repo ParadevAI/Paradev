@@ -200,12 +200,13 @@ function DroppableGroupTab({
 					<button
 						type="button"
 						onClick={handleClick}
-						className={`group flex items-center gap-1 w-full h-8 px-3 text-sm rounded-md [transition:all_0.2s,border_0s] ${isSelected
-							? "bg-neutral-800 border border-neutral-700"
-							: isOver
-								? "bg-blue-900/50 border border-blue-500"
-								: "hover:bg-neutral-800/50"
-							}`}
+						className={`group flex items-center gap-1 w-full h-8 px-3 text-sm rounded-md [transition:all_0.2s,border_0s] ${
+							isSelected
+								? "bg-neutral-800 border border-neutral-700"
+								: isOver
+									? "bg-blue-900/50 border border-blue-500"
+									: "hover:bg-neutral-800/50"
+						}`}
 						style={{ paddingLeft: `${level * 12 + 12}px` }}
 					>
 						<ChevronRight
@@ -264,8 +265,9 @@ function DroppableGroupArea({
 	return (
 		<div
 			ref={setNodeRef}
-			className={`relative ${isOver ? "bg-blue-900/20 border-l-2 border-blue-500 rounded-r-md" : ""
-				}`}
+			className={`relative ${
+				isOver ? "bg-blue-900/20 border-l-2 border-blue-500 rounded-r-md" : ""
+			}`}
 			style={{
 				minHeight: "40px",
 				transition: "all 0.2s",
@@ -324,7 +326,9 @@ export function WorktreeItem({
 	const [mergeDisabledReason, setMergeDisabledReason] = useState<string>("");
 	const [targetWorktreeId, setTargetWorktreeId] = useState<string>("");
 	const [targetBranch, setTargetBranch] = useState<string>("");
-	const [availableWorktrees, setAvailableWorktrees] = useState<Array<{ id: string; branch: string }>>([]);
+	const [availableWorktrees, setAvailableWorktrees] = useState<
+		Array<{ id: string; branch: string }>
+	>([]);
 
 	// Dialog states
 	const [showRemoveDialog, setShowRemoveDialog] = useState(false);
@@ -581,7 +585,11 @@ export function WorktreeItem({
 
 			if (result.success) {
 				// Optimistically update the local worktree data
-				const updatedTabs = updateTabNameRecursive(worktree.tabs, groupTabId, newName);
+				const updatedTabs = updateTabNameRecursive(
+					worktree.tabs,
+					groupTabId,
+					newName,
+				);
 				const updatedWorktree = { ...worktree, tabs: updatedTabs };
 				onUpdateWorktree(updatedWorktree);
 			} else {
@@ -716,12 +724,14 @@ export function WorktreeItem({
 		});
 
 		if (result.success) {
+			// Backend removes from config first, then git worktree in background
+			// This provides immediate UI feedback
 			onReload();
 		} else {
 			setErrorTitle("Failed to Remove Worktree");
 			setErrorMessage(
 				result.error ||
-				"An unknown error occurred while removing the worktree.",
+					"An unknown error occurred while removing the worktree.",
 			);
 			setShowErrorDialog(true);
 		}
@@ -751,11 +761,15 @@ export function WorktreeItem({
 
 		if (canMergeResult.targetHasUncommittedChanges) {
 			const targetBranchText = targetBranch ? ` (${targetBranch})` : "";
-			warnings.push(`The target worktree${targetBranchText} has uncommitted changes.`);
+			warnings.push(
+				`The target worktree${targetBranchText} has uncommitted changes.`,
+			);
 		}
 
 		if (canMergeResult.sourceHasUncommittedChanges) {
-			warnings.push(`The source worktree (${worktree.branch}) has uncommitted changes.`);
+			warnings.push(
+				`The source worktree (${worktree.branch}) has uncommitted changes.`,
+			);
 		}
 
 		if (warnings.length > 0) {
@@ -771,7 +785,9 @@ export function WorktreeItem({
 		setTargetWorktreeId(newTargetId);
 
 		// Update target branch display
-		const targetWorktree = availableWorktrees.find(wt => wt.id === newTargetId);
+		const targetWorktree = availableWorktrees.find(
+			(wt) => wt.id === newTargetId,
+		);
 		if (targetWorktree) {
 			setTargetBranch(targetWorktree.branch);
 		}
@@ -791,12 +807,18 @@ export function WorktreeItem({
 		const warnings = [];
 
 		if (canMergeResult.targetHasUncommittedChanges) {
-			const targetBranchText = targetWorktree?.branch ? ` (${targetWorktree.branch})` : "";
-			warnings.push(`The target worktree${targetBranchText} has uncommitted changes.`);
+			const targetBranchText = targetWorktree?.branch
+				? ` (${targetWorktree.branch})`
+				: "";
+			warnings.push(
+				`The target worktree${targetBranchText} has uncommitted changes.`,
+			);
 		}
 
 		if (canMergeResult.sourceHasUncommittedChanges) {
-			warnings.push(`The source worktree (${worktree.branch}) has uncommitted changes.`);
+			warnings.push(
+				`The source worktree (${worktree.branch}) has uncommitted changes.`,
+			);
 		}
 
 		if (warnings.length > 0) {
@@ -852,7 +874,7 @@ export function WorktreeItem({
 			setErrorTitle("Failed to Check Settings");
 			setErrorMessage(
 				checkResult.error ||
-				"An unknown error occurred while checking settings.",
+					"An unknown error occurred while checking settings.",
 			);
 			setShowErrorDialog(true);
 			return;
@@ -933,7 +955,11 @@ export function WorktreeItem({
 
 			if (result.success) {
 				// Optimistically update the local worktree data
-				const updatedTabs = updateTabNameRecursive(worktree.tabs, tabId, newName);
+				const updatedTabs = updateTabNameRecursive(
+					worktree.tabs,
+					tabId,
+					newName,
+				);
 				const updatedWorktree = { ...worktree, tabs: updatedTabs };
 				onUpdateWorktree(updatedWorktree);
 			} else {
@@ -946,13 +972,20 @@ export function WorktreeItem({
 	};
 
 	// Helper to recursively update tab name
-	const updateTabNameRecursive = (tabs: Tab[], tabId: string, newName: string): Tab[] => {
-		return tabs.map(tab => {
+	const updateTabNameRecursive = (
+		tabs: Tab[],
+		tabId: string,
+		newName: string,
+	): Tab[] => {
+		return tabs.map((tab) => {
 			if (tab.id === tabId) {
 				return { ...tab, name: newName };
 			}
 			if (tab.type === "group" && tab.tabs) {
-				return { ...tab, tabs: updateTabNameRecursive(tab.tabs, tabId, newName) };
+				return {
+					...tab,
+					tabs: updateTabNameRecursive(tab.tabs, tabId, newName),
+				};
 			}
 			return tab;
 		});
@@ -1052,7 +1085,10 @@ export function WorktreeItem({
 						<GitBranch size={14} className="opacity-70" />
 						<span className="truncate flex-1 text-left">{worktree.branch}</span>
 						{worktree.branch === mainBranch && (
-							<Star size={14} className="text-yellow-500 shrink-0 fill-yellow-500" />
+							<Star
+								size={14}
+								className="text-yellow-500 shrink-0 fill-yellow-500"
+							/>
 						)}
 						{worktree.merged && (
 							<GitMerge size={14} className="text-purple-500 shrink-0" />
@@ -1157,7 +1193,10 @@ export function WorktreeItem({
 
 					{/* Target Branch Selector */}
 					<div className="space-y-2 py-4">
-						<label htmlFor="target-branch" className="text-sm font-medium text-gray-200">
+						<label
+							htmlFor="target-branch"
+							className="text-sm font-medium text-gray-200"
+						>
 							Target Branch
 						</label>
 						<select

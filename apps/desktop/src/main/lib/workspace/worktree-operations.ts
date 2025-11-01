@@ -120,22 +120,29 @@ export async function removeWorktree(
 			return { success: false, error: "Worktree not found" };
 		}
 
-		// Remove git worktree
-		await worktreeManager.removeWorktree(workspace.repoPath, worktree.path);
+		// Save the worktree path for git removal
+		const worktreePath = worktree.path;
+		const repoPath = workspace.repoPath;
 
-		// Remove from workspace
+		// Remove from workspace config first (for immediate UI feedback)
 		workspace.worktrees = workspace.worktrees.filter(
 			(wt) => wt.id !== worktreeId,
 		);
 		workspace.updatedAt = new Date().toISOString();
 
-		// Save to config
+		// Save to config immediately
 		const config = configManager.read();
 		const index = config.workspaces.findIndex((ws) => ws.id === workspace.id);
 		if (index !== -1) {
 			config.workspaces[index] = workspace;
 			configManager.write(config);
 		}
+
+		// Remove git worktree asynchronously in the background (this can be slow)
+		// Don't await - let it complete in the background
+		worktreeManager.removeWorktree(repoPath, worktreePath).catch((error) => {
+			console.error("Failed to remove git worktree (async):", error);
+		});
 
 		return { success: true };
 	} catch (error) {
@@ -182,9 +189,7 @@ export async function canMergeWorktree(
 			};
 		}
 
-		const targetWorktree = workspace.worktrees.find(
-			(wt) => wt.id === targetId,
-		);
+		const targetWorktree = workspace.worktrees.find((wt) => wt.id === targetId);
 		if (!targetWorktree) {
 			return {
 				success: true,
@@ -241,9 +246,7 @@ export async function mergeWorktree(
 
 		// Find the target worktree (default to active worktree)
 		const targetId = targetWorktreeId || workspace.activeWorktreeId;
-		const targetWorktree = workspace.worktrees.find(
-			(wt) => wt.id === targetId,
-		);
+		const targetWorktree = workspace.worktrees.find((wt) => wt.id === targetId);
 		if (!targetWorktree) {
 			return { success: false, error: "Target worktree not found" };
 		}
