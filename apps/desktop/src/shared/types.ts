@@ -60,6 +60,7 @@ export interface Worktree {
 	tabs: Tab[]; // Changed from tabGroups to tabs
 	createdAt: string;
 	detectedPorts?: Record<string, number>; // Map of service name to detected port
+	merged?: boolean; // Indicates if this worktree has been merged into another worktree
 }
 
 export interface Workspace {

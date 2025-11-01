@@ -38,6 +38,9 @@ export function WorktreeList({
 	const hasPortForwarding =
 		currentWorkspace.ports && currentWorkspace.ports.length > 0;
 
+	// Get main branch from workspace config, fallback to 'main'
+	const mainBranch = currentWorkspace.branch || "main";
+
 	return (
 		<>
 			{currentWorkspace.worktrees.map((worktree) => (
@@ -46,6 +49,7 @@ export function WorktreeList({
 					worktree={worktree}
 					workspaceId={currentWorkspace.id}
 					activeWorktreeId={currentWorkspace.activeWorktreeId}
+					mainBranch={mainBranch}
 					isExpanded={expandedWorktrees.has(worktree.id)}
 					onToggle={onToggleWorktree}
 					onTabSelect={onTabSelect}

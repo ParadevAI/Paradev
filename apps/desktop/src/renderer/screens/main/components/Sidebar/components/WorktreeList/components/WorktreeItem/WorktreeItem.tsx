@@ -23,6 +23,7 @@ import {
 	GitMerge,
 	Plus,
 	Settings,
+	Star,
 	Trash2,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -284,6 +285,7 @@ interface WorktreeItemProps {
 	worktree: Worktree;
 	workspaceId: string;
 	activeWorktreeId: string | null;
+	mainBranch: string;
 	isExpanded: boolean;
 	onToggle: (worktreeId: string) => void;
 	onTabSelect: (worktreeId: string, tabId: string) => void;
@@ -297,6 +299,7 @@ export function WorktreeItem({
 	worktree,
 	workspaceId,
 	activeWorktreeId,
+	mainBranch,
 	isExpanded,
 	onToggle,
 	onTabSelect,
@@ -317,7 +320,9 @@ export function WorktreeItem({
 	// Track if merge is disabled (when this is the active worktree)
 	const [isMergeDisabled, setIsMergeDisabled] = useState(false);
 	const [mergeDisabledReason, setMergeDisabledReason] = useState<string>("");
+	const [targetWorktreeId, setTargetWorktreeId] = useState<string>("");
 	const [targetBranch, setTargetBranch] = useState<string>("");
+	const [availableWorktrees, setAvailableWorktrees] = useState<Array<{ id: string; branch: string }>>([]);
 
 	// Dialog states
 	const [showRemoveDialog, setShowRemoveDialog] = useState(false);
@@ -639,42 +644,50 @@ export function WorktreeItem({
 		}
 	};
 
-	// Check if merge should be disabled on mount and get target branch
+	// Load available worktrees on mount
 	useEffect(() => {
-		const checkMergeStatus = async () => {
-			// Get the workspace to find the active worktree
+		const loadWorktrees = async () => {
+			// Get the workspace to find available worktrees
 			const workspace = await window.ipcRenderer.invoke(
 				"workspace-get",
 				workspaceId,
 			);
 
 			if (workspace) {
-				const activeWorktree = workspace.worktrees.find(
-					(wt: { id: string }) => wt.id === workspace.activeWorktreeId,
-				);
-				if (activeWorktree) {
-					setTargetBranch(activeWorktree.branch);
+				// Get all worktrees except the current one
+				const otherWorktrees = workspace.worktrees
+					.filter((wt: { id: string }) => wt.id !== worktree.id)
+					.map((wt: { id: string; branch: string }) => ({
+						id: wt.id,
+						branch: wt.branch,
+					}));
+				setAvailableWorktrees(otherWorktrees);
+
+				// Disable merge only if there are no other worktrees to merge into
+				if (otherWorktrees.length === 0) {
+					setIsMergeDisabled(true);
+					setMergeDisabledReason("No other worktrees available");
+				} else {
+					setIsMergeDisabled(false);
+					setMergeDisabledReason("");
+
+					// Set default target to active worktree if it exists and is not this worktree
+					const activeWorktree = workspace.worktrees.find(
+						(wt: { id: string }) => wt.id === workspace.activeWorktreeId,
+					);
+					if (activeWorktree && activeWorktree.id !== worktree.id) {
+						setTargetWorktreeId(activeWorktree.id);
+						setTargetBranch(activeWorktree.branch);
+					} else if (otherWorktrees.length > 0) {
+						// If active worktree is this worktree, default to first available worktree
+						setTargetWorktreeId(otherWorktrees[0].id);
+						setTargetBranch(otherWorktrees[0].branch);
+					}
 				}
-			}
-
-			const canMergeResult = await window.ipcRenderer.invoke(
-				"worktree-can-merge",
-				{
-					workspaceId,
-					worktreeId: worktree.id,
-				},
-			);
-
-			if (canMergeResult.isActiveWorktree) {
-				setIsMergeDisabled(true);
-				setMergeDisabledReason(canMergeResult.reason || "Active worktree");
-			} else {
-				setIsMergeDisabled(false);
-				setMergeDisabledReason("");
 			}
 		};
 
-		checkMergeStatus();
+		loadWorktrees();
 	}, [workspaceId, worktree.id, activeWorktreeId]);
 
 	// Context menu handlers
@@ -713,12 +726,13 @@ export function WorktreeItem({
 	};
 
 	const handleMergeWorktree = async () => {
-		// Check if can merge first
+		// Check if can merge with the selected target
 		const canMergeResult = await window.ipcRenderer.invoke(
 			"worktree-can-merge",
 			{
 				workspaceId,
 				worktreeId: worktree.id,
+				targetWorktreeId: targetWorktreeId || undefined,
 			},
 		);
 
@@ -731,12 +745,63 @@ export function WorktreeItem({
 
 		// Build warning message if there are uncommitted changes
 		let warning = "";
-		if (canMergeResult.hasUncommittedChanges) {
+		const warnings = [];
+
+		if (canMergeResult.targetHasUncommittedChanges) {
 			const targetBranchText = targetBranch ? ` (${targetBranch})` : "";
-			warning = `Warning: The target worktree${targetBranchText} has uncommitted changes. The merge will proceed anyway.`;
+			warnings.push(`The target worktree${targetBranchText} has uncommitted changes.`);
 		}
+
+		if (canMergeResult.sourceHasUncommittedChanges) {
+			warnings.push(`The source worktree (${worktree.branch}) has uncommitted changes.`);
+		}
+
+		if (warnings.length > 0) {
+			warning = `Warning: ${warnings.join(" ")} The merge will proceed anyway.`;
+		}
+
 		setMergeWarning(warning);
 		setShowMergeDialog(true);
+	};
+
+	// Handler for when target worktree changes
+	const handleTargetWorktreeChange = async (newTargetId: string) => {
+		setTargetWorktreeId(newTargetId);
+
+		// Update target branch display
+		const targetWorktree = availableWorktrees.find(wt => wt.id === newTargetId);
+		if (targetWorktree) {
+			setTargetBranch(targetWorktree.branch);
+		}
+
+		// Re-check merge status with new target
+		const canMergeResult = await window.ipcRenderer.invoke(
+			"worktree-can-merge",
+			{
+				workspaceId,
+				worktreeId: worktree.id,
+				targetWorktreeId: newTargetId,
+			},
+		);
+
+		// Update warning message
+		let warning = "";
+		const warnings = [];
+
+		if (canMergeResult.targetHasUncommittedChanges) {
+			const targetBranchText = targetWorktree?.branch ? ` (${targetWorktree.branch})` : "";
+			warnings.push(`The target worktree${targetBranchText} has uncommitted changes.`);
+		}
+
+		if (canMergeResult.sourceHasUncommittedChanges) {
+			warnings.push(`The source worktree (${worktree.branch}) has uncommitted changes.`);
+		}
+
+		if (warnings.length > 0) {
+			warning = `Warning: ${warnings.join(" ")} The merge will proceed anyway.`;
+		}
+
+		setMergeWarning(warning);
 	};
 
 	const confirmMergeWorktree = async () => {
@@ -746,6 +811,7 @@ export function WorktreeItem({
 		const result = await window.ipcRenderer.invoke("worktree-merge", {
 			workspaceId,
 			worktreeId: worktree.id,
+			targetWorktreeId: targetWorktreeId || undefined,
 		});
 
 		if (result.success) {
@@ -983,6 +1049,12 @@ export function WorktreeItem({
 						/>
 						<GitBranch size={14} className="opacity-70" />
 						<span className="truncate flex-1 text-left">{worktree.branch}</span>
+						{worktree.branch === mainBranch && (
+							<Star size={14} className="text-yellow-500 shrink-0 fill-yellow-500" />
+						)}
+						{worktree.merged && (
+							<GitMerge size={14} className="text-purple-500 shrink-0" />
+						)}
 					</Button>
 				</ContextMenuTrigger>
 				<ContextMenuContent>
@@ -993,9 +1065,7 @@ export function WorktreeItem({
 						<GitMerge size={14} className="mr-2" />
 						{isMergeDisabled
 							? `Merge Worktree (${mergeDisabledReason})`
-							: targetBranch
-								? `Merge into (${targetBranch})`
-								: "Merge into Active Worktree"}
+							: "Merge Worktree..."}
 					</ContextMenuItem>
 					<ContextMenuItem onClick={handleCopyPath}>
 						<Clipboard size={14} className="mr-2" />
@@ -1074,18 +1144,37 @@ export function WorktreeItem({
 					<DialogHeader>
 						<DialogTitle>Merge Worktree</DialogTitle>
 						<DialogDescription>
-							Are you sure you want to merge "{worktree.branch}"
-							{targetBranch
-								? ` into "${targetBranch}"`
-								: " into the active worktree"}
-							?
-							{mergeWarning && (
-								<div className="mt-3 p-3 bg-yellow-500/10 border border-yellow-500/30 rounded text-yellow-200 text-sm">
-									{mergeWarning}
-								</div>
-							)}
+							Merge "{worktree.branch}" into the selected target branch.
 						</DialogDescription>
 					</DialogHeader>
+
+					{/* Target Branch Selector */}
+					<div className="space-y-2 py-4">
+						<label htmlFor="target-branch" className="text-sm font-medium text-gray-200">
+							Target Branch
+						</label>
+						<select
+							id="target-branch"
+							value={targetWorktreeId}
+							onChange={(e) => handleTargetWorktreeChange(e.target.value)}
+							className="w-full px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-md text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+						>
+							{availableWorktrees.map((wt) => (
+								<option key={wt.id} value={wt.id}>
+									{wt.branch}
+									{wt.id === activeWorktreeId ? " (active)" : ""}
+								</option>
+							))}
+						</select>
+					</div>
+
+					{/* Warning Message */}
+					{mergeWarning && (
+						<div className="p-3 bg-yellow-500/10 border border-yellow-500/30 rounded text-yellow-200 text-sm">
+							{mergeWarning}
+						</div>
+					)}
+
 					<DialogFooter>
 						<Button
 							variant="ghost"

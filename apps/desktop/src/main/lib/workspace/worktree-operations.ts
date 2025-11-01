@@ -148,18 +148,20 @@ export async function removeWorktree(
 }
 
 /**
- * Check if a worktree can be merged into the active worktree
+ * Check if a worktree can be merged into a target worktree
  */
 export async function canMergeWorktree(
 	workspace: Workspace,
 	worktreeId: string,
+	targetWorktreeId?: string,
 ): Promise<{
 	success: boolean;
 	canMerge?: boolean;
 	reason?: string;
 	error?: string;
 	isActiveWorktree?: boolean;
-	hasUncommittedChanges?: boolean;
+	targetHasUncommittedChanges?: boolean;
+	sourceHasUncommittedChanges?: boolean;
 }> {
 	try {
 		const worktree = workspace.worktrees.find((wt) => wt.id === worktreeId);
@@ -167,40 +169,44 @@ export async function canMergeWorktree(
 			return { success: false, error: "Worktree not found" };
 		}
 
-		// Check if this is the active worktree
-		if (workspace.activeWorktreeId === worktreeId) {
+		// Find the target worktree (default to active worktree)
+		const targetId = targetWorktreeId || workspace.activeWorktreeId;
+
+		// Check if trying to merge into itself
+		if (targetId === worktreeId) {
 			return {
 				success: true,
 				canMerge: false,
-				reason: "Cannot merge the active worktree into itself",
-				isActiveWorktree: true,
+				reason: "Cannot merge a worktree into itself",
+				isActiveWorktree: targetId === workspace.activeWorktreeId,
 			};
 		}
 
-		// Find the active worktree
-		const activeWorktree = workspace.worktrees.find(
-			(wt) => wt.id === workspace.activeWorktreeId,
+		const targetWorktree = workspace.worktrees.find(
+			(wt) => wt.id === targetId,
 		);
-		if (!activeWorktree) {
+		if (!targetWorktree) {
 			return {
 				success: true,
 				canMerge: false,
-				reason: "No active worktree found",
+				reason: "Target worktree not found",
 			};
 		}
 
-		// Check if the source branch can be merged into the active worktree
+		// Check if the source branch can be merged into the target worktree
 		const canMerge = await worktreeManager.canMerge(
-			activeWorktree.path,
+			targetWorktree.path,
 			worktree.branch,
+			worktree.path, // Pass source worktree path to check its uncommitted changes
 		);
 
 		return {
 			success: true,
 			canMerge: canMerge.canMerge,
 			reason: canMerge.reason,
-			hasUncommittedChanges: canMerge.hasUncommittedChanges,
-			isActiveWorktree: false,
+			targetHasUncommittedChanges: canMerge.targetHasUncommittedChanges,
+			sourceHasUncommittedChanges: canMerge.sourceHasUncommittedChanges,
+			isActiveWorktree: targetId === workspace.activeWorktreeId,
 		};
 	} catch (error) {
 		console.error("Failed to check if worktree can be merged:", error);
@@ -212,11 +218,12 @@ export async function canMergeWorktree(
 }
 
 /**
- * Merge a worktree into the active worktree
+ * Merge a worktree into a target worktree
  */
 export async function mergeWorktree(
 	workspace: Workspace,
 	worktreeId: string,
+	targetWorktreeId?: string,
 ): Promise<{ success: boolean; error?: string }> {
 	try {
 		const worktree = workspace.worktrees.find((wt) => wt.id === worktreeId);
@@ -224,30 +231,43 @@ export async function mergeWorktree(
 			return { success: false, error: "Worktree not found" };
 		}
 
-		// Check if this is the active worktree
-		if (workspace.activeWorktreeId === worktreeId) {
+		// Check if this is the target worktree
+		if (targetWorktreeId === worktreeId) {
 			return {
 				success: false,
-				error: "Cannot merge the active worktree into itself",
+				error: "Cannot merge a worktree into itself",
 			};
 		}
 
-		// Find the active worktree
-		const activeWorktree = workspace.worktrees.find(
-			(wt) => wt.id === workspace.activeWorktreeId,
+		// Find the target worktree (default to active worktree)
+		const targetId = targetWorktreeId || workspace.activeWorktreeId;
+		const targetWorktree = workspace.worktrees.find(
+			(wt) => wt.id === targetId,
 		);
-		if (!activeWorktree) {
-			return { success: false, error: "No active worktree found" };
+		if (!targetWorktree) {
+			return { success: false, error: "Target worktree not found" };
 		}
 
-		// Merge the source branch into the active worktree
+		// Merge the source branch into the target worktree
 		const result = await worktreeManager.merge(
-			activeWorktree.path,
+			targetWorktree.path,
 			worktree.branch,
 		);
 
 		if (!result.success) {
 			return { success: false, error: result.error };
+		}
+
+		// Mark the worktree as merged
+		worktree.merged = true;
+		workspace.updatedAt = new Date().toISOString();
+
+		// Save to config
+		const config = configManager.read();
+		const index = config.workspaces.findIndex((ws) => ws.id === workspace.id);
+		if (index !== -1) {
+			config.workspaces[index] = workspace;
+			configManager.write(config);
 		}
 
 		return { success: true };
@@ -305,6 +325,9 @@ export async function scanAndImportWorktrees(
 		});
 		const removedCount = initialWorktreeCount - workspace.worktrees.length;
 
+		// Get the main branch from workspace config, fallback to 'main'
+		const mainBranch = workspace.branch || "main";
+
 		for (const gitWorktree of allWorktrees) {
 			// Get the actual current branch for this worktree path
 			const currentBranch =
@@ -316,11 +339,25 @@ export async function scanAndImportWorktrees(
 				(wt) => wt.path === gitWorktree.path,
 			);
 
+			// Check if this branch has been merged into the main branch
+			const isMerged =
+				currentBranch !== mainBranch &&
+				worktreeManager.isBranchMerged(
+					workspace.repoPath,
+					currentBranch,
+					mainBranch,
+				);
+
 			if (existingWorktree) {
 				// Update the branch if it has changed
 				if (existingWorktree.branch !== currentBranch) {
 					existingWorktree.branch = currentBranch;
 					importedCount++;
+					configChanged = true;
+				}
+				// Update merged status if it has changed
+				if (existingWorktree.merged !== isMerged) {
+					existingWorktree.merged = isMerged;
 					configChanged = true;
 				}
 			} else {
@@ -331,6 +368,7 @@ export async function scanAndImportWorktrees(
 					path: gitWorktree.path,
 					tabs: [],
 					createdAt: now,
+					merged: isMerged,
 				};
 
 				workspace.worktrees.push(worktree);
