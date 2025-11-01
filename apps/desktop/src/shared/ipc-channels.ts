@@ -101,16 +101,18 @@ export interface IpcChannels {
 		response: IpcResponse;
 	};
 	"worktree-can-merge": {
-		request: { workspaceId: string; worktreeId: string };
+		request: { workspaceId: string; worktreeId: string; targetWorktreeId?: string };
 		response: {
 			canMerge: boolean;
 			reason?: string;
 			isActiveWorktree?: boolean;
 			hasUncommittedChanges?: boolean;
+			targetHasUncommittedChanges?: boolean;
+			sourceHasUncommittedChanges?: boolean;
 		};
 	};
 	"worktree-merge": {
-		request: { workspaceId: string; worktreeId: string };
+		request: { workspaceId: string; worktreeId: string; targetWorktreeId?: string };
 		response: IpcResponse;
 	};
 	"worktree-get-path": {
