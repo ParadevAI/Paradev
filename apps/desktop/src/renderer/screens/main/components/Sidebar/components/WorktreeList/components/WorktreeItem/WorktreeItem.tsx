@@ -293,6 +293,7 @@ interface WorktreeItemProps {
 	onUpdateWorktree: (updatedWorktree: Worktree) => void;
 	selectedTabId: string | undefined;
 	hasPortForwarding?: boolean;
+	onCloneWorktree: () => void;
 }
 
 export function WorktreeItem({
@@ -307,6 +308,7 @@ export function WorktreeItem({
 	onUpdateWorktree,
 	selectedTabId,
 	hasPortForwarding = false,
+	onCloneWorktree,
 }: WorktreeItemProps) {
 	// Track expanded group tabs
 	const [expandedGroupTabs, setExpandedGroupTabs] = useState<Set<string>>(
@@ -1058,6 +1060,11 @@ export function WorktreeItem({
 					</Button>
 				</ContextMenuTrigger>
 				<ContextMenuContent>
+					<ContextMenuItem onClick={onCloneWorktree}>
+						<GitBranch size={14} className="mr-2" />
+						Clone Worktree...
+					</ContextMenuItem>
+					<ContextMenuSeparator />
 					<ContextMenuItem
 						onClick={handleMergeWorktree}
 						disabled={isMergeDisabled}

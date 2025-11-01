@@ -97,11 +97,14 @@ export function Sidebar({
 					currentWorkspace.id,
 				);
 				setBranches(result.branches);
-				setSourceBranch(result.currentBranch || result.branches[0] || "");
+				// Only set default source branch if not already set (e.g., from clone operation)
+				if (!sourceBranch) {
+					setSourceBranch(result.currentBranch || result.branches[0] || "");
+				}
 			};
 			fetchBranches();
 		}
-	}, [showWorktreeModal, currentWorkspace]);
+	}, [showWorktreeModal, currentWorkspace, sourceBranch]);
 
 	const toggleWorktree = (worktreeId: string) => {
 		setExpandedWorktrees((prev) => {
@@ -116,7 +119,17 @@ export function Sidebar({
 	};
 
 	const handleCreateWorktree = () => {
-		console.log("[Sidebar] New Worktree button clicked");
+		// Reset modal state for creating a new worktree (not cloning)
+		setSourceBranch("");
+		setCloneTabsFromWorktreeId("");
+		setShowWorktreeModal(true);
+	};
+
+	const handleCloneWorktree = (worktreeId: string, branch: string) => {
+		// Pre-populate modal for cloning: use the clicked worktree's branch as source
+		// and clone its tabs to the new worktree
+		setSourceBranch(branch);
+		setCloneTabsFromWorktreeId(worktreeId);
 		setShowWorktreeModal(true);
 	};
 
@@ -153,8 +166,6 @@ export function Sidebar({
 			});
 
 			if (result.success) {
-				console.log("[Sidebar] Worktree created successfully");
-
 				// Display setup result if available
 				if (result.setupResult) {
 					setSetupStatus(
@@ -168,8 +179,10 @@ export function Sidebar({
 					await new Promise((resolve) => setTimeout(resolve, 1500));
 				}
 
+				// Reset modal state and close
 				setShowWorktreeModal(false);
 				setBranchName("");
+				setSourceBranch("");
 				setCloneTabsFromWorktreeId("");
 				setSetupStatus(undefined);
 				setSetupOutput(undefined);
@@ -195,6 +208,7 @@ export function Sidebar({
 	const handleCancelWorktree = () => {
 		setShowWorktreeModal(false);
 		setBranchName("");
+		setSourceBranch("");
 		setCloneTabsFromWorktreeId("");
 		setSetupStatus(undefined);
 		setSetupOutput(undefined);
@@ -301,6 +315,7 @@ export function Sidebar({
 							onReload={onWorktreeCreated}
 							onUpdateWorktree={onUpdateWorktree}
 							selectedTabId={selectedTabId}
+							onCloneWorktree={handleCloneWorktree}
 						/>
 
 						{workspace && (
