@@ -100,8 +100,21 @@ export interface IpcChannels {
 		request: { workspaceId: string; worktreeId: string };
 		response: IpcResponse;
 	};
+	"worktree-can-remove": {
+		request: { workspaceId: string; worktreeId: string };
+		response: {
+			success: boolean;
+			canRemove?: boolean;
+			hasUncommittedChanges?: boolean;
+			error?: string;
+		};
+	};
 	"worktree-can-merge": {
-		request: { workspaceId: string; worktreeId: string; targetWorktreeId?: string };
+		request: {
+			workspaceId: string;
+			worktreeId: string;
+			targetWorktreeId?: string;
+		};
 		response: {
 			canMerge: boolean;
 			reason?: string;
@@ -112,7 +125,11 @@ export interface IpcChannels {
 		};
 	};
 	"worktree-merge": {
-		request: { workspaceId: string; worktreeId: string; targetWorktreeId?: string };
+		request: {
+			workspaceId: string;
+			worktreeId: string;
+			targetWorktreeId?: string;
+		};
 		response: IpcResponse;
 	};
 	"worktree-get-path": {
@@ -282,6 +299,7 @@ export function isValidChannel(channel: string): channel is IpcChannelName {
 		"workspace-update-terminal-cwd",
 		"worktree-create",
 		"worktree-remove",
+		"worktree-can-remove",
 		"worktree-can-merge",
 		"worktree-merge",
 		"worktree-get-path",

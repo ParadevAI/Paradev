@@ -194,7 +194,7 @@ export class PortDetector extends EventEmitter {
 						.filter((p) => !Number.isNaN(p) && p > 0 && p <= 65535);
 
 					allPorts.push(...ports);
-				} catch (error) { }
+				} catch (error) {}
 			}
 
 			return [...new Set(allPorts)]; // Deduplicate
@@ -233,7 +233,7 @@ export class PortDetector extends EventEmitter {
 						toProcess.push(childPid);
 					}
 				}
-			} catch (error) { }
+			} catch (error) {}
 		}
 
 		return allPids;

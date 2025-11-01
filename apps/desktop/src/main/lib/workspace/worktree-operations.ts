@@ -108,6 +108,43 @@ export async function createWorktree(
 }
 
 /**
+ * Check if a worktree can be removed (check for uncommitted changes)
+ */
+export async function canRemoveWorktree(
+	workspace: Workspace,
+	worktreeId: string,
+): Promise<{
+	success: boolean;
+	canRemove?: boolean;
+	hasUncommittedChanges?: boolean;
+	error?: string;
+}> {
+	try {
+		const worktree = workspace.worktrees.find((wt) => wt.id === worktreeId);
+		if (!worktree) {
+			return { success: false, error: "Worktree not found" };
+		}
+
+		// Check if the worktree has uncommitted changes
+		const hasUncommittedChanges = worktreeManager.hasUncommittedChanges(
+			worktree.path,
+		);
+
+		return {
+			success: true,
+			canRemove: true,
+			hasUncommittedChanges,
+		};
+	} catch (error) {
+		console.error("Failed to check if worktree can be removed:", error);
+		return {
+			success: false,
+			error: error instanceof Error ? error.message : String(error),
+		};
+	}
+}
+
+/**
  * Remove a worktree
  */
 export async function removeWorktree(

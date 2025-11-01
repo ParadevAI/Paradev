@@ -4,6 +4,7 @@ import "@xterm/xterm/css/xterm.css";
 import { FitAddon } from "@xterm/addon-fit";
 import { SearchAddon } from "@xterm/addon-search";
 import { WebLinksAddon } from "@xterm/addon-web-links";
+
 // WebglAddon disabled due to cursor positioning issues with autocomplete
 // import { WebglAddon } from "@xterm/addon-webgl";
 

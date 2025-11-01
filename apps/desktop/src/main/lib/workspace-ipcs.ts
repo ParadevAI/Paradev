@@ -332,10 +332,28 @@ export function registerWorkspaceIPCs() {
 		},
 	);
 
+	// Check if worktree can be removed
+	ipcMain.handle(
+		"worktree-can-remove",
+		async (_event, input: { workspaceId: string; worktreeId: string }) => {
+			return await workspaceManager.canRemoveWorktree(
+				input.workspaceId,
+				input.worktreeId,
+			);
+		},
+	);
+
 	// Check if worktree can be merged
 	ipcMain.handle(
 		"worktree-can-merge",
-		async (_event, input: { workspaceId: string; worktreeId: string; targetWorktreeId?: string }) => {
+		async (
+			_event,
+			input: {
+				workspaceId: string;
+				worktreeId: string;
+				targetWorktreeId?: string;
+			},
+		) => {
 			return await workspaceManager.canMergeWorktree(
 				input.workspaceId,
 				input.worktreeId,
@@ -347,7 +365,14 @@ export function registerWorkspaceIPCs() {
 	// Merge worktree
 	ipcMain.handle(
 		"worktree-merge",
-		async (_event, input: { workspaceId: string; worktreeId: string; targetWorktreeId?: string }) => {
+		async (
+			_event,
+			input: {
+				workspaceId: string;
+				worktreeId: string;
+				targetWorktreeId?: string;
+			},
+		) => {
 			return await workspaceManager.mergeWorktree(
 				input.workspaceId,
 				input.worktreeId,

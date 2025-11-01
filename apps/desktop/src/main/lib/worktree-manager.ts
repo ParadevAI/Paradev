@@ -234,7 +234,11 @@ class WorktreeManager {
 	/**
 	 * Check if a branch has been merged into another branch
 	 */
-	isBranchMerged(repoPath: string, branch: string, targetBranch: string): boolean {
+	isBranchMerged(
+		repoPath: string,
+		branch: string,
+		targetBranch: string,
+	): boolean {
 		try {
 			// Use git branch --merged to check if branch is fully merged into targetBranch
 			const output = execSync(`git branch --merged ${targetBranch}`, {
@@ -367,6 +371,23 @@ class WorktreeManager {
 				success: false,
 				error: error instanceof Error ? error.message : String(error),
 			};
+		}
+	}
+
+	/**
+	 * Check if a worktree has uncommitted changes
+	 */
+	hasUncommittedChanges(worktreePath: string): boolean {
+		try {
+			const status = execSync("git status --porcelain", {
+				cwd: worktreePath,
+				encoding: "utf-8",
+			}).trim();
+
+			return !!status;
+		} catch (error) {
+			console.error("Failed to check for uncommitted changes:", error);
+			return false;
 		}
 	}
 }

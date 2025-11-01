@@ -337,6 +337,7 @@ export function WorktreeItem({
 	const [errorMessage, setErrorMessage] = useState("");
 	const [errorTitle, setErrorTitle] = useState("");
 	const [mergeWarning, setMergeWarning] = useState("");
+	const [removeWarning, setRemoveWarning] = useState("");
 
 	// Track if this worktree is active
 	const isActive = activeWorktreeId === worktree.id;
@@ -711,12 +712,29 @@ export function WorktreeItem({
 		}
 	};
 
-	const handleRemoveWorktree = () => {
+	const handleRemoveWorktree = async () => {
+		// Check if the worktree has uncommitted changes
+		const canRemoveResult = await window.ipcRenderer.invoke(
+			"worktree-can-remove",
+			{
+				workspaceId,
+				worktreeId: worktree.id,
+			},
+		);
+
+		// Build warning message if there are uncommitted changes
+		let warning = "";
+		if (canRemoveResult.hasUncommittedChanges) {
+			warning = `Warning: This worktree (${worktree.branch}) has uncommitted changes. Removing it will delete these changes permanently.`;
+		}
+
+		setRemoveWarning(warning);
 		setShowRemoveDialog(true);
 	};
 
 	const confirmRemoveWorktree = async () => {
 		setShowRemoveDialog(false);
+		setRemoveWarning("");
 
 		const result = await window.ipcRenderer.invoke("worktree-remove", {
 			workspaceId,
@@ -1170,8 +1188,22 @@ export function WorktreeItem({
 							This action cannot be undone.
 						</DialogDescription>
 					</DialogHeader>
+
+					{/* Warning Message */}
+					{removeWarning && (
+						<div className="p-3 bg-yellow-500/10 border border-yellow-500/30 rounded text-yellow-200 text-sm">
+							{removeWarning}
+						</div>
+					)}
+
 					<DialogFooter>
-						<Button variant="ghost" onClick={() => setShowRemoveDialog(false)}>
+						<Button
+							variant="ghost"
+							onClick={() => {
+								setShowRemoveDialog(false);
+								setRemoveWarning("");
+							}}
+						>
 							Cancel
 						</Button>
 						<Button variant="destructive" onClick={confirmRemoveWorktree}>

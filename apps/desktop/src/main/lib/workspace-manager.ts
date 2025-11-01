@@ -150,6 +150,25 @@ class WorkspaceManager {
 	}
 
 	/**
+	 * Check if a worktree can be removed
+	 */
+	async canRemoveWorktree(
+		workspaceId: string,
+		worktreeId: string,
+	): Promise<{
+		success: boolean;
+		canRemove?: boolean;
+		hasUncommittedChanges?: boolean;
+		error?: string;
+	}> {
+		const workspace = await this.get(workspaceId);
+		if (!workspace) {
+			return { success: false, error: "Workspace not found" };
+		}
+		return worktreeOps.canRemoveWorktree(workspace, worktreeId);
+	}
+
+	/**
 	 * Check if a worktree can be merged
 	 */
 	async canMergeWorktree(
@@ -168,7 +187,11 @@ class WorkspaceManager {
 		if (!workspace) {
 			return { success: false, error: "Workspace not found" };
 		}
-		return worktreeOps.canMergeWorktree(workspace, worktreeId, targetWorktreeId);
+		return worktreeOps.canMergeWorktree(
+			workspace,
+			worktreeId,
+			targetWorktreeId,
+		);
 	}
 
 	/**
