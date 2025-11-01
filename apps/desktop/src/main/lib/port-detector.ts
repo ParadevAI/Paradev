@@ -194,7 +194,7 @@ export class PortDetector extends EventEmitter {
 						.filter((p) => !Number.isNaN(p) && p > 0 && p <= 65535);
 
 					allPorts.push(...ports);
-				} catch (error) {}
+				} catch (error) { }
 			}
 
 			return [...new Set(allPorts)]; // Deduplicate
@@ -233,7 +233,7 @@ export class PortDetector extends EventEmitter {
 						toProcess.push(childPid);
 					}
 				}
-			} catch (error) {}
+			} catch (error) { }
 		}
 
 		return allPids;
@@ -259,18 +259,12 @@ export class PortDetector extends EventEmitter {
 		const appsIndex = parts.lastIndexOf("apps");
 		if (appsIndex !== -1 && appsIndex < parts.length - 1) {
 			const serviceName = parts[appsIndex + 1];
-			console.log(
-				`[PortDetector] Detected service "${serviceName}" from CWD: ${cwd}`,
-			);
 			return serviceName;
 		}
 
 		const packagesIndex = parts.lastIndexOf("packages");
 		if (packagesIndex !== -1 && packagesIndex < parts.length - 1) {
 			const serviceName = parts[packagesIndex + 1];
-			console.log(
-				`[PortDetector] Detected service "${serviceName}" from CWD: ${cwd}`,
-			);
 			return serviceName;
 		}
 
@@ -279,17 +273,11 @@ export class PortDetector extends EventEmitter {
 		if (worktreesIndex !== -1 && worktreesIndex < parts.length - 2) {
 			// Use repo name (one level after 'worktrees'), not branch name
 			const serviceName = parts[worktreesIndex + 1];
-			console.log(
-				`[PortDetector] Detected service "${serviceName}" from worktree path: ${cwd}`,
-			);
 			return serviceName;
 		}
 
 		// Fallback: use the last directory name
 		const serviceName = parts[parts.length - 1];
-		console.log(
-			`[PortDetector] Detected service "${serviceName}" (fallback) from CWD: ${cwd}`,
-		);
 		return serviceName;
 	}
 
