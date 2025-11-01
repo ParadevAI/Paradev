@@ -9,6 +9,7 @@ interface WorktreeListProps {
 	onReload: () => void;
 	onUpdateWorktree: (worktreeId: string, updatedWorktree: Worktree) => void;
 	selectedTabId: string | undefined;
+	onCloneWorktree: (worktreeId: string, branch: string) => void;
 }
 
 export function WorktreeList({
@@ -19,6 +20,7 @@ export function WorktreeList({
 	onReload,
 	onUpdateWorktree,
 	selectedTabId,
+	onCloneWorktree,
 }: WorktreeListProps) {
 	if (!currentWorkspace) {
 		return (
@@ -59,6 +61,7 @@ export function WorktreeList({
 					}
 					selectedTabId={selectedTabId}
 					hasPortForwarding={hasPortForwarding}
+					onCloneWorktree={() => onCloneWorktree(worktree.id, worktree.branch)}
 				/>
 			))}
 		</>
