@@ -122,7 +122,6 @@ export default function TerminalComponent({
 			fontFamily: 'Menlo, Monaco, "Courier New", monospace',
 			theme:
 				currentTheme === "light" ? TERMINAL_THEME.LIGHT : TERMINAL_THEME.DARK,
-			convertEol: true,
 			allowTransparency: true,
 			disableStdin: false,
 		});
@@ -133,6 +132,27 @@ export default function TerminalComponent({
 		let isDisposed = false;
 		// Track if this is the initial setup to prevent resize events during reconnection
 		let isInitialSetup = true;
+
+		// Add iTerm2-like keyboard shortcuts
+		term.attachCustomKeyEventHandler((event: KeyboardEvent) => {
+			// Cmd+K (Mac) or Ctrl+K (Win/Linux): Clear terminal like iTerm2
+			// This clears both the scrollback buffer and sends clear to the shell
+			if (event.metaKey && event.key === "k") {
+				event.preventDefault();
+				// Clear the xterm buffer (removes scrollback)
+				term.clear();
+				// Also send clear command to shell to reset shell state
+				if (terminalIdRef.current) {
+					window.ipcRenderer.send("terminal-input", {
+						id: terminalIdRef.current,
+						data: "\x0c", // Form feed (Ctrl+L) - clears screen in most shells
+					});
+				}
+				return false; // Prevent default terminal handling
+			}
+			// Allow all other keys to be processed normally
+			return true;
+		});
 
 		// Load addons
 		// 1. WebLinks - Makes URLs clickable and open in default browser
@@ -226,8 +246,7 @@ export default function TerminalComponent({
 							"History last 50 chars:",
 							JSON.stringify(history.slice(-50)),
 						);
-						// Write history without triggering convertEol by writing directly
-						// The history already has proper line endings from PTY
+						// Write history directly - PTY data already has proper formatting
 						term.write(history);
 
 						// Delay initial fit AFTER writing history to prevent resize events
