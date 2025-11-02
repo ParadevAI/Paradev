@@ -1,7 +1,7 @@
 import { createElectronRouter } from "electron-router-dom";
 
 export const { Router, registerRoute, settings } = createElectronRouter({
-	port: 4927,
+	port: Number(process.env.VITE_DEV_SERVER_PORT) || 4927,
 
 	types: {
 		ids: ["main", "about"],

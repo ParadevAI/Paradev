@@ -47,7 +47,8 @@ export default defineConfig({
 		},
 
 		server: {
-			port: settings.port,
+			port: Number(process.env.VITE_DEV_SERVER_PORT) || settings.port,
+			strictPort: true, // Fail if port is already in use
 		},
 
 		plugins: [

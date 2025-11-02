@@ -14,6 +14,8 @@
 		"start": "electron-vite preview",
 		"predev": "bun run clean:dev",
 		"dev": "cross-env NODE_ENV=development electron-vite dev --watch",
+		"dev:instance": "cross-env NODE_ENV=development VITE_DEV_SERVER_PORT=${PORT:-4927} electron-vite dev --watch",
+		"dev:alt": "cross-env NODE_ENV=development VITE_DEV_SERVER_PORT=4928 electron-vite dev --watch -- --user-data-dir=$HOME/.superset-dev-alt",
 		"compile:app": "electron-vite build",
 		"compile:packageJSON": "tsx ./src/lib/electron-app/release/modules/prebuild.ts",
 		"prebuild": "bun run clean:dev && bun run compile:app && bun run compile:packageJSON",

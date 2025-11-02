@@ -154,3 +154,25 @@ const result = await window.ipcRenderer.invoke("my-channel", {
 - `src/shared/` - Shared types and constants
   - `types.ts` - Data models
   - `ipc-channels.ts` - IPC type definitions
+
+### Running Multiple Instances
+
+You can run multiple Electron instances simultaneously for parallel development. See `apps/desktop/MULTIPLE_INSTANCES.md` for full documentation.
+
+**Quick start:**
+```bash
+# Terminal 1 - Default instance on port 4927
+bun dev
+
+# Terminal 2 - Alternative instance on port 4928
+./dev-instance.sh instance2 4928
+
+# Or use the npm script
+bun run dev:alt
+```
+
+Each instance runs with:
+- **Separate dev server port** via `VITE_DEV_SERVER_PORT` env var
+- **Separate user data directory** via `--user-data-dir` flag
+
+This allows you to test different branches, compare features, or debug without affecting other instances.
