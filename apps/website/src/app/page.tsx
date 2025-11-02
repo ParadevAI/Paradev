@@ -25,19 +25,19 @@ const CLIENT_LOGOS = [
 // Scale features data
 const SCALE_FEATURES = [
 	{
-		title: "Analytics & insights",
-		description: "Track traffic, measure performance, and monitor conversions.",
+		title: "Build at the speed of thought",
+		description: "Run multiple agents in parallel to experiment and build features as quickly as you can come up with them.",
 		link: "Learn more",
 	},
 	{
-		title: "A/B Testing & optimization",
-		description: "A/B testing, funnels, and built-in growth insights.",
+		title: "No deadtime",
+		description: "Code on the go using always-on agents that work even when you're away from your laptop.",
 		link: "Learn more",
 	},
 	{
-		title: "SEO & performance",
+		title: "Zero switching cost",
 		description:
-			"Optimize every page with built-in SEO settings, metadata, and blazing-fast hosting.",
+			"As the human in the loop, we handle the port switching and context management so you're never overloaded.",
 		link: "Learn more",
 	},
 ] as const;
