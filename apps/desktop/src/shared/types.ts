@@ -61,6 +61,7 @@ export interface Worktree {
 	createdAt: string;
 	detectedPorts?: Record<string, number>; // Map of service name to detected port
 	merged?: boolean; // Indicates if this worktree has been merged into another worktree
+	description?: string; // Optional description of the worktree's goal or purpose
 }
 
 export interface Workspace {
@@ -94,6 +95,7 @@ export interface CreateWorktreeInput {
 	createBranch?: boolean;
 	cloneTabsFromWorktreeId?: string; // Optional worktree ID to clone tab setup from
 	sourceBranch?: string; // Optional source branch to create from (defaults to current branch)
+	description?: string; // Optional description of the worktree's goal or purpose
 }
 
 export interface CreateTabInput {

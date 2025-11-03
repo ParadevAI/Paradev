@@ -268,6 +268,25 @@ class WorkspaceManager {
 		);
 	}
 
+	/**
+	 * Update worktree description
+	 */
+	async updateWorktreeDescription(
+		workspaceId: string,
+		worktreeId: string,
+		description: string,
+	): Promise<{ success: boolean; error?: string }> {
+		const workspace = await this.get(workspaceId);
+		if (!workspace) {
+			return { success: false, error: "Workspace not found" };
+		}
+		return worktreeOps.updateWorktreeDescription(
+			workspace,
+			worktreeId,
+			description,
+		);
+	}
+
 	// ============================================================================
 	// Tab Operations
 	// ============================================================================

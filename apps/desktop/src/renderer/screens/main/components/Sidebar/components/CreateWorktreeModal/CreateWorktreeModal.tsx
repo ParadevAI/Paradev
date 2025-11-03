@@ -27,6 +27,8 @@ interface CreateWorktreeModalProps {
 	worktrees: Worktree[];
 	cloneTabsFromWorktreeId: string;
 	onCloneTabsFromWorktreeIdChange: (value: string) => void;
+	description: string;
+	onDescriptionChange: (value: string) => void;
 	setupStatus?: string;
 	setupOutput?: string;
 }
@@ -44,12 +46,15 @@ export function CreateWorktreeModal({
 	worktrees,
 	cloneTabsFromWorktreeId,
 	onCloneTabsFromWorktreeIdChange,
+	description,
+	onDescriptionChange,
 	setupStatus,
 	setupOutput,
 }: CreateWorktreeModalProps) {
 	const inputId = useId();
 	const sourceBranchId = useId();
 	const cloneTabsId = useId();
+	const descriptionId = useId();
 
 	return (
 		<Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -115,6 +120,19 @@ export function CreateWorktreeModal({
 							autoFocus
 							required
 							disabled={isCreating}
+						/>
+					</div>
+
+					<div className="space-y-2">
+						<Label htmlFor={descriptionId}>Description (Optional)</Label>
+						<textarea
+							id={descriptionId}
+							value={description}
+							onChange={(e) => onDescriptionChange(e.target.value)}
+							placeholder="What is the goal of this worktree?"
+							disabled={isCreating}
+							rows={3}
+							className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 resize-none"
 						/>
 					</div>
 

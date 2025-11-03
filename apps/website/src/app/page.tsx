@@ -46,7 +46,8 @@ const SCALE_FEATURES = [
 	},
 	{
 		title: "Bring your own tools",
-		description: "We're a superset of your existing tools, not a replacement. Use your own coding setup, tools, and agents. We bring the tooling and gluing.",
+		description:
+			"We're a superset of your existing tools, not a replacement. Use your own coding setup, tools, and agents. We bring the tooling and gluing.",
 		link: "Learn more",
 	},
 ] as const;

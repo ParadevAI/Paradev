@@ -422,6 +422,21 @@ export function registerWorkspaceIPCs() {
 		},
 	);
 
+	// Update worktree description
+	ipcMain.handle(
+		"worktree-update-description",
+		async (
+			_event,
+			input: { workspaceId: string; worktreeId: string; description: string },
+		) => {
+			return await workspaceManager.updateWorktreeDescription(
+				input.workspaceId,
+				input.worktreeId,
+				input.description,
+			);
+		},
+	);
+
 	// Open app settings in Cursor
 	ipcMain.handle("open-app-settings", async () => {
 		try {

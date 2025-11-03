@@ -13,6 +13,7 @@ import {
 	ContextMenuSeparator,
 	ContextMenuTrigger,
 } from "@superset/ui/context-menu";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import {
 	ChevronRight,
 	Clipboard,
@@ -1087,29 +1088,40 @@ export function WorktreeItem({
 			{/* Worktree Header */}
 			<ContextMenu>
 				<ContextMenuTrigger asChild>
-					<Button
-						variant="ghost"
-						size="sm"
-						onClick={() => onToggle(worktree.id)}
-						className="group w-full h-8 px-3 pb-1 font-normal relative"
-						style={{ justifyContent: "flex-start" }}
-					>
-						<ChevronRight
-							size={12}
-							className={`transition-transform ${isExpanded ? "rotate-90" : ""}`}
-						/>
-						<GitBranch size={14} className="opacity-70" />
-						<span className="truncate flex-1 text-left">{worktree.branch}</span>
-						{worktree.branch === mainBranch && (
-							<Star
-								size={14}
-								className="text-yellow-500 shrink-0 fill-yellow-500"
-							/>
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<Button
+								variant="ghost"
+								size="sm"
+								onClick={() => onToggle(worktree.id)}
+								className="group w-full h-8 px-3 pb-1 font-normal relative"
+								style={{ justifyContent: "flex-start" }}
+							>
+								<ChevronRight
+									size={12}
+									className={`transition-transform ${isExpanded ? "rotate-90" : ""}`}
+								/>
+								<GitBranch size={14} className="opacity-70" />
+								<span className="truncate flex-1 text-left">
+									{worktree.branch}
+								</span>
+								{worktree.branch === mainBranch && (
+									<Star
+										size={14}
+										className="text-yellow-500 shrink-0 fill-yellow-500"
+									/>
+								)}
+								{worktree.merged && (
+									<GitMerge size={14} className="text-purple-500 shrink-0" />
+								)}
+							</Button>
+						</TooltipTrigger>
+						{worktree.description && (
+							<TooltipContent side="right" className="max-w-xs">
+								<p className="text-sm">{worktree.description}</p>
+							</TooltipContent>
 						)}
-						{worktree.merged && (
-							<GitMerge size={14} className="text-purple-500 shrink-0" />
-						)}
-					</Button>
+					</Tooltip>
 				</ContextMenuTrigger>
 				<ContextMenuContent>
 					<ContextMenuItem onClick={onCloneWorktree}>

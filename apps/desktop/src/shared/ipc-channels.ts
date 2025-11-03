@@ -148,6 +148,14 @@ export interface IpcChannels {
 		};
 		response: { success: boolean; created?: boolean; error?: string };
 	};
+	"worktree-update-description": {
+		request: {
+			workspaceId: string;
+			worktreeId: string;
+			description: string;
+		};
+		response: IpcResponse;
+	};
 
 	// Tab operations
 	"tab-create": {
@@ -305,6 +313,7 @@ export function isValidChannel(channel: string): channel is IpcChannelName {
 		"worktree-get-path",
 		"worktree-check-settings",
 		"worktree-open-settings",
+		"worktree-update-description",
 		"open-app-settings",
 		"tab-create",
 		"tab-delete",
