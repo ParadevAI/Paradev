@@ -1,8 +1,8 @@
 import { dirname, normalize, resolve } from "node:path";
-import { config } from "dotenv";
 import tailwindcss from "@tailwindcss/vite";
 import reactPlugin from "@vitejs/plugin-react";
 import { codeInspectorPlugin } from "code-inspector-plugin";
+import { config } from "dotenv";
 import { defineConfig, externalizeDepsPlugin } from "electron-vite";
 import injectProcessEnvPlugin from "rollup-plugin-inject-process-env";
 import tsconfigPathsPlugin from "vite-tsconfig-paths";
