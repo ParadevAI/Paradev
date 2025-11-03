@@ -30,7 +30,7 @@ const SCALE_FEATURES = [
 		link: "Learn more",
 	},
 	{
-		title: "No deadtime",
+		title: "No downtime",
 		description: "Code on the go using always-on agents that work even when you're away from your laptop.",
 		link: "Learn more",
 	},
@@ -329,6 +329,63 @@ function ScaleFeaturesSection() {
 	);
 }
 
+// Simplified features section
+function FeaturesSection() {
+	return (
+		<section className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 md:px-8 bg-black">
+			<div className="max-w-5xl mx-auto">
+				<motion.div
+					initial={{ opacity: 0, y: 20 }}
+					whileInView={{ opacity: 1, y: 0 }}
+					viewport={{ once: true, margin: "-100px" }}
+					transition={{ duration: 0.5 }}
+					className="text-center mb-12 sm:mb-16"
+				>
+					<h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
+						Build like a VP of Engineering
+					</h2>
+				</motion.div>
+
+				<div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+					{SCALE_FEATURES.map((feature, idx) => (
+						<motion.div
+							key={feature.title}
+							initial={{ opacity: 0, y: 20 }}
+							whileInView={{ opacity: 1, y: 0 }}
+							viewport={{ once: true, margin: "-100px" }}
+							transition={{ duration: 0.5, delay: idx * 0.1 }}
+						>
+							<Card className="p-6 sm:p-8 h-full bg-zinc-950 border-zinc-800 hover:border-zinc-700 transition-all">
+								<h3 className="text-xl sm:text-2xl font-semibold mb-3 text-white">
+									{feature.title}
+								</h3>
+								<p className="text-sm sm:text-base text-zinc-400">
+									{feature.description}
+								</p>
+							</Card>
+						</motion.div>
+					))}
+				</div>
+
+				<motion.div
+					initial={{ opacity: 0, y: 20 }}
+					whileInView={{ opacity: 1, y: 0 }}
+					viewport={{ once: true, margin: "-100px" }}
+					transition={{ duration: 0.5, delay: 0.4 }}
+					className="flex justify-center mt-12 sm:mt-16"
+				>
+					<a
+						href="#"
+						className="bg-white text-black px-6 py-3 rounded-lg text-base font-medium hover:bg-zinc-200 transition-colors"
+					>
+						Join waitlist
+					</a>
+				</motion.div>
+			</div>
+		</section>
+	);
+}
+
 // Main page component
 export default function Home() {
 	return (
@@ -336,8 +393,7 @@ export default function Home() {
 			<Header />
 			<main className="flex min-h-screen flex-col bg-black">
 				<HeroSection />
-				<ClientLogosSection />
-				<ScaleFeaturesSection />
+				<FeaturesSection />
 				<Footer />
 			</main>
 		</>
