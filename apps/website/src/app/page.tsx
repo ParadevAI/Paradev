@@ -3,8 +3,10 @@
 import { Card } from "@superset/ui/card";
 import { motion } from "framer-motion";
 import type { ReactNode } from "react";
+import { useState } from "react";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { WaitlistModal } from "@/components/WaitlistModal";
 import { FadeUp } from "@/components/motion/FadeUp";
 import { HeroParallax } from "@/components/motion/HeroParallax";
 import { TiltCard } from "@/components/motion/TiltCard";
@@ -330,7 +332,11 @@ function ScaleFeaturesSection() {
 }
 
 // Simplified features section
-function FeaturesSection() {
+function FeaturesSection({
+	onOpenWaitlist,
+}: {
+	onOpenWaitlist: () => void;
+}) {
 	return (
 		<section className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 md:px-8 bg-black">
 			<div className="max-w-5xl mx-auto">
@@ -374,12 +380,13 @@ function FeaturesSection() {
 					transition={{ duration: 0.5, delay: 0.4 }}
 					className="flex justify-center mt-12 sm:mt-16"
 				>
-					<a
-						href="#"
+					<button
+						type="button"
+						onClick={onOpenWaitlist}
 						className="bg-white text-black px-6 py-3 rounded-lg text-base font-medium hover:bg-zinc-200 transition-colors"
 					>
 						Join waitlist
-					</a>
+					</button>
 				</motion.div>
 			</div>
 		</section>
@@ -388,14 +395,20 @@ function FeaturesSection() {
 
 // Main page component
 export default function Home() {
+	const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
+
 	return (
 		<>
 			<Header />
 			<main className="flex min-h-screen flex-col bg-black">
 				<HeroSection />
-				<FeaturesSection />
+				<FeaturesSection onOpenWaitlist={() => setIsWaitlistOpen(true)} />
 				<Footer />
 			</main>
+			<WaitlistModal
+				isOpen={isWaitlistOpen}
+				onClose={() => setIsWaitlistOpen(false)}
+			/>
 		</>
 	);
 }
