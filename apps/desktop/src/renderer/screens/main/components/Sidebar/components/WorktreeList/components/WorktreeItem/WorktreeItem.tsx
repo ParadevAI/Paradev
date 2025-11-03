@@ -1086,9 +1086,9 @@ export function WorktreeItem({
 	return (
 		<div className="space-y-1">
 			{/* Worktree Header */}
-			<ContextMenu>
-				<ContextMenuTrigger asChild>
-					<Tooltip>
+			<Tooltip>
+				<ContextMenu>
+					<ContextMenuTrigger asChild>
 						<TooltipTrigger asChild>
 							<Button
 								variant="ghost"
@@ -1116,47 +1116,50 @@ export function WorktreeItem({
 								)}
 							</Button>
 						</TooltipTrigger>
-						{worktree.description && (
-							<TooltipContent side="right" className="max-w-xs">
-								<p className="text-sm">{worktree.description}</p>
-							</TooltipContent>
-						)}
-					</Tooltip>
-				</ContextMenuTrigger>
-				<ContextMenuContent>
-					<ContextMenuItem onClick={onCloneWorktree}>
-						<GitBranch size={14} className="mr-2" />
-						Clone Worktree...
-					</ContextMenuItem>
-					<ContextMenuSeparator />
-					<ContextMenuItem
-						onClick={handleMergeWorktree}
-						disabled={isMergeDisabled}
-					>
-						<GitMerge size={14} className="mr-2" />
-						{isMergeDisabled
-							? `Merge Worktree (${mergeDisabledReason})`
-							: "Merge Worktree..."}
-					</ContextMenuItem>
-					<ContextMenuItem onClick={handleCopyPath}>
-						<Clipboard size={14} className="mr-2" />
-						Copy Path
-					</ContextMenuItem>
-					<ContextMenuItem onClick={handleOpenInCursor}>
-						<ExternalLink size={14} className="mr-2" />
-						Open in Cursor
-					</ContextMenuItem>
-					<ContextMenuItem onClick={handleOpenSettings}>
-						<Settings size={14} className="mr-2" />
-						Open Settings
-					</ContextMenuItem>
-					<ContextMenuSeparator />
-					<ContextMenuItem onClick={handleRemoveWorktree} variant="destructive">
-						<Trash2 size={14} className="mr-2" />
-						Remove Worktree
-					</ContextMenuItem>
-				</ContextMenuContent>
-			</ContextMenu>
+					</ContextMenuTrigger>
+					<ContextMenuContent>
+						<ContextMenuItem onClick={onCloneWorktree}>
+							<GitBranch size={14} className="mr-2" />
+							Clone Worktree...
+						</ContextMenuItem>
+						<ContextMenuSeparator />
+						<ContextMenuItem
+							onClick={handleMergeWorktree}
+							disabled={isMergeDisabled}
+						>
+							<GitMerge size={14} className="mr-2" />
+							{isMergeDisabled
+								? `Merge Worktree (${mergeDisabledReason})`
+								: "Merge Worktree..."}
+						</ContextMenuItem>
+						<ContextMenuItem onClick={handleCopyPath}>
+							<Clipboard size={14} className="mr-2" />
+							Copy Path
+						</ContextMenuItem>
+						<ContextMenuItem onClick={handleOpenInCursor}>
+							<ExternalLink size={14} className="mr-2" />
+							Open in Cursor
+						</ContextMenuItem>
+						<ContextMenuItem onClick={handleOpenSettings}>
+							<Settings size={14} className="mr-2" />
+							Open Settings
+						</ContextMenuItem>
+						<ContextMenuSeparator />
+						<ContextMenuItem
+							onClick={handleRemoveWorktree}
+							variant="destructive"
+						>
+							<Trash2 size={14} className="mr-2" />
+							Remove Worktree
+						</ContextMenuItem>
+					</ContextMenuContent>
+				</ContextMenu>
+				{worktree.description && (
+					<TooltipContent side="right" className="max-w-xs">
+						<p className="text-sm">{worktree.description}</p>
+					</TooltipContent>
+				)}
+			</Tooltip>
 
 			{/* Ports List - shown inline if port forwarding is configured */}
 			{isExpanded && hasPortForwarding && (
