@@ -5,8 +5,9 @@ import Script from "next/script";
 import "./globals.css";
 
 export const metadata: Metadata = {
-	title: "Superset",
-	description: "Superset Website",
+	title: "Superset - The last developer tool you'll ever need",
+	description:
+		"The last developer tool you'll ever need. Work in parallel with always-on agents, zero switching cost, and bring your own tools.",
 };
 
 export default function RootLayout({
