@@ -1,7 +1,7 @@
 {
 	"displayName": "Superset",
 	"name": "Superset",
-	"description": "The last app you'll ever need",
+	"description": "The last developer tool you'll ever need",
 	"version": "0.0.0",
 	"main": "./node_modules/.dev/main/index.js",
 	"resources": "src/resources",

@@ -12,14 +12,14 @@ import { HeroCanvas } from "@/components/three/HeroCanvas";
 
 // Client logos data
 const CLIENT_LOGOS = [
-	{ name: "OpenAI", logo: "OpenAI" },
-	{ name: "Cash App", logo: "Cash App" },
-	{ name: "Scale", logo: "scale" },
-	{ name: "Ramp", logo: "ramp" },
-	{ name: "Vercel", logo: "Vercel" },
-	{ name: "Coinbase", logo: "coinbase" },
-	{ name: "BOOM", logo: "BOOM" },
-	{ name: "Cursor", logo: "CURSOR" },
+	{ name: "numbies", logo: "numbies.xyz" },
+	{ name: "cadra", logo: "Cadra" },
+	{ name: "onlook", logo: "Onlook" },
+	{ name: "amazon", logo: "Amazon" },
+	{ name: "google", logo: "Google" },
+	{ name: "servicenow", logo: "ServiceNow" },
+	{ name: "ycombinator", logo: "Y Combinator" },
+	{ name: "scribe", logo: "Scribe" },
 ] as const;
 
 // Scale features data
@@ -59,7 +59,7 @@ function HeroSection() {
 				</FadeUp>
 				<FadeUp delay={0.2}>
 					<h2 className="text-lg sm:text-xl md:text-2xl font-thin px-4">
-						The last app you'll ever need
+						The last developer tool you'll ever need
 					</h2>
 				</FadeUp>
 			</div>
@@ -90,7 +90,7 @@ function FeatureCard({ title, description, delay }: FeatureCardProps) {
 // Client logos section component
 function ClientLogosSection() {
 	return (
-		<section className="py-12 sm:py-16 md:py-24 px-4 sm:px-6 md:px-8 bg-black">
+		<section className="py-12 sm:py-16 md:py-24 px-4 sm:px-6 md:px-8 bg-black overflow-hidden">
 			<div className="max-w-7xl mx-auto">
 				<motion.div
 					initial={{ opacity: 0, y: 20 }}
@@ -99,11 +99,8 @@ function ClientLogosSection() {
 					transition={{ duration: 0.5, ease: "easeOut" }}
 				>
 					<h2 className="text-xl sm:text-2xl font-normal text-center mb-4 sm:mb-8 text-white px-4">
-						Powering the world's best product teams.
+						Trusted by engineers from
 					</h2>
-					<p className="text-base sm:text-lg text-center mb-8 sm:mb-12 md:mb-16 text-zinc-400 px-4">
-						From next-gen startups to established enterprises.
-					</p>
 				</motion.div>
 
 				<motion.div
@@ -111,18 +108,40 @@ function ClientLogosSection() {
 					whileInView={{ opacity: 1, y: 0 }}
 					viewport={{ once: true, margin: "-100px" }}
 					transition={{ duration: 0.5, delay: 0.2 }}
+					className="relative"
 				>
-					<div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 md:gap-12 items-center justify-items-center">
-						{CLIENT_LOGOS.map((client, index) => (
-							<motion.div
-								key={client.name}
-								className="text-white text-lg sm:text-xl md:text-2xl lg:text-3xl font-semibold opacity-60 hover:opacity-100 transition-opacity cursor-pointer"
-								whileHover={{ scale: 1.05 }}
-								transition={{ duration: 0.2 }}
-							>
-								{client.logo}
-							</motion.div>
-						))}
+					<div className="flex overflow-hidden">
+						<motion.div
+							className="flex gap-12 sm:gap-16 md:gap-24"
+							animate={{
+								x: [0, -1000],
+							}}
+							transition={{
+								x: {
+									repeat: Number.POSITIVE_INFINITY,
+									repeatType: "loop",
+									duration: 20,
+									ease: "linear",
+								},
+							}}
+						>
+							{/* Render logos three times for seamless loop */}
+							{[...Array(3)].map((_, setIndex) => (
+								<div
+									key={setIndex}
+									className="flex gap-12 sm:gap-16 md:gap-24 items-center"
+								>
+									{CLIENT_LOGOS.map((client) => (
+										<div
+											key={`${setIndex}-${client.name}`}
+											className="text-white text-lg sm:text-xl md:text-2xl lg:text-3xl font-semibold opacity-60 hover:opacity-100 transition-opacity cursor-pointer whitespace-nowrap"
+										>
+											{client.logo}
+										</div>
+									))}
+								</div>
+							))}
+						</motion.div>
 					</div>
 				</motion.div>
 			</div>
@@ -171,7 +190,7 @@ function ScaleFeatureCard({
 						{feature.description}
 					</p>
 					<a
-						href="#"
+						href="/#"
 						className="text-sm sm:text-base text-zinc-400 hover:text-white transition-colors inline-flex items-center gap-2 group"
 					>
 						{feature.link}
@@ -202,9 +221,9 @@ function ScaleFeaturesSection() {
 					transition={{ duration: 0.5, ease: "easeOut" }}
 				>
 					<h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-8 sm:mb-12 md:mb-16 text-white">
-						Scale without
+						Build like a
 						<br />
-						switching tools
+						VP of Engineering
 					</h2>
 				</motion.div>
 
