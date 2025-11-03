@@ -1,4 +1,5 @@
 import { dirname, normalize, resolve } from "node:path";
+import { config } from "dotenv";
 import tailwindcss from "@tailwindcss/vite";
 import reactPlugin from "@vitejs/plugin-react";
 import { codeInspectorPlugin } from "code-inspector-plugin";
@@ -7,6 +8,9 @@ import injectProcessEnvPlugin from "rollup-plugin-inject-process-env";
 import tsconfigPathsPlugin from "vite-tsconfig-paths";
 import { main, resources } from "./package.json";
 import { settings } from "./src/lib/electron-router-dom";
+
+// Load .env from monorepo root
+config({ path: resolve(__dirname, "../../.env") });
 
 const [nodeModules, devFolder] = normalize(dirname(main)).split(/\/|\\/g);
 const devPath = [nodeModules, devFolder].join("/");

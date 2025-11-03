@@ -76,6 +76,7 @@
         "@vitejs/plugin-react": "^5.0.1",
         "code-inspector-plugin": "^1.2.2",
         "cross-env": "^10.0.0",
+        "dotenv": "^17.2.3",
         "electron": "^37.3.1",
         "electron-builder": "^26.0.12",
         "electron-extension-installer": "^2.0.0",

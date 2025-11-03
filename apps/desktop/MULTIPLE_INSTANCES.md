@@ -4,7 +4,33 @@ This guide explains how to run multiple Electron instances simultaneously for pa
 
 ## Quick Start
 
-### macOS/Linux
+### Method 1: Using Worktrees (Recommended)
+
+When you create a new worktree via the Superset app, it automatically runs `update-port.sh` which increments the port number in the root `.env`:
+
+```bash
+# Worktree 1 - automatically uses port 4927
+# Worktree 2 - automatically uses port 4928
+# Worktree 3 - automatically uses port 4929
+```
+
+Each worktree reads the port from the root `.env` file, which gets incremented automatically during worktree setup.
+
+### Method 2: Manual Script Execution
+
+Run the port update script manually from the monorepo root:
+
+```bash
+# Increment port in root .env
+./update-port.sh
+
+# Then run dev in desktop app
+cd apps/desktop && bun dev
+```
+
+### Method 3: Helper Scripts (Advanced)
+
+Override the .env port using environment variables:
 
 ```bash
 # Terminal 1 - Instance 1 on port 4927

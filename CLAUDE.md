@@ -161,18 +161,20 @@ You can run multiple Electron instances simultaneously for parallel development.
 
 **Quick start:**
 ```bash
-# Terminal 1 - Default instance on port 4927
-bun dev
+# Method 1: Auto-increment port when creating worktrees
+# The update-port.sh script runs automatically during worktree setup
+# and increments VITE_DEV_SERVER_PORT in the root .env
 
-# Terminal 2 - Alternative instance on port 4928
+# Method 2: Manual port update
+./update-port.sh  # Increments port in root .env
+cd apps/desktop && bun dev
+
+# Method 3: Helper scripts (override .env)
 ./dev-instance.sh instance2 4928
-
-# Or use the npm script
-bun run dev:alt
 ```
 
-Each instance runs with:
-- **Separate dev server port** via `VITE_DEV_SERVER_PORT` env var
-- **Separate user data directory** via `--user-data-dir` flag
+Each instance needs:
+- **Separate dev server port** - Set via `VITE_DEV_SERVER_PORT` in root `.env`
+- **Separate user data directory** - Pass via `--user-data-dir` flag
 
-This allows you to test different branches, compare features, or debug without affecting other instances.
+The desktop app loads environment variables from the monorepo root `.env` file.
