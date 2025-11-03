@@ -917,14 +917,12 @@ export function WorktreeItem({
 	};
 
 	const handleAddTab = async () => {
-		// Get the first top-level group tab
-		const _firstGroupTab = worktree.tabs.find((t) => t.type === "group");
 		try {
 			const result = await window.ipcRenderer.invoke("tab-create", {
 				workspaceId,
 				worktreeId: worktree.id,
 				// No parentTabId - create at worktree level
-				name: `Terminal ${worktree.tabs.length + 1}`,
+				name: "New Terminal",
 				type: "terminal",
 			});
 

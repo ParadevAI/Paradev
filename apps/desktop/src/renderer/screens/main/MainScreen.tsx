@@ -82,6 +82,28 @@ export function MainScreen() {
 		(wt) => wt.id === selectedWorktreeId,
 	);
 
+	// Helper: Create a new tab
+	const createTab = async (
+		workspaceId: string,
+		worktreeId: string,
+		name: string,
+		type: string,
+	) => {
+		const result = await window.ipcRenderer.invoke("tab-create", {
+			workspaceId,
+			worktreeId,
+			name,
+			type,
+		});
+
+		if (!result.success || !result.tab) {
+			console.error("[MainScreen] Failed to create tab:", result.error);
+			return null;
+		}
+
+		return result.tab;
+	};
+
 	// Configure sensors for drag-and-drop
 	const sensors = useSensors(
 		useSensor(PointerSensor, {
@@ -503,26 +525,20 @@ export function MainScreen() {
 						}
 
 						// Create a new duplicate tab
-						const newTabResult = await window.ipcRenderer.invoke("tab-create", {
-							workspaceId: currentWorkspace.id,
-							worktreeId: selectedWorktreeId,
-							name: originalTab.name,
-							type: originalTab.type,
-						});
+						const newTab = await createTab(
+							currentWorkspace.id,
+							selectedWorktreeId,
+							originalTab.name,
+							originalTab.type,
+						);
 
-						if (!newTabResult.success || !newTabResult.tab) {
-							console.error(
-								"[MainScreen] Failed to create duplicate tab:",
-								newTabResult.error,
-							);
-							return;
-						}
+						if (!newTab) return;
 
 						// Move the new tab into the group
 						const moveResult = await window.ipcRenderer.invoke("tab-move", {
 							workspaceId: currentWorkspace.id,
 							worktreeId: selectedWorktreeId,
-							tabId: newTabResult.tab.id,
+							tabId: newTab.id,
 							sourceParentTabId: undefined,
 							targetParentTabId: selectedTab.id,
 							targetIndex: selectedTab.tabs?.length || 0,
@@ -536,7 +552,7 @@ export function MainScreen() {
 						// Update the mosaic tree to include the new tab
 						const updatedMosaicTree = addTabToMosaicTree(
 							selectedTab.mosaicTree,
-							newTabResult.tab.id,
+							newTab.id,
 						);
 
 						await window.ipcRenderer.invoke("tab-update-mosaic-tree", {
@@ -610,41 +626,29 @@ export function MainScreen() {
 						);
 
 						// Create a new tab with the same type and name
-						const newTabResult = await window.ipcRenderer.invoke("tab-create", {
-							workspaceId: currentWorkspace.id,
-							worktreeId: selectedWorktreeId,
-							name: selectedTab.name,
-							type: selectedTab.type,
-						});
+						const newTab = await createTab(
+							currentWorkspace.id,
+							selectedWorktreeId,
+							selectedTab.name,
+							selectedTab.type,
+						);
 
-						if (!newTabResult.success || !newTabResult.tab) {
-							console.error(
-								"[MainScreen] Failed to create duplicate tab:",
-								newTabResult.error,
-							);
-							return;
-						}
+						if (!newTab) return;
 
-						secondTabId = newTabResult.tab.id;
+						secondTabId = newTab.id;
 					}
 
 					// Create a new group tab
-					const groupResult = await window.ipcRenderer.invoke("tab-create", {
-						workspaceId: currentWorkspace.id,
-						worktreeId: selectedWorktreeId,
-						name: "Tab Group",
-						type: "group",
-					});
+					const groupTab = await createTab(
+						currentWorkspace.id,
+						selectedWorktreeId,
+						"Tab Group",
+						"group",
+					);
 
-					if (!groupResult.success || !groupResult.tab) {
-						console.error(
-							"[MainScreen] Failed to create group tab:",
-							groupResult.error,
-						);
-						return;
-					}
+					if (!groupTab) return;
 
-					const groupTabId = groupResult.tab.id;
+					const groupTabId = groupTab.id;
 
 					// Move both tabs into the group
 					// First, move the currently selected tab
