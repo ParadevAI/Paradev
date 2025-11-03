@@ -27,7 +27,7 @@ const CLIENT_LOGOS = [
 // Scale features data
 const SCALE_FEATURES = [
 	{
-		title: "Build in parallel",
+		title: "Work in parallel",
 		description:
 			"Run multiple agents in parallel. Build features as quickly as you can come up with them.",
 		link: "Learn more",
@@ -403,6 +403,7 @@ export default function Home() {
 			<Header />
 			<main className="flex min-h-screen flex-col bg-black">
 				<HeroSection />
+				<ClientLogosSection />
 				<FeaturesSection onOpenWaitlist={() => setIsWaitlistOpen(true)} />
 				<Footer />
 			</main>
