@@ -6,11 +6,11 @@ import type { ReactNode } from "react";
 import { useState } from "react";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
-import { WaitlistModal } from "@/components/WaitlistModal";
 import { FadeUp } from "@/components/motion/FadeUp";
 import { HeroParallax } from "@/components/motion/HeroParallax";
 import { TiltCard } from "@/components/motion/TiltCard";
 import { HeroCanvas } from "@/components/three/HeroCanvas";
+import { WaitlistModal } from "@/components/WaitlistModal";
 
 // Client logos data
 const CLIENT_LOGOS = [
@@ -27,19 +27,26 @@ const CLIENT_LOGOS = [
 // Scale features data
 const SCALE_FEATURES = [
 	{
-		title: "Build at the speed of thought",
-		description: "Run multiple agents in parallel to experiment and build features as quickly as you can come up with them.",
+		title: "Build in parallel",
+		description:
+			"Run multiple agents in parallel. Build features as quickly as you can come up with them.",
 		link: "Learn more",
 	},
 	{
 		title: "No downtime",
-		description: "Code on the go using always-on agents that work even when you're away from your laptop.",
+		description:
+			"Code on the go. Always-on agents that work even when you're away from your laptop.",
 		link: "Learn more",
 	},
 	{
 		title: "Zero switching cost",
 		description:
-			"As the human in the loop, we handle the port switching and context management so you're never overloaded.",
+			"Be the human in the loop. We handle the port switching and context management so you're never overloaded.",
+		link: "Learn more",
+	},
+	{
+		title: "Bring your own tools",
+		description: "We're a superset of your existing tools, not a replacement. Use your own coding setup, tools, and agents. We bring the tooling and gluing.",
 		link: "Learn more",
 	},
 ] as const;
@@ -332,27 +339,23 @@ function ScaleFeaturesSection() {
 }
 
 // Simplified features section
-function FeaturesSection({
-	onOpenWaitlist,
-}: {
-	onOpenWaitlist: () => void;
-}) {
+function FeaturesSection({ onOpenWaitlist }: { onOpenWaitlist: () => void }) {
 	return (
 		<section className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 md:px-8 bg-black">
-			<div className="max-w-5xl mx-auto">
+			<div className="max-w-3xl mx-auto">
 				<motion.div
 					initial={{ opacity: 0, y: 20 }}
 					whileInView={{ opacity: 1, y: 0 }}
 					viewport={{ once: true, margin: "-100px" }}
 					transition={{ duration: 0.5 }}
-					className="text-center mb-12 sm:mb-16"
+					className="text-center mb-16 sm:mb-20"
 				>
 					<h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
 						Build like a VP of Engineering
 					</h2>
 				</motion.div>
 
-				<div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+				<div className="space-y-8 sm:space-y-12">
 					{SCALE_FEATURES.map((feature, idx) => (
 						<motion.div
 							key={feature.title}
@@ -361,14 +364,12 @@ function FeaturesSection({
 							viewport={{ once: true, margin: "-100px" }}
 							transition={{ duration: 0.5, delay: idx * 0.1 }}
 						>
-							<Card className="p-6 sm:p-8 h-full bg-zinc-950 border-zinc-800 hover:border-zinc-700 transition-all">
-								<h3 className="text-xl sm:text-2xl font-semibold mb-3 text-white">
-									{feature.title}
-								</h3>
-								<p className="text-sm sm:text-base text-zinc-400">
-									{feature.description}
-								</p>
-							</Card>
+							<h3 className="text-2xl sm:text-3xl font-semibold mb-3 text-white">
+								{feature.title}
+							</h3>
+							<p className="text-base sm:text-lg text-zinc-400">
+								{feature.description}
+							</p>
 						</motion.div>
 					))}
 				</div>
@@ -378,7 +379,7 @@ function FeaturesSection({
 					whileInView={{ opacity: 1, y: 0 }}
 					viewport={{ once: true, margin: "-100px" }}
 					transition={{ duration: 0.5, delay: 0.4 }}
-					className="flex justify-center mt-12 sm:mt-16"
+					className="flex justify-center mt-16 sm:mt-20"
 				>
 					<button
 						type="button"
