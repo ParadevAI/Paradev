@@ -7,11 +7,9 @@
 	"main": "./src/index.ts",
 	"types": "./src/index.ts",
 	"scripts": {
-		"dev": "drizzle-kit studio --config=./drizzle.config.ts",
 		"typecheck": "tsc --noEmit",
 		"db:gen": "drizzle-kit generate",
 		"db:push": "drizzle-kit push",
-		"db:studio": "drizzle-kit studio",
 		"db:migrate": "drizzle-kit migrate",
 		"db:seed": "bun src/seed/seed.ts",
 		"db:seed:stripe": "bun src/seed/stripe/stripe.ts",
