@@ -11,6 +11,9 @@ import {
 	ContextMenuContent,
 	ContextMenuItem,
 	ContextMenuSeparator,
+	ContextMenuSub,
+	ContextMenuSubContent,
+	ContextMenuSubTrigger,
 	ContextMenuTrigger,
 } from "@superset/ui/context-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
@@ -1195,24 +1198,30 @@ export function WorktreeItem({
 						</TooltipTrigger>
 					</ContextMenuTrigger>
 					<ContextMenuContent>
-						<ContextMenuItem onClick={onCloneWorktree}>
-							<GitBranch size={14} className="mr-2" />
-							Clone Worktree...
-						</ContextMenuItem>
+						<ContextMenuSub>
+							<ContextMenuSubTrigger>
+								<GitBranch size={14} className="mr-2" />
+								Git
+							</ContextMenuSubTrigger>
+							<ContextMenuSubContent>
+								<ContextMenuItem onClick={onCloneWorktree}>
+									<GitBranch size={14} className="mr-2" />
+									Clone
+								</ContextMenuItem>
+								<ContextMenuItem
+									onClick={handleMergeWorktree}
+									disabled={isMergeDisabled}
+								>
+									<GitMerge size={14} className="mr-2" />
+									{isMergeDisabled ? `Merge (${mergeDisabledReason})` : "Merge"}
+								</ContextMenuItem>
+								<ContextMenuItem onClick={() => setShowGitStatusDialog(true)}>
+									<GitBranch size={14} className="mr-2" />
+									Status
+								</ContextMenuItem>
+							</ContextMenuSubContent>
+						</ContextMenuSub>
 						<ContextMenuSeparator />
-						<ContextMenuItem
-							onClick={handleMergeWorktree}
-							disabled={isMergeDisabled}
-						>
-							<GitMerge size={14} className="mr-2" />
-							{isMergeDisabled
-								? `Merge Worktree (${mergeDisabledReason})`
-								: "Merge Worktree..."}
-						</ContextMenuItem>
-						<ContextMenuItem onClick={() => setShowGitStatusDialog(true)}>
-							<GitBranch size={14} className="mr-2" />
-							Git Status
-						</ContextMenuItem>
 						<ContextMenuItem onClick={handleCopyPath}>
 							<Clipboard size={14} className="mr-2" />
 							Copy Path
