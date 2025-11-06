@@ -4,14 +4,24 @@ import "@xterm/xterm/css/xterm.css";
 import { FitAddon } from "@xterm/addon-fit";
 import { SearchAddon } from "@xterm/addon-search";
 import { WebLinksAddon } from "@xterm/addon-web-links";
+import { createShortcutHandler } from "../../../../lib/keyboard-shortcuts";
+import { createTerminalShortcuts } from "../../../../lib/shortcuts";
 
 // WebglAddon disabled due to cursor positioning issues with autocomplete
 // import { WebglAddon } from "@xterm/addon-webgl";
+
+// Custom styles for terminal padding
+const terminalStyles = `
+	.terminal-with-padding .xterm-screen {
+		padding: 8px;
+	}
+`;
 
 interface TerminalProps {
 	terminalId?: string | null;
 	hidden?: boolean;
 	className?: string;
+	isSelected?: boolean;
 	onFocus?: () => void;
 }
 
@@ -72,6 +82,7 @@ export default function TerminalComponent({
 	terminalId,
 	hidden = false,
 	className = "",
+	isSelected = true,
 	onFocus,
 }: TerminalProps) {
 	const terminalRef = useRef<HTMLDivElement>(null);
@@ -85,6 +96,16 @@ export default function TerminalComponent({
 	useEffect(() => {
 		onFocusRef.current = onFocus;
 	}, [onFocus]);
+
+	// // Auto-focus terminal when selected (new tab or switched tab)
+	// useEffect(() => {
+	// 	if (terminal && terminalId && isSelected) {
+	// 		// Small delay to ensure terminal is fully mounted
+	// 		setTimeout(() => {
+	// 			terminal?.textarea?.focus();
+	// 		}, 50);
+	// 	}
+	// }, [terminal, terminalId, isSelected]);
 
 	useEffect(() => {
 		if (terminal) {
@@ -142,12 +163,9 @@ export default function TerminalComponent({
 		let isResizing = false;
 		let writeQueue: string[] = [];
 
-		// Add iTerm2-like keyboard shortcuts
-		term.attachCustomKeyEventHandler((event: KeyboardEvent) => {
-			// Cmd+K (Mac) or Ctrl+K (Win/Linux): Clear terminal like iTerm2
-			// This clears both the scrollback buffer and sends clear to the shell
-			if (event.metaKey && event.key === "k") {
-				event.preventDefault();
+		// Set up keyboard shortcuts
+		const terminalShortcuts = createTerminalShortcuts({
+			clearTerminal: () => {
 				// Clear the xterm buffer (removes scrollback)
 				term.clear();
 				// Also send clear command to shell to reset shell state
@@ -157,11 +175,11 @@ export default function TerminalComponent({
 						data: "\x0c", // Form feed (Ctrl+L) - clears screen in most shells
 					});
 				}
-				return false; // Prevent default terminal handling
-			}
-			// Allow all other keys to be processed normally
-			return true;
+			},
 		});
+
+		const handleShortcut = createShortcutHandler(terminalShortcuts.shortcuts);
+		term.attachCustomKeyEventHandler(handleShortcut);
 
 		// Load addons
 		// 1. WebLinks - Makes URLs clickable and open in default browser
@@ -421,9 +439,12 @@ export default function TerminalComponent({
 	}
 
 	return (
-		<div
-			ref={terminalRef}
-			className={`h-full w-full transition-opacity duration-200 text-start ${hidden ? "opacity-0" : "opacity-100 delay-300"}`}
-		/>
+		<>
+			<style>{terminalStyles}</style>
+			<div
+				ref={terminalRef}
+				className={`terminal-with-padding h-full w-full transition-opacity duration-200 text-start ${hidden ? "opacity-0" : "opacity-100 delay-300"}`}
+			/>
+		</>
 	);
 }

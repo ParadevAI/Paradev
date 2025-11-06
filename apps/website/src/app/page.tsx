@@ -15,6 +15,7 @@ import { WaitlistModal } from "@/components/WaitlistModal";
 // Client logos data
 const CLIENT_LOGOS = [
 	{ name: "numbies", logo: "numbies.xyz" },
+	{ name: "findmymachinist", logo: "findmymachinist.com" },
 	{ name: "cadra", logo: "Cadra" },
 	{ name: "onlook", logo: "Onlook" },
 	{ name: "amazon", logo: "Amazon" },

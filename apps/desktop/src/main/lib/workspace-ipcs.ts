@@ -5,11 +5,13 @@ import type {
 	CreateWorkspaceInput,
 	CreateWorktreeInput,
 	MosaicNode,
+	UpdatePreviewTabInput,
 	UpdateWorkspaceInput,
 } from "shared/types";
 
 import configManager from "./config-manager";
 import workspaceManager from "./workspace-manager";
+import worktreeManager from "./worktree-manager";
 
 export function registerWorkspaceIPCs() {
 	// Open repository dialog
@@ -133,6 +135,14 @@ export function registerWorkspaceIPCs() {
 	ipcMain.handle("tab-create", async (_event, input: CreateTabInput) => {
 		return await workspaceManager.createTab(input);
 	});
+
+	// Update preview tab
+	ipcMain.handle(
+		"tab-update-preview",
+		async (_event, input: UpdatePreviewTabInput) => {
+			return await workspaceManager.updatePreviewTab(input);
+		},
+	);
 
 	// Delete tab
 	ipcMain.handle(
@@ -419,6 +429,45 @@ export function registerWorkspaceIPCs() {
 				input.worktreeId,
 				input.createIfMissing,
 			);
+		},
+	);
+
+	// Get git status for a worktree
+	ipcMain.handle(
+		"worktree-get-git-status",
+		async (_event, input: { workspaceId: string; worktreeId: string }) => {
+			try {
+				const workspace = await workspaceManager.getWorkspace(
+					input.workspaceId,
+				);
+				if (!workspace) {
+					return {
+						success: false,
+						error: "Workspace not found",
+					};
+				}
+
+				const worktree = workspace.worktrees.find(
+					(wt) => wt.id === input.worktreeId,
+				);
+				if (!worktree) {
+					return {
+						success: false,
+						error: "Worktree not found",
+					};
+				}
+
+				return await worktreeManager.getGitStatus(
+					worktree.path,
+					workspace.branch,
+				);
+			} catch (error) {
+				console.error("Failed to get git status:", error);
+				return {
+					success: false,
+					error: error instanceof Error ? error.message : String(error),
+				};
+			}
 		},
 	);
 

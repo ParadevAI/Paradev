@@ -22,6 +22,7 @@ import {
 	FolderOpen,
 	GitBranch,
 	GitMerge,
+	Monitor,
 	Plus,
 	Settings,
 	Star,
@@ -39,7 +40,15 @@ import {
 } from "renderer/components/ui/dialog";
 import type { Tab, Worktree } from "shared/types";
 import { WorktreePortsList } from "../WorktreePortsList";
+import { GitStatusDialog } from "./components/GitStatusDialog";
 import { TabItem } from "./components/TabItem";
+
+interface ProxyStatus {
+	canonical: number;
+	target?: number;
+	service?: string;
+	active: boolean;
+}
 
 // Sortable wrapper for tabs
 function SortableTab({
@@ -335,6 +344,7 @@ export function WorktreeItem({
 	const [showRemoveDialog, setShowRemoveDialog] = useState(false);
 	const [showMergeDialog, setShowMergeDialog] = useState(false);
 	const [showErrorDialog, setShowErrorDialog] = useState(false);
+	const [showGitStatusDialog, setShowGitStatusDialog] = useState(false);
 	const [errorMessage, setErrorMessage] = useState("");
 	const [errorTitle, setErrorTitle] = useState("");
 	const [mergeWarning, setMergeWarning] = useState("");
@@ -942,6 +952,75 @@ export function WorktreeItem({
 		}
 	};
 
+	const handleAddPreview = async () => {
+		try {
+			const previewTabs = Array.isArray(worktree.tabs)
+				? worktree.tabs.filter((tab) => tab.type === "preview")
+				: [];
+			const previewIndex = previewTabs.length + 1;
+
+			const detectedPorts = worktree.detectedPorts || {};
+			const portEntries = Object.entries(detectedPorts);
+
+			let initialUrl: string | undefined;
+			let previewLabel =
+				previewIndex > 1 ? `Preview ${previewIndex}` : "Preview";
+
+			if (portEntries.length > 0) {
+				const [service, port] = portEntries[0];
+
+				try {
+					const status = (await window.ipcRenderer.invoke(
+						"proxy-get-status",
+					)) as ProxyStatus[];
+					const activeProxies = (status || []).filter(
+						(item) => item.active && typeof item.target === "number",
+					);
+					const proxyMap = new Map(
+						activeProxies.map((item) => [
+							item.target as number,
+							item.canonical,
+						]),
+					);
+
+					const canonicalPort = proxyMap.get(port);
+					const resolvedPort = canonicalPort ?? port;
+					initialUrl = `http://localhost:${resolvedPort}`;
+				} catch (error) {
+					console.error("Failed to determine proxied port:", error);
+					initialUrl = `http://localhost:${port}`;
+				}
+
+				if (service) {
+					previewLabel =
+						previewIndex > 1
+							? `Preview ${previewIndex} – ${service}`
+							: `Preview – ${service}`;
+				}
+			}
+
+			const result = await window.ipcRenderer.invoke("tab-create", {
+				workspaceId,
+				worktreeId: worktree.id,
+				name: previewLabel,
+				type: "preview",
+				url: initialUrl,
+			});
+
+			if (result.success) {
+				const newTabId = result.tab?.id;
+				if (newTabId) {
+					handleTabSelect(worktree.id, newTabId, false);
+				}
+				onReload();
+			} else {
+				console.error("Failed to create preview tab:", result.error);
+			}
+		} catch (error) {
+			console.error("Error creating preview tab:", error);
+		}
+	};
+
 	const handleTabRemove = async (tabId: string) => {
 		try {
 			const result = await window.ipcRenderer.invoke("tab-delete", {
@@ -1132,6 +1211,10 @@ export function WorktreeItem({
 								? `Merge Worktree (${mergeDisabledReason})`
 								: "Merge Worktree..."}
 						</ContextMenuItem>
+						<ContextMenuItem onClick={() => setShowGitStatusDialog(true)}>
+							<GitBranch size={14} className="mr-2" />
+							Git Status
+						</ContextMenuItem>
 						<ContextMenuItem onClick={handleCopyPath}>
 							<Clipboard size={14} className="mr-2" />
 							Copy Path
@@ -1177,17 +1260,27 @@ export function WorktreeItem({
 						{tabs.map((tab) => renderTab(tab, undefined, 0))}
 					</SortableContext>
 
-					{/* New Tab Button */}
-					<Button
-						variant="ghost"
-						size="sm"
-						onClick={handleAddTab}
-						className="w-full h-8 px-3 font-normal opacity-70 hover:opacity-100"
-						style={{ justifyContent: "flex-start" }}
-					>
-						<Plus size={14} />
-						<span className="truncate">New Tab</span>
-					</Button>
+					{/* New Terminal / Preview Buttons */}
+					<div className="flex flex-col sm:flex-row items-stretch gap-2 w-full">
+						<Button
+							variant="ghost"
+							size="sm"
+							onClick={handleAddTab}
+							className="flex-1 h-8 px-2 font-normal opacity-70 hover:opacity-100 min-w-0"
+						>
+							<Plus size={14} className="shrink-0" />
+							<span className="truncate ml-1">Terminal</span>
+						</Button>
+						<Button
+							variant="ghost"
+							size="sm"
+							onClick={handleAddPreview}
+							className="flex-1 h-8 px-2 font-normal opacity-70 hover:opacity-100 min-w-0"
+						>
+							<Monitor size={14} className="shrink-0" />
+							<span className="truncate ml-1">Preview</span>
+						</Button>
+					</div>
 				</div>
 			)}
 
@@ -1297,6 +1390,15 @@ export function WorktreeItem({
 					</DialogFooter>
 				</DialogContent>
 			</Dialog>
+
+			{/* Git Status Dialog */}
+			<GitStatusDialog
+				open={showGitStatusDialog}
+				onOpenChange={setShowGitStatusDialog}
+				workspaceId={workspaceId}
+				worktreeId={worktree.id}
+				worktreeBranch={worktree.branch}
+			/>
 		</div>
 	);
 }
