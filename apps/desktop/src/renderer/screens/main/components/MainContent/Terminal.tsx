@@ -10,18 +10,9 @@ import { createTerminalShortcuts } from "../../../../lib/shortcuts";
 // WebglAddon disabled due to cursor positioning issues with autocomplete
 // import { WebglAddon } from "@xterm/addon-webgl";
 
-// Custom styles for terminal padding
-const terminalStyles = `
-	.terminal-with-padding .xterm-screen {
-		padding: 8px;
-	}
-`;
-
 interface TerminalProps {
 	terminalId?: string | null;
 	hidden?: boolean;
-	className?: string;
-	isSelected?: boolean;
 	onFocus?: () => void;
 }
 
@@ -81,31 +72,18 @@ const TERMINAL_THEME: Record<"LIGHT" | "DARK", ITheme> = {
 export default function TerminalComponent({
 	terminalId,
 	hidden = false,
-	className = "",
-	isSelected = true,
 	onFocus,
 }: TerminalProps) {
 	const terminalRef = useRef<HTMLDivElement>(null);
 	const [terminal, setTerminal] = useState<XTerm | null>(null);
 	const [theme] = useState<"light" | "dark">("dark"); // Can be connected to theme provider later
-	const terminalIdRef = useRef<string | null>(null);
+	const terminalIdRef = useRef<string | null>(null); // Also serves as initialization guard
 	const onFocusRef = useRef(onFocus);
-	const fitFunctionRef = useRef<(() => void) | null>(null);
 
 	// Update the ref when onFocus changes
 	useEffect(() => {
 		onFocusRef.current = onFocus;
 	}, [onFocus]);
-
-	// // Auto-focus terminal when selected (new tab or switched tab)
-	// useEffect(() => {
-	// 	if (terminal && terminalId && isSelected) {
-	// 		// Small delay to ensure terminal is fully mounted
-	// 		setTimeout(() => {
-	// 			terminal?.textarea?.focus();
-	// 		}, 50);
-	// 	}
-	// }, [terminal, terminalId, isSelected]);
 
 	useEffect(() => {
 		if (terminal) {
@@ -115,24 +93,28 @@ export default function TerminalComponent({
 	}, [theme, terminal]);
 
 	useEffect(() => {
-		if (!terminalRef.current || terminal || !terminalId) {
+		// Guard: only initialize once per terminalId
+		// terminalIdRef serves as both storage and initialization guard
+		if (!terminalRef.current || terminal || !terminalId || terminalIdRef.current === terminalId) {
 			return;
 		}
 
-		const { term, terminalDataListener, cleanup, fit } = initTerminal(
+		// Set terminalIdRef immediately to prevent race conditions
+		terminalIdRef.current = terminalId;
+
+		const { term } = initTerminal(
 			terminalRef.current,
 			theme,
 			onFocusRef,
 		);
 		setTerminal(term);
-		fitFunctionRef.current = fit;
 
 		return () => {
 			// Don't dispose XTerm or cleanup on unmount
 			// XTerm instances should persist through reordering
 			// They will only be cleaned up when the tab is removed from config
 		};
-	}, [theme, terminalId]);
+	}, [terminalId]); // Only re-run when terminalId changes
 
 	function initTerminal(
 		container: HTMLDivElement,
@@ -145,12 +127,12 @@ export default function TerminalComponent({
 			fontFamily: 'Menlo, Monaco, "Courier New", monospace',
 			theme:
 				currentTheme === "light" ? TERMINAL_THEME.LIGHT : TERMINAL_THEME.DARK,
-			allowTransparency: true,
-			disableStdin: false,
-			// Add scrollback configuration for better history handling
-			scrollback: 10000,
-			// Enable alternate screen for better full-screen app support
-			altClickMovesCursor: false,
+			scrollback: 9999999, // Very large scrollback buffer (practical maximum)
+			// Use xterm.js defaults for all other settings to match standard terminal behavior
+			// scrollOnUserInput: true (default)
+			// altClickMovesCursor: true (default - matches iTerm2)
+			// convertEol: false (default - PTY handles EOL conversion)
+			// fastScrollModifier: "alt" (default)
 		});
 
 		term.open(container);
@@ -189,19 +171,7 @@ export default function TerminalComponent({
 		});
 		term.loadAddon(webLinksAddon);
 
-		// 2. WebGL Renderer - DISABLED due to cursor positioning issues with autocomplete
-		// WebGL can cause cursor desynchronization when shell sends rapid escape sequences
-		// Canvas renderer is more stable for autocomplete and dynamic content
-		// Uncomment the lines below to re-enable WebGL if needed
-		// const webglAddon: WebglAddon | null = null;
-		// try {
-		// 	webglAddon = new WebglAddon();
-		// 	term.loadAddon(webglAddon);
-		// } catch (e) {
-		// 	console.warn("WebGL addon failed to load, falling back to canvas:", e);
-		// }
-
-		// 3. FitAddon - Automatically fit terminal to container
+		// 2. FitAddon - Automatically fit terminal to container
 		const fitAddon = new FitAddon();
 		term.loadAddon(fitAddon);
 
@@ -230,7 +200,7 @@ export default function TerminalComponent({
 			}
 		};
 
-		// 4. SearchAddon - Enable text searching (Ctrl+F or Cmd+F)
+		// 3. SearchAddon - Enable text searching (Ctrl+F or Cmd+F)
 		const searchAddon = new SearchAddon();
 		term.loadAddon(searchAddon);
 
@@ -280,20 +250,13 @@ export default function TerminalComponent({
 		// Also listen for window resize as fallback
 		window.addEventListener("resize", handleResize);
 
-		// Use the provided terminalId from props
+		// terminalIdRef.current is already set in the useEffect before calling initTerminal
+		// Get terminal history for existing terminal
 		if (terminalId) {
-			terminalIdRef.current = terminalId;
-
-			// Get terminal history for existing terminal
 			window.ipcRenderer
 				.invoke("terminal-get-history", terminalId)
 				.then((history: string | undefined) => {
 					if (history) {
-						// Debug: log the last characters of history
-						console.log(
-							"History last 50 chars:",
-							JSON.stringify(history.slice(-50)),
-						);
 						// Write history directly - PTY data already has proper formatting
 						term.write(history);
 
@@ -422,29 +385,18 @@ export default function TerminalComponent({
 			} catch (e) {
 				console.warn("WebLinksAddon disposal failed:", e);
 			}
-			// WebGL addon disposal removed (addon disabled)
-			// if (webglAddon) {
-			// 	try {
-			// 		webglAddon.dispose();
-			// 	} catch (e) {
-			// 		console.warn("WebglAddon disposal failed:", e);
-			// 	}
-			// }
 
 			// Terminal process lifecycle is managed by ScreenLayout
 			// Don't kill it here to avoid conflicts
 		};
 
-		return { term, terminalDataListener, cleanup, fit: customFit };
+		return { term };
 	}
 
 	return (
-		<>
-			<style>{terminalStyles}</style>
-			<div
-				ref={terminalRef}
-				className={`terminal-with-padding h-full w-full transition-opacity duration-200 text-start ${hidden ? "opacity-0" : "opacity-100 delay-300"}`}
-			/>
-		</>
+		<div
+			ref={terminalRef}
+			className={`h-full w-full transition-opacity duration-200 text-start [&_.xterm-screen]:!p-0 ${hidden ? "opacity-0" : "opacity-100 delay-300"}`}
+		/>
 	);
 }
