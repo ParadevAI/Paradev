@@ -1635,7 +1635,12 @@ export function MainScreen() {
 									onWorkspaceSelect={handleWorkspaceSelect}
 									onUpdateWorktree={handleUpdateWorktree}
 									selectedTabId={selectedTabId ?? undefined}
-									onCollapse={() => setIsSidebarOpen(false)}
+									onCollapse={() => {
+									const panel = sidebarPanelRef.current;
+									if (panel && !panel.isCollapsed()) {
+										panel.collapse();
+									}
+								}}
 									isDragging={!!activeId}
 								/>
 							)}
@@ -1645,12 +1650,17 @@ export function MainScreen() {
 						<ResizablePanel minSize={30}>
 							<div className="flex flex-col h-full overflow-hidden">
 								{/* Top Bar */}
-								{/* <TopBar
-							isSidebarOpen={isSidebarOpen}
-							onOpenSidebar={() => setIsSidebarOpen(true)}
-							workspaceName={currentWorkspace?.name}
-							currentBranch={currentWorkspace?.branch}
-						/> */}
+								<TopBar
+									isSidebarOpen={isSidebarOpen}
+									onOpenSidebar={() => {
+										const panel = sidebarPanelRef.current;
+										if (panel && panel.isCollapsed()) {
+											panel.expand();
+										}
+									}}
+									workspaceName={currentWorkspace?.name}
+									currentBranch={currentWorkspace?.branch}
+								/>
 
 								{/* Content Area */}
 								<DroppableMainContent isOver={isOverMainContent}>
