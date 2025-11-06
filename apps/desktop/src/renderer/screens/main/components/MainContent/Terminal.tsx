@@ -81,7 +81,7 @@ export default function TerminalComponent({
 	const terminalRef = useRef<HTMLDivElement>(null);
 	const [terminal, setTerminal] = useState<XTerm | null>(null);
 	const [theme] = useState<"light" | "dark">("dark"); // Can be connected to theme provider later
-	const terminalIdRef = useRef<string | null>(null);
+	const terminalIdRef = useRef<string | null>(null); // Also serves as initialization guard
 	const onFocusRef = useRef(onFocus);
 	const fitFunctionRef = useRef<(() => void) | null>(null);
 
@@ -108,9 +108,14 @@ export default function TerminalComponent({
 	}, [theme, terminal]);
 
 	useEffect(() => {
-		if (!terminalRef.current || terminal || !terminalId) {
+		// Guard: only initialize once per terminalId
+		// terminalIdRef serves as both storage and initialization guard
+		if (!terminalRef.current || terminal || !terminalId || terminalIdRef.current === terminalId) {
 			return;
 		}
+
+		// Set terminalIdRef immediately to prevent race conditions
+		terminalIdRef.current = terminalId;
 
 		const { term, terminalDataListener, cleanup, fit } = initTerminal(
 			terminalRef.current,
@@ -125,7 +130,7 @@ export default function TerminalComponent({
 			// XTerm instances should persist through reordering
 			// They will only be cleaned up when the tab is removed from config
 		};
-	}, [theme, terminalId]);
+	}, [terminalId]); // Only re-run when terminalId changes
 
 	function initTerminal(
 		container: HTMLDivElement,
@@ -273,11 +278,9 @@ export default function TerminalComponent({
 		// Also listen for window resize as fallback
 		window.addEventListener("resize", handleResize);
 
-		// Use the provided terminalId from props
+		// terminalIdRef.current is already set in the useEffect before calling initTerminal
+		// Get terminal history for existing terminal
 		if (terminalId) {
-			terminalIdRef.current = terminalId;
-
-			// Get terminal history for existing terminal
 			window.ipcRenderer
 				.invoke("terminal-get-history", terminalId)
 				.then((history: string | undefined) => {
