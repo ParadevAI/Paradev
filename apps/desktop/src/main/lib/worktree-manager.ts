@@ -390,6 +390,143 @@ class WorktreeManager {
 			return false;
 		}
 	}
+
+	/**
+	 * Get detailed git status for a worktree
+	 */
+	async getGitStatus(
+		worktreePath: string,
+		mainBranch: string,
+	): Promise<{
+		success: boolean;
+		status?: {
+			branch: string;
+			ahead: number;
+			behind: number;
+			files: {
+				staged: Array<{ path: string; status: string }>;
+				unstaged: Array<{ path: string; status: string }>;
+				untracked: Array<{ path: string }>;
+			};
+			diffAgainstMain: string;
+			isMerging: boolean;
+			isRebasing: boolean;
+			conflictFiles: string[];
+		};
+		error?: string;
+	}> {
+		try {
+			// Get current branch
+			const branchResult = await execAsync("git rev-parse --abbrev-ref HEAD", {
+				cwd: worktreePath,
+			});
+			const branch = branchResult.stdout.trim();
+
+			// Get ahead/behind counts
+			let ahead = 0;
+			let behind = 0;
+			try {
+				const revListResult = await execAsync(
+					`git rev-list --left-right --count ${mainBranch}...HEAD`,
+					{ cwd: worktreePath },
+				);
+				const [behindStr, aheadStr] = revListResult.stdout.trim().split("\t");
+				behind = Number.parseInt(behindStr, 10) || 0;
+				ahead = Number.parseInt(aheadStr, 10) || 0;
+			} catch (error) {
+				console.warn("Could not get ahead/behind counts:", error);
+			}
+
+			// Get file status
+			const statusResult = await execAsync("git status --porcelain", {
+				cwd: worktreePath,
+			});
+			const statusLines = statusResult.stdout
+				.trim()
+				.split("\n")
+				.filter(Boolean);
+
+			const staged: Array<{ path: string; status: string }> = [];
+			const unstaged: Array<{ path: string; status: string }> = [];
+			const untracked: Array<{ path: string }> = [];
+
+			for (const line of statusLines) {
+				const statusCode = line.substring(0, 2);
+				const filePath = line.substring(3);
+
+				if (statusCode[0] !== " " && statusCode[0] !== "?") {
+					// Staged changes
+					staged.push({ path: filePath, status: statusCode[0] });
+				}
+				if (statusCode[1] !== " " && statusCode[1] !== "?") {
+					// Unstaged changes
+					unstaged.push({ path: filePath, status: statusCode[1] });
+				}
+				if (statusCode === "??") {
+					// Untracked files
+					untracked.push({ path: filePath });
+				}
+			}
+
+			// Get diff against main branch
+			let diffAgainstMain = "";
+			try {
+				const diffResult = await execAsync(
+					`git diff ${mainBranch}...HEAD --stat`,
+					{ cwd: worktreePath },
+				);
+				diffAgainstMain = diffResult.stdout.trim();
+			} catch (error) {
+				console.warn("Could not get diff against main:", error);
+			}
+
+			// Check merge/rebase state
+			const gitDir = path.join(worktreePath, ".git");
+			const isMerging = existsSync(path.join(gitDir, "MERGE_HEAD"));
+			const isRebasing =
+				existsSync(path.join(gitDir, "rebase-merge")) ||
+				existsSync(path.join(gitDir, "rebase-apply"));
+
+			// Get conflict files
+			const conflictFiles: string[] = [];
+			if (isMerging || isRebasing) {
+				for (const line of statusLines) {
+					const statusCode = line.substring(0, 2);
+					if (
+						statusCode.includes("U") ||
+						statusCode === "AA" ||
+						statusCode === "DD"
+					) {
+						conflictFiles.push(line.substring(3));
+					}
+				}
+			}
+
+			return {
+				success: true,
+				status: {
+					branch,
+					ahead,
+					behind,
+					files: {
+						staged,
+						unstaged,
+						untracked,
+					},
+					diffAgainstMain,
+					isMerging,
+					isRebasing,
+					conflictFiles,
+				},
+			};
+		} catch (error) {
+			console.error("Failed to get git status:", error);
+			return {
+				success: false,
+				error: error instanceof Error ? error.message : String(error),
+			};
+		}
+	}
 }
 
 export default WorktreeManager.getInstance();

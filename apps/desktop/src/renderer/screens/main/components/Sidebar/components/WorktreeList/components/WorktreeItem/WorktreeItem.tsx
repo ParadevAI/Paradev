@@ -41,6 +41,7 @@ import {
 } from "renderer/components/ui/dialog";
 import type { Tab, Worktree } from "shared/types";
 import { WorktreePortsList } from "../WorktreePortsList";
+import { GitStatusDialog } from "./components/GitStatusDialog";
 import { TabItem } from "./components/TabItem";
 
 // Sortable wrapper for tabs
@@ -337,6 +338,7 @@ export function WorktreeItem({
 	const [showRemoveDialog, setShowRemoveDialog] = useState(false);
 	const [showMergeDialog, setShowMergeDialog] = useState(false);
 	const [showErrorDialog, setShowErrorDialog] = useState(false);
+	const [showGitStatusDialog, setShowGitStatusDialog] = useState(false);
 	const [errorMessage, setErrorMessage] = useState("");
 	const [errorTitle, setErrorTitle] = useState("");
 	const [mergeWarning, setMergeWarning] = useState("");
@@ -1126,7 +1128,7 @@ export function WorktreeItem({
 						<ContextMenuSubContent>
 							<ContextMenuItem onClick={onCloneWorktree}>
 								<GitBranch size={14} className="mr-2" />
-								Clone Worktree...
+								Clone Worktree
 							</ContextMenuItem>
 							<ContextMenuItem
 								onClick={handleMergeWorktree}
@@ -1135,9 +1137,9 @@ export function WorktreeItem({
 								<GitMerge size={14} className="mr-2" />
 								{isMergeDisabled
 									? `Merge Worktree (${mergeDisabledReason})`
-									: "Merge Worktree..."}
+									: "Merge Worktree"}
 							</ContextMenuItem>
-							<ContextMenuItem onClick={() => console.log("Git Status clicked")}>
+							<ContextMenuItem onClick={() => setShowGitStatusDialog(true)}>
 								<GitBranch size={14} className="mr-2" />
 								Git Status
 							</ContextMenuItem>
@@ -1302,6 +1304,15 @@ export function WorktreeItem({
 					</DialogFooter>
 				</DialogContent>
 			</Dialog>
+
+			{/* Git Status Dialog */}
+			<GitStatusDialog
+				open={showGitStatusDialog}
+				onOpenChange={setShowGitStatusDialog}
+				workspaceId={workspaceId}
+				worktreeId={worktree.id}
+				worktreeBranch={worktree.branch}
+			/>
 		</div>
 	);
 }
