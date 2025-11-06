@@ -5,6 +5,7 @@ import type {
 	CreateWorkspaceInput,
 	CreateWorktreeInput,
 	MosaicNode,
+	UpdatePreviewTabInput,
 	UpdateWorkspaceInput,
 } from "shared/types";
 
@@ -134,6 +135,14 @@ export function registerWorkspaceIPCs() {
 	ipcMain.handle("tab-create", async (_event, input: CreateTabInput) => {
 		return await workspaceManager.createTab(input);
 	});
+
+	// Update preview tab
+	ipcMain.handle(
+		"tab-update-preview",
+		async (_event, input: UpdatePreviewTabInput) => {
+			return await workspaceManager.updatePreviewTab(input);
+		},
+	);
 
 	// Delete tab
 	ipcMain.handle(
@@ -459,6 +468,21 @@ export function registerWorkspaceIPCs() {
 					error: error instanceof Error ? error.message : String(error),
 				};
 			}
+		},
+	);
+
+	// Update worktree description
+	ipcMain.handle(
+		"worktree-update-description",
+		async (
+			_event,
+			input: { workspaceId: string; worktreeId: string; description: string },
+		) => {
+			return await workspaceManager.updateWorktreeDescription(
+				input.workspaceId,
+				input.worktreeId,
+				input.description,
+			);
 		},
 	);
 

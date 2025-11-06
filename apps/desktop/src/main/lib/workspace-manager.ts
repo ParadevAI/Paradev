@@ -4,6 +4,7 @@ import type {
 	CreateWorktreeInput,
 	MosaicNode,
 	Tab,
+	UpdatePreviewTabInput,
 	UpdateWorkspaceInput,
 	Workspace,
 	Worktree,
@@ -268,6 +269,25 @@ class WorkspaceManager {
 		);
 	}
 
+	/**
+	 * Update worktree description
+	 */
+	async updateWorktreeDescription(
+		workspaceId: string,
+		worktreeId: string,
+		description: string,
+	): Promise<{ success: boolean; error?: string }> {
+		const workspace = await this.get(workspaceId);
+		if (!workspace) {
+			return { success: false, error: "Workspace not found" };
+		}
+		return worktreeOps.updateWorktreeDescription(
+			workspace,
+			worktreeId,
+			description,
+		);
+	}
+
 	// ============================================================================
 	// Tab Operations
 	// ============================================================================
@@ -382,6 +402,19 @@ class WorkspaceManager {
 			tabId,
 			name,
 		});
+	}
+
+	/**
+	 * Update preview tab URL
+	 */
+	async updatePreviewTab(
+		input: UpdatePreviewTabInput,
+	): Promise<{ success: boolean; error?: string }> {
+		const workspace = await this.get(input.workspaceId);
+		if (!workspace) {
+			return { success: false, error: "Workspace not found" };
+		}
+		return tabOps.updatePreviewTabUrl(workspace, input);
 	}
 
 	/**

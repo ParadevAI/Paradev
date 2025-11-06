@@ -11,11 +11,9 @@ import {
 	ContextMenuContent,
 	ContextMenuItem,
 	ContextMenuSeparator,
-	ContextMenuSub,
-	ContextMenuSubContent,
-	ContextMenuSubTrigger,
 	ContextMenuTrigger,
 } from "@superset/ui/context-menu";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import {
 	ChevronRight,
 	Clipboard,
@@ -24,6 +22,7 @@ import {
 	FolderOpen,
 	GitBranch,
 	GitMerge,
+	Monitor,
 	Plus,
 	Settings,
 	Star,
@@ -43,6 +42,13 @@ import type { Tab, Worktree } from "shared/types";
 import { WorktreePortsList } from "../WorktreePortsList";
 import { GitStatusDialog } from "./components/GitStatusDialog";
 import { TabItem } from "./components/TabItem";
+
+interface ProxyStatus {
+	canonical: number;
+	target?: number;
+	service?: string;
+	active: boolean;
+}
 
 // Sortable wrapper for tabs
 function SortableTab({
@@ -922,14 +928,12 @@ export function WorktreeItem({
 	};
 
 	const handleAddTab = async () => {
-		// Get the first top-level group tab
-		const _firstGroupTab = worktree.tabs.find((t) => t.type === "group");
 		try {
 			const result = await window.ipcRenderer.invoke("tab-create", {
 				workspaceId,
 				worktreeId: worktree.id,
 				// No parentTabId - create at worktree level
-				name: `Terminal ${worktree.tabs.length + 1}`,
+				name: "New Terminal",
 				type: "terminal",
 			});
 
@@ -945,6 +949,75 @@ export function WorktreeItem({
 			}
 		} catch (error) {
 			console.error("Error creating tab:", error);
+		}
+	};
+
+	const handleAddPreview = async () => {
+		try {
+			const previewTabs = Array.isArray(worktree.tabs)
+				? worktree.tabs.filter((tab) => tab.type === "preview")
+				: [];
+			const previewIndex = previewTabs.length + 1;
+
+			const detectedPorts = worktree.detectedPorts || {};
+			const portEntries = Object.entries(detectedPorts);
+
+			let initialUrl: string | undefined;
+			let previewLabel =
+				previewIndex > 1 ? `Preview ${previewIndex}` : "Preview";
+
+			if (portEntries.length > 0) {
+				const [service, port] = portEntries[0];
+
+				try {
+					const status = (await window.ipcRenderer.invoke(
+						"proxy-get-status",
+					)) as ProxyStatus[];
+					const activeProxies = (status || []).filter(
+						(item) => item.active && typeof item.target === "number",
+					);
+					const proxyMap = new Map(
+						activeProxies.map((item) => [
+							item.target as number,
+							item.canonical,
+						]),
+					);
+
+					const canonicalPort = proxyMap.get(port);
+					const resolvedPort = canonicalPort ?? port;
+					initialUrl = `http://localhost:${resolvedPort}`;
+				} catch (error) {
+					console.error("Failed to determine proxied port:", error);
+					initialUrl = `http://localhost:${port}`;
+				}
+
+				if (service) {
+					previewLabel =
+						previewIndex > 1
+							? `Preview ${previewIndex} – ${service}`
+							: `Preview – ${service}`;
+				}
+			}
+
+			const result = await window.ipcRenderer.invoke("tab-create", {
+				workspaceId,
+				worktreeId: worktree.id,
+				name: previewLabel,
+				type: "preview",
+				url: initialUrl,
+			});
+
+			if (result.success) {
+				const newTabId = result.tab?.id;
+				if (newTabId) {
+					handleTabSelect(worktree.id, newTabId, false);
+				}
+				onReload();
+			} else {
+				console.error("Failed to create preview tab:", result.error);
+			}
+		} catch (error) {
+			console.error("Error creating preview tab:", error);
 		}
 	};
 
@@ -1092,81 +1165,84 @@ export function WorktreeItem({
 	return (
 		<div className="space-y-1">
 			{/* Worktree Header */}
-			<ContextMenu>
-				<ContextMenuTrigger asChild>
-					<Button
-						variant="ghost"
-						size="sm"
-						onClick={() => onToggle(worktree.id)}
-						className="group w-full h-8 px-3 pb-1 font-normal relative"
-						style={{ justifyContent: "flex-start" }}
-					>
-						<ChevronRight
-							size={12}
-							className={`transition-transform ${isExpanded ? "rotate-90" : ""}`}
-						/>
-						<GitBranch size={14} className="opacity-70" />
-						<span className="truncate flex-1 text-left">{worktree.branch}</span>
-						{worktree.branch === mainBranch && (
-							<Star
-								size={14}
-								className="text-yellow-500 shrink-0 fill-yellow-500"
-							/>
-						)}
-						{worktree.merged && (
-							<GitMerge size={14} className="text-purple-500 shrink-0" />
-						)}
-					</Button>
-				</ContextMenuTrigger>
-				<ContextMenuContent>
-					{/* Git operations submenu */}
-					<ContextMenuSub>
-						<ContextMenuSubTrigger>
-							<GitBranch size={14} className="mr-2" />
-							Git
-						</ContextMenuSubTrigger>
-						<ContextMenuSubContent>
-							<ContextMenuItem onClick={onCloneWorktree}>
-								<GitBranch size={14} className="mr-2" />
-								Clone Worktree
-							</ContextMenuItem>
-							<ContextMenuItem
-								onClick={handleMergeWorktree}
-								disabled={isMergeDisabled}
+			<Tooltip>
+				<ContextMenu>
+					<ContextMenuTrigger asChild>
+						<TooltipTrigger asChild>
+							<Button
+								variant="ghost"
+								size="sm"
+								onClick={() => onToggle(worktree.id)}
+								className="group w-full h-8 px-3 pb-1 font-normal relative"
+								style={{ justifyContent: "flex-start" }}
 							>
-								<GitMerge size={14} className="mr-2" />
-								{isMergeDisabled
-									? `Merge Worktree (${mergeDisabledReason})`
-									: "Merge Worktree"}
-							</ContextMenuItem>
-							<ContextMenuItem onClick={() => setShowGitStatusDialog(true)}>
-								<GitBranch size={14} className="mr-2" />
-								Git Status
-							</ContextMenuItem>
-						</ContextMenuSubContent>
-					</ContextMenuSub>
-					<ContextMenuSeparator />
-					{/* Files group */}
-					<ContextMenuItem onClick={handleCopyPath}>
-						<Clipboard size={14} className="mr-2" />
-						Copy Path
-					</ContextMenuItem>
-					<ContextMenuItem onClick={handleOpenInCursor}>
-						<ExternalLink size={14} className="mr-2" />
-						Open in Cursor
-					</ContextMenuItem>
-					<ContextMenuItem onClick={handleOpenSettings}>
-						<Settings size={14} className="mr-2" />
-						Open Settings
-					</ContextMenuItem>
-					<ContextMenuSeparator />
-					{/* Delete group */}
-					<ContextMenuItem onClick={handleRemoveWorktree} variant="destructive">
-						<Trash2 size={14} className="mr-2" />
-						Remove Worktree
-					</ContextMenuItem>
-				</ContextMenuContent>
-			</ContextMenu>
+								<ChevronRight
+									size={12}
+									className={`transition-transform ${isExpanded ? "rotate-90" : ""}`}
+								/>
+								<GitBranch size={14} className="opacity-70" />
+								<span className="truncate flex-1 text-left">
+									{worktree.branch}
+								</span>
+								{worktree.branch === mainBranch && (
+									<Star
+										size={14}
+										className="text-yellow-500 shrink-0 fill-yellow-500"
+									/>
+								)}
+								{worktree.merged && (
+									<GitMerge size={14} className="text-purple-500 shrink-0" />
+								)}
+							</Button>
+						</TooltipTrigger>
+					</ContextMenuTrigger>
+					<ContextMenuContent>
+						<ContextMenuItem onClick={onCloneWorktree}>
+							<GitBranch size={14} className="mr-2" />
+							Clone Worktree...
+						</ContextMenuItem>
+						<ContextMenuSeparator />
+						<ContextMenuItem
+							onClick={handleMergeWorktree}
+							disabled={isMergeDisabled}
+						>
+							<GitMerge size={14} className="mr-2" />
+							{isMergeDisabled
+								? `Merge Worktree (${mergeDisabledReason})`
+								: "Merge Worktree..."}
+						</ContextMenuItem>
+						<ContextMenuItem onClick={() => setShowGitStatusDialog(true)}>
+							<GitBranch size={14} className="mr-2" />
+							Git Status
+						</ContextMenuItem>
+						<ContextMenuItem onClick={handleCopyPath}>
+							<Clipboard size={14} className="mr-2" />
+							Copy Path
+						</ContextMenuItem>
+						<ContextMenuItem onClick={handleOpenInCursor}>
+							<ExternalLink size={14} className="mr-2" />
+							Open in Cursor
+						</ContextMenuItem>
+						<ContextMenuItem onClick={handleOpenSettings}>
+							<Settings size={14} className="mr-2" />
+							Open Settings
+						</ContextMenuItem>
+						<ContextMenuSeparator />
+						<ContextMenuItem
+							onClick={handleRemoveWorktree}
+							variant="destructive"
+						>
+							<Trash2 size={14} className="mr-2" />
+							Remove Worktree
+						</ContextMenuItem>
+					</ContextMenuContent>
+				</ContextMenu>
+				{worktree.description && (
+					<TooltipContent side="right" className="max-w-xs">
+						<p className="text-sm">{worktree.description}</p>
+					</TooltipContent>
+				)}
+			</Tooltip>
 
 			{/* Ports List - shown inline if port forwarding is configured */}
 			{isExpanded && hasPortForwarding && (
@@ -1184,17 +1260,27 @@ export function WorktreeItem({
 						{tabs.map((tab) => renderTab(tab, undefined, 0))}
 					</SortableContext>
 
-					{/* New Tab Button */}
-					<Button
-						variant="ghost"
-						size="sm"
-						onClick={handleAddTab}
-						className="w-full h-8 px-3 font-normal opacity-70 hover:opacity-100"
-						style={{ justifyContent: "flex-start" }}
-					>
-						<Plus size={14} />
-						<span className="truncate">New Tab</span>
-					</Button>
+					{/* New Terminal / Preview Buttons */}
+					<div className="flex items-center gap-2 w-full">
+						<Button
+							variant="ghost"
+							size="sm"
+							onClick={handleAddTab}
+							className="flex-1 h-8 px-3 font-normal opacity-70 hover:opacity-100"
+						>
+							<Plus size={14} />
+							<span className="truncate">New Terminal</span>
+						</Button>
+						<Button
+							variant="ghost"
+							size="sm"
+							onClick={handleAddPreview}
+							className="flex-1 h-8 px-3 font-normal opacity-70 hover:opacity-100"
+						>
+							<Monitor size={14} />
+							<span className="truncate">New Preview</span>
+						</Button>
+					</div>
 				</div>
 			)}
 

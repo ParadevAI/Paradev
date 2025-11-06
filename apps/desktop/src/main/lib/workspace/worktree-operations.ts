@@ -65,6 +65,7 @@ export async function createWorktree(
 			path: worktreeResult.path!,
 			tabs,
 			createdAt: now,
+			...(input.description && { description: input.description }),
 		};
 
 		// Add to workspace
@@ -513,6 +514,42 @@ export async function openWorktreeSettings(
 		return { success: true, created: !settingsExists };
 	} catch (error) {
 		console.error("Failed to open worktree settings:", error);
+		return {
+			success: false,
+			error: error instanceof Error ? error.message : String(error),
+		};
+	}
+}
+
+/**
+ * Update worktree description
+ */
+export async function updateWorktreeDescription(
+	workspace: Workspace,
+	worktreeId: string,
+	description: string,
+): Promise<{ success: boolean; error?: string }> {
+	try {
+		const worktree = workspace.worktrees.find((wt) => wt.id === worktreeId);
+		if (!worktree) {
+			return { success: false, error: "Worktree not found" };
+		}
+
+		// Update the description
+		worktree.description = description;
+		workspace.updatedAt = new Date().toISOString();
+
+		// Save to config
+		const config = configManager.read();
+		const index = config.workspaces.findIndex((ws) => ws.id === workspace.id);
+		if (index !== -1) {
+			config.workspaces[index] = workspace;
+			configManager.write(config);
+		}
+
+		return { success: true };
+	} catch (error) {
+		console.error("Failed to update worktree description:", error);
 		return {
 			success: false,
 			error: error instanceof Error ? error.message : String(error),

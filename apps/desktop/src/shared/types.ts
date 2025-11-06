@@ -47,6 +47,7 @@ export interface Tab {
 	// Terminal-specific properties
 	command?: string | null; // For terminal tabs
 	cwd?: string; // Current working directory (for terminal tabs)
+	url?: string; // For preview/browser tabs
 	// Mosaic layout properties (used when type === "group")
 	tabs?: Tab[]; // Child tabs when type is "group" (NOTE: cannot contain nested group tabs)
 	mosaicTree?: MosaicNode<string>; // Mosaic tree structure (tab IDs as leaf nodes)
@@ -61,6 +62,7 @@ export interface Worktree {
 	createdAt: string;
 	detectedPorts?: Record<string, number>; // Map of service name to detected port
 	merged?: boolean; // Indicates if this worktree has been merged into another worktree
+	description?: string; // Optional description of the worktree's goal or purpose
 }
 
 export interface Workspace {
@@ -94,6 +96,7 @@ export interface CreateWorktreeInput {
 	createBranch?: boolean;
 	cloneTabsFromWorktreeId?: string; // Optional worktree ID to clone tab setup from
 	sourceBranch?: string; // Optional source branch to create from (defaults to current branch)
+	description?: string; // Optional description of the worktree's goal or purpose
 }
 
 export interface CreateTabInput {
@@ -103,8 +106,16 @@ export interface CreateTabInput {
 	name: string;
 	type?: TabType; // Optional - defaults to "terminal"
 	command?: string | null;
+	url?: string; // Initial URL for preview/browser tabs
 	// For copying tab content when splitting
 	copyFromTabId?: string;
+}
+
+export interface UpdatePreviewTabInput {
+	workspaceId: string;
+	worktreeId: string;
+	tabId: string;
+	url: string;
 }
 
 export interface UpdateWorkspaceInput {

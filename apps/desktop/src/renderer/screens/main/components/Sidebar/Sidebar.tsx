@@ -44,6 +44,7 @@ export function Sidebar({
 	const [branches, setBranches] = useState<string[]>([]);
 	const [sourceBranch, setSourceBranch] = useState("");
 	const [cloneTabsFromWorktreeId, setCloneTabsFromWorktreeId] = useState("");
+	const [description, setDescription] = useState("");
 	const [setupStatus, setSetupStatus] = useState<string | undefined>(undefined);
 	const [setupOutput, setSetupOutput] = useState<string | undefined>(undefined);
 
@@ -122,6 +123,7 @@ export function Sidebar({
 		// Reset modal state for creating a new worktree (not cloning)
 		setSourceBranch("");
 		setCloneTabsFromWorktreeId("");
+		setDescription("");
 		setShowWorktreeModal(true);
 	};
 
@@ -163,6 +165,7 @@ export function Sidebar({
 				createBranch: true,
 				sourceBranch: sourceBranch,
 				...(cloneTabsFromWorktreeId && { cloneTabsFromWorktreeId }),
+				...(description.trim() && { description: description.trim() }),
 			});
 
 			if (result.success) {
@@ -184,6 +187,7 @@ export function Sidebar({
 				setBranchName("");
 				setSourceBranch("");
 				setCloneTabsFromWorktreeId("");
+				setDescription("");
 				setSetupStatus(undefined);
 				setSetupOutput(undefined);
 				onWorktreeCreated();
@@ -350,6 +354,8 @@ export function Sidebar({
 				worktrees={currentWorkspace?.worktrees || []}
 				cloneTabsFromWorktreeId={cloneTabsFromWorktreeId}
 				onCloneTabsFromWorktreeIdChange={setCloneTabsFromWorktreeId}
+				description={description}
+				onDescriptionChange={setDescription}
 				setupStatus={setupStatus}
 				setupOutput={setupOutput}
 			/>
