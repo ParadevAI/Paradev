@@ -40,6 +40,7 @@ import {
 } from "renderer/components/ui/dialog";
 import type { Tab, Worktree } from "shared/types";
 import { WorktreePortsList } from "../WorktreePortsList";
+import { GitStatusDialog } from "./components/GitStatusDialog";
 import { TabItem } from "./components/TabItem";
 
 interface ProxyStatus {
@@ -343,6 +344,7 @@ export function WorktreeItem({
 	const [showRemoveDialog, setShowRemoveDialog] = useState(false);
 	const [showMergeDialog, setShowMergeDialog] = useState(false);
 	const [showErrorDialog, setShowErrorDialog] = useState(false);
+	const [showGitStatusDialog, setShowGitStatusDialog] = useState(false);
 	const [errorMessage, setErrorMessage] = useState("");
 	const [errorTitle, setErrorTitle] = useState("");
 	const [mergeWarning, setMergeWarning] = useState("");
@@ -1209,6 +1211,10 @@ export function WorktreeItem({
 								? `Merge Worktree (${mergeDisabledReason})`
 								: "Merge Worktree..."}
 						</ContextMenuItem>
+						<ContextMenuItem onClick={() => setShowGitStatusDialog(true)}>
+							<GitBranch size={14} className="mr-2" />
+							Git Status
+						</ContextMenuItem>
 						<ContextMenuItem onClick={handleCopyPath}>
 							<Clipboard size={14} className="mr-2" />
 							Copy Path
@@ -1384,6 +1390,15 @@ export function WorktreeItem({
 					</DialogFooter>
 				</DialogContent>
 			</Dialog>
+
+			{/* Git Status Dialog */}
+			<GitStatusDialog
+				open={showGitStatusDialog}
+				onOpenChange={setShowGitStatusDialog}
+				workspaceId={workspaceId}
+				worktreeId={worktree.id}
+				worktreeBranch={worktree.branch}
+			/>
 		</div>
 	);
 }
