@@ -2,7 +2,8 @@
 import { resolve } from "node:path";
 import { config } from "dotenv";
 
-config({ path: resolve(__dirname, "../../../../.env") });
+// Use override: true to ensure .env values take precedence over inherited env vars
+config({ path: resolve(__dirname, "../../../../.env"), override: true });
 
 import { app } from "electron";
 import { makeAppSetup } from "lib/electron-app/factories/app/setup";

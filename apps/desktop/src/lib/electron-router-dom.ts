@@ -1,11 +1,8 @@
-import { resolve } from "node:path";
-import { config } from "dotenv";
 import { createElectronRouter } from "electron-router-dom";
 
-// Load .env from monorepo root BEFORE reading env variables
-// Use override: true to ensure .env values take precedence over inherited env vars
-config({ path: resolve(__dirname, "../../../../.env"), override: true });
-
+// Note: Environment variables are loaded in main/index.ts before any imports
+// The port value comes from VITE_DEV_SERVER_PORT in the monorepo root .env file
+// This module can be safely imported in both main and renderer processes
 export const { Router, registerRoute, settings } = createElectronRouter({
 	port: Number(process.env.VITE_DEV_SERVER_PORT) || 4927,
 	types: {
