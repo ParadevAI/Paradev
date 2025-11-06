@@ -177,4 +177,59 @@ Each instance needs:
 - **Separate dev server port** - Set via `VITE_DEV_SERVER_PORT` in root `.env`
 - **Separate user data directory** - Pass via `--user-data-dir` flag
 
-The desktop app loads environment variables from the monorepo root `.env` file.
+### Environment Variable Loading
+
+The desktop app loads environment variables from the monorepo root `.env` file:
+
+**Loading sequence:**
+1. `src/main/index.ts` - Loads `.env` with `override: true` before any imports (main process)
+2. `electron.vite.config.ts` - Loads `.env` with `override: true` for Vite configuration (build time)
+
+**Important notes:**
+- `override: true` is critical - ensures `.env` values override inherited environment variables
+- `src/lib/electron-router-dom.ts` must NOT import Node.js modules (`node:path`, `dotenv`) as it's shared between main and renderer processes
+- Port configuration flows: `.env` → main process → `electron-router-dom` settings → Vite dev server
+
+### Keyboard Shortcuts System
+
+The desktop app uses a centralized keyboard shortcuts system inspired by Arc Browser.
+
+**File Structure:**
+- `src/renderer/lib/keyboard-shortcuts.ts` - Core shortcuts infrastructure (types, matchers, handlers)
+- `src/renderer/lib/shortcuts.ts` - Arc-style shortcut definitions (workspace, tab, terminal)
+
+**Implemented Shortcuts:**
+
+**Workspace Management:**
+- `Cmd+Option+Left/Right` - Switch between workspaces
+- `Cmd+S` - Toggle sidebar visibility
+- `Cmd+D` - Create split view (horizontal)
+- `Cmd+Shift+D` - Create split view (vertical)
+
+**Tab Management:**
+- `Cmd+Option+Up/Down` - Switch between tabs
+- `Cmd+T` - Create new tab
+- `Cmd+W` - Close tab
+- `Cmd+Shift+T` - Reopen closed tab [TODO - requires history tracking]
+- `Cmd+1-9` - Jump to tab by position
+
+**Terminal:**
+- `Cmd+K` - Clear terminal (scrollback + screen)
+
+**Adding New Shortcuts:**
+
+1. Define handlers in the component (e.g., `MainScreen.tsx`)
+2. Create shortcut group using helper functions from `shortcuts.ts`
+3. Use `createShortcutHandler` to convert to event handler
+4. Attach to event listener or terminal custom key handler
+
+**Example:**
+```typescript
+const shortcuts = createWorkspaceShortcuts({
+  switchToPrevWorkspace: () => { /* handler logic */ },
+  // ... other handlers
+});
+
+const handleKeyDown = createShortcutHandler(shortcuts.shortcuts);
+window.addEventListener("keydown", handleKeyDown);
+```

@@ -62,6 +62,7 @@ export default function TabContent({
 					workspaceId={workspaceId}
 					worktreeId={worktreeId}
 					groupTabId={groupTabId}
+					selectedTabId={selectedTabId}
 					onFocus={handleFocus}
 				/>
 			);
@@ -132,6 +133,7 @@ interface TerminalTabContentProps {
 	workspaceId?: string;
 	worktreeId?: string;
 	groupTabId: string; // ID of the parent group tab
+	selectedTabId?: string; // Currently selected tab ID
 	onFocus: () => void;
 }
 
@@ -141,10 +143,12 @@ function TerminalTabContent({
 	workspaceId,
 	worktreeId,
 	groupTabId,
+	selectedTabId,
 	onFocus,
 }: TerminalTabContentProps) {
 	const terminalId = tab.id;
 	const terminalCreatedRef = useRef(false);
+	const isSelected = selectedTabId === tab.id;
 
 	// Terminal creation and lifecycle
 	useEffect(() => {
@@ -227,7 +231,12 @@ function TerminalTabContent({
 
 	return (
 		<div className="w-full h-full">
-			<Terminal key={terminalId} terminalId={terminalId} onFocus={onFocus} />
+			<Terminal
+				key={terminalId}
+				terminalId={terminalId}
+				isSelected={isSelected}
+				onFocus={onFocus}
+			/>
 		</div>
 	);
 }
