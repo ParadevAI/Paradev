@@ -11,6 +11,7 @@ import {
 } from "renderer/components/ui/dialog";
 import { Input } from "renderer/components/ui/input";
 import { Label } from "renderer/components/ui/label";
+import { Separator } from "renderer/components/ui/separator";
 import type { Worktree } from "shared/types";
 import { TerminalOutput } from "./TerminalOutput";
 
@@ -19,6 +20,8 @@ interface CreateWorktreeModalProps {
 	onClose: () => void;
 	onSubmit: (e: React.FormEvent) => void;
 	isCreating: boolean;
+	title: string;
+	onTitleChange: (value: string) => void;
 	branchName: string;
 	onBranchNameChange: (value: string) => void;
 	branches: string[];
@@ -38,6 +41,8 @@ export function CreateWorktreeModal({
 	onClose,
 	onSubmit,
 	isCreating,
+	title,
+	onTitleChange,
 	branchName,
 	onBranchNameChange,
 	branches,
@@ -51,7 +56,8 @@ export function CreateWorktreeModal({
 	setupStatus,
 	setupOutput,
 }: CreateWorktreeModalProps) {
-	const inputId = useId();
+	const titleId = useId();
+	const branchNameId = useId();
 	const sourceBranchId = useId();
 	const cloneTabsId = useId();
 	const descriptionId = useId();
@@ -73,6 +79,50 @@ export function CreateWorktreeModal({
 					onSubmit={onSubmit}
 					className="space-y-4 flex-1 flex flex-col overflow-hidden"
 				>
+					<div className="space-y-2">
+						<Label htmlFor={titleId}>Title</Label>
+						<Input
+							type="text"
+							id={titleId}
+							value={title}
+							onChange={(e) => onTitleChange(e.target.value)}
+							placeholder="My new feature"
+							autoFocus
+							required
+							disabled={isCreating}
+						/>
+					</div>
+
+					<div className="space-y-2">
+						<Label htmlFor={branchNameId}>
+							Branch Name{" "}
+							<span className="text-muted-foreground font-normal">(optional)</span>
+						</Label>
+						<Input
+							type="text"
+							id={branchNameId}
+							value={branchName}
+							onChange={(e) => onBranchNameChange(e.target.value)}
+							placeholder="Auto-generated from title"
+							disabled={isCreating}
+						/>
+					</div>
+
+					<div className="space-y-2">
+						<Label htmlFor={descriptionId}>Description (Optional)</Label>
+						<textarea
+							id={descriptionId}
+							value={description}
+							onChange={(e) => onDescriptionChange(e.target.value)}
+							placeholder="What is the goal of this worktree?"
+							disabled={isCreating}
+							rows={3}
+							className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 resize-none"
+						/>
+					</div>
+
+					<Separator />
+
 					<div className="space-y-2">
 						<Label htmlFor={sourceBranchId}>Create From Branch</Label>
 						<select
@@ -109,32 +159,6 @@ export function CreateWorktreeModal({
 						</select>
 					</div>
 
-					<div className="space-y-2">
-						<Label htmlFor={inputId}>New Branch Name</Label>
-						<Input
-							type="text"
-							id={inputId}
-							value={branchName}
-							onChange={(e) => onBranchNameChange(e.target.value)}
-							placeholder="feature/my-branch"
-							autoFocus
-							required
-							disabled={isCreating}
-						/>
-					</div>
-
-					<div className="space-y-2">
-						<Label htmlFor={descriptionId}>Description (Optional)</Label>
-						<textarea
-							id={descriptionId}
-							value={description}
-							onChange={(e) => onDescriptionChange(e.target.value)}
-							placeholder="What is the goal of this worktree?"
-							disabled={isCreating}
-							rows={3}
-							className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 resize-none"
-						/>
-					</div>
 
 					{/* Setup Progress Section */}
 					{isCreating && (
@@ -184,7 +208,7 @@ export function CreateWorktreeModal({
 						>
 							Cancel
 						</Button>
-						<Button type="submit" disabled={isCreating || !branchName.trim()}>
+						<Button type="submit" disabled={isCreating || !title.trim()}>
 							{isCreating ? "Creating..." : "Create"}
 						</Button>
 					</DialogFooter>
