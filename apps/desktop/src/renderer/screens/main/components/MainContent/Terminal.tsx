@@ -13,8 +13,6 @@ import { createTerminalShortcuts } from "../../../../lib/shortcuts";
 interface TerminalProps {
 	terminalId?: string | null;
 	hidden?: boolean;
-	className?: string;
-	isSelected?: boolean;
 	onFocus?: () => void;
 }
 
@@ -74,8 +72,6 @@ const TERMINAL_THEME: Record<"LIGHT" | "DARK", ITheme> = {
 export default function TerminalComponent({
 	terminalId,
 	hidden = false,
-	className = "",
-	isSelected = true,
 	onFocus,
 }: TerminalProps) {
 	const terminalRef = useRef<HTMLDivElement>(null);
@@ -83,22 +79,11 @@ export default function TerminalComponent({
 	const [theme] = useState<"light" | "dark">("dark"); // Can be connected to theme provider later
 	const terminalIdRef = useRef<string | null>(null); // Also serves as initialization guard
 	const onFocusRef = useRef(onFocus);
-	const fitFunctionRef = useRef<(() => void) | null>(null);
 
 	// Update the ref when onFocus changes
 	useEffect(() => {
 		onFocusRef.current = onFocus;
 	}, [onFocus]);
-
-	// // Auto-focus terminal when selected (new tab or switched tab)
-	// useEffect(() => {
-	// 	if (terminal && terminalId && isSelected) {
-	// 		// Small delay to ensure terminal is fully mounted
-	// 		setTimeout(() => {
-	// 			terminal?.textarea?.focus();
-	// 		}, 50);
-	// 	}
-	// }, [terminal, terminalId, isSelected]);
 
 	useEffect(() => {
 		if (terminal) {
@@ -117,13 +102,12 @@ export default function TerminalComponent({
 		// Set terminalIdRef immediately to prevent race conditions
 		terminalIdRef.current = terminalId;
 
-		const { term, terminalDataListener, cleanup, fit } = initTerminal(
+		const { term } = initTerminal(
 			terminalRef.current,
 			theme,
 			onFocusRef,
 		);
 		setTerminal(term);
-		fitFunctionRef.current = fit;
 
 		return () => {
 			// Don't dispose XTerm or cleanup on unmount
@@ -187,19 +171,7 @@ export default function TerminalComponent({
 		});
 		term.loadAddon(webLinksAddon);
 
-		// 2. WebGL Renderer - DISABLED due to cursor positioning issues with autocomplete
-		// WebGL can cause cursor desynchronization when shell sends rapid escape sequences
-		// Canvas renderer is more stable for autocomplete and dynamic content
-		// Uncomment the lines below to re-enable WebGL if needed
-		// const webglAddon: WebglAddon | null = null;
-		// try {
-		// 	webglAddon = new WebglAddon();
-		// 	term.loadAddon(webglAddon);
-		// } catch (e) {
-		// 	console.warn("WebGL addon failed to load, falling back to canvas:", e);
-		// }
-
-		// 3. FitAddon - Automatically fit terminal to container
+		// 2. FitAddon - Automatically fit terminal to container
 		const fitAddon = new FitAddon();
 		term.loadAddon(fitAddon);
 
@@ -228,7 +200,7 @@ export default function TerminalComponent({
 			}
 		};
 
-		// 4. SearchAddon - Enable text searching (Ctrl+F or Cmd+F)
+		// 3. SearchAddon - Enable text searching (Ctrl+F or Cmd+F)
 		const searchAddon = new SearchAddon();
 		term.loadAddon(searchAddon);
 
@@ -285,11 +257,6 @@ export default function TerminalComponent({
 				.invoke("terminal-get-history", terminalId)
 				.then((history: string | undefined) => {
 					if (history) {
-						// Debug: log the last characters of history
-						console.log(
-							"History last 50 chars:",
-							JSON.stringify(history.slice(-50)),
-						);
 						// Write history directly - PTY data already has proper formatting
 						term.write(history);
 
@@ -418,28 +385,18 @@ export default function TerminalComponent({
 			} catch (e) {
 				console.warn("WebLinksAddon disposal failed:", e);
 			}
-			// WebGL addon disposal removed (addon disabled)
-			// if (webglAddon) {
-			// 	try {
-			// 		webglAddon.dispose();
-			// 	} catch (e) {
-			// 		console.warn("WebglAddon disposal failed:", e);
-			// 	}
-			// }
 
 			// Terminal process lifecycle is managed by ScreenLayout
 			// Don't kill it here to avoid conflicts
 		};
 
-		return { term, terminalDataListener, cleanup, fit: customFit };
+		return { term };
 	}
 
 	return (
-		<div className="h-full w-full">
-			<div
-				ref={terminalRef}
-				className={`h-full w-full transition-opacity duration-200 text-start [&_.xterm-screen]:!p-0 ${hidden ? "opacity-0" : "opacity-100 delay-300"}`}
-			/>
-		</div>
+		<div
+			ref={terminalRef}
+			className={`h-full w-full transition-opacity duration-200 text-start [&_.xterm-screen]:!p-0 ${hidden ? "opacity-0" : "opacity-100 delay-300"}`}
+		/>
 	);
 }
