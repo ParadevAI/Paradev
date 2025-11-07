@@ -19,7 +19,7 @@ export const NewLayoutMain: React.FC = () => {
 					<WorkspaceTabs />
 
 					{/* Main content area with resizable sidebar */}
-					<div className="flex-1 overflow-hidden">
+					<div className="flex-1 overflow-hidden border-t border-neutral-700">
 						<ResizablePanelGroup direction="horizontal" autoSaveId="new-layout-panels">
 							{/* Sidebar panel with worktree tab view */}
 							<ResizablePanel

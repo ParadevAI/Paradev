@@ -23,11 +23,15 @@ export const WorkspaceTabs: React.FC = () => {
 
 	return (
 		<div
-			className="flex items-center border-b border-neutral-700 select-none"
-			style={{ height: "48px", WebkitAppRegion: "drag" } as React.CSSProperties}
+			className="flex items-end select-none bg-black/20"
+			style={{
+				height: "48px",
+				paddingLeft: "88px",
+				WebkitAppRegion: "drag"
+			} as React.CSSProperties}
 		>
 			<div
-				className="flex items-center gap-1 px-2 overflow-x-auto"
+				className="flex items-center gap-1 px-2 h-full"
 				style={{ WebkitAppRegion: "no-drag" } as React.CSSProperties}
 			>
 				{MOCK_WORKSPACES.map((workspace) => (
@@ -36,11 +40,11 @@ export const WorkspaceTabs: React.FC = () => {
 						type="button"
 						onClick={() => setActiveWorkspaceId(workspace.id)}
 						className={`
-							flex items-center gap-2 px-3 py-1.5 rounded-md transition-all h-8
+							flex items-center gap-2 px-3 h-8 rounded-t-md transition-all border-t border-x
 							${
 								activeWorkspaceId === workspace.id
-									? "bg-neutral-800 text-white border border-neutral-700"
-									: "text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/50"
+									? "bg-neutral-900 text-white border-neutral-700 -mb-px"
+									: "bg-neutral-800/50 text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800 border-transparent"
 							}
 						`}
 					>

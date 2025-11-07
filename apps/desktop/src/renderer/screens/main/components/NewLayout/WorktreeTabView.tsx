@@ -1,6 +1,7 @@
 import { GitBranch, Globe, Terminal as TerminalIcon } from "lucide-react";
 import type React from "react";
 import { useState } from "react";
+import { SidebarHeader } from "./SidebarHeader";
 import { BrowserView } from "./views/BrowserView";
 import { GitView } from "./views/GitView";
 import { SummaryView } from "./views/SummaryView";
@@ -40,9 +41,12 @@ export const WorktreeTabView: React.FC = () => {
 	};
 
 	return (
-		<div className="flex flex-col h-full">
+		<div className="flex flex-col h-full w-full select-none text-neutral-300">
+			{/* Sidebar header with collapse/settings */}
+			<SidebarHeader />
+
 			{/* Tab selector */}
-			<div className="flex items-center border-b border-neutral-700 px-2 py-1 gap-1">
+			<div className="flex items-center border-b border-neutral-700 px-3 py-2 gap-1">
 				{TABS.map((tab) => (
 					<button
 						key={tab.id}
