@@ -32,6 +32,7 @@ import {
 	createWorkspaceShortcuts,
 	createTabShortcuts,
 } from "../../lib/shortcuts";
+import { NewLayoutMain } from "./components/NewLayout/NewLayoutMain";
 
 // Droppable wrapper for main content area
 function DroppableMainContent({
@@ -68,6 +69,15 @@ function DroppableMainContent({
 }
 
 export function MainScreen() {
+	// Check if new UI is enabled
+	const enableNewUI = import.meta.env.ENABLE_NEW_UI === "true";
+
+	// If new UI is enabled, render the new layout
+	if (enableNewUI) {
+		return <NewLayoutMain />;
+	}
+
+	// Otherwise, render the original layout
 	const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 	const [showSidebarOverlay, setShowSidebarOverlay] = useState(false);
 	const sidebarPanelRef = useRef<ImperativePanelHandle>(null);
