@@ -96,6 +96,27 @@ The desktop app uses:
 - **Terminal Management** - node-pty for terminal sessions
 - **Workspace/Worktree System** - Git worktree-based workspace management
 
+### Critical Architecture Rules
+
+**⚠️ NEVER import Node.js modules in renderer or shared code!**
+
+1. **Main process** (`src/main/`): Can use Node.js modules (fs, path, os, net, etc.)
+2. **Renderer process** (`src/renderer/`): Cannot use Node.js modules - browser environment only
+3. **Shared code** (`src/lib/electron-router-dom.ts` and similar): Cannot use Node.js modules
+
+**Why?** Vite externalizes Node.js modules for browser compatibility. Importing them in renderer code causes:
+```
+Uncaught Error: Module "node:fs" has been externalized for browser compatibility
+```
+
+**How to check:** Run `bun run lint:check-node-imports` to detect violations automatically.
+This check runs as part of `bun run typecheck`.
+
+**If you need Node.js functionality in renderer:**
+- Move the code to `src/main/lib/`
+- Use IPC to communicate between renderer and main process
+- Pass data through preload script or environment variables
+
 ### Type-Safe IPC System
 
 **All IPC communication is fully type-safe.** See `apps/desktop/docs/TYPE_SAFE_IPC.md` for complete documentation.

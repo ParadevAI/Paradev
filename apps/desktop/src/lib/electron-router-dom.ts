@@ -1,5 +1,10 @@
 import { createElectronRouter } from "electron-router-dom";
 
+// ⚠️ CRITICAL: This module is shared between main and renderer processes
+// DO NOT import Node.js modules (fs, path, os, net, etc.) here!
+// Doing so will cause "Module externalized for browser compatibility" errors
+// If you need Node.js functionality, use IPC or move code to src/main/
+
 // Note: This module can be safely imported in both main and renderer processes
 // The port is injected by Vite at build time via import.meta.env.DEV_SERVER_PORT
 // Port value comes from:
