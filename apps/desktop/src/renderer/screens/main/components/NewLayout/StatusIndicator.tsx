@@ -45,9 +45,16 @@ export const StatusIndicator: React.FC<StatusIndicatorProps> = ({
 
 	return (
 		<div className="flex items-center gap-1.5">
-			<div className="relative" style={{ width: circleSize, height: circleSize }}>
+			<div
+				className="relative"
+				style={{ width: circleSize, height: circleSize }}
+			>
 				{/* Main circle */}
-				<svg width={circleSize} height={circleSize} viewBox={`0 0 ${circleSize} ${circleSize}`}>
+				<svg
+					width={circleSize}
+					height={circleSize}
+					viewBox={`0 0 ${circleSize} ${circleSize}`}
+				>
 					{config.type === "dashed" ? (
 						<circle
 							cx={circleSize / 2}

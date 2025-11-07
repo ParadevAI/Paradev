@@ -33,7 +33,7 @@ const MOCK_TASKS: MockTask[] = [
 		description: "Redesigning the homepage with new branding and improved UX",
 		assignee: "Alice",
 		assigneeAvatarUrl: "https://i.pravatar.cc/150?img=1",
-		lastUpdated: "2 hours ago"
+		lastUpdated: "2 hours ago",
 	},
 	{
 		id: "2",
@@ -44,7 +44,7 @@ const MOCK_TASKS: MockTask[] = [
 		description: "Integrate new REST API endpoints for user management",
 		assignee: "Bob",
 		assigneeAvatarUrl: "https://i.pravatar.cc/150?img=12",
-		lastUpdated: "1 day ago"
+		lastUpdated: "1 day ago",
 	},
 	{
 		id: "3",
@@ -55,7 +55,7 @@ const MOCK_TASKS: MockTask[] = [
 		description: "Collection of bug fixes reported by users",
 		assignee: "Charlie",
 		assigneeAvatarUrl: "https://i.pravatar.cc/150?img=33",
-		lastUpdated: "3 days ago"
+		lastUpdated: "3 days ago",
 	},
 	{
 		id: "4",
@@ -66,7 +66,7 @@ const MOCK_TASKS: MockTask[] = [
 		description: "Optimize database queries for faster page loads",
 		assignee: "Diana",
 		assigneeAvatarUrl: "https://i.pravatar.cc/150?img=9",
-		lastUpdated: "5 minutes ago"
+		lastUpdated: "5 minutes ago",
 	},
 ];
 
@@ -93,11 +93,13 @@ export const TaskTabs: React.FC<TaskTabsProps> = ({
 	return (
 		<div
 			className="flex items-end select-none bg-black/20"
-			style={{
-				height: "48px",
-				paddingLeft: "88px",
-				WebkitAppRegion: "drag"
-			} as React.CSSProperties}
+			style={
+				{
+					height: "48px",
+					paddingLeft: "88px",
+					WebkitAppRegion: "drag",
+				} as React.CSSProperties
+			}
 		>
 			<div
 				className="flex items-center gap-1 px-2 h-full"
@@ -108,7 +110,11 @@ export const TaskTabs: React.FC<TaskTabsProps> = ({
 					{isSidebarOpen ? (
 						<Tooltip>
 							<TooltipTrigger asChild>
-								<Button variant="ghost" size="icon-sm" onClick={onCollapseSidebar}>
+								<Button
+									variant="ghost"
+									size="icon-sm"
+									onClick={onCollapseSidebar}
+								>
 									<PanelLeftClose size={16} />
 								</Button>
 							</TooltipTrigger>
@@ -119,7 +125,11 @@ export const TaskTabs: React.FC<TaskTabsProps> = ({
 					) : (
 						<Tooltip>
 							<TooltipTrigger asChild>
-								<Button variant="ghost" size="icon-sm" onClick={onExpandSidebar}>
+								<Button
+									variant="ghost"
+									size="icon-sm"
+									onClick={onExpandSidebar}
+								>
 									<PanelLeftOpen size={16} />
 								</Button>
 							</TooltipTrigger>
@@ -166,7 +176,9 @@ export const TaskTabs: React.FC<TaskTabsProps> = ({
 											<h4 className="font-semibold text-sm text-white">
 												[{task.slug}] {task.name}
 											</h4>
-											<p className="text-xs text-neutral-400 mt-1.5 leading-relaxed">{task.description}</p>
+											<p className="text-xs text-neutral-400 mt-1.5 leading-relaxed">
+												{task.description}
+											</p>
 										</div>
 
 										{/* Assignee in top-right */}
@@ -183,19 +195,27 @@ export const TaskTabs: React.FC<TaskTabsProps> = ({
 										<div className="flex items-center gap-2">
 											<span className="text-neutral-500">Status</span>
 											<div className="flex items-center gap-1.5">
-												<StatusIndicator status={task.status} showLabel={false} size="sm" />
+												<StatusIndicator
+													status={task.status}
+													showLabel={false}
+													size="sm"
+												/>
 												<span className="text-neutral-300">{statusLabel}</span>
 											</div>
 										</div>
 
 										<div className="flex items-center gap-2">
 											<span className="text-neutral-500">Updated</span>
-											<span className="text-neutral-300">{task.lastUpdated}</span>
+											<span className="text-neutral-300">
+												{task.lastUpdated}
+											</span>
 										</div>
 
 										<div className="flex items-center gap-2 col-span-2">
 											<span className="text-neutral-500">Branch</span>
-											<span className="text-neutral-300 font-mono text-xs truncate">{task.branch}</span>
+											<span className="text-neutral-300 font-mono text-xs truncate">
+												{task.branch}
+											</span>
 										</div>
 									</div>
 								</div>

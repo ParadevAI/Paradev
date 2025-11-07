@@ -95,18 +95,19 @@ export default function TerminalComponent({
 	useEffect(() => {
 		// Guard: only initialize once per terminalId
 		// terminalIdRef serves as both storage and initialization guard
-		if (!terminalRef.current || terminal || !terminalId || terminalIdRef.current === terminalId) {
+		if (
+			!terminalRef.current ||
+			terminal ||
+			!terminalId ||
+			terminalIdRef.current === terminalId
+		) {
 			return;
 		}
 
 		// Set terminalIdRef immediately to prevent race conditions
 		terminalIdRef.current = terminalId;
 
-		const { term } = initTerminal(
-			terminalRef.current,
-			theme,
-			onFocusRef,
-		);
+		const { term } = initTerminal(terminalRef.current, theme, onFocusRef);
 		setTerminal(term);
 
 		return () => {
