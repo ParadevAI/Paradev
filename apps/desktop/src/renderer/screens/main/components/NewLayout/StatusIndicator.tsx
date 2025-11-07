@@ -1,19 +1,15 @@
 import type React from "react";
 
-export type WorkspaceStatus =
-	| "planning"
-	| "working"
-	| "needs-feedback"
-	| "ready-to-merge";
+export type TaskStatus = "planning" | "working" | "needs-feedback" | "ready-to-merge";
 
 interface StatusIndicatorProps {
-	status: WorkspaceStatus;
+	status: TaskStatus;
 	showLabel?: boolean;
-	size?: "sm" | "md";
+	size?: "xs" | "sm" | "md";
 }
 
 const STATUS_CONFIG: Record<
-	WorkspaceStatus,
+	TaskStatus,
 	{ label: string; color: string; type: "dashed" | "filled" | "pulsing" }
 > = {
 	planning: {
@@ -44,7 +40,7 @@ export const StatusIndicator: React.FC<StatusIndicatorProps> = ({
 	size = "sm",
 }) => {
 	const config = STATUS_CONFIG[status];
-	const circleSize = size === "sm" ? 10 : 14;
+	const circleSize = size === "xs" ? 8 : size === "sm" ? 10 : 14;
 	const strokeWidth = 1.5;
 
 	return (
