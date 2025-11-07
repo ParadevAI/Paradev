@@ -113,14 +113,14 @@ export function WorktreeList({
 		<>
 		{/* Workspace Header - more minimal */}
 		{showWorkspaceHeader && currentWorkspace && (
-			<div className="px-3 pt-3 pb-2">
+			<div className="px-3 pt-2 pb-1.5">
 				<WorkspacePortIndicator workspace={currentWorkspace} />
 			</div>
 		)}
 
 		{/* Action Buttons - more subtle, inline */}
 		{selectedWorktreeId && (
-			<div className="px-3 pb-2 flex items-center gap-1.5">
+			<div className="px-3 pb-1.5 flex items-center justify-center gap-1.5">
 				<Tooltip>
 					<TooltipTrigger asChild>
 						<Button

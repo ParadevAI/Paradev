@@ -24,11 +24,10 @@ export function SidebarHeader({
 
 	return (
 		<div
-			className="flex items-center border-b border-neutral-800/50"
+			className="flex items-center justify-center border-b border-neutral-800/50"
 			style={
 				{
 					height: "48px",
-					paddingLeft: "88px",
 					WebkitAppRegion: "drag",
 				} as React.CSSProperties
 			}
