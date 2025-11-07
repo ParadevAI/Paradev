@@ -1,0 +1,2 @@
+export { DiffTab } from './DiffTab';
+
