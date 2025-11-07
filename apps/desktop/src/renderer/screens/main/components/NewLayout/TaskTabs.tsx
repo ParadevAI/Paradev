@@ -141,23 +141,11 @@ export const TaskTabs: React.FC<TaskTabsProps> = ({
 				</div>
 
 				{/* Task tabs */}
-<<<<<<< HEAD:apps/desktop/src/renderer/screens/main/components/NewLayout/WorkspaceTabs.tsx
-				{MOCK_TASKS.map((task) => {
-					const statusLabel =
-						task.status === "planning"
-							? "Planning"
-							: task.status === "working"
-								? "Working"
-								: task.status === "needs-feedback"
-									? "Needs Feedback"
-									: "Ready to Merge";
-=======
 				{openTasks.map((task) => {
 					const statusLabel = task.status === "planning" ? "Planning" :
 						task.status === "working" ? "Working" :
 						task.status === "needs-feedback" ? "Needs Feedback" :
 						"Ready to Merge";
->>>>>>> origin/main:apps/desktop/src/renderer/screens/main/components/NewLayout/TaskTabs.tsx
 
 					return (
 						<HoverCard key={task.id} openDelay={200}>
