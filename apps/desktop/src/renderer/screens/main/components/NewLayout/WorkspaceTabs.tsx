@@ -1,6 +1,6 @@
 import { Button } from "@superset/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
-import { Plus } from "lucide-react";
+import { PanelLeftClose, PanelLeftOpen, Plus } from "lucide-react";
 import type React from "react";
 import { useState } from "react";
 import { StatusIndicator, type WorkspaceStatus } from "./StatusIndicator";
@@ -18,7 +18,17 @@ const MOCK_WORKSPACES: MockWorkspace[] = [
 	{ id: "4", name: "Performance Optimization", status: "ready-to-merge" },
 ];
 
-export const WorkspaceTabs: React.FC = () => {
+interface WorkspaceTabsProps {
+	onCollapseSidebar: () => void;
+	onExpandSidebar: () => void;
+	isSidebarOpen: boolean;
+}
+
+export const WorkspaceTabs: React.FC<WorkspaceTabsProps> = ({
+	onCollapseSidebar,
+	onExpandSidebar,
+	isSidebarOpen,
+}) => {
 	const [activeWorkspaceId, setActiveWorkspaceId] = useState(MOCK_WORKSPACES[0].id);
 
 	return (
@@ -34,6 +44,34 @@ export const WorkspaceTabs: React.FC = () => {
 				className="flex items-center gap-1 px-2 h-full"
 				style={{ WebkitAppRegion: "no-drag" } as React.CSSProperties}
 			>
+				{/* Sidebar collapse/expand toggle */}
+				<div className="flex items-center gap-1 mr-2">
+					{isSidebarOpen ? (
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<Button variant="ghost" size="icon-sm" onClick={onCollapseSidebar}>
+									<PanelLeftClose size={16} />
+								</Button>
+							</TooltipTrigger>
+							<TooltipContent side="bottom">
+								<p>Collapse sidebar</p>
+							</TooltipContent>
+						</Tooltip>
+					) : (
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<Button variant="ghost" size="icon-sm" onClick={onExpandSidebar}>
+									<PanelLeftOpen size={16} />
+								</Button>
+							</TooltipTrigger>
+							<TooltipContent side="bottom">
+								<p>Expand sidebar</p>
+							</TooltipContent>
+						</Tooltip>
+					)}
+				</div>
+
+				{/* Workspace tabs */}
 				{MOCK_WORKSPACES.map((workspace) => (
 					<button
 						key={workspace.id}
