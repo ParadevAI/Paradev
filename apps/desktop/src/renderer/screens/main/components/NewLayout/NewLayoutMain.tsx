@@ -23,8 +23,12 @@ export const NewLayoutMain: React.FC = () => {
 
 	// Workspace state
 	const [workspaces, setWorkspaces] = useState<Workspace[] | null>(null);
-	const [currentWorkspace, setCurrentWorkspace] = useState<Workspace | null>(null);
-	const [selectedWorktreeId, setSelectedWorktreeId] = useState<string | null>(null);
+	const [currentWorkspace, setCurrentWorkspace] = useState<Workspace | null>(
+		null,
+	);
+	const [selectedWorktreeId, setSelectedWorktreeId] = useState<string | null>(
+		null,
+	);
 	const [selectedTabId, setSelectedTabId] = useState<string | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
@@ -133,11 +137,17 @@ export const NewLayoutMain: React.FC = () => {
 	// Handle workspace selection
 	const handleWorkspaceSelect = async (workspaceId: string) => {
 		try {
-			const workspace = await window.ipcRenderer.invoke("workspace-get", workspaceId);
+			const workspace = await window.ipcRenderer.invoke(
+				"workspace-get",
+				workspaceId,
+			);
 
 			if (workspace) {
 				setCurrentWorkspace(workspace);
-				await window.ipcRenderer.invoke("workspace-set-active-workspace-id", workspaceId);
+				await window.ipcRenderer.invoke(
+					"workspace-set-active-workspace-id",
+					workspaceId,
+				);
 
 				const activeSelection = await window.ipcRenderer.invoke(
 					"workspace-get-active-selection",
@@ -177,7 +187,10 @@ export const NewLayoutMain: React.FC = () => {
 	};
 
 	// Handle worktree update
-	const handleUpdateWorktree = (worktreeId: string, updatedWorktree: Worktree) => {
+	const handleUpdateWorktree = (
+		worktreeId: string,
+		updatedWorktree: Worktree,
+	) => {
 		if (!currentWorkspace) return;
 
 		const updatedWorktrees = currentWorkspace.worktrees.map((wt) =>
@@ -205,7 +218,9 @@ export const NewLayoutMain: React.FC = () => {
 		if (!currentWorkspace) return;
 
 		// Find the worktree
-		const worktree = currentWorkspace.worktrees?.find((wt) => wt.id === worktreeId);
+		const worktree = currentWorkspace.worktrees?.find(
+			(wt) => wt.id === worktreeId,
+		);
 		if (!worktree) return;
 
 		// Check if a diff tab already exists for this worktree
@@ -280,15 +295,22 @@ export const NewLayoutMain: React.FC = () => {
 
 				await loadAllWorkspaces();
 
-				let workspaceId = await window.ipcRenderer.invoke("workspace-get-active-workspace-id");
+				let workspaceId = await window.ipcRenderer.invoke(
+					"workspace-get-active-workspace-id",
+				);
 
 				if (!workspaceId) {
-					const lastOpenedWorkspace = await window.ipcRenderer.invoke("workspace-get-last-opened");
+					const lastOpenedWorkspace = await window.ipcRenderer.invoke(
+						"workspace-get-last-opened",
+					);
 					workspaceId = lastOpenedWorkspace?.id ?? null;
 				}
 
 				if (workspaceId) {
-					const workspace = await window.ipcRenderer.invoke("workspace-get", workspaceId);
+					const workspace = await window.ipcRenderer.invoke(
+						"workspace-get",
+						workspaceId,
+					);
 
 					if (workspace) {
 						setCurrentWorkspace(workspace);
@@ -317,13 +339,22 @@ export const NewLayoutMain: React.FC = () => {
 	// Listen for workspace-opened event
 	useEffect(() => {
 		const handler = async (workspace: Workspace) => {
-			console.log("[NewLayoutMain] Workspace opened event received:", workspace);
+			console.log(
+				"[NewLayoutMain] Workspace opened event received:",
+				workspace,
+			);
 			setLoading(false);
 
-			await window.ipcRenderer.invoke("workspace-set-active-workspace-id", workspace.id);
+			await window.ipcRenderer.invoke(
+				"workspace-set-active-workspace-id",
+				workspace.id,
+			);
 			await loadAllWorkspaces();
 
-			const refreshedWorkspace = await window.ipcRenderer.invoke("workspace-get", workspace.id);
+			const refreshedWorkspace = await window.ipcRenderer.invoke(
+				"workspace-get",
+				workspace.id,
+			);
 			if (refreshedWorkspace) {
 				setCurrentWorkspace(refreshedWorkspace);
 			}
@@ -382,7 +413,10 @@ export const NewLayoutMain: React.FC = () => {
 
 					{/* Main content area with resizable sidebar */}
 					<div className="flex-1 overflow-hidden border-t border-neutral-700">
-						<ResizablePanelGroup direction="horizontal" autoSaveId="new-layout-panels">
+						<ResizablePanelGroup
+							direction="horizontal"
+							autoSaveId="new-layout-panels"
+						>
 							{/* Sidebar panel with full workspace/worktree management */}
 							<ResizablePanel
 								ref={sidebarPanelRef}
@@ -417,7 +451,11 @@ export const NewLayoutMain: React.FC = () => {
 
 							{/* Main content panel */}
 							<ResizablePanel defaultSize={80} minSize={30}>
-								{loading || error || !currentWorkspace || !selectedTab || !selectedWorktree ? (
+								{loading ||
+								error ||
+								!currentWorkspace ||
+								!selectedTab ||
+								!selectedWorktree ? (
 									<PlaceholderState
 										loading={loading}
 										error={error}
@@ -428,7 +466,9 @@ export const NewLayoutMain: React.FC = () => {
 									<TabGroup
 										key={`${parentGroupTab.id}-${JSON.stringify(parentGroupTab.mosaicTree)}-${parentGroupTab.tabs?.length}`}
 										groupTab={parentGroupTab}
-										workingDirectory={selectedWorktree.path || currentWorkspace.repoPath}
+										workingDirectory={
+											selectedWorktree.path || currentWorkspace.repoPath
+										}
 										workspaceId={currentWorkspace.id}
 										worktreeId={selectedWorktreeId ?? undefined}
 										selectedTabId={selectedTabId ?? undefined}
@@ -441,7 +481,9 @@ export const NewLayoutMain: React.FC = () => {
 									<TabGroup
 										key={`${selectedTab.id}-${JSON.stringify(selectedTab.mosaicTree)}-${selectedTab.tabs?.length}`}
 										groupTab={selectedTab}
-										workingDirectory={selectedWorktree.path || currentWorkspace.repoPath}
+										workingDirectory={
+											selectedWorktree.path || currentWorkspace.repoPath
+										}
 										workspaceId={currentWorkspace.id}
 										worktreeId={selectedWorktreeId ?? undefined}
 										selectedTabId={selectedTabId ?? undefined}
@@ -466,7 +508,9 @@ export const NewLayoutMain: React.FC = () => {
 									<div className="w-full h-full p-2 bg-[#1e1e1e]">
 										<TabContent
 											tab={selectedTab}
-											workingDirectory={selectedWorktree.path || currentWorkspace.repoPath}
+											workingDirectory={
+												selectedWorktree.path || currentWorkspace.repoPath
+											}
 											workspaceId={currentWorkspace.id}
 											worktreeId={selectedWorktreeId ?? undefined}
 											worktree={selectedWorktree}

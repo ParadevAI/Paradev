@@ -7,13 +7,13 @@ import {
 } from "@superset/ui/context-menu";
 import {
 	Edit2,
-	Globe2,
 	FolderOutput,
 	FolderTree,
+	GitCompare,
+	Globe2,
 	Monitor,
 	SquareTerminal,
 	X,
-	GitCompare,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { Tab, Worktree } from "shared/types";

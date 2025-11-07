@@ -1,5 +1,5 @@
 export interface DiffLine {
-	type: 'added' | 'removed' | 'modified' | 'unchanged';
+	type: "added" | "removed" | "modified" | "unchanged";
 	oldLineNumber: number | null;
 	newLineNumber: number | null;
 	content: string;
@@ -9,7 +9,7 @@ export interface FileDiff {
 	id: string;
 	fileName: string;
 	filePath: string;
-	status: 'added' | 'deleted' | 'modified' | 'renamed' | 'unchanged';
+	status: "added" | "deleted" | "modified" | "renamed" | "unchanged";
 	oldPath?: string; // For renamed files
 	additions: number;
 	deletions: number;
@@ -23,4 +23,3 @@ export interface DiffViewData {
 	timestamp: string;
 	files: FileDiff[];
 }
-

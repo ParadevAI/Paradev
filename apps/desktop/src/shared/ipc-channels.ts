@@ -187,12 +187,12 @@ export interface IpcChannels {
 					id: string;
 					fileName: string;
 					filePath: string;
-					status: 'added' | 'deleted' | 'modified' | 'renamed';
+					status: "added" | "deleted" | "modified" | "renamed";
 					oldPath?: string;
 					additions: number;
 					deletions: number;
 					changes: Array<{
-						type: 'added' | 'removed' | 'modified' | 'unchanged';
+						type: "added" | "removed" | "modified" | "unchanged";
 						oldLineNumber: number | null;
 						newLineNumber: number | null;
 						content: string;

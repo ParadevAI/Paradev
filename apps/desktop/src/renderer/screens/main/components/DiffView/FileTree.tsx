@@ -1,11 +1,17 @@
-import { useState, useMemo, memo } from 'react';
-import { ChevronRight, ChevronDown, File, Folder, FolderOpen } from 'lucide-react';
-import type { FileDiff } from './types';
+import {
+	ChevronDown,
+	ChevronRight,
+	File,
+	Folder,
+	FolderOpen,
+} from "lucide-react";
+import { memo, useMemo, useState } from "react";
+import type { FileDiff } from "./types";
 
 interface FileNode {
 	name: string;
 	path: string;
-	type: 'file' | 'folder';
+	type: "file" | "folder";
 	children?: FileNode[];
 	file?: FileDiff;
 }
@@ -14,7 +20,7 @@ interface FileTreeProps {
 	files: FileDiff[];
 	selectedFile: string | null;
 	onFileSelect: (fileId: string) => void;
-	getFileIcon: (status: FileDiff['status']) => React.ReactNode;
+	getFileIcon: (status: FileDiff["status"]) => React.ReactNode;
 }
 
 // Build hierarchical tree from flat file list
@@ -23,25 +29,29 @@ function buildFileTree(files: FileDiff[]): FileNode[] {
 	const folderMap = new Map<string, FileNode>();
 
 	// Sort files by path for consistent tree structure
-	const sortedFiles = [...files].sort((a, b) => a.filePath.localeCompare(b.filePath));
+	const sortedFiles = [...files].sort((a, b) =>
+		a.filePath.localeCompare(b.filePath),
+	);
 
 	for (const file of sortedFiles) {
-		const parts = file.filePath.split('/');
+		const parts = file.filePath.split("/");
 		let currentLevel = root;
-		let currentPath = '';
+		let currentPath = "";
 
 		// Create folders
 		for (let i = 0; i < parts.length - 1; i++) {
 			const part = parts[i];
 			currentPath = currentPath ? `${currentPath}/${part}` : part;
 
-			let folder = currentLevel.find((node) => node.name === part && node.type === 'folder');
+			let folder = currentLevel.find(
+				(node) => node.name === part && node.type === "folder",
+			);
 
 			if (!folder) {
 				folder = {
 					name: part,
 					path: currentPath,
-					type: 'folder',
+					type: "folder",
 					children: [],
 				};
 				currentLevel.push(folder);
@@ -55,7 +65,7 @@ function buildFileTree(files: FileDiff[]): FileNode[] {
 		currentLevel.push({
 			name: file.fileName,
 			path: file.filePath,
-			type: 'file',
+			type: "file",
 			file,
 		});
 	}
@@ -65,9 +75,9 @@ function buildFileTree(files: FileDiff[]): FileNode[] {
 
 // Check if a folder node contains any files (recursively)
 function hasFiles(node: FileNode): boolean {
-	if (node.type === 'file') return true;
+	if (node.type === "file") return true;
 	if (!node.children) return false;
-	return node.children.some(child => hasFiles(child));
+	return node.children.some((child) => hasFiles(child));
 }
 
 const TreeNode = memo(function TreeNode({
@@ -80,13 +90,15 @@ const TreeNode = memo(function TreeNode({
 	node: FileNode;
 	selectedFile: string | null;
 	onFileSelect: (fileId: string) => void;
-	getFileIcon: (status: FileDiff['status']) => React.ReactNode;
+	getFileIcon: (status: FileDiff["status"]) => React.ReactNode;
 	level?: number;
 }) {
 	// Start expanded if folder contains any files (changed files)
-	const [isExpanded, setIsExpanded] = useState(node.type === 'folder' ? hasFiles(node) : false);
+	const [isExpanded, setIsExpanded] = useState(
+		node.type === "folder" ? hasFiles(node) : false,
+	);
 
-	if (node.type === 'folder') {
+	if (node.type === "folder") {
 		return (
 			<div>
 				<button
@@ -133,7 +145,9 @@ const TreeNode = memo(function TreeNode({
 		<button
 			onClick={() => onFileSelect(file.id)}
 			className={`w-full flex items-center gap-2 px-2 py-1 rounded-md text-left transition-all duration-150 ${
-				isSelected ? 'bg-white/8 text-zinc-100' : 'hover:bg-white/5 text-zinc-300'
+				isSelected
+					? "bg-white/8 text-zinc-100"
+					: "hover:bg-white/5 text-zinc-300"
 			}`}
 			style={{ paddingLeft: `${level * 12 + 20}px` }}
 			type="button"
@@ -141,14 +155,23 @@ const TreeNode = memo(function TreeNode({
 			{getFileIcon(file.status)}
 			<span className="flex-1 text-xs font-medium truncate">{node.name}</span>
 			<div className="flex items-center gap-1.5 shrink-0 text-[10px]">
-				{file.additions > 0 && <span className="text-emerald-400">+{file.additions}</span>}
-				{file.deletions > 0 && <span className="text-rose-400">-{file.deletions}</span>}
+				{file.additions > 0 && (
+					<span className="text-emerald-400">+{file.additions}</span>
+				)}
+				{file.deletions > 0 && (
+					<span className="text-rose-400">-{file.deletions}</span>
+				)}
 			</div>
 		</button>
 	);
 });
 
-export const FileTree = memo(function FileTree({ files, selectedFile, onFileSelect, getFileIcon }: FileTreeProps) {
+export const FileTree = memo(function FileTree({
+	files,
+	selectedFile,
+	onFileSelect,
+	getFileIcon,
+}: FileTreeProps) {
 	const tree = useMemo(() => buildFileTree(files), [files]);
 
 	return (

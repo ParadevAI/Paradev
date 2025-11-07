@@ -1,36 +1,36 @@
-import { Sparkles } from 'lucide-react';
+import { Sparkles } from "lucide-react";
 
-import type { FileDiff } from './types';
+import type { FileDiff } from "./types";
 
 interface DiffSummaryProps {
 	summary: string;
-	status: FileDiff['status'];
+	status: FileDiff["status"];
 }
 
 export function DiffSummary({ summary, status }: DiffSummaryProps) {
 	const getBgColor = () => {
 		switch (status) {
-			case 'added':
-				return 'bg-emerald-500/5';
-			case 'deleted':
-				return 'bg-rose-500/5';
-			case 'modified':
-				return 'bg-amber-500/5';
+			case "added":
+				return "bg-emerald-500/5";
+			case "deleted":
+				return "bg-rose-500/5";
+			case "modified":
+				return "bg-amber-500/5";
 			default:
-				return 'bg-white/[0.02]';
+				return "bg-white/[0.02]";
 		}
 	};
 
 	const getIconColor = () => {
 		switch (status) {
-			case 'added':
-				return 'text-emerald-400/60';
-			case 'deleted':
-				return 'text-rose-400/60';
-			case 'modified':
-				return 'text-amber-400/60';
+			case "added":
+				return "text-emerald-400/60";
+			case "deleted":
+				return "text-rose-400/60";
+			case "modified":
+				return "text-amber-400/60";
 			default:
-				return 'text-zinc-500';
+				return "text-zinc-500";
 		}
 	};
 
@@ -47,4 +47,3 @@ export function DiffSummary({ summary, status }: DiffSummaryProps) {
 		</div>
 	);
 }
-

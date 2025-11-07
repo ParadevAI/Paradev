@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useState } from 'react';
-import { Button } from '@superset/ui/button';
-import { RefreshCw, AlertCircle, X } from 'lucide-react';
-import type { Tab, Worktree } from 'shared/types';
-import { DiffView } from '../../../DiffView/DiffView';
-import type { DiffViewData } from '../../../DiffView/types';
+import { Button } from "@superset/ui/button";
+import { AlertCircle, RefreshCw, X } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import type { Tab, Worktree } from "shared/types";
+import { DiffView } from "../../../DiffView/DiffView";
+import type { DiffViewData } from "../../../DiffView/types";
 
 interface DiffTabProps {
 	tab: Tab;
@@ -29,46 +29,61 @@ export function DiffTab({
 	const [diffData, setDiffData] = useState<DiffViewData | null>(null);
 	const [error, setError] = useState<string | null>(null);
 
-	const loadDiff = useCallback(async (isRefresh = false) => {
-		if (isRefresh) {
-			setRefreshing(true);
-		} else {
-			setLoading(true);
-		}
-		setError(null);
-
-		try {
-			const result = await window.ipcRenderer.invoke(
-				'worktree-get-git-diff',
-				{
-					workspaceId,
-					worktreeId,
-				},
-			);
-
-			if (result && typeof result === 'object' && 'success' in result && result.success && 'diff' in result && result.diff) {
-				// Transform the diff data to match DiffViewData format
-				const diffViewData: DiffViewData = {
-					title: `Changes in ${worktree?.branch || 'worktree'}`,
-					description: workspaceName ? `Workspace: ${workspaceName}` : undefined,
-					timestamp: new Date().toLocaleString(),
-					files: result.diff.files,
-				};
-				setDiffData(diffViewData);
-			} else {
-				const errorMsg = result && typeof result === 'object' && 'error' in result ? result.error : 'Failed to load diff';
-				setError(errorMsg || 'Failed to load diff');
-			}
-		} catch (err) {
-			setError(err instanceof Error ? err.message : 'Unknown error');
-		} finally {
+	const loadDiff = useCallback(
+		async (isRefresh = false) => {
 			if (isRefresh) {
-				setRefreshing(false);
+				setRefreshing(true);
 			} else {
-				setLoading(false);
+				setLoading(true);
 			}
-		}
-	}, [workspaceId, worktreeId, worktree?.branch, workspaceName]);
+			setError(null);
+
+			try {
+				const result = await window.ipcRenderer.invoke(
+					"worktree-get-git-diff",
+					{
+						workspaceId,
+						worktreeId,
+					},
+				);
+
+				if (
+					result &&
+					typeof result === "object" &&
+					"success" in result &&
+					result.success &&
+					"diff" in result &&
+					result.diff
+				) {
+					// Transform the diff data to match DiffViewData format
+					const diffViewData: DiffViewData = {
+						title: `Changes in ${worktree?.branch || "worktree"}`,
+						description: workspaceName
+							? `Workspace: ${workspaceName}`
+							: undefined,
+						timestamp: new Date().toLocaleString(),
+						files: result.diff.files,
+					};
+					setDiffData(diffViewData);
+				} else {
+					const errorMsg =
+						result && typeof result === "object" && "error" in result
+							? result.error
+							: "Failed to load diff";
+					setError(errorMsg || "Failed to load diff");
+				}
+			} catch (err) {
+				setError(err instanceof Error ? err.message : "Unknown error");
+			} finally {
+				if (isRefresh) {
+					setRefreshing(false);
+				} else {
+					setLoading(false);
+				}
+			}
+		},
+		[workspaceId, worktreeId, worktree?.branch, workspaceName],
+	);
 
 	const handleRefresh = useCallback(() => {
 		loadDiff(true);
@@ -94,7 +109,9 @@ export function DiffTab({
 			<div className="flex items-center justify-center h-full bg-[#1a1a1a]">
 				<div className="text-center space-y-4 max-w-md px-6">
 					<AlertCircle className="w-10 h-10 text-rose-400 mx-auto" />
-					<h3 className="text-sm font-medium text-zinc-200">Error Loading Diff</h3>
+					<h3 className="text-sm font-medium text-zinc-200">
+						Error Loading Diff
+					</h3>
 					<p className="text-xs text-zinc-500 leading-relaxed">{error}</p>
 					<Button
 						onClick={() => loadDiff(false)}
@@ -116,7 +133,8 @@ export function DiffTab({
 					<div className="text-4xl text-emerald-400">✓</div>
 					<h3 className="text-sm font-medium text-zinc-200">No Changes</h3>
 					<p className="text-xs text-zinc-500 leading-relaxed">
-						There are no changes in this worktree compared to {mainBranch || 'the main branch'}.
+						There are no changes in this worktree compared to{" "}
+						{mainBranch || "the main branch"}.
 					</p>
 					<Button
 						onClick={handleRefresh}
@@ -124,7 +142,9 @@ export function DiffTab({
 						disabled={refreshing}
 						className="h-8 px-3 text-xs"
 					>
-						<RefreshCw className={`w-3.5 h-3.5 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+						<RefreshCw
+							className={`w-3.5 h-3.5 mr-2 ${refreshing ? "animate-spin" : ""}`}
+						/>
 						Refresh
 					</Button>
 				</div>
@@ -134,8 +154,8 @@ export function DiffTab({
 
 	return (
 		<div className="h-full w-full">
-			<DiffView 
-				data={diffData} 
+			<DiffView
+				data={diffData}
 				onRefresh={handleRefresh}
 				isRefreshing={refreshing}
 				onClose={onClose}
@@ -143,4 +163,3 @@ export function DiffTab({
 		</div>
 	);
 }
-

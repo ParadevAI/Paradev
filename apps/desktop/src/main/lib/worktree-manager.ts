@@ -541,12 +541,12 @@ class WorktreeManager {
 				id: string;
 				fileName: string;
 				filePath: string;
-				status: 'added' | 'deleted' | 'modified' | 'renamed';
+				status: "added" | "deleted" | "modified" | "renamed";
 				oldPath?: string;
 				additions: number;
 				deletions: number;
 				changes: Array<{
-					type: 'added' | 'removed' | 'modified' | 'unchanged';
+					type: "added" | "removed" | "modified" | "unchanged";
 					oldLineNumber: number | null;
 					newLineNumber: number | null;
 					content: string;
@@ -563,26 +563,30 @@ class WorktreeManager {
 				{ cwd: worktreePath },
 			);
 
-			const fileLines = diffFilesResult.stdout.trim().split('\n').filter(Boolean);
+			const fileLines = diffFilesResult.stdout
+				.trim()
+				.split("\n")
+				.filter(Boolean);
 			const files = [];
 
 			for (const fileLine of fileLines) {
-				const parts = fileLine.split('\t');
+				const parts = fileLine.split("\t");
 				const statusCode = parts[0];
 				const filePath = parts[1];
 				const oldPath = parts[2]; // For renamed files
 
 				// Determine status
-				let status: 'added' | 'deleted' | 'modified' | 'renamed' = 'modified';
-				if (statusCode.startsWith('A')) status = 'added';
-				else if (statusCode.startsWith('D')) status = 'deleted';
-				else if (statusCode.startsWith('R')) status = 'renamed';
-				else if (statusCode.startsWith('M')) status = 'modified';
+				let status: "added" | "deleted" | "modified" | "renamed" = "modified";
+				if (statusCode.startsWith("A")) status = "added";
+				else if (statusCode.startsWith("D")) status = "deleted";
+				else if (statusCode.startsWith("R")) status = "renamed";
+				else if (statusCode.startsWith("M")) status = "modified";
 
-			// Get detailed diff for this file
-			const diffCommand = status === 'deleted'
-				? `git diff ${mainBranch} -- "${filePath}"`
-				: `git diff ${mainBranch} -- "${oldPath || filePath}"`;
+				// Get detailed diff for this file
+				const diffCommand =
+					status === "deleted"
+						? `git diff ${mainBranch} -- "${filePath}"`
+						: `git diff ${mainBranch} -- "${oldPath || filePath}"`;
 
 				const fileDiffResult = await execAsync(diffCommand, {
 					cwd: worktreePath,
@@ -590,10 +594,10 @@ class WorktreeManager {
 				});
 
 				const diffOutput = fileDiffResult.stdout;
-				
+
 				// Parse the diff output
 				const changes: Array<{
-					type: 'added' | 'removed' | 'modified' | 'unchanged';
+					type: "added" | "removed" | "modified" | "unchanged";
 					oldLineNumber: number | null;
 					newLineNumber: number | null;
 					content: string;
@@ -604,12 +608,12 @@ class WorktreeManager {
 				let additions = 0;
 				let deletions = 0;
 
-				const diffLines = diffOutput.split('\n');
+				const diffLines = diffOutput.split("\n");
 				for (let i = 0; i < diffLines.length; i++) {
 					const line = diffLines[i];
 
 					// Parse hunk headers (e.g., @@ -1,4 +1,5 @@)
-					if (line.startsWith('@@')) {
+					if (line.startsWith("@@")) {
 						const match = line.match(/@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@/);
 						if (match) {
 							oldLineNum = parseInt(match[1], 10);
@@ -619,35 +623,37 @@ class WorktreeManager {
 					}
 
 					// Skip file headers
-					if (line.startsWith('diff --git') || 
-					    line.startsWith('index ') || 
-					    line.startsWith('---') || 
-					    line.startsWith('+++')) {
+					if (
+						line.startsWith("diff --git") ||
+						line.startsWith("index ") ||
+						line.startsWith("---") ||
+						line.startsWith("+++")
+					) {
 						continue;
 					}
 
 					// Parse actual changes
-					if (line.startsWith('+')) {
+					if (line.startsWith("+")) {
 						changes.push({
-							type: 'added',
+							type: "added",
 							oldLineNumber: null,
 							newLineNumber: newLineNum,
 							content: line.substring(1),
 						});
 						newLineNum++;
 						additions++;
-					} else if (line.startsWith('-')) {
+					} else if (line.startsWith("-")) {
 						changes.push({
-							type: 'removed',
+							type: "removed",
 							oldLineNumber: oldLineNum,
 							newLineNumber: null,
 							content: line.substring(1),
 						});
 						oldLineNum++;
 						deletions++;
-					} else if (line.startsWith(' ')) {
+					} else if (line.startsWith(" ")) {
 						changes.push({
-							type: 'unchanged',
+							type: "unchanged",
 							oldLineNumber: oldLineNum,
 							newLineNumber: newLineNum,
 							content: line.substring(1),

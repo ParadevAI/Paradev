@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import type { Tab, Worktree } from "shared/types";
+import { DiffTab } from "../TabContent/components/DiffTab";
 import { PortTab } from "../TabContent/components/PortTab";
 import { PreviewTab } from "../TabContent/components/PreviewTab";
-import { DiffTab } from "../TabContent/components/DiffTab";
 import TabGroup from "./TabGroup";
 import Terminal from "./Terminal";
 
@@ -46,20 +46,20 @@ export default function TabContent({
 
 	// Render based on tab type
 	switch (tab.type) {
-	case "group":
-		// Recursively render a nested ScreenLayout for group tabs
-		return (
-			<TabGroup
-				groupTab={tab}
-				workingDirectory={workingDirectory}
-				workspaceId={workspaceId}
-				worktreeId={worktreeId}
-				selectedTabId={selectedTabId}
-				onTabFocus={onTabFocus}
-				workspaceName={workspaceName}
-				mainBranch={mainBranch}
-			/>
-		);
+		case "group":
+			// Recursively render a nested ScreenLayout for group tabs
+			return (
+				<TabGroup
+					groupTab={tab}
+					workingDirectory={workingDirectory}
+					workspaceId={workspaceId}
+					worktreeId={worktreeId}
+					selectedTabId={selectedTabId}
+					onTabFocus={onTabFocus}
+					workspaceName={workspaceName}
+					mainBranch={mainBranch}
+				/>
+			);
 
 		case "terminal":
 			return (
@@ -108,49 +108,49 @@ export default function TabContent({
 				/>
 			);
 
-	case "preview":
-		return (
-			<div className="w-full h-full" onClick={handleFocus}>
-				<PreviewTab
-					tab={tab}
-					workspaceId={workspaceId}
-					worktreeId={worktreeId}
-					worktree={worktree}
-				/>
-			</div>
-		);
+		case "preview":
+			return (
+				<div className="w-full h-full" onClick={handleFocus}>
+					<PreviewTab
+						tab={tab}
+						workspaceId={workspaceId}
+						worktreeId={worktreeId}
+						worktree={worktree}
+					/>
+				</div>
+			);
 
-	case "diff":
-		if (!worktreeId) {
+		case "diff":
+			if (!worktreeId) {
+				return (
+					<PlaceholderContent
+						type="diff"
+						message="Worktree not available"
+						onFocus={handleFocus}
+					/>
+				);
+			}
+			return (
+				<div className="w-full h-full" onClick={handleFocus}>
+					<DiffTab
+						tab={tab}
+						workspaceId={workspaceId}
+						worktreeId={worktreeId}
+						worktree={worktree}
+						workspaceName={workspaceName}
+						mainBranch={mainBranch}
+					/>
+				</div>
+			);
+
+		default:
 			return (
 				<PlaceholderContent
-					type="diff"
-					message="Worktree not available"
+					type="unknown"
+					message={`Unknown tab type: ${tab.type}`}
 					onFocus={handleFocus}
 				/>
 			);
-		}
-		return (
-			<div className="w-full h-full" onClick={handleFocus}>
-				<DiffTab
-					tab={tab}
-					workspaceId={workspaceId}
-					worktreeId={worktreeId}
-					worktree={worktree}
-					workspaceName={workspaceName}
-					mainBranch={mainBranch}
-				/>
-			</div>
-		);
-
-	default:
-		return (
-			<PlaceholderContent
-				type="unknown"
-				message={`Unknown tab type: ${tab.type}`}
-				onFocus={handleFocus}
-			/>
-		);
 	}
 }
 
@@ -261,12 +261,7 @@ function TerminalTabContent({
 
 	return (
 		<div className="w-full h-full">
-			<Terminal
-				key={terminalId}
-				terminalId={terminalId}
-				isSelected={isSelected}
-				onFocus={onFocus}
-			/>
+			<Terminal key={terminalId} terminalId={terminalId} onFocus={onFocus} />
 		</div>
 	);
 }

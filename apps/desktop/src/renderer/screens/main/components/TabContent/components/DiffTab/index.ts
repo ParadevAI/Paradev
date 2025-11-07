@@ -1,2 +1,1 @@
-export { DiffTab } from './DiffTab';
-
+export { DiffTab } from "./DiffTab";

@@ -20,20 +20,20 @@ import {
 import { useEffect, useRef, useState } from "react";
 import type { ImperativePanelHandle } from "react-resizable-panels";
 import type { MosaicNode, Tab, TabType, Workspace } from "shared/types";
+import { createShortcutHandler } from "../../lib/keyboard-shortcuts";
+import {
+	createTabShortcuts,
+	createWorkspaceShortcuts,
+} from "../../lib/shortcuts";
 import { AppFrame } from "./components/AppFrame";
 import { Background } from "./components/Background";
 import TabContent from "./components/MainContent/TabContent";
 import TabGroup from "./components/MainContent/TabGroup";
+import { NewLayoutMain } from "./components/NewLayout/NewLayoutMain";
 import { PlaceholderState } from "./components/PlaceholderState";
 import { Sidebar } from "./components/Sidebar";
-import { TopBar } from "./components/TopBar";
 import { DiffTab } from "./components/TabContent/components/DiffTab";
-import { createShortcutHandler } from "../../lib/keyboard-shortcuts";
-import {
-	createWorkspaceShortcuts,
-	createTabShortcuts,
-} from "../../lib/shortcuts";
-import { NewLayoutMain } from "./components/NewLayout/NewLayoutMain";
+import { TopBar } from "./components/TopBar";
 
 // Droppable wrapper for main content area
 function DroppableMainContent({
@@ -92,7 +92,7 @@ export function MainScreen() {
 	const [selectedTabId, setSelectedTabId] = useState<string | null>(null); // Can be a group tab or any tab
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
-	
+
 	// Diff view state
 	const [showDiffView, setShowDiffView] = useState(false);
 	const [diffWorktreeId, setDiffWorktreeId] = useState<string | null>(null);
@@ -136,13 +136,13 @@ export function MainScreen() {
 		if (!currentWorkspace) return;
 
 		// Find the worktree
-		const worktree = currentWorkspace.worktrees?.find((wt) => wt.id === worktreeId);
+		const worktree = currentWorkspace.worktrees?.find(
+			(wt) => wt.id === worktreeId,
+		);
 		if (!worktree) return;
 
 		// Check if a diff tab already exists for this worktree
-		const existingDiffTab = worktree.tabs?.find(
-			(tab) => tab.type === "diff"
-		);
+		const existingDiffTab = worktree.tabs?.find((tab) => tab.type === "diff");
 
 		if (existingDiffTab) {
 			// If a diff tab already exists, just select it
@@ -1333,20 +1333,20 @@ export function MainScreen() {
 
 					const first = parentGroupTab.mosaicTree;
 
-          if (!first) {
-            console.error(
-              "Failed to create vertical split: parentGroupTab.mosaicTree is undefined"
-            );
-            return;
-          }
+					if (!first) {
+						console.error(
+							"Failed to create vertical split: parentGroupTab.mosaicTree is undefined",
+						);
+						return;
+					}
 
-          // Update mosaic tree with column direction for vertical split
-          const updatedMosaicTree: MosaicNode<string> = {
-            direction: "column",
-            first,
-            second: newTab.id,
-            splitPercentage: 50,
-          } satisfies MosaicNode<string>;
+					// Update mosaic tree with column direction for vertical split
+					const updatedMosaicTree: MosaicNode<string> = {
+						direction: "column",
+						first,
+						second: newTab.id,
+						splitPercentage: 50,
+					} satisfies MosaicNode<string>;
 
 					await window.ipcRenderer.invoke("tab-update-mosaic-tree", {
 						workspaceId: currentWorkspace.id,
@@ -1693,20 +1693,20 @@ export function MainScreen() {
 						onMouseLeave={() => setShowSidebarOverlay(false)}
 					>
 						<div className="h-full border-r border-neutral-800 bg-neutral-950/95 backdrop-blur-sm">
-						<Sidebar
-							workspaces={workspaces}
-							currentWorkspace={currentWorkspace}
-							onTabSelect={handleTabSelect}
-							onWorktreeCreated={handleWorktreeCreated}
-							onWorkspaceSelect={handleWorkspaceSelect}
-							onUpdateWorktree={handleUpdateWorktree}
-							selectedTabId={selectedTabId ?? undefined}
-							onCollapse={() => {
-								setShowSidebarOverlay(false);
-							}}
-							isDragging={!!activeId}
-							onShowDiff={handleShowDiffView}
-						/>
+							<Sidebar
+								workspaces={workspaces}
+								currentWorkspace={currentWorkspace}
+								onTabSelect={handleTabSelect}
+								onWorktreeCreated={handleWorktreeCreated}
+								onWorkspaceSelect={handleWorkspaceSelect}
+								onUpdateWorktree={handleUpdateWorktree}
+								selectedTabId={selectedTabId ?? undefined}
+								onCollapse={() => {
+									setShowSidebarOverlay(false);
+								}}
+								isDragging={!!activeId}
+								onShowDiff={handleShowDiffView}
+							/>
 						</div>
 					</div>
 				)}
@@ -1733,11 +1733,11 @@ export function MainScreen() {
 									onUpdateWorktree={handleUpdateWorktree}
 									selectedTabId={selectedTabId ?? undefined}
 									onCollapse={() => {
-									const panel = sidebarPanelRef.current;
-									if (panel && !panel.isCollapsed()) {
-										panel.collapse();
-									}
-								}}
+										const panel = sidebarPanelRef.current;
+										if (panel && !panel.isCollapsed()) {
+											panel.collapse();
+										}
+									}}
 									isDragging={!!activeId}
 									onShowDiff={handleShowDiffView}
 								/>
@@ -1747,45 +1747,53 @@ export function MainScreen() {
 						{/* Main Content Area */}
 						<ResizablePanel minSize={30}>
 							<div className="flex flex-col h-full overflow-hidden">
-						{/* Top Bar */}
-						<TopBar
-							isSidebarOpen={isSidebarOpen}
-							onOpenSidebar={() => {
-								const panel = sidebarPanelRef.current;
-								if (panel && panel.isCollapsed()) {
-									panel.expand();
-								}
-							}}
-							workspaceName={currentWorkspace?.name}
-							currentBranch={currentWorkspace?.branch}
-						/>
+								{/* Top Bar */}
+								<TopBar
+									isSidebarOpen={isSidebarOpen}
+									onOpenSidebar={() => {
+										const panel = sidebarPanelRef.current;
+										if (panel && panel.isCollapsed()) {
+											panel.expand();
+										}
+									}}
+									workspaceName={currentWorkspace?.name}
+									currentBranch={currentWorkspace?.branch}
+								/>
 
-							{/* Content Area */}
-							<DroppableMainContent isOver={isOverMainContent}>
-								{showDiffView && diffWorktreeId && diffWorktree && currentWorkspace ? (
-									// Show diff view
-									<div className="w-full h-full">
-										<DiffTab
-											tab={{ id: 'temp-diff', name: 'Diff View', type: 'diff', createdAt: new Date().toISOString() }}
-											workspaceId={currentWorkspace.id}
-											worktreeId={diffWorktreeId}
-											worktree={diffWorktree}
-											workspaceName={currentWorkspace.name}
-											mainBranch={currentWorkspace.branch}
-											onClose={handleCloseDiffView}
+								{/* Content Area */}
+								<DroppableMainContent isOver={isOverMainContent}>
+									{showDiffView &&
+									diffWorktreeId &&
+									diffWorktree &&
+									currentWorkspace ? (
+										// Show diff view
+										<div className="w-full h-full">
+											<DiffTab
+												tab={{
+													id: "temp-diff",
+													name: "Diff View",
+													type: "diff",
+													createdAt: new Date().toISOString(),
+												}}
+												workspaceId={currentWorkspace.id}
+												worktreeId={diffWorktreeId}
+												worktree={diffWorktree}
+												workspaceName={currentWorkspace.name}
+												mainBranch={currentWorkspace.branch}
+												onClose={handleCloseDiffView}
+											/>
+										</div>
+									) : loading ||
+										error ||
+										!currentWorkspace ||
+										!selectedTab ||
+										!selectedWorktree ? (
+										<PlaceholderState
+											loading={loading}
+											error={error}
+											hasWorkspace={!!currentWorkspace}
 										/>
-									</div>
-								) : loading ||
-								error ||
-								!currentWorkspace ||
-								!selectedTab ||
-								!selectedWorktree ? (
-									<PlaceholderState
-										loading={loading}
-										error={error}
-										hasWorkspace={!!currentWorkspace}
-									/>
-								) : parentGroupTab ? (
+									) : parentGroupTab ? (
 										// Selected tab is a sub-tab of a group → display the parent group's mosaic
 										<TabGroup
 											key={`${parentGroupTab.id}-${JSON.stringify(parentGroupTab.mosaicTree)}-${parentGroupTab.tabs?.length}`}

@@ -299,30 +299,28 @@ export function Sidebar({
 
 	return (
 		<div className="flex flex-col h-full w-full select-none text-neutral-300 text-sm">
-
-
-		<WorkspaceCarousel
-			workspaces={workspaces}
-			currentWorkspace={currentWorkspace}
-			onWorkspaceSelect={onWorkspaceSelect}
-			onScrollProgress={setScrollProgress}
-			isDragging={isDragging}
-		>
-			{(workspace, isActive) => (
-				<>
-					<WorktreeList
-						currentWorkspace={workspace}
-						expandedWorktrees={expandedWorktrees}
-						onToggleWorktree={toggleWorktree}
-						onTabSelect={onTabSelect}
-						onReload={onWorktreeCreated}
-						onUpdateWorktree={onUpdateWorktree}
-						selectedTabId={selectedTabId}
-						onCloneWorktree={handleCloneWorktree}
-						onShowDiff={onShowDiff}
-						selectedWorktreeId={currentWorkspace?.activeWorktreeId}
-						showWorkspaceHeader={true}
-					/>
+			<WorkspaceCarousel
+				workspaces={workspaces}
+				currentWorkspace={currentWorkspace}
+				onWorkspaceSelect={onWorkspaceSelect}
+				onScrollProgress={setScrollProgress}
+				isDragging={isDragging}
+			>
+				{(workspace, isActive) => (
+					<>
+						<WorktreeList
+							currentWorkspace={workspace}
+							expandedWorktrees={expandedWorktrees}
+							onToggleWorktree={toggleWorktree}
+							onTabSelect={onTabSelect}
+							onReload={onWorktreeCreated}
+							onUpdateWorktree={onUpdateWorktree}
+							selectedTabId={selectedTabId}
+							onCloneWorktree={handleCloneWorktree}
+							onShowDiff={onShowDiff}
+							selectedWorktreeId={currentWorkspace?.activeWorktreeId}
+							showWorkspaceHeader={true}
+						/>
 
 						{workspace && (
 							<CreateWorktreeButton
@@ -333,8 +331,6 @@ export function Sidebar({
 					</>
 				)}
 			</WorkspaceCarousel>
-
-
 
 			<CreateWorktreeModal
 				isOpen={showWorktreeModal}

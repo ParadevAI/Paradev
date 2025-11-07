@@ -1,15 +1,27 @@
-import { useState, useEffect, useRef } from 'react';
+import { Button } from "@superset/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
+import {
+	ChevronDown,
+	ChevronRight,
+	File,
+	FileEdit,
+	FilePlus,
+	FileX,
+	GitCommit,
+	GitPullRequest,
+	MessageSquare,
+	PanelLeftClose,
+	PanelLeftOpen,
+	RefreshCw,
+	X,
+} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { DiffContent } from "./DiffContent";
+import { DiffSummary } from "./DiffSummary";
+import { FileTree } from "./FileTree";
+import type { DiffViewData, FileDiff } from "./types";
 
-import { ChevronRight, ChevronDown, File, FilePlus, FileX, FileEdit, RefreshCw, X, MessageSquare, GitPullRequest, GitCommit, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
-import { Button } from '@superset/ui/button';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@superset/ui/tooltip';
-
-import type { DiffViewData, FileDiff } from './types';
-import { DiffContent } from './DiffContent';
-import { DiffSummary } from './DiffSummary';
-import { FileTree } from './FileTree';
-
-type ViewMode = 'conversation' | 'files';
+type ViewMode = "conversation" | "files";
 
 interface DiffViewProps {
 	data: DiffViewData;
@@ -18,33 +30,46 @@ interface DiffViewProps {
 	onClose?: () => void;
 }
 
-export function DiffView({ data, onRefresh, isRefreshing = false, onClose }: DiffViewProps) {
-	const [viewMode, setViewMode] = useState<ViewMode>('files');
-	const [selectedFile, setSelectedFile] = useState<string | null>(data.files[0]?.id || null);
+export function DiffView({
+	data,
+	onRefresh,
+	isRefreshing = false,
+	onClose,
+}: DiffViewProps) {
+	const [viewMode, setViewMode] = useState<ViewMode>("files");
+	const [selectedFile, setSelectedFile] = useState<string | null>(
+		data.files[0]?.id || null,
+	);
 	const [showFileTree, setShowFileTree] = useState(true);
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
 	const isScrollingProgrammatically = useRef(false);
 
-	const getFileIcon = (status: FileDiff['status']) => {
+	const getFileIcon = (status: FileDiff["status"]) => {
 		switch (status) {
-			case 'added':
+			case "added":
 				return <FilePlus className="w-3.5 h-3.5 text-emerald-400" />;
-			case 'deleted':
+			case "deleted":
 				return <FileX className="w-3.5 h-3.5 text-rose-400" />;
-			case 'modified':
+			case "modified":
 				return <FileEdit className="w-3.5 h-3.5 text-amber-400" />;
 			default:
 				return <File className="w-3.5 h-3.5 text-zinc-500" />;
 		}
 	};
 
-	const totalAdditions = data.files.reduce((sum, file) => sum + file.additions, 0);
-	const totalDeletions = data.files.reduce((sum, file) => sum + file.deletions, 0);
+	const totalAdditions = data.files.reduce(
+		(sum, file) => sum + file.additions,
+		0,
+	);
+	const totalDeletions = data.files.reduce(
+		(sum, file) => sum + file.deletions,
+		0,
+	);
 	const filesChanged = data.files.length;
 
 	// Set up intersection observer to track which file is at the top of the viewport
 	useEffect(() => {
-		if (viewMode !== 'files' || !scrollContainerRef.current) return;
+		if (viewMode !== "files" || !scrollContainerRef.current) return;
 
 		const observer = new IntersectionObserver(
 			(entries) => {
@@ -53,7 +78,9 @@ export function DiffView({ data, onRefresh, isRefreshing = false, onClose }: Dif
 
 				// Find the topmost visible file
 				// Filter entries that are intersecting
-				const visibleEntries = entries.filter(entry => entry.isIntersecting && entry.intersectionRatio > 0);
+				const visibleEntries = entries.filter(
+					(entry) => entry.isIntersecting && entry.intersectionRatio > 0,
+				);
 
 				if (visibleEntries.length === 0) return;
 
@@ -64,7 +91,7 @@ export function DiffView({ data, onRefresh, isRefreshing = false, onClose }: Dif
 
 				// Select the topmost file
 				const topmostEntry = visibleEntries[0];
-				const fileId = topmostEntry.target.id.replace('file-diff-', '');
+				const fileId = topmostEntry.target.id.replace("file-diff-", "");
 
 				if (fileId) {
 					setSelectedFile(fileId);
@@ -72,13 +99,14 @@ export function DiffView({ data, onRefresh, isRefreshing = false, onClose }: Dif
 			},
 			{
 				root: scrollContainerRef.current,
-				rootMargin: '0px 0px -80% 0px', // Trigger when file enters top 20% of viewport
+				rootMargin: "0px 0px -80% 0px", // Trigger when file enters top 20% of viewport
 				threshold: [0, 0.1, 0.2, 0.3],
-			}
+			},
 		);
 
 		// Observe all file diff elements
-		const elements = scrollContainerRef.current.querySelectorAll('[id^="file-diff-"]');
+		const elements =
+			scrollContainerRef.current.querySelectorAll('[id^="file-diff-"]');
 		elements.forEach((el) => observer.observe(el));
 
 		return () => {
@@ -108,7 +136,7 @@ export function DiffView({ data, onRefresh, isRefreshing = false, onClose }: Dif
 			// Smooth scroll to the target position
 			container.scrollTo({
 				top: targetScrollTop,
-				behavior: 'smooth'
+				behavior: "smooth",
 			});
 		}
 
@@ -125,11 +153,15 @@ export function DiffView({ data, onRefresh, isRefreshing = false, onClose }: Dif
 				<div className="flex items-center justify-between">
 					<div className="flex items-center gap-3 flex-1 min-w-0">
 						<GitPullRequest className="w-4 h-4 text-zinc-500 shrink-0" />
-						<h1 className="text-sm font-medium text-zinc-200 truncate">{data.title}</h1>
+						<h1 className="text-sm font-medium text-zinc-200 truncate">
+							{data.title}
+						</h1>
 						{data.description && (
 							<>
 								<span className="text-xs text-zinc-600">•</span>
-								<span className="text-xs text-zinc-500 truncate">{data.description}</span>
+								<span className="text-xs text-zinc-500 truncate">
+									{data.description}
+								</span>
 							</>
 						)}
 					</div>
@@ -144,7 +176,9 @@ export function DiffView({ data, onRefresh, isRefreshing = false, onClose }: Dif
 										disabled={isRefreshing}
 										className="h-7 w-7 text-zinc-400 hover:text-zinc-200 hover:bg-white/5"
 									>
-										<RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
+										<RefreshCw
+											className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin" : ""}`}
+										/>
 									</Button>
 								</TooltipTrigger>
 								<TooltipContent side="bottom">
@@ -177,11 +211,11 @@ export function DiffView({ data, onRefresh, isRefreshing = false, onClose }: Dif
 			<div className="border-b border-white/5 px-4 bg-[#1a1a1a]">
 				<div className="flex items-center gap-1">
 					<button
-						onClick={() => setViewMode('conversation')}
+						onClick={() => setViewMode("conversation")}
 						className={`flex items-center gap-2 px-3 py-2 text-xs font-medium border-b-2 transition-colors ${
-							viewMode === 'conversation'
-								? 'border-sky-500 text-zinc-100'
-								: 'border-transparent text-zinc-500 hover:text-zinc-300'
+							viewMode === "conversation"
+								? "border-sky-500 text-zinc-100"
+								: "border-transparent text-zinc-500 hover:text-zinc-300"
 						}`}
 						type="button"
 					>
@@ -189,11 +223,11 @@ export function DiffView({ data, onRefresh, isRefreshing = false, onClose }: Dif
 						Conversation
 					</button>
 					<button
-						onClick={() => setViewMode('files')}
+						onClick={() => setViewMode("files")}
 						className={`flex items-center gap-2 px-3 py-2 text-xs font-medium border-b-2 transition-colors ${
-							viewMode === 'files'
-								? 'border-sky-500 text-zinc-100'
-								: 'border-transparent text-zinc-500 hover:text-zinc-300'
+							viewMode === "files"
+								? "border-sky-500 text-zinc-100"
+								: "border-transparent text-zinc-500 hover:text-zinc-300"
 						}`}
 						type="button"
 					>
@@ -208,7 +242,7 @@ export function DiffView({ data, onRefresh, isRefreshing = false, onClose }: Dif
 
 			{/* Main content area */}
 			<div className="flex flex-1 overflow-hidden">
-				{viewMode === 'conversation' ? (
+				{viewMode === "conversation" ? (
 					// Conversation view - placeholder for comments/activity
 					<div className="flex-1 overflow-y-auto">
 						<div className="max-w-4xl mx-auto py-6 px-4">
@@ -216,17 +250,25 @@ export function DiffView({ data, onRefresh, isRefreshing = false, onClose }: Dif
 							<div className="bg-white/[0.02] border border-white/5 rounded-lg p-4 mb-4">
 								<div className="flex items-start gap-3">
 									<div className="flex-1">
-										<h3 className="text-sm font-medium text-zinc-200 mb-2">Changes Summary</h3>
+										<h3 className="text-sm font-medium text-zinc-200 mb-2">
+											Changes Summary
+										</h3>
 										<div className="flex items-center gap-4 text-xs">
 											<div className="flex items-center gap-2">
 												<GitCommit className="w-3.5 h-3.5 text-zinc-500" />
-												<span className="text-zinc-400">{filesChanged} files changed</span>
+												<span className="text-zinc-400">
+													{filesChanged} files changed
+												</span>
 											</div>
 											<div className="flex items-center gap-2">
-												<span className="text-emerald-400">+{totalAdditions} additions</span>
+												<span className="text-emerald-400">
+													+{totalAdditions} additions
+												</span>
 											</div>
 											<div className="flex items-center gap-2">
-												<span className="text-rose-400">-{totalDeletions} deletions</span>
+												<span className="text-rose-400">
+													-{totalDeletions} deletions
+												</span>
 											</div>
 										</div>
 										{data.timestamp && (
@@ -262,14 +304,23 @@ export function DiffView({ data, onRefresh, isRefreshing = false, onClose }: Dif
 												</div>
 												<div className="flex items-center gap-2 text-[10px]">
 													{file.additions > 0 && (
-														<span className="text-emerald-400">+{file.additions}</span>
+														<span className="text-emerald-400">
+															+{file.additions}
+														</span>
 													)}
 													{file.deletions > 0 && (
-														<span className="text-rose-400">-{file.deletions}</span>
+														<span className="text-rose-400">
+															-{file.deletions}
+														</span>
 													)}
 												</div>
 											</div>
-											{file.summary && <DiffSummary summary={file.summary} status={file.status} />}
+											{file.summary && (
+												<DiffSummary
+													summary={file.summary}
+													status={file.status}
+												/>
+											)}
 										</div>
 									))}
 							</div>
@@ -288,7 +339,9 @@ export function DiffView({ data, onRefresh, isRefreshing = false, onClose }: Dif
 					// Files changed view - scrollable list of all files (GitHub style)
 					<>
 						{/* File tree sidebar - kept mounted, hidden with display:none for instant toggle */}
-						<div className={`w-72 border-r border-white/5 overflow-y-auto bg-[#1a1a1a] shrink-0 ${showFileTree ? '' : 'hidden'}`}>
+						<div
+							className={`w-72 border-r border-white/5 overflow-y-auto bg-[#1a1a1a] shrink-0 ${showFileTree ? "" : "hidden"}`}
+						>
 							<div className="py-2">
 								<div className="flex items-center justify-between px-3 py-2">
 									<h2 className="text-xs font-medium text-zinc-500">Files</h2>
@@ -336,7 +389,11 @@ export function DiffView({ data, onRefresh, isRefreshing = false, onClose }: Dif
 							)}
 							<div ref={scrollContainerRef} className="flex-1 overflow-y-auto">
 								{data.files.map((file, index) => (
-									<div key={file.id} id={`file-diff-${file.id}`} className="border-b border-white/5 last:border-b-0">
+									<div
+										key={file.id}
+										id={`file-diff-${file.id}`}
+										className="border-b border-white/5 last:border-b-0"
+									>
 										<DiffContent file={file} />
 									</div>
 								))}
@@ -348,4 +405,3 @@ export function DiffView({ data, onRefresh, isRefreshing = false, onClose }: Dif
 		</div>
 	);
 }
-
