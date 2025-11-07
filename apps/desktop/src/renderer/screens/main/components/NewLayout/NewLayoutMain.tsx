@@ -85,8 +85,8 @@ export const NewLayoutMain: React.FC = () => {
 
 							{/* Main content panel */}
 							<ResizablePanel defaultSize={75} minSize={30}>
-								<div className="h-full bg-[#1e1e1e] flex items-center justify-center m-1 rounded-lg">
-									<div className="text-center space-y-2">
+								<div className="h-full bg-[#1e1e1e] flex items-center justify-center p-12 m-1 rounded-lg">
+									<div>
 										<h2 className="text-2xl font-semibold text-neutral-400">
 											New UI Mock
 										</h2>
