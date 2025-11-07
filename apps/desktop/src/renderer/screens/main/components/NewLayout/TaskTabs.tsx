@@ -9,13 +9,13 @@ import { PanelLeftClose, PanelLeftOpen, Plus } from "lucide-react";
 import type React from "react";
 import { useState } from "react";
 import { TaskAssignee } from "./TaskAssignee";
-import { StatusIndicator, type WorkspaceStatus } from "./StatusIndicator";
+import { StatusIndicator, type TaskStatus } from "./StatusIndicator";
 
 interface MockTask {
 	id: string;
 	slug: string;
 	name: string;
-	status: WorkspaceStatus;
+	status: TaskStatus;
 	branch: string;
 	description: string;
 	assignee: string;
@@ -70,18 +70,25 @@ const MOCK_TASKS: MockTask[] = [
 	},
 ];
 
-interface WorkspaceTabsProps {
+interface TaskTabsProps {
 	onCollapseSidebar: () => void;
 	onExpandSidebar: () => void;
 	isSidebarOpen: boolean;
+	onAddTask: () => void;
+	activeTaskId: string;
+	onActiveTaskChange: (taskId: string) => void;
+	openTasks: MockTask[];
 }
 
-export const WorkspaceTabs: React.FC<WorkspaceTabsProps> = ({
+export const TaskTabs: React.FC<TaskTabsProps> = ({
 	onCollapseSidebar,
 	onExpandSidebar,
 	isSidebarOpen,
+	onAddTask,
+	activeTaskId,
+	onActiveTaskChange,
+	openTasks,
 }) => {
-	const [activeTaskId, setActiveTaskId] = useState(MOCK_TASKS[0].id);
 
 	return (
 		<div
@@ -124,7 +131,7 @@ export const WorkspaceTabs: React.FC<WorkspaceTabsProps> = ({
 				</div>
 
 				{/* Task tabs */}
-				{MOCK_TASKS.map((task) => {
+				{openTasks.map((task) => {
 					const statusLabel = task.status === "planning" ? "Planning" :
 						task.status === "working" ? "Working" :
 						task.status === "needs-feedback" ? "Needs Feedback" :
@@ -135,7 +142,7 @@ export const WorkspaceTabs: React.FC<WorkspaceTabsProps> = ({
 							<HoverCardTrigger asChild>
 								<button
 									type="button"
-									onClick={() => setActiveTaskId(task.id)}
+									onClick={() => onActiveTaskChange(task.id)}
 									className={`
 										flex items-center gap-2 px-3 h-8 rounded-t-md transition-all border-t border-x
 										${
@@ -198,12 +205,12 @@ export const WorkspaceTabs: React.FC<WorkspaceTabsProps> = ({
 				})}
 				<Tooltip>
 					<TooltipTrigger asChild>
-						<Button variant="ghost" size="icon-sm" className="ml-1">
+						<Button variant="ghost" size="icon-sm" className="ml-1" onClick={onAddTask}>
 							<Plus size={18} />
 						</Button>
 					</TooltipTrigger>
 					<TooltipContent side="bottom">
-						<p>Add workspace</p>
+						<p>Open task</p>
 					</TooltipContent>
 				</Tooltip>
 			</div>
