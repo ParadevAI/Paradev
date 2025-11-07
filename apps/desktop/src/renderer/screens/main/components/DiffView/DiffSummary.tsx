@@ -15,7 +15,7 @@ export function DiffSummary({ summary, status }: DiffSummaryProps) {
 			case 'deleted':
 				return 'bg-rose-500/5';
 			case 'modified':
-				return 'bg-sky-500/5';
+				return 'bg-amber-500/5';
 			default:
 				return 'bg-white/[0.02]';
 		}
@@ -28,7 +28,7 @@ export function DiffSummary({ summary, status }: DiffSummaryProps) {
 			case 'deleted':
 				return 'text-rose-400/60';
 			case 'modified':
-				return 'text-sky-400/60';
+				return 'text-amber-400/60';
 			default:
 				return 'text-zinc-500';
 		}

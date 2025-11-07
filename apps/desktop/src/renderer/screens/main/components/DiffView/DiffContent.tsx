@@ -1,10 +1,15 @@
+import { memo } from 'react';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import type { FileDiff, DiffLine } from './types';
+import { detectLanguage } from './languageDetector';
 
 interface DiffContentProps {
 	file: FileDiff;
 }
 
-export function DiffContent({ file }: DiffContentProps) {
+export const DiffContent = memo(function DiffContent({ file }: DiffContentProps) {
+	const language = detectLanguage(file.fileName);
 	const renderDiffLine = (line: DiffLine, index: number) => {
 		const getBgColor = () => {
 			switch (line.type) {
@@ -13,7 +18,7 @@ export function DiffContent({ file }: DiffContentProps) {
 				case 'removed':
 					return 'bg-rose-500/8 hover:bg-rose-500/10';
 				case 'modified':
-					return 'bg-sky-500/8 hover:bg-sky-500/10';
+					return 'bg-amber-500/8 hover:bg-amber-500/10';
 				default:
 					return 'hover:bg-white/[0.02]';
 			}
@@ -50,7 +55,7 @@ export function DiffContent({ file }: DiffContentProps) {
 				case 'removed':
 					return 'text-rose-400';
 				case 'modified':
-					return 'text-sky-400';
+					return 'text-amber-400';
 				default:
 					return 'text-transparent';
 			}
@@ -63,7 +68,7 @@ export function DiffContent({ file }: DiffContentProps) {
 				case 'removed':
 					return 'border-l-rose-500/30';
 				case 'modified':
-					return 'border-l-sky-500/30';
+					return 'border-l-amber-500/30';
 				default:
 					return 'border-l-transparent';
 			}
@@ -83,8 +88,28 @@ export function DiffContent({ file }: DiffContentProps) {
 				<div className={`shrink-0 w-7 text-center py-0.5 ${getMarkerColor()} select-none font-semibold`}>
 					{getLinePrefix()}
 				</div>
-				<div className={`flex-1 py-0.5 pr-4 ${getTextColor()}`}>
-					<pre className="whitespace-pre-wrap break-all">{line.content || ' '}</pre>
+				<div className={`flex-1 py-0.5 pr-4`}>
+					<SyntaxHighlighter
+						language={language}
+						style={vscDarkPlus}
+						customStyle={{
+							margin: 0,
+							padding: 0,
+							background: 'transparent',
+							fontSize: 'inherit',
+							lineHeight: 'inherit',
+						}}
+						codeTagProps={{
+							style: {
+								fontFamily: 'inherit',
+								background: 'transparent',
+							},
+						}}
+						PreTag="div"
+						className="inline-block"
+					>
+						{line.content || ' '}
+					</SyntaxHighlighter>
 				</div>
 			</div>
 		);
@@ -112,7 +137,7 @@ export function DiffContent({ file }: DiffContentProps) {
 									: file.status === 'deleted'
 									? 'bg-rose-500/10 text-rose-400'
 									: file.status === 'modified'
-									? 'bg-sky-500/10 text-sky-400'
+									? 'bg-amber-500/10 text-amber-400'
 									: 'bg-white/5 text-zinc-400'
 							}`}
 						>
@@ -129,5 +154,5 @@ export function DiffContent({ file }: DiffContentProps) {
 			</div>
 		</div>
 	);
-}
+});
 

@@ -114,9 +114,6 @@ export function WorktreeList({
 		{/* Workspace Header - more minimal */}
 		{showWorkspaceHeader && currentWorkspace && (
 			<div className="px-3 pt-3 pb-2">
-				<div className="text-[10px] font-medium text-neutral-500 uppercase tracking-wider mb-1">
-					{currentWorkspace.name}
-				</div>
 				<WorkspacePortIndicator workspace={currentWorkspace} />
 			</div>
 		)}

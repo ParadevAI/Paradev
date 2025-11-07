@@ -334,14 +334,7 @@ export function Sidebar({
 				)}
 			</WorkspaceCarousel>
 
-			<WorkspaceSwitcher
-				workspaces={workspaces}
-				currentWorkspaceId={currentWorkspace?.id || null}
-				onWorkspaceSelect={onWorkspaceSelect}
-				onAddWorkspace={handleAddWorkspace}
-				onRemoveWorkspace={handleRemoveWorkspace}
-				scrollProgress={scrollProgress}
-			/>
+
 
 			<CreateWorktreeModal
 				isOpen={showWorktreeModal}
