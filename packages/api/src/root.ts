@@ -2,11 +2,13 @@ import { createTRPCRouter } from './trpc';
 import { organizationRouter } from './router/organization';
 import { repositoryRouter } from './router/repository';
 import { taskRouter } from './router/task';
+import { userRouter } from './router/user';
 
 export const appRouter = createTRPCRouter({
   organization: organizationRouter,
   repository: repositoryRouter,
   task: taskRouter,
+  user: userRouter,
 });
 
 export type AppRouter = typeof appRouter;
