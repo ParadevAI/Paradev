@@ -210,6 +210,7 @@ export const NewLayoutMain: React.FC = () => {
 	const [selectedTabId, setSelectedTabId] = useState<string | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+	const [mode, setMode] = useState<"plan" | "edit">("edit");
 
 	const handleCollapseSidebar = () => {
 		const panel = sidebarPanelRef.current;
@@ -640,6 +641,8 @@ export const NewLayoutMain: React.FC = () => {
 						activeTaskId={activeTaskId}
 						onActiveTaskChange={setActiveTaskId}
 						openTasks={openTasks}
+						mode={mode}
+						onModeChange={setMode}
 					/>
 
 					{/* Main content area with resizable sidebar */}

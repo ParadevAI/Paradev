@@ -78,6 +78,8 @@ interface TaskTabsProps {
 	activeTaskId: string;
 	onActiveTaskChange: (taskId: string) => void;
 	openTasks: MockTask[];
+	mode?: "plan" | "edit";
+	onModeChange?: (mode: "plan" | "edit") => void;
 }
 
 export const TaskTabs: React.FC<TaskTabsProps> = ({
@@ -88,6 +90,8 @@ export const TaskTabs: React.FC<TaskTabsProps> = ({
 	activeTaskId,
 	onActiveTaskChange,
 	openTasks,
+	mode = "edit",
+	onModeChange,
 }) => {
 
 	return (
@@ -139,6 +143,36 @@ export const TaskTabs: React.FC<TaskTabsProps> = ({
 						</Tooltip>
 					)}
 				</div>
+
+				{/* Plan/Edit mode toggle */}
+				{onModeChange && (
+					<div className="flex items-center mr-3">
+						<div className="inline-flex rounded-lg bg-neutral-800/50 p-0.5 gap-0.5">
+							<button
+								type="button"
+								onClick={() => onModeChange("plan")}
+								className={`px-2.5 py-1 text-xs font-medium rounded-md transition-colors ${
+									mode === "plan"
+										? "bg-neutral-700 text-white"
+										: "text-neutral-400 hover:text-neutral-200"
+								}`}
+							>
+								Plan
+							</button>
+							<button
+								type="button"
+								onClick={() => onModeChange("edit")}
+								className={`px-2.5 py-1 text-xs font-medium rounded-md transition-colors ${
+									mode === "edit"
+										? "bg-neutral-700 text-white"
+										: "text-neutral-400 hover:text-neutral-200"
+								}`}
+							>
+								Edit
+							</button>
+						</div>
+					</div>
+				)}
 
 				{/* Task tabs */}
 				{openTasks.map((task) => {

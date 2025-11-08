@@ -7,6 +7,8 @@ interface TopBarProps {
 	onOpenSidebar: () => void;
 	workspaceName?: string;
 	currentBranch?: string;
+	mode?: "plan" | "edit";
+	onModeChange?: (mode: "plan" | "edit") => void;
 }
 
 export function TopBar({
@@ -14,6 +16,8 @@ export function TopBar({
 	onOpenSidebar,
 	workspaceName,
 	currentBranch,
+	mode = "edit",
+	onModeChange,
 }: TopBarProps) {
 	return (
 		<div
@@ -44,8 +48,38 @@ export function TopBar({
 				)}
 			</div>
 
-			{/* Center section - Empty */}
-			<div className="flex-1" />
+			{/* Center section - Mode Toggle */}
+			<div className="flex-1 flex items-center justify-center">
+				{onModeChange && (
+					<div
+						className="inline-flex rounded-lg bg-neutral-800/50 p-1 gap-1"
+						style={{ WebkitAppRegion: "no-drag" } as React.CSSProperties}
+					>
+						<button
+							type="button"
+							onClick={() => onModeChange("plan")}
+							className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${
+								mode === "plan"
+									? "bg-neutral-700 text-white"
+									: "text-neutral-400 hover:text-neutral-200"
+							}`}
+						>
+							Plan
+						</button>
+						<button
+							type="button"
+							onClick={() => onModeChange("edit")}
+							className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${
+								mode === "edit"
+									? "bg-neutral-700 text-white"
+									: "text-neutral-400 hover:text-neutral-200"
+							}`}
+						>
+							Edit
+						</button>
+					</div>
+				)}
+			</div>
 
 			{/* Right section - Empty */}
 			<div className="pr-4" />
