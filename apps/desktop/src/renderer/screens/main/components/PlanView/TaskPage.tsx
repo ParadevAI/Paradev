@@ -1,12 +1,22 @@
-import type React from "react";
 import type { RouterOutputs } from "@superset/api";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Pencil } from "lucide-react";
+import type React from "react";
+import { useState } from "react";
+import { EditTaskModal } from "./EditTaskModal";
 
 type Task = RouterOutputs["task"]["all"][number];
 
 interface TaskPageProps {
 	task: Task;
 	onBack: () => void;
+	onUpdate: (
+		taskId: string,
+		updates: {
+			title: string;
+			description: string;
+			status: Task["status"];
+		},
+	) => void;
 }
 
 const statusColors: Record<string, string> = {
@@ -31,24 +41,44 @@ const statusLabels: Record<string, string> = {
 	canceled: "Canceled",
 };
 
-export const TaskPage: React.FC<TaskPageProps> = ({ task, onBack }) => {
+export const TaskPage: React.FC<TaskPageProps> = ({
+	task,
+	onBack,
+	onUpdate,
+}) => {
 	const statusColor = statusColors[task.status] || "bg-neutral-500";
+	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
 	return (
 		<div className="flex flex-col h-full bg-neutral-950">
 			{/* Header with Breadcrumbs */}
 			<div className="border-b border-neutral-800/50 bg-neutral-950/80 backdrop-blur-sm">
-				<div className="flex items-center gap-3 px-8 py-4">
+				<div className="flex items-center justify-between px-8 py-4">
+					<div className="flex items-center gap-3">
+						<button
+							type="button"
+							onClick={onBack}
+							className="flex items-center gap-2 text-sm text-neutral-400 hover:text-white transition-colors group"
+						>
+							<ChevronLeft
+								size={16}
+								className="group-hover:-translate-x-0.5 transition-transform"
+							/>
+							<span className="font-medium">Plan</span>
+						</button>
+						<span className="text-neutral-600">/</span>
+						<span className="text-sm text-neutral-300 font-medium">
+							{task.slug}
+						</span>
+					</div>
 					<button
 						type="button"
-						onClick={onBack}
-						className="flex items-center gap-2 text-sm text-neutral-400 hover:text-white transition-colors group"
+						onClick={() => setIsEditModalOpen(true)}
+						className="inline-flex items-center gap-2 px-3 py-1.5 bg-neutral-700/80 hover:bg-neutral-700 text-white text-sm font-medium rounded-lg transition-all"
 					>
-						<ChevronLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
-						<span className="font-medium">Plan</span>
+						<Pencil size={14} />
+						<span>Edit</span>
 					</button>
-					<span className="text-neutral-600">/</span>
-					<span className="text-sm text-neutral-300 font-medium">{task.slug}</span>
 				</div>
 			</div>
 
@@ -65,8 +95,12 @@ export const TaskPage: React.FC<TaskPageProps> = ({ task, onBack }) => {
 										{task.slug}
 									</span>
 									<div className="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg bg-neutral-800/50 text-neutral-400 border border-neutral-800">
-										<div className={`w-1.5 h-1.5 rounded-full ${statusColor} shadow-sm`} />
-										<span className="font-medium">{statusLabels[task.status] || task.status}</span>
+										<div
+											className={`w-1.5 h-1.5 rounded-full ${statusColor} shadow-sm`}
+										/>
+										<span className="font-medium">
+											{statusLabels[task.status] || task.status}
+										</span>
 									</div>
 								</div>
 								<h1 className="text-2xl font-semibold text-white leading-tight mb-6">
@@ -128,7 +162,10 @@ export const TaskPage: React.FC<TaskPageProps> = ({ task, onBack }) => {
 									</label>
 									<div className="flex items-center gap-3 px-3 py-2 bg-neutral-900/50 border border-neutral-800/50 rounded-lg">
 										<img
-											src={task.assignee.avatarUrl || "https://via.placeholder.com/32"}
+											src={
+												task.assignee.avatarUrl ||
+												"https://via.placeholder.com/32"
+											}
 											alt={task.assignee.name}
 											className="w-6 h-6 rounded-full ring-2 ring-neutral-800"
 										/>
@@ -147,7 +184,10 @@ export const TaskPage: React.FC<TaskPageProps> = ({ task, onBack }) => {
 									</label>
 									<div className="flex items-center gap-3 px-3 py-2 bg-neutral-900/50 border border-neutral-800/50 rounded-lg">
 										<img
-											src={task.creator.avatarUrl || "https://via.placeholder.com/32"}
+											src={
+												task.creator.avatarUrl ||
+												"https://via.placeholder.com/32"
+											}
 											alt={task.creator.name}
 											className="w-6 h-6 rounded-full ring-2 ring-neutral-800"
 										/>
@@ -176,10 +216,10 @@ export const TaskPage: React.FC<TaskPageProps> = ({ task, onBack }) => {
 									Created
 								</label>
 								<div className="text-sm text-neutral-400">
-									{new Date(task.createdAt).toLocaleDateString('en-US', {
-										month: 'short',
-										day: 'numeric',
-										year: 'numeric'
+									{new Date(task.createdAt).toLocaleDateString("en-US", {
+										month: "short",
+										day: "numeric",
+										year: "numeric",
 									})}
 								</div>
 							</div>
@@ -190,10 +230,10 @@ export const TaskPage: React.FC<TaskPageProps> = ({ task, onBack }) => {
 									Updated
 								</label>
 								<div className="text-sm text-neutral-400">
-									{new Date(task.updatedAt).toLocaleDateString('en-US', {
-										month: 'short',
-										day: 'numeric',
-										year: 'numeric'
+									{new Date(task.updatedAt).toLocaleDateString("en-US", {
+										month: "short",
+										day: "numeric",
+										year: "numeric",
 									})}
 								</div>
 							</div>
@@ -201,6 +241,14 @@ export const TaskPage: React.FC<TaskPageProps> = ({ task, onBack }) => {
 					</div>
 				</div>
 			</div>
+
+			{/* Edit Task Modal */}
+			<EditTaskModal
+				task={task}
+				isOpen={isEditModalOpen}
+				onClose={() => setIsEditModalOpen(false)}
+				onUpdate={onUpdate}
+			/>
 		</div>
 	);
 };

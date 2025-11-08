@@ -1,4 +1,3 @@
-import type React from "react";
 import type { RouterOutputs } from "@superset/api";
 import {
 	Dialog,
@@ -6,6 +5,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@superset/ui/dialog";
+import type React from "react";
 
 type Task = RouterOutputs["task"]["all"][number];
 
@@ -56,8 +56,12 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
 							{task.slug}
 						</span>
 						<div className="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg bg-neutral-800/50 text-neutral-400 border border-neutral-800">
-							<div className={`w-1.5 h-1.5 rounded-full ${statusColor} shadow-sm`} />
-							<span className="font-medium">{statusLabels[task.status] || task.status}</span>
+							<div
+								className={`w-1.5 h-1.5 rounded-full ${statusColor} shadow-sm`}
+							/>
+							<span className="font-medium">
+								{statusLabels[task.status] || task.status}
+							</span>
 						</div>
 					</div>
 					<DialogTitle className="text-xl font-semibold text-white leading-tight">
@@ -90,7 +94,8 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
 								<div className="flex items-center gap-2.5">
 									<img
 										src={
-											task.assignee.avatarUrl || "https://via.placeholder.com/32"
+											task.assignee.avatarUrl ||
+											"https://via.placeholder.com/32"
 										}
 										alt={task.assignee.name}
 										className="w-7 h-7 rounded-full ring-2 ring-neutral-800"

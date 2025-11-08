@@ -1,15 +1,15 @@
-import type React from "react";
-import { useState } from "react";
 import type { RouterOutputs } from "@superset/api";
+import { Button } from "@superset/ui/button";
 import {
 	Dialog,
 	DialogContent,
 	DialogHeader,
 	DialogTitle,
 } from "@superset/ui/dialog";
-import { Button } from "@superset/ui/button";
 import { Input } from "@superset/ui/input";
 import { Label } from "@superset/ui/label";
+import type React from "react";
+import { useState } from "react";
 
 type Task = RouterOutputs["task"]["all"][number];
 
@@ -61,7 +61,10 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
 				<form onSubmit={handleSubmit} className="space-y-5 py-5">
 					{/* Title */}
 					<div className="space-y-2">
-						<Label htmlFor="title" className="text-sm font-semibold text-neutral-300">
+						<Label
+							htmlFor="title"
+							className="text-sm font-semibold text-neutral-300"
+						>
 							Title
 						</Label>
 						<Input
@@ -76,7 +79,10 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
 
 					{/* Description */}
 					<div className="space-y-2">
-						<Label htmlFor="description" className="text-sm font-semibold text-neutral-300">
+						<Label
+							htmlFor="description"
+							className="text-sm font-semibold text-neutral-300"
+						>
 							Description
 						</Label>
 						<textarea
@@ -90,7 +96,10 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
 
 					{/* Status */}
 					<div className="space-y-2">
-						<Label htmlFor="status" className="text-sm font-semibold text-neutral-300">
+						<Label
+							htmlFor="status"
+							className="text-sm font-semibold text-neutral-300"
+						>
 							Status
 						</Label>
 						<select

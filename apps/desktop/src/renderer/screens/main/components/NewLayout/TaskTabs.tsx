@@ -8,8 +8,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { PanelLeftClose, PanelLeftOpen, Plus } from "lucide-react";
 import type React from "react";
 import { useState } from "react";
-import { TaskAssignee } from "./TaskAssignee";
 import { StatusIndicator, type TaskStatus } from "./StatusIndicator";
+import { TaskAssignee } from "./TaskAssignee";
 
 interface MockTask {
 	id: string;
@@ -93,7 +93,6 @@ export const TaskTabs: React.FC<TaskTabsProps> = ({
 	mode = "edit",
 	onModeChange,
 }) => {
-
 	return (
 		<div
 			className="flex items-end select-none bg-black/20"
@@ -176,10 +175,14 @@ export const TaskTabs: React.FC<TaskTabsProps> = ({
 
 				{/* Task tabs */}
 				{openTasks.map((task) => {
-					const statusLabel = task.status === "planning" ? "Planning" :
-						task.status === "working" ? "Working" :
-						task.status === "needs-feedback" ? "Needs Feedback" :
-						"Ready to Merge";
+					const statusLabel =
+						task.status === "planning"
+							? "Planning"
+							: task.status === "working"
+								? "Working"
+								: task.status === "needs-feedback"
+									? "Needs Feedback"
+									: "Ready to Merge";
 
 					return (
 						<HoverCard key={task.id} openDelay={200}>
@@ -259,7 +262,12 @@ export const TaskTabs: React.FC<TaskTabsProps> = ({
 				})}
 				<Tooltip>
 					<TooltipTrigger asChild>
-						<Button variant="ghost" size="icon-sm" className="ml-1" onClick={onAddTask}>
+						<Button
+							variant="ghost"
+							size="icon-sm"
+							className="ml-1"
+							onClick={onAddTask}
+						>
 							<Plus size={18} />
 						</Button>
 					</TooltipTrigger>

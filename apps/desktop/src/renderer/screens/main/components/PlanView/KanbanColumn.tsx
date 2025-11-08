@@ -1,5 +1,5 @@
-import type React from "react";
 import type { RouterOutputs } from "@superset/api";
+import type React from "react";
 import { TaskCard } from "./TaskCard";
 
 type Task = RouterOutputs["task"]["all"][number];
@@ -8,6 +8,7 @@ interface KanbanColumnProps {
 	title: string;
 	tasks: Task[];
 	onTaskClick: (task: Task) => void;
+	onTaskEdit: (task: Task) => void;
 	statusColor?: string;
 }
 
@@ -15,6 +16,7 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = ({
 	title,
 	tasks,
 	onTaskClick,
+	onTaskEdit,
 	statusColor = "bg-neutral-500",
 }) => {
 	return (
@@ -35,7 +37,12 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = ({
 			{/* Column content - scrollable */}
 			<div className="flex-1 overflow-y-auto px-3 space-y-2.5 pb-4">
 				{tasks.map((task) => (
-					<TaskCard key={task.id} task={task} onClick={() => onTaskClick(task)} />
+					<TaskCard
+						key={task.id}
+						task={task}
+						onClick={() => onTaskClick(task)}
+						onEdit={() => onTaskEdit(task)}
+					/>
 				))}
 			</div>
 		</div>

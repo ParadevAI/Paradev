@@ -12,12 +12,12 @@ import { Background } from "../Background";
 import TabContent from "../MainContent/TabContent";
 import TabGroup from "../MainContent/TabGroup";
 import { PlaceholderState } from "../PlaceholderState";
+import { PlanView } from "../PlanView";
 import { Sidebar } from "../Sidebar";
 import { DiffTab } from "../TabContent/components/DiffTab";
 import { AddTaskModal } from "./AddTaskModal";
 import { TaskTabs } from "./TaskTabs";
 import { WorktreeTabView } from "./WorktreeTabView";
-import { PlanView } from "../PlanView";
 
 // Mock tasks data - TODO: Replace with actual task data from backend
 const MOCK_TASKS = [
@@ -30,7 +30,7 @@ const MOCK_TASKS = [
 		description: "Redesigning the homepage with new branding and improved UX",
 		assignee: "Alice",
 		assigneeAvatarUrl: "https://i.pravatar.cc/150?img=1",
-		lastUpdated: "2 hours ago"
+		lastUpdated: "2 hours ago",
 	},
 	{
 		id: "2",
@@ -41,7 +41,7 @@ const MOCK_TASKS = [
 		description: "Integrate new REST API endpoints for user management",
 		assignee: "Bob",
 		assigneeAvatarUrl: "https://i.pravatar.cc/150?img=12",
-		lastUpdated: "1 day ago"
+		lastUpdated: "1 day ago",
 	},
 	{
 		id: "3",
@@ -52,7 +52,7 @@ const MOCK_TASKS = [
 		description: "Collection of bug fixes reported by users",
 		assignee: "Charlie",
 		assigneeAvatarUrl: "https://i.pravatar.cc/150?img=33",
-		lastUpdated: "3 days ago"
+		lastUpdated: "3 days ago",
 	},
 	{
 		id: "4",
@@ -63,7 +63,7 @@ const MOCK_TASKS = [
 		description: "Optimize database queries for faster page loads",
 		assignee: "Diana",
 		assigneeAvatarUrl: "https://i.pravatar.cc/150?img=9",
-		lastUpdated: "5 minutes ago"
+		lastUpdated: "5 minutes ago",
 	},
 	{
 		id: "5",
@@ -71,10 +71,11 @@ const MOCK_TASKS = [
 		name: "User Authentication System",
 		status: "working" as const,
 		branch: "feature/auth-system",
-		description: "Implement OAuth2 and JWT-based authentication system with refresh tokens",
+		description:
+			"Implement OAuth2 and JWT-based authentication system with refresh tokens",
 		assignee: "Eve",
 		assigneeAvatarUrl: "https://i.pravatar.cc/150?img=5",
-		lastUpdated: "3 hours ago"
+		lastUpdated: "3 hours ago",
 	},
 	{
 		id: "6",
@@ -85,7 +86,7 @@ const MOCK_TASKS = [
 		description: "Add dark mode theme support across the entire application",
 		assignee: "Frank",
 		assigneeAvatarUrl: "https://i.pravatar.cc/150?img=13",
-		lastUpdated: "2 days ago"
+		lastUpdated: "2 days ago",
 	},
 	{
 		id: "7",
@@ -93,10 +94,11 @@ const MOCK_TASKS = [
 		name: "Database Migration Scripts",
 		status: "ready-to-merge" as const,
 		branch: "db/migration-scripts",
-		description: "Create automated migration scripts for production database updates",
+		description:
+			"Create automated migration scripts for production database updates",
 		assignee: "Grace",
 		assigneeAvatarUrl: "https://i.pravatar.cc/150?img=20",
-		lastUpdated: "1 hour ago"
+		lastUpdated: "1 hour ago",
 	},
 	{
 		id: "8",
@@ -104,10 +106,11 @@ const MOCK_TASKS = [
 		name: "Email Notification Service",
 		status: "needs-feedback" as const,
 		branch: "feature/email-notifications",
-		description: "Build email notification service using SendGrid for transactional emails",
+		description:
+			"Build email notification service using SendGrid for transactional emails",
 		assignee: "Henry",
 		assigneeAvatarUrl: "https://i.pravatar.cc/150?img=8",
-		lastUpdated: "4 hours ago"
+		lastUpdated: "4 hours ago",
 	},
 	{
 		id: "9",
@@ -115,10 +118,11 @@ const MOCK_TASKS = [
 		name: "Mobile Responsive Design",
 		status: "working" as const,
 		branch: "feature/mobile-responsive",
-		description: "Make the application fully responsive for mobile and tablet devices",
+		description:
+			"Make the application fully responsive for mobile and tablet devices",
 		assignee: "Iris",
 		assigneeAvatarUrl: "https://i.pravatar.cc/150?img=16",
-		lastUpdated: "6 hours ago"
+		lastUpdated: "6 hours ago",
 	},
 	{
 		id: "10",
@@ -126,10 +130,11 @@ const MOCK_TASKS = [
 		name: "Analytics Dashboard",
 		status: "planning" as const,
 		branch: "feature/analytics-dashboard",
-		description: "Create admin dashboard with charts and metrics for user analytics",
+		description:
+			"Create admin dashboard with charts and metrics for user analytics",
 		assignee: "Jack",
 		assigneeAvatarUrl: "https://i.pravatar.cc/150?img=11",
-		lastUpdated: "1 week ago"
+		lastUpdated: "1 week ago",
 	},
 	{
 		id: "11",
@@ -137,10 +142,11 @@ const MOCK_TASKS = [
 		name: "CI/CD Pipeline",
 		status: "ready-to-merge" as const,
 		branch: "devops/ci-cd-pipeline",
-		description: "Set up automated CI/CD pipeline with GitHub Actions and Docker",
+		description:
+			"Set up automated CI/CD pipeline with GitHub Actions and Docker",
 		assignee: "Kate",
 		assigneeAvatarUrl: "https://i.pravatar.cc/150?img=25",
-		lastUpdated: "30 minutes ago"
+		lastUpdated: "30 minutes ago",
 	},
 	{
 		id: "12",
@@ -151,7 +157,7 @@ const MOCK_TASKS = [
 		description: "Implement full-text search with Elasticsearch integration",
 		assignee: "Liam",
 		assigneeAvatarUrl: "https://i.pravatar.cc/150?img=14",
-		lastUpdated: "5 hours ago"
+		lastUpdated: "5 hours ago",
 	},
 	{
 		id: "13",
@@ -159,10 +165,11 @@ const MOCK_TASKS = [
 		name: "File Upload System",
 		status: "needs-feedback" as const,
 		branch: "feature/file-uploads",
-		description: "Build secure file upload system with S3 storage and virus scanning",
+		description:
+			"Build secure file upload system with S3 storage and virus scanning",
 		assignee: "Mia",
 		assigneeAvatarUrl: "https://i.pravatar.cc/150?img=27",
-		lastUpdated: "2 hours ago"
+		lastUpdated: "2 hours ago",
 	},
 	{
 		id: "14",
@@ -173,7 +180,7 @@ const MOCK_TASKS = [
 		description: "Implement rate limiting and throttling for API endpoints",
 		assignee: "Noah",
 		assigneeAvatarUrl: "https://i.pravatar.cc/150?img=17",
-		lastUpdated: "4 days ago"
+		lastUpdated: "4 days ago",
 	},
 	{
 		id: "15",
@@ -181,10 +188,11 @@ const MOCK_TASKS = [
 		name: "Internationalization",
 		status: "working" as const,
 		branch: "feature/i18n",
-		description: "Add multi-language support with i18next for English, Spanish, and French",
+		description:
+			"Add multi-language support with i18next for English, Spanish, and French",
 		assignee: "Olivia",
 		assigneeAvatarUrl: "https://i.pravatar.cc/150?img=32",
-		lastUpdated: "8 hours ago"
+		lastUpdated: "8 hours ago",
 	},
 ];
 
@@ -195,7 +203,7 @@ export const NewLayoutMain: React.FC = () => {
 	const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
 	// Initialize with first 4 tasks to match the tabs currently displayed
 	const [openTasks, setOpenTasks] = useState<typeof MOCK_TASKS>(
-		MOCK_TASKS.slice(0, 4)
+		MOCK_TASKS.slice(0, 4),
 	);
 	const [activeTaskId, setActiveTaskId] = useState(MOCK_TASKS[0].id);
 	const [allTasks, setAllTasks] = useState(MOCK_TASKS);
@@ -475,7 +483,7 @@ export const NewLayoutMain: React.FC = () => {
 		setIsAddTaskModalOpen(false);
 	};
 
-	const handleSelectTask = (task: typeof MOCK_TASKS[0]) => {
+	const handleSelectTask = (task: (typeof MOCK_TASKS)[0]) => {
 		// Check if task is already open
 		const isAlreadyOpen = openTasks.some((t) => t.id === task.id);
 		if (!isAlreadyOpen) {
