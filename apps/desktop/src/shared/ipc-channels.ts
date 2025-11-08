@@ -267,7 +267,7 @@ export interface IpcChannels {
 			rows?: number;
 			cwd?: string;
 		};
-		response: { id: string; pid: number };
+		response: string; // terminal ID
 	};
 	"terminal-execute-command": {
 		request: { id: string; command: string };
@@ -276,6 +276,18 @@ export interface IpcChannels {
 	"terminal-get-history": {
 		request: string; // terminal ID
 		response: string | undefined;
+	};
+	"terminal-resize": {
+		request: { id: string; cols: number; rows: number; seq: number };
+		response: void;
+	};
+	"terminal-signal": {
+		request: { id: string; signal: string };
+		response: void;
+	};
+	"terminal-detach": {
+		request: string; // terminal ID
+		response: void;
 	};
 
 	// Update terminal CWD in workspace config
@@ -376,6 +388,9 @@ export function isValidChannel(channel: string): channel is IpcChannelName {
 		"terminal-create",
 		"terminal-execute-command",
 		"terminal-get-history",
+		"terminal-resize",
+		"terminal-signal",
+		"terminal-detach",
 		"open-external",
 		"workspace-set-ports",
 		"workspace-get-detected-ports",

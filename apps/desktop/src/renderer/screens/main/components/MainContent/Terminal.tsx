@@ -14,6 +14,7 @@ interface TerminalProps {
 	terminalId?: string | null;
 	hidden?: boolean;
 	onFocus?: () => void;
+	cwd?: string;
 }
 
 interface TerminalMessage {
@@ -73,12 +74,18 @@ export default function TerminalComponent({
 	terminalId,
 	hidden = false,
 	onFocus,
+	cwd,
 }: TerminalProps) {
 	const terminalRef = useRef<HTMLDivElement>(null);
 	const [terminal, setTerminal] = useState<XTerm | null>(null);
 	const [theme] = useState<"light" | "dark">("dark"); // Can be connected to theme provider later
 	const terminalIdRef = useRef<string | null>(null); // Also serves as initialization guard
 	const onFocusRef = useRef(onFocus);
+	const fitFunctionRef = useRef<(() => void) | null>(null);
+	const hasBeenVisibleRef = useRef(false);
+
+	// Log visibility changes for debugging
+	console.log(`[Terminal] Render: ${terminalId?.slice(0, 8)} hidden=${hidden} terminal=${!!terminal}`);
 
 	// Update the ref when onFocus changes
 	useEffect(() => {
@@ -92,6 +99,40 @@ export default function TerminalComponent({
 		}
 	}, [theme, terminal]);
 
+	// Handle visibility changes - fit terminal when it becomes visible
+	useEffect(() => {
+		console.log(`[Terminal] Visibility effect fired: ${terminalIdRef.current?.slice(0, 8)} hidden=${hidden} terminal=${!!terminal} hasBeenVisible=${hasBeenVisibleRef.current}`);
+
+		if (!hidden && terminal && fitFunctionRef.current && terminalRef.current) {
+			const isFirstTimeVisible = !hasBeenVisibleRef.current;
+			hasBeenVisibleRef.current = true;
+
+			// When terminal becomes visible, ensure it fits the container
+			// Retry logic to handle cases where container dimensions aren't available immediately
+			let attempts = 0;
+			const maxAttempts = 10;
+			const retryDelay = 50;
+
+			const tryFit = () => {
+				const rect = terminalRef.current?.getBoundingClientRect();
+				if (rect && rect.width > 0 && rect.height > 0) {
+					console.log(`[Terminal] Fitting terminal ${terminalIdRef.current?.slice(0, 8)} after becoming visible (attempt ${attempts + 1}, firstTime=${isFirstTimeVisible})`);
+					fitFunctionRef.current?.();
+				} else if (attempts < maxAttempts) {
+					attempts++;
+					console.log(`[Terminal] Container not ready for ${terminalIdRef.current?.slice(0, 8)}, retrying... (${rect?.width}x${rect?.height})`);
+					setTimeout(tryFit, retryDelay);
+				} else {
+					console.warn(`[Terminal] Failed to fit ${terminalIdRef.current} after ${maxAttempts} attempts`);
+				}
+			};
+
+			// Start with a small initial delay
+			const timer = setTimeout(tryFit, 50);
+			return () => clearTimeout(timer);
+		}
+	}, [hidden, terminal]);
+
 	useEffect(() => {
 		// Guard: only initialize once per terminalId
 		// terminalIdRef serves as both storage and initialization guard
@@ -104,11 +145,15 @@ export default function TerminalComponent({
 			return;
 		}
 
+		console.log(`[Terminal] Initializing terminal: ${terminalId.slice(0, 8)}`);
+
 		// Set terminalIdRef immediately to prevent race conditions
 		terminalIdRef.current = terminalId;
 
 		const { term } = initTerminal(terminalRef.current, theme, onFocusRef);
 		setTerminal(term);
+
+		console.log(`[Terminal] Initialized terminal: ${terminalId.slice(0, 8)}`);
 
 		return () => {
 			// Don't dispose XTerm or cleanup on unmount
@@ -187,6 +232,7 @@ export default function TerminalComponent({
 				const height = rect.height;
 
 				if (width <= 0 || height <= 0) {
+					console.log(`[Terminal] Skipping fit for ${terminalIdRef.current} - container has no dimensions (${width}x${height})`);
 					return; // Skip if container has no dimensions yet
 				}
 
@@ -194,12 +240,16 @@ export default function TerminalComponent({
 				// Then manually resize to ensure PTY gets the correct dimensions
 				const dimensions = fitAddon.proposeDimensions();
 				if (dimensions) {
+					console.log(`[Terminal] Fitting ${terminalIdRef.current} to ${dimensions.cols}x${dimensions.rows}`);
 					term.resize(dimensions.cols, dimensions.rows);
 				}
 			} catch (e) {
 				console.warn("Custom fit failed:", e);
 			}
 		};
+
+		// Store the fit function so it can be called from useEffect when visibility changes
+		fitFunctionRef.current = customFit;
 
 		// 3. SearchAddon - Enable text searching (Ctrl+F or Cmd+F)
 		const searchAddon = new SearchAddon();
@@ -218,6 +268,24 @@ export default function TerminalComponent({
 		// Perform initial fit to size terminal correctly on first render
 		// This ensures the terminal has correct dimensions when it first appears
 		customFit();
+
+		// Create/attach terminal session with proper dimensions
+		// This is deferred until the terminal is initialized so we can pass correct cols/rows
+		if (terminalId && cwd) {
+			const dimensions = fitAddon.proposeDimensions();
+			const cols = dimensions?.cols || 80;
+			const rows = dimensions?.rows || 30;
+
+			console.log(`[Terminal] Creating terminal ${terminalId.slice(0, 8)} with dimensions ${cols}x${rows}`);
+			window.ipcRenderer.invoke("terminal-create", {
+				id: terminalId,
+				cwd,
+				cols,
+				rows,
+			}).catch((error: Error) => {
+				console.error("Failed to create terminal:", error);
+			});
+		}
 
 		// Listen for container resize to auto-fit terminal
 		// Use ResizeObserver to detect when the container size changes
@@ -270,6 +338,10 @@ export default function TerminalComponent({
 								isInitialSetup = false;
 							}
 						}, 100);
+					} else {
+						// No cached history - terminal will receive content from PTY on attach
+						// Mark setup complete immediately
+						isInitialSetup = false;
 					}
 				})
 				.catch((error: Error) => {
@@ -290,6 +362,23 @@ export default function TerminalComponent({
 		// Set up event listeners
 		term.onData((data) => {
 			if (terminalIdRef.current) {
+				// Filter out terminal response sequences that shouldn't be sent as input
+				// These are generated by xterm.js in response to queries from the shell/tmux
+				const isTerminalResponse =
+					data.startsWith('\x1b[?1;') ||  // Primary DA response (e.g., \x1b[?1;2c)
+					data.startsWith('\x1b[>') ||    // Secondary DA response (e.g., \x1b[>0;276;0c)
+					data.startsWith('\x1b]10;') ||  // Foreground color query response
+					data.startsWith('\x1b]11;') ||  // Background color query response
+					data === '\x1b[I' ||            // Focus in event
+					data === '\x1b[O';              // Focus out event
+
+				if (isTerminalResponse) {
+					console.log(`[Terminal] Filtered terminal response for ${terminalIdRef.current}:`, JSON.stringify(data));
+					return;
+				}
+
+				// Debug: log user input
+				console.log(`[Terminal] User input for ${terminalIdRef.current}:`, JSON.stringify(data), `(length: ${data.length})`);
 				window.ipcRenderer.send("terminal-input", {
 					id: terminalIdRef.current,
 					data,
@@ -299,6 +388,8 @@ export default function TerminalComponent({
 
 		// Store current dimensions to detect actual changes
 		let currentDimensions = { cols: 80, rows: 30 };
+		// Monotonic sequence counter for resize events to prevent out-of-order processing
+		let resizeSeq = 0;
 
 		term.onResize(({ cols, rows }) => {
 			// Skip resize events during initial setup to prevent shell from redrawing prompt
@@ -316,16 +407,24 @@ export default function TerminalComponent({
 			currentDimensions = { cols, rows };
 
 			if (terminalIdRef.current) {
+				// Increment sequence number for this resize event
+				resizeSeq += 1;
+
 				window.ipcRenderer.send("terminal-resize", {
 					id: terminalIdRef.current,
 					cols,
 					rows,
+					seq: resizeSeq,
 				});
 			}
 		});
 
 		const terminalDataListener = (message: TerminalMessage) => {
 			if (message?.id === terminalIdRef.current) {
+				// Debug: log data being written to xterm
+				if (message.data.includes("1;2c") || message.data.includes("0;276")) {
+					console.log(`[Terminal] Received data for ${terminalIdRef.current}:`, JSON.stringify(message.data), `(length: ${message.data.length})`);
+				}
 				// If we're in the middle of a resize, queue the write
 				if (isResizing) {
 					writeQueue.push(message.data);
