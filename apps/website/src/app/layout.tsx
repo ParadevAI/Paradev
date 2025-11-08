@@ -2,6 +2,7 @@ import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 import type { Metadata } from "next";
 import Script from "next/script";
+import { TRPCReactProvider } from "@/trpc/react";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -26,7 +27,9 @@ export default function RootLayout({
 					strategy="afterInteractive"
 				/>
 			</head>
-			<body className="overscroll-none font-sans">{children}</body>
+			<body className="overscroll-none font-sans">
+			<TRPCReactProvider>{children}</TRPCReactProvider>
+		</body>
 		</html>
 	);
 }

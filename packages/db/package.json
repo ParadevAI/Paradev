@@ -4,34 +4,43 @@
 	"version": "0.0.0",
 	"private": true,
 	"type": "module",
-	"main": "./src/index.ts",
-	"types": "./src/index.ts",
+	"exports": {
+		".": {
+			"types": "./src/index.ts",
+			"default": "./src/index.ts"
+		},
+		"./client": {
+			"types": "./src/client.ts",
+			"default": "./src/client.ts"
+		},
+		"./enums": {
+			"types": "./src/schema/enums.ts",
+			"default": "./src/schema/enums.ts"
+		},
+		"./schema": {
+			"types": "./src/schema/index.ts",
+			"default": "./src/schema/index.ts"
+		}
+	},
 	"scripts": {
 		"typecheck": "tsc --noEmit",
-		"db:gen": "drizzle-kit generate",
-		"db:push": "drizzle-kit push",
-		"db:migrate": "drizzle-kit migrate",
-		"db:seed": "bun src/seed/seed.ts",
-		"db:seed:stripe": "bun src/seed/stripe/stripe.ts",
-		"db:reset": "bun src/seed/reset.ts",
-		"db:drop": "drizzle-kit drop"
+		"push": "drizzle-kit push",
+		"migrate": "drizzle-kit migrate",
+		"studio": "drizzle-kit studio"
 	},
 	"dependencies": {
+		"@neondatabase/serverless": "1.0.1",
 		"@superset/constants": "*",
-		"@superset/models": "*",
-		"ai": "^5.0.76",
+		"@t3-oss/env-core": "^0.13.8",
 		"dotenv": "^17.2.3",
-		"drizzle-orm": "^0.44.6",
-		"drizzle-zod": "^0.8.3",
-		"pg": "^8.16.3",
-		"postgres": "^3.4.7",
-		"uuid": "^13.0.0",
+		"drizzle-orm": "0.44.3",
+		"drizzle-zod": "0.8.2",
 		"zod": "^4.1.12"
 	},
 	"devDependencies": {
 		"@superset/typescript": "*",
 		"@types/node": "^24.9.1",
-		"drizzle-kit": "^0.31.5",
+		"drizzle-kit": "0.31.1",
 		"typescript": "^5.9.3"
 	}
 }

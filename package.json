@@ -14,7 +14,7 @@
 		"dev": "turbo dev",
 		"test": "turbo test",
 		"build": "turbo build",
-		"db:gen": "turbo db:gen",
+		"db:generate": "turbo db:generate",
 		"db:push": "cd packages/db && bun db:push",
 		"db:seed": "cd packages/db && bun db:seed",
 		"db:migrate": "cd packages/db && bun db:migrate",
