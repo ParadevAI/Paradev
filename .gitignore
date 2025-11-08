@@ -50,3 +50,4 @@ mise.toml
 
 # Turbo
 .turbo
+.envrc

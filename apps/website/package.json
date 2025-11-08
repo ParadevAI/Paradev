@@ -11,7 +11,12 @@
 	"dependencies": {
 		"@react-three/drei": "^10.7.6",
 		"@react-three/fiber": "^9.4.0",
+		"@superset/api": "workspace:*",
 		"@superset/ui": "workspace:*",
+		"@tanstack/react-query": "^5.90.5",
+		"@trpc/client": "^11.7.0",
+		"@trpc/server": "^11.7.0",
+		"@trpc/tanstack-react-query": "^11.7.0",
 		"framer-motion": "^12.23.24",
 		"geist": "^1.5.1",
 		"next": "^15.1.6",
@@ -20,6 +25,7 @@
 		"nextra-theme-docs": "^4.6.0",
 		"react": "^19.1.1",
 		"react-dom": "^19.1.1",
+		"superjson": "2.2.3",
 		"three": "^0.180.0"
 	},
 	"devDependencies": {
