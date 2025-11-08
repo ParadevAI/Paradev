@@ -173,7 +173,7 @@ export const mockTasks: Task[] = [
     creator: {
       id: SATYA_ID,
       name: "Satya Patel",
-      avatarUrl: null,
+      avatarUrl: "https://avatars.githubusercontent.com/u/14907857?v=4&size=64",
     },
   },
   {
@@ -216,7 +216,7 @@ export const mockTasks: Task[] = [
     assignee: {
       id: SATYA_ID,
       name: "Satya Patel",
-      avatarUrl: null,
+      avatarUrl: "https://avatars.githubusercontent.com/u/14907857?v=4&size=64",
     },
     creator: {
       id: AVI_ID,
@@ -245,7 +245,7 @@ export const mockTasks: Task[] = [
     creator: {
       id: SATYA_ID,
       name: "Satya Patel",
-      avatarUrl: null,
+      avatarUrl: "https://avatars.githubusercontent.com/u/14907857?v=4&size=64",
     },
   },
   {
@@ -288,7 +288,7 @@ export const mockTasks: Task[] = [
     assignee: {
       id: SATYA_ID,
       name: "Satya Patel",
-      avatarUrl: null,
+      avatarUrl: "https://avatars.githubusercontent.com/u/14907857?v=4&size=64",
     },
     creator: {
       id: AVI_ID,
@@ -317,7 +317,7 @@ export const mockTasks: Task[] = [
     creator: {
       id: SATYA_ID,
       name: "Satya Patel",
-      avatarUrl: null,
+      avatarUrl: "https://avatars.githubusercontent.com/u/14907857?v=4&size=64",
     },
   },
   {
@@ -360,7 +360,7 @@ export const mockTasks: Task[] = [
     assignee: {
       id: SATYA_ID,
       name: "Satya Patel",
-      avatarUrl: null,
+      avatarUrl: "https://avatars.githubusercontent.com/u/14907857?v=4&size=64",
     },
     creator: {
       id: AVI_ID,

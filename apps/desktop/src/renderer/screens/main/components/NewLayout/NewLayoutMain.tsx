@@ -17,6 +17,7 @@ import { DiffTab } from "../TabContent/components/DiffTab";
 import { AddTaskModal } from "./AddTaskModal";
 import { TaskTabs } from "./TaskTabs";
 import { WorktreeTabView } from "./WorktreeTabView";
+import { PlanView } from "../PlanView";
 
 // Mock tasks data - TODO: Replace with actual task data from backend
 const MOCK_TASKS = [
@@ -645,119 +646,125 @@ export const NewLayoutMain: React.FC = () => {
 						onModeChange={setMode}
 					/>
 
-					{/* Main content area with resizable sidebar */}
+					{/* Main content area - conditionally render based on mode */}
 					<div className="flex-1 overflow-hidden border-t border-neutral-700">
-						<ResizablePanelGroup
-							direction="horizontal"
-							autoSaveId="new-layout-panels"
-						>
-							{/* Sidebar panel with full workspace/worktree management */}
-							<ResizablePanel
-								ref={sidebarPanelRef}
-								defaultSize={20}
-								minSize={15}
-								maxSize={40}
-								collapsible
-								onCollapse={() => setIsSidebarOpen(false)}
-								onExpand={() => setIsSidebarOpen(true)}
+						{mode === "plan" ? (
+							// Plan mode - show kanban board
+							<PlanView />
+						) : (
+							// Edit mode - show workspace/terminal view
+							<ResizablePanelGroup
+								direction="horizontal"
+								autoSaveId="new-layout-panels"
 							>
-								{isSidebarOpen && workspaces && (
-									<Sidebar
-										workspaces={workspaces}
-										currentWorkspace={currentWorkspace}
-										onTabSelect={handleTabSelect}
-										onWorktreeCreated={handleWorktreeCreated}
-										onWorkspaceSelect={handleWorkspaceSelect}
-										onUpdateWorktree={handleUpdateWorktree}
-										selectedTabId={selectedTabId ?? undefined}
-										onCollapse={() => {
-											const panel = sidebarPanelRef.current;
-											if (panel && !panel.isCollapsed()) {
-												panel.collapse();
-											}
-										}}
-										onShowDiff={handleShowDiff}
-									/>
-								)}
-							</ResizablePanel>
-
-							<ResizableHandle withHandle />
-
-							{/* Main content panel */}
-							<ResizablePanel defaultSize={80} minSize={30}>
-								{loading ||
-								error ||
-								!currentWorkspace ||
-								!selectedTab ||
-								!selectedWorktree ? (
-									<PlaceholderState
-										loading={loading}
-										error={error}
-										hasWorkspace={!!currentWorkspace}
-									/>
-								) : parentGroupTab ? (
-									// Selected tab is a sub-tab of a group → display the parent group's mosaic
-									<TabGroup
-										key={`${parentGroupTab.id}-${JSON.stringify(parentGroupTab.mosaicTree)}-${parentGroupTab.tabs?.length}`}
-										groupTab={parentGroupTab}
-										workingDirectory={
-											selectedWorktree.path || currentWorkspace.repoPath
-										}
-										workspaceId={currentWorkspace.id}
-										worktreeId={selectedWorktreeId ?? undefined}
-										selectedTabId={selectedTabId ?? undefined}
-										onTabFocus={handleTabFocus}
-										workspaceName={currentWorkspace.name}
-										mainBranch={currentWorkspace.branch}
-									/>
-								) : selectedTab.type === "group" ? (
-									// Selected tab is a group tab → display its mosaic layout
-									<TabGroup
-										key={`${selectedTab.id}-${JSON.stringify(selectedTab.mosaicTree)}-${selectedTab.tabs?.length}`}
-										groupTab={selectedTab}
-										workingDirectory={
-											selectedWorktree.path || currentWorkspace.repoPath
-										}
-										workspaceId={currentWorkspace.id}
-										worktreeId={selectedWorktreeId ?? undefined}
-										selectedTabId={selectedTabId ?? undefined}
-										onTabFocus={handleTabFocus}
-										workspaceName={currentWorkspace.name}
-										mainBranch={currentWorkspace.branch}
-									/>
-								) : selectedTab.type === "diff" ? (
-									// Diff tab → display diff view
-									<div className="w-full h-full">
-										<DiffTab
-											tab={selectedTab}
-											workspaceId={currentWorkspace.id}
-											worktreeId={selectedWorktreeId ?? ""}
-											worktree={selectedWorktree}
-											workspaceName={currentWorkspace.name}
-											mainBranch={currentWorkspace.branch}
+								{/* Sidebar panel with full workspace/worktree management */}
+								<ResizablePanel
+									ref={sidebarPanelRef}
+									defaultSize={20}
+									minSize={15}
+									maxSize={40}
+									collapsible
+									onCollapse={() => setIsSidebarOpen(false)}
+									onExpand={() => setIsSidebarOpen(true)}
+								>
+									{isSidebarOpen && workspaces && (
+										<Sidebar
+											workspaces={workspaces}
+											currentWorkspace={currentWorkspace}
+											onTabSelect={handleTabSelect}
+											onWorktreeCreated={handleWorktreeCreated}
+											onWorkspaceSelect={handleWorkspaceSelect}
+											onUpdateWorktree={handleUpdateWorktree}
+											selectedTabId={selectedTabId ?? undefined}
+											onCollapse={() => {
+												const panel = sidebarPanelRef.current;
+												if (panel && !panel.isCollapsed()) {
+													panel.collapse();
+												}
+											}}
+											onShowDiff={handleShowDiff}
 										/>
-									</div>
-								) : (
-									// Base level tab (terminal, preview, etc.) → display full width/height
-									<div className="w-full h-full p-2 bg-[#1e1e1e]">
-										<TabContent
-											tab={selectedTab}
+									)}
+								</ResizablePanel>
+
+								<ResizableHandle withHandle />
+
+								{/* Main content panel */}
+								<ResizablePanel defaultSize={80} minSize={30}>
+									{loading ||
+									error ||
+									!currentWorkspace ||
+									!selectedTab ||
+									!selectedWorktree ? (
+										<PlaceholderState
+											loading={loading}
+											error={error}
+											hasWorkspace={!!currentWorkspace}
+										/>
+									) : parentGroupTab ? (
+										// Selected tab is a sub-tab of a group → display the parent group's mosaic
+										<TabGroup
+											key={`${parentGroupTab.id}-${JSON.stringify(parentGroupTab.mosaicTree)}-${parentGroupTab.tabs?.length}`}
+											groupTab={parentGroupTab}
 											workingDirectory={
 												selectedWorktree.path || currentWorkspace.repoPath
 											}
 											workspaceId={currentWorkspace.id}
 											worktreeId={selectedWorktreeId ?? undefined}
-											worktree={selectedWorktree}
-											groupTabId="" // No parent group
 											selectedTabId={selectedTabId ?? undefined}
 											onTabFocus={handleTabFocus}
 											workspaceName={currentWorkspace.name}
 											mainBranch={currentWorkspace.branch}
 										/>
-									</div>
-								)}
-							</ResizablePanel>
-						</ResizablePanelGroup>
+									) : selectedTab.type === "group" ? (
+										// Selected tab is a group tab → display its mosaic layout
+										<TabGroup
+											key={`${selectedTab.id}-${JSON.stringify(selectedTab.mosaicTree)}-${selectedTab.tabs?.length}`}
+											groupTab={selectedTab}
+											workingDirectory={
+												selectedWorktree.path || currentWorkspace.repoPath
+											}
+											workspaceId={currentWorkspace.id}
+											worktreeId={selectedWorktreeId ?? undefined}
+											selectedTabId={selectedTabId ?? undefined}
+											onTabFocus={handleTabFocus}
+											workspaceName={currentWorkspace.name}
+											mainBranch={currentWorkspace.branch}
+										/>
+									) : selectedTab.type === "diff" ? (
+										// Diff tab → display diff view
+										<div className="w-full h-full">
+											<DiffTab
+												tab={selectedTab}
+												workspaceId={currentWorkspace.id}
+												worktreeId={selectedWorktreeId ?? ""}
+												worktree={selectedWorktree}
+												workspaceName={currentWorkspace.name}
+												mainBranch={currentWorkspace.branch}
+											/>
+										</div>
+									) : (
+										// Base level tab (terminal, preview, etc.) → display full width/height
+										<div className="w-full h-full p-2 bg-[#1e1e1e]">
+											<TabContent
+												tab={selectedTab}
+												workingDirectory={
+													selectedWorktree.path || currentWorkspace.repoPath
+												}
+												workspaceId={currentWorkspace.id}
+												worktreeId={selectedWorktreeId ?? undefined}
+												worktree={selectedWorktree}
+												groupTabId="" // No parent group
+												selectedTabId={selectedTabId ?? undefined}
+												onTabFocus={handleTabFocus}
+												workspaceName={currentWorkspace.name}
+												mainBranch={currentWorkspace.branch}
+											/>
+										</div>
+									)}
+								</ResizablePanel>
+							</ResizablePanelGroup>
+						)}
 					</div>
 				</div>
 			</AppFrame>
