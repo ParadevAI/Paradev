@@ -4,7 +4,6 @@ import type React from "react";
 import { useMemo, useState } from "react";
 import { mockTasks } from "../../../../../lib/mock-data";
 import { CreateTaskModal } from "./CreateTaskModal";
-import { EditTaskModal } from "./EditTaskModal";
 import { KanbanColumn } from "./KanbanColumn";
 import { TaskPage } from "./TaskPage";
 
@@ -26,7 +25,6 @@ export const PlanView: React.FC = () => {
 	});
 
 	const [viewingTask, setViewingTask] = useState<Task | null>(null);
-	const [editingTask, setEditingTask] = useState<Task | null>(null);
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
 	// Group tasks by status
@@ -140,35 +138,30 @@ export const PlanView: React.FC = () => {
 						title="Backlog"
 						tasks={tasksByStatus.backlog}
 						onTaskClick={setViewingTask}
-						onTaskEdit={setEditingTask}
 						statusColor="bg-neutral-500"
 					/>
 					<KanbanColumn
 						title="Todo"
 						tasks={tasksByStatus.todo}
 						onTaskClick={setViewingTask}
-						onTaskEdit={setEditingTask}
 						statusColor="bg-blue-500"
 					/>
 					<KanbanColumn
 						title="Pending"
 						tasks={tasksByStatus.planning}
 						onTaskClick={setViewingTask}
-						onTaskEdit={setEditingTask}
 						statusColor="bg-yellow-500"
 					/>
 					<KanbanColumn
 						title="Needs Feedback"
 						tasks={tasksByStatus["needs-feedback"]}
 						onTaskClick={setViewingTask}
-						onTaskEdit={setEditingTask}
 						statusColor="bg-orange-500"
 					/>
 					<KanbanColumn
 						title="Completed"
 						tasks={tasksByStatus.completed}
 						onTaskClick={setViewingTask}
-						onTaskEdit={setEditingTask}
 						statusColor="bg-green-600"
 					/>
 				</div>
@@ -179,14 +172,6 @@ export const PlanView: React.FC = () => {
 				isOpen={isCreateModalOpen}
 				onClose={() => setIsCreateModalOpen(false)}
 				onCreate={handleCreateTask}
-			/>
-
-			{/* Edit Task Modal */}
-			<EditTaskModal
-				task={editingTask}
-				isOpen={!!editingTask}
-				onClose={() => setEditingTask(null)}
-				onUpdate={handleUpdateTask}
 			/>
 		</div>
 	);

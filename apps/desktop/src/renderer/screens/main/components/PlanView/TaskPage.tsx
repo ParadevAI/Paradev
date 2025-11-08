@@ -1,8 +1,7 @@
 import type { RouterOutputs } from "@superset/api";
-import { ChevronLeft, Pencil } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import type React from "react";
-import { useState } from "react";
-import { EditTaskModal } from "./EditTaskModal";
+import { useEffect, useState } from "react";
 
 type Task = RouterOutputs["task"]["all"][number];
 
@@ -47,38 +46,54 @@ export const TaskPage: React.FC<TaskPageProps> = ({
 	onUpdate,
 }) => {
 	const statusColor = statusColors[task.status] || "bg-neutral-500";
-	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+	const [title, setTitle] = useState(task.title);
+	const [description, setDescription] = useState(task.description || "");
+	const [status, setStatus] = useState(task.status);
+
+	// Update local state when task changes
+	useEffect(() => {
+		setTitle(task.title);
+		setDescription(task.description || "");
+		setStatus(task.status);
+	}, [task]);
+
+	const handleTitleBlur = () => {
+		if (title.trim() && title !== task.title) {
+			onUpdate(task.id, { title: title.trim(), description, status });
+		}
+	};
+
+	const handleDescriptionBlur = () => {
+		if (description !== (task.description || "")) {
+			onUpdate(task.id, { title, description: description.trim(), status });
+		}
+	};
+
+	const handleStatusChange = (newStatus: Task["status"]) => {
+		setStatus(newStatus);
+		onUpdate(task.id, { title, description, status: newStatus });
+	};
 
 	return (
 		<div className="flex flex-col h-full bg-neutral-950">
 			{/* Header with Breadcrumbs */}
 			<div className="border-b border-neutral-800/50 bg-neutral-950/80 backdrop-blur-sm">
-				<div className="flex items-center justify-between px-8 py-4">
-					<div className="flex items-center gap-3">
-						<button
-							type="button"
-							onClick={onBack}
-							className="flex items-center gap-2 text-sm text-neutral-400 hover:text-white transition-colors group"
-						>
-							<ChevronLeft
-								size={16}
-								className="group-hover:-translate-x-0.5 transition-transform"
-							/>
-							<span className="font-medium">Plan</span>
-						</button>
-						<span className="text-neutral-600">/</span>
-						<span className="text-sm text-neutral-300 font-medium">
-							{task.slug}
-						</span>
-					</div>
+				<div className="flex items-center gap-3 px-8 py-4">
 					<button
 						type="button"
-						onClick={() => setIsEditModalOpen(true)}
-						className="inline-flex items-center gap-2 px-3 py-1.5 bg-neutral-700/80 hover:bg-neutral-700 text-white text-sm font-medium rounded-lg transition-all"
+						onClick={onBack}
+						className="flex items-center gap-2 text-sm text-neutral-400 hover:text-white transition-colors group"
 					>
-						<Pencil size={14} />
-						<span>Edit</span>
+						<ChevronLeft
+							size={16}
+							className="group-hover:-translate-x-0.5 transition-transform"
+						/>
+						<span className="font-medium">Plan</span>
 					</button>
+					<span className="text-neutral-600">/</span>
+					<span className="text-sm text-neutral-300 font-medium">
+						{task.slug}
+					</span>
 				</div>
 			</div>
 
@@ -99,25 +114,34 @@ export const TaskPage: React.FC<TaskPageProps> = ({
 											className={`w-1.5 h-1.5 rounded-full ${statusColor} shadow-sm`}
 										/>
 										<span className="font-medium">
-											{statusLabels[task.status] || task.status}
+											{statusLabels[status] || status}
 										</span>
 									</div>
 								</div>
-								<h1 className="text-2xl font-semibold text-white leading-tight mb-6">
-									{task.title}
-								</h1>
 
-								{/* Description Section */}
-								{task.description && (
-									<div className="bg-neutral-900/30 border border-neutral-800/50 rounded-xl p-6">
-										<h2 className="text-sm font-semibold text-neutral-400 mb-3">
-											Description
-										</h2>
-										<p className="text-sm text-neutral-300 leading-relaxed">
-											{task.description}
-										</p>
-									</div>
-								)}
+								{/* Editable Title */}
+								<input
+									type="text"
+									value={title}
+									onChange={(e) => setTitle(e.target.value)}
+									onBlur={handleTitleBlur}
+									className="w-full text-2xl font-semibold text-white leading-tight mb-6 bg-transparent border-none outline-none focus:outline-none px-0 placeholder:text-neutral-600"
+									placeholder="Task title..."
+								/>
+
+								{/* Editable Description Section */}
+								<div className="bg-neutral-900/30 border border-neutral-800/50 rounded-xl p-6">
+									<h2 className="text-sm font-semibold text-neutral-400 mb-3">
+										Description
+									</h2>
+									<textarea
+										value={description}
+										onChange={(e) => setDescription(e.target.value)}
+										onBlur={handleDescriptionBlur}
+										className="w-full min-h-[100px] text-sm text-neutral-300 leading-relaxed bg-transparent border-none outline-none focus:outline-none resize-none placeholder:text-neutral-600"
+										placeholder="Add a description..."
+									/>
+								</div>
 							</div>
 
 							{/* Activity/Comments Section (Placeholder) */}
@@ -141,17 +165,31 @@ export const TaskPage: React.FC<TaskPageProps> = ({
 								Properties
 							</h2>
 
-							{/* Status */}
+							{/* Status - Editable Dropdown */}
 							<div>
-								<label className="text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2 block">
+								<label
+									htmlFor="status-select"
+									className="text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2 block"
+								>
 									Status
 								</label>
-								<div className="flex items-center gap-2 px-3 py-2 bg-neutral-900/50 border border-neutral-800/50 rounded-lg">
-									<div className={`w-2 h-2 rounded-full ${statusColor}`} />
-									<span className="text-sm text-neutral-300 font-medium">
-										{statusLabels[task.status] || task.status}
-									</span>
-								</div>
+								<select
+									id="status-select"
+									value={status}
+									onChange={(e) =>
+										handleStatusChange(e.target.value as Task["status"])
+									}
+									className="w-full bg-neutral-900/50 border border-neutral-800/50 rounded-lg px-3 py-2 text-sm text-neutral-300 font-medium focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600/50 transition-all cursor-pointer"
+								>
+									<option value="backlog">Backlog</option>
+									<option value="todo">Todo</option>
+									<option value="planning">Pending</option>
+									<option value="working">Working</option>
+									<option value="needs-feedback">Needs Feedback</option>
+									<option value="ready-to-merge">Ready to Merge</option>
+									<option value="completed">Completed</option>
+									<option value="canceled">Canceled</option>
+								</select>
 							</div>
 
 							{/* Assignee */}
@@ -241,14 +279,6 @@ export const TaskPage: React.FC<TaskPageProps> = ({
 					</div>
 				</div>
 			</div>
-
-			{/* Edit Task Modal */}
-			<EditTaskModal
-				task={task}
-				isOpen={isEditModalOpen}
-				onClose={() => setIsEditModalOpen(false)}
-				onUpdate={onUpdate}
-			/>
 		</div>
 	);
 };

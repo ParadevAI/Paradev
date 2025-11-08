@@ -8,7 +8,6 @@ interface KanbanColumnProps {
 	title: string;
 	tasks: Task[];
 	onTaskClick: (task: Task) => void;
-	onTaskEdit: (task: Task) => void;
 	statusColor?: string;
 }
 
@@ -16,7 +15,6 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = ({
 	title,
 	tasks,
 	onTaskClick,
-	onTaskEdit,
 	statusColor = "bg-neutral-500",
 }) => {
 	return (
@@ -41,7 +39,6 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = ({
 						key={task.id}
 						task={task}
 						onClick={() => onTaskClick(task)}
-						onEdit={() => onTaskEdit(task)}
 					/>
 				))}
 			</div>
