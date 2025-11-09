@@ -237,6 +237,7 @@ function enrichWorktreesWithTasks(
 			branch: pending.branch,
 			path: "", // Pending worktrees don't have a path yet
 			tabs: [],
+			createdAt: new Date().toISOString(),
 			isPending: true, // Mark as pending for UI
 			task: pending.taskData
 				? {
@@ -717,6 +718,81 @@ export const NewLayoutMain: React.FC = () => {
 		})();
 	};
 
+	const handleCreatePR = async () => {
+		if (!currentWorkspace || !selectedWorktreeId) return;
+
+		const worktree = currentWorkspace.worktrees?.find(
+			(wt) => wt.id === selectedWorktreeId,
+		);
+		if (!worktree) return;
+
+		try {
+			const result = await window.ipcRenderer.invoke("worktree-create-pr", {
+				workspaceId: currentWorkspace.id,
+				worktreeId: selectedWorktreeId,
+			});
+
+			if (result.success) {
+				// Reload workspace to show updated PR state
+				const refreshedWorkspace = await window.ipcRenderer.invoke(
+					"workspace-get",
+					currentWorkspace.id,
+				);
+				if (refreshedWorkspace) {
+					setCurrentWorkspace(refreshedWorkspace);
+				}
+
+				// Open PR URL in default browser only if we have a valid URL
+				// (--web mode opens browser automatically, so we don't need to open it again)
+				if (result.prUrl && result.prUrl.startsWith("http")) {
+					await window.ipcRenderer.invoke("open-external", result.prUrl);
+				}
+			} else {
+				// Show error as alert
+				alert(`Failed to create PR: ${result.error || "Unknown error"}`);
+			}
+		} catch (error) {
+			const errorMessage =
+				error instanceof Error ? error.message : String(error);
+			alert(`Failed to create PR: ${errorMessage}`);
+		}
+	};
+
+	const handleMergePR = async () => {
+		if (!currentWorkspace || !selectedWorktreeId) return;
+
+		const worktree = currentWorkspace.worktrees?.find(
+			(wt) => wt.id === selectedWorktreeId,
+		);
+		if (!worktree) return;
+
+		try {
+			const result = await window.ipcRenderer.invoke("worktree-merge-pr", {
+				workspaceId: currentWorkspace.id,
+				worktreeId: selectedWorktreeId,
+			});
+
+			if (result.success) {
+				// Reload workspace to show updated state
+				const refreshedWorkspace = await window.ipcRenderer.invoke(
+					"workspace-get",
+					currentWorkspace.id,
+				);
+				if (refreshedWorkspace) {
+					setCurrentWorkspace(refreshedWorkspace);
+				}
+				alert("PR merged successfully!");
+			} else {
+				// Show error as alert
+				alert(`Failed to merge PR: ${result.error || "Unknown error"}`);
+			}
+		} catch (error) {
+			const errorMessage =
+				error instanceof Error ? error.message : String(error);
+			alert(`Failed to merge PR: ${errorMessage}`);
+		}
+	};
+
 	// Load active workspace on mount
 	useEffect(() => {
 		const loadActiveWorkspace = async () => {
@@ -841,6 +917,8 @@ export const NewLayoutMain: React.FC = () => {
 						onExpandSidebar={handleExpandSidebar}
 						isSidebarOpen={isSidebarOpen}
 						onAddTask={handleOpenAddTaskModal}
+						onCreatePR={handleCreatePR}
+						onMergePR={handleMergePR}
 						worktrees={enrichWorktreesWithTasks(
 							currentWorkspace?.worktrees || [],
 							pendingWorktrees,

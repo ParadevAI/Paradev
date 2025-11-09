@@ -688,6 +688,255 @@ class WorktreeManager {
 			};
 		}
 	}
+
+	/**
+	 * Create a pull request for a worktree using gh CLI
+	 */
+	async createPullRequest(
+		worktreePath: string,
+		sourceBranch: string,
+		baseBranch: string,
+	): Promise<{
+		success: boolean;
+		prUrl?: string;
+		error?: string;
+	}> {
+		try {
+			// Step 1: Check if there are uncommitted changes and commit them
+			const hasUncommitted = this.hasUncommittedChanges(worktreePath);
+			if (hasUncommitted) {
+				try {
+					// Stage all changes
+					execSync("git add .", {
+						cwd: worktreePath,
+						stdio: "pipe",
+					});
+
+					// Create commit with auto-generated message
+					const commitMessage = `Work in progress\n\nAuto-committed for PR creation`;
+					execSync(`git commit -m "${commitMessage}"`, {
+						cwd: worktreePath,
+						stdio: "pipe",
+					});
+
+					console.log("Auto-committed uncommitted changes");
+				} catch (commitError) {
+					console.error("Failed to commit changes:", commitError);
+					return {
+						success: false,
+						error: "Failed to commit changes. Please commit manually and try again.",
+					};
+				}
+			}
+
+			// Step 2: Check if there are any commits between base and source
+			let hasCommits = false;
+			try {
+				const commitCount = execSync(
+					`git rev-list --count ${baseBranch}..${sourceBranch}`,
+					{
+						cwd: worktreePath,
+						encoding: "utf-8",
+						stdio: "pipe",
+					},
+				).trim();
+
+				hasCommits = commitCount !== "0";
+			} catch (countError) {
+				console.error("Failed to check commit count:", countError);
+				// Continue anyway - might be a new branch
+				hasCommits = true; // Assume we have commits
+			}
+
+			if (!hasCommits) {
+				return {
+					success: false,
+					error: `No commits found between ${baseBranch} and ${sourceBranch}. Make some changes first.`,
+				};
+			}
+
+			// Step 3: Push the branch to remote
+			try {
+				execSync(`git push -u origin ${sourceBranch}`, {
+					cwd: worktreePath,
+					stdio: "pipe",
+				});
+			} catch (pushError) {
+				const errorStr = String(pushError);
+				// Only ignore if branch already exists or is up-to-date
+				if (!errorStr.includes("already exists") && !errorStr.includes("up-to-date")) {
+					console.error("Failed to push branch:", errorStr);
+					return {
+						success: false,
+						error: "Failed to push branch to remote. Please push manually and try again.",
+					};
+				}
+			}
+
+			// Step 4: Create PR using gh CLI
+			let prUrl: string | undefined;
+
+			// Try with --fill first (uses commit messages)
+			try {
+				const result = execSync(
+					`gh pr create --base ${baseBranch} --head ${sourceBranch} --fill`,
+					{
+						cwd: worktreePath,
+						encoding: "utf-8",
+						stdio: "pipe",
+					},
+				);
+
+				// Extract the PR URL from the output
+				// gh pr create outputs the URL, but may have other text
+				const output = result.trim();
+				console.log(`Raw gh pr create output: "${output}"`);
+
+				const urlMatch = output.match(/(https:\/\/github\.com\/[^\s]+)/);
+				if (urlMatch) {
+					prUrl = urlMatch[1];
+					console.log(`Extracted PR URL: ${prUrl}`);
+				} else {
+					// If no URL found in output, try to get it from gh pr list
+					console.log("No URL in create output, fetching from pr list");
+					try {
+						const prListResult = execSync(
+							`gh pr list --head ${sourceBranch} --json url --jq '.[0].url'`,
+							{
+								cwd: worktreePath,
+								encoding: "utf-8",
+								stdio: "pipe",
+							},
+						);
+						prUrl = prListResult.trim();
+					} catch (listError) {
+						console.warn("Could not fetch PR URL from list:", listError);
+						prUrl = undefined;
+					}
+				}
+			} catch (fillError) {
+				// If --fill fails, try with web interface instead
+				console.log("--fill failed, opening web interface");
+				try {
+					execSync(
+						`gh pr create --base ${baseBranch} --head ${sourceBranch} --web`,
+						{
+							cwd: worktreePath,
+							stdio: "inherit", // Let it open the browser directly
+						},
+					);
+
+					// Poll for the PR URL after web creation
+					// User needs to complete the PR in the browser, so we poll
+					console.log("Polling for PR URL after web creation...");
+					let attempts = 0;
+					const maxAttempts = 30; // Poll for up to 30 seconds
+
+					while (attempts < maxAttempts) {
+						await new Promise((resolve) => setTimeout(resolve, 1000));
+						attempts++;
+
+						try {
+							const prListResult = execSync(
+								`gh pr list --head ${sourceBranch} --json url --jq '.[0].url'`,
+								{
+									cwd: worktreePath,
+									encoding: "utf-8",
+									stdio: "pipe",
+								},
+							);
+							const fetchedUrl = prListResult.trim();
+							if (fetchedUrl && fetchedUrl.startsWith("http")) {
+								prUrl = fetchedUrl;
+								console.log(`Found PR URL after ${attempts} seconds: ${prUrl}`);
+								break;
+							}
+						} catch (listError) {
+							// PR not found yet, continue polling
+							if (attempts % 5 === 0) {
+								console.log(`Still waiting for PR creation... (${attempts}s)`);
+							}
+						}
+					}
+
+					if (!prUrl) {
+						console.warn(
+							"Could not fetch PR URL after web creation - user may not have completed the PR",
+						);
+					}
+				} catch (webError) {
+					console.error("Web PR creation failed:", webError);
+					return {
+						success: false,
+						error: "Failed to create PR via web interface",
+					};
+				}
+			}
+
+			return {
+				success: true,
+				prUrl,
+			};
+		} catch (error) {
+			console.error("Failed to create PR:", error);
+			const errorMessage = error instanceof Error ? error.message : String(error);
+
+			// Provide helpful error messages
+			if (errorMessage.includes("could not find any commits")) {
+				return {
+					success: false,
+					error: "No commits to create PR from. Make some changes first.",
+				};
+			}
+
+			return {
+				success: false,
+				error: errorMessage,
+			};
+		}
+	}
+
+	/**
+	 * Merge a pull request using gh CLI
+	 */
+	async mergePullRequest(
+		worktreePath: string,
+		prUrl: string,
+	): Promise<{
+		success: boolean;
+		error?: string;
+	}> {
+		try {
+			// Extract PR number from URL (e.g., https://github.com/owner/repo/pull/123 -> 123)
+			const prMatch = prUrl.match(/\/pull\/(\d+)/);
+			if (!prMatch) {
+				return {
+					success: false,
+					error: "Invalid PR URL format",
+				};
+			}
+
+			const prNumber = prMatch[1];
+
+			// Merge the PR using gh CLI with squash merge
+			execSync(`gh pr merge ${prNumber} --squash --delete-branch`, {
+				cwd: worktreePath,
+				stdio: "pipe",
+			});
+
+			return {
+				success: true,
+			};
+		} catch (error) {
+			console.error("Failed to merge PR:", error);
+			const errorMessage = error instanceof Error ? error.message : String(error);
+
+			return {
+				success: false,
+				error: errorMessage,
+			};
+		}
+	}
 }
 
 export default WorktreeManager.getInstance();

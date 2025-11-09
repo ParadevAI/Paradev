@@ -202,6 +202,21 @@ export interface IpcChannels {
 			error?: string;
 		};
 	};
+	"worktree-create-pr": {
+		request: { workspaceId: string; worktreeId: string };
+		response: {
+			success: boolean;
+			prUrl?: string;
+			error?: string;
+		};
+	};
+	"worktree-merge-pr": {
+		request: { workspaceId: string; worktreeId: string };
+		response: {
+			success: boolean;
+			error?: string;
+		};
+	};
 
 	// Tab operations
 	"tab-create": {
@@ -383,6 +398,9 @@ export function isValidChannel(channel: string): channel is IpcChannelName {
 		"worktree-open-settings",
 		"worktree-get-git-status",
 		"worktree-update-description",
+		"worktree-get-git-diff",
+		"worktree-create-pr",
+		"worktree-merge-pr",
 		"open-app-settings",
 		"tab-create",
 		"tab-update-preview",
