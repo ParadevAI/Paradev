@@ -1,12 +1,14 @@
 import type { RouterOutputs } from "@superset/api";
-import { ChevronLeft } from "lucide-react";
+import { ChevronDown, ChevronLeft, User as UserIcon } from "lucide-react";
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type Task = RouterOutputs["task"]["all"][number];
+type User = RouterOutputs["user"]["all"][number];
 
 interface TaskPageProps {
 	task: Task;
+	users: User[];
 	onBack: () => void;
 	onUpdate: (
 		taskId: string,
@@ -14,6 +16,7 @@ interface TaskPageProps {
 			title: string;
 			description: string;
 			status: Task["status"];
+			assigneeId?: string | null;
 		},
 	) => void;
 }
@@ -42,6 +45,7 @@ const statusLabels: Record<string, string> = {
 
 export const TaskPage: React.FC<TaskPageProps> = ({
 	task,
+	users,
 	onBack,
 	onUpdate,
 }) => {
@@ -49,13 +53,39 @@ export const TaskPage: React.FC<TaskPageProps> = ({
 	const [title, setTitle] = useState(task.title);
 	const [description, setDescription] = useState(task.description || "");
 	const [status, setStatus] = useState(task.status);
+	const [assigneeId, setAssigneeId] = useState<string | null>(
+		task.assigneeId,
+	);
+	const [isAssigneeDropdownOpen, setIsAssigneeDropdownOpen] = useState(false);
+	const dropdownRef = useRef<HTMLDivElement>(null);
 
 	// Update local state when task changes
 	useEffect(() => {
 		setTitle(task.title);
 		setDescription(task.description || "");
 		setStatus(task.status);
+		setAssigneeId(task.assigneeId);
 	}, [task]);
+
+	// Close dropdown when clicking outside
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			if (
+				dropdownRef.current &&
+				!dropdownRef.current.contains(event.target as Node)
+			) {
+				setIsAssigneeDropdownOpen(false);
+			}
+		};
+
+		if (isAssigneeDropdownOpen) {
+			document.addEventListener("mousedown", handleClickOutside);
+		}
+
+		return () => {
+			document.removeEventListener("mousedown", handleClickOutside);
+		};
+	}, [isAssigneeDropdownOpen]);
 
 	const handleTitleBlur = () => {
 		if (title.trim() && title !== task.title) {
@@ -73,6 +103,21 @@ export const TaskPage: React.FC<TaskPageProps> = ({
 		setStatus(newStatus);
 		onUpdate(task.id, { title, description, status: newStatus });
 	};
+
+	const handleAssigneeChange = (newAssigneeId: string | null) => {
+		setAssigneeId(newAssigneeId);
+		setIsAssigneeDropdownOpen(false);
+		onUpdate(task.id, {
+			title,
+			description,
+			status,
+			assigneeId: newAssigneeId,
+		});
+	};
+
+	const selectedUser = assigneeId
+		? users.find((u) => u.id === assigneeId)
+		: null;
 
 	return (
 		<div className="flex flex-col h-full bg-neutral-950">
@@ -192,27 +237,82 @@ export const TaskPage: React.FC<TaskPageProps> = ({
 								</select>
 							</div>
 
-							{/* Assignee */}
-							{task.assignee && (
-								<div>
-									<label className="text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2 block">
-										Assignee
-									</label>
-									<div className="flex items-center gap-3 px-3 py-2 bg-neutral-900/50 border border-neutral-800/50 rounded-lg">
-										<img
-											src={
-												task.assignee.avatarUrl ||
-												"https://via.placeholder.com/32"
-											}
-											alt={task.assignee.name}
-											className="w-6 h-6 rounded-full ring-2 ring-neutral-800"
-										/>
-										<span className="text-sm text-neutral-300 font-medium">
-											{task.assignee.name}
-										</span>
+							{/* Assignee - Editable Dropdown */}
+							<div className="relative" ref={dropdownRef}>
+								<label className="text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2 block">
+									Assignee
+								</label>
+								<button
+									type="button"
+									onClick={() =>
+										setIsAssigneeDropdownOpen(!isAssigneeDropdownOpen)
+									}
+									className="w-full bg-neutral-900/50 border border-neutral-800/50 rounded-lg px-3 py-2 text-sm text-neutral-300 font-medium hover:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600/50 transition-all cursor-pointer flex items-center justify-between h-9"
+								>
+									<div className="flex items-center gap-2">
+										{selectedUser ? (
+											<>
+												<img
+													src={
+														selectedUser.avatarUrl ||
+														"https://via.placeholder.com/24"
+													}
+													alt={selectedUser.name}
+													className="w-5 h-5 rounded-full ring-1 ring-neutral-700"
+												/>
+												<span>{selectedUser.name}</span>
+											</>
+										) : (
+											<>
+												<div className="w-5 h-5 rounded-full bg-neutral-800 flex items-center justify-center">
+													<UserIcon className="w-3 h-3" />
+												</div>
+												<span className="text-neutral-500">Unassigned</span>
+											</>
+										)}
 									</div>
-								</div>
-							)}
+									<ChevronDown
+										className={`w-4 h-4 text-neutral-500 transition-transform ${
+											isAssigneeDropdownOpen ? "rotate-180" : ""
+										}`}
+									/>
+								</button>
+
+								{isAssigneeDropdownOpen && (
+									<div className="absolute top-full left-0 right-0 mt-1 bg-neutral-900 border border-neutral-800 rounded-lg shadow-lg z-50 overflow-hidden">
+										<div className="py-1 max-h-64 overflow-y-auto">
+											<button
+												type="button"
+												onClick={() => handleAssigneeChange(null)}
+												className="w-full px-3 py-2 text-sm text-neutral-300 hover:bg-neutral-800 focus:bg-neutral-800 flex items-center gap-2 transition-colors cursor-pointer text-left"
+											>
+												<div className="w-5 h-5 rounded-full bg-neutral-800 flex items-center justify-center">
+													<UserIcon className="w-3 h-3" />
+												</div>
+												<span>Unassigned</span>
+											</button>
+											{users.map((user) => (
+												<button
+													type="button"
+													key={user.id}
+													onClick={() => handleAssigneeChange(user.id)}
+													className="w-full px-3 py-2 text-sm text-neutral-300 hover:bg-neutral-800 focus:bg-neutral-800 flex items-center gap-2 transition-colors cursor-pointer text-left"
+												>
+													<img
+														src={
+															user.avatarUrl ||
+															"https://via.placeholder.com/24"
+														}
+														alt={user.name}
+														className="w-5 h-5 rounded-full ring-1 ring-neutral-700"
+													/>
+													<span>{user.name}</span>
+												</button>
+											))}
+										</div>
+									</div>
+								)}
+							</div>
 
 							{/* Creator */}
 							{task.creator && (

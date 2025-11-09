@@ -2,12 +2,13 @@ import type { RouterOutputs } from "@superset/api";
 import { Plus } from "lucide-react";
 import type React from "react";
 import { useMemo, useState } from "react";
-import { mockTasks } from "../../../../../lib/mock-data";
+import { mockTasks, mockUsers } from "../../../../../lib/mock-data";
 import { CreateTaskModal } from "./CreateTaskModal";
 import { KanbanColumn } from "./KanbanColumn";
 import { TaskPage } from "./TaskPage";
 
 type Task = RouterOutputs["task"]["all"][number];
+type User = RouterOutputs["user"]["all"][number];
 
 export const PlanView: React.FC = () => {
 	// Initialize with mock tasks and add some variety to statuses
@@ -69,31 +70,53 @@ export const PlanView: React.FC = () => {
 			title: string;
 			description: string;
 			status: Task["status"];
+			assigneeId?: string | null;
 		},
 	) => {
 		setTasks(
-			tasks.map((task) =>
-				task.id === taskId
-					? {
-							...task,
-							title: updates.title,
-							description: updates.description,
-							status: updates.status,
-							updatedAt: new Date(),
-						}
-					: task,
-			),
+			tasks.map((task) => {
+				if (task.id === taskId) {
+					const updatedTask = {
+						...task,
+						title: updates.title,
+						description: updates.description,
+						status: updates.status,
+						updatedAt: new Date(),
+					};
+
+					// Update assignee if assigneeId is provided
+					if (updates.assigneeId !== undefined) {
+						updatedTask.assigneeId = updates.assigneeId;
+						updatedTask.assignee = updates.assigneeId
+							? mockUsers.find((u) => u.id === updates.assigneeId) || null
+							: null;
+					}
+
+					return updatedTask;
+				}
+				return task;
+			}),
 		);
 
 		// Update viewingTask if it's the one being edited
 		if (viewingTask?.id === taskId) {
-			setViewingTask({
+			const updatedViewingTask = {
 				...viewingTask,
 				title: updates.title,
 				description: updates.description,
 				status: updates.status,
 				updatedAt: new Date(),
-			});
+			};
+
+			// Update assignee if assigneeId is provided
+			if (updates.assigneeId !== undefined) {
+				updatedViewingTask.assigneeId = updates.assigneeId;
+				updatedViewingTask.assignee = updates.assigneeId
+					? mockUsers.find((u) => u.id === updates.assigneeId) || null
+					: null;
+			}
+
+			setViewingTask(updatedViewingTask);
 		}
 	};
 
@@ -102,6 +125,7 @@ export const PlanView: React.FC = () => {
 		return (
 			<TaskPage
 				task={viewingTask}
+				users={mockUsers}
 				onBack={() => setViewingTask(null)}
 				onUpdate={handleUpdateTask}
 			/>
