@@ -347,6 +347,12 @@ export interface IpcChannels {
 			active: boolean;
 		}>;
 	};
+
+	// Deep linking
+	"deep-link-get-url": {
+		request: void;
+		response: string | null;
+	};
 }
 
 /**
@@ -413,6 +419,7 @@ export function isValidChannel(channel: string): channel is IpcChannelName {
 		"workspace-set-ports",
 		"workspace-get-detected-ports",
 		"proxy-get-status",
+		"deep-link-get-url",
 	];
 	return validChannels.includes(channel as IpcChannelName);
 }
