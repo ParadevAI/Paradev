@@ -5,7 +5,7 @@ import {
 	HoverCardTrigger,
 } from "@superset/ui/hover-card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
-import { Loader2, PanelLeftClose, PanelLeftOpen, Plus } from "lucide-react";
+import { GitMerge, GitPullRequest, Loader2, PanelLeftClose, PanelLeftOpen, Plus } from "lucide-react";
 import type React from "react";
 import type { Worktree } from "shared/types";
 import { StatusIndicator, type TaskStatus } from "./StatusIndicator";
@@ -33,6 +33,8 @@ interface TaskTabsProps {
 	onExpandSidebar: () => void;
 	isSidebarOpen: boolean;
 	onAddTask: () => void;
+	onCreatePR?: () => void;
+	onMergePR?: () => void;
 	worktrees: WorktreeWithTask[];
 	selectedWorktreeId: string | null;
 	onWorktreeSelect: (worktreeId: string) => void;
@@ -45,15 +47,20 @@ export const TaskTabs: React.FC<TaskTabsProps> = ({
 	onExpandSidebar,
 	isSidebarOpen,
 	onAddTask,
+	onCreatePR,
+	onMergePR,
 	worktrees,
 	selectedWorktreeId,
 	onWorktreeSelect,
 	mode = "edit",
 	onModeChange,
 }) => {
+	const selectedWorktree = worktrees.find(wt => wt.id === selectedWorktreeId);
+	const canCreatePR = selectedWorktree && !selectedWorktree.isPending;
+	const hasPR = selectedWorktree && selectedWorktree.prUrl;
 	return (
 		<div
-			className="flex items-end select-none bg-black/20"
+			className="flex items-end justify-between select-none bg-black/20"
 			style={
 				{
 					height: "48px",
@@ -300,6 +307,53 @@ export const TaskTabs: React.FC<TaskTabsProps> = ({
 						<p>New task</p>
 					</TooltipContent>
 				</Tooltip>
+			</div>
+
+			{/* Right side actions */}
+			<div
+				className="flex items-center gap-2 px-4 h-full"
+				style={{ WebkitAppRegion: "no-drag" } as React.CSSProperties}
+			>
+				{hasPR && onMergePR ? (
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<Button
+								variant="default"
+								size="sm"
+								onClick={onMergePR}
+								className="h-7 bg-green-600 hover:bg-green-700 text-white"
+							>
+								<GitMerge size={14} className="mr-1.5" />
+								Merge PR
+							</Button>
+						</TooltipTrigger>
+						<TooltipContent side="bottom">
+							<p>Merge pull request for {selectedWorktree?.branch}</p>
+						</TooltipContent>
+					</Tooltip>
+				) : onCreatePR ? (
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<Button
+								variant="default"
+								size="sm"
+								onClick={onCreatePR}
+								disabled={!canCreatePR}
+								className="h-7"
+							>
+								<GitPullRequest size={14} className="mr-1.5" />
+								Create PR
+							</Button>
+						</TooltipTrigger>
+						<TooltipContent side="bottom">
+							<p>
+								{canCreatePR
+									? `Create pull request for ${selectedWorktree?.branch}`
+									: "Select a worktree to create a PR"}
+							</p>
+						</TooltipContent>
+					</Tooltip>
+				) : null}
 			</div>
 		</div>
 	);

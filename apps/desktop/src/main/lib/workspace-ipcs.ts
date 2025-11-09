@@ -525,6 +525,114 @@ export function registerWorkspaceIPCs() {
 		},
 	);
 
+	// Create PR for a worktree
+	ipcMain.handle(
+		"worktree-create-pr",
+		async (_event, input: { workspaceId: string; worktreeId: string }) => {
+			try {
+				const workspace = await workspaceManager.getWorkspace(
+					input.workspaceId,
+				);
+				if (!workspace) {
+					return {
+						success: false,
+						error: "Workspace not found",
+					};
+				}
+
+				const worktree = workspace.worktrees.find(
+					(wt) => wt.id === input.worktreeId,
+				);
+				if (!worktree) {
+					return {
+						success: false,
+						error: "Worktree not found",
+					};
+				}
+
+				const result = await worktreeManager.createPullRequest(
+					worktree.path,
+					worktree.branch,
+					workspace.branch,
+				);
+
+				// If successful, store the PR URL in the worktree config
+				if (result.success && result.prUrl) {
+					console.log(`Storing PR URL for worktree ${worktree.id}: ${result.prUrl}`);
+					worktree.prUrl = result.prUrl;
+					await workspaceManager.saveConfig();
+				} else {
+					console.log(
+						`PR created but no URL returned. Success: ${result.success}, URL: ${result.prUrl}`,
+					);
+				}
+
+				return result;
+			} catch (error) {
+				console.error("Failed to create PR:", error);
+				return {
+					success: false,
+					error: error instanceof Error ? error.message : String(error),
+				};
+			}
+		},
+	);
+
+	// Merge PR for a worktree
+	ipcMain.handle(
+		"worktree-merge-pr",
+		async (_event, input: { workspaceId: string; worktreeId: string }) => {
+			try {
+				const workspace = await workspaceManager.getWorkspace(
+					input.workspaceId,
+				);
+				if (!workspace) {
+					return {
+						success: false,
+						error: "Workspace not found",
+					};
+				}
+
+				const worktree = workspace.worktrees.find(
+					(wt) => wt.id === input.worktreeId,
+				);
+				if (!worktree) {
+					return {
+						success: false,
+						error: "Worktree not found",
+					};
+				}
+
+				if (!worktree.prUrl) {
+					return {
+						success: false,
+						error: "No PR found for this worktree",
+					};
+				}
+
+				const result = await worktreeManager.mergePullRequest(
+					worktree.path,
+					worktree.prUrl,
+				);
+
+				// If successful, clear the PR URL and mark as merged
+				if (result.success) {
+					worktree.prUrl = undefined;
+					worktree.merged = true;
+					await workspaceManager.saveConfig();
+				}
+
+				return result;
+			} catch (error) {
+				console.error("Failed to merge PR:", error);
+				return {
+					success: false,
+					error: error instanceof Error ? error.message : String(error),
+				};
+			}
+		},
+	);
+
 	// Open app settings in Cursor
 	ipcMain.handle("open-app-settings", async () => {
 		try {
