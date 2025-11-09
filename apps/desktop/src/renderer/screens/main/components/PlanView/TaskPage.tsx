@@ -1,7 +1,8 @@
 import type { RouterOutputs } from "@superset/api";
-import { ChevronDown, ChevronLeft, User as UserIcon } from "lucide-react";
+import { ChevronDown, ChevronLeft, Play, User as UserIcon } from "lucide-react";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
+import type { Workspace } from "shared/types";
 
 type Task = RouterOutputs["task"]["all"][number];
 type User = RouterOutputs["user"]["all"][number];
@@ -19,6 +20,10 @@ interface TaskPageProps {
 			assigneeId?: string | null;
 		},
 	) => void;
+	currentWorkspace: Workspace | null;
+	selectedWorktreeId: string | null;
+	onTabSelect: (worktreeId: string, tabId: string) => void;
+	onReload: () => void;
 }
 
 const statusColors: Record<string, string> = {
@@ -48,6 +53,10 @@ export const TaskPage: React.FC<TaskPageProps> = ({
 	users,
 	onBack,
 	onUpdate,
+	currentWorkspace,
+	selectedWorktreeId,
+	onTabSelect,
+	onReload,
 }) => {
 	const statusColor = statusColors[task.status] || "bg-neutral-500";
 	const [title, setTitle] = useState(task.title);
@@ -119,26 +128,99 @@ export const TaskPage: React.FC<TaskPageProps> = ({
 		? users.find((u) => u.id === assigneeId)
 		: null;
 
+	const handleStartTask = async () => {
+		if (!currentWorkspace) {
+			console.error("No workspace selected");
+			return;
+		}
+
+		// Find worktree to use: either the selected one, task's branch worktree, or first worktree
+		let targetWorktreeId = selectedWorktreeId;
+
+		if (!targetWorktreeId) {
+			// Try to find a worktree matching the task's branch
+			const taskWorktree = currentWorkspace.worktrees?.find(
+				(wt) => wt.branch === task.branch,
+			);
+
+			if (taskWorktree) {
+				targetWorktreeId = taskWorktree.id;
+			} else if (currentWorkspace.worktrees && currentWorkspace.worktrees.length > 0) {
+				// Use the first worktree as fallback
+				targetWorktreeId = currentWorkspace.worktrees[0].id;
+			}
+		}
+
+		if (!targetWorktreeId) {
+			console.error("No worktree available to create terminal");
+			return;
+		}
+
+		try {
+			// Create a new terminal with claude command
+			const result = await window.ipcRenderer.invoke("tab-create", {
+				workspaceId: currentWorkspace.id,
+				worktreeId: targetWorktreeId,
+				name: `Task: ${task.slug}`,
+				type: "terminal",
+				command: `claude "hi"`,
+			});
+
+			if (result.success) {
+				// Update task status to planning (pending)
+				onUpdate(task.id, {
+					title: task.title,
+					description: task.description || "",
+					status: "planning",
+				});
+
+				// Reload workspace to get updated tab data
+				await onReload();
+
+				// Select the new tab after reload
+				const newTabId = result.tab?.id;
+				if (newTabId) {
+					// Small delay to ensure workspace is reloaded
+					setTimeout(() => {
+						onTabSelect(targetWorktreeId, newTabId);
+					}, 100);
+				}
+			}
+		} catch (error) {
+			console.error("Error starting task:", error);
+		}
+	};
+
 	return (
 		<div className="flex flex-col h-full bg-neutral-950">
 			{/* Header with Breadcrumbs */}
 			<div className="border-b border-neutral-800/50 bg-neutral-950/80 backdrop-blur-sm">
-				<div className="flex items-center gap-3 px-8 py-4">
+				<div className="flex items-center justify-between gap-3 px-8 py-4">
+					<div className="flex items-center gap-3">
+						<button
+							type="button"
+							onClick={onBack}
+							className="flex items-center gap-2 text-sm text-neutral-400 hover:text-white transition-colors group"
+						>
+							<ChevronLeft
+								size={16}
+								className="group-hover:-translate-x-0.5 transition-transform"
+							/>
+							<span className="font-medium">Plan</span>
+						</button>
+						<span className="text-neutral-600">/</span>
+						<span className="text-sm text-neutral-300 font-medium">
+							{task.slug}
+						</span>
+					</div>
 					<button
 						type="button"
-						onClick={onBack}
-						className="flex items-center gap-2 text-sm text-neutral-400 hover:text-white transition-colors group"
+						onClick={handleStartTask}
+						className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-2"
 					>
-						<ChevronLeft
-							size={16}
-							className="group-hover:-translate-x-0.5 transition-transform"
-						/>
-						<span className="font-medium">Plan</span>
+						<Play size={14} className="fill-white" />
+						<span>Start Task</span>
 					</button>
-					<span className="text-neutral-600">/</span>
-					<span className="text-sm text-neutral-300 font-medium">
-						{task.slug}
-					</span>
 				</div>
 			</div>
 
@@ -272,9 +354,8 @@ export const TaskPage: React.FC<TaskPageProps> = ({
 										)}
 									</div>
 									<ChevronDown
-										className={`w-4 h-4 text-neutral-500 transition-transform ${
-											isAssigneeDropdownOpen ? "rotate-180" : ""
-										}`}
+										className={`w-4 h-4 text-neutral-500 transition-transform ${isAssigneeDropdownOpen ? "rotate-180" : ""
+											}`}
 									/>
 								</button>
 

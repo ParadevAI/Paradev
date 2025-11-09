@@ -1,11 +1,27 @@
 import type { RouterOutputs } from "@superset/api";
+import { Play } from "lucide-react";
 import type React from "react";
+import { useState } from "react";
+import type { Workspace } from "shared/types";
 
 type Task = RouterOutputs["task"]["all"][number];
 
 interface TaskCardProps {
 	task: Task;
 	onClick: () => void;
+	currentWorkspace: Workspace | null;
+	selectedWorktreeId: string | null;
+	onTabSelect: (worktreeId: string, tabId: string) => void;
+	onReload: () => void;
+	onUpdateTask: (
+		taskId: string,
+		updates: {
+			title: string;
+			description: string;
+			status: Task["status"];
+			assigneeId?: string | null;
+		},
+	) => void;
 }
 
 const statusColors: Record<string, string> = {
@@ -19,14 +35,90 @@ const statusColors: Record<string, string> = {
 	canceled: "bg-red-500",
 };
 
-export const TaskCard: React.FC<TaskCardProps> = ({ task, onClick }) => {
+export const TaskCard: React.FC<TaskCardProps> = ({
+	task,
+	onClick,
+	currentWorkspace,
+	selectedWorktreeId,
+	onTabSelect,
+	onReload,
+	onUpdateTask,
+}) => {
 	const statusColor = statusColors[task.status] || "bg-neutral-500";
+	const [isHovered, setIsHovered] = useState(false);
+
+	const handleStartTask = async (e: React.MouseEvent) => {
+		e.stopPropagation();
+
+		if (!currentWorkspace) {
+			console.error("No workspace selected");
+			return;
+		}
+
+		// Find worktree to use: either the selected one, task's branch worktree, or first worktree
+		let targetWorktreeId = selectedWorktreeId;
+
+		if (!targetWorktreeId) {
+			// Try to find a worktree matching the task's branch
+			const taskWorktree = currentWorkspace.worktrees?.find(
+				(wt) => wt.branch === task.branch,
+			);
+
+			if (taskWorktree) {
+				targetWorktreeId = taskWorktree.id;
+			} else if (currentWorkspace.worktrees && currentWorkspace.worktrees.length > 0) {
+				// Use the first worktree as fallback
+				targetWorktreeId = currentWorkspace.worktrees[0].id;
+			}
+		}
+
+		if (!targetWorktreeId) {
+			console.error("No worktree available to create terminal");
+			return;
+		}
+
+		try {
+			// Create a new terminal with claude command
+			const result = await window.ipcRenderer.invoke("tab-create", {
+				workspaceId: currentWorkspace.id,
+				worktreeId: targetWorktreeId,
+				name: `Task: ${task.slug}`,
+				type: "terminal",
+				command: `claude "hi"`,
+			});
+
+			if (result.success) {
+				// Update task status to planning (pending)
+				onUpdateTask(task.id, {
+					title: task.title,
+					description: task.description || "",
+					status: "planning",
+				});
+
+				// Reload workspace to get updated tab data
+				await onReload();
+
+				// Select the new tab after reload
+				const newTabId = result.tab?.id;
+				if (newTabId) {
+					// Small delay to ensure workspace is reloaded
+					setTimeout(() => {
+						onTabSelect(targetWorktreeId, newTabId);
+					}, 100);
+				}
+			}
+		} catch (error) {
+			console.error("Error starting task:", error);
+		}
+	};
 
 	return (
 		<button
 			type="button"
 			onClick={onClick}
-			className="w-full bg-neutral-900/40 hover:bg-neutral-900/70 border border-neutral-800/50 hover:border-neutral-700/70 rounded-xl p-3.5 text-left transition-all group shadow-sm hover:shadow-md"
+			onMouseEnter={() => setIsHovered(true)}
+			onMouseLeave={() => setIsHovered(false)}
+			className="w-full bg-neutral-900/40 hover:bg-neutral-900/70 border border-neutral-800/50 hover:border-neutral-700/70 rounded-xl p-3.5 text-left transition-all group shadow-sm hover:shadow-md relative"
 		>
 			{/* Task header */}
 			<div className="flex items-start gap-2 mb-2.5">
@@ -56,6 +148,18 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onClick }) => {
 					</div>
 				)}
 				<div className="flex-1" />
+
+				{/* Start Task button - appears on hover for TODO tasks */}
+				{isHovered && task.status === "todo" && (
+					<button
+						type="button"
+						onClick={handleStartTask}
+						className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-md transition-colors flex items-center gap-1.5"
+					>
+						<Play size={12} className="fill-white" />
+						<span>Start Task</span>
+					</button>
+				)}
 			</div>
 		</button>
 	);
