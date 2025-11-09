@@ -16,8 +16,23 @@ import { PlanView } from "../PlanView";
 import { Sidebar } from "../Sidebar";
 import { DiffTab } from "../TabContent/components/DiffTab";
 import { AddTaskModal } from "./AddTaskModal";
-import { TaskTabs } from "./TaskTabs";
+import { TaskTabs, type WorktreeWithTask } from "./TaskTabs";
+import type { TaskStatus } from "./StatusIndicator";
 import { WorktreeTabView } from "./WorktreeTabView";
+import { WorktreeProvider } from "../../../../contexts/WorktreeContext";
+
+// Type alias for task data used in UI
+type UITask = {
+	id: string;
+	slug: string;
+	name: string;
+	status: TaskStatus;
+	branch: string;
+	description: string;
+	assignee: string;
+	assigneeAvatarUrl: string;
+	lastUpdated: string;
+};
 
 // Mock tasks data - TODO: Replace with actual task data from backend
 const MOCK_TASKS = [
@@ -196,17 +211,41 @@ const MOCK_TASKS = [
 	},
 ];
 
+// Helper function to enrich worktrees with task metadata
+function enrichWorktreesWithTasks(worktrees: Worktree[]): WorktreeWithTask[] {
+	return worktrees.map((worktree) => {
+		// Try to find a matching task by branch name
+		const matchingTask = MOCK_TASKS.find((task) => task.branch === worktree.branch);
+
+		if (matchingTask) {
+			// Worktree has an associated task - add task metadata
+			return {
+				...worktree,
+				task: {
+					id: matchingTask.id,
+					slug: matchingTask.slug,
+					title: matchingTask.name,
+					status: matchingTask.status,
+					description: matchingTask.description,
+					assignee: {
+						name: matchingTask.assignee,
+						avatarUrl: matchingTask.assigneeAvatarUrl,
+					},
+					lastUpdated: matchingTask.lastUpdated,
+				},
+			};
+		}
+
+		// Worktree without task - return as-is
+		return worktree;
+	});
+}
+
 export const NewLayoutMain: React.FC = () => {
 	const sidebarPanelRef = useRef<ImperativePanelHandle>(null);
 	const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 	const [showSidebarOverlay, setShowSidebarOverlay] = useState(false);
 	const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
-	// Initialize with first 4 tasks to match the tabs currently displayed
-	const [openTasks, setOpenTasks] = useState<typeof MOCK_TASKS>(
-		MOCK_TASKS.slice(0, 4),
-	);
-	const [activeTaskId, setActiveTaskId] = useState(MOCK_TASKS[0].id);
-	const [allTasks, setAllTasks] = useState(MOCK_TASKS);
 
 	// Workspace state
 	const [workspaces, setWorkspaces] = useState<Workspace[] | null>(null);
@@ -220,6 +259,11 @@ export const NewLayoutMain: React.FC = () => {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	const [mode, setMode] = useState<"plan" | "edit">("edit");
+
+	// Compute which tasks have worktrees (are "open")
+	const openTasks = MOCK_TASKS.filter((task) =>
+		currentWorkspace?.worktrees?.some((wt) => wt.branch === task.branch),
+	);
 
 	const handleCollapseSidebar = () => {
 		const panel = sidebarPanelRef.current;
@@ -483,45 +527,87 @@ export const NewLayoutMain: React.FC = () => {
 		setIsAddTaskModalOpen(false);
 	};
 
-	const handleSelectTask = (task: (typeof MOCK_TASKS)[0]) => {
-		// Check if task is already open
-		const isAlreadyOpen = openTasks.some((t) => t.id === task.id);
-		if (!isAlreadyOpen) {
-			// Add to open tasks and make it active
-			setOpenTasks([...openTasks, task]);
-			setActiveTaskId(task.id);
+	const handleSelectTask = (task: UITask) => {
+		if (!currentWorkspace) return;
+
+		// Find existing worktree for this task's branch
+		const existingWorktree = currentWorkspace.worktrees?.find(
+			(wt) => wt.branch === task.branch,
+		);
+
+		if (existingWorktree) {
+			// Worktree already exists - switch to it
+			setSelectedWorktreeId(existingWorktree.id);
+			if (existingWorktree.tabs && existingWorktree.tabs.length > 0) {
+				handleTabSelect(existingWorktree.id, existingWorktree.tabs[0].id);
+			}
+			handleCloseAddTaskModal();
 		} else {
-			// Task is already open, just switch focus to it
-			setActiveTaskId(task.id);
+			// Worktree doesn't exist - create it
+			void (async () => {
+				try {
+					const result = await window.ipcRenderer.invoke("worktree-create", {
+						workspaceId: currentWorkspace.id,
+						title: task.name,
+						branch: task.branch,
+						createBranch: false, // Branch should already exist
+						description: task.description,
+					});
+
+					if (result.success && result.worktree) {
+						await handleWorktreeCreated();
+						setSelectedWorktreeId(result.worktree.id);
+						if (result.worktree.tabs && result.worktree.tabs.length > 0) {
+							handleTabSelect(result.worktree.id, result.worktree.tabs[0].id);
+						}
+						handleCloseAddTaskModal();
+					}
+				} catch (error) {
+					console.error("Failed to create worktree for task:", error);
+				}
+			})();
 		}
 	};
 
 	const handleCreateTask = (taskData: {
 		name: string;
 		description: string;
-		status: "planning" | "working" | "needs-feedback" | "ready-to-merge";
+		status: TaskStatus;
 		assignee: string;
 		branch: string;
 	}) => {
-		// Generate new task with mock data
-		const newTask = {
-			id: String(allTasks.length + 1),
-			slug: `SSET-${allTasks.length + 1}`,
-			name: taskData.name,
-			status: taskData.status,
-			branch: taskData.branch,
-			description: taskData.description,
-			assignee: taskData.assignee,
-			assigneeAvatarUrl: "https://i.pravatar.cc/150?img=1", // Default avatar
-			lastUpdated: "Just now",
-		};
+		if (!currentWorkspace) return;
 
-		// Add to all tasks
-		setAllTasks([...allTasks, newTask]);
+		void (async () => {
+			try {
+				// Create a worktree for this task
+				const result = await window.ipcRenderer.invoke("worktree-create", {
+					workspaceId: currentWorkspace.id,
+					title: taskData.name,
+					branch: taskData.branch,
+					createBranch: true,
+					description: taskData.description,
+				});
 
-		// Open the new task
-		setOpenTasks([...openTasks, newTask]);
-		setActiveTaskId(newTask.id);
+				if (result.success && result.worktree) {
+					// Reload workspace to get the new worktree
+					await handleWorktreeCreated();
+
+					// Switch to the new worktree
+					setSelectedWorktreeId(result.worktree.id);
+
+					// Select first tab if available
+					if (result.worktree.tabs && result.worktree.tabs.length > 0) {
+						handleTabSelect(result.worktree.id, result.worktree.tabs[0].id);
+					}
+
+					// Close the modal
+					handleCloseAddTaskModal();
+				}
+			} catch (error) {
+				console.error("Failed to create task/worktree:", error);
+			}
+		})();
 	};
 
 	// Load active workspace on mount
@@ -630,6 +716,7 @@ export const NewLayoutMain: React.FC = () => {
 							onWorkspaceSelect={handleWorkspaceSelect}
 							onUpdateWorktree={handleUpdateWorktree}
 							selectedTabId={selectedTabId ?? undefined}
+							selectedWorktreeId={selectedWorktreeId}
 							onCollapse={() => {
 								setShowSidebarOverlay(false);
 							}}
@@ -641,15 +728,24 @@ export const NewLayoutMain: React.FC = () => {
 
 			<AppFrame>
 				<div className="flex flex-col h-full w-full">
-					{/* Task tabs at the top */}
+					{/* Worktree tabs at the top - each tab represents a worktree */}
 					<TaskTabs
 						onCollapseSidebar={handleCollapseSidebar}
 						onExpandSidebar={handleExpandSidebar}
 						isSidebarOpen={isSidebarOpen}
 						onAddTask={handleOpenAddTaskModal}
-						activeTaskId={activeTaskId}
-						onActiveTaskChange={setActiveTaskId}
-						openTasks={openTasks}
+						worktrees={enrichWorktreesWithTasks(currentWorkspace?.worktrees || [])}
+						selectedWorktreeId={selectedWorktreeId}
+						onWorktreeSelect={(worktreeId) => {
+							setSelectedWorktreeId(worktreeId);
+							// Select first tab in the worktree
+							const worktree = currentWorkspace?.worktrees?.find(
+								(wt) => wt.id === worktreeId,
+							);
+							if (worktree && worktree.tabs && worktree.tabs.length > 0) {
+								handleTabSelect(worktreeId, worktree.tabs[0].id);
+							}
+						}}
 						mode={mode}
 						onModeChange={setMode}
 					/>
@@ -684,6 +780,7 @@ export const NewLayoutMain: React.FC = () => {
 											onWorkspaceSelect={handleWorkspaceSelect}
 											onUpdateWorktree={handleUpdateWorktree}
 											selectedTabId={selectedTabId ?? undefined}
+											selectedWorktreeId={selectedWorktreeId}
 											onCollapse={() => {
 												const panel = sidebarPanelRef.current;
 												if (panel && !panel.isCollapsed()) {
@@ -781,7 +878,7 @@ export const NewLayoutMain: React.FC = () => {
 			<AddTaskModal
 				isOpen={isAddTaskModalOpen}
 				onClose={handleCloseAddTaskModal}
-				tasks={allTasks}
+				tasks={MOCK_TASKS}
 				openTasks={openTasks}
 				onSelectTask={handleSelectTask}
 				onCreateTask={handleCreateTask}

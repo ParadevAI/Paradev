@@ -20,10 +20,12 @@ interface TaskPreviewProps {
 }
 
 const STATUS_LABELS: Record<TaskStatus, string> = {
+	backlog: "Backlog",
 	planning: "Planning",
 	working: "Working",
 	"needs-feedback": "Needs Feedback",
 	"ready-to-merge": "Ready to Merge",
+	completed: "Completed",
 };
 
 export const TaskPreview: React.FC<TaskPreviewProps> = ({

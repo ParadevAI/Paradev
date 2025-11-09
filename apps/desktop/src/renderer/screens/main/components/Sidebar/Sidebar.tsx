@@ -22,6 +22,7 @@ interface SidebarProps {
 	selectedTabId: string | undefined;
 	isDragging?: boolean;
 	onShowDiff?: (worktreeId: string) => void;
+	selectedWorktreeId?: string | null;
 }
 
 export function Sidebar({
@@ -35,6 +36,7 @@ export function Sidebar({
 	selectedTabId,
 	isDragging = false,
 	onShowDiff,
+	selectedWorktreeId,
 }: SidebarProps) {
 	const [expandedWorktrees, setExpandedWorktrees] = useState<Set<string>>(
 		new Set(),
@@ -318,7 +320,7 @@ export function Sidebar({
 							selectedTabId={selectedTabId}
 							onCloneWorktree={handleCloneWorktree}
 							onShowDiff={onShowDiff}
-							selectedWorktreeId={currentWorkspace?.activeWorktreeId}
+							selectedWorktreeId={selectedWorktreeId ?? currentWorkspace?.activeWorktreeId}
 							showWorkspaceHeader={true}
 						/>
 
