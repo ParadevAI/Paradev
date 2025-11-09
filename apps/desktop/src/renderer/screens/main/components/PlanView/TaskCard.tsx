@@ -2,7 +2,7 @@ import type { RouterOutputs } from "@superset/api";
 import { Play } from "lucide-react";
 import type React from "react";
 import { useState } from "react";
-import type { Workspace } from "shared/types";
+import type { Tab, Workspace } from "shared/types";
 
 type Task = RouterOutputs["task"]["all"][number];
 
@@ -12,7 +12,7 @@ interface TaskCardProps {
 	currentWorkspace: Workspace | null;
 	selectedWorktreeId: string | null;
 	onTabSelect: (worktreeId: string, tabId: string) => void;
-	onReload: () => void;
+	onTabCreated: (worktreeId: string, tab: Tab) => void;
 	onUpdateTask: (
 		taskId: string,
 		updates: {
@@ -41,7 +41,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
 	currentWorkspace,
 	selectedWorktreeId,
 	onTabSelect,
-	onReload,
+	onTabCreated,
 	onUpdateTask,
 }) => {
 	const statusColor = statusColors[task.status] || "bg-neutral-500";
@@ -79,15 +79,23 @@ export const TaskCard: React.FC<TaskCardProps> = ({
 
 		try {
 			// Create a new terminal with claude command
+			const taskPrompt = `${task.title}\n\n${task.description || ""}`.trim();
+			// Escape quotes and newlines for shell command
+			const escapedPrompt = taskPrompt
+				.replace(/\\/g, '\\\\')  // Escape backslashes first
+				.replace(/"/g, '\\"')     // Escape double quotes
+				.replace(/\n/g, '\\n');   // Escape newlines
 			const result = await window.ipcRenderer.invoke("tab-create", {
 				workspaceId: currentWorkspace.id,
 				worktreeId: targetWorktreeId,
 				name: `Task: ${task.slug}`,
 				type: "terminal",
-				command: `claude "hi"`,
+				command: `claude "${escapedPrompt}"`,
 			});
 
-			if (result.success) {
+			if (result.success && result.tab) {
+				const newTabId = result.tab.id;
+
 				// Update task status to planning (pending)
 				onUpdateTask(task.id, {
 					title: task.title,
@@ -95,17 +103,11 @@ export const TaskCard: React.FC<TaskCardProps> = ({
 					status: "planning",
 				});
 
-				// Reload workspace to get updated tab data
-				await onReload();
+				// Optimistically add the tab to state
+				onTabCreated(targetWorktreeId, result.tab);
 
-				// Select the new tab after reload
-				const newTabId = result.tab?.id;
-				if (newTabId) {
-					// Small delay to ensure workspace is reloaded
-					setTimeout(() => {
-						onTabSelect(targetWorktreeId, newTabId);
-					}, 100);
-				}
+				// Select the new tab immediately
+				onTabSelect(targetWorktreeId, newTabId);
 			}
 		} catch (error) {
 			console.error("Error starting task:", error);
