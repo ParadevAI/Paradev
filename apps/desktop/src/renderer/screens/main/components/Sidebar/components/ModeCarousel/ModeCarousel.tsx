@@ -1,22 +1,11 @@
-import { type MotionValue, useMotionValue } from "framer-motion";
-import {
-	type ReactNode,
-	useCallback,
-	useEffect,
-	useRef,
-	useState,
-} from "react";
-
-export type SidebarMode = "tabs" | "diff";
-
-interface ModeCarouselProps {
-	modes: SidebarMode[];
-	currentMode: SidebarMode;
-	onModeSelect: (mode: SidebarMode) => void;
-	children: (mode: SidebarMode, isActive: boolean) => ReactNode;
-	onScrollProgress: (progress: MotionValue<number>) => void;
-	isDragging?: boolean;
-}
+import { useCallback, useRef, useState } from "react";
+import { ModeContent } from "./components/ModeContent";
+import { ModeHeader } from "./components/ModeHeader";
+import { ModeNavigation } from "./components/ModeNavigation";
+import { useModeDetection } from "./hooks/useModeDetection";
+import { useScrollProgress } from "./hooks/useScrollProgress";
+import { useScrollSnap } from "./hooks/useScrollSnap";
+import type { ModeCarouselProps } from "./types";
 
 export function ModeCarousel({
 	modes,
@@ -26,13 +15,8 @@ export function ModeCarousel({
 	onScrollProgress,
 	isDragging = false,
 }: ModeCarouselProps) {
-	const scrollTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 	const isInitialMount = useRef(true);
-
 	const currentIndex = modes.findIndex((m) => m === currentMode);
-	const initialProgress = currentIndex >= 0 ? currentIndex : 0;
-	const modeProgress = useMotionValue(initialProgress);
-
 	const [scrollContainer, setScrollContainer] = useState<HTMLDivElement | null>(
 		null,
 	);
@@ -44,143 +28,87 @@ export function ModeCarousel({
 		}
 	}, []);
 
-	// Track scroll position and update motion value
-	useEffect(() => {
-		if (!scrollContainer) return;
+	// Track scroll progress
+	const modeProgress = useScrollProgress({
+		scrollContainer,
+		currentIndex,
+		onScrollProgress,
+	});
 
-		let rafId: number | undefined;
+	// Handle scroll snapping
+	useScrollSnap({
+		scrollContainer,
+		currentIndex,
+		isInitialMount,
+	});
 
-		const updateProgress = () => {
-			const scrollLeft = scrollContainer.scrollLeft;
-			const containerWidth = scrollContainer.offsetWidth;
-			const progress = scrollLeft / containerWidth;
-			modeProgress.set(progress);
-		};
-
-		const handleScroll = () => {
-			// Use requestAnimationFrame for smooth updates
-			if (rafId !== undefined) {
-				cancelAnimationFrame(rafId);
-			}
-			rafId = requestAnimationFrame(updateProgress);
-		};
-
-		scrollContainer.addEventListener("scroll", handleScroll, { passive: true });
-
-		// Initial value
-		updateProgress();
-
-		return () => {
-			scrollContainer.removeEventListener("scroll", handleScroll);
-			if (rafId !== undefined) {
-				cancelAnimationFrame(rafId);
-			}
-		};
-	}, [scrollContainer, modeProgress]);
-
-	// Expose scroll progress to parent
-	useEffect(() => {
-		onScrollProgress(modeProgress);
-	}, [onScrollProgress, modeProgress]);
-
-	// Scroll to current mode when it changes externally
-	useEffect(() => {
-		if (!scrollContainer || currentIndex < 0) return;
-
-		const targetScrollX = currentIndex * scrollContainer.offsetWidth;
-
-		// Only scroll if we're not already at the target position
-		if (Math.abs(scrollContainer.scrollLeft - targetScrollX) > 10) {
-			scrollContainer.scrollTo({
-				left: targetScrollX,
-				behavior: isInitialMount.current ? "auto" : "smooth",
-			});
-		}
-
-		// Mark that initial mount is complete
-		isInitialMount.current = false;
-	}, [currentIndex, scrollContainer]);
-
-	// Detect when user finishes scrolling and update current mode
-	useEffect(() => {
-		if (!scrollContainer || isDragging) return;
-
-		const handleScroll = () => {
-			// Clear existing timeout
-			if (scrollTimeoutRef.current) {
-				clearTimeout(scrollTimeoutRef.current);
-			}
-
-			// Wait for scroll to settle (150ms after last scroll event)
-			scrollTimeoutRef.current = setTimeout(() => {
-				const scrollLeft = scrollContainer.scrollLeft;
-				const containerWidth = scrollContainer.offsetWidth;
-
-				// Calculate which mode we're closest to
-				const newIndex = Math.round(scrollLeft / containerWidth);
-
-				// Update mode if it changed
-				if (
-					newIndex >= 0 &&
-					newIndex < modes.length &&
-					modes[newIndex] &&
-					modes[newIndex] !== currentMode
-				) {
-					onModeSelect(modes[newIndex]);
-				}
-			}, 150);
-		};
-
-		scrollContainer.addEventListener("scroll", handleScroll);
-
-		return () => {
-			scrollContainer.removeEventListener("scroll", handleScroll);
-			if (scrollTimeoutRef.current) {
-				clearTimeout(scrollTimeoutRef.current);
-			}
-		};
-	}, [modes, currentMode, onModeSelect, scrollContainer, isDragging]);
+	// Detect mode changes from scrolling
+	useModeDetection({
+		scrollContainer,
+		modes,
+		currentMode,
+		onModeSelect,
+		isDragging,
+	});
 
 	// If only one mode or no modes, disable carousel
 	if (modes.length <= 1) {
 		return (
-			<div className="flex-1 overflow-y-auto px-3">
-				{children(currentMode, true)}
+			<div className="flex flex-col flex-1 h-full">
+				<div className="flex-1 overflow-y-auto">
+					<ModeHeader mode={currentMode} />
+					<div className="px-3">{children(currentMode, true)}</div>
+				</div>
 			</div>
 		);
 	}
 
 	return (
-		<div
-			ref={scrollContainerRef}
-			className="flex-1 overflow-x-scroll overflow-y-hidden hide-scrollbar"
-			style={{
-				scrollSnapType: isDragging ? "none" : "x mandatory",
-				WebkitOverflowScrolling: "touch",
-				scrollbarWidth: "none",
-				msOverflowStyle: "none",
-				pointerEvents: isDragging ? "none" : "auto",
-			}}
-		>
+		<div className="flex flex-col flex-1 h-full">
+			{/* Carousel content */}
 			<div
-				className="flex h-full"
-				style={{ width: `${modes.length * 100}%` }}
+				ref={scrollContainerRef}
+				className="flex-1 overflow-x-scroll overflow-y-hidden hide-scrollbar"
+				style={{
+					scrollSnapType: isDragging ? "none" : "x mandatory",
+					scrollSnapStop: "always",
+					scrollBehavior: "smooth",
+					WebkitOverflowScrolling: "touch",
+					overscrollBehaviorX: "contain",
+					scrollbarWidth: "none",
+					msOverflowStyle: "none",
+					pointerEvents: isDragging ? "none" : "auto",
+				}}
 			>
-				{modes.map((mode) => (
-					<div
-						key={mode}
-						className="overflow-y-auto px-3"
-						style={{
-							scrollSnapAlign: "start",
-							scrollSnapStop: "always",
-							width: `${100 / modes.length}%`,
-						}}
-					>
-						{children(mode, mode === currentMode)}
-					</div>
-				))}
+				<div
+					className="flex h-full"
+					style={{ width: `${modes.length * 100}%` }}
+				>
+					{modes.map((mode) => (
+						<div
+							key={mode}
+							style={{
+								width: `${100 / modes.length}%`,
+							}}
+						>
+							<ModeContent
+								mode={mode}
+								isActive={mode === currentMode}
+							>
+								{children(mode, mode === currentMode)}
+							</ModeContent>
+						</div>
+					))}
+				</div>
 			</div>
+
+			{/* Bottom navigation bar */}
+			<ModeNavigation
+				modes={modes}
+				currentMode={currentMode}
+				onModeSelect={onModeSelect}
+				scrollProgress={modeProgress}
+			/>
 		</div>
 	);
 }
-
