@@ -690,11 +690,99 @@ class WorktreeManager {
 	}
 
 	/**
-	 * Get file list with stats (without full diff content) - non-blocking
+	 * Detect the main branch of a repository
+	 * Tries: main, master, then git's default branch
 	 */
+	async detectMainBranch(repoPath: string): Promise<string> {
+		// Try common main branch names
+		const candidates = ["main", "master"];
+
+		for (const candidate of candidates) {
+			try {
+				await execAsync(`git rev-parse --verify ${candidate}`, {
+					cwd: repoPath,
+				});
+				return candidate;
+			} catch {
+				// Try remote version
+				try {
+					await execAsync(`git rev-parse --verify origin/${candidate}`, {
+						cwd: repoPath,
+					});
+					return `origin/${candidate}`;
+				} catch {
+					// Continue to next candidate
+				}
+			}
+		}
+
+		// Fallback: try to get git's default branch
+		try {
+			const result = await execAsync(
+				"git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'",
+				{ cwd: repoPath },
+			);
+			const defaultBranch = result.stdout.trim();
+			if (defaultBranch) {
+				return defaultBranch;
+			}
+		} catch {
+			// Ignore errors
+		}
+
+		// Last resort: return "main" and let caller handle the error
+		return "main";
+	}
+
+	/**
+	 * Check if a file should be excluded from diff (build artifacts, dependencies, etc.)
+	 */
+	private shouldExcludeFile(filePath: string): boolean {
+		const excludePatterns = [
+			// Dependencies
+			/node_modules/,
+			/\.pnp\./,
+			/\.yarn\//,
+			// Build outputs
+			/\/dist\//,
+			/\/dist-ssr\//,
+			/\/dist-electron\//,
+			/\/build\//,
+			/\/\.next\//,
+			/\/out\//,
+			/\/release\//,
+			/\/coverage\//,
+			// Lock files
+			/package-lock\.json$/,
+			/yarn\.lock$/,
+			/pnpm-lock\.yaml$/,
+			// Environment files
+			/\.env$/,
+			/\.env\./,
+			// Editor files
+			/\.DS_Store$/,
+			/\.vscode\//,
+			/\.idea\//,
+			// Cache files
+			/\.turbo\//,
+			/\.eslintcache$/,
+			/\.tsbuildinfo$/,
+			// Test results
+			/\/test-results\//,
+			/\/playwright-report\//,
+			/\/playwright\/\.cache\//,
+			// Temporary files
+			/\.tmp\//,
+			// Electron build artifacts
+			/electron\.vite\.config\.\d+\.mjs$/,
+		];
+
+		return excludePatterns.some((pattern) => pattern.test(filePath));
+	}
+
 	async getGitDiffFileList(
 		worktreePath: string,
-		mainBranch: string,
+		_configuredBranch: string,
 	): Promise<{
 		success: boolean;
 		files?: Array<{
@@ -709,9 +797,45 @@ class WorktreeManager {
 		error?: string;
 	}> {
 		try {
+			// Detect the actual main branch (main/master) instead of using configured branch
+			// This ensures we always compare against the main branch, not a feature branch
+			// Get the actual git repository root (works for both regular repos and worktrees)
+			let repoPath = worktreePath;
+			try {
+				const gitDirResult = await execAsync("git rev-parse --show-toplevel", {
+					cwd: worktreePath,
+				});
+				repoPath = gitDirResult.stdout.trim();
+			} catch {
+				// Fallback: try to find .git directory
+				let currentPath = worktreePath;
+				while (currentPath !== "/" && currentPath !== "") {
+					if (existsSync(path.join(currentPath, ".git"))) {
+						repoPath = currentPath;
+						break;
+					}
+					currentPath = path.dirname(currentPath);
+				}
+			}
+
+			const mainBranch = await this.detectMainBranch(repoPath);
+
+			// Verify mainBranch exists
+			try {
+				await execAsync(`git rev-parse --verify ${mainBranch}`, {
+					cwd: worktreePath,
+				});
+			} catch {
+				return {
+					success: false,
+					error: `Main branch "${mainBranch}" not found in repository`,
+				};
+			}
+
 			// Get list of changed files with status
+			// Using three-dot syntax to show only committed changes (HEAD vs mainBranch)
 			const diffFilesResult = await execAsync(
-				`git diff ${mainBranch} --name-status`,
+				`git diff ${mainBranch}...HEAD --name-status`,
 				{ cwd: worktreePath },
 			);
 
@@ -719,6 +843,7 @@ class WorktreeManager {
 				.trim()
 				.split("\n")
 				.filter(Boolean);
+
 			const files = [];
 
 			for (let i = 0; i < fileLines.length; i++) {
@@ -727,6 +852,11 @@ class WorktreeManager {
 				const statusCode = parts[0];
 				const filePath = parts[1];
 				const oldPath = parts[2]; // For renamed files
+
+				// Check if file should be excluded
+				if (this.shouldExcludeFile(filePath) || (oldPath && this.shouldExcludeFile(oldPath))) {
+					continue;
+				}
 
 				// Determine status
 				let status: "added" | "deleted" | "modified" | "renamed" = "modified";
@@ -756,7 +886,7 @@ class WorktreeManager {
 							deletions = parseInt(statParts[1], 10) || 0;
 						}
 					}
-				} catch (statError) {
+				} catch {
 					// If stat fails, try to get from shortstat
 					try {
 						const shortStatResult = await execAsync(
@@ -823,10 +953,11 @@ class WorktreeManager {
 	}> {
 		try {
 			// Get detailed diff for this file
+			// Use three-dot syntax to show only committed changes (HEAD vs mainBranch)
 			const diffCommand =
 				status === "deleted"
-					? `git diff ${mainBranch} -- "${filePath}"`
-					: `git diff ${mainBranch} -- "${oldPath || filePath}"`;
+					? `git diff ${mainBranch}...HEAD -- "${filePath}"`
+					: `git diff ${mainBranch}...HEAD -- "${oldPath || filePath}"`;
 
 			const fileDiffResult = await execAsync(diffCommand, {
 				cwd: worktreePath,
@@ -847,6 +978,16 @@ class WorktreeManager {
 			let newLineNum = 0;
 
 			const diffLines = diffOutput.split("\n");
+			// Only include 3 lines of context around changes to reduce data size
+			// This dramatically reduces memory usage for large files with few changes
+			const CONTEXT_LINES = 3;
+			let contextBuffer: Array<{
+				type: "unchanged";
+				oldLineNumber: number;
+				newLineNumber: number;
+				content: string;
+			}> = [];
+
 			for (let i = 0; i < diffLines.length; i++) {
 				const line = diffLines[i];
 
@@ -857,6 +998,8 @@ class WorktreeManager {
 						oldLineNum = parseInt(match[1], 10);
 						newLineNum = parseInt(match[2], 10);
 					}
+					// Flush context buffer when starting a new hunk
+					contextBuffer = [];
 					continue;
 				}
 
@@ -872,6 +1015,13 @@ class WorktreeManager {
 
 				// Parse actual changes
 				if (line.startsWith("+")) {
+					// Flush context buffer before adding change
+					if (contextBuffer.length > 0) {
+						// Only include up to CONTEXT_LINES from buffer
+						const contextToInclude = contextBuffer.slice(-CONTEXT_LINES);
+						changes.push(...contextToInclude);
+						contextBuffer = [];
+					}
 					changes.push({
 						type: "added",
 						oldLineNumber: null,
@@ -880,6 +1030,12 @@ class WorktreeManager {
 					});
 					newLineNum++;
 				} else if (line.startsWith("-")) {
+					// Flush context buffer before removing change
+					if (contextBuffer.length > 0) {
+						const contextToInclude = contextBuffer.slice(-CONTEXT_LINES);
+						changes.push(...contextToInclude);
+						contextBuffer = [];
+					}
 					changes.push({
 						type: "removed",
 						oldLineNumber: oldLineNum,
@@ -888,12 +1044,17 @@ class WorktreeManager {
 					});
 					oldLineNum++;
 				} else if (line.startsWith(" ")) {
-					changes.push({
+					// Store unchanged lines in buffer (only keep last CONTEXT_LINES)
+					contextBuffer.push({
 						type: "unchanged",
 						oldLineNumber: oldLineNum,
 						newLineNumber: newLineNum,
 						content: line.substring(1),
 					});
+					// Keep buffer size limited
+					if (contextBuffer.length > CONTEXT_LINES * 2) {
+						contextBuffer.shift();
+					}
 					oldLineNum++;
 					newLineNum++;
 				}
