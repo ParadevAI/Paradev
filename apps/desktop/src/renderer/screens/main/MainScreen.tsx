@@ -1,93 +1,294 @@
 import {
-	closestCenter,
-	DndContext,
-	type DragEndEvent,
-	type DragOverEvent,
-	DragOverlay,
-	type DragStartEvent,
-	KeyboardSensor,
-	PointerSensor,
-	useDroppable,
-	useSensor,
-	useSensors,
-} from "@dnd-kit/core";
-import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
-import {
 	ResizableHandle,
 	ResizablePanel,
 	ResizablePanelGroup,
 } from "@superset/ui/resizable";
 import { useEffect, useRef, useState } from "react";
 import type { ImperativePanelHandle } from "react-resizable-panels";
-import type {
-	MosaicNode,
-	Tab,
-	TabType,
-	Workspace,
-	Worktree,
-} from "shared/types";
-import { createShortcutHandler } from "../../lib/keyboard-shortcuts";
-import {
-	createTabShortcuts,
-	createWorkspaceShortcuts,
-} from "../../lib/shortcuts";
+import type { Tab, Workspace, Worktree } from "shared/types";
 import { AppFrame } from "./components/AppFrame";
 import { Background } from "./components/Background";
+import { AddTaskModal } from "./components/Layout/AddTaskModal";
+import type { TaskStatus } from "./components/Layout/StatusIndicator";
+import { TaskTabs, type WorktreeWithTask } from "./components/Layout/TaskTabs";
 import TabContent from "./components/MainContent/TabContent";
 import TabGroup from "./components/MainContent/TabGroup";
-import { NewLayoutMain } from "./components/NewLayout/NewLayoutMain";
 import { PlaceholderState } from "./components/PlaceholderState";
+import { PlanView } from "./components/PlanView";
 import { Sidebar } from "./components/Sidebar";
 import { DiffTab } from "./components/TabContent/components/DiffTab";
-import { TopBar } from "./components/TopBar";
 
-// Droppable wrapper for main content area
-function DroppableMainContent({
-	children,
-	isOver,
-}: {
-	children: React.ReactNode;
-	isOver: boolean;
-}) {
-	const { setNodeRef } = useDroppable({
-		id: "main-content-drop-zone",
-		data: {
-			type: "main-content",
-		},
+// Type alias for task data used in UI
+type UITask = {
+	id: string;
+	slug: string;
+	name: string;
+	status: TaskStatus;
+	branch: string;
+	description: string;
+	assignee: string;
+	assigneeAvatarUrl: string;
+	lastUpdated: string;
+};
+
+// Type for pending worktrees (optimistic updates)
+type PendingWorktree = {
+	id: string;
+	isPending: true;
+	title: string;
+	branch: string;
+	description?: string;
+	taskData?: {
+		slug: string;
+		name: string;
+		status: TaskStatus;
+	};
+};
+
+// Mock tasks data - TODO: Replace with actual task data from backend
+const MOCK_TASKS = [
+	{
+		id: "1",
+		slug: "SSET-1",
+		name: "Homepage Redesign",
+		status: "working" as const,
+		branch: "feature/homepage-redesign",
+		description: "Redesigning the homepage with new branding and improved UX",
+		assignee: "Alice",
+		assigneeAvatarUrl: "https://i.pravatar.cc/150?img=1",
+		lastUpdated: "2 hours ago",
+	},
+	{
+		id: "2",
+		slug: "SSET-2",
+		name: "API Integration",
+		status: "needs-feedback" as const,
+		branch: "feature/api-integration",
+		description: "Integrate new REST API endpoints for user management",
+		assignee: "Bob",
+		assigneeAvatarUrl: "https://i.pravatar.cc/150?img=12",
+		lastUpdated: "1 day ago",
+	},
+	{
+		id: "3",
+		slug: "SSET-3",
+		name: "Bug Fixes",
+		status: "planning" as const,
+		branch: "fix/various-bugs",
+		description: "Collection of bug fixes reported by users",
+		assignee: "Charlie",
+		assigneeAvatarUrl: "https://i.pravatar.cc/150?img=33",
+		lastUpdated: "3 days ago",
+	},
+	{
+		id: "4",
+		slug: "SSET-4",
+		name: "Performance Optimization",
+		status: "ready-to-merge" as const,
+		branch: "perf/optimize-queries",
+		description: "Optimize database queries for faster page loads",
+		assignee: "Diana",
+		assigneeAvatarUrl: "https://i.pravatar.cc/150?img=9",
+		lastUpdated: "5 minutes ago",
+	},
+	{
+		id: "5",
+		slug: "SSET-5",
+		name: "User Authentication System",
+		status: "working" as const,
+		branch: "feature/auth-system",
+		description:
+			"Implement OAuth2 and JWT-based authentication system with refresh tokens",
+		assignee: "Eve",
+		assigneeAvatarUrl: "https://i.pravatar.cc/150?img=5",
+		lastUpdated: "3 hours ago",
+	},
+	{
+		id: "6",
+		slug: "SSET-6",
+		name: "Dark Mode Support",
+		status: "planning" as const,
+		branch: "feature/dark-mode",
+		description: "Add dark mode theme support across the entire application",
+		assignee: "Frank",
+		assigneeAvatarUrl: "https://i.pravatar.cc/150?img=13",
+		lastUpdated: "2 days ago",
+	},
+	{
+		id: "7",
+		slug: "SSET-7",
+		name: "Database Migration Scripts",
+		status: "ready-to-merge" as const,
+		branch: "db/migration-scripts",
+		description:
+			"Create automated migration scripts for production database updates",
+		assignee: "Grace",
+		assigneeAvatarUrl: "https://i.pravatar.cc/150?img=20",
+		lastUpdated: "1 hour ago",
+	},
+	{
+		id: "8",
+		slug: "SSET-8",
+		name: "Email Notification Service",
+		status: "needs-feedback" as const,
+		branch: "feature/email-notifications",
+		description:
+			"Build email notification service using SendGrid for transactional emails",
+		assignee: "Henry",
+		assigneeAvatarUrl: "https://i.pravatar.cc/150?img=8",
+		lastUpdated: "4 hours ago",
+	},
+	{
+		id: "9",
+		slug: "SSET-9",
+		name: "Mobile Responsive Design",
+		status: "working" as const,
+		branch: "feature/mobile-responsive",
+		description:
+			"Make the application fully responsive for mobile and tablet devices",
+		assignee: "Iris",
+		assigneeAvatarUrl: "https://i.pravatar.cc/150?img=16",
+		lastUpdated: "6 hours ago",
+	},
+	{
+		id: "10",
+		slug: "SSET-10",
+		name: "Analytics Dashboard",
+		status: "planning" as const,
+		branch: "feature/analytics-dashboard",
+		description:
+			"Create admin dashboard with charts and metrics for user analytics",
+		assignee: "Jack",
+		assigneeAvatarUrl: "https://i.pravatar.cc/150?img=11",
+		lastUpdated: "1 week ago",
+	},
+	{
+		id: "11",
+		slug: "SSET-11",
+		name: "CI/CD Pipeline",
+		status: "ready-to-merge" as const,
+		branch: "devops/ci-cd-pipeline",
+		description:
+			"Set up automated CI/CD pipeline with GitHub Actions and Docker",
+		assignee: "Kate",
+		assigneeAvatarUrl: "https://i.pravatar.cc/150?img=25",
+		lastUpdated: "30 minutes ago",
+	},
+	{
+		id: "12",
+		slug: "SSET-12",
+		name: "Search Functionality",
+		status: "working" as const,
+		branch: "feature/search",
+		description: "Implement full-text search with Elasticsearch integration",
+		assignee: "Liam",
+		assigneeAvatarUrl: "https://i.pravatar.cc/150?img=14",
+		lastUpdated: "5 hours ago",
+	},
+	{
+		id: "13",
+		slug: "SSET-13",
+		name: "File Upload System",
+		status: "needs-feedback" as const,
+		branch: "feature/file-uploads",
+		description:
+			"Build secure file upload system with S3 storage and virus scanning",
+		assignee: "Mia",
+		assigneeAvatarUrl: "https://i.pravatar.cc/150?img=27",
+		lastUpdated: "2 hours ago",
+	},
+	{
+		id: "14",
+		slug: "SSET-14",
+		name: "API Rate Limiting",
+		status: "planning" as const,
+		branch: "feature/rate-limiting",
+		description: "Implement rate limiting and throttling for API endpoints",
+		assignee: "Noah",
+		assigneeAvatarUrl: "https://i.pravatar.cc/150?img=17",
+		lastUpdated: "4 days ago",
+	},
+	{
+		id: "15",
+		slug: "SSET-15",
+		name: "Internationalization",
+		status: "working" as const,
+		branch: "feature/i18n",
+		description:
+			"Add multi-language support with i18next for English, Spanish, and French",
+		assignee: "Olivia",
+		assigneeAvatarUrl: "https://i.pravatar.cc/150?img=32",
+		lastUpdated: "8 hours ago",
+	},
+];
+
+// Helper function to enrich worktrees with task metadata
+function enrichWorktreesWithTasks(
+	worktrees: Worktree[],
+	pendingWorktrees: PendingWorktree[],
+): WorktreeWithTask[] {
+	// First, convert pending worktrees to WorktreeWithTask format
+	const pendingAsWorktrees: WorktreeWithTask[] = pendingWorktrees.map(
+		(pending) => ({
+			id: pending.id,
+			branch: pending.branch,
+			path: "", // Pending worktrees don't have a path yet
+			tabs: [],
+			createdAt: new Date().toISOString(),
+			isPending: true, // Mark as pending for UI
+			task: pending.taskData
+				? {
+					id: pending.id,
+					slug: pending.taskData.slug,
+					title: pending.taskData.name,
+					status: pending.taskData.status,
+					description: pending.description || "",
+				}
+				: undefined,
+		}),
+	);
+
+	// Then, enrich real worktrees with task metadata
+	const enrichedWorktrees = worktrees.map((worktree) => {
+		// Try to find a matching task by branch name
+		const matchingTask = MOCK_TASKS.find(
+			(task) => task.branch === worktree.branch,
+		);
+
+		if (matchingTask) {
+			// Worktree has an associated task - add task metadata
+			return {
+				...worktree,
+				task: {
+					id: matchingTask.id,
+					slug: matchingTask.slug,
+					title: matchingTask.name,
+					status: matchingTask.status,
+					description: matchingTask.description,
+					assignee: {
+						name: matchingTask.assignee,
+						avatarUrl: matchingTask.assigneeAvatarUrl,
+					},
+					lastUpdated: matchingTask.lastUpdated,
+				},
+			};
+		}
+
+		// Worktree without task - return as-is
+		return worktree;
 	});
 
-	return (
-		<div
-			ref={setNodeRef}
-			className={`flex-1 overflow-hidden m-1 rounded-lg relative ${
-				isOver ? "ring-2 ring-blue-500 ring-inset" : ""
-			}`}
-		>
-			{children}
-			{isOver && (
-				<div className="absolute inset-0 bg-blue-500/10 pointer-events-none flex items-center justify-center">
-					<div className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium">
-						Drop to add to split view
-					</div>
-				</div>
-			)}
-		</div>
-	);
+	// Merge pending and real worktrees
+	return [...pendingAsWorktrees, ...enrichedWorktrees];
 }
 
 export function MainScreen() {
-	// Check if new UI is enabled
-	const enableNewUI = import.meta.env.ENABLE_NEW_UI === "true";
-
-	// If new UI is enabled, render the new layout
-	if (enableNewUI) {
-		return <NewLayoutMain />;
-	}
-
-	// Otherwise, render the original layout
+	const sidebarPanelRef = useRef<ImperativePanelHandle>(null);
 	const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 	const [showSidebarOverlay, setShowSidebarOverlay] = useState(false);
-	const sidebarPanelRef = useRef<ImperativePanelHandle>(null);
+	const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
+
+	// Workspace state
 	const [workspaces, setWorkspaces] = useState<Workspace[] | null>(null);
 	const [currentWorkspace, setCurrentWorkspace] = useState<Workspace | null>(
 		null,
@@ -95,50 +296,235 @@ export function MainScreen() {
 	const [selectedWorktreeId, setSelectedWorktreeId] = useState<string | null>(
 		null,
 	);
-	const [selectedTabId, setSelectedTabId] = useState<string | null>(null); // Can be a group tab or any tab
+	const [selectedTabId, setSelectedTabId] = useState<string | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+	const [mode, setMode] = useState<"plan" | "edit">("edit");
+	const [pendingWorktrees, setPendingWorktrees] = useState<PendingWorktree[]>(
+		[],
+	);
 
-	// Diff view state
-	const [showDiffView, setShowDiffView] = useState(false);
-	const [diffWorktreeId, setDiffWorktreeId] = useState<string | null>(null);
+	// Compute which tasks have worktrees (are "open")
+	const openTasks = MOCK_TASKS.filter((task) =>
+		currentWorkspace?.worktrees?.some((wt) => wt.branch === task.branch),
+	);
 
-	// Drag and drop state
-	const [activeId, setActiveId] = useState<string | null>(null);
-	const [isOverMainContent, setIsOverMainContent] = useState(false);
+	const handleCollapseSidebar = () => {
+		const panel = sidebarPanelRef.current;
+		if (panel && !panel.isCollapsed()) {
+			panel.collapse();
+			setIsSidebarOpen(false);
+		}
+	};
 
+	const handleExpandSidebar = () => {
+		const panel = sidebarPanelRef.current;
+		if (panel?.isCollapsed()) {
+			panel.expand();
+			setIsSidebarOpen(true);
+		}
+	};
+
+	// Get selected worktree
 	const selectedWorktree = currentWorkspace?.worktrees?.find(
 		(wt) => wt.id === selectedWorktreeId,
 	);
 
-	const diffWorktree = currentWorkspace?.worktrees?.find(
-		(wt) => wt.id === diffWorktreeId,
-	);
+	// Helper function to find a tab recursively (for finding sub-tabs inside groups)
+	const findTabRecursive = (
+		tabs: Tab[] | undefined,
+		tabId: string,
+	): { tab: Tab; parent?: Tab } | null => {
+		if (!tabs) return null;
 
-	// Helper: Create a new tab
-	const createTab = async (
-		workspaceId: string,
-		worktreeId: string,
-		name: string,
-		type: TabType,
-	) => {
-		const result = await window.ipcRenderer.invoke("tab-create", {
-			workspaceId,
-			worktreeId,
-			name,
-			type,
-		});
-
-		if (!result.success || !result.tab) {
-			console.error("[MainScreen] Failed to create tab:", result.error);
-			return null;
+		for (const tab of tabs) {
+			if (tab.id === tabId) {
+				return { tab };
+			}
+			// Check if this tab is a group tab with children
+			if (tab.type === "group" && tab.tabs) {
+				for (const childTab of tab.tabs) {
+					if (childTab.id === tabId) {
+						return { tab: childTab, parent: tab };
+					}
+				}
+			}
 		}
-
-		return result.tab;
+		return null;
 	};
 
-	// Helper: Show diff view for a worktree - now creates a tab
-	const handleShowDiffView = async (worktreeId: string) => {
+	// Get selected tab and its parent (if it's a sub-tab)
+	const tabResult = selectedWorktree?.tabs
+		? findTabRecursive(selectedWorktree.tabs, selectedTabId ?? "")
+		: null;
+
+	const selectedTab = tabResult?.tab;
+	const parentGroupTab = tabResult?.parent;
+
+	// Load all workspaces
+	const loadAllWorkspaces = async () => {
+		try {
+			const allWorkspaces = await window.ipcRenderer.invoke("workspace-list");
+			setWorkspaces(allWorkspaces);
+		} catch (error) {
+			console.error("Failed to load workspaces:", error);
+		}
+	};
+
+	// Optimistically add a tab to the current workspace
+	const handleTabCreated = (worktreeId: string, tab: Tab) => {
+		if (!currentWorkspace) return;
+
+		// Find the worktree and add the tab
+		const updatedWorktrees = currentWorkspace.worktrees.map((wt) => {
+			if (wt.id === worktreeId) {
+				return {
+					...wt,
+					tabs: [...wt.tabs, tab],
+				};
+			}
+			return wt;
+		});
+
+		const updatedWorkspace = {
+			...currentWorkspace,
+			worktrees: updatedWorktrees,
+			activeWorktreeId: worktreeId,
+			activeTabId: tab.id,
+		};
+
+		setCurrentWorkspace(updatedWorkspace);
+
+		// Also update in workspaces array
+		if (workspaces) {
+			setWorkspaces(
+				workspaces.map((ws) =>
+					ws.id === currentWorkspace.id ? updatedWorkspace : ws,
+				),
+			);
+		}
+	};
+
+	// Handle tab selection
+	const handleTabSelect = (worktreeId: string, tabId: string) => {
+		setSelectedWorktreeId(worktreeId);
+		setSelectedTabId(tabId);
+
+		if (currentWorkspace) {
+			window.ipcRenderer.invoke("workspace-set-active-selection", {
+				workspaceId: currentWorkspace.id,
+				worktreeId,
+				tabId,
+			});
+
+			setCurrentWorkspace({
+				...currentWorkspace,
+				activeWorktreeId: worktreeId,
+				activeTabId: tabId,
+			});
+		}
+	};
+
+	// Handle tab focus (for terminals)
+	const handleTabFocus = (tabId: string) => {
+		if (!currentWorkspace || !selectedWorktreeId) return;
+
+		setSelectedTabId(tabId);
+
+		window.ipcRenderer.invoke("workspace-set-active-selection", {
+			workspaceId: currentWorkspace.id,
+			worktreeId: selectedWorktreeId,
+			tabId,
+		});
+
+		setCurrentWorkspace({
+			...currentWorkspace,
+			activeWorktreeId: selectedWorktreeId,
+			activeTabId: tabId,
+		});
+	};
+
+	// Handle workspace selection
+	const handleWorkspaceSelect = async (workspaceId: string) => {
+		try {
+			const workspace = await window.ipcRenderer.invoke(
+				"workspace-get",
+				workspaceId,
+			);
+
+			if (workspace) {
+				setCurrentWorkspace(workspace);
+				await window.ipcRenderer.invoke(
+					"workspace-set-active-workspace-id",
+					workspaceId,
+				);
+
+				const activeSelection = await window.ipcRenderer.invoke(
+					"workspace-get-active-selection",
+					workspaceId,
+				);
+
+				if (activeSelection?.worktreeId && activeSelection?.tabId) {
+					setSelectedWorktreeId(activeSelection.worktreeId);
+					setSelectedTabId(activeSelection.tabId);
+				} else {
+					setSelectedWorktreeId(null);
+					setSelectedTabId(null);
+				}
+			}
+		} catch (error) {
+			console.error("Failed to load workspace:", error);
+		}
+	};
+
+	// Handle worktree created
+	const handleWorktreeCreated = async () => {
+		if (!currentWorkspace) return;
+
+		try {
+			const refreshedWorkspace = await window.ipcRenderer.invoke(
+				"workspace-get",
+				currentWorkspace.id,
+			);
+
+			if (refreshedWorkspace) {
+				setCurrentWorkspace(refreshedWorkspace);
+				await loadAllWorkspaces();
+			}
+		} catch (error) {
+			console.error("Failed to refresh workspace:", error);
+		}
+	};
+
+	// Handle worktree update
+	const handleUpdateWorktree = (
+		worktreeId: string,
+		updatedWorktree: Worktree,
+	) => {
+		if (!currentWorkspace) return;
+
+		const updatedWorktrees = currentWorkspace.worktrees.map((wt) =>
+			wt.id === worktreeId ? updatedWorktree : wt,
+		);
+
+		const updatedCurrentWorkspace = {
+			...currentWorkspace,
+			worktrees: updatedWorktrees,
+		};
+
+		setCurrentWorkspace(updatedCurrentWorkspace);
+
+		if (workspaces) {
+			setWorkspaces(
+				workspaces.map((ws) =>
+					ws.id === currentWorkspace.id ? updatedCurrentWorkspace : ws,
+				),
+			);
+		}
+	};
+
+	// Handle show diff - creates a diff tab
+	const handleShowDiff = async (worktreeId: string) => {
 		if (!currentWorkspace) return;
 
 		// Find the worktree
@@ -210,212 +596,246 @@ export function MainScreen() {
 		}
 	};
 
-	// Helper: Close diff view (legacy - can be removed if not used elsewhere)
-	const handleCloseDiffView = () => {
-		setShowDiffView(false);
-		setDiffWorktreeId(null);
+	// Task handlers
+	const handleOpenAddTaskModal = () => {
+		setIsAddTaskModalOpen(true);
 	};
 
-	// Configure sensors for drag-and-drop
-	const sensors = useSensors(
-		useSensor(PointerSensor, {
-			activationConstraint: {
-				distance: 8,
-			},
-		}),
-		useSensor(KeyboardSensor, {
-			coordinateGetter: sortableKeyboardCoordinates,
-		}),
-	);
-
-	// Helper function to find a tab recursively (for finding sub-tabs inside groups)
-	const findTabRecursive = (
-		tabs: Tab[] | undefined,
-		tabId: string,
-	): { tab: Tab; parent?: Tab } | null => {
-		if (!tabs) return null;
-
-		for (const tab of tabs) {
-			if (tab.id === tabId) {
-				return { tab };
-			}
-			// Check if this tab is a group tab with children
-			if (tab.type === "group" && tab.tabs) {
-				for (const childTab of tab.tabs) {
-					if (childTab.id === tabId) {
-						return { tab: childTab, parent: tab };
-					}
-				}
-			}
-		}
-		return null;
+	const handleCloseAddTaskModal = () => {
+		setIsAddTaskModalOpen(false);
 	};
 
-	// Get selected tab and its parent (if it's a sub-tab)
-	const tabResult = selectedWorktree?.tabs
-		? findTabRecursive(selectedWorktree.tabs, selectedTabId ?? "")
-		: null;
-
-	const selectedTab = tabResult?.tab;
-	const parentGroupTab = tabResult?.parent;
-
-	const handleTabSelect = (worktreeId: string, tabId: string) => {
-		setSelectedWorktreeId(worktreeId);
-		setSelectedTabId(tabId);
-		// Save active selection and update workspace state
-		if (currentWorkspace) {
-			window.ipcRenderer.invoke("workspace-set-active-selection", {
-				workspaceId: currentWorkspace.id,
-				worktreeId,
-				tabId,
-			});
-			// Update the current workspace state to reflect the new active selection
-			setCurrentWorkspace({
-				...currentWorkspace,
-				activeWorktreeId: worktreeId,
-				activeTabId: tabId,
-			});
-		}
-	};
-
-	const handleTabFocus = (tabId: string) => {
-		// When a terminal gets focus, update the selected tab
-		if (!currentWorkspace || !selectedWorktreeId) return;
-
-		setSelectedTabId(tabId);
-		// Save active selection and update workspace state
-		window.ipcRenderer.invoke("workspace-set-active-selection", {
-			workspaceId: currentWorkspace.id,
-			worktreeId: selectedWorktreeId,
-			tabId,
-		});
-		// Update the current workspace state to reflect the new active selection
-		setCurrentWorkspace({
-			...currentWorkspace,
-			activeWorktreeId: selectedWorktreeId,
-			activeTabId: tabId,
-		});
-	};
-
-	const handleWorkspaceSelect = async (workspaceId: string) => {
-		try {
-			const workspace = await window.ipcRenderer.invoke(
-				"workspace-get",
-				workspaceId,
-			);
-
-			if (workspace) {
-				setCurrentWorkspace(workspace);
-				// Persist the active workspace
-				await window.ipcRenderer.invoke(
-					"workspace-set-active-workspace-id",
-					workspaceId,
-				);
-				// Restore the active selection for this workspace
-				const activeSelection = await window.ipcRenderer.invoke(
-					"workspace-get-active-selection",
-					workspaceId,
-				);
-
-				if (activeSelection?.worktreeId && activeSelection?.tabId) {
-					setSelectedWorktreeId(activeSelection.worktreeId);
-					setSelectedTabId(activeSelection.tabId);
-				} else {
-					// No saved selection, reset
-					setSelectedWorktreeId(null);
-					setSelectedTabId(null);
-				}
-			}
-		} catch (error) {
-			console.error("Failed to load workspace:", error);
-		}
-	};
-
-	const handleWorktreeCreated = async () => {
-		// Refresh workspace data after worktree creation
+	const handleSelectTask = (task: UITask) => {
 		if (!currentWorkspace) return;
 
-		try {
-			const refreshedWorkspace = await window.ipcRenderer.invoke(
-				"workspace-get",
-				currentWorkspace.id,
-			);
-
-			if (refreshedWorkspace) {
-				setCurrentWorkspace(refreshedWorkspace);
-				// Also refresh workspaces list
-				await loadAllWorkspaces();
-			}
-		} catch (error) {
-			console.error("Failed to refresh workspace:", error);
-		}
-	};
-
-	const handleUpdateWorktree = (worktreeId: string, updatedWorktree: any) => {
-		// Optimistically update the worktree in the current workspace
-		if (!currentWorkspace) return;
-
-		const updatedWorktrees = currentWorkspace.worktrees.map((wt) =>
-			wt.id === worktreeId ? updatedWorktree : wt,
+		// Find existing worktree for this task's branch
+		const existingWorktree = currentWorkspace.worktrees?.find(
+			(wt) => wt.branch === task.branch,
 		);
 
-		const updatedCurrentWorkspace = {
-			...currentWorkspace,
-			worktrees: updatedWorktrees,
+		if (existingWorktree) {
+			// Worktree already exists - switch to it
+			setSelectedWorktreeId(existingWorktree.id);
+			if (existingWorktree.tabs && existingWorktree.tabs.length > 0) {
+				handleTabSelect(existingWorktree.id, existingWorktree.tabs[0].id);
+			}
+			handleCloseAddTaskModal();
+		} else {
+			// Worktree doesn't exist - create it with optimistic update
+			const pendingId = `pending-${Date.now()}`;
+			const pendingWorktree: PendingWorktree = {
+				id: pendingId,
+				isPending: true,
+				title: task.name,
+				branch: task.branch,
+				description: task.description,
+				taskData: {
+					slug: task.slug,
+					name: task.name,
+					status: task.status,
+				},
+			};
+
+			// Add pending worktree immediately
+			setPendingWorktrees((prev) => [...prev, pendingWorktree]);
+			handleCloseAddTaskModal();
+
+			void (async () => {
+				try {
+					const result = await window.ipcRenderer.invoke("worktree-create", {
+						workspaceId: currentWorkspace.id,
+						title: task.name,
+						branch: task.branch,
+						createBranch: false, // Branch should already exist
+						description: task.description,
+					});
+
+					if (result.success && result.worktree) {
+						// Remove pending worktree
+						setPendingWorktrees((prev) =>
+							prev.filter((wt) => wt.id !== pendingId),
+						);
+						// Refresh workspace to get the real worktree
+						await handleWorktreeCreated();
+						setSelectedWorktreeId(result.worktree.id);
+						if (result.worktree.tabs && result.worktree.tabs.length > 0) {
+							handleTabSelect(result.worktree.id, result.worktree.tabs[0].id);
+						}
+					} else {
+						// Remove pending on failure
+						setPendingWorktrees((prev) =>
+							prev.filter((wt) => wt.id !== pendingId),
+						);
+					}
+				} catch (error) {
+					console.error("Failed to create worktree for task:", error);
+					// Remove pending on error
+					setPendingWorktrees((prev) =>
+						prev.filter((wt) => wt.id !== pendingId),
+					);
+				}
+			})();
+		}
+	};
+
+	const handleCreateTask = (taskData: {
+		name: string;
+		description: string;
+		status: TaskStatus;
+		assignee: string;
+		branch: string;
+	}) => {
+		if (!currentWorkspace) return;
+
+		// Create pending worktree for optimistic update
+		const pendingId = `pending-${Date.now()}`;
+		const pendingWorktree: PendingWorktree = {
+			id: pendingId,
+			isPending: true,
+			title: taskData.name,
+			branch: taskData.branch,
+			description: taskData.description,
+			taskData: {
+				slug: "...", // Will be generated by backend
+				name: taskData.name,
+				status: taskData.status,
+			},
 		};
 
-		setCurrentWorkspace(updatedCurrentWorkspace);
+		// Add pending worktree immediately
+		setPendingWorktrees((prev) => [...prev, pendingWorktree]);
+		handleCloseAddTaskModal();
 
-		// Also update the workspaces array so the carousel renders the updated data
-		if (workspaces) {
-			setWorkspaces(
-				workspaces.map((ws) =>
-					ws.id === currentWorkspace.id ? updatedCurrentWorkspace : ws,
-				),
-			);
-		}
+		void (async () => {
+			try {
+				// Create a worktree for this task
+				const result = await window.ipcRenderer.invoke("worktree-create", {
+					workspaceId: currentWorkspace.id,
+					title: taskData.name,
+					branch: taskData.branch,
+					createBranch: true,
+					description: taskData.description,
+				});
+
+				if (result.success && result.worktree) {
+					// Remove pending worktree
+					setPendingWorktrees((prev) =>
+						prev.filter((wt) => wt.id !== pendingId),
+					);
+
+					// Reload workspace to get the new worktree
+					await handleWorktreeCreated();
+
+					// Switch to the new worktree
+					setSelectedWorktreeId(result.worktree.id);
+
+					// Select first tab if available
+					if (result.worktree.tabs && result.worktree.tabs.length > 0) {
+						handleTabSelect(result.worktree.id, result.worktree.tabs[0].id);
+					}
+				} else {
+					// Remove pending on failure
+					setPendingWorktrees((prev) =>
+						prev.filter((wt) => wt.id !== pendingId),
+					);
+				}
+			} catch (error) {
+				console.error("Failed to create task/worktree:", error);
+				// Remove pending on error
+				setPendingWorktrees((prev) => prev.filter((wt) => wt.id !== pendingId));
+			}
+		})();
 	};
 
-	const loadAllWorkspaces = async () => {
+	const handleCreatePR = async () => {
+		if (!currentWorkspace || !selectedWorktreeId) return;
+
+		const worktree = currentWorkspace.worktrees?.find(
+			(wt) => wt.id === selectedWorktreeId,
+		);
+		if (!worktree) return;
+
 		try {
-			const allWorkspaces = await window.ipcRenderer.invoke("workspace-list");
+			const result = await window.ipcRenderer.invoke("worktree-create-pr", {
+				workspaceId: currentWorkspace.id,
+				worktreeId: selectedWorktreeId,
+			});
 
-			setWorkspaces(allWorkspaces);
+			if (result.success) {
+				// Reload workspace to show updated PR state
+				const refreshedWorkspace = await window.ipcRenderer.invoke(
+					"workspace-get",
+					currentWorkspace.id,
+				);
+				if (refreshedWorkspace) {
+					setCurrentWorkspace(refreshedWorkspace);
+				}
+
+				// Open PR URL in default browser only if we have a valid URL
+				// (--web mode opens browser automatically, so we don't need to open it again)
+				if (result.prUrl?.startsWith("http")) {
+					await window.ipcRenderer.invoke("open-external", result.prUrl);
+				}
+			} else {
+				// Show error as alert
+				alert(`Failed to create PR: ${result.error || "Unknown error"}`);
+			}
 		} catch (error) {
-			console.error("Failed to load workspaces:", error);
+			const errorMessage =
+				error instanceof Error ? error.message : String(error);
+			alert(`Failed to create PR: ${errorMessage}`);
 		}
 	};
 
-	// Scan for existing worktrees when workspace is opened
-	const scanWorktrees = async (workspaceId: string) => {
+	const handleMergePR = async () => {
+		if (!currentWorkspace || !selectedWorktreeId) return;
+
+		const worktree = currentWorkspace.worktrees?.find(
+			(wt) => wt.id === selectedWorktreeId,
+		);
+		if (!worktree) return;
+
 		try {
-			const result = await window.ipcRenderer.invoke(
-				"workspace-scan-worktrees",
-				workspaceId,
-			);
+			const result = await window.ipcRenderer.invoke("worktree-merge-pr", {
+				workspaceId: currentWorkspace.id,
+				worktreeId: selectedWorktreeId,
+			});
 
-			// Success - worktrees imported
+			if (result.success) {
+				// Reload workspace to show updated state
+				const refreshedWorkspace = await window.ipcRenderer.invoke(
+					"workspace-get",
+					currentWorkspace.id,
+				);
+				if (refreshedWorkspace) {
+					setCurrentWorkspace(refreshedWorkspace);
+				}
+				alert("PR merged successfully!");
+			} else {
+				// Show error as alert
+				alert(`Failed to merge PR: ${result.error || "Unknown error"}`);
+			}
 		} catch (error) {
-			console.error("[MainScreen] Failed to scan worktrees:", error);
+			const errorMessage =
+				error instanceof Error ? error.message : String(error);
+			alert(`Failed to merge PR: ${errorMessage}`);
 		}
 	};
 
-	// Load active workspace and all workspaces on mount
+	// Load active workspace on mount
 	useEffect(() => {
 		const loadActiveWorkspace = async () => {
 			try {
 				setLoading(true);
 				setError(null);
 
-				// Load all workspaces
-				await loadAllWorkspaces();
+				const allWorkspaces = await window.ipcRenderer.invoke("workspace-list");
+				setWorkspaces(allWorkspaces);
 
-				// Try to load the active workspace first, fall back to last opened
 				let workspaceId = await window.ipcRenderer.invoke(
 					"workspace-get-active-workspace-id",
 				);
 
-				// Fall back to last opened if no active workspace
 				if (!workspaceId) {
 					const lastOpenedWorkspace = await window.ipcRenderer.invoke(
 						"workspace-get-last-opened",
@@ -431,10 +851,7 @@ export function MainScreen() {
 
 					if (workspace) {
 						setCurrentWorkspace(workspace);
-						// Scan for existing worktrees
-						await scanWorktrees(workspace.id);
 
-						// Restore active selection for this workspace
 						const activeSelection = await window.ipcRenderer.invoke(
 							"workspace-get-active-selection",
 							workspaceId,
@@ -456,20 +873,19 @@ export function MainScreen() {
 		loadActiveWorkspace();
 	}, []);
 
-	// Listen for workspace-opened event from menu
+	// Listen for workspace-opened event
 	useEffect(() => {
 		const handler = async (workspace: Workspace) => {
+			console.log("[MainScreen] Workspace opened event received:", workspace);
 			setLoading(false);
-			// Persist the active workspace
+
 			await window.ipcRenderer.invoke(
 				"workspace-set-active-workspace-id",
 				workspace.id,
 			);
-			// Scan for existing worktrees FIRST
-			await scanWorktrees(workspace.id);
-			// Refresh workspaces list (after scanning to get updated worktrees)
-			await loadAllWorkspaces();
-			// Fetch the updated workspace after scanning (this includes imported worktrees)
+			const allWorkspaces = await window.ipcRenderer.invoke("workspace-list");
+			setWorkspaces(allWorkspaces);
+
 			const refreshedWorkspace = await window.ipcRenderer.invoke(
 				"workspace-get",
 				workspace.id,
@@ -485,1289 +901,129 @@ export function MainScreen() {
 		};
 	}, []);
 
-	// Listen for terminal exit events and auto-close the tab
-	useEffect(() => {
-		const handleTerminalExit = async (data: {
-			id: string;
-			exitCode: number;
-		}) => {
-			if (!currentWorkspace || !selectedWorktreeId) return;
-
-			// Find which tab contains this terminal
-			const worktree = currentWorkspace.worktrees.find(
-				(wt) => wt.id === selectedWorktreeId,
-			);
-			if (!worktree) return;
-
-			// Check if the exited terminal is the currently selected tab
-			const isCurrentTab = selectedTabId === data.id;
-
-			// Find the tab to determine its context (top-level or in group)
-			const tabResult = findTabRecursive(worktree.tabs, data.id);
-			if (!tabResult) return;
-
-			const parentGroup = tabResult.parent;
-			const isInGroup = !!parentGroup;
-
-			// Get the tabs array (either from group or top-level)
-			const tabs = isInGroup ? parentGroup?.tabs || [] : worktree.tabs;
-			const currentIndex = tabs.findIndex((t) => t.id === data.id);
-
-			// Update mosaic tree if in a group
-			if (isInGroup && parentGroup && parentGroup.mosaicTree) {
-				const updatedMosaicTree = removeTabFromMosaicTree(
-					parentGroup.mosaicTree as MosaicNode<string>,
-					data.id,
-				);
-
-				await window.ipcRenderer.invoke("tab-update-mosaic-tree", {
-					workspaceId: currentWorkspace.id,
-					worktreeId: selectedWorktreeId,
-					tabId: parentGroup.id,
-					mosaicTree: updatedMosaicTree,
-				});
-			}
-
-			// Delete the tab
-			const result = await window.ipcRenderer.invoke("tab-delete", {
-				workspaceId: currentWorkspace.id,
-				worktreeId: selectedWorktreeId,
-				tabId: data.id,
-			});
-
-			if (!result.success) {
-				console.error("Failed to close exited terminal tab:", result.error);
-				return;
-			}
-
-			// Temporarily clear selection to force unmount if it's the current tab
-			const savedTabId = selectedTabId;
-			const savedWorktreeId = selectedWorktreeId;
-			if (isCurrentTab) {
-				setSelectedTabId(null);
-			}
-
-			// Refresh workspace
-			const refreshedWorkspace = await window.ipcRenderer.invoke(
-				"workspace-get",
-				currentWorkspace.id,
-			);
-
-			if (refreshedWorkspace) {
-				setCurrentWorkspace(refreshedWorkspace);
-				await loadAllWorkspaces();
-
-				// Wait for next tick to ensure state updates
-				await new Promise((resolve) => setTimeout(resolve, 0));
-
-				// Only select adjacent tab if the exited terminal was the current one
-				if (isCurrentTab) {
-					const updatedWorktree = refreshedWorkspace.worktrees.find(
-						(wt) => wt.id === savedWorktreeId,
-					);
-
-					if (updatedWorktree) {
-						if (isInGroup && parentGroup) {
-							// Select adjacent tab within the group
-							const updatedGroupTab = findTabById(
-								updatedWorktree.tabs,
-								parentGroup.id,
-							);
-							if (
-								updatedGroupTab &&
-								updatedGroupTab.tabs &&
-								updatedGroupTab.tabs.length > 0
-							) {
-								const newIndex = Math.min(
-									currentIndex,
-									updatedGroupTab.tabs.length - 1,
-								);
-								handleTabSelect(
-									savedWorktreeId,
-									updatedGroupTab.tabs[newIndex].id,
-								);
-							} else {
-								setSelectedTabId(null);
-							}
-						} else if (updatedWorktree.tabs.length > 0) {
-							// Select adjacent top-level tab
-							const newIndex = Math.min(
-								currentIndex,
-								updatedWorktree.tabs.length - 1,
-							);
-							handleTabSelect(
-								savedWorktreeId,
-								updatedWorktree.tabs[newIndex].id,
-							);
-						} else {
-							setSelectedTabId(null);
-						}
-					}
-				}
-			}
-		};
-
-		window.ipcRenderer.on("terminal-exited", handleTerminalExit);
-		return () => {
-			window.ipcRenderer.off("terminal-exited", handleTerminalExit);
-		};
-	}, [currentWorkspace, selectedWorktreeId, selectedTabId]);
-
-	// Helper: recursively find a tab by ID
-	const findTabById = (tabs: Tab[], tabId: string): Tab | null => {
-		for (const tab of tabs) {
-			if (tab.id === tabId) return tab;
-			if (tab.type === "group" && tab.tabs) {
-				const found = findTabById(tab.tabs, tabId);
-				if (found) return found;
-			}
-		}
-		return null;
-	};
-
-	// Helper: Remove tab ID from mosaic tree
-	const removeTabFromMosaicTree = (
-		tree: MosaicNode<string>,
-		tabId: string,
-	): MosaicNode<string> | null => {
-		if (typeof tree === "string") {
-			// If this is the tab to remove, return null
-			return tree === tabId ? null : tree;
-		}
-
-		// Recursively remove from branches
-		const newFirst = removeTabFromMosaicTree(tree.first, tabId);
-		const newSecond = removeTabFromMosaicTree(tree.second, tabId);
-
-		// If both branches are gone, return null
-		if (!newFirst && !newSecond) {
-			return null;
-		}
-
-		// If one branch is gone, return the other
-		if (!newFirst) {
-			return newSecond;
-		}
-		if (!newSecond) {
-			return newFirst;
-		}
-
-		// Both branches exist, keep the structure
-		return {
-			...tree,
-			first: newFirst,
-			second: newSecond,
-		};
-	};
-
-	// Helper: Add tab ID to mosaic tree
-	const addTabToMosaicTree = (
-		tree: MosaicNode<string> | null | undefined,
-		tabId: string,
-	): MosaicNode<string> => {
-		if (!tree) {
-			return tabId;
-		}
-
-		if (typeof tree === "string") {
-			// Prevent duplicate IDs - if the tree already contains this tab ID, just return the tree
-			if (tree === tabId) {
-				console.warn(
-					`[MainScreen] Attempted to add duplicate tab ID "${tabId}" to mosaic tree`,
-				);
-				return tree;
-			}
-
-			// Single tab - create a split
-			return {
-				direction: "row",
-				first: tree,
-				second: tabId,
-				splitPercentage: 50,
-			};
-		}
-
-		// Check if the tab ID already exists in the tree (recursively)
-		const containsTabId = (node: MosaicNode<string>): boolean => {
-			if (typeof node === "string") {
-				return node === tabId;
-			}
-			return containsTabId(node.first) || containsTabId(node.second);
-		};
-
-		if (containsTabId(tree)) {
-			console.warn(
-				`[MainScreen] Tab ID "${tabId}" already exists in mosaic tree, skipping addition`,
-			);
-			return tree;
-		}
-
-		// Tree node - add to the second branch
-		return {
-			...tree,
-			second: addTabToMosaicTree(tree.second, tabId),
-		};
-	};
-
-	// Drag and drop handlers
-	const handleDragStart = (event: DragStartEvent) => {
-		setActiveId(event.active.id as string);
-		setIsOverMainContent(false);
-	};
-
-	const handleDragOver = (event: DragOverEvent) => {
-		const overId = event.over?.id;
-		setIsOverMainContent(overId === "main-content-drop-zone");
-	};
-
-	const handleDragEnd = async (event: DragEndEvent) => {
-		const { active, over } = event;
-		setActiveId(null);
-		setIsOverMainContent(false);
-
-		if (!over || active.id === over.id) return;
-
-		const activeData = active.data.current;
-		const overData = over.data.current;
-
-		// Only handle tab dragging
-		if (activeData?.type !== "tab") {
-			return;
-		}
-
-		// Handle dropping onto the main content area
-		if (over.id === "main-content-drop-zone") {
-			const activeData = active.data.current;
-			const draggedTabId = active.id as string;
-
-			// Only handle tab dragging
-			if (activeData?.type !== "tab") {
-				return;
-			}
-
-			const draggedWorktreeId = activeData.worktreeId as string;
-
-			// Check if the dragged tab is from the same worktree as the currently selected tab
-			if (draggedWorktreeId !== selectedWorktreeId) {
-				return;
-			}
-
-			if (!currentWorkspace || !selectedWorktreeId) return;
-
-			const worktree = currentWorkspace.worktrees.find(
-				(wt) => wt.id === selectedWorktreeId,
-			);
-			if (!worktree) return;
-
-			const draggedTab = findTabById(worktree.tabs, draggedTabId);
-			if (!draggedTab || draggedTab.type === "group") {
-				return;
-			}
-
-			// Case 1: Currently viewing a group tab - add the dragged tab to that group
-			if (selectedTab?.type === "group") {
-				try {
-					const parentTabId = activeData.parentTabId;
-
-					// Check if the dragged tab is already in this group
-					const isAlreadyInGroup = selectedTab.tabs?.some(
-						(t) => t.id === draggedTabId,
-					);
-					if (isAlreadyInGroup) {
-						// Find the original tab to get its properties
-						const originalTab = findTabById(worktree.tabs, draggedTabId);
-						if (!originalTab) {
-							console.error(
-								"[MainScreen] Could not find original tab:",
-								draggedTabId,
-							);
-							return;
-						}
-
-						// Create a new duplicate tab
-						const newTab = await createTab(
-							currentWorkspace.id,
-							selectedWorktreeId,
-							originalTab.name,
-							originalTab.type,
-						);
-
-						if (!newTab) return;
-
-						// Move the new tab into the group
-						const moveResult = await window.ipcRenderer.invoke("tab-move", {
-							workspaceId: currentWorkspace.id,
-							worktreeId: selectedWorktreeId,
-							tabId: newTab.id,
-							sourceParentTabId: undefined,
-							targetParentTabId: selectedTab.id,
-							targetIndex: selectedTab.tabs?.length || 0,
-						});
-
-						if (!moveResult.success) {
-							console.error(
-								"[MainScreen] Failed to move tab:",
-								moveResult.error,
-							);
-							return;
-						}
-
-						// Update the mosaic tree to include the new tab
-						const updatedMosaicTree = addTabToMosaicTree(
-							selectedTab.mosaicTree,
-							newTab.id,
-						);
-
-						await window.ipcRenderer.invoke("tab-update-mosaic-tree", {
-							workspaceId: currentWorkspace.id,
-							worktreeId: selectedWorktreeId,
-							tabId: selectedTab.id,
-							mosaicTree: updatedMosaicTree,
-						});
-
-						// Refresh workspace to show the updated structure
-						const refreshedWorkspace = await window.ipcRenderer.invoke(
-							"workspace-get",
-							currentWorkspace.id,
-						);
-						if (refreshedWorkspace) {
-							setCurrentWorkspace(refreshedWorkspace);
-						}
-						return;
-					}
-
-					// Move the tab into the group
-					const moveResult = await window.ipcRenderer.invoke("tab-move", {
-						workspaceId: currentWorkspace.id,
-						worktreeId: selectedWorktreeId,
-						tabId: draggedTabId,
-						sourceParentTabId: parentTabId,
-						targetParentTabId: selectedTab.id,
-						targetIndex: selectedTab.tabs?.length || 0,
-					});
-
-					if (!moveResult.success) {
-						console.error("[MainScreen] Failed to move tab:", moveResult.error);
-						return;
-					}
-
-					// Update the mosaic tree to include the new tab
-					const updatedMosaicTree = addTabToMosaicTree(
-						selectedTab.mosaicTree,
-						draggedTabId,
-					);
-
-					await window.ipcRenderer.invoke("tab-update-mosaic-tree", {
-						workspaceId: currentWorkspace.id,
-						worktreeId: selectedWorktreeId,
-						tabId: selectedTab.id,
-						mosaicTree: updatedMosaicTree,
-					});
-
-					// Refresh workspace to show the updated structure
-					const refreshedWorkspace = await window.ipcRenderer.invoke(
-						"workspace-get",
-						currentWorkspace.id,
-					);
-					if (refreshedWorkspace) {
-						setCurrentWorkspace(refreshedWorkspace);
-					}
-				} catch (error) {
-					console.error("[MainScreen] Error adding tab to group:", error);
-				}
-			}
-			// Case 2: Currently viewing a single tab - create a new group with both tabs
-			else if (selectedTab) {
-				try {
-					// If dragging a tab onto itself, create a new duplicate tab for the split
-					let secondTabId = draggedTabId;
-					const parentTabId = activeData.parentTabId;
-
-					if (draggedTabId === selectedTab.id) {
-						// Create a new tab with the same type and name
-						const newTab = await createTab(
-							currentWorkspace.id,
-							selectedWorktreeId,
-							selectedTab.name,
-							selectedTab.type,
-						);
-
-						if (!newTab) return;
-
-						secondTabId = newTab.id;
-					}
-
-					// Create a new group tab
-					const groupTab = await createTab(
-						currentWorkspace.id,
-						selectedWorktreeId,
-						"Tab Group",
-						"group",
-					);
-
-					if (!groupTab) return;
-
-					const groupTabId = groupTab.id;
-
-					// Move both tabs into the group
-					// First, move the currently selected tab
-					await window.ipcRenderer.invoke("tab-move", {
-						workspaceId: currentWorkspace.id,
-						worktreeId: selectedWorktreeId,
-						tabId: selectedTab.id,
-						sourceParentTabId: undefined,
-						targetParentTabId: groupTabId,
-						targetIndex: 0,
-					});
-
-					// Then, move the second tab (either the dragged tab or the newly created one)
-					await window.ipcRenderer.invoke("tab-move", {
-						workspaceId: currentWorkspace.id,
-						worktreeId: selectedWorktreeId,
-						tabId: secondTabId,
-						sourceParentTabId:
-							secondTabId === draggedTabId ? parentTabId : undefined,
-						targetParentTabId: groupTabId,
-						targetIndex: 1,
-					});
-
-					// Create a simple mosaic tree with both tabs
-					const mosaicTree: MosaicNode<string> = {
-						direction: "row",
-						first: selectedTab.id,
-						second: secondTabId,
-						splitPercentage: 50,
-					};
-
-					await window.ipcRenderer.invoke("tab-update-mosaic-tree", {
-						workspaceId: currentWorkspace.id,
-						worktreeId: selectedWorktreeId,
-						tabId: groupTabId,
-						mosaicTree,
-					});
-
-					// Select the new group tab to show the mosaic
-					setSelectedTabId(groupTabId);
-					await window.ipcRenderer.invoke("workspace-set-active-selection", {
-						workspaceId: currentWorkspace.id,
-						worktreeId: selectedWorktreeId,
-						tabId: groupTabId,
-					});
-
-					// Refresh workspace to show the updated structure
-					const refreshedWorkspace = await window.ipcRenderer.invoke(
-						"workspace-get",
-						currentWorkspace.id,
-					);
-					if (refreshedWorkspace) {
-						setCurrentWorkspace(refreshedWorkspace);
-					}
-				} catch (error) {
-					console.error("[MainScreen] Error creating tab group:", error);
-				}
-			}
-			return;
-		}
-
-		// Handle sidebar drag operations (reordering, moving between groups)
-		const draggedWorktreeId = activeData.worktreeId as string;
-		const draggedTabId = active.id as string;
-		const activeParentTabId = activeData.parentTabId;
-		const overParentTabId = overData?.parentTabId;
-
-		if (!currentWorkspace || !draggedWorktreeId) return;
-
-		const worktree = currentWorkspace.worktrees.find(
-			(wt) => wt.id === draggedWorktreeId,
-		);
-		if (!worktree) return;
-
-		try {
-			// Dropping onto a group tab or group area
-			if (overData?.type === "group" || overData?.type === "group-area") {
-				const groupTabId = overData.groupTabId as string;
-
-				// Don't allow dropping a tab onto its own parent
-				if (activeParentTabId === groupTabId) {
-					return;
-				}
-
-				const draggedTab = findTabById(worktree.tabs, draggedTabId);
-				const groupTab = findTabById(worktree.tabs, groupTabId);
-
-				if (!draggedTab || !groupTab || groupTab.type !== "group") {
-					console.error("[MainScreen] Invalid tab or group tab");
-					return;
-				}
-
-				// Move the tab into the group
-				const moveResult = await window.ipcRenderer.invoke("tab-move", {
-					workspaceId: currentWorkspace.id,
-					worktreeId: draggedWorktreeId,
-					tabId: draggedTabId,
-					sourceParentTabId: activeParentTabId,
-					targetParentTabId: groupTabId,
-					targetIndex: groupTab.tabs?.length || 0,
-				});
-
-				if (!moveResult.success) {
-					console.error("[MainScreen] Failed to move tab:", moveResult.error);
-					return;
-				}
-
-				// Update the mosaic tree to include the new tab
-				const updatedMosaicTree = addTabToMosaicTree(
-					groupTab.mosaicTree,
-					draggedTabId,
-				);
-
-				await window.ipcRenderer.invoke("tab-update-mosaic-tree", {
-					workspaceId: currentWorkspace.id,
-					worktreeId: draggedWorktreeId,
-					tabId: groupTabId,
-					mosaicTree: updatedMosaicTree,
-				});
-
-				// Refresh workspace
-				const refreshedWorkspace = await window.ipcRenderer.invoke(
-					"workspace-get",
-					currentWorkspace.id,
-				);
-				if (refreshedWorkspace) {
-					setCurrentWorkspace(refreshedWorkspace);
-				}
-				return;
-			}
-
-			// Reordering within the same parent group
-			if (overData?.type === "tab" && activeParentTabId === overParentTabId) {
-				const parentTab = activeParentTabId
-					? findTabById(worktree.tabs, activeParentTabId)
-					: null;
-
-				const tabsArray = parentTab?.tabs || worktree.tabs;
-				const oldIndex = tabsArray.findIndex((t) => t.id === active.id);
-				const newIndex = tabsArray.findIndex((t) => t.id === over.id);
-
-				if (oldIndex === -1 || newIndex === -1) return;
-
-				// Save to backend
-				const reorderedTabs = arrayMove(tabsArray, oldIndex, newIndex);
-				const newOrder = reorderedTabs.map((t) => t.id);
-				const result = await window.ipcRenderer.invoke("tab-reorder", {
-					workspaceId: currentWorkspace.id,
-					worktreeId: draggedWorktreeId,
-					parentTabId: activeParentTabId,
-					tabIds: newOrder,
-				});
-
-				if (!result.success) {
-					console.error("[MainScreen] Failed to reorder tabs:", result.error);
-				}
-
-				// Refresh workspace
-				const refreshedWorkspace = await window.ipcRenderer.invoke(
-					"workspace-get",
-					currentWorkspace.id,
-				);
-				if (refreshedWorkspace) {
-					setCurrentWorkspace(refreshedWorkspace);
-				}
-			}
-			// Moving to a different parent group
-			else if (
-				overData?.type === "tab" &&
-				activeParentTabId !== overParentTabId
-			) {
-				const targetParentTabId = overParentTabId;
-
-				if (targetParentTabId) {
-					const draggedTab = findTabById(worktree.tabs, draggedTabId);
-					const targetGroupTab = findTabById(worktree.tabs, targetParentTabId);
-
-					if (
-						!draggedTab ||
-						!targetGroupTab ||
-						targetGroupTab.type !== "group"
-					) {
-						console.error("[MainScreen] Invalid tab or target group");
-						return;
-					}
-
-					// Move the tab into the group
-					const moveResult = await window.ipcRenderer.invoke("tab-move", {
-						workspaceId: currentWorkspace.id,
-						worktreeId: draggedWorktreeId,
-						tabId: draggedTabId,
-						sourceParentTabId: activeParentTabId,
-						targetParentTabId: targetParentTabId,
-						targetIndex: targetGroupTab.tabs?.length || 0,
-					});
-
-					if (!moveResult.success) {
-						console.error("[MainScreen] Failed to move tab:", moveResult.error);
-						return;
-					}
-
-					// Update the mosaic tree to include the new tab
-					const updatedMosaicTree = addTabToMosaicTree(
-						targetGroupTab.mosaicTree,
-						draggedTabId,
-					);
-
-					await window.ipcRenderer.invoke("tab-update-mosaic-tree", {
-						workspaceId: currentWorkspace.id,
-						worktreeId: draggedWorktreeId,
-						tabId: targetParentTabId,
-						mosaicTree: updatedMosaicTree,
-					});
-
-					// Refresh workspace
-					const refreshedWorkspace = await window.ipcRenderer.invoke(
-						"workspace-get",
-						currentWorkspace.id,
-					);
-					if (refreshedWorkspace) {
-						setCurrentWorkspace(refreshedWorkspace);
-					}
-				}
-			}
-		} catch (error) {
-			console.error("[MainScreen] Error during sidebar drag operation:", error);
-		}
-	};
-
-	// Get active item for drag overlay
-	const activeTab =
-		activeId && selectedWorktree
-			? findTabById(selectedWorktree.tabs, activeId)
-			: null;
-
-	// Set up keyboard shortcuts
-	useEffect(() => {
-		const workspaceShortcuts = createWorkspaceShortcuts({
-			switchToPrevWorkspace: () => {
-				if (!workspaces || !currentWorkspace) return;
-				const currentIndex = workspaces.findIndex(
-					(ws) => ws.id === currentWorkspace.id,
-				);
-				if (currentIndex > 0) {
-					handleWorkspaceSelect(workspaces[currentIndex - 1].id);
-				}
-			},
-			switchToNextWorkspace: () => {
-				if (!workspaces || !currentWorkspace) return;
-				const currentIndex = workspaces.findIndex(
-					(ws) => ws.id === currentWorkspace.id,
-				);
-				if (currentIndex < workspaces.length - 1) {
-					handleWorkspaceSelect(workspaces[currentIndex + 1].id);
-				}
-			},
-			toggleSidebar: () => {
-				const panel = sidebarPanelRef.current;
-				if (!panel) return;
-
-				if (panel.isCollapsed()) {
-					panel.expand();
-					setIsSidebarOpen(true);
-				} else {
-					panel.collapse();
-					setIsSidebarOpen(false);
-				}
-			},
-			createSplitView: async () => {
-				// Create horizontal split
-				if (!currentWorkspace || !selectedWorktreeId || !selectedTab) return;
-
-				// If we're inside a group (parentGroupTab exists), add to that group
-				if (parentGroupTab) {
-					const newTab = await createTab(
-						currentWorkspace.id,
-						selectedWorktreeId,
-						"Terminal",
-						"terminal",
-					);
-					if (!newTab) return;
-
-					// Move into the parent group
-					await window.ipcRenderer.invoke("tab-move", {
-						workspaceId: currentWorkspace.id,
-						worktreeId: selectedWorktreeId,
-						tabId: newTab.id,
-						sourceParentTabId: undefined,
-						targetParentTabId: parentGroupTab.id,
-						targetIndex: parentGroupTab.tabs?.length || 0,
-					});
-
-					// Update mosaic tree (horizontal split) - add to existing group's mosaic
-					const updatedMosaicTree = addTabToMosaicTree(
-						parentGroupTab.mosaicTree,
-						newTab.id,
-					);
-
-					await window.ipcRenderer.invoke("tab-update-mosaic-tree", {
-						workspaceId: currentWorkspace.id,
-						worktreeId: selectedWorktreeId,
-						tabId: parentGroupTab.id,
-						mosaicTree: updatedMosaicTree,
-					});
-
-					// Select the newly created terminal
-					setSelectedTabId(newTab.id);
-					await window.ipcRenderer.invoke("workspace-set-active-selection", {
-						workspaceId: currentWorkspace.id,
-						worktreeId: selectedWorktreeId,
-						tabId: newTab.id,
-					});
-				} else {
-					// Create new group with horizontal split
-					const newTab = await createTab(
-						currentWorkspace.id,
-						selectedWorktreeId,
-						"Terminal",
-						"terminal",
-					);
-					if (!newTab) return;
-
-					const groupTab = await createTab(
-						currentWorkspace.id,
-						selectedWorktreeId,
-						"Tab Group",
-						"group",
-					);
-					if (!groupTab) return;
-
-					// Move both tabs into group
-					await window.ipcRenderer.invoke("tab-move", {
-						workspaceId: currentWorkspace.id,
-						worktreeId: selectedWorktreeId,
-						tabId: selectedTab.id,
-						sourceParentTabId: undefined,
-						targetParentTabId: groupTab.id,
-						targetIndex: 0,
-					});
-
-					await window.ipcRenderer.invoke("tab-move", {
-						workspaceId: currentWorkspace.id,
-						worktreeId: selectedWorktreeId,
-						tabId: newTab.id,
-						sourceParentTabId: undefined,
-						targetParentTabId: groupTab.id,
-						targetIndex: 1,
-					});
-
-					// Create horizontal mosaic tree
-					const mosaicTree: MosaicNode<string> = {
-						direction: "row",
-						first: selectedTab.id,
-						second: newTab.id,
-						splitPercentage: 50,
-					};
-
-					await window.ipcRenderer.invoke("tab-update-mosaic-tree", {
-						workspaceId: currentWorkspace.id,
-						worktreeId: selectedWorktreeId,
-						tabId: groupTab.id,
-						mosaicTree,
-					});
-
-					// Select the newly created terminal (not the group)
-					setSelectedTabId(newTab.id);
-					await window.ipcRenderer.invoke("workspace-set-active-selection", {
-						workspaceId: currentWorkspace.id,
-						worktreeId: selectedWorktreeId,
-						tabId: newTab.id,
-					});
-				}
-
-				// Refresh workspace
-				const refreshedWorkspace = await window.ipcRenderer.invoke(
-					"workspace-get",
-					currentWorkspace.id,
-				);
-				if (refreshedWorkspace) {
-					setCurrentWorkspace(refreshedWorkspace);
-					// Also refresh workspaces list for sidebar
-					await loadAllWorkspaces();
-				}
-			},
-			createVerticalSplit: async () => {
-				// Create vertical split
-				if (!currentWorkspace || !selectedWorktreeId || !selectedTab) return;
-
-				// If we're inside a group (parentGroupTab exists), add to that group
-				if (parentGroupTab) {
-					const newTab = await createTab(
-						currentWorkspace.id,
-						selectedWorktreeId,
-						"Terminal",
-						"terminal",
-					);
-					if (!newTab) return;
-
-					// Move into the parent group
-					await window.ipcRenderer.invoke("tab-move", {
-						workspaceId: currentWorkspace.id,
-						worktreeId: selectedWorktreeId,
-						tabId: newTab.id,
-						sourceParentTabId: undefined,
-						targetParentTabId: parentGroupTab.id,
-						targetIndex: parentGroupTab.tabs?.length || 0,
-					});
-
-					const first = parentGroupTab.mosaicTree;
-
-					if (!first) {
-						console.error(
-							"Failed to create vertical split: parentGroupTab.mosaicTree is undefined",
-						);
-						return;
-					}
-
-					// Update mosaic tree with column direction for vertical split
-					const updatedMosaicTree: MosaicNode<string> = {
-						direction: "column",
-						first,
-						second: newTab.id,
-						splitPercentage: 50,
-					} satisfies MosaicNode<string>;
-
-					await window.ipcRenderer.invoke("tab-update-mosaic-tree", {
-						workspaceId: currentWorkspace.id,
-						worktreeId: selectedWorktreeId,
-						tabId: parentGroupTab.id,
-						mosaicTree: updatedMosaicTree,
-					});
-
-					// Select the newly created terminal
-					setSelectedTabId(newTab.id);
-					await window.ipcRenderer.invoke("workspace-set-active-selection", {
-						workspaceId: currentWorkspace.id,
-						worktreeId: selectedWorktreeId,
-						tabId: newTab.id,
-					});
-				} else {
-					// Create new group with vertical split
-					const newTab = await createTab(
-						currentWorkspace.id,
-						selectedWorktreeId,
-						"Terminal",
-						"terminal",
-					);
-					if (!newTab) return;
-
-					const groupTab = await createTab(
-						currentWorkspace.id,
-						selectedWorktreeId,
-						"Tab Group",
-						"group",
-					);
-					if (!groupTab) return;
-
-					// Move both tabs into group
-					await window.ipcRenderer.invoke("tab-move", {
-						workspaceId: currentWorkspace.id,
-						worktreeId: selectedWorktreeId,
-						tabId: selectedTab.id,
-						sourceParentTabId: undefined,
-						targetParentTabId: groupTab.id,
-						targetIndex: 0,
-					});
-
-					await window.ipcRenderer.invoke("tab-move", {
-						workspaceId: currentWorkspace.id,
-						worktreeId: selectedWorktreeId,
-						tabId: newTab.id,
-						sourceParentTabId: undefined,
-						targetParentTabId: groupTab.id,
-						targetIndex: 1,
-					});
-
-					// Create vertical mosaic tree
-					const mosaicTree: MosaicNode<string> = {
-						direction: "column",
-						first: selectedTab.id,
-						second: newTab.id,
-						splitPercentage: 50,
-					};
-
-					await window.ipcRenderer.invoke("tab-update-mosaic-tree", {
-						workspaceId: currentWorkspace.id,
-						worktreeId: selectedWorktreeId,
-						tabId: groupTab.id,
-						mosaicTree,
-					});
-
-					// Select the newly created terminal (not the group)
-					setSelectedTabId(newTab.id);
-					await window.ipcRenderer.invoke("workspace-set-active-selection", {
-						workspaceId: currentWorkspace.id,
-						worktreeId: selectedWorktreeId,
-						tabId: newTab.id,
-					});
-				}
-
-				// Refresh workspace
-				const refreshedWorkspace = await window.ipcRenderer.invoke(
-					"workspace-get",
-					currentWorkspace.id,
-				);
-				if (refreshedWorkspace) {
-					setCurrentWorkspace(refreshedWorkspace);
-					// Also refresh workspaces list for sidebar
-					await loadAllWorkspaces();
-				}
-			},
-		});
-
-		const tabShortcuts = createTabShortcuts({
-			switchToPrevTab: () => {
-				if (!selectedWorktree || !selectedTabId) return;
-
-				// If we're inside a group tab, navigate between group's children
-				if (parentGroupTab && parentGroupTab.tabs) {
-					const tabs = parentGroupTab.tabs;
-					const currentIndex = tabs.findIndex((t) => t.id === selectedTabId);
-					if (currentIndex > 0) {
-						handleTabSelect(selectedWorktree.id, tabs[currentIndex - 1].id);
-					}
-				} else {
-					// Navigate between top-level tabs
-					const tabs = selectedWorktree.tabs;
-					const currentIndex = tabs.findIndex((t) => t.id === selectedTabId);
-					if (currentIndex > 0) {
-						handleTabSelect(selectedWorktree.id, tabs[currentIndex - 1].id);
-					}
-				}
-			},
-			switchToNextTab: () => {
-				if (!selectedWorktree || !selectedTabId) return;
-
-				// If we're inside a group tab, navigate between group's children
-				if (parentGroupTab && parentGroupTab.tabs) {
-					const tabs = parentGroupTab.tabs;
-					const currentIndex = tabs.findIndex((t) => t.id === selectedTabId);
-					if (currentIndex < tabs.length - 1) {
-						handleTabSelect(selectedWorktree.id, tabs[currentIndex + 1].id);
-					}
-				} else {
-					// Navigate between top-level tabs
-					const tabs = selectedWorktree.tabs;
-					const currentIndex = tabs.findIndex((t) => t.id === selectedTabId);
-					if (currentIndex < tabs.length - 1) {
-						handleTabSelect(selectedWorktree.id, tabs[currentIndex + 1].id);
-					}
-				}
-			},
-			newTab: async () => {
-				if (!currentWorkspace || !selectedWorktreeId) return;
-
-				try {
-					const result = await window.ipcRenderer.invoke("tab-create", {
-						workspaceId: currentWorkspace.id,
-						worktreeId: selectedWorktreeId,
-						name: "New Terminal",
-						type: "terminal",
-					});
-
-					if (result.success && result.tab) {
-						const newTabId = result.tab.id;
-
-						// Select the new tab first (matches sidebar button behavior)
-						handleTabSelect(selectedWorktreeId, newTabId);
-
-						// Then refresh workspace to get updated data
-						const refreshedWorkspace = await window.ipcRenderer.invoke(
-							"workspace-get",
-							currentWorkspace.id,
-						);
-
-						if (refreshedWorkspace) {
-							setCurrentWorkspace(refreshedWorkspace);
-							// Also refresh workspaces list for sidebar
-							await loadAllWorkspaces();
-						}
-					} else {
-						console.error("Failed to create tab:", result.error);
-					}
-				} catch (error) {
-					console.error("Error creating new tab:", error);
-				}
-			},
-			closeTab: async () => {
-				if (!currentWorkspace || !selectedWorktreeId || !selectedTabId) return;
-
-				// Check if we're inside a group tab
-				const isInGroup = !!parentGroupTab;
-				const tabs = isInGroup
-					? parentGroupTab?.tabs || []
-					: selectedWorktree?.tabs || [];
-				const currentIndex = tabs.findIndex((t) => t.id === selectedTabId);
-				const tabToClose = selectedTabId;
-
-				// Delete the tab first
-				const result = await window.ipcRenderer.invoke("tab-delete", {
-					workspaceId: currentWorkspace.id,
-					worktreeId: selectedWorktreeId,
-					tabId: tabToClose,
-				});
-
-				if (!result.success) {
-					console.error("Failed to close tab:", result.error);
-					return;
-				}
-
-				// Then update mosaic tree if in a group (after deletion)
-				if (isInGroup && parentGroupTab && parentGroupTab.mosaicTree) {
-					const updatedMosaicTree = removeTabFromMosaicTree(
-						parentGroupTab.mosaicTree as MosaicNode<string>,
-						tabToClose,
-					);
-
-					await window.ipcRenderer.invoke("tab-update-mosaic-tree", {
-						workspaceId: currentWorkspace.id,
-						worktreeId: selectedWorktreeId,
-						tabId: parentGroupTab.id,
-						mosaicTree: updatedMosaicTree,
-					});
-				}
-
-				// Refresh workspace to get updated tab list
-				const refreshedWorkspace = await window.ipcRenderer.invoke(
-					"workspace-get",
-					currentWorkspace.id,
-				);
-
-				if (refreshedWorkspace) {
-					// Force update workspaces list first for sidebar
-					await loadAllWorkspaces();
-
-					// Update workspace state with new object reference
-					setCurrentWorkspace(refreshedWorkspace);
-
-					// Find the worktree and updated parent group if applicable
-					const updatedWorktree = refreshedWorkspace.worktrees.find(
-						(wt) => wt.id === selectedWorktreeId,
-					);
-
-					if (updatedWorktree) {
-						// Re-find the parent group from the refreshed workspace
-						const wasInGroup = isInGroup;
-						const oldParentId = parentGroupTab?.id;
-
-						if (wasInGroup && oldParentId) {
-							const updatedGroupTab = findTabById(
-								updatedWorktree.tabs,
-								oldParentId,
-							);
-							if (
-								updatedGroupTab &&
-								updatedGroupTab.tabs &&
-								updatedGroupTab.tabs.length > 0
-							) {
-								// Select adjacent tab within the group
-								const newIndex = Math.min(
-									currentIndex,
-									updatedGroupTab.tabs.length - 1,
-								);
-								handleTabSelect(
-									selectedWorktreeId,
-									updatedGroupTab.tabs[newIndex].id,
-								);
-							} else {
-								// Group is now empty, clear selection
-								setSelectedTabId(null);
-							}
-						} else if (updatedWorktree.tabs.length > 0) {
-							// Top-level tab - select adjacent top-level tab
-							const newIndex = Math.min(
-								currentIndex,
-								updatedWorktree.tabs.length - 1,
-							);
-							handleTabSelect(
-								selectedWorktreeId,
-								updatedWorktree.tabs[newIndex].id,
-							);
-						} else {
-							// No tabs left, clear selection
-							setSelectedTabId(null);
-						}
-					}
-				}
-			},
-			reopenClosedTab: () => {
-				// TODO: implement reopen closed tab
-			},
-			jumpToTab: (index: number) => {
-				if (!selectedWorktree) return;
-
-				// Flatten tabs: expand group children to number all actual terminals
-				const flattenTabs = (tabs: Tab[]): Tab[] => {
-					const result: Tab[] = [];
-					for (const tab of tabs) {
-						if (tab.type === "group" && tab.tabs && tab.tabs.length > 0) {
-							// Add all children of the group
-							result.push(...tab.tabs);
-						} else {
-							// Add non-group tabs
-							result.push(tab);
-						}
-					}
-					return result;
-				};
-
-				const flatTabs = flattenTabs(selectedWorktree.tabs);
-				if (index > 0 && index <= flatTabs.length) {
-					handleTabSelect(selectedWorktree.id, flatTabs[index - 1].id);
-				}
-			},
-		});
-
-		const handleKeyDown = (event: KeyboardEvent) => {
-			// Try workspace shortcuts first
-			const workspaceHandler = createShortcutHandler(
-				workspaceShortcuts.shortcuts,
-			);
-			if (!workspaceHandler(event)) {
-				return;
-			}
-
-			// Then try tab shortcuts
-			const tabHandler = createShortcutHandler(tabShortcuts.shortcuts);
-			tabHandler(event);
-		};
-
-		// Use capture phase to intercept events before they reach terminal
-		window.addEventListener("keydown", handleKeyDown, true);
-		return () => {
-			window.removeEventListener("keydown", handleKeyDown, true);
-		};
-	}, [
-		workspaces,
-		currentWorkspace,
-		selectedWorktree,
-		selectedWorktreeId,
-		selectedTabId,
-	]);
-
 	return (
-		<DndContext
-			sensors={sensors}
-			collisionDetection={closestCenter}
-			onDragStart={handleDragStart}
-			onDragOver={handleDragOver}
-			onDragEnd={handleDragEnd}
-		>
-			<div className="flex h-screen relative text-neutral-300">
-				<Background />
+		<>
+			<Background />
 
-				{/* Hover trigger area when sidebar is hidden */}
-				{!isSidebarOpen && (
-					<div
-						className="fixed left-0 top-0 bottom-0 w-2 z-50"
-						onMouseEnter={() => setShowSidebarOverlay(true)}
-					/>
-				)}
+			{/* Hover trigger area when sidebar is hidden */}
+			{!isSidebarOpen && (
+				<button
+					type="button"
+					className="fixed left-0 top-0 bottom-0 w-2 z-50"
+					onMouseEnter={() => setShowSidebarOverlay(true)}
+					aria-label="Show sidebar"
+				/>
+			)}
 
-				{/* Sidebar overlay when hidden and hovering */}
-				{!isSidebarOpen && showSidebarOverlay && workspaces && (
-					<div
-						className="fixed left-0 top-0 bottom-0 w-80 z-40 animate-in slide-in-from-left duration-200"
-						onMouseLeave={() => setShowSidebarOverlay(false)}
-					>
-						<div className="h-full border-r border-neutral-800 bg-neutral-950/95 backdrop-blur-sm">
-							<Sidebar
-								workspaces={workspaces}
-								currentWorkspace={currentWorkspace}
-								onTabSelect={handleTabSelect}
-								onWorktreeCreated={handleWorktreeCreated}
-								onWorkspaceSelect={handleWorkspaceSelect}
-								onUpdateWorktree={handleUpdateWorktree}
-								selectedTabId={selectedTabId ?? undefined}
-								onCollapse={() => {
-									setShowSidebarOverlay(false);
-								}}
-								isDragging={!!activeId}
-								onShowDiff={handleShowDiffView}
-							/>
-						</div>
+			{/* Sidebar overlay when hidden and hovering */}
+			{!isSidebarOpen && showSidebarOverlay && workspaces && (
+				<aside
+					className="fixed left-0 top-0 bottom-0 w-80 z-40 animate-in slide-in-from-left duration-200"
+					onMouseLeave={() => setShowSidebarOverlay(false)}
+				>
+					<div className="h-full border-r border-neutral-800 bg-neutral-950/95 backdrop-blur-sm">
+						<Sidebar
+							workspaces={workspaces}
+							currentWorkspace={currentWorkspace}
+							onTabSelect={handleTabSelect}
+							onWorktreeCreated={handleWorktreeCreated}
+							onWorkspaceSelect={handleWorkspaceSelect}
+							onUpdateWorktree={handleUpdateWorktree}
+							selectedTabId={selectedTabId ?? undefined}
+							selectedWorktreeId={selectedWorktreeId}
+							onCollapse={() => {
+								setShowSidebarOverlay(false);
+							}}
+							onShowDiff={handleShowDiff}
+						/>
 					</div>
-				)}
+				</aside>
+			)}
 
-				{/* App Frame - continuous border + sidebar + topbar */}
-				<AppFrame>
-					<ResizablePanelGroup direction="horizontal" autoSaveId="main-layout">
-						<ResizablePanel
-							ref={sidebarPanelRef}
-							defaultSize={20}
-							minSize={15}
-							maxSize={40}
-							collapsible={true}
-							onCollapse={() => setIsSidebarOpen(false)}
-							onExpand={() => setIsSidebarOpen(true)}
-						>
-							{isSidebarOpen && workspaces && (
-								<Sidebar
-									workspaces={workspaces}
-									currentWorkspace={currentWorkspace}
-									onTabSelect={handleTabSelect}
-									onWorktreeCreated={handleWorktreeCreated}
-									onWorkspaceSelect={handleWorkspaceSelect}
-									onUpdateWorktree={handleUpdateWorktree}
-									selectedTabId={selectedTabId ?? undefined}
-									onCollapse={() => {
-										const panel = sidebarPanelRef.current;
-										if (panel && !panel.isCollapsed()) {
-											panel.collapse();
-										}
-									}}
-									isDragging={!!activeId}
-									onShowDiff={handleShowDiffView}
-								/>
-							)}
-						</ResizablePanel>
-						<ResizableHandle withHandle />
-						{/* Main Content Area */}
-						<ResizablePanel minSize={30}>
-							<div className="flex flex-col h-full overflow-hidden">
-								{/* Top Bar */}
-								<TopBar
-									isSidebarOpen={isSidebarOpen}
-									onOpenSidebar={() => {
-										const panel = sidebarPanelRef.current;
-										if (panel && panel.isCollapsed()) {
-											panel.expand();
-										}
-									}}
-									workspaceName={currentWorkspace?.name}
-									currentBranch={currentWorkspace?.branch}
-								/>
+			<AppFrame>
+				<div className="flex flex-col h-full w-full">
+					{/* Worktree tabs at the top - each tab represents a worktree */}
+					<TaskTabs
+						onCollapseSidebar={handleCollapseSidebar}
+						onExpandSidebar={handleExpandSidebar}
+						isSidebarOpen={isSidebarOpen}
+						onAddTask={handleOpenAddTaskModal}
+						onCreatePR={handleCreatePR}
+						onMergePR={handleMergePR}
+						worktrees={enrichWorktreesWithTasks(
+							currentWorkspace?.worktrees || [],
+							pendingWorktrees,
+						)}
+						selectedWorktreeId={selectedWorktreeId}
+						onWorktreeSelect={(worktreeId) => {
+							// Don't allow selecting pending worktrees
+							if (worktreeId.startsWith("pending-")) return;
 
-								{/* Content Area */}
-								<DroppableMainContent isOver={isOverMainContent}>
-									{showDiffView &&
-									diffWorktreeId &&
-									diffWorktree &&
-									currentWorkspace ? (
-										// Show diff view
-										<div className="w-full h-full">
-											<DiffTab
-												tab={{
-													id: "temp-diff",
-													name: "Diff View",
-													type: "diff",
-													createdAt: new Date().toISOString(),
-												}}
-												workspaceId={currentWorkspace.id}
-												worktreeId={diffWorktreeId}
-												worktree={diffWorktree}
-												workspaceName={currentWorkspace.name}
-												mainBranch={currentWorkspace.branch}
-												onClose={handleCloseDiffView}
-											/>
-										</div>
-									) : loading ||
+							setSelectedWorktreeId(worktreeId);
+							// Select first tab in the worktree
+							const worktree = currentWorkspace?.worktrees?.find(
+								(wt) => wt.id === worktreeId,
+							);
+							if (worktree?.tabs && worktree.tabs.length > 0) {
+								handleTabSelect(worktreeId, worktree.tabs[0].id);
+							}
+						}}
+						mode={mode}
+						onModeChange={setMode}
+					/>
+
+					{/* Main content area - conditionally render based on mode */}
+					<div className="flex-1 overflow-hidden">
+						{mode === "plan" ? (
+							// Plan mode - show kanban board
+							<PlanView
+								currentWorkspace={currentWorkspace}
+								selectedWorktreeId={selectedWorktreeId}
+								onTabSelect={handleTabSelect}
+								onTabCreated={handleTabCreated}
+							/>
+						) : (
+							// Edit mode - show workspace/terminal view
+							<ResizablePanelGroup
+								direction="horizontal"
+								autoSaveId="new-layout-panels"
+							>
+								{/* Sidebar panel with full workspace/worktree management */}
+								<ResizablePanel
+									ref={sidebarPanelRef}
+									defaultSize={20}
+									minSize={15}
+									maxSize={40}
+									collapsible
+									onCollapse={() => setIsSidebarOpen(false)}
+									onExpand={() => setIsSidebarOpen(true)}
+								>
+									{isSidebarOpen && workspaces && (
+										<Sidebar
+											workspaces={workspaces}
+											currentWorkspace={currentWorkspace}
+											onTabSelect={handleTabSelect}
+											onWorktreeCreated={handleWorktreeCreated}
+											onWorkspaceSelect={handleWorkspaceSelect}
+											onUpdateWorktree={handleUpdateWorktree}
+											selectedTabId={selectedTabId ?? undefined}
+											selectedWorktreeId={selectedWorktreeId}
+											onCollapse={() => {
+												const panel = sidebarPanelRef.current;
+												if (panel && !panel.isCollapsed()) {
+													panel.collapse();
+												}
+											}}
+											onShowDiff={handleShowDiff}
+										/>
+									)}
+								</ResizablePanel>
+
+								<ResizableHandle withHandle />
+
+								{/* Main content panel */}
+								<ResizablePanel defaultSize={80} minSize={30}>
+									{loading ||
 										error ||
 										!currentWorkspace ||
 										!selectedTab ||
@@ -1789,6 +1045,8 @@ export function MainScreen() {
 											worktreeId={selectedWorktreeId ?? undefined}
 											selectedTabId={selectedTabId ?? undefined}
 											onTabFocus={handleTabFocus}
+											workspaceName={currentWorkspace.name}
+											mainBranch={currentWorkspace.branch}
 										/>
 									) : selectedTab.type === "group" ? (
 										// Selected tab is a group tab → display its mosaic layout
@@ -1805,8 +1063,20 @@ export function MainScreen() {
 											workspaceName={currentWorkspace.name}
 											mainBranch={currentWorkspace.branch}
 										/>
+									) : selectedTab.type === "diff" ? (
+										// Diff tab → display diff view
+										<div className="w-full h-full">
+											<DiffTab
+												tab={selectedTab}
+												workspaceId={currentWorkspace.id}
+												worktreeId={selectedWorktreeId ?? ""}
+												worktree={selectedWorktree}
+												workspaceName={currentWorkspace.name}
+												mainBranch={currentWorkspace.branch}
+											/>
+										</div>
 									) : (
-										// Base level tab (not inside a group) → display full width/height
+										// Base level tab (terminal, preview, etc.) → display full width/height
 										<div className="w-full h-full p-2 bg-[#1e1e1e]">
 											<TabContent
 												tab={selectedTab}
@@ -1824,21 +1094,22 @@ export function MainScreen() {
 											/>
 										</div>
 									)}
-								</DroppableMainContent>
-							</div>
-						</ResizablePanel>
-					</ResizablePanelGroup>
-				</AppFrame>
-			</div>
-
-			{/* Drag Overlay - follows the cursor */}
-			<DragOverlay>
-				{activeTab ? (
-					<div className="bg-neutral-800 border border-neutral-700 rounded px-3 py-2 text-sm opacity-90 cursor-grabbing">
-						{activeTab.name}
+								</ResizablePanel>
+							</ResizablePanelGroup>
+						)}
 					</div>
-				) : null}
-			</DragOverlay>
-		</DndContext>
+				</div>
+			</AppFrame>
+
+			{/* Open Task Modal */}
+			<AddTaskModal
+				isOpen={isAddTaskModalOpen}
+				onClose={handleCloseAddTaskModal}
+				tasks={MOCK_TASKS}
+				openTasks={openTasks}
+				onSelectTask={handleSelectTask}
+				onCreateTask={handleCreateTask}
+			/>
+		</>
 	);
 }
