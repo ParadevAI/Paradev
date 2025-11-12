@@ -23,7 +23,6 @@ interface SidebarProps {
 	onUpdateWorktree: (worktreeId: string, updatedWorktree: Worktree) => void;
 	selectedTabId: string | undefined;
 	isDragging?: boolean;
-	onShowDiff?: (worktreeId: string) => void;
 	selectedWorktreeId?: string | null;
 	onDiffModeChange?: (mode: SidebarMode, selectedFile: string | null) => void;
 }
@@ -38,7 +37,6 @@ export function Sidebar({
 	onUpdateWorktree,
 	selectedTabId,
 	isDragging = false,
-	onShowDiff,
 	selectedWorktreeId,
 	onDiffModeChange,
 }: SidebarProps) {
@@ -388,7 +386,6 @@ export function Sidebar({
 								onUpdateWorktree={onUpdateWorktree}
 								selectedTabId={selectedTabId}
 								onCloneWorktree={handleCloneWorktree}
-								onShowDiff={onShowDiff}
 								selectedWorktreeId={
 									selectedWorktreeId ?? currentWorkspace?.activeWorktreeId
 								}

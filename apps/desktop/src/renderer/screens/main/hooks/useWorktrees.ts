@@ -64,79 +64,6 @@ export function useWorktrees({
 		});
 	};
 
-	// Handle show diff - creates a diff tab
-	const handleShowDiff = async (worktreeId: string) => {
-		if (!currentWorkspace) return;
-
-		// Find the worktree
-		const worktree = currentWorkspace.worktrees?.find(
-			(wt) => wt.id === worktreeId,
-		);
-		if (!worktree) return;
-
-		// Check if a diff tab already exists for this worktree
-		const existingDiffTab = worktree.tabs?.find((tab) => tab.type === "diff");
-
-		if (existingDiffTab) {
-			// If a diff tab already exists, just select it
-			await window.ipcRenderer.invoke("workspace-set-active-selection", {
-				workspaceId: currentWorkspace.id,
-				worktreeId: worktreeId,
-				tabId: existingDiffTab.id,
-			});
-
-			// Reload the workspace to get the updated state
-			const updatedWorkspace = await window.ipcRenderer.invoke(
-				"workspace-get",
-				currentWorkspace.id,
-			);
-			if (updatedWorkspace) {
-				setCurrentWorkspace(updatedWorkspace);
-			}
-
-			// Update the workspaces array
-			await loadAllWorkspaces();
-
-			// Set state to select the tab
-			setSelectedWorktreeId(worktreeId);
-			setSelectedTabId(existingDiffTab.id);
-			return;
-		}
-
-		// Create a new diff tab
-		const result = await window.ipcRenderer.invoke("tab-create", {
-			workspaceId: currentWorkspace.id,
-			worktreeId: worktreeId,
-			name: `Changes – ${worktree.branch}`,
-			type: "diff",
-		});
-
-		if (result.success && result.tab) {
-			// Set active selection in backend first
-			await window.ipcRenderer.invoke("workspace-set-active-selection", {
-				workspaceId: currentWorkspace.id,
-				worktreeId: worktreeId,
-				tabId: result.tab.id,
-			});
-
-			// Reload the workspace to get the updated state with the new tab
-			const updatedWorkspace = await window.ipcRenderer.invoke(
-				"workspace-get",
-				currentWorkspace.id,
-			);
-			if (updatedWorkspace) {
-				setCurrentWorkspace(updatedWorkspace);
-			}
-
-			// Update the workspaces array
-			await loadAllWorkspaces();
-
-			// Set state to select the new tab
-			setSelectedWorktreeId(worktreeId);
-			setSelectedTabId(result.tab.id);
-		}
-	};
-
 	const handleCreatePR = async (selectedWorktreeId: string | null) => {
 		if (!currentWorkspace || !selectedWorktreeId) return;
 
@@ -215,7 +142,6 @@ export function useWorktrees({
 	return {
 		handleWorktreeCreated,
 		handleUpdateWorktree,
-		handleShowDiff,
 		handleCreatePR,
 		handleMergePR,
 	};

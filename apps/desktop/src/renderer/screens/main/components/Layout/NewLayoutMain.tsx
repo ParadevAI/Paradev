@@ -15,7 +15,6 @@ import TabGroup from "../MainContent/TabGroup";
 import { PlaceholderState } from "../PlaceholderState";
 import { PlanView } from "../PlanView";
 import { Sidebar } from "../Sidebar";
-import { DiffTab } from "../TabContent/components/DiffTab";
 import { AddTaskModal } from "./AddTaskModal";
 import type { TaskStatus } from "./StatusIndicator";
 import { TaskTabs, type WorktreeWithTask } from "./TaskTabs";
@@ -241,12 +240,12 @@ function enrichWorktreesWithTasks(
 			isPending: true, // Mark as pending for UI
 			task: pending.taskData
 				? {
-						id: pending.id,
-						slug: pending.taskData.slug,
-						title: pending.taskData.name,
-						status: pending.taskData.status,
-						description: pending.description || "",
-					}
+					id: pending.id,
+					slug: pending.taskData.slug,
+					title: pending.taskData.name,
+					status: pending.taskData.status,
+					description: pending.description || "",
+				}
 				: undefined,
 		}),
 	);
@@ -523,79 +522,6 @@ export const MainLayout: React.FC = () => {
 					ws.id === currentWorkspace.id ? updatedCurrentWorkspace : ws,
 				),
 			);
-		}
-	};
-
-	// Handle show diff - creates a diff tab
-	const handleShowDiff = async (worktreeId: string) => {
-		if (!currentWorkspace) return;
-
-		// Find the worktree
-		const worktree = currentWorkspace.worktrees?.find(
-			(wt) => wt.id === worktreeId,
-		);
-		if (!worktree) return;
-
-		// Check if a diff tab already exists for this worktree
-		const existingDiffTab = worktree.tabs?.find((tab) => tab.type === "diff");
-
-		if (existingDiffTab) {
-			// If a diff tab already exists, just select it
-			await window.ipcRenderer.invoke("workspace-set-active-selection", {
-				workspaceId: currentWorkspace.id,
-				worktreeId: worktreeId,
-				tabId: existingDiffTab.id,
-			});
-
-			// Reload the workspace to get the updated state
-			const updatedWorkspace = await window.ipcRenderer.invoke(
-				"workspace-get",
-				currentWorkspace.id,
-			);
-			if (updatedWorkspace) {
-				setCurrentWorkspace(updatedWorkspace);
-			}
-
-			// Update the workspaces array
-			await loadAllWorkspaces();
-
-			// Set state to select the tab
-			setSelectedWorktreeId(worktreeId);
-			setSelectedTabId(existingDiffTab.id);
-			return;
-		}
-
-		// Create a new diff tab
-		const result = await window.ipcRenderer.invoke("tab-create", {
-			workspaceId: currentWorkspace.id,
-			worktreeId: worktreeId,
-			name: `Changes – ${worktree.branch}`,
-			type: "diff",
-		});
-
-		if (result.success && result.tab) {
-			// Set active selection in backend first
-			await window.ipcRenderer.invoke("workspace-set-active-selection", {
-				workspaceId: currentWorkspace.id,
-				worktreeId: worktreeId,
-				tabId: result.tab.id,
-			});
-
-			// Reload the workspace to get the updated state with the new tab
-			const updatedWorkspace = await window.ipcRenderer.invoke(
-				"workspace-get",
-				currentWorkspace.id,
-			);
-			if (updatedWorkspace) {
-				setCurrentWorkspace(updatedWorkspace);
-			}
-
-			// Update the workspaces array
-			await loadAllWorkspaces();
-
-			// Set state to select the new tab
-			setSelectedWorktreeId(worktreeId);
-			setSelectedTabId(result.tab.id);
 		}
 	};
 
@@ -932,7 +858,6 @@ export const MainLayout: React.FC = () => {
 							onCollapse={() => {
 								setShowSidebarOverlay(false);
 							}}
-							onShowDiff={handleShowDiff}
 						/>
 					</div>
 				</div>
@@ -1012,7 +937,6 @@ export const MainLayout: React.FC = () => {
 													panel.collapse();
 												}
 											}}
-											onShowDiff={handleShowDiff}
 										/>
 									)}
 								</ResizablePanel>
@@ -1022,10 +946,10 @@ export const MainLayout: React.FC = () => {
 								{/* Main content panel */}
 								<ResizablePanel defaultSize={80} minSize={30}>
 									{loading ||
-									error ||
-									!currentWorkspace ||
-									!selectedTab ||
-									!selectedWorktree ? (
+										error ||
+										!currentWorkspace ||
+										!selectedTab ||
+										!selectedWorktree ? (
 										<PlaceholderState
 											loading={loading}
 											error={error}
@@ -1061,18 +985,6 @@ export const MainLayout: React.FC = () => {
 											workspaceName={currentWorkspace.name}
 											mainBranch={currentWorkspace.branch}
 										/>
-									) : selectedTab.type === "diff" ? (
-										// Diff tab → display diff view
-										<div className="w-full h-full">
-											<DiffTab
-												tab={selectedTab}
-												workspaceId={currentWorkspace.id}
-												worktreeId={selectedWorktreeId ?? ""}
-												worktree={selectedWorktree}
-												workspaceName={currentWorkspace.name}
-												mainBranch={currentWorkspace.branch}
-											/>
-										</div>
 									) : (
 										// Base level tab (terminal, preview, etc.) → display full width/height
 										<div className="w-full h-full p-2 bg-[#1e1e1e]">

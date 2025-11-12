@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import type { Tab, Worktree } from "shared/types";
-import { DiffTab } from "../TabContent/components/DiffTab";
 import { PortTab } from "../TabContent/components/PortTab";
 import { PreviewTab } from "../TabContent/components/PreviewTab";
 import TabGroup from "./TabGroup";
@@ -119,29 +118,6 @@ export default function TabContent({
 						workspaceId={workspaceId}
 						worktreeId={worktreeId}
 						worktree={worktree}
-					/>
-				</div>
-			);
-
-		case "diff":
-			if (!worktreeId) {
-				return (
-					<PlaceholderContent
-						type="diff"
-						message="Worktree not available"
-						onFocus={handleFocus}
-					/>
-				);
-			}
-			return (
-				<div className="w-full h-full" onClick={handleFocus}>
-					<DiffTab
-						tab={tab}
-						workspaceId={workspaceId}
-						worktreeId={worktreeId}
-						worktree={worktree}
-						workspaceName={workspaceName}
-						mainBranch={mainBranch}
 					/>
 				</div>
 			);

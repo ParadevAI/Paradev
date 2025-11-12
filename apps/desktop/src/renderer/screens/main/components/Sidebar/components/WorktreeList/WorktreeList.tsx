@@ -1,6 +1,6 @@
 import { Button } from "@superset/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
-import { GitCompare, Monitor, Plus } from "lucide-react";
+import { Monitor, Plus } from "lucide-react";
 import type { Workspace, Worktree } from "shared/types";
 import { WorkspacePortIndicator } from "../WorkspacePortIndicator";
 import { WorktreeItem } from "./components/WorktreeItem";
@@ -14,7 +14,6 @@ interface WorktreeListProps {
 	onUpdateWorktree: (worktreeId: string, updatedWorktree: Worktree) => void;
 	selectedTabId: string | undefined;
 	onCloneWorktree: (worktreeId: string, branch: string) => void;
-	onShowDiff?: (worktreeId: string) => void;
 	selectedWorktreeId?: string | null;
 	showWorkspaceHeader?: boolean;
 }
@@ -28,7 +27,6 @@ export function WorktreeList({
 	onUpdateWorktree,
 	selectedTabId,
 	onCloneWorktree,
-	onShowDiff,
 	selectedWorktreeId,
 	showWorkspaceHeader = false,
 }: WorktreeListProps) {
@@ -106,12 +104,6 @@ export function WorktreeList({
 		}
 	};
 
-	const handleShowDiff = () => {
-		if (onShowDiff && selectedWorktreeId) {
-			onShowDiff(selectedWorktreeId);
-		}
-	};
-
 	return (
 		<>
 			{/* Workspace Header - more minimal */}
@@ -155,24 +147,6 @@ export function WorktreeList({
 							<p className="text-xs">New Preview</p>
 						</TooltipContent>
 					</Tooltip>
-
-					{onShowDiff && (
-						<Tooltip>
-							<TooltipTrigger asChild>
-								<Button
-									variant="ghost"
-									size="icon-sm"
-									onClick={handleShowDiff}
-									className="h-6 w-6 hover:bg-neutral-800/60 text-neutral-400 hover:text-neutral-200"
-								>
-									<GitCompare size={14} />
-								</Button>
-							</TooltipTrigger>
-							<TooltipContent side="bottom">
-								<p className="text-xs">View Changes</p>
-							</TooltipContent>
-						</Tooltip>
-					)}
 				</div>
 			)}
 

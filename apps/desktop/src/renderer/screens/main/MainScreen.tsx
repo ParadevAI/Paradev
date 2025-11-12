@@ -76,7 +76,6 @@ export function MainScreen() {
 	const {
 		handleWorktreeCreated,
 		handleUpdateWorktree,
-		handleShowDiff,
 		handleCreatePR,
 		handleMergePR,
 	} = useWorktrees({
@@ -130,7 +129,6 @@ export function MainScreen() {
 				onUpdateWorktree={handleUpdateWorktree}
 				selectedTabId={selectedTabId ?? undefined}
 				selectedWorktreeId={selectedWorktreeId}
-				onShowDiff={handleShowDiff}
 			/>
 
 			<AppFrame>
@@ -188,7 +186,6 @@ export function MainScreen() {
 							onUpdateWorktree={handleUpdateWorktree}
 							onTabFocus={handleTabFocus}
 							onTabCreated={handleTabCreated}
-							onShowDiff={handleShowDiff}
 						/>
 					</div>
 				</div>

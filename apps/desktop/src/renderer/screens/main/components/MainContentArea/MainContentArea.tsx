@@ -15,7 +15,6 @@ import { PlaceholderState } from "../PlaceholderState";
 import { PlanView } from "../PlanView";
 import { Sidebar } from "../Sidebar";
 import type { SidebarMode } from "../Sidebar/components/ModeCarousel";
-import { DiffTab } from "../TabContent/components/DiffTab";
 
 interface MainContentAreaProps {
     mode: AppMode;
@@ -38,7 +37,6 @@ interface MainContentAreaProps {
     onUpdateWorktree: (worktreeId: string, updatedWorktree: Worktree) => void;
     onTabFocus: (tabId: string) => void;
     onTabCreated: (worktreeId: string, tab: Tab) => void;
-    onShowDiff: (worktreeId: string) => Promise<void>;
 }
 
 export function MainContentArea({
@@ -62,7 +60,6 @@ export function MainContentArea({
     onUpdateWorktree,
     onTabFocus,
     onTabCreated,
-    onShowDiff,
 }: MainContentAreaProps) {
     const [sidebarMode, setSidebarMode] = useState<SidebarMode>("tabs");
     const [selectedFile, setSelectedFile] = useState<string | null>(null);
@@ -119,7 +116,6 @@ export function MainContentArea({
                                 panel.collapse();
                             }
                         }}
-                        onShowDiff={onShowDiff}
                         onDiffModeChange={(mode, file) => {
                             setSidebarMode(mode);
                             setSelectedFile(file);
@@ -195,18 +191,6 @@ export function MainContentArea({
                         workspaceName={currentWorkspace.name}
                         mainBranch={currentWorkspace.branch}
                     />
-                ) : selectedTab.type === "diff" ? (
-                    // Diff tab → display diff view
-                    <div className="w-full h-full">
-                        <DiffTab
-                            tab={selectedTab}
-                            workspaceId={currentWorkspace.id}
-                            worktreeId={selectedWorktreeId ?? ""}
-                            worktree={selectedWorktree}
-                            workspaceName={currentWorkspace.name}
-                            mainBranch={currentWorkspace.branch}
-                        />
-                    </div>
                 ) : (
                     // Base level tab (terminal, preview, etc.) → display full width/height
                     <div className="w-full h-full p-2 bg-[#1e1e1e]">

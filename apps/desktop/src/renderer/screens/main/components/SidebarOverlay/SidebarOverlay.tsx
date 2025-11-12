@@ -12,7 +12,6 @@ interface SidebarOverlayProps {
 	onUpdateWorktree: (worktreeId: string, updatedWorktree: import("shared/types").Worktree) => void;
 	selectedTabId?: string;
 	selectedWorktreeId: string | null;
-	onShowDiff: (worktreeId: string) => Promise<void>;
 }
 
 export function SidebarOverlay({
@@ -26,7 +25,6 @@ export function SidebarOverlay({
 	onUpdateWorktree,
 	selectedTabId,
 	selectedWorktreeId,
-	onShowDiff,
 }: SidebarOverlayProps) {
 	if (!isVisible || !workspaces) return null;
 
@@ -46,7 +44,6 @@ export function SidebarOverlay({
 					selectedTabId={selectedTabId}
 					selectedWorktreeId={selectedWorktreeId}
 					onCollapse={onMouseLeave}
-					onShowDiff={onShowDiff}
 				/>
 			</div>
 		</aside>
