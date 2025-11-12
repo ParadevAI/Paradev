@@ -3,14 +3,18 @@ import {
     ResizablePanel,
     ResizablePanelGroup,
 } from "@superset/ui/resizable";
+import { useState } from "react";
 import type { ImperativePanelHandle } from "react-resizable-panels";
 import type { Tab, Workspace, Worktree } from "shared/types";
+import { useDiffData } from "../../hooks";
 import type { AppMode } from "../../types";
+import { DiffContentArea } from "../DiffView";
 import TabContent from "../MainContent/TabContent";
 import TabGroup from "../MainContent/TabGroup";
 import { PlaceholderState } from "../PlaceholderState";
 import { PlanView } from "../PlanView";
 import { Sidebar } from "../Sidebar";
+import type { SidebarMode } from "../Sidebar/components/ModeCarousel";
 import { DiffTab } from "../TabContent/components/DiffTab";
 
 interface MainContentAreaProps {
@@ -60,6 +64,22 @@ export function MainContentArea({
     onTabCreated,
     onShowDiff,
 }: MainContentAreaProps) {
+    const [sidebarMode, setSidebarMode] = useState<SidebarMode>("tabs");
+    const [selectedFile, setSelectedFile] = useState<string | null>(null);
+
+    // Fetch diff data when sidebar is in diff mode
+    const {
+        diffData,
+        loading: diffLoading,
+        refreshing: diffRefreshing,
+        refresh: refreshDiff,
+    } = useDiffData({
+        workspaceId: currentWorkspace?.id,
+        worktreeId: selectedWorktreeId ?? undefined,
+        worktreeBranch: selectedWorktree?.branch,
+        workspaceName: currentWorkspace?.name,
+        enabled: sidebarMode === "diff" && !!selectedWorktreeId,
+    });
     if (mode === "plan") {
         return (
             <PlanView
@@ -100,6 +120,10 @@ export function MainContentArea({
                             }
                         }}
                         onShowDiff={onShowDiff}
+                        onDiffModeChange={(mode, file) => {
+                            setSidebarMode(mode);
+                            setSelectedFile(file);
+                        }}
                     />
                 )}
             </ResizablePanel>
@@ -108,7 +132,30 @@ export function MainContentArea({
 
             {/* Main content panel */}
             <ResizablePanel defaultSize={80} minSize={30}>
-                {loading ||
+                {sidebarMode === "diff" ? (
+                    diffLoading ? (
+                        <PlaceholderState
+                            loading={true}
+                            error={null}
+                            hasWorkspace={!!currentWorkspace}
+                        />
+                    ) : diffData ? (
+                        // Diff mode - show diff content area
+                        <DiffContentArea
+                            data={diffData}
+                            selectedFile={selectedFile}
+                            onFileSelect={setSelectedFile}
+                            onRefresh={refreshDiff}
+                            isRefreshing={diffRefreshing}
+                        />
+                    ) : (
+                        <PlaceholderState
+                            loading={false}
+                            error={null}
+                            hasWorkspace={!!currentWorkspace}
+                        />
+                    )
+                ) : loading ||
                     error ||
                     !currentWorkspace ||
                     !selectedTab ||

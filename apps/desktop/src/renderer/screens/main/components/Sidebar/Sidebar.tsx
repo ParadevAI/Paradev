@@ -1,6 +1,10 @@
 import { type MotionValue, useMotionValue } from "framer-motion";
+import { File, FileEdit, FilePlus, FileX } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { Tab, Workspace, Worktree } from "shared/types";
+import { useDiffData } from "../../hooks";
+import { FileTree } from "../DiffView";
+import type { FileDiff } from "../DiffView/types";
 import {
 	CreateWorktreeButton,
 	CreateWorktreeModal,
@@ -21,6 +25,7 @@ interface SidebarProps {
 	isDragging?: boolean;
 	onShowDiff?: (worktreeId: string) => void;
 	selectedWorktreeId?: string | null;
+	onDiffModeChange?: (mode: SidebarMode, selectedFile: string | null) => void;
 }
 
 export function Sidebar({
@@ -35,6 +40,7 @@ export function Sidebar({
 	isDragging = false,
 	onShowDiff,
 	selectedWorktreeId,
+	onDiffModeChange,
 }: SidebarProps) {
 	const [expandedWorktrees, setExpandedWorktrees] = useState<Set<string>>(
 		new Set(),
@@ -51,6 +57,7 @@ export function Sidebar({
 	const [setupStatus, setSetupStatus] = useState<string | undefined>(undefined);
 	const [setupOutput, setSetupOutput] = useState<string | undefined>(undefined);
 	const [currentMode, setCurrentMode] = useState<SidebarMode>("tabs");
+	const [selectedFile, setSelectedFile] = useState<string | null>(null);
 
 	// Initialize scroll progress
 	const defaultScrollProgress = useMotionValue(0);
@@ -59,6 +66,42 @@ export function Sidebar({
 	);
 
 	const modes: SidebarMode[] = ["tabs", "diff"];
+
+	// Fetch diff data when in diff mode
+	const { diffData } = useDiffData({
+		workspaceId: currentWorkspace?.id,
+		worktreeId: selectedWorktreeId ?? undefined,
+		worktreeBranch: currentWorkspace?.worktrees?.find(
+			(wt) => wt.id === selectedWorktreeId,
+		)?.branch,
+		workspaceName: currentWorkspace?.name,
+		enabled: currentMode === "diff" && !!selectedWorktreeId,
+	});
+
+	// Set initial selected file when diff data loads
+	useEffect(() => {
+		if (diffData?.files && diffData.files.length > 0 && !selectedFile) {
+			setSelectedFile(diffData.files[0]?.id || null);
+		}
+	}, [diffData, selectedFile]);
+
+	// Notify parent of mode and selected file changes
+	useEffect(() => {
+		onDiffModeChange?.(currentMode, selectedFile);
+	}, [currentMode, selectedFile, onDiffModeChange]);
+
+	const getFileIcon = (status: FileDiff["status"]) => {
+		switch (status) {
+			case "added":
+				return <FilePlus className="w-3.5 h-3.5 text-emerald-400" />;
+			case "deleted":
+				return <FileX className="w-3.5 h-3.5 text-rose-400" />;
+			case "modified":
+				return <FileEdit className="w-3.5 h-3.5 text-amber-400" />;
+			default:
+				return <File className="w-3.5 h-3.5 text-zinc-500" />;
+		}
+	};
 
 	// Auto-expand worktree if it contains the selected tab
 	useEffect(() => {
@@ -303,8 +346,34 @@ export function Sidebar({
 			>
 				{(mode, isActive) => {
 					if (mode === "diff") {
-						// Diff mode - empty for now
-						return <div className="flex-1" />;
+						// Diff mode - show file tree
+						if (!diffData || diffData.files.length === 0) {
+							return (
+								<div className="flex-1 flex items-center justify-center text-neutral-500 text-sm">
+									{selectedWorktreeId
+										? "No changes found"
+										: "Select a worktree to view changes"}
+								</div>
+							);
+						}
+
+						return (
+							<div className="flex-1 overflow-y-auto">
+								<div className="py-2">
+									<div className="px-3 py-2">
+										<h2 className="text-xs font-medium text-zinc-500">Files</h2>
+									</div>
+									<div className="px-2">
+										<FileTree
+											files={diffData.files}
+											selectedFile={selectedFile}
+											onFileSelect={setSelectedFile}
+											getFileIcon={getFileIcon}
+										/>
+									</div>
+								</div>
+							</div>
+						);
 					}
 
 					// Tabs mode - show worktree list

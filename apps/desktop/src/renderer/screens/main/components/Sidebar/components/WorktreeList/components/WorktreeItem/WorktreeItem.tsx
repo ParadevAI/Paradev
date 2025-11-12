@@ -200,10 +200,10 @@ function DroppableGroupTab({
 						type="button"
 						onClick={handleClick}
 						className={`group flex items-center gap-1.5 w-full h-7 px-2.5 text-xs rounded-md transition-all ${isSelected
-								? "bg-neutral-800/80 text-neutral-200"
-								: isOver
-									? "bg-blue-900/40 text-blue-200"
-									: "hover:bg-neutral-800/40 text-neutral-400"
+							? "bg-neutral-800/80 text-neutral-200"
+							: isOver
+								? "bg-blue-900/40 text-blue-200"
+								: "hover:bg-neutral-800/40 text-neutral-400"
 							}`}
 						style={{ paddingLeft: `${level * 12 + 10}px` }}
 					>

@@ -1,3 +1,4 @@
+export { useDiffData } from "./useDiffData";
 export { useSidebar } from "./useSidebar";
 export { useTabs } from "./useTabs";
 export { useTasks } from "./useTasks";
