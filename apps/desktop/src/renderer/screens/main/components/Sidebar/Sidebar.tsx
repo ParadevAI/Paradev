@@ -1,6 +1,6 @@
 import { type MotionValue, useMotionValue } from "framer-motion";
 import { useEffect, useState } from "react";
-import type { Workspace, Worktree } from "shared/types";
+import type { Tab, Workspace, Worktree } from "shared/types";
 import {
 	CreateWorktreeButton,
 	CreateWorktreeModal,
@@ -69,7 +69,7 @@ export function Sidebar({
 			// Find which worktree contains the selected tab (recursively search through tabs)
 			const findWorktreeWithTab = (tabId: string) => {
 				return currentWorkspace.worktrees?.find((worktree) => {
-					const searchTabs = (tabs: any[]): boolean => {
+					const searchTabs = (tabs: Tab[]): boolean => {
 						for (const tab of tabs) {
 							if (tab.id === tabId) return true;
 							if (tab.type === "group" && tab.tabs) {
@@ -149,17 +149,12 @@ export function Sidebar({
 
 		if (!currentWorkspace || !title.trim()) return;
 
-		console.log("[Sidebar] Creating worktree:", {
-			title,
-			branch: branchName.trim() || undefined,
-			createBranch: true,
-		});
 		setIsCreatingWorktree(true);
 		setSetupStatus("Creating git worktree...");
 		setSetupOutput(undefined);
 
 		// Listen for setup progress events
-		const progressHandler = (data: any) => {
+		const progressHandler = (data: { status: string; output: string }) => {
 			if (data && data.status !== undefined && data.output !== undefined) {
 				setSetupStatus(data.status);
 				setSetupOutput(data.output);
@@ -272,10 +267,6 @@ export function Sidebar({
 	const handleScanWorktrees = async () => {
 		if (!currentWorkspace) return;
 
-		console.log(
-			"[Sidebar] Scanning worktrees for workspace:",
-			currentWorkspace.id,
-		);
 		setIsScanningWorktrees(true);
 
 		try {
@@ -285,7 +276,6 @@ export function Sidebar({
 			)) as { success: boolean; imported?: number; error?: string };
 
 			if (result.success) {
-				console.log("[Sidebar] Scan completed, imported:", result.imported);
 				if (result.imported && result.imported > 0) {
 					onWorktreeCreated();
 				}
