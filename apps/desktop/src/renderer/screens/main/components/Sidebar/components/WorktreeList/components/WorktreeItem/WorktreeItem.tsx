@@ -10,26 +10,12 @@ import {
 	ContextMenu,
 	ContextMenuContent,
 	ContextMenuItem,
-	ContextMenuSeparator,
-	ContextMenuSub,
-	ContextMenuSubContent,
-	ContextMenuSubTrigger,
 	ContextMenuTrigger,
 } from "@superset/ui/context-menu";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import {
 	ChevronRight,
-	Clipboard,
 	Edit2,
-	ExternalLink,
 	FolderOpen,
-	GitBranch,
-	GitMerge,
-	Monitor,
-	Plus,
-	Settings,
-	Star,
-	Trash2,
 } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import type { MosaicNode } from "react-mosaic-component";
@@ -127,7 +113,7 @@ function SortableTab({
 function DroppableGroupTab({
 	tab,
 	worktreeId,
-	workspaceId,
+	workspaceId: _workspaceId,
 	selectedTabId,
 	isExpanded,
 	level,
@@ -213,13 +199,12 @@ function DroppableGroupTab({
 					<button
 						type="button"
 						onClick={handleClick}
-						className={`group flex items-center gap-1.5 w-full h-7 px-2.5 text-xs rounded-md transition-all ${
-							isSelected
+						className={`group flex items-center gap-1.5 w-full h-7 px-2.5 text-xs rounded-md transition-all ${isSelected
 								? "bg-neutral-800/80 text-neutral-200"
 								: isOver
 									? "bg-blue-900/40 text-blue-200"
 									: "hover:bg-neutral-800/40 text-neutral-400"
-						}`}
+							}`}
 						style={{ paddingLeft: `${level * 12 + 10}px` }}
 					>
 						<ChevronRight
@@ -278,9 +263,8 @@ function DroppableGroupArea({
 	return (
 		<div
 			ref={setNodeRef}
-			className={`relative ${
-				isOver ? "bg-blue-900/20 border-l-2 border-blue-500 rounded-r-md" : ""
-			}`}
+			className={`relative ${isOver ? "bg-blue-900/20 border-l-2 border-blue-500 rounded-r-md" : ""
+				}`}
 			style={{
 				minHeight: "40px",
 				transition: "all 0.2s",
@@ -300,9 +284,6 @@ interface WorktreeItemProps {
 	worktree: Worktree;
 	workspaceId: string;
 	activeWorktreeId: string | null;
-	mainBranch: string;
-	isExpanded: boolean;
-	onToggle: (worktreeId: string) => void;
 	onTabSelect: (worktreeId: string, tabId: string) => void;
 	onReload: () => void;
 	onUpdateWorktree: (updatedWorktree: Worktree) => void;
@@ -315,15 +296,12 @@ export function WorktreeItem({
 	worktree,
 	workspaceId,
 	activeWorktreeId,
-	mainBranch,
-	isExpanded,
-	onToggle,
 	onTabSelect,
 	onReload,
 	onUpdateWorktree,
 	selectedTabId,
 	hasPortForwarding = false,
-	onCloneWorktree,
+	onCloneWorktree: _onCloneWorktree,
 }: WorktreeItemProps) {
 	// Track expanded group tabs
 	const [expandedGroupTabs, setExpandedGroupTabs] = useState<Set<string>>(
@@ -335,7 +313,9 @@ export function WorktreeItem({
 	const [lastClickedTabId, setLastClickedTabId] = useState<string | null>(null);
 
 	// Track if merge is disabled (when this is the active worktree)
+	// biome-ignore lint/correctness/noUnusedVariables: kept for potential future use
 	const [isMergeDisabled, setIsMergeDisabled] = useState(false);
+	// biome-ignore lint/correctness/noUnusedVariables: kept for potential future use
 	const [mergeDisabledReason, setMergeDisabledReason] = useState<string>("");
 	const [targetWorktreeId, setTargetWorktreeId] = useState<string>("");
 	const [targetBranch, setTargetBranch] = useState<string>("");
@@ -356,12 +336,8 @@ export function WorktreeItem({
 	// Track if this worktree is active
 	const isActive = activeWorktreeId === worktree.id;
 
-	// Effect: Log when worktree becomes active/inactive
-	useEffect(() => {
-		console.log(
-			`[WorktreeItem] Worktree ${worktree.branch} (${worktree.id}) active state: ${isActive}`,
-		);
-	}, [isActive, worktree.branch, worktree.id]);
+	// Generate ID for select element (must be called before conditional return)
+	const targetBranchSelectId = useId();
 
 	// Auto-expand group tabs that contain the selected tab
 	// biome-ignore lint/correctness/useExhaustiveDependencies: findParentGroupTab is stable
@@ -713,9 +689,15 @@ export function WorktreeItem({
 		};
 
 		loadWorktrees();
-	}, [workspaceId, worktree.id, activeWorktreeId]);
+	}, [workspaceId, worktree.id]);
 
-	// Context menu handlers
+	// Only render tabs for the active worktree
+	if (!isActive) {
+		return null;
+	}
+
+	// Context menu handlers (unused but kept for potential future use)
+	// biome-ignore lint/correctness/noUnusedVariables: kept for potential future use
 	const handleCopyPath = async () => {
 		const path = await window.ipcRenderer.invoke("worktree-get-path", {
 			workspaceId,
@@ -726,6 +708,7 @@ export function WorktreeItem({
 		}
 	};
 
+	// biome-ignore lint/correctness/noUnusedVariables: kept for potential future use
 	const handleRemoveWorktree = async () => {
 		// Check if the worktree has uncommitted changes
 		const canRemoveResult = await window.ipcRenderer.invoke(
@@ -763,12 +746,13 @@ export function WorktreeItem({
 			setErrorTitle("Failed to Remove Worktree");
 			setErrorMessage(
 				result.error ||
-					"An unknown error occurred while removing the worktree.",
+				"An unknown error occurred while removing the worktree.",
 			);
 			setShowErrorDialog(true);
 		}
 	};
 
+	// biome-ignore lint/correctness/noUnusedVariables: kept for potential future use
 	const handleMergeWorktree = async () => {
 		// Check if can merge with the selected target
 		const canMergeResult = await window.ipcRenderer.invoke(
@@ -881,6 +865,7 @@ export function WorktreeItem({
 		}
 	};
 
+	// biome-ignore lint/correctness/noUnusedVariables: kept for potential future use
 	const handleOpenInCursor = async () => {
 		const path = await window.ipcRenderer.invoke("worktree-get-path", {
 			workspaceId,
@@ -892,6 +877,7 @@ export function WorktreeItem({
 		}
 	};
 
+	// biome-ignore lint/correctness/noUnusedVariables: kept for potential future use
 	const handleOpenSettings = async () => {
 		// First, check if settings folder exists
 		const checkResult = await window.ipcRenderer.invoke(
@@ -906,7 +892,7 @@ export function WorktreeItem({
 			setErrorTitle("Failed to Check Settings");
 			setErrorMessage(
 				checkResult.error ||
-					"An unknown error occurred while checking settings.",
+				"An unknown error occurred while checking settings.",
 			);
 			setShowErrorDialog(true);
 			return;
@@ -930,6 +916,7 @@ export function WorktreeItem({
 		}
 	};
 
+	// biome-ignore lint/correctness/noUnusedVariables: kept for potential future use
 	const handleAddTab = async () => {
 		try {
 			const result = await window.ipcRenderer.invoke("tab-create", {
@@ -955,6 +942,7 @@ export function WorktreeItem({
 		}
 	};
 
+	// biome-ignore lint/correctness/noUnusedVariables: kept for potential future use
 	const handleAddPreview = async () => {
 		try {
 			const previewTabs = Array.isArray(worktree.tabs)
@@ -1167,109 +1155,21 @@ export function WorktreeItem({
 
 	return (
 		<div className="space-y-0.5">
-			{/* Worktree Header */}
-			<Tooltip>
-				<ContextMenu>
-					<ContextMenuTrigger asChild>
-						<TooltipTrigger asChild>
-							<Button
-								variant="ghost"
-								size="sm"
-								onClick={() => onToggle(worktree.id)}
-								className="group w-full h-7 px-2.5 font-normal text-xs hover:bg-neutral-800/50 gap-1.5"
-								style={{ justifyContent: "flex-start" }}
-							>
-								<ChevronRight
-									size={11}
-									className={`transition-transform text-neutral-500 ${isExpanded ? "rotate-90" : ""}`}
-								/>
-								<GitBranch size={12} className="text-neutral-400" />
-								<span className="truncate flex-1 text-left text-neutral-300">
-									{worktree.branch}
-								</span>
-								{worktree.branch === mainBranch && (
-									<Star
-										size={11}
-										className="text-yellow-500/80 shrink-0 fill-yellow-500/80"
-									/>
-								)}
-								{worktree.merged && (
-									<GitMerge size={11} className="text-purple-400/80 shrink-0" />
-								)}
-							</Button>
-						</TooltipTrigger>
-					</ContextMenuTrigger>
-					<ContextMenuContent>
-						<ContextMenuSub>
-							<ContextMenuSubTrigger>
-								<GitBranch size={14} className="mr-2" />
-								Git
-							</ContextMenuSubTrigger>
-							<ContextMenuSubContent>
-								<ContextMenuItem onClick={onCloneWorktree}>
-									<GitBranch size={14} className="mr-2" />
-									Clone
-								</ContextMenuItem>
-								<ContextMenuItem
-									onClick={handleMergeWorktree}
-									disabled={isMergeDisabled}
-								>
-									<GitMerge size={14} className="mr-2" />
-									{isMergeDisabled ? `Merge (${mergeDisabledReason})` : "Merge"}
-								</ContextMenuItem>
-								<ContextMenuItem onClick={() => setShowGitStatusDialog(true)}>
-									<GitBranch size={14} className="mr-2" />
-									Status
-								</ContextMenuItem>
-							</ContextMenuSubContent>
-						</ContextMenuSub>
-						<ContextMenuSeparator />
-						<ContextMenuItem onClick={handleCopyPath}>
-							<Clipboard size={14} className="mr-2" />
-							Copy Path
-						</ContextMenuItem>
-						<ContextMenuItem onClick={handleOpenInCursor}>
-							<ExternalLink size={14} className="mr-2" />
-							Open in Cursor
-						</ContextMenuItem>
-						<ContextMenuItem onClick={handleOpenSettings}>
-							<Settings size={14} className="mr-2" />
-							Open Settings
-						</ContextMenuItem>
-						<ContextMenuSeparator />
-						<ContextMenuItem
-							onClick={handleRemoveWorktree}
-							variant="destructive"
-						>
-							<Trash2 size={14} className="mr-2" />
-							Remove Worktree
-						</ContextMenuItem>
-					</ContextMenuContent>
-				</ContextMenu>
-				{worktree.description && (
-					<TooltipContent side="right" className="max-w-xs">
-						<p className="text-sm">{worktree.description}</p>
-					</TooltipContent>
-				)}
-			</Tooltip>
-
 			{/* Ports List - shown inline if port forwarding is configured */}
-			{isExpanded && hasPortForwarding && (
+			{hasPortForwarding && (
 				<WorktreePortsList worktree={worktree} workspaceId={workspaceId} />
 			)}
 
 			{/* Tabs List */}
-			{isExpanded && (
-				<div className="ml-4 space-y-0.5">
-					{/* Render tabs with collapsible groups */}
-					<SortableContext
-						items={allTabIds}
-						strategy={verticalListSortingStrategy}
-					>
-						{tabs.map((tab) => renderTab(tab, undefined, 0))}
-					</SortableContext>
-				</div>
-			)}
+			<div className="space-y-0.5">
+				{/* Render tabs with collapsible groups */}
+				<SortableContext
+					items={allTabIds}
+					strategy={verticalListSortingStrategy}
+				>
+					{tabs.map((tab) => renderTab(tab, undefined, 0))}
+				</SortableContext>
+			</div>
 
 			{/* Remove Worktree Confirmation Dialog */}
 			<Dialog open={showRemoveDialog} onOpenChange={setShowRemoveDialog}>
@@ -1325,7 +1225,7 @@ export function WorktreeItem({
 							Target Branch
 						</label>
 						<select
-							id={useId()}
+							id={targetBranchSelectId}
 							value={targetWorktreeId}
 							onChange={(e) => handleTargetWorktreeChange(e.target.value)}
 							className="w-full px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-md text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"

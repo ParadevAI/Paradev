@@ -182,9 +182,6 @@ export function WorktreeList({
 					worktree={worktree}
 					workspaceId={currentWorkspace.id}
 					activeWorktreeId={currentWorkspace.activeWorktreeId}
-					mainBranch={mainBranch}
-					isExpanded={expandedWorktrees.has(worktree.id)}
-					onToggle={onToggleWorktree}
 					onTabSelect={onTabSelect}
 					onReload={onReload}
 					onUpdateWorktree={(updatedWorktree) =>
