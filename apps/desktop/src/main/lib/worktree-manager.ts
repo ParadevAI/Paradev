@@ -690,6 +690,229 @@ class WorktreeManager {
 	}
 
 	/**
+	 * Get file list with stats (without full diff content) - non-blocking
+	 */
+	async getGitDiffFileList(
+		worktreePath: string,
+		mainBranch: string,
+	): Promise<{
+		success: boolean;
+		files?: Array<{
+			id: string;
+			fileName: string;
+			filePath: string;
+			status: "added" | "deleted" | "modified" | "renamed";
+			oldPath?: string;
+			additions: number;
+			deletions: number;
+		}>;
+		error?: string;
+	}> {
+		try {
+			// Get list of changed files with status
+			const diffFilesResult = await execAsync(
+				`git diff ${mainBranch} --name-status`,
+				{ cwd: worktreePath },
+			);
+
+			const fileLines = diffFilesResult.stdout
+				.trim()
+				.split("\n")
+				.filter(Boolean);
+			const files = [];
+
+			for (let i = 0; i < fileLines.length; i++) {
+				const fileLine = fileLines[i];
+				const parts = fileLine.split("\t");
+				const statusCode = parts[0];
+				const filePath = parts[1];
+				const oldPath = parts[2]; // For renamed files
+
+				// Determine status
+				let status: "added" | "deleted" | "modified" | "renamed" = "modified";
+				if (statusCode.startsWith("A")) status = "added";
+				else if (statusCode.startsWith("D")) status = "deleted";
+				else if (statusCode.startsWith("R")) status = "renamed";
+				else if (statusCode.startsWith("M")) status = "modified";
+
+				// Get stats only (additions/deletions) without full diff content
+				const statCommand =
+					status === "deleted"
+						? `git diff ${mainBranch} --numstat -- "${filePath}"`
+						: `git diff ${mainBranch} --numstat -- "${oldPath || filePath}"`;
+
+				let additions = 0;
+				let deletions = 0;
+
+				try {
+					const statResult = await execAsync(statCommand, {
+						cwd: worktreePath,
+					});
+					const statLine = statResult.stdout.trim();
+					if (statLine) {
+						const statParts = statLine.split("\t");
+						if (statParts.length >= 2) {
+							additions = parseInt(statParts[0], 10) || 0;
+							deletions = parseInt(statParts[1], 10) || 0;
+						}
+					}
+				} catch (statError) {
+					// If stat fails, try to get from shortstat
+					try {
+						const shortStatResult = await execAsync(
+							`git diff ${mainBranch} --shortstat -- "${oldPath || filePath}"`,
+							{ cwd: worktreePath },
+						);
+						const shortStat = shortStatResult.stdout.trim();
+						const additionsMatch = shortStat.match(/(\d+)\s+insertion/);
+						const deletionsMatch = shortStat.match(/(\d+)\s+deletion/);
+						if (additionsMatch) {
+							additions = parseInt(additionsMatch[1], 10) || 0;
+						}
+						if (deletionsMatch) {
+							deletions = parseInt(deletionsMatch[1], 10) || 0;
+						}
+					} catch {
+						// If both fail, leave as 0
+					}
+				}
+
+				const fileName = path.basename(oldPath || filePath);
+				files.push({
+					id: `file-${i}`,
+					fileName,
+					filePath: oldPath || filePath,
+					status,
+					...(oldPath && { oldPath: filePath }),
+					additions,
+					deletions,
+				});
+			}
+
+			return {
+				success: true,
+				files,
+			};
+		} catch (error) {
+			console.error("Failed to get git diff file list:", error);
+			return {
+				success: false,
+				error: error instanceof Error ? error.message : String(error),
+			};
+		}
+	}
+
+	/**
+	 * Get detailed diff content for a single file - lazy loading
+	 */
+	async getGitDiffFile(
+		worktreePath: string,
+		mainBranch: string,
+		filePath: string,
+		oldPath: string | undefined,
+		status: "added" | "deleted" | "modified" | "renamed",
+	): Promise<{
+		success: boolean;
+		changes?: Array<{
+			type: "added" | "removed" | "modified" | "unchanged";
+			oldLineNumber: number | null;
+			newLineNumber: number | null;
+			content: string;
+		}>;
+		error?: string;
+	}> {
+		try {
+			// Get detailed diff for this file
+			const diffCommand =
+				status === "deleted"
+					? `git diff ${mainBranch} -- "${filePath}"`
+					: `git diff ${mainBranch} -- "${oldPath || filePath}"`;
+
+			const fileDiffResult = await execAsync(diffCommand, {
+				cwd: worktreePath,
+				maxBuffer: 10 * 1024 * 1024, // 10MB buffer for large diffs
+			});
+
+			const diffOutput = fileDiffResult.stdout;
+
+			// Parse the diff output
+			const changes: Array<{
+				type: "added" | "removed" | "modified" | "unchanged";
+				oldLineNumber: number | null;
+				newLineNumber: number | null;
+				content: string;
+			}> = [];
+
+			let oldLineNum = 0;
+			let newLineNum = 0;
+
+			const diffLines = diffOutput.split("\n");
+			for (let i = 0; i < diffLines.length; i++) {
+				const line = diffLines[i];
+
+				// Parse hunk headers (e.g., @@ -1,4 +1,5 @@)
+				if (line.startsWith("@@")) {
+					const match = line.match(/@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@/);
+					if (match) {
+						oldLineNum = parseInt(match[1], 10);
+						newLineNum = parseInt(match[2], 10);
+					}
+					continue;
+				}
+
+				// Skip file headers
+				if (
+					line.startsWith("diff --git") ||
+					line.startsWith("index ") ||
+					line.startsWith("---") ||
+					line.startsWith("+++")
+				) {
+					continue;
+				}
+
+				// Parse actual changes
+				if (line.startsWith("+")) {
+					changes.push({
+						type: "added",
+						oldLineNumber: null,
+						newLineNumber: newLineNum,
+						content: line.substring(1),
+					});
+					newLineNum++;
+				} else if (line.startsWith("-")) {
+					changes.push({
+						type: "removed",
+						oldLineNumber: oldLineNum,
+						newLineNumber: null,
+						content: line.substring(1),
+					});
+					oldLineNum++;
+				} else if (line.startsWith(" ")) {
+					changes.push({
+						type: "unchanged",
+						oldLineNumber: oldLineNum,
+						newLineNumber: newLineNum,
+						content: line.substring(1),
+					});
+					oldLineNum++;
+					newLineNum++;
+				}
+			}
+
+			return {
+				success: true,
+				changes,
+			};
+		} catch (error) {
+			console.error("Failed to get git diff file:", error);
+			return {
+				success: false,
+				error: error instanceof Error ? error.message : String(error),
+			};
+		}
+	}
+
+	/**
 	 * Create a pull request for a worktree using gh CLI
 	 */
 	async createPullRequest(

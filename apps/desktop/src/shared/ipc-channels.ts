@@ -210,6 +210,41 @@ export interface IpcChannels {
 			error?: string;
 		};
 	};
+	"worktree-get-git-diff-file-list": {
+		request: { workspaceId: string; worktreeId: string };
+		response: {
+			success: boolean;
+			files?: Array<{
+				id: string;
+				fileName: string;
+				filePath: string;
+				status: "added" | "deleted" | "modified" | "renamed";
+				oldPath?: string;
+				additions: number;
+				deletions: number;
+			}>;
+			error?: string;
+		};
+	};
+	"worktree-get-git-diff-file": {
+		request: {
+			workspaceId: string;
+			worktreeId: string;
+			filePath: string;
+			oldPath?: string;
+			status: "added" | "deleted" | "modified" | "renamed";
+		};
+		response: {
+			success: boolean;
+			changes?: Array<{
+				type: "added" | "removed" | "modified" | "unchanged";
+				oldLineNumber: number | null;
+				newLineNumber: number | null;
+				content: string;
+			}>;
+			error?: string;
+		};
+	};
 	"worktree-create-pr": {
 		request: { workspaceId: string; worktreeId: string };
 		response: {

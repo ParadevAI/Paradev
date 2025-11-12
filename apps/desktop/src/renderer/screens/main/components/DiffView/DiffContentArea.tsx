@@ -19,6 +19,9 @@ interface DiffContentAreaProps {
 	onFileSelect: (fileId: string) => void;
 	onRefresh?: () => void;
 	isRefreshing?: boolean;
+	loadFileContent?: (fileId: string) => void;
+	loadedFiles?: Set<string>;
+	loadingFiles?: Set<string>;
 }
 
 export function DiffContentArea({
@@ -27,9 +30,51 @@ export function DiffContentArea({
 	onFileSelect,
 	onRefresh,
 	isRefreshing = false,
+	loadFileContent,
+	loadedFiles = new Set(),
+	loadingFiles = new Set(),
 }: DiffContentAreaProps) {
 	const [viewMode, setViewMode] = useState<ViewMode>("files");
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+	// Load selected file immediately
+	useEffect(() => {
+		if (selectedFile && loadFileContent && !loadedFiles.has(selectedFile) && !loadingFiles.has(selectedFile)) {
+			loadFileContent(selectedFile);
+		}
+	}, [selectedFile, loadFileContent, loadedFiles, loadingFiles]);
+
+	// Use intersection observer to load files when they come into view
+	useEffect(() => {
+		if (viewMode !== "files" || !scrollContainerRef.current || !loadFileContent) return;
+
+		const observer = new IntersectionObserver(
+			(entries) => {
+				for (const entry of entries) {
+					if (entry.isIntersecting) {
+						const fileId = entry.target.id.replace("file-diff-", "");
+						if (fileId && !loadedFiles.has(fileId) && !loadingFiles.has(fileId)) {
+							loadFileContent(fileId);
+						}
+					}
+				}
+			},
+			{
+				root: scrollContainerRef.current,
+				rootMargin: "200px", // Start loading 200px before file comes into view
+				threshold: 0.1,
+			},
+		);
+
+		// Observe all file diff elements
+		const elements =
+			scrollContainerRef.current.querySelectorAll('[id^="file-diff-"]');
+		elements.forEach((el) => observer.observe(el));
+
+		return () => {
+			observer.disconnect();
+		};
+	}, [viewMode, data.files, loadFileContent, loadedFiles, loadingFiles]);
 
 	const getFileIcon = (status: FileDiff["status"]) => {
 		switch (status) {
@@ -267,7 +312,11 @@ export function DiffContentArea({
 										selectedFile === file.id ? "bg-white/[0.02]" : ""
 									}`}
 								>
-									<DiffContent file={file} />
+									<DiffContent
+										file={file}
+										isLoading={loadingFiles.has(file.id)}
+										onLoad={() => loadFileContent?.(file.id)}
+									/>
 								</div>
 							))}
 						</div>

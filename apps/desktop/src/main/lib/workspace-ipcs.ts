@@ -552,6 +552,96 @@ export function registerWorkspaceIPCs() {
 		},
 	);
 
+	// Get git diff file list (without full content) - non-blocking
+	ipcMain.handle(
+		"worktree-get-git-diff-file-list",
+		async (_event, input: { workspaceId: string; worktreeId: string }) => {
+			try {
+				const workspace = await workspaceManager.getWorkspace(
+					input.workspaceId,
+				);
+				if (!workspace) {
+					return {
+						success: false,
+						error: "Workspace not found",
+					};
+				}
+
+				const worktree = workspace.worktrees.find(
+					(wt) => wt.id === input.worktreeId,
+				);
+				if (!worktree) {
+					return {
+						success: false,
+						error: "Worktree not found",
+					};
+				}
+
+				return await worktreeManager.getGitDiffFileList(
+					worktree.path,
+					workspace.branch,
+				);
+			} catch (error) {
+				console.error("Failed to get git diff file list:", error);
+				return {
+					success: false,
+					error: error instanceof Error ? error.message : String(error),
+				};
+			}
+		},
+	);
+
+	// Get git diff for a single file - lazy loading
+	ipcMain.handle(
+		"worktree-get-git-diff-file",
+		async (
+			_event,
+			input: {
+				workspaceId: string;
+				worktreeId: string;
+				filePath: string;
+				oldPath?: string;
+				status: "added" | "deleted" | "modified" | "renamed";
+			},
+		) => {
+			try {
+				const workspace = await workspaceManager.getWorkspace(
+					input.workspaceId,
+				);
+				if (!workspace) {
+					return {
+						success: false,
+						error: "Workspace not found",
+					};
+				}
+
+				const worktree = workspace.worktrees.find(
+					(wt) => wt.id === input.worktreeId,
+				);
+				if (!worktree) {
+					return {
+						success: false,
+						error: "Worktree not found",
+					};
+				}
+
+				return await worktreeManager.getGitDiffFile(
+					worktree.path,
+					workspace.branch,
+					input.filePath,
+					input.oldPath,
+					input.status,
+				);
+			} catch (error) {
+				console.error("Failed to get git diff file:", error);
+				return {
+					success: false,
+					error: error instanceof Error ? error.message : String(error),
+				};
+			}
+		},
+	);
+
 	// Create PR for a worktree
 	ipcMain.handle(
 		"worktree-create-pr",

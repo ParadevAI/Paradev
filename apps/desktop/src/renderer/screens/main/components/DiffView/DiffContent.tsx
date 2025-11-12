@@ -1,4 +1,5 @@
-import { memo } from "react";
+import { Loader2 } from "lucide-react";
+import { memo, useEffect } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { detectLanguage } from "./languageDetector";
@@ -6,12 +7,23 @@ import type { DiffLine, FileDiff } from "./types";
 
 interface DiffContentProps {
 	file: FileDiff;
+	isLoading?: boolean;
+	onLoad?: () => void;
 }
 
 export const DiffContent = memo(function DiffContent({
 	file,
+	isLoading = false,
+	onLoad,
 }: DiffContentProps) {
 	const language = detectLanguage(file.fileName);
+
+	// Trigger load when component mounts if content is not loaded
+	useEffect(() => {
+		if (file.changes.length === 0 && !isLoading && onLoad) {
+			onLoad();
+		}
+	}, [file.changes.length, isLoading, onLoad]);
 	const renderDiffLine = (line: DiffLine, index: number) => {
 		const getBgColor = () => {
 			switch (line.type) {
@@ -159,9 +171,18 @@ export const DiffContent = memo(function DiffContent({
 			</div>
 			{/* Diff content area */}
 			<div className="flex-1 overflow-auto">
-				<div className="min-w-max">
-					{file.changes.map((line, index) => renderDiffLine(line, index))}
-				</div>
+				{isLoading || file.changes.length === 0 ? (
+					<div className="flex items-center justify-center h-full min-h-[200px]">
+						<div className="flex flex-col items-center gap-2 text-zinc-500">
+							<Loader2 className="w-5 h-5 animate-spin" />
+							<span className="text-xs">Loading diff content...</span>
+						</div>
+					</div>
+				) : (
+					<div className="min-w-max">
+						{file.changes.map((line, index) => renderDiffLine(line, index))}
+					</div>
+				)}
 			</div>
 		</div>
 	);

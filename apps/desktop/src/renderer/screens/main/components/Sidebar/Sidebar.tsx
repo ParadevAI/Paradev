@@ -6,7 +6,6 @@ import { useDiffData } from "../../hooks";
 import { FileTree } from "../DiffView";
 import type { FileDiff } from "../DiffView/types";
 import {
-	CreateWorktreeButton,
 	CreateWorktreeModal,
 	WorktreeList,
 } from "./components";
@@ -66,7 +65,7 @@ export function Sidebar({
 	const modes: SidebarMode[] = ["tabs", "diff"];
 
 	// Fetch diff data when in diff mode
-	const { diffData } = useDiffData({
+	const { diffData, loading: diffLoading } = useDiffData({
 		workspaceId: currentWorkspace?.id,
 		worktreeId: selectedWorktreeId ?? undefined,
 		worktreeBranch: currentWorkspace?.worktrees?.find(
@@ -345,6 +344,14 @@ export function Sidebar({
 				{(mode, isActive) => {
 					if (mode === "diff") {
 						// Diff mode - show file tree
+						if (diffLoading) {
+							return (
+								<div className="flex-1 flex items-center justify-center text-neutral-500 text-sm">
+									Loading files...
+								</div>
+							);
+						}
+
 						if (!diffData || diffData.files.length === 0) {
 							return (
 								<div className="flex-1 flex items-center justify-center text-neutral-500 text-sm">
@@ -391,13 +398,6 @@ export function Sidebar({
 								}
 								showWorkspaceHeader={true}
 							/>
-
-							{currentWorkspace && (
-								<CreateWorktreeButton
-									onClick={handleCreateWorktree}
-									isCreating={isCreatingWorktree}
-								/>
-							)}
 						</>
 					);
 				}}

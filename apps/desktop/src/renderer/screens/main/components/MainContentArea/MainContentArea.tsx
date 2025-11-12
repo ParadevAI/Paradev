@@ -70,6 +70,9 @@ export function MainContentArea({
         loading: diffLoading,
         refreshing: diffRefreshing,
         refresh: refreshDiff,
+        loadFileContent,
+        loadedFiles,
+        loadingFiles,
     } = useDiffData({
         workspaceId: currentWorkspace?.id,
         worktreeId: selectedWorktreeId ?? undefined,
@@ -143,6 +146,9 @@ export function MainContentArea({
                             onFileSelect={setSelectedFile}
                             onRefresh={refreshDiff}
                             isRefreshing={diffRefreshing}
+                            loadFileContent={loadFileContent}
+                            loadedFiles={loadedFiles}
+                            loadingFiles={loadingFiles}
                         />
                     ) : (
                         <PlaceholderState
