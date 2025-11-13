@@ -25,11 +25,11 @@ export const TaskTabs: React.FC<TaskTabsProps> = ({
 
 	return (
 		<div
-			className="flex items-end justify-between select-none shrink-0 h-10 pl-14 border-b border-neutral-800"
+			className="flex items-end justify-between select-none shrink-0 h-10 pl-16 border-b border-neutral-800"
 			style={{ WebkitAppRegion: "drag" } as React.CSSProperties}
 		>
 			<div
-				className="flex items-center gap-1 px-2 h-full"
+				className="flex items-center gap-1 px-1 h-full"
 				style={{ WebkitAppRegion: "no-drag" } as React.CSSProperties}
 			>
 				<SidebarToggle
@@ -40,7 +40,7 @@ export const TaskTabs: React.FC<TaskTabsProps> = ({
 
 				{onModeChange && <ModeToggle mode={mode} onChange={onModeChange} />}
 
-				<div className="flex items-end h-full gap-0">
+				<div className="flex items-end h-full gap-1">
 					{worktrees.map((worktree, index) => {
 						const isSelected = selectedWorktreeId === worktree.id;
 						const prevWorktree = index > 0 ? worktrees[index - 1] : null;
