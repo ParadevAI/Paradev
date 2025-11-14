@@ -78,11 +78,13 @@ export function MainScreen() {
 		handleUpdateWorktree,
 		handleCreatePR,
 		handleMergePR,
+		handleDeleteWorktree,
 	} = useWorktrees({
 		currentWorkspace,
 		setCurrentWorkspace,
 		setWorkspaces,
 		loadAllWorkspaces,
+		selectedWorktreeId,
 		setSelectedWorktreeId,
 		setSelectedTabId,
 	});
@@ -90,6 +92,11 @@ export function MainScreen() {
 	// Task management
 	const {
 		isAddTaskModalOpen,
+		addTaskModalInitialMode,
+		branches,
+		isCreatingWorktree,
+		setupStatus,
+		setupOutput,
 		pendingWorktrees,
 		openTasks,
 		handleOpenAddTaskModal,
@@ -159,6 +166,8 @@ export function MainScreen() {
 								handleTabSelect(worktreeId, worktree.tabs[0].id);
 							}
 						}}
+						onDeleteWorktree={handleDeleteWorktree}
+						workspaceId={currentWorkspace?.id}
 						mode={mode}
 						onModeChange={setMode}
 					/>
@@ -199,6 +208,12 @@ export function MainScreen() {
 				openTasks={openTasks}
 				onSelectTask={handleSelectTask}
 				onCreateTask={handleCreateTask}
+				initialMode={addTaskModalInitialMode}
+				branches={branches}
+				worktrees={currentWorkspace?.worktrees || []}
+				isCreating={isCreatingWorktree}
+				setupStatus={setupStatus}
+				setupOutput={setupOutput}
 			/>
 
 			{/* Workspace Selection Modal */}
