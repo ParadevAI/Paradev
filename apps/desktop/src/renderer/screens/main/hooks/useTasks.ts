@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Worktree } from "shared/types";
 import type { TaskStatus } from "../components/Layout/StatusIndicator";
 import type { UITask, PendingWorktree } from "../types";
@@ -29,6 +29,19 @@ export function useTasks({
 	const [pendingWorktrees, setPendingWorktrees] = useState<PendingWorktree[]>(
 		[],
 	);
+	const progressHandlerRef = useRef<((data: { status: string; output: string }) => void) | null>(null);
+	const isHandlingProgressRef = useRef(false);
+
+	// Cleanup IPC listener on unmount or when creation completes
+	useEffect(() => {
+		return () => {
+			if (progressHandlerRef.current) {
+				window.ipcRenderer.removeListener("worktree-setup-progress", progressHandlerRef.current);
+				progressHandlerRef.current = null;
+			}
+			isHandlingProgressRef.current = false;
+		};
+	}, []);
 
 	// Compute which tasks have worktrees (are "open")
 	const openTasks = MOCK_TASKS.filter((task) =>
@@ -55,6 +68,11 @@ export function useTasks({
 		if (isCreatingWorktree) return; // Prevent closing while creating
 		setIsAddTaskModalOpen(false);
 		setIsCreatingWorktree(false);
+		setSetupStatus(undefined);
+		setSetupOutput(undefined);
+	};
+
+	const handleClearStatus = () => {
 		setSetupStatus(undefined);
 		setSetupOutput(undefined);
 	};
@@ -147,13 +165,24 @@ export function useTasks({
 		setSetupStatus("Creating git worktree...");
 		setSetupOutput(undefined);
 
+		// Clean up any existing listener first
+		if (progressHandlerRef.current) {
+			window.ipcRenderer.removeListener("worktree-setup-progress", progressHandlerRef.current);
+		}
+
+		isHandlingProgressRef.current = true;
+
 		// Listen for setup progress events
 		const progressHandler = (data: { status: string; output: string }) => {
+			// Ignore events if we're no longer handling progress
+			if (!isHandlingProgressRef.current) return;
+			
 			if (data && data.status !== undefined && data.output !== undefined) {
 				setSetupStatus(data.status);
 				setSetupOutput(data.output);
 			}
 		};
+		progressHandlerRef.current = progressHandler;
 		window.ipcRenderer.on("worktree-setup-progress", progressHandler);
 
 		try {
@@ -172,8 +201,6 @@ export function useTasks({
 				}),
 			});
 
-			window.ipcRenderer.removeListener("worktree-setup-progress", progressHandler);
-
 			if (result.success) {
 				// Display setup result if available
 				if (result.setupResult) {
@@ -183,25 +210,28 @@ export function useTasks({
 							: "Setup completed with errors",
 					);
 					setSetupOutput(result.setupResult.output);
-
-					// Keep modal open for 1.5 seconds to show result
-					await new Promise((resolve) => setTimeout(resolve, 1500));
+				} else {
+					setSetupStatus("Task created successfully!");
 				}
 
-				// Reset modal state and close
-				setIsAddTaskModalOpen(false);
 				setIsCreatingWorktree(false);
-				setSetupStatus(undefined);
-				setSetupOutput(undefined);
 
 				// Reload workspace to get the new worktree
 				await handleWorktreeCreated();
 
-				// Switch to the new worktree if available
-				if (result.worktree) {
-					setSelectedWorktreeId(result.worktree.id);
-					if (result.worktree.tabs && result.worktree.tabs.length > 0) {
-						handleTabSelect(result.worktree.id, result.worktree.tabs[0].id);
+				// Only close modal and select worktree if modal is still open
+				if (isAddTaskModalOpen) {
+					// Close modal and reset state
+					setIsAddTaskModalOpen(false);
+					setSetupStatus(undefined);
+					setSetupOutput(undefined);
+
+					// Switch to the new worktree if available
+					if (result.worktree) {
+						setSelectedWorktreeId(result.worktree.id);
+						if (result.worktree.tabs && result.worktree.tabs.length > 0) {
+							handleTabSelect(result.worktree.id, result.worktree.tabs[0].id);
+						}
 					}
 				}
 			} else {
@@ -216,7 +246,17 @@ export function useTasks({
 			setSetupStatus("Error creating worktree");
 			setSetupOutput(String(error));
 			setIsCreatingWorktree(false);
-			window.ipcRenderer.removeListener("worktree-setup-progress", progressHandler);
+		} finally {
+			// Stop handling progress events
+			isHandlingProgressRef.current = false;
+			
+			// Wait a bit to ensure any queued events are processed, then remove listener
+			setTimeout(() => {
+				if (progressHandlerRef.current) {
+					window.ipcRenderer.removeListener("worktree-setup-progress", progressHandlerRef.current);
+					progressHandlerRef.current = null;
+				}
+			}, 100);
 		}
 	};
 
@@ -233,6 +273,7 @@ export function useTasks({
 		handleCloseAddTaskModal,
 		handleSelectTask,
 		handleCreateTask,
+		handleClearStatus,
 	};
 }
 
