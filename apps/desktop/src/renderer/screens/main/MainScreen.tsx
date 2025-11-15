@@ -74,6 +74,7 @@ export function MainScreen() {
 	// Worktree operations
 	const {
 		handleWorktreeCreated,
+		handleWorktreeCreatedWithResult,
 		handleUpdateWorktree,
 		handleCreatePR,
 		handleMergePR,
@@ -107,7 +108,7 @@ export function MainScreen() {
 		currentWorkspace,
 		setSelectedWorktreeId,
 		handleTabSelect,
-		handleWorktreeCreated,
+		handleWorktreeCreated: handleWorktreeCreatedWithResult,
 	});
 
 	return (
