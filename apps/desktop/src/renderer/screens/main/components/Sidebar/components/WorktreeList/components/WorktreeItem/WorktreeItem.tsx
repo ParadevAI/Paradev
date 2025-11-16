@@ -1,10 +1,3 @@
-import { useDroppable } from "@dnd-kit/core";
-import {
-	SortableContext,
-	useSortable,
-	verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
 import { Button } from "@superset/ui/button";
 import {
 	ContextMenu,
@@ -12,12 +5,10 @@ import {
 	ContextMenuItem,
 	ContextMenuTrigger,
 } from "@superset/ui/context-menu";
-import {
-	ChevronRight,
-	Edit2,
-	FolderOpen,
-} from "lucide-react";
-import { useEffect, useId, useRef, useState } from "react";
+import { ChevronRight, Edit2, FolderOpen } from "lucide-react";
+import { useEffect, useId, useMemo, useState } from "react";
+import type { NodeApi, TreeApi } from "react-arborist";
+import { Tree } from "react-arborist";
 import type { MosaicNode } from "react-mosaic-component";
 import {
 	Dialog,
@@ -39,245 +30,74 @@ interface ProxyStatus {
 	active: boolean;
 }
 
-// Sortable wrapper for tabs
-function SortableTab({
-	tab,
-	worktreeId,
-	worktree,
-	workspaceId,
-	parentTabId,
-	selectedTabId,
-	selectedTabIds,
-	onTabSelect,
-	onTabRemove,
-	onGroupTabs,
-	onMoveOutOfGroup,
-	onTabRename,
-}: {
+// Tree node type for react-arborist
+type TreeNode = {
+	id: string;
+	name: string;
 	tab: Tab;
-	worktreeId: string;
-	worktree: Worktree;
-	workspaceId: string;
-	parentTabId?: string; // Optional parent group tab ID
-	selectedTabId?: string;
-	selectedTabIds: Set<string>;
-	onTabSelect: (worktreeId: string, tabId: string, shiftKey: boolean) => void;
-	onTabRemove: (tabId: string) => void;
-	onGroupTabs: (tabIds: string[]) => void;
-	onMoveOutOfGroup: (tabId: string, parentTabId: string) => void;
-	onTabRename: (tabId: string, newName: string) => void;
-}) {
-	const {
-		attributes,
-		listeners,
-		setNodeRef,
-		transform,
-		transition,
-		isDragging,
-	} = useSortable({
-		id: tab.id,
-		data: {
-			type: "tab",
-			parentTabId,
-			worktreeId,
-		},
+	children?: TreeNode[];
+};
+
+// Constants
+const TREE_ROW_HEIGHT = 28;
+const TREE_MIN_HEIGHT = 10;
+const TREE_MAX_HEIGHT = 600;
+
+// Convert Tab[] to react-arborist format
+function convertTabsToTreeData(tabs: Tab[]): TreeNode[] {
+	return tabs.map((tab) => {
+		const node: TreeNode = {
+			id: tab.id,
+			name: tab.name,
+			tab,
+		};
+		if (tab.type === "group" && tab.tabs) {
+			node.children = convertTabsToTreeData(tab.tabs);
+		}
+		return node;
 	});
-
-	const style = {
-		transform: CSS.Transform.toString(transform),
-		transition,
-		opacity: isDragging ? 0.5 : 1,
-	};
-
-	return (
-		<div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-			<TabItem
-				tab={tab}
-				worktreeId={worktreeId}
-				worktree={worktree}
-				workspaceId={workspaceId}
-				parentTabId={parentTabId}
-				selectedTabId={selectedTabId}
-				selectedTabIds={selectedTabIds}
-				onTabSelect={onTabSelect}
-				onTabRemove={onTabRemove}
-				onGroupTabs={onGroupTabs}
-				onMoveOutOfGroup={onMoveOutOfGroup}
-				onTabRename={onTabRename}
-			/>
-		</div>
-	);
 }
 
-// Droppable wrapper for group tabs
-function DroppableGroupTab({
-	tab,
-	worktreeId,
-	workspaceId: _workspaceId,
-	selectedTabId,
-	isExpanded,
-	level,
-	onToggle,
-	onTabSelect,
-	onUngroupTab,
-	onRenameGroup,
-	isOver,
-}: {
-	tab: Tab;
-	worktreeId: string;
-	workspaceId: string;
-	selectedTabId?: string;
-	isExpanded: boolean;
-	level: number;
-	onToggle: (groupTabId: string) => void;
-	onTabSelect: (worktreeId: string, tabId: string, shiftKey: boolean) => void;
-	onUngroupTab: (groupTabId: string) => void;
-	onRenameGroup: (groupTabId: string, newName: string) => void;
-	isOver: boolean;
-}) {
-	const [isEditing, setIsEditing] = useState(false);
-	const [editName, setEditName] = useState(tab.name);
-	const inputRef = useRef<HTMLInputElement>(null);
-
-	const { setNodeRef } = useDroppable({
-		id: `group-${tab.id}`,
-		data: {
-			type: "group",
-			groupTabId: tab.id,
-		},
-	});
-
-	// Focus input when entering edit mode
-	useEffect(() => {
-		if (isEditing && inputRef.current) {
-			inputRef.current.focus();
-			inputRef.current.select();
-		}
-	}, [isEditing]);
-
-	const isSelected = selectedTabId === tab.id;
-
-	const handleClick = (e: React.MouseEvent) => {
-		if (!isEditing) {
-			onTabSelect(worktreeId, tab.id, e.shiftKey);
-			onToggle(tab.id);
+// Helper: Collect all group tab IDs recursively
+function collectGroupTabIds(tabs: Tab[]): Set<string> {
+	const groupTabIds = new Set<string>();
+	const collect = (tabList: Tab[]) => {
+		for (const tab of tabList) {
+			if (tab.type === "group") {
+				groupTabIds.add(tab.id);
+				if (tab.tabs) {
+					collect(tab.tabs);
+				}
+			}
 		}
 	};
-
-	const handleStartRename = () => {
-		setEditName(tab.name);
-		setIsEditing(true);
-	};
-
-	const handleSaveRename = () => {
-		const trimmedName = editName.trim();
-		if (trimmedName !== "" && trimmedName !== tab.name) {
-			onRenameGroup(tab.id, trimmedName);
-		}
-		setIsEditing(false);
-	};
-
-	const handleCancelRename = () => {
-		setEditName(tab.name);
-		setIsEditing(false);
-	};
-
-	const handleKeyDown = (e: React.KeyboardEvent) => {
-		if (e.key === "Enter") {
-			e.preventDefault();
-			handleSaveRename();
-		} else if (e.key === "Escape") {
-			e.preventDefault();
-			handleCancelRename();
-		}
-	};
-
-	return (
-		<div ref={setNodeRef}>
-			<ContextMenu>
-				<ContextMenuTrigger asChild>
-					<button
-						type="button"
-						onClick={handleClick}
-						className={`group flex items-center gap-1.5 w-full h-7 px-2.5 text-xs rounded-md transition-all ${isSelected
-							? "bg-neutral-800/80 text-neutral-200"
-							: isOver
-								? "bg-blue-900/40 text-blue-200"
-								: "hover:bg-neutral-800/40 text-neutral-400"
-							}`}
-						style={{ paddingLeft: `${level * 12 + 10}px` }}
-					>
-						<ChevronRight
-							size={11}
-							className={`transition-transform ${isExpanded ? "rotate-90" : ""} shrink-0 text-neutral-500`}
-						/>
-						{isEditing ? (
-							<input
-								ref={inputRef}
-								type="text"
-								value={editName}
-								onChange={(e) => setEditName(e.target.value)}
-								onBlur={handleSaveRename}
-								onKeyDown={handleKeyDown}
-								onClick={(e) => e.stopPropagation()}
-								className="flex-1 bg-neutral-700 text-white px-2 py-0.5 rounded-sm text-xs outline-none focus:ring-1 focus:ring-blue-500 min-w-0"
-							/>
-						) : (
-							<span className="truncate flex-1 text-left">{tab.name}</span>
-						)}
-					</button>
-				</ContextMenuTrigger>
-				<ContextMenuContent>
-					<ContextMenuItem onClick={handleStartRename}>
-						<Edit2 size={14} className="mr-2" />
-						Rename
-					</ContextMenuItem>
-					<ContextMenuItem onClick={() => onUngroupTab(tab.id)}>
-						<FolderOpen size={14} className="mr-2" />
-						Ungroup Tabs
-					</ContextMenuItem>
-				</ContextMenuContent>
-			</ContextMenu>
-		</div>
-	);
+	collect(tabs);
+	return groupTabIds;
 }
 
-// Droppable area wrapper for the expanded group tab content
-function DroppableGroupArea({
-	groupTabId,
-	isOver,
-	children,
-}: {
-	groupTabId: string;
-	isOver: boolean;
-	children: React.ReactNode;
-}) {
-	const { setNodeRef } = useDroppable({
-		id: `group-area-${groupTabId}`,
-		data: {
-			type: "group-area",
-			groupTabId,
-		},
-	});
+// Helper: Build merge warning message
+function buildMergeWarning(
+	canMergeResult: {
+		targetHasUncommittedChanges?: boolean;
+		sourceHasUncommittedChanges?: boolean;
+	},
+	sourceBranch: string,
+	targetBranch?: string,
+): string {
+	const warnings: string[] = [];
 
-	return (
-		<div
-			ref={setNodeRef}
-			className={`relative ${isOver ? "bg-blue-900/20 border-l-2 border-blue-500 rounded-r-md" : ""
-				}`}
-			style={{
-				minHeight: "40px",
-				transition: "all 0.2s",
-			}}
-		>
-			{children}
-			{isOver && (
-				<div className="absolute inset-0 pointer-events-none flex items-center justify-center text-blue-400 text-xs font-medium">
-					Drop here to add to group
-				</div>
-			)}
-		</div>
-	);
+	if (canMergeResult.targetHasUncommittedChanges) {
+		const targetBranchText = targetBranch ? ` (${targetBranch})` : "";
+		warnings.push(`The target worktree${targetBranchText} has uncommitted changes.`);
+	}
+
+	if (canMergeResult.sourceHasUncommittedChanges) {
+		warnings.push(`The source worktree (${sourceBranch}) has uncommitted changes.`);
+	}
+
+	return warnings.length > 0
+		? `Warning: ${warnings.join(" ")} The merge will proceed anyway.`
+		: "";
 }
 
 interface WorktreeItemProps {
@@ -303,9 +123,10 @@ export function WorktreeItem({
 	hasPortForwarding = false,
 	onCloneWorktree: _onCloneWorktree,
 }: WorktreeItemProps) {
-	// Track expanded group tabs
-	const [expandedGroupTabs, setExpandedGroupTabs] = useState<Set<string>>(
-		new Set(),
+	// Track expanded group tabs - initialize with all group tabs expanded by default
+	const tabs = Array.isArray(worktree.tabs) ? worktree.tabs : [];
+	const [expandedGroupTabs, setExpandedGroupTabs] = useState<Set<string>>(() =>
+		collectGroupTabIds(tabs),
 	);
 
 	// Track multi-selected tabs
@@ -415,20 +236,6 @@ export function WorktreeItem({
 		};
 	};
 
-	// Helper: recursively get all tabs as flat array with their parent IDs
-	const getAllTabs = (
-		tabs: Tab[],
-		parentTabId?: string,
-	): Array<{ tab: Tab; parentTabId?: string }> => {
-		const result: Array<{ tab: Tab; parentTabId?: string }> = [];
-		for (const tab of tabs) {
-			result.push({ tab, parentTabId });
-			if (tab.type === "group" && tab.tabs) {
-				result.push(...getAllTabs(tab.tabs, tab.id));
-			}
-		}
-		return result;
-	};
 
 	// Helper: get all non-group tabs at the same level (for shift-click range selection)
 	const getTabsAtSameLevel = (
@@ -691,6 +498,32 @@ export function WorktreeItem({
 		loadWorktrees();
 	}, [workspaceId, worktree.id]);
 
+
+	// Calculate responsive height based on visible items
+	// Must be before early return to satisfy React hooks rules
+	const treeData = useMemo(() => convertTabsToTreeData(tabs), [tabs]);
+	const treeHeight = useMemo(() => {
+		// Count visible nodes (including expanded children)
+		const countVisibleNodes = (nodes: TreeNode[]): number => {
+			let count = 0;
+			for (const node of nodes) {
+				count += 1; // Count the node itself
+				if (
+					node.tab.type === "group" &&
+					node.children &&
+					expandedGroupTabs.has(node.id)
+				) {
+					count += countVisibleNodes(node.children);
+				}
+			}
+			return count;
+		};
+
+		const visibleCount = countVisibleNodes(treeData);
+		const calculatedHeight = visibleCount * TREE_ROW_HEIGHT;
+		return Math.max(TREE_MIN_HEIGHT, Math.min(TREE_MAX_HEIGHT, calculatedHeight));
+	}, [treeData, expandedGroupTabs]);
+
 	// Only render tabs for the active worktree
 	if (!isActive) {
 		return null;
@@ -771,28 +604,9 @@ export function WorktreeItem({
 			return;
 		}
 
-		// Build warning message if there are uncommitted changes
-		let warning = "";
-		const warnings = [];
-
-		if (canMergeResult.targetHasUncommittedChanges) {
-			const targetBranchText = targetBranch ? ` (${targetBranch})` : "";
-			warnings.push(
-				`The target worktree${targetBranchText} has uncommitted changes.`,
-			);
-		}
-
-		if (canMergeResult.sourceHasUncommittedChanges) {
-			warnings.push(
-				`The source worktree (${worktree.branch}) has uncommitted changes.`,
-			);
-		}
-
-		if (warnings.length > 0) {
-			warning = `Warning: ${warnings.join(" ")} The merge will proceed anyway.`;
-		}
-
-		setMergeWarning(warning);
+		setMergeWarning(
+			buildMergeWarning(canMergeResult, worktree.branch, targetBranch),
+		);
 		setShowMergeDialog(true);
 	};
 
@@ -818,30 +632,13 @@ export function WorktreeItem({
 			},
 		);
 
-		// Update warning message
-		let warning = "";
-		const warnings = [];
-
-		if (canMergeResult.targetHasUncommittedChanges) {
-			const targetBranchText = targetWorktree?.branch
-				? ` (${targetWorktree.branch})`
-				: "";
-			warnings.push(
-				`The target worktree${targetBranchText} has uncommitted changes.`,
-			);
-		}
-
-		if (canMergeResult.sourceHasUncommittedChanges) {
-			warnings.push(
-				`The source worktree (${worktree.branch}) has uncommitted changes.`,
-			);
-		}
-
-		if (warnings.length > 0) {
-			warning = `Warning: ${warnings.join(" ")} The merge will proceed anyway.`;
-		}
-
-		setMergeWarning(warning);
+		setMergeWarning(
+			buildMergeWarning(
+				canMergeResult,
+				worktree.branch,
+				targetWorktree?.branch,
+			),
+		);
 	};
 
 	const confirmMergeWorktree = async () => {
@@ -1078,72 +875,170 @@ export function WorktreeItem({
 		});
 	};
 
-	// Get all tabs for sortable context (including nested)
-	// Defensive: ensure worktree.tabs exists and is an array
-	const tabs = Array.isArray(worktree.tabs) ? worktree.tabs : [];
-	const allTabsFlat = getAllTabs(tabs);
-	const allTabIds = allTabsFlat.map((item) => item.tab.id);
+	// Handle drag and drop (move) using react-arborist
+	const handleMove = async (args: {
+		dragIds: string[];
+		dragNodes: NodeApi<TreeNode>[];
+		parentId: string | null;
+		parentNode: NodeApi<TreeNode> | null;
+		index: number;
+	}) => {
+		if (args.dragNodes.length === 0) return;
 
-	// Toggle group tab expansion
-	const toggleGroupTab = (groupTabId: string) => {
-		setExpandedGroupTabs((prev) => {
-			const next = new Set(prev);
-			if (next.has(groupTabId)) {
-				next.delete(groupTabId);
-			} else {
-				next.add(groupTabId);
+		const draggedNode = args.dragNodes[0];
+		const draggedTab = draggedNode.data.tab as Tab;
+
+		if (!draggedTab) return;
+
+		const draggedTabId = draggedTab.id;
+		const isGroupTab = draggedTab.type === "group";
+		const sourceParent = draggedNode.parent;
+		const sourceParentTabId =
+			sourceParent?.data.tab?.type === "group" ? sourceParent.id : null;
+		const targetParentTabId =
+			args.parentNode?.data.tab?.type === "group" ? args.parentNode.id : null;
+
+		// If moving to a different parent, use tab-move
+		if (sourceParentTabId !== targetParentTabId) {
+			// Prevent group tabs from being moved into other groups
+			if (isGroupTab && targetParentTabId) {
+				return;
 			}
-			return next;
-		});
+
+			try {
+				const result = await window.ipcRenderer.invoke("tab-move", {
+					workspaceId,
+					worktreeId: worktree.id,
+					tabId: draggedTabId,
+					sourceParentTabId: sourceParentTabId || undefined,
+					targetParentTabId: targetParentTabId || undefined,
+					targetIndex: args.index,
+				});
+
+				if (result.success) {
+					onReload();
+					onTabSelect(worktree.id, draggedTabId);
+				} else {
+					console.error("Failed to move tab:", result.error);
+				}
+			} catch (error) {
+				console.error("Error moving tab:", error);
+			}
+			return;
+		}
+
+		// Same parent - handle reordering (works for both regular tabs and group tabs)
+		const parentTabs = sourceParentTabId
+			? (sourceParent?.data.tab as Tab).tabs || []
+			: tabs;
+
+		if (!parentTabs || parentTabs.length === 0) return;
+
+		// Get current order
+		const currentOrder = parentTabs.map((t) => t.id);
+		const draggedIndex = currentOrder.indexOf(draggedTabId);
+		const targetIndex = args.index;
+
+		if (
+			draggedIndex !== -1 &&
+			targetIndex !== -1 &&
+			draggedIndex !== targetIndex
+		) {
+			// Reorder
+			const newOrder = [...currentOrder];
+			newOrder.splice(draggedIndex, 1);
+			newOrder.splice(targetIndex, 0, draggedTabId);
+
+			try {
+				const result = await window.ipcRenderer.invoke("tab-reorder", {
+					workspaceId,
+					worktreeId: worktree.id,
+					parentTabId: sourceParentTabId || undefined,
+					tabIds: newOrder,
+				});
+
+				if (result.success) {
+					onReload();
+				} else {
+					console.error("Failed to reorder tabs:", result.error);
+				}
+			} catch (error) {
+				console.error("Error reordering tabs:", error);
+			}
+		}
 	};
 
-	// Render a single tab or group tab with nesting
-	const renderTab = (tab: Tab, parentTabId?: string, level = 0) => {
-		if (tab.type === "group") {
-			const isExpanded = expandedGroupTabs.has(tab.id);
-			return (
-				<div key={tab.id} className="space-y-0.5">
-					{/* Group Tab Header */}
-					<DroppableGroupTab
-						tab={tab}
-						worktreeId={worktree.id}
-						workspaceId={workspaceId}
-						selectedTabId={selectedTabId}
-						isExpanded={isExpanded}
-						level={level}
-						onToggle={toggleGroupTab}
-						onTabSelect={handleTabSelect}
-						onUngroupTab={handleUngroupTab}
-						onRenameGroup={handleRenameGroup}
-						isOver={false}
-					/>
+	// Render node content for react-arborist Tree
+	const renderNode = (props: {
+		node: NodeApi<TreeNode>;
+		style: React.CSSProperties;
+		tree: TreeApi<TreeNode>;
+		dragHandle?: (el: HTMLDivElement | null) => void;
+		preview?: boolean;
+	}) => {
+		const { node, style, dragHandle } = props;
+		const tab = node.data.tab as Tab;
+		const isGroup = tab.type === "group";
+		const isSelected = selectedTabId === tab.id;
+		const isExpanded = node.isOpen;
 
-					{/* Nested Tabs - Make the entire area droppable */}
-					{isExpanded && tab.tabs && (
-						<DroppableGroupArea groupTabId={tab.id} isOver={false}>
-							<div className="space-y-0.5">
-								{tab.tabs.map((childTab) =>
-									renderTab(childTab, tab.id, level + 1),
-								)}
-							</div>
-						</DroppableGroupArea>
-					)}
+		if (isGroup) {
+			return (
+				<div style={style} className="flex items-center" ref={dragHandle}>
+					<ContextMenu>
+						<ContextMenuTrigger asChild>
+							<button
+								type="button"
+								onClick={() => {
+									node.toggle();
+									handleTabSelect(worktree.id, tab.id, false);
+								}}
+								className={`group flex items-center gap-1.5 w-full h-7 px-2.5 text-xs rounded-md transition-all ${isSelected
+									? "bg-neutral-800/80 text-neutral-200"
+									: "hover:bg-neutral-800/40 text-neutral-400"
+									}`}
+								style={{ paddingLeft: `${node.level * 12 + 10}px` }}
+							>
+								<ChevronRight
+									size={11}
+									className={`transition-transform ${isExpanded ? "rotate-90" : ""} shrink-0 text-neutral-500`}
+								/>
+								<span className="truncate flex-1 text-left">{tab.name}</span>
+							</button>
+						</ContextMenuTrigger>
+						<ContextMenuContent>
+							<ContextMenuItem
+								onClick={() => handleRenameGroup(tab.id, tab.name)}
+							>
+								<Edit2 size={14} className="mr-2" />
+								Rename
+							</ContextMenuItem>
+							<ContextMenuItem onClick={() => handleUngroupTab(tab.id)}>
+								<FolderOpen size={14} className="mr-2" />
+								Ungroup Tabs
+							</ContextMenuItem>
+						</ContextMenuContent>
+					</ContextMenu>
 				</div>
 			);
 		}
 
-		// Regular tab (terminal, editor, etc.)
+		// Regular tab - attach drag handle for dragging
 		return (
-			<div key={tab.id} style={{ paddingLeft: `${level * 10}px` }}>
-				<SortableTab
+			<div style={style} ref={dragHandle}>
+				<TabItem
 					tab={tab}
 					worktreeId={worktree.id}
 					worktree={worktree}
 					workspaceId={workspaceId}
-					parentTabId={parentTabId}
+					parentTabId={
+						node.parent?.data.tab?.type === "group" ? node.parent.id : undefined
+					}
 					selectedTabId={selectedTabId}
 					selectedTabIds={selectedTabIds}
-					onTabSelect={handleTabSelect}
+					onTabSelect={(wtId, tabId, shiftKey) => {
+						handleTabSelect(wtId, tabId, shiftKey);
+					}}
 					onTabRemove={handleTabRemove}
 					onGroupTabs={handleGroupTabs}
 					onMoveOutOfGroup={handleMoveOutOfGroup}
@@ -1162,13 +1057,51 @@ export function WorktreeItem({
 
 			{/* Tabs List */}
 			<div className="space-y-0.5">
-				{/* Render tabs with collapsible groups */}
-				<SortableContext
-					items={allTabIds}
-					strategy={verticalListSortingStrategy}
+				<Tree
+					data={treeData}
+					width="100%"
+					height={treeHeight}
+					onMove={handleMove}
+					onSelect={(nodes) => {
+						if (nodes.length > 0) {
+							const node = nodes[0];
+							handleTabSelect(worktree.id, node.id, false);
+						}
+					}}
+					onToggle={(id) => {
+						const node = treeData.find((item) => item.id === id);
+						if (node && node.tab.type === "group") {
+							setExpandedGroupTabs((prev) => {
+								const next = new Set(prev);
+								if (next.has(id)) {
+									next.delete(id);
+								} else {
+									next.add(id);
+								}
+								return next;
+							});
+						}
+					}}
+					openByDefault={true}
+					initialOpenState={Object.fromEntries(
+						treeData
+							.filter((item) => item.tab.type === "group")
+							.map((item) => [item.id, true]),
+					)}
+					rowHeight={TREE_ROW_HEIGHT}
+					indent={12}
+					disableDrop={(args) => {
+						// Prevent dropping group tabs into other groups
+						const draggedTab = args.dragNodes[0]?.data.tab as Tab;
+						const targetParentTab = args.parentNode?.data.tab as Tab;
+						return (
+							draggedTab?.type === "group" &&
+							targetParentTab?.type === "group"
+						);
+					}}
 				>
-					{tabs.map((tab) => renderTab(tab, undefined, 0))}
-				</SortableContext>
+					{renderNode}
+				</Tree>
 			</div>
 
 			{/* Remove Worktree Confirmation Dialog */}
