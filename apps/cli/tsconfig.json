@@ -5,5 +5,7 @@
 		"skipLibCheck": true,
 		"types": []
 	},
-	"include": ["source"]
+	"include": [
+		"src"
+	]
 }

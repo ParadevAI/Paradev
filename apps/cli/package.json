@@ -10,7 +10,7 @@
 	"scripts": {
 		"build": "tsc",
 		"dev": "tsc --watch",
-		"start": "bun watch.ts",
+		"start": "bun server.ts",
 		"typecheck": "tsc --noEmit",
 		"test": "prettier --check . && xo && ava",
 		"lint": "biome check --write .",
