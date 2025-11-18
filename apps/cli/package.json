@@ -1,0 +1,58 @@
+{
+	"name": "cli",
+	"version": "0.0.0",
+	"license": "MIT",
+	"bin": "dist/cli.js",
+	"type": "module",
+	"engines": {
+		"node": ">=16"
+	},
+	"scripts": {
+		"build": "tsc",
+		"dev": "tsc --watch",
+		"start": "bun watch.ts",
+		"typecheck": "tsc --noEmit",
+		"test": "prettier --check . && xo && ava",
+		"lint": "biome check --write .",
+		"lint:check": "biome check .",
+		"format": "biome format --write .",
+		"format:check": "biome format ."
+	},
+	"files": [
+		"dist"
+	],
+	"dependencies": {
+		"ink": "^4.1.0",
+		"meow": "^11.0.0",
+		"react": "^19.1.1"
+	},
+	"devDependencies": {
+		"@sindresorhus/tsconfig": "^3.0.1",
+		"@types/react": "^19.1.11",
+		"@vdemedes/prettier-config": "^2.0.1",
+		"ava": "^5.2.0",
+		"chalk": "^5.6.2",
+		"chokidar": "^3.5.3",
+		"eslint-config-xo-react": "^0.27.0",
+		"eslint-plugin-react": "^7.32.2",
+		"eslint-plugin-react-hooks": "^4.6.0",
+		"ink-testing-library": "^3.0.0",
+		"prettier": "^2.8.7",
+		"typescript": "^5.9.3",
+		"xo": "^0.53.1"
+	},
+	"ava": {
+		"extensions": {
+			"ts": "module",
+			"tsx": "module"
+		}
+	},
+	"xo": {
+		"extends": "xo-react",
+		"prettier": true,
+		"rules": {
+			"react/prop-types": "off"
+		}
+	},
+	"prettier": "@vdemedes/prettier-config"
+}
