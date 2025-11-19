@@ -2,12 +2,12 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { ProcessType } from "../../../types/process.js";
-import { WorkspaceType } from "../../../types/workspace.js";
-import { LowdbAdapter } from "../../storage/lowdb-adapter.js";
-import { EnvironmentOrchestrator } from "../environment-orchestrator.js";
-import { ProcessOrchestrator } from "../process-orchestrator.js";
-import { WorkspaceOrchestrator } from "../workspace-orchestrator.js";
+import { ProcessType } from "../../../types/process";
+import { WorkspaceType } from "../../../types/workspace";
+import { LowdbAdapter } from "../../storage/lowdb-adapter";
+import { EnvironmentOrchestrator } from "../environment-orchestrator";
+import { ProcessOrchestrator } from "../process-orchestrator";
+import { WorkspaceOrchestrator } from "../workspace-orchestrator";
 
 describe("EnvironmentOrchestrator", () => {
 	let tempDir: string;
@@ -92,9 +92,7 @@ describe("EnvironmentOrchestrator", () => {
 		});
 
 		test("throws error for non-existent environment", async () => {
-			expect(
-				orchestrator.update("non-existent", {}),
-			).rejects.toThrow();
+			expect(orchestrator.update("non-existent", {})).rejects.toThrow();
 		});
 	});
 

@@ -6,9 +6,9 @@ import {
 	type Process,
 	ProcessType,
 	type Terminal,
-} from "../../types/process.js";
-import type { Workspace } from "../../types/workspace.js";
-import type { StorageAdapter } from "../storage/adapter.js";
+} from "../../types/process";
+import type { Workspace } from "../../types/workspace";
+import type { StorageAdapter } from "../storage/adapter";
 
 /**
  * Process orchestrator implementation using storage adapter
@@ -70,7 +70,12 @@ export class ProcessOrchestrator implements IProcessOrchestrator {
 		const existing = await this.get(id);
 
 		// Filter out immutable fields to prevent desync
-		const { id: _, workspaceId: __, createdAt: ___, ...updatesWithoutImmutable } = updates;
+		const {
+			id: _,
+			workspaceId: __,
+			createdAt: ___,
+			...updatesWithoutImmutable
+		} = updates;
 
 		const updated = {
 			...existing,

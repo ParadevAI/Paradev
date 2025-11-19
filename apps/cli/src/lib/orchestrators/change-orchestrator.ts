@@ -2,8 +2,8 @@ import { randomUUID } from "node:crypto";
 import type {
 	Change,
 	ChangeOrchestrator as IChangeOrchestrator,
-} from "../../types/change.js";
-import type { StorageAdapter } from "../storage/adapter.js";
+} from "../../types/change";
+import type { StorageAdapter } from "../storage/adapter";
 
 /**
  * Change orchestrator implementation using storage adapter
@@ -37,7 +37,12 @@ export class ChangeOrchestrator implements IChangeOrchestrator {
 		}
 
 		// Filter out immutable fields to prevent desync
-		const { id: _, workspaceId: __, createdAt: ___, ...updatesWithoutImmutable } = updates;
+		const {
+			id: _,
+			workspaceId: __,
+			createdAt: ___,
+			...updatesWithoutImmutable
+		} = updates;
 
 		const updated = { ...existing, ...updatesWithoutImmutable };
 		await this.storage.set("changes", id, updated);
