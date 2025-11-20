@@ -1,14 +1,20 @@
 import { Button } from "@superset/ui/button";
-import { useWorkspacesStore } from "renderer/stores/workspaces";
+import { useCreateWorkspace } from "renderer/react-query/workspaces";
 
 export function AddWorkspaceButton() {
-	const { addWorkspace } = useWorkspacesStore();
+	const createWorkspace = useCreateWorkspace();
+
+	const handleAddWorkspace = () => {
+		createWorkspace.mutate({
+			name: "New Workspace",
+		});
+	};
 
 	return (
 		<Button
 			variant="ghost"
 			size="icon"
-			onClick={addWorkspace}
+			onClick={handleAddWorkspace}
 			aria-label="Add new workspace"
 		>
 			<span className="text-lg">+</span>
