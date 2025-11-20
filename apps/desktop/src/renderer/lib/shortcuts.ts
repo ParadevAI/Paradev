@@ -12,8 +12,8 @@ export interface ShortcutHandlers {
 	switchToPrevWorkspace: () => void;
 	switchToNextWorkspace: () => void;
 	toggleSidebar: () => void;
-	createSplitView: () => void;
-	createVerticalSplit: () => void;
+	splitHorizontal: () => void;
+	splitVertical: () => void;
 
 	// Tab management
 	switchToPrevTab: () => void;
@@ -22,6 +22,12 @@ export interface ShortcutHandlers {
 	closeTab: () => void;
 	reopenClosedTab: () => void;
 	jumpToTab: (index: number) => void;
+
+	// Split pane navigation
+	focusPaneLeft: () => void;
+	focusPaneRight: () => void;
+	focusPaneUp: () => void;
+	focusPaneDown: () => void;
 
 	// Terminal specific
 	clearTerminal: () => void;
@@ -34,8 +40,8 @@ export function createWorkspaceShortcuts(
 		| "switchToPrevWorkspace"
 		| "switchToNextWorkspace"
 		| "toggleSidebar"
-		| "createSplitView"
-		| "createVerticalSplit"
+		| "splitVertical"
+		| "splitHorizontal"
 	>,
 ): KeyboardShortcutGroup {
 	return {
@@ -74,20 +80,20 @@ export function createWorkspaceShortcuts(
 			{
 				key: "d",
 				modifiers: ["meta"],
-				description: "Create split view (horizontal)",
+				description: "Split window vertically",
 				handler: (event) => {
 					event.preventDefault();
-					handlers.createSplitView();
+					handlers.splitVertical();
 					return false;
 				},
 			},
 			{
 				key: "d",
 				modifiers: ["meta", "shift"],
-				description: "Create split view (vertical)",
+				description: "Split window horizontally",
 				handler: (event) => {
 					event.preventDefault();
-					handlers.createVerticalSplit();
+					handlers.splitHorizontal();
 					return false;
 				},
 			},
@@ -159,7 +165,6 @@ export function createTabShortcuts(
 		},
 	];
 
-	// Add Cmd+1-9 shortcuts for jumping to tabs
 	for (let i = 1; i <= 9; i++) {
 		shortcuts.push({
 			key: i.toString(),
@@ -176,6 +181,59 @@ export function createTabShortcuts(
 	return {
 		name: "Tab Management",
 		shortcuts,
+	};
+}
+
+export function createSplitPaneShortcuts(
+	handlers: Pick<
+		ShortcutHandlers,
+		"focusPaneLeft" | "focusPaneRight" | "focusPaneUp" | "focusPaneDown"
+	>,
+): KeyboardShortcutGroup {
+	return {
+		name: "Split Pane Navigation",
+		shortcuts: [
+			{
+				key: "ArrowLeft",
+				modifiers: ["meta", "alt"],
+				description: "Focus left pane",
+				handler: (event) => {
+					event.preventDefault();
+					handlers.focusPaneLeft();
+					return false;
+				},
+			},
+			{
+				key: "ArrowRight",
+				modifiers: ["meta", "alt"],
+				description: "Focus right pane",
+				handler: (event) => {
+					event.preventDefault();
+					handlers.focusPaneRight();
+					return false;
+				},
+			},
+			{
+				key: "ArrowUp",
+				modifiers: ["meta", "alt"],
+				description: "Focus upper pane",
+				handler: (event) => {
+					event.preventDefault();
+					handlers.focusPaneUp();
+					return false;
+				},
+			},
+			{
+				key: "ArrowDown",
+				modifiers: ["meta", "alt"],
+				description: "Focus lower pane",
+				handler: (event) => {
+					event.preventDefault();
+					handlers.focusPaneDown();
+					return false;
+				},
+			},
+		],
 	};
 }
 

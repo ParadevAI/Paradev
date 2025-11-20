@@ -14,6 +14,8 @@ import {
 	getChildTabIds,
 	type TabGroup,
 	useActiveTabIds,
+	useSplitTabHorizontal,
+	useSplitTabVertical,
 	useTabs,
 	useTabsStore,
 } from "renderer/stores";
@@ -52,6 +54,8 @@ export function GroupTabView({ tab }: GroupTabViewProps) {
 	const removeChildTabFromGroup = useTabsStore(
 		(state) => state.removeChildTabFromGroup,
 	);
+	const splitTabHorizontal = useSplitTabHorizontal();
+	const splitTabVertical = useSplitTabVertical();
 	const activeTabIds = useActiveTabIds();
 	const activeTabId = activeTabIds[tab.workspaceId];
 
@@ -78,49 +82,64 @@ export function GroupTabView({ tab }: GroupTabViewProps) {
 		[tab.id, tab.layout, updateTabGroupLayout, removeChildTabFromGroup],
 	);
 
-	const handleSplitHorizontal = (tabId: string) => {
-		// TODO: Implement split horizontally functionality
-		console.log("Split horizontally:", tabId);
-	};
+	const handleSplitHorizontal = useCallback(
+		(tabId: string, path: MosaicBranch[]) => {
+			splitTabHorizontal(tab.workspaceId, tabId, path);
+		},
+		[tab.workspaceId, splitTabHorizontal],
+	);
 
-	const handleSplitVertical = (tabId: string) => {
-		// TODO: Implement split vertically functionality
-		console.log("Split vertically:", tabId);
-	};
+	const handleSplitVertical = useCallback(
+		(tabId: string, path: MosaicBranch[]) => {
+			splitTabVertical(tab.workspaceId, tabId, path);
+		},
+		[tab.workspaceId, splitTabVertical],
+	);
 
-	const handleClosePane = (tabId: string) => {
-		// TODO: Implement close pane functionality
-		console.log("Close pane:", tabId);
-	};
+	const handleClosePane = useCallback(
+		(tabId: string) => {
+			removeChildTabFromGroup(tab.id, tabId);
+		},
+		[tab.id, removeChildTabFromGroup],
+	);
 
-	const renderPane = (tabId: string, path: MosaicBranch[]) => {
-		const isActive = tabId === activeTabId;
-		const childTab = childTabs.find((t) => t.id === tabId);
-		if (!childTab) {
+	const renderPane = useCallback(
+		(tabId: string, path: MosaicBranch[]) => {
+			const isActive = tabId === activeTabId;
+			const childTab = childTabs.find((t) => t.id === tabId);
+			if (!childTab) {
+				return (
+					<div className="w-full h-full flex items-center justify-center text-muted-foreground">
+						Tab not found: {tabId}
+					</div>
+				);
+			}
+
 			return (
-				<div className="w-full h-full flex items-center justify-center text-muted-foreground">
-					Tab not found: {tabId}
-				</div>
-			);
-		}
-
-		return (
-			<MosaicWindow<string>
-				path={path}
-				title={childTab.title}
-				toolbarControls={<div />}
-				className={isActive ? "mosaic-window-focused" : ""}
-			>
-				<TabContentContextMenu
-					onSplitHorizontal={() => handleSplitHorizontal(tabId)}
-					onSplitVertical={() => handleSplitVertical(tabId)}
-					onClosePane={() => handleClosePane(tabId)}
+				<MosaicWindow<string>
+					path={path}
+					title={childTab.title}
+					toolbarControls={<div />}
+					className={isActive ? "mosaic-window-focused" : ""}
 				>
-					<div className="w-full h-full">{childTab.title}</div>
-				</TabContentContextMenu>
-			</MosaicWindow>
-		);
-	};
+					<TabContentContextMenu
+						onSplitHorizontal={() => handleSplitHorizontal(tabId, path)}
+						onSplitVertical={() => handleSplitVertical(tabId, path)}
+						onClosePane={() => handleClosePane(tabId)}
+					>
+						<div className="w-full h-full">{childTab.title}</div>
+					</TabContentContextMenu>
+				</MosaicWindow>
+			);
+		},
+		[
+			activeTabId,
+			childTabs,
+			handleSplitHorizontal,
+			handleSplitVertical,
+			handleClosePane,
+		],
+	);
 
 	if (childTabs.length === 0 || !cleanedLayout) {
 		return (
