@@ -5,12 +5,17 @@ import {
 	useActiveTabIds,
 	useRemoveTab,
 	useSetActiveTab,
+	useTabs,
+	useUngroupTab,
+	useUngroupTabs,
 	useWorkspacesStore,
 } from "renderer/stores";
 import { TabType } from "renderer/stores/tabs/types";
+import { TabContextMenu } from "./TabContextMenu";
 import type { TabItemProps } from "./types";
 import { useDragTab } from "./useDragTab";
 import { useGroupDrop } from "./useGroupDrop";
+import { useTabRename } from "./useTabRename";
 
 export function TabItem({ tab, childTabs = [] }: TabItemProps) {
 	const [isExpanded, setIsExpanded] = useState(true);
@@ -20,6 +25,9 @@ export function TabItem({ tab, childTabs = [] }: TabItemProps) {
 	const activeTabIds = useActiveTabIds();
 	const removeTab = useRemoveTab();
 	const setActiveTab = useSetActiveTab();
+	const ungroupTabs = useUngroupTabs();
+	const ungroupTab = useUngroupTab();
+	const tabs = useTabs();
 
 	const activeTabId = activeWorkspaceId
 		? activeTabIds[activeWorkspaceId]
@@ -29,12 +37,15 @@ export function TabItem({ tab, childTabs = [] }: TabItemProps) {
 	const { drag, drop, isDragging, isDragOver } = useDragTab(tab.id);
 	const groupDrop = useGroupDrop(tab.id);
 
-	const handleRemoveTab = (e: React.MouseEvent) => {
-		e.stopPropagation();
+	const rename = useTabRename(tab.id, tab.title);
+
+	const handleRemoveTab = (e?: React.MouseEvent) => {
+		e?.stopPropagation();
 		removeTab(tab.id);
 	};
 
 	const handleTabClick = () => {
+		if (rename.isRenaming) return;
 		if (activeWorkspaceId) {
 			setActiveTab(activeWorkspaceId, tab.id);
 		}
@@ -42,7 +53,33 @@ export function TabItem({ tab, childTabs = [] }: TabItemProps) {
 
 	const handleToggleExpand = (e: React.MouseEvent) => {
 		e.stopPropagation();
+		e.preventDefault();
+		if (rename.isRenaming) return;
 		setIsExpanded(!isExpanded);
+	};
+
+	const handleDuplicate = () => {
+		// TODO: Implement duplicate functionality
+		console.log("Duplicate tab:", tab.id);
+	};
+
+	const handleUngroup = () => {
+		ungroupTabs(tab.id);
+	};
+
+	const handleMoveOutOfGroup = () => {
+		if (!tab.parentId) return;
+
+		// Find the parent group's index in the workspace tabs
+		const workspaceTabs = tabs.filter(
+			(t) => t.workspaceId === tab.workspaceId && !t.parentId,
+		);
+		const parentIndex = workspaceTabs.findIndex((t) => t.id === tab.parentId);
+
+		// Place after the parent (parentIndex + 1)
+		if (parentIndex !== -1) {
+			ungroupTab(tab.id, parentIndex + 1);
+		}
 	};
 
 	const attachRef = (el: HTMLButtonElement | null) => {
@@ -55,48 +92,77 @@ export function TabItem({ tab, childTabs = [] }: TabItemProps) {
 
 	return (
 		<div className="w-full">
-			<Button
-				ref={attachRef}
-				variant="ghost"
-				onClick={handleTabClick}
-				onKeyDown={(e) => {
-					if (e.key === "Enter" || e.key === " ") {
-						e.preventDefault();
-						handleTabClick();
-					}
-				}}
-				tabIndex={0}
-				className={`
+			<TabContextMenu
+				tabId={tab.id}
+				tabType={tab.type}
+				hasParent={!!tab.parentId}
+				onClose={handleRemoveTab}
+				onRename={rename.startRename}
+				onDuplicate={!isGroupTab ? handleDuplicate : undefined}
+				onUngroup={isGroupTab ? handleUngroup : undefined}
+				onMoveOutOfGroup={tab.parentId ? handleMoveOutOfGroup : undefined}
+			>
+				<Button
+					ref={attachRef}
+					variant="ghost"
+					onClick={handleTabClick}
+					onDoubleClick={rename.startRename}
+					onKeyDown={(e) => {
+						if (e.key === "Enter" || e.key === " ") {
+							e.preventDefault();
+							handleTabClick();
+						}
+					}}
+					tabIndex={0}
+					className={`
 					w-full text-start group px-3 py-2 rounded-md cursor-pointer flex items-center justify-between
 					${isActive ? "bg-sidebar-accent" : ""}
 					${isDragging ? "opacity-50" : ""}
 					${isDragOver ? "bg-sidebar-accent/50" : ""}
 				`}
-			>
-				<div className="flex items-center gap-1 flex-1 min-w-0">
-					{isGroupTab && hasChildren && (
+				>
+					<div className="flex items-center gap-1 flex-1 min-w-0">
+						{isGroupTab && hasChildren && (
+							<button
+								type="button"
+								onClick={handleToggleExpand}
+								onDoubleClick={(e) => {
+									e.stopPropagation();
+									e.preventDefault();
+								}}
+								className="shrink-0 cursor-pointer hover:opacity-80"
+							>
+								<HiChevronRight
+									className={`size-4 transition-transform ${isExpanded ? "rotate-90" : ""}`}
+								/>
+							</button>
+						)}
+						{rename.isRenaming ? (
+							<input
+								ref={rename.inputRef}
+								type="text"
+								value={rename.renameValue}
+								onChange={(e) => rename.setRenameValue(e.target.value)}
+								onBlur={rename.submitRename}
+								onKeyDown={rename.handleKeyDown}
+								onClick={(e) => e.stopPropagation()}
+								className="flex-1 bg-sidebar-accent border border-primary rounded px-1 py-0.5 text-sm outline-none"
+							/>
+						) : (
+							<span className="truncate flex-1">{tab.title}</span>
+						)}
+					</div>
+					{!isGroupTab && (
 						<button
 							type="button"
-							onClick={handleToggleExpand}
-							className="shrink-0 cursor-pointer hover:opacity-80"
+							onClick={handleRemoveTab}
+							className="cursor-pointer opacity-0 group-hover:opacity-100 ml-2 text-xs shrink-0"
 						>
-							<HiChevronRight
-								className={`size-4 transition-transform ${isExpanded ? "rotate-90" : ""}`}
-							/>
+							<HiMiniXMark className="size-4" />
 						</button>
 					)}
-					<span className="truncate flex-1">{tab.title}</span>
-				</div>
-				{!isGroupTab && (
-					<button
-						type="button"
-						onClick={handleRemoveTab}
-						className="opacity-0 group-hover:opacity-100 ml-2 text-xs shrink-0"
-					>
-						<HiMiniXMark className="size-4" />
-					</button>
-				)}
-			</Button>
+				</Button>
+			</TabContextMenu>
 
 			{isGroupTab && hasChildren && isExpanded && (
 				<div

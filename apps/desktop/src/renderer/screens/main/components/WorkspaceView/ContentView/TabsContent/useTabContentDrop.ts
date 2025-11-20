@@ -3,7 +3,7 @@ import type { Tab } from "renderer/stores";
 import { useTabsStore } from "renderer/stores";
 import { type DragItem, TAB_DND_TYPE } from "./types";
 
-export function useDropTabTarget(activeTab: Tab | null) {
+export function useTabContentDrop(tabToRender: Tab | null) {
 	const dragTabToTab = useTabsStore((state) => state.dragTabToTab);
 
 	const [{ isOver, canDrop }, drop] = useDrop<
@@ -13,14 +13,12 @@ export function useDropTabTarget(activeTab: Tab | null) {
 	>({
 		accept: TAB_DND_TYPE,
 		drop: (item) => {
-			// Only allow drop if there's an active tab and it's different from dragged tab
-			if (activeTab && item.tabId !== activeTab.id) {
-				dragTabToTab(item.tabId, activeTab.id);
+			if (tabToRender && item.tabId !== tabToRender.id) {
+				dragTabToTab(item.tabId, tabToRender.id);
 			}
 		},
 		canDrop: (item) => {
-			// Can only drop if there's an active tab and it's different from the dragged tab
-			return activeTab !== null && item.tabId !== activeTab.id;
+			return tabToRender !== null && item.tabId !== tabToRender.id;
 		},
 		collect: (monitor) => ({
 			isOver: monitor.isOver(),
@@ -30,5 +28,9 @@ export function useDropTabTarget(activeTab: Tab | null) {
 
 	const isDropZone = isOver && canDrop;
 
-	return { drop, isDropZone };
+	const attachDrop = (node: HTMLDivElement | null) => {
+		if (node) drop(node);
+	};
+
+	return { isDropZone, attachDrop };
 }

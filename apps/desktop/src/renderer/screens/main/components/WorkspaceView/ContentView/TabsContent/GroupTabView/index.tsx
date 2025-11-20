@@ -13,16 +13,16 @@ import {
 	cleanLayout,
 	getChildTabIds,
 	type TabGroup,
+	useActiveTabIds,
 	useTabs,
 	useTabsStore,
 } from "renderer/stores";
+import { TabContentContextMenu } from "../TabContentContextMenu";
 
 interface GroupTabViewProps {
 	tab: TabGroup;
-	focusedChildId?: string | null;
 }
 
-// Extract all tab IDs from a mosaic layout tree
 function extractTabIdsFromLayout(
 	layout: MosaicNode<string> | null,
 ): Set<string> {
@@ -42,7 +42,7 @@ function extractTabIdsFromLayout(
 	return ids;
 }
 
-export function GroupTabView({ tab, focusedChildId }: GroupTabViewProps) {
+export function GroupTabView({ tab }: GroupTabViewProps) {
 	const allTabs = useTabs();
 	const childTabIds = getChildTabIds(allTabs, tab.id);
 	const childTabs = allTabs.filter((t) => childTabIds.includes(t.id));
@@ -52,28 +52,25 @@ export function GroupTabView({ tab, focusedChildId }: GroupTabViewProps) {
 	const removeChildTabFromGroup = useTabsStore(
 		(state) => state.removeChildTabFromGroup,
 	);
+	const activeTabIds = useActiveTabIds();
+	const activeTabId = activeTabIds[tab.workspaceId];
 
-	// Clean the layout to only include tabs that currently exist as children
 	const validTabIds = new Set(childTabIds);
 	const cleanedLayout = cleanLayout(tab.layout, validTabIds);
 
 	const handleLayoutChange = useCallback(
 		(newLayout: MosaicNode<string> | null) => {
-			// Extract tab IDs from old and new layouts to detect removals
 			const oldTabIds = extractTabIdsFromLayout(tab.layout);
 			const newTabIds = extractTabIdsFromLayout(newLayout);
 
-			// Find tabs that were removed from the layout
 			const removedTabIds = Array.from(oldTabIds).filter(
 				(id) => !newTabIds.has(id),
 			);
 
-			// Remove tabs that were closed in the mosaic
 			for (const removedId of removedTabIds) {
 				removeChildTabFromGroup(tab.id, removedId);
 			}
 
-			// Update layout only if there are still tabs remaining
 			if (newLayout) {
 				updateTabGroupLayout(tab.id, newLayout);
 			}
@@ -81,33 +78,49 @@ export function GroupTabView({ tab, focusedChildId }: GroupTabViewProps) {
 		[tab.id, tab.layout, updateTabGroupLayout, removeChildTabFromGroup],
 	);
 
-	const renderPane = useCallback(
-		(tabId: string, path: MosaicBranch[]) => {
-			const childTab = childTabs.find((t) => t.id === tabId);
+	const handleSplitHorizontal = (tabId: string) => {
+		// TODO: Implement split horizontally functionality
+		console.log("Split horizontally:", tabId);
+	};
 
-			if (!childTab) {
-				return (
-					<div className="w-full h-full flex items-center justify-center text-muted-foreground">
-						Tab not found: {tabId}
-					</div>
-				);
-			}
+	const handleSplitVertical = (tabId: string) => {
+		// TODO: Implement split vertically functionality
+		console.log("Split vertically:", tabId);
+	};
 
-			const isFocused = tabId === focusedChildId;
+	const handleClosePane = (tabId: string) => {
+		// TODO: Implement close pane functionality
+		console.log("Close pane:", tabId);
+	};
 
+	const renderPane = (tabId: string, path: MosaicBranch[]) => {
+		const isActive = tabId === activeTabId;
+		const childTab = childTabs.find((t) => t.id === tabId);
+		if (!childTab) {
 			return (
-				<MosaicWindow<string>
-					path={path}
-					title={childTab.title}
-					toolbarControls={<div />}
-					className={isFocused ? "mosaic-window-focused" : ""}
+				<div className="w-full h-full flex items-center justify-center text-muted-foreground">
+					Tab not found: {tabId}
+				</div>
+			);
+		}
+
+		return (
+			<MosaicWindow<string>
+				path={path}
+				title={childTab.title}
+				toolbarControls={<div />}
+				className={isActive ? "mosaic-window-focused" : ""}
+			>
+				<TabContentContextMenu
+					onSplitHorizontal={() => handleSplitHorizontal(tabId)}
+					onSplitVertical={() => handleSplitVertical(tabId)}
+					onClosePane={() => handleClosePane(tabId)}
 				>
 					<div className="w-full h-full">{childTab.title}</div>
-				</MosaicWindow>
-			);
-		},
-		[childTabs, focusedChildId],
-	);
+				</TabContentContextMenu>
+			</MosaicWindow>
+		);
+	};
 
 	if (childTabs.length === 0 || !cleanedLayout) {
 		return (
