@@ -17,7 +17,7 @@ export function ModeNavigation({
 	scrollProgress,
 }: ModeNavigationProps) {
 	return (
-		<div className="flex items-center justify-center gap-1 px-2 pb-3 pt-2 border-t border-sidebar-border">
+		<div className="flex items-center justify-center gap-1 px-2 pb-3 pt-2">
 			<div className="relative flex items-center gap-1">
 				<AnimatedBackground
 					progress={scrollProgress}
