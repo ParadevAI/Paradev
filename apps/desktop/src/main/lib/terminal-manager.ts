@@ -1,6 +1,7 @@
 import { EventEmitter } from "node:events";
 import os from "node:os";
 import * as pty from "node-pty";
+import { HistoryReader, HistoryWriter } from "./terminal-history";
 
 interface TerminalSession {
 	pty: pty.IPty;
@@ -12,6 +13,10 @@ interface TerminalSession {
 	lastActive: number;
 	scrollback: string[];
 	isAlive: boolean;
+	historyWriter?: HistoryWriter;
+	deleteHistoryOnExit?: boolean;
+	wasRecovered: boolean;
+	historyFinalized?: boolean;
 }
 
 export interface TerminalDataEvent {
@@ -32,16 +37,17 @@ export class TerminalManager extends EventEmitter {
 	private readonly DEFAULT_COLS = 80;
 	private readonly DEFAULT_ROWS = 24;
 
-	createOrAttach(params: {
+	async createOrAttach(params: {
 		tabId: string;
 		workspaceId: string;
 		cwd?: string;
 		cols?: number;
 		rows?: number;
-	}): {
+	}): Promise<{
 		isNew: boolean;
 		scrollback: string[];
-	} {
+		wasRecovered: boolean;
+	}> {
 		const { tabId, workspaceId, cwd, cols, rows } = params;
 
 		const existing = this.sessions.get(tabId);
@@ -53,6 +59,7 @@ export class TerminalManager extends EventEmitter {
 			return {
 				isNew: false,
 				scrollback: existing.scrollback,
+				wasRecovered: existing.wasRecovered,
 			};
 		}
 
@@ -60,6 +67,9 @@ export class TerminalManager extends EventEmitter {
 		const workingDir = cwd || os.homedir();
 		const terminalCols = cols || this.DEFAULT_COLS;
 		const terminalRows = rows || this.DEFAULT_ROWS;
+
+		const historyReader = new HistoryReader(workspaceId, tabId);
+		const recovery = await historyReader.getLatestSession();
 
 		const ptyProcess = pty.spawn(shell, [], {
 			name: "xterm-256color",
@@ -69,6 +79,15 @@ export class TerminalManager extends EventEmitter {
 			env: this.sanitizeEnv(process.env),
 		});
 
+		const historyWriter = new HistoryWriter(
+			workspaceId,
+			tabId,
+			workingDir,
+			terminalCols,
+			terminalRows,
+		);
+		await historyWriter.init();
+
 		const session: TerminalSession = {
 			pty: ptyProcess,
 			tabId,
@@ -77,30 +96,51 @@ export class TerminalManager extends EventEmitter {
 			cols: terminalCols,
 			rows: terminalRows,
 			lastActive: Date.now(),
-			scrollback: [],
+			scrollback:
+				recovery.wasRecovered && recovery.scrollback
+					? [recovery.scrollback]
+					: [],
 			isAlive: true,
+			historyWriter,
+			wasRecovered: recovery.wasRecovered,
+			historyFinalized: false,
 		};
 
 		ptyProcess.onData((data) => {
 			this.addToScrollback(session, data);
+			if (session.historyWriter) {
+				session.historyWriter.writeData(data);
+			}
 			this.emit(`data:${tabId}`, data);
 		});
 
-		ptyProcess.onExit(({ exitCode, signal }) => {
+		ptyProcess.onExit(async ({ exitCode, signal }) => {
 			session.isAlive = false;
+
+			await this.finalizeHistory(session, {
+				exitCode,
+				signal,
+				cleanupDir: session.deleteHistoryOnExit ?? false,
+			});
+
 			this.emit(`exit:${tabId}`, exitCode, signal);
 
 			// Allow reconnection window before cleanup
-			setTimeout(() => {
+			const timeout = setTimeout(() => {
 				this.sessions.delete(tabId);
 			}, 5000);
+			timeout.unref();
 		});
 
 		this.sessions.set(tabId, session);
 
 		return {
 			isNew: true,
-			scrollback: [],
+			scrollback:
+				recovery.wasRecovered && recovery.scrollback
+					? [recovery.scrollback]
+					: [],
+			wasRecovered: recovery.wasRecovered,
 		};
 	}
 
@@ -153,8 +193,11 @@ export class TerminalManager extends EventEmitter {
 		session.lastActive = Date.now();
 	}
 
-	kill(params: { tabId: string }): void {
-		const { tabId } = params;
+	async kill(params: {
+		tabId: string;
+		deleteHistory?: boolean;
+	}): Promise<void> {
+		const { tabId, deleteHistory = false } = params;
 		const session = this.sessions.get(tabId);
 
 		if (!session) {
@@ -162,11 +205,21 @@ export class TerminalManager extends EventEmitter {
 			return;
 		}
 
-		if (session.isAlive) {
-			session.pty.kill();
+		if (deleteHistory) {
+			session.deleteHistoryOnExit = true;
 		}
 
-		this.sessions.delete(tabId);
+		if (session.isAlive) {
+			session.pty.kill();
+		} else {
+			// If already dead, finalize and cleanup immediately since exit handler won't run
+			await this.finalizeHistory(session, {
+				exitCode: undefined,
+				signal: undefined,
+				cleanupDir: deleteHistory,
+			});
+			this.sessions.delete(tabId);
+		}
 	}
 
 	detach(params: { tabId: string }): void {
@@ -198,12 +251,42 @@ export class TerminalManager extends EventEmitter {
 		};
 	}
 
-	cleanup(): void {
-		for (const [_tabId, session] of this.sessions.entries()) {
+	async cleanup(): Promise<void> {
+		const exitPromises: Promise<void>[] = [];
+
+		for (const [tabId, session] of this.sessions.entries()) {
 			if (session.isAlive) {
+				const exitPromise = new Promise<void>((resolve) => {
+					const exitHandler = () => {
+						this.off(`exit:${tabId}`, exitHandler);
+						if (timeoutId) {
+							clearTimeout(timeoutId);
+						}
+						resolve();
+					};
+					this.once(`exit:${tabId}`, exitHandler);
+
+					// Set timeout to avoid hanging indefinitely
+					const timeoutId = setTimeout(() => {
+						this.off(`exit:${tabId}`, exitHandler);
+						resolve();
+					}, 2000);
+					timeoutId.unref();
+				});
+
+				exitPromises.push(exitPromise);
 				session.pty.kill();
+			} else {
+				await this.finalizeHistory(session, {
+					exitCode: undefined,
+					signal: undefined,
+					cleanupDir: session.deleteHistoryOnExit ?? false,
+				});
 			}
 		}
+
+		await Promise.all(exitPromises);
+
 		this.sessions.clear();
 		this.removeAllListeners();
 	}
@@ -262,6 +345,37 @@ export class TerminalManager extends EventEmitter {
 		}
 
 		return Object.keys(sanitized).length > 0 ? sanitized : undefined;
+	}
+
+	private async finalizeHistory(
+		session: TerminalSession,
+		params: { exitCode?: number; signal?: number; cleanupDir: boolean },
+	): Promise<void> {
+		if (session.historyFinalized) {
+			return;
+		}
+
+		const writer = session.historyWriter;
+		session.historyWriter = undefined;
+		session.historyFinalized = true;
+
+		if (!writer) {
+			return;
+		}
+
+		if (writer.isOpen()) {
+			await writer.writeExit(params.exitCode, params.signal);
+		} else {
+			await writer.finalize(params.exitCode);
+		}
+
+		if (params.cleanupDir) {
+			const historyReader = new HistoryReader(
+				session.workspaceId,
+				session.tabId,
+			);
+			await historyReader.cleanup();
+		}
 	}
 }
 
