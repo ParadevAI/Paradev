@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
+import { electronStorage } from "../../lib/electron-storage";
 import { handleDragTabToTab } from "./drag-logic";
 import {
 	getActiveTab,
@@ -15,6 +16,10 @@ import {
 	handleUpdateTabGroupLayout,
 } from "./helpers/group-operations";
 import {
+	handleSplitTabHorizontal,
+	handleSplitTabVertical,
+} from "./helpers/split-operations";
+import {
 	handleAddTab,
 	handleMarkTabAsUsed,
 	handleRemoveTab,
@@ -24,12 +29,8 @@ import {
 	handleReorderTabById,
 	handleReorderTabs,
 } from "./helpers/tab-ordering";
-import {
-	handleSplitTabHorizontal,
-	handleSplitTabVertical,
-} from "./helpers/split-operations";
-import { TabType, type TabsStore } from "./types";
-import { electronStorage } from "../../lib/electron-storage";
+import { type TabsStore, TabType } from "./types";
+import { killTerminalForTab } from "./utils/terminal-cleanup";
 
 export const useTabsStore = create<TabsStore>()(
 	devtools(
@@ -47,13 +48,13 @@ export const useTabsStore = create<TabsStore>()(
 					const state = get();
 					const result = handleRemoveTab(state, id);
 					if (result === null) {
-						// Delegate to removeChildTabFromGroup if tab has parentId
 						const tabToRemove = state.tabs.find((tab) => tab.id === id);
 						if (tabToRemove?.parentId) {
 							get().removeChildTabFromGroup(tabToRemove.parentId, id);
 						}
 						return;
 					}
+					killTerminalForTab(id);
 					set(() => result);
 				},
 
@@ -88,6 +89,7 @@ export const useTabsStore = create<TabsStore>()(
 				},
 
 				removeChildTabFromGroup: (groupId, childTabId) => {
+					killTerminalForTab(childTabId);
 					set((state) =>
 						handleRemoveChildTabFromGroup(state, groupId, childTabId),
 					);

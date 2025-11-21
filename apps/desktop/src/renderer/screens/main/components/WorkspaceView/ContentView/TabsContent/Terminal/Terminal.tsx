@@ -1,103 +1,164 @@
-import { useEffect, useRef } from "react";
-import { Terminal as XTerm } from "@xterm/xterm";
-import { FitAddon } from "@xterm/addon-fit";
-import { WebLinksAddon } from "@xterm/addon-web-links";
 import "@xterm/xterm/css/xterm.css";
+import type { FitAddon } from "@xterm/addon-fit";
+import type { Terminal as XTerm } from "@xterm/xterm";
+import { useEffect, useRef, useState } from "react";
+import { trpc } from "renderer/lib/trpc";
+import { useSetActiveTab } from "renderer/stores";
+import {
+	createTerminalInstance,
+	setupFocusListener,
+	setupResizeHandlers,
+} from "./helpers";
+import type { TerminalProps, TerminalStreamEvent } from "./types";
 
-export const Terminal = () => {
+export const Terminal = ({ tabId, workspaceId }: TerminalProps) => {
 	const terminalRef = useRef<HTMLDivElement>(null);
 	const xtermRef = useRef<XTerm | null>(null);
 	const fitAddonRef = useRef<FitAddon | null>(null);
+	const isExitedRef = useRef(false);
+	const pendingEventsRef = useRef<TerminalStreamEvent[]>([]);
+	const [subscriptionEnabled, setSubscriptionEnabled] = useState(false);
+	const setActiveTab = useSetActiveTab();
+
+	const createOrAttachMutation = trpc.terminal.createOrAttach.useMutation();
+	const writeMutation = trpc.terminal.write.useMutation();
+	const resizeMutation = trpc.terminal.resize.useMutation();
+	const detachMutation = trpc.terminal.detach.useMutation();
+
+	// Avoid effect re-runs when mutations change
+	const createOrAttachRef = useRef(createOrAttachMutation.mutate);
+	const writeRef = useRef(writeMutation.mutate);
+	const resizeRef = useRef(resizeMutation.mutate);
+	const detachRef = useRef(detachMutation.mutate);
+
+	createOrAttachRef.current = createOrAttachMutation.mutate;
+	writeRef.current = writeMutation.mutate;
+	resizeRef.current = resizeMutation.mutate;
+	detachRef.current = detachMutation.mutate;
+
+	const handleStreamData = (event: TerminalStreamEvent) => {
+		if (!xtermRef.current) {
+			pendingEventsRef.current.push(event);
+			return;
+		}
+
+		if (event.type === "data") {
+			xtermRef.current.write(event.data);
+		} else if (event.type === "exit") {
+			isExitedRef.current = true;
+			setSubscriptionEnabled(false);
+			xtermRef.current.writeln(
+				`\r\n\r\n[Process exited with code ${event.exitCode}]`,
+			);
+			xtermRef.current.writeln("[Press any key to restart]");
+		}
+	};
+
+	trpc.terminal.stream.useSubscription(tabId, {
+		onData: handleStreamData,
+		enabled: subscriptionEnabled,
+	});
 
 	useEffect(() => {
-		if (!terminalRef.current) return;
+		const container = terminalRef.current;
+		if (!container) return;
 
-		// Create xterm instance
-		const xterm = new XTerm({
-			cursorBlink: true,
-			fontSize: 14,
-			fontFamily: 'Menlo, Monaco, "Courier New", monospace',
-			theme: {
-				background: "#000000",
-				foreground: "#d4d4d4",
-				cursor: "#d4d4d4",
-				black: "#000000",
-				red: "#cd3131",
-				green: "#0dbc79",
-				yellow: "#e5e510",
-				blue: "#2472c8",
-				magenta: "#bc3fbc",
-				cyan: "#11a8cd",
-				white: "#e5e5e5",
-				brightBlack: "#666666",
-				brightRed: "#f14c4c",
-				brightGreen: "#23d18b",
-				brightYellow: "#f5f543",
-				brightBlue: "#3b8eea",
-				brightMagenta: "#d670d6",
-				brightCyan: "#29b8db",
-				brightWhite: "#e5e5e5",
-			},
-			allowProposedApi: true,
-		});
-
-		// Create and load addons
-		const fitAddon = new FitAddon();
-		const webLinksAddon = new WebLinksAddon();
-
-		xterm.loadAddon(fitAddon);
-		xterm.loadAddon(webLinksAddon);
-
-		// Open terminal in the DOM
-		xterm.open(terminalRef.current);
-
-		// Fit terminal to container
-		fitAddon.fit();
-
-		// Store references
+		const { xterm, fitAddon } = createTerminalInstance(container);
 		xtermRef.current = xterm;
 		fitAddonRef.current = fitAddon;
+		isExitedRef.current = false;
+		setSubscriptionEnabled(true);
 
-		// Write some demo text
-		xterm.writeln("Welcome to Superset Terminal!");
-		xterm.writeln("");
-		xterm.writeln("This is a demo terminal using xterm.js");
-		xterm.writeln("Backend integration coming soon...");
-		xterm.writeln("");
-		xterm.write("$ ");
-
-		// Handle user input (echo back for now)
-		xterm.onData((data) => {
-			// Handle special keys
-			if (data === "\r") {
-				// Enter key
-				xterm.write("\r\n$ ");
-			} else if (data === "\u007F") {
-				// Backspace
-				xterm.write("\b \b");
-			} else if (data === "\u0003") {
-				// Ctrl+C
-				xterm.write("^C");
-				xterm.write("\r\n$ ");
-			} else {
-				// Echo the character
-				xterm.write(data);
+		// Flush any pending events that arrived before xterm was ready
+		const flushPendingEvents = () => {
+			if (pendingEventsRef.current.length === 0) return;
+			const events = pendingEventsRef.current.splice(
+				0,
+				pendingEventsRef.current.length,
+			);
+			for (const event of events) {
+				if (event.type === "data") {
+					xterm.write(event.data);
+				} else {
+					isExitedRef.current = true;
+					setSubscriptionEnabled(false);
+					xterm.writeln(`\r\n\r\n[Process exited with code ${event.exitCode}]`);
+					xterm.writeln("[Press any key to restart]");
+				}
 			}
-		});
+		};
+		flushPendingEvents();
 
-		// Handle window resize
-		const handleResize = () => {
-			fitAddon.fit();
+		const restartTerminal = () => {
+			isExitedRef.current = false;
+			setSubscriptionEnabled(false);
+			xterm.clear();
+			createOrAttachRef.current(
+				{
+					tabId,
+					workspaceId,
+					cols: xterm.cols,
+					rows: xterm.rows,
+				},
+				{
+					onSuccess: () => {
+						setSubscriptionEnabled(true);
+					},
+				},
+			);
 		};
 
-		window.addEventListener("resize", handleResize);
+		const handleTerminalInput = (data: string) => {
+			if (isExitedRef.current) {
+				restartTerminal();
+			} else {
+				writeRef.current({ tabId, data });
+			}
+		};
 
-		// Cleanup
+		createOrAttachRef.current(
+			{
+				tabId,
+				workspaceId,
+				cols: xterm.cols,
+				rows: xterm.rows,
+			},
+			{
+				onSuccess: (result) => {
+					if (!result.isNew && result.scrollback.length > 0) {
+						xterm.write(result.scrollback[0]);
+					}
+				},
+			},
+		);
+
+		const inputDisposable = xterm.onData(handleTerminalInput);
+		const cleanupFocus = setupFocusListener(
+			xterm,
+			workspaceId,
+			tabId,
+			setActiveTab,
+		);
+		const cleanupResize = setupResizeHandlers(
+			container,
+			xterm,
+			fitAddon,
+			(cols, rows) => {
+				resizeRef.current({ tabId, cols, rows });
+			},
+		);
+
 		return () => {
-			window.removeEventListener("resize", handleResize);
+			inputDisposable.dispose();
+			cleanupFocus?.();
+			cleanupResize();
+			// Keep PTY running for reattachment
+			detachRef.current({ tabId });
+			setSubscriptionEnabled(false);
 			xterm.dispose();
+			xtermRef.current = null;
 		};
-	}, []);
+	}, [tabId, workspaceId, setActiveTab]);
 
 	return (
 		<div className="h-full w-full overflow-hidden bg-black">
