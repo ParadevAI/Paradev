@@ -1,7 +1,7 @@
 import { Separator } from "@superset/ui/separator";
 import { Fragment, useEffect, useRef, useState } from "react";
 import { trpc } from "renderer/lib/trpc";
-import { AddWorkspaceButton } from "./AddWorkspaceButton";
+import { WorkspaceDropdown } from "./WorkspaceDropdown";
 import { WorkspaceItem } from "./WorkspaceItem";
 
 const MIN_WORKSPACE_WIDTH = 60;
@@ -66,9 +66,8 @@ export function WorkspacesTabs() {
 		<div
 			ref={containerRef}
 			className="flex items-center h-full w-full"
-			style={{ isolation: "isolate" }}
 		>
-			<div className="relative flex-1 h-full overflow-hidden w-full">
+			<div className="relative flex-1 h-full overflow-hidden min-w-0">
 				<div
 					ref={scrollRef}
 					className="flex h-full overflow-x-auto hide-scrollbar gap-2"
@@ -118,10 +117,8 @@ export function WorkspacesTabs() {
 					<div className="pointer-events-none absolute right-0 top-0 h-full w-8 bg-linear-to-l from-background to-transparent" />
 				)}
 			</div>
+			<WorkspaceDropdown className="no-drag" />
 
-			<div className="no-drag">
-				<AddWorkspaceButton />
-			</div>
 		</div>
 	);
 }

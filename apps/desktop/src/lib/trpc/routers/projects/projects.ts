@@ -1,90 +1,74 @@
 import { dialog } from "electron";
 import type { BrowserWindow } from "electron";
 import { basename } from "node:path";
-import { z } from "zod";
+import { nanoid } from "nanoid";
 import { publicProcedure, router } from "../..";
 import { db } from "../../../../main/lib/db";
-import type { RecentProject } from "../../../../main/lib/db/schemas";
+import type { Project } from "../../../../main/lib/db/schemas";
+import { getGitRoot } from "../workspaces/utils/git";
 
-/**
- * Projects router
- * Handles project selection, recents management, and workspace creation
- */
 export const createProjectsRouter = (window: BrowserWindow) => {
 	return router({
-		/**
-		 * Open a new project via folder picker
-		 * Adds to recents and returns path for UI to handle
-		 */
-		openProject: publicProcedure.mutation(async () => {
+		getRecents: publicProcedure.query((): Project[] => {
+			return db.data.projects
+				.slice()
+				.sort((a, b) => b.lastOpenedAt - a.lastOpenedAt);
+		}),
+
+		openNew: publicProcedure.mutation(async () => {
 			const result = await dialog.showOpenDialog(window, {
 				properties: ["openDirectory"],
 				title: "Open Project",
 			});
 
 			if (result.canceled || result.filePaths.length === 0) {
-				return { success: false as const };
+				return { success: false };
 			}
 
-			const path = result.filePaths[0];
-			const name = basename(path);
+			const selectedPath = result.filePaths[0];
 
-			await db.update((data) => {
-				const existingIndex = data.recentProjects.findIndex(
-					(p) => p.path === path,
-				);
-				if (existingIndex !== -1) {
-					data.recentProjects[existingIndex].lastOpenedAt = Date.now();
-				} else {
-					data.recentProjects.push({
-						path,
-						name,
-						lastOpenedAt: Date.now(),
-					});
-				}
-			});
+			let mainRepoPath: string;
+			try {
+				mainRepoPath = await getGitRoot(selectedPath);
+			} catch (_error) {
+				return {
+					success: false,
+					error: "Selected folder is not in a git repository",
+				};
+			}
+
+			const name = basename(mainRepoPath);
+
+			let project = db.data.projects.find(
+				(p) => p.mainRepoPath === mainRepoPath,
+			);
+
+			if (project) {
+				await db.update((data) => {
+					const p = data.projects.find((p) => p.id === project?.id);
+					if (p) {
+						p.lastOpenedAt = Date.now();
+					}
+				});
+			} else {
+				project = {
+					id: nanoid(),
+					mainRepoPath,
+					name,
+					lastOpenedAt: Date.now(),
+					createdAt: Date.now(),
+				};
+
+				await db.update((data) => {
+					data.projects.push(project!);
+				});
+			}
 
 			return {
 				success: true as const,
-				path,
-				name,
+				project,
 			};
 		}),
-		openRecent: publicProcedure
-			.input(z.object({ path: z.string() }))
-			.mutation(async ({ input }) => {
-				const { path } = input;
-				const name = basename(path);
-
-				await db.update((data) => {
-					const recent = data.recentProjects.find((p) => p.path === path);
-					if (recent) {
-						recent.lastOpenedAt = Date.now();
-					}
-				});
-
-				return {
-					success: true as const,
-					path,
-					name,
-				};
-			}),
-		getRecents: publicProcedure.query((): RecentProject[] => {
-			return db.data.recentProjects
-				.slice()
-				.sort((a, b) => b.lastOpenedAt - a.lastOpenedAt);
-		}),
-		removeRecent: publicProcedure
-			.input(z.object({ path: z.string() }))
-			.mutation(async ({ input }) => {
-				await db.update((data) => {
-					data.recentProjects = data.recentProjects.filter(
-						(p) => p.path !== input.path,
-					);
-				});
-
-				return { success: true };
-			}),
 	});
 };
 
