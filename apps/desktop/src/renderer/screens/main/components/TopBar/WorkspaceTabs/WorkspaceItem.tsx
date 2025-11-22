@@ -1,12 +1,13 @@
 import { Button } from "@superset/ui/button";
 import { cn } from "@superset/ui/utils";
+import { useState } from "react";
 import { useDrag, useDrop } from "react-dnd";
 import { HiMiniXMark } from "react-icons/hi2";
 import {
-	useDeleteWorkspace,
 	useReorderWorkspaces,
 	useSetActiveWorkspace,
 } from "renderer/react-query/workspaces";
+import { DeleteWorkspaceDialog } from "./DeleteWorkspaceDialog";
 import { useTabs } from "renderer/stores";
 
 const WORKSPACE_TYPE = "WORKSPACE";
@@ -33,11 +34,10 @@ export function WorkspaceItem({
 	onMouseLeave,
 }: WorkspaceItemProps) {
 	const setActive = useSetActiveWorkspace();
-	const deleteWorkspace = useDeleteWorkspace();
 	const reorderWorkspaces = useReorderWorkspaces();
+	const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 	const tabs = useTabs();
 
-	// Derive if workspace needs attention from any of its tabs
 	const needsAttention = tabs
 		.filter((t) => t.workspaceId === id)
 		.some((t) => t.needsAttention);
@@ -69,57 +69,66 @@ export function WorkspaceItem({
 	});
 
 	return (
-		<div
-			className="group relative flex items-end shrink-0 h-full no-drag"
-			style={{ width: `${width}px` }}
-		>
-			{/* Main workspace button */}
-			<button
-				type="button"
-				ref={(node) => {
-					drag(drop(node));
-				}}
-				onMouseDown={() => setActive.mutate({ id })}
-				onMouseEnter={onMouseEnter}
-				onMouseLeave={onMouseLeave}
-				className={`
-					flex items-center gap-0.5 rounded-t-md transition-all w-full shrink-0 pr-6 pl-3 h-[80%]
-					${
-						isActive
-							? "text-foreground bg-muted"
-							: "text-muted-foreground hover:text-foreground hover:bg-muted/30"
-					}
-					${isDragging ? "opacity-30" : "opacity-100"}
-				`}
-				style={{ cursor: isDragging ? "grabbing" : "pointer" }}
+		<>
+			<div
+				className="group relative flex items-end shrink-0 h-full no-drag"
+				style={{ width: `${width}px` }}
 			>
-				<span className="text-sm whitespace-nowrap truncate flex-1 text-left">
-					{title}
-				</span>
-				{needsAttention && (
-					<span className="relative flex size-2 shrink-0">
-						<span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
-						<span className="relative inline-flex size-2 rounded-full bg-red-500" />
+				{/* Main workspace button */}
+				<button
+					type="button"
+					ref={(node) => {
+						drag(drop(node));
+					}}
+					onMouseDown={() => setActive.mutate({ id })}
+					onMouseEnter={onMouseEnter}
+					onMouseLeave={onMouseLeave}
+					className={`
+						flex items-center gap-0.5 rounded-t-md transition-all w-full shrink-0 pr-6 pl-3 h-[80%]
+						${
+							isActive
+								? "text-foreground bg-muted"
+								: "text-muted-foreground hover:text-foreground hover:bg-muted/30"
+						}
+						${isDragging ? "opacity-30" : "opacity-100"}
+					`}
+					style={{ cursor: isDragging ? "grabbing" : "pointer" }}
+				>
+					<span className="text-sm whitespace-nowrap truncate flex-1 text-left">
+						{title}
 					</span>
-				)}
-			</button>
+					{needsAttention && (
+						<span className="relative flex size-2 shrink-0">
+							<span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
+							<span className="relative inline-flex size-2 rounded-full bg-red-500" />
+						</span>
+					)}
+				</button>
 
-			<Button
-				type="button"
-				variant="ghost"
-				size="icon"
-				onClick={(e) => {
-					e.stopPropagation();
-					deleteWorkspace.mutate({ id });
-				}}
-				className={cn(
-					"mt-1 absolute right-1 top-1/2 -translate-y-1/2 size-5 ",
-					isActive ? "opacity-90" : "opacity-0 group-hover:opacity-90",
-				)}
-				aria-label="Close workspace"
-			>
-				<HiMiniXMark className="size-4" />
-			</Button>
-		</div>
+				<Button
+					type="button"
+					variant="ghost"
+					size="icon"
+					onClick={(e) => {
+						e.stopPropagation();
+						setShowDeleteDialog(true);
+					}}
+					className={cn(
+						"mt-1 absolute right-1 top-1/2 -translate-y-1/2 cursor-pointer size-5 group-hover:opacity-100",
+						isActive ? "opacity-90" : "opacity-0",
+					)}
+					aria-label="Close workspace"
+				>
+					<HiMiniXMark />
+				</Button>
+			</div>
+
+			<DeleteWorkspaceDialog
+				workspaceId={id}
+				workspaceName={title}
+				open={showDeleteDialog}
+				onOpenChange={setShowDeleteDialog}
+			/>
+		</>
 	);
 }
