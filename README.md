@@ -1,6 +1,9 @@
 <!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
 <div align="center">
-<img width="600" alt="header image" src="apps/website/public/title.svg">
+<img width="600" alt="supersetlogo" src="https://github.com/user-attachments/assets/43c1bde8-93f5-4f53-9db4-187f632051a2" />
+
+
+
 <h3 align="center">Superset</h3>
   <p align="center">
     The last developer tool you'll ever need
