@@ -1,6 +1,8 @@
+import { homedir } from "node:os";
 import { join } from "node:path";
 import { db } from "main/lib/db";
 import { nanoid } from "nanoid";
+import { SUPERSET_DIR_NAME, WORKTREES_DIR_NAME } from "shared/constants";
 import simpleGit from "simple-git";
 import { z } from "zod";
 import { publicProcedure, router } from "../..";
@@ -28,7 +30,12 @@ export const createWorkspacesRouter = () => {
 
 				const branch = generateBranchName();
 
-				const worktreePath = join(project.mainRepoPath, ".superset", branch);
+				const worktreePath = join(
+					homedir(),
+					SUPERSET_DIR_NAME,
+					WORKTREES_DIR_NAME,
+					branch,
+				);
 
 				await createWorktree(project.mainRepoPath, branch, worktreePath);
 
