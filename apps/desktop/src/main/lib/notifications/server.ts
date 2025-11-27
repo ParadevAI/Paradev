@@ -1,6 +1,5 @@
 import { EventEmitter } from "node:events";
 import express from "express";
-import { PORTS } from "shared/constants";
 
 export interface AgentCompleteEvent {
 	tabId: string;
@@ -46,12 +45,12 @@ app.get("/hook/complete", (req, res) => {
 });
 
 // Health check
-app.get("/health", (req, res) => {
+app.get("/health", (_req, res) => {
 	res.json({ status: "ok" });
 });
 
 // 404
-app.use((req, res) => {
+app.use((_req, res) => {
 	res.status(404).json({ error: "Not found" });
 });
 
