@@ -3,7 +3,7 @@ import os from "node:os";
 import * as pty from "node-pty";
 import { NOTIFICATIONS_PORT } from "shared/constants";
 import { getSupersetPath } from "./agent-setup";
-import { filterTerminalQueryResponses } from "./terminal-escape-filter";
+import { TerminalEscapeFilter } from "./terminal-escape-filter";
 import { HistoryReader, HistoryWriter } from "./terminal-history";
 
 interface TerminalSession {
@@ -19,6 +19,7 @@ interface TerminalSession {
 	deleteHistoryOnExit?: boolean;
 	wasRecovered: boolean;
 	historyWriter?: HistoryWriter;
+	escapeFilter: TerminalEscapeFilter;
 }
 
 export interface TerminalDataEvent {
@@ -135,20 +136,28 @@ export class TerminalManager extends EventEmitter {
 			isAlive: true,
 			wasRecovered,
 			historyWriter,
+			escapeFilter: new TerminalEscapeFilter(),
 		};
 
 		ptyProcess.onData((data) => {
-			// Filter terminal query responses before storing in scrollback
-			// These are responses to xterm.js queries that display as garbage on reattach
-			const filteredData = filterTerminalQueryResponses(data);
+			// Filter terminal query responses for storage only
+			// xterm needs raw data for proper terminal behavior (DA/DSR/OSC responses)
+			const filteredData = session.escapeFilter.filter(data);
 			session.scrollback += filteredData;
 			session.historyWriter?.write(filteredData);
-			// Emit original data to xterm - it needs to process the responses
+			// Emit ORIGINAL data to xterm - it needs to process query responses
 			this.emit(`data:${tabId}`, data);
 		});
 
 		ptyProcess.onExit(async ({ exitCode, signal }) => {
 			session.isAlive = false;
+
+			// Flush any buffered data from the escape filter
+			const remaining = session.escapeFilter.flush();
+			if (remaining) {
+				session.scrollback += remaining;
+				session.historyWriter?.write(remaining);
+			}
 
 			await this.closeHistory(session, exitCode);
 

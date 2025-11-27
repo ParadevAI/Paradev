@@ -1,5 +1,8 @@
 import { describe, expect, it } from "bun:test";
-import { filterTerminalQueryResponses } from "./terminal-escape-filter";
+import {
+	filterTerminalQueryResponses,
+	TerminalEscapeFilter,
+} from "./terminal-escape-filter";
 
 // Control characters for building test sequences
 const ESC = "\x1b";
@@ -211,6 +214,33 @@ describe("filterTerminalQueryResponses", () => {
 				`${ESC}]12;rgb:00ff/00ff/00ff${BEL}`;
 			expect(filterTerminalQueryResponses(input)).toBe("");
 		});
+
+		it("should filter short-form (2-digit) hex color responses", () => {
+			const osc10 = `${ESC}]10;rgb:f5/f5/f5${BEL}`;
+			expect(filterTerminalQueryResponses(osc10)).toBe("");
+		});
+
+		it("should filter short-form hex with ST terminator", () => {
+			const osc11 = `${ESC}]11;rgb:1a/1a/1a${ESC}\\`;
+			expect(filterTerminalQueryResponses(osc11)).toBe("");
+		});
+
+		it("should filter 3-digit hex color responses", () => {
+			const osc10 = `${ESC}]10;rgb:fff/fff/fff${BEL}`;
+			expect(filterTerminalQueryResponses(osc10)).toBe("");
+		});
+	});
+
+	describe("filters Standard Mode Reports", () => {
+		it("should filter standard mode report", () => {
+			const report = `${ESC}[12;2$y`;
+			expect(filterTerminalQueryResponses(report)).toBe("");
+		});
+
+		it("should filter mode report with different values", () => {
+			const report = `${ESC}[4;1$y`;
+			expect(filterTerminalQueryResponses(report)).toBe("");
+		});
 	});
 
 	describe("filters Tertiary Device Attributes (DA3)", () => {
@@ -329,6 +359,164 @@ describe("filterTerminalQueryResponses", () => {
 			expect(filterTerminalQueryResponses(binary)).toBe(
 				"\x00\x01\x02\x03\x04\x05",
 			);
+		});
+	});
+});
+
+describe("TerminalEscapeFilter (stateful)", () => {
+	describe("handles chunked data", () => {
+		it("should reassemble split DA1 response", () => {
+			const filter = new TerminalEscapeFilter();
+			// DA1 response split across chunks
+			const chunk1 = `hello${ESC}[?`;
+			const chunk2 = `1;0c`;
+			const result1 = filter.filter(chunk1);
+			const result2 = filter.filter(chunk2);
+			expect(result1 + result2).toBe("hello");
+		});
+
+		it("should reassemble split standard mode report", () => {
+			const filter = new TerminalEscapeFilter();
+			// Standard mode report ESC[12;2$y split across chunks
+			const chunk1 = `text${ESC}[1`;
+			const chunk2 = `2;2$y`;
+			const result1 = filter.filter(chunk1);
+			const result2 = filter.filter(chunk2);
+			expect(result1 + result2).toBe("text");
+		});
+
+		it("should reassemble split CPR with row only", () => {
+			const filter = new TerminalEscapeFilter();
+			// CPR ESC[2R split across chunks
+			const chunk1 = `prompt${ESC}[2`;
+			const chunk2 = `R`;
+			const result1 = filter.filter(chunk1);
+			const result2 = filter.filter(chunk2);
+			expect(result1 + result2).toBe("prompt");
+		});
+
+		it("should reassemble split OSC color response", () => {
+			const filter = new TerminalEscapeFilter();
+			// OSC 10 response split across chunks
+			const chunk1 = `text${ESC}]1`;
+			const chunk2 = `0;rgb:ffff/ffff/ffff${BEL}more`;
+			const result1 = filter.filter(chunk1);
+			const result2 = filter.filter(chunk2);
+			expect(result1 + result2).toBe("textmore");
+		});
+
+		it("should buffer digit CSI but pass through color codes when complete", () => {
+			const filter = new TerminalEscapeFilter();
+			// Color sequence is buffered initially (could be CPR/mode report)
+			const chunk1 = `text${ESC}[32`;
+			const chunk2 = `mgreen`;
+			const result1 = filter.filter(chunk1);
+			const result2 = filter.filter(chunk2);
+			// First chunk buffered, second chunk completes sequence
+			// Color code doesn't match filter patterns, so passes through
+			expect(result1).toBe("text");
+			expect(result2).toBe(`${ESC}[32mgreen`);
+		});
+
+		it("should NOT buffer ESC alone at end", () => {
+			const filter = new TerminalEscapeFilter();
+			const chunk1 = `text${ESC}`;
+			const result1 = filter.filter(chunk1);
+			// ESC alone should pass through (conservative - don't buffer)
+			expect(result1).toBe(`text${ESC}`);
+		});
+
+		it("should NOT buffer ESC [ alone at end", () => {
+			const filter = new TerminalEscapeFilter();
+			const chunk1 = `text${ESC}[`;
+			const result1 = filter.filter(chunk1);
+			// ESC [ alone should pass through (could be any CSI)
+			expect(result1).toBe(`text${ESC}[`);
+		});
+
+		it("should buffer ESC [ digit (could be CPR/mode report/DA)", () => {
+			const filter = new TerminalEscapeFilter();
+			const chunk1 = `text${ESC}[2`;
+			const result1 = filter.filter(chunk1);
+			// ESC [ digit is buffered - could be start of CPR, mode report, or DA
+			// When complete, if it's a color code it will pass through (no match)
+			expect(result1).toBe("text");
+			// Complete with R (CPR) - should be filtered
+			const result2 = filter.filter("R");
+			expect(result2).toBe("");
+		});
+
+		it("should pass through color codes when complete", () => {
+			const filter = new TerminalEscapeFilter();
+			// Color code split at chunk boundary
+			const chunk1 = `text${ESC}[32`;
+			const result1 = filter.filter(chunk1);
+			expect(result1).toBe("text"); // Buffered
+			// Complete with m - not a query response, passes through
+			const result2 = filter.filter("mgreen");
+			expect(result2).toBe(`${ESC}[32mgreen`);
+		});
+
+		it("should NOT buffer complete CSI followed by text", () => {
+			const filter = new TerminalEscapeFilter();
+			// Complete color code followed by text at chunk end
+			const chunk = `hello${ESC}[31mworld\n`;
+			const result = filter.filter(chunk);
+			// Should pass through immediately - CSI is complete
+			expect(result).toBe(`hello${ESC}[31mworld\n`);
+		});
+
+		it("should NOT buffer SGR reset followed by prompt", () => {
+			const filter = new TerminalEscapeFilter();
+			// Reset code followed by prompt
+			const chunk = `${ESC}[0m$ `;
+			const result = filter.filter(chunk);
+			expect(result).toBe(`${ESC}[0m$ `);
+		});
+	});
+
+	describe("flush behavior", () => {
+		it("should flush buffered incomplete sequence", () => {
+			const filter = new TerminalEscapeFilter();
+			const chunk = `hello${ESC}[?1;0`; // Incomplete DA1
+			const result = filter.filter(chunk);
+			expect(result).toBe("hello");
+			// Flush returns the buffered data (filtered)
+			const flushed = filter.flush();
+			expect(flushed).toBe(`${ESC}[?1;0`); // Not filtered because incomplete
+		});
+
+		it("should return empty on flush when no buffer", () => {
+			const filter = new TerminalEscapeFilter();
+			filter.filter("complete data");
+			expect(filter.flush()).toBe("");
+		});
+	});
+
+	describe("reset behavior", () => {
+		it("should clear buffer on reset", () => {
+			const filter = new TerminalEscapeFilter();
+			filter.filter(`text${ESC}[?1;0`); // Leaves incomplete in buffer
+			filter.reset();
+			expect(filter.flush()).toBe(""); // Buffer was cleared
+		});
+	});
+
+	describe("preserves normal output", () => {
+		it("should not buffer or delay normal text", () => {
+			const filter = new TerminalEscapeFilter();
+			const result = filter.filter("normal text output");
+			expect(result).toBe("normal text output");
+		});
+
+		it("should preserve ANSI colors even at chunk boundaries", () => {
+			const filter = new TerminalEscapeFilter();
+			const chunk1 = `${ESC}[31mred${ESC}`;
+			const chunk2 = `[0mnormal`;
+			const result1 = filter.filter(chunk1);
+			const result2 = filter.filter(chunk2);
+			// Colors should pass through
+			expect(result1 + result2).toBe(`${ESC}[31mred${ESC}[0mnormal`);
 		});
 	});
 });

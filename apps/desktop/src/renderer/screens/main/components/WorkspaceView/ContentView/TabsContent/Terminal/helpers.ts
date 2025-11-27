@@ -2,20 +2,63 @@ import { ClipboardAddon } from "@xterm/addon-clipboard";
 import { FitAddon } from "@xterm/addon-fit";
 import { Unicode11Addon } from "@xterm/addon-unicode11";
 import { WebLinksAddon } from "@xterm/addon-web-links";
+import type { ITheme } from "@xterm/xterm";
 import { Terminal as XTerm } from "@xterm/xterm";
 import { debounce } from "lodash";
 import { trpcClient } from "renderer/lib/trpc-client";
+import { toXtermTheme } from "renderer/stores/theme/utils";
+import { builtInThemes, DEFAULT_THEME_ID } from "shared/themes";
 import { RESIZE_DEBOUNCE_MS, TERMINAL_OPTIONS } from "./config";
 import { FilePathLinkProvider } from "./FilePathLinkProvider";
+
+/**
+ * Get the default terminal theme from localStorage cache.
+ * This reads cached terminal colors before store hydration to prevent flash.
+ * Supports both built-in and custom themes via direct color cache.
+ */
+export function getDefaultTerminalTheme(): ITheme {
+	try {
+		// First try cached terminal colors (works for all themes including custom)
+		const cachedTerminal = localStorage.getItem("theme-terminal");
+		if (cachedTerminal) {
+			return toXtermTheme(JSON.parse(cachedTerminal));
+		}
+		// Fallback to looking up by theme ID (for fresh installs before first theme apply)
+		const themeId = localStorage.getItem("theme-id") ?? DEFAULT_THEME_ID;
+		const theme = builtInThemes.find((t) => t.id === themeId);
+		if (theme) {
+			return toXtermTheme(theme.terminal);
+		}
+	} catch {
+		// Fall through to default
+	}
+	// Final fallback to default theme
+	const defaultTheme = builtInThemes.find((t) => t.id === DEFAULT_THEME_ID);
+	return defaultTheme
+		? toXtermTheme(defaultTheme.terminal)
+		: { background: "#1a1a1a", foreground: "#d4d4d4" };
+}
+
+/**
+ * Get the default terminal background based on stored theme.
+ * This reads from localStorage before store hydration to prevent flash.
+ */
+export function getDefaultTerminalBg(): string {
+	return getDefaultTerminalTheme().background ?? "#1a1a1a";
+}
 
 export function createTerminalInstance(
 	container: HTMLDivElement,
 	cwd?: string,
+	initialTheme?: ITheme | null,
 ): {
 	xterm: XTerm;
 	fitAddon: FitAddon;
 } {
-	const xterm = new XTerm(TERMINAL_OPTIONS);
+	// Use provided theme, or fall back to localStorage-based default to prevent flash
+	const theme = initialTheme ?? getDefaultTerminalTheme();
+	const options = { ...TERMINAL_OPTIONS, theme };
+	const xterm = new XTerm(options);
 	const fitAddon = new FitAddon();
 
 	const webLinksAddon = new WebLinksAddon((event, uri) => {
