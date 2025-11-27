@@ -12,7 +12,6 @@ import { dragDropManager } from "../../lib/dnd";
 import { AppFrame } from "./components/AppFrame";
 import { Background } from "./components/Background";
 import { SettingsView } from "./components/SettingsView";
-import { StartView } from "./components/StartView";
 import { TopBar } from "./components/TopBar";
 import { WorkspaceView } from "./components/WorkspaceView";
 
@@ -59,29 +58,15 @@ export function MainScreen() {
 		[activeWorkspaceId, splitTabHorizontal, isWorkspaceView],
 	);
 
-	// Show start screen when no active workspace and not in settings
-	if (!activeWorkspace && currentView !== "settings") {
-		return <StartView />;
-	}
-
-	// Determine which content view to show
-	const renderContent = () => {
-		if (currentView === "settings") {
-			return <SettingsView />;
-		}
-		if (!activeWorkspace) {
-			return <StartView />;
-		}
-		return <WorkspaceView />;
-	};
-
 	return (
 		<DndProvider manager={dragDropManager}>
 			<Background />
 			<AppFrame>
 				<div className="flex flex-col h-full w-full">
 					<TopBar />
-					<div className="flex flex-1 overflow-hidden">{renderContent()}</div>
+					<div className="flex flex-1 overflow-hidden">
+						{currentView === "settings" ? <SettingsView /> : <WorkspaceView />}
+					</div>
 				</div>
 			</AppFrame>
 		</DndProvider>

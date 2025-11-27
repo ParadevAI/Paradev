@@ -14,9 +14,9 @@ export const oneDarkTheme: Theme = {
 	ui: {
 		background: "#282c34",
 		foreground: "#abb2bf",
-		card: "#2c313c",
+		card: "#282c34",
 		cardForeground: "#abb2bf",
-		popover: "#2c313c",
+		popover: "#21252b",
 		popoverForeground: "#abb2bf",
 		primary: "#61afef",
 		primaryForeground: "#282c34",
