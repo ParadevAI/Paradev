@@ -20,14 +20,16 @@ echo "📥 Installing dependencies..."
 bun install
 success "Dependencies installed"
 
-# Link direnv config
-echo "🔧 Linking .envrc..."
-ln -sf "$CONDUCTOR_ROOT_PATH/.envrc" .envrc
-success "direnv configured"
+# Link direnv config from root repo if it exists
+if [ -n "$SUPERSET_ROOT_PATH" ] && [ -f "$SUPERSET_ROOT_PATH/.envrc" ]; then
+  echo "🔧 Linking .envrc..."
+  ln -sf "$SUPERSET_ROOT_PATH/.envrc" .envrc
+  success "direnv configured"
+fi
 
 # Create Neon branch for this workspace
 echo "🗄️  Creating Neon branch..."
-WORKSPACE_NAME=$(basename "${CONDUCTOR_WORKSPACE_PATH:-$PWD}")
+WORKSPACE_NAME="${SUPERSET_WORKSPACE_NAME:-$(basename "$PWD")}"
 NEON_OUTPUT=$(neonctl branches create \
   --project-id tiny-cherry-82420694 \
   --name "$WORKSPACE_NAME" \
