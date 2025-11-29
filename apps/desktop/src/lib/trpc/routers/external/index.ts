@@ -1,8 +1,39 @@
 import { spawn } from "node:child_process";
 import path from "node:path";
-import { shell } from "electron";
+import { clipboard, shell } from "electron";
+import { db } from "main/lib/db";
+import { EXTERNAL_APPS, type ExternalApp } from "main/lib/db/schemas";
 import { z } from "zod";
 import { publicProcedure, router } from "../..";
+
+const ExternalAppSchema = z.enum(EXTERNAL_APPS);
+
+/**
+ * Get the command and args to open a path in the specified app
+ */
+const getAppCommand = (
+	app: ExternalApp,
+	targetPath: string,
+): { command: string; args: string[] } | null => {
+	switch (app) {
+		case "finder":
+			return null; // Handled specially with shell.showItemInFolder
+		case "vscode":
+			return { command: "code", args: [targetPath] };
+		case "cursor":
+			return { command: "cursor", args: [targetPath] };
+		case "xcode":
+			return { command: "open", args: ["-a", "Xcode", targetPath] };
+		case "iterm":
+			return { command: "open", args: ["-a", "iTerm", targetPath] };
+		case "warp":
+			return { command: "open", args: ["-a", "Warp", targetPath] };
+		case "terminal":
+			return { command: "open", args: ["-a", "Terminal", targetPath] };
+		default:
+			return null;
+	}
+};
 
 /**
  * Spawns a process and waits for it to complete
@@ -44,6 +75,36 @@ export const createExternalRouter = () => {
 			.mutation(async ({ input }) => {
 				shell.showItemInFolder(input);
 			}),
+
+		openInApp: publicProcedure
+			.input(
+				z.object({
+					path: z.string(),
+					app: ExternalAppSchema,
+				}),
+			)
+			.mutation(async ({ input }) => {
+				// Save last used app to DB
+				await db.update((data) => {
+					data.settings.lastUsedApp = input.app;
+				});
+
+				if (input.app === "finder") {
+					shell.showItemInFolder(input.path);
+					return;
+				}
+
+				const cmd = getAppCommand(input.app, input.path);
+				if (!cmd) {
+					throw new Error(`Unknown app: ${input.app}`);
+				}
+
+				await spawnAsync(cmd.command, cmd.args);
+			}),
+
+		copyPath: publicProcedure.input(z.string()).mutation(async ({ input }) => {
+			clipboard.writeText(input);
+		}),
 
 		openFileInEditor: publicProcedure
 			.input(

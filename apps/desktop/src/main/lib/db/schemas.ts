@@ -36,8 +36,21 @@ export interface Tab {
 	updatedAt: number;
 }
 
+export const EXTERNAL_APPS = [
+	"finder",
+	"vscode",
+	"cursor",
+	"xcode",
+	"iterm",
+	"warp",
+	"terminal",
+] as const;
+
+export type ExternalApp = (typeof EXTERNAL_APPS)[number];
+
 export interface Settings {
 	lastActiveWorkspaceId?: string;
+	lastUsedApp?: ExternalApp;
 }
 
 export interface Database {
