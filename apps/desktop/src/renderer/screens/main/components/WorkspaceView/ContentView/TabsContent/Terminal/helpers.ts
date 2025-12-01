@@ -117,9 +117,6 @@ export function createTerminalInstance(
 	// Activate Unicode 11
 	xterm.unicode.activeVersion = "11";
 
-	// Forward app hotkeys to document so useHotkeys can catch them
-	setupShortcutForwarding(xterm);
-
 	// Fit after addons are loaded
 	fitAddon.fit();
 
@@ -130,26 +127,45 @@ export function createTerminalInstance(
 	};
 }
 
-/**
- * Setup shortcut forwarding for xterm.
- * When an app hotkey is pressed while terminal is focused, re-dispatch to document
- * so react-hotkeys-hook handlers can catch it.
- */
-function setupShortcutForwarding(xterm: XTerm): void {
-	xterm.attachCustomKeyEventHandler((event: KeyboardEvent) => {
-		// Only intercept keydown events with meta/ctrl modifier
-		if (event.type !== "keydown") return true;
-		if (!event.metaKey && !event.ctrlKey) return true;
+export interface KeyboardHandlerOptions {
+	/** Callback for Shift+Enter to create a line continuation (like iTerm) */
+	onShiftEnter?: () => void;
+}
 
-		// Check if this is an app hotkey
-		if (isAppHotkey(event)) {
-			// Re-dispatch to document for react-hotkeys-hook to catch
-			document.dispatchEvent(new KeyboardEvent(event.type, event));
-			// Return false to tell xterm to ignore this event
+/**
+ * Setup keyboard handling for xterm including:
+ * - Shortcut forwarding: App hotkeys are re-dispatched to document for react-hotkeys-hook
+ * - Shift+Enter: Creates a line continuation (like iTerm) instead of executing
+ */
+export function setupKeyboardHandler(
+	xterm: XTerm,
+	options: KeyboardHandlerOptions = {},
+): void {
+	xterm.attachCustomKeyEventHandler((event: KeyboardEvent) => {
+		const isShiftEnter =
+			event.key === "Enter" &&
+			event.shiftKey &&
+			!event.metaKey &&
+			!event.ctrlKey &&
+			!event.altKey;
+
+		if (isShiftEnter) {
+			// Block both keydown and keyup to prevent Enter from leaking through
+			if (event.type === "keydown" && options.onShiftEnter) {
+				options.onShiftEnter();
+			}
 			return false;
 		}
 
-		// Let xterm handle all other keys
+		if (event.type !== "keydown") return true;
+		if (!event.metaKey && !event.ctrlKey) return true;
+
+		if (isAppHotkey(event)) {
+			// Re-dispatch to document for react-hotkeys-hook to catch
+			document.dispatchEvent(new KeyboardEvent(event.type, event));
+			return false;
+		}
+
 		return true;
 	});
 }
