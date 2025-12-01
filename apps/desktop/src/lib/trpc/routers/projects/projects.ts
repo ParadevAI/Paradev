@@ -1,14 +1,84 @@
-import { basename } from "node:path";
+import { existsSync } from "node:fs";
+import { access } from "node:fs/promises";
+import { basename, join } from "node:path";
 import type { BrowserWindow } from "electron";
 import { dialog } from "electron";
 import { db } from "main/lib/db";
 import type { Project } from "main/lib/db/schemas";
 import { nanoid } from "nanoid";
 import { PROJECT_COLOR_VALUES } from "shared/constants/project-colors";
+import simpleGit from "simple-git";
 import { z } from "zod";
 import { publicProcedure, router } from "../..";
 import { getGitRoot } from "../workspaces/utils/git";
 import { assignRandomColor } from "./utils/colors";
+
+// Safe filename regex: letters, numbers, dots, underscores, hyphens, spaces, and common unicode
+// Allows most valid Git repo names while avoiding path traversal characters
+const SAFE_REPO_NAME_REGEX = /^[a-zA-Z0-9._\- ]+$/;
+
+/**
+ * Extracts and validates a repository name from a git URL.
+ * Handles HTTP/HTTPS URLs, SSH-style URLs (git@host:user/repo), and edge cases.
+ */
+function extractRepoName(urlInput: string): string | null {
+	// Normalize: trim whitespace and strip trailing slashes
+	let normalized = urlInput.trim().replace(/\/+$/, "");
+
+	if (!normalized) return null;
+
+	let repoSegment: string | undefined;
+
+	// Try parsing as HTTP/HTTPS URL first
+	try {
+		const parsed = new URL(normalized);
+		if (parsed.protocol === "http:" || parsed.protocol === "https:") {
+			// Get pathname and strip query/hash (URL constructor handles this)
+			const pathname = parsed.pathname;
+			// Get the last segment of the path
+			repoSegment = pathname.split("/").filter(Boolean).pop();
+		}
+	} catch {
+		// Not a valid URL, try SSH-style parsing
+	}
+
+	// Fallback to SSH-style parsing (git@github.com:user/repo.git)
+	if (!repoSegment) {
+		// Handle SSH format: git@host:path or just path segments
+		const colonIndex = normalized.indexOf(":");
+		if (colonIndex !== -1 && !normalized.includes("://")) {
+			// SSH-style: take everything after the colon
+			normalized = normalized.slice(colonIndex + 1);
+		}
+		// Split by '/' and get the last segment
+		repoSegment = normalized.split("/").filter(Boolean).pop();
+	}
+
+	if (!repoSegment) return null;
+
+	// Strip query string and hash if present (for edge cases)
+	repoSegment = repoSegment.split("?")[0].split("#")[0];
+
+	// Remove trailing .git extension
+	repoSegment = repoSegment.replace(/\.git$/, "");
+
+	// Decode percent-encoded characters
+	try {
+		repoSegment = decodeURIComponent(repoSegment);
+	} catch {
+		// Invalid encoding, continue with raw value
+	}
+
+	// Trim any remaining whitespace or special characters at boundaries
+	repoSegment = repoSegment.trim();
+
+	// Validate against safe filename regex
+	if (!repoSegment || !SAFE_REPO_NAME_REGEX.test(repoSegment)) {
+		return null;
+	}
+
+	return repoSegment;
+}
 
 export const createProjectsRouter = (window: BrowserWindow) => {
 	return router({
@@ -72,6 +142,129 @@ export const createProjectsRouter = (window: BrowserWindow) => {
 				project,
 			};
 		}),
+
+		cloneRepo: publicProcedure
+			.input(
+				z.object({
+					url: z.string().url(),
+					// Trim and convert empty/whitespace strings to undefined
+					targetDirectory: z
+						.string()
+						.trim()
+						.optional()
+						.transform((v) => (v && v.length > 0 ? v : undefined)),
+				}),
+			)
+			.mutation(async ({ input }) => {
+				try {
+					let targetDir = input.targetDirectory;
+
+					if (!targetDir) {
+						const result = await dialog.showOpenDialog(window, {
+							properties: ["openDirectory", "createDirectory"],
+							title: "Select Clone Destination",
+						});
+
+						// User canceled - return canceled state (not an error)
+						if (result.canceled || result.filePaths.length === 0) {
+							return { canceled: true as const, success: false as const };
+						}
+
+						targetDir = result.filePaths[0];
+					}
+
+					const repoName = extractRepoName(input.url);
+					if (!repoName) {
+						return {
+							canceled: false as const,
+							success: false as const,
+							error: "Invalid repository URL",
+						};
+					}
+
+					const clonePath = join(targetDir, repoName);
+
+					// Check if we already have a project for this path
+					const existingProject = db.data.projects.find(
+						(p) => p.mainRepoPath === clonePath,
+					);
+
+					if (existingProject) {
+						// Verify the filesystem path still exists
+						try {
+							await access(clonePath);
+							// Directory exists - update lastOpenedAt and return existing project
+							await db.update((data) => {
+								const p = data.projects.find(
+									(p) => p.id === existingProject.id,
+								);
+								if (p) {
+									p.lastOpenedAt = Date.now();
+								}
+							});
+							return {
+								canceled: false as const,
+								success: true as const,
+								project: existingProject,
+							};
+						} catch {
+							// Directory is missing - remove the stale project record and continue with clone
+							await db.update((data) => {
+								const index = data.projects.findIndex(
+									(p) => p.id === existingProject.id,
+								);
+								if (index !== -1) {
+									data.projects.splice(index, 1);
+								}
+							});
+							// Continue to normal creation flow below
+						}
+					}
+
+					// Check if target directory already exists (but not our project)
+					if (existsSync(clonePath)) {
+						return {
+							canceled: false as const,
+							success: false as const,
+							error: `A folder named "${repoName}" already exists at this location. Please choose a different destination.`,
+						};
+					}
+
+					// Clone the repository
+					const git = simpleGit();
+					await git.clone(input.url, clonePath);
+
+					// Create new project
+					const name = basename(clonePath);
+					const project: Project = {
+						id: nanoid(),
+						mainRepoPath: clonePath,
+						name,
+						color: assignRandomColor(),
+						tabOrder: null,
+						lastOpenedAt: Date.now(),
+						createdAt: Date.now(),
+					};
+
+					await db.update((data) => {
+						data.projects.push(project);
+					});
+
+					return {
+						canceled: false as const,
+						success: true as const,
+						project,
+					};
+				} catch (error) {
+					const errorMessage =
+						error instanceof Error ? error.message : String(error);
+					return {
+						canceled: false as const,
+						success: false as const,
+						error: `Failed to clone repository: ${errorMessage}`,
+					};
+				}
+			}),
 
 		update: publicProcedure
 			.input(
