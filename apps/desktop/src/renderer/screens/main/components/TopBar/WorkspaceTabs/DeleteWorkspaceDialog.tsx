@@ -28,9 +28,13 @@ export function DeleteWorkspaceDialog({
 	const deleteWorkspace = useDeleteWorkspace();
 
 	// Query to check if workspace can be deleted
+	// Refetch every 2 seconds while dialog is open to keep terminal count fresh
 	const { data: canDeleteData, isLoading } = trpc.workspaces.canDelete.useQuery(
 		{ id: workspaceId },
-		{ enabled: open }, // Only run when dialog is open
+		{
+			enabled: open,
+			refetchInterval: open ? 2000 : false,
+		},
 	);
 
 	const handleDelete = () => {
@@ -39,11 +43,18 @@ export function DeleteWorkspaceDialog({
 		toast.promise(deleteWorkspace.mutateAsync({ id: workspaceId }), {
 			loading: `Deleting "${workspaceName}"...`,
 			success: (result) => {
-				if (result.teardownError) {
+				if (result.teardownError || result.terminalWarning) {
 					setTimeout(() => {
-						toast.warning("Workspace deleted with teardown warning", {
-							description: result.teardownError,
-						});
+						if (result.teardownError) {
+							toast.warning("Workspace deleted with teardown warning", {
+								description: result.teardownError,
+							});
+						}
+						if (result.terminalWarning) {
+							toast.warning("Workspace deleted with terminal warning", {
+								description: result.terminalWarning,
+							});
+						}
 					}, 100);
 				}
 				return `Workspace "${workspaceName}" deleted`;
@@ -58,6 +69,7 @@ export function DeleteWorkspaceDialog({
 	const canDelete = canDeleteData?.canDelete ?? true;
 	const reason = canDeleteData?.reason;
 	const warning = canDeleteData?.warning;
+	const activeTerminalCount = canDeleteData?.activeTerminalCount ?? 0;
 
 	return (
 		<AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -77,6 +89,12 @@ export function DeleteWorkspaceDialog({
 								{warning && (
 									<span className="block mt-2 text-yellow-600 dark:text-yellow-400">
 										Warning: {warning}
+									</span>
+								)}
+								{activeTerminalCount > 0 && (
+									<span className="block mt-2 text-muted-foreground">
+										{activeTerminalCount} active terminal
+										{activeTerminalCount === 1 ? "" : "s"} will be terminated.
 									</span>
 								)}
 								<span className="block mt-2">
