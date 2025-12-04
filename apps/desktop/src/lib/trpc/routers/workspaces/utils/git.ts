@@ -1,49 +1,23 @@
+import { randomBytes } from "node:crypto";
 import { mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import simpleGit from "simple-git";
+import {
+	adjectives,
+	animals,
+	uniqueNamesGenerator,
+} from "unique-names-generator";
 
 export function generateBranchName(): string {
-	const adjectives = [
-		"azure",
-		"crimson",
-		"emerald",
-		"golden",
-		"indigo",
-		"jade",
-		"lavender",
-		"magenta",
-		"navy",
-		"olive",
-		"pearl",
-		"rose",
-		"silver",
-		"teal",
-		"violet",
-	];
+	const name = uniqueNamesGenerator({
+		dictionaries: [adjectives, animals],
+		separator: "-",
+		length: 2,
+		style: "lowerCase",
+	});
+	const suffix = randomBytes(3).toString("hex");
 
-	const nouns = [
-		"cloud",
-		"forest",
-		"mountain",
-		"ocean",
-		"river",
-		"storm",
-		"sunset",
-		"thunder",
-		"wave",
-		"wind",
-		"meadow",
-		"canyon",
-		"glacier",
-		"valley",
-		"peak",
-	];
-
-	const adjective = adjectives[Math.floor(Math.random() * adjectives.length)];
-	const noun = nouns[Math.floor(Math.random() * nouns.length)];
-	const number = Math.floor(Math.random() * 100);
-
-	return `${adjective}-${noun}-${number}`;
+	return `${name}-${suffix}`;
 }
 
 export async function createWorktree(
