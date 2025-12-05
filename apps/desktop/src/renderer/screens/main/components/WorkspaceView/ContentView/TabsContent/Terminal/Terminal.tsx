@@ -42,6 +42,10 @@ export const Terminal = ({ tabId, workspaceId }: TerminalProps) => {
 		? focusedPaneIds[pane.windowId] === paneId
 		: false;
 
+	// Ref to track focus state for use in terminal creation effect
+	const isFocusedRef = useRef(isFocused);
+	isFocusedRef.current = isFocused;
+
 	// Required for resolving relative file paths in terminal commands
 	const { data: workspaceCwd } =
 		trpc.terminal.getWorkspaceCwd.useQuery(workspaceId);
@@ -108,6 +112,13 @@ export const Terminal = ({ tabId, workspaceId }: TerminalProps) => {
 		}
 	}, [isFocused]);
 
+	// Autofocus terminal when it becomes the focused pane (e.g., after split)
+	useEffect(() => {
+		if (isFocused && xtermRef.current) {
+			xtermRef.current.focus();
+		}
+	}, [isFocused]);
+
 	// Toggle search with Cmd+F (only for the focused terminal)
 	useHotkeys(
 		HOTKEYS.FIND_IN_TERMINAL.keys,
@@ -132,6 +143,11 @@ export const Terminal = ({ tabId, workspaceId }: TerminalProps) => {
 		xtermRef.current = xterm;
 		fitAddonRef.current = fitAddon;
 		isExitedRef.current = false;
+
+		// Autofocus on initial render if this terminal is the focused pane
+		if (isFocusedRef.current) {
+			xterm.focus();
+		}
 
 		// Load search addon for Cmd+F functionality
 		import("@xterm/addon-search").then(({ SearchAddon }) => {
