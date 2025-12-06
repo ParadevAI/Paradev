@@ -1,5 +1,6 @@
 import { trpc } from "renderer/lib/trpc";
 import { WorkspaceHeader } from "../WorkspaceView/WorkspaceHeader";
+import { HelpMenu } from "./HelpMenu";
 import { SettingsButton } from "./SettingsButton";
 import { SidebarControl } from "./SidebarControl";
 import { WindowControls } from "./WindowControls";
@@ -25,6 +26,7 @@ export function TopBar() {
 			<div className="flex items-center gap-2 h-full pr-4">
 				<WorkspaceHeader worktreePath={activeWorkspace?.worktreePath} />
 				<SettingsButton />
+				<HelpMenu />
 				{!isMac && <WindowControls />}
 			</div>
 		</div>
