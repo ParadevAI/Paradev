@@ -13,6 +13,8 @@ import {
 	generateBranchName,
 	getDefaultBranch,
 	hasOriginRemote,
+	hasUncommittedChanges,
+	hasUnpushedCommits,
 	removeWorktree,
 	worktreeExists,
 } from "./utils/git";
@@ -288,7 +290,13 @@ export const createWorkspacesRouter = () => {
 			}),
 
 		canDelete: publicProcedure
-			.input(z.object({ id: z.string() }))
+			.input(
+				z.object({
+					id: z.string(),
+					// Skip expensive git checks (status, unpushed) during polling - only check terminal count
+					skipGitChecks: z.boolean().optional(),
+				}),
+			)
 			.query(async ({ input }) => {
 				const workspace = db.data.workspaces.find((w) => w.id === input.id);
 
@@ -298,11 +306,27 @@ export const createWorkspacesRouter = () => {
 						reason: "Workspace not found",
 						workspace: null,
 						activeTerminalCount: 0,
+						hasChanges: false,
+						hasUnpushedCommits: false,
 					};
 				}
 
 				const activeTerminalCount =
 					terminalManager.getSessionCountByWorkspaceId(input.id);
+
+				// If skipping git checks, return early with just terminal count
+				// This is used during polling to avoid expensive git operations
+				if (input.skipGitChecks) {
+					return {
+						canDelete: true,
+						reason: null,
+						workspace,
+						warning: null,
+						activeTerminalCount,
+						hasChanges: false,
+						hasUnpushedCommits: false,
+					};
+				}
 
 				const worktree = db.data.worktrees.find(
 					(wt) => wt.id === workspace.worktreeId,
@@ -326,8 +350,16 @@ export const createWorkspacesRouter = () => {
 								warning:
 									"Worktree not found in git (may have been manually removed)",
 								activeTerminalCount,
+								hasChanges: false,
+								hasUnpushedCommits: false,
 							};
 						}
+
+						// Check for uncommitted changes and unpushed commits in parallel
+						const [hasChanges, unpushedCommits] = await Promise.all([
+							hasUncommittedChanges(worktree.path),
+							hasUnpushedCommits(worktree.path),
+						]);
 
 						return {
 							canDelete: true,
@@ -335,6 +367,8 @@ export const createWorkspacesRouter = () => {
 							workspace,
 							warning: null,
 							activeTerminalCount,
+							hasChanges,
+							hasUnpushedCommits: unpushedCommits,
 						};
 					} catch (error) {
 						return {
@@ -342,6 +376,8 @@ export const createWorkspacesRouter = () => {
 							reason: `Failed to check worktree status: ${error instanceof Error ? error.message : String(error)}`,
 							workspace,
 							activeTerminalCount,
+							hasChanges: false,
+							hasUnpushedCommits: false,
 						};
 					}
 				}
@@ -352,6 +388,8 @@ export const createWorkspacesRouter = () => {
 					workspace,
 					warning: "No associated worktree found",
 					activeTerminalCount,
+					hasChanges: false,
+					hasUnpushedCommits: false,
 				};
 			}),
 
