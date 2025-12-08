@@ -7,15 +7,7 @@ export function createApplicationMenu() {
 	const template: Electron.MenuItemConstructorOptions[] = [
 		{
 			label: "File",
-			submenu: [
-				{
-					label: "New Window",
-					accelerator: "CmdOrCtrl+Shift+N",
-					click: async () => {},
-				},
-				{ type: "separator" },
-				{ role: "quit" },
-			],
+			submenu: [{ role: "quit" }],
 		},
 		{
 			label: "Edit",

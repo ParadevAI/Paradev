@@ -4,49 +4,47 @@ import { useRef, useState } from "react";
 import { useDrag, useDrop } from "react-dnd";
 import { HiMiniXMark } from "react-icons/hi2";
 import { trpc } from "renderer/lib/trpc";
-import { useWindowsStore } from "renderer/stores/tabs/store";
-import type { Window } from "renderer/stores/tabs/types";
-import { getWindowDisplayName } from "renderer/stores/tabs/utils";
-import { WindowContextMenu } from "./WindowContextMenu";
+import { useTabsStore } from "renderer/stores/tabs/store";
+import type { Tab } from "renderer/stores/tabs/types";
+import { getTabDisplayName } from "renderer/stores/tabs/utils";
+import { TabContextMenu } from "./TabContextMenu";
 
-const DRAG_TYPE = "WINDOW";
+const DRAG_TYPE = "TAB";
 
 interface DragItem {
 	type: typeof DRAG_TYPE;
-	windowId: string;
+	tabId: string;
 	index: number;
 }
 
-interface WindowItemProps {
-	window: Window;
+interface TabItemProps {
+	tab: Tab;
 	index: number;
 	isActive: boolean;
 }
 
-export function WindowItem({ window, index, isActive }: WindowItemProps) {
+export function TabItem({ tab, index, isActive }: TabItemProps) {
 	const { data: activeWorkspace } = trpc.workspaces.getActive.useQuery();
 	const activeWorkspaceId = activeWorkspace?.id;
-	const removeWindow = useWindowsStore((s) => s.removeWindow);
-	const setActiveWindow = useWindowsStore((s) => s.setActiveWindow);
-	const renameWindow = useWindowsStore((s) => s.renameWindow);
-	const needsAttention = useWindowsStore((s) =>
-		Object.values(s.panes).some(
-			(p) => p.windowId === window.id && p.needsAttention,
-		),
+	const removeTab = useTabsStore((s) => s.removeTab);
+	const setActiveTab = useTabsStore((s) => s.setActiveTab);
+	const renameTab = useTabsStore((s) => s.renameTab);
+	const needsAttention = useTabsStore((s) =>
+		Object.values(s.panes).some((p) => p.tabId === tab.id && p.needsAttention),
 	);
 
 	const [isRenaming, setIsRenaming] = useState(false);
 	const [renameValue, setRenameValue] = useState("");
 	const inputRef = useRef<HTMLInputElement>(null);
 
-	// Drag source for window reordering
+	// Drag source for tab reordering
 	const [{ isDragging }, drag] = useDrag<
 		DragItem,
 		void,
 		{ isDragging: boolean }
 	>({
 		type: DRAG_TYPE,
-		item: { type: DRAG_TYPE, windowId: window.id, index },
+		item: { type: DRAG_TYPE, tabId: tab.id, index },
 		collect: (monitor) => ({
 			isDragging: monitor.isDragging(),
 		}),
@@ -64,22 +62,22 @@ export function WindowItem({ window, index, isActive }: WindowItemProps) {
 		}),
 	});
 
-	const displayName = getWindowDisplayName(window);
+	const displayName = getTabDisplayName(tab);
 
-	const handleRemoveWindow = (e?: React.MouseEvent) => {
+	const handleRemoveTab = (e?: React.MouseEvent) => {
 		e?.stopPropagation();
-		removeWindow(window.id);
+		removeTab(tab.id);
 	};
 
-	const handleWindowClick = () => {
+	const handleTabClick = () => {
 		if (isRenaming) return;
 		if (activeWorkspaceId) {
-			setActiveWindow(activeWorkspaceId, window.id);
+			setActiveTab(activeWorkspaceId, tab.id);
 		}
 	};
 
 	const startRename = () => {
-		setRenameValue(window.name || displayName);
+		setRenameValue(tab.name || displayName);
 		setIsRenaming(true);
 		setTimeout(() => {
 			inputRef.current?.focus();
@@ -90,8 +88,8 @@ export function WindowItem({ window, index, isActive }: WindowItemProps) {
 	const submitRename = () => {
 		const trimmedValue = renameValue.trim();
 		// Only update if the name actually changed
-		if (trimmedValue && trimmedValue !== window.name) {
-			renameWindow(window.id, trimmedValue);
+		if (trimmedValue && trimmedValue !== tab.name) {
+			renameTab(tab.id, trimmedValue);
 		}
 		setIsRenaming(false);
 	};
@@ -112,16 +110,16 @@ export function WindowItem({ window, index, isActive }: WindowItemProps) {
 
 	return (
 		<div className="w-full">
-			<WindowContextMenu onClose={handleRemoveWindow} onRename={startRename}>
+			<TabContextMenu onClose={handleRemoveTab} onRename={startRename}>
 				<Button
 					ref={attachRef}
 					variant="ghost"
-					onClick={handleWindowClick}
+					onClick={handleTabClick}
 					onDoubleClick={startRename}
 					onKeyDown={(e) => {
 						if (!isRenaming && (e.key === "Enter" || e.key === " ")) {
 							e.preventDefault();
-							handleWindowClick();
+							handleTabClick();
 						}
 					}}
 					tabIndex={0}
@@ -162,13 +160,13 @@ export function WindowItem({ window, index, isActive }: WindowItemProps) {
 					<button
 						type="button"
 						tabIndex={-1}
-						onClick={handleRemoveWindow}
+						onClick={handleRemoveTab}
 						className="cursor-pointer opacity-0 group-hover:opacity-100 ml-2 text-xs shrink-0"
 					>
 						<HiMiniXMark className="size-4" />
 					</button>
 				</Button>
-			</WindowContextMenu>
+			</TabContextMenu>
 		</div>
 	);
 }

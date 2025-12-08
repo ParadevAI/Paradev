@@ -13,46 +13,46 @@ import { Terminal } from "../Terminal";
 
 type SplitOrientation = "vertical" | "horizontal";
 
-interface WindowPaneProps {
+interface TabPaneProps {
 	paneId: string;
 	path: MosaicBranch[];
 	pane: Pane;
 	isActive: boolean;
-	windowId: string;
+	tabId: string;
 	workspaceId: string;
 	splitPaneAuto: (
-		windowId: string,
+		tabId: string,
 		sourcePaneId: string,
 		dimensions: { width: number; height: number },
 		path?: MosaicBranch[],
 	) => void;
 	splitPaneHorizontal: (
-		windowId: string,
+		tabId: string,
 		sourcePaneId: string,
 		path?: MosaicBranch[],
 	) => void;
 	splitPaneVertical: (
-		windowId: string,
+		tabId: string,
 		sourcePaneId: string,
 		path?: MosaicBranch[],
 	) => void;
 	removePane: (paneId: string) => void;
-	setFocusedPane: (windowId: string, paneId: string) => void;
+	setFocusedPane: (tabId: string, paneId: string) => void;
 }
 
-export function WindowPane({
+export function TabPane({
 	paneId,
 	path,
 	pane,
 	isActive,
-	windowId,
+	tabId,
 	workspaceId,
 	splitPaneAuto,
 	splitPaneHorizontal,
 	splitPaneVertical,
 	removePane,
 	setFocusedPane,
-}: WindowPaneProps) {
+}: TabPaneProps) {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [splitOrientation, setSplitOrientation] =
 		useState<SplitOrientation>("vertical");
@@ -87,7 +87,7 @@ export function WindowPane({
 	}, []);
 
 	const handleFocus = () => {
-		setFocusedPane(windowId, paneId);
+		setFocusedPane(tabId, paneId);
 	};
 
 	const handleClosePane = (e: React.MouseEvent) => {
@@ -101,7 +101,7 @@ export function WindowPane({
 		if (!container) return;
 
 		const { width, height } = container.getBoundingClientRect();
-		splitPaneAuto(windowId, paneId, { width, height }, path);
+		splitPaneAuto(tabId, paneId, { width, height }, path);
 	};
 
 	const splitIcon =
@@ -138,8 +138,8 @@ export function WindowPane({
 			className={isActive ? "mosaic-window-focused" : ""}
 		>
 			<TabContentContextMenu
-				onSplitHorizontal={() => splitPaneHorizontal(windowId, paneId, path)}
-				onSplitVertical={() => splitPaneVertical(windowId, paneId, path)}
+				onSplitHorizontal={() => splitPaneHorizontal(tabId, paneId, path)}
+				onSplitVertical={() => splitPaneVertical(tabId, paneId, path)}
 				onClosePane={() => removePane(paneId)}
 			>
 				{/* biome-ignore lint/a11y/useKeyWithClickEvents lint/a11y/noStaticElementInteractions: Terminal handles its own keyboard events and focus */}

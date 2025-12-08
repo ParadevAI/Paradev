@@ -8,42 +8,42 @@ import {
 	type MosaicNode,
 } from "react-mosaic-component";
 import { dragDropManager } from "renderer/lib/dnd";
-import { useWindowsStore } from "renderer/stores/tabs/store";
-import type { Pane, Window } from "renderer/stores/tabs/types";
+import { useTabsStore } from "renderer/stores/tabs/store";
+import type { Pane, Tab } from "renderer/stores/tabs/types";
 import {
 	cleanLayout,
 	extractPaneIdsFromLayout,
-	getPaneIdsForWindow,
+	getPaneIdsForTab,
 } from "renderer/stores/tabs/utils";
-import { WindowPane } from "./WindowPane";
+import { TabPane } from "./TabPane";
 
-interface WindowViewProps {
-	window: Window;
+interface TabViewProps {
+	tab: Tab;
 	panes: Record<string, Pane>;
 }
 
-export function WindowView({ window, panes }: WindowViewProps) {
-	const updateWindowLayout = useWindowsStore((s) => s.updateWindowLayout);
-	const removePane = useWindowsStore((s) => s.removePane);
-	const removeWindow = useWindowsStore((s) => s.removeWindow);
-	const splitPaneAuto = useWindowsStore((s) => s.splitPaneAuto);
-	const splitPaneHorizontal = useWindowsStore((s) => s.splitPaneHorizontal);
-	const splitPaneVertical = useWindowsStore((s) => s.splitPaneVertical);
-	const setFocusedPane = useWindowsStore((s) => s.setFocusedPane);
-	const focusedPaneIds = useWindowsStore((s) => s.focusedPaneIds);
+export function TabView({ tab, panes }: TabViewProps) {
+	const updateTabLayout = useTabsStore((s) => s.updateTabLayout);
+	const removePane = useTabsStore((s) => s.removePane);
+	const removeTab = useTabsStore((s) => s.removeTab);
+	const splitPaneAuto = useTabsStore((s) => s.splitPaneAuto);
+	const splitPaneHorizontal = useTabsStore((s) => s.splitPaneHorizontal);
+	const splitPaneVertical = useTabsStore((s) => s.splitPaneVertical);
+	const setFocusedPane = useTabsStore((s) => s.setFocusedPane);
+	const focusedPaneIds = useTabsStore((s) => s.focusedPaneIds);
 
-	const focusedPaneId = focusedPaneIds[window.id];
+	const focusedPaneId = focusedPaneIds[tab.id];
 
-	// Get valid pane IDs for this window
-	const validPaneIds = new Set(getPaneIdsForWindow(panes, window.id));
-	const cleanedLayout = cleanLayout(window.layout, validPaneIds);
+	// Get valid pane IDs for this tab
+	const validPaneIds = new Set(getPaneIdsForTab(panes, tab.id));
+	const cleanedLayout = cleanLayout(tab.layout, validPaneIds);
 
-	// Auto-remove window when all panes are gone
+	// Auto-remove tab when all panes are gone
 	useEffect(() => {
 		if (!cleanedLayout) {
-			removeWindow(window.id);
+			removeTab(tab.id);
 		}
-	}, [cleanedLayout, removeWindow, window.id]);
+	}, [cleanedLayout, removeTab, tab.id]);
 
 	const handleLayoutChange = useCallback(
 		(newLayout: MosaicNode<string> | null) => {
@@ -52,7 +52,7 @@ export function WindowView({ window, panes }: WindowViewProps) {
 				return;
 			}
 
-			const oldPaneIds = extractPaneIdsFromLayout(window.layout);
+			const oldPaneIds = extractPaneIdsFromLayout(tab.layout);
 			const newPaneIds = extractPaneIdsFromLayout(newLayout);
 
 			// Find removed panes (e.g., from Mosaic close button)
@@ -66,9 +66,9 @@ export function WindowView({ window, panes }: WindowViewProps) {
 			}
 
 			// Update the layout
-			updateWindowLayout(window.id, newLayout);
+			updateTabLayout(tab.id, newLayout);
 		},
-		[window.id, window.layout, updateWindowLayout, removePane],
+		[tab.id, tab.layout, updateTabLayout, removePane],
 	);
 
 	const renderPane = useCallback(
@@ -85,13 +85,13 @@ export function WindowView({ window, panes }: WindowViewProps) {
 			}
 
 			return (
-				<WindowPane
+				<TabPane
 					paneId={paneId}
 					path={path}
 					pane={pane}
 					isActive={isActive}
-					windowId={window.id}
-					workspaceId={window.workspaceId}
+					tabId={tab.id}
+					workspaceId={tab.workspaceId}
 					splitPaneAuto={splitPaneAuto}
 					splitPaneHorizontal={splitPaneHorizontal}
 					splitPaneVertical={splitPaneVertical}
@@ -103,8 +103,8 @@ export function WindowView({ window, panes }: WindowViewProps) {
 		[
 			panes,
 			focusedPaneId,
-			window.id,
-			window.workspaceId,
+			tab.id,
+			tab.workspaceId,
 			splitPaneAuto,
 			splitPaneHorizontal,
 			splitPaneVertical,
@@ -113,7 +113,7 @@ export function WindowView({ window, panes }: WindowViewProps) {
 		],
 	);
 
-	// Window will be removed by useEffect above
+	// Tab will be removed by useEffect above
 	if (!cleanedLayout) {
 		return null;
 	}
