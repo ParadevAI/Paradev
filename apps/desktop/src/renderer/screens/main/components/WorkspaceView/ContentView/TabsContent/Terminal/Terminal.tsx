@@ -2,12 +2,14 @@ import "@xterm/xterm/css/xterm.css";
 import type { FitAddon } from "@xterm/addon-fit";
 import type { SearchAddon } from "@xterm/addon-search";
 import type { Terminal as XTerm } from "@xterm/xterm";
+import debounce from "lodash/debounce";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { trpc } from "renderer/lib/trpc";
 import { useTabsStore } from "renderer/stores/tabs/store";
 import { useTerminalTheme } from "renderer/stores/theme";
 import { HOTKEYS } from "shared/hotkeys";
+import { sanitizeForTitle } from "./commandBuffer";
 import {
 	createTerminalInstance,
 	getDefaultTerminalBg,
@@ -26,22 +28,25 @@ export const Terminal = ({ tabId, workspaceId }: TerminalProps) => {
 	const panes = useTabsStore((s) => s.panes);
 	const pane = panes[paneId];
 	const paneName = pane?.name || "Terminal";
+	const parentTabId = pane?.tabId;
 	const terminalRef = useRef<HTMLDivElement>(null);
 	const xtermRef = useRef<XTerm | null>(null);
 	const fitAddonRef = useRef<FitAddon | null>(null);
 	const searchAddonRef = useRef<SearchAddon | null>(null);
 	const isExitedRef = useRef(false);
 	const pendingEventsRef = useRef<TerminalStreamEvent[]>([]);
+	const commandBufferRef = useRef("");
 	const [subscriptionEnabled, setSubscriptionEnabled] = useState(false);
 	const [isSearchOpen, setIsSearchOpen] = useState(false);
 	const setFocusedPane = useTabsStore((s) => s.setFocusedPane);
+	const setTabAutoTitle = useTabsStore((s) => s.setTabAutoTitle);
 	const focusedPaneIds = useTabsStore((s) => s.focusedPaneIds);
 	const terminalTheme = useTerminalTheme();
 
-	// Check if this terminal is the focused pane in its tab
-	const isFocused = pane?.tabId ? focusedPaneIds[pane.tabId] === paneId : false;
+	// Ref for initial theme to avoid recreating terminal on theme change
+	const initialThemeRef = useRef(terminalTheme);
 
-	// Ref to track focus state for use in terminal creation effect
+	const isFocused = pane?.tabId ? focusedPaneIds[pane.tabId] === paneId : false;
 	const isFocusedRef = useRef(isFocused);
 	isFocusedRef.current = isFocused;
 
@@ -64,6 +69,21 @@ export const Terminal = ({ tabId, workspaceId }: TerminalProps) => {
 	writeRef.current = writeMutation.mutate;
 	resizeRef.current = resizeMutation.mutate;
 	detachRef.current = detachMutation.mutate;
+
+	const parentTabIdRef = useRef(parentTabId);
+	parentTabIdRef.current = parentTabId;
+
+	const paneNameRef = useRef(paneName);
+	paneNameRef.current = paneName;
+
+	const setTabAutoTitleRef = useRef(setTabAutoTitle);
+	setTabAutoTitleRef.current = setTabAutoTitle;
+
+	const debouncedSetTabAutoTitleRef = useRef(
+		debounce((tabId: string, title: string) => {
+			setTabAutoTitleRef.current(tabId, title);
+		}, 100),
+	);
 
 	const handleStreamData = (event: TerminalStreamEvent) => {
 		if (!xtermRef.current) {
@@ -90,14 +110,12 @@ export const Terminal = ({ tabId, workspaceId }: TerminalProps) => {
 		}
 	};
 
-	// Use paneId (tabId) for stream subscription
 	trpc.terminal.stream.useSubscription(paneId, {
 		onData: handleStreamData,
 		// Always listen to prevent missing events during initialization
 		enabled: true,
 	});
 
-	// Handler to set focused pane when terminal gains focus
 	// Use ref to avoid triggering full terminal recreation when focus handler changes
 	const handleTerminalFocusRef = useRef(() => {});
 	handleTerminalFocusRef.current = () => {
@@ -106,21 +124,18 @@ export const Terminal = ({ tabId, workspaceId }: TerminalProps) => {
 		}
 	};
 
-	// Auto-close search when terminal loses focus
 	useEffect(() => {
 		if (!isFocused) {
 			setIsSearchOpen(false);
 		}
 	}, [isFocused]);
 
-	// Autofocus terminal when it becomes the focused pane (e.g., after split)
 	useEffect(() => {
 		if (isFocused && xtermRef.current) {
 			xtermRef.current.focus();
 		}
 	}, [isFocused]);
 
-	// Toggle search with Cmd+F (only for the focused terminal)
 	useHotkeys(
 		HOTKEYS.FIND_IN_TERMINAL.keys,
 		() => {
@@ -140,17 +155,19 @@ export const Terminal = ({ tabId, workspaceId }: TerminalProps) => {
 			xterm,
 			fitAddon,
 			cleanup: cleanupQuerySuppression,
-		} = createTerminalInstance(container, workspaceCwd, terminalTheme);
+		} = createTerminalInstance(
+			container,
+			workspaceCwd,
+			initialThemeRef.current,
+		);
 		xtermRef.current = xterm;
 		fitAddonRef.current = fitAddon;
 		isExitedRef.current = false;
 
-		// Autofocus on initial render if this terminal is the focused pane
 		if (isFocusedRef.current) {
 			xterm.focus();
 		}
 
-		// Load search addon for Cmd+F functionality
 		import("@xterm/addon-search").then(({ SearchAddon }) => {
 			if (isUnmounted) return;
 			const searchAddon = new SearchAddon();
@@ -194,7 +211,7 @@ export const Terminal = ({ tabId, workspaceId }: TerminalProps) => {
 				{
 					tabId: paneId,
 					workspaceId,
-					tabTitle: paneName,
+					tabTitle: paneNameRef.current,
 					cols: xterm.cols,
 					rows: xterm.rows,
 				},
@@ -214,8 +231,32 @@ export const Terminal = ({ tabId, workspaceId }: TerminalProps) => {
 		const handleTerminalInput = (data: string) => {
 			if (isExitedRef.current) {
 				restartTerminal();
-			} else {
-				writeRef.current({ tabId: paneId, data });
+				return;
+			}
+			writeRef.current({ tabId: paneId, data });
+		};
+
+		const handleKeyPress = (event: {
+			key: string;
+			domEvent: KeyboardEvent;
+		}) => {
+			const { domEvent } = event;
+			if (domEvent.key === "Enter") {
+				const title = sanitizeForTitle(commandBufferRef.current);
+				if (title && parentTabIdRef.current) {
+					debouncedSetTabAutoTitleRef.current(parentTabIdRef.current, title);
+				}
+				commandBufferRef.current = "";
+			} else if (domEvent.key === "Backspace") {
+				commandBufferRef.current = commandBufferRef.current.slice(0, -1);
+			} else if (domEvent.key === "c" && domEvent.ctrlKey) {
+				commandBufferRef.current = "";
+			} else if (
+				domEvent.key.length === 1 &&
+				!domEvent.ctrlKey &&
+				!domEvent.metaKey
+			) {
+				commandBufferRef.current += domEvent.key;
 			}
 		};
 
@@ -223,7 +264,7 @@ export const Terminal = ({ tabId, workspaceId }: TerminalProps) => {
 			{
 				tabId: paneId,
 				workspaceId,
-				tabTitle: paneName,
+				tabTitle: paneNameRef.current,
 				cols: xterm.cols,
 				rows: xterm.rows,
 			},
@@ -244,6 +285,7 @@ export const Terminal = ({ tabId, workspaceId }: TerminalProps) => {
 		);
 
 		const inputDisposable = xterm.onData(handleTerminalInput);
+		const keyDisposable = xterm.onKey(handleKeyPress);
 
 		// Intercept keyboard events to handle app hotkeys and provide iTerm-like line continuation UX
 		const cleanupKeyboard = setupKeyboardHandler(xterm, {
@@ -258,7 +300,6 @@ export const Terminal = ({ tabId, workspaceId }: TerminalProps) => {
 			},
 		});
 
-		// Setup focus listener to track focused pane (use ref to get latest handler)
 		const cleanupFocus = setupFocusListener(xterm, () =>
 			handleTerminalFocusRef.current(),
 		);
@@ -271,26 +312,31 @@ export const Terminal = ({ tabId, workspaceId }: TerminalProps) => {
 			},
 		);
 		// Setup paste handler to ensure bracketed paste mode works for TUI apps like opencode
-		const cleanupPaste = setupPasteHandler(xterm);
+		const cleanupPaste = setupPasteHandler(xterm, {
+			onPaste: (text) => {
+				commandBufferRef.current += text;
+			},
+		});
 
 		return () => {
 			isUnmounted = true;
 			inputDisposable.dispose();
+			keyDisposable.dispose();
 			cleanupKeyboard();
 			cleanupFocus?.();
 			cleanupResize();
 			cleanupPaste();
 			cleanupQuerySuppression();
-			// Keep PTY running for reattachment
+			debouncedSetTabAutoTitleRef.current?.cancel?.();
+			// Detach instead of kill to keep PTY running for reattachment
 			detachRef.current({ tabId: paneId });
 			setSubscriptionEnabled(false);
 			xterm.dispose();
 			xtermRef.current = null;
 			searchAddonRef.current = null;
 		};
-	}, [paneId, workspaceId, workspaceCwd, paneName, terminalTheme]);
+	}, [paneId, workspaceId, workspaceCwd]);
 
-	// Sync theme changes to xterm instance for live theme switching
 	useEffect(() => {
 		const xterm = xtermRef.current;
 		if (!xterm || !terminalTheme) return;
