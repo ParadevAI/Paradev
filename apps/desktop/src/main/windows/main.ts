@@ -8,6 +8,7 @@ import { createIPCHandler } from "trpc-electron/main";
 import { productName } from "~/package.json";
 import { setMainWindow } from "../lib/auto-updater";
 import { createApplicationMenu } from "../lib/menu";
+import { playNotificationSound } from "../lib/notification-sound";
 import {
 	type AgentCompleteEvent,
 	notificationsApp,
@@ -86,8 +87,10 @@ export async function MainWindow() {
 				body: isPermissionRequest
 					? `"${event.tabTitle}" needs your attention`
 					: `"${event.tabTitle}" has finished its task`,
-				silent: false,
+				silent: true,
 			});
+
+			playNotificationSound();
 
 			notification.on("click", () => {
 				window.show();
