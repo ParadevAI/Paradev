@@ -16,6 +16,8 @@ export interface Pane {
 	name: string;
 	isNew?: boolean;
 	needsAttention?: boolean;
+	initialCommands?: string[];
+	initialCwd?: string;
 }
 
 /**
@@ -43,11 +45,22 @@ export interface TabsState {
 }
 
 /**
+ * Options for creating a tab with preset configuration
+ */
+export interface AddTabOptions {
+	initialCommands?: string[];
+	initialCwd?: string;
+}
+
+/**
  * Actions available on the tabs store
  */
 export interface TabsStore extends TabsState {
 	// Tab operations
-	addTab: (workspaceId: string) => { tabId: string; paneId: string };
+	addTab: (
+		workspaceId: string,
+		options?: AddTabOptions,
+	) => { tabId: string; paneId: string };
 	removeTab: (tabId: string) => void;
 	renameTab: (tabId: string, newName: string) => void;
 	setTabAutoTitle: (tabId: string, title: string) => void;
@@ -66,6 +79,7 @@ export interface TabsStore extends TabsState {
 	setFocusedPane: (tabId: string, paneId: string) => void;
 	markPaneAsUsed: (paneId: string) => void;
 	setNeedsAttention: (paneId: string, needsAttention: boolean) => void;
+	clearPaneInitialData: (paneId: string) => void;
 
 	// Split operations
 	splitPaneVertical: (

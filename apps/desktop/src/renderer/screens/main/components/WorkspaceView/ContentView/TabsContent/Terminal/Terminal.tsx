@@ -23,11 +23,13 @@ import type { TerminalProps, TerminalStreamEvent } from "./types";
 import { shellEscapePaths } from "./utils";
 
 export const Terminal = ({ tabId, workspaceId }: TerminalProps) => {
-	// tabId is actually paneId in the new model
 	const paneId = tabId;
 	const panes = useTabsStore((s) => s.panes);
 	const pane = panes[paneId];
 	const paneName = pane?.name || "Terminal";
+	const paneInitialCommands = pane?.initialCommands;
+	const paneInitialCwd = pane?.initialCwd;
+	const clearPaneInitialData = useTabsStore((s) => s.clearPaneInitialData);
 	const parentTabId = pane?.tabId;
 	const terminalRef = useRef<HTMLDivElement>(null);
 	const xtermRef = useRef<XTerm | null>(null);
@@ -47,10 +49,18 @@ export const Terminal = ({ tabId, workspaceId }: TerminalProps) => {
 	const initialThemeRef = useRef(terminalTheme);
 
 	const isFocused = pane?.tabId ? focusedPaneIds[pane.tabId] === paneId : false;
+
+	// Refs avoid effect re-runs when these values change
 	const isFocusedRef = useRef(isFocused);
 	isFocusedRef.current = isFocused;
 
-	// Required for resolving relative file paths in terminal commands
+	const paneInitialCommandsRef = useRef(paneInitialCommands);
+	const paneInitialCwdRef = useRef(paneInitialCwd);
+	const clearPaneInitialDataRef = useRef(clearPaneInitialData);
+	paneInitialCommandsRef.current = paneInitialCommands;
+	paneInitialCwdRef.current = paneInitialCwd;
+	clearPaneInitialDataRef.current = clearPaneInitialData;
+
 	const { data: workspaceCwd } =
 		trpc.terminal.getWorkspaceCwd.useQuery(workspaceId);
 
@@ -59,12 +69,10 @@ export const Terminal = ({ tabId, workspaceId }: TerminalProps) => {
 	const resizeMutation = trpc.terminal.resize.useMutation();
 	const detachMutation = trpc.terminal.detach.useMutation();
 
-	// Avoid effect re-runs when mutations change
 	const createOrAttachRef = useRef(createOrAttachMutation.mutate);
 	const writeRef = useRef(writeMutation.mutate);
 	const resizeRef = useRef(resizeMutation.mutate);
 	const detachRef = useRef(detachMutation.mutate);
-
 	createOrAttachRef.current = createOrAttachMutation.mutate;
 	writeRef.current = writeMutation.mutate;
 	resizeRef.current = resizeMutation.mutate;
@@ -86,14 +94,8 @@ export const Terminal = ({ tabId, workspaceId }: TerminalProps) => {
 	);
 
 	const handleStreamData = (event: TerminalStreamEvent) => {
-		if (!xtermRef.current) {
-			// Prevent data loss during terminal initialization
-			pendingEventsRef.current.push(event);
-			return;
-		}
-
-		// Prevent race condition where events arrive before scrollback recovery completes
-		if (!subscriptionEnabled) {
+		// Queue events until terminal is ready to prevent data loss
+		if (!xtermRef.current || !subscriptionEnabled) {
 			pendingEventsRef.current.push(event);
 			return;
 		}
@@ -112,7 +114,6 @@ export const Terminal = ({ tabId, workspaceId }: TerminalProps) => {
 
 	trpc.terminal.stream.useSubscription(paneId, {
 		onData: handleStreamData,
-		// Always listen to prevent missing events during initialization
 		enabled: true,
 	});
 
@@ -174,8 +175,6 @@ export const Terminal = ({ tabId, workspaceId }: TerminalProps) => {
 			xterm.loadAddon(searchAddon);
 			searchAddonRef.current = searchAddon;
 		});
-
-		// Delay enabling subscription to ensure scrollback is applied first, preventing duplicate output
 
 		const flushPendingEvents = () => {
 			if (pendingEventsRef.current.length === 0) return;
@@ -260,6 +259,9 @@ export const Terminal = ({ tabId, workspaceId }: TerminalProps) => {
 			}
 		};
 
+		const initialCommands = paneInitialCommandsRef.current;
+		const initialCwd = paneInitialCwdRef.current;
+
 		createOrAttachRef.current(
 			{
 				tabId: paneId,
@@ -267,10 +269,15 @@ export const Terminal = ({ tabId, workspaceId }: TerminalProps) => {
 				tabTitle: paneNameRef.current,
 				cols: xterm.cols,
 				rows: xterm.rows,
+				initialCommands,
+				cwd: initialCwd,
 			},
 			{
 				onSuccess: (result) => {
-					// Avoid duplication when pending events already contain scrollback data
+					// Clear after successful creation to prevent re-running on future reattach
+					if (initialCommands || initialCwd) {
+						clearPaneInitialDataRef.current(paneId);
+					}
 					const hasPendingEvents = pendingEventsRef.current.length > 0;
 					if (result.isNew || !hasPendingEvents) {
 						applyInitialScrollback(result);
@@ -287,11 +294,9 @@ export const Terminal = ({ tabId, workspaceId }: TerminalProps) => {
 		const inputDisposable = xterm.onData(handleTerminalInput);
 		const keyDisposable = xterm.onKey(handleKeyPress);
 
-		// Intercept keyboard events to handle app hotkeys and provide iTerm-like line continuation UX
 		const cleanupKeyboard = setupKeyboardHandler(xterm, {
 			onShiftEnter: () => {
 				if (!isExitedRef.current) {
-					// Use shell's native continuation syntax to avoid shell-specific parsing
 					writeRef.current({ tabId: paneId, data: "\\\n" });
 				}
 			},
@@ -340,11 +345,9 @@ export const Terminal = ({ tabId, workspaceId }: TerminalProps) => {
 	useEffect(() => {
 		const xterm = xtermRef.current;
 		if (!xterm || !terminalTheme) return;
-
 		xterm.options.theme = terminalTheme;
 	}, [terminalTheme]);
 
-	// Match container background to terminal theme for seamless visual integration
 	const terminalBg = terminalTheme?.background ?? getDefaultTerminalBg();
 
 	const handleDragOver = (event: React.DragEvent) => {

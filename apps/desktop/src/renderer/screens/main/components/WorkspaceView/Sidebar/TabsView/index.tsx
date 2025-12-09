@@ -1,12 +1,16 @@
 import { Button } from "@superset/ui/button";
+import { ButtonGroup } from "@superset/ui/button-group";
 import { LayoutGroup, motion } from "framer-motion";
+import type { TerminalPreset } from "main/lib/db/schemas";
 import { useMemo, useRef, useState } from "react";
 import { useDrop } from "react-dnd";
-import { HiMiniPlus } from "react-icons/hi2";
+import { HiMiniEllipsisHorizontal, HiMiniPlus } from "react-icons/hi2";
 import { trpc } from "renderer/lib/trpc";
-import { useSidebarStore } from "renderer/stores";
+import { usePresets } from "renderer/react-query/presets";
+import { useOpenSettings, useSidebarStore } from "renderer/stores";
 import { useTabsStore } from "renderer/stores/tabs/store";
 import { TabItem } from "./TabItem";
+import { TabsCommandDialog } from "./TabsCommandDialog";
 
 const DRAG_TYPE = "TAB";
 
@@ -22,10 +26,15 @@ export function TabsView() {
 	const activeWorkspaceId = activeWorkspace?.id;
 	const allTabs = useTabsStore((s) => s.tabs);
 	const addTab = useTabsStore((s) => s.addTab);
+	const renameTab = useTabsStore((s) => s.renameTab);
 	const reorderTabById = useTabsStore((s) => s.reorderTabById);
 	const activeTabIds = useTabsStore((s) => s.activeTabIds);
 	const [dropIndex, setDropIndex] = useState<number | null>(null);
+	const [commandOpen, setCommandOpen] = useState(false);
+	const openSettings = useOpenSettings();
 	const containerRef = useRef<HTMLElement>(null);
+
+	const { presets } = usePresets();
 
 	const tabs = useMemo(
 		() =>
@@ -38,10 +47,32 @@ export function TabsView() {
 	const handleAddTab = () => {
 		if (activeWorkspaceId) {
 			addTab(activeWorkspaceId);
+			setCommandOpen(false);
 		}
 	};
 
-	// Drop zone for reordering tabs
+	const handleOpenPresetsSettings = () => {
+		openSettings("presets");
+		setCommandOpen(false);
+	};
+
+	const handleSelectPreset = (preset: TerminalPreset) => {
+		if (!activeWorkspaceId) return;
+
+		// Pass preset options to addTab - Terminal component will read them from pane state
+		const { tabId } = addTab(activeWorkspaceId, {
+			initialCommands: preset.commands,
+			initialCwd: preset.cwd || undefined,
+		});
+
+		// Rename the tab to the preset name
+		if (preset.name) {
+			renameTab(tabId, preset.name);
+		}
+
+		setCommandOpen(false);
+	};
+
 	const [{ isOver }, drop] = useDrop<DragItem, void, { isOver: boolean }>({
 		accept: DRAG_TYPE,
 		hover: (item, monitor) => {
@@ -50,7 +81,6 @@ export function TabsView() {
 			const clientOffset = monitor.getClientOffset();
 			if (!clientOffset) return;
 
-			// Find all tab items in the container
 			const tabItems = containerRef.current.querySelectorAll("[data-tab-item]");
 			let newDropIndex = tabs.length;
 
@@ -63,7 +93,6 @@ export function TabsView() {
 				}
 			});
 
-			// Don't show indicator at the dragged item's current position
 			if (newDropIndex === item.index || newDropIndex === item.index + 1) {
 				setDropIndex(null);
 			} else {
@@ -82,7 +111,6 @@ export function TabsView() {
 		}),
 	});
 
-	// Clear drop index when not hovering
 	if (!isOver && dropIndex !== null) {
 		setDropIndex(null);
 	}
@@ -97,6 +125,38 @@ export function TabsView() {
 			className="flex flex-col h-full p-2"
 		>
 			<LayoutGroup>
+				<motion.div
+					layout={!isResizing}
+					transition={{ layout: { duration: 0.2, ease: "easeInOut" } }}
+				>
+					<ButtonGroup className="w-full mt-1">
+						<Button
+							variant="ghost"
+							onClick={handleAddTab}
+							className="flex-1 text-start group px-3 py-2 rounded-md cursor-pointer flex items-center justify-between"
+							disabled={!activeWorkspaceId}
+						>
+							<HiMiniPlus className="size-4" />
+							<span className="truncate flex-1">New Terminal</span>
+						</Button>
+						<Button
+							variant="ghost"
+							onClick={() => setCommandOpen(true)}
+							className="px-3 py-2 rounded-md cursor-pointer"
+							disabled={!activeWorkspaceId}
+						>
+							<HiMiniEllipsisHorizontal className="size-4" />
+						</Button>
+					</ButtonGroup>
+					<TabsCommandDialog
+						open={commandOpen}
+						onOpenChange={setCommandOpen}
+						onAddTab={handleAddTab}
+						onOpenPresetsSettings={handleOpenPresetsSettings}
+						presets={presets}
+						onSelectPreset={handleSelectPreset}
+					/>
+				</motion.div>
 				<div className="text-sm text-sidebar-foreground space-y-1 relative">
 					{tabs.map((tab, index) => (
 						<motion.div
@@ -108,7 +168,6 @@ export function TabsView() {
 							}}
 							className="relative"
 						>
-							{/* Drop line indicator before this tab */}
 							{isOver && dropIndex === index && (
 								<div className="absolute -top-1 left-0 right-0 h-0.5 bg-primary rounded-full z-20 pointer-events-none" />
 							)}
@@ -121,25 +180,10 @@ export function TabsView() {
 							</div>
 						</motion.div>
 					))}
-					{/* Drop line indicator at the end */}
 					{isOver && dropIndex === tabs.length && (
 						<div className="h-0.5 bg-primary rounded-full z-20 pointer-events-none mt-1" />
 					)}
 				</div>
-				<motion.div
-					layout={!isResizing}
-					transition={{ layout: { duration: 0.2, ease: "easeInOut" } }}
-				>
-					<Button
-						variant="ghost"
-						onClick={handleAddTab}
-						className="w-full text-start group px-3 py-2 rounded-md cursor-pointer flex items-center justify-between mt-1"
-						disabled={!activeWorkspaceId}
-					>
-						<HiMiniPlus className="size-4" />
-						<span className="truncate flex-1">New Terminal</span>
-					</Button>
-				</motion.div>
 			</LayoutGroup>
 		</nav>
 	);
