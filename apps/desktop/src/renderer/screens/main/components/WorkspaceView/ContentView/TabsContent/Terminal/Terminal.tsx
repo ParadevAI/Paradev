@@ -68,15 +68,18 @@ export const Terminal = ({ tabId, workspaceId }: TerminalProps) => {
 	const writeMutation = trpc.terminal.write.useMutation();
 	const resizeMutation = trpc.terminal.resize.useMutation();
 	const detachMutation = trpc.terminal.detach.useMutation();
+	const clearScrollbackMutation = trpc.terminal.clearScrollback.useMutation();
 
 	const createOrAttachRef = useRef(createOrAttachMutation.mutate);
 	const writeRef = useRef(writeMutation.mutate);
 	const resizeRef = useRef(resizeMutation.mutate);
 	const detachRef = useRef(detachMutation.mutate);
+	const clearScrollbackRef = useRef(clearScrollbackMutation.mutate);
 	createOrAttachRef.current = createOrAttachMutation.mutate;
 	writeRef.current = writeMutation.mutate;
 	resizeRef.current = resizeMutation.mutate;
 	detachRef.current = detachMutation.mutate;
+	clearScrollbackRef.current = clearScrollbackMutation.mutate;
 
 	const parentTabIdRef = useRef(parentTabId);
 	parentTabIdRef.current = parentTabId;
@@ -302,6 +305,7 @@ export const Terminal = ({ tabId, workspaceId }: TerminalProps) => {
 			},
 			onClear: () => {
 				xterm.clear();
+				clearScrollbackRef.current({ tabId: paneId });
 			},
 		});
 
@@ -316,7 +320,6 @@ export const Terminal = ({ tabId, workspaceId }: TerminalProps) => {
 				resizeRef.current({ tabId: paneId, cols, rows });
 			},
 		);
-		// Setup paste handler to ensure bracketed paste mode works for TUI apps like opencode
 		const cleanupPaste = setupPasteHandler(xterm, {
 			onPaste: (text) => {
 				commandBufferRef.current += text;
@@ -333,7 +336,6 @@ export const Terminal = ({ tabId, workspaceId }: TerminalProps) => {
 			cleanupPaste();
 			cleanupQuerySuppression();
 			debouncedSetTabAutoTitleRef.current?.cancel?.();
-			// Detach instead of kill to keep PTY running for reattachment
 			detachRef.current({ tabId: paneId });
 			setSubscriptionEnabled(false);
 			xterm.dispose();
