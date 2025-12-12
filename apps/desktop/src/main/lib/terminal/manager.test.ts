@@ -3,8 +3,8 @@ import { promises as fs } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import * as pty from "node-pty";
-import { getHistoryDir } from "./terminal-history";
-import { TerminalManager } from "./terminal-manager";
+import { getHistoryDir } from "../terminal-history";
+import { TerminalManager } from "./manager";
 
 // Use real history implementation - it will write to tmpdir thanks to NODE_ENV=test
 const testTmpDir = join(tmpdir(), "superset-test");
@@ -509,6 +509,9 @@ describe("TerminalManager", () => {
 				onDataCallback("test output\n");
 			}
 
+			// Wait for DataBatcher to flush (16ms batching interval)
+			await new Promise((resolve) => setTimeout(resolve, 30));
+
 			expect(dataHandler).toHaveBeenCalledWith("test output\n");
 		});
 
@@ -529,6 +532,9 @@ describe("TerminalManager", () => {
 			if (onDataCallback) {
 				onDataCallback(dataWithEscapes);
 			}
+
+			// Wait for DataBatcher to flush (16ms batching interval)
+			await new Promise((resolve) => setTimeout(resolve, 30));
 
 			// Raw data passed through unchanged
 			expect(dataHandler).toHaveBeenCalledWith(dataWithEscapes);
@@ -804,6 +810,34 @@ describe("TerminalManager", () => {
 			// Only content after the clear sequence should remain
 			expect(result.scrollback).not.toContain("some output");
 			expect(result.scrollback).toContain("new content after clear");
+			// ED3 sequence itself should NOT be in scrollback
+			expect(result.scrollback).not.toContain("\x1b[3J");
+		});
+
+		it("should not persist content before clear sequence", async () => {
+			await manager.createOrAttach({
+				paneId: "pane-clear-before",
+				tabId: "tab-clear-before",
+				workspaceId: "workspace-1",
+			});
+
+			const onDataCallback =
+				mockPty.onData.mock.calls[mockPty.onData.mock.calls.length - 1]?.[0];
+			if (onDataCallback) {
+				// Content before and after clear in same chunk
+				onDataCallback("old content\x1b[3Jnew content");
+			}
+
+			const result = await manager.createOrAttach({
+				paneId: "pane-clear-before",
+				tabId: "tab-clear-before",
+				workspaceId: "workspace-1",
+			});
+
+			// Old content should be gone, only new content remains
+			expect(result.scrollback).not.toContain("old content");
+			expect(result.scrollback).toContain("new content");
+			expect(result.scrollback).not.toContain("\x1b[3J");
 		});
 	});
 
