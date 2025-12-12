@@ -15,6 +15,10 @@ command -v bun &> /dev/null || error "Bun not installed. Install from https://bu
 command -v neonctl &> /dev/null || error "Neon CLI not installed. Run: npm install -g neonctl"
 command -v jq &> /dev/null || error "jq not installed. Run: brew install jq"
 
+# Check required environment variables
+NEON_PROJECT_ID="${NEON_PROJECT_ID:-}"
+[ -z "$NEON_PROJECT_ID" ] && error "NEON_PROJECT_ID environment variable is required"
+
 # Install dependencies
 echo "📥 Installing dependencies..."
 bun install
@@ -34,23 +38,23 @@ fi
 echo "🗄️  Creating Neon branch..."
 WORKSPACE_NAME="${SUPERSET_WORKSPACE_NAME:-$(basename "$PWD")}"
 NEON_OUTPUT=$(neonctl branches create \
-  --project-id tiny-cherry-82420694 \
+  --project-id "$NEON_PROJECT_ID" \
   --name "$WORKSPACE_NAME" \
   --output json)
 
 # Parse connection strings from create output
 BRANCH_ID=$(echo "$NEON_OUTPUT" | jq -r '.branch.id')
-DATABASE_URL=$(echo "$NEON_OUTPUT" | jq -r '.connection_uris[0].connection_uri')
+DIRECT_URL=$(echo "$NEON_OUTPUT" | jq -r '.connection_uris[0].connection_uri')
 POOLER_HOST=$(echo "$NEON_OUTPUT" | jq -r '.connection_uris[0].connection_parameters.pooler_host')
 PASSWORD=$(echo "$NEON_OUTPUT" | jq -r '.connection_uris[0].connection_parameters.password')
 ROLE=$(echo "$NEON_OUTPUT" | jq -r '.connection_uris[0].connection_parameters.role')
 DATABASE=$(echo "$NEON_OUTPUT" | jq -r '.connection_uris[0].connection_parameters.database')
-DATABASE_POOLED_URL="postgresql://${ROLE}:${PASSWORD}@${POOLER_HOST}/${DATABASE}?sslmode=require"
+POOLED_URL="postgresql://${ROLE}:${PASSWORD}@${POOLER_HOST}/${DATABASE}?sslmode=require"
 
-cat > .env << EOF
+cat >> .env << EOF
 NEON_BRANCH_ID=$BRANCH_ID
-DATABASE_URL=$DATABASE_URL
-DATABASE_POOLED_URL=$DATABASE_POOLED_URL
+DATABASE_URL=$POOLED_URL
+DATABASE_URL_UNPOOLED=$DIRECT_URL
 EOF
 
 success "Neon branch created: $WORKSPACE_NAME"
