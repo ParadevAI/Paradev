@@ -1,69 +1,19 @@
 import { db } from "main/lib/db";
-import type { TerminalPreset } from "main/lib/db/schemas";
 import { nanoid } from "nanoid";
 import { DEFAULT_RINGTONE_ID, RINGTONES } from "shared/ringtones";
 import { z } from "zod";
 import { publicProcedure, router } from "../..";
 
-/** Valid ringtone IDs for validation */
 const VALID_RINGTONE_IDS = RINGTONES.map((r) => r.id);
-
-/** Default presets to load when no presets exist */
-const DEFAULT_PRESETS: Omit<TerminalPreset, "id">[] = [
-	{
-		name: "codex",
-		description: "Danger mode: All permissions auto-approved",
-		cwd: "",
-		commands: [
-			'codex -c model_reasoning_effort="high" --ask-for-approval never --sandbox danger-full-access -c model_reasoning_summary="detailed" -c model_supports_reasoning_summaries=true',
-		],
-	},
-	{
-		name: "claude",
-		description: "Danger mode: All permissions auto-approved",
-		cwd: "",
-		commands: ["claude --dangerously-skip-permissions"],
-	},
-];
 
 export const createSettingsRouter = () => {
 	return router({
 		getLastUsedApp: publicProcedure.query(() => {
 			return db.data.settings.lastUsedApp ?? "cursor";
 		}),
-
-		getTerminalPresets: publicProcedure.query(async () => {
-			const { terminalPresets, terminalPresetsInitialized } = db.data.settings;
-
-			// Handle first-time initialization
-			if (!terminalPresetsInitialized) {
-				// If user already has presets (from before the flag existed), preserve them
-				if (terminalPresets && terminalPresets.length > 0) {
-					await db.update((data) => {
-						data.settings.terminalPresetsInitialized = true;
-					});
-					return terminalPresets;
-				}
-
-				// No existing presets - seed with defaults
-				const defaultPresetsWithIds: TerminalPreset[] = DEFAULT_PRESETS.map(
-					(preset) => ({
-						id: nanoid(),
-						...preset,
-					}),
-				);
-
-				await db.update((data) => {
-					data.settings.terminalPresets = defaultPresetsWithIds;
-					data.settings.terminalPresetsInitialized = true;
-				});
-
-				return defaultPresetsWithIds;
-			}
-
-			return terminalPresets ?? [];
+		getTerminalPresets: publicProcedure.query(() => {
+			return db.data.settings.terminalPresets ?? [];
 		}),
-
 		createTerminalPreset: publicProcedure
 			.input(
 				z.object({
