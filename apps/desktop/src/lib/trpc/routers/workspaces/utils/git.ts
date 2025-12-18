@@ -296,23 +296,21 @@ export async function hasOriginRemote(mainRepoPath: string): Promise<boolean> {
 /**
  * Detects the default branch of a repository by checking:
  * 1. Remote HEAD reference (origin/HEAD -> origin/main or origin/master)
- * 2. Common branch names (main, master, develop, trunk)
- * 3. Fallback to 'main'
+ * 2. Common branch names from local refs (main, master, develop, trunk)
+ * 3. Remote HEAD via ls-remote (fallback when local refs not fetched)
+ * 4. Fallback to 'main'
  */
 export async function getDefaultBranch(mainRepoPath: string): Promise<string> {
 	const git = simpleGit(mainRepoPath);
 
-	// Method 1: Check origin/HEAD symbolic ref
 	try {
 		const headRef = await git.raw(["symbolic-ref", "refs/remotes/origin/HEAD"]);
-		// Returns something like 'refs/remotes/origin/main'
 		const match = headRef.trim().match(/refs\/remotes\/origin\/(.+)/);
 		if (match) return match[1];
 	} catch {
 		// origin/HEAD not set, continue to fallback
 	}
 
-	// Method 2: Check which common branches exist on remote
 	try {
 		const branches = await git.branch(["-r"]);
 		const remoteBranches = branches.all.map((b) => b.replace("origin/", ""));
@@ -326,7 +324,19 @@ export async function getDefaultBranch(mainRepoPath: string): Promise<string> {
 		// Failed to list branches
 	}
 
-	// Fallback
+	try {
+		const hasRemote = await hasOriginRemote(mainRepoPath);
+		if (hasRemote) {
+			const result = await git.raw(["ls-remote", "--symref", "origin", "HEAD"]);
+			const symrefMatch = result.match(/ref:\s+refs\/heads\/(.+?)\tHEAD/);
+			if (symrefMatch) {
+				return symrefMatch[1];
+			}
+		}
+	} catch {
+		// Failed to query remote
+	}
+
 	return "main";
 }
 
