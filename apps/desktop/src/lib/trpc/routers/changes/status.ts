@@ -28,6 +28,7 @@ export const createStatusRouter = () => {
 				const parsed = parseGitStatus(status);
 
 				const branchComparison = await getBranchComparison(git, defaultBranch);
+				const trackingStatus = await getTrackingBranchStatus(git);
 
 				await applyNumstatToFiles(git, parsed.staged, [
 					"diff",
@@ -49,6 +50,9 @@ export const createStatusRouter = () => {
 					untracked: parsed.untracked,
 					ahead: branchComparison.ahead,
 					behind: branchComparison.behind,
+					pushCount: trackingStatus.pushCount,
+					pullCount: trackingStatus.pullCount,
+					hasUpstream: trackingStatus.hasUpstream,
 				};
 			}),
 
@@ -149,5 +153,41 @@ async function applyUntrackedLineCount(
 			file.additions = lineCount;
 			file.deletions = 0;
 		} catch {}
+	}
+}
+
+interface TrackingStatus {
+	pushCount: number;
+	pullCount: number;
+	hasUpstream: boolean;
+}
+
+async function getTrackingBranchStatus(
+	git: ReturnType<typeof simpleGit>,
+): Promise<TrackingStatus> {
+	try {
+		const upstream = await git.raw([
+			"rev-parse",
+			"--abbrev-ref",
+			"@{upstream}",
+		]);
+		if (!upstream.trim()) {
+			return { pushCount: 0, pullCount: 0, hasUpstream: false };
+		}
+
+		const tracking = await git.raw([
+			"rev-list",
+			"--left-right",
+			"--count",
+			"@{upstream}...HEAD",
+		]);
+		const [pullStr, pushStr] = tracking.trim().split(/\s+/);
+		return {
+			pushCount: Number.parseInt(pushStr || "0", 10),
+			pullCount: Number.parseInt(pullStr || "0", 10),
+			hasUpstream: true,
+		};
+	} catch {
+		return { pushCount: 0, pullCount: 0, hasUpstream: false };
 	}
 }
