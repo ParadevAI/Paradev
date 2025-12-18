@@ -107,7 +107,7 @@ export function WorkspaceView() {
 	}, [isSidebarOpen]);
 
 	return (
-		<div className="flex-1">
+		<div className="flex-1 h-full flex flex-col">
 			<WorkspaceHeader worktreePath={activeWorkspace?.worktreePath} />
 			<ResizablePanelGroup
 				direction="horizontal"
