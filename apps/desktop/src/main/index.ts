@@ -69,6 +69,22 @@ app.on("open-url", async (event, url) => {
 	await processDeepLink(url);
 });
 
+// Track when app is quitting to suppress expected termination errors
+let isQuitting = false;
+app.on("before-quit", () => {
+	isQuitting = true;
+});
+
+process.on("uncaughtException", (error) => {
+	if (isQuitting) return;
+	console.error("[main] Uncaught exception:", error);
+});
+
+process.on("unhandledRejection", (reason) => {
+	if (isQuitting) return;
+	console.error("[main] Unhandled rejection:", reason);
+});
+
 // Single instance lock - required for second-instance event on Windows/Linux
 const gotTheLock = app.requestSingleInstanceLock();
 
