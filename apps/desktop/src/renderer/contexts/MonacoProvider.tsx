@@ -39,6 +39,17 @@ async function initializeMonaco(): Promise<typeof monaco> {
 	}
 
 	await loader.init();
+
+	// Note: Disable all diagnostics (lint errors, type errors, etc.) since it's a diff viewer
+	monaco.typescript.typescriptDefaults.setDiagnosticsOptions({
+		noSemanticValidation: true,
+		noSyntaxValidation: true,
+	});
+	monaco.typescript.javascriptDefaults.setDiagnosticsOptions({
+		noSemanticValidation: true,
+		noSyntaxValidation: true,
+	});
+
 	monacoInitialized = true;
 	return monaco;
 }
