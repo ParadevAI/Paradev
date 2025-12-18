@@ -1,11 +1,17 @@
 import { DiffEditor, type DiffOnMount } from "@monaco-editor/react";
+import type * as Monaco from "monaco-editor";
 import { useCallback, useRef } from "react";
-import { monaco, SUPERSET_THEME } from "renderer/contexts/MonacoProvider";
+import { SUPERSET_THEME } from "renderer/contexts/MonacoProvider";
 import type { DiffViewMode, FileContents } from "shared/changes-types";
+import {
+	registerCopyPathLineAction,
+	registerSaveCommand,
+} from "./editor-actions";
 
 interface DiffViewerProps {
 	contents: FileContents;
 	viewMode: DiffViewMode;
+	filePath: string;
 	editable?: boolean;
 	onSave?: (content: string) => void;
 }
@@ -13,31 +19,33 @@ interface DiffViewerProps {
 export function DiffViewer({
 	contents,
 	viewMode,
+	filePath,
 	editable = false,
 	onSave,
 }: DiffViewerProps) {
-	const modifiedEditorRef = useRef<ReturnType<
-		NonNullable<Parameters<DiffOnMount>[0]["getModifiedEditor"]>
-	> | null>(null);
+	const modifiedEditorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(
+		null,
+	);
 
 	const handleSave = useCallback(() => {
 		if (!editable || !onSave || !modifiedEditorRef.current) return;
-		const content = modifiedEditorRef.current.getValue();
-		onSave(content);
+		onSave(modifiedEditorRef.current.getValue());
 	}, [editable, onSave]);
 
 	const handleMount: DiffOnMount = useCallback(
 		(editor) => {
-			modifiedEditorRef.current = editor.getModifiedEditor();
+			const originalEditor = editor.getOriginalEditor();
+			const modifiedEditor = editor.getModifiedEditor();
+			modifiedEditorRef.current = modifiedEditor;
 
-			if (editable && modifiedEditorRef.current) {
-				modifiedEditorRef.current.addCommand(
-					monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS,
-					handleSave,
-				);
+			registerCopyPathLineAction(originalEditor, filePath);
+			registerCopyPathLineAction(modifiedEditor, filePath);
+
+			if (editable) {
+				registerSaveCommand(modifiedEditor, handleSave);
 			}
 		},
-		[editable, handleSave],
+		[editable, handleSave, filePath],
 	);
 
 	return (
