@@ -3,23 +3,32 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Suspense, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const DESKTOP_PROTOCOL =
 	process.env.NODE_ENV === "development" ? "superset-dev" : "superset";
 
-function CallbackContent() {
+export default function Page() {
 	const searchParams = useSearchParams();
-	const code = searchParams.get("code");
+	const accessToken = searchParams.get("accessToken");
+	const accessTokenExpiresAt = searchParams.get("accessTokenExpiresAt");
+	const refreshToken = searchParams.get("refreshToken");
+	const refreshTokenExpiresAt = searchParams.get("refreshTokenExpiresAt");
 	const state = searchParams.get("state");
 	const error = searchParams.get("error");
 
 	const [hasAttempted, setHasAttempted] = useState(false);
 
-	const desktopUrl =
-		code && state
-			? `${DESKTOP_PROTOCOL}://auth/callback?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state)}`
-			: null;
+	const hasAllTokens =
+		accessToken &&
+		accessTokenExpiresAt &&
+		refreshToken &&
+		refreshTokenExpiresAt &&
+		state;
+
+	const desktopUrl = hasAllTokens
+		? `${DESKTOP_PROTOCOL}://auth/callback?accessToken=${encodeURIComponent(accessToken)}&accessTokenExpiresAt=${encodeURIComponent(accessTokenExpiresAt)}&refreshToken=${encodeURIComponent(refreshToken)}&refreshTokenExpiresAt=${encodeURIComponent(refreshTokenExpiresAt)}&state=${encodeURIComponent(state)}`
+		: null;
 
 	const openDesktopApp = useCallback(() => {
 		if (!desktopUrl) return;
@@ -27,13 +36,10 @@ function CallbackContent() {
 	}, [desktopUrl]);
 
 	useEffect(() => {
-		if (error || !code) return;
-
-		if (!hasAttempted) {
-			setHasAttempted(true);
-			openDesktopApp();
-		}
-	}, [code, error, hasAttempted, openDesktopApp]);
+		if (error || !desktopUrl || hasAttempted) return;
+		setHasAttempted(true);
+		openDesktopApp();
+	}, [error, desktopUrl, hasAttempted, openDesktopApp]);
 
 	if (error) {
 		return (
@@ -53,7 +59,7 @@ function CallbackContent() {
 		);
 	}
 
-	if (!code || !state) {
+	if (!hasAllTokens) {
 		return (
 			<div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
 				<div className="flex flex-col items-center gap-6">
@@ -87,37 +93,16 @@ function CallbackContent() {
 					Redirecting to the desktop app...
 				</p>
 				<div className="flex flex-col items-center gap-2">
-					<Link
-						href={desktopUrl as string}
-						className="text-muted-foreground/70 underline decoration-muted-foreground/40 underline-offset-4 transition-colors hover:text-muted-foreground"
-					>
-						If you weren&apos;t redirected, click here.
-					</Link>
+					{desktopUrl && (
+						<Link
+							href={desktopUrl}
+							className="text-muted-foreground/70 underline decoration-muted-foreground/40 underline-offset-4 transition-colors hover:text-muted-foreground"
+						>
+							If you weren&apos;t redirected, click here.
+						</Link>
+					)}
 				</div>
 			</div>
 		</div>
-	);
-}
-
-export default function DesktopCallbackPage() {
-	return (
-		<Suspense
-			fallback={
-				<div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
-					<div className="flex flex-col items-center gap-6">
-						<Image
-							src="/title.svg"
-							alt="Superset"
-							width={140}
-							height={43}
-							priority
-						/>
-						<p className="text-xl text-muted-foreground">Loading...</p>
-					</div>
-				</div>
-			}
-		>
-			<CallbackContent />
-		</Suspense>
 	);
 }

@@ -3,8 +3,6 @@ name: Deploy Production
 on:
   push:
     branches: [main]
-    paths-ignore:
-      - "apps/desktop/**"
   workflow_dispatch:
 
 jobs:
@@ -79,6 +77,10 @@ jobs:
           BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
           NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
           DESKTOP_AUTH_SECRET: ${{ secrets.DESKTOP_AUTH_SECRET }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GH_CLIENT_ID: ${{ secrets.GH_CLIENT_ID }}
+          GH_CLIENT_SECRET: ${{ secrets.GH_CLIENT_SECRET }}
         run: |
           vercel pull --yes --environment=production --token=$VERCEL_TOKEN
           vercel build --prod --token=$VERCEL_TOKEN
@@ -91,7 +93,11 @@ jobs:
             --env NEXT_PUBLIC_WEB_URL=$NEXT_PUBLIC_WEB_URL \
             --env NEXT_PUBLIC_ADMIN_URL=$NEXT_PUBLIC_ADMIN_URL \
             --env NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=$NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY \
-            --env DESKTOP_AUTH_SECRET=$DESKTOP_AUTH_SECRET
+            --env DESKTOP_AUTH_SECRET=$DESKTOP_AUTH_SECRET \
+            --env GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID \
+            --env GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET \
+            --env GH_CLIENT_ID=$GH_CLIENT_ID \
+            --env GH_CLIENT_SECRET=$GH_CLIENT_SECRET
 
   deploy-web:
     name: Deploy Web to Vercel

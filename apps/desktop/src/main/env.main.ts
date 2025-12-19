@@ -16,6 +16,8 @@ export const env = createEnv({
 			.default("development"),
 		NEXT_PUBLIC_API_URL: z.url().default("https://api.superset.sh"),
 		NEXT_PUBLIC_WEB_URL: z.url().default("https://app.superset.sh"),
+		GOOGLE_CLIENT_ID: z.string().min(1),
+		GH_CLIENT_ID: z.string().min(1),
 	},
 
 	runtimeEnv: {

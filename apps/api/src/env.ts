@@ -6,9 +6,12 @@ export const env = createEnv({
 		DATABASE_URL: z.string(),
 		DATABASE_URL_UNPOOLED: z.string(),
 		CLERK_SECRET_KEY: z.string(),
-		CLERK_WEBHOOK_SECRET: z.string(),
 		BLOB_READ_WRITE_TOKEN: z.string(),
 		DESKTOP_AUTH_SECRET: z.string().min(32),
+		GOOGLE_CLIENT_ID: z.string().min(1),
+		GOOGLE_CLIENT_SECRET: z.string().min(1),
+		GH_CLIENT_ID: z.string().min(1),
+		GH_CLIENT_SECRET: z.string().min(1),
 	},
 	client: {
 		NEXT_PUBLIC_WEB_URL: z.string().url(),
