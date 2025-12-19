@@ -1,7 +1,7 @@
 import type { BrowserWindow } from "electron";
 import { createElectronRouter } from "electron-router-dom";
 import { PORTS } from "shared/constants";
-import { env } from "../env";
+import { env } from "shared/env.shared";
 
 const electronRouter = createElectronRouter({
 	port: PORTS.VITE_DEV_SERVER,

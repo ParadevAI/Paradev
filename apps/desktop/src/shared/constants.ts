@@ -1,4 +1,4 @@
-import { env } from "../env";
+import { env } from "./env.shared";
 
 export const PLATFORM = {
 	IS_MAC: process.platform === "darwin",
