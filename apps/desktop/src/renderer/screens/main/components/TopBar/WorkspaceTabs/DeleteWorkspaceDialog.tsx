@@ -115,23 +115,28 @@ export function DeleteWorkspaceDialog({
 		<AlertDialog open={open} onOpenChange={onOpenChange}>
 			<AlertDialogContent className="max-w-[340px] gap-0 p-0">
 				<AlertDialogHeader className="px-4 pt-4 pb-2">
-					<AlertDialogTitle className="text-sm font-medium">
-						Close workspace?
+					<AlertDialogTitle className="font-medium">
+						Remove workspace "{workspaceName}"?
 					</AlertDialogTitle>
-					<AlertDialogDescription className="text-xs text-muted-foreground">
-						{isLoading ? (
-							"Checking status..."
-						) : !canDelete ? (
-							<span className="text-destructive">{reason}</span>
-						) : (
-							<span className="font-mono">{workspaceName}</span>
-						)}
+					<AlertDialogDescription asChild>
+						<div className="text-muted-foreground space-y-1.5">
+							{isLoading ? (
+								"Checking status..."
+							) : !canDelete ? (
+								<span className="text-destructive">{reason}</span>
+							) : (
+								<span className="block">
+									Close to hide from tabs (keeps files). Delete to permanently
+									remove worktree from disk.
+								</span>
+							)}
+						</div>
 					</AlertDialogDescription>
 				</AlertDialogHeader>
 
 				{!isLoading && canDelete && hasWarnings && (
 					<div className="px-4 pb-2">
-						<div className="text-xs text-amber-600 dark:text-amber-400 bg-amber-500/10 rounded px-2 py-1.5">
+						<div className="text-sm text-amber-600 dark:text-amber-400 bg-amber-100/50 dark:bg-amber-900/50 border border-amber-500 dark:border-amber-600 rounded px-2 py-1.5">
 							{hasChanges && hasUnpushedCommits
 								? "Has uncommitted changes and unpushed commits"
 								: hasChanges
