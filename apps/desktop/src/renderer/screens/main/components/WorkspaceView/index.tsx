@@ -12,7 +12,7 @@ import { useTabsStore } from "renderer/stores/tabs/store";
 import { HOTKEYS } from "shared/hotkeys";
 import { ContentView } from "./ContentView";
 import { Sidebar } from "./Sidebar";
-import { WorkspaceHeader } from "./WorkspaceHeader";
+import { WorkspaceFooter } from "./WorkspaceFooter";
 
 export function WorkspaceView() {
 	const { data: activeWorkspace } = trpc.workspaces.getActive.useQuery();
@@ -91,7 +91,7 @@ export function WorkspaceView() {
 		}
 	}, [activeWorkspace?.worktreePath]);
 
-	const { isSidebarOpen, sidebarSize, setSidebarSize, setIsResizing } =
+	const { isSidebarOpen, lastOpenSidebarSize, setSidebarSize, setIsResizing } =
 		useSidebarStore();
 	const sidebarPanelRef = useRef<ImperativePanelHandle>(null);
 
@@ -107,34 +107,35 @@ export function WorkspaceView() {
 	}, [isSidebarOpen]);
 
 	return (
-		<div className="flex-1 h-full flex flex-col">
+		<div className="flex-1 h-full flex flex-col overflow-hidden">
 			<ResizablePanelGroup
 				direction="horizontal"
-				className="flex-1 bg-tertiary"
+				className="flex-1 bg-tertiary overflow-hidden"
 			>
 				<ResizablePanel
 					ref={sidebarPanelRef}
-					defaultSize={sidebarSize}
+					defaultSize={isSidebarOpen ? lastOpenSidebarSize : 0}
 					minSize={15}
 					maxSize={40}
 					collapsible
 					collapsedSize={0}
 					onCollapse={() => setSidebarSize(0)}
-					onExpand={() => setSidebarSize(15)}
+					onExpand={() => setSidebarSize(lastOpenSidebarSize)}
 					onResize={setSidebarSize}
+					className="overflow-hidden"
 				>
 					{isSidebarOpen && <Sidebar />}
 				</ResizablePanel>
 				<ResizableHandle
-					className="bg-tertiary hover:bg-border transition-colors"
+					className="bg-transparent w-0 after:w-1.5! after:rounded-full! data-[resize-handle-state=hover]:after:bg-border data-[resize-handle-state=drag]:after:bg-border after:transition-colors"
 					onDragging={setIsResizing}
 				/>
-				<ResizablePanel defaultSize={100 - sidebarSize}>
+				<ResizablePanel className="overflow-hidden">
 					<div className="h-full bg-background rounded-t-lg flex flex-col overflow-hidden">
-						<div className="flex-1 min-h-0 h-full">
+						<div className="flex-1 min-h-0 overflow-hidden">
 							<ContentView />
 						</div>
-						<WorkspaceHeader worktreePath={activeWorkspace?.worktreePath} />
+						<WorkspaceFooter worktreePath={activeWorkspace?.worktreePath} />
 					</div>
 				</ResizablePanel>
 			</ResizablePanelGroup>
