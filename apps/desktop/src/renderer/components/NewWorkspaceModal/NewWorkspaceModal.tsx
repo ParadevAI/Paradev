@@ -1,5 +1,12 @@
 import { Button } from "@superset/ui/button";
 import {
+	Command,
+	CommandEmpty,
+	CommandInput,
+	CommandItem,
+	CommandList,
+} from "@superset/ui/command";
+import {
 	Dialog,
 	DialogContent,
 	DialogFooter,
@@ -7,6 +14,7 @@ import {
 	DialogTitle,
 } from "@superset/ui/dialog";
 import { Input } from "@superset/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@superset/ui/popover";
 import {
 	Select,
 	SelectContent,
@@ -15,8 +23,10 @@ import {
 	SelectValue,
 } from "@superset/ui/select";
 import { toast } from "@superset/ui/sonner";
-import { useEffect, useState } from "react";
-import { HiPlus } from "react-icons/hi2";
+import { useEffect, useMemo, useState } from "react";
+import { GoGitBranch } from "react-icons/go";
+import { HiCheck, HiChevronUpDown, HiPlus } from "react-icons/hi2";
+import { formatRelativeTime } from "renderer/lib/formatRelativeTime";
 import { trpc } from "renderer/lib/trpc";
 import { useOpenNew } from "renderer/react-query/projects";
 import {
@@ -54,14 +64,35 @@ export function NewWorkspaceModal() {
 	const [branchName, setBranchName] = useState("");
 	const [branchNameEdited, setBranchNameEdited] = useState(false);
 	const [mode, setMode] = useState<Mode>("new");
+	const [baseBranch, setBaseBranch] = useState<string | null>(null);
+	const [baseBranchOpen, setBaseBranchOpen] = useState(false);
+	const [branchSearch, setBranchSearch] = useState("");
 
 	const { data: activeWorkspace } = trpc.workspaces.getActive.useQuery();
 	const { data: recentProjects = [] } = trpc.projects.getRecents.useQuery();
+	const {
+		data: branchData,
+		isLoading: isBranchesLoading,
+		isError: isBranchesError,
+	} = trpc.projects.getBranches.useQuery(
+		{ projectId: selectedProjectId ?? "" },
+		{ enabled: !!selectedProjectId },
+	);
 	const createWorkspace = useCreateWorkspace();
 	const createBranchWorkspace = useCreateBranchWorkspace();
 	const openNew = useOpenNew();
 
 	const currentProjectId = activeWorkspace?.projectId;
+
+	// Filter branches based on search
+	const filteredBranches = useMemo(() => {
+		if (!branchData?.branches) return [];
+		if (!branchSearch) return branchData.branches;
+		const searchLower = branchSearch.toLowerCase();
+		return branchData.branches.filter((b) =>
+			b.name.toLowerCase().includes(searchLower),
+		);
+	}, [branchData?.branches, branchSearch]);
 
 	// Auto-select current project when modal opens
 	useEffect(() => {
@@ -69,6 +100,19 @@ export function NewWorkspaceModal() {
 			setSelectedProjectId(currentProjectId);
 		}
 	}, [isOpen, currentProjectId, selectedProjectId]);
+
+	// Auto-select default branch when branches load
+	useEffect(() => {
+		if (branchData?.defaultBranch && !baseBranch) {
+			setBaseBranch(branchData.defaultBranch);
+		}
+	}, [branchData?.defaultBranch, baseBranch]);
+
+	// Reset base branch when project changes
+	// biome-ignore lint/correctness/useExhaustiveDependencies: intentionally reset when project changes
+	useEffect(() => {
+		setBaseBranch(null);
+	}, [selectedProjectId]);
 
 	// Auto-generate branch name from title (unless manually edited)
 	useEffect(() => {
@@ -83,6 +127,8 @@ export function NewWorkspaceModal() {
 		setBranchName("");
 		setBranchNameEdited(false);
 		setMode("new");
+		setBaseBranch(null);
+		setBranchSearch("");
 	};
 
 	const handleClose = () => {
@@ -106,6 +152,7 @@ export function NewWorkspaceModal() {
 				projectId: selectedProjectId,
 				name: workspaceName,
 				branchName: customBranchName,
+				baseBranch: baseBranch || undefined,
 			}),
 			{
 				loading: "Creating workspace...",
@@ -244,7 +291,7 @@ export function NewWorkspaceModal() {
 											htmlFor="branch"
 											className="text-xs text-muted-foreground"
 										>
-											Branch
+											Branch Name
 										</label>
 										<Input
 											id="branch"
@@ -257,6 +304,99 @@ export function NewWorkspaceModal() {
 											value={branchName}
 											onChange={(e) => handleBranchNameChange(e.target.value)}
 										/>
+									</div>
+
+									<div className="space-y-1.5">
+										<span className="text-xs text-muted-foreground">
+											Base branch
+										</span>
+										{isBranchesError ? (
+											<div className="flex items-center gap-2 h-8 px-3 rounded-md border border-destructive/50 bg-destructive/10 text-destructive text-xs">
+												Failed to load branches
+											</div>
+										) : (
+											<Popover
+												open={baseBranchOpen}
+												onOpenChange={setBaseBranchOpen}
+											>
+												<PopoverTrigger asChild>
+													<Button
+														variant="outline"
+														size="sm"
+														className="w-full h-8 justify-between font-normal"
+														disabled={isBranchesLoading}
+													>
+														<span className="flex items-center gap-2 truncate">
+															<GoGitBranch className="size-3.5 shrink-0 text-muted-foreground" />
+															<span className="truncate font-mono text-sm">
+																{baseBranch || "Select branch..."}
+															</span>
+															{baseBranch === branchData?.defaultBranch && (
+																<span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+																	default
+																</span>
+															)}
+														</span>
+														<HiChevronUpDown className="size-4 shrink-0 text-muted-foreground" />
+													</Button>
+												</PopoverTrigger>
+												<PopoverContent
+													className="w-[--radix-popover-trigger-width] p-0"
+													align="start"
+												>
+													<Command shouldFilter={false}>
+														<CommandInput
+															placeholder="Search branches..."
+															value={branchSearch}
+															onValueChange={setBranchSearch}
+														/>
+														<CommandList className="max-h-[200px]">
+															<CommandEmpty>No branches found</CommandEmpty>
+															{filteredBranches.map((branch) => (
+																<CommandItem
+																	key={branch.name}
+																	value={branch.name}
+																	onSelect={() => {
+																		setBaseBranch(branch.name);
+																		setBaseBranchOpen(false);
+																		setBranchSearch("");
+																	}}
+																	className="flex items-center justify-between"
+																>
+																	<span className="flex items-center gap-2 truncate">
+																		<GoGitBranch className="size-3.5 shrink-0 text-muted-foreground" />
+																		<span className="truncate">
+																			{branch.name}
+																		</span>
+																		{branch.name ===
+																			branchData?.defaultBranch && (
+																			<span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+																				default
+																			</span>
+																		)}
+																	</span>
+																	<span className="flex items-center gap-2 shrink-0">
+																		{branch.lastCommitDate > 0 && (
+																			<span className="text-xs text-muted-foreground">
+																				{formatRelativeTime(
+																					branch.lastCommitDate,
+																				)}
+																			</span>
+																		)}
+																		{baseBranch === branch.name && (
+																			<HiCheck className="size-4 text-primary" />
+																		)}
+																	</span>
+																</CommandItem>
+															))}
+														</CommandList>
+													</Command>
+												</PopoverContent>
+											</Popover>
+										)}
+										<p className="text-[11px] text-muted-foreground/70">
+											Your new branch will be created from this branch
+										</p>
 									</div>
 								</div>
 							) : (
@@ -282,7 +422,7 @@ export function NewWorkspaceModal() {
 						<Button
 							className="w-full h-8 text-sm"
 							onClick={handleCreateWorkspace}
-							disabled={createWorkspace.isPending}
+							disabled={createWorkspace.isPending || isBranchesError}
 						>
 							Create Workspace
 						</Button>

@@ -248,33 +248,63 @@ export async function hasOriginRemote(mainRepoPath: string): Promise<boolean> {
 export async function getDefaultBranch(mainRepoPath: string): Promise<string> {
 	const git = simpleGit(mainRepoPath);
 
-	try {
-		const headRef = await git.raw(["symbolic-ref", "refs/remotes/origin/HEAD"]);
-		const match = headRef.trim().match(/refs\/remotes\/origin\/(.+)/);
-		if (match) return match[1];
-	} catch {}
+	// First check if we have an origin remote
+	const hasRemote = await hasOriginRemote(mainRepoPath);
 
-	try {
-		const branches = await git.branch(["-r"]);
-		const remoteBranches = branches.all.map((b) => b.replace("origin/", ""));
+	if (hasRemote) {
+		// Try to get the default branch from origin/HEAD
+		try {
+			const headRef = await git.raw([
+				"symbolic-ref",
+				"refs/remotes/origin/HEAD",
+			]);
+			const match = headRef.trim().match(/refs\/remotes\/origin\/(.+)/);
+			if (match) return match[1];
+		} catch {}
 
-		for (const candidate of ["main", "master", "develop", "trunk"]) {
-			if (remoteBranches.includes(candidate)) {
-				return candidate;
+		// Check remote branches for common default branch names
+		try {
+			const branches = await git.branch(["-r"]);
+			const remoteBranches = branches.all.map((b) => b.replace("origin/", ""));
+
+			for (const candidate of ["main", "master", "develop", "trunk"]) {
+				if (remoteBranches.includes(candidate)) {
+					return candidate;
+				}
 			}
-		}
-	} catch {}
+		} catch {}
 
-	try {
-		const hasRemote = await hasOriginRemote(mainRepoPath);
-		if (hasRemote) {
+		// Try ls-remote as last resort for remote repos
+		try {
 			const result = await git.raw(["ls-remote", "--symref", "origin", "HEAD"]);
 			const symrefMatch = result.match(/ref:\s+refs\/heads\/(.+?)\tHEAD/);
 			if (symrefMatch) {
 				return symrefMatch[1];
 			}
-		}
-	} catch {}
+		} catch {}
+	} else {
+		// No remote - use the current local branch or check for common branch names
+		try {
+			const currentBranch = await getCurrentBranch(mainRepoPath);
+			if (currentBranch) {
+				return currentBranch;
+			}
+		} catch {}
+
+		// Fallback: check for common default branch names locally
+		try {
+			const localBranches = await git.branchLocal();
+			for (const candidate of ["main", "master", "develop", "trunk"]) {
+				if (localBranches.all.includes(candidate)) {
+					return candidate;
+				}
+			}
+			// If we have any local branches, use the first one
+			if (localBranches.all.length > 0) {
+				return localBranches.all[0];
+			}
+		} catch {}
+	}
 
 	return "main";
 }
@@ -357,6 +387,58 @@ export async function branchExistsOnRemote(
 		// --exit-code makes git return non-zero if no matching refs found
 		return false;
 	}
+}
+
+/**
+ * Detect which branch a worktree was likely based off of.
+ * Uses merge-base to find the closest common ancestor with candidate base branches.
+ */
+export async function detectBaseBranch(
+	worktreePath: string,
+	currentBranch: string,
+	defaultBranch: string,
+): Promise<string | null> {
+	const git = simpleGit(worktreePath);
+
+	// Candidate base branches to check, in priority order
+	const candidates = [
+		defaultBranch,
+		"main",
+		"master",
+		"develop",
+		"development",
+	].filter((b, i, arr) => arr.indexOf(b) === i); // dedupe
+
+	let bestCandidate: string | null = null;
+	let bestAheadCount = Number.POSITIVE_INFINITY;
+
+	for (const candidate of candidates) {
+		// Skip if this is the current branch
+		if (candidate === currentBranch) continue;
+
+		try {
+			// Check if the remote branch exists
+			const remoteBranch = `origin/${candidate}`;
+			await git.raw(["rev-parse", "--verify", remoteBranch]);
+
+			// Count how many commits the current branch is ahead of the merge-base
+			// The branch with the fewest commits "ahead" is likely the base
+			const mergeBase = await git.raw(["merge-base", "HEAD", remoteBranch]);
+			const aheadCount = await git.raw([
+				"rev-list",
+				"--count",
+				`${mergeBase.trim()}..HEAD`,
+			]);
+
+			const count = Number.parseInt(aheadCount.trim(), 10);
+			if (count < bestAheadCount) {
+				bestAheadCount = count;
+				bestCandidate = candidate;
+			}
+		} catch {}
+	}
+
+	return bestCandidate;
 }
 
 /**
