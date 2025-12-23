@@ -88,6 +88,9 @@ export default defineConfig({
 				process.env.GOOGLE_CLIENT_ID,
 			),
 			"process.env.GH_CLIENT_ID": JSON.stringify(process.env.GH_CLIENT_ID),
+			"process.env.SENTRY_DSN_DESKTOP": JSON.stringify(
+				process.env.SENTRY_DSN_DESKTOP,
+			),
 		},
 
 		build: {
@@ -103,6 +106,7 @@ export default defineConfig({
 					"electron",
 					"better-sqlite3", // Native module - must stay external
 					"node-pty", // Native module - must stay external
+					/^@sentry\/electron/,
 				],
 			},
 		},
@@ -161,6 +165,9 @@ export default defineConfig({
 			"import.meta.env.NEXT_PUBLIC_POSTHOG_HOST": JSON.stringify(
 				process.env.NEXT_PUBLIC_POSTHOG_HOST,
 			),
+			"import.meta.env.SENTRY_DSN_DESKTOP": JSON.stringify(
+				process.env.SENTRY_DSN_DESKTOP,
+			),
 		},
 
 		server: {
@@ -205,6 +212,9 @@ export default defineConfig({
 				input: {
 					index: resolve("src/renderer/index.html"),
 				},
+
+				// Externalize Sentry - it uses IPC to communicate with main process
+				external: [/^@sentry\/electron/],
 			},
 		},
 	},
