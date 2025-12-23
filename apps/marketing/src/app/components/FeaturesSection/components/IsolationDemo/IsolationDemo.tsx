@@ -100,7 +100,7 @@ export function IsolationDemo() {
 	return (
 		<motion.div
 			ref={ref}
-			className="w-full max-w-2xl bg-[#1a1a1a]/90 backdrop-blur-sm rounded-lg border border-white/10 shadow-2xl overflow-hidden"
+			className="w-full min-w-[500px] max-w-2xl bg-[#1a1a1a]/90 backdrop-blur-sm rounded-lg border border-white/10 shadow-2xl overflow-hidden"
 			initial={{ opacity: 0, y: 20 }}
 			animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
 			transition={{ duration: 0.5 }}
@@ -117,10 +117,10 @@ export function IsolationDemo() {
 						components/HeroSection/HeroSection.tsx
 					</span>
 				</div>
-				<div className="flex items-center gap-2">
+				<div className="flex items-center gap-2 mx-2">
 					<button
 						type="button"
-						className="px-2 py-1 text-xs text-white/60 hover:text-white/80 bg-white/5 rounded transition-colors"
+						className="px-2 py-1 text-xs text-white/60 hover:text-white/80 bg-white/5 rounded transition-colors whitespace-nowrap"
 					>
 						Side by Side
 					</button>
