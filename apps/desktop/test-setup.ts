@@ -67,6 +67,8 @@ mock.module("electron", () => ({
 		getPath: mock(() => testTmpDir),
 		getName: mock(() => "test-app"),
 		getVersion: mock(() => "1.0.0"),
+		getAppPath: mock(() => testTmpDir),
+		isPackaged: false,
 	},
 	dialog: {
 		showOpenDialog: mock(() =>
@@ -88,6 +90,24 @@ mock.module("electron", () => ({
 	},
 	shell: {
 		openExternal: mock(() => Promise.resolve()),
+		openPath: mock(() => Promise.resolve("")),
+	},
+	clipboard: {
+		writeText: mock(),
+		readText: mock(() => ""),
+	},
+	screen: {
+		getPrimaryDisplay: mock(() => ({
+			workAreaSize: { width: 1920, height: 1080 },
+		})),
+	},
+	Notification: mock(() => ({
+		show: mock(),
+		on: mock(),
+	})),
+	Menu: {
+		buildFromTemplate: mock(() => ({})),
+		setApplicationMenu: mock(),
 	},
 }));
 
@@ -99,4 +119,49 @@ mock.module("main/lib/analytics", () => ({
 	track: mock(() => {}),
 	clearUserCache: mock(() => {}),
 	shutdown: mock(() => Promise.resolve()),
+}));
+
+// =============================================================================
+// Local DB Mock (better-sqlite3 not supported in Bun tests)
+// =============================================================================
+
+mock.module("main/lib/local-db", () => ({
+	localDb: {
+		select: mock(() => ({
+			from: mock(() => ({
+				where: mock(() => ({
+					get: mock(() => null),
+					all: mock(() => []),
+				})),
+				get: mock(() => null),
+				all: mock(() => []),
+			})),
+		})),
+		insert: mock(() => ({
+			values: mock(() => ({
+				returning: mock(() => ({
+					get: mock(() => ({ id: "test-id" })),
+				})),
+				onConflictDoUpdate: mock(() => ({
+					run: mock(),
+				})),
+				run: mock(),
+			})),
+		})),
+		update: mock(() => ({
+			set: mock(() => ({
+				where: mock(() => ({
+					run: mock(),
+					returning: mock(() => ({
+						get: mock(() => ({ id: "test-id" })),
+					})),
+				})),
+			})),
+		})),
+		delete: mock(() => ({
+			where: mock(() => ({
+				run: mock(),
+			})),
+		})),
+	},
 }));
