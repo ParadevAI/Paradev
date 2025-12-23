@@ -34,9 +34,22 @@ const config: Configuration = {
 	asar: true,
 	asarUnpack: [
 		"**/node_modules/better-sqlite3/**/*",
+		// better-sqlite3 uses `bindings` to locate native modules - must be unpacked together
+		"**/node_modules/bindings/**/*",
+		"**/node_modules/file-uri-to-path/**/*",
 		"**/node_modules/node-pty/**/*",
 		// Sound files must be unpacked so external audio players (afplay, paplay, etc.) can access them
 		"**/resources/sounds/**/*",
+	],
+
+	// Extra resources placed outside asar archive (accessible via process.resourcesPath)
+	extraResources: [
+		// Database migrations - must be outside asar for drizzle-orm to read
+		{
+			from: "dist/resources/migrations",
+			to: "resources/migrations",
+			filter: ["**/*"],
+		},
 	],
 
 	files: [
@@ -47,18 +60,25 @@ const config: Configuration = {
 			to: "resources",
 			filter: ["**/*"],
 		},
-		// Database migrations from local-db package (copied to dist/resources/migrations by vite)
-		{
-			from: "dist/resources/migrations",
-			to: "resources/migrations",
-			filter: ["**/*"],
-		},
 		// Native modules that can't be bundled by Vite.
+		// bun creates symlinks for direct deps in workspace node_modules.
 		// The copy:native-modules script replaces symlinks with real files
 		// before building (required for Bun 1.3+ isolated installs).
 		{
 			from: "node_modules/better-sqlite3",
 			to: "node_modules/better-sqlite3",
+			filter: ["**/*"],
+		},
+		// better-sqlite3 uses `bindings` package to locate its native .node file
+		{
+			from: "node_modules/bindings",
+			to: "node_modules/bindings",
+			filter: ["**/*"],
+		},
+		// `bindings` requires `file-uri-to-path` for file:// URL handling
+		{
+			from: "node_modules/file-uri-to-path",
+			to: "node_modules/file-uri-to-path",
 			filter: ["**/*"],
 		},
 		{
@@ -69,10 +89,8 @@ const config: Configuration = {
 		"!**/.DS_Store",
 	],
 
-	// Skip npm rebuild - dependencies already built in monorepo
-	npmRebuild: false,
-	buildDependenciesFromSource: false,
-	nodeGypRebuild: false,
+	// Rebuild native modules for Electron's Node.js version
+	npmRebuild: true,
 
 	// macOS
 	mac: {
