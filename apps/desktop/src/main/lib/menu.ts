@@ -1,6 +1,12 @@
 import { COMPANY } from "@superset/shared/constants";
 import { app, Menu, shell } from "electron";
-import { checkForUpdatesInteractive } from "./auto-updater";
+import { env } from "main/env.main";
+import {
+	checkForUpdatesInteractive,
+	simulateDownloading,
+	simulateError,
+	simulateUpdateReady,
+} from "./auto-updater";
 import { menuEmitter } from "./menu-events";
 
 export function createApplicationMenu() {
@@ -71,6 +77,27 @@ export function createApplicationMenu() {
 			],
 		},
 	];
+
+	// DEV ONLY: Add Dev menu
+	if (env.NODE_ENV === "development") {
+		template.push({
+			label: "Dev",
+			submenu: [
+				{
+					label: "Simulate Update Downloading",
+					click: () => simulateDownloading(),
+				},
+				{
+					label: "Simulate Update Ready",
+					click: () => simulateUpdateReady(),
+				},
+				{
+					label: "Simulate Update Error",
+					click: () => simulateError(),
+				},
+			],
+		});
+	}
 
 	if (process.platform === "darwin") {
 		template.unshift({
