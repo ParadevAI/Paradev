@@ -185,6 +185,17 @@ export default defineConfig({
 				hotKeys: ["altKey"],
 				hideConsole: true,
 			}),
+
+			// Inject env vars into index.html CSP
+			{
+				name: "html-env-transform",
+				transformIndexHtml(html) {
+					return html.replace(
+						/%NEXT_PUBLIC_API_URL%/g,
+						process.env.NEXT_PUBLIC_API_URL || "https://api.superset.sh",
+					);
+				},
+			},
 		],
 
 		// Monaco editor worker configuration
@@ -194,6 +205,7 @@ export default defineConfig({
 
 		optimizeDeps: {
 			include: ["monaco-editor"],
+			exclude: ["@electric-sql/pglite"],
 		},
 
 		publicDir: resolve(resources, "public"),
