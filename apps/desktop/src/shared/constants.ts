@@ -43,3 +43,6 @@ export const NOTIFICATION_EVENTS = {
 	AGENT_COMPLETE: "agent-complete",
 	FOCUS_TAB: "focus-tab",
 } as const;
+
+// Default user preference values
+export const DEFAULT_CONFIRM_ON_QUIT = true;

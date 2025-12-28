@@ -1,5 +1,6 @@
 import { settings, type TerminalPreset } from "@superset/local-db";
 import { localDb } from "main/lib/local-db";
+import { DEFAULT_CONFIRM_ON_QUIT } from "shared/constants";
 import { DEFAULT_RINGTONE_ID, RINGTONES } from "shared/ringtones";
 import { z } from "zod";
 import { publicProcedure, router } from "../..";
@@ -153,6 +154,27 @@ export const createSettingsRouter = () => {
 					.onConflictDoUpdate({
 						target: settings.id,
 						set: { selectedRingtoneId: input.ringtoneId },
+					})
+					.run();
+
+				return { success: true };
+			}),
+
+		getConfirmOnQuit: publicProcedure.query(() => {
+			const row = getSettings();
+			// Default to true (confirm on quit enabled by default)
+			return row.confirmOnQuit ?? DEFAULT_CONFIRM_ON_QUIT;
+		}),
+
+		setConfirmOnQuit: publicProcedure
+			.input(z.object({ enabled: z.boolean() }))
+			.mutation(({ input }) => {
+				localDb
+					.insert(settings)
+					.values({ id: 1, confirmOnQuit: input.enabled })
+					.onConflictDoUpdate({
+						target: settings.id,
+						set: { confirmOnQuit: input.enabled },
 					})
 					.run();
 

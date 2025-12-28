@@ -126,6 +126,7 @@ export const settings = sqliteTable("settings", {
 	}),
 	selectedRingtoneId: text("selected_ringtone_id"),
 	activeOrganizationId: text("active_organization_id"),
+	confirmOnQuit: integer("confirm_on_quit", { mode: "boolean" }),
 });
 
 export type InsertSettings = typeof settings.$inferInsert;

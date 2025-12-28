@@ -22,6 +22,13 @@
       "when": 1766776955487,
       "tag": "0002_add_active_organization_id",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1766932805546,
+      "tag": "0003_add_confirm_on_quit_setting",
+      "breakpoints": true
     }
   ]
 }
