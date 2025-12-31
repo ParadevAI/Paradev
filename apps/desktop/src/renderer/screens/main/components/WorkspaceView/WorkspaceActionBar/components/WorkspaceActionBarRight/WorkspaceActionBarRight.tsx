@@ -23,6 +23,7 @@ import {
 } from "renderer/components/OpenInButton";
 import { shortenHomePath } from "renderer/lib/formatPath";
 import { trpc } from "renderer/lib/trpc";
+import { useHotkeyText } from "renderer/stores/hotkeys";
 
 interface FormattedPath {
 	prefix: string;
@@ -65,6 +66,10 @@ export function WorkspaceActionBarRight({
 
 	const formattedPath = formatWorktreePath(worktreePath, homeDir);
 	const currentApp = getAppOption(lastUsedApp);
+	const openInShortcut = useHotkeyText("OPEN_IN_APP");
+	const copyPathShortcut = useHotkeyText("COPY_PATH");
+	const showOpenInShortcut = openInShortcut !== "Unassigned";
+	const showCopyPathShortcut = copyPathShortcut !== "Unassigned";
 
 	const handleOpenInEditor = () => {
 		openInApp.mutate({ path: worktreePath, app: lastUsedApp });
@@ -109,7 +114,7 @@ export function WorkspaceActionBarRight({
 					<span className="flex items-center gap-1.5">
 						Open in {currentApp.displayLabel ?? currentApp.label}
 						<kbd className="px-1.5 py-0.5 text-[10px] font-sans bg-foreground/10 rounded">
-							⌘O
+							{showOpenInShortcut ? openInShortcut : "—"}
 						</kbd>
 					</span>
 				</TooltipContent>
@@ -142,8 +147,8 @@ export function WorkspaceActionBarRight({
 								className="size-4 object-contain mr-2"
 							/>
 							{app.label}
-							{app.id === lastUsedApp && (
-								<DropdownMenuShortcut>⌘O</DropdownMenuShortcut>
+							{app.id === lastUsedApp && showOpenInShortcut && (
+								<DropdownMenuShortcut>{openInShortcut}</DropdownMenuShortcut>
 							)}
 						</DropdownMenuItem>
 					))}
@@ -204,7 +209,9 @@ export function WorkspaceActionBarRight({
 					<DropdownMenuItem onClick={handleCopyPath}>
 						<LuCopy className="size-4 mr-2" />
 						Copy path
-						<DropdownMenuShortcut>⌘⇧C</DropdownMenuShortcut>
+						{showCopyPathShortcut && (
+							<DropdownMenuShortcut>{copyPathShortcut}</DropdownMenuShortcut>
+						)}
 					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>
