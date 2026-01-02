@@ -23,6 +23,7 @@ import {
 } from "renderer/react-query/workspaces";
 import { useAppHotkey, useHotkeyText } from "renderer/stores/hotkeys";
 import { useOpenNewWorkspaceModal } from "renderer/stores/new-workspace-modal";
+import { InitGitDialog } from "../../StartView/InitGitDialog";
 
 export interface CreateWorkspaceButtonProps {
 	className?: string;
@@ -32,6 +33,10 @@ export function CreateWorkspaceButton({
 	className,
 }: CreateWorkspaceButtonProps) {
 	const [open, setOpen] = useState(false);
+	const [initGitDialog, setInitGitDialog] = useState<{
+		isOpen: boolean;
+		selectedPath: string;
+	}>({ isOpen: false, selectedPath: "" });
 
 	const { data: activeWorkspace } = trpc.workspaces.getActive.useQuery();
 	const { data: recentProjects = [] } = trpc.projects.getRecents.useQuery();
@@ -68,9 +73,9 @@ export function CreateWorkspaceButton({
 				return;
 			}
 			if ("needsGitInit" in result) {
-				toast.error("Selected folder is not a git repository", {
-					description:
-						"Please use 'Open project' from the start view to initialize git.",
+				setInitGitDialog({
+					isOpen: true,
+					selectedPath: result.selectedPath,
 				});
 				return;
 			}
@@ -221,6 +226,15 @@ export function CreateWorkspaceButton({
 					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>
+
+			<InitGitDialog
+				isOpen={initGitDialog.isOpen}
+				selectedPath={initGitDialog.selectedPath}
+				onClose={() => setInitGitDialog({ isOpen: false, selectedPath: "" })}
+				onError={(error) =>
+					toast.error("Failed to initialize git", { description: error })
+				}
+			/>
 		</div>
 	);
 }
