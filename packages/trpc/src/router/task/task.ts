@@ -1,5 +1,6 @@
-import { db } from "@superset/db/client";
+import { db, dbWs } from "@superset/db/client";
 import { tasks, users } from "@superset/db/schema";
+import { getCurrentTxid } from "@superset/db/utils";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { and, desc, eq, isNull } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
@@ -73,53 +74,73 @@ export const taskRouter = {
 	create: protectedProcedure
 		.input(createTaskSchema)
 		.mutation(async ({ ctx, input }) => {
-			const [user] = await db
+			const [user] = await dbWs
 				.select()
 				.from(users)
 				.where(eq(users.clerkId, ctx.userId))
 				.limit(1);
 			if (!user) throw new Error("User not found");
 
-			const [task] = await db
-				.insert(tasks)
-				.values({
-					...input,
-					creatorId: user.id,
-					labels: input.labels ?? [],
-				})
-				.returning();
+			const result = await dbWs.transaction(async (tx) => {
+				const [task] = await tx
+					.insert(tasks)
+					.values({
+						...input,
+						creatorId: user.id,
+						labels: input.labels ?? [],
+					})
+					.returning();
 
-			if (task) {
-				syncTask(task.id);
+				const txid = await getCurrentTxid(tx);
+
+				return { task, txid };
+			});
+
+			if (result.task) {
+				syncTask(result.task.id);
 			}
 
-			return task;
+			return result;
 		}),
 
 	update: protectedProcedure
 		.input(updateTaskSchema)
 		.mutation(async ({ input }) => {
 			const { id, ...data } = input;
-			const [task] = await db
-				.update(tasks)
-				.set(data)
-				.where(eq(tasks.id, id))
-				.returning();
 
-			if (task) {
-				syncTask(task.id);
+			const result = await dbWs.transaction(async (tx) => {
+				const [task] = await tx
+					.update(tasks)
+					.set(data)
+					.where(eq(tasks.id, id))
+					.returning();
+
+				const txid = await getCurrentTxid(tx);
+
+				return { task, txid };
+			});
+
+			if (result.task) {
+				syncTask(result.task.id);
 			}
 
-			return task;
+			return result;
 		}),
 
 	delete: protectedProcedure
 		.input(z.string().uuid())
 		.mutation(async ({ input }) => {
-			await db
-				.update(tasks)
-				.set({ deletedAt: new Date() })
-				.where(eq(tasks.id, input));
-			return { success: true };
+			const result = await dbWs.transaction(async (tx) => {
+				await tx
+					.update(tasks)
+					.set({ deletedAt: new Date() })
+					.where(eq(tasks.id, input));
+
+				const txid = await getCurrentTxid(tx);
+
+				return { txid };
+			});
+
+			return result;
 		}),
 } satisfies TRPCRouterRecord;

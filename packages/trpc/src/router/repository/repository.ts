@@ -1,5 +1,6 @@
-import { db } from "@superset/db/client";
+import { db, dbWs } from "@superset/db/client";
 import { repositories } from "@superset/db/schema";
+import { getCurrentTxid } from "@superset/db/utils";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { and, desc, eq } from "drizzle-orm";
 import { z } from "zod";
@@ -66,11 +67,18 @@ export const repositoryRouter = {
 			}),
 		)
 		.mutation(async ({ input }) => {
-			const [repository] = await db
-				.insert(repositories)
-				.values(input)
-				.returning();
-			return repository;
+			const result = await dbWs.transaction(async (tx) => {
+				const [repository] = await tx
+					.insert(repositories)
+					.values(input)
+					.returning();
+
+				const txid = await getCurrentTxid(tx);
+
+				return { repository, txid };
+			});
+
+			return result;
 		}),
 
 	update: protectedProcedure
@@ -83,18 +91,33 @@ export const repositoryRouter = {
 		)
 		.mutation(async ({ input }) => {
 			const { id, ...data } = input;
-			const [repository] = await db
-				.update(repositories)
-				.set(data)
-				.where(eq(repositories.id, id))
-				.returning();
-			return repository;
+
+			const result = await dbWs.transaction(async (tx) => {
+				const [repository] = await tx
+					.update(repositories)
+					.set(data)
+					.where(eq(repositories.id, id))
+					.returning();
+
+				const txid = await getCurrentTxid(tx);
+
+				return { repository, txid };
+			});
+
+			return result;
 		}),
 
 	delete: protectedProcedure
 		.input(z.string().uuid())
 		.mutation(async ({ input }) => {
-			await db.delete(repositories).where(eq(repositories.id, input));
-			return { success: true };
+			const result = await dbWs.transaction(async (tx) => {
+				await tx.delete(repositories).where(eq(repositories.id, input));
+
+				const txid = await getCurrentTxid(tx);
+
+				return { txid };
+			});
+
+			return result;
 		}),
 } satisfies TRPCRouterRecord;

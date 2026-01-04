@@ -1,3 +1,5 @@
+import type { TaskPriority } from "@superset/db/enums";
+import type { SelectTask } from "@superset/db/schema";
 import { Badge } from "@superset/ui/badge";
 import { Button } from "@superset/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@superset/ui/card";
@@ -18,8 +20,9 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@superset/ui/select";
+import { toast } from "@superset/ui/sonner";
 import { Textarea } from "@superset/ui/textarea";
-import { desc, isNull } from "drizzle-orm";
+import { useLiveQuery } from "@tanstack/react-db";
 import { useState } from "react";
 import {
 	HiCalendar,
@@ -29,22 +32,17 @@ import {
 	HiPencil,
 	HiUser,
 } from "react-icons/hi2";
-import { OrganizationsProvider } from "renderer/contexts/OrganizationsProvider";
 import {
-	PGliteProvider,
-	type SelectTask,
-	type TaskPriority,
-	tasksTable,
-	useDb,
-	useLiveDrizzle,
-} from "renderer/lib/pglite";
-import { trpc } from "renderer/lib/trpc";
+	ActiveOrganizationProvider,
+	CollectionsProvider,
+	OrganizationsProvider,
+	useActiveOrganization,
+	useCollections,
+} from "renderer/contexts";
 import { OrganizationSwitcher } from "./components/OrganizationSwitcher";
 
-type Task = SelectTask;
-
 interface TaskEditDialogProps {
-	task: Task;
+	task: SelectTask;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 }
@@ -54,24 +52,33 @@ function TaskEditDialog({ task, open, onOpenChange }: TaskEditDialogProps) {
 	const [description, setDescription] = useState(task.description || "");
 	const [priority, setPriority] = useState(task.priority);
 	const [isSaving, setIsSaving] = useState(false);
+	const { tasks: tasksCollection } = useCollections();
 
-	const updateTask = trpc.tasks.update.useMutation({
-		onSuccess: () => {
-			onOpenChange(false);
-		},
-		onSettled: () => {
-			setIsSaving(false);
-		},
-	});
-
-	const handleSave = () => {
+	const handleSave = async () => {
 		setIsSaving(true);
-		updateTask.mutate({
-			id: task.id,
-			title,
-			description: description || null,
-			priority: priority as "urgent" | "high" | "medium" | "low" | "none",
-		});
+		try {
+			// Use collection's update method - this triggers onUpdate handler
+			// which sends the mutation to the API
+			await tasksCollection.update(task.id, (draft) => {
+				draft.title = title;
+				draft.description = description || null;
+				draft.priority = priority as
+					| "urgent"
+					| "high"
+					| "medium"
+					| "low"
+					| "none";
+			});
+			toast.success("Task updated");
+			onOpenChange(false);
+		} catch (error) {
+			console.error("[TaskEditDialog] Update failed:", error);
+			toast.error(
+				`Failed to update task: ${error instanceof Error ? error.message : String(error)}`,
+			);
+		} finally {
+			setIsSaving(false);
+		}
 	};
 
 	return (
@@ -79,9 +86,9 @@ function TaskEditDialog({ task, open, onOpenChange }: TaskEditDialogProps) {
 			<DialogContent className="sm:max-w-[500px]">
 				<DialogHeader>
 					<DialogTitle className="flex items-center gap-2">
-						{task.external_key && (
+						{task.externalKey && (
 							<Badge variant="outline" className="text-xs">
-								{task.external_key}
+								{task.externalKey}
 							</Badge>
 						)}
 						Edit Task
@@ -132,11 +139,6 @@ function TaskEditDialog({ task, open, onOpenChange }: TaskEditDialogProps) {
 						{isSaving ? "Saving..." : "Save & Sync to Linear"}
 					</Button>
 				</DialogFooter>
-				{updateTask.error && (
-					<p className="text-sm text-destructive mt-2">
-						Error: {updateTask.error.message}
-					</p>
-				)}
 			</DialogContent>
 		</Dialog>
 	);
@@ -146,8 +148,8 @@ function TaskCard({
 	task,
 	onEdit,
 }: {
-	task: Task;
-	onEdit: (task: Task) => void;
+	task: SelectTask;
+	onEdit: (task: SelectTask) => void;
 }) {
 	const priorityColors: Record<string, string> = {
 		urgent: "bg-red-500",
@@ -173,9 +175,9 @@ function TaskCard({
 			<CardHeader className="pb-2">
 				<div className="flex items-start justify-between gap-2">
 					<div className="flex items-center gap-2 min-w-0">
-						{task.external_key && (
+						{task.externalKey && (
 							<Badge variant="outline" className="shrink-0 text-xs">
-								{task.external_key}
+								{task.externalKey}
 							</Badge>
 						)}
 						<CardTitle className="text-sm font-medium truncate">
@@ -199,10 +201,10 @@ function TaskCard({
 						)}
 						<Badge
 							variant="secondary"
-							className={`text-xs text-white ${statusColors[task.status] || (task.status_color ? "" : "bg-gray-400")}`}
+							className={`text-xs text-white ${statusColors[task.status] || (task.statusColor ? "" : "bg-gray-400")}`}
 							style={
-								task.status_color
-									? { backgroundColor: task.status_color }
+								task.statusColor
+									? { backgroundColor: task.statusColor }
 									: undefined
 							}
 						>
@@ -218,16 +220,16 @@ function TaskCard({
 					</p>
 				)}
 				<div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
-					{task.assignee_id && (
+					{task.assigneeId && (
 						<span className="flex items-center gap-1">
 							<HiUser className="h-3 w-3" />
 							Assigned
 						</span>
 					)}
-					{task.due_date && (
+					{task.dueDate && (
 						<span className="flex items-center gap-1">
 							<HiCalendar className="h-3 w-3" />
-							{new Date(task.due_date).toLocaleDateString()}
+							{new Date(task.dueDate).toLocaleDateString()}
 						</span>
 					)}
 					{task.branch && (
@@ -235,15 +237,15 @@ function TaskCard({
 							{task.branch}
 						</span>
 					)}
-					{task.external_url && (
+					{task.externalUrl && (
 						<a
-							href={task.external_url}
+							href={task.externalUrl}
 							target="_blank"
 							rel="noopener noreferrer"
 							className="flex items-center gap-1 hover:text-foreground"
 						>
 							<HiLink className="h-3 w-3" />
-							{task.external_provider || "Link"}
+							{task.externalProvider || "Link"}
 						</a>
 					)}
 				</div>
@@ -262,17 +264,28 @@ function TaskCard({
 }
 
 function TasksList() {
-	const [editingTask, setEditingTask] = useState<Task | null>(null);
-	const db = useDb();
+	const [editingTask, setEditingTask] = useState<SelectTask | null>(null);
+	const { tasks: tasksCollection } = useCollections();
+	const { activeOrganizationId } = useActiveOrganization();
 
-	const result = useLiveDrizzle(
-		db
-			.select()
-			.from(tasksTable)
-			.where(isNull(tasksTable.deleted_at))
-			.orderBy(desc(tasksTable.created_at)),
+	// Query all task objects from collection
+	// Include tasksCollection and activeOrganizationId in deps to force re-query when they change
+	const { data: allTasks, isLoading } = useLiveQuery(
+		(q) => q.from({ tasks: tasksCollection }),
+		[tasksCollection, activeOrganizationId],
 	);
-	const tasks = result?.rows ?? [];
+
+	// Filter out deleted tasks in JavaScript
+	const tasks = (allTasks?.filter((task) => task.deletedAt === null) ||
+		[]) as SelectTask[];
+
+	if (isLoading) {
+		return (
+			<div className="flex items-center justify-center h-64">
+				<div className="h-5 w-5 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
+			</div>
+		);
+	}
 
 	if (tasks.length === 0) {
 		return (
@@ -341,9 +354,11 @@ function TasksViewContent() {
 export function TasksView() {
 	return (
 		<OrganizationsProvider>
-			<PGliteProvider>
-				<TasksViewContent />
-			</PGliteProvider>
+			<ActiveOrganizationProvider>
+				<CollectionsProvider>
+					<TasksViewContent />
+				</CollectionsProvider>
+			</ActiveOrganizationProvider>
 		</OrganizationsProvider>
 	);
 }

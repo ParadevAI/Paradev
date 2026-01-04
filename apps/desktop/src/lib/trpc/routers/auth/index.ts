@@ -50,6 +50,7 @@ export const createAuthRouter = (getWindow: () => BrowserWindow | null) => {
 						const accessToken = await authService.getAccessToken();
 						emit.next({ accessToken });
 					} catch (err) {
+						console.error("[auth/onAccessToken] Error getting token:", err);
 						emit.error(err instanceof Error ? err : new Error(String(err)));
 					}
 				};

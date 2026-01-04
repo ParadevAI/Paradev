@@ -1,5 +1,6 @@
 import { createContext, type ReactNode, useContext } from "react";
 import { type RouterOutputs, trpc } from "renderer/lib/trpc";
+import { SignInScreen } from "renderer/screens/sign-in";
 
 export type Organization = RouterOutputs["user"]["myOrganizations"][number];
 
@@ -21,15 +22,23 @@ export function useOrganizations(): Organization[] {
 }
 
 export function OrganizationsProvider({ children }: { children: ReactNode }) {
-	const { data: organizations, isLoading } =
-		trpc.user.myOrganizations.useQuery();
+	const {
+		data: organizations,
+		isLoading,
+		error,
+	} = trpc.user.myOrganizations.useQuery();
 
 	if (isLoading) {
-		return (
-			<div className="flex h-full items-center justify-center">
-				<div className="h-5 w-5 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
-			</div>
-		);
+		return null;
+	}
+
+	if (error) {
+		if (
+			error.data?.code === "UNAUTHORIZED" ||
+			error.message?.includes("Not authenticated")
+		) {
+			return <SignInScreen />;
+		}
 	}
 
 	if (!organizations?.length) {

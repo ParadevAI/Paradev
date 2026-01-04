@@ -27,6 +27,11 @@ const testTmpDir = join(tmpdir(), "superset-test");
 const mockStyleMap = new Map<string, string>();
 const mockClassList = new Set<string>();
 
+const mockHead = {
+	appendChild: mock(() => {}),
+	removeChild: mock(() => {}),
+};
+
 // biome-ignore lint/suspicious/noExplicitAny: Test setup requires extending globalThis
 (globalThis as any).document = {
 	documentElement: {
@@ -45,6 +50,20 @@ const mockClassList = new Set<string>();
 			contains: (className: string) => mockClassList.has(className),
 		},
 	},
+	head: mockHead,
+	getElementsByTagName: mock((tag: string) => {
+		if (tag === "head") return [mockHead];
+		return [];
+	}),
+	createElement: mock((_tag: string) => ({
+		setAttribute: mock(() => {}),
+		appendChild: mock(() => {}),
+		textContent: "",
+		type: "",
+	})),
+	createTextNode: mock((text: string) => ({
+		textContent: text,
+	})),
 };
 
 // =============================================================================
