@@ -19,6 +19,7 @@ import { useTabsStore } from "renderer/stores/tabs/store";
 import type { Tab } from "renderer/stores/tabs/types";
 import { useAgentHookListener } from "renderer/stores/tabs/useAgentHookListener";
 import { findPanePath, getFirstPaneId } from "renderer/stores/tabs/utils";
+import { useWorkspaceInitStore } from "renderer/stores/workspace-init";
 import { dragDropManager } from "../../lib/dnd";
 import { AppFrame } from "./components/AppFrame";
 import { Background } from "./components/Background";
@@ -26,6 +27,7 @@ import { SettingsView } from "./components/SettingsView";
 import { StartView } from "./components/StartView";
 import { TasksView } from "./components/TasksView";
 import { TopBar } from "./components/TopBar";
+import { WorkspaceInitEffects } from "./components/WorkspaceInitEffects";
 import { WorkspaceView } from "./components/WorkspaceView";
 
 function LoadingSpinner() {
@@ -52,6 +54,19 @@ export function MainScreen() {
 	// Subscribe to auth state changes
 	trpc.auth.onStateChange.useSubscription(undefined, {
 		onData: () => utils.auth.getState.invalidate(),
+	});
+
+	// Subscribe to workspace initialization progress
+	const updateInitProgress = useWorkspaceInitStore((s) => s.updateProgress);
+	trpc.workspaces.onInitProgress.useSubscription(undefined, {
+		onData: (progress) => {
+			updateInitProgress(progress);
+			// Invalidate workspace queries when initialization completes or fails
+			if (progress.step === "ready" || progress.step === "failed") {
+				utils.workspaces.getActive.invalidate();
+				utils.workspaces.getAllGrouped.invalidate();
+			}
+		},
 	});
 
 	const currentView = useCurrentView();
@@ -343,6 +358,7 @@ export function MainScreen() {
 			</AppFrame>
 			<SetupConfigModal />
 			<NewWorkspaceModal />
+			<WorkspaceInitEffects />
 		</DndProvider>
 	);
 }
