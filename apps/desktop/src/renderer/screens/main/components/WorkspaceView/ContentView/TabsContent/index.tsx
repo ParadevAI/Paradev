@@ -23,5 +23,9 @@ export function TabsContent() {
 		return <EmptyTabView />;
 	}
 
-	return <TabView tab={tabToRender} panes={panes} />;
+	return (
+		<div className="flex-1 min-h-0 overflow-hidden">
+			<TabView tab={tabToRender} panes={panes} />
+		</div>
+	);
 }

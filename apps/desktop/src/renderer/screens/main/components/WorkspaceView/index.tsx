@@ -7,9 +7,9 @@ import {
 	useHasWorkspaceFailed,
 	useIsWorkspaceInitializing,
 } from "renderer/stores/workspace-init";
+import { useWorkspaceViewModeStore } from "renderer/stores/workspace-view-mode";
 import { ContentView } from "./ContentView";
 import { ResizableSidebar } from "./ResizableSidebar";
-import { WorkspaceActionBar } from "./WorkspaceActionBar";
 import { WorkspaceInitializingView } from "./WorkspaceInitializingView";
 
 export function WorkspaceView() {
@@ -61,16 +61,31 @@ export function WorkspaceView() {
 	// Get focused pane ID for the active tab
 	const focusedPaneId = activeTabId ? focusedPaneIds[activeTabId] : null;
 
+	// View mode for terminal creation - subscribe to actual data for reactivity
+	const viewModeByWorkspaceId = useWorkspaceViewModeStore(
+		(s) => s.viewModeByWorkspaceId,
+	);
+	const setWorkspaceViewMode = useWorkspaceViewModeStore(
+		(s) => s.setWorkspaceViewMode,
+	);
+	const viewMode = activeWorkspaceId
+		? (viewModeByWorkspaceId[activeWorkspaceId] ?? "workbench")
+		: "workbench";
+
 	// Tab management shortcuts
 	useAppHotkey(
-		"NEW_TERMINAL",
+		"NEW_GROUP",
 		() => {
 			if (activeWorkspaceId) {
+				// If in Review mode, switch to Workbench first
+				if (viewMode === "review") {
+					setWorkspaceViewMode(activeWorkspaceId, "workbench");
+				}
 				addTab(activeWorkspaceId);
 			}
 		},
 		undefined,
-		[activeWorkspaceId, addTab],
+		[activeWorkspaceId, addTab, viewMode, setWorkspaceViewMode],
 	);
 
 	useAppHotkey(
@@ -85,7 +100,7 @@ export function WorkspaceView() {
 		[focusedPaneId, removePane],
 	);
 
-	// Switch between tabs (configurable shortcut)
+	// Switch between tabs (⌘+Up/Down)
 	useAppHotkey(
 		"PREV_TERMINAL",
 		() => {
@@ -112,7 +127,7 @@ export function WorkspaceView() {
 		[activeWorkspaceId, activeTabId, tabs, setActiveTab],
 	);
 
-	// Switch between panes within a tab (configurable shortcut)
+	// Switch between panes within a tab (⌘+⌥+Left/Right)
 	useAppHotkey(
 		"PREV_PANE",
 		() => {
@@ -174,8 +189,7 @@ export function WorkspaceView() {
 		<div className="flex-1 h-full flex flex-col overflow-hidden">
 			<div className="flex-1 flex bg-tertiary overflow-hidden">
 				<ResizableSidebar />
-				<div className="flex-1 min-w-0 h-full bg-background rounded-t-lg flex flex-col overflow-hidden">
-					<WorkspaceActionBar worktreePath={activeWorkspace?.worktreePath} />
+				<div className="flex-1 min-w-0 h-full bg-background flex flex-col overflow-hidden">
 					<div className="flex-1 min-h-0 overflow-hidden">
 						{showInitView && activeWorkspaceId ? (
 							<WorkspaceInitializingView

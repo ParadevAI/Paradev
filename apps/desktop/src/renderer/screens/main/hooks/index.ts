@@ -1,1 +1,1 @@
-//
+export { useWorkspaceRename } from "./useWorkspaceRename";
