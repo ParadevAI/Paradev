@@ -211,12 +211,12 @@ export function CommitInput({
 			: null;
 
 	return (
-		<div className="flex flex-col gap-2 p-3">
+		<div className="flex flex-col gap-1.5 px-2 py-2 border-b border-border">
 			<Textarea
 				placeholder="Commit message"
 				value={commitMessage}
 				onChange={(e) => setCommitMessage(e.target.value)}
-				className="min-h-[52px] rounded-sm resize-none text-sm shadow-none focus-visible:ring-0 focus-visible:border-border"
+				className="min-h-[52px] resize-none text-[10px] bg-background"
 				onKeyDown={(e) => {
 					if (e.key === "Enter" && (e.metaKey || e.ctrlKey) && canCommit) {
 						e.preventDefault();
@@ -230,16 +230,14 @@ export function CommitInput({
 						<Button
 							variant="secondary"
 							size="sm"
-							className="flex-1 gap-1.5 font-medium"
+							className="flex-1 gap-1.5 h-7 text-xs"
 							onClick={primary.handler}
 							disabled={primary.disabled}
 						>
 							{primary.icon}
 							<span>{primary.label}</span>
 							{countBadge && (
-								<span className="text-xs text-muted-foreground">
-									{countBadge}
-								</span>
+								<span className="text-[10px] opacity-70">{countBadge}</span>
 							)}
 						</Button>
 					</TooltipTrigger>
@@ -248,22 +246,28 @@ export function CommitInput({
 				<DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
 					<DropdownMenuTrigger asChild>
 						<Button
-							variant="secondary"
+							variant="default"
 							size="sm"
-							className="px-2"
 							disabled={isPending}
+							className="h-7 px-1.5"
 						>
 							<HiChevronDown className="size-3.5" />
 						</Button>
 					</DropdownMenuTrigger>
-					<DropdownMenuContent align="end" className="w-48">
-						<DropdownMenuItem onClick={handleCommit} disabled={!canCommit}>
+					<DropdownMenuContent align="end" className="w-48 text-xs">
+						{/* Commit actions */}
+						<DropdownMenuItem
+							onClick={handleCommit}
+							disabled={!canCommit}
+							className="text-xs"
+						>
 							<HiCheck className="size-3.5" />
 							Commit
 						</DropdownMenuItem>
 						<DropdownMenuItem
 							onClick={handleCommitAndPush}
 							disabled={!canCommit}
+							className="text-xs"
 						>
 							<HiArrowUp className="size-3.5" />
 							Commit & Push
@@ -272,6 +276,7 @@ export function CommitInput({
 							<DropdownMenuItem
 								onClick={handleCommitPushAndCreatePR}
 								disabled={!canCommit}
+								className="text-xs"
 							>
 								<HiArrowTopRightOnSquare className="size-3.5" />
 								Commit, Push & Create PR
@@ -283,22 +288,27 @@ export function CommitInput({
 						<DropdownMenuItem
 							onClick={handlePush}
 							disabled={pushCount === 0 && hasUpstream}
+							className="text-xs"
 						>
 							<HiArrowUp className="size-3.5" />
 							<span className="flex-1">
 								{hasUpstream ? "Push" : "Publish Branch"}
 							</span>
 							{pushCount > 0 && (
-								<span className="text-[11px] text-muted-foreground">
+								<span className="text-[10px] text-muted-foreground">
 									{pushCount}
 								</span>
 							)}
 						</DropdownMenuItem>
-						<DropdownMenuItem onClick={handlePull} disabled={pullCount === 0}>
+						<DropdownMenuItem
+							onClick={handlePull}
+							disabled={pullCount === 0}
+							className="text-xs"
+						>
 							<HiArrowDown className="size-3.5" />
 							<span className="flex-1">Pull</span>
 							{pullCount > 0 && (
-								<span className="text-[11px] text-muted-foreground">
+								<span className="text-[10px] text-muted-foreground">
 									{pullCount}
 								</span>
 							)}
@@ -306,6 +316,7 @@ export function CommitInput({
 						<DropdownMenuItem
 							onClick={handleSync}
 							disabled={pushCount === 0 && pullCount === 0}
+							className="text-xs"
 						>
 							<HiArrowsUpDown className="size-3.5" />
 							Sync
@@ -314,12 +325,12 @@ export function CommitInput({
 						<DropdownMenuSeparator />
 
 						{hasExistingPR ? (
-							<DropdownMenuItem onClick={handleOpenPR}>
+							<DropdownMenuItem onClick={handleOpenPR} className="text-xs">
 								<HiArrowTopRightOnSquare className="size-3.5" />
 								Open Pull Request
 							</DropdownMenuItem>
 						) : (
-							<DropdownMenuItem onClick={handleCreatePR}>
+							<DropdownMenuItem onClick={handleCreatePR} className="text-xs">
 								<HiArrowTopRightOnSquare className="size-3.5" />
 								Create Pull Request
 							</DropdownMenuItem>
