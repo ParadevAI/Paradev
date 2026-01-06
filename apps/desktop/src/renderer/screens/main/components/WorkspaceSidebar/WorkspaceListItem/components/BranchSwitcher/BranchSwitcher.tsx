@@ -13,6 +13,7 @@ import { HiCheck, HiChevronUpDown } from "react-icons/hi2";
 import { LuGitBranch, LuGitFork, LuLoader } from "react-icons/lu";
 import { trpc } from "renderer/lib/trpc";
 import { useSetActiveWorkspace } from "renderer/react-query/workspaces";
+import { STROKE_WIDTH } from "../../../constants";
 
 interface BranchSwitcherProps {
 	projectId: string;
@@ -146,7 +147,10 @@ export function BranchSwitcher({
 				<div className="overflow-y-auto flex-1 py-1">
 					{isLoading ? (
 						<div className="flex items-center justify-center py-4">
-							<LuLoader className="size-4 animate-spin text-muted-foreground" />
+							<LuLoader
+								className="size-4 animate-spin text-muted-foreground"
+								strokeWidth={STROKE_WIDTH}
+							/>
 						</div>
 					) : filteredBranches.length === 0 ? (
 						<div className="text-center py-4 text-xs text-muted-foreground">
@@ -169,9 +173,15 @@ export function BranchSwitcher({
 										className="flex items-center gap-2 px-2 py-1.5"
 									>
 										{isInUse ? (
-											<LuGitFork className="size-3.5 shrink-0 text-amber-500" />
+											<LuGitFork
+												className="size-3.5 shrink-0 text-amber-500"
+												strokeWidth={STROKE_WIDTH}
+											/>
 										) : (
-											<LuGitBranch className="size-3.5 shrink-0 text-muted-foreground" />
+											<LuGitBranch
+												className="size-3.5 shrink-0 text-muted-foreground"
+												strokeWidth={STROKE_WIDTH}
+											/>
 										)}
 										<span className="flex-1 truncate text-xs">{branch}</span>
 										{isInUse && (

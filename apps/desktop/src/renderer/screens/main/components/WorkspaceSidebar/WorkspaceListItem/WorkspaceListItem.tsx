@@ -29,6 +29,7 @@ import { useWorkspaceRename } from "renderer/screens/main/hooks/useWorkspaceRena
 import { useCloseWorkspacesList } from "renderer/stores/app-state";
 import { useTabsStore } from "renderer/stores/tabs/store";
 import { extractPaneIdsFromLayout } from "renderer/stores/tabs/utils";
+import { STROKE_WIDTH } from "../constants";
 import {
 	BranchSwitcher,
 	DeleteWorkspaceDialog,
@@ -198,14 +199,22 @@ export function WorkspaceListItem({
 					isActive && "bg-muted",
 				)}
 			>
-				{/* Active indicator */}
-				{isActive && (
-					<div className="absolute left-0 top-1 bottom-1 w-0.5 bg-primary rounded-r" />
-				)}
 				{isBranchWorkspace ? (
-					<LuFolder className="size-4 text-muted-foreground" />
+					<LuFolder
+						className={cn(
+							"size-4",
+							isActive ? "text-foreground" : "text-muted-foreground",
+						)}
+						strokeWidth={STROKE_WIDTH}
+					/>
 				) : (
-					<LuFolderGit2 className="size-4 text-muted-foreground" />
+					<LuFolderGit2
+						className={cn(
+							"size-4",
+							isActive ? "text-foreground" : "text-muted-foreground",
+						)}
+						strokeWidth={STROKE_WIDTH}
+					/>
 				)}
 				{/* Notification dot */}
 				{needsAttention && (
@@ -232,17 +241,35 @@ export function WorkspaceListItem({
 			);
 		}
 
-		// Worktree workspaces get the full hover card
+		// Worktree workspaces get the full hover card with context menu
 		return (
-			<HoverCard
-				openDelay={HOVER_CARD_OPEN_DELAY}
-				closeDelay={HOVER_CARD_CLOSE_DELAY}
-			>
-				<HoverCardTrigger asChild>{collapsedButton}</HoverCardTrigger>
-				<HoverCardContent side="right" align="start" className="w-72">
-					<WorkspaceHoverCardContent workspaceId={id} workspaceAlias={name} />
-				</HoverCardContent>
-			</HoverCard>
+			<>
+				<HoverCard
+					openDelay={HOVER_CARD_OPEN_DELAY}
+					closeDelay={HOVER_CARD_CLOSE_DELAY}
+				>
+					<ContextMenu>
+						<HoverCardTrigger asChild>
+							<ContextMenuTrigger asChild>{collapsedButton}</ContextMenuTrigger>
+						</HoverCardTrigger>
+						<ContextMenuContent>
+							<ContextMenuItem onSelect={() => handleDeleteClick()}>
+								Close Worktree
+							</ContextMenuItem>
+						</ContextMenuContent>
+					</ContextMenu>
+					<HoverCardContent side="right" align="start" className="w-72">
+						<WorkspaceHoverCardContent workspaceId={id} workspaceAlias={name} />
+					</HoverCardContent>
+				</HoverCard>
+				<DeleteWorkspaceDialog
+					workspaceId={id}
+					workspaceName={name}
+					workspaceType={type}
+					open={showDeleteDialog}
+					onOpenChange={setShowDeleteDialog}
+				/>
+			</>
 		);
 	}
 
@@ -275,9 +302,15 @@ export function WorkspaceListItem({
 				<TooltipTrigger asChild>
 					<div className="relative shrink-0 size-5 flex items-center justify-center mr-2.5">
 						{isBranchWorkspace ? (
-							<LuFolder className="size-4 text-muted-foreground" />
+							<LuFolder
+								className="size-4 text-muted-foreground"
+								strokeWidth={STROKE_WIDTH}
+							/>
 						) : (
-							<LuFolderGit2 className="size-4 text-muted-foreground" />
+							<LuFolderGit2
+								className="size-4 text-muted-foreground"
+								strokeWidth={STROKE_WIDTH}
+							/>
 						)}
 						{needsAttention && (
 							<span className="absolute -top-0.5 -right-0.5 flex size-2">
@@ -394,12 +427,12 @@ export function WorkspaceListItem({
 		<ContextMenuItem onSelect={handleToggleUnread}>
 			{isUnread ? (
 				<>
-					<LuEye className="size-4 mr-2" />
+					<LuEye className="size-4 mr-2" strokeWidth={STROKE_WIDTH} />
 					Mark as Read
 				</>
 			) : (
 				<>
-					<LuEyeOff className="size-4 mr-2" />
+					<LuEyeOff className="size-4 mr-2" strokeWidth={STROKE_WIDTH} />
 					Mark as Unread
 				</>
 			)}
