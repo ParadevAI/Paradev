@@ -39,6 +39,7 @@
 		"@radix-ui/react-dialog": "^1.1.15",
 		"@radix-ui/react-label": "^2.1.8",
 		"@sentry/electron": "^7.5.0",
+		"@superset/auth": "workspace:*",
 		"@superset/db": "workspace:*",
 		"@superset/local-db": "workspace:*",
 		"@superset/shared": "workspace:*",
@@ -122,7 +123,6 @@
 		"zustand": "^5.0.8"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^2.3.8",
 		"@superset/typescript": "workspace:*",
 		"@tailwindcss/vite": "^4.0.9",
 		"@types/better-sqlite3": "^7.6.13",
