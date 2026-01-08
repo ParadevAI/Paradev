@@ -1,6 +1,12 @@
 import os from "node:os";
 import * as pty from "node-pty";
 import { getShellArgs } from "../agent-setup";
+import { DataBatcher } from "../data-batcher";
+import {
+	containsClearScrollbackSequence,
+	extractContentAfterClear,
+} from "../terminal-escape-filter";
+import { HistoryReader, HistoryWriter } from "../terminal-history";
 import { buildTerminalEnv, FALLBACK_SHELL, getDefaultShell } from "./env";
 import type { InternalCreateSessionParams, TerminalSession } from "./types";
 
@@ -8,6 +14,31 @@ const DEFAULT_COLS = 80;
 const DEFAULT_ROWS = 24;
 /** Max time to wait for agent hooks before running initial commands */
 const AGENT_HOOKS_TIMEOUT_MS = 2000;
+
+export async function recoverScrollback(
+	existingScrollback: string | null,
+	workspaceId: string,
+	paneId: string,
+): Promise<{ scrollback: string; wasRecovered: boolean }> {
+	if (existingScrollback) {
+		return { scrollback: existingScrollback, wasRecovered: true };
+	}
+
+	const historyReader = new HistoryReader(workspaceId, paneId);
+	const history = await historyReader.read();
+
+	if (history.scrollback) {
+		// Keep only a reasonable amount of scrollback history
+		const MAX_SCROLLBACK_CHARS = 500_000;
+		const scrollback =
+			history.scrollback.length > MAX_SCROLLBACK_CHARS
+				? history.scrollback.slice(-MAX_SCROLLBACK_CHARS)
+				: history.scrollback;
+		return { scrollback, wasRecovered: true };
+	}
+
+	return { scrollback: "", wasRecovered: false };
+}
 
 function spawnPty(params: {
 	shell: string;
@@ -42,6 +73,7 @@ export async function createSession(
 		cwd,
 		cols,
 		rows,
+		existingScrollback,
 		useFallbackShell = false,
 	} = params;
 
@@ -60,6 +92,9 @@ export async function createSession(
 		rootPath,
 	});
 
+	const { scrollback: recoveredScrollback, wasRecovered } =
+		await recoverScrollback(existingScrollback, workspaceId, paneId);
+
 	const ptyProcess = spawnPty({
 		shell,
 		cols: terminalCols,
@@ -68,7 +103,20 @@ export async function createSession(
 		env,
 	});
 
-	const session: TerminalSession = {
+	const historyWriter = new HistoryWriter(
+		workspaceId,
+		paneId,
+		workingDir,
+		terminalCols,
+		terminalRows,
+	);
+	await historyWriter.init(recoveredScrollback || undefined);
+
+	const dataBatcher = new DataBatcher((batchedData) => {
+		onData(paneId, batchedData);
+	});
+
+	return {
 		pty: ptyProcess,
 		paneId,
 		workspaceId,
@@ -76,54 +124,107 @@ export async function createSession(
 		cols: terminalCols,
 		rows: terminalRows,
 		lastActive: Date.now(),
+		scrollback: recoveredScrollback,
 		isAlive: true,
+		wasRecovered,
+		historyWriter,
+		dataBatcher,
 		shell,
 		startTime: Date.now(),
 		usedFallback: useFallbackShell,
 	};
-
-	ptyProcess.onData((data) => {
-		onData(paneId, data);
-	});
-
-	return session;
 }
 
-/**
- * Set up initial commands to run after shell prompt is ready.
- * Commands are only sent for new sessions (not reattachments).
- */
-export function setupInitialCommands(
+export function setupDataHandler(
 	session: TerminalSession,
 	initialCommands: string[] | undefined,
+	wasRecovered: boolean,
+	onHistoryReinit: () => Promise<void>,
 	beforeInitialCommands?: Promise<void>,
 ): void {
-	if (!initialCommands || initialCommands.length === 0) {
+	const initialCommandString =
+		!wasRecovered && initialCommands && initialCommands.length > 0
+			? `${initialCommands.join(" && ")}\n`
+			: null;
+	let commandsSent = false;
+
+	session.pty.onData((data) => {
+		let dataToStore = data;
+
+		if (containsClearScrollbackSequence(data)) {
+			session.scrollback = "";
+			onHistoryReinit().catch(() => {});
+			dataToStore = extractContentAfterClear(data);
+		}
+
+		session.scrollback += dataToStore;
+		session.historyWriter?.write(dataToStore);
+
+		session.dataBatcher.write(data);
+
+		if (initialCommandString && !commandsSent) {
+			commandsSent = true;
+			setTimeout(() => {
+				if (session.isAlive) {
+					void (async () => {
+						if (beforeInitialCommands) {
+							const timeout = new Promise<void>((resolve) =>
+								setTimeout(resolve, AGENT_HOOKS_TIMEOUT_MS),
+							);
+							await Promise.race([beforeInitialCommands, timeout]).catch(
+								() => {},
+							);
+						}
+
+						if (session.isAlive) {
+							session.pty.write(initialCommandString);
+						}
+					})();
+				}
+			}, 100);
+		}
+	});
+}
+
+export async function closeSessionHistory(
+	session: TerminalSession,
+	exitCode?: number,
+): Promise<void> {
+	if (session.deleteHistoryOnExit) {
+		if (session.historyWriter) {
+			await session.historyWriter.close();
+			session.historyWriter = undefined;
+		}
+		const historyReader = new HistoryReader(
+			session.workspaceId,
+			session.paneId,
+		);
+		await historyReader.cleanup();
 		return;
 	}
 
-	const initialCommandString = `${initialCommands.join(" && ")}\n`;
+	if (session.historyWriter) {
+		await session.historyWriter.close(exitCode);
+		session.historyWriter = undefined;
+	}
+}
 
-	const dataHandler = session.pty.onData(() => {
-		dataHandler.dispose();
+export async function reinitializeHistory(
+	session: TerminalSession,
+): Promise<void> {
+	if (session.historyWriter) {
+		await session.historyWriter.close();
+		session.historyWriter = new HistoryWriter(
+			session.workspaceId,
+			session.paneId,
+			session.cwd,
+			session.cols,
+			session.rows,
+		);
+		await session.historyWriter.init();
+	}
+}
 
-		setTimeout(() => {
-			if (session.isAlive) {
-				void (async () => {
-					if (beforeInitialCommands) {
-						const timeout = new Promise<void>((resolve) =>
-							setTimeout(resolve, AGENT_HOOKS_TIMEOUT_MS),
-						);
-						await Promise.race([beforeInitialCommands, timeout]).catch(
-							() => {},
-						);
-					}
-
-					if (session.isAlive) {
-						session.pty.write(initialCommandString);
-					}
-				})();
-			}
-		}, 100);
-	});
+export function flushSession(session: TerminalSession): void {
+	session.dataBatcher.dispose();
 }
