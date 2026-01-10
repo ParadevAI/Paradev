@@ -1,6 +1,9 @@
+import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
+import { useFeatureFlagEnabled } from "posthog-js/react";
 import { useState } from "react";
+import { HiOutlineClipboardDocumentList } from "react-icons/hi2";
 import {
 	LuLayers,
 	LuPanelLeft,
@@ -11,10 +14,12 @@ import { useWorkspaceSidebarStore } from "renderer/stores";
 import {
 	useCloseWorkspacesList,
 	useCurrentView,
+	useOpenTasks,
 	useOpenWorkspacesList,
 } from "renderer/stores/app-state";
 import { STROKE_WIDTH, STROKE_WIDTH_THIN } from "../constants";
 import { NewWorkspaceButton } from "./NewWorkspaceButton";
+import { OrganizationDropdown } from "./OrganizationDropdown";
 
 interface WorkspaceSidebarHeaderProps {
 	isCollapsed?: boolean;
@@ -26,10 +31,15 @@ export function WorkspaceSidebarHeader({
 	const currentView = useCurrentView();
 	const openWorkspacesList = useOpenWorkspacesList();
 	const closeWorkspacesList = useCloseWorkspacesList();
+	const openTasks = useOpenTasks();
 	const { toggleCollapsed } = useWorkspaceSidebarStore();
 	const [isHovering, setIsHovering] = useState(false);
+	const hasTasksAccess = useFeatureFlagEnabled(
+		FEATURE_FLAGS.ELECTRIC_TASKS_ACCESS,
+	);
 
 	const isWorkspacesListOpen = currentView === "workspaces-list";
+	const isTasksOpen = currentView === "tasks";
 
 	const handleClick = () => {
 		if (isWorkspacesListOpen) {
@@ -43,17 +53,14 @@ export function WorkspaceSidebarHeader({
 		toggleCollapsed();
 	};
 
-	// Determine which icon to show based on collapsed state and hover
 	const getToggleIcon = () => {
 		if (isCollapsed) {
-			// Collapsed: show panel-left normally, panel-left-open on hover
 			return isHovering ? (
 				<LuPanelLeftOpen className="size-4" strokeWidth={STROKE_WIDTH_THIN} />
 			) : (
 				<LuPanelLeft className="size-4" strokeWidth={STROKE_WIDTH_THIN} />
 			);
 		}
-		// Open: show panel-left normally, panel-left-close on hover
 		return isHovering ? (
 			<LuPanelLeftClose className="size-4" strokeWidth={STROKE_WIDTH_THIN} />
 		) : (
@@ -64,7 +71,6 @@ export function WorkspaceSidebarHeader({
 	if (isCollapsed) {
 		return (
 			<div className="flex flex-col items-center border-b border-border py-2 gap-2">
-				{/* Toggle sidebar button */}
 				<Tooltip delayDuration={300}>
 					<TooltipTrigger asChild>
 						<button
@@ -80,7 +86,8 @@ export function WorkspaceSidebarHeader({
 					<TooltipContent side="right">Toggle sidebar</TooltipContent>
 				</Tooltip>
 
-				{/* Workspaces button */}
+				<OrganizationDropdown isCollapsed />
+
 				<Tooltip delayDuration={300}>
 					<TooltipTrigger asChild>
 						<button
@@ -99,6 +106,29 @@ export function WorkspaceSidebarHeader({
 					<TooltipContent side="right">Workspaces</TooltipContent>
 				</Tooltip>
 
+				{hasTasksAccess && (
+					<Tooltip delayDuration={300}>
+						<TooltipTrigger asChild>
+							<button
+								type="button"
+								onClick={() => openTasks()}
+								className={cn(
+									"flex items-center justify-center size-8 rounded-md transition-colors",
+									isTasksOpen
+										? "text-foreground bg-accent"
+										: "text-muted-foreground hover:text-foreground hover:bg-accent/50",
+								)}
+							>
+								<HiOutlineClipboardDocumentList
+									className="size-4"
+									strokeWidth={STROKE_WIDTH}
+								/>
+							</button>
+						</TooltipTrigger>
+						<TooltipContent side="right">Tasks</TooltipContent>
+					</Tooltip>
+				)}
+
 				<NewWorkspaceButton isCollapsed />
 			</div>
 		);
@@ -106,7 +136,6 @@ export function WorkspaceSidebarHeader({
 
 	return (
 		<div className="flex flex-col gap-1 border-b border-border px-2 pt-2 pb-2">
-			{/* Toggle sidebar button */}
 			<Tooltip delayDuration={300}>
 				<TooltipTrigger asChild>
 					<button
@@ -129,7 +158,8 @@ export function WorkspaceSidebarHeader({
 				<TooltipContent side="right">Toggle sidebar</TooltipContent>
 			</Tooltip>
 
-			{/* Workspaces button */}
+			<OrganizationDropdown />
+
 			<button
 				type="button"
 				onClick={handleClick}
@@ -145,6 +175,27 @@ export function WorkspaceSidebarHeader({
 				</div>
 				<span className="text-sm font-medium flex-1 text-left">Workspaces</span>
 			</button>
+
+			{hasTasksAccess && (
+				<button
+					type="button"
+					onClick={() => openTasks()}
+					className={cn(
+						"flex items-center gap-2 px-2 py-1.5 w-full rounded-md transition-colors",
+						isTasksOpen
+							? "text-foreground bg-accent"
+							: "text-muted-foreground hover:text-foreground hover:bg-accent/50",
+					)}
+				>
+					<div className="flex items-center justify-center size-5">
+						<HiOutlineClipboardDocumentList
+							className="size-4"
+							strokeWidth={STROKE_WIDTH}
+						/>
+					</div>
+					<span className="text-sm font-medium flex-1 text-left">Tasks</span>
+				</button>
+			)}
 
 			<NewWorkspaceButton />
 		</div>

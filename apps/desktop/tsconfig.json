@@ -10,7 +10,7 @@
 	},
 	"include": [
 		"./src",
-		"electron.vite.config.*",
+		"electron.vite.config.ts",
 		"electron-builder.ts",
 		"index.d.ts"
 	],
