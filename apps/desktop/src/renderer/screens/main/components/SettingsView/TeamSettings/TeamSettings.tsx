@@ -11,8 +11,8 @@ import {
 } from "@superset/ui/table";
 import { eq } from "@tanstack/db";
 import { useLiveQuery } from "@tanstack/react-db";
-import { useAuth } from "renderer/contexts/AuthProvider";
-import { useCollections } from "renderer/contexts/CollectionsProvider";
+import { useAuth } from "renderer/providers/AuthProvider";
+import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { InviteMemberButton } from "./components/InviteMemberButton";
 import { MemberActions } from "./components/MemberActions";
 
