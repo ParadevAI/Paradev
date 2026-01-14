@@ -25,12 +25,7 @@ import { parseCwd } from "./parseCwd";
 import { ScrollToBottomButton } from "./ScrollToBottomButton";
 import { TerminalSearch } from "./TerminalSearch";
 import type { TerminalProps, TerminalStreamEvent } from "./types";
-import {
-	getScrollOffsetFromBottom,
-	restoreScrollPosition,
-	shellEscapePaths,
-	smoothScrollToBottom,
-} from "./utils";
+import { shellEscapePaths, smoothScrollToBottom } from "./utils";
 
 export const Terminal = ({ tabId, workspaceId }: TerminalProps) => {
 	const paneId = tabId;
@@ -385,12 +380,9 @@ export const Terminal = ({ tabId, workspaceId }: TerminalProps) => {
 			wasRecovered: boolean;
 			isNew: boolean;
 			scrollback: string;
-			viewportY?: number;
 		}) => {
-			xterm.write(result.scrollback, () => {
-				updateCwdRef.current(result.scrollback);
-				restoreScrollPosition(xterm, result.viewportY);
-			});
+			xterm.write(result.scrollback);
+			updateCwdRef.current(result.scrollback);
 		};
 
 		const restartTerminal = () => {
@@ -569,10 +561,8 @@ export const Terminal = ({ tabId, workspaceId }: TerminalProps) => {
 			unregisterClearCallbackRef.current(paneId);
 			unregisterScrollToBottomCallbackRef.current(paneId);
 			debouncedSetTabAutoTitleRef.current?.cancel?.();
-			detachRef.current({
-				paneId,
-				viewportY: getScrollOffsetFromBottom(xterm),
-			});
+			// Detach instead of kill to keep PTY running for reattachment
+			detachRef.current({ paneId });
 			setSubscriptionEnabled(false);
 			xterm.dispose();
 			xtermRef.current = null;
