@@ -42,6 +42,7 @@ export function WorkspaceSidebar({
 						mainRepoPath={group.project.mainRepoPath}
 						workspaces={group.workspaces}
 						shortcutBaseIndex={projectShortcutIndices[index]}
+						index={index}
 						isCollapsed={isCollapsed}
 					/>
 				))}
