@@ -17,7 +17,11 @@ import { initAppState } from "./lib/app-state";
 import { setupAutoUpdater } from "./lib/auto-updater";
 import { localDb } from "./lib/local-db";
 import { ensureShellEnvVars } from "./lib/shell-env";
-import { terminalManager } from "./lib/terminal";
+import {
+	reconcileDaemonSessions,
+	shutdownOrphanedDaemon,
+} from "./lib/terminal";
+import { getWorkspaceRuntimeRegistry } from "./lib/workspace-runtime";
 import { MainWindow } from "./windows/main";
 
 // Initialize local SQLite database (runs migrations + legacy data migration on import)
@@ -172,7 +176,10 @@ app.on("before-quit", async (event) => {
 	quitState = "cleaning";
 
 	try {
-		await Promise.all([terminalManager.cleanup(), posthog?.shutdown()]);
+		await Promise.all([
+			getWorkspaceRuntimeRegistry().getDefault().terminal.cleanup(),
+			posthog?.shutdown(),
+		]);
 	} finally {
 		quitState = "ready-to-quit";
 		app.quit();
@@ -234,6 +241,14 @@ if (!gotTheLock) {
 		}
 
 		await initAppState();
+
+		// Clean up stale daemon sessions from previous app runs
+		// Must happen BEFORE renderer restore runs
+		await reconcileDaemonSessions();
+
+		// Shutdown orphaned daemon if persistence is disabled
+		// (cleans up daemon left from previous session with persistence enabled)
+		await shutdownOrphanedDaemon();
 
 		// Resolve shell environment before setting up agent hooks
 		// This ensures ZDOTDIR and PATH are available for terminal initialization

@@ -5,6 +5,7 @@ import {
 	HiOutlineBell,
 	HiOutlineCog6Tooth,
 	HiOutlineCommandLine,
+	HiOutlineComputerDesktop,
 	HiOutlinePaintBrush,
 	HiOutlineUser,
 	HiOutlineUserGroup,
@@ -17,7 +18,8 @@ type SettingsRoute =
 	| "/settings/ringtones"
 	| "/settings/keyboard"
 	| "/settings/presets"
-	| "/settings/behavior";
+	| "/settings/behavior"
+	| "/settings/terminal";
 
 const GENERAL_SECTIONS: {
 	id: SettingsRoute;
@@ -58,6 +60,11 @@ const GENERAL_SECTIONS: {
 		id: "/settings/behavior",
 		label: "Behavior",
 		icon: <HiOutlineAdjustmentsHorizontal className="h-4 w-4" />,
+	},
+	{
+		id: "/settings/terminal",
+		label: "Terminal",
+		icon: <HiOutlineComputerDesktop className="h-4 w-4" />,
 	},
 ];
 
