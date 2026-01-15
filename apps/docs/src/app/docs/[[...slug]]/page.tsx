@@ -6,6 +6,7 @@ import {
 } from "fumadocs-ui/layouts/docs/page";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { LLMCopyButton, ViewOptions } from "@/components/ai/page-actions";
 import { getPageImage, source } from "@/lib/source";
 import { getMDXComponents } from "@/mdx-components";
 
@@ -15,13 +16,33 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
 	if (!page) notFound();
 
 	const MDX = page.data.body;
+	const gitConfig = {
+		user: "superset-sh",
+		repo: "superset",
+		branch: "main",
+	};
 
 	return (
-		<DocsPage toc={page.data.toc} full={page.data.full}>
+		<DocsPage
+			toc={page.data.toc}
+			full={page.data.full}
+			tableOfContent={{
+				style: "clerk",
+			}}
+		>
 			<DocsTitle>{page.data.title}</DocsTitle>
-			<DocsDescription>{page.data.description}</DocsDescription>
+			<DocsDescription className="mb-0">
+				{page.data.description}
+			</DocsDescription>
+			<div className="flex flex-row gap-2 items-center border-b pb-6">
+				<LLMCopyButton markdownUrl={`${page.url}.mdx`} />
+				<ViewOptions
+					markdownUrl={`${page.url}.mdx`}
+					githubUrl={`https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/apps/docs/content/docs/${page.path}`}
+				/>
+			</div>
 			<DocsBody>
-				<MDX components={getMDXComponents({})} />
+				<MDX components={getMDXComponents()} />
 			</DocsBody>
 		</DocsPage>
 	);
