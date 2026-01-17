@@ -25,9 +25,10 @@ function SupersetLogo() {
 
 interface HeaderProps {
 	ctaButtons: React.ReactNode;
+	starCounter?: React.ReactNode;
 }
 
-export function Header({ ctaButtons }: HeaderProps) {
+export function Header({ ctaButtons, starCounter }: HeaderProps) {
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 
 	return (
@@ -53,7 +54,10 @@ export function Header({ ctaButtons }: HeaderProps) {
 						animate={{ opacity: 1, x: 0 }}
 						transition={{ duration: 0.3, delay: 0.1 }}
 					>
-						<SocialLinks />
+						<div className="flex items-center gap-2">
+							<SocialLinks />
+							{starCounter}
+						</div>
 						<div className="flex items-center gap-3">{ctaButtons}</div>
 					</motion.div>
 
@@ -87,7 +91,10 @@ export function Header({ ctaButtons }: HeaderProps) {
 							transition={{ duration: 0.2 }}
 						>
 							<div className="px-4 py-4 flex flex-col gap-4">
-								<SocialLinks className="justify-center" />
+								<div className="flex items-center justify-center gap-2">
+									<SocialLinks />
+									{starCounter}
+								</div>
 								<div className="flex flex-col gap-2">{ctaButtons}</div>
 							</div>
 						</motion.div>
