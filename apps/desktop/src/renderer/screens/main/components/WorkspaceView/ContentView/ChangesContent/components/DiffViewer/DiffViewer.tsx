@@ -75,6 +75,18 @@ export function DiffViewer({
 	const [isEditorMounted, setIsEditorMounted] = useState(false);
 	const hasScrolledToFirstDiffRef = useRef(false);
 
+	useEffect(() => {
+		if (!isMonacoReady) return;
+		if (!isEditorMounted) return;
+
+		requestAnimationFrame(() => {
+			const modifiedEditor = modifiedEditorRef.current;
+			if (modifiedEditor) {
+				modifiedEditor.layout();
+			}
+		});
+	}, [isMonacoReady, isEditorMounted]);
+
 	// biome-ignore lint/correctness/useExhaustiveDependencies: Reset on file change only
 	useEffect(() => {
 		hasScrolledToFirstDiffRef.current = false;

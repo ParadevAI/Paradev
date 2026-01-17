@@ -94,11 +94,7 @@ type CreateOrAttachResult = {
 	};
 };
 
-export const Terminal = ({
-	tabId,
-	workspaceId,
-	isTabVisible,
-}: TerminalProps) => {
+export const Terminal = ({ tabId, workspaceId }: TerminalProps) => {
 	const paneId = tabId;
 	// Use granular selectors to avoid re-renders when other panes change
 	const pane = useTabsStore((s) => s.panes[paneId]);
@@ -160,8 +156,6 @@ export const Terminal = ({
 	const initialThemeRef = useRef(terminalTheme);
 
 	const isFocused = focusedPaneId === paneId;
-	const isTabVisibleRef = useRef(isTabVisible);
-	isTabVisibleRef.current = isTabVisible;
 
 	// Gate streaming until initial state restoration is applied to avoid interleaving output.
 	const isStreamReadyRef = useRef(false);
@@ -972,16 +966,13 @@ export const Terminal = ({
 	}, [isFocused]);
 
 	useEffect(() => {
-		if (isFocused && isTabVisible && xtermRef.current) {
-			xtermRef.current.focus();
-		}
-	}, [isFocused, isTabVisible]);
+		const xterm = xtermRef.current;
+		if (!xterm) return;
 
-	useEffect(() => {
-		if (!isTabVisible && xtermRef.current) {
-			xtermRef.current.blur();
+		if (isFocused) {
+			xterm.focus();
 		}
-	}, [isTabVisible]);
+	}, [isFocused]);
 
 	useAppHotkey(
 		"FIND_IN_TERMINAL",
@@ -1124,9 +1115,6 @@ export const Terminal = ({
 			if (isRestoredModeRef.current || connectionErrorRef.current) {
 				return;
 			}
-			if (!isTabVisibleRef.current) {
-				return;
-			}
 			if (isExitedRef.current) {
 				if (!isFocusedRef.current || wasKilledByUserRef.current) {
 					return;
@@ -1143,9 +1131,6 @@ export const Terminal = ({
 		}) => {
 			// Don't treat overlay interactions as terminal typing.
 			if (isRestoredModeRef.current || connectionErrorRef.current) {
-				return;
-			}
-			if (!isTabVisibleRef.current) {
 				return;
 			}
 			const { domEvent } = event;
@@ -1197,7 +1182,7 @@ export const Terminal = ({
 
 		const cancelInitialAttach = scheduleTerminalAttach({
 			paneId,
-			priority: isTabVisible ? (isFocusedRef.current ? 0 : 1) : 2,
+			priority: isFocusedRef.current ? 0 : 1,
 			run: (done) => {
 				if (isTerminalKilledByUser(paneId)) {
 					wasKilledByUserRef.current = true;
@@ -1338,7 +1323,7 @@ export const Terminal = ({
 		};
 
 		const handleWrite = (data: string) => {
-			if (!isTabVisibleRef.current || isExitedRef.current) {
+			if (isExitedRef.current) {
 				return;
 			}
 			writeRef.current({ paneId, data });
