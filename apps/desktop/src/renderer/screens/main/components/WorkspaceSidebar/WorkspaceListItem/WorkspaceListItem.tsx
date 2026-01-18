@@ -1,4 +1,3 @@
-import { Button } from "@superset/ui/button";
 import {
 	ContextMenu,
 	ContextMenuContent,
@@ -118,6 +117,29 @@ export function WorkspaceListItem({
 			},
 		);
 
+	// Lazy-load local git changes on hover
+	const { data: localChanges } = electronTrpc.changes.getStatus.useQuery(
+		{ worktreePath },
+		{
+			enabled: hasHovered && type === "worktree" && !!worktreePath,
+			staleTime: GITHUB_STATUS_STALE_TIME,
+		},
+	);
+
+	// Calculate total local changes (staged + unstaged + untracked)
+	const localDiffStats = useMemo(() => {
+		if (!localChanges) return null;
+		const allFiles = [
+			...localChanges.staged,
+			...localChanges.unstaged,
+			...localChanges.untracked,
+		];
+		const additions = allFiles.reduce((sum, f) => sum + (f.additions || 0), 0);
+		const deletions = allFiles.reduce((sum, f) => sum + (f.deletions || 0), 0);
+		if (additions === 0 && deletions === 0) return null;
+		return { additions, deletions };
+	}, [localChanges]);
+
 	// Memoize workspace pane IDs to avoid recalculating on every render
 	const workspacePaneIds = useMemo(() => {
 		const workspaceTabs = tabs.filter((t) => t.workspaceId === id);
@@ -193,7 +215,13 @@ export function WorkspaceListItem({
 	});
 
 	const pr = githubStatus?.pr;
-	const showDiffStats = pr && (pr.additions > 0 || pr.deletions > 0);
+	// Show diff stats from PR if available, otherwise from local changes
+	const diffStats =
+		localDiffStats ||
+		(pr && (pr.additions > 0 || pr.deletions > 0)
+			? { additions: pr.additions, deletions: pr.deletions }
+			: null);
+	const showDiffStats = !!diffStats;
 
 	// Determine if we should show the branch subtitle
 	const showBranchSubtitle =
@@ -322,7 +350,7 @@ export function WorkspaceListItem({
 		>
 			{/* Active indicator - left border */}
 			{isActive && (
-				<div className="absolute left-0 top-1.5 bottom-1.5 w-0.5 bg-primary rounded-r" />
+				<div className="absolute left-0 top-0 bottom-0 w-0.5 bg-primary rounded-r" />
 			)}
 
 			{/* Icon with status indicator */}
@@ -333,12 +361,18 @@ export function WorkspaceListItem({
 							<AsciiSpinner className="text-base" />
 						) : isBranchWorkspace ? (
 							<LuFolder
-								className="size-4 text-muted-foreground"
+								className={cn(
+									"size-4 transition-colors",
+									isActive ? "text-foreground" : "text-muted-foreground",
+								)}
 								strokeWidth={STROKE_WIDTH}
 							/>
 						) : (
 							<LuFolderGit2
-								className="size-4 text-muted-foreground"
+								className={cn(
+									"size-4 transition-colors",
+									isActive ? "text-foreground" : "text-muted-foreground",
+								)}
 								strokeWidth={STROKE_WIDTH}
 							/>
 						)}
@@ -373,8 +407,8 @@ export function WorkspaceListItem({
 				</TooltipContent>
 			</Tooltip>
 
-			{/* Workspace name and optional branch */}
-			<div className="flex-1 min-w-0 mr-2">
+			{/* Content area */}
+			<div className="flex-1 min-w-0">
 				{rename.isRenaming ? (
 					<Input
 						ref={rename.inputRef}
@@ -391,70 +425,85 @@ export function WorkspaceListItem({
 						className="h-6 px-1 py-0 text-sm -ml-1"
 					/>
 				) : (
-					<div className="flex flex-col justify-center">
+					<div className="flex flex-col gap-0.5">
+						{/* Row 1: Title + actions */}
 						<div className="flex items-center gap-1.5">
 							<span
 								className={cn(
-									"truncate text-[13px] leading-tight",
+									"truncate text-[13px] leading-tight transition-colors flex-1",
 									isActive
 										? "text-foreground font-medium"
-										: "text-muted-foreground",
+										: "text-foreground/80",
 								)}
 							>
 								{name || branch}
 							</span>
-							{pr && (
-								<WorkspaceStatusBadge state={pr.state} prNumber={pr.number} />
+
+							{/* Keyboard shortcut */}
+							{shortcutIndex !== undefined &&
+								shortcutIndex < MAX_KEYBOARD_SHORTCUT_INDEX && (
+									<span className="text-[10px] text-muted-foreground/50 opacity-0 group-hover:opacity-100 transition-opacity font-mono tabular-nums shrink-0">
+										⌘{shortcutIndex + 1}
+									</span>
+								)}
+
+							{/* Branch switcher for branch workspaces */}
+							{isBranchWorkspace && (
+								<BranchSwitcher projectId={projectId} currentBranch={branch} />
 							)}
+
+							{/* Diff stats (transforms to X on hover) or close button for worktree workspaces */}
+							{!isBranchWorkspace &&
+								(showDiffStats && diffStats ? (
+									<WorkspaceDiffStats
+										additions={diffStats.additions}
+										deletions={diffStats.deletions}
+										isActive={isActive}
+										onClose={(e) => {
+											e.stopPropagation();
+											handleDeleteClick();
+										}}
+									/>
+								) : (
+									<Tooltip delayDuration={300}>
+										<TooltipTrigger asChild>
+											<button
+												type="button"
+												onClick={(e) => {
+													e.stopPropagation();
+													handleDeleteClick();
+												}}
+												className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-muted-foreground hover:text-foreground"
+												aria-label="Close workspace"
+											>
+												<HiMiniXMark className="size-3.5" />
+											</button>
+										</TooltipTrigger>
+										<TooltipContent side="top" sideOffset={4}>
+											Close workspace
+										</TooltipContent>
+									</Tooltip>
+								))}
 						</div>
-						{showBranchSubtitle && (
-							<span className="text-[11px] text-muted-foreground/70 truncate font-mono leading-tight mt-0.5">
-								{branch}
-							</span>
+
+						{/* Row 2: Git info (branch + PR badge) */}
+						{(showBranchSubtitle || pr) && (
+							<div className="flex items-center gap-2 text-[11px] w-full">
+								{showBranchSubtitle && (
+									<span className="text-muted-foreground/60 truncate font-mono leading-tight">
+										{branch}
+									</span>
+								)}
+								{pr && (
+									<WorkspaceStatusBadge
+										state={pr.state}
+										prNumber={pr.number}
+										className="ml-auto"
+									/>
+								)}
+							</div>
 						)}
 					</div>
-				)}
-			</div>
-
-			{/* Right side actions */}
-			<div className="flex items-center gap-1 shrink-0">
-				{/* Diff stats - always visible when available */}
-				{showDiffStats && (
-					<WorkspaceDiffStats
-						additions={pr.additions}
-						deletions={pr.deletions}
-					/>
-				)}
-
-				{/* Keyboard shortcut - visible on hover */}
-				{shortcutIndex !== undefined &&
-					shortcutIndex < MAX_KEYBOARD_SHORTCUT_INDEX && (
-						<span className="text-[10px] text-muted-foreground/60 opacity-0 group-hover:opacity-100 transition-opacity font-mono px-1">
-							⌘{shortcutIndex + 1}
-						</span>
-					)}
-
-				{/* Branch switcher for branch workspaces - at the end */}
-				{isBranchWorkspace && (
-					<BranchSwitcher projectId={projectId} currentBranch={branch} />
-				)}
-
-				{/* Close button for worktree workspaces */}
-				{!isBranchWorkspace && (
-					<Button
-						type="button"
-						variant="ghost"
-						size="icon"
-						onClick={handleDeleteClick}
-						className={cn(
-							"size-6 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity rounded-sm",
-							"hover:bg-muted-foreground/10",
-							isActive && "opacity-60",
-						)}
-						aria-label="Close or delete workspace"
-					>
-						<HiMiniXMark className="size-3.5 text-muted-foreground" />
-					</Button>
 				)}
 			</div>
 		</div>
