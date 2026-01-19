@@ -1,15 +1,19 @@
 import { cn } from "@superset/ui/utils";
 import { Link, useMatchRoute } from "@tanstack/react-router";
 import {
-	HiOutlineAdjustmentsHorizontal,
 	HiOutlineBell,
-	HiOutlineCog6Tooth,
 	HiOutlineCommandLine,
 	HiOutlineComputerDesktop,
 	HiOutlinePaintBrush,
+	HiOutlineSparkles,
 	HiOutlineUser,
 	HiOutlineUserGroup,
 } from "react-icons/hi2";
+import type { SettingsSection } from "renderer/stores/settings-state";
+
+interface GeneralSettingsProps {
+	matchCounts: Partial<Record<SettingsSection, number>> | null;
+}
 
 type SettingsRoute =
 	| "/settings/account"
@@ -17,59 +21,72 @@ type SettingsRoute =
 	| "/settings/appearance"
 	| "/settings/ringtones"
 	| "/settings/keyboard"
-	| "/settings/presets"
 	| "/settings/behavior"
 	| "/settings/terminal";
 
 const GENERAL_SECTIONS: {
 	id: SettingsRoute;
+	section: SettingsSection;
 	label: string;
 	icon: React.ReactNode;
 }[] = [
 	{
 		id: "/settings/account",
+		section: "account",
 		label: "Account",
 		icon: <HiOutlineUser className="h-4 w-4" />,
 	},
 	{
 		id: "/settings/team",
+		section: "team",
 		label: "Organization",
 		icon: <HiOutlineUserGroup className="h-4 w-4" />,
 	},
 	{
 		id: "/settings/appearance",
+		section: "appearance",
 		label: "Appearance",
 		icon: <HiOutlinePaintBrush className="h-4 w-4" />,
 	},
 	{
 		id: "/settings/ringtones",
-		label: "Ringtones",
+		section: "ringtones",
+		label: "Notifications",
 		icon: <HiOutlineBell className="h-4 w-4" />,
 	},
 	{
 		id: "/settings/keyboard",
-		label: "Keyboard Shortcuts",
+		section: "keyboard",
+		label: "Keyboard",
 		icon: <HiOutlineCommandLine className="h-4 w-4" />,
 	},
 	{
-		id: "/settings/presets",
-		label: "Presets",
-		icon: <HiOutlineCog6Tooth className="h-4 w-4" />,
-	},
-	{
 		id: "/settings/behavior",
-		label: "Behavior",
-		icon: <HiOutlineAdjustmentsHorizontal className="h-4 w-4" />,
+		section: "behavior",
+		label: "Features",
+		icon: <HiOutlineSparkles className="h-4 w-4" />,
 	},
 	{
 		id: "/settings/terminal",
+		section: "terminal",
 		label: "Terminal",
 		icon: <HiOutlineComputerDesktop className="h-4 w-4" />,
 	},
 ];
 
-export function GeneralSettings() {
+export function GeneralSettings({ matchCounts }: GeneralSettingsProps) {
 	const matchRoute = useMatchRoute();
+
+	// When searching, only show sections that have matches
+	const filteredSections = matchCounts
+		? GENERAL_SECTIONS.filter(
+				(section) => (matchCounts[section.section] ?? 0) > 0,
+			)
+		: GENERAL_SECTIONS;
+
+	if (filteredSections.length === 0) {
+		return null;
+	}
 
 	return (
 		<div className="mb-4">
@@ -77,8 +94,9 @@ export function GeneralSettings() {
 				General
 			</h2>
 			<nav className="flex flex-col gap-0.5">
-				{GENERAL_SECTIONS.map((section) => {
+				{filteredSections.map((section) => {
 					const isActive = matchRoute({ to: section.id });
+					const count = matchCounts?.[section.section];
 
 					return (
 						<Link
@@ -92,7 +110,12 @@ export function GeneralSettings() {
 							)}
 						>
 							{section.icon}
-							{section.label}
+							<span className="flex-1">{section.label}</span>
+							{count !== undefined && count > 0 && (
+								<span className="text-xs text-muted-foreground bg-accent/50 px-1.5 py-0.5 rounded">
+									{count}
+								</span>
+							)}
 						</Link>
 					);
 				})}

@@ -1,16 +1,31 @@
 import { cn } from "@superset/ui/utils";
 import { Link, useMatchRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { HiChevronDown, HiChevronRight } from "react-icons/hi2";
 import { electronTrpc } from "renderer/lib/electron-trpc";
+import { getMatchCountBySection } from "../settings-search";
 
-export function ProjectsSettings() {
+interface ProjectsSettingsProps {
+	searchQuery: string;
+}
+
+export function ProjectsSettings({ searchQuery }: ProjectsSettingsProps) {
 	const { data: groups = [] } =
 		electronTrpc.workspaces.getAllGrouped.useQuery();
 	const matchRoute = useMatchRoute();
 	const [expandedProjects, setExpandedProjects] = useState<Set<string>>(
 		new Set(),
 	);
+
+	// Check if project/workspace sections have matches during search
+	const matchCounts = useMemo(() => {
+		if (!searchQuery) return null;
+		return getMatchCountBySection(searchQuery);
+	}, [searchQuery]);
+
+	const hasProjectMatches = (matchCounts?.project ?? 0) > 0;
+	const hasWorkspaceMatches = (matchCounts?.workspace ?? 0) > 0;
+	const hasAnyMatches = hasProjectMatches || hasWorkspaceMatches;
 
 	// Expand all projects by default when groups are loaded
 	useEffect(() => {
@@ -31,6 +46,11 @@ export function ProjectsSettings() {
 		});
 	};
 
+	// Hide projects section when searching and no matches
+	if (searchQuery && !hasAnyMatches) {
+		return null;
+	}
+
 	if (groups.length === 0) {
 		return null;
 	}
@@ -39,6 +59,11 @@ export function ProjectsSettings() {
 		<div className="mb-4">
 			<h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 mb-2">
 				Projects
+				{searchQuery && hasAnyMatches && (
+					<span className="ml-2 text-xs bg-accent/50 px-1.5 py-0.5 rounded">
+						{(matchCounts?.project ?? 0) + (matchCounts?.workspace ?? 0)}
+					</span>
+				)}
 			</h2>
 			<nav className="flex flex-col gap-0.5">
 				{groups.map((group) => {
