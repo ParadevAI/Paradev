@@ -1,10 +1,11 @@
 import { db } from "@superset/db/client";
 import { members } from "@superset/db/schema";
+import type { sessions } from "@superset/db/schema/auth";
 import * as authSchema from "@superset/db/schema/auth";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { bearer, organization } from "better-auth/plugins";
-import { eq } from "drizzle-orm";
+import { bearer, customSession, organization } from "better-auth/plugins";
+import { and, eq } from "drizzle-orm";
 
 import { env } from "./env";
 
@@ -76,30 +77,39 @@ export const auth = betterAuth({
 				},
 			},
 		},
-		session: {
-			create: {
-				before: async (session) => {
-					// Set initial active organization when session is created
-					// This handles existing users who already have organizations
-					const membership = await db.query.members.findFirst({
-						where: eq(members.userId, session.userId),
-					});
-
-					return {
-						data: {
-							...session,
-							activeOrganizationId: membership?.organizationId,
-						},
-					};
-				},
-			},
-		},
 	},
 	plugins: [
 		organization({
 			creatorRole: "owner",
 		}),
 		bearer(),
+		customSession(async ({ user, session: baseSession }) => {
+			const session = baseSession as typeof sessions.$inferSelect;
+
+			let activeOrganizationId = session.activeOrganizationId;
+
+			const membership = await db.query.members.findFirst({
+				where: activeOrganizationId
+					? and(
+							eq(members.userId, session.userId),
+							eq(members.organizationId, activeOrganizationId),
+						)
+					: eq(members.userId, session.userId),
+			});
+
+			if (!activeOrganizationId && membership?.organizationId) {
+				activeOrganizationId = membership.organizationId;
+				await db
+					.update(authSchema.sessions)
+					.set({ activeOrganizationId })
+					.where(eq(authSchema.sessions.id, session.id));
+			}
+
+			return {
+				user,
+				session: { ...session, activeOrganizationId, role: membership?.role },
+			};
+		}),
 	],
 });
 

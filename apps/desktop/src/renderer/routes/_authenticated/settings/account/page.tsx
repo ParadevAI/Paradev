@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo } from "react";
-import { AccountSettings } from "renderer/screens/main/components/SettingsView/AccountSettings";
-import { getMatchingItemsForSection } from "renderer/screens/main/components/SettingsView/settings-search";
 import { useSettingsSearchQuery } from "renderer/stores/settings-state";
+import { getMatchingItemsForSection } from "../utils/settings-search";
+import { AccountSettings } from "./components/AccountSettings";
 
 export const Route = createFileRoute("/_authenticated/settings/account/")({
 	component: AccountSettingsPage,
