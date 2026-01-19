@@ -347,13 +347,6 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
-        },
-        "terminal_persistence": {
-          "name": "terminal_persistence",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
         }
       },
       "indexes": {},
