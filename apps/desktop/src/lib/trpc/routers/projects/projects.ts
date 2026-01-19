@@ -1,4 +1,4 @@
-import { existsSync } from "node:fs";
+import { existsSync, statSync } from "node:fs";
 import { access } from "node:fs/promises";
 import { basename, join } from "node:path";
 import {
@@ -429,6 +429,61 @@ export const createProjectsRouter = (getWindow: () => BrowserWindow | null) => {
 				project,
 			};
 		}),
+
+		openFromPath: publicProcedure
+			.input(z.object({ path: z.string() }))
+			.mutation(async ({ input }): Promise<OpenNewResult> => {
+				const selectedPath = input.path;
+
+				// Check if path exists
+				if (!existsSync(selectedPath)) {
+					return { canceled: false, error: "Path does not exist" };
+				}
+
+				// Check if path is a directory
+				try {
+					const stats = statSync(selectedPath);
+					if (!stats.isDirectory()) {
+						return {
+							canceled: false,
+							error: "Please drop a folder, not a file",
+						};
+					}
+				} catch {
+					return {
+						canceled: false,
+						error: "Could not access the dropped item",
+					};
+				}
+
+				let mainRepoPath: string;
+				try {
+					mainRepoPath = await getGitRoot(selectedPath);
+				} catch (_error) {
+					// Return a special response so the UI can offer to initialize git
+					return {
+						canceled: false,
+						needsGitInit: true,
+						selectedPath,
+					};
+				}
+
+				const defaultBranch = await getDefaultBranch(mainRepoPath);
+				const project = upsertProject(mainRepoPath, defaultBranch);
+
+				// Auto-create main workspace if it doesn't exist
+				await ensureMainWorkspace(project);
+
+				track("project_opened", {
+					project_id: project.id,
+					method: "drop",
+				});
+
+				return {
+					canceled: false,
+					project,
+				};
+			}),
 
 		initGitAndOpen: publicProcedure
 			.input(z.object({ path: z.string() }))
