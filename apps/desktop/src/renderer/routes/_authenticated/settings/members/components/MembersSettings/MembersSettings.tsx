@@ -24,7 +24,7 @@ import {
 	type SettingItemId,
 } from "../../../utils/settings-search";
 import type { TeamMember } from "../../types";
-import { InviteMemberButton } from "./components/InviteMemberButton";
+import { PendingInvitations } from "../PendingInvitations";
 import { MemberActions } from "./components/MemberActions";
 
 interface MembersSettingsProps {
@@ -39,10 +39,6 @@ export function MembersSettings({ visibleItems }: MembersSettingsProps) {
 
 	const showMembersList = isItemVisible(
 		SETTING_ITEM_ID.MEMBERS_LIST,
-		visibleItems,
-	);
-	const showInvite = isItemVisible(
-		SETTING_ITEM_ID.MEMBERS_INVITE,
 		visibleItems,
 	);
 
@@ -104,13 +100,20 @@ export function MembersSettings({ visibleItems }: MembersSettingsProps) {
 			</div>
 
 			<div className="flex-1 overflow-auto">
-				<div className="p-8">
+				<div className="p-8 space-y-12">
+					{currentUserRole && activeOrganizationId && activeOrg?.name && (
+						<div className="max-w-5xl">
+							<PendingInvitations
+								visibleItems={visibleItems}
+								currentUserRole={currentUserRole}
+								organizationId={activeOrganizationId}
+								organizationName={activeOrg.name}
+							/>
+						</div>
+					)}
+
 					<div className="max-w-5xl space-y-4">
-						{showInvite && (
-							<div className="flex justify-end">
-								<InviteMemberButton />
-							</div>
-						)}
+						<h3 className="text-lg font-semibold">Team Members</h3>
 
 						{showMembersList &&
 							(isLoading ? (

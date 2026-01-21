@@ -1,6 +1,9 @@
 import { db } from "@superset/db/client";
 import { members, organizations } from "@superset/db/schema";
-import { sessions as authSessions } from "@superset/db/schema/auth";
+import {
+	sessions as authSessions,
+	invitations,
+} from "@superset/db/schema/auth";
 import { canRemoveMember, type OrganizationRole } from "@superset/shared/auth";
 import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
 import { del, put } from "@vercel/blob";
@@ -48,6 +51,48 @@ export const organizationRouter = {
 				repositories: true,
 			},
 		});
+	}),
+
+	getInvitation: publicProcedure.input(z.uuid()).query(async ({ input }) => {
+		const invitation = await db.query.invitations.findFirst({
+			where: eq(invitations.id, input),
+			with: {
+				organization: true,
+				inviter: true,
+			},
+		});
+
+		if (!invitation) {
+			throw new TRPCError({
+				code: "NOT_FOUND",
+				message: "Invitation not found",
+			});
+		}
+
+		// Check if invitation is expired
+		const isExpired = new Date(invitation.expiresAt) < new Date();
+
+		return {
+			id: invitation.id,
+			email: invitation.email,
+			name: invitation.name,
+			role: invitation.role,
+			status: invitation.status,
+			expiresAt: invitation.expiresAt,
+			isExpired,
+			organization: {
+				id: invitation.organization.id,
+				name: invitation.organization.name,
+				slug: invitation.organization.slug,
+				logo: invitation.organization.logo,
+			},
+			inviter: {
+				id: invitation.inviter.id,
+				name: invitation.inviter.name,
+				email: invitation.inviter.email,
+				image: invitation.inviter.image,
+			},
+		};
 	}),
 
 	create: protectedProcedure
@@ -335,7 +380,7 @@ export const organizationRouter = {
 			await ctx.auth.api.removeMember({
 				body: {
 					organizationId: input.organizationId,
-					memberIdOrEmail: input.userId,
+					memberIdOrEmail: targetMember.id, // Use member ID, not user ID
 				},
 				headers: ctx.headers,
 			});
