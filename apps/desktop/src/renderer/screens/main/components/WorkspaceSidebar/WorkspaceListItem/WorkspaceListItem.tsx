@@ -18,7 +18,16 @@ import { useMatchRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useDrag, useDrop } from "react-dnd";
 import { HiMiniXMark } from "react-icons/hi2";
-import { LuEye, LuEyeOff, LuFolder, LuFolderGit2 } from "react-icons/lu";
+import {
+	LuCopy,
+	LuEye,
+	LuEyeOff,
+	LuFolder,
+	LuFolderGit2,
+	LuFolderOpen,
+	LuPencil,
+	LuX,
+} from "react-icons/lu";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import {
 	useReorderWorkspaces,
@@ -182,6 +191,17 @@ export function WorkspaceListItem({
 		setUnread.mutate({ id, isUnread: !isUnread });
 	};
 
+	const handleCopyPath = async () => {
+		if (worktreePath) {
+			try {
+				await navigator.clipboard.writeText(worktreePath);
+				toast.success("Path copied to clipboard");
+			} catch {
+				toast.error("Failed to copy path");
+			}
+		}
+	};
+
 	// Drag and drop
 	const [{ isDragging }, drag] = useDrag(
 		() => ({
@@ -300,7 +320,13 @@ export function WorkspaceListItem({
 							<ContextMenuTrigger asChild>{collapsedButton}</ContextMenuTrigger>
 						</HoverCardTrigger>
 						<ContextMenuContent>
+							<ContextMenuItem onSelect={handleCopyPath}>
+								<LuCopy className="size-4 mr-2" strokeWidth={STROKE_WIDTH} />
+								Copy Path
+							</ContextMenuItem>
+							<ContextMenuSeparator />
 							<ContextMenuItem onSelect={() => handleDeleteClick()}>
+								<LuX className="size-4 mr-2" strokeWidth={STROKE_WIDTH} />
 								Close Worktree
 							</ContextMenuItem>
 						</ContextMenuContent>
@@ -533,7 +559,15 @@ export function WorkspaceListItem({
 					<ContextMenuTrigger asChild>{content}</ContextMenuTrigger>
 					<ContextMenuContent>
 						<ContextMenuItem onSelect={handleOpenInFinder}>
+							<LuFolderOpen
+								className="size-4 mr-2"
+								strokeWidth={STROKE_WIDTH}
+							/>
 							Open in Finder
+						</ContextMenuItem>
+						<ContextMenuItem onSelect={handleCopyPath}>
+							<LuCopy className="size-4 mr-2" strokeWidth={STROKE_WIDTH} />
+							Copy Path
 						</ContextMenuItem>
 						<ContextMenuSeparator />
 						{unreadMenuItem}
@@ -562,11 +596,20 @@ export function WorkspaceListItem({
 					</HoverCardTrigger>
 					<ContextMenuContent>
 						<ContextMenuItem onSelect={rename.startRename}>
+							<LuPencil className="size-4 mr-2" strokeWidth={STROKE_WIDTH} />
 							Rename
 						</ContextMenuItem>
 						<ContextMenuSeparator />
 						<ContextMenuItem onSelect={handleOpenInFinder}>
+							<LuFolderOpen
+								className="size-4 mr-2"
+								strokeWidth={STROKE_WIDTH}
+							/>
 							Open in Finder
+						</ContextMenuItem>
+						<ContextMenuItem onSelect={handleCopyPath}>
+							<LuCopy className="size-4 mr-2" strokeWidth={STROKE_WIDTH} />
+							Copy Path
 						</ContextMenuItem>
 						<ContextMenuSeparator />
 						{unreadMenuItem}
