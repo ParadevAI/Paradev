@@ -28,29 +28,26 @@ import {
 	LuUndo2,
 } from "react-icons/lu";
 import { electronTrpc } from "renderer/lib/electron-trpc";
-import type { ChangedFile } from "shared/changes-types";
+import type { ChangeCategory, ChangedFile } from "shared/changes-types";
+import { createFileKey, useScrollContext } from "../../../../ChangesContent";
 import { getStatusColor, getStatusIndicator } from "../../utils";
 
 interface FileItemProps {
 	file: ChangedFile;
 	isSelected: boolean;
-	/** Single click - opens in preview mode */
 	onClick: () => void;
-	/** Double click - opens pinned (permanent) */
 	onDoubleClick?: () => void;
 	showStats?: boolean;
-	/** Number of level indentations (for tree view) */
 	level?: number;
-	/** Callback for staging the file (shown on hover for unstaged files) */
 	onStage?: () => void;
-	/** Callback for unstaging the file (shown on hover for staged files) */
 	onUnstage?: () => void;
-	/** Whether the action is currently pending */
 	isActioning?: boolean;
-	/** Worktree path for constructing absolute paths */
 	worktreePath?: string;
-	/** Callback for discarding changes */
 	onDiscard?: () => void;
+	category?: ChangeCategory;
+	commitHash?: string;
+	/** Expanded view uses scroll-sync highlighting; collapsed view uses selection highlighting */
+	isExpandedView?: boolean;
 }
 
 function LevelIndicators({ level }: { level: number }) {
@@ -82,8 +79,12 @@ export function FileItem({
 	isActioning = false,
 	worktreePath,
 	onDiscard,
+	category,
+	commitHash,
+	isExpandedView = false,
 }: FileItemProps) {
 	const [showDiscardDialog, setShowDiscardDialog] = useState(false);
+	const { activeFileKey } = useScrollContext();
 
 	const fileName = getFileName(file.path);
 	const statusBadgeColor = getStatusColor(file.status);
@@ -92,6 +93,10 @@ export function FileItem({
 		showStats && (file.additions > 0 || file.deletions > 0);
 	const hasIndent = level > 0;
 	const hasAction = onStage || onUnstage;
+
+	const isScrollSyncActive =
+		category && activeFileKey === createFileKey(file, category, commitHash);
+	const isHighlighted = isExpandedView ? isScrollSyncActive : isSelected;
 
 	const openInFinderMutation = electronTrpc.external.openInFinder.useMutation();
 	const openInEditorMutation =
@@ -144,7 +149,7 @@ export function FileItem({
 			className={cn(
 				"group w-full flex items-stretch gap-1 px-1.5 text-left rounded-sm",
 				"hover:bg-accent/50 cursor-pointer transition-colors overflow-hidden",
-				isSelected && "bg-accent",
+				isHighlighted && "bg-accent",
 			)}
 		>
 			{hasIndent && <LevelIndicators level={level} />}

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { ChangedFile } from "shared/changes-types";
+import type { ChangeCategory, ChangedFile } from "shared/changes-types";
 import { FileItem } from "../FileItem";
 import { FolderRow } from "../FolderRow";
 
@@ -7,9 +7,7 @@ interface FileListTreeProps {
 	files: ChangedFile[];
 	selectedFile: ChangedFile | null;
 	selectedCommitHash: string | null;
-	/** Single click - opens in preview mode */
 	onFileSelect: (file: ChangedFile) => void;
-	/** Double click - opens pinned (permanent) */
 	onFileDoubleClick?: (file: ChangedFile) => void;
 	showStats?: boolean;
 	onStage?: (file: ChangedFile) => void;
@@ -17,6 +15,9 @@ interface FileListTreeProps {
 	isActioning?: boolean;
 	worktreePath?: string;
 	onDiscard?: (file: ChangedFile) => void;
+	category?: ChangeCategory;
+	commitHash?: string;
+	isExpandedView?: boolean;
 }
 
 interface FileTreeNode {
@@ -93,6 +94,9 @@ interface TreeNodeComponentProps {
 	isActioning?: boolean;
 	worktreePath?: string;
 	onDiscard?: (file: ChangedFile) => void;
+	category?: ChangeCategory;
+	commitHash?: string;
+	isExpandedView?: boolean;
 }
 
 function TreeNodeComponent({
@@ -108,6 +112,9 @@ function TreeNodeComponent({
 	isActioning,
 	worktreePath,
 	onDiscard,
+	category,
+	commitHash,
+	isExpandedView,
 }: TreeNodeComponentProps) {
 	const [isExpanded, setIsExpanded] = useState(true);
 	const hasChildren = node.children && node.children.length > 0;
@@ -138,6 +145,9 @@ function TreeNodeComponent({
 						isActioning={isActioning}
 						worktreePath={worktreePath}
 						onDiscard={onDiscard}
+						category={category}
+						commitHash={commitHash}
+						isExpandedView={isExpandedView}
 					/>
 				))}
 			</FolderRow>
@@ -161,6 +171,9 @@ function TreeNodeComponent({
 				isActioning={isActioning}
 				worktreePath={worktreePath}
 				onDiscard={onDiscard ? () => onDiscard(file) : undefined}
+				category={category}
+				commitHash={commitHash}
+				isExpandedView={isExpandedView}
 			/>
 		);
 	}
@@ -180,6 +193,9 @@ export function FileListTree({
 	isActioning,
 	worktreePath,
 	onDiscard,
+	category,
+	commitHash,
+	isExpandedView,
 }: FileListTreeProps) {
 	const tree = buildFileTree(files);
 
@@ -199,6 +215,9 @@ export function FileListTree({
 					isActioning={isActioning}
 					worktreePath={worktreePath}
 					onDiscard={onDiscard}
+					category={category}
+					commitHash={commitHash}
+					isExpandedView={isExpandedView}
 				/>
 			))}
 		</div>

@@ -10,13 +10,11 @@ interface CommitItemProps {
 	onToggle: () => void;
 	selectedFile: ChangedFile | null;
 	selectedCommitHash: string | null;
-	/** Single click - opens in preview mode */
 	onFileSelect: (file: ChangedFile, commitHash: string) => void;
-	/** Double click - opens pinned (permanent) */
 	onFileDoubleClick?: (file: ChangedFile, commitHash: string) => void;
 	viewMode: ChangesViewMode;
-	/** Worktree path for constructing absolute paths */
 	worktreePath?: string;
+	isExpandedView?: boolean;
 }
 
 function CommitHeader({
@@ -51,6 +49,7 @@ export function CommitItem({
 	onFileDoubleClick,
 	viewMode,
 	worktreePath,
+	isExpandedView,
 }: CommitItemProps) {
 	const hasFiles = commit.files.length > 0;
 
@@ -87,6 +86,9 @@ export function CommitItem({
 					onFileSelect={handleFileSelect}
 					onFileDoubleClick={handleFileDoubleClick}
 					worktreePath={worktreePath}
+					category="committed"
+					commitHash={commit.hash}
+					isExpandedView={isExpandedView}
 				/>
 			)}
 		</CollapsibleRow>

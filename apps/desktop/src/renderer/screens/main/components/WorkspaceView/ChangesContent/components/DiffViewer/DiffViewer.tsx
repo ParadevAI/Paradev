@@ -53,8 +53,9 @@ interface DiffViewerProps {
 	editable?: boolean;
 	onSave?: (content: string) => void;
 	onChange?: (content: string) => void;
-	// Optional context menu props - when provided, wraps editor with context menu
 	contextMenuProps?: DiffViewerContextMenuProps;
+	captureScroll?: boolean;
+	fitContent?: boolean;
 }
 
 export function DiffViewer({
@@ -66,6 +67,8 @@ export function DiffViewer({
 	onSave,
 	onChange,
 	contextMenuProps,
+	captureScroll = true,
+	fitContent = false,
 }: DiffViewerProps) {
 	const isMonacoReady = useMonacoReady();
 	const diffEditorRef = useRef<Monaco.editor.IStandaloneDiffEditor | null>(
@@ -75,7 +78,12 @@ export function DiffViewer({
 		null,
 	);
 	const [isEditorMounted, setIsEditorMounted] = useState(false);
+	const [isFocused, setIsFocused] = useState(false);
+	const [contentHeight, setContentHeight] = useState<number | null>(null);
 	const hasScrolledToFirstDiffRef = useRef(false);
+	const containerRef = useRef<HTMLDivElement>(null);
+
+	const contentSizeListenersRef = useRef<Monaco.IDisposable[]>([]);
 
 	useEffect(() => {
 		if (!isMonacoReady) return;
@@ -114,23 +122,79 @@ export function DiffViewer({
 
 			diffUpdateListenerRef.current?.dispose();
 			diffUpdateListenerRef.current = editor.onDidUpdateDiff(() => {
-				if (hasScrolledToFirstDiffRef.current) return;
-				scrollToFirstDiff(editor, modifiedEditor);
-				hasScrolledToFirstDiffRef.current = true;
+				if (!hasScrolledToFirstDiffRef.current) {
+					scrollToFirstDiff(editor, modifiedEditor);
+					hasScrolledToFirstDiffRef.current = true;
+				}
 			});
+
+			if (fitContent) {
+				contentSizeListenersRef.current.forEach((d) => {
+					d.dispose();
+				});
+				contentSizeListenersRef.current = [];
+
+				const updateHeight = () => {
+					const modHeight = modifiedEditor.getContentHeight();
+					const origHeight = originalEditor.getContentHeight();
+					setContentHeight(Math.max(modHeight, origHeight));
+				};
+
+				contentSizeListenersRef.current.push(
+					modifiedEditor.onDidContentSizeChange(updateHeight),
+					originalEditor.onDidContentSizeChange(updateHeight),
+				);
+
+				requestAnimationFrame(updateHeight);
+			}
 
 			setIsEditorMounted(true);
 		},
-		[filePath],
+		[filePath, fitContent],
 	);
 
-	// Cleanup diff update listener on unmount
 	useEffect(() => {
 		return () => {
 			diffUpdateListenerRef.current?.dispose();
 			diffUpdateListenerRef.current = null;
+			contentSizeListenersRef.current.forEach((d) => {
+				d.dispose();
+			});
+			contentSizeListenersRef.current = [];
 		};
 	}, []);
+
+	useEffect(() => {
+		if (captureScroll) return;
+		if (!isEditorMounted || !diffEditorRef.current) return;
+
+		const originalEditor = diffEditorRef.current.getOriginalEditor();
+		const modifiedEditor = diffEditorRef.current.getModifiedEditor();
+
+		const scrollOptions = {
+			scrollbar: { handleMouseWheel: isFocused },
+		};
+
+		originalEditor.updateOptions(scrollOptions);
+		modifiedEditor.updateOptions(scrollOptions);
+	}, [captureScroll, isEditorMounted, isFocused]);
+
+	const handleFocus = useCallback(() => {
+		if (!captureScroll) {
+			setIsFocused(true);
+		}
+	}, [captureScroll]);
+
+	const handleBlur = useCallback(
+		(e: React.FocusEvent) => {
+			if (!captureScroll && containerRef.current) {
+				if (!containerRef.current.contains(e.relatedTarget as Node)) {
+					setIsFocused(false);
+				}
+			}
+		},
+		[captureScroll],
+	);
 
 	// Update readOnly and register save action when editable changes or editor mounts
 	// Using addAction with an ID allows replacing the action on subsequent calls
@@ -187,10 +251,12 @@ export function DiffViewer({
 		);
 	}
 
+	const editorHeight = fitContent && contentHeight ? contentHeight : "100%";
+
 	const diffEditor = (
 		<DiffEditor
 			key={`${filePath}-${viewMode}-${hideUnchangedRegions}`}
-			height="100%"
+			height={editorHeight}
 			original={contents.original}
 			modified={contents.modified}
 			language={contents.language}
@@ -208,20 +274,36 @@ export function DiffViewer({
 				useInlineViewWhenSpaceIsLimited: false,
 				readOnly: !editable,
 				originalEditable: false,
-				renderOverviewRuler: true,
+				renderOverviewRuler: !fitContent,
 				renderGutterMenu: false,
 				diffWordWrap: "on",
 				contextmenu: !contextMenuProps, // Disable Monaco's context menu if we have custom props
 				hideUnchangedRegions: {
 					enabled: hideUnchangedRegions,
 				},
+				scrollbar: {
+					handleMouseWheel: captureScroll,
+					vertical: fitContent ? "hidden" : "auto",
+					horizontal: fitContent ? "hidden" : "auto",
+				},
+				scrollBeyondLastLine: !fitContent,
 			}}
 		/>
 	);
 
 	// If no context menu props, return plain editor
 	if (!contextMenuProps) {
-		return <div className="h-full w-full">{diffEditor}</div>;
+		return (
+			// biome-ignore lint/a11y/noStaticElementInteractions: focus/blur tracking for scroll behavior
+			<div
+				ref={containerRef}
+				className="h-full w-full"
+				onFocus={handleFocus}
+				onBlur={handleBlur}
+			>
+				{diffEditor}
+			</div>
+		);
 	}
 
 	// Wrap with custom context menu
@@ -237,7 +319,15 @@ export function DiffViewer({
 
 	return (
 		<EditorContextMenu editorActions={editorActions} paneActions={paneActions}>
-			<div className="h-full w-full">{diffEditor}</div>
+			{/* biome-ignore lint/a11y/noStaticElementInteractions: focus/blur tracking for scroll behavior */}
+			<div
+				ref={containerRef}
+				className="h-full w-full"
+				onFocus={handleFocus}
+				onBlur={handleBlur}
+			>
+				{diffEditor}
+			</div>
 		</EditorContextMenu>
 	);
 }

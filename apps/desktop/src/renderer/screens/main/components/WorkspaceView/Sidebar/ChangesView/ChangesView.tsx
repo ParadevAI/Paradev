@@ -24,23 +24,23 @@ import { CommitItem } from "./components/CommitItem";
 import { FileList } from "./components/FileList";
 
 interface ChangesViewProps {
-	/** Single click - opens in preview mode */
 	onFileOpen?: (
 		file: ChangedFile,
 		category: ChangeCategory,
 		commitHash?: string,
 	) => void;
-	/** Double click - opens pinned (permanent) */
 	onFileOpenPinned?: (
 		file: ChangedFile,
 		category: ChangeCategory,
 		commitHash?: string,
 	) => void;
+	isExpandedView?: boolean;
 }
 
 export function ChangesView({
 	onFileOpen,
 	onFileOpenPinned,
+	isExpandedView,
 }: ChangesViewProps) {
 	const { workspaceId } = useParams({ strict: false });
 	const { data: workspace } = electronTrpc.workspaces.get.useQuery(
@@ -401,6 +401,8 @@ export function ChangesView({
 								handleFileDoubleClick(file, "against-base")
 							}
 							worktreePath={worktreePath}
+							category="against-base"
+							isExpandedView={isExpandedView}
 						/>
 					</CategorySection>
 
@@ -422,6 +424,7 @@ export function ChangesView({
 								onFileDoubleClick={handleCommitFileDoubleClick}
 								viewMode={fileListViewMode}
 								worktreePath={worktreePath}
+								isExpandedView={isExpandedView}
 							/>
 						))}
 					</CategorySection>
@@ -487,6 +490,8 @@ export function ChangesView({
 							}
 							isActioning={unstageFileMutation.isPending}
 							worktreePath={worktreePath}
+							category="staged"
+							isExpandedView={isExpandedView}
 						/>
 					</CategorySection>
 
@@ -556,6 +561,8 @@ export function ChangesView({
 							}
 							worktreePath={worktreePath}
 							onDiscard={handleDiscard}
+							category="unstaged"
+							isExpandedView={isExpandedView}
 						/>
 					</CategorySection>
 				</div>

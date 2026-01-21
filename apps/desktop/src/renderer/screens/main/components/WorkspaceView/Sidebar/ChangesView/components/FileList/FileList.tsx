@@ -1,4 +1,4 @@
-import type { ChangedFile } from "shared/changes-types";
+import type { ChangeCategory, ChangedFile } from "shared/changes-types";
 import type { ChangesViewMode } from "../../types";
 import { FileListGrouped } from "./FileListGrouped";
 import { FileListTree } from "./FileListTree";
@@ -8,21 +8,17 @@ interface FileListProps {
 	viewMode: ChangesViewMode;
 	selectedFile: ChangedFile | null;
 	selectedCommitHash: string | null;
-	/** Single click - opens in preview mode */
 	onFileSelect: (file: ChangedFile) => void;
-	/** Double click - opens pinned (permanent) */
 	onFileDoubleClick?: (file: ChangedFile) => void;
 	showStats?: boolean;
-	/** Callback for staging a file */
 	onStage?: (file: ChangedFile) => void;
-	/** Callback for unstaging a file */
 	onUnstage?: (file: ChangedFile) => void;
-	/** Whether an action is currently pending */
 	isActioning?: boolean;
-	/** Worktree path for constructing absolute paths */
 	worktreePath?: string;
-	/** Callback for discarding changes */
 	onDiscard?: (file: ChangedFile) => void;
+	category?: ChangeCategory;
+	commitHash?: string;
+	isExpandedView?: boolean;
 }
 
 export function FileList({
@@ -38,6 +34,9 @@ export function FileList({
 	isActioning,
 	worktreePath,
 	onDiscard,
+	category,
+	commitHash,
+	isExpandedView,
 }: FileListProps) {
 	if (files.length === 0) {
 		return null;
@@ -57,11 +56,13 @@ export function FileList({
 				isActioning={isActioning}
 				worktreePath={worktreePath}
 				onDiscard={onDiscard}
+				category={category}
+				commitHash={commitHash}
+				isExpandedView={isExpandedView}
 			/>
 		);
 	}
 
-	// Grouped mode - group files by folder
 	return (
 		<FileListGrouped
 			files={files}
@@ -75,6 +76,9 @@ export function FileList({
 			isActioning={isActioning}
 			worktreePath={worktreePath}
 			onDiscard={onDiscard}
+			category={category}
+			commitHash={commitHash}
+			isExpandedView={isExpandedView}
 		/>
 	);
 }
