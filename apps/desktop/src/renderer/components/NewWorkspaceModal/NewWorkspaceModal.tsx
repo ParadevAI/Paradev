@@ -84,7 +84,7 @@ export function NewWorkspaceModal() {
 	);
 	const createWorkspace = useCreateWorkspace();
 
-	// Filter branches based on search
+	// Filter branches based on search (for base branch selector)
 	const filteredBranches = useMemo(() => {
 		if (!branchData?.branches) return [];
 		if (!branchSearch) return branchData.branches;
@@ -197,7 +197,7 @@ export function NewWorkspaceModal() {
 	return (
 		<Dialog modal open={isOpen} onOpenChange={(open) => !open && handleClose()}>
 			<DialogContent
-				className="sm:max-w-[380px] gap-0 p-0 overflow-hidden"
+				className="sm:max-w-[440px] gap-0 p-0 overflow-hidden"
 				onKeyDown={handleKeyDown}
 			>
 				<DialogHeader className="px-4 pt-4 pb-3">
@@ -333,6 +333,7 @@ export function NewWorkspaceModal() {
 													<Popover
 														open={baseBranchOpen}
 														onOpenChange={setBaseBranchOpen}
+														modal={false}
 													>
 														<PopoverTrigger asChild>
 															<Button
@@ -359,6 +360,7 @@ export function NewWorkspaceModal() {
 														<PopoverContent
 															className="w-[--radix-popover-trigger-width] p-0"
 															align="start"
+															onWheel={(e) => e.stopPropagation()}
 														>
 															<Command shouldFilter={false}>
 																<CommandInput
