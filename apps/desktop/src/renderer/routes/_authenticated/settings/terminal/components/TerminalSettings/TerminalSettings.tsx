@@ -1,4 +1,8 @@
-import type { TerminalLinkBehavior, TerminalPreset } from "@superset/local-db";
+import type {
+	ExecutionMode,
+	TerminalLinkBehavior,
+	TerminalPreset,
+} from "@superset/local-db";
 import {
 	AlertDialog,
 	AlertDialogContent,
@@ -20,7 +24,11 @@ import { toast } from "@superset/ui/sonner";
 import { Switch } from "@superset/ui/switch";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { HiOutlineCheck, HiOutlinePlus } from "react-icons/hi2";
+import {
+	HiOutlineCheck,
+	HiOutlinePlus,
+	HiOutlineQuestionMarkCircle,
+} from "react-icons/hi2";
 import {
 	getPresetIcon,
 	useIsDarkTheme,
@@ -216,6 +224,20 @@ export function TerminalSettings({ visibleItems }: TerminalSettingsProps) {
 		updatePreset.mutate({
 			id: preset.id,
 			patch: { commands: preset.commands },
+		});
+	};
+
+	const handleExecutionModeChange = (rowIndex: number, mode: ExecutionMode) => {
+		const preset = localPresets[rowIndex];
+		if (!preset) return;
+
+		setLocalPresets((prev) =>
+			prev.map((p, i) => (i === rowIndex ? { ...p, executionMode: mode } : p)),
+		);
+
+		updatePreset.mutate({
+			id: preset.id,
+			patch: { executionMode: mode },
 		});
 	};
 
@@ -423,7 +445,7 @@ export function TerminalSettings({ visibleItems }: TerminalSettingsProps) {
 	};
 
 	return (
-		<div className="p-6 max-w-6xl w-full">
+		<div className="p-6 max-w-7xl w-full">
 			<div className="mb-8">
 				<h2 className="text-xl font-semibold">Terminal</h2>
 				<p className="text-sm text-muted-foreground mt-1">
@@ -508,6 +530,25 @@ export function TerminalSettings({ visibleItems }: TerminalSettingsProps) {
 											{column.label}
 										</div>
 									))}
+									<Tooltip>
+										<TooltipTrigger asChild>
+											<div className="w-28 text-xs font-medium text-muted-foreground uppercase tracking-wider shrink-0 cursor-help flex items-center gap-1">
+												Mode
+												<HiOutlineQuestionMarkCircle className="h-3.5 w-3.5" />
+											</div>
+										</TooltipTrigger>
+										<TooltipContent side="top" className="max-w-xs">
+											<p className="font-medium mb-1">Execution Mode</p>
+											<p className="text-xs">
+												<strong>Sequential:</strong> Commands run one after
+												another in a single terminal (joined with &&)
+											</p>
+											<p className="text-xs mt-1">
+												<strong>Parallel:</strong> Each command runs in its own
+												split pane within a single tab
+											</p>
+										</TooltipContent>
+									</Tooltip>
 									<div className="w-20 text-xs font-medium text-muted-foreground uppercase tracking-wider text-center shrink-0">
 										Actions
 									</div>
@@ -532,6 +573,7 @@ export function TerminalSettings({ visibleItems }: TerminalSettingsProps) {
 												onBlur={handleCellBlur}
 												onCommandsChange={handleCommandsChange}
 												onCommandsBlur={handleCommandsBlur}
+												onExecutionModeChange={handleExecutionModeChange}
 												onDelete={handleDeleteRow}
 												onSetDefault={handleSetDefault}
 											/>
