@@ -158,6 +158,47 @@ export const createSettingsRouter = () => {
 				return { success: true };
 			}),
 
+		reorderTerminalPresets: publicProcedure
+			.input(
+				z.object({
+					presetId: z.string(),
+					targetIndex: z.number().int().min(0),
+				}),
+			)
+			.mutation(({ input }) => {
+				const row = getSettings();
+				const presets = row.terminalPresets ?? [];
+
+				const currentIndex = presets.findIndex((p) => p.id === input.presetId);
+				if (currentIndex === -1) {
+					throw new TRPCError({
+						code: "NOT_FOUND",
+						message: "Preset not found",
+					});
+				}
+
+				if (input.targetIndex < 0 || input.targetIndex >= presets.length) {
+					throw new TRPCError({
+						code: "BAD_REQUEST",
+						message: "Invalid target index for reordering presets",
+					});
+				}
+
+				const [removed] = presets.splice(currentIndex, 1);
+				presets.splice(input.targetIndex, 0, removed);
+
+				localDb
+					.insert(settings)
+					.values({ id: 1, terminalPresets: presets })
+					.onConflictDoUpdate({
+						target: settings.id,
+						set: { terminalPresets: presets },
+					})
+					.run();
+
+				return { success: true };
+			}),
+
 		getDefaultPreset: publicProcedure.query(() => {
 			const row = getSettings();
 			const presets = row.terminalPresets ?? [];

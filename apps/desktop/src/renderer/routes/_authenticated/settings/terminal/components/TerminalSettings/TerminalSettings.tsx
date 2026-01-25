@@ -23,7 +23,7 @@ import {
 import { toast } from "@superset/ui/sonner";
 import { Switch } from "@superset/ui/switch";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
 	HiOutlineCheck,
 	HiOutlinePlus,
@@ -145,11 +145,17 @@ export function TerminalSettings({ visibleItems }: TerminalSettingsProps) {
 		updatePreset,
 		deletePreset,
 		setDefaultPreset,
+		reorderPresets,
 	} = usePresets();
 	const [localPresets, setLocalPresets] =
 		useState<TerminalPreset[]>(serverPresets);
 	const presetsContainerRef = useRef<HTMLDivElement>(null);
 	const prevPresetsCountRef = useRef(serverPresets.length);
+	const serverPresetsRef = useRef(serverPresets);
+
+	useEffect(() => {
+		serverPresetsRef.current = serverPresets;
+	}, [serverPresets]);
 
 	useEffect(() => {
 		setLocalPresets(serverPresets);
@@ -173,97 +179,159 @@ export function TerminalSettings({ visibleItems }: TerminalSettingsProps) {
 	const isTemplateAdded = (template: PresetTemplate) =>
 		existingPresetNames.has(template.preset.name);
 
-	const handleCellChange = (
-		rowIndex: number,
-		column: PresetColumnKey,
-		value: string,
-	) => {
-		setLocalPresets((prev) =>
-			prev.map((p, i) => (i === rowIndex ? { ...p, [column]: value } : p)),
-		);
-	};
+	const handleCellChange = useCallback(
+		(rowIndex: number, column: PresetColumnKey, value: string) => {
+			setLocalPresets((prev) =>
+				prev.map((p, i) => (i === rowIndex ? { ...p, [column]: value } : p)),
+			);
+		},
+		[],
+	);
 
-	const handleCellBlur = (rowIndex: number, column: PresetColumnKey) => {
-		const preset = localPresets[rowIndex];
-		const serverPreset = serverPresets[rowIndex];
-		if (!preset || !serverPreset) return;
-		if (preset[column] === serverPreset[column]) return;
+	const handleCellBlur = useCallback(
+		(rowIndex: number, column: PresetColumnKey) => {
+			setLocalPresets((currentLocal) => {
+				const preset = currentLocal[rowIndex];
+				if (!preset) return currentLocal;
+				const serverPreset = serverPresetsRef.current.find(
+					(p) => p.id === preset.id,
+				);
+				if (!serverPreset) return currentLocal;
+				if (preset[column] === serverPreset[column]) return currentLocal;
 
-		updatePreset.mutate({
-			id: preset.id,
-			patch: { [column]: preset[column] },
-		});
-	};
-
-	const handleCommandsChange = (rowIndex: number, commands: string[]) => {
-		const preset = localPresets[rowIndex];
-		const isDelete = preset && commands.length < preset.commands.length;
-
-		setLocalPresets((prev) =>
-			prev.map((p, i) => (i === rowIndex ? { ...p, commands } : p)),
-		);
-
-		// Save immediately on delete since onBlur won't have the updated state yet
-		if (isDelete) {
-			updatePreset.mutate({
-				id: preset.id,
-				patch: { commands },
+				updatePreset.mutate({
+					id: preset.id,
+					patch: { [column]: preset[column] },
+				});
+				return currentLocal;
 			});
-		}
-	};
+		},
+		[updatePreset],
+	);
 
-	const handleCommandsBlur = (rowIndex: number) => {
-		const preset = localPresets[rowIndex];
-		const serverPreset = serverPresets[rowIndex];
-		if (!preset || !serverPreset) return;
-		if (
-			JSON.stringify(preset.commands) === JSON.stringify(serverPreset.commands)
-		)
-			return;
+	const handleCommandsChange = useCallback(
+		(rowIndex: number, commands: string[]) => {
+			setLocalPresets((prev) => {
+				const preset = prev[rowIndex];
+				const isDelete = preset && commands.length < preset.commands.length;
+				const newPresets = prev.map((p, i) =>
+					i === rowIndex ? { ...p, commands } : p,
+				);
 
-		updatePreset.mutate({
-			id: preset.id,
-			patch: { commands: preset.commands },
-		});
-	};
+				// Save immediately on delete since onBlur won't have the updated state yet
+				if (isDelete && preset) {
+					updatePreset.mutate({
+						id: preset.id,
+						patch: { commands },
+					});
+				}
+				return newPresets;
+			});
+		},
+		[updatePreset],
+	);
 
-	const handleExecutionModeChange = (rowIndex: number, mode: ExecutionMode) => {
-		const preset = localPresets[rowIndex];
-		if (!preset) return;
+	const handleCommandsBlur = useCallback(
+		(rowIndex: number) => {
+			setLocalPresets((currentLocal) => {
+				const preset = currentLocal[rowIndex];
+				if (!preset) return currentLocal;
+				const serverPreset = serverPresetsRef.current.find(
+					(p) => p.id === preset.id,
+				);
+				if (!serverPreset) return currentLocal;
+				if (
+					JSON.stringify(preset.commands) ===
+					JSON.stringify(serverPreset.commands)
+				)
+					return currentLocal;
 
-		setLocalPresets((prev) =>
-			prev.map((p, i) => (i === rowIndex ? { ...p, executionMode: mode } : p)),
-		);
+				updatePreset.mutate({
+					id: preset.id,
+					patch: { commands: preset.commands },
+				});
+				return currentLocal;
+			});
+		},
+		[updatePreset],
+	);
 
-		updatePreset.mutate({
-			id: preset.id,
-			patch: { executionMode: mode },
-		});
-	};
+	const handleExecutionModeChange = useCallback(
+		(rowIndex: number, mode: ExecutionMode) => {
+			setLocalPresets((currentLocal) => {
+				const preset = currentLocal[rowIndex];
+				if (!preset) return currentLocal;
 
-	const handleAddRow = () => {
+				const newPresets = currentLocal.map((p, i) =>
+					i === rowIndex ? { ...p, executionMode: mode } : p,
+				);
+
+				updatePreset.mutate({
+					id: preset.id,
+					patch: { executionMode: mode },
+				});
+
+				return newPresets;
+			});
+		},
+		[updatePreset],
+	);
+
+	const handleAddRow = useCallback(() => {
 		createPreset.mutate({
 			name: "",
 			cwd: "",
 			commands: [""],
 		});
-	};
+	}, [createPreset]);
 
-	const handleAddTemplate = (template: PresetTemplate) => {
-		if (isTemplateAdded(template)) return;
-		createPreset.mutate(template.preset);
-	};
+	const handleAddTemplate = useCallback(
+		(template: PresetTemplate) => {
+			if (existingPresetNames.has(template.preset.name)) return;
+			createPreset.mutate(template.preset);
+		},
+		[createPreset, existingPresetNames],
+	);
 
-	const handleDeleteRow = (rowIndex: number) => {
-		const preset = localPresets[rowIndex];
-		if (!preset) return;
+	const handleDeleteRow = useCallback(
+		(rowIndex: number) => {
+			setLocalPresets((currentLocal) => {
+				const preset = currentLocal[rowIndex];
+				if (preset) {
+					deletePreset.mutate({ id: preset.id });
+				}
+				return currentLocal;
+			});
+		},
+		[deletePreset],
+	);
 
-		deletePreset.mutate({ id: preset.id });
-	};
+	const handleSetDefault = useCallback(
+		(presetId: string | null) => {
+			setDefaultPreset.mutate({ id: presetId });
+		},
+		[setDefaultPreset],
+	);
 
-	const handleSetDefault = (presetId: string | null) => {
-		setDefaultPreset.mutate({ id: presetId });
-	};
+	const handleLocalReorder = useCallback(
+		(fromIndex: number, toIndex: number) => {
+			setLocalPresets((prev) => {
+				const newPresets = [...prev];
+				const [removed] = newPresets.splice(fromIndex, 1);
+				newPresets.splice(toIndex, 0, removed);
+				return newPresets;
+			});
+		},
+		[],
+	);
+
+	const handlePersistReorder = useCallback(
+		(presetId: string, targetIndex: number) => {
+			reorderPresets.mutate({ presetId, targetIndex });
+		},
+		[reorderPresets],
+	);
+
 	const { data: terminalPersistence, isLoading } =
 		electronTrpc.settings.getTerminalPersistence.useQuery();
 
@@ -522,6 +590,7 @@ export function TerminalSettings({ visibleItems }: TerminalSettingsProps) {
 						{showPresets && (
 							<div className="rounded-lg border border-border overflow-hidden">
 								<div className="flex items-center gap-4 py-2 px-4 bg-accent/10 border-b border-border">
+									<div className="w-6 shrink-0" />
 									{PRESET_COLUMNS.map((column) => (
 										<div
 											key={column.key}
@@ -576,6 +645,8 @@ export function TerminalSettings({ visibleItems }: TerminalSettingsProps) {
 												onExecutionModeChange={handleExecutionModeChange}
 												onDelete={handleDeleteRow}
 												onSetDefault={handleSetDefault}
+												onLocalReorder={handleLocalReorder}
+												onPersistReorder={handlePersistReorder}
 											/>
 										))
 									) : (
