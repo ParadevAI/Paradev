@@ -40,6 +40,7 @@ import {
 	useNewWorkspaceModalOpen,
 	usePreSelectedProjectId,
 } from "renderer/stores/new-workspace-modal";
+import { ENABLE_CLOUD_WORKSPACES } from "shared/constants";
 import { sanitizeBranchName, sanitizeSegment } from "shared/utils/branch";
 import { ExistingWorktreesList } from "./components/ExistingWorktreesList";
 
@@ -299,17 +300,19 @@ export function NewWorkspaceModal() {
 								>
 									Existing
 								</button>
-								<button
-									type="button"
-									onClick={() => setMode("cloud")}
-									className={`flex-1 px-3 py-1 text-xs font-medium rounded-sm transition-colors ${
-										mode === "cloud"
-											? "bg-background text-foreground shadow-sm"
-											: "text-muted-foreground hover:text-foreground"
-									}`}
-								>
-									Cloud
-								</button>
+								{ENABLE_CLOUD_WORKSPACES && (
+									<button
+										type="button"
+										onClick={() => setMode("cloud")}
+										className={`flex-1 px-3 py-1 text-xs font-medium rounded-sm transition-colors ${
+											mode === "cloud"
+												? "bg-background text-foreground shadow-sm"
+												: "text-muted-foreground hover:text-foreground"
+										}`}
+									>
+										Cloud
+									</button>
+								)}
 							</div>
 						</div>
 
@@ -480,7 +483,7 @@ export function NewWorkspaceModal() {
 									onOpenSuccess={handleClose}
 								/>
 							)}
-							{mode === "cloud" && (
+							{ENABLE_CLOUD_WORKSPACES && mode === "cloud" && (
 								<div className="flex flex-col items-center justify-center py-8 text-center">
 									<div className="text-sm font-medium text-foreground mb-1">
 										Cloud Workspaces

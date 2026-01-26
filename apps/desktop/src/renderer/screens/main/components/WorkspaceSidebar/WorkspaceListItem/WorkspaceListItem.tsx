@@ -14,10 +14,15 @@ import { Input } from "@superset/ui/input";
 import { toast } from "@superset/ui/sonner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
+import { useQuery } from "@tanstack/react-query";
 import { useMatchRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useDrag, useDrop } from "react-dnd";
-import { HiMiniXMark } from "react-icons/hi2";
+import {
+	HiMiniXMark,
+	HiOutlineCloud,
+	HiOutlineExclamationTriangle,
+} from "react-icons/hi2";
 import {
 	LuCopy,
 	LuEye,
@@ -28,6 +33,7 @@ import {
 	LuPencil,
 	LuX,
 } from "react-icons/lu";
+import { apiTrpcClient } from "renderer/lib/api-trpc-client";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import {
 	useReorderWorkspaces,
@@ -39,6 +45,7 @@ import { StatusIndicator } from "renderer/screens/main/components/StatusIndicato
 import { useWorkspaceRename } from "renderer/screens/main/hooks/useWorkspaceRename";
 import { useTabsStore } from "renderer/stores/tabs/store";
 import { extractPaneIdsFromLayout } from "renderer/stores/tabs/utils";
+import { ENABLE_CLOUD_WORKSPACES } from "shared/constants";
 import { getHighestPriorityStatus } from "shared/tabs-types";
 import { STROKE_WIDTH } from "../constants";
 import {
@@ -69,6 +76,8 @@ interface WorkspaceListItemProps {
 	shortcutIndex?: number;
 	/** Whether the sidebar is in collapsed mode (icon-only view) */
 	isCollapsed?: boolean;
+	/** Cloud workspace ID if linked to cloud */
+	cloudWorkspaceId?: string | null;
 }
 
 export function WorkspaceListItem({
@@ -82,8 +91,20 @@ export function WorkspaceListItem({
 	index,
 	shortcutIndex,
 	isCollapsed = false,
+	cloudWorkspaceId,
 }: WorkspaceListItemProps) {
 	const isBranchWorkspace = type === "branch";
+
+	const { data: cloudWorkspace } = useQuery({
+		queryKey: ["cloudWorkspace", cloudWorkspaceId],
+		queryFn: () =>
+			apiTrpcClient.cloudWorkspace.byId.query(cloudWorkspaceId as string),
+		enabled: ENABLE_CLOUD_WORKSPACES && !!cloudWorkspaceId,
+		staleTime: 30_000,
+	});
+
+	const isCloudWorkspace = ENABLE_CLOUD_WORKSPACES && !!cloudWorkspaceId;
+	const isCloudDeleted = cloudWorkspace?.deletedAt != null;
 	const navigate = useNavigate();
 	const matchRoute = useMatchRoute();
 	const reorderWorkspaces = useReorderWorkspaces();
@@ -96,7 +117,6 @@ export function WorkspaceListItem({
 	);
 	const utils = electronTrpc.useUtils();
 
-	// Derive isActive from route
 	const isActive = !!matchRoute({
 		to: "/workspace/$workspaceId",
 		params: { workspaceId: id },
@@ -112,11 +132,9 @@ export function WorkspaceListItem({
 			toast.error(`Failed to update unread status: ${error.message}`),
 	});
 
-	// Shared delete logic
 	const { showDeleteDialog, setShowDeleteDialog, handleDeleteClick } =
 		useWorkspaceDeleteHandler();
 
-	// Lazy-load GitHub status on hover to avoid N+1 queries
 	const { data: githubStatus } =
 		electronTrpc.workspaces.getGitHubStatus.useQuery(
 			{ workspaceId: id },
@@ -126,7 +144,6 @@ export function WorkspaceListItem({
 			},
 		);
 
-	// Lazy-load local git changes on hover
 	const { data: localChanges } = electronTrpc.changes.getStatus.useQuery(
 		{ worktreePath },
 		{
@@ -135,7 +152,6 @@ export function WorkspaceListItem({
 		},
 	);
 
-	// Calculate total local changes (staged + unstaged + untracked)
 	const localDiffStats = useMemo(() => {
 		if (!localChanges) return null;
 		const allFiles = [
@@ -149,7 +165,6 @@ export function WorkspaceListItem({
 		return { additions, deletions };
 	}, [localChanges]);
 
-	// Memoize workspace pane IDs to avoid recalculating on every render
 	const workspacePaneIds = useMemo(() => {
 		const workspaceTabs = tabs.filter((t) => t.workspaceId === id);
 		return new Set(
@@ -157,9 +172,7 @@ export function WorkspaceListItem({
 		);
 	}, [tabs, id]);
 
-	// Compute aggregate status for workspace using shared priority logic
 	const workspaceStatus = useMemo(() => {
-		// Generator avoids array allocation
 		function* paneStatuses() {
 			for (const paneId of workspacePaneIds) {
 				yield panes[paneId]?.status;
@@ -202,7 +215,6 @@ export function WorkspaceListItem({
 		}
 	};
 
-	// Drag and drop
 	const [{ isDragging }, drag] = useDrag(
 		() => ({
 			type: WORKSPACE_TYPE,
@@ -235,18 +247,14 @@ export function WorkspaceListItem({
 	});
 
 	const pr = githubStatus?.pr;
-	// Show diff stats from PR if available, otherwise from local changes
 	const diffStats =
 		localDiffStats ||
 		(pr && (pr.additions > 0 || pr.deletions > 0)
 			? { additions: pr.additions, deletions: pr.deletions }
 			: null);
 	const showDiffStats = !!diffStats;
-
-	// Determine if we should show the branch subtitle
 	const showBranchSubtitle = !isBranchWorkspace;
 
-	// Collapsed sidebar: show just the icon with hover card (worktree) or tooltip (branch)
 	if (isCollapsed) {
 		const collapsedButton = (
 			<button
@@ -261,6 +269,17 @@ export function WorkspaceListItem({
 			>
 				{workspaceStatus === "working" ? (
 					<AsciiSpinner className="text-base" />
+				) : isCloudWorkspace && isCloudDeleted ? (
+					<HiOutlineExclamationTriangle
+						className={cn("size-4 text-destructive")}
+					/>
+				) : isCloudWorkspace ? (
+					<HiOutlineCloud
+						className={cn(
+							"size-4",
+							isActive ? "text-foreground" : "text-muted-foreground",
+						)}
+					/>
 				) : isBranchWorkspace ? (
 					<LuFolder
 						className={cn(
@@ -278,13 +297,11 @@ export function WorkspaceListItem({
 						strokeWidth={STROKE_WIDTH}
 					/>
 				)}
-				{/* Status indicator - only show for non-working statuses */}
 				{workspaceStatus && workspaceStatus !== "working" && (
 					<span className="absolute top-1 right-1">
 						<StatusIndicator status={workspaceStatus} />
 					</span>
 				)}
-				{/* Unread dot (only when no status) */}
 				{isUnread && !workspaceStatus && (
 					<span className="absolute top-1 right-1 flex size-2">
 						<span className="relative inline-flex size-2 rounded-full bg-blue-500" />
@@ -293,22 +310,29 @@ export function WorkspaceListItem({
 			</button>
 		);
 
-		// Branch workspaces get a simple tooltip
-		if (isBranchWorkspace) {
+		if (isBranchWorkspace || isCloudWorkspace) {
 			return (
 				<Tooltip delayDuration={300}>
 					<TooltipTrigger asChild>{collapsedButton}</TooltipTrigger>
 					<TooltipContent side="right" className="flex flex-col gap-0.5">
 						<span className="font-medium">{name || branch}</span>
-						<span className="text-xs text-muted-foreground">
-							Local workspace
+						<span
+							className={cn(
+								"text-xs",
+								isCloudDeleted ? "text-destructive" : "text-muted-foreground",
+							)}
+						>
+							{isCloudDeleted
+								? "Cloud workspace deleted"
+								: isCloudWorkspace
+									? "Cloud workspace"
+									: "Local workspace"}
 						</span>
 					</TooltipContent>
 				</Tooltip>
 			);
 		}
 
-		// Worktree workspaces get the full hover card with context menu
 		return (
 			<>
 				<HoverCard
@@ -373,17 +397,26 @@ export function WorkspaceListItem({
 			)}
 			style={{ cursor: isDragging ? "grabbing" : "pointer" }}
 		>
-			{/* Active indicator - left border */}
 			{isActive && (
 				<div className="absolute left-0 top-0 bottom-0 w-0.5 bg-primary rounded-r" />
 			)}
 
-			{/* Icon with status indicator */}
 			<Tooltip delayDuration={500}>
 				<TooltipTrigger asChild>
 					<div className="relative shrink-0 size-5 flex items-center justify-center mr-2.5">
 						{workspaceStatus === "working" ? (
 							<AsciiSpinner className="text-base" />
+						) : isCloudWorkspace && isCloudDeleted ? (
+							<HiOutlineExclamationTriangle
+								className={cn("size-4 transition-colors text-destructive")}
+							/>
+						) : isCloudWorkspace ? (
+							<HiOutlineCloud
+								className={cn(
+									"size-4 transition-colors",
+									isActive ? "text-foreground" : "text-muted-foreground",
+								)}
+							/>
 						) : isBranchWorkspace ? (
 							<LuFolder
 								className={cn(
@@ -414,7 +447,23 @@ export function WorkspaceListItem({
 					</div>
 				</TooltipTrigger>
 				<TooltipContent side="right" sideOffset={8}>
-					{isBranchWorkspace ? (
+					{isCloudWorkspace && isCloudDeleted ? (
+						<>
+							<p className="text-xs font-medium text-destructive">
+								Cloud workspace deleted
+							</p>
+							<p className="text-xs text-muted-foreground">
+								The linked cloud workspace was deleted
+							</p>
+						</>
+					) : isCloudWorkspace ? (
+						<>
+							<p className="text-xs font-medium">Cloud workspace</p>
+							<p className="text-xs text-muted-foreground">
+								Linked to cloud for remote access
+							</p>
+						</>
+					) : isBranchWorkspace ? (
 						<>
 							<p className="text-xs font-medium">Local workspace</p>
 							<p className="text-xs text-muted-foreground">
@@ -432,7 +481,6 @@ export function WorkspaceListItem({
 				</TooltipContent>
 			</Tooltip>
 
-			{/* Content area */}
 			<div className="flex-1 min-w-0">
 				{rename.isRenaming ? (
 					<Input
@@ -451,7 +499,6 @@ export function WorkspaceListItem({
 					/>
 				) : (
 					<div className="flex flex-col gap-0.5">
-						{/* Row 1: Title + actions */}
 						<div className="flex items-center gap-1.5">
 							<span
 								className={cn(
@@ -464,7 +511,6 @@ export function WorkspaceListItem({
 								{name || branch}
 							</span>
 
-							{/* Keyboard shortcut */}
 							{shortcutIndex !== undefined &&
 								shortcutIndex < MAX_KEYBOARD_SHORTCUT_INDEX && (
 									<span className="text-[10px] text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity font-mono tabular-nums shrink-0">
@@ -472,12 +518,10 @@ export function WorkspaceListItem({
 									</span>
 								)}
 
-							{/* Branch switcher for branch workspaces */}
 							{isBranchWorkspace && (
 								<BranchSwitcher projectId={projectId} currentBranch={branch} />
 							)}
 
-							{/* Diff stats (transforms to X on hover) or close button for worktree workspaces */}
 							{!isBranchWorkspace &&
 								(showDiffStats && diffStats ? (
 									<WorkspaceDiffStats
@@ -511,7 +555,6 @@ export function WorkspaceListItem({
 								))}
 						</div>
 
-						{/* Row 2: Git info (branch + PR badge) */}
 						{(showBranchSubtitle || pr) && (
 							<div className="flex items-center gap-2 text-[11px] w-full">
 								{showBranchSubtitle && (
@@ -551,7 +594,6 @@ export function WorkspaceListItem({
 		</ContextMenuItem>
 	);
 
-	// Wrap with context menu and hover card
 	if (isBranchWorkspace) {
 		return (
 			<>
