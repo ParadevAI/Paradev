@@ -23,12 +23,15 @@ import {
 	generateBranchName,
 	getBranchWorktreePath,
 	getCurrentBranch,
+	getGitAuthorName,
 	getPrInfo,
 	getPrLocalBranchName,
 	listBranches,
 	type PullRequestInfo,
 	parsePrUrl,
 	safeCheckoutBranch,
+	sanitizeAuthorPrefix,
+	sanitizeBranchName,
 	worktreeExists,
 } from "../utils/git";
 import { loadSetupConfig } from "../utils/setup";
@@ -299,6 +302,18 @@ export const createCreateProcedures = () => {
 				const { local, remote } = await listBranches(project.mainRepoPath);
 				const existingBranches = [...local, ...remote];
 
+				const authorName = await getGitAuthorName(project.mainRepoPath);
+				const rawAuthorPrefix = authorName
+					? sanitizeAuthorPrefix(authorName)
+					: undefined;
+
+				const existingSet = new Set(
+					existingBranches.map((b) => b.toLowerCase()),
+				);
+				const prefixWouldCollide =
+					rawAuthorPrefix && existingSet.has(rawAuthorPrefix.toLowerCase());
+				const authorPrefix = prefixWouldCollide ? undefined : rawAuthorPrefix;
+
 				let branch: string;
 				if (existingBranchName) {
 					if (!existingBranches.includes(existingBranchName)) {
@@ -307,9 +322,10 @@ export const createCreateProcedures = () => {
 						);
 					}
 					branch = existingBranchName;
+				} else if (input.branchName?.trim()) {
+					branch = sanitizeBranchName(input.branchName);
 				} else {
-					branch =
-						input.branchName?.trim() || generateBranchName(existingBranches);
+					branch = generateBranchName({ existingBranches, authorPrefix });
 				}
 
 				const worktreePath = join(
