@@ -1,88 +1,64 @@
-import { createHash } from "node:crypto";
 import { db } from "@superset/db/client";
-import { apiKeys } from "@superset/db/schema";
-import { eq } from "drizzle-orm";
+import { members, subscriptions } from "@superset/db/schema";
+import { and, eq } from "drizzle-orm";
 
 export interface McpContext {
 	userId: string;
 	organizationId: string;
+	role: string | null;
+	plan: string | null;
 	defaultDeviceId: string | null;
 }
 
-function hashApiKey(key: string): string {
-	return createHash("sha256").update(key).digest("hex");
-}
+export async function buildMcpContext({
+	userId,
+	organizationId,
+}: {
+	userId: string;
+	organizationId: string;
+}): Promise<McpContext | null> {
+	const membership = await db.query.members.findFirst({
+		where: and(
+			eq(members.userId, userId),
+			eq(members.organizationId, organizationId),
+		),
+	});
 
-async function validateApiKey(key: string): Promise<McpContext | null> {
-	if (!key.startsWith("sk_live_")) {
+	if (!membership) {
+		console.error(
+			"[mcp/auth] User is not a member of organization:",
+			userId,
+			organizationId,
+		);
 		return null;
 	}
 
-	const keyHash = hashApiKey(key);
-
-	const [found] = await db
-		.select({
-			id: apiKeys.id,
-			userId: apiKeys.userId,
-			organizationId: apiKeys.organizationId,
-			defaultDeviceId: apiKeys.defaultDeviceId,
-			expiresAt: apiKeys.expiresAt,
-			revokedAt: apiKeys.revokedAt,
-		})
-		.from(apiKeys)
-		.where(eq(apiKeys.keyHash, keyHash))
-		.limit(1);
-
-	if (!found) {
-		return null;
-	}
-
-	if (found.revokedAt) {
-		return null;
-	}
-
-	if (found.expiresAt && found.expiresAt < new Date()) {
-		return null;
-	}
-
-	// Update last used timestamp (fire and forget)
-	db.update(apiKeys)
-		.set({ lastUsedAt: new Date() })
-		.where(eq(apiKeys.id, found.id))
-		.catch(() => {});
+	const subscription = await db.query.subscriptions.findFirst({
+		where: and(
+			eq(subscriptions.referenceId, organizationId),
+			eq(subscriptions.status, "active"),
+		),
+	});
 
 	return {
-		userId: found.userId,
-		organizationId: found.organizationId,
-		defaultDeviceId: found.defaultDeviceId,
+		userId,
+		organizationId: organizationId,
+		role: membership.role ?? null,
+		plan: subscription?.plan ?? null,
+		defaultDeviceId: null,
 	};
 }
 
-/**
- * Authenticate an MCP request using API key from header
- */
-export async function authenticateMcpRequest(
-	request: Request,
-): Promise<McpContext | null> {
-	const apiKey = request.headers.get("X-API-Key");
-
-	if (!apiKey) {
-		return null;
-	}
-
-	return validateApiKey(apiKey);
-}
-
-/**
- * Create an unauthorized JSON-RPC error response
- */
 export function createUnauthorizedResponse(): Response {
+	const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+	const resourceMetadataUrl = `${baseUrl}/.well-known/oauth-protected-resource`;
+
 	return new Response(
 		JSON.stringify({
 			jsonrpc: "2.0",
 			error: {
 				code: -32001,
-				message: "Unauthorized: Invalid or missing API key",
+				message: "Unauthorized: Invalid or missing credentials",
 			},
 			id: null,
 		}),
@@ -90,6 +66,7 @@ export function createUnauthorizedResponse(): Response {
 			status: 401,
 			headers: {
 				"Content-Type": "application/json",
+				"WWW-Authenticate": `Bearer resource_metadata="${resourceMetadataUrl}"`,
 			},
 		},
 	);

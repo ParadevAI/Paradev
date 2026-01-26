@@ -15,7 +15,13 @@ import { SubscriptionStartedEmail } from "@superset/email/emails/subscription-st
 import { canInvite, type OrganizationRole } from "@superset/shared/auth";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { bearer, customSession, organization } from "better-auth/plugins";
+import {
+	apiKey,
+	bearer,
+	customSession,
+	mcp,
+	organization,
+} from "better-auth/plugins";
 import { and, count, eq } from "drizzle-orm";
 import Stripe from "stripe";
 import { env } from "./env";
@@ -97,6 +103,20 @@ export const auth = betterAuth({
 		},
 	},
 	plugins: [
+		apiKey({
+			enableMetadata: true,
+			enableSessionForAPIKeys: true,
+			defaultPrefix: "sk_live_",
+		}),
+		mcp({
+			loginPage: `${env.NEXT_PUBLIC_WEB_URL}/sign-in`,
+			oidcConfig: {
+				loginPage: `${env.NEXT_PUBLIC_WEB_URL}/sign-in`,
+				consentPage: `${env.NEXT_PUBLIC_WEB_URL}/oauth/consent`,
+				accessTokenExpiresIn: 3600,
+				refreshTokenExpiresIn: 2592000,
+			},
+		}),
 		expo(),
 		organization({
 			creatorRole: "owner",
@@ -369,10 +389,10 @@ export const auth = betterAuth({
 			const membership = await db.query.members.findFirst({
 				where: activeOrganizationId
 					? and(
-							eq(members.userId, session.userId),
+							eq(members.userId, session.userId ?? user.id),
 							eq(members.organizationId, activeOrganizationId),
 						)
-					: eq(members.userId, session.userId),
+					: eq(members.userId, session.userId ?? user.id),
 			});
 
 			if (!activeOrganizationId && membership?.organizationId) {
