@@ -128,11 +128,16 @@ function ProjectPage() {
 
 	const handleCreateWorkspace = async () => {
 		const workspaceName = title.trim() || undefined;
+		const generatedBranchName = generateBranchFromTitle({
+			title,
+			authorPrefix,
+		});
 
 		try {
 			await createWorkspace.mutateAsync({
 				projectId,
 				name: workspaceName,
+				branchName: generatedBranchName || undefined,
 				baseBranch: effectiveBaseBranch || undefined,
 			});
 
