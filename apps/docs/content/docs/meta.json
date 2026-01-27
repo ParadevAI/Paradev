@@ -5,9 +5,20 @@
 		"quick-start",
 		"overview",
 		"installation",
+		"first-workspace",
 		"---Gauge Core Features---",
-		"core-features",
-		"---BookOpen How to Guides---",
-		"setup-teardown-scripts"
+		"workspaces",
+		"diff-viewer",
+		"terminal-integration",
+		"ports",
+		"agent-integration",
+		"---BookOpen Guides---",
+		"setup-teardown-scripts",
+		"use-with-ide",
+		"using-monorepos",
+		"keyboard-shortcuts",
+		"customization",
+		"---CircleHelp Help---",
+		"faq"
 	]
 }
