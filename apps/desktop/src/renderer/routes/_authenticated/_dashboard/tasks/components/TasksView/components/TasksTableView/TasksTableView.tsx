@@ -1,3 +1,4 @@
+import { cn } from "@superset/ui/utils";
 import { flexRender, type Table } from "@tanstack/react-table";
 import type { TaskWithStatus } from "../../hooks/useTasksTable";
 import { TaskContextMenu } from "./components/TaskContextMenu";
@@ -5,11 +6,13 @@ import { TaskContextMenu } from "./components/TaskContextMenu";
 interface TasksTableViewProps {
 	table: Table<TaskWithStatus>;
 	slugColumnWidth: string;
+	onTaskClick: (task: TaskWithStatus) => void;
 }
 
 export function TasksTableView({
 	table,
 	slugColumnWidth,
+	onTaskClick,
 }: TasksTableViewProps) {
 	return (
 		<div className="flex flex-col">
@@ -43,10 +46,22 @@ export function TasksTableView({
 							console.log("Delete task:", task.id);
 						}}
 					>
+						{/* biome-ignore lint/a11y/useSemanticElements: Grid layout requires div, button cannot use grid styling */}
 						<div
-							className="grid items-center gap-3 px-4 h-9 hover:bg-accent/50 cursor-pointer border-b border-border/50"
+							role="button"
+							tabIndex={0}
+							className={cn(
+								"grid items-center gap-3 px-4 h-9 cursor-pointer border-b border-border/50 hover:bg-accent/50",
+							)}
 							style={{
 								gridTemplateColumns: `auto auto ${slugColumnWidth} 1fr auto auto`,
+							}}
+							onClick={() => onTaskClick(task)}
+							onKeyDown={(e) => {
+								if (e.key === "Enter" || e.key === " ") {
+									e.preventDefault();
+									onTaskClick(task);
+								}
 							}}
 						>
 							{cells.slice(1).map((cell) => (

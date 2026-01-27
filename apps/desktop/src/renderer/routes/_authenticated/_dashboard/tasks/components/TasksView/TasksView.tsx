@@ -1,12 +1,14 @@
 import { ScrollArea } from "@superset/ui/scroll-area";
 import { Spinner } from "@superset/ui/spinner";
+import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { HiCheckCircle } from "react-icons/hi2";
 import { TasksTableView } from "./components/TasksTableView";
 import { type TabValue, TasksTopBar } from "./components/TasksTopBar";
-import { useTasksTable } from "./hooks/useTasksTable";
+import { type TaskWithStatus, useTasksTable } from "./hooks/useTasksTable";
 
 export function TasksView() {
+	const navigate = useNavigate();
 	const [currentTab, setCurrentTab] = useState<TabValue>("all");
 	const [searchQuery, setSearchQuery] = useState("");
 
@@ -14,6 +16,13 @@ export function TasksView() {
 		filterTab: currentTab,
 		searchQuery,
 	});
+
+	const handleTaskClick = (task: TaskWithStatus) => {
+		navigate({
+			to: "/tasks/$taskId",
+			params: { taskId: task.id },
+		});
+	};
 
 	return (
 		<div className="flex-1 flex flex-col min-h-0">
@@ -37,7 +46,11 @@ export function TasksView() {
 				</div>
 			) : (
 				<ScrollArea className="flex-1 min-h-0">
-					<TasksTableView table={table} slugColumnWidth={slugColumnWidth} />
+					<TasksTableView
+						table={table}
+						slugColumnWidth={slugColumnWidth}
+						onTaskClick={handleTaskClick}
+					/>
 				</ScrollArea>
 			)}
 		</div>
