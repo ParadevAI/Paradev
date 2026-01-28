@@ -1,6 +1,6 @@
 import { homedir } from "node:os";
 import { join } from "node:path";
-import { projects, workspaces, worktrees } from "@superset/local-db";
+import { projects, settings, workspaces, worktrees } from "@superset/local-db";
 import { and, eq, isNull, not } from "drizzle-orm";
 import { track } from "main/lib/analytics";
 import { localDb } from "main/lib/local-db";
@@ -21,7 +21,7 @@ import {
 	createWorktreeFromPr,
 	fetchPrBranch,
 	generateBranchName,
-	getAuthorPrefix,
+	getBranchPrefix,
 	getBranchWorktreePath,
 	getCurrentBranch,
 	getPrInfo,
@@ -302,9 +302,22 @@ export const createCreateProcedures = () => {
 				const { local, remote } = await listBranches(project.mainRepoPath);
 				const existingBranches = [...local, ...remote];
 
-				const authorName = await getAuthorPrefix(project.mainRepoPath);
-				const rawAuthorPrefix = authorName
-					? sanitizeAuthorPrefix(authorName)
+				const globalSettings = localDb.select().from(settings).get();
+				const projectOverrides = project.branchPrefixMode != null;
+				const prefixMode = projectOverrides
+					? project.branchPrefixMode
+					: (globalSettings?.branchPrefixMode ?? "none");
+				const customPrefix = projectOverrides
+					? project.branchPrefixCustom
+					: globalSettings?.branchPrefixCustom;
+
+				const rawPrefix = await getBranchPrefix({
+					repoPath: project.mainRepoPath,
+					mode: prefixMode,
+					customPrefix,
+				});
+				const rawAuthorPrefix = rawPrefix
+					? sanitizeAuthorPrefix(rawPrefix)
 					: undefined;
 
 				const existingSet = new Set(
@@ -323,7 +336,8 @@ export const createCreateProcedures = () => {
 					}
 					branch = existingBranchName;
 				} else if (input.branchName?.trim()) {
-					branch = sanitizeBranchName(input.branchName);
+					const sanitized = sanitizeBranchName(input.branchName);
+					branch = authorPrefix ? `${authorPrefix}/${sanitized}` : sanitized;
 				} else {
 					branch = generateBranchName({ existingBranches, authorPrefix });
 				}

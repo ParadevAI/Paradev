@@ -5,6 +5,7 @@ import { promisify } from "node:util";
 
 import friendlyWords = require("friendly-words");
 
+import type { BranchPrefixMode } from "@superset/local-db";
 import simpleGit, { type StatusResult } from "simple-git";
 import { checkGitLfsAvailable, getShellEnvironment } from "./shell-env";
 
@@ -337,6 +338,32 @@ export async function getAuthorPrefix(
 	}
 
 	return null;
+}
+
+export async function getBranchPrefix({
+	repoPath,
+	mode,
+	customPrefix,
+}: {
+	repoPath: string;
+	mode?: BranchPrefixMode | null;
+	customPrefix?: string | null;
+}): Promise<string | null> {
+	switch (mode) {
+		case "none":
+			return null;
+		case "custom":
+			return customPrefix || null;
+		case "author": {
+			const authorName = await getGitAuthorName(repoPath);
+			if (authorName) {
+				return authorName.toLowerCase().replace(/\s+/g, "-");
+			}
+			return null;
+		}
+		default:
+			return getAuthorPrefix(repoPath);
+	}
 }
 
 export {

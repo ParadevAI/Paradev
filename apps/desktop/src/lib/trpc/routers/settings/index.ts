@@ -1,4 +1,5 @@
 import {
+	BRANCH_PREFIX_MODES,
 	EXECUTION_MODES,
 	settings,
 	TERMINAL_LINK_BEHAVIORS,
@@ -17,6 +18,7 @@ import {
 import { DEFAULT_RINGTONE_ID, RINGTONES } from "shared/ringtones";
 import { z } from "zod";
 import { publicProcedure, router } from "../..";
+import { getGitAuthorName, getGitHubUsername } from "../workspaces/utils/git";
 
 const VALID_RINGTONE_IDS = RINGTONES.map((r) => r.id);
 
@@ -141,7 +143,6 @@ export const createSettingsRouter = () => {
 				const row = getSettings();
 				const presets = row.terminalPresets ?? [];
 
-				// Clear existing default and set new one (if id is provided)
 				const updatedPresets = presets.map((p) => ({
 					...p,
 					isDefault: input.id === p.id ? true : undefined,
@@ -256,7 +257,6 @@ export const createSettingsRouter = () => {
 
 		getConfirmOnQuit: publicProcedure.query(() => {
 			const row = getSettings();
-			// Default to true (confirm on quit enabled by default)
 			return row.confirmOnQuit ?? DEFAULT_CONFIRM_ON_QUIT;
 		}),
 
@@ -339,6 +339,51 @@ export const createSettingsRouter = () => {
 			app.relaunch();
 			quitWithoutConfirmation();
 			return { success: true };
+		}),
+
+		getBranchPrefix: publicProcedure.query(() => {
+			const row = getSettings();
+			return {
+				mode: row.branchPrefixMode ?? "none",
+				customPrefix: row.branchPrefixCustom ?? null,
+			};
+		}),
+
+		setBranchPrefix: publicProcedure
+			.input(
+				z.object({
+					mode: z.enum(BRANCH_PREFIX_MODES),
+					customPrefix: z.string().nullable().optional(),
+				}),
+			)
+			.mutation(({ input }) => {
+				localDb
+					.insert(settings)
+					.values({
+						id: 1,
+						branchPrefixMode: input.mode,
+						branchPrefixCustom: input.customPrefix ?? null,
+					})
+					.onConflictDoUpdate({
+						target: settings.id,
+						set: {
+							branchPrefixMode: input.mode,
+							branchPrefixCustom: input.customPrefix ?? null,
+						},
+					})
+					.run();
+
+				return { success: true };
+			}),
+
+		getGitInfo: publicProcedure.query(async () => {
+			const githubUsername = await getGitHubUsername();
+			const authorName = await getGitAuthorName();
+			return {
+				githubUsername,
+				authorName,
+				authorPrefix: authorName?.toLowerCase().replace(/\s+/g, "-") ?? null,
+			};
 		}),
 	});
 };
