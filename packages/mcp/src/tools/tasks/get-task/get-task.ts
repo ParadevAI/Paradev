@@ -93,9 +93,20 @@ export function register(server: McpServer) {
 				};
 			}
 
+			const serializedTask = {
+				...task,
+				dueDate: task.dueDate?.toISOString() ?? null,
+				createdAt: task.createdAt.toISOString(),
+				updatedAt: task.updatedAt.toISOString(),
+			};
 			return {
-				structuredContent: { task },
-				content: [{ type: "text", text: JSON.stringify({ task }, null, 2) }],
+				structuredContent: { task: serializedTask },
+				content: [
+					{
+						type: "text",
+						text: JSON.stringify({ task: serializedTask }, null, 2),
+					},
+				],
 			};
 		},
 	);

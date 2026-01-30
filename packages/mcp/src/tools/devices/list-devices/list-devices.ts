@@ -66,6 +66,7 @@ export function register(server: McpServer) {
 
 			const devicesWithStatus = devices.map((d) => ({
 				...d,
+				lastSeenAt: d.lastSeenAt.toISOString(),
 				isOnline: d.lastSeenAt > threshold,
 			}));
 

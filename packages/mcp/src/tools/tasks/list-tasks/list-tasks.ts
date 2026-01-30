@@ -208,7 +208,12 @@ export function register(server: McpServer) {
 				.offset(offset);
 
 			const data = {
-				tasks: tasksList,
+				tasks: tasksList.map((t) => ({
+					...t,
+					dueDate: t.dueDate?.toISOString() ?? null,
+					createdAt: t.createdAt.toISOString(),
+					deletedAt: t.deletedAt?.toISOString() ?? null,
+				})),
 				count: tasksList.length,
 				hasMore: tasksList.length === limit,
 			};
