@@ -22,7 +22,11 @@ import {
 } from "./hooks";
 import { ScrollToBottomButton } from "./ScrollToBottomButton";
 import { TerminalSearch } from "./TerminalSearch";
-import type { TerminalProps, TerminalStreamEvent } from "./types";
+import type {
+	TerminalExitReason,
+	TerminalProps,
+	TerminalStreamEvent,
+} from "./types";
 import { shellEscapePaths } from "./utils";
 
 export const Terminal = ({ paneId, tabId, workspaceId }: TerminalProps) => {
@@ -88,7 +92,7 @@ export const Terminal = ({ paneId, tabId, workspaceId }: TerminalProps) => {
 	// Refs for stream event handlers (populated after useTerminalStream)
 	// These allow flushPendingEvents to call the handlers via refs
 	const handleTerminalExitRef = useRef<
-		(exitCode: number, xterm: XTerm) => void
+		(exitCode: number, xterm: XTerm, reason?: TerminalExitReason) => void
 	>(() => {});
 	const handleStreamErrorRef = useRef<
 		(
@@ -143,8 +147,8 @@ export const Terminal = ({ paneId, tabId, workspaceId }: TerminalProps) => {
 		modeScanBufferRef,
 		updateCwdFromData,
 		updateModesFromData,
-		onExitEvent: (exitCode, xterm) =>
-			handleTerminalExitRef.current(exitCode, xterm),
+		onExitEvent: (exitCode, xterm, reason) =>
+			handleTerminalExitRef.current(exitCode, xterm, reason),
 		onErrorEvent: (event, xterm) => handleStreamErrorRef.current(event, xterm),
 		onDisconnectEvent: (reason) =>
 			setConnectionError(reason || "Connection to terminal daemon lost"),
@@ -213,12 +217,10 @@ export const Terminal = ({ paneId, tabId, workspaceId }: TerminalProps) => {
 		isFocused,
 		xtermRef,
 	});
-
 	useEffect(() => {
 		if (!isRestoredMode) return;
 		handleStartShell();
 	}, [isRestoredMode, handleStartShell]);
-
 	const { xtermInstance, restartTerminal } = useTerminalLifecycle({
 		paneId,
 		tabIdRef,
