@@ -18,6 +18,13 @@ async function hasUpstreamBranch(
 	}
 }
 
+async function fetchCurrentBranch(
+	git: ReturnType<typeof simpleGit>,
+): Promise<void> {
+	const branch = (await git.revparse(["--abbrev-ref", "HEAD"])).trim();
+	await git.fetch(["origin", branch]);
+}
+
 export const createGitOperationsRouter = () => {
 	return router({
 		// NOTE: saveFile is defined in file-contents.ts with hardened path validation
@@ -59,7 +66,7 @@ export const createGitOperationsRouter = () => {
 				} else {
 					await git.push();
 				}
-				await git.fetch();
+				await fetchCurrentBranch(git);
 				return { success: true };
 			}),
 
@@ -106,13 +113,13 @@ export const createGitOperationsRouter = () => {
 					if (isUpstreamMissingError(message)) {
 						const branch = await git.revparse(["--abbrev-ref", "HEAD"]);
 						await git.push(["--set-upstream", "origin", branch.trim()]);
-						await git.fetch();
+						await fetchCurrentBranch(git);
 						return { success: true };
 					}
 					throw error;
 				}
 				await git.push();
-				await git.fetch();
+				await fetchCurrentBranch(git);
 				return { success: true };
 			}),
 
@@ -121,7 +128,7 @@ export const createGitOperationsRouter = () => {
 			.mutation(async ({ input }): Promise<{ success: boolean }> => {
 				assertRegisteredWorktree(input.worktreePath);
 				const git = simpleGit(input.worktreePath);
-				await git.fetch();
+				await fetchCurrentBranch(git);
 				return { success: true };
 			}),
 
@@ -161,7 +168,7 @@ export const createGitOperationsRouter = () => {
 					const url = `https://github.com/${repo}/compare/${branch}?expand=1`;
 
 					await shell.openExternal(url);
-					await git.fetch();
+					await fetchCurrentBranch(git);
 
 					return { success: true, url };
 				},
