@@ -1,7 +1,7 @@
 import { Button } from "@superset/ui/button";
 import { Input } from "@superset/ui/input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
 	LuChevronsDownUp,
 	LuEye,
@@ -9,6 +9,7 @@ import {
 	LuFilePlus,
 	LuFolderPlus,
 	LuRefreshCw,
+	LuX,
 } from "react-icons/lu";
 import { SEARCH_DEBOUNCE_MS } from "../../constants";
 
@@ -36,30 +37,70 @@ export function FileTreeToolbar({
 	isRefreshing = false,
 }: FileTreeToolbarProps) {
 	const [localSearchTerm, setLocalSearchTerm] = useState(searchTerm);
+	const debounceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+	useEffect(() => {
+		if (debounceTimeoutRef.current) {
+			clearTimeout(debounceTimeoutRef.current);
+			debounceTimeoutRef.current = null;
+		}
+		setLocalSearchTerm(searchTerm);
+	}, [searchTerm]);
+
+	useEffect(() => {
+		return () => {
+			if (debounceTimeoutRef.current) {
+				clearTimeout(debounceTimeoutRef.current);
+			}
+		};
+	}, []);
 
 	const handleSearchChange = useCallback(
 		(e: React.ChangeEvent<HTMLInputElement>) => {
 			const value = e.target.value;
 			setLocalSearchTerm(value);
 
-			const timeoutId = setTimeout(() => {
-				onSearchChange(value);
-			}, SEARCH_DEBOUNCE_MS);
+			if (debounceTimeoutRef.current) {
+				clearTimeout(debounceTimeoutRef.current);
+			}
 
-			return () => clearTimeout(timeoutId);
+			debounceTimeoutRef.current = setTimeout(() => {
+				onSearchChange(value);
+				debounceTimeoutRef.current = null;
+			}, SEARCH_DEBOUNCE_MS);
 		},
 		[onSearchChange],
 	);
 
+	const handleClearSearch = useCallback(() => {
+		setLocalSearchTerm("");
+		if (debounceTimeoutRef.current) {
+			clearTimeout(debounceTimeoutRef.current);
+			debounceTimeoutRef.current = null;
+		}
+		onSearchChange("");
+	}, [onSearchChange]);
+
 	return (
 		<div className="flex flex-col gap-1 px-2 py-1.5 border-b border-border">
-			<Input
-				type="text"
-				placeholder="Search files..."
-				value={localSearchTerm}
-				onChange={handleSearchChange}
-				className="h-7 text-xs"
-			/>
+			<div className="relative">
+				<Input
+					type="text"
+					placeholder="Search files..."
+					value={localSearchTerm}
+					onChange={handleSearchChange}
+					className="h-7 text-xs pr-7"
+				/>
+				{localSearchTerm && (
+					<button
+						type="button"
+						onClick={handleClearSearch}
+						className="absolute right-1 top-1/2 -translate-y-1/2 p-0.5 rounded text-muted-foreground hover:text-foreground hover:bg-muted-foreground/20 transition-colors"
+					>
+						<LuX className="size-3.5" />
+					</button>
+				)}
+			</div>
 
 			<div className="flex items-center gap-0.5">
 				<Tooltip>
