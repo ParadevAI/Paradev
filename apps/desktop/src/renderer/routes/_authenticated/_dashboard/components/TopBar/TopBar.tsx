@@ -1,4 +1,6 @@
 import { useParams } from "@tanstack/react-router";
+import { HiOutlineWifi } from "react-icons/hi2";
+import { useOnlineStatus } from "renderer/hooks/useOnlineStatus";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { NavigationControls } from "./components/NavigationControls";
 import { OpenInMenuButton } from "./components/OpenInMenuButton";
@@ -13,6 +15,7 @@ export function TopBar() {
 		{ id: workspaceId ?? "" },
 		{ enabled: !!workspaceId },
 	);
+	const isOnline = useOnlineStatus();
 	// Default to Mac layout while loading to avoid overlap with traffic lights
 	const isMac = platform === undefined || platform === "darwin";
 
@@ -37,6 +40,12 @@ export function TopBar() {
 			)}
 
 			<div className="flex items-center gap-3 h-full pr-4 shrink-0">
+				{!isOnline && (
+					<div className="no-drag flex items-center gap-1.5 text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
+						<HiOutlineWifi className="size-3.5" />
+						<span>Offline</span>
+					</div>
+				)}
 				{workspace?.worktreePath && (
 					<OpenInMenuButton
 						worktreePath={workspace.worktreePath}
