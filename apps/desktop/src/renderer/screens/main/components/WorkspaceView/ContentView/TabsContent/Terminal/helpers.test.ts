@@ -1,5 +1,5 @@
-import type { Terminal as XTerm } from "@xterm/xterm";
 import { afterEach, beforeEach, describe, expect, it, mock } from "bun:test";
+import type { Terminal as XTerm } from "@xterm/xterm";
 
 // Mock localStorage for Node.js test environment
 const mockStorage = new Map<string, string>();
@@ -31,11 +31,8 @@ mock.module("renderer/lib/trpc-client", () => ({
 }));
 
 // Import after mocks are set up
-const {
-	getDefaultTerminalBg,
-	getDefaultTerminalTheme,
-	setupKeyboardHandler,
-} = await import("./helpers");
+const { getDefaultTerminalBg, getDefaultTerminalTheme, setupKeyboardHandler } =
+	await import("./helpers");
 
 describe("getDefaultTerminalTheme", () => {
 	beforeEach(() => {
@@ -117,7 +114,6 @@ describe("setupKeyboardHandler", () => {
 
 	afterEach(() => {
 		// Restore navigator between tests
-		// @ts-expect-error - resetting global navigator for tests
 		globalThis.navigator = originalNavigator;
 	});
 
@@ -125,17 +121,21 @@ describe("setupKeyboardHandler", () => {
 		// @ts-expect-error - mocking navigator for tests
 		globalThis.navigator = { platform: "MacIntel" };
 
-		let handler: ((event: KeyboardEvent) => boolean) | null = null;
+		const captured: { handler: ((event: KeyboardEvent) => boolean) | null } = {
+			handler: null,
+		};
 		const xterm = {
-			attachCustomKeyEventHandler: (next: (event: KeyboardEvent) => boolean) => {
-				handler = next;
+			attachCustomKeyEventHandler: (
+				next: (event: KeyboardEvent) => boolean,
+			) => {
+				captured.handler = next;
 			},
 		};
 
 		const onWrite = mock(() => {});
 		setupKeyboardHandler(xterm as unknown as XTerm, { onWrite });
 
-		handler?.({
+		captured.handler?.({
 			type: "keydown",
 			key: "ArrowLeft",
 			altKey: true,
@@ -143,7 +143,7 @@ describe("setupKeyboardHandler", () => {
 			ctrlKey: false,
 			shiftKey: false,
 		} as KeyboardEvent);
-		handler?.({
+		captured.handler?.({
 			type: "keydown",
 			key: "ArrowRight",
 			altKey: true,
@@ -160,17 +160,21 @@ describe("setupKeyboardHandler", () => {
 		// @ts-expect-error - mocking navigator for tests
 		globalThis.navigator = { platform: "Win32" };
 
-		let handler: ((event: KeyboardEvent) => boolean) | null = null;
+		const captured: { handler: ((event: KeyboardEvent) => boolean) | null } = {
+			handler: null,
+		};
 		const xterm = {
-			attachCustomKeyEventHandler: (next: (event: KeyboardEvent) => boolean) => {
-				handler = next;
+			attachCustomKeyEventHandler: (
+				next: (event: KeyboardEvent) => boolean,
+			) => {
+				captured.handler = next;
 			},
 		};
 
 		const onWrite = mock(() => {});
 		setupKeyboardHandler(xterm as unknown as XTerm, { onWrite });
 
-		handler?.({
+		captured.handler?.({
 			type: "keydown",
 			key: "ArrowLeft",
 			altKey: false,
@@ -178,7 +182,7 @@ describe("setupKeyboardHandler", () => {
 			ctrlKey: true,
 			shiftKey: false,
 		} as KeyboardEvent);
-		handler?.({
+		captured.handler?.({
 			type: "keydown",
 			key: "ArrowRight",
 			altKey: false,
