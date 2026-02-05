@@ -261,7 +261,14 @@ export function FilesView() {
 	}, [tree]);
 
 	const handleRefresh = useCallback(() => {
+		// Invalidate root explicitly (getItems() may not include it)
 		tree.getItemInstance("root")?.invalidateChildrenIds();
+		// Also invalidate all expanded directories so new files in nested folders appear
+		for (const item of tree.getItems()) {
+			if (item.getItemData()?.isDirectory) {
+				item.invalidateChildrenIds();
+			}
+		}
 	}, [tree]);
 
 	const handleToggleHiddenFiles = useCallback(() => {
