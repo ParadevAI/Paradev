@@ -1,4 +1,5 @@
 import { toast } from "@superset/ui/sonner";
+import { CanvasAddon } from "@xterm/addon-canvas";
 import { ClipboardAddon } from "@xterm/addon-clipboard";
 import { FitAddon } from "@xterm/addon-fit";
 import { ImageAddon } from "@xterm/addon-image";
@@ -60,48 +61,33 @@ export function getDefaultTerminalBg(): string {
 
 /**
  * Load GPU-accelerated renderer with automatic fallback.
- * Tries WebGL first, falls back to DOM if WebGL fails.
- * This follows VS Code's approach: WebGL → DOM (canvas addon removed in xterm.js 6.0).
+ * Tries WebGL first, falls back to Canvas if WebGL fails.
  */
 export type TerminalRenderer = {
-	kind: "webgl" | "dom";
+	kind: "webgl" | "canvas" | "dom";
 	dispose: () => void;
 	clearTextureAtlas?: () => void;
 };
 
 type PreferredRenderer = TerminalRenderer["kind"] | "auto";
 
-// Track WebGL failures globally to avoid repeated initialization attempts (VS Code pattern)
-let suggestedRendererType: TerminalRenderer["kind"] | undefined;
-
 function getPreferredRenderer(): PreferredRenderer {
-	// If WebGL previously failed, don't try again
-	if (suggestedRendererType === "dom") {
-		return "dom";
-	}
-
 	try {
 		const stored = localStorage.getItem("terminal-renderer");
-		if (stored === "webgl" || stored === "dom") {
+		if (stored === "webgl" || stored === "canvas" || stored === "dom") {
 			return stored;
-		}
-		if (stored === "canvas") {
-			// Canvas renderer was removed in xterm.js 6.0; fall back to DOM.
-			try {
-				localStorage.setItem("terminal-renderer", "dom");
-			} catch {
-				// ignore storage errors
-			}
-			return "dom";
 		}
 	} catch {
 		// ignore
 	}
 
-	return "auto";
+	// Default: avoid xterm-webgl on macOS. We've seen repeated corruption/glitching
+	// when terminals are hidden/shown or switched between panes.
+	return navigator.userAgent.includes("Macintosh") ? "canvas" : "webgl";
 }
 
 function loadRenderer(xterm: XTerm): TerminalRenderer {
+	let renderer: WebglAddon | CanvasAddon | null = null;
 	let webglAddon: WebglAddon | null = null;
 	let kind: TerminalRenderer["kind"] = "dom";
 
@@ -111,35 +97,54 @@ function loadRenderer(xterm: XTerm): TerminalRenderer {
 		return { kind: "dom", dispose: () => {}, clearTextureAtlas: undefined };
 	}
 
+	const tryLoadCanvas = () => {
+		try {
+			renderer = new CanvasAddon();
+			xterm.loadAddon(renderer);
+			kind = "canvas";
+		} catch {
+			// Canvas fallback failed, use default renderer
+		}
+	};
+
+	if (preferred === "canvas") {
+		tryLoadCanvas();
+		return {
+			kind,
+			dispose: () => renderer?.dispose(),
+			clearTextureAtlas: undefined,
+		};
+	}
+
 	try {
 		webglAddon = new WebglAddon();
 
 		webglAddon.onContextLoss(() => {
-			console.warn(
-				"[Terminal] WebGL context lost, falling back to DOM renderer",
-			);
 			webglAddon?.dispose();
 			webglAddon = null;
-			kind = "dom";
-			// Force refresh after context loss
-			xterm.refresh(0, xterm.rows - 1);
+			try {
+				renderer = new CanvasAddon();
+				xterm.loadAddon(renderer);
+				kind = "canvas";
+				// Force refresh after context loss recovery
+				xterm.refresh(0, xterm.rows - 1);
+			} catch {
+				// Canvas fallback failed, use default renderer
+				renderer = null;
+				kind = "dom";
+			}
 		});
 
 		xterm.loadAddon(webglAddon);
+		renderer = webglAddon;
 		kind = "webgl";
-	} catch (e) {
-		console.warn(
-			"[Terminal] WebGL could not be loaded, falling back to DOM renderer",
-			e,
-		);
-		suggestedRendererType = "dom";
-		webglAddon = null;
-		kind = "dom";
+	} catch {
+		tryLoadCanvas();
 	}
 
 	return {
 		kind,
-		dispose: () => webglAddon?.dispose(),
+		dispose: () => renderer?.dispose(),
 		clearTextureAtlas: webglAddon
 			? () => {
 					try {
@@ -211,11 +216,11 @@ export function createTerminalInstance(
 
 	// Defer GPU renderer loading to next animation frame.
 	// xterm.open() schedules a setTimeout for Viewport.syncScrollArea which expects
-	// the renderer to be ready. Loading WebGL immediately after open() can cause a
-	// race condition where the setTimeout fires during addon initialization, when
-	// _renderer is temporarily undefined (old renderer disposed, new not yet set).
+	// the renderer to be ready. Loading WebGL/Canvas immediately after open() can
+	// cause a race condition where the setTimeout fires during addon initialization,
+	// when _renderer is temporarily undefined (old renderer disposed, new not yet set).
 	// Deferring to rAF ensures xterm's internal setTimeout completes first with the
-	// default DOM renderer, then we safely swap to WebGL.
+	// default DOM renderer, then we safely swap to WebGL/Canvas.
 	rafId = requestAnimationFrame(() => {
 		rafId = null;
 		if (isDisposed) return;
