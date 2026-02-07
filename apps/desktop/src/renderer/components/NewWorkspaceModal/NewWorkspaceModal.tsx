@@ -200,15 +200,49 @@ export function NewWorkspaceModal() {
 		try {
 			const result = await openNew.mutateAsync(undefined);
 			if (result.canceled) return;
-			if ("error" in result) {
+
+			if ("error" in result && !("multi" in result)) {
 				toast.error("Failed to open project", { description: result.error });
 				return;
 			}
-			if ("needsGitInit" in result) {
-				toast.error("Selected folder is not a git repository");
-				return;
+
+			if ("multi" in result) {
+				const successes = result.results.filter((r) => r.status === "success");
+				const needsGitInit = result.results.filter(
+					(r) => r.status === "needsGitInit",
+				);
+				const errors = result.results.filter((r) => r.status === "error");
+
+				// Show summary toast when multiple projects imported
+				if (successes.length > 1) {
+					toast.success(`${successes.length} projects imported`);
+				}
+
+				// Select the first successful project
+				if (successes.length > 0) {
+					setSelectedProjectId(successes[0].project.id);
+				}
+
+				// Show errors
+				for (const err of errors) {
+					toast.error(`Failed to open ${err.selectedPath.split("/").pop()}`, {
+						description: err.error,
+					});
+				}
+
+				// Show git init warnings
+				if (needsGitInit.length > 0) {
+					const names = needsGitInit
+						.map((r) => r.selectedPath.split("/").pop())
+						.join(", ");
+					toast.error(
+						needsGitInit.length === 1
+							? "Folder is not a git repository"
+							: `${needsGitInit.length} folders are not git repositories`,
+						{ description: names },
+					);
+				}
 			}
-			setSelectedProjectId(result.project.id);
 		} catch (error) {
 			toast.error("Failed to open project", {
 				description:

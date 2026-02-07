@@ -31,29 +31,67 @@ export function WorkspaceSidebarFooter({
 			if (result.canceled) {
 				return;
 			}
-			if ("error" in result) {
+			if ("error" in result && !("multi" in result)) {
 				toast.error("Failed to open project", {
 					description: result.error,
 				});
 				return;
 			}
-			if ("needsGitInit" in result) {
-				toast.error("Selected folder is not a git repository", {
-					description:
-						"Please use 'Open project' from the start view to initialize git.",
-				});
-				return;
+
+			if ("multi" in result) {
+				const successes = result.results.filter((r) => r.status === "success");
+				const needsGitInit = result.results.filter(
+					(r) => r.status === "needsGitInit",
+				);
+				const errors = result.results.filter((r) => r.status === "error");
+
+				// Create branch workspaces for all successful projects
+				for (const s of successes) {
+					try {
+						await createBranchWorkspace.mutateAsync({
+							projectId: s.project.id,
+						});
+					} catch (err) {
+						toast.error(`Failed to open ${s.project.name}`, {
+							description:
+								err instanceof Error
+									? err.message
+									: "Failed to create workspace",
+						});
+					}
+				}
+
+				// Summary toast
+				if (successes.length > 0) {
+					toast.success(
+						successes.length === 1
+							? "Project opened"
+							: `${successes.length} projects opened`,
+					);
+				}
+
+				// Show errors
+				for (const err of errors) {
+					toast.error(`Failed to open ${err.selectedPath.split("/").pop()}`, {
+						description: err.error,
+					});
+				}
+
+				// Show git init warnings
+				if (needsGitInit.length > 0) {
+					const names = needsGitInit
+						.map((r) => r.selectedPath.split("/").pop())
+						.join(", ");
+					toast.error(
+						needsGitInit.length === 1
+							? "Folder is not a git repository"
+							: `${needsGitInit.length} folders are not git repositories`,
+						{
+							description: `${names} - use 'Open project' from the start view to initialize git.`,
+						},
+					);
+				}
 			}
-			// Create a main workspace on the current branch for the new project
-			toast.promise(
-				createBranchWorkspace.mutateAsync({ projectId: result.project.id }),
-				{
-					loading: "Opening project...",
-					success: "Project opened",
-					error: (err) =>
-						err instanceof Error ? err.message : "Failed to open project",
-				},
-			);
 		} catch (error) {
 			toast.error("Failed to open project", {
 				description:

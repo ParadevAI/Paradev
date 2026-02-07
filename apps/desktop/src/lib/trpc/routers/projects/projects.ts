@@ -38,7 +38,7 @@ import { fetchGitHubOwner, getGitHubAvatarUrl } from "./utils/github";
 
 type Project = SelectProject;
 
-// Return types for openNew procedure
+// Return types for openNew procedure (single project)
 type OpenNewCanceled = { canceled: true };
 type OpenNewSuccess = { canceled: false; project: Project };
 type OpenNewNeedsGitInit = {
@@ -51,6 +51,23 @@ export type OpenNewResult =
 	| OpenNewCanceled
 	| OpenNewSuccess
 	| OpenNewNeedsGitInit
+	| OpenNewError;
+
+// Per-folder outcome for multi-select
+export type FolderOutcome =
+	| { status: "success"; project: Project }
+	| { status: "needsGitInit"; selectedPath: string }
+	| { status: "error"; selectedPath: string; error: string };
+
+// Return types for openNew procedure (multi-select)
+type OpenNewMultiSuccess = {
+	canceled: false;
+	multi: true;
+	results: FolderOutcome[];
+};
+export type OpenNewMultiResult =
+	| OpenNewCanceled
+	| OpenNewMultiSuccess
 	| OpenNewError;
 
 /**
@@ -453,13 +470,13 @@ export const createProjectsRouter = (getWindow: () => BrowserWindow | null) => {
 				},
 			),
 
-		openNew: publicProcedure.mutation(async (): Promise<OpenNewResult> => {
+		openNew: publicProcedure.mutation(async (): Promise<OpenNewMultiResult> => {
 			const window = getWindow();
 			if (!window) {
 				return { canceled: false, error: "No window available" };
 			}
 			const result = await dialog.showOpenDialog(window, {
-				properties: ["openDirectory"],
+				properties: ["openDirectory", "multiSelections"],
 				title: "Open Project",
 			});
 
@@ -467,35 +484,43 @@ export const createProjectsRouter = (getWindow: () => BrowserWindow | null) => {
 				return { canceled: true };
 			}
 
-			const selectedPath = result.filePaths[0];
+			const outcomes: FolderOutcome[] = [];
 
-			let mainRepoPath: string;
-			try {
-				mainRepoPath = await getGitRoot(selectedPath);
-			} catch (_error) {
-				// Return a special response so the UI can offer to initialize git
-				return {
-					canceled: false,
-					needsGitInit: true,
-					selectedPath,
-				};
+			for (const selectedPath of result.filePaths) {
+				let mainRepoPath: string;
+				try {
+					mainRepoPath = await getGitRoot(selectedPath);
+				} catch {
+					outcomes.push({ status: "needsGitInit", selectedPath });
+					continue;
+				}
+
+				try {
+					const defaultBranch = await getDefaultBranch(mainRepoPath);
+					const project = upsertProject(mainRepoPath, defaultBranch);
+					await ensureMainWorkspace(project);
+
+					track("project_opened", {
+						project_id: project.id,
+						method: "open",
+					});
+
+					outcomes.push({ status: "success", project });
+				} catch (error) {
+					console.error(
+						"[projects/openNew] Failed to open project:",
+						selectedPath,
+						error,
+					);
+					outcomes.push({
+						status: "error",
+						selectedPath,
+						error: "Failed to open project",
+					});
+				}
 			}
 
-			const defaultBranch = await getDefaultBranch(mainRepoPath);
-			const project = upsertProject(mainRepoPath, defaultBranch);
-
-			// Auto-create main workspace if it doesn't exist
-			await ensureMainWorkspace(project);
-
-			track("project_opened", {
-				project_id: project.id,
-				method: "open",
-			});
-
-			return {
-				canceled: false,
-				project,
-			};
+			return { canceled: false, multi: true, results: outcomes };
 		}),
 
 		openFromPath: publicProcedure
