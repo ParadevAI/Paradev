@@ -32,6 +32,8 @@ const agentRequestSchema = z.object({
 	cwd: z.string().optional(),
 	env: z.record(z.string(), z.string()).optional(),
 	notification: notificationSchema.optional(),
+	maxThinkingTokens: z.number().optional(),
+	model: z.string().optional(),
 });
 
 interface SessionEntry {
@@ -169,7 +171,15 @@ app.post("/", async (c) => {
 		);
 	}
 
-	const { messages, sessionId, cwd, env: agentEnv, notification } = parsed.data;
+	const {
+		messages,
+		sessionId,
+		cwd,
+		env: agentEnv,
+		notification,
+		maxThinkingTokens,
+		model,
+	} = parsed.data;
 
 	const latestUserMessage = messages?.filter((m) => m.role === "user").pop();
 
@@ -197,7 +207,7 @@ app.post("/", async (c) => {
 		options: {
 			...(claudeSessionId && { resume: claudeSessionId }),
 			...(cwd && { cwd }),
-			model: process.env.CLAUDE_MODEL ?? DEFAULT_MODEL,
+			model: model ?? process.env.CLAUDE_MODEL ?? DEFAULT_MODEL,
 			maxTurns: MAX_AGENT_TURNS,
 			includePartialMessages: true,
 			permissionMode: "bypassPermissions" as const,
@@ -205,6 +215,7 @@ app.post("/", async (c) => {
 			env: queryEnv,
 			abortController,
 			...(hooks && { hooks }),
+			...(maxThinkingTokens !== undefined && { maxThinkingTokens }),
 		},
 	});
 
