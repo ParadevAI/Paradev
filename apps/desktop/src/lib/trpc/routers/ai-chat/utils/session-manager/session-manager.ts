@@ -1,9 +1,8 @@
 import { EventEmitter } from "node:events";
-import { buildClaudeEnv } from "../auth";
+import type { AgentProvider } from "../agent-provider";
+import type { SessionStore } from "../session-store";
 
 const PROXY_URL = process.env.DURABLE_STREAM_URL || "http://localhost:8080";
-const CLAUDE_AGENT_URL =
-	process.env.CLAUDE_AGENT_URL || "http://localhost:9090";
 const DURABLE_STREAM_AUTH_TOKEN =
 	process.env.DURABLE_STREAM_AUTH_TOKEN || process.env.DURABLE_STREAM_TOKEN;
 
@@ -44,22 +43,31 @@ interface ActiveSession {
 	cwd: string;
 }
 
-class ClaudeSessionManager extends EventEmitter {
+export class ChatSessionManager extends EventEmitter {
 	private sessions = new Map<string, ActiveSession>();
+
+	constructor(
+		private readonly provider: AgentProvider,
+		private readonly store: SessionStore,
+	) {
+		super();
+	}
 
 	async startSession({
 		sessionId,
+		workspaceId,
 		cwd,
 	}: {
 		sessionId: string;
+		workspaceId: string;
 		cwd: string;
 	}): Promise<void> {
 		if (this.sessions.has(sessionId)) {
-			console.warn(`[claude/session] Session ${sessionId} already running`);
+			console.warn(`[chat/session] Session ${sessionId} already active`);
 			return;
 		}
 
-		console.log(`[claude/session] Initializing session ${sessionId} in ${cwd}`);
+		console.log(`[chat/session] Starting session ${sessionId} in ${cwd}`);
 		const headers = buildProxyHeaders();
 
 		try {
@@ -73,26 +81,16 @@ class ClaudeSessionManager extends EventEmitter {
 				);
 			}
 
-			const env = buildClaudeEnv();
+			const registration = this.provider.getAgentRegistration({
+				sessionId,
+				cwd,
+			});
 			const registerRes = await fetch(
 				`${PROXY_URL}/v1/sessions/${sessionId}/agents`,
 				{
 					method: "POST",
 					headers,
-					body: JSON.stringify({
-						agents: [
-							{
-								id: "claude",
-								endpoint: `${CLAUDE_AGENT_URL}/`,
-								triggers: "user-messages",
-								bodyTemplate: {
-									sessionId,
-									cwd,
-									env,
-								},
-							},
-						],
-					}),
+					body: JSON.stringify({ agents: [registration] }),
 				},
 			);
 			if (!registerRes.ok) {
@@ -103,15 +101,91 @@ class ClaudeSessionManager extends EventEmitter {
 
 			this.sessions.set(sessionId, { sessionId, cwd });
 
+			await this.store.create({
+				sessionId,
+				workspaceId,
+				provider: this.provider.spec.id,
+				title: "New chat",
+				cwd,
+				createdAt: Date.now(),
+				lastActiveAt: Date.now(),
+			});
+
 			this.emit("event", {
 				type: "session_start",
 				sessionId,
 			} satisfies SessionStartEvent);
 
-			console.log(`[claude/session] Session ${sessionId} started`);
+			console.log(`[chat/session] Session ${sessionId} started`);
 		} catch (error) {
 			const message = error instanceof Error ? error.message : String(error);
-			console.error(`[claude/session] Failed to start session:`, message);
+			console.error(`[chat/session] Failed to start session:`, message);
+			this.emit("event", {
+				type: "error",
+				sessionId,
+				error: message,
+			} satisfies ErrorEvent);
+		}
+	}
+
+	async restoreSession({
+		sessionId,
+		cwd,
+	}: {
+		sessionId: string;
+		cwd: string;
+	}): Promise<void> {
+		if (this.sessions.has(sessionId)) {
+			return;
+		}
+
+		console.log(`[chat/session] Restoring session ${sessionId}`);
+		const headers = buildProxyHeaders();
+
+		try {
+			const createRes = await fetch(`${PROXY_URL}/v1/sessions/${sessionId}`, {
+				method: "PUT",
+				headers,
+			});
+			if (!createRes.ok) {
+				throw new Error(
+					`PUT /v1/sessions/${sessionId} failed: ${createRes.status}`,
+				);
+			}
+
+			const registration = this.provider.getAgentRegistration({
+				sessionId,
+				cwd,
+			});
+			const registerRes = await fetch(
+				`${PROXY_URL}/v1/sessions/${sessionId}/agents`,
+				{
+					method: "POST",
+					headers,
+					body: JSON.stringify({ agents: [registration] }),
+				},
+			);
+			if (!registerRes.ok) {
+				throw new Error(
+					`POST /v1/sessions/${sessionId}/agents failed: ${registerRes.status}`,
+				);
+			}
+
+			this.sessions.set(sessionId, { sessionId, cwd });
+
+			await this.store.update(sessionId, {
+				lastActiveAt: Date.now(),
+			});
+
+			this.emit("event", {
+				type: "session_start",
+				sessionId,
+			} satisfies SessionStartEvent);
+
+			console.log(`[chat/session] Session ${sessionId} restored`);
+		} catch (error) {
+			const message = error instanceof Error ? error.message : String(error);
+			console.error(`[chat/session] Failed to restore session:`, message);
 			this.emit("event", {
 				type: "error",
 				sessionId,
@@ -123,12 +197,12 @@ class ClaudeSessionManager extends EventEmitter {
 	async interrupt({ sessionId }: { sessionId: string }): Promise<void> {
 		if (!this.sessions.has(sessionId)) {
 			console.warn(
-				`[claude/session] Session ${sessionId} not found for interrupt`,
+				`[chat/session] Session ${sessionId} not found for interrupt`,
 			);
 			return;
 		}
 
-		console.log(`[claude/session] Interrupting session ${sessionId}`);
+		console.log(`[chat/session] Interrupting session ${sessionId}`);
 		try {
 			await fetch(`${PROXY_URL}/v1/sessions/${sessionId}/stop`, {
 				method: "POST",
@@ -136,39 +210,40 @@ class ClaudeSessionManager extends EventEmitter {
 				body: JSON.stringify({}),
 			});
 		} catch (error) {
-			console.error(`[claude/session] Interrupt failed:`, error);
+			console.error(`[chat/session] Interrupt failed:`, error);
 		}
 	}
 
-	async stopSession({ sessionId }: { sessionId: string }): Promise<void> {
+	// Removes from active set but preserves the proxy session for later restore
+	async deactivateSession({ sessionId }: { sessionId: string }): Promise<void> {
 		if (!this.sessions.has(sessionId)) {
 			return;
 		}
 
-		console.log(`[claude/session] Stopping session ${sessionId}`);
-		const headers = buildProxyHeaders();
+		console.log(`[chat/session] Deactivating session ${sessionId}`);
 
 		try {
 			await fetch(`${PROXY_URL}/v1/sessions/${sessionId}/stop`, {
 				method: "POST",
-				headers,
+				headers: buildProxyHeaders(),
 				body: JSON.stringify({}),
 			});
-		} catch (error) {
-			console.warn(`[claude/session] Stop request failed (non-fatal):`, error);
-		}
+		} catch {}
 
 		try {
-			await fetch(`${PROXY_URL}/v1/sessions/${sessionId}`, {
-				method: "DELETE",
-				headers,
-			});
-		} catch (error) {
-			console.warn(
-				`[claude/session] Delete request failed (non-fatal):`,
-				error,
-			);
-		}
+			const providerSessionId =
+				await this.provider.getProviderSessionId(sessionId);
+			if (providerSessionId) {
+				await this.store.update(sessionId, {
+					providerSessionId,
+					lastActiveAt: Date.now(),
+				});
+			} else {
+				await this.store.update(sessionId, {
+					lastActiveAt: Date.now(),
+				});
+			}
+		} catch {}
 
 		this.sessions.delete(sessionId);
 
@@ -179,6 +254,48 @@ class ClaudeSessionManager extends EventEmitter {
 		} satisfies SessionEndEvent);
 	}
 
+	async deleteSession({ sessionId }: { sessionId: string }): Promise<void> {
+		console.log(`[chat/session] Deleting session ${sessionId}`);
+		const headers = buildProxyHeaders();
+
+		try {
+			await fetch(`${PROXY_URL}/v1/sessions/${sessionId}/stop`, {
+				method: "POST",
+				headers,
+				body: JSON.stringify({}),
+			});
+		} catch {}
+
+		try {
+			await fetch(`${PROXY_URL}/v1/sessions/${sessionId}`, {
+				method: "DELETE",
+				headers,
+			});
+		} catch {}
+
+		await this.provider.cleanup(sessionId);
+		await this.store.archive(sessionId);
+
+		this.sessions.delete(sessionId);
+
+		this.emit("event", {
+			type: "session_end",
+			sessionId,
+			exitCode: null,
+		} satisfies SessionEndEvent);
+	}
+
+	async updateSessionMeta(
+		sessionId: string,
+		patch: {
+			title?: string;
+			messagePreview?: string;
+			providerSessionId?: string;
+		},
+	): Promise<void> {
+		await this.store.update(sessionId, patch);
+	}
+
 	isSessionActive(sessionId: string): boolean {
 		return this.sessions.has(sessionId);
 	}
@@ -187,5 +304,3 @@ class ClaudeSessionManager extends EventEmitter {
 		return Array.from(this.sessions.keys());
 	}
 }
-
-export const claudeSessionManager = new ClaudeSessionManager();

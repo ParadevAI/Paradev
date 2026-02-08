@@ -31,10 +31,15 @@ import type { ModelOption } from "./types";
 
 interface ChatInterfaceProps {
 	sessionId: string;
+	workspaceId: string;
 	cwd: string;
 }
 
-export function ChatInterface({ sessionId, cwd }: ChatInterfaceProps) {
+export function ChatInterface({
+	sessionId,
+	workspaceId,
+	cwd,
+}: ChatInterfaceProps) {
 	const [selectedModel, setSelectedModel] = useState<ModelOption>(MODELS[1]);
 	const [modelSelectorOpen, setModelSelectorOpen] = useState(false);
 
@@ -83,29 +88,87 @@ export function ChatInterface({ sessionId, cwd }: ChatInterfaceProps) {
 			console.error("[chat] Start session failed:", err);
 		},
 	});
+	const restoreSession = electronTrpc.aiChat.restoreSession.useMutation({
+		onSuccess: () => {
+			console.log("[chat] Session restored");
+			setSessionReady(true);
+		},
+		onError: (err) => {
+			console.error("[chat] Restore session failed:", err);
+		},
+	});
 	const stopSession = electronTrpc.aiChat.stopSession.useMutation();
+	const renameSession = electronTrpc.aiChat.renameSession.useMutation();
 
 	const startSessionRef = useRef(startSession);
 	startSessionRef.current = startSession;
+	const restoreSessionRef = useRef(restoreSession);
+	restoreSessionRef.current = restoreSession;
 	const stopSessionRef = useRef(stopSession);
 	stopSessionRef.current = stopSession;
+	const renameSessionRef = useRef(renameSession);
+	renameSessionRef.current = renameSession;
+
+	const { data: existingSession } = electronTrpc.aiChat.getSession.useQuery(
+		{ sessionId },
+		{ enabled: !!sessionId },
+	);
 
 	useEffect(() => {
 		if (!sessionId || !cwd) return;
+		if (existingSession === undefined) return;
+
 		hasConnected.current = false;
 		setSessionReady(false);
-		startSessionRef.current.mutate({ sessionId, cwd });
+
+		if (existingSession) {
+			restoreSessionRef.current.mutate({ sessionId, cwd });
+		} else {
+			startSessionRef.current.mutate({
+				sessionId,
+				workspaceId,
+				cwd,
+			});
+		}
+
 		return () => {
 			stopSessionRef.current.mutate({ sessionId });
 		};
-	}, [sessionId, cwd]);
+	}, [sessionId, cwd, workspaceId, existingSession]);
 
-	// Connect once both session is ready and config has loaded
 	useEffect(() => {
 		if (sessionReady && config?.proxyUrl) {
 			doConnect();
 		}
 	}, [sessionReady, config?.proxyUrl, doConnect]);
+
+	const hasAutoTitled = useRef(false);
+	useEffect(() => {
+		if (hasAutoTitled.current) return;
+		if (!sessionId) return;
+
+		const userMsg = messages.find((m) => m.role === "user");
+		const assistantMsg = messages.find((m) => m.role === "assistant");
+		if (!userMsg || !assistantMsg) return;
+
+		hasAutoTitled.current = true;
+
+		const textPart = userMsg.parts?.find((p) => p.type === "text");
+		const firstUserText =
+			(textPart && "content" in textPart
+				? (textPart.content as string)
+				: undefined
+			)?.slice(0, 80) ?? "Chat";
+		const title =
+			firstUserText.length === 80 ? `${firstUserText}...` : firstUserText;
+
+		renameSessionRef.current.mutate({ sessionId, title });
+	}, [messages, sessionId]);
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: must reset when session changes
+	useEffect(() => {
+		hasAutoTitled.current = false;
+	}, [sessionId]);
 
 	const handleSend = useCallback(
 		(message: { text: string }) => {
