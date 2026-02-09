@@ -134,12 +134,14 @@ export function PresetRow({
 		drag(dragHandleRef);
 	}, [preview, drop, drag]);
 
-	const isWorkspaceCreation =
+	const isWorkspaceCreation = !!(
 		preset.applyOnWorkspaceCreated ||
-		(!preset.applyOnNewTab && preset.isDefault);
-	const isNewTab =
+		(!preset.applyOnNewTab && preset.isDefault)
+	);
+	const isNewTab = !!(
 		preset.applyOnNewTab ||
-		(!preset.applyOnWorkspaceCreated && preset.isDefault);
+		(!preset.applyOnWorkspaceCreated && preset.isDefault)
+	);
 
 	return (
 		<div
