@@ -33,8 +33,7 @@ async function execute(
 			workspaceId: workspace.id,
 			projectId: pending?.projectId ?? workspace.projectId,
 			initialCommands: [...(pending?.initialCommands ?? []), params.command],
-			// Preserve undefined (signals "fetch from backend") vs null (no preset needed)
-			defaultPreset: pending ? pending.defaultPreset : null,
+			defaultPresets: pending?.defaultPresets,
 		});
 
 		return {

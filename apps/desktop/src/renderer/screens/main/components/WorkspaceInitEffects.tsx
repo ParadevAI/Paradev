@@ -2,17 +2,14 @@ import { toast } from "@superset/ui/sonner";
 import { useCallback, useEffect, useRef } from "react";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { useTabsStore } from "renderer/stores/tabs/store";
-import type { AddTabWithMultiplePanesOptions } from "renderer/stores/tabs/types";
+import { useTabsWithPresets } from "renderer/stores/tabs/useTabsWithPresets";
 import {
 	type PendingTerminalSetup,
 	useWorkspaceInitStore,
 } from "renderer/stores/workspace-init";
 import { DEFAULT_AUTO_APPLY_DEFAULT_PRESET } from "shared/constants";
 
-/**
- * Handles terminal setup when workspaces become ready.
- * Mounted at app root to survive dialog unmounts.
- */
+/** Mounted at app root to survive dialog unmounts. */
 export function WorkspaceInitEffects() {
 	const initProgress = useWorkspaceInitStore((s) => s.initProgress);
 	const pendingTerminalSetups = useWorkspaceInitStore(
@@ -31,78 +28,29 @@ export function WorkspaceInitEffects() {
 	const processingRef = useRef<Set<string>>(new Set());
 
 	const addTab = useTabsStore((state) => state.addTab);
-	const addPane = useTabsStore((state) => state.addPane);
-	const addPanesToTab = useTabsStore((state) => state.addPanesToTab);
-	const addTabWithMultiplePanes = useTabsStore(
-		(state) => state.addTabWithMultiplePanes,
-	);
 	const setTabAutoTitle = useTabsStore((state) => state.setTabAutoTitle);
-	const renameTab = useTabsStore((state) => state.renameTab);
+	const { openPreset } = useTabsWithPresets();
 	const createOrAttach = electronTrpc.terminal.createOrAttach.useMutation();
 	const utils = electronTrpc.useUtils();
-
-	const createPresetTerminal = useCallback(
-		(
-			workspaceId: string,
-			preset: NonNullable<PendingTerminalSetup["defaultPreset"]>,
-			existingTabId?: string,
-		) => {
-			const isParallel =
-				preset.executionMode === "parallel" && preset.commands.length > 1;
-
-			if (existingTabId) {
-				if (isParallel) {
-					addPanesToTab(existingTabId, {
-						commands: preset.commands,
-						initialCwd: preset.cwd || undefined,
-					});
-				} else {
-					addPane(existingTabId, {
-						initialCommands: preset.commands,
-						initialCwd: preset.cwd || undefined,
-					});
-				}
-				return;
-			}
-
-			if (isParallel) {
-				const options: AddTabWithMultiplePanesOptions = {
-					commands: preset.commands,
-					initialCwd: preset.cwd || undefined,
-				};
-				const { tabId } = addTabWithMultiplePanes(workspaceId, options);
-				renameTab(tabId, preset.name);
-			} else {
-				const { tabId } = addTab(workspaceId, {
-					initialCommands: preset.commands,
-					initialCwd: preset.cwd || undefined,
-				});
-				renameTab(tabId, preset.name);
-			}
-		},
-		[addTab, addPane, addPanesToTab, addTabWithMultiplePanes, renameTab],
-	);
 
 	const handleTerminalSetup = useCallback(
 		(setup: PendingTerminalSetup, onComplete: () => void) => {
 			const hasSetupScript =
 				Array.isArray(setup.initialCommands) &&
 				setup.initialCommands.length > 0;
-			const hasDefaultPreset =
-				shouldApplyPreset &&
-				setup.defaultPreset != null &&
-				setup.defaultPreset.commands.length > 0;
+			const presets = (setup.defaultPresets ?? []).filter(
+				(p) => p.commands.length > 0,
+			);
+			const hasPresets = shouldApplyPreset && presets.length > 0;
 
-			if (hasSetupScript && hasDefaultPreset && setup.defaultPreset) {
+			if (hasSetupScript && hasPresets) {
 				const { tabId: setupTabId, paneId: setupPaneId } = addTab(
 					setup.workspaceId,
 				);
 				setTabAutoTitle(setupTabId, "Workspace Setup");
-				createPresetTerminal(
-					setup.workspaceId,
-					setup.defaultPreset,
-					setupTabId,
-				);
+				for (const preset of presets) {
+					openPreset(setup.workspaceId, preset);
+				}
 
 				createOrAttach.mutate(
 					{
@@ -171,26 +119,17 @@ export function WorkspaceInitEffects() {
 				return;
 			}
 
-			if (
-				shouldApplyPreset &&
-				setup.defaultPreset &&
-				setup.defaultPreset.commands.length > 0
-			) {
-				createPresetTerminal(setup.workspaceId, setup.defaultPreset);
+			if (hasPresets) {
+				for (const preset of presets) {
+					openPreset(setup.workspaceId, preset);
+				}
 				onComplete();
 				return;
 			}
 
-			// No setup script or default preset — sidebar card handles the prompt
 			onComplete();
 		},
-		[
-			addTab,
-			setTabAutoTitle,
-			createOrAttach,
-			createPresetTerminal,
-			shouldApplyPreset,
-		],
+		[addTab, setTabAutoTitle, createOrAttach, openPreset, shouldApplyPreset],
 	);
 
 	useEffect(() => {
@@ -201,7 +140,6 @@ export function WorkspaceInitEffects() {
 				continue;
 			}
 
-			// No initProgress means workspace is already initialized — process immediately
 			if (!progress) {
 				processingRef.current.add(workspaceId);
 				handleTerminalSetup(setup, () => {
@@ -216,13 +154,13 @@ export function WorkspaceInitEffects() {
 
 				// Always fetch from backend to ensure we have the latest preset
 				// (client-side preset query may not have resolved when pending setup was created)
-				if (setup.defaultPreset === undefined) {
+				if (setup.defaultPresets === undefined) {
 					utils.workspaces.getSetupCommands
 						.fetch({ workspaceId })
 						.then((setupData) => {
 							const completeSetup: PendingTerminalSetup = {
 								...setup,
-								defaultPreset: setupData?.defaultPreset ?? null,
+								defaultPresets: setupData?.defaultPresets ?? [],
 							};
 							handleTerminalSetup(completeSetup, () => {
 								removePendingTerminalSetup(workspaceId);
@@ -282,7 +220,7 @@ export function WorkspaceInitEffects() {
 						workspaceId,
 						projectId: setupData.projectId,
 						initialCommands: setupData.initialCommands,
-						defaultPreset: setupData.defaultPreset,
+						defaultPresets: setupData.defaultPresets ?? [],
 					};
 
 					handleTerminalSetup(fetchedSetup, () => {

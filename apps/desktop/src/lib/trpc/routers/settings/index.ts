@@ -29,6 +29,18 @@ function getSettings() {
 	return row;
 }
 
+/** Get presets tagged with a given auto-apply field, falling back to the isDefault preset */
+export function getPresetsForTrigger(
+	field: "applyOnWorkspaceCreated" | "applyOnNewTab",
+) {
+	const row = getSettings();
+	const presets = row.terminalPresets ?? [];
+	const tagged = presets.filter((p) => p[field]);
+	if (tagged.length > 0) return tagged;
+	const defaultPreset = presets.find((p) => p.isDefault);
+	return defaultPreset ? [defaultPreset] : [];
+}
+
 export const createSettingsRouter = () => {
 	return router({
 		getLastUsedApp: publicProcedure.query(() => {
@@ -159,6 +171,54 @@ export const createSettingsRouter = () => {
 				return { success: true };
 			}),
 
+		setPresetAutoApply: publicProcedure
+			.input(
+				z.object({
+					id: z.string(),
+					field: z.enum(["applyOnWorkspaceCreated", "applyOnNewTab"]),
+					enabled: z.boolean(),
+				}),
+			)
+			.mutation(({ input }) => {
+				const row = getSettings();
+				const presets = row.terminalPresets ?? [];
+
+				const updatedPresets = presets.map((p) => {
+					if (p.id !== input.id) return p;
+
+					// Migrate legacy isDefault preset to explicit fields on first toggle
+					const needsMigration =
+						p.isDefault &&
+						p.applyOnWorkspaceCreated === undefined &&
+						p.applyOnNewTab === undefined;
+
+					const base = needsMigration
+						? {
+								...p,
+								isDefault: undefined,
+								applyOnWorkspaceCreated: true as const,
+								applyOnNewTab: true as const,
+							}
+						: p;
+
+					return {
+						...base,
+						[input.field]: input.enabled ? true : undefined,
+					};
+				});
+
+				localDb
+					.insert(settings)
+					.values({ id: 1, terminalPresets: updatedPresets })
+					.onConflictDoUpdate({
+						target: settings.id,
+						set: { terminalPresets: updatedPresets },
+					})
+					.run();
+
+				return { success: true };
+			}),
+
 		reorderTerminalPresets: publicProcedure
 			.input(
 				z.object({
@@ -205,6 +265,14 @@ export const createSettingsRouter = () => {
 			const presets = row.terminalPresets ?? [];
 			return presets.find((p) => p.isDefault) ?? null;
 		}),
+
+		getWorkspaceCreationPresets: publicProcedure.query(() =>
+			getPresetsForTrigger("applyOnWorkspaceCreated"),
+		),
+
+		getNewTabPresets: publicProcedure.query(() =>
+			getPresetsForTrigger("applyOnNewTab"),
+		),
 
 		getSelectedRingtoneId: publicProcedure.query(() => {
 			const row = getSettings();

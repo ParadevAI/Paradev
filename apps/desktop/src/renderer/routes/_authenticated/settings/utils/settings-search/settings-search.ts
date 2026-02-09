@@ -405,8 +405,9 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 	{
 		id: SETTING_ITEM_ID.TERMINAL_AUTO_APPLY_PRESET,
 		section: "terminal",
-		title: "Auto-apply Default Preset",
-		description: "Automatically apply default preset when creating workspaces",
+		title: "Auto-Apply Default Preset",
+		description:
+			"Automatically apply the workspace creation preset when creating new workspaces",
 		keywords: [
 			"terminal",
 			"preset",
