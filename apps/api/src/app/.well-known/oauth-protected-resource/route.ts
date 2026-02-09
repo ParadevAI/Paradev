@@ -1,4 +1,7 @@
-import { auth } from "@superset/auth/server";
-import { oAuthProtectedResourceMetadata } from "better-auth/plugins";
+import { protectedResourceHandler } from "mcp-handler";
+import { env } from "@/env";
 
-export const GET = oAuthProtectedResourceMetadata(auth);
+export const GET = protectedResourceHandler({
+	authServerUrls: [env.NEXT_PUBLIC_API_URL],
+	resourceUrl: env.NEXT_PUBLIC_API_URL,
+});
