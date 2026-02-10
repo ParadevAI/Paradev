@@ -63,7 +63,6 @@ function useCollectionData<C extends Collection<any, any, any, any, any>>(
 		return () => subscription.unsubscribe();
 	});
 
-	// Update subscribe ref when collection changes
 	subscribeRef.current = (onStoreChange: () => void): (() => void) => {
 		const subscription = collection.subscribeChanges(() => {
 			versionRef.current++;
@@ -72,24 +71,21 @@ function useCollectionData<C extends Collection<any, any, any, any, any>>(
 		return () => subscription.unsubscribe();
 	};
 
-	// Snapshot callback - returns cached data unless version changed.
+	// Returns cached data unless version changed.
 	// Stored in ref to maintain stable reference for useSyncExternalStore.
 	const getSnapshotRef = useRef((): T[] => {
 		const currentVersion = versionRef.current;
 		const cached = snapshotRef.current;
 
-		// Return cached snapshot if version hasn't changed
 		if (cached.version === currentVersion) {
 			return cached.data;
 		}
 
-		// Version changed - create new snapshot and cache it
 		const data = [...collection.values()] as T[];
 		snapshotRef.current = { version: currentVersion, data };
 		return data;
 	});
 
-	// Update getSnapshot ref when collection changes
 	getSnapshotRef.current = (): T[] => {
 		const currentVersion = versionRef.current;
 		const cached = snapshotRef.current;
@@ -177,7 +173,8 @@ export function useDurableChat<
 		client: DurableChatClient<TTools>;
 		key: string;
 	} | null>(null);
-	const key = `${clientOptions.sessionId}:${clientOptions.proxyUrl}`;
+	const authHeader = clientOptions.stream?.headers?.Authorization;
+	const key = `${clientOptions.sessionId}:${clientOptions.proxyUrl}:${authHeader ?? ""}`;
 
 	// Create or recreate client when key changes or client was disposed.
 	// The isDisposed check handles React Strict Mode: cleanup disposes the client,
@@ -219,7 +216,6 @@ export function useDurableChat<
 	const sessionMetaRows = useCollectionData(client.collections.sessionMeta);
 
 	const messages = useMemo(
-		// Transform MessageRow[] to UIMessage[]
 		() => messageRows.map(messageRowToUIMessage),
 		[messageRows],
 	);
@@ -274,15 +270,6 @@ export function useDurableChat<
 		},
 		[client],
 	);
-
-	const reload = useCallback(async () => {
-		try {
-			await client.reload();
-		} catch (err) {
-			setError(err instanceof Error ? err : new Error(String(err)));
-			throw err;
-		}
-	}, [client]);
 
 	const stop = useCallback(() => {
 		client.stop();
@@ -372,7 +359,6 @@ export function useDurableChat<
 		messages,
 		sendMessage,
 		append,
-		reload,
 		stop,
 		clear,
 		isLoading,

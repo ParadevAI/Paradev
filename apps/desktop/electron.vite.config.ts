@@ -21,6 +21,9 @@ import {
 // override: true ensures .env values take precedence over inherited env vars
 config({ path: resolve(__dirname, "../../.env"), override: true, quiet: true });
 
+// Validate required env vars at build time using the Zod schema (single source of truth)
+await import("./src/main/env.main");
+
 const tsconfigPaths = tsconfigPathsPlugin({
 	projects: [resolve("tsconfig.json")],
 });
@@ -57,8 +60,6 @@ export default defineConfig({
 				process.env.NEXT_PUBLIC_DOCS_URL,
 				"https://docs.superset.sh",
 			),
-			"process.env.GOOGLE_CLIENT_ID": defineEnv(process.env.GOOGLE_CLIENT_ID),
-			"process.env.GH_CLIENT_ID": defineEnv(process.env.GH_CLIENT_ID),
 			"process.env.SENTRY_DSN_DESKTOP": defineEnv(
 				process.env.SENTRY_DSN_DESKTOP,
 			),

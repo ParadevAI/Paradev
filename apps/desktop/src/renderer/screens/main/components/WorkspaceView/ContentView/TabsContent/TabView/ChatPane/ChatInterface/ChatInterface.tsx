@@ -58,6 +58,14 @@ export function ChatInterface({
 	const [isSending, setIsSending] = useState(false);
 
 	const updateConfig = electronTrpc.aiChat.updateSessionConfig.useMutation();
+	const triggerAgent = electronTrpc.aiChat.sendMessage.useMutation({
+		onError: (err) => {
+			console.error("[chat] Agent trigger failed:", err);
+			setIsSending(false);
+		},
+	});
+	const interruptAgent = electronTrpc.aiChat.interrupt.useMutation();
+	const approveToolUse = electronTrpc.aiChat.approveToolUse.useMutation();
 
 	const { data: config } = electronTrpc.aiChat.getConfig.useQuery();
 
@@ -170,10 +178,10 @@ export function ChatInterface({
 	}, [sessionId, cwd, workspaceId, existingSession, paneId, tabId]);
 
 	useEffect(() => {
-		if (sessionReady && config?.proxyUrl) {
+		if (sessionReady && config?.proxyUrl && config?.authToken) {
 			doConnect();
 		}
-	}, [sessionReady, config?.proxyUrl, doConnect]);
+	}, [sessionReady, config?.proxyUrl, config?.authToken, doConnect]);
 
 	const handleRename = useCallback(
 		(title: string) => {
@@ -192,12 +200,17 @@ export function ChatInterface({
 		(message: { text: string }) => {
 			if (!message.text.trim()) return;
 			setIsSending(true);
-			sendMessage(message.text).catch((err) => {
-				console.error("[chat] Send failed:", err);
-				setIsSending(false);
-			});
+			sendMessage(message.text)
+				.then(() => {
+					// Trigger the local agent to process the message
+					triggerAgent.mutate({ sessionId, text: message.text });
+				})
+				.catch((err) => {
+					console.error("[chat] Send failed:", err);
+					setIsSending(false);
+				});
 		},
-		[sendMessage],
+		[sendMessage, triggerAgent, sessionId],
 	);
 
 	// Clear isSending once the server starts streaming (isLoading takes over)
@@ -209,16 +222,26 @@ export function ChatInterface({
 
 	const handleApprove = useCallback(
 		(approvalId: string) => {
+			approveToolUse.mutate({
+				sessionId,
+				toolUseId: approvalId,
+				approved: true,
+			});
 			addToolApprovalResponse({ id: approvalId, approved: true });
 		},
-		[addToolApprovalResponse],
+		[approveToolUse, sessionId, addToolApprovalResponse],
 	);
 
 	const handleDeny = useCallback(
 		(approvalId: string) => {
+			approveToolUse.mutate({
+				sessionId,
+				toolUseId: approvalId,
+				approved: false,
+			});
 			addToolApprovalResponse({ id: approvalId, approved: false });
 		},
-		[addToolApprovalResponse],
+		[approveToolUse, sessionId, addToolApprovalResponse],
 	);
 
 	const handleAnswer = useCallback(
@@ -266,9 +289,11 @@ export function ChatInterface({
 	const handleStop = useCallback(
 		(e: React.MouseEvent) => {
 			e.preventDefault();
+			setIsSending(false);
+			interruptAgent.mutate({ sessionId });
 			stop();
 		},
-		[stop],
+		[interruptAgent, sessionId, stop],
 	);
 
 	const handleSlashCommandSend = useCallback(
@@ -359,8 +384,12 @@ export function ChatInterface({
 													modelId={selectedModel.id}
 												/>
 												<PromptInputSubmit
-													status={isLoading ? "streaming" : undefined}
-													onClick={isLoading ? handleStop : undefined}
+													status={
+														isSending || isLoading ? "streaming" : undefined
+													}
+													onClick={
+														isSending || isLoading ? handleStop : undefined
+													}
 												/>
 											</div>
 										</PromptInputFooter>

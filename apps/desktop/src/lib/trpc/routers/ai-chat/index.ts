@@ -1,7 +1,6 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
-import { observable } from "@trpc/server/observable";
 import { env } from "main/env.main";
 import { z } from "zod";
 import { publicProcedure, router } from "../..";
@@ -9,11 +8,7 @@ import {
 	readClaudeSessionMessages,
 	scanClaudeSessions,
 } from "./utils/claude-session-scanner";
-import {
-	type ClaudeStreamEvent,
-	chatSessionManager,
-	sessionStore,
-} from "./utils/session-manager";
+import { chatSessionManager, sessionStore } from "./utils/session-manager";
 
 interface CommandEntry {
 	name: string;
@@ -226,23 +221,34 @@ export const createAiChatRouter = () => {
 				});
 			}),
 
-		streamEvents: publicProcedure
-			.input(z.object({ sessionId: z.string().optional() }))
-			.subscription(({ input }) => {
-				return observable<ClaudeStreamEvent>((emit) => {
-					const onEvent = (event: ClaudeStreamEvent) => {
-						if (input.sessionId && event.sessionId !== input.sessionId) {
-							return;
-						}
-						emit.next(event);
-					};
-
-					chatSessionManager.on("event", onEvent);
-
-					return () => {
-						chatSessionManager.off("event", onEvent);
-					};
+		sendMessage: publicProcedure
+			.input(z.object({ sessionId: z.string(), text: z.string() }))
+			.mutation(({ input }) => {
+				// Fire-and-forget: agent runs in background, errors surface via streamEvents
+				chatSessionManager.startAgent({
+					sessionId: input.sessionId,
+					prompt: input.text,
 				});
+				return { success: true };
+			}),
+
+		approveToolUse: publicProcedure
+			.input(
+				z.object({
+					sessionId: z.string(),
+					toolUseId: z.string(),
+					approved: z.boolean(),
+					updatedInput: z.record(z.string(), z.unknown()).optional(),
+				}),
+			)
+			.mutation(({ input }) => {
+				chatSessionManager.resolvePermission({
+					sessionId: input.sessionId,
+					toolUseId: input.toolUseId,
+					approved: input.approved,
+					updatedInput: input.updatedInput,
+				});
+				return { success: true };
 			}),
 	});
 };

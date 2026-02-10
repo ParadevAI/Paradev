@@ -45,5 +45,6 @@
 		"packages/*",
 		"apps/*",
 		"tooling/*"
-	]
+	],
+	"resolutions": {}
 }

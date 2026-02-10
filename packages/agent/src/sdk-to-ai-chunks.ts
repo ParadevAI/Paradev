@@ -1,9 +1,5 @@
 /**
- * SDK-to-AI Chunk Converter
- *
  * Converts Claude Agent SDK `SDKMessage` objects to TanStack AI `StreamChunk` (AG-UI events).
- * The proxy expects SSE with JSON AG-UI events. The `StreamProcessor` on the client
- * materializes these into `MessagePart[]` for the UI.
  *
  * Handled AG-UI events:
  * - TEXT_MESSAGE_CONTENT  — text token streaming
@@ -17,10 +13,6 @@
 
 import { createTextSegmentEnricher } from "@superset/durable-session";
 import type { StreamChunk } from "@tanstack/ai";
-
-// ============================================================================
-// Claude SDK Types (subset used for conversion)
-// ============================================================================
 
 interface SDKPartialAssistantMessage {
 	type: "stream_event";
@@ -63,10 +55,6 @@ type SDKMessage =
 	| SDKSystemMessage
 	| { type: string; [key: string]: unknown };
 
-// ============================================================================
-// Beta Raw Message Stream Events (from Anthropic SDK)
-// ============================================================================
-
 type BetaRawMessageStreamEvent =
 	| { type: "message_start"; message: { id: string; model: string } }
 	| {
@@ -101,10 +89,6 @@ type ContentBlockDelta =
 	| { type: "signature_delta"; signature: string }
 	| { type: "citations_delta"; [key: string]: unknown };
 
-// ============================================================================
-// Conversion State
-// ============================================================================
-
 interface ActiveBlock {
 	type: "text" | "tool_use" | "thinking" | "other";
 	toolCallId?: string;
@@ -117,10 +101,6 @@ export interface ConversionState {
 	messageId: string;
 	runId: string;
 }
-
-// ============================================================================
-// Converter Factory
-// ============================================================================
 
 export function createConverter(): {
 	state: ConversionState;
@@ -144,10 +124,6 @@ export function createConverter(): {
 	};
 }
 
-// ============================================================================
-// Main Conversion Logic
-// ============================================================================
-
 function convertMessage(
 	state: ConversionState,
 	message: SDKMessage,
@@ -163,7 +139,8 @@ function convertMessage(
 			return handleUserMessage(message as SDKUserMessage);
 
 		case "assistant":
-			return handleAssistantMessage(state, message);
+			// Content already streamed via stream_event; skip the full message.
+			return [];
 
 		case "result":
 			return handleResultMessage(state, message as SDKResultMessage);
@@ -172,10 +149,6 @@ function convertMessage(
 			return [];
 	}
 }
-
-// ============================================================================
-// Stream Event Handlers
-// ============================================================================
 
 function handleStreamEvent(
 	state: ConversionState,
@@ -194,7 +167,6 @@ function handleStreamEvent(
 			return handleContentBlockStop(state, event.index, now);
 
 		default:
-			// message_start, message_delta, message_stop — not needed for chunk conversion
 			return [];
 	}
 }
@@ -305,7 +277,6 @@ function handleContentBlockDelta(
 		}
 
 		default:
-			// signature_delta, citations_delta — skip
 			return [];
 	}
 }
@@ -347,10 +318,6 @@ function handleContentBlockStop(
 
 	return [];
 }
-
-// ============================================================================
-// User Message Handler (Tool Results)
-// ============================================================================
 
 function handleUserMessage(message: SDKUserMessage): StreamChunk[] {
 	if (!message.message) return [];
@@ -400,42 +367,6 @@ function handleUserMessage(message: SDKUserMessage): StreamChunk[] {
 
 	return chunks;
 }
-
-// ============================================================================
-// Assistant Message Handler (non-streamed responses, e.g. slash command output)
-// ============================================================================
-
-function handleAssistantMessage(
-	state: ConversionState,
-	message: SDKMessage,
-): StreamChunk[] {
-	const msg = message as {
-		type: "assistant";
-		message?: { content?: Array<{ type: string; text?: string }> };
-	};
-	const content = msg.message?.content;
-	if (!content || !Array.isArray(content)) return [];
-
-	const now = Date.now();
-	const chunks: StreamChunk[] = [];
-
-	for (const block of content) {
-		if (block.type === "text" && block.text) {
-			chunks.push({
-				type: "TEXT_MESSAGE_CONTENT",
-				messageId: state.messageId,
-				delta: block.text,
-				timestamp: now,
-			} satisfies StreamChunk);
-		}
-	}
-
-	return chunks;
-}
-
-// ============================================================================
-// Result Message Handler
-// ============================================================================
 
 function handleResultMessage(
 	state: ConversionState,
