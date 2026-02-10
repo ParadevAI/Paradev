@@ -128,3 +128,7 @@ export const BRANCH_PREFIX_MODES = [
 ] as const;
 
 export type BranchPrefixMode = (typeof BRANCH_PREFIX_MODES)[number];
+
+export const FILE_OPEN_MODES = ["split-pane", "new-tab"] as const;
+
+export type FileOpenMode = (typeof FILE_OPEN_MODES)[number];
