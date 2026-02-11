@@ -8,11 +8,11 @@ import { DesktopRedirect } from "./components/DesktopRedirect";
 export default async function DesktopSuccessPage({
 	searchParams,
 }: {
-	searchParams: Promise<{ desktop_state?: string }>;
+	searchParams: Promise<{ desktop_state?: string; desktop_protocol?: string }>;
 }) {
-	const { desktop_state: state } = await searchParams;
+	const { desktop_state: state, desktop_protocol } = await searchParams;
 
-	if (!state) {
+	if (!state || !desktop_protocol) {
 		return (
 			<div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
 				<p className="text-xl text-muted-foreground">Missing auth state</p>
@@ -71,9 +71,7 @@ export default async function DesktopSuccessPage({
 		activeOrganizationId: session.session.activeOrganizationId,
 		updatedAt: now,
 	});
-	const protocol =
-		process.env.NODE_ENV === "development" ? "superset-dev" : "superset";
-	const desktopUrl = `${protocol}://auth/callback?token=${encodeURIComponent(token)}&expiresAt=${encodeURIComponent(expiresAt.toISOString())}&state=${encodeURIComponent(state)}`;
+	const desktopUrl = `${desktop_protocol}://auth/callback?token=${encodeURIComponent(token)}&expiresAt=${encodeURIComponent(expiresAt.toISOString())}&state=${encodeURIComponent(state)}`;
 
 	return (
 		<div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
