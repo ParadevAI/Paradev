@@ -189,6 +189,8 @@ async function ensureMainWorkspace(project: Project): Promise<void> {
 // Safe filename regex: letters, numbers, dots, underscores, hyphens, spaces, and common unicode
 // Allows most valid Git repo names while avoiding path traversal characters
 const SAFE_REPO_NAME_REGEX = /^[a-zA-Z0-9._\- ]+$/;
+const ALLOWED_URL_PROTOCOLS = new Set(["http:", "https:", "ssh:", "git:"]);
+const SSH_GIT_URL_REGEX = /^[\w.-]+@[\w.-]+:[\w./-]+$/;
 
 /**
  * Extracts and validates a repository name from a git URL.
@@ -625,7 +627,20 @@ export const createProjectsRouter = (getWindow: () => BrowserWindow | null) => {
 		cloneRepo: publicProcedure
 			.input(
 				z.object({
-					url: z.string().url(),
+					url: z
+						.string()
+						.min(1)
+						.refine(
+							(val) => {
+								try {
+									const parsed = new URL(val);
+									return ALLOWED_URL_PROTOCOLS.has(parsed.protocol);
+								} catch {
+									return SSH_GIT_URL_REGEX.test(val);
+								}
+							},
+							{ message: "Must be a valid Git URL (HTTPS or SSH)" },
+						),
 					// Trim and convert empty/whitespace strings to undefined
 					targetDirectory: z
 						.string()
