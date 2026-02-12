@@ -5,6 +5,7 @@ import { db } from "@superset/db/client";
 import { integrationConnections } from "@superset/db/schema";
 import { and, eq } from "drizzle-orm";
 import { env } from "@/env";
+import { DEFAULT_SLACK_MODEL } from "../../../constants";
 import type { AgentAction } from "../slack-blocks";
 import {
 	createSupersetMcpClient,
@@ -113,6 +114,7 @@ interface RunSlackAgentParams {
 	threadTs: string;
 	organizationId: string;
 	slackToken: string;
+	model?: string;
 	onProgress?: (status: string) => void | Promise<void>;
 }
 
@@ -489,7 +491,7 @@ ${agentContext}`;
 		];
 
 		let response = await anthropic.messages.create({
-			model: "claude-sonnet-4-5",
+			model: params.model ?? DEFAULT_SLACK_MODEL,
 			max_tokens: 2048,
 			system: contextualSystem,
 			tools,
@@ -515,7 +517,7 @@ ${agentContext}`;
 				}
 				messages.push({ role: "assistant", content: response.content });
 				response = await anthropic.messages.create({
-					model: "claude-sonnet-4-5",
+					model: params.model ?? DEFAULT_SLACK_MODEL,
 					max_tokens: 2048,
 					system: contextualSystem,
 					tools,
@@ -611,7 +613,7 @@ ${agentContext}`;
 			messages.push({ role: "user", content: toolResults });
 
 			response = await anthropic.messages.create({
-				model: "claude-sonnet-4-5",
+				model: params.model ?? DEFAULT_SLACK_MODEL,
 				max_tokens: 2048,
 				system: contextualSystem,
 				tools,
