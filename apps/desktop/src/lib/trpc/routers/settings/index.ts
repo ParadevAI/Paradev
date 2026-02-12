@@ -21,6 +21,10 @@ import { DEFAULT_RINGTONE_ID, RINGTONES } from "shared/ringtones";
 import { z } from "zod";
 import { publicProcedure, router } from "../..";
 import { getGitAuthorName, getGitHubUsername } from "../workspaces/utils/git";
+import {
+	setFontSettingsSchema,
+	transformFontSettings,
+} from "./font-settings.utils";
 
 const VALID_RINGTONE_IDS = RINGTONES.map((r) => r.id);
 
@@ -563,6 +567,37 @@ export const createSettingsRouter = () => {
 					.onConflictDoUpdate({
 						target: settings.id,
 						set: { notificationSoundsMuted: input.muted },
+					})
+					.run();
+
+				return { success: true };
+			}),
+
+		getFontSettings: publicProcedure.query(() => {
+			const row = getSettings();
+			return {
+				terminalFontFamily: row.terminalFontFamily ?? null,
+				terminalFontSize: row.terminalFontSize ?? null,
+				editorFontFamily: row.editorFontFamily ?? null,
+				editorFontSize: row.editorFontSize ?? null,
+			};
+		}),
+
+		setFontSettings: publicProcedure
+			.input(setFontSettingsSchema)
+			.mutation(({ input }) => {
+				const set = transformFontSettings(input);
+
+				if (Object.keys(set).length === 0) {
+					return { success: true };
+				}
+
+				localDb
+					.insert(settings)
+					.values({ id: 1, ...set })
+					.onConflictDoUpdate({
+						target: settings.id,
+						set,
 					})
 					.run();
 
