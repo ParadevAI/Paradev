@@ -110,6 +110,32 @@ step_check_dependencies() {
   return 0
 }
 
+step_kill_terminal_daemons() {
+  echo "🔪 Killing terminal daemon processes..."
+
+  local worktree_path
+  worktree_path="$(pwd)"
+  local killed=0
+
+  for pattern in "terminal-host.js" "pty-subprocess.js"; do
+    local pids
+    pids=$(pgrep -f "${worktree_path}/.*${pattern}" 2>/dev/null || true)
+    if [ -n "$pids" ]; then
+      for pid in $pids; do
+        kill "$pid" 2>/dev/null && ((killed++)) || true
+      done
+    fi
+  done
+
+  if [ "$killed" -gt 0 ]; then
+    success "Killed $killed terminal daemon process(es)"
+  else
+    success "No terminal daemon processes found"
+  fi
+
+  return 0
+}
+
 step_stop_electric() {
   echo "⚡ Stopping Electric SQL container..."
 
@@ -195,12 +221,17 @@ main() {
   # Step 2: Check dependencies (informational only)
   step_check_dependencies
 
-  # Step 3: Stop Electric SQL
+  # Step 3: Kill terminal daemons
+  if ! step_kill_terminal_daemons; then
+    step_failed "Kill terminal daemons"
+  fi
+
+  # Step 4: Stop Electric SQL
   if ! step_stop_electric; then
     step_failed "Stop Electric SQL"
   fi
 
-  # Step 4: Delete Neon branch
+  # Step 5: Delete Neon branch
   if ! step_delete_neon_branch; then
     step_failed "Delete Neon branch"
   fi
