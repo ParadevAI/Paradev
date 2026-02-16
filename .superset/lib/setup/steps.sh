@@ -350,7 +350,8 @@ step_write_env() {
     # Each workspace gets a range of 20 ports from its base.
     # Offsets: +0 web, +1 api, +2 marketing, +3 admin, +4 docs,
     #          +5 desktop vite, +6 notifications, +7 streams, +8 streams internal, +9 electric,
-    #          +10 caddy (HTTP/2 reverse proxy for API electric endpoint), +11 code inspector
+    #          +10 caddy (HTTP/2 reverse proxy for API electric endpoint), +11 code inspector,
+    #          +12 desktop automation (CDP)
     local BASE=$SUPERSET_PORT_BASE
 
     # App ports (fixed offsets from base)
@@ -366,6 +367,7 @@ step_write_env() {
     local ELECTRIC_PORT=$((BASE + 9))
     local CADDY_ELECTRIC_PORT=$((BASE + 10))
     local CODE_INSPECTOR_PORT=$((BASE + 11))
+    local DESKTOP_AUTOMATION_PORT=$((BASE + 12))
 
     echo ""
     echo "# Workspace Ports (allocated from SUPERSET_PORT_BASE=$BASE, range=20)"
@@ -382,6 +384,7 @@ step_write_env() {
     write_env_var "ELECTRIC_PORT" "$ELECTRIC_PORT"
     write_env_var "CADDY_ELECTRIC_PORT" "$CADDY_ELECTRIC_PORT"
     write_env_var "CODE_INSPECTOR_PORT" "$CODE_INSPECTOR_PORT"
+    write_env_var "DESKTOP_AUTOMATION_PORT" "$DESKTOP_AUTOMATION_PORT"
     echo ""
     echo "# Cross-app URLs (overrides from root .env)"
     write_env_var "NEXT_PUBLIC_API_URL" "http://localhost:$API_PORT"
