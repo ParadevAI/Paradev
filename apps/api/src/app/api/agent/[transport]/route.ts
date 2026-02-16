@@ -120,6 +120,8 @@ const baseHandler = createMcpHandler(
 		basePath: "/api/agent",
 		verboseLogs: env.NODE_ENV === "development",
 		maxDuration: 60,
+		// @ts-expect-error mcp-handler types sessionIdGenerator as undefined but runtime accepts it
+		sessionIdGenerator: () => crypto.randomUUID(),
 	},
 );
 
