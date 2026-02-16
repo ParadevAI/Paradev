@@ -16,15 +16,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	useEffect(() => {
 		if (!isSuccess || isHydrated) return;
 
-		if (storedToken?.token && storedToken?.expiresAt) {
-			const isExpired = new Date(storedToken.expiresAt) < new Date();
-			if (!isExpired) {
-				setAuthToken(storedToken.token);
-				refetchSession().catch(() => {});
+		let cancelled = false;
+
+		async function hydrate() {
+			if (storedToken?.token && storedToken?.expiresAt) {
+				const isExpired = new Date(storedToken.expiresAt) < new Date();
+				if (!isExpired) {
+					setAuthToken(storedToken.token);
+					try {
+						await refetchSession();
+					} catch (err) {
+						console.warn(
+							"[AuthProvider] session refetch failed during hydration",
+							err,
+						);
+					}
+				}
+			}
+			if (!cancelled) {
+				setIsHydrated(true);
 			}
 		}
 
-		setIsHydrated(true);
+		hydrate();
+		return () => {
+			cancelled = true;
+		};
 	}, [storedToken, isSuccess, isHydrated, refetchSession]);
 
 	electronTrpc.auth.onTokenChanged.useSubscription(undefined, {
@@ -33,11 +50,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 				setAuthToken(null);
 				await authClient.signOut({ fetchOptions: { throw: false } });
 				setAuthToken(data.token);
+				try {
+					await refetchSession();
+				} catch (err) {
+					console.warn(
+						"[AuthProvider] session refetch failed after token change",
+						err,
+					);
+				}
 				setIsHydrated(true);
-				refetchSession();
 			} else if (data === null) {
 				setAuthToken(null);
-				refetchSession();
+				try {
+					await refetchSession();
+				} catch (err) {
+					console.warn(
+						"[AuthProvider] session refetch failed after token cleared",
+						err,
+					);
+				}
 			}
 		},
 	});
