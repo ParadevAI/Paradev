@@ -63,7 +63,7 @@ export function SecretsSettings({ projectId }: SecretsSettingsProps) {
 				neonProjectId: suggestedMatch.id,
 			});
 		}
-	}, [suggestedMatch, linkToNeon.mutate, projectId]);
+	}, [suggestedMatch, linkToNeon.mutate, projectId, linkToNeon]);
 
 	const linkedCloudProject = useMemo(() => {
 		if (!project?.neonProjectId || !cloudProjects) return null;

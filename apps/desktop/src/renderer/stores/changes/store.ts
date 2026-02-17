@@ -19,7 +19,6 @@ interface ChangesState {
 	viewMode: DiffViewMode;
 	fileListViewMode: FileListViewMode;
 	expandedSections: Record<ChangeCategory, boolean>;
-	baseBranch: Record<string, string | null>;
 	showRenderedMarkdown: Record<string, boolean>;
 	hideUnchangedRegions: boolean;
 	focusMode: boolean;
@@ -35,8 +34,6 @@ interface ChangesState {
 	setFileListViewMode: (mode: FileListViewMode) => void;
 	toggleSection: (section: ChangeCategory) => void;
 	setSectionExpanded: (section: ChangeCategory, expanded: boolean) => void;
-	setBaseBranch: (worktreePath: string, branch: string | null) => void;
-	getBaseBranch: (worktreePath: string) => string | null;
 	toggleRenderedMarkdown: (worktreePath: string) => void;
 	getShowRenderedMarkdown: (worktreePath: string) => boolean;
 	toggleHideUnchangedRegions: () => void;
@@ -54,7 +51,6 @@ const initialState = {
 		staged: true,
 		unstaged: true,
 	},
-	baseBranch: {} as Record<string, string | null>,
 	showRenderedMarkdown: {} as Record<string, boolean>,
 	hideUnchangedRegions: false,
 	focusMode: false,
@@ -114,20 +110,6 @@ export const useChangesStore = create<ChangesState>()(
 					});
 				},
 
-				setBaseBranch: (worktreePath, branch) => {
-					const { baseBranch } = get();
-					set({
-						baseBranch: {
-							...baseBranch,
-							[worktreePath]: branch,
-						},
-					});
-				},
-
-				getBaseBranch: (worktreePath) => {
-					return get().baseBranch[worktreePath] ?? null;
-				},
-
 				toggleRenderedMarkdown: (worktreePath) => {
 					const { showRenderedMarkdown } = get();
 					set({
@@ -162,10 +144,12 @@ export const useChangesStore = create<ChangesState>()(
 			}),
 			{
 				name: "changes-store",
-				version: 1,
-				migrate: (persisted) => {
+				version: 2,
+				migrate: (persisted, version) => {
 					const state = persisted as Record<string, unknown>;
-					state.baseBranch = {};
+					if (version < 2) {
+						delete state.baseBranch;
+					}
 					return state as unknown as ChangesState;
 				},
 				partialize: (state) => ({
@@ -173,7 +157,6 @@ export const useChangesStore = create<ChangesState>()(
 					viewMode: state.viewMode,
 					fileListViewMode: state.fileListViewMode,
 					expandedSections: state.expandedSections,
-					baseBranch: state.baseBranch,
 					showRenderedMarkdown: state.showRenderedMarkdown,
 					hideUnchangedRegions: state.hideUnchangedRegions,
 					focusMode: state.focusMode,
