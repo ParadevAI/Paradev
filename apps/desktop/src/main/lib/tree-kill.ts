@@ -3,6 +3,20 @@ import treeKill from "tree-kill";
 const DEFAULT_ESCALATION_TIMEOUT_MS = 2000;
 const POLL_INTERVAL_MS = 50;
 
+export function treeKillAsync(pid: number, signal: string): Promise<void> {
+	return new Promise<void>((resolve) => {
+		treeKill(pid, signal, (err) => {
+			if (err) {
+				console.warn(
+					`[treeKillAsync] Failed to ${signal} pid ${pid}:`,
+					err.message,
+				);
+			}
+			resolve();
+		});
+	});
+}
+
 /**
  * Kill a process tree with escalation to SIGKILL if the process survives.
  * Sends SIGTERM, polls for exit, escalates to SIGKILL after timeout.
