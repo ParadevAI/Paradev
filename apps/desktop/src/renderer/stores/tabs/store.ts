@@ -1197,15 +1197,20 @@ export const useTabsStore = create<TabsStore>()(
 							title,
 							...(faviconUrl !== undefined ? { faviconUrl } : {}),
 						};
-						set({
-							panes: {
-								...state.panes,
-								[paneId]: {
-									...pane,
-									name: title || "Browser",
-									browser: { ...pane.browser, history },
-								},
+						const newPanes = {
+							...state.panes,
+							[paneId]: {
+								...pane,
+								name: title || "Browser",
+								browser: { ...pane.browser, history },
 							},
+						};
+						const tabName = deriveTabName(newPanes, pane.tabId);
+						set({
+							panes: newPanes,
+							tabs: state.tabs.map((t) =>
+								t.id === pane.tabId ? { ...t, name: tabName } : t,
+							),
 						});
 						return;
 					}
@@ -1222,20 +1227,25 @@ export const useTabsStore = create<TabsStore>()(
 						history.splice(0, history.length - 100);
 					}
 
-					set({
-						panes: {
-							...state.panes,
-							[paneId]: {
-								...pane,
-								name: title || "Browser",
-								browser: {
-									...pane.browser,
-									currentUrl: url,
-									history,
-									historyIndex: history.length - 1,
-								},
+					const newPanes = {
+						...state.panes,
+						[paneId]: {
+							...pane,
+							name: title || "Browser",
+							browser: {
+								...pane.browser,
+								currentUrl: url,
+								history,
+								historyIndex: history.length - 1,
 							},
 						},
+					};
+					const tabName = deriveTabName(newPanes, pane.tabId);
+					set({
+						panes: newPanes,
+						tabs: state.tabs.map((t) =>
+							t.id === pane.tabId ? { ...t, name: tabName } : t,
+						),
 					});
 				},
 
@@ -1254,19 +1264,24 @@ export const useTabsStore = create<TabsStore>()(
 					if (newIndex < 0 || newIndex >= history.length) return null;
 
 					const entry = history[newIndex];
-					set({
-						panes: {
-							...state.panes,
-							[paneId]: {
-								...pane,
-								name: entry.title || "Browser",
-								browser: {
-									...pane.browser,
-									currentUrl: entry.url,
-									historyIndex: newIndex,
-								},
+					const newPanes = {
+						...state.panes,
+						[paneId]: {
+							...pane,
+							name: entry.title || "Browser",
+							browser: {
+								...pane.browser,
+								currentUrl: entry.url,
+								historyIndex: newIndex,
 							},
 						},
+					};
+					const tabName = deriveTabName(newPanes, pane.tabId);
+					set({
+						panes: newPanes,
+						tabs: state.tabs.map((t) =>
+							t.id === pane.tabId ? { ...t, name: tabName } : t,
+						),
 					});
 
 					return entry.url;

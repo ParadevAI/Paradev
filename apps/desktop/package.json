@@ -117,7 +117,7 @@
 		"date-fns": "^4.1.0",
 		"default-shell": "^2.2.0",
 		"dnd-core": "^16.0.1",
-		"dotenv": "^17.2.3",
+		"dotenv": "^17.3.1",
 		"drizzle-orm": "0.45.1",
 		"electron-updater": "^6.7.3",
 		"execa": "^9.6.0",
