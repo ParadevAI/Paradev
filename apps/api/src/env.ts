@@ -44,6 +44,8 @@ export const env = createEnv({
 		SLACK_BILLING_WEBHOOK_URL: z.string().url(),
 		SECRETS_ENCRYPTION_KEY: z.string().min(1),
 		SENTRY_AUTH_TOKEN: z.string().optional(),
+		DURABLE_STREAMS_URL: z.string().url().optional(),
+		DURABLE_STREAMS_SECRET: z.string().min(1).optional(),
 	},
 	client: {
 		NEXT_PUBLIC_API_URL: z.string().url(),
