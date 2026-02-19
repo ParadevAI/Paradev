@@ -3,11 +3,18 @@ import path from "node:path";
 import {
 	buildClaudeWrapperScript,
 	buildCodexWrapperScript,
+	buildCursorAgentWrapperScript,
 	buildOpenCodeWrapperScript,
+	CURSOR_HOOK_MARKER,
 	getClaudeSettingsContent,
 	getClaudeSettingsPath,
 	getClaudeWrapperPath,
 	getCodexWrapperPath,
+	getCursorAgentWrapperPath,
+	getCursorGlobalHooksJsonPath,
+	getCursorHookScriptContent,
+	getCursorHookScriptPath,
+	getCursorHooksJsonContent,
 	getOpenCodeGlobalPluginPath,
 	getOpenCodePluginContent,
 	getOpenCodePluginPath,
@@ -71,6 +78,19 @@ async function ensureScriptFile(params: {
 	const shouldBeExecutable = (mode & 0o111) !== 0;
 	if (shouldBeExecutable && !(await isExecutable(filePath))) {
 		await fs.chmod(filePath, mode);
+	}
+}
+
+async function ensureCursorHooksJson(): Promise<void> {
+	const globalPath = getCursorGlobalHooksJsonPath();
+	const hookScriptPath = getCursorHookScriptPath();
+	const existing = await readFileIfExists(globalPath);
+
+	if (!existing || !existing.includes(hookScriptPath)) {
+		const content = getCursorHooksJsonContent(hookScriptPath);
+		await fs.mkdir(path.dirname(globalPath), { recursive: true });
+		await fs.writeFile(globalPath, content, { mode: 0o644 });
+		console.log("[agent-setup] Rewrote Cursor hooks.json");
 	}
 }
 
@@ -171,6 +191,28 @@ export function ensureAgentHooks(): Promise<void> {
 			marker: WRAPPER_MARKER,
 			logLabel: "OpenCode wrapper",
 		});
+
+		await ensureScriptFile({
+			filePath: getCursorHookScriptPath(),
+			content: getCursorHookScriptContent(),
+			mode: 0o755,
+			marker: CURSOR_HOOK_MARKER,
+			logLabel: "Cursor hook script",
+		});
+
+		await ensureScriptFile({
+			filePath: getCursorAgentWrapperPath(),
+			content: buildCursorAgentWrapperScript(),
+			mode: 0o755,
+			marker: WRAPPER_MARKER,
+			logLabel: "cursor-agent wrapper",
+		});
+
+		try {
+			await ensureCursorHooksJson();
+		} catch (error) {
+			console.warn("[agent-setup] Failed to write Cursor hooks.json:", error);
+		}
 	})().finally(() => {
 		inFlight = null;
 	});
