@@ -18,6 +18,7 @@ import { HiCheck, HiChevronDown, HiChevronUpDown } from "react-icons/hi2";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { formatRelativeTime } from "renderer/lib/formatRelativeTime";
 import { electronTrpcClient as trpcClient } from "renderer/lib/trpc-client";
+import { resolveEffectiveWorkspaceBaseBranch } from "renderer/lib/workspaceBaseBranch";
 import { useCreateWorkspace } from "renderer/react-query/workspaces";
 import { NotFound } from "renderer/routes/not-found";
 import { sanitizeSegment } from "shared/utils/branch";
@@ -102,7 +103,12 @@ function ProjectPage() {
 		);
 	}, [branchData?.branches, branchSearch]);
 
-	const effectiveBaseBranch = baseBranch ?? branchData?.defaultBranch ?? null;
+	const effectiveBaseBranch = resolveEffectiveWorkspaceBaseBranch({
+		explicitBaseBranch: baseBranch,
+		workspaceBaseBranch: project?.workspaceBaseBranch,
+		defaultBranch: branchData?.defaultBranch,
+		branches: branchData?.branches,
+	});
 
 	useEffect(() => {
 		const timer = setTimeout(() => {
@@ -130,7 +136,7 @@ function ProjectPage() {
 				projectId,
 				name: workspaceName,
 				branchName: generatedBranchName || undefined,
-				baseBranch: effectiveBaseBranch || undefined,
+				baseBranch: baseBranch || undefined,
 			});
 
 			toast.success("Workspace created", {

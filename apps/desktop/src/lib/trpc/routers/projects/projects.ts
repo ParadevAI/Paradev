@@ -812,6 +812,7 @@ export const createProjectsRouter = (getWindow: () => BrowserWindow | null) => {
 							.optional(),
 						branchPrefixMode: z.enum(BRANCH_PREFIX_MODES).nullable().optional(),
 						branchPrefixCustom: z.string().nullable().optional(),
+						workspaceBaseBranch: z.string().nullable().optional(),
 						hideImage: z.boolean().optional(),
 						defaultApp: z.enum(EXTERNAL_APPS).nullable().optional(),
 					}),
@@ -839,6 +840,9 @@ export const createProjectsRouter = (getWindow: () => BrowserWindow | null) => {
 						}),
 						...(input.patch.branchPrefixCustom !== undefined && {
 							branchPrefixCustom: input.patch.branchPrefixCustom,
+						}),
+						...(input.patch.workspaceBaseBranch !== undefined && {
+							workspaceBaseBranch: input.patch.workspaceBaseBranch,
 						}),
 						...(input.patch.hideImage !== undefined && {
 							hideImage: input.patch.hideImage,
