@@ -1,11 +1,15 @@
 import { promises as fs, constants as fsConstants } from "node:fs";
 import path from "node:path";
 import {
+	buildCopilotWrapperExecLine,
 	buildWrapperScript,
+	COPILOT_HOOK_MARKER,
 	CURSOR_HOOK_MARKER,
 	GEMINI_HOOK_MARKER,
 	getClaudeSettingsContent,
 	getClaudeSettingsPath,
+	getCopilotHookScriptContent,
+	getCopilotHookScriptPath,
 	getCursorGlobalHooksJsonPath,
 	getCursorHookScriptContent,
 	getCursorHookScriptPath,
@@ -187,6 +191,10 @@ export function ensureAgentHooks(): Promise<void> {
 				binaryName: "gemini",
 				content: buildWrapperScript("gemini", `exec "$REAL_BIN" "$@"`),
 			},
+			{
+				binaryName: "copilot",
+				content: buildWrapperScript("copilot", buildCopilotWrapperExecLine()),
+			},
 		];
 
 		for (const { binaryName, content } of wrappers) {
@@ -252,6 +260,14 @@ export function ensureAgentHooks(): Promise<void> {
 				error,
 			);
 		}
+
+		await ensureScriptFile({
+			filePath: getCopilotHookScriptPath(),
+			content: getCopilotHookScriptContent(),
+			mode: 0o755,
+			marker: COPILOT_HOOK_MARKER,
+			logLabel: "Copilot hook script",
+		});
 	})().finally(() => {
 		inFlight = null;
 	});
