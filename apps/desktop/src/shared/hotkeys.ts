@@ -726,6 +726,23 @@ export const HOTKEYS = {
 		description: "Search and open files in the current workspace",
 	}),
 
+	// Chat
+	FOCUS_CHAT_INPUT: defineHotkey({
+		keys: "meta+f",
+		label: "Focus Chat Input",
+		category: "Terminal",
+	}),
+	CHAT_ADD_ATTACHMENT: defineHotkey({
+		keys: "meta+u",
+		label: "Add Attachment",
+		category: "Terminal",
+	}),
+	CHAT_LINK_ISSUE: defineHotkey({
+		keys: "meta+i",
+		label: "Link Issue",
+		category: "Terminal",
+	}),
+
 	// Help
 	OPEN_SETTINGS: defineHotkey({
 		keys: "meta+,",

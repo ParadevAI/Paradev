@@ -1,6 +1,5 @@
 import type { BrowserWindow } from "electron";
 import { router } from "..";
-import { createAgentManagerRouter } from "./agent-manager";
 import { createAnalyticsRouter } from "./analytics";
 import { createAuthRouter } from "./auth";
 import { createAutoUpdateRouter } from "./auto-update";
@@ -8,6 +7,7 @@ import { createBrowserRouter } from "./browser/browser";
 import { createBrowserHistoryRouter } from "./browser-history";
 import { createCacheRouter } from "./cache";
 import { createChangesRouter } from "./changes";
+import { createChatServiceRouter } from "./chat-service";
 import { createConfigRouter } from "./config";
 import { createExternalRouter } from "./external";
 import { createFilesystemRouter } from "./filesystem";
@@ -27,7 +27,7 @@ import { createWorkspacesRouter } from "./workspaces";
 
 export const createAppRouter = (getWindow: () => BrowserWindow | null) => {
 	return router({
-		agentManager: createAgentManagerRouter(),
+		chatService: createChatServiceRouter(),
 		analytics: createAnalyticsRouter(),
 		browser: createBrowserRouter(),
 		browserHistory: createBrowserHistoryRouter(),

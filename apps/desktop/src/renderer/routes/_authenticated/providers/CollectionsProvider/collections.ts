@@ -13,6 +13,7 @@ import type {
 	SelectTask,
 	SelectTaskStatus,
 	SelectUser,
+	SelectWorkspace,
 } from "@superset/db/schema";
 import type { AppRouter } from "@superset/trpc";
 import { electricCollectionOptions } from "@tanstack/electric-db-collection";
@@ -46,6 +47,7 @@ interface OrgCollections {
 	tasks: Collection<SelectTask>;
 	taskStatuses: Collection<SelectTaskStatus>;
 	projects: Collection<SelectProject>;
+	workspaces: Collection<SelectWorkspace>;
 	members: Collection<SelectMember>;
 	users: Collection<SelectUser>;
 	invitations: Collection<SelectInvitation>;
@@ -154,6 +156,22 @@ function createOrgCollections(organizationId: string): OrgCollections {
 				url: electricUrl,
 				params: {
 					table: "projects",
+					organizationId,
+				},
+				headers: electricHeaders,
+				columnMapper,
+			},
+			getKey: (item) => item.id,
+		}),
+	);
+
+	const workspaces = createCollection(
+		electricCollectionOptions<SelectWorkspace>({
+			id: `workspaces-${organizationId}`,
+			shapeOptions: {
+				url: electricUrl,
+				params: {
+					table: "workspaces",
 					organizationId,
 				},
 				headers: electricHeaders,
@@ -343,6 +361,7 @@ function createOrgCollections(organizationId: string): OrgCollections {
 		tasks,
 		taskStatuses,
 		projects,
+		workspaces,
 		members,
 		users,
 		invitations,

@@ -18,7 +18,6 @@
 		"@mastra/ai-sdk": "^1.0.4",
 		"@mastra/core": "^1.3.0",
 		"@mastra/memory": "^1.2.0",
-		"@superset/durable-session": "workspace:*",
 		"cheerio": "^1.2.0",
 		"zod": "^4.3.5"
 	},

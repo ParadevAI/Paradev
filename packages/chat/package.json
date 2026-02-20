@@ -1,0 +1,51 @@
+{
+	"name": "@superset/chat",
+	"version": "0.0.1",
+	"private": true,
+	"type": "module",
+	"exports": {
+		"./schema": {
+			"types": "./src/schema/index.ts",
+			"default": "./src/schema/index.ts"
+		},
+		"./host": {
+			"types": "./src/host/index.ts",
+			"default": "./src/host/index.ts"
+		},
+		"./client": {
+			"types": "./src/client/index.ts",
+			"default": "./src/client/index.ts"
+		}
+	},
+	"scripts": {
+		"typecheck": "tsc --noEmit --emitDeclarationOnly false",
+		"test": "bun test"
+	},
+	"dependencies": {
+		"@durable-streams/client": "^0.2.1",
+		"@durable-streams/state": "^0.2.0",
+		"@electric-sql/client": "1.5.2",
+		"@superset/agent": "workspace:*",
+		"@superset/db": "workspace:*",
+		"@tanstack/db": "0.5.25",
+		"@trpc/server": "^11.7.1",
+		"ai": "^6.0.0",
+		"fast-glob": "^3.3.3",
+		"fuse.js": "^7.1.0",
+		"superjson": "^2.2.5",
+		"zod": "^4.3.5"
+	},
+	"peerDependencies": {
+		"@tanstack/react-query": "^5.0.0",
+		"@trpc/react-query": "^11.7.1",
+		"drizzle-orm": "0.45.1",
+		"react": "^18.0.0 || ^19.0.0"
+	},
+	"devDependencies": {
+		"@superset/typescript": "workspace:*",
+		"@types/bun": "^1.2.17",
+		"@types/node": "^24.9.1",
+		"@types/react": "~19.2.2",
+		"typescript": "^5.9.3"
+	}
+}

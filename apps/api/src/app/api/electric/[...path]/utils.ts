@@ -12,6 +12,7 @@ import {
 	subscriptions,
 	taskStatuses,
 	tasks,
+	workspaces,
 } from "@superset/db/schema";
 import { eq, inArray, sql } from "drizzle-orm";
 import type { PgColumn, PgTable } from "drizzle-orm/pg-core";
@@ -30,6 +31,7 @@ export type AllowedTable =
 	| "agent_commands"
 	| "integration_connections"
 	| "subscriptions"
+	| "workspaces"
 	| "chat_sessions"
 	| "session_hosts";
 
@@ -126,6 +128,9 @@ export async function buildWhereClause(
 
 		case "subscriptions":
 			return build(subscriptions, subscriptions.referenceId, organizationId);
+
+		case "workspaces":
+			return build(workspaces, workspaces.organizationId, organizationId);
 
 		case "chat_sessions":
 			return build(chatSessions, chatSessions.organizationId, organizationId);

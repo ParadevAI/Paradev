@@ -1,3 +1,4 @@
+import { alert } from "@superset/ui/atoms/Alert";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -6,6 +7,8 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
+import { toast } from "@superset/ui/sonner";
+import { eq } from "@tanstack/db";
 import { useLiveQuery } from "@tanstack/react-db";
 import { useState } from "react";
 import {
@@ -18,13 +21,15 @@ import { useCollections } from "renderer/routes/_authenticated/providers/Collect
 
 interface SessionSelectorProps {
 	currentSessionId: string | null;
-	onSelectSession: (sessionId: string) => void;
+	workspaceId: string;
+	onSelectSession: (sessionId: string, title: string | null) => void;
 	onNewChat: () => void;
-	onDeleteSession: (sessionId: string) => void;
+	onDeleteSession: (sessionId: string) => Promise<void>;
 }
 
 export function SessionSelector({
 	currentSessionId,
+	workspaceId,
 	onSelectSession,
 	onNewChat,
 	onDeleteSession,
@@ -35,10 +40,11 @@ export function SessionSelector({
 	const { data: sessions } = useLiveQuery(
 		(q) =>
 			q
-				.from({ cs: collections.chatSessions })
-				.orderBy(({ cs }) => cs.lastActiveAt, "desc")
-				.select(({ cs }) => cs),
-		[collections],
+				.from({ chatSessions: collections.chatSessions })
+				.where(({ chatSessions }) => eq(chatSessions.workspaceId, workspaceId))
+				.orderBy(({ chatSessions }) => chatSessions.lastActiveAt, "desc")
+				.select(({ chatSessions }) => ({ ...chatSessions })),
+		[collections, workspaceId],
 	);
 
 	const current = sessions?.find((s) => s.id === currentSessionId);
@@ -67,7 +73,7 @@ export function SessionSelector({
 								key={session.id}
 								className="group flex items-center justify-between gap-2"
 								onSelect={() => {
-									onSelectSession(session.id);
+									onSelectSession(session.id, session.title);
 									setIsOpen(false);
 								}}
 							>
@@ -82,7 +88,18 @@ export function SessionSelector({
 										className="shrink-0 rounded p-0.5 opacity-0 transition-opacity hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100"
 										onClick={(e) => {
 											e.stopPropagation();
-											onDeleteSession(session.id);
+											alert.destructive({
+												title: "Delete Chat Session",
+												description: `Are you sure you want to delete "${session.title || "New Chat"}"? This action cannot be undone.`,
+												confirmText: "Delete",
+												onConfirm: () => {
+													toast.promise(onDeleteSession(session.id), {
+														loading: "Deleting session...",
+														success: "Session deleted",
+														error: "Failed to delete session",
+													});
+												},
+											});
 										}}
 									>
 										<HiMiniTrash className="size-3" />

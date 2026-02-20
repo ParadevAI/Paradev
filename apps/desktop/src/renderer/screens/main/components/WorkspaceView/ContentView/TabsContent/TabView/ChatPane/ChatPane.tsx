@@ -1,14 +1,24 @@
-import { useCallback } from "react";
+import { ChatServiceProvider } from "@superset/chat/client";
+import { eq } from "@tanstack/db";
+import { useLiveQuery } from "@tanstack/react-db";
+import { useCallback, useEffect, useRef } from "react";
 import type { MosaicBranch } from "react-mosaic-component";
 import { env } from "renderer/env.renderer";
+import { apiTrpcClient } from "renderer/lib/api-trpc-client";
 import { authClient, getAuthToken } from "renderer/lib/auth-client";
 import { electronTrpc } from "renderer/lib/electron-trpc";
+import { electronQueryClient } from "renderer/providers/ElectronTRPCProvider";
+import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useTabsStore } from "renderer/stores/tabs/store";
 import { BasePaneWindow, PaneToolbarActions } from "../components";
 import { ChatInterface } from "./ChatInterface";
 import { SessionSelector } from "./components/SessionSelector";
+import { createChatServiceIpcClient } from "./utils/chat-service-client";
 
 const apiUrl = env.NEXT_PUBLIC_API_URL;
+
+// Module-level IPC client — shared across all local workspaces
+const ipcClient = createChatServiceIpcClient();
 
 interface ChatPaneProps {
 	paneId: string;
@@ -48,12 +58,81 @@ export function ChatPane({
 
 	const organizationId = session?.session?.activeOrganizationId ?? null;
 	const deviceId = deviceInfo?.deviceId ?? null;
+	const collections = useCollections();
+
+	// Check if workspace already exists remotely via Electric collection
+	const { data: remoteWorkspaces } = useLiveQuery(
+		(q) =>
+			q
+				.from({ ws: collections.workspaces })
+				.where(({ ws }) => eq(ws.id, workspaceId))
+				.select(({ ws }) => ({ id: ws.id })),
+		[collections.workspaces, workspaceId],
+	);
+	const existsRemotely = remoteWorkspaces && remoteWorkspaces.length > 0;
+
+	// Get current session title from Electric so ChatInterface can skip title generation
+	const { data: currentSessionRows } = useLiveQuery(
+		(q) =>
+			q
+				.from({ chatSessions: collections.chatSessions })
+				.where(({ chatSessions }) => eq(chatSessions.id, sessionId ?? ""))
+				.select(({ chatSessions }) => ({ title: chatSessions.title })),
+		[collections.chatSessions, sessionId],
+	);
+	const sessionTitle = currentSessionRows?.[0]?.title ?? null;
+
+	// Ensure remote workspace + project exist before any chat session references them
+	const ensuredRef = useRef<string | null>(null);
+	useEffect(() => {
+		if (existsRemotely) return;
+		if (!workspace?.project || !organizationId) return;
+		if (ensuredRef.current === workspaceId) return;
+
+		const project = workspace.project;
+		const repoName = project.mainRepoPath.split("/").pop();
+		if (!repoName || !project.githubOwner) return;
+
+		ensuredRef.current = workspaceId;
+
+		apiTrpcClient.workspace.ensure
+			.mutate({
+				organizationId,
+				project: {
+					name: project.name,
+					slug: repoName.toLowerCase(),
+					repoOwner: project.githubOwner,
+					repoName,
+					repoUrl: `https://github.com/${project.githubOwner}/${repoName}`,
+					defaultBranch: project.defaultBranch ?? "main",
+				},
+				workspace: {
+					id: workspaceId,
+					name: workspace.name,
+					type: "local",
+					config: {
+						path: workspace.worktreePath,
+						branch:
+							workspace.worktree?.branch ?? project.defaultBranch ?? "main",
+					},
+				},
+			})
+			.catch((err) => {
+				console.error("[chat-pane] Failed to ensure remote workspace:", err);
+				ensuredRef.current = null;
+			});
+	}, [existsRemotely, workspace, organizationId, workspaceId]);
+
+	const setTabAutoTitle = useTabsStore((s) => s.setTabAutoTitle);
 
 	const handleSelectSession = useCallback(
-		(newSessionId: string) => {
+		(newSessionId: string, title: string | null) => {
 			switchChatSession(paneId, newSessionId);
+			if (title) {
+				setTabAutoTitle(tabId, title);
+			}
 		},
-		[paneId, switchChatSession],
+		[paneId, tabId, switchChatSession, setTabAutoTitle],
 	);
 
 	const handleNewChat = useCallback(() => {
@@ -61,12 +140,12 @@ export function ChatPane({
 	}, [paneId, switchChatSession]);
 
 	const handleDeleteSession = useCallback(
-		(sessionIdToDelete: string) => {
+		async (sessionIdToDelete: string) => {
 			const token = getAuthToken();
-			fetch(`${apiUrl}/api/chat/${sessionIdToDelete}/stream`, {
+			await fetch(`${apiUrl}/api/chat/${sessionIdToDelete}/stream`, {
 				method: "DELETE",
 				headers: token ? { Authorization: `Bearer ${token}` } : {},
-			}).catch(console.error);
+			});
 
 			if (sessionIdToDelete === sessionId) {
 				switchChatSession(paneId, null);
@@ -75,42 +154,50 @@ export function ChatPane({
 		[sessionId, paneId, switchChatSession],
 	);
 
+	// For now all workspaces are local (IPC). When sandbox support lands,
+	// cloud workspaces will use: createChatServiceHttpClient(sandboxUrl)
+	const chatClient = ipcClient;
+
 	return (
-		<BasePaneWindow
-			paneId={paneId}
-			path={path}
-			tabId={tabId}
-			splitPaneAuto={splitPaneAuto}
-			removePane={removePane}
-			setFocusedPane={setFocusedPane}
-			renderToolbar={(handlers) => (
-				<div className="flex h-full w-full items-center justify-between px-3">
-					<div className="flex min-w-0 items-center gap-2">
-						<SessionSelector
-							currentSessionId={sessionId}
-							onSelectSession={handleSelectSession}
-							onNewChat={handleNewChat}
-							onDeleteSession={handleDeleteSession}
+		<ChatServiceProvider client={chatClient} queryClient={electronQueryClient}>
+			<BasePaneWindow
+				paneId={paneId}
+				path={path}
+				tabId={tabId}
+				splitPaneAuto={splitPaneAuto}
+				removePane={removePane}
+				setFocusedPane={setFocusedPane}
+				renderToolbar={(handlers) => (
+					<div className="flex h-full w-full items-center justify-between px-3">
+						<div className="flex min-w-0 items-center gap-2">
+							<SessionSelector
+								currentSessionId={sessionId}
+								workspaceId={workspaceId}
+								onSelectSession={handleSelectSession}
+								onNewChat={handleNewChat}
+								onDeleteSession={handleDeleteSession}
+							/>
+						</div>
+						<PaneToolbarActions
+							splitOrientation={handlers.splitOrientation}
+							onSplitPane={handlers.onSplitPane}
+							onClosePane={handlers.onClosePane}
+							closeHotkeyId="CLOSE_TERMINAL"
 						/>
 					</div>
-					<PaneToolbarActions
-						splitOrientation={handlers.splitOrientation}
-						onSplitPane={handlers.onSplitPane}
-						onClosePane={handlers.onClosePane}
-						closeHotkeyId="CLOSE_TERMINAL"
-					/>
-				</div>
-			)}
-		>
-			<ChatInterface
-				sessionId={sessionId}
-				organizationId={organizationId}
-				deviceId={deviceId}
-				workspaceId={workspaceId}
-				cwd={workspace?.worktreePath ?? ""}
-				paneId={paneId}
-				tabId={tabId}
-			/>
-		</BasePaneWindow>
+				)}
+			>
+				<ChatInterface
+					sessionId={sessionId}
+					sessionTitle={sessionTitle}
+					organizationId={organizationId}
+					deviceId={deviceId}
+					workspaceId={workspaceId}
+					cwd={workspace?.worktreePath ?? ""}
+					paneId={paneId}
+					tabId={tabId}
+				/>
+			</BasePaneWindow>
+		</ChatServiceProvider>
 	);
 }

@@ -1,7 +1,10 @@
-import type { SlashCommand } from "@superset/durable-session/react";
+import type { ChatServiceRouter } from "@superset/chat/host";
+import type { inferRouterOutputs } from "@trpc/server";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-export type { SlashCommand };
+type ChatServiceOutputs = inferRouterOutputs<ChatServiceRouter>;
+export type SlashCommand =
+	ChatServiceOutputs["workspace"]["getSlashCommands"][number];
 
 export function useSlashCommands({
 	inputValue,

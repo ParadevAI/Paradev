@@ -51,8 +51,10 @@ export function SlashCommandMenu({
 						}}
 					>
 						<div className="flex items-center gap-1.5">
-							<span className="font-mono text-muted-foreground">/</span>
-							<span className="font-medium">{cmd.name}</span>
+							<span className="font-medium">
+								<span className="font-mono text-muted-foreground">/</span>
+								{cmd.name}
+							</span>
 							{cmd.argumentHint && (
 								<span className="text-muted-foreground">
 									{cmd.argumentHint}

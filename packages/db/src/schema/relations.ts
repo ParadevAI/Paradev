@@ -269,7 +269,7 @@ export const sandboxImagesRelations = relations(sandboxImages, ({ one }) => ({
 	}),
 }));
 
-export const workspacesRelations = relations(workspaces, ({ one }) => ({
+export const workspacesRelations = relations(workspaces, ({ one, many }) => ({
 	organization: one(organizations, {
 		fields: [workspaces.organizationId],
 		references: [organizations.id],
@@ -282,6 +282,7 @@ export const workspacesRelations = relations(workspaces, ({ one }) => ({
 		fields: [workspaces.createdByUserId],
 		references: [users.id],
 	}),
+	chatSessions: many(chatSessions),
 }));
 
 export const chatSessionsRelations = relations(
@@ -294,6 +295,10 @@ export const chatSessionsRelations = relations(
 		createdBy: one(users, {
 			fields: [chatSessions.createdBy],
 			references: [users.id],
+		}),
+		workspace: one(workspaces, {
+			fields: [chatSessions.workspaceId],
+			references: [workspaces.id],
 		}),
 		sessionHosts: many(sessionHosts),
 	}),

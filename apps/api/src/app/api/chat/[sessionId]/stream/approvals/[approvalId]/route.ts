@@ -1,4 +1,4 @@
-import { sessionStateSchema } from "@superset/durable-session";
+import { sessionStateSchema } from "@superset/chat/schema";
 import { appendToStream, requireAuth } from "../../../../lib";
 
 export async function POST(

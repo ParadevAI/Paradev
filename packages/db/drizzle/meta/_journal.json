@@ -148,6 +148,13 @@
       "when": 1771357800887,
       "tag": "0020_session_hosts_and_chat_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1771473303728,
+      "tag": "0021_add_workspace_id_to_chat_sessions",
+      "breakpoints": true
     }
   ]
 }

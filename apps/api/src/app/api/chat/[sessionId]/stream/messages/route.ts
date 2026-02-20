@@ -1,6 +1,6 @@
+import { sessionStateSchema } from "@superset/chat/schema";
 import { db } from "@superset/db/client";
 import { chatSessions } from "@superset/db/schema";
-import { sessionStateSchema } from "@superset/durable-session";
 import { eq } from "drizzle-orm";
 import { appendToStream, ensureStream, requireAuth } from "../../../lib";
 
@@ -19,6 +19,11 @@ export async function POST(
 		messageId?: string;
 		txid?: string;
 		files?: Array<{ url: string; mediaType: string; filename?: string }>;
+		metadata?: {
+			model?: string;
+			permissionMode?: string;
+			thinkingEnabled?: boolean;
+		};
 	};
 
 	if (!body.content && (!body.files || body.files.length === 0)) {
@@ -65,7 +70,11 @@ export async function POST(
 			messageId,
 			actorId,
 			role: "user",
-			chunk: JSON.stringify({ type: "whole-message", message }),
+			chunk: JSON.stringify({
+				type: "whole-message",
+				message,
+				...(body.metadata ? { metadata: body.metadata } : {}),
+			}),
 			seq: 0,
 			createdAt: new Date().toISOString(),
 		},

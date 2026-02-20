@@ -1,20 +1,33 @@
-import { acquireSessionDB } from "@superset/durable-session";
-import type { SlashCommand } from "@superset/durable-session/react";
-import { useDurableChat } from "@superset/durable-session/react";
+import { chatServiceTrpc, useChat } from "@superset/chat/client";
 import type { PromptInputMessage } from "@superset/ui/ai-elements/prompt-input";
 import { PromptInputProvider } from "@superset/ui/ai-elements/prompt-input";
+import { useQuery } from "@tanstack/react-query";
 import type { FileUIPart } from "ai";
 import type React from "react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { env } from "renderer/env.renderer";
+import { apiTrpcClient } from "renderer/lib/api-trpc-client";
 import { getAuthToken } from "renderer/lib/auth-client";
 import { useTabsStore } from "renderer/stores/tabs/store";
 import { ChatInputFooter } from "./components/ChatInputFooter";
 import { MessageList } from "./components/MessageList";
-import { DEFAULT_MODEL } from "./constants";
+import type { SlashCommand } from "./hooks/useSlashCommands";
 import type { ChatInterfaceProps, ModelOption, PermissionMode } from "./types";
 
 const apiUrl = env.NEXT_PUBLIC_API_URL;
+
+function useAvailableModels(): {
+	models: ModelOption[];
+	defaultModel: ModelOption | null;
+} {
+	const { data } = useQuery({
+		queryKey: ["chat", "models"],
+		queryFn: () => apiTrpcClient.chat.getModels.query(),
+		staleTime: Number.POSITIVE_INFINITY,
+	});
+	const models = data?.models ?? [];
+	return { models, defaultModel: models[0] ?? null };
+}
 
 function getAuthHeaders(): Record<string, string> {
 	const token = getAuthToken();
@@ -25,6 +38,7 @@ async function createSession(
 	sessionId: string,
 	organizationId: string,
 	deviceId: string | null,
+	workspaceId?: string,
 ): Promise<void> {
 	const token = getAuthToken();
 	await fetch(`${apiUrl}/api/chat/${sessionId}`, {
@@ -36,6 +50,7 @@ async function createSession(
 		body: JSON.stringify({
 			organizationId,
 			...(deviceId ? { deviceId } : {}),
+			...(workspaceId ? { workspaceId } : {}),
 		}),
 	});
 }
@@ -44,7 +59,6 @@ async function uploadFile(
 	sessionId: string,
 	file: FileUIPart,
 ): Promise<FileUIPart> {
-	// Convert the data URL to a File object for upload
 	const response = await fetch(file.url);
 	const blob = await response.blob();
 	const filename = file.filename || "attachment";
@@ -69,227 +83,118 @@ async function uploadFile(
 	return { type: "file", ...result };
 }
 
-export function ChatInterface(props: ChatInterfaceProps) {
-	const [pendingMessage, setPendingMessage] = useState<string | null>(null);
-	const [pendingFiles, setPendingFiles] = useState<FileUIPart[]>([]);
-
-	if (props.sessionId) {
-		return (
-			<ActiveChatInterface
-				{...props}
-				sessionId={props.sessionId}
-				pendingMessage={pendingMessage}
-				pendingFiles={pendingFiles}
-				clearPendingMessage={() => {
-					setPendingMessage(null);
-					setPendingFiles([]);
-				}}
-			/>
-		);
-	}
-	return (
-		<EmptyChatInterface
-			{...props}
-			onMessageSent={(text, files) => {
-				setPendingMessage(text);
-				setPendingFiles(files);
-			}}
-		/>
-	);
-}
-
-function EmptyChatInterface({
+export function ChatInterface({
+	sessionId,
+	sessionTitle,
 	organizationId,
 	deviceId,
 	workspaceId,
 	cwd,
 	paneId,
-	onMessageSent,
-}: ChatInterfaceProps & {
-	onMessageSent: (text: string, files: FileUIPart[]) => void;
-}) {
+	tabId,
+}: ChatInterfaceProps) {
 	const switchChatSession = useTabsStore((s) => s.switchChatSession);
-	const [selectedModel, setSelectedModel] =
-		useState<ModelOption>(DEFAULT_MODEL);
-	const [modelSelectorOpen, setModelSelectorOpen] = useState(false);
-	const [thinkingEnabled, setThinkingEnabled] = useState(false);
-	const [permissionMode, setPermissionMode] =
-		useState<PermissionMode>("bypassPermissions");
-	const [error, setError] = useState<string | null>(null);
-	const [sentMessage, setSentMessage] = useState<{
-		text: string;
-		files: FileUIPart[];
-	} | null>(null);
+	const setTabAutoTitle = useTabsStore((s) => s.setTabAutoTitle);
+	const { models: availableModels, defaultModel } = useAvailableModels();
 
-	const handleSend = useCallback(
-		(message: PromptInputMessage) => {
-			const text = message.text.trim();
-			const files = message.files ?? [];
-			if (!text && files.length === 0) return;
-			if (!organizationId) return;
-
-			setError(null);
-			setSentMessage({ text, files });
-
-			const newSessionId = crypto.randomUUID();
-			createSession(newSessionId, organizationId, deviceId)
-				.then(async () => {
-					// Config is fire-and-forget
-					fetch(`${apiUrl}/api/chat/${newSessionId}/stream/config`, {
-						method: "POST",
-						headers: {
-							"Content-Type": "application/json",
-							...getAuthHeaders(),
-						},
-						body: JSON.stringify({
-							model: selectedModel.id,
-							permissionMode,
-							thinkingEnabled,
-							cwd,
-						}),
-					});
-
-					// Upload files immediately
-					let uploadedFiles: FileUIPart[] = [];
-					if (files.length > 0) {
-						const results = await Promise.all(
-							files.map((f) => uploadFile(newSessionId, f)),
-						);
-						uploadedFiles = results;
-					}
-
-					// Pre-warm cache AFTER session exists on server
-					acquireSessionDB({
-						sessionId: newSessionId,
-						baseUrl: `${apiUrl}/api/chat`,
-						headers: getAuthHeaders(),
-					});
-
-					onMessageSent(text, uploadedFiles);
-					switchChatSession(paneId, newSessionId);
-				})
-				.catch((err) => {
-					setSentMessage(null);
-					setError(
-						err instanceof Error ? err.message : "Failed to create session",
-					);
-				});
-		},
-		[
-			organizationId,
-			deviceId,
-			paneId,
-			switchChatSession,
-			onMessageSent,
-			selectedModel.id,
-			permissionMode,
-			thinkingEnabled,
-			cwd,
-		],
-	);
-
-	const displayMessages = sentMessage
-		? [
-				{
-					id: "pending",
-					role: "user" as const,
-					parts: [
-						...(sentMessage.text
-							? [{ type: "text" as const, text: sentMessage.text }]
-							: []),
-						...sentMessage.files,
-					],
-					createdAt: new Date(),
-				},
-			]
-		: [];
-
-	return (
-		<PromptInputProvider>
-			<div className="flex h-full flex-col bg-background">
-				<MessageList
-					messages={displayMessages}
-					isStreaming={!!sentMessage}
-					workspaceId={workspaceId}
-				/>
-				<ChatInputFooter
-					cwd={cwd}
-					error={error}
-					isStreaming={!!sentMessage}
-					availableModels={[]}
-					selectedModel={selectedModel}
-					setSelectedModel={setSelectedModel}
-					modelSelectorOpen={modelSelectorOpen}
-					setModelSelectorOpen={setModelSelectorOpen}
-					permissionMode={permissionMode}
-					setPermissionMode={setPermissionMode}
-					thinkingEnabled={thinkingEnabled}
-					setThinkingEnabled={setThinkingEnabled}
-					slashCommands={[]}
-					onSend={handleSend}
-					onStop={() => {}}
-					onSlashCommandSend={() => {}}
-				/>
-			</div>
-		</PromptInputProvider>
-	);
-}
-
-// ---------------------------------------------------------------------------
-// ActiveChatInterface — self-contained via useDurableChat
-// ---------------------------------------------------------------------------
-
-function ActiveChatInterface({
-	sessionId,
-	workspaceId,
-	cwd,
-	pendingMessage,
-	pendingFiles,
-	clearPendingMessage,
-}: Omit<ChatInterfaceProps, "sessionId"> & {
-	sessionId: string;
-	pendingMessage: string | null;
-	pendingFiles: FileUIPart[];
-	clearPendingMessage: () => void;
-}) {
-	const [selectedModel, setSelectedModel] =
-		useState<ModelOption>(DEFAULT_MODEL);
+	// --- Shared UI state (declared once) ---
+	const [selectedModel, setSelectedModel] = useState<ModelOption | null>(null);
+	const activeModel = selectedModel ?? defaultModel;
 	const [modelSelectorOpen, setModelSelectorOpen] = useState(false);
 	const [thinkingEnabled, setThinkingEnabled] = useState(false);
 	const [permissionMode, setPermissionMode] =
 		useState<PermissionMode>("bypassPermissions");
 
-	const {
-		ready,
-		messages,
-		isLoading: isStreaming,
-		sendMessage,
-		stop,
-		error,
-		metadata,
-	} = useDurableChat({
+	// --- Pending message bridge (no-session → session) ---
+	const [pendingMessage, setPendingMessage] = useState<string | null>(null);
+	const [pendingFiles, setPendingFiles] = useState<FileUIPart[]>([]);
+
+	// --- useChat — always called, inert when sessionId is null ---
+	const chat = useChat({
 		sessionId,
 		proxyUrl: apiUrl,
 		getHeaders: getAuthHeaders,
 	});
 
-	// Once ready, send the pending message through useDurableChat's optimistic
-	// path — the optimistic insert replaces the synthetic message seamlessly.
+	// --- Slash commands (always active) ---
+	const { data: slashCommands = [] } =
+		chatServiceTrpc.workspace.getSlashCommands.useQuery({ cwd });
+
+	const activateMutation = chatServiceTrpc.session.activate.useMutation();
+
+	// --- Per-message metadata (sent with every message) ---
+	const messageMetadata = useMemo(
+		() => ({
+			model: activeModel?.id,
+			permissionMode,
+			thinkingEnabled,
+		}),
+		[activeModel?.id, permissionMode, thinkingEnabled],
+	);
+
+	// --- Send pending message once the session is ready ---
 	const sentPendingRef = useRef(false);
 	useEffect(() => {
-		if (!ready || sentPendingRef.current) return;
+		if (!chat.ready || sentPendingRef.current) return;
 		if (!pendingMessage && pendingFiles.length === 0) return;
 		sentPendingRef.current = true;
-		sendMessage(
+		chat.sendMessage(
 			pendingMessage ?? "",
 			pendingFiles.length > 0 ? pendingFiles : undefined,
+			messageMetadata,
 		);
-		clearPendingMessage();
-	}, [ready, pendingMessage, pendingFiles, sendMessage, clearPendingMessage]);
+		setPendingMessage(null);
+		setPendingFiles([]);
+	}, [
+		chat.ready,
+		chat.sendMessage,
+		pendingMessage,
+		pendingFiles,
+		messageMetadata,
+	]);
 
-	// Show pending message immediately while useDurableChat preloads.
+	// Reset ref when sessionId changes so pending message is re-sent for new sessions
+	// biome-ignore lint/correctness/useExhaustiveDependencies: sessionId triggers the reset intentionally
+	useEffect(() => {
+		sentPendingRef.current = false;
+	}, [sessionId]);
+
+	useEffect(() => {
+		if (chat.isLoading) return;
+		if (!sessionId) return;
+		if (sessionTitle) return;
+
+		const hasAssistantMessage = chat.messages.some(
+			(m) => m.role === "assistant",
+		);
+		if (!hasAssistantMessage) return;
+
+		const digest = chat.messages.slice(-20).map((m) => {
+			const text = m.parts
+				?.filter((p): p is { type: "text"; text: string } => p.type === "text")
+				.map((p) => p.text.slice(0, 500))
+				.join(" ");
+			return { role: m.role, text: text ?? "" };
+		});
+
+		apiTrpcClient.chat.generateTitle
+			.mutate({ sessionId, messages: digest })
+			.then(({ title }) => {
+				setTabAutoTitle(tabId, title);
+			})
+			.catch(console.error);
+	}, [
+		chat.isLoading,
+		chat.messages,
+		sessionId,
+		sessionTitle,
+		tabId,
+		setTabAutoTitle,
+	]);
+
+	// --- Display messages: show synthetic pending while useChat preloads ---
 	const displayMessages =
-		messages.length === 0 && (pendingMessage || pendingFiles.length > 0)
+		chat.messages.length === 0 && (pendingMessage || pendingFiles.length > 0)
 			? [
 					{
 						id: "pending",
@@ -303,86 +208,76 @@ function ActiveChatInterface({
 						createdAt: new Date(),
 					},
 				]
-			: messages;
+			: chat.messages;
 
-	const registeredRef = useRef(false);
-	useEffect(() => {
-		if (!ready || registeredRef.current) return;
-		registeredRef.current = true;
-		metadata.updateConfig({
-			model: selectedModel.id,
-			permissionMode,
-			thinkingEnabled,
-			cwd,
-		});
-	}, [
-		ready,
-		cwd,
-		metadata.updateConfig,
-		permissionMode,
-		selectedModel.id,
-		thinkingEnabled,
-	]);
-
-	const prevConfigRef = useRef({
-		modelId: selectedModel.id,
-		permissionMode,
-		thinkingEnabled,
-	});
-	useEffect(() => {
-		const prev = prevConfigRef.current;
-		if (
-			prev.modelId === selectedModel.id &&
-			prev.permissionMode === permissionMode &&
-			prev.thinkingEnabled === thinkingEnabled
-		) {
-			return;
-		}
-		prevConfigRef.current = {
-			modelId: selectedModel.id,
-			permissionMode,
-			thinkingEnabled,
-		};
-		metadata.updateConfig({
-			model: selectedModel.id,
-			permissionMode,
-			thinkingEnabled,
-			cwd,
-		});
-	}, [
-		selectedModel.id,
-		permissionMode,
-		thinkingEnabled,
-		cwd,
-		metadata.updateConfig,
-	]);
-
+	// --- Send handler: creates session if needed, otherwise sends directly ---
 	const handleSend = useCallback(
 		async (message: PromptInputMessage) => {
 			const text = message.text.trim();
 			const files = message.files ?? [];
 			if (!text && files.length === 0) return;
 
-			// Upload files immediately before sending the message
-			let uploadedFiles: FileUIPart[] | undefined;
-			if (files.length > 0) {
-				const results = await Promise.all(
-					files.map((f) => uploadFile(sessionId, f)),
-				);
-				uploadedFiles = results;
-			}
+			if (sessionId) {
+				// Active session — send directly
+				activateMutation.mutate({ sessionId });
 
-			sendMessage(text, uploadedFiles);
+				let uploadedFiles: FileUIPart[] | undefined;
+				if (files.length > 0) {
+					const results = await Promise.all(
+						files.map((f) => uploadFile(sessionId, f)),
+					);
+					uploadedFiles = results;
+				}
+
+				chat.sendMessage(text, uploadedFiles, messageMetadata);
+			} else {
+				// No session — create one, then switch (re-renders with sessionId)
+				if (!organizationId) return;
+
+				const newSessionId = crypto.randomUUID();
+				try {
+					await createSession(
+						newSessionId,
+						organizationId,
+						deviceId,
+						workspaceId,
+					);
+
+					// Upload files immediately
+					let uploadedFiles: FileUIPart[] = [];
+					if (files.length > 0) {
+						uploadedFiles = await Promise.all(
+							files.map((f) => uploadFile(newSessionId, f)),
+						);
+					}
+
+					setPendingMessage(text);
+					setPendingFiles(uploadedFiles);
+					switchChatSession(paneId, newSessionId);
+				} catch {
+					// Session creation failed — don't navigate
+				}
+			}
 		},
-		[sendMessage, sessionId],
+		[
+			sessionId,
+			organizationId,
+			deviceId,
+			workspaceId,
+			paneId,
+			switchChatSession,
+			activateMutation,
+			chat.sendMessage,
+			messageMetadata,
+		],
 	);
 
 	const handleStop = useCallback(
 		(e: React.MouseEvent) => {
 			e.preventDefault();
-			stop();
+			chat.stop();
 		},
-		[stop],
+		[chat.stop],
 	);
 
 	const handleSlashCommandSend = useCallback(
@@ -392,20 +287,22 @@ function ActiveChatInterface({
 		[handleSend],
 	);
 
+	const isStreaming = chat.isLoading || !!pendingMessage;
+
 	return (
 		<PromptInputProvider>
 			<div className="flex h-full flex-col bg-background">
 				<MessageList
 					messages={displayMessages}
-					isStreaming={isStreaming || !!pendingMessage}
+					isStreaming={isStreaming}
 					workspaceId={workspaceId}
 				/>
 				<ChatInputFooter
 					cwd={cwd}
-					error={error}
-					isStreaming={isStreaming || !!pendingMessage}
-					availableModels={metadata.config.availableModels ?? []}
-					selectedModel={selectedModel}
+					error={chat.error}
+					isStreaming={isStreaming}
+					availableModels={availableModels}
+					selectedModel={activeModel}
 					setSelectedModel={setSelectedModel}
 					modelSelectorOpen={modelSelectorOpen}
 					setModelSelectorOpen={setModelSelectorOpen}
@@ -413,7 +310,7 @@ function ActiveChatInterface({
 					setPermissionMode={setPermissionMode}
 					thinkingEnabled={thinkingEnabled}
 					setThinkingEnabled={setThinkingEnabled}
-					slashCommands={metadata.config.slashCommands ?? []}
+					slashCommands={slashCommands}
 					onSend={handleSend}
 					onStop={handleStop}
 					onSlashCommandSend={handleSlashCommandSend}

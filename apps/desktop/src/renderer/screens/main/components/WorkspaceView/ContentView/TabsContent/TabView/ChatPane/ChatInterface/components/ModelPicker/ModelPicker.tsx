@@ -35,7 +35,7 @@ export function ModelPicker({
 	onOpenChange,
 }: {
 	models: ModelOption[];
-	selectedModel: ModelOption;
+	selectedModel: ModelOption | null;
 	onSelectModel: (model: ModelOption) => void;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
@@ -50,14 +50,16 @@ export function ModelPicker({
 		return groups;
 	}, [models]);
 
-	const selectedLogo = providerToLogo(selectedModel.provider);
+	const selectedLogo = selectedModel
+		? providerToLogo(selectedModel.provider)
+		: null;
 
 	return (
 		<ModelSelector open={open} onOpenChange={onOpenChange}>
 			<ModelSelectorTrigger asChild>
 				<PromptInputButton className="gap-1.5 text-xs">
-					<ModelSelectorLogo provider={selectedLogo} />
-					<span>{selectedModel.name}</span>
+					{selectedLogo && <ModelSelectorLogo provider={selectedLogo} />}
+					<span>{selectedModel?.name ?? "Model"}</span>
 				</PromptInputButton>
 			</ModelSelectorTrigger>
 			<ModelSelectorContent title="Select Model">

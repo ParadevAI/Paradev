@@ -9,7 +9,7 @@ import { electronTrpc } from "renderer/lib/electron-trpc";
 export function useAgentManager() {
 	const { data: session } = authClient.useSession();
 	const organizationId = session?.session?.activeOrganizationId;
-	const startMutation = electronTrpc.agentManager.start.useMutation();
+	const startMutation = electronTrpc.chatService.start.useMutation();
 	const mutateRef = useRef(startMutation.mutate);
 	mutateRef.current = startMutation.mutate;
 	const prevOrgRef = useRef<string | null>(null);

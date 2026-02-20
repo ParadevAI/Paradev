@@ -15,6 +15,7 @@ export async function PUT(
 	const body = (await request.json()) as {
 		organizationId: string;
 		deviceId?: string;
+		workspaceId?: string;
 	};
 
 	if (!body.organizationId) {
@@ -31,6 +32,7 @@ export async function PUT(
 		id: sessionId,
 		organizationId: body.organizationId,
 		createdBy: session.user.id,
+		...(body.workspaceId ? { workspaceId: body.workspaceId } : {}),
 	});
 
 	if (body.deviceId) {
