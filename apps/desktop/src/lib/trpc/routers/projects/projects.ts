@@ -1,5 +1,5 @@
 import { existsSync, statSync } from "node:fs";
-import { access } from "node:fs/promises";
+import { access, mkdir, rm } from "node:fs/promises";
 import { basename, join } from "node:path";
 import {
 	BRANCH_PREFIX_MODES,
@@ -62,29 +62,20 @@ type OpenNewMultiResult =
 	| { canceled: false; multi: true; results: FolderOutcome[] }
 	| OpenNewError;
 
-/**
- * Initializes a git repository in the given path with an initial commit.
- * Reused by openNew, openFromPath, and initGitAndOpen.
- */
 async function initGitRepo(path: string): Promise<{ defaultBranch: string }> {
 	const git = simpleGit(path);
 
-	// Initialize git repository with 'main' as default branch
-	// Try with --initial-branch=main (Git 2.28+), fall back to plain init
 	try {
 		await git.init(["--initial-branch=main"]);
 	} catch (err) {
-		// Likely an older Git version that doesn't support --initial-branch
 		console.warn("Git init with --initial-branch failed, using fallback:", err);
 		await git.init();
 	}
 
-	// Create initial commit so we have a valid branch ref
 	try {
 		await git.raw(["commit", "--allow-empty", "-m", "Initial commit"]);
 	} catch (err) {
 		const errorMessage = err instanceof Error ? err.message : String(err);
-		// Check for common git config issues
 		if (
 			errorMessage.includes("empty ident") ||
 			errorMessage.includes("user.email") ||
@@ -103,11 +94,6 @@ async function initGitRepo(path: string): Promise<{ defaultBranch: string }> {
 	return { defaultBranch };
 }
 
-/**
- * Creates or updates a project record in the database.
- * If a project with the same mainRepoPath exists, updates lastOpenedAt.
- * Otherwise, creates a new project.
- */
 function upsertProject(mainRepoPath: string, defaultBranch: string): Project {
 	const name = basename(mainRepoPath);
 
@@ -140,22 +126,15 @@ function upsertProject(mainRepoPath: string, defaultBranch: string): Project {
 	return project;
 }
 
-/**
- * Ensures a project has a main (branch) workspace.
- * If one doesn't exist, creates it automatically.
- * This is called after opening/creating a project to provide a default workspace.
- */
 async function ensureMainWorkspace(project: Project): Promise<void> {
 	const existingBranchWorkspace = getBranchWorkspace(project.id);
 
-	// If branch workspace already exists, just touch it and return
 	if (existingBranchWorkspace) {
 		touchWorkspace(existingBranchWorkspace.id);
 		setLastActiveWorkspace(existingBranchWorkspace.id);
 		return;
 	}
 
-	// Get current branch from main repo
 	const branch = await getCurrentBranch(project.mainRepoPath);
 	if (!branch) {
 		console.warn(
@@ -164,8 +143,7 @@ async function ensureMainWorkspace(project: Project): Promise<void> {
 		return;
 	}
 
-	// Insert new branch workspace with conflict handling for race conditions
-	// The unique partial index (projectId WHERE type='branch') prevents duplicates
+	// Unique partial index (projectId WHERE type='branch') prevents duplicates
 	const insertResult = localDb
 		.insert(workspaces)
 		.values({
@@ -181,7 +159,6 @@ async function ensureMainWorkspace(project: Project): Promise<void> {
 
 	const wasExisting = insertResult.length === 0;
 
-	// Only shift existing workspaces if we successfully inserted
 	if (!wasExisting) {
 		const newWorkspaceId = insertResult[0].id;
 		const projectWorkspaces = localDb
@@ -205,7 +182,6 @@ async function ensureMainWorkspace(project: Project): Promise<void> {
 		}
 	}
 
-	// Get the workspace (either newly created or existing from race condition)
 	const workspace = insertResult[0] ?? getBranchWorkspace(project.id);
 
 	if (!workspace) {
@@ -230,45 +206,33 @@ async function ensureMainWorkspace(project: Project): Promise<void> {
 	}
 }
 
-// Safe filename regex: letters, numbers, dots, underscores, hyphens, spaces, and common unicode
-// Allows most valid Git repo names while avoiding path traversal characters
+// Callers must additionally reject dot-only names (".", "..") to prevent path traversal
 const SAFE_REPO_NAME_REGEX = /^[a-zA-Z0-9._\- ]+$/;
 const ALLOWED_URL_PROTOCOLS = new Set(["http:", "https:", "ssh:", "git:"]);
 const SSH_GIT_URL_REGEX = /^[\w.-]+@[\w.-]+:[\w./-]+$/;
 
-/**
- * Extracts and validates a repository name from a git URL.
- * Handles HTTP/HTTPS URLs, SSH-style URLs (git@host:user/repo), and edge cases.
- */
 function extractRepoName(urlInput: string): string | null {
-	// Normalize: trim whitespace and strip trailing slashes
 	let normalized = urlInput.trim().replace(/\/+$/, "");
 
 	if (!normalized) return null;
 
 	let repoSegment: string | undefined;
 
-	// Try parsing as HTTP/HTTPS URL first
 	try {
 		const parsed = new URL(normalized);
 		if (parsed.protocol === "http:" || parsed.protocol === "https:") {
-			// Get pathname and strip query/hash (URL constructor handles this)
 			const pathname = parsed.pathname;
 			repoSegment = pathname.split("/").filter(Boolean).pop();
 		}
 	} catch {
-		// Not a valid URL, try SSH-style parsing
+		// Not a standard URL — fall through to SSH-style parsing
 	}
 
-	// Fallback to SSH-style parsing (git@github.com:user/repo.git)
 	if (!repoSegment) {
-		// Handle SSH format: git@host:path or just path segments
 		const colonIndex = normalized.indexOf(":");
 		if (colonIndex !== -1 && !normalized.includes("://")) {
-			// SSH-style: take everything after the colon
 			normalized = normalized.slice(colonIndex + 1);
 		}
-		// Split by '/' and get the last segment
 		repoSegment = normalized.split("/").filter(Boolean).pop();
 	}
 
@@ -279,13 +243,10 @@ function extractRepoName(urlInput: string): string | null {
 
 	try {
 		repoSegment = decodeURIComponent(repoSegment);
-	} catch {
-		// Invalid encoding, continue with raw value
-	}
+	} catch {}
 
 	repoSegment = repoSegment.trim();
 
-	// Validate against safe filename regex
 	if (!repoSegment || !SAFE_REPO_NAME_REGEX.test(repoSegment)) {
 		return null;
 	}
@@ -334,6 +295,28 @@ export const createProjectsRouter = (getWindow: () => BrowserWindow | null) => {
 				.all();
 		}),
 
+		selectDirectory: publicProcedure
+			.input(
+				z.object({
+					defaultPath: z.string().optional(),
+				}),
+			)
+			.mutation(async ({ input }) => {
+				const window = getWindow();
+				if (!window) {
+					return { canceled: true as const, path: null };
+				}
+				const result = await dialog.showOpenDialog(window, {
+					properties: ["openDirectory", "createDirectory"],
+					title: "Select Directory",
+					defaultPath: input.defaultPath,
+				});
+				if (result.canceled || result.filePaths.length === 0) {
+					return { canceled: true as const, path: null };
+				}
+				return { canceled: false as const, path: result.filePaths[0] };
+			}),
+
 		getBranches: publicProcedure
 			.input(z.object({ projectId: z.string() }))
 			.query(
@@ -359,14 +342,11 @@ export const createProjectsRouter = (getWindow: () => BrowserWindow | null) => {
 
 					const git = simpleGit(project.mainRepoPath);
 
-					// Check if origin remote exists
 					let hasOrigin = false;
 					try {
 						const remotes = await git.getRemotes();
 						hasOrigin = remotes.some((r) => r.name === "origin");
-					} catch {
-						// If we can't get remotes, assume no origin
-					}
+					} catch {}
 
 					const branchSummary = await git.branch(["-a"]);
 
@@ -383,13 +363,11 @@ export const createProjectsRouter = (getWindow: () => BrowserWindow | null) => {
 						}
 					}
 
-					// Get branch dates for sorting - fetch from both local and remote
 					const branchMap = new Map<
 						string,
 						{ lastCommitDate: number; isLocal: boolean; isRemote: boolean }
 					>();
 
-					// First, get remote branch dates (if origin exists)
 					if (hasOrigin) {
 						try {
 							const remoteBranchInfo = await git.raw([
@@ -422,7 +400,6 @@ export const createProjectsRouter = (getWindow: () => BrowserWindow | null) => {
 								});
 							}
 						} catch {
-							// Fallback for remote branches
 							for (const name of remoteBranchSet) {
 								branchMap.set(name, {
 									lastCommitDate: 0,
@@ -433,7 +410,6 @@ export const createProjectsRouter = (getWindow: () => BrowserWindow | null) => {
 						}
 					}
 
-					// Then, add local-only branches
 					try {
 						const localBranchInfo = await git.raw([
 							"for-each-ref",
@@ -793,6 +769,67 @@ export const createProjectsRouter = (getWindow: () => BrowserWindow | null) => {
 						canceled: false as const,
 						success: false as const,
 						error: `Failed to clone repository: ${errorMessage}`,
+					};
+				}
+			}),
+
+		createEmptyRepo: publicProcedure
+			.input(
+				z.object({
+					name: z
+						.string()
+						.min(1)
+						.refine(
+							(val) => SAFE_REPO_NAME_REGEX.test(val) && !/^\.+$/.test(val),
+							{
+								message:
+									"Name can only contain letters, numbers, dots, underscores, hyphens, and spaces",
+							},
+						),
+					parentDir: z.string().min(1),
+				}),
+			)
+			.mutation(async ({ input }) => {
+				try {
+					const repoPath = join(input.parentDir, input.name);
+
+					if (existsSync(repoPath)) {
+						return {
+							canceled: false as const,
+							success: false as const,
+							error: `A folder named "${input.name}" already exists at this location.`,
+						};
+					}
+
+					await mkdir(repoPath, { recursive: true });
+
+					let defaultBranch: string;
+					try {
+						({ defaultBranch } = await initGitRepo(repoPath));
+					} catch (gitErr) {
+						await rm(repoPath, { recursive: true, force: true });
+						throw gitErr;
+					}
+					const project = upsertProject(repoPath, defaultBranch);
+					await ensureMainWorkspace(project);
+
+					track("project_opened", {
+						project_id: project.id,
+						method: "create_empty",
+					});
+
+					return {
+						canceled: false as const,
+						success: true as const,
+						project,
+					};
+				} catch (error) {
+					const errorMessage =
+						error instanceof Error ? error.message : String(error);
+					return {
+						canceled: false as const,
+						success: false as const,
+						error: `Failed to create repository: ${errorMessage}`,
 					};
 				}
 			}),
