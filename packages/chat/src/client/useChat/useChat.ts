@@ -112,24 +112,44 @@ export function useChat(options: UseChatOptions): UseChatReturn {
 	// --- Messages via collection pipeline (null-safe) ---
 	const rows = useCollectionData(session?.messagesCollection ?? null);
 
-	const messages = useMemo(() => rows.map(messageRowToUIMessage), [rows]);
+	const [dismissedIncompleteMessageIds, setDismissedIncompleteMessageIds] =
+		useState<string[]>([]);
+
+	// Hide orphaned partial assistant rows after recovery/retry.
+	// Valid in-progress assistant output is expected to be the latest row and fresh.
+	const visibleRows = (() => {
+		const now = Date.now();
+		const dismissed = new Set(dismissedIncompleteMessageIds);
+		return rows.filter((row, index) => {
+			if (row.role !== "assistant" || row.isComplete) return true;
+			if (dismissed.has(row.id)) return false;
+			const isLatest = index === rows.length - 1;
+			const isStale = now - row.lastChunkAt.getTime() >= STALE_THRESHOLD_MS;
+			if (isStale) return false;
+			return isLatest;
+		});
+	})();
+
+	const messages = useMemo(
+		() => visibleRows.map(messageRowToUIMessage),
+		[visibleRows],
+	);
 
 	// --- Staleness-aware isLoading ---
 	// Tick forces re-evaluation so time-based staleness actually triggers.
 	const [_tick, setTick] = useState(0);
 	useEffect(() => {
-		if (!rows.some((r) => !r.isComplete)) return;
+		if (!visibleRows.some((r) => !r.isComplete)) return;
 		const timer = setInterval(() => setTick((t) => t + 1), 5_000);
 		return () => clearInterval(timer);
-	}, [rows]);
+	}, [visibleRows]);
 
-	const isLoading = useMemo(() => {
+	const isLoading = visibleRows.some((row) => {
 		const now = Date.now();
-		return rows.some(
-			(row) =>
-				!row.isComplete && now - row.lastChunkAt.getTime() < STALE_THRESHOLD_MS,
+		return (
+			!row.isComplete && now - row.lastChunkAt.getTime() < STALE_THRESHOLD_MS
 		);
-	}, [rows]);
+	});
 
 	// --- Metadata (title, config, presence, agents) — null-safe ---
 	const metadata = useChatMetadata({
@@ -224,12 +244,22 @@ export function useChat(options: UseChatOptions): UseChatReturn {
 
 	const stop = useCallback(() => {
 		if (!sessionId) return;
+
+		const incompleteAssistantIds = rows
+			.filter((row) => row.role === "assistant" && !row.isComplete)
+			.map((row) => row.id);
+		if (incompleteAssistantIds.length > 0) {
+			setDismissedIncompleteMessageIds((prev) =>
+				Array.from(new Set([...prev, ...incompleteAssistantIds])),
+			);
+		}
+
 		fetch(url("/control"), {
 			method: "POST",
 			headers: headers(),
 			body: JSON.stringify({ action: "abort" }),
 		}).catch(console.error);
-	}, [url, headers, sessionId]);
+	}, [url, headers, sessionId, rows]);
 
 	const submitToolResult = useCallback(
 		async (toolCallId: string, output: unknown, err?: string) => {

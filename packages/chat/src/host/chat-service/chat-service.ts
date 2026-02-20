@@ -2,7 +2,6 @@ import { AgentManager, type AgentManagerConfig } from "./agent-manager";
 
 export interface ChatServiceHostConfig {
 	deviceId: string;
-	electricUrl: string;
 	apiUrl: string;
 }
 
@@ -22,7 +21,6 @@ export class ChatService {
 			deviceId: this.hostConfig.deviceId,
 			organizationId: options.organizationId,
 			authToken: options.authToken,
-			electricUrl: this.hostConfig.electricUrl,
 			apiUrl: this.hostConfig.apiUrl,
 		};
 
@@ -49,7 +47,12 @@ export class ChatService {
 		return this.agentManager?.hasWatcher(sessionId) ?? false;
 	}
 
-	ensureWatcher(sessionId: string): void {
-		this.agentManager?.ensureWatcher(sessionId);
+	async ensureWatcher(
+		sessionId: string,
+	): Promise<{ ready: boolean; reason?: string }> {
+		if (!this.agentManager) {
+			return { ready: false, reason: "Chat service is not started" };
+		}
+		return this.agentManager.ensureWatcher(sessionId);
 	}
 }

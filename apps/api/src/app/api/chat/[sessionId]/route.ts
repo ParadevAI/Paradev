@@ -1,5 +1,5 @@
 import { db } from "@superset/db/client";
-import { chatSessions, sessionHosts } from "@superset/db/schema";
+import { chatSessions } from "@superset/db/schema";
 import { eq } from "drizzle-orm";
 import { getDurableStream, requireAuth } from "../lib";
 
@@ -14,7 +14,6 @@ export async function PUT(
 
 	const body = (await request.json()) as {
 		organizationId: string;
-		deviceId?: string;
 		workspaceId?: string;
 	};
 
@@ -34,14 +33,6 @@ export async function PUT(
 		createdBy: session.user.id,
 		...(body.workspaceId ? { workspaceId: body.workspaceId } : {}),
 	});
-
-	if (body.deviceId) {
-		await db.insert(sessionHosts).values({
-			sessionId,
-			organizationId: body.organizationId,
-			deviceId: body.deviceId,
-		});
-	}
 
 	return Response.json(
 		{

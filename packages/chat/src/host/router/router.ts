@@ -62,10 +62,11 @@ export function createChatServiceRouter(service: ChatService) {
 				};
 			}),
 
-			activate: t.procedure.input(sessionIdInput).mutation(({ input }) => {
-				service.ensureWatcher(input.sessionId);
-				return { active: true };
-			}),
+			ensureRuntime: t.procedure
+				.input(sessionIdInput)
+				.mutation(async ({ input }) => {
+					return service.ensureWatcher(input.sessionId);
+				}),
 
 			config: t.procedure
 				.input(

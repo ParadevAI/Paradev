@@ -250,9 +250,10 @@ export class SessionHost {
 				headers: { ...this.headers, ...init?.headers },
 			})) as typeof fetch;
 
+		let producerError: Error | null = null;
 		const producer = new IdempotentProducer(
 			durableStream,
-			`agent-${this.sessionId}`,
+			`agent-${this.sessionId}-${messageId}`,
 			{
 				autoClaim: true,
 				lingerMs: 250,
@@ -261,6 +262,7 @@ export class SessionHost {
 				fetch: authFetch,
 				onError: (err) => {
 					if (options?.signal?.aborted) return;
+					producerError = err;
 					this.emit("error", err);
 				},
 			},
@@ -268,6 +270,7 @@ export class SessionHost {
 
 		let seq = 0;
 		const reader = stream.getReader();
+		let writeError: Error | null = null;
 
 		try {
 			while (true) {
@@ -290,6 +293,41 @@ export class SessionHost {
 				seq++;
 			}
 
+			// Some provider/tool-approval edge-cases can yield an empty stream.
+			// Emit a terminal assistant error chunk so the UI doesn't appear stuck.
+			if (!options?.signal?.aborted && seq === 0) {
+				const emptyEvent = sessionStateSchema.chunks.insert({
+					key: `${messageId}:${seq}`,
+					value: {
+						messageId,
+						actorId: "agent",
+						role: "assistant",
+						chunk: JSON.stringify({
+							type: "error",
+							errorText: "Agent returned no response",
+						}),
+						seq,
+						createdAt: new Date().toISOString(),
+					},
+				});
+				producer.append(JSON.stringify(emptyEvent));
+				seq++;
+
+				const abortEvent = sessionStateSchema.chunks.insert({
+					key: `${messageId}:${seq}`,
+					value: {
+						messageId,
+						actorId: "agent",
+						role: "assistant",
+						chunk: JSON.stringify({ type: "abort" }),
+						seq,
+						createdAt: new Date().toISOString(),
+					},
+				});
+				producer.append(JSON.stringify(abortEvent));
+				seq++;
+			}
+
 			// Write abort chunk so clients see isComplete = true
 			if (options?.signal?.aborted) {
 				const abortEvent = sessionStateSchema.chunks.insert({
@@ -306,18 +344,30 @@ export class SessionHost {
 				producer.append(JSON.stringify(abortEvent));
 				seq++;
 			}
+
+			if (producerError) {
+				throw producerError;
+			}
+		} catch (err) {
+			writeError = err instanceof Error ? err : new Error(String(err));
 		} finally {
 			try {
 				await producer.flush();
 				await producer.detach();
 			} catch (err) {
 				if (!options?.signal?.aborted) {
-					this.emit(
-						"error",
-						err instanceof Error ? err : new Error(String(err)),
-					);
+					const producerCleanupError =
+						err instanceof Error ? err : new Error(String(err));
+					this.emit("error", producerCleanupError);
+					if (!writeError) {
+						writeError = producerCleanupError;
+					}
 				}
 			}
+		}
+
+		if (writeError && !options?.signal?.aborted) {
+			throw writeError;
 		}
 	}
 

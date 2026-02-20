@@ -3,13 +3,12 @@ import { ChatService } from "../chat-service";
 import { createChatServiceRouter } from "../router";
 
 const deviceId = process.env.DEVICE_ID ?? "docker";
-const electricUrl = process.env.ELECTRIC_URL ?? "";
 const apiUrl = process.env.API_URL ?? "";
 const organizationId = process.env.ORGANIZATION_ID ?? "";
 const authToken = process.env.AUTH_TOKEN ?? "";
 const port = Number(process.env.PORT ?? "3001");
 
-const service = new ChatService({ deviceId, electricUrl, apiUrl });
+const service = new ChatService({ deviceId, apiUrl });
 
 async function main() {
 	await service.start({ organizationId, authToken });

@@ -9,19 +9,25 @@ import { electronTrpc } from "renderer/lib/electron-trpc";
 export function useAgentManager() {
 	const { data: session } = authClient.useSession();
 	const organizationId = session?.session?.activeOrganizationId;
+	const authToken = getAuthToken();
 	const startMutation = electronTrpc.chatService.start.useMutation();
-	const mutateRef = useRef(startMutation.mutate);
-	mutateRef.current = startMutation.mutate;
-	const prevOrgRef = useRef<string | null>(null);
+	const mutateRef = useRef(startMutation.mutateAsync);
+	mutateRef.current = startMutation.mutateAsync;
+	const prevStartKeyRef = useRef<string | null>(null);
 
 	useEffect(() => {
 		if (!organizationId) return;
-		if (organizationId === prevOrgRef.current) return;
-
-		const authToken = getAuthToken();
 		if (!authToken) return;
+		const startKey = `${organizationId}:${authToken}`;
+		if (startKey === prevStartKeyRef.current) return;
 
-		prevOrgRef.current = organizationId;
-		mutateRef.current({ organizationId, authToken });
-	}, [organizationId]);
+		void mutateRef
+			.current({ organizationId, authToken })
+			.then(() => {
+				prevStartKeyRef.current = startKey;
+			})
+			.catch((error) => {
+				console.error("[useAgentManager] Failed to start chat service:", error);
+			});
+	}, [organizationId, authToken]);
 }

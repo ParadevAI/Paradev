@@ -120,7 +120,9 @@ export function ChatInterface({
 	const { data: slashCommands = [] } =
 		chatServiceTrpc.workspace.getSlashCommands.useQuery({ cwd });
 
-	const activateMutation = chatServiceTrpc.session.activate.useMutation();
+	const ensureRuntimeMutation =
+		chatServiceTrpc.session.ensureRuntime.useMutation();
+	const [runtimeError, setRuntimeError] = useState<string | null>(null);
 
 	// --- Per-message metadata (sent with every message) ---
 	const messageMetadata = useMemo(
@@ -137,20 +139,49 @@ export function ChatInterface({
 	useEffect(() => {
 		if (!chat.ready || sentPendingRef.current) return;
 		if (!pendingMessage && pendingFiles.length === 0) return;
+		if (!sessionId) return;
+
+		let cancelled = false;
 		sentPendingRef.current = true;
-		chat.sendMessage(
-			pendingMessage ?? "",
-			pendingFiles.length > 0 ? pendingFiles : undefined,
-			messageMetadata,
-		);
-		setPendingMessage(null);
-		setPendingFiles([]);
+
+		void (async () => {
+			try {
+				const runtime = await ensureRuntimeMutation.mutateAsync({ sessionId });
+				if (!runtime.ready) {
+					throw new Error(runtime.reason ?? "Session runtime is not ready");
+				}
+				if (cancelled) return;
+				setRuntimeError(null);
+				await chat.sendMessage(
+					pendingMessage ?? "",
+					pendingFiles.length > 0 ? pendingFiles : undefined,
+					messageMetadata,
+				);
+				if (cancelled) return;
+				setPendingMessage(null);
+				setPendingFiles([]);
+			} catch (err) {
+				if (cancelled) return;
+				sentPendingRef.current = false;
+				setRuntimeError(
+					err instanceof Error
+						? err.message
+						: "Failed to start session runtime",
+				);
+			}
+		})();
+
+		return () => {
+			cancelled = true;
+		};
 	}, [
 		chat.ready,
 		chat.sendMessage,
 		pendingMessage,
 		pendingFiles,
 		messageMetadata,
+		sessionId,
+		ensureRuntimeMutation,
 	]);
 
 	// Reset ref when sessionId changes so pending message is re-sent for new sessions
@@ -218,9 +249,16 @@ export function ChatInterface({
 			if (!text && files.length === 0) return;
 
 			if (sessionId) {
-				// Active session — send directly
-				activateMutation.mutate({ sessionId });
+				setRuntimeError(null);
+				const runtime = await ensureRuntimeMutation.mutateAsync({ sessionId });
+				if (!runtime.ready) {
+					setRuntimeError(
+						runtime.reason ?? "Session runtime is not ready on this device",
+					);
+					return;
+				}
 
+				// Active session — send directly
 				let uploadedFiles: FileUIPart[] | undefined;
 				if (files.length > 0) {
 					const results = await Promise.all(
@@ -229,7 +267,7 @@ export function ChatInterface({
 					uploadedFiles = results;
 				}
 
-				chat.sendMessage(text, uploadedFiles, messageMetadata);
+				await chat.sendMessage(text, uploadedFiles, messageMetadata);
 			} else {
 				// No session — create one, then switch (re-renders with sessionId)
 				if (!organizationId) return;
@@ -266,7 +304,7 @@ export function ChatInterface({
 			workspaceId,
 			paneId,
 			switchChatSession,
-			activateMutation,
+			ensureRuntimeMutation,
 			chat.sendMessage,
 			messageMetadata,
 		],
@@ -299,7 +337,7 @@ export function ChatInterface({
 				/>
 				<ChatInputFooter
 					cwd={cwd}
-					error={chat.error}
+					error={runtimeError ?? chat.error}
 					isStreaming={isStreaming}
 					availableModels={availableModels}
 					selectedModel={activeModel}
