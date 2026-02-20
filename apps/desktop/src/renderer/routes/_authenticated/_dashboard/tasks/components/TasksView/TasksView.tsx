@@ -1,9 +1,10 @@
 import { Spinner } from "@superset/ui/spinner";
 import { useLiveQuery } from "@tanstack/react-db";
 import { useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { HiCheckCircle } from "react-icons/hi2";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
+import { useTasksFilterStore } from "../../stores/tasks-filter-state";
 import { LinearCTA } from "./components/LinearCTA";
 import { TasksTableView } from "./components/TasksTableView";
 import { type TabValue, TasksTopBar } from "./components/TasksTopBar";
@@ -11,14 +12,26 @@ import { type TaskWithStatus, useTasksTable } from "./hooks/useTasksTable";
 
 interface TasksViewProps {
 	initialTab?: "all" | "active" | "backlog";
+	initialAssignee?: string;
 }
 
-export function TasksView({ initialTab }: TasksViewProps) {
+export function TasksView({ initialTab, initialAssignee }: TasksViewProps) {
 	const navigate = useNavigate();
 	const collections = useCollections();
 	const currentTab: TabValue = initialTab ?? "all";
 	const [searchQuery, setSearchQuery] = useState("");
-	const [assigneeFilter, setAssigneeFilter] = useState<string | null>(null);
+	const assigneeFilter = initialAssignee ?? null;
+
+	const { setTab: storeSetTab, setAssignee: storeSetAssignee } =
+		useTasksFilterStore();
+
+	useEffect(() => {
+		storeSetTab(currentTab);
+	}, [currentTab, storeSetTab]);
+
+	useEffect(() => {
+		storeSetAssignee(assigneeFilter);
+	}, [assigneeFilter, storeSetAssignee]);
 
 	const { data: integrations, isLoading: isCheckingLinear } = useLiveQuery(
 		(q) =>
@@ -50,18 +63,35 @@ export function TasksView({ initialTab }: TasksViewProps) {
 	}, [rowSelection, table]);
 
 	const handleTabChange = (tab: TabValue) => {
+		const search: Record<string, string> = {};
+		if (tab !== "all") search.tab = tab;
+		if (assigneeFilter) search.assignee = assigneeFilter;
 		navigate({
 			to: "/tasks",
-			search: tab === "all" ? {} : { tab },
+			search,
+			replace: true,
+		});
+	};
+
+	const handleAssigneeFilterChange = (assignee: string | null) => {
+		const search: Record<string, string> = {};
+		if (currentTab !== "all") search.tab = currentTab;
+		if (assignee) search.assignee = assignee;
+		navigate({
+			to: "/tasks",
+			search,
 			replace: true,
 		});
 	};
 
 	const handleTaskClick = (task: TaskWithStatus) => {
+		const search: Record<string, string> = {};
+		if (currentTab !== "all") search.tab = currentTab;
+		if (assigneeFilter) search.assignee = assigneeFilter;
 		navigate({
 			to: "/tasks/$taskId",
 			params: { taskId: task.id },
-			search: currentTab === "all" ? {} : { tab: currentTab },
+			search,
 		});
 	};
 
@@ -85,7 +115,7 @@ export function TasksView({ initialTab }: TasksViewProps) {
 					searchQuery={searchQuery}
 					onSearchChange={setSearchQuery}
 					assigneeFilter={assigneeFilter}
-					onAssigneeFilterChange={setAssigneeFilter}
+					onAssigneeFilterChange={handleAssigneeFilterChange}
 					selectedCount={selectedTasks.length}
 					onClearSelection={handleClearSelection}
 				/>
