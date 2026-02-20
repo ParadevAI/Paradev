@@ -1,5 +1,6 @@
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { useLocation, useRouter } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { LuArrowLeft, LuArrowRight } from "react-icons/lu";
 import { HotkeyTooltipContent } from "renderer/components/HotkeyTooltipContent";
 import { useAppHotkey } from "renderer/stores/hotkeys";
@@ -14,6 +15,21 @@ export function NavigationControls() {
 
 	useAppHotkey("NAVIGATE_BACK", () => router.history.back());
 	useAppHotkey("NAVIGATE_FORWARD", () => router.history.forward());
+
+	useEffect(() => {
+		const handleMouseUp = (event: MouseEvent) => {
+			if (event.button === 3) {
+				event.preventDefault();
+				router.history.back();
+			} else if (event.button === 4) {
+				event.preventDefault();
+				router.history.forward();
+			}
+		};
+
+		window.addEventListener("mouseup", handleMouseUp);
+		return () => window.removeEventListener("mouseup", handleMouseUp);
+	}, [router]);
 
 	return (
 		<div className="flex items-center">
