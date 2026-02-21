@@ -1,6 +1,12 @@
 import Editor, { type OnMount } from "@monaco-editor/react";
 import type * as Monaco from "monaco-editor";
-import { type MutableRefObject, useCallback, useEffect, useRef } from "react";
+import {
+	type MutableRefObject,
+	type RefObject,
+	useCallback,
+	useEffect,
+	useRef,
+} from "react";
 import { LuLoader } from "react-icons/lu";
 import { MarkdownRenderer } from "renderer/components/MarkdownRenderer";
 import {
@@ -17,6 +23,7 @@ import type { FileViewerMode } from "shared/tabs-types";
 import { DiffViewer } from "../../../../../../ChangesContent/components/DiffViewer";
 import { registerCopyPathLineAction } from "../../../../../components/EditorContextMenu";
 import { FileEditorContextMenu } from "../FileEditorContextMenu";
+import { MarkdownSearch } from "../MarkdownSearch";
 
 interface RawFileData {
 	ok: true;
@@ -89,6 +96,20 @@ interface FileViewerContentProps {
 	availableTabs: Tab[];
 	onMoveToTab: (tabId: string) => void;
 	onMoveToNewTab: () => void;
+	// Markdown search props
+	markdownContainerRef: RefObject<HTMLDivElement | null>;
+	markdownSearch: {
+		isSearchOpen: boolean;
+		query: string;
+		caseSensitive: boolean;
+		matchCount: number;
+		activeMatchIndex: number;
+		setQuery: (query: string) => void;
+		setCaseSensitive: (caseSensitive: boolean) => void;
+		findNext: () => void;
+		findPrevious: () => void;
+		closeSearch: () => void;
+	};
 }
 
 export function FileViewerContent({
@@ -121,6 +142,9 @@ export function FileViewerContent({
 	availableTabs,
 	onMoveToTab,
 	onMoveToNewTab,
+	// Markdown search props
+	markdownContainerRef,
+	markdownSearch,
 }: FileViewerContentProps) {
 	const isImage = isImageFile(filePath);
 	const isMonacoReady = useMonacoReady();
@@ -304,8 +328,22 @@ export function FileViewerContent({
 
 	if (viewMode === "rendered") {
 		return (
-			<div className="p-4 overflow-auto h-full">
-				<MarkdownRenderer content={rawFileData.content} />
+			<div className="relative h-full">
+				<MarkdownSearch
+					isOpen={markdownSearch.isSearchOpen}
+					query={markdownSearch.query}
+					caseSensitive={markdownSearch.caseSensitive}
+					matchCount={markdownSearch.matchCount}
+					activeMatchIndex={markdownSearch.activeMatchIndex}
+					onQueryChange={markdownSearch.setQuery}
+					onCaseSensitiveChange={markdownSearch.setCaseSensitive}
+					onFindNext={markdownSearch.findNext}
+					onFindPrevious={markdownSearch.findPrevious}
+					onClose={markdownSearch.closeSearch}
+				/>
+				<div ref={markdownContainerRef} className="p-4 overflow-auto h-full">
+					<MarkdownRenderer content={rawFileData.content} />
+				</div>
 			</div>
 		);
 	}

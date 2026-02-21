@@ -508,6 +508,12 @@ export const HOTKEYS = {
 		category: "Terminal",
 		description: "Search text in the active terminal",
 	}),
+	FIND_IN_FILE_VIEWER: defineHotkey({
+		keys: "meta+f",
+		label: "Find in File Viewer",
+		category: "Terminal",
+		description: "Search text in the rendered file viewer",
+	}),
 	NEW_GROUP: defineHotkey({
 		keys: "meta+t",
 		label: "New Terminal",

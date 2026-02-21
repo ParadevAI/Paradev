@@ -12,6 +12,7 @@ import { FileViewerContent } from "./components/FileViewerContent";
 import { FileViewerToolbar } from "./components/FileViewerToolbar";
 import { useFileContent } from "./hooks/useFileContent";
 import { useFileSave } from "./hooks/useFileSave";
+import { useMarkdownSearch } from "./hooks/useMarkdownSearch";
 import { UnsavedChangesDialog } from "./UnsavedChangesDialog";
 
 interface FileViewerPaneProps {
@@ -58,6 +59,7 @@ export function FileViewerPane({
 }: FileViewerPaneProps) {
 	// Use granular selector to only get this pane's fileViewer data
 	const fileViewer = useTabsStore((s) => s.panes[paneId]?.fileViewer);
+	const isFocused = useTabsStore((s) => s.focusedPaneIds[tabId] === paneId);
 	const {
 		viewMode: diffViewMode,
 		setViewMode: setDiffViewMode,
@@ -66,6 +68,7 @@ export function FileViewerPane({
 	} = useChangesStore();
 
 	const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null);
+	const markdownContainerRef = useRef<HTMLDivElement>(null);
 	const [isDirty, setIsDirty] = useState(false);
 	const originalContentRef = useRef<string>("");
 	const draftContentRef = useRef<string | null>(null);
@@ -84,6 +87,13 @@ export function FileViewerPane({
 	const initialColumn = fileViewer?.initialColumn;
 
 	const pinPane = useTabsStore((s) => s.pinPane);
+
+	const markdownSearch = useMarkdownSearch({
+		containerRef: markdownContainerRef,
+		isFocused,
+		isRenderedMode: viewMode === "rendered",
+		filePath,
+	});
 
 	const { handleSaveRaw, handleSaveDiff } = useFileSave({
 		worktreePath,
@@ -323,6 +333,9 @@ export function FileViewerPane({
 					availableTabs={availableTabs}
 					onMoveToTab={onMoveToTab}
 					onMoveToNewTab={onMoveToNewTab}
+					// Markdown search props
+					markdownContainerRef={markdownContainerRef}
+					markdownSearch={markdownSearch}
 				/>
 			</BasePaneWindow>
 			<UnsavedChangesDialog
