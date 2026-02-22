@@ -8,10 +8,20 @@ const organizationId = process.env.ORGANIZATION_ID ?? "";
 const authToken = process.env.AUTH_TOKEN ?? "";
 const port = Number(process.env.PORT ?? "3001");
 
-const service = new ChatService({ deviceId, apiUrl });
+const service = new ChatService({
+	deviceId,
+	apiUrl,
+	getHeaders: () => {
+		const headers: Record<string, string> = {};
+		if (authToken) {
+			headers.Authorization = `Bearer ${authToken}`;
+		}
+		return headers;
+	},
+});
 
 async function main() {
-	await service.start({ organizationId, authToken });
+	await service.start({ organizationId });
 
 	const router = createChatServiceRouter(service);
 
