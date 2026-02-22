@@ -15,6 +15,7 @@ const SLACK_SCOPES = [
 	"im:write",
 	"mpim:history",
 	"users:read",
+	"files:read",
 	"assistant:write",
 	"links:read",
 	"links:write",

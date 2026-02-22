@@ -1,4 +1,3 @@
-import type { AppMentionEvent } from "@slack/types";
 import { db } from "@superset/db/client";
 import {
 	integrationConnections,
@@ -14,9 +13,34 @@ import {
 } from "../utils/run-agent";
 import { formatSideEffectsMessage } from "../utils/slack-blocks";
 import { createSlackClient } from "../utils/slack-client";
+import {
+	extractSlackImageAssets,
+	formatSlackImageAssetError,
+	SlackImageAssetError,
+} from "../utils/slack-image-assets";
+
+interface SlackEventFile {
+	id: string;
+	name?: string;
+	mimetype?: string;
+	size?: number;
+	url_private?: string;
+	url_private_download?: string;
+}
+
+interface SlackAppMentionEvent {
+	type: "app_mention";
+	user: string;
+	text: string;
+	ts: string;
+	channel: string;
+	event_ts: string;
+	thread_ts?: string;
+	files?: SlackEventFile[];
+}
 
 interface ProcessMentionParams {
-	event: AppMentionEvent;
+	event: SlackAppMentionEvent;
 	teamId: string;
 	eventId: string;
 }
@@ -165,19 +189,26 @@ export async function processSlackMention({
 	}
 
 	try {
+		const imageAssets = await extractSlackImageAssets({
+			eventFiles: event.files,
+			slack,
+			slackToken: connection.accessToken,
+		});
+
 		const resolve = await resolveUserMentions({
-			texts: [event.text],
+			texts: [event.text ?? ""],
 			slack,
 		});
 
 		const result = await runSlackAgent({
-			prompt: resolve(event.text),
+			prompt: resolve(event.text ?? ""),
 			channelId: event.channel,
 			threadTs,
 			organizationId: connection.organizationId,
 			userId: slackUserLink.userId,
 			slackToken: connection.accessToken,
 			model: slackUserLink.modelPreference ?? undefined,
+			images: imageAssets,
 			onProgress: messageTs
 				? async (status) => {
 						try {
@@ -226,7 +257,10 @@ export async function processSlackMention({
 	} catch (err) {
 		console.error("[slack/process-mention] Agent error:", err);
 
-		const errorText = await formatErrorForSlack(err);
+		const errorText =
+			err instanceof SlackImageAssetError
+				? formatSlackImageAssetError(err)
+				: await formatErrorForSlack(err);
 		if (messageTs) {
 			await slack.chat.update({
 				channel: event.channel,

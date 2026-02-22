@@ -4,6 +4,7 @@ import { WebClient } from "@slack/web-api";
 import { env } from "@/env";
 import { DEFAULT_SLACK_MODEL } from "../../../constants";
 import type { AgentAction } from "../slack-blocks";
+import type { SlackImageAsset } from "../slack-image-assets";
 import {
 	createSupersetMcpClient,
 	mcpToolToAnthropicTool,
@@ -113,6 +114,7 @@ interface RunSlackAgentParams {
 	userId: string;
 	slackToken: string;
 	model?: string;
+	images?: SlackImageAsset[];
 	onProgress?: (status: string) => void | Promise<void>;
 }
 
@@ -425,6 +427,42 @@ async function fetchAgentContext({
 	return sections.join("\n\n");
 }
 
+function buildUserMessageContent({
+	prompt,
+	threadContext,
+	images,
+}: {
+	prompt: string;
+	threadContext: string;
+	images: SlackImageAsset[] | undefined;
+}): string | Anthropic.ContentBlockParam[] {
+	const textContent = threadContext
+		? `${threadContext}\n\nCurrent message:\n${prompt}`
+		: prompt;
+
+	if (!images || images.length === 0) {
+		return textContent;
+	}
+
+	const content: Anthropic.ContentBlockParam[] = [];
+	if (textContent.trim().length > 0) {
+		content.push({ type: "text", text: textContent });
+	}
+
+	for (const image of images) {
+		content.push({
+			type: "image",
+			source: {
+				type: "base64",
+				media_type: image.mediaType,
+				data: image.base64Data,
+			},
+		});
+	}
+
+	return content;
+}
+
 export async function runSlackAgent(
 	params: RunSlackAgentParams,
 ): Promise<SlackAgentResult> {
@@ -481,9 +519,11 @@ Current context:
 
 ${agentContext}`;
 
-		const userContent = threadContext
-			? `${threadContext}\n\nCurrent message:\n${params.prompt}`
-			: params.prompt;
+		const userContent = buildUserMessageContent({
+			prompt: params.prompt,
+			threadContext,
+			images: params.images,
+		});
 
 		const messages: Anthropic.MessageParam[] = [
 			{
