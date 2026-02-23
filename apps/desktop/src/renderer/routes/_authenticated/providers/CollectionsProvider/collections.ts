@@ -82,7 +82,6 @@ const electricHeaders = {
 		const token = getAuthToken();
 		return token ? `Bearer ${token}` : "";
 	},
-	"X-Electric-Backend": "cloud",
 };
 
 const organizationsCollection = createCollection(

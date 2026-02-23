@@ -24,22 +24,26 @@ export async function GET(request: Request): Promise<Response> {
 		return new Response("Not a member of this organization", { status: 403 });
 	}
 
-	const useCloud =
-		request.headers.get("x-electric-backend") === "cloud" &&
-		env.ELECTRIC_SOURCE_ID &&
-		env.ELECTRIC_SOURCE_SECRET;
+	const {
+		ELECTRIC_SOURCE_ID,
+		ELECTRIC_SOURCE_SECRET,
+		ELECTRIC_URL,
+		ELECTRIC_SECRET,
+	} = env;
 
-	const originUrl = useCloud
-		? new URL("/v1/shape", "https://api.electric-sql.cloud")
-		: new URL(env.ELECTRIC_URL);
-
-	if (useCloud) {
-		// biome-ignore lint/style/noNonNullAssertion: guarded by useCloud check above
-		originUrl.searchParams.set("source_id", env.ELECTRIC_SOURCE_ID!);
-		// biome-ignore lint/style/noNonNullAssertion: guarded by useCloud check above
-		originUrl.searchParams.set("source_secret", env.ELECTRIC_SOURCE_SECRET!);
+	let originUrl: URL;
+	if (ELECTRIC_SOURCE_ID && ELECTRIC_SOURCE_SECRET) {
+		originUrl = new URL("/v1/shape", "https://api.electric-sql.cloud");
+		originUrl.searchParams.set("source_id", ELECTRIC_SOURCE_ID);
+		originUrl.searchParams.set("source_secret", ELECTRIC_SOURCE_SECRET);
+	} else if (ELECTRIC_URL && ELECTRIC_SECRET) {
+		originUrl = new URL(ELECTRIC_URL);
+		originUrl.searchParams.set("secret", ELECTRIC_SECRET);
 	} else {
-		originUrl.searchParams.set("secret", env.ELECTRIC_SECRET);
+		return new Response(
+			"Missing Electric config: set ELECTRIC_SOURCE_ID/SECRET or ELECTRIC_URL/SECRET",
+			{ status: 500 },
+		);
 	}
 
 	url.searchParams.forEach((value, key) => {
@@ -85,7 +89,7 @@ export async function GET(request: Request): Promise<Response> {
 	const response = await fetch(originUrl.toString());
 
 	const headers = new Headers(response.headers);
-	headers.append("Vary", "Authorization, X-Electric-Backend");
+	headers.append("Vary", "Authorization");
 
 	if (headers.get("content-encoding")) {
 		headers.delete("content-encoding");
