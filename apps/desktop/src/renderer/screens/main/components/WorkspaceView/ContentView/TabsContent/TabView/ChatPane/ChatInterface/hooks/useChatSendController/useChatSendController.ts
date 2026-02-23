@@ -44,6 +44,12 @@ interface UseChatSendControllerReturn {
 	pendingMessages: PendingUserMessage[];
 	runtimeError: string | null;
 	handleSend: (message: PromptInputMessage) => void;
+	startFreshSession: () => Promise<{
+		created: boolean;
+		errorMessage?: string;
+	}>;
+	setRuntimeErrorMessage: (message: string) => void;
+	clearRuntimeError: () => void;
 	stopPendingSends: () => void;
 	markSubmitStarted: () => void;
 	markSubmitEnded: () => void;
@@ -196,13 +202,22 @@ export function useChatSendController(
 
 	const sendAbortControllersRef = useRef(new Map<string, AbortController>());
 	const sendingQueuedMessageIdRef = useRef<string | null>(null);
+	const freshSessionAbortControllerRef = useRef<AbortController | null>(null);
 
-	const setRuntimeErrorMessage = useCallback(
+	const setRuntimeErrorFromUnknown = useCallback(
 		(error: unknown, fallback: string) => {
 			setRuntimeError(error instanceof Error ? error.message : fallback);
 		},
 		[],
 	);
+
+	const setRuntimeErrorMessage = useCallback((message: string) => {
+		setRuntimeError(message);
+	}, []);
+
+	const clearRuntimeError = useCallback(() => {
+		setRuntimeError(null);
+	}, []);
 
 	const removePendingMessage = useCallback((messageId: string) => {
 		setPendingMessages((prev) => {
@@ -233,6 +248,8 @@ export function useChatSendController(
 	}, []);
 
 	const abortAllInFlightSends = useCallback(() => {
+		freshSessionAbortControllerRef.current?.abort();
+		freshSessionAbortControllerRef.current = null;
 		for (const controller of sendAbortControllersRef.current.values()) {
 			controller.abort();
 		}
@@ -394,7 +411,7 @@ export function useChatSendController(
 				removePendingMessage(queuedPendingMessage.id);
 				removeAwaitingAssistant(queuedPendingMessage.id);
 				clearQueuedPendingMessage(queuedPendingMessage.id);
-				setRuntimeErrorMessage(err, "Failed to start session runtime");
+				setRuntimeErrorFromUnknown(err, "Failed to start session runtime");
 			} finally {
 				if (
 					!cancelled &&
@@ -418,7 +435,7 @@ export function useChatSendController(
 		removePendingMessage,
 		removeAwaitingAssistant,
 		sendPreparedMessage,
-		setRuntimeErrorMessage,
+		setRuntimeErrorFromUnknown,
 	]);
 
 	useEffect(() => {
@@ -510,7 +527,7 @@ export function useChatSendController(
 					}
 					removePendingMessage(messageId);
 					removeAwaitingAssistant(messageId);
-					setRuntimeErrorMessage(err, "Failed to send message");
+					setRuntimeErrorFromUnknown(err, "Failed to send message");
 				} finally {
 					if (
 						!handedOffToQueue &&
@@ -529,15 +546,65 @@ export function useChatSendController(
 			removePendingMessage,
 			addAwaitingAssistant,
 			removeAwaitingAssistant,
-			setRuntimeErrorMessage,
+			setRuntimeErrorFromUnknown,
 		],
 	);
 
 	const stopPendingSends = useCallback(() => {
 		abortAllInFlightSends();
 		setIsPreparingSubmit(false);
-		setRuntimeError(null);
-	}, [abortAllInFlightSends]);
+		clearRuntimeError();
+	}, [abortAllInFlightSends, clearRuntimeError]);
+
+	const startFreshSession = useCallback(async (): Promise<{
+		created: boolean;
+		errorMessage?: string;
+	}> => {
+		if (!organizationId) {
+			const errorMessage = "Organization is required to start a chat session";
+			setRuntimeError(errorMessage);
+			return { created: false, errorMessage };
+		}
+
+		try {
+			abortAllInFlightSends();
+			setIsPreparingSubmit(false);
+			chat.stop();
+
+			const freshSessionAbortController = new AbortController();
+			freshSessionAbortControllerRef.current = freshSessionAbortController;
+			const newSessionId = crypto.randomUUID();
+			await createSession(
+				newSessionId,
+				organizationId,
+				deviceId,
+				workspaceId,
+				freshSessionAbortController.signal,
+			);
+			clearRuntimeError();
+			switchChatSession(paneId, newSessionId);
+			return { created: true };
+		} catch (err) {
+			if (isAbortError(err)) {
+				return { created: false };
+			}
+			const errorMessage =
+				err instanceof Error ? err.message : "Failed to create a new session";
+			setRuntimeError(errorMessage);
+			return { created: false, errorMessage };
+		} finally {
+			freshSessionAbortControllerRef.current = null;
+		}
+	}, [
+		organizationId,
+		abortAllInFlightSends,
+		chat.stop,
+		clearRuntimeError,
+		deviceId,
+		workspaceId,
+		switchChatSession,
+		paneId,
+	]);
 
 	const markSubmitStarted = useCallback(() => {
 		setIsPreparingSubmit(true);
@@ -562,6 +629,9 @@ export function useChatSendController(
 		pendingMessages,
 		runtimeError,
 		handleSend,
+		startFreshSession,
+		setRuntimeErrorMessage,
+		clearRuntimeError,
 		stopPendingSends,
 		markSubmitStarted,
 		markSubmitEnded,

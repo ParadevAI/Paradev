@@ -29,7 +29,7 @@ export function SlashCommandMenu({
 			side="top"
 			align="start"
 			sideOffset={0}
-			className="w-80 p-0 text-xs"
+			className="w-[min(44rem,calc(100vw-2rem))] p-0 text-xs"
 			onOpenAutoFocus={(e) => e.preventDefault()}
 			onCloseAutoFocus={(e) => e.preventDefault()}
 		>
@@ -55,6 +55,11 @@ export function SlashCommandMenu({
 								<span className="font-mono text-muted-foreground">/</span>
 								{cmd.name}
 							</span>
+							{cmd.kind === "builtin" && (
+								<span className="rounded-sm border border-border/70 bg-muted/40 px-1 py-0.5 font-mono text-[10px] text-muted-foreground uppercase leading-none">
+									builtin
+								</span>
+							)}
 							{cmd.argumentHint && (
 								<span className="text-muted-foreground">
 									{cmd.argumentHint}
@@ -64,6 +69,11 @@ export function SlashCommandMenu({
 						{cmd.description && (
 							<span className="text-muted-foreground pl-4">
 								{cmd.description}
+							</span>
+						)}
+						{cmd.aliases.length > 0 && (
+							<span className="text-muted-foreground pl-4 font-mono">
+								aliases: {cmd.aliases.map((alias) => `/${alias}`).join(", ")}
 							</span>
 						)}
 					</button>

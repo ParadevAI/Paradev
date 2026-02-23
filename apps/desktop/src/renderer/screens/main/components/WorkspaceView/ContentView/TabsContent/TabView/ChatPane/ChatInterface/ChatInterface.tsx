@@ -1,5 +1,8 @@
 import { chatServiceTrpc, useChat } from "@superset/chat/client";
-import { PromptInputProvider } from "@superset/ui/ai-elements/prompt-input";
+import {
+	type PromptInputMessage,
+	PromptInputProvider,
+} from "@superset/ui/ai-elements/prompt-input";
 import { useQuery } from "@tanstack/react-query";
 import type React from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -10,6 +13,7 @@ import { useTabsStore } from "renderer/stores/tabs/store";
 import { ChatInputFooter } from "./components/ChatInputFooter";
 import { MessageList } from "./components/MessageList";
 import { useChatSendController } from "./hooks/useChatSendController";
+import { useSlashCommandExecutor } from "./hooks/useSlashCommandExecutor";
 import type { SlashCommand } from "./hooks/useSlashCommands";
 import type { ChatInterfaceProps, ModelOption, PermissionMode } from "./types";
 
@@ -106,7 +110,10 @@ export function ChatInterface({
 	const {
 		pendingMessages,
 		runtimeError,
-		handleSend,
+		handleSend: sendThroughController,
+		startFreshSession,
+		setRuntimeErrorMessage,
+		clearRuntimeError,
 		stopPendingSends,
 		markSubmitStarted,
 		markSubmitEnded,
@@ -123,6 +130,42 @@ export function ChatInterface({
 		messageMetadata,
 		switchChatSession,
 	});
+
+	const stopActiveResponse = useCallback(() => {
+		stopPendingSends();
+		chat.stop();
+	}, [stopPendingSends, chat.stop]);
+
+	const { resolveSlashCommandInput } = useSlashCommandExecutor({
+		cwd,
+		availableModels,
+		canAbort,
+		onStartFreshSession: startFreshSession,
+		onStopActiveResponse: stopActiveResponse,
+		onSelectModel: setSelectedModel,
+		onOpenModelPicker: () => setModelSelectorOpen(true),
+		onSetErrorMessage: setRuntimeErrorMessage,
+		onClearError: clearRuntimeError,
+	});
+
+	const handleSend = useCallback(
+		async (message: PromptInputMessage) => {
+			let text = message.text.trim();
+			const files = message.files ?? [];
+
+			const slashCommandResult = await resolveSlashCommandInput(text);
+			if (slashCommandResult.handled) {
+				return;
+			}
+			text = slashCommandResult.nextText.trim();
+
+			if (!text && files.length === 0) return;
+
+			clearRuntimeError();
+			sendThroughController({ text, files });
+		},
+		[clearRuntimeError, resolveSlashCommandInput, sendThroughController],
+	);
 
 	useEffect(() => {
 		if (chat.isLoading) return;
@@ -180,10 +223,10 @@ export function ChatInterface({
 	const handleStop = useCallback(
 		(event: React.MouseEvent) => {
 			event.preventDefault();
-			stopPendingSends();
-			chat.stop();
+			clearRuntimeError();
+			stopActiveResponse();
 		},
-		[stopPendingSends, chat.stop],
+		[clearRuntimeError, stopActiveResponse],
 	);
 
 	const handleSlashCommandSend = useCallback(
