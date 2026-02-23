@@ -11,7 +11,10 @@ import {
 	ModelSelectorTrigger,
 } from "@superset/ui/ai-elements/model-selector";
 import { PromptInputButton } from "@superset/ui/ai-elements/prompt-input";
+import { claudeIcon } from "@superset/ui/icons/preset-icons";
+import { ChevronDownIcon } from "lucide-react";
 import { useMemo } from "react";
+import { PILL_BUTTON_CLASS } from "../../styles";
 import type { ModelOption } from "../../types";
 
 /** Derive a logo provider slug from the provider name */
@@ -57,9 +60,16 @@ export function ModelPicker({
 	return (
 		<ModelSelector open={open} onOpenChange={onOpenChange}>
 			<ModelSelectorTrigger asChild>
-				<PromptInputButton className="gap-1.5 text-xs">
-					{selectedLogo && <ModelSelectorLogo provider={selectedLogo} />}
+				<PromptInputButton
+					className={`${PILL_BUTTON_CLASS} px-2 gap-1.5 text-xs text-foreground`}
+				>
+					{selectedLogo === "anthropic" ? (
+						<img alt="Claude" className="size-3" src={claudeIcon} />
+					) : selectedLogo ? (
+						<ModelSelectorLogo provider={selectedLogo} />
+					) : null}
 					<span>{selectedModel?.name ?? "Model"}</span>
+					<ChevronDownIcon className="size-2.5 opacity-50" />
 				</PromptInputButton>
 			</ModelSelectorTrigger>
 			<ModelSelectorContent title="Select Model">
@@ -79,7 +89,11 @@ export function ModelPicker({
 											onOpenChange(false);
 										}}
 									>
-										<ModelSelectorLogo provider={logo} />
+										{logo === "anthropic" ? (
+											<img alt="Claude" className="size-3" src={claudeIcon} />
+										) : (
+											<ModelSelectorLogo provider={logo} />
+										)}
 										<div className="flex flex-1 flex-col gap-0.5">
 											<ModelSelectorName>{model.name}</ModelSelectorName>
 											<span className="text-muted-foreground text-xs">

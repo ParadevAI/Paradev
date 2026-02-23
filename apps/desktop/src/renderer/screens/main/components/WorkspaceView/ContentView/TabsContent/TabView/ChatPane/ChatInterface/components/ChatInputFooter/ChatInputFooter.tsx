@@ -134,9 +134,9 @@ export function ChatInputFooter({
 	const [issueLinkOpen, setIssueLinkOpen] = useState(false);
 
 	return (
-		<ChatInputDropZone className="border-t bg-background px-4 py-3">
+		<ChatInputDropZone className="bg-background px-4 py-3">
 			{(dragType) => (
-				<div className="mx-auto w-full max-w-3xl">
+				<div className="mx-auto w-full max-w-[680px]">
 					{error && (
 						<div className="mb-3 select-text rounded-md border border-destructive/20 bg-destructive/10 px-4 py-2 text-sm text-destructive">
 							{error}
@@ -155,10 +155,8 @@ export function ChatInputFooter({
 											: "relative"
 									}
 								>
-									<span className="pointer-events-none absolute top-3 right-3 z-10 text-xs text-muted-foreground/50 [:focus-within>&]:hidden">
-										⌘F to focus
-									</span>
 									<PromptInput
+										className="[&>[data-slot=input-group]]:rounded-[13px] [&>[data-slot=input-group]]:border-[0.5px] [&>[data-slot=input-group]]:shadow-none [&>[data-slot=input-group]]:bg-foreground/[0.02]"
 										onSubmitStart={onSubmitStart}
 										onSubmitEnd={onSubmitEnd}
 										onSubmit={onSend}
@@ -180,7 +178,10 @@ export function ChatInputFooter({
 											cwd={cwd}
 											slashCommands={slashCommands}
 										/>
-										<PromptInputTextarea placeholder="Ask to make changes, @mention files, run /commands" />
+										<PromptInputTextarea
+											placeholder="Ask anything..."
+											className="min-h-10"
+										/>
 										<ChatComposerControls
 											availableModels={availableModels}
 											selectedModel={selectedModel}
@@ -201,6 +202,11 @@ export function ChatInputFooter({
 							</MentionAnchor>
 						</MentionProvider>
 					</SlashCommandInput>
+					<div className="flex items-center px-2 pt-1.5">
+						<span className="text-xs text-muted-foreground/50">
+							Use '@' to mention files, run /commands
+						</span>
+					</div>
 				</div>
 			)}
 		</ChatInputDropZone>

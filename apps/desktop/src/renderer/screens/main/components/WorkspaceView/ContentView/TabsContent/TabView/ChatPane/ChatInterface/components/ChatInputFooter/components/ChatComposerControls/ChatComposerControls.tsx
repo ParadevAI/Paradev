@@ -5,7 +5,9 @@ import {
 } from "@superset/ui/ai-elements/prompt-input";
 import { ThinkingToggle } from "@superset/ui/ai-elements/thinking-toggle";
 import type { ChatStatus } from "ai";
+import { ArrowUpIcon, Loader2Icon, SquareIcon } from "lucide-react";
 import type React from "react";
+import { PILL_BUTTON_CLASS } from "../../../../styles";
 import type { ModelOption, PermissionMode } from "../../../../types";
 import { ModelPicker } from "../../../ModelPicker";
 import { PermissionModePicker } from "../../../PermissionModePicker";
@@ -44,7 +46,11 @@ export function ChatComposerControls({
 }: ChatComposerControlsProps) {
 	return (
 		<PromptInputFooter>
-			<PromptInputTools>
+			<PromptInputTools className="gap-1.5">
+				<PermissionModePicker
+					selectedMode={permissionMode}
+					onSelectMode={setPermissionMode}
+				/>
 				<ModelPicker
 					models={availableModels}
 					selectedModel={selectedModel}
@@ -55,18 +61,24 @@ export function ChatComposerControls({
 				<ThinkingToggle
 					enabled={thinkingEnabled}
 					onToggle={setThinkingEnabled}
-				/>
-				<PermissionModePicker
-					selectedMode={permissionMode}
-					onSelectMode={setPermissionMode}
+					className={`${PILL_BUTTON_CLASS} w-[23px] [&>svg]:size-3.5`}
 				/>
 			</PromptInputTools>
-			<div className="flex items-center space-x-2">
+			<div className="flex items-center gap-2">
 				<PlusMenu onLinkIssue={onLinkIssue} />
 				<PromptInputSubmit
+					className="size-[23px] rounded-full border border-transparent bg-foreground/10 shadow-none p-[5px] hover:bg-foreground/20"
 					status={submitStatus}
 					onClick={canAbort ? onStop : undefined}
-				/>
+				>
+					{submitStatus === "submitted" ? (
+						<Loader2Icon className="size-3.5 animate-spin text-muted-foreground" />
+					) : submitStatus === "streaming" ? (
+						<SquareIcon className="size-3.5 text-muted-foreground" />
+					) : (
+						<ArrowUpIcon className="size-3.5 text-muted-foreground" />
+					)}
+				</PromptInputSubmit>
 			</div>
 		</PromptInputFooter>
 	);

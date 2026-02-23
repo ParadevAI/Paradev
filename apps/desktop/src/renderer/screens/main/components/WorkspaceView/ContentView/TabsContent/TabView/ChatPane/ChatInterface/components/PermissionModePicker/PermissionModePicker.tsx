@@ -13,6 +13,7 @@ import {
 	ShieldIcon,
 	ShieldOffIcon,
 } from "lucide-react";
+import { PILL_BUTTON_CLASS } from "../../styles";
 import type { PermissionMode } from "../../types";
 
 interface PermissionModeOption {
@@ -25,13 +26,13 @@ interface PermissionModeOption {
 const PERMISSION_MODES: PermissionModeOption[] = [
 	{
 		value: "bypassPermissions",
-		label: "Autonomous",
+		label: "Auto",
 		description: "Tools run without approval",
 		icon: ShieldOffIcon,
 	},
 	{
 		value: "acceptEdits",
-		label: "Auto-edit",
+		label: "Semi-auto",
 		description: "Edits auto-approved, others need approval",
 		icon: ShieldCheckIcon,
 	},
@@ -58,10 +59,12 @@ export function PermissionModePicker({
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
-				<PromptInputButton className="gap-1 text-xs">
-					<ActiveIcon className="size-3.5" />
+				<PromptInputButton
+					className={`${PILL_BUTTON_CLASS} px-2 gap-1 text-xs text-foreground`}
+				>
+					<ActiveIcon className="size-3.5 opacity-60" />
 					<span>{active.label}</span>
-					<ChevronDownIcon className="size-3" />
+					<ChevronDownIcon className="size-2.5 opacity-50" />
 				</PromptInputButton>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="start" className="w-64">
