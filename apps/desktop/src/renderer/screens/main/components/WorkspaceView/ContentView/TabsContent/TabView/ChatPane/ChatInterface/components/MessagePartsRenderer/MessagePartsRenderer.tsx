@@ -1,5 +1,4 @@
 import { ExploringGroup } from "@superset/ui/ai-elements/exploring-group";
-import { MessageResponse } from "@superset/ui/ai-elements/message";
 import type { UIMessage } from "ai";
 import { getToolName, isToolUIPart } from "ai";
 import {
@@ -20,6 +19,7 @@ import { getArgs } from "../../utils/tool-helpers";
 import { MastraToolCallBlock } from "../MastraToolCallBlock";
 import { ReadOnlyToolCall } from "../ReadOnlyToolCall";
 import { ReasoningBlock } from "../ReasoningBlock";
+import { StreamingMessageText } from "./components/StreamingMessageText";
 
 interface MessagePartsRendererProps {
 	parts: UIMessage["parts"];
@@ -96,14 +96,13 @@ export function MessagePartsRenderer({
 
 			if (part.type === "text") {
 				nodes.push(
-					<MessageResponse
+					<StreamingMessageText
 						key={i}
+						text={part.text}
 						isAnimating={isLastAssistant && isStreaming}
 						mermaid={mermaidConfig}
 						components={components}
-					>
-						{part.text}
-					</MessageResponse>,
+					/>,
 				);
 				i++;
 				continue;
