@@ -23,6 +23,11 @@ const OPENCODE_PLUGIN_TEMPLATE_PATH = path.join(
 	"templates",
 	"opencode-plugin.template.js",
 );
+const CODEX_WRAPPER_EXEC_TEMPLATE_PATH = path.join(
+	__dirname,
+	"templates",
+	"codex-wrapper-exec.template.sh",
+);
 
 const SUPERSET_MANAGED_HOOK_PATH_PATTERN = /\/\.superset(?:-[^/'"\s\\]+)?\//;
 
@@ -177,9 +182,14 @@ export function createCodexWrapper(): void {
 	const notifyPath = getNotifyScriptPath();
 	const script = buildWrapperScript(
 		"codex",
-		`exec "$REAL_BIN" -c 'notify=["bash","${notifyPath}"]' "$@"`,
+		buildCodexWrapperExecLine(notifyPath),
 	);
 	createWrapper("codex", script);
+}
+
+export function buildCodexWrapperExecLine(notifyPath: string): string {
+	const template = fs.readFileSync(CODEX_WRAPPER_EXEC_TEMPLATE_PATH, "utf-8");
+	return template.replaceAll("{{NOTIFY_PATH}}", notifyPath);
 }
 
 /**
