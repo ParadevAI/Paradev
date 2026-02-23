@@ -53,9 +53,7 @@ jobs:
         with:
           path: |
             ~/.bun/install/cache
-          key: ${{ runner.os }}-bun-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-bun-
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
 
       - name: Install dependencies
         run: bun install --frozen
@@ -142,7 +140,7 @@ jobs:
 
   build-linux:
     name: Build - Linux (x64)
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     environment: production
 
     steps:
@@ -159,9 +157,7 @@ jobs:
         with:
           path: |
             ~/.bun/install/cache
-          key: ${{ runner.os }}-bun-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-bun-
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
 
       - name: Install dependencies
         run: bun install --frozen
