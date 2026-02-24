@@ -1,5 +1,12 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { getAnthropicAuthToken } from "@superset/agent";
+import {
+	getAnthropicAuthToken,
+	setAnthropicOAuthCredentials,
+} from "@superset/agent";
+import {
+	createAnthropicOAuthSession,
+	exchangeAnthropicAuthorizationCode,
+} from "../auth/anthropic";
 import type { GetHeaders } from "../lib/auth/auth";
 import { AgentManager, type AgentManagerConfig } from "./agent-manager";
 
@@ -20,6 +27,12 @@ export interface ChatServiceHostConfig {
 export class ChatService {
 	private agentManager: AgentManager | null = null;
 	private hostConfig: ChatServiceHostConfig;
+	private anthropicAuthSession: {
+		verifier: string;
+		state: string;
+		createdAt: number;
+	} | null = null;
+	private static readonly ANTHROPIC_AUTH_SESSION_TTL_MS = 10 * 60 * 1000;
 
 	constructor(hostConfig: ChatServiceHostConfig) {
 		this.hostConfig = hostConfig;
@@ -69,6 +82,58 @@ export class ChatService {
 			return { ready: false, reason: "Chat service is not started" };
 		}
 		return this.agentManager.ensureWatcher(sessionId, cwd);
+	}
+
+	getAnthropicAuthStatus(): { authenticated: boolean } {
+		return { authenticated: Boolean(getAnthropicAuthToken()) };
+	}
+
+	startAnthropicOAuth(): { url: string; instructions: string } {
+		const session = createAnthropicOAuthSession();
+		this.anthropicAuthSession = {
+			verifier: session.verifier,
+			state: session.state,
+			createdAt: session.createdAt,
+		};
+
+		return {
+			url: session.authUrl,
+			instructions:
+				"Authorize Anthropic in your browser, then paste the code shown there (format: code#state).",
+		};
+	}
+
+	cancelAnthropicOAuth(): { success: true } {
+		this.anthropicAuthSession = null;
+		return { success: true };
+	}
+
+	async completeAnthropicOAuth(input: {
+		code: string;
+	}): Promise<{ success: true; expiresAt: number }> {
+		if (!this.anthropicAuthSession) {
+			throw new Error("No active Anthropic auth session. Start auth again.");
+		}
+
+		const elapsed = Date.now() - this.anthropicAuthSession.createdAt;
+		if (elapsed > ChatService.ANTHROPIC_AUTH_SESSION_TTL_MS) {
+			this.anthropicAuthSession = null;
+			throw new Error(
+				"Anthropic auth session expired. Start auth again and paste a fresh code.",
+			);
+		}
+
+		const session = this.anthropicAuthSession;
+		this.anthropicAuthSession = null;
+
+		const credentials = await exchangeAnthropicAuthorizationCode({
+			rawCode: input.code,
+			verifier: session.verifier,
+			expectedState: session.state,
+		});
+
+		setAnthropicOAuthCredentials(credentials);
+		return { success: true, expiresAt: credentials.expiresAt };
 	}
 
 	private async maybeGenerateTitle(sessionId: string): Promise<void> {
