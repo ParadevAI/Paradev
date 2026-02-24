@@ -1,15 +1,7 @@
+import type { TerminalPreset } from "@superset/local-db";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
-import { Button } from "@superset/ui/button";
-import {
-	DropdownMenu,
-	DropdownMenuCheckboxItem,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuSeparator,
-	DropdownMenuTrigger,
-} from "@superset/ui/dropdown-menu";
 import { useLiveQuery } from "@tanstack/react-db";
-import { useParams } from "@tanstack/react-router";
+import { useNavigate, useParams } from "@tanstack/react-router";
 import { useFeatureFlagEnabled } from "posthog-js/react";
 import {
 	useCallback,
@@ -19,11 +11,8 @@ import {
 	useRef,
 	useState,
 } from "react";
-import { BsTerminalPlus } from "react-icons/bs";
-import { LuPlus } from "react-icons/lu";
-import { TbMessageCirclePlus, TbWorld } from "react-icons/tb";
-import { HotkeyMenuShortcut } from "renderer/components/HotkeyMenuShortcut";
 import { electronTrpc } from "renderer/lib/electron-trpc";
+import { usePresets } from "renderer/react-query/presets";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useTabsStore } from "renderer/stores/tabs/store";
 import { useTabsWithPresets } from "renderer/stores/tabs/useTabsWithPresets";
@@ -31,9 +20,13 @@ import {
 	isLastPaneInTab,
 	resolveActiveTabIdForWorkspace,
 } from "renderer/stores/tabs/utils";
+import {
+	DEFAULT_SHOW_PRESETS_BAR,
+	DEFAULT_USE_COMPACT_TERMINAL_ADD_BUTTON,
+} from "shared/constants";
 import { type ActivePaneStatus, pickHigherStatus } from "shared/tabs-types";
+import { AddTabButton } from "./components/AddTabButton";
 import { GroupItem } from "./GroupItem";
-import { NewTabDropZone } from "./NewTabDropZone";
 
 export function GroupStrip() {
 	const { workspaceId: activeWorkspaceId } = useParams({ strict: false });
@@ -42,7 +35,7 @@ export function GroupStrip() {
 	const panes = useTabsStore((s) => s.panes);
 	const activeTabIds = useTabsStore((s) => s.activeTabIds);
 	const tabHistoryStacks = useTabsStore((s) => s.tabHistoryStacks);
-	const { addTab } = useTabsWithPresets();
+	const { addTab, openPreset } = useTabsWithPresets();
 	const addChatMastraTab = useTabsStore((s) => s.addChatMastraTab);
 	const addBrowserTab = useTabsStore((s) => s.addBrowserTab);
 	const renameTab = useTabsStore((s) => s.renameTab);
@@ -53,6 +46,8 @@ export function GroupStrip() {
 	const reorderTabs = useTabsStore((s) => s.reorderTabs);
 
 	const setTabAutoTitle = useTabsStore((s) => s.setTabAutoTitle);
+	const { presets } = usePresets();
+	const navigate = useNavigate();
 
 	const hasAiChat = useFeatureFlagEnabled(FEATURE_FLAGS.AI_CHAT);
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -61,6 +56,8 @@ export function GroupStrip() {
 	const utils = electronTrpc.useUtils();
 	const { data: showPresetsBar } =
 		electronTrpc.settings.getShowPresetsBar.useQuery();
+	const { data: useCompactTerminalAddButton } =
+		electronTrpc.settings.getUseCompactTerminalAddButton.useQuery();
 	const setShowPresetsBar = electronTrpc.settings.setShowPresetsBar.useMutation(
 		{
 			onMutate: async ({ enabled }) => {
@@ -79,6 +76,30 @@ export function GroupStrip() {
 			},
 		},
 	);
+	const setUseCompactTerminalAddButton =
+		electronTrpc.settings.setUseCompactTerminalAddButton.useMutation({
+			onMutate: async ({ enabled }) => {
+				await utils.settings.getUseCompactTerminalAddButton.cancel();
+				const previous =
+					utils.settings.getUseCompactTerminalAddButton.getData();
+				utils.settings.getUseCompactTerminalAddButton.setData(
+					undefined,
+					enabled,
+				);
+				return { previous };
+			},
+			onError: (_err, _vars, context) => {
+				if (context?.previous !== undefined) {
+					utils.settings.getUseCompactTerminalAddButton.setData(
+						undefined,
+						context.previous,
+					);
+				}
+			},
+			onSettled: () => {
+				utils.settings.getUseCompactTerminalAddButton.invalidate();
+			},
+		});
 
 	const tabs = useMemo(
 		() =>
@@ -160,6 +181,18 @@ export function GroupStrip() {
 		addBrowserTab(activeWorkspaceId);
 	};
 
+	const handleOpenPreset = useCallback(
+		(preset: TerminalPreset) => {
+			if (!activeWorkspaceId) return;
+			openPreset(activeWorkspaceId, preset, { target: "active-tab" });
+		},
+		[activeWorkspaceId, openPreset],
+	);
+
+	const handleOpenPresetsSettings = useCallback(() => {
+		navigate({ to: "/settings/presets" });
+	}, [navigate]);
+
 	const handleSelectGroup = (tabId: string) => {
 		if (activeWorkspaceId) {
 			setActiveTab(activeWorkspaceId, tabId);
@@ -219,52 +252,29 @@ export function GroupStrip() {
 		requestAnimationFrame(updateOverflow);
 	}, [updateOverflow]);
 
+	const useCompactAddButton =
+		useCompactTerminalAddButton ?? DEFAULT_USE_COMPACT_TERMINAL_ADD_BUTTON;
+
 	const plusControl = (
-		<NewTabDropZone
-			onDrop={(paneId) => movePaneToNewTab(paneId)}
+		<AddTabButton
+			hasAiChat={hasAiChat === true}
+			useCompactAddButton={useCompactAddButton}
+			showPresetsBar={showPresetsBar ?? DEFAULT_SHOW_PRESETS_BAR}
+			presets={presets}
+			onDropToNewTab={movePaneToNewTab}
 			isLastPaneInTab={checkIsLastPaneInTab}
-		>
-			<DropdownMenu>
-				<DropdownMenuTrigger asChild>
-					<Button
-						variant="ghost"
-						size="icon"
-						className="size-7 px-1 shrink-0 rounded-md border border-border/60 bg-muted/30 text-muted-foreground hover:bg-accent/60 hover:text-foreground"
-					>
-						<LuPlus className="size-3.5" strokeWidth={1.8} />
-					</Button>
-				</DropdownMenuTrigger>
-				<DropdownMenuContent align="end" className="w-56">
-					<DropdownMenuItem onClick={handleAddGroup} className="gap-2">
-						<BsTerminalPlus className="size-4" />
-						<span>Terminal</span>
-						<HotkeyMenuShortcut hotkeyId="NEW_GROUP" />
-					</DropdownMenuItem>
-					{hasAiChat && (
-						<DropdownMenuItem onClick={handleAddChat} className="gap-2">
-							<TbMessageCirclePlus className="size-4" />
-							<span>Chat</span>
-							<HotkeyMenuShortcut hotkeyId="NEW_CHAT" />
-						</DropdownMenuItem>
-					)}
-					<DropdownMenuItem onClick={handleAddBrowser} className="gap-2">
-						<TbWorld className="size-4" />
-						<span>Browser</span>
-						<HotkeyMenuShortcut hotkeyId="NEW_BROWSER" />
-					</DropdownMenuItem>
-					<DropdownMenuSeparator />
-					<DropdownMenuCheckboxItem
-						checked={showPresetsBar ?? false}
-						onCheckedChange={(checked) =>
-							setShowPresetsBar.mutate({ enabled: checked })
-						}
-						onSelect={(e) => e.preventDefault()}
-					>
-						Show Preset Bar
-					</DropdownMenuCheckboxItem>
-				</DropdownMenuContent>
-			</DropdownMenu>
-		</NewTabDropZone>
+			onAddTerminal={handleAddGroup}
+			onAddChat={handleAddChat}
+			onAddBrowser={handleAddBrowser}
+			onOpenPreset={handleOpenPreset}
+			onConfigurePresets={handleOpenPresetsSettings}
+			onToggleShowPresetsBar={(enabled) =>
+				setShowPresetsBar.mutate({ enabled })
+			}
+			onToggleCompactAddButton={(enabled) =>
+				setUseCompactTerminalAddButton.mutate({ enabled })
+			}
+		/>
 	);
 
 	return (
@@ -301,7 +311,15 @@ export function GroupStrip() {
 						</div>
 					)}
 					{hasHorizontalOverflow ? (
-						<div className="h-full w-10 shrink-0" />
+						<div
+							className={`h-full shrink-0 ${
+								!useCompactAddButton
+									? hasAiChat
+										? "w-[220px]"
+										: "w-[170px]"
+									: "w-10"
+							}`}
+						/>
 					) : (
 						<div className="shrink-0">{plusControl}</div>
 					)}
