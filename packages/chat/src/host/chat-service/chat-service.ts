@@ -1,3 +1,5 @@
+import Anthropic from "@anthropic-ai/sdk";
+import { getAnthropicAuthToken } from "@superset/agent";
 import type { GetHeaders } from "../lib/auth/auth";
 import { AgentManager, type AgentManagerConfig } from "./agent-manager";
 
@@ -29,7 +31,12 @@ export class ChatService {
 			organizationId: options.organizationId,
 			apiUrl: this.hostConfig.apiUrl,
 			getHeaders: this.hostConfig.getHeaders,
-			onLifecycleEvent: this.hostConfig.onLifecycleEvent,
+			onLifecycleEvent: (event) => {
+				this.hostConfig.onLifecycleEvent?.(event);
+				if (event.eventType === "Stop") {
+					void this.maybeGenerateTitle(event.sessionId);
+				}
+			},
 		};
 
 		if (this.agentManager) {
@@ -62,5 +69,52 @@ export class ChatService {
 			return { ready: false, reason: "Chat service is not started" };
 		}
 		return this.agentManager.ensureWatcher(sessionId, cwd);
+	}
+
+	private async maybeGenerateTitle(sessionId: string): Promise<void> {
+		const watcher = this.agentManager?.getWatcher(sessionId);
+		if (!watcher) return;
+
+		const host = watcher.sessionHost;
+		const messages = host.getMessageDigest();
+		if (messages.length === 0) return;
+
+		const userCount = messages.filter((m) => m.role === "user").length;
+		if (userCount !== 1 && userCount % 10 !== 0) return;
+
+		const { title } = await this.generateTitle(messages);
+		await host.postTitle(title);
+	}
+
+	private async generateTitle(
+		messages: { role: string; text: string }[],
+	): Promise<{ title: string }> {
+		const authToken = getAnthropicAuthToken();
+		if (!authToken) {
+			const firstUser = messages.find((m) => m.role === "user");
+			return { title: firstUser?.text.slice(0, 40).trim() || "Untitled Chat" };
+		}
+
+		const digest = messages.map((m) => `${m.role}: ${m.text}`).join("\n");
+		const client = new Anthropic({
+			authToken,
+			defaultHeaders: {
+				"anthropic-beta": "oauth-2025-04-20",
+			},
+		});
+
+		const response = await client.messages.create({
+			model: "claude-haiku-4-5-20251001",
+			max_tokens: 30,
+			system:
+				"Generate a concise 2-5 word title for this coding chat. Respond with just the title, nothing else.",
+			messages: [{ role: "user", content: digest }],
+		});
+
+		const text =
+			response.content[0]?.type === "text"
+				? response.content[0].text.trim()
+				: null;
+		return { title: text || "Untitled Chat" };
 	}
 }

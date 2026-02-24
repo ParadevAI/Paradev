@@ -238,7 +238,7 @@ export const createChatPane = (tabId: string): Pane => {
 		id,
 		tabId,
 		type: "chat",
-		name: "Chat",
+		name: "New Chat",
 		chat: {
 			sessionId: null,
 		},
@@ -329,18 +329,13 @@ export const createBrowserTabWithPane = (
  */
 export const createChatTabWithPane = (
 	workspaceId: string,
-	existingTabs: Tab[] = [],
 ): { tab: Tab; pane: Pane } => {
 	const tabId = generateId("tab");
 	const pane = createChatPane(tabId);
 
-	const workspaceTabs = existingTabs.filter(
-		(t) => t.workspaceId === workspaceId,
-	);
-
 	const tab: Tab = {
 		id: tabId,
-		name: `Chat ${workspaceTabs.filter((t) => t.name.startsWith("Chat")).length + 1}`,
+		name: "New Chat",
 		workspaceId,
 		layout: pane.id,
 		createdAt: Date.now(),

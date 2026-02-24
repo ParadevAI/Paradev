@@ -3,6 +3,10 @@ import { DurableStream, IdempotentProducer } from "@durable-streams/client";
 import type { UIMessage, UIMessageChunk } from "ai";
 import { type ChunkRow, sessionStateSchema } from "../../../../../schema";
 import { createSessionDB, type SessionDB } from "../../../../../session-db";
+import {
+	extractTextContent,
+	materializeMessage,
+} from "../../../../../session-db/collections/messages";
 import type { GetHeaders } from "../../../../lib/auth/auth";
 import { sessionRunIds } from "../../session-state";
 
@@ -464,6 +468,33 @@ export class SessionHost {
 		}
 
 		return latestRunId;
+	}
+
+	getMessageDigest(limit = 20): { role: string; text: string }[] {
+		if (!this.sessionDB) return [];
+
+		const chunks = this.sessionDB.collections.chunks;
+		const grouped = new Map<string, ChunkRow[]>();
+		for (const row of chunks.values()) {
+			const r = row as ChunkRow;
+			const arr = grouped.get(r.messageId);
+			if (arr) arr.push(r);
+			else grouped.set(r.messageId, [r]);
+		}
+
+		const messages: { role: string; text: string; createdAt: Date }[] = [];
+		for (const rows of grouped.values()) {
+			try {
+				const msg = materializeMessage(rows);
+				const text = extractTextContent(msg).slice(0, 500);
+				messages.push({ role: msg.role, text, createdAt: msg.createdAt });
+			} catch {
+				// skip unmaterializable
+			}
+		}
+
+		messages.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+		return messages.slice(-limit).map(({ role, text }) => ({ role, text }));
 	}
 
 	async postTitle(title: string): Promise<void> {

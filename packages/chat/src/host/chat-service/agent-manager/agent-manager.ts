@@ -69,6 +69,10 @@ export class AgentManager {
 		return this.watchers.has(sessionId);
 	}
 
+	getWatcher(sessionId: string): StreamWatcher | undefined {
+		return this.watchers.get(sessionId);
+	}
+
 	async ensureWatcher(
 		sessionId: string,
 		cwd?: string,

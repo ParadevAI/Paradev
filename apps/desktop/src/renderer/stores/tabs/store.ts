@@ -149,7 +149,7 @@ export const useTabsStore = create<TabsStore>()(
 				addChatTab: (workspaceId: string) => {
 					const state = get();
 
-					const { tab, pane } = createChatTabWithPane(workspaceId, state.tabs);
+					const { tab, pane } = createChatTabWithPane(workspaceId);
 
 					const currentActiveId = state.activeTabIds[workspaceId];
 					const historyStack = state.tabHistoryStacks[workspaceId] || [];

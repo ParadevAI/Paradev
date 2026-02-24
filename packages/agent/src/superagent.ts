@@ -25,6 +25,10 @@ export function setAnthropicAuthToken(token: string) {
 	anthropicAuthToken = token;
 }
 
+export function getAnthropicAuthToken(): string | null {
+	return anthropicAuthToken;
+}
+
 /**
  * Resolve the model for a Mastra Agent.
  *

@@ -5,7 +5,7 @@ import {
 } from "@superset/ui/ai-elements/prompt-input";
 import { useQuery } from "@tanstack/react-query";
 import type React from "react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { env } from "renderer/env.renderer";
 import { apiTrpcClient } from "renderer/lib/api-trpc-client";
 import { getAuthToken } from "renderer/lib/auth-client";
@@ -42,35 +42,6 @@ function getAuthHeaders(): Record<string, string> {
 	return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
-interface TitleMessagePartLike {
-	type: string;
-	text?: string;
-}
-
-interface TitleMessageLike {
-	role: string;
-	parts?: TitleMessagePartLike[];
-}
-
-interface TitleDigestMessage {
-	role: string;
-	text: string;
-}
-
-function hasAssistantMessage(messages: TitleMessageLike[]): boolean {
-	return messages.some((message) => message.role === "assistant");
-}
-
-function buildTitleDigest(messages: TitleMessageLike[]): TitleDigestMessage[] {
-	return messages.slice(-20).map((message) => {
-		const text = (message.parts ?? [])
-			.filter((part) => part.type === "text")
-			.map((part) => part.text?.slice(0, 500) ?? "")
-			.join(" ");
-		return { role: message.role, text };
-	});
-}
-
 function cloneParts(
 	parts: InterruptedMessage["parts"],
 ): InterruptedMessage["parts"] {
@@ -82,24 +53,19 @@ function cloneParts(
 
 export function ChatInterface({
 	sessionId,
-	sessionTitle,
 	organizationId,
 	deviceId,
 	workspaceId,
 	cwd,
 	paneId,
-	tabId,
 }: ChatInterfaceProps) {
 	const switchChatSession = useTabsStore((state) => state.switchChatSession);
-	const setTabAutoTitle = useTabsStore((state) => state.setTabAutoTitle);
 	const { models: availableModels, defaultModel } = useAvailableModels();
 
 	const [selectedModel, setSelectedModel] = useState<ModelOption | null>(null);
 	const activeModel = selectedModel ?? defaultModel;
 	const [modelSelectorOpen, setModelSelectorOpen] = useState(false);
 	const [thinkingEnabled, setThinkingEnabled] = useState(false);
-	const titleRequestedRef = useRef(false);
-	const titleRequestSessionRef = useRef<string | null>(null);
 	const [permissionMode, setPermissionMode] =
 		useState<PermissionMode>("bypassPermissions");
 	const [interruptedMessage, setInterruptedMessage] =
@@ -196,41 +162,6 @@ export function ChatInterface({
 		},
 		[clearRuntimeError, resolveSlashCommandInput, sendThroughController],
 	);
-
-	useEffect(() => {
-		if (chat.isLoading) return;
-		if (!sessionId || sessionTitle) return;
-		if (titleRequestSessionRef.current !== sessionId) {
-			titleRequestSessionRef.current = sessionId;
-			titleRequestedRef.current = false;
-		}
-		if (titleRequestedRef.current) return;
-		if (!hasAssistantMessage(chat.messages)) return;
-		titleRequestedRef.current = true;
-
-		const requestedSessionId = sessionId;
-		const digest = buildTitleDigest(chat.messages);
-
-		apiTrpcClient.chat.generateTitle
-			.mutate({ sessionId: requestedSessionId, messages: digest })
-			.then(({ title }) => {
-				if (titleRequestSessionRef.current !== requestedSessionId) return;
-				setTabAutoTitle(tabId, title);
-			})
-			.catch((error) => {
-				if (titleRequestSessionRef.current === requestedSessionId) {
-					titleRequestedRef.current = false;
-				}
-				console.error(error);
-			});
-	}, [
-		chat.isLoading,
-		chat.messages,
-		sessionId,
-		sessionTitle,
-		tabId,
-		setTabAutoTitle,
-	]);
 
 	const displayMessages = useMemo(() => {
 		const persistedIds = new Set(chat.messages.map((message) => message.id));
