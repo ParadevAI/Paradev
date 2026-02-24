@@ -2,6 +2,7 @@ import { toast } from "@superset/ui/sonner";
 import { useCallback, useEffect, useRef } from "react";
 import { useCreateOrAttachWithTheme } from "renderer/hooks/useCreateOrAttachWithTheme";
 import { electronTrpc } from "renderer/lib/electron-trpc";
+import { launchCommandInPane } from "renderer/lib/terminal/launch-command";
 import { useTabsStore } from "renderer/stores/tabs/store";
 import { useTabsWithPresets } from "renderer/stores/tabs/useTabsWithPresets";
 import {
@@ -30,9 +31,13 @@ export function WorkspaceInitEffects() {
 
 	const addTab = useTabsStore((state) => state.addTab);
 	const addPane = useTabsStore((state) => state.addPane);
+	const removePane = useTabsStore((state) => state.removePane);
 	const setTabAutoTitle = useTabsStore((state) => state.setTabAutoTitle);
 	const { openPreset } = useTabsWithPresets();
 	const createOrAttach = useCreateOrAttachWithTheme();
+	const terminalCreateOrAttach =
+		electronTrpc.terminal.createOrAttach.useMutation();
+	const terminalWrite = electronTrpc.terminal.write.useMutation();
 	const utils = electronTrpc.useUtils();
 
 	const openPresetsInActiveTab = useCallback(
@@ -43,6 +48,55 @@ export function WorkspaceInitEffects() {
 			}
 		},
 		[openPreset],
+	);
+
+	const launchAgentCommand = useCallback(
+		({
+			paneId,
+			tabId,
+			workspaceId,
+			command,
+			removePaneOnError,
+		}: {
+			paneId: string;
+			tabId: string;
+			workspaceId: string;
+			command: string;
+			removePaneOnError?: boolean;
+		}) => {
+			void launchCommandInPane({
+				paneId,
+				tabId,
+				workspaceId,
+				command,
+				createOrAttach: (input) => terminalCreateOrAttach.mutateAsync(input),
+				write: (input) => terminalWrite.mutateAsync(input),
+			}).catch((error) => {
+				if (removePaneOnError) {
+					removePane(paneId);
+				}
+				console.error("[WorkspaceInitEffects] Failed to start agent:", error);
+				toast.error("Failed to start agent", {
+					description:
+						error instanceof Error
+							? error.message
+							: "Failed to start agent terminal session.",
+				});
+			});
+		},
+		[removePane, terminalCreateOrAttach, terminalWrite],
+	);
+
+	const runSetupCommandsInPane = useCallback(
+		async (paneId: string, commands: string[] | null) => {
+			if (!Array.isArray(commands) || commands.length === 0) return;
+			await terminalWrite.mutateAsync({
+				paneId,
+				data: `${commands.join(" && ")}\n`,
+				throwOnError: true,
+			});
+		},
+		[terminalWrite],
 	);
 
 	const handleTerminalSetup = useCallback(
@@ -64,9 +118,16 @@ export function WorkspaceInitEffects() {
 				openPresetsInActiveTab(setup.workspaceId, presets);
 
 				if (agentCommand) {
-					addPane(setupTabId, {
-						initialCommands: [agentCommand],
-					});
+					const agentPaneId = addPane(setupTabId);
+					if (agentPaneId) {
+						launchAgentCommand({
+							paneId: agentPaneId,
+							tabId: setupTabId,
+							workspaceId: setup.workspaceId,
+							command: agentCommand,
+							removePaneOnError: true,
+						});
+					}
 				}
 
 				createOrAttach.mutate(
@@ -74,10 +135,27 @@ export function WorkspaceInitEffects() {
 						paneId: setupPaneId,
 						tabId: setupTabId,
 						workspaceId: setup.workspaceId,
-						initialCommands: setup.initialCommands ?? undefined,
 					},
 					{
-						onSuccess: () => onComplete(),
+						onSuccess: () => {
+							void runSetupCommandsInPane(
+								setupPaneId,
+								setup.initialCommands ?? null,
+							)
+								.catch((error) => {
+									console.error(
+										"[WorkspaceInitEffects] Failed to run setup commands:",
+										error,
+									);
+									toast.error("Failed to run setup commands", {
+										description:
+											error instanceof Error
+												? error.message
+												: "Failed to execute setup commands.",
+									});
+								})
+								.finally(() => onComplete());
+						},
 						onError: (error) => {
 							console.error(
 								"[WorkspaceInitEffects] Failed to create terminal:",
@@ -99,9 +177,16 @@ export function WorkspaceInitEffects() {
 				setTabAutoTitle(tabId, "Workspace Setup");
 
 				if (agentCommand) {
-					addPane(tabId, {
-						initialCommands: [agentCommand],
-					});
+					const agentPaneId = addPane(tabId);
+					if (agentPaneId) {
+						launchAgentCommand({
+							paneId: agentPaneId,
+							tabId,
+							workspaceId: setup.workspaceId,
+							command: agentCommand,
+							removePaneOnError: true,
+						});
+					}
 				}
 
 				createOrAttach.mutate(
@@ -109,10 +194,24 @@ export function WorkspaceInitEffects() {
 						paneId,
 						tabId,
 						workspaceId: setup.workspaceId,
-						initialCommands: setup.initialCommands ?? undefined,
 					},
 					{
-						onSuccess: () => onComplete(),
+						onSuccess: () => {
+							void runSetupCommandsInPane(paneId, setup.initialCommands ?? null)
+								.catch((error) => {
+									console.error(
+										"[WorkspaceInitEffects] Failed to run setup commands:",
+										error,
+									);
+									toast.error("Failed to run setup commands", {
+										description:
+											error instanceof Error
+												? error.message
+												: "Failed to execute setup commands.",
+									});
+								})
+								.finally(() => onComplete());
+						},
 						onError: (error) => {
 							console.error(
 								"[WorkspaceInitEffects] Failed to create terminal:",
@@ -127,12 +226,32 @@ export function WorkspaceInitEffects() {
 										const { tabId: newTabId, paneId: newPaneId } = addTab(
 											setup.workspaceId,
 										);
-										createOrAttach.mutate({
-											paneId: newPaneId,
-											tabId: newTabId,
-											workspaceId: setup.workspaceId,
-											initialCommands: setup.initialCommands ?? undefined,
-										});
+										createOrAttach.mutate(
+											{
+												paneId: newPaneId,
+												tabId: newTabId,
+												workspaceId: setup.workspaceId,
+											},
+											{
+												onSuccess: () => {
+													void runSetupCommandsInPane(
+														newPaneId,
+														setup.initialCommands ?? null,
+													).catch((runError) => {
+														console.error(
+															"[WorkspaceInitEffects] Failed to run setup commands:",
+															runError,
+														);
+														toast.error("Failed to run setup commands", {
+															description:
+																runError instanceof Error
+																	? runError.message
+																	: "Failed to execute setup commands.",
+														});
+													});
+												},
+											},
+										);
 									},
 								},
 							});
@@ -146,20 +265,34 @@ export function WorkspaceInitEffects() {
 			if (hasPresets) {
 				openPresetsInActiveTab(setup.workspaceId, presets);
 				if (agentCommand) {
-					const { tabId: agentTabId } = addTab(setup.workspaceId, {
-						initialCommands: [agentCommand],
-					});
+					const { tabId: agentTabId, paneId: agentPaneId } = addTab(
+						setup.workspaceId,
+					);
 					setTabAutoTitle(agentTabId, "Agent");
+					launchAgentCommand({
+						paneId: agentPaneId,
+						tabId: agentTabId,
+						workspaceId: setup.workspaceId,
+						command: agentCommand,
+						removePaneOnError: true,
+					});
 				}
 				onComplete();
 				return;
 			}
 
 			if (agentCommand) {
-				const { tabId: agentTabId } = addTab(setup.workspaceId, {
-					initialCommands: [agentCommand],
-				});
+				const { tabId: agentTabId, paneId: agentPaneId } = addTab(
+					setup.workspaceId,
+				);
 				setTabAutoTitle(agentTabId, "Agent");
+				launchAgentCommand({
+					paneId: agentPaneId,
+					tabId: agentTabId,
+					workspaceId: setup.workspaceId,
+					command: agentCommand,
+					removePaneOnError: true,
+				});
 				onComplete();
 				return;
 			}
@@ -171,6 +304,8 @@ export function WorkspaceInitEffects() {
 			addPane,
 			setTabAutoTitle,
 			createOrAttach,
+			launchAgentCommand,
+			runSetupCommandsInPane,
 			openPresetsInActiveTab,
 			shouldApplyPreset,
 		],
