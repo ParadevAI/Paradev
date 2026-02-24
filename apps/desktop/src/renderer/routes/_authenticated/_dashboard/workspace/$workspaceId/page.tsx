@@ -13,6 +13,10 @@ import {
 	CommandPalette,
 	useCommandPalette,
 } from "renderer/screens/main/components/CommandPalette";
+import {
+	KeywordSearch,
+	useKeywordSearch,
+} from "renderer/screens/main/components/KeywordSearch";
 import { WorkspaceInitializingView } from "renderer/screens/main/components/WorkspaceView/WorkspaceInitializingView";
 import { WorkspaceLayout } from "renderer/screens/main/components/WorkspaceView/WorkspaceLayout";
 import { usePRStatus } from "renderer/screens/main/hooks";
@@ -367,9 +371,28 @@ function WorkspacePage() {
 		workspaceId,
 		worktreePath: workspace?.worktreePath,
 	});
-	useAppHotkey("QUICK_OPEN", () => commandPalette.toggle(), undefined, [
-		commandPalette.toggle,
-	]);
+	const keywordSearch = useKeywordSearch({
+		workspaceId,
+		worktreePath: workspace?.worktreePath,
+	});
+	useAppHotkey(
+		"QUICK_OPEN",
+		() => {
+			keywordSearch.handleOpenChange(false);
+			commandPalette.toggle();
+		},
+		undefined,
+		[commandPalette.toggle, keywordSearch.handleOpenChange],
+	);
+	useAppHotkey(
+		"KEYWORD_SEARCH",
+		() => {
+			commandPalette.handleOpenChange(false);
+			keywordSearch.toggle();
+		},
+		undefined,
+		[commandPalette.handleOpenChange, keywordSearch.toggle],
+	);
 
 	// Toggle changes sidebar (⌘L)
 	useAppHotkey("TOGGLE_SIDEBAR", () => toggleSidebar(), undefined, [
@@ -526,8 +549,30 @@ function WorkspacePage() {
 				onOpenChange={commandPalette.handleOpenChange}
 				query={commandPalette.query}
 				onQueryChange={commandPalette.setQuery}
+				filtersOpen={commandPalette.filtersOpen}
+				onFiltersOpenChange={commandPalette.setFiltersOpen}
+				includePattern={commandPalette.includePattern}
+				onIncludePatternChange={commandPalette.setIncludePattern}
+				excludePattern={commandPalette.excludePattern}
+				onExcludePatternChange={commandPalette.setExcludePattern}
+				isLoading={commandPalette.isFetching}
 				searchResults={commandPalette.searchResults}
 				onSelectFile={commandPalette.selectFile}
+			/>
+			<KeywordSearch
+				open={keywordSearch.open}
+				onOpenChange={keywordSearch.handleOpenChange}
+				query={keywordSearch.query}
+				onQueryChange={keywordSearch.setQuery}
+				filtersOpen={keywordSearch.filtersOpen}
+				onFiltersOpenChange={keywordSearch.setFiltersOpen}
+				includePattern={keywordSearch.includePattern}
+				onIncludePatternChange={keywordSearch.setIncludePattern}
+				excludePattern={keywordSearch.excludePattern}
+				onExcludePatternChange={keywordSearch.setExcludePattern}
+				isLoading={keywordSearch.isFetching}
+				searchResults={keywordSearch.searchResults}
+				onSelectMatch={keywordSearch.selectMatch}
 			/>
 		</div>
 	);
