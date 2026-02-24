@@ -175,15 +175,17 @@ function WorkspacePage() {
 		workspaceId,
 		addTab,
 	]);
+	useAppHotkey("NEW_CHAT", () => addChatTab(workspaceId), undefined, [
+		workspaceId,
+		addChatTab,
+	]);
 	useAppHotkey(
 		"REOPEN_TAB",
 		() => {
-			if (!reopenClosedTab(workspaceId)) {
-				addChatTab(workspaceId);
-			}
+			reopenClosedTab(workspaceId);
 		},
 		undefined,
-		[workspaceId, reopenClosedTab, addChatTab],
+		[workspaceId, reopenClosedTab],
 	);
 	useAppHotkey("NEW_BROWSER", () => addBrowserTab(workspaceId), undefined, [
 		workspaceId,
