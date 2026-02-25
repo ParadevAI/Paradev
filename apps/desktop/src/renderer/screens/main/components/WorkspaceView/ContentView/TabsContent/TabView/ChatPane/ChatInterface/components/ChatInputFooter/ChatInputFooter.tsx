@@ -24,10 +24,11 @@ import { ChatComposerControls } from "./components/ChatComposerControls";
 import { ChatInputDropZone } from "./components/ChatInputDropZone";
 import { FileDropOverlay } from "./components/FileDropOverlay";
 import { SlashCommandPreview } from "./components/SlashCommandPreview";
+import { getErrorMessage } from "./utils/getErrorMessage";
 
 interface ChatInputFooterProps {
 	cwd: string;
-	error: string | null;
+	error: unknown;
 	canAbort: boolean;
 	submitStatus?: ChatStatus;
 	availableModels: ModelOption[];
@@ -132,14 +133,15 @@ export function ChatInputFooter({
 	onSlashCommandSend,
 }: ChatInputFooterProps) {
 	const [issueLinkOpen, setIssueLinkOpen] = useState(false);
+	const errorMessage = getErrorMessage(error);
 
 	return (
 		<ChatInputDropZone className="bg-background px-4 py-3">
 			{(dragType) => (
 				<div className="mx-auto w-full max-w-[680px]">
-					{error && (
+					{errorMessage && (
 						<div className="mb-3 select-text rounded-md border border-destructive/20 bg-destructive/10 px-4 py-2 text-sm text-destructive">
-							{error}
+							{errorMessage}
 						</div>
 					)}
 					<SlashCommandInput
