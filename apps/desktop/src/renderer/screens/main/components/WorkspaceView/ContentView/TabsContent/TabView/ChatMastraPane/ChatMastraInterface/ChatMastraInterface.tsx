@@ -11,12 +11,16 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { apiTrpcClient } from "renderer/lib/api-trpc-client";
 import { ChatInputFooter } from "../../ChatPane/ChatInterface/components/ChatInputFooter";
 import { MessageList } from "../../ChatPane/ChatInterface/components/MessageList";
+import { useSlashCommandExecutor } from "../../ChatPane/ChatInterface/hooks/useSlashCommandExecutor";
 import type { SlashCommand } from "../../ChatPane/ChatInterface/hooks/useSlashCommands";
 import type {
 	ModelOption,
 	PermissionMode,
 } from "../../ChatPane/ChatInterface/types";
+import { McpControls } from "./components/McpControls";
+import { useMcpUi } from "./hooks/useMcpUi";
 import type { ChatMastraInterfaceProps } from "./types";
+import { messagePartsFromDisplay } from "./utils/message-parts-from-display";
 
 function useAvailableModels(): {
 	models: ModelOption[];
@@ -38,27 +42,12 @@ function toErrorMessage(error: unknown): string | null {
 	return "Unknown chat error";
 }
 
-function messageTextFromDisplay(currentMessage: {
-	content: Array<{ type: string; text?: string; thinking?: string }>;
-}): string {
-	return currentMessage.content
-		.map((part) => {
-			if (part.type === "text" && typeof part.text === "string")
-				return part.text;
-			if (part.type === "thinking" && typeof part.thinking === "string") {
-				return part.thinking;
-			}
-			return "";
-		})
-		.filter(Boolean)
-		.join("\n");
-}
-
 export function ChatMastraInterface({
 	sessionId,
 	organizationId,
 	workspaceId,
 	cwd,
+	onStartFreshSession,
 }: ChatMastraInterfaceProps) {
 	const { models: availableModels, defaultModel } = useAvailableModels();
 	const [selectedModel, setSelectedModel] = useState<ModelOption | null>(null);
@@ -70,8 +59,10 @@ export function ChatMastraInterface({
 	const [submitStatus, setSubmitStatus] = useState<ChatStatus | undefined>(
 		undefined,
 	);
+	const [runtimeError, setRuntimeError] = useState<string | null>(null);
 	const [messages, setMessages] = useState<UIMessage[]>([]);
 	const currentSessionRef = useRef<string | null>(null);
+	const chatServiceTrpcUtils = chatServiceTrpc.useUtils();
 
 	const { data: slashCommands = [] } =
 		chatServiceTrpc.workspace.getSlashCommands.useQuery(
@@ -88,12 +79,56 @@ export function ChatMastraInterface({
 		fps: 60,
 	});
 
+	const clearRuntimeError = useCallback(() => {
+		setRuntimeError(null);
+	}, []);
+
+	const setRuntimeErrorMessage = useCallback((message: string) => {
+		setRuntimeError(message);
+	}, []);
+
+	const canAbort = Boolean(chat.displayState?.isRunning);
+	const loadMcpOverview = useCallback(
+		(rootCwd: string) =>
+			chatServiceTrpcUtils.workspace.getMcpOverview.fetch({
+				cwd: rootCwd,
+			}),
+		[chatServiceTrpcUtils.workspace.getMcpOverview],
+	);
+	const mcpUi = useMcpUi({
+		chat,
+		cwd,
+		loadOverview: loadMcpOverview,
+		onSetErrorMessage: setRuntimeErrorMessage,
+		onClearError: clearRuntimeError,
+	});
+	const resetMcpUi = mcpUi.resetUi;
+	const refreshMcpOverview = mcpUi.refreshOverview;
+
+	const { resolveSlashCommandInput } = useSlashCommandExecutor({
+		cwd,
+		availableModels,
+		canAbort,
+		onStartFreshSession,
+		onStopActiveResponse: () => {
+			void chat.control({ action: "stop" });
+		},
+		onSelectModel: setSelectedModel,
+		onOpenModelPicker: () => setModelSelectorOpen(true),
+		onSetErrorMessage: setRuntimeErrorMessage,
+		onClearError: clearRuntimeError,
+		onShowMcpOverview: mcpUi.showOverview,
+	});
+
 	useEffect(() => {
 		if (currentSessionRef.current === sessionId) return;
 		currentSessionRef.current = sessionId;
 		setMessages([]);
 		setSubmitStatus(undefined);
-	}, [sessionId]);
+		setRuntimeError(null);
+		resetMcpUi();
+		void refreshMcpOverview();
+	}, [refreshMcpOverview, resetMcpUi, sessionId]);
 
 	useEffect(() => {
 		if (chat.displayState?.isRunning) {
@@ -109,11 +144,10 @@ export function ChatMastraInterface({
 		const currentMessage = chat.displayState?.currentMessage;
 		if (!currentMessage) return;
 
-		const text = messageTextFromDisplay(currentMessage);
 		const nextMessage: UIMessage = {
 			id: currentMessage.id,
 			role: currentMessage.role,
-			parts: text ? [{ type: "text", text }] : [],
+			parts: messagePartsFromDisplay(currentMessage),
 		};
 
 		setMessages((prev) => {
@@ -126,9 +160,12 @@ export function ChatMastraInterface({
 	}, [chat.displayState?.currentMessage]);
 
 	const appendUserMessage = useCallback(
-		(messageId: string, message: PromptInputMessage) => {
-			const text = message.text.trim();
-			const files = (message.files ?? []).map((file) => ({
+		(
+			messageId: string,
+			text: string,
+			files: Array<{ url: string; mediaType: string; filename?: string }>,
+		) => {
+			const fileParts = files.map((file) => ({
 				type: "file" as const,
 				url: file.url,
 				mediaType: file.mediaType,
@@ -138,7 +175,10 @@ export function ChatMastraInterface({
 			const next: UIMessage = {
 				id: messageId,
 				role: "user",
-				parts: [...(text ? [{ type: "text" as const, text }] : []), ...files],
+				parts: [
+					...(text ? [{ type: "text" as const, text }] : []),
+					...fileParts,
+				],
 			};
 
 			setMessages((prev) => [...prev, next]);
@@ -149,17 +189,24 @@ export function ChatMastraInterface({
 	const handleSend = useCallback(
 		async (message: PromptInputMessage) => {
 			if (!sessionId) return;
-			const text = message.text.trim();
+			let text = message.text.trim();
 			const files = (message.files ?? []).map((file) => ({
 				url: file.url,
 				mediaType: file.mediaType,
 				filename: file.filename,
 			}));
+
+			const slashCommandResult = await resolveSlashCommandInput(text);
+			if (slashCommandResult.handled) {
+				return;
+			}
+			text = slashCommandResult.nextText.trim();
 			if (!text && files.length === 0) return;
 
 			const messageId = crypto.randomUUID();
-			appendUserMessage(messageId, message);
+			appendUserMessage(messageId, text, files);
 			setSubmitStatus("submitted");
+			clearRuntimeError();
 
 			const accepted = await chat.sendMessage({
 				content: text || undefined,
@@ -181,17 +228,20 @@ export function ChatMastraInterface({
 			appendUserMessage,
 			chat,
 			permissionMode,
+			resolveSlashCommandInput,
 			sessionId,
 			thinkingEnabled,
+			clearRuntimeError,
 		],
 	);
 
 	const handleStop = useCallback(
 		async (event: React.MouseEvent) => {
 			event.preventDefault();
+			clearRuntimeError();
 			await chat.control({ action: "stop" });
 		},
-		[chat],
+		[chat, clearRuntimeError],
 	);
 
 	const handleSlashCommandSend = useCallback(
@@ -203,20 +253,21 @@ export function ChatMastraInterface({
 
 	const handleAnswer = useCallback(
 		async (_toolCallId: string, answers: Record<string, string>) => {
-			const pendingQuestion = chat.displayState?.pendingQuestion;
-			if (!pendingQuestion) return;
+			const currentPendingQuestion = chat.displayState?.pendingQuestion;
+			if (!currentPendingQuestion) return;
 			const firstAnswer = Object.values(answers)[0];
 			if (!firstAnswer) return;
+			clearRuntimeError();
 			await chat.respondToQuestion({
-				questionId: pendingQuestion.questionId,
+				questionId: currentPendingQuestion.questionId,
 				answer: firstAnswer,
 			});
 		},
-		[chat],
+		[chat, clearRuntimeError],
 	);
 
-	const canAbort = Boolean(chat.displayState?.isRunning);
-	const errorMessage = toErrorMessage(chat.error) ?? chat.reason;
+	const errorMessage =
+		runtimeError ?? toErrorMessage(chat.error) ?? chat.reason;
 	const mergedMessages = useMemo(() => messages, [messages]);
 
 	return (
@@ -229,6 +280,7 @@ export function ChatMastraInterface({
 					workspaceId={workspaceId}
 					onAnswer={handleAnswer}
 				/>
+				<McpControls mcpUi={mcpUi} />
 				<ChatInputFooter
 					cwd={cwd}
 					error={errorMessage}
