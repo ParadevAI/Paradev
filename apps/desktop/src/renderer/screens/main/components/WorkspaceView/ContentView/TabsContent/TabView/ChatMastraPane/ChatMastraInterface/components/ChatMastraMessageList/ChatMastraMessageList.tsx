@@ -37,6 +37,8 @@ interface ChatMastraMessageListProps {
 	messages: MastraMessage[];
 	isRunning: boolean;
 	currentMessage: MastraMessage | null;
+	workspaceId: string;
+	workspaceCwd?: string;
 	activeTools: MastraActiveTools | undefined;
 	toolInputBuffers: MastraToolInputBuffers | undefined;
 }
@@ -225,10 +227,14 @@ function UserMessage({ message }: { message: MastraMessage }) {
 function AssistantMessage({
 	message,
 	isStreaming,
+	workspaceId,
+	workspaceCwd,
 	previewToolParts = [],
 }: {
 	message: MastraMessage;
 	isStreaming: boolean;
+	workspaceId: string;
+	workspaceCwd?: string;
 	previewToolParts?: ToolPart[];
 }) {
 	const nodes: ReactNode[] = [];
@@ -287,6 +293,8 @@ function AssistantMessage({
 						result,
 						isStreaming,
 					})}
+					workspaceId={workspaceId}
+					workspaceCwd={workspaceCwd}
 				/>,
 			);
 
@@ -303,6 +311,8 @@ function AssistantMessage({
 				<MastraToolCallBlock
 					key={`${message.id}-tool-result-${part.id}`}
 					part={toToolPartFromResult(part)}
+					workspaceId={workspaceId}
+					workspaceCwd={workspaceCwd}
 				/>,
 			);
 			continue;
@@ -327,6 +337,8 @@ function AssistantMessage({
 			<MastraToolCallBlock
 				key={`${message.id}-tool-preview-${previewPart.toolCallId}`}
 				part={previewPart}
+				workspaceId={workspaceId}
+				workspaceCwd={workspaceCwd}
 			/>,
 		);
 	}
@@ -350,6 +362,8 @@ export function ChatMastraMessageList({
 	messages,
 	isRunning,
 	currentMessage,
+	workspaceId,
+	workspaceCwd,
 	activeTools,
 	toolInputBuffers,
 }: ChatMastraMessageListProps) {
@@ -392,6 +406,8 @@ export function ChatMastraMessageList({
 							<AssistantMessage
 								key={message.id}
 								message={message}
+								workspaceId={workspaceId}
+								workspaceCwd={workspaceCwd}
 								isStreaming={false}
 								previewToolParts={[]}
 							/>
@@ -402,6 +418,8 @@ export function ChatMastraMessageList({
 					<AssistantMessage
 						key={`current-${currentMessage.id}`}
 						message={currentMessage}
+						workspaceId={workspaceId}
+						workspaceCwd={workspaceCwd}
 						isStreaming
 						previewToolParts={previewToolParts}
 					/>
@@ -428,6 +446,8 @@ export function ChatMastraMessageList({
 									<MastraToolCallBlock
 										key={`tool-preview-${part.toolCallId}`}
 										part={part}
+										workspaceId={workspaceId}
+										workspaceCwd={workspaceCwd}
 									/>
 								))}
 							</MessageContent>
