@@ -1,5 +1,8 @@
 import { chatServiceTrpc } from "@superset/chat/client";
-import { useMastraChatDisplay } from "@superset/chat-mastra/client";
+import {
+	chatMastraServiceTrpc,
+	useMastraChatDisplay,
+} from "@superset/chat-mastra/client";
 import {
 	type PromptInputMessage,
 	PromptInputProvider,
@@ -61,7 +64,7 @@ export function ChatMastraInterface({
 	);
 	const [runtimeError, setRuntimeError] = useState<string | null>(null);
 	const currentSessionRef = useRef<string | null>(null);
-	const chatServiceTrpcUtils = chatServiceTrpc.useUtils();
+	const chatMastraServiceTrpcUtils = chatMastraServiceTrpc.useUtils();
 
 	const { data: slashCommands = [] } =
 		chatServiceTrpc.workspace.getSlashCommands.useQuery(
@@ -95,11 +98,17 @@ export function ChatMastraInterface({
 
 	const canAbort = Boolean(isRunning);
 	const loadMcpOverview = useCallback(
-		(rootCwd: string) =>
-			chatServiceTrpcUtils.workspace.getMcpOverview.fetch({
+		async (rootCwd: string) => {
+			if (!sessionId) {
+				return { sourcePath: null, servers: [] };
+			}
+
+			return chatMastraServiceTrpcUtils.workspace.getMcpOverview.fetch({
+				sessionId,
 				cwd: rootCwd,
-			}),
-		[chatServiceTrpcUtils.workspace.getMcpOverview],
+			});
+		},
+		[chatMastraServiceTrpcUtils.workspace.getMcpOverview, sessionId],
 	);
 	const mcpUi = useMcpUi({
 		cwd,
@@ -123,6 +132,7 @@ export function ChatMastraInterface({
 		onSetErrorMessage: setRuntimeErrorMessage,
 		onClearError: clearRuntimeError,
 		onShowMcpOverview: mcpUi.showOverview,
+		loadMcpOverview,
 	});
 
 	useEffect(() => {
@@ -131,7 +141,9 @@ export function ChatMastraInterface({
 		setSubmitStatus(undefined);
 		setRuntimeError(null);
 		resetMcpUi();
-		void refreshMcpOverview();
+		if (sessionId) {
+			void refreshMcpOverview();
+		}
 	}, [refreshMcpOverview, resetMcpUi, sessionId]);
 
 	useEffect(() => {
