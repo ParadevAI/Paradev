@@ -1,3 +1,4 @@
+import { ChatServiceProvider } from "@superset/chat/client";
 import { ChatMastraServiceProvider } from "@superset/chat-mastra/client";
 import { toast } from "@superset/ui/sonner";
 import { eq } from "@tanstack/db";
@@ -11,6 +12,7 @@ import { electronTrpc } from "renderer/lib/electron-trpc";
 import { electronQueryClient } from "renderer/providers/ElectronTRPCProvider";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useTabsStore } from "renderer/stores/tabs/store";
+import { createChatServiceIpcClient } from "../ChatPane/utils/chat-service-client";
 import { BasePaneWindow, PaneToolbarActions } from "../components";
 import { ChatMastraInterface } from "./ChatMastraInterface";
 import { SessionSelector } from "./components/SessionSelector";
@@ -19,6 +21,7 @@ import { reportChatMastraError } from "./utils/reportChatMastraError";
 
 const apiUrl = env.NEXT_PUBLIC_API_URL;
 const mastraIpcClient = createChatMastraServiceIpcClient();
+const chatIpcClient = createChatServiceIpcClient();
 
 interface ChatMastraPaneProps {
 	paneId: string;
@@ -225,6 +228,42 @@ export function ChatMastraPane({
 		}
 	}, [organizationId, paneId, switchChatMastraSession, workspaceId]);
 
+	const handleStartFreshSession = useCallback(async () => {
+		if (!organizationId) {
+			return {
+				created: false as const,
+				errorMessage: "No active organization selected",
+			};
+		}
+
+		const newSessionId = crypto.randomUUID();
+		try {
+			await createSessionRecord({
+				sessionId: newSessionId,
+				organizationId,
+				workspaceId,
+			});
+			switchChatMastraSession(paneId, newSessionId);
+			return { created: true as const };
+		} catch (error) {
+			reportChatMastraError({
+				operation: "session.create",
+				error,
+				sessionId: newSessionId,
+				workspaceId,
+				paneId,
+				organizationId,
+			});
+			return {
+				created: false as const,
+				errorMessage:
+					error instanceof Error
+						? error.message
+						: "Failed to create a new chat session",
+			};
+		}
+	}, [organizationId, paneId, switchChatMastraSession, workspaceId]);
+
 	const handleDeleteSession = useCallback(
 		async (sessionIdToDelete: string) => {
 			try {
@@ -270,39 +309,45 @@ export function ChatMastraPane({
 			client={mastraIpcClient}
 			queryClient={electronQueryClient}
 		>
-			<BasePaneWindow
-				paneId={paneId}
-				path={path}
-				tabId={tabId}
-				splitPaneAuto={splitPaneAuto}
-				removePane={removePane}
-				setFocusedPane={setFocusedPane}
-				renderToolbar={(handlers) => (
-					<div className="flex h-full w-full items-center justify-between px-3">
-						<div className="flex min-w-0 items-center gap-2">
-							<SessionSelector
-								currentSessionId={sessionId}
-								sessions={sessionItems}
-								onSelectSession={handleSelectSession}
-								onNewChat={handleNewChat}
-								onDeleteSession={handleDeleteSession}
+			<ChatServiceProvider
+				client={chatIpcClient}
+				queryClient={electronQueryClient}
+			>
+				<BasePaneWindow
+					paneId={paneId}
+					path={path}
+					tabId={tabId}
+					splitPaneAuto={splitPaneAuto}
+					removePane={removePane}
+					setFocusedPane={setFocusedPane}
+					renderToolbar={(handlers) => (
+						<div className="flex h-full w-full items-center justify-between px-3">
+							<div className="flex min-w-0 items-center gap-2">
+								<SessionSelector
+									currentSessionId={sessionId}
+									sessions={sessionItems}
+									onSelectSession={handleSelectSession}
+									onNewChat={handleNewChat}
+									onDeleteSession={handleDeleteSession}
+								/>
+							</div>
+							<PaneToolbarActions
+								splitOrientation={handlers.splitOrientation}
+								onSplitPane={handlers.onSplitPane}
+								onClosePane={handlers.onClosePane}
+								closeHotkeyId="CLOSE_TERMINAL"
 							/>
 						</div>
-						<PaneToolbarActions
-							splitOrientation={handlers.splitOrientation}
-							onSplitPane={handlers.onSplitPane}
-							onClosePane={handlers.onClosePane}
-							closeHotkeyId="CLOSE_TERMINAL"
-						/>
-					</div>
-				)}
-			>
-				<ChatMastraInterface
-					sessionId={sessionId}
-					workspaceId={workspaceId}
-					cwd={workspace?.worktreePath ?? ""}
-				/>
-			</BasePaneWindow>
+					)}
+				>
+					<ChatMastraInterface
+						sessionId={sessionId}
+						workspaceId={workspaceId}
+						cwd={workspace?.worktreePath ?? ""}
+						onStartFreshSession={handleStartFreshSession}
+					/>
+				</BasePaneWindow>
+			</ChatServiceProvider>
 		</ChatMastraServiceProvider>
 	);
 }
