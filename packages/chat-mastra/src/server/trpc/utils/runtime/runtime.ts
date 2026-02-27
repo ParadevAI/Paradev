@@ -10,10 +10,11 @@ export type RuntimeMcpManager = Awaited<
 export type RuntimeHookManager = Awaited<
 	ReturnType<typeof createMastraCode>
 >["hookManager"];
-type RuntimeHarnessEvent = Parameters<
-	Parameters<RuntimeHarness["subscribe"]>[0]
->[0];
-type RuntimeAgentEndEvent = Extract<RuntimeHarnessEvent, { type: "agent_end" }>;
+
+interface RuntimeAgentEndEvent {
+	type: "agent_end";
+	reason?: unknown;
+}
 
 export interface RuntimeSession {
 	sessionId: string;
@@ -65,6 +66,37 @@ export async function runUserPromptHook(
 	}
 }
 
+export async function runSessionStartHook(
+	runtime: RuntimeSession,
+): Promise<void> {
+	if (!runtime.hookManager) return;
+	runtime.hookManager.setSessionId(runtime.sessionId);
+	const result = await runtime.hookManager.runSessionStart();
+	logHookResult(runtime, "SessionStart", result);
+}
+
+async function runSessionEndHook(runtime: RuntimeSession): Promise<void> {
+	if (!runtime.hookManager) return;
+	runtime.hookManager.setSessionId(runtime.sessionId);
+	const result = await runtime.hookManager.runSessionEnd();
+	logHookResult(runtime, "SessionEnd", result);
+}
+
+function reloadHookConfig(runtime: RuntimeSession): void {
+	if (!runtime.hookManager) return;
+	try {
+		runtime.hookManager.reload();
+	} catch (error) {
+		if (DEBUG_HOOKS_ENABLED) {
+			console.warn("[chat-mastra] failed to reload hook config", {
+				sessionId: runtime.sessionId,
+				error:
+					error instanceof Error ? error.message : "Unknown hook reload error",
+			});
+		}
+	}
+}
+
 export async function runStopHook(
 	runtime: RuntimeSession,
 	stopReason: "complete" | "aborted" | "error",
@@ -83,9 +115,15 @@ function toStopReason(
 	return "complete";
 }
 
+function isRuntimeAgentEndEvent(event: unknown): event is RuntimeAgentEndEvent {
+	if (!event || typeof event !== "object") return false;
+	if (!("type" in event)) return false;
+	return (event as { type?: unknown }).type === "agent_end";
+}
+
 function subscribeRuntimeHooks(runtime: RuntimeSession): void {
-	runtime.harness.subscribe(async (event) => {
-		if (event.type !== "agent_end") return;
+	runtime.harness.subscribe(async (event: unknown) => {
+		if (!isRuntimeAgentEndEvent(event)) return;
 
 		try {
 			await runStopHook(runtime, toStopReason(event));
@@ -103,20 +141,44 @@ function subscribeRuntimeHooks(runtime: RuntimeSession): void {
 	});
 }
 
-export async function getOrCreateRuntime(
-	sessionId: string,
-	cwd?: string,
-): Promise<RuntimeSession> {
-	const existing = runtimes.get(sessionId);
-	if (existing) {
-		if (cwd && existing.cwd !== cwd) {
-			existing.cwd = cwd;
-			runtimes.set(sessionId, existing);
+async function destroyRuntime(runtime: RuntimeSession): Promise<void> {
+	try {
+		await runSessionEndHook(runtime);
+	} catch (error) {
+		if (DEBUG_HOOKS_ENABLED) {
+			console.warn("[chat-mastra] failed to emit SessionEnd hook", {
+				sessionId: runtime.sessionId,
+				error:
+					error instanceof Error
+						? error.message
+						: "Unknown hook execution error",
+			});
 		}
-		return existing;
 	}
 
-	const runtimeCwd = cwd ?? process.cwd();
+	try {
+		const harnessWithDestroy = runtime.harness as RuntimeHarness & {
+			destroy?: () => Promise<void>;
+		};
+		await harnessWithDestroy.destroy?.();
+	} catch (error) {
+		if (DEBUG_HOOKS_ENABLED) {
+			console.warn("[chat-mastra] failed to destroy runtime harness", {
+				sessionId: runtime.sessionId,
+				error:
+					error instanceof Error
+						? error.message
+						: "Unknown harness destroy error",
+			});
+		}
+	}
+}
+
+async function createRuntimeSession(
+	sessionId: string,
+	runtimeCwd: string,
+): Promise<RuntimeSession> {
+	// This runtime powers interactive chat tool execution.
 	const runtimeMastra = await createMastraCode({ cwd: runtimeCwd });
 	if (runtimeMastra.mcpManager?.hasServers()) {
 		try {
@@ -152,6 +214,49 @@ export async function getOrCreateRuntime(
 	runtimeMastra.harness.setResourceId({ resourceId: sessionId });
 	await runtimeMastra.harness.selectOrCreateThread();
 
+	if (DEBUG_HOOKS_ENABLED) {
+		const harnessWithInternals = runtimeMastra.harness as unknown as {
+			buildRequestContext?: () => Promise<unknown>;
+			getCurrentMode?: () => {
+				agent?: {
+					listAssignedTools?: (params: {
+						requestContext: unknown;
+					}) => Promise<Record<string, unknown>>;
+					listTools?: () => Promise<Record<string, unknown>>;
+				};
+			};
+		};
+		try {
+			const currentMode = harnessWithInternals.getCurrentMode?.();
+			const currentAgent = currentMode?.agent;
+			const requestContext = await harnessWithInternals.buildRequestContext?.();
+
+			let resolvedTools: Record<string, unknown> = {};
+			if (currentAgent?.listAssignedTools && requestContext) {
+				resolvedTools = await currentAgent.listAssignedTools({
+					requestContext,
+				});
+			} else if (currentAgent?.listTools) {
+				resolvedTools = await currentAgent.listTools();
+			}
+
+			console.log("[chat-mastra] runtime tool resolution", {
+				sessionId,
+				cwd: runtimeCwd,
+				resolvedToolNames: Object.keys(resolvedTools).sort(),
+			});
+		} catch (error) {
+			console.warn("[chat-mastra] failed to inspect resolved runtime tools", {
+				sessionId,
+				cwd: runtimeCwd,
+				error:
+					error instanceof Error
+						? error.message
+						: "Unknown runtime tool inspection error",
+			});
+		}
+	}
+
 	const runtime: RuntimeSession = {
 		sessionId,
 		harness: runtimeMastra.harness,
@@ -159,9 +264,41 @@ export async function getOrCreateRuntime(
 		hookManager: runtimeMastra.hookManager,
 		cwd: runtimeCwd,
 	};
+	try {
+		await runSessionStartHook(runtime);
+	} catch (error) {
+		if (DEBUG_HOOKS_ENABLED) {
+			console.warn("[chat-mastra] failed to emit SessionStart hook", {
+				sessionId: runtime.sessionId,
+				error:
+					error instanceof Error
+						? error.message
+						: "Unknown hook execution error",
+			});
+		}
+	}
 	subscribeRuntimeHooks(runtime);
 	runtimes.set(sessionId, runtime);
 	return runtime;
+}
+
+export async function getOrCreateRuntime(
+	sessionId: string,
+	cwd?: string,
+): Promise<RuntimeSession> {
+	const existing = runtimes.get(sessionId);
+	if (existing) {
+		if (cwd && existing.cwd !== cwd) {
+			await destroyRuntime(existing);
+			runtimes.delete(sessionId);
+		} else {
+			reloadHookConfig(existing);
+			return existing;
+		}
+	}
+
+	const runtimeCwd = cwd ?? process.cwd();
+	return createRuntimeSession(sessionId, runtimeCwd);
 }
 
 function toNonEmptyString(value: unknown): string | null {
