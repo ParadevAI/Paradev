@@ -13,6 +13,7 @@ import {
 	runSessionStartHook,
 	subscribeToSessionEvents,
 } from "./utils/runtime";
+import { getSupersetMcpTools } from "./utils/runtime/superset-mcp";
 import {
 	approvalRespondInput,
 	displayStateInput,
@@ -64,7 +65,14 @@ export class ChatMastraService {
 		}
 
 		const runtimeCwd = cwd ?? process.cwd();
-		const runtimeMastra = await createMastraCode({ cwd: runtimeCwd });
+		const extraTools = await getSupersetMcpTools(
+			() => Promise.resolve(this.opts.headers()),
+			this.opts.apiUrl,
+		);
+		const runtimeMastra = await createMastraCode({
+			cwd: runtimeCwd,
+			extraTools,
+		});
 		if (runtimeMastra.mcpManager?.hasServers()) {
 			await runtimeMastra.mcpManager.init().catch(() => {});
 		}
