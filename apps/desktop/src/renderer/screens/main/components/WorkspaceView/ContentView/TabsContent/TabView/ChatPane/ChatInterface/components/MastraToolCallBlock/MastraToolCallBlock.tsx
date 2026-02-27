@@ -6,6 +6,7 @@ import { WebSearchTool } from "@superset/ui/ai-elements/web-search-tool";
 import { getToolName } from "ai";
 import { FileIcon, FolderIcon, MessageCircleQuestionIcon } from "lucide-react";
 import { useCallback, useMemo } from "react";
+import { useChangesStore } from "renderer/stores/changes";
 import { useTabsStore } from "renderer/stores/tabs/store";
 import type { ChangeCategory } from "shared/changes-types";
 import { READ_ONLY_TOOLS } from "../../constants";
@@ -46,6 +47,9 @@ export function MastraToolCallBlock({
 	const result = getResult(part);
 	const state = toWsToolState(part);
 	const toolName = normalizeToolName(getToolName(part));
+	const hideUnchangedRegions = useChangesStore(
+		(store) => store.hideUnchangedRegions,
+	);
 	const addFileViewerPane = useTabsStore((store) => store.addFileViewerPane);
 	const panes = useTabsStore((store) => store.panes);
 	const tabs = useTabsStore((store) => store.tabs);
@@ -173,6 +177,47 @@ export function MastraToolCallBlock({
 		return firstText(...values) ?? "";
 	};
 
+	const deriveStringsFromStructuredPatch = (
+		hunks?: Array<{ lines: string[] }>,
+	): { oldString: string; newString: string } | undefined => {
+		if (!hunks?.length) return undefined;
+
+		const oldLines: string[] = [];
+		const newLines: string[] = [];
+
+		for (const hunk of hunks) {
+			for (const rawLine of hunk.lines) {
+				if (
+					rawLine.startsWith("@@") ||
+					rawLine.startsWith("\\ No newline at end of file")
+				) {
+					continue;
+				}
+
+				if (rawLine.startsWith("+")) {
+					newLines.push(rawLine.slice(1));
+					continue;
+				}
+
+				if (rawLine.startsWith("-")) {
+					oldLines.push(rawLine.slice(1));
+					continue;
+				}
+
+				const line = rawLine.startsWith(" ") ? rawLine.slice(1) : rawLine;
+				oldLines.push(line);
+				newLines.push(line);
+			}
+		}
+
+		if (oldLines.length === 0 && newLines.length === 0) return undefined;
+
+		return {
+			oldString: oldLines.join("\n"),
+			newString: newLines.join("\n"),
+		};
+	};
+
 	// --- Execute command → BashTool ---
 	if (toolName === "mastra_workspace_execute_command") {
 		const { command, stdout, stderr, exitCode } = getExecuteCommandViewModel({
@@ -216,6 +261,7 @@ export function MastraToolCallBlock({
 									filePath={filePath}
 									oldString=""
 									newString={content}
+									hideUnchangedRegions={hideUnchangedRegions}
 								/>
 							)
 						: undefined
@@ -320,6 +366,10 @@ export function MastraToolCallBlock({
 				);
 			},
 		);
+		const derivedStrings = deriveStringsFromStructuredPatch(structuredPatch);
+		const expandedOldString = oldString || derivedStrings?.oldString || "";
+		const expandedNewString = newString || derivedStrings?.newString || "";
+
 		return (
 			<FileDiffTool
 				filePath={filePath}
@@ -328,12 +378,13 @@ export function MastraToolCallBlock({
 				structuredPatch={structuredPatch}
 				onFilePathClick={openFileInDiffPane}
 				renderExpandedContent={
-					oldString || newString
+					expandedOldString || expandedNewString
 						? () => (
 								<EditToolExpandedDiff
 									filePath={filePath}
-									oldString={oldString}
-									newString={newString}
+									oldString={expandedOldString}
+									newString={expandedNewString}
+									hideUnchangedRegions={hideUnchangedRegions}
 								/>
 							)
 						: undefined
