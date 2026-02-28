@@ -14,6 +14,7 @@ import {
 	runSessionStartHook,
 	subscribeToSessionEvents,
 } from "./utils/runtime";
+import { isMastraMcpEnabled } from "./utils/runtime/mcp-gate";
 import { getSupersetMcpTools } from "./utils/runtime/superset-mcp";
 import {
 	approvalRespondInput,
@@ -59,6 +60,7 @@ export class ChatMastraService {
 		sessionId: string,
 		cwd?: string,
 	): Promise<RuntimeSession> {
+		const mcpEnabled = isMastraMcpEnabled();
 		const runtimeCwd = cwd ?? process.cwd();
 		const runtimeKey = `${sessionId}:${runtimeCwd}`;
 
@@ -80,13 +82,16 @@ export class ChatMastraService {
 
 		const creationPromise = (async () => {
 			try {
-				const extraTools = await getSupersetMcpTools(
-					() => Promise.resolve(this.opts.headers()),
-					this.opts.apiUrl,
-				);
+				const extraTools = mcpEnabled
+					? await getSupersetMcpTools(
+							() => Promise.resolve(this.opts.headers()),
+							this.opts.apiUrl,
+						)
+					: {};
 				const runtimeMastra = await createMastraCode({
 					cwd: runtimeCwd,
 					extraTools,
+					disableMcp: !mcpEnabled,
 				});
 				runtimeMastra.hookManager?.setSessionId(sessionId);
 				await runtimeMastra.harness.init();
@@ -133,6 +138,10 @@ export class ChatMastraService {
 				getMcpOverview: t.procedure
 					.input(mcpOverviewInput)
 					.query(async ({ input }) => {
+						if (!isMastraMcpEnabled()) {
+							return { sourcePath: null, servers: [] };
+						}
+
 						const runtime = await this.getOrCreateRuntime(
 							input.sessionId,
 							input.cwd,
@@ -142,6 +151,10 @@ export class ChatMastraService {
 				authenticateMcpServer: t.procedure
 					.input(mcpServerAuthInput)
 					.mutation(async ({ input }) => {
+						if (!isMastraMcpEnabled()) {
+							return { sourcePath: null, servers: [] };
+						}
+
 						const runtime = await this.getOrCreateRuntime(
 							input.sessionId,
 							input.cwd,
