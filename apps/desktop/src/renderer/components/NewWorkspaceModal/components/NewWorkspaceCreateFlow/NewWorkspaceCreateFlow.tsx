@@ -4,6 +4,7 @@ import {
 	type AgentType,
 } from "@superset/shared/agent-command";
 import { Button } from "@superset/ui/button";
+import { Kbd, KbdGroup } from "@superset/ui/kbd";
 import {
 	Select,
 	SelectContent,
@@ -19,6 +20,7 @@ import {
 	getPresetIcon,
 	useIsDarkTheme,
 } from "renderer/assets/app-icons/preset-icons";
+import { useHotkeysStore } from "renderer/stores/hotkeys";
 
 export type WorkspaceCreateAgent = AgentType | "none";
 
@@ -52,6 +54,8 @@ export function NewWorkspaceCreateFlow({
 	advancedOptions,
 }: NewWorkspaceCreateFlowProps) {
 	const isDark = useIsDarkTheme();
+	const platform = useHotkeysStore((state) => state.platform);
+	const modKey = platform === "darwin" || platform === undefined ? "⌘" : "Ctrl";
 
 	return (
 		<div className="space-y-3 min-w-0">
@@ -125,6 +129,14 @@ export function NewWorkspaceCreateFlow({
 				disabled={isCreateDisabled}
 			>
 				Create Workspace
+				<KbdGroup className="ml-1.5 opacity-70">
+					<Kbd className="bg-primary-foreground/15 text-primary-foreground h-4 min-w-4 text-[10px]">
+						{modKey}
+					</Kbd>
+					<Kbd className="bg-primary-foreground/15 text-primary-foreground h-4 min-w-4 text-[10px]">
+						↵
+					</Kbd>
+				</KbdGroup>
 			</Button>
 
 			{advancedOptions}
