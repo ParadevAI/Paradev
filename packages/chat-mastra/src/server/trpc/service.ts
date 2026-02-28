@@ -104,6 +104,7 @@ export class ChatMastraService {
 					mcpManager: runtimeMastra.mcpManager,
 					hookManager: runtimeMastra.hookManager,
 					mcpManualStatuses: new Map(),
+					lastErrorMessage: null,
 					cwd: runtimeCwd,
 				};
 				await runSessionStartHook(runtime).catch(() => {});
@@ -171,7 +172,22 @@ export class ChatMastraService {
 							input.sessionId,
 							input.cwd,
 						);
-						return runtime.harness.getDisplayState();
+						const displayState = runtime.harness.getDisplayState();
+						const currentMessage = displayState.currentMessage as {
+							role?: string;
+							stopReason?: string;
+							errorMessage?: string;
+						} | null;
+						const currentMessageError =
+							currentMessage?.role === "assistant" &&
+							typeof currentMessage.errorMessage === "string" &&
+							currentMessage.errorMessage.trim()
+								? currentMessage.errorMessage.trim()
+								: null;
+						return {
+							...displayState,
+							errorMessage: currentMessageError ?? runtime.lastErrorMessage,
+						};
 					}),
 
 				listMessages: t.procedure
@@ -191,6 +207,7 @@ export class ChatMastraService {
 							input.sessionId,
 							input.cwd,
 						);
+						runtime.lastErrorMessage = null;
 						const userMessage =
 							input.payload.content.trim() || "[non-text message]";
 						await onUserPromptSubmit(runtime, userMessage);

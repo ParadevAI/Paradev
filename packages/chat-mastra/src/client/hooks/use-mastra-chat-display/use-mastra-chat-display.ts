@@ -37,6 +37,30 @@ function findLastUserMessageIndex(messages: ListMessagesOutput): number {
 	return -1;
 }
 
+export function findLatestAssistantErrorMessage(
+	messages: ListMessagesOutput,
+): string | null {
+	for (let index = messages.length - 1; index >= 0; index -= 1) {
+		const message = messages[index] as {
+			role?: string;
+			stopReason?: string;
+			errorMessage?: string;
+		};
+		if (message.role !== "assistant") continue;
+		if (message.stopReason !== undefined && message.stopReason !== "error") {
+			return null;
+		}
+		if (
+			typeof message.errorMessage === "string" &&
+			message.errorMessage.trim().length > 0
+		) {
+			return message.errorMessage.trim();
+		}
+		return null;
+	}
+	return null;
+}
+
 export function withoutActiveTurnAssistantHistory({
 	messages,
 	currentMessage,
@@ -89,9 +113,17 @@ export function useMastraChatDisplay(options: UseMastraChatDisplayOptions) {
 	);
 
 	const displayState = displayQuery.data ?? null;
+	const runtimeErrorMessage =
+		typeof displayState?.errorMessage === "string" &&
+		displayState.errorMessage.trim()
+			? displayState.errorMessage
+			: null;
 	const currentMessage = displayState?.currentMessage ?? null;
 	const isRunning = displayState?.isRunning ?? false;
 	const historicalMessages = messagesQuery.data ?? [];
+	const latestAssistantErrorMessage = isRunning
+		? null
+		: findLatestAssistantErrorMessage(historicalMessages);
 	const [optimisticUserMessage, setOptimisticUserMessage] = useState<
 		ListMessagesOutput[number] | null
 	>(null);
@@ -235,7 +267,13 @@ export function useMastraChatDisplay(options: UseMastraChatDisplayOptions) {
 	return {
 		...displayState,
 		messages,
-		error: displayQuery.error ?? messagesQuery.error ?? commandError ?? null,
+		error:
+			runtimeErrorMessage ??
+			latestAssistantErrorMessage ??
+			displayQuery.error ??
+			messagesQuery.error ??
+			commandError ??
+			null,
 		commands,
 	};
 }
