@@ -5,6 +5,7 @@ import { createMastraCode } from "mastracode";
 import superjson from "superjson";
 import { searchFiles } from "./utils/file-search";
 import {
+	authenticateRuntimeMcpServer,
 	destroyRuntime,
 	getRuntimeMcpOverview,
 	onUserPromptSubmit,
@@ -19,6 +20,7 @@ import {
 	displayStateInput,
 	listMessagesInput,
 	mcpOverviewInput,
+	mcpServerAuthInput,
 	planRespondInput,
 	questionRespondInput,
 	searchFilesInput,
@@ -86,11 +88,6 @@ export class ChatMastraService {
 					cwd: runtimeCwd,
 					extraTools,
 				});
-				const mcpManager = runtimeMastra.mcpManager;
-				const hasMcpServers = mcpManager?.hasServers() ?? false;
-				if (mcpManager && hasMcpServers) {
-					await mcpManager.init().catch(() => {});
-				}
 				runtimeMastra.hookManager?.setSessionId(sessionId);
 				await runtimeMastra.harness.init();
 				runtimeMastra.harness.setResourceId({ resourceId: sessionId });
@@ -101,6 +98,7 @@ export class ChatMastraService {
 					harness: runtimeMastra.harness,
 					mcpManager: runtimeMastra.mcpManager,
 					hookManager: runtimeMastra.hookManager,
+					mcpManualStatuses: new Map(),
 					cwd: runtimeCwd,
 				};
 				await runSessionStartHook(runtime).catch(() => {});
@@ -140,6 +138,15 @@ export class ChatMastraService {
 							input.cwd,
 						);
 						return getRuntimeMcpOverview(runtime);
+					}),
+				authenticateMcpServer: t.procedure
+					.input(mcpServerAuthInput)
+					.mutation(async ({ input }) => {
+						const runtime = await this.getOrCreateRuntime(
+							input.sessionId,
+							input.cwd,
+						);
+						return authenticateRuntimeMcpServer(runtime, input.serverName);
 					}),
 			}),
 
