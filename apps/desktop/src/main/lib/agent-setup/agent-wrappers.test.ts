@@ -122,18 +122,31 @@ describe("agent-wrappers copilot", () => {
 		expect(updated).not.toContain("/tmp/old-hook.sh");
 	});
 
-	it("injects codex message-start watcher + completion notifications in wrapper", () => {
+	it("injects codex start + permission watchers and completion notifications in wrapper", () => {
 		createCodexWrapper();
 
 		const wrapperPath = path.join(TEST_BIN_DIR, "codex");
 		const wrapper = readFileSync(wrapperPath, "utf-8");
 
 		expect(wrapper).toContain("export CODEX_TUI_RECORD_SESSION=1");
-		expect(wrapper).toContain('"type":"task_started"');
+		expect(wrapper).toContain('"msg":{"type":"task_started"');
 		expect(wrapper).toContain('_superset_last_turn_id=""');
+		expect(wrapper).toContain('_superset_last_approval_id=""');
+		expect(wrapper).toContain('_superset_last_exec_call_id=""');
+		expect(wrapper).toContain("_superset_approval_fallback_seq=0");
+		expect(wrapper).toContain("_superset_emit_event()");
 		expect(wrapper).toContain("_superset_turn_id=$(printf");
+		expect(wrapper).toContain("_superset_approval_id=$(printf");
+		expect(wrapper).toContain("_superset_exec_call_id=$(printf");
 		expect(wrapper).toContain('awk -F\'"turn_id":"\'');
-		expect(wrapper).toContain('{"hook_event_name":"Start"}');
+		expect(wrapper).toContain('"msg":{"type":"exec_command_begin"');
+		expect(wrapper).toContain('_approval_request"');
+		expect(wrapper).toContain(
+			`approval_request_\${_superset_approval_fallback_seq}`,
+		);
+		expect(wrapper).toContain('awk -F\'"approval_id":"\'');
+		expect(wrapper).toContain('_superset_emit_event "Start"');
+		expect(wrapper).toContain('_superset_emit_event "PermissionRequest"');
 		expect(wrapper).toContain(
 			`"$REAL_BIN" -c 'notify=["bash","${path.join(TEST_HOOKS_DIR, "notify.sh")}"]' "$@"`,
 		);
