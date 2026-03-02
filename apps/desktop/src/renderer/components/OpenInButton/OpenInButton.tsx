@@ -43,8 +43,8 @@ import windsurfWhiteIcon from "renderer/assets/app-icons/windsurf-white.svg";
 import xcodeIcon from "renderer/assets/app-icons/xcode.svg";
 import zedIcon from "renderer/assets/app-icons/zed.png";
 import { electronTrpc } from "renderer/lib/electron-trpc";
-import { useHotkeyText } from "renderer/stores/hotkeys";
 import { useThemeStore } from "renderer/stores";
+import { useHotkeyText } from "renderer/stores/hotkeys";
 
 interface AppOption {
 	id: ExternalApp;
