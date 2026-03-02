@@ -65,6 +65,9 @@ export function ChatMastraInterface({
 		undefined,
 	);
 	const [runtimeError, setRuntimeError] = useState<string | null>(null);
+	const [approvalResponsePending, setApprovalResponsePending] = useState(false);
+	const [planResponsePending, setPlanResponsePending] = useState(false);
+	const [questionResponsePending, setQuestionResponsePending] = useState(false);
 	const currentMcpScopeRef = useRef<string | null>(null);
 	const chatMastraServiceTrpcUtils = chatMastraServiceTrpc.useUtils();
 	const authenticateMcpServerMutation =
@@ -90,6 +93,10 @@ export function ChatMastraInterface({
 		error = null,
 		activeTools,
 		toolInputBuffers,
+		activeSubagents,
+		pendingApproval = null,
+		pendingPlanApproval = null,
+		pendingQuestion = null,
 	} = chat;
 
 	const clearRuntimeError = useCallback(() => {
@@ -311,6 +318,66 @@ export function ChatMastraInterface({
 		},
 		[handleSend],
 	);
+	const handleApprovalResponse = useCallback(
+		async (decision: "approve" | "decline" | "always_allow_category") => {
+			if (!pendingApproval?.toolCallId) return;
+			clearRuntimeError();
+			setApprovalResponsePending(true);
+			try {
+				await commands.respondToApproval({
+					payload: { decision },
+				});
+			} finally {
+				setApprovalResponsePending(false);
+			}
+		},
+		[clearRuntimeError, commands, pendingApproval?.toolCallId],
+	);
+	const handlePlanResponse = useCallback(
+		async (response: {
+			action: "approved" | "rejected";
+			feedback?: string;
+		}) => {
+			if (!pendingPlanApproval?.planId) return;
+			clearRuntimeError();
+			setPlanResponsePending(true);
+			try {
+				const feedback = response.feedback?.trim();
+				await commands.respondToPlan({
+					payload: {
+						planId: pendingPlanApproval.planId,
+						response: {
+							action: response.action,
+							...(feedback ? { feedback } : {}),
+						},
+					},
+				});
+			} finally {
+				setPlanResponsePending(false);
+			}
+		},
+		[clearRuntimeError, commands, pendingPlanApproval?.planId],
+	);
+	const handleQuestionResponse = useCallback(
+		async (questionId: string, answer: string) => {
+			const trimmedQuestionId = questionId.trim();
+			const trimmedAnswer = answer.trim();
+			if (!trimmedQuestionId || !trimmedAnswer) return;
+			clearRuntimeError();
+			setQuestionResponsePending(true);
+			try {
+				await commands.respondToQuestion({
+					payload: {
+						questionId: trimmedQuestionId,
+						answer: trimmedAnswer,
+					},
+				});
+			} finally {
+				setQuestionResponsePending(false);
+			}
+		},
+		[clearRuntimeError, commands],
+	);
 
 	const errorMessage = runtimeError ?? toErrorMessage(error);
 	const mergedMessages = useMemo(() => messages, [messages]);
@@ -328,6 +395,16 @@ export function ChatMastraInterface({
 					workspaceCwd={cwd}
 					activeTools={activeTools}
 					toolInputBuffers={toolInputBuffers}
+					activeSubagents={activeSubagents}
+					pendingApproval={pendingApproval}
+					isApprovalSubmitting={approvalResponsePending}
+					onApprovalRespond={handleApprovalResponse}
+					pendingPlanApproval={pendingPlanApproval}
+					isPlanSubmitting={planResponsePending}
+					onPlanRespond={handlePlanResponse}
+					pendingQuestion={pendingQuestion}
+					isQuestionSubmitting={questionResponsePending}
+					onQuestionRespond={handleQuestionResponse}
 				/>
 				<McpControls mcpUi={mcpUi} />
 				<ChatInputFooter
