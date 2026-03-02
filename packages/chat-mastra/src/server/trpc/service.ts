@@ -29,6 +29,8 @@ import {
 	sessionIdInput,
 } from "./zod";
 
+const INTERNAL_MASTRA_TOOL_NAMES = ["request_sandbox_access"] as const;
+
 export interface ChatMastraServiceOptions {
 	headers: () => Record<string, string> | Promise<Record<string, string>>;
 	apiUrl: string;
@@ -92,6 +94,7 @@ export class ChatMastraService {
 					cwd: runtimeCwd,
 					extraTools,
 					disableMcp: !mcpEnabled,
+					disabledTools: [...INTERNAL_MASTRA_TOOL_NAMES],
 				});
 				runtimeMastra.hookManager?.setSessionId(sessionId);
 				await runtimeMastra.harness.init();
