@@ -1,6 +1,7 @@
 import { chatServiceTrpc } from "@superset/chat/client";
 import {
 	chatMastraServiceTrpc,
+	type UseMastraChatDisplayReturn,
 	useMastraChatDisplay,
 } from "@superset/chat-mastra/client";
 import {
@@ -60,6 +61,31 @@ function toErrorMessage(error: unknown): string | null {
 const AUTO_LAUNCH_MAX_RETRIES = 3;
 const AUTO_LAUNCH_RETRY_DELAY_MS = 1500;
 
+type MastraMessage = NonNullable<
+	UseMastraChatDisplayReturn["messages"]
+>[number];
+
+type InterruptedMessage = {
+	id: string;
+	sourceMessageId: string;
+	content: MastraMessage["content"];
+};
+
+type ChatAnalyticsProperties = Record<string, unknown>;
+
+function cloneMessageContent(
+	content: MastraMessage["content"],
+): MastraMessage["content"] {
+	if (typeof structuredClone === "function") {
+		return structuredClone(content);
+	}
+	try {
+		return JSON.parse(JSON.stringify(content)) as MastraMessage["content"];
+	} catch {
+		return content.map((part) => ({ ...part }));
+	}
+}
+
 function getLaunchConfigKey(
 	config: NonNullable<ChatMastraInterfaceProps["initialLaunchConfig"]>,
 ): string {
@@ -100,6 +126,8 @@ export function ChatMastraInterface({
 		undefined,
 	);
 	const [runtimeError, setRuntimeError] = useState<string | null>(null);
+	const [interruptedMessage, setInterruptedMessage] =
+		useState<InterruptedMessage | null>(null);
 	const [pendingImmediateUserMessage, setPendingImmediateUserMessage] =
 		useState<MastraHistoryMessage | null>(null);
 	const [approvalResponsePending, setApprovalResponsePending] = useState(false);
@@ -117,6 +145,17 @@ export function ChatMastraInterface({
 	const chatMastraServiceTrpcUtils = chatMastraServiceTrpc.useUtils();
 	const authenticateMcpServerMutation =
 		chatMastraServiceTrpc.workspace.authenticateMcpServer.useMutation();
+	const captureChatEvent = useCallback(
+		(event: string, properties?: ChatAnalyticsProperties) => {
+			posthog.capture(event, {
+				workspace_id: workspaceId,
+				session_id: sessionId,
+				organization_id: organizationId,
+				...properties,
+			});
+		},
+		[organizationId, sessionId, workspaceId],
+	);
 
 	const { data: slashCommands = [] } =
 		chatServiceTrpc.workspace.getSlashCommands.useQuery(
@@ -160,17 +199,14 @@ export function ChatMastraInterface({
 				setSelectedModelId(null);
 				return;
 			}
-			posthog.capture("chat_model_changed", {
-				workspace_id: workspaceId,
-				session_id: sessionId,
-				organization_id: organizationId,
+			captureChatEvent("chat_model_changed", {
 				model_id: nextSelectedModel.id,
 				model_name: nextSelectedModel.name,
 				trigger: "picker",
 			});
 			setSelectedModelId(nextSelectedModel.id);
 		},
-		[organizationId, selectedModel, sessionId, setSelectedModelId, workspaceId],
+		[captureChatEvent, selectedModel, setSelectedModelId],
 	);
 
 	const sendMessageToSession = useCallback(
@@ -243,17 +279,49 @@ export function ChatMastraInterface({
 		authenticateServer: authenticateMcpServer,
 		onSetErrorMessage: setRuntimeErrorMessage,
 		onClearError: clearRuntimeError,
-		onTrackEvent: (event, properties) => {
-			posthog.capture(event, {
-				workspace_id: workspaceId,
-				session_id: sessionId,
-				organization_id: organizationId,
-				...properties,
-			});
-		},
+		onTrackEvent: captureChatEvent,
 	});
 	const resetMcpUi = mcpUi.resetUi;
 	const refreshMcpOverview = mcpUi.refreshOverview;
+
+	const captureInterruptedMessage =
+		useCallback((): InterruptedMessage | null => {
+			if (!isRunning) return null;
+			if (!currentMessage || currentMessage.role !== "assistant") return null;
+			if (currentMessage.content.length === 0) return null;
+			return {
+				id: `interrupted:${currentMessage.id}`,
+				sourceMessageId: currentMessage.id,
+				content: cloneMessageContent(currentMessage.content),
+			};
+		}, [currentMessage, isRunning]);
+
+	const stopActiveResponse = useCallback(async () => {
+		clearRuntimeError();
+		const snapshot = captureInterruptedMessage();
+		try {
+			await commands.stop();
+		} catch (error) {
+			setInterruptedMessage(null);
+			setRuntimeErrorMessage(
+				toErrorMessage(error) ?? "Failed to stop response",
+			);
+			return;
+		}
+		if (snapshot) {
+			setInterruptedMessage(snapshot);
+		}
+		captureChatEvent("chat_turn_aborted", {
+			model_id: activeModel?.id ?? null,
+		});
+	}, [
+		activeModel?.id,
+		captureChatEvent,
+		captureInterruptedMessage,
+		clearRuntimeError,
+		commands,
+		setRuntimeErrorMessage,
+	]);
 
 	const { resolveSlashCommandInput } = useSlashCommandExecutor({
 		cwd,
@@ -261,7 +329,7 @@ export function ChatMastraInterface({
 		canAbort,
 		onStartFreshSession,
 		onStopActiveResponse: () => {
-			void commands.stop();
+			void stopActiveResponse();
 		},
 		onSelectModel: handleSelectModel,
 		onOpenModelPicker: () => setModelSelectorOpen(true),
@@ -269,14 +337,7 @@ export function ChatMastraInterface({
 		onClearError: clearRuntimeError,
 		onShowMcpOverview: mcpUi.showOverview,
 		loadMcpOverview,
-		onTrackEvent: (event, properties) => {
-			posthog.capture(event, {
-				workspace_id: workspaceId,
-				session_id: sessionId,
-				organization_id: organizationId,
-				...properties,
-			});
-		},
+		onTrackEvent: captureChatEvent,
 	});
 
 	useEffect(() => {
@@ -285,6 +346,7 @@ export function ChatMastraInterface({
 		currentMcpScopeRef.current = scopeKey;
 		setSubmitStatus(undefined);
 		setRuntimeError(null);
+		setInterruptedMessage(null);
 		setPendingImmediateUserMessage(null);
 		resetMcpUi();
 		if (sessionId) {
@@ -372,6 +434,7 @@ export function ChatMastraInterface({
 				setSubmitStatus(undefined);
 				return;
 			}
+			setInterruptedMessage(null);
 			setSubmitStatus("submitted");
 			clearRuntimeError();
 
@@ -419,10 +482,8 @@ export function ChatMastraInterface({
 				throw new Error(sendErrorMessage);
 			}
 
-			posthog.capture("chat_message_sent", {
-				workspace_id: workspaceId,
+			captureChatEvent("chat_message_sent", {
 				session_id: targetSessionId,
-				organization_id: organizationId,
 				model_id: activeModel?.id ?? null,
 				mention_count: 0,
 				attachment_count: files.length,
@@ -433,18 +494,17 @@ export function ChatMastraInterface({
 		},
 		[
 			activeModel?.id,
+			captureChatEvent,
 			clearRuntimeError,
 			commands,
 			messages?.length,
 			isSessionReady,
 			onStartFreshSession,
-			organizationId,
 			resolveSlashCommandInput,
 			ensureSessionReady,
 			sendMessageToSession,
 			sessionId,
 			setRuntimeErrorMessage,
-			workspaceId,
 		],
 	);
 
@@ -517,10 +577,8 @@ export function ChatMastraInterface({
 				delete autoLaunchSessionLockRef.current[launchConfigKey];
 				onConsumeLaunchConfig();
 
-				posthog.capture("chat_message_sent", {
-					workspace_id: workspaceId,
+				captureChatEvent("chat_message_sent", {
 					session_id: sendResult.targetSessionId,
-					organization_id: organizationId,
 					model_id: modelId ?? null,
 					mention_count: 0,
 					attachment_count: 0,
@@ -557,6 +615,7 @@ export function ChatMastraInterface({
 		};
 	}, [
 		activeModel?.id,
+		captureChatEvent,
 		clearRuntimeError,
 		commands,
 		ensureSessionReady,
@@ -564,33 +623,17 @@ export function ChatMastraInterface({
 		isSessionReady,
 		onConsumeLaunchConfig,
 		onStartFreshSession,
-		organizationId,
 		sendMessageToSession,
 		sessionId,
 		setRuntimeErrorMessage,
-		workspaceId,
 	]);
 
 	const handleStop = useCallback(
 		async (event: React.MouseEvent) => {
 			event.preventDefault();
-			clearRuntimeError();
-			await commands.stop();
-			posthog.capture("chat_turn_aborted", {
-				workspace_id: workspaceId,
-				session_id: sessionId,
-				organization_id: organizationId,
-				model_id: activeModel?.id ?? null,
-			});
+			await stopActiveResponse();
 		},
-		[
-			activeModel?.id,
-			clearRuntimeError,
-			commands,
-			organizationId,
-			sessionId,
-			workspaceId,
-		],
+		[stopActiveResponse],
 	);
 
 	const handleSlashCommandSend = useCallback(
@@ -676,6 +719,7 @@ export function ChatMastraInterface({
 					isRunning={canAbort}
 					isAwaitingAssistant={isAwaitingAssistant}
 					currentMessage={currentMessage ?? null}
+					interruptedMessage={interruptedMessage}
 					workspaceId={workspaceId}
 					sessionId={sessionId}
 					organizationId={organizationId}
