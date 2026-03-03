@@ -32,11 +32,7 @@ function addCorsHeaders(response: Response): Response {
 }
 
 export default {
-	async fetch(
-		request: Request,
-		env: Env,
-		ctx: ExecutionContext,
-	): Promise<Response> {
+	async fetch(request: Request, env: Env): Promise<Response> {
 		if (request.method === "OPTIONS") {
 			return new Response(null, { status: 204, headers: CORS_HEADERS });
 		}
@@ -74,41 +70,25 @@ export default {
 			}
 		}
 
+		const authorizedOrganizationIds = [...auth.organizationIds].sort();
 		const whereClause = buildWhereClause(
 			tableName,
 			organizationId ?? "",
-			auth.organizationIds,
+			authorizedOrganizationIds,
 		);
 		if (!whereClause) {
 			return corsResponse(400, `Unknown table: ${tableName}`);
 		}
 
 		const upstreamUrl = buildUpstreamUrl(url, tableName, whereClause, env);
+		const upstreamHeaders = new Headers(request.headers);
+		upstreamHeaders.delete("Authorization");
+		upstreamHeaders.delete("Cookie");
 
-		// Use the Worker's own URL as the cache key (required for Cache API).
-		// organizationId must stay in the key to prevent cross-tenant cache sharing.
-		// For auth.organizations (no organizationId param), the where clause depends
-		// on the user's JWT org list, so add a stable derivative to scope the cache.
-		const cacheUrl = new URL(request.url);
-		if (tableName === "auth.organizations") {
-			cacheUrl.searchParams.set(
-				"_orgIds",
-				[...auth.organizationIds].sort().join(","),
-			);
-		}
-		const cacheKey = new Request(cacheUrl.toString());
-
-		const cache = caches.default;
-		const cached = await cache.match(cacheKey);
-		if (cached) {
-			return addCorsHeaders(cached);
-		}
-
-		const response = await fetch(upstreamUrl.toString());
-
-		if (response.ok && response.headers.has("cache-control")) {
-			ctx.waitUntil(cache.put(cacheKey, response.clone()));
-		}
+		const response = await fetch(upstreamUrl.toString(), {
+			headers: upstreamHeaders,
+			cf: { cacheEverything: true },
+		});
 
 		return addCorsHeaders(response);
 	},
