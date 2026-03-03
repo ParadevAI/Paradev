@@ -167,7 +167,7 @@ export default defineConfig({
 			),
 			"process.env.NEXT_PUBLIC_ELECTRIC_URL": defineEnv(
 				process.env.NEXT_PUBLIC_ELECTRIC_URL,
-				"https://api.superset.sh/api/electric",
+				"https://electric-proxy.avi-6ac.workers.dev",
 			),
 			"process.env.NEXT_PUBLIC_DOCS_URL": defineEnv(
 				process.env.NEXT_PUBLIC_DOCS_URL,

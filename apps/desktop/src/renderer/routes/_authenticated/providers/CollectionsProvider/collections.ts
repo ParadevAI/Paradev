@@ -21,12 +21,17 @@ import type { Collection } from "@tanstack/react-db";
 import { createCollection } from "@tanstack/react-db";
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
 import { env } from "renderer/env.renderer";
-import { getAuthToken } from "renderer/lib/auth-client";
+import { getAuthToken, getJwt } from "renderer/lib/auth-client";
 import superjson from "superjson";
 import { z } from "zod";
 
 const columnMapper = snakeCamelMapper();
-const electricUrl = `${env.NEXT_PUBLIC_ELECTRIC_URL}/v1/shape`;
+
+let electricUrl = `${env.NEXT_PUBLIC_API_URL}/api/electric/v1/shape`;
+
+export function setElectricUrl(url: string) {
+	electricUrl = `${url}/v1/shape`;
+}
 
 const apiKeyDisplaySchema = z.object({
 	id: z.string(),
@@ -79,10 +84,9 @@ const apiClient = createTRPCProxyClient<AppRouter>({
 
 const electricHeaders = {
 	Authorization: () => {
-		const token = getAuthToken();
+		const token = getJwt();
 		return token ? `Bearer ${token}` : "";
 	},
-	"X-Electric-Backend": "cloud",
 };
 
 const organizationsCollection = createCollection(
