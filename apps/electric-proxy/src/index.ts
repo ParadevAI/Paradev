@@ -1,5 +1,5 @@
 import { verifyJWT } from "./auth";
-import { buildCacheKey, buildUpstreamUrl } from "./electric";
+import { buildUpstreamUrl } from "./electric";
 import type { Env } from "./types";
 import { buildWhereClause } from "./where";
 
@@ -64,41 +64,24 @@ export default {
 		}
 
 		const upstreamUrl = buildUpstreamUrl(url, tableName, whereClause, env);
-		const cacheKey = buildCacheKey(upstreamUrl, auth);
 
-		const cache = caches.default;
-		const cacheRequest = new Request(cacheKey);
-		let response = await cache.match(cacheRequest);
+		const response = await fetch(upstreamUrl.toString(), {
+			cf: { cacheEverything: true },
+		});
 
-		if (!response) {
-			response = await fetch(upstreamUrl.toString());
-
-			const headers = new Headers(response.headers);
-			if (headers.get("content-encoding")) {
-				headers.delete("content-encoding");
-				headers.delete("content-length");
-			}
-
-			response = new Response(response.body, {
-				status: response.status,
-				statusText: response.statusText,
-				headers,
-			});
-
-			if (response.ok && response.headers.has("cache-control")) {
-				await cache.put(cacheRequest, response.clone());
-			}
+		const headers = new Headers(response.headers);
+		if (headers.get("content-encoding")) {
+			headers.delete("content-encoding");
+			headers.delete("content-length");
 		}
-
-		const finalHeaders = new Headers(response.headers);
 		for (const [key, value] of Object.entries(CORS_HEADERS)) {
-			finalHeaders.set(key, value);
+			headers.set(key, value);
 		}
 
 		return new Response(response.body, {
 			status: response.status,
 			statusText: response.statusText,
-			headers: finalHeaders,
+			headers,
 		});
 	},
 } satisfies ExportedHandler<Env>;
