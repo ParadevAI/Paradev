@@ -1,3 +1,4 @@
+import type { ExternalApp } from "@superset/local-db";
 import {
 	MAX_SIDEBAR_WIDTH,
 	MIN_SIDEBAR_WIDTH,
@@ -10,7 +11,17 @@ import { ContentView } from "../ContentView";
 import { useBrowserLifecycle } from "../hooks/useBrowserLifecycle";
 import { RightSidebar } from "../RightSidebar";
 
-export function WorkspaceLayout() {
+interface WorkspaceLayoutProps {
+	defaultExternalApp?: ExternalApp | null;
+	onOpenInApp: () => void;
+	onOpenQuickOpen: () => void;
+}
+
+export function WorkspaceLayout({
+	defaultExternalApp,
+	onOpenInApp,
+	onOpenQuickOpen,
+}: WorkspaceLayoutProps) {
 	useBrowserLifecycle();
 	const {
 		isSidebarOpen,
@@ -26,7 +37,15 @@ export function WorkspaceLayout() {
 	return (
 		<ScrollProvider>
 			<div className="flex-1 min-w-0 overflow-hidden">
-				{isExpanded ? <ChangesContent /> : <ContentView />}
+				{isExpanded ? (
+					<ChangesContent />
+				) : (
+					<ContentView
+						defaultExternalApp={defaultExternalApp}
+						onOpenInApp={onOpenInApp}
+						onOpenQuickOpen={onOpenQuickOpen}
+					/>
+				)}
 			</div>
 			{isSidebarOpen && (
 				<ResizablePanel

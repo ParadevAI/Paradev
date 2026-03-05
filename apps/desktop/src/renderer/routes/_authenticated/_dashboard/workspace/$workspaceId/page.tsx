@@ -323,27 +323,24 @@ function WorkspacePage() {
 		{ enabled: !!projectId },
 	);
 	const utils = electronTrpc.useUtils();
-	const openInApp = electronTrpc.external.openInApp.useMutation({
-		onSuccess: () => {
-			if (projectId) {
-				utils.projects.getDefaultApp.invalidate({ projectId });
-			}
-		},
-	});
-	useAppHotkey(
-		"OPEN_IN_APP",
-		() => {
-			if (workspace?.worktreePath && defaultApp) {
-				openInApp.mutate({
-					path: workspace.worktreePath,
-					app: defaultApp,
-					projectId,
-				});
-			}
-		},
-		undefined,
-		[workspace?.worktreePath, defaultApp, projectId],
-	);
+	const { mutate: mutateOpenInApp } =
+		electronTrpc.external.openInApp.useMutation({
+			onSuccess: () => {
+				if (projectId) {
+					utils.projects.getDefaultApp.invalidate({ projectId });
+				}
+			},
+		});
+	const handleOpenInApp = useCallback(() => {
+		if (workspace?.worktreePath && defaultApp) {
+			mutateOpenInApp({
+				path: workspace.worktreePath,
+				app: defaultApp,
+				projectId,
+			});
+		}
+	}, [workspace?.worktreePath, defaultApp, mutateOpenInApp, projectId]);
+	useAppHotkey("OPEN_IN_APP", handleOpenInApp, undefined, [handleOpenInApp]);
 
 	// Copy path shortcut
 	const copyPath = electronTrpc.external.copyPath.useMutation();
@@ -384,24 +381,18 @@ function WorkspacePage() {
 		workspaceId,
 		worktreePath: workspace?.worktreePath,
 	});
-	useAppHotkey(
-		"QUICK_OPEN",
-		() => {
-			keywordSearch.handleOpenChange(false);
-			commandPalette.toggle();
-		},
-		undefined,
-		[commandPalette.toggle, keywordSearch.handleOpenChange],
-	);
-	useAppHotkey(
-		"KEYWORD_SEARCH",
-		() => {
-			commandPalette.handleOpenChange(false);
-			keywordSearch.toggle();
-		},
-		undefined,
-		[commandPalette.handleOpenChange, keywordSearch.toggle],
-	);
+	const handleQuickOpen = useCallback(() => {
+		keywordSearch.handleOpenChange(false);
+		commandPalette.toggle();
+	}, [commandPalette.toggle, keywordSearch.handleOpenChange]);
+	const handleKeywordSearch = useCallback(() => {
+		commandPalette.handleOpenChange(false);
+		keywordSearch.toggle();
+	}, [commandPalette.handleOpenChange, keywordSearch.toggle]);
+	useAppHotkey("QUICK_OPEN", handleQuickOpen, undefined, [handleQuickOpen]);
+	useAppHotkey("KEYWORD_SEARCH", handleKeywordSearch, undefined, [
+		handleKeywordSearch,
+	]);
 
 	// Toggle changes sidebar (⌘L)
 	useAppHotkey("TOGGLE_SIDEBAR", () => toggleSidebar(), undefined, [
@@ -550,7 +541,11 @@ function WorkspacePage() {
 						isInterrupted={hasIncompleteInit && !isInitializing}
 					/>
 				) : (
-					<WorkspaceLayout />
+					<WorkspaceLayout
+						defaultExternalApp={defaultApp}
+						onOpenInApp={handleOpenInApp}
+						onOpenQuickOpen={handleQuickOpen}
+					/>
 				)}
 			</div>
 			<CommandPalette
