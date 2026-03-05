@@ -23,14 +23,12 @@ export function WorkspaceLayout({
 	onOpenQuickOpen,
 }: WorkspaceLayoutProps) {
 	useBrowserLifecycle();
-	const {
-		isSidebarOpen,
-		sidebarWidth,
-		setSidebarWidth,
-		isResizing,
-		setIsResizing,
-		currentMode,
-	} = useSidebarStore();
+	const isSidebarOpen = useSidebarStore((s) => s.isSidebarOpen);
+	const sidebarWidth = useSidebarStore((s) => s.sidebarWidth);
+	const setSidebarWidth = useSidebarStore((s) => s.setSidebarWidth);
+	const isResizing = useSidebarStore((s) => s.isResizing);
+	const setIsResizing = useSidebarStore((s) => s.setIsResizing);
+	const currentMode = useSidebarStore((s) => s.currentMode);
 
 	const isExpanded = currentMode === SidebarMode.Changes;
 
