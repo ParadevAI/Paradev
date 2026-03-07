@@ -232,6 +232,40 @@ function RefreshButton({ onRefresh }: { onRefresh: () => void }) {
 	);
 }
 
+const reviewTagStyles = {
+	approved: "bg-emerald-500/15 text-emerald-500",
+	changes_requested: "bg-destructive/15 text-destructive-foreground",
+	pending: "bg-amber-500/15 text-amber-500",
+} as const;
+
+const reviewTagLabels = {
+	approved: "Approved",
+	changes_requested: "Changes req.",
+	pending: "Review pending",
+} as const;
+
+function ReviewTag({
+	status,
+	requestedReviewers,
+}: {
+	status: "approved" | "changes_requested" | "pending";
+	requestedReviewers?: string[];
+}) {
+	const label =
+		status === "pending" && requestedReviewers && requestedReviewers.length > 0
+			? `Awaiting ${requestedReviewers.join(", ")}`
+			: reviewTagLabels[status];
+
+	return (
+		<span
+			className={`ml-auto text-[10px] font-medium px-1.5 py-0.5 rounded-md shrink-0 truncate max-w-[140px] ${reviewTagStyles[status]}`}
+			title={label}
+		>
+			{label}
+		</span>
+	);
+}
+
 export function ChangesHeader({
 	onRefresh,
 	viewMode,
@@ -257,6 +291,12 @@ export function ChangesHeader({
 			/>
 			<ViewModeToggle viewMode={viewMode} onViewModeChange={onViewModeChange} />
 			<RefreshButton onRefresh={onRefresh} />
+			{pr && pr.state === "open" && (
+				<ReviewTag
+					status={pr.reviewDecision}
+					requestedReviewers={pr.requestedReviewers}
+				/>
+			)}
 			<PRButton
 				pr={pr}
 				isLoading={isPRStatusLoading}

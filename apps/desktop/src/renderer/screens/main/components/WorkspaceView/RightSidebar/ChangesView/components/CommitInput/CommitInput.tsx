@@ -207,7 +207,7 @@ export function CommitInput({
 			: null;
 
 	return (
-		<div className="flex flex-col gap-1.5 px-2 py-2 border-b border-border">
+		<div className="flex flex-col gap-1.5 px-2 py-2">
 			<Textarea
 				placeholder="Commit message"
 				value={commitMessage}
