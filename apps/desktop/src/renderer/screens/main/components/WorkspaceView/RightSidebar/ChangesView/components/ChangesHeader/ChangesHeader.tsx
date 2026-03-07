@@ -17,9 +17,13 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@superset/ui/popover";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { HiArrowPath, HiCheck } from "react-icons/hi2";
-import { LuGitBranch } from "react-icons/lu";
-import { VscGitStash, VscGitStashApply } from "react-icons/vsc";
+import {
+	VscCheck,
+	VscGitStash,
+	VscGitStashApply,
+	VscRefresh,
+	VscSourceControl,
+} from "react-icons/vsc";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import type { ChangesViewMode } from "../../types";
 import { ViewModeToggle } from "../ViewModeToggle";
@@ -96,7 +100,7 @@ function BaseBranchSelector({ worktreePath }: { worktreePath: string }) {
 							className="size-6 p-0"
 							disabled={isLoading}
 						>
-							<LuGitBranch className="size-3.5" />
+							<VscSourceControl className="size-3.5" />
 						</Button>
 					</PopoverTrigger>
 				</TooltipTrigger>
@@ -129,7 +133,7 @@ function BaseBranchSelector({ worktreePath }: { worktreePath: string }) {
 									)}
 								</span>
 								{branch === effectiveBaseBranch && (
-									<HiCheck className="size-3.5 shrink-0 text-primary" />
+									<VscCheck className="size-3.5 shrink-0 text-primary" />
 								)}
 							</CommandItem>
 						))}
@@ -216,7 +220,7 @@ function RefreshButton({ onRefresh }: { onRefresh: () => void }) {
 					disabled={isSpinning}
 					className="size-6 p-0"
 				>
-					<HiArrowPath
+					<VscRefresh
 						className={`size-3.5 ${isSpinning ? "animate-spin" : ""}`}
 					/>
 				</Button>
