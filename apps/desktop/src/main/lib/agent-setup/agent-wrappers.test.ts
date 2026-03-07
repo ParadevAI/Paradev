@@ -69,6 +69,45 @@ const {
 	getGeminiSettingsJsonContent,
 	getMastraHooksJsonContent,
 } = await import("./agent-wrappers");
+const { reconcileManagedEntries } = await import("./agent-wrappers-common");
+
+describe("reconcileManagedEntries", () => {
+	it("preserves user-managed entries while replacing stale managed entries", () => {
+		const result = reconcileManagedEntries({
+			current: [
+				"/usr/local/bin/custom-hook Start",
+				"/tmp/.superset-old/hooks/notify.sh Start",
+			],
+			desired: ["/tmp/.superset-new/hooks/notify.sh Start"],
+			isManaged: (entry: string) => entry.includes("/.superset-"),
+			isEquivalent: (entry: string, desired: string) => entry === desired,
+		});
+
+		expect(result.entries).toEqual([
+			"/usr/local/bin/custom-hook Start",
+			"/tmp/.superset-new/hooks/notify.sh Start",
+		]);
+		expect(result.replacedManagedEntries).toEqual([
+			"/tmp/.superset-old/hooks/notify.sh Start",
+		]);
+	});
+
+	it("reconciles edited managed entries even when a managed hook already exists", () => {
+		const result = reconcileManagedEntries({
+			current: ["/tmp/.superset-current/hooks/notify.sh Start --debug"],
+			desired: ["/tmp/.superset-current/hooks/notify.sh Start"],
+			isManaged: (entry: string) => entry.includes("/.superset-"),
+			isEquivalent: (entry: string, desired: string) => entry === desired,
+		});
+
+		expect(result.entries).toEqual([
+			"/tmp/.superset-current/hooks/notify.sh Start",
+		]);
+		expect(result.replacedManagedEntries).toEqual([
+			"/tmp/.superset-current/hooks/notify.sh Start --debug",
+		]);
+	});
+});
 
 describe("agent-wrappers copilot", () => {
 	beforeEach(() => {
@@ -451,8 +490,17 @@ describe("agent-wrappers copilot", () => {
 		);
 
 		const content = getDroidSettingsJsonContent(currentHookPath);
+		expect(content).not.toBeNull();
+		if (content === null) {
+			throw new Error("Expected Droid settings content for valid JSON object");
+		}
 		writeFileSync(droidSettingsPath, content);
+
 		const content2 = getDroidSettingsJsonContent(currentHookPath);
+		expect(content2).not.toBeNull();
+		if (content2 === null) {
+			throw new Error("Expected Droid settings content after rewrite");
+		}
 
 		const parsed = JSON.parse(content) as {
 			hooks: Record<
