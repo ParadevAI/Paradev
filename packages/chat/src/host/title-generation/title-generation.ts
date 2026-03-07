@@ -1,7 +1,17 @@
-import { Agent } from "@mastra/core/agent";
-
-type TitleAgent = Pick<Agent, "generateTitleFromUserMessage">;
-type TitleModel = ConstructorParameters<typeof Agent>[0]["model"];
+type TitleModel = unknown;
+type TitleAgent = {
+	generateTitleFromUserMessage: (args: {
+		message: string;
+		model?: string;
+		tracingContext?: Record<string, unknown>;
+	}) => Promise<string | null | undefined>;
+};
+type TitleAgentCtor = new (options: {
+	id: string;
+	name: string;
+	instructions: string;
+	model: TitleModel;
+}) => TitleAgent;
 
 type GenerateTitleFromMessageParams =
 	| {
@@ -35,6 +45,14 @@ export async function generateTitleFromMessage(
 			tracingContext,
 		});
 		return title?.trim() || null;
+	}
+
+	const agentModuleId = "@mastra/core/agent";
+	const { Agent } = (await import(agentModuleId)) as {
+		Agent?: TitleAgentCtor;
+	};
+	if (!Agent) {
+		throw new Error("Mastra Agent constructor is unavailable");
 	}
 
 	const titleAgent = new Agent({
