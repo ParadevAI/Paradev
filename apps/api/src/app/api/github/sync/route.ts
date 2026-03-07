@@ -70,6 +70,7 @@ export async function POST(request: Request) {
 				.insert(githubRepositories)
 				.values({
 					installationId: installation.id,
+					organizationId,
 					repoId: String(repo.id),
 					owner: repo.owner.login,
 					name: repo.name,
@@ -80,6 +81,7 @@ export async function POST(request: Request) {
 				.onConflictDoUpdate({
 					target: [githubRepositories.repoId],
 					set: {
+						organizationId,
 						owner: repo.owner.login,
 						name: repo.name,
 						fullName: repo.full_name,
@@ -159,6 +161,7 @@ export async function POST(request: Request) {
 					.insert(githubPullRequests)
 					.values({
 						repositoryId: dbRepo.id,
+						organizationId,
 						prNumber: pr.number,
 						nodeId: pr.node_id,
 						headBranch: pr.head.ref,
@@ -185,6 +188,7 @@ export async function POST(request: Request) {
 							githubPullRequests.prNumber,
 						],
 						set: {
+							organizationId: dbRepo.organizationId,
 							headSha: pr.head.sha,
 							title: pr.title,
 							state: pr.state,

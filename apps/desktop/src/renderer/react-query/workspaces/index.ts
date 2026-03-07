@@ -9,7 +9,6 @@ export { useImportAllWorktrees } from "./useImportAllWorktrees";
 export { useMoveWorkspacesToSection } from "./useMoveWorkspacesToSection";
 export { useMoveWorkspaceToSection } from "./useMoveWorkspaceToSection";
 export { useOpenExternalWorktree } from "./useOpenExternalWorktree";
-export { useOpenWorktree } from "./useOpenWorktree";
 export { useReorderSections } from "./useReorderSections";
 export { useReorderWorkspaces } from "./useReorderWorkspaces";
 export { useReorderWorkspacesInSection } from "./useReorderWorkspacesInSection";

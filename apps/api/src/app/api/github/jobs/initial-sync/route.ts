@@ -64,7 +64,7 @@ export async function POST(request: Request) {
 		return Response.json({ error: "Invalid payload" }, { status: 400 });
 	}
 
-	const { installationDbId } = parsed.data;
+	const { installationDbId, organizationId } = parsed.data;
 
 	const [installation] = await db
 		.select()
@@ -98,6 +98,7 @@ export async function POST(request: Request) {
 				.insert(githubRepositories)
 				.values({
 					installationId: installationDbId,
+					organizationId,
 					repoId: String(repo.id),
 					owner: repo.owner.login,
 					name: repo.name,
@@ -108,6 +109,7 @@ export async function POST(request: Request) {
 				.onConflictDoUpdate({
 					target: [githubRepositories.repoId],
 					set: {
+						organizationId,
 						owner: repo.owner.login,
 						name: repo.name,
 						fullName: repo.full_name,
@@ -187,6 +189,7 @@ export async function POST(request: Request) {
 					.insert(githubPullRequests)
 					.values({
 						repositoryId: dbRepo.id,
+						organizationId,
 						prNumber: pr.number,
 						nodeId: pr.node_id,
 						headBranch: pr.head.ref,
@@ -213,6 +216,7 @@ export async function POST(request: Request) {
 							githubPullRequests.prNumber,
 						],
 						set: {
+							organizationId: dbRepo.organizationId,
 							headSha: pr.head.sha,
 							title: pr.title,
 							state: pr.state,
