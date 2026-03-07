@@ -9,6 +9,7 @@ import {
 	type StartableAgentType,
 } from "@superset/shared/agent-launch";
 import { Button } from "@superset/ui/button";
+import { ButtonGroup, ButtonGroupSeparator } from "@superset/ui/button-group";
 import { Kbd, KbdGroup } from "@superset/ui/kbd";
 import {
 	Select,
@@ -21,7 +22,7 @@ import { toast } from "@superset/ui/sonner";
 import { Textarea } from "@superset/ui/textarea";
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { GoGitBranch } from "react-icons/go";
+import { HiChevronDown } from "react-icons/hi2";
 import {
 	getPresetIcon,
 	useIsDarkTheme,
@@ -30,6 +31,24 @@ import { electronTrpc } from "renderer/lib/electron-trpc";
 import { resolveEffectiveWorkspaceBaseBranch } from "renderer/lib/workspaceBaseBranch";
 import { useCreateWorkspace } from "renderer/react-query/workspaces";
 import { useHotkeysStore } from "renderer/stores/hotkeys/store";
+import {
+	useClearNewWorkspaceModalInputsIfDraftVersion,
+	useNewWorkspaceModalBaseBranch,
+	useNewWorkspaceModalBranchName,
+	useNewWorkspaceModalBranchNameEdited,
+	useNewWorkspaceModalBranchSearch,
+	useNewWorkspaceModalDraftVersion,
+	useNewWorkspaceModalPrompt,
+	useNewWorkspaceModalRunSetupScript,
+	useNewWorkspaceModalShowAdvanced,
+	useSetNewWorkspaceModalBaseBranch,
+	useSetNewWorkspaceModalBranchName,
+	useSetNewWorkspaceModalBranchNameEdited,
+	useSetNewWorkspaceModalBranchSearch,
+	useSetNewWorkspaceModalPrompt,
+	useSetNewWorkspaceModalRunSetupScript,
+	useSetNewWorkspaceModalShowAdvanced,
+} from "renderer/stores/new-workspace-modal";
 import {
 	resolveBranchPrefix,
 	sanitizeBranchNameWithMaxLength,
@@ -51,14 +70,24 @@ export function PromptGroup({ projectId, onClose }: PromptGroupProps) {
 	const modKey = platform === "darwin" ? "⌘" : "Ctrl";
 	const isDark = useIsDarkTheme();
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
-	const [prompt, setPrompt] = useState("");
-	const [branchName, setBranchName] = useState("");
-	const [branchNameEdited, setBranchNameEdited] = useState(false);
-	const [baseBranch, setBaseBranch] = useState<string | null>(null);
+	const prompt = useNewWorkspaceModalPrompt();
+	const setPrompt = useSetNewWorkspaceModalPrompt();
+	const branchName = useNewWorkspaceModalBranchName();
+	const setBranchName = useSetNewWorkspaceModalBranchName();
+	const branchNameEdited = useNewWorkspaceModalBranchNameEdited();
+	const setBranchNameEdited = useSetNewWorkspaceModalBranchNameEdited();
+	const baseBranch = useNewWorkspaceModalBaseBranch();
+	const setBaseBranch = useSetNewWorkspaceModalBaseBranch();
+	const showAdvanced = useNewWorkspaceModalShowAdvanced();
+	const setShowAdvanced = useSetNewWorkspaceModalShowAdvanced();
+	const runSetupScript = useNewWorkspaceModalRunSetupScript();
+	const setRunSetupScript = useSetNewWorkspaceModalRunSetupScript();
+	const branchSearch = useNewWorkspaceModalBranchSearch();
+	const setBranchSearch = useSetNewWorkspaceModalBranchSearch();
+	const clearInputsIfDraftVersion =
+		useClearNewWorkspaceModalInputsIfDraftVersion();
+	const draftVersion = useNewWorkspaceModalDraftVersion();
 	const [baseBranchOpen, setBaseBranchOpen] = useState(false);
-	const [branchSearch, setBranchSearch] = useState("");
-	const [showAdvanced, setShowAdvanced] = useState(false);
-	const [runSetupScript, setRunSetupScript] = useState(true);
 	const runSetupScriptRef = useRef(runSetupScript);
 	runSetupScriptRef.current = runSetupScript;
 	const createWorkspace = useCreateWorkspace({
@@ -141,12 +170,17 @@ export function PromptGroup({ projectId, onClose }: PromptGroupProps) {
 			? sanitizeBranchNameWithMaxLength(`${resolvedPrefix}/${branchSlug}`)
 			: branchSlug;
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: intentionally reset advanced branch state when project changes
+	const previousProjectIdRef = useRef(projectId);
+
 	useEffect(() => {
+		if (previousProjectIdRef.current === projectId) {
+			return;
+		}
+		previousProjectIdRef.current = projectId;
 		setBaseBranch(null);
 		setBaseBranchOpen(false);
 		setBranchSearch("");
-	}, [projectId]);
+	}, [projectId, setBaseBranch, setBranchSearch]);
 
 	const handleAgentChange = (value: WorkspaceCreateAgent) => {
 		setSelectedAgent(value);
@@ -154,7 +188,7 @@ export function PromptGroup({ projectId, onClose }: PromptGroupProps) {
 	};
 
 	const buildLaunchRequest = (
-		trimmedPrompt: string,
+		promptValue: string,
 	): AgentLaunchRequest | null => {
 		if (selectedAgent === "none") return null;
 
@@ -165,14 +199,14 @@ export function PromptGroup({ projectId, onClose }: PromptGroupProps) {
 				agentType: "superset-chat",
 				source: "new-workspace",
 				chat: {
-					initialPrompt: trimmedPrompt || undefined,
+					initialPrompt: promptValue || undefined,
 				},
 			};
 		}
 
-		const command = trimmedPrompt
+		const command = promptValue
 			? buildAgentPromptCommand({
-					prompt: trimmedPrompt,
+					prompt: promptValue,
 					randomId: window.crypto.randomUUID(),
 					agent: selectedAgent,
 				})
@@ -198,26 +232,30 @@ export function PromptGroup({ projectId, onClose }: PromptGroupProps) {
 			return;
 		}
 		const launchRequest = buildLaunchRequest(trimmedPrompt);
+		const submitDraftVersion = draftVersion;
+		const createWorkspacePromise = createWorkspace.mutateAsyncWithPendingSetup(
+			{
+				projectId,
+				prompt: trimmedPrompt || undefined,
+				branchName: branchSlug || undefined,
+				baseBranch: baseBranch || undefined,
+				applyPrefix,
+			},
+			launchRequest ? { agentLaunchRequest: launchRequest } : undefined,
+		);
 
 		onClose();
-		toast.promise(
-			createWorkspace.mutateAsyncWithPendingSetup(
-				{
-					projectId,
-					prompt: trimmedPrompt || undefined,
-					branchName: branchSlug || undefined,
-					baseBranch: baseBranch || undefined,
-					applyPrefix,
-				},
-				launchRequest ? { agentLaunchRequest: launchRequest } : undefined,
-			),
-			{
-				loading: "Creating workspace...",
-				success: "Workspace created",
-				error: (err) =>
-					err instanceof Error ? err.message : "Failed to create workspace",
-			},
-		);
+		toast.promise(createWorkspacePromise, {
+			loading: "Creating workspace...",
+			success: "Workspace created",
+			error: (err) =>
+				err instanceof Error ? err.message : "Failed to create workspace",
+		});
+		void createWorkspacePromise
+			.then(() => {
+				clearInputsIfDraftVersion(submitDraftVersion);
+			})
+			.catch(() => undefined);
 	};
 
 	const handleBranchNameChange = (value: string) => {
@@ -289,57 +327,62 @@ export function PromptGroup({ projectId, onClose }: PromptGroupProps) {
 				}}
 			/>
 
-			{(trimmedPrompt || branchNameEdited) && (
-				<p className="text-xs text-muted-foreground grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-1.5 min-w-0">
-					<GoGitBranch className="size-3" />
-					<span className="font-mono min-w-0 truncate">
-						{branchPreview || "branch-name"}
-					</span>
-					<span className="text-muted-foreground/60 whitespace-nowrap">
-						from {effectiveBaseBranch ?? "..."}
-					</span>
-				</p>
+			<ButtonGroup className="w-full">
+				<Button
+					className="h-8 flex-1 text-sm"
+					onClick={handleCreate}
+					disabled={createWorkspace.isPending}
+				>
+					Create Workspace
+					<KbdGroup className="ml-1.5 opacity-70">
+						<Kbd className="bg-primary-foreground/15 text-primary-foreground h-4 min-w-4 text-[10px]">
+							{modKey}
+						</Kbd>
+						<Kbd className="bg-primary-foreground/15 text-primary-foreground h-4 min-w-4 text-[10px]">
+							↵
+						</Kbd>
+					</KbdGroup>
+				</Button>
+				<ButtonGroupSeparator />
+				<Button
+					size="sm"
+					className="h-8 px-2.5"
+					aria-label={
+						showAdvanced ? "Hide advanced options" : "Show advanced options"
+					}
+					aria-expanded={showAdvanced}
+					onClick={() => setShowAdvanced(!showAdvanced)}
+					disabled={createWorkspace.isPending}
+				>
+					<HiChevronDown
+						className={`size-3.5 transition-transform ${showAdvanced ? "rotate-180" : ""}`}
+					/>
+				</Button>
+			</ButtonGroup>
+
+			{showAdvanced && (
+				<PromptGroupAdvancedOptions
+					branchInputValue={branchNameEdited ? branchName : branchPreview}
+					onBranchInputChange={handleBranchNameChange}
+					onBranchInputBlur={handleBranchNameBlur}
+					onEditPrefix={() => {
+						onClose();
+						navigate({ to: "/settings/behavior" });
+					}}
+					isBranchesError={isBranchesError}
+					isBranchesLoading={isBranchesLoading}
+					baseBranchOpen={baseBranchOpen}
+					onBaseBranchOpenChange={setBaseBranchOpen}
+					effectiveBaseBranch={effectiveBaseBranch}
+					defaultBranch={branchData?.defaultBranch}
+					branchSearch={branchSearch}
+					onBranchSearchChange={setBranchSearch}
+					filteredBranches={filteredBranches}
+					onSelectBaseBranch={handleBaseBranchSelect}
+					runSetupScript={runSetupScript}
+					onRunSetupScriptChange={setRunSetupScript}
+				/>
 			)}
-
-			<Button
-				className="w-full h-8 text-sm"
-				onClick={handleCreate}
-				disabled={createWorkspace.isPending}
-			>
-				Create Workspace
-				<KbdGroup className="ml-1.5 opacity-70">
-					<Kbd className="bg-primary-foreground/15 text-primary-foreground h-4 min-w-4 text-[10px]">
-						{modKey}
-					</Kbd>
-					<Kbd className="bg-primary-foreground/15 text-primary-foreground h-4 min-w-4 text-[10px]">
-						↵
-					</Kbd>
-				</KbdGroup>
-			</Button>
-
-			<PromptGroupAdvancedOptions
-				showAdvanced={showAdvanced}
-				onShowAdvancedChange={setShowAdvanced}
-				branchInputValue={branchNameEdited ? branchName : branchPreview}
-				onBranchInputChange={handleBranchNameChange}
-				onBranchInputBlur={handleBranchNameBlur}
-				onEditPrefix={() => {
-					onClose();
-					navigate({ to: "/settings/behavior" });
-				}}
-				isBranchesError={isBranchesError}
-				isBranchesLoading={isBranchesLoading}
-				baseBranchOpen={baseBranchOpen}
-				onBaseBranchOpenChange={setBaseBranchOpen}
-				effectiveBaseBranch={effectiveBaseBranch}
-				defaultBranch={branchData?.defaultBranch}
-				branchSearch={branchSearch}
-				onBranchSearchChange={setBranchSearch}
-				filteredBranches={filteredBranches}
-				onSelectBaseBranch={handleBaseBranchSelect}
-				runSetupScript={runSetupScript}
-				onRunSetupScriptChange={setRunSetupScript}
-			/>
 		</div>
 	);
 }
