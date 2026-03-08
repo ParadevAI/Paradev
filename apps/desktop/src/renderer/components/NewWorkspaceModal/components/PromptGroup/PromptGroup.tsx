@@ -82,13 +82,18 @@ export function PromptGroup({ projectId, onClose }: PromptGroupProps) {
 		{ enabled: !!projectId },
 	);
 	const {
-		data: branchData,
+		data: localBranchData,
 		isLoading: isBranchesLoading,
 		isError: isBranchesError,
-	} = electronTrpc.projects.getBranches.useQuery(
+	} = electronTrpc.projects.getBranchesLocal.useQuery(
 		{ projectId: projectId ?? "" },
 		{ enabled: !!projectId },
 	);
+	const { data: remoteBranchData } = electronTrpc.projects.getBranches.useQuery(
+		{ projectId: projectId ?? "" },
+		{ enabled: !!projectId },
+	);
+	const branchData = remoteBranchData ?? localBranchData;
 	const { data: gitAuthor } = electronTrpc.projects.getGitAuthor.useQuery(
 		{ id: projectId ?? "" },
 		{ enabled: !!projectId },

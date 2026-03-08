@@ -20,10 +20,21 @@ export function BranchesGroup({ projectId, onClose }: BranchesGroupProps) {
 	const navigate = useNavigate();
 	const createBranchWorkspace = useCreateBranchWorkspace();
 
-	const { data, isLoading } = electronTrpc.projects.getBranches.useQuery(
+	// Fast query: local branches + cached remote refs (no network)
+	const { data: localData, isLoading: isLocalLoading } =
+		electronTrpc.projects.getBranchesLocal.useQuery(
+			{ projectId: projectId ?? "" },
+			{ enabled: !!projectId },
+		);
+
+	// Slow query: fetches from remote, runs in background
+	const { data: remoteData } = electronTrpc.projects.getBranches.useQuery(
 		{ projectId: projectId ?? "" },
 		{ enabled: !!projectId },
 	);
+
+	// Use remote data when available, fall back to local data
+	const data = remoteData ?? localData;
 
 	const { data: allWorkspaces = [] } =
 		electronTrpc.workspaces.getAll.useQuery();
@@ -85,7 +96,7 @@ export function BranchesGroup({ projectId, onClose }: BranchesGroupProps) {
 		);
 	}
 
-	if (isLoading) {
+	if (isLocalLoading) {
 		return (
 			<CommandGroup>
 				<CommandEmpty>Loading branches...</CommandEmpty>
