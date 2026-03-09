@@ -5,11 +5,7 @@ import { authClient, getAuthToken } from "renderer/lib/auth-client";
 const SESSION_RECOVERY_INTERVAL_MS = 15_000;
 
 export function useSessionRecovery() {
-	const {
-		data: session,
-		isPending,
-		refetch,
-	} = authClient.useSession();
+	const { data: session, isPending, refetch } = authClient.useSession();
 	const isOnline = useOnlineStatus();
 	const hasLocalToken = !!getAuthToken();
 	const recoveryInFlightRef = useRef(false);
