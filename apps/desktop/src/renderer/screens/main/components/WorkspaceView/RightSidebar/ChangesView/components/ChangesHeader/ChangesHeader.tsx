@@ -29,6 +29,8 @@ import type { ChangesViewMode } from "../../types";
 import { ViewModeToggle } from "../ViewModeToggle";
 import { PRButton } from "./components/PRButton";
 
+const BRANCH_QUERY_STALE_TIME_MS = 10_000;
+
 interface ChangesHeaderProps {
 	onRefresh: () => void;
 	viewMode: ChangesViewMode;
@@ -51,7 +53,11 @@ function BaseBranchSelector({ worktreePath }: { worktreePath: string }) {
 	const { data: branchData, isLoading } =
 		electronTrpc.changes.getBranches.useQuery(
 			{ worktreePath },
-			{ enabled: !!worktreePath },
+			{
+				enabled: !!worktreePath,
+				staleTime: BRANCH_QUERY_STALE_TIME_MS,
+				refetchOnWindowFocus: false,
+			},
 		);
 
 	const updateBaseBranch = electronTrpc.changes.updateBaseBranch.useMutation({
