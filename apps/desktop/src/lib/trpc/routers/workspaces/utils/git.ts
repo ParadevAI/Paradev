@@ -151,7 +151,7 @@ export async function getStatusNoLock(repoPath: string): Promise<StatusResult> {
 				"-z",
 				"-uall",
 			],
-			{ env, timeout: 30_000 },
+			{ env, timeout: 30_000, maxBuffer: 10 * 1024 * 1024 },
 		);
 
 		return parsePortelainStatus(stdout);
