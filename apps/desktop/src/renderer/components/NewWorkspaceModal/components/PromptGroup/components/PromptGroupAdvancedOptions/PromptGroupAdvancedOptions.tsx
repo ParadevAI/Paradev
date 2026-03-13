@@ -48,6 +48,7 @@ interface PromptGroupAdvancedOptionsProps {
 	onSelectBaseBranch: (branchName: string) => void;
 	runSetupScript: boolean;
 	onRunSetupScriptChange: (checked: boolean) => void;
+	hideSetupScript?: boolean;
 }
 
 export function PromptGroupAdvancedOptions({
@@ -69,6 +70,7 @@ export function PromptGroupAdvancedOptions({
 	onSelectBaseBranch,
 	runSetupScript,
 	onRunSetupScriptChange,
+	hideSetupScript,
 }: PromptGroupAdvancedOptionsProps) {
 	return (
 		<Collapsible open={showAdvanced} onOpenChange={onShowAdvancedChange}>
@@ -184,19 +186,21 @@ export function PromptGroupAdvancedOptions({
 					)}
 				</div>
 
-				<div className="flex items-center justify-between">
-					<Label
-						htmlFor="run-setup-script"
-						className="text-xs text-muted-foreground"
-					>
-						Run setup script
-					</Label>
-					<Switch
-						id="run-setup-script"
-						checked={runSetupScript}
-						onCheckedChange={onRunSetupScriptChange}
-					/>
-				</div>
+				{!hideSetupScript && (
+					<div className="flex items-center justify-between">
+						<Label
+							htmlFor="run-setup-script"
+							className="text-xs text-muted-foreground"
+						>
+							Run setup script
+						</Label>
+						<Switch
+							id="run-setup-script"
+							checked={runSetupScript}
+							onCheckedChange={onRunSetupScriptChange}
+						/>
+					</div>
+				)}
 			</CollapsibleContent>
 		</Collapsible>
 	);

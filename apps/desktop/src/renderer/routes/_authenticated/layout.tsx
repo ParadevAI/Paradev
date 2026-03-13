@@ -1,3 +1,4 @@
+import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { Button } from "@superset/ui/button";
 import { Spinner } from "@superset/ui/spinner";
 import {
@@ -7,12 +8,14 @@ import {
 	useLocation,
 	useNavigate,
 } from "@tanstack/react-router";
+import { useFeatureFlagEnabled } from "posthog-js/react";
 import { useEffect, useRef } from "react";
 import { DndProvider } from "react-dnd";
 import { HiOutlineWifi } from "react-icons/hi2";
 import { NewWorkspaceModal } from "renderer/components/NewWorkspaceModal";
 import { Paywall } from "renderer/components/Paywall";
 import { useUpdateListener } from "renderer/components/UpdateToast";
+import { V2NewWorkspaceModal } from "renderer/components/V2NewWorkspaceModal";
 import { env } from "renderer/env.renderer";
 import { useOnlineStatus } from "renderer/hooks/useOnlineStatus";
 import { authClient, getAuthToken } from "renderer/lib/auth-client";
@@ -49,6 +52,8 @@ function AuthenticatedLayout() {
 	const setOriginRoute = useSettingsStore((s) => s.setOriginRoute);
 	const utils = electronTrpc.useUtils();
 	const shownWorkspaceInitWarningsRef = useRef(new Set<string>());
+	const isV2CloudEnabled =
+		useFeatureFlagEnabled(FEATURE_FLAGS.V2_CLOUD) ?? false;
 
 	const isSignedIn = env.SKIP_ENV_VALIDATION || !!session?.user;
 	const activeOrganizationId = env.SKIP_ENV_VALIDATION
@@ -151,7 +156,7 @@ function AuthenticatedLayout() {
 					<AgentHooks />
 					<Outlet />
 					<WorkspaceInitEffects />
-					<NewWorkspaceModal />
+					{isV2CloudEnabled ? <V2NewWorkspaceModal /> : <NewWorkspaceModal />}
 					<InitGitDialog />
 					<TeardownLogsDialog />
 					<Paywall />
