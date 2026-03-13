@@ -2,7 +2,7 @@ import { Command, CommandInput, CommandList } from "@superset/ui/command";
 import { Tabs, TabsList, TabsTrigger } from "@superset/ui/tabs";
 import { eq } from "@tanstack/db";
 import { useLiveQuery } from "@tanstack/react-db";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import {
@@ -24,6 +24,7 @@ interface V2NewWorkspaceModalContentProps {
 	preSelectedProjectId: string | null;
 }
 
+/** V2 content pane for the New Workspace modal with collection-based project selection. */
 export function V2NewWorkspaceModalContent({
 	isOpen,
 	preSelectedProjectId,
@@ -40,6 +41,15 @@ export function V2NewWorkspaceModalContent({
 		[collections],
 	);
 	const v2Projects = useMemo(() => v2ProjectsData ?? [], [v2ProjectsData]);
+	const areV2ProjectsReady = v2ProjectsData !== undefined;
+
+	const appliedPreSelectionRef = useRef<string | null>(null);
+
+	useEffect(() => {
+		if (!isOpen) {
+			appliedPreSelectionRef.current = null;
+		}
+	}, [isOpen]);
 
 	// Auto-select first v2 project when modal opens
 	useEffect(() => {
@@ -48,12 +58,22 @@ export function V2NewWorkspaceModalContent({
 		// Only use preSelectedProjectId if it matches an actual v2 project
 		if (
 			preSelectedProjectId &&
-			preSelectedProjectId !== draft.selectedProjectId &&
-			v2Projects.some((p) => p.id === preSelectedProjectId)
+			preSelectedProjectId !== appliedPreSelectionRef.current
 		) {
-			updateDraft({ selectedProjectId: preSelectedProjectId });
-			return;
+			if (!areV2ProjectsReady) return;
+			const hasPreSelectedProject = v2Projects.some(
+				(project) => project.id === preSelectedProjectId,
+			);
+			if (hasPreSelectedProject) {
+				appliedPreSelectionRef.current = preSelectedProjectId;
+				if (preSelectedProjectId !== draft.selectedProjectId) {
+					updateDraft({ selectedProjectId: preSelectedProjectId });
+				}
+				return;
+			}
 		}
+
+		if (!areV2ProjectsReady) return;
 
 		const hasSelectedProject = v2Projects.some(
 			(project) => project.id === draft.selectedProjectId,
@@ -63,6 +83,7 @@ export function V2NewWorkspaceModalContent({
 		}
 	}, [
 		draft.selectedProjectId,
+		areV2ProjectsReady,
 		isOpen,
 		preSelectedProjectId,
 		v2Projects,
