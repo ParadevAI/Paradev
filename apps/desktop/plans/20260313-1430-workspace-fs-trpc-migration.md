@@ -13,7 +13,7 @@ Refactor `packages/workspace-fs` and desktop filesystem router to match `plans/w
 - `writeFile` uses `{ create, overwrite }` flags + `precondition.ifMatch` for conflict detection.
 - Watch events: no revision, no ordering guarantees. Overflow → full resync.
 - Revision token: `mtime-ms + size` string. Cheap, good enough for conflict detection. Not a content hash.
-- `createDirectory` is idempotent — succeeds silently if directory already exists. Needed for infra setup (`.superset/` dir) without error handling.
+- `createDirectory` is idempotent — succeeds silently if directory already exists. `recursive?: boolean` enables `mkdir -p` semantics for higher-level callers such as nested new-file creation. Needed for infra setup (`.superset/` dir) without error handling.
 - `movePath` fails if destination exists. Client must check or delete first. Matches current behavior.
 - `readFile` encoding behavior: encoding provided → `kind: "text"`, `content: string`. Encoding omitted → `kind: "bytes"`, `content: Uint8Array`.
 
@@ -48,7 +48,7 @@ Refactor `packages/workspace-fs` and desktop filesystem router to match `plans/w
     readFile({ absolutePath, offset?, maxBytes?, encoding? }) → FsReadResult
     getMetadata({ absolutePath }) → FsMetadata | null
     writeFile({ absolutePath, content: string | Uint8Array, encoding?, options?: { create, overwrite }, precondition?: { ifMatch } }) → FsWriteResult
-    createDirectory({ absolutePath }) → { absolutePath, kind: "directory" }
+    createDirectory({ absolutePath, recursive? }) → { absolutePath, kind: "directory" }
     deletePath({ absolutePath, permanent? }) → { absolutePath }
     movePath({ sourceAbsolutePath, destinationAbsolutePath }) → { fromAbsolutePath, toAbsolutePath }
     copyPath({ sourceAbsolutePath, destinationAbsolutePath }) → { fromAbsolutePath, toAbsolutePath }
@@ -179,6 +179,6 @@ Manual: diff viewer, save with revision-based conflict detection, discard untrac
 
 ## Outcomes & Retrospective
 
-All milestones complete. The workspace-fs package now exposes a pure path-based service interface (no workspaceId). Desktop adapter handles workspace scoping. Renderer hooks (useFileContent, useFileSave, useFileDiffEdit) and components (FileViewerPane, FileDiffSection, ChangesView, RightSidebar) all route through `trpc.filesystem.*` for reads/writes and `trpc.changes.getGitFileContents`/`getGitOriginalContent` for git-only diffs. Legacy changes procedures (getFileContents, saveFile, readWorkingFile, readWorkingFileImage) removed. Legacy filesystem procedures (exists, stat) removed. Legacy filesystem procedures still actively used by file tree UI (readDirectory, subscribe, searchFiles, searchFilesMulti, searchKeyword, createFile, createDirectory, rename, delete, move, copy) retained — these should be migrated in a follow-up.
+This migration established the schema-aligned path-based service and moved desktop workspace scoping to the adapter boundary. A later follow-up completed the remaining file-tree and search migration, removed the legacy `trpc.filesystem` compatibility procedures, added explicit client/host package boundaries for `workspace-fs`, and extended `createDirectory` with `recursive?: boolean` for higher-level nested create flows.
 
-Validation: typecheck passes, lint clean, no `node:fs` in changes router or terminal router. 4 pre-existing test failures unrelated to this migration.
+Validation at that milestone: typecheck passes, lint clean, no `node:fs` in changes router or terminal router. 4 pre-existing test failures unrelated to that migration pass.
