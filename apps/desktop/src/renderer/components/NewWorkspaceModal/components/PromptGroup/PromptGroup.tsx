@@ -1,13 +1,4 @@
-import {
-	AGENT_PRESET_COMMANDS,
-	buildAgentPromptCommand,
-} from "@superset/shared/agent-command";
-import {
-	type AgentLaunchRequest,
-	STARTABLE_AGENT_LABELS,
-	STARTABLE_AGENT_TYPES,
-	type StartableAgentType,
-} from "@superset/shared/agent-launch";
+import type { AgentLaunchRequest } from "@superset/shared/agent-launch";
 import {
 	PromptInput,
 	PromptInputAttachment,
@@ -38,13 +29,6 @@ import {
 } from "@superset/ui/dropdown-menu";
 import { Input } from "@superset/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@superset/ui/popover";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@superset/ui/select";
 import { toast } from "@superset/ui/sonner";
 import { cn } from "@superset/ui/utils";
 import { AnimatePresence, motion } from "framer-motion";
@@ -66,10 +50,8 @@ import { GoGitBranch } from "react-icons/go";
 import { HiCheck, HiChevronUpDown } from "react-icons/hi2";
 import { LuFolderGit, LuFolderOpen, LuGitPullRequest } from "react-icons/lu";
 import { SiLinear } from "react-icons/si";
-import {
-	getPresetIcon,
-	useIsDarkTheme,
-} from "renderer/assets/app-icons/preset-icons";
+import { AgentSelect } from "renderer/components/AgentSelect";
+import { useAgentLaunchPreferences } from "renderer/hooks/useAgentLaunchPreferences";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { formatRelativeTime } from "renderer/lib/formatRelativeTime";
 import { resolveEffectiveWorkspaceBaseBranch } from "renderer/lib/workspaceBaseBranch";
@@ -77,13 +59,19 @@ import { ProjectThumbnail } from "renderer/screens/main/components/WorkspaceSide
 import { LinkedIssuePill } from "renderer/screens/main/components/WorkspaceView/ContentView/TabsContent/TabView/ChatPane/ChatInterface/components/ChatInputFooter/components/LinkedIssuePill";
 import { IssueLinkCommand } from "renderer/screens/main/components/WorkspaceView/ContentView/TabsContent/TabView/ChatPane/ChatInterface/components/IssueLinkCommand";
 import { useHotkeysStore } from "renderer/stores/hotkeys/store";
+import { buildPromptAgentLaunchRequest } from "shared/utils/agent-launch-request";
+import {
+	type AgentDefinitionId,
+	getEnabledAgentConfigs,
+	indexResolvedAgentConfigs,
+} from "shared/utils/agent-settings";
 import { sanitizeBranchNameWithMaxLength } from "shared/utils/branch";
 import type { LinkedPR } from "../../NewWorkspaceModalDraftContext";
 import { useNewWorkspaceModalDraft } from "../../NewWorkspaceModalDraftContext";
 import { LinkedPRPill } from "./components/LinkedPRPill";
 import { PRLinkCommand } from "./components/PRLinkCommand";
 
-type WorkspaceCreateAgent = StartableAgentType | "none";
+type WorkspaceCreateAgent = AgentDefinitionId | "none";
 
 const AGENT_STORAGE_KEY = "lastSelectedWorkspaceCreateAgent";
 
@@ -405,9 +393,14 @@ function PromptGroupInner({
 }: PromptGroupProps) {
 	const platform = useHotkeysStore((state) => state.platform);
 	const modKey = platform === "darwin" ? "⌘" : "Ctrl";
-	const isDark = useIsDarkTheme();
-	const { createWorkspace, createFromPr, draft, runAsyncAction, updateDraft } =
-		useNewWorkspaceModalDraft();
+	const {
+		closeModal,
+		createWorkspace,
+		createFromPr,
+		draft,
+		runAsyncAction,
+		updateDraft,
+	} = useNewWorkspaceModalDraft();
 	const attachments = useProviderAttachments();
 	const {
 		baseBranch,
@@ -422,17 +415,28 @@ function PromptGroupInner({
 	} = draft;
 	const runSetupScriptRef = useRef(runSetupScript);
 	runSetupScriptRef.current = runSetupScript;
-	const [selectedAgent, setSelectedAgent] = useState<WorkspaceCreateAgent>(
-		() => {
-			if (typeof window === "undefined") return "none";
-			const stored = window.localStorage.getItem(AGENT_STORAGE_KEY);
-			if (stored === "none") return "none";
-			return stored &&
-				(STARTABLE_AGENT_TYPES as readonly string[]).includes(stored)
-				? (stored as WorkspaceCreateAgent)
-				: "none";
-		},
+	const agentPresetsQuery = electronTrpc.settings.getAgentPresets.useQuery();
+	const agentPresets = agentPresetsQuery.data ?? [];
+	const enabledAgentPresets = useMemo(
+		() => getEnabledAgentConfigs(agentPresets),
+		[agentPresets],
 	);
+	const agentConfigsById = useMemo(
+		() => indexResolvedAgentConfigs(agentPresets),
+		[agentPresets],
+	);
+	const selectableAgentIds = useMemo(
+		() => enabledAgentPresets.map((preset) => preset.id),
+		[enabledAgentPresets],
+	);
+	const { selectedAgent, setSelectedAgent } =
+		useAgentLaunchPreferences<WorkspaceCreateAgent>({
+			agentStorageKey: AGENT_STORAGE_KEY,
+			defaultAgent: "none",
+			fallbackAgent: "none",
+			validAgents: ["none", ...selectableAgentIds],
+			agentsReady: agentPresetsQuery.isFetched,
+		});
 	const [issueLinkOpen, setIssueLinkOpen] = useState(false);
 	const [prLinkOpen, setPRLinkOpen] = useState(false);
 	const plusMenuRef = useRef<HTMLDivElement>(null);
@@ -504,10 +508,20 @@ function PromptGroupInner({
 		updateDraft({ baseBranch: null });
 	}, [projectId, updateDraft]);
 
-	const handleAgentChange = (value: WorkspaceCreateAgent) => {
-		setSelectedAgent(value);
-		window.localStorage.setItem(AGENT_STORAGE_KEY, value);
-	};
+	const buildLaunchRequest = useCallback(
+		(prompt: string, files?: ConvertedFile[]): AgentLaunchRequest | null => {
+			return buildPromptAgentLaunchRequest({
+				workspaceId: "pending-workspace",
+				source: "new-workspace",
+				selectedAgent,
+				prompt,
+				initialFiles: files,
+				taskSlug: firstIssueSlug || undefined,
+				configsById: agentConfigsById,
+			});
+		},
+		[agentConfigsById, firstIssueSlug, selectedAgent],
+	);
 
 	const convertBlobUrlToDataUrl = useCallback(
 		async (url: string): Promise<string> => {
@@ -526,48 +540,6 @@ function PromptGroupInner({
 			});
 		},
 		[],
-	);
-
-	const buildLaunchRequest = useCallback(
-		(prompt: string, files?: ConvertedFile[]): AgentLaunchRequest | null => {
-			if (selectedAgent === "none") return null;
-
-			if (selectedAgent === "superset-chat") {
-				return {
-					kind: "chat",
-					workspaceId: "pending-workspace",
-					agentType: "superset-chat",
-					source: "new-workspace",
-					chat: {
-						initialPrompt: prompt || undefined,
-						initialFiles: files?.length ? files : undefined,
-						taskSlug: firstIssueSlug || undefined,
-					},
-				};
-			}
-
-			const command = prompt
-				? buildAgentPromptCommand({
-						prompt,
-						randomId: window.crypto.randomUUID(),
-						agent: selectedAgent,
-					})
-				: (AGENT_PRESET_COMMANDS[selectedAgent][0] ?? null);
-
-			if (!command) return null;
-
-			return {
-				kind: "terminal",
-				workspaceId: "pending-workspace",
-				agentType: selectedAgent,
-				source: "new-workspace",
-				terminal: {
-					command,
-					name: "Agent",
-				},
-			};
-		},
-		[selectedAgent, firstIssueSlug],
 	);
 
 	const handleCreate = useCallback(async () => {
@@ -594,9 +566,19 @@ function PromptGroupInner({
 			}
 		}
 
-		// If a PR is linked, use createFromPr instead of regular create
+		let launchRequest: AgentLaunchRequest | null = null;
+		try {
+			launchRequest = buildLaunchRequest(trimmedPrompt, convertedFiles);
+		} catch (error) {
+			toast.error(
+				error instanceof Error
+					? error.message
+					: "Failed to prepare agent launch",
+			);
+			return;
+		}
+
 		if (linkedPR) {
-			const launchRequest = buildLaunchRequest(trimmedPrompt, convertedFiles);
 			void runAsyncAction(
 				createFromPr.mutateAsyncWithSetup(
 					{ projectId, prUrl: linkedPR.url },
@@ -614,7 +596,6 @@ function PromptGroupInner({
 			return;
 		}
 
-		const launchRequest = buildLaunchRequest(trimmedPrompt, convertedFiles);
 		void runAsyncAction(
 			createWorkspace.mutateAsyncWithPendingSetup(
 				{
@@ -687,15 +668,6 @@ function PromptGroupInner({
 	const removeLinkedPR = () => {
 		updateDraft({ linkedPR: null });
 	};
-
-	const agentIcon =
-		selectedAgent !== "none" ? getPresetIcon(selectedAgent, isDark) : null;
-	const agentLabel =
-		selectedAgent === "none"
-			? "No agent"
-			: selectedAgent === "superset-chat"
-				? "Superset"
-				: STARTABLE_AGENT_LABELS[selectedAgent];
 
 	return (
 		<div className="p-3 space-y-2">
@@ -805,49 +777,18 @@ function PromptGroupInner({
 				/>
 				<PromptInputFooter>
 					<PromptInputTools className="gap-1.5">
-						<Select
+						<AgentSelect<WorkspaceCreateAgent>
+							agents={enabledAgentPresets}
 							value={selectedAgent}
-							onValueChange={(value: WorkspaceCreateAgent) =>
-								handleAgentChange(value)
-							}
-						>
-							<SelectTrigger
-								className={`${PILL_BUTTON_CLASS} px-1.5 gap-1 text-foreground w-auto`}
-							>
-								{agentIcon && (
-									<img
-										src={agentIcon}
-										alt=""
-										className="size-3 object-contain"
-									/>
-								)}
-								<SelectValue placeholder="No agent">{agentLabel}</SelectValue>
-							</SelectTrigger>
-							<SelectContent>
-								<SelectItem value="none">No agent</SelectItem>
-								{(STARTABLE_AGENT_TYPES as readonly StartableAgentType[]).map(
-									(agent) => {
-										const icon = getPresetIcon(agent, isDark);
-										return (
-											<SelectItem key={agent} value={agent}>
-												<span className="flex items-center gap-2">
-													{icon && (
-														<img
-															src={icon}
-															alt=""
-															className="size-4 object-contain"
-														/>
-													)}
-													{agent === "superset-chat"
-														? "Superset"
-														: STARTABLE_AGENT_LABELS[agent]}
-												</span>
-											</SelectItem>
-										);
-									},
-								)}
-							</SelectContent>
-						</Select>
+							placeholder="No agent"
+							onValueChange={setSelectedAgent}
+							onBeforeConfigureAgents={closeModal}
+							triggerClassName={`${PILL_BUTTON_CLASS} px-1.5 gap-1 text-foreground w-auto max-w-[160px]`}
+							iconClassName="size-3 object-contain"
+							allowNone
+							noneLabel="No agent"
+							noneValue="none"
+						/>
 					</PromptInputTools>
 					<div className="flex items-center gap-2">
 						<PlusMenu
