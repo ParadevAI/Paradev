@@ -1,129 +1,167 @@
 import { Button } from "@superset/ui/button";
 import {
-	Command,
-	CommandEmpty,
-	CommandGroup,
-	CommandItem,
-	CommandList,
-} from "@superset/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@superset/ui/popover";
-import { useLiveQuery } from "@tanstack/react-db";
-import { useEffect, useMemo, useState } from "react";
-import { HiCheck, HiChevronUpDown } from "react-icons/hi2";
-import { electronTrpc } from "renderer/lib/electron-trpc";
-import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuSeparator,
+	DropdownMenuSub,
+	DropdownMenuSubContent,
+	DropdownMenuSubTrigger,
+	DropdownMenuTrigger,
+} from "@superset/ui/dropdown-menu";
+import { cn } from "@superset/ui/utils";
+import {
+	HiCheck,
+	HiChevronUpDown,
+	HiOutlineCloud,
+	HiOutlineComputerDesktop,
+	HiOutlineGlobeAlt,
+	HiOutlineServer,
+} from "react-icons/hi2";
+import type { WorkspaceHostTarget } from "renderer/lib/v2-workspace-host";
+import {
+	useWorkspaceHostOptions,
+	type WorkspaceHostDeviceOption,
+} from "./hooks/useWorkspaceHostOptions";
 
 interface DevicePickerProps {
-	selectedDeviceId: string | null;
-	onSelectDevice: (id: string | null) => void;
+	hostTarget: WorkspaceHostTarget;
+	onSelectHostTarget: (target: WorkspaceHostTarget) => void;
+}
+
+function getDeviceIcon(type: WorkspaceHostDeviceOption["type"]) {
+	switch (type) {
+		case "cloud":
+			return HiOutlineCloud;
+		case "viewer":
+			return HiOutlineGlobeAlt;
+		default:
+			return HiOutlineComputerDesktop;
+	}
+}
+
+function getSelectedLabel(
+	hostTarget: WorkspaceHostTarget,
+	currentDeviceName: string | null,
+	otherDevices: WorkspaceHostDeviceOption[],
+) {
+	if (hostTarget.kind === "local") {
+		return currentDeviceName ?? "Local Device";
+	}
+
+	if (hostTarget.kind === "cloud") {
+		return "Cloud Workspace";
+	}
+
+	return (
+		otherDevices.find((device) => device.id === hostTarget.deviceId)?.name ??
+		"Unknown Device"
+	);
+}
+
+function getSelectedIcon(hostTarget: WorkspaceHostTarget) {
+	if (hostTarget.kind === "local") {
+		return <HiOutlineComputerDesktop className="size-4 shrink-0" />;
+	}
+
+	if (hostTarget.kind === "cloud") {
+		return <HiOutlineCloud className="size-4 shrink-0" />;
+	}
+
+	return <HiOutlineServer className="size-4 shrink-0" />;
 }
 
 export function DevicePicker({
-	selectedDeviceId,
-	onSelectDevice,
+	hostTarget,
+	onSelectHostTarget,
 }: DevicePickerProps) {
-	const [open, setOpen] = useState(false);
-	const collections = useCollections();
-	const { data: deviceInfo } = electronTrpc.auth.getDeviceInfo.useQuery();
-
-	const { data: allDevices } = useLiveQuery(
-		(q) =>
-			q
-				.from({ devices: collections.v2Devices })
-				.select(({ devices }) => ({ ...devices })),
-		[collections],
+	const { currentDeviceName, otherDevices } = useWorkspaceHostOptions();
+	const selectedLabel = getSelectedLabel(
+		hostTarget,
+		currentDeviceName,
+		otherDevices,
 	);
-
-	const { data: userDeviceLinks } = useLiveQuery(
-		(q) =>
-			q
-				.from({ ud: collections.v2UsersDevices })
-				.select(({ ud }) => ({ ...ud })),
-		[collections],
-	);
-
-	const localHostDevice = useMemo(() => {
-		if (!allDevices || !deviceInfo) return null;
-		return (
-			allDevices.find(
-				(d) => d.type === "host" && d.clientId === deviceInfo.deviceId,
-			) ?? null
-		);
-	}, [allDevices, deviceInfo]);
-
-	const accessibleDeviceIds = useMemo(() => {
-		if (!userDeviceLinks) return new Set<string>();
-		return new Set(userDeviceLinks.map((link) => link.deviceId));
-	}, [userDeviceLinks]);
-
-	const otherDevices = useMemo(() => {
-		if (!allDevices) return [];
-		return allDevices.filter(
-			(d) => d.id !== localHostDevice?.id && accessibleDeviceIds.has(d.id),
-		);
-	}, [allDevices, localHostDevice, accessibleDeviceIds]);
-
-	// Auto-default to local device when it becomes available
-	useEffect(() => {
-		if (!selectedDeviceId && localHostDevice?.id) {
-			onSelectDevice(localHostDevice.id);
-		}
-	}, [selectedDeviceId, localHostDevice?.id, onSelectDevice]);
-
-	const selectedLabel = useMemo(() => {
-		if (!selectedDeviceId || selectedDeviceId === localHostDevice?.id) {
-			return "This device";
-		}
-		const device = otherDevices.find((d) => d.id === selectedDeviceId);
-		return device?.name ?? "Select device";
-	}, [selectedDeviceId, localHostDevice, otherDevices]);
 
 	return (
-		<Popover open={open} onOpenChange={setOpen}>
-			<PopoverTrigger asChild>
-				<Button variant="ghost" size="sm" className="h-7 px-2 text-xs gap-1">
-					<span className="truncate max-w-[140px]">{selectedLabel}</span>
-					<HiChevronUpDown className="size-3" />
+		<DropdownMenu>
+			<DropdownMenuTrigger asChild>
+				<Button variant="ghost" size="sm" className="h-7 gap-1 px-2 text-xs">
+					<span className="flex min-w-0 items-center gap-1.5">
+						{getSelectedIcon(hostTarget)}
+						<span className="max-w-[140px] truncate">{selectedLabel}</span>
+					</span>
+					<HiChevronUpDown className="size-3 shrink-0" />
 				</Button>
-			</PopoverTrigger>
-			<PopoverContent align="end" className="w-52 p-0">
-				<Command>
-					<CommandList>
-						<CommandEmpty>No devices found.</CommandEmpty>
-						<CommandGroup>
-							<CommandItem
-								value="This device"
-								onSelect={() => {
-									onSelectDevice(localHostDevice?.id ?? null);
-									setOpen(false);
-								}}
-							>
-								This device
-								{localHostDevice ? ` (${localHostDevice.name})` : ""}
-								{(!selectedDeviceId ||
-									selectedDeviceId === localHostDevice?.id) && (
-									<HiCheck className="ml-auto size-4" />
-								)}
-							</CommandItem>
-							{otherDevices.map((device) => (
-								<CommandItem
-									key={device.id}
-									value={device.name}
-									onSelect={() => {
-										onSelectDevice(device.id);
-										setOpen(false);
-									}}
-								>
-									{device.name}
-									{device.id === selectedDeviceId && (
-										<HiCheck className="ml-auto size-4" />
-									)}
-								</CommandItem>
-							))}
-						</CommandGroup>
-					</CommandList>
-				</Command>
-			</PopoverContent>
-		</Popover>
+			</DropdownMenuTrigger>
+			<DropdownMenuContent align="end" className="w-72">
+				<DropdownMenuItem
+					onSelect={() => onSelectHostTarget({ kind: "local" })}
+				>
+					<HiOutlineComputerDesktop className="size-4" />
+					<span className="flex-1">Local Device</span>
+					{hostTarget.kind === "local" && <HiCheck className="size-4" />}
+				</DropdownMenuItem>
+				<DropdownMenuItem
+					onSelect={() => onSelectHostTarget({ kind: "cloud" })}
+				>
+					<HiOutlineCloud className="size-4" />
+					<span className="flex-1">Cloud Workspace</span>
+					{hostTarget.kind === "cloud" && <HiCheck className="size-4" />}
+				</DropdownMenuItem>
+				<DropdownMenuSeparator />
+				<DropdownMenuSub>
+					<DropdownMenuSubTrigger>
+						<HiOutlineServer className="size-4" />
+						Other Devices
+					</DropdownMenuSubTrigger>
+					<DropdownMenuSubContent className="w-72">
+						{otherDevices.length === 0 ? (
+							<DropdownMenuItem disabled>No devices found</DropdownMenuItem>
+						) : (
+							otherDevices.map((device) => {
+								const DeviceIcon = getDeviceIcon(device.type);
+								const isSelected =
+									hostTarget.kind === "device" &&
+									hostTarget.deviceId === device.id;
+
+								return (
+									<DropdownMenuItem
+										key={device.id}
+										onSelect={() =>
+											onSelectHostTarget({
+												kind: "device",
+												deviceId: device.id,
+											})
+										}
+									>
+										<DeviceIcon className="size-4" />
+										<div className="min-w-0 flex-1">
+											<div className="truncate">{device.name}</div>
+											<div className="text-xs text-muted-foreground">
+												{device.type}
+											</div>
+										</div>
+										<div className="flex items-center gap-2">
+											<span
+												className={cn(
+													"size-2 rounded-full",
+													device.isOnline
+														? "bg-emerald-500"
+														: "bg-muted-foreground/40",
+												)}
+											/>
+											<span className="text-xs text-muted-foreground">
+												{device.isOnline ? "Online" : "Offline"}
+											</span>
+											{isSelected && <HiCheck className="size-4" />}
+										</div>
+									</DropdownMenuItem>
+								);
+							})
+						)}
+					</DropdownMenuSubContent>
+				</DropdownMenuSub>
+			</DropdownMenuContent>
+		</DropdownMenu>
 	);
 }

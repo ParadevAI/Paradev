@@ -12,6 +12,7 @@ import {
 } from "react-icons/go";
 import { SiGithub } from "react-icons/si";
 import { useDebouncedValue } from "renderer/hooks/useDebouncedValue";
+import type { WorkspaceHostTarget } from "renderer/lib/v2-workspace-host";
 import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useV2CreateWorkspace } from "../../hooks/useV2CreateWorkspace";
@@ -20,13 +21,13 @@ import { useV2NewWorkspaceModalDraft } from "../../V2NewWorkspaceModalDraftConte
 interface V2PullRequestsGroupProps {
 	projectId: string | null;
 	githubRepositoryId: string | null;
-	selectedDeviceId: string | null;
+	hostTarget: WorkspaceHostTarget;
 }
 
 export function V2PullRequestsGroup({
 	projectId,
 	githubRepositoryId,
-	selectedDeviceId,
+	hostTarget,
 }: V2PullRequestsGroupProps) {
 	const collections = useCollections();
 	const navigate = useNavigate();
@@ -139,7 +140,7 @@ export function V2PullRequestsGroup({
 								projectId,
 								name: pr.title,
 								branch: pr.headBranch,
-								deviceId: selectedDeviceId ?? undefined,
+								hostTarget,
 							}),
 							{
 								loading: "Creating workspace from PR...",

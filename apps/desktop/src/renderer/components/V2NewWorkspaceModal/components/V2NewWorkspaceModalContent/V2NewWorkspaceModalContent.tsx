@@ -171,10 +171,8 @@ export function V2NewWorkspaceModalContent({
 				</Tabs>
 				<div className="flex items-center gap-1">
 					<DevicePicker
-						selectedDeviceId={draft.selectedDeviceId}
-						onSelectDevice={(selectedDeviceId) =>
-							updateDraft({ selectedDeviceId })
-						}
+						hostTarget={draft.hostTarget}
+						onSelectHostTarget={(hostTarget) => updateDraft({ hostTarget })}
 					/>
 					<div className="mx-0.5 h-4 w-px bg-border" />
 					<V2ProjectSelector
@@ -205,20 +203,20 @@ export function V2NewWorkspaceModalContent({
 							<V2PullRequestsGroup
 								projectId={draft.selectedProjectId}
 								githubRepositoryId={githubRepositoryId}
-								selectedDeviceId={draft.selectedDeviceId}
+								hostTarget={draft.hostTarget}
 							/>
 						)}
 						{draft.activeTab === "branches" && (
 							<V2BranchesGroup
 								projectId={draft.selectedProjectId}
 								localProjectId={resolvedLocalProjectId}
-								selectedDeviceId={draft.selectedDeviceId}
+								hostTarget={draft.hostTarget}
 							/>
 						)}
 						{draft.activeTab === "issues" && (
 							<V2IssuesGroup
 								projectId={draft.selectedProjectId}
-								selectedDeviceId={draft.selectedDeviceId}
+								hostTarget={draft.hostTarget}
 							/>
 						)}
 					</CommandList>
@@ -228,7 +226,7 @@ export function V2NewWorkspaceModalContent({
 					<V2PromptGroup
 						projectId={draft.selectedProjectId}
 						localProjectId={resolvedLocalProjectId}
-						selectedDeviceId={draft.selectedDeviceId}
+						hostTarget={draft.hostTarget}
 					/>
 				</div>
 			)}

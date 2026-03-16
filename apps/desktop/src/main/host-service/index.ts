@@ -17,6 +17,8 @@ import {
 const authToken = process.env.AUTH_TOKEN;
 const cloudApiUrl = process.env.CLOUD_API_URL;
 const dbPath = process.env.HOST_DB_PATH;
+const deviceClientId = process.env.DEVICE_CLIENT_ID;
+const deviceName = process.env.DEVICE_NAME;
 
 const auth =
 	authToken && cloudApiUrl ? new JwtAuthProvider(authToken) : undefined;
@@ -26,6 +28,8 @@ const app = createApp({
 	auth,
 	cloudApiUrl,
 	dbPath,
+	deviceClientId,
+	deviceName,
 });
 
 const server = serve(

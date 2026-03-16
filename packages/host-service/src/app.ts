@@ -16,6 +16,8 @@ export interface CreateAppOptions {
 	auth?: AuthProvider;
 	cloudApiUrl?: string;
 	dbPath?: string;
+	deviceClientId?: string;
+	deviceName?: string;
 }
 
 export function createApp(options?: CreateAppOptions) {
@@ -29,7 +31,13 @@ export function createApp(options?: CreateAppOptions) {
 	const dbPath = options?.dbPath ?? join(homedir(), ".superset", "host.db");
 	const db = createDb(dbPath);
 
-	const createContext = createContextFactory({ credentials, api, db });
+	const createContext = createContextFactory({
+		credentials,
+		api,
+		db,
+		deviceClientId: options?.deviceClientId,
+		deviceName: options?.deviceName,
+	});
 
 	const app = new Hono();
 	app.use("*", cors());

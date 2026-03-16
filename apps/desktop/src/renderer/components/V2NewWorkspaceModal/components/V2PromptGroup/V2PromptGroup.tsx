@@ -5,6 +5,7 @@ import { Textarea } from "@superset/ui/textarea";
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { electronTrpc } from "renderer/lib/electron-trpc";
+import type { WorkspaceHostTarget } from "renderer/lib/v2-workspace-host";
 import { resolveEffectiveWorkspaceBaseBranch } from "renderer/lib/workspaceBaseBranch";
 import { useHotkeysStore } from "renderer/stores/hotkeys/store";
 import {
@@ -18,13 +19,13 @@ import { useV2NewWorkspaceModalDraft } from "../../V2NewWorkspaceModalDraftConte
 interface V2PromptGroupProps {
 	projectId: string | null;
 	localProjectId: string | null;
-	selectedDeviceId: string | null;
+	hostTarget: WorkspaceHostTarget;
 }
 
 export function V2PromptGroup({
 	projectId,
 	localProjectId,
-	selectedDeviceId,
+	hostTarget,
 }: V2PromptGroupProps) {
 	const navigate = useNavigate();
 	const platform = useHotkeysStore((state) => state.platform);
@@ -141,7 +142,7 @@ export function V2PromptGroup({
 				projectId,
 				name,
 				branch,
-				deviceId: selectedDeviceId ?? undefined,
+				hostTarget,
 			}),
 			{
 				loading: "Creating workspace...",

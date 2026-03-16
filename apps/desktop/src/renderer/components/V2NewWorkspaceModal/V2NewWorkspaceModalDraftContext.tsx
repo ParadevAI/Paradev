@@ -7,6 +7,7 @@ import {
 	useMemo,
 	useState,
 } from "react";
+import type { WorkspaceHostTarget } from "renderer/lib/v2-workspace-host";
 
 export type V2NewWorkspaceModalTab =
 	| "prompt"
@@ -17,7 +18,7 @@ export type V2NewWorkspaceModalTab =
 export interface V2NewWorkspaceModalDraft {
 	activeTab: V2NewWorkspaceModalTab;
 	selectedProjectId: string | null;
-	selectedDeviceId: string | null;
+	hostTarget: WorkspaceHostTarget;
 	prompt: string;
 	branchName: string;
 	branchNameEdited: boolean;
@@ -36,7 +37,7 @@ interface V2NewWorkspaceModalDraftState extends V2NewWorkspaceModalDraft {
 const initialDraft: V2NewWorkspaceModalDraft = {
 	activeTab: "prompt",
 	selectedProjectId: null,
-	selectedDeviceId: null,
+	hostTarget: { kind: "local" },
 	prompt: "",
 	branchName: "",
 	branchNameEdited: false,
@@ -142,7 +143,7 @@ export function V2NewWorkspaceModalDraftProvider({
 			draft: {
 				activeTab: state.activeTab,
 				selectedProjectId: state.selectedProjectId,
-				selectedDeviceId: state.selectedDeviceId,
+				hostTarget: state.hostTarget,
 				prompt: state.prompt,
 				branchName: state.branchName,
 				branchNameEdited: state.branchNameEdited,

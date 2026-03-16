@@ -12,6 +12,7 @@ import { SiLinear } from "react-icons/si";
 import { GATED_FEATURES, usePaywall } from "renderer/components/Paywall";
 import { useDebouncedValue } from "renderer/hooks/useDebouncedValue";
 import { getSlugColumnWidth } from "renderer/lib/slug-width";
+import type { WorkspaceHostTarget } from "renderer/lib/v2-workspace-host";
 import {
 	StatusIcon,
 	type StatusType,
@@ -25,13 +26,10 @@ import { useV2NewWorkspaceModalDraft } from "../../V2NewWorkspaceModalDraftConte
 
 interface V2IssuesGroupProps {
 	projectId: string | null;
-	selectedDeviceId: string | null;
+	hostTarget: WorkspaceHostTarget;
 }
 
-export function V2IssuesGroup({
-	projectId,
-	selectedDeviceId,
-}: V2IssuesGroupProps) {
+export function V2IssuesGroup({ projectId, hostTarget }: V2IssuesGroupProps) {
 	const collections = useCollections();
 	const navigate = useNavigate();
 	const { gateFeature } = usePaywall();
@@ -160,7 +158,7 @@ export function V2IssuesGroup({
 								projectId,
 								name: task.title,
 								branch: task.slug.toLowerCase(),
-								deviceId: selectedDeviceId ?? undefined,
+								hostTarget,
 							}),
 							{
 								loading: "Creating workspace...",

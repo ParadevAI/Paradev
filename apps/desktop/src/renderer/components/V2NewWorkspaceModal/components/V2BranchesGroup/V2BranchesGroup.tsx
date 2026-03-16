@@ -8,6 +8,7 @@ import { useCallback, useMemo } from "react";
 import { GoArrowUpRight, GoGitBranch, GoGlobe } from "react-icons/go";
 import { useDebouncedValue } from "renderer/hooks/useDebouncedValue";
 import { electronTrpc } from "renderer/lib/electron-trpc";
+import type { WorkspaceHostTarget } from "renderer/lib/v2-workspace-host";
 import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useV2CreateWorkspace } from "../../hooks/useV2CreateWorkspace";
@@ -16,13 +17,13 @@ import { useV2NewWorkspaceModalDraft } from "../../V2NewWorkspaceModalDraftConte
 interface V2BranchesGroupProps {
 	projectId: string | null;
 	localProjectId: string | null;
-	selectedDeviceId: string | null;
+	hostTarget: WorkspaceHostTarget;
 }
 
 export function V2BranchesGroup({
 	projectId,
 	localProjectId,
-	selectedDeviceId,
+	hostTarget,
 }: V2BranchesGroupProps) {
 	const navigate = useNavigate();
 	const collections = useCollections();
@@ -111,7 +112,7 @@ export function V2BranchesGroup({
 					projectId,
 					name: branchName,
 					branch: branchName,
-					deviceId: selectedDeviceId ?? undefined,
+					hostTarget,
 				}),
 				{
 					loading: "Creating workspace from branch...",
@@ -121,7 +122,7 @@ export function V2BranchesGroup({
 				},
 			);
 		},
-		[createWorkspace, projectId, runAsyncAction, selectedDeviceId],
+		[createWorkspace, hostTarget, projectId, runAsyncAction],
 	);
 
 	const handleOpen = useCallback(
