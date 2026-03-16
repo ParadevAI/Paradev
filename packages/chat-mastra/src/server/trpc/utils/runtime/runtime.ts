@@ -2,6 +2,7 @@ import { generateTitleFromMessage } from "@superset/chat/host";
 import type { AppRouter } from "@superset/trpc";
 import type { createTRPCClient } from "@trpc/client";
 import type { createMastraCode } from "mastracode";
+import type { ThinkingLevel } from "../../zod";
 
 export type RuntimeHarness = Awaited<
 	ReturnType<typeof createMastraCode>
@@ -61,6 +62,7 @@ interface RuntimeRestartPayload {
 	};
 	metadata?: {
 		model?: string;
+		thinkingLevel?: ThinkingLevel;
 	};
 }
 
@@ -414,6 +416,11 @@ export async function restartRuntimeFromUserMessage(
 			modelId: selectedModel,
 			scope: "thread",
 		});
+	}
+
+	const thinkingLevel = input.metadata?.thinkingLevel;
+	if (thinkingLevel) {
+		await runtime.harness.setState({ thinkingLevel });
 	}
 
 	runtime.lastErrorMessage = null;

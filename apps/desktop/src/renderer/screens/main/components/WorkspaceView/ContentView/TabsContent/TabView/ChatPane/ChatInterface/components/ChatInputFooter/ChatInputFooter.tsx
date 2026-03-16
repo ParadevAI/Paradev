@@ -5,6 +5,7 @@ import {
 	type PromptInputMessage,
 	PromptInputTextarea,
 } from "@superset/ui/ai-elements/prompt-input";
+import type { ThinkingLevel } from "@superset/ui/ai-elements/thinking-toggle";
 import type { ChatStatus, FileUIPart } from "ai";
 import type React from "react";
 import type { ReactNode } from "react";
@@ -37,8 +38,8 @@ interface ChatInputFooterProps {
 	setModelSelectorOpen: React.Dispatch<React.SetStateAction<boolean>>;
 	permissionMode: PermissionMode;
 	setPermissionMode: React.Dispatch<React.SetStateAction<PermissionMode>>;
-	thinkingEnabled: boolean;
-	setThinkingEnabled: React.Dispatch<React.SetStateAction<boolean>>;
+	thinkingLevel: ThinkingLevel;
+	setThinkingLevel: (level: ThinkingLevel) => void;
 	slashCommands: SlashCommand[];
 	submitDisabled?: boolean;
 	renderAttachment?: (file: FileUIPart & { id: string }) => ReactNode;
@@ -62,8 +63,8 @@ export function ChatInputFooter({
 	setModelSelectorOpen,
 	permissionMode,
 	setPermissionMode,
-	thinkingEnabled,
-	setThinkingEnabled,
+	thinkingLevel,
+	setThinkingLevel,
 	slashCommands,
 	submitDisabled,
 	renderAttachment,
@@ -184,8 +185,8 @@ export function ChatInputFooter({
 											setModelSelectorOpen={setModelSelectorOpen}
 											permissionMode={permissionMode}
 											setPermissionMode={setPermissionMode}
-											thinkingEnabled={thinkingEnabled}
-											setThinkingEnabled={setThinkingEnabled}
+											thinkingLevel={thinkingLevel}
+											setThinkingLevel={setThinkingLevel}
 											canAbort={canAbort}
 											submitStatus={submitStatus}
 											submitDisabled={submitDisabled}

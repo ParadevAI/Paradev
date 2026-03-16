@@ -274,6 +274,10 @@ export class ChatMastraService {
 								scope: "thread",
 							});
 						}
+						const thinkingLevel = input.metadata?.thinkingLevel;
+						if (thinkingLevel) {
+							await runtime.harness.setState({ thinkingLevel });
+						}
 						void generateAndSetTitle(runtime, this.apiClient, {
 							submittedUserMessage:
 								submittedUserMessage.length > 0

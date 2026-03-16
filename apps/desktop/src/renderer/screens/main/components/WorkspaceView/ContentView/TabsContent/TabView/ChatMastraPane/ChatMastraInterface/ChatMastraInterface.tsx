@@ -206,7 +206,10 @@ export function ChatMastraInterface({
 		availableModels.find((model) => model.id === selectedModelId) ?? null;
 	const activeModel = selectedModel ?? defaultModel;
 	const [modelSelectorOpen, setModelSelectorOpen] = useState(false);
-	const [thinkingEnabled, setThinkingEnabled] = useState(false);
+	const thinkingLevel = useChatPreferencesStore((state) => state.thinkingLevel);
+	const setThinkingLevel = useChatPreferencesStore(
+		(state) => state.setThinkingLevel,
+	);
 	const [permissionMode, setPermissionMode] =
 		useState<PermissionMode>("bypassPermissions");
 	const [submitStatus, setSubmitStatus] = useState<ChatStatus | undefined>(
@@ -574,6 +577,7 @@ export function ChatMastraInterface({
 				},
 				metadata: {
 					model: activeModel?.id,
+					thinkingLevel,
 				},
 			};
 			const immediateUserMessage =
@@ -651,6 +655,7 @@ export function ChatMastraInterface({
 			sendMessageToSession,
 			setRuntimeErrorMessage,
 			onUserMessageSubmitted,
+			thinkingLevel,
 		],
 	);
 
@@ -705,6 +710,7 @@ export function ChatMastraInterface({
 				},
 				metadata: {
 					model: modelId,
+					thinkingLevel,
 				},
 			};
 
@@ -778,6 +784,7 @@ export function ChatMastraInterface({
 		sessionId,
 		setRuntimeErrorMessage,
 		onUserMessageSubmitted,
+		thinkingLevel,
 	]);
 
 	const handleStop = useCallback(
@@ -814,6 +821,7 @@ export function ChatMastraInterface({
 				payload: request.payload,
 				metadata: {
 					model: activeModel?.id,
+					thinkingLevel,
 				},
 			});
 			if (optimisticMessage) {
@@ -833,6 +841,7 @@ export function ChatMastraInterface({
 						payload: request.payload,
 						metadata: {
 							model: activeModel?.id,
+							thinkingLevel,
 						},
 					},
 				);
@@ -870,6 +879,7 @@ export function ChatMastraInterface({
 			onUserMessageSubmitted,
 			sessionId,
 			setRuntimeErrorMessage,
+			thinkingLevel,
 		],
 	);
 	const handleResendUserMessage = useCallback(
@@ -995,8 +1005,8 @@ export function ChatMastraInterface({
 					setModelSelectorOpen={setModelSelectorOpen}
 					permissionMode={permissionMode}
 					setPermissionMode={setPermissionMode}
-					thinkingEnabled={thinkingEnabled}
-					setThinkingEnabled={setThinkingEnabled}
+					thinkingLevel={thinkingLevel}
+					setThinkingLevel={setThinkingLevel}
 					slashCommands={slashCommands}
 					sessionId={sessionId}
 					onError={setRuntimeErrorMessage}
