@@ -39,12 +39,15 @@ export class LocalCredentialProvider implements CredentialProvider {
 		return promise;
 	}
 
-	private fetchTokenViaGitCredential(host: string): Promise<string | null> {
+	private async fetchTokenViaGitCredential(
+		host: string,
+	): Promise<string | null> {
+		const env = await this.envResolver();
 		return new Promise((resolve) => {
 			const child = execFile(
 				"git",
 				["credential", "fill"],
-				{ timeout: 10_000 },
+				{ timeout: 10_000, env },
 				(error, stdout) => {
 					if (error) {
 						resolve(null);
