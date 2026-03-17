@@ -15,6 +15,7 @@ interface DashboardSidebarProjectSectionProps {
 	project: DashboardSidebarProject;
 	isSidebarCollapsed?: boolean;
 	workspaceShortcutLabels: Map<string, string>;
+	onWorkspaceHover: (workspaceId: string) => void | Promise<void>;
 	onToggleCollapse: (projectId: string) => void;
 }
 
@@ -22,6 +23,7 @@ export function DashboardSidebarProjectSection({
 	project,
 	isSidebarCollapsed = false,
 	workspaceShortcutLabels,
+	onWorkspaceHover,
 	onToggleCollapse,
 }: DashboardSidebarProjectSectionProps) {
 	const allSections = useMemo(
@@ -66,13 +68,13 @@ export function DashboardSidebarProjectSection({
 			>
 				<div className={cn("border-b border-border last:border-b-0")}>
 					<DashboardSidebarCollapsedProjectContent
-						projectId={project.id}
 						projectName={project.name}
 						githubOwner={project.githubOwner}
 						isCollapsed={project.isCollapsed}
 						totalWorkspaceCount={totalWorkspaceCount}
 						workspaces={flattenedCollapsedWorkspaces}
 						workspaceShortcutLabels={workspaceShortcutLabels}
+						onWorkspaceHover={onWorkspaceHover}
 						onToggleCollapse={() => onToggleCollapse(project.id)}
 					/>
 				</div>
@@ -106,11 +108,11 @@ export function DashboardSidebarProjectSection({
 			</DashboardSidebarProjectContextMenu>
 
 			<DashboardSidebarExpandedProjectContent
-				projectId={project.id}
 				isCollapsed={project.isCollapsed}
 				projectChildren={project.children}
 				allSections={allSections}
 				workspaceShortcutLabels={workspaceShortcutLabels}
+				onWorkspaceHover={onWorkspaceHover}
 				onDeleteSection={deleteSection}
 				onRenameSection={renameSection}
 				onToggleSectionCollapse={toggleSectionCollapsed}

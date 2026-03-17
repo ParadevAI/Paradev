@@ -1,9 +1,14 @@
 import { eq } from "@tanstack/db";
 import { useLiveQuery } from "@tanstack/react-db";
-import { useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useCallback, useMemo } from "react";
+import { env } from "renderer/env.renderer";
+import { authClient } from "renderer/lib/auth-client";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
+import { useHostService } from "renderer/routes/_authenticated/providers/HostServiceProvider";
+import { MOCK_ORG_ID } from "shared/constants";
 import type {
 	DashboardSidebarProject,
 	DashboardSidebarProjectChild,
@@ -12,9 +17,18 @@ import type {
 } from "../../types";
 
 export function useDashboardSidebarData() {
+	const { data: session } = authClient.useSession();
 	const collections = useCollections();
+	const { services } = useHostService();
 	const { toggleProjectCollapsed } = useDashboardSidebarState();
 	const { data: deviceInfo } = electronTrpc.auth.getDeviceInfo.useQuery();
+	const activeOrganizationId = env.SKIP_ENV_VALIDATION
+		? MOCK_ORG_ID
+		: (session?.session?.activeOrganizationId ?? null);
+	const activeHostService =
+		activeOrganizationId !== null
+			? (services.get(activeOrganizationId) ?? null)
+			: null;
 
 	const { data: sidebarProjects = [] } = useLiveQuery(
 		(q) =>
@@ -36,6 +50,7 @@ export function useDashboardSidebarData() {
 					slug: projects.slug,
 					githubRepositoryId: projects.githubRepositoryId,
 					githubOwner: repos?.owner ?? null,
+					githubRepoName: repos?.name ?? null,
 					createdAt: projects.createdAt,
 					updatedAt: projects.updatedAt,
 					isCollapsed: sidebarProjects.isCollapsed,
@@ -88,6 +103,59 @@ export function useDashboardSidebarData() {
 					sectionId: sidebarWorkspaces.sectionId,
 				})),
 		[collections],
+	);
+
+	const localWorkspaceIds = useMemo(
+		() =>
+			sidebarWorkspaces
+				.filter(
+					(workspace) =>
+						workspace.deviceType !== "cloud" &&
+						workspace.deviceClientId === deviceInfo?.deviceId,
+				)
+				.map((workspace) => workspace.id)
+				.sort(),
+		[deviceInfo?.deviceId, sidebarWorkspaces],
+	);
+
+	const { data: pullRequestData, refetch: refetchPullRequests } = useQuery({
+		queryKey: [
+			"dashboard-sidebar",
+			"pull-requests",
+			activeOrganizationId,
+			localWorkspaceIds,
+		],
+		enabled: activeHostService !== null && localWorkspaceIds.length > 0,
+		refetchInterval: 15_000,
+		queryFn: () =>
+			activeHostService?.client.pullRequests.getByWorkspaces.query({
+				workspaceIds: localWorkspaceIds,
+			}) ?? Promise.resolve({ workspaces: [] }),
+	});
+
+	const refreshWorkspacePullRequest = useCallback(
+		async (workspaceId: string) => {
+			if (!activeHostService || !localWorkspaceIds.includes(workspaceId)) {
+				return;
+			}
+
+			await activeHostService.client.pullRequests.refreshByWorkspaces.mutate({
+				workspaceIds: [workspaceId],
+			});
+			await refetchPullRequests();
+		},
+		[activeHostService, localWorkspaceIds, refetchPullRequests],
+	);
+
+	const localPullRequestsByWorkspaceId = useMemo(
+		() =>
+			new Map(
+				(pullRequestData?.workspaces ?? []).map((workspace) => [
+					workspace.workspaceId,
+					workspace.pullRequest,
+				]),
+			),
+		[pullRequestData?.workspaces],
 	);
 
 	const groups = useMemo<DashboardSidebarProject[]>(() => {
@@ -149,6 +217,19 @@ export function useDashboardSidebarData() {
 				accentColor: null,
 				name: workspace.name,
 				branch: workspace.branch,
+				pullRequest:
+					hostType === "local-device"
+						? (localPullRequestsByWorkspaceId.get(workspace.id) ?? null)
+						: null,
+				repoUrl:
+					project.githubOwner && project.githubRepoName
+						? `https://github.com/${project.githubOwner}/${project.githubRepoName}`
+						: null,
+				branchExistsOnRemote:
+					project.githubOwner !== null && project.githubRepoName !== null,
+				previewUrl: null,
+				needsRebase: null,
+				behindCount: null,
 				createdAt: workspace.createdAt,
 				updatedAt: workspace.updatedAt,
 			};
@@ -188,6 +269,7 @@ export function useDashboardSidebarData() {
 		});
 	}, [
 		deviceInfo?.deviceId,
+		localPullRequestsByWorkspaceId,
 		sidebarProjects,
 		sidebarSections,
 		sidebarWorkspaces,
@@ -195,6 +277,8 @@ export function useDashboardSidebarData() {
 
 	return {
 		groups,
+		refetchPullRequests,
+		refreshWorkspacePullRequest,
 		toggleProjectCollapsed,
 	};
 }

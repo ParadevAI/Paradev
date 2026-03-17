@@ -4,22 +4,22 @@ import { DashboardSidebarSection as DashboardSidebarSectionComponent } from "../
 import { DashboardSidebarWorkspaceItem } from "../../../DashboardSidebarWorkspaceItem";
 
 interface DashboardSidebarExpandedProjectContentProps {
-	projectId: string;
 	isCollapsed: boolean;
 	projectChildren: DashboardSidebarProjectChild[];
 	allSections: Array<{ id: string; name: string }>;
 	workspaceShortcutLabels: Map<string, string>;
+	onWorkspaceHover: (workspaceId: string) => void | Promise<void>;
 	onDeleteSection: (sectionId: string) => void;
 	onRenameSection: (sectionId: string, name: string) => void;
 	onToggleSectionCollapse: (sectionId: string) => void;
 }
 
 export function DashboardSidebarExpandedProjectContent({
-	projectId,
 	isCollapsed,
 	projectChildren,
 	allSections,
 	workspaceShortcutLabels,
+	onWorkspaceHover,
 	onDeleteSection,
 	onRenameSection,
 	onToggleSectionCollapse,
@@ -39,12 +39,8 @@ export function DashboardSidebarExpandedProjectContent({
 							child.type === "workspace" ? (
 								<DashboardSidebarWorkspaceItem
 									key={child.workspace.id}
-									id={child.workspace.id}
-									projectId={projectId}
-									accentColor={child.workspace.accentColor}
-									hostType={child.workspace.hostType}
-									name={child.workspace.name}
-									branch={child.workspace.branch}
+									workspace={child.workspace}
+									onHoverCardOpen={() => onWorkspaceHover(child.workspace.id)}
 									shortcutLabel={workspaceShortcutLabels.get(
 										child.workspace.id,
 									)}
@@ -52,10 +48,11 @@ export function DashboardSidebarExpandedProjectContent({
 							) : (
 								<DashboardSidebarSectionComponent
 									key={child.section.id}
-									projectId={projectId}
+									projectId={child.section.projectId}
 									section={child.section}
 									allSections={allSections}
 									workspaceShortcutLabels={workspaceShortcutLabels}
+									onWorkspaceHover={onWorkspaceHover}
 									onDelete={onDeleteSection}
 									onRename={onRenameSection}
 									onToggleCollapse={onToggleSectionCollapse}

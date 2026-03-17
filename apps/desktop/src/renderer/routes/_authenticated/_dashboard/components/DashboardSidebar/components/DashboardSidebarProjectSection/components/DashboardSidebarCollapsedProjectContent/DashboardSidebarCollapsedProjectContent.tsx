@@ -8,13 +8,13 @@ import { DashboardSidebarWorkspaceItem } from "../../../DashboardSidebarWorkspac
 
 interface DashboardSidebarCollapsedProjectContentProps
 	extends ComponentPropsWithoutRef<"div"> {
-	projectId: string;
 	projectName: string;
 	githubOwner: string | null;
 	isCollapsed: boolean;
 	totalWorkspaceCount: number;
 	workspaces: DashboardSidebarWorkspace[];
 	workspaceShortcutLabels: Map<string, string>;
+	onWorkspaceHover: (workspaceId: string) => void | Promise<void>;
 	onToggleCollapse: () => void;
 }
 
@@ -24,13 +24,13 @@ export const DashboardSidebarCollapsedProjectContent = forwardRef<
 >(
 	(
 		{
-			projectId,
 			projectName,
 			githubOwner,
 			isCollapsed,
 			totalWorkspaceCount,
 			workspaces,
 			workspaceShortcutLabels,
+			onWorkspaceHover,
 			onToggleCollapse,
 			className,
 			...props
@@ -83,13 +83,9 @@ export const DashboardSidebarCollapsedProjectContent = forwardRef<
 							<div className="flex w-full flex-col pt-1">
 								{workspaces.map((workspace) => (
 									<DashboardSidebarWorkspaceItem
-										accentColor={workspace.accentColor}
 										key={workspace.id}
-										id={workspace.id}
-										projectId={projectId}
-										hostType={workspace.hostType}
-										name={workspace.name}
-										branch={workspace.branch}
+										workspace={workspace}
+										onHoverCardOpen={() => onWorkspaceHover(workspace.id)}
 										shortcutLabel={workspaceShortcutLabels.get(workspace.id)}
 										isCollapsed
 									/>

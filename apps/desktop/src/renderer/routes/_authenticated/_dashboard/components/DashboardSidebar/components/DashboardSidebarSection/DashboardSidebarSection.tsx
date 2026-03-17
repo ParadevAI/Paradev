@@ -11,15 +11,16 @@ interface DashboardSidebarSectionProps {
 	section: DashboardSidebarSectionRecord;
 	allSections: Array<{ id: string; name: string }>;
 	workspaceShortcutLabels: Map<string, string>;
+	onWorkspaceHover: (workspaceId: string) => void | Promise<void>;
 	onDelete: (sectionId: string) => void;
 	onRename: (sectionId: string, name: string) => void;
 	onToggleCollapse: (sectionId: string) => void;
 }
 
 export function DashboardSidebarSection({
-	projectId,
 	section,
 	workspaceShortcutLabels,
+	onWorkspaceHover,
 	onDelete,
 	onRename,
 	onToggleCollapse,
@@ -72,9 +73,9 @@ export function DashboardSidebarSection({
 			</DashboardSidebarSectionContextMenu>
 
 			<DashboardSidebarSectionContent
-				projectId={projectId}
 				section={section}
 				workspaceShortcutLabels={workspaceShortcutLabels}
+				onWorkspaceHover={onWorkspaceHover}
 			/>
 		</div>
 	);

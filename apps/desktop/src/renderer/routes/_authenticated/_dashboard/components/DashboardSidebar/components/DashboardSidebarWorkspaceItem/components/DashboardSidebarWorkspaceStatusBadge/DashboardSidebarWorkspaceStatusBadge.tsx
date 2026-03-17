@@ -1,19 +1,22 @@
 import { cn } from "@superset/ui/utils";
 import { LuCircleDot, LuGitMerge, LuGitPullRequest } from "react-icons/lu";
-
-type MockPrState = "open" | "merged" | "closed" | "draft";
+import { electronTrpc } from "renderer/lib/electron-trpc";
+import type { DashboardSidebarWorkspacePullRequest } from "../../../../types";
 
 interface DashboardSidebarWorkspaceStatusBadgeProps {
-	state: MockPrState;
+	state: DashboardSidebarWorkspacePullRequest["state"];
 	prNumber?: number;
+	prUrl?: string;
 	className?: string;
 }
 
 export function DashboardSidebarWorkspaceStatusBadge({
 	state,
 	prNumber,
+	prUrl,
 	className,
 }: DashboardSidebarWorkspaceStatusBadgeProps) {
+	const openUrl = electronTrpc.external.openUrl.useMutation();
 	const iconClass = "h-3 w-3";
 
 	const config = {
@@ -56,12 +59,24 @@ export function DashboardSidebarWorkspaceStatusBadge({
 	};
 
 	const { icon, bgColor } = config[state];
+	const isClickable = !!prUrl;
+
+	const handleClick = (event: React.MouseEvent) => {
+		if (!prUrl) return;
+		event.stopPropagation();
+		openUrl.mutate(prUrl);
+	};
 
 	return (
-		<div
+		<button
+			type="button"
+			onClick={handleClick}
+			disabled={!isClickable}
 			className={cn(
-				"flex items-center justify-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] leading-none shrink-0",
+				"flex items-center justify-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] leading-none shrink-0 transition-colors",
 				bgColor,
+				isClickable && "cursor-pointer hover:opacity-80",
+				!isClickable && "cursor-default",
 				className,
 			)}
 		>
@@ -71,6 +86,6 @@ export function DashboardSidebarWorkspaceStatusBadge({
 					#{prNumber}
 				</span>
 			)}
-		</div>
+		</button>
 	);
 }

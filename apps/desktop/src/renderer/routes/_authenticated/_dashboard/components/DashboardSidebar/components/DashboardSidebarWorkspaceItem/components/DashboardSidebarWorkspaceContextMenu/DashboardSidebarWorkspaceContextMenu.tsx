@@ -31,6 +31,7 @@ import { useCollections } from "renderer/routes/_authenticated/providers/Collect
 interface DashboardSidebarWorkspaceContextMenuProps {
 	hoverCardContent?: React.ReactNode;
 	projectId: string;
+	onHoverCardOpen?: () => void;
 	onCreateSection: () => void;
 	onMoveToSection: (sectionId: string | null) => void;
 	onOpenInFinder: () => void;
@@ -43,6 +44,7 @@ interface DashboardSidebarWorkspaceContextMenuProps {
 
 export function DashboardSidebarWorkspaceContextMenu({
 	projectId,
+	onHoverCardOpen,
 	hoverCardContent,
 	onCreateSection,
 	onMoveToSection,
@@ -142,6 +144,11 @@ export function DashboardSidebarWorkspaceContextMenu({
 			open={isContextMenuOpen ? false : undefined}
 			openDelay={400}
 			closeDelay={100}
+			onOpenChange={(open) => {
+				if (open) {
+					onHoverCardOpen?.();
+				}
+			}}
 		>
 			<ContextMenu onOpenChange={setIsContextMenuOpen}>
 				<HoverCardTrigger asChild>

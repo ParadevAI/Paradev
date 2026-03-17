@@ -87,11 +87,24 @@ export function DashboardNewWorkspaceDraftProvider({
 
 	const updateDraft = useCallback(
 		(patch: Partial<DashboardNewWorkspaceDraft>) => {
-			setState((state) => ({
-				...state,
-				...patch,
-				draftVersion: state.draftVersion + 1,
-			}));
+			setState((state) => {
+				const entries = Object.entries(patch) as Array<
+					[
+						keyof DashboardNewWorkspaceDraft,
+						DashboardNewWorkspaceDraft[keyof DashboardNewWorkspaceDraft],
+					]
+				>;
+				const hasChanges = entries.some(([key, value]) => state[key] !== value);
+				if (!hasChanges) {
+					return state;
+				}
+
+				return {
+					...state,
+					...patch,
+					draftVersion: state.draftVersion + 1,
+				};
+			});
 		},
 		[],
 	);

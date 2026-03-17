@@ -2,6 +2,7 @@ import { eq, useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute } from "@tanstack/react-router";
 import { workspaceTrpc } from "renderer/lib/workspace-trpc";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
+import { WorkspaceTerminal } from "./components/WorkspaceTerminal";
 
 export const Route = createFileRoute(
 	"/_authenticated/_dashboard/v2-workspace/$workspaceId/",
@@ -67,13 +68,15 @@ function V2WorkspaceContent({
 	});
 
 	return (
-		<div className="flex h-full flex-col gap-6 overflow-y-auto p-6">
+		<div className="flex h-full w-full flex-col gap-6 overflow-y-auto p-6">
 			<div>
 				<h1 className="text-xl font-semibold">{workspaceName}</h1>
 				<p className="text-sm text-muted-foreground">
 					{projectName} &middot; {workspaceBranch}
 				</p>
 			</div>
+
+			<WorkspaceTerminal workspaceId={workspaceId} />
 
 			<div className="space-y-4">
 				<Section title="health.info" query={healthQuery} />
@@ -96,7 +99,7 @@ function Section({
 	};
 }) {
 	return (
-		<div className="rounded-lg border border-border p-4">
+		<div className="w-full rounded-lg border border-border p-4">
 			<h2 className="mb-2 text-sm font-medium">{title}</h2>
 			{query.isPending ? (
 				<p className="text-xs text-muted-foreground">Loading...</p>

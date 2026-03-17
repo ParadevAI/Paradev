@@ -10,7 +10,8 @@ interface DashboardSidebarProps {
 export function DashboardSidebar({
 	isCollapsed = false,
 }: DashboardSidebarProps) {
-	const { groups, toggleProjectCollapsed } = useDashboardSidebarData();
+	const { groups, refreshWorkspacePullRequest, toggleProjectCollapsed } =
+		useDashboardSidebarData();
 	const workspaceShortcutLabels = useDashboardSidebarShortcuts(groups);
 
 	return (
@@ -24,6 +25,7 @@ export function DashboardSidebar({
 						project={project}
 						isSidebarCollapsed={isCollapsed}
 						workspaceShortcutLabels={workspaceShortcutLabels}
+						onWorkspaceHover={refreshWorkspacePullRequest}
 						onToggleCollapse={toggleProjectCollapsed}
 					/>
 				))}

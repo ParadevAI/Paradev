@@ -23,7 +23,7 @@ const deviceName = process.env.DEVICE_NAME;
 const auth =
 	authToken && cloudApiUrl ? new JwtAuthProvider(authToken) : undefined;
 
-const app = createApp({
+const { app, injectWebSocket } = createApp({
 	credentials: new LocalCredentialProvider(),
 	auth,
 	cloudApiUrl,
@@ -38,6 +38,7 @@ const server = serve(
 		process.stdout.write(`${JSON.stringify({ port: info.port })}\n`);
 	},
 );
+injectWebSocket(server);
 
 const shutdown = () => {
 	server.close();

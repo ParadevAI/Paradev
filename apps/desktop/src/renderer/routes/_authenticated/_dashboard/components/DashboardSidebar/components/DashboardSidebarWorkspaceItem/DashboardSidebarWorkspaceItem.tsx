@@ -1,3 +1,4 @@
+import type { DashboardSidebarWorkspace } from "../../types";
 import { DashboardSidebarDeleteDialog } from "../DashboardSidebarDeleteDialog";
 import { DashboardSidebarCollapsedWorkspaceButton } from "./components/DashboardSidebarCollapsedWorkspaceButton";
 import { DashboardSidebarExpandedWorkspaceRow } from "./components/DashboardSidebarExpandedWorkspaceRow";
@@ -7,26 +8,26 @@ import { useDashboardSidebarWorkspaceItemActions } from "./hooks/useDashboardSid
 import { getWorkspaceRowMocks } from "./utils";
 
 interface DashboardSidebarWorkspaceItemProps {
-	id: string;
-	projectId: string;
-	accentColor?: string | null;
-	hostType: "local-device" | "remote-device" | "cloud";
-	name: string;
-	branch: string;
+	workspace: DashboardSidebarWorkspace;
+	onHoverCardOpen?: () => void;
 	shortcutLabel?: string;
 	isCollapsed?: boolean;
 }
 
 export function DashboardSidebarWorkspaceItem({
-	id,
-	projectId,
-	accentColor = null,
-	hostType,
-	name,
-	branch,
+	workspace,
+	onHoverCardOpen,
 	shortcutLabel,
 	isCollapsed = false,
 }: DashboardSidebarWorkspaceItemProps) {
+	const {
+		id,
+		projectId,
+		accentColor = null,
+		hostType,
+		name,
+		branch,
+	} = workspace;
 	const mockData = getWorkspaceRowMocks(id);
 	const {
 		cancelRename,
@@ -57,10 +58,12 @@ export function DashboardSidebarWorkspaceItem({
 			<>
 				<DashboardSidebarWorkspaceContextMenu
 					projectId={projectId}
+					onHoverCardOpen={
+						hostType === "local-device" ? onHoverCardOpen : undefined
+					}
 					hoverCardContent={
 						<DashboardSidebarWorkspaceHoverCardContent
-							name={name}
-							branch={branch}
+							workspace={workspace}
 							mockData={mockData}
 						/>
 					}
@@ -108,10 +111,12 @@ export function DashboardSidebarWorkspaceItem({
 		<>
 			<DashboardSidebarWorkspaceContextMenu
 				projectId={projectId}
+				onHoverCardOpen={
+					hostType === "local-device" ? onHoverCardOpen : undefined
+				}
 				hoverCardContent={
 					<DashboardSidebarWorkspaceHoverCardContent
-						name={name}
-						branch={branch}
+						workspace={workspace}
 						mockData={mockData}
 					/>
 				}
@@ -126,10 +131,7 @@ export function DashboardSidebarWorkspaceItem({
 				onDelete={() => setIsDeleteDialogOpen(true)}
 			>
 				<DashboardSidebarExpandedWorkspaceRow
-					accentColor={accentColor}
-					hostType={hostType}
-					name={name}
-					branch={branch}
+					workspace={workspace}
 					isActive={isActive}
 					isRenaming={isRenaming}
 					renameValue={renameValue}

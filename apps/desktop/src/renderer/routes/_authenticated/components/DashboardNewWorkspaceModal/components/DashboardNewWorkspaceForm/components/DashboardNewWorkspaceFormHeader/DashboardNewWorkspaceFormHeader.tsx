@@ -10,7 +10,7 @@ interface DashboardNewWorkspaceFormHeaderProps {
 	selectedProjectId: string | null;
 	onSelectTab: (tab: DashboardNewWorkspaceTab) => void;
 	onSelectHostTarget: (hostTarget: WorkspaceHostTarget) => void;
-	onSelectProject: (projectId: string) => void;
+	onSelectProject: (projectId: string | null) => void;
 }
 
 export function DashboardNewWorkspaceFormHeader({

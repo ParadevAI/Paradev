@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { useDashboardNewWorkspaceDraft } from "../../DashboardNewWorkspaceDraftContext";
 import { DashboardNewWorkspaceFormHeader } from "./components/DashboardNewWorkspaceFormHeader";
 import { DashboardNewWorkspaceListTabContent } from "./components/DashboardNewWorkspaceListTabContent";
@@ -16,13 +17,18 @@ export function DashboardNewWorkspaceForm({
 	preSelectedProjectId,
 }: DashboardNewWorkspaceFormProps) {
 	const { draft, updateDraft } = useDashboardNewWorkspaceDraft();
+	const handleSelectProject = useCallback(
+		(selectedProjectId: string | null) => {
+			updateDraft({ selectedProjectId });
+		},
+		[updateDraft],
+	);
 	const { githubRepository, githubRepositoryId } =
 		useDashboardNewWorkspaceProjectSelection({
 			isOpen,
 			preSelectedProjectId,
 			selectedProjectId: draft.selectedProjectId,
-			onSelectProject: (selectedProjectId) =>
-				updateDraft({ selectedProjectId }),
+			onSelectProject: handleSelectProject,
 		});
 	const resolvedLocalProjectId = useResolvedLocalProject(githubRepository);
 
@@ -59,9 +65,7 @@ export function DashboardNewWorkspaceForm({
 				selectedProjectId={draft.selectedProjectId}
 				onSelectTab={(activeTab) => updateDraft({ activeTab })}
 				onSelectHostTarget={(hostTarget) => updateDraft({ hostTarget })}
-				onSelectProject={(selectedProjectId) =>
-					updateDraft({ selectedProjectId })
-				}
+				onSelectProject={handleSelectProject}
 			/>
 
 			{isListTab ? (

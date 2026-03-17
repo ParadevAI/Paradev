@@ -3,15 +3,15 @@ import type { DashboardSidebarSection } from "../../../../types";
 import { DashboardSidebarWorkspaceItem } from "../../../DashboardSidebarWorkspaceItem";
 
 interface DashboardSidebarSectionContentProps {
-	projectId: string;
 	section: DashboardSidebarSection;
 	workspaceShortcutLabels: Map<string, string>;
+	onWorkspaceHover: (workspaceId: string) => void | Promise<void>;
 }
 
 export function DashboardSidebarSectionContent({
-	projectId,
 	section,
 	workspaceShortcutLabels,
+	onWorkspaceHover,
 }: DashboardSidebarSectionContentProps) {
 	return (
 		<AnimatePresence initial={false}>
@@ -26,13 +26,9 @@ export function DashboardSidebarSectionContent({
 					<div>
 						{section.workspaces.map((workspace) => (
 							<DashboardSidebarWorkspaceItem
-								accentColor={workspace.accentColor}
 								key={workspace.id}
-								id={workspace.id}
-								projectId={projectId}
-								hostType={workspace.hostType}
-								name={workspace.name}
-								branch={workspace.branch}
+								workspace={workspace}
+								onHoverCardOpen={() => onWorkspaceHover(workspace.id)}
 								shortcutLabel={workspaceShortcutLabels.get(workspace.id)}
 							/>
 						))}

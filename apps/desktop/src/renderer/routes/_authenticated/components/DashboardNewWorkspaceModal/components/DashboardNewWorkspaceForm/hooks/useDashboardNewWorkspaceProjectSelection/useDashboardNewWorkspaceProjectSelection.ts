@@ -62,7 +62,10 @@ export function useDashboardNewWorkspaceProjectSelection({
 			(project) => project.id === selectedProjectId,
 		);
 		if (!hasSelectedProject) {
-			onSelectProject(v2Projects[0]?.id ?? null);
+			const nextProjectId = v2Projects[0]?.id ?? null;
+			if (nextProjectId !== selectedProjectId) {
+				onSelectProject(nextProjectId);
+			}
 		}
 	}, [
 		selectedProjectId,
