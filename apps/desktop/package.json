@@ -82,7 +82,6 @@
 		"@streamdown/mermaid": "^1.0.2",
 		"@superset/auth": "workspace:*",
 		"@superset/chat": "workspace:*",
-		"@superset/chat-mastra": "workspace:*",
 		"@superset/db": "workspace:*",
 		"@superset/desktop-mcp": "workspace:*",
 		"@superset/host-service": "workspace:*",

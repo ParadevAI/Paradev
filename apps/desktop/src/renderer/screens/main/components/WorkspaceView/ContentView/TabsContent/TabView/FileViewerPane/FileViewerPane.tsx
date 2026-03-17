@@ -540,7 +540,7 @@ export function FileViewerPane({
 							onSplitVertical={() => splitPaneVertical(tabId, paneId, path)}
 							onSplitWithNewChat={() =>
 								splitPaneVertical(tabId, paneId, path, {
-									paneType: "chat-mastra",
+									paneType: "chat",
 								})
 							}
 							onSplitWithNewBrowser={() =>
