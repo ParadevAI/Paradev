@@ -1,6 +1,6 @@
 import { describe, expect, it, mock } from "bun:test";
-import { renderToStaticMarkup } from "react-dom/server";
 import type { ReactNode } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 
 const streamdownCalls: Array<Record<string, unknown>> = [];
 
