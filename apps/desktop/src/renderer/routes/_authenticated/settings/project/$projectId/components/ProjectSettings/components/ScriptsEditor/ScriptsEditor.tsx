@@ -175,7 +175,6 @@ export function ScriptsEditor({ projectId, className }: ScriptsEditorProps) {
 	const [setupContent, setSetupContent] = useState("");
 	const [teardownContent, setTeardownContent] = useState("");
 	const [runContent, setRunContent] = useState("");
-	const [hasChanges, setHasChanges] = useState(false);
 	const latestContentRef = useRef({
 		setup: "",
 		teardown: "",
@@ -212,7 +211,6 @@ export function ScriptsEditor({ projectId, className }: ScriptsEditorProps) {
 		setSetupContent(parsed.setup);
 		setTeardownContent(parsed.teardown);
 		setRunContent(parsed.run);
-		setHasChanges(false);
 		lastSavedPayloadRef.current = serializePayload(
 			buildPayload({
 				setup: parsed.setup,
@@ -226,17 +224,14 @@ export function ScriptsEditor({ projectId, className }: ScriptsEditorProps) {
 
 	const handleSetupChange = useCallback((value: string) => {
 		setSetupContent(value);
-		setHasChanges(true);
 	}, []);
 
 	const handleTeardownChange = useCallback((value: string) => {
 		setTeardownContent(value);
-		setHasChanges(true);
 	}, []);
 
 	const handleRunChange = useCallback((value: string) => {
 		setRunContent(value);
-		setHasChanges(true);
 	}, []);
 
 	const handleSave = useCallback(async () => {
@@ -253,18 +248,12 @@ export function ScriptsEditor({ projectId, className }: ScriptsEditorProps) {
 				const serializedPayload = serializePayload(payload);
 
 				if (serializedPayload === lastSavedPayloadRef.current) {
-					setHasChanges(false);
 					continue;
 				}
 
 				await updateConfigMutation.mutateAsync(payload);
 				lastSavedPayloadRef.current = serializedPayload;
 				await invalidateProjectScriptQueries(utils, projectId);
-
-				const currentPayload = buildPayload(latestContentRef.current);
-				setHasChanges(
-					serializePayload(currentPayload) !== lastSavedPayloadRef.current,
-				);
 			} while (saveQueuedRef.current);
 		} finally {
 			saveInFlightRef.current = false;
@@ -286,29 +275,19 @@ export function ScriptsEditor({ projectId, className }: ScriptsEditorProps) {
 					<h3 className="text-base font-semibold text-foreground">Scripts</h3>
 					<p className="text-sm text-muted-foreground">
 						Automate your workspace lifecycle with setup and teardown scripts.
+						Changes are saved automatically.
 					</p>
 				</div>
-				<div className="flex gap-2 shrink-0">
-					<Button variant="outline" size="sm" asChild>
-						<a
-							href={EXTERNAL_LINKS.SETUP_TEARDOWN_SCRIPTS}
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							Get started with setup scripts
-							<HiArrowTopRightOnSquare className="h-3.5 w-3.5" />
-						</a>
-					</Button>
-					{hasChanges && (
-						<Button
-							size="sm"
-							onClick={handleSave}
-							disabled={updateConfigMutation.isPending}
-						>
-							{updateConfigMutation.isPending ? "Saving..." : "Save"}
-						</Button>
-					)}
-				</div>
+				<Button variant="outline" size="sm" asChild>
+					<a
+						href={EXTERNAL_LINKS.SETUP_TEARDOWN_SCRIPTS}
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						Get started with setup scripts
+						<HiArrowTopRightOnSquare className="h-3.5 w-3.5" />
+					</a>
+				</Button>
 			</div>
 
 			<ScriptTextarea
