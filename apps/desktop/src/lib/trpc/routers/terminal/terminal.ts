@@ -1,4 +1,4 @@
-import { projects, workspaces, worktrees } from "@superset/local-db";
+import { workspaces, worktrees } from "@superset/local-db";
 import { TRPCError } from "@trpc/server";
 import { observable } from "@trpc/server/observable";
 import { eq } from "drizzle-orm";
@@ -14,9 +14,8 @@ import { getWorkspaceRuntimeRegistry } from "main/lib/workspace-runtime";
 import { z } from "zod";
 import { publicProcedure, router } from "../..";
 import { assertWorkspaceUsable } from "../workspaces/utils/usability";
-import { getWorkspacePath } from "../workspaces/utils/worktree";
 import { resolveTerminalThemeType } from "./theme-type";
-import { resolveCwd } from "./utils";
+import { getWorkspaceTerminalContext, resolveCwd } from "./utils";
 
 const DEBUG_TERMINAL = process.env.SUPERSET_TERMINAL_DEBUG === "1";
 const logger = console;
@@ -87,14 +86,8 @@ export const createTerminalRouter = () => {
 					themeType,
 				} = input;
 
-				const workspace = localDb
-					.select()
-					.from(workspaces)
-					.where(eq(workspaces.id, workspaceId))
-					.get();
-				const workspacePath = workspace
-					? (getWorkspacePath(workspace) ?? undefined)
-					: undefined;
+				const { workspace, workspacePath, rootPath } =
+					getWorkspaceTerminalContext(workspaceId);
 				if (workspace?.type === "worktree") {
 					assertWorkspaceUsable(workspaceId, workspacePath);
 				}
@@ -112,13 +105,6 @@ export const createTerminalRouter = () => {
 					});
 				}
 
-				const project = workspace
-					? localDb
-							.select()
-							.from(projects)
-							.where(eq(projects.id, workspace.projectId))
-							.get()
-					: undefined;
 				const resolvedThemeType = resolveTerminalThemeType({
 					requestedThemeType: themeType,
 					persistedThemeState: appState.data.themeState,
@@ -131,7 +117,7 @@ export const createTerminalRouter = () => {
 						workspaceId,
 						workspaceName: workspace?.name,
 						workspacePath,
-						rootPath: project?.mainRepoPath,
+						rootPath,
 						cwd,
 						cols,
 						rows,
