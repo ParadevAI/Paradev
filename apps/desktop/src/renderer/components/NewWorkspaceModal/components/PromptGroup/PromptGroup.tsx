@@ -120,7 +120,7 @@ const PlusMenu = forwardRef<
 						<PlusIcon className="size-3.5" />
 					</PromptInputButton>
 				</DropdownMenuTrigger>
-				<DropdownMenuContent side="top" align="end" className="w-52">
+				<DropdownMenuContent side="bottom" align="start" className="w-52">
 					<DropdownMenuItem onSelect={() => attachments.openFileDialog()}>
 						<PaperclipIcon className="size-4" />
 						Add attachment
