@@ -160,7 +160,6 @@ export function ChatInputFooter({
 										<ChatShortcuts
 											isFocused={isFocused}
 											setIssueLinkOpen={setIssueLinkOpen}
-											inputRootRef={inputRootRef}
 										/>
 										<IssueLinkCommand
 											open={issueLinkOpen}
