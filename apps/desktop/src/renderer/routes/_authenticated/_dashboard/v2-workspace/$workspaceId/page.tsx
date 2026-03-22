@@ -115,7 +115,7 @@ function V2WorkspaceContent({
 		{ projectId },
 		{ enabled: !!projectId, staleTime: 30000 },
 	);
-	const resolvedDefaultApp: ExternalApp = defaultApp ?? "cursor";
+	const resolvedDefaultApp: ExternalApp = defaultApp ?? "finder";
 	const { mutate: mutateOpenInApp } =
 		electronTrpc.external.openInApp.useMutation({
 			onSuccess: () => {
