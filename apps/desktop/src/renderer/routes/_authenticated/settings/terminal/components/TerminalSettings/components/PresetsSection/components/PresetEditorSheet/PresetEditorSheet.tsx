@@ -32,15 +32,19 @@ import {
 } from "shared/absolute-paths";
 import { CommandsEditor } from "../../../PresetRow/components/CommandsEditor";
 import type { AutoApplyField } from "../../constants";
+import type { PresetProjectOption } from "../../preset-project-options";
 import { LabelWithTooltip } from "../LabelWithTooltip";
+import { ProjectTargetingField } from "./components/ProjectTargetingField";
 
 interface PresetEditorSheetProps {
 	preset: TerminalPreset | null;
+	projects: PresetProjectOption[];
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	onDeletePreset: () => void;
 	onFieldChange: (column: PresetColumnKey, value: string) => void;
 	onFieldBlur: (column: PresetColumnKey) => void;
+	onProjectIdsChange: (projectIds: string[] | null) => void;
 	onDirectorySelect: (path: string) => void;
 	onCommandsChange: (commands: string[]) => void;
 	onCommandsBlur: () => void;
@@ -71,11 +75,13 @@ function toPresetDirectoryValue(
 
 export function PresetEditorSheet({
 	preset,
+	projects,
 	open,
 	onOpenChange,
 	onDeletePreset,
 	onFieldChange,
 	onFieldBlur,
+	onProjectIdsChange,
 	onDirectorySelect,
 	onCommandsChange,
 	onCommandsBlur,
@@ -144,7 +150,7 @@ export function PresetEditorSheet({
 								{preset.name.trim() || "Edit Preset"}
 							</SheetTitle>
 							<SheetDescription>
-								Configure commands and advanced launch options.
+								Configure commands, targeting, and advanced launch options.
 							</SheetDescription>
 						</SheetHeader>
 
@@ -176,6 +182,19 @@ export function PresetEditorSheet({
 									onChange={(e) => onFieldChange("description", e.target.value)}
 									onBlur={() => onFieldBlur("description")}
 									placeholder="e.g. Starts the dev server (optional)"
+								/>
+							</div>
+
+							<div className="space-y-2">
+								<LabelWithTooltip
+									label="Applies To"
+									tooltip="Choose whether this preset is available everywhere or only in specific projects."
+								/>
+								<ProjectTargetingField
+									projectIds={preset.projectIds}
+									projects={projects}
+									preferredProjectId={originWorkspace?.projectId ?? null}
+									onChange={onProjectIdsChange}
 								/>
 							</div>
 

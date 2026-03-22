@@ -36,7 +36,6 @@ export function GroupStrip() {
 	const panes = useTabsStore((s) => s.panes);
 	const activeTabIds = useTabsStore((s) => s.activeTabIds);
 	const tabHistoryStacks = useTabsStore((s) => s.tabHistoryStacks);
-	const { addTab, openPreset } = useTabsWithPresets();
 	const addChatTab = useTabsStore((s) => s.addChatTab);
 	const addBrowserTab = useTabsStore((s) => s.addBrowserTab);
 	const renameTab = useTabsStore((s) => s.renameTab);
@@ -49,8 +48,13 @@ export function GroupStrip() {
 
 	const setTabAutoTitle = useTabsStore((s) => s.setTabAutoTitle);
 	const setPaneAutoTitle = useTabsStore((s) => s.setPaneAutoTitle);
-	const { presets } = usePresets();
 	const navigate = useNavigate();
+	const { data: workspace } = electronTrpc.workspaces.get.useQuery(
+		{ id: activeWorkspaceId ?? "" },
+		{ enabled: !!activeWorkspaceId },
+	);
+	const { addTab, openPreset } = useTabsWithPresets(workspace?.projectId);
+	const { matchedPresets: presets } = usePresets(workspace?.projectId);
 
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
 	const tabsTrackRef = useRef<HTMLDivElement>(null);
