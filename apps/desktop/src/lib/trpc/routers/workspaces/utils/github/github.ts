@@ -5,17 +5,10 @@ import { execWithShellEnv } from "../shell-env";
 import { parseUpstreamRef } from "../upstream-ref";
 import {
 	clearGitHubCachesForWorktree,
-	clearInFlightGitHubStatus,
-	clearInFlightPullRequestComments,
-	getCachedGitHubStatus,
-	getCachedPullRequestComments,
-	getInFlightGitHubStatus,
-	getInFlightPullRequestComments,
+	getCachedPullRequestCommentsState,
 	makePullRequestCommentsCacheKey,
-	setCachedGitHubStatus,
-	setCachedPullRequestComments,
-	setInFlightGitHubStatus,
-	setInFlightPullRequestComments,
+	readCachedGitHubStatus,
+	readCachedPullRequestComments,
 } from "./cache";
 import { fetchPullRequestComments } from "./comments";
 import { getPRForBranch } from "./pr-resolution";
@@ -46,7 +39,7 @@ function getPullRequestCommentsRepoNameWithOwner(
 async function resolvePullRequestCommentsTarget(
 	worktreePath: string,
 ): Promise<PullRequestCommentsTarget | null> {
-	const repoContext = await getRepoContext(worktreePath);
+	const repoContext = await getRepoContext(worktreePath, { forceFresh: true });
 	if (!repoContext) {
 		return null;
 	}
@@ -89,6 +82,104 @@ export function resolveRemoteBranchNameForGitHubStatus({
 	return upstreamBranchName?.trim() || prHeadRefName?.trim() || localBranchName;
 }
 
+async function refreshGitHubPRStatus(
+	worktreePath: string,
+): Promise<GitHubStatus | null> {
+	try {
+		const repoContext = await getRepoContext(worktreePath, {
+			forceFresh: true,
+		});
+		if (!repoContext) {
+			return null;
+		}
+
+		const [branchResult, shaResult, upstreamResult] = await Promise.all([
+			execGitWithShellPath(["rev-parse", "--abbrev-ref", "HEAD"], {
+				cwd: worktreePath,
+			}),
+			execGitWithShellPath(["rev-parse", "HEAD"], { cwd: worktreePath }),
+			execGitWithShellPath(["rev-parse", "--abbrev-ref", "@{upstream}"], {
+				cwd: worktreePath,
+			}).catch(() => ({ stdout: "", stderr: "" })),
+		]);
+		const branchName = branchResult.stdout.trim();
+		const headSha = shaResult.stdout.trim();
+		const parsedUpstreamRef = parseUpstreamRef(upstreamResult.stdout.trim());
+		const trackingRemote = parsedUpstreamRef?.remoteName ?? "origin";
+		const previewBranchName = resolveRemoteBranchNameForGitHubStatus({
+			localBranchName: branchName,
+			upstreamBranchName: parsedUpstreamRef?.branchName,
+		});
+
+		const [prInfo, previewUrl] = await Promise.all([
+			getPRForBranch(worktreePath, branchName, repoContext, headSha),
+			fetchPreviewDeploymentUrl(
+				worktreePath,
+				headSha,
+				previewBranchName,
+				repoContext,
+			),
+		]);
+
+		const remoteBranchName = resolveRemoteBranchNameForGitHubStatus({
+			localBranchName: branchName,
+			upstreamBranchName: parsedUpstreamRef?.branchName,
+			prHeadRefName: prInfo?.headRefName,
+		});
+
+		const branchCheck = await branchExistsOnRemote(
+			worktreePath,
+			remoteBranchName,
+			trackingRemote,
+		);
+
+		let finalPreviewUrl = previewUrl;
+		if (!finalPreviewUrl && prInfo?.number) {
+			const targetUrl = repoContext.isFork
+				? repoContext.upstreamUrl
+				: repoContext.repoUrl;
+			const nwo = extractNwoFromUrl(targetUrl);
+			if (nwo) {
+				finalPreviewUrl = await queryDeploymentUrl(
+					worktreePath,
+					nwo,
+					`ref=${encodeURIComponent(`refs/pull/${prInfo.number}/merge`)}`,
+				);
+			}
+		}
+
+		const result: GitHubStatus = {
+			pr: prInfo,
+			repoUrl: repoContext.repoUrl,
+			upstreamUrl: repoContext.upstreamUrl,
+			isFork: repoContext.isFork,
+			branchExistsOnRemote: branchCheck.status === "exists",
+			previewUrl: finalPreviewUrl,
+			lastRefreshed: Date.now(),
+		};
+
+		return result;
+	} catch {
+		return null;
+	}
+}
+
+async function refreshGitHubPRComments({
+	worktreePath,
+	repoNameWithOwner,
+	pullRequestNumber,
+}: {
+	worktreePath: string;
+	repoNameWithOwner: string;
+	pullRequestNumber: number;
+}): Promise<PullRequestComment[]> {
+	return fetchPullRequestComments({
+		worktreePath,
+		repoNameWithOwner,
+		pullRequestNumber,
+	});
+}
+
 /**
  * Fetches GitHub PR status for a worktree using the `gh` CLI.
  * Returns null if `gh` is not installed, not authenticated, or on error.
@@ -96,101 +187,9 @@ export function resolveRemoteBranchNameForGitHubStatus({
 export async function fetchGitHubPRStatus(
 	worktreePath: string,
 ): Promise<GitHubStatus | null> {
-	const cached = getCachedGitHubStatus(worktreePath);
-	if (cached) {
-		return cached;
-	}
-
-	const inFlight = getInFlightGitHubStatus(worktreePath);
-	if (inFlight) {
-		return inFlight;
-	}
-
-	const promise = (async () => {
-		try {
-			const repoContext = await getRepoContext(worktreePath);
-			if (!repoContext) {
-				return null;
-			}
-
-			const [branchResult, shaResult, upstreamResult] = await Promise.all([
-				execGitWithShellPath(["rev-parse", "--abbrev-ref", "HEAD"], {
-					cwd: worktreePath,
-				}),
-				execGitWithShellPath(["rev-parse", "HEAD"], { cwd: worktreePath }),
-				execGitWithShellPath(["rev-parse", "--abbrev-ref", "@{upstream}"], {
-					cwd: worktreePath,
-				}).catch(() => ({ stdout: "", stderr: "" })),
-			]);
-			const branchName = branchResult.stdout.trim();
-			const headSha = shaResult.stdout.trim();
-			const parsedUpstreamRef = parseUpstreamRef(upstreamResult.stdout.trim());
-			const trackingRemote = parsedUpstreamRef?.remoteName ?? "origin";
-			const previewBranchName = resolveRemoteBranchNameForGitHubStatus({
-				localBranchName: branchName,
-				upstreamBranchName: parsedUpstreamRef?.branchName,
-			});
-
-			const [prInfo, previewUrl] = await Promise.all([
-				getPRForBranch(worktreePath, branchName, repoContext, headSha),
-				fetchPreviewDeploymentUrl(
-					worktreePath,
-					headSha,
-					previewBranchName,
-					repoContext,
-				),
-			]);
-
-			const remoteBranchName = resolveRemoteBranchNameForGitHubStatus({
-				localBranchName: branchName,
-				upstreamBranchName: parsedUpstreamRef?.branchName,
-				prHeadRefName: prInfo?.headRefName,
-			});
-
-			const branchCheck = await branchExistsOnRemote(
-				worktreePath,
-				remoteBranchName,
-				trackingRemote,
-			);
-
-			// If no preview URL found via SHA/branch, try the PR merge ref
-			// (GitHub Actions pull_request triggers use refs/pull/N/merge)
-			let finalPreviewUrl = previewUrl;
-			if (!finalPreviewUrl && prInfo?.number) {
-				const targetUrl = repoContext.isFork
-					? repoContext.upstreamUrl
-					: repoContext.repoUrl;
-				const nwo = extractNwoFromUrl(targetUrl);
-				if (nwo) {
-					finalPreviewUrl = await queryDeploymentUrl(
-						worktreePath,
-						nwo,
-						`ref=${encodeURIComponent(`refs/pull/${prInfo.number}/merge`)}`,
-					);
-				}
-			}
-
-			const result: GitHubStatus = {
-				pr: prInfo,
-				repoUrl: repoContext.repoUrl,
-				upstreamUrl: repoContext.upstreamUrl,
-				isFork: repoContext.isFork,
-				branchExistsOnRemote: branchCheck.status === "exists",
-				previewUrl: finalPreviewUrl,
-				lastRefreshed: Date.now(),
-			};
-
-			setCachedGitHubStatus(worktreePath, result);
-			return result;
-		} catch {
-			return null;
-		} finally {
-			clearInFlightGitHubStatus(worktreePath);
-		}
-	})();
-
-	setInFlightGitHubStatus(worktreePath, promise);
-	return promise;
+	return readCachedGitHubStatus(worktreePath, () =>
+		refreshGitHubPRStatus(worktreePath),
+	);
 }
 
 export async function fetchGitHubPRComments({
@@ -218,32 +217,26 @@ export async function fetchGitHubPRComments({
 			repoNameWithOwner,
 			pullRequestNumber: pullRequestTarget.prNumber,
 		});
-		const cached = getCachedPullRequestComments(cacheKey);
-		if (cached) {
-			return cached;
-		}
-
-		const inFlight = getInFlightPullRequestComments(cacheKey);
-		if (inFlight) {
-			return await inFlight;
-		}
-
-		const promise = (async () => {
-			try {
-				const comments = await fetchPullRequestComments({
+		try {
+			return await readCachedPullRequestComments(cacheKey, () =>
+				refreshGitHubPRComments({
 					worktreePath,
 					repoNameWithOwner,
 					pullRequestNumber: pullRequestTarget.prNumber,
-				});
-				setCachedPullRequestComments(cacheKey, comments);
-				return comments;
-			} finally {
-				clearInFlightPullRequestComments(cacheKey);
+				}),
+			);
+		} catch (error) {
+			const cached = getCachedPullRequestCommentsState(cacheKey);
+			if (cached) {
+				console.warn(
+					"[GitHub] Failed to refresh pull request comments; using cached value:",
+					error,
+				);
+				return cached.value;
 			}
-		})();
 
-		setInFlightPullRequestComments(cacheKey, promise);
-		return await promise;
+			throw error;
+		}
 	} catch {
 		return [];
 	}

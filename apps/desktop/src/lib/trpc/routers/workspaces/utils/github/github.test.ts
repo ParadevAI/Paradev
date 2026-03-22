@@ -3,7 +3,7 @@ import {
 	mergePullRequestComments,
 	parseConversationCommentsResponse,
 	parsePaginatedApiArray,
-	parseReviewCommentsResponse,
+	parseReviewThreadCommentsResponse,
 } from "./comments";
 import { resolveRemoteBranchNameForGitHubStatus } from "./github";
 import {
@@ -70,22 +70,32 @@ describe("getPullRequestRepoArgs", () => {
 	});
 });
 
-describe("parseReviewCommentsResponse", () => {
-	test("normalizes inline review comments with file metadata", () => {
+describe("parseReviewThreadCommentsResponse", () => {
+	test("normalizes inline review-thread comments with file metadata", () => {
 		expect(
-			parseReviewCommentsResponse([
+			parseReviewThreadCommentsResponse([
 				{
-					id: 42,
-					user: {
-						login: "octocat",
-						avatar_url: "https://avatars.githubusercontent.com/u/1?v=4",
+					isResolved: false,
+					comments: {
+						nodes: [
+							{
+								databaseId: 42,
+								author: {
+									login: "octocat",
+									avatarUrl: "https://avatars.githubusercontent.com/u/1?v=4",
+								},
+								body: "Please rename this helper.",
+								createdAt: "2026-03-21T04:19:41Z",
+								url: "https://github.com/superset-sh/superset/pull/2681#discussion_r42",
+								path: "apps/desktop/src/file.ts",
+								line: 19,
+							},
+						],
+						pageInfo: {
+							hasNextPage: false,
+							endCursor: null,
+						},
 					},
-					body: "Please rename this helper.",
-					created_at: "2026-03-21T04:19:41Z",
-					html_url:
-						"https://github.com/superset-sh/superset/pull/2681#discussion_r42",
-					path: "apps/desktop/src/file.ts",
-					line: 19,
 				},
 			]),
 		).toEqual([
@@ -99,6 +109,89 @@ describe("parseReviewCommentsResponse", () => {
 				kind: "review",
 				path: "apps/desktop/src/file.ts",
 				line: 19,
+				isResolved: false,
+			},
+		]);
+	});
+
+	test("marks all comments in resolved threads as resolved", () => {
+		expect(
+			parseReviewThreadCommentsResponse([
+				{
+					isResolved: true,
+					comments: {
+						nodes: [
+							{
+								databaseId: 42,
+								author: {
+									login: "octocat",
+								},
+								body: "Please rename this helper.",
+								createdAt: "2026-03-21T04:19:41Z",
+								url: "https://github.com/superset-sh/superset/pull/2681#discussion_r42",
+								path: "apps/desktop/src/file.ts",
+								line: 19,
+							},
+						],
+						pageInfo: {
+							hasNextPage: false,
+							endCursor: null,
+						},
+					},
+				},
+			]),
+		).toEqual([
+			{
+				id: "review-42",
+				authorLogin: "octocat",
+				body: "Please rename this helper.",
+				createdAt: new Date("2026-03-21T04:19:41Z").getTime(),
+				url: "https://github.com/superset-sh/superset/pull/2681#discussion_r42",
+				kind: "review",
+				path: "apps/desktop/src/file.ts",
+				line: 19,
+				isResolved: true,
+			},
+		]);
+	});
+
+	test("falls back to the GraphQL node id when databaseId is unavailable", () => {
+		expect(
+			parseReviewThreadCommentsResponse([
+				{
+					isResolved: false,
+					comments: {
+						nodes: [
+							{
+								id: "PRRC_kwDOQGUlEs4abc",
+								author: {
+									login: "octocat",
+								},
+								body: "Please rename this helper.",
+								createdAt: "2026-03-21T04:19:41Z",
+								url: "https://github.com/superset-sh/superset/pull/2681#discussion_r42",
+								path: "apps/desktop/src/file.ts",
+								originalLine: 19,
+							},
+						],
+						pageInfo: {
+							hasNextPage: false,
+							endCursor: null,
+						},
+					},
+				},
+			]),
+		).toEqual([
+			{
+				id: "review-node-PRRC_kwDOQGUlEs4abc",
+				authorLogin: "octocat",
+				body: "Please rename this helper.",
+				createdAt: new Date("2026-03-21T04:19:41Z").getTime(),
+				url: "https://github.com/superset-sh/superset/pull/2681#discussion_r42",
+				kind: "review",
+				path: "apps/desktop/src/file.ts",
+				line: 19,
+				isResolved: false,
 			},
 		]);
 	});
@@ -145,6 +238,7 @@ describe("parseConversationCommentsResponse", () => {
 				createdAt: new Date("2026-03-21T04:08:13Z").getTime(),
 				url: "https://github.com/superset-sh/superset/pull/2681#issuecomment-7",
 				kind: "conversation",
+				isResolved: false,
 			},
 		]);
 	});
@@ -161,6 +255,7 @@ describe("mergePullRequestComments", () => {
 						body: "Inline note",
 						createdAt: 200,
 						kind: "review",
+						isResolved: false,
 					},
 				],
 				[
@@ -170,6 +265,7 @@ describe("mergePullRequestComments", () => {
 						body: "Top-level note",
 						createdAt: 100,
 						kind: "conversation",
+						isResolved: false,
 					},
 				],
 			),
@@ -180,6 +276,7 @@ describe("mergePullRequestComments", () => {
 				body: "Inline note",
 				createdAt: 200,
 				kind: "review",
+				isResolved: false,
 			},
 			{
 				id: "conversation-7",
@@ -187,6 +284,7 @@ describe("mergePullRequestComments", () => {
 				body: "Top-level note",
 				createdAt: 100,
 				kind: "conversation",
+				isResolved: false,
 			},
 		]);
 	});

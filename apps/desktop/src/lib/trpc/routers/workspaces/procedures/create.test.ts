@@ -162,6 +162,7 @@ function withDefaults(tableName: TableName, row: Row): Row {
 	switch (tableName) {
 		case "projects":
 			return {
+				id: null,
 				tabOrder: null,
 				lastOpenedAt: null,
 				workspaceBaseBranch: null,
@@ -170,6 +171,7 @@ function withDefaults(tableName: TableName, row: Row): Row {
 			};
 		case "workspaces":
 			return {
+				id: null,
 				sectionId: null,
 				deletingAt: null,
 				lastOpenedAt: null,
@@ -178,6 +180,7 @@ function withDefaults(tableName: TableName, row: Row): Row {
 			};
 		case "worktrees":
 			return {
+				id: null,
 				gitStatus: null,
 				createdBySuperset: true,
 				...row,
@@ -518,7 +521,7 @@ describe("Workspace creation with external worktree auto-import", () => {
 		expect(result).toBeUndefined();
 	});
 
-	test("should preserve external worktree on disk when workspace deletion fails", async () => {
+	test("should preserve external worktree on disk when removing the workspace record", async () => {
 		// Create external worktree
 		createExternalWorktree(
 			mainRepoPath,

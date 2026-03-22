@@ -37,6 +37,11 @@ export const GHCommentAuthorSchema = z.object({
 	avatar_url: z.string().optional(),
 });
 
+export const GHGraphQLCommentAuthorSchema = z.object({
+	login: z.string().optional(),
+	avatarUrl: z.string().optional(),
+});
+
 export const GHCommentSchema = z.object({
 	id: z.string().optional(),
 	author: GHCommentAuthorSchema.nullable().optional(),
@@ -54,6 +59,61 @@ export const GHReviewCommentSchema = z.object({
 	path: z.string().optional(),
 	line: z.number().nullable().optional(),
 	original_line: z.number().nullable().optional(),
+});
+
+export const GHReviewThreadCommentSchema = z.object({
+	id: z.string().optional(),
+	databaseId: z.number().nullable().optional(),
+	author: GHGraphQLCommentAuthorSchema.nullable().optional(),
+	body: z.string().optional(),
+	createdAt: z.string().optional(),
+	url: z.string().optional(),
+	path: z.string().optional(),
+	line: z.number().nullable().optional(),
+	originalLine: z.number().nullable().optional(),
+});
+
+export const GHPageInfoSchema = z.object({
+	hasNextPage: z.boolean(),
+	endCursor: z.string().nullable(),
+});
+
+export const GHReviewThreadCommentsConnectionSchema = z.object({
+	nodes: z.array(GHReviewThreadCommentSchema.nullable()).optional(),
+	pageInfo: GHPageInfoSchema,
+});
+
+export const GHReviewThreadSchema = z.object({
+	id: z.string().optional(),
+	isResolved: z.boolean().optional(),
+	comments: GHReviewThreadCommentsConnectionSchema.nullable().optional(),
+});
+
+export const GHReviewThreadsResponseSchema = z.object({
+	data: z.object({
+		repository: z
+			.object({
+				pullRequest: z
+					.object({
+						reviewThreads: z.object({
+							nodes: z.array(GHReviewThreadSchema.nullable()).optional(),
+							pageInfo: GHPageInfoSchema,
+						}),
+					})
+					.nullable(),
+			})
+			.nullable(),
+	}),
+});
+
+export const GHReviewThreadCommentsResponseSchema = z.object({
+	data: z.object({
+		node: z
+			.object({
+				comments: GHReviewThreadCommentsConnectionSchema,
+			})
+			.nullable(),
+	}),
 });
 
 export const GHIssueCommentSchema = z.object({

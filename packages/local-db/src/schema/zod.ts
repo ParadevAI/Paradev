@@ -35,6 +35,7 @@ export const pullRequestCommentSchema = z.object({
 	kind: z.enum(["review", "conversation"]).optional(),
 	path: z.string().optional(),
 	line: z.number().optional(),
+	isResolved: z.boolean().optional(),
 });
 
 export type PullRequestComment = z.infer<typeof pullRequestCommentSchema>;

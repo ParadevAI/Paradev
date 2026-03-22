@@ -1,6 +1,89 @@
 import type { PullRequestComment } from "@superset/local-db";
+import type { z } from "zod";
 import { execWithShellEnv } from "../shell-env";
-import { GHIssueCommentSchema, GHReviewCommentSchema } from "./types";
+import {
+	GHIssueCommentSchema,
+	type GHReviewThreadCommentSchema,
+	GHReviewThreadCommentsConnectionSchema,
+	GHReviewThreadCommentsResponseSchema,
+	GHReviewThreadSchema,
+	GHReviewThreadsResponseSchema,
+} from "./types";
+
+const REVIEW_THREADS_QUERY = `
+query PullRequestReviewThreads(
+	$owner: String!
+	$name: String!
+	$pullRequestNumber: Int!
+	$after: String
+) {
+	repository(owner: $owner, name: $name) {
+		pullRequest(number: $pullRequestNumber) {
+			reviewThreads(first: 100, after: $after) {
+				nodes {
+					id
+					isResolved
+					comments(first: 100) {
+						nodes {
+							id
+							databaseId
+							author {
+								login
+								avatarUrl
+							}
+							body
+							createdAt
+							url
+							path
+							line
+							originalLine
+						}
+						pageInfo {
+							hasNextPage
+							endCursor
+						}
+					}
+				}
+				pageInfo {
+					hasNextPage
+					endCursor
+				}
+			}
+		}
+	}
+}
+`;
+
+const REVIEW_THREAD_COMMENTS_QUERY = `
+query PullRequestReviewThreadComments($threadId: ID!, $after: String) {
+	node(id: $threadId) {
+		... on PullRequestReviewThread {
+			comments(first: 100, after: $after) {
+				nodes {
+					id
+					databaseId
+					author {
+						login
+						avatarUrl
+					}
+					body
+					createdAt
+					url
+					path
+					line
+					originalLine
+				}
+				pageInfo {
+					hasNextPage
+					endCursor
+				}
+			}
+		}
+	}
+}
+`;
+
+type ReviewThreadCommentNode = z.infer<typeof GHReviewThreadCommentSchema>;
 
 function parseTimestamp(value?: string): number | undefined {
 	if (!value) {
@@ -9,6 +92,51 @@ function parseTimestamp(value?: string): number | undefined {
 
 	const timestamp = new Date(value).getTime();
 	return Number.isNaN(timestamp) ? undefined : timestamp;
+}
+
+function sortPullRequestComments(
+	comments: PullRequestComment[],
+): PullRequestComment[] {
+	return comments.sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0));
+}
+
+function getReviewThreadCommentId(
+	comment: ReviewThreadCommentNode,
+): string | null {
+	if (typeof comment.databaseId === "number") {
+		return `review-${comment.databaseId}`;
+	}
+
+	return comment.id ? `review-node-${comment.id}` : null;
+}
+
+function parseReviewThreadCommentNode({
+	comment,
+	isResolved,
+}: {
+	comment: ReviewThreadCommentNode;
+	isResolved: boolean;
+}): PullRequestComment | null {
+	const id = getReviewThreadCommentId(comment);
+	const body = comment.body?.trim();
+	if (!id || !body) {
+		return null;
+	}
+
+	return {
+		id,
+		authorLogin: comment.author?.login || "github",
+		...(comment.author?.avatarUrl
+			? { avatarUrl: comment.author.avatarUrl }
+			: {}),
+		body,
+		createdAt: parseTimestamp(comment.createdAt),
+		url: comment.url,
+		kind: "review" as const,
+		path: comment.path,
+		line: comment.line ?? comment.originalLine ?? undefined,
+		isResolved,
+	};
 }
 
 export function parsePaginatedApiArray(stdout: string): unknown[] {
@@ -33,46 +161,56 @@ export function parsePaginatedApiArray(stdout: string): unknown[] {
 	}
 }
 
-export function parseReviewCommentsResponse(
+export function parseReviewThreadCommentsConnection({
+	comments,
+	isResolved,
+}: {
+	comments: unknown;
+	isResolved: boolean;
+}): PullRequestComment[] {
+	const parsed = GHReviewThreadCommentsConnectionSchema.safeParse(comments);
+	if (!parsed.success) {
+		return [];
+	}
+
+	return (
+		parsed.data.nodes?.flatMap((comment) => {
+			if (!comment) {
+				return [];
+			}
+
+			const parsedComment = parseReviewThreadCommentNode({
+				comment,
+				isResolved,
+			});
+			return parsedComment ? [parsedComment] : [];
+		}) ?? []
+	);
+}
+
+export function parseReviewThreadCommentsResponse(
 	raw: unknown[],
 ): PullRequestComment[] {
-	return raw
-		.flatMap((item) => {
-			const result = GHReviewCommentSchema.safeParse(item);
+	return sortPullRequestComments(
+		raw.flatMap((item) => {
+			const result = GHReviewThreadSchema.safeParse(item);
 			if (!result.success) {
 				return [];
 			}
 
-			const comment = result.data;
-			const body = comment.body?.trim();
-			if (!body) {
-				return [];
-			}
-
-			return [
-				{
-					id: `review-${comment.id}`,
-					authorLogin: comment.user?.login || "github",
-					...(comment.user?.avatar_url
-						? { avatarUrl: comment.user.avatar_url }
-						: {}),
-					body,
-					createdAt: parseTimestamp(comment.created_at),
-					url: comment.html_url,
-					kind: "review" as const,
-					path: comment.path,
-					line: comment.line ?? comment.original_line ?? undefined,
-				},
-			];
-		})
-		.sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0));
+			return parseReviewThreadCommentsConnection({
+				comments: result.data.comments,
+				isResolved: result.data.isResolved === true,
+			});
+		}),
+	);
 }
 
 export function parseConversationCommentsResponse(
 	raw: unknown[],
 ): PullRequestComment[] {
-	return raw
-		.flatMap((item) => {
+	return sortPullRequestComments(
+		raw.flatMap((item) => {
 			const result = GHIssueCommentSchema.safeParse(item);
 			if (!result.success) {
 				return [];
@@ -95,10 +233,11 @@ export function parseConversationCommentsResponse(
 					createdAt: parseTimestamp(comment.created_at),
 					url: comment.html_url,
 					kind: "conversation" as const,
+					isResolved: false,
 				},
 			];
-		})
-		.sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0));
+		}),
+	);
 }
 
 export function mergePullRequestComments(
@@ -112,9 +251,7 @@ export function mergePullRequestComments(
 		}
 	}
 
-	return [...commentsById.values()].sort(
-		(a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0),
-	);
+	return sortPullRequestComments([...commentsById.values()]);
 }
 
 async function fetchPaginatedCommentsEndpoint(
@@ -130,17 +267,220 @@ async function fetchPaginatedCommentsEndpoint(
 	return parsePaginatedApiArray(stdout);
 }
 
-async function fetchReviewCommentsForPullRequest(
+function parseJsonOrNull({
+	stdout,
+	errorLabel,
+	context,
+}: {
+	stdout: string;
+	errorLabel: string;
+	context?: Record<string, unknown>;
+}): unknown | null {
+	try {
+		return JSON.parse(stdout.trim());
+	} catch (error) {
+		console.warn(errorLabel, {
+			error,
+			stdout,
+			...context,
+		});
+		return null;
+	}
+}
+
+async function fetchAdditionalReviewThreadCommentsForThread({
+	worktreePath,
+	threadId,
+	initialAfterCursor,
+	isResolved,
+}: {
+	worktreePath: string;
+	threadId: string;
+	initialAfterCursor: string;
+	isResolved: boolean;
+}): Promise<PullRequestComment[]> {
+	const reviewComments: PullRequestComment[] = [];
+	let afterCursor: string | null = initialAfterCursor;
+
+	while (afterCursor) {
+		let stdout: string;
+		try {
+			const result = await execWithShellEnv(
+				"gh",
+				[
+					"api",
+					"graphql",
+					"-f",
+					`query=${REVIEW_THREAD_COMMENTS_QUERY}`,
+					"-F",
+					`threadId=${threadId}`,
+					"-F",
+					`after=${afterCursor}`,
+				],
+				{ cwd: worktreePath },
+			);
+			stdout = result.stdout;
+		} catch (error) {
+			console.warn(
+				"[GitHub] Failed to fetch additional pull request review thread comments:",
+				{
+					error,
+					threadId,
+					worktreePath,
+					afterCursor,
+				},
+			);
+			return reviewComments;
+		}
+		const raw = parseJsonOrNull({
+			stdout,
+			errorLabel:
+				"[GitHub] Failed to parse pull request review thread comments JSON response:",
+			context: { threadId, worktreePath },
+		});
+		if (raw === null) {
+			return reviewComments;
+		}
+
+		const parsed = GHReviewThreadCommentsResponseSchema.safeParse(raw);
+		if (!parsed.success) {
+			console.warn(
+				"[GitHub] Failed to parse pull request review thread comments response:",
+				parsed.error.message,
+			);
+			return reviewComments;
+		}
+
+		const comments = parsed.data.data.node?.comments;
+		if (!comments) {
+			return reviewComments;
+		}
+
+		reviewComments.push(
+			...parseReviewThreadCommentsConnection({
+				comments,
+				isResolved,
+			}),
+		);
+		afterCursor =
+			comments.pageInfo.hasNextPage && comments.pageInfo.endCursor
+				? comments.pageInfo.endCursor
+				: null;
+	}
+
+	return reviewComments;
+}
+
+async function fetchReviewThreadCommentsForPullRequest(
 	worktreePath: string,
 	repoNameWithOwner: string,
 	pullRequestNumber: number,
 ): Promise<PullRequestComment[]> {
-	const pages = await fetchPaginatedCommentsEndpoint(
-		worktreePath,
-		`repos/${repoNameWithOwner}/pulls/${pullRequestNumber}/comments?per_page=100`,
-	);
+	const [owner, name] = repoNameWithOwner.split("/");
+	if (!owner || !name) {
+		return [];
+	}
 
-	return parseReviewCommentsResponse(pages);
+	const reviewComments: PullRequestComment[] = [];
+	let afterCursor: string | null = null;
+
+	while (true) {
+		const args = [
+			"api",
+			"graphql",
+			"-f",
+			`query=${REVIEW_THREADS_QUERY}`,
+			"-F",
+			`owner=${owner}`,
+			"-F",
+			`name=${name}`,
+			"-F",
+			`pullRequestNumber=${pullRequestNumber}`,
+		];
+		if (afterCursor) {
+			args.push("-F", `after=${afterCursor}`);
+		}
+
+		let stdout: string;
+		try {
+			const result = await execWithShellEnv("gh", args, {
+				cwd: worktreePath,
+			});
+			stdout = result.stdout;
+		} catch (error) {
+			console.warn("[GitHub] Failed to fetch pull request review threads:", {
+				error,
+				owner,
+				name,
+				pullRequestNumber,
+				worktreePath,
+				afterCursor,
+			});
+			return sortPullRequestComments(reviewComments);
+		}
+		const raw = parseJsonOrNull({
+			stdout,
+			errorLabel:
+				"[GitHub] Failed to parse pull request review threads JSON response:",
+			context: { owner, name, pullRequestNumber, worktreePath },
+		});
+		if (raw === null) {
+			return sortPullRequestComments(reviewComments);
+		}
+
+		const parsed = GHReviewThreadsResponseSchema.safeParse(raw);
+		if (!parsed.success) {
+			console.warn(
+				"[GitHub] Failed to parse pull request review threads response:",
+				parsed.error.message,
+			);
+			return sortPullRequestComments(reviewComments);
+		}
+
+		const reviewThreads =
+			parsed.data.data.repository?.pullRequest?.reviewThreads ?? null;
+		if (!reviewThreads) {
+			return sortPullRequestComments(reviewComments);
+		}
+
+		for (const thread of reviewThreads.nodes ?? []) {
+			if (!thread) {
+				continue;
+			}
+
+			const isResolved = thread.isResolved === true;
+			reviewComments.push(
+				...parseReviewThreadCommentsConnection({
+					comments: thread.comments,
+					isResolved,
+				}),
+			);
+
+			if (
+				thread.id &&
+				thread.comments?.pageInfo.hasNextPage &&
+				thread.comments.pageInfo.endCursor
+			) {
+				reviewComments.push(
+					...(await fetchAdditionalReviewThreadCommentsForThread({
+						worktreePath,
+						threadId: thread.id,
+						initialAfterCursor: thread.comments.pageInfo.endCursor,
+						isResolved,
+					})),
+				);
+			}
+		}
+
+		if (
+			!reviewThreads.pageInfo.hasNextPage ||
+			!reviewThreads.pageInfo.endCursor
+		) {
+			return sortPullRequestComments(reviewComments);
+		}
+
+		afterCursor = reviewThreads.pageInfo.endCursor;
+	}
 }
 
 async function fetchConversationCommentsForPullRequest(
@@ -165,8 +505,8 @@ export async function fetchPullRequestComments({
 	repoNameWithOwner: string;
 	pullRequestNumber: number;
 }): Promise<PullRequestComment[]> {
-	const [reviewResult, conversationResult] = await Promise.allSettled([
-		fetchReviewCommentsForPullRequest(
+	const [reviewThreadsResult, conversationResult] = await Promise.allSettled([
+		fetchReviewThreadCommentsForPullRequest(
 			worktreePath,
 			repoNameWithOwner,
 			pullRequestNumber,
@@ -179,14 +519,14 @@ export async function fetchPullRequestComments({
 	]);
 
 	const reviewComments =
-		reviewResult.status === "fulfilled" ? reviewResult.value : [];
+		reviewThreadsResult.status === "fulfilled" ? reviewThreadsResult.value : [];
 	const conversationComments =
 		conversationResult.status === "fulfilled" ? conversationResult.value : [];
 
-	if (reviewResult.status === "rejected") {
+	if (reviewThreadsResult.status === "rejected") {
 		console.warn(
-			"[GitHub] Failed to fetch pull request review comments:",
-			reviewResult.reason,
+			"[GitHub] Failed to fetch pull request review threads:",
+			reviewThreadsResult.reason,
 		);
 	}
 

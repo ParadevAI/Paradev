@@ -8,13 +8,9 @@ import {
 import { Skeleton } from "@superset/ui/skeleton";
 import { toast } from "@superset/ui/sonner";
 import { cn } from "@superset/ui/utils";
+import type { ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
-import {
-	LuArrowUpRight,
-	LuCheck,
-	LuCopy,
-	LuMessageSquareText,
-} from "react-icons/lu";
+import { LuArrowUpRight, LuCheck, LuCopy } from "react-icons/lu";
 import { VscChevronRight } from "react-icons/vsc";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { PRIcon } from "renderer/screens/main/components/PRIcon";
@@ -24,6 +20,7 @@ import {
 	buildCommentClipboardText,
 	checkIconConfig,
 	checkSummaryIconConfig,
+	countOpenPullRequestComments,
 	formatShortAge,
 	getCommentAvatarFallback,
 	getCommentCopyActionKey,
@@ -32,6 +29,7 @@ import {
 	prStateLabel,
 	resolveCheckDestinationUrl,
 	reviewDecisionConfig,
+	splitPullRequestComments,
 } from "./utils";
 
 interface ReviewPanelProps {
@@ -49,6 +47,9 @@ export function ReviewPanel({
 }: ReviewPanelProps) {
 	const [checksOpen, setChecksOpen] = useState(true);
 	const [commentsOpen, setCommentsOpen] = useState(true);
+	const [openCommentsGroupOpen, setOpenCommentsGroupOpen] = useState(true);
+	const [resolvedCommentsGroupOpen, setResolvedCommentsGroupOpen] =
+		useState(false);
 	const [copiedActionKey, setCopiedActionKey] = useState<string | null>(null);
 	const copiedActionResetTimeoutRef = useRef<ReturnType<
 		typeof setTimeout
@@ -98,14 +99,6 @@ export function ReviewPanel({
 			text: buildCommentClipboardText(comment),
 			actionKey: getCommentCopyActionKey(comment.id),
 			errorLabel: "Failed to copy comment",
-		});
-	};
-
-	const handleCopyCommentsList = () => {
-		void copyTextToClipboard({
-			text: buildAllCommentsClipboardText(comments),
-			actionKey: ALL_COMMENTS_COPY_ACTION_KEY,
-			errorLabel: "Failed to copy comments",
 		});
 	};
 
@@ -175,10 +168,153 @@ export function ReviewPanel({
 	const checksStatus = relevantChecks.length > 0 ? pr.checksStatus : "none";
 	const checksStatusConfig = checkSummaryIconConfig[checksStatus];
 	const ChecksStatusIcon = checksStatusConfig.icon;
-	const hasComments = comments.length > 0;
-	const commentsCountLabel = isCommentsLoading ? "..." : comments.length;
+	const { active: activeComments, resolved: resolvedComments } =
+		splitPullRequestComments(comments);
+	const commentsCountLabel = isCommentsLoading
+		? "..."
+		: countOpenPullRequestComments(comments);
 	const copyAllCommentsLabel =
 		copiedActionKey === ALL_COMMENTS_COPY_ACTION_KEY ? "Copied" : "Copy all";
+
+	const handleCopyCommentsList = () => {
+		void copyTextToClipboard({
+			text: buildAllCommentsClipboardText(activeComments),
+			actionKey: ALL_COMMENTS_COPY_ACTION_KEY,
+			errorLabel: "Failed to copy comments",
+		});
+	};
+
+	const renderCommentList = (list: PullRequestComment[]) =>
+		list.map((comment) => {
+			const age = formatShortAge(comment.createdAt);
+			const commentCopyActionKey = getCommentCopyActionKey(comment.id);
+			const isCopied = copiedActionKey === commentCopyActionKey;
+			const content = (
+				<>
+					<Avatar className="mt-0.5 size-4 shrink-0">
+						{comment.avatarUrl ? (
+							<AvatarImage src={comment.avatarUrl} alt={comment.authorLogin} />
+						) : null}
+						<AvatarFallback className="text-[10px] font-medium">
+							{getCommentAvatarFallback(comment.authorLogin)}
+						</AvatarFallback>
+					</Avatar>
+					<div className="min-w-0 flex-1">
+						<div className="flex items-center gap-1.5">
+							<span className="truncate text-xs font-medium text-foreground">
+								{comment.authorLogin}
+							</span>
+							<span className="shrink-0 rounded border border-border/70 bg-muted/35 px-1 py-0 text-[9px] uppercase tracking-wide text-muted-foreground">
+								{getCommentKindText(comment)}
+							</span>
+							{age ? (
+								<span className="shrink-0 text-[10px] text-muted-foreground">
+									{age}
+								</span>
+							) : null}
+						</div>
+						<p className="mt-0.5 line-clamp-1 text-xs leading-4 text-muted-foreground">
+							{getCommentPreviewText(comment.body)}
+						</p>
+					</div>
+				</>
+			);
+
+			return (
+				<div
+					key={comment.id}
+					className="group flex items-start gap-1 rounded-sm px-1.5 py-1 transition-colors hover:bg-accent/50"
+				>
+					{comment.url ? (
+						<a
+							href={comment.url}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="flex min-w-0 flex-1 items-start gap-2"
+						>
+							{content}
+						</a>
+					) : (
+						<div className="flex min-w-0 flex-1 items-start gap-2">
+							{content}
+						</div>
+					)}
+					<div className="mt-0.5 flex shrink-0 flex-col gap-1 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
+						{comment.url ? (
+							<a
+								href={comment.url}
+								target="_blank"
+								rel="noopener noreferrer"
+								className="inline-flex size-4 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+								aria-label="Open comment on GitHub"
+							>
+								<LuArrowUpRight className="size-3" />
+							</a>
+						) : null}
+						<button
+							type="button"
+							className="inline-flex size-4 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+							onClick={(event) => {
+								event.preventDefault();
+								event.stopPropagation();
+								handleCopySingleComment(comment);
+							}}
+							aria-label={isCopied ? "Copied comment" : "Copy comment"}
+						>
+							{isCopied ? (
+								<LuCheck className="size-3" />
+							) : (
+								<LuCopy className="size-3" />
+							)}
+						</button>
+					</div>
+				</div>
+			);
+		});
+
+	const renderCommentSection = ({
+		title,
+		comments,
+		isOpen,
+		onOpenChange,
+		action,
+	}: {
+		title: string;
+		comments: PullRequestComment[];
+		isOpen: boolean;
+		onOpenChange: (open: boolean) => void;
+		action?: ReactNode;
+	}) => (
+		<Collapsible
+			open={isOpen}
+			onOpenChange={onOpenChange}
+			className="min-w-0 overflow-hidden"
+		>
+			<div className="group flex min-w-0 items-center">
+				<CollapsibleTrigger
+					className={cn(
+						"flex w-full min-w-0 items-center gap-1.5 px-1.5 py-1 text-left",
+						"hover:bg-accent/30 cursor-pointer transition-colors",
+					)}
+				>
+					<VscChevronRight
+						className={cn(
+							"size-3 text-muted-foreground shrink-0 transition-transform duration-150",
+							isOpen && "rotate-90",
+						)}
+					/>
+					<span className="text-xs font-medium truncate">{title}</span>
+					<span className="text-[10px] text-muted-foreground shrink-0">
+						{comments.length}
+					</span>
+				</CollapsibleTrigger>
+				{action ? <div className="mr-1 shrink-0">{action}</div> : null}
+			</div>
+			<CollapsibleContent className="min-w-0 overflow-hidden">
+				{renderCommentList(comments)}
+			</CollapsibleContent>
+		</Collapsible>
+	);
 
 	return (
 		<div className="flex h-full min-h-0 flex-col overflow-y-auto">
@@ -219,8 +355,8 @@ export function ReviewPanel({
 			<Collapsible open={checksOpen} onOpenChange={setChecksOpen}>
 				<CollapsibleTrigger
 					className={cn(
-						"group flex w-full items-center justify-between gap-2 px-2 py-1.5 text-left min-w-0",
-						"hover:bg-accent/30 cursor-pointer transition-colors",
+						"group flex w-full min-w-0 items-center justify-between gap-2 px-2 py-1 text-left",
+						"hover:bg-accent/50 cursor-pointer transition-colors",
 					)}
 				>
 					<div className="flex min-w-0 items-center gap-1.5">
@@ -252,9 +388,9 @@ export function ReviewPanel({
 						</span>
 					</div>
 				</CollapsibleTrigger>
-				<CollapsibleContent className="px-0.5 pb-1 min-w-0 overflow-hidden">
+				<CollapsibleContent className="min-w-0 px-0.5 pb-1 overflow-hidden">
 					{relevantChecks.length === 0 ? (
-						<div className="px-1.5 py-1.5 text-xs text-muted-foreground">
+						<div className="px-1.5 py-1 text-xs text-muted-foreground">
 							No active checks reported for this pull request yet.
 						</div>
 					) : (
@@ -271,10 +407,10 @@ export function ReviewPanel({
 									rel="noopener noreferrer"
 									className="group block"
 								>
-									<div className="flex min-w-0 items-center gap-1.5 rounded-sm px-1.5 py-1.5 text-xs transition-colors hover:bg-accent/30">
+									<div className="flex min-w-0 items-center gap-1 rounded-sm px-1.5 py-1 text-xs transition-colors hover:bg-accent/50">
 										<CheckIcon
 											className={cn(
-												"size-3.5 shrink-0",
+												"size-3 shrink-0",
 												className,
 												check.status === "pending" && "animate-spin",
 											)}
@@ -293,11 +429,11 @@ export function ReviewPanel({
 							) : (
 								<div
 									key={check.name}
-									className="flex min-w-0 items-center gap-1.5 rounded-sm px-1.5 py-1.5 text-xs"
+									className="flex min-w-0 items-center gap-1 rounded-sm px-1.5 py-1 text-xs"
 								>
 									<CheckIcon
 										className={cn(
-											"size-3.5 shrink-0",
+											"size-3 shrink-0",
 											className,
 											check.status === "pending" && "animate-spin",
 										)}
@@ -318,13 +454,13 @@ export function ReviewPanel({
 			<Collapsible
 				open={commentsOpen}
 				onOpenChange={setCommentsOpen}
-				className="flex min-h-0 flex-1 flex-col"
+				className="min-w-0"
 			>
 				<div className="group flex min-w-0 items-center">
 					<CollapsibleTrigger
 						className={cn(
-							"flex min-w-0 flex-1 items-center gap-1.5 px-2 py-1.5 text-left",
-							"hover:bg-accent/30 cursor-pointer transition-colors",
+							"flex min-w-0 flex-1 items-center gap-1.5 px-2 py-1 text-left",
+							"hover:bg-accent/50 cursor-pointer transition-colors",
 						)}
 					>
 						<VscChevronRight
@@ -333,33 +469,14 @@ export function ReviewPanel({
 								commentsOpen && "rotate-90",
 							)}
 						/>
-						<LuMessageSquareText className="size-3.5 shrink-0 text-muted-foreground" />
 						<span className="text-xs font-medium truncate">Comments</span>
 						<span className="text-[10px] text-muted-foreground shrink-0">
 							{commentsCountLabel}
 						</span>
 					</CollapsibleTrigger>
-					{hasComments && (
-						<button
-							type="button"
-							className="mr-1 flex items-center gap-1 rounded-sm px-1.5 py-1 text-[10px] text-muted-foreground transition-colors hover:bg-accent/30 hover:text-foreground"
-							onClick={(event) => {
-								event.preventDefault();
-								event.stopPropagation();
-								handleCopyCommentsList();
-							}}
-						>
-							{copiedActionKey === ALL_COMMENTS_COPY_ACTION_KEY ? (
-								<LuCheck className="size-3" />
-							) : (
-								<LuCopy className="size-3" />
-							)}
-							<span>{copyAllCommentsLabel}</span>
-						</button>
-					)}
 				</div>
-				<CollapsibleContent className="min-h-0 flex-1 overflow-hidden">
-					<div className="h-full overflow-y-auto px-0.5 py-1">
+				<CollapsibleContent className="min-w-0 overflow-hidden">
+					<div className="px-0.5 py-1">
 						{isCommentsLoading ? (
 							<div className="space-y-1 px-1">
 								<Skeleton className="h-11 w-full rounded-sm" />
@@ -371,99 +488,44 @@ export function ReviewPanel({
 								No comments yet.
 							</div>
 						) : (
-							comments.map((comment) => {
-								const age = formatShortAge(comment.createdAt);
-								const commentCopyActionKey = getCommentCopyActionKey(
-									comment.id,
-								);
-								const isCopied = copiedActionKey === commentCopyActionKey;
-								const content = (
-									<>
-										<Avatar className="mt-0.5 size-5 shrink-0">
-											{comment.avatarUrl ? (
-												<AvatarImage
-													src={comment.avatarUrl}
-													alt={comment.authorLogin}
-												/>
-											) : null}
-											<AvatarFallback className="text-[10px] font-medium">
-												{getCommentAvatarFallback(comment.authorLogin)}
-											</AvatarFallback>
-										</Avatar>
-										<div className="min-w-0 flex-1">
-											<div className="flex items-center gap-1.5">
-												<span className="truncate text-xs font-medium text-foreground">
-													{comment.authorLogin}
-												</span>
-												<span className="shrink-0 rounded border border-border/70 bg-muted/35 px-1 py-0 text-[9px] uppercase tracking-wide text-muted-foreground">
-													{getCommentKindText(comment)}
-												</span>
-												{age && (
-													<span className="shrink-0 text-[10px] text-muted-foreground">
-														{age}
-													</span>
-												)}
-											</div>
-											<p className="mt-0.5 line-clamp-1 text-xs leading-4 text-muted-foreground">
-												{getCommentPreviewText(comment.body)}
-											</p>
-										</div>
-									</>
-								);
-
-								return (
-									<div
-										key={comment.id}
-										className="group flex items-start gap-1 rounded-sm px-1.5 py-1.5 transition-colors hover:bg-accent/30"
-									>
-										{comment.url ? (
-											<a
-												href={comment.url}
-												target="_blank"
-												rel="noopener noreferrer"
-												className="flex min-w-0 flex-1 items-start gap-2"
-											>
-												{content}
-											</a>
-										) : (
-											<div className="flex min-w-0 flex-1 items-start gap-2">
-												{content}
-											</div>
-										)}
-										<div className="mt-0.5 flex shrink-0 flex-col gap-1 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
-											{comment.url ? (
-												<a
-													href={comment.url}
-													target="_blank"
-													rel="noopener noreferrer"
-													className="inline-flex size-5 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-													aria-label="Open comment on GitHub"
+							<>
+								{activeComments.length > 0
+									? renderCommentSection({
+											title: "Open",
+											comments: activeComments,
+											isOpen: openCommentsGroupOpen,
+											onOpenChange: setOpenCommentsGroupOpen,
+											action: (
+												<button
+													type="button"
+													className="flex items-center gap-1 rounded-sm px-1.5 py-1 text-[10px] text-muted-foreground transition-colors hover:bg-accent/30 hover:text-foreground"
+													onClick={(event) => {
+														event.preventDefault();
+														event.stopPropagation();
+														handleCopyCommentsList();
+													}}
 												>
-													<LuArrowUpRight className="size-3" />
-												</a>
-											) : null}
-											<button
-												type="button"
-												className="inline-flex size-5 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-												onClick={(event) => {
-													event.preventDefault();
-													event.stopPropagation();
-													handleCopySingleComment(comment);
-												}}
-												aria-label={
-													isCopied ? "Copied comment" : "Copy comment"
-												}
-											>
-												{isCopied ? (
-													<LuCheck className="size-3" />
-												) : (
-													<LuCopy className="size-3" />
-												)}
-											</button>
-										</div>
+													{copiedActionKey === ALL_COMMENTS_COPY_ACTION_KEY ? (
+														<LuCheck className="size-3" />
+													) : (
+														<LuCopy className="size-3" />
+													)}
+													<span>{copyAllCommentsLabel}</span>
+												</button>
+											),
+										})
+									: null}
+								{resolvedComments.length > 0 ? (
+									<div className="pt-1">
+										{renderCommentSection({
+											title: "Resolved",
+											comments: resolvedComments,
+											isOpen: resolvedCommentsGroupOpen,
+											onOpenChange: setResolvedCommentsGroupOpen,
+										})}
 									</div>
-								);
-							})
+								) : null}
+							</>
 						)}
 					</div>
 				</CollapsibleContent>

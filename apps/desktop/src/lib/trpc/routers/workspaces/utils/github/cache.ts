@@ -1,4 +1,9 @@
 import type { GitHubStatus, PullRequestComment } from "@superset/local-db";
+import {
+	type CachedResourceReadOptions,
+	type CacheState,
+	createCachedResource,
+} from "./cached-resource";
 import type { RepoContext } from "./types";
 
 const GITHUB_STATUS_CACHE_TTL_MS = 10_000;
@@ -9,105 +14,49 @@ const MAX_GITHUB_STATUS_CACHE_ENTRIES = 256;
 const MAX_GITHUB_PR_COMMENTS_CACHE_ENTRIES = 512;
 const MAX_GITHUB_REPO_CONTEXT_CACHE_ENTRIES = 256;
 
-interface CacheEntry<T> {
-	value: T;
-	expiresAt: number;
-}
+const githubStatusResource = createCachedResource<GitHubStatus | null>({
+	ttlMs: GITHUB_STATUS_CACHE_TTL_MS,
+	maxEntries: MAX_GITHUB_STATUS_CACHE_ENTRIES,
+});
 
-const githubStatusCache = new Map<string, CacheEntry<GitHubStatus>>();
-const githubStatusInFlight = new Map<string, Promise<GitHubStatus | null>>();
+const pullRequestCommentsResource = createCachedResource<PullRequestComment[]>({
+	ttlMs: GITHUB_PR_COMMENTS_CACHE_TTL_MS,
+	maxEntries: MAX_GITHUB_PR_COMMENTS_CACHE_ENTRIES,
+});
 
-const pullRequestCommentsCache = new Map<
-	string,
-	CacheEntry<PullRequestComment[]>
->();
-const pullRequestCommentsInFlight = new Map<
-	string,
-	Promise<PullRequestComment[]>
->();
-
-const repoContextCache = new Map<string, CacheEntry<RepoContext>>();
-const repoContextInFlight = new Map<string, Promise<RepoContext | null>>();
-
-function getCachedValue<T>(
-	cache: Map<string, CacheEntry<T>>,
-	cacheKey: string,
-): T | null {
-	const cached = cache.get(cacheKey);
-	if (!cached) {
-		return null;
-	}
-
-	if (cached.expiresAt <= Date.now()) {
-		cache.delete(cacheKey);
-		return null;
-	}
-
-	return cached.value;
-}
-
-function setCachedValue<T>(
-	cache: Map<string, CacheEntry<T>>,
-	cacheKey: string,
-	value: T,
-	ttlMs: number,
-	maxEntries: number,
-): void {
-	if (!cache.has(cacheKey) && cache.size >= maxEntries) {
-		cache.clear();
-	}
-
-	cache.set(cacheKey, {
-		value,
-		expiresAt: Date.now() + ttlMs,
-	});
-}
-
-function clearEntriesWithPrefix<T>(
-	cache: Map<string, T>,
-	cacheKeyPrefix: string,
-): void {
-	for (const cacheKey of cache.keys()) {
-		if (cacheKey.startsWith(cacheKeyPrefix)) {
-			cache.delete(cacheKey);
-		}
-	}
-}
+const repoContextResource = createCachedResource<RepoContext | null>({
+	ttlMs: GITHUB_REPO_CONTEXT_CACHE_TTL_MS,
+	maxEntries: MAX_GITHUB_REPO_CONTEXT_CACHE_ENTRIES,
+});
 
 export function getCachedGitHubStatus(
 	worktreePath: string,
 ): GitHubStatus | null {
-	return getCachedValue(githubStatusCache, worktreePath);
+	return githubStatusResource.get(worktreePath);
+}
+
+export function getCachedGitHubStatusState(
+	worktreePath: string,
+): CacheState<GitHubStatus | null> | null {
+	return githubStatusResource.getState(worktreePath);
 }
 
 export function setCachedGitHubStatus(
 	worktreePath: string,
 	value: GitHubStatus,
 ): void {
-	setCachedValue(
-		githubStatusCache,
-		worktreePath,
-		value,
-		GITHUB_STATUS_CACHE_TTL_MS,
-		MAX_GITHUB_STATUS_CACHE_ENTRIES,
-	);
+	githubStatusResource.set(worktreePath, value);
 }
 
-export function getInFlightGitHubStatus(
+export function readCachedGitHubStatus(
 	worktreePath: string,
-): Promise<GitHubStatus | null> | null {
-	return githubStatusInFlight.get(worktreePath) ?? null;
-}
-
-export function setInFlightGitHubStatus(
-	worktreePath: string,
-	promise: Promise<GitHubStatus | null>,
-): void {
-	githubStatusInFlight.set(worktreePath, promise);
-}
-
-export function clearInFlightGitHubStatus(worktreePath: string): void {
-	githubStatusInFlight.delete(worktreePath);
+	load: () => Promise<GitHubStatus | null>,
+	options?: CachedResourceReadOptions<GitHubStatus | null>,
+): Promise<GitHubStatus | null> {
+	return githubStatusResource.read(worktreePath, load, {
+		...options,
+		shouldCache: options?.shouldCache ?? ((value) => value !== null),
+	});
 }
 
 export function makePullRequestCommentsCachePrefix(
@@ -131,80 +80,62 @@ export function makePullRequestCommentsCacheKey({
 export function getCachedPullRequestComments(
 	cacheKey: string,
 ): PullRequestComment[] | null {
-	return getCachedValue(pullRequestCommentsCache, cacheKey);
+	return pullRequestCommentsResource.get(cacheKey);
+}
+
+export function getCachedPullRequestCommentsState(
+	cacheKey: string,
+): CacheState<PullRequestComment[]> | null {
+	return pullRequestCommentsResource.getState(cacheKey);
 }
 
 export function setCachedPullRequestComments(
 	cacheKey: string,
 	value: PullRequestComment[],
 ): void {
-	setCachedValue(
-		pullRequestCommentsCache,
-		cacheKey,
-		value,
-		GITHUB_PR_COMMENTS_CACHE_TTL_MS,
-		MAX_GITHUB_PR_COMMENTS_CACHE_ENTRIES,
-	);
+	pullRequestCommentsResource.set(cacheKey, value);
 }
 
-export function getInFlightPullRequestComments(
+export function readCachedPullRequestComments(
 	cacheKey: string,
-): Promise<PullRequestComment[]> | null {
-	return pullRequestCommentsInFlight.get(cacheKey) ?? null;
-}
-
-export function setInFlightPullRequestComments(
-	cacheKey: string,
-	promise: Promise<PullRequestComment[]>,
-): void {
-	pullRequestCommentsInFlight.set(cacheKey, promise);
-}
-
-export function clearInFlightPullRequestComments(cacheKey: string): void {
-	pullRequestCommentsInFlight.delete(cacheKey);
+	load: () => Promise<PullRequestComment[]>,
+	options?: CachedResourceReadOptions<PullRequestComment[]>,
+): Promise<PullRequestComment[]> {
+	return pullRequestCommentsResource.read(cacheKey, load, options);
 }
 
 export function getCachedRepoContext(worktreePath: string): RepoContext | null {
-	return getCachedValue(repoContextCache, worktreePath);
+	return repoContextResource.get(worktreePath);
+}
+
+export function getCachedRepoContextState(
+	worktreePath: string,
+): CacheState<RepoContext | null> | null {
+	return repoContextResource.getState(worktreePath);
 }
 
 export function setCachedRepoContext(
 	worktreePath: string,
 	value: RepoContext,
 ): void {
-	setCachedValue(
-		repoContextCache,
-		worktreePath,
-		value,
-		GITHUB_REPO_CONTEXT_CACHE_TTL_MS,
-		MAX_GITHUB_REPO_CONTEXT_CACHE_ENTRIES,
-	);
+	repoContextResource.set(worktreePath, value);
 }
 
-export function getInFlightRepoContext(
+export function readCachedRepoContext(
 	worktreePath: string,
-): Promise<RepoContext | null> | null {
-	return repoContextInFlight.get(worktreePath) ?? null;
-}
-
-export function setInFlightRepoContext(
-	worktreePath: string,
-	promise: Promise<RepoContext | null>,
-): void {
-	repoContextInFlight.set(worktreePath, promise);
-}
-
-export function clearInFlightRepoContext(worktreePath: string): void {
-	repoContextInFlight.delete(worktreePath);
+	load: () => Promise<RepoContext | null>,
+	options?: CachedResourceReadOptions<RepoContext | null>,
+): Promise<RepoContext | null> {
+	return repoContextResource.read(worktreePath, load, {
+		...options,
+		shouldCache: options?.shouldCache ?? ((value) => value !== null),
+	});
 }
 
 export function clearGitHubCachesForWorktree(worktreePath: string): void {
-	githubStatusCache.delete(worktreePath);
-	githubStatusInFlight.delete(worktreePath);
-	repoContextCache.delete(worktreePath);
-	repoContextInFlight.delete(worktreePath);
-
-	const commentsCachePrefix = makePullRequestCommentsCachePrefix(worktreePath);
-	clearEntriesWithPrefix(pullRequestCommentsCache, commentsCachePrefix);
-	clearEntriesWithPrefix(pullRequestCommentsInFlight, commentsCachePrefix);
+	githubStatusResource.invalidate(worktreePath);
+	repoContextResource.invalidate(worktreePath);
+	pullRequestCommentsResource.invalidatePrefix(
+		makePullRequestCommentsCachePrefix(worktreePath),
+	);
 }
