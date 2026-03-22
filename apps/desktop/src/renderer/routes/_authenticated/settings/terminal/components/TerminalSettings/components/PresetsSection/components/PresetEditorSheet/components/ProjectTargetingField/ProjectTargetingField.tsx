@@ -1,4 +1,3 @@
-import { Badge } from "@superset/ui/badge";
 import { Button } from "@superset/ui/button";
 import {
 	Command,
@@ -33,6 +32,10 @@ export function ProjectTargetingField({
 	onChange,
 }: ProjectTargetingFieldProps) {
 	const [open, setOpen] = useState(false);
+	const radioItemClassName =
+		"border-border bg-transparent text-foreground shadow-none dark:bg-transparent data-[state=checked]:border-foreground data-[state=checked]:bg-transparent data-[state=checked]:text-foreground dark:data-[state=checked]:bg-transparent focus-visible:border-foreground/30 focus-visible:ring-2 focus-visible:ring-foreground/10 [&_svg]:fill-current";
+	const triggerButtonClassName =
+		"h-9 w-full justify-between border-border/70 bg-transparent shadow-none hover:bg-accent/40 focus-visible:border-foreground/30 focus-visible:ring-2 focus-visible:ring-foreground/10 dark:bg-transparent";
 	const projectOptionsById = useMemo(
 		() => new Map(projects.map((project) => [project.id, project])),
 		[projects],
@@ -87,9 +90,17 @@ export function ProjectTargetingField({
 
 	return (
 		<div className="space-y-3">
-			<RadioGroup value={appliesToValue} onValueChange={handleAppliesToChange}>
+			<RadioGroup
+				value={appliesToValue}
+				onValueChange={handleAppliesToChange}
+				className="gap-4"
+			>
 				<div className="flex items-start gap-2">
-					<RadioGroupItem value="all" id="preset-project-scope-all" />
+					<RadioGroupItem
+						value="all"
+						id="preset-project-scope-all"
+						className={radioItemClassName}
+					/>
 					<div className="space-y-0.5">
 						<label
 							htmlFor="preset-project-scope-all"
@@ -107,8 +118,9 @@ export function ProjectTargetingField({
 						value="projects"
 						id="preset-project-scope-specific"
 						disabled={projects.length === 0}
+						className={radioItemClassName}
 					/>
-					<div className="min-w-0 flex-1 space-y-2">
+					<div className="min-w-0 flex-1 space-y-2.5">
 						<div className="space-y-0.5">
 							<label
 								htmlFor="preset-project-scope-specific"
@@ -128,7 +140,7 @@ export function ProjectTargetingField({
 										<Button
 											type="button"
 											variant="outline"
-											className="w-full justify-between"
+											className={triggerButtonClassName}
 											disabled={projects.length === 0}
 										>
 											<span className="truncate">{buttonLabel}</span>
@@ -176,17 +188,10 @@ export function ProjectTargetingField({
 								</Popover>
 
 								{selectedProjects.length > 0 ? (
-									<div className="flex flex-wrap gap-1.5">
-										{selectedProjects.map((project) => (
-											<Badge key={project.id} variant="outline">
-												<span
-													className="size-1.5 rounded-full"
-													style={{ backgroundColor: project.color }}
-												/>
-												{project.name}
-											</Badge>
-										))}
-									</div>
+									<p className="text-xs text-muted-foreground">
+										{selectedProjects.length} project
+										{selectedProjects.length === 1 ? "" : "s"} selected.
+									</p>
 								) : (
 									<p className="text-xs text-muted-foreground">
 										Choose one or more projects.
