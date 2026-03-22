@@ -48,6 +48,7 @@ export function OpenInButton({
 		{ projectId: projectId as string },
 		{ enabled: !!projectId },
 	);
+	const resolvedApp: ExternalApp = defaultApp ?? "cursor";
 
 	const openInApp = electronTrpc.external.openInApp.useMutation({
 		onSuccess: () => {
@@ -58,7 +59,7 @@ export function OpenInButton({
 	});
 	const { copyToClipboard } = useCopyToClipboard();
 
-	const currentApp = defaultApp ? (getAppOption(defaultApp) ?? null) : null;
+	const currentApp = getAppOption(resolvedApp) ?? null;
 
 	const isDark = activeTheme?.type === "dark";
 	const currentAppIcon = currentApp?.[isDark ? "darkIcon" : "lightIcon"];
@@ -75,8 +76,8 @@ export function OpenInButton({
 	};
 
 	const handleOpenLastUsed = () => {
-		if (!path || !defaultApp) return;
-		openInApp.mutate({ path, app: defaultApp, projectId });
+		if (!path) return;
+		openInApp.mutate({ path, app: resolvedApp, projectId });
 	};
 
 	return (
@@ -121,11 +122,11 @@ export function OpenInButton({
 				<DropdownMenuContent align="end" className="w-48">
 					<OpenInExternalDropdownItems
 						isDark={isDark}
-						activeApp={defaultApp ?? undefined}
+						activeApp={resolvedApp}
 						onOpenIn={handleOpenIn}
 						onCopyPath={handleCopyPath}
 						renderAppTrailing={(appId, group) => {
-							if (appId !== defaultApp) return null;
+							if (appId !== resolvedApp) return null;
 							if (group === "vscode") {
 								if (!showShortcuts) return null;
 								return (
