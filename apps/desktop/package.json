@@ -85,6 +85,7 @@
 		"@superset/host-service": "workspace:*",
 		"@superset/local-db": "workspace:*",
 		"@superset/macos-process-metrics": "workspace:*",
+		"@superset/pane-layout": "workspace:*",
 		"@superset/shared": "workspace:*",
 		"@superset/trpc": "workspace:*",
 		"@superset/ui": "workspace:*",
