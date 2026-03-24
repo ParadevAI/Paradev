@@ -231,7 +231,7 @@ export const auth = betterAuth({
 			invitationExpiresIn: 60 * 60 * 24 * 7,
 			sendInvitationEmail: async (data) => {
 				const token = await generateMagicTokenForInvite({
-					email: data.email,
+					invitationId: data.id,
 				});
 
 				const inviteLink = `${env.NEXT_PUBLIC_WEB_URL}/accept-invitation/${data.id}?token=${token}`;
