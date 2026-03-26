@@ -296,22 +296,17 @@ export const createGitStatusProcedures = () => {
 					return [];
 				}
 
-				const allWorktrees = await listExternalWorktrees(project.mainRepoPath);
+				const externalWorktrees = await listExternalWorktrees(
+					project.mainRepoPath,
+					input.projectId,
+				);
 
-				const trackedWorktrees = localDb
-					.select({ path: worktrees.path })
-					.from(worktrees)
-					.where(eq(worktrees.projectId, input.projectId))
-					.all();
-				const trackedPaths = new Set(trackedWorktrees.map((wt) => wt.path));
-
-				return allWorktrees
+				return externalWorktrees
 					.filter((wt) => {
 						if (wt.path === project.mainRepoPath) return false;
 						if (wt.isBare) return false;
 						if (wt.isDetached) return false;
 						if (!wt.branch) return false;
-						if (trackedPaths.has(wt.path)) return false;
 						return true;
 					})
 					.map((wt) => ({

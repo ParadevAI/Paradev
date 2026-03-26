@@ -110,7 +110,10 @@ export async function createWorkspaceFromExternalWorktree({
 	}
 
 	// Check for external worktree (exists on disk but not tracked in DB)
-	const externalWorktrees = await listExternalWorktrees(project.mainRepoPath);
+	const externalWorktrees = await listExternalWorktrees(
+		project.mainRepoPath,
+		projectId,
+	);
 
 	// Filter candidates: exclude main repo, bare, and detached
 	const candidates = externalWorktrees.filter(
