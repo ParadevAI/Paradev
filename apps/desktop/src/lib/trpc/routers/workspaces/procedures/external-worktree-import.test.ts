@@ -112,18 +112,18 @@ describe("External worktree detection and import", () => {
 		expect(worktreeList).toContain("feature-external");
 	});
 
-	test("listAllGitWorktrees detects all git worktrees", async () => {
+	test("listExternalWorktrees detects external worktree", async () => {
 		// Create external worktree
 		createExternalWorktree(mainRepoPath, "feature-test", externalWorktreePath);
 
-		// Import the listAllGitWorktrees function
-		const { listAllGitWorktrees } = await import("../utils/git");
+		// Import the listExternalWorktrees function
+		const { listExternalWorktrees } = await import("../utils/git");
 
-		// List all git worktrees
-		const allWorktrees = await listAllGitWorktrees(mainRepoPath);
+		// List external worktrees
+		const externalWorktrees = await listExternalWorktrees(mainRepoPath);
 
 		// Find our external worktree
-		const found = allWorktrees.find((wt) => wt.branch === "feature-test");
+		const found = externalWorktrees.find((wt) => wt.branch === "feature-test");
 
 		expect(found).toBeDefined();
 		expect(found?.path).toBe(externalWorktreePath);
