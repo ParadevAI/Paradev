@@ -110,7 +110,7 @@
     },
     "apps/desktop": {
       "name": "@superset/desktop",
-      "version": "1.4.0",
+      "version": "1.4.3",
       "dependencies": {
         "@ai-sdk/anthropic": "^3.0.43",
         "@ai-sdk/openai": "3.0.36",
@@ -778,10 +778,6 @@
       "peerDependencies": {
         "react": "19.2.0",
       },
-    },
-    "packages/scripts": {
-      "name": "@superset/scripts",
-      "version": "0.1.0",
     },
     "packages/shared": {
       "name": "@superset/shared",
@@ -2341,8 +2337,6 @@
     "@superset/mobile": ["@superset/mobile@workspace:apps/mobile"],
 
     "@superset/pane-layout": ["@superset/pane-layout@workspace:packages/pane-layout"],
-
-    "@superset/scripts": ["@superset/scripts@workspace:packages/scripts"],
 
     "@superset/shared": ["@superset/shared@workspace:packages/shared"],
 
