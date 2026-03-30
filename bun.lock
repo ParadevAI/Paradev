@@ -110,7 +110,11 @@
     },
     "apps/desktop": {
       "name": "@superset/desktop",
+<<<<<<< HEAD
+      "version": "1.4.0",
+=======
       "version": "1.4.4",
+>>>>>>> origin
       "dependencies": {
         "@ai-sdk/anthropic": "^3.0.43",
         "@ai-sdk/openai": "3.0.36",
