@@ -56,6 +56,7 @@ mock.module("node:os", () => ({
 }));
 
 const {
+	createAmpWrapper,
 	buildCodexWrapperExecLine,
 	buildCopilotWrapperExecLine,
 	buildWrapperScript,
@@ -257,6 +258,17 @@ exit 0
 
 		expect(wrapper).toContain("# Superset wrapper for mastracode");
 		expect(wrapper).toContain('REAL_BIN="$(find_real_binary "mastracode")"');
+		expect(wrapper).toContain('exec "$REAL_BIN" "$@"');
+	});
+
+	it("creates amp wrapper passthrough", () => {
+		createAmpWrapper();
+
+		const wrapperPath = path.join(TEST_BIN_DIR, "amp");
+		const wrapper = readFileSync(wrapperPath, "utf-8");
+
+		expect(wrapper).toContain("# Superset wrapper for amp");
+		expect(wrapper).toContain('REAL_BIN="$(find_real_binary "amp")"');
 		expect(wrapper).toContain('exec "$REAL_BIN" "$@"');
 	});
 

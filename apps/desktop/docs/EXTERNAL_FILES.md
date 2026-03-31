@@ -17,6 +17,7 @@ This separation prevents multiple instances from interfering with each other.
 
 | File | Purpose |
 |------|---------|
+| `amp` | Wrapper for Amp CLI that preserves Superset terminal context |
 | `claude` | Wrapper for Claude Code CLI that injects notification hooks |
 | `codex` | Wrapper for Codex CLI that injects notification hooks |
 | `droid` | Wrapper for Factory Droid CLI that preserves Superset hook integration |
