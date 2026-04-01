@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import type { WorkspaceState } from "../../types";
+import type { Tab, WorkspaceState } from "../../types";
 import type { CreatePaneInput } from "./store";
 import { createWorkspaceStore } from "./store";
 
@@ -574,6 +574,148 @@ describe("openPane", () => {
 		if (layout?.type === "split") {
 			expect(layout.children).toHaveLength(2);
 		}
+	});
+});
+
+describe("movePaneToSplit", () => {
+	it("moves a pane within the same tab", () => {
+		const store = makeStore({
+			version: 1,
+			tabs: [
+				{
+					id: "t1",
+					createdAt: Date.now(),
+					activePaneId: "p1",
+					layout: {
+						type: "split",
+						id: "s1",
+						direction: "horizontal",
+						children: [
+							{ type: "pane", paneId: "p1" },
+							{ type: "pane", paneId: "p2" },
+						],
+						weights: [1, 1],
+					},
+					panes: {
+						p1: { id: "p1", kind: "test", data: { label: "p1" } },
+						p2: { id: "p2", kind: "test", data: { label: "p2" } },
+					},
+				},
+			],
+			activeTabId: "t1",
+		});
+
+		store.getState().movePaneToSplit({
+			sourcePaneId: "p1",
+			targetPaneId: "p2",
+			position: "bottom",
+		});
+
+		const tab = store.getState().tabs[0];
+		expect(tab).toBeDefined();
+		// p1 should now be split below p2
+		expect(tab?.panes.p1).toBeDefined();
+		expect(tab?.panes.p2).toBeDefined();
+		expect(tab?.activePaneId).toBe("p1");
+	});
+
+	it("moves a pane across tabs", () => {
+		const store = makeStore({
+			version: 1,
+			tabs: [
+				{
+					id: "t1",
+					createdAt: Date.now(),
+					activePaneId: "p1",
+					layout: {
+						type: "split",
+						id: "s1",
+						direction: "horizontal",
+						children: [
+							{ type: "pane", paneId: "p1" },
+							{ type: "pane", paneId: "p2" },
+						],
+						weights: [1, 1],
+					},
+					panes: {
+						p1: { id: "p1", kind: "test", data: { label: "p1" } },
+						p2: { id: "p2", kind: "test", data: { label: "p2" } },
+					},
+				},
+				{
+					id: "t2",
+					createdAt: Date.now(),
+					activePaneId: "p3",
+					layout: { type: "pane", paneId: "p3" },
+					panes: {
+						p3: { id: "p3", kind: "test", data: { label: "p3" } },
+					},
+				},
+			],
+			activeTabId: "t1",
+		});
+
+		store.getState().movePaneToSplit({
+			sourcePaneId: "p1",
+			targetPaneId: "p3",
+			position: "right",
+		});
+
+		// Source tab should have p2 only
+		const t1 = store.getState().tabs.find((t) => t.id === "t1");
+		expect(t1?.panes.p1).toBeUndefined();
+		expect(t1?.layout).toEqual({ type: "pane", paneId: "p2" });
+
+		// Target tab should have p3 + p1
+		const t2 = store.getState().tabs.find((t) => t.id === "t2");
+		expect(t2?.panes.p1).toBeDefined();
+		expect(t2?.panes.p3).toBeDefined();
+		expect(t2?.activePaneId).toBe("p1");
+		expect(store.getState().activeTabId).toBe("t2");
+	});
+
+	it("removes source tab when last pane is moved out", () => {
+		const store = makeStore();
+		store.getState().addTab({ id: "t1", panes: [tp("p1")] });
+		store.getState().addTab({ id: "t2", panes: [tp("p2")] });
+
+		const tab1 = store.getState().tabs[0] as Tab<TestData>;
+		const tab2 = store.getState().tabs[1] as Tab<TestData>;
+		const p1Id = Object.keys(tab1.panes)[0] as string;
+		const p2Id = Object.keys(tab2.panes)[0] as string;
+
+		store.getState().movePaneToSplit({
+			sourcePaneId: p1Id,
+			targetPaneId: p2Id,
+			position: "right",
+		});
+
+		expect(store.getState().tabs).toHaveLength(1);
+	});
+
+	it("is a no-op when dropping on self", () => {
+		const store = makeStore();
+		store.getState().addTab({ id: "t1", panes: [tp("p1")] });
+
+		const tab0 = store.getState().tabs[0] as Tab<TestData>;
+		const p1Id = Object.keys(tab0.panes)[0] as string;
+		const before = structuredClone({
+			version: store.getState().version,
+			tabs: store.getState().tabs,
+			activeTabId: store.getState().activeTabId,
+		});
+
+		store.getState().movePaneToSplit({
+			sourcePaneId: p1Id,
+			targetPaneId: p1Id,
+			position: "right",
+		});
+
+		expect({
+			version: store.getState().version,
+			tabs: store.getState().tabs,
+			activeTabId: store.getState().activeTabId,
+		}).toEqual(before);
 	});
 });
 
