@@ -10,13 +10,16 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { PencilIcon, XIcon } from "lucide-react";
 import { type ReactNode, useCallback, useRef, useState } from "react";
-import { useDrop } from "react-dnd";
+import { useDrag, useDrop } from "react-dnd";
 import type { Tab } from "../../../../../../../types";
 import { PANE_DRAG_TYPE } from "../../../Tab/components/Pane/components/PaneHeader";
 import { TabRenameInput } from "./components/TabRenameInput";
 
+export const TAB_DRAG_TYPE = "tab";
+
 interface TabItemProps<TData> {
 	tab: Tab<TData>;
+	index: number;
 	isActive: boolean;
 	onSelect: () => void;
 	onClose: () => void;
@@ -29,6 +32,7 @@ interface TabItemProps<TData> {
 
 export function TabItem<TData>({
 	tab,
+	index,
 	isActive,
 	onSelect,
 	onClose,
@@ -59,7 +63,21 @@ export function TabItem<TData>({
 		stopEditing();
 	};
 
-	const [{ isOver }, connectDrop] = useDrop(
+	const nodeRef = useRef<HTMLDivElement>(null);
+
+	const [{ isDragging }, connectDrag] = useDrag(
+		() => ({
+			type: TAB_DRAG_TYPE,
+			item: { tabId: tab.id, index },
+			collect: (monitor) => ({
+				isDragging: monitor.isDragging(),
+			}),
+		}),
+		[tab.id, index],
+	);
+
+	// Existing pane-to-tab drop (hovering a pane over a tab switches to it)
+	const [{ isOver: isPaneOver }, connectPaneDrop] = useDrop(
 		() => ({
 			accept: PANE_DRAG_TYPE,
 			hover: () => {
@@ -72,24 +90,27 @@ export function TabItem<TData>({
 		[isActive, onSelect],
 	);
 
-	const nodeRef = useRef<HTMLDivElement>(null);
-	const setDropRef = useCallback(
+	const setRef = useCallback(
 		(node: HTMLDivElement | null) => {
 			(nodeRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
-			connectDrop(node);
+			connectDrag(node);
+			connectPaneDrop(node);
 		},
-		[connectDrop],
+		[connectDrag, connectPaneDrop],
 	);
 
 	return (
 		<ContextMenu>
 			<ContextMenuTrigger asChild>
+				{/* biome-ignore lint/a11y/noStaticElementInteractions: mousedown selects tab immediately before drag threshold */}
 				<div
-					ref={setDropRef}
+					ref={setRef}
 					className={cn(
 						"group relative flex h-full w-full items-center border-r border-border",
-						isOver && "bg-primary/5",
+						isPaneOver && "bg-primary/5",
+						isDragging && "opacity-30",
 					)}
+					onMouseDown={onSelect}
 				>
 					{isEditing ? (
 						<div className="flex h-full w-full shrink-0 items-center px-2">
@@ -104,7 +125,10 @@ export function TabItem<TData>({
 						</div>
 					) : (
 						<>
-							<Tooltip delayDuration={500}>
+							<Tooltip
+								delayDuration={500}
+								open={isDragging ? false : undefined}
+							>
 								<TooltipTrigger asChild>
 									<button
 										className={cn(

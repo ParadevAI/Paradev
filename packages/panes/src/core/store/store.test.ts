@@ -757,3 +757,69 @@ describe("edge cases", () => {
 		expect(store.getState().activeTabId).toBe("injected");
 	});
 });
+
+describe("reorderTab", () => {
+	it("moves a tab forward", () => {
+		const store = makeStore();
+		store.getState().addTab({ id: "t1", panes: [tp("p1")] });
+		store.getState().addTab({ id: "t2", panes: [tp("p2")] });
+		store.getState().addTab({ id: "t3", panes: [tp("p3")] });
+
+		store.getState().reorderTab({ tabId: "t1", toIndex: 2 });
+
+		expect(store.getState().tabs.map((t) => t.id)).toEqual(["t2", "t3", "t1"]);
+	});
+
+	it("moves a tab backward", () => {
+		const store = makeStore();
+		store.getState().addTab({ id: "t1", panes: [tp("p1")] });
+		store.getState().addTab({ id: "t2", panes: [tp("p2")] });
+		store.getState().addTab({ id: "t3", panes: [tp("p3")] });
+
+		store.getState().reorderTab({ tabId: "t3", toIndex: 0 });
+
+		expect(store.getState().tabs.map((t) => t.id)).toEqual(["t3", "t1", "t2"]);
+	});
+
+	it("is a no-op when moving to same index", () => {
+		const store = makeStore();
+		store.getState().addTab({ id: "t1", panes: [tp("p1")] });
+		store.getState().addTab({ id: "t2", panes: [tp("p2")] });
+
+		const before = store.getState().tabs.map((t) => t.id);
+		store.getState().reorderTab({ tabId: "t1", toIndex: 0 });
+
+		expect(store.getState().tabs.map((t) => t.id)).toEqual(before);
+	});
+
+	it("is a no-op for unknown tabId", () => {
+		const store = makeStore();
+		store.getState().addTab({ id: "t1", panes: [tp("p1")] });
+
+		const before = store.getState().tabs.map((t) => t.id);
+		store.getState().reorderTab({ tabId: "missing", toIndex: 0 });
+
+		expect(store.getState().tabs.map((t) => t.id)).toEqual(before);
+	});
+
+	it("clamps toIndex to valid range", () => {
+		const store = makeStore();
+		store.getState().addTab({ id: "t1", panes: [tp("p1")] });
+		store.getState().addTab({ id: "t2", panes: [tp("p2")] });
+
+		store.getState().reorderTab({ tabId: "t1", toIndex: 100 });
+
+		expect(store.getState().tabs.map((t) => t.id)).toEqual(["t2", "t1"]);
+	});
+
+	it("preserves activeTabId", () => {
+		const store = makeStore();
+		store.getState().addTab({ id: "t1", panes: [tp("p1")] });
+		store.getState().addTab({ id: "t2", panes: [tp("p2")] });
+		store.getState().setActiveTab("t2");
+
+		store.getState().reorderTab({ tabId: "t1", toIndex: 1 });
+
+		expect(store.getState().activeTabId).toBe("t2");
+	});
+});

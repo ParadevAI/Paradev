@@ -58,6 +58,9 @@ export function Workspace<TData>({
 							.getState()
 							.setTabTitleOverride({ tabId, titleOverride: title })
 					}
+					onReorderTab={(tabId, toIndex) =>
+						store.getState().reorderTab({ tabId, toIndex })
+					}
 					getTabTitle={(tab) => tab.titleOverride ?? tab.id}
 					renderAddTabMenu={renderAddTabMenu}
 					renderTabAccessory={renderTabAccessory}

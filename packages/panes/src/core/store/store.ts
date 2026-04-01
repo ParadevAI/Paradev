@@ -145,6 +145,8 @@ export interface WorkspaceStore<TData> extends WorkspaceState<TData> {
 		position: SplitPosition;
 	}) => void;
 
+	reorderTab: (args: { tabId: string; toIndex: number }) => void;
+
 	replaceState: (
 		next:
 			| WorkspaceState<TData>
@@ -706,6 +708,19 @@ export function createWorkspaceStore<TData>(
 					tabs: nextTabs,
 					activeTabId: targetTab.id,
 				};
+			});
+		},
+
+		reorderTab: (args) => {
+			set((s) => {
+				const fromIndex = s.tabs.findIndex((t) => t.id === args.tabId);
+				if (fromIndex === -1) return s;
+				const toIndex = Math.max(0, Math.min(args.toIndex, s.tabs.length - 1));
+				if (fromIndex === toIndex) return s;
+				const nextTabs = [...s.tabs];
+				const [tab] = nextTabs.splice(fromIndex, 1);
+				nextTabs.splice(toIndex, 0, tab!);
+				return { tabs: nextTabs };
 			});
 		},
 
