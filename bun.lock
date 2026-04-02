@@ -932,6 +932,17 @@
       "version": "0.1.0",
     },
   },
+  "trustedDependencies": [
+    "koffi",
+    "sharp",
+    "node-pty",
+    "utf-8-validate",
+    "esbuild",
+    "electron",
+    "better-sqlite3",
+    "bufferutil",
+    "workerd",
+  ],
   "overrides": {
     "axios": "1.14.0",
   },
