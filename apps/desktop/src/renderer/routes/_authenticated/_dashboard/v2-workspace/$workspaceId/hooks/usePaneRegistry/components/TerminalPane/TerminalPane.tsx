@@ -139,7 +139,7 @@ export function TerminalPane({ workspaceId }: WorkspaceTerminalProps) {
 	}, [websocketUrl]);
 
 	return (
-		<div className="w-full rounded-lg border border-border p-4">
+		<div className="w-full p-4">
 			<div className="mb-3 flex items-center justify-between gap-3">
 				<div>
 					<h2 className="text-sm font-medium">terminal</h2>
@@ -161,7 +161,7 @@ export function TerminalPane({ workspaceId }: WorkspaceTerminalProps) {
 			</div>
 			<div
 				ref={containerRef}
-				className="h-[360px] overflow-hidden rounded-md border border-border bg-[#14100f] p-2"
+				className="h-[360px] overflow-hidden bg-[#14100f] p-2"
 			/>
 		</div>
 	);
