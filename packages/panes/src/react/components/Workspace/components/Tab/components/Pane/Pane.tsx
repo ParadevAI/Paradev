@@ -81,8 +81,13 @@ export function Pane<TData>({
 			isActive,
 			store,
 			actions: {
-				close: () =>
-					store.getState().closePane({ tabId: tab.id, paneId: pane.id }),
+				close: async () => {
+					if (definition?.onBeforeClose) {
+						const allowed = await definition.onBeforeClose(pane);
+						if (!allowed) return;
+					}
+					store.getState().closePane({ tabId: tab.id, paneId: pane.id });
+				},
 				focus: () =>
 					store.getState().setActivePane({ tabId: tab.id, paneId: pane.id }),
 				setTitle: (title: string) =>
@@ -93,7 +98,6 @@ export function Pane<TData>({
 					}),
 				pin: () =>
 					store.getState().setPanePinned({
-						tabId: tab.id,
 						paneId: pane.id,
 						pinned: true,
 					}),
@@ -216,6 +220,12 @@ export function Pane<TData>({
 				toolbar={toolbar}
 				actionsContent={<context.components.PaneHeaderActions />}
 				paneId={pane.id}
+				onClick={
+					definition?.onHeaderClick
+						? () => definition.onHeaderClick?.(context)
+						: context.actions.pin
+				}
+				onMiddleClick={context.actions.close}
 			/>
 			<PaneContent>
 				{definition ? (
