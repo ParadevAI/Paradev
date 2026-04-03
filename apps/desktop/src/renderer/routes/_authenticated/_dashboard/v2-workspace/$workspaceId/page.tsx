@@ -63,7 +63,6 @@ function V2WorkspacePage() {
 		<WorkspaceContent
 			projectId={workspace.projectId}
 			workspaceId={workspace.id}
-			workspaceName={workspace.name}
 		/>
 	);
 }
@@ -71,11 +70,9 @@ function V2WorkspacePage() {
 function WorkspaceContent({
 	projectId,
 	workspaceId,
-	workspaceName,
 }: {
 	projectId: string;
 	workspaceId: string;
-	workspaceName: string;
 }) {
 	const { localWorkspaceState, store } = useV2WorkspacePaneLayout({
 		projectId,
@@ -146,14 +143,12 @@ function WorkspaceContent({
 				{
 					kind: "terminal",
 					data: {
-						sessionKey: `${workspaceId}:${crypto.randomUUID()}`,
-						cwd: `/workspace/${workspaceName}`,
-						launchMode: "workspace-shell",
+						terminalId: crypto.randomUUID(),
 					} as TerminalPaneData,
 				},
 			],
 		});
-	}, [store, workspaceId, workspaceName]);
+	}, [store]);
 
 	const addChatTab = useCallback(() => {
 		store.getState().addTab({
@@ -204,9 +199,7 @@ function WorkspaceContent({
 					ctx.actions.split(position, {
 						kind: "terminal",
 						data: {
-							sessionKey: `${workspaceId}:${crypto.randomUUID()}`,
-							cwd: `/workspace/${workspaceName}`,
-							launchMode: "workspace-shell",
+							terminalId: crypto.randomUUID(),
 						} as TerminalPaneData,
 					});
 				},
@@ -220,7 +213,7 @@ function WorkspaceContent({
 				onClick: (ctx) => ctx.actions.close(),
 			},
 		],
-		[workspaceId, workspaceName],
+		[],
 	);
 
 	const collections = useCollections();
