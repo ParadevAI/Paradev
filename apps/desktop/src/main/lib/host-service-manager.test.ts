@@ -31,7 +31,12 @@ class MockChildProcess extends EventEmitter {
 }
 
 const getProcessEnvWithShellPathMock = mock(
-	async (env: Record<string, string>) => env,
+	async (baseEnv?: NodeJS.ProcessEnv): Promise<Record<string, string>> => ({
+		...(baseEnv ? (baseEnv as Record<string, string>) : {}),
+		HOME: "/Users/test",
+		PATH: "/usr/bin:/bin",
+		SHELL: "/bin/zsh",
+	}),
 );
 let lastChild: MockChildProcess | null = null;
 const spawnMock = mock((..._args: unknown[]) => {
@@ -51,12 +56,9 @@ describe("HostServiceManager", () => {
 
 		spyOn(childProcessModule, "spawn").mockImplementation(((..._args) =>
 			spawnMock(..._args)) as typeof childProcessModule.spawn);
-		spyOn(shellEnvModule, "getProcessEnvWithShellPath").mockImplementation(((
-			baseEnv: NodeJS.ProcessEnv = process.env,
-		) =>
-			getProcessEnvWithShellPathMock(
-				baseEnv as Record<string, string>,
-			)) as typeof shellEnvModule.getProcessEnvWithShellPath);
+		spyOn(shellEnvModule, "getProcessEnvWithShellPath").mockImplementation(
+			(baseEnv) => getProcessEnvWithShellPathMock(baseEnv),
+		);
 
 		mock.module("electron", () => ({
 			app: {
@@ -81,7 +83,12 @@ describe("HostServiceManager", () => {
 	beforeEach(() => {
 		getProcessEnvWithShellPathMock.mockReset();
 		getProcessEnvWithShellPathMock.mockImplementation(
-			async (env: Record<string, string>) => env,
+			async (baseEnv?: NodeJS.ProcessEnv) => ({
+				...(baseEnv ? (baseEnv as Record<string, string>) : {}),
+				HOME: "/Users/test",
+				PATH: "/usr/bin:/bin",
+				SHELL: "/bin/zsh",
+			}),
 		);
 		spawnMock.mockReset();
 		spawnMock.mockImplementation(() => {
@@ -91,7 +98,7 @@ describe("HostServiceManager", () => {
 		lastChild = null;
 	});
 
-	it("dedupes concurrent starts while shell PATH is resolving", async () => {
+	it("dedupes concurrent starts while shell env is resolving", async () => {
 		const manager = new HostServiceManager();
 		const pendingEnv = createDeferred<Record<string, string>>();
 		getProcessEnvWithShellPathMock.mockImplementation(() => pendingEnv.promise);
@@ -101,11 +108,14 @@ describe("HostServiceManager", () => {
 
 		expect(manager.getStatus("org-1")).toBe("starting");
 
-		// Flush microtasks so tryAdopt completes (no manifest → falls through to spawn)
 		await new Promise((resolve) => setTimeout(resolve, 0));
 		expect(getProcessEnvWithShellPathMock.mock.calls).toHaveLength(1);
 
-		pendingEnv.resolve({ PATH: "/usr/bin:/bin" });
+		pendingEnv.resolve({
+			HOME: "/Users/test",
+			PATH: "/usr/bin:/bin",
+			SHELL: "/bin/zsh",
+		});
 		await new Promise((resolve) => setTimeout(resolve, 0));
 
 		expect(spawnMock.mock.calls).toHaveLength(1);
@@ -119,6 +129,53 @@ describe("HostServiceManager", () => {
 		expect(await firstStart).toBe(4242);
 		expect(await secondStart).toBe(4242);
 		expect(manager.getPort("org-1")).toBe(4242);
+	});
+
+	it("spawns host-service from shell-path env plus explicit service keys", async () => {
+		const manager = new HostServiceManager();
+		manager.setAuthToken("auth-token");
+		manager.setCloudApiUrl("https://api.example.com");
+
+		const originalValues = {
+			__HOST_SERVICE_RUNTIME_ENV_TEST__:
+				process.env.__HOST_SERVICE_RUNTIME_ENV_TEST__,
+		};
+		process.env.__HOST_SERVICE_RUNTIME_ENV_TEST__ = "desktop-runtime";
+
+		try {
+			const startPromise = manager.start("org-1");
+			await new Promise((resolve) => setTimeout(resolve, 0));
+
+			const spawnOptions = spawnMock.mock.calls[0]?.[2] as
+				| { env?: Record<string, string> }
+				| undefined;
+			const env = spawnOptions?.env;
+
+			expect(env).toBeDefined();
+			expect(env).toMatchObject({
+				HOME: "/Users/test",
+				PATH: "/usr/bin:/bin",
+				SHELL: "/bin/zsh",
+				__HOST_SERVICE_RUNTIME_ENV_TEST__: "desktop-runtime",
+				AUTH_TOKEN: "auth-token",
+				CLOUD_API_URL: "https://api.example.com",
+				ELECTRON_RUN_AS_NODE: "1",
+				SUPERSET_AGENT_HOOK_VERSION: expect.any(String),
+				SUPERSET_HOME_DIR: expect.any(String),
+			});
+			expect(env?.HOST_SERVICE_SECRET).toEqual(expect.any(String));
+			expect(env?.HOST_DB_PATH).toEqual(expect.any(String));
+
+			lastChild?.emit("message", { type: "ready", port: 4001 });
+			await startPromise;
+		} finally {
+			if (originalValues.__HOST_SERVICE_RUNTIME_ENV_TEST__ !== undefined) {
+				process.env.__HOST_SERVICE_RUNTIME_ENV_TEST__ =
+					originalValues.__HOST_SERVICE_RUNTIME_ENV_TEST__;
+			} else {
+				delete process.env.__HOST_SERVICE_RUNTIME_ENV_TEST__;
+			}
+		}
 	});
 
 	it("stopAll() kills all instances", async () => {

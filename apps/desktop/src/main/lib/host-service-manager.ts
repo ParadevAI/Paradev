@@ -4,7 +4,9 @@ import { randomBytes } from "node:crypto";
 import { EventEmitter } from "node:events";
 import path from "node:path";
 import { app } from "electron";
+import { env as sharedEnv } from "shared/env.shared";
 import { getProcessEnvWithShellPath } from "../../lib/trpc/routers/workspaces/utils/shell-env";
+import { SUPERSET_HOME_DIR } from "./app-environment";
 import { getDeviceName, getHashedDeviceId } from "./device-info";
 import {
 	HOST_SERVICE_PROTOCOL_VERSION,
@@ -15,6 +17,7 @@ import {
 	readManifest,
 	removeManifest,
 } from "./host-service-manifest";
+import { HOOK_PROTOCOL_VERSION } from "./terminal/env";
 
 export type HostServiceStatus =
 	| "starting"
@@ -123,8 +126,10 @@ async function buildHostServiceEnv(
 	secret: string,
 ): Promise<Record<string, string>> {
 	const orgDir = manifestDir(organizationId);
+
 	return getProcessEnvWithShellPath({
 		...(process.env as Record<string, string>),
+		// Host-service runtime keys
 		ELECTRON_RUN_AS_NODE: "1",
 		ORGANIZATION_ID: organizationId,
 		DEVICE_CLIENT_ID: getHashedDeviceId(),
@@ -137,6 +142,10 @@ async function buildHostServiceEnv(
 		HOST_MIGRATIONS_PATH: app.isPackaged
 			? path.join(process.resourcesPath, "resources/host-migrations")
 			: path.join(app.getAppPath(), "../../packages/host-service/drizzle"),
+		DESKTOP_VITE_PORT: String(sharedEnv.DESKTOP_VITE_PORT),
+		SUPERSET_HOME_DIR: SUPERSET_HOME_DIR,
+		SUPERSET_AGENT_HOOK_PORT: String(sharedEnv.DESKTOP_NOTIFICATIONS_PORT),
+		SUPERSET_AGENT_HOOK_VERSION: HOOK_PROTOCOL_VERSION,
 	});
 }
 

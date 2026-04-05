@@ -1,16 +1,27 @@
 import { existsSync } from "node:fs";
-import { homedir } from "node:os";
 import type { NodeWebSocket } from "@hono/node-ws";
 import { eq } from "drizzle-orm";
 import type { Hono } from "hono";
 import { type IPty, spawn } from "node-pty";
 import type { HostDb } from "../db";
-import { terminalSessions, workspaces } from "../db/schema";
+import { projects, terminalSessions, workspaces } from "../db/schema";
+import {
+	buildV2TerminalEnv,
+	getShellLaunchArgs,
+	getTerminalBaseEnv,
+	resolveLaunchShell,
+} from "./env";
 
 interface RegisterWorkspaceTerminalRouteOptions {
 	app: Hono;
 	db: HostDb;
 	upgradeWebSocket: NodeWebSocket["upgradeWebSocket"];
+}
+
+function parseThemeType(
+	value: string | null | undefined,
+): "dark" | "light" | undefined {
+	return value === "dark" || value === "light" ? value : undefined;
 }
 
 type TerminalClientMessage =
@@ -50,13 +61,6 @@ function sendMessage(
 ) {
 	if (socket.readyState !== 1) return;
 	socket.send(JSON.stringify(message));
-}
-
-function resolveShell(): string {
-	if (process.platform === "win32") {
-		return process.env.COMSPEC || "cmd.exe";
-	}
-	return process.env.SHELL || "/bin/zsh";
 }
 
 function bufferOutput(session: TerminalSession, data: string) {
@@ -102,12 +106,14 @@ function disposeSession(terminalId: string, db: HostDb) {
 interface CreateTerminalSessionOptions {
 	terminalId: string;
 	workspaceId: string;
+	themeType?: "dark" | "light";
 	db: HostDb;
 }
 
 function createTerminalSessionInternal({
 	terminalId,
 	workspaceId,
+	themeType,
 	db,
 }: CreateTerminalSessionOptions): TerminalSession | { error: string } {
 	const existing = sessions.get(terminalId);
@@ -123,22 +129,47 @@ function createTerminalSessionInternal({
 		return { error: "Workspace worktree not found" };
 	}
 
+	// Derive root path from the workspace's project
+	let rootPath = "";
+	const project = db.query.projects
+		.findFirst({ where: eq(projects.id, workspace.projectId) })
+		.sync();
+	if (project?.repoPath) {
+		rootPath = project.repoPath;
+	}
+
 	const cwd = workspace.worktreePath;
+
+	// Use the preserved shell snapshot — never live process.env
+	const baseEnv = getTerminalBaseEnv();
+	const supersetHomeDir = process.env.SUPERSET_HOME_DIR || "";
+	const shell = resolveLaunchShell(baseEnv);
+	const shellArgs = getShellLaunchArgs({ shell, supersetHomeDir });
+	const ptyEnv = buildV2TerminalEnv({
+		baseEnv,
+		shell,
+		supersetHomeDir,
+		themeType,
+		cwd,
+		terminalId,
+		workspaceId,
+		workspacePath: workspace.worktreePath,
+		rootPath,
+		hostServiceVersion: process.env.HOST_SERVICE_VERSION || "unknown",
+		supersetEnv:
+			process.env.NODE_ENV === "development" ? "development" : "production",
+		agentHookPort: process.env.SUPERSET_AGENT_HOOK_PORT || "",
+		agentHookVersion: process.env.SUPERSET_AGENT_HOOK_VERSION || "",
+	});
 
 	let pty: IPty;
 	try {
-		pty = spawn(resolveShell(), [], {
+		pty = spawn(shell, shellArgs, {
 			name: "xterm-256color",
 			cwd,
 			cols: 120,
 			rows: 32,
-			env: {
-				...process.env,
-				TERM: "xterm-256color",
-				COLORTERM: "truecolor",
-				HOME: process.env.HOME || homedir(),
-				PWD: cwd,
-			},
+			env: ptyEnv,
 		});
 	} catch (error) {
 		return {
@@ -210,6 +241,7 @@ export function registerWorkspaceTerminalRoute({
 		const body = await c.req.json<{
 			terminalId: string;
 			workspaceId: string;
+			themeType?: string;
 		}>();
 
 		if (!body.terminalId || !body.workspaceId) {
@@ -219,6 +251,7 @@ export function registerWorkspaceTerminalRoute({
 		const result = createTerminalSessionInternal({
 			terminalId: body.terminalId,
 			workspaceId: body.workspaceId,
+			themeType: parseThemeType(body.themeType),
 			db,
 		});
 
@@ -261,6 +294,7 @@ export function registerWorkspaceTerminalRoute({
 		upgradeWebSocket((c) => {
 			const terminalId = c.req.param("terminalId") ?? "";
 			const workspaceId = c.req.query("workspaceId") ?? null;
+			const themeType = parseThemeType(c.req.query("themeType"));
 
 			return {
 				onOpen: (_event, ws) => {
@@ -304,6 +338,7 @@ export function registerWorkspaceTerminalRoute({
 					const result = createTerminalSessionInternal({
 						terminalId,
 						workspaceId,
+						themeType,
 						db,
 					});
 
