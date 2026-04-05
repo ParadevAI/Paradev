@@ -5,8 +5,8 @@ import { cn } from "@superset/ui/utils";
 import { useMatchRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef } from "react";
 import { HiMiniXMark } from "react-icons/hi2";
-import { HotkeyTooltipContent } from "renderer/components/HotkeyTooltipContent";
 import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
+import { HotkeyLabel } from "renderer/hotkeys";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { useHoverGitHubStatus } from "renderer/lib/githubQueryPolicy";
 import { useWorkspaceDeleteHandler } from "renderer/react-query/workspaces";
@@ -419,9 +419,9 @@ export function WorkspaceListItem({
 												</button>
 											</TooltipTrigger>
 											<TooltipContent side="top" sideOffset={4}>
-												<HotkeyTooltipContent
+												<HotkeyLabel
 													label="Close workspace"
-													hotkeyId={isActive ? "CLOSE_WORKSPACE" : undefined}
+													id={isActive ? "CLOSE_WORKSPACE" : undefined}
 												/>
 											</TooltipContent>
 										</Tooltip>

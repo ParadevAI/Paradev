@@ -16,7 +16,7 @@ import { createIPCHandler } from "trpc-electron/main";
 import { productName } from "~/package.json";
 import { appState } from "../lib/app-state";
 import { browserManager } from "../lib/browser/browser-manager";
-import { createApplicationMenu, registerMenuHotkeyUpdates } from "../lib/menu";
+import { createApplicationMenu } from "../lib/menu";
 import { playNotificationSound } from "../lib/notification-sound";
 import { NotificationManager } from "../lib/notifications/notification-manager";
 import {
@@ -127,7 +127,6 @@ export async function MainWindow() {
 	});
 
 	createApplicationMenu();
-	registerMenuHotkeyUpdates();
 
 	currentWindow = window;
 

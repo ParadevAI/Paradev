@@ -2,16 +2,12 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { useMatchRoute, useNavigate } from "@tanstack/react-router";
 import { LuLayers, LuPlus } from "react-icons/lu";
+import { useHotkeyDisplay } from "renderer/hotkeys";
 import {
 	STROKE_WIDTH,
 	STROKE_WIDTH_THICK,
 } from "renderer/screens/main/components/WorkspaceSidebar/constants";
-import {
-	useEffectiveHotkeysMap,
-	useHotkeysStore,
-} from "renderer/stores/hotkeys";
 import { useOpenNewWorkspaceModal } from "renderer/stores/new-workspace-modal";
-import { formatHotkeyText } from "shared/hotkeys";
 
 interface DashboardSidebarHeaderProps {
 	isCollapsed?: boolean;
@@ -23,9 +19,7 @@ export function DashboardSidebarHeader({
 	const navigate = useNavigate();
 	const matchRoute = useMatchRoute();
 	const openModal = useOpenNewWorkspaceModal();
-	const platform = useHotkeysStore((state) => state.platform);
-	const effective = useEffectiveHotkeysMap();
-	const shortcutText = formatHotkeyText(effective.NEW_WORKSPACE, platform);
+	const shortcutText = useHotkeyDisplay("NEW_WORKSPACE").text;
 	const isWorkspacesPageOpen = !!matchRoute({ to: "/v2-workspaces" });
 
 	const handleWorkspacesClick = () => {

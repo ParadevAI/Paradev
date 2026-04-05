@@ -11,12 +11,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useMemo, useState } from "react";
 import { HiMiniXMark } from "react-icons/hi2";
 import { TbLayoutColumns, TbLayoutRows } from "react-icons/tb";
-import { HotkeyTooltipContent } from "renderer/components/HotkeyTooltipContent";
+import { HotkeyLabel, useHotkey } from "renderer/hotkeys";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { CommandPalette } from "renderer/screens/main/components/CommandPalette";
 import { PresetsBar } from "renderer/screens/main/components/WorkspaceView/ContentView/components/PresetsBar";
-import { useAppHotkey } from "renderer/stores/hotkeys";
 import { useStore } from "zustand";
 import { AddTabMenu } from "./components/AddTabMenu";
 import { WorkspaceEmptyState } from "./components/WorkspaceEmptyState";
@@ -193,9 +192,7 @@ function WorkspaceContent({
 					) : (
 						<TbLayoutColumns className="size-3.5" />
 					),
-				tooltip: (
-					<HotkeyTooltipContent label="Split pane" hotkeyId="SPLIT_AUTO" />
-				),
+				tooltip: <HotkeyLabel label="Split pane" id="SPLIT_AUTO" />,
 				onClick: (ctx) => {
 					const position =
 						ctx.pane.parentDirection === "horizontal" ? "down" : "right";
@@ -210,9 +207,7 @@ function WorkspaceContent({
 			{
 				key: "close",
 				icon: <HiMiniXMark className="size-3.5" />,
-				tooltip: (
-					<HotkeyTooltipContent label="Close pane" hotkeyId="CLOSE_TERMINAL" />
-				),
+				tooltip: <HotkeyLabel label="Close pane" id="CLOSE_TERMINAL" />,
 				onClick: (ctx) => ctx.actions.close(),
 			},
 		],
@@ -228,11 +223,11 @@ function WorkspaceContent({
 		});
 	}, [collections, workspaceId]);
 
-	useAppHotkey("TOGGLE_SIDEBAR", toggleSidebar, undefined, [toggleSidebar]);
-	useAppHotkey("NEW_GROUP", addTerminalTab, undefined, [addTerminalTab]);
-	useAppHotkey("NEW_CHAT", addChatTab, undefined, [addChatTab]);
-	useAppHotkey("NEW_BROWSER", addBrowserTab, undefined, [addBrowserTab]);
-	useAppHotkey("QUICK_OPEN", handleQuickOpen, undefined, [handleQuickOpen]);
+	useHotkey("TOGGLE_SIDEBAR", toggleSidebar);
+	useHotkey("NEW_GROUP", addTerminalTab);
+	useHotkey("NEW_CHAT", addChatTab);
+	useHotkey("NEW_BROWSER", addBrowserTab);
+	useHotkey("QUICK_OPEN", handleQuickOpen);
 
 	return (
 		<>

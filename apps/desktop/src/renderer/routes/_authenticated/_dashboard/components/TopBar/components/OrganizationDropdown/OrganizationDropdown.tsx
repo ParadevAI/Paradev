@@ -27,18 +27,18 @@ import {
 } from "react-icons/hi2";
 import { IoBugOutline } from "react-icons/io5";
 import { LuKeyboard } from "react-icons/lu";
+import { useHotkeyDisplay } from "renderer/hotkeys";
 import { authClient } from "renderer/lib/auth-client";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
-import { useHotkeyText } from "renderer/stores/hotkeys";
 
 export function OrganizationDropdown() {
 	const { data: session } = authClient.useSession();
 	const collections = useCollections();
 	const signOutMutation = electronTrpc.auth.signOut.useMutation();
 	const navigate = useNavigate();
-	const settingsHotkey = useHotkeyText("OPEN_SETTINGS");
-	const shortcutsHotkey = useHotkeyText("SHOW_HOTKEYS");
+	const settingsHotkey = useHotkeyDisplay("OPEN_SETTINGS").text;
+	const shortcutsHotkey = useHotkeyDisplay("SHOW_HOTKEYS").text;
 
 	const activeOrganizationId = session?.session?.activeOrganizationId;
 

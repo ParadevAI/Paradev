@@ -193,6 +193,7 @@
 		"react-dnd-html5-backend": "^16.0.1",
 		"react-dom": "19.2.0",
 		"react-hook-form": "^7.71.1",
+		"react-hotkeys-hook": "^5.2.4",
 		"react-icons": "^5.5.0",
 		"react-markdown": "^10.1.0",
 		"react-mosaic-component": "^6.1.1",
