@@ -1,14 +1,18 @@
 import { Button } from "@superset/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { Search } from "lucide-react";
-import { type ReactNode, useState } from "react";
+import { useMemo, useState } from "react";
 import { FilesTab } from "./components/FilesTab";
 import { SidebarHeader } from "./components/SidebarHeader";
-
-type SidebarTab = "files" | "changes" | "checks";
+import { useChangesTab } from "./hooks/useChangesTab";
+import type { SidebarTabDefinition } from "./types";
 
 interface WorkspaceSidebarProps {
 	onSelectFile: (absolutePath: string) => void;
+	onSelectDiffFile?: (
+		path: string,
+		category: "against-base" | "staged" | "unstaged",
+	) => void;
 	onSearch?: () => void;
 	selectedFilePath?: string;
 	workspaceId: string;
@@ -43,50 +47,60 @@ function IconButton({
 
 export function WorkspaceSidebar({
 	onSelectFile,
+	onSelectDiffFile,
 	onSearch,
 	selectedFilePath,
 	workspaceId,
 	workspaceName,
 }: WorkspaceSidebarProps) {
-	const [activeTab, setActiveTab] = useState<SidebarTab>("files");
+	const [activeTab, setActiveTab] = useState("files");
 
-	const tabActions: Record<SidebarTab, ReactNode> = {
-		files: <IconButton icon={Search} tooltip="Search" onClick={onSearch} />,
-		changes: null,
-		checks: null,
-	};
+	const changesTab = useChangesTab({
+		workspaceId,
+		onSelectFile: onSelectDiffFile,
+	});
 
-	return (
-		<div className="flex h-full min-h-0 flex-col overflow-hidden border-l border-border bg-background">
-			<SidebarHeader
-				tabs={[
-					{ id: "files", label: "All files" },
-					{ id: "changes", label: "Changes" },
-					{ id: "checks", label: "Checks" },
-				]}
-				activeTab={activeTab}
-				onTabChange={(id) => setActiveTab(id as SidebarTab)}
-				actions={tabActions[activeTab]}
-			/>
-
-			<div className={activeTab === "files" ? "min-h-0 flex-1" : "hidden"}>
+	const filesTab: SidebarTabDefinition = useMemo(
+		() => ({
+			id: "files",
+			label: "All files",
+			actions: <IconButton icon={Search} tooltip="Search" onClick={onSearch} />,
+			content: (
 				<FilesTab
 					onSelectFile={onSelectFile}
 					selectedFilePath={selectedFilePath}
 					workspaceId={workspaceId}
 					workspaceName={workspaceName}
 				/>
-			</div>
-			<div className={activeTab === "changes" ? "min-h-0 flex-1" : "hidden"}>
+			),
+		}),
+		[onSearch, onSelectFile, selectedFilePath, workspaceId, workspaceName],
+	);
+
+	const checksTab: SidebarTabDefinition = useMemo(
+		() => ({
+			id: "checks",
+			label: "Checks",
+			content: (
 				<div className="flex h-full items-center justify-center text-sm text-muted-foreground">
 					Coming soon
 				</div>
-			</div>
-			<div className={activeTab === "checks" ? "min-h-0 flex-1" : "hidden"}>
-				<div className="flex h-full items-center justify-center text-sm text-muted-foreground">
-					Coming soon
-				</div>
-			</div>
+			),
+		}),
+		[],
+	);
+
+	const tabs = [filesTab, changesTab, checksTab];
+	const activeTabDef = tabs.find((t) => t.id === activeTab);
+
+	return (
+		<div className="flex h-full min-h-0 flex-col overflow-hidden border-l border-border bg-background">
+			<SidebarHeader
+				tabs={tabs}
+				activeTab={activeTab}
+				onTabChange={setActiveTab}
+			/>
+			<div className="min-h-0 flex-1">{activeTabDef?.content}</div>
 		</div>
 	);
 }

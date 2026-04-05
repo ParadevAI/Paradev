@@ -14,6 +14,19 @@ export const dashboardSidebarProjectSchema = z.object({
 
 const paneWorkspaceStateSchema = z.custom<WorkspaceState<unknown>>();
 
+const changesFilterSchema = z.discriminatedUnion("kind", [
+	z.object({ kind: z.literal("all") }),
+	z.object({ kind: z.literal("uncommitted") }),
+	z.object({ kind: z.literal("commit"), hash: z.string() }),
+	z.object({
+		kind: z.literal("range"),
+		fromHash: z.string(),
+		toHash: z.string(),
+	}),
+]);
+
+export type ChangesFilter = z.infer<typeof changesFilterSchema>;
+
 export const workspaceLocalStateSchema = z.object({
 	workspaceId: z.string().uuid(),
 	createdAt: persistedDateSchema,
@@ -21,6 +34,8 @@ export const workspaceLocalStateSchema = z.object({
 		projectId: z.string().uuid(),
 		tabOrder: z.number().int().default(0),
 		sectionId: z.string().uuid().nullable().default(null),
+		changesFilter: changesFilterSchema.default({ kind: "all" }),
+		baseBranch: z.string().nullable().default(null),
 	}),
 	paneLayout: paneWorkspaceStateSchema,
 	rightSidebarOpen: z.boolean().default(false),
