@@ -190,21 +190,6 @@ app.on("before-quit", async (event) => {
 	const quitMode = pendingQuitMode;
 	pendingQuitMode = null;
 
-	const manager = getHostServiceManager();
-
-	// macOS: close windows & keep tray alive when services should stay running
-	if (
-		PLATFORM.IS_MAC &&
-		(quitMode === null || quitMode === "release") &&
-		manager.hasActiveInstances()
-	) {
-		event.preventDefault();
-		for (const win of BrowserWindow.getAllWindows()) {
-			win.destroy();
-		}
-		return;
-	}
-
 	const isDev = process.env.NODE_ENV === "development";
 	if (quitMode === null && !isDev && getConfirmOnQuitSetting()) {
 		event.preventDefault();
@@ -228,6 +213,7 @@ app.on("before-quit", async (event) => {
 	}
 
 	isQuitting = true;
+	const manager = getHostServiceManager();
 	if (quitMode === "stop") {
 		manager.stopAll();
 	} else {
