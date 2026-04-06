@@ -23,6 +23,28 @@ export function findFirstPaneId(node: LayoutNode): string | null {
 	return findFirstPaneId(node.first) ?? findFirstPaneId(node.second);
 }
 
+export function findSiblingPaneId(
+	node: LayoutNode,
+	paneId: string,
+): string | null {
+	if (node.type === "pane") return null;
+
+	const inFirst = findPaneInLayout(node.first, paneId);
+	const inSecond = findPaneInLayout(node.second, paneId);
+
+	if (inFirst && !inSecond) {
+		// Target is in the first branch — sibling is the nearest pane in second
+		const deeper = findSiblingPaneId(node.first, paneId);
+		return deeper ?? findFirstPaneId(node.second);
+	}
+	if (inSecond && !inFirst) {
+		const deeper = findSiblingPaneId(node.second, paneId);
+		return deeper ?? findFirstPaneId(node.first);
+	}
+
+	return null;
+}
+
 export function removePaneFromLayout(
 	node: LayoutNode,
 	paneId: string,

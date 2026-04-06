@@ -2,6 +2,7 @@ export {
 	equalizeAllSplits,
 	findFirstPaneId,
 	findPaneInLayout,
+	findSiblingPaneId,
 	generateId,
 	getNodeAtPath,
 	getOtherBranch,

@@ -11,6 +11,7 @@ import {
 	equalizeAllSplits,
 	findFirstPaneId,
 	findPaneInLayout,
+	findSiblingPaneId,
 	generateId,
 	positionToDirection,
 	removePaneFromLayout,
@@ -281,7 +282,8 @@ export function createWorkspaceStore<TData>(
 									panes: nextPanes,
 									activePaneId:
 										tab.activePaneId === args.paneId
-											? findFirstPaneId(nextLayout)
+											? (findSiblingPaneId(tab.layout, args.paneId) ??
+												findFirstPaneId(nextLayout))
 											: tab.activePaneId,
 								}
 							: t,
@@ -687,7 +689,8 @@ export function createWorkspaceStore<TData>(
 								panes: nextSourcePanes,
 								activePaneId:
 									t.activePaneId === args.sourcePaneId
-										? findFirstPaneId(nextSourceLayout)
+										? (findSiblingPaneId(sourceTab.layout, args.sourcePaneId) ??
+											findFirstPaneId(nextSourceLayout))
 										: t.activePaneId,
 							};
 						}
@@ -748,7 +751,8 @@ export function createWorkspaceStore<TData>(
 								panes: nextSourcePanes,
 								activePaneId:
 									t.activePaneId === args.paneId
-										? findFirstPaneId(nextSourceLayout)
+										? (findSiblingPaneId(sourceTab.layout, args.paneId) ??
+											findFirstPaneId(nextSourceLayout))
 										: t.activePaneId,
 							};
 						}
@@ -802,7 +806,8 @@ export function createWorkspaceStore<TData>(
 								panes: nextSourcePanes,
 								activePaneId:
 									t.activePaneId === args.paneId
-										? findFirstPaneId(nextSourceLayout)
+										? (findSiblingPaneId(sourceTab.layout, args.paneId) ??
+											findFirstPaneId(nextSourceLayout))
 										: t.activePaneId,
 							};
 						}
