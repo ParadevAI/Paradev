@@ -13,6 +13,7 @@ export function Workspace<TData>({
 	renderAddTabMenu,
 	onBeforeCloseTab,
 	paneActions,
+	contextMenuActions,
 }: WorkspaceProps<TData>) {
 	const tabs = useStore(store, (s) => s.tabs);
 	const activeTabId = useStore(store, (s) => s.activeTabId);
@@ -66,6 +67,7 @@ export function Workspace<TData>({
 					tab={activeTab}
 					registry={registry}
 					paneActions={paneActions}
+					contextMenuActions={contextMenuActions}
 				/>
 			) : (
 				<div className="flex min-h-0 min-w-0 flex-1 items-center justify-center text-sm text-muted-foreground">

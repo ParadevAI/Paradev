@@ -1,7 +1,19 @@
-import type { PaneRegistry, RendererContext } from "@superset/panes";
+import type {
+	ContextMenuActionConfig,
+	PaneRegistry,
+	RendererContext,
+} from "@superset/panes";
 import { alert } from "@superset/ui/atoms/Alert";
 import { Circle, Globe, MessageSquare, TerminalSquare } from "lucide-react";
 import { useMemo } from "react";
+import {
+	LuArrowDownToLine,
+	LuClipboard,
+	LuClipboardCopy,
+	LuEraser,
+} from "react-icons/lu";
+import { useHotkeyDisplay } from "renderer/hotkeys";
+import { terminalRuntimeRegistry } from "renderer/lib/terminal/terminal-runtime-registry";
 import { FileIcon } from "renderer/screens/main/components/WorkspaceView/RightSidebar/FilesView/utils";
 import type {
 	BrowserPaneData,
@@ -9,6 +21,7 @@ import type {
 	DevtoolsPaneData,
 	FilePaneData,
 	PaneViewerData,
+	TerminalPaneData,
 } from "../../types";
 import { ChatPane } from "./components/ChatPane";
 import { FilePane } from "./components/FilePane";
@@ -18,9 +31,16 @@ function getFileName(filePath: string): string {
 	return filePath.split("/").pop() ?? filePath;
 }
 
+const MOD_KEY = navigator.platform.toLowerCase().includes("mac")
+	? "⌘"
+	: "Ctrl+";
+
 export function usePaneRegistry(
 	workspaceId: string,
 ): PaneRegistry<PaneViewerData> {
+	const clearShortcut = useHotkeyDisplay("CLEAR_TERMINAL").text;
+	const scrollToBottomShortcut = useHotkeyDisplay("SCROLL_TO_BOTTOM").text;
+
 	return useMemo<PaneRegistry<PaneViewerData>>(
 		() => ({
 			file: {
@@ -78,6 +98,10 @@ export function usePaneRegistry(
 						});
 					});
 				},
+				contextMenuActions: (_ctx, defaults) =>
+					defaults.map((d) =>
+						d.key === "close-pane" ? { ...d, label: "Close File" } : d,
+					),
 			},
 			terminal: {
 				getIcon: () => <TerminalSquare className="size-4" />,
@@ -85,6 +109,73 @@ export function usePaneRegistry(
 				renderPane: (ctx: RendererContext<PaneViewerData>) => (
 					<TerminalPane ctx={ctx} workspaceId={workspaceId} />
 				),
+				contextMenuActions: (_ctx, defaults) => {
+					const terminalActions: ContextMenuActionConfig<PaneViewerData>[] = [
+						{
+							key: "copy",
+							label: "Copy",
+							icon: <LuClipboardCopy />,
+							shortcut: `${MOD_KEY}C`,
+							disabled: (ctx) => {
+								const { terminalId } = ctx.pane.data as TerminalPaneData;
+								return !terminalRuntimeRegistry.getSelection(terminalId);
+							},
+							onSelect: (ctx) => {
+								const { terminalId } = ctx.pane.data as TerminalPaneData;
+								const text = terminalRuntimeRegistry.getSelection(terminalId);
+								if (text) navigator.clipboard.writeText(text);
+							},
+						},
+						{
+							key: "paste",
+							label: "Paste",
+							icon: <LuClipboard />,
+							shortcut: `${MOD_KEY}V`,
+							onSelect: async (ctx) => {
+								const { terminalId } = ctx.pane.data as TerminalPaneData;
+								try {
+									const text = await navigator.clipboard.readText();
+									if (text) terminalRuntimeRegistry.paste(terminalId, text);
+								} catch {
+									// Clipboard access denied
+								}
+							},
+						},
+						{ key: "sep-terminal-clipboard", type: "separator" },
+						{
+							key: "clear-terminal",
+							label: "Clear Terminal",
+							icon: <LuEraser />,
+							shortcut:
+								clearShortcut !== "Unassigned" ? clearShortcut : undefined,
+							onSelect: (ctx) => {
+								const { terminalId } = ctx.pane.data as TerminalPaneData;
+								terminalRuntimeRegistry.clear(terminalId);
+							},
+						},
+						{
+							key: "scroll-to-bottom",
+							label: "Scroll to Bottom",
+							icon: <LuArrowDownToLine />,
+							shortcut:
+								scrollToBottomShortcut !== "Unassigned"
+									? scrollToBottomShortcut
+									: undefined,
+							onSelect: (ctx) => {
+								const { terminalId } = ctx.pane.data as TerminalPaneData;
+								terminalRuntimeRegistry.scrollToBottom(terminalId);
+							},
+						},
+						{ key: "sep-terminal-defaults", type: "separator" },
+					];
+
+					// Update close label
+					const modifiedDefaults = defaults.map((d) =>
+						d.key === "close-pane" ? { ...d, label: "Close Terminal" } : d,
+					);
+
+					return [...terminalActions, ...modifiedDefaults];
+				},
 			},
 			browser: {
 				getIcon: () => <Globe className="size-4" />,
@@ -102,6 +193,10 @@ export function usePaneRegistry(
 						/>
 					);
 				},
+				contextMenuActions: (_ctx, defaults) =>
+					defaults.map((d) =>
+						d.key === "close-pane" ? { ...d, label: "Close Browser" } : d,
+					),
 			},
 			chat: {
 				getIcon: () => <MessageSquare className="size-4" />,
@@ -120,6 +215,10 @@ export function usePaneRegistry(
 						/>
 					);
 				},
+				contextMenuActions: (_ctx, defaults) =>
+					defaults.map((d) =>
+						d.key === "close-pane" ? { ...d, label: "Close Chat" } : d,
+					),
 			},
 			devtools: {
 				getTitle: () => "DevTools",
@@ -133,6 +232,6 @@ export function usePaneRegistry(
 				},
 			},
 		}),
-		[workspaceId],
+		[workspaceId, clearShortcut, scrollToBottomShortcut],
 	);
 }

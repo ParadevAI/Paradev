@@ -8,6 +8,7 @@ import type {
 	Tab,
 } from "../../../../../../../types";
 import type {
+	ContextMenuActionConfig,
 	PaneActionConfig,
 	PaneRegistry,
 	RendererContext,
@@ -15,6 +16,7 @@ import type {
 import { PaneHeaderActions } from "../../../../../PaneHeaderActions";
 import { DropZoneOverlay } from "./components/DropZoneOverlay";
 import { PaneContent } from "./components/PaneContent";
+import { PaneContextMenu } from "./components/PaneContextMenu";
 import { PANE_DRAG_TYPE, PaneHeader } from "./components/PaneHeader";
 
 interface PaneComponentProps<TData> {
@@ -27,19 +29,19 @@ interface PaneComponentProps<TData> {
 	paneActions?:
 		| PaneActionConfig<TData>[]
 		| ((context: RendererContext<TData>) => PaneActionConfig<TData>[]);
+	contextMenuActions?:
+		| ContextMenuActionConfig<TData>[]
+		| ((context: RendererContext<TData>) => ContextMenuActionConfig<TData>[]);
 }
 
-function resolveActions<TData>(
+function resolveActions<TData, TAction>(
 	config:
-		| PaneActionConfig<TData>[]
-		| ((
-				context: RendererContext<TData>,
-				defaults: PaneActionConfig<TData>[],
-		  ) => PaneActionConfig<TData>[])
+		| TAction[]
+		| ((context: RendererContext<TData>, defaults: TAction[]) => TAction[])
 		| undefined,
 	context: RendererContext<TData>,
-	defaults: PaneActionConfig<TData>[],
-): PaneActionConfig<TData>[] {
+	defaults: TAction[],
+): TAction[] {
 	if (!config) return defaults;
 	if (typeof config === "function") return config(context, defaults);
 	return config;
@@ -68,6 +70,7 @@ export function Pane<TData>({
 	registry,
 	parentDirection = null,
 	paneActions,
+	contextMenuActions,
 }: PaneComponentProps<TData>) {
 	const definition = registry[pane.kind];
 
@@ -143,6 +146,19 @@ export function Pane<TData>({
 		tabPosition,
 	]);
 
+	const resolvedContextMenuActions = useMemo(() => {
+		const workspaceResolved =
+			typeof contextMenuActions === "function"
+				? contextMenuActions(context)
+				: (contextMenuActions ?? []);
+
+		return resolveActions(
+			definition?.contextMenuActions,
+			context,
+			workspaceResolved,
+		);
+	}, [context, contextMenuActions, definition]);
+
 	const dropPositionRef = useRef<SplitPosition | null>(null);
 	const [dropPosition, setDropPosition] = useState<SplitPosition | null>(null);
 	const dropRef = useRef<HTMLDivElement>(null);
@@ -205,38 +221,40 @@ export function Pane<TData>({
 	const isDropTarget = isOver && canDrop;
 
 	return (
-		// biome-ignore lint/a11y/noStaticElementInteractions: clicking anywhere in a pane focuses it (standard IDE behavior)
-		<div
-			ref={setRefs}
-			className="relative flex h-full w-full flex-col overflow-hidden"
-			onMouseDown={context.actions.focus}
-		>
-			<PaneHeader
-				title={title}
-				icon={icon}
-				isActive={isActive}
-				titleContent={titleContent}
-				headerExtras={headerExtras}
-				toolbar={toolbar}
-				actionsContent={<context.components.PaneHeaderActions />}
-				paneId={pane.id}
-				onClick={
-					definition?.onHeaderClick
-						? () => definition.onHeaderClick?.(context)
-						: context.actions.pin
-				}
-				onMiddleClick={context.actions.close}
-			/>
-			<PaneContent>
-				{definition ? (
-					definition.renderPane(context)
-				) : (
-					<div className="flex flex-1 items-center justify-center text-xs text-muted-foreground">
-						Unknown pane kind: {pane.kind}
-					</div>
-				)}
-			</PaneContent>
-			{isDropTarget && <DropZoneOverlay position={dropPosition} />}
-		</div>
+		<PaneContextMenu actions={resolvedContextMenuActions} context={context}>
+			{/* biome-ignore lint/a11y/noStaticElementInteractions: clicking anywhere in a pane focuses it (standard IDE behavior) */}
+			<div
+				ref={setRefs}
+				className="relative flex h-full w-full flex-col overflow-hidden"
+				onMouseDown={context.actions.focus}
+			>
+				<PaneHeader
+					title={title}
+					icon={icon}
+					isActive={isActive}
+					titleContent={titleContent}
+					headerExtras={headerExtras}
+					toolbar={toolbar}
+					actionsContent={<context.components.PaneHeaderActions />}
+					paneId={pane.id}
+					onClick={
+						definition?.onHeaderClick
+							? () => definition.onHeaderClick?.(context)
+							: context.actions.pin
+					}
+					onMiddleClick={context.actions.close}
+				/>
+				<PaneContent>
+					{definition ? (
+						definition.renderPane(context)
+					) : (
+						<div className="flex flex-1 items-center justify-center text-xs text-muted-foreground">
+							Unknown pane kind: {pane.kind}
+						</div>
+					)}
+				</PaneContent>
+				{isDropTarget && <DropZoneOverlay position={dropPosition} />}
+			</div>
+		</PaneContextMenu>
 	);
 }

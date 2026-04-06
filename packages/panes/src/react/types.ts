@@ -10,6 +10,21 @@ export interface PaneActionConfig<TData> {
 	onClick: (context: RendererContext<TData>) => void;
 }
 
+export interface ContextMenuActionConfig<TData> {
+	key: string;
+	label?: string;
+	icon?: ReactNode;
+	hotkeyId?: string;
+	shortcut?: string;
+	onSelect?: (context: RendererContext<TData>) => void;
+	disabled?: boolean | ((context: RendererContext<TData>) => boolean);
+	variant?: "destructive";
+	type?: "item" | "separator";
+	children?:
+		| ContextMenuActionConfig<TData>[]
+		| ((context: RendererContext<TData>) => ContextMenuActionConfig<TData>[]);
+}
+
 export interface PaneContext<TData> extends Pane<TData> {
 	parentDirection: "horizontal" | "vertical" | null;
 }
@@ -56,6 +71,12 @@ export interface PaneDefinition<TData> {
 				context: RendererContext<TData>,
 				defaults: PaneActionConfig<TData>[],
 		  ) => PaneActionConfig<TData>[]);
+	contextMenuActions?:
+		| ContextMenuActionConfig<TData>[]
+		| ((
+				context: RendererContext<TData>,
+				defaults: ContextMenuActionConfig<TData>[],
+		  ) => ContextMenuActionConfig<TData>[]);
 }
 
 export type PaneRegistry<TData> = Record<string, PaneDefinition<TData>>;
@@ -75,4 +96,7 @@ export interface WorkspaceProps<TData> {
 	paneActions?:
 		| PaneActionConfig<TData>[]
 		| ((context: RendererContext<TData>) => PaneActionConfig<TData>[]);
+	contextMenuActions?:
+		| ContextMenuActionConfig<TData>[]
+		| ((context: RendererContext<TData>) => ContextMenuActionConfig<TData>[]);
 }

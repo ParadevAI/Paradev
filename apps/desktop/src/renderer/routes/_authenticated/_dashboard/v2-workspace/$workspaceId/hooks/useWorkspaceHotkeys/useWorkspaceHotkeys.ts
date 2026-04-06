@@ -236,8 +236,6 @@ export function useWorkspaceHotkeys({
 		const state = store.getState();
 		const tab = state.getActiveTab();
 		if (!tab) return;
-		if (tab.layout.type === "split") {
-			state.equalizeSplit({ tabId: tab.id, splitId: tab.layout.id });
-		}
+		state.equalizeTab({ tabId: tab.id });
 	});
 }

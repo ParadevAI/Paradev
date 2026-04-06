@@ -6,8 +6,13 @@ import {
 import { useRef } from "react";
 import type { StoreApi } from "zustand/vanilla";
 import type { WorkspaceStore } from "../../../../../core/store";
-import type { LayoutNode, Tab as TabType } from "../../../../../types";
 import type {
+	LayoutNode,
+	SplitPath,
+	Tab as TabType,
+} from "../../../../../types";
+import type {
+	ContextMenuActionConfig,
 	PaneActionConfig,
 	PaneRegistry,
 	RendererContext,
@@ -21,65 +26,75 @@ interface TabProps<TData> {
 	paneActions?:
 		| PaneActionConfig<TData>[]
 		| ((context: RendererContext<TData>) => PaneActionConfig<TData>[]);
-}
-
-function weightsToPercentages(weights: number[]): number[] {
-	const total = weights.reduce((sum, w) => sum + w, 0);
-	if (total === 0) return weights.map(() => 100 / weights.length);
-	return weights.map((w) => (w / total) * 100);
+	contextMenuActions?:
+		| ContextMenuActionConfig<TData>[]
+		| ((context: RendererContext<TData>) => ContextMenuActionConfig<TData>[]);
 }
 
 function SplitView<TData>({
 	store,
 	tab,
 	node,
+	path,
 	registry,
 	paneActions,
+	contextMenuActions,
 }: {
 	store: StoreApi<WorkspaceStore<TData>>;
 	tab: TabType<TData>;
 	node: Extract<LayoutNode, { type: "split" }>;
+	path: SplitPath;
 	registry: PaneRegistry<TData>;
 	paneActions?: TabProps<TData>["paneActions"];
+	contextMenuActions?: TabProps<TData>["contextMenuActions"];
 }) {
 	const groupRef = useRef<React.ComponentRef<typeof ResizablePanelGroup>>(null);
-	const percentages = weightsToPercentages(node.weights);
+	const firstSize = node.splitPercentage ?? 50;
+	const secondSize = 100 - firstSize;
 
 	return (
 		<ResizablePanelGroup
 			ref={groupRef}
 			direction={node.direction}
 			onLayout={(sizes) => {
-				store.getState().resizeSplit({
-					tabId: tab.id,
-					splitId: node.id,
-					weights: sizes,
-				});
+				if (sizes[0] != null) {
+					store.getState().resizeSplit({
+						tabId: tab.id,
+						path,
+						splitPercentage: sizes[0],
+					});
+				}
 			}}
 			onDoubleClick={(e) => {
 				e.stopPropagation();
-				const equal = node.children.map(() => 100 / node.children.length);
-				groupRef.current?.setLayout(equal);
+				groupRef.current?.setLayout([50, 50]);
 			}}
 		>
-			{node.children.map((child, index) => {
-				const key = child.type === "pane" ? child.paneId : child.id;
-				return (
-					<>
-						{index > 0 && <ResizableHandle key={`handle-${key}`} />}
-						<ResizablePanel key={key} defaultSize={percentages[index]}>
-							<LayoutNodeView
-								store={store}
-								tab={tab}
-								node={child}
-								registry={registry}
-								paneActions={paneActions}
-								parentDirection={node.direction}
-							/>
-						</ResizablePanel>
-					</>
-				);
-			})}
+			<ResizablePanel defaultSize={firstSize}>
+				<LayoutNodeView
+					store={store}
+					tab={tab}
+					node={node.first}
+					path={[...path, "first"]}
+					registry={registry}
+					paneActions={paneActions}
+					contextMenuActions={contextMenuActions}
+					parentDirection={node.direction}
+				/>
+			</ResizablePanel>
+			<ResizableHandle />
+			<ResizablePanel defaultSize={secondSize}>
+				<LayoutNodeView
+					store={store}
+					tab={tab}
+					node={node.second}
+					path={[...path, "second"]}
+					registry={registry}
+					paneActions={paneActions}
+					contextMenuActions={contextMenuActions}
+					parentDirection={node.direction}
+				/>
+			</ResizablePanel>
 		</ResizablePanelGroup>
 	);
 }
@@ -88,15 +103,19 @@ function LayoutNodeView<TData>({
 	store,
 	tab,
 	node,
+	path,
 	registry,
 	paneActions,
+	contextMenuActions,
 	parentDirection = null,
 }: {
 	store: StoreApi<WorkspaceStore<TData>>;
 	tab: TabType<TData>;
 	node: LayoutNode;
+	path: SplitPath;
 	registry: PaneRegistry<TData>;
 	paneActions?: TabProps<TData>["paneActions"];
+	contextMenuActions?: TabProps<TData>["contextMenuActions"];
 	parentDirection?: "horizontal" | "vertical" | null;
 }) {
 	if (node.type === "pane") {
@@ -111,6 +130,7 @@ function LayoutNodeView<TData>({
 				isActive={tab.activePaneId === pane.id}
 				registry={registry}
 				paneActions={paneActions}
+				contextMenuActions={contextMenuActions}
 				parentDirection={parentDirection}
 			/>
 		);
@@ -121,8 +141,10 @@ function LayoutNodeView<TData>({
 			store={store}
 			tab={tab}
 			node={node}
+			path={path}
 			registry={registry}
 			paneActions={paneActions}
+			contextMenuActions={contextMenuActions}
 		/>
 	);
 }
@@ -132,6 +154,7 @@ export function Tab<TData>({
 	tab,
 	registry,
 	paneActions,
+	contextMenuActions,
 }: TabProps<TData>) {
 	if (!tab.layout) {
 		return (
@@ -147,8 +170,10 @@ export function Tab<TData>({
 				store={store}
 				tab={tab}
 				node={tab.layout}
+				path={[]}
 				registry={registry}
 				paneActions={paneActions}
+				contextMenuActions={contextMenuActions}
 			/>
 		</div>
 	);

@@ -98,6 +98,30 @@ class TerminalRuntimeRegistryImpl {
 		this.entries.delete(terminalId);
 	}
 
+	getSelection(terminalId: string): string {
+		const entry = this.entries.get(terminalId);
+		return entry?.runtime?.terminal.getSelection() ?? "";
+	}
+
+	clear(terminalId: string): void {
+		const entry = this.entries.get(terminalId);
+		entry?.runtime?.terminal.clear();
+	}
+
+	scrollToBottom(terminalId: string): void {
+		const entry = this.entries.get(terminalId);
+		entry?.runtime?.terminal.scrollToBottom();
+	}
+
+	paste(terminalId: string, text: string): void {
+		const entry = this.entries.get(terminalId);
+		entry?.runtime?.terminal.paste(text);
+	}
+
+	getTerminal(terminalId: string) {
+		return this.entries.get(terminalId)?.runtime?.terminal ?? null;
+	}
+
 	getAllTerminalIds(): Set<string> {
 		return new Set(this.entries.keys());
 	}

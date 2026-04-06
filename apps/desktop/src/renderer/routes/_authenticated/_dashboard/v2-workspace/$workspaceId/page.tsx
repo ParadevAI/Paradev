@@ -21,6 +21,7 @@ import { AddTabMenu } from "./components/AddTabMenu";
 import { WorkspaceEmptyState } from "./components/WorkspaceEmptyState";
 import { WorkspaceNotFoundState } from "./components/WorkspaceNotFoundState";
 import { WorkspaceSidebar } from "./components/WorkspaceSidebar";
+import { useDefaultContextMenuActions } from "./hooks/useDefaultContextMenuActions";
 import { usePaneRegistry } from "./hooks/usePaneRegistry";
 import { useV2WorkspacePaneLayout } from "./hooks/useV2WorkspacePaneLayout";
 import { useWorkspaceHotkeys } from "./hooks/useWorkspaceHotkeys";
@@ -82,6 +83,7 @@ function WorkspaceContent({
 		workspaceId,
 	});
 	const paneRegistry = usePaneRegistry(workspaceId);
+	const defaultContextMenuActions = useDefaultContextMenuActions();
 
 	const utils = electronTrpc.useUtils();
 	const { data: showPresetsBar, isLoading: isLoadingPresetsBar } =
@@ -232,6 +234,7 @@ function WorkspaceContent({
 						<Workspace<PaneViewerData>
 							registry={paneRegistry}
 							paneActions={defaultPaneActions}
+							contextMenuActions={defaultContextMenuActions}
 							renderAddTabMenu={() => (
 								<AddTabMenu
 									onAddTerminal={addTerminalTab}
