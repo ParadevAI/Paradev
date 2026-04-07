@@ -11,16 +11,16 @@ import {
 } from "renderer/routes/_authenticated/providers/HostServiceProvider";
 import { MOCK_ORG_ID } from "shared/constants";
 
-export interface WorkspaceHostDeviceOption {
+export interface WorkspaceHostOption {
 	id: string;
 	name: string;
-	type: "host" | "cloud" | "viewer";
+	isCloud: boolean;
 }
 
 interface UseWorkspaceHostOptionsResult {
 	currentDeviceName: string | null;
 	localHostService: OrgService | null;
-	otherDevices: WorkspaceHostDeviceOption[];
+	otherHosts: WorkspaceHostOption[];
 }
 
 export function useWorkspaceHostOptions(): UseWorkspaceHostOptionsResult {
@@ -39,45 +39,43 @@ export function useWorkspaceHostOptions(): UseWorkspaceHostOptionsResult {
 			? (services.get(activeOrganizationId) ?? null)
 			: null;
 
-	const { data: accessibleDevices = [] } = useLiveQuery(
+	const { data: accessibleHosts = [] } = useLiveQuery(
 		(q) =>
 			q
-				.from({ userDevices: collections.v2UsersDevices })
-				.innerJoin(
-					{ devices: collections.v2Devices },
-					({ userDevices, devices }) => eq(userDevices.deviceId, devices.id),
+				.from({ userHosts: collections.v2UsersHosts })
+				.innerJoin({ hosts: collections.v2Hosts }, ({ userHosts, hosts }) =>
+					eq(userHosts.hostId, hosts.id),
 				)
-				.where(({ userDevices, devices }) =>
+				.where(({ userHosts, hosts }) =>
 					and(
-						eq(userDevices.userId, currentUserId ?? ""),
-						eq(devices.organizationId, activeOrganizationId ?? ""),
+						eq(userHosts.userId, currentUserId ?? ""),
+						eq(hosts.organizationId, activeOrganizationId ?? ""),
 					),
 				)
-				.select(({ devices }) => ({
-					id: devices.id,
-					clientId: devices.clientId,
-					name: devices.name,
-					type: devices.type,
+				.select(({ hosts }) => ({
+					id: hosts.id,
+					machineId: hosts.machineId,
+					name: hosts.name,
 				})),
 		[activeOrganizationId, collections, currentUserId],
 	);
 
-	const otherDevices = useMemo(
+	const otherHosts = useMemo(
 		() =>
-			accessibleDevices
-				.filter((device) => device.clientId !== deviceInfo?.deviceId)
-				.map((device) => ({
-					id: device.id,
-					name: device.name,
-					type: device.type,
+			accessibleHosts
+				.filter((host) => host.machineId !== deviceInfo?.deviceId)
+				.map((host) => ({
+					id: host.id,
+					name: host.name,
+					isCloud: host.machineId == null,
 				}))
 				.sort((a, b) => a.name.localeCompare(b.name)),
-		[accessibleDevices, deviceInfo?.deviceId],
+		[accessibleHosts, deviceInfo?.deviceId],
 	);
 
 	return {
 		currentDeviceName: deviceInfo?.deviceName ?? null,
 		localHostService,
-		otherDevices,
+		otherHosts,
 	};
 }

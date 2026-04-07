@@ -1,10 +1,10 @@
 export { createApiClient } from "./api";
 export { type CreateAppOptions, createApp } from "./app";
 export type { HostDb } from "./db";
-export {
-	buildWorkspaceFilesystemEventsPath,
-	type WorkspaceFilesystemServerMessage,
-} from "./filesystem";
+export type {
+	ClientMessage as EventBusClientMessage,
+	ServerMessage as EventBusServerMessage,
+} from "./events";
 export type { ApiAuthProvider } from "./providers/auth";
 export { DeviceKeyApiAuthProvider, JwtApiAuthProvider } from "./providers/auth";
 export {

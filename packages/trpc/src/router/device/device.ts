@@ -2,9 +2,10 @@ import { db, dbWs } from "@superset/db/client";
 import {
 	devicePresence,
 	deviceTypeValues,
-	v2DevicePresence,
-	v2Devices,
-	v2UsersDevices,
+	v2Clients,
+	v2ClientTypeValues,
+	v2Hosts,
+	v2UsersHosts,
 } from "@superset/db/schema";
 import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
 import { z } from "zod";
@@ -14,7 +15,7 @@ export const deviceRouter = {
 	ensureV2Host: protectedProcedure
 		.input(
 			z.object({
-				clientId: z.string().min(1),
+				machineId: z.string().min(1),
 				name: z.string().min(1),
 			}),
 		)
@@ -30,59 +31,96 @@ export const deviceRouter = {
 			const userId = ctx.session.user.id;
 			const now = new Date();
 
-			const [device] = await dbWs
-				.insert(v2Devices)
+			const [host] = await dbWs
+				.insert(v2Hosts)
 				.values({
 					organizationId,
-					clientId: input.clientId,
+					machineId: input.machineId,
 					name: input.name,
-					type: "host",
+					lastSeenAt: now,
 					createdByUserId: userId,
 				})
 				.onConflictDoUpdate({
-					target: [v2Devices.organizationId, v2Devices.clientId],
+					target: [v2Hosts.organizationId, v2Hosts.machineId],
 					set: {
 						name: input.name,
-						type: "host",
+						lastSeenAt: now,
 					},
 				})
 				.returning();
 
-			if (!device) {
+			if (!host) {
 				throw new TRPCError({
 					code: "INTERNAL_SERVER_ERROR",
-					message: "Failed to ensure device",
+					message: "Failed to ensure host",
 				});
 			}
 
 			await dbWs
-				.insert(v2UsersDevices)
+				.insert(v2UsersHosts)
 				.values({
 					organizationId,
 					userId,
-					deviceId: device.id,
+					hostId: host.id,
 					role: "owner",
 				})
 				.onConflictDoNothing({
-					target: [v2UsersDevices.userId, v2UsersDevices.deviceId],
+					target: [
+						v2UsersHosts.organizationId,
+						v2UsersHosts.userId,
+						v2UsersHosts.hostId,
+					],
 				});
 
-			await dbWs
-				.insert(v2DevicePresence)
+			return host;
+		}),
+
+	ensureV2Client: protectedProcedure
+		.input(
+			z.object({
+				machineId: z.string().min(1),
+				type: z.enum(v2ClientTypeValues),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const organizationId = ctx.session.session.activeOrganizationId;
+			if (!organizationId) {
+				throw new TRPCError({
+					code: "BAD_REQUEST",
+					message: "No active organization selected",
+				});
+			}
+
+			const userId = ctx.session.user.id;
+
+			const [client] = await dbWs
+				.insert(v2Clients)
 				.values({
-					deviceId: device.id,
 					organizationId,
-					lastSeenAt: now,
+					userId,
+					machineId: input.machineId,
+					type: input.type,
 				})
 				.onConflictDoUpdate({
-					target: [v2DevicePresence.deviceId],
+					target: [
+						v2Clients.organizationId,
+						v2Clients.userId,
+						v2Clients.machineId,
+					],
 					set: {
-						organizationId,
-						lastSeenAt: now,
+						type: input.type,
 					},
-				});
+				})
+				.returning();
 
-			return device;
+			if (!client) {
+				throw new TRPCError({
+					code: "INTERNAL_SERVER_ERROR",
+					message: "Failed to ensure client",
+				});
+			}
+
+			return client;
 		}),
 
 	/**

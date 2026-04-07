@@ -1,5 +1,5 @@
 import { dbWs } from "@superset/db/client";
-import { v2Devices, v2Projects, v2Workspaces } from "@superset/db/schema";
+import { v2Hosts, v2Projects, v2Workspaces } from "@superset/db/schema";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
@@ -32,19 +32,19 @@ async function getScopedProject(organizationId: string, projectId: string) {
 	);
 }
 
-async function getScopedDevice(organizationId: string, deviceId: string) {
+async function getScopedHost(organizationId: string, hostId: string) {
 	return requireOrgScopedResource(
 		() =>
-			dbWs.query.v2Devices.findFirst({
+			dbWs.query.v2Hosts.findFirst({
 				columns: {
 					id: true,
 					organizationId: true,
 				},
-				where: eq(v2Devices.id, deviceId),
+				where: eq(v2Hosts.id, hostId),
 			}),
 		{
 			code: "BAD_REQUEST",
-			message: "Device not found in this organization",
+			message: "Host not found in this organization",
 			organizationId,
 		},
 	);
@@ -100,7 +100,7 @@ export const v2WorkspaceRouter = {
 				projectId: z.string().uuid(),
 				name: z.string().min(1),
 				branch: z.string().min(1),
-				deviceId: z.string().uuid(),
+				hostId: z.string().uuid(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
@@ -110,7 +110,7 @@ export const v2WorkspaceRouter = {
 			);
 
 			const project = await getScopedProject(organizationId, input.projectId);
-			const device = await getScopedDevice(organizationId, input.deviceId);
+			const host = await getScopedHost(organizationId, input.hostId);
 
 			const [workspace] = await dbWs
 				.insert(v2Workspaces)
@@ -119,7 +119,7 @@ export const v2WorkspaceRouter = {
 					projectId: project.id,
 					name: input.name,
 					branch: input.branch,
-					deviceId: device.id,
+					hostId: host.id,
 					createdByUserId: ctx.session.user.id,
 				})
 				.returning();
@@ -132,7 +132,7 @@ export const v2WorkspaceRouter = {
 				id: z.string().uuid(),
 				name: z.string().min(1).optional(),
 				branch: z.string().min(1).optional(),
-				deviceId: z.string().uuid().optional(),
+				hostId: z.string().uuid().optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
@@ -148,13 +148,13 @@ export const v2WorkspaceRouter = {
 				},
 			);
 
-			if (input.deviceId !== undefined) {
-				await getScopedDevice(workspace.organizationId, input.deviceId);
+			if (input.hostId !== undefined) {
+				await getScopedHost(workspace.organizationId, input.hostId);
 			}
 
 			const data = {
 				branch: input.branch,
-				deviceId: input.deviceId,
+				hostId: input.hostId,
 				name: input.name,
 			};
 			if (

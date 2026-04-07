@@ -4,6 +4,7 @@ import { workspaceTrpc } from "@superset/workspace-client";
 import type { inferRouterOutputs } from "@trpc/server";
 import { GitBranch, Pencil } from "lucide-react";
 import { useCallback, useMemo, useRef, useState } from "react";
+import { useWorkspaceEvent } from "renderer/hooks/host-service/useWorkspaceEvent";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import type { ChangesFilter } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal/schema";
 import type { SidebarTabDefinition } from "../../types";
@@ -214,20 +215,27 @@ export function useChangesTab({
 		[collections, workspaceId],
 	);
 
+	const statusUtils = workspaceTrpc.useUtils();
+
 	const status = workspaceTrpc.git.getStatus.useQuery(
 		{ workspaceId, baseBranch: baseBranch ?? undefined },
-		{ refetchInterval: 3_000, refetchOnWindowFocus: true },
+		{ refetchOnWindowFocus: true },
 	);
 
 	const commits = workspaceTrpc.git.listCommits.useQuery(
 		{ workspaceId, baseBranch: baseBranch ?? undefined },
-		{ refetchInterval: 3_000, refetchOnWindowFocus: true },
+		{ refetchOnWindowFocus: true },
 	);
 
 	const branches = workspaceTrpc.git.listBranches.useQuery(
 		{ workspaceId },
 		{ refetchInterval: 30_000, refetchOnWindowFocus: true },
 	);
+
+	useWorkspaceEvent("git:changed", workspaceId, () => {
+		void statusUtils.git.getStatus.invalidate({ workspaceId });
+		void statusUtils.git.listCommits.invalidate({ workspaceId });
+	});
 
 	const renameBranchMutation = workspaceTrpc.git.renameBranch.useMutation();
 
@@ -267,27 +275,25 @@ export function useChangesTab({
 		{ enabled: filter.kind === "commit" || filter.kind === "range" },
 	);
 
-	const totalChanges = status.data
-		? status.data.againstBase.length +
-			status.data.staged.length +
-			status.data.unstaged.length
-		: 0;
+	const filteredFiles = useMemo(() => {
+		if (!status.data) return [];
+		if (filter.kind === "uncommitted") {
+			return [...status.data.staged, ...status.data.unstaged];
+		}
+		if (filter.kind === "commit" || filter.kind === "range") {
+			return commitFiles.data?.files ?? [];
+		}
+		// "all" — deduplicate by path
+		const map = new Map<string, (typeof status.data.againstBase)[number]>();
+		for (const f of status.data.againstBase) map.set(f.path, f);
+		for (const f of status.data.staged) map.set(f.path, f);
+		for (const f of status.data.unstaged) map.set(f.path, f);
+		return Array.from(map.values());
+	}, [status.data, filter.kind, commitFiles.data?.files]);
 
-	const totalAdditions = status.data
-		? [
-				...status.data.againstBase,
-				...status.data.staged,
-				...status.data.unstaged,
-			].reduce((sum, f) => sum + f.additions, 0)
-		: 0;
-
-	const totalDeletions = status.data
-		? [
-				...status.data.againstBase,
-				...status.data.staged,
-				...status.data.unstaged,
-			].reduce((sum, f) => sum + f.deletions, 0)
-		: 0;
+	const totalChanges = filteredFiles.length;
+	const totalAdditions = filteredFiles.reduce((sum, f) => sum + f.additions, 0);
+	const totalDeletions = filteredFiles.reduce((sum, f) => sum + f.deletions, 0);
 
 	const content = useMemo(() => {
 		if (status.isLoading) {

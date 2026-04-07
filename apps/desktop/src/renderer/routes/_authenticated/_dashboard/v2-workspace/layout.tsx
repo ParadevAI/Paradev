@@ -7,7 +7,7 @@ import {
 	getHostServiceHeaders,
 	getHostServiceWsToken,
 } from "renderer/lib/host-service-auth";
-import { getWorkspaceHostUrlForWorkspace } from "renderer/lib/v2-workspace-host";
+import { getRemoteHostUrl } from "renderer/lib/v2-workspace-host";
 import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useHostService } from "renderer/routes/_authenticated/providers/HostServiceProvider";
@@ -40,30 +40,30 @@ function V2WorkspaceLayout() {
 		[collections, workspaceId],
 	);
 	const workspace = workspaces[0] ?? null;
-	const { data: currentDevices = [] } = useLiveQuery(
+	const { data: hosts = [] } = useLiveQuery(
 		(q) =>
 			q
-				.from({ v2Devices: collections.v2Devices })
-				.where(({ v2Devices }) =>
+				.from({ v2Hosts: collections.v2Hosts })
+				.where(({ v2Hosts }) =>
 					and(
-						eq(v2Devices.clientId, deviceInfo?.deviceId ?? ""),
-						eq(v2Devices.organizationId, workspace?.organizationId ?? ""),
+						eq(v2Hosts.machineId, deviceInfo?.deviceId ?? ""),
+						eq(v2Hosts.organizationId, workspace?.organizationId ?? ""),
 					),
 				),
 		[collections, deviceInfo?.deviceId, workspace?.organizationId],
 	);
-	const currentDevice = currentDevices[0] ?? null;
+	const localHost = hosts[0] ?? null;
 	const localHostUrl = workspace
 		? (services.get(workspace.organizationId)?.url ?? null)
 		: null;
 	const shouldWaitForDeviceInfo = workspace !== null && isDeviceInfoPending;
-	const isLocal = workspace?.deviceId === currentDevice?.id;
+	const isLocal = workspace?.hostId === localHost?.id;
 	const hostUrl =
 		!workspace || shouldWaitForDeviceInfo
 			? null
 			: isLocal
 				? localHostUrl
-				: getWorkspaceHostUrlForWorkspace(workspace.id);
+				: getRemoteHostUrl(workspace.hostId);
 
 	const lastEnsuredWorkspaceIdRef = useRef<string | null>(null);
 

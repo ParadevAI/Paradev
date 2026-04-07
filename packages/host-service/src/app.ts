@@ -8,7 +8,7 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { createApiClient } from "./api";
 import { createDb } from "./db";
-import { registerWorkspaceFilesystemEventsRoute } from "./filesystem";
+import { EventBus, registerEventBusRoute } from "./events";
 import type { ApiAuthProvider } from "./providers/auth";
 import { LocalGitCredentialProvider } from "./providers/git";
 import type { HostAuthProvider } from "./providers/host-auth";
@@ -93,6 +93,9 @@ export function createApp(options?: CreateAppOptions): CreateAppResult {
 		}),
 	);
 
+	const eventBus = new EventBus({ db, filesystem });
+	eventBus.start();
+
 	if (options?.hostAuth) {
 		const { hostAuth } = options;
 		const wsAuth: MiddlewareHandler = async (c, next) => {
@@ -104,14 +107,10 @@ export function createApp(options?: CreateAppOptions): CreateAppResult {
 			return next();
 		};
 		app.use("/terminal/*", wsAuth);
-		app.use("/workspace-filesystem/*", wsAuth);
+		app.use("/events", wsAuth);
 	}
 
-	registerWorkspaceFilesystemEventsRoute({
-		app,
-		filesystem,
-		upgradeWebSocket,
-	});
+	registerEventBusRoute({ app, eventBus, upgradeWebSocket });
 	registerWorkspaceTerminalRoute({
 		app,
 		db,

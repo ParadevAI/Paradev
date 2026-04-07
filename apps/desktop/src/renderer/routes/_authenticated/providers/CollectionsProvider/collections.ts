@@ -14,9 +14,10 @@ import type {
 	SelectTask,
 	SelectTaskStatus,
 	SelectUser,
-	SelectV2Device,
+	SelectV2Client,
+	SelectV2Host,
 	SelectV2Project,
-	SelectV2UsersDevices,
+	SelectV2UsersHosts,
 	SelectV2Workspace,
 	SelectWorkspace,
 } from "@superset/db/schema";
@@ -67,9 +68,10 @@ export interface OrgCollections {
 	tasks: Collection<SelectTask>;
 	taskStatuses: Collection<SelectTaskStatus>;
 	projects: Collection<SelectProject>;
-	v2Devices: Collection<SelectV2Device>;
+	v2Hosts: Collection<SelectV2Host>;
+	v2Clients: Collection<SelectV2Client>;
+	v2UsersHosts: Collection<SelectV2UsersHosts>;
 	v2Projects: Collection<SelectV2Project>;
-	v2UsersDevices: Collection<SelectV2UsersDevices>;
 	v2Workspaces: Collection<SelectV2Workspace>;
 	workspaces: Collection<SelectWorkspace>;
 	members: Collection<SelectMember>;
@@ -230,13 +232,13 @@ function createOrgCollections(organizationId: string): OrgCollections {
 		}),
 	);
 
-	const v2Devices = createCollection(
-		electricCollectionOptions<SelectV2Device>({
-			id: `v2_devices-${organizationId}`,
+	const v2Hosts = createCollection(
+		electricCollectionOptions<SelectV2Host>({
+			id: `v2_hosts-${organizationId}`,
 			shapeOptions: {
 				url: electricUrl,
 				params: {
-					table: "v2_devices",
+					table: "v2_hosts",
 					organizationId,
 				},
 				headers: electricHeaders,
@@ -246,13 +248,29 @@ function createOrgCollections(organizationId: string): OrgCollections {
 		}),
 	);
 
-	const v2UsersDevices = createCollection(
-		electricCollectionOptions<SelectV2UsersDevices>({
-			id: `v2_users_devices-${organizationId}`,
+	const v2Clients = createCollection(
+		electricCollectionOptions<SelectV2Client>({
+			id: `v2_clients-${organizationId}`,
 			shapeOptions: {
 				url: electricUrl,
 				params: {
-					table: "v2_users_devices",
+					table: "v2_clients",
+					organizationId,
+				},
+				headers: electricHeaders,
+				columnMapper,
+			},
+			getKey: (item) => item.id,
+		}),
+	);
+
+	const v2UsersHosts = createCollection(
+		electricCollectionOptions<SelectV2UsersHosts>({
+			id: `v2_users_hosts-${organizationId}`,
+			shapeOptions: {
+				url: electricUrl,
+				params: {
+					table: "v2_users_hosts",
 					organizationId,
 				},
 				headers: electricHeaders,
@@ -509,9 +527,10 @@ function createOrgCollections(organizationId: string): OrgCollections {
 		tasks,
 		taskStatuses,
 		projects,
-		v2Devices,
+		v2Hosts,
+		v2Clients,
+		v2UsersHosts,
 		v2Projects,
-		v2UsersDevices,
 		v2Workspaces,
 		workspaces,
 		members,

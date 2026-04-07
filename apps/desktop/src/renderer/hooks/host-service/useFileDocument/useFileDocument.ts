@@ -1,6 +1,6 @@
+import { workspaceTrpc } from "@superset/workspace-client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { workspaceTrpc } from "../../workspace-trpc";
-import { useWorkspaceFsEvents } from "../useWorkspaceFsEvents";
+import { useWorkspaceEvent } from "../useWorkspaceEvent";
 
 const DEFAULT_MAX_BYTES = 2 * 1024 * 1024;
 const BINARY_CHECK_SIZE = 8192;
@@ -162,7 +162,8 @@ export function useFileDocument({
 		setConflict({ diskContent });
 	}, [fetchCurrentDiskContent, mode]);
 
-	useWorkspaceFsEvents(
+	useWorkspaceEvent(
+		"fs:events",
 		workspaceId,
 		(event) => {
 			const path = currentPathRef.current;

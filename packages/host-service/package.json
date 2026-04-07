@@ -12,9 +12,9 @@
 			"types": "./src/db/index.ts",
 			"default": "./src/db/index.ts"
 		},
-		"./filesystem": {
-			"types": "./src/filesystem/index.ts",
-			"default": "./src/filesystem/index.ts"
+		"./events": {
+			"types": "./src/events/index.ts",
+			"default": "./src/events/index.ts"
 		},
 		"./git": {
 			"types": "./src/runtime/git/index.ts",

@@ -93,8 +93,8 @@ export const workspaceRouter = router({
 				await git.raw(["worktree", "add", "-b", input.branch, worktreePath]);
 			}
 
-			const device = await ctx.api.device.ensureV2Host.mutate({
-				clientId: ctx.deviceClientId,
+			const host = await ctx.api.device.ensureV2Host.mutate({
+				machineId: ctx.deviceClientId,
 				name: ctx.deviceName,
 			});
 
@@ -103,7 +103,7 @@ export const workspaceRouter = router({
 					projectId: input.projectId,
 					name: input.name,
 					branch: input.branch,
-					deviceId: device.id,
+					hostId: host.id,
 				})
 				.catch(async (err) => {
 					try {

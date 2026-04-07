@@ -1,7 +1,7 @@
-import type { FsEntry, FsEntryKind } from "@superset/workspace-fs/host";
+import { workspaceTrpc } from "@superset/workspace-client";
+import type { FsEntry, FsEntryKind } from "@superset/workspace-fs/client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { workspaceTrpc } from "../../workspace-trpc";
-import { useWorkspaceFsEvents } from "../useWorkspaceFsEvents";
+import { useWorkspaceEvent } from "../useWorkspaceEvent";
 
 export interface FileTreeNode {
 	absolutePath: string;
@@ -354,7 +354,8 @@ export function useFileTree({
 		void loadDirectory(rootPath, true);
 	}, [loadDirectory, rootPath, updateState]);
 
-	useWorkspaceFsEvents(
+	useWorkspaceEvent(
+		"fs:events",
 		workspaceId,
 		(event) => {
 			if (!rootPath) {

@@ -14,13 +14,12 @@ import {
 	HiChevronUpDown,
 	HiOutlineCloud,
 	HiOutlineComputerDesktop,
-	HiOutlineGlobeAlt,
 	HiOutlineServer,
 } from "react-icons/hi2";
 import type { WorkspaceHostTarget } from "renderer/lib/v2-workspace-host";
 import {
 	useWorkspaceHostOptions,
-	type WorkspaceHostDeviceOption,
+	type WorkspaceHostOption,
 } from "./hooks/useWorkspaceHostOptions";
 
 interface DevicePickerProps {
@@ -28,21 +27,14 @@ interface DevicePickerProps {
 	onSelectHostTarget: (target: WorkspaceHostTarget) => void;
 }
 
-function getDeviceIcon(type: WorkspaceHostDeviceOption["type"]) {
-	switch (type) {
-		case "cloud":
-			return HiOutlineCloud;
-		case "viewer":
-			return HiOutlineGlobeAlt;
-		default:
-			return HiOutlineComputerDesktop;
-	}
+function getHostIcon(host: WorkspaceHostOption) {
+	return host.isCloud ? HiOutlineCloud : HiOutlineComputerDesktop;
 }
 
 function getSelectedLabel(
 	hostTarget: WorkspaceHostTarget,
 	currentDeviceName: string | null,
-	otherDevices: WorkspaceHostDeviceOption[],
+	otherHosts: WorkspaceHostOption[],
 ) {
 	if (hostTarget.kind === "local") {
 		return currentDeviceName ?? "Local Device";
@@ -53,8 +45,8 @@ function getSelectedLabel(
 	}
 
 	return (
-		otherDevices.find((device) => device.id === hostTarget.deviceId)?.name ??
-		"Unknown Device"
+		otherHosts.find((host) => host.id === hostTarget.hostId)?.name ??
+		"Unknown Host"
 	);
 }
 
@@ -74,11 +66,11 @@ export function DevicePicker({
 	hostTarget,
 	onSelectHostTarget,
 }: DevicePickerProps) {
-	const { currentDeviceName, otherDevices } = useWorkspaceHostOptions();
+	const { currentDeviceName, otherHosts } = useWorkspaceHostOptions();
 	const selectedLabel = getSelectedLabel(
 		hostTarget,
 		currentDeviceName,
-		otherDevices,
+		otherHosts,
 	);
 
 	return (
@@ -111,34 +103,30 @@ export function DevicePicker({
 				<DropdownMenuSub>
 					<DropdownMenuSubTrigger>
 						<HiOutlineServer className="size-4" />
-						Other Devices
+						Other Hosts
 					</DropdownMenuSubTrigger>
 					<DropdownMenuSubContent className="w-72">
-						{otherDevices.length === 0 ? (
-							<DropdownMenuItem disabled>No devices found</DropdownMenuItem>
+						{otherHosts.length === 0 ? (
+							<DropdownMenuItem disabled>No hosts found</DropdownMenuItem>
 						) : (
-							otherDevices.map((device) => {
-								const DeviceIcon = getDeviceIcon(device.type);
+							otherHosts.map((host) => {
+								const HostIcon = getHostIcon(host);
 								const isSelected =
-									hostTarget.kind === "device" &&
-									hostTarget.deviceId === device.id;
+									hostTarget.kind === "host" && hostTarget.hostId === host.id;
 
 								return (
 									<DropdownMenuItem
-										key={device.id}
+										key={host.id}
 										onSelect={() =>
 											onSelectHostTarget({
-												kind: "device",
-												deviceId: device.id,
+												kind: "host",
+												hostId: host.id,
 											})
 										}
 									>
-										<DeviceIcon className="size-4" />
+										<HostIcon className="size-4" />
 										<div className="min-w-0 flex-1">
-											<div className="truncate">{device.name}</div>
-											<div className="text-xs text-muted-foreground">
-												{device.type}
-											</div>
+											<div className="truncate">{host.name}</div>
 										</div>
 										{isSelected && <HiCheck className="size-4" />}
 									</DropdownMenuItem>

@@ -25,24 +25,24 @@ export function V2WorkspaceOpenInButton({
 		[collections, workspaceId],
 	);
 	const workspace = workspaces[0] ?? null;
-	const { data: currentDevices = [] } = useLiveQuery(
+	const { data: localHosts = [] } = useLiveQuery(
 		(q) =>
 			q
-				.from({ devices: collections.v2Devices })
-				.where(({ devices }) =>
+				.from({ hosts: collections.v2Hosts })
+				.where(({ hosts }) =>
 					and(
-						eq(devices.clientId, deviceInfo?.deviceId ?? ""),
-						eq(devices.organizationId, workspace?.organizationId ?? ""),
+						eq(hosts.machineId, deviceInfo?.deviceId ?? ""),
+						eq(hosts.organizationId, workspace?.organizationId ?? ""),
 					),
 				),
 		[collections, deviceInfo?.deviceId, workspace?.organizationId],
 	);
-	const currentDevice = currentDevices[0] ?? null;
+	const localHost = localHosts[0] ?? null;
 	const hostUrl = workspace
 		? (services.get(workspace.organizationId)?.url ?? null)
 		: null;
 	const isLocalWorkspace =
-		Boolean(workspace) && workspace.deviceId === currentDevice?.id;
+		Boolean(workspace) && workspace.hostId === localHost?.id;
 
 	const workspaceQuery = useQuery({
 		queryKey: ["v2-open-in-workspace", hostUrl, workspaceId],

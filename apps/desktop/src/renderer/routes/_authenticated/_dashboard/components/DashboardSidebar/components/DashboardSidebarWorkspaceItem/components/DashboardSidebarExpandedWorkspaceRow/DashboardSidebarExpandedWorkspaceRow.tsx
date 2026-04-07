@@ -8,10 +8,10 @@ import {
 	useRef,
 } from "react";
 import { HiMiniXMark } from "react-icons/hi2";
+import type { DiffStats } from "renderer/hooks/host-service/useDiffStats";
 import { HotkeyLabel } from "renderer/hotkeys";
 import { RenameInput } from "renderer/screens/main/components/WorkspaceSidebar/RenameInput";
 import type { DashboardSidebarWorkspace } from "../../../../types";
-import type { WorkspaceRowMockData } from "../../utils";
 import { getCreationStatusText } from "../../utils/getCreationStatusText";
 import { DashboardSidebarWorkspaceDiffStats } from "../DashboardSidebarWorkspaceDiffStats";
 import { DashboardSidebarWorkspaceIcon } from "../DashboardSidebarWorkspaceIcon";
@@ -24,7 +24,7 @@ interface DashboardSidebarExpandedWorkspaceRowProps
 	isRenaming: boolean;
 	renameValue: string;
 	shortcutLabel?: string;
-	mockData: WorkspaceRowMockData;
+	diffStats: DiffStats | null;
 	onClick?: () => void;
 	onDoubleClick?: () => void;
 	onDeleteClick: () => void;
@@ -44,7 +44,7 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 			isRenaming,
 			renameValue,
 			shortcutLabel,
-			mockData,
+			diffStats,
 			onClick,
 			onDoubleClick,
 			onDeleteClick,
@@ -124,7 +124,7 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 								hostType={hostType}
 								isActive={isActive}
 								variant="expanded"
-								workspaceStatus={mockData.workspaceStatus}
+								workspaceStatus={null}
 								creationStatus={creationStatus}
 							/>
 						</div>
@@ -167,11 +167,13 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 								</span>
 							) : (
 								<>
-									<DashboardSidebarWorkspaceDiffStats
-										additions={mockData.diffStats.additions}
-										deletions={mockData.diffStats.deletions}
-										isActive={isActive}
-									/>
+									{diffStats && (
+										<DashboardSidebarWorkspaceDiffStats
+											additions={diffStats.additions}
+											deletions={diffStats.deletions}
+											isActive={isActive}
+										/>
+									)}
 									<div className="invisible flex items-center justify-end gap-1.5 opacity-0 transition-[opacity,visibility] group-hover:visible group-hover:opacity-100">
 										{shortcutLabel && (
 											<span className="shrink-0 font-mono text-[10px] tabular-nums text-muted-foreground">

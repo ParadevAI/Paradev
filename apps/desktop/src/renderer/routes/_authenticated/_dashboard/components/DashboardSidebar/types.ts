@@ -23,7 +23,7 @@ export interface DashboardSidebarWorkspacePullRequest {
 export interface DashboardSidebarWorkspace {
 	id: string;
 	projectId: string;
-	deviceId: string;
+	hostId: string;
 	hostType: DashboardSidebarWorkspaceHostType;
 	accentColor: string | null;
 	name: string;
