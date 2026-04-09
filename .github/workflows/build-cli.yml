@@ -54,6 +54,8 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/cli-v')
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout code
