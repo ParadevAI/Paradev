@@ -50,32 +50,58 @@ export function TerminalPane({ ctx, workspaceId }: TerminalPaneProps) {
 	);
 	const initialThemeType = initialThemeTypeRef.current;
 
-	const websocketUrl = useWorkspaceWsUrl(`/terminal/${terminalId}`, {
-		workspaceId,
-		themeType: initialThemeType,
-	});
+	// URL is stable — no workspaceId/themeType in query params.
+	// Session is created via tRPC before WebSocket connects.
+	const websocketUrl = useWorkspaceWsUrl(`/terminal/${terminalId}`);
+
+	const ensureSession = workspaceTrpc.terminal.ensureSession.useMutation();
+	const ensureSessionRef = useRef(ensureSession);
+	ensureSessionRef.current = ensureSession;
 
 	const connectionState = useSyncExternalStore(
 		subscribeToState(terminalId),
 		() => getConnectionState(terminalId),
 	);
 
-	// Appearance read from ref to avoid re-attach on theme/font change.
 	useEffect(() => {
 		const container = containerRef.current;
 		if (!container) return;
 
-		terminalRuntimeRegistry.attach(
-			terminalId,
-			container,
-			websocketUrl,
-			appearanceRef.current,
-		);
+		let cancelled = false;
+
+		// Create session via tRPC, then connect WebSocket as data pipe.
+		ensureSessionRef.current
+			.mutateAsync({
+				terminalId,
+				workspaceId,
+				themeType: initialThemeType,
+			})
+			.then(() => {
+				if (cancelled) return;
+				terminalRuntimeRegistry.attach(
+					terminalId,
+					container,
+					websocketUrl,
+					appearanceRef.current,
+				);
+			})
+			.catch((err) => {
+				if (cancelled) return;
+				console.error("[TerminalPane] ensureSession failed:", err);
+				// Still try to connect — WS handler has fallback for existing sessions
+				terminalRuntimeRegistry.attach(
+					terminalId,
+					container,
+					websocketUrl,
+					appearanceRef.current,
+				);
+			});
 
 		return () => {
+			cancelled = true;
 			terminalRuntimeRegistry.detach(terminalId);
 		};
-	}, [terminalId, websocketUrl]);
+	}, [terminalId, websocketUrl, initialThemeType, workspaceId]);
 
 	useEffect(() => {
 		terminalRuntimeRegistry.updateAppearance(terminalId, appearance);
