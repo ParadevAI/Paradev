@@ -92,6 +92,8 @@ async function resolveGithubRepo(
 	return { owner: repo.owner, name: repo.name };
 }
 
+import { normalizeGitHubQuery } from "./normalize-github-query";
+
 async function listBranchNames(
 	ctx: HostServiceContext,
 	repoPath: string,
@@ -489,37 +491,58 @@ export const workspaceCreationRouter = router({
 		)
 		.query(async ({ ctx, input }) => {
 			const repo = await resolveGithubRepo(ctx, input.projectId);
-			const octokit = await ctx.github();
 			const limit = input.limit ?? 30;
 
+			// Normalize the query: detect GitHub issue URLs, strip `#` shorthand
+			const raw = input.query?.trim() ?? "";
+			const normalized = normalizeGitHubQuery(raw, repo, "issue");
+
+			if (normalized.repoMismatch) {
+				return {
+					issues: [],
+					repoMismatch: `${repo.owner}/${repo.name}`,
+				};
+			}
+
+			const effectiveQuery = normalized.query;
+			const octokit = await ctx.github();
+
 			try {
-				if (input.query?.trim()) {
-					const q = `repo:${repo.owner}/${repo.name} is:issue is:open in:title,body ${input.query}`;
-					const { data } = await octokit.search.issuesAndPullRequests({
-						q,
-						per_page: limit,
+				// Direct lookup by issue number (from URL paste or `#123` shorthand)
+				if (normalized.isDirectLookup) {
+					const issueNumber = Number.parseInt(effectiveQuery, 10);
+					const { data: issue } = await octokit.issues.get({
+						owner: repo.owner,
+						repo: repo.name,
+						issue_number: issueNumber,
 					});
+					// issues.get returns PRs too — filter them out
+					if (issue.pull_request) {
+						return { issues: [] };
+					}
 					return {
-						issues: data.items
-							.filter((item) => !item.pull_request)
-							.map((item) => ({
-								issueNumber: item.number,
-								title: item.title,
-								url: item.html_url,
-								state: item.state,
-								authorLogin: item.user?.login ?? null,
-							})),
+						issues: [
+							{
+								issueNumber: issue.number,
+								title: issue.title,
+								url: issue.html_url,
+								state: issue.state,
+								authorLogin: issue.user?.login ?? null,
+							},
+						],
 					};
 				}
 
-				const { data } = await octokit.issues.listForRepo({
-					owner: repo.owner,
-					repo: repo.name,
-					state: "open",
+				const q =
+					`repo:${repo.owner}/${repo.name} is:issue ${effectiveQuery}`.trim();
+				const { data } = await octokit.search.issuesAndPullRequests({
+					q,
 					per_page: limit,
+					sort: "updated",
+					order: "desc",
 				});
 				return {
-					issues: data
+					issues: data.items
 						.filter((item) => !item.pull_request)
 						.map((item) => ({
 							issueNumber: item.number,
@@ -545,47 +568,64 @@ export const workspaceCreationRouter = router({
 		)
 		.query(async ({ ctx, input }) => {
 			const repo = await resolveGithubRepo(ctx, input.projectId);
-			const octokit = await ctx.github();
 			const limit = input.limit ?? 30;
 
+			// Normalize the query: detect GitHub PR URLs, strip `#` shorthand
+			const raw = input.query?.trim() ?? "";
+			const normalized = normalizeGitHubQuery(raw, repo, "pull");
+
+			if (normalized.repoMismatch) {
+				return {
+					pullRequests: [],
+					repoMismatch: `${repo.owner}/${repo.name}`,
+				};
+			}
+
+			const effectiveQuery = normalized.query;
+			const octokit = await ctx.github();
+
 			try {
-				if (input.query?.trim()) {
-					const q = `repo:${repo.owner}/${repo.name} is:pr in:title ${input.query}`;
-					const { data } = await octokit.search.issuesAndPullRequests({
-						q,
-						per_page: limit,
+				// Direct lookup by PR number (from URL paste or `#123` shorthand)
+				if (normalized.isDirectLookup) {
+					const prNumber = Number.parseInt(effectiveQuery, 10);
+					const { data: pr } = await octokit.pulls.get({
+						owner: repo.owner,
+						repo: repo.name,
+						pull_number: prNumber,
 					});
 					return {
-						pullRequests: data.items
-							.filter((item) => item.pull_request)
-							.map((item) => ({
-								prNumber: item.number,
-								title: item.title,
-								url: item.html_url,
-								state: item.state,
-								isDraft: item.draft ?? false,
-								authorLogin: item.user?.login ?? null,
-							})),
+						pullRequests: [
+							{
+								prNumber: pr.number,
+								title: pr.title,
+								url: pr.html_url,
+								state: pr.state,
+								isDraft: pr.draft ?? false,
+								authorLogin: pr.user?.login ?? null,
+							},
+						],
 					};
 				}
 
-				const { data } = await octokit.pulls.list({
-					owner: repo.owner,
-					repo: repo.name,
-					state: "open",
-					sort: "updated",
-					direction: "desc",
+				const q =
+					`repo:${repo.owner}/${repo.name} is:pr ${effectiveQuery}`.trim();
+				const { data } = await octokit.search.issuesAndPullRequests({
+					q,
 					per_page: limit,
+					sort: "updated",
+					order: "desc",
 				});
 				return {
-					pullRequests: data.map((pr) => ({
-						prNumber: pr.number,
-						title: pr.title,
-						url: pr.html_url,
-						state: pr.state,
-						isDraft: pr.draft ?? false,
-						authorLogin: pr.user?.login ?? null,
-					})),
+					pullRequests: data.items
+						.filter((item) => item.pull_request)
+						.map((item) => ({
+							prNumber: item.number,
+							title: item.title,
+							url: item.html_url,
+							state: item.state,
+							isDraft: item.draft ?? false,
+							authorLogin: item.user?.login ?? null,
+						})),
 				};
 			} catch (err) {
 				console.warn("[workspaceCreation.searchPullRequests] failed", err);
