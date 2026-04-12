@@ -9,6 +9,8 @@ import { WebglAddon } from "@xterm/addon-webgl";
 import type { ITheme } from "@xterm/xterm";
 import { Terminal as XTerm } from "@xterm/xterm";
 import { getBinding, isTerminalReservedEvent } from "renderer/hotkeys";
+import type { DetectedLink } from "renderer/lib/terminal/links";
+import { TerminalLinkManager } from "renderer/lib/terminal/terminal-link-manager";
 import { electronTrpcClient as trpcClient } from "renderer/lib/trpc-client";
 import { toXtermTheme } from "renderer/stores/theme/utils";
 import {
@@ -17,7 +19,6 @@ import {
 	getTerminalColors,
 } from "shared/themes";
 import { TERMINAL_OPTIONS } from "./config";
-import { FilePathLinkProvider, UrlLinkProvider } from "./link-providers";
 import { suppressQueryResponses } from "./suppressQueryResponses";
 
 /**
@@ -65,9 +66,14 @@ export function getDefaultTerminalBg(): string {
 let suggestedRendererType: "webgl" | "dom" | undefined;
 
 export interface CreateTerminalOptions {
-	cwd?: string;
+	/**
+	 * Workspace id used for worktree lookup during path stat/resolution.
+	 * The main process looks up the worktree root, so relative paths always
+	 * anchor to the correct worktree regardless of renderer load state.
+	 */
+	workspaceId?: string;
 	initialTheme?: ITheme | null;
-	onFileLinkClick?: (path: string, line?: number, column?: number) => void;
+	onFileLinkClick?: (event: MouseEvent, link: DetectedLink) => void;
 	onUrlClickRef?: { current: ((url: string) => void) | undefined };
 }
 
@@ -83,10 +89,11 @@ export function createTerminalInWrapper(options: CreateTerminalOptions = {}): {
 	fitAddon: FitAddon;
 	searchAddon: SearchAddon;
 	wrapper: HTMLDivElement;
+	linkManager: TerminalLinkManager;
 	cleanup: () => void;
 } {
 	const {
-		cwd,
+		workspaceId,
 		initialTheme,
 		onFileLinkClick,
 		onUrlClickRef: urlClickRef,
@@ -143,48 +150,51 @@ export function createTerminalInWrapper(options: CreateTerminalOptions = {}): {
 
 	const cleanupQuerySuppression = suppressQueryResponses(xterm);
 
-	const urlLinkProvider = new UrlLinkProvider(xterm, (_event, uri) => {
-		const handler = urlClickRef?.current;
-		if (handler) {
-			handler(uri);
-			return;
-		}
-		trpcClient.external.openUrl.mutate(uri).catch((error) => {
-			console.error("[Terminal] Failed to open URL:", uri, error);
-			toast.error("Failed to open URL", {
-				description:
-					error instanceof Error
-						? error.message
-						: "Could not open URL in browser",
-			});
-		});
-	});
-	xterm.registerLinkProvider(urlLinkProvider);
-
-	const filePathLinkProvider = new FilePathLinkProvider(
-		xterm,
-		(_event, path, line, column) => {
-			if (onFileLinkClick) {
-				onFileLinkClick(path, line, column);
-			} else {
-				trpcClient.external.openFileInEditor
-					.mutate({
-						path,
-						line,
-						column,
-						cwd,
-					})
-					.catch((error) => {
-						console.error(
-							"[Terminal] Failed to open file in editor:",
-							path,
-							error,
-						);
-					});
+	const linkManager = new TerminalLinkManager(xterm);
+	linkManager.setHandlers({
+		stat: async (path) => {
+			try {
+				return await trpcClient.external.statPath.mutate({ path, workspaceId });
+			} catch {
+				return null;
 			}
 		},
-	);
-	xterm.registerLinkProvider(filePathLinkProvider);
+		onFileLinkClick: (event, link) => {
+			if (onFileLinkClick) {
+				onFileLinkClick(event, link);
+				return;
+			}
+			trpcClient.external.openFileInEditor
+				.mutate({
+					path: link.resolvedPath,
+					line: link.row,
+					column: link.col,
+				})
+				.catch((error) => {
+					console.error(
+						"[Terminal] Failed to open file in editor:",
+						link.resolvedPath,
+						error,
+					);
+				});
+		},
+		onUrlClick: (uri) => {
+			const handler = urlClickRef?.current;
+			if (handler) {
+				handler(uri);
+				return;
+			}
+			trpcClient.external.openUrl.mutate(uri).catch((error) => {
+				console.error("[Terminal] Failed to open URL:", uri, error);
+				toast.error("Failed to open URL", {
+					description:
+						error instanceof Error
+							? error.message
+							: "Could not open URL in browser",
+				});
+			});
+		},
+	});
 
 	xterm.unicode.activeVersion = "11";
 
@@ -193,10 +203,12 @@ export function createTerminalInWrapper(options: CreateTerminalOptions = {}): {
 		fitAddon,
 		searchAddon,
 		wrapper,
+		linkManager,
 		cleanup: () => {
 			disposed = true;
 			cancelAnimationFrame(rafId);
 			cleanupQuerySuppression();
+			linkManager.dispose();
 			try {
 				webglAddon?.dispose();
 			} catch {}

@@ -4,6 +4,7 @@ import type { IDisposable, ITheme, Terminal as XTerm } from "@xterm/xterm";
 import type { MutableRefObject, RefObject } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { writeCommandInPane } from "renderer/lib/terminal/launch-command";
+import type { DetectedLink } from "renderer/lib/terminal/links";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
 import { useTabsStore } from "renderer/stores/tabs/store";
 import { killTerminalForPane } from "renderer/stores/tabs/utils/terminal-cleanup";
@@ -100,9 +101,8 @@ export interface UseTerminalLifecycleOptions {
 	isRestoredModeRef: MutableRefObject<boolean>;
 	connectionErrorRef: MutableRefObject<string | null>;
 	initialThemeRef: MutableRefObject<ITheme | null>;
-	workspaceCwdRef: MutableRefObject<string | null>;
 	handleFileLinkClickRef: MutableRefObject<
-		(path: string, line?: number, column?: number) => void
+		(event: MouseEvent, link: DetectedLink) => void
 	>;
 	handleUrlClickRef: MutableRefObject<((url: string) => void) | undefined>;
 	paneInitialCwdRef: MutableRefObject<string | undefined>;
@@ -165,7 +165,6 @@ export function useTerminalLifecycle({
 	isRestoredModeRef,
 	connectionErrorRef,
 	initialThemeRef,
-	workspaceCwdRef,
 	handleFileLinkClickRef,
 	handleUrlClickRef,
 	paneInitialCwdRef,
@@ -240,10 +239,10 @@ export function useTerminalLifecycle({
 			console.log(`[Terminal] isReattach=${isReattach} paneId=${paneId}`);
 		}
 		const cached = v1TerminalCache.getOrCreate(paneId, {
-			cwd: workspaceCwdRef.current ?? undefined,
+			workspaceId,
 			initialTheme: initialThemeRef.current,
-			onFileLinkClick: (path, line, column) =>
-				handleFileLinkClickRef.current(path, line, column),
+			onFileLinkClick: (event, link) =>
+				handleFileLinkClickRef.current(event, link),
 			onUrlClickRef: handleUrlClickRef,
 		});
 
