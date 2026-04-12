@@ -67,7 +67,6 @@ export function useSubmitWorkspace(projectId: string | null) {
 			status: "creating",
 			error: null,
 			workspaceId: null,
-			initialCommands: null,
 			createdAt: new Date(),
 		});
 
@@ -112,7 +111,7 @@ export function useSubmitWorkspace(projectId: string | null) {
 			collections.pendingWorkspaces.update(pendingId, (row) => {
 				row.status = "succeeded";
 				row.workspaceId = result.workspace?.id ?? null;
-				row.initialCommands = result.initialCommands ?? null;
+				row.terminals = result.terminals ?? [];
 			});
 			void clearAttachments(pendingId);
 		} catch (err) {

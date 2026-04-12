@@ -6,6 +6,7 @@ import { eq } from "drizzle-orm";
 import simpleGit from "simple-git";
 import { z } from "zod";
 import { projects, workspaces } from "../../../db/schema";
+import { createTerminalSessionInternal } from "../../../terminal/terminal";
 import type { HostServiceContext } from "../../../types";
 import { protectedProcedure, router } from "../../index";
 import { resolveStartPoint } from "./utils/resolve-start-point";
@@ -488,12 +489,33 @@ export const workspaceCreationRouter = router({
 				})
 				.run();
 
-			// 5. Resolve setup commands (returned to renderer, not executed here)
-			let initialCommands: string[] | null = null;
+			// 5. Create setup terminal if setup script exists
+			const terminals: Array<{
+				id: string;
+				role: string;
+				label: string;
+			}> = [];
+			const warnings: string[] = [];
+
 			if (input.composer.runSetupScript) {
 				const setupScriptPath = join(worktreePath, ".superset", "setup.sh");
 				if (existsSync(setupScriptPath)) {
-					initialCommands = [`bash "${setupScriptPath}"`];
+					const terminalId = crypto.randomUUID();
+					const result = createTerminalSessionInternal({
+						terminalId,
+						workspaceId: cloudRow.id,
+						db: ctx.db,
+						initialCommand: `bash "${setupScriptPath}"`,
+					});
+					if ("error" in result) {
+						warnings.push(`Failed to start setup terminal: ${result.error}`);
+					} else {
+						terminals.push({
+							id: terminalId,
+							role: "setup",
+							label: "Workspace Setup",
+						});
+					}
 				}
 			}
 
@@ -501,8 +523,8 @@ export const workspaceCreationRouter = router({
 
 			return {
 				workspace: cloudRow,
-				initialCommands,
-				warnings: [] as string[],
+				terminals,
+				warnings,
 			};
 		}),
 
