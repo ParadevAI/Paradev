@@ -433,11 +433,9 @@ describe("openPane", () => {
 
 		store.getState().openPane({
 			pane: tp("p1", "opened"),
-			tabTitle: "My Tab",
 		});
 
 		expect(store.getState().tabs).toHaveLength(1);
-		expect(store.getState().tabs[0]?.titleOverride).toBe("My Tab");
 		expect(store.getState().getActivePane()?.pane.data.label).toBe("opened");
 	});
 

@@ -39,7 +39,6 @@ export function useWorkspaceHotkeys({
 
 	useHotkey("NEW_GROUP", () => {
 		store.getState().addTab({
-			titleOverride: "Terminal",
 			panes: [
 				{
 					kind: "terminal",
@@ -51,14 +50,12 @@ export function useWorkspaceHotkeys({
 
 	useHotkey("NEW_CHAT", () => {
 		store.getState().addTab({
-			titleOverride: "Chat",
 			panes: [{ kind: "chat", data: { sessionId: null } as ChatPaneData }],
 		});
 	});
 
 	useHotkey("NEW_BROWSER", () => {
 		store.getState().addTab({
-			titleOverride: "Browser",
 			panes: [
 				{
 					kind: "browser",

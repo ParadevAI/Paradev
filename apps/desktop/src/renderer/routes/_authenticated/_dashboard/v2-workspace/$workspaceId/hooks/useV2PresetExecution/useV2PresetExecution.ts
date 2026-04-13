@@ -10,9 +10,13 @@ import { filterMatchingPresetsForProject } from "shared/preset-project-targeting
 import type { StoreApi } from "zustand/vanilla";
 import type { PaneViewerData, TerminalPaneData } from "../../types";
 
-function makeTerminalPane(terminalId: string): CreatePaneInput<PaneViewerData> {
+function makeTerminalPane(
+	terminalId: string,
+	titleOverride?: string,
+): CreatePaneInput<PaneViewerData> {
 	return {
 		kind: "terminal",
+		titleOverride,
 		data: { terminalId } as TerminalPaneData,
 	};
 }
@@ -84,8 +88,7 @@ export function useV2PresetExecution({
 							preset.commands[0] as string,
 						);
 						state.addTab({
-							titleOverride: preset.name || "Terminal",
-							panes: [makeTerminalPane(id)],
+							panes: [makeTerminalPane(id, preset.name || undefined)],
 						});
 						break;
 					}
@@ -94,16 +97,22 @@ export function useV2PresetExecution({
 						const ids = await Promise.all(
 							preset.commands.map((cmd) => createSessionWithCommand(cmd)),
 						);
-						const panes = ids.map((id) => makeTerminalPane(id));
+						const panes = ids.map((id) =>
+							makeTerminalPane(id, preset.name || undefined),
+						);
 						state.addTab({
-							titleOverride: preset.name || "Terminal",
 							panes:
 								panes.length > 0
 									? (panes as [
 											CreatePaneInput<PaneViewerData>,
 											...CreatePaneInput<PaneViewerData>[],
 										])
-									: [makeTerminalPane(crypto.randomUUID())],
+									: [
+											makeTerminalPane(
+												crypto.randomUUID(),
+												preset.name || undefined,
+											),
+										],
 						});
 						break;
 					}
@@ -114,8 +123,9 @@ export function useV2PresetExecution({
 						);
 						for (let i = 0; i < ids.length; i++) {
 							state.addTab({
-								titleOverride: preset.name || "Terminal",
-								panes: [makeTerminalPane(ids[i] as string)],
+								panes: [
+									makeTerminalPane(ids[i] as string, preset.name || undefined),
+								],
 							});
 						}
 						break;
@@ -127,14 +137,13 @@ export function useV2PresetExecution({
 						);
 						if (!activeTabId) {
 							state.addTab({
-								titleOverride: preset.name || "Terminal",
-								panes: [makeTerminalPane(id)],
+								panes: [makeTerminalPane(id, preset.name || undefined)],
 							});
 							break;
 						}
 						state.addPane({
 							tabId: activeTabId,
-							pane: makeTerminalPane(id),
+							pane: makeTerminalPane(id, preset.name || undefined),
 						});
 						break;
 					}
@@ -144,23 +153,29 @@ export function useV2PresetExecution({
 							preset.commands.map((cmd) => createSessionWithCommand(cmd)),
 						);
 						if (!activeTabId) {
-							const panes = ids.map((id) => makeTerminalPane(id));
+							const panes = ids.map((id) =>
+								makeTerminalPane(id, preset.name || undefined),
+							);
 							state.addTab({
-								titleOverride: preset.name || "Terminal",
 								panes:
 									panes.length > 0
 										? (panes as [
 												CreatePaneInput<PaneViewerData>,
 												...CreatePaneInput<PaneViewerData>[],
 											])
-										: [makeTerminalPane(crypto.randomUUID())],
+										: [
+												makeTerminalPane(
+													crypto.randomUUID(),
+													preset.name || undefined,
+												),
+											],
 							});
 							break;
 						}
 						for (const id of ids) {
 							state.addPane({
 								tabId: activeTabId,
-								pane: makeTerminalPane(id),
+								pane: makeTerminalPane(id, preset.name || undefined),
 							});
 						}
 						break;

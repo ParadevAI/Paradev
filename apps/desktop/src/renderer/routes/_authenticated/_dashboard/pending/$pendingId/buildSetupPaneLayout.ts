@@ -17,7 +17,6 @@ export function buildSetupPaneLayout(
 		const tabId = `tab-${crypto.randomUUID()}`;
 		return {
 			id: tabId,
-			titleOverride: t.label,
 			createdAt: Date.now(),
 			activePaneId: paneId,
 			layout: { type: "pane" as const, paneId },
@@ -25,6 +24,7 @@ export function buildSetupPaneLayout(
 				[paneId]: {
 					id: paneId,
 					kind: "terminal",
+					titleOverride: t.label,
 					data: { terminalId: t.id } as TerminalPaneData,
 				},
 			},

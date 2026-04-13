@@ -120,7 +120,8 @@ export function usePaneRegistry(
 					const name = getFileName(data.filePath);
 					return <FileIcon fileName={name} className="size-4" />;
 				},
-				getTitle: (ctx: RendererContext<PaneViewerData>) => {
+				getTitle: (pane) => getFileName((pane.data as FilePaneData).filePath),
+				renderTitle: (ctx: RendererContext<PaneViewerData>) => {
 					const data = ctx.pane.data as FilePaneData;
 					const name = getFileName(data.filePath);
 					return (
@@ -262,9 +263,15 @@ export function usePaneRegistry(
 			},
 			browser: {
 				getIcon: () => <Globe className="size-4" />,
-				getTitle: (ctx: RendererContext<PaneViewerData>) => {
-					const data = ctx.pane.data as BrowserPaneData;
-					return data.pageTitle || data.url;
+				getTitle: (pane) => {
+					const data = pane.data as BrowserPaneData;
+					if (data.pageTitle) return data.pageTitle;
+					if (data.url && data.url !== "about:blank") {
+						try {
+							return new URL(data.url).host;
+						} catch {}
+					}
+					return "Browser";
 				},
 				renderPane: (ctx: RendererContext<PaneViewerData>) => (
 					<BrowserPane ctx={ctx} />

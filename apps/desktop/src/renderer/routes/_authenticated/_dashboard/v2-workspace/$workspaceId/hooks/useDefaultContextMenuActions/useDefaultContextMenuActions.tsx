@@ -1,4 +1,9 @@
-import type { ContextMenuActionConfig, RendererContext } from "@superset/panes";
+import {
+	type ContextMenuActionConfig,
+	type PaneRegistry,
+	type RendererContext,
+	resolveTabTitle,
+} from "@superset/panes";
 import { useMemo } from "react";
 import {
 	LuColumns2,
@@ -18,7 +23,9 @@ import type {
 	TerminalPaneData,
 } from "../../types";
 
-export function useDefaultContextMenuActions(): ContextMenuActionConfig<PaneViewerData>[] {
+export function useDefaultContextMenuActions(
+	paneRegistry: PaneRegistry<PaneViewerData>,
+): ContextMenuActionConfig<PaneViewerData>[] {
 	const splitDownShortcut = useHotkeyDisplay("SPLIT_DOWN").text;
 	const splitRightShortcut = useHotkeyDisplay("SPLIT_RIGHT").text;
 	const splitWithChatShortcut = useHotkeyDisplay("SPLIT_WITH_CHAT").text;
@@ -115,7 +122,7 @@ export function useDefaultContextMenuActions(): ContextMenuActionConfig<PaneView
 					const items: ContextMenuActionConfig<PaneViewerData>[] =
 						otherTabs.map((tab) => ({
 							key: `move-to-${tab.id}`,
-							label: tab.titleOverride ?? tab.id,
+							label: resolveTabTitle(tab, tabs, paneRegistry),
 							onSelect: () => {
 								ctx.store
 									.getState()
@@ -154,6 +161,7 @@ export function useDefaultContextMenuActions(): ContextMenuActionConfig<PaneView
 			splitWithBrowserShortcut,
 			equalizePaneSplitsShortcut,
 			closePaneShortcut,
+			paneRegistry,
 		],
 	);
 }

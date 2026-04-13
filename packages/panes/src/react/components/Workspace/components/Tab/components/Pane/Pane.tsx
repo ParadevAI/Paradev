@@ -211,7 +211,7 @@ export function Pane<TData>({
 	}
 
 	const title = definition
-		? (pane.titleOverride ?? definition.getTitle?.(context) ?? pane.id)
+		? (pane.titleOverride ?? definition.getTitle?.(pane) ?? pane.id)
 		: `Unknown: ${pane.kind}`;
 	const icon = definition?.getIcon?.(context);
 	const titleContent = definition?.renderTitle?.(context);

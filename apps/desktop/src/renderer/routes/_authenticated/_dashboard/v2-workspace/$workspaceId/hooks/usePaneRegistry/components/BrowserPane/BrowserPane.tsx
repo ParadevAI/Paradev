@@ -22,20 +22,6 @@ function getSingleBrowserPane(
 	return { id: pane.id, data: pane.data as BrowserPaneData };
 }
 
-export function getBrowserTabTitle(
-	tab: Tab<PaneViewerData>,
-): string | undefined {
-	const browser = getSingleBrowserPane(tab);
-	if (!browser) return undefined;
-	if (browser.data.pageTitle) return browser.data.pageTitle;
-	if (browser.data.url && browser.data.url !== "about:blank") {
-		try {
-			return new URL(browser.data.url).hostname;
-		} catch {}
-	}
-	return undefined;
-}
-
 export function renderBrowserTabIcon(tab: Tab<PaneViewerData>) {
 	const browser = getSingleBrowserPane(tab);
 	if (!browser?.data.faviconUrl) return null;

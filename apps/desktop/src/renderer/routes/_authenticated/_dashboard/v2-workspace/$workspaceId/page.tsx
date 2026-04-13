@@ -22,10 +22,7 @@ import { WorkspaceNotFoundState } from "./components/WorkspaceNotFoundState";
 import { WorkspaceSidebar } from "./components/WorkspaceSidebar";
 import { useDefaultContextMenuActions } from "./hooks/useDefaultContextMenuActions";
 import { usePaneRegistry } from "./hooks/usePaneRegistry";
-import {
-	getBrowserTabTitle,
-	renderBrowserTabIcon,
-} from "./hooks/usePaneRegistry/components/BrowserPane";
+import { renderBrowserTabIcon } from "./hooks/usePaneRegistry/components/BrowserPane";
 import { useV2PresetExecution } from "./hooks/useV2PresetExecution";
 import { useV2WorkspacePaneLayout } from "./hooks/useV2WorkspacePaneLayout";
 import { useWorkspaceHotkeys } from "./hooks/useWorkspaceHotkeys";
@@ -93,7 +90,7 @@ function WorkspaceContent({
 		projectId,
 	});
 	const paneRegistry = usePaneRegistry(workspaceId);
-	const defaultContextMenuActions = useDefaultContextMenuActions();
+	const defaultContextMenuActions = useDefaultContextMenuActions(paneRegistry);
 
 	const selectedFilePath = useStore(store, (s) => {
 		const tab = s.tabs.find((t) => t.id === s.activeTabId);
@@ -108,7 +105,6 @@ function WorkspaceContent({
 			const state = store.getState();
 			if (openInNewTab) {
 				state.addTab({
-					titleOverride: filePath.split(/[/\\]/).pop(),
 					panes: [
 						{
 							kind: "file",
@@ -139,7 +135,6 @@ function WorkspaceContent({
 						hasChanges: false,
 					} as FilePaneData,
 				},
-				tabTitle: "Files",
 			});
 		},
 		[store],
@@ -148,9 +143,8 @@ function WorkspaceContent({
 	const openDiffPane = useCallback(
 		(filePath: string) => {
 			const state = store.getState();
-			const activeTab = state.tabs.find((t) => t.id === state.activeTabId);
-			if (activeTab) {
-				for (const pane of Object.values(activeTab.panes)) {
+			for (const tab of state.tabs) {
+				for (const pane of Object.values(tab.panes)) {
 					if (pane.kind !== "diff") continue;
 					const prev = pane.data as DiffPaneData;
 					state.setPaneData({
@@ -160,19 +154,21 @@ function WorkspaceContent({
 							path: filePath,
 						} as PaneViewerData,
 					});
-					state.setActivePane({ tabId: activeTab.id, paneId: pane.id });
+					state.setActiveTab(tab.id);
+					state.setActivePane({ tabId: tab.id, paneId: pane.id });
 					return;
 				}
 			}
-			state.openPane({
-				pane: {
-					kind: "diff",
-					data: {
-						path: filePath,
-						collapsedFiles: [],
-					} as DiffPaneData,
-				},
-				tabTitle: "Changes",
+			state.addTab({
+				panes: [
+					{
+						kind: "diff",
+						data: {
+							path: filePath,
+							collapsedFiles: [],
+						} as DiffPaneData,
+					},
+				],
 			});
 		},
 		[store],
@@ -180,7 +176,6 @@ function WorkspaceContent({
 
 	const addTerminalTab = useCallback(() => {
 		store.getState().addTab({
-			titleOverride: "Terminal",
 			panes: [
 				{
 					kind: "terminal",
@@ -194,7 +189,6 @@ function WorkspaceContent({
 
 	const addChatTab = useCallback(() => {
 		store.getState().addTab({
-			titleOverride: "Chat",
 			panes: [
 				{
 					kind: "chat",
@@ -206,7 +200,6 @@ function WorkspaceContent({
 
 	const addBrowserTab = useCallback(() => {
 		store.getState().addTab({
-			titleOverride: "Browser",
 			panes: [
 				{
 					kind: "browser",
@@ -270,7 +263,6 @@ function WorkspaceContent({
 							registry={paneRegistry}
 							paneActions={defaultPaneActions}
 							contextMenuActions={defaultContextMenuActions}
-							getTabTitle={getBrowserTabTitle}
 							renderTabIcon={renderBrowserTabIcon}
 							renderBelowTabBar={() => (
 								<V2PresetsBar

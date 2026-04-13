@@ -121,7 +121,7 @@ export interface WorkspaceStore<TData> extends WorkspaceState<TData> {
 		newPane: CreatePaneInput<TData>;
 	}) => void;
 
-	openPane: (args: { pane: CreatePaneInput<TData>; tabTitle?: string }) => void;
+	openPane: (args: { pane: CreatePaneInput<TData> }) => void;
 
 	splitPane: (args: {
 		tabId: string;
@@ -406,7 +406,6 @@ export function createWorkspaceStore<TData>(
 			// No tab → create one
 			if (!tab || !activeTabId) {
 				get().addTab({
-					titleOverride: args.tabTitle,
 					panes: [args.pane],
 				});
 				return;

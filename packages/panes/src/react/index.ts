@@ -1,4 +1,4 @@
-export { Workspace } from "./components/Workspace";
+export { resolveTabTitle, Workspace } from "./components/Workspace";
 export type {
 	ContextMenuActionConfig,
 	PaneActionConfig,

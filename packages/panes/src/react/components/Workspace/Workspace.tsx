@@ -5,6 +5,7 @@ import type { Pane } from "../../../types";
 import type { WorkspaceProps } from "../../types";
 import { Tab } from "./components/Tab";
 import { TabBar } from "./components/TabBar";
+import { resolveTabTitle } from "./utils/resolveTabTitle";
 
 export function Workspace<TData>({
 	store,
@@ -12,7 +13,6 @@ export function Workspace<TData>({
 	className,
 	renderTabAccessory,
 	renderTabIcon,
-	getTabTitle,
 	renderEmptyState,
 	renderAddTabMenu,
 	renderBelowTabBar,
@@ -78,7 +78,7 @@ export function Workspace<TData>({
 				onReorderTab={(tabId, toIndex) =>
 					store.getState().reorderTab({ tabId, toIndex })
 				}
-				getTabTitle={(tab) => tab.titleOverride ?? getTabTitle?.(tab) ?? tab.id}
+				getTabTitle={(tab) => resolveTabTitle(tab, tabs, registry)}
 				renderTabIcon={renderTabIcon}
 				renderAddTabMenu={renderAddTabMenu}
 				renderTabAccessory={renderTabAccessory}

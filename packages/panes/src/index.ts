@@ -17,7 +17,7 @@ export type {
 	TabContext,
 	WorkspaceProps,
 } from "./react";
-export { Workspace } from "./react";
+export { resolveTabTitle, Workspace } from "./react";
 export type {
 	LayoutNode,
 	Pane,

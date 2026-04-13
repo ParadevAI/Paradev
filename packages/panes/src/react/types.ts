@@ -58,7 +58,7 @@ export interface RendererContext<TData> {
 
 export interface PaneDefinition<TData> {
 	renderPane(context: RendererContext<TData>): ReactNode;
-	getTitle?(context: RendererContext<TData>): ReactNode;
+	getTitle?(pane: Pane<TData>): string | undefined;
 	getIcon?(context: RendererContext<TData>): ReactNode;
 	renderTitle?(context: RendererContext<TData>): ReactNode;
 	renderHeaderExtras?(context: RendererContext<TData>): ReactNode;
@@ -88,7 +88,6 @@ export interface WorkspaceProps<TData> {
 	className?: string;
 	renderTabAccessory?: (tab: Tab<TData>) => ReactNode;
 	renderTabIcon?: (tab: Tab<TData>) => ReactNode;
-	getTabTitle?: (tab: Tab<TData>) => string | undefined;
 	renderEmptyState?: () => ReactNode;
 	renderAddTabMenu?: () => ReactNode;
 	renderBelowTabBar?: () => ReactNode;
