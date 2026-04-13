@@ -8,7 +8,9 @@ import {
 import { toast } from "@superset/ui/sonner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
-import { useCallback, useMemo, useState } from "react";
+import { eq } from "@tanstack/db";
+import { useLiveQuery } from "@tanstack/react-db";
+import { useCallback, useMemo } from "react";
 import { HiChevronDown } from "react-icons/hi2";
 import {
 	getAppOption,
@@ -16,41 +18,49 @@ import {
 } from "renderer/components/OpenInExternalDropdown";
 import { HotkeyLabel, useHotkey, useHotkeyDisplay } from "renderer/hotkeys";
 import { electronTrpc } from "renderer/lib/electron-trpc";
+import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useThemeStore } from "renderer/stores";
 
 interface V2OpenInMenuButtonProps {
 	worktreePath: string;
 	branch: string;
-	workspaceId: string;
+	projectId: string;
 }
 
 export function V2OpenInMenuButton({
 	worktreePath,
 	branch,
-	workspaceId,
+	projectId,
 }: V2OpenInMenuButtonProps) {
 	const collections = useCollections();
+	const { ensureProjectInSidebar } = useDashboardSidebarState();
 	const activeTheme = useThemeStore((state) => state.activeTheme);
 
-	const localState = collections.v2WorkspaceLocalState.get(workspaceId);
-	const [defaultApp, setDefaultApp] = useState<ExternalApp>(
-		(localState?.defaultOpenInApp as ExternalApp) ?? "finder",
+	const { data: sidebarProjectRows = [] } = useLiveQuery(
+		(q) =>
+			q
+				.from({ sp: collections.v2SidebarProjects })
+				.where(({ sp }) => eq(sp.projectId, projectId))
+				.select(({ sp }) => ({ defaultOpenInApp: sp.defaultOpenInApp })),
+		[collections, projectId],
 	);
+	const resolvedApp: ExternalApp =
+		(sidebarProjectRows[0]?.defaultOpenInApp as ExternalApp | null) ?? "finder";
 
-	const handleDefaultAppChange = useCallback(
+	const persistDefaultApp = useCallback(
 		(app: ExternalApp) => {
-			setDefaultApp(app);
-			collections.v2WorkspaceLocalState.update(workspaceId, (draft) => {
+			ensureProjectInSidebar(projectId);
+			collections.v2SidebarProjects.update(projectId, (draft) => {
 				draft.defaultOpenInApp = app;
 			});
 		},
-		[collections, workspaceId],
+		[collections, ensureProjectInSidebar, projectId],
 	);
 
 	const openInApp = electronTrpc.external.openInApp.useMutation({
 		onSuccess: (_data, variables) => {
-			handleDefaultAppChange(variables.app);
+			persistDefaultApp(variables.app);
 		},
 		onError: (error) => toast.error(`Failed to open: ${error.message}`),
 	});
@@ -60,8 +70,8 @@ export function V2OpenInMenuButton({
 	});
 
 	const currentApp = useMemo(
-		() => getAppOption(defaultApp) ?? null,
-		[defaultApp],
+		() => getAppOption(resolvedApp) ?? null,
+		[resolvedApp],
 	);
 	const openInDisplay = useHotkeyDisplay("OPEN_IN_APP");
 	const copyPathDisplay = useHotkeyDisplay("COPY_PATH");
@@ -72,8 +82,8 @@ export function V2OpenInMenuButton({
 
 	const handleOpenInEditor = useCallback(() => {
 		if (openInApp.isPending || copyPath.isPending) return;
-		openInApp.mutate({ path: worktreePath, app: defaultApp });
-	}, [worktreePath, defaultApp, openInApp, copyPath.isPending]);
+		openInApp.mutate({ path: worktreePath, app: resolvedApp });
+	}, [worktreePath, resolvedApp, openInApp, copyPath.isPending]);
 
 	const handleOpenInOtherApp = useCallback(
 		(appId: ExternalApp) => {
@@ -162,12 +172,12 @@ export function V2OpenInMenuButton({
 				<DropdownMenuContent align="end" className="w-48">
 					<OpenInExternalDropdownItems
 						isDark={isDark}
-						activeApp={defaultApp}
+						activeApp={resolvedApp}
 						onOpenIn={handleOpenInOtherApp}
 						onCopyPath={handleCopyPath}
 						renderAppTrailing={(appId, group) => {
 							if (
-								appId !== defaultApp ||
+								appId !== resolvedApp ||
 								!showOpenInShortcut ||
 								group === "jetbrains"
 							) {
