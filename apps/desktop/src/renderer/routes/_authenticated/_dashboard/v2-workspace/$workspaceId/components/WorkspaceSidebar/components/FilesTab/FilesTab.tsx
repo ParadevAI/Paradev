@@ -1,9 +1,12 @@
 import type { AppRouter } from "@superset/host-service";
+import type { ExternalApp } from "@superset/local-db";
 import { alert } from "@superset/ui/atoms/Alert";
 import { Button } from "@superset/ui/button";
 import { toast } from "@superset/ui/sonner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { workspaceTrpc } from "@superset/workspace-client";
+import { eq } from "@tanstack/db";
+import { useLiveQuery } from "@tanstack/react-db";
 import type { inferRouterOutputs } from "@trpc/server";
 import { FilePlus, FolderPlus, FoldVertical, RefreshCw } from "lucide-react";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
@@ -16,6 +19,9 @@ import {
 	useGitStatusMap,
 } from "renderer/hooks/host-service/useGitStatusMap";
 import { useWorkspaceEvent } from "renderer/hooks/host-service/useWorkspaceEvent";
+import { electronTrpcClient } from "renderer/lib/trpc-client";
+import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
+import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import {
 	ROW_HEIGHT,
 	TREE_INDENT,
@@ -31,7 +37,7 @@ type InlineEditState =
 	| null;
 
 interface FilesTabProps {
-	onSelectFile: (absolutePath: string) => void;
+	onSelectFile: (absolutePath: string, openInNewTab?: boolean) => void;
 	selectedFilePath?: string;
 	workspaceId: string;
 	workspaceName?: string;
@@ -55,6 +61,7 @@ function TreeNode({
 	folderStatusByPath,
 	ignoredPaths,
 	onSelectFile,
+	onOpenInEditor,
 	onToggleDirectory,
 	onInlineEditSubmit,
 	onInlineEditCancel,
@@ -74,7 +81,8 @@ function TreeNode({
 	fileStatusByPath: Map<string, FileStatus>;
 	folderStatusByPath: Map<string, FileStatus>;
 	ignoredPaths: Set<string>;
-	onSelectFile: (absolutePath: string) => void;
+	onSelectFile: (absolutePath: string, openInNewTab?: boolean) => void;
+	onOpenInEditor: (absolutePath: string) => void;
 	onToggleDirectory: (absolutePath: string) => void;
 	onInlineEditSubmit: (name: string) => void;
 	onInlineEditCancel: () => void;
@@ -127,6 +135,7 @@ function TreeNode({
 					decoration={decoration}
 					isMuted={isMuted}
 					onSelectFile={onSelectFile}
+					onOpenInEditor={onOpenInEditor}
 					onToggleDirectory={onToggleDirectory}
 					onNewFile={onNewFile}
 					onNewFolder={onNewFolder}
@@ -162,6 +171,7 @@ function TreeNode({
 									folderStatusByPath={folderStatusByPath}
 									ignoredPaths={ignoredPaths}
 									onSelectFile={onSelectFile}
+									onOpenInEditor={onOpenInEditor}
 									onToggleDirectory={onToggleDirectory}
 									onInlineEditSubmit={onInlineEditSubmit}
 									onInlineEditCancel={onInlineEditCancel}
@@ -210,6 +220,53 @@ export function FilesTab({
 		id: workspaceId,
 	});
 	const rootPath = workspaceQuery.data?.worktreePath ?? "";
+	const projectId = workspaceQuery.data?.projectId;
+
+	const collections = useCollections();
+	const { machineId } = useLocalHostService();
+	const { data: workspacesWithHost = [] } = useLiveQuery(
+		(q) =>
+			q
+				.from({ workspaces: collections.v2Workspaces })
+				.leftJoin({ hosts: collections.v2Hosts }, ({ workspaces, hosts }) =>
+					eq(workspaces.hostId, hosts.id),
+				)
+				.where(({ workspaces }) => eq(workspaces.id, workspaceId))
+				.select(({ hosts }) => ({
+					hostMachineId: hosts?.machineId ?? null,
+				})),
+		[collections, workspaceId],
+	);
+	const workspaceHost = workspacesWithHost[0];
+
+	const { data: sidebarProjectRows = [] } = useLiveQuery(
+		(q) =>
+			q
+				.from({ sp: collections.v2SidebarProjects })
+				.where(({ sp }) => eq(sp.projectId, projectId ?? ""))
+				.select(({ sp }) => ({ defaultOpenInApp: sp.defaultOpenInApp })),
+		[collections, projectId],
+	);
+	const resolvedOpenInApp: ExternalApp =
+		(sidebarProjectRows[0]?.defaultOpenInApp as ExternalApp | null) ?? "finder";
+
+	const handleOpenInEditor = useCallback(
+		(absolutePath: string) => {
+			if (!workspaceHost) return;
+			if (workspaceHost.hostMachineId !== machineId) {
+				toast.error("Opening in editor is only supported on local workspaces");
+				return;
+			}
+			electronTrpcClient.external.openInApp
+				.mutate({ path: absolutePath, app: resolvedOpenInApp })
+				.catch((err) => {
+					toast.error("Couldn't open file", {
+						description: err instanceof Error ? err.message : String(err),
+					});
+				});
+		},
+		[workspaceHost, machineId, resolvedOpenInApp],
+	);
 
 	const writeFile = workspaceTrpc.filesystem.writeFile.useMutation();
 	const createDirectory =
@@ -566,6 +623,7 @@ export function FilesTab({
 										folderStatusByPath={folderStatusByPath}
 										ignoredPaths={ignoredPaths}
 										onSelectFile={onSelectFile}
+										onOpenInEditor={handleOpenInEditor}
 										onToggleDirectory={(absolutePath) =>
 											void fileTree.toggle(absolutePath)
 										}
