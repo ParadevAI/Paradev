@@ -2,73 +2,80 @@ import { useEffect, useRef } from "react";
 import { HOTKEYS, type HotkeyId, PLATFORM } from "../../registry";
 import { useHotkeyOverridesStore } from "../../stores/hotkeyOverridesStore";
 import type { Platform } from "../../types";
+import {
+	canonicalizeChord,
+	isIgnorableKey,
+	normalizeToken,
+	TERMINAL_RESERVED_CHORDS,
+} from "../../utils/resolveHotkeyFromEvent";
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
+// Matches the registry's written modifier order (`meta+alt+up`) so recorded
+// strings stay visually aligned with defaults. Canonicalization handles
+// reordering at compare time.
 const MODIFIER_ORDER = ["meta", "ctrl", "alt", "shift"] as const;
 
-function captureHotkeyFromEvent(event: KeyboardEvent): string | null {
-	const key = event.key.toLowerCase();
-	if (["shift", "ctrl", "alt", "meta", "dead", "unidentified"].includes(key))
-		return null;
+export function captureHotkeyFromEvent(event: KeyboardEvent): string | null {
+	// event.code (not event.key) so Shift+2 records as `2`, Alt+L on Mac as
+	// `l`, and non-US layouts produce stable tokens matching the registry.
+	if (event.code === undefined) return null;
+	const key = normalizeToken(event.code);
+	if (isIgnorableKey(key)) return null;
 
-	// Must include ctrl or meta (or be F1-F12)
 	const isFKey = /^f([1-9]|1[0-2])$/.test(key);
 	if (!isFKey && !event.ctrlKey && !event.metaKey) return null;
 
-	// Reject meta on non-Mac
-	if (PLATFORM !== "mac" && event.metaKey) return null;
+	const modifiers = new Set<string>();
+	if (event.metaKey) modifiers.add("meta");
+	if (event.ctrlKey) modifiers.add("ctrl");
+	if (event.altKey) modifiers.add("alt");
+	if (event.shiftKey) modifiers.add("shift");
 
-	const modifiers: string[] = [];
-	if (event.metaKey) modifiers.push("meta");
-	if (event.ctrlKey) modifiers.push("ctrl");
-	if (event.altKey) modifiers.push("alt");
-	if (event.shiftKey) modifiers.push("shift");
-
-	const ordered = MODIFIER_ORDER.filter((m) => modifiers.includes(m));
+	const ordered = MODIFIER_ORDER.filter((m) => modifiers.has(m));
 	return [...ordered, key].join("+");
 }
 
-const TERMINAL_RESERVED = new Set([
-	"ctrl+c",
-	"ctrl+d",
-	"ctrl+z",
-	"ctrl+s",
-	"ctrl+q",
-	"ctrl+\\",
-]);
-
-const OS_RESERVED: Record<Platform, string[]> = {
-	mac: ["meta+q", "meta+space", "meta+tab"],
-	windows: ["alt+f4", "alt+tab", "ctrl+alt+delete"],
-	linux: ["alt+f4", "alt+tab"],
+// Chords the OS / shell is likely to intercept. Binding is allowed (Linux
+// WM configs vary), but the recorder emits a warning so the user knows why
+// a chord they just bound might not fire. Canonicalized at build time so
+// multi-modifier entries (e.g. `ctrl+alt+delete` → `alt+ctrl+delete`) match.
+const OS_RESERVED: Record<Platform, Set<string>> = {
+	mac: new Set(["meta+q", "meta+space", "meta+tab"].map(canonicalizeChord)),
+	windows: new Set(
+		[
+			"alt+f4",
+			"alt+tab",
+			"ctrl+alt+delete",
+			"meta+d", // Show desktop
+			"meta+e", // Explorer
+			"meta+l", // Lock
+			"meta+r", // Run
+			"meta+tab", // Task view
+		].map(canonicalizeChord),
+	),
+	linux: new Set(["alt+f4", "alt+tab"].map(canonicalizeChord)),
 };
 
 function checkReserved(
 	keys: string,
 ): { reason: string; severity: "error" | "warning" } | null {
-	if (TERMINAL_RESERVED.has(keys))
+	const canonical = canonicalizeChord(keys);
+	if (TERMINAL_RESERVED_CHORDS.has(canonical))
 		return { reason: "Reserved by terminal", severity: "error" };
-	if (OS_RESERVED[PLATFORM].includes(keys))
+	if (OS_RESERVED[PLATFORM].has(canonical))
 		return { reason: "Reserved by OS", severity: "warning" };
 	return null;
 }
 
 function getHotkeyConflict(keys: string, excludeId: HotkeyId): HotkeyId | null {
 	const { overrides } = useHotkeyOverridesStore.getState();
+	const canonicalKeys = canonicalizeChord(keys);
 	for (const id of Object.keys(HOTKEYS) as HotkeyId[]) {
 		if (id === excludeId) continue;
 		const effective = id in overrides ? overrides[id] : HOTKEYS[id].key;
-		if (effective === keys) return id;
+		if (effective && canonicalizeChord(effective) === canonicalKeys) return id;
 	}
 	return null;
 }
-
-// ---------------------------------------------------------------------------
-// Hook
-// ---------------------------------------------------------------------------
 
 interface UseRecordHotkeysOptions {
 	onSave?: (id: HotkeyId, keys: string) => void;
@@ -129,7 +136,7 @@ export function useRecordHotkeys(
 			}
 
 			const defaultKey = HOTKEYS[recordingId].key;
-			if (captured === defaultKey) {
+			if (canonicalizeChord(captured) === canonicalizeChord(defaultKey)) {
 				resetOverride(recordingId);
 			} else {
 				setOverride(recordingId, captured);
