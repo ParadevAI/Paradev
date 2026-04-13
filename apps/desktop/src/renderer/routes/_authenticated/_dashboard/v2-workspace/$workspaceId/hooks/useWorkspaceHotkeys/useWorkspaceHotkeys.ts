@@ -84,6 +84,23 @@ export function useWorkspaceHotkeys({
 		}
 	});
 
+	useHotkey("PREV_TAB", () => {
+		const state = store.getState();
+		if (!state.activeTabId || state.tabs.length === 0) return;
+		const index = state.tabs.findIndex((t) => t.id === state.activeTabId);
+		const prevIndex = index <= 0 ? state.tabs.length - 1 : index - 1;
+		state.setActiveTab(state.tabs[prevIndex].id);
+	});
+
+	useHotkey("NEXT_TAB", () => {
+		const state = store.getState();
+		if (!state.activeTabId || state.tabs.length === 0) return;
+		const index = state.tabs.findIndex((t) => t.id === state.activeTabId);
+		const nextIndex =
+			index >= state.tabs.length - 1 || index === -1 ? 0 : index + 1;
+		state.setActiveTab(state.tabs[nextIndex].id);
+	});
+
 	useHotkey("PREV_TAB_ALT", () => {
 		const state = store.getState();
 		if (!state.activeTabId || state.tabs.length === 0) return;

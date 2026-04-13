@@ -136,7 +136,10 @@ export function useRecordHotkeys(
 			}
 
 			const defaultKey = HOTKEYS[recordingId].key;
-			if (canonicalizeChord(captured) === canonicalizeChord(defaultKey)) {
+			if (
+				defaultKey &&
+				canonicalizeChord(captured) === canonicalizeChord(defaultKey)
+			) {
 				resetOverride(recordingId);
 			} else {
 				setOverride(recordingId, captured);

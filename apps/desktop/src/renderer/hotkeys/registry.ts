@@ -101,6 +101,18 @@ export const HOTKEYS_REGISTRY = {
 		label: "Switch to Workspace 9",
 		category: "Workspace",
 	},
+	PREV_WORKSPACE: {
+		key: { mac: null, windows: null, linux: null },
+		label: "Previous Workspace",
+		category: "Workspace",
+		description: "Navigate to the previous workspace in the sidebar",
+	},
+	NEXT_WORKSPACE: {
+		key: { mac: null, windows: null, linux: null },
+		label: "Next Workspace",
+		category: "Workspace",
+		description: "Navigate to the next workspace in the sidebar",
+	},
 	CLOSE_WORKSPACE: {
 		key: {
 			mac: "meta+shift+backspace",
@@ -329,6 +341,18 @@ export const HOTKEYS_REGISTRY = {
 		key: { mac: "ctrl+tab", windows: "ctrl+tab", linux: "ctrl+tab" },
 		label: "Next Tab (Alt)",
 		category: "Terminal",
+	},
+	PREV_TAB: {
+		key: { mac: null, windows: null, linux: null },
+		label: "Previous Tab",
+		category: "Terminal",
+		description: "Focus the previous tab in the active workspace",
+	},
+	NEXT_TAB: {
+		key: { mac: null, windows: null, linux: null },
+		label: "Next Tab",
+		category: "Terminal",
+		description: "Focus the next tab in the active workspace",
 	},
 	FOCUS_PANE_LEFT: {
 		key: {

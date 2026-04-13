@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from "bun:test";
-import { HOTKEYS } from "../registry";
+import { HOTKEYS, type HotkeyId } from "../registry";
 import { useHotkeyOverridesStore } from "../stores/hotkeyOverridesStore";
+import type { HotkeyDefinition } from "../types";
 import {
 	canonicalizeChord,
 	eventToChord,
@@ -148,10 +149,13 @@ describe("resolveHotkeyFromEvent — live override index", () => {
 	});
 
 	// Resolve once so registry reorders / removals surface as a test failure
-	// here instead of silently skipping the cases below.
-	const sampleEntry = (
-		Object.entries(HOTKEYS) as [keyof typeof HOTKEYS, { key: string }][]
-	).find(([, hotkey]) => !!hotkey.key);
+	// here instead of silently skipping the cases below. The type predicate
+	// narrows to a HotkeyDefinition whose .key is guaranteed non-null after
+	// the filter, so sampleDef.key can be passed to string-only helpers below.
+	const sampleEntry = Object.entries(HOTKEYS).find(
+		(entry): entry is [HotkeyId, HotkeyDefinition & { key: string }] =>
+			entry[1].key !== null,
+	);
 	if (!sampleEntry) throw new Error("HOTKEYS has no bound default");
 	const [sampleId, sampleDef] = sampleEntry;
 

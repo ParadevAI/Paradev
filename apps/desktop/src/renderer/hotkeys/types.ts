@@ -1,6 +1,10 @@
 export type Platform = "mac" | "windows" | "linux";
 
-export type PlatformKey = { mac: string; windows: string; linux: string };
+export type PlatformKey = {
+	mac: string | null;
+	windows: string | null;
+	linux: string | null;
+};
 
 export type HotkeyCategory =
 	| "Navigation"
@@ -18,7 +22,7 @@ export interface HotkeyDisplay {
 }
 
 export interface HotkeyDefinition {
-	key: string;
+	key: string | null;
 	label: string;
 	category: HotkeyCategory;
 	description?: string;
