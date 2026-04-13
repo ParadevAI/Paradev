@@ -1,4 +1,6 @@
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
+import { eq } from "@tanstack/db";
+import { useLiveQuery } from "@tanstack/react-db";
 import {
 	LuPanelRight,
 	LuPanelRightClose,
@@ -9,8 +11,16 @@ import { useCollections } from "renderer/routes/_authenticated/providers/Collect
 
 export function RightSidebarToggle({ workspaceId }: { workspaceId: string }) {
 	const collections = useCollections();
-	const localState = collections.v2WorkspaceLocalState.get(workspaceId);
-	const isOpen = localState?.rightSidebarOpen ?? false;
+	const { data: localStateRows = [] } = useLiveQuery(
+		(query) =>
+			query
+				.from({ v2WorkspaceLocalState: collections.v2WorkspaceLocalState })
+				.where(({ v2WorkspaceLocalState }) =>
+					eq(v2WorkspaceLocalState.workspaceId, workspaceId),
+				),
+		[collections, workspaceId],
+	);
+	const isOpen = localStateRows[0]?.rightSidebarOpen ?? false;
 
 	const toggle = () => {
 		collections.v2WorkspaceLocalState.update(workspaceId, (draft) => {
