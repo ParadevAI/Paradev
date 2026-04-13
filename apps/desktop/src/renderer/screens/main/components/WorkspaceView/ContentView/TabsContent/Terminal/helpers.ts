@@ -23,6 +23,10 @@ import {
 	DEFAULT_THEME_ID,
 	getTerminalColors,
 } from "shared/themes";
+import {
+	shouldBubbleClipboardShortcut,
+	shouldSelectAllShortcut,
+} from "./clipboardShortcuts";
 import { TERMINAL_OPTIONS } from "./config";
 import { suppressQueryResponses } from "./suppressQueryResponses";
 
@@ -571,6 +575,26 @@ export function setupKeyboardHandler(
 			if (event.type === "keydown" && options.onWrite) {
 				options.onWrite("\x1bf"); // Meta+F - forward word
 			}
+			return false;
+		}
+
+		if (shouldSelectAllShortcut(event, isMac)) {
+			if (event.type === "keydown") {
+				event.preventDefault();
+				xterm.selectAll();
+			}
+			return false;
+		}
+
+		// Mirror VS Code terminal clipboard bindings so host copy/paste happens
+		// before kitty CSI-u handling in xterm consumes the command chord.
+		if (
+			shouldBubbleClipboardShortcut(event, {
+				isMac,
+				isWindows,
+				hasSelection: xterm.hasSelection(),
+			})
+		) {
 			return false;
 		}
 
