@@ -1,5 +1,5 @@
 import type { ExternalApp } from "@superset/local-db";
-import { createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
 import { useFileOpenMode } from "renderer/hooks/useFileOpenMode";
@@ -8,7 +8,6 @@ import { electronTrpc } from "renderer/lib/electron-trpc";
 import { electronTrpcClient as trpcClient } from "renderer/lib/trpc-client";
 import { usePresets } from "renderer/react-query/presets";
 import type { WorkspaceSearchParams } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
-import { navigateToWorkspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { usePresetHotkeys } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/hooks/usePresetHotkeys";
 import { useWorkspaceRunCommand } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/hooks/useWorkspaceRunCommand";
 import { NotFound } from "renderer/routes/not-found";
@@ -35,8 +34,6 @@ import { useTabsWithPresets } from "renderer/stores/tabs/useTabsWithPresets";
 import {
 	findPanePath,
 	getFirstPaneId,
-	getNextPaneId,
-	getPreviousPaneId,
 	resolveActiveTabIdForWorkspace,
 } from "renderer/stores/tabs/utils";
 import {
@@ -93,7 +90,6 @@ function WorkspacePage() {
 		worktreePath: workspace?.worktreePath,
 		enabled: Boolean(workspace?.worktreePath),
 	});
-	const navigate = useNavigate();
 	const routeNavigate = Route.useNavigate();
 	const { tabId: searchTabId, paneId: searchPaneId } = Route.useSearch();
 
@@ -228,20 +224,6 @@ function WorkspacePage() {
 		}
 	});
 
-	useHotkey("PREV_TAB", () => {
-		if (!activeTabId || tabs.length === 0) return;
-		const index = tabs.findIndex((t) => t.id === activeTabId);
-		const prevIndex = index <= 0 ? tabs.length - 1 : index - 1;
-		setActiveTab(workspaceId, tabs[prevIndex].id);
-	});
-
-	useHotkey("NEXT_TAB", () => {
-		if (!activeTabId || tabs.length === 0) return;
-		const index = tabs.findIndex((t) => t.id === activeTabId);
-		const nextIndex = index >= tabs.length - 1 || index === -1 ? 0 : index + 1;
-		setActiveTab(workspaceId, tabs[nextIndex].id);
-	});
-
 	useHotkey("PREV_TAB_ALT", () => {
 		if (!activeTabId || tabs.length === 0) return;
 		const index = tabs.findIndex((t) => t.id === activeTabId);
@@ -275,22 +257,6 @@ function WorkspacePage() {
 	useHotkey("JUMP_TO_TAB_7", () => switchToTab(6));
 	useHotkey("JUMP_TO_TAB_8", () => switchToTab(7));
 	useHotkey("JUMP_TO_TAB_9", () => switchToTab(8));
-
-	useHotkey("PREV_PANE", () => {
-		if (!activeTabId || !activeTab?.layout || !focusedPaneId) return;
-		const prevPaneId = getPreviousPaneId(activeTab.layout, focusedPaneId);
-		if (prevPaneId) {
-			setFocusedPane(activeTabId, prevPaneId);
-		}
-	});
-
-	useHotkey("NEXT_PANE", () => {
-		if (!activeTabId || !activeTab?.layout || !focusedPaneId) return;
-		const nextPaneId = getNextPaneId(activeTab.layout, focusedPaneId);
-		if (nextPaneId) {
-			setFocusedPane(activeTabId, nextPaneId);
-		}
-	});
 
 	// Open in last used app shortcut
 	const projectId = workspace?.projectId;
@@ -424,31 +390,6 @@ function WorkspacePage() {
 	useHotkey("EQUALIZE_PANE_SPLITS", () => {
 		if (activeTabId) {
 			equalizePaneSplits(activeTabId);
-		}
-	});
-
-	// Navigate to previous workspace (⌘↑)
-	const getPreviousWorkspace =
-		electronTrpc.workspaces.getPreviousWorkspace.useQuery(
-			{ id: workspaceId },
-			{ enabled: !!workspaceId },
-		);
-	useHotkey("PREV_WORKSPACE", () => {
-		const prevWorkspaceId = getPreviousWorkspace.data;
-		if (prevWorkspaceId) {
-			navigateToWorkspace(prevWorkspaceId, navigate);
-		}
-	});
-
-	// Navigate to next workspace (⌘↓)
-	const getNextWorkspace = electronTrpc.workspaces.getNextWorkspace.useQuery(
-		{ id: workspaceId },
-		{ enabled: !!workspaceId },
-	);
-	useHotkey("NEXT_WORKSPACE", () => {
-		const nextWorkspaceId = getNextWorkspace.data;
-		if (nextWorkspaceId) {
-			navigateToWorkspace(nextWorkspaceId, navigate);
 		}
 	});
 

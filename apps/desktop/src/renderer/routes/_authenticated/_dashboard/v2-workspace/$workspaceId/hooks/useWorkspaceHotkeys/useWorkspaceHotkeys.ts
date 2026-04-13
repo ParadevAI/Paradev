@@ -1,4 +1,8 @@
-import type { WorkspaceStore } from "@superset/panes";
+import {
+	type FocusDirection,
+	getSpatialNeighborPaneId,
+	type WorkspaceStore,
+} from "@superset/panes";
 import { useCallback } from "react";
 import { useHotkey } from "renderer/hotkeys";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
@@ -83,23 +87,6 @@ export function useWorkspaceHotkeys({
 		}
 	});
 
-	useHotkey("PREV_TAB", () => {
-		const state = store.getState();
-		if (!state.activeTabId || state.tabs.length === 0) return;
-		const index = state.tabs.findIndex((t) => t.id === state.activeTabId);
-		const prevIndex = index <= 0 ? state.tabs.length - 1 : index - 1;
-		state.setActiveTab(state.tabs[prevIndex].id);
-	});
-
-	useHotkey("NEXT_TAB", () => {
-		const state = store.getState();
-		if (!state.activeTabId || state.tabs.length === 0) return;
-		const index = state.tabs.findIndex((t) => t.id === state.activeTabId);
-		const nextIndex =
-			index >= state.tabs.length - 1 || index === -1 ? 0 : index + 1;
-		state.setActiveTab(state.tabs[nextIndex].id);
-	});
-
 	useHotkey("PREV_TAB_ALT", () => {
 		const state = store.getState();
 		if (!state.activeTabId || state.tabs.length === 0) return;
@@ -138,25 +125,25 @@ export function useWorkspaceHotkeys({
 
 	// --- Pane management ---
 
-	useHotkey("PREV_PANE", () => {
-		const state = store.getState();
-		const tab = state.getActiveTab();
-		if (!tab || !tab.activePaneId) return;
-		const paneIds = Object.keys(tab.panes);
-		const index = paneIds.indexOf(tab.activePaneId);
-		const prevIndex = index <= 0 ? paneIds.length - 1 : index - 1;
-		state.setActivePane({ tabId: tab.id, paneId: paneIds[prevIndex] });
-	});
+	const moveFocusDirectional = useCallback(
+		(dir: FocusDirection) => {
+			const state = store.getState();
+			const tab = state.getActiveTab();
+			if (!tab || !tab.activePaneId) return;
+			const neighbor = getSpatialNeighborPaneId(
+				tab.layout,
+				tab.activePaneId,
+				dir,
+			);
+			if (neighbor) state.setActivePane({ tabId: tab.id, paneId: neighbor });
+		},
+		[store],
+	);
 
-	useHotkey("NEXT_PANE", () => {
-		const state = store.getState();
-		const tab = state.getActiveTab();
-		if (!tab || !tab.activePaneId) return;
-		const paneIds = Object.keys(tab.panes);
-		const index = paneIds.indexOf(tab.activePaneId);
-		const nextIndex = index >= paneIds.length - 1 ? 0 : index + 1;
-		state.setActivePane({ tabId: tab.id, paneId: paneIds[nextIndex] });
-	});
+	useHotkey("FOCUS_PANE_LEFT", () => moveFocusDirectional("left"));
+	useHotkey("FOCUS_PANE_RIGHT", () => moveFocusDirectional("right"));
+	useHotkey("FOCUS_PANE_UP", () => moveFocusDirectional("up"));
+	useHotkey("FOCUS_PANE_DOWN", () => moveFocusDirectional("down"));
 
 	useHotkey("SPLIT_AUTO", () => {
 		const state = store.getState();
