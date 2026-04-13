@@ -4,7 +4,16 @@ import type {
 	RendererContext,
 } from "@superset/panes";
 import { alert } from "@superset/ui/atoms/Alert";
-import { Circle, Globe, MessageSquare, TerminalSquare } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
+import { cn } from "@superset/ui/utils";
+import {
+	Circle,
+	GitCompareArrows,
+	Globe,
+	MessageSquare,
+	SquareSplitHorizontal,
+	TerminalSquare,
+} from "lucide-react";
 import { useMemo } from "react";
 import {
 	LuArrowDownToLine,
@@ -12,9 +21,11 @@ import {
 	LuClipboardCopy,
 	LuEraser,
 } from "react-icons/lu";
+import { TbScan } from "react-icons/tb";
 import { useHotkeyDisplay } from "renderer/hotkeys";
 import { terminalRuntimeRegistry } from "renderer/lib/terminal/terminal-runtime-registry";
 import { FileIcon } from "renderer/screens/main/components/WorkspaceView/RightSidebar/FilesView/utils";
+import { useSettings } from "renderer/stores/settings";
 import type {
 	BrowserPaneData,
 	ChatPaneData,
@@ -29,6 +40,7 @@ import {
 	browserRuntimeRegistry,
 } from "./components/BrowserPane";
 import { ChatPane } from "./components/ChatPane";
+import { DiffPane } from "./components/DiffPane";
 import { FilePane } from "./components/FilePane";
 import { TerminalPane } from "./components/TerminalPane";
 
@@ -39,6 +51,60 @@ function getFileName(filePath: string): string {
 const MOD_KEY = navigator.platform.toLowerCase().includes("mac")
 	? "⌘"
 	: "Ctrl+";
+
+function DiffViewModeToggle() {
+	const diffStyle = useSettings((s) => s.diffStyle);
+	const updateSetting = useSettings((s) => s.update);
+
+	const buttonClass = (active: boolean) =>
+		cn(
+			"flex size-6 items-center justify-center transition-colors",
+			active
+				? "bg-secondary text-foreground"
+				: "text-muted-foreground hover:text-foreground",
+		);
+
+	return (
+		<div className="flex items-center">
+			<Tooltip>
+				<TooltipTrigger asChild>
+					<button
+						type="button"
+						onClick={() => updateSetting("diffStyle", "unified")}
+						aria-label="Unified view"
+						aria-pressed={diffStyle === "unified"}
+						className={buttonClass(diffStyle === "unified")}
+					>
+						<TbScan className="size-3.5" />
+					</button>
+				</TooltipTrigger>
+				<TooltipContent side="bottom" showArrow={false}>
+					Unified view
+				</TooltipContent>
+			</Tooltip>
+			<Tooltip>
+				<TooltipTrigger asChild>
+					<button
+						type="button"
+						onClick={() => updateSetting("diffStyle", "split")}
+						aria-label="Split view"
+						aria-pressed={diffStyle === "split"}
+						className={buttonClass(diffStyle === "split")}
+					>
+						<SquareSplitHorizontal className="size-3.5" />
+					</button>
+				</TooltipTrigger>
+				<TooltipContent side="bottom" showArrow={false}>
+					Split view
+				</TooltipContent>
+			</Tooltip>
+			<div
+				className="mx-1.5 h-4 w-px bg-muted-foreground/30"
+				aria-hidden="true"
+			/>
+		</div>
+	);
+}
 
 export function usePaneRegistry(
 	workspaceId: string,
@@ -106,6 +172,18 @@ export function usePaneRegistry(
 				contextMenuActions: (_ctx, defaults) =>
 					defaults.map((d) =>
 						d.key === "close-pane" ? { ...d, label: "Close File" } : d,
+					),
+			},
+			diff: {
+				getIcon: () => <GitCompareArrows className="size-4" />,
+				getTitle: () => "Changes",
+				renderPane: (ctx: RendererContext<PaneViewerData>) => (
+					<DiffPane context={ctx} workspaceId={workspaceId} />
+				),
+				renderHeaderExtras: () => <DiffViewModeToggle />,
+				contextMenuActions: (_ctx, defaults) =>
+					defaults.map((d) =>
+						d.key === "close-pane" ? { ...d, label: "Close Diff" } : d,
 					),
 			},
 			terminal: {

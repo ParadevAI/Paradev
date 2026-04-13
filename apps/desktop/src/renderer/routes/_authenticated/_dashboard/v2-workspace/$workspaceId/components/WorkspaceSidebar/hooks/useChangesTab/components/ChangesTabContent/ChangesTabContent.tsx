@@ -2,7 +2,7 @@ import type { AppRouter } from "@superset/host-service";
 import type { inferRouterOutputs } from "@trpc/server";
 import { memo } from "react";
 import type { ChangesFilter } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal/schema";
-import type { ChangedFile } from "../../types";
+import type { ChangesetFile } from "../../../../../../hooks/useChangeset";
 import { ChangesFileList } from "../ChangesFileList";
 import { ChangesHeader } from "../ChangesHeader";
 
@@ -15,34 +15,28 @@ interface ChangesTabContentProps {
 	};
 	commits: { data: RouterOutputs["git"]["listCommits"] | undefined };
 	branches: { data: RouterOutputs["git"]["listBranches"] | undefined };
-	commitFiles: {
-		data: { files: ChangedFile[] } | undefined;
-		isLoading: boolean;
-	};
 	filter: ChangesFilter;
-	filteredFiles: ChangedFile[];
-	fileCategory: "against-base" | "staged" | "unstaged";
+	files: ChangesetFile[];
+	isLoading: boolean;
 	totalChanges: number;
 	totalAdditions: number;
 	totalDeletions: number;
-	onSelectFile?: (
-		path: string,
-		category: "against-base" | "staged" | "unstaged",
-	) => void;
+	onSelectFile?: (path: string) => void;
 	onFilterChange: (filter: ChangesFilter) => void;
 	onBaseBranchChange: (branchName: string) => void;
 	onRenameBranch: (newName: string) => void;
 	canRenameBranch: boolean;
+	viewedSet: Set<string>;
+	onSetViewed: (path: string, next: boolean) => void;
 }
 
 export const ChangesTabContent = memo(function ChangesTabContent({
 	status,
 	commits,
 	branches,
-	commitFiles,
 	filter,
-	filteredFiles,
-	fileCategory,
+	files,
+	isLoading,
 	totalChanges,
 	totalAdditions,
 	totalDeletions,
@@ -51,6 +45,8 @@ export const ChangesTabContent = memo(function ChangesTabContent({
 	onBaseBranchChange,
 	onRenameBranch,
 	canRenameBranch,
+	viewedSet,
+	onSetViewed,
 }: ChangesTabContentProps) {
 	if (status.isLoading) {
 		return (
@@ -90,20 +86,11 @@ export const ChangesTabContent = memo(function ChangesTabContent({
 			/>
 			<div className="min-h-0 flex-1 overflow-y-auto">
 				<ChangesFileList
-					files={filter.kind === "uncommitted" ? [] : filteredFiles}
-					staged={
-						filter.kind === "uncommitted" ? status.data.staged : undefined
-					}
-					unstaged={
-						filter.kind === "uncommitted" ? status.data.unstaged : undefined
-					}
-					isLoading={
-						filter.kind === "commit" || filter.kind === "range"
-							? commitFiles.isLoading
-							: false
-					}
+					files={files}
+					isLoading={isLoading}
 					onSelectFile={onSelectFile}
-					category={fileCategory}
+					viewedSet={viewedSet}
+					onSetViewed={onSetViewed}
 				/>
 			</div>
 		</div>
