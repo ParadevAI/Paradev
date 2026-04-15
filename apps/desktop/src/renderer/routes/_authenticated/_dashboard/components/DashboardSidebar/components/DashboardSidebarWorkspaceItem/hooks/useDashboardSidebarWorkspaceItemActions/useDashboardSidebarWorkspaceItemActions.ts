@@ -1,12 +1,16 @@
 import { toast } from "@superset/ui/sonner";
 import { useMatchRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
 import { apiTrpcClient } from "renderer/lib/api-trpc-client";
+import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
+import { electronTrpcClient } from "renderer/lib/trpc-client";
 import { getDeleteFocusTargetWorkspaceId } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/utils/getDeleteFocusTargetWorkspaceId";
 import { getFlattenedV2WorkspaceIds } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/utils/getFlattenedV2WorkspaceIds";
 import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
+import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 
 interface UseDashboardSidebarWorkspaceItemActionsOptions {
 	workspaceId: string;
@@ -22,6 +26,8 @@ export function useDashboardSidebarWorkspaceItemActions({
 	const navigate = useNavigate();
 	const matchRoute = useMatchRoute();
 	const collections = useCollections();
+	const { activeHostUrl } = useLocalHostService();
+	const { copyToClipboard } = useCopyToClipboard();
 	const { createSection, moveWorkspaceToSection, removeWorkspaceFromSidebar } =
 		useDashboardSidebarState();
 
@@ -97,12 +103,44 @@ export function useDashboardSidebarWorkspaceItemActions({
 		moveWorkspaceToSection(workspaceId, projectId, newSectionId);
 	};
 
-	const handleOpenInFinder = () => {
-		toast.info("Open in Finder is coming soon");
+	const resolveWorktreePath = async (): Promise<string | null> => {
+		if (!activeHostUrl) {
+			toast.error("Host service is not available");
+			return null;
+		}
+		const workspace = await getHostServiceClientByUrl(
+			activeHostUrl,
+		).workspace.get.query({ id: workspaceId });
+		if (!workspace?.worktreePath) {
+			toast.error("Workspace path is not available");
+			return null;
+		}
+		return workspace.worktreePath;
 	};
 
-	const handleCopyPath = () => {
-		toast.info("Copy Path is coming soon");
+	const handleOpenInFinder = async () => {
+		try {
+			const path = await resolveWorktreePath();
+			if (!path) return;
+			await electronTrpcClient.external.openInFinder.mutate(path);
+		} catch (error) {
+			toast.error(
+				`Failed to open in Finder: ${error instanceof Error ? error.message : "Unknown error"}`,
+			);
+		}
+	};
+
+	const handleCopyPath = async () => {
+		try {
+			const path = await resolveWorktreePath();
+			if (!path) return;
+			await copyToClipboard(path);
+			toast.success("Path copied");
+		} catch (error) {
+			toast.error(
+				`Failed to copy path: ${error instanceof Error ? error.message : "Unknown error"}`,
+			);
+		}
 	};
 
 	return {
