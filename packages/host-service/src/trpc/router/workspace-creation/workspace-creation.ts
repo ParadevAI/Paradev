@@ -639,8 +639,9 @@ export const workspaceCreationRouter = router({
 			// Always create a new branch — never check out an existing one.
 			// Checking out existing branches is a separate intent (createFromPr,
 			// or the picker's Check out action via the `checkout` procedure).
-			// --no-track prevents the new branch from tracking the remote ref
-			// (e.g. origin/main); push.autoSetupRemote handles first-push tracking.
+			// --no-track keeps `git pull` / ahead-behind counts from treating
+			// the start point as the branch's home. Push targeting is handled
+			// separately by push.autoSetupRemote (set below).
 			const startPointArg =
 				startPoint.kind === "head" ? "HEAD" : startPoint.shortName;
 			await git.raw([
@@ -654,6 +655,45 @@ export const workspaceCreationRouter = router({
 					? startPoint.remoteShortName
 					: startPointArg,
 			]);
+
+			// Enable autoSetupRemote so the first terminal `git push` creates
+			// origin/<branchName> and sets it as upstream without requiring
+			// `-u`. Note: `--local` in a linked worktree writes to the shared
+			// repo config, so this applies repo-wide — intentional, every
+			// workspace worktree wants the same ergonomics. Safe against
+			// wrong-upstream targeting because --no-track above guarantees no
+			// upstream exists at first push, so auto-create always wins and
+			// always uses the branch's own name (never the base branch).
+			await git
+				.raw([
+					"-C",
+					worktreePath,
+					"config",
+					"--local",
+					"push.autoSetupRemote",
+					"true",
+				])
+				.catch((err) => {
+					console.warn(
+						"[workspaceCreation.create] failed to set push.autoSetupRemote:",
+						err,
+					);
+				});
+
+			// Record the base branch in git config so the Changes tab knows what
+			// to compare against on first open. startPoint.shortName is the ref
+			// we actually forked from (user selection, resolved against local /
+			// remote). Skipped for "head" start point — no meaningful base.
+			if (startPoint.kind !== "head") {
+				await git
+					.raw(["config", `branch.${branchName}.base`, startPoint.shortName])
+					.catch((err) => {
+						console.warn(
+							`[workspaceCreation.create] failed to record base branch ${startPoint.shortName}:`,
+							err,
+						);
+					});
+			}
 
 			setProgress(input.pendingId, "registering");
 
@@ -908,6 +948,28 @@ export const workspaceCreationRouter = router({
 				// we still get here for races.
 				throw new TRPCError({ code: "CONFLICT", message });
 			}
+
+			// Enable autoSetupRemote so the first terminal `git push` on a
+			// local-only branch creates origin/<branch> without requiring -u.
+			// Branches checked out from a remote already have upstream set
+			// via --track above, so this config is a no-op for them.
+			// `--local` in a linked worktree writes to the shared repo config,
+			// so this applies repo-wide — intentional.
+			await git
+				.raw([
+					"-C",
+					worktreePath,
+					"config",
+					"--local",
+					"push.autoSetupRemote",
+					"true",
+				])
+				.catch((err) => {
+					console.warn(
+						"[workspaceCreation.checkout] failed to set push.autoSetupRemote:",
+						err,
+					);
+				});
 
 			setProgress(input.pendingId, "registering");
 
