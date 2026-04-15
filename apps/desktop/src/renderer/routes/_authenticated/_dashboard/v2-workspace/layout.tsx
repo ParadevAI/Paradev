@@ -29,7 +29,7 @@ function V2WorkspaceLayout() {
 	const { machineId, activeHostUrl } = useLocalHostService();
 	const { ensureWorkspaceInSidebar } = useDashboardSidebarState();
 
-	const { data: workspacesWithHost = [] } = useLiveQuery(
+	const { data: workspacesWithHost = [], isReady } = useLiveQuery(
 		(q) =>
 			q
 				.from({ v2Workspaces: collections.v2Workspaces })
@@ -64,22 +64,14 @@ function V2WorkspaceLayout() {
 		ensureWorkspaceInSidebar(workspace.id, workspace.projectId);
 	}, [ensureWorkspaceInSidebar, workspace]);
 
-	// TODO: This renders child routes without WorkspaceTrpcProvider when
-	// the workspace hasn't loaded from collections yet, or during route
-	// transitions (e.g. navigating away from a workspace). If the outgoing
-	// workspace page hasn't fully unmounted, its components (TerminalPane,
-	// etc.) will crash with "useWorkspaceClient must be used within
-	// WorkspaceClientProvider". Either the layout should never render
-	// children without the provider, or the provider should move to the
-	// page level so each page owns its own context.
-	if (!workspaceId || !workspace) {
-		return <Outlet />;
+	if (!workspaceId || !isReady) {
+		return null;
 	}
 
-	if (!hostUrl) {
+	if (!workspace || !hostUrl) {
 		return (
 			<div className="flex h-full w-full items-center justify-center text-muted-foreground">
-				Workspace host service not available
+				Workspace not found
 			</div>
 		);
 	}
