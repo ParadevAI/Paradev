@@ -6,7 +6,6 @@ import { useCollections } from "renderer/routes/_authenticated/providers/Collect
 import type { ChangesFilter } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal/schema";
 import { useChangeset } from "../../../../hooks/useChangeset";
 import { useSidebarDiffRef } from "../../../../hooks/useSidebarDiffRef";
-import { useViewedFiles } from "../../../../hooks/useViewedFiles";
 import type { SidebarTabDefinition } from "../../types";
 import { ChangesTabContent } from "./components/ChangesTabContent";
 
@@ -35,8 +34,6 @@ export function useChangesTab({
 		{ staleTime: Number.POSITIVE_INFINITY },
 	);
 	const baseBranch = baseBranchQuery.data?.baseBranch ?? null;
-
-	const { viewedSet, setViewed } = useViewedFiles(workspaceId);
 
 	const ref = useSidebarDiffRef(workspaceId);
 	const { files, isLoading } = useChangeset({ workspaceId, ref });
@@ -123,8 +120,6 @@ export function useChangesTab({
 			onBaseBranchChange={setBaseBranch}
 			onRenameBranch={handleRenameBranch}
 			canRenameBranch={canRenameBranch}
-			viewedSet={viewedSet}
-			onSetViewed={setViewed}
 		/>
 	);
 

@@ -36,6 +36,8 @@ export const workspaceLocalStateSchema = z.object({
 		tabOrder: z.number().int().default(0),
 		sectionId: z.string().uuid().nullable().default(null),
 		changesFilter: changesFilterSchema.default({ kind: "all" }),
+		activeTab: z.enum(["changes", "files"]).default("changes"),
+		changesSubtab: z.enum(["diffs", "review"]).default("diffs"),
 	}),
 	paneLayout: paneWorkspaceStateSchema,
 	rightSidebarOpen: z.boolean().default(false),
