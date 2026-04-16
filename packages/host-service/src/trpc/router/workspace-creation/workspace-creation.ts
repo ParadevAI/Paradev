@@ -16,6 +16,7 @@ import {
 import { createTerminalSessionInternal } from "../../../terminal/terminal";
 import type { HostServiceContext } from "../../../types";
 import { protectedProcedure, router } from "../../index";
+import { execGh } from "./utils/exec-gh";
 import { resolveStartPoint } from "./utils/resolve-start-point";
 import { deduplicateBranchName } from "./utils/sanitize-branch";
 
@@ -1330,6 +1331,11 @@ export const workspaceCreationRouter = router({
 			}
 		}),
 
+	// Shell out to the user's `gh` CLI rather than host-service's
+	// octokit — `gh auth login` works out of the box while the
+	// credential-manager path requires setup most users don't have.
+	// Matches V1's projects.getIssueContent behavior.
+
 	getGitHubIssueContent: protectedProcedure
 		.input(
 			z.object({
@@ -1339,22 +1345,26 @@ export const workspaceCreationRouter = router({
 		)
 		.query(async ({ ctx, input }) => {
 			const repo = await resolveGithubRepo(ctx, input.projectId);
-			const octokit = await ctx.github();
 			try {
-				const { data } = await octokit.issues.get({
-					owner: repo.owner,
-					repo: repo.name,
-					issue_number: input.issueNumber,
-				});
+				const raw = await execGh([
+					"issue",
+					"view",
+					String(input.issueNumber),
+					"--repo",
+					`${repo.owner}/${repo.name}`,
+					"--json",
+					"number,title,body,url,state,author,createdAt,updatedAt",
+				]);
+				const data = IssueSchema.parse(raw);
 				return {
 					number: data.number,
 					title: data.title,
 					body: data.body ?? "",
-					url: data.html_url,
-					state: data.state,
-					author: data.user?.login ?? null,
-					createdAt: data.created_at,
-					updatedAt: data.updated_at,
+					url: data.url,
+					state: data.state.toLowerCase(),
+					author: data.author?.login ?? null,
+					createdAt: data.createdAt,
+					updatedAt: data.updatedAt,
 				};
 			} catch (err) {
 				throw new TRPCError({
@@ -1363,4 +1373,70 @@ export const workspaceCreationRouter = router({
 				});
 			}
 		}),
+
+	getGitHubPullRequestContent: protectedProcedure
+		.input(
+			z.object({
+				projectId: z.string(),
+				prNumber: z.number().int().positive(),
+			}),
+		)
+		.query(async ({ ctx, input }) => {
+			const repo = await resolveGithubRepo(ctx, input.projectId);
+			try {
+				const raw = await execGh([
+					"pr",
+					"view",
+					String(input.prNumber),
+					"--repo",
+					`${repo.owner}/${repo.name}`,
+					"--json",
+					"number,title,body,url,state,author,headRefName,baseRefName,isDraft,createdAt,updatedAt",
+				]);
+				const data = PrSchema.parse(raw);
+				return {
+					number: data.number,
+					title: data.title,
+					body: data.body ?? "",
+					url: data.url,
+					state: data.state.toLowerCase(),
+					branch: data.headRefName,
+					baseBranch: data.baseRefName,
+					author: data.author?.login ?? null,
+					isDraft: data.isDraft,
+					createdAt: data.createdAt,
+					updatedAt: data.updatedAt,
+				};
+			} catch (err) {
+				throw new TRPCError({
+					code: "INTERNAL_SERVER_ERROR",
+					message: `Failed to fetch PR #${input.prNumber}: ${err instanceof Error ? err.message : String(err)}`,
+				});
+			}
+		}),
+});
+
+const IssueSchema = z.object({
+	number: z.number(),
+	title: z.string(),
+	body: z.string().nullable().optional(),
+	url: z.string(),
+	state: z.string(),
+	author: z.object({ login: z.string() }).optional(),
+	createdAt: z.string().optional(),
+	updatedAt: z.string().optional(),
+});
+
+const PrSchema = z.object({
+	number: z.number(),
+	title: z.string(),
+	body: z.string().nullable().optional(),
+	url: z.string(),
+	state: z.string(),
+	headRefName: z.string(),
+	baseRefName: z.string(),
+	isDraft: z.boolean(),
+	author: z.object({ login: z.string() }).optional(),
+	createdAt: z.string().optional(),
+	updatedAt: z.string().optional(),
 });

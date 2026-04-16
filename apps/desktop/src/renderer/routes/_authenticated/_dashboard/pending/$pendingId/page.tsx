@@ -1,3 +1,4 @@
+import { toast } from "@superset/ui/sonner";
 import { eq } from "@tanstack/db";
 import { useLiveQuery } from "@tanstack/react-db";
 import { useQuery } from "@tanstack/react-query";
@@ -6,6 +7,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { GoGitBranch } from "react-icons/go";
 import { HiCheck, HiExclamationTriangle } from "react-icons/hi2";
 import { env } from "renderer/env.renderer";
+import { electronTrpc } from "renderer/lib/electron-trpc";
 import { formatRelativeTime } from "renderer/lib/formatRelativeTime";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import {
@@ -25,6 +27,7 @@ import {
 	buildForkPayload,
 } from "./buildIntentPayload";
 import { buildSetupPaneLayout } from "./buildSetupPaneLayout";
+import { dispatchForkLaunch } from "./dispatchForkLaunch";
 
 /**
  * Pending workspace progress page.
@@ -51,6 +54,8 @@ function useFireIntent(pendingId: string, pending: PendingWorkspaceRow | null) {
 	const createWorkspace = useCreateDashboardWorkspace();
 	const checkoutWorkspace = useCheckoutDashboardWorkspace();
 	const adoptWorktree = useAdoptWorktree();
+	const trpcUtils = electronTrpc.useUtils();
+	const { activeHostUrl } = useLocalHostService();
 
 	return useCallback(async () => {
 		if (!pending) return;
@@ -66,21 +71,25 @@ function useFireIntent(pendingId: string, pending: PendingWorkspaceRow | null) {
 				terminals?: Array<{ id: string; role: string; label: string }>;
 				warnings?: string[];
 			};
+			let loadedAttachments:
+				| Array<{ data: string; mediaType: string; filename: string }>
+				| undefined;
 
 			switch (pending.intent) {
 				case "fork": {
-					let attachments:
-						| Array<{ data: string; mediaType: string; filename: string }>
-						| undefined;
 					if (pending.attachmentCount > 0) {
 						try {
-							attachments = await loadAttachments(pendingId);
-						} catch {
-							// proceed without
+							loadedAttachments = await loadAttachments(pendingId);
+						} catch (err) {
+							const msg = err instanceof Error ? err.message : String(err);
+							console.warn("[v2-launch] loadAttachments failed:", err);
+							toast.warning("Couldn't load saved attachments", {
+								description: `Workspace will be created without files. ${msg}`,
+							});
 						}
 					}
 					result = await createWorkspace(
-						buildForkPayload(pendingId, pending, attachments),
+						buildForkPayload(pendingId, pending, loadedAttachments),
 					);
 					break;
 				}
@@ -94,6 +103,36 @@ function useFireIntent(pendingId: string, pending: PendingWorkspaceRow | null) {
 					result = await adoptWorktree(buildAdoptPayload(pending));
 					break;
 				}
+			}
+
+			// V2 dispatch: after host-service.create resolves, build the launch
+			// plan and stash it on the pending row. The V2 workspace page's
+			// useConsumePendingLaunch mount-effect picks it up and opens the
+			// pane. See apps/desktop/docs/V2_LAUNCH_CONTEXT.md.
+			//
+			// Fetch agent configs imperatively here rather than reading from
+			// a useQuery hook — a not-yet-resolved query would silently skip
+			// the dispatch, permanently losing the launch for a successful
+			// workspace create.
+			if (pending.intent === "fork" && result.workspace?.id) {
+				const agentConfigs = await trpcUtils.settings.getAgentPresets.fetch();
+				await dispatchForkLaunch({
+					workspaceId: result.workspace.id,
+					pending,
+					loadedAttachments,
+					agentConfigs,
+					activeHostUrl,
+					onApplyToRow: (patch) => {
+						collections.pendingWorkspaces.update(pendingId, (draft) => {
+							if (patch.terminalLaunch !== undefined) {
+								draft.terminalLaunch = patch.terminalLaunch;
+							}
+							if (patch.chatLaunch !== undefined) {
+								draft.chatLaunch = patch.chatLaunch;
+							}
+						});
+					},
+				});
 			}
 
 			collections.pendingWorkspaces.update(pendingId, (draft) => {
@@ -117,6 +156,8 @@ function useFireIntent(pendingId: string, pending: PendingWorkspaceRow | null) {
 		adoptWorktree,
 		pending,
 		pendingId,
+		trpcUtils,
+		activeHostUrl,
 	]);
 }
 
