@@ -191,7 +191,8 @@ function PendingWorkspacePage() {
 				.select(({ pw }) => ({ ...pw })),
 		[collections, pendingId],
 	);
-	const pending = pendingRows?.[0] ?? null;
+	const pending: PendingWorkspaceRow | null =
+		(pendingRows?.[0] as PendingWorkspaceRow | undefined) ?? null;
 	const fireIntent = useFireIntent(pendingId, pending);
 
 	// Wait for the cloud row to appear in the local collection before
