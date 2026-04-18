@@ -9,7 +9,6 @@ import { useQuery } from "@tanstack/react-query";
 import type { ChatStatus } from "ai";
 import type React from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { SlashCommand } from "renderer/components/Chat/ChatInterface/hooks/useSlashCommands";
 import type {
 	ModelOption,
 	PermissionMode,
@@ -226,6 +225,11 @@ export function ChatPaneInterface({
 	const [approvalResponsePending, setApprovalResponsePending] = useState(false);
 	const [planResponsePending, setPlanResponsePending] = useState(false);
 	const [questionResponsePending, setQuestionResponsePending] = useState(false);
+	const [footerScrollTrigger, setFooterScrollTrigger] = useState(0);
+	const bumpFooterScroll = useCallback(
+		() => setFooterScrollTrigger((n) => n + 1),
+		[],
+	);
 	const [editingUserMessageId, setEditingUserMessageId] = useState<
 		string | null
 	>(null);
@@ -496,6 +500,12 @@ export function ChatPaneInterface({
 		setSubmitStatus(undefined);
 	}, [isRunning]);
 
+	// Scroll chat to bottom whenever the footer question overlay appears, changes, or disappears
+	// biome-ignore lint/correctness/useExhaustiveDependencies: pendingQuestion is an intentional re-run trigger
+	useEffect(() => {
+		bumpFooterScroll();
+	}, [bumpFooterScroll, pendingQuestion]);
+
 	useEffect(() => {
 		onRawSnapshotChange?.({
 			sessionId,
@@ -763,14 +773,6 @@ export function ChatPaneInterface({
 		[stopActiveResponse],
 	);
 
-	const handleSlashCommandSend = useCallback(
-		(command: SlashCommand) => {
-			void handleSend({ content: `/${command.name}` }).catch((error) => {
-				console.debug("[chat] handleSlashCommandSend error", error);
-			});
-		},
-		[handleSend],
-	);
 	const restartFromUserMessage = useCallback(
 		async (
 			request: UserMessageRestartRequest,
@@ -906,6 +908,7 @@ export function ChatPaneInterface({
 			const trimmedAnswer = answer.trim();
 			if (!trimmedQuestionId || !trimmedAnswer) return;
 			clearRuntimeError();
+			bumpFooterScroll();
 			setQuestionResponsePending(true);
 			try {
 				await commands.respondToQuestion({
@@ -918,7 +921,7 @@ export function ChatPaneInterface({
 				setQuestionResponsePending(false);
 			}
 		},
-		[clearRuntimeError, commands],
+		[bumpFooterScroll, clearRuntimeError, commands],
 	);
 
 	const errorMessage = runtimeError ?? toErrorMessage(error);
@@ -947,15 +950,13 @@ export function ChatPaneInterface({
 					pendingPlanApproval={pendingPlanApproval}
 					isPlanSubmitting={planResponsePending}
 					onPlanRespond={handlePlanResponse}
-					pendingQuestion={pendingQuestion}
-					isQuestionSubmitting={questionResponsePending}
-					onQuestionRespond={handleQuestionResponse}
 					editingUserMessageId={editingUserMessageId}
 					isEditSubmitting={isAwaitingAssistant}
 					onStartEditUserMessage={setEditingUserMessageId}
 					onCancelEditUserMessage={() => setEditingUserMessageId(null)}
 					onSubmitEditedUserMessage={handleSubmitEditedUserMessage}
 					onRestartUserMessage={handleResendUserMessage}
+					footerScrollTrigger={footerScrollTrigger}
 				/>
 				<McpControls mcpUi={mcpUi} />
 				<ChatUploadFooter
@@ -980,7 +981,13 @@ export function ChatPaneInterface({
 					onSend={handleSend}
 					onSubmitStart={() => setSubmitStatus("submitted")}
 					onStop={handleStop}
-					onSlashCommandSend={handleSlashCommandSend}
+					pendingQuestion={pendingQuestion}
+					isQuestionSubmitting={questionResponsePending}
+					onQuestionRespond={handleQuestionResponse}
+					onQuestionCancel={() => {
+						bumpFooterScroll();
+						void stopActiveResponse();
+					}}
 				/>
 			</div>
 		</PromptInputProvider>
