@@ -1,5 +1,4 @@
 import type { RendererContext } from "@superset/panes";
-import { toast } from "@superset/ui/sonner";
 import { workspaceTrpc } from "@superset/workspace-client";
 import "@xterm/xterm/css/xterm.css";
 import {
@@ -15,7 +14,9 @@ import {
 	terminalRuntimeRegistry,
 } from "renderer/lib/terminal/terminal-runtime-registry";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
+import { useOpenInExternalEditor } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useOpenInExternalEditor";
 import type {
+	BrowserPaneData,
 	PaneViewerData,
 	TerminalPaneData,
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
@@ -24,11 +25,15 @@ import { ScrollToBottomButton } from "renderer/screens/main/components/Workspace
 import { TerminalSearch } from "renderer/screens/main/components/WorkspaceView/ContentView/TabsContent/Terminal/TerminalSearch";
 import { useTheme } from "renderer/stores/theme";
 import { resolveTerminalThemeType } from "renderer/stores/theme/utils";
+import { LinkHoverTooltip } from "./components/LinkHoverTooltip";
+import { useLinkHoverState } from "./hooks/useLinkHoverState";
 import { useTerminalAppearance } from "./hooks/useTerminalAppearance";
 
 interface TerminalPaneProps {
 	ctx: RendererContext<PaneViewerData>;
 	workspaceId: string;
+	onOpenFile: (path: string, openInNewTab?: boolean) => void;
+	onRevealPath: (path: string) => void;
 }
 
 function subscribeToState(terminalId: string) {
@@ -40,7 +45,18 @@ function getConnectionState(terminalId: string): ConnectionState {
 	return terminalRuntimeRegistry.getConnectionState(terminalId);
 }
 
-export function TerminalPane({ ctx, workspaceId }: TerminalPaneProps) {
+export function TerminalPane({
+	ctx,
+	workspaceId,
+	onOpenFile,
+	onRevealPath,
+}: TerminalPaneProps) {
+	const openInExternalEditor = useOpenInExternalEditor(workspaceId);
+	const {
+		hoveredLink,
+		onHover: onLinkHover,
+		onLeave: onLinkLeave,
+	} = useLinkHoverState();
 	const paneData = ctx.pane.data as TerminalPaneData;
 	const { terminalId } = paneData;
 	const containerRef = useRef<HTMLDivElement | null>(null);
@@ -141,27 +157,49 @@ export function TerminalPane({ ctx, workspaceId }: TerminalPaneProps) {
 					return null;
 				}
 			},
-			onFileLinkClick: (_event, link) => {
-				if (!_event.metaKey && !_event.ctrlKey) return;
-				_event.preventDefault();
-				electronTrpcClient.external.openFileInEditor
-					.mutate({
-						path: link.resolvedPath,
+			onFileLinkClick: (event, link) => {
+				if (!event.metaKey && !event.ctrlKey) return;
+				event.preventDefault();
+				if (event.shiftKey) {
+					openInExternalEditor(link.resolvedPath, {
 						line: link.row,
 						column: link.col,
-					})
-					.catch((error) => {
-						console.error("[v2 Terminal] Failed to open file:", error);
-						toast.error("Failed to open file in editor");
 					});
+					return;
+				}
+				if (link.isDirectory) {
+					onRevealPath(link.resolvedPath);
+				} else {
+					onOpenFile(link.resolvedPath);
+				}
 			},
-			onUrlClick: (url) => {
-				electronTrpcClient.external.openUrl.mutate(url).catch((error) => {
-					console.error("[v2 Terminal] Failed to open URL:", url, error);
+			onUrlClick: (event, url) => {
+				if (event.shiftKey) {
+					electronTrpcClient.external.openUrl.mutate(url).catch((error) => {
+						console.error("[v2 Terminal] Failed to open URL:", url, error);
+					});
+					return;
+				}
+				ctx.store.getState().openPane({
+					pane: {
+						kind: "browser",
+						data: { url } satisfies BrowserPaneData,
+					},
 				});
 			},
+			onLinkHover,
+			onLinkLeave,
 		});
-	}, [terminalId, workspaceId]);
+	}, [
+		terminalId,
+		workspaceId,
+		ctx.store,
+		onOpenFile,
+		onRevealPath,
+		openInExternalEditor,
+		onLinkHover,
+		onLinkLeave,
+	]);
 
 	useHotkey(
 		"CLEAR_TERMINAL",
@@ -217,6 +255,7 @@ export function TerminalPane({ ctx, workspaceId }: TerminalPaneProps) {
 					<span>Disconnected</span>
 				</div>
 			)}
+			<LinkHoverTooltip hoveredLink={hoveredLink} />
 		</div>
 	);
 }
