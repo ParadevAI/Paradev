@@ -149,11 +149,13 @@ export function createRuntime(
 	wrapper.style.width = "100%";
 	wrapper.style.height = "100%";
 	terminal.open(wrapper);
-	restoreBuffer(terminalId, terminal);
 
 	terminal.attachCustomKeyEventHandler((event) => !isAppHotkey(event));
 
+	// Activate Unicode 11 widths (inside loadAddons) before restoring the buffer,
+	// else CJK/emoji/ZWJ widths get baked wrong into the replay. (#3572)
 	const addonsResult = loadAddons(terminal);
+	restoreBuffer(terminalId, terminal);
 
 	return {
 		terminalId,
