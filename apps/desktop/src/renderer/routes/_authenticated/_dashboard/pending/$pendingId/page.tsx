@@ -59,7 +59,7 @@ function useFireIntent(pendingId: string, pending: PendingWorkspaceRow | null) {
 	const trpcUtils = electronTrpc.useUtils();
 	const { activeHostUrl } = useLocalHostService();
 
-	return useCallback(async () => {
+	const fire = useCallback(async () => {
 		if (!pending) return;
 
 		collections.pendingWorkspaces.update(pendingId, (draft) => {
@@ -202,6 +202,8 @@ function useFireIntent(pendingId: string, pending: PendingWorkspaceRow | null) {
 		trpcUtils,
 		activeHostUrl,
 	]);
+
+	return fire;
 }
 
 function PendingWorkspacePage() {

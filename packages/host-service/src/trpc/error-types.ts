@@ -22,3 +22,23 @@ export function isTeardownFailureCause(
 		(value as { kind: unknown }).kind === "TEARDOWN_FAILED"
 	);
 }
+
+/**
+ * Thrown by host-service procedures that require the project to already
+ * be set up on this host.
+ */
+export interface ProjectNotSetupCause {
+	kind: "PROJECT_NOT_SETUP";
+	projectId: string;
+}
+
+export function isProjectNotSetupCause(
+	value: unknown,
+): value is ProjectNotSetupCause {
+	return (
+		!!value &&
+		typeof value === "object" &&
+		"kind" in value &&
+		(value as { kind: unknown }).kind === "PROJECT_NOT_SETUP"
+	);
+}

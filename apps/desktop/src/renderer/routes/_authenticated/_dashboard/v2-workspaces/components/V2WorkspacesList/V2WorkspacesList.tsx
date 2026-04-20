@@ -25,7 +25,6 @@ import { V2WorkspaceRow } from "./components/V2WorkspaceRow";
 interface V2WorkspacesListProps {
 	pinned: AccessibleV2Workspace[];
 	others: AccessibleV2Workspace[];
-	hasAnyAccessible: boolean;
 }
 
 interface ProjectGroup {
@@ -75,11 +74,7 @@ function groupByProject(workspaces: AccessibleV2Workspace[]): ProjectGroup[] {
 	});
 }
 
-export function V2WorkspacesList({
-	pinned,
-	others,
-	hasAnyAccessible,
-}: V2WorkspacesListProps) {
+export function V2WorkspacesList({ pinned, others }: V2WorkspacesListProps) {
 	const matchRoute = useMatchRoute();
 	const currentWorkspaceMatch = matchRoute({
 		to: "/v2-workspace/$workspaceId",
@@ -93,8 +88,6 @@ export function V2WorkspacesList({
 	);
 	const resetFilters = useV2WorkspacesFilterStore((state) => state.reset);
 
-	// `pinned` / `others` already have the search filter applied upstream in
-	// useAccessibleV2Workspaces, so here we only narrow by device filter.
 	const filteredPinnedGroups = useMemo(() => {
 		const filtered = pinned.filter((workspace) =>
 			matchesDeviceFilter(workspace.hostType, deviceFilter),
@@ -120,26 +113,6 @@ export function V2WorkspacesList({
 	const hasAnyMatches = pinnedCount > 0 || othersCount > 0;
 	const hasActiveFilters = searchQuery.trim() !== "" || deviceFilter !== "all";
 
-	if (!hasAnyAccessible) {
-		return (
-			<Empty className="flex-1 border-0">
-				<EmptyHeader>
-					<EmptyMedia
-						variant="icon"
-						className="size-14 [&_svg:not([class*='size-'])]:size-7"
-					>
-						<LuLayers />
-					</EmptyMedia>
-					<EmptyTitle>No workspaces yet</EmptyTitle>
-					<EmptyDescription>
-						Create a workspace from the sidebar to get started. Workspaces you
-						have access to across all your devices will show up here.
-					</EmptyDescription>
-				</EmptyHeader>
-			</Empty>
-		);
-	}
-
 	if (!hasAnyMatches) {
 		return (
 			<Empty className="flex-1 border-0">
@@ -148,11 +121,17 @@ export function V2WorkspacesList({
 						variant="icon"
 						className="size-14 [&_svg:not([class*='size-'])]:size-7"
 					>
-						<LuSearchX />
+						{hasActiveFilters ? <LuSearchX /> : <LuLayers />}
 					</EmptyMedia>
-					<EmptyTitle>No workspaces match your filters</EmptyTitle>
+					<EmptyTitle>
+						{hasActiveFilters
+							? "No workspaces match your filters"
+							: "No workspaces yet"}
+					</EmptyTitle>
 					<EmptyDescription>
-						Try a different search term or clear the device filter.
+						{hasActiveFilters
+							? "Try a different search term or clear the device filter."
+							: "Workspaces you have access to across all your devices will show up here."}
 					</EmptyDescription>
 				</EmptyHeader>
 				{hasActiveFilters ? (

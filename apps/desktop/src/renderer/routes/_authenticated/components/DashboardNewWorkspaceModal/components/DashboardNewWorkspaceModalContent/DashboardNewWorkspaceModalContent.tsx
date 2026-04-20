@@ -1,8 +1,13 @@
+import { eq } from "@tanstack/db";
 import { useLiveQuery } from "@tanstack/react-db";
 import { useEffect, useMemo, useRef } from "react";
+import { env } from "renderer/env.renderer";
+import { authClient } from "renderer/lib/auth-client";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
+import { MOCK_ORG_ID } from "shared/constants";
 import { useDashboardNewWorkspaceDraft } from "../../DashboardNewWorkspaceDraftContext";
 import { PromptGroup } from "../DashboardNewWorkspaceForm/PromptGroup";
+import { useSelectedHostProjectIds } from "./hooks/useSelectedHostProjectIds";
 
 interface DashboardNewWorkspaceModalContentProps {
 	isOpen: boolean;
@@ -22,13 +27,20 @@ export function DashboardNewWorkspaceModalContent({
 }: DashboardNewWorkspaceModalContentProps) {
 	const { draft, updateDraft } = useDashboardNewWorkspaceDraft();
 	const collections = useCollections();
+	const { data: session } = authClient.useSession();
+	const activeOrganizationId = env.SKIP_ENV_VALIDATION
+		? MOCK_ORG_ID
+		: (session?.session?.activeOrganizationId ?? null);
 
 	const { data: v2Projects } = useLiveQuery(
 		(q) =>
 			q
 				.from({ projects: collections.v2Projects })
+				.where(({ projects }) =>
+					eq(projects.organizationId, activeOrganizationId ?? ""),
+				)
 				.select(({ projects }) => ({ ...projects })),
-		[collections],
+		[collections, activeOrganizationId],
 	);
 
 	const { data: githubRepositories } = useLiveQuery(
@@ -40,6 +52,8 @@ export function DashboardNewWorkspaceModalContent({
 			})),
 		[collections],
 	);
+
+	const setUpProjectIds = useSelectedHostProjectIds(draft.hostTarget);
 
 	const recentProjects = useMemo(() => {
 		const repoById = new Map(
@@ -54,9 +68,11 @@ export function DashboardNewWorkspaceModalContent({
 				name: project.name,
 				githubOwner: repo?.owner ?? null,
 				githubRepoName: repo?.name ?? null,
+				needsSetup:
+					setUpProjectIds === null ? null : !setUpProjectIds.has(project.id),
 			};
 		});
-	}, [githubRepositories, v2Projects]);
+	}, [githubRepositories, setUpProjectIds, v2Projects]);
 
 	const areProjectsReady = v2Projects !== undefined;
 	const appliedPreSelectionRef = useRef<string | null>(null);

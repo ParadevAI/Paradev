@@ -18,6 +18,7 @@ import { GoGitBranch } from "react-icons/go";
 import { HiCheck, HiChevronUpDown } from "react-icons/hi2";
 import { formatRelativeTime } from "renderer/lib/formatRelativeTime";
 import type { BranchFilter, BranchRow } from "../../../hooks/useBranchContext";
+import { FormPickerTrigger } from "../FormPickerTrigger";
 
 interface CompareBaseBranchPickerProps {
 	effectiveCompareBaseBranch: string | null;
@@ -107,10 +108,9 @@ export function CompareBaseBranchPicker({
 			}}
 		>
 			<PopoverTrigger asChild>
-				<button
-					type="button"
+				<FormPickerTrigger
 					disabled={isBranchesLoading && branches.length === 0}
-					className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50 min-w-0 max-w-full"
+					className="max-w-full"
 				>
 					<GoGitBranch className="size-3 shrink-0" />
 					{isBranchesLoading && branches.length === 0 ? (
@@ -121,7 +121,7 @@ export function CompareBaseBranchPicker({
 						</span>
 					)}
 					<HiChevronUpDown className="size-3 shrink-0" />
-				</button>
+				</FormPickerTrigger>
 			</PopoverTrigger>
 			<PopoverContent
 				className="w-96 p-0"

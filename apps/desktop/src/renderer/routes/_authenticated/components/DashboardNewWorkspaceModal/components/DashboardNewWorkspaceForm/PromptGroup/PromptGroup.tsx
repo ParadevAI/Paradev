@@ -2,6 +2,7 @@ import {
 	PromptInput,
 	PromptInputAttachment,
 	PromptInputAttachments,
+	PromptInputButton,
 	PromptInputFooter,
 	PromptInputSubmit,
 	PromptInputTextarea,
@@ -14,8 +15,10 @@ import { cn } from "@superset/ui/utils";
 import type { FileUIPart } from "ai";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUpIcon } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
+import { GoIssueOpened } from "react-icons/go";
 import { LuGitPullRequest } from "react-icons/lu";
+import { SiLinear } from "react-icons/si";
 import { AgentSelect } from "renderer/components/AgentSelect";
 import { LinkedIssuePill } from "renderer/components/Chat/ChatInterface/components/ChatInputFooter/components/LinkedIssuePill";
 import { IssueLinkCommand } from "renderer/components/Chat/ChatInterface/components/IssueLinkCommand";
@@ -91,11 +94,6 @@ export function PromptGroup({
 			agentsReady: agentPresetsQuery.isFetched,
 		});
 
-	// ── Link commands ────────────────────────────────────────────────
-	const [issueLinkOpen, setIssueLinkOpen] = useState(false);
-	const [gitHubIssueLinkOpen, setGitHubIssueLinkOpen] = useState(false);
-	const [prLinkOpen, setPRLinkOpen] = useState(false);
-	const plusMenuRef = useRef<HTMLDivElement>(null);
 	const trimmedPrompt = prompt.trim();
 	const branchPreview = branchNameEdited
 		? sanitizeUserBranchName(branchName)
@@ -299,46 +297,56 @@ export function PromptGroup({
 					</PromptInputTools>
 					<div className="flex items-center gap-2">
 						<AttachmentButtons
-							anchorRef={plusMenuRef}
-							onOpenIssueLink={() =>
-								requestAnimationFrame(() => setIssueLinkOpen(true))
+							linearIssueTrigger={
+								<IssueLinkCommand
+									onSelect={addLinkedIssue}
+									tooltipLabel="Link issue"
+								>
+									<PromptInputButton
+										aria-label="Link issue"
+										className={`${PILL_BUTTON_CLASS} w-[22px]`}
+									>
+										<SiLinear className="size-3.5" />
+									</PromptInputButton>
+								</IssueLinkCommand>
 							}
-							onOpenGitHubIssue={() =>
-								requestAnimationFrame(() => setGitHubIssueLinkOpen(true))
+							githubIssueTrigger={
+								<GitHubIssueLinkCommand
+									onSelect={(issue) =>
+										addLinkedGitHubIssue(
+											issue.issueNumber,
+											issue.title,
+											issue.url,
+											issue.state,
+										)
+									}
+									projectId={projectId}
+									hostTarget={hostTarget}
+									tooltipLabel="Link GitHub issue"
+								>
+									<PromptInputButton
+										aria-label="Link GitHub issue"
+										className={`${PILL_BUTTON_CLASS} w-[22px]`}
+									>
+										<GoIssueOpened className="size-3.5" />
+									</PromptInputButton>
+								</GitHubIssueLinkCommand>
 							}
-							onOpenPRLink={() =>
-								requestAnimationFrame(() => setPRLinkOpen(true))
+							prTrigger={
+								<PRLinkCommand
+									onSelect={setLinkedPR}
+									projectId={projectId}
+									hostTarget={hostTarget}
+									tooltipLabel="Link pull request"
+								>
+									<PromptInputButton
+										aria-label="Link pull request"
+										className={`${PILL_BUTTON_CLASS} w-[22px]`}
+									>
+										<LuGitPullRequest className="size-3.5" />
+									</PromptInputButton>
+								</PRLinkCommand>
 							}
-						/>
-						<IssueLinkCommand
-							variant="popover"
-							anchorRef={plusMenuRef}
-							open={issueLinkOpen}
-							onOpenChange={setIssueLinkOpen}
-							onSelect={addLinkedIssue}
-						/>
-						<GitHubIssueLinkCommand
-							open={gitHubIssueLinkOpen}
-							onOpenChange={setGitHubIssueLinkOpen}
-							onSelect={(issue) =>
-								addLinkedGitHubIssue(
-									issue.issueNumber,
-									issue.title,
-									issue.url,
-									issue.state,
-								)
-							}
-							projectId={projectId}
-							hostTarget={hostTarget}
-							anchorRef={plusMenuRef}
-						/>
-						<PRLinkCommand
-							open={prLinkOpen}
-							onOpenChange={setPRLinkOpen}
-							onSelect={setLinkedPR}
-							projectId={projectId}
-							hostTarget={hostTarget}
-							anchorRef={plusMenuRef}
 						/>
 						<PromptInputSubmit
 							className="size-[22px] rounded-full border border-transparent bg-foreground/10 shadow-none p-[5px] hover:bg-foreground/20"
@@ -356,9 +364,13 @@ export function PromptGroup({
 			{/* Bottom bar */}
 			<div className="flex items-center justify-between gap-2">
 				<div className="flex items-center gap-2 min-w-0 flex-1">
+					<DevicePicker
+						hostTarget={hostTarget}
+						onSelectHostTarget={(t) => updateDraft({ hostTarget: t })}
+					/>
 					<ProjectPickerPill
 						selectedProject={selectedProject}
-						recentProjects={recentProjects}
+						projects={recentProjects}
 						onSelectProject={onSelectProject}
 					/>
 					<AnimatePresence mode="wait" initial={false}>
@@ -389,10 +401,11 @@ export function PromptGroup({
 					</AnimatePresence>
 				</div>
 				<div className="flex items-center gap-1.5">
-					<DevicePicker
-						hostTarget={hostTarget}
-						onSelectHostTarget={(t) => updateDraft({ hostTarget: t })}
-					/>
+					{selectedProject?.needsSetup === true && (
+						<span className="text-[11px] text-amber-500">
+							Project needs to be set up
+						</span>
+					)}
 					<span className="text-[11px] text-muted-foreground/50">
 						{modKey}↵
 					</span>

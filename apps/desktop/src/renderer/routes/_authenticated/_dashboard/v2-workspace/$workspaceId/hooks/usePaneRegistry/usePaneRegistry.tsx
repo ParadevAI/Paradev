@@ -34,7 +34,6 @@ import {
 } from "../../state/fileDocumentStore";
 import type {
 	BrowserPaneData,
-	ChatPaneData,
 	CommentPaneData,
 	DevtoolsPaneData,
 	FilePaneData,
@@ -46,7 +45,6 @@ import {
 	BrowserPaneToolbar,
 	browserRuntimeRegistry,
 } from "./components/BrowserPane";
-import { ChatPane } from "./components/ChatPane";
 import { CommentPane } from "./components/CommentPane";
 import { DiffPane } from "./components/DiffPane";
 import { FilePane } from "./components/FilePane";
@@ -345,28 +343,13 @@ export function usePaneRegistry(
 			chat: {
 				getIcon: () => <MessageSquare className="size-4" />,
 				getTitle: () => "Chat",
-				renderPane: (ctx: RendererContext<PaneViewerData>) => {
-					const data = ctx.pane.data as ChatPaneData;
-					return (
-						<ChatPane
-							onSessionIdChange={(sessionId) =>
-								ctx.actions.updateData({
-									sessionId,
-									launchConfig: data.launchConfig ?? null,
-								} as PaneViewerData)
-							}
-							sessionId={data.sessionId}
-							workspaceId={workspaceId}
-							initialLaunchConfig={data.launchConfig ?? null}
-							onConsumeLaunchConfig={() =>
-								ctx.actions.updateData({
-									sessionId: data.sessionId,
-									launchConfig: null,
-								} as PaneViewerData)
-							}
-						/>
-					);
-				},
+				// Disabled until ChatServiceProvider is wired above v2 panes —
+				// TiptapPromptEditor needs its tRPC context.
+				renderPane: (_ctx: RendererContext<PaneViewerData>) => (
+					<div className="flex h-full items-center justify-center p-4 text-sm text-muted-foreground">
+						Chat pane is temporarily disabled.
+					</div>
+				),
 				contextMenuActions: (_ctx, defaults) =>
 					defaults.map((d) =>
 						d.key === "close-pane" ? { ...d, label: "Close Chat" } : d,

@@ -14,7 +14,6 @@ import { useFocusPromptOnPane } from "renderer/components/Chat/ChatInterface/hoo
 import { useHotkeyDisplay } from "renderer/hotkeys";
 import type { SlashCommand } from "../../hooks/useSlashCommands";
 import type { ModelOption, PermissionMode } from "../../types";
-import { IssueLinkCommand } from "../IssueLinkCommand";
 import { TiptapPromptEditor } from "../TiptapPromptEditor";
 import { ChatComposerControls } from "./components/ChatComposerControls";
 import { ChatInputDropZone } from "./components/ChatInputDropZone";
@@ -100,22 +99,11 @@ export function ChatInputFooter({
 		}
 	}, [pendingQuestion, textInput]);
 
-	const [issueLinkOpen, setIssueLinkOpen] = useState(false);
 	const [linkedIssues, setLinkedIssues] = useState<LinkedIssue[]>([]);
 	const inputRootRef = useRef<HTMLDivElement>(null);
 	const errorMessage = getErrorMessage(error);
 	const focusShortcutText = useHotkeyDisplay("FOCUS_CHAT_INPUT").text;
 	const showFocusHint = focusShortcutText !== "Unassigned";
-
-	const addLinkedIssue = useCallback(
-		(slug: string, title: string, taskId: string | undefined, url?: string) => {
-			setLinkedIssues((prev) => {
-				if (prev.some((issue) => issue.slug === slug)) return prev;
-				return [...prev, { slug, title, taskId, url }];
-			});
-		},
-		[],
-	);
 
 	const removeLinkedIssue = useCallback((slug: string) => {
 		setLinkedIssues((prev) => prev.filter((issue) => issue.slug !== slug));
@@ -176,15 +164,7 @@ export function ChatInputFooter({
 								maxFileSize={10 * 1024 * 1024}
 								globalDrop
 							>
-								<ChatShortcuts
-									isFocused={isFocused}
-									setIssueLinkOpen={setIssueLinkOpen}
-								/>
-								<IssueLinkCommand
-									open={issueLinkOpen}
-									onOpenChange={setIssueLinkOpen}
-									onSelect={addLinkedIssue}
-								/>
+								<ChatShortcuts isFocused={isFocused} />
 								<FileDropOverlay visible={dragType === "files"} />
 								<PromptInputAttachments>
 									{renderAttachment ??
@@ -217,7 +197,6 @@ export function ChatInputFooter({
 									submitStatus={submitStatus}
 									submitDisabled={submitDisabled}
 									onStop={onStop}
-									onLinkIssue={() => setIssueLinkOpen(true)}
 								/>
 							</PromptInput>
 						</div>
