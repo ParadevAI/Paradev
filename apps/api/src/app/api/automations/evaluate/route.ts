@@ -8,7 +8,10 @@ import { env } from "@/env";
 
 export const dynamic = "force-dynamic";
 
-const qstash = new Client({ token: env.QSTASH_TOKEN });
+const qstash = new Client({
+	token: env.QSTASH_TOKEN,
+	baseUrl: env.QSTASH_URL,
+});
 const receiver = new Receiver({
 	currentSigningKey: env.QSTASH_CURRENT_SIGNING_KEY,
 	nextSigningKey: env.QSTASH_NEXT_SIGNING_KEY,

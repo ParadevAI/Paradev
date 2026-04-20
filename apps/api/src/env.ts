@@ -31,6 +31,7 @@ export const env = createEnv({
 		SLACK_SIGNING_SECRET: z.string(),
 		ANTHROPIC_API_KEY: z.string(),
 		QSTASH_TOKEN: z.string().min(1),
+		QSTASH_URL: z.string().url(),
 		QSTASH_CURRENT_SIGNING_KEY: z.string().min(1),
 		QSTASH_NEXT_SIGNING_KEY: z.string().min(1),
 		RESEND_API_KEY: z.string(),

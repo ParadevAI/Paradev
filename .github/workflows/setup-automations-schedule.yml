@@ -32,4 +32,5 @@ jobs:
         env:
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
           QSTASH_TOKEN: ${{ secrets.QSTASH_TOKEN }}
+          QSTASH_URL: ${{ secrets.QSTASH_URL }}
         run: bun run apps/api/scripts/setup-automations-schedule.ts
