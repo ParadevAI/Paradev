@@ -1,5 +1,7 @@
 import {
 	agentCommands,
+	automationRuns,
+	automations,
 	chatSessions,
 	devicePresence,
 	githubPullRequests,
@@ -141,6 +143,16 @@ export function buildWhereClause(
 			return build(
 				githubPullRequests,
 				githubPullRequests.organizationId,
+				organizationId,
+			);
+
+		case "automations":
+			return build(automations, automations.organizationId, organizationId);
+
+		case "automation_runs":
+			return build(
+				automationRuns,
+				automationRuns.organizationId,
 				organizationId,
 			);
 

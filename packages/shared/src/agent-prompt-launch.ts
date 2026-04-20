@@ -3,7 +3,9 @@
  * payloads. Keep this enum intentionally small and add a new transport only
  * when a real agent requires it. Avoid arbitrary per-agent shell templates.
  */
-export type PromptTransport = "argv" | "stdin";
+export const PROMPT_TRANSPORTS = ["argv", "stdin"] as const;
+
+export type PromptTransport = (typeof PROMPT_TRANSPORTS)[number];
 
 function resolveDelimiter(prompt: string, randomId: string): string {
 	let delimiter = `SUPERSET_PROMPT_${randomId.replaceAll("-", "")}`;

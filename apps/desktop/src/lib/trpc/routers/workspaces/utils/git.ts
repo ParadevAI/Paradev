@@ -4,12 +4,12 @@ import { mkdir, rename } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { promisify } from "node:util";
 import type { BranchPrefixMode } from "@superset/local-db";
-import friendlyWords from "friendly-words";
 import {
 	sanitizeAuthorPrefix,
 	sanitizeBranchName,
 	sanitizeBranchNameWithMaxLength,
-} from "shared/utils/branch";
+} from "@superset/shared/workspace-launch";
+import friendlyWords from "friendly-words";
 import type { StatusResult } from "simple-git";
 import { runWithPostCheckoutHookTolerance } from "../../utils/git-hook-tolerance";
 import { execGitWithShellPath, getSimpleGitWithShellPath } from "./git-client";

@@ -246,6 +246,13 @@
       "when": 1776647783826,
       "tag": "0034_v2_projects_decouple_github_install_add_clone_url",
       "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1776661088164,
+      "tag": "0035_add_automations",
+      "breakpoints": true
     }
   ]
 }

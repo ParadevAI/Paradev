@@ -1,4 +1,11 @@
 import { isTerminalAgentDefinition } from "@superset/shared/agent-catalog";
+import {
+	buildPromptCommandFromAgentConfig,
+	getCommandFromAgentConfig,
+	getFallbackAgentId,
+	indexResolvedAgentConfigs,
+	type ResolvedAgentConfig,
+} from "@superset/shared/agent-settings";
 import { apiTrpcClient } from "renderer/lib/api-trpc-client";
 import type {
 	PendingChatLaunch,
@@ -15,13 +22,6 @@ import type {
 	LaunchSource,
 	ResolveCtx,
 } from "shared/context/types";
-import {
-	buildPromptCommandFromAgentConfig,
-	getCommandFromAgentConfig,
-	getFallbackAgentId,
-	indexResolvedAgentConfigs,
-	type ResolvedAgentConfig,
-} from "shared/utils/agent-settings";
 
 export interface LoadedAttachment {
 	data: string; // base64 data URL

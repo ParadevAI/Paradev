@@ -1,3 +1,5 @@
+import { isPaidPlan } from "@superset/shared/billing";
+import { FEATURE_FLAGS } from "@superset/shared/constants";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -7,9 +9,17 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { useMatchRoute, useNavigate } from "@tanstack/react-router";
+import { useFeatureFlagEnabled } from "posthog-js/react";
 import { HiMiniPlus, HiOutlineClipboardDocumentList } from "react-icons/hi2";
-import { LuFolderInput, LuFolderPlus, LuLayers, LuPlus } from "react-icons/lu";
+import {
+	LuClock,
+	LuFolderInput,
+	LuFolderPlus,
+	LuLayers,
+	LuPlus,
+} from "react-icons/lu";
 import { GATED_FEATURES, usePaywall } from "renderer/components/Paywall";
+import { useCurrentPlan } from "renderer/hooks/useCurrentPlan";
 import { useHotkeyDisplay } from "renderer/hotkeys";
 import { OrganizationDropdown } from "renderer/routes/_authenticated/_dashboard/components/TopBar/components/OrganizationDropdown";
 import { useTasksFilterStore } from "renderer/routes/_authenticated/_dashboard/tasks/stores/tasks-filter-state";
@@ -36,6 +46,13 @@ export function DashboardSidebarHeader({
 	const { gateFeature } = usePaywall();
 	const isWorkspacesListOpen = !!matchRoute({ to: "/v2-workspaces" });
 	const isTasksOpen = !!matchRoute({ to: "/tasks", fuzzy: true });
+	const isAutomationsOpen = !!matchRoute({ to: "/automations", fuzzy: true });
+
+	const automationsFlagEnabled = useFeatureFlagEnabled(
+		FEATURE_FLAGS.AUTOMATIONS_ACCESS,
+	);
+	const plan = useCurrentPlan();
+	const showAutomations = automationsFlagEnabled && isPaidPlan(plan);
 
 	const {
 		tab: lastTab,
@@ -45,6 +62,10 @@ export function DashboardSidebarHeader({
 
 	const handleWorkspacesClick = () => {
 		navigate({ to: "/v2-workspaces" });
+	};
+
+	const handleAutomationsClick = () => {
+		navigate({ to: "/automations" });
 	};
 
 	const handleTasksClick = () => {
@@ -125,6 +146,26 @@ export function DashboardSidebarHeader({
 					</DropdownMenuContent>
 				</DropdownMenu>
 
+				{showAutomations && (
+					<Tooltip delayDuration={300}>
+						<TooltipTrigger asChild>
+							<button
+								type="button"
+								onClick={handleAutomationsClick}
+								className={cn(
+									"flex size-8 items-center justify-center rounded-md transition-colors",
+									isAutomationsOpen
+										? "bg-accent text-foreground"
+										: "text-muted-foreground hover:bg-accent/50 hover:text-foreground",
+								)}
+							>
+								<LuClock className="size-4" />
+							</button>
+						</TooltipTrigger>
+						<TooltipContent side="right">Automations</TooltipContent>
+					</Tooltip>
+				)}
+
 				<Tooltip delayDuration={300}>
 					<TooltipTrigger asChild>
 						<button
@@ -190,6 +231,22 @@ export function DashboardSidebarHeader({
 				<LuLayers className="size-4 shrink-0" />
 				<span className="flex-1 text-left">Workspaces</span>
 			</button>
+
+			{showAutomations && (
+				<button
+					type="button"
+					onClick={handleAutomationsClick}
+					className={cn(
+						"flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm font-medium transition-colors",
+						isAutomationsOpen
+							? "bg-accent text-foreground"
+							: "text-muted-foreground hover:bg-accent/50 hover:text-foreground",
+					)}
+				>
+					<LuClock className="size-4 shrink-0" />
+					<span className="flex-1 text-left">Automations</span>
+				</button>
+			)}
 
 			<button
 				type="button"

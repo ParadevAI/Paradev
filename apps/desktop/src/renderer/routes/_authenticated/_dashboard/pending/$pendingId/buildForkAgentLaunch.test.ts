@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { resolveAgentConfigs } from "shared/utils/agent-settings";
+import { resolveAgentConfigs } from "@superset/shared/agent-settings";
 import {
 	buildForkAgentLaunch,
 	buildLaunchSourcesFromPending,

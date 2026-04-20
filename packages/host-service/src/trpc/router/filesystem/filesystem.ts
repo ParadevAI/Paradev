@@ -22,6 +22,26 @@ function getFilesystemService(ctx: HostServiceContext, workspaceId: string) {
 	}
 }
 
+function getProjectFilesystemService(
+	ctx: HostServiceContext,
+	projectId: string,
+) {
+	try {
+		return ctx.runtime.filesystem.getServiceForProject(projectId);
+	} catch (error) {
+		// "Project not found" just means the repo hasn't been cloned on this host
+		// yet (no workspace ever created for it). Return null so callers can degrade
+		// gracefully rather than throwing a 404.
+		if (
+			error instanceof Error &&
+			error.message.startsWith("Project not found:")
+		) {
+			return null;
+		}
+		throw error;
+	}
+}
+
 const writeFileContentSchema = z.union([
 	z.string(),
 	z.object({
@@ -230,14 +250,20 @@ export const filesystemRouter = router({
 
 	searchFiles: protectedProcedure
 		.input(
-			z.object({
-				workspaceId: z.string(),
-				query: z.string(),
-				includeHidden: z.boolean().optional(),
-				includePattern: z.string().optional(),
-				excludePattern: z.string().optional(),
-				limit: z.number().optional(),
-			}),
+			z
+				.object({
+					workspaceId: z.string().optional(),
+					projectId: z.string().optional(),
+					query: z.string(),
+					includeHidden: z.boolean().optional(),
+					includePattern: z.string().optional(),
+					excludePattern: z.string().optional(),
+					limit: z.number().optional(),
+				})
+				.refine(
+					(v) => !!v.workspaceId !== !!v.projectId,
+					"Exactly one of workspaceId or projectId must be provided",
+				),
 		)
 		.query(async ({ ctx, input }) => {
 			const trimmedQuery = input.query.trim();
@@ -245,8 +271,14 @@ export const filesystemRouter = router({
 				return { matches: [] };
 			}
 
-			const { workspaceId, ...serviceInput } = input;
-			const service = getFilesystemService(ctx, workspaceId);
+			const { workspaceId, projectId, ...serviceInput } = input;
+			const service = workspaceId
+				? getFilesystemService(ctx, workspaceId)
+				: getProjectFilesystemService(ctx, projectId as string);
+			if (!service) {
+				return { matches: [] };
+			}
+
 			return await service.searchFiles({
 				...serviceInput,
 				query: trimmedQuery,

@@ -1,5 +1,8 @@
-import { sanitizeUserBranchName, slugifyForBranch } from "shared/utils/branch";
-import { generateFriendlyBranchName } from "shared/utils/friendly-branch-name";
+import {
+	generateFriendlyBranchName,
+	sanitizeUserBranchName,
+	slugifyForBranch,
+} from "@superset/shared/workspace-launch";
 import type { DashboardNewWorkspaceDraft } from "../../../../../DashboardNewWorkspaceDraftContext";
 
 interface ResolvedNames {

@@ -11,6 +11,10 @@
 		"./integrations/*": {
 			"types": "./src/lib/integrations/*/index.ts",
 			"default": "./src/lib/integrations/*/index.ts"
+		},
+		"./automation-dispatch": {
+			"types": "./src/router/automation/dispatch.ts",
+			"default": "./src/router/automation/dispatch.ts"
 		}
 	},
 	"scripts": {

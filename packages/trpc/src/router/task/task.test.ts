@@ -109,6 +109,9 @@ mock.module("@superset/db/schema", () => ({
 		organizationId: "members.organizationId",
 		userId: "members.userId",
 	},
+	subscriptions: {
+		referenceId: "subscriptions.referenceId",
+	},
 	taskStatuses: {
 		id: "task_statuses.id",
 		organizationId: "task_statuses.organizationId",

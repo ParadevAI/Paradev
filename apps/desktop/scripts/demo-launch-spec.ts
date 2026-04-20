@@ -10,14 +10,14 @@
  *   or: bun run scripts/demo-launch-spec.ts codex cursor-agent
  */
 
+import {
+	indexResolvedAgentConfigs,
+	resolveAgentConfigs,
+} from "@superset/shared/agent-settings";
 import { buildLaunchSpec } from "../src/shared/context/buildLaunchSpec";
 import { buildLaunchContext } from "../src/shared/context/composer";
 import { defaultContributorRegistry } from "../src/shared/context/contributors";
 import type { LaunchSource, ResolveCtx } from "../src/shared/context/types";
-import {
-	indexResolvedAgentConfigs,
-	resolveAgentConfigs,
-} from "../src/shared/utils/agent-settings";
 
 // ---------------------------------------------------------------------------
 // Stub resolvers (mirror what host-service/issues + task services would return)

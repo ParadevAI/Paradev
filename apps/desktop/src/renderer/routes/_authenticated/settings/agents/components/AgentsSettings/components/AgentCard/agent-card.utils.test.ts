@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import type { ResolvedAgentConfig } from "shared/utils/agent-settings";
+import type { ResolvedAgentConfig } from "@superset/shared/agent-settings";
 import { buildAgentFieldPatch } from "./agent-card.utils";
 
 const BUILTIN_TERMINAL_PRESET: ResolvedAgentConfig = {

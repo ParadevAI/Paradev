@@ -44,6 +44,26 @@
 			"types": "./src/agent-prompt-template.ts",
 			"default": "./src/agent-prompt-template.ts"
 		},
+		"./agent-custom": {
+			"types": "./src/agent-custom.ts",
+			"default": "./src/agent-custom.ts"
+		},
+		"./billing": {
+			"types": "./src/billing.ts",
+			"default": "./src/billing.ts"
+		},
+		"./workspace-launch": {
+			"types": "./src/workspace-launch/index.ts",
+			"default": "./src/workspace-launch/index.ts"
+		},
+		"./agent-settings": {
+			"types": "./src/agent-settings.ts",
+			"default": "./src/agent-settings.ts"
+		},
+		"./agent-launch-request": {
+			"types": "./src/agent-launch-request.ts",
+			"default": "./src/agent-launch-request.ts"
+		},
 		"./task-slug": {
 			"types": "./src/task-slug.ts",
 			"default": "./src/task-slug.ts"
@@ -71,6 +91,10 @@
 		"./shell-ready-scanner": {
 			"types": "./src/shell-ready-scanner.ts",
 			"default": "./src/shell-ready-scanner.ts"
+		},
+		"./rrule": {
+			"types": "./src/rrule.ts",
+			"default": "./src/rrule.ts"
 		}
 	},
 	"scripts": {
@@ -79,10 +103,14 @@
 		"test": "bun test"
 	},
 	"dependencies": {
+		"@date-fns/tz": "^1.4.1",
+		"friendly-words": "^1.3.1",
+		"rrule": "^2.8.1",
 		"zod": "^4.3.5"
 	},
 	"devDependencies": {
 		"@superset/typescript": "workspace:*",
+		"@types/friendly-words": "^1.2.2",
 		"bun-types": "^1.3.1",
 		"typescript": "^5.9.3"
 	}

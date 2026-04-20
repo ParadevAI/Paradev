@@ -10,6 +10,7 @@ import { useLiveQuery } from "@tanstack/react-db";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo } from "react";
+import { MarkdownEditor } from "renderer/components/MarkdownEditor";
 import { apiTrpcClient } from "renderer/lib/api-trpc-client";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { Route as TasksLayoutRoute } from "../layout";
@@ -17,7 +18,6 @@ import { ActivitySection } from "./components/ActivitySection";
 import { EditableTitle } from "./components/EditableTitle";
 import { PropertiesSidebar } from "./components/PropertiesSidebar";
 import { TaskDetailHeader } from "./components/TaskDetailHeader";
-import { TaskMarkdownRenderer } from "./components/TaskMarkdownRenderer";
 import { useEscapeToNavigate } from "./hooks/useEscapeToNavigate";
 
 export const Route = createFileRoute(
@@ -156,7 +156,7 @@ function TaskDetailPage() {
 					<div className="px-6 py-6 max-w-4xl">
 						<EditableTitle value={task.title} onSave={handleSaveTitle} />
 
-						<TaskMarkdownRenderer
+						<MarkdownEditor
 							content={task.description ?? ""}
 							onSave={handleSaveDescription}
 						/>

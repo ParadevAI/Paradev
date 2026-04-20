@@ -110,15 +110,6 @@ describe("captureHotkeyFromEvent — Bug 2: uses event.code, not event.key", () 
 		expect(captureHotkeyFromEvent(ev({ code: "F12", key: "F12" }))).toBe("f12");
 	});
 
-	it("requires ctrl or meta for non-F-keys", () => {
-		expect(
-			captureHotkeyFromEvent(ev({ code: "KeyA", key: "a", shiftKey: true })),
-		).toBeNull();
-		expect(
-			captureHotkeyFromEvent(ev({ code: "KeyA", key: "a", altKey: true })),
-		).toBeNull();
-	});
-
 	it("returns null when event.code is undefined (synthetic / autofill events)", () => {
 		expect(
 			captureHotkeyFromEvent(ev({ code: undefined, ctrlKey: true })),

@@ -173,7 +173,7 @@ export function V2WorkspacesList({ pinned, others }: V2WorkspacesListProps) {
 	);
 
 	return (
-		<ScrollArea className="flex-1">
+		<ScrollArea className="min-h-0 flex-1">
 			<div className="flex flex-col gap-8 px-6 py-6">
 				{pinnedCount > 0 ? (
 					<section className="flex flex-col gap-3">

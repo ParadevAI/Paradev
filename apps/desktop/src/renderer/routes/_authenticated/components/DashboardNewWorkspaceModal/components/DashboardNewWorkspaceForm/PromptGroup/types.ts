@@ -1,4 +1,4 @@
-import type { AgentDefinitionId } from "shared/utils/agent-settings";
+import type { AgentDefinitionId } from "@superset/shared/agent-settings";
 
 export type WorkspaceCreateAgent = AgentDefinitionId | "none";
 

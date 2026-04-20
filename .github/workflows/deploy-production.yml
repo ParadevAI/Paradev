@@ -122,6 +122,7 @@ jobs:
           SLACK_BILLING_WEBHOOK_URL: ${{ secrets.SLACK_BILLING_WEBHOOK_URL }}
           SECRETS_ENCRYPTION_KEY: ${{ secrets.SECRETS_ENCRYPTION_KEY }}
           TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
+          RELAY_URL: ${{ secrets.RELAY_URL }}
         run: |
           vercel pull --yes --environment=production --token=$VERCEL_TOKEN
           vercel build --prod --token=$VERCEL_TOKEN
@@ -173,7 +174,8 @@ jobs:
             --env STRIPE_ENTERPRISE_YEARLY_PRICE_ID=$STRIPE_ENTERPRISE_YEARLY_PRICE_ID \
             --env SLACK_BILLING_WEBHOOK_URL=$SLACK_BILLING_WEBHOOK_URL \
             --env SECRETS_ENCRYPTION_KEY=$SECRETS_ENCRYPTION_KEY \
-            --env TAVILY_API_KEY=$TAVILY_API_KEY
+            --env TAVILY_API_KEY=$TAVILY_API_KEY \
+            --env RELAY_URL=$RELAY_URL
 
   deploy-web:
     name: Deploy Web to Vercel
@@ -297,6 +299,8 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_MARKETING_PROJECT_ID }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_URL_UNPOOLED: ${{ secrets.DATABASE_URL_UNPOOLED }}
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
           NEXT_PUBLIC_WEB_URL: ${{ secrets.NEXT_PUBLIC_WEB_URL }}
           NEXT_PUBLIC_MARKETING_URL: ${{ secrets.NEXT_PUBLIC_MARKETING_URL }}
@@ -324,6 +328,8 @@ jobs:
           vercel pull --yes --environment=production --token=$VERCEL_TOKEN
           vercel build --prod --token=$VERCEL_TOKEN
           vercel deploy --prod --prebuilt --archive=tgz --token=$VERCEL_TOKEN \
+            --env DATABASE_URL=$DATABASE_URL \
+            --env DATABASE_URL_UNPOOLED=$DATABASE_URL_UNPOOLED \
             --env BETTER_AUTH_SECRET=$BETTER_AUTH_SECRET \
             --env NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
             --env NEXT_PUBLIC_WEB_URL=$NEXT_PUBLIC_WEB_URL \
@@ -529,6 +535,8 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_DOCS_PROJECT_ID }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_URL_UNPOOLED: ${{ secrets.DATABASE_URL_UNPOOLED }}
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
           NEXT_PUBLIC_WEB_URL: ${{ secrets.NEXT_PUBLIC_WEB_URL }}
           NEXT_PUBLIC_MARKETING_URL: ${{ secrets.NEXT_PUBLIC_MARKETING_URL }}
@@ -542,6 +550,8 @@ jobs:
           vercel pull --yes --environment=production --token=$VERCEL_TOKEN
           vercel build --prod --token=$VERCEL_TOKEN
           vercel deploy --prod --prebuilt --archive=tgz --token=$VERCEL_TOKEN \
+            --env DATABASE_URL=$DATABASE_URL \
+            --env DATABASE_URL_UNPOOLED=$DATABASE_URL_UNPOOLED \
             --env NEXT_PUBLIC_POSTHOG_KEY=$NEXT_PUBLIC_POSTHOG_KEY \
             --env NEXT_PUBLIC_POSTHOG_HOST=$NEXT_PUBLIC_POSTHOG_HOST \
             --env NEXT_PUBLIC_SENTRY_DSN_DOCS=$NEXT_PUBLIC_SENTRY_DSN_DOCS \

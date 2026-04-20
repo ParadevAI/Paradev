@@ -472,6 +472,7 @@ step_write_env() {
     write_env_var "EXPO_PUBLIC_WEB_URL" "http://localhost:$WEB_PORT"
     write_env_var "EXPO_PUBLIC_API_URL" "http://localhost:$API_PORT"
     write_env_var "RELAY_URL" "http://localhost:$RELAY_PORT"
+    write_env_var "SUPERSET_WEB_URL" "http://localhost:$WEB_PORT"
     echo ""
     echo "# Streams URLs (overrides from root .env)"
     write_env_var "PORT" "$STREAMS_PORT"

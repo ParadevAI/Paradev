@@ -1,5 +1,9 @@
 import type { BranchPrefixMode } from "@superset/local-db";
 import {
+	resolveBranchPrefix,
+	sanitizeSegment,
+} from "@superset/shared/workspace-launch";
+import {
 	AlertDialog,
 	AlertDialogAction,
 	AlertDialogCancel,
@@ -39,7 +43,6 @@ import {
 	useImportAllWorktrees,
 	useOpenExternalWorktree,
 } from "renderer/react-query/workspaces";
-import { resolveBranchPrefix, sanitizeSegment } from "shared/utils/branch";
 import { ClickablePath } from "../../../../components/ClickablePath";
 import {
 	useDefaultWorktreePath,

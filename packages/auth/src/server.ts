@@ -930,3 +930,40 @@ export const auth = betterAuth({
 
 export type Session = typeof auth.$Infer.Session;
 export type User = typeof auth.$Infer.Session.user;
+
+/**
+ * Mints a short-lived JWT signed with the same JWKS key the Better Auth JWT
+ * plugin uses for session-derived tokens. Used by headless service code
+ * (e.g. the automations dispatcher) that needs to act on behalf of a user
+ * without holding their session cookie.
+ *
+ * The resulting token is accepted by anything that verifies via the public
+ * JWKS endpoint (the relay and any other downstream service), because it is
+ * signed with the same RS256 key pair.
+ */
+export async function mintUserJwt(args: {
+	userId: string;
+	email?: string;
+	organizationIds: string[];
+	scope?: string;
+	runId?: string;
+	/** Token lifetime in seconds. Default 300 (5 minutes). */
+	ttlSeconds?: number;
+}): Promise<string> {
+	const exp = Math.floor(Date.now() / 1000) + (args.ttlSeconds ?? 300);
+
+	const response = await auth.api.signJWT({
+		body: {
+			payload: {
+				sub: args.userId,
+				email: args.email,
+				organizationIds: args.organizationIds,
+				scope: args.scope,
+				runId: args.runId,
+				exp,
+			},
+		},
+	});
+
+	return response.token;
+}

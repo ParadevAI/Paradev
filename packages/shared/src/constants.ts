@@ -66,4 +66,11 @@ export const FEATURE_FLAGS = {
 	DISABLE_REMOTE_AGENT: "disable-remote-agent",
 	/** Gates access to V2 Cloud features (host-service, cloud sprites). */
 	V2_CLOUD: "v2-cloud",
+	/**
+	 * Gates the Automations feature in the UI (sidebar entry, routes, create
+	 * flow). Complementary to the subscriptions.plan paid-tier check —
+	 * server-side procedures still enforce paid plan; this flag controls
+	 * UI visibility and staged rollout.
+	 */
+	AUTOMATIONS_ACCESS: "automations-access",
 } as const;

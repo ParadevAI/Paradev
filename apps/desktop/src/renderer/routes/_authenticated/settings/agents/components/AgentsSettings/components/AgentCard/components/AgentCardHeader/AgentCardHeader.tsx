@@ -1,3 +1,4 @@
+import type { ResolvedAgentConfig } from "@superset/shared/agent-settings";
 import { CardDescription, CardHeader, CardTitle } from "@superset/ui/card";
 import { Switch } from "@superset/ui/switch";
 import { cn } from "@superset/ui/utils";
@@ -6,7 +7,6 @@ import {
 	getPresetIcon,
 	useIsDarkTheme,
 } from "renderer/assets/app-icons/preset-icons";
-import type { ResolvedAgentConfig } from "shared/utils/agent-settings";
 
 interface AgentCardHeaderProps {
 	preset: ResolvedAgentConfig;

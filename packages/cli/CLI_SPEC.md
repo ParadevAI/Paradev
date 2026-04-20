@@ -1152,16 +1152,26 @@ PORT    URL                      WORKSPACE      TERMINAL         DETECTED
 
 ---
 
-## `superset crons` (cloud + device for execution)
+## `superset automations` (cloud + device for execution)
 
-### `superset crons list`
+Gated behind a paid plan (`plan !== "free"` on the active organization).
+Schedules use RRule (RFC 5545). The desktop UI exposes preset pickers;
+the CLI takes the RRule directly — common shapes look like:
+
+- Daily at 9 AM: `FREQ=DAILY;BYHOUR=9;BYMINUTE=0`
+- Weekdays at 9 AM: `FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=9;BYMINUTE=0`
+- Weekly on Monday at 10 AM: `FREQ=WEEKLY;BYDAY=MO;BYHOUR=10;BYMINUTE=0`
+- Monthly on the 1st at 9 AM: `FREQ=MONTHLY;BYMONTHDAY=1;BYHOUR=9;BYMINUTE=0`
+- Every 15 minutes: `FREQ=MINUTELY;INTERVAL=15`
+
+### `superset automations list`
 
 **Human output:**
 ```
-NAME              SCHEDULE        DEVICE                STATUS     LAST RUN      NEXT RUN
-daily review      0 9 * * *       Satyas-MacBook-Pro    enabled    1d ago        tomorrow 9am
-weekly report     0 10 * * 1      Satyas-MacBook-Pro    enabled    5d ago        Mon 10am
-nightly tests     0 2 * * *       Kunals-MacBook-Pro    disabled   —             —
+ID          NAME                AGENT     SCHEDULE                  ENABLED  NEXT RUN
+9f3c-a201   Weekly release…     claude    every Friday at 9:00 AM   yes      2026-04-24T09:00:00-07:00
+7b11-c4e0   Daily standup       claude    every day at 9:00 AM      yes      2026-04-18T09:00:00-07:00
+3aa2-1fe8   Nightly test audit  codex     every day at 2:00 AM      no       —
 ```
 
 **`--json`:**
@@ -1169,116 +1179,76 @@ nightly tests     0 2 * * *       Kunals-MacBook-Pro    disabled   —          
 {
   "data": [{
     "id": "...",
-    "name": "daily review",
-    "schedule": "0 9 * * *",
-    "deviceId": "...",
-    "deviceName": "Satyas-MacBook-Pro",
-    "prompt": "Review all open PRs and...",
+    "name": "Weekly release notes",
+    "agentConfig": { "id": "claude", "kind": "terminal", "label": "Claude", ... },
+    "rrule": "FREQ=WEEKLY;BYDAY=FR;BYHOUR=9;BYMINUTE=0",
+    "scheduleText": "every Friday at 9:00 AM",
+    "timezone": "America/Los_Angeles",
+    "targetHostId": "...",
+    "v2ProjectId": "...",
+    "v2WorkspaceId": null,
     "enabled": true,
-    "lastRunAt": "2026-04-02T09:00:00Z",
-    "nextRunAt": "2026-04-04T09:00:00Z",
-    "createdAt": "2026-03-15T..."
+    "nextRunAt": "2026-04-24T09:00:00-07:00"
   }]
 }
 ```
 
-### `superset crons create`
+`agentConfig` is the full snapshot of the agent preset (id, command, kind, model, etc.)
+taken at create time. `v2WorkspaceId` is `null` when the automation creates a fresh
+workspace per run; otherwise it points at the reused workspace.
+
+### `superset automations create`
 ```
 Input:
   --name <name>                required
-  --schedule <cron>            required, e.g. "0 9 * * *"
-  --device <deviceId>          optional, auto-detected
-  --prompt <text>              one of prompt or prompt-file required
-  --prompt-file <path>         reads file contents as prompt
-  --workspace <workspaceId>    optional, default workspace for execution
-  --agent <type>               default: "claude"
+  --rrule <rrule>              required, RFC 5545 RRULE body
+  --project <projectId>        required
+  --workspace <workspaceId>    optional — reuse this existing workspace every
+                               run. When unset, a fresh workspace is created
+                               per run inside --project.
+  --prompt <text> |            one of --prompt / --prompt-file required
+    --prompt-file <path>
+  --device <hostId>            default: owner's online host
+  --timezone <IANA>            default: host TZ, else UTC
+  --dtstart <iso8601>          default: now (anchors interval rules)
+  --agent <preset-id>          default: "claude"
+  --agent-config-file <path>   optional — path to a JSON ResolvedAgentConfig
+                               snapshot to use verbatim (bypasses --agent)
 ```
 
 **Human output:**
 ```
-Created cron "daily review" (0 9 * * *)
-Next run: tomorrow at 9:00 AM
+Created automation "Weekly release notes" (9f3c…a201)
+Next run: 2026-04-24T09:00:00-07:00
 ```
 
-**`--json`:**
-```json
-{ "data": { "id": "...", "name": "daily review", "schedule": "0 9 * * *", "deviceId": "...", "enabled": true, "nextRunAt": "2026-04-04T09:00:00Z" } }
-```
-
-### `superset crons update <id>`
+### `superset automations update <id>`
 ```
 Input:
   --name <name>
-  --schedule <cron>
-  --device <deviceId>
-  --prompt <text>
-  --prompt-file <path>
-  --enabled <bool>
+  --prompt <text> | --prompt-file <path>
+  --rrule <rrule>
+  --timezone <IANA>
+  --dtstart <iso8601>
+  --agent <preset-id>
+  --device <hostId>
+  --enabled <bool>             pause / resume
 ```
 
-**Human output:**
+### `superset automations delete <id>`
+
+### `superset automations logs <id>`
+Shows recent runs. Duration / token columns are not populated in v1 —
+runs stop at "dispatched" and detailed state lives in the workspace.
 ```
-Updated cron "daily review"
+STATUS              SCHEDULED FOR         DISPATCHED AT         KIND      ERROR
+dispatched          2026-04-17T09:00:00Z  2026-04-17T09:00:01Z  chat      —
+dispatched          2026-04-10T09:00:00Z  2026-04-10T09:00:02Z  chat      —
+skipped_offline     2026-04-03T09:00:00Z  —                     —         target host offline
+dispatch_failed     2026-03-27T09:00:00Z  —                     —         relay 502: …
 ```
 
-**`--json`:**
-```json
-{ "data": { ... } }
-```
-
-### `superset crons delete <id>`
-
-**Human output:**
-```
-Deleted cron "daily review"
-```
-
-**`--json`:**
-```json
-{ "success": true }
-```
-
-### `superset crons logs <id>`
-Shows run history for a cron.
-```
-Input:
-  <id>              required
-  --limit <n>       default 20
-```
-
-**Human output:**
-```
-STATUS       STARTED              DURATION    ERROR
-completed    Apr 3, 9:00 AM       2m 34s      —
-completed    Apr 2, 9:00 AM       1m 12s      —
-skipped      Apr 1, 9:00 AM       —           device offline
-failed       Mar 31, 9:00 AM      0m 45s      timeout
-```
-
-**`--json`:**
-```json
-{
-  "data": [{
-    "id": "...",
-    "status": "completed",
-    "startedAt": "2026-04-03T09:00:00Z",
-    "completedAt": "2026-04-03T09:02:34Z",
-    "output": "Reviewed 3 PRs...",
-    "error": null,
-    "durationMs": 154000
-  }]
-}
-```
-
-### `superset crons run <id>`
-Manually triggers a cron.
-
-**Human output:**
-```
-Triggered cron "daily review"
-```
-
-**`--json`:**
-```json
-{ "data": { "runId": "...", "status": "pending" } }
-```
+### `superset automations run <id>`
+Dispatches the automation synchronously (doesn't wait for the next cron tick)
+and returns the run id. Works even on paused automations. The automation's
+regular `next_run_at` is unaffected.

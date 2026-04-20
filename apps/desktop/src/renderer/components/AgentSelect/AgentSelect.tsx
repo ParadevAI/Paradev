@@ -1,3 +1,7 @@
+import type {
+	AgentDefinitionId,
+	ResolvedAgentConfig,
+} from "@superset/shared/agent-settings";
 import {
 	Select,
 	SelectContent,
@@ -11,10 +15,6 @@ import {
 	getPresetIcon,
 	useIsDarkTheme,
 } from "renderer/assets/app-icons/preset-icons";
-import type {
-	AgentDefinitionId,
-	ResolvedAgentConfig,
-} from "shared/utils/agent-settings";
 
 const CONFIGURE_AGENTS_VALUE = "__configure_agents__";
 

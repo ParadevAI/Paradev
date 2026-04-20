@@ -1,4 +1,8 @@
 import type { BranchPrefixMode } from "@superset/local-db";
+import {
+	resolveBranchPrefix,
+	sanitizeSegment,
+} from "@superset/shared/workspace-launch";
 import { Input } from "@superset/ui/input";
 import { Label } from "@superset/ui/label";
 import {
@@ -11,7 +15,6 @@ import {
 import { Switch } from "@superset/ui/switch";
 import { useEffect, useState } from "react";
 import { electronTrpc } from "renderer/lib/electron-trpc";
-import { resolveBranchPrefix, sanitizeSegment } from "shared/utils/branch";
 import {
 	useDefaultWorktreePath,
 	WorktreeLocationPicker,

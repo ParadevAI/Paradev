@@ -1,6 +1,8 @@
 import { snakeCamelMapper } from "@electric-sql/client";
 import type {
 	SelectAgentCommand,
+	SelectAutomation,
+	SelectAutomationRun,
 	SelectChatSession,
 	SelectGithubPullRequest,
 	SelectGithubRepository,
@@ -28,6 +30,7 @@ import type {
 	LocalStorageCollectionUtils,
 } from "@tanstack/react-db";
 import {
+	BasicIndex,
 	createCollection,
 	localStorageCollectionOptions,
 } from "@tanstack/react-db";
@@ -52,6 +55,16 @@ import {
 const columnMapper = snakeCamelMapper();
 
 const electricUrl = `${env.NEXT_PUBLIC_ELECTRIC_URL}/v1/shape`;
+
+const indexDefaults = {
+	autoIndex: "eager",
+	defaultIndexType: BasicIndex,
+} as const;
+
+const createIndexedCollection = ((
+	config: Parameters<typeof createCollection>[0],
+) =>
+	createCollection({ ...config, ...indexDefaults })) as typeof createCollection;
 
 const apiKeyDisplaySchema = z.object({
 	id: z.string(),
@@ -89,6 +102,8 @@ export interface OrgCollections {
 	sessionHosts: Collection<SelectSessionHost>;
 	githubRepositories: Collection<SelectGithubRepository>;
 	githubPullRequests: Collection<SelectGithubPullRequest>;
+	automations: Collection<SelectAutomation>;
+	automationRuns: Collection<SelectAutomationRun>;
 	v2SidebarProjects: Collection<
 		DashboardSidebarProjectRow,
 		string,
@@ -154,7 +169,7 @@ const electricHeaders = {
 	},
 };
 
-const organizationsCollection = createCollection(
+const organizationsCollection = createIndexedCollection(
 	electricCollectionOptions<SelectOrganization>({
 		id: "organizations",
 		shapeOptions: {
@@ -168,7 +183,7 @@ const organizationsCollection = createCollection(
 );
 
 function createOrgCollections(organizationId: string): OrgCollections {
-	const tasks = createCollection(
+	const tasks = createIndexedCollection(
 		electricCollectionOptions<SelectTask>({
 			id: `tasks-${organizationId}`,
 			shapeOptions: {
@@ -202,7 +217,7 @@ function createOrgCollections(organizationId: string): OrgCollections {
 		}),
 	);
 
-	const taskStatuses = createCollection(
+	const taskStatuses = createIndexedCollection(
 		electricCollectionOptions<SelectTaskStatus>({
 			id: `task_statuses-${organizationId}`,
 			shapeOptions: {
@@ -218,7 +233,7 @@ function createOrgCollections(organizationId: string): OrgCollections {
 		}),
 	);
 
-	const projects = createCollection(
+	const projects = createIndexedCollection(
 		electricCollectionOptions<SelectProject>({
 			id: `projects-${organizationId}`,
 			shapeOptions: {
@@ -234,7 +249,7 @@ function createOrgCollections(organizationId: string): OrgCollections {
 		}),
 	);
 
-	const v2Projects = createCollection(
+	const v2Projects = createIndexedCollection(
 		electricCollectionOptions<SelectV2Project>({
 			id: `v2_projects-${organizationId}`,
 			shapeOptions: {
@@ -250,7 +265,7 @@ function createOrgCollections(organizationId: string): OrgCollections {
 		}),
 	);
 
-	const v2Hosts = createCollection(
+	const v2Hosts = createIndexedCollection(
 		electricCollectionOptions<SelectV2Host>({
 			id: `v2_hosts-${organizationId}`,
 			shapeOptions: {
@@ -266,7 +281,7 @@ function createOrgCollections(organizationId: string): OrgCollections {
 		}),
 	);
 
-	const v2Clients = createCollection(
+	const v2Clients = createIndexedCollection(
 		electricCollectionOptions<SelectV2Client>({
 			id: `v2_clients-${organizationId}`,
 			shapeOptions: {
@@ -282,7 +297,7 @@ function createOrgCollections(organizationId: string): OrgCollections {
 		}),
 	);
 
-	const v2UsersHosts = createCollection(
+	const v2UsersHosts = createIndexedCollection(
 		electricCollectionOptions<SelectV2UsersHosts>({
 			id: `v2_users_hosts-${organizationId}`,
 			shapeOptions: {
@@ -298,7 +313,7 @@ function createOrgCollections(organizationId: string): OrgCollections {
 		}),
 	);
 
-	const v2Workspaces = createCollection(
+	const v2Workspaces = createIndexedCollection(
 		electricCollectionOptions<SelectV2Workspace>({
 			id: `v2_workspaces-${organizationId}`,
 			shapeOptions: {
@@ -314,7 +329,7 @@ function createOrgCollections(organizationId: string): OrgCollections {
 		}),
 	);
 
-	const workspaces = createCollection(
+	const workspaces = createIndexedCollection(
 		electricCollectionOptions<SelectWorkspace>({
 			id: `workspaces-${organizationId}`,
 			shapeOptions: {
@@ -330,7 +345,7 @@ function createOrgCollections(organizationId: string): OrgCollections {
 		}),
 	);
 
-	const members = createCollection(
+	const members = createIndexedCollection(
 		electricCollectionOptions<SelectMember>({
 			id: `members-${organizationId}`,
 			shapeOptions: {
@@ -346,7 +361,7 @@ function createOrgCollections(organizationId: string): OrgCollections {
 		}),
 	);
 
-	const users = createCollection(
+	const users = createIndexedCollection(
 		electricCollectionOptions<SelectUser>({
 			id: `users-${organizationId}`,
 			shapeOptions: {
@@ -362,7 +377,7 @@ function createOrgCollections(organizationId: string): OrgCollections {
 		}),
 	);
 
-	const invitations = createCollection(
+	const invitations = createIndexedCollection(
 		electricCollectionOptions<SelectInvitation>({
 			id: `invitations-${organizationId}`,
 			shapeOptions: {
@@ -378,7 +393,7 @@ function createOrgCollections(organizationId: string): OrgCollections {
 		}),
 	);
 
-	const agentCommands = createCollection(
+	const agentCommands = createIndexedCollection(
 		electricCollectionOptions<SelectAgentCommand>({
 			id: `agent_commands-${organizationId}`,
 			shapeOptions: {
@@ -402,7 +417,7 @@ function createOrgCollections(organizationId: string): OrgCollections {
 		}),
 	);
 
-	const integrationConnections = createCollection(
+	const integrationConnections = createIndexedCollection(
 		electricCollectionOptions<IntegrationConnectionDisplay>({
 			id: `integration_connections-${organizationId}`,
 			shapeOptions: {
@@ -418,7 +433,7 @@ function createOrgCollections(organizationId: string): OrgCollections {
 		}),
 	);
 
-	const subscriptions = createCollection(
+	const subscriptions = createIndexedCollection(
 		electricCollectionOptions<SelectSubscription>({
 			id: `subscriptions-${organizationId}`,
 			shapeOptions: {
@@ -434,7 +449,7 @@ function createOrgCollections(organizationId: string): OrgCollections {
 		}),
 	);
 
-	const apiKeys = createCollection(
+	const apiKeys = createIndexedCollection(
 		electricCollectionOptions<ApiKeyDisplay>({
 			id: `apikeys-${organizationId}`,
 			shapeOptions: {
@@ -450,7 +465,7 @@ function createOrgCollections(organizationId: string): OrgCollections {
 		}),
 	);
 
-	const chatSessions = createCollection(
+	const chatSessions = createIndexedCollection(
 		electricCollectionOptions<SelectChatSession>({
 			id: `chat_sessions-${organizationId}`,
 			shapeOptions: {
@@ -466,7 +481,7 @@ function createOrgCollections(organizationId: string): OrgCollections {
 		}),
 	);
 
-	const sessionHosts = createCollection(
+	const sessionHosts = createIndexedCollection(
 		electricCollectionOptions<SelectSessionHost>({
 			id: `session_hosts-${organizationId}`,
 			shapeOptions: {
@@ -482,7 +497,7 @@ function createOrgCollections(organizationId: string): OrgCollections {
 		}),
 	);
 
-	const githubRepositories = createCollection(
+	const githubRepositories = createIndexedCollection(
 		electricCollectionOptions<SelectGithubRepository>({
 			id: `github_repositories-${organizationId}`,
 			shapeOptions: {
@@ -498,7 +513,7 @@ function createOrgCollections(organizationId: string): OrgCollections {
 		}),
 	);
 
-	const githubPullRequests = createCollection(
+	const githubPullRequests = createIndexedCollection(
 		electricCollectionOptions<SelectGithubPullRequest>({
 			id: `github_pull_requests-${organizationId}`,
 			shapeOptions: {
@@ -514,7 +529,39 @@ function createOrgCollections(organizationId: string): OrgCollections {
 		}),
 	);
 
-	const v2SidebarProjects = createCollection(
+	const automations = createIndexedCollection(
+		electricCollectionOptions<SelectAutomation>({
+			id: `automations-${organizationId}`,
+			shapeOptions: {
+				url: electricUrl,
+				params: {
+					table: "automations",
+					organizationId,
+				},
+				headers: electricHeaders,
+				columnMapper,
+			},
+			getKey: (item) => item.id,
+		}),
+	);
+
+	const automationRuns = createIndexedCollection(
+		electricCollectionOptions<SelectAutomationRun>({
+			id: `automation_runs-${organizationId}`,
+			shapeOptions: {
+				url: electricUrl,
+				params: {
+					table: "automation_runs",
+					organizationId,
+				},
+				headers: electricHeaders,
+				columnMapper,
+			},
+			getKey: (item) => item.id,
+		}),
+	);
+
+	const v2SidebarProjects = createIndexedCollection(
 		localStorageCollectionOptions({
 			id: `v2_sidebar_projects-${organizationId}`,
 			storageKey: `v2-sidebar-projects-${organizationId}`,
@@ -523,7 +570,7 @@ function createOrgCollections(organizationId: string): OrgCollections {
 		}),
 	);
 
-	const v2WorkspaceLocalState = createCollection(
+	const v2WorkspaceLocalState = createIndexedCollection(
 		localStorageCollectionOptions({
 			id: `v2_workspace_local_state-${organizationId}`,
 			storageKey: `v2-workspace-local-state-${organizationId}`,
@@ -532,7 +579,7 @@ function createOrgCollections(organizationId: string): OrgCollections {
 		}),
 	);
 
-	const v2SidebarSections = createCollection(
+	const v2SidebarSections = createIndexedCollection(
 		localStorageCollectionOptions({
 			id: `v2_sidebar_sections-${organizationId}`,
 			storageKey: `v2-sidebar-sections-${organizationId}`,
@@ -541,7 +588,7 @@ function createOrgCollections(organizationId: string): OrgCollections {
 		}),
 	);
 
-	const v2TerminalPresets = createCollection(
+	const v2TerminalPresets = createIndexedCollection(
 		localStorageCollectionOptions({
 			id: `v2_terminal_presets-${organizationId}`,
 			storageKey: `v2-terminal-presets-${organizationId}`,
@@ -550,7 +597,7 @@ function createOrgCollections(organizationId: string): OrgCollections {
 		}),
 	);
 
-	const pendingWorkspaces = createCollection(
+	const pendingWorkspaces = createIndexedCollection(
 		localStorageCollectionOptions({
 			id: `pending_workspaces-${organizationId}`,
 			storageKey: `pending-workspaces-${organizationId}`,
@@ -580,6 +627,8 @@ function createOrgCollections(organizationId: string): OrgCollections {
 		sessionHosts,
 		githubRepositories,
 		githubPullRequests,
+		automations,
+		automationRuns,
 		v2SidebarProjects,
 		v2WorkspaceLocalState,
 		v2SidebarSections,

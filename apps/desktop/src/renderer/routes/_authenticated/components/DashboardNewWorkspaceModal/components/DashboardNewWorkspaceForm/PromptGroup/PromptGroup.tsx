@@ -1,4 +1,8 @@
 import {
+	sanitizeUserBranchName,
+	slugifyForBranch,
+} from "@superset/shared/workspace-launch";
+import {
 	PromptInput,
 	PromptInputAttachment,
 	PromptInputAttachments,
@@ -23,11 +27,9 @@ import { AgentSelect } from "renderer/components/AgentSelect";
 import { LinkedIssuePill } from "renderer/components/Chat/ChatInterface/components/ChatInputFooter/components/LinkedIssuePill";
 import { IssueLinkCommand } from "renderer/components/Chat/ChatInterface/components/IssueLinkCommand";
 import { useAgentLaunchPreferences } from "renderer/hooks/useAgentLaunchPreferences";
+import { useEnabledAgents } from "renderer/hooks/useEnabledAgents";
 import { PLATFORM } from "renderer/hotkeys";
-import { electronTrpc } from "renderer/lib/electron-trpc";
 import { useNewWorkspaceModalOpen } from "renderer/stores/new-workspace-modal";
-import { getEnabledAgentConfigs } from "shared/utils/agent-settings";
-import { sanitizeUserBranchName, slugifyForBranch } from "shared/utils/branch";
 import { useDashboardNewWorkspaceDraft } from "../../../DashboardNewWorkspaceDraftContext";
 import { DevicePicker } from "../components/DevicePicker";
 import { AttachmentButtons } from "./components/AttachmentButtons";
@@ -76,11 +78,8 @@ export function PromptGroup({
 	} = draft;
 
 	// ── Agent presets ────────────────────────────────────────────────
-	const agentPresetsQuery = electronTrpc.settings.getAgentPresets.useQuery();
-	const enabledAgentPresets = useMemo(
-		() => getEnabledAgentConfigs(agentPresetsQuery.data ?? []),
-		[agentPresetsQuery.data],
-	);
+	const { agents: enabledAgentPresets, isFetched: agentsFetched } =
+		useEnabledAgents();
 	const selectableAgentIds = useMemo(
 		() => enabledAgentPresets.map((preset) => preset.id),
 		[enabledAgentPresets],
@@ -91,7 +90,7 @@ export function PromptGroup({
 			defaultAgent: "claude",
 			fallbackAgent: "none",
 			validAgents: ["none", ...selectableAgentIds],
-			agentsReady: agentPresetsQuery.isFetched,
+			agentsReady: agentsFetched,
 		});
 
 	const trimmedPrompt = prompt.trim();
@@ -401,6 +400,11 @@ export function PromptGroup({
 					</AnimatePresence>
 				</div>
 				<div className="flex items-center gap-1.5">
+					<DevicePicker
+						className="w-[160px]"
+						hostTarget={hostTarget}
+						onSelectHostTarget={(t) => updateDraft({ hostTarget: t })}
+					/>
 					{selectedProject?.needsSetup === true && (
 						<span className="text-[11px] text-amber-500">
 							Project needs to be set up
