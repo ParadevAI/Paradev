@@ -7,6 +7,7 @@ import { settings } from "@superset/local-db";
 import { getDeviceName, getHashedDeviceId } from "@superset/shared/device-info";
 import { app } from "electron";
 import { env } from "main/env.main";
+import semver from "semver";
 import { env as sharedEnv } from "shared/env.shared";
 import { getProcessEnvWithShellPath } from "../../lib/trpc/routers/workspaces/utils/shell-env";
 import { SUPERSET_HOME_DIR } from "./app-environment";
@@ -294,9 +295,15 @@ export class HostServiceCoordinator extends EventEmitter {
 			manifest.endpoint,
 			manifest.authToken,
 		);
-		if (version && version < MIN_HOST_SERVICE_VERSION) {
+		if (
+			!version ||
+			!semver.satisfies(version, `>=${MIN_HOST_SERVICE_VERSION}`)
+		) {
+			const reason = version
+				? `version ${version} < ${MIN_HOST_SERVICE_VERSION}`
+				: "version unknown";
 			console.log(
-				`[host-service:${organizationId}] Adopted service version ${version} < ${MIN_HOST_SERVICE_VERSION}, killing`,
+				`[host-service:${organizationId}] Adopted service ${reason}, killing`,
 			);
 			try {
 				process.kill(manifest.pid, "SIGTERM");
