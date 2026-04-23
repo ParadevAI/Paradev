@@ -4,6 +4,7 @@ import {
 	type DestroyWorkspaceError,
 	useDestroyWorkspace,
 } from "renderer/hooks/host-service/useDestroyWorkspace";
+import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences/useV2UserPreferences";
 import { useNavigateAwayFromWorkspace } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/hooks/useNavigateAwayFromWorkspace";
 import { useDeletingWorkspaces } from "renderer/routes/_authenticated/providers/DeletingWorkspacesProvider";
 
@@ -27,7 +28,7 @@ interface UseDestroyDialogStateOptions {
  *   - On error, `clearDeleting` runs in the `finally` block so the row
  *     reappears. For decision-required errors (CONFLICT, TEARDOWN_FAILED)
  *     we reopen the dialog in the matching error pane so the user can
- *     force-retry with full context. The branch opt-in is preserved.
+ *     force-retry with full context.
  *   - For unknown errors we just toast.error — no reopen.
  */
 export function useDestroyDialogState({
@@ -40,16 +41,15 @@ export function useDestroyDialogState({
 	const { markDeleting, clearDeleting } = useDeletingWorkspaces();
 	const navigateAway = useNavigateAwayFromWorkspace();
 
-	const [deleteBranch, setDeleteBranch] = useState(false);
+	const { preferences, setDeleteLocalBranch: setDeleteBranch } =
+		useV2UserPreferences();
+	const deleteBranch = preferences.deleteLocalBranch;
 	const [error, setError] = useState<DestroyWorkspaceError | null>(null);
 	const inFlight = useRef(false);
 
 	const handleOpenChange = useCallback(
 		(next: boolean) => {
-			if (!next) {
-				setDeleteBranch(false);
-				setError(null);
-			}
+			if (!next) setError(null);
 			onOpenChange(next);
 		},
 		[onOpenChange],
@@ -69,8 +69,6 @@ export function useDestroyDialogState({
 			// and hiding the row were swallowing the nav otherwise.
 			navigateAway(workspaceId);
 
-			// Optimistic close. `deleteBranch` preserved in case we re-open
-			// on a decision-required error.
 			setError(null);
 			onOpenChange(false);
 			markDeleting(workspaceId);
@@ -79,7 +77,6 @@ export function useDestroyDialogState({
 			try {
 				const result = await destroy({ deleteBranch, force });
 				for (const warning of result.warnings) toast.warning(warning);
-				setDeleteBranch(false);
 				onDeleted?.();
 			} catch (err) {
 				const e = err as DestroyWorkspaceError;
