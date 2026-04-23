@@ -210,6 +210,41 @@ async function listWorktreeBranches(
 	return { worktreeMap, checkedOutBranches };
 }
 
+/**
+ * Check whether a git worktree is registered at `worktreePath` with the given
+ * branch checked out. Used by adopt when the caller provides an explicit path
+ * (e.g. v1→v2 migration) rather than a Superset-managed `.worktrees/<branch>`
+ * path discovered via `listWorktreeBranches`.
+ */
+async function findWorktreeAtPath(
+	git: GitClient,
+	worktreePath: string,
+	expectedBranch: string,
+): Promise<boolean> {
+	const targetPath = resolve(worktreePath);
+	try {
+		const raw = await git.raw(["worktree", "list", "--porcelain"]);
+		let currentPath: string | null = null;
+		for (const line of raw.split("\n")) {
+			if (line.startsWith("worktree ")) {
+				currentPath = line.slice("worktree ".length).trim();
+			} else if (line.startsWith("branch refs/heads/") && currentPath) {
+				if (resolve(currentPath) !== targetPath) continue;
+				const branch = line.slice("branch refs/heads/".length).trim();
+				return branch === expectedBranch;
+			} else if (line === "") {
+				currentPath = null;
+			}
+		}
+	} catch (err) {
+		console.warn(
+			"[workspace-creation] git worktree list failed in findWorktreeAtPath:",
+			err,
+		);
+	}
+	return false;
+}
+
 // Parses `git log -g` to return {branchName: ordinal} where 0 = most recent.
 async function getRecentBranchOrder(
 	git: GitClient,
@@ -1370,6 +1405,12 @@ export const workspaceCreationRouter = router({
 				projectId: z.string(),
 				workspaceName: z.string(),
 				branch: z.string(),
+				// When provided, adopt the worktree at this explicit path instead
+				// of looking one up under <repoPath>/.worktrees/<branch>. Used by
+				// the v1→v2 migration to adopt worktrees at legacy paths (e.g.
+				// ~/.superset/worktrees/...) that aren't under the picker's
+				// Superset-managed prefix.
+				worktreePath: z.string().optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
@@ -1392,16 +1433,30 @@ export const workspaceCreationRouter = router({
 			}
 
 			const git = await ctx.git(localProject.repoPath);
-			const { worktreeMap } = await listWorktreeBranches(
-				git,
-				localProject.repoPath,
-			);
-			const worktreePath = worktreeMap.get(branch);
-			if (!worktreePath) {
-				throw new TRPCError({
-					code: "NOT_FOUND",
-					message: `No existing worktree for branch "${branch}"`,
-				});
+
+			let worktreePath: string;
+			if (input.worktreePath) {
+				const found = await findWorktreeAtPath(git, input.worktreePath, branch);
+				if (!found) {
+					throw new TRPCError({
+						code: "NOT_FOUND",
+						message: `No git worktree registered at "${input.worktreePath}" on branch "${branch}"`,
+					});
+				}
+				worktreePath = input.worktreePath;
+			} else {
+				const { worktreeMap } = await listWorktreeBranches(
+					git,
+					localProject.repoPath,
+				);
+				const found = worktreeMap.get(branch);
+				if (!found) {
+					throw new TRPCError({
+						code: "NOT_FOUND",
+						message: `No existing worktree for branch "${branch}"`,
+					});
+				}
+				worktreePath = found;
 			}
 
 			// We used to short-circuit on an existing local `workspaces` row
