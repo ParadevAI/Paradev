@@ -124,6 +124,34 @@ function hostIsVisible(container: HTMLDivElement | null): boolean {
 	return container.clientWidth > 0 && container.clientHeight > 0;
 }
 
+// Body-level hidden container that owns wrapper divs of terminals whose
+// React component is currently unmounted (e.g. workspace switch). Keeps
+// xterm attached to the document so it survives provider remounts without
+// a detach/reattach flash — VSCode's setVisible(false) model. Looked up
+// by DOM id so it's HMR-safe (module-level `let` would leak on re-eval).
+// `inert` removes the whole subtree from the tab order and the accessibility
+// tree, and also moves focus out of it — so a parked terminal's internal
+// <textarea> can't receive keystrokes meant for the active pane.
+const PARKING_CONTAINER_ID = "v2-terminal-parking";
+function getParkingContainer(): HTMLDivElement {
+	const existing = document.getElementById(PARKING_CONTAINER_ID);
+	if (existing) return existing as HTMLDivElement;
+
+	const el = document.createElement("div");
+	el.id = PARKING_CONTAINER_ID;
+	el.setAttribute("inert", "");
+	el.setAttribute("aria-hidden", "true");
+	el.style.position = "fixed";
+	el.style.left = "-9999px";
+	el.style.top = "-9999px";
+	el.style.width = "100vw";
+	el.style.height = "100vh";
+	el.style.overflow = "hidden";
+	el.style.pointerEvents = "none";
+	document.body.appendChild(el);
+	return el;
+}
+
 function measureAndResize(runtime: TerminalRuntime) {
 	if (!hostIsVisible(runtime.container)) return;
 	runtime.fitAddon.fit();
@@ -178,6 +206,16 @@ export function attachToContainer(
 	container: HTMLDivElement,
 	onResize?: () => void,
 ) {
+	// If we're already attached to this exact container, do nothing. Prevents
+	// redundant refresh/focus/fit from transient remounts during provider key
+	// churn — VSCode setVisible() is idempotent for the same host element.
+	const sameContainer =
+		runtime.container === container &&
+		runtime.wrapper.parentElement === container;
+	if (sameContainer && runtime.resizeObserver) {
+		return;
+	}
+
 	runtime.container = container;
 	container.appendChild(runtime.wrapper);
 	measureAndResize(runtime);
@@ -201,7 +239,9 @@ export function detachFromContainer(runtime: TerminalRuntime) {
 	persistDimensions(runtime.terminalId, runtime.lastCols, runtime.lastRows);
 	runtime.resizeObserver?.disconnect();
 	runtime.resizeObserver = null;
-	runtime.wrapper.remove();
+	// Park instead of .remove() so xterm survives the React unmount —
+	// see getParkingContainer.
+	getParkingContainer().appendChild(runtime.wrapper);
 	runtime.container = null;
 }
 
