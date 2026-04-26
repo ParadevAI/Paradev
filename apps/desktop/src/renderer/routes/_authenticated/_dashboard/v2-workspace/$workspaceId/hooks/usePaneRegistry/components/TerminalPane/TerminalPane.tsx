@@ -54,10 +54,9 @@ export function TerminalPane({
 		onLeave: onLinkLeave,
 	} = useLinkHoverState();
 	const { hint, showHint } = useLinkClickHint();
+	const openInExternalEditor = useOpenInExternalEditor(workspaceId);
 	const paneData = ctx.pane.data as TerminalPaneData;
 	const { terminalId } = paneData;
-	const sessionWorkspaceId = paneData.workspaceId ?? workspaceId;
-	const openInExternalEditor = useOpenInExternalEditor(sessionWorkspaceId);
 	const terminalInstanceId = ctx.pane.id;
 	const containerRef = useRef<HTMLDivElement | null>(null);
 	const activeTheme = useTheme();
@@ -79,8 +78,8 @@ export function TerminalPane({
 	const websocketUrl = useWorkspaceWsUrl(`/terminal/${terminalId}`);
 	const websocketUrlRef = useRef(websocketUrl);
 	websocketUrlRef.current = websocketUrl;
-	const sessionWorkspaceIdRef = useRef(sessionWorkspaceId);
-	sessionWorkspaceIdRef.current = sessionWorkspaceId;
+	const workspaceIdRef = useRef(workspaceId);
+	workspaceIdRef.current = workspaceId;
 
 	const ensureSession = workspaceTrpc.terminal.ensureSession.useMutation();
 	const ensureSessionRef = useRef(ensureSession);
@@ -125,7 +124,7 @@ export function TerminalPane({
 	//      "Session not found."
 	// Deps narrowed to [terminalId] so provider key remount churn (workspaceId
 	// briefly flipping while pane data catches up) doesn't re-run this effect.
-	// sessionWorkspaceId / websocketUrl are read through refs.
+	// workspaceId / websocketUrl are read through refs.
 	useEffect(() => {
 		const container = containerRef.current;
 		if (!container) return;
@@ -138,7 +137,7 @@ export function TerminalPane({
 		);
 
 		let cancelled = false;
-		const activeSessionWorkspaceId = sessionWorkspaceIdRef.current;
+		const sessionWorkspaceId = workspaceIdRef.current;
 
 		// Always connect after ensureSession settles, even on error: if the
 		// session actually exists on the server (e.g. we raced another client),
@@ -148,12 +147,14 @@ export function TerminalPane({
 		ensureSessionRef.current
 			.mutateAsync({
 				terminalId,
-				workspaceId: activeSessionWorkspaceId,
+				workspaceId: sessionWorkspaceId,
 				themeType: initialThemeTypeRef.current,
 			})
 			.then((result) => {
 				if (result.status === "active") {
-					void invalidateTerminalSessionsRef.current();
+					void invalidateTerminalSessionsRef.current({
+						workspaceId: sessionWorkspaceId,
+					});
 				}
 			})
 			.catch((err) => {
@@ -209,7 +210,7 @@ export function TerminalPane({
 				stat: async (path) => {
 					try {
 						const result = await statPathRef.current({
-							workspaceId: sessionWorkspaceId,
+							workspaceId,
 							path,
 						});
 						if (!result) return null;
@@ -280,7 +281,7 @@ export function TerminalPane({
 	}, [
 		terminalId,
 		terminalInstanceId,
-		sessionWorkspaceId,
+		workspaceId,
 		ctx.store,
 		onOpenFile,
 		onRevealPath,
