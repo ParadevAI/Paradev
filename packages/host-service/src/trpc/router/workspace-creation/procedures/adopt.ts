@@ -1,4 +1,4 @@
-import { getDeviceName, getHashedDeviceId } from "@superset/shared/device-info";
+import { getHostId, getHostName } from "@superset/shared/host-info";
 import { TRPCError } from "@trpc/server";
 import { and, eq, ne, or } from "drizzle-orm";
 import { workspaces } from "../../../../db/schema";
@@ -115,8 +115,8 @@ async function recordBaseBranch(
 export const adopt = protectedProcedure
 	.input(adoptInputSchema)
 	.mutation(async ({ ctx, input }) => {
-		const deviceClientId = getHashedDeviceId();
-		const deviceName = getDeviceName();
+		const machineId = getHostId();
+		const hostName = getHostName();
 
 		const localProject = requireLocalProject(ctx, input.projectId);
 		await ensureMainWorkspace(ctx, input.projectId, localProject.repoPath);
@@ -245,20 +245,16 @@ export const adopt = protectedProcedure
 			deleteLocalWorkspace(ctx, existingLocalByPath.id);
 		}
 
-		// Reuse an exact local/cloud match for rerun safety. If the local row
-		// points at a hard-deleted cloud row, drop it and create a fresh row below.
-		// Rows with the same branch but a different path are treated as stale and
-		// replaced after the new cloud row is created.
-		let host: { id: string };
+		let host: { machineId: string };
 		try {
-			host = await ctx.api.device.ensureV2Host.mutate({
+			host = await ctx.api.host.ensure.mutate({
 				organizationId: ctx.organizationId,
-				machineId: deviceClientId,
-				name: deviceName,
+				machineId,
+				name: hostName,
 			});
 		} catch (err) {
 			if (err instanceof TRPCError) throw err;
-			console.error("[workspaceCreation.adopt] ensureV2Host failed", err);
+			console.error("[workspaceCreation.adopt] host.ensure failed", err);
 			throw new TRPCError({
 				code: "INTERNAL_SERVER_ERROR",
 				message: `Failed to register host: ${err instanceof Error ? err.message : String(err)}`,
@@ -272,7 +268,7 @@ export const adopt = protectedProcedure
 				projectId: input.projectId,
 				name: input.workspaceName,
 				branch,
-				hostId: host.id,
+				hostId: host.machineId,
 			});
 		} catch (err) {
 			if (err instanceof TRPCError) throw err;

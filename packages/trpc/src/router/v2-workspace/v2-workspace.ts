@@ -39,10 +39,13 @@ async function getScopedHost(organizationId: string, hostId: string) {
 		() =>
 			dbWs.query.v2Hosts.findFirst({
 				columns: {
-					id: true,
+					machineId: true,
 					organizationId: true,
 				},
-				where: eq(v2Hosts.id, hostId),
+				where: and(
+					eq(v2Hosts.organizationId, organizationId),
+					eq(v2Hosts.machineId, hostId),
+				),
 			}),
 		{
 			code: "BAD_REQUEST",
@@ -106,7 +109,7 @@ export const v2WorkspaceRouter = {
 				projectId: z.string().uuid(),
 				name: z.string().min(1),
 				branch: z.string().min(1),
-				hostId: z.string().uuid(),
+				hostId: z.string().min(1),
 				type: z.enum(v2WorkspaceTypeValues).default("worktree"),
 			}),
 		)
@@ -135,7 +138,7 @@ export const v2WorkspaceRouter = {
 					projectId: project.id,
 					name: input.name,
 					branch: input.branch,
-					hostId: host.id,
+					hostId: host.machineId,
 					type: input.type,
 					createdByUserId: ctx.userId,
 				})
@@ -148,7 +151,7 @@ export const v2WorkspaceRouter = {
 				const existing = await dbWs.query.v2Workspaces.findFirst({
 					where: and(
 						eq(v2Workspaces.projectId, project.id),
-						eq(v2Workspaces.hostId, host.id),
+						eq(v2Workspaces.hostId, host.machineId),
 						eq(v2Workspaces.type, "main"),
 					),
 				});
@@ -177,7 +180,7 @@ export const v2WorkspaceRouter = {
 
 			throw new TRPCError({
 				code: "INTERNAL_SERVER_ERROR",
-				message: `Workspace insert returned no row (type=${input.type}, projectId=${project.id}, hostId=${host.id})`,
+				message: `Workspace insert returned no row (type=${input.type}, projectId=${project.id}, hostId=${host.machineId})`,
 			});
 		}),
 
@@ -212,7 +215,7 @@ export const v2WorkspaceRouter = {
 				id: z.string().uuid(),
 				name: z.string().min(1).optional(),
 				branch: z.string().min(1).optional(),
-				hostId: z.string().uuid().optional(),
+				hostId: z.string().min(1).optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {

@@ -1,4 +1,4 @@
-import { getDeviceName, getHashedDeviceId } from "@superset/shared/device-info";
+import { getHostId, getHostName } from "@superset/shared/host-info";
 import { workspaces } from "../../../../db/schema";
 import type { HostServiceContext } from "../../../../types";
 
@@ -49,10 +49,10 @@ export async function ensureMainWorkspace(
 			return null;
 		}
 
-		const host = await ctx.api.device.ensureV2Host.mutate({
+		const host = await ctx.api.host.ensure.mutate({
 			organizationId: ctx.organizationId,
-			machineId: getHashedDeviceId(),
-			name: getDeviceName(),
+			machineId: getHostId(),
+			name: getHostName(),
 		});
 
 		const cloudRow = await ctx.api.v2Workspace.create.mutate({
@@ -60,7 +60,7 @@ export async function ensureMainWorkspace(
 			projectId,
 			name: branch,
 			branch,
-			hostId: host.id,
+			hostId: host.machineId,
 			type: "main",
 		});
 
