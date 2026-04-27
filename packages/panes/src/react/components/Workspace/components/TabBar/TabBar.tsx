@@ -4,13 +4,12 @@ import {
 	DropdownMenuContent,
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
-import { cn } from "@superset/ui/utils";
+import { OverflowFadeContainer } from "@superset/ui/overflow-fade-container";
 import { PlusIcon } from "lucide-react";
 import {
+	type ComponentProps,
 	type ReactNode,
 	useCallback,
-	useEffect,
-	useLayoutEffect,
 	useRef,
 	useState,
 } from "react";
@@ -78,7 +77,6 @@ export function TabBar<TData>({
 	renderAddTabMenu,
 	renderTabAccessory,
 }: TabBarProps<TData>) {
-	const scrollContainerRef = useRef<HTMLDivElement>(null);
 	const tabsTrackRef = useRef<HTMLDivElement>(null);
 	const [hasHorizontalOverflow, setHasHorizontalOverflow] = useState(false);
 
@@ -133,41 +131,18 @@ export function TabBar<TData>({
 
 	const setScrollContainerRef = useCallback(
 		(node: HTMLDivElement | null) => {
-			(
-				scrollContainerRef as React.MutableRefObject<HTMLDivElement | null>
-			).current = node;
 			connectDrop(node);
 		},
 		[connectDrop],
 	);
 
-	const updateOverflow = useCallback(() => {
-		const container = scrollContainerRef.current;
-		const track = tabsTrackRef.current;
-		if (!container || !track) return;
-		setHasHorizontalOverflow(track.scrollWidth > container.clientWidth + 1);
+	const handleOverflowChange = useCallback<
+		NonNullable<
+			ComponentProps<typeof OverflowFadeContainer>["onOverflowChange"]
+		>
+	>((state) => {
+		setHasHorizontalOverflow(state.hasOverflowX);
 	}, []);
-
-	useLayoutEffect(() => {
-		const container = scrollContainerRef.current;
-		const track = tabsTrackRef.current;
-		if (!container || !track) return;
-
-		updateOverflow();
-		const resizeObserver = new ResizeObserver(updateOverflow);
-		resizeObserver.observe(container);
-		resizeObserver.observe(track);
-		window.addEventListener("resize", updateOverflow);
-
-		return () => {
-			resizeObserver.disconnect();
-			window.removeEventListener("resize", updateOverflow);
-		};
-	}, [updateOverflow]);
-
-	useEffect(() => {
-		requestAnimationFrame(updateOverflow);
-	}, [updateOverflow]);
 
 	const insertLineLeft = insertIndex !== null ? insertIndex * TAB_WIDTH : null;
 
@@ -184,20 +159,11 @@ export function TabBar<TData>({
 
 	return (
 		<div className="group/root-tabs flex h-10 min-w-0 shrink-0 items-stretch border-b border-border bg-background">
-			<div
+			<OverflowFadeContainer
 				ref={setScrollContainerRef}
-				className={cn(
-					"flex min-w-0 flex-1 items-stretch overflow-x-auto overflow-y-hidden",
-					hasHorizontalOverflow
-						? [
-								"[scrollbar-width:none]",
-								"[&::-webkit-scrollbar]:h-0",
-								"group-hover/root-tabs:[scrollbar-width:thin]",
-								"group-hover/root-tabs:[&::-webkit-scrollbar]:h-2",
-								"group-hover/root-tabs:[&::-webkit-scrollbar-thumb]:border-[2px]",
-							].join(" ")
-						: "hide-scrollbar",
-				)}
+				observeChildren
+				onOverflowChange={handleOverflowChange}
+				className="hide-scrollbar flex min-w-0 flex-1 items-stretch overflow-x-auto overflow-y-hidden"
 			>
 				<div ref={tabsTrackRef} className="relative flex h-full items-stretch">
 					{tabs.map((tab, i) => (
@@ -233,7 +199,7 @@ export function TabBar<TData>({
 						</div>
 					)}
 				</div>
-			</div>
+			</OverflowFadeContainer>
 			{hasHorizontalOverflow && (
 				<div className="flex h-full w-10 shrink-0 items-stretch bg-background">
 					<AddTabButton renderAddTabMenu={renderAddTabMenu} />
