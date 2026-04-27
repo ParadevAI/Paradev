@@ -1,4 +1,5 @@
 import type { ResolvedAgentConfig } from "@superset/shared/agent-settings";
+import { sql } from "drizzle-orm";
 import {
 	boolean,
 	index,
@@ -24,6 +25,7 @@ import {
 	taskStatusEnumValues,
 	v2ClientTypeValues,
 	v2UsersHostRoleValues,
+	v2WorkspaceTypeValues,
 	workspaceTypeValues,
 } from "./enums";
 import { githubRepositories } from "./github";
@@ -42,6 +44,10 @@ export const v2ClientType = pgEnum("v2_client_type", v2ClientTypeValues);
 export const v2UsersHostRole = pgEnum(
 	"v2_users_host_role",
 	v2UsersHostRoleValues,
+);
+export const v2WorkspaceType = pgEnum(
+	"v2_workspace_type",
+	v2WorkspaceTypeValues,
 );
 
 export const taskStatuses = pgTable(
@@ -529,6 +535,7 @@ export const v2Workspaces = pgTable(
 			.references(() => v2Hosts.id),
 		name: text().notNull(),
 		branch: text().notNull(),
+		type: v2WorkspaceType().notNull().default("worktree"),
 		createdByUserId: uuid("created_by_user_id").references(() => users.id, {
 			onDelete: "set null",
 		}),
@@ -544,6 +551,9 @@ export const v2Workspaces = pgTable(
 		index("v2_workspaces_project_id_idx").on(table.projectId),
 		index("v2_workspaces_organization_id_idx").on(table.organizationId),
 		index("v2_workspaces_host_id_idx").on(table.hostId),
+		uniqueIndex("v2_workspaces_one_main_per_host")
+			.on(table.projectId, table.hostId)
+			.where(sql`${table.type} = 'main'`),
 	],
 );
 

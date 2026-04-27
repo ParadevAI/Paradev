@@ -1,6 +1,7 @@
 import { rmSync } from "node:fs";
 import { TRPCError } from "@trpc/server";
 import type { HostServiceContext } from "../../../types";
+import { ensureMainWorkspace } from "./utils/ensure-main-workspace";
 import { persistLocalProject } from "./utils/persist-project";
 import {
 	cloneRepoInto,
@@ -26,6 +27,7 @@ function slugifyProjectName(name: string): string {
 interface CreateResult {
 	projectId: string;
 	repoPath: string;
+	mainWorkspaceId: string | null;
 }
 
 function slugWithSuffix(baseSlug: string, attempt: number): string {
@@ -112,7 +114,16 @@ export async function createFromClone(
 			resolved,
 			"createFromClone",
 		);
-		return { projectId: cloudProject.id, repoPath: resolved.repoPath };
+		const mainWorkspace = await ensureMainWorkspace(
+			ctx,
+			cloudProject.id,
+			resolved.repoPath,
+		);
+		return {
+			projectId: cloudProject.id,
+			repoPath: resolved.repoPath,
+			mainWorkspaceId: mainWorkspace?.id ?? null,
+		};
 	} catch (err) {
 		// Once a cloud project exists, keep the clone in place so rerun/recovery
 		// has a local repo path to relink instead of creating a second clone.
@@ -144,5 +155,14 @@ export async function createFromImportLocal(
 		resolved,
 		"createFromImportLocal",
 	);
-	return { projectId: cloudProject.id, repoPath: resolved.repoPath };
+	const mainWorkspace = await ensureMainWorkspace(
+		ctx,
+		cloudProject.id,
+		resolved.repoPath,
+	);
+	return {
+		projectId: cloudProject.id,
+		repoPath: resolved.repoPath,
+		mainWorkspaceId: mainWorkspace?.id ?? null,
+	};
 }

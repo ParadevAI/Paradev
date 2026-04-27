@@ -4,6 +4,7 @@ import { and, eq, ne, or } from "drizzle-orm";
 import { workspaces } from "../../../../db/schema";
 import type { HostServiceContext } from "../../../../types";
 import { protectedProcedure } from "../../../index";
+import { ensureMainWorkspace } from "../../project/utils/ensure-main-workspace";
 import { adoptInputSchema } from "../schemas";
 import {
 	getWorktreeBranchAtPath,
@@ -118,6 +119,7 @@ export const adopt = protectedProcedure
 		const deviceName = getDeviceName();
 
 		const localProject = requireLocalProject(ctx, input.projectId);
+		await ensureMainWorkspace(ctx, input.projectId, localProject.repoPath);
 
 		let branch = input.branch.trim();
 		if (!branch) {
