@@ -81,7 +81,9 @@ function shouldRetryWorkspace(
 	if (existing.status === "error") return true;
 	return (
 		existing.status === "skipped" &&
-		existing.reason === "parent_project_unresolved"
+		(existing.reason === "parent_project_unresolved" ||
+			existing.reason === "orphan_worktree" ||
+			existing.reason === "worktree_not_registered")
 	);
 }
 
@@ -142,6 +144,16 @@ function skippedWorkspaceReason(reason: string | null | undefined): string {
 		default:
 			return reason ?? "skipped";
 	}
+}
+
+function wasAlreadyMissingWorktreeSkip(
+	existing: { status: string; reason?: string | null } | undefined,
+): boolean {
+	return (
+		existing?.status === "skipped" &&
+		(existing.reason === "orphan_worktree" ||
+			existing.reason === "worktree_not_registered")
+	);
 }
 
 function addWorkspaceError(
@@ -398,42 +410,77 @@ export async function migrateV1DataToV2(args: Args): Promise<MigrationSummary> {
 			continue;
 		}
 
-		if (workspace.type === "worktree") {
-			if (!workspace.worktreeId || !worktreesById.has(workspace.worktreeId)) {
+		const v1Worktree = workspace.worktreeId
+			? worktreesById.get(workspace.worktreeId)
+			: undefined;
+		const v1WorktreePath = v1Worktree?.path;
+		const v1BaseBranch = v1Worktree?.baseBranch;
+
+		const adoptWorkspace = (worktreePath: string | undefined) =>
+			hostService.workspaceCreation.adopt.mutate({
+				projectId: v2ProjectId,
+				workspaceName: workspace.name,
+				branch: workspace.branch,
+				baseBranch: v1BaseBranch ?? undefined,
+				existingWorkspaceId: existing?.v2Id ?? undefined,
+				worktreePath,
+			});
+
+		const recordAdoptFailure = async (err: unknown) => {
+			if (trpcCode(err) === "NOT_FOUND") {
+				const reason = "worktree_not_registered";
 				await electronTrpc.migration.upsertState.mutate({
 					v1Id: workspace.id,
 					kind: "workspace",
 					v2Id: null,
 					organizationId,
 					status: "skipped",
-					reason: "orphan_worktree",
+					reason,
 				});
+				if (wasAlreadyMissingWorktreeSkip(existing)) {
+					summary.workspaces.push({
+						name: workspace.name,
+						branch: workspace.branch,
+						status: "skipped",
+						reason: skippedWorkspaceReason(reason),
+					});
+					return;
+				}
 				addWorkspaceSkip(
 					summary,
 					workspace.name,
 					workspace.branch,
-					"worktree record missing",
+					"worktree no longer exists",
 				);
-				continue;
+				return;
 			}
-		}
-
-		const v1WorktreePath = workspace.worktreeId
-			? worktreesById.get(workspace.worktreeId)?.path
-			: undefined;
-		const v1BaseBranch = workspace.worktreeId
-			? worktreesById.get(workspace.worktreeId)?.baseBranch
-			: undefined;
+			const message = errorMessage(err);
+			await electronTrpc.migration.upsertState.mutate({
+				v1Id: workspace.id,
+				kind: "workspace",
+				v2Id: null,
+				organizationId,
+				status: "error",
+				reason: message,
+			});
+			addWorkspaceError(summary, workspace.name, workspace.branch, message);
+			console.error("[v1-migration] workspace failed", workspace.name, err);
+		};
 
 		try {
-			const result = await hostService.workspaceCreation.adopt.mutate({
-				projectId: v2ProjectId,
-				workspaceName: workspace.name,
-				branch: workspace.branch,
-				baseBranch: v1BaseBranch ?? undefined,
-				existingWorkspaceId: existing?.v2Id ?? undefined,
-				worktreePath: v1WorktreePath,
-			});
+			let result: Awaited<ReturnType<typeof adoptWorkspace>>;
+			try {
+				result = await adoptWorkspace(v1WorktreePath);
+			} catch (err) {
+				if (trpcCode(err) !== "NOT_FOUND" || !v1WorktreePath) {
+					throw err;
+				}
+
+				// v1 worktree rows can be stale while git still has the branch
+				// registered at a different path. Retry by branch before giving up.
+				result = await adoptWorkspace(undefined);
+			}
+
 			await electronTrpc.migration.upsertState.mutate({
 				v1Id: workspace.id,
 				kind: "workspace",
@@ -450,34 +497,7 @@ export async function migrateV1DataToV2(args: Args): Promise<MigrationSummary> {
 				status: "adopted",
 			});
 		} catch (err) {
-			if (trpcCode(err) === "NOT_FOUND") {
-				await electronTrpc.migration.upsertState.mutate({
-					v1Id: workspace.id,
-					kind: "workspace",
-					v2Id: null,
-					organizationId,
-					status: "skipped",
-					reason: "worktree_not_registered",
-				});
-				addWorkspaceSkip(
-					summary,
-					workspace.name,
-					workspace.branch,
-					"worktree no longer exists",
-				);
-				continue;
-			}
-			const message = errorMessage(err);
-			await electronTrpc.migration.upsertState.mutate({
-				v1Id: workspace.id,
-				kind: "workspace",
-				v2Id: null,
-				organizationId,
-				status: "error",
-				reason: message,
-			});
-			addWorkspaceError(summary, workspace.name, workspace.branch, message);
-			console.error("[v1-migration] workspace failed", workspace.name, err);
+			await recordAdoptFailure(err);
 		}
 	}
 

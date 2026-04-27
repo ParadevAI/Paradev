@@ -67,6 +67,7 @@ interface FakeEnv {
 	setupThrowsFor: Set<string>;
 	createThrowsFor: Set<string>;
 	adoptThrowsFor: Map<string, { code: string; message?: string }>;
+	adoptThrowsForPath: Map<string, { code: string; message?: string }>;
 	createCalls: Array<{ name: string; repoPath: string }>;
 	createdProjectIds: string[];
 	setupCalls: Array<{ projectId: string; repoPath?: string }>;
@@ -95,6 +96,7 @@ function makeFakeEnv(overrides: Partial<FakeEnv> = {}): FakeEnv {
 		setupThrowsFor: new Set(),
 		createThrowsFor: new Set(),
 		adoptThrowsFor: new Map(),
+		adoptThrowsForPath: new Map(),
 		createCalls: [],
 		createdProjectIds: [],
 		setupCalls: [],
@@ -178,14 +180,13 @@ function makeHostService(env: FakeEnv): HostServiceClient {
 					mode,
 				}: {
 					projectId: string;
-					mode: { repoPath?: string };
+					mode: { repoPath: string; allowRelocate?: boolean };
 				}) => {
 					env.setupCalls.push({ projectId, repoPath: mode.repoPath });
 					if (env.setupThrowsFor.has(projectId)) {
 						throw trpcErr("CONFLICT", "already set up elsewhere");
 					}
-					if (mode.repoPath)
-						env.hostProjectsByPath.set(mode.repoPath, projectId);
+					env.hostProjectsByPath.set(mode.repoPath, projectId);
 					return { repoPath: "/fake" };
 				},
 			},
@@ -242,6 +243,11 @@ function makeHostService(env: FakeEnv): HostServiceClient {
 					if (existingWorkspaceId)
 						call.existingWorkspaceId = existingWorkspaceId;
 					env.adoptCalls.push(call);
+					const pathBehavior = worktreePath
+						? env.adoptThrowsForPath.get(worktreePath)
+						: undefined;
+					if (pathBehavior)
+						throw trpcErr(pathBehavior.code, pathBehavior.message);
 					const behavior = env.adoptThrowsFor.get(branch);
 					if (behavior) throw trpcErr(behavior.code, behavior.message);
 					const key = `${projectId}:${worktreePath ?? branch}`;
@@ -441,6 +447,7 @@ describe("migrateV1DataToV2", () => {
 				}),
 			],
 			v1Worktrees: [],
+			adoptThrowsFor: new Map([["branch-w-orphan", { code: "NOT_FOUND" }]]),
 		});
 
 		const summary = await migrateV1DataToV2({
@@ -452,7 +459,39 @@ describe("migrateV1DataToV2", () => {
 
 		expect(summary.workspacesSkipped).toBe(1);
 		expect(summary.workspacesCreated).toBe(0);
-		expect(env.state.get("workspace:w-orphan")?.reason).toBe("orphan_worktree");
+		expect(env.state.get("workspace:w-orphan")?.reason).toBe(
+			"worktree_not_registered",
+		);
+	});
+
+	test("missing v1 worktree row falls back to branch adoption", async () => {
+		const env = makeFakeEnv({
+			v1Projects: [project("p1")],
+			v1Workspaces: [
+				workspace("w1", "p1", {
+					type: "worktree",
+					worktreeId: "missing",
+				}),
+			],
+			v1Worktrees: [],
+		});
+
+		const summary = await migrateV1DataToV2({
+			organizationId: ORG,
+			electronTrpc: makeElectronTrpc(env),
+			hostService: makeHostService(env),
+			collections: makeCollections(),
+		});
+
+		expect(summary.workspacesCreated).toBe(1);
+		expect(summary.workspacesSkipped).toBe(0);
+		expect(env.adoptCalls).toContainEqual({
+			projectId: "v2-proj-1",
+			branch: "branch-w1",
+			worktreePath: undefined,
+			baseBranch: undefined,
+		});
+		expect(env.state.get("workspace:w1")?.status).toBe("success");
 	});
 
 	test("adopt NOT_FOUND is skipped, not errored", async () => {
@@ -481,6 +520,45 @@ describe("migrateV1DataToV2", () => {
 		expect(env.state.get("workspace:w1")?.reason).toBe(
 			"worktree_not_registered",
 		);
+	});
+
+	test("stale v1 worktree path falls back to branch adoption", async () => {
+		const env = makeFakeEnv({
+			v1Projects: [project("p1")],
+			v1Workspaces: [
+				workspace("w1", "p1", {
+					worktreeId: "wt1",
+					type: "worktree",
+				}),
+			],
+			v1Worktrees: [{ id: "wt1", path: "/stale-worktree" }],
+			adoptThrowsForPath: new Map([["/stale-worktree", { code: "NOT_FOUND" }]]),
+		});
+
+		const summary = await migrateV1DataToV2({
+			organizationId: ORG,
+			electronTrpc: makeElectronTrpc(env),
+			hostService: makeHostService(env),
+			collections: makeCollections(),
+		});
+
+		expect(summary.workspacesCreated).toBe(1);
+		expect(summary.workspacesSkipped).toBe(0);
+		expect(env.adoptCalls).toEqual([
+			{
+				projectId: "v2-proj-1",
+				branch: "branch-w1",
+				worktreePath: "/stale-worktree",
+				baseBranch: undefined,
+			},
+			{
+				projectId: "v2-proj-1",
+				branch: "branch-w1",
+				worktreePath: undefined,
+				baseBranch: undefined,
+			},
+		]);
+		expect(env.state.get("workspace:w1")?.status).toBe("success");
 	});
 
 	test("adopt non-NOT_FOUND error is recorded as error", async () => {
@@ -785,7 +863,7 @@ describe("migrateV1DataToV2", () => {
 		expect(env.state.get("workspace:w1")?.v2Id).toBe("v2-ws-existing");
 	});
 
-	test("rerun does not retry permanent skipped workspaces", async () => {
+	test("rerun retries previous worktree skips so old skipped state can recover", async () => {
 		const env = makeFakeEnv({
 			v1Projects: [project("p1")],
 			v1Workspaces: [
@@ -828,10 +906,75 @@ describe("migrateV1DataToV2", () => {
 			collections: makeCollections(),
 		});
 
+		expect(summary.workspacesCreated).toBe(1);
+		expect(summary.workspacesSkipped).toBe(0);
+		expect(env.adoptCalls).toContainEqual({
+			projectId: "v2-p1",
+			branch: "branch-w-orphan",
+			worktreePath: undefined,
+			baseBranch: undefined,
+		});
+		expect(env.state.get("workspace:w-orphan")?.status).toBe("success");
+	});
+
+	test("failed retry of previous missing-worktree skip does not count as new work", async () => {
+		const env = makeFakeEnv({
+			v1Projects: [project("p1")],
+			v1Workspaces: [
+				workspace("w-orphan", "p1", {
+					type: "worktree",
+					worktreeId: "missing",
+				}),
+			],
+			v1Worktrees: [],
+			adoptThrowsFor: new Map([["branch-w-orphan", { code: "NOT_FOUND" }]]),
+			state: new Map([
+				[
+					"project:p1",
+					{
+						v1Id: "p1",
+						v2Id: "v2-p1",
+						organizationId: ORG,
+						kind: "project",
+						status: "success",
+						reason: null,
+					},
+				],
+				[
+					"workspace:w-orphan",
+					{
+						v1Id: "w-orphan",
+						v2Id: null,
+						organizationId: ORG,
+						kind: "workspace",
+						status: "skipped",
+						reason: "worktree_not_registered",
+					},
+				],
+			]),
+		});
+
+		const summary = await migrateV1DataToV2({
+			organizationId: ORG,
+			electronTrpc: makeElectronTrpc(env),
+			hostService: makeHostService(env),
+			collections: makeCollections(),
+		});
+
 		expect(summary.workspacesCreated).toBe(0);
 		expect(summary.workspacesSkipped).toBe(0);
-		expect(env.adoptCalls).toHaveLength(0);
+		expect(env.adoptCalls).toHaveLength(1);
+		expect(summary.workspaces).toHaveLength(1);
+		expect(summary.workspaces).toContainEqual({
+			name: "workspace-w-orphan",
+			branch: "branch-w-orphan",
+			status: "skipped",
+			reason: "worktree no longer exists",
+		});
 		expect(env.state.get("workspace:w-orphan")?.status).toBe("skipped");
+		expect(env.state.get("workspace:w-orphan")?.reason).toBe(
+			"worktree_not_registered",
+		);
 	});
 
 	test("passes v1 worktree base branch into adoption", async () => {
