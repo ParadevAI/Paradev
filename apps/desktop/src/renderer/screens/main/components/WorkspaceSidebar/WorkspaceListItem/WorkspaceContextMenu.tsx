@@ -47,6 +47,7 @@ interface WorkspaceContextMenuProps {
 	isUnread: boolean;
 	workspaceStatus: string | null | undefined;
 	sections: { id: string; name: string }[];
+	diffStats?: { additions: number; deletions: number } | null;
 	onRename: () => void;
 	onOpenInFinder: () => void;
 	onOpenInEditor: () => void;
@@ -66,6 +67,7 @@ export function WorkspaceContextMenu({
 	isUnread,
 	workspaceStatus,
 	sections,
+	diffStats,
 	onRename,
 	onOpenInFinder,
 	onOpenInEditor,
@@ -252,6 +254,7 @@ export function WorkspaceContextMenu({
 				<WorkspaceHoverCardContent
 					workspaceId={id}
 					workspaceAlias={name}
+					diffStats={diffStats}
 					onEditBranchClick={setRenameBranchTarget}
 				/>
 			</HoverCardContent>

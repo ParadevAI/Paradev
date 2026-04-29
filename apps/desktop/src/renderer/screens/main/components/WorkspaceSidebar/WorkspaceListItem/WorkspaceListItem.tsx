@@ -160,22 +160,6 @@ export function WorkspaceListItem({
 		enabled: hasHovered && !!worktreePath,
 		staleTime: GITHUB_STATUS_STALE_TIME,
 	});
-
-	const { data: aheadBehind, refetch: refetchAheadBehind } =
-		electronTrpc.workspaces.getAheadBehind.useQuery(
-			{ workspaceId: id },
-			{
-				enabled: isBranchWorkspace,
-				staleTime: GITHUB_STATUS_STALE_TIME,
-			},
-		);
-
-	useBranchSyncInvalidation({
-		gitBranch: localChanges?.branch,
-		workspaceBranch: branch,
-		workspaceId: id,
-	});
-
 	const localDiffStats = useMemo(() => {
 		if (!localChanges) return null;
 		const allFiles =
@@ -191,6 +175,21 @@ export function WorkspaceListItem({
 		if (additions === 0 && deletions === 0) return null;
 		return { additions, deletions };
 	}, [localChanges]);
+
+	const { data: aheadBehind, refetch: refetchAheadBehind } =
+		electronTrpc.workspaces.getAheadBehind.useQuery(
+			{ workspaceId: id },
+			{
+				enabled: isBranchWorkspace,
+				staleTime: GITHUB_STATUS_STALE_TIME,
+			},
+		);
+
+	useBranchSyncInvalidation({
+		gitBranch: localChanges?.branch,
+		workspaceBranch: branch,
+		workspaceId: id,
+	});
 
 	const handleClick = (e?: React.MouseEvent) => {
 		if (rename.isRenaming) return;
@@ -250,11 +249,7 @@ export function WorkspaceListItem({
 	};
 
 	const pr = githubStatus?.pr;
-	const diffStats =
-		localDiffStats ||
-		(pr && (pr.additions > 0 || pr.deletions > 0)
-			? { additions: pr.additions, deletions: pr.deletions }
-			: null);
+	const diffStats = localDiffStats;
 
 	const showBranchSubtitle = isBranchWorkspace || (!!name && name !== branch);
 
@@ -268,6 +263,7 @@ export function WorkspaceListItem({
 				isActive={isActive}
 				isUnread={isUnread}
 				workspaceStatus={workspaceStatus}
+				diffStats={diffStats}
 				itemRef={collapsedItemRef}
 				showDeleteDialog={showDeleteDialog}
 				setShowDeleteDialog={setShowDeleteDialog}
@@ -470,6 +466,7 @@ export function WorkspaceListItem({
 				isUnread={isUnread}
 				workspaceStatus={workspaceStatus}
 				sections={sections}
+				diffStats={diffStats}
 				onRename={rename.startRename}
 				onOpenInFinder={handleOpenInFinder}
 				onOpenInEditor={handleOpenInEditor}

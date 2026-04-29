@@ -21,12 +21,14 @@ import { ReviewStatus } from "./components/ReviewStatus";
 interface WorkspaceHoverCardContentProps {
 	workspaceId: string;
 	workspaceAlias?: string;
+	diffStats?: { additions: number; deletions: number } | null;
 	onEditBranchClick?: (branchName: string) => void;
 }
 
 export function WorkspaceHoverCardContent({
 	workspaceId,
 	workspaceAlias,
+	diffStats,
 	onEditBranchClick,
 }: WorkspaceHoverCardContentProps) {
 	const { data: worktreeInfo } =
@@ -60,6 +62,15 @@ export function WorkspaceHoverCardContent({
 				Open Preview
 			</a>
 		</Button>
+	) : null;
+
+	const diffStatsBadge = diffStats ? (
+		<div className="flex items-center gap-1.5 text-xs font-mono shrink-0">
+			<span className="text-emerald-500">+{diffStats.additions}</span>
+			<span className="text-destructive-foreground">
+				-{diffStats.deletions}
+			</span>
+		</div>
 	) : null;
 
 	const needsRebase = worktreeInfo?.gitStatus?.needsRebase;
@@ -165,12 +176,7 @@ export function WorkspaceHoverCardContent({
 								/>
 							)}
 						</div>
-						<div className="flex items-center gap-1.5 text-xs font-mono shrink-0">
-							<span className="text-emerald-500">+{pr.additions}</span>
-							<span className="text-destructive-foreground">
-								-{pr.deletions}
-							</span>
-						</div>
+						{diffStatsBadge}
 					</div>
 
 					<p className="text-xs leading-relaxed line-clamp-2">{pr.title}</p>
@@ -208,10 +214,17 @@ export function WorkspaceHoverCardContent({
 				</div>
 			) : repoUrl ? (
 				<div className="pt-2 border-t border-border space-y-2">
-					<div className="text-xs text-muted-foreground">
-						No PR for this branch
+					<div className="flex items-center justify-between gap-2">
+						<div className="text-xs text-muted-foreground">
+							No PR for this branch
+						</div>
+						{diffStatsBadge}
 					</div>
 					{previewButton}
+				</div>
+			) : diffStatsBadge ? (
+				<div className="pt-2 border-t border-border flex items-center justify-end">
+					{diffStatsBadge}
 				</div>
 			) : null}
 		</div>
