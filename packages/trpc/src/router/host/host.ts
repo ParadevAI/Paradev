@@ -1,13 +1,19 @@
 import { db, dbWs } from "@superset/db/client";
 import {
+	subscriptions,
 	v2Clients,
 	v2ClientTypeValues,
 	v2Hosts,
 	v2UsersHosts,
 } from "@superset/db/schema";
+import {
+	ACTIVE_SUBSCRIPTION_STATUSES,
+	isActiveSubscriptionStatus,
+	isPaidPlan,
+} from "@superset/shared/billing";
 import { parseHostRoutingKey } from "@superset/shared/host-routing";
 import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 import { jwtProcedure, protectedProcedure } from "../../trpc";
 
@@ -124,19 +130,40 @@ export const hostRouter = {
 		.input(z.object({ hostId: z.string().min(1) }))
 		.query(async ({ ctx, input }) => {
 			const parsed = parseHostRoutingKey(input.hostId);
-			if (!parsed) return { allowed: false };
+			if (!parsed) return { allowed: false, paidPlan: false };
 			if (!ctx.organizationIds.includes(parsed.organizationId)) {
-				return { allowed: false };
+				return { allowed: false, paidPlan: false };
 			}
-			const row = await db.query.v2UsersHosts.findFirst({
-				where: and(
-					eq(v2UsersHosts.userId, ctx.userId),
-					eq(v2UsersHosts.organizationId, parsed.organizationId),
-					eq(v2UsersHosts.hostId, parsed.machineId),
-				),
-				columns: { hostId: true },
-			});
-			return { allowed: !!row };
+			const [row] = await db
+				.select({
+					hostId: v2UsersHosts.hostId,
+					subscriptionPlan: subscriptions.plan,
+					subscriptionStatus: subscriptions.status,
+				})
+				.from(v2UsersHosts)
+				.leftJoin(
+					subscriptions,
+					and(
+						eq(subscriptions.referenceId, v2UsersHosts.organizationId),
+						inArray(subscriptions.status, ACTIVE_SUBSCRIPTION_STATUSES),
+					),
+				)
+				.where(
+					and(
+						eq(v2UsersHosts.userId, ctx.userId),
+						eq(v2UsersHosts.organizationId, parsed.organizationId),
+						eq(v2UsersHosts.hostId, parsed.machineId),
+					),
+				)
+				.orderBy(desc(subscriptions.createdAt))
+				.limit(1);
+
+			const allowed = !!row;
+			const paidPlan =
+				!!row &&
+				isPaidPlan(row.subscriptionPlan) &&
+				isActiveSubscriptionStatus(row.subscriptionStatus);
+			return { allowed, paidPlan };
 		}),
 
 	setOnline: jwtProcedure
