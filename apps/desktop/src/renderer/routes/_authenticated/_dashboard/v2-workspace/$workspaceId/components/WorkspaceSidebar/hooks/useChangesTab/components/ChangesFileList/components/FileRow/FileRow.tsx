@@ -16,9 +16,16 @@ import {
 import { toast } from "@superset/ui/sonner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { workspaceTrpc } from "@superset/workspace-client";
-import { ChevronDown } from "lucide-react";
+import {
+	ChevronDown,
+	ExternalLink,
+	FileText,
+	GitCompare,
+	SquarePlus,
+	Trash2,
+	Undo2,
+} from "lucide-react";
 import { memo, useState } from "react";
-import { LuUndo2 } from "react-icons/lu";
 import { modifierLabel, useSidebarFilePolicy } from "renderer/lib/clickPolicy";
 import { DiscardConfirmDialog } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/DiscardConfirmDialog";
 import { StatusIndicator } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/StatusIndicator";
@@ -136,7 +143,7 @@ export const FileRow = memo(function FileRow({
 									setShowDiscardConfirm(true);
 								}}
 							>
-								<LuUndo2 className="size-3.5" />
+								<Undo2 className="size-3.5" />
 							</button>
 						</TooltipTrigger>
 						<TooltipContent side="top">Discard changes</TooltipContent>
@@ -153,11 +160,13 @@ export const FileRow = memo(function FileRow({
 							<ChevronDown className="size-3.5" />
 						</button>
 					</DropdownMenuTrigger>
-					<DropdownMenuContent align="end" className="w-56">
+					<DropdownMenuContent align="end" className="w-64">
 						<DropdownMenuItem onSelect={() => onSelect?.(file.path)}>
+							<GitCompare />
 							Open Diff
 						</DropdownMenuItem>
 						<DropdownMenuItem onSelect={() => onSelect?.(file.path, true)}>
+							<SquarePlus />
 							Open Diff in New Tab
 							{newTabTier && (
 								<DropdownMenuShortcut>
@@ -169,18 +178,21 @@ export const FileRow = memo(function FileRow({
 							onSelect={() => absolutePath && onOpenFile?.(absolutePath)}
 							disabled={!onOpenFile || !absolutePath}
 						>
+							<FileText />
 							Open File
 						</DropdownMenuItem>
 						<DropdownMenuItem
 							onSelect={() => absolutePath && onOpenFile?.(absolutePath, true)}
 							disabled={!onOpenFile || !absolutePath}
 						>
+							<SquarePlus />
 							Open File in New Tab
 						</DropdownMenuItem>
 						<DropdownMenuItem
 							onSelect={() => onOpenInEditor?.(file.path)}
 							disabled={!onOpenInEditor}
 						>
+							<ExternalLink />
 							Open in Editor
 							{externalTier && (
 								<DropdownMenuShortcut>
@@ -202,11 +214,13 @@ export const FileRow = memo(function FileRow({
 				</ContextMenuTrigger>
 				<TooltipContent side="right">{policy.hint}</TooltipContent>
 			</Tooltip>
-			<ContextMenuContent className="w-56">
+			<ContextMenuContent className="w-64">
 				<ContextMenuItem onSelect={() => onSelect?.(file.path)}>
+					<GitCompare />
 					Open Diff
 				</ContextMenuItem>
 				<ContextMenuItem onSelect={() => onSelect?.(file.path, true)}>
+					<SquarePlus />
 					Open Diff in New Tab
 					{newTabTier && (
 						<ContextMenuShortcut>
@@ -218,18 +232,21 @@ export const FileRow = memo(function FileRow({
 					onSelect={() => absolutePath && onOpenFile?.(absolutePath)}
 					disabled={!onOpenFile || !absolutePath}
 				>
+					<FileText />
 					Open File
 				</ContextMenuItem>
 				<ContextMenuItem
 					onSelect={() => absolutePath && onOpenFile?.(absolutePath, true)}
 					disabled={!onOpenFile || !absolutePath}
 				>
+					<SquarePlus />
 					Open File in New Tab
 				</ContextMenuItem>
 				<ContextMenuItem
 					onSelect={() => onOpenInEditor?.(file.path)}
 					disabled={!onOpenInEditor}
 				>
+					<ExternalLink />
 					Open in Editor
 					{externalTier && (
 						<ContextMenuShortcut>
@@ -250,9 +267,10 @@ export const FileRow = memo(function FileRow({
 					<>
 						<ContextMenuSeparator />
 						<ContextMenuItem
+							variant="destructive"
 							onSelect={() => setShowDiscardConfirm(true)}
-							className="text-destructive focus:text-destructive"
 						>
+							{isDeleteAction ? <Trash2 /> : <Undo2 />}
 							{isDeleteAction ? "Delete" : "Discard changes"}
 						</ContextMenuItem>
 					</>

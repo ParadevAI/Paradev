@@ -39,7 +39,7 @@ export function RowContextMenu({
 					}}
 				/>
 			</DropdownMenuTrigger>
-			<DropdownMenuContent {...attrs} className="w-56" align="start">
+			<DropdownMenuContent {...attrs} className="w-64" align="start">
 				{children}
 			</DropdownMenuContent>
 		</DropdownMenu>

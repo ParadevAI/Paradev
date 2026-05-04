@@ -3,6 +3,7 @@ import {
 	DropdownMenuSeparator,
 } from "@superset/ui/dropdown-menu";
 import { toast } from "@superset/ui/sonner";
+import { Clipboard, Copy, FolderOpen } from "lucide-react";
 import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
 
@@ -32,18 +33,21 @@ export function PathActions({ absolutePath, relativePath }: PathActionsProps) {
 	return (
 		<>
 			<DropdownMenuItem onSelect={handleRevealInFinder}>
+				<FolderOpen />
 				Reveal in Finder
 			</DropdownMenuItem>
 			<DropdownMenuSeparator />
 			<DropdownMenuItem
 				onSelect={() => handleCopy(absolutePath, "Path copied")}
 			>
+				<Clipboard />
 				Copy Path
 			</DropdownMenuItem>
 			{relativePath && (
 				<DropdownMenuItem
 					onSelect={() => handleCopy(relativePath, "Relative path copied")}
 				>
+					<Copy />
 					Copy Relative Path
 				</DropdownMenuItem>
 			)}

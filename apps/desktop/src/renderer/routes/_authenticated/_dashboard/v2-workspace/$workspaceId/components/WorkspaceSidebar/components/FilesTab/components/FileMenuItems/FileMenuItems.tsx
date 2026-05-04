@@ -3,6 +3,13 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuShortcut,
 } from "@superset/ui/dropdown-menu";
+import {
+	ExternalLink,
+	FileText,
+	Pencil,
+	SquarePlus,
+	Trash2,
+} from "lucide-react";
 import { modifierLabel, useSidebarFilePolicy } from "renderer/lib/clickPolicy";
 import { PathActions } from "../PathActions";
 
@@ -30,8 +37,12 @@ export function FileMenuItems({
 	const externalTier = tierForAction("external");
 	return (
 		<>
-			<DropdownMenuItem onSelect={onOpen}>Open</DropdownMenuItem>
+			<DropdownMenuItem onSelect={onOpen}>
+				<FileText />
+				Open
+			</DropdownMenuItem>
 			<DropdownMenuItem onSelect={onOpenInNewTab}>
+				<SquarePlus />
 				Open in New Tab
 				{newTabTier && (
 					<DropdownMenuShortcut>
@@ -40,6 +51,7 @@ export function FileMenuItems({
 				)}
 			</DropdownMenuItem>
 			<DropdownMenuItem onSelect={onOpenInEditor}>
+				<ExternalLink />
 				Open in Editor
 				{externalTier && (
 					<DropdownMenuShortcut>
@@ -51,9 +63,11 @@ export function FileMenuItems({
 			<PathActions absolutePath={absolutePath} relativePath={relativePath} />
 			<DropdownMenuSeparator />
 			<DropdownMenuItem onSelect={() => setTimeout(onRename, 0)}>
+				<Pencil />
 				Rename...
 			</DropdownMenuItem>
 			<DropdownMenuItem variant="destructive" onSelect={onDelete}>
+				<Trash2 />
 				Delete
 			</DropdownMenuItem>
 		</>
