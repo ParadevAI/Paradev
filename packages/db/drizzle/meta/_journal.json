@@ -323,6 +323,13 @@
       "when": 1777881871315,
       "tag": "0045_v2_projects_icon_url",
       "breakpoints": true
+    },
+    {
+      "idx": 46,
+      "version": "7",
+      "when": 1777885504135,
+      "tag": "0046_add_chat_attachments",
+      "breakpoints": true
     }
   ]
 }
