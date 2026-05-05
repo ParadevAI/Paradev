@@ -1,6 +1,6 @@
 ---
 name: superset
-description: Enables orchestration of coding agents across devices, including the creation of isolated workspaces, planning work in tasks, and more.
+description: Drives the Superset CLI to orchestrate coding agents across devices. Use when the user wants to spawn an agent, create or manage workspaces, schedule automations, or interact with Superset projects, hosts, or tasks from the terminal.
 allowed-tools: Bash(superset:*)
 ---
 

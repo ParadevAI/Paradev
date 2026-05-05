@@ -1,0 +1,22 @@
+{
+	"name": "superset",
+	"version": "0.1.0",
+	"description": "Drive Superset from Claude Code — named slash commands for spawning agents in workspaces, managing tasks, and editing automation prompts. Bundles the superset SKILL.md and wires the official Superset MCP server.",
+	"author": {
+		"name": "Superset",
+		"url": "https://superset.sh"
+	},
+	"homepage": "https://docs.superset.sh",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/superset-sh/superset"
+	},
+	"license": "MIT",
+	"keywords": [
+		"superset",
+		"agents",
+		"workspaces",
+		"automations",
+		"orchestration"
+	]
+}

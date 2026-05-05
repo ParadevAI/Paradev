@@ -1,0 +1,14 @@
+{
+	"name": "superset",
+	"owner": {
+		"name": "Superset",
+		"url": "https://superset.sh"
+	},
+	"plugins": [
+		{
+			"name": "superset",
+			"source": "./plugins/superset",
+			"description": "Drive Superset from Claude Code — named slash commands for spawning agents in workspaces, managing tasks, and editing automation prompts. Bundles the superset SKILL.md and wires the official Superset MCP server."
+		}
+	]
+}
