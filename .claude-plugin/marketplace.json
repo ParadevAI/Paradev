@@ -8,7 +8,7 @@
 		{
 			"name": "superset",
 			"source": "./plugins/superset",
-			"description": "Drive Superset from Claude Code — named slash commands for spawning agents in workspaces, managing tasks, and editing automation prompts. Bundles the superset SKILL.md and wires the official Superset MCP server."
+			"description": "Use Superset to spawn agents, create workspaces, manage tasks, and schedule automations from Claude Code."
 		}
 	]
 }
