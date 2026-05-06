@@ -1,23 +1,17 @@
-import {
-	AlertDialog,
-	AlertDialogAction,
-	AlertDialogCancel,
-	AlertDialogContent,
-	AlertDialogDescription,
-	AlertDialogFooter,
-	AlertDialogHeader,
-	AlertDialogTitle,
-	AlertDialogTrigger,
-} from "@superset/ui/alert-dialog";
 import { toast } from "@superset/ui/sonner";
 import { Spinner } from "@superset/ui/spinner";
+import { eq } from "@tanstack/db";
+import { useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { LuFolder, LuX } from "react-icons/lu";
-import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
-import { electronTrpc } from "renderer/lib/electron-trpc";
-import { useOpenProject } from "renderer/react-query/projects/useOpenProject";
+import { LuFolder } from "react-icons/lu";
+import { env } from "renderer/env.renderer";
+import { authClient } from "renderer/lib/auth-client";
+import { useFolderFirstImport } from "renderer/routes/_authenticated/_dashboard/components/AddRepositoryModals/hooks/useFolderFirstImport";
+import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
+import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { STEP_ROUTES, useOnboardingStore } from "renderer/stores/onboarding";
+import { MOCK_ORG_ID } from "shared/constants";
 import { SetupButton } from "../components/SetupButton";
 import { StepHeader, StepShell, SupersetPill } from "../components/StepShell";
 import { SupersetIcon } from "../providers/components/SupersetIcon";
@@ -31,91 +25,45 @@ function OnboardingProjectPage() {
 	const goTo = useOnboardingStore((s) => s.goTo);
 	const markComplete = useOnboardingStore((s) => s.markComplete);
 	const markSkipped = useOnboardingStore((s) => s.markSkipped);
-	const completed = useOnboardingStore((s) => s.completed.project);
-	const manualWalkthrough = useOnboardingStore((s) => s.manualWalkthrough);
-	const setManualWalkthrough = useOnboardingStore(
-		(s) => s.setManualWalkthrough,
+
+	const collections = useCollections();
+	const { data: session } = authClient.useSession();
+	const activeOrganizationId = env.SKIP_ENV_VALIDATION
+		? MOCK_ORG_ID
+		: (session?.session?.activeOrganizationId ?? null);
+
+	const { data: projects = [], isLoading } = useLiveQuery(
+		(q) =>
+			q
+				.from({ projects: collections.v2Projects })
+				.where(({ projects }) =>
+					eq(projects.organizationId, activeOrganizationId ?? ""),
+				)
+				.select(({ projects }) => ({
+					id: projects.id,
+					name: projects.name,
+					repoCloneUrl: projects.repoCloneUrl,
+				})),
+		[collections, activeOrganizationId],
 	);
 
-	const { data: projects, isPending } =
-		electronTrpc.projects.getRecents.useQuery();
-	const { openNew, isPending: isOpenPending } = useOpenProject();
-	const utils = electronTrpc.useUtils();
-	const isV2CloudEnabled = useIsV2CloudEnabled();
-	const closeProject = electronTrpc.projects.close.useMutation({
-		onSuccess: async () => {
-			await utils.projects.getRecents.invalidate();
-		},
+	const folderImport = useFolderFirstImport({
+		onError: (message) => toast.error(message),
 	});
-
-	const handleRemoveProject = async (id: string, name: string) => {
-		try {
-			await closeProject.mutateAsync({ id });
-			toast.success(`Removed ${name}`);
-		} catch (err) {
-			toast.error(
-				err instanceof Error ? err.message : "Failed to remove project",
-			);
-		}
-	};
+	const { activeHostUrl } = useLocalHostService();
+	const hostReady = activeHostUrl !== null;
 
 	useEffect(() => {
 		goTo("project");
 	}, [goTo]);
 
-	const projectCount = projects?.length ?? 0;
+	const projectCount = projects.length;
 	const hasProjects = projectCount > 0;
-	const shouldAutoAdvance = !completed && !manualWalkthrough && hasProjects;
-
-	useEffect(() => {
-		if (shouldAutoAdvance) {
-			markComplete("project");
-			navigate({ to: STEP_ROUTES["adopt-worktrees"], replace: true });
-		}
-	}, [shouldAutoAdvance, markComplete, navigate]);
-
-	// After creating a new project, route to the project page in v2 — that's
-	// where the user creates their first proper worktree workspace (which sets
-	// up the v2 pane layout). The default "branch" workspace auto-created by
-	// openNew → ensureMainWorkspace has no pane layout, so navigating there
-	// renders an empty workspace surface. In v1, navigate to the existing
-	// branch workspace as before.
-	const openProjectInWorkspace = async (projectId: string) => {
-		if (isV2CloudEnabled) {
-			navigate({
-				to: "/project/$projectId",
-				params: { projectId },
-			});
-			return;
-		}
-		try {
-			const grouped = await utils.workspaces.getAllGrouped.fetch();
-			const wsForProject = grouped
-				.flatMap((g) => g.workspaces)
-				.find((w) => w.projectId === projectId);
-			if (wsForProject) {
-				navigate({
-					to: "/workspace/$workspaceId",
-					params: { workspaceId: wsForProject.id },
-				});
-				return;
-			}
-		} catch {
-			// fall through
-		}
-		navigate({
-			to: "/project/$projectId",
-			params: { projectId },
-		});
-	};
 
 	const handleSelectNewRepo = async () => {
-		const created = await openNew();
-		const project = created[0];
-		if (project) {
+		const result = await folderImport.start();
+		if (result) {
 			markComplete("project");
-			setManualWalkthrough(false);
-			await openProjectInWorkspace(project.id);
 		}
 	};
 
@@ -129,7 +77,7 @@ function OnboardingProjectPage() {
 		navigate({ to: STEP_ROUTES["adopt-worktrees"] });
 	};
 
-	if (isPending || shouldAutoAdvance) {
+	if (isLoading) {
 		return (
 			<div className="flex h-full w-full items-center justify-center bg-[#151110]">
 				<Spinner className="size-6 text-[#a8a5a3]" />
@@ -145,7 +93,7 @@ function OnboardingProjectPage() {
 		</SupersetPill>
 	);
 
-	if (hasProjects && projects) {
+	if (hasProjects) {
 		return (
 			<StepShell backTo={STEP_ROUTES.permissions}>
 				<StepHeader
@@ -159,7 +107,7 @@ function OnboardingProjectPage() {
 						{projects.map((project) => (
 							<div
 								key={project.id}
-								className="group flex items-center gap-3 px-4 py-3"
+								className="flex items-center gap-3 px-4 py-3"
 							>
 								<div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-[#151110] text-[#a8a5a3]">
 									<LuFolder className="size-4" />
@@ -168,43 +116,12 @@ function OnboardingProjectPage() {
 									<p className="truncate text-[12px] font-medium text-[#eae8e6]">
 										{project.name}
 									</p>
-									<p className="truncate font-mono text-[10px] text-[#a8a5a3]">
-										{project.mainRepoPath}
-									</p>
+									{project.repoCloneUrl && (
+										<p className="truncate font-mono text-[10px] text-[#a8a5a3]">
+											{project.repoCloneUrl}
+										</p>
+									)}
 								</div>
-								<AlertDialog>
-									<AlertDialogTrigger asChild>
-										<button
-											type="button"
-											aria-label={`Remove ${project.name}`}
-											className="flex size-7 shrink-0 items-center justify-center rounded text-[#a8a5a3] opacity-0 transition-opacity hover:bg-white/5 hover:text-[#eae8e6] group-hover:opacity-100 focus-visible:opacity-100"
-										>
-											<LuX className="size-4" />
-										</button>
-									</AlertDialogTrigger>
-									<AlertDialogContent>
-										<AlertDialogHeader>
-											<AlertDialogTitle>
-												Remove {project.name}?
-											</AlertDialogTitle>
-											<AlertDialogDescription>
-												This removes the project and its tracked workspaces from
-												Superset. The folder on disk and your git history are
-												untouched — you can re-add it any time.
-											</AlertDialogDescription>
-										</AlertDialogHeader>
-										<AlertDialogFooter>
-											<AlertDialogCancel>Cancel</AlertDialogCancel>
-											<AlertDialogAction
-												onClick={() =>
-													handleRemoveProject(project.id, project.name)
-												}
-											>
-												Remove
-											</AlertDialogAction>
-										</AlertDialogFooter>
-									</AlertDialogContent>
-								</AlertDialog>
 							</div>
 						))}
 					</div>
@@ -217,15 +134,9 @@ function OnboardingProjectPage() {
 					<SetupButton
 						variant="secondary"
 						onClick={handleSelectNewRepo}
-						disabled={isOpenPending}
+						disabled={!hostReady}
 					>
-						{isOpenPending ? "Opening…" : "Select new repo"}
-					</SetupButton>
-					<SetupButton
-						variant="secondary"
-						onClick={() => navigate({ to: "/new-project" })}
-					>
-						Clone from GitHub
+						{hostReady ? "Select new repo" : "Connecting…"}
 					</SetupButton>
 					<SetupButton variant="link" onClick={handleSkipStep}>
 						Skip for now
@@ -244,14 +155,8 @@ function OnboardingProjectPage() {
 			/>
 
 			<div className="flex w-[273px] flex-col gap-2 self-center">
-				<SetupButton onClick={handleSelectNewRepo} disabled={isOpenPending}>
-					{isOpenPending ? "Opening…" : "Select new repo"}
-				</SetupButton>
-				<SetupButton
-					variant="secondary"
-					onClick={() => navigate({ to: "/new-project" })}
-				>
-					Clone from GitHub
+				<SetupButton onClick={handleSelectNewRepo} disabled={!hostReady}>
+					{hostReady ? "Select new repo" : "Connecting…"}
 				</SetupButton>
 				<SetupButton variant="link" onClick={handleSkipStep}>
 					Skip for now
