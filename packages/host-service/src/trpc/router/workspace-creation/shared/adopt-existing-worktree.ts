@@ -34,6 +34,10 @@ export interface AdoptExistingWorktreeResult {
 	 *  created in this call. Used by `workspaces.create` to decide whether
 	 *  to dispatch setup terminal + sugar agents. */
 	alreadyExists: boolean;
+	/** Postgres xid of the API insert when this call freshly created the
+	 *  cloud row. Undefined for reuse paths so renderer optimistic inserts
+	 *  fall back to natural shape sync. */
+	txid?: number;
 }
 
 /**
@@ -217,6 +221,7 @@ export async function adoptExistingWorktree(
 	return {
 		workspace: cloudRow,
 		alreadyExists: false,
+		txid: cloudRow.txid,
 	};
 }
 

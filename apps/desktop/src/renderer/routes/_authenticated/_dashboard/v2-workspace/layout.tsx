@@ -4,7 +4,7 @@ import { createFileRoute, Outlet, useMatchRoute } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
 import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
-import { useWorkspaceCreatesStore } from "renderer/stores/workspace-creates";
+import { useWorkspaceCreateFailuresStore } from "renderer/stores/workspace-creates";
 import { WorkspaceCreateErrorState } from "./components/WorkspaceCreateErrorState";
 import { WorkspaceCreatingState } from "./components/WorkspaceCreatingState";
 import { WorkspaceNotFoundState } from "./components/WorkspaceNotFoundState";
@@ -34,41 +34,47 @@ function V2WorkspaceLayout() {
 		[collections, workspaceId],
 	);
 	const workspace = workspaces?.[0] ?? null;
-	const inFlight = useWorkspaceCreatesStore((store) =>
-		workspaceId
-			? store.entries.find((entry) => entry.snapshot.id === workspaceId)
-			: undefined,
+	// Read `$synced` straight off the row — useLiveQuery returns rows enriched
+	// with virtual props, and changes to optimistic state retrigger the query.
+	const isSynced = workspace?.$synced ?? false;
+	const failure = useWorkspaceCreateFailuresStore((store) =>
+		workspaceId ? store.failures[workspaceId] : undefined,
 	);
 
 	const lastEnsuredWorkspaceIdRef = useRef<string | null>(null);
 	useEffect(() => {
 		if (!workspace || lastEnsuredWorkspaceIdRef.current === workspace.id)
 			return;
+		// Only pin to the sidebar once the workspace is confirmed by the
+		// backend — pinning an optimistic row produces a sidebar state row
+		// that has to be cleaned up on rollback.
+		if (!isSynced) return;
 		lastEnsuredWorkspaceIdRef.current = workspace.id;
 		ensureWorkspaceInSidebar(workspace.id, workspace.projectId);
-	}, [ensureWorkspaceInSidebar, workspace]);
+	}, [ensureWorkspaceInSidebar, workspace, isSynced]);
 
 	if (!workspaceId || !isReady || !workspaces) {
 		return <div className="flex h-full w-full" />;
 	}
 
+	if (workspace && !isSynced) {
+		return (
+			<WorkspaceCreatingState
+				name={workspace.name}
+				branch={workspace.branch}
+				startedAt={workspace.createdAt.getTime()}
+			/>
+		);
+	}
+
 	if (!workspace) {
-		if (inFlight?.state === "creating") {
-			return (
-				<WorkspaceCreatingState
-					name={inFlight.snapshot.name}
-					branch={inFlight.snapshot.branch}
-					startedAt={inFlight.startedAt}
-				/>
-			);
-		}
-		if (inFlight?.state === "error") {
+		if (failure) {
 			return (
 				<WorkspaceCreateErrorState
 					workspaceId={workspaceId}
-					name={inFlight.snapshot.name}
-					branch={inFlight.snapshot.branch}
-					error={inFlight.error ?? "Unknown error"}
+					name={failure.snapshot.name}
+					branch={failure.snapshot.branch}
+					error={failure.error}
 				/>
 			);
 		}
