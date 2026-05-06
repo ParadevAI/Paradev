@@ -163,9 +163,16 @@ export type WorkspaceCreateAgentResult =
 export interface WorkspaceCreateResult {
 	workspace: {
 		id: string;
+		organizationId: string;
 		projectId: string;
+		hostId: string;
 		name: string;
 		branch: string;
+		type: "main" | "worktree";
+		createdByUserId: string | null;
+		taskId: string | null;
+		createdAt: Date;
+		updatedAt: Date;
 	};
 	terminals: Array<{ terminalId: string; label?: string }>;
 	agents: WorkspaceCreateAgentResult[];

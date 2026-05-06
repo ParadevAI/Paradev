@@ -33,12 +33,16 @@ function V2WorkspaceLayout() {
 				.where(({ v2Workspaces }) => eq(v2Workspaces.id, workspaceId ?? "")),
 		[collections, workspaceId],
 	);
-	const workspace = workspaces?.[0] ?? null;
+	const syncedWorkspace = workspaces?.[0] ?? null;
 	const inFlight = useWorkspaceCreatesStore((store) =>
 		workspaceId
 			? store.entries.find((entry) => entry.snapshot.id === workspaceId)
 			: undefined,
 	);
+	// Fall back to the cloud row cached on the in-flight entry while
+	// Electric hasn't yet delivered the synced row. The cloud has already
+	// confirmed the workspace at this point — no need to block on sync.
+	const workspace = syncedWorkspace ?? inFlight?.cloudRow ?? null;
 
 	const lastEnsuredWorkspaceIdRef = useRef<string | null>(null);
 	useEffect(() => {

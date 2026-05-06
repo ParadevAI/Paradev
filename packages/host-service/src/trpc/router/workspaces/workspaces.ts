@@ -74,18 +74,17 @@ type AgentLaunchResult =
 	| ({ ok: true } & AgentRunResult)
 	| { ok: false; error: string };
 
-interface ResolvedWorkspace {
-	id: string;
-	projectId: string;
-	name: string;
-	branch: string;
-}
+type CloudWorkspace = NonNullable<
+	Awaited<
+		ReturnType<HostServiceContext["api"]["v2Workspace"]["getFromHost"]["query"]>
+	>
+>;
 
 async function findExistingWorkspaceByBranch(
 	ctx: HostServiceContext,
 	projectId: string,
 	branch: string,
-): Promise<ResolvedWorkspace | null> {
+): Promise<CloudWorkspace | null> {
 	const local = ctx.db.query.workspaces
 		.findFirst({
 			where: and(
@@ -100,13 +99,7 @@ async function findExistingWorkspaceByBranch(
 		organizationId: ctx.organizationId,
 		id: local.id,
 	});
-	if (!cloud) return null;
-	return {
-		id: cloud.id,
-		projectId: cloud.projectId,
-		name: cloud.name,
-		branch: cloud.branch,
-	};
+	return cloud ?? null;
 }
 
 interface PrMetadata {
@@ -381,7 +374,7 @@ async function registerCloudAndLocal(args: {
 	taskId: string | undefined;
 	rollbackWorktree: () => Promise<void>;
 	hostPromise: Promise<{ machineId: string }>;
-}): Promise<{ id: string; projectId: string; name: string; branch: string }> {
+}): Promise<CloudWorkspace> {
 	const { ctx } = args;
 	let host: { machineId: string };
 	try {
@@ -443,12 +436,7 @@ async function registerCloudAndLocal(args: {
 		});
 	}
 
-	return {
-		id: cloudRow.id,
-		projectId: cloudRow.projectId,
-		name: cloudRow.name,
-		branch: cloudRow.branch,
-	};
+	return cloudRow;
 }
 
 async function dispatchSugarAgents(
@@ -526,12 +514,7 @@ export const workspacesRouter = router({
 			let resolvedBranch: string;
 			let worktreePath: string;
 			let alreadyExists = false;
-			let workspaceRow: {
-				id: string;
-				projectId: string;
-				name: string;
-				branch: string;
-			};
+			let workspaceRow: CloudWorkspace;
 			let prMetadata: PrMetadata | null = null;
 
 			if (input.pr !== undefined) {
@@ -872,12 +855,7 @@ export const workspacesRouter = router({
 			);
 
 			return {
-				workspace: {
-					id: workspaceRow.id,
-					projectId: workspaceRow.projectId,
-					name: workspaceRow.name,
-					branch: workspaceRow.branch,
-				},
+				workspace: workspaceRow,
 				terminals: terminalsResult,
 				agents: agentsResult,
 				alreadyExists,

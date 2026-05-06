@@ -68,6 +68,14 @@ export function useWorkspaceCreates(): UseWorkspaceCreatesApi {
 				const client = getHostServiceClientByUrl(hostUrl);
 				const result = await client.workspaces.create.mutate(args.snapshot);
 
+				// Cache the cloud row on the in-flight entry so the workspace
+				// detail layout can render the workspace immediately, without
+				// waiting for Electric to deliver the synced row. Manager.tsx
+				// removes the entry once the row appears in collections.
+				useWorkspaceCreatesStore
+					.getState()
+					.markCloudRow(result.workspace.id, result.workspace);
+
 				const existing = collections.v2WorkspaceLocalState.get(
 					result.workspace.id,
 				);
