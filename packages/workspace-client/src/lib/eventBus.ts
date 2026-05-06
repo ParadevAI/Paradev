@@ -103,7 +103,9 @@ function handleMessage(state: ConnectionState, data: unknown): void {
 	}
 
 	if (message.type === "error") {
-		console.error("[event-bus-client]", message.message);
+		// Server-side bus errors aren't actionable from the client; the
+		// reconnect loop already handles transient failures, and logging
+		// here just floods the console when a host bounces offline.
 		return;
 	}
 
