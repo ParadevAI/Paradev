@@ -23,7 +23,7 @@ import { electronTrpc } from "renderer/lib/electron-trpc";
 import { showWorkspaceAutoNameWarningToast } from "renderer/lib/workspaces/showWorkspaceAutoNameWarningToast";
 import { InitGitDialog } from "renderer/react-query/projects/InitGitDialog";
 import { DashboardNewWorkspaceModal } from "renderer/routes/_authenticated/components/DashboardNewWorkspaceModal";
-import { V1MigrationSummaryModal } from "renderer/routes/_authenticated/components/V1MigrationSummaryModal";
+import { V1ImportModal } from "renderer/routes/_authenticated/components/V1ImportModal";
 import { WorkspaceInitEffects } from "renderer/screens/main/components/WorkspaceInitEffects";
 import {
 	STEP_ROUTES,
@@ -222,7 +222,7 @@ function AuthenticatedLayout() {
 							<AgentHooks />
 							<V2NotificationController />
 							<Outlet />
-							<V1MigrationSummaryModal />
+							<V1ImportModal />
 							<WorkspaceInitEffects />
 							{isV2CloudEnabled ? (
 								<DashboardNewWorkspaceModal />

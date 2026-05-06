@@ -14,7 +14,6 @@ import { HiOutlinePlus } from "react-icons/hi2";
 import { useIsDarkTheme } from "renderer/assets/app-icons/preset-icons";
 import { useV2AgentConfigs } from "renderer/hooks/useV2AgentConfigs";
 import { buildAgentLaunchCommand } from "renderer/lib/agent-launch-command";
-import { useMigrateV1PresetsToV2 } from "renderer/routes/_authenticated/hooks/useMigrateV1PresetsToV2";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import type { V2TerminalPresetRow } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
@@ -54,7 +53,6 @@ export function V2PresetsSection({
 }: V2PresetsSectionProps) {
 	const isDark = useIsDarkTheme();
 	const collections = useCollections();
-	useMigrateV1PresetsToV2();
 
 	// Read v2 agent configs from the host service — this is the same
 	// data source the v2 /settings/agents page reads and writes, so edits

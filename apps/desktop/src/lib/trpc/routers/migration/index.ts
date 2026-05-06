@@ -1,7 +1,6 @@
 import {
 	projects,
 	v1MigrationState,
-	workspaceSections,
 	workspaces,
 	worktrees,
 } from "@superset/local-db";
@@ -12,7 +11,7 @@ import { publicProcedure, router } from "../..";
 
 const migrationStateRowSchema = z.object({
 	v1Id: z.string().min(1),
-	kind: z.enum(["project", "workspace"]),
+	kind: z.enum(["project", "workspace", "preset"]),
 	v2Id: z.string().nullable(),
 	organizationId: z.string().min(1),
 	status: z.enum(["success", "linked", "error", "skipped"]),
@@ -22,9 +21,9 @@ const migrationStateRowSchema = z.object({
 export const createMigrationRouter = () => {
 	return router({
 		readV1Projects: publicProcedure.query(() => {
-			// Only migrate pinned projects. v1's `hideProject` nulls tab_order when
-			// the last workspace in a project is deleted, effectively abandoning the
-			// project — don't resurrect those in v2.
+			// Only surface pinned projects. v1's `hideProject` nulls tab_order
+			// when the last workspace in a project is deleted, effectively
+			// abandoning the project — don't resurrect those in v2.
 			return localDb
 				.select()
 				.from(projects)
@@ -42,10 +41,6 @@ export const createMigrationRouter = () => {
 
 		readV1Worktrees: publicProcedure.query(() => {
 			return localDb.select().from(worktrees).all();
-		}),
-
-		readV1WorkspaceSections: publicProcedure.query(() => {
-			return localDb.select().from(workspaceSections).all();
 		}),
 
 		listState: publicProcedure
@@ -85,15 +80,6 @@ export const createMigrationRouter = () => {
 							migratedAt: Date.now(),
 						},
 					})
-					.run();
-			}),
-
-		clearState: publicProcedure
-			.input(z.object({ organizationId: z.string().min(1) }))
-			.mutation(({ input }) => {
-				localDb
-					.delete(v1MigrationState)
-					.where(eq(v1MigrationState.organizationId, input.organizationId))
 					.run();
 			}),
 	});
