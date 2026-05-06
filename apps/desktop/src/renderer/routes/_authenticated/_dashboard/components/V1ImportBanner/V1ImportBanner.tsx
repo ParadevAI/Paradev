@@ -1,10 +1,13 @@
 import { Button } from "@superset/ui/button";
+import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { LuArrowRight, LuX } from "react-icons/lu";
 import { env } from "renderer/env.renderer";
 import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
 import { authClient } from "renderer/lib/auth-client";
 import { electronTrpc } from "renderer/lib/electron-trpc";
+import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
+import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { useOpenV1ImportModal } from "renderer/stores/v1-import-modal";
 import { MOCK_ORG_ID } from "shared/constants";
 
@@ -26,39 +29,41 @@ export function V1ImportBanner() {
 		? MOCK_ORG_ID
 		: (session?.session?.activeOrganizationId ?? null);
 	const openModal = useOpenV1ImportModal();
+	const { activeHostUrl } = useLocalHostService();
 	const [dismissed, setDismissed] = useState(() =>
 		readDismissed(organizationId),
 	);
 
-	// Re-sync local state when the active org changes — dismissal is per
-	// org, so flipping orgs should reveal the banner again if it hasn't
-	// been dismissed there yet.
 	useEffect(() => {
 		setDismissed(readDismissed(organizationId));
 	}, [organizationId]);
 
+	const enabled = isV2CloudEnabled && !!organizationId && !dismissed;
+
 	const projectsQuery = electronTrpc.migration.readV1Projects.useQuery(
 		undefined,
-		{ enabled: isV2CloudEnabled && !!organizationId && !dismissed },
+		{ enabled },
 	);
-	const auditQuery = electronTrpc.migration.listState.useQuery(
-		{ organizationId: organizationId ?? "" },
-		{ enabled: isV2CloudEnabled && !!organizationId && !dismissed },
-	);
+	const hostProjectListQuery = useQuery({
+		queryKey: ["v1-import-banner", "hostProjectList", activeHostUrl],
+		queryFn: async () => {
+			if (!activeHostUrl) return [];
+			const client = getHostServiceClientByUrl(activeHostUrl);
+			return client.project.list.query();
+		},
+		enabled: enabled && !!activeHostUrl,
+		retry: false,
+	});
 
 	if (!isV2CloudEnabled || !organizationId || dismissed) return null;
 
 	const projects = projectsQuery.data ?? [];
-	const importedV1Ids = new Set(
-		(auditQuery.data ?? [])
-			.filter(
-				(row) =>
-					row.kind === "project" &&
-					(row.status === "success" || row.status === "linked"),
-			)
-			.map((row) => row.v1Id),
+	const importedRepoPaths = new Set(
+		(hostProjectListQuery.data ?? []).map((p) => p.repoPath),
 	);
-	const remaining = projects.filter((p) => !importedV1Ids.has(p.id)).length;
+	const remaining = projects.filter(
+		(p) => !importedRepoPaths.has(p.mainRepoPath),
+	).length;
 
 	if (remaining === 0) return null;
 

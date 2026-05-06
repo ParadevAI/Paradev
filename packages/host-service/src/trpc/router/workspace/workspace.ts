@@ -23,18 +23,16 @@ export const workspaceRouter = router({
 			return localWorkspace;
 		}),
 
-	/**
-	 * Asks cloud (not this device's local DB) for the live set of v2
-	 * workspace ids in the org. Used by the v1→v2 importer to detect audit
-	 * rows that map to workspaces another device or user has since deleted.
-	 * Returns just `{ id }[]` to keep the payload small — list calls
-	 * already paginate workspace metadata where it's needed.
-	 */
 	cloudList: protectedProcedure.query(async ({ ctx }) => {
 		const rows = await ctx.api.v2Workspace.list.query({
 			organizationId: ctx.organizationId,
 		});
-		return rows.map((row) => ({ id: row.id }));
+		return rows.map((row) => ({
+			id: row.id,
+			projectId: row.projectId,
+			branch: row.branch,
+			hostId: row.hostId,
+		}));
 	}),
 
 	gitStatus: protectedProcedure

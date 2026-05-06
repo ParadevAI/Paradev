@@ -39,18 +39,6 @@ export const projectRouter = router({
 			.all();
 	}),
 
-	/**
-	 * Asks cloud (not the local DB cache) for the live set of v2 projects in
-	 * this org. Used by the v1→v2 importer to detect stale audit-log rows
-	 * that point at projects another device or user has since deleted.
-	 */
-	cloudList: protectedProcedure.query(async ({ ctx }) => {
-		const rows = await ctx.api.v2Project.list.query({
-			organizationId: ctx.organizationId,
-		});
-		return rows.map((row) => ({ id: row.id, name: row.name }));
-	}),
-
 	get: protectedProcedure
 		.input(z.object({ projectId: z.string().uuid() }))
 		.query(({ ctx, input }) => {

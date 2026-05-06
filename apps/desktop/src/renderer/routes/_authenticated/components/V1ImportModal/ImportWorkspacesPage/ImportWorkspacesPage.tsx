@@ -12,14 +12,9 @@ interface ImportWorkspacesPageProps {
 	activeHostUrl: string;
 }
 
-interface AuditLogEntry {
-	v2Id: string | null;
-	status: string;
-	reason: string | null;
-}
-
 const WORKTREE_LIST_KEY_PREFIX = ["v1-import", "projectWorktrees"] as const;
 const WORKSPACE_CLOUD_LIST_KEY = ["v1-import", "workspaceCloudList"] as const;
+const HOST_PROJECT_LIST_KEY_PREFIX = ["v1-import", "hostProjectList"] as const;
 
 function trpcCode(err: unknown): string | null {
 	if (typeof err !== "object" || err === null) return null;
@@ -37,9 +32,16 @@ export function ImportWorkspacesPage({
 	const projectsQuery = electronTrpc.migration.readV1Projects.useQuery();
 	const workspacesQuery = electronTrpc.migration.readV1Workspaces.useQuery();
 	const worktreesQuery = electronTrpc.migration.readV1Worktrees.useQuery();
-	const auditQuery = electronTrpc.migration.listState.useQuery({
-		organizationId,
+
+	const hostProjectListQuery = useQuery({
+		queryKey: [...HOST_PROJECT_LIST_KEY_PREFIX, activeHostUrl],
+		queryFn: async () => {
+			const client = getHostServiceClientByUrl(activeHostUrl);
+			return client.project.list.query();
+		},
+		retry: false,
 	});
+
 	const cloudWorkspacesQuery = useQuery({
 		queryKey: [...WORKSPACE_CLOUD_LIST_KEY, organizationId, activeHostUrl],
 		queryFn: async () => {
@@ -49,34 +51,28 @@ export function ImportWorkspacesPage({
 		retry: false,
 	});
 
-	const liveWorkspaceIds = useMemo(() => {
-		if (!cloudWorkspacesQuery.data) return null;
-		return new Set(cloudWorkspacesQuery.data.map((w) => w.id));
+	const v2ProjectIdByV1Id = useMemo(() => {
+		const v2ByPath = new Map<string, string>();
+		for (const v2 of hostProjectListQuery.data ?? []) {
+			v2ByPath.set(v2.repoPath, v2.id);
+		}
+		const map = new Map<string, string>();
+		for (const v1 of projectsQuery.data ?? []) {
+			const v2Id = v2ByPath.get(v1.mainRepoPath);
+			if (v2Id) map.set(v1.id, v2Id);
+		}
+		return map;
+	}, [hostProjectListQuery.data, projectsQuery.data]);
+
+	const cloudWorkspaceKeys = useMemo(() => {
+		const set = new Set<string>();
+		for (const w of cloudWorkspacesQuery.data ?? []) {
+			set.add(`${w.projectId}\0${w.branch}`);
+		}
+		return set;
 	}, [cloudWorkspacesQuery.data]);
 
-	const projectAuditByV1Id = new Map<string, AuditLogEntry>();
-	const workspaceAuditByV1Id = new Map<string, AuditLogEntry>();
-	for (const row of auditQuery.data ?? []) {
-		const entry: AuditLogEntry = {
-			v2Id: row.v2Id,
-			status: row.status,
-			reason: row.reason,
-		};
-		if (row.kind === "project") projectAuditByV1Id.set(row.v1Id, entry);
-		else if (row.kind === "workspace")
-			workspaceAuditByV1Id.set(row.v1Id, entry);
-	}
-
-	// Live `git worktree list` per imported v2 project — used to filter out
-	// v1 workspaces whose branch no longer has a worktree (folder deleted,
-	// branch pruned, etc.) so we don't surface guaranteed-to-fail rows.
-	const importedV2ProjectIds = Array.from(projectAuditByV1Id.values())
-		.filter(
-			(entry) =>
-				!!entry.v2Id &&
-				(entry.status === "success" || entry.status === "linked"),
-		)
-		.map((entry) => entry.v2Id as string);
+	const importedV2ProjectIds = Array.from(new Set(v2ProjectIdByV1Id.values()));
 
 	const worktreeListQueries = useQueries({
 		queries: importedV2ProjectIds.map((v2ProjectId) => ({
@@ -111,7 +107,7 @@ export function ImportWorkspacesPage({
 		projectsQuery.isPending ||
 		workspacesQuery.isPending ||
 		worktreesQuery.isPending ||
-		auditQuery.isPending ||
+		hostProjectListQuery.isPending ||
 		worktreeListQueries.some((q) => q.isPending);
 
 	const [isRefreshing, setIsRefreshing] = useState(false);
@@ -122,7 +118,7 @@ export function ImportWorkspacesPage({
 				projectsQuery.refetch(),
 				workspacesQuery.refetch(),
 				worktreesQuery.refetch(),
-				auditQuery.refetch(),
+				hostProjectListQuery.refetch(),
 				cloudWorkspacesQuery.refetch(),
 				queryClient.invalidateQueries({
 					queryKey: WORKTREE_LIST_KEY_PREFIX,
@@ -141,51 +137,44 @@ export function ImportWorkspacesPage({
 	);
 	const allWorkspaces = workspacesQuery.data ?? [];
 
-	const visibleWorkspaces: typeof allWorkspaces = [];
+	type VisibleWorkspace = {
+		workspace: (typeof allWorkspaces)[number];
+		v2ProjectId: string;
+		alreadyImported: boolean;
+	};
+	const visibleWorkspaces: VisibleWorkspace[] = [];
 	for (const workspace of allWorkspaces) {
-		const projAudit = projectAuditByV1Id.get(workspace.projectId);
-		const parentImported =
-			!!projAudit?.v2Id &&
-			(projAudit.status === "success" || projAudit.status === "linked");
-		// Only surface workspaces whose v1 project has already been brought
-		// over to v2 — workspaces under un-imported projects are useless
-		// rows.
-		if (!parentImported) continue;
+		const v2ProjectId = v2ProjectIdByV1Id.get(workspace.projectId);
+		if (!v2ProjectId) continue;
 
-		const wsAudit = workspaceAuditByV1Id.get(workspace.id);
-		// Audit rows can be ghosts: status=success but cloud no longer has
-		// the v2 workspace. Only treat as "already imported" when the cloud
-		// list confirms it (or when the cloud list hasn't loaded yet, in
-		// which case we trust audit until proven otherwise).
-		const alreadyImported =
-			wsAudit?.status === "success" &&
-			(liveWorkspaceIds === null ||
-				(!!wsAudit.v2Id && liveWorkspaceIds.has(wsAudit.v2Id)));
-		if (!alreadyImported && projAudit?.v2Id) {
-			const validBranches = validBranchesByV2ProjectId.get(projAudit.v2Id);
+		const alreadyImported = cloudWorkspaceKeys.has(
+			`${v2ProjectId}\0${workspace.branch}`,
+		);
+		if (!alreadyImported) {
+			const validBranches = validBranchesByV2ProjectId.get(v2ProjectId);
 			if (validBranches !== undefined && !validBranches.has(workspace.branch)) {
 				continue;
 			}
 		}
-		visibleWorkspaces.push(workspace);
+		visibleWorkspaces.push({ workspace, v2ProjectId, alreadyImported });
 	}
 
 	const grouped = new Map<
 		string,
 		{
 			projectName: string;
-			items: typeof visibleWorkspaces;
+			items: VisibleWorkspace[];
 		}
 	>();
-	for (const workspace of visibleWorkspaces) {
-		const project = projectsById.get(workspace.projectId);
+	for (const entry of visibleWorkspaces) {
+		const project = projectsById.get(entry.workspace.projectId);
 		if (!project) continue;
-		const bucket = grouped.get(workspace.projectId) ?? {
+		const bucket = grouped.get(entry.workspace.projectId) ?? {
 			projectName: project.name,
 			items: [],
 		};
-		bucket.items.push(workspace);
-		grouped.set(workspace.projectId, bucket);
+		bucket.items.push(entry);
+		grouped.set(entry.workspace.projectId, bucket);
 	}
 
 	return (
@@ -207,7 +196,7 @@ export function ImportWorkspacesPage({
 					<div className="px-3 pt-2 pb-1 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
 						{group.projectName}
 					</div>
-					{group.items.map((workspace) => (
+					{group.items.map(({ workspace, v2ProjectId, alreadyImported }) => (
 						<WorkspaceRow
 							key={workspace.id}
 							workspace={workspace}
@@ -222,9 +211,8 @@ export function ImportWorkspacesPage({
 										null)
 									: null
 							}
-							projectAudit={projectAuditByV1Id.get(workspace.projectId)}
-							workspaceAudit={workspaceAuditByV1Id.get(workspace.id)}
-							liveWorkspaceIds={liveWorkspaceIds}
+							v2ProjectId={v2ProjectId}
+							alreadyImported={alreadyImported}
 							organizationId={organizationId}
 							activeHostUrl={activeHostUrl}
 						/>
@@ -244,10 +232,8 @@ interface WorkspaceRowProps {
 	};
 	worktreePath: string | undefined;
 	baseBranch: string | null;
-	projectAudit: AuditLogEntry | undefined;
-	workspaceAudit: AuditLogEntry | undefined;
-	/** Live cloud workspace ids in the org. `null` while still loading. */
-	liveWorkspaceIds: Set<string> | null;
+	v2ProjectId: string;
+	alreadyImported: boolean;
 	organizationId: string;
 	activeHostUrl: string;
 }
@@ -256,40 +242,20 @@ function WorkspaceRow({
 	workspace,
 	worktreePath,
 	baseBranch,
-	projectAudit,
-	workspaceAudit,
-	liveWorkspaceIds,
+	v2ProjectId,
+	alreadyImported,
 	organizationId,
 	activeHostUrl,
 }: WorkspaceRowProps) {
 	const queryClient = useQueryClient();
-	const upsertState = electronTrpc.migration.upsertState.useMutation();
-	const trpcUtils = electronTrpc.useUtils();
 	const { ensureWorkspaceInSidebar } = useDashboardSidebarState();
 	const [running, setRunning] = useState(false);
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
+	const [adoptedV2Id, setAdoptedV2Id] = useState<string | null>(null);
 
-	const parentImported =
-		projectAudit !== undefined &&
-		projectAudit.v2Id !== null &&
-		(projectAudit.status === "success" || projectAudit.status === "linked");
-	const v2ProjectId = parentImported ? (projectAudit?.v2Id ?? null) : null;
-
-	// Same ghost-detection as page-level filter: audit success is a lie if
-	// cloud confirms the v2 workspace is gone.
-	const auditClaimsImported =
-		workspaceAudit !== undefined && workspaceAudit.status === "success";
-	const auditImported =
-		auditClaimsImported &&
-		(liveWorkspaceIds === null ||
-			(!!workspaceAudit?.v2Id && liveWorkspaceIds.has(workspaceAudit.v2Id)));
-	const auditError =
-		workspaceAudit !== undefined && workspaceAudit.status === "error"
-			? workspaceAudit.reason
-			: null;
+	const isImported = alreadyImported || !!adoptedV2Id;
 
 	const runImport = async () => {
-		if (!v2ProjectId) return;
 		setRunning(true);
 		setErrorMessage(null);
 		try {
@@ -299,7 +265,7 @@ function WorkspaceRow({
 				workspaceName: workspace.name,
 				branch: workspace.branch,
 				baseBranch: baseBranch ?? undefined,
-				existingWorkspaceId: workspaceAudit?.v2Id ?? undefined,
+				existingWorkspaceId: adoptedV2Id ?? undefined,
 			};
 			let result: Awaited<
 				ReturnType<typeof client.workspaceCreation.adopt.mutate>
@@ -310,9 +276,6 @@ function WorkspaceRow({
 					worktreePath,
 				});
 			} catch (err) {
-				// v1's worktree row can be stale (folder moved/deleted) while git still
-				// has the branch registered at the canonical worktree path. Retry by
-				// branch before giving up.
 				if (worktreePath && trpcCode(err) === "NOT_FOUND") {
 					result = await client.workspaceCreation.adopt.mutate(adoptArgs);
 				} else {
@@ -320,42 +283,21 @@ function WorkspaceRow({
 				}
 			}
 
-			await upsertState.mutateAsync({
-				v1Id: workspace.id,
-				kind: "workspace",
-				v2Id: result.workspace.id,
-				organizationId,
-				status: "success",
-				reason: null,
-			});
-
 			ensureWorkspaceInSidebar(result.workspace.id, v2ProjectId);
-			await trpcUtils.migration.listState.invalidate({ organizationId });
-			// Without this, the freshly-adopted workspace isn't in the
-			// cached cloud-list snapshot, so the audit-ghost detector flips
-			// the row from "Imported" back to a fresh Adopt button.
+			setAdoptedV2Id(result.workspace.id);
 			await queryClient.invalidateQueries({
 				queryKey: WORKSPACE_CLOUD_LIST_KEY,
 			});
 		} catch (err) {
 			const message = err instanceof Error ? err.message : String(err);
 			setErrorMessage(message);
-			await upsertState
-				.mutateAsync({
-					v1Id: workspace.id,
-					kind: "workspace",
-					v2Id: null,
-					organizationId,
-					status: "error",
-					reason: message,
-				})
-				.catch((auditErr) => {
-					console.warn(
-						"[v1-import] failed to record workspace adopt error in audit",
-						{ workspaceId: workspace.id, auditErr },
-					);
-				});
-			await trpcUtils.migration.listState.invalidate({ organizationId });
+			console.error("[v1-import] workspace adopt failed", {
+				v1WorkspaceId: workspace.id,
+				v2ProjectId,
+				branch: workspace.branch,
+				organizationId,
+				err,
+			});
 		} finally {
 			setRunning(false);
 		}
@@ -363,18 +305,9 @@ function WorkspaceRow({
 
 	const action: RowAction = (() => {
 		if (running) return { kind: "running" };
-		if (auditImported) return { kind: "imported" };
-		if (!parentImported) {
-			return {
-				kind: "blocked",
-				reason: "Import the project on the Projects tab first.",
-			};
-		}
+		if (isImported) return { kind: "imported" };
 		if (errorMessage) {
 			return { kind: "error", message: errorMessage, onRetry: runImport };
-		}
-		if (auditError) {
-			return { kind: "error", message: auditError, onRetry: runImport };
 		}
 		return { kind: "ready", label: "Adopt", onClick: runImport };
 	})();

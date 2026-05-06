@@ -5,8 +5,6 @@ import {
 	DialogDescription,
 	DialogTitle,
 } from "@superset/ui/dialog";
-import { cn } from "@superset/ui/utils";
-import { useState } from "react";
 import { env } from "renderer/env.renderer";
 import { authClient } from "renderer/lib/auth-client";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
@@ -14,15 +12,12 @@ import {
 	useCloseV1ImportModal,
 	useV1ImportModalStore,
 	V1_IMPORT_PAGE_ORDER,
-	type V1ImportPage,
 } from "renderer/stores/v1-import-modal";
 import { MOCK_ORG_ID } from "shared/constants";
 import { WelcomePage } from "./components/WelcomePage";
 import { ImportPresetsPage } from "./ImportPresetsPage";
 import { ImportProjectsPage } from "./ImportProjectsPage";
 import { ImportWorkspacesPage } from "./ImportWorkspacesPage";
-
-const TRANSITION_MS = 160;
 
 export function V1ImportModal() {
 	const isOpen = useV1ImportModalStore((s) => s.isOpen);
@@ -35,18 +30,7 @@ export function V1ImportModal() {
 		? MOCK_ORG_ID
 		: (session?.session?.activeOrganizationId ?? null);
 
-	const [isTransitioning, setIsTransitioning] = useState(false);
-
 	if (!organizationId) return null;
-
-	const transitionToPage = (next: V1ImportPage) => {
-		if (next === page || isTransitioning) return;
-		setIsTransitioning(true);
-		window.setTimeout(() => {
-			setPage(next);
-			setIsTransitioning(false);
-		}, TRANSITION_MS);
-	};
 
 	const currentIndex = V1_IMPORT_PAGE_ORDER.indexOf(page);
 	const previousPage = V1_IMPORT_PAGE_ORDER[currentIndex - 1];
@@ -74,12 +58,7 @@ export function V1ImportModal() {
 					v2.
 				</DialogDescription>
 
-				<div
-					className={cn(
-						"transition-opacity duration-200 ease-out",
-						isTransitioning ? "opacity-0" : "opacity-100",
-					)}
-				>
+				<div key={page} className="animate-in fade-in duration-200">
 					{page === "welcome" && <WelcomePage />}
 					{(page === "projects" || page === "workspaces") && !activeHostUrl && (
 						<div className="flex h-[454px] items-center justify-center bg-background px-6 text-center text-sm text-muted-foreground">
@@ -106,27 +85,18 @@ export function V1ImportModal() {
 
 				<div className="box-border flex items-center justify-between border-t bg-background px-5 py-4">
 					{previousPage ? (
-						<Button
-							variant="outline"
-							disabled={isTransitioning}
-							onClick={() => transitionToPage(previousPage)}
-						>
+						<Button variant="outline" onClick={() => setPage(previousPage)}>
 							Back
 						</Button>
 					) : (
 						<div />
 					)}
 					{nextPage ? (
-						<Button
-							disabled={isTransitioning}
-							onClick={() => transitionToPage(nextPage)}
-						>
+						<Button onClick={() => setPage(nextPage)}>
 							{page === "welcome" ? "Get started" : "Next"}
 						</Button>
 					) : (
-						<Button disabled={isTransitioning} onClick={close}>
-							Done
-						</Button>
+						<Button onClick={close}>Done</Button>
 					)}
 				</div>
 			</DialogContent>
