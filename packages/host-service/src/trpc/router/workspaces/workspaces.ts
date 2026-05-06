@@ -381,13 +381,7 @@ async function registerCloudAndLocal(args: {
 	taskId: string | undefined;
 	rollbackWorktree: () => Promise<void>;
 	hostPromise: Promise<{ machineId: string }>;
-}): Promise<{
-	id: string;
-	projectId: string;
-	name: string;
-	branch: string;
-	txid?: number;
-}> {
+}): Promise<{ id: string; projectId: string; name: string; branch: string }> {
 	const { ctx } = args;
 	let host: { machineId: string };
 	try {
@@ -454,7 +448,6 @@ async function registerCloudAndLocal(args: {
 		projectId: cloudRow.projectId,
 		name: cloudRow.name,
 		branch: cloudRow.branch,
-		txid: cloudRow.txid,
 	};
 }
 
@@ -538,12 +531,7 @@ export const workspacesRouter = router({
 				projectId: string;
 				name: string;
 				branch: string;
-				txid?: number;
 			};
-			// Postgres xid of the cloud insert in this call. Set on fresh-create
-			// paths and bubbled up to renderer optimistic inserts so Electric can
-			// match the synced row.
-			let workspaceTxid: number | undefined;
 			let prMetadata: PrMetadata | null = null;
 
 			if (input.pr !== undefined) {
@@ -601,7 +589,6 @@ export const workspacesRouter = router({
 						});
 						workspaceRow = result.workspace;
 						alreadyExists = result.alreadyExists;
-						workspaceTxid = result.txid;
 						await enablePushAutoSetupRemote(
 							git,
 							worktreePath,
@@ -714,7 +701,6 @@ export const workspacesRouter = router({
 							rollbackWorktree,
 							hostPromise,
 						});
-						workspaceTxid = workspaceRow.txid;
 
 						if (prMetadata.baseRefName) {
 							await recordBaseBranchConfig({
@@ -800,7 +786,6 @@ export const workspacesRouter = router({
 						});
 						workspaceRow = result.workspace;
 						alreadyExists = result.alreadyExists;
-						workspaceTxid = result.txid;
 					} else {
 						worktreePath = safeResolveWorktreePath(
 							localProject.id,
@@ -858,7 +843,6 @@ export const workspacesRouter = router({
 							rollbackWorktree,
 							hostPromise,
 						});
-						workspaceTxid = workspaceRow.txid;
 					}
 				}
 			}
@@ -897,10 +881,6 @@ export const workspacesRouter = router({
 				terminals: terminalsResult,
 				agents: agentsResult,
 				alreadyExists,
-				// Postgres xid set when this call freshly created the cloud row.
-				// Renderers thread it back to Electric so optimistic inserts
-				// resolve against the synced shape.
-				txid: workspaceTxid,
 			};
 		}),
 

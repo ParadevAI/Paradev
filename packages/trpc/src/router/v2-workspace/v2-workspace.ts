@@ -238,8 +238,7 @@ export const v2WorkspaceRouter = {
 							type: inserted.type,
 						},
 					});
-					const txid = await getCurrentTxid(tx);
-					return { row: inserted, txid };
+					return inserted;
 				}
 
 				if (input.id) {
@@ -249,9 +248,7 @@ export const v2WorkspaceRouter = {
 							eq(v2Workspaces.organizationId, project.organizationId),
 						),
 					});
-					if (existing) {
-						return { row: existing, txid: undefined };
-					}
+					if (existing) return existing;
 					const collision = await tx.query.v2Workspaces.findFirst({
 						columns: { id: true },
 						where: eq(v2Workspaces.id, input.id),
@@ -289,23 +286,16 @@ export const v2WorkspaceRouter = {
 								.set(patch)
 								.where(eq(v2Workspaces.id, existing.id))
 								.returning();
-							const txid = await getCurrentTxid(tx);
-							return { row: updated ?? existing, txid };
+							return updated ?? existing;
 						}
-						return { row: existing, txid: undefined };
+						return existing;
 					}
 				}
 
 				return null;
 			});
 
-			if (result) {
-				// `txid` is undefined on idempotent return paths where the row was
-				// already synced; renderer optimistic inserts treat that as
-				// "accept without waiting" and let the natural shape stream
-				// settle the state.
-				return { ...result.row, txid: result.txid };
-			}
+			if (result) return result;
 
 			throw new TRPCError({
 				code: "INTERNAL_SERVER_ERROR",

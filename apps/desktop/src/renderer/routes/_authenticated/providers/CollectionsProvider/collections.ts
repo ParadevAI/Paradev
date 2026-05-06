@@ -22,7 +22,6 @@ import type {
 	SelectV2Workspace,
 	SelectWorkspace,
 } from "@superset/db/schema";
-import type { WorkspaceState } from "@superset/panes";
 import type { AppRouter } from "@superset/trpc";
 import { electricCollectionOptions } from "@tanstack/electric-db-collection";
 import {
@@ -41,13 +40,6 @@ import {
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
 import { env } from "renderer/env.renderer";
 import { getAuthToken, getJwt } from "renderer/lib/auth-client";
-import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
-import type { PaneViewerData } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
-import { appendLaunchesToPaneLayout } from "renderer/stores/workspace-creates/appendLaunchesToPaneLayout";
-import {
-	WorkspaceAlreadyExistsAtDifferentIdError,
-	type WorkspaceCreateMeta,
-} from "renderer/stores/workspace-creates/store";
 import superjson from "superjson";
 import { z } from "zod";
 import {
@@ -55,10 +47,8 @@ import {
 	type DashboardSidebarSectionRow,
 	dashboardSidebarProjectSchema,
 	dashboardSidebarSectionSchema,
-	getPrependTabOrder,
 	healV2UserPreferences,
 	healWorkspaceLocalState,
-	isSidebarWorkspaceVisible,
 	type V2TerminalPresetRow,
 	type V2UserPreferencesRow,
 	v2TerminalPresetSchema,
@@ -404,88 +394,6 @@ function createOrgCollections(organizationId: string): OrgCollections {
 				columnMapper,
 			},
 			getKey: (item) => item.id,
-			onInsert: async ({ transaction }) => {
-				const { modified, metadata } = transaction.mutations[0];
-				const meta = metadata as WorkspaceCreateMeta;
-				const client = getHostServiceClientByUrl(meta.hostUrl);
-				const result = await client.workspaces.create.mutate({
-					id: modified.id,
-					projectId: modified.projectId,
-					name: meta.providedName,
-					branch: meta.providedBranch,
-					pr: meta.pr,
-					baseBranch: meta.baseBranch,
-					taskId: modified.taskId ?? undefined,
-					agents: meta.agents,
-				});
-
-				if (result.alreadyExists && result.workspace.id !== modified.id) {
-					// Canonical row lives at a different id — roll back the optimistic
-					// row by throwing so Electric drops it. The submit hook catches
-					// this to redirect callers to the canonical id.
-					throw new WorkspaceAlreadyExistsAtDifferentIdError(
-						result.workspace.id,
-					);
-				}
-
-				// Mirror the post-create paneLayout setup that used to live in the
-				// renderer dispatch. Local-state writes are best-effort — the
-				// remote create has already succeeded, so a localStorage failure
-				// must NOT throw back to Electric (which would roll the row back
-				// even though the host wrote it). The next ensureWorkspaceInSidebar
-				// call (e.g. detail-page mount) will resync local state.
-				try {
-					const existing = v2WorkspaceLocalState.get(result.workspace.id);
-					const paneLayout = appendLaunchesToPaneLayout({
-						existing: existing?.paneLayout as
-							| WorkspaceState<PaneViewerData>
-							| undefined,
-						terminals: result.terminals,
-						agents: result.agents,
-					});
-					if (existing) {
-						v2WorkspaceLocalState.update(result.workspace.id, (draft) => {
-							draft.paneLayout = paneLayout;
-						});
-					} else {
-						// Prepend so the new workspace lands at the top of its project
-						// lane regardless of where existing tabOrders sit. Compute from
-						// the same project's visible top-level workspace rows.
-						const projectTabOrders = Array.from(
-							v2WorkspaceLocalState.state.values(),
-						)
-							.filter(
-								(row) =>
-									row.sidebarState.projectId === result.workspace.projectId &&
-									row.sidebarState.sectionId === null &&
-									isSidebarWorkspaceVisible(row),
-							)
-							.map((row) => ({ tabOrder: row.sidebarState.tabOrder }));
-						v2WorkspaceLocalState.insert({
-							workspaceId: result.workspace.id,
-							createdAt: new Date(),
-							sidebarState: {
-								projectId: result.workspace.projectId,
-								tabOrder: getPrependTabOrder(projectTabOrders),
-								sectionId: null,
-								changesFilter: { kind: "all" },
-								activeTab: "changes",
-								isHidden: false,
-							},
-							paneLayout,
-							viewedFiles: [],
-							recentlyViewedFiles: [],
-						});
-					}
-				} catch (err) {
-					console.warn(
-						"[v2Workspaces.onInsert] local sidebar state write failed; remote create succeeded",
-						{ workspaceId: result.workspace.id, err },
-					);
-				}
-
-				return result.txid !== undefined ? { txid: result.txid } : undefined;
-			},
 			onUpdate: async ({ transaction }) => {
 				const { original, changes } = transaction.mutations[0];
 				const { branch, hostId, name } = changes;

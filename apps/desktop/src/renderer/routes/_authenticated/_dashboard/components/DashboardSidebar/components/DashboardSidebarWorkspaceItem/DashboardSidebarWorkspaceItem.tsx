@@ -4,7 +4,7 @@ import { useOptimisticCollectionActions } from "renderer/routes/_authenticated/h
 import { useDeletingWorkspaces } from "renderer/routes/_authenticated/providers/DeletingWorkspacesProvider";
 import { RenameBranchDialog } from "renderer/screens/main/components/WorkspaceSidebar/WorkspaceListItem/components";
 import { useV2WorkspaceNotificationStatus } from "renderer/stores/v2-notifications";
-import { useWorkspaceCreateFailuresStore } from "renderer/stores/workspace-creates";
+import { useWorkspaceCreatesStore } from "renderer/stores/workspace-creates";
 import { useDashboardSidebarHover } from "../../providers/DashboardSidebarHoverProvider";
 import type { DashboardSidebarWorkspace } from "../../types";
 import { DashboardSidebarDeleteDialog } from "../DashboardSidebarDeleteDialog";
@@ -83,7 +83,7 @@ export function DashboardSidebarWorkspaceItem({
 	const isDeleting = useDeletingWorkspaces().isDeleting(id);
 
 	const handleDismissInFlight = useCallback(() => {
-		useWorkspaceCreateFailuresStore.getState().clear(id);
+		useWorkspaceCreatesStore.getState().remove(id);
 	}, [id]);
 
 	const {
