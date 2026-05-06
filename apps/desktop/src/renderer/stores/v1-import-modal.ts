@@ -1,10 +1,16 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
-export type V1ImportPage = "welcome" | "projects" | "workspaces" | "presets";
+export type V1ImportPage =
+	| "welcome"
+	| "intro"
+	| "projects"
+	| "workspaces"
+	| "presets";
 
 export const V1_IMPORT_PAGE_ORDER: V1ImportPage[] = [
 	"welcome",
+	"intro",
 	"projects",
 	"workspaces",
 	"presets",

@@ -29,8 +29,12 @@ export function ImportPresetsPage({ organizationId }: ImportPresetsPageProps) {
 		[collections],
 	);
 
-	const importedV1Ids = useMemo(
-		() => new Set(v2Presets.map((p) => p.id)),
+	const importedAgentIds = useMemo(
+		() => new Set(v2Presets.flatMap((p) => (p.agentId ? [p.agentId] : []))),
+		[v2Presets],
+	);
+	const importedNames = useMemo(
+		() => new Set(v2Presets.flatMap((p) => (p.agentId ? [] : [p.name]))),
 		[v2Presets],
 	);
 
@@ -56,15 +60,28 @@ export function ImportPresetsPage({ organizationId }: ImportPresetsPageProps) {
 			onRefresh={refresh}
 			isRefreshing={isRefreshing}
 		>
-			{presets.map((preset, index) => (
-				<PresetRow
-					key={preset.id}
-					preset={preset}
-					tabOrder={index}
-					alreadyImported={importedV1Ids.has(preset.id)}
-					organizationId={organizationId}
-				/>
-			))}
+			{presets.map((preset, index) => {
+				const linkedAgentId = BUILTIN_AGENT_IDS.has(preset.name)
+					? (preset.name as AgentType)
+					: undefined;
+				const v2Name = linkedAgentId
+					? AGENT_LABELS[linkedAgentId]
+					: preset.name;
+				const alreadyImported = linkedAgentId
+					? importedAgentIds.has(linkedAgentId)
+					: importedNames.has(v2Name);
+				return (
+					<PresetRow
+						key={preset.id}
+						preset={preset}
+						tabOrder={index}
+						linkedAgentId={linkedAgentId}
+						v2Name={v2Name}
+						alreadyImported={alreadyImported}
+						organizationId={organizationId}
+					/>
+				);
+			})}
 		</ImportPageShell>
 	);
 }
@@ -72,6 +89,8 @@ export function ImportPresetsPage({ organizationId }: ImportPresetsPageProps) {
 interface PresetRowProps {
 	preset: TerminalPreset;
 	tabOrder: number;
+	linkedAgentId: AgentType | undefined;
+	v2Name: string;
 	alreadyImported: boolean;
 	organizationId: string;
 }
@@ -79,6 +98,8 @@ interface PresetRowProps {
 function PresetRow({
 	preset,
 	tabOrder,
+	linkedAgentId,
+	v2Name,
 	alreadyImported,
 	organizationId,
 }: PresetRowProps) {
@@ -90,15 +111,9 @@ function PresetRow({
 		setRunning(true);
 		setErrorMessage(null);
 		try {
-			const linkedAgentId: AgentType | undefined = BUILTIN_AGENT_IDS.has(
-				preset.name,
-			)
-				? (preset.name as AgentType)
-				: undefined;
-
 			const row: V2TerminalPresetRow = {
-				id: preset.id,
-				name: linkedAgentId ? AGENT_LABELS[linkedAgentId] : preset.name,
+				id: crypto.randomUUID(),
+				name: v2Name,
 				description: preset.description,
 				cwd: preset.cwd,
 				commands: preset.commands,
@@ -137,7 +152,7 @@ function PresetRow({
 	return (
 		<ImportRow
 			icon={<LuTerminal className="size-3.5" strokeWidth={2} />}
-			primary={preset.name}
+			primary={v2Name}
 			secondary={preset.description ?? preset.commands[0]}
 			action={action}
 		/>

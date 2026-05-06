@@ -14,6 +14,7 @@ import {
 	V1_IMPORT_PAGE_ORDER,
 } from "renderer/stores/v1-import-modal";
 import { MOCK_ORG_ID } from "shared/constants";
+import { IntroPage } from "./components/IntroPage";
 import { WelcomePage } from "./components/WelcomePage";
 import { ImportPresetsPage } from "./ImportPresetsPage";
 import { ImportProjectsPage } from "./ImportProjectsPage";
@@ -51,15 +52,20 @@ export function V1ImportModal() {
 				onInteractOutside={(event) => event.preventDefault()}
 			>
 				<DialogTitle className="sr-only">
-					{page === "welcome" ? "Welcome to Superset v2" : "Import from v1"}
+					{page === "welcome"
+						? "Welcome to Superset v2"
+						: page === "intro"
+							? "Let's get you started"
+							: "Import from v1"}
 				</DialogTitle>
 				<DialogDescription className="sr-only">
-					Bring projects, workspaces, and terminal presets from Superset v1 into
-					v2.
+					Let's get your workspaces and projects ported over. Terminal sessions
+					won't be carried over, but you can still access v1 at any time.
 				</DialogDescription>
 
 				<div key={page} className="animate-in fade-in duration-200">
 					{page === "welcome" && <WelcomePage />}
+					{page === "intro" && <IntroPage />}
 					{(page === "projects" || page === "workspaces") && !activeHostUrl && (
 						<div className="flex h-[454px] items-center justify-center bg-background px-6 text-center text-sm text-muted-foreground">
 							Host service is not ready yet. This window will populate as soon

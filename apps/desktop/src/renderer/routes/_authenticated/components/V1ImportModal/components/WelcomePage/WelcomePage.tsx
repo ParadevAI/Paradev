@@ -26,10 +26,6 @@ export function WelcomePage() {
 				<div className="text-3xl font-semibold text-white">
 					Welcome to Superset v2
 				</div>
-				<p className="mt-3 max-w-md text-sm text-white/80">
-					Bring your v1 projects, workspaces, and terminal presets over. Import
-					each one with a single click — nothing happens automatically.
-				</p>
 			</div>
 		</div>
 	);
