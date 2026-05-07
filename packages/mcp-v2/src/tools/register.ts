@@ -18,11 +18,13 @@ import * as automationsRun from "./automations/run";
 import * as automationsSetPrompt from "./automations/set_prompt";
 import * as automationsUpdate from "./automations/update";
 import * as hostsList from "./hosts/list";
+import * as organizationMembersList from "./organization/members/list";
 import * as projectsList from "./projects/list";
 import * as tasksCreate from "./tasks/create";
 import * as tasksDelete from "./tasks/delete";
 import * as tasksGet from "./tasks/get";
 import * as tasksList from "./tasks/list";
+import * as tasksStatusesList from "./tasks/statuses/list";
 import * as tasksUpdate from "./tasks/update";
 import * as workspacesCreate from "./workspaces/create";
 import * as workspacesDelete from "./workspaces/delete";
@@ -35,6 +37,8 @@ const REGISTRARS = [
 	tasksCreate,
 	tasksUpdate,
 	tasksDelete,
+	tasksStatusesList,
+	organizationMembersList,
 	automationsList,
 	automationsGet,
 	automationsGetPrompt,
