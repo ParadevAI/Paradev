@@ -15,6 +15,7 @@ import { NewWorkspaceModal } from "renderer/components/NewWorkspaceModal";
 import { Paywall } from "renderer/components/Paywall";
 import { useUpdateListener } from "renderer/components/UpdateToast";
 import { env } from "renderer/env.renderer";
+import { useIsFreshInstall } from "renderer/hooks/useIsFreshInstall";
 import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
 import { useOnlineStatus } from "renderer/hooks/useOnlineStatus";
 import { authClient, getAuthToken } from "renderer/lib/auth-client";
@@ -65,6 +66,7 @@ function AuthenticatedLayout() {
 	const utils = electronTrpc.useUtils();
 	const shownWorkspaceInitWarningsRef = useRef(new Set<string>());
 	const isV2CloudEnabled = useIsV2CloudEnabled();
+	const isFreshInstall = useIsFreshInstall();
 	const requiredComplete = useOnboardingStore(selectRequiredStepsComplete);
 	const firstIncompleteStep = useOnboardingStore(selectFirstIncompleteStep);
 
@@ -205,7 +207,12 @@ function AuthenticatedLayout() {
 	}
 
 	const isOnSetupRoute = location.pathname.startsWith("/setup");
-	if (isV2CloudEnabled && !requiredComplete && !isOnSetupRoute) {
+	if (
+		isV2CloudEnabled &&
+		isFreshInstall === true &&
+		!requiredComplete &&
+		!isOnSetupRoute
+	) {
 		return <Navigate to={STEP_ROUTES[firstIncompleteStep]} replace />;
 	}
 
