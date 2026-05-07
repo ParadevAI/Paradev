@@ -65,26 +65,31 @@ export const gitRouter = router({
 			const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
 			const git = await ctx.git(worktreePath);
 
-			const currentBranchName = (
-				await git.revparse(["--abbrev-ref", "HEAD"]).catch(() => "")
-			).trim();
-			const base = await resolveBaseComparison(git);
-
-			let branchNames: string[] = [];
+			// `%(HEAD)` emits "*" for the checked-out branch, " " otherwise.
+			// Single spawn — independent of branch count. Only `name`/`isHead`
+			// are read by the v2 sidebar's BaseBranchSelector; the other
+			// per-branch fields the previous implementation computed (upstream,
+			// ahead/behind, last-commit) cost 4 spawns each and were unused.
+			let branches: { name: string; isHead: boolean }[] = [];
 			try {
 				const raw = await git.raw([
-					"branch",
-					"--list",
-					"--format=%(refname:short)",
+					"for-each-ref",
+					"refs/heads/",
+					"--format=%(HEAD)\t%(refname:short)",
 				]);
-				branchNames = raw.trim().split("\n").filter(Boolean);
+				branches = raw
+					.trim()
+					.split("\n")
+					.filter(Boolean)
+					.map((line) => {
+						const tab = line.indexOf("\t");
+						if (tab < 0) return { name: line, isHead: false };
+						return {
+							isHead: line.slice(0, tab) === "*",
+							name: line.slice(tab + 1),
+						};
+					});
 			} catch {}
-
-			const branches = await Promise.all(
-				branchNames.map((name) =>
-					buildBranch(git, name, name === currentBranchName, base?.baseRef),
-				),
-			);
 
 			return { branches };
 		}),
