@@ -40,9 +40,20 @@ function OnboardingGhCliPage() {
 
 	if (isPending) {
 		return (
-			<div className="flex h-full w-full items-center justify-center bg-[#151110]">
-				<Spinner className="size-6 text-[#a8a5a3]" />
-			</div>
+			<StepShell backTo={STEP_ROUTES.providers}>
+				<StepHeader
+					title="Checking GitHub CLI…"
+					subtitle="Looking for gh on your system."
+				/>
+				<div className="flex justify-center py-2">
+					<Spinner className="size-6 text-[#a8a5a3]" />
+				</div>
+				<div className="flex w-[273px] flex-col gap-2 self-center">
+					<SetupButton variant="link" onClick={handleSkip}>
+						Skip for now
+					</SetupButton>
+				</div>
+			</StepShell>
 		);
 	}
 

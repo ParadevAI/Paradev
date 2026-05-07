@@ -51,14 +51,6 @@ function OnboardingProvidersPage() {
 		goTo("providers");
 	}, [goTo]);
 
-	if (isStatusPending) {
-		return (
-			<div className="flex h-full w-full items-center justify-center bg-[#151110]">
-				<Spinner className="size-6 text-[#a8a5a3]" />
-			</div>
-		);
-	}
-
 	const handleContinueToNextStep = () => {
 		markComplete("providers");
 		navigate({ to: STEP_ROUTES["gh-cli"] });
@@ -68,6 +60,25 @@ function OnboardingProvidersPage() {
 		markSkipped("providers");
 		navigate({ to: STEP_ROUTES["gh-cli"] });
 	};
+
+	if (isStatusPending) {
+		return (
+			<StepShell maxWidth="lg">
+				<StepHeader
+					title="Connect AI Provider"
+					subtitle="Checking your provider connections…"
+				/>
+				<div className="flex justify-center py-2">
+					<Spinner className="size-6 text-[#a8a5a3]" />
+				</div>
+				<div className="flex w-[273px] flex-col gap-2 self-center">
+					<SetupButton variant="link" onClick={handleSkipStep}>
+						Skip for now
+					</SetupButton>
+				</div>
+			</StepShell>
+		);
+	}
 
 	const handleConnect = (
 		base: "/setup/providers/claude-code" | "/setup/providers/codex",

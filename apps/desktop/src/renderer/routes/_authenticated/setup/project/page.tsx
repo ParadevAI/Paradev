@@ -1,14 +1,13 @@
 import { toast } from "@superset/ui/sonner";
 import { Spinner } from "@superset/ui/spinner";
-import { eq } from "@tanstack/db";
-import { useLiveQuery } from "@tanstack/react-db";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { LuFolder } from "react-icons/lu";
 import { env } from "renderer/env.renderer";
+import { apiTrpcClient } from "renderer/lib/api-trpc-client";
 import { authClient } from "renderer/lib/auth-client";
 import { useFolderFirstImport } from "renderer/routes/_authenticated/_dashboard/components/AddRepositoryModals/hooks/useFolderFirstImport";
-import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { STEP_ROUTES, useOnboardingStore } from "renderer/stores/onboarding";
 import { MOCK_ORG_ID } from "shared/constants";
@@ -26,26 +25,19 @@ function OnboardingProjectPage() {
 	const markComplete = useOnboardingStore((s) => s.markComplete);
 	const markSkipped = useOnboardingStore((s) => s.markSkipped);
 
-	const collections = useCollections();
 	const { data: session } = authClient.useSession();
 	const activeOrganizationId = env.SKIP_ENV_VALIDATION
 		? MOCK_ORG_ID
 		: (session?.session?.activeOrganizationId ?? null);
 
-	const { data: projects = [], isLoading } = useLiveQuery(
-		(q) =>
-			q
-				.from({ projects: collections.v2Projects })
-				.where(({ projects }) =>
-					eq(projects.organizationId, activeOrganizationId ?? ""),
-				)
-				.select(({ projects }) => ({
-					id: projects.id,
-					name: projects.name,
-					repoCloneUrl: projects.repoCloneUrl,
-				})),
-		[collections, activeOrganizationId],
-	);
+	const { data: projects = [], isLoading } = useQuery({
+		queryKey: ["onboarding", "v2Projects", activeOrganizationId],
+		enabled: !!activeOrganizationId,
+		queryFn: () =>
+			apiTrpcClient.v2Project.list.query({
+				organizationId: activeOrganizationId as string,
+			}),
+	});
 
 	const folderImport = useFolderFirstImport({
 		onError: (message) => toast.error(message),
@@ -77,14 +69,6 @@ function OnboardingProjectPage() {
 		navigate({ to: STEP_ROUTES["adopt-worktrees"] });
 	};
 
-	if (isLoading) {
-		return (
-			<div className="flex h-full w-full items-center justify-center bg-[#151110]">
-				<Spinner className="size-6 text-[#a8a5a3]" />
-			</div>
-		);
-	}
-
 	const supersetIcon = (
 		<SupersetPill>
 			<div className="flex size-[48px] items-center justify-center rounded-[12px] bg-[#151110]">
@@ -92,6 +76,26 @@ function OnboardingProjectPage() {
 			</div>
 		</SupersetPill>
 	);
+
+	if (isLoading) {
+		return (
+			<StepShell backTo={STEP_ROUTES.permissions}>
+				<StepHeader
+					icon={supersetIcon}
+					title="Loading projects…"
+					subtitle="Checking for existing projects in your organization"
+				/>
+				<div className="flex justify-center py-2">
+					<Spinner className="size-6 text-[#a8a5a3]" />
+				</div>
+				<div className="flex w-[273px] flex-col gap-2 self-center">
+					<SetupButton variant="link" onClick={handleSkipStep}>
+						Skip for now
+					</SetupButton>
+				</div>
+			</StepShell>
+		);
+	}
 
 	if (hasProjects) {
 		return (
