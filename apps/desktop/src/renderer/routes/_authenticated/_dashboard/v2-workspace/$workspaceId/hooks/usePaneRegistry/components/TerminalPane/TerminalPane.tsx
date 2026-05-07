@@ -33,6 +33,8 @@ import { openUrlInV2Workspace } from "renderer/routes/_authenticated/_dashboard/
 import { useWorkspaceWsUrl } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceTrpcProvider/WorkspaceTrpcProvider";
 import { ScrollToBottomButton } from "renderer/screens/main/components/WorkspaceView/ContentView/TabsContent/Terminal/ScrollToBottomButton";
 import { TerminalSearch } from "renderer/screens/main/components/WorkspaceView/ContentView/TabsContent/Terminal/TerminalSearch";
+import { useTheme } from "renderer/stores/theme";
+import { resolveTerminalThemeType } from "renderer/stores/theme/utils";
 import { useLinkClickHint } from "./hooks/useLinkClickHint";
 import { type HoveredLink, useLinkHoverState } from "./hooks/useLinkHoverState";
 import { useTerminalAppearance } from "./hooks/useTerminalAppearance";
@@ -71,7 +73,14 @@ export function TerminalPane({
 	const appearanceRef = useRef(appearance);
 	appearanceRef.current = appearance;
 
-	const websocketUrl = useWorkspaceWsUrl(`/terminal/${terminalId}`);
+	// themeType reaches the host-side respawn fallback so a restored shell
+	// gets the right COLORFGBG; PTY env is set at spawn time only.
+	const activeTheme = useTheme();
+	const themeType = resolveTerminalThemeType({
+		activeThemeType: activeTheme?.type,
+	});
+	const baseWebsocketUrl = useWorkspaceWsUrl(`/terminal/${terminalId}`);
+	const websocketUrl = `${baseWebsocketUrl}?themeType=${encodeURIComponent(themeType)}`;
 	const websocketUrlRef = useRef(websocketUrl);
 	websocketUrlRef.current = websocketUrl;
 	const workspaceIdRef = useRef(workspaceId);
@@ -177,13 +186,16 @@ export function TerminalPane({
 	// URL re-resolution on provider remount). Reconnect only if the transport
 	// is already live — on initial mount the transport is "disconnected" and
 	// we let the mount path above open it.
+	// Reconnect on base-URL change only; themeType lives on the ref so a
+	// theme toggle doesn't tear down a live shell for a visual-only change.
+	// biome-ignore lint/correctness/useExhaustiveDependencies: see comment above
 	useEffect(() => {
 		terminalRuntimeRegistry.reconnect(
 			terminalId,
-			websocketUrl,
+			websocketUrlRef.current,
 			terminalInstanceId,
 		);
-	}, [terminalId, terminalInstanceId, websocketUrl]);
+	}, [terminalId, terminalInstanceId, baseWebsocketUrl]);
 
 	useEffect(() => {
 		terminalRuntimeRegistry.updateAppearance(
