@@ -80,7 +80,9 @@ export function TerminalPane({
 		activeThemeType: activeTheme?.type,
 	});
 	const baseWebsocketUrl = useWorkspaceWsUrl(`/terminal/${terminalId}`);
-	const websocketUrl = `${baseWebsocketUrl}?themeType=${encodeURIComponent(themeType)}`;
+	const themedUrl = new URL(baseWebsocketUrl);
+	themedUrl.searchParams.set("themeType", themeType);
+	const websocketUrl = themedUrl.toString();
 	const websocketUrlRef = useRef(websocketUrl);
 	websocketUrlRef.current = websocketUrl;
 	const workspaceIdRef = useRef(workspaceId);
