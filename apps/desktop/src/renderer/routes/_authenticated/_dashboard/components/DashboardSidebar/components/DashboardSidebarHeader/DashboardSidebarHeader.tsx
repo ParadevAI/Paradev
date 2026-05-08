@@ -74,6 +74,8 @@ export function DashboardSidebarHeader({
 		tab: lastTab,
 		assignee: lastAssignee,
 		search: lastSearch,
+		typeTab: lastTypeTab,
+		projectFilter: lastProjectFilter,
 	} = useTasksFilterStore();
 
 	const handleWorkspacesClick = () => {
@@ -92,6 +94,8 @@ export function DashboardSidebarHeader({
 			if (lastTab !== "all") search.tab = lastTab;
 			if (lastAssignee) search.assignee = lastAssignee;
 			if (lastSearch) search.search = lastSearch;
+			if (lastTypeTab !== "tasks") search.type = lastTypeTab;
+			if (lastProjectFilter) search.project = lastProjectFilter;
 			navigate({ to: "/tasks", search });
 		});
 	};
