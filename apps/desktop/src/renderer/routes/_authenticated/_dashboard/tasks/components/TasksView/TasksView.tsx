@@ -133,6 +133,22 @@ export function TasksView({
 		[collections],
 	);
 
+	const { data: v2Projects } = useLiveQuery(
+		(q) => q.from({ projects: collections.v2Projects }),
+		[collections],
+	);
+
+	useEffect(() => {
+		if (projectFilter) return;
+		const firstProject = v2Projects?.[0];
+		if (!firstProject) return;
+		navigate({
+			to: "/tasks",
+			search: buildSearch({ project: firstProject.id }),
+			replace: true,
+		});
+	}, [projectFilter, v2Projects, navigate, buildSearch]);
+
 	const isLinearConnected =
 		integrations?.some((i) => i.provider === "linear") ?? false;
 
@@ -152,7 +168,7 @@ export function TasksView({
 		navigate({ to: "/tasks", search: buildSearch({ type }), replace: true });
 	};
 
-	const handleProjectFilterChange = (project: string | null) => {
+	const handleProjectFilterChange = (project: string) => {
 		navigate({ to: "/tasks", search: buildSearch({ project }), replace: true });
 	};
 

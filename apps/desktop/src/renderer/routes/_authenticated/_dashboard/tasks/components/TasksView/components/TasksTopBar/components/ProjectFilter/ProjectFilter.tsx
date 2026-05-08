@@ -16,7 +16,7 @@ import { useCollections } from "renderer/routes/_authenticated/providers/Collect
 
 interface ProjectFilterProps {
 	value: string | null;
-	onChange: (value: string | null) => void;
+	onChange: (value: string) => void;
 }
 
 export function ProjectFilter({ value, onChange }: ProjectFilterProps) {
@@ -42,7 +42,7 @@ export function ProjectFilter({ value, onChange }: ProjectFilterProps) {
 		return projects.filter((p) => p.name.toLowerCase().includes(q));
 	}, [projects, search]);
 
-	const handleSelect = (id: string | null) => {
+	const handleSelect = (id: string) => {
 		onChange(id);
 		setOpen(false);
 		setSearch("");
@@ -87,12 +87,6 @@ export function ProjectFilter({ value, onChange }: ProjectFilterProps) {
 						onValueChange={setSearch}
 					/>
 					<CommandList className="max-h-80">
-						<CommandGroup>
-							<CommandItem onSelect={() => handleSelect(null)}>
-								<span className="text-sm">All projects</span>
-								{value === null && <HiCheck className="ml-auto size-3.5" />}
-							</CommandItem>
-						</CommandGroup>
 						{filtered.length === 0 && search && (
 							<CommandEmpty>No projects found.</CommandEmpty>
 						)}
