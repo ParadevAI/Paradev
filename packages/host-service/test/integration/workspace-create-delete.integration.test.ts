@@ -91,6 +91,45 @@ describe("workspace.create + workspace.delete integration", () => {
 		expect(existsSync(nonCanonicalPath)).toBe(true);
 	});
 
+	test("create() adopts a worktree created by another tool (e.g. `.watt-worktrees/`) instead of bubbling git's `is already used by worktree` fatal", async () => {
+		// Regress: when another tool already ran `git worktree add` for the
+		// branch, `workspaces.create` surfaced git's raw `'<branch>' is
+		// already used by worktree at ...` fatal instead of adopting.
+		const scenario = await createProjectScenario({
+			hostOptions: { apiOverrides: cloudFlows.workspaceCreateOk() },
+		});
+		dispose = scenario.dispose;
+
+		const branch = "Roshvan/mcp-1013-trust-wattdata-xyz";
+		const externalToolPath = join(
+			scenario.repo.repoPath,
+			".watt-worktrees",
+			branch,
+		);
+		await scenario.repo.git.raw([
+			"worktree",
+			"add",
+			"-b",
+			branch,
+			externalToolPath,
+		]);
+
+		const result = await scenario.host.trpc.workspaces.create.mutate({
+			projectId: scenario.projectId,
+			name: "adopted-from-watt",
+			branch,
+		});
+
+		expect(result?.workspace?.branch).toBe(branch);
+		const persisted = scenario.host.db
+			.select()
+			.from(workspaces)
+			.where(eq(workspaces.id, result?.workspace?.id ?? ""))
+			.get();
+		expect(persisted?.worktreePath).toBe(externalToolPath);
+		expect(existsSync(externalToolPath)).toBe(true);
+	});
+
 	test("create() prunes a stale worktree (rm-ed dir) before adding a new one", async () => {
 		// Regress: when a worktree's directory was deleted without
 		// `git worktree remove`, git still lists it (prunable) and claims
