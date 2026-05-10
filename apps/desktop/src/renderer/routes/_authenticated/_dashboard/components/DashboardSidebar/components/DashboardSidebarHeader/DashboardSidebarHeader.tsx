@@ -214,12 +214,12 @@ export function DashboardSidebarHeader({
 			    horizontal inset — keeps traffic-light alignment matching the
 			    TopBar's 80px pad regardless of parent padding changes. */}
 			<div
-				className="drag -mx-2 flex h-8 items-center gap-1.5"
+				className="drag -mx-2 flex h-8 items-center gap-1.5 pr-2"
 				style={{ paddingLeft: isMac ? "80px" : "8px" }}
 			>
 				<SidebarToggle />
-				<NavigationControls showHistoryDropdown={false} />
-				<ResourceConsumption surface="v2" />
+				<NavigationControls />
+				<ResourceConsumption surface="v2" className="ml-auto" />
 			</div>
 			<OrganizationDropdown variant="expanded" />
 
