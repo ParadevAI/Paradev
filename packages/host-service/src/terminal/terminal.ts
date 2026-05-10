@@ -690,8 +690,13 @@ export async function createTerminalSessionInternal({
 		.findFirst({ where: eq(workspaces.id, workspaceId) })
 		.sync();
 
-	if (!workspace || !existsSync(workspace.worktreePath)) {
-		return { error: "Workspace worktree not found" };
+	if (!workspace) {
+		return { error: "Workspace not found" };
+	}
+	if (!existsSync(workspace.worktreePath)) {
+		return {
+			error: `Workspace worktree no longer exists: ${workspace.worktreePath}`,
+		};
 	}
 
 	// Derive root path from the workspace's project

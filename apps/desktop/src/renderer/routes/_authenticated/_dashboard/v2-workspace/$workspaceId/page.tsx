@@ -1,4 +1,5 @@
 import { Workspace } from "@superset/panes";
+import { workspaceTrpc } from "@superset/workspace-client";
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
@@ -13,7 +14,9 @@ import { V2NotificationStatusIndicator } from "./components/V2NotificationStatus
 import { V2PresetsBar } from "./components/V2PresetsBar";
 import { V2WorkspaceRunButton } from "./components/V2WorkspaceRunButton";
 import { WorkspaceEmptyState } from "./components/WorkspaceEmptyState";
+import { WorkspaceMissingWorktreeState } from "./components/WorkspaceMissingWorktreeState";
 import { WorkspaceSidebar } from "./components/WorkspaceSidebar";
+import { WorkspaceStatusUnavailableState } from "./components/WorkspaceStatusUnavailableState";
 import { useBrowserShellInteractionPassthrough } from "./hooks/useBrowserShellInteractionPassthrough";
 import { useClearActivePaneAttention } from "./hooks/useClearActivePaneAttention";
 import { useConsumeAutomationRunLink } from "./hooks/useConsumeAutomationRunLink";
@@ -69,6 +72,49 @@ export const Route = createFileRoute(
 });
 
 function V2WorkspacePage() {
+	const { workspace } = useWorkspace();
+	const workspaceStatusQuery = workspaceTrpc.workspace.get.useQuery(
+		{ id: workspace.id },
+		{
+			refetchOnWindowFocus: true,
+			retry: false,
+		},
+	);
+
+	if (workspaceStatusQuery.isPending) {
+		return <div className="flex h-full w-full" />;
+	}
+
+	if (workspaceStatusQuery.isError) {
+		return (
+			<WorkspaceStatusUnavailableState
+				onRefresh={() => {
+					void workspaceStatusQuery.refetch();
+				}}
+				isRefreshing={workspaceStatusQuery.isFetching}
+			/>
+		);
+	}
+
+	if (workspaceStatusQuery.data?.worktreeExists === false) {
+		return (
+			<WorkspaceMissingWorktreeState
+				workspaceId={workspace.id}
+				workspaceName={workspace.name}
+				branch={workspace.branch}
+				worktreePath={workspaceStatusQuery.data?.worktreePath}
+				onRefresh={() => {
+					void workspaceStatusQuery.refetch();
+				}}
+				isRefreshing={workspaceStatusQuery.isFetching}
+			/>
+		);
+	}
+
+	return <V2WorkspaceContent />;
+}
+
+function V2WorkspaceContent() {
 	const {
 		terminalId,
 		chatSessionId,
