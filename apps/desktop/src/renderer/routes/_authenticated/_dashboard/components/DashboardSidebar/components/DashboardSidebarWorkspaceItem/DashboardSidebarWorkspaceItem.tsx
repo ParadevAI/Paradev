@@ -37,6 +37,7 @@ export function DashboardSidebarWorkspaceItem({
 		name,
 		branch,
 		creationStatus,
+		pullRequest,
 	} = workspace;
 	const isMainWorkspace = workspace.type === "main";
 	const diffStats = useDiffStats(id);
@@ -142,6 +143,7 @@ export function DashboardSidebarWorkspaceItem({
 					workspaceStatus={workspaceStatus}
 					onClick={handleClick}
 					creationStatus={creationStatus}
+					pullRequestState={pullRequest?.state ?? null}
 					aria-label={
 						creationStatus ? `Creating workspace: ${name}` : undefined
 					}
