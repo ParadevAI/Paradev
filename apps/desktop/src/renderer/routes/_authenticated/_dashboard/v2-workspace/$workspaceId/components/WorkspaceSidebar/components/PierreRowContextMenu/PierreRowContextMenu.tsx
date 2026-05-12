@@ -5,7 +5,7 @@ import {
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
 
-interface RowContextMenuProps extends Record<string, unknown> {
+interface PierreRowContextMenuProps extends Record<string, unknown> {
 	anchorRect: ContextMenuOpenContext["anchorRect"];
 	onClose: () => void;
 	children: React.ReactNode;
@@ -18,12 +18,12 @@ interface RowContextMenuProps extends Record<string, unknown> {
  * The data-file-tree-context-menu-root attr (passed via {...attrs}) tells
  * Pierre that portaled clicks inside the menu are not "outside" clicks.
  */
-export function RowContextMenu({
+export function PierreRowContextMenu({
 	anchorRect,
 	onClose,
 	children,
 	...attrs
-}: RowContextMenuProps) {
+}: PierreRowContextMenuProps) {
 	return (
 		<DropdownMenu open onOpenChange={(open) => !open && onClose()}>
 			<DropdownMenuTrigger asChild>

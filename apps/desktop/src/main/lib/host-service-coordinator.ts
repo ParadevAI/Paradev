@@ -443,7 +443,7 @@ export class HostServiceCoordinator extends EventEmitter {
 		let child: ReturnType<typeof childProcess.spawn>;
 		try {
 			// Prod: detached so PTYs survive Electron restarts via manifest
-			// adoption (HOST_SERVICE_LIFECYCLE.md). Dev: attached so a `bun dev`
+			// adoption (docs/HOST_SERVICE_LIFECYCLE.md). Dev: attached so a `bun dev`
 			// kill propagates and serve.ts's dev shutdown can stop pty-daemon.
 			child = childProcess.spawn(process.execPath, [this.scriptPath], {
 				detached: !isDev,
