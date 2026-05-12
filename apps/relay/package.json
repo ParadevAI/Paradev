@@ -6,6 +6,7 @@
 	"scripts": {
 		"dev": "bun run --env-file=../../.env --hot src/index.ts",
 		"start": "bun run src/index.ts",
+		"deploy": "./scripts/deploy.sh",
 		"typecheck": "tsc --noEmit --emitDeclarationOnly false"
 	},
 	"dependencies": {

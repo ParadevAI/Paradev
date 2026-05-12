@@ -85,4 +85,13 @@ export const FEATURE_FLAGS = {
 	 * the credential), so this only controls who can START a session.
 	 */
 	WEB_REMOTE_CONTROL_ACCESS: "web-remote-control-access",
+	/**
+	 * Per-user override for the relay base URL. Payload shape:
+	 * `{ "url": "https://..." }`. When set, both the host-service tunnel and
+	 * the desktop renderer's client-side WS opens route through this URL
+	 * instead of `env.RELAY_URL`. Lets us A/B-test alternative relay
+	 * implementations (e.g. Cloudflare Durable Objects) without changing
+	 * defaults for other users.
+	 */
+	RELAY_URL_OVERRIDE: "relay-url-override",
 } as const;

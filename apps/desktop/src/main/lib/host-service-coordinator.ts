@@ -7,7 +7,6 @@ import { settings } from "@superset/local-db";
 import { getHostId, getHostName } from "@superset/shared/host-info";
 import { app } from "electron";
 import log from "electron-log/main";
-import { env } from "main/env.main";
 import { env as sharedEnv } from "shared/env.shared";
 import { getProcessEnvWithShellPath } from "../../lib/trpc/routers/workspaces/utils/shell-env";
 import { SUPERSET_HOME_DIR } from "./app-environment";
@@ -27,6 +26,7 @@ import {
 	pollHealthCheck,
 } from "./host-service-utils";
 import { localDb } from "./local-db";
+import { getRelayUrl } from "./relay-url";
 import { HOOK_PROTOCOL_VERSION } from "./terminal/env";
 
 export type HostServiceStatus = "starting" | "running" | "stopped";
@@ -541,9 +541,13 @@ export class HostServiceCoordinator extends EventEmitter {
 
 		// `getProcessEnvWithShellPath` merges in the user's interactive shell env,
 		// which in dev has `RELAY_URL` set. Enforce the toggle *after* that merge
-		// so the child definitely doesn't see a relay URL when disabled.
-		if (exposeViaRelay && env.RELAY_URL) {
-			childEnv.RELAY_URL = env.RELAY_URL;
+		// so the child definitely doesn't see a relay URL when disabled. The
+		// effective URL comes from the PostHog `relay-url-override` flag with
+		// `env.RELAY_URL` as fallback (see main/lib/relay-url) so we can A/B-test
+		// alternate relay deployments per-user.
+		const effectiveRelayUrl = await getRelayUrl();
+		if (exposeViaRelay && effectiveRelayUrl) {
+			childEnv.RELAY_URL = effectiveRelayUrl;
 		} else {
 			delete childEnv.RELAY_URL;
 		}
