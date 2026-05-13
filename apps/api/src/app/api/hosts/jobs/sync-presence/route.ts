@@ -72,6 +72,12 @@ export async function POST(request: Request): Promise<Response> {
 		});
 	}
 
+	// Pass the connected set as a single Postgres array-literal parameter
+	// rather than letting drizzle expand the JS array into N placeholders
+	// (`($1, $2, ...)::text[]` is a row-cast, not an array). Routing keys are
+	// `${uuid}:${32-char-hex}` so the unquoted `{a,b,c}` literal is safe.
+	const connectedArrayLiteral = `{${connected.join(",")}}`;
+
 	let rows: Array<{
 		organization_id: string;
 		machine_id: string;
@@ -87,7 +93,7 @@ export async function POST(request: Request): Promise<Response> {
 				SELECT
 					organization_id,
 					machine_id,
-					(organization_id::text || ':' || machine_id) = ANY(${connected}::text[]) AS expected
+					(organization_id::text || ':' || machine_id) = ANY(${connectedArrayLiteral}::text[]) AS expected
 				FROM v2_hosts
 			)
 			UPDATE v2_hosts h
