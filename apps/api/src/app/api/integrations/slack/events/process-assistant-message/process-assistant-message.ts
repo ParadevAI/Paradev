@@ -39,6 +39,8 @@ interface SlackAssistantMessageEvent {
 	event_ts: string;
 	thread_ts?: string;
 	files?: SlackEventFile[];
+	team?: string;
+	user_team?: string;
 }
 
 interface ProcessAssistantMessageParams {
@@ -52,9 +54,15 @@ export async function processAssistantMessage({
 	teamId,
 	eventId,
 }: ProcessAssistantMessageParams): Promise<void> {
+	// Slack Connect DMs deliver the bot's team in the envelope but the user's
+	// home team on the event itself. Route by the user's team so the user's
+	// own org's connection responds.
+	const userTeam = event.user_team ?? event.team ?? teamId;
+
 	console.log("[slack/process-assistant-message] Processing message:", {
 		eventId,
 		teamId,
+		userTeam,
 		channel: event.channel,
 		user: event.user,
 	});
@@ -62,7 +70,7 @@ export async function processAssistantMessage({
 	const connection = await db.query.integrationConnections.findFirst({
 		where: and(
 			eq(integrationConnections.provider, "slack"),
-			eq(integrationConnections.externalOrgId, teamId),
+			eq(integrationConnections.externalOrgId, userTeam),
 			isNull(integrationConnections.disconnectedAt),
 		),
 		orderBy: [
@@ -74,7 +82,7 @@ export async function processAssistantMessage({
 	if (!connection) {
 		console.error(
 			"[slack/process-assistant-message] No connection found for team:",
-			teamId,
+			userTeam,
 		);
 		return;
 	}
@@ -86,7 +94,7 @@ export async function processAssistantMessage({
 			? db.query.usersSlackUsers.findFirst({
 					where: and(
 						eq(usersSlackUsers.slackUserId, event.user),
-						eq(usersSlackUsers.teamId, teamId),
+						eq(usersSlackUsers.teamId, userTeam),
 					),
 					columns: { userId: true, modelPreference: true },
 				})
@@ -151,7 +159,7 @@ export async function processAssistantMessage({
 		});
 		const connectUrl = generateConnectUrl({
 			slackUserId: event.user,
-			teamId,
+			teamId: userTeam,
 		});
 		await slack.chat.postMessage({
 			channel: event.channel,
