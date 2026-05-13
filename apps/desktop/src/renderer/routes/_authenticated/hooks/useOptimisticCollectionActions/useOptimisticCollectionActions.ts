@@ -21,6 +21,7 @@ interface V2WorkspacePatch {
 	name?: string;
 	branch?: string;
 	hostId?: string;
+	taskId?: string | null;
 }
 
 function getErrorMessage(error: unknown): string {
@@ -188,6 +189,9 @@ export function useOptimisticCollectionActions() {
 							}
 							if (patch.hostId !== undefined) {
 								draft.hostId = patch.hostId;
+							}
+							if (patch.taskId !== undefined) {
+								draft.taskId = patch.taskId;
 							}
 						}),
 					),
