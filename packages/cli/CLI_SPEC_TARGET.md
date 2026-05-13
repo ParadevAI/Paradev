@@ -602,8 +602,7 @@ Output: `Automation` (with `recentRuns` omitted — use
 | `--workspace <workspaceId>` | one of workspace/project | Reuse an existing workspace; project is derived server-side. |
 | `--project <projectId>` | one of workspace/project | New-workspace-per-run mode. |
 | `--host <hostId>` | no | Target host for runs. Default: owner's online host. |
-| `--agent <presetId>` | no | Default: `claude`. |
-| `--agent-config-file <path>` | no | Full ResolvedAgentConfig JSON; overrides `--agent`. |
+| `--agent <agent>` | no | Host agent presetId, `HostAgentConfig` instance UUID, or `superset` for built-in chat. Default: `claude`. |
 
 Exactly one of `--prompt` or `--prompt-file` must be provided. Exactly one
 of `--workspace` or `--project` must be provided. Both constraints are
@@ -611,7 +610,7 @@ enforced at parse time and shown as `(required, one of: ...)` in help.
 
 tRPC: `automation.create`.
 
-Output: `Automation` (raw, including `id`, `nextRunAt`, `agentConfig`).
+Output: `Automation` (raw, including `id`, `nextRunAt`, `agent`).
 
 ### `superset automations update <id>`
 
@@ -628,8 +627,7 @@ update semantics (see Backend Prerequisites).
 | `--timezone <iana>` | |
 | `--dtstart <iso8601>` | |
 | `--host <hostId>` | Preserves the existing host when omitted. |
-| `--agent <presetId>` | Preserves the existing agent config when omitted. |
-| `--agent-config-file <path>` | Overrides `--agent` when both provided. |
+| `--agent <agent>` | Host agent presetId, instance UUID, or `superset`. Preserves the existing value when omitted. |
 | `--enabled` / `--no-enabled` | Calls `automation.setEnabled` first. |
 
 tRPC:
@@ -812,8 +810,8 @@ These changes must land in the API/server before the v1 CLI ships:
 - **`automation.create` workspace-only mode** — when `v2WorkspaceId` is
   provided, derive `v2ProjectId` server-side instead of requiring both.
 - **`automation.update` partial semantics** — treat `undefined` fields as
-  "no change" for `targetHostId` and `agentConfig`. The CLI will rely on
-  this to fix the silent-clobber bug (CLI-CURRENT-010, CLI-CURRENT-028).
+  "no change" for `targetHostId` and `agent`. The CLI will rely on this to
+  fix the silent-clobber bug (CLI-CURRENT-010, CLI-CURRENT-028).
 - **`host.list`** on cloud — new tRPC procedure for the
   `superset hosts list` discovery command. Returns hosts with
   `id = machineId` (the consolidated identifier — see below).

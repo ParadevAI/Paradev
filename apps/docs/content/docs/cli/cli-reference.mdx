@@ -849,8 +849,7 @@ Use [`automations logs`](#superset-automations-logs-id) for run history.
 		{ flag: "--workspace <workspaceId>", description: "Reuse an existing workspace." },
 		{ flag: "--project <projectId>", description: "Project ID for new-workspace-per-run mode." },
 		{ flag: "--host <hostId>", description: "Default: owner's online host." },
-		{ flag: "--agent <presetId>", description: "Default: claude." },
-		{ flag: "--agent-config-file <path>", description: "Full ResolvedAgentConfig JSON; overrides --agent." },
+		{ flag: "--agent <agent>", description: "Host agent presetId, instance UUID, or 'superset' for built-in chat. Default: claude." },
 	]}
 	output="Automation"
 >
@@ -881,8 +880,7 @@ superset automations create \
 		{ flag: "--host <hostId>", description: "New target host." },
 		{ flag: "--project <projectId>", description: "New v2 project ID." },
 		{ flag: "--workspace <workspaceId>", description: "New v2 workspace ID." },
-		{ flag: "--agent <presetId>", description: "New agent preset." },
-		{ flag: "--agent-config-file <path>", description: "Overrides --agent when both provided." },
+		{ flag: "--agent <agent>", description: "New host agent presetId, instance UUID, or 'superset'." },
 		{ flag: "--mcp-scope <a,b,c>", description: "Comma-separated MCP scope strings." },
 		{ flag: "--enabled / --no-enabled", description: "Calls automation.setEnabled first." },
 	]}
