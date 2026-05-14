@@ -10,7 +10,10 @@ import {
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useTasksFilterStore } from "../../stores/tasks-filter-state";
 import { BoardContent } from "./components/BoardContent";
-import { GitHubIssuesContent } from "./components/GitHubIssuesContent";
+import {
+	GitHubIssuesContent,
+	type SelectedIssue,
+} from "./components/GitHubIssuesContent";
 import { LinearCTA } from "./components/LinearCTA";
 import { PullRequestsContent } from "./components/PullRequestsContent";
 import { TableContent } from "./components/TableContent";
@@ -194,6 +197,21 @@ export function TasksView({
 		clearSelectionRef.current?.();
 	}, []);
 
+	const [selectedIssues, setSelectedIssues] = useState<SelectedIssue[]>([]);
+	const clearIssueSelectionRef = useRef<(() => void) | null>(null);
+
+	const handleIssueSelectionChange = useCallback(
+		(issues: SelectedIssue[], clearSelection: () => void) => {
+			setSelectedIssues(issues);
+			clearIssueSelectionRef.current = clearSelection;
+		},
+		[],
+	);
+
+	const handleClearIssueSelection = useCallback(() => {
+		clearIssueSelectionRef.current?.();
+	}, []);
+
 	const handleTaskClick = (task: TaskWithStatus) => {
 		navigate({
 			to: "/tasks/$taskId",
@@ -221,6 +239,8 @@ export function TasksView({
 					onAssigneeFilterChange={handleAssigneeFilterChange}
 					selectedTasks={selectedTasks}
 					onClearSelection={handleClearSelection}
+					selectedIssues={selectedIssues}
+					onClearIssueSelection={handleClearIssueSelection}
 					viewMode={viewMode}
 					onViewModeChange={setViewMode}
 					typeTab={typeTab}
@@ -261,6 +281,7 @@ export function TasksView({
 						<GitHubIssuesContent
 							projectFilter={projectFilter}
 							searchQuery={deferredSearchQuery}
+							onSelectionChange={handleIssueSelectionChange}
 						/>
 					)}
 				</div>
