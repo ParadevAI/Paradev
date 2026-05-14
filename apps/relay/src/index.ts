@@ -28,6 +28,13 @@ const redactingLogger = logger((message, ...rest) => {
 
 initSentry();
 
+process.on("uncaughtException", (err) => {
+	console.error("[relay] uncaughtException (suppressed)", err);
+});
+process.on("unhandledRejection", (reason) => {
+	console.error("[relay] unhandledRejection (suppressed)", reason);
+});
+
 type AppContext = {
 	Variables: {
 		auth: AuthContext;
@@ -42,6 +49,14 @@ const { injectWebSocket, upgradeWebSocket } = createNodeWebSocket({ app });
 
 app.use("*", redactingLogger);
 app.use("*", cors());
+
+app.onError((err, c) => {
+	captureSentryException(err, {
+		op: "hono.onError",
+		path: new URL(c.req.url).pathname,
+	});
+	return c.json({ error: "Internal server error" }, 500);
+});
 
 app.get("/health", (c) => c.json({ ok: true, region: env.FLY_REGION }));
 

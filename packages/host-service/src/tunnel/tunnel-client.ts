@@ -302,7 +302,14 @@ export class TunnelClient {
 
 	private cleanupChannels(): void {
 		for (const channel of this.localChannels.values()) {
-			channel.ws.close(1001, "Tunnel disconnected");
+			try {
+				channel.ws.close(1000, "Tunnel disconnected");
+			} catch (err) {
+				console.warn(
+					"[host-service:tunnel] error closing local channel ws",
+					err,
+				);
+			}
 		}
 		this.localChannels.clear();
 	}
