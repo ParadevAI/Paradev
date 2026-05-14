@@ -149,6 +149,7 @@ function V2WorkspaceContent() {
 
 	const {
 		openFilePane,
+		openFilePaneFromTreeClick,
 		revealPath,
 		selectedFilePath,
 		pendingReveal,
@@ -190,6 +191,17 @@ function V2WorkspaceContent() {
 			if (!next) closeQuickOpen();
 		},
 		[closeQuickOpen],
+	);
+	// Picking a file from Quick Open should surface the sidebar/Files tab so
+	// the reveal (expand + highlight + scroll) is actually visible. Tree
+	// clicks and other openFilePane callers already have the sidebar open.
+	const handleQuickOpenSelectFile = useCallback(
+		(filePath: string, openInNewTab?: boolean) => {
+			setRightSidebarOpen(true);
+			setRightSidebarTab("files");
+			openFilePane(filePath, openInNewTab);
+		},
+		[openFilePane, setRightSidebarOpen, setRightSidebarTab],
 	);
 	const defaultPaneActions = useDefaultPaneActions({ launcher });
 	const onBeforeCloseTab = useDirtyTabCloseGuard();
@@ -325,7 +337,7 @@ function V2WorkspaceContent() {
 					>
 						<WorkspaceSidebar
 							workspaceId={workspaceId}
-							onSelectFile={openFilePane}
+							onSelectFile={openFilePaneFromTreeClick}
 							onSelectDiffFile={openDiffPane}
 							onOpenComment={openCommentPane}
 							onSearch={handleQuickOpen}
@@ -339,7 +351,7 @@ function V2WorkspaceContent() {
 				workspaceId={workspaceId}
 				open={quickOpenOpen}
 				onOpenChange={handleQuickOpenChange}
-				onSelectFile={openFilePane}
+				onSelectFile={handleQuickOpenSelectFile}
 				variant="v2"
 				recentlyViewedFiles={recentFiles}
 				openFilePaths={openFilePaths}
