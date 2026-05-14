@@ -58,6 +58,13 @@ export const TEARDOWN_TIMEOUT_MS = 60_000;
 // PostHog
 export const POSTHOG_COOKIE_NAME = "superset";
 
+// Users whose account was created at or after this instant are v2-only:
+// the v1↔v2 surface switch is hidden and v2 cloud is forced on. Pre-cutoff
+// users keep the existing opt-in toggle. Stored as an ISO string so the
+// value is identical on server, desktop renderer, web, and admin.
+// 2026-05-15 14:00 UTC = Fri 07:00 PDT / 10:00 EDT.
+export const V2_ONLY_USER_CUTOFF = "2026-05-15T14:00:00.000Z";
+
 export const FEATURE_FLAGS = {
 	/** Gates access to experimental Electric SQL tasks feature. */
 	ELECTRIC_TASKS_ACCESS: "electric-tasks-access",
