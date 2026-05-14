@@ -38,8 +38,6 @@ interface SlackAppMentionEvent {
 	event_ts: string;
 	thread_ts?: string;
 	files?: SlackEventFile[];
-	user_team?: string;
-	team?: string;
 }
 
 interface ProcessMentionParams {
@@ -53,15 +51,9 @@ export async function processSlackMention({
 	teamId,
 	eventId,
 }: ProcessMentionParams): Promise<void> {
-	// In Slack Connect (shared) channels the envelope team_id is the team of the
-	// bot that received the event, which can be a different org than the user.
-	// Route by the user's home team so the user's own org's connection responds.
-	const userTeam = event.user_team ?? event.team ?? teamId;
-
 	console.log("[slack/process-mention] Processing mention:", {
 		eventId,
 		teamId,
-		userTeam,
 		channel: event.channel,
 		user: event.user,
 	});
@@ -69,7 +61,7 @@ export async function processSlackMention({
 	const connection = await db.query.integrationConnections.findFirst({
 		where: and(
 			eq(integrationConnections.provider, "slack"),
-			eq(integrationConnections.externalOrgId, userTeam),
+			eq(integrationConnections.externalOrgId, teamId),
 			isNull(integrationConnections.disconnectedAt),
 		),
 		orderBy: [
@@ -81,7 +73,7 @@ export async function processSlackMention({
 	if (!connection) {
 		console.error(
 			"[slack/process-mention] No connection found for team:",
-			userTeam,
+			teamId,
 		);
 		return;
 	}
@@ -93,7 +85,7 @@ export async function processSlackMention({
 			? db.query.usersSlackUsers.findFirst({
 					where: and(
 						eq(usersSlackUsers.slackUserId, event.user),
-						eq(usersSlackUsers.teamId, userTeam),
+						eq(usersSlackUsers.teamId, teamId),
 					),
 					columns: { userId: true, modelPreference: true },
 				})
@@ -158,7 +150,7 @@ export async function processSlackMention({
 		});
 		const connectUrl = generateConnectUrl({
 			slackUserId: event.user,
-			teamId: userTeam,
+			teamId,
 		});
 		await slack.chat.postMessage({
 			channel: event.channel,
