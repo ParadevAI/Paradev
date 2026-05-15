@@ -17,6 +17,9 @@ const result = await Bun.build({
 	outdir,
 	naming: "host-service.js",
 	format: "esm",
+	define: {
+		"process.env.NODE_ENV": JSON.stringify("production"),
+	},
 	external: [
 		"better-sqlite3",
 		"node-pty",
