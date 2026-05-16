@@ -24,3 +24,6 @@ fly scale count "app=$COUNT" \
 
 echo "==> Status"
 fly status --app "$APP"
+
+echo "==> Smoke test"
+"$(dirname "$0")/smoke-test.sh" "${APP}.fly.dev" "${REGIONS[@]}"
