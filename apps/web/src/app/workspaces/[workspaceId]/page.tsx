@@ -5,15 +5,23 @@ import Link from "next/link";
 import { use, useCallback, useEffect, useState } from "react";
 import { trpcClient } from "../../../trpc/client";
 import {
+	buildHostAgentLaunchCommand,
 	createHostTerminal,
+	type HostAgentConfig,
+	listHostAgentConfigs,
 	listHostTerminals,
 } from "../../../trpc/host-client";
 import { WebTerminal } from "./components/WebTerminal";
+import { WebTerminalPresetsBar } from "./components/WebTerminalPresetsBar";
 
 interface HostTerminal {
 	terminalId: string;
 	title: string | null;
 	exited: boolean;
+}
+
+function getErrorMessage(caught: unknown): string {
+	return caught instanceof Error ? caught.message : String(caught);
 }
 
 export default function WorkspaceTerminalPage({
@@ -24,11 +32,13 @@ export default function WorkspaceTerminalPage({
 	const { workspaceId } = use(params);
 	const [routingKey, setRoutingKey] = useState<string | null>(null);
 	const [terminals, setTerminals] = useState<HostTerminal[] | null>(null);
+	const [presets, setPresets] = useState<HostAgentConfig[] | null>(null);
 	const [selectedTerminalId, setSelectedTerminalId] = useState<string | null>(
 		null,
 	);
 	const [loadError, setLoadError] = useState<string | null>(null);
 	const [creating, setCreating] = useState(false);
+	const [runningPresetId, setRunningPresetId] = useState<string | null>(null);
 	const [viewportHeight, setViewportHeight] = useState<number | null>(null);
 
 	const loadTerminals = useCallback(
@@ -44,7 +54,7 @@ export default function WorkspaceTerminalPage({
 					})),
 				);
 			} catch (caught) {
-				setLoadError(caught instanceof Error ? caught.message : String(caught));
+				setLoadError(getErrorMessage(caught));
 				setTerminals([]);
 			}
 		},
@@ -58,6 +68,7 @@ export default function WorkspaceTerminalPage({
 				if (!organization) {
 					setLoadError("No active organization.");
 					setTerminals([]);
+					setPresets([]);
 					return;
 				}
 				const workspace = await trpcClient.v2Workspace.getFromHost.query({
@@ -67,35 +78,53 @@ export default function WorkspaceTerminalPage({
 				if (!workspace) {
 					setLoadError("Workspace not found.");
 					setTerminals([]);
+					setPresets([]);
 					return;
 				}
 				const key = buildHostRoutingKey(organization.id, workspace.hostId);
 				setRoutingKey(key);
-				await loadTerminals(key);
+				const [presetResult] = await Promise.allSettled([
+					listHostAgentConfigs(key),
+					loadTerminals(key),
+				]);
+				if (presetResult.status === "fulfilled") {
+					setPresets(presetResult.value);
+				} else {
+					setPresets([]);
+					setLoadError(getErrorMessage(presetResult.reason));
+				}
 			} catch (caught) {
-				setLoadError(caught instanceof Error ? caught.message : String(caught));
+				setLoadError(getErrorMessage(caught));
 				setTerminals([]);
+				setPresets([]);
 			}
 		})();
 	}, [workspaceId, loadTerminals]);
 
-	useEffect(() => {
-		if (selectedTerminalId || !terminals) return;
-		const first =
-			terminals.find((terminal) => !terminal.exited) ?? terminals[0];
-		if (first) setSelectedTerminalId(first.terminalId);
-	}, [terminals, selectedTerminalId]);
+	const activeTerminalId =
+		selectedTerminalId &&
+		terminals?.some((terminal) => terminal.terminalId === selectedTerminalId)
+			? selectedTerminalId
+			: (terminals?.find((terminal) => !terminal.exited)?.terminalId ??
+				terminals?.[0]?.terminalId ??
+				null);
 
 	useEffect(() => {
 		const visualViewport = window.visualViewport;
 		if (!visualViewport) return;
 		const update = () => setViewportHeight(visualViewport.height);
+		const scrollListenerOptions = { passive: true };
+		const visualViewportTarget = visualViewport as EventTarget;
 		update();
 		visualViewport.addEventListener("resize", update);
-		visualViewport.addEventListener("scroll", update);
+		visualViewportTarget.addEventListener(
+			"scroll",
+			update,
+			scrollListenerOptions,
+		);
 		return () => {
 			visualViewport.removeEventListener("resize", update);
-			visualViewport.removeEventListener("scroll", update);
+			visualViewportTarget.removeEventListener("scroll", update);
 		};
 	}, []);
 
@@ -107,11 +136,28 @@ export default function WorkspaceTerminalPage({
 			await loadTerminals(routingKey);
 			setSelectedTerminalId(created.terminalId);
 		} catch (caught) {
-			setLoadError(caught instanceof Error ? caught.message : String(caught));
-		} finally {
-			setCreating(false);
+			setLoadError(getErrorMessage(caught));
 		}
+		setCreating(false);
 	}, [routingKey, workspaceId, loadTerminals]);
+
+	const runPreset = useCallback(
+		async (preset: HostAgentConfig) => {
+			if (!routingKey) return;
+			setRunningPresetId(preset.id);
+			try {
+				const created = await createHostTerminal(routingKey, workspaceId, {
+					initialCommand: buildHostAgentLaunchCommand(preset),
+				});
+				await loadTerminals(routingKey);
+				setSelectedTerminalId(created.terminalId);
+			} catch (caught) {
+				setLoadError(getErrorMessage(caught));
+			}
+			setRunningPresetId(null);
+		},
+		[routingKey, workspaceId, loadTerminals],
+	);
 
 	return (
 		<div
@@ -129,7 +175,7 @@ export default function WorkspaceTerminalPage({
 					← Workspaces
 				</Link>
 				<select
-					value={selectedTerminalId ?? ""}
+					value={activeTerminalId ?? ""}
 					onChange={(event) =>
 						setSelectedTerminalId(event.target.value || null)
 					}
@@ -169,12 +215,18 @@ export default function WorkspaceTerminalPage({
 					{loadError}
 				</div>
 			)}
+			<WebTerminalPresetsBar
+				presets={presets}
+				runningPresetId={runningPresetId}
+				disabled={!routingKey}
+				onRunPreset={(preset) => void runPreset(preset)}
+			/>
 			<div className="relative flex-1 overflow-hidden">
-				{selectedTerminalId && routingKey ? (
+				{activeTerminalId && routingKey ? (
 					<WebTerminal
-						key={selectedTerminalId}
+						key={activeTerminalId}
 						workspaceId={workspaceId}
-						terminalId={selectedTerminalId}
+						terminalId={activeTerminalId}
 						routingKey={routingKey}
 					/>
 				) : (

@@ -15,6 +15,22 @@ export interface HostTerminalSession {
 	title: string | null;
 }
 
+export interface HostAgentConfig {
+	id: string;
+	presetId: string;
+	label: string;
+	command: string;
+	args: string[];
+	promptTransport: "argv" | "stdin";
+	promptArgs: string[];
+	env: Record<string, string>;
+	order: number;
+}
+
+interface CreateHostTerminalOptions {
+	initialCommand?: string;
+}
+
 async function hostCall<TOutput>(
 	routingKey: string,
 	procedure: string,
@@ -22,10 +38,10 @@ async function hostCall<TOutput>(
 	method: "GET" | "POST",
 ): Promise<TOutput> {
 	const token = await getAuthToken();
-	const encoded = SuperJSON.serialize(input);
 	const base = `${getRelayUrl()}/hosts/${routingKey}/trpc/${procedure}`;
+	const encoded = input === undefined ? undefined : SuperJSON.serialize(input);
 	const url =
-		method === "GET"
+		method === "GET" && encoded !== undefined
 			? `${base}?input=${encodeURIComponent(JSON.stringify(encoded))}`
 			: base;
 
@@ -35,7 +51,10 @@ async function hostCall<TOutput>(
 			authorization: `Bearer ${token}`,
 			...(method === "POST" ? { "content-type": "application/json" } : {}),
 		},
-		body: method === "POST" ? JSON.stringify(encoded) : undefined,
+		body:
+			method === "POST" && encoded !== undefined
+				? JSON.stringify(encoded)
+				: undefined,
 	});
 	if (!response.ok) {
 		throw new Error(`host ${procedure} failed (${response.status})`);
@@ -57,11 +76,54 @@ export function listHostTerminals(routingKey: string, workspaceId: string) {
 	);
 }
 
-export function createHostTerminal(routingKey: string, workspaceId: string) {
+export function createHostTerminal(
+	routingKey: string,
+	workspaceId: string,
+	options: CreateHostTerminalOptions = {},
+) {
+	const input =
+		options.initialCommand === undefined
+			? { workspaceId }
+			: { workspaceId, initialCommand: options.initialCommand };
 	return hostCall<{ terminalId: string; status: string }>(
 		routingKey,
 		"terminal.createSession",
-		{ workspaceId },
+		input,
 		"POST",
 	);
+}
+
+export function listHostAgentConfigs(routingKey: string) {
+	return hostCall<HostAgentConfig[]>(
+		routingKey,
+		"settings.agentConfigs.list",
+		undefined,
+		"GET",
+	);
+}
+
+function quoteSingleShell(value: string): string {
+	return `'${value.replaceAll("'", "'\\''")}'`;
+}
+
+function buildArgvCommand(argv: string[]): string {
+	return argv.map(quoteSingleShell).join(" ");
+}
+
+function envOverlayPrefix(env: Record<string, string>): string {
+	const assignments = Object.entries(env).map(
+		([key, value]) => `${key}=${quoteSingleShell(value)}`,
+	);
+	return assignments.length > 0 ? `${assignments.join(" ")} ` : "";
+}
+
+export function buildHostAgentLaunchCommand(config: {
+	command: string;
+	args: string[];
+	env: Record<string, string>;
+}) {
+	return `${envOverlayPrefix(config.env)}${buildArgvCommand([
+		config.command,
+		...config.args,
+	])}`;
 }
