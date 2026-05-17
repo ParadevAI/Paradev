@@ -55,6 +55,11 @@ export function useFolderFirstImport(options?: {
 		try {
 			const response = await client.project.findByPath.query({ repoPath });
 			candidates = response.candidates;
+			if (candidates.length === 0 && response.cloudErrors.length > 0) {
+				const first = response.cloudErrors[0];
+				onError?.(`Couldn't reach cloud for ${first.url}: ${first.message}`);
+				return null;
+			}
 		} catch (err) {
 			onError?.(err instanceof Error ? err.message : String(err));
 			return null;
