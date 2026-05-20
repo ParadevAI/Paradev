@@ -2,40 +2,32 @@
 
 import { ContactInquiryEmail } from "@superset/email/emails/contact-inquiry";
 import { Resend } from "resend";
+import { z } from "zod";
 import { env } from "@/env";
+import { checkEmailFormRateLimit } from "@/lib/email-rate-limit";
+import {
+	sanitizeMessage,
+	sanitizeSingleLine,
+	validateEmail,
+} from "@/lib/form-utils";
 
 const resend = new Resend(env.RESEND_API_KEY);
 
-interface ContactFormData {
-	name: string;
-	email: string;
-	topic: string;
-	message: string;
-	honeypot?: string;
-}
+const contactFormDataSchema = z.object({
+	name: z.string(),
+	email: z.string(),
+	topic: z.string().optional().default(""),
+	message: z.string(),
+	honeypot: z.string().optional(),
+});
 
-function validateEmail(email: string): boolean {
-	const parts = email.split("@");
-	return (
-		parts.length === 2 &&
-		parts[0] !== undefined &&
-		parts[0].length > 0 &&
-		parts[1] !== undefined &&
-		parts[1].length > 0 &&
-		parts[1].includes(".")
-	);
-}
+export async function submitContactInquiry(data: unknown) {
+	const parsedData = contactFormDataSchema.safeParse(data);
+	if (!parsedData.success) {
+		return { success: false, error: "Invalid input detected." };
+	}
 
-function sanitizeSingleLine(input: string): string {
-	return input.replace(/[\r\n\0]/g, "").trim();
-}
-
-function sanitizeMessage(input: string): string {
-	return input.replace(/\0/g, "").trim();
-}
-
-export async function submitContactInquiry(data: ContactFormData) {
-	const { name, email, topic, message, honeypot } = data;
+	const { name, email, topic, message, honeypot } = parsedData.data;
 
 	if (honeypot && honeypot.length > 0) {
 		return { success: false, error: "Something went wrong. Please try again." };
@@ -47,7 +39,7 @@ export async function submitContactInquiry(data: ContactFormData) {
 
 	const sanitizedName = sanitizeSingleLine(name);
 	const sanitizedEmail = sanitizeSingleLine(email);
-	const sanitizedTopic = topic ? sanitizeSingleLine(topic) : "General question";
+	const sanitizedTopic = sanitizeSingleLine(topic) || "General question";
 	const sanitizedMessage = sanitizeMessage(message);
 
 	if (!sanitizedName || !sanitizedEmail || !sanitizedMessage) {
@@ -59,6 +51,13 @@ export async function submitContactInquiry(data: ContactFormData) {
 	}
 
 	try {
+		if (!(await checkEmailFormRateLimit(sanitizedEmail))) {
+			return {
+				success: false,
+				error: "Too many messages. Please try again later.",
+			};
+		}
+
 		const { error } = await resend.emails.send({
 			from: "Superset <noreply@superset.sh>",
 			to: "founders@superset.sh",

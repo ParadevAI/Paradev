@@ -75,14 +75,14 @@ export function Footer({ showSocial = true }: FooterProps) {
 			{/* Legal Links */}
 			<Text className="text-muted text-xs leading-none m-0 mb-4">
 				<Link
-					href="https://superset.sh/privacy"
+					href={`${env.NEXT_PUBLIC_MARKETING_URL}/privacy`}
 					className="text-muted no-underline"
 				>
 					Privacy
 				</Link>
 				{" • "}
 				<Link
-					href="https://superset.sh/terms"
+					href={`${env.NEXT_PUBLIC_MARKETING_URL}/terms`}
 					className="text-muted no-underline"
 				>
 					Terms
