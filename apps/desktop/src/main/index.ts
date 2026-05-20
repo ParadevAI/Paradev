@@ -176,14 +176,14 @@ export function quitApp(): void {
 	app.quit();
 }
 
-/** Nuclear quit: also kills host-service(s) and pty-daemon/terminal-host. */
+/** Quit + also tear down the v1 terminal-host client. Tray "Quit Completely". */
 export function quitAppCompletely(): void {
 	forceFullCleanup = true;
 	setSkipQuitConfirmation();
 	app.quit();
 }
 
-/** Bypasses before-quit — services are left running for re-adoption on next launch. */
+/** Bypasses before-quit. Host-service children self-exit via the parent watchdog. */
 export function exitImmediately(): void {
 	app.exit(0);
 }
@@ -224,11 +224,9 @@ app.on("before-quit", async (event) => {
 
 	isQuitting = true;
 	try {
+		getHostServiceCoordinator().stopAll();
 		if (isDev || forceFullCleanup || isUpdateReadyToInstall()) {
-			await runFullQuitCleanup();
-		} else {
-			// Prod: leave services running so the next launch re-adopts via manifest.
-			getHostServiceCoordinator().releaseAll();
+			await teardownTerminalHost();
 		}
 		shutdownTanstackDbPersistence();
 		disposeTray();
@@ -241,13 +239,10 @@ app.on("before-quit", async (event) => {
 });
 
 /**
- * Full cleanup — kill host-service + terminal-host children. Used in dev, on
- * update installs, and on the tray's "Quit Superset Completely" path in prod.
+ * Tear down the v1 terminal-host client. Skipped on regular quit so v1
+ * PTY sessions reattach via socket on next launch.
  */
-async function runFullQuitCleanup(): Promise<void> {
-	const coordinator = getHostServiceCoordinator();
-	await coordinator.teardownKnownManifests();
-	coordinator.stopAll();
+async function teardownTerminalHost(): Promise<void> {
 	try {
 		await getTerminalHostClient().shutdownIfRunning({ killSessions: true });
 	} catch (err) {
@@ -273,8 +268,9 @@ if (process.env.NODE_ENV === "development") {
 		if (signalHandled) return;
 		signalHandled = true;
 		console.log(`[main] Received ${signal}, quitting...`);
+		getHostServiceCoordinator().stopAll();
 		void Promise.allSettled([
-			runFullQuitCleanup(),
+			teardownTerminalHost(),
 			stopNetworkLogger(),
 		]).finally(() => app.exit(0));
 	};
@@ -417,10 +413,6 @@ if (!gotTheLock) {
 		} catch (error) {
 			console.error("[main] Failed to install bundled CLI shim:", error);
 		}
-
-		// Discover and adopt host-services that survived a previous quit
-		// before the tray initializes, so it shows accurate status immediately.
-		await getHostServiceCoordinator().discoverAll();
 
 		if (IS_DEV) {
 			getHostServiceCoordinator().enableDevReload(async () => {
