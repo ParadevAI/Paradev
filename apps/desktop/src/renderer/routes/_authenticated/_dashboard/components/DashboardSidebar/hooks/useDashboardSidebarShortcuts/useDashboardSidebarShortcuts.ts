@@ -3,7 +3,6 @@ import { useCallback, useMemo, useRef } from "react";
 import { useHotkey } from "renderer/hotkeys";
 import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
-import { useDeletingWorkspaces } from "renderer/routes/_authenticated/providers/DeletingWorkspacesProvider";
 import type { DashboardSidebarProject } from "../../types";
 import { getProjectChildrenWorkspaces } from "../../utils/projectChildren";
 
@@ -54,13 +53,12 @@ export function useDashboardSidebarShortcuts(
 	const navigate = useNavigate();
 	const { toggleProjectCollapsed, toggleSectionCollapsed } =
 		useDashboardSidebarState();
-	const { isDeleting } = useDeletingWorkspaces();
 	const flattenedWorkspaces = useMemo(
 		() =>
 			groups
 				.flatMap((project) => getProjectChildrenWorkspaces(project.children))
-				.filter((workspace) => workspace.isSynced && !isDeleting(workspace.id)),
-		[groups, isDeleting],
+				.filter((workspace) => !workspace.creationStatus),
+		[groups],
 	);
 	const workspaceShortcutLabels =
 		useStableWorkspaceShortcutLabels(flattenedWorkspaces);

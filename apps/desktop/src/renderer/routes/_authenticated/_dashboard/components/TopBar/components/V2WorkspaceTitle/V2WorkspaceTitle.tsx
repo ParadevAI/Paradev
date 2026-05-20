@@ -3,6 +3,7 @@ import { eq } from "@tanstack/db";
 import { useLiveQuery } from "@tanstack/react-db";
 import { ChevronRight, GitBranch } from "lucide-react";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
+import { useWorkspaceCreatesStore } from "renderer/stores/workspace-creates";
 
 interface V2WorkspaceTitleProps {
 	workspaceId: string;
@@ -21,9 +22,20 @@ export function V2WorkspaceTitle({ workspaceId }: V2WorkspaceTitleProps) {
 				})),
 		[collections, workspaceId],
 	);
-	const workspace = workspaces[0] ?? null;
-	const name = workspace?.name ?? null;
-	const branch = workspace?.branch ?? null;
+	const syncedWorkspace = workspaces[0] ?? null;
+	const inFlight = useWorkspaceCreatesStore((store) =>
+		store.entries.find((entry) => entry.snapshot.id === workspaceId),
+	);
+	const name =
+		syncedWorkspace?.name ??
+		inFlight?.cloudRow?.name ??
+		inFlight?.snapshot.name ??
+		null;
+	const branch =
+		syncedWorkspace?.branch ??
+		inFlight?.cloudRow?.branch ??
+		inFlight?.snapshot.branch ??
+		null;
 
 	if (!name && !branch) {
 		return null;

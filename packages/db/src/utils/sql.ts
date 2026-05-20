@@ -22,16 +22,15 @@ export async function getCurrentTxid(
 	tx: PgTransaction<any, any, any>,
 ): Promise<number> {
 	const result = await tx.execute<{ txid: string }>(
-		sql`SELECT pg_current_xact_id()::xid::text as txid`,
+		sql`SELECT pg_current_xact_id()::text as txid`,
 	);
 
-	const raw = result.rows[0]?.txid;
-	const txid = raw === undefined ? Number.NaN : Number.parseInt(raw, 10);
-	if (!Number.isSafeInteger(txid)) {
-		throw new Error(`Failed to get valid Electric txid: ${raw}`);
+	const txid = result.rows[0]?.txid;
+	if (!txid) {
+		throw new Error("Failed to get current transaction ID");
 	}
 
-	return txid;
+	return Number.parseInt(txid, 10);
 }
 
 export async function withConnectionLock<T>(

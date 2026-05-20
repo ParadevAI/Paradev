@@ -70,10 +70,11 @@ export function useBranchPickerController(args: UseBranchPickerControllerArgs) {
 	);
 
 	// Server's `workspaces.create` resolves all three cases (open tracked,
-	// adopt foreign worktree, fresh create). Navigate to the optimistic id;
-	// a failed create surfaces on the workspace route's error state.
+	// adopt foreign worktree, fresh create). Await + navigate to the canonical
+	// id — the existing-row and adoption paths can return an id different from
+	// the optimistic snapshot id, which would otherwise 404.
 	const onOpenWorkspace = useCallback(
-		(target: OpenWorkspaceTarget) => {
+		async (target: OpenWorkspaceTarget) => {
 			if (!projectId) {
 				toast.error("Select a project first");
 				return;
@@ -86,7 +87,7 @@ export function useBranchPickerController(args: UseBranchPickerControllerArgs) {
 			const snapshotId = crypto.randomUUID();
 			const workspaceName = resolveActionWorkspaceName(branchName);
 			closeModal();
-			const { workspaceId, completed } = submit({
+			const result = await submit({
 				hostId: resolvedHostId,
 				snapshot: {
 					id: snapshotId,
@@ -96,19 +97,16 @@ export function useBranchPickerController(args: UseBranchPickerControllerArgs) {
 					...(target.worktreePath ? { worktreePath: target.worktreePath } : {}),
 				},
 			});
-			void navigate({
-				to: "/v2-workspace/$workspaceId",
-				params: { workspaceId },
-			});
-			void completed.then((outcome) => {
-				if (outcome.ok && outcome.workspaceId !== workspaceId) {
-					void navigate({
-						to: "/v2-workspace/$workspaceId",
-						params: { workspaceId: outcome.workspaceId },
-						replace: true,
-					});
-				}
-			});
+			if (result.ok) {
+				void navigate({
+					to: "/v2-workspace/$workspaceId",
+					params: { workspaceId: result.workspaceId },
+				});
+			} else {
+				// `submit` records the failure for the in-flight tracker but
+				// doesn't toast; surface it here so the closed modal isn't silent.
+				toast.error(result.error || "Failed to open workspace");
+			}
 		},
 		[
 			projectId,

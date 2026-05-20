@@ -117,11 +117,6 @@ type CloudWorkspace = NonNullable<
 	>
 >;
 
-function extractCreateTxid(row: CloudWorkspace): number | null {
-	const txid = (row as { txid?: unknown }).txid;
-	return typeof txid === "number" ? txid : null;
-}
-
 async function findExistingWorkspaceByBranch(
 	ctx: HostServiceContext,
 	projectId: string,
@@ -1037,7 +1032,6 @@ export const workspacesRouter = router({
 				agents: agentsResult,
 				alreadyExists,
 				warnings,
-				txid: extractCreateTxid(workspaceRow),
 			};
 		}),
 

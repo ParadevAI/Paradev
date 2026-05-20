@@ -4,6 +4,7 @@ import {
 	type ComponentPropsWithoutRef,
 	forwardRef,
 	useEffect,
+	useMemo,
 	useRef,
 } from "react";
 import { HiMiniMinus, HiMiniXMark } from "react-icons/hi2";
@@ -16,6 +17,7 @@ import type {
 	DashboardSidebarWorkspace,
 	DashboardSidebarWorkspacePullRequest,
 } from "../../../../types";
+import { getCreationStatusText } from "../../utils/getCreationStatusText";
 import { DashboardSidebarWorkspaceDiffStats } from "../DashboardSidebarWorkspaceDiffStats";
 import { DashboardSidebarWorkspaceIcon } from "../DashboardSidebarWorkspaceIcon";
 
@@ -81,9 +83,8 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 			name,
 			branch,
 			pullRequest,
-			isSynced,
+			creationStatus,
 		} = workspace;
-		const isPending = !isSynced;
 		const showsStandaloneActiveStripe = accentColor == null;
 		const localRef = useRef<HTMLDivElement>(null);
 		const openUrl = electronTrpc.external.openUrl.useMutation();
@@ -97,7 +98,10 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 			}
 		}, [isActive]);
 
-		const creationStatusText = isPending ? "Creating…" : null;
+		const creationStatusText = useMemo(
+			() => getCreationStatusText(creationStatus),
+			[creationStatus],
+		);
 		const isMainWorkspace = workspace.type === "main";
 		const workspaceKindTitle = isMainWorkspace
 			? "Main workspace"
@@ -111,7 +115,7 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 			<div
 				role={onClick ? "button" : undefined}
 				tabIndex={onClick ? 0 : undefined}
-				aria-disabled={isPending ? true : undefined}
+				aria-disabled={creationStatus ? true : undefined}
 				ref={(node) => {
 					localRef.current = node;
 					if (typeof ref === "function") ref(node);
@@ -170,7 +174,7 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 									isActive={isActive}
 									variant="expanded"
 									workspaceStatus={workspaceStatus}
-									isSynced={isSynced}
+									creationStatus={creationStatus}
 									pullRequestState={pullRequest.state}
 								/>
 							</button>
@@ -183,7 +187,7 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 									isActive={isActive}
 									variant="expanded"
 									workspaceStatus={workspaceStatus}
-									isSynced={isSynced}
+									creationStatus={creationStatus}
 									pullRequestState={null}
 								/>
 							</div>
@@ -252,7 +256,14 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 
 					<div className="col-start-2 row-start-1 grid h-5 shrink-0 items-center justify-items-end [&>*]:col-start-1 [&>*]:row-start-1">
 						{creationStatusText ? (
-							<span className="text-[11px] text-muted-foreground">
+							<span
+								className={cn(
+									"text-[11px]",
+									creationStatus === "failed"
+										? "text-destructive group-hover:hidden"
+										: "text-muted-foreground",
+								)}
+							>
 								{creationStatusText}
 							</span>
 						) : (
@@ -265,9 +276,9 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 								/>
 							)
 						)}
-						{isSynced && (
+						{(!creationStatus || creationStatus === "failed") && (
 							<div className="hidden items-center justify-end gap-1.5 group-hover:flex">
-								{shortcutLabel && (
+								{shortcutLabel && !creationStatus && (
 									<span className="shrink-0 font-mono text-[10px] tabular-nums text-muted-foreground">
 										{shortcutLabel}
 									</span>
@@ -319,16 +330,24 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 													}
 												}}
 												className="flex items-center justify-center text-muted-foreground hover:text-foreground"
-												aria-label="Close workspace"
+												aria-label={
+													creationStatus === "failed"
+														? "Dismiss"
+														: "Close workspace"
+												}
 											>
 												<HiMiniXMark className="size-3.5" />
 											</button>
 										</TooltipTrigger>
 										<TooltipContent side="top" sideOffset={4}>
-											<HotkeyLabel
-												label="Close workspace"
-												id={isActive ? "CLOSE_WORKSPACE" : undefined}
-											/>
+											{creationStatus === "failed" ? (
+												"Dismiss"
+											) : (
+												<HotkeyLabel
+													label="Close workspace"
+													id={isActive ? "CLOSE_WORKSPACE" : undefined}
+												/>
+											)}
 										</TooltipContent>
 									</Tooltip>
 								)}

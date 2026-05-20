@@ -247,7 +247,7 @@ export function OpenInWorkspaceV2({ task }: OpenInWorkspaceV2Props) {
 			params: { workspaceId: snapshotId },
 		});
 
-		const { completed } = submit({
+		const promise = submit({
 			hostId,
 			snapshot: {
 				id: snapshotId,
@@ -257,17 +257,34 @@ export function OpenInWorkspaceV2({ task }: OpenInWorkspaceV2Props) {
 				taskId: task.id,
 				agents,
 			},
-		});
-
-		void completed.then((outcome) => {
-			if (!outcome.ok) return;
-			if (outcome.workspaceId !== snapshotId) {
+		}).then((result) => {
+			if (!result.ok) {
+				// We optimistically navigated to the snapshot URL — bounce back to
+				// the task on failure so the user isn't stranded on a dead route.
+				void navigate({
+					to: "/tasks/$taskId",
+					params: { taskId: task.id },
+					replace: true,
+				});
+				throw new Error(result.error);
+			}
+			if (result.workspaceId !== snapshotId) {
 				void navigate({
 					to: "/v2-workspace/$workspaceId",
-					params: { workspaceId: outcome.workspaceId },
+					params: { workspaceId: result.workspaceId },
 					replace: true,
 				});
 			}
+			return result;
+		});
+
+		toast.promise(promise, {
+			loading: "Creating workspace...",
+			success: (result) =>
+				result.alreadyExists
+					? "Opened existing workspace"
+					: "Workspace created",
+			error: (err) => (err instanceof Error ? err.message : String(err)),
 		});
 	};
 

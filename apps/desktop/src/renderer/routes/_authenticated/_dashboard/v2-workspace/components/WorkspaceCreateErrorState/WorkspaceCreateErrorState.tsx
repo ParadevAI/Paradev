@@ -1,44 +1,26 @@
 import { Button } from "@superset/ui/button";
 import { useNavigate } from "@tanstack/react-router";
 import { AlertCircle, GitBranch } from "lucide-react";
-import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
-import type { FailedWorkspaceCreateRow } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
 import { useWorkspaceCreates } from "renderer/stores/workspace-creates";
 
 interface WorkspaceCreateErrorStateProps {
-	entry: FailedWorkspaceCreateRow;
+	workspaceId: string;
+	name?: string;
+	branch?: string;
+	error: string;
 }
 
 export function WorkspaceCreateErrorState({
-	entry,
+	workspaceId,
+	name,
+	branch,
+	error,
 }: WorkspaceCreateErrorStateProps) {
 	const navigate = useNavigate();
-	const collections = useCollections();
-	const { submit } = useWorkspaceCreates();
-
-	const name = entry.input.name;
-	const branch = entry.input.branch;
-
-	const handleRetry = () => {
-		const { workspaceId, completed } = submit({
-			hostId: entry.hostId,
-			snapshot: entry.input,
-		});
-		void completed.then((outcome) => {
-			if (outcome.ok && outcome.workspaceId !== workspaceId) {
-				void navigate({
-					to: "/v2-workspace/$workspaceId",
-					params: { workspaceId: outcome.workspaceId },
-					replace: true,
-				});
-			}
-		});
-	};
+	const { retry, dismiss } = useWorkspaceCreates();
 
 	const handleDismiss = () => {
-		if (collections.failedWorkspaceCreates.get(entry.id)) {
-			collections.failedWorkspaceCreates.delete(entry.id);
-		}
+		dismiss(workspaceId);
 		void navigate({ to: "/v2-workspaces" });
 	};
 
@@ -79,12 +61,12 @@ export function WorkspaceCreateErrorState({
 
 				<div className="w-full rounded-md border border-destructive/20 bg-destructive/[0.04] px-3 py-2.5">
 					<p className="select-text font-mono text-[11px] leading-relaxed text-destructive/90 break-words whitespace-pre-wrap cursor-text">
-						{entry.error}
+						{error}
 					</p>
 				</div>
 
 				<div className="flex items-center gap-2">
-					<Button size="sm" onClick={handleRetry}>
+					<Button size="sm" onClick={() => void retry(workspaceId)}>
 						Try again
 					</Button>
 					<Button size="sm" variant="ghost" onClick={handleDismiss}>
