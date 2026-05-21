@@ -574,7 +574,6 @@ export const workspacesRouter = router({
 			let worktreePath: string;
 			let alreadyExists = false;
 			let workspaceRow: CloudWorkspace;
-			const warnings: string[] = [];
 
 			if (input.pr !== undefined) {
 				const releaseCreateLock = await acquireWorkspaceCreateLock(
@@ -614,7 +613,6 @@ export const workspacesRouter = router({
 						) => {
 							if (materialized.warning) {
 								console.warn(`[workspaces.create] ${materialized.warning}`);
-								warnings.push(materialized.warning);
 							}
 						};
 						const normalizeExistingPrBranch = async () => {
@@ -1015,7 +1013,6 @@ export const workspacesRouter = router({
 				});
 				if (warning) {
 					console.warn(`[workspaces.create] setup warning: ${warning}`);
-					warnings.push(warning);
 				}
 				if (terminal) {
 					terminalsResult.push({
@@ -1036,7 +1033,6 @@ export const workspacesRouter = router({
 				terminals: terminalsResult,
 				agents: agentsResult,
 				alreadyExists,
-				warnings,
 				txid: extractCreateTxid(workspaceRow),
 			};
 		}),
