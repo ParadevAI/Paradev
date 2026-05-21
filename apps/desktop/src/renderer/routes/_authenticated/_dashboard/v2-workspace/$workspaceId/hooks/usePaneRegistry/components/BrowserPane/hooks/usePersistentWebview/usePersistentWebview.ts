@@ -80,9 +80,27 @@ export function usePersistentWebview({
 					},
 				},
 			);
+		const closePaneSub = electronTrpcClient.browser.onClosePane.subscribe(
+			{ paneId },
+			{
+				onData: () => {
+					ctxRef.current.actions.close();
+				},
+			},
+		);
+		const reloadPaneSub = electronTrpcClient.browser.onReloadPane.subscribe(
+			{ paneId },
+			{
+				onData: () => {
+					browserRuntimeRegistry.reload(paneId);
+				},
+			},
+		);
 		return () => {
 			newWindowSub.unsubscribe();
 			contextMenuSub.unsubscribe();
+			closePaneSub.unsubscribe();
+			reloadPaneSub.unsubscribe();
 		};
 	}, [paneId]);
 
