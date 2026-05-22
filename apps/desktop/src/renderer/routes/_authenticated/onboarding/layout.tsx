@@ -35,7 +35,6 @@ const STEPS = [
 function OnboardingFlowLayout() {
 	const { data: session, isPending } = authClient.useSession();
 	const { data: platform } = electronTrpc.window.getPlatform.useQuery();
-	const { data: ghStatus } = electronTrpc.system.detectGhCli.useQuery();
 	const isMac = platform === undefined || platform === "darwin";
 	const chatClient = useMemo(() => createChatServiceIpcClient(), []);
 	const location = useLocation();
@@ -51,11 +50,6 @@ function OnboardingFlowLayout() {
 	const isFirstStep = currentStepIdx === 0;
 	const currentStep = isOnMainStep ? STEPS[currentStepIdx] : null;
 
-	// Step 1 requires GitHub CLI installed + authenticated before continuing.
-	// Shares the query cache with the dashboard page, so rechecks update both.
-	const ghReady =
-		ghStatus?.installed === true && ghStatus.authenticated === true;
-
 	const handleBack = () => {
 		if (currentStepIdx <= 0) return;
 		const target = STEPS[currentStepIdx - 1];
@@ -68,7 +62,6 @@ function OnboardingFlowLayout() {
 	const handleContinue = isFirstStep
 		? () => navigate({ to: "/onboarding/project" })
 		: null;
-	const continueDisabled = isFirstStep && !ghReady;
 
 	return (
 		<ChatServiceProvider client={chatClient} queryClient={electronQueryClient}>
@@ -100,7 +93,6 @@ function OnboardingFlowLayout() {
 						totalSteps={STEPS.length}
 						onBack={isFirstStep ? null : handleBack}
 						onContinue={handleContinue}
-						continueDisabled={continueDisabled}
 						continueLabel="Continue"
 					/>
 				)}
