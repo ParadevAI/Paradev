@@ -15,6 +15,7 @@ import {
 	getPresetProjectTargetLabel,
 	type PresetProjectOption,
 } from "../PresetsSection/preset-project-options";
+import { getPresetModeLabel } from "./PresetRow.utils";
 
 interface PresetWithAgent extends TerminalPreset {
 	agentId?: string;
@@ -99,18 +100,7 @@ export function PresetRow({
 	const isNewTab = !!preset.applyOnNewTab;
 	const isVisibleInBar = preset.pinnedToBar !== false;
 	const modeValue = normalizeExecutionMode(preset.executionMode);
-	const modeLabel =
-		modeValue === "new-tab"
-			? commands.length > 1
-				? "Tab per command"
-				: "New tab"
-			: modeValue === "new-tab-split-pane"
-				? commands.length > 1
-					? "New tab + panes"
-					: "New tab"
-				: commands.length > 1
-					? "Single tab + panes"
-					: "Split pane";
+	const modeLabel = getPresetModeLabel(modeValue, commands.length);
 	const firstCommand =
 		commands.find((cmd) => cmd.trim().length > 0)?.trim() ?? "Empty command";
 	const commandSummary =
