@@ -7,37 +7,52 @@ import { CodeView, type CodeViewHandle } from "@pierre/diffs/react";
 import type { RendererContext } from "@superset/panes";
 import { useCallback, useMemo, useRef } from "react";
 import type { DiffPaneData, PaneViewerData } from "../../../../types";
-import { useChangeset } from "../../../useChangeset";
+import { type ChangesetFile, useChangeset } from "../../../useChangeset";
 import { useOpenInExternalEditor } from "../../../useOpenInExternalEditor";
 import { useSidebarDiffRef } from "../../../useSidebarDiffRef";
 import { useViewedFiles } from "../../../useViewedFiles";
+import { AgentCommentComposer } from "./components/AgentCommentComposer";
 import { CommentThread } from "./components/CommentThread";
 import { DiffHeaderMetadata } from "./components/DiffHeaderMetadata";
 import { DiffHeaderPrefix } from "./components/DiffHeaderPrefix";
 import {
-	type DiffCommentThread,
+	type DiffAnnotationMetadata,
 	useDiffAnnotationsByPath,
 } from "./hooks/useDiffAnnotations";
 import { useDiffCodeViewItems } from "./hooks/useDiffCodeViewItems";
 import { useDiffCodeViewScroll } from "./hooks/useDiffCodeViewScroll";
 import { useDiffCodeViewTheme } from "./hooks/useDiffCodeViewTheme";
+import { useDiffCommentComposer } from "./hooks/useDiffCommentComposer";
+
+interface CreateNewAgentSessionInput {
+	configId: string;
+	placement: "split-pane" | "new-tab";
+	prompt: string;
+}
 
 interface DiffPaneProps {
 	context: RendererContext<PaneViewerData>;
 	workspaceId: string;
 	onOpenFile: (path: string, openInNewTab?: boolean) => void;
+	onCreateNewAgentSession?: (
+		input: CreateNewAgentSessionInput,
+	) => Promise<{ terminalId: string } | null>;
 }
 
-export function DiffPane({ context, workspaceId, onOpenFile }: DiffPaneProps) {
+export function DiffPane({
+	context,
+	workspaceId,
+	onOpenFile,
+	onCreateNewAgentSession,
+}: DiffPaneProps) {
 	const data = context.pane.data as DiffPaneData;
-	const codeViewRef = useRef<CodeViewHandle<DiffCommentThread>>(null);
+	const codeViewRef = useRef<CodeViewHandle<DiffAnnotationMetadata>>(null);
 
 	const ref = useSidebarDiffRef(workspaceId);
 	const { files, isLoading } = useChangeset({ workspaceId, ref });
 	const { viewedSet, setViewed } = useViewedFiles(workspaceId);
 	const openInExternalEditor = useOpenInExternalEditor(workspaceId);
-	const annotationsByPath = useDiffAnnotationsByPath({ workspaceId });
-	const { options, style } = useDiffCodeViewTheme();
+	const threadAnnotationsByPath = useDiffAnnotationsByPath({ workspaceId });
 
 	const collapsedSet = useMemo(
 		() => new Set(data.collapsedFiles ?? []),
@@ -61,13 +76,38 @@ export function DiffPane({ context, workspaceId, onOpenFile }: DiffPaneProps) {
 		[updateData],
 	);
 
+	// fileByItemId is produced by useDiffCodeViewItems below, but the composer
+	// hook needs access to look files up at submit time. Funnel through a
+	// stable ref so the composer hook can be wired before items are computed
+	// and still read the latest map when its submit callback fires.
+	const fileByItemIdRef = useRef<ReadonlyMap<string, ChangesetFile>>(new Map());
+	const getFile = useCallback(
+		(itemId: string) => fileByItemIdRef.current.get(itemId),
+		[],
+	);
+
+	const {
+		composerAnnotationsByItemId,
+		onSelectedLinesChange,
+		onGutterUtilityClick,
+		clear: clearComposer,
+		submit: submitComposer,
+	} = useDiffCommentComposer({
+		workspaceId,
+		codeViewRef,
+		getFile,
+		onCreateNewAgentSession,
+	});
+
 	const { items, fileByItemId, pathToItemId, hasPendingDiff, hasDiffError } =
 		useDiffCodeViewItems({
 			workspaceId,
 			files,
 			collapsedSet,
-			annotationsByPath,
+			annotationsByPath: threadAnnotationsByPath,
+			extraAnnotationsByItemId: composerAnnotationsByItemId,
 		});
+	fileByItemIdRef.current = fileByItemId;
 
 	const { targetItemId } = useDiffCodeViewScroll({
 		codeViewRef,
@@ -79,8 +119,20 @@ export function DiffPane({ context, workspaceId, onOpenFile }: DiffPaneProps) {
 		setCollapsed,
 	});
 
+	const { options, style } = useDiffCodeViewTheme();
+
+	const codeViewOptions = useMemo(
+		() => ({
+			...options,
+			enableLineSelection: true,
+			enableGutterUtility: true,
+			onGutterUtilityClick,
+		}),
+		[options, onGutterUtilityClick],
+	);
+
 	const renderHeaderPrefix = useCallback(
-		(item: CodeViewItem<DiffCommentThread>) => {
+		(item: CodeViewItem<DiffAnnotationMetadata>) => {
 			const file = fileByItemId.get(item.id);
 			if (!file) return null;
 			return (
@@ -95,7 +147,7 @@ export function DiffPane({ context, workspaceId, onOpenFile }: DiffPaneProps) {
 	);
 
 	const renderHeaderMetadata = useCallback(
-		(item: CodeViewItem<DiffCommentThread>) => {
+		(item: CodeViewItem<DiffAnnotationMetadata>) => {
 			const file = fileByItemId.get(item.id);
 			if (!file) return null;
 			return (
@@ -124,11 +176,23 @@ export function DiffPane({ context, workspaceId, onOpenFile }: DiffPaneProps) {
 	const renderAnnotation = useCallback(
 		(
 			annotation:
-				| LineAnnotation<DiffCommentThread>
-				| DiffLineAnnotation<DiffCommentThread>,
-			item: CodeViewItem<DiffCommentThread>,
+				| LineAnnotation<DiffAnnotationMetadata>
+				| DiffLineAnnotation<DiffAnnotationMetadata>,
+			item: CodeViewItem<DiffAnnotationMetadata>,
 		) => {
 			if (item.type !== "diff") return null;
+			const m = annotation.metadata;
+			if (m.kind === "composer") {
+				return (
+					<AgentCommentComposer
+						workspaceId={workspaceId}
+						startLine={m.startLine}
+						endLine={m.endLine}
+						onCancel={clearComposer}
+						onSubmit={submitComposer}
+					/>
+				);
+			}
 			const annotationSide = "side" in annotation ? annotation.side : undefined;
 			const focused =
 				item.id === targetItemId &&
@@ -139,16 +203,24 @@ export function DiffPane({ context, workspaceId, onOpenFile }: DiffPaneProps) {
 			return (
 				<CommentThread
 					workspaceId={workspaceId}
-					threadId={annotation.metadata.threadId}
-					isResolved={annotation.metadata.isResolved}
-					isOutdated={annotation.metadata.isOutdated}
-					url={annotation.metadata.url}
-					comments={annotation.metadata.comments}
+					threadId={m.threadId}
+					isResolved={m.isResolved}
+					isOutdated={m.isOutdated}
+					url={m.url}
+					comments={m.comments}
 					focusTick={focused ? data.focusTick : undefined}
 				/>
 			);
 		},
-		[workspaceId, targetItemId, data.focusLine, data.focusSide, data.focusTick],
+		[
+			workspaceId,
+			targetItemId,
+			data.focusLine,
+			data.focusSide,
+			data.focusTick,
+			clearComposer,
+			submitComposer,
+		],
 	);
 
 	if (files.length === 0) {
@@ -172,12 +244,13 @@ export function DiffPane({ context, workspaceId, onOpenFile }: DiffPaneProps) {
 	}
 
 	return (
-		<CodeView<DiffCommentThread>
+		<CodeView<DiffAnnotationMetadata>
 			ref={codeViewRef}
 			className="h-full w-full overflow-y-auto overflow-x-clip overscroll-contain [overflow-anchor:none]"
 			style={style}
 			items={items}
-			options={options}
+			options={codeViewOptions}
+			onSelectedLinesChange={onSelectedLinesChange}
 			renderHeaderPrefix={renderHeaderPrefix}
 			renderHeaderMetadata={renderHeaderMetadata}
 			renderAnnotation={renderAnnotation}
