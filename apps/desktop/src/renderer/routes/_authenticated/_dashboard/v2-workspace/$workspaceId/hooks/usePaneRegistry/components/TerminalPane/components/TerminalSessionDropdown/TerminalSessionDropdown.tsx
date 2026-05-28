@@ -294,7 +294,7 @@ export function TerminalSessionDropdown({
 					onMouseDown={(event) => event.stopPropagation()}
 					onClick={(event) => event.stopPropagation()}
 				>
-					<TerminalPaneIcon terminalId={terminalId} />
+					<TerminalPaneIcon workspaceId={workspaceId} terminalId={terminalId} />
 					{workspaceRunState && (
 						<span
 							className={

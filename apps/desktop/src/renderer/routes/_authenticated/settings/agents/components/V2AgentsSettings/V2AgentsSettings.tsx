@@ -12,6 +12,7 @@ import {
 	V2_AGENT_CONFIGS_QUERY_KEY as QUERY_KEY,
 	useV2AgentConfigs,
 } from "renderer/hooks/useV2AgentConfigs";
+import { electronTrpc } from "renderer/lib/electron-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { getHostServiceUnavailableMessage } from "renderer/lib/host-service-unavailable";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
@@ -61,8 +62,10 @@ export function V2AgentsSettings({
 		);
 	};
 
+	const setupAgentMutation = electronTrpc.settings.setupAgent.useMutation();
+
 	const addMutation = useMutation({
-		mutationFn: (preset: HostAgentPreset) => {
+		mutationFn: async (preset: HostAgentPreset) => {
 			if (!activeHostUrl) {
 				throw new Error(
 					getHostServiceUnavailableMessage(hostService, {
@@ -71,9 +74,23 @@ export function V2AgentsSettings({
 				);
 			}
 			const { description: _description, ...body } = preset;
-			return getHostServiceClientByUrl(
-				activeHostUrl,
-			).settings.agentConfigs.add.mutate(body);
+			const added =
+				await getHostServiceClientByUrl(
+					activeHostUrl,
+				).settings.agentConfigs.add.mutate(body);
+			// Safety net: re-run wrapper/hook setup so Add guarantees the hooks
+			// are wired even if boot setup failed or the wrapper was wiped.
+			setupAgentMutation.mutate(
+				{ agentId: preset.presetId },
+				{
+					onError: (err) =>
+						console.warn(
+							`[agents] setupAgent failed for ${preset.presetId}`,
+							err,
+						),
+				},
+			);
+			return added;
 		},
 		onSuccess: (added) => {
 			invalidate();
