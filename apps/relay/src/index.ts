@@ -1,6 +1,6 @@
 import { serve } from "@hono/node-server";
 import { createNodeWebSocket } from "@hono/node-ws";
-import type { MiddlewareHandler } from "hono";
+import type { Context, MiddlewareHandler } from "hono";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
@@ -10,6 +10,7 @@ import * as directory from "./directory";
 import { env } from "./env";
 import { captureSentryException, initSentry } from "./sentry";
 import { startSyntheticCheck } from "./synthetic";
+import { isTrpcPath, trpcErrorResponse } from "./trpc-error";
 import { TunnelManager } from "./tunnel";
 
 // Bearer tokens we never want in stdout. The remote-control viewer must
@@ -141,12 +142,26 @@ async function maybeReplay(hostId: string): Promise<{
 	};
 }
 
+function pathAfterHost(c: Context<AppContext>): string {
+	const hostId = c.req.param("hostId") ?? "";
+	const path = new URL(c.req.url).pathname;
+	return path.slice(`/hosts/${hostId}`.length);
+}
+
 const authMiddleware: MiddlewareHandler<AppContext> = async (c, next) => {
+	const wantsTrpc = isTrpcPath(pathAfterHost(c));
+
 	const token = extractToken(c);
-	if (!token) return c.json({ error: "Unauthorized" }, 401);
+	if (!token)
+		return wantsTrpc
+			? trpcErrorResponse(c, "UNAUTHORIZED", "Unauthorized")
+			: c.json({ error: "Unauthorized" }, 401);
 
 	const auth = await verifyJWT(token, env.NEXT_PUBLIC_API_URL);
-	if (!auth) return c.json({ error: "Unauthorized" }, 401);
+	if (!auth)
+		return wantsTrpc
+			? trpcErrorResponse(c, "UNAUTHORIZED", "Unauthorized")
+			: c.json({ error: "Unauthorized" }, 401);
 
 	const hostId = c.req.param("hostId");
 	if (!hostId) return c.json({ error: "Missing hostId" }, 400);
@@ -157,11 +172,16 @@ const authMiddleware: MiddlewareHandler<AppContext> = async (c, next) => {
 	if (!tunnelManager.hasTunnel(hostId)) {
 		const replay = await maybeReplay(hostId);
 		if (replay) return c.body(null, 200, replay.header);
-		return c.json({ error: "Host not connected" }, 503);
+		return wantsTrpc
+			? trpcErrorResponse(c, "SERVICE_UNAVAILABLE", "Host is not online")
+			: c.json({ error: "Host not connected" }, 503);
 	}
 
 	const hasAccess = await checkHostAccess(auth, token, hostId);
-	if (!hasAccess) return c.json({ error: "Forbidden" }, 403);
+	if (!hasAccess)
+		return wantsTrpc
+			? trpcErrorResponse(c, "FORBIDDEN", "Forbidden")
+			: c.json({ error: "Forbidden" }, 403);
 
 	c.set("auth", auth);
 	c.set("token", token);
@@ -306,10 +326,8 @@ app.all("/hosts/:hostId/trpc/*", async (c) => {
 		});
 	} catch (error) {
 		captureSentryException(error, { hostId, path });
-		return c.json(
-			{ error: error instanceof Error ? error.message : "Proxy error" },
-			502,
-		);
+		const message = error instanceof Error ? error.message : "Proxy error";
+		return trpcErrorResponse(c, "BAD_GATEWAY", message);
 	}
 });
 
