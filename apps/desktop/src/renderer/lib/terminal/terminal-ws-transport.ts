@@ -57,6 +57,13 @@ export interface TerminalTransport {
 	 * with no output still gets replay on the next connect.
 	 */
 	_hasReceivedBytes: boolean;
+	/** Internal: wall-clock-gap watchdog for laptop sleep/wake detection. */
+	_livenessTimer: ReturnType<typeof setInterval> | null;
+	/** Internal: Date.now() at the last watchdog tick. */
+	_lastLivenessTick: number;
+	/** Internal: bound resume handler shared by the online/focus/visibility
+	 * listeners, so they can be removed on teardown. */
+	_resumeListener: (() => void) | null;
 }
 
 const MAX_LOG_ENTRIES = 200;
@@ -153,7 +160,101 @@ export function createTransport(): TerminalTransport {
 		_terminal: null,
 		_hasReceivedBytes: false,
 		_terminated: false,
+		_livenessTimer: null,
+		_lastLivenessTick: 0,
+		_resumeListener: null,
 	};
+}
+
+// Wall-clock watchdog cadence and the gap that counts as a suspend. A tick gap
+// far larger than the interval means the process was paused (laptop sleep), so
+// any socket still reporting OPEN is almost certainly half-open — dead, but
+// without a `close` event ever firing. This is the dependable desktop signal:
+// app-suspend doesn't reliably fire focus/visibility when the window was
+// focused both before and after sleep.
+const LIVENESS_CHECK_INTERVAL_MS = 5_000;
+const LIVENESS_SUSPEND_GAP_MS = 20_000;
+
+// Drop the current socket and immediately reconnect, without waiting for a
+// `close` event that a half-open socket will never deliver. The host keeps the
+// PTY alive, so this just re-attaches (and replays anything missed).
+function reconnectNow(transport: TerminalTransport) {
+	if (transport._terminated) return;
+	if (!transport.currentUrl || !transport._terminal) return;
+	cancelReconnect(transport);
+	if (transport.socket) {
+		const dead = transport.socket;
+		transport.socket = null;
+		try {
+			dead.close();
+		} catch {
+			// best-effort; the close handler is a no-op once socket is detached
+		}
+	}
+	transport._reconnectAttempt = 0;
+	// connect() is idempotent while "open"/"connecting"; force "closed" so it
+	// actually re-dials the now-detached socket.
+	setConnectionState(transport, "closed");
+	connect(transport, transport._terminal, transport.currentUrl);
+}
+
+// DOM resume signal (online/focus/visibilitychange). Reset backoff and
+// reconnect only if the socket is actually dead — a healthy or still-connecting
+// socket is left alone. Mirrors TerminalConnection.handleResume on web.
+function handleResume(transport: TerminalTransport) {
+	if (transport._terminated) return;
+	if (!transport.currentUrl || !transport._terminal) return;
+	transport._reconnectAttempt = 0;
+	const socket = transport.socket;
+	if (
+		socket &&
+		(socket.readyState === WebSocket.OPEN ||
+			socket.readyState === WebSocket.CONNECTING)
+	) {
+		return;
+	}
+	reconnectNow(transport);
+}
+
+function setupLiveness(transport: TerminalTransport) {
+	if (transport._livenessTimer === null) {
+		transport._lastLivenessTick = Date.now();
+		transport._livenessTimer = setInterval(() => {
+			const now = Date.now();
+			const gap = now - transport._lastLivenessTick;
+			transport._lastLivenessTick = now;
+			if (gap > LIVENESS_SUSPEND_GAP_MS) reconnectNow(transport);
+		}, LIVENESS_CHECK_INTERVAL_MS);
+	}
+	if (!transport._resumeListener) {
+		const listener = () => handleResume(transport);
+		transport._resumeListener = listener;
+		if (typeof window !== "undefined") {
+			window.addEventListener("online", listener);
+			window.addEventListener("focus", listener);
+		}
+		if (typeof document !== "undefined") {
+			document.addEventListener("visibilitychange", listener);
+		}
+	}
+}
+
+function teardownLiveness(transport: TerminalTransport) {
+	if (transport._livenessTimer !== null) {
+		clearInterval(transport._livenessTimer);
+		transport._livenessTimer = null;
+	}
+	const listener = transport._resumeListener;
+	if (listener) {
+		if (typeof window !== "undefined") {
+			window.removeEventListener("online", listener);
+			window.removeEventListener("focus", listener);
+		}
+		if (typeof document !== "undefined") {
+			document.removeEventListener("visibilitychange", listener);
+		}
+		transport._resumeListener = null;
+	}
 }
 
 function scheduleReconnect(transport: TerminalTransport) {
@@ -235,6 +336,7 @@ export function connect(
 	transport.currentUrl = wsUrl;
 	transport._terminal = terminal;
 	transport._terminated = false;
+	setupLiveness(transport);
 	setConnectionState(transport, "connecting");
 	const actualUrl = transport._hasReceivedBytes
 		? appendQueryParam(wsUrl, "replay", "0")
@@ -391,6 +493,7 @@ function attachSocketListeners(
 
 export function disconnect(transport: TerminalTransport) {
 	cancelReconnect(transport);
+	teardownLiveness(transport);
 	if (transport.socket) {
 		transport.socket.close();
 		transport.socket = null;
@@ -430,6 +533,7 @@ export function sendDispose(transport: TerminalTransport) {
 
 export function disposeTransport(transport: TerminalTransport) {
 	cancelReconnect(transport);
+	teardownLiveness(transport);
 	if (transport.socket) {
 		transport.socket.close();
 		transport.socket = null;
