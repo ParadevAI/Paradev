@@ -205,11 +205,13 @@ function handleResume(transport: TerminalTransport) {
 	if (transport._terminated) return;
 	if (!transport.currentUrl || !transport._terminal) return;
 	transport._reconnectAttempt = 0;
+	// Bail if a connect is already in flight. State "connecting" also covers the
+	// /hosts/ pre-flight window, where transport.socket is still null but
+	// reconnecting would orphan the socket the pending pre-flight is about to open.
 	const socket = transport.socket;
 	if (
-		socket &&
-		(socket.readyState === WebSocket.OPEN ||
-			socket.readyState === WebSocket.CONNECTING)
+		transport.connectionState === "connecting" ||
+		socket?.readyState === WebSocket.OPEN
 	) {
 		return;
 	}
