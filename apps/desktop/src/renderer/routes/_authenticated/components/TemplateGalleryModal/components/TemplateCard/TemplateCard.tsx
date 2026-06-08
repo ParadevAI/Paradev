@@ -1,7 +1,7 @@
 import { cn } from "@superset/ui/utils";
 import { useState } from "react";
 import { LuLoader } from "react-icons/lu";
-import { type ProjectTemplate, templateBannerImage } from "../../templates";
+import type { ProjectTemplate } from "../../templates";
 
 interface TemplateCardProps {
 	template: ProjectTemplate;
@@ -19,7 +19,7 @@ export function TemplateCard({
 	const [imageFailed, setImageFailed] = useState(false);
 	const available = !!template.repo;
 	const Icon = template.icon;
-	const bannerImage = templateBannerImage(template.repo);
+	const bannerImage = template.banner;
 
 	return (
 		<button

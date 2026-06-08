@@ -7,6 +7,12 @@ import {
 	LuMessageSquare,
 	LuSmartphone,
 } from "react-icons/lu";
+import gstackBanner from "./assets/gstack.png";
+import honoBanner from "./assets/hono.png";
+import nextjsBanner from "./assets/nextjs.png";
+import nextjsChatbotBanner from "./assets/nextjs-chatbot.png";
+import reactNativeBanner from "./assets/react-native.png";
+import t3TurboBanner from "./assets/t3-turbo.png";
 
 export interface ProjectTemplate {
 	id: string;
@@ -15,16 +21,7 @@ export interface ProjectTemplate {
 	icon: IconType;
 	bannerClassName: string;
 	repo?: string;
-}
-
-/**
- * GitHub's auto-generated repo social card, used as the card banner image.
- */
-export function templateBannerImage(repo: string | undefined): string | null {
-	if (!repo) return null;
-	const match = repo.match(/github\.com[/:]([^/]+)\/([^/]+?)(?:\.git)?\/?$/i);
-	if (!match) return null;
-	return `https://opengraph.githubassets.com/1/${match[1]}/${match[2]}`;
+	banner?: string;
 }
 
 export const PROJECT_TEMPLATES: ProjectTemplate[] = [
@@ -35,6 +32,7 @@ export const PROJECT_TEMPLATES: ProjectTemplate[] = [
 		icon: LuLayers,
 		bannerClassName: "bg-zinc-900 text-white",
 		repo: "https://github.com/garrytan/gstack",
+		banner: gstackBanner,
 	},
 	{
 		id: "nextjs",
@@ -43,6 +41,7 @@ export const PROJECT_TEMPLATES: ProjectTemplate[] = [
 		icon: LuGlobe,
 		bannerClassName: "bg-black text-white",
 		repo: "https://github.com/vercel/nextjs-postgres-auth-starter",
+		banner: nextjsBanner,
 	},
 	{
 		id: "nextjs-chatbot",
@@ -51,6 +50,7 @@ export const PROJECT_TEMPLATES: ProjectTemplate[] = [
 		icon: LuMessageSquare,
 		bannerClassName: "bg-black text-white",
 		repo: "https://github.com/vercel/ai-chatbot",
+		banner: nextjsChatbotBanner,
 	},
 	{
 		id: "react-native",
@@ -59,6 +59,7 @@ export const PROJECT_TEMPLATES: ProjectTemplate[] = [
 		icon: LuSmartphone,
 		bannerClassName: "bg-blue-500 text-white",
 		repo: "https://github.com/expo/expo-template-default",
+		banner: reactNativeBanner,
 	},
 	{
 		id: "t3-turbo",
@@ -67,6 +68,7 @@ export const PROJECT_TEMPLATES: ProjectTemplate[] = [
 		icon: LuBoxes,
 		bannerClassName: "bg-purple-700 text-white",
 		repo: "https://github.com/t3-oss/create-t3-turbo",
+		banner: t3TurboBanner,
 	},
 	{
 		id: "hono",
@@ -75,5 +77,6 @@ export const PROJECT_TEMPLATES: ProjectTemplate[] = [
 		icon: LuFlame,
 		bannerClassName: "bg-orange-600 text-white",
 		repo: "https://github.com/cloudflare/react-router-hono-fullstack-template",
+		banner: honoBanner,
 	},
 ];
