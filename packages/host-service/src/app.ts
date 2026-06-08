@@ -123,7 +123,12 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		"*",
 		cors({
 			origin: config.allowedOrigins,
-			allowHeaders: ["Content-Type", "Authorization", "trpc-accept"],
+			allowHeaders: [
+				"Content-Type",
+				"Authorization",
+				"trpc-accept",
+				"x-superset-client-machine-id",
+			],
 		}),
 	);
 
@@ -180,6 +185,8 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 					terminalAgentStore,
 					organizationId: config.organizationId,
 					isAuthenticated,
+					clientMachineId:
+						c.req.header("x-superset-client-machine-id") ?? undefined,
 				} as Record<string, unknown>;
 			},
 		}),

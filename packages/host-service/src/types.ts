@@ -31,4 +31,5 @@ export interface HostServiceContext {
 	terminalAgentStore: TerminalAgentStore;
 	organizationId: string;
 	isAuthenticated: boolean;
+	clientMachineId?: string;
 }
