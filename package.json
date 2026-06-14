@@ -50,7 +50,8 @@
 	"overrides": {
 		"axios": "1.14.0",
 		"hono": "4.12.23",
-		"kysely": "0.28.17"
+		"kysely": "0.28.17",
+		"shell-quote": "1.8.4"
 	},
 	"trustedDependencies": [
 		"better-sqlite3",
