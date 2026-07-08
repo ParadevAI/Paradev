@@ -47,12 +47,8 @@ import {
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
 import type { inferRouterOutputs } from "@trpc/server";
 import { env } from "renderer/env.renderer";
-import {
-	authClient,
-	getAuthToken,
-	getJwt,
-	setJwt,
-} from "renderer/lib/auth-client";
+import { getAuthToken, getJwt } from "renderer/lib/auth-client";
+import { refreshJwtAfterUnauthorized } from "renderer/lib/jwt-refresh";
 import superjson from "superjson";
 import { z } from "zod";
 import {
@@ -240,14 +236,10 @@ type ElectricSyncErrorHandler = NonNullable<ShapeStreamOptions["onError"]>;
 
 const handleElectricSyncError: ElectricSyncErrorHandler = async (error) => {
 	if (error instanceof FetchError && error.status === 401) {
-		try {
-			const result = await authClient.token();
-			if (result.data?.token) {
-				setJwt(result.data.token);
-			}
-		} catch (refreshError) {
-			console.error("[collections] JWT refresh after 401 failed", refreshError);
-		}
+		// Shared gate: concurrent shape 401s dedupe to one /api/auth/token call,
+		// and a broken session backs off + trips a circuit instead of storming
+		// the endpoint into Vercel's firewall (issue #5513).
+		await refreshJwtAfterUnauthorized();
 	} else {
 		console.error("[collections] Electric sync error", error);
 	}
