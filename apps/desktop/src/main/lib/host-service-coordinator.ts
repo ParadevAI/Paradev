@@ -5,7 +5,7 @@ import * as fs from "node:fs";
 import path from "node:path";
 import { settings } from "@superset/local-db";
 import { getHostId, getHostName } from "@superset/shared/host-info";
-import { app } from "electron";
+import { app, dialog } from "electron";
 import log from "electron-log/main";
 import { env as sharedEnv } from "shared/env.shared";
 import { getProcessEnvWithShellPath } from "../../lib/trpc/routers/workspaces/utils/shell-env";
@@ -405,16 +405,25 @@ export class HostServiceCoordinator extends EventEmitter {
 		}
 
 		instance.pid = childPid;
-		child.on("exit", (code) => {
-			log.info(`[host-service:${organizationId}] exited with code ${code}`);
+		child.on("exit", (code, signal) => {
+			log.info(
+				`[host-service:${organizationId}] exited with code ${code} signal ${signal}`,
+			);
 			const current = this.instances.get(organizationId);
 			if (!current || current.pid !== childPid || current.status === "stopped")
 				return;
 
+			// Only alert a crash of a running child; startup deaths surface via
+			// start()'s rejection instead.
+			const previousStatus = current.status;
 			this.rememberPort(organizationId, current.port);
 			this.instances.delete(organizationId);
 			removeManifest(organizationId);
-			this.emitStatus(organizationId, "stopped", "running");
+			this.emitStatus(organizationId, "stopped", previousStatus);
+
+			if (previousStatus === "running") {
+				this.alertChildCrashed(organizationId, code, signal);
+			}
 		});
 		// Don't let the child block Electron's exit — stopAll() handles teardown.
 		child.unref();
@@ -503,6 +512,24 @@ export class HostServiceCoordinator extends EventEmitter {
 			status,
 			previousStatus,
 		} satisfies HostServiceStatusEvent);
+	}
+
+	/**
+	 * Alert on an unexpected crash of a running child. Recovery is the existing
+	 * tray > Host Service > Restart.
+	 */
+	private alertChildCrashed(
+		organizationId: string,
+		code: number | null,
+		signal: NodeJS.Signals | null,
+	): void {
+		const cause =
+			signal != null ? `signal ${signal}` : `exit code ${code ?? "unknown"}`;
+		log.error(`[host-service:${organizationId}] crashed (${cause})`);
+		dialog.showErrorBox(
+			"Host service crashed",
+			`The Superset host service stopped unexpectedly (${cause}). Workspaces and terminals for this organization are unavailable until it restarts — use the Superset tray menu > Host Service > Restart.`,
+		);
 	}
 }
 
