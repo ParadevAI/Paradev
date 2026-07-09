@@ -1,8 +1,7 @@
-import { useLiveQuery } from "@tanstack/react-db";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
+import { useWorkspaceHost } from "@/hooks/useWorkspaceHost";
 import { createHostClient } from "@/lib/trpc/host-client";
-import { useCollections } from "@/screens/(authenticated)/providers/CollectionsProvider";
 
 // Minimal label map for builtin terminal agents (avoids importing
 // @superset/shared/agent-catalog, whose transitive deps aren't RN-vetted).
@@ -60,23 +59,9 @@ export function useWorkspaceTerminalAgents(workspaceId: string): {
 	rows: TerminalAgentRow[];
 	hostOnline: boolean;
 } {
-	const collections = useCollections();
-	const { data: workspaces } = useLiveQuery(
-		(q) => q.from({ v2Workspaces: collections.v2Workspaces }),
-		[collections],
-	);
-	const { data: hosts } = useLiveQuery(
-		(q) => q.from({ v2Hosts: collections.v2Hosts }),
-		[collections],
-	);
-
-	const workspace =
-		(workspaces ?? []).find((w) => w.id === workspaceId) ?? null;
+	const { workspace, host } = useWorkspaceHost(workspaceId);
 	const organizationId = workspace?.organizationId ?? null;
 	const hostId = workspace?.hostId ?? null;
-	const host = hostId
-		? ((hosts ?? []).find((h) => h.machineId === hostId) ?? null)
-		: null;
 	const hostOnline = host?.isOnline ?? false;
 
 	const client = useMemo(() => {

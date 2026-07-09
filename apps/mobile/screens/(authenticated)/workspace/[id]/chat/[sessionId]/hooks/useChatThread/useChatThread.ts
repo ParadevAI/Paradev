@@ -1,6 +1,6 @@
-import { useLiveQuery } from "@tanstack/react-db";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useWorkspaceHost } from "@/hooks/useWorkspaceHost";
 import type {
 	ChatMessage,
 	ChatMessagePart,
@@ -8,7 +8,6 @@ import type {
 	SendMessagePayload,
 } from "@/lib/trpc/host-chat-types";
 import { createHostClient } from "@/lib/trpc/host-client";
-import { useCollections } from "@/screens/(authenticated)/providers/CollectionsProvider";
 
 export type { ChatMessage } from "@/lib/trpc/host-chat-types";
 
@@ -90,27 +89,11 @@ export function useChatThread(params: {
 	workspaceId: string;
 }): UseChatThreadResult {
 	const { sessionId, workspaceId } = params;
-	const collections = useCollections();
-
-	const { data: workspaces, isReady: workspacesReady } = useLiveQuery(
-		(q) => q.from({ v2Workspaces: collections.v2Workspaces }),
-		[collections],
-	);
-	const { data: hosts } = useLiveQuery(
-		(q) => q.from({ v2Hosts: collections.v2Hosts }),
-		[collections],
-	);
-
-	const workspace =
-		(workspaces ?? []).find((w) => w.id === workspaceId) ?? null;
+	const { workspace, host, isResolving } = useWorkspaceHost(workspaceId);
 	const organizationId = workspace?.organizationId ?? null;
 	const hostId = workspace?.hostId ?? null;
-	const host = hostId
-		? ((hosts ?? []).find((h) => h.machineId === hostId) ?? null)
-		: null;
 	const hostOnline = host?.isOnline ?? false;
-	// Cache-first: only "resolving" when we have no row AND aren't ready yet.
-	const workspaceResolving = !workspace && !workspacesReady;
+	const workspaceResolving = isResolving;
 
 	const client = useMemo(() => {
 		if (!organizationId || !hostId) return null;
