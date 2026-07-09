@@ -225,6 +225,11 @@ local_write_env() {
     write_env_var "ELECTRIC_URL" "http://localhost:$LOCAL_ELECTRIC_PORT/v1/shape"
     write_env_var "NEXT_PUBLIC_ELECTRIC_URL" "https://localhost:$CADDY_ELECTRIC_PORT"
     write_env_var "NEXT_PUBLIC_ELECTRIC_PROXY_URL" "https://localhost:$CADDY_ELECTRIC_PORT"
+    echo ""
+    echo "# Mobile (Expo) — plain-HTTP electric-proxy; RN fetch rejects Caddy's self-signed cert"
+    write_env_var "EXPO_PUBLIC_API_URL" "http://localhost:$API_PORT"
+    write_env_var "EXPO_PUBLIC_ELECTRIC_URL" "http://localhost:$WRANGLER_PORT"
+    write_env_var "EXPO_PUBLIC_POSTHOG_KEY" "phc_local_dev_disabled"
   } >> .env
 
   cat > Caddyfile <<-CADDYEOF
