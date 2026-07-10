@@ -57,6 +57,7 @@ export function DevSignInButton() {
 	return (
 		<View className="w-full items-center gap-2">
 			<Button
+				testID="dev-sign-in-button"
 				onPress={handleSignIn}
 				disabled={isLoading}
 				variant="outline"

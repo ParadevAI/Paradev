@@ -41,7 +41,11 @@ export function NewChatWidget({
 	workspaces: HostWorkspaceItem[];
 }) {
 	return (
-		<View pointerEvents="box-none" style={StyleSheet.absoluteFill}>
+		<View
+			testID="home-screen"
+			pointerEvents="box-none"
+			style={StyleSheet.absoluteFill}
+		>
 			<PromptInputProvider>
 				<NewChatWidgetInner workspaces={workspaces} />
 			</PromptInputProvider>
