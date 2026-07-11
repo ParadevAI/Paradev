@@ -1,6 +1,6 @@
 import { prompt } from "@superset/alert-prompt";
 import * as Clipboard from "expo-clipboard";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import type { ReactNode } from "react";
 import { Alert, Share } from "react-native";
 import type {
@@ -19,6 +19,7 @@ export function WorkspaceRowMenu({
 	cache: HostWorkspacesCacheOps;
 	children: ReactNode;
 }) {
+	const router = useRouter();
 	const renameWorkspace = async () => {
 		const hostUrl = cache.resolveHostUrl(workspace.hostId);
 		if (!hostUrl) {
@@ -115,6 +116,14 @@ export function WorkspaceRowMenu({
 		>
 			<Link.Trigger>{children}</Link.Trigger>
 			<Link.Menu>
+				<Link.MenuAction
+					icon="terminal"
+					onPress={() =>
+						router.push(`/(authenticated)/workspace/${workspace.id}/chat/acp`)
+					}
+				>
+					Live sessions
+				</Link.MenuAction>
 				<Link.MenuAction icon="pencil" onPress={() => void renameWorkspace()}>
 					Rename
 				</Link.MenuAction>

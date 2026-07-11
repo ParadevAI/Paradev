@@ -10,6 +10,7 @@ import log from "electron-log/main";
 import { env as sharedEnv } from "shared/env.shared";
 import { getProcessEnvWithShellPath } from "../../lib/trpc/routers/workspaces/utils/shell-env";
 import { SUPERSET_HOME_DIR } from "./app-environment";
+import { isInternalBuild } from "./build-channel";
 import {
 	isProcessAlive,
 	killProcess,
@@ -479,6 +480,10 @@ export class HostServiceCoordinator extends EventEmitter {
 			AUTH_TOKEN: config.authToken,
 			SUPERSET_AUTH_CONFIG_PATH: path.join(SUPERSET_HOME_DIR, "config.json"),
 			SUPERSET_API_URL: config.cloudApiUrl,
+			// Pre-release ACP session harness, internal-channel only: enabled on
+			// canary and dev builds, never on stable. The host gates its router
+			// and WS stream route on this env var.
+			...(isInternalBuild() ? { SUPERSET_ACP_SESSIONS: "1" } : {}),
 			// Read by the child's parent watchdog so it can self-exit if
 			// Electron crashes without sending SIGTERM (orphan reparenting).
 			HOST_PARENT_PID: String(process.pid),
