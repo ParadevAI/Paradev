@@ -70,9 +70,9 @@ function getAcpClient(): AcpHostClient {
 
 export function listAcpSessions(
 	routingKey: string,
-	workspaceId: string,
+	input?: { workspaceId?: string; cursor?: string; limit?: number },
 ): Promise<SessionsPage> {
-	return getAcpClient().listSessions(routingKey, workspaceId);
+	return getAcpClient().listSessions(routingKey, input);
 }
 
 export function createAcpSession(

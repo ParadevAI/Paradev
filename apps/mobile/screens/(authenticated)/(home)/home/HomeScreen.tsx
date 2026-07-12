@@ -24,6 +24,7 @@ import { OrganizationHeaderButton } from "./components/OrganizationHeaderButton"
 import { OrganizationSwitcherSheet } from "./components/OrganizationSwitcherSheet";
 import { SessionRow } from "./components/SessionRow";
 import { WorkspaceRow } from "./components/WorkspaceRow";
+import { useHostAcpSessions } from "./hooks/useHostAcpSessions";
 import { useHostTerminalAgents } from "./hooks/useHostTerminalAgents";
 import { useVisibleDiffStats } from "./hooks/useVisibleDiffStats";
 import { useWorkspacesFilterStore } from "./stores/workspacesFilterStore";
@@ -95,10 +96,7 @@ export function HomeScreen() {
 		(q) => q.from({ githubPullRequests: collections.githubPullRequests }),
 		[collections],
 	);
-	const { data: chatSessions } = useLiveQuery(
-		(q) => q.from({ chatSessions: collections.chatSessions }),
-		[collections],
-	);
+	const { sessionsByWorkspace } = useHostAcpSessions(selectedHost);
 
 	const sortedProjects = useMemo(
 		() => [...(projects ?? [])].sort((a, b) => a.name.localeCompare(b.name)),
@@ -114,22 +112,12 @@ export function HomeScreen() {
 	);
 
 	const sessionRowsByWorkspace = useMemo(() => {
-		const chatSessionsByWorkspace = new Map<
-			string,
-			NonNullable<typeof chatSessions>
-		>();
-		for (const session of chatSessions ?? []) {
-			if (!session.v2WorkspaceId) continue;
-			const group = chatSessionsByWorkspace.get(session.v2WorkspaceId);
-			if (group) group.push(session);
-			else chatSessionsByWorkspace.set(session.v2WorkspaceId, [session]);
-		}
 		const rowsByWorkspace = new Map<string, SessionRowData[]>();
-		for (const [workspaceId, sessions] of chatSessionsByWorkspace) {
+		for (const [workspaceId, sessions] of sessionsByWorkspace) {
 			rowsByWorkspace.set(workspaceId, buildSessionRows(sessions));
 		}
 		return rowsByWorkspace;
-	}, [chatSessions]);
+	}, [sessionsByWorkspace]);
 
 	// Recency ranks a group by its latest activity — the newest of the
 	// workspace's own update and its sessions' updates.
@@ -261,6 +249,7 @@ export function HomeScreen() {
 		void queryClient.invalidateQueries({
 			queryKey: ["host-service", "workspaces", "list"],
 		});
+		void queryClient.invalidateQueries({ queryKey: ["acp-sessions", "list"] });
 		void queryClient.invalidateQueries({ queryKey: ["diff-stats"] });
 	}, [queryClient]);
 
@@ -294,7 +283,7 @@ export function HomeScreen() {
 						<Text
 							className={cn(
 								"text-muted-foreground px-4 pb-1 font-semibold text-xs",
-								index === 0 ? undefined : "border-border mt-1.5 border-t pt-3",
+								index === 0 ? undefined : "mt-6",
 							)}
 						>
 							{item.label}
@@ -304,46 +293,37 @@ export function HomeScreen() {
 					const { workspace } = item;
 					const repositoryId = repositoryIdsByProject.get(workspace.projectId);
 					return (
-						<View
-							className={
-								index === 0 || listItems[index - 1]?.kind === "dateHeader"
-									? undefined
-									: "border-border mt-1.5 border-t pt-1.5"
+						<WorkspaceRow
+							workspace={workspace}
+							pullRequest={
+								repositoryId
+									? pullRequestsByRepoBranch.get(
+											`${repositoryId}::${workspace.branch}`,
+										)
+									: undefined
 							}
-						>
-							<WorkspaceRow
-								workspace={workspace}
-								pullRequest={
-									repositoryId
-										? pullRequestsByRepoBranch.get(
-												`${repositoryId}::${workspace.branch}`,
-											)
-										: undefined
-								}
-								diffStats={diffStats.get(workspace.id) ?? null}
-								cache={cache}
-								attention={attentionByWorkspace.get(workspace.id) ?? null}
-							/>
-						</View>
+							diffStats={diffStats.get(workspace.id) ?? null}
+							cache={cache}
+							attention={attentionByWorkspace.get(workspace.id) ?? null}
+						/>
 					);
 				}
 				case "session":
 					return (
-						<View
-							className={cn(
-								"bg-foreground/5 mx-3 overflow-hidden",
-								item.groupFirst && "rounded-t-2xl",
-								item.groupLast && "mb-3.5 rounded-b-2xl",
-							)}
-						>
-							{!item.groupFirst && (
-								<View className="border-border/40 ml-10 border-t" />
-							)}
+						<View className={cn("ml-7", item.groupLast && "mb-2")}>
+							<View
+								className={cn(
+									"bg-border absolute left-0 w-[1.5px] rounded-full",
+									item.groupFirst ? "top-1" : "top-0",
+									item.groupLast ? "bottom-3" : "bottom-0",
+								)}
+							/>
 							<SessionRow
 								row={item.row}
+								className="gap-2.5 py-2 pr-4 pl-4"
 								onPress={() =>
 									router.push(
-										`/(authenticated)/workspace/${item.workspaceId}/chat/${item.row.id}`,
+										`/(authenticated)/workspace/${item.workspaceId}/chat/acp/${item.row.id}`,
 									)
 								}
 							/>
@@ -358,7 +338,6 @@ export function HomeScreen() {
 			cache,
 			router,
 			attentionByWorkspace,
-			listItems,
 		],
 	);
 
@@ -439,10 +418,7 @@ export function HomeScreen() {
 					}
 				/>
 			)}
-			<NewChatWidget
-				workspaces={workspaces}
-				resolveHostUrl={cache.resolveHostUrl}
-			/>
+			<NewChatWidget workspaces={workspaces} />
 			<OrganizationSwitcherSheet
 				isPresented={sheetOpen}
 				onIsPresentedChange={setSheetOpen}
