@@ -30,6 +30,16 @@ function useAsciiFrame(active: boolean): number {
 	return frame;
 }
 
+/**
+ * Compact version for the inline pill — canary builds carry a timestamp
+ * suffix ("1.14.1-canary.20260711221936") that would overflow the sidebar
+ * footer, so shorten to "1.14.1-ca". The tooltip keeps the full version.
+ */
+function displayVersion(version: string): string {
+	const [base, prereleaseTag] = version.split("-", 2);
+	return prereleaseTag ? `${base}-${prereleaseTag.slice(0, 2)}` : base;
+}
+
 /** Marquee-style terminal progress bar, e.g. `[·##···]` */
 function asciiBar(frame: number): string {
 	const cells = Array.from({ length: BAR_CELLS }, (_, i) =>
@@ -219,7 +229,9 @@ export function UpdatesPill({ isCollapsed = false }: UpdatesPillProps) {
 									}}
 								/>
 							</svg>
-							<span>{version ? `v${version}` : "downloaded"}</span>
+							<span>
+								{version ? `v${displayVersion(version)}` : "downloaded"}
+							</span>
 						</>
 					) : isReady ? (
 						<>
