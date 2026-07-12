@@ -8,6 +8,8 @@ Generate a new changelog entry for this week based on merged PRs.
    - Use `gh pr list --state merged --search "merged:>=$(date -d 'last monday' +%Y-%m-%d)" --json number,title,body,url,mergedAt --limit 50` to get all PRs merged in the past week
    - Categorize PRs into: **Major features**, **Improvements**, **Bug fixes**
    - Skip PRs that are purely internal (CI/CD, dev tooling, refactors) unless they affect users
+   - **Drop reverted work**: scan the same window for `revert:` PRs and exclude both the revert and the PR it undoes (e.g. #5639 merged and was reverted by #5641 eleven minutes later)
+   - **Dedupe against the previous entry**: the date window overlaps the day the last changelog merged, so read the most recent existing entry and skip any PR it already announced
 
 2. **Check for existing changelog**
    - Before creating a new file, check if a changelog already exists for this week's date
@@ -18,6 +20,9 @@ Generate a new changelog entry for this week based on merged PRs.
    - **Lead with 2-4 major features** - These get their own sections with full descriptions
    - **Group smaller improvements** - Can combine related small changes under one heading
    - **Bug fixes go in a footnote section** - Brief one-liner summaries at the bottom
+   - **Pricing/entitlement changes always get a line** - free-plan unlocks and paywall removals matter to users regardless of diff size
+   - **Experimental/internal features are footnotes, not heroes** - label them ("Experimental: ...") and give them one line near the bottom of Improvements; no section, no hero image
+   - **Milestones don't need a PR** - announcements like SOC 2, open beta, or a pricing page get their own section with no PRBadge
 
 4. **Create the changelog file**
    - Create a new file at: `apps/marketing/content/changelog/YYYY-MM-DD-slug.mdx`
@@ -64,13 +69,26 @@ Brief description of the feature and its benefit to users.
    - Add TODO comments for features that would benefit from screenshots
    - Use a horizontal rule (`---`) before the bug fixes section
    - Bug fixes should use bullet points, one fix per line, same as Improvements
+   - **Title Case for `##` headings** ("Redesigned Workspace Activity Strip", not "Redesigned workspace activity strip")
+   - **Shortcuts as mac glyphs**: ⌘I, ⌘⇧L, not "Cmd+I" or "Cmd-Shift-L"
+   - **UI paths in bold with arrows**: **Settings → Experimental**, **Integrations → Slack**
+   - **No emoji in the changelog entry** - emoji belong in the launch thread only
+   - **Bug fixes stay a flat list**; only if there are 15+ do you group them with bold area prefixes ("**Terminal** - ..."). Never pack small items into a running prose paragraph of PRBadges
 
 7. **Writing style**
+   - **No em dashes** - never use em dashes (—) in the changelog or the launch thread; use commas, colons, or separate sentences instead
    - **Be brief** - Users scan changelogs, they don't read every word
    - **Lead with value** - What can users do now that they couldn't before?
    - **One sentence per feature** - If you need more, use 2-3 bullet points max
    - **Skip implementation details** - Users don't care about internal changes
+   - **No internal jargon** - name the user benefit, never the mechanism; "tRPC-first sessions", "Electric collections", and package names are banned in copy
    - **Combine related small fixes** - Don't give each tiny fix its own section
+   - **End every feature with how to get it** - a hotkey (⌘I), a UI path (**Settings → Agents**), or an install command; a feature nobody can find isn't announced
+   - **Show CLI/SDK features as code** - a short copy-pasteable snippet beats prose about flags
+   - **Ground abstract features in use cases** - platform-y features (automations, SDKs) get 2-4 "typical uses" bullets
+   - **Link the docs** when a docs.superset.sh page exists for the feature
+   - **Credit external contributors by GitHub handle** - grab the author via `gh pr view <n> --json author` and link it: "contributed by [@ThomsenDrake](https://github.com/ThomsenDrake) from the Mistral team". Fall back to the company/team name only if the handle is unavailable. In the launch thread, don't @-mention GitHub handles (they ping the wrong account on X); use the team name there
+   - **Cap the entry at ~80 lines** - cut harder rather than run long; only a multi-week entry may open with a 2-3 sentence overview paragraph before the first section
 
 ## Content hierarchy
 
@@ -98,6 +116,19 @@ the full `pointerdown/mousedown/pointerup/mouseup/click` sequence) and
 `Page.captureScreenshot` to grab each surface (Settings → Agents, the create-dialog
 model picker, the Automations/Workspaces tables, etc.). Quit the dev stack when done —
 it shares a pty-daemon with other dev instances, so keep uptime short.
+
+**Shoot small and sharp — the feature must read big in a blog post.** Full-desktop
+captures make the feature a tiny sliver of the frame. Before capturing, shrink the
+renderer to a compact viewport and bump the pixel density with
+`Emulation.setDeviceMetricsOverride` (e.g. `{width: 1120, height: 720,
+deviceScaleFactor: 2}`), so UI text renders large and crisp relative to the frame.
+Collapse the sidebar and close side panels unless they're the subject — this also keeps
+internal workspace/branch names out of frame. Two gotchas: the override only lives as
+long as the CDP session that set it, so do size → interact → capture over one WebSocket
+connection; and applying/clearing the override fires a resize that dismisses open
+dropdowns/popovers and reflows terminal TUIs (set the size first, then open the menu /
+render the TUI content). Note the beautify script's crop is cover-fit — very tall,
+narrow crops get over-zoomed, so prefer landscape-ish crops.
 
 **2. Beautify** with `.github/prompts/beautify-screenshot.ts` (local headless-Chrome
 render — no upload, unlike Shots.so/Screely/Pika, which matters because these shots can
