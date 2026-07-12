@@ -3,6 +3,7 @@ import {
 	type RelayAffinityProbe,
 } from "@superset/workspace-client";
 import type { Terminal as XTerm } from "@xterm/xterm";
+import { ensureFreshJwt } from "renderer/lib/auth-client";
 import { posthog } from "renderer/lib/posthog";
 import { classifyTerminalFailure } from "./terminalConnectionDiagnostics";
 import { createWriteCoalescer, type WriteCoalescer } from "./write-coalescer";
@@ -78,6 +79,10 @@ export interface TerminalTransport {
 	_writeCoalescer: WriteCoalescer | null;
 	/** Internal: last `_whoowns` probe, used to explain a failed connection. */
 	_lastProbe: RelayAffinityProbe | null;
+	/** Internal: bumped per connect() so async preflight callbacks from a
+	 * superseded attempt (reconnectNow re-entering the same URL) can't open a
+	 * duplicate socket or fatally terminate the newer attempt. */
+	_connectEpoch: number;
 }
 
 const MAX_LOG_ENTRIES = 200;
@@ -179,6 +184,7 @@ export function createTransport(): TerminalTransport {
 		_resumeListener: null,
 		_writeCoalescer: null,
 		_lastProbe: null,
+		_connectEpoch: 0,
 	};
 }
 
@@ -361,6 +367,7 @@ export function connect(
 	}
 
 	cancelReconnect(transport);
+	const epoch = ++transport._connectEpoch;
 	transport.currentUrl = wsUrl;
 	transport._terminal = terminal;
 	// Recreate per connect so the coalescer always targets the current
@@ -376,10 +383,12 @@ export function connect(
 		? appendQueryParam(wsUrl, "replay", "0")
 		: wsUrl;
 
-	const openSocket = () => {
-		// Bail if the transport raced into a different URL or was disconnected
-		// while the pre-flight was in flight.
+	const openSocket = (targetUrl: string) => {
+		// Bail if the transport raced into a different URL, was disconnected, or
+		// a newer connect() superseded this attempt while the pre-flight was in
+		// flight.
 		if (
+			transport._connectEpoch !== epoch ||
 			transport.currentUrl !== wsUrl ||
 			transport.connectionState !== "connecting"
 		) {
@@ -387,12 +396,12 @@ export function connect(
 		}
 		let socket: WebSocket;
 		try {
-			socket = new WebSocket(actualUrl);
+			socket = new WebSocket(targetUrl);
 		} catch (err) {
 			pushLog(
 				transport,
 				"error",
-				`WebSocket construction failed for ${formatWsEndpoint(actualUrl)}: ${
+				`WebSocket construction failed for ${formatWsEndpoint(targetUrl)}: ${
 					err instanceof Error ? err.message : String(err)
 				}`,
 			);
@@ -409,16 +418,53 @@ export function connect(
 	};
 
 	// Pre-flight `_whoowns` to pin fly edge affinity before the WS upgrade (see
-	// primeRelayAffinity); skip for non-/hosts URLs. Probe `wsUrl`, not the
-	// `replay`-carrying `actualUrl`, and keep the result to explain a failure.
+	// primeRelayAffinity); skip for non-/hosts URLs. Keep the result to explain
+	// a failure.
 	if (isRelayHostUrl(wsUrl)) {
 		transport._lastProbe = null;
-		void primeRelayAffinity(wsUrl).then((probe) => {
-			transport._lastProbe = probe;
-			openSocket();
+		// Relay URLs carry the user JWT, which rotates hourly. The URL was signed
+		// at render time, so reconnect attempts (this function re-entered from
+		// scheduleReconnect with the same currentUrl) would otherwise redial with
+		// an expired token forever — re-sign every attempt with a fresh one.
+		void ensureFreshJwt().then((token) => {
+			const signedUrl = token
+				? appendQueryParam(actualUrl, "token", token)
+				: actualUrl;
+			return primeRelayAffinity(signedUrl).then((probe) => {
+				transport._lastProbe = probe;
+				// 403 is a definitive access denial (the token is fresh), not a
+				// transient failure — retrying would hammer the relay with the same
+				// answer. Stop and surface it; a manual reconnect re-enters connect().
+				if (probe?.status === 403) {
+					if (
+						transport._connectEpoch !== epoch ||
+						transport.currentUrl !== wsUrl ||
+						transport.connectionState !== "connecting"
+					) {
+						return;
+					}
+					const diagnosis = classifyTerminalFailure(probe, true);
+					pushLog(
+						transport,
+						"error",
+						`Connection refused for ${formatWsEndpoint(wsUrl)}: ${diagnosis.message} Not retrying.`,
+					);
+					posthog.capture("terminal_connect_failed", {
+						endpoint: formatWsEndpoint(wsUrl),
+						preflight_status: probe.status,
+						tunnel_region: probe.region,
+						reconnect_attempts: transport._reconnectAttempt,
+						category: diagnosis.category,
+					});
+					transport._terminated = true;
+					setConnectionState(transport, "closed");
+					return;
+				}
+				openSocket(signedUrl);
+			});
 		});
 	} else {
-		openSocket();
+		openSocket(actualUrl);
 	}
 }
 
