@@ -1,7 +1,10 @@
 import { WebSocket as ReconnectingWebSocket } from "partysocket";
 import { primeRelayAffinity } from "../primeRelayAffinity";
+import { createOutageReporter } from "./outageReporter";
 
 export interface RelaySocketOptions {
+	/** Label attached to telemetry events so consumers are distinguishable. */
+	name?: string;
 	/** URL for this attempt, WITHOUT the auth token — the wrapper signs it. */
 	buildUrl: () => string | Promise<string>;
 	/** Fresh token per attempt (user JWT for relay hosts, PSK for local). */
@@ -49,11 +52,19 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
  */
 export function createRelaySocket(opts: RelaySocketOptions): RelaySocket {
 	let socket: ReconnectingWebSocket | null = null;
+	const reporter = createOutageReporter(opts.name ?? "relay");
+	// retryCount is the 0-based ordinal of the current dial and only resets
+	// after minUptime of stable connection. When reporting a failure the dial
+	// counts itself, hence +1; at open time it already equals the failures
+	// that preceded the successful dial.
+	const failuresSoFar = () => (socket?.retryCount ?? 0) + 1;
 
 	const provider = async (): Promise<string> => {
 		const url = signUrl(await opts.buildUrl(), await opts.getToken());
 		const probe = await primeRelayAffinity(url);
+		reporter.attempt(url, probe);
 		if (probe?.status === 403) {
+			reporter.accessDenied(failuresSoFar());
 			opts.onAccessDenied?.();
 			if (opts.accessDeniedRetryMs == null) {
 				socket?.close(1000, "relay access denied");
@@ -74,5 +85,24 @@ export function createRelaySocket(opts: RelaySocketOptions): RelaySocket {
 		connectionTimeout: opts.connectionTimeout,
 		maxEnqueuedMessages: opts.maxEnqueuedMessages ?? 0,
 	});
+
+	socket.addEventListener("close", (event) => {
+		// Only count real server closes. partysocket also dispatches synthetic
+		// close events (deliberate close(), and echoes of dial errors that the
+		// error listener already counts); its browser cloneEvent mangles those —
+		// code becomes the string "close" — which is how we can tell them apart.
+		if (typeof event.code !== "number") return;
+		// 1000 = deliberate close (cleanup, access-denied shutdown), not a failure.
+		if (event.code === 1000) return;
+		reporter.failed(failuresSoFar(), {
+			code: event.code,
+			reason: typeof event.reason === "string" ? event.reason : "",
+		});
+	});
+	socket.addEventListener("error", () => reporter.failed(failuresSoFar()));
+	socket.addEventListener("open", () =>
+		reporter.opened(socket?.retryCount ?? 0),
+	);
+
 	return socket;
 }
