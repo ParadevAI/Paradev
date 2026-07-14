@@ -4,6 +4,7 @@ import { getBlogPosts } from "@/lib/blog";
 import { getChangelogEntries } from "@/lib/changelog";
 import { getComparisonPages } from "@/lib/compare";
 import { getAllLegalSlugs, getLegalPage } from "@/lib/legal";
+import { themeListings } from "@/lib/marketplace";
 import { getAllPeople } from "@/lib/people";
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -141,6 +142,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
 		};
 	});
 
+	const themePages: MetadataRoute.Sitemap = themeListings.map((theme) => ({
+		url: `${baseUrl}/marketplace/themes/${theme.slug}`,
+		lastModified: new Date(),
+		changeFrequency: "monthly" as const,
+		priority: 0.6,
+	}));
+
 	return [
 		...staticPages,
 		...blogPages,
@@ -148,5 +156,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
 		...teamPages,
 		...comparisonPages,
 		...legalPages,
+		...themePages,
 	];
 }
