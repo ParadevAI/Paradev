@@ -47,6 +47,11 @@ export const DEFAULT_IGNORE_PATTERNS = [
 	"**/.vercel/**",
 	"**/target/**",
 	"**/out/**",
+	"**/.venv/**",
+	"**/vendor/**",
+	"**/.gradle/**",
+	"**/.pnpm-store/**",
+	"**/.yarn/**",
 	"**/*.tsbuildinfo",
 ];
 
@@ -329,16 +334,24 @@ export async function getSearchIndex(
 
 	const buildPromise = buildSearchIndex(options)
 		.then((items) => {
-			evictLruSearchIndexEntries();
-			searchIndexCache.set(cacheKey, {
-				items,
-				lastAccessedAt: Date.now(),
-			});
-			searchIndexBuilds.delete(cacheKey);
+			// Cache only if this build is still current. Invalidation (FSEvents
+			// overflow, root recovery, watcher patches with no cached index)
+			// deletes the builds entry to cancel us — caching anyway would
+			// resurrect an index that predates the events that invalidated it.
+			if (searchIndexBuilds.get(cacheKey) === buildPromise) {
+				evictLruSearchIndexEntries();
+				searchIndexCache.set(cacheKey, {
+					items,
+					lastAccessedAt: Date.now(),
+				});
+				searchIndexBuilds.delete(cacheKey);
+			}
 			return items;
 		})
 		.catch((error) => {
-			searchIndexBuilds.delete(cacheKey);
+			if (searchIndexBuilds.get(cacheKey) === buildPromise) {
+				searchIndexBuilds.delete(cacheKey);
+			}
 			throw error;
 		});
 	searchIndexBuilds.set(cacheKey, buildPromise);
