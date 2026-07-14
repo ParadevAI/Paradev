@@ -74,30 +74,43 @@ The `run` field defines commands that start your dev server or other long-runnin
 
 ## User Overrides
 
-Override project scripts without modifying the repo by placing a `config.json` in your home directory:
+Override project scripts without modifying the repo by placing a `config.json` in your home directory, mirroring the repo's absolute path:
 
 ```
-~/.superset/projects/<project-id>/config.json
+~/.superset/projects/<repo-path>/config.json
 ```
 
-Where `<project-id>` is your project's unique ID in Superset (visible in the app's project settings).
+For a repo at `/Users/me/work/app`, that's `~/.superset/projects/Users/me/work/app/config.json`. The legacy location keyed by project ID (`~/.superset/projects/<project-id>/config.json`) still works as a fallback.
 
 ### Priority Order
 
-Config is resolved in this order (first found wins, for setup, teardown, and run):
-1. `~/.superset/projects/<project-id>/config.json`: user override
-2. `<worktree>/.superset/config.json`: worktree-specific
+For each key (`setup`, `teardown`, `run`), the highest-priority source that defines it wins:
+
+1. `~/.superset/projects/<repo-path>/config.json`: user override
+2. `<worktree>/.superset/config.json`: workspace-specific (setup and teardown only)
 3. `<repo>/.superset/config.json`: project default
 
-No merging occurs between levels. The first config found is used entirely.
+Levels merge per key: a key one level doesn't define falls through to the next. `run` resolves at the project level, so it skips the worktree layer.
+
+### Script Fallback
+
+If no commands are configured for a key, Superset looks for a script instead: `.superset/<key>.sh` (`setup.sh`, `teardown.sh`, `run.sh`) in the worktree first, then the main repo. A gitignored script isn't checked out into new worktrees, so it typically exists only in the main repo.
+
+### Working Directory
+
+Set `cwd` to run commands somewhere other than the workspace root. Relative paths resolve against the worktree:
+
+```json
+{ "cwd": "apps/web", "run": ["bun dev"] }
+```
 
 ### Examples
 
 **Custom setup script:**
 ```json
 {
-  "setup": ["~/.superset/projects/<project-id>/setup.sh"],
-  "teardown": ["~/.superset/projects/<project-id>/teardown.sh"]
+  "setup": ["~/.superset/projects/<repo-path>/setup.sh"],
+  "teardown": ["~/.superset/projects/<repo-path>/teardown.sh"]
 }
 ```
 
