@@ -42,13 +42,16 @@ import {
 	SortableHeader,
 	type SortDirection,
 } from "renderer/routes/_authenticated/_dashboard/components/SortableHeader";
+import { useFailedAutomations } from "renderer/routes/_authenticated/_dashboard/hooks/useFailedAutomations";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { AutomationRow } from "./components/AutomationRow";
 import { AutomationsEmptyState } from "./components/AutomationsEmptyState";
 import { CreateAutomationDialog } from "./components/CreateAutomationDialog";
+import { HostOfflineRunDialog } from "./components/HostOfflineRunDialog";
 import { useRecentProjects } from "./hooks/useRecentProjects";
 import type { AutomationTemplate } from "./templates";
+import { isHostOfflineError } from "./utils/hostOfflineError";
 
 export const Route = createFileRoute("/_authenticated/_dashboard/automations/")(
 	{
@@ -73,15 +76,27 @@ function AutomationsPage() {
 	const [pendingDelete, setPendingDelete] = useState<SelectAutomation | null>(
 		null,
 	);
+	const [hostOfflineRun, setHostOfflineRun] = useState<{
+		hostId: string | null;
+	} | null>(null);
 
 	const runNowMutation = useMutation({
-		mutationFn: ({ id }: { id: string; name: string }) =>
-			apiTrpcClient.automation.runNow.mutate({ id }),
+		mutationFn: ({
+			id,
+		}: {
+			id: string;
+			name: string;
+			targetHostId: string | null;
+		}) => apiTrpcClient.automation.runNow.mutate({ id }),
 		onSuccess: (_, { name }) => toast.success(`Running "${name}" now`),
-		onError: (error) =>
-			toast.error(
-				error instanceof Error ? error.message : "Failed to trigger run",
-			),
+		onError: (error, { targetHostId }) => {
+			const message = error instanceof Error ? error.message : null;
+			if (isHostOfflineError(message)) {
+				setHostOfflineRun({ hostId: targetHostId });
+				return;
+			}
+			toast.error(message ?? "Failed to trigger run");
+		},
 	});
 
 	const deleteMutation = useMutation({
@@ -120,6 +135,8 @@ function AutomationsPage() {
 			})),
 		[collections.users],
 	);
+	const { lastRunStatusById } = useFailedAutomations();
+
 	const recentProjects = useRecentProjects();
 	const { workspaces: hostWorkspaces } = useHostWorkspaces();
 	const { data: hostRows = [] } = useLiveQuery(
@@ -228,8 +245,9 @@ function AutomationsPage() {
 		if (!next) setInitialTemplate(null);
 	};
 
-	const colWidth = scope === "team" ? "w-[13%]" : "w-[15%]";
-	const scheduleWidth = scope === "team" ? "w-[16%]" : "w-[18%]";
+	const colWidth = scope === "team" ? "w-[11%]" : "w-[13%]";
+	const scheduleWidth = scope === "team" ? "w-[14%]" : "w-[16%]";
+	const lastRunWidth = "w-[9%]";
 	const showAutomationLoading = !automationsReady && visible.length === 0;
 	const showMineEmptyState =
 		automationsReady && visible.length === 0 && scope === "mine";
@@ -422,6 +440,9 @@ function AutomationsPage() {
 											onSort={handleSort}
 										/>
 									</TableHead>
+									<TableHead className={cn(DATA_TABLE_HEAD_CELL, lastRunWidth)}>
+										Last run
+									</TableHead>
 									<TableHead
 										className={cn(DATA_TABLE_HEAD_CELL, "w-12 pr-4")}
 									/>
@@ -448,9 +469,16 @@ function AutomationsPage() {
 											project={projectsById.get(automation.v2ProjectId)}
 											workspaceLabel={workspaceLabel}
 											hostLabel={host?.name ?? "Auto"}
+											lastRunStatus={
+												lastRunStatusById.get(automation.id) ?? null
+											}
 											isOwner={automation.ownerUserId === currentUserId}
 											onRunNow={(a) =>
-												runNowMutation.mutate({ id: a.id, name: a.name })
+												runNowMutation.mutate({
+													id: a.id,
+													name: a.name,
+													targetHostId: a.targetHostId,
+												})
 											}
 											onDelete={setPendingDelete}
 										/>
@@ -467,6 +495,14 @@ function AutomationsPage() {
 				onOpenChange={handleDialogOpenChange}
 				initialTemplate={initialTemplate}
 				onCreated={() => handleDialogOpenChange(false)}
+			/>
+
+			<HostOfflineRunDialog
+				hostId={hostOfflineRun?.hostId ?? null}
+				open={!!hostOfflineRun}
+				onOpenChange={(next) => {
+					if (!next) setHostOfflineRun(null);
+				}}
 			/>
 
 			<AlertDialog
