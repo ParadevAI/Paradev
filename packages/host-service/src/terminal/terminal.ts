@@ -1228,7 +1228,9 @@ export async function createTerminalSessionInternal({
 						? bytes
 						: Buffer.from(bytes.buffer, bytes.byteOffset, bytes.byteLength),
 				);
-				if (hintText.length > 0) portManager.checkOutputForHint(hintText);
+				// Runs even when the decoder buffers a partial codepoint into ""
+				// — the chunk is still output and must refresh the idle clock.
+				portManager.checkOutputForHint(terminalId, hintText);
 
 				// Feed the tracker on every byte — broadcast skips the FIFO,
 				// so this is the only path that catches startup mode escapes.
