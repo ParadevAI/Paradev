@@ -70,6 +70,7 @@ import {
 	type WorkspacesCreateInput,
 	workspaceLocalStateSchema,
 } from "./dashboardSidebarLocal";
+import { evictInactiveOrgs } from "./evictInactiveOrgs";
 import { withReadHeal } from "./withReadHeal";
 
 const columnMapper = snakeCamelMapper();
@@ -949,6 +950,32 @@ export function getCollections(organizationId: string) {
 		...orgCollections,
 		organizations: organizationsCollection,
 	};
+}
+
+/**
+ * Evict the collection sets of every cached org except `activeOrganizationId`,
+ * stopping their Electric/localStorage sync, clearing their in-memory rows, and
+ * dropping them from the cache. Call this when the active org changes so prior
+ * orgs stop holding entire synced tables in the heap.
+ *
+ * The shared `organizationsCollection` singleton lives outside `collectionsCache`
+ * and is never touched. Recovery is handled by `getCollections`, which rebuilds
+ * fresh instances (rehydrating cache-first from the untouched on-disk rows) when
+ * an evicted org is re-entered.
+ */
+export function evictInactiveOrgCollections(
+	activeOrganizationId: string,
+): void {
+	evictInactiveOrgs(
+		collectionsCache as unknown as Map<string, Record<string, unknown>>,
+		getCollectionsCacheKey(activeOrganizationId),
+		(orgKey, collectionName, error) => {
+			console.error(
+				`[collections] Failed to clean up evicted collection ${collectionName} for org ${orgKey}`,
+				error,
+			);
+		},
+	);
 }
 
 export type AppCollections = ReturnType<typeof getCollections>;
