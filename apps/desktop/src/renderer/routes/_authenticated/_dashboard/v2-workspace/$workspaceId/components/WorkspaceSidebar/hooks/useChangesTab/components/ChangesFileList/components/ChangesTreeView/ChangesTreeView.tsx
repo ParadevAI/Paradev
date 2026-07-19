@@ -32,6 +32,7 @@ import {
 	type ChangesetFile,
 	getChangesetFileKey,
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useChangeset";
+import type { ChangesViewMode } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal/schema";
 import {
 	toAbsoluteWorkspacePath,
 	toRelativeWorkspacePath,
@@ -41,11 +42,19 @@ import { FileRowContextMenuItems } from "./components/FileRowContextMenuItems";
 import { FolderContextMenuItems } from "./components/FolderContextMenuItems";
 import { ShadowRowHoverActions } from "./components/ShadowRowHoverActions";
 import { useMeasuredTreeHeight } from "./hooks/useMeasuredTreeHeight";
+import {
+	buildPierreProjection,
+	compareFolderProjectionEntries,
+} from "./utils/buildPierreProjection";
 import { buildTreeShape } from "./utils/buildTreeShape";
 
 const ITEM_HEIGHT = 24;
 // Pierre rows carry `margin-block: 1px`, so each row occupies ITEM_HEIGHT + 2px.
 const ROW_BOX = ITEM_HEIGHT + 2;
+// A full-content host disables Pierre's internal virtualizer by making every
+// row part of its viewport. Cap the host while retaining Pierre's own complete
+// scroll range; overscan still keeps the interaction boundary smooth.
+const MAX_VIEWPORT_ROWS = 20;
 // Small cushion so the last row never clips against the host's `overflow: hidden`.
 const HEIGHT_CUSHION = 8;
 
@@ -59,6 +68,7 @@ type SectionKind = ChangesetFile["source"]["kind"];
 interface ChangesTreeViewProps {
 	/** Files for a single section — caller has already pre-grouped by `source.kind`. */
 	files: ChangesetFile[];
+	viewMode: ChangesViewMode;
 	/** Section the files came from; used to scope context-menu/hover Discard. */
 	sectionKind: SectionKind;
 	workspaceId: string;
@@ -77,12 +87,13 @@ interface ChangesTreeViewProps {
 }
 
 /**
- * Tree view of a single changes section, powered by `@pierre/trees`. Pierre
- * builds the directory hierarchy from the flat path list and handles
- * virtualization + status tints + icons; we layer on:
+ * Changes view of a single section, powered by `@pierre/trees` in both modes.
+ * Tree mode passes through real paths; folder mode projects every immediate
+ * parent into one top-level Pierre directory. Pierre handles virtualization,
+ * status tints, and icons; we layer on:
  *
  *  - `renderRowDecoration`: `+N/−N` on files, file count on directories
- *  - `renderContextMenu`: file-row actions matching `FileRow`; folder-row
+ *  - `renderContextMenu`: the existing file actions plus folder-row
  *    actions (open in editor, copy path)
  *  - hover actions overlay (Discard on unstaged + more-actions ⌄ dropdown)
  *  - `useChangesSidebarFilePolicy` for settings-driven click routing
@@ -94,6 +105,7 @@ interface ChangesTreeViewProps {
  */
 export const ChangesTreeView = memo(function ChangesTreeView({
 	files,
+	viewMode,
 	sectionKind,
 	workspaceId,
 	worktreePath,
@@ -103,16 +115,29 @@ export const ChangesTreeView = memo(function ChangesTreeView({
 	onOpenFile,
 	onOpenInEditor,
 }: ChangesTreeViewProps) {
-	const paths = useMemo(() => files.map((f) => f.path), [files]);
+	const projection = useMemo(
+		() =>
+			buildPierreProjection(
+				files.map((file) => file.path),
+				viewMode,
+			),
+		[files, viewMode],
+	);
+	const { paths } = projection;
 	const fileByPath = useMemo(() => {
 		const map = new Map<string, ChangesetFile>();
-		for (const file of files) map.set(file.path, file);
+		for (const file of files) {
+			const treePath = projection.treePathByFilePath.get(file.path);
+			if (treePath) map.set(treePath, file);
+		}
 		return map;
-	}, [files]);
+	}, [files, projection]);
 
 	const { dirs, dirFileCount } = useMemo(() => buildTreeShape(paths), [paths]);
 
-	const initialGitStatusEntriesRef = useRef(buildPierreGitStatus(files));
+	const initialGitStatusEntriesRef = useRef(
+		buildPierreGitStatus(files, projection.treePathByFilePath),
+	);
 
 	// Callbacks routed through a ref so Pierre's stable handler closures
 	// (resolved once at `useFileTree` time) always see the latest props.
@@ -127,6 +152,7 @@ export const ChangesTreeView = memo(function ChangesTreeView({
 
 	const { model } = usePierreFileTree({
 		paths,
+		sort: viewMode === "folders" ? compareFolderProjectionEntries : "default",
 		initialExpansion: "open",
 		search: false,
 		gitStatus: initialGitStatusEntriesRef.current,
@@ -148,8 +174,10 @@ export const ChangesTreeView = memo(function ChangesTreeView({
 	}, [model, paths]);
 
 	useEffect(() => {
-		model.setGitStatus(buildPierreGitStatus(files));
-	}, [model, files]);
+		model.setGitStatus(
+			buildPierreGitStatus(files, projection.treePathByFilePath),
+		);
+	}, [model, files, projection]);
 
 	useFallthroughIcons(model);
 
@@ -157,10 +185,14 @@ export const ChangesTreeView = memo(function ChangesTreeView({
 	// 100%`, which collapses to 0 inside this section's auto-height container);
 	// fall back to a row-count estimate until that first measurement lands.
 	const contentHeight = useMeasuredTreeHeight(model);
-	const treeHeight =
+	const fullTreeHeight =
 		contentHeight != null
 			? contentHeight + HEIGHT_CUSHION
 			: (dirs.length + paths.length) * ROW_BOX + HEIGHT_CUSHION;
+	const treeHeight = Math.min(
+		fullTreeHeight,
+		MAX_VIEWPORT_ROWS * ROW_BOX + HEIGHT_CUSHION,
+	);
 
 	const setAllDirsExpanded = useCallback(
 		(expanded: boolean) => {
@@ -194,23 +226,23 @@ export const ChangesTreeView = memo(function ChangesTreeView({
 		selectedFilePath && worktreePath
 			? toRelativeWorkspacePath(worktreePath, selectedFilePath)
 			: selectedFilePath;
+	const selectedTreePath = selectedRelPath
+		? projection.treePathByFilePath.get(selectedRelPath)
+		: undefined;
 	useEffect(() => {
-		if (!selectedRelPath || !fileByPath.has(selectedRelPath)) return;
+		if (!selectedRelPath || !selectedTreePath) return;
 		if (lastUserSelectRef.current === selectedRelPath) {
 			lastUserSelectRef.current = null;
 			return;
 		}
-		model.focusPath(selectedRelPath);
-	}, [model, selectedRelPath, fileByPath]);
+		model.focusPath(selectedTreePath);
+	}, [model, selectedRelPath, selectedTreePath]);
 
 	handlersRef.current.onSelect = (treePath) => {
-		lastUserSelectRef.current = treePath;
 		const file = fileByPath.get(treePath);
-		onSelectFile?.(
-			treePath,
-			false,
-			file ? getChangesetFileKey(file) : undefined,
-		);
+		if (!file) return;
+		lastUserSelectRef.current = file.path;
+		onSelectFile?.(file.path, false, getChangesetFileKey(file));
 	};
 	// Pierre's row decoration accepts text or icon, not arbitrary JSX. The
 	// status indicator is already painted by `setGitStatus` (row tint + icon),
@@ -231,20 +263,27 @@ export const ChangesTreeView = memo(function ChangesTreeView({
 	const { onClickCapture, findFileRow } = usePierreChangesSidebarRowClickPolicy(
 		{
 			getFileIntent: filePolicy.getIntent,
-			onSelectDiff: (rel, openInNewTab) => {
-				lastUserSelectRef.current = rel;
-				const file = fileByPath.get(rel);
-				onSelectFile?.(
-					rel,
+			onSelectDiff: (treePath, openInNewTab) => {
+				const file = fileByPath.get(treePath);
+				if (!file) return;
+				lastUserSelectRef.current = file.path;
+				onSelectFile?.(file.path, openInNewTab, getChangesetFileKey(file));
+			},
+			onOpenFile: (treePath, openInNewTab) => {
+				if (!worktreePath) return;
+				const file = fileByPath.get(treePath);
+				if (!file) return;
+				onOpenFile?.(
+					toAbsoluteWorkspacePath(worktreePath, file.path),
 					openInNewTab,
-					file ? getChangesetFileKey(file) : undefined,
 				);
 			},
-			onOpenFile: (rel, openInNewTab) => {
-				if (!worktreePath) return;
-				onOpenFile?.(toAbsoluteWorkspacePath(worktreePath, rel), openInNewTab);
+			openInExternalEditor: (treePath) => {
+				const filePath = fileByPath.get(treePath)?.path;
+				const directoryPath = projection.directoryPathByTreePath.get(treePath);
+				const realPath = filePath ?? directoryPath;
+				if (realPath !== undefined) onOpenInEditor?.(realPath);
 			},
-			openInExternalEditor: (rel) => onOpenInEditor?.(rel),
 		},
 	);
 
@@ -281,9 +320,12 @@ export const ChangesTreeView = memo(function ChangesTreeView({
 	) => {
 		const menuItems = (() => {
 			if (item.kind === "directory") {
+				const treePath = stripTrailingSlash(item.path);
+				const directoryPath = projection.directoryPathByTreePath.get(treePath);
+				if (directoryPath === undefined) return null;
 				return (
 					<FolderContextMenuItems
-						relativePath={stripTrailingSlash(item.path)}
+						relativePath={directoryPath}
 						worktreePath={worktreePath}
 						onOpenInEditor={onOpenInEditor}
 					/>
@@ -383,11 +425,16 @@ export const ChangesTreeView = memo(function ChangesTreeView({
 	);
 });
 
-function buildPierreGitStatus(files: ChangesetFile[]): PierreGitStatusEntry[] {
-	return files.map((file) => ({
-		path: file.path,
-		status: FILE_STATUS_TO_PIERRE[file.status],
-	}));
+function buildPierreGitStatus(
+	files: ChangesetFile[],
+	treePathByFilePath: Map<string, string>,
+): PierreGitStatusEntry[] {
+	return files.flatMap((file) => {
+		const treePath = treePathByFilePath.get(file.path);
+		return treePath
+			? [{ path: treePath, status: FILE_STATUS_TO_PIERRE[file.status] }]
+			: [];
+	});
 }
 
 function formatDiffStats(additions: number, deletions: number): string {

@@ -1,7 +1,6 @@
 import { memo, useMemo } from "react";
 import type { ChangesetFile } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useChangeset";
 import type { ChangesViewMode } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal/schema";
-import { ChangesFoldersView } from "./components/ChangesFoldersView";
 import { ChangesSection } from "./components/ChangesSection";
 import { ChangesTreeView } from "./components/ChangesTreeView";
 
@@ -86,7 +85,10 @@ export const ChangesFileList = memo(function ChangesFileList({
 	}
 
 	return (
-		<div className="min-h-0 flex-1 space-y-2 overflow-y-auto pt-1">
+		<div
+			className="min-h-0 flex-1 space-y-2 overflow-y-auto pt-1"
+			data-changes-scroll-container
+		>
 			{GROUP_ORDER.map((key) => {
 				const groupFiles = grouped[key];
 				if (groupFiles.length === 0) return null;
@@ -103,29 +105,19 @@ export const ChangesFileList = memo(function ChangesFileList({
 								: undefined
 						}
 					>
-						{viewMode === "tree" ? (
-							<ChangesTreeView
-								files={groupFiles}
-								sectionKind={key}
-								workspaceId={workspaceId}
-								worktreePath={worktreePath}
-								selectedFilePath={selectedFilePath}
-								foldSignal={foldSignal}
-								onSelectFile={onSelectFile}
-								onOpenFile={onOpenFile}
-								onOpenInEditor={onOpenInEditor}
-							/>
-						) : (
-							<ChangesFoldersView
-								files={groupFiles}
-								workspaceId={workspaceId}
-								worktreePath={worktreePath}
-								foldSignal={foldSignal}
-								onSelectFile={onSelectFile}
-								onOpenFile={onOpenFile}
-								onOpenInEditor={onOpenInEditor}
-							/>
-						)}
+						<ChangesTreeView
+							key={viewMode}
+							files={groupFiles}
+							viewMode={viewMode}
+							sectionKind={key}
+							workspaceId={workspaceId}
+							worktreePath={worktreePath}
+							selectedFilePath={selectedFilePath}
+							foldSignal={foldSignal}
+							onSelectFile={onSelectFile}
+							onOpenFile={onOpenFile}
+							onOpenInEditor={onOpenInEditor}
+						/>
 					</ChangesSection>
 				);
 			})}
