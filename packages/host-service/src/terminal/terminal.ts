@@ -40,6 +40,7 @@ import { listTerminalResourceSessions } from "./resource-sessions.ts";
 import {
 	createModeTracker,
 	type ModeTracker,
+	type TerminalSnapshot,
 } from "./terminal-mode-tracker.ts";
 
 /**
@@ -534,6 +535,128 @@ export function writeInputToSession({
 
 	session.pty.write(data);
 	return { success: true };
+}
+
+// Ring-buffer replay after adoption arrives asynchronously over the daemon
+// socket, and it is what rebuilds the mode tracker (bracketed paste, screen
+// content). Protocol v2 has no replay-complete signal, so watch the replayed
+// bytes accumulate — they land in session.buffer, since no renderer is
+// attached right after adoption — and return once they quiesce.
+const ADOPTION_REPLAY_WAIT_MS = 500;
+
+async function waitForAdoptionReplay(session: TerminalSession): Promise<void> {
+	const deadline = Date.now() + ADOPTION_REPLAY_WAIT_MS;
+	let seen = -1;
+	while (Date.now() < deadline) {
+		const count = session.bufferBytes;
+		if (count > 0 && count === seen) return;
+		seen = count;
+		await new Promise((resolve) => setTimeout(resolve, 25));
+	}
+}
+
+/**
+ * Resolve a session for headless IO. The in-memory map empties on every
+ * host-service restart while the detached daemon keeps PTYs alive, so a
+ * miss is not "gone" — recover it the same way pane auto-adoption does.
+ */
+async function getOrAdoptSession({
+	terminalId,
+	workspaceId,
+	db,
+	eventBus,
+}: {
+	terminalId: string;
+	workspaceId: string;
+	db: HostDb;
+	eventBus?: EventBus;
+}): Promise<TerminalSession | { error: string }> {
+	const existing = sessions.get(terminalId);
+	if (existing) {
+		if (existing.workspaceId !== workspaceId) {
+			return { error: "Terminal session does not belong to this workspace" };
+		}
+		return existing;
+	}
+
+	const adopted = await createTerminalSessionInternal({
+		terminalId,
+		workspaceId,
+		db,
+		eventBus,
+		adoptOnly: true,
+	});
+	if ("error" in adopted) return adopted;
+
+	await waitForAdoptionReplay(adopted);
+	return adopted;
+}
+
+/**
+ * Public "send a follow-up to whatever runs in this terminal" path. Frames
+ * the text as a bracketed paste when the running program has that mode on,
+ * so embedded newlines reach a TUI agent (claude/codex) as literal newlines
+ * rather than premature Enter presses.
+ */
+export async function writeFramedInputToSession({
+	terminalId,
+	workspaceId,
+	text,
+	submit,
+	db,
+	eventBus,
+}: {
+	terminalId: string;
+	workspaceId: string;
+	text: string;
+	submit: boolean;
+	db: HostDb;
+	eventBus?: EventBus;
+}): Promise<{ success: true } | { error: string }> {
+	const session = await getOrAdoptSession({
+		terminalId,
+		workspaceId,
+		db,
+		eventBus,
+	});
+	if ("error" in session) return session;
+	if (session.exited) {
+		return { error: "Terminal session has exited" };
+	}
+
+	const framed = session.modeTracker.isBracketedPasteActive()
+		? `\x1b[200~${text}\x1b[201~`
+		: text;
+	session.pty.write(submit ? `${framed}\r` : framed);
+	return { success: true };
+}
+
+/**
+ * Non-destructive read of the terminal's current screen (and recent
+ * scrollback) off the per-session headless emulator. For TUI agents this is
+ * the alt-screen the agent renders to — i.e. its visible output.
+ */
+export async function snapshotSession({
+	terminalId,
+	workspaceId,
+	maxLines,
+	db,
+	eventBus,
+}: {
+	terminalId: string;
+	workspaceId: string;
+	maxLines?: number;
+	db: HostDb;
+	eventBus?: EventBus;
+}): Promise<({ success: true } & TerminalSnapshot) | { error: string }> {
+	const session = await getOrAdoptSession({
+		terminalId,
+		workspaceId,
+		db,
+		eventBus,
+	});
+	if ("error" in session) return session;
+	return { success: true, ...session.modeTracker.snapshot(maxLines) };
 }
 
 function sendMessage(
