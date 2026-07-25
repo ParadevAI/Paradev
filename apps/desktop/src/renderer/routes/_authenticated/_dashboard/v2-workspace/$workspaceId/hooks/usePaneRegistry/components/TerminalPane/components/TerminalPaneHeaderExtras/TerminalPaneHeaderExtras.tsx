@@ -51,9 +51,7 @@ export function TerminalPaneHeaderExtras({
 						<SquarePen className="size-3.5" />
 					</button>
 				</TooltipTrigger>
-				<TooltipContent side="bottom" showArrow={false}>
-					{label}
-				</TooltipContent>
+				<TooltipContent side="bottom">{label}</TooltipContent>
 			</Tooltip>
 		</div>
 	);

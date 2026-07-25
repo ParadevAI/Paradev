@@ -55,7 +55,7 @@ export function DashboardSidebarPortsList() {
 							<LuCircleHelp className="size-3" strokeWidth={STROKE_WIDTH} />
 						</button>
 					</TooltipTrigger>
-					<TooltipContent side="top" sideOffset={4}>
+					<TooltipContent side="top">
 						<p className="text-xs">Learn about port labels</p>
 					</TooltipContent>
 				</Tooltip>

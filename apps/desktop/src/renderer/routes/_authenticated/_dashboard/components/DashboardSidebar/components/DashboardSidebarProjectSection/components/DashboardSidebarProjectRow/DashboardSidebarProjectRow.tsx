@@ -112,9 +112,7 @@ export const DashboardSidebarProjectRow = forwardRef<
 									<HiMiniPlus className="size-4 text-muted-foreground" />
 								</button>
 							</TooltipTrigger>
-							<TooltipContent side="bottom" sideOffset={4}>
-								New workspace
-							</TooltipContent>
+							<TooltipContent side="bottom">New workspace</TooltipContent>
 						</Tooltip>
 					</div>
 				)}

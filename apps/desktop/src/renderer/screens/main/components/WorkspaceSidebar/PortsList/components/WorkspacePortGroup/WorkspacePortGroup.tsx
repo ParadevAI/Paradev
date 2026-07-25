@@ -57,7 +57,7 @@ export function WorkspacePortGroup({ group }: WorkspacePortGroupProps) {
 							)}
 						</button>
 					</TooltipTrigger>
-					<TooltipContent side="top" sideOffset={4}>
+					<TooltipContent side="top">
 						<p className="text-xs">Close all ports</p>
 					</TooltipContent>
 				</Tooltip>

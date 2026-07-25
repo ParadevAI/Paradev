@@ -169,9 +169,7 @@ export function TabItem<TData>({
 										</OverflowFadeText>
 									</div>
 								</TooltipTrigger>
-								<TooltipContent side="bottom" showArrow={false}>
-									{title}
-								</TooltipContent>
+								<TooltipContent side="bottom">{title}</TooltipContent>
 							</Tooltip>
 							<div className="relative flex h-full w-7 shrink-0 items-center justify-center">
 								{accessory && (

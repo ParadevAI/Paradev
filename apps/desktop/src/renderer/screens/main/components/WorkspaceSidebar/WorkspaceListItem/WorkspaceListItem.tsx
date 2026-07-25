@@ -421,7 +421,7 @@ export function WorkspaceListItem({
 													<HiMiniXMark className="size-3.5" />
 												</button>
 											</TooltipTrigger>
-											<TooltipContent side="top" sideOffset={4}>
+											<TooltipContent side="top">
 												<HotkeyLabel
 													label="Close workspace"
 													id={isActive ? "CLOSE_WORKSPACE" : undefined}

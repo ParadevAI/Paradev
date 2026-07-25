@@ -198,14 +198,7 @@ export function UpdatesPill({ isCollapsed = false }: UpdatesPillProps) {
 						)}
 					</button>
 				</TooltipTrigger>
-				<TooltipContent
-					side="right"
-					sideOffset={4}
-					showArrow={false}
-					className="rounded-sm border border-border bg-background px-1.5 py-0.5 font-medium text-muted-foreground shadow-sm"
-				>
-					{tooltip}
-				</TooltipContent>
+				<TooltipContent side="right">{tooltip}</TooltipContent>
 			</Tooltip>
 		);
 	}
@@ -291,14 +284,7 @@ export function UpdatesPill({ isCollapsed = false }: UpdatesPillProps) {
 					)}
 				</button>
 			</TooltipTrigger>
-			<TooltipContent
-				side="top"
-				sideOffset={4}
-				showArrow={false}
-				className="rounded-sm border border-border bg-background px-1.5 py-0.5 font-medium text-muted-foreground shadow-sm"
-			>
-				{tooltip}
-			</TooltipContent>
+			<TooltipContent side="top">{tooltip}</TooltipContent>
 		</Tooltip>
 	);
 }

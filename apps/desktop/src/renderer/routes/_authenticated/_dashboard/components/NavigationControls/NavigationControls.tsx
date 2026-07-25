@@ -32,7 +32,7 @@ export function NavigationControls() {
 
 	return (
 		<div className="flex items-center">
-			<Tooltip delayDuration={300}>
+			<Tooltip delayDuration={1000}>
 				<TooltipTrigger asChild>
 					<button
 						type="button"
@@ -44,11 +44,11 @@ export function NavigationControls() {
 					</button>
 				</TooltipTrigger>
 				<TooltipContent side="bottom">
-					<HotkeyLabel label="Go back" id="NAVIGATE_BACK" />
+					<HotkeyLabel fallbackLabel="Go back" id="NAVIGATE_BACK" />
 				</TooltipContent>
 			</Tooltip>
 
-			<Tooltip delayDuration={300}>
+			<Tooltip delayDuration={1000}>
 				<TooltipTrigger asChild>
 					<button
 						type="button"
@@ -60,7 +60,7 @@ export function NavigationControls() {
 					</button>
 				</TooltipTrigger>
 				<TooltipContent side="bottom">
-					<HotkeyLabel label="Go forward" id="NAVIGATE_FORWARD" />
+					<HotkeyLabel fallbackLabel="Go forward" id="NAVIGATE_FORWARD" />
 				</TooltipContent>
 			</Tooltip>
 
