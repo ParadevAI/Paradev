@@ -77,7 +77,6 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 		ref,
 	) => {
 		const {
-			accentColor = null,
 			hostType,
 			hostIsOnline,
 			name,
@@ -86,7 +85,6 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 			pendingTransaction,
 		} = workspace;
 		const isPending = pendingTransaction?.type === "insert";
-		const showsStandaloneActiveStripe = accentColor == null;
 		const localRef = useRef<HTMLDivElement>(null);
 		const openUrl = electronTrpc.external.openUrl.useMutation();
 
@@ -116,20 +114,14 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 					else if (ref) ref.current = node;
 				}}
 				className={cn(
-					"relative w-full text-left text-sm",
-					isActive && "bg-muted",
-					onClick && (isActive ? "hover:bg-muted" : "hover:bg-muted/50"),
+					"relative mx-2 rounded-md text-left text-sm transition-colors",
+					isActive && "bg-fill-selected",
+					onClick &&
+						(isActive ? "hover:bg-fill-selected" : "hover:bg-fill-hover"),
 					className,
 				)}
 				{...props}
 			>
-				{isActive && showsStandaloneActiveStripe && (
-					<div
-						className="absolute top-0 bottom-0 left-0 w-0.5 rounded-r"
-						style={{ backgroundColor: "var(--color-foreground)" }}
-					/>
-				)}
-
 				{/* biome-ignore lint/a11y/noStaticElementInteractions: Mirrors the legacy sidebar row UI, which includes nested action buttons. */}
 				<div
 					role={onClick ? "button" : undefined}
@@ -144,8 +136,8 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 					}}
 					onDoubleClick={onDoubleClick}
 					className={cn(
-						"group relative flex w-full items-center py-2 pr-2",
-						isInSection ? "pl-10" : "pl-5",
+						"group relative flex w-full items-center py-1.5 pr-2",
+						isInSection ? "pl-8" : "pl-3",
 						onClick && "cursor-pointer",
 					)}
 				>

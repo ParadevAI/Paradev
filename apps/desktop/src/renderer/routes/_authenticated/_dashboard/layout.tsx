@@ -151,6 +151,17 @@ function DashboardLayout() {
 		},
 	);
 
+	// Collapsed rail on the v2 workspace route: the rail's headroom strip
+	// continues the pane tab bar, so the panel must not draw its own
+	// full-height border — the sidebar's inner border (which stops below the
+	// strip) is the only divider.
+	const railContinuesTabBar =
+		isV2CloudEnabled &&
+		onV2WorkspaceRoute &&
+		!versionMismatch &&
+		isWorkspaceSidebarOpen &&
+		isWorkspaceSidebarCollapsed();
+
 	const sidebarPanel = isWorkspaceSidebarOpen && (
 		<ResizablePanel
 			width={workspaceSidebarWidth}
@@ -161,6 +172,7 @@ function DashboardLayout() {
 			maxWidth={MAX_WORKSPACE_SIDEBAR_WIDTH}
 			handleSide="right"
 			clampWidth={false}
+			className={railContinuesTabBar ? "border-r-0" : undefined}
 			onDoubleClickHandle={() =>
 				setWorkspaceSidebarWidth(DEFAULT_WORKSPACE_SIDEBAR_WIDTH)
 			}
@@ -184,14 +196,20 @@ function DashboardLayout() {
 		isWorkspaceSidebarOpen &&
 		!isWorkspaceSidebarCollapsed();
 
-	// On the v2 workspace route with an expanded sidebar the TopBar row is
-	// merged into the pane tab bar (which provides the drag region and hosts
-	// the right-sidebar toggle). The new-workspace page brings its own drag
-	// strip. Collapsed/closed sidebars keep the TopBar: its inset is what
-	// keeps content clear of the macOS traffic lights.
+	// On the v2 workspace route with an open sidebar the TopBar row is merged
+	// into the pane tab bar (which provides the drag region and hosts the
+	// right-sidebar toggle). Expanded sidebars host the traffic-light pad in
+	// their header; collapsed rails host it via their headroom spacer plus the
+	// tab bar's leading inset. Only a fully closed sidebar keeps the TopBar,
+	// whose inset then keeps content clear of the macOS traffic lights. The
+	// new-workspace page brings its own drag strip, so it hides the TopBar
+	// whenever the expanded sidebar sits outside the column.
 	const hideTopBar =
-		((onV2WorkspaceRoute && !versionMismatch) || onNewWorkspaceRoute) &&
-		sidebarOutsideColumn;
+		(onV2WorkspaceRoute &&
+			!versionMismatch &&
+			isV2CloudEnabled &&
+			isWorkspaceSidebarOpen) ||
+		(onNewWorkspaceRoute && sidebarOutsideColumn);
 
 	return (
 		<div className="flex h-full w-full overflow-hidden">
