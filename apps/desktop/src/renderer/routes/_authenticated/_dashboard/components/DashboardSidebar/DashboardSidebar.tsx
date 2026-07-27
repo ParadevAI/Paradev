@@ -251,7 +251,11 @@ export function DashboardSidebar({
 										{createPortal(
 											<DragOverlay dropAnimation={null}>
 												{activeProject && (
-													<div className="bg-background shadow-lg border-b border-border">
+													// Transparent on purpose: the sidebar surface comes from
+													// window vibrancy, so any opaque bg renders as a solid
+													// slab. Sortable siblings make room, so the row floats
+													// over empty sidebar, not over other rows.
+													<div>
 														<DashboardSidebarProjectSection
 															project={activeProject}
 															isSidebarCollapsed={isCollapsed}
