@@ -98,21 +98,16 @@ function parseFlatItems(items: UniqueIdentifier[]): ParsedFlatItems {
 interface UseSidebarDndOptions {
 	projectId: string;
 	projectChildren: DashboardSidebarProjectChild[];
-	// While the sidebar filter is active, projectChildren is a pruned subset —
-	// committing a drop from it would rewrite tabOrder against incomplete data
-	// and corrupt the order of the hidden siblings.
-	disabled?: boolean;
 }
 
 export function useSidebarDnd({
 	projectId,
 	projectChildren,
-	disabled = false,
 }: UseSidebarDndOptions) {
 	const { reorderProjectChildren, moveWorkspaceToSectionAtIndex } =
 		useDashboardSidebarState();
 
-	const enabledSensors = useSensors(
+	const sensors = useSensors(
 		useSensor(MouseSensor, { activationConstraint: { distance: 8 } }),
 		useSensor(TouchSensor, {
 			activationConstraint: { delay: 200, tolerance: 5 },
@@ -295,11 +290,10 @@ export function useSidebarDnd({
 
 	const onDragStart = useCallback(
 		({ active }: DragStartEvent) => {
-			if (disabled) return;
 			setActiveId(active.id);
 			clonedRef.current = [...flatItems];
 		},
-		[disabled, flatItems],
+		[flatItems],
 	);
 
 	const onDragOver = useCallback(({ over }: DragOverEvent) => {
@@ -378,8 +372,7 @@ export function useSidebarDnd({
 	}, []);
 
 	return {
-		// No sensors means dnd-kit can never activate a drag.
-		sensors: disabled ? [] : enabledSensors,
+		sensors,
 		measuring,
 		collisionDetection: closestCenter,
 		flatItems,
