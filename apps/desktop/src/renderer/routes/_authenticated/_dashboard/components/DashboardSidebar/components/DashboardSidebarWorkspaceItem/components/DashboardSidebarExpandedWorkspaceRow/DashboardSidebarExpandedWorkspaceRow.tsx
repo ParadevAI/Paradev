@@ -284,7 +284,7 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 								)
 							)}
 							{!isPending && (
-								<div className="invisible flex items-center justify-end gap-1.5 group-hover:visible group-focus-within:visible">
+								<div className="hidden items-center justify-end gap-1.5 group-hover:flex group-focus-within:flex">
 									{shortcutLabel && (
 										<span className="shrink-0 font-mono text-[10px] tabular-nums text-muted-foreground">
 											{shortcutLabel}
