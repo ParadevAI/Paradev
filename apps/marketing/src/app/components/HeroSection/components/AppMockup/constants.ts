@@ -1,4 +1,4 @@
-import type { AgentTab, FileChange, PortGroup, WorkspaceData } from "./types";
+import type { AgentTab, FileChange, WorkspaceData } from "./types";
 
 export const WORKSPACES: WorkspaceData[] = [
 	{
@@ -60,14 +60,6 @@ export const FILE_CHANGES: FileChange[] = [
 	{ path: "apps/api/src/trpc/routers", type: "folder" },
 	{ path: "ssh-manager.ts", add: 277, del: 0, type: "add", indent: 1 },
 	{ path: "index.ts", add: 7, del: 0, type: "edit", indent: 1 },
-];
-
-export const PORTS: PortGroup[] = [
-	{ workspace: "use any agents", ports: ["3002"] },
-	{
-		workspace: "see changes",
-		ports: ["3000", "3001", "5678"],
-	},
 ];
 
 export const AGENT_TABS: AgentTab[] = [

@@ -24,7 +24,7 @@ export function UniversalCompatibilityDemo() {
 	return (
 		<motion.div
 			ref={ref}
-			className="w-full max-w-xs bg-[#1a1a1a]/90 backdrop-blur-sm rounded-lg border border-white/10 shadow-2xl overflow-hidden"
+			className="w-full max-w-xs bg-[#1a1a1a]/90 backdrop-blur-sm rounded-md border border-white/10 shadow-2xl overflow-hidden"
 			initial={{ opacity: 0, y: 20 }}
 			animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
 			transition={{ duration: 0.5 }}
