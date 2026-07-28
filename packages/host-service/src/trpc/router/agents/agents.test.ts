@@ -1,5 +1,9 @@
 import { describe, expect, it } from "bun:test";
-import { buildAgentCommandString } from "./agents";
+import { TRPCError } from "@trpc/server";
+import {
+	buildAgentCommandString,
+	validateAgentEffortSelection,
+} from "./agents";
 
 const argvConfig = {
 	id: "00000000-0000-0000-0000-000000000001",
@@ -89,5 +93,45 @@ describe("buildAgentCommandString", () => {
 		expect(buildAgentCommandString(stdinConfig, "", [], RANDOM_ID)).toBe(
 			"'amp'",
 		);
+	});
+});
+
+describe("validateAgentEffortSelection", () => {
+	it("leaves the effort unset so the agent can use its own default", () => {
+		expect(() =>
+			validateAgentEffortSelection("codex", "Codex", undefined),
+		).not.toThrow();
+	});
+
+	it("accepts a supported effort for the selected agent", () => {
+		expect(() =>
+			validateAgentEffortSelection("codex", "Codex", "xhigh"),
+		).not.toThrow();
+	});
+
+	it("rejects an invalid effort with the supported values", () => {
+		try {
+			validateAgentEffortSelection("codex", "Codex", "max");
+			throw new Error("Expected validation to fail");
+		} catch (error) {
+			expect(error).toBeInstanceOf(TRPCError);
+			expect((error as TRPCError).code).toBe("BAD_REQUEST");
+			expect((error as Error).message).toBe(
+				'Unsupported reasoning effort "max" for Codex. Choose one of: low, medium, high, xhigh.',
+			);
+		}
+	});
+
+	it("rejects overrides for agents without effort support", () => {
+		try {
+			validateAgentEffortSelection("superset", "Superset", "high");
+			throw new Error("Expected validation to fail");
+		} catch (error) {
+			expect(error).toBeInstanceOf(TRPCError);
+			expect((error as TRPCError).code).toBe("BAD_REQUEST");
+			expect((error as Error).message).toBe(
+				"Superset does not support a reasoning effort override. Omit effort to use the agent default.",
+			);
+		}
 	});
 });

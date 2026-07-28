@@ -13,7 +13,11 @@ import {
 	toCloudShape,
 } from "../../../workspaces/local-workspace-store";
 import { protectedProcedure, router } from "../../index";
-import { type AgentRunResult, runAgentInWorkspace } from "../agents";
+import {
+	type AgentRunResult,
+	runAgentInWorkspace,
+	validateAgentLaunchEffort,
+} from "../agents";
 import { ensureMainWorkspace } from "../project/utils/ensure-main-workspace";
 import { getHostWorktreeBaseDir } from "../settings/worktree-location";
 import { adoptExistingWorktree } from "../workspace-creation/shared/adopt-existing-worktree";
@@ -428,6 +432,10 @@ export const workspacesRouter = router({
 	create: protectedProcedure
 		.input(createInputSchema)
 		.mutation(async ({ ctx, input }) => {
+			for (const launch of input.agents ?? []) {
+				validateAgentLaunchEffort(ctx.db, launch);
+			}
+
 			const localProject = requireLocalProject(ctx, input.projectId);
 
 			// Kick off AI naming in parallel when the user supplied a prompt
