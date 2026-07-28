@@ -9,6 +9,7 @@ import { HERO_POSITIONING_FLAG } from "@/lib/analytics/hero-flag-bootstrap";
 import { isMacPlatform, usePlatform } from "../../hooks/useOS";
 import { DownloadButton } from "../DownloadButton";
 import { WaitlistModal } from "../WaitlistModal";
+import { BoidsBackground } from "./components/BoidsBackground";
 import { ProductDemo } from "./components/ProductDemo";
 import { TypewriterText } from "./components/TypewriterText";
 
@@ -65,7 +66,8 @@ export function HeroSection() {
 
 	return (
 		<div>
-			<div className="flex flex-col items-center pt-24 sm:pt-32 lg:pt-40 overflow-hidden">
+			<div className="relative flex flex-col items-center pt-24 sm:pt-32 lg:pt-40 overflow-hidden">
+				<BoidsBackground />
 				<div className="relative w-full max-w-[1600px] mx-auto px-4 sm:px-8 lg:px-[30px]">
 					<div className="flex flex-col items-center text-center">
 						<div className="space-y-4 sm:space-y-6">
