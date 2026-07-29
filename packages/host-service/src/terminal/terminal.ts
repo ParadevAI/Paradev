@@ -211,6 +211,16 @@ type TerminalSocket = {
 const SHELL_READY_TIMEOUT_MS = 15_000;
 
 /**
+ * Gap between writing the initialCommand text and the Enter (`\r`) that runs
+ * it. The shell-ready marker fires from precmd, before the line editor reads
+ * input — plugin init in that window can flush the PTY input queue, eating a
+ * newline bundled with the command while the text itself survives in the edit
+ * buffer (typed-but-never-run). A separated, delayed Enter lands after that
+ * init storm.
+ */
+const INITIAL_COMMAND_ENTER_DELAY_MS = 500;
+
+/**
  * Shell readiness lifecycle:
  * - `pending`     — shell initialising; scanner active
  * - `ready`       — OSC 133;A detected; scanner off
@@ -847,9 +857,7 @@ function queueInitialCommand(
 ): void {
 	if (session.initialCommandQueued || session.exited) return;
 	session.initialCommandQueued = true;
-	const cmd = initialCommand.endsWith("\n")
-		? initialCommand
-		: `${initialCommand}\n`;
+	const commandText = initialCommand.replace(/[\r\n]+$/, "");
 	// Marker-backed shells can run interactive startup hooks that read or flush
 	// PTY input before the first prompt (direnv/devenv is one example). Wait for
 	// that prompt so the command cannot be consumed as startup input. Launches
@@ -857,9 +865,20 @@ function queueInitialCommand(
 	// marker resolves it via SHELL_READY_TIMEOUT_MS — the command must
 	// eventually run; only session teardown may cancel it.
 	void session.shellReadyPromise.then(() => {
-		if (!session.exited && session.shellReadyState !== "cancelled") {
-			session.pty.write(cmd);
-		}
+		if (session.exited || session.shellReadyState === "cancelled") return;
+		// The OSC 133;A marker fires from precmd, which runs BEFORE the line
+		// editor starts reading input. Plugin init in that gap (vi-mode,
+		// syntax-highlighting) can flush the PTY input queue mid-read, eating a
+		// trailing newline sent in the same write: the command text survives in
+		// the editor's buffer but never executes. Send Enter as its own delayed
+		// write — and as `\r`, what a real Enter key sends, bound to accept-line
+		// in every keymap — so it lands after the init storm. One Enter total,
+		// so a double-run is impossible.
+		session.pty.write(commandText);
+		setTimeout(() => {
+			if (session.exited || session.shellReadyState === "cancelled") return;
+			session.pty.write("\r");
+		}, INITIAL_COMMAND_ENTER_DELAY_MS);
 	});
 }
 
