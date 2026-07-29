@@ -38,7 +38,8 @@ detect_target() {
         Linux)
             case "$arch" in
                 x86_64) echo "linux-x64" ;;
-                *) error "Unsupported Linux architecture: $arch (only x64 is supported)" ;;
+                aarch64|arm64) echo "linux-arm64" ;;
+                *) error "Unsupported Linux architecture: $arch (only x64 and arm64 are supported)" ;;
             esac
             ;;
         *)
