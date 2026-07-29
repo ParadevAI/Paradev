@@ -283,11 +283,17 @@ async function runChatAgent(
 	return { kind: "chat", sessionId, label };
 }
 
-async function runTerminalAgent(
-	ctx: { db: HostDb; eventBus: import("../../../events").EventBus },
+/**
+ * Resolve a terminal agent launch to the shell command that runs it, without
+ * creating a terminal. Used by `runTerminalAgent` and by the workspace-create
+ * wait-for-setup gate, which chains this command behind the setup commands in
+ * the setup terminal. Throws NOT_FOUND for unknown agents or attachments.
+ */
+export function buildTerminalAgentLaunch(
+	db: HostDb,
 	input: AgentRunInput,
-): Promise<AgentRunResult> {
-	const config = resolveHostAgentConfig(ctx.db, input.agent);
+): { fullCommand: string; label: string } {
+	const config = resolveHostAgentConfig(db, input.agent);
 	if (!config) {
 		// Worded for end users (automation run errors show this verbatim), but
 		// keep "No host agent config matching" — the desktop matches on it to
@@ -319,7 +325,17 @@ async function runTerminalAgent(
 		...effortArgs,
 	]);
 	const modelEnv = buildAgentModelEnv(config.presetId, input.model);
-	const fullCommand = `${envOverlayPrefix({ ...config.env, ...modelEnv })}${command}`;
+	return {
+		fullCommand: `${envOverlayPrefix({ ...config.env, ...modelEnv })}${command}`,
+		label: config.label,
+	};
+}
+
+async function runTerminalAgent(
+	ctx: { db: HostDb; eventBus: import("../../../events").EventBus },
+	input: AgentRunInput,
+): Promise<AgentRunResult> {
+	const { fullCommand, label } = buildTerminalAgentLaunch(ctx.db, input);
 
 	const terminalId = crypto.randomUUID();
 	const result = await createTerminalSessionInternal({
@@ -340,8 +356,13 @@ async function runTerminalAgent(
 	return {
 		kind: "terminal",
 		sessionId: result.terminalId,
-		label: config.label,
+		label,
 	};
+}
+
+/** Sugar agents that run as chat sessions rather than terminal commands. */
+export function isChatAgent(agent: string): boolean {
+	return agent === SUPERSET_AGENT_ID;
 }
 
 export async function runAgentInWorkspace(
