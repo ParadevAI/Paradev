@@ -73,8 +73,5 @@
 		"sharp",
 		"utf-8-validate",
 		"workerd"
-	],
-	"dependencies": {
-		"hono": "4.12.27"
-	}
+	]
 }

@@ -4,9 +4,6 @@
   "workspaces": {
     "": {
       "name": "@superset/repo",
-      "dependencies": {
-        "hono": "4.12.27",
-      },
       "devDependencies": {
         "@biomejs/biome": "2.4.2",
         "@types/bun": "1.3.14",
