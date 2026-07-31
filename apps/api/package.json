@@ -19,7 +19,7 @@
 		"@octokit/app": "16.1.2",
 		"@octokit/rest": "22.0.1",
 		"@octokit/webhooks": "14.2.0",
-		"@sentry/nextjs": "10.46.0",
+		"@sentry/nextjs": "10.68.0",
 		"@slack/types": "2.20.1",
 		"@slack/web-api": "7.15.0",
 		"@superset/auth": "workspace:*",

@@ -10,6 +10,7 @@ import { app, dialog } from "electron";
 import log from "electron-log/main";
 import { env as sharedEnv } from "shared/env.shared";
 import { getProcessEnvWithShellPath } from "../../lib/trpc/routers/workspaces/utils/shell-env";
+import { env as mainEnv } from "../env.main";
 import { SUPERSET_HOME_DIR } from "./app-environment";
 import { isInternalBuild } from "./build-channel";
 import { acquireSpawnLock } from "./host-service-lock";
@@ -706,6 +707,13 @@ export class HostServiceCoordinator extends EventEmitter {
 			// canary and dev builds, never on stable. The host gates its router
 			// and WS stream route on this env var.
 			...(isInternalBuild() ? { SUPERSET_ACP_SESSIONS: "1" } : {}),
+			...(app.isPackaged && mainEnv.SENTRY_DSN_HOST_SERVICE
+				? {
+						SENTRY_DSN: mainEnv.SENTRY_DSN_HOST_SERVICE,
+						SENTRY_RELEASE: app.getVersion(),
+						SENTRY_ENVIRONMENT: "production",
+					}
+				: {}),
 			// Read by the child's parent watchdog so it can self-exit if
 			// Electron crashes without sending SIGTERM (orphan reparenting).
 			HOST_PARENT_PID: String(process.pid),
@@ -775,6 +783,25 @@ export class HostServiceCoordinator extends EventEmitter {
 		const cause =
 			signal != null ? `signal ${signal}` : `exit code ${code ?? "unknown"}`;
 		log.error(`[host-service:${organizationId}] crashed (${cause})`);
+		// The child cannot report its own death for hard kills (SIGSEGV, OOM),
+		// so the supervisor is the only place these are observable. Imported
+		// lazily: a static @sentry/electron import needs electron APIs the
+		// coordinator tests' stub does not provide.
+		void import("@sentry/electron/main")
+			.then((Sentry) =>
+				Sentry.captureMessage(`host-service crashed (${cause})`, {
+					level: "error",
+					tags: {
+						exit_code: String(code ?? "none"),
+						exit_signal: signal ?? "none",
+					},
+					extra: {
+						organizationId,
+						respawnAttempts: this.respawns.get(organizationId)?.attempts ?? 0,
+					},
+				}),
+			)
+			.catch(() => {});
 		this.scheduleRespawn(organizationId, cause);
 	}
 

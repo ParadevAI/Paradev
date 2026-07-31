@@ -84,7 +84,7 @@
 		"@radix-ui/react-dialog": "1.1.15",
 		"@radix-ui/react-label": "2.1.8",
 		"@replit/codemirror-css-color-picker": "6.3.0",
-		"@sentry/electron": "7.10.0",
+		"@sentry/electron": "7.16.0",
 		"@streamdown/mermaid": "1.0.2",
 		"@superset/auth": "workspace:*",
 		"@superset/chat": "workspace:*",
@@ -245,7 +245,7 @@
 		"zustand": "5.0.12"
 	},
 	"devDependencies": {
-		"@sentry/vite-plugin": "4.9.1",
+		"@sentry/vite-plugin": "5.4.0",
 		"@superset/typescript": "workspace:*",
 		"@tailwindcss/vite": "4.2.2",
 		"@tanstack/router-cli": "1.167.17",
