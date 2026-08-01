@@ -5,10 +5,27 @@ all tRPC traffic; any in-process git spawn or sync fs walk head-of-line
 blocks every response. Worker pools exist on both sides — coverage, not
 infrastructure, is the gap.
 
-Enforced by ratchet tests (fail on new call sites, fail on stale allowlist
-entries):
+Enforced by two layers:
+
+**Ratchet tests** — per-file matching-line counts (an allowlisted file can't
+grow new sites), bare-identifier patterns (renamed imports and namespace
+access count), comment-stripped. Fail on new sites AND on counts that became
+too high after a fix:
 - `packages/host-service/src/no-main-loop-blocking.test.ts`
 - `apps/desktop/src/no-main-process-blocking.test.ts`
+- `packages/chat/src/server/desktop/no-desktop-main-blocking.test.ts` —
+  chat's desktop server runs on Electron main; the desktop ratchet can't see
+  across the package boundary
+- `packages/pty-daemon/src/no-daemon-loop-blocking.test.ts` — the daemon
+  loop serves every terminal session in the org
+
+**Biome** (`biome.jsonc`, editor + `bun run lint`) — repo-wide
+`noRestrictedImports` ban on `execSync`/`spawnSync`/`execFileSync` from
+`child_process`; tests/scripts and the ratchet-frozen legacy files are
+override-exempted. Delete an override entry when its file is fixed.
+
+Known blind spot: host-service call sites spawning via `ctx.git()` (the
+shared factory) are invisible to both layers — backlog-only below.
 
 ## Done (this branch)
 
@@ -64,3 +81,7 @@ allowlist line lose it when ported; the rest are backlog-only.
 5. `workspaces/utils/git.ts` — grab-bag; port per-function as consumers move
 6. `main/lib/agent-setup/utils.ts` — dead `execFileSync` code; delete
 7. `git-status.ts:335` — `existsSync` per worktree row → `pathExistsCached`
+8. `packages/chat/src/server/desktop/auth/anthropic/anthropic.ts` — two
+   `execSync` keychain `security` reads in the sync credential-resolver
+   chain, each blocks Electron main; the enclosing
+   `getCredentialsFromAnySource` is already async, so switch to execFile
