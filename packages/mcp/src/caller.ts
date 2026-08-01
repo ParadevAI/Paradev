@@ -34,7 +34,7 @@ export function createMcpCaller(ctx: McpContext): McpCaller {
 			updatedAt: new Date(0),
 		},
 		session: {
-			id: `mcp-v2-${ctx.requestId}`,
+			id: `mcp-${ctx.requestId}`,
 			userId: ctx.userId,
 			activeOrganizationId: ctx.organizationId,
 			organizationIds: ctx.organizationIds,

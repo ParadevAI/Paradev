@@ -96,7 +96,7 @@ const SPEC = {
 		description: [
 			"Superset (https://superset.sh) runs parallel AI coding agents in isolated Git worktrees.",
 			"",
-			"The primary programmatic surface is the **MCP server** (Model Context Protocol, JSON-RPC 2.0 over Streamable HTTP) at `/api/v2/agent/mcp`. It exposes tools for tasks, workspaces, coding-agent sessions, terminals, automations, hosts, projects, and organization members. The tool catalog with input schemas is published at `" +
+			"The primary programmatic surface is the **MCP server** (Model Context Protocol, JSON-RPC 2.0 over Streamable HTTP) at `/mcp` (legacy alias: `/api/v2/agent/mcp`). It exposes tools for tasks, workspaces, coding-agent sessions, terminals, automations, hosts, projects, and organization members. The tool catalog with input schemas is published at `" +
 				`${API_URL}/.well-known/mcp/server-card.json` +
 				"` and served live via the MCP `tools/list` method.",
 			"",
@@ -123,13 +123,13 @@ const SPEC = {
 	],
 	security: [{ bearerAuth: [] }],
 	paths: {
-		"/api/v2/agent/mcp": {
+		"/mcp": {
 			post: {
 				operationId: "mcpRequest",
 				tags: ["mcp"],
 				summary: "Send an MCP JSON-RPC request",
 				description:
-					"Streamable HTTP transport endpoint for the Superset MCP server. Send `initialize`, then `tools/list` to enumerate the available tools, then `tools/call` to act on the authenticated user's tasks, workspaces, agents, automations, terminals, hosts, and projects. Responses are `application/json` or `text/event-stream` depending on the request's Accept header.",
+					"Streamable HTTP transport endpoint for the Superset MCP server (also served at the legacy alias /api/v2/agent/mcp). Send `initialize`, then `tools/list` to enumerate the available tools, then `tools/call` to act on the authenticated user's tasks, workspaces, agents, automations, terminals, hosts, and projects. Responses are `application/json` or `text/event-stream` depending on the request's Accept header.",
 				requestBody: {
 					required: true,
 					content: {

@@ -11,7 +11,7 @@ export interface McpServerOptions {
 
 export function createMcpServer(options?: McpServerOptions): McpServer {
 	const server = new McpServer(
-		{ name: "superset-v2", version: packageJson.version },
+		{ name: "superset", version: packageJson.version },
 		{
 			capabilities: { tools: {} },
 			instructions:

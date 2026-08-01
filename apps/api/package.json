@@ -24,7 +24,7 @@
 		"@slack/web-api": "7.15.0",
 		"@superset/auth": "workspace:*",
 		"@superset/db": "workspace:*",
-		"@superset/mcp-v2": "workspace:*",
+		"@superset/mcp": "workspace:*",
 		"@superset/shared": "workspace:*",
 		"@superset/trpc": "workspace:*",
 		"@t3-oss/env-nextjs": "0.13.11",

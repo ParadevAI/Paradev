@@ -1,6 +1,6 @@
 import type Anthropic from "@anthropic-ai/sdk";
 import type { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { createInMemoryMcpClient } from "@superset/mcp-v2/in-memory";
+import { createInMemoryMcpClient } from "@superset/mcp/in-memory";
 import { posthog } from "@/lib/analytics";
 import { getRelayUrl } from "@/lib/relay-url";
 

@@ -76,7 +76,7 @@
         "@slack/web-api": "7.15.0",
         "@superset/auth": "workspace:*",
         "@superset/db": "workspace:*",
-        "@superset/mcp-v2": "workspace:*",
+        "@superset/mcp": "workspace:*",
         "@superset/shared": "workspace:*",
         "@superset/trpc": "workspace:*",
         "@t3-oss/env-nextjs": "0.13.11",
@@ -914,8 +914,8 @@
         "node-addon-api": "7.1.1",
       },
     },
-    "packages/mcp-v2": {
-      "name": "@superset/mcp-v2",
+    "packages/mcp": {
+      "name": "@superset/mcp",
       "version": "0.1.0",
       "dependencies": {
         "@modelcontextprotocol/sdk": "1.28.0",
@@ -2852,7 +2852,7 @@
 
     "@superset/marketing": ["@superset/marketing@workspace:apps/marketing"],
 
-    "@superset/mcp-v2": ["@superset/mcp-v2@workspace:packages/mcp-v2"],
+    "@superset/mcp": ["@superset/mcp@workspace:packages/mcp"],
 
     "@superset/mobile": ["@superset/mobile@workspace:apps/mobile"],
 

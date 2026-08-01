@@ -87,7 +87,7 @@ export async function createInMemoryMcpClient({
 			...options,
 			authInfo: {
 				token: "internal",
-				clientId: "mcp-v2-internal",
+				clientId: "mcp-internal",
 				scopes: ["mcp:full"],
 				extra: { mcpContext },
 			},
@@ -96,7 +96,7 @@ export async function createInMemoryMcpClient({
 	await server.connect(serverTransport);
 
 	const client = new Client({
-		name: "superset-v2-internal",
+		name: "superset-internal",
 		version: "1.0.0",
 	});
 	await client.connect(clientTransport);

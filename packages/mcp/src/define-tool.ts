@@ -54,7 +54,7 @@ function emitToolCall(server: McpServer, event: McpToolCallEvent): void {
 	try {
 		emitter(event);
 	} catch (e) {
-		console.error("[mcp-v2] tool-call emitter threw:", e);
+		console.error("[mcp] tool-call emitter threw:", e);
 	}
 }
 

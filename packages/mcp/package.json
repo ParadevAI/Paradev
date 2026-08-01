@@ -1,5 +1,5 @@
 {
-	"name": "@superset/mcp-v2",
+	"name": "@superset/mcp",
 	"version": "0.1.0",
 	"private": true,
 	"type": "module",
