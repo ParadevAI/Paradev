@@ -562,7 +562,7 @@ export function NewWorkspaceScreen({
 						onChange={(markdown) => updateDraft({ prompt: markdown })}
 						onPasteFiles={(files) => attachments.add(files)}
 						onEnterSubmit={handleSubmit}
-						autoFocus={promptSeed > 0 ? "end" : "start"}
+						autoFocus={draft.prompt ? "end" : "start"}
 						placeholder="What do you want to do?"
 						className="flex flex-col min-h-[80px] max-h-[200px] px-3 pt-3"
 						editorClassName="overflow-y-auto text-sm"
