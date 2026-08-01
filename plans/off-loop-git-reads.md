@@ -61,9 +61,19 @@ factory) so the ratchet doesn't see them — they're backlog-only.
    loop; hoist + worker-route `worktree remove`
 6. `trpc/router/workspace/workspace.ts` — full `git.status()` on the legacy
    surface; also per-row `existsSync` in `workspace.list`
-7. `trpc/router/settings/branch-prefix.ts`,
-   `workspace-creation/shared/project-helpers.ts`,
+7. `workspace-creation/shared/project-helpers.ts`,
    `trpc/router/git/utils/git-helpers.ts` — cheap but on-loop; port last
+   (`settings/branch-prefix.ts` done — first `offLoop()` port)
+
+New procedures should not join this list: build them as a worker task plus
+an `offLoop()` resolver (`src/trpc/off-loop.ts`) — `prepare` runs on-loop
+and returns plain data, the task runs in the pool.
+
+Pool-level follow-up: task cancellation. Handlers are non-cancellable today
+(caller abort rejects the promise; the handler and any child process run to
+completion, bounded by their own timeouts). Proper cancellation needs an
+abort message in the worker protocol driving a per-task AbortController —
+applies to all tasks, raised on PR #6107 review.
 
 ## Backlog — desktop
 

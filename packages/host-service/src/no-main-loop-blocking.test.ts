@@ -58,11 +58,10 @@ const RULES: Rule[] = [
 			"trpc/router/git/utils/git-helpers.ts": 2,
 			"trpc/router/project/project.ts": 2,
 			"trpc/router/project/utils/resolve-repo.ts": 10,
-			"trpc/router/settings/branch-prefix.ts": 2,
 			"trpc/router/workspace-creation/shared/project-helpers.ts": 3,
 		},
 		advice:
-			"simple-git is async, but a client constructed here still pays the spawn syscall + stdout drain on the event loop — cost scales linearly with call volume (measured ~830ms/min at light churn). Async isn't enough for git; route it off-loop: add a task to workers/tasks/git.ts and run it via getHostWorkerPool().",
+			"simple-git is async, but a client constructed here still pays the spawn syscall + stdout drain on the event loop — cost scales linearly with call volume (measured ~830ms/min at light churn). Async isn't enough for git; route it off-loop: add a task to workers/tasks/git.ts and expose it with an offLoop() resolver (src/trpc/off-loop.ts).",
 	},
 ];
 

@@ -3,6 +3,10 @@
 // host-service event loop. Credential env is resolved in-process (it needs
 // the credential provider) and crosses as plain data.
 
+import {
+	type ResolvedGitInfo,
+	readGitIdentity,
+} from "../../runtime/git/identity.ts";
 import { createUserSimpleGit } from "../../runtime/git/simple-git.ts";
 import {
 	readWorkspaceRefs,
@@ -73,9 +77,18 @@ export const gitWorkspaceRefsTask = defineWorkerTask<
 	},
 });
 
+export const gitIdentityTask = defineWorkerTask<
+	{ shellEnv: GitTaskEnv },
+	ResolvedGitInfo
+>({
+	type: "git/readGitIdentity",
+	handler: ({ shellEnv }) => readGitIdentity(shellEnv),
+});
+
 export const gitTasks = [
 	gitStatusSnapshotTask,
 	gitFetchBaseRefTask,
 	gitCommitFilesTask,
 	gitWorkspaceRefsTask,
+	gitIdentityTask,
 ];
