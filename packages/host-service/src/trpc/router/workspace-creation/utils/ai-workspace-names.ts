@@ -27,7 +27,7 @@ const WORKSPACE_TITLE_MAX = 150;
 const BRANCH_NAME_MAX = 25;
 const GENERATE_TIMEOUT_MS = 5_000;
 
-function sanitizeBranchCandidate(raw: string): string {
+export function sanitizeBranchCandidate(raw: string): string {
 	return raw
 		.toLowerCase()
 		.trim()
@@ -324,33 +324,55 @@ export async function generateWorkspaceNamesFromPrompt(
 	return null;
 }
 
-interface ApplyAiRenameArgs {
+interface ApplyGeneratedNamesArgs {
 	ctx: HostServiceContext;
 	workspaceId: string;
 	repoPath: string;
 	worktreePath: string;
 	oldBranchName: string;
 	oldWorkspaceName: string;
-	prompt: string;
 	/** Replace the workspace title with an AI-picked one. Skip when the user typed a name. */
 	renameTitle: boolean;
 	/** Replace the git branch name with an AI-picked one. Skip when the user typed a branch. */
 	renameBranch: boolean;
 }
 
+interface ApplyAiRenameArgs extends ApplyGeneratedNamesArgs {
+	prompt: string;
+}
+
 /**
  * Generates an AI title+branch for a freshly-created workspace and
- * applies whichever side the caller asked for. Git rename runs first
- * (cheap to roll back); the host-local row is the source of truth and
- * commits next; the cloud mirror is pushed best-effort afterwards (a
- * failure leaves the row cloud-dirty for the reconciler).
- *
- * `renameTitle` / `renameBranch` let callers preserve user-typed
- * values: skip replacing whichever side the user supplied directly.
+ * applies whichever side the caller asked for. Callers that already
+ * have a naming call in flight should use `applyGeneratedWorkspaceNames`
+ * directly instead of paying for a second LLM call.
  */
 export async function applyAiWorkspaceRename(
 	args: ApplyAiRenameArgs,
 ): Promise<void> {
+	if (!args.renameTitle && !args.renameBranch) return;
+
+	const aiNames = await generateWorkspaceNamesFromPrompt(args.prompt);
+	if (!aiNames) return;
+
+	await applyGeneratedWorkspaceNames({ ...args, names: aiNames });
+}
+
+/**
+ * Applies already-generated names to a workspace and returns the final
+ * (name, branch) pair, or null when nothing changed. Git rename runs
+ * first (cheap to roll back); the host-local row is the source of truth
+ * and commits next; the cloud mirror is pushed best-effort afterwards
+ * (a failure leaves the row cloud-dirty for the reconciler).
+ *
+ * `renameTitle` / `renameBranch` let callers preserve user-typed
+ * values: skip replacing whichever side the user supplied directly.
+ * The worktree directory keeps its creation-time name — renaming it
+ * under running terminals/agents would break their recorded paths.
+ */
+export async function applyGeneratedWorkspaceNames(
+	args: ApplyGeneratedNamesArgs & { names: GeneratedWorkspaceNames },
+): Promise<{ name: string; branch: string } | null> {
 	const {
 		ctx,
 		workspaceId,
@@ -358,15 +380,12 @@ export async function applyAiWorkspaceRename(
 		worktreePath,
 		oldBranchName,
 		oldWorkspaceName,
-		prompt,
+		names: aiNames,
 		renameTitle,
 		renameBranch,
 	} = args;
 
-	if (!renameTitle && !renameBranch) return;
-
-	const aiNames = await generateWorkspaceNamesFromPrompt(prompt);
-	if (!aiNames) return;
+	if (!renameTitle && !renameBranch) return null;
 
 	const titleChanged =
 		renameTitle && aiNames.title !== "" && aiNames.title !== oldWorkspaceName;
@@ -374,7 +393,7 @@ export async function applyAiWorkspaceRename(
 		renameBranch &&
 		aiNames.branchName !== "" &&
 		aiNames.branchName !== oldBranchName;
-	if (!titleChanged && !branchChanged) return;
+	if (!titleChanged && !branchChanged) return null;
 
 	let deduped = oldBranchName;
 	let gitRenamed = false;
@@ -389,14 +408,17 @@ export async function applyAiWorkspaceRename(
 			await worktreeGit.raw(["branch", "-m", oldBranchName, deduped]);
 			gitRenamed = true;
 		} catch (err) {
-			console.warn("[applyAiWorkspaceRename] git branch rename failed", err);
+			console.warn(
+				"[applyGeneratedWorkspaceNames] git branch rename failed",
+				err,
+			);
 		}
 	}
 
 	const patch: { name?: string; branch?: string } = {};
 	if (titleChanged) patch.name = aiNames.title;
 	if (gitRenamed) patch.branch = deduped;
-	if (patch.name === undefined && patch.branch === undefined) return;
+	if (patch.name === undefined && patch.branch === undefined) return null;
 
 	const updated = updateLocalWorkspace(
 		{ db: ctx.db, eventBus: ctx.eventBus },
@@ -407,8 +429,10 @@ export async function applyAiWorkspaceRename(
 		// The git branch may already be renamed at this point; make the
 		// row-vs-git divergence observable instead of failing silently.
 		console.warn(
-			"[applyAiWorkspaceRename] workspace row missing after git rename",
+			"[applyGeneratedWorkspaceNames] workspace row missing after git rename",
 			{ workspaceId, patch },
 		);
+		return null;
 	}
+	return { name: updated.name, branch: updated.branch };
 }

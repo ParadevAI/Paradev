@@ -21,7 +21,7 @@ export interface SubmitArgs {
 }
 
 export type SubmitOutcome =
-	| { ok: true; workspaceId: string; autoNameWarning?: string }
+	| { ok: true; workspaceId: string }
 	| { ok: false; error: string };
 
 export interface SubmitHandle {
@@ -165,7 +165,6 @@ export function useWorkspaceCreates(): UseWorkspaceCreatesApi {
 					return {
 						ok: true,
 						workspaceId: result.workspace.id,
-						autoNameWarning: result.autoNameWarning,
 					};
 				})
 				.catch<SubmitOutcome>((error: unknown) => {

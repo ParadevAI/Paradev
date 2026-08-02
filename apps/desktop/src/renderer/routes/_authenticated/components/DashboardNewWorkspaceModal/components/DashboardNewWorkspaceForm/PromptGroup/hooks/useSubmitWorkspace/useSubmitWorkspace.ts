@@ -2,7 +2,6 @@ import { toast } from "@superset/ui/sonner";
 import { useMatchRoute, useNavigate } from "@tanstack/react-router";
 import { useCallback } from "react";
 import { authClient } from "renderer/lib/auth-client";
-import { showWorkspaceAutoNameWarningToast } from "renderer/lib/workspaces/showWorkspaceAutoNameWarningToast";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import type { NewWorkspacePromptContextApi } from "renderer/stores/new-workspace-prompt-context";
 import { usePromptHistoryStore } from "renderer/stores/prompt-history";
@@ -100,9 +99,9 @@ export function useSubmitWorkspace(
 
 		// PR path supplies a name (PR title) so the in-flight UI has
 		// something to show immediately. Branch path leaves both `name`
-		// and `branch` undefined when the user didn't type — the server
-		// generates a friendly random and AI-renames whichever side(s)
-		// the user didn't supply.
+		// and `branch` undefined when the user didn't type — a typed name
+		// seeds the branch slug; otherwise the server creates with a
+		// friendly random and AI-renames once names arrive.
 		const prName = isPrCheckout
 			? draft.linkedPR?.title || `PR #${draft.linkedPR?.prNumber}`
 			: undefined;
@@ -148,15 +147,6 @@ export function useSubmitWorkspace(
 
 		void completed.then((outcome) => {
 			if (!outcome.ok) return;
-
-			if (outcome.autoNameWarning) {
-				showWorkspaceAutoNameWarningToast({
-					description: outcome.autoNameWarning,
-					onOpenModelAuthSettings: () => {
-						void navigate({ to: "/settings/models" });
-					},
-				});
-			}
 
 			// The server can resolve the optimistic workspace to a different
 			// canonical id; follow it only if we're still on the optimistic route.
