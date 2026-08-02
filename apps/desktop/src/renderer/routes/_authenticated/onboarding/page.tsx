@@ -8,7 +8,7 @@ import { type ReactNode, useState } from "react";
 import { HiArrowUpRight } from "react-icons/hi2";
 import { SiGithub, SiOpenai } from "react-icons/si";
 import { electronTrpc } from "renderer/lib/electron-trpc";
-import { GhAuthDialog } from "./components/GhAuthDialog";
+import { GhAuthDialog, type GhAuthDialogMode } from "./components/GhAuthDialog";
 import {
 	type Provider,
 	ProviderConnectModal,
@@ -23,7 +23,9 @@ const PREREQ_POLL_MS = 4000;
 
 function OnboardingDashboardPage() {
 	const [connectProvider, setConnectProvider] = useState<Provider | null>(null);
-	const [ghAuthOpen, setGhAuthOpen] = useState(false);
+	const [ghDialogMode, setGhDialogMode] = useState<GhAuthDialogMode | null>(
+		null,
+	);
 
 	// Poll while mounted so external changes (installing gh in a browser,
 	// signing in from a terminal) are picked up without a focus change.
@@ -34,6 +36,7 @@ function OnboardingDashboardPage() {
 		refetch: refetchGh,
 		isPending: isPendingGh,
 	} = electronTrpc.system.detectGhCli.useQuery(undefined, statusPolling);
+	const { data: brewStatus } = electronTrpc.system.detectBrew.useQuery();
 	const { data: anthropicStatus, isPending: isPendingAnthropic } =
 		chatServiceTrpc.auth.getAnthropicStatus.useQuery(undefined, statusPolling);
 	const { data: openAIStatus, isPending: isPendingOpenAI } =
@@ -53,7 +56,13 @@ function OnboardingDashboardPage() {
 			? "Not signed in"
 			: "Not installed";
 
+	const brewAvailable = brewStatus?.installed === true;
+
 	const openGitHubInstall = () => {
+		if (brewAvailable) {
+			setGhDialogMode("install");
+			return;
+		}
 		window.open("https://cli.github.com/", "_blank", "noopener,noreferrer");
 	};
 
@@ -79,10 +88,12 @@ function OnboardingDashboardPage() {
 						required
 						actionLabel={ghInstalled ? "Sign in" : "Install"}
 						actionIcon={
-							ghInstalled ? undefined : <HiArrowUpRight className="size-3.5" />
+							ghInstalled || brewAvailable ? undefined : (
+								<HiArrowUpRight className="size-3.5" />
+							)
 						}
 						onAction={
-							ghInstalled ? () => setGhAuthOpen(true) : openGitHubInstall
+							ghInstalled ? () => setGhDialogMode("auth") : openGitHubInstall
 						}
 					/>
 					<OnboardingRow
@@ -132,8 +143,11 @@ function OnboardingDashboardPage() {
 			/>
 
 			<GhAuthDialog
-				open={ghAuthOpen}
-				onOpenChange={setGhAuthOpen}
+				open={ghDialogMode !== null}
+				mode={ghDialogMode ?? "auth"}
+				onOpenChange={(open) => {
+					if (!open) setGhDialogMode(null);
+				}}
 				onExit={() => void refetchGh()}
 			/>
 		</>
