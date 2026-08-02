@@ -1,8 +1,12 @@
 import { randomUUID } from "node:crypto";
 import { EventEmitter } from "node:events";
 import fs from "node:fs/promises";
-import { join } from "node:path";
-import { SUPERSET_HOME_DIR } from "main/lib/app-environment";
+import { basename, dirname, join } from "node:path";
+import {
+	SUPERSET_HOME_DIR,
+	SUPERSET_HOME_DIR_MODE,
+	SUPERSET_SENSITIVE_FILE_MODE,
+} from "main/lib/app-environment";
 import { lock } from "proper-lockfile";
 import { PROTOCOL_SCHEME } from "shared/constants";
 import { decrypt, encrypt } from "./crypto-storage";
@@ -14,10 +18,30 @@ interface StoredAuth {
 	organizationIdsRevision?: number;
 }
 
+interface LoadedAuth {
+	token: string | null;
+	expiresAt: string | null;
+	organizationIds: string[] | null;
+	organizationIdsRevision: number;
+}
+
+const TOKEN_FILE_NAME = "auth-token.enc";
+const EMPTY_LOADED_AUTH: LoadedAuth = {
+	token: null,
+	expiresAt: null,
+	organizationIds: null,
+	organizationIdsRevision: 0,
+};
+
+type InspectedTokenStorage =
+	| { status: "missing" }
+	| { status: "valid"; storedAuth: StoredAuth }
+	| { status: "invalid"; reason: string };
+
 function getTokenFile(): string {
 	return join(
 		process.env.SUPERSET_HOME_DIR || SUPERSET_HOME_DIR,
-		"auth-token.enc",
+		TOKEN_FILE_NAME,
 	);
 }
 
@@ -44,7 +68,10 @@ function parseStoredAuth(data: Buffer): StoredAuth {
 	const candidate = parsed as Record<string, unknown>;
 	if (
 		typeof candidate.token !== "string" ||
-		typeof candidate.expiresAt !== "string"
+		candidate.token.length === 0 ||
+		typeof candidate.expiresAt !== "string" ||
+		candidate.expiresAt.length === 0 ||
+		Number.isNaN(Date.parse(candidate.expiresAt))
 	) {
 		throw new Error("Invalid stored auth payload");
 	}
@@ -66,27 +93,103 @@ function parseStoredAuth(data: Buffer): StoredAuth {
 	};
 }
 
-async function readStoredAuth(): Promise<StoredAuth | null> {
+function describePathType(stats: Awaited<ReturnType<typeof fs.lstat>>): string {
+	if (stats.isDirectory()) return "directory";
+	if (stats.isSymbolicLink()) return "symbolic link";
+	return "special file";
+}
+
+async function inspectTokenStorage(
+	tokenFile: string,
+): Promise<InspectedTokenStorage> {
+	let stats: Awaited<ReturnType<typeof fs.lstat>>;
 	try {
-		return parseStoredAuth(await fs.readFile(getTokenFile()));
+		stats = await fs.lstat(tokenFile);
 	} catch (error) {
-		if ((error as NodeJS.ErrnoException).code === "ENOENT") return null;
+		if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+			return { status: "missing" };
+		}
+		throw error;
+	}
+
+	if (!stats.isFile()) {
+		return {
+			status: "invalid",
+			reason: `path is a ${describePathType(stats)}`,
+		};
+	}
+
+	const encrypted = await fs.readFile(tokenFile);
+	try {
+		return { status: "valid", storedAuth: parseStoredAuth(encrypted) };
+	} catch {
+		return {
+			status: "invalid",
+			reason: "contents could not be decrypted or parsed",
+		};
+	}
+}
+
+async function quarantineInvalidTokenStorage(
+	tokenFile: string,
+	reason: string,
+): Promise<string> {
+	const quarantinePath = `${tokenFile}.corrupt-${Date.now()}-${randomUUID()}`;
+	await fs.rename(tokenFile, quarantinePath);
+	console.warn(
+		`[auth] Quarantined invalid auth token storage (${reason}) as ${basename(quarantinePath)}`,
+	);
+	return quarantinePath;
+}
+
+/** Returns the stored auth, quarantining the file if it is unusable. */
+async function readStoredAuth(): Promise<StoredAuth | null> {
+	const tokenFile = getTokenFile();
+	const inspected = await inspectTokenStorage(tokenFile);
+	if (inspected.status === "missing") return null;
+	if (inspected.status === "invalid") {
+		await quarantineInvalidTokenStorage(tokenFile, inspected.reason);
+		return null;
+	}
+	return inspected.storedAuth;
+}
+
+async function atomicWriteToken(
+	tokenFile: string,
+	contents: Buffer,
+): Promise<void> {
+	const parentDirectory = dirname(tokenFile);
+	await fs.mkdir(parentDirectory, {
+		recursive: true,
+		mode: SUPERSET_HOME_DIR_MODE,
+	});
+
+	const temporaryFile = join(
+		parentDirectory,
+		`.${basename(tokenFile)}.${process.pid}-${randomUUID()}.tmp`,
+	);
+	let handle: Awaited<ReturnType<typeof fs.open>> | null = null;
+	try {
+		handle = await fs.open(temporaryFile, "wx", SUPERSET_SENSITIVE_FILE_MODE);
+		await handle.writeFile(contents);
+		await handle.sync();
+		await handle.close();
+		handle = null;
+		// chmod before the commit rename: the open() mode is masked by umask,
+		// and a failure here must leave the previous token intact.
+		await fs.chmod(temporaryFile, SUPERSET_SENSITIVE_FILE_MODE);
+		await fs.rename(temporaryFile, tokenFile);
+	} catch (error) {
+		await handle?.close().catch(() => {});
+		await fs.unlink(temporaryFile).catch(() => {});
 		throw error;
 	}
 }
 
 async function writeStoredAuth(storedAuth: StoredAuth): Promise<void> {
-	const tokenFile = getTokenFile();
-	const temporaryFile = `${tokenFile}.${process.pid}.${randomUUID()}.tmp`;
-	try {
-		await fs.writeFile(temporaryFile, encrypt(JSON.stringify(storedAuth)), {
-			mode: 0o600,
-		});
-		await fs.rename(temporaryFile, tokenFile);
-	} finally {
-		await fs.rm(temporaryFile, { force: true });
-	}
+	await atomicWriteToken(getTokenFile(), encrypt(JSON.stringify(storedAuth)));
 }
+
 export const stateStore = new Map<string, number>();
 let authWriteQueue: Promise<unknown> = Promise.resolve();
 
@@ -116,35 +219,26 @@ export const authEvents = new EventEmitter();
 /**
  * Load token from encrypted disk storage.
  */
-export async function loadToken(): Promise<{
-	token: string | null;
-	expiresAt: string | null;
-	organizationIds: string[] | null;
-	organizationIdsRevision: number;
-}> {
+export async function loadToken(): Promise<LoadedAuth> {
+	const tokenFile = getTokenFile();
 	try {
-		const parsed = await readStoredAuth();
-		if (!parsed) {
-			return {
-				token: null,
-				expiresAt: null,
-				organizationIds: null,
-				organizationIdsRevision: 0,
-			};
-		}
+		const storedAuth = await readStoredAuth();
+		if (!storedAuth) return EMPTY_LOADED_AUTH;
+
+		await fs
+			.chmod(tokenFile, SUPERSET_SENSITIVE_FILE_MODE)
+			.catch((error) =>
+				console.warn("[auth] Failed to repair auth token permissions", error),
+			);
 		return {
-			token: parsed.token,
-			expiresAt: parsed.expiresAt,
-			organizationIds: parsed.organizationIds ?? null,
-			organizationIdsRevision: parsed.organizationIdsRevision ?? 0,
+			token: storedAuth.token,
+			expiresAt: storedAuth.expiresAt,
+			organizationIds: storedAuth.organizationIds ?? null,
+			organizationIdsRevision: storedAuth.organizationIdsRevision ?? 0,
 		};
-	} catch {
-		return {
-			token: null,
-			expiresAt: null,
-			organizationIds: null,
-			organizationIdsRevision: 0,
-		};
+	} catch (error) {
+		console.error("[auth] Failed to inspect auth token storage", error);
+		return EMPTY_LOADED_AUTH;
 	}
 }
 
@@ -159,18 +253,21 @@ export async function saveToken({
 	expiresAt: string;
 }): Promise<void> {
 	await serializeAuthWrite(async () => {
-		const storedAuth: StoredAuth = { token, expiresAt };
-		await writeStoredAuth(storedAuth);
+		// Moves unusable storage aside first: renaming onto a directory fails.
+		await readStoredAuth();
+		await writeStoredAuth({ token, expiresAt });
 		authEvents.emit("token-saved", { token, expiresAt });
 	});
 }
 
 export async function clearToken(): Promise<void> {
 	await serializeAuthWrite(async () => {
-		try {
-			await fs.unlink(getTokenFile());
-		} catch (error) {
-			if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+		const tokenFile = getTokenFile();
+		const inspected = await inspectTokenStorage(tokenFile);
+		if (inspected.status === "valid") {
+			await fs.rm(tokenFile, { force: true });
+		} else if (inspected.status === "invalid") {
+			await quarantineInvalidTokenStorage(tokenFile, inspected.reason);
 		}
 		authEvents.emit("token-cleared");
 	});
@@ -229,33 +326,56 @@ export async function handleAuthCallback(params: {
 	expiresAt: string;
 	state: string;
 }): Promise<{ success: boolean; error?: string }> {
-	if (!stateStore.has(params.state)) {
+	const stateIssuedAt = stateStore.get(params.state);
+	if (stateIssuedAt === undefined) {
 		return { success: false, error: "Invalid or expired auth session" };
 	}
 	stateStore.delete(params.state);
 
-	await saveToken({ token: params.token, expiresAt: params.expiresAt });
+	try {
+		await saveToken({ token: params.token, expiresAt: params.expiresAt });
+	} catch (error) {
+		// Put the state back so the callback can be retried after a write failure.
+		stateStore.set(params.state, stateIssuedAt);
+		console.error("[auth] Failed to persist desktop auth token", error);
+		return {
+			success: false,
+			error: `Superset could not save your sign-in to ${getTokenFile()}. Your existing data was left untouched. Check the path and try again.`,
+		};
+	}
 
 	return { success: true };
 }
 
+export type ParsedAuthDeepLink =
+	| { type: "not-auth" }
+	| { type: "malformed" }
+	| {
+			type: "valid";
+			params: { token: string; expiresAt: string; state: string };
+	  };
+
 /**
  * Parse and validate auth deep link URL.
+ *
+ * Classifies by host/path before validating fields so a malformed auth
+ * callback (which may still carry a token) is never treated as a plain
+ * deep link and logged or navigated with.
  */
-export function parseAuthDeepLink(
-	url: string,
-): { token: string; expiresAt: string; state: string } | null {
+export function parseAuthDeepLink(url: string): ParsedAuthDeepLink {
 	try {
 		const parsed = new URL(url);
-		if (parsed.protocol !== `${PROTOCOL_SCHEME}:`) return null;
-		if (parsed.host !== "auth" || parsed.pathname !== "/callback") return null;
+		if (parsed.protocol !== `${PROTOCOL_SCHEME}:`) return { type: "not-auth" };
+		if (parsed.host !== "auth" || parsed.pathname !== "/callback") {
+			return { type: "not-auth" };
+		}
 
 		const token = parsed.searchParams.get("token");
 		const expiresAt = parsed.searchParams.get("expiresAt");
 		const state = parsed.searchParams.get("state");
-		if (!token || !expiresAt || !state) return null;
-		return { token, expiresAt, state };
+		if (!token || !expiresAt || !state) return { type: "malformed" };
+		return { type: "valid", params: { token, expiresAt, state } };
 	} catch {
-		return null;
+		return { type: "not-auth" };
 	}
 }
