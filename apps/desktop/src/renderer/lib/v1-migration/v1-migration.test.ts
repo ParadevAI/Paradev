@@ -278,11 +278,14 @@ describe("planTerminalMigration", () => {
 
 import {
 	consumeV1ContinuityPending,
+	consumeV1WelcomePending,
 	isForcedFlipVersion,
 	isV1FollowUpPending,
+	isV1WelcomePending,
 	markV1MigrationComplete,
 	peekV1ContinuityPending,
 	setV1FollowUpPending,
+	V1_MIGRATION_COMPLETED_EVENT,
 } from "./completion";
 import { computeGateComplete, type KindSummary } from "./summary";
 import { v1MigrationEventProps } from "./telemetry";
@@ -374,6 +377,50 @@ describe("completion markers", () => {
 		expect(consumeV1ContinuityPending("org-rearm")).toBe(true);
 		markV1MigrationComplete("org-rearm");
 		expect(peekV1ContinuityPending("org-rearm")).toBe(false);
+	});
+
+	test("first completion dispatches the flip-notice event exactly once", () => {
+		const events: string[] = [];
+		// Scoped DOM shims: bun runs every test file in one process, so a
+		// leaked global `window` makes browser-gated modules in OTHER files
+		// (theme store) take their renderer-only paths and crash.
+		const g = globalThis as Record<string, unknown>;
+		const prevWindow = g.window;
+		const prevCustomEvent = g.CustomEvent;
+		try {
+			g.CustomEvent = class {
+				type: string;
+				detail: unknown;
+				constructor(type: string, init?: { detail?: unknown }) {
+					this.type = type;
+					this.detail = init?.detail;
+				}
+			};
+			g.window = {
+				dispatchEvent: (e: { type: string }) => {
+					events.push(e.type);
+					return true;
+				},
+			};
+			markV1MigrationComplete("org-evt");
+			markV1MigrationComplete("org-evt"); // re-completion: no re-dispatch
+			expect(events).toEqual([V1_MIGRATION_COMPLETED_EVENT]);
+		} finally {
+			if (prevWindow === undefined) delete g.window;
+			else g.window = prevWindow;
+			if (prevCustomEvent === undefined) delete g.CustomEvent;
+			else g.CustomEvent = prevCustomEvent;
+		}
+	});
+
+	test("first completion arms the post-flip welcome; consume is dismiss-time", () => {
+		markV1MigrationComplete("org-welcome");
+		expect(isV1WelcomePending("org-welcome")).toBe(true);
+		expect(isV1WelcomePending("org-welcome")).toBe(true); // read is non-destructive
+		consumeV1WelcomePending("org-welcome");
+		expect(isV1WelcomePending("org-welcome")).toBe(false);
+		markV1MigrationComplete("org-welcome"); // re-completion never re-arms
+		expect(isV1WelcomePending("org-welcome")).toBe(false);
 	});
 
 	test("follow-up flag set/clear round-trips", () => {

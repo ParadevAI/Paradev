@@ -11,6 +11,9 @@ const KEY_PREFIX = "v1-migration-complete-";
 /** One-shot handoff flag so the first v2 boot can restore continuity. */
 const PENDING_CONTINUITY_PREFIX = "v1-migration-continuity-pending-";
 
+/** One-shot flag for the post-flip welcome card; consumed on dismiss. */
+const WELCOME_PREFIX = "v1-migration-welcome-pending-";
+
 /**
  * Best-effort kinds (settings/presets/terminals) that were still failing or
  * deferred when the gate completed retry post-flip while this flag is set
@@ -72,11 +75,27 @@ export function isV1MigrationCompleteAtBoot(
 	return value;
 }
 
+/**
+ * Fired on window when an org's migration first completes mid-session, so
+ * UI (V1FlipNotice) can react without polling localStorage.
+ */
+export const V1_MIGRATION_COMPLETED_EVENT = "v1-migration-completed";
+
 export function markV1MigrationComplete(organizationId: string): void {
 	const first = !isV1MigrationComplete(organizationId);
 	localStorage.setItem(KEY_PREFIX + organizationId, new Date().toISOString());
 	if (first) {
 		localStorage.setItem(PENDING_CONTINUITY_PREFIX + organizationId, "1");
+		localStorage.setItem(WELCOME_PREFIX + organizationId, "1");
+		try {
+			window.dispatchEvent(
+				new CustomEvent(V1_MIGRATION_COMPLETED_EVENT, {
+					detail: { organizationId },
+				}),
+			);
+		} catch {
+			// Non-DOM environment (tests): marker semantics don't depend on it.
+		}
 	}
 }
 
@@ -103,6 +122,21 @@ export function consumeV1ContinuityPending(organizationId: string): boolean {
 	} catch {
 		return false;
 	}
+}
+
+export function isV1WelcomePending(organizationId: string): boolean {
+	try {
+		return localStorage.getItem(WELCOME_PREFIX + organizationId) !== null;
+	} catch {
+		return false;
+	}
+}
+
+/** Dismiss-time consume: the card survives reloads until acknowledged. */
+export function consumeV1WelcomePending(organizationId: string): void {
+	try {
+		localStorage.removeItem(WELCOME_PREFIX + organizationId);
+	} catch {}
 }
 
 export function isV1FollowUpPending(organizationId: string): boolean {
