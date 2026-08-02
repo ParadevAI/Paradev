@@ -912,21 +912,26 @@ function createOrgCollections(organizationId: string): OrgCollections {
 }
 
 /**
- * Preload collections for an organization by starting Electric sync.
- * Collections are lazy — they don't fetch data until subscribed or preloaded.
- * Call this eagerly so data is ready when the user switches orgs.
+ * Start Electric sync for every collection of an organization. Collections
+ * are lazy — they don't fetch until subscribed or preloaded.
+ *
+ * Resolves once sync is STARTED, not once it completes. `preload()` on a
+ * persisted collection only settles after Electric's initial network sync,
+ * but SQLite-persisted rows hydrate into the collection immediately — the UI
+ * renders cache-first either way, and a never-synced org streams in exactly
+ * like first boot does. Waiting here only delays the switch and lets any
+ * single wedged shape hang it indefinitely.
  */
 export async function preloadCollections(
 	organizationId: string,
 ): Promise<void> {
 	const collections = getCollections(organizationId);
-	const collectionsToPreload = Object.entries(collections)
-		.filter(([name]) => name !== "organizations")
-		.map(([, collection]) => collection as Collection<object>);
-
-	await Promise.allSettled(
-		collectionsToPreload.map((c) => (c as Collection<object>).preload()),
-	);
+	for (const [name, collection] of Object.entries(collections)) {
+		if (name === "organizations") continue;
+		(collection as Collection<object>).preload().catch((error) => {
+			console.error(`[collections] Preload failed: ${name}`, error);
+		});
+	}
 }
 
 /**

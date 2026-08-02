@@ -74,7 +74,11 @@ export function useHostWorkspacesSource(
 	const { activeHostUrl, machineId } = useLocalHostService();
 	const relayUrl = useRelayUrl();
 
-	const { hosts, organizationId: knownHostsOrgId } = useKnownHosts();
+	const {
+		hosts,
+		organizationId: knownHostsOrgId,
+		settled: knownHostsSettled,
+	} = useKnownHosts();
 
 	const { data: cloudRows = [] } = useLiveQuery(
 		(q) => q.from({ workspaces: collections.v2Workspaces }),
@@ -229,7 +233,14 @@ export function useHostWorkspacesSource(
 	// rows without reaching ready), so gating on cloudReady would hang the
 	// empty state forever for a genuinely-empty local host while offline.
 	// A scoped host that hasn't resolved to a target yet is still loading.
+	// Known-hosts settlement IS a gate, though: targets derive from it, and
+	// before it settles the fan-out covers only the local host — every query
+	// answering then means "the hosts we know of answered", not "every host
+	// answered". Reporting ready off that would flash not-found for remote
+	// workspaces right after an org switch (offline stays fine: a prior
+	// session's snapshot settles it without Electric).
 	const isReady =
+		knownHostsSettled &&
 		(scopedHostId === undefined || targets.length > 0) &&
 		queries.every(
 			(query, index) =>

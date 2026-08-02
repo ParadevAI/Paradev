@@ -29,6 +29,13 @@ export type { KnownHostRow } from "./useKnownHosts.utils";
 export function useKnownHosts(): {
 	hosts: KnownHostRow[];
 	organizationId: string | null;
+	/**
+	 * True once the host list is trustworthy: Electric reached ready, or this
+	 * org's IndexedDB snapshot loaded. Until then the list may be missing
+	 * remote hosts entirely — gate "host/workspace doesn't exist" conclusions
+	 * on this, never row rendering.
+	 */
+	settled: boolean;
 } {
 	const collections = useCollections();
 	const { data: session } = authClient.useSession();
@@ -88,5 +95,9 @@ export function useKnownHosts(): {
 		);
 	}, [liveRows, liveReady, snapshot, organizationId]);
 
-	return { hosts, organizationId };
+	const settled =
+		liveReady ||
+		(snapshot !== null && snapshot.organizationId === organizationId);
+
+	return { hosts, organizationId, settled };
 }

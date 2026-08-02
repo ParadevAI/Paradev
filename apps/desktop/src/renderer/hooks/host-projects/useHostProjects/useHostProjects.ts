@@ -53,7 +53,7 @@ export function useHostProjects(): UseHostProjectsResult {
 		? MOCK_ORG_ID
 		: (session?.session?.activeOrganizationId ?? null);
 
-	const { hosts } = useKnownHosts();
+	const { hosts, settled: knownHostsSettled } = useKnownHosts();
 
 	const targets = useMemo(
 		() =>
@@ -205,8 +205,10 @@ export function useHostProjects(): UseHostProjectsResult {
 	);
 
 	// Never vacuously ready: zero targets means host discovery hasn't run
-	// yet (cold start), not "no projects exist".
+	// yet (cold start), not "no projects exist". Known-hosts settlement gates
+	// too — see useHostWorkspaces: before it settles the fan-out is local-only.
 	const isReady =
+		knownHostsSettled &&
 		targets.length > 0 &&
 		queries.every(
 			(query, index) =>

@@ -163,7 +163,8 @@ export function TasksView({
 	);
 
 	// Projects are fully local — identity comes from the host fan-out.
-	const { projects: hostProjects } = useHostProjects();
+	const { projects: hostProjects, isReady: hostProjectsReady } =
+		useHostProjects();
 	const v2Projects = useMemo(
 		() =>
 			hostProjects.map((project) => ({
@@ -174,7 +175,9 @@ export function TasksView({
 	);
 
 	useEffect(() => {
-		if (!v2Projects) return;
+		// A partial fan-out must not rewrite the user's filter: the selected
+		// project may live on a host that hasn't answered yet.
+		if (!hostProjectsReady) return;
 		if (projectFilter && v2Projects.some((p) => p.id === projectFilter)) return;
 		const firstProject = v2Projects[0];
 		if (!firstProject) return;
@@ -183,7 +186,7 @@ export function TasksView({
 			search: buildSearch({ project: firstProject.id }),
 			replace: true,
 		});
-	}, [projectFilter, v2Projects, navigate, buildSearch]);
+	}, [hostProjectsReady, projectFilter, v2Projects, navigate, buildSearch]);
 
 	const isLinearConnected =
 		integrations?.some((i) => i.provider === "linear") ?? false;
