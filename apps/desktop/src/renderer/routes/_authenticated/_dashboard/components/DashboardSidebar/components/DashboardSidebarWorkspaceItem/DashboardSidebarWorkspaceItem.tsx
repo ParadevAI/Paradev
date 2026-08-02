@@ -123,14 +123,23 @@ export function DashboardSidebarWorkspaceItem({
 		[workspace],
 	);
 
-	const handleMouseEnter = useCallback(() => {
-		if (!hoverEligible || !rowRef.current) return;
-		hoverRequestOpen(id, rowRef.current, hoverPayload);
-	}, [hoverEligible, hoverRequestOpen, id, hoverPayload]);
-	const handleMouseLeave = useCallback(() => {
-		if (!hoverEligible) return;
-		hoverRequestClose(id);
-	}, [hoverEligible, hoverRequestClose, id]);
+	const handleMouseEnter = useCallback(
+		(event: React.MouseEvent) => {
+			if (!hoverEligible || !rowRef.current) return;
+			hoverRequestOpen(id, rowRef.current, hoverPayload, {
+				x: event.clientX,
+				y: event.clientY,
+			});
+		},
+		[hoverEligible, hoverRequestOpen, id, hoverPayload],
+	);
+	const handleMouseLeave = useCallback(
+		(event: React.MouseEvent) => {
+			if (!hoverEligible) return;
+			hoverRequestClose(id, { x: event.clientX, y: event.clientY });
+		},
+		[hoverEligible, hoverRequestClose, id],
+	);
 
 	const isHovered = hoverHoveredId === id;
 	useEffect(() => {
