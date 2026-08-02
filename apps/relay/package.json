@@ -22,7 +22,7 @@
 		"jose": "6.2.2",
 		"lru-cache": "11.2.7",
 		"superjson": "2.2.6",
-		"zod": "4.3.6"
+		"zod": "4.4.3"
 	},
 	"devDependencies": {
 		"@superset/typescript": "workspace:*",

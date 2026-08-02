@@ -163,7 +163,7 @@
 		"@xterm/addon-webgl": "0.20.0-beta.288",
 		"@xterm/headless": "6.1.0-beta.289",
 		"@xterm/xterm": "6.1.0-beta.289",
-		"ai": "6.0.141",
+		"ai": "6.0.235",
 		"better-auth": "1.6.22",
 		"better-sqlite3": "12.6.2",
 		"bindings": "1.5.0",
@@ -242,7 +242,7 @@
 		"use-resize-observer": "9.1.0",
 		"utf-8-validate": "6.0.6",
 		"uuid": "14.0.0",
-		"zod": "4.3.6",
+		"zod": "4.4.3",
 		"zustand": "5.0.12"
 	},
 	"devDependencies": {
