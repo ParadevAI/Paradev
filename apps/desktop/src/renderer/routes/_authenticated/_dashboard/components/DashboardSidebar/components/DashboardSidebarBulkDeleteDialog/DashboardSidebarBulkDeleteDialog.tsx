@@ -43,7 +43,8 @@ export function DashboardSidebarBulkDeleteDialog({
 		onOpenChange,
 		onDeleted,
 	});
-	const { canConfirm, changedCount, items, unpushedCount } = inspectionSummary;
+	const { canConfirm, changedCount, items, uncheckedCount, unpushedCount } =
+		inspectionSummary;
 	const hasWarnings = changedCount > 0 || unpushedCount > 0;
 	const workspaceLabel = workspaces.length === 1 ? "workspace" : "workspaces";
 
@@ -151,9 +152,11 @@ export function DashboardSidebarBulkDeleteDialog({
 					>
 						{isDeleting
 							? `Deleting ${Math.min(completedCount + 1, workspaces.length)} of ${workspaces.length}…`
-							: hasWarnings
-								? "Delete anyway"
-								: "Delete"}
+							: uncheckedCount > 0
+								? "Delete without checking"
+								: hasWarnings
+									? "Delete anyway"
+									: "Delete"}
 					</Button>
 				</AlertDialogFooter>
 			</AlertDialogContent>

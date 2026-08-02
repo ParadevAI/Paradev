@@ -161,6 +161,14 @@ export function useBulkWorkspaceDelete({
 									inspection.preview.hasUnpushedCommits))
 						);
 					},
+					// "Delete without checking": a conflict on a workspace whose
+					// preview never completed means the unverified worktree was
+					// dirty — the user already consented, so force like the
+					// single-workspace dialog does. Checked-clean races still
+					// land in the failures pane.
+					shouldRetryWithForce: (workspace, error) =>
+						error.kind === "conflict" &&
+						inspections.get(workspace.id)?.status !== "ready",
 					destroy: (workspace, force) =>
 						destroyWorkspaceAtHost(targetFor(workspace), {
 							deleteBranch: preferences.deleteLocalBranch,

@@ -12,7 +12,7 @@ const workspaces = [
 ];
 
 describe("buildBulkWorkspaceInspectionSummary", () => {
-	it("annotates risk and blocks confirmation until every target is safe", () => {
+	it("annotates risk and blocks confirmation only on hard blockers", () => {
 		const summary = buildBulkWorkspaceInspectionSummary(
 			workspaces,
 			new Map([
@@ -56,10 +56,13 @@ describe("buildBulkWorkspaceInspectionSummary", () => {
 			]),
 		);
 
+		// The main-workspace blocker gates confirmation; the failed check
+		// ("offline") does not — it flips the copy to "Delete without checking".
 		expect(summary.canConfirm).toBeFalse();
 		expect(summary.changedCount).toBe(1);
 		expect(summary.unpushedCount).toBe(1);
 		expect(summary.errorCount).toBe(1);
+		expect(summary.uncheckedCount).toBe(1);
 		expect(summary.blocked).toEqual([
 			{
 				workspaceId: "main",
@@ -74,6 +77,21 @@ describe("buildBulkWorkspaceInspectionSummary", () => {
 			hasChanges: true,
 			hasUnpushedCommits: true,
 		});
+	});
+
+	it("keeps confirmation enabled while checks are pending or failed", () => {
+		const summary = buildBulkWorkspaceInspectionSummary(
+			workspaces.slice(0, 3),
+			new Map([
+				["clean", { status: "loading" as const }],
+				["offline", { status: "error" as const }],
+			]),
+		);
+
+		expect(summary.canConfirm).toBeTrue();
+		expect(summary.loadingCount).toBe(2);
+		expect(summary.errorCount).toBe(1);
+		expect(summary.uncheckedCount).toBe(3);
 	});
 
 	it("enables confirmation when every target has a ready deletable preview", () => {
@@ -175,5 +193,59 @@ describe("executeBulkWorkspaceDeleteTargets", () => {
 			"later",
 		]);
 		expect(result.failures).toEqual([{ workspace: "raced", error: conflict }]);
+	});
+
+	it("force-retries once when shouldRetryWithForce accepts the failure", async () => {
+		const calls: Array<{ workspace: string; force: boolean }> = [];
+		const conflict = new Error("Worktree has uncommitted changes");
+
+		const result = await executeBulkWorkspaceDeleteTargets<
+			string,
+			string,
+			Error
+		>({
+			targets: ["unchecked", "clean"],
+			shouldForce: () => false,
+			shouldRetryWithForce: (workspace, error) =>
+				workspace === "unchecked" && error === conflict,
+			destroy: async (workspace, force) => {
+				calls.push({ workspace, force });
+				if (workspace === "unchecked" && !force) throw conflict;
+				return `${workspace}-deleted`;
+			},
+		});
+
+		expect(calls).toEqual([
+			{ workspace: "unchecked", force: false },
+			{ workspace: "unchecked", force: true },
+			{ workspace: "clean", force: false },
+		]);
+		expect(result.successes.map(({ workspace }) => workspace)).toEqual([
+			"unchecked",
+			"clean",
+		]);
+		expect(result.failures).toEqual([]);
+	});
+
+	it("does not retry an already-forced destroy", async () => {
+		const calls: Array<{ workspace: string; force: boolean }> = [];
+		const failure = new Error("still failing");
+
+		const result = await executeBulkWorkspaceDeleteTargets<
+			string,
+			string,
+			Error
+		>({
+			targets: ["ws"],
+			shouldForce: () => true,
+			shouldRetryWithForce: () => true,
+			destroy: async (workspace, force) => {
+				calls.push({ workspace, force });
+				throw failure;
+			},
+		});
+
+		expect(calls).toEqual([{ workspace: "ws", force: true }]);
+		expect(result.failures).toEqual([{ workspace: "ws", error: failure }]);
 	});
 });

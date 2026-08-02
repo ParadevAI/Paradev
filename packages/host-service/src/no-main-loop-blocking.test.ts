@@ -63,6 +63,29 @@ const RULES: Rule[] = [
 		advice:
 			"simple-git is async, but a client constructed here still pays the spawn syscall + stdout drain on the event loop — cost scales linearly with call volume (measured ~830ms/min at light churn). Async isn't enough for git; route it off-loop: add a task to workers/tasks/git.ts and expose it with an offLoop() resolver (src/trpc/off-loop.ts).",
 	},
+	{
+		name: "on-loop git via the ctx.git() shared factory",
+		pattern: /\b(ctx|context)\.git\b/,
+		allowedCounts: {
+			// Legacy ctx.git() consumers — previously invisible to every
+			// enforcement layer (the client is constructed inside the exempt
+			// runtime/git/). Shrink by porting to worker tasks: resolve env
+			// on-loop with createGitEnvResolver, run the git work in the pool
+			// (see workspace-cleanup/git-ops.ts for the pattern).
+			"trpc/router/git/git.ts": 12,
+			"trpc/router/project/project.ts": 1,
+			"trpc/router/project/utils/ensure-main-workspace.ts": 1,
+			"trpc/router/workspace-creation/procedures/adopt.ts": 1,
+			"trpc/router/workspace-creation/procedures/list-project-worktrees.ts": 1,
+			"trpc/router/workspace-creation/procedures/search-branches.ts": 1,
+			"trpc/router/workspace-creation/utils/ai-workspace-names.ts": 1,
+			"trpc/router/workspace-creation/utils/list-branch-names.ts": 1,
+			"trpc/router/workspace/workspace.ts": 1,
+			"trpc/router/workspaces/workspaces.ts": 1,
+		},
+		advice:
+			"ctx.git() hands back an on-loop client — every call spawns and drains git on the event loop, and the ratchet's other rules can't see it. Resolve the env on-loop (createGitEnvResolver) and run the git work as a worker task instead (workers/tasks/git.ts; see workspace-cleanup/git-ops.ts). The pattern only matches direct property access — don't dodge it by destructuring/aliasing the factory off the context.",
+	},
 ];
 
 // The worker pool and the git runtime own the primitives the rules police;

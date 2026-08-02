@@ -21,11 +21,16 @@ export async function executeBulkWorkspaceDeleteTargets<
 >({
 	targets,
 	shouldForce,
+	shouldRetryWithForce,
 	destroy,
 	onSettled,
 }: {
 	targets: readonly Workspace[];
 	shouldForce: (workspace: Workspace) => boolean;
+	/** Retry a failed unforced destroy once with force. Used for conflicts on
+	 * workspaces whose preview never completed — "Delete without checking" is
+	 * the user's consent. Checked-clean races stay failures (no silent force). */
+	shouldRetryWithForce?: (workspace: Workspace, error: Failure) => boolean;
 	destroy: (workspace: Workspace, force: boolean) => Promise<Result>;
 	onSettled?: () => void;
 }): Promise<{
@@ -37,7 +42,17 @@ export async function executeBulkWorkspaceDeleteTargets<
 
 	for (const workspace of targets) {
 		try {
-			const result = await destroy(workspace, shouldForce(workspace));
+			const force = shouldForce(workspace);
+			let result: Result;
+			try {
+				result = await destroy(workspace, force);
+			} catch (error) {
+				if (!force && shouldRetryWithForce?.(workspace, error as Failure)) {
+					result = await destroy(workspace, true);
+				} else {
+					throw error;
+				}
+			}
 			successes.push({ workspace, result });
 		} catch (error) {
 			failures.push({ workspace, error: error as Failure });
@@ -119,14 +134,15 @@ export function buildBulkWorkspaceInspectionSummary(
 	return {
 		loadingCount,
 		errorCount,
+		// Pending or failed checks flip the confirm copy to "Delete without
+		// checking" instead of disabling confirmation.
+		uncheckedCount: loadingCount + errorCount,
 		blocked,
 		changedCount,
 		unpushedCount,
 		items,
-		canConfirm:
-			workspaces.length > 0 &&
-			loadingCount === 0 &&
-			errorCount === 0 &&
-			blocked.length === 0,
+		// Checks never gate deletion — only hard blockers (main workspaces,
+		// which the host refuses anyway) do.
+		canConfirm: workspaces.length > 0 && blocked.length === 0,
 	};
 }

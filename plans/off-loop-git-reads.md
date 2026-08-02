@@ -24,8 +24,10 @@ too high after a fix:
 `child_process`; tests/scripts and the ratchet-frozen legacy files are
 override-exempted. Delete an override entry when its file is fixed.
 
-Known blind spot: host-service call sites spawning via `ctx.git()` (the
-shared factory) are invisible to both layers — backlog-only below.
+The former blind spot — call sites spawning via `ctx.git()` (the shared
+factory) — is now covered by a dedicated `ctx.git` count rule in the
+host-service ratchet. It matches direct property access only; destructuring
+or aliasing the factory off the context would still slip through (don't).
 
 ## Done (this branch)
 
@@ -38,30 +40,43 @@ shared factory) are invisible to both layers — backlog-only below.
 - `base-ref-freshness`: common-dir rev-parse TTL-cached (was 1 spawn per
   status poll, #5776)
 - `resolve-repo.ts` / `project/handlers.ts`: recursive `rmSync` → async `rm`
+- Workspace delete (`workspace-cleanup.ts`): inspect/preflight `status()` +
+  unpushed check, `worktree remove --force --force` (recursive delete of the
+  whole worktree), branch delete → `gitWorktreeStateTask` /
+  `gitWorktreeRemoveTask` / `gitDeleteBranchTask` via
+  `workspace-cleanup/git-ops.ts`
 - Desktop: `changes.getBranches`, `workspaces.getAheadBehind`,
   `changes.get*FileContents` → changes git worker
 
 ## Backlog — host-service
 
-Priority order; port to `workers/tasks/git.ts`. Items constructing git
-clients directly have an allowlist line in `no-main-loop-blocking.test.ts`
-to delete when ported; items 1–3 and 6 spawn via `ctx.git()` (the shared
-factory) so the ratchet doesn't see them — they're backlog-only.
+Priority order; port to `workers/tasks/git.ts`. Every item has a count
+entry in `no-main-loop-blocking.test.ts` (under the direct-construction
+rule, the `ctx.git` rule, or both) — lower/delete the counts when porting.
 
 1. `trpc/router/git/git.ts` — `listCommits` (`git log`, unbounded),
    `getDiff` (2× `git show`, buffers file contents), `getBranchSyncStatus`
    (7 spawns incl. full `status()`), `renameBranch` (`ls-remote`, network)
 2. `trpc/router/workspace-creation/procedures/search-branches.ts` — network
    `fetch --prune` + 500-entry reflog walk on a typeahead query
-3. `trpc/router/workspace-cleanup/workspace-cleanup.ts` — `status()`
-   preflights + `worktree remove --force` (blocking recursive delete)
+3. `trpc/router/workspaces/workspaces.ts` — workspace CREATE is still
+   mostly on-loop: only the base-ref fetch was ported (#6093); `worktree
+   prune`, start-point resolution (`getLocalBranchHead`, rev-parses),
+   `worktree add` (spawn + full-checkout stdout drain), and
+   `branch.<name>.base` config writes all run via one `ctx.git()` client
 4. `trpc/router/project/utils/resolve-repo.ts` — `git clone` inline
    (unbounded network); worker task or spawn with streaming
 5. `trpc/router/project/project.ts` — `ctx.git()` inside `project.remove`
-   loop; hoist + worker-route `worktree remove`
+   loop; hoist + worker-route `worktree remove` (same class as the
+   workspace-delete port above; reuse `gitWorktreeRemoveTask`)
 6. `trpc/router/workspace/workspace.ts` — full `git.status()` on the legacy
    surface; also per-row `existsSync` in `workspace.list`
-7. `workspace-creation/shared/project-helpers.ts`,
+7. Small one-shot `ctx.git()` sites (one spawn each, low churn):
+   `workspace-creation/procedures/adopt.ts` + `list-project-worktrees.ts`
+   (`worktree list`), `workspace-creation/utils/list-branch-names.ts`,
+   `ai-workspace-names.ts` (`branch -m` rename),
+   `project/utils/ensure-main-workspace.ts` (current-branch probe)
+8. `workspace-creation/shared/project-helpers.ts`,
    `trpc/router/git/utils/git-helpers.ts` — cheap but on-loop; port last
    (`settings/branch-prefix.ts` done — first `offLoop()` port)
 
