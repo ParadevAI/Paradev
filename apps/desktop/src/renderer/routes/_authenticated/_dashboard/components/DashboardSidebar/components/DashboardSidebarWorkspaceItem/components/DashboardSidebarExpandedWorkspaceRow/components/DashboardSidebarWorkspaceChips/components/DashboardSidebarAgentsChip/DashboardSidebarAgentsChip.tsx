@@ -4,13 +4,8 @@ import {
 	HoverCardContent,
 	HoverCardTrigger,
 } from "@superset/ui/hover-card";
-import { Separator } from "@superset/ui/separator";
-import { toast } from "@superset/ui/sonner";
 import { cn } from "@superset/ui/utils";
-import { LuLoaderCircle, LuX } from "react-icons/lu";
-import { STROKE_WIDTH } from "renderer/screens/main/components/WorkspaceSidebar/constants";
 import { STATUS_PRIORITY } from "shared/tabs-types";
-import { useDashboardSidebarAgentKill } from "../../hooks/useDashboardSidebarAgentKill";
 import { useDashboardSidebarChipHoverSuppression } from "../../hooks/useDashboardSidebarChipHoverSuppression";
 import type { DashboardSidebarRunningAgent } from "../../hooks/useDashboardSidebarWorkspaceRunningAgents";
 import { DashboardSidebarAgentAvatar } from "./components/DashboardSidebarAgentAvatar";
@@ -24,14 +19,13 @@ interface DashboardSidebarAgentsChipProps {
 /**
  * Running-agents chip on the workspace row: one avatar (the agent whose
  * status most needs attention, newest session on ties) plus the total count.
- * Hovering or clicking the chip opens a card listing each agent with its own
- * open/stop actions; clicking the chip again closes the card.
+ * Hovering or clicking the chip opens a card listing each agent with an
+ * open action; clicking the chip again closes the card.
  */
 export function DashboardSidebarAgentsChip({
 	workspaceId,
 	agents,
 }: DashboardSidebarAgentsChipProps) {
-	const { isPending, killAgents } = useDashboardSidebarAgentKill(workspaceId);
 	const { isOpen, onOpenChange, onPointerEnter, onPointerLeave, toggleOpen } =
 		useDashboardSidebarChipHoverSuppression();
 
@@ -43,20 +37,6 @@ export function DashboardSidebarAgentsChip({
 		}
 		return agent.startedAt > best.startedAt ? agent : best;
 	});
-
-	const handleStopAll = async () => {
-		if (isPending) return;
-		const stoppedCount = await killAgents(
-			agents.map((agent) => agent.terminalId),
-		);
-		if (stoppedCount > 0) {
-			toast.success(
-				stoppedCount === 1
-					? "Stopped 1 agent"
-					: `Stopped ${stoppedCount} agents`,
-			);
-		}
-	};
 
 	return (
 		<HoverCard
@@ -83,24 +63,15 @@ export function DashboardSidebarAgentsChip({
 								event.stopPropagation();
 							}
 						}}
-						disabled={isPending}
-						aria-busy={isPending}
 						aria-expanded={isOpen}
 						aria-label={`${agents.length} running agents — ${isOpen ? "hide" : "show"} details`}
 						className={cn(
 							"group/chip h-[18px] overflow-visible bg-muted/60 px-1.5 py-0 text-[9px] font-medium tabular-nums text-muted-foreground",
-							"[&>svg]:size-2.5 hover:bg-muted hover:text-foreground disabled:opacity-70",
+							"[&>svg]:size-2.5 hover:bg-muted hover:text-foreground",
 						)}
 					>
 						<DashboardSidebarAgentAvatar agent={primaryAgent} />
-						{isPending ? (
-							<LuLoaderCircle
-								className="size-2.5 shrink-0 animate-spin"
-								strokeWidth={STROKE_WIDTH}
-							/>
-						) : (
-							<span className="shrink-0">{agents.length}</span>
-						)}
+						<span className="shrink-0">{agents.length}</span>
 					</button>
 				</Badge>
 			</HoverCardTrigger>
@@ -123,16 +94,6 @@ export function DashboardSidebarAgentsChip({
 						/>
 					))}
 				</div>
-				<Separator className="my-1" />
-				<button
-					type="button"
-					onClick={() => void handleStopAll()}
-					disabled={isPending}
-					className="flex w-full items-center gap-1.5 rounded-sm px-2 py-1 text-xs hover:bg-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-70"
-				>
-					<LuX className="size-3" strokeWidth={STROKE_WIDTH} />
-					Stop all agents
-				</button>
 			</HoverCardContent>
 		</HoverCard>
 	);
