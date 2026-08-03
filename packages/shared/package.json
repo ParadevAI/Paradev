@@ -8,6 +8,10 @@
 			"types": "./src/constants.ts",
 			"default": "./src/constants.ts"
 		},
+		"./sentry": {
+			"types": "./src/sentry.ts",
+			"default": "./src/sentry.ts"
+		},
 		"./terminal-wheel-handler": {
 			"types": "./src/terminal-wheel-handler/index.ts",
 			"default": "./src/terminal-wheel-handler/index.ts"

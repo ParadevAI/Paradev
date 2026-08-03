@@ -1,3 +1,4 @@
+import { SENTRY_IGNORE_ERRORS } from "@superset/shared/sentry";
 import { env } from "../env.renderer";
 
 let sentryInitialized = false;
@@ -16,7 +17,8 @@ export async function initSentry(): Promise<void> {
 		Sentry.init({
 			dsn: env.SENTRY_DSN_DESKTOP,
 			environment: env.NODE_ENV,
-			tracesSampleRate: 0.1,
+			tracesSampleRate: 0,
+			ignoreErrors: SENTRY_IGNORE_ERRORS,
 		});
 
 		sentryInitialized = true;

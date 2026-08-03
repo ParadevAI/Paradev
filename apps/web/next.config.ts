@@ -67,7 +67,12 @@ const contentSecurityPolicy = [
 	"frame-ancestors 'none'",
 	"img-src 'self' data: blob: https:",
 	"object-src 'none'",
-	["script-src 'self' 'unsafe-inline'", !isProduction && "'unsafe-eval'"]
+	[
+		// wasm-unsafe-eval: WebAssembly.instantiate only — NOT eval()/Function.
+		// Without it Chrome blocks wasm under script-src (WEB-2K, /oauth/consent).
+		"script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'",
+		!isProduction && "'unsafe-eval'",
+	]
 		.filter(Boolean)
 		.join(" "),
 	"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
@@ -150,6 +155,7 @@ const config: NextConfig = {
 export default withSentryConfig(config, {
 	org: "superset-sh",
 	project: "web",
+	applicationKey: "superset-web",
 	silent: !process.env.CI,
 	authToken: process.env.SENTRY_AUTH_TOKEN,
 	widenClientFileUpload: true,
