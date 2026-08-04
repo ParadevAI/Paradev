@@ -74,6 +74,7 @@ function DashboardLayout() {
 	const onDashboardViewRoute =
 		matchRoute({ to: "/automations", fuzzy: true }) !== false ||
 		matchRoute({ to: "/tasks", fuzzy: true }) !== false ||
+		matchRoute({ to: "/pull-requests", fuzzy: true }) !== false ||
 		matchRoute({ to: "/v2-workspaces", fuzzy: true }) !== false;
 	const versionMismatch =
 		(isV2CloudEnabled && onV1WorkspaceRoute) ||

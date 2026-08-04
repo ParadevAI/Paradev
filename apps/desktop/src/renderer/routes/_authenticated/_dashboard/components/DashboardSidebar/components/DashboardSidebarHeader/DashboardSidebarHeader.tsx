@@ -9,6 +9,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { useMatchRoute, useNavigate } from "@tanstack/react-router";
 import { useRef } from "react";
+import { GoGitPullRequest } from "react-icons/go";
 import { HiOutlineClipboardDocumentList } from "react-icons/hi2";
 import { LuClock, LuLayers, LuPlus, LuSearch } from "react-icons/lu";
 import {
@@ -28,6 +29,10 @@ import { useFolderFirstImport } from "renderer/routes/_authenticated/_dashboard/
 import { NavigationControls } from "renderer/routes/_authenticated/_dashboard/components/NavigationControls";
 import { SidebarToggle } from "renderer/routes/_authenticated/_dashboard/components/SidebarToggle";
 import { useFailedAutomations } from "renderer/routes/_authenticated/_dashboard/hooks/useFailedAutomations";
+import {
+	pullRequestsSearchFromFilters,
+	usePullRequestsFilterStore,
+} from "renderer/routes/_authenticated/_dashboard/pull-requests/stores/pullRequestsFilterStore";
 import {
 	tasksSearchFromFilters,
 	useTasksFilterStore,
@@ -100,6 +105,10 @@ export function DashboardSidebarHeader({
 		fuzzy: true,
 	});
 	const isTasksOpen = !!matchRoute({ to: "/tasks", fuzzy: true });
+	const isPullRequestsOpen = !!matchRoute({
+		to: "/pull-requests",
+		fuzzy: true,
+	});
 	const isAutomationsOpen = !!matchRoute({ to: "/automations", fuzzy: true });
 	const { myFailedCount } = useFailedAutomations();
 
@@ -110,7 +119,13 @@ export function DashboardSidebarHeader({
 		typeTab: lastTypeTab,
 		projectFilter: lastProjectFilter,
 		linearProjectFilter: lastLinearProjectFilter,
+		includeClosedIssues: lastIncludeClosedIssues,
 	} = useTasksFilterStore();
+	const {
+		search: lastPullRequestsSearch,
+		projectFilter: lastPullRequestsProjectFilter,
+		includeClosed: lastPullRequestsIncludeClosed,
+	} = usePullRequestsFilterStore();
 
 	const handleWorkspacesClick = () => {
 		navigate({ to: "/v2-workspaces" });
@@ -131,6 +146,20 @@ export function DashboardSidebarHeader({
 					typeTab: lastTypeTab,
 					projectFilter: lastProjectFilter,
 					linearProjectFilter: lastLinearProjectFilter,
+					includeClosedIssues: lastIncludeClosedIssues,
+				}),
+			});
+		});
+	};
+
+	const handlePullRequestsClick = () => {
+		gateFeature(GATED_FEATURES.TASKS, () => {
+			navigate({
+				to: "/pull-requests",
+				search: pullRequestsSearchFromFilters({
+					search: lastPullRequestsSearch,
+					projectFilter: lastPullRequestsProjectFilter,
+					includeClosed: lastPullRequestsIncludeClosed,
 				}),
 			});
 		});
@@ -246,6 +275,8 @@ export function DashboardSidebarHeader({
 							<button
 								type="button"
 								onClick={handleTasksClick}
+								aria-label="Tasks"
+								aria-current={isTasksOpen ? "page" : undefined}
 								className={cn(
 									"flex size-7 items-center justify-center rounded-md transition-colors",
 									isTasksOpen
@@ -256,7 +287,27 @@ export function DashboardSidebarHeader({
 								<HiOutlineClipboardDocumentList className="size-3.5" />
 							</button>
 						</TooltipTrigger>
-						<TooltipContent side="right">Tasks & PRs</TooltipContent>
+						<TooltipContent side="right">Tasks</TooltipContent>
+					</Tooltip>
+
+					<Tooltip delayDuration={300}>
+						<TooltipTrigger asChild>
+							<button
+								type="button"
+								onClick={handlePullRequestsClick}
+								aria-label="Pull requests"
+								aria-current={isPullRequestsOpen ? "page" : undefined}
+								className={cn(
+									"flex size-7 items-center justify-center rounded-md transition-colors",
+									isPullRequestsOpen
+										? "bg-fill-selected text-muted-foreground"
+										: "text-muted-foreground hover:bg-fill-hover",
+								)}
+							>
+								<GoGitPullRequest className="size-3.5" />
+							</button>
+						</TooltipTrigger>
+						<TooltipContent side="right">Pull requests</TooltipContent>
 					</Tooltip>
 
 					<DropdownMenu>
@@ -410,6 +461,8 @@ export function DashboardSidebarHeader({
 			<button
 				type="button"
 				onClick={handleTasksClick}
+				aria-label="Tasks"
+				aria-current={isTasksOpen ? "page" : undefined}
 				className={cn(
 					"flex w-full items-center gap-2 rounded-md px-2 py-1 text-[13px] font-medium transition-colors",
 					isTasksOpen
@@ -418,7 +471,23 @@ export function DashboardSidebarHeader({
 				)}
 			>
 				<HiOutlineClipboardDocumentList className="size-3.5 shrink-0 text-muted-foreground" />
-				<span className="flex-1 text-left">Tasks & PRs</span>
+				<span className="flex-1 text-left">Tasks</span>
+			</button>
+
+			<button
+				type="button"
+				onClick={handlePullRequestsClick}
+				aria-label="Pull requests"
+				aria-current={isPullRequestsOpen ? "page" : undefined}
+				className={cn(
+					"flex w-full items-center gap-2 rounded-md px-2 py-1 text-[13px] font-medium transition-colors",
+					isPullRequestsOpen
+						? "bg-fill-selected text-foreground"
+						: "text-muted-foreground hover:bg-fill-hover hover:text-foreground",
+				)}
+			>
+				<GoGitPullRequest className="size-3.5 shrink-0 text-muted-foreground" />
+				<span className="flex-1 text-left">Pull requests</span>
 			</button>
 		</div>
 	);

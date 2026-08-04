@@ -24,7 +24,7 @@ export function ProjectFilter({ value, onChange }: ProjectFilterProps) {
 	const [search, setSearch] = useState("");
 
 	// Projects are fully local — identity comes from the host fan-out.
-	const { projects: hostProjects } = useHostProjects();
+	const { projects: hostProjects, isReady } = useHostProjects();
 	const projects = useMemo(
 		() =>
 			hostProjects.map((project) => ({
@@ -51,6 +51,7 @@ export function ProjectFilter({ value, onChange }: ProjectFilterProps) {
 		setOpen(false);
 		setSearch("");
 	};
+	const fallbackLabel = isReady ? "Select project" : "Loading projects";
 
 	return (
 		<Popover
@@ -64,8 +65,8 @@ export function ProjectFilter({ value, onChange }: ProjectFilterProps) {
 				<Button
 					variant="ghost"
 					size="sm"
-					title={selected ? selected.name : "Project"}
-					aria-label={selected ? selected.name : "Project"}
+					title={selected ? selected.name : fallbackLabel}
+					aria-label={selected ? `Project: ${selected.name}` : fallbackLabel}
 					className="h-8 gap-1.5 px-2 text-muted-foreground hover:text-foreground"
 				>
 					{selected ? (
@@ -77,8 +78,8 @@ export function ProjectFilter({ value, onChange }: ProjectFilterProps) {
 					) : (
 						<HiOutlineFolder className="size-4" />
 					)}
-					<span className="text-sm hidden @4xl:inline">
-						{selected ? selected.name : "Project"}
+					<span className="hidden max-w-32 truncate text-sm @4xl:inline @6xl:max-w-48">
+						{selected ? selected.name : fallbackLabel}
 					</span>
 					<HiChevronDown className="size-3" />
 				</Button>
@@ -91,8 +92,14 @@ export function ProjectFilter({ value, onChange }: ProjectFilterProps) {
 						onValueChange={setSearch}
 					/>
 					<CommandList className="max-h-80">
-						{filtered.length === 0 && search && (
-							<CommandEmpty>No projects found.</CommandEmpty>
+						{filtered.length === 0 && (
+							<CommandEmpty>
+								{isReady
+									? search
+										? "No projects found."
+										: "No projects available."
+									: "Loading projects…"}
+							</CommandEmpty>
 						)}
 						{filtered.length > 0 && (
 							<CommandGroup>
