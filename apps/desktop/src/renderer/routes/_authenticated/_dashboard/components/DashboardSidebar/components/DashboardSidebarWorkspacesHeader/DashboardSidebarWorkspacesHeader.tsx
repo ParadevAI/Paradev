@@ -69,8 +69,12 @@ export function DashboardSidebarWorkspacesHeader() {
 			<span className="min-w-0 truncate text-left">Projects</span>
 			<HiChevronRight
 				className={cn(
-					"size-3 shrink-0 text-muted-foreground opacity-0 transition-[opacity,transform] duration-150 group-hover:opacity-100 group-focus-visible:opacity-100",
-					!isCollapsed && "rotate-90",
+					"size-3 shrink-0 text-muted-foreground transition-[opacity,transform] duration-150",
+					// Stays visible while collapsed — it's the only cue that the
+					// project rows are hidden rather than missing (GH #6009).
+					isCollapsed
+						? "opacity-100"
+						: "rotate-90 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100",
 				)}
 			/>
 			<div className="min-w-0 flex-1" />
