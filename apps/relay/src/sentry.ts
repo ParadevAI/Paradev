@@ -11,6 +11,11 @@ export function initSentry(): void {
 		release: process.env.FLY_IMAGE_REF,
 		environment: process.env.FLY_APP_NAME ?? "relay-local",
 		tracesSampleRate: 0,
+		beforeSend(event) {
+			const exceptionType = event.exception?.values?.[0]?.type;
+			if (exceptionType === "TunnelLifecycleError") return null;
+			return event;
+		},
 		integrations: [
 			Sentry.onUncaughtExceptionIntegration({
 				exitEvenIfOtherHandlersAreRegistered: false,
