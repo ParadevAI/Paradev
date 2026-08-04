@@ -12,8 +12,12 @@ export function initSentry(): void {
 		environment: process.env.FLY_APP_NAME ?? "relay-local",
 		tracesSampleRate: 0,
 		beforeSend(event) {
-			const exceptionType = event.exception?.values?.[0]?.type;
-			if (exceptionType === "TunnelLifecycleError") return null;
+			const exception = event.exception?.values?.[0];
+			if (exception?.type === "TunnelLifecycleError") return null;
+			// Client hung up during the async auth that runs before the WS
+			// handshake: Bun's node:ws shim then calls server.upgrade() with the
+			// already-released Request and throws. The client is gone either way.
+			if (exception?.value === "upgrade requires a Request object") return null;
 			return event;
 		},
 		integrations: [
