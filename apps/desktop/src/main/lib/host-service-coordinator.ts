@@ -797,11 +797,14 @@ export class HostServiceCoordinator extends EventEmitter {
 			// canary and dev builds, never on stable. The host gates its router
 			// and WS stream route on this env var.
 			...(isInternalBuild() ? { SUPERSET_ACP_SESSIONS: "1" } : {}),
+			// Namespaced so terminals/agents spawned by the host service don't
+			// inherit a generic SENTRY_DSN — third-party tools with a Sentry SDK
+			// auto-pick it up and report into our project.
 			...(app.isPackaged && mainEnv.SENTRY_DSN_HOST_SERVICE
 				? {
-						SENTRY_DSN: mainEnv.SENTRY_DSN_HOST_SERVICE,
-						SENTRY_RELEASE: app.getVersion(),
-						SENTRY_ENVIRONMENT: "production",
+						HOST_SERVICE_SENTRY_DSN: mainEnv.SENTRY_DSN_HOST_SERVICE,
+						HOST_SERVICE_SENTRY_RELEASE: app.getVersion(),
+						HOST_SERVICE_SENTRY_ENVIRONMENT: "production",
 					}
 				: {}),
 			// Read by the child's parent watchdog so it can self-exit if

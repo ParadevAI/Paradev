@@ -4,10 +4,12 @@ let initialized = false;
 
 export function initSentry(options: { organizationId?: string }): void {
 	if (initialized) return;
-	const dsn = process.env.SENTRY_DSN;
+	const dsn = process.env.HOST_SERVICE_SENTRY_DSN;
 	if (!dsn) return;
 	Sentry.init({
 		dsn,
+		release: process.env.HOST_SERVICE_SENTRY_RELEASE,
+		environment: process.env.HOST_SERVICE_SENTRY_ENVIRONMENT,
 		tracesSampleRate: 0,
 		// safety.ts keeps the process alive through uncaught exceptions; Sentry
 		// must capture them without re-introducing the exit.
