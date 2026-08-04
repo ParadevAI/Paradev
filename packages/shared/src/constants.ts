@@ -95,11 +95,6 @@ export const V2_NEW_USER_V1_EXPERIMENT_START = "2026-06-08T06:59:00.000Z";
 // Bump this if the release slips.
 export const V2_NEW_USER_V2_DEFAULT_START = "2026-07-09T17:00:00.000Z";
 
-// Eligibility cutoff for the new-workspace-screen experiment: only accounts
-// created on/after this date enter the experiment, so exposure stays scoped to
-// new users. Bump only before launch; changing it mid-experiment skews arms.
-export const NEW_WORKSPACE_SCREEN_EXPERIMENT_START = "2026-07-22T00:00:00.000Z";
-
 export const FEATURE_FLAGS = {
 	/** Gates access to experimental Electric SQL tasks feature. */
 	ELECTRIC_TASKS_ACCESS: "electric-tasks-access",
@@ -138,10 +133,11 @@ export const FEATURE_FLAGS = {
 	HIRING_BANNER: "hiring-banner",
 	/**
 	 * Experiment flag (control/test): renders the new-workspace surface as a
-	 * full-screen view with sample prompts instead of the dense modal. Only
-	 * evaluated for accounts created on/after
-	 * NEW_WORKSPACE_SCREEN_EXPERIMENT_START and only when the surface opens,
-	 * so `$feature_flag_called` exposure matches the experiment population.
+	 * full-screen view with sample prompts instead of the dense modal.
+	 * Eligibility (new accounts only) is a release condition on the flag —
+	 * `created_at` person property, sent with flag requests at identify time —
+	 * and the flag is only evaluated when the surface opens, so
+	 * `$feature_flag_called` exposure matches the experiment population.
 	 */
 	NEW_WORKSPACE_SCREEN: "new-workspace-screen",
 	/**
