@@ -10,6 +10,7 @@ import {
 import { loadToken } from "lib/trpc/routers/auth/utils/auth-functions";
 import { env } from "main/env.main";
 import { focusMainWindow, quitApp } from "main/index";
+import { checkForUpdatesInteractive } from "main/lib/auto-updater";
 import {
 	getHostServiceCoordinator,
 	type HostServiceStatusEvent,
@@ -226,8 +227,6 @@ async function updateTrayMenu(): Promise<void> {
 		{
 			label: "Check for Updates",
 			click: () => {
-				// Imported lazily to avoid circular dependency
-				const { checkForUpdatesInteractive } = require("../auto-updater");
 				checkForUpdatesInteractive();
 			},
 		},
