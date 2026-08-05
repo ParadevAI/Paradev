@@ -41,6 +41,7 @@ export interface SupersetChatModel extends AgentModelOption {
  * model edits here so the two never drift.
  */
 export const SUPERSET_CHAT_MODELS: readonly SupersetChatModel[] = [
+	{ id: "anthropic/claude-opus-5", label: "Opus 5", provider: "Anthropic" },
 	{ id: "anthropic/claude-opus-4-8", label: "Opus 4.8", provider: "Anthropic" },
 	{ id: "anthropic/claude-opus-4-7", label: "Opus 4.7", provider: "Anthropic" },
 	{ id: "anthropic/claude-fable-5", label: "Fable 5", provider: "Anthropic" },
