@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import { runWithPostCheckoutHookTolerance } from "../../utils/git-hook-tolerance";
 import { getCurrentBranch } from "../../workspaces/utils/git";
 import { getSimpleGitWithShellPath } from "../../workspaces/utils/git-client";
@@ -53,12 +54,18 @@ export async function gitSwitchBranch(
 
 	// Validate: reject anything that looks like a flag
 	if (branch.startsWith("-")) {
-		throw new Error("Invalid branch name: cannot start with -");
+		throw new TRPCError({
+			code: "BAD_REQUEST",
+			message: "Invalid branch name: cannot start with -",
+		});
 	}
 
 	// Validate: reject empty branch names
 	if (!branch.trim()) {
-		throw new Error("Invalid branch name: cannot be empty");
+		throw new TRPCError({
+			code: "BAD_REQUEST",
+			message: "Invalid branch name: cannot be empty",
+		});
 	}
 
 	const git = await getGitWithShellPath(worktreePath);
@@ -100,7 +107,10 @@ export async function gitCheckoutFiles(
 	filePaths: string[],
 ): Promise<void> {
 	if (filePaths.length === 0) {
-		throw new Error("filePaths must not be empty");
+		throw new TRPCError({
+			code: "BAD_REQUEST",
+			message: "filePaths must not be empty",
+		});
 	}
 	assertRegisteredWorktree(worktreePath);
 	for (const filePath of filePaths) {
@@ -139,7 +149,10 @@ export async function gitStageFiles(
 	filePaths: string[],
 ): Promise<void> {
 	if (filePaths.length === 0) {
-		throw new Error("filePaths must not be empty");
+		throw new TRPCError({
+			code: "BAD_REQUEST",
+			message: "filePaths must not be empty",
+		});
 	}
 	assertRegisteredWorktree(worktreePath);
 	for (const filePath of filePaths) {
@@ -161,7 +174,10 @@ export async function gitUnstageFiles(
 	filePaths: string[],
 ): Promise<void> {
 	if (filePaths.length === 0) {
-		throw new Error("filePaths must not be empty");
+		throw new TRPCError({
+			code: "BAD_REQUEST",
+			message: "filePaths must not be empty",
+		});
 	}
 	assertRegisteredWorktree(worktreePath);
 	for (const filePath of filePaths) {

@@ -14,14 +14,15 @@ import friendlyWords from "friendly-words";
 import type { StatusResult } from "simple-git";
 import { runWithPostCheckoutHookTolerance } from "../../utils/git-hook-tolerance";
 import { execGitWithShellPath, getSimpleGitWithShellPath } from "./git-client";
+import { GitEnvironmentError } from "./git-errors";
 import { execWithShellEnv, getProcessEnvWithShellPath } from "./shell-env";
 import { resolveTrackingRemoteName } from "./upstream-ref";
 
 const execFileAsync = promisify(execFile);
 
 export class NotGitRepoError extends Error {
-	constructor(repoPath: string) {
-		super(`Not a git repository: ${repoPath}`);
+	constructor(message: string) {
+		super(message);
 		this.name = "NotGitRepoError";
 	}
 }
@@ -197,13 +198,14 @@ async function getGitEnv(): Promise<Record<string, string>> {
 export async function getStatusNoLock(repoPath: string): Promise<StatusResult> {
 	const env = await getGitEnv();
 
+	let stdout: string;
 	try {
 		// Run git status with --no-optional-locks to avoid holding locks
 		// Use porcelain=v2 for stable machine-parseable output with branch headers
 		// Use -z for NUL-terminated output (handles filenames with special chars)
 		// Use -uall to show individual files in untracked directories (not just the directory)
 		// Note: porcelain=v2 includes structured rename/copy records without needing -M
-		const { stdout } = await execGitWithShellPath(
+		({ stdout } = await execGitWithShellPath(
 			[
 				"--no-optional-locks",
 				"-C",
@@ -215,24 +217,30 @@ export async function getStatusNoLock(repoPath: string): Promise<StatusResult> {
 				"-uall",
 			],
 			{ env, timeout: 30_000, maxBuffer: 10 * 1024 * 1024 },
-		);
-
-		return parsePorcelainStatusV2(stdout);
+		));
 	} catch (error) {
 		// Provide more descriptive error messages
 		if (isExecFileException(error)) {
 			if (error.code === "ENOENT") {
-				throw new Error("Git is not installed or not found in PATH");
+				throw new GitEnvironmentError(
+					"Git is not installed or not found in PATH",
+				);
 			}
 			const stderr = error.stderr || error.message || "";
 			if (stderr.includes("not a git repository")) {
-				throw new NotGitRepoError(repoPath);
+				throw new NotGitRepoError(`Not a git repository: ${repoPath}`);
 			}
 		}
-		throw new Error(
+		// maxBuffer overflows, timeouts, permission walls: pathological working
+		// trees, not bugs.
+		throw new GitEnvironmentError(
 			`Failed to get git status: ${error instanceof Error ? error.message : String(error)}`,
 		);
 	}
+
+	// Parsing failures are our bugs, not the environment's — keep them outside
+	// the catch so they surface as reported 500s.
+	return parsePorcelainStatusV2(stdout);
 }
 
 /**
@@ -630,7 +638,7 @@ export async function createWorktree(
 			console.error(
 				`Git lock file error during worktree creation: ${errorMessage}`,
 			);
-			throw new Error(
+			throw new GitEnvironmentError(
 				`Failed to create worktree: The git repository is locked by another process. ` +
 					`This usually happens when another git operation is in progress, or a previous operation crashed. ` +
 					`Please wait for the other operation to complete, or manually remove the lock file ` +
@@ -719,7 +727,7 @@ export async function createWorktreeFromExistingBranch({
 			console.error(
 				`Git lock file error during worktree creation: ${errorMessage}`,
 			);
-			throw new Error(
+			throw new GitEnvironmentError(
 				`Failed to create worktree: The git repository is locked by another process. ` +
 					`This usually happens when another git operation is in progress, or a previous operation crashed. ` +
 					`Please wait for the other operation to complete, or manually remove the lock file ` +
@@ -732,7 +740,7 @@ export async function createWorktreeFromExistingBranch({
 			lowerError.includes("already checked out") ||
 			lowerError.includes("is already used by worktree")
 		) {
-			throw new Error(
+			throw new GitEnvironmentError(
 				`Branch "${branch}" is already checked out in another worktree. ` +
 					`Each branch can only be checked out in one worktree at a time.`,
 			);
@@ -829,7 +837,7 @@ export async function getGitRoot(path: string): Promise<string> {
 	} catch (error) {
 		const message = error instanceof Error ? error.message : String(error);
 		if (message.toLowerCase().includes("not a git repository")) {
-			throw new NotGitRepoError(path);
+			throw new NotGitRepoError(`Not a git repository: ${path}`);
 		}
 		throw error;
 	}
@@ -843,9 +851,18 @@ export async function worktreeExists(
 		const git = await getSimpleGitWithShellPath(mainRepoPath);
 		const worktrees = await git.raw(["worktree", "list", "--porcelain"]);
 
-		const lines = worktrees.split("\n");
+		// Git keeps deleted worktrees in its metadata as `prunable` entries, so a
+		// listed path is not proof the worktree is live on disk.
 		const worktreePrefix = `worktree ${worktreePath}`;
-		return lines.some((line) => line.trim() === worktreePrefix);
+		return worktrees.split("\n\n").some((block) => {
+			const lines = block.split("\n").map((line) => line.trim());
+			return (
+				lines.some((line) => line === worktreePrefix) &&
+				!lines.some(
+					(line) => line === "prunable" || line.startsWith("prunable "),
+				)
+			);
+		});
 	} catch (error) {
 		console.error(`Failed to check worktree existence: ${error}`);
 		throw error;
@@ -1634,7 +1651,9 @@ export async function safeCheckoutBranch(
 
 	const safety = await checkBranchCheckoutSafety(repoPath);
 	if (!safety.safe) {
-		throw new Error(safety.error);
+		throw new GitEnvironmentError(
+			safety.error ?? "Branch checkout is not safe",
+		);
 	}
 
 	await checkoutBranch(repoPath, branch);
@@ -1751,13 +1770,13 @@ export async function getPrInfo({
 	} catch (error) {
 		if (isExecFileException(error)) {
 			if (error.code === "ENOENT") {
-				throw new Error(
+				throw new GitEnvironmentError(
 					"GitHub CLI (gh) is not installed. Please install it from https://cli.github.com/",
 				);
 			}
 			const stderr = error.stderr || error.message || "";
 			if (stderr.includes("not logged in")) {
-				throw new Error(
+				throw new GitEnvironmentError(
 					"Not logged in to GitHub CLI. Please run 'gh auth login' first.",
 				);
 			}
@@ -1765,7 +1784,9 @@ export async function getPrInfo({
 				stderr.includes("Could not resolve") ||
 				stderr.includes("not found")
 			) {
-				throw new Error(`PR #${prNumber} not found in ${owner}/${repo}`);
+				throw new GitEnvironmentError(
+					`PR #${prNumber} not found in ${owner}/${repo}`,
+				);
 			}
 		}
 		throw new Error(
@@ -1876,7 +1897,7 @@ export async function createWorktreeFromPr({
 			lowerError.includes("already checked out") ||
 			lowerError.includes("is already used by worktree")
 		) {
-			throw new Error(
+			throw new GitEnvironmentError(
 				`This PR's branch is already checked out in another worktree.`,
 			);
 		}
