@@ -75,7 +75,7 @@ type SessionClient = {
 
 Lint guards (CI): `protocol/` imports zod only; `core/` imports `protocol/` + stdlib only; `react/` is the only entry importing react; nothing imports react-dom/react-native/node builtins.
 
-## 2. Workstream B — host runtime (`packages/host-service/src/runtime/chat/`)
+## 2. Workstream B — host runtime (**AMENDED 2026-08-04:** now standalone `packages/chat-runtime`, owning its own `chat.db` — never host.db; exports `createChatRuntime({ dataDir })` plus, later, a mountable tRPC router + WS handler that host-service mounts in a few lines. Paths below map from `host-service/src/runtime/chat/` → `chat-runtime/src/`; the db/ section's host.db tables become CREATE-IF-NOT-EXISTS bootstrap in the package's own file.)
 
 ```
 packages/host-service/src/runtime/chat/
@@ -163,6 +163,8 @@ New pane, co-located per AGENTS.md, registered as pane kind `"chat"`:
                                #   merged with host listSessions for liveness
 ```
 
+**Codex desktop teardown adoptions (2026-08-04; from the shipped app — Electron 42 + React 19 + Tailwind v4, validating our stack):** (1) virtualize by **turn**, not message — layout stored as `distanceFromBottom` + per-turn heights so appends are no-ops; scroll compensation applies only to turns between viewport and bottom; (2) two-tier `content-visibility: auto` + `contain-intrinsic-size: auto 240px` (36px for diff rows) with `:has()` escape hatches for expanded widgets; (3) **re-pace** agent text: rAF queue, ~24 chars/frame, bounded force-drain — constant reveal regardless of network burstiness; exec output on a 50ms queue tail-truncated to last 20k chars; (4) at-bottom check: 24px tolerance normally, 0px while content is pending; (5) in-transcript find via CSS Custom Highlight API (no DOM mutation — survives streaming + virtualization); (6) sync IPC bootstrap + theme class set pre-React (no flash), and a tiny generic bridge redispatching IPC as DOM MessageEvents so renderer code stays web-portable; (7) persisted per-thread scroll restoration ({anchorKey, turnHeights}); (8) they gate durable-vs-ephemeral notifications with a static method→boolean map — our spine/delta split, confirmed shipped. Their code extracts live only in the session scratchpad — never commit any of it.
+
 **Component reuse policy:** the pane's *skin* comes from the existing vendored `@superset/ui/ai-elements` presentational components (`message`/`response` shells, `tool` collapsible, `reasoning`, `code-block`, `task`, `shimmer`) mapped onto our timeline entries — they're external copy-in components, not the deprecated internal chat logic, and they keep the pane visually consistent for free. Four things are **never** reused from that set, per research findings: the data shapes (`UIMessage` must not reappear as an interchange format), whole-message markdown rendering (`MessageResponse` has a broken memo comparator; our per-block `MarkdownView` is the perf recipe — streamdown is acceptable only as the per-block renderer if the M0 #473 check passes), `Conversation`/`use-stick-to-bottom` (bottom-chasing scroll — our anchor-user-turn `Transcript` stands), and `PromptInput` internals (no mention/slash support; visual shell only). Same skin-only rule applies to the RN ai-elements set in the mobile phase.
 
 **Registry swap & deletion:** `usePaneRegistry.tsx` pane kind `"chat"` points at `ChatV3Pane` behind `chat_v3` flag; at flag-flip the old subtree is deleted in the same PR: old `ChatPane/`, `useWorkspaceChatDisplay.ts` (4fps poller), `ToolCallBlock.tsx` + ~25 per-tool renderers, `prompt-input.tsx` (1569 lines), fake-stream `StreamingMessageText`, and the already-dead `MessageList/`, `MessagePartsRenderer/`, `PlanBlock/`, `SlashCommandInput/`. Grep gate in the PR: zero remaining imports of `chatService`/`chat.getSnapshot` from the v2 route tree.
@@ -189,6 +191,8 @@ Serial worst case ~4 weeks; with adapter parallelization (M3/M4 concurrent) ~3 w
 - **Reducer property tests**: shuffle/duplicate/drop envelope sequences must converge; replay(journal) === live fold; transcript never shrinks.
 - **Headless E2E** (M2) runs in CI; **CDP E2E** (M5) follows the AGENTS.md evidence-gate rules (real journey, screenshots, no synthetic-only claims).
 - Lint boundaries from §1/§2 run in CI. `bun run lint` + `typecheck` green before every push (repo rule).
+
+**Workstream B build notes (2026-08-04):** `packages/chat-runtime` landed (29 tests). Two facts to preserve: (1) better-sqlite3 in the bun store is compiled for Electron's ABI, so tests inject `bun:sqlite` through the `SqliteDatabase` seam — both drivers satisfy the interface structurally with zero casts, but the better-sqlite3 path is verified by types + host-service parity, not test execution; exercise it in the M5 CDP pass. (2) Boundary rule for the mount: **host passes resolved facts, never concepts** — runtime receives opaque `workspaceId` + resolved `cwd`/env, never imports workspace logic; host.db never grows a chat table. Also: `host-service/src/runtime/chat/` is occupied by legacy mastra code — the mount lives elsewhere or that subtree renames at flag-flip.
 
 ## 6. Risks & mitigations (carried from pre-flight review)
 

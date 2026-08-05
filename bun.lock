@@ -759,6 +759,24 @@
         "react": "19.2.3",
       },
     },
+    "packages/chat-runtime": {
+      "name": "@superset/chat-runtime",
+      "version": "0.0.1",
+      "dependencies": {
+        "@superset/chat": "workspace:*",
+        "better-sqlite3": "12.6.2",
+        "drizzle-orm": "0.45.2",
+        "zod": "4.4.3",
+      },
+      "devDependencies": {
+        "@superset/typescript": "workspace:*",
+        "@types/better-sqlite3": "7.6.13",
+        "@types/bun": "1.3.14",
+        "@types/node": "24.12.0",
+        "drizzle-kit": "0.31.8",
+        "typescript": "6.0.3",
+      },
+    },
     "packages/cli": {
       "name": "@superset/cli",
       "version": "1.19.0",
@@ -2852,6 +2870,8 @@
     "@superset/chat": ["@superset/chat@workspace:packages/chat"],
 
     "@superset/chat-legacy": ["@superset/chat-legacy@workspace:packages/chat-legacy"],
+
+    "@superset/chat-runtime": ["@superset/chat-runtime@workspace:packages/chat-runtime"],
 
     "@superset/cli": ["@superset/cli@workspace:packages/cli"],
 
