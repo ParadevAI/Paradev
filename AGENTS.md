@@ -33,6 +33,15 @@ bun run check:versions     # assert versions are unified
 Cut releases on a dedicated release branch (not `main`); `bun run release desktop
 <version> <commit>` provisions one from a commit. Full runbook: `scripts/release/README.md`.
 
+**Canary release** (separate from the above — a rolling internal-testing build of
+the desktop app, not a versioned stable release): `bash scripts/release-canary.sh
+[commit]` (or `/canaryrelease`). Triggers `release-desktop-canary.yml` via `gh
+workflow run`, which force-builds and replaces the rolling `desktop-canary`
+prerelease/tag on GitHub. Omit `commit` to build off the current default branch;
+pass one to build an arbitrary commit via a temp `canary-release-<sha>` branch.
+This is what "run a canary release" means in this repo — do not confuse it with
+`bun run release desktop`, which cuts a real versioned stable release.
+
 ## Code Quality
 
 **Biome runs at root level** (not per-package) for speed — use `bun run lint:fix` to fix all issues automatically.
