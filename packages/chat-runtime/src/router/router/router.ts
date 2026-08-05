@@ -59,8 +59,15 @@ export function createChatRouter(
 		createSession: t.procedure
 			.input(createSessionInputSchema)
 			.mutation(async ({ input }) => {
-				const cwd = await options.resolveCwd(input.workspaceId);
-				return guarded(() => runtime.commands.createSession({ ...input, cwd }));
+				const { workspaceId, ...rest } = input;
+				const cwd = await options.resolveCwd(workspaceId);
+				return guarded(() =>
+					runtime.commands.createSession({
+						...rest,
+						scopeId: workspaceId,
+						cwd,
+					}),
+				);
 			}),
 
 		prompt: t.procedure
@@ -89,7 +96,14 @@ export function createChatRouter(
 
 		listSessions: t.procedure
 			.input(listSessionsInputSchema)
-			.query(({ input }) => runtime.commands.listSessions(input)),
+			.query(({ input }) =>
+				runtime.commands.listSessions({
+					limit: input.limit,
+					...(input.workspaceId === undefined
+						? {}
+						: { scopeId: input.workspaceId }),
+				}),
+			),
 
 		getItems: t.procedure
 			.input(getItemsInputSchema)
