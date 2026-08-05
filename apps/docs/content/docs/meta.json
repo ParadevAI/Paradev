@@ -25,6 +25,7 @@
 		"tasks",
 		"remote-workspaces",
 		"automations",
+		"skills",
 		"mcp-server",
 		"---CLI---",
 		"cli/getting-started",

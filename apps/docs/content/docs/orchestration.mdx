@@ -7,13 +7,15 @@ description: Turn the agent you're already talking to into a coordinator of othe
 	the fan-out is mechanical: many similar slices, clear acceptance criteria, and results a coordinator can verify against tests. For work you want to review step by step, use the manual recipes above.
 </Callout>
 
-The `superset-orchestration` skill lets one agent coordinate many. Ask the agent you're already talking to for parallel work, and it runs the whole job through the Superset CLI: an isolated workspace per worker, an agent launched in each, follow-ups sent over their terminals, results collected at the end.
+The `superset:orchestrate` skill lets one agent coordinate many. Ask the agent you're already talking to for parallel work, and it runs the whole job through the Superset CLI: an isolated workspace per worker, an agent launched in each, follow-ups sent over their terminals, results collected at the end.
 
 ![Agents working in parallel workspaces](/images/agents-race.png)
 
 The coordinator can be Claude Code or Codex; the workers can be any mix of agents Superset runs.
 
 ## Install
+
+The desktop app [ships this skill automatically](/skills) — if you use Superset, your agents already have it. For standalone agents:
 
 ```bash
 npx skills add superset-sh/skills
