@@ -124,6 +124,10 @@
 			"types": "./src/tunnel-protocol.ts",
 			"default": "./src/tunnel-protocol.ts"
 		},
+		"./tunnel-v2-protocol": {
+			"types": "./src/tunnel-v2-protocol.ts",
+			"default": "./src/tunnel-v2-protocol.ts"
+		},
 		"./host-info": {
 			"types": "./src/host-info.ts",
 			"default": "./src/host-info.ts"
