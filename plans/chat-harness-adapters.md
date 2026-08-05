@@ -61,27 +61,36 @@ interface HarnessAdapter {
 
 Adapters emit protocol shapes and nothing else — no cursors (journal assigns them), no persistence, no sockets. That is what makes them testable as pure `SDKMessage[] → AdapterEvent[]` functions.
 
+**Unmapped vs ignored (amended 2026-08-05, after both adapters shipped).** The original rule — "anything unmapped becomes a `notice`, never silently dropped" — is too blunt for real harness streams, and Claude and Codex ran into it independently. Split it:
+
+- **Semantic events** — anything a reader would want in the transcript — become `notice`. This is the default, and it is what keeps the vocabulary honest when a harness grows a message type we have never seen.
+- **Enumerated telemetry** is ignored: hook lifecycle, MCP server startup chatter, account and rate-limit updates, and derived aggregates that duplicate items we already emit (codex's `turn/diff/updated`). Left as notices these flood a single turn with rows nobody reads.
+
+The rule that makes the second bucket safe is that **the ignore list is enumerated and named in code** (a per-adapter `IGNORED_*` constant), so each exclusion is a reviewable decision rather than a silent `default:` fallthrough — and anything not on the list still surfaces as a notice.
+
 ## 3. The mapping (SDKMessage → protocol)
 
 SDK options: `includePartialMessages: true` (for deltas), `--forward-subagent-text` (or subagent prose never arrives), `canUseTool` wired to approvals.
 
 | SDK signal | Protocol emission |
 |---|---|
-| `system/init` (model, `capabilities[]`) | `session` update (`harness: "claude-code"`, `modelId`); capabilities stored for feature detection — never version-string compares |
+| `system/init` (model, `capabilities`) | `session` update (`harness: "claude-code"`, `modelId`). **Recorded:** `capabilities` is `null` on 2.1.222 — there is nothing to feature-detect from, so the adapter leans on open-union tolerance instead |
 | `prompt()` accepted | `user_message` item (host-minted, echoes `clientId`); `turn` running |
 | `stream_event` text deltas | `delta {type:"text"}`, coalesced host-side |
 | assistant message settled | `agent_message` full snapshot (authoritative over deltas) |
-| thinking blocks | `reasoning` item (deltas → same `text` channel) |
-| `tool_use` block | `tool_call` snapshot, `status: "running"`; `toolKind`/`title` from the ported map (Read→`read`, Edit→`edit` + diff content, **Write→`edit` with `oldText: null`**, Bash→`execute` + terminal content, Grep/Glob→`search`, WebFetch/WebSearch→`fetch`, Task→`other`); paths display-relativized only when inside cwd |
-| `canUseTool` callback | `approval_request` item (`targetItemId` = the tool_call, `title` from `options.title`); SDK promise resolves on `respondToApproval`; `decline`→deny (turn continues), `cancel`→deny + `cancelTurn()`; unresolved-at-provider-loss → snapshot re-emitted `status: "stale"` |
-| `tool_use_result` | `tool_call` snapshot with `status`, `rawOutput` from the **full Output object** (never the model-facing string — that one carries our own agentId/usage trailer for Task tools), content updated (terminal output snapshot, `truncated` set by our own caps) |
-| messages with `parent_tool_use_id` | same items with `parentItemId` = the Task tool_call id (flat list; nesting is render-side) |
+| thinking blocks | `reasoning` item (deltas → same `text` channel). **Recorded:** thinking and text settle as *separate* messages sharing one `message.id`, so item ids are `${messageId}#${index}` and ordering follows arrival, not block index. `signature_delta` carries no renderable text and is ignored |
+| `tool_use` block | `tool_call` snapshot, `status: "running"`; `toolKind`/`title` from the ported map (Read→`read`, Edit→`edit` + diff content, **Write→`edit` with `oldText: null`**, Bash→`execute` + terminal content, Grep/Glob→`search`, WebFetch/WebSearch→`fetch`, Task→`other`); paths display-relativized only when inside cwd. **Recorded:** the subagent tool is named **`Agent`** on 2.1.222 — map both `Agent` and `Task` or subagent calls fall through to the default |
+| `canUseTool` callback | `approval_request` item (`targetItemId` = the tool_call, `title` from `options.title`); SDK promise resolves on `respondToApproval`; `decline`→deny (turn continues), `cancel`→deny + `cancelTurn()`; unresolved-at-provider-loss → snapshot re-emitted `status: "stale"`. **Two recorded traps, both silent:** `allowedTools` **shadows** `canUseTool` — a tool on that list is auto-approved and the callback never fires, so the adapter must refuse to set both; and an `accept` **must echo `updatedInput`** back or the tool call dies with a ZodError |
+| `tool_use_result` | `tool_call` snapshot with `status`, `rawOutput` from the **full Output object** on the snake_case `tool_use_result` (never the model-facing string — that one carries our own agentId/usage trailer for Task tools), content updated (terminal output snapshot, `truncated` set by our own caps). **Recorded:** bash results carry no `exitCode`, so `ToolContent.terminal.exitCode` stays absent for Claude |
+| messages with `parent_tool_use_id` | same items with `parentItemId` = the subagent (`Agent`/`Task`) tool_call id (flat list; nesting is render-side) |
 | `SDKToolUseSummaryMessage` | v1: dropped (projection-layer collapsing covers it); revisit as a group-title source |
 | `background_tasks_changed` | level-replace of an internal running-set; surfaces only via `session.status` (no per-task items in v1) |
 | compaction events | `notice {noticeKind: "compaction"}` |
 | `result` (success/error, usage, cost) | `turn` completed/failed + `Usage` (cached tokens kept distinct) |
-| abort / `TerminalReason` | `turn` interrupted; `aborted_streaming` vs `aborted_tools` recorded in `turn.error.message` |
-| anything unmapped | `notice {noticeKind: "info"}` — never silently dropped |
+| abort / `TerminalReason` | `turn` interrupted; `aborted_streaming` vs `aborted_tools` recorded in `turn.error.message`. **Recorded:** an abort arrives as a **thrown iterator error**, not as a terminal `result` message — the interrupted turn and its canceled tool_calls are synthesized in the `catch`, which is the only place invariant 5b can be honoured |
+| anything unmapped | `notice {noticeKind: "info"}` for semantic events; enumerated telemetry is ignored — see §2's unmapped-vs-ignored rule |
+
+**Approvals have no wire representation.** `canUseTool` is a callback the SDK invokes in-process; nothing about it appears in a recorded message stream. Approval behaviour therefore *cannot* be covered by fixtures — only the live smoke test exercises it, and the two traps above (shadowing, `updatedInput`) are exactly the kind that fixtures would have missed. Budget for that asymmetry: for Claude the fixture suite is a regression net for *mapping*, and the live test is the only net for *approvals*.
 
 Slash commands, mentions: the composer sends `TextElement` chips; the adapter expands them into the prompt string using the existing host-side slash-command registry (reused over RPC as today — it is already the only workable design since discovery walks the host filesystem).
 
@@ -103,15 +112,45 @@ Cross-harness continuation ("take this Claude session forward with Codex") is th
 
 Golden transcripts: record real `SDKMessage` streams into `fixtures/` (bash run, edit with approval, decline, subagent task, compaction, abort mid-tool), then assert `adapter(fixture) → AdapterEvent[]` snapshots and — through the shared reducer — final folded timelines. This covers adapter, journal ordering, and reducer with zero UI and zero live Claude. One live smoke per PR touching the adapter.
 
+What fixtures cannot cover, per harness, is worth stating up front because it decides where the live smoke earns its keep. For **Claude**, approvals are an in-process `canUseTool` callback with no wire representation at all — no recording can contain one, so the live test is the *only* coverage for the approval path (§3). For **Codex** the opposite holds: approvals are ordinary server-initiated JSON-RPC requests, so a recording captures the full round trip including our response, and the fixture replays it through a transport-level player. Recording is also the only way to learn the wire truth in §6a — the generated bindings disagreed with it twice.
+
 ## 6. Sequencing — dual-harness launch (Claude + Codex)
 
-Decision: ship Claude and Codex adapters together. The runtime is 100% shared, the Codex mapping is near-1:1 (our mechanics are copied from its app-server protocol, and `commandActions` supplies `toolKind`/`title` pre-parsed), and N=2 at launch is the forcing function that keeps the vocabulary harness-neutral instead of accreting Claude-isms.
+Decision: ship Claude and Codex adapters together. The runtime is 100% shared, the Codex mapping is near-1:1 (our mechanics are copied from its app-server protocol), and N=2 at launch is the forcing function that keeps the vocabulary harness-neutral instead of accreting Claude-isms. That bet paid off: both adapters independently hit the unmapped-vs-ignored problem in §2, which a single-harness launch would have shipped as a Claude-ism. It was also optimistic in places — `commandActions` turned out to supply `toolKind`/`title` only sometimes, and approvals do not map field-for-field. See §6a.
 
 1. `harness/types.ts` + journal + projection (no adapter yet; a scripted fake harness drives it).
 2. Claude adapter against fixtures; port the tools.ts mapping table with its test cases. Claude goes first by a few days to drive out runtime rough edges.
-3. **Codex adapter in parallel** once the interface + fixture pattern settle: `harness/codex/` speaking **app-server JSON-RPC over stdio** (NOT `@openai/codex-sdk` / exec-JSON — that path drops tool arguments and diff text, openai/codex#5028). Thread/Turn/Item → our items; approvals map field-for-field; `Plan` → `plan`.
+3. **Codex adapter in parallel** once the interface + fixture pattern settle: `harness/codex/` speaking **app-server JSON-RPC over stdio** (NOT `@openai/codex-sdk` / exec-JSON — that path drops tool arguments and diff text, openai/codex#5028). Thread/Turn/Item → our items; approvals carry a harness-supplied decision set (§6a); `Plan` → `plan`.
 4. Stream endpoint + reset/replay semantics against the journal.
 5. tRPC commands with `commandId` dedupe.
 6. Minimal desktop pane behind the internal-build flag, harness picker included from day one.
 
-Version-skew policy (the real Codex cost): users bring their own `codex` binary and the app-server interface is officially experimental. The Codex adapter therefore: enforces a minimum supported version at `initialize` (clean "upgrade codex" error, never a mangled transcript), feature-detects from the handshake (never version-string compares), and keeps fixtures recorded against both the pinned minimum and current. Claude is insulated by exact-pinning `@anthropic-ai/claude-agent-sdk` (0.3.x moves fast; upgrade deliberately with the fixture suite as the regression gate).
+Version-skew policy (the real Codex cost): users bring their own `codex` binary and the app-server interface is officially experimental. The Codex adapter therefore: enforces a minimum supported version at `initialize` (clean "upgrade codex" error, never a mangled transcript), and keeps fixtures recorded against both the pinned minimum and current. Claude is insulated by exact-pinning `@anthropic-ai/claude-agent-sdk` (0.3.x moves fast; upgrade deliberately with the fixture suite as the regression gate).
+
+### 6a. Codex wire truth (recorded 2026-08-05 against codex-cli 0.143.0)
+
+Everything below comes from recorded `codex app-server` frames (`packages/chat-runtime/src/harness/codex/fixtures/*.jsonl`), not from the generated `app-server generate-ts` bindings. **Where the two disagree, the recording wins** — the bindings were wrong or incomplete in two places that matter.
+
+**Feature detection is not available, so the version gate carries the whole load.** `initialize` returns `{userAgent, codexHome, platformFamily, platformOs}` and nothing more; the `capabilities` object in that handshake is *client*-declared (`experimentalApi`, `requestAttestation`), not a server reply. The instruction above to "feature-detect from the handshake, never version-string compare" is therefore not implementable as written, and the adapter does the only two things on offer: enforce a minimum version, and tolerate whatever it does not recognise (unknown notifications and unknown item types become `notice`s). Read the rule as *never version-compare **for features***; the compatibility gate itself has no choice but to be a version compare.
+
+**That version only exists inside `userAgent`, prefixed by our own client name** — `superset-chat-runtime/0.143.0 (Mac OS 26.5.0; arm64) …`, where the number after the first slash is codex's. A fragile parse on a string we partly control. `thread.cliVersion` on the `thread/start` response is the cross-check.
+
+**`MIN_CODEX_VERSION` is evidence-bound, not conservative.** It sits at 0.143.0 because that is the only version anyone has verified; it will reject users on slightly older binaries. Lower it as older versions are actually tested — do not lower it by assumption.
+
+**Server frames omit `jsonrpc` entirely.** Requests we send carry it; responses and notifications coming back do not. A strict JSON-RPC 2.0 reader rejects the entire stream.
+
+**Approvals: `availableDecisions` drives the options — never hardcode a decision set.** The field is on the wire and absent from the generated bindings. The recorded exec approval offered `accept`, `acceptWithExecpolicyAmendment` and `cancel` — and **no `decline`**. It maps straight onto `ApprovalRequest.options`, with the raw value returned via `Decision.option`. A fixed accept/decline/cancel button row would offer users decisions codex rejects.
+
+**`commandActions` is a hint, not the pre-parsed title §6 assumed.** `read`, `search` and `listFiles` arrive parsed with name/query/path; an ordinary `echo` or `touch` yields `{"type":"unknown"}`, so the adapter still synthesizes `title` and `toolKind` for the common case. Relatedly the item's `command` is the full `/bin/zsh -lc '…'` wrapper — `commandActions[].command` is the one to display.
+
+**`fileChange` diffs come in two different formats.** `add` gives the raw new file content with no `+` prefixes; `update` gives a headerless hunk diff (`@@ -1,3 +1,3 @@`, no `---`/`+++`). Our `ToolContent.diff` wants `oldText`/`newText`, so the adapter reconstructs both sides — and for `update` that reconstruction is **hunk-local, not whole-file**. Renderers must not assume the two strings are complete file contents.
+
+**Timestamp units are mixed:** `Turn.startedAt`/`completedAt` are seconds, item `startedAtMs`/`completedAtMs` are milliseconds.
+
+**There is no per-thread mode setter.** `collaborationMode` (`plan` | `default`) is readable in `ThreadSettings` and settable only as a TUI startup flag; no client request writes it. So `setMode` maps to the sandbox/approval pairing applied to each `turn/start` — `read-only`, `auto`, `full-access`. For codex, `SessionState.modeId` is a permission level, not plan-vs-default, and the picker should say so.
+
+**Interrupt leaves items dangling; the adapter closes them.** `turn/completed{interrupted}` arrives with no `item/completed` for the in-flight message. The adapter settles them itself: accumulated delta text plus `completedAtMs`, and running tool_calls to `canceled`. That is invariant 5b enforced at the adapter rather than only at resurrection — and it is why the adapter accumulates delta text it would otherwise not need.
+
+**The `turn/start` response races its own notifications.** Its promise can resolve *after* `turn/completed`, which would regress a settled turn back to `running`. The adapter suppresses running-after-terminal. Any adapter that emits turn state from both a request response and a notification stream needs the same guard.
+
+**Known weak mapping: `item/plan/delta`.** It is routed to the `text` delta channel targeting a `plan` item, which has no `text` field for a client to append to. Flagged rather than solved; dropping it may be the more honest answer once someone sees a real streamed plan.
