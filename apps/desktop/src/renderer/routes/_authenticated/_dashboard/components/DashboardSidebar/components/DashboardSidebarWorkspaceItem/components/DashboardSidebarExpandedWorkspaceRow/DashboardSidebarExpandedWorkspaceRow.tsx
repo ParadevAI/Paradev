@@ -113,6 +113,10 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 
 		const creationStatusText = isPending ? "Creating…" : null;
 		const isMainWorkspace = workspace.type === "main";
+		// No hover action button on the local main workspace: a stray click on the
+		// minus would remove the project's anchor row. Removal stays available via
+		// the context menu.
+		const isLocalMainWorkspace = isMainWorkspace && hostType === "local-device";
 		const workspaceKindTitle = isMainWorkspace
 			? "Main workspace"
 			: "Worktree workspace";
@@ -317,7 +321,7 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 											{shortcutLabel}
 										</span>
 									)}
-									{isMainWorkspace ? (
+									{isLocalMainWorkspace ? null : isMainWorkspace ? (
 										<Tooltip delayDuration={300}>
 											<TooltipTrigger asChild>
 												<button
