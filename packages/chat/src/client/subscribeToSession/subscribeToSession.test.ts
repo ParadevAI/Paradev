@@ -43,7 +43,7 @@ function startStack(script: FakeHarnessScript): {
 	const server = createMemoryStreamServer(runtime);
 	const created = runtime.commands.createSession({
 		commandId: randomUUID(),
-		workspaceId: "workspace-1",
+		scopeId: "workspace-1",
 		harness: FAKE_HARNESS,
 		cwd: "/tmp/workspace",
 	});

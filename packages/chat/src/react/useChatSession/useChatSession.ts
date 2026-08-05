@@ -43,7 +43,7 @@ export type ChatSession = {
 	connection: StreamStatus;
 	outbox: OutboxEntry[];
 	hasOlder: boolean;
-	sendPrompt(content: UserContent[]): void;
+	sendPrompt(content: UserContent[]): OutboxEntry;
 	retryPrompt(clientId: string): void;
 	discardPrompt(clientId: string): void;
 	loadOlder(): Promise<void>;
@@ -193,8 +193,9 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 
 	const sendPrompt = useCallback(
 		(content: UserContent[]) => {
-			outbox.enqueue(content);
+			const entry = outbox.enqueue(content);
 			void outbox.flush();
+			return entry;
 		},
 		[outbox],
 	);
