@@ -8,6 +8,8 @@ import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { useWorkspaceHostOptions } from "renderer/routes/_authenticated/components/DashboardNewWorkspaceModal/components/DashboardNewWorkspaceForm/components/DevicePicker/hooks/useWorkspaceHostOptions";
 import { ProjectThumbnail } from "renderer/routes/_authenticated/components/ProjectThumbnail";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
+import { HighlightText } from "renderer/routes/_authenticated/settings/components/HighlightText";
+import { useSettingsSearchQuery } from "renderer/stores/settings-state";
 import {
 	HostSelect,
 	type HostSelectOption,
@@ -32,6 +34,7 @@ export function V2ProjectSettings({
 	hostId,
 }: V2ProjectSettingsProps) {
 	const navigate = useNavigate();
+	const searchQuery = useSettingsSearchQuery();
 	const { machineId } = useLocalHostService();
 	const { currentDeviceName, localHostId, otherHosts } =
 		useWorkspaceHostOptions();
@@ -225,7 +228,9 @@ export function V2ProjectSettings({
 					{targetHostUrl && (
 						<div className="pt-4">
 							<div className="mb-3">
-								<h3 className="text-sm font-medium">Scripts</h3>
+								<h3 className="text-sm font-medium">
+									<HighlightText text="Scripts" query={searchQuery} />
+								</h3>
 								<p className="mt-0.5 text-xs text-muted-foreground">
 									Runs in a terminal for setup, teardown, and the workspace Run
 									button.

@@ -145,6 +145,7 @@
 	--color-sidebar-ring: var(--sidebar-ring);
 	--color-highlight: var(--highlight);
 	--color-highlight-foreground: var(--highlight-foreground);
+	--color-highlight-match: var(--highlight-match);
 	--color-fill-hover: var(--fill-hover);
 	--color-fill-selected: var(--fill-selected);
 }

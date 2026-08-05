@@ -8,6 +8,8 @@ import { env } from "renderer/env.renderer";
 import { resolveCurrentPlan } from "renderer/hooks/useCurrentPlan";
 import { authClient } from "renderer/lib/auth-client";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
+import { HighlightText } from "renderer/routes/_authenticated/settings/components/HighlightText";
+import { useSettingsSearchQuery } from "renderer/stores/settings-state";
 import {
 	isItemVisible,
 	SETTING_ITEM_ID,
@@ -26,6 +28,7 @@ interface BillingOverviewProps {
 export function BillingOverview({ visibleItems }: BillingOverviewProps) {
 	const { data: session } = authClient.useSession();
 	const collections = useCollections();
+	const searchQuery = useSettingsSearchQuery();
 	const [isUpgrading, setIsUpgrading] = useState(false);
 	const [isCanceling, setIsCanceling] = useState(false);
 	const [isRestoring, setIsRestoring] = useState(false);
@@ -159,7 +162,7 @@ export function BillingOverview({ visibleItems }: BillingOverviewProps) {
 				</div>
 				<Button variant="ghost" size="sm" asChild>
 					<Link to="/settings/billing/plans">
-						All plans
+						<HighlightText text="All plans" query={searchQuery} />
 						<HiArrowRight className="h-3 w-3" />
 					</Link>
 				</Button>

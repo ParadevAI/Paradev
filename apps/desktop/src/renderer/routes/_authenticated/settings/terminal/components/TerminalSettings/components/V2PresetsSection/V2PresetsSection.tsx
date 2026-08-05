@@ -16,7 +16,9 @@ import { getAgentCommandText } from "renderer/lib/agent-launch-command";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import type { V2TerminalPresetRow } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
+import { HighlightText } from "renderer/routes/_authenticated/settings/components/HighlightText";
 import type { PresetColumnKey } from "renderer/routes/_authenticated/settings/presets/types";
+import { useSettingsSearchQuery } from "renderer/stores/settings-state";
 import { PresetEditorDialog } from "../PresetsSection/components/PresetEditorDialog";
 
 import { PresetsTable } from "../PresetsSection/components/PresetsTable";
@@ -54,6 +56,7 @@ export function V2PresetsSection({
 	pendingCreateProjectId,
 	onPendingCreateProjectIdChange,
 }: V2PresetsSectionProps) {
+	const searchQuery = useSettingsSearchQuery();
 	const isDark = useIsDarkTheme();
 	const collections = useCollections();
 
@@ -626,7 +629,9 @@ export function V2PresetsSection({
 			<div className="rounded-lg border border-border overflow-hidden divide-y divide-border">
 				<div className="flex items-start justify-between gap-3 p-4">
 					<div className="min-w-0">
-						<h3 className="text-sm font-medium">Terminal presets</h3>
+						<h3 className="text-sm font-medium">
+							<HighlightText text="Terminal presets" query={searchQuery} />
+						</h3>
 						<p className="text-xs text-muted-foreground mt-0.5">
 							Pre-configured terminal launches. Click a preset to edit, drag to
 							reorder.

@@ -40,10 +40,12 @@ import {
 	resolveTerminalAppearance,
 } from "renderer/lib/terminal/appearance";
 import { terminalRuntimeRegistry } from "renderer/lib/terminal/terminal-runtime-registry";
+import { HighlightText } from "renderer/routes/_authenticated/settings/components/HighlightText";
 import {
 	DEFAULT_CODE_EDITOR_FONT_FAMILY,
 	DEFAULT_CODE_EDITOR_FONT_SIZE,
 } from "renderer/screens/main/components/WorkspaceView/components/CodeEditor/constants";
+import { useSettingsSearchQuery } from "renderer/stores/settings-state";
 import { useTerminalTheme } from "renderer/stores/theme";
 import { FontFamilyCombobox } from "./components/FontFamilyCombobox";
 import { FontPreview } from "./components/FontPreview";
@@ -138,6 +140,7 @@ export function FontSettingSection({
 		showEditor ? "editor" : "terminal",
 	);
 	const config = VARIANT_CONFIG[variant];
+	const searchQuery = useSettingsSearchQuery();
 	const utils = electronTrpc.useUtils();
 	const queryClient = useQueryClient();
 	const terminalTheme = useTerminalTheme();
@@ -312,7 +315,9 @@ export function FontSettingSection({
 							) : (
 								<SquareTerminal className="size-4 text-muted-foreground" />
 							)}
-							<h4 className="text-sm font-medium">{config.title}</h4>
+							<h4 className="text-sm font-medium">
+								<HighlightText text={config.title} query={searchQuery} />
+							</h4>
 						</div>
 						<p className="mt-1 text-xs text-muted-foreground">
 							{config.description}

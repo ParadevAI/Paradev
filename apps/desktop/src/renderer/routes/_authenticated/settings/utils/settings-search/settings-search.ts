@@ -1491,8 +1491,12 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 	},
 ];
 
+export function splitSearchTerms(query: string): string[] {
+	return query.trim().toLowerCase().split(/\s+/).filter(Boolean);
+}
+
 export function searchSettings(query: string): SettingsItem[] {
-	const terms = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
+	const terms = splitSearchTerms(query);
 	if (terms.length === 0) return SETTINGS_ITEMS;
 
 	return SETTINGS_ITEMS.filter((item) => {

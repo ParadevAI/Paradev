@@ -1,6 +1,8 @@
 import { Label } from "@superset/ui/label";
 import { Switch } from "@superset/ui/switch";
 import { electronTrpc } from "renderer/lib/electron-trpc";
+import { HighlightText } from "renderer/routes/_authenticated/settings/components/HighlightText";
+import { useSettingsSearchQuery } from "renderer/stores/settings-state";
 
 /**
  * Experimental toggle for the wait-for-setup agent gate. Self-contained
@@ -9,6 +11,7 @@ import { electronTrpc } from "renderer/lib/electron-trpc";
  * host `workspaces.create` chaining (v2).
  */
 export function WaitForSetupBeforeAgentSetting() {
+	const searchQuery = useSettingsSearchQuery();
 	const utils = electronTrpc.useUtils();
 	const { data: waitForSetupBeforeAgent, isLoading } =
 		electronTrpc.settings.getWaitForSetupBeforeAgent.useQuery();
@@ -40,11 +43,16 @@ export function WaitForSetupBeforeAgentSetting() {
 					htmlFor="wait-for-setup-before-agent"
 					className="text-sm font-medium"
 				>
-					Wait for workspace setup before starting agents
+					<HighlightText
+						text="Wait for workspace setup before starting agents"
+						query={searchQuery}
+					/>
 				</Label>
 				<p className="text-xs text-muted-foreground">
-					Run the agent in the Workspace Setup terminal once setup finishes
-					instead of starting a second terminal alongside it
+					<HighlightText
+						text="Run the agent in the Workspace Setup terminal once setup finishes instead of starting a second terminal alongside it"
+						query={searchQuery}
+					/>
 				</p>
 			</div>
 			<Switch
