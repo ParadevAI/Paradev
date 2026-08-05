@@ -19,8 +19,10 @@ Addressing review feedback is high-interruption, low-creativity work. Create a w
 2. Prompt an agent to work through the feedback. The `gh` CLI is already authenticated in every workspace:
 
 ```text
-Read all review feedback on this PR: `gh pr view --comments` for discussion,
-plus `gh api repos/{owner}/{repo}/pulls/{number}/comments` for inline code comments.
+Read all review feedback on this PR. `gh pr view --comments` misses inline
+code comments, so also run
+`gh api repos/{owner}/{repo}/pulls/{pr}/comments --paginate`
+with this repo's owner/name and this PR's number.
 Address each comment: make the change, or reply explaining why not.
 Commit with one commit per comment, referencing it. Do not force-push.
 Summarize what you changed and what you pushed back on in your final message.

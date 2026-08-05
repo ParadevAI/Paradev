@@ -60,7 +60,7 @@ export default function NavigationBar() {
 					<MobileSearchIcon />
 					<SidebarTrigger />
 					<ul className="navbar:flex items-center gap-2 hidden shrink-0">
-						<NavLink href={`${COMPANY.MARKETING_URL}/changelog`} external>
+						<NavLink href={COMPANY.CHANGELOG_URL} external>
 							Changelog
 						</NavLink>
 						<NavLink href={COMPANY.MARKETING_URL} external>

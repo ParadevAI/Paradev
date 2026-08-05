@@ -1,5 +1,4 @@
 import { Card, Cards } from "fumadocs-ui/components/card";
-import { Step, Steps } from "fumadocs-ui/components/steps";
 import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 import defaultMdxComponents from "fumadocs-ui/mdx";
 import {
@@ -42,8 +41,6 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
 		...defaultMdxComponents,
 		Card,
 		Cards,
-		Step,
-		Steps,
 		BookOpen,
 		Bot,
 		CalendarClock,
