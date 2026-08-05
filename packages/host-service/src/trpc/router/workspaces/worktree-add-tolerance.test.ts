@@ -74,6 +74,7 @@ describe("addBranchWorktree hook tolerance", () => {
 				usedExistingBranch: false,
 			},
 			worktreePath,
+			sparsePaths: [],
 		});
 
 		expect(existsSync(worktreePath)).toBe(true);
@@ -104,6 +105,7 @@ describe("addBranchWorktree hook tolerance", () => {
 				usedExistingBranch: true,
 			},
 			worktreePath,
+			sparsePaths: [],
 		});
 
 		expect(existsSync(worktreePath)).toBe(true);
@@ -134,6 +136,7 @@ describe("addBranchWorktree hook tolerance", () => {
 					usedExistingBranch: false,
 				},
 				worktreePath,
+				sparsePaths: [],
 			}),
 		).rejects.toThrow();
 		expect(existsSync(worktreePath)).toBe(false);

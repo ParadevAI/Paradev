@@ -1,6 +1,5 @@
 import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
-import { runWithPostCheckoutHookTolerance } from "@superset/shared/git-hook-tolerance";
 import { generateFriendlyBranchName } from "@superset/shared/workspace-launch";
 import { TRPCError } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
@@ -36,6 +35,10 @@ import { startCommandTerminal } from "../workspace-creation/shared/command-termi
 import { enablePushAutoSetupRemote } from "../workspace-creation/shared/git-config";
 import { requireLocalProject } from "../workspace-creation/shared/local-project";
 import { startSetupTerminalIfPresent } from "../workspace-creation/shared/setup-terminal";
+import {
+	addWorktreeWithSparseCheckout,
+	parseSparseCheckoutPaths,
+} from "../workspace-creation/shared/sparse-checkout";
 import type { GitClient } from "../workspace-creation/shared/types";
 import { safeResolveWorktreePath } from "../workspace-creation/shared/worktree-paths";
 import { generateBranchNameFromPrompt } from "../workspace-creation/utils/ai-branch-name";
@@ -330,58 +333,59 @@ export async function addBranchWorktree(args: {
 	git: GitClient;
 	plan: BranchSourcePlan;
 	worktreePath: string;
+	sparsePaths: string[];
 }): Promise<void> {
-	const { git, plan, worktreePath } = args;
+	const { git, plan, worktreePath, sparsePaths } = args;
 
 	// Post-checkout hooks run after the checkout itself, so a hook that exits
-	// non-zero fails `worktree add` with the worktree fully in place. Every
+	// non-zero fails the operation with the worktree fully in place. Every
 	// branch case below checks out `plan.branch`, so registered-at-path with
-	// that branch is the ground truth.
-	const runWorktreeAdd = (addArgs: string[]) =>
-		runWithPostCheckoutHookTolerance({
-			context: `Worktree created at ${worktreePath}`,
-			run: async () => {
-				await git.raw(addArgs);
-			},
-			didSucceed: async () => {
-				if (!(await findWorktreeAtPath(git, worktreePath, plan.branch))) {
-					return false;
-				}
-				try {
-					// The worktree list can report a branch for a half-created
-					// worktree; require a resolvable HEAD in the worktree itself.
-					await git.raw(["-C", worktreePath, "rev-parse", "--verify", "HEAD"]);
-					return true;
-				} catch {
-					return false;
-				}
-			},
-		});
+	// that branch is the ground truth. Handed to addWorktreeWithSparseCheckout
+	// so it applies to whichever command actually performs the checkout —
+	// the plain add below, or the sparse path's explicit `checkout` step.
+	const hookTolerance = {
+		context: `Worktree created at ${worktreePath}`,
+		didSucceed: async () => {
+			if (!(await findWorktreeAtPath(git, worktreePath, plan.branch))) {
+				return false;
+			}
+			try {
+				// The worktree list can report a branch for a half-created
+				// worktree; require a resolvable HEAD in the worktree itself.
+				await git.raw(["-C", worktreePath, "rev-parse", "--verify", "HEAD"]);
+				return true;
+			} catch {
+				return false;
+			}
+		},
+	};
 
 	if (plan.usedExistingBranch) {
 		// Existing branch — check it out into a fresh worktree. Remote-tracking
 		// refs need explicit --track + -b so the worktree gets a real local
 		// branch, not detached HEAD.
-		await runWorktreeAdd(
-			plan.startPoint.kind === "remote-tracking"
-				? [
-						"worktree",
-						"add",
-						"--track",
-						"-b",
-						plan.branch,
-						worktreePath,
-						plan.startPoint.remoteShortName,
-					]
-				: [
-						"worktree",
-						"add",
-						worktreePath,
-						plan.startPoint.kind === "head"
-							? "HEAD"
-							: plan.startPoint.shortName,
-					],
-		);
+		await addWorktreeWithSparseCheckout({
+			git,
+			worktreeArgs:
+				plan.startPoint.kind === "remote-tracking"
+					? [
+							"--track",
+							"-b",
+							plan.branch,
+							worktreePath,
+							plan.startPoint.remoteShortName,
+						]
+					: [
+							worktreePath,
+							plan.startPoint.kind === "head"
+								? "HEAD"
+								: plan.startPoint.shortName,
+						],
+			worktreePath,
+			sparsePaths,
+			logPrefix: "[workspaces.create]",
+			hookTolerance,
+		});
 		return;
 	}
 
@@ -394,15 +398,20 @@ export async function addBranchWorktree(args: {
 			: plan.startPoint.kind === "remote-tracking"
 				? plan.startPoint.remoteShortName
 				: plan.startPoint.shortName;
-	await runWorktreeAdd([
-		"worktree",
-		"add",
-		"--no-track",
-		"-b",
-		plan.branch,
+	await addWorktreeWithSparseCheckout({
+		git,
+		worktreeArgs: [
+			"--no-track",
+			"-b",
+			plan.branch,
+			worktreePath,
+			startPointArg,
+		],
 		worktreePath,
-		startPointArg,
-	]);
+		sparsePaths,
+		logPrefix: "[workspaces.create]",
+		hookTolerance,
+	});
 }
 
 async function recordBaseBranchConfig(args: {
@@ -544,6 +553,11 @@ export const workspacesRouter = router({
 			);
 			const worktreeBaseDir =
 				localProject.worktreeBaseDir ?? getHostWorktreeBaseDir(ctx);
+			// Empty means a full checkout. Only applies to worktrees we create —
+			// adopted ones keep whatever checkout they already have.
+			const sparsePaths = parseSparseCheckoutPaths(
+				localProject.sparseCheckoutPaths,
+			);
 
 			// Free branches still claimed by registrations whose dirs are
 			// gone — without this, `git worktree add` later fails with
@@ -678,12 +692,13 @@ export const workspacesRouter = router({
 							if (adoptLocalBranch) {
 								await normalizeExistingPrBranch();
 								try {
-									await git.raw([
-										"worktree",
-										"add",
+									await addWorktreeWithSparseCheckout({
+										git,
+										worktreeArgs: [worktreePath, resolvedBranch],
 										worktreePath,
-										resolvedBranch,
-									]);
+										sparsePaths,
+										logPrefix: "[workspaces.create]",
+									});
 								} catch (err) {
 									throw new TRPCError({
 										code: "CONFLICT",
@@ -721,12 +736,13 @@ export const workspacesRouter = router({
 									});
 									recordMaterializedWarning(materialized);
 									worktreeAddStarted = true;
-									await git.raw([
-										"worktree",
-										"add",
+									await addWorktreeWithSparseCheckout({
+										git,
+										worktreeArgs: [worktreePath, resolvedBranch],
 										worktreePath,
-										resolvedBranch,
-									]);
+										sparsePaths,
+										logPrefix: "[workspaces.create]",
+									});
 								} catch (err) {
 									if (worktreeAddStarted || materialized?.createdBranch) {
 										await rollbackPreparedPr();
@@ -938,7 +954,12 @@ export const workspacesRouter = router({
 
 						let adoptedRow: CloudWorkspace | undefined;
 						try {
-							await addBranchWorktree({ git, plan, worktreePath });
+							await addBranchWorktree({
+								git,
+								plan,
+								worktreePath,
+								sparsePaths,
+							});
 						} catch (err) {
 							// Branch is already claimed by another worktree that the
 							// pre-check missed (auto-gen path, or a race). Adopt at
