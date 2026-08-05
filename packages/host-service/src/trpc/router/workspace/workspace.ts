@@ -9,6 +9,7 @@ import {
 	updateLocalWorkspace,
 } from "../../../workspaces/local-workspace-store";
 import { protectedProcedure, router } from "../../index";
+import { resolveWorktreePath } from "../git/utils/resolve-worktree";
 import { destroyWorkspace } from "../workspace-cleanup";
 
 export const workspaceRouter = router({
@@ -130,18 +131,8 @@ export const workspaceRouter = router({
 	gitStatus: protectedProcedure
 		.input(z.object({ id: z.string() }))
 		.query(async ({ ctx, input }) => {
-			const localWorkspace = ctx.db.query.workspaces
-				.findFirst({ where: eq(workspaces.id, input.id) })
-				.sync();
-
-			if (!localWorkspace) {
-				throw new TRPCError({
-					code: "NOT_FOUND",
-					message: "Workspace not found",
-				});
-			}
-
-			const git = await ctx.git(localWorkspace.worktreePath);
+			const worktreePath = resolveWorktreePath(ctx, input.id);
+			const git = await ctx.git(worktreePath);
 			const status = await git.status();
 
 			return {
