@@ -5,6 +5,7 @@ import { mkdir, rename } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { promisify } from "node:util";
 import type { BranchPrefixMode } from "@superset/local-db";
+import { runWithPostCheckoutHookTolerance } from "@superset/shared/git-hook-tolerance";
 import {
 	sanitizeAuthorPrefix,
 	sanitizeBranchName,
@@ -12,7 +13,6 @@ import {
 } from "@superset/shared/workspace-launch";
 import friendlyWords from "friendly-words";
 import type { StatusResult } from "simple-git";
-import { runWithPostCheckoutHookTolerance } from "../../utils/git-hook-tolerance";
 import { execGitWithShellPath, getSimpleGitWithShellPath } from "./git-client";
 import { GitEnvironmentError } from "./git-errors";
 import { execWithShellEnv, getProcessEnvWithShellPath } from "./shell-env";
@@ -143,27 +143,67 @@ async function isWorktreeRegistered({
 
 /**
  * Runs `git worktree add`, tolerating hook failures.
- * Post-checkout hooks can exit non-zero after the worktree is created.
- * If the worktree exists on disk despite the error, we warn and continue.
+ * Post-checkout hooks run after the checkout itself, so they can exit
+ * non-zero — or blow past the timeout and get killed — with the worktree
+ * fully created. If the worktree verifiably reached the expected state
+ * despite the error, we warn and continue.
  */
 async function execWorktreeAdd({
 	mainRepoPath,
 	args,
 	worktreePath,
-	timeout = 120_000,
+	expectedBranch,
+	// Generous: post-checkout hooks may install dependencies on fresh worktrees.
+	timeout = 600_000,
 }: {
 	mainRepoPath: string;
 	args: string[];
 	worktreePath: string;
+	/**
+	 * Branch the worktree must have checked out for a failed add to count as
+	 * success. When omitted (detached adds), only a worktree registered by
+	 * THIS call qualifies — a path registered beforehand belongs to some
+	 * other checkout and its "already exists" failure must surface. A
+	 * detached worktree stranded by a killed prior attempt therefore does
+	 * NOT recover via retry: without a branch there is no way to tell a
+	 * same-PR leftover from a foreign checkout, and running
+	 * `gh pr checkout --force` in the latter would clobber it.
+	 */
+	expectedBranch?: string;
 	timeout?: number;
 }): Promise<void> {
+	const wasRegisteredBefore =
+		expectedBranch === undefined
+			? await isWorktreeRegistered({ mainRepoPath, worktreePath })
+			: false;
+
 	await runWithPostCheckoutHookTolerance({
 		context: `Worktree created at ${worktreePath}`,
 		run: async () => {
 			await execGitWithShellPath(args, { timeout });
 		},
-		didSucceed: async () =>
-			isWorktreeRegistered({ mainRepoPath, worktreePath }),
+		didSucceed: async () => {
+			if (!(await isWorktreeRegistered({ mainRepoPath, worktreePath }))) {
+				return false;
+			}
+			if (expectedBranch !== undefined) {
+				return (await getCurrentBranch(worktreePath)) === expectedBranch;
+			}
+			if (wasRegisteredBefore) {
+				return false;
+			}
+			try {
+				// A half-created worktree can stay registered; require a
+				// resolvable HEAD to prove the checkout completed.
+				await execGitWithShellPath(
+					["-C", worktreePath, "rev-parse", "--verify", "HEAD"],
+					{ timeout: 10_000 },
+				);
+				return true;
+			} catch {
+				return false;
+			}
+		},
 	});
 }
 
@@ -613,6 +653,7 @@ export async function createWorktree(
 				startPoint,
 			],
 			worktreePath,
+			expectedBranch: branch,
 		});
 
 		// Enable autoSetupRemote so the first `git push` automatically creates
@@ -677,6 +718,7 @@ export async function createWorktreeFromExistingBranch({
 				mainRepoPath,
 				args: ["-C", mainRepoPath, "worktree", "add", worktreePath, branch],
 				worktreePath,
+				expectedBranch: branch,
 			});
 		} else {
 			const remoteBranches = await git.branch(["-r"]);
@@ -696,6 +738,7 @@ export async function createWorktreeFromExistingBranch({
 						remoteBranchName,
 					],
 					worktreePath,
+					expectedBranch: branch,
 				});
 			} else {
 				throw new Error(
@@ -1673,6 +1716,8 @@ export interface PullRequestInfo {
 	number: number;
 	title: string;
 	headRefName: string;
+	/** Head commit SHA — ground truth for whether a PR checkout completed. */
+	headRefOid?: string;
 	headRepository: {
 		owner: string;
 		name: string;
@@ -1761,7 +1806,7 @@ export async function getPrInfo({
 				"--repo",
 				`${owner}/${repo}`,
 				"--json",
-				"number,title,headRefName,headRepository,headRepositoryOwner,isCrossRepository",
+				"number,title,headRefName,headRefOid,headRepository,headRepositoryOwner,isCrossRepository",
 			],
 			{ timeout: 30_000 },
 		);
@@ -1830,6 +1875,7 @@ export async function createWorktreeFromPr({
 					localBranchName,
 				],
 				worktreePath,
+				expectedBranch: localBranchName,
 			});
 		} else {
 			await execWorktreeAdd({
@@ -1839,46 +1885,79 @@ export async function createWorktreeFromPr({
 			});
 		}
 
-		try {
-			await execWithShellEnv(
-				"gh",
-				[
-					"pr",
-					"checkout",
-					String(prInfo.number),
-					"--branch",
-					localBranchName,
-					"--force",
-				],
-				{ cwd: worktreePath, timeout: 120_000 },
-			);
-		} catch (ghError) {
-			const ghMsg =
-				ghError instanceof Error ? ghError.message : String(ghError);
-			// `gh pr checkout` can fail with "is not a branch" when the branch name
-			// contains '/' (e.g. "user/feature-branch"). Git has trouble resolving
-			// "origin/user/feature-branch" as a tracking ref inside a worktree.
-			// gh already fetched the remote successfully, so FETCH_HEAD points to
-			// the right commit — fall back to creating the branch without tracking.
-			if (!ghMsg.includes("is not a branch")) {
-				throw ghError;
-			}
-			console.log(
-				`[git] gh pr checkout failed with tracking error for PR #${prInfo.number}, falling back to FETCH_HEAD checkout`,
-			);
-			await execGitWithShellPath(
-				[
-					"-C",
-					worktreePath,
-					"checkout",
-					"-B",
-					localBranchName,
-					"--no-track",
-					"FETCH_HEAD",
-				],
-				{ timeout: 30_000 },
-			);
-		}
+		// Checkouts run post-checkout hooks too — tolerate a hook failure only
+		// when the checkout verifiably completed: right branch AND at the PR's
+		// head commit. Branch name alone is not enough — in the branch-exists
+		// path the branch is already checked out before gh runs, which would
+		// mask genuine gh failures (auth, network) as hook noise.
+		await runWithPostCheckoutHookTolerance({
+			context: `Checked out PR #${prInfo.number} branch "${localBranchName}" in ${worktreePath}`,
+			didSucceed: async () => {
+				if (!prInfo.headRefOid) {
+					return false;
+				}
+				if ((await getCurrentBranch(worktreePath)) !== localBranchName) {
+					return false;
+				}
+				try {
+					const { stdout } = await execGitWithShellPath(
+						["-C", worktreePath, "rev-parse", "HEAD"],
+						{ timeout: 10_000 },
+					);
+					return (
+						stdout.trim().toLowerCase() ===
+						prInfo.headRefOid.trim().toLowerCase()
+					);
+				} catch {
+					return false;
+				}
+			},
+			run: async () => {
+				try {
+					await execWithShellEnv(
+						"gh",
+						[
+							"pr",
+							"checkout",
+							String(prInfo.number),
+							"--branch",
+							localBranchName,
+							"--force",
+						],
+						// Generous: checkout runs post-checkout hooks, which may
+						// install dependencies on fresh worktrees.
+						{ cwd: worktreePath, timeout: 600_000 },
+					);
+				} catch (ghError) {
+					const ghMsg =
+						ghError instanceof Error ? ghError.message : String(ghError);
+					// `gh pr checkout` can fail with "is not a branch" when the branch name
+					// contains '/' (e.g. "user/feature-branch"). Git has trouble resolving
+					// "origin/user/feature-branch" as a tracking ref inside a worktree.
+					// gh already fetched the remote successfully, so FETCH_HEAD points to
+					// the right commit — fall back to creating the branch without tracking.
+					if (!ghMsg.includes("is not a branch")) {
+						throw ghError;
+					}
+					console.log(
+						`[git] gh pr checkout failed with tracking error for PR #${prInfo.number}, falling back to FETCH_HEAD checkout`,
+					);
+					await execGitWithShellPath(
+						[
+							"-C",
+							worktreePath,
+							"checkout",
+							"-B",
+							localBranchName,
+							"--no-track",
+							"FETCH_HEAD",
+						],
+						// Generous: checkout runs post-checkout hooks (see above).
+						{ timeout: 600_000 },
+					);
+				}
+			},
+		});
 
 		// Enable autoSetupRemote so `git push` just works without -u flag.
 		await execGitWithShellPath(
