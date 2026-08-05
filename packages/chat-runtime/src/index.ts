@@ -15,6 +15,7 @@ export * from "./harness";
 export * from "./journal";
 export * from "./projection";
 export * from "./replay";
+export * from "./router";
 export * from "./sessions";
 export * from "./stream";
 
