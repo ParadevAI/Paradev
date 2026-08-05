@@ -489,3 +489,50 @@ describe("Terminal Host Session emulator backlog backpressure", () => {
 		expect(fakeChildProcess.stdout.resumeCalls).toBe(1);
 	});
 });
+
+describe("PtySubprocessFrameDecoder resync", () => {
+	it("recovers after an oversized frame instead of poisoning the stream", () => {
+		const decoder = new PtySubprocessFrameDecoder();
+
+		// A corrupted stream presents a garbage header whose length field is
+		// far above the cap (observed: 1131308389 = ASCII "Come" read as
+		// u32LE). The decoder must surface the error but reset its internal
+		// state so the NEXT push() can re-sync; otherwise every subsequent
+		// chunk re-throws on the same stale header and the session freezes
+		// (regression #6153).
+		const badHeader = Buffer.alloc(5);
+		badHeader.writeUInt8(PtySubprocessIpcType.Write, 0);
+		badHeader.writeUInt32LE(64 * 1024 * 1024 + 1, 1); // > MAX_FRAME_BYTES
+
+		expect(() => decoder.push(badHeader)).toThrow(/frame too large/);
+
+		// A well-formed frame on the next chunk must decode normally.
+		const goodType = PtySubprocessIpcType.Ready;
+		const goodPayload = Buffer.from("hello");
+		const goodHeader = createFrameHeader(goodType, goodPayload.length);
+		const frames = decoder.push(Buffer.concat([goodHeader, goodPayload]));
+
+		expect(frames).toHaveLength(1);
+		expect(frames[0].type).toBe(goodType);
+		expect(frames[0].payload.toString("utf8")).toBe("hello");
+	});
+
+	it("recovers when the oversized header and a valid frame share one chunk", () => {
+		const decoder = new PtySubprocessFrameDecoder();
+
+		const badHeader = Buffer.alloc(5);
+		badHeader.writeUInt8(PtySubprocessIpcType.Write, 0);
+		badHeader.writeUInt32LE(64 * 1024 * 1024 + 1, 1);
+
+		const goodType = PtySubprocessIpcType.Spawned;
+		const goodPayload = Buffer.from("world");
+		const goodHeader = createFrameHeader(goodType, goodPayload.length);
+
+		expect(() => decoder.push(badHeader)).toThrow(/frame too large/);
+		const frames = decoder.push(Buffer.concat([goodHeader, goodPayload]));
+
+		expect(frames).toHaveLength(1);
+		expect(frames[0].type).toBe(goodType);
+		expect(frames[0].payload.toString("utf8")).toBe("world");
+	});
+});
