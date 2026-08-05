@@ -131,14 +131,6 @@ export const ROADMAP_ITEMS: RoadmapItem[] = [
 		category: "Integrations",
 		status: "next",
 	},
-	{
-		id: "sso-saml",
-		title: "SSO (SAML / OIDC)",
-		description: "Single sign-on for organizations, self-serve configurable.",
-		category: "Platform",
-		status: "next",
-	},
-
 	// ── Later ────────────────────────────────────────
 	{
 		id: "project-wide-search",
