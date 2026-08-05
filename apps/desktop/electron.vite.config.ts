@@ -43,6 +43,22 @@ const sentryPlugin = process.env.SENTRY_AUTH_TOKEN
 		})
 	: null;
 
+// host-service runs as a child process reporting to its own Sentry project,
+// and sourcemap lookup is per-project — its bundles must also be uploaded
+// there or host-service stacks stay unsymbolicated. Debug IDs are derived
+// from file content, so the double injection with sentryPlugin is identical.
+const hostServiceSentryPlugin = process.env.SENTRY_AUTH_TOKEN
+	? sentryVitePlugin({
+			org: "superset-sh",
+			project: "host-service",
+			authToken: process.env.SENTRY_AUTH_TOKEN,
+			release: { name: version },
+			sourcemaps: {
+				assets: ["**/host-service.js*", "**/host-worker.js*"],
+			},
+		})
+	: null;
+
 export default defineConfig({
 	main: {
 		plugins: [tsconfigPaths, copyResourcesPlugin()],
@@ -129,7 +145,7 @@ export default defineConfig({
 					dir: resolve(devPath, "main"),
 				},
 				external: ["electron", ...mainExternalizedDependencies],
-				plugins: [sentryPlugin].filter(Boolean),
+				plugins: [sentryPlugin, hostServiceSentryPlugin].filter(Boolean),
 			},
 		},
 		resolve: {
