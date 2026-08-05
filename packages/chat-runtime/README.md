@@ -14,7 +14,7 @@ The runtime speaks only the vocabulary in `plans/chat-protocol-v1.md`; it never 
 | `journal/` | `journal/` appends a durable event and the projection row in one transaction; `epoch/` mints an epoch on create or journal loss (journal is its only consumer, so it nests here) |
 | `replay/` | Reads the spine: `readSince`, `readPage`, `latestSeq`. Top-level because journal, stream, commands and the test helpers all consume it |
 | `projection/` | Every `chat_sessions_local` read and write, plus `ChatSessionStore`. Top-level because journal, replay, commands and the root wiring all consume it |
-| `harness/` | `HarnessAdapter` + `AdapterEvent` — the contract every harness implements — and `fake/`, the scripted adapter that drives the tests. Adapters emit protocol shapes only: no cursors, no persistence, no sockets |
+| `harness/` | `HarnessAdapter` + `AdapterEvent` — the contract every harness implements — plus `eventQueue/` (the async-iterable pump adapters emit through), `fake/` (the scripted adapter that drives the runtime tests) and `codex/`. Adapters emit protocol shapes only: no cursors, no persistence, no sockets |
 | `sessions/` | `liveSession/` (one running session: event pump, FIFO prompt queue, cancel) and `registry/`, which builds one per harness |
 | `stream/` | `subscriptions/` — `SubscriptionHub`: replay-then-live subscribe, per-subscriber delta channels, reset frames, delta coalescing |
 | `commands/` | The client-facing verbs, each parsed with the `@superset/chat` command schemas and deduped by `commandId` |
@@ -33,6 +33,23 @@ const runtime = createChatRuntime({
 });
 ```
 
-Both adapters land in M3/M4 of `plans/chat-ship-plan.md`. Today the registry is empty by default and only tests register the fake, via `fakeHarnessRegistry()` from `src/testing/testUtils`.
+The registry is empty by default; tests register the fake via `fakeHarnessRegistry()` from `src/testing/testUtils`.
+
+## The codex harness
+
+`harness/codex/` speaks the codex **app-server** JSON-RPC protocol over stdio — not `@openai/codex-sdk`, which drops tool arguments and diff text. `rpcClient/` owns framing (newline-delimited JSON), request correlation and server-initiated requests; `codexAdapter/` owns thread and turn lifecycle, approvals and the version gate; `mapThreadItem/` turns a codex `ThreadItem` into one of our items.
+
+Codex's `initialize` response advertises no capabilities, so the only handshake signal is the version inside `userAgent`. The adapter gates on `MIN_CODEX_VERSION` and ends the session with a `notice` plus `status: "dead"` rather than streaming a transcript it cannot map; everything else is handled by tolerating unknown notifications (they become `notice` items) instead of comparing versions.
+
+`SessionState.modeId` maps to codex's sandbox/approval pairing — `read-only`, `auto`, `full-access` — applied to each `turn/start`, because the app-server has no per-thread collaboration-mode setter.
+
+Fixtures in `harness/codex/fixtures/*.jsonl` are real recorded frames, replayed through `fixturePlayer/` as a transport so the adapter tests exercise the actual wire. Re-record them with a codex binary on PATH:
+
+```bash
+bun run scripts/recordCodexFixtures.ts            # all scenarios
+bun run scripts/recordCodexFixtures.ts approval   # one scenario
+```
+
+The recorder copies only `auth.json` into a throwaway `CODEX_HOME`, so recordings carry no local hooks, MCP servers or home paths.
 
 When host-service mounts this package it must pass `migrationsFolder`: the generated `src/db/drizzle/` directory is a runtime file dependency that the bundler will not inline.

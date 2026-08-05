@@ -5,6 +5,7 @@ import type {
 	Turn,
 	UserContent,
 } from "@superset/chat/protocol";
+import { EventQueue } from "../eventQueue";
 import type {
 	AdapterEvent,
 	HarnessAdapter,
@@ -57,43 +58,6 @@ function asRunningToolCall(event: AdapterEvent): ToolCall | null {
 	return item as ToolCall;
 }
 
-class EventQueue {
-	private readonly buffered: AdapterEvent[] = [];
-	private waiting: ((result: IteratorResult<AdapterEvent>) => void) | null =
-		null;
-	private closed = false;
-
-	push(event: AdapterEvent): void {
-		if (this.closed) return;
-		const waiting = this.waiting;
-		if (waiting) {
-			this.waiting = null;
-			waiting({ value: event, done: false });
-			return;
-		}
-		this.buffered.push(event);
-	}
-
-	close(): void {
-		if (this.closed) return;
-		this.closed = true;
-		const waiting = this.waiting;
-		if (waiting) {
-			this.waiting = null;
-			waiting({ value: undefined, done: true });
-		}
-	}
-
-	next(): Promise<IteratorResult<AdapterEvent>> {
-		const buffered = this.buffered.shift();
-		if (buffered) return Promise.resolve({ value: buffered, done: false });
-		if (this.closed) return Promise.resolve({ value: undefined, done: true });
-		return new Promise((resolve) => {
-			this.waiting = resolve;
-		});
-	}
-}
-
 export class FakeHarness implements HarnessAdapter {
 	private readonly queue = new EventQueue();
 	private readonly pendingApprovals = new Map<string, PendingApproval>();
@@ -111,12 +75,7 @@ export class FakeHarness implements HarnessAdapter {
 
 	start(_options: HarnessStartOptions): AsyncIterable<AdapterEvent> {
 		this.enqueue(this.script.start ?? []);
-		const queue = this.queue;
-		return {
-			[Symbol.asyncIterator](): AsyncIterator<AdapterEvent> {
-				return { next: () => queue.next() };
-			},
-		};
+		return this.queue.iterable();
 	}
 
 	prompt(_content: UserContent[]): void {
