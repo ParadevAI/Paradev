@@ -1,5 +1,8 @@
-import { existsSync } from "node:fs";
-import { isAbsolute, join } from "node:path";
+import { randomBytes } from "node:crypto";
+import { existsSync, writeFileSync } from "node:fs";
+import { readdir, rm, stat } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { basename, isAbsolute, join } from "node:path";
 import { StringDecoder } from "node:string_decoder";
 import type { NodeWebSocket } from "@hono/node-ws";
 import { hasRunningForegroundProcess } from "@superset/pty-daemon/process-tree";
@@ -224,6 +227,18 @@ const SHELL_READY_TIMEOUT_MS = 15_000;
 const INITIAL_COMMAND_ENTER_DELAY_MS = 500;
 
 /**
+ * Byte ceiling for typing an initialCommand directly into the PTY. The
+ * shell-ready marker fires from precmd, before the line editor switches the
+ * TTY to raw mode; input written in that gap queues under the kernel's
+ * canonical-mode line discipline, which silently drops every byte past
+ * MAX_CANON (1024 on macOS). Long agent launches lost their closing quote
+ * and wedged the shell at `quote>` (#5092). Commands over this limit are
+ * staged as a temp script and only a short source line is typed; 512 leaves
+ * margin for platforms with tighter line-discipline limits.
+ */
+const MAX_TYPED_INITIAL_COMMAND_BYTES = 512;
+
+/**
  * Shell readiness lifecycle:
  * - `pending`     — shell initialising; scanner active
  * - `ready`       — OSC 133;A detected; scanner off
@@ -281,6 +296,12 @@ interface TerminalSession {
 	shellReadyTimeoutId: ReturnType<typeof setTimeout> | null;
 	scanState: ShellReadyScanState;
 	initialCommandQueued: boolean;
+	/**
+	 * Basename of the launch shell. Picks the source keyword when a long
+	 * initialCommand is staged as a script (fish 4 removed `.`; sh/ksh
+	 * have no `source`).
+	 */
+	launchShellName: string;
 
 	/**
 	 * Side-channel UTF-8 decoder. portManager.checkOutputForHint takes a
@@ -854,6 +875,74 @@ function cancelShellReady(session: TerminalSession): void {
 	}
 }
 
+/**
+ * A staged launch script normally lives well under a second (self-deletes on
+ * execution; unlinked on pre-Enter teardown), but a host-service crash inside
+ * that window skips both paths and leaves the prompt-bearing file behind.
+ * Sweep stale ones at boot — age-gated so a concurrently-running instance's
+ * just-staged script is never touched.
+ */
+const LAUNCH_SCRIPT_STALE_MS = 60 * 60 * 1000;
+void (async () => {
+	try {
+		const dir = tmpdir();
+		for (const name of await readdir(dir)) {
+			if (!name.startsWith("superset-launch-")) continue;
+			const scriptPath = join(dir, name);
+			try {
+				const { mtimeMs } = await stat(scriptPath);
+				if (Date.now() - mtimeMs > LAUNCH_SCRIPT_STALE_MS) {
+					await rm(scriptPath, { force: true });
+				}
+			} catch {
+				// raced another instance's sweep — skip
+			}
+		}
+	} catch (error) {
+		// Non-fatal, but this sweep is the only cleanup for crash-stranded
+		// prompt-bearing scripts — surface the miss instead of hiding it.
+		console.warn("[terminal] stale launch-script sweep failed", { error });
+	}
+})();
+
+/**
+ * Stage an oversized initialCommand as a temp script and return the short
+ * source line to type instead, keeping the typed input under MAX_CANON.
+ * Sourcing (not `sh <path>`) preserves the interactive shell context, so the
+ * command behaves exactly as if typed. The script deletes itself on its first
+ * line — the shell keeps reading from the already-open fd — so cleanup never
+ * waits on a long-running agent process. Returns null when the write fails;
+ * the caller falls back to typing the full text.
+ */
+function stageInitialCommandScript(
+	session: TerminalSession,
+	commandText: string,
+): { typedLine: string; scriptPath: string } | null {
+	const safeId = session.terminalId.replace(/[^\w-]/g, "_").slice(0, 60);
+	const scriptPath = join(
+		tmpdir(),
+		`superset-launch-${safeId}-${randomBytes(4).toString("hex")}.sh`,
+	);
+	// tmpdir paths never contain quotes, so this quoting is identical in
+	// POSIX shells and fish.
+	const quotedPath = `'${scriptPath.replaceAll("'", "'\\''")}'`;
+	const sourceKeyword = session.launchShellName === "fish" ? "source" : ".";
+	try {
+		writeFileSync(
+			scriptPath,
+			`command rm -f -- ${quotedPath}\n${commandText}\n`,
+			{ mode: 0o600, flag: "wx" },
+		);
+	} catch (error) {
+		console.warn("[terminal] failed to stage long initial command; typing it", {
+			terminalId: session.terminalId,
+			error,
+		});
+		return null;
+	}
+	return { typedLine: `${sourceKeyword} ${quotedPath}`, scriptPath };
+}
+
 function queueInitialCommand(
 	session: TerminalSession,
 	initialCommand: string,
@@ -867,8 +956,30 @@ function queueInitialCommand(
 	// without a verified marker resolve this promise immediately, and a missing
 	// marker resolves it via SHELL_READY_TIMEOUT_MS — the command must
 	// eventually run; only session teardown may cancel it.
+	// Dispose paths that never see onExit (daemon callbacks are unsubscribed
+	// first) leave `exited` false and a non-pending readyState untouched —
+	// only the registry reliably says the session is gone.
+	const isDefunct = () =>
+		session.exited ||
+		session.shellReadyState === "cancelled" ||
+		sessions.get(session.terminalId) !== session;
 	void session.shellReadyPromise.then(() => {
-		if (session.exited || session.shellReadyState === "cancelled") return;
+		if (isDefunct()) return;
+		// Even after the marker, the TTY is still in canonical mode (the marker
+		// fires from precmd, before the line editor takes over), so whatever we
+		// type here rides the kernel's MAX_CANON line limit. Long commands go
+		// to disk; only a short source line is typed.
+		let typedText = commandText;
+		let scriptPath: string | null = null;
+		if (
+			Buffer.byteLength(commandText, "utf8") > MAX_TYPED_INITIAL_COMMAND_BYTES
+		) {
+			const staged = stageInitialCommandScript(session, commandText);
+			if (staged) {
+				typedText = staged.typedLine;
+				scriptPath = staged.scriptPath;
+			}
+		}
 		// The OSC 133;A marker fires from precmd, which runs BEFORE the line
 		// editor starts reading input. Plugin init in that gap (vi-mode,
 		// syntax-highlighting) can flush the PTY input queue mid-read, eating a
@@ -877,9 +988,14 @@ function queueInitialCommand(
 		// write — and as `\r`, what a real Enter key sends, bound to accept-line
 		// in every keymap — so it lands after the init storm. One Enter total,
 		// so a double-run is impossible.
-		session.pty.write(commandText);
+		session.pty.write(typedText);
 		setTimeout(() => {
-			if (session.exited || session.shellReadyState === "cancelled") return;
+			if (isDefunct()) {
+				// Enter never sent — the staged script won't run, so it can't
+				// self-delete.
+				if (scriptPath) void rm(scriptPath, { force: true }).catch(() => {});
+				return;
+			}
 			session.pty.write("\r");
 		}, INITIAL_COMMAND_ENTER_DELAY_MS);
 	});
@@ -1424,6 +1540,7 @@ export async function createTerminalSessionInternal({
 		// Adopted sessions have already run their initialCommand in the prior
 		// host-service lifetime — flag it as queued so we don't double-fire it.
 		initialCommandQueued: isAdopted,
+		launchShellName: basename(shell),
 		portHintDecoder: new StringDecoder("utf8"),
 		modeTracker: createModeTracker(cols, rows),
 	};
