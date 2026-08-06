@@ -165,7 +165,7 @@
 		@apply border-border outline-ring/50;
 	}
 	body {
-		@apply overscroll-none bg-background text-foreground selection:bg-foreground selection:text-background;
+		@apply overscroll-none bg-background text-foreground selection:bg-brand selection:text-black;
 	}
 }
 
@@ -246,6 +246,40 @@ html:not([data-anchor-scrolling]) {
 		0 0 2px var(--background),
 		0 0 2px var(--background),
 		0 1px 4px var(--background);
+}
+
+/* Dense halo in the page background color: knocks the dither back around text.
+   Tight radii are stacked many times — each repeat multiplies opacity. */
+@utility text-halo {
+	text-shadow:
+		0 0 2px var(--background),
+		0 0 2px var(--background),
+		0 0 2px var(--background),
+		0 0 2px var(--background),
+		0 0 2px var(--background),
+		0 0 2px var(--background),
+		0 0 4px var(--background),
+		0 0 4px var(--background),
+		0 0 4px var(--background),
+		0 0 4px var(--background),
+		0 0 4px var(--background),
+		0 0 4px var(--background),
+		0 0 6px var(--background),
+		0 0 6px var(--background),
+		0 0 6px var(--background),
+		0 0 6px var(--background),
+		0 0 6px var(--background),
+		0 0 8px var(--background),
+		0 0 8px var(--background),
+		0 0 8px var(--background),
+		0 0 8px var(--background),
+		0 0 12px var(--background),
+		0 0 12px var(--background),
+		0 0 12px var(--background),
+		0 0 16px var(--background),
+		0 0 16px var(--background),
+		0 0 24px var(--background),
+		0 0 32px var(--background);
 }
 
 @utility no-scrollbar {
