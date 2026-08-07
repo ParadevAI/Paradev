@@ -117,7 +117,9 @@ function DashboardLayout() {
 		}
 	});
 	useHotkey("NEW_WORKSPACE", () =>
-		openNewWorkspaceModal(currentWorkspace?.projectId),
+		openNewWorkspaceModal(
+			currentWorkspace?.projectId ?? currentV2Workspace?.projectId ?? undefined,
+		),
 	);
 
 	const [deleteTarget, setDeleteTarget] = useState<DeleteTarget | null>(null);
