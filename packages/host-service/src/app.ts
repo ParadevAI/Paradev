@@ -213,10 +213,10 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 	// Hygiene only — reads hide defunct bindings via the session-liveness
 	// join regardless, so a failure here must not block startup.
 	try {
-		terminalAgentPersistence.deleteDefunct();
+		terminalAgentPersistence.sweepDefunct();
 	} catch (error) {
 		console.warn(
-			"[terminal-agents] failed to prune defunct binding rows",
+			"[terminal-agents] failed to sweep defunct binding rows",
 			error,
 		);
 	}

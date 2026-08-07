@@ -18,11 +18,14 @@ import {
 } from "@superset/shared/terminal-title-scanner";
 import { and, eq, inArray, isNull, ne } from "drizzle-orm";
 import type { Hono } from "hono";
+import { getSupervisor } from "../daemon/index.ts";
 import { isProcessAlive, readPtyDaemonManifest } from "../daemon/manifest.ts";
 import type { HostDb } from "../db/index.ts";
 import { projects, terminalSessions, workspaces } from "../db/schema.ts";
 import type { EventBus } from "../events/index.ts";
 import { portManager } from "../ports/port-manager.ts";
+import { sweepAgentBindingsAfterDaemonLoss } from "../terminal-agents/daemon-loss-sweep.ts";
+import { markTerminalAgentBindingEnded } from "../terminal-agents/persistence.ts";
 import {
 	DaemonClient,
 	type Signal as DaemonSignal,
@@ -256,6 +259,8 @@ type ShellReadyState =
 interface TerminalSession {
 	terminalId: string;
 	workspaceId: string;
+	/** Handle for db writes from module-scope handlers (daemon disconnect). */
+	db: HostDb;
 	pty: DaemonPty;
 	cols: number;
 	rows: number;
@@ -332,12 +337,36 @@ const sessions = new Map<string, TerminalSession>();
 //
 // We also clear the in-memory sessions map so a stale subscription closure
 // doesn't keep firing for sessions that no longer match daemon state.
+/**
+ * Session ids a live daemon currently owns, or null when no daemon answers
+ * (still respawning, or gone for good). Read via the supervisor rather than
+ * the client singleton so a rebuilt connection isn't required.
+ */
+async function listDaemonAliveSessionIds(): Promise<Set<string> | null> {
+	const organizationId = process.env.ORGANIZATION_ID;
+	if (!organizationId) return null;
+	const list = await getSupervisor().listSessions(organizationId);
+	if (list === null) return null;
+	return new Set(list.filter((info) => info.alive).map((info) => info.id));
+}
+
 onDaemonDisconnect((err) => {
 	const sessionCount = sessions.size;
 	if (sessionCount === 0) return;
 	console.warn(
 		`[terminal] pty-daemon disconnected (${err?.message ?? "no message"}); closing ${sessionCount} terminal WS socket(s) to trigger renderer reconnect`,
 	);
+	// If the ptys died with the daemon, their agent bindings become resume
+	// candidates — but a disconnect can also be an upgrade handoff or socket
+	// blip with sessions surviving for adoption, so the sweep verifies
+	// against a live daemon before marking anything.
+	void sweepAgentBindingsAfterDaemonLoss({
+		candidates: [...sessions.values()].map((session) => ({
+			terminalId: session.terminalId,
+			db: session.db,
+		})),
+		listAliveSessionIds: listDaemonAliveSessionIds,
+	});
 	for (const session of sessions.values()) {
 		cancelShellReady(session);
 		for (const socket of session.sockets) {
@@ -1511,6 +1540,7 @@ export async function createTerminalSessionInternal({
 	const session: TerminalSession = {
 		terminalId,
 		workspaceId,
+		db,
 		pty,
 		cols,
 		rows,
@@ -1613,6 +1643,22 @@ export async function createTerminalSessionInternal({
 					.set({ status: "exited", endedAt: occurredAt })
 					.where(eq(terminalSessions.id, terminalId))
 					.run();
+
+				// The agent died with the pty; unless its SessionEnd hook already
+				// marked a clean detach, keep the binding as a resume candidate.
+				try {
+					markTerminalAgentBindingEnded(
+						db,
+						terminalId,
+						"terminal-exited",
+						occurredAt,
+					);
+				} catch (error) {
+					console.warn(
+						`[terminal] failed to mark agent binding ended for ${terminalId}`,
+						error,
+					);
+				}
 
 				broadcastMessage(session, {
 					type: "exit",
@@ -1824,7 +1870,17 @@ export function registerWorkspaceTerminalRoute({
 				// Active row but daemon no longer owns the PTY (laptop sleep,
 				// daemon restart, machine reboot). Respawn rather than dead-end
 				// the pane — the renderer's xterm scrollback stays painted above.
+				// Any agent bound to the old PTY died with it without a goodbye;
+				// mark its binding ended so it surfaces as a resume candidate.
 				console.log(`[terminal] respawning lost session ${terminalId}`);
+				try {
+					markTerminalAgentBindingEnded(db, terminalId, "terminal-exited");
+				} catch (error) {
+					console.warn(
+						`[terminal] failed to mark agent binding ended for ${terminalId}`,
+						error,
+					);
+				}
 				return createTerminalSessionInternal({
 					terminalId,
 					workspaceId: record.originWorkspaceId,

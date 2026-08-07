@@ -12,7 +12,9 @@ import type {
 	TerminalAgentBinding,
 	TerminalAgentId,
 } from "../../../terminal-agents";
+import { findResumeCandidateBinding } from "../../../terminal-agents/persistence";
 import { protectedProcedure, router } from "../../index";
+import { resolveHostAgentConfig } from "../agents/agents";
 
 type GetOrCreateResult = {
 	binding: TerminalAgentBinding;
@@ -74,6 +76,40 @@ export const terminalAgentsRouter = router({
 					input.definitionId,
 				) ?? null
 			);
+		}),
+
+	/**
+	 * The resumable agent session behind a dead terminal, if any: the binding
+	 * captured an agent session id and the terminal died under the agent
+	 * (kill, crash, daemon death, reboot) rather than the agent detaching
+	 * cleanly. `agent` is the value to pass to `agents.run` together with
+	 * `resumeSessionId`; `resumeSupported` is false when the matching agent
+	 * config has no resume args (or the config was removed).
+	 */
+	resumeCandidate: protectedProcedure
+		.input(z.object({ workspaceId: z.string(), terminalId: z.string() }))
+		.query(({ ctx, input }) => {
+			const binding = findResumeCandidateBinding(
+				ctx.db,
+				input.workspaceId,
+				input.terminalId,
+			);
+			if (!binding?.agentSessionId) return null;
+
+			const config = resolveHostAgentConfig(
+				ctx.db,
+				binding.definitionId ?? binding.agentId,
+			);
+			return {
+				terminalId: binding.terminalId,
+				agentId: binding.agentId,
+				definitionId: binding.definitionId ?? null,
+				agentSessionId: binding.agentSessionId,
+				endedAt: binding.endedAt ?? null,
+				agent: config?.id ?? binding.agentId,
+				agentLabel: config?.label ?? binding.agentId,
+				resumeSupported: (config?.resumeArgs.length ?? 0) > 0,
+			};
 		}),
 
 	/**

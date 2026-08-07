@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, mock } from "bun:test";
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import {
 	chmodSync,
 	existsSync,
@@ -461,8 +461,64 @@ exit 0
 			encoding: "utf-8",
 		});
 
-		expect(existsSync(notifyCapturePath)).toBe(false);
+		// Only the clean-exit SessionEnd report — nothing from the unrelated
+		// rollout file.
+		const notifications = readFileSync(notifyCapturePath, "utf-8");
+		expect(notifications.trim()).toBe('{"hook_event_name":"SessionEnd"}');
 		expect(readFileSync(debugLogPath, "utf-8")).toContain("watching session=");
+	});
+
+	it("reports SessionEnd on clean codex exit but not on signal death", () => {
+		const realBinDir = path.join(TEST_ROOT, "real-bin");
+		const realCodex = path.join(realBinDir, "codex");
+		const wrapperPath = path.join(TEST_BIN_DIR, "codex");
+		const notifyPath = path.join(TEST_HOOKS_DIR, "notify.sh");
+		const notifyCapturePath = path.join(
+			TEST_ROOT,
+			"codex-session-end-events.txt",
+		);
+
+		mkdirSync(realBinDir, { recursive: true });
+		mkdirSync(TEST_HOOKS_DIR, { recursive: true });
+		writeFileSync(
+			notifyPath,
+			`#!/bin/bash
+printf '%s\n' "$1" >> "$NOTIFY_CAPTURE_PATH"
+exit 0
+`,
+			{ mode: 0o755 },
+		);
+		chmodSync(notifyPath, 0o755);
+		createCodexWrapper();
+
+		const runWrapper = () =>
+			spawnSync(wrapperPath, [], {
+				env: {
+					...process.env,
+					NOTIFY_CAPTURE_PATH: notifyCapturePath,
+					PATH: `${TEST_BIN_DIR}:${realBinDir}:${process.env.PATH || ""}`,
+					SUPERSET_TERMINAL_ID: "terminal-1",
+				},
+				encoding: "utf-8",
+			});
+
+		writeFileSync(realCodex, "#!/bin/bash\nexit 0\n", { mode: 0o755 });
+		chmodSync(realCodex, 0o755);
+		runWrapper();
+		expect(readFileSync(notifyCapturePath, "utf-8").trim()).toBe(
+			'{"hook_event_name":"SessionEnd"}',
+		);
+
+		// A signal death (pty/daemon kill) must stay unreported so the session
+		// remains a resume candidate.
+		rmSync(notifyCapturePath);
+		writeFileSync(realCodex, '#!/bin/bash\nkill -HUP "$$"\nsleep 1\n', {
+			mode: 0o755,
+		});
+		chmodSync(realCodex, 0o755);
+		const signalRun = runWrapper();
+		expect(signalRun.status).toBe(129);
+		expect(existsSync(notifyCapturePath)).toBe(false);
 	});
 
 	it("creates mastracode wrapper passthrough", () => {

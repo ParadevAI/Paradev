@@ -56,6 +56,11 @@ export const terminalAgentBindings = sqliteTable(
 		startedAt: integer("started_at").notNull(),
 		lastEventAt: integer("last_event_at").notNull(),
 		lastEventType: text("last_event_type").notNull(),
+		// Set when the agent session ended. "detached" = the agent reported its
+		// own end (SessionEnd hook) — not resumable; "terminal-exited" = the
+		// terminal died under it (kill, crash, reboot) — resume candidate.
+		endedAt: integer("ended_at"),
+		endReason: text("end_reason"),
 	},
 	(table) => [
 		index("terminal_agent_bindings_workspace_id_idx").on(table.workspaceId),
@@ -175,6 +180,9 @@ export const hostAgentConfigs = sqliteTable(
 		argsJson: text("args_json").notNull().default("[]"),
 		promptTransport: text("prompt_transport").notNull(),
 		promptArgsJson: text("prompt_args_json").notNull().default("[]"),
+		// Args that resume a previous session; the session id is appended after
+		// them. Empty means the agent has no id-based resume.
+		resumeArgsJson: text("resume_args_json").notNull().default("[]"),
 		envJson: text("env_json").notNull().default("{}"),
 		displayOrder: integer("display_order").notNull(),
 		createdAt: integer("created_at")

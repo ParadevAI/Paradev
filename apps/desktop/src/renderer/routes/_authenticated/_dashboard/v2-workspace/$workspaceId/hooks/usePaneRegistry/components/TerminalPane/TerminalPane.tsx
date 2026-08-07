@@ -35,6 +35,7 @@ import { ScrollToBottomButton } from "renderer/screens/main/components/Workspace
 import { TerminalSearch } from "renderer/screens/main/components/WorkspaceView/ContentView/TabsContent/Terminal/TerminalSearch";
 import { useTheme } from "renderer/stores/theme";
 import { resolveTerminalThemeType } from "renderer/stores/theme/utils";
+import { TerminalAgentResumeBanner } from "./components/TerminalAgentResumeBanner";
 import { TerminalRichInput } from "./components/TerminalRichInput";
 import { useLinkClickHint } from "./hooks/useLinkClickHint";
 import { type HoveredLink, useLinkHoverState } from "./hooks/useLinkHoverState";
@@ -451,6 +452,13 @@ export function TerminalPane({
 					style={{ backgroundColor: appearance.background }}
 				/>
 				<ScrollToBottomButton terminal={terminal} />
+				<TerminalAgentResumeBanner
+					key={terminalId}
+					workspaceId={workspaceId}
+					terminalId={terminalId}
+					connectionState={connectionState}
+					ctx={ctx}
+				/>
 			</div>
 			<TerminalRichInput
 				workspaceId={workspaceId}
