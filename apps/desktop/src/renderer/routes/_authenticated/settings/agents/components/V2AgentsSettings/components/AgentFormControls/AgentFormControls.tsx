@@ -104,15 +104,18 @@ export function AgentLaunchFields({
 				/>
 			</StackedField>
 
-			<StackedField
-				label="Prompt transport"
-				hint="How the prompt is delivered to the process."
-			>
+			<div className="flex items-center justify-between gap-8">
+				<div className="min-w-0 flex-1">
+					<Label className="text-sm font-medium">Prompt transport</Label>
+					<p className="text-xs text-muted-foreground mt-0.5">
+						How the prompt is delivered to the process.
+					</p>
+				</div>
 				<PromptTransportToggle
 					value={promptTransport}
 					onChange={onPromptTransportChange}
 				/>
-			</StackedField>
+			</div>
 		</Section>
 	);
 }
@@ -168,7 +171,7 @@ export function PromptTransportToggle({
 	onChange,
 }: PromptTransportToggleProps) {
 	return (
-		<div className="inline-flex rounded-md border border-border overflow-hidden">
+		<div className="inline-flex shrink-0 rounded-md border border-border overflow-hidden">
 			{TRANSPORT_OPTIONS.map((option, index) => {
 				const isSelected = value === option;
 				return (

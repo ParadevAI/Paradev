@@ -21,6 +21,10 @@ esac
 
 printf '{}\n'
 
+# ~/.gemini/settings.json is global, so this also fires in sessions launched
+# outside Superset terminals; only those terminals set SUPERSET_* vars.
+[ -n "$SUPERSET_TERMINAL_ID" ] || [ -n "$SUPERSET_TAB_ID" ] || exit 0
+
 V1_EVENT_TYPE="$EVENT_TYPE"
 case "$V1_EVENT_TYPE" in
   SessionStart) V1_EVENT_TYPE="Start" ;;

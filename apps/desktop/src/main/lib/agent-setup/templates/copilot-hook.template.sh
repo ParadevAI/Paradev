@@ -22,6 +22,11 @@ esac
 
 printf '{}\n'
 
+# The injected .github/hooks file persists in the worktree, so copilot run
+# there outside Superset would still fire this; only Superset terminals set
+# SUPERSET_* vars.
+[ -n "$SUPERSET_TERMINAL_ID" ] || [ -n "$SUPERSET_TAB_ID" ] || exit 0
+
 V1_EVENT_TYPE="$EVENT_TYPE"
 case "$V1_EVENT_TYPE" in
   SessionStart) V1_EVENT_TYPE="Start" ;;

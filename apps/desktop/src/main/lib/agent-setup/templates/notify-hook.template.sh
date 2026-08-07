@@ -11,6 +11,12 @@ else
   INPUT=$(cat)
 fi
 
+# Agent hook configs are global, so this can fire in sessions launched
+# outside Superset terminals (including via stale entries from older
+# installs). Only Superset terminals set SUPERSET_* vars; the agent-supplied
+# payload alone must never dispatch.
+[ -n "$SUPERSET_TERMINAL_ID" ] || [ -n "$SUPERSET_TAB_ID" ] || exit 0
+
 HOOK_SESSION_ID=$(echo "$INPUT" | grep -oE '"session_id"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -oE '"[^"]*"$' | tr -d '"')
 if [ -z "$HOOK_SESSION_ID" ]; then
   # Grok's envelope is camelCase.
