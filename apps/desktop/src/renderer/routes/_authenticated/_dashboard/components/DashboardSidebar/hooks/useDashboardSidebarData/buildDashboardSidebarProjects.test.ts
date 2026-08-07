@@ -20,6 +20,7 @@ function makeProject(
 		githubOwner: null,
 		githubRepoName: null,
 		iconUrl: null,
+		color: null,
 		createdAt: DATE,
 		updatedAt: DATE,
 		isCollapsed: false,

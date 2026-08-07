@@ -95,6 +95,8 @@ export interface ProjectSnapshot {
 	worktreeBaseDir: string | null;
 	/** Custom icon data-URI, or null to fall back to the GitHub avatar. */
 	icon: string | null;
+	/** Accent color as a `#rrggbb` hex, or null for the default. */
+	color: string | null;
 	createdAt: number;
 	updatedAt: number;
 }

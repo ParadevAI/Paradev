@@ -65,6 +65,7 @@ export const projectRouter = router({
 				repoUrl: row.repoUrl,
 				worktreeBaseDir: row.worktreeBaseDir,
 				icon: row.icon,
+				color: row.color,
 				createdAt: row.createdAt,
 				updatedAt: row.updatedAt || row.createdAt,
 			}));
@@ -114,6 +115,7 @@ export const projectRouter = router({
 				branchPrefixMode: row.branchPrefixMode,
 				branchPrefixCustom: row.branchPrefixCustom,
 				icon: row.icon,
+				color: row.color,
 				// Always an array; the column's JSON encoding stays internal.
 				sparseCheckoutPaths: parseSparseCheckoutPaths(row.sparseCheckoutPaths),
 				namingInstructions: row.namingInstructions,
@@ -122,17 +124,22 @@ export const projectRouter = router({
 
 	/**
 	 * Set (or clear) this project's custom icon. Local-first: the icon is a
-	 * small downscaled data-URI stored on the host row. A null clears it so the
-	 * project falls back to the GitHub owner avatar / placeholder.
+	 * small downscaled data-URI stored on the host row. The "none" sentinel
+	 * means "explicitly no icon" (renderers show the letter placeholder); a
+	 * null clears back to the default (GitHub owner avatar / placeholder).
 	 */
 	setIcon: protectedProcedure
 		.input(
 			z.object({
 				projectId: z.string().uuid(),
 				icon: z
-					.string()
-					.max(MAX_PROJECT_ICON_LENGTH, "Icon image is too large")
-					.regex(/^data:image\//, "Icon must be an image data URI")
+					.union([
+						z
+							.string()
+							.max(MAX_PROJECT_ICON_LENGTH, "Icon image is too large")
+							.regex(/^data:image\//, "Icon must be an image data URI"),
+						z.literal("none"),
+					])
 					.nullable(),
 			}),
 		)
@@ -141,6 +148,35 @@ export const projectRouter = router({
 				{ db: ctx.db, eventBus: ctx.eventBus },
 				input.projectId,
 				{ icon: input.icon },
+			);
+			if (!row) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Project is not set up on this host",
+				});
+			}
+			return toProjectSnapshot(row);
+		}),
+
+	/**
+	 * Set (or clear) this project's accent color. Stored as a `#rrggbb` hex on
+	 * the host row; a null clears it back to the default (no accent).
+	 */
+	setColor: protectedProcedure
+		.input(
+			z.object({
+				projectId: z.string().uuid(),
+				color: z
+					.string()
+					.regex(/^#[0-9a-fA-F]{6}$/, "Color must be a #rrggbb hex")
+					.nullable(),
+			}),
+		)
+		.mutation(({ ctx, input }) => {
+			const row = updateLocalProject(
+				{ db: ctx.db, eventBus: ctx.eventBus },
+				input.projectId,
+				{ color: input.color },
 			);
 			if (!row) {
 				throw new TRPCError({

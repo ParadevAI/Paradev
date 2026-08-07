@@ -80,6 +80,8 @@ export const projects = sqliteTable(
 		// Custom project icon as a small downscaled data-URI. Null falls back to
 		// the GitHub owner avatar (when a repo is linked) or a placeholder.
 		icon: text("icon"),
+		// Accent color as a `#rrggbb` hex. Null means the default (no accent).
+		color: text("color"),
 		// JSON array of repo-relative folders to cone-mode sparse-checkout into
 		// new worktrees. Null (the default) means a full checkout. Read through
 		// `parseSparseCheckoutPaths` — the encoding is not part of the API.

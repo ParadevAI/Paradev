@@ -84,6 +84,8 @@ export interface DashboardSidebarProject {
 	githubOwner: string | null;
 	githubRepoName: string | null;
 	iconUrl: string | null;
+	/** Accent color as a `#rrggbb` hex, or null for the default. */
+	color: string | null;
 	createdAt: Date;
 	updatedAt: Date;
 	isCollapsed: boolean;
