@@ -141,7 +141,19 @@ export function RunIssuesInWorkspacePopover({
 	const [open, setOpen] = useState(false);
 	const [projectPickerOpen, setProjectPickerOpen] = useState(false);
 
+	// Workspaces launch against one project; a mixed-repo selection would
+	// silently run every issue against a single repository.
+	const issueProjectIds = useMemo(
+		() => new Set(issues.map((issue) => issue.projectId)),
+		[issues],
+	);
+
+	const hasMixedRepos = issueProjectIds.size > 1;
+
 	const submitBlocker = useMemo<string | null>(() => {
+		if (hasMixedRepos) {
+			return "Selected issues span multiple repositories. Select issues from a single repository to run them.";
+		}
 		if (!selectedProjectId) return "Select a project";
 		if (!hostId) return "No active host";
 		if (hostId !== machineId) {
@@ -162,6 +174,7 @@ export function RunIssuesInWorkspacePopover({
 		}
 		return null;
 	}, [
+		hasMixedRepos,
 		selectedProjectId,
 		selectedProject?.needsSetup,
 		setUpProjectIds,
@@ -339,10 +352,16 @@ export function RunIssuesInWorkspacePopover({
 				</div>
 
 				<div className="border-t border-border p-2">
+					{hasMixedRepos && (
+						<p className="mb-2 text-xs text-muted-foreground text-wrap-pretty">
+							{submitBlocker}
+						</p>
+					)}
 					<Button
 						size="sm"
 						className="w-full h-8"
 						disabled={!!submitBlocker}
+						title={submitBlocker ?? undefined}
 						onClick={handleRun}
 					>
 						Run {issues.length} Workspace{issues.length === 1 ? "" : "s"}

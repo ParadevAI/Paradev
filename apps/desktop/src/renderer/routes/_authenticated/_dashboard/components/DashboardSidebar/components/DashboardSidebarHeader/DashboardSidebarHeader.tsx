@@ -127,13 +127,15 @@ export function DashboardSidebarHeader({
 		assignee: lastAssignee,
 		search: lastSearch,
 		typeTab: lastTypeTab,
-		projectFilter: lastProjectFilter,
+		projectFilters: lastProjectFilters,
 		linearProjectFilter: lastLinearProjectFilter,
 		includeClosedIssues: lastIncludeClosedIssues,
 	} = useTasksFilterStore();
 	const {
 		search: lastPullRequestsSearch,
-		projectFilter: lastPullRequestsProjectFilter,
+		projectFilters: lastPullRequestsProjectFilters,
+		authorFilter: lastPullRequestsAuthorFilter,
+		reviewFilter: lastPullRequestsReviewFilter,
 		includeClosed: lastPullRequestsIncludeClosed,
 	} = usePullRequestsFilterStore();
 
@@ -154,7 +156,7 @@ export function DashboardSidebarHeader({
 					assignee: lastAssignee,
 					search: lastSearch,
 					typeTab: lastTypeTab,
-					projectFilter: lastProjectFilter,
+					projectFilters: lastProjectFilters,
 					linearProjectFilter: lastLinearProjectFilter,
 					includeClosedIssues: lastIncludeClosedIssues,
 				}),
@@ -168,7 +170,9 @@ export function DashboardSidebarHeader({
 				to: "/pull-requests",
 				search: pullRequestsSearchFromFilters({
 					search: lastPullRequestsSearch,
-					projectFilter: lastPullRequestsProjectFilter,
+					projectFilters: lastPullRequestsProjectFilters,
+					authorFilter: lastPullRequestsAuthorFilter,
+					reviewFilter: lastPullRequestsReviewFilter,
 					includeClosed: lastPullRequestsIncludeClosed,
 				}),
 			});
