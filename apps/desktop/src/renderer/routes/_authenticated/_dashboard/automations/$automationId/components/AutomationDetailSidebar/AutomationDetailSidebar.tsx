@@ -158,6 +158,7 @@ export function AutomationDetailSidebar({
 								<ProjectPicker
 									className="-mr-4"
 									selectedProject={selectedProject}
+									sessionSelected={automation.v2ProjectId === null}
 									recentProjects={recentProjects}
 									onSelectProject={(v2ProjectId) =>
 										updateMutation.mutate({ v2ProjectId })
@@ -178,8 +179,9 @@ export function AutomationDetailSidebar({
 											v2WorkspaceId,
 											// Denormalized pin: the picker is scoped to this
 											// host/project, so send both — the cloud stores them
-											// without a workspace-registry lookup.
-											...(v2WorkspaceId && hostId && automation.v2ProjectId
+											// without a workspace-registry lookup. A null project
+											// means the pin is a session workspace.
+											...(v2WorkspaceId && hostId
 												? {
 														targetHostId: hostId,
 														v2ProjectId: automation.v2ProjectId,

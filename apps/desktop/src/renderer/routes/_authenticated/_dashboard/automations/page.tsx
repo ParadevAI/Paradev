@@ -320,6 +320,7 @@ function AutomationsPage() {
 					return owner?.name ?? owner?.email ?? "";
 				}
 				case "project":
+					if (automation.v2ProjectId === null) return "Session";
 					return projectsById.get(automation.v2ProjectId)?.name ?? "";
 				case "schedule":
 					return describeSchedule(automation.rrule);
@@ -593,7 +594,12 @@ function AutomationsPage() {
 											automation={automation}
 											owner={usersById.get(automation.ownerUserId)}
 											showOwner={scope === "team"}
-											project={projectsById.get(automation.v2ProjectId)}
+											project={
+												automation.v2ProjectId === null
+													? undefined
+													: projectsById.get(automation.v2ProjectId)
+											}
+											isSession={automation.v2ProjectId === null}
 											workspaceLabel={workspaceLabel}
 											hostLabel={host?.name ?? "Auto"}
 											lastRunStatus={

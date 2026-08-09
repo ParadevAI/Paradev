@@ -22,7 +22,8 @@ import { useV2NotificationStore } from "renderer/stores/v2-notifications";
 
 interface UseDashboardSidebarWorkspaceItemActionsOptions {
 	workspaceId: string;
-	projectId: string;
+	/** Null for project-less "session" workspaces. */
+	projectId: string | null;
 	workspaceName: string;
 	branch: string;
 	isMainWorkspace?: boolean;
@@ -112,6 +113,8 @@ export function useDashboardSidebarWorkspaceItemActions({
 	};
 
 	const handleCreateSection = () => {
+		// Sessions get groups in the stacked nesting PR.
+		if (projectId === null) return;
 		const sectionId = createSection(projectId);
 		moveWorkspaceToSection(workspaceId, projectId, sectionId);
 		requestSectionRename(sectionId);

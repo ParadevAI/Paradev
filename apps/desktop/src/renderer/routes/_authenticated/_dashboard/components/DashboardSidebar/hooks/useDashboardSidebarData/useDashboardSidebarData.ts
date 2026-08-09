@@ -23,6 +23,7 @@ import type {
 import {
 	buildDashboardSidebarPinnedWorkspaces,
 	buildDashboardSidebarProjects,
+	buildDashboardSidebarSessionWorkspaces,
 	partitionSidebarWorkspacesByPinned,
 } from "./buildDashboardSidebarProjects";
 import {
@@ -322,7 +323,13 @@ export function useDashboardSidebarData() {
 	const rawLocalMainWorkspaces = useMemo(
 		() =>
 			hostWorkspaces
-				.filter((workspace) => workspace.type === "main")
+				.filter(
+					(
+						workspace,
+					): workspace is (typeof hostWorkspaces)[number] & {
+						projectId: string;
+					} => workspace.type === "main" && workspace.projectId !== null,
+				)
 				.map((workspace) => ({
 					id: workspace.id,
 					projectId: workspace.projectId,
@@ -379,7 +386,10 @@ export function useDashboardSidebarData() {
 				hosts,
 				machineId,
 				relayUrl,
-				workspaces: visibleSidebarWorkspaces,
+				// Sessions (null projectId) have no remote and never carry PRs.
+				workspaces: visibleSidebarWorkspaces.filter(
+					(workspace) => workspace.projectId !== null,
+				),
 				fallbackOrganizationId: knownHostsOrgId,
 			}),
 		[
@@ -457,12 +467,23 @@ export function useDashboardSidebarData() {
 		[visibleSidebarWorkspaces],
 	);
 
+	// Unpinned sessions render in the top-level Sessions section; pinned
+	// sessions stay in Pinned like any other row.
+	const { sessionRows, projectRows } = useMemo(() => {
+		const sessions: typeof unpinnedRows = [];
+		const projectScoped: typeof unpinnedRows = [];
+		for (const row of unpinnedRows) {
+			(row.projectId === null ? sessions : projectScoped).push(row);
+		}
+		return { sessionRows: sessions, projectRows: projectScoped };
+	}, [unpinnedRows]);
+
 	const computedGroups = useMemo<DashboardSidebarProject[]>(
 		() =>
 			buildDashboardSidebarProjects({
 				sidebarProjects,
 				sidebarSections,
-				visibleSidebarWorkspaces: unpinnedRows,
+				visibleSidebarWorkspaces: projectRows,
 				machineId,
 				pullRequestsByWorkspaceId,
 			}),
@@ -471,10 +492,21 @@ export function useDashboardSidebarData() {
 			pullRequestsByWorkspaceId,
 			sidebarProjects,
 			sidebarSections,
-			unpinnedRows,
+			projectRows,
 		],
 	);
 	const groups = useStableDashboardSidebarProjects(computedGroups);
+
+	const computedSessionWorkspaces = useMemo<DashboardSidebarWorkspace[]>(
+		() =>
+			buildDashboardSidebarSessionWorkspaces({
+				sessionSidebarWorkspaces: sessionRows,
+				machineId,
+				pullRequestsByWorkspaceId,
+			}),
+		[machineId, pullRequestsByWorkspaceId, sessionRows],
+	);
+	const sessionWorkspaces = useJsonStable(computedSessionWorkspaces);
 
 	const computedPinnedWorkspaces = useMemo<DashboardSidebarPinnedWorkspace[]>(
 		() =>
@@ -491,6 +523,7 @@ export function useDashboardSidebarData() {
 	return {
 		groups,
 		pinnedWorkspaces,
+		sessionWorkspaces,
 		refreshWorkspacePullRequest,
 		toggleProjectCollapsed,
 	};

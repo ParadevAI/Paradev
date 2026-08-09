@@ -4,11 +4,15 @@ import { useHotkey } from "renderer/hotkeys";
 import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
 import { useDeletingWorkspaces } from "renderer/routes/_authenticated/providers/DeletingWorkspacesProvider";
-import type { DashboardSidebarProject } from "../../types";
+import type {
+	DashboardSidebarProject,
+	DashboardSidebarWorkspace,
+} from "../../types";
 import { getProjectChildrenWorkspaces } from "../../utils/projectChildren";
 
 interface WorkspaceLocation {
-	projectId: string;
+	/** Null for the Sessions section — no project row to expand. */
+	projectId: string | null;
 	projectIsCollapsed: boolean;
 	sectionId: string | null;
 	sectionIsCollapsed: boolean;
@@ -50,6 +54,7 @@ function useStableWorkspaceShortcutLabels(
 
 export function useDashboardSidebarShortcuts(
 	groups: DashboardSidebarProject[],
+	sessionWorkspaces: DashboardSidebarWorkspace[] = [],
 ) {
 	const navigate = useNavigate();
 	const { toggleProjectCollapsed, toggleSectionCollapsed } =
@@ -57,10 +62,14 @@ export function useDashboardSidebarShortcuts(
 	const { isDeleting } = useDeletingWorkspaces();
 	const flattenedWorkspaces = useMemo(
 		() =>
-			groups
-				.flatMap((project) => getProjectChildrenWorkspaces(project.children))
-				.filter((workspace) => !isDeleting(workspace.id)),
-		[groups, isDeleting],
+			[
+				// Sessions render above the project groups.
+				...sessionWorkspaces,
+				...groups.flatMap((project) =>
+					getProjectChildrenWorkspaces(project.children),
+				),
+			].filter((workspace) => !isDeleting(workspace.id)),
+		[groups, sessionWorkspaces, isDeleting],
 	);
 	const workspaceShortcutLabels =
 		useStableWorkspaceShortcutLabels(flattenedWorkspaces);
@@ -88,14 +97,22 @@ export function useDashboardSidebarShortcuts(
 				}
 			}
 		}
+		for (const workspace of sessionWorkspaces) {
+			map.set(workspace.id, {
+				projectId: null,
+				projectIsCollapsed: false,
+				sectionId: null,
+				sectionIsCollapsed: false,
+			});
+		}
 		return map;
-	}, [groups]);
+	}, [groups, sessionWorkspaces]);
 
 	const revealWorkspace = useCallback(
 		(workspaceId: string) => {
 			const location = workspaceLocations.get(workspaceId);
 			if (!location) return;
-			if (location.projectIsCollapsed) {
+			if (location.projectId !== null && location.projectIsCollapsed) {
 				toggleProjectCollapsed(location.projectId);
 			}
 			if (location.sectionId && location.sectionIsCollapsed) {

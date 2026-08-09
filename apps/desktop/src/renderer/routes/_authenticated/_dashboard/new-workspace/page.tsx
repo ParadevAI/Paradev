@@ -9,9 +9,10 @@ export const Route = createFileRoute(
 )({
 	validateSearch: (
 		search: Record<string, unknown>,
-	): { projectId?: string } => ({
+	): { projectId?: string; session?: boolean } => ({
 		projectId:
 			typeof search.projectId === "string" ? search.projectId : undefined,
+		session: search.session === true ? true : undefined,
 	}),
 	component: NewWorkspacePage,
 });
@@ -21,11 +22,15 @@ export const Route = createFileRoute(
  * route. Store opens are redirected here by DashboardNewWorkspaceModal.
  */
 function NewWorkspacePage() {
-	const { projectId } = Route.useSearch();
+	const { projectId, session } = Route.useSearch();
 	return (
 		<DashboardNewWorkspaceDraftProvider onClose={() => {}}>
 			<PromptInputProvider attachmentsStore={newWorkspaceAttachmentsStore}>
-				<NewWorkspaceScreen isOpen preSelectedProjectId={projectId ?? null} />
+				<NewWorkspaceScreen
+					isOpen
+					preSelectedProjectId={projectId ?? null}
+					preSelectedSession={session === true}
+				/>
 				{/* Window-drag surface replacing the hidden TopBar's drag region.
 				    Stops short of the top-right corner so the screen's naming
 				    instructions + prompt history buttons underneath stay

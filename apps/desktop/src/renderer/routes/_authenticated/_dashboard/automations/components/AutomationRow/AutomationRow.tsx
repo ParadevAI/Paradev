@@ -38,6 +38,8 @@ interface AutomationRowProps {
 	owner: Pick<SelectUser, "id" | "name" | "email"> | undefined;
 	showOwner: boolean;
 	project: ProjectOption | undefined;
+	/** True when the automation targets sessions (no project). */
+	isSession?: boolean;
 	workspaceLabel: string;
 	hostLabel: string;
 	/** The automation's most recent run status; null when it has no runs. */
@@ -64,6 +66,7 @@ export function AutomationRow({
 	owner,
 	showOwner,
 	project,
+	isSession = false,
 	workspaceLabel,
 	hostLabel,
 	lastRunStatus,
@@ -158,7 +161,9 @@ export function AutomationRow({
 									className="!size-3.5 shrink-0"
 								/>
 							) : null}
-							<span className="min-w-0 truncate">{project?.name ?? "—"}</span>
+							<span className="min-w-0 truncate">
+								{project?.name ?? (isSession ? "Session" : "—")}
+							</span>
 						</span>
 					</TableCell>
 
