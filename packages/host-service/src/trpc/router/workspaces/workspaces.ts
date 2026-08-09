@@ -1,6 +1,9 @@
 import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
-import { generateFriendlyBranchName } from "@superset/shared/workspace-launch";
+import {
+	generateFriendlyBranchName,
+	sanitizeUserBranchName,
+} from "@superset/shared/workspace-launch";
 import { TRPCError } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
@@ -81,6 +84,12 @@ const createInputSchema = z
 		// start. With no prompt, the friendly-random fallback is final.
 		name: z.string().min(1).optional(),
 		branch: z.string().min(1).optional(),
+		// Use the typed branch verbatim instead of namespacing it under the
+		// project branch prefix; a name collision reuses the existing branch
+		// (and its workspace), as with any typed branch. Set when the branch
+		// comes from an external provider (Linear's branchName), whose exact
+		// format the provider autolinks.
+		skipBranchPrefix: z.boolean().optional(),
 		pr: z.number().int().positive().optional(),
 		baseBranch: z.string().min(1).optional(),
 		taskId: z.string().uuid().optional(),
@@ -419,6 +428,28 @@ async function recordBaseBranchConfig(args: {
 				err,
 			);
 		});
+}
+
+/**
+ * Best-effort cloud lookup of the linked task's provider branch name
+ * (Linear's branchName, synced into tasks.branch). Bounded so an offline
+ * host never stalls workspace creation.
+ */
+async function fetchLinkedTaskBranch(
+	ctx: HostServiceContext,
+	taskId: string,
+): Promise<string | undefined> {
+	try {
+		const task = await Promise.race([
+			ctx.api.task.byId.query(taskId),
+			new Promise<null>((resolve) => setTimeout(() => resolve(null), 2_000)),
+		]);
+		const branch = task?.branch?.trim();
+		return branch ? sanitizeUserBranchName(branch) || undefined : undefined;
+	} catch (err) {
+		console.warn("[workspaces.create] linked task branch lookup failed:", err);
+		return undefined;
+	}
 }
 
 /**
@@ -778,7 +809,16 @@ export const workspacesRouter = router({
 					"[workspaces.create]",
 				);
 			} else {
-				const typedBranch = input.branch?.trim();
+				// A linked task can supply the branch when the caller didn't
+				// pick one (CLI/MCP/automation creates from a task — desktop
+				// surfaces resolve it client-side). Provider branch names are
+				// used exactly, like an explicit skipBranchPrefix create.
+				const taskBranch =
+					!input.branch && input.taskId
+						? await fetchLinkedTaskBranch(ctx, input.taskId)
+						: undefined;
+				const skipBranchPrefix = input.skipBranchPrefix || !!taskBranch;
+				const typedBranch = input.branch?.trim() || taskBranch;
 				let plan: BranchSourcePlan;
 
 				if (typedBranch) {
@@ -799,8 +839,9 @@ export const workspacesRouter = router({
 					resolvedBranch = plan.branch;
 					// Namespace newly-created branches under the configured
 					// prefix. A typed branch that resolves to an existing ref is
-					// checked out as-is and never re-prefixed.
-					if (!plan.usedExistingBranch) {
+					// checked out as-is and never re-prefixed. Provider-supplied
+					// branches (skipBranchPrefix) keep their exact format.
+					if (!plan.usedExistingBranch && !skipBranchPrefix) {
 						const prefix = await resolveProjectBranchPrefix({
 							ctx,
 							project: localProject,
@@ -1123,6 +1164,23 @@ export const workspacesRouter = router({
 				terminalsResult.push({
 					terminalId: commandResult.terminal.id,
 					label: commandResult.terminal.label,
+				});
+			}
+
+			// Work is starting on the linked task — move it to In Progress.
+			// Best-effort cloud call; creation never blocks on it. A reused
+			// workspace keeps its own task link, so only nudge when this call
+			// actually linked the requested task.
+			if (
+				input.taskId &&
+				(!alreadyExists || workspaceRow.taskId === input.taskId)
+			) {
+				const taskId = input.taskId;
+				void ctx.api.task.start.mutate({ id: taskId }).catch((err) => {
+					console.warn(
+						`[workspaces.create] failed to mark task ${taskId} as started:`,
+						err,
+					);
 				});
 			}
 

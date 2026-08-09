@@ -424,12 +424,17 @@ export function PromptGroup({
 							updateDraft({
 								branchName: e.target.value.replace(/\s+/g, "-"),
 								branchNameEdited: true,
+								branchNameFromProvider: false,
 							})
 						}
 						onBlur={() => {
 							const sanitized = sanitizeUserBranchName(branchName.trim());
 							if (!sanitized)
-								updateDraft({ branchName: "", branchNameEdited: false });
+								updateDraft({
+									branchName: "",
+									branchNameEdited: false,
+									branchNameFromProvider: false,
+								});
 							else updateDraft({ branchName: sanitized });
 						}}
 					/>

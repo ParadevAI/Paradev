@@ -6,6 +6,8 @@ export type LinkedIssue = {
 	source?: "github" | "internal";
 	url?: string;
 	taskId?: string;
+	/** Provider branch name (e.g. Linear's), synced into `tasks.branch`. */
+	branch?: string;
 	number?: number;
 	state?: "open" | "closed";
 };
@@ -39,6 +41,12 @@ export interface NewWorkspaceDraft {
 	workspaceNameEdited: boolean;
 	branchName: string;
 	branchNameEdited: boolean;
+	/**
+	 * True while branchName is the provider's own branch name (Linear's
+	 * branchName) seeded by linking an issue. Cleared on manual edits.
+	 * Provider branches are created verbatim — no project branch prefix.
+	 */
+	branchNameFromProvider: boolean;
 	linkedIssues: LinkedIssue[];
 	linkedPR: LinkedPR | null;
 	selectedAgentId: string | null;
@@ -66,6 +74,7 @@ function buildInitialDraft(): NewWorkspaceDraft {
 		workspaceNameEdited: false,
 		branchName: "",
 		branchNameEdited: false,
+		branchNameFromProvider: false,
 		linkedIssues: [],
 		linkedPR: null,
 		selectedAgentId: null,

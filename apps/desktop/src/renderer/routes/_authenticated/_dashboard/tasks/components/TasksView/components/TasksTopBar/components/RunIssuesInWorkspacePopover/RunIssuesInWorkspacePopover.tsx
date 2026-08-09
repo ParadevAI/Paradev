@@ -22,9 +22,9 @@ import { useWorkspaceHostOptions } from "renderer/routes/_authenticated/componen
 import { useSelectedHostProjectIds } from "renderer/routes/_authenticated/components/DashboardNewWorkspaceModal/components/DashboardNewWorkspaceModalContent/hooks/useSelectedHostProjectIds";
 import { ProjectThumbnail } from "renderer/routes/_authenticated/components/ProjectThumbnail";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
+import { deriveBranchName } from "renderer/routes/_authenticated/utils/deriveBranchName";
 import { useV2WorkspaceCreateDefaultsStore } from "renderer/stores/v2-workspace-create-defaults";
 import { useWorkspaceCreates } from "renderer/stores/workspace-creates";
-import { deriveBranchName } from "../../../../../../$taskId/utils/deriveBranchName";
 import type { SelectedIssue } from "../../../GitHubIssuesContent";
 
 const AGENT_STORAGE_KEY = "lastSelectedV2IssueBatchAgent";

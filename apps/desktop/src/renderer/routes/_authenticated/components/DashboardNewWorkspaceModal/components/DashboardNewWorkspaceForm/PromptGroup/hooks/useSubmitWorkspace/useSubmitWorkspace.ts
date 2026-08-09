@@ -127,6 +127,10 @@ export function useSubmitWorkspace(
 					projectId: projectId as string,
 					name: isPrCheckout ? prName : (workspaceName ?? undefined),
 					branch: isPrCheckout ? undefined : (branchName ?? undefined),
+					skipBranchPrefix:
+						!isPrCheckout && branchName !== null && draft.branchNameFromProvider
+							? true
+							: undefined,
 					pr: isPrCheckout ? draft.linkedPR?.prNumber : undefined,
 					baseBranch: draft.baseBranch ?? undefined,
 					taskId: linkedTaskId,

@@ -12,10 +12,16 @@ export default command({
 			"Project ID. Omit to create a project-less session (a managed scratch folder)",
 		),
 		name: string().desc("Workspace name"),
-		branch: string().desc("Git branch (required unless --pr is set)"),
+		branch: string().desc("Git branch (required unless --pr or --task is set)"),
 		pr: number().desc("PR number — checks out the verified PR head"),
+		task: string().desc(
+			"Task ID to link. When --branch is omitted, the task's provider branch name (e.g. Linear's) is used verbatim",
+		),
 		baseBranch: string().desc(
 			"Branch to fork from when `branch` does not exist (defaults to project default)",
+		),
+		skipBranchPrefix: boolean().desc(
+			"Use --branch exactly as given instead of namespacing it under the project branch prefix",
 		),
 		agent: string().desc(
 			"Agent to spawn after creation. Preset id (`claude`, `codex`, …), HostAgentConfig instance UUID, or `superset`",
@@ -48,6 +54,8 @@ export default command({
 				["--branch", options.branch],
 				["--pr", options.pr],
 				["--base-branch", options.baseBranch],
+				["--task", options.task],
+				["--skip-branch-prefix", options.skipBranchPrefix || undefined],
 			] as const) {
 				if (value !== undefined) {
 					throw new CLIError(
@@ -56,11 +64,19 @@ export default command({
 					);
 				}
 			}
-		} else if (Boolean(options.branch) === Boolean(options.pr)) {
-			throw new CLIError(
-				"Specify exactly one of --branch or --pr",
-				"Use --branch <name> or --pr <number>",
-			);
+		} else {
+			if (options.branch && options.pr) {
+				throw new CLIError(
+					"Specify only one of --branch or --pr",
+					"Use --branch <name> or --pr <number>",
+				);
+			}
+			if (!options.branch && !options.pr && !options.task) {
+				throw new CLIError(
+					"Specify --branch, --pr, or --task",
+					"Use --branch <name>, --pr <number>, or --task <id>",
+				);
+			}
 		}
 
 		if (options.prompt && !options.agent) {
@@ -139,7 +155,9 @@ export default command({
 			name: options.name,
 			branch: options.branch,
 			pr: options.pr,
+			taskId: options.task,
 			baseBranch: options.baseBranch,
+			skipBranchPrefix: options.skipBranchPrefix ?? undefined,
 			agents,
 			command: options.command ?? undefined,
 		});
