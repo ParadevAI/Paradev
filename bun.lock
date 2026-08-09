@@ -239,7 +239,7 @@
         "@xterm/addon-search": "0.17.0-beta.289",
         "@xterm/addon-serialize": "0.15.0-beta.289",
         "@xterm/addon-unicode11": "0.10.0-beta.289",
-        "@xterm/addon-webgl": "0.20.0-beta.288",
+        "@xterm/addon-webgl": "0.20.0-beta.297",
         "@xterm/headless": "6.1.0-beta.289",
         "@xterm/xterm": "6.1.0-beta.289",
         "ai": "6.0.235",
@@ -3548,7 +3548,7 @@
 
     "@xterm/addon-unicode11": ["@xterm/addon-unicode11@0.10.0-beta.289", "", { "peerDependencies": { "@xterm/xterm": "^6.1.0-beta.289" } }, "sha512-wZ1eQ3bakATnttLmO4Ys+wFPV6Ajl38c5RS2cGK1ihaqjC/6GoW0Iga9CVS3fNOk9yvIcLioVnxn5eH8jo2zUQ=="],
 
-    "@xterm/addon-webgl": ["@xterm/addon-webgl@0.20.0-beta.288", "", { "peerDependencies": { "@xterm/xterm": "^6.1.0-beta.289" } }, "sha512-4Jp7+SjFm8RWQwGX54RRNPmhV5F9kZ3o9+DYGGrj9RmJ2rJEqzfG861QJUynlTz11Ni634MwXxxIoSC1yQkLgw=="],
+    "@xterm/addon-webgl": ["@xterm/addon-webgl@0.20.0-beta.297", "", { "peerDependencies": { "@xterm/xterm": "^6.1.0-beta.300" } }, "sha512-XWnYnI36ynIdI2nzC9QTlbQis9+W5PgosjBfKYsXy1EJfxyopkcTxctq9YwfaQJ9X1cGsevfNg7gXfj4hpUpUA=="],
 
     "@xterm/headless": ["@xterm/headless@6.1.0-beta.289", "", {}, "sha512-2O36sJvUsDVMitxVSBP+74RncxhsnI+K9M7OhgX39ok2Y71MOi1wWvdl6A/IYwaXEUl+lz2htU8RypWlpzdXvQ=="],
 
