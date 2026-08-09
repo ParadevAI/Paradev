@@ -10,7 +10,6 @@ import {
 import { useDiffStats } from "renderer/hooks/host-service/useDiffStats";
 import { useV2WorkspaceNotificationStatus } from "renderer/hooks/host-service/useV2NotificationStatus";
 import { useOptimisticCollectionActions } from "renderer/routes/_authenticated/hooks/useOptimisticCollectionActions";
-import { useDeletingWorkspaces } from "renderer/routes/_authenticated/providers/DeletingWorkspacesProvider";
 import { RenameBranchDialog } from "renderer/screens/main/components/WorkspaceSidebar/WorkspaceListItem/components";
 import { useDashboardSidebarHover } from "../../providers/DashboardSidebarHoverProvider";
 import type { WorkspaceSelectionEvent } from "../../providers/DashboardSidebarSelectionProvider";
@@ -108,9 +107,6 @@ export function DashboardSidebarWorkspaceItem({
 		v2WorkspaceActions.updateWorkspace(id, { branch: newBranchName });
 	};
 	const isPending = pendingTransaction?.type === "insert";
-	// Keep the delete dialog outside the hidden wrapper below — the destroy
-	// flow reopens it into an error pane on conflict/teardown-failed.
-	const isDeleting = useDeletingWorkspaces().isDeleting(id);
 
 	const {
 		hoveredId: hoverHoveredId,
@@ -230,7 +226,7 @@ export function DashboardSidebarWorkspaceItem({
 
 		return (
 			<>
-				<div hidden={isDeleting}>
+				<div>
 					{isPending ? (
 						content
 					) : (
@@ -329,7 +325,7 @@ export function DashboardSidebarWorkspaceItem({
 
 	return (
 		<>
-			<div hidden={isDeleting}>
+			<div>
 				{isPending ? (
 					expandedContent
 				) : isBulkMenu ? (

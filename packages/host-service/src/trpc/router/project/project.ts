@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import { basename, resolve as resolvePath } from "node:path";
 import {
 	type ParsedGitHubRemote,
@@ -839,11 +840,17 @@ export const projectRouter = router({
 				.sync();
 			if (!localProject) return { success: true, repoPath: null };
 
+			// The project-row delete below cascades tombstones away — removing a
+			// project intentionally drops its workspace history. Sweep worktrees
+			// for live rows AND stranded tombstones (crash-interrupted deletes
+			// whose worktree survives): once the cascade runs, the startup
+			// reconciler can no longer see them.
 			const localWorkspaces = ctx.db
 				.select()
 				.from(workspaces)
 				.where(eq(workspaces.projectId, input.projectId))
-				.all();
+				.all()
+				.filter((ws) => ws.archivedAt == null || existsSync(ws.worktreePath));
 
 			for (const ws of localWorkspaces) {
 				if (ws.worktreePath === localProject.repoPath) continue;

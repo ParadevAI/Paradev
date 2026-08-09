@@ -24,6 +24,9 @@ export type HostShapedWorkspace = Omit<
 export interface HostWorkspaceRow extends HostShapedWorkspace {
 	worktreePath: string;
 	worktreeExists: boolean;
+	/** Non-null = archived tombstone (only served on `includeArchived`). */
+	archivedAt?: number | null;
+	archiveReason?: "merged" | "deleted" | null;
 }
 
 /** Merged item returned by useHostWorkspaces. */
@@ -34,6 +37,9 @@ export interface HostWorkspaceItem extends HostShapedWorkspace {
 	hostReachable: boolean;
 	/** "host" = served by a host (live or last-seen); "cloud" = Electric fallback. */
 	source: "host" | "cloud";
+	/** Non-null = archived tombstone (only present on `includeArchived`). */
+	archivedAt?: number | null;
+	archiveReason?: "merged" | "deleted" | null;
 }
 
 export interface HostWorkspacesQueryTarget {

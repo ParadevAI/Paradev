@@ -47,22 +47,23 @@ describe("migration 0019 upgrade", () => {
 		const dbPath = join(dir, "host.db");
 
 		// A migrations folder truncated to 0018 — the pre-upgrade schema.
+		// Everything from 0019 onward is removed (later migrations would
+		// otherwise be applied into the "pre-0019" fixture out of order).
+		const isPre0019 = (tag: string) => Number(tag.slice(0, 4)) < 19;
 		const oldMigrations = join(dir, "drizzle-pre-0019");
 		cpSync(MIGRATIONS_DIR, oldMigrations, { recursive: true });
 		const journalPath = join(oldMigrations, "meta", "_journal.json");
 		const journal = JSON.parse(readFileSync(journalPath, "utf8")) as {
 			entries: Array<{ tag: string }>;
 		};
-		const removed = journal.entries.filter((entry) =>
-			entry.tag.startsWith("0019"),
-		);
-		expect(removed.length).toBe(1);
-		journal.entries = journal.entries.filter(
-			(entry) => !entry.tag.startsWith("0019"),
-		);
+		const removed = journal.entries.filter((entry) => !isPre0019(entry.tag));
+		expect(removed.length).toBeGreaterThanOrEqual(1);
+		journal.entries = journal.entries.filter((entry) => isPre0019(entry.tag));
 		writeFileSync(journalPath, JSON.stringify(journal));
 		for (const file of readdirSync(oldMigrations)) {
-			if (file.startsWith("0019")) unlinkSync(join(oldMigrations, file));
+			if (/^\d{4}/.test(file) && !isPre0019(file)) {
+				unlinkSync(join(oldMigrations, file));
+			}
 		}
 
 		const sqlite = new BunDatabase(dbPath, { create: true, readwrite: true });

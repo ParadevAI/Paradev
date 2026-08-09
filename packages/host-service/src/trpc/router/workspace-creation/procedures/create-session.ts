@@ -43,7 +43,9 @@ const createSessionInputSchema = z.object({
 	namingPrompt: z.string().min(1).optional(),
 });
 
-/** Names already claimed: session dirs on disk plus session rows in the DB. */
+/** Names already claimed: session dirs on disk plus session rows in the DB.
+ * Deliberately includes archived tombstones — reusing a tombstone's folder
+ * path would defeat the archived-workspace reconciler's live-path guard. */
 function claimedSessionNames(ctx: HostServiceContext): string[] {
 	const root = defaultSessionsRoot();
 	const onDisk = existsSync(root) ? readdirSync(root) : [];

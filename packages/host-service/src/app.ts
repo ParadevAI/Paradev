@@ -19,6 +19,7 @@ import {
 	registerAcpSessionStreamRoute,
 	SqliteAcpSessionPersistence,
 } from "./runtime/acp-sessions";
+import { runArchivedWorkspaceReconcile } from "./runtime/archived-workspace-reconcile";
 import { ChatRuntimeManager } from "./runtime/chat";
 import { WorkspaceFilesystemManager } from "./runtime/filesystem";
 import type { GitCredentialProvider } from "./runtime/git";
@@ -251,6 +252,23 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 			eventBus,
 		}).catch((err) => {
 			console.warn("[host-service] main-workspace sweep failed:", err);
+		});
+		// Finish any delete the previous process crashed out of (archived row
+		// whose worktree still exists).
+		await runArchivedWorkspaceReconcile({
+			git,
+			credentials: providers.credentials,
+			github,
+			execGh,
+			api,
+			db,
+			runtime,
+			eventBus,
+			terminalAgentStore,
+			organizationId: config.organizationId,
+			isAuthenticated: true,
+		}).catch((err) => {
+			console.warn("[host-service] archived-workspace reconcile failed:", err);
 		});
 	})();
 

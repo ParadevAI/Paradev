@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { TRPCError } from "@trpc/server";
-import { and, eq, ne, or } from "drizzle-orm";
+import { and, eq, isNull, ne, or } from "drizzle-orm";
 import { workspaces } from "../../../../db/schema";
 import type { HostServiceContext } from "../../../../types";
 import {
@@ -120,6 +120,7 @@ export async function adoptExistingWorktree(
 			where: and(
 				eq(workspaces.projectId, projectId),
 				eq(workspaces.branch, branch),
+				isNull(workspaces.archivedAt),
 			),
 		})
 		.sync();
@@ -138,6 +139,7 @@ export async function adoptExistingWorktree(
 			where: and(
 				eq(workspaces.projectId, projectId),
 				eq(workspaces.worktreePath, worktreePath),
+				isNull(workspaces.archivedAt),
 			),
 		})
 		.sync();
@@ -216,6 +218,9 @@ function deleteLocalWorkspaceConflicts(
 					eq(workspaces.worktreePath, args.worktreePath),
 				),
 				ne(workspaces.id, args.keepWorkspaceId),
+				// Tombstones aren't phantoms — same-branch history must survive
+				// re-creating a workspace on that branch.
+				isNull(workspaces.archivedAt),
 			),
 		)
 		.all();

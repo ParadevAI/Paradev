@@ -140,7 +140,7 @@ describe("workspaces.createSession + delete integration", () => {
 		expect(basename(row?.worktreePath ?? "")).not.toContain("..");
 	});
 
-	test("destroy removes the folder and the row; cloud is never called", async () => {
+	test("destroy removes the folder and archives the row; cloud is never called", async () => {
 		// No apiOverrides: any cloud call would throw inside the saga and
 		// surface as a warning — assert none appear.
 		const result = await createSession({ name: "delete me" });
@@ -162,12 +162,15 @@ describe("workspaces.createSession + delete integration", () => {
 		expect(destroyed?.warnings).toEqual([]);
 		expect(existsSync(row?.worktreePath ?? "")).toBe(false);
 
-		const gone = host?.db
+		// Sessions tombstone like any workspace; no PR link means the
+		// reason is always "deleted".
+		const tombstone = host?.db
 			.select()
 			.from(workspaces)
 			.where(eq(workspaces.id, result.workspace.id))
 			.get();
-		expect(gone).toBeUndefined();
+		expect(tombstone?.archivedAt).not.toBeNull();
+		expect(tombstone?.archiveReason).toBe("deleted");
 	});
 
 	test("dirty session blocks destroy with CONFLICT; force removes it", async () => {

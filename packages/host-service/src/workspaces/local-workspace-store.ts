@@ -197,7 +197,9 @@ export function updateLocalWorkspace(
 	return row;
 }
 
-/** Delete a local row and broadcast. Idempotent. */
+/** Hard-delete a local row and broadcast. Idempotent. The destroy pipeline
+ * archives via `archiveLocalWorkspace` instead — this remains only for
+ * phantom-row cleanup (adopt-existing-worktree conflicts). */
 export function deleteLocalWorkspace(
 	ctx: WorkspaceStoreContext,
 	id: string,
@@ -213,6 +215,74 @@ export function deleteLocalWorkspace(
 		});
 		trackWorkspaceEvent(ctx, "workspace_deleted", existing);
 	}
+}
+
+/**
+ * Tombstone a local row instead of deleting it. Broadcasts the same
+ * `deleted` event shape as a hard delete so every existing consumer drops
+ * the row identically; the row itself survives for the board's
+ * Merged/Deleted history. Idempotent — re-archiving keeps the original
+ * timestamp and reason.
+ */
+export function archiveLocalWorkspace(
+	ctx: WorkspaceStoreContext,
+	id: string,
+	reason: "merged" | "deleted",
+): void {
+	const existing = getLocalWorkspace(ctx.db, id);
+	if (!existing) return;
+	if (existing.archivedAt == null) {
+		ctx.db
+			.update(workspaces)
+			.set({
+				archivedAt: Date.now(),
+				archiveReason: reason,
+				updatedAt: Date.now(),
+			})
+			.where(eq(workspaces.id, id))
+			.run();
+	}
+	ctx.eventBus.broadcastWorkspaceChanged({
+		workspaceId: id,
+		eventType: "deleted",
+		workspace: null,
+		occurredAt: Date.now(),
+	});
+	// Telemetry deliberately NOT emitted here: the destroy can still fail
+	// and un-archive. The pipeline calls trackWorkspaceDeleted once the
+	// physical cleanup actually commits.
+}
+
+/** Emit the deletion telemetry event — called by the destroy pipeline
+ * after physical cleanup succeeds, so failed/retried destroys count once. */
+export function trackWorkspaceDeleted(
+	ctx: WorkspaceStoreContext,
+	row: HostWorkspaceRow,
+): void {
+	trackWorkspaceEvent(ctx, "workspace_deleted", row);
+}
+
+/**
+ * Revive a tombstoned row — the destroy pipeline failed after the
+ * mark-first commit, so the workspace is live and retryable again.
+ * Broadcasts `created` so list patchers that dropped the row on the
+ * archive event re-add it. Idempotent.
+ */
+export function unarchiveLocalWorkspace(
+	ctx: WorkspaceStoreContext,
+	id: string,
+): void {
+	const existing = getLocalWorkspace(ctx.db, id);
+	if (!existing) return;
+	if (existing.archivedAt != null) {
+		ctx.db
+			.update(workspaces)
+			.set({ archivedAt: null, archiveReason: null, updatedAt: Date.now() })
+			.where(eq(workspaces.id, id))
+			.run();
+	}
+	const row = getLocalWorkspace(ctx.db, id);
+	if (row) emitWorkspaceChanged(ctx.eventBus, "created", row);
 }
 
 function emitWorkspaceChanged(

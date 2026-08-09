@@ -140,6 +140,9 @@ export const pullRequests = sqliteTable(
 		reviewDecision: text("review_decision"),
 		checksStatus: text("checks_status").notNull().default("none"),
 		checksJson: text("checks_json").notNull().default("[]"),
+		// Set when the PR is first observed merged; never cleared. Anchors
+		// "merged in the last N days" windows on the workspaces board.
+		mergedAt: integer("merged_at"),
 		lastFetchedAt: integer("last_fetched_at"),
 		error: text(),
 		createdAt: integer("created_at")
@@ -238,9 +241,15 @@ export const workspaces = sqliteTable(
 		// Null = local changes not yet pushed to the cloud mirror (dual-write
 		// era only; the column and reconciler go away in R3).
 		cloudSyncedAt: integer("cloud_synced_at"),
+		// Tombstone: null = live. Set at the destroy commit point; rows are
+		// kept forever and surface on the board's Merged/Deleted columns.
+		archivedAt: integer("archived_at"),
+		// "merged" when the linked PR was merged at destroy time.
+		archiveReason: text("archive_reason").$type<"merged" | "deleted">(),
 	},
 	(table) => [
 		index("workspaces_project_id_idx").on(table.projectId),
+		index("workspaces_archived_at_idx").on(table.archivedAt),
 		index("workspaces_upstream_ref_idx").on(
 			table.upstreamOwner,
 			table.upstreamRepo,

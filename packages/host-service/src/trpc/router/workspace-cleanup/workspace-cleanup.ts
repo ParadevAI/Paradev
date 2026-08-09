@@ -2,13 +2,20 @@ import { existsSync } from "node:fs";
 import { rm } from "node:fs/promises";
 import { sanitizePromptForPty } from "@superset/shared/agent-prompt-launch";
 import { TRPCError } from "@trpc/server";
+import { eq } from "drizzle-orm";
 import { z } from "zod";
+import { pullRequests } from "../../../db/schema";
 import { invalidateLabelCache } from "../../../ports/static-ports";
+import { coercePullRequestState } from "../../../runtime/pull-requests/utils/pull-request-mappers";
 import { runTeardown, type TeardownResult } from "../../../runtime/teardown";
 import { disposeSessionsByWorkspaceId } from "../../../terminal/terminal";
 import type { HostServiceContext } from "../../../types";
 import type { GitTaskEnv } from "../../../workers/tasks/git";
-import { deleteLocalWorkspace } from "../../../workspaces/local-workspace-store";
+import {
+	archiveLocalWorkspace,
+	trackWorkspaceDeleted,
+	unarchiveLocalWorkspace,
+} from "../../../workspaces/local-workspace-store";
 import type {
 	DeleteInProgressCause,
 	TeardownFailureCause,
@@ -138,18 +145,22 @@ export const workspaceCleanupRouter = router({
 		}),
 
 	/**
-	 * Destroy a workspace in five phases:
+	 * Destroy a workspace in phases:
 	 *
-	 *   0. Preflight     — dirty-worktree check (skip if force)
-	 *   1. Teardown      — run .superset/teardown.sh (per teardownMode)
-	 *   2. Local cleanup — PTYs, worktree
-	 *   3. Cloud delete  ← authoritative UI state
-	 *   4. Branch delete — optional local branch cleanup
-	 *   5. Host sqlite   — local index cleanup
+	 *   0.   Preflight    — dirty-worktree check (skip if force)
+	 *   1.   Teardown     — run .superset/teardown.sh (per teardownMode)
+	 *   1.5. Archive      ← the commit point: the row tombstones
+	 *                       (archivedAt/archiveReason) and vanishes from
+	 *                       default lists
+	 *   2.   Local cleanup — PTYs, worktree
+	 *   3.   Best-effort legacy cloud delete (skipped for sessions)
+	 *   4.   Branch delete — optional local branch cleanup
+	 *   5.   Caches
 	 *
-	 * Worktree removal is intentionally before cloud delete. If it fails
-	 * while the path still exists, the cloud row remains so the workspace is
-	 * still visible and delete can be retried instead of orphaning disk state.
+	 * A failure in phases 2-5 un-archives the row so the workspace stays
+	 * visible and retryable instead of orphaning disk state; a crash after
+	 * the archive is finished by the startup reconciler
+	 * (runArchivedWorkspaceReconcile).
 	 *
 	 * Force semantics (git only; teardown is governed by teardownMode):
 	 *   - skips preflight (step 0)
@@ -260,7 +271,10 @@ async function runDestroy(
 
 	// ─── Step 1: Teardown ──────────────────────────────────────────
 	// Script is the user's last chance to stop services / flush state
-	// before the workspace goes away.
+	// before the workspace goes away. Deliberately BEFORE the archive
+	// commit point: a blocking failure here re-opens the delete dialog
+	// with a force-retry, and that dialog lives under the still-visible
+	// row — archiving first would unmount it mid-prompt.
 	if (input.teardownMode !== "skip" && local && project) {
 		const teardown: TeardownResult = await runTeardown({
 			db: ctx.db,
@@ -290,6 +304,74 @@ async function runDestroy(
 		}
 	}
 
+	// ─── Step 1.5: Archive (the commit point) ──────────────────────
+	// The tombstone is a durable delete-intent record: the row vanishes
+	// from default lists on every device before any physical destruction,
+	// and if the host crashes mid-cleanup the startup reconciler finishes
+	// the job. A cleanup failure below un-archives so the workspace stays
+	// live and retryable. Sessions tombstone too — they're workspaces with
+	// a little missing data (no project, no PRs; reason is always
+	// "deleted"), and session folder names are claimed against ALL rows
+	// including tombstones, so a tombstone's path can't be reused.
+	const marked = local != null;
+	if (marked) {
+		archiveLocalWorkspace(ctx, input.workspaceId, archiveReasonFor(ctx, local));
+	}
+
+	try {
+		const result = await runDestroyPhases(ctx, input, {
+			local,
+			project,
+			warnings,
+		});
+		// Telemetry at the true commit: a failed destroy un-archives below and
+		// must not count, and a retried destroy must count exactly once.
+		if (marked && local) trackWorkspaceDeleted(ctx, local);
+		return result;
+	} catch (err) {
+		if (marked) unarchiveLocalWorkspace(ctx, input.workspaceId);
+		throw err;
+	}
+}
+
+/** "merged" when the linked PR was observed merged; every other delete —
+ * open/closed/draft PR or none at all — is a plain "deleted". */
+function archiveReasonFor(
+	ctx: HostServiceContext,
+	local: { pullRequestId: string | null },
+): "merged" | "deleted" {
+	if (!local.pullRequestId) return "deleted";
+	try {
+		const pr = ctx.db.query.pullRequests
+			.findFirst({ where: eq(pullRequests.id, local.pullRequestId) })
+			.sync();
+		return coercePullRequestState(pr?.state ?? null) === "merged"
+			? "merged"
+			: "deleted";
+	} catch (err) {
+		// A reason lookup failure must never block the delete — but a merged
+		// workspace misfiled under Deleted deserves a trace.
+		console.warn("[workspace-cleanup] archive reason lookup failed", {
+			pullRequestId: local.pullRequestId,
+			err,
+		});
+		return "deleted";
+	}
+}
+
+async function runDestroyPhases(
+	ctx: HostServiceContext,
+	input: DestroyWorkspaceInput,
+	{
+		local,
+		project,
+		warnings,
+	}: {
+		local: Awaited<ReturnType<typeof isMainWorkspace>>["local"];
+		project: Awaited<ReturnType<typeof isMainWorkspace>>["project"];
+		warnings: string[];
+	},
+) {
 	// ─── Step 2: Local cleanup ─────────────────────────────────────
 	// 2a. PTYs
 	try {
@@ -393,11 +475,10 @@ async function runDestroy(
 		}
 	}
 
-	// ─── Step 3: Local delete (authoritative) ─────────────────────
-	// The local row is the commit point and the only record. The cloud
-	// delete is best-effort legacy cleanup for rows mirrored before
+	// ─── Step 3: Legacy cloud cleanup ──────────────────────────────
+	// The row already committed at step 1.5 (archived tombstone). The
+	// cloud delete is best-effort legacy cleanup for rows mirrored before
 	// workspaces went fully local.
-	deleteLocalWorkspace(ctx, input.workspaceId);
 	let cloudDeleted = false;
 	// Sessions postdate the cloud mirror — there is no legacy row to clean.
 	if (local?.type !== "session") {

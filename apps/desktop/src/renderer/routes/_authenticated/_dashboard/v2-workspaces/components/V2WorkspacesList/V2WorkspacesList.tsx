@@ -28,7 +28,6 @@ import type {
 } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces";
 import {
 	DEVICE_FILTER_THIS_DEVICE,
-	PROJECT_FILTER_ALL,
 	useV2WorkspacesFilterStore,
 } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/stores/v2WorkspacesFilterStore";
 import { useV2ProjectLocalMetaStore } from "renderer/stores/v2-project-local-meta";
@@ -145,8 +144,14 @@ export function V2WorkspacesList({
 	const deviceFilter = useV2WorkspacesFilterStore(
 		(state) => state.deviceFilter,
 	);
-	const projectFilter = useV2WorkspacesFilterStore(
-		(state) => state.projectFilter,
+	const projectFilters = useV2WorkspacesFilterStore(
+		(state) => state.projectFilters,
+	);
+	const prStateFilters = useV2WorkspacesFilterStore(
+		(state) => state.prStateFilters,
+	);
+	const agentStatusFilters = useV2WorkspacesFilterStore(
+		(state) => state.agentStatusFilters,
 	);
 	const resetFilters = useV2WorkspacesFilterStore((state) => state.reset);
 
@@ -174,7 +179,9 @@ export function V2WorkspacesList({
 	const hasActiveFilters =
 		searchQuery.trim() !== "" ||
 		deviceFilter !== DEVICE_FILTER_THIS_DEVICE ||
-		projectFilter !== PROJECT_FILTER_ALL;
+		projectFilters.length > 0 ||
+		prStateFilters.length > 0 ||
+		agentStatusFilters.length > 0;
 
 	const columnHeader = (
 		<DataTableHeader>
