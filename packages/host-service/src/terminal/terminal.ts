@@ -171,23 +171,19 @@ type TerminalServerMessage =
 	| { type: "exit"; exitCode: number; signal: number }
 	| { type: "title"; title: string | null };
 
-// Dim separator fed into the emulator ahead of a respawned shell's output so
-// users can tell restored scrollback from the fresh session (cf. VS Code's
-// "History restored" line). Part of the tracked buffer, so it survives into
-// every grid resync.
+const MAX_BUFFER_BYTES = 64 * 1024;
+// Dim separator delivered ahead of a respawned shell's output so users can
+// tell restored scrollback from the fresh session (cf. VS Code's "History
+// restored" line).
 const SESSION_RESTORED_NOTICE = new TextEncoder().encode(
 	"\r\n\x1b[90m─── Session Contents Restored ───\x1b[0m\r\n\r\n",
 );
-// Full terminal reset (RIS). Prefixed to a grid resync so the renderer's
-// buffer is rebuilt from the emulator state alone, regardless of what the
-// previous socket delivered.
-const TERMINAL_FULL_RESET = new TextEncoder().encode("\x1bc");
 // Cap on a single renderer socket's unflushed WebSocket send buffer. With no
 // ACK flow control, a renderer that stops draining (slow paint, pinned main
 // thread, dead tab) would let this buffer grow without bound → host OOM (the
 // risk #4868 was about). Once a socket blows past this, we drop it; the
-// renderer auto-reconnects and gets a full grid resync. Crucially the PTY is
-// never paused, so a stalled renderer can't wedge the shell. Matches the
+// renderer auto-reconnects and replays the bounded tail buffer. Crucially the
+// PTY is never paused, so a stalled renderer can't wedge the shell. Matches the
 // daemon's own 8 MB outbound socket cap.
 const WS_SEND_BUFFER_CAP_BYTES = 8 * 1024 * 1024;
 const SOCKET_OPEN = 1;
@@ -281,10 +277,18 @@ interface TerminalSession {
 	unsubscribeDaemon: (() => void) | null;
 	sockets: Set<TerminalSocket>;
 	/**
-	 * Total PTY-output bytes fed to the mode tracker. Monotonic; used to
-	 * detect when an adoption ring replay has quiesced.
+	 * Buffered PTY output retained for replay on (re)attach. Bytes, not
+	 * strings — keeping this byte-aligned with the wire frees us from the
+	 * per-chunk UTF-8 decoding that used to mangle TUIs.
 	 */
-	outputByteCount: number;
+	buffer: Uint8Array[];
+	bufferBytes: number;
+	/**
+	 * Deliver SESSION_RESTORED_NOTICE ahead of the next replay. Kept out of
+	 * the FIFO so MAX_BUFFER_BYTES eviction can't drop it before a client
+	 * attaches. Cleared on first replay.
+	 */
+	restoredNoticePending: boolean;
 	createdAt: number;
 	exited: boolean;
 	exitCode: number;
@@ -339,16 +343,6 @@ interface TerminalSession {
 
 /** PTY lifetime is independent of socket lifetime — sockets detach/reattach freely. */
 const sessions = new Map<string, TerminalSession>();
-
-/**
- * Respawns triggered by a WS attach, keyed by terminalId, so concurrent
- * attaches share one creation and exactly one of them owns the
- * skip-the-reset resync (the others hold stale grids and must be reset).
- */
-const inflightRespawns = new Map<
-	string,
-	Promise<TerminalSession | { error: string }>
->();
 
 // When the daemon disconnects, close every WS socket so the renderer's
 // existing exponential-backoff reconnect kicks in. On reconnect, host-service
@@ -625,14 +619,15 @@ export function writeInputToSession({
 // Ring-buffer replay after adoption arrives asynchronously over the daemon
 // socket, and it is what rebuilds the mode tracker (bracketed paste, screen
 // content). Protocol v2 has no replay-complete signal, so watch the replayed
-// bytes accumulate in the tracker's counter and return once they quiesce.
+// bytes accumulate — they land in session.buffer, since no renderer is
+// attached right after adoption — and return once they quiesce.
 const ADOPTION_REPLAY_WAIT_MS = 500;
 
 async function waitForAdoptionReplay(session: TerminalSession): Promise<void> {
 	const deadline = Date.now() + ADOPTION_REPLAY_WAIT_MS;
 	let seen = -1;
 	while (Date.now() < deadline) {
-		const count = session.outputByteCount;
+		const count = session.bufferBytes;
 		if (count > 0 && count === seen) return;
 		seen = count;
 		await new Promise((resolve) => setTimeout(resolve, 25));
@@ -832,6 +827,16 @@ function setSessionTitle(session: TerminalSession, title: string | null) {
 	broadcastMessage(session, { type: "title", title });
 }
 
+function bufferOutput(session: TerminalSession, data: Uint8Array) {
+	session.buffer.push(data);
+	session.bufferBytes += data.byteLength;
+
+	while (session.bufferBytes > MAX_BUFFER_BYTES && session.buffer.length > 1) {
+		const removed = session.buffer.shift();
+		if (removed) session.bufferBytes -= removed.byteLength;
+	}
+}
+
 function normalizeTerminalDimension(
 	value: number | null | undefined,
 	min: number,
@@ -889,45 +894,40 @@ function broadcastBytes(session: TerminalSession, bytes: Uint8Array): number {
 	return sent;
 }
 
-/**
- * Bring an attaching socket's grid to the emulator's authoritative state:
- * full reset, then the tracker's serialized buffer (content, colors, cursor,
- * alt-screen), then the mode preamble (RIS cleared the modes).
- *
- * The wire protocol is at-most-once — half-open sockets (sleep/wake) and
- * back-pressure drops lose bytes without the host knowing — and an
- * incremental-repaint TUI never recovers from a gap on its own, leaving
- * ghost content until a real resize forces a repaint. Rebuilding the grid
- * from the emulator on every attach makes reattach independent of delivery
- * history (VS Code's ptyService revive model).
- *
- * `reset: false` skips the wipe and appends instead — used when the session
- * was respawned by this very attach, so the renderer's restored scrollback
- * from the dead PTY stays painted above the fresh shell.
- */
-export function sendGridResync(
-	session: TerminalSession,
-	socket: TerminalSocket,
-	{ reset }: { reset: boolean },
-) {
+export function replayBuffer(session: TerminalSession, socket: TerminalSocket) {
+	// sendBytes below no-ops on a non-open socket — bail before clearing the
+	// buffer/notice so the next attach can still replay them.
 	if (socket.readyState !== SOCKET_OPEN) return;
-	const content = new TextEncoder().encode(session.modeTracker.serialize());
+	// Preamble first, then the restored notice, then FIFO. Mode-setting
+	// escapes (kitty keyboard, bracketed paste, focus, …) are typically
+	// emitted once at startup and broadcast away rather than buffered, so a
+	// fresh xterm needs them re-asserted on every attach — even when the
+	// FIFO is empty.
 	const preamble = session.modeTracker.buildPreamble();
+	const notice = session.restoredNoticePending ? SESSION_RESTORED_NOTICE : null;
+	let bufferTotal = 0;
+	for (const b of session.buffer) bufferTotal += b.byteLength;
+	const preambleLen = preamble?.byteLength ?? 0;
+	const noticeLen = notice?.byteLength ?? 0;
+	if (preambleLen === 0 && noticeLen === 0 && bufferTotal === 0) return;
 
-	const parts: Uint8Array[] = [];
-	if (reset) parts.push(TERMINAL_FULL_RESET);
-	if (content.byteLength > 0) parts.push(content);
-	if (preamble) parts.push(preamble);
-	if (parts.length === 0) return;
-
-	let total = 0;
-	for (const p of parts) total += p.byteLength;
-	const combined = new Uint8Array(total);
+	const combined = new Uint8Array(preambleLen + noticeLen + bufferTotal);
 	let offset = 0;
-	for (const p of parts) {
-		combined.set(p, offset);
-		offset += p.byteLength;
+	if (preamble) {
+		combined.set(preamble, offset);
+		offset += preamble.byteLength;
 	}
+	if (notice) {
+		combined.set(notice, offset);
+		offset += notice.byteLength;
+	}
+	for (const b of session.buffer) {
+		combined.set(b, offset);
+		offset += b.byteLength;
+	}
+	session.restoredNoticePending = false;
+	session.buffer.length = 0;
+	session.bufferBytes = 0;
 	sendBytes(socket, combined);
 }
 
@@ -953,8 +953,9 @@ function resolveShellReady(
 		session.scanState.heldBytes.length = 0;
 		session.scanState.matchPos = 0;
 		session.modeTracker.feed(heldBytes);
-		session.outputByteCount += heldBytes.byteLength;
-		broadcastBytes(session, heldBytes);
+		if (broadcastBytes(session, heldBytes) === 0) {
+			bufferOutput(session, heldBytes);
+		}
 	}
 	if (session.shellReadyResolve) {
 		session.shellReadyResolve();
@@ -1371,9 +1372,16 @@ interface CreateTerminalSessionOptions {
 	/** Only recover an already-live daemon session; never spawn a new PTY. */
 	adoptOnly?: boolean;
 	/**
-	 * Feed a "session restored" separator into the emulator ahead of the
-	 * shell's output. Set on the cold-restore respawn path, where the renderer
-	 * paints stale scrollback above a brand-new shell.
+	 * Replay the daemon's ring buffer on subscribe. Default true. Pass false
+	 * when the renderer's xterm already has the scrollback — replaying then
+	 * doubles the visible output. Tradeoff: bytes the PTY produced during
+	 * the WS-down window are dropped (sub-second on a daemon swap).
+	 */
+	replayOnAdoption?: boolean;
+	/**
+	 * Deliver a "session restored" separator ahead of the first replay. Set on
+	 * the cold-restore respawn path, where the renderer paints stale scrollback
+	 * above a brand-new shell.
 	 */
 	restoredNotice?: boolean;
 }
@@ -1422,6 +1430,7 @@ export async function createTerminalSessionInternal({
 	cols: requestedCols,
 	rows: requestedRows,
 	adoptOnly = false,
+	replayOnAdoption = true,
 	restoredNotice = false,
 }: CreateTerminalSessionOptions): Promise<TerminalSession | { error: string }> {
 	const existing = sessions.get(terminalId);
@@ -1474,13 +1483,12 @@ export async function createTerminalSessionInternal({
 	}
 
 	const cwd = resolveTerminalCwd(cwdOverride, workspace.worktreePath);
-	// Adoption overrides these with the live PTY's dimensions below.
-	let cols = normalizeTerminalDimension(
+	const cols = normalizeTerminalDimension(
 		requestedCols,
 		MIN_TERMINAL_COLS,
 		DEFAULT_TERMINAL_COLS,
 	);
-	let rows = normalizeTerminalDimension(
+	const rows = normalizeTerminalDimension(
 		requestedRows,
 		MIN_TERMINAL_ROWS,
 		DEFAULT_TERMINAL_ROWS,
@@ -1527,10 +1535,6 @@ export async function createTerminalSessionInternal({
 			}
 			openResult = { pid: found.pid };
 			isAdopted = true;
-			// The ring replay must be parsed at the width the app drew at, so
-			// the tracker takes the live PTY's dimensions, not caller defaults.
-			cols = normalizeTerminalDimension(found.cols, MIN_TERMINAL_COLS, cols);
-			rows = normalizeTerminalDimension(found.rows, MIN_TERMINAL_ROWS, rows);
 			console.log(
 				`[terminal] adopted existing daemon session ${terminalId} pid=${found.pid}`,
 			);
@@ -1557,16 +1561,6 @@ export async function createTerminalSessionInternal({
 					if (!found) throw err;
 					openResult = { pid: found.pid };
 					isAdopted = true;
-					cols = normalizeTerminalDimension(
-						found.cols,
-						MIN_TERMINAL_COLS,
-						cols,
-					);
-					rows = normalizeTerminalDimension(
-						found.rows,
-						MIN_TERMINAL_ROWS,
-						rows,
-					);
 					console.log(
 						`[terminal] adopted existing daemon session ${terminalId} pid=${found.pid}`,
 					);
@@ -1625,7 +1619,10 @@ export async function createTerminalSessionInternal({
 		rows,
 		unsubscribeDaemon: null,
 		sockets: new Set(),
-		outputByteCount: 0,
+		buffer: [],
+		bufferBytes: 0,
+		// Adopted sessions kept a live shell — nothing was restored.
+		restoredNoticePending: restoredNotice && !isAdopted,
 		createdAt,
 		exited: false,
 		exitCode: 0,
@@ -1653,13 +1650,6 @@ export async function createTerminalSessionInternal({
 	sessions.set(terminalId, session);
 	portManager.upsertSession(terminalId, workspaceId, pty.pid);
 
-	// Adopted sessions kept a live shell — nothing was restored. Feeding the
-	// separator into the emulator (before any PTY output arrives) makes it
-	// part of the tracked buffer, so it survives into every grid resync.
-	if (restoredNotice && !isAdopted) {
-		session.modeTracker.feed(SESSION_RESTORED_NOTICE);
-	}
-
 	if (session.shellReadyState === "pending") {
 		session.shellReadyTimeoutId = setTimeout(() => {
 			resolveShellReady(session, "timed_out");
@@ -1668,11 +1658,7 @@ export async function createTerminalSessionInternal({
 
 	session.unsubscribeDaemon = daemon.subscribe(
 		terminalId,
-		// Always replay the daemon's ring buffer: on adoption it repopulates
-		// the fresh ModeTracker (the source grid resyncs are built from), and
-		// on a new spawn the ring is empty-to-tiny. Renderer duplication is
-		// impossible — attach resets the peer before the resync.
-		{ replay: true },
+		{ replay: replayOnAdoption },
 		{
 			onOutput(chunk) {
 				// Bytes flow daemon → host → xterm without UTF-8 decoding;
@@ -1709,12 +1695,13 @@ export async function createTerminalSessionInternal({
 				// — the chunk is still output and must refresh the idle clock.
 				portManager.checkOutputForHint(terminalId, hintText);
 
-				// Feed the tracker on every byte — it is the authoritative
-				// buffer state that grid resyncs on attach are built from.
+				// Feed the tracker on every byte — broadcast skips the FIFO,
+				// so this is the only path that catches startup mode escapes.
 				session.modeTracker.feed(bytes);
-				session.outputByteCount += bytes.byteLength;
 
-				broadcastBytes(session, bytes);
+				if (broadcastBytes(session, bytes) === 0) {
+					bufferOutput(session, bytes);
+				}
 			},
 			onExit({ code, signal }) {
 				session.exited = true;
@@ -1865,7 +1852,6 @@ export function registerWorkspaceTerminalRoute({
 			const attachSocketToSession = (
 				session: TerminalSession,
 				ws: TerminalSocket,
-				{ reset }: { reset: boolean },
 			): boolean => {
 				if (session.sockets.has(ws)) return false;
 				session.sockets.add(ws);
@@ -1877,7 +1863,7 @@ export function registerWorkspaceTerminalRoute({
 					.run();
 
 				sendMessage(ws, { type: "title", title: session.title });
-				sendGridResync(session, ws, { reset });
+				replayBuffer(session, ws);
 				if (session.exited) {
 					sendMessage(ws, {
 						type: "exit",
@@ -1888,8 +1874,7 @@ export function registerWorkspaceTerminalRoute({
 				return true;
 			};
 			const resolveSessionForAttach = async (): Promise<
-				| { session: TerminalSession; respawned: boolean }
-				| { error: string; code?: "session-gone" }
+				TerminalSession | { error: string; code?: "session-gone" }
 			> => {
 				const existing = sessions.get(terminalId);
 				if (existing) {
@@ -1901,7 +1886,7 @@ export function registerWorkspaceTerminalRoute({
 						});
 						if (mismatchError) return { error: mismatchError };
 					}
-					return { session: existing, respawned: false };
+					return existing;
 				}
 
 				const record = db.query.terminalSessions
@@ -1943,9 +1928,6 @@ export function registerWorkspaceTerminalRoute({
 
 				// Prefer adoption: if the daemon still owns the PTY across a
 				// host-service restart, we keep the live shell + ring buffer.
-				// (The daemon ring replays into the fresh ModeTracker and streams
-				// to the socket after the reset — legacy `?replay=0` renderers
-				// need no special-casing since the reset prevents duplication.)
 				const adopted = await createTerminalSessionInternal({
 					terminalId,
 					workspaceId: record.originWorkspaceId,
@@ -1953,14 +1935,10 @@ export function registerWorkspaceTerminalRoute({
 					db,
 					eventBus,
 					adoptOnly: true,
+					// Renderer passes `?replay=0` on reconnect; see replayOnAdoption.
+					replayOnAdoption: c.req.query("replay") !== "0",
 				});
-				if (!("error" in adopted)) {
-					// The ring replay streams in asynchronously and rebuilds the
-					// fresh tracker. Let it quiesce so the attach resync carries the
-					// prior content instead of a reset + near-empty grid.
-					await waitForAdoptionReplay(adopted);
-					return { session: adopted, respawned: false };
-				}
+				if (!("error" in adopted)) return adopted;
 
 				// Active row but daemon no longer owns the PTY (laptop sleep,
 				// daemon restart, machine reboot). Respawn rather than dead-end
@@ -1976,16 +1954,7 @@ export function registerWorkspaceTerminalRoute({
 						error,
 					);
 				}
-				// Concurrent attaches for the same id must share one respawn, and
-				// only the attach that owns it may skip the reset — the others'
-				// renderers hold stale grids that need the full resync.
-				const inflight = inflightRespawns.get(terminalId);
-				if (inflight) {
-					const shared = await inflight;
-					if ("error" in shared) return shared;
-					return { session: shared, respawned: false };
-				}
-				const respawnPromise = createTerminalSessionInternal({
+				return createTerminalSessionInternal({
 					terminalId,
 					workspaceId: record.originWorkspaceId,
 					themeType,
@@ -1993,14 +1962,6 @@ export function registerWorkspaceTerminalRoute({
 					eventBus,
 					restoredNotice: true,
 				});
-				inflightRespawns.set(terminalId, respawnPromise);
-				try {
-					const respawned = await respawnPromise;
-					if ("error" in respawned) return respawned;
-					return { session: respawned, respawned: true };
-				} finally {
-					inflightRespawns.delete(terminalId);
-				}
 			};
 
 			return {
@@ -2011,23 +1972,18 @@ export function registerWorkspaceTerminalRoute({
 					}
 
 					void (async () => {
-						const resolved = await resolveSessionForAttach();
-						if ("error" in resolved) {
+						const session = await resolveSessionForAttach();
+						if ("error" in session) {
 							sendMessage(ws, {
 								type: "error",
-								message: resolved.error,
-								code: resolved.code,
+								message: session.error,
+								code: session.code,
 							});
-							ws.close(1011, resolved.error);
+							ws.close(1011, session.error);
 							return;
 						}
 						if (ws.readyState !== SOCKET_OPEN) return;
-						// A respawn was created by this very attach: skip the reset so
-						// the renderer's restored scrollback from the dead PTY stays
-						// painted above the fresh shell.
-						attachSocketToSession(resolved.session, ws, {
-							reset: !resolved.respawned,
-						});
+						attachSocketToSession(session, ws);
 					})().catch((error) => {
 						console.error("[terminal] unexpected error during attach", error);
 						if (ws.readyState !== SOCKET_OPEN) return;

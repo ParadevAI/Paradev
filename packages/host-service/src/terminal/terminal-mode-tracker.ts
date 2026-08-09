@@ -18,8 +18,6 @@ import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
 const { Terminal: HeadlessTerminal } =
 	require("@xterm/headless") as typeof import("@xterm/headless");
-const { SerializeAddon } =
-	require("@xterm/addon-serialize") as typeof import("@xterm/addon-serialize");
 
 export interface ModeTracker {
 	feed(bytes: Uint8Array): void;
@@ -27,12 +25,6 @@ export interface ModeTracker {
 	buildPreamble(): Uint8Array | null;
 	isBracketedPasteActive(): boolean;
 	snapshot(maxLines?: number): TerminalSnapshot;
-	/**
-	 * Full-fidelity VT dump of the emulator buffer (content, colors, cursor,
-	 * alt-screen switch) for grid resync on attach. Escape-sequence string,
-	 * not plain text — write it into a freshly reset xterm.
-	 */
-	serialize(): string;
 	dispose(): void;
 }
 
@@ -57,10 +49,6 @@ type HeadlessInternals = {
 	};
 };
 
-// Scrollback retained by the emulator and emitted by grid resyncs. Bounds the
-// per-attach resync payload; history beyond it is renderer-local only.
-const TRACKER_SCROLLBACK_LINES = 1000;
-
 export function createModeTracker(cols: number, rows: number): ModeTracker {
 	const term = new HeadlessTerminal({
 		cols,
@@ -68,11 +56,9 @@ export function createModeTracker(cols: number, rows: number): ModeTracker {
 		// Retains recent scrollback so `snapshot()` can serve line-mode history,
 		// not just the visible screen. Irrelevant to alt-screen TUIs (no
 		// scrollback), but cheap insurance for plain shell output.
-		scrollback: TRACKER_SCROLLBACK_LINES,
+		scrollback: 1000,
 		allowProposedApi: true,
 	});
-	const serializeAddon = new SerializeAddon();
-	term.loadAddon(serializeAddon);
 	const internals = term as unknown as HeadlessInternals;
 
 	// Validate the private surface up front so a future @xterm/headless
@@ -169,9 +155,6 @@ export function createModeTracker(cols: number, rows: number): ModeTracker {
 			return term.modes.bracketedPasteMode;
 		},
 		snapshot,
-		serialize() {
-			return serializeAddon.serialize({ scrollback: TRACKER_SCROLLBACK_LINES });
-		},
 		dispose() {
 			term.dispose();
 		},

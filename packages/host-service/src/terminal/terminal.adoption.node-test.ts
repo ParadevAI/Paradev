@@ -34,7 +34,7 @@ import {
 	createTerminalSessionInternal,
 	disposeSessionAndWait,
 	listTerminalSessions,
-	sendGridResync,
+	replayBuffer,
 } from "./terminal.ts";
 import { __setAccountShellForTesting } from "./user-shell.ts";
 
@@ -444,67 +444,49 @@ describe("createTerminalSessionInternal — host-service restart adoption", () =
 		await disposeSessionAndWait(terminalId, db);
 	});
 
-	test("restoredNotice is part of the tracked grid: present in every resync, ahead of shell output", async () => {
+	test("restoredNotice delivers the separator ahead of shell output on first replay only", async () => {
 		const terminalId = `e2e-notice-${randomUUID().slice(0, 8)}`;
-		const marker = `notice-order-${randomUUID().slice(0, 6)}`;
 		const result = await createTerminalSessionInternal({
 			terminalId,
 			workspaceId,
 			db,
 			listed: true,
 			restoredNotice: true,
-			initialCommand: `printf '%s\\n' "${marker}"`,
 		});
 		assert.ok(!("error" in result));
 		if ("error" in result) return;
 
-		await waitFor(() => sessionBufferText(result).includes(marker), 15_000);
-
-		// Respawn-created attach appends (no reset) so the renderer's restored
-		// scrollback stays painted above the fresh shell.
 		const first = makeCaptureSocket();
-		sendGridResync(result, first.socket, { reset: false });
-		const firstPayload = first.received();
-		assert.ok(
-			!firstPayload.startsWith("\x1bc"),
-			"reset: false must not wipe the peer",
-		);
-		const noticeIndex = firstPayload.indexOf("Session Contents Restored");
-		assert.ok(noticeIndex >= 0, "resync should carry the separator");
-		assert.ok(
-			noticeIndex < firstPayload.indexOf(marker),
-			"separator should precede the shell output",
+		replayBuffer(result, first.socket);
+		assert.match(
+			first.received(),
+			/Session Contents Restored/,
+			"first replay should carry the restored-session separator",
 		);
 
-		// Later reattaches reset the peer and rebuild it from the emulator —
-		// the separator is buffer content now, so it survives.
 		const second = makeCaptureSocket();
-		sendGridResync(result, second.socket, { reset: true });
-		const secondPayload = second.received();
-		assert.ok(
-			secondPayload.startsWith("\x1bc"),
-			"reset: true must prefix a full terminal reset",
-		);
-		assert.match(
-			secondPayload,
+		replayBuffer(result, second.socket);
+		assert.doesNotMatch(
+			second.received(),
 			/Session Contents Restored/,
-			"separator persists across resyncs as part of the grid",
+			"separator should not repeat on later replays",
 		);
 
 		await disposeSessionAndWait(terminalId, db);
 	});
 
-	test("resync after an unattached output flood delivers the emulator tail, newest output included", async () => {
-		const terminalId = `e2e-flood-resync-${randomUUID().slice(0, 8)}`;
+	test("restoredNotice survives FIFO eviction when the shell floods output before attach", async () => {
+		const terminalId = `e2e-notice-flood-${randomUUID().slice(0, 8)}`;
 		const suffix = randomUUID().slice(0, 6);
 		const result = await createTerminalSessionInternal({
 			terminalId,
 			workspaceId,
 			db,
 			listed: true,
-			// Far more output than any bounded replay could hold, produced with
-			// no socket attached. The marker is assembled by printf so the PTY
-			// echo of the command line doesn't match it.
+			restoredNotice: true,
+			// > MAX_BUFFER_BYTES (64 KiB) so the FIFO drops its oldest chunks
+			// before any socket attaches. The marker is assembled by printf so
+			// the PTY echo of the command line doesn't match it.
 			initialCommand: `head -c 200000 /dev/zero | tr '\\0' x; printf 'flood-done-%s\\n' "${suffix}"`,
 		});
 		assert.ok(!("error" in result));
@@ -516,11 +498,13 @@ describe("createTerminalSessionInternal — host-service restart adoption", () =
 		);
 
 		const capture = makeCaptureSocket();
-		sendGridResync(result, capture.socket, { reset: true });
+		replayBuffer(result, capture.socket);
 		const replayed = capture.received();
+		const noticeIndex = replayed.indexOf("Session Contents Restored");
+		assert.ok(noticeIndex >= 0, "separator should survive buffer eviction");
 		assert.ok(
-			replayed.includes(`flood-done-${suffix}`),
-			"resync must contain the newest output no matter how much was produced while detached",
+			noticeIndex < replayed.indexOf("xxxx"),
+			"separator should precede the flooded shell output",
 		);
 
 		await disposeSessionAndWait(terminalId, db);
@@ -550,7 +534,7 @@ describe("createTerminalSessionInternal — host-service restart adoption", () =
 		if ("error" in second) return;
 
 		const capture = makeCaptureSocket();
-		sendGridResync(second, capture.socket, { reset: true });
+		replayBuffer(second, capture.socket);
 		assert.doesNotMatch(
 			capture.received(),
 			/Session Contents Restored/,
@@ -744,13 +728,14 @@ describe("createTerminalSessionInternal — host-service restart adoption", () =
 		await disposeSessionAndWait(terminalId, db);
 	});
 
-	test("adoption replays the daemon ring into the mode tracker, so resyncs carry prior output", async () => {
-		// The daemon ring is what rebuilds the fresh ModeTracker after a
-		// host-service restart — grid resyncs are built from it, and the
-		// attach-time reset makes renderer duplication impossible (the old
-		// duplicated-output-on-daemon-swap failure mode that `replayOnAdoption:
-		// false` used to paper over).
-		const terminalId = `e2e-ringreplay-${randomUUID().slice(0, 8)}`;
+	test("replayOnAdoption: false suppresses ring-buffer replay on reconnect", async () => {
+		// Regression for the duplicated-output-on-daemon-swap bug: when the
+		// renderer's xterm scrollback survives the WS reconnect (which it
+		// does), replaying the daemon's ring buffer rewrites bytes the user
+		// has already seen and the conversation appears doubled. This test
+		// drives the createTerminalSessionInternal layer that the WS upgrade
+		// handler maps to.
+		const terminalId = `e2e-noreplay-${randomUUID().slice(0, 8)}`;
 
 		const first = await createTerminalSessionInternal({
 			terminalId,
@@ -761,8 +746,9 @@ describe("createTerminalSessionInternal — host-service restart adoption", () =
 		assert.ok(!("error" in first));
 		if ("error" in first) return;
 
-		// Seed the daemon's ring buffer with a sentinel — replayed on adoption.
-		const SENTINEL = `ringreplay-sentinel-${randomUUID().slice(0, 6)}`;
+		// Seed the daemon's ring buffer with a sentinel — that's what would
+		// be replayed on a normal adoption.
+		const SENTINEL = `noreplay-sentinel-${randomUUID().slice(0, 6)}`;
 		first.pty.write(`echo ${SENTINEL}\n`);
 		await waitForOutput(first.pty, SENTINEL, 3000);
 
@@ -776,6 +762,7 @@ describe("createTerminalSessionInternal — host-service restart adoption", () =
 			workspaceId,
 			db,
 			listed: true,
+			replayOnAdoption: false,
 		});
 		assert.ok(!("error" in second));
 		if ("error" in second) return;
@@ -785,23 +772,29 @@ describe("createTerminalSessionInternal — host-service restart adoption", () =
 			"adopted session should have same shell pid",
 		);
 
-		// Ring replay arrives asynchronously; the sentinel must land in the
-		// fresh tracker so the next grid resync can deliver it.
-		await waitFor(() => sessionBufferText(second).includes(SENTINEL), 5000);
-		const capture = makeCaptureSocket();
-		sendGridResync(second, capture.socket, { reset: true });
-		assert.ok(
-			capture.received().includes(SENTINEL),
-			"resync after adoption should carry the prior lifetime's output",
+		// The shell may still produce live prompt bytes after reconnect, but
+		// the daemon ring-buffer sentinel from the previous host lifetime must
+		// not be replayed when replayOnAdoption=false.
+		await new Promise((r) => setTimeout(r, 500));
+
+		const bufferedAfterAdoption = Buffer.concat(
+			second.buffer.map((b) => Buffer.from(b)),
+		).toString("utf8");
+		assert.equal(
+			bufferedAfterAdoption.includes(SENTINEL),
+			false,
+			`adopted session replayed prior output despite replayOnAdoption=false: ${JSON.stringify(bufferedAfterAdoption.slice(0, 200))}`,
 		);
 
 		// Sanity check: live output still flows post-reattach.
 		const LIVE_SENTINEL = `live-after-reattach-${randomUUID().slice(0, 6)}`;
 		second.pty.write(`echo ${LIVE_SENTINEL}\n`);
-		await waitFor(
-			() => sessionBufferText(second).includes(LIVE_SENTINEL),
-			3000,
-		);
+		await waitFor(() => {
+			const text = Buffer.concat(
+				second.buffer.map((b) => Buffer.from(b)),
+			).toString("utf8");
+			return text.includes(LIVE_SENTINEL);
+		}, 3000);
 
 		await disposeSessionAndWait(terminalId, db);
 	});
@@ -940,10 +933,8 @@ async function waitForOutput(
 	}
 }
 
-function sessionBufferText(session: {
-	modeTracker: { snapshot(): { text: string } };
-}): string {
-	return session.modeTracker.snapshot().text;
+function sessionBufferText(session: { buffer: Uint8Array[] }): string {
+	return Buffer.concat(session.buffer).toString("utf8");
 }
 
 function makeCaptureSocket() {
