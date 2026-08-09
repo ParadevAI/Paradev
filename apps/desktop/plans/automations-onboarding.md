@@ -18,7 +18,7 @@ Layout (replaces `AutomationsEmptyState` content; stat cards + tabs stay above p
    ┌──────────────────────────────────────────────┐
    │  ✦  <rotating placeholder, see below>     ↑  │   ← NL input (Phase 2 chat;
    └──────────────────────────────────────────────┘      interim: prefills CreateAutomationDialog)
-     Runs land in a workspace — review the
+     Runs land in a workspace. Review the
      diff, merge what's good.                          ← the one education line
 
    SUGGESTED                                          ← 4 cards, picked by repo signals

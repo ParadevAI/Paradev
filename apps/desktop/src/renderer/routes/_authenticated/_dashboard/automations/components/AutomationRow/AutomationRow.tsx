@@ -263,7 +263,7 @@ export function AutomationRow({
 											</TooltipTrigger>
 											<TooltipContent>
 												{lastRunMeta.failed
-													? "The last run failed — open its workspace to see why"
+													? "The last run failed. Open its workspace to see why"
 													: "Open the run's workspace"}
 											</TooltipContent>
 										</Tooltip>

@@ -16,7 +16,7 @@ export function TemplateCard({ template, onSelect }: TemplateCardProps) {
 				<span className="text-base leading-none">{template.emoji}</span>
 				{template.name}
 			</span>
-			<span className="line-clamp-2 text-xs text-muted-foreground">
+			<span className="line-clamp-3 text-xs text-muted-foreground">
 				{template.description}
 			</span>
 		</button>

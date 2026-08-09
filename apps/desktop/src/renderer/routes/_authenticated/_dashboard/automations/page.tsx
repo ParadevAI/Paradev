@@ -35,7 +35,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { useLiveQuery } from "@tanstack/react-db";
 import { useMutation } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
 	LuCircleHelp,
@@ -43,11 +43,13 @@ import {
 	LuRotateCw,
 	LuSearch,
 	LuSearchX,
+	LuSparkles,
 	LuTerminal,
 	LuX,
 } from "react-icons/lu";
 import { useRecentProjects } from "renderer/hooks/host-projects/useRecentProjects";
 import { useNow } from "renderer/hooks/useNow";
+import { useV2AgentChoices } from "renderer/hooks/useV2AgentChoices";
 import { apiTrpcClient } from "renderer/lib/api-trpc-client";
 import { authClient } from "renderer/lib/auth-client";
 import { DATA_TABLE_HEAD_CELL } from "renderer/routes/_authenticated/_dashboard/components/DataTableHeader";
@@ -56,7 +58,10 @@ import {
 	type SortDirection,
 } from "renderer/routes/_authenticated/_dashboard/components/SortableHeader";
 import { useFailedAutomations } from "renderer/routes/_authenticated/_dashboard/hooks/useFailedAutomations";
+import { AGENT_STORAGE_KEY } from "renderer/routes/_authenticated/components/DashboardNewWorkspaceModal/components/DashboardNewWorkspaceForm/PromptGroup/types";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
+import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
+import { useWorkspaceCreates } from "renderer/stores/workspace-creates";
 import { AutomationRow } from "./components/AutomationRow";
 import { AutomationStatCards } from "./components/AutomationStatCards";
 import { AutomationsEmptyState } from "./components/AutomationsEmptyState";
@@ -75,6 +80,12 @@ export const Route = createFileRoute("/_authenticated/_dashboard/automations/")(
 type Scope = "mine" | "team";
 
 type AutomationSortField = "name" | "owner" | "schedule" | "status";
+
+// Seeds the "Create with AI" agent session. The skill is provisioned as
+// superset:automate; mentioning it by name loads it (it isn't in the chat
+// slash-command allowlist).
+const AUTOMATION_AGENT_PROMPT =
+	"Help me create a Superset automation. Use the superset:automate skill if it's available, otherwise the `superset` CLI (start with `superset automations --help`). Ask me what should run on a schedule, confirm the cadence, target project, and agent, then create the automation and trigger a first run so we can review the result together.";
 
 function settledErrorMessage(result: PromiseSettledResult<unknown>) {
 	return result.status === "rejected" && result.reason instanceof Error
@@ -415,6 +426,47 @@ function AutomationsPage() {
 		setCreateOpen(true);
 	};
 
+	const navigate = useNavigate();
+	const { machineId, activeHostUrl } = useLocalHostService();
+	const { agents: agentChoices } = useV2AgentChoices(activeHostUrl);
+	const { submit: submitWorkspaceCreate } = useWorkspaceCreates();
+
+	// Opens a project-less agent session seeded with automation-creation
+	// instructions. The in-app "superset" chat agent can't run the CLI, so
+	// pick the user's last terminal agent (composer behavior).
+	const [creatingWithAgent, setCreatingWithAgent] = useState(false);
+	const handleCreateWithAgent = () => {
+		if (creatingWithAgent) return;
+		if (!machineId) {
+			toast.error("Host service is not running");
+			return;
+		}
+		const terminalAgents = agentChoices.filter((a) => a.id !== "superset");
+		const stored = window.localStorage.getItem(AGENT_STORAGE_KEY);
+		const agent =
+			terminalAgents.find((a) => a.id === stored)?.id ?? terminalAgents[0]?.id;
+		if (!agent) {
+			toast.error("No terminal agent is configured on this device");
+			return;
+		}
+		setCreatingWithAgent(true);
+		const { workspaceId, completed } = submitWorkspaceCreate({
+			hostId: machineId,
+			snapshot: {
+				id: crypto.randomUUID(),
+				projectId: null,
+				agents: [{ agent, prompt: AUTOMATION_AGENT_PROMPT }],
+			},
+		});
+		// The store shows creation failures on the optimistic sidebar row; this
+		// just re-arms the button if the user navigates back.
+		void completed.finally(() => setCreatingWithAgent(false));
+		navigate({
+			to: "/v2-workspace/$workspaceId",
+			params: { workspaceId },
+		}).catch(() => {});
+	};
+
 	const handleDialogOpenChange = (next: boolean) => {
 		setCreateOpen(next);
 		if (!next) setInitialTemplate(null);
@@ -425,10 +477,11 @@ function AutomationsPage() {
 	const statusWidth = scope === "team" ? "w-[12%]" : "w-[13%]";
 	const columnCount = scope === "team" ? 6 : 5;
 	const showAutomationLoading = !automationsReady && tabVisible.length === 0;
-	const showMineEmptyState =
-		automationsReady && tabVisible.length === 0 && scope === "mine";
-	const showTeamEmptyState =
-		automationsReady && tabVisible.length === 0 && scope === "team";
+	// True first run: nothing in the org — stats/tabs/search are noise.
+	const orgEmpty = automationsReady && automations.length === 0;
+	const tabEmpty = automationsReady && tabVisible.length === 0;
+	const showMineEmptyState = tabEmpty && scope === "mine";
+	const showTeamEmptyState = tabEmpty && scope === "team";
 
 	const renderAutomationRow = (automation: SelectAutomation) => (
 		<AutomationRow
@@ -484,7 +537,7 @@ function AutomationsPage() {
 			<div className="drag h-10 shrink-0" />
 
 			<div className="min-h-0 flex-1 overflow-y-auto">
-				<div className="mx-auto w-full max-w-5xl px-8 pb-12">
+				<div className="mx-auto flex min-h-full w-full max-w-5xl flex-col px-8 pb-12">
 					<div className="flex items-center justify-between">
 						<h1 className="text-xl font-semibold tracking-tight">
 							Automations
@@ -512,6 +565,17 @@ function AutomationsPage() {
 							</Tooltip>
 							<Button
 								type="button"
+								variant="outline"
+								size="sm"
+								className="h-8 gap-1.5 px-3"
+								disabled={creatingWithAgent}
+								onClick={handleCreateWithAgent}
+							>
+								<LuSparkles className="size-4" />
+								<span>Create with AI</span>
+							</Button>
+							<Button
+								type="button"
 								size="sm"
 								className="h-8 gap-1.5 px-3"
 								onClick={() => setCreateOpen(true)}
@@ -522,91 +586,99 @@ function AutomationsPage() {
 						</div>
 					</div>
 
-					<div className="mt-5">
-						{showAutomationLoading ? (
-							<div className="grid grid-cols-3 gap-2">
-								{["a", "b", "c"].map((key) => (
-									<Skeleton key={key} className="h-[70px] w-full" />
-								))}
-							</div>
-						) : (
-							<AutomationStatCards
-								active={runStats.active}
-								created7d={runStats.created7d}
-								failed7d={runStats.failed7d}
-								failedFilter={failedOnly}
-								canFilterFailed={failedInTab.length > 0}
-								onToggleFailedFilter={() => setFailedOnly((v) => !v)}
-							/>
-						)}
-					</div>
-
-					<div className="mt-6 flex items-center justify-between gap-2">
-						<Tabs value={scope} onValueChange={handleScopeChange}>
-							<TabsList className="h-8 bg-transparent p-0 gap-1">
-								<TabsTrigger
-									value="mine"
-									className="h-8 rounded-md px-3 data-[state=active]:bg-accent data-[state=active]:text-foreground data-[state=inactive]:text-muted-foreground"
-								>
-									<span className="text-sm">Mine</span>
-									<span className="ml-1 tabular-nums text-xs text-muted-foreground">
-										{mineCount}
-									</span>
-								</TabsTrigger>
-								<TabsTrigger
-									value="team"
-									className="h-8 rounded-md px-3 data-[state=active]:bg-accent data-[state=active]:text-foreground data-[state=inactive]:text-muted-foreground"
-								>
-									<span className="text-sm">Team</span>
-									<span className="ml-1 tabular-nums text-xs text-muted-foreground">
-										{teamCount}
-									</span>
-								</TabsTrigger>
-							</TabsList>
-						</Tabs>
-						<div className="flex items-center gap-2">
-							{scope === "mine" && failedMine.length > 0 && (
-								<Tooltip>
-									<TooltipTrigger asChild>
-										<Button
-											type="button"
-											variant="outline"
-											size="sm"
-											className="h-8 gap-1.5 px-3"
-											disabled={retryAllMutation.isPending}
-											onClick={() => retryAllMutation.mutate(failedMine)}
-										>
-											<LuRotateCw
-												className={cn(
-													"size-4",
-													retryAllMutation.isPending && "animate-spin",
-												)}
-											/>
-											<span>Retry all</span>
-											<span className="tabular-nums text-xs text-muted-foreground">
-												{failedMine.length}
-											</span>
-										</Button>
-									</TooltipTrigger>
-									<TooltipContent>
-										Retry every automation whose last run failed
-									</TooltipContent>
-								</Tooltip>
-							)}
-							<div className="relative">
-								<LuSearch className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
-								<Input
-									value={search}
-									onChange={(e) => setSearch(e.target.value)}
-									placeholder="Search"
-									aria-label="Search automations"
-									className="h-8 w-44 pl-8"
+					{/* Zero-count stats and search are noise while a tab is empty;
+					    with nothing in the org at all the tabs go too. */}
+					{!tabEmpty && (
+						<div className="mt-5">
+							{showAutomationLoading ? (
+								<div className="grid grid-cols-3 gap-2">
+									{["a", "b", "c"].map((key) => (
+										<Skeleton key={key} className="h-[70px] w-full" />
+									))}
+								</div>
+							) : (
+								<AutomationStatCards
+									active={runStats.active}
+									created7d={runStats.created7d}
+									failed7d={runStats.failed7d}
+									failedFilter={failedOnly}
+									canFilterFailed={failedInTab.length > 0}
+									onToggleFailedFilter={() => setFailedOnly((v) => !v)}
 								/>
-							</div>
+							)}
 						</div>
-					</div>
+					)}
 
-					<div className="mt-3">
+					{!orgEmpty && (
+						<div className="mt-6 flex items-center justify-between gap-2">
+							<Tabs value={scope} onValueChange={handleScopeChange}>
+								<TabsList className="h-8 bg-transparent p-0 gap-1">
+									<TabsTrigger
+										value="mine"
+										className="h-8 rounded-md px-3 data-[state=active]:bg-accent data-[state=active]:text-foreground data-[state=inactive]:text-muted-foreground"
+									>
+										<span className="text-sm">Mine</span>
+										<span className="ml-1 tabular-nums text-xs text-muted-foreground">
+											{mineCount}
+										</span>
+									</TabsTrigger>
+									<TabsTrigger
+										value="team"
+										className="h-8 rounded-md px-3 data-[state=active]:bg-accent data-[state=active]:text-foreground data-[state=inactive]:text-muted-foreground"
+									>
+										<span className="text-sm">Team</span>
+										<span className="ml-1 tabular-nums text-xs text-muted-foreground">
+											{teamCount}
+										</span>
+									</TabsTrigger>
+								</TabsList>
+							</Tabs>
+							{!tabEmpty && (
+								<div className="flex items-center gap-2">
+									{scope === "mine" && failedMine.length > 0 && (
+										<Tooltip>
+											<TooltipTrigger asChild>
+												<Button
+													type="button"
+													variant="outline"
+													size="sm"
+													className="h-8 gap-1.5 px-3"
+													disabled={retryAllMutation.isPending}
+													onClick={() => retryAllMutation.mutate(failedMine)}
+												>
+													<LuRotateCw
+														className={cn(
+															"size-4",
+															retryAllMutation.isPending && "animate-spin",
+														)}
+													/>
+													<span>Retry all</span>
+													<span className="tabular-nums text-xs text-muted-foreground">
+														{failedMine.length}
+													</span>
+												</Button>
+											</TooltipTrigger>
+											<TooltipContent>
+												Retry every automation whose last run failed
+											</TooltipContent>
+										</Tooltip>
+									)}
+									<div className="relative">
+										<LuSearch className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
+										<Input
+											value={search}
+											onChange={(e) => setSearch(e.target.value)}
+											placeholder="Search"
+											aria-label="Search automations"
+											className="h-8 w-44 pl-8"
+										/>
+									</div>
+								</div>
+							)}
+						</div>
+					)}
+
+					<div className={cn("mt-3", tabEmpty && "flex flex-1 flex-col")}>
 						{showAutomationLoading ? (
 							<div className="space-y-2">
 								{["a", "b", "c", "d", "e", "f"].map((key) => (
@@ -614,10 +686,10 @@ function AutomationsPage() {
 								))}
 							</div>
 						) : showMineEmptyState ? (
-							<div className="py-10">
+							<div className="flex flex-1 flex-col py-6">
 								<AutomationsEmptyState
 									onSelectTemplate={handleSelectTemplate}
-									onCreate={() => setCreateOpen(true)}
+									onCreateWithAgent={handleCreateWithAgent}
 								/>
 							</div>
 						) : showTeamEmptyState ? (
@@ -727,7 +799,7 @@ function AutomationsPage() {
 						)}
 					</div>
 
-					{!cliHintDismissed && !showAutomationLoading && (
+					{!cliHintDismissed && !showAutomationLoading && !tabEmpty && (
 						<div className="relative mt-4 flex items-center gap-2.5 rounded-lg border border-border/60 px-3 py-2 pr-9">
 							<LuTerminal className="size-3.5 shrink-0 text-muted-foreground" />
 							<p className="min-w-0 truncate text-xs text-muted-foreground">
