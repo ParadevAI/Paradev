@@ -234,6 +234,15 @@ const SHELL_READY_TIMEOUT_MS = 15_000;
 const INITIAL_COMMAND_ENTER_DELAY_MS = 500;
 
 /**
+ * Gap between a follow-up send's text and the Enter that submits it. TUI
+ * agents treat bytes arriving together as one paste burst, so an Enter
+ * bundled with the text can be swallowed into the draft instead of
+ * submitting it when the session is busy or slow (#6243). The delay puts
+ * the Enter in its own read, where it can only be a keypress.
+ */
+const FOLLOW_UP_ENTER_DELAY_MS = 500;
+
+/**
  * Byte ceiling for typing an initialCommand directly into the PTY. The
  * shell-ready marker fires from precmd, before the line editor switches the
  * TTY to raw mode; input written in that gap queues under the kernel's
@@ -319,6 +328,13 @@ interface TerminalSession {
 	 * paste, focus, mouse, etc. that the FIFO can't restore on its own.
 	 */
 	modeTracker: ModeTracker;
+
+	/**
+	 * Tail of the in-flight follow-up send (writeFramedInputToSession).
+	 * Serializes text + delayed-Enter sequences so concurrent sends can't
+	 * interleave inside another send's Enter window.
+	 */
+	followUpWriteChain?: Promise<void>;
 }
 
 /** PTY lifetime is independent of socket lifetime — sockets detach/reattach freely. */
@@ -624,6 +640,14 @@ async function waitForAdoptionReplay(session: TerminalSession): Promise<void> {
 }
 
 /**
+ * In-flight headless adoptions by terminal id. Concurrent callers racing an
+ * adoption would each build their own TerminalSession (independent
+ * followUpWriteChain, duplicate daemon subscriptions) — sharing the leader's
+ * attempt keeps session identity unique per terminal.
+ */
+const adoptionsInFlight = new Map<string, Promise<unknown>>();
+
+/**
  * Resolve a session for headless IO. The in-memory map empties on every
  * host-service restart while the detached daemon keeps PTYs alive, so a
  * miss is not "gone" — recover it the same way pane auto-adoption does.
@@ -639,25 +663,44 @@ async function getOrAdoptSession({
 	db: HostDb;
 	eventBus?: EventBus;
 }): Promise<TerminalSession | { error: string }> {
-	const existing = sessions.get(terminalId);
-	if (existing) {
-		if (existing.workspaceId !== workspaceId) {
-			return { error: "Terminal session does not belong to this workspace" };
+	for (;;) {
+		const existing = sessions.get(terminalId);
+		if (existing) {
+			if (existing.workspaceId !== workspaceId) {
+				return { error: "Terminal session does not belong to this workspace" };
+			}
+			return existing;
 		}
-		return existing;
+
+		// Another caller is mid-adoption: wait it out, then re-resolve so
+		// this caller runs its own workspace check (or leads a fresh attempt
+		// if the leader failed).
+		const pending = adoptionsInFlight.get(terminalId);
+		if (pending) {
+			await pending.catch(() => {});
+			continue;
+		}
+
+		const attempt = (async () => {
+			const adopted = await createTerminalSessionInternal({
+				terminalId,
+				workspaceId,
+				db,
+				eventBus,
+				adoptOnly: true,
+			});
+			if ("error" in adopted) return adopted;
+
+			await waitForAdoptionReplay(adopted);
+			return adopted;
+		})();
+		adoptionsInFlight.set(terminalId, attempt);
+		try {
+			return await attempt;
+		} finally {
+			adoptionsInFlight.delete(terminalId);
+		}
 	}
-
-	const adopted = await createTerminalSessionInternal({
-		terminalId,
-		workspaceId,
-		db,
-		eventBus,
-		adoptOnly: true,
-	});
-	if ("error" in adopted) return adopted;
-
-	await waitForAdoptionReplay(adopted);
-	return adopted;
 }
 
 /**
@@ -692,11 +735,38 @@ export async function writeFramedInputToSession({
 		return { error: "Terminal session has exited" };
 	}
 
-	const framed = session.modeTracker.isBracketedPasteActive()
-		? `\x1b[200~${text}\x1b[201~`
-		: text;
-	session.pty.write(submit ? `${framed}\r` : framed);
-	return { success: true };
+	// Serialize sends per session: the delayed Enter opens a window where a
+	// concurrent send's text (even a submit: false draft) would land between
+	// this text and its Enter and get submitted by it.
+	const previous = session.followUpWriteChain ?? Promise.resolve();
+	const task = previous.then(
+		async (): Promise<{ success: true } | { error: string }> => {
+			if (session.exited) {
+				return { error: "Terminal session has exited" };
+			}
+			const framed = session.modeTracker.isBracketedPasteActive()
+				? `\x1b[200~${text}\x1b[201~`
+				: text;
+			if (!submit) {
+				session.pty.write(framed);
+				return { success: true };
+			}
+			if (text.length > 0) {
+				session.pty.write(framed);
+				await new Promise((r) => setTimeout(r, FOLLOW_UP_ENTER_DELAY_MS));
+				if (session.exited) {
+					return { error: "Terminal session has exited" };
+				}
+			}
+			session.pty.write("\r");
+			return { success: true };
+		},
+	);
+	session.followUpWriteChain = task.then(
+		() => undefined,
+		() => undefined,
+	);
+	return task;
 }
 
 /**
