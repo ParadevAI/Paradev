@@ -158,6 +158,13 @@ export interface TerminalTransport {
 	/** Internal: bound resume handler shared by the online/focus/visibility
 	 * listeners, so they can be removed on teardown. */
 	_resumeListener: (() => void) | null;
+	/**
+	 * Internal: removes the textarea focus/blur listeners that keep the
+	 * host's declared focus state current. The host aggregates the declared
+	 * state across sockets, so it must track live focus changes — xterm's
+	 * in-band \x1b[I/\x1b[O reports bypass that aggregation.
+	 */
+	_disposeFocusListeners: (() => void) | null;
 }
 
 const MAX_LOG_ENTRIES = 200;
@@ -334,6 +341,7 @@ export function createTransport(
 		_livenessTimer: null,
 		_lastLivenessTick: 0,
 		_resumeListener: null,
+		_disposeFocusListeners: null,
 	};
 }
 
@@ -506,6 +514,20 @@ export function connect(
 	transport.currentUrl = wsUrl;
 	transport._localToken = extractToken(wsUrl);
 	transport._terminal = terminal;
+	// Keep the host's declared focus state current across live focus changes,
+	// not just at attach — the host writes the aggregate across all attached
+	// clients, so a pane whose focus only travelled in-band would be invisible
+	// to it and an unfocused sibling could clobber the program's state.
+	if (!transport._disposeFocusListeners && terminal.textarea) {
+		const textarea = terminal.textarea;
+		const send = () => sendFocusState(transport);
+		textarea.addEventListener("focus", send);
+		textarea.addEventListener("blur", send);
+		transport._disposeFocusListeners = () => {
+			textarea.removeEventListener("focus", send);
+			textarea.removeEventListener("blur", send);
+		};
+	}
 	transport._terminated = false;
 	transport._diagnosisLogged = false;
 	transport.lastDiagnosis = null;
@@ -647,6 +669,18 @@ function attachSocketListeners(
 			transport.seqAnchor = { epoch: message.epoch, seq: message.seq };
 			transport._seqCounting = true;
 			transport._seqEverSynced = true;
+			// Re-assert current keyboard focus so the running program's focus
+			// state can't stay stale across the reattach (tmux does the same on
+			// client attach). xterm's own DECSET-1004 self-report fires while
+			// the preamble parses, but on a rebuilt pane it can read the focus
+			// class before pane focus settles and report the wrong state — so
+			// this must land at the PTY *after* that report. `synced` arrives
+			// behind the preamble frame: flush it into xterm, then queue an
+			// empty write whose callback runs once the preamble (and any
+			// self-report it triggered) has parsed. The host forwards the state
+			// only when the program enabled mode 1004.
+			transport._writeCoalescer?.flushSync();
+			terminal.write("", () => sendFocusState(transport));
 			return;
 		}
 
@@ -767,6 +801,8 @@ export function reconnect(transport: TerminalTransport) {
 
 export function disconnect(transport: TerminalTransport) {
 	teardownLiveness(transport);
+	transport._disposeFocusListeners?.();
+	transport._disposeFocusListeners = null;
 	if (transport._socket) {
 		transport._socket.close();
 		transport._socket = null;
@@ -801,6 +837,17 @@ export function getPersistableSeqAnchor(
 	return null;
 }
 
+function sendFocusState(transport: TerminalTransport) {
+	const socket = transport._socket;
+	if (!socket || socket.readyState !== WebSocket.OPEN) return;
+	const textarea = transport._terminal?.textarea ?? null;
+	const focused =
+		textarea !== null &&
+		document.hasFocus() &&
+		document.activeElement === textarea;
+	socket.send(JSON.stringify({ type: "focus", focused }));
+}
+
 export function sendResize(
 	transport: TerminalTransport,
 	cols: number,
@@ -827,6 +874,8 @@ export function sendDispose(transport: TerminalTransport) {
 
 export function disposeTransport(transport: TerminalTransport) {
 	teardownLiveness(transport);
+	transport._disposeFocusListeners?.();
+	transport._disposeFocusListeners = null;
 	if (transport._socket) {
 		transport._socket.close();
 		transport._socket = null;
