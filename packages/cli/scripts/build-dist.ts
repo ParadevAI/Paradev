@@ -60,6 +60,7 @@ const RUNTIME_PACKAGES = [
 	"@duckdb/node-api",
 	"@duckdb/node-bindings",
 	"@xterm/headless",
+	"@xterm/addon-serialize",
 ] as const;
 
 /**
