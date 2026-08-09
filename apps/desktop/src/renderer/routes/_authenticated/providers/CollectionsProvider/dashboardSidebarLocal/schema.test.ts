@@ -90,6 +90,32 @@ describe("healV2UserPreferences", () => {
 			DEFAULT_V2_USER_PREFERENCES.sidebarFileLinks,
 		);
 	});
+
+	it("migrates the legacy url link default to the current default", () => {
+		const healed = healV2UserPreferences({
+			urlLinks: {
+				plain: null,
+				shift: null,
+				meta: "pane",
+				metaShift: "external",
+			},
+		});
+
+		expect(healed.urlLinks).toEqual(DEFAULT_V2_USER_PREFERENCES.urlLinks);
+		expect(healed.urlLinks.shift).toBe("newTab");
+	});
+
+	it("keeps a customized url link map untouched", () => {
+		const customized = {
+			plain: "external",
+			shift: null,
+			meta: "pane",
+			metaShift: "external",
+		} as const;
+		const healed = healV2UserPreferences({ urlLinks: customized });
+
+		expect(healed.urlLinks).toEqual(customized);
+	});
 });
 
 describe("healWorkspaceLocalState", () => {

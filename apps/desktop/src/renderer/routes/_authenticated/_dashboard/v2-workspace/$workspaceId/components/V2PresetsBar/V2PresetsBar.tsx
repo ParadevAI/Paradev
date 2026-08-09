@@ -233,7 +233,7 @@ export function V2PresetsBar({
 			style={{ scrollbarWidth: "none" }}
 		>
 			<DropdownMenu>
-				<Tooltip delayDuration={1000}>
+				<Tooltip delayDuration={1000} disableHoverableContent>
 					<TooltipTrigger asChild>
 						<DropdownMenuTrigger asChild>
 							<Button
