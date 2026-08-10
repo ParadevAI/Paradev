@@ -1,11 +1,11 @@
 import { create } from "zustand";
 
 /**
- * Workspace ids with a destroy in flight. The archive commit point lands
- * AFTER the (potentially slow) teardown script, so for those seconds the
- * rows are still present in every list — navigation targeting and keyboard
- * shortcuts must not send the user into a workspace that is about to
- * vanish. Module-scope store, not a provider: it is written imperatively
+ * Workspace ids with a destroy in flight. The archive commit tombstones the
+ * row almost immediately, but there's still a window before the broadcast
+ * lands (plus the reappear-on-failure case) — navigation targeting and
+ * keyboard shortcuts must not send the user into a workspace that is about
+ * to vanish. Module-scope store, not a provider: it is written imperatively
  * by the destroy flows and read wherever a target is picked.
  */
 interface DeletingWorkspacesState {

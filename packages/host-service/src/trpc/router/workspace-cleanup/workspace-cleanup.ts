@@ -45,7 +45,7 @@ export interface DestroyWorkspaceInput {
 	deleteBranch: boolean;
 	force: boolean;
 	/**
-	 * Teardown (step 1) behavior — deliberately separate from `force`, which
+	 * Teardown (step 2) behavior — deliberately separate from `force`, which
 	 * only carries the destructive git semantics (skip preflight, double-force
 	 * worktree removal):
 	 *   - "blocking":    a failed script throws PRECONDITION_FAILED so an
@@ -147,25 +147,29 @@ export const workspaceCleanupRouter = router({
 	/**
 	 * Destroy a workspace in phases:
 	 *
-	 *   0.   Preflight    — dirty-worktree check (skip if force)
-	 *   1.   Teardown     — run .superset/teardown.sh (per teardownMode)
-	 *   1.5. Archive      ← the commit point: the row tombstones
+	 *   0.   Archive      ← the commit point, FIRST: the row tombstones
 	 *                       (archivedAt/archiveReason) and vanishes from
-	 *                       default lists
-	 *   2.   Local cleanup — PTYs, worktree
-	 *   3.   Best-effort legacy cloud delete (skipped for sessions)
-	 *   4.   Branch delete — optional local branch cleanup
-	 *   5.   Caches
+	 *                       default lists before any slow work, so the
+	 *                       delete feels instant in every client
+	 *   1.   Preflight    — dirty-worktree check (skip if force)
+	 *   2.   Teardown     — run .superset/teardown.sh (per teardownMode)
+	 *   3.   Local cleanup — PTYs, worktree
+	 *   4.   Best-effort legacy cloud delete (skipped for sessions)
+	 *   5.   Branch delete — optional local branch cleanup
+	 *   6.   Caches
 	 *
-	 * A failure in phases 2-5 un-archives the row so the workspace stays
-	 * visible and retryable instead of orphaning disk state; a crash after
-	 * the archive is finished by the startup reconciler
-	 * (runArchivedWorkspaceReconcile).
+	 * A thrown failure — preflight conflict, blocking teardown, or the
+	 * unrecoverable parts of step 3 — un-archives the row so the workspace
+	 * reappears and stays retryable instead of orphaning disk state.
+	 * Steps 4-6 (and the tolerated parts of step 3) degrade to warnings on
+	 * a still-successful delete, and telemetry fires on that success. A
+	 * crash after the archive is finished by the startup reconciler
+	 * (runArchivedWorkspaceReconcile) with best-effort teardown.
 	 *
 	 * Force semantics (git only; teardown is governed by teardownMode):
-	 *   - skips preflight (step 0)
-	 *   - step 2b always uses `--force --force`
-	 *   - step 4 always uses `-D` regardless: the `deleteBranch`
+	 *   - skips preflight (step 1)
+	 *   - step 3b always uses `--force --force`
+	 *   - step 5 always uses `-D` regardless: the `deleteBranch`
 	 *     checkbox is the user's consent, so refusing unmerged branches
 	 *     would just silently drop the opt-in.
 	 *
@@ -187,14 +191,21 @@ export const workspaceCleanupRouter = router({
 				workspaceId: z.string(),
 				deleteBranch: z.boolean().default(false),
 				force: z.boolean().default(false),
+				// Consent to NOT run the teardown script — set only by the
+				// teardown-failed retry. Deliberately a separate flag from
+				// `force`, which carries only the git-destructive consent
+				// (dirty worktree / unpushed commits): a warned "Delete
+				// anyway" must still run teardown, otherwise editing any
+				// tracked file silently disables the user's cleanup script.
+				skipTeardown: z.boolean().default(false),
 			}),
 		)
 		.mutation(async ({ ctx, input }) =>
 			destroyWorkspace(ctx, {
-				...input,
-				// Interactive contract: force-retry is the user's explicit consent
-				// to abandon a failed teardown.
-				teardownMode: input.force ? "skip" : "blocking",
+				workspaceId: input.workspaceId,
+				deleteBranch: input.deleteBranch,
+				force: input.force,
+				teardownMode: input.skipTeardown ? "skip" : "blocking",
 			}),
 		),
 });
@@ -232,84 +243,16 @@ async function runDestroy(
 	}
 	const { local, project } = main;
 
-	// ─── Step 0: Preflight ─────────────────────────────────────────
-	// Block only on dirty worktree (the common "I forgot to commit"
-	// case). Missing/broken local state is handled by the cleanup phase.
-	// Sessions are standalone repos — the same dirty check applies even
-	// though they have no project row.
-	if (!input.force && local && (project || local.type === "session")) {
-		try {
-			const gitEnv = await cleanupGitOps.resolveGitEnv(ctx, local.worktreePath);
-			const state = await cleanupGitOps.readWorktreeState({
-				worktreePath: local.worktreePath,
-				gitEnv,
-			});
-			if (state.hasChanges) {
-				throw new TRPCError({
-					code: "CONFLICT",
-					message: "Worktree has uncommitted changes",
-				});
-			}
-		} catch (err) {
-			if (err instanceof TRPCError) throw err;
-			if (isIndeterminateGitTaskFailure(err)) {
-				// Timeout/pool failure: dirty-state is UNKNOWN. Fail closed on
-				// this destructive path rather than silently skipping the
-				// dirty-worktree block — a retry usually succeeds (the first
-				// attempt warmed the FS cache), and force skips preflight
-				// entirely as the explicit escape hatch.
-				const message = err instanceof Error ? err.message : String(err);
-				throw new TRPCError({
-					code: "INTERNAL_SERVER_ERROR",
-					message: `Couldn't verify worktree state at ${local.worktreePath}: ${message}`,
-				});
-			}
-			// Can't read status (missing worktree dir, etc.) — not a
-			// conflict. Continue; step 3b will skip idempotently.
-		}
-	}
-
-	// ─── Step 1: Teardown ──────────────────────────────────────────
-	// Script is the user's last chance to stop services / flush state
-	// before the workspace goes away. Deliberately BEFORE the archive
-	// commit point: a blocking failure here re-opens the delete dialog
-	// with a force-retry, and that dialog lives under the still-visible
-	// row — archiving first would unmount it mid-prompt.
-	if (input.teardownMode !== "skip" && local && project) {
-		const teardown: TeardownResult = await runTeardown({
-			db: ctx.db,
-			workspaceId: input.workspaceId,
-			worktreePath: local.worktreePath,
-			repoPath: project.repoPath,
-			projectId: project.id,
-		});
-		if (teardown.status === "failed") {
-			if (input.teardownMode === "blocking") {
-				const cause: TeardownFailureCause = {
-					kind: "TEARDOWN_FAILED",
-					exitCode: teardown.exitCode,
-					signal: teardown.signal,
-					timedOut: teardown.timedOut,
-					outputTail: teardown.outputTail,
-				};
-				// Recoverable via force-retry — an expected user-script failure, not a
-				// service bug; must not be reported as a 500.
-				throw new TRPCError({
-					code: "PRECONDITION_FAILED",
-					message: "Teardown script failed",
-					cause,
-				});
-			}
-			warnings.push(formatTeardownWarning(teardown));
-		}
-	}
-
-	// ─── Step 1.5: Archive (the commit point) ──────────────────────
-	// The tombstone is a durable delete-intent record: the row vanishes
-	// from default lists on every device before any physical destruction,
-	// and if the host crashes mid-cleanup the startup reconciler finishes
-	// the job. A cleanup failure below un-archives so the workspace stays
-	// live and retryable. Sessions tombstone too — they're workspaces with
+	// ─── Step 0: Archive (the commit point) ────────────────────────
+	// FIRST, before any slow work (git preflight, teardown script): the
+	// tombstone is a durable delete-intent record, and its broadcast is
+	// what drops the row from every list — archiving up front is what
+	// makes the delete feel instant. If the host crashes mid-cleanup the
+	// startup reconciler finishes the job with best-effort teardown. ANY
+	// failure below un-archives so the workspace reappears live and
+	// retryable. The renderer's delete dialog is globally mounted (not
+	// under the row) so a teardown-failure prompt survives the row
+	// vanishing here. Sessions tombstone too — they're workspaces with
 	// a little missing data (no project, no PRs; reason is always
 	// "deleted"), and session folder names are claimed against ALL rows
 	// including tombstones, so a tombstone's path can't be reused.
@@ -319,6 +262,81 @@ async function runDestroy(
 	}
 
 	try {
+		// ─── Step 1: Preflight ─────────────────────────────────────
+		// Block only on dirty worktree (the common "I forgot to commit"
+		// case). Missing/broken local state is handled by the cleanup phase.
+		// Sessions are standalone repos — the same dirty check applies even
+		// though they have no project row.
+		if (!input.force && local && (project || local.type === "session")) {
+			try {
+				const gitEnv = await cleanupGitOps.resolveGitEnv(
+					ctx,
+					local.worktreePath,
+				);
+				const state = await cleanupGitOps.readWorktreeState({
+					worktreePath: local.worktreePath,
+					gitEnv,
+				});
+				if (state.hasChanges) {
+					throw new TRPCError({
+						code: "CONFLICT",
+						message: "Worktree has uncommitted changes",
+					});
+				}
+			} catch (err) {
+				if (err instanceof TRPCError) throw err;
+				if (isIndeterminateGitTaskFailure(err)) {
+					// Timeout/pool failure: dirty-state is UNKNOWN. Fail closed on
+					// this destructive path rather than silently skipping the
+					// dirty-worktree block — a retry usually succeeds (the first
+					// attempt warmed the FS cache), and force skips preflight
+					// entirely as the explicit escape hatch.
+					const message = err instanceof Error ? err.message : String(err);
+					throw new TRPCError({
+						code: "INTERNAL_SERVER_ERROR",
+						message: `Couldn't verify worktree state at ${local.worktreePath}: ${message}`,
+					});
+				}
+				// Can't read status (missing worktree dir, etc.) — not a
+				// conflict. Continue; step 3b will skip idempotently.
+			}
+		}
+
+		// ─── Step 2: Teardown ──────────────────────────────────────
+		// Script is the user's last chance to stop services / flush state
+		// before the workspace goes away. Runs after the archive so the
+		// (potentially slow) script never delays the row leaving the UI; a
+		// blocking failure throws, the catch below un-archives, and the
+		// globally-mounted dialog re-opens with a force-retry.
+		if (input.teardownMode !== "skip" && local && project) {
+			const teardown: TeardownResult = await runTeardown({
+				db: ctx.db,
+				workspaceId: input.workspaceId,
+				worktreePath: local.worktreePath,
+				repoPath: project.repoPath,
+				projectId: project.id,
+			});
+			if (teardown.status === "failed") {
+				if (input.teardownMode === "blocking") {
+					const cause: TeardownFailureCause = {
+						kind: "TEARDOWN_FAILED",
+						exitCode: teardown.exitCode,
+						signal: teardown.signal,
+						timedOut: teardown.timedOut,
+						outputTail: teardown.outputTail,
+					};
+					// Recoverable via force-retry — an expected user-script failure, not a
+					// service bug; must not be reported as a 500.
+					throw new TRPCError({
+						code: "PRECONDITION_FAILED",
+						message: "Teardown script failed",
+						cause,
+					});
+				}
+				warnings.push(formatTeardownWarning(teardown));
+			}
+		}
+
 		const result = await runDestroyPhases(ctx, input, {
 			local,
 			project,
@@ -372,8 +390,8 @@ async function runDestroyPhases(
 		warnings: string[];
 	},
 ) {
-	// ─── Step 2: Local cleanup ─────────────────────────────────────
-	// 2a. PTYs
+	// ─── Step 3: Local cleanup ─────────────────────────────────────
+	// 3a. PTYs
 	try {
 		const killed = await disposeSessionsByWorkspaceId(
 			input.workspaceId,
@@ -387,7 +405,7 @@ async function runDestroyPhases(
 		warnings.push(`Failed to dispose terminal sessions: ${message}`);
 	}
 
-	// 2b. Worktree. Double-force unlocks the rare locked-worktree case and
+	// 3b. Worktree. Double-force unlocks the rare locked-worktree case and
 	//     clears stale metadata when the directory was manually removed.
 	//     Runs in the worker pool: the removal is a recursive delete of the
 	//     whole worktree directory, which would otherwise stall the loop.
@@ -475,8 +493,8 @@ async function runDestroyPhases(
 		}
 	}
 
-	// ─── Step 3: Legacy cloud cleanup ──────────────────────────────
-	// The row already committed at step 1.5 (archived tombstone). The
+	// ─── Step 4: Legacy cloud cleanup ──────────────────────────────
+	// The row already committed at step 0 (archived tombstone). The
 	// cloud delete is best-effort legacy cleanup for rows mirrored before
 	// workspaces went fully local.
 	let cloudDeleted = false;
@@ -493,7 +511,7 @@ async function runDestroyPhases(
 		}
 	}
 
-	// ─── Step 4: Optional branch delete ────────────────────────────
+	// ─── Step 5: Optional branch delete ────────────────────────────
 	// After the local commit point so a failure here can't block the delete.
 	// An absent ref (renamed, pruned, or never materialized) already
 	// satisfies the goal, so the task skips the delete without a scary
@@ -513,7 +531,7 @@ async function runDestroyPhases(
 		}
 	}
 
-	// ─── Step 5: Caches ────────────────────────────────────────────
+	// ─── Step 6: Caches ────────────────────────────────────────────
 	if (local) {
 		try {
 			invalidateLabelCache(input.workspaceId);

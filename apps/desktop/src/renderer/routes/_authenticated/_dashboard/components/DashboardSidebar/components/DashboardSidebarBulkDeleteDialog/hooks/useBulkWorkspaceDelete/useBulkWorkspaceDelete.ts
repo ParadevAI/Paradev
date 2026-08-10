@@ -122,10 +122,14 @@ export function useBulkWorkspaceDelete({
 		async ({
 			targets,
 			forceAll,
+			skipTeardown,
 			retainedFailures,
 		}: {
 			targets: DashboardSidebarWorkspace[];
 			forceAll: boolean;
+			/** Only the teardown-failure retry pass abandons teardown; warned
+			 * (forced) deletes still run it. */
+			skipTeardown: boolean;
 			retainedFailures: BulkWorkspaceDeleteFailure[];
 		}) => {
 			if (inFlight.current || targets.length === 0) return;
@@ -174,6 +178,7 @@ export function useBulkWorkspaceDelete({
 						destroyWorkspaceAtHost(targetFor(workspace), {
 							deleteBranch: preferences.deleteLocalBranch,
 							force,
+							skipTeardown,
 						}),
 					onSettled: () => setCompletedCount((count) => count + 1),
 				});
@@ -261,6 +266,7 @@ export function useBulkWorkspaceDelete({
 		await execute({
 			targets: workspaces,
 			forceAll: false,
+			skipTeardown: false,
 			retainedFailures: [],
 		});
 	}, [execute, inspectionSummary.canConfirm, workspaces]);
@@ -276,6 +282,7 @@ export function useBulkWorkspaceDelete({
 		await execute({
 			targets: teardownFailures.map((failure) => failure.workspace),
 			forceAll: true,
+			skipTeardown: true,
 			retainedFailures: failures.filter(
 				(failure) => !teardownWorkspaceIds.has(failure.workspace.id),
 			),

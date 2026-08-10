@@ -7,15 +7,15 @@ import {
 } from "@superset/ui/context-menu";
 import { toast } from "@superset/ui/sonner";
 import { useNavigate } from "@tanstack/react-router";
-import { type ReactNode, useCallback, useState } from "react";
+import { type ReactNode, useCallback } from "react";
 import { LuArrowUpRight, LuGitBranch, LuTrash2 } from "react-icons/lu";
 import { RiPushpinFill, RiPushpinLine } from "react-icons/ri";
 import { GATED_FEATURES, usePaywall } from "renderer/components/Paywall";
 import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
-import { DashboardSidebarDeleteDialog } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/components/DashboardSidebarDeleteDialog";
 import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces";
 import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
+import { useDeleteWorkspaceIntent } from "renderer/stores/delete-workspace-intent";
 
 export interface V2WorkspaceActions {
 	/** Navigate to the workspace (paywall-gated for remote hosts). */
@@ -45,17 +45,10 @@ export function V2WorkspaceContextMenu({
 }: V2WorkspaceContextMenuProps) {
 	const navigate = useNavigate();
 	const { gateFeature } = usePaywall();
-	const {
-		ensureWorkspaceInSidebar,
-		removeWorkspaceFromSidebar,
-		hideWorkspaceInSidebar,
-	} = useDashboardSidebarState();
+	const { ensureWorkspaceInSidebar, hideWorkspaceInSidebar } =
+		useDashboardSidebarState();
 	const { copyToClipboard } = useCopyToClipboard();
 	const isMainWorkspace = workspace.type === "main";
-	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-	// Latched on first open so the dialog stays mounted through the destroy —
-	// a teardown failure re-opens it to offer force-delete.
-	const [deleteDialogMounted, setDeleteDialogMounted] = useState(false);
 
 	const open = useCallback(() => {
 		const go = () => navigateToV2Workspace(workspace.id, navigate);
@@ -112,80 +105,63 @@ export function V2WorkspaceContextMenu({
 		}
 	}, [copyToClipboard, workspace.branch]);
 
+	// Globally-mounted dialog (DeleteWorkspaceMount): archive-first
+	// tombstoning drops this row the moment the destroy starts, which
+	// would unmount a row-local dialog mid-flight.
 	const openDeleteDialog = useCallback(() => {
-		setDeleteDialogMounted(true);
-		setIsDeleteDialogOpen(true);
-	}, []);
-
-	const handleDeleted = useCallback(() => {
-		setDeleteDialogMounted(false);
-		removeWorkspaceFromSidebar(workspace.id);
-	}, [removeWorkspaceFromSidebar, workspace.id]);
+		useDeleteWorkspaceIntent.getState().request({
+			workspaceId: workspace.id,
+			workspaceName: workspace.name || workspace.branch,
+		});
+	}, [workspace.id, workspace.name, workspace.branch]);
 
 	return (
-		<>
-			<ContextMenu>
-				<ContextMenuTrigger asChild>
-					{children({
-						open,
-						addToSidebar,
-						removeFromSidebar,
-						openDeleteDialog,
-					})}
-				</ContextMenuTrigger>
-				<ContextMenuContent
-					onCloseAutoFocus={(event) => event.preventDefault()}
-				>
-					<ContextMenuItem onSelect={open}>
-						<LuArrowUpRight className="size-4" />
-						Open
+		<ContextMenu>
+			<ContextMenuTrigger asChild>
+				{children({
+					open,
+					addToSidebar,
+					removeFromSidebar,
+					openDeleteDialog,
+				})}
+			</ContextMenuTrigger>
+			<ContextMenuContent onCloseAutoFocus={(event) => event.preventDefault()}>
+				<ContextMenuItem onSelect={open}>
+					<LuArrowUpRight className="size-4" />
+					Open
+				</ContextMenuItem>
+				<ContextMenuItem onSelect={handleCopyBranchName}>
+					<LuGitBranch className="size-4" />
+					Copy Branch Name
+				</ContextMenuItem>
+				<ContextMenuSeparator />
+				{workspace.isInSidebar ? (
+					<ContextMenuItem
+						onSelect={removeFromSidebar}
+						disabled={isCurrentRoute}
+					>
+						<RiPushpinLine className="size-4" />
+						Unpin from Sidebar
 					</ContextMenuItem>
-					<ContextMenuItem onSelect={handleCopyBranchName}>
-						<LuGitBranch className="size-4" />
-						Copy Branch Name
+				) : (
+					<ContextMenuItem onSelect={addToSidebar}>
+						<RiPushpinFill className="size-4" />
+						Pin to Sidebar
 					</ContextMenuItem>
-					<ContextMenuSeparator />
-					{workspace.isInSidebar ? (
+				)}
+				{!isMainWorkspace ? (
+					<>
+						<ContextMenuSeparator />
 						<ContextMenuItem
-							onSelect={removeFromSidebar}
-							disabled={isCurrentRoute}
+							onSelect={openDeleteDialog}
+							className="text-destructive focus:text-destructive"
 						>
-							<RiPushpinLine className="size-4" />
-							Unpin from Sidebar
+							<LuTrash2 className="size-4 text-destructive" />
+							Delete
 						</ContextMenuItem>
-					) : (
-						<ContextMenuItem onSelect={addToSidebar}>
-							<RiPushpinFill className="size-4" />
-							Pin to Sidebar
-						</ContextMenuItem>
-					)}
-					{!isMainWorkspace ? (
-						<>
-							<ContextMenuSeparator />
-							<ContextMenuItem
-								onSelect={openDeleteDialog}
-								className="text-destructive focus:text-destructive"
-							>
-								<LuTrash2 className="size-4 text-destructive" />
-								Delete
-							</ContextMenuItem>
-						</>
-					) : null}
-				</ContextMenuContent>
-			</ContextMenu>
-			{/* Mount the dialog (and its per-workspace live-query subscription)
-			    only once the user opened it — not idle for every row. The latch
-			    keeps it mounted through the destroy so a teardown-failure can
-			    re-open it to offer force-delete. */}
-			{!isMainWorkspace && deleteDialogMounted ? (
-				<DashboardSidebarDeleteDialog
-					workspaceId={workspace.id}
-					workspaceName={workspace.name || workspace.branch}
-					open={isDeleteDialogOpen}
-					onOpenChange={setIsDeleteDialogOpen}
-					onDeleted={handleDeleted}
-				/>
-			) : null}
-		</>
+					</>
+				) : null}
+			</ContextMenuContent>
+		</ContextMenu>
 	);
 }

@@ -236,9 +236,12 @@ describe("workspaceCleanup.destroy integration", () => {
 		// the workspace is live and retryable.
 		expect(remaining[0]?.archivedAt).toBeNull();
 
+		// The teardown-failed retry carries both consents: force (git) and
+		// skipTeardown — force alone would run the failing script again.
 		const result = await scenario.host.trpc.workspaceCleanup.destroy.mutate({
 			workspaceId: scenario.featureWorkspaceId,
 			force: true,
+			skipTeardown: true,
 		});
 		expect(result.success).toBe(true);
 		expect(result.worktreeRemoved).toBe(true);

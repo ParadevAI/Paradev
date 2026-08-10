@@ -95,14 +95,25 @@ export function useDestroyDialogState({
 	);
 
 	const run = useCallback(
-		async (force: boolean) => {
+		// Two separate consents, never conflated: `force` covers git
+		// destructiveness (dirty worktree, unpushed commits), `skipTeardown`
+		// covers abandoning the teardown script and is set only by the
+		// teardown-failed retry — a warned "Delete anyway" still runs teardown.
+		async ({
+			force,
+			skipTeardown = false,
+		}: {
+			force: boolean;
+			skipTeardown?: boolean;
+		}) => {
 			if (inFlight.current) return;
 			inFlight.current = true;
 
 			setError(null);
 			onOpenChange(false);
-			// The row stays listed until the archive commit (post-teardown);
-			// mark it so navigation/shortcuts skip it in the meantime.
+			// The archive commit tombstones the row almost immediately, but
+			// until that broadcast lands (and if a failure un-archives it)
+			// navigation/shortcuts must skip it.
 			useDeletingWorkspacesStore.getState().markDeleting(workspaceId);
 			// Navigate up-front: no-ops if the deleted workspace isn't the
 			// active route, so a later user navigation won't be hijacked.
@@ -116,17 +127,18 @@ export function useDestroyDialogState({
 			try {
 				let result: DestroyWorkspaceSuccess;
 				try {
-					result = await destroy({ deleteBranch, force });
+					result = await destroy({ deleteBranch, force, skipTeardown });
 				} catch (firstErr) {
 					const e = firstErr as DestroyWorkspaceError;
 					// Silent force-retry on the dirty-worktree race: preflight said
 					// clean but the worktree was dirty by destroy time. The user
 					// already confirmed once — don't bounce them back through a
-					// second warning. Do NOT extend this to `in-progress` (that's
-					// a different CONFLICT cause; retrying just races the same
+					// second warning. Git consent only: teardown still runs on the
+					// retry. Do NOT extend this to `in-progress` (that's a
+					// different CONFLICT cause; retrying just races the same
 					// guard).
 					if (e.kind === "conflict" && !force) {
-						result = await destroy({ deleteBranch, force: true });
+						result = await destroy({ deleteBranch, force: true, skipTeardown });
 					} else {
 						throw firstErr;
 					}

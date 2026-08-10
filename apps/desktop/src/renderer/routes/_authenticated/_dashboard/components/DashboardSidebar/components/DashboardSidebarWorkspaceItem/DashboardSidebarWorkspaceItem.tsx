@@ -14,7 +14,6 @@ import { RenameBranchDialog } from "renderer/screens/main/components/WorkspaceSi
 import { useDashboardSidebarHover } from "../../providers/DashboardSidebarHoverProvider";
 import type { WorkspaceSelectionEvent } from "../../providers/DashboardSidebarSelectionProvider";
 import type { DashboardSidebarWorkspace } from "../../types";
-import { DashboardSidebarDeleteDialog } from "../DashboardSidebarDeleteDialog";
 import { DashboardSidebarCollapsedWorkspaceButton } from "./components/DashboardSidebarCollapsedWorkspaceButton";
 import { DashboardSidebarExpandedWorkspaceRow } from "./components/DashboardSidebarExpandedWorkspaceRow";
 import {
@@ -70,19 +69,17 @@ export function DashboardSidebarWorkspaceItem({
 		handleCopyPath,
 		handleCopyBranchName,
 		handleCreateSection,
-		handleDeleted,
 		handleOpenInFinder,
 		handleRemoveFromSidebar,
 		handleRemovePullRequest,
 		handleTogglePin,
 		handleToggleUnread,
 		isActive,
-		isDeleteDialogOpen,
 		isUnread,
 		isRenaming,
 		moveWorkspaceToSection,
 		renameValue,
-		setIsDeleteDialogOpen,
+		requestDelete,
 		setRenameValue,
 		startRename,
 		submitRename,
@@ -254,9 +251,7 @@ export function DashboardSidebarWorkspaceItem({
 							onRemoveFromSidebar={handleRemoveFromSidebar}
 							onRemovePullRequest={handleRemovePullRequest}
 							onRename={isMainWorkspace ? undefined : startRename}
-							onDelete={
-								isMainWorkspace ? undefined : () => setIsDeleteDialogOpen(true)
-							}
+							onDelete={isMainWorkspace ? undefined : requestDelete}
 							onToggleUnread={handleToggleUnread}
 							onClearStatus={handleClearStatus}
 						>
@@ -265,15 +260,6 @@ export function DashboardSidebarWorkspaceItem({
 					)}
 				</div>
 
-				{!isPending && !isMainWorkspace && (
-					<DashboardSidebarDeleteDialog
-						workspaceId={id}
-						workspaceName={name || branch}
-						open={isDeleteDialogOpen}
-						onOpenChange={setIsDeleteDialogOpen}
-						onDeleted={handleDeleted}
-					/>
-				)}
 				{renameBranchTarget && (
 					<RenameBranchDialog
 						workspaceId={id}
@@ -315,7 +301,7 @@ export function DashboardSidebarWorkspaceItem({
 				onWorkspaceChipsClick={handleWorkspaceChipsClick}
 				onDoubleClick={isPending || isMainWorkspace ? undefined : startRename}
 				onRemoveFromSidebarClick={handleRemoveFromSidebar}
-				onCloseWorkspaceClick={() => setIsDeleteDialogOpen(true)}
+				onCloseWorkspaceClick={requestDelete}
 				onRenameValueChange={setRenameValue}
 				onSubmitRename={submitRename}
 				onCancelRename={cancelRename}
@@ -357,9 +343,7 @@ export function DashboardSidebarWorkspaceItem({
 						onRemoveFromSidebar={handleRemoveFromSidebar}
 						onRemovePullRequest={handleRemovePullRequest}
 						onRename={isMainWorkspace ? undefined : startRename}
-						onDelete={
-							isMainWorkspace ? undefined : () => setIsDeleteDialogOpen(true)
-						}
+						onDelete={isMainWorkspace ? undefined : requestDelete}
 						onToggleUnread={handleToggleUnread}
 						onClearStatus={handleClearStatus}
 					>
@@ -368,15 +352,6 @@ export function DashboardSidebarWorkspaceItem({
 				)}
 			</div>
 
-			{!isPending && !isMainWorkspace && (
-				<DashboardSidebarDeleteDialog
-					workspaceId={id}
-					workspaceName={name || branch}
-					open={isDeleteDialogOpen}
-					onOpenChange={setIsDeleteDialogOpen}
-					onDeleted={handleDeleted}
-				/>
-			)}
 			{renameBranchTarget && (
 				<RenameBranchDialog
 					workspaceId={id}
