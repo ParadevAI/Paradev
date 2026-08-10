@@ -111,6 +111,36 @@ export interface ProjectChangedMessage {
 	occurredAt: number;
 }
 
+export interface WorkspaceCreateTerminalLaunch {
+	terminalId: string;
+	label?: string;
+}
+
+export type WorkspaceCreateAgentLaunch =
+	| { ok: true; kind: "terminal" | "chat"; sessionId: string; label: string }
+	| { ok: false; error: string };
+
+/**
+ * Terminal event for an enqueued `workspaces.createEnqueued` call. The HTTP
+ * response returns immediately; this carries what the synchronous
+ * `workspaces.create` response used to: the canonical row id (which can
+ * differ from the enqueue id when the create resolved to an existing
+ * workspace) and the launched terminals/agents for the pane-layout seed.
+ */
+export interface WorkspaceCreateSettledMessage {
+	type: "workspace:create-settled";
+	/** The client-minted id from the enqueue call — the correlation key. */
+	workspaceId: string;
+	ok: boolean;
+	canonicalWorkspaceId: string | null;
+	projectId: string | null;
+	terminals: WorkspaceCreateTerminalLaunch[];
+	agents: WorkspaceCreateAgentLaunch[];
+	alreadyExists: boolean;
+	error?: string;
+	occurredAt: number;
+}
+
 export interface EventBusErrorMessage {
 	type: "error";
 	message: string;
@@ -123,6 +153,7 @@ export type ServerMessage =
 	| TerminalLifecycleMessage
 	| PortChangedMessage
 	| WorkspaceChangedMessage
+	| WorkspaceCreateSettledMessage
 	| ProjectChangedMessage
 	| EventBusErrorMessage;
 

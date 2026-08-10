@@ -78,6 +78,7 @@ export interface CreateAppResult {
 	injectWebSocket: ReturnType<typeof createNodeWebSocket>["injectWebSocket"];
 	api: ApiClient;
 	db: HostDb;
+	eventBus: EventBus;
 	dispose: () => Promise<void>;
 }
 
@@ -365,5 +366,5 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		}
 	};
 
-	return { app, injectWebSocket, api, db, dispose };
+	return { app, injectWebSocket, api, db, eventBus, dispose };
 }

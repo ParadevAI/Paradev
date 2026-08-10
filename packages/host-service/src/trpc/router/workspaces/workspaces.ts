@@ -19,7 +19,7 @@ import {
 	insertLocalWorkspace,
 	toCloudShape,
 } from "../../../workspaces/local-workspace-store";
-import { protectedProcedure, router } from "../../index";
+import { createCallerFactory, protectedProcedure, router } from "../../index";
 import {
 	buildTerminalAgentLaunch,
 	isChatAgent,
@@ -1195,6 +1195,66 @@ export const workspacesRouter = router({
 			};
 		}),
 
+	/**
+	 * Enqueue-and-return variant of `create` for renderer clients: the full
+	 * create (worktree add, AI naming, agent dispatch) can run for minutes,
+	 * which would pin one of Chromium's 6-per-origin pooled sockets — and
+	 * relay-fronted hosts hard-cap request exchanges at 30s. Validates
+	 * cheaply, responds immediately, then runs the real `create` in the
+	 * background and broadcasts a `workspace:create-settled` event carrying
+	 * everything the synchronous response used to. CLI/MCP/SDK/automations
+	 * keep calling `create` directly.
+	 */
+	createEnqueued: protectedProcedure
+		.input(createInputSchema)
+		.mutation(({ ctx, input }) => {
+			const workspaceId = input.id;
+			if (!workspaceId) {
+				throw new TRPCError({
+					code: "BAD_REQUEST",
+					message: "createEnqueued requires a client-minted `id`",
+				});
+			}
+			for (const launch of input.agents ?? []) {
+				validateAgentLaunchEffort(ctx.db, launch);
+			}
+			requireLocalProject(ctx, input.projectId);
+
+			void createWorkspacesCaller(ctx)
+				.create(input)
+				.then((result) => {
+					ctx.eventBus.broadcastWorkspaceCreateSettled({
+						workspaceId,
+						ok: true,
+						canonicalWorkspaceId: result.workspace.id,
+						projectId: result.workspace.projectId ?? null,
+						terminals: result.terminals,
+						agents: result.agents,
+						alreadyExists: result.alreadyExists,
+						occurredAt: Date.now(),
+					});
+				})
+				.catch((error) => {
+					console.warn(
+						`[workspaces.createEnqueued] create failed for workspace ${workspaceId} (project ${input.projectId})`,
+						error,
+					);
+					ctx.eventBus.broadcastWorkspaceCreateSettled({
+						workspaceId,
+						ok: false,
+						canonicalWorkspaceId: null,
+						projectId: null,
+						terminals: [],
+						agents: [],
+						alreadyExists: false,
+						error: error instanceof Error ? error.message : String(error),
+						occurredAt: Date.now(),
+					});
+				});
+
+			return { workspaceId };
+		}),
+
 	aiRename: protectedProcedure
 		.input(
 			z.object({
@@ -1260,5 +1320,10 @@ export const workspacesRouter = router({
 			return { branchName };
 		}),
 });
+
+// Server-side caller for createEnqueued's background run of the real create.
+// Declared after the router; the resolver closure only dereferences it at
+// request time, long after module init.
+const createWorkspacesCaller = createCallerFactory(workspacesRouter);
 
 export { generateWorkspaceNamesFromPrompt as _aiNamesGenerator };

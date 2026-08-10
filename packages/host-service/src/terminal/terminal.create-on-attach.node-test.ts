@@ -20,6 +20,7 @@ import { fileURLToPath } from "node:url";
 import { serve } from "@hono/node-server";
 import { createNodeWebSocket } from "@hono/node-ws";
 import { Server } from "@superset/pty-daemon";
+import { eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { createDb, type HostDb } from "../db/index.ts";
 import { projects, terminalSessions, workspaces } from "../db/schema.ts";
@@ -161,6 +162,15 @@ test("attach with create=1 creates the session for a brand-new id", async () => 
 	const result = await dial(terminalId, `?workspaceId=${workspaceId}&create=1`);
 	assert.deepEqual(result, { kind: "attached" });
 	assert.ok(isLiveTerminalSession(terminalId));
+
+	// The session must be persisted, not just in-memory — the row is what
+	// future attaches (and the session-gone contract) key off after restarts.
+	const row = db.query.terminalSessions
+		.findFirst({ where: eq(terminalSessions.id, terminalId) })
+		.sync();
+	assert.ok(row);
+	assert.equal(row.originWorkspaceId, workspaceId);
+	assert.equal(row.status, "active");
 
 	// The session now exists like any other: a plain re-attach works.
 	const reattach = await dial(terminalId, `?workspaceId=${workspaceId}`);
