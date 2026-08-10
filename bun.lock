@@ -114,7 +114,7 @@
     },
     "apps/desktop": {
       "name": "@superset/desktop",
-      "version": "1.20.1",
+      "version": "1.20.2",
       "dependencies": {
         "@agentclientprotocol/claude-agent-acp": "0.56.0",
         "@ai-sdk/anthropic": "3.0.64",
@@ -277,7 +277,7 @@
         "lucide-react": "0.563.0",
         "mastracode": "0.18.1",
         "mdast-util-to-string": "4.0.0",
-        "nanoid": "5.1.7",
+        "nanoid": "6.0.0",
         "native-keymap": "3.3.9",
         "node-addon-api": "7.1.1",
         "node-pty": "1.2.0-beta.14",
@@ -814,7 +814,7 @@
     },
     "packages/cli": {
       "name": "@superset/cli",
-      "version": "1.20.1",
+      "version": "1.20.2",
       "dependencies": {
         "@clack/prompts": "0.10.1",
         "@superset/cli-framework": "workspace:*",
@@ -909,7 +909,7 @@
     },
     "packages/host-service": {
       "name": "@superset/host-service",
-      "version": "1.20.1",
+      "version": "1.20.2",
       "dependencies": {
         "@agentclientprotocol/claude-agent-acp": "0.56.0",
         "@agentclientprotocol/sdk": "1.2.0",
@@ -1178,7 +1178,7 @@
         "input-otp": "1.4.2",
         "lucide-react": "0.563.0",
         "motion": "12.38.0",
-        "nanoid": "5.1.7",
+        "nanoid": "6.0.0",
         "next-themes": "0.4.6",
         "radix-ui": "1.4.3",
         "react-day-picker": "9.14.0",
@@ -5313,7 +5313,7 @@
 
     "mz": ["mz@2.7.0", "", { "dependencies": { "any-promise": "^1.0.0", "object-assign": "^4.0.1", "thenify-all": "^1.0.0" } }, "sha512-z81GNO7nnYMEhrGh9LeymoE4+Yr0Wn5McHIZMK5cfQCl+NDX08sCZgUc9/6MHni9IWuFLm1Z3HTCXu2z9fN62Q=="],
 
-    "nanoid": ["nanoid@5.1.7", "", { "bin": { "nanoid": "bin/nanoid.js" } }, "sha512-ua3NDgISf6jdwezAheMOk4mbE1LXjm1DfMUDMuJf4AqxLFK3ccGpgWizwa5YV7Yz9EpXwEaWoRXSb/BnV0t5dQ=="],
+    "nanoid": ["nanoid@6.0.0", "", { "bin": { "nanoid": "bin/nanoid.js" } }, "sha512-mkUH+rPkwU2qPadJ0oJZOjeZ5Mxn8Q1UhevwkTRWNuUZzyia3h4rhzK39hxaHTk0o2OxB8W2SQ6A8k23ZDi1pQ=="],
 
     "nanostores": ["nanostores@1.4.2", "", {}, "sha512-Wxv8Roefr2nqtiRG0bnaFlpYqpIVtOEeJZHaH+4nGgOK1/7n6OHOuHCb/bhqrNQgZM8fyd0s1PqhdrJc9Ib44g=="],
 
