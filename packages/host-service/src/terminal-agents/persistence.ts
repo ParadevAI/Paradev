@@ -213,7 +213,13 @@ export function seedEndedTerminalAgentBinding(
 export class SqliteTerminalAgentBindingPersistence
 	implements TerminalAgentBindingPersistence
 {
-	constructor(private readonly db: HostDb) {}
+	// No parameter property: this module is on terminal.ts's import chain,
+	// which node --experimental-strip-types test runners load unbundled.
+	private readonly db: HostDb;
+
+	constructor(db: HostDb) {
+		this.db = db;
+	}
 
 	load(): TerminalAgentBinding[] {
 		const rows = this.db

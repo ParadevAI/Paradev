@@ -2075,6 +2075,13 @@ export async function createTerminalSessionInternal({
 	return session;
 }
 
+// Concurrent create-on-attach dials for the same brand-new terminalId must
+// share one spawn instead of racing createTerminalSessionInternal.
+const inflightCreates = new Map<
+	string,
+	Promise<TerminalSession | { error: string }>
+>();
+
 export function registerWorkspaceTerminalRoute({
 	app,
 	db,
@@ -2167,6 +2174,11 @@ export function registerWorkspaceTerminalRoute({
 			const terminalId = c.req.param("terminalId") ?? "";
 			const requestedWorkspaceId = c.req.query("workspaceId") || null;
 			const seqRequest = parseSeqAttachParam(c.req.query("seq"));
+			// Optimistic pane creation: the renderer inserts the pane first and
+			// lets this attach create the session, so plain terminal creation
+			// never queues behind Chromium's 6-per-origin HTTP socket pool.
+			const createRequested = c.req.query("create") === "1";
+			const requestedThemeType = parseThemeType(c.req.query("themeType"));
 			const attachSocketToSession = (
 				session: TerminalSession,
 				ws: TerminalSocket,
@@ -2215,6 +2227,37 @@ export function registerWorkspaceTerminalRoute({
 					.findFirst({ where: eq(terminalSessions.id, terminalId) })
 					.sync();
 				if (!record) {
+					// Only ids with no session row at all qualify for create-on-attach
+					// — exited/disposed records below keep their session-gone answer.
+					if (createRequested && requestedWorkspaceId) {
+						const inflight = inflightCreates.get(terminalId);
+						if (inflight) {
+							const shared = await inflight;
+							if ("error" in shared) return shared;
+							// The shared spawn was created for the FIRST dial's workspace —
+							// validate ownership like every other attach path.
+							const mismatchError = getTerminalWorkspaceMismatchError({
+								terminalId,
+								ownerWorkspaceId: shared.workspaceId,
+								requestedWorkspaceId,
+							});
+							if (mismatchError) return { error: mismatchError };
+							return shared;
+						}
+						const createPromise = createTerminalSessionInternal({
+							terminalId,
+							workspaceId: requestedWorkspaceId,
+							themeType: requestedThemeType,
+							db,
+							eventBus,
+						});
+						inflightCreates.set(terminalId, createPromise);
+						try {
+							return await createPromise;
+						} finally {
+							inflightCreates.delete(terminalId);
+						}
+					}
 					return {
 						error: `Terminal session "${terminalId}" not found; create it before connecting.`,
 						code: "session-gone",
@@ -2246,14 +2289,12 @@ export function registerWorkspaceTerminalRoute({
 					if (mismatchError) return { error: mismatchError };
 				}
 
-				const themeType = parseThemeType(c.req.query("themeType"));
-
 				// Prefer adoption: if the daemon still owns the PTY across a
 				// host-service restart, we keep the live shell + ring buffer.
 				const adopted = await createTerminalSessionInternal({
 					terminalId,
 					workspaceId: record.originWorkspaceId,
-					themeType,
+					themeType: requestedThemeType,
 					db,
 					eventBus,
 					adoptOnly: true,
@@ -2284,7 +2325,7 @@ export function registerWorkspaceTerminalRoute({
 				return createTerminalSessionInternal({
 					terminalId,
 					workspaceId: record.originWorkspaceId,
-					themeType,
+					themeType: requestedThemeType,
 					db,
 					eventBus,
 					restoredNotice: true,
