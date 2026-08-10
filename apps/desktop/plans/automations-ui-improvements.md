@@ -85,6 +85,23 @@ Cursor's trigger UX to grow toward (`cursor2-editor-settings-pagerduty.png`): tr
 - Circuit breaker: evaluate cron tracks `consecutiveFailures` on the automation, auto-pauses at N (Kestra `stopAfter` pattern), sets `pausedReason`; UI shows "paused after N failed creates" banner with one-click resume + the underlying error. Schema: `consecutiveFailures`, `pausedReason` on `automations`.
 - Desktop notification on failed create (host offline being the common cause — the existing HostOfflineRunDialog flow stays the manual-run path); one "creating again" ping on first success after a streak.
 
+## Phase 5 — Detail page (audit 2026-08-09)
+
+Ref: `cursor2-editor-settings-pagerduty.png`, `cursor2-editor-weekly-full.png`, `mobbin-cursor-automation-run-history.png`, `codex-automation-edit-daily-brief.png`, `mobbin-chatgpt-task-edit-custom-schedule.png`.
+
+Current shape (`routes/.../automations/$automationId/page.tsx`): two-column, no tabs — h-11 breadcrumb header (icon actions: version history / pause / delete / Run now), inline title + prompt editor (blur-save), fixed 360px right rail (Status / Details pickers / last-10 runs). Cursor's detail page has the same skeleton (title, sectioned body, side-by-side config) — the gaps are outcome legibility and edit affordances, not layout.
+
+1. **Header, Cursor-style identity row**: under the title, an **Active toggle + owner name** (`cursor2-editor-settings-pagerduty.png`) replacing the icon-only pause button; a muted run-count chip ("12 runs · Active", Codex edit modal). Delete moves to a ⋯ overflow menu with a real confirm dialog (today: bare trash icon + `alert()`), gaining **Duplicate** (Cursor has it; trivial — copy row minus runs). Breadcrumb becomes a router `Link` (cmd-click works).
+2. **Tabs: Overview | Run history** (= Phase 3's tab). Rail run list shrinks to last-5 teaser + "View all →". Fixes the silent `RECENT_RUNS_LIMIT=10` cap and "Last ran" being computed over that truncated, `createdAt`-sorted window.
+3. **Failure legibility**: failed runs get persistent, `select-text` error text (today: hover-only `max-w-xs` tooltip — violates our own AGENTS error-text rule) + per-run **Retry** (parity with the list page's `useFailedAutomations` retry); a banner when the latest run failed to create.
+4. **Next run row**: relative time ("in 3h") with absolute on hover + next-3 occurrences via existing `nextOccurrences`; when paused show "would run at …" instead of `—` so schedule edits are previewable before resuming.
+5. **SchedulePicker correctness** (feeds Phase 4): picker calls `onRruleChange` per keystroke in Custom mode, persisting partial/invalid RRULEs — save only on valid parse/blur; validate via `automation.validateRrule`; echo the rule human-readably. Timezone row shows offset ("America/New_York · UTC−4"); picker list grouped/sorted, not raw `Intl.supportedValuesOf` order.
+6. **Save affordance**: name/prompt save on blur with zero feedback — add a transient "Saved" indicator and flush pending edits on nav/unmount.
+7. **Read-only mode disables, not hides**: non-owners currently lose every header action including version history and Run now, with the explanation buried in the rail. Show disabled controls + move "Owned by X" up next to the toggle.
+8. **Prompt column measure**: no max-width today — long lines on wide windows. Center at ~`max-w-3xl` like the dashboard (and Cursor's editor).
+
+Not adopting: model picker + Tools rows (Cursor) — the agent preset owns that; per-run Duration until a lifecycle exists (Phase 0 semantics); trigger chips beyond schedule (Phase 4's growth path).
+
 ---
 
 ## Order & dependencies
@@ -97,6 +114,7 @@ Cursor's trigger UX to grow toward (`cursor2-editor-settings-pagerduty.png`): tr
 | 2.5 onboarding | none (interim dialog-prefill); NL box benefits from 2 | S — see automations-onboarding.md |
 | 3 run history | 0 (language), #5449 status hooks | M — one tab |
 | 4 schedule + failure policy | migration for circuit breaker | S+S |
+| 5 detail page | 3 for the tab; rest independent | M — header/rail rework + picker fixes |
 
 All phases are independent enough to parallelize; 1 and 3 share row components (build together).
 

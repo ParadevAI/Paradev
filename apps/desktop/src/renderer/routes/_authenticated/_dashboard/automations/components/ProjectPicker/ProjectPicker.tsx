@@ -22,6 +22,7 @@ interface ProjectPickerProps {
 	/** Null = session mode: runs use project-less session workspaces. */
 	onSelectProject: (projectId: string | null) => void;
 	className?: string;
+	disabled?: boolean;
 }
 
 export function ProjectPicker({
@@ -30,13 +31,17 @@ export function ProjectPicker({
 	recentProjects,
 	onSelectProject,
 	className,
+	disabled,
 }: ProjectPickerProps) {
 	const [open, setOpen] = useState(false);
 
 	return (
-		<Popover open={open} onOpenChange={setOpen}>
+		// Guard the open state, not just the trigger: Radix opens on pointerdown,
+		// which Chromium still dispatches to fieldset-disabled buttons.
+		<Popover open={open} onOpenChange={(next) => !disabled && setOpen(next)}>
 			<PopoverTrigger asChild>
 				<PickerTrigger
+					disabled={disabled}
 					className={className}
 					icon={
 						selectedProject ? (

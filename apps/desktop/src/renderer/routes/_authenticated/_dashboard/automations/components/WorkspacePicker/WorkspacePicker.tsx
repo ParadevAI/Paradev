@@ -28,6 +28,7 @@ interface WorkspacePickerProps {
 	value: string | null;
 	onChange: (workspaceId: string | null) => void;
 	className?: string;
+	disabled?: boolean;
 }
 
 export function WorkspacePicker({
@@ -36,6 +37,7 @@ export function WorkspacePicker({
 	value,
 	onChange,
 	className,
+	disabled,
 }: WorkspacePickerProps) {
 	const [open, setOpen] = useState(false);
 	const collections = useCollections();
@@ -101,9 +103,12 @@ export function WorkspacePicker({
 					: "New workspace";
 
 	return (
-		<Popover open={open} onOpenChange={setOpen}>
+		// Guard the open state, not just the trigger: Radix opens on pointerdown,
+		// which Chromium still dispatches to fieldset-disabled buttons.
+		<Popover open={open} onOpenChange={(next) => !disabled && setOpen(next)}>
 			<PopoverTrigger asChild>
 				<PickerTrigger
+					disabled={disabled}
 					className={cn((offScope || missing) && "text-amber-500", className)}
 					icon={
 						offScope || missing ? (

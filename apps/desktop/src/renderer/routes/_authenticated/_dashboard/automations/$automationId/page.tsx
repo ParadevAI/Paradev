@@ -17,7 +17,6 @@ import { isHostOfflineError } from "../utils/hostOfflineError";
 import { isStaleAgentError, STALE_AGENT_HELP } from "../utils/staleAgentError";
 import { AutomationBody } from "./components/AutomationBody";
 import { AutomationDetailHeader } from "./components/AutomationDetailHeader";
-import { AutomationDetailSidebar } from "./components/AutomationDetailSidebar";
 import { VersionHistorySheet } from "./components/VersionHistorySheet";
 
 type AutomationDetailSearch = {
@@ -68,6 +67,17 @@ function AutomationDetailPage() {
 		[collections.automationRuns, automationId],
 	);
 	const recentRuns = runRows as SelectAutomationRun[];
+
+	const ownerUserId = automation?.ownerUserId;
+	const { data: ownerRows = [] } = useLiveQuery(
+		(q) =>
+			q
+				.from({ u: collections.users })
+				.where(({ u }) => eq(u.id, ownerUserId ?? ""))
+				.select(({ u }) => ({ name: u.name, email: u.email })),
+		[collections.users, ownerUserId],
+	);
+	const ownerName = ownerRows[0]?.name ?? ownerRows[0]?.email ?? null;
 
 	const setEnabledMutation = useMutation({
 		mutationFn: (enabled: boolean) =>
@@ -122,9 +132,6 @@ function AutomationDetailPage() {
 			<div className="flex flex-1 flex-col overflow-hidden">
 				<AutomationDetailHeader
 					name={automation.name}
-					enabled={automation.enabled}
-					onBack={() => navigate({ to: "/automations" })}
-					onToggleEnabled={() => setEnabledMutation.mutate(!automation.enabled)}
 					onDelete={() => {
 						alert({
 							title: "Delete automation?",
@@ -150,7 +157,6 @@ function AutomationDetailPage() {
 					}}
 					onRunNow={() => runNowMutation.mutate()}
 					onOpenHistory={() => setHistoryOpen(true)}
-					toggleDisabled={setEnabledMutation.isPending}
 					deleteDisabled={deleteMutation.isPending}
 					runNowDisabled={runNowMutation.isPending}
 					readOnly={readOnly}
@@ -159,15 +165,13 @@ function AutomationDetailPage() {
 				<AutomationBody
 					key={automation.id}
 					automation={automation}
+					recentRuns={recentRuns}
+					ownerName={ownerName}
+					onToggleEnabled={(enabled) => setEnabledMutation.mutate(enabled)}
+					toggleDisabled={setEnabledMutation.isPending}
 					readOnly={readOnly}
 				/>
 			</div>
-
-			<AutomationDetailSidebar
-				automation={automation}
-				recentRuns={recentRuns}
-				readOnly={readOnly}
-			/>
 
 			<HostOfflineRunDialog
 				hostId={automation.targetHostId}

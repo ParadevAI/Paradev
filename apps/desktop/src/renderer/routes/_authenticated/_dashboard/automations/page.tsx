@@ -712,7 +712,10 @@ function AutomationsPage() {
 							// sticks relative to the page scroll container.
 							<div className="rounded-xl border border-border">
 								<Table className="table-fixed">
-									<TableHeader className="sticky top-0 z-10 rounded-t-xl bg-background shadow-[inset_0_-1px_0_0_var(--color-border)] [&_tr]:border-b-0">
+									{/* Radius + bg live on the corner cells: Chromium ignores
+									    border-radius on table-header-groups, so a thead bg pokes
+									    square past the container's rounded corners. */}
+									<TableHeader className="sticky top-0 z-10 shadow-[inset_0_-1px_0_0_var(--color-border)] [&_th]:bg-background [&_tr>th:first-child]:rounded-tl-xl [&_tr>th:last-child]:rounded-tr-xl [&_tr]:border-b-0">
 										<TableRow className="hover:bg-transparent">
 											<TableHead className={cn(DATA_TABLE_HEAD_CELL, "pl-4")}>
 												<SortableHeader
