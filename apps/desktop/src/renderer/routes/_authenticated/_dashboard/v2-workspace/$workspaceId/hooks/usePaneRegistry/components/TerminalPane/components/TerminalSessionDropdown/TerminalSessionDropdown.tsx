@@ -95,16 +95,13 @@ export function TerminalSessionDropdown({
 	const utils = workspaceTrpc.useUtils();
 	const killTerminalSession = workspaceTrpc.terminal.killSession.useMutation();
 	const sessionsInput = useMemo(() => ({ workspaceId }), [workspaceId]);
-	const sessionsQuery = workspaceTrpc.terminal.listSessions.useQuery(
-		sessionsInput,
-		{
-			enabled: shouldQueryTerminalSessionList(isOpen),
-			notifyOnChangeProps: ["data", "isFetching"],
-			refetchInterval: getTerminalSessionListRefetchInterval(isOpen),
-			refetchOnWindowFocus: false,
-			staleTime: TERMINAL_SESSION_LIST_STALE_MS,
-		},
-	);
+	const sessionsQuery = workspaceTrpc.terminal.list.useQuery(sessionsInput, {
+		enabled: shouldQueryTerminalSessionList(isOpen),
+		notifyOnChangeProps: ["data", "isFetching"],
+		refetchInterval: getTerminalSessionListRefetchInterval(isOpen),
+		refetchOnWindowFocus: false,
+		staleTime: TERMINAL_SESSION_LIST_STALE_MS,
+	});
 	useRenderStressInstrumentation("TerminalSessionDropdown", {
 		warnAt: 30,
 		getDetails: () => ({
@@ -230,7 +227,7 @@ export function TerminalSessionDropdown({
 			});
 			closePanesForTerminal(session.terminalId);
 		} finally {
-			await utils.terminal.listSessions.invalidate({ workspaceId });
+			await utils.terminal.list.invalidate({ workspaceId });
 		}
 	};
 
@@ -260,7 +257,7 @@ export function TerminalSessionDropdown({
 			paneId: context.pane.id,
 			titleOverride: undefined,
 		});
-		void utils.terminal.listSessions.invalidate({ workspaceId });
+		void utils.terminal.list.invalidate({ workspaceId });
 		setIsOpen(false);
 	};
 

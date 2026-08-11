@@ -8,7 +8,7 @@ import {
 	disposeSessionAndWait,
 	disposeSessionsByWorkspaceId,
 	disposeSessionsByWorktreePath,
-	listWorkspaceTerminalSessions,
+	listLiveTerminalSessions,
 	parseThemeType,
 	sessionHasRunningProcess,
 	snapshotSession,
@@ -134,34 +134,19 @@ export const terminalRouter = router({
 		)
 		.mutation(createTerminalSessionFromInput),
 
-	listSessions: protectedProcedure
+	list: protectedProcedure
 		.input(
-			z.object({
-				workspaceId: z.string(),
-			}),
+			z
+				.object({
+					workspaceId: z.string().optional(),
+				})
+				.optional(),
 		)
 		.query(async ({ ctx, input }) => ({
-			sessions: await listWorkspaceTerminalSessions(ctx.db, input.workspaceId),
-		})),
-
-	countBackgroundSessions: protectedProcedure
-		.input(
-			z.object({
-				workspaceId: z.string(),
-				attachedTerminalIds: z.array(z.string()).default([]),
+			sessions: await listLiveTerminalSessions(ctx.db, {
+				workspaceId: input?.workspaceId,
 			}),
-		)
-		.query(async ({ ctx, input }) => {
-			const sessions = await listWorkspaceTerminalSessions(
-				ctx.db,
-				input.workspaceId,
-			);
-			const attached = new Set(input.attachedTerminalIds);
-			return {
-				count: sessions.filter((session) => !attached.has(session.terminalId))
-					.length,
-			};
-		}),
+		})),
 
 	hasRunningProcess: protectedProcedure
 		.input(

@@ -630,7 +630,8 @@ export function listTerminalSessions(
 }
 
 /**
- * Workspace session list sourced from truth, not from this process's memory.
+ * Live session list sourced from truth, not from this process's memory —
+ * host-wide by default, narrowed to one workspace when `workspaceId` is set.
  *
  * The in-memory map is attachment plumbing: it empties on every host-service
  * restart while the detached pty-daemon keeps PTYs alive, and it only
@@ -645,10 +646,11 @@ export function listTerminalSessions(
  * only the daemon knows has never been attached in this process's lifetime,
  * hence `attached: false, title: null`.
  */
-export async function listWorkspaceTerminalSessions(
+export async function listLiveTerminalSessions(
 	db: HostDb,
-	workspaceId: string,
+	options: { workspaceId?: string } = {},
 ): Promise<TerminalSessionSummary[]> {
+	const { workspaceId } = options;
 	// `getDaemonClient` gates on the daemon bootstrap (waitForDaemonReady +
 	// supervisor.ensure), so a query racing a host-service restart blocks
 	// until the daemon is adopted instead of observing it as unreachable.
@@ -663,7 +665,7 @@ export async function listWorkspaceTerminalSessions(
 		// view is the whole truth. The dropdowns' polls re-query, so a
 		// transient connection failure self-heals.
 		console.warn(
-			"[terminal] listWorkspaceTerminalSessions: daemon unreachable, serving in-memory view",
+			"[terminal] listLiveTerminalSessions: daemon unreachable, serving in-memory view",
 			{ workspaceId, error },
 		);
 		daemonAliveIds = null;
@@ -691,12 +693,17 @@ export async function listWorkspaceTerminalSessions(
 
 	const merged = [...known];
 	for (const row of rows) {
-		if (row.originWorkspaceId !== workspaceId) continue;
+		// Orphaned rows (workspace deleted → origin nulled) have no home in a
+		// grouped listing and can't be attached through workspace-scoped IO.
+		if (row.originWorkspaceId == null) continue;
+		if (workspaceId !== undefined && row.originWorkspaceId !== workspaceId) {
+			continue;
+		}
 		if (row.status !== "active") continue;
 		if (row.disposeRequestedAt != null) continue;
 		merged.push({
 			terminalId: row.id,
-			workspaceId,
+			workspaceId: row.originWorkspaceId,
 			createdAt: row.createdAt,
 			exited: false,
 			exitCode: 0,

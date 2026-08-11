@@ -127,7 +127,7 @@ export function useCreatePendingMigratedTerminals({
 			if (pending.length > 0) {
 				// Nudge the session list so auto-adopt builds the panes now
 				// rather than on the next natural refetch.
-				await utils.terminal.listSessions.invalidate({ workspaceId });
+				await utils.terminal.list.invalidate({ workspaceId });
 			}
 			runningRef.current = false;
 		})();

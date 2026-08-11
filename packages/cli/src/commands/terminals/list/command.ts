@@ -34,7 +34,7 @@ export default command({
 			userJwt: ctx.bearer,
 		});
 
-		const result = await target.client.terminal.listSessions.query({
+		const result = await target.client.terminal.list.query({
 			workspaceId: options.workspace,
 		});
 

@@ -105,10 +105,10 @@ export function TerminalPane({
 
 	const workspaceTrpcUtils = workspaceTrpc.useUtils();
 	const invalidateTerminalSessionsRef = useRef(
-		workspaceTrpcUtils.terminal.listSessions.invalidate,
+		workspaceTrpcUtils.terminal.list.invalidate,
 	);
 	invalidateTerminalSessionsRef.current =
-		workspaceTrpcUtils.terminal.listSessions.invalidate;
+		workspaceTrpcUtils.terminal.list.invalidate;
 
 	// useCallback so useSyncExternalStore doesn't re-subscribe every render —
 	// otherwise every keystroke-triggered re-render unsubscribes and

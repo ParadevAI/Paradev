@@ -132,7 +132,7 @@ export function usePaneRegistry({
 		workspaceTrpc.terminal.killSession.useMutation({
 			onSuccess: () => {
 				toast.success("Terminal session killed");
-				void workspaceTrpcUtils.terminal.listSessions.invalidate({
+				void workspaceTrpcUtils.terminal.list.invalidate({
 					workspaceId,
 				});
 			},
@@ -147,7 +147,7 @@ export function usePaneRegistry({
 	const { mutate: killTerminalSessionSilently } =
 		workspaceTrpc.terminal.killSession.useMutation({
 			onSuccess: () => {
-				void workspaceTrpcUtils.terminal.listSessions.invalidate({
+				void workspaceTrpcUtils.terminal.list.invalidate({
 					workspaceId,
 				});
 			},

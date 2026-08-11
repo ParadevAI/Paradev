@@ -75,7 +75,7 @@ async function hostCall<TOutput>(
 export function listHostTerminals(routingKey: string, workspaceId: string) {
 	return hostCall<{ sessions: HostTerminalSession[] }>(
 		routingKey,
-		"terminal.listSessions",
+		"terminal.list",
 		{ workspaceId },
 		"GET",
 	);
