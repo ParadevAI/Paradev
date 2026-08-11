@@ -1055,6 +1055,8 @@ export const auth = betterAuth({
 								),
 							},
 							retries: 3,
+							// portal collects the cancellation survey after cancel confirms; give it time
+							delay: 120,
 						});
 					} catch (error) {
 						console.error(
