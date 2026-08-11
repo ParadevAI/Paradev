@@ -1,12 +1,14 @@
 import {
+	CatchBoundary,
 	createFileRoute,
-	Navigate,
 	Outlet,
+	useLocation,
 	useMatchRoute,
 	useNavigate,
 } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { CommandPaletteHost } from "renderer/commandPalette";
+import { Redirect } from "renderer/components/Redirect";
 import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
 import { useHotkey } from "renderer/hotkeys";
 import { electronTrpc } from "renderer/lib/electron-trpc";
@@ -26,16 +28,12 @@ import {
 } from "renderer/stores/workspace-sidebar-state";
 import { AddRepositoryModals } from "./components/AddRepositoryModals";
 import { CrossVersionMismatchState } from "./components/CrossVersionMismatchState";
+import { DashboardContentError } from "./components/DashboardContentError";
 import { TopBar } from "./components/TopBar";
 
 export const Route = createFileRoute("/_authenticated/_dashboard")({
 	component: DashboardLayout,
 });
-
-// Hoisted for stable props identity — <Navigate> re-navigates whenever its
-// props object changes, so an inline element re-navigates on every re-render
-// until React throws error #185 (see routes/page.tsx, #5729, SUPER-1814).
-const newWorkspaceRedirect = <Navigate to="/new-workspace" replace />;
 
 /** v1 only — v2 deletes go through the globally-mounted DeleteWorkspaceMount
  * (see delete-workspace-intent store). */
@@ -47,6 +45,7 @@ type DeleteTarget = {
 
 function DashboardLayout() {
 	const navigate = useNavigate();
+	const location = useLocation();
 	const openNewWorkspaceModal = useOpenNewWorkspaceModal();
 	const isV2CloudEnabled = useIsV2CloudEnabled();
 	const { workspaces: hostWorkspaces } = useHostWorkspaces();
@@ -230,12 +229,23 @@ function DashboardLayout() {
 							// dead-end "pick a workspace" screen. v1 users keep the
 							// static state — /new-workspace is a v2-only surface.
 							isV2CloudEnabled ? (
-								newWorkspaceRedirect
+								<Redirect to="/new-workspace" replace />
 							) : (
 								<CrossVersionMismatchState />
 							)
 						) : (
-							<Outlet />
+							// Contain content-route crashes to this pane: without a
+							// boundary they bubble to the root and unmount the whole
+							// app, which reads as Superset restarting itself
+							// (SUPER-1814). Resets on navigation.
+							<CatchBoundary
+								// Full href, not just pathname: a same-path search/hash
+								// change (filter, tab) must also clear a stuck error pane.
+								getResetKey={() => location.href}
+								errorComponent={DashboardContentError}
+							>
+								<Outlet />
+							</CatchBoundary>
 						)}
 					</div>
 				</div>

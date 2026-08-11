@@ -114,7 +114,11 @@
 							"options": {
 								"paths": {
 									"@superset/workspace-fs/host": "Renderer code must stay browser-compatible. Import Node filesystem helpers from the desktop server/host layer instead.",
-									"@superset/workspace-fs/server": "Renderer code must stay browser-compatible. Import Node filesystem helpers from the desktop server/host layer instead."
+									"@superset/workspace-fs/server": "Renderer code must stay browser-compatible. Import Node filesystem helpers from the desktop server/host layer instead.",
+									"@tanstack/react-router": {
+										"importNames": ["Navigate"],
+										"message": "<Navigate> re-navigates whenever its props object identity changes — inline usage loops into React error #185 (#5729, SUPER-1814). Use Redirect from renderer/components/Redirect, or `beforeLoad: () => { throw redirect(...) }` for static targets."
+									}
 								},
 								"patterns": [
 									{
