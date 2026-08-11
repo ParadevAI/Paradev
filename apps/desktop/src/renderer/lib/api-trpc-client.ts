@@ -16,12 +16,12 @@ export const apiTrpcClient = createTRPCProxyClient<AppRouter>({
 			transformer: superjson,
 			headers: () => {
 				const token = getAuthToken();
-				if (token) {
-					return {
-						Authorization: `Bearer ${token}`,
-					};
-				}
-				return {};
+				return {
+					...(token ? { Authorization: `Bearer ${token}` } : {}),
+					...(window.App?.appVersion
+						? { "x-superset-client": `desktop/${window.App.appVersion}` }
+						: {}),
+				};
 			},
 		}),
 	],

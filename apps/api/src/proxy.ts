@@ -29,7 +29,7 @@ function getCorsHeaders(origin: string | null, deploymentOrigin: string) {
 		"Access-Control-Allow-Origin": isAllowed ? origin : "",
 		"Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
 		"Access-Control-Allow-Headers":
-			"Content-Type, Authorization, x-trpc-source, trpc-accept, Producer-Id, Producer-Epoch, Producer-Seq, Stream-Closed",
+			"Content-Type, Authorization, x-trpc-source, trpc-accept, x-superset-client, Producer-Id, Producer-Epoch, Producer-Seq, Stream-Closed",
 		"Access-Control-Expose-Headers": [
 			// Durable stream headers
 			"Stream-Next-Offset",

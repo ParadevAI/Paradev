@@ -249,7 +249,12 @@ const apiClient = createTRPCProxyClient<AppRouter>({
 			url: `${env.NEXT_PUBLIC_API_URL}/api/trpc`,
 			headers: () => {
 				const token = getAuthToken();
-				return token ? { Authorization: `Bearer ${token}` } : {};
+				return {
+					...(token ? { Authorization: `Bearer ${token}` } : {}),
+					...(window.App?.appVersion
+						? { "x-superset-client": `desktop/${window.App.appVersion}` }
+						: {}),
+				};
 			},
 			transformer: superjson,
 		}),
