@@ -1,9 +1,12 @@
 "use client";
 
+import { AutomationsDemo } from "./components/AutomationsDemo";
+import { CliDemo } from "./components/CliDemo";
 import { FeatureDemo } from "./components/FeatureDemo";
 import { IsolationDemo } from "./components/IsolationDemo";
 import { OpenInDemo } from "./components/OpenInDemo";
 import { ParallelExecutionDemo } from "./components/ParallelExecutionDemo";
+import { RemoteWorkspacesDemo } from "./components/RemoteWorkspacesDemo";
 import { UniversalCompatibilityDemo } from "./components/UniversalCompatibilityDemo";
 import { FEATURES } from "./constants";
 
@@ -12,6 +15,9 @@ const DEMO_COMPONENTS = [
 	UniversalCompatibilityDemo,
 	IsolationDemo,
 	OpenInDemo,
+	AutomationsDemo,
+	RemoteWorkspacesDemo,
+	CliDemo,
 ];
 
 export function FeaturesSection() {
@@ -47,7 +53,7 @@ export function FeaturesSection() {
 
 								{/* Demo */}
 								<div className={`${isReversed ? "lg:order-1" : "lg:order-2"}`}>
-									<FeatureDemo colors={feature.colors}>
+									<FeatureDemo>
 										{DemoComponent && <DemoComponent />}
 									</FeatureDemo>
 								</div>

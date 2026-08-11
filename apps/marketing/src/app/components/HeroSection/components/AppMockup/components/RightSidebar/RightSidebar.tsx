@@ -62,14 +62,16 @@ export function RightSidebar({ activeDemo }: RightSidebarProps) {
 
 			<div className="bg-background px-3 pt-3 pb-2">
 				<div className="flex items-center gap-1.5 font-mono text-[10px] text-muted-foreground/60">
-					<span className="tabular-nums text-emerald-400/85">+1,128</span>
-					<span className="tabular-nums text-rose-400/75">−98</span>
+					<span className="tabular-nums text-emerald-400/85">+393</span>
+					<span className="tabular-nums text-rose-400/75">−42</span>
 					<span className="text-muted-foreground/45">·</span>
-					<span>10 files</span>
+					<span>5 files</span>
 					<span className="text-muted-foreground/45">·</span>
 					<span className="flex items-center gap-1">
 						<LuArrowRight className="size-2.5" />
-						main
+						<span className="rounded-sm bg-foreground/[0.07] px-1 py-px">
+							main
+						</span>
 					</span>
 				</div>
 			</div>

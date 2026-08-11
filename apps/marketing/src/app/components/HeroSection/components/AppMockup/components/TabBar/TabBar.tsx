@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { LuChevronDown, LuPlus, LuTerminal } from "react-icons/lu";
+import { LuChevronDown, LuPlus } from "react-icons/lu";
 import { AGENT_TABS } from "../../constants";
 import type { ActiveDemo } from "../../types";
 
@@ -14,7 +14,7 @@ interface TabBarProps {
 const TAB_WIDTH = 112;
 
 export function TabBar({ activeDemo }: TabBarProps) {
-	const isSetup = activeDemo === "Create Parallel Branches";
+	const showAgentTabs = activeDemo === "Orchestrate Parallel Agents";
 
 	return (
 		<div className="flex h-9 items-center gap-0.5 bg-card">
@@ -23,19 +23,13 @@ export function TabBar({ activeDemo }: TabBarProps) {
 					className="flex h-full shrink-0 items-center gap-1.5 bg-background px-3 text-[11px] font-medium text-foreground/95"
 					style={{ width: TAB_WIDTH }}
 				>
-					{isSetup ? (
-						<LuTerminal className="size-3.5 shrink-0 text-muted-foreground/75" />
-					) : (
-						<Image
-							src="/app-icons/claude.svg"
-							alt="Claude"
-							width={12}
-							height={12}
-						/>
-					)}
-					<span className="min-w-0 flex-1 truncate">
-						{isSetup ? "setup" : "claude"}
-					</span>
+					<Image
+						src="/app-icons/claude.svg"
+						alt="Claude"
+						width={12}
+						height={12}
+					/>
+					<span className="min-w-0 flex-1 truncate">claude</span>
 				</div>
 
 				{AGENT_TABS.map((tab) => (
@@ -49,15 +43,15 @@ export function TabBar({ activeDemo }: TabBarProps) {
 							paddingRight: 0,
 						}}
 						animate={{
-							opacity: activeDemo === "Use Any Agents" ? 1 : 0,
-							width: activeDemo === "Use Any Agents" ? TAB_WIDTH : 0,
-							paddingLeft: activeDemo === "Use Any Agents" ? 12 : 0,
-							paddingRight: activeDemo === "Use Any Agents" ? 12 : 0,
+							opacity: showAgentTabs ? 1 : 0,
+							width: showAgentTabs ? TAB_WIDTH : 0,
+							paddingLeft: showAgentTabs ? 12 : 0,
+							paddingRight: showAgentTabs ? 12 : 0,
 						}}
 						transition={{
 							duration: 0.25,
 							ease: "easeOut",
-							delay: activeDemo === "Use Any Agents" ? tab.delay : 0,
+							delay: showAgentTabs ? tab.delay : 0,
 						}}
 					>
 						<Image src={tab.src} alt={tab.alt} width={12} height={12} />

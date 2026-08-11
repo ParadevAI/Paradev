@@ -26,11 +26,12 @@ const ibmPlexMono = IBM_Plex_Mono({
 	display: "swap",
 });
 
+// Variable font with the opsz axis: large sizes render as Inter Display
 const inter = Inter({
-	weight: ["300", "400", "500"],
 	subsets: ["latin"],
 	variable: "--font-inter",
 	display: "swap",
+	axes: ["opsz"],
 });
 
 const micro5 = Micro_5({

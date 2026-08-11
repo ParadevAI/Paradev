@@ -355,6 +355,14 @@ export function BoidsBackground() {
 			animate={{ opacity: 1 }}
 			transition={{ duration: 1.2, ease: "easeOut" }}
 			aria-hidden="true"
+			style={{
+				// Fade the flock out above the product demo so the mockup sits on a
+				// clean backdrop instead of glyph noise
+				maskImage:
+					"linear-gradient(to bottom, black 0%, black 40%, transparent 65%)",
+				WebkitMaskImage:
+					"linear-gradient(to bottom, black 0%, black 40%, transparent 65%)",
+			}}
 		>
 			<canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
 		</motion.div>

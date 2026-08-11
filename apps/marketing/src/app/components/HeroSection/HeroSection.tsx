@@ -10,17 +10,17 @@ import { BoidsBackground } from "./components/BoidsBackground";
 import { ProductDemo } from "./components/ProductDemo";
 import { TypewriterText } from "./components/TypewriterText";
 
-const PIXEL_FONT_STYLE = {
-	fontFamily: "var(--font-geist-pixel-grid)",
-} satisfies React.CSSProperties;
-
 const HERO_COPY = {
 	segments: [
 		{ text: "The Code Editor for " },
-		{ text: "AI Agents.", style: PIXEL_FONT_STYLE },
+		{
+			text: "AI Agents.",
+			className:
+				"corner-brackets inline-block px-[0.2em] py-[0.06em] whitespace-nowrap",
+		},
 	],
 	subheadline:
-		"Orchestrate 100+ coding agents in parallel. Works for any agents. Built for the AI era.",
+		"Orchestrate 100+ parallel coding agents, automate recurring tasks, and run workspaces anywhere.",
 };
 
 export function HeroSection() {
@@ -30,32 +30,28 @@ export function HeroSection() {
 		<div>
 			<div className="relative flex flex-col items-center pt-24 sm:pt-32 lg:pt-40 pb-16 sm:pb-24 overflow-hidden">
 				<BoidsBackground />
+				{/* Hiring pill: pinned just below the sticky header, out of the hero flow */}
+				<Link
+					href="/join-us"
+					className="group absolute top-5 sm:top-6 left-1/2 -translate-x-1/2 z-10 inline-flex items-center gap-2 rounded-[2px] border border-border bg-background/80 px-3 py-1.5 text-xs font-mono text-muted-foreground transition-colors hover:text-foreground hover:border-foreground/[0.2]"
+				>
+					<span className="text-brand shrink-0">●</span>
+					<span>
+						We&apos;re hiring engineers
+						<span className="hidden sm:inline"> in San Francisco</span>
+					</span>
+					<span className="shrink-0 transition-transform group-hover:translate-x-0.5">
+						→
+					</span>
+				</Link>
 				<div className="relative w-full max-w-7xl mx-auto px-6 sm:px-8">
 					<div className="flex flex-col items-center text-center">
-						<Link
-							href="/join-us"
-							className="group mb-6 inline-flex items-center gap-2 rounded-[2px] border border-border bg-background/80 px-3 py-1.5 text-xs font-mono text-muted-foreground transition-colors hover:text-foreground hover:border-foreground/[0.2]"
-						>
-							<span className="text-brand shrink-0">●</span>
-							<span>
-								We&apos;re hiring engineers
-								<span className="hidden sm:inline"> in San Francisco</span>
-							</span>
-							<span className="shrink-0 transition-transform group-hover:translate-x-0.5">
-								→
-							</span>
-						</Link>
 						<div className="space-y-4 sm:space-y-6">
-							<h1
-								className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-medium tracking-tight leading-[1.1] text-foreground relative max-w-6xl mx-auto"
-								style={{
-									fontFamily: "var(--font-ibm-plex-mono), monospace",
-								}}
-							>
-								{/* Sizer must mirror the visible segments' fonts so wrapping matches */}
+							<h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-medium tracking-tight leading-[1.1] [word-spacing:0.15em] text-foreground relative max-w-6xl mx-auto">
+								{/* Sizer must mirror the visible segments' styling so wrapping matches */}
 								<span className="invisible" aria-hidden="true">
 									{HERO_COPY.segments.map((segment) => (
-										<span key={segment.text} style={segment.style}>
+										<span key={segment.text} className={segment.className}>
 											{segment.text}
 										</span>
 									))}
