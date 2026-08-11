@@ -32,6 +32,11 @@ export const Route = createFileRoute("/_authenticated/_dashboard")({
 	component: DashboardLayout,
 });
 
+// Hoisted for stable props identity — <Navigate> re-navigates whenever its
+// props object changes, so an inline element re-navigates on every re-render
+// until React throws error #185 (see routes/page.tsx, #5729, SUPER-1814).
+const newWorkspaceRedirect = <Navigate to="/new-workspace" replace />;
+
 /** v1 only — v2 deletes go through the globally-mounted DeleteWorkspaceMount
  * (see delete-workspace-intent store). */
 type DeleteTarget = {
@@ -225,7 +230,7 @@ function DashboardLayout() {
 							// dead-end "pick a workspace" screen. v1 users keep the
 							// static state — /new-workspace is a v2-only surface.
 							isV2CloudEnabled ? (
-								<Navigate to="/new-workspace" replace />
+								newWorkspaceRedirect
 							) : (
 								<CrossVersionMismatchState />
 							)
