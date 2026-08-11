@@ -1,5 +1,6 @@
 import { CLIError } from "@superset/cli-framework";
 import { getHostId } from "@superset/shared/host-info";
+import type { ApiClient } from "../../lib/api-client";
 import { resolveHostTarget } from "../../lib/host-target";
 import { findWorkspaceOnHost } from "../../lib/host-workspaces";
 
@@ -13,6 +14,7 @@ import { findWorkspaceOnHost } from "../../lib/host-workspaces";
 export async function resolveAutomationTarget(args: {
 	organizationId: string;
 	userJwt: string;
+	api: ApiClient;
 	hostId?: string;
 	workspaceId?: string;
 	projectId?: string;
@@ -24,6 +26,7 @@ export async function resolveAutomationTarget(args: {
 			{
 				organizationId: args.organizationId,
 				userJwt: args.userJwt,
+				api: args.api,
 				hostId: targetHostId,
 			},
 			args.workspaceId,
@@ -50,10 +53,11 @@ export async function resolveAutomationTarget(args: {
 		// workspaces.createSession.
 		return { targetHostId, v2ProjectId: null };
 	}
-	const target = resolveHostTarget({
+	const target = await resolveHostTarget({
 		requestedHostId: targetHostId,
 		organizationId: args.organizationId,
 		userJwt: args.userJwt,
+		api: args.api,
 	});
 	const projects = await target.client.project.list.query();
 	if (!projects.some((project) => project.id === args.projectId)) {

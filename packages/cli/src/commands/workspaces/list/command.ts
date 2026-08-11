@@ -29,6 +29,7 @@ export default command({
 		const { workspaces } = await listWorkspacesOnHost({
 			organizationId,
 			userJwt: ctx.bearer,
+			api: ctx.api,
 			hostId: resolveHostFilter({
 				host: options.host ?? undefined,
 				local: options.local ?? undefined,

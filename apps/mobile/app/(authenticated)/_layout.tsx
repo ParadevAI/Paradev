@@ -2,6 +2,7 @@ import { isLiquidGlassAvailable } from "expo-glass-effect";
 import { Stack } from "expo-router";
 import { PromptInputProvider } from "@/components/ai-elements/prompt-input";
 import { useDevicePresence } from "@/hooks/useDevicePresence";
+import { usePrimeRelayUrl } from "@/hooks/usePrimeRelayUrl";
 import { CollectionsProvider } from "@/screens/(authenticated)/providers/CollectionsProvider";
 
 const settingsScreenOptions = (title: string) => ({
@@ -25,6 +26,7 @@ const glassHeaderOptions = {
 
 export default function AuthenticatedLayout() {
 	useDevicePresence();
+	usePrimeRelayUrl();
 
 	return (
 		<CollectionsProvider>

@@ -50,6 +50,7 @@ export default command({
 		const target = await resolveAutomationTarget({
 			organizationId,
 			userJwt: ctx.bearer,
+			api: ctx.api,
 			hostId: options.host ?? undefined,
 			workspaceId: options.workspace ?? undefined,
 			projectId: options.project ?? undefined,
