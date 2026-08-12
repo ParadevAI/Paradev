@@ -165,5 +165,6 @@ The `src/components/ui/` and `src/components/ai-elements` directories contain sh
 - Use Drizzle ORM for all database operations
 
 ## DB migrations
-- Never run a migration yourself, and **NEVER manually edit files in `packages/db/drizzle/`** (`.sql` files, `meta/_journal.json`, snapshots — all auto-generated). Only modify schema files in `packages/db/src/schema/` and ask the user to run `drizzle-kit generate`.
-- Workflow (Neon branch setup, drizzle-kit invocation): see `.agents/skills/db-migrations/SKILL.md`.
+- Agents may run `drizzle-kit generate` themselves after modifying schema files in `packages/db/src/schema/` — follow the workflow (Neon branch setup, drizzle-kit invocation) in `.agents/skills/db-migrations/SKILL.md`.
+- **NEVER manually edit files in `packages/db/drizzle/`** (`.sql` files, `meta/_journal.json`, snapshots — all auto-generated; hand-edits only with explicit user confirmation).
+- **NEVER apply or run migrations against a shared or production database** — migrations apply through the normal deploy flow.

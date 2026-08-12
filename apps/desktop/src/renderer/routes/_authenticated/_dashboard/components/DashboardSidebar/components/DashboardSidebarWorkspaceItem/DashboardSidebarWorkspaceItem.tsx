@@ -7,7 +7,7 @@ import {
 	useRef,
 	useState,
 } from "react";
-import { useOptimisticCollectionActions } from "renderer/routes/_authenticated/hooks/useOptimisticCollectionActions";
+import { useOptimisticActions } from "renderer/routes/_authenticated/hooks/useOptimisticActions";
 import { RenameBranchDialog } from "renderer/screens/main/components/WorkspaceSidebar/WorkspaceListItem/components";
 import {
 	useDashboardSidebarHoverActions,
@@ -94,7 +94,7 @@ export function DashboardSidebarWorkspaceItem({
 		isPinned: workspace.isPinned,
 	});
 
-	const { v2Workspaces: v2WorkspaceActions } = useOptimisticCollectionActions();
+	const { v2Workspaces: v2WorkspaceActions } = useOptimisticActions();
 	const [renameBranchTarget, setRenameBranchTarget] = useState<string | null>(
 		null,
 	);

@@ -27,7 +27,6 @@ import { createGitEnvResolver, createGitFactory } from "./runtime/git";
 import { runMainWorkspaceSweep } from "./runtime/main-workspace-sweep";
 import { runProjectBackfill } from "./runtime/project-backfill";
 import { PullRequestRuntimeManager } from "./runtime/pull-requests";
-import { runWorkspaceBackfill } from "./runtime/workspace-backfill";
 import { registerWorkspaceTerminalRoute } from "./terminal/terminal";
 import {
 	SqliteTerminalAgentBindingPersistence,
@@ -225,8 +224,8 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 	const terminalAgentStore = new TerminalAgentStore(terminalAgentPersistence);
 
 	// Startup sweeps run in the background so they don't block server
-	// startup. Ordering matters: the backfills fill identity fields on
-	// pre-existing rows before the main-workspace sweep touches them.
+	// startup. Ordering matters: the project backfill fills identity fields
+	// on pre-existing rows before the main-workspace sweep touches them.
 	void (async () => {
 		await runProjectBackfill({
 			api,
@@ -235,14 +234,6 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 			organizationId: config.organizationId,
 		}).catch((err) => {
 			console.warn("[host-service] project backfill failed:", err);
-		});
-		await runWorkspaceBackfill({
-			api,
-			db,
-			eventBus,
-			organizationId: config.organizationId,
-		}).catch((err) => {
-			console.warn("[host-service] workspace backfill failed:", err);
 		});
 		// Backfill `kind='main'` workspaces for projects already set up before
 		// this column shipped. Idempotent — only does real work the first

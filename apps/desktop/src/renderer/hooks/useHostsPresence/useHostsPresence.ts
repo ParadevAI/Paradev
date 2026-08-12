@@ -95,6 +95,6 @@ export function useHostsPresence(
 	});
 
 	// Null = presence unavailable (v1 relay, probe/fetch failed, empty target
-	// set): callers must keep the Electric-synced isOnline value.
+	// set): callers must keep the cloud row's isOnline value.
 	return enabled ? (data ?? null) : null;
 }

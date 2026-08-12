@@ -1,10 +1,8 @@
-import { and, eq } from "@tanstack/db";
-import { useLiveQuery } from "@tanstack/react-db";
 import { useMemo } from "react";
 import { env } from "renderer/env.renderer";
 import { useHostsPresence } from "renderer/hooks/useHostsPresence";
 import { authClient } from "renderer/lib/auth-client";
-import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
+import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { MOCK_ORG_ID } from "shared/constants";
 
@@ -20,7 +18,7 @@ interface UseWorkspaceHostOptionsResult {
 	localHostId: string | null;
 	/**
 	 * Relay connectivity of the local device as the cloud sees it; null while
-	 * its v2Hosts row hasn't synced. Cloud-dispatched work (automations) needs
+	 * its host row hasn't loaded. Cloud-dispatched work (automations) needs
 	 * this even for the local device.
 	 */
 	localHostIsOnline: boolean | null;
@@ -30,7 +28,6 @@ interface UseWorkspaceHostOptionsResult {
 
 export function useWorkspaceHostOptions(): UseWorkspaceHostOptionsResult {
 	const { data: session } = authClient.useSession();
-	const collections = useCollections();
 	const { machineId, activeHostUrl } = useLocalHostService();
 
 	const activeOrganizationId = env.SKIP_ENV_VALIDATION
@@ -38,26 +35,31 @@ export function useWorkspaceHostOptions(): UseWorkspaceHostOptionsResult {
 		: (session?.session?.activeOrganizationId ?? null);
 	const currentUserId = session?.user?.id ?? null;
 
-	const { data: accessibleHosts = [] } = useLiveQuery(
-		(q) =>
-			q
-				.from({ userHosts: collections.v2UsersHosts })
-				.innerJoin({ hosts: collections.v2Hosts }, ({ userHosts, hosts }) =>
-					eq(userHosts.hostId, hosts.machineId),
-				)
-				.where(({ userHosts, hosts }) =>
-					and(
-						eq(userHosts.userId, currentUserId ?? ""),
-						eq(hosts.organizationId, activeOrganizationId ?? ""),
-					),
-				)
-				.select(({ hosts }) => ({
-					machineId: hosts.machineId,
-					name: hosts.name,
-					isOnline: hosts.isOnline,
-				})),
-		[activeOrganizationId, collections, currentUserId],
-	);
+	const { data: hostRows = [] } = cloudTrpc.v2Host.list.useQuery(undefined, {
+		refetchInterval: 30_000,
+	});
+
+	const { data: hostMemberRows = [] } =
+		cloudTrpc.v2Host.listMembers.useQuery(undefined);
+
+	const accessibleHosts = useMemo(() => {
+		const accessibleHostIds = new Set(
+			hostMemberRows
+				.filter((member) => member.userId === (currentUserId ?? ""))
+				.map((member) => member.hostId),
+		);
+		return hostRows
+			.filter(
+				(host) =>
+					host.organizationId === (activeOrganizationId ?? "") &&
+					accessibleHostIds.has(host.machineId),
+			)
+			.map((host) => ({
+				machineId: host.machineId,
+				name: host.name,
+				isOnline: host.isOnline,
+			}));
+	}, [activeOrganizationId, currentUserId, hostMemberRows, hostRows]);
 
 	const presenceTargets = useMemo(
 		() =>
@@ -100,8 +102,8 @@ export function useWorkspaceHostOptions(): UseWorkspaceHostOptionsResult {
 		[hostsWithPresence, machineId],
 	);
 
-	// Always surface the local device, even if its v2Hosts row hasn't synced
-	// via Electric — the picker is useless without "this device" present.
+	// Always surface the local device, even if its host row hasn't loaded yet —
+	// the picker is useless without "this device" present.
 	return {
 		currentDeviceName: localHost?.name ?? (machineId ? "This device" : null),
 		localHostId: localHost?.machineId ?? machineId,

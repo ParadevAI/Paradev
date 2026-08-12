@@ -1,13 +1,8 @@
 import { cn } from "@superset/ui/utils";
-import { eq } from "@tanstack/db";
-import { useLiveQuery } from "@tanstack/react-db";
 import { Link } from "@tanstack/react-router";
 import { useMemo } from "react";
-import { env } from "renderer/env.renderer";
 import { useHostsPresence } from "renderer/hooks/useHostsPresence";
-import { authClient } from "renderer/lib/auth-client";
-import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
-import { MOCK_ORG_ID } from "shared/constants";
+import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import {
 	type SettingsListGroup,
 	SettingsListSidebar,
@@ -28,40 +23,9 @@ interface HostsSettingsSidebarProps {
 export function HostsSettingsSidebar({
 	selectedHostId,
 }: HostsSettingsSidebarProps) {
-	const collections = useCollections();
-	const { data: session } = authClient.useSession();
+	const { data: hosts = [] } = cloudTrpc.v2Host.list.useQuery(undefined);
 
-	const activeOrganizationId = env.SKIP_ENV_VALIDATION
-		? MOCK_ORG_ID
-		: (session?.session?.activeOrganizationId ?? null);
-
-	const { data: hosts = [] } = useLiveQuery(
-		(q) =>
-			q
-				.from({ hosts: collections.v2Hosts })
-				.where(({ hosts }) =>
-					eq(hosts.organizationId, activeOrganizationId ?? ""),
-				)
-				.select(({ hosts }) => ({
-					id: hosts.machineId,
-					name: hosts.name,
-					machineId: hosts.machineId,
-					isOnline: hosts.isOnline,
-				})),
-		[collections, activeOrganizationId],
-	);
-
-	const presenceTargets = useMemo(
-		() =>
-			activeOrganizationId
-				? hosts.map((host) => ({
-						organizationId: activeOrganizationId,
-						machineId: host.machineId,
-					}))
-				: [],
-		[hosts, activeOrganizationId],
-	);
-	const presence = useHostsPresence(presenceTargets);
+	const presence = useHostsPresence(hosts);
 	const hostsWithPresence = useMemo(
 		() =>
 			presence
@@ -74,9 +38,14 @@ export function HostsSettingsSidebar({
 	);
 
 	const listGroups = useMemo<Array<SettingsListGroup<HostRow>>>(() => {
-		const sorted = [...hostsWithPresence].sort((a, b) =>
-			a.name.localeCompare(b.name),
-		);
+		const sorted = hostsWithPresence
+			.map((host) => ({
+				id: host.machineId,
+				name: host.name,
+				machineId: host.machineId,
+				isOnline: host.isOnline,
+			}))
+			.sort((a, b) => a.name.localeCompare(b.name));
 		return [
 			{
 				id: "online",
