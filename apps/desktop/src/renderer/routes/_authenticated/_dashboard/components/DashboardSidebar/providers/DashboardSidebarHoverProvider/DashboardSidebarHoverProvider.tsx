@@ -6,6 +6,7 @@ import {
 	useMemo,
 	useRef,
 	useState,
+	useSyncExternalStore,
 } from "react";
 import type { DashboardSidebarWorkspace } from "../../types";
 
@@ -129,6 +130,31 @@ interface HoverContextValue {
 
 const HoverContext = createContext<HoverContextValue | null>(null);
 
+/**
+ * The subset of the hover machine whose identities never change. Row-count
+ * components (workspace rows, their context menus, chips) consume this
+ * instead of the full context so a hovered-id commit doesn't re-render every
+ * row in the sidebar; only the overlay needs the stateful context above.
+ */
+interface HoverActionsContextValue {
+	requestOpen: HoverContextValue["requestOpen"];
+	requestClose: HoverContextValue["requestClose"];
+	cancelClose: () => void;
+	forceClose: () => void;
+	setContextMenuOpen: (open: boolean) => void;
+	beginHoverCardSuppression: () => void;
+	endHoverCardSuppression: () => void;
+	syncIfHovered: HoverContextValue["syncIfHovered"];
+	setCardElement: (element: HTMLElement | null) => void;
+	/** Per-row hovered-state subscription backing useDashboardSidebarIsHovered. */
+	subscribeHoveredId: (listener: () => void) => () => void;
+	getHoveredId: () => string | null;
+}
+
+const HoverActionsContext = createContext<HoverActionsContextValue | null>(
+	null,
+);
+
 export function DashboardSidebarHoverProvider({
 	children,
 }: {
@@ -157,9 +183,23 @@ export function DashboardSidebarHoverProvider({
 	}, []);
 
 	const stateRef = useRef(state);
+	const hoveredIdListenersRef = useRef(new Set<() => void>());
 	useEffect(() => {
+		const hoveredIdChanged = stateRef.current.hoveredId !== state.hoveredId;
 		stateRef.current = state;
+		if (hoveredIdChanged) {
+			for (const listener of [...hoveredIdListenersRef.current]) {
+				listener();
+			}
+		}
 	}, [state]);
+	const subscribeHoveredId = useCallback((listener: () => void) => {
+		hoveredIdListenersRef.current.add(listener);
+		return () => {
+			hoveredIdListenersRef.current.delete(listener);
+		};
+	}, []);
+	const getHoveredId = useCallback(() => stateRef.current.hoveredId, []);
 
 	const openTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -434,8 +474,40 @@ export function DashboardSidebarHoverProvider({
 		],
 	);
 
+	// Every entry is identity-stable, so this memo never invalidates and
+	// consumers of the actions context never re-render from hover churn.
+	const actionsValue = useMemo<HoverActionsContextValue>(
+		() => ({
+			requestOpen,
+			requestClose,
+			cancelClose,
+			forceClose,
+			setContextMenuOpen,
+			beginHoverCardSuppression,
+			endHoverCardSuppression,
+			syncIfHovered,
+			setCardElement,
+			subscribeHoveredId,
+			getHoveredId,
+		}),
+		[
+			requestOpen,
+			requestClose,
+			cancelClose,
+			forceClose,
+			beginHoverCardSuppression,
+			endHoverCardSuppression,
+			syncIfHovered,
+			setCardElement,
+			subscribeHoveredId,
+			getHoveredId,
+		],
+	);
+
 	return (
-		<HoverContext.Provider value={value}>{children}</HoverContext.Provider>
+		<HoverActionsContext.Provider value={actionsValue}>
+			<HoverContext.Provider value={value}>{children}</HoverContext.Provider>
+		</HoverActionsContext.Provider>
 	);
 }
 
@@ -447,4 +519,27 @@ export function useDashboardSidebarHover() {
 		);
 	}
 	return ctx;
+}
+
+export function useDashboardSidebarHoverActions() {
+	const ctx = useContext(HoverActionsContext);
+	if (!ctx) {
+		throw new Error(
+			"useDashboardSidebarHoverActions must be used inside DashboardSidebarHoverProvider",
+		);
+	}
+	return ctx;
+}
+
+/**
+ * Whether `id` is the committed hovered row. Subscription-based so a hover
+ * commit re-renders only the two affected rows, not every context consumer.
+ */
+export function useDashboardSidebarIsHovered(id: string): boolean {
+	const { subscribeHoveredId, getHoveredId } =
+		useDashboardSidebarHoverActions();
+	return useSyncExternalStore(
+		subscribeHoveredId,
+		useCallback(() => getHoveredId() === id, [getHoveredId, id]),
+	);
 }

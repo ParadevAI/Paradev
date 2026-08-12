@@ -113,7 +113,7 @@ export const DashboardSidebarCollapsedProjectContent = forwardRef<
 												key={String(id)}
 												sortableId={String(id)}
 												workspace={workspace}
-												onHoverCardOpen={() => onWorkspaceHover(parsed.realId)}
+												onHoverCardOpen={onWorkspaceHover}
 												shortcutLabel={workspaceShortcutLabels.get(
 													parsed.realId,
 												)}

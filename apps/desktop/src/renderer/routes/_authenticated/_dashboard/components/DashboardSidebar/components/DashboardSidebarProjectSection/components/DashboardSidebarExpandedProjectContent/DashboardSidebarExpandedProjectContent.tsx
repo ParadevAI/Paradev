@@ -2,6 +2,7 @@ import {
 	SortableContext,
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
+import { cn } from "@superset/ui/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { useMemo } from "react";
 import {
@@ -132,49 +133,54 @@ export function DashboardSidebarExpandedProjectContent({
 										workspace.type === "worktree" &&
 										workspace.pendingTransaction?.type !== "insert";
 
+									// Rows collapse via a CSS grid-row transition instead of a
+									// per-row AnimatePresence/motion.div (~80 motion components
+									// cost real render time). Hidden rows stay mounted: `inert`
+									// removes them from focus/hit-testing and the disabled
+									// sortable unregisters their droppable, matching the old
+									// unmount behavior for DnD.
 									return (
-										<AnimatePresence key={String(id)} initial={false}>
-											{!hidden && (
-												<motion.div
-													initial={{ height: 0, opacity: 0 }}
-													animate={{ height: "auto", opacity: 1 }}
-													exit={{ height: 0, opacity: 0 }}
-													transition={{ duration: 0.15, ease: "easeOut" }}
-												>
-													<SortableWorkspaceItem
-														sortableId={String(id)}
-														workspace={workspace}
-														accentColor={group?.color}
-														isInSection={groupInfo.has(parsed.realId)}
-														onHoverCardOpen={() =>
-															onWorkspaceHover(parsed.realId)
-														}
-														shortcutLabel={workspaceShortcutLabels.get(
-															parsed.realId,
-														)}
-														isSelected={
-															canBulkSelect &&
-															isWorkspaceSelected(parsed.realId)
-														}
-														onSelectionClick={
-															canBulkSelect
-																? (event) =>
-																		selectWorkspaceFromEvent(event, {
-																			workspaceId: parsed.realId,
-																			projectId,
-																			orderedWorkspaceIds:
-																				selectableWorkspaceIds,
-																		})
-																: undefined
-														}
-														disabled={
-															workspace.type === "main" &&
-															workspace.hostType === "local-device"
-														}
-													/>
-												</motion.div>
+										<div
+											key={String(id)}
+											className={cn(
+												"grid transition-[grid-template-rows,opacity] duration-150 ease-out",
+												hidden
+													? "grid-rows-[0fr] opacity-0"
+													: "grid-rows-[1fr] opacity-100",
 											)}
-										</AnimatePresence>
+											inert={hidden}
+										>
+											<div className="min-h-0 overflow-hidden">
+												<SortableWorkspaceItem
+													sortableId={String(id)}
+													workspace={workspace}
+													accentColor={group?.color}
+													isInSection={isInSection}
+													onHoverCardOpen={onWorkspaceHover}
+													shortcutLabel={workspaceShortcutLabels.get(
+														parsed.realId,
+													)}
+													isSelected={
+														canBulkSelect && isWorkspaceSelected(parsed.realId)
+													}
+													onSelectionClick={
+														canBulkSelect
+															? (event) =>
+																	selectWorkspaceFromEvent(event, {
+																		workspaceId: parsed.realId,
+																		projectId,
+																		orderedWorkspaceIds: selectableWorkspaceIds,
+																	})
+															: undefined
+													}
+													disabled={
+														hidden ||
+														(workspace.type === "main" &&
+															workspace.hostType === "local-device")
+													}
+												/>
+											</div>
+										</div>
 									);
 								})}
 							</SortableContext>

@@ -7,7 +7,7 @@ import { DashboardSidebarWorkspaceItem } from "../../../../../DashboardSidebarWo
 interface SortableCollapsedWorkspaceItemProps {
 	sortableId: string;
 	workspace: DashboardSidebarWorkspace;
-	onHoverCardOpen?: () => void;
+	onHoverCardOpen?: (workspaceId: string) => void | Promise<void>;
 	shortcutLabel?: string;
 	disabled?: boolean;
 }

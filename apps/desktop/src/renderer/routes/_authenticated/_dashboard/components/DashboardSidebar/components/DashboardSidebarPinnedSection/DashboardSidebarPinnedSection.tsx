@@ -46,7 +46,7 @@ export function DashboardSidebarPinnedSection({
 						key={workspace.id}
 						workspace={workspace}
 						isCollapsed
-						onHoverCardOpen={() => onWorkspaceHover(workspace.id)}
+						onHoverCardOpen={onWorkspaceHover}
 					/>
 				))}
 				<div className="mx-3 mt-1 border-b border-border" />
@@ -85,7 +85,7 @@ export function DashboardSidebarPinnedSection({
 								projectName: project?.name ?? null,
 								projectIconUrl: project?.iconUrl ?? null,
 							}}
-							onHoverCardOpen={() => onWorkspaceHover(parsed.realId)}
+							onHoverCardOpen={onWorkspaceHover}
 						/>
 					);
 				})}

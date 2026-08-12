@@ -10,7 +10,7 @@ interface SortableWorkspaceItemProps {
 	workspace: DashboardSidebarWorkspace;
 	accentColor?: string | null;
 	isInSection?: boolean;
-	onHoverCardOpen?: () => void;
+	onHoverCardOpen?: (workspaceId: string) => void | Promise<void>;
 	shortcutLabel?: string;
 	disabled?: boolean;
 	isSelected?: boolean;

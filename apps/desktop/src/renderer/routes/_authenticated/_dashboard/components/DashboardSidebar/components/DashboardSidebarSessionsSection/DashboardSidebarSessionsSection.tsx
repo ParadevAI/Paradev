@@ -62,7 +62,7 @@ export function DashboardSidebarSessionsSection({
 						workspace={workspace}
 						isCollapsed
 						isInSection={false}
-						onHoverCardOpen={() => onWorkspaceHover(workspace.id)}
+						onHoverCardOpen={onWorkspaceHover}
 					/>
 				))}
 				<div className="mx-3 mt-1 border-b border-border" />
@@ -106,7 +106,7 @@ export function DashboardSidebarSessionsSection({
 								sortableId={String(id)}
 								workspace={workspace}
 								shortcutLabel={workspaceShortcutLabels?.get(parsed.realId)}
-								onHoverCardOpen={() => onWorkspaceHover(parsed.realId)}
+								onHoverCardOpen={onWorkspaceHover}
 							/>
 						);
 					})}

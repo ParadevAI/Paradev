@@ -17,7 +17,7 @@ import type {
 	DashboardSidebarProject,
 	DashboardSidebarWorkspace,
 } from "../../types";
-import { useDashboardSidebarHover } from "../DashboardSidebarHoverProvider";
+import { useDashboardSidebarHoverActions } from "../DashboardSidebarHoverProvider";
 
 interface DashboardSidebarDndProviderProps {
 	/** Projects in their current display order. */
@@ -65,7 +65,7 @@ export function DashboardSidebarDndProvider({
 	// popping open under the drop point). Hold a hover suppression for the
 	// drag's duration; dnd-kit pairs every start with exactly one end/cancel.
 	const { beginHoverCardSuppression, endHoverCardSuppression, forceClose } =
-		useDashboardSidebarHover();
+		useDashboardSidebarHoverActions();
 	// try/finally throughout: a throwing drag handler (e.g. a persistence
 	// write) must not leak the counted suppression, or hover cards stay dead
 	// until the sidebar remounts.
