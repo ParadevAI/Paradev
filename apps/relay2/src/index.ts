@@ -117,6 +117,46 @@ app.get("/v2/dial", async (c) => {
 	);
 });
 
+// ── Batch presence (the DO is the presence authority) ───────────────
+
+const MAX_PRESENCE_HOSTS = 50;
+
+app.get("/presence", async (c) => {
+	const hostIds = (c.req.query("hostIds") ?? "")
+		.split(",")
+		.map((id) => id.trim())
+		.filter(Boolean);
+	if (hostIds.length === 0 || hostIds.length > MAX_PRESENCE_HOSTS) {
+		return c.json({ error: `Provide 1-${MAX_PRESENCE_HOSTS} hostIds` }, 400);
+	}
+	const token = extractToken(c);
+	if (!token) return c.json({ error: "Unauthorized" }, 401);
+	const auth = await verifyJWT(token, c.env.NEXT_PUBLIC_API_URL);
+	if (!auth) return c.json({ error: "Unauthorized" }, 401);
+
+	// Denied and unknown hosts are omitted rather than erroring the batch: a
+	// partial answer still renders every dot the caller may see.
+	const entries = await Promise.all(
+		hostIds.map(async (hostId) => {
+			const access = await checkHostAccess(
+				auth,
+				token,
+				hostId,
+				c.env.NEXT_PUBLIC_API_URL,
+			);
+			if (!access.ok) return null;
+			const stub = await tunnelStub(c, hostId);
+			return [hostId, await stub.presenceInfo()] as const;
+		}),
+	);
+	const hosts: Record<string, { online: boolean; lastSeenAt: number | null }> =
+		{};
+	for (const entry of entries) {
+		if (entry) hosts[entry[0]] = entry[1];
+	}
+	return c.json({ hosts });
+});
+
 // ── Client-facing host routes (wire-identical to the v1 relay) ──────
 
 function pathAfterHost(c: Context<AppContext>): string {

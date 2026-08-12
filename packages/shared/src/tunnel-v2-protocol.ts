@@ -14,14 +14,9 @@ export interface StreamDial {
 	query?: string;
 }
 
-/**
- * Host → relay keepalive, carrying the host's current JWT so long-lived
- * control channels don't strand the relay with an expired token (JWTs rotate
- * roughly hourly; the relay needs a valid one to write presence at any time).
- */
+/** Host → relay keepalive; the relay stamps liveness and answers with a pong. */
 export interface ControlPing {
 	type: "ping";
-	token?: string;
 }
 
 export interface ControlPong {

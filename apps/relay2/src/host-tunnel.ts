@@ -9,7 +9,6 @@ import {
 	type HttpExchangeResult,
 	HttpExchanges,
 } from "./http-exchange";
-import { writePresence } from "./presence";
 import type { RelayEnv } from "./types";
 
 const HOST_TAG = "host";
@@ -19,8 +18,8 @@ const MAX_EARLY_FRAMES = 256;
 // closed rather than left open.
 const UNPAIRED_DIAL_TIMEOUT_MS = 15_000;
 // Liveness sweep: deploys and abrupt terminations kill sockets without
-// delivering a close event, so disconnect handlers alone leave presence
-// stale and zombie sockets registered. The alarm is the backstop.
+// delivering a close event, leaving zombie sockets registered. The socket
+// set is the presence authority, so the alarm is what keeps it truthful.
 const LIVENESS_SWEEP_MS = 45_000;
 // Three missed 30s host keepalives. A host that cannot ping for this long
 // cannot serve dials either, so closing it never severs a usable tunnel.
@@ -51,9 +50,6 @@ export class HostTunnel extends Server<RelayEnv> {
 		ReturnType<typeof setTimeout>
 	>();
 	private readonly httpExchanges = new HttpExchanges();
-	// Single-threaded within the instance, so ++ is atomic; concurrent writes
-	// can't be in flight across a hibernation boundary.
-	private presenceSeq = 0;
 
 	// ── RPC (called by the Worker) ────────────────────────────────────
 
@@ -63,6 +59,18 @@ export class HostTunnel extends Server<RelayEnv> {
 		// comes looking.
 		await this.ensureLivenessAlarm();
 		return this.hostConn() !== null;
+	}
+
+	async presenceInfo(): Promise<{
+		online: boolean;
+		lastSeenAt: number | null;
+	}> {
+		await this.ensureLivenessAlarm();
+		return {
+			online: this.hostConn() !== null,
+			lastSeenAt:
+				(await this.ctx.storage.get<number>("lastHostSeenAt")) ?? null,
+		};
 	}
 
 	async prepareStream(
@@ -119,7 +127,6 @@ export class HostTunnel extends Server<RelayEnv> {
 		const ticket = url.searchParams.get("ticket") ?? "";
 
 		if (conn.tags.includes(HOST_TAG)) {
-			const token = ctx.request.headers.get("x-relay-token") ?? "";
 			const hostId = url.searchParams.get("hostId") ?? this.name;
 			// State first: a replaced socket's close is delivered mid-await, and
 			// teardown must be able to tell this connection is the live host.
@@ -129,13 +136,8 @@ export class HostTunnel extends Server<RelayEnv> {
 				if (other.id !== conn.id)
 					closeQuietly(other, 1000, "Replaced by new tunnel");
 			}
-			await this.ctx.storage.put({
-				session: { hostId, token },
-				lastHostSeenAt: Date.now(),
-				presenceOnline: true,
-			});
+			await this.ctx.storage.put("lastHostSeenAt", Date.now());
 			await this.ctx.storage.setAlarm(Date.now() + LIVENESS_SWEEP_MS);
-			this.ctx.waitUntil(this.presence(hostId, token, true));
 			console.log(`[relay2] host connected: ${hostId}`);
 			return;
 		}
@@ -220,18 +222,10 @@ export class HostTunnel extends Server<RelayEnv> {
 				return;
 			}
 			if (ping.type !== "ping") return;
-			// Only the live host may rewrite the session: a ping in flight from
-			// a socket that has just been replaced would otherwise revert the
-			// replacement's token to its own stale one.
+			// Only the live host refreshes liveness: a ping in flight from a
+			// just-replaced socket must not extend the stale window.
 			if (this.hostConn()?.id === conn.id) {
-				void this.ctx.storage.put(
-					ping.token
-						? {
-								session: { hostId: state.hostId, token: ping.token },
-								lastHostSeenAt: Date.now(),
-							}
-						: { lastHostSeenAt: Date.now() },
-				);
+				void this.ctx.storage.put("lastHostSeenAt", Date.now());
 			}
 			conn.send('{"type":"pong"}');
 			return;
@@ -280,15 +274,9 @@ export class HostTunnel extends Server<RelayEnv> {
 			for (const [, timer] of this.unpairedDialTimers) clearTimeout(timer);
 			this.unpairedDialTimers.clear();
 			this.httpExchanges.abortAll();
-			const session = await this.ctx.storage.get<{
-				hostId: string;
-				token: string;
-			}>("session");
 			// A replaced socket's close lands after the new one registered.
-			if (session && !this.hostConn()) {
-				console.log(`[relay2] host disconnected: ${session.hostId}`);
-				await this.ctx.storage.put("presenceOnline", false);
-				this.ctx.waitUntil(this.presence(session.hostId, session.token, false));
+			if (!this.hostConn()) {
+				console.log(`[relay2] host disconnected: ${state.hostId}`);
 			}
 			return;
 		}
@@ -310,48 +298,22 @@ export class HostTunnel extends Server<RelayEnv> {
 	async onAlarm(): Promise<void> {
 		const host = this.hostConn();
 
-		if (!host) {
-			// Socket vanished without a close event (deploy, abrupt kill):
-			// the disconnect path never ran, so presence is still online.
-			const [session, online] = await Promise.all([
-				this.ctx.storage.get<{ hostId: string; token: string }>("session"),
-				this.ctx.storage.get<boolean>("presenceOnline"),
-			]);
-			if (session && online !== false) {
-				console.log(`[relay2] host vanished without close: ${session.hostId}`);
-				await this.ctx.storage.put("presenceOnline", false);
-				this.ctx.waitUntil(this.presence(session.hostId, session.token, false));
-			}
-			// Not rescheduled: a reconnecting host re-arms the sweep.
-			return;
-		}
+		// Not rescheduled without a host: a reconnecting host re-arms the sweep.
+		if (!host) return;
 
-		const [lastSeen, session] = await Promise.all([
-			this.ctx.storage.get<number>("lastHostSeenAt"),
-			this.ctx.storage.get<{ hostId: string; token: string }>("session"),
-		]);
-		if (Date.now() - (lastSeen ?? 0) > HOST_STALE_MS) {
+		const lastSeen =
+			(await this.ctx.storage.get<number>("lastHostSeenAt")) ?? 0;
+		if (Date.now() - lastSeen > HOST_STALE_MS) {
+			// A dead peer never completes the close handshake, but closing here
+			// flips this object's socket state — and the socket *is* presence.
 			const state = host.state as ConnState | undefined;
-			const hostId = state?.kind === "host" ? state.hostId : this.name;
-			console.log(`[relay2] host stale, closing: ${hostId}`);
-			// closeQuietly alone is not enough: a server-initiated close on a
-			// dead peer never completes, so tear presence down here instead of
-			// relying on the close handler.
-			await this.ctx.storage.put("presenceOnline", false);
+			console.log(
+				`[relay2] host stale, closing: ${state?.kind === "host" ? state.hostId : this.name}`,
+			);
 			closeQuietly(host, 1011, "No keepalive from host");
-			if (session) {
-				this.ctx.waitUntil(this.presence(session.hostId, session.token, false));
-			}
 			return;
 		}
 
-		// Presence writes race (an offline write can land after the reconnect's
-		// online write and stick), so a live host's row is re-asserted every
-		// sweep rather than trusting the connect-time write to have won.
-		if (session) {
-			await this.ctx.storage.put("presenceOnline", true);
-			this.ctx.waitUntil(this.presence(session.hostId, session.token, true));
-		}
 		await this.ctx.storage.setAlarm(Date.now() + LIVENESS_SWEEP_MS);
 	}
 
@@ -380,21 +342,6 @@ export class HostTunnel extends Server<RelayEnv> {
 
 	private sendDial(host: Connection, dial: StreamDial): void {
 		host.send(JSON.stringify(dial));
-	}
-
-	private presence(
-		hostId: string,
-		token: string,
-		isOnline: boolean,
-	): Promise<void> {
-		return writePresence({
-			version: ++this.presenceSeq,
-			isSuperseded: (version) => version !== this.presenceSeq,
-			apiUrl: this.env.NEXT_PUBLIC_API_URL,
-			hostId,
-			token,
-			isOnline,
-		});
 	}
 }
 

@@ -96,21 +96,7 @@ export class TunnelClientV2 {
 
 		this.pingTimer = setInterval(() => {
 			if (control.readyState !== WebSocket.OPEN) return;
-			// The token rides the keepalive so the relay always holds a fresh
-			// one; its stored copy would otherwise expire on a long-lived
-			// channel and fail the presence write at disconnect.
-			void this.options
-				.getAuthToken()
-				.then((token) => {
-					if (control.readyState === WebSocket.OPEN) {
-						control.send(JSON.stringify({ type: "ping", token }));
-					}
-				})
-				.catch(() => {
-					if (control.readyState === WebSocket.OPEN) {
-						control.send('{"type":"ping"}');
-					}
-				});
+			control.send('{"type":"ping"}');
 		}, PING_INTERVAL_MS);
 
 		this.watchdogTimer = setInterval(() => {
