@@ -1,6 +1,7 @@
 import type { SelectV2Host } from "@superset/db/schema";
 import { useLiveQuery } from "@tanstack/react-db";
 import { useMemo } from "react";
+import { useHostsPresence } from "@/hooks/useHostsPresence";
 import { useWorkspacesFilterStore } from "@/screens/(authenticated)/(home)/home/stores/workspacesFilterStore";
 import { useCollections } from "@/screens/(authenticated)/providers/CollectionsProvider";
 
@@ -16,16 +17,20 @@ export function useSelectedHost(): SelectV2Host | null {
 		(q) => q.from({ v2Hosts: collections.v2Hosts }),
 		[collections],
 	);
+	const presence = useHostsPresence(hosts ?? []);
 
 	return useMemo(() => {
-		const sorted = [...(hosts ?? [])].sort((a, b) =>
-			a.name.localeCompare(b.name),
-		);
+		const sorted = [...(hosts ?? [])]
+			.map((host) => ({
+				...host,
+				isOnline: presence?.get(host.machineId) ?? host.isOnline,
+			}))
+			.sort((a, b) => a.name.localeCompare(b.name));
 		return (
 			sorted.find((host) => host.machineId === hostFilter) ??
 			sorted.find((host) => host.isOnline) ??
 			sorted[0] ??
 			null
 		);
-	}, [hosts, hostFilter]);
+	}, [hosts, hostFilter, presence]);
 }

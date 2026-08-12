@@ -2,6 +2,7 @@ import type { SelectV2Host } from "@superset/db/schema";
 import { useLiveQuery } from "@tanstack/react-db";
 import { useQueries } from "@tanstack/react-query";
 import { useMemo } from "react";
+import { useHostsPresence } from "@/hooks/useHostsPresence";
 import {
 	getHostWorkspacesQueryKey,
 	type HostWorkspaceRow,
@@ -33,16 +34,21 @@ export function useWorkspaceHost(
 		(q) => q.from({ v2Hosts: collections.v2Hosts }),
 		[collections],
 	);
+	const presence = useHostsPresence(hosts ?? []);
 
 	const targets = useMemo(
 		() =>
 			(hosts ?? [])
+				.map((host) => ({
+					...host,
+					isOnline: presence?.get(host.machineId) ?? host.isOnline,
+				}))
 				.filter((host) => host.isOnline)
 				.map((host) => ({
 					host,
 					hostUrl: buildRelayHostUrl(host.organizationId, host.machineId),
 				})),
-		[hosts],
+		[hosts, presence],
 	);
 
 	const queries = useQueries({

@@ -4,6 +4,7 @@ import { useLiveQuery } from "@tanstack/react-db";
 import { Link } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { env } from "renderer/env.renderer";
+import { useHostsPresence } from "renderer/hooks/useHostsPresence";
 import { authClient } from "renderer/lib/auth-client";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { MOCK_ORG_ID } from "shared/constants";
@@ -50,8 +51,32 @@ export function HostsSettingsSidebar({
 		[collections, activeOrganizationId],
 	);
 
+	const presenceTargets = useMemo(
+		() =>
+			activeOrganizationId
+				? hosts.map((host) => ({
+						organizationId: activeOrganizationId,
+						machineId: host.machineId,
+					}))
+				: [],
+		[hosts, activeOrganizationId],
+	);
+	const presence = useHostsPresence(presenceTargets);
+	const hostsWithPresence = useMemo(
+		() =>
+			presence
+				? hosts.map((host) => ({
+						...host,
+						isOnline: presence.get(host.machineId) ?? host.isOnline,
+					}))
+				: hosts,
+		[hosts, presence],
+	);
+
 	const listGroups = useMemo<Array<SettingsListGroup<HostRow>>>(() => {
-		const sorted = [...hosts].sort((a, b) => a.name.localeCompare(b.name));
+		const sorted = [...hostsWithPresence].sort((a, b) =>
+			a.name.localeCompare(b.name),
+		);
 		return [
 			{
 				id: "online",
@@ -64,7 +89,7 @@ export function HostsSettingsSidebar({
 				rows: sorted.filter((h) => !h.isOnline),
 			},
 		];
-	}, [hosts]);
+	}, [hostsWithPresence]);
 
 	return (
 		<SettingsListSidebar

@@ -2,6 +2,7 @@ import { and, eq } from "@tanstack/db";
 import { useLiveQuery } from "@tanstack/react-db";
 import { useMemo } from "react";
 import { env } from "renderer/env.renderer";
+import { useHostsPresence } from "renderer/hooks/useHostsPresence";
 import { authClient } from "renderer/lib/auth-client";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
@@ -58,14 +59,37 @@ export function useWorkspaceHostOptions(): UseWorkspaceHostOptionsResult {
 		[activeOrganizationId, collections, currentUserId],
 	);
 
+	const presenceTargets = useMemo(
+		() =>
+			activeOrganizationId
+				? accessibleHosts.map((host) => ({
+						organizationId: activeOrganizationId,
+						machineId: host.machineId,
+					}))
+				: [],
+		[accessibleHosts, activeOrganizationId],
+	);
+	const presence = useHostsPresence(presenceTargets);
+	const hostsWithPresence = useMemo(
+		() =>
+			presence
+				? accessibleHosts.map((host) => ({
+						...host,
+						isOnline: presence.get(host.machineId) ?? host.isOnline,
+					}))
+				: accessibleHosts,
+		[accessibleHosts, presence],
+	);
+
 	const localHost = useMemo(
-		() => accessibleHosts.find((host) => host.machineId === machineId) ?? null,
-		[accessibleHosts, machineId],
+		() =>
+			hostsWithPresence.find((host) => host.machineId === machineId) ?? null,
+		[hostsWithPresence, machineId],
 	);
 
 	const otherHosts = useMemo(
 		() =>
-			accessibleHosts
+			hostsWithPresence
 				.filter((host) => host.machineId !== machineId)
 				.map((host) => ({
 					id: host.machineId,
@@ -73,7 +97,7 @@ export function useWorkspaceHostOptions(): UseWorkspaceHostOptionsResult {
 					isOnline: host.isOnline ?? false,
 				}))
 				.sort((a, b) => a.name.localeCompare(b.name)),
-		[accessibleHosts, machineId],
+		[hostsWithPresence, machineId],
 	);
 
 	// Always surface the local device, even if its v2Hosts row hasn't synced

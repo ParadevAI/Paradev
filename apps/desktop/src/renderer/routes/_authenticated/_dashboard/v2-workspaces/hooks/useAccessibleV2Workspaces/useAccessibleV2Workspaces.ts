@@ -8,6 +8,7 @@ import { resolveProjectIconUrl } from "renderer/hooks/host-projects/resolveProje
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { deriveTerminalAgentStatus } from "renderer/hooks/host-service/useTerminalAgentStatuses";
 import { useHostWorkspacesSource } from "renderer/hooks/host-workspaces/useHostWorkspaces";
+import { useHostsPresence } from "renderer/hooks/useHostsPresence";
 import { useRelayUrl } from "renderer/hooks/useRelayUrl";
 import { authClient } from "renderer/lib/auth-client";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
@@ -227,7 +228,7 @@ export function useAccessibleV2Workspaces(
 	const { workspaces: hostWorkspaces, isReady } =
 		deviceFilter === undefined ? fanoutSource : scopedSource;
 
-	const { data: hostRows = [] } = useLiveQuery(
+	const { data: rawHostRows = [] } = useLiveQuery(
 		(q) =>
 			q.from({ hosts: collections.v2Hosts }).select(({ hosts }) => ({
 				organizationId: hosts.organizationId,
@@ -236,6 +237,17 @@ export function useAccessibleV2Workspaces(
 				isOnline: hosts.isOnline,
 			})),
 		[collections],
+	);
+	const presence = useHostsPresence(rawHostRows);
+	const hostRows = useMemo(
+		() =>
+			presence
+				? rawHostRows.map((host) => ({
+						...host,
+						isOnline: presence.get(host.machineId) ?? host.isOnline,
+					}))
+				: rawHostRows,
+		[rawHostRows, presence],
 	);
 
 	const { data: userHostRows = [] } = useLiveQuery(

@@ -2,6 +2,7 @@ import { useLiveQuery } from "@tanstack/react-db";
 import { formatDistanceToNow } from "date-fns";
 import { useMemo } from "react";
 import { ScrollView, Text } from "react-native";
+import { useHostsPresence } from "@/hooks/useHostsPresence";
 import { useTheme } from "@/hooks/useTheme";
 import { HostStatusDot } from "@/screens/(authenticated)/components/HostStatusDot";
 import { ListRow } from "@/screens/(authenticated)/components/ListRow";
@@ -15,10 +16,17 @@ export function HostsSettingsScreen() {
 		(q) => q.from({ v2Hosts: collections.v2Hosts }),
 		[collections],
 	);
+	const presence = useHostsPresence(hosts ?? []);
 
 	const hostRows = useMemo(
-		() => [...(hosts ?? [])].sort((a, b) => a.name.localeCompare(b.name)),
-		[hosts],
+		() =>
+			[...(hosts ?? [])]
+				.map((host) => ({
+					...host,
+					isOnline: presence?.get(host.machineId) ?? host.isOnline,
+				}))
+				.sort((a, b) => a.name.localeCompare(b.name)),
+		[hosts, presence],
 	);
 
 	return (

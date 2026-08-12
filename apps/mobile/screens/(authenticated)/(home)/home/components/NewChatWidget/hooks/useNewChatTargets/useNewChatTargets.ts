@@ -3,6 +3,7 @@ import { useQueries } from "@tanstack/react-query";
 import { compareDesc } from "date-fns";
 import { useMemo } from "react";
 import { toHostProjectItem } from "@/hooks/useHostProjects";
+import { useHostsPresence } from "@/hooks/useHostsPresence";
 import type { HostWorkspaceItem } from "@/hooks/useHostWorkspaces";
 import {
 	buildRelayHostUrl,
@@ -48,16 +49,17 @@ export function useNewChatTargets(workspaces: HostWorkspaceItem[] = []): {
 		(q) => q.from({ v2Hosts: collections.v2Hosts }),
 		[collections],
 	);
+	const presence = useHostsPresence(hosts ?? []);
 	const onlineHosts = useMemo(
 		() =>
 			(hosts ?? [])
-				.filter((host) => host.isOnline)
+				.filter((host) => presence?.get(host.machineId) ?? host.isOnline)
 				.map((host) => ({
 					machineId: host.machineId,
 					name: host.name,
 					hostUrl: buildRelayHostUrl(host.organizationId, host.machineId),
 				})),
-		[hosts],
+		[hosts, presence],
 	);
 
 	const projectListQueries = useQueries({

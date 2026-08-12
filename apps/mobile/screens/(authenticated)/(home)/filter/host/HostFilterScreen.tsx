@@ -2,6 +2,7 @@ import { useLiveQuery } from "@tanstack/react-db";
 import { useRouter } from "expo-router";
 import { useMemo } from "react";
 import { ScrollView } from "react-native";
+import { useHostsPresence } from "@/hooks/useHostsPresence";
 import { useWorkspacesFilterStore } from "@/screens/(authenticated)/(home)/home/stores/workspacesFilterStore";
 import { useSelectedHost } from "@/screens/(authenticated)/(home)/hooks/useSelectedHost";
 import { HostStatusDot } from "@/screens/(authenticated)/components/HostStatusDot";
@@ -21,10 +22,17 @@ export function HostFilterScreen() {
 		(q) => q.from({ v2Hosts: collections.v2Hosts }),
 		[collections],
 	);
+	const presence = useHostsPresence(hosts ?? []);
 
 	const sortedHosts = useMemo(
-		() => [...(hosts ?? [])].sort((a, b) => a.name.localeCompare(b.name)),
-		[hosts],
+		() =>
+			[...(hosts ?? [])]
+				.map((host) => ({
+					...host,
+					isOnline: presence?.get(host.machineId) ?? host.isOnline,
+				}))
+				.sort((a, b) => a.name.localeCompare(b.name)),
+		[hosts, presence],
 	);
 
 	const selectHost = (machineId: string) => {

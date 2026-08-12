@@ -3,6 +3,7 @@ import { eq } from "@tanstack/db";
 import { useLiveQuery } from "@tanstack/react-db";
 import { useMemo } from "react";
 import { useHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
+import { useHostsPresence } from "renderer/hooks/useHostsPresence";
 import { authClient } from "renderer/lib/auth-client";
 import {
 	type PersistableTransaction,
@@ -52,6 +53,10 @@ export function HostSettings({ hostId }: HostSettingsProps) {
 		[collections, hostId],
 	);
 	const host = hostRows[0];
+	const presence = useHostsPresence(hostRows);
+	const hostIsOnline = host
+		? (presence?.get(host.machineId) ?? host.isOnline)
+		: false;
 
 	const { data: hostUserRows = [] } = useLiveQuery(
 		(q) =>
@@ -167,7 +172,7 @@ export function HostSettings({ hostId }: HostSettingsProps) {
 		<div className="p-6 max-w-4xl w-full mx-auto select-text">
 			<HostHeader
 				name={host.name}
-				isOnline={host.isOnline}
+				isOnline={hostIsOnline}
 				machineId={host.machineId}
 				canRename={isOwner}
 			/>
@@ -177,7 +182,7 @@ export function HostSettings({ hostId }: HostSettingsProps) {
 					hostUrl={hostUrl}
 					hostName={host.name}
 					isRemoteTarget={isRemoteTarget}
-					isOnline={host.isOnline || !isRemoteTarget}
+					isOnline={hostIsOnline || !isRemoteTarget}
 					canEdit={isOwner}
 				/>
 

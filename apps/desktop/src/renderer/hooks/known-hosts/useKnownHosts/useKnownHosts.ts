@@ -1,6 +1,7 @@
 import { useLiveQuery } from "@tanstack/react-db";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { env } from "renderer/env.renderer";
+import { useHostsPresence } from "renderer/hooks/useHostsPresence";
 import { authClient } from "renderer/lib/auth-client";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { MOCK_ORG_ID } from "shared/constants";
@@ -95,9 +96,18 @@ export function useKnownHosts(): {
 		);
 	}, [liveRows, liveReady, snapshot, organizationId]);
 
+	const presence = useHostsPresence(hosts);
+	const hostsWithPresence = useMemo(() => {
+		if (!presence) return hosts;
+		return hosts.map((host) => ({
+			...host,
+			isOnline: presence.get(host.machineId) ?? host.isOnline,
+		}));
+	}, [hosts, presence]);
+
 	const settled =
 		liveReady ||
 		(snapshot !== null && snapshot.organizationId === organizationId);
 
-	return { hosts, organizationId, settled };
+	return { hosts: hostsWithPresence, organizationId, settled };
 }

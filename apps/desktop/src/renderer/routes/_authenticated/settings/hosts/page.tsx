@@ -3,6 +3,7 @@ import { useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo } from "react";
 import { env } from "renderer/env.renderer";
+import { useHostsPresence } from "renderer/hooks/useHostsPresence";
 import { authClient } from "renderer/lib/auth-client";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { MOCK_ORG_ID } from "shared/constants";
@@ -35,11 +36,23 @@ function HostsIndexPage() {
 		[collections, activeOrganizationId],
 	);
 
+	const presenceTargets = useMemo(
+		() =>
+			activeOrganizationId
+				? hosts.map((host) => ({
+						organizationId: activeOrganizationId,
+						machineId: host.id,
+					}))
+				: [],
+		[hosts, activeOrganizationId],
+	);
+	const presence = useHostsPresence(presenceTargets);
+
 	const firstHostId = useMemo(() => {
 		const sorted = [...hosts].sort((a, b) => a.name.localeCompare(b.name));
-		const online = sorted.find((h) => h.isOnline);
+		const online = sorted.find((h) => presence?.get(h.id) ?? h.isOnline);
 		return (online ?? sorted[0])?.id ?? null;
-	}, [hosts]);
+	}, [hosts, presence]);
 
 	useEffect(() => {
 		if (firstHostId) {
