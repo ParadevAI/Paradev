@@ -224,13 +224,17 @@ export function TasksView({
 	const isLinearConnected =
 		integrations?.some((i) => i.provider === "linear") ?? false;
 
+	// Defaults ("all"/null) are omitted from the URL, so write the store too —
+	// otherwise the render falls back to the stale stored value (no-op select).
 	const handleTabChange = (tab: TabValue) => {
 		cancelPendingSearchNavigation();
+		storeSetTab(tab);
 		navigate({ to: "/tasks", search: buildSearch({ tab }), replace: true });
 	};
 
 	const handleAssigneeFilterChange = (assignee: string | null) => {
 		cancelPendingSearchNavigation();
+		storeSetAssignee(assignee);
 		navigate({
 			to: "/tasks",
 			search: buildSearch({ assignee }),
@@ -269,6 +273,7 @@ export function TasksView({
 
 	const handleLinearProjectFilterChange = (linearProject: string | null) => {
 		cancelPendingSearchNavigation();
+		storeSetLinearProjectFilter(linearProject);
 		navigate({
 			to: "/tasks",
 			search: buildSearch({ linearProject }),
