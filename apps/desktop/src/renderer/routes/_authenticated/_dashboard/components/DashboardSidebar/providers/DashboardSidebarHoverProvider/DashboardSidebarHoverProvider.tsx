@@ -143,11 +143,16 @@ export function DashboardSidebarHoverProvider({
 	// Counted, not boolean: overlapping holds (chip trigger hovered while its
 	// hover card is open, adjacent chips) must not release each other early.
 	const [suppressionCount, setSuppressionCount] = useState(0);
+	// Mirror for the stable callbacks below: opens must check suppression at
+	// call time (pointer events during drags), not at closure-creation time.
+	const suppressionCountRef = useRef(0);
 
 	const beginHoverCardSuppression = useCallback(() => {
+		suppressionCountRef.current += 1;
 		setSuppressionCount((count) => count + 1);
 	}, []);
 	const endHoverCardSuppression = useCallback(() => {
+		suppressionCountRef.current = Math.max(0, suppressionCountRef.current - 1);
 		setSuppressionCount((count) => Math.max(0, count - 1));
 	}, []);
 
@@ -213,6 +218,11 @@ export function DashboardSidebarHoverProvider({
 			anchor: HTMLElement,
 			payload: DashboardSidebarHoverPayload,
 		) => {
+			// While suppressed (chip popover up, sidebar drag in progress) the
+			// hover machine is inert: opening would set hoveredId, and hover-open
+			// side effects (PR refresh) key off that state even when the card
+			// itself is hidden.
+			if (suppressionCountRef.current > 0) return;
 			clearCloseTimer();
 			stopSafeTriangleTracking();
 			if (stateRef.current.hoveredId !== null) {
@@ -222,8 +232,11 @@ export function DashboardSidebarHoverProvider({
 			}
 			clearOpenTimer();
 			openTimerRef.current = setTimeout(() => {
-				setState({ hoveredId: id, anchorElement: anchor, payload });
 				openTimerRef.current = null;
+				// Re-check at fire time: suppression may have begun (chip popover,
+				// drag start) while this open was waiting out OPEN_DELAY_MS.
+				if (suppressionCountRef.current > 0) return;
+				setState({ hoveredId: id, anchorElement: anchor, payload });
 			}, OPEN_DELAY_MS);
 		},
 		[clearCloseTimer, clearOpenTimer, stopSafeTriangleTracking],

@@ -1,19 +1,5 @@
 import {
-	closestCenter,
-	DndContext,
-	type DragEndEvent,
-	DragOverlay,
-	KeyboardSensor,
-	MeasuringStrategy,
-	MouseSensor,
-	TouchSensor,
-	useSensor,
-	useSensors,
-} from "@dnd-kit/core";
-import {
-	arrayMove,
 	SortableContext,
-	sortableKeyboardCoordinates,
 	useSortable,
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
@@ -23,7 +9,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { useMatchRoute, useNavigate } from "@tanstack/react-router";
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
-import { createPortal } from "react-dom";
 import { HiOutlineCog6Tooth } from "react-icons/hi2";
 import { HiringBanner } from "renderer/components/HiringBanner";
 import { UpdatesPill } from "renderer/components/UpdatesPill";
@@ -45,6 +30,8 @@ import { DashboardSidebarWorkspacesHeader } from "./components/DashboardSidebarW
 import { V2SetupScriptCard } from "./components/V2SetupScriptCard";
 import { useDashboardSidebarData } from "./hooks/useDashboardSidebarData";
 import { useDashboardSidebarShortcuts } from "./hooks/useDashboardSidebarShortcuts";
+import { useDashboardSidebarDnd } from "./hooks/useSidebarDnd";
+import { DashboardSidebarDndProvider } from "./providers/DashboardSidebarDndProvider";
 import { DashboardSidebarHoverProvider } from "./providers/DashboardSidebarHoverProvider";
 import { DashboardSidebarPortsProvider } from "./providers/DashboardSidebarPortsProvider";
 import { DashboardSidebarSelectionProvider } from "./providers/DashboardSidebarSelectionProvider";
@@ -58,7 +45,6 @@ interface DashboardSidebarProps {
 interface SortableProjectWrapperProps {
 	project: DashboardSidebarProject;
 	isCollapsed: boolean;
-	isDraggingProject: boolean;
 	workspaceShortcutLabels: Map<string, string>;
 	onWorkspaceHover: (workspaceId: string) => void | Promise<void>;
 	onToggleCollapse: (projectId: string) => void;
@@ -67,7 +53,6 @@ interface SortableProjectWrapperProps {
 const SortableProjectWrapper = memo(function SortableProjectWrapper({
 	project,
 	isCollapsed,
-	isDraggingProject,
 	workspaceShortcutLabels,
 	onWorkspaceHover,
 	onToggleCollapse,
@@ -80,16 +65,14 @@ const SortableProjectWrapper = memo(function SortableProjectWrapper({
 		transition,
 		isDragging,
 	} = useSortable({ id: project.id });
+	const { activeType } = useDashboardSidebarDnd();
+	const isDraggingProject = activeType === "project";
 
-	return (
-		<div
-			ref={setNodeRef}
-			style={{
-				transform: CSS.Translate.toString(transform),
-				transition,
-				opacity: isDragging ? 0.5 : undefined,
-			}}
-		>
+	// useSortable re-renders this wrapper on every pointer move of any drag in
+	// the sidebar's DndContext; the project section subtree is expensive, so
+	// keep it referentially stable while only the wrapper transform changes.
+	const section = useMemo(
+		() => (
 			<DashboardSidebarProjectSection
 				project={project}
 				isSidebarCollapsed={isCollapsed}
@@ -100,6 +83,29 @@ const SortableProjectWrapper = memo(function SortableProjectWrapper({
 				dragHandleListeners={listeners}
 				dragHandleAttributes={attributes}
 			/>
+		),
+		[
+			project,
+			isCollapsed,
+			isDraggingProject,
+			workspaceShortcutLabels,
+			onWorkspaceHover,
+			onToggleCollapse,
+			listeners,
+			attributes,
+		],
+	);
+
+	return (
+		<div
+			ref={setNodeRef}
+			style={{
+				transform: CSS.Translate.toString(transform),
+				transition,
+				opacity: isDragging ? 0.5 : undefined,
+			}}
+		>
+			{section}
 		</div>
 	);
 });
@@ -126,19 +132,6 @@ export function DashboardSidebar({
 	const workspacesListCollapsed = useSidebarWorkspacesCollapseStore(
 		(s) => s.isCollapsed,
 	);
-
-	const sensors = useSensors(
-		useSensor(MouseSensor, { activationConstraint: { distance: 8 } }),
-		useSensor(TouchSensor, {
-			activationConstraint: { delay: 200, tolerance: 5 },
-		}),
-		useSensor(KeyboardSensor, {
-			coordinateGetter: sortableKeyboardCoordinates,
-		}),
-	);
-
-	const [activeProject, setActiveProject] =
-		useState<DashboardSidebarProject | null>(null);
 
 	// Local project order — syncs from groups, updated on drag end
 	const [projectOrder, setProjectOrder] = useState(() =>
@@ -203,20 +196,12 @@ export function DashboardSidebar({
 		return null;
 	}, [groups, pinnedWorkspaces, activeV2WorkspaceId]);
 
-	const handleDragEnd = useCallback(
-		({ active, over }: DragEndEvent) => {
-			if (over && active.id !== over.id) {
-				const oldIndex = projectOrder.indexOf(String(active.id));
-				const newIndex = projectOrder.indexOf(String(over.id));
-				if (oldIndex !== -1 && newIndex !== -1) {
-					const reordered = arrayMove(projectOrder, oldIndex, newIndex);
-					setProjectOrder(reordered);
-					reorderProjects(reordered);
-				}
-			}
-			setActiveProject(null);
+	const handleReorderProjects = useCallback(
+		(reordered: string[]) => {
+			setProjectOrder(reordered);
+			reorderProjects(reordered);
 		},
-		[projectOrder, reorderProjects],
+		[reorderProjects],
 	);
 
 	return (
@@ -227,46 +212,41 @@ export function DashboardSidebar({
 				<DashboardSidebarHoverProvider>
 					<DashboardSidebarPortsProvider enabled={!isCollapsed}>
 						<DashboardSidebarHoverCardOverlay>
-							<div className="flex h-full flex-col border-r border-border bg-muted/45 dark:bg-muted/35">
-								<DashboardSidebarHeader isCollapsed={isCollapsed} />
+							<DashboardSidebarDndProvider
+								projects={orderedGroups}
+								pinnedWorkspaces={pinnedWorkspaces}
+								sessionWorkspaces={sessionWorkspaces}
+								isSidebarCollapsed={isCollapsed}
+								workspaceShortcutLabels={workspaceShortcutLabels}
+								onReorderProjects={handleReorderProjects}
+							>
+								<div className="flex h-full flex-col border-r border-border bg-muted/45 dark:bg-muted/35">
+									<DashboardSidebarHeader isCollapsed={isCollapsed} />
 
-								<OverflowFadeContainer
-									fadeEdges={["top", "bottom"]}
-									className="flex-1 overflow-y-auto hide-scrollbar"
-								>
-									{(isCollapsed || !workspacesListCollapsed) && (
-										<DashboardSidebarPinnedSection
-											pinnedWorkspaces={pinnedWorkspaces}
+									<OverflowFadeContainer
+										fadeEdges={["top", "bottom"]}
+										className="flex-1 overflow-y-auto hide-scrollbar"
+									>
+										{(isCollapsed || !workspacesListCollapsed) && (
+											<DashboardSidebarPinnedSection
+												pinnedWorkspaces={pinnedWorkspaces}
+												isCollapsed={isCollapsed}
+												onWorkspaceHover={refreshWorkspacePullRequest}
+											/>
+										)}
+										<DashboardSidebarSessionsSection
+											sessionWorkspaces={sessionWorkspaces}
 											isCollapsed={isCollapsed}
+											rowsHidden={!isCollapsed && workspacesListCollapsed}
+											workspaceShortcutLabels={workspaceShortcutLabels}
 											onWorkspaceHover={refreshWorkspacePullRequest}
 										/>
-									)}
-									<DashboardSidebarSessionsSection
-										sessionWorkspaces={sessionWorkspaces}
-										isCollapsed={isCollapsed}
-										rowsHidden={!isCollapsed && workspacesListCollapsed}
-										workspaceShortcutLabels={workspaceShortcutLabels}
-										onWorkspaceHover={refreshWorkspacePullRequest}
-									/>
-									{!isCollapsed && (
-										<DashboardSidebarBulkActions projects={orderedGroups}>
-											<DashboardSidebarWorkspacesHeader />
-										</DashboardSidebarBulkActions>
-									)}
-									{(isCollapsed || !workspacesListCollapsed) && (
-										<DndContext
-											sensors={sensors}
-											collisionDetection={closestCenter}
-											measuring={{
-												droppable: { strategy: MeasuringStrategy.Always },
-											}}
-											onDragStart={({ active }) => {
-												const project = groups.find((p) => p.id === active.id);
-												setActiveProject(project ?? null);
-											}}
-											onDragEnd={handleDragEnd}
-											onDragCancel={() => setActiveProject(null)}
-										>
+										{!isCollapsed && (
+											<DashboardSidebarBulkActions projects={orderedGroups}>
+												<DashboardSidebarWorkspacesHeader />
+											</DashboardSidebarBulkActions>
+										)}
+										{(isCollapsed || !workspacesListCollapsed) && (
 											<SortableContext
 												items={projectOrder}
 												strategy={verticalListSortingStrategy}
@@ -276,91 +256,66 @@ export function DashboardSidebar({
 														key={project.id}
 														project={project}
 														isCollapsed={isCollapsed}
-														isDraggingProject={activeProject != null}
 														workspaceShortcutLabels={workspaceShortcutLabels}
 														onWorkspaceHover={refreshWorkspacePullRequest}
 														onToggleCollapse={toggleProjectCollapsed}
 													/>
 												))}
 											</SortableContext>
+										)}
+									</OverflowFadeContainer>
+									{!isCollapsed && !inlineWorkspacePortsEnabled && (
+										<DashboardSidebarPortsList />
+									)}
+									{!isCollapsed && activeV2Project && activeHostUrl && (
+										<V2SetupScriptCard
+											hostUrl={activeHostUrl}
+											projectId={activeV2Project.id}
+											projectName={activeV2Project.name}
+										/>
+									)}
+									<HiringBanner surface="v2" isCollapsed={isCollapsed} />
+									<div
+										className={cn(
+											isCollapsed
+												? "flex flex-col items-center gap-2 py-2"
+												: "flex items-center gap-1 p-2",
+										)}
+									>
+										{isCollapsed ? (
+											<OrganizationDropdown variant="collapsed" />
+										) : (
+											<div className="min-w-0 flex-1">
+												<OrganizationDropdown variant="expanded" />
+											</div>
+										)}
 
-											{createPortal(
-												<DragOverlay dropAnimation={null}>
-													{activeProject && (
-														// Transparent on purpose: the sidebar surface comes from
-														// window vibrancy, so any opaque bg renders as a solid
-														// slab. Sortable siblings make room, so the row floats
-														// over empty sidebar, not over other rows.
-														<div>
-															<DashboardSidebarProjectSection
-																project={activeProject}
-																isSidebarCollapsed={isCollapsed}
-																isDraggingProject
-																workspaceShortcutLabels={
-																	workspaceShortcutLabels
-																}
-																onWorkspaceHover={() => {}}
-																onToggleCollapse={() => {}}
-															/>
-														</div>
+										<UpdatesPill isCollapsed={isCollapsed} />
+										<Tooltip delayDuration={300}>
+											<TooltipTrigger asChild>
+												<button
+													type="button"
+													aria-label="Settings"
+													onClick={() => navigate({ to: "/settings/account" })}
+													className={cn(
+														"flex size-8 shrink-0 items-center justify-center rounded-md transition-colors",
+														isSettingsOpen
+															? "bg-fill-selected text-muted-foreground"
+															: "text-muted-foreground hover:bg-fill-hover",
 													)}
-												</DragOverlay>,
-												document.body,
-											)}
-										</DndContext>
-									)}
-								</OverflowFadeContainer>
-								{!isCollapsed && !inlineWorkspacePortsEnabled && (
-									<DashboardSidebarPortsList />
-								)}
-								{!isCollapsed && activeV2Project && activeHostUrl && (
-									<V2SetupScriptCard
-										hostUrl={activeHostUrl}
-										projectId={activeV2Project.id}
-										projectName={activeV2Project.name}
-									/>
-								)}
-								<HiringBanner surface="v2" isCollapsed={isCollapsed} />
-								<div
-									className={cn(
-										isCollapsed
-											? "flex flex-col items-center gap-2 py-2"
-											: "flex items-center gap-1 p-2",
-									)}
-								>
-									{isCollapsed ? (
-										<OrganizationDropdown variant="collapsed" />
-									) : (
-										<div className="min-w-0 flex-1">
-											<OrganizationDropdown variant="expanded" />
-										</div>
-									)}
-
-									<UpdatesPill isCollapsed={isCollapsed} />
-									<Tooltip delayDuration={300}>
-										<TooltipTrigger asChild>
-											<button
-												type="button"
-												aria-label="Settings"
-												onClick={() => navigate({ to: "/settings/account" })}
-												className={cn(
-													"flex size-8 shrink-0 items-center justify-center rounded-md transition-colors",
-													isSettingsOpen
-														? "bg-fill-selected text-muted-foreground"
-														: "text-muted-foreground hover:bg-fill-hover",
-												)}
-											>
-												<HiOutlineCog6Tooth className="size-3.5" />
-											</button>
-										</TooltipTrigger>
-										<TooltipContent side={isCollapsed ? "right" : "top"}>
-											{settingsHotkey !== "Unassigned"
-												? `Settings (${settingsHotkey})`
-												: "Settings"}
-										</TooltipContent>
-									</Tooltip>
+												>
+													<HiOutlineCog6Tooth className="size-3.5" />
+												</button>
+											</TooltipTrigger>
+											<TooltipContent side={isCollapsed ? "right" : "top"}>
+												{settingsHotkey !== "Unassigned"
+													? `Settings (${settingsHotkey})`
+													: "Settings"}
+											</TooltipContent>
+										</Tooltip>
+									</div>
 								</div>
-							</div>
+							</DashboardSidebarDndProvider>
 						</DashboardSidebarHoverCardOverlay>
 					</DashboardSidebarPortsProvider>
 				</DashboardSidebarHoverProvider>
