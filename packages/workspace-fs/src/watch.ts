@@ -40,6 +40,17 @@ const MAX_WORK_CHUNK_SIZE = 500;
 const THROTTLE_DELAY_MS = 200;
 const MAX_BUFFERED_EVENTS = 30_000;
 
+// FSEvents overflow rescan pacing. Under sustained churn the kernel drops
+// events repeatedly (648 overflows/day observed across 8 worktrees of one
+// monorepo); reacting to each one cancels in-flight search-index rebuilds and
+// re-triggers full disk walks. Instead: coalesce per watch root into at most
+// one rescan per window, double the window while overflows keep arriving, and
+// reset after a quiet period. The rescan timer always trails the last
+// overflow, so settled state is guaranteed to be picked up.
+const OVERFLOW_RESCAN_INITIAL_MS = 5_000;
+const OVERFLOW_RESCAN_MAX_MS = 60_000;
+const OVERFLOW_BACKOFF_RESET_MS = 120_000;
+
 // Recovery liveness probe: a freshly attached FSEvents stream can be deaf for
 // a sub-second window after subscribe() resolves (observed on a busy Electron
 // main loop) — writes in that window are missed forever. Recovery writes a
@@ -130,6 +141,16 @@ interface WatcherState {
 	/** Bounded post-overflow probe for a root deletion whose event was dropped. */
 	overflowRootCheckTimer: ReturnType<typeof setInterval> | null;
 	overflowRootChecksLeft: number;
+	/** Pending coalesced overflow rescan; trails the last overflow of a storm. */
+	overflowRescanTimer: ReturnType<typeof setTimeout> | null;
+	/** Hard fire-by time for the pending batch — rearms clamp to this so
+	 * sustained overflow can't postpone rescans past the cap. */
+	overflowRescanDeadline: number;
+	/** Delay for the next overflow rescan; doubles per rescan up to the cap. */
+	overflowRescanDelayMs: number;
+	/** Overflows absorbed by the pending rescan (fire-time log only). */
+	overflowsCoalesced: number;
+	lastOverflowAt: number;
 	listeners: Set<WatchListener>;
 	/**
 	 * Root-relative directories pruned from the native subscription beyond the
@@ -207,6 +228,10 @@ export interface FsWatcherManagerOptions {
 	filePathsMax?: number;
 	/** How often a suspended watcher polls for its deleted root to reappear. */
 	recoveryPollMs?: number;
+	/** Overflow rescan pacing. Test-only overrides. */
+	overflowRescanInitialMs?: number;
+	overflowRescanMaxMs?: number;
+	overflowBackoffResetMs?: number;
 }
 
 export class FsWatcherManager {
@@ -215,6 +240,9 @@ export class FsWatcherManager {
 	private readonly listGitIgnoredDirs?: (rootPath: string) => Promise<string[]>;
 	private readonly filePathsMax: number;
 	private readonly recoveryPollMs: number;
+	private readonly overflowRescanInitialMs: number;
+	private readonly overflowRescanMaxMs: number;
+	private readonly overflowBackoffResetMs: number;
 	private readonly watchers = new Map<string, WatcherState>();
 	/**
 	 * One-shot dedup so a single ENOSPC report doesn't spam logs across every
@@ -234,6 +262,12 @@ export class FsWatcherManager {
 		this.listGitIgnoredDirs = options.listGitIgnoredDirs;
 		this.filePathsMax = options.filePathsMax ?? FILE_PATHS_MAX;
 		this.recoveryPollMs = options.recoveryPollMs ?? 2_000;
+		this.overflowRescanInitialMs =
+			options.overflowRescanInitialMs ?? OVERFLOW_RESCAN_INITIAL_MS;
+		this.overflowRescanMaxMs =
+			options.overflowRescanMaxMs ?? OVERFLOW_RESCAN_MAX_MS;
+		this.overflowBackoffResetMs =
+			options.overflowBackoffResetMs ?? OVERFLOW_BACKOFF_RESET_MS;
 	}
 
 	async subscribe(
@@ -284,6 +318,7 @@ export class FsWatcherManager {
 			state.recoveryTimer = null;
 		}
 		this.clearOverflowRootCheck(state);
+		this.clearOverflowRescan(state);
 		state.generation += 1;
 		state.throttler.dispose();
 		const subscription = state.subscription;
@@ -370,12 +405,13 @@ export class FsWatcherManager {
 	 *   exhausted. Log once with a remediation hint; spamming repeats doesn't
 	 *   help — user has to bump the system limit and restart.
 	 * - `'File system must be re-scanned'`: macOS FSEvents kernel queue
-	 *   overflowed. Log and invalidate the search index (next search rebuilds
-	 *   from disk). Crucially, do NOT emit a synthetic event to listeners —
-	 *   overflow means "some events were dropped," not "git state changed,"
-	 *   and downstream consumers (git-watcher → renderer's useGitStatus →
-	 *   host-service git.getStatus) would interpret it as the latter and storm
-	 *   the host-service with git subprocess spawns.
+	 *   overflowed — some events were dropped and per-path bookkeeping can no
+	 *   longer be trusted. Schedule a coalesced, backed-off rescan (see
+	 *   `scheduleOverflowRescan`) rather than reacting per overflow: an
+	 *   immediate per-overflow reaction (index invalidation + a synthetic
+	 *   event) storms full disk walks and git-status refetches under
+	 *   sustained churn, while never reacting leaves consumers stale forever
+	 *   when the dropped events were the last ones of a burst.
 	 */
 	private onUnexpectedError(error: unknown, state: WatcherState): void {
 		const msg = toErrorMessage(error);
@@ -393,14 +429,7 @@ export class FsWatcherManager {
 		}
 
 		if (msg.indexOf("File system must be re-scanned") !== -1) {
-			console.error("[workspace-fs/watch] FSEvents overflow:", {
-				absolutePath: state.absolutePath,
-				error: msg,
-			});
-			// The kernel dropped events, so patch-based index maintenance can no
-			// longer be trusted; drop the index and let the next search rebuild
-			// from a fresh disk walk. Cheap (a map delete), so no debounce.
-			invalidateSearchIndexesForRoot(state.absolutePath);
+			this.scheduleOverflowRescan(state);
 			// The dropped events may have included the root's own deletion.
 			this.scheduleOverflowRootCheck(state);
 			return;
@@ -448,6 +477,11 @@ export class FsWatcherManager {
 			probeSeen: false,
 			overflowRootCheckTimer: null,
 			overflowRootChecksLeft: 0,
+			overflowRescanTimer: null,
+			overflowRescanDeadline: 0,
+			overflowRescanDelayMs: this.overflowRescanInitialMs,
+			overflowsCoalesced: 0,
+			lastOverflowAt: 0,
 			listeners: new Set<WatchListener>(),
 			prunedRelPrefixes: [],
 			filePaths: new Map<string, true>(),
@@ -741,11 +775,127 @@ export class FsWatcherManager {
 	}
 
 	/**
-	 * The watch root was deleted: the native stream is dead and will never
-	 * deliver again (FSEvents keeps following the old inode). Keep the state
-	 * and its listeners, drop the native side, and poll for the path to
-	 * reappear — VS Code's suspend/resume pattern (baseWatcher.ts).
+	 * Coalesce FSEvents overflows into a per-root trailing rescan: the rescan
+	 * fires one window after the LAST overflow, so it never lands mid-burst.
+	 * The rearm is lazy — overflows on the hot path only stamp
+	 * `lastOverflowAt`; the armed timer re-checks at fire time and pushes
+	 * itself out if an overflow landed inside its window (no timer-heap churn
+	 * at storm rates). Sustained overflow can't postpone it forever: a batch
+	 * deadline (first overflow + the cap) overrides the trailing wait, forcing
+	 * a rescan at least every OVERFLOW_RESCAN_MAX_MS, and a deadline-forced
+	 * fire arms a follow-up batch so the final rescan still trails the last
+	 * overflow once churn settles. The window doubles per fired rescan up to
+	 * the cap and resets after a quiet OVERFLOW_BACKOFF_RESET_MS.
 	 */
+	private scheduleOverflowRescan(state: WatcherState): void {
+		const now = Date.now();
+		if (now - state.lastOverflowAt >= this.overflowBackoffResetMs) {
+			state.overflowRescanDelayMs = this.overflowRescanInitialMs;
+		}
+		state.lastOverflowAt = now;
+		state.overflowsCoalesced += 1;
+		if (state.overflowRescanTimer) {
+			return;
+		}
+		state.overflowRescanDeadline = now + this.overflowRescanMaxMs;
+		console.error(
+			"[workspace-fs/watch] FSEvents overflow — rescan scheduled:",
+			{
+				absolutePath: state.absolutePath,
+				delayMs: state.overflowRescanDelayMs,
+			},
+		);
+		this.armOverflowRescan(state, now + state.overflowRescanDelayMs);
+	}
+
+	private armOverflowRescan(state: WatcherState, fireAt: number): void {
+		const delayMs = Math.max(
+			0,
+			Math.min(fireAt, state.overflowRescanDeadline) - Date.now(),
+		);
+		const timer = setTimeout(() => {
+			state.overflowRescanTimer = null;
+			this.performOverflowRescan(state);
+		}, delayMs);
+		timer.unref?.();
+		state.overflowRescanTimer = timer;
+	}
+
+	private performOverflowRescan(state: WatcherState): void {
+		if (this.watchers.get(state.absolutePath) !== state) {
+			return;
+		}
+		const now = Date.now();
+		const windowMs = state.overflowRescanDelayMs;
+		const trailingFireAt = state.lastOverflowAt + windowMs;
+		if (now < trailingFireAt && now < state.overflowRescanDeadline) {
+			// An overflow landed inside this window — lazy rearm to trail it.
+			this.armOverflowRescan(state, trailingFireAt);
+			return;
+		}
+		const coalescedOverflows = state.overflowsCoalesced;
+		state.overflowsCoalesced = 0;
+		state.overflowRescanDelayMs = Math.min(
+			windowMs * 2,
+			this.overflowRescanMaxMs,
+		);
+		console.error("[workspace-fs/watch] FSEvents overflow rescan:", {
+			absolutePath: state.absolutePath,
+			coalescedOverflows,
+		});
+		// The kernel dropped events, so the patch-maintained index can't be
+		// trusted; drop it and let the next search rebuild from a disk walk.
+		invalidateSearchIndexesForRoot(state.absolutePath);
+		// One broad "state changed" signal so consumers (git-watcher, file
+		// tree) refetch instead of trusting per-path events that never arrived.
+		this.emitDirect(state, {
+			events: [
+				{
+					kind: "overflow",
+					absolutePath: state.absolutePath,
+					isDirectory: true,
+				},
+			],
+		});
+		// A deadline-forced fire mid-storm hasn't seen the fs settle — arm a
+		// follow-up batch to keep the trailing guarantee.
+		if (now - state.lastOverflowAt < windowMs) {
+			state.overflowRescanDeadline = now + this.overflowRescanMaxMs;
+			this.armOverflowRescan(state, now + state.overflowRescanDelayMs);
+		}
+	}
+
+	/**
+	 * Deliver a batch to listeners directly, bypassing the throttler: for
+	 * convergence signals (overflow rescan, recovery resume) that must not be
+	 * dropped when the bounded buffer is full — exactly the burst conditions
+	 * that produce them. Per-listener throws are contained so one bad
+	 * subscriber can't skip siblings.
+	 */
+	private emitDirect(
+		state: WatcherState,
+		batch: { events: FsWatchEvent[] },
+	): void {
+		for (const listener of state.listeners) {
+			try {
+				listener(batch);
+			} catch (error) {
+				console.error("[workspace-fs/watch] direct emit listener threw", {
+					absolutePath: state.absolutePath,
+					error: toErrorMessage(error),
+				});
+			}
+		}
+	}
+
+	private clearOverflowRescan(state: WatcherState): void {
+		if (state.overflowRescanTimer) {
+			clearTimeout(state.overflowRescanTimer);
+			state.overflowRescanTimer = null;
+		}
+		state.overflowsCoalesced = 0;
+	}
+
 	/**
 	 * A kernel overflow can swallow the root-delete event itself (reproduced
 	 * with a 20k-file rm -rf), leaving the event-based detection in
@@ -787,6 +937,12 @@ export class FsWatcherManager {
 		state.overflowRootChecksLeft = 0;
 	}
 
+	/**
+	 * The watch root was deleted: the native stream is dead and will never
+	 * deliver again (FSEvents keeps following the old inode). Keep the state
+	 * and its listeners, drop the native side, and poll for the path to
+	 * reappear — VS Code's suspend/resume pattern (baseWatcher.ts).
+	 */
 	private async suspendForRecovery(state: WatcherState): Promise<void> {
 		if (!state.subscription || state.recoveryTimer) {
 			return;
@@ -809,6 +965,9 @@ export class FsWatcherManager {
 			state.flushTimer = null;
 		}
 		this.clearOverflowRootCheck(state);
+		// Recovery's resume already invalidates the index and emits a root
+		// create — a pending overflow rescan would be a redundant echo.
+		this.clearOverflowRescan(state);
 		// Must complete before any re-subscribe on this path: a new parcel
 		// subscription opened while the dead one is still registered joins the
 		// dead native backend and never delivers (verified empirically).
@@ -865,14 +1024,16 @@ export class FsWatcherManager {
 			return;
 		}
 		// The recreated tree is unknown: reset per-path tracking, drop the
-		// search index, and emit a root create so consumers refetch.
+		// search index, and emit a root create so consumers refetch. Direct
+		// delivery — this resume signal is a convergence signal like the
+		// overflow rescan and must not be dropped by a full throttler buffer.
 		state.filePaths.clear();
 		state.directoryPaths.clear();
 		invalidateSearchIndexesForRoot(state.absolutePath);
 		console.error("[workspace-fs/watch] watch root recreated — resumed:", {
 			absolutePath: state.absolutePath,
 		});
-		this.emit(state, {
+		this.emitDirect(state, {
 			events: [
 				{
 					kind: "create",
