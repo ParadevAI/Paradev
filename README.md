@@ -1,6 +1,6 @@
 <div align="center">
 
-<img width="full" alt="Superset" src="apps/marketing/public/images/readme-hero.png" />
+<img width="full" alt="Claude and OpenCode working in parallel Superset workspaces with live diffs" src="apps/marketing/public/images/readme-hero.gif" />
 
 ### The Code Editor for AI Agents
 
