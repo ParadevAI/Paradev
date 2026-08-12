@@ -1,3 +1,5 @@
+import * as Sentry from "@sentry/cloudflare";
+import { RELAY_CLOSE } from "@superset/shared/tunnel-v2-protocol";
 import type { Context, MiddlewareHandler } from "hono";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
@@ -38,12 +40,13 @@ function isWsUpgrade(c: Context<AppContext>): boolean {
 }
 
 // A failed auth on a WebSocket upgrade completes the handshake and closes
-// 1008 with a reason ≤123 bytes — the only way the peer can see *why*
-// (browsers and plain WS clients cannot read a non-101 response).
-function acceptAndClose(reason: string): Response {
+// with a typed RELAY_CLOSE code + reason ≤123 bytes — the only way the peer
+// can see *why* (browsers and plain WS clients cannot read a non-101
+// response).
+function acceptAndClose(code: number, reason: string): Response {
 	const pair = new WebSocketPair();
 	pair[1].accept();
-	pair[1].close(1008, reason);
+	pair[1].close(code, reason);
 	return new Response(null, { status: 101, webSocket: pair[0] });
 }
 
@@ -85,9 +88,14 @@ app.get("/v2/control", async (c) => {
 		return c.json({ error: "WebSocket upgrade required" }, 426);
 	}
 	const hostId = c.req.query("hostId");
-	if (!hostId) return acceptAndClose("Missing hostId");
+	if (!hostId) return acceptAndClose(RELAY_CLOSE.badRequest, "Missing hostId");
 	const result = await authenticate(c, hostId);
-	if (isDenial(result)) return acceptAndClose(result.message);
+	if (isDenial(result)) {
+		return acceptAndClose(
+			result.status === 401 ? RELAY_CLOSE.authExpired : RELAY_CLOSE.forbidden,
+			result.message,
+		);
+	}
 
 	const stub = await tunnelStub(c, hostId);
 	return stub.fetch(
@@ -107,7 +115,8 @@ app.get("/v2/dial", async (c) => {
 	}
 	const hostId = c.req.query("hostId");
 	const ticket = c.req.query("ticket");
-	if (!hostId || !ticket) return acceptAndClose("Missing hostId or ticket");
+	if (!hostId || !ticket)
+		return acceptAndClose(RELAY_CLOSE.badRequest, "Missing hostId or ticket");
 	const stub = await tunnelStub(c, hostId);
 	return stub.fetch(
 		`https://relay2/dial?ticket=${encodeURIComponent(ticket)}`,
@@ -254,8 +263,22 @@ app.get("/hosts/:hostId/*", async (c) => {
 	);
 });
 
-export { HostTunnel };
+// Exceptions only — console/breadcrumb capture stays off (the v1 relay's
+// memory leak was Sentry's console firehose). No-op until SENTRY_DSN is set.
+const sentryOptions = (env: RelayEnv): Sentry.CloudflareOptions => ({
+	dsn: env.SENTRY_DSN,
+	tracesSampleRate: 0,
+	sendDefaultPii: false,
+	integrations: (defaults) =>
+		defaults.filter((integration) => integration.name !== "Console"),
+});
 
-export default {
+const InstrumentedHostTunnel = Sentry.instrumentDurableObjectWithSentry(
+	sentryOptions,
+	HostTunnel,
+);
+export { InstrumentedHostTunnel as HostTunnel };
+
+export default Sentry.withSentry(sentryOptions, {
 	fetch: app.fetch,
-} satisfies ExportedHandler<RelayEnv>;
+} satisfies ExportedHandler<RelayEnv>);

@@ -19,6 +19,42 @@ export interface ControlPing {
 	type: "ping";
 }
 
+// ── Close codes ─────────────────────────────────────────────────────
+// Application close codes (4400-4499) with fixed recovery semantics, so
+// every leg logs the same name and no client infers behavior from reason
+// strings. Anything else is a transport-level close.
+export const RELAY_CLOSE = {
+	/** Malformed upgrade (missing hostId/ticket, unknown endpoint): fix the caller. */
+	badRequest: 4400,
+	/** JWT missing, invalid, or expired: mint a fresh token, then reconnect. */
+	authExpired: 4401,
+	/** Access check denied this identity: retry slowly, likely a config problem. */
+	forbidden: 4403,
+	/** Dial ticket unknown, expired, or already consumed: abandon this stream. */
+	unknownTicket: 4404,
+	/** Host sent no keepalive inside the stale window: reconnect immediately. */
+	staleHost: 4408,
+	/** A newer socket for the same host registered: yield, do not reconnect over it. */
+	replaced: 4409,
+	/** The host's control channel went away: this stream is dead, re-dial later. */
+	tunnelGone: 4410,
+} as const;
+
+const RELAY_CLOSE_DESCRIPTIONS: Record<number, string> = {
+	[RELAY_CLOSE.badRequest]: "bad-request: malformed upgrade, fix the caller",
+	[RELAY_CLOSE.authExpired]: "auth-expired: mint a fresh token and reconnect",
+	[RELAY_CLOSE.forbidden]: "forbidden: access denied, retry slowly",
+	[RELAY_CLOSE.unknownTicket]:
+		"unknown-ticket: stream credential gone, abandon",
+	[RELAY_CLOSE.staleHost]: "stale-host: no keepalive, reconnect now",
+	[RELAY_CLOSE.replaced]: "replaced: a newer host socket took over",
+	[RELAY_CLOSE.tunnelGone]: "tunnel-gone: host control channel disconnected",
+};
+
+export function describeRelayClose(code: number): string | null {
+	return RELAY_CLOSE_DESCRIPTIONS[code] ?? null;
+}
+
 export interface ControlPong {
 	type: "pong";
 }

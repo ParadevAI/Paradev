@@ -1,6 +1,7 @@
 import {
 	type ControlPing,
 	DIAL_TIMEOUT_MS,
+	RELAY_CLOSE,
 	type StreamDial,
 } from "@superset/shared/tunnel-v2-protocol";
 import { type Connection, type ConnectionContext, Server } from "partyserver";
@@ -134,7 +135,7 @@ export class HostTunnel extends Server<RelayEnv> {
 			// Last-write-wins: the new socket evicts any old one.
 			for (const other of this.getConnections(HOST_TAG)) {
 				if (other.id !== conn.id)
-					closeQuietly(other, 1000, "Replaced by new tunnel");
+					closeQuietly(other, RELAY_CLOSE.replaced, "Replaced by new tunnel");
 			}
 			await this.ctx.storage.put("lastHostSeenAt", Date.now());
 			await this.ctx.storage.setAlarm(Date.now() + LIVENESS_SWEEP_MS);
@@ -153,7 +154,7 @@ export class HostTunnel extends Server<RelayEnv> {
 			// ticket is this route's only credential, so anything else is
 			// refused rather than left open.
 			if (!waiting) {
-				conn.close(1008, "Unknown or expired ticket");
+				conn.close(RELAY_CLOSE.unknownTicket, "Unknown or expired ticket");
 				return;
 			}
 			conn.setState({ kind: "dial", ticket } satisfies ConnState);
@@ -163,7 +164,11 @@ export class HostTunnel extends Server<RelayEnv> {
 				setTimeout(() => {
 					this.unpairedDialTimers.delete(ticket);
 					this.earlyFrames.delete(conn.id);
-					closeQuietly(conn, 1011, "Client never attached");
+					closeQuietly(
+						conn,
+						RELAY_CLOSE.unknownTicket,
+						"Client never attached",
+					);
 				}, UNPAIRED_DIAL_TIMEOUT_MS),
 			);
 			waiting(true);
@@ -173,7 +178,7 @@ export class HostTunnel extends Server<RelayEnv> {
 		if (conn.tags.includes("client")) {
 			const dial = this.findByTicket(ticket, "dial");
 			if (!dial) {
-				conn.close(1011, "Stream expired");
+				conn.close(RELAY_CLOSE.unknownTicket, "Stream expired");
 				return;
 			}
 			const dialTimer = this.unpairedDialTimers.get(ticket);
@@ -199,7 +204,7 @@ export class HostTunnel extends Server<RelayEnv> {
 			return;
 		}
 
-		conn.close(1008, "Unknown endpoint");
+		conn.close(RELAY_CLOSE.badRequest, "Unknown endpoint");
 	}
 
 	onMessage(
@@ -269,7 +274,7 @@ export class HostTunnel extends Server<RelayEnv> {
 			// replacement host socket still mid-onConnect is never torn down.
 			for (const other of this.getConnections()) {
 				if (other.id === conn.id || other.tags.includes(HOST_TAG)) continue;
-				closeQuietly(other, 1001, "Tunnel disconnected");
+				closeQuietly(other, RELAY_CLOSE.tunnelGone, "Tunnel disconnected");
 			}
 			for (const [, timer] of this.unpairedDialTimers) clearTimeout(timer);
 			this.unpairedDialTimers.clear();
@@ -310,7 +315,7 @@ export class HostTunnel extends Server<RelayEnv> {
 			console.log(
 				`[relay2] host stale, closing: ${state?.kind === "host" ? state.hostId : this.name}`,
 			);
-			closeQuietly(host, 1011, "No keepalive from host");
+			closeQuietly(host, RELAY_CLOSE.staleHost, "No keepalive from host");
 			return;
 		}
 

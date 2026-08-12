@@ -1,6 +1,7 @@
-import type {
-	HttpDialFrame,
-	StreamDial,
+import {
+	describeRelayClose,
+	type HttpDialFrame,
+	type StreamDial,
 } from "@superset/shared/tunnel-v2-protocol";
 import ReconnectingWebSocket from "partysocket/ws";
 
@@ -87,9 +88,10 @@ export class TunnelClientV2 {
 		});
 
 		control.addEventListener("close", (event) => {
-			if (event.code === 1008) {
+			const described = describeRelayClose(event.code) ?? "";
+			if (event.code === 1008 || described) {
 				console.warn(
-					`[host-service:tunnel-v2] relay rejected connection (${event.reason ?? ""}); partysocket will retry`,
+					`[host-service:tunnel-v2] relay closed control (${event.code} ${described}): ${event.reason ?? ""}; partysocket will retry`,
 				);
 			}
 		});
