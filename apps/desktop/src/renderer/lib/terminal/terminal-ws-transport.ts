@@ -690,12 +690,18 @@ function attachSocketListeners(
 				message: message.message,
 			};
 			pushLog(transport, "error", message.message);
-			// Server closes after this; reconnecting would just hit the same error.
-			transport._terminated = true;
 			if (message.code === "session-gone") {
+				// The session is permanently destroyed — reconnecting can't revive it.
+				transport._terminated = true;
 				markSessionEnded(transport);
+				socket.close();
+				return;
 			}
-			socket.close();
+			// Any other error may be transient (e.g. a daemon-open timeout while the
+			// pty-daemon is stalled). The server closes the socket after this frame;
+			// let that close drive the normal reconnect/backoff path instead of
+			// terminating — a later attempt re-runs create-on-attach and succeeds
+			// once the host recovers.
 			return;
 		}
 
