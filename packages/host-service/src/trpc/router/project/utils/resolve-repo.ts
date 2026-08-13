@@ -144,12 +144,25 @@ function asInitialCommitTrpcError(err: unknown): TRPCError {
 
 /**
  * Scaffolding commits are authored by us in repos we just created — the
- * user's global git hooks (e.g. a `core.hooksPath` commit-msg policy) must
- * not be able to reject them. `--no-verify` skips pre-commit/commit-msg;
- * the empty `core.hooksPath` override covers the rest (a failing
- * prepare-commit-msg still aborts a `--no-verify` commit).
+ * user's local git policy must not be able to reject them. Two bypasses,
+ * both per-invocation `-c` overrides that never touch stored config:
+ *
+ * - Hooks: `--no-verify` skips pre-commit/commit-msg; the empty
+ *   `core.hooksPath` override covers the rest (a failing
+ *   prepare-commit-msg still aborts a `--no-verify` commit).
+ * - Signing: `commit.gpgsign=false` — this is our scaffolding, not the
+ *   user's work, so it must not carry their signing identity, and a
+ *   signing key that git cannot load (absent, unreadable, or not in the
+ *   agent) must not fail the commit outright (HOST-SERVICE-22).
  */
-const scaffoldCommitArgs = ["-c", "core.hooksPath=", "commit", "--no-verify"];
+const scaffoldCommitArgs = [
+	"-c",
+	"core.hooksPath=",
+	"-c",
+	"commit.gpgsign=false",
+	"commit",
+	"--no-verify",
+];
 
 /** `git init --initial-branch=main` with a fallback for older git versions. */
 async function gitInitMainBranch(targetPath: string): Promise<void> {

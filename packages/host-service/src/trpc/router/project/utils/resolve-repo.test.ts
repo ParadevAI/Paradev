@@ -404,6 +404,92 @@ describe("scaffolding commits bypass user git hooks", () => {
 	});
 });
 
+// ── scaffolding commits vs user commit signing ────────────────────
+
+describe("scaffolding commits bypass user commit signing", () => {
+	// Simulates a global config that requires SSH-signed commits with a
+	// signing key git cannot load, which makes every commit die with
+	// "fatal: failed to write commit object" (HOST-SERVICE-22). Nothing
+	// here disables signing for the repos under test — that is the point.
+	let savedGlobalConfig: string | undefined;
+	let signingConfig: string;
+	let identityConfig: string;
+
+	beforeEach(() => {
+		const identity = "[user]\n\tname = test\n\temail = test@example.com\n";
+		const missingKey = join(workRoot, "absent-signing-key.pub");
+		signingConfig = join(workRoot, "gitconfig-signing");
+		writeFileSync(
+			signingConfig,
+			`${identity}\tsigningkey = ${missingKey}\n[gpg]\n\tformat = ssh\n[commit]\n\tgpgsign = true\n`,
+		);
+		identityConfig = join(workRoot, "gitconfig-identity");
+		writeFileSync(identityConfig, `${identity}[commit]\n\tgpgsign = false\n`);
+		savedGlobalConfig = process.env.GIT_CONFIG_GLOBAL;
+		process.env.GIT_CONFIG_GLOBAL = signingConfig;
+	});
+
+	afterEach(() => {
+		if (savedGlobalConfig === undefined) delete process.env.GIT_CONFIG_GLOBAL;
+		else process.env.GIT_CONFIG_GLOBAL = savedGlobalConfig;
+	});
+
+	test("fixture sanity: the unusable signing key aborts a plain commit", async () => {
+		const repo = join(workRoot, "signed");
+		mkdirSync(repo);
+		const git = simpleGit(repo);
+		await git.init();
+
+		// simple-git's chain object is a thenable, not a Promise —
+		// `expect().rejects` won't unwrap it, so catch manually.
+		let rejected = false;
+		try {
+			await git.raw(["commit", "--allow-empty", "-m", "should be rejected"]);
+		} catch {
+			rejected = true;
+		}
+		expect(rejected).toBe(true);
+	});
+
+	test("initEmptyRepo commits despite required signing with an unusable key", async () => {
+		const resolved = await initEmptyRepo(workRoot, "fresh-signed");
+
+		expect(eqRealpath(resolved.repoPath, join(workRoot, "fresh-signed"))).toBe(
+			true,
+		);
+	});
+
+	test("initLocalRepoInPlace commits despite required signing with an unusable key", async () => {
+		const dir = join(workRoot, "in-place-signed");
+		mkdirSync(dir);
+
+		const resolved = await initLocalRepoInPlace(dir);
+
+		expect(eqRealpath(resolved.repoPath, dir)).toBe(true);
+	});
+
+	test("cloneTemplateInto snapshot commit despite required signing with an unusable key", async () => {
+		const template = join(workRoot, "template-signed");
+		mkdirSync(template);
+		writeFileSync(join(template, "README.md"), "template");
+		// Seed the template fixture without required signing in effect —
+		// only the code under test may exercise the bypass path.
+		process.env.GIT_CONFIG_GLOBAL = identityConfig;
+		const templateGit = simpleGit(template);
+		await templateGit.init();
+		await templateGit.add(".");
+		await templateGit.raw(["commit", "-m", "seed"]);
+		process.env.GIT_CONFIG_GLOBAL = signingConfig;
+
+		const resolved = await cloneTemplateInto(template, workRoot, "from-tpl");
+
+		expect(eqRealpath(resolved.repoPath, join(workRoot, "from-tpl"))).toBe(
+			true,
+		);
+		expect(existsSync(join(workRoot, "from-tpl", "README.md"))).toBe(true);
+	});
+});
+
 // ── cloneRepoInto ─────────────────────────────────────────────────
 
 describe("cloneRepoInto", () => {
