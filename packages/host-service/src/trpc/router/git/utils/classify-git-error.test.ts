@@ -26,6 +26,14 @@ describe("rethrowEnvironmentalGitError", () => {
 		expect(causeKind(thrown)).toBe("WORKTREE_MISSING");
 	});
 
+	test("bare repo or pruned worktree → NOT_FOUND / NOT_A_WORK_TREE", () => {
+		const message = "fatal: this operation must be run in a work tree\n";
+		const thrown = capture(new Error(message));
+		expect(thrown?.code).toBe("NOT_FOUND");
+		expect(causeKind(thrown)).toBe("NOT_A_WORK_TREE");
+		expect(thrown?.message).toBe(message);
+	});
+
 	test("permission wall → PRECONDITION_FAILED / GIT_ENVIRONMENT", () => {
 		const thrown = capture(
 			new Error(
@@ -50,6 +58,17 @@ describe("rethrowEnvironmentalGitError", () => {
 			capture(new TRPCError({ code: "NOT_FOUND", message: "missing" })),
 		).toBeNull();
 		expect(capture(new Error("fatal: bad revision 'HEAD~1'"))).toBeNull();
+		expect(
+			capture(
+				new Error(
+					"fatal: Unable to create '/repo/.git/index.lock': File exists.\n",
+				),
+			),
+		).toBeNull();
+		expect(
+			capture(new Error("fatal: detected dubious ownership in repository\n")),
+		).toBeNull();
+		expect(capture(new Error("fatal: cannot chdir to work tree\n"))).toBeNull();
 		expect(capture("string error")).toBeNull();
 	});
 });

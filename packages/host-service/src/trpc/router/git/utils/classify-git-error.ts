@@ -7,6 +7,11 @@ const CWD_GONE_PATTERN =
 	/unable to read current working directory: no such file or directory/i;
 const CWD_UNREADABLE_PATTERN = /unable to read current working directory/i;
 const NOT_GIT_REPO_PATTERN = /not a git repository/i;
+// Git's text when the directory resolves to a repository but has no work tree
+// attached: the repo is bare, or the linked worktree's admin data was removed
+// or pruned. Distinct from CWD_GONE_PATTERN, where the directory itself is
+// unlinked from under the running process.
+const NOT_A_WORK_TREE_PATTERN = /this operation must be run in a work tree/i;
 
 /**
  * Rethrows environmental git failures as typed non-500 TRPCErrors — the same
@@ -21,6 +26,13 @@ export function rethrowEnvironmentalGitError(error: unknown): void {
 			code: "BAD_REQUEST",
 			message: error.message,
 			cause: { kind: "NOT_GIT_REPO" },
+		});
+	}
+	if (NOT_A_WORK_TREE_PATTERN.test(error.message)) {
+		throw new TRPCError({
+			code: "NOT_FOUND",
+			message: error.message,
+			cause: { kind: "NOT_A_WORK_TREE" },
 		});
 	}
 	if (CWD_GONE_PATTERN.test(error.message)) {
