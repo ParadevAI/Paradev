@@ -19,8 +19,6 @@ import {
 	devicePresence,
 	integrationConnections,
 	projects,
-	sandboxImages,
-	secrets,
 	subscriptions,
 	taskStatuses,
 	tasks,
@@ -73,8 +71,6 @@ export const organizationsRelations = relations(organizations, ({ many }) => ({
 	v2Clients: many(v2Clients),
 	v2UsersHosts: many(v2UsersHosts),
 	v2Projects: many(v2Projects),
-	secrets: many(secrets),
-	sandboxImages: many(sandboxImages),
 	workspaces: many(workspaces),
 	tasks: many(tasks),
 	taskStatuses: many(taskStatuses),
@@ -260,8 +256,6 @@ export const projectsRelations = relations(projects, ({ one, many }) => ({
 		fields: [projects.githubRepositoryId],
 		references: [githubRepositories.id],
 	}),
-	secrets: many(secrets),
-	sandboxImage: one(sandboxImages),
 	workspaces: many(workspaces),
 }));
 
@@ -334,32 +328,6 @@ export const v2WorkspacesRelations = relations(v2Workspaces, ({ one }) => ({
 	task: one(tasks, {
 		fields: [v2Workspaces.taskId],
 		references: [tasks.id],
-	}),
-}));
-
-export const secretsRelations = relations(secrets, ({ one }) => ({
-	organization: one(organizations, {
-		fields: [secrets.organizationId],
-		references: [organizations.id],
-	}),
-	project: one(projects, {
-		fields: [secrets.projectId],
-		references: [projects.id],
-	}),
-	createdBy: one(users, {
-		fields: [secrets.createdByUserId],
-		references: [users.id],
-	}),
-}));
-
-export const sandboxImagesRelations = relations(sandboxImages, ({ one }) => ({
-	organization: one(organizations, {
-		fields: [sandboxImages.organizationId],
-		references: [organizations.id],
-	}),
-	project: one(projects, {
-		fields: [sandboxImages.projectId],
-		references: [projects.id],
 	}),
 }));
 

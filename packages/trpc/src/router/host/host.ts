@@ -1,11 +1,5 @@
 import { db, dbWs } from "@superset/db/client";
-import {
-	subscriptions,
-	v2Clients,
-	v2ClientTypeValues,
-	v2Hosts,
-	v2UsersHosts,
-} from "@superset/db/schema";
+import { subscriptions, v2Hosts, v2UsersHosts } from "@superset/db/schema";
 import {
 	ACTIVE_SUBSCRIPTION_STATUSES,
 	isActiveSubscriptionStatus,
@@ -20,7 +14,7 @@ import { and, desc, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 import { fetchRelayPresence } from "../../lib/relay-presence";
 import { resolveUserRelayUrl } from "../../lib/relay-url";
-import { jwtProcedure, protectedProcedure } from "../../trpc";
+import { jwtProcedure } from "../../trpc";
 
 export const hostRouter = {
 	/**
@@ -155,54 +149,6 @@ export const hostRouter = {
 			}
 
 			return host;
-		}),
-
-	ensureClient: protectedProcedure
-		.input(
-			z.object({
-				machineId: z.string().min(1),
-				type: z.enum(v2ClientTypeValues),
-			}),
-		)
-		.mutation(async ({ ctx, input }) => {
-			const organizationId = ctx.activeOrganizationId;
-			if (!organizationId) {
-				throw new TRPCError({
-					code: "BAD_REQUEST",
-					message: "No active organization selected",
-				});
-			}
-
-			const userId = ctx.session.user.id;
-
-			const [client] = await dbWs
-				.insert(v2Clients)
-				.values({
-					organizationId,
-					userId,
-					machineId: input.machineId,
-					type: input.type,
-				})
-				.onConflictDoUpdate({
-					target: [
-						v2Clients.organizationId,
-						v2Clients.userId,
-						v2Clients.machineId,
-					],
-					set: {
-						type: input.type,
-					},
-				})
-				.returning();
-
-			if (!client) {
-				throw new TRPCError({
-					code: "INTERNAL_SERVER_ERROR",
-					message: "Failed to ensure client",
-				});
-			}
-
-			return client;
 		}),
 
 	checkAccess: jwtProcedure

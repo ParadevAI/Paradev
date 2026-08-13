@@ -470,6 +470,13 @@
       "when": 1786584902692,
       "tag": "0066_add_user_deletion_requested_at",
       "breakpoints": true
+    },
+    {
+      "idx": 67,
+      "version": "7",
+      "when": 1786640555531,
+      "tag": "0067_drop_secrets_and_sandbox_images",
+      "breakpoints": true
     }
   ]
 }

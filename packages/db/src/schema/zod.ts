@@ -25,10 +25,3 @@ export const workspaceConfigSchema = z.union([
 	cloudWorkspaceConfigSchema,
 ]);
 export type WorkspaceConfig = LocalWorkspaceConfig | CloudWorkspaceConfig;
-
-export const sandboxImageSchema = z.object({
-	setupCommands: z.array(z.string()).default([]),
-	baseImage: z.string().nullable().optional(),
-	systemPackages: z.array(z.string()).default([]),
-});
-export type SandboxImageInput = z.infer<typeof sandboxImageSchema>;

@@ -38,14 +38,12 @@ export const CLOUD_TRPC_ROUTER_ROOTS = [
 	"host",
 	"integration",
 	"organization",
-	"project",
 	"support",
 	"task",
 	"team",
 	"user",
 	"v2Host",
 	"v2Project",
-	"workspace",
 ] as const;
 
 export const cloudTrpcClient = cloudTrpc.createClient({

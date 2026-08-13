@@ -590,66 +590,6 @@ export const v2Workspaces = pgTable(
 export type InsertV2Workspace = typeof v2Workspaces.$inferInsert;
 export type SelectV2Workspace = typeof v2Workspaces.$inferSelect;
 
-export const secrets = pgTable(
-	"secrets",
-	{
-		id: uuid().primaryKey().defaultRandom(),
-		organizationId: uuid("organization_id")
-			.notNull()
-			.references(() => organizations.id, { onDelete: "cascade" }),
-		projectId: uuid("project_id")
-			.notNull()
-			.references(() => projects.id, { onDelete: "cascade" }),
-		key: text().notNull(),
-		encryptedValue: text("encrypted_value").notNull(),
-		sensitive: boolean().notNull().default(false),
-		createdByUserId: uuid("created_by_user_id").references(() => users.id, {
-			onDelete: "set null",
-		}),
-		createdAt: timestamp("created_at").notNull().defaultNow(),
-		updatedAt: timestamp("updated_at")
-			.notNull()
-			.defaultNow()
-			.$onUpdate(() => new Date()),
-	},
-	(table) => [
-		unique("secrets_project_key_unique").on(table.projectId, table.key),
-		index("secrets_project_id_idx").on(table.projectId),
-		index("secrets_organization_id_idx").on(table.organizationId),
-	],
-);
-
-export type InsertSecret = typeof secrets.$inferInsert;
-export type SelectSecret = typeof secrets.$inferSelect;
-
-export const sandboxImages = pgTable(
-	"sandbox_images",
-	{
-		id: uuid().primaryKey().defaultRandom(),
-		organizationId: uuid("organization_id")
-			.notNull()
-			.references(() => organizations.id, { onDelete: "cascade" }),
-		projectId: uuid("project_id")
-			.notNull()
-			.references(() => projects.id, { onDelete: "cascade" }),
-		setupCommands: jsonb("setup_commands").$type<string[]>().default([]),
-		baseImage: text("base_image"),
-		systemPackages: jsonb("system_packages").$type<string[]>().default([]),
-		createdAt: timestamp("created_at").notNull().defaultNow(),
-		updatedAt: timestamp("updated_at")
-			.notNull()
-			.defaultNow()
-			.$onUpdate(() => new Date()),
-	},
-	(table) => [
-		unique("sandbox_images_project_unique").on(table.projectId),
-		index("sandbox_images_organization_id_idx").on(table.organizationId),
-	],
-);
-
-export type InsertSandboxImage = typeof sandboxImages.$inferInsert;
-export type SelectSandboxImage = typeof sandboxImages.$inferSelect;
-
 export const workspaces = pgTable(
 	"workspaces",
 	{
