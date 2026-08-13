@@ -32,6 +32,7 @@ import {
 	resolveAgentConfigs,
 	upsertCustomAgentDefinition,
 } from "@superset/shared/agent-settings";
+import { NOTIFICATION_VOLUME_LIMITS } from "@superset/shared/settings-constraints";
 import { TRPCError } from "@trpc/server";
 import { app } from "electron";
 import { env } from "main/env.main";
@@ -899,7 +900,14 @@ export const createSettingsRouter = () => {
 		}),
 
 		setNotificationVolume: publicProcedure
-			.input(z.object({ volume: z.number().min(0).max(100) }))
+			.input(
+				z.object({
+					volume: z
+						.number()
+						.min(NOTIFICATION_VOLUME_LIMITS.min)
+						.max(NOTIFICATION_VOLUME_LIMITS.max),
+				}),
+			)
 			.mutation(({ input }) => {
 				localDb
 					.insert(settings)

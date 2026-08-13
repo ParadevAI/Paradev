@@ -32,6 +32,26 @@
 			"types": "./src/media-files.ts",
 			"default": "./src/media-files.ts"
 		},
+		"./ringtones": {
+			"types": "./src/ringtones.ts",
+			"default": "./src/ringtones.ts"
+		},
+		"./settings-constraints": {
+			"types": "./src/settings-constraints.ts",
+			"default": "./src/settings-constraints.ts"
+		},
+		"./themes": {
+			"types": "./src/themes/index.ts",
+			"default": "./src/themes/index.ts"
+		},
+		"./themes/types": {
+			"types": "./src/themes/types.ts",
+			"default": "./src/themes/types.ts"
+		},
+		"./themes/utils": {
+			"types": "./src/themes/utils.ts",
+			"default": "./src/themes/utils.ts"
+		},
 		"./v2-only-user": {
 			"types": "./src/v2-only-user.ts",
 			"default": "./src/v2-only-user.ts"
@@ -168,6 +188,7 @@
 	},
 	"dependencies": {
 		"@date-fns/tz": "1.4.1",
+		"culori": "4.0.2",
 		"friendly-words": "1.3.1",
 		"rrule": "2.8.1",
 		"semver": "7.7.4",
@@ -175,6 +196,7 @@
 	},
 	"devDependencies": {
 		"@superset/typescript": "workspace:*",
+		"@types/culori": "4.0.1",
 		"@types/friendly-words": "1.2.2",
 		"@types/semver": "7.7.1",
 		"@xterm/xterm": "6.1.0-beta.289",

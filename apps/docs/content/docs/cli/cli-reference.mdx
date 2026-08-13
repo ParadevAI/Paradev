@@ -1299,6 +1299,205 @@ superset automations logs aut_…
 
 ---
 
+### settings
+
+Read and update the Superset desktop app's settings on this machine —
+behavior, git, notifications, terminal, and terminal/editor appearance —
+plus the app theme. These commands work offline and don't require login.
+
+Settings changes are picked up by a running desktop app the next time its
+window regains focus. Theme changes require an app restart (quit the app
+first, or it may overwrite the change). Git settings (`branchPrefixMode`,
+`branchPrefixCustom`, `worktreeBaseDir`) are host-wide and are written
+through the local host service, so the desktop app or `superset start`
+must be running for those.
+
+<Command
+	name="superset settings list"
+	output={`Array<{
+  key: string;
+  value: string;
+  isSet: boolean;
+  default: string;
+  allowed: string;
+  section: string;
+  description: string;
+}>`}
+	humanColumns={["KEY", "VALUE", "DEFAULT", "SECTION", "DESCRIPTION"]}
+>
+List every settable key with its current value, default, and allowed values.
+`isSet: false` means the app is using its built-in default.
+
+```bash
+superset settings list
+```
+</Command>
+
+<Command
+	name="superset settings get <key>"
+	args={[
+		{ name: "key", required: true, description: "Setting key from `settings list`." },
+	]}
+	output={`{
+  key: string;
+  value: string | number | boolean | null;
+  isSet: boolean;
+  default: string | number | boolean | null;
+  allowed: string;
+  description: string;
+}`}
+>
+Print the effective value of one setting (falls back to the app default
+when unset).
+
+```bash
+superset settings get terminalFontSize
+```
+</Command>
+
+<Command
+	name="superset settings set <key> <value>"
+	args={[
+		{ name: "key", required: true, description: "Setting key from `settings list`." },
+		{ name: "value", required: true, description: "New value. Validated against the setting's type, range, and allowed values." },
+	]}
+>
+Set a setting. Booleans accept `true/false/on/off/1/0/yes/no`; enums and
+numeric ranges are validated the same way the desktop settings UI validates
+them.
+
+```bash
+superset settings set confirmOnQuit false
+superset settings set terminalFontSize 16
+superset settings set defaultEditor cursor
+superset settings set selectedRingtoneId ping
+```
+</Command>
+
+<Command
+	name="superset settings reset <key>"
+	args={[
+		{ name: "key", required: true, description: "Setting key from `settings list`." },
+	]}
+>
+Reset a setting to the app default.
+
+```bash
+superset settings reset terminalFontSize
+```
+</Command>
+
+<Command
+	name="superset settings theme list"
+	output={`{
+  activeThemeId: string;
+  systemLightThemeId: string;
+  systemDarkThemeId: string;
+  themes: Array<{ id: string; name: string; type: string; source: "system" | "built-in" | "custom"; active: "*" | "" }>;
+}`}
+	humanColumns={["ID", "NAME", "TYPE", "SOURCE", "ACTIVE"]}
+>
+List available themes: `system` (follows OS appearance), the built-ins
+(`dark`, `light`, `monokai`), and any custom themes imported through the
+app.
+
+```bash
+superset settings theme list
+```
+</Command>
+
+<Command
+	name="superset settings theme get"
+	output={`{
+  activeThemeId: string;
+  systemLightThemeId: string;
+  systemDarkThemeId: string;
+}`}
+>
+Print the active theme.
+
+```bash
+superset settings theme get
+```
+</Command>
+
+<Command
+	name="superset settings theme export <id>"
+	args={[
+		{ name: "id", required: true, description: "Theme id (built-in or custom)." },
+	]}
+	options={[
+		{ flag: "--out <path>", description: "Write to a file instead of stdout." },
+	]}
+	output="Theme (full definition JSON)"
+>
+Export a theme's full JSON definition — the starting point for creating a
+custom theme: export a built-in, edit the colors, then import it.
+
+```bash
+superset settings theme export dark --out my-theme.json
+```
+</Command>
+
+<Command
+	name="superset settings theme import <file>"
+	args={[
+		{ name: "file", required: true, description: "Path to a theme JSON file (max 256 KB): a single theme, an array, or `{ themes: [...] }`." },
+	]}
+	output={`{
+  imported: string[]; // theme ids
+  issues: string[];   // per-entry validation issues that were skipped
+}`}
+>
+Import custom themes, using the same validation and normalization as the
+desktop's Appearance UI (ids are slugified; missing colors are filled from
+the built-in base theme; reserved ids like `dark` are rejected).
+Re-importing an id replaces that custom theme.
+
+```bash
+superset settings theme export dark --out my-theme.json
+# edit my-theme.json (id, name, ui/terminal/editor colors)
+superset settings theme import my-theme.json
+superset settings theme set my-theme
+```
+</Command>
+
+<Command
+	name="superset settings theme remove <id>"
+	args={[
+		{ name: "id", required: true, description: "Custom theme id. Built-ins can't be removed." },
+	]}
+>
+Remove a custom theme. If it was the active theme (or a system light/dark
+mapping), that reference falls back to the default.
+
+```bash
+superset settings theme remove my-theme
+```
+</Command>
+
+<Command
+	name="superset settings theme set [theme]"
+	args={[
+		{ name: "theme", description: "Theme id, or `system` to follow the OS appearance." },
+	]}
+	options={[
+		{ flag: "--system-light <id>", description: "Theme used for OS light mode when the active theme is `system`." },
+		{ flag: "--system-dark <id>", description: "Theme used for OS dark mode when the active theme is `system`." },
+	]}
+>
+Set the active theme and/or the system light/dark mappings. Restart the
+desktop app to apply — quit it first if it's running, or the app may
+overwrite the change.
+
+```bash
+superset settings theme set monokai
+superset settings theme set system --system-light light --system-dark monokai
+```
+</Command>
+
+---
+
 ## Output modes
 
 **JSON mode** (`--json`): raw payloads. Lists print arrays, get/create/update

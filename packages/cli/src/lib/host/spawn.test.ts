@@ -1,4 +1,7 @@
 import { afterAll, afterEach, describe, expect, mock, test } from "bun:test";
+// Snapshot the real module BEFORE mock.module: bun module mocks are process-wide,
+// so a partial replacement breaks other test files that import e.g. execFileSync.
+import * as realChildProcess from "node:child_process";
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -38,6 +41,7 @@ const spawnMock = mock(
 );
 
 mock.module("node:child_process", () => ({
+	...realChildProcess,
 	spawn: spawnMock,
 }));
 

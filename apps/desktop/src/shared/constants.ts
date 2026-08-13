@@ -40,10 +40,18 @@ export const MOCK_ORG_ID = "mock-org-id";
 
 // Terminal defaults
 export const DEFAULT_TERMINAL_SCROLLBACK = 5000;
+
 // Hidden (parked) xterm instances kept fully alive before LRU eviction. (SUPER-1545)
-export const DEFAULT_TERMINAL_PARKED_RUNTIME_CAP = 12;
-export const MIN_TERMINAL_PARKED_RUNTIME_CAP = 2;
-export const MAX_TERMINAL_PARKED_RUNTIME_CAP = 64;
+import {
+	DEFAULT_TERMINAL_PARKED_RUNTIME_CAP as SHARED_DEFAULT_PARKED_CAP,
+	TERMINAL_PARKED_RUNTIME_CAP_LIMITS,
+} from "@superset/shared/settings-constraints";
+
+export const DEFAULT_TERMINAL_PARKED_RUNTIME_CAP = SHARED_DEFAULT_PARKED_CAP;
+export const MIN_TERMINAL_PARKED_RUNTIME_CAP =
+	TERMINAL_PARKED_RUNTIME_CAP_LIMITS.min;
+export const MAX_TERMINAL_PARKED_RUNTIME_CAP =
+	TERMINAL_PARKED_RUNTIME_CAP_LIMITS.max;
 
 // Default user preference values
 export const DEFAULT_CONFIRM_ON_QUIT = true;
