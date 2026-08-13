@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { useEffect, useState } from "react";
 
 interface TextSegment {
@@ -67,7 +67,7 @@ export function TypewriterText({
 
 	const renderCursor = (override?: string) =>
 		showCursor ? (
-			<motion.span
+			<m.span
 				className={
 					override ??
 					cursorClassName ??

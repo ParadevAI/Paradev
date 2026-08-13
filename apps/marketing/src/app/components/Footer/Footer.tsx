@@ -1,7 +1,7 @@
 "use client";
 
 import { COMPANY } from "@superset/shared/constants";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -70,7 +70,7 @@ export function Footer() {
 
 	return (
 		<footer className="border-t border-border bg-background">
-			<motion.div
+			<m.div
 				initial={{ opacity: 0 }}
 				whileInView={{ opacity: 1 }}
 				viewport={{ once: true }}
@@ -96,7 +96,7 @@ export function Footer() {
 					<FooterColumn title="Resources" links={RESOURCE_LINKS} />
 					<FooterColumn title="Legal" links={LEGAL_LINKS} />
 				</div>
-			</motion.div>
+			</m.div>
 		</footer>
 	);
 }

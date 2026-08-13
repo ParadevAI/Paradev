@@ -1,5 +1,6 @@
 import { ArrowRight } from "lucide-react";
 import type { Metadata } from "next";
+import { Micro_5 } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -9,6 +10,14 @@ import {
 } from "react-icons/ri";
 import { getAllPeople } from "@/lib/people";
 import { TeamBio } from "./components/TeamBio";
+
+// Loaded here instead of the root layout so other pages don't preload it
+const micro5 = Micro_5({
+	weight: "400",
+	subsets: ["latin"],
+	variable: "--font-micro5",
+	display: "swap",
+});
 
 export const metadata: Metadata = {
 	title: "About",
@@ -37,7 +46,7 @@ export default function TeamPage() {
 	const people = getAllPeople();
 
 	return (
-		<main className="relative min-h-screen bg-background">
+		<main className={`relative min-h-screen bg-background ${micro5.variable}`}>
 			<div className="max-w-5xl mx-auto px-6 py-24 md:py-32">
 				{/* Header Section */}
 				<section className="mb-20 md:mb-28">

@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { useEffect, useRef } from "react";
 
 // character grid — glyphs stay upright and snapped, like real terminal text
@@ -349,7 +349,7 @@ export function BoidsBackground() {
 	}, []);
 
 	return (
-		<motion.div
+		<m.div
 			className="absolute inset-0 pointer-events-none z-0"
 			initial={{ opacity: 0 }}
 			animate={{ opacity: 1 }}
@@ -365,6 +365,6 @@ export function BoidsBackground() {
 			}}
 		>
 			<canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
-		</motion.div>
+		</m.div>
 	);
 }
