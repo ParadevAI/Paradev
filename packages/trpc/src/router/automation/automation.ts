@@ -3,7 +3,6 @@ import {
 	automationRuns,
 	automations,
 	v2Hosts,
-	v2Projects,
 	v2UsersHosts,
 	v2Workspaces,
 } from "@superset/db/schema";
@@ -108,28 +107,6 @@ async function verifyWorkspaceInOrg(
 	};
 }
 
-async function verifyProjectInOrg(organizationId: string, projectId: string) {
-	const [project] = await db
-		.select({ id: v2Projects.id, organizationId: v2Projects.organizationId })
-		.from(v2Projects)
-		.where(eq(v2Projects.id, projectId))
-		.limit(1);
-
-	// Local-first projects live only in host.db — no cloud row exists and
-	// none ever will, so absence is not an error. The pin is metadata: real
-	// authorization is the per-user host access check, and a dangling pin
-	// surfaces as a readable host-side error at dispatch (PR #5741 model).
-	// When a legacy cloud row DOES exist, still enforce the org match.
-	if (!project) return;
-
-	if (project.organizationId !== organizationId) {
-		throw new TRPCError({
-			code: "NOT_FOUND",
-			message: "Project not found",
-		});
-	}
-}
-
 export const automationRouter = {
 	versions: automationVersionsRouter,
 
@@ -222,18 +199,12 @@ export const automationRouter = {
 
 			let targetHostId = input.targetHostId ?? null;
 			let v2ProjectId = input.v2ProjectId ?? null;
-			if (input.v2WorkspaceId && targetHostId) {
-				// Denormalized pin: the client resolved the workspace on its host
-				// and supplies hostId (and projectId, when the workspace has one)
-				// alongside the id — no workspace registry lookup (hosts own
-				// workspace records). A null project means the pin is a session
-				// workspace. Host access and project scoping are still verified
-				// below; a stale pin surfaces as a host-side error at run time,
-				// same as today.
-				if (v2ProjectId) {
-					await verifyProjectInOrg(organizationId, v2ProjectId);
-				}
-			} else if (input.v2WorkspaceId) {
+			// Denormalized pin: a client that supplies hostId (and projectId, when
+			// the workspace has one) alongside the workspace id needs no registry
+			// lookup — hosts own workspace records. A null project means the pin
+			// is a session workspace. Host access is still verified below; a
+			// stale pin surfaces as a host-side error at run time, same as today.
+			if (input.v2WorkspaceId && !targetHostId) {
 				// Legacy clients (pre-denormalization) — resolve via the cloud
 				// table while it still exists; this branch is deleted in R3.
 				const workspace = await verifyWorkspaceInOrg(
@@ -254,8 +225,6 @@ export const automationRouter = {
 					});
 				}
 				v2ProjectId = workspace.projectId;
-			} else if (v2ProjectId) {
-				await verifyProjectInOrg(organizationId, v2ProjectId);
 			}
 			// No project and no pin = session automation: each run creates a
 			// project-less session workspace on the host.
@@ -364,9 +333,6 @@ export const automationRouter = {
 				// Denormalized pin (see create): the client supplies host (and
 				// project, when the workspace has one) with the workspace id; no
 				// workspace registry lookup. A null project = session pin.
-				if (input.v2ProjectId) {
-					await verifyProjectInOrg(organizationId, input.v2ProjectId);
-				}
 				nextProjectId = input.v2ProjectId ?? null;
 				nextTargetHostId = input.targetHostId;
 			} else if (input.v2WorkspaceId) {
@@ -403,11 +369,6 @@ export const automationRouter = {
 					});
 				}
 				nextTargetHostId = workspace.hostId;
-			} else if (
-				input.v2ProjectId != null &&
-				input.v2ProjectId !== existing.v2ProjectId
-			) {
-				await verifyProjectInOrg(organizationId, input.v2ProjectId);
 			}
 			if (
 				nextTargetHostId &&

@@ -198,10 +198,8 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 	// on pre-existing rows before the main-workspace sweep touches them.
 	void (async () => {
 		await runProjectBackfill({
-			api,
 			db,
 			eventBus,
-			organizationId: config.organizationId,
 		}).catch((err) => {
 			console.warn("[host-service] project backfill failed:", err);
 		});
