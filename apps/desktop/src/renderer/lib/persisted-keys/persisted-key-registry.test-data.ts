@@ -79,7 +79,7 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 		["workspace-sidebar-store"],
 	],
 	[
-		"src/renderer/stores/sidebar-workspaces-collapse.ts",
+		"src/renderer/stores/sidebar-sections-collapse.ts",
 		["sidebar-workspaces-collapse"],
 	],
 	["src/renderer/stores/v2-local-override.ts", ["v2-local-override-v2"]],

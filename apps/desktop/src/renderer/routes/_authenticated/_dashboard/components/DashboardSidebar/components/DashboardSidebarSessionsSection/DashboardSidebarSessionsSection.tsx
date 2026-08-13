@@ -5,6 +5,7 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { LuPlus } from "react-icons/lu";
 import { useOpenNewSessionModal } from "renderer/stores/new-workspace-modal";
+import { useSidebarSectionsCollapseStore } from "renderer/stores/sidebar-sections-collapse";
 import {
 	dropZoneId,
 	parseId,
@@ -12,6 +13,7 @@ import {
 	useDashboardSidebarDnd,
 } from "../../hooks/useSidebarDnd";
 import type { DashboardSidebarWorkspace } from "../../types";
+import { DashboardSidebarSectionHeader } from "../DashboardSidebarSectionHeader";
 import { DashboardSidebarWorkspaceItem } from "../DashboardSidebarWorkspaceItem";
 import { SidebarDropZone } from "../SidebarDropZone";
 import { SortableWorkspaceItem } from "../SortableWorkspaceItem";
@@ -29,7 +31,8 @@ interface DashboardSidebarSessionsSectionProps {
  * Top-level "Sessions" section, rendered above the Projects header. The
  * header (and its "+", which opens the create surface with "No project"
  * preselected) always renders in expanded mode — like the Projects header —
- * so sessions stay discoverable at zero. Expanded rows are sortable: sessions
+ * so sessions stay discoverable at zero, and toggles a persisted section
+ * collapse that hides the rows. Expanded rows are sortable: sessions
  * reorder among themselves, can be dragged into the Pinned section (pin), and
  * a pinned session dragged back here unpins. Collapsed rail renders a plain
  * icon stack with a trailing divider, matching the Pinned section.
@@ -44,8 +47,12 @@ export function DashboardSidebarSessionsSection({
 	const openNewSessionModal = useOpenNewSessionModal();
 	const { sessionItems, workspacesById, activeWorkspaceHome } =
 		useDashboardSidebarDnd();
+	const isSectionCollapsed = useSidebarSectionsCollapseStore(
+		(s) => s.collapsed.sessions,
+	);
 	// Only a project-less session may land here, and only when there are no
-	// rows to target directly.
+	// rows to target directly. An empty section has nothing to hide, so the
+	// zone renders regardless of the section collapse.
 	const dropZoneEligible =
 		!isCollapsed &&
 		!rowsHidden &&
@@ -72,16 +79,17 @@ export function DashboardSidebarSessionsSection({
 
 	return (
 		<div className="pb-1">
-			{/* Header styled to match the Projects header below it. */}
-			<div className="flex min-h-8 w-full shrink-0 items-center gap-1.5 py-1.5 pl-4 pr-2 text-[10px] font-semibold uppercase tracking-[0.075em] text-muted-foreground">
-				<span className="min-w-0 truncate text-left">Sessions</span>
-				<div className="min-w-0 flex-1" />
+			<DashboardSidebarSectionHeader label="Sessions" section="sessions">
 				<Tooltip delayDuration={700}>
 					<TooltipTrigger asChild>
 						<button
 							type="button"
 							aria-label="New session"
-							onClick={openNewSessionModal}
+							onClick={(event) => {
+								event.stopPropagation();
+								openNewSessionModal();
+							}}
+							onKeyDown={(event) => event.stopPropagation()}
 							className="flex size-6 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-fill-hover hover:text-foreground"
 						>
 							<LuPlus className="size-3.5" />
@@ -89,8 +97,8 @@ export function DashboardSidebarSessionsSection({
 					</TooltipTrigger>
 					<TooltipContent side="bottom">New session</TooltipContent>
 				</Tooltip>
-			</div>
-			{!rowsHidden && (
+			</DashboardSidebarSectionHeader>
+			{!rowsHidden && !isSectionCollapsed && (
 				<SortableContext
 					items={sessionItems}
 					strategy={verticalListSortingStrategy}

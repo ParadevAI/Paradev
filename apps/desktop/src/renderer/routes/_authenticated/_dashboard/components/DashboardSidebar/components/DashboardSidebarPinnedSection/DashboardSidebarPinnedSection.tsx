@@ -2,6 +2,8 @@ import {
 	SortableContext,
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
+import { cn } from "@superset/ui/utils";
+import { useSidebarSectionsCollapseStore } from "renderer/stores/sidebar-sections-collapse";
 import {
 	dropZoneId,
 	PINNED_CONTAINER,
@@ -9,6 +11,7 @@ import {
 	useDashboardSidebarDnd,
 } from "../../hooks/useSidebarDnd";
 import type { DashboardSidebarPinnedWorkspace } from "../../types";
+import { DashboardSidebarSectionHeader } from "../DashboardSidebarSectionHeader";
 import { DashboardSidebarWorkspaceItem } from "../DashboardSidebarWorkspaceItem";
 import { SidebarDropZone } from "../SidebarDropZone";
 import { SortableWorkspaceItem } from "../SortableWorkspaceItem";
@@ -25,8 +28,10 @@ interface DashboardSidebarPinnedSectionProps {
  * exempt from project grouping. Expanded rows are sortable and the section
  * accepts workspaces dragged in from project lists or Sessions (drop = pin);
  * while any workspace drag is active an empty section renders a drop zone so
- * the first pin can land. The collapsed rail renders no section chrome
- * anywhere, so collapsed mode is a plain icon stack with a trailing divider.
+ * the first pin can land. The header toggles a persisted section collapse that
+ * hides the rows, exactly like the Projects header. The collapsed rail renders
+ * no section chrome anywhere, so collapsed mode is a plain icon stack with a
+ * trailing divider.
  */
 export function DashboardSidebarPinnedSection({
 	pinnedWorkspaces,
@@ -36,6 +41,9 @@ export function DashboardSidebarPinnedSection({
 	const { pinnedItems, workspacesById, projectsById, activeType } =
 		useDashboardSidebarDnd();
 	const isDraggingWorkspace = activeType === "workspace";
+	const isSectionCollapsed = useSidebarSectionsCollapseStore(
+		(s) => s.collapsed.pinned,
+	);
 
 	if (isCollapsed) {
 		if (pinnedWorkspaces.length === 0) return null;
@@ -59,37 +67,38 @@ export function DashboardSidebarPinnedSection({
 	if (pinnedItems.length === 0 && !isDraggingWorkspace) return null;
 
 	return (
-		<div className="mt-1 pb-3 first:mt-0">
-			{/* Micro-label styled to match the PROJECTS header above the groups. */}
-			<div className="flex min-h-8 items-center py-1.5 pl-4 pr-2 text-[10px] font-semibold uppercase tracking-[0.075em] text-muted-foreground">
-				<span className="min-w-0 truncate">Pinned</span>
-			</div>
-			<SortableContext
-				items={pinnedItems}
-				strategy={verticalListSortingStrategy}
-			>
-				{pinnedItems.map((id) => {
-					const parsed = parseId(id);
-					if (!parsed || parsed.type !== "workspace") return null;
-					const workspace = workspacesById.get(parsed.realId);
-					if (!workspace) return null;
-					const project = workspace.projectId
-						? projectsById.get(workspace.projectId)
-						: null;
-					return (
-						<SortableWorkspaceItem
-							key={String(id)}
-							sortableId={String(id)}
-							workspace={workspace}
-							pinnedContext={{
-								projectName: project?.name ?? null,
-								projectIconUrl: project?.iconUrl ?? null,
-							}}
-							onHoverCardOpen={onWorkspaceHover}
-						/>
-					);
-				})}
-			</SortableContext>
+		<div className={cn("mt-1 first:mt-0", !isSectionCollapsed && "pb-3")}>
+			<DashboardSidebarSectionHeader label="Pinned" section="pinned" />
+			{!isSectionCollapsed && (
+				<SortableContext
+					items={pinnedItems}
+					strategy={verticalListSortingStrategy}
+				>
+					{pinnedItems.map((id) => {
+						const parsed = parseId(id);
+						if (!parsed || parsed.type !== "workspace") return null;
+						const workspace = workspacesById.get(parsed.realId);
+						if (!workspace) return null;
+						const project = workspace.projectId
+							? projectsById.get(workspace.projectId)
+							: null;
+						return (
+							<SortableWorkspaceItem
+								key={String(id)}
+								sortableId={String(id)}
+								workspace={workspace}
+								pinnedContext={{
+									projectName: project?.name ?? null,
+									projectIconUrl: project?.iconUrl ?? null,
+								}}
+								onHoverCardOpen={onWorkspaceHover}
+							/>
+						);
+					})}
+				</SortableContext>
+			)}
+			{/* An empty section only stays mounted mid-drag; the drop zone renders
+			    regardless of collapse so the first pin can always land. */}
 			{pinnedItems.length === 0 && (
 				<SidebarDropZone
 					dropZoneId={dropZoneId(PINNED_CONTAINER)}
