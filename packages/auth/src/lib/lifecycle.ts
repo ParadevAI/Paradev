@@ -19,9 +19,9 @@ export async function getActivationVariant(
 			userId,
 		);
 		await posthog.flush();
-		return variant === "control" ? "control" : "test";
+		return variant === "test" ? "test" : "control";
 	} catch (error) {
 		console.error("[lifecycle] Failed to evaluate activation flag:", error);
-		return "test";
+		return "control";
 	}
 }

@@ -247,39 +247,39 @@ export const auth = betterAuth({
 							.where(eq(authSchema.sessions.userId, user.id));
 					}
 
-					try {
-						await resend.emails.send({
-							from: "Superset <noreply@superset.sh>",
-							replyTo: "founders@superset.sh",
-							to: user.email,
-							subject: "Welcome to Superset",
-							react: WelcomeEmail({
-								userName: user.name,
-								userEmail: user.email,
-							}),
-						});
-					} catch (error) {
-						console.error(
-							`[lifecycle] Failed to send welcome email to ${user.id}:`,
-							error,
-						);
-					}
+					const variant = await getActivationVariant(user.id);
+					if (variant === "test") {
+						try {
+							await resend.emails.send({
+								from: "Superset <noreply@superset.sh>",
+								replyTo: "founders@superset.sh",
+								to: user.email,
+								subject: "Welcome to Superset",
+								react: WelcomeEmail({
+									userName: user.name,
+									userEmail: user.email,
+								}),
+							});
+						} catch (error) {
+							console.error(
+								`[lifecycle] Failed to send welcome email to ${user.id}:`,
+								error,
+							);
+						}
 
-					try {
-						const variant = await getActivationVariant(user.id);
-						if (variant === "test") {
+						try {
 							const { error } = await resend.events.send({
 								event: "user.signed_up",
 								email: user.email,
 								payload: { userId: user.id, name: user.name },
 							});
 							if (error) throw new Error(error.message);
+						} catch (error) {
+							console.error(
+								`[lifecycle] Failed to emit signup event for ${user.id}:`,
+								error,
+							);
 						}
-					} catch (error) {
-						console.error(
-							`[lifecycle] Failed to emit signup event for ${user.id}:`,
-							error,
-						);
 					}
 				},
 			},
