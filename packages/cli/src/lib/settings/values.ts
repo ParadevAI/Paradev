@@ -4,6 +4,7 @@ import {
 	writeHostGitSetting,
 } from "./host-settings";
 import { readSettingsRow, writeSetting } from "./local-settings";
+import { notifyDesktopSettingsChanged } from "./notify";
 import type { SettingDefinition, SettingValue } from "./registry";
 
 export interface SettingReading {
@@ -67,11 +68,14 @@ export async function readAllSettings(
 	return readings;
 }
 
-/** Write one setting to its owning store (null = reset to default). */
+/**
+ * Write one setting to its owning store (null = reset to default).
+ * Returns whether a running desktop app acknowledged the refresh nudge.
+ */
 export async function writeSettingValue(
 	def: SettingDefinition,
 	value: SettingValue | null,
-): Promise<void> {
+): Promise<boolean> {
 	if (def.store === "hostService") {
 		await writeHostGitSetting(def.key as HostGitKey, value as string | null);
 		// Keep the legacy local.db columns in sync for v1 surfaces; the host
@@ -79,7 +83,8 @@ export async function writeSettingValue(
 		try {
 			writeSetting(def.key, value);
 		} catch {}
-		return;
+	} else {
+		writeSetting(def.key, value);
 	}
-	writeSetting(def.key, value);
+	return notifyDesktopSettingsChanged();
 }

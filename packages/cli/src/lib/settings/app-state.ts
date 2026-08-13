@@ -15,7 +15,7 @@ import {
 	parseThemeConfigFile,
 	type Theme,
 } from "@superset/shared/themes";
-
+import { notifyDesktopSettingsChanged } from "./notify";
 import { getAppStatePath, getSupersetHomeDir } from "./paths";
 
 export const SYSTEM_THEME_ID = "system";
@@ -84,7 +84,9 @@ export function readThemeState(): ThemeState {
  * at startup and overwrites it while running, so callers must tell the user
  * to restart (and ideally quit cleanly first).
  */
-export function writeThemeState(patch: Partial<ThemeState>): ThemeState {
+export async function writeThemeState(
+	patch: Partial<ThemeState>,
+): Promise<{ themeState: ThemeState; refreshed: boolean }> {
 	const appState = readAppState();
 	const themeState = {
 		...DEFAULT_THEME_STATE,
@@ -107,7 +109,9 @@ export function writeThemeState(patch: Partial<ThemeState>): ThemeState {
 		} catch {}
 		throw error;
 	}
-	return themeState;
+	// a running app re-reads themeState and applies it live (no restart)
+	const refreshed = await notifyDesktopSettingsChanged();
+	return { themeState, refreshed };
 }
 
 export interface ThemeChoice {
@@ -163,11 +167,12 @@ export function requireThemeId(
  * the desktop's Appearance UI (single theme, array, or `{ themes: [...] }`).
  * Re-importing an id replaces the existing custom theme.
  */
-export function importThemes(filePath: string): {
+export async function importThemes(filePath: string): Promise<{
 	imported: Theme[];
 	issues: string[];
 	themeState: ThemeState;
-} {
+	refreshed: boolean;
+}> {
 	if (!existsSync(filePath)) {
 		throw new CLIError(`Theme file not found: ${filePath}`);
 	}
@@ -190,8 +195,13 @@ export function importThemes(filePath: string): {
 			isBuiltIn: false,
 		})),
 	];
-	const themeState = writeThemeState({ customThemes });
-	return { imported: result.themes, issues: result.issues, themeState };
+	const { themeState, refreshed } = await writeThemeState({ customThemes });
+	return {
+		imported: result.themes,
+		issues: result.issues,
+		themeState,
+		refreshed,
+	};
 }
 
 /** Export a theme definition (built-in or custom) as pretty JSON. */
@@ -214,7 +224,9 @@ export function exportTheme(id: string): Theme {
  * Remove a custom theme. Falls back to the default theme (or default system
  * mappings) anywhere the removed theme was referenced.
  */
-export function removeCustomTheme(id: string): ThemeState {
+export async function removeCustomTheme(
+	id: string,
+): Promise<{ themeState: ThemeState; refreshed: boolean }> {
 	const state = readThemeState();
 	if (!state.customThemes.some((theme) => theme.id === id)) {
 		const customIds = state.customThemes.map((theme) => theme.id);
@@ -225,7 +237,7 @@ export function removeCustomTheme(id: string): ThemeState {
 				: "There are no custom themes installed.",
 		);
 	}
-	return writeThemeState({
+	return await writeThemeState({
 		customThemes: state.customThemes.filter((theme) => theme.id !== id),
 		activeThemeId:
 			state.activeThemeId === id ? DEFAULT_THEME_ID : state.activeThemeId,

@@ -13,10 +13,13 @@ export default command({
 	skipMiddleware: true,
 	run: async ({ args }) => {
 		const id = args.id as string;
-		const themeState = removeCustomTheme(id);
+		const { themeState, refreshed } = await removeCustomTheme(id);
+		const effect = refreshed
+			? "Applied to the running desktop app."
+			: THEME_EFFECT;
 		return {
 			data: { removed: id, activeThemeId: themeState.activeThemeId },
-			message: `Removed custom theme "${id}". Active theme: ${themeState.activeThemeId}. ${THEME_EFFECT}`,
+			message: `Removed custom theme "${id}". Active theme: ${themeState.activeThemeId}. ${effect}`,
 		};
 	},
 });

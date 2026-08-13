@@ -9,12 +9,17 @@ export default command({
 	args: [positional("file").required().desc("Path to a theme JSON file")],
 	skipMiddleware: true,
 	run: async ({ args }) => {
-		const { imported, issues } = importThemes(args.file as string);
+		const { imported, issues, refreshed } = await importThemes(
+			args.file as string,
+		);
 		const ids = imported.map((theme) => theme.id);
 		const issueSuffix = issues.length ? ` Skipped: ${issues.join("; ")}.` : "";
+		const effect = refreshed
+			? "The running desktop app refreshed immediately."
+			: THEME_EFFECT;
 		return {
 			data: { imported: ids, issues },
-			message: `Imported ${ids.length} theme${ids.length === 1 ? "" : "s"}: ${ids.join(", ")}.${issueSuffix} Activate with: superset settings theme set <id>. ${THEME_EFFECT}`,
+			message: `Imported ${ids.length} theme${ids.length === 1 ? "" : "s"}: ${ids.join(", ")}.${issueSuffix} Activate with: superset settings theme set <id>. ${effect}`,
 		};
 	},
 });

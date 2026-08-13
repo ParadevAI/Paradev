@@ -17,9 +17,10 @@ export default command({
 	run: async ({ args }) => {
 		const def = getSettingDefinition(args.key as string);
 		const value = parseSettingValue(def, args.value as string);
-		await writeSettingValue(def, value);
-		const effect =
-			def.store === "hostService"
+		const refreshed = await writeSettingValue(def, value);
+		const effect = refreshed
+			? "The running desktop app refreshed immediately."
+			: def.store === "hostService"
 				? HOST_EFFECT
 				: def.key === "selectedRingtoneId"
 					? RINGTONE_EFFECT

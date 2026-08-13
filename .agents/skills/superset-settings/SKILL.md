@@ -35,7 +35,7 @@ already on PATH. `SUPERSET_HOME_DIR` overrides the target profile
 
 ## Creating custom themes
 
-Two paths; both end with import → set → app relaunch.
+Two paths; both end with import → set (a running app restyles live).
 
 **From scratch** — a minimal file is enough. Every color you omit is filled
 in from the built-in base theme for your declared `type`, so start small and
@@ -56,8 +56,7 @@ override only what you care about:
 
 ```bash
 superset settings theme import ocean.json   # -> Imported 1 theme: midnight-ocean
-superset settings theme set midnight-ocean
-# quit the app, relaunch — theme applies at startup
+superset settings theme set midnight-ocean  # a running app applies it live
 ```
 
 **From a starter** — export any theme's complete definition (all ~38 ui +
@@ -94,13 +93,21 @@ superset settings theme export midnight-ocean   # round-trip the stored result
 superset settings theme remove midnight-ocean   # active falls back to dark
 ```
 
-Iterating on colors: each `import` replaces the theme, but the app only
-reads themes at launch — so the loop is edit → import → relaunch.
+Iterating on colors: each `import` replaces the theme, and a running app
+applies it live — the loop is edit → import → `theme set <id>` (re-set to
+re-apply the active theme after edits).
 
 ## How changes take effect
 
+After every write the CLI nudges the running desktop app
+(`POST /settings-changed` on its local server) and the app refreshes
+immediately — themes included, no restart. The command output tells you
+which happened: "refreshed immediately" / "Applied to the running desktop
+app" means the nudge landed. The notes below are the fallback behavior when
+no app acknowledged (app not running, or an older app version):
+
 - **Regular settings** (most of `settings set`): written to
-  `~/.superset/local.db`. A running desktop app picks them up the next time
+  `~/.superset/local.db`. A running older app picks them up the next time
   its window regains focus — no restart needed.
 - **Git settings** (`branchPrefixMode`, `branchPrefixCustom`,
   `worktreeBaseDir`): host-wide values written through the local host
@@ -109,14 +116,12 @@ reads themes at launch — so the loop is edit → import → relaunch.
 - **Ringtone caveat**: `selectedRingtoneId` changes what sound plays
   immediately, but the checkmark in Settings → Notifications only updates
   after an app restart.
-- **Theme** (`settings theme set`): written to `~/.superset/app-state.json`,
-  which the app only reads at startup. **Quit the app cleanly first, then set
-  the theme, then relaunch** — a running app overwrites the file on its own
-  writes, and if the app was force-killed mid-write its renderer keeps a
-  pending localStorage snapshot that wins over the file for ~5 minutes.
-  If you are an agent running inside a Superset terminal, do NOT kill the
-  app yourself (that kills your own session) — run the import/set commands,
-  then ask the user to quit and reopen Superset.
+- **Theme** (`settings theme set`): applies live when the nudge lands. If
+  the output shows the restart fallback instead: quit the app cleanly first,
+  then set, then relaunch — a running older app overwrites the file on its
+  own writes. If you are an agent running inside a Superset terminal, never
+  kill the app yourself (that kills your own session) — ask the user to
+  restart instead.
 - Both stores are created by the desktop app. On a machine that never ran
   the app, `set` commands fail with a hint to launch it once.
 

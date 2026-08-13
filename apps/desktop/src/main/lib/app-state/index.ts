@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { JSONFilePreset } from "lowdb/node";
 import { APP_STATE_PATH } from "../app-environment";
 import type { AppState } from "./schemas";
@@ -42,6 +43,37 @@ function ensureValidShape(data: Partial<AppState>): AppState {
 		},
 		lastRunVersion: data.lastRunVersion,
 	};
+}
+
+/**
+ * Re-read only themeState from disk into the in-memory app state. Used when
+ * an external writer (the CLI) updates app-state.json while the app runs:
+ * without this, the next lowdb flush would clobber the external change.
+ * Deliberately does not reload other fields — they are owned by in-memory
+ * state and may have unflushed updates.
+ */
+export function reloadThemeStateFromDisk(): AppState["themeState"] | null {
+	if (!_appState) return null;
+	try {
+		const raw = readFileSync(APP_STATE_PATH, "utf-8");
+		const parsed = JSON.parse(raw) as Partial<AppState> | null;
+		if (
+			typeof parsed !== "object" ||
+			parsed === null ||
+			Array.isArray(parsed)
+		) {
+			return null;
+		}
+		const themeState = {
+			...defaultAppState.themeState,
+			...(parsed.themeState ?? {}),
+		};
+		_appState.data.themeState = themeState;
+		return themeState;
+	} catch (error) {
+		console.error("[app-state] Failed to reload themeState from disk:", error);
+		return null;
+	}
 }
 
 export async function initAppState(): Promise<void> {

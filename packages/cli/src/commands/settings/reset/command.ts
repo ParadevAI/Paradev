@@ -13,9 +13,13 @@ export default command({
 	skipMiddleware: true,
 	run: async ({ args }) => {
 		const def = getSettingDefinition(args.key as string);
-		await writeSettingValue(def, null);
+		const refreshed = await writeSettingValue(def, null);
 		const defaultLabel = formatSettingValue(def.defaultValue) || "app default";
-		const effect = def.store === "hostService" ? HOST_EFFECT : LOCAL_DB_EFFECT;
+		const effect = refreshed
+			? "The running desktop app refreshed immediately."
+			: def.store === "hostService"
+				? HOST_EFFECT
+				: LOCAL_DB_EFFECT;
 		return {
 			data: { key: def.key, value: null, default: def.defaultValue },
 			message: `Reset ${def.key} to its default (${defaultLabel}). ${effect}`,

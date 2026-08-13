@@ -1305,12 +1305,14 @@ Read and update the Superset desktop app's settings on this machine —
 behavior, git, notifications, terminal, and terminal/editor appearance —
 plus the app theme. These commands work offline and don't require login.
 
-Settings changes are picked up by a running desktop app the next time its
-window regains focus. Theme changes require an app restart (quit the app
-first, or it may overwrite the change). Git settings (`branchPrefixMode`,
-`branchPrefixCustom`, `worktreeBaseDir`) are host-wide and are written
-through the local host service, so the desktop app or `superset start`
-must be running for those.
+After every write the CLI nudges the running desktop app, which refreshes
+immediately — themes included, no restart (the command output confirms
+with "refreshed immediately" / "applied to the running desktop app").
+Without a running app (or on older app versions) settings apply on next
+window focus and theme changes on next launch. Git settings
+(`branchPrefixMode`, `branchPrefixCustom`, `worktreeBaseDir`) are
+host-wide and written through the local host service, so the desktop app
+or `superset start` must be running for those.
 
 <Command
 	name="superset settings list"

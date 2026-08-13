@@ -17,6 +17,7 @@ import { env } from "renderer/env.renderer";
 import { useDelayElapsed } from "renderer/hooks/useDelayElapsed";
 import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
 import { useOnlineStatus } from "renderer/hooks/useOnlineStatus";
+import { useSettingsExternalChangeListener } from "renderer/hooks/useSettingsExternalChangeListener";
 import { useSignOut } from "renderer/hooks/useSignOut";
 import { authClient, getAuthToken } from "renderer/lib/auth-client";
 import { dragDropManager } from "renderer/lib/dnd";
@@ -99,6 +100,7 @@ function AuthenticatedLayout() {
 	const [isSigningOut, setIsSigningOut] = useState(false);
 
 	useAgentHookListener();
+	useSettingsExternalChangeListener();
 
 	// Seed the parked-terminal eviction cap from settings (SUPER-1545).
 	const { data: parkedRuntimeCap } =

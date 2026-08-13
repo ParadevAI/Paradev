@@ -53,17 +53,20 @@ export default command({
 			});
 		}
 
-		const next = writeThemeState(patch);
+		const { themeState: next, refreshed } = await writeThemeState(patch);
 		const summary = patch.activeThemeId
 			? `Theme set to ${next.activeThemeId}.`
 			: `Updated system theme mappings (light: ${next.systemLightThemeId}, dark: ${next.systemDarkThemeId}).`;
+		const effect = refreshed
+			? "Applied to the running desktop app."
+			: THEME_EFFECT;
 		return {
 			data: {
 				activeThemeId: next.activeThemeId,
 				systemLightThemeId: next.systemLightThemeId,
 				systemDarkThemeId: next.systemDarkThemeId,
 			},
-			message: `${summary} ${THEME_EFFECT}`,
+			message: `${summary} ${effect}`,
 		};
 	},
 });
