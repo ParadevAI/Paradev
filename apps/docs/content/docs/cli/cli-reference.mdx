@@ -1301,12 +1301,12 @@ superset automations logs aut_…
 
 ### settings
 
-Read and update the Superset desktop app's settings on this machine —
-behavior, git, notifications, terminal, and terminal/editor appearance —
-plus the app theme. These commands work offline and don't require login.
+Read and update the Superset desktop app's settings on this machine:
+behavior, git, notifications, terminal, terminal/editor appearance, and the
+app theme. These commands work offline and don't require login.
 
 After every write the CLI nudges the running desktop app, which refreshes
-immediately — themes included, no restart (the command output confirms
+immediately, themes included, no restart (the command output confirms
 with "refreshed immediately" / "applied to the running desktop app").
 Without a running app (or on older app versions) settings apply on next
 window focus and theme changes on next launch. Git settings
@@ -1433,7 +1433,7 @@ superset settings theme get
 	]}
 	output="Theme (full definition JSON)"
 >
-Export a theme's full JSON definition — the starting point for creating a
+Export a theme's full JSON definition, the starting point for creating a
 custom theme: export a built-in, edit the colors, then import it.
 
 ```bash
@@ -1488,9 +1488,10 @@ superset settings theme remove my-theme
 		{ flag: "--system-dark <id>", description: "Theme used for OS dark mode when the active theme is `system`." },
 	]}
 >
-Set the active theme and/or the system light/dark mappings. Restart the
-desktop app to apply — quit it first if it's running, or the app may
-overwrite the change.
+Set the active theme and/or the system light/dark mappings. A running
+desktop app restyles live; without one the theme applies on next launch.
+(On app versions without live reload, quit the app first, then set, then
+relaunch, or the app may overwrite the change.)
 
 ```bash
 superset settings theme set monokai
