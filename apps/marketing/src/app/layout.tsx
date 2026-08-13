@@ -71,7 +71,7 @@ export const metadata: Metadata = {
 				url: "/og-image.png",
 				width: 1200,
 				height: 630,
-				alt: `${COMPANY.NAME} - The Terminal for Coding Agents`,
+				alt: `${COMPANY.NAME} - Run 100+ coding agents in parallel`,
 			},
 		],
 	},
@@ -119,7 +119,7 @@ export default function RootLayout({
 				<OrganizationJsonLd />
 				<SoftwareApplicationJsonLd />
 				<WebsiteJsonLd />
-				{/* Google tag (gtag.js) — Google Ads */}
+				{/* Google tag (gtag.js) for Google Ads */}
 				<Script
 					src="https://www.googletagmanager.com/gtag/js?id=AW-18209336001"
 					strategy="lazyOnload"

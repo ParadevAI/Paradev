@@ -2,7 +2,7 @@
 
 <img width="full" alt="Claude and OpenCode working in parallel Superset workspaces with live diffs" src="apps/marketing/public/images/readme-hero.gif" />
 
-### The Code Editor for AI Agents
+### Run 100+ Coding Agents in Parallel
 
 [![GitHub stars](https://img.shields.io/github/stars/superset-sh/superset?style=flat&logo=github)](https://github.com/superset-sh/superset/stargazers)
 [![GitHub release](https://img.shields.io/github/v/release/superset-sh/superset?style=flat&logo=github)](https://github.com/superset-sh/superset/releases)
@@ -170,7 +170,7 @@ Jump to any workspace, action, or setting from one search box.
 
 **Also in the box:**
 
-- **[Built-in skills](https://docs.superset.sh/skills)**: agents come pre-loaded with `superset:*` skills — orchestrate parallel agents, schedule automations, file feedback, diagnose issues — provisioned automatically at launch
+- **[Built-in skills](https://docs.superset.sh/skills)**: agents come pre-loaded with `superset:*` skills (orchestrate parallel agents, schedule automations, file feedback, diagnose issues), provisioned automatically at launch
 - **[Model picker & custom agents](https://docs.superset.sh/agent-integration)**: choose a model and reasoning effort at launch, and add any terminal agent with its own icon
 - **[Workspace setup scripts](https://docs.superset.sh/setup-teardown-scripts)**: automate env setup, dependency installs, and dev servers per workspace
 - **[Terminal presets](https://docs.superset.sh/terminal-presets)**: save agent and shell layouts and open them with one keystroke

@@ -30,7 +30,7 @@ export function RemoteWorkspacesDemo() {
 					<div className="size-2 rounded-full bg-[#28c840]/85" />
 				</div>
 				<span className="pointer-events-none absolute inset-x-0 text-center font-mono text-[10px] tracking-tight text-muted-foreground/60">
-					gpu-box — ssh
+					gpu-box (ssh)
 				</span>
 			</div>
 

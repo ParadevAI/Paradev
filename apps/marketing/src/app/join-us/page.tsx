@@ -81,7 +81,7 @@ export default function JoinUsPage() {
 						Open roles
 					</h2>
 
-					{/* Managed via YC Work at a Startup — layout/colors configured at bookface.ycombinator.com/workatastartup/job_board_settings */}
+					{/* Managed via YC Work at a Startup; layout/colors configured at bookface.ycombinator.com/workatastartup/job_board_settings */}
 					<style>{`
 						waas-job-board {
 							--waas-primary: var(--brand);

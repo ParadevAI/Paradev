@@ -38,7 +38,7 @@ export default function proxy(request: NextRequest) {
 	}
 
 	// Accept negotiation on content pages that have a markdown twin. Segments
-	// with an extension (llms.txt, feed.xml) are files, not pages — skip them.
+	// with an extension (llms.txt, feed.xml) are files, not pages, so skip them.
 	if (
 		/^\/(blog|compare|changelog)\/[^/.]+$/.test(pathname) &&
 		acceptsMarkdown(request)

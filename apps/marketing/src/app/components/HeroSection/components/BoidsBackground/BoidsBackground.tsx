@@ -3,11 +3,11 @@
 import { m } from "framer-motion";
 import { useEffect, useRef } from "react";
 
-// character grid — glyphs stay upright and snapped, like real terminal text
+// character grid: glyphs stay upright and snapped, like real terminal text
 const CELL = 13;
 const FONT_SIZE = 11;
 
-// the source text each boid writes as it flies — trails spell real code
+// the source text each boid writes as it flies, so trails spell real code
 const CODE =
 	'awaitagent.spawn({preset:"claude",workspace:"boid"})superset.orchestrate({agents:100,' +
 	'parallel:true})agent.review({channel:"all",sla:"24h"})awaitworktree.create({branch:"main",' +
@@ -208,7 +208,7 @@ export function BoidsBackground() {
 					wrapped = true;
 				}
 
-				// write the next character only after real net displacement — a boid
+				// write the next character only after real net displacement: a boid
 				// hovering on a cell boundary shouldn't flicker through its code string
 				if (wrapped) {
 					this.sx = this.x;
