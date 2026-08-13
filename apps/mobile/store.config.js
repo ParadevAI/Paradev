@@ -40,7 +40,7 @@ module.exports = {
 			demoUsername: process.env.APP_REVIEW_EMAIL ?? "",
 			demoPassword: process.env.APP_REVIEW_PASSWORD ?? "",
 			notes:
-				"Superset Mobile is a companion app for the Superset desktop product (https://superset.sh): developers monitor and chat with AI coding agents running in their own workspaces. Access requires a Superset Pro subscription purchased outside the app (multiplatform service; there are no in-app purchases). Please use the provided demo account (sign in via the 'Sign in with email' link) to access a Pro workspace with sample data. Sign in with Apple, GitHub, or Google also works and creates a free account instantly, which shows the subscription-required screen. Account deletion is available from Settings > Account and from the subscription screen.",
+				"Superset Mobile is a companion app for the Superset desktop product (https://superset.sh): developers monitor and chat with AI coding agents running in their own workspaces. Access requires a Superset Pro subscription purchased outside the app (multiplatform service; there are no in-app purchases). Please use the provided demo account (sign in via the 'Sign in with email' link) to access a Pro workspace with sample data. Sign in with Apple, GitHub, or Google also works and creates a free account instantly, which shows the subscription-required screen. Account deletion is available from Settings, under Danger Zone. Settings is reachable even on the subscription-required screen, via the organization name in the top-left.",
 		},
 	},
 };
