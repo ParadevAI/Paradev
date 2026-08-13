@@ -20,6 +20,7 @@ export function RootLayout() {
 	if (isPending) return null;
 
 	const pendingDeletion = !!session?.user.deletionRequestedAt;
+	const hasPaidPlan = !!session?.session.plan;
 
 	return (
 		<GestureHandlerRootView style={{ flex: 1 }}>
@@ -27,8 +28,15 @@ export function RootLayout() {
 				<PostHogProvider>
 					<ThemeProvider value={NAV_THEME.dark}>
 						<Stack screenOptions={{ headerShown: false }}>
-							<Stack.Protected guard={!!session && !pendingDeletion}>
+							<Stack.Protected
+								guard={!!session && !pendingDeletion && hasPaidPlan}
+							>
 								<Stack.Screen name="(authenticated)" />
+							</Stack.Protected>
+							<Stack.Protected
+								guard={!!session && !pendingDeletion && !hasPaidPlan}
+							>
+								<Stack.Screen name="paywall" />
 							</Stack.Protected>
 							<Stack.Protected guard={pendingDeletion}>
 								<Stack.Screen name="account-pending-deletion" />
