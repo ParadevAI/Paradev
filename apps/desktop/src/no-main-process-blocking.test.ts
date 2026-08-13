@@ -67,7 +67,7 @@ const RULES: Rule[] = [
 			// to worker task types (changes/workers/git-task-types.ts).
 			"lib/trpc/routers/changes/git-operations.ts": 2,
 			"lib/trpc/routers/changes/security/git-commands.ts": 2,
-			"lib/trpc/routers/changes/staging.ts": 3,
+			"lib/trpc/routers/changes/staging.ts": 2,
 			"lib/trpc/routers/projects/projects.ts": 6,
 			"lib/trpc/routers/workspaces/utils/base-branch-config.ts": 4,
 			"lib/trpc/routers/workspaces/utils/git.ts": 21,
