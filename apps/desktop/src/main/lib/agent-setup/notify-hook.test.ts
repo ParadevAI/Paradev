@@ -37,7 +37,29 @@ function runNotifyHook(
 
 describe("getNotifyScriptContent", () => {
 	it("bumps the notify hook marker when hook semantics change", () => {
-		expect(NOTIFY_SCRIPT_MARKER).toBe("# Superset agent notification hook v7");
+		expect(NOTIFY_SCRIPT_MARKER).toBe("# Superset agent notification hook v8");
+	});
+
+	it("ignores hooks fired inside a subagent (agent_id present)", () => {
+		const result = runNotifyHook({
+			hook_event_name: "PostToolUse",
+			session_id: "main-session",
+			agent_id: "a251e067cfdbabec7",
+			agent_type: "general-purpose",
+		});
+
+		expect(result.exitCode).toBe(0);
+		expect(result.stderr.toString()).toBe("");
+	});
+
+	it("still dispatches main-loop hooks without agent_id", () => {
+		const result = runNotifyHook({
+			hook_event_name: "Stop",
+			session_id: "main-session",
+		});
+
+		expect(result.exitCode).toBe(0);
+		expect(result.stderr.toString()).toContain("[notify-hook] event=Stop");
 	});
 
 	it("exits silently outside Superset terminals even with a payload session id", () => {

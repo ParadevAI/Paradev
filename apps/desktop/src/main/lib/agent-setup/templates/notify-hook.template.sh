@@ -17,6 +17,12 @@ fi
 # payload alone must never dispatch.
 [ -n "$SUPERSET_TERMINAL_ID" ] || [ -n "$SUPERSET_TAB_ID" ] || exit 0
 
+# Claude Code (and forks sharing its hook schema) set agent_id only when the
+# hook fires inside a subagent (Task tool). Subagent activity must not drive
+# terminal-level agent status or notifications — only the main loop counts.
+SUBAGENT_ID=$(echo "$INPUT" | grep -oE '"agent_id"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -oE '"[^"]*"$' | tr -d '"')
+[ -n "$SUBAGENT_ID" ] && exit 0
+
 HOOK_SESSION_ID=$(echo "$INPUT" | grep -oE '"session_id"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -oE '"[^"]*"$' | tr -d '"')
 if [ -z "$HOOK_SESSION_ID" ]; then
   # Grok's envelope is camelCase.
