@@ -104,10 +104,13 @@ export function LeftSidebar({ activeDemo }: LeftSidebarProps) {
 					</div>
 				</m.div>
 				<div className="mt-1">
+					<GroupHeader label="gpu-box" count={14} />
+				</div>
+				<div className="mt-1">
 					<GroupHeader label="mobile" count={1} />
 				</div>
 				<div className="mt-1">
-					<GroupHeader label="cli" count={2} />
+					<GroupHeader label="cli" count={4} />
 				</div>
 			</div>
 		</div>
