@@ -458,6 +458,7 @@ export function FileViewerContent({
 					<TipTapMarkdownRenderer
 						value={renderedContent}
 						editable
+						preserveSourceFormatting
 						editorRef={markdownEditorRef}
 						onChange={onContentChange}
 						onSave={onSaveFile}
