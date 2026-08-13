@@ -12,8 +12,8 @@
 
 <br />
 
-Orchestrate swarms of Claude Code, Codex, and more in parallel.<br />
-Works with any CLI agent. Built for local worktree-based development.
+Claude Code, Codex, or any CLI agent, each in its own isolated worktree.<br />
+Spend your time shipping, not waiting.
 
 <br />
 
@@ -26,7 +26,7 @@ Works with any CLI agent. Built for local worktree-based development.
 
 ## Code 10x Faster With No Switching Cost
 
-Superset orchestrates CLI-based coding agents across isolated git worktrees, with built-in terminal, review, and open-in-editor workflows.
+Superset runs CLI-based coding agents in parallel across isolated git worktrees, with built-in terminal, review, and open-in-editor workflows.
 
 - **Run multiple agents simultaneously** without context switching overhead
 - **Isolate each task** in its own git worktree so agents don't interfere with each other
@@ -45,7 +45,7 @@ Wait less, ship more.
 
 ### Parallel Workspaces
 
-Run 10+ coding agents at once, each in its own git worktree with its own branch, terminal, and environment. Compare the results and merge the winner.
+Run 100+ coding agents at once, each in its own git worktree with its own branch, terminal, and environment. Compare the results and merge the winner.
 
 [Docs →](https://docs.superset.sh/workspaces)
 
