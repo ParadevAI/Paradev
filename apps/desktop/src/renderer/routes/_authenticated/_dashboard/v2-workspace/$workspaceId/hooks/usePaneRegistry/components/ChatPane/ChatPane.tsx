@@ -1,38 +1,14 @@
+import { ChatUnderConstruction } from "renderer/components/ChatUnderConstruction";
 import type { ChatLaunchConfig } from "shared/tabs-types";
-import { ChatPaneInterface as WorkspaceChatInterface } from "./components/WorkspaceChatInterface";
-import { useWorkspaceChatController } from "./hooks/useWorkspaceChatController";
 
-export function ChatPane({
-	onSessionIdChange,
-	sessionId,
-	workspaceId,
-	initialLaunchConfig,
-	onConsumeLaunchConfig,
-}: {
+// Chat is temporarily disabled while it's being reworked; the pane keeps its
+// props so existing chat panes still mount without churn in the registry.
+export function ChatPane(_props: {
 	onSessionIdChange: (sessionId: string | null) => void;
 	sessionId: string | null;
 	workspaceId: string;
 	initialLaunchConfig?: ChatLaunchConfig | null;
 	onConsumeLaunchConfig?: () => void;
 }) {
-	const { organizationId, workspacePath, handleNewChat, getOrCreateSession } =
-		useWorkspaceChatController({
-			onSessionIdChange,
-			sessionId,
-			workspaceId,
-		});
-
-	return (
-		<WorkspaceChatInterface
-			getOrCreateSession={getOrCreateSession}
-			initialLaunchConfig={initialLaunchConfig ?? null}
-			onConsumeLaunchConfig={onConsumeLaunchConfig}
-			isFocused
-			onResetSession={handleNewChat}
-			sessionId={sessionId}
-			workspaceId={workspaceId}
-			organizationId={organizationId}
-			cwd={workspacePath}
-		/>
-	);
+	return <ChatUnderConstruction />;
 }
