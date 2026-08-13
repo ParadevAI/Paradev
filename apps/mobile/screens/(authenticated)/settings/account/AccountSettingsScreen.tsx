@@ -2,12 +2,12 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { ACCOUNT_DELETION_GRACE_DAYS } from "@superset/shared/constants";
 import { Alert, ScrollView, View } from "react-native";
 import { Text } from "@/components/ui/text";
-import { useDeleteAccount } from "@/hooks/useDeleteAccount";
 import { useTheme } from "@/hooks/useTheme";
 import { useSession } from "@/lib/auth/client";
 import { ListRow } from "@/screens/(authenticated)/components/ListRow";
 import { ListRowValue } from "@/screens/(authenticated)/components/ListRowValue";
 import { UserAvatar } from "../components/UserAvatar";
+import { useDeleteAccount } from "../hooks/useDeleteAccount";
 
 export function AccountSettingsScreen() {
 	const theme = useTheme();

@@ -98,16 +98,6 @@ const PENDING_DELETION_ALLOWED_PROCEDURES = new Set([
 	"user.reactivateAccount",
 ]);
 
-/** Mobile is a paid-plan surface; unpaid mobile sessions may only manage the
- * account itself and switch to an org that has a plan. Other clients are
- * never gated here. */
-const MOBILE_PAYWALL_ALLOWED_PROCEDURES = new Set([
-	"user.me",
-	"user.deleteAccount",
-	"user.reactivateAccount",
-	"user.myOrganizations",
-]);
-
 export const protectedProcedure = t.procedure
 	.use(clientTelemetry)
 	.use(async ({ ctx, next }) => {
@@ -128,19 +118,6 @@ export const protectedProcedure = t.procedure
 			throw new TRPCError({
 				code: "FORBIDDEN",
 				message: "Account is pending deletion.",
-			});
-		}
-		return next();
-	})
-	.use(async ({ ctx, path, next }) => {
-		if (
-			ctx.client?.product === "mobile" &&
-			!ctx.session.session.plan &&
-			!MOBILE_PAYWALL_ALLOWED_PROCEDURES.has(path)
-		) {
-			throw new TRPCError({
-				code: "FORBIDDEN",
-				message: "Superset Mobile requires a paid plan.",
 			});
 		}
 		return next();
