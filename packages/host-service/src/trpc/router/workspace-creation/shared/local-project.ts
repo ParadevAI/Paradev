@@ -1,4 +1,4 @@
-import { existsSync } from "node:fs";
+import { statSync } from "node:fs";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { projects } from "../../../../db/schema";
@@ -31,10 +31,12 @@ export function requireLocalProject(
 // lifecycle state, not a bug — classify it here so simple-git's construct
 // error can't escape a workspace-creation procedure as a reportable 500.
 export function requireProjectRepoPath(localProject: LocalProject): string {
-	if (!existsSync(localProject.repoPath)) {
+	if (
+		!statSync(localProject.repoPath, { throwIfNoEntry: false })?.isDirectory()
+	) {
 		throw new TRPCError({
 			code: "NOT_FOUND",
-			message: "Project directory no longer exists on disk",
+			message: "Project directory is no longer a directory on disk",
 			cause: { kind: "PROJECT_DIR_MISSING", repoPath: localProject.repoPath },
 		});
 	}

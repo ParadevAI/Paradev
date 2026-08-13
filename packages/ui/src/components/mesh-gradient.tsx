@@ -26,13 +26,26 @@ interface GradientInstance {
 	};
 }
 
+/**
+ * Browsers cap how many WebGL contexts may be live at once, and a probe
+ * context counts against that cap until it is explicitly lost. Probing on
+ * every mount without releasing would eventually starve the real gradient of
+ * a context, so release immediately and cache the answer: WebGL support does
+ * not change over a page's lifetime.
+ */
+let webglSupport: boolean | undefined;
+
 function supportsWebgl(): boolean {
+	if (webglSupport !== undefined) return webglSupport;
 	try {
 		const probe = document.createElement("canvas");
-		return Boolean(probe.getContext("webgl2") || probe.getContext("webgl"));
+		const context = probe.getContext("webgl2") || probe.getContext("webgl");
+		context?.getExtension("WEBGL_lose_context")?.loseContext();
+		webglSupport = Boolean(context);
 	} catch {
-		return false;
+		webglSupport = false;
 	}
+	return webglSupport;
 }
 
 export function MeshGradient({

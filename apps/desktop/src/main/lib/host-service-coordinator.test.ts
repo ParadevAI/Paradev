@@ -620,6 +620,7 @@ describe("HostServiceCoordinator respawn after a crash", () => {
 			status: "running",
 			spawnedAt: Date.now(),
 			outputTail: "",
+			redactions: ["secret"],
 			owned: true,
 		});
 	}

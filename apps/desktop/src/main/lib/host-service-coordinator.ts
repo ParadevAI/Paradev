@@ -74,6 +74,12 @@ interface HostServiceProcess {
 	/** Rolling tail of the child's stdout/stderr, attached to crash reports. */
 	outputTail: string;
 	/**
+	 * Every secret handed to this child. `outputTail` is raw child output, so
+	 * anything the child logs (a request header, an env dump in a stack trace)
+	 * can land in a crash report — strip these before it reaches telemetry.
+	 */
+	redactions: string[];
+	/**
 	 * True when this instance spawned the child and owns its lifecycle (may
 	 * SIGTERM it and remove its manifest). False when the entry was *adopted*
 	 * from another live app instance's host-service — we connect to it but must
@@ -649,6 +655,9 @@ export class HostServiceCoordinator extends EventEmitter {
 			status: "running",
 			spawnedAt: manifest.startedAt,
 			outputTail: "",
+			// Adopted children are owned by another app instance: we never see
+			// their stdio, so outputTail stays empty and this is belt-and-braces.
+			redactions: [manifest.authToken],
 			owned: false,
 		});
 		this.rememberPort(organizationId, port);
@@ -681,6 +690,9 @@ export class HostServiceCoordinator extends EventEmitter {
 			status: "starting",
 			spawnedAt: Date.now(),
 			outputTail: "",
+			redactions: [secret, config.authToken].filter((value): value is string =>
+				Boolean(value),
+			),
 			owned: true,
 		};
 		this.instances.set(organizationId, instance);
@@ -934,11 +946,10 @@ export class HostServiceCoordinator extends EventEmitter {
 							pid: childPid,
 							version: app.getVersion(),
 							uptimeMs: Date.now() - current.spawnedAt,
-							// The child's own auth secret can reach its logs (request
-							// headers); never ship it to Sentry.
-							outputTail: current.outputTail
-								.split(current.secret)
-								.join("[redacted]"),
+							outputTail: current.redactions.reduce(
+								(tail, secret) => tail.split(secret).join("[redacted]"),
+								current.outputTail,
+							),
 						},
 					}),
 				)
