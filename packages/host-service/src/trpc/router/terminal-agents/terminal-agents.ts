@@ -18,6 +18,7 @@ import {
 } from "../../../terminal-agents/persistence";
 import { protectedProcedure, router } from "../../index";
 import { resolveHostAgentConfig } from "../agents/agents";
+import { toTerminalSessionError } from "../terminal/errors";
 
 type GetOrCreateResult = {
 	binding: TerminalAgentBinding;
@@ -212,10 +213,7 @@ export const terminalAgentsRouter = router({
 				});
 
 				if ("error" in created) {
-					throw new TRPCError({
-						code: "INTERNAL_SERVER_ERROR",
-						message: created.error,
-					});
+					throw toTerminalSessionError(created);
 				}
 
 				try {

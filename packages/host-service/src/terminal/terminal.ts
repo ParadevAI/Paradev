@@ -726,6 +726,49 @@ export interface TerminalSessionSummary {
 	title: string | null;
 }
 
+/**
+ * Why this session operation failed, as a value rather than as prose.
+ *
+ * Every session producer in this module returns one of these, and each
+ * consumer (tRPC, the HTTP attach route, the websocket) decides its own
+ * mapping by switching on `kind`. `error` stays the human-readable string
+ * those consumers already surface, so it can be reworded freely without
+ * changing anyone's behaviour.
+ */
+export type TerminalSessionErrorKind =
+	/** No session with this id, in memory or on the daemon. */
+	| "SESSION_NOT_FOUND"
+	/** The session exists but is owned by a different workspace. */
+	| "SESSION_WRONG_WORKSPACE"
+	/** The session existed and its process has already ended. */
+	| "SESSION_EXITED"
+	/** Adoption was requested but the daemon has no live session by that id. */
+	| "SESSION_NOT_ACTIVE"
+	/** No workspace row for the requested workspace id. */
+	| "WORKSPACE_NOT_FOUND"
+	/** The workspace row exists but its worktree is gone from disk. */
+	| "WORKTREE_GONE"
+	/**
+	 * The daemon could not be reached (stalled, restarting, bootstrap
+	 * pending). The supervisor heals these and the session may still come up
+	 * under the same id, so callers should retry rather than go dead.
+	 */
+	| "DAEMON_UNAVAILABLE"
+	/**
+	 * Bootstrap failed permanently (missing daemon binary, no socket path,
+	 * crash circuit open, handshake rejected) or the PTY would not open.
+	 * Retrying will fail the same way; this is the only kind that means "we
+	 * have a bug or a broken install".
+	 */
+	| "TERMINAL_START_FAILED";
+
+export type TerminalSessionError = {
+	kind: TerminalSessionErrorKind;
+	error: string;
+	/** Retained for the attach route and websocket, which branch on it. */
+	transient?: boolean;
+};
+
 export function listTerminalSessions(
 	options: { workspaceId?: string; includeExited?: boolean } = {},
 ): TerminalSessionSummary[] {
@@ -843,16 +886,19 @@ export function writeInputToSession({
 	terminalId: string;
 	workspaceId: string;
 	data: string;
-}): { success: true } | { error: string } {
+}): { success: true } | TerminalSessionError {
 	const session = sessions.get(terminalId);
 	if (!session) {
-		return { error: "Terminal session not found" };
+		return { kind: "SESSION_NOT_FOUND", error: "Terminal session not found" };
 	}
 	if (session.workspaceId !== workspaceId) {
-		return { error: "Terminal session does not belong to this workspace" };
+		return {
+			kind: "SESSION_WRONG_WORKSPACE",
+			error: "Terminal session does not belong to this workspace",
+		};
 	}
 	if (session.exited) {
-		return { error: "Terminal session has exited" };
+		return { kind: "SESSION_EXITED", error: "Terminal session has exited" };
 	}
 
 	session.pty.write(data);
@@ -900,12 +946,15 @@ async function getOrAdoptSession({
 	workspaceId: string;
 	db: HostDb;
 	eventBus?: EventBus;
-}): Promise<TerminalSession | { error: string }> {
+}): Promise<TerminalSession | TerminalSessionError> {
 	for (;;) {
 		const existing = sessions.get(terminalId);
 		if (existing) {
 			if (existing.workspaceId !== workspaceId) {
-				return { error: "Terminal session does not belong to this workspace" };
+				return {
+					kind: "SESSION_WRONG_WORKSPACE",
+					error: "Terminal session does not belong to this workspace",
+				};
 			}
 			return existing;
 		}
@@ -961,7 +1010,7 @@ export async function writeFramedInputToSession({
 	submit: boolean;
 	db: HostDb;
 	eventBus?: EventBus;
-}): Promise<{ success: true } | { error: string }> {
+}): Promise<{ success: true } | TerminalSessionError> {
 	const session = await getOrAdoptSession({
 		terminalId,
 		workspaceId,
@@ -970,7 +1019,7 @@ export async function writeFramedInputToSession({
 	});
 	if ("error" in session) return session;
 	if (session.exited) {
-		return { error: "Terminal session has exited" };
+		return { kind: "SESSION_EXITED", error: "Terminal session has exited" };
 	}
 
 	// Serialize sends per session: the delayed Enter opens a window where a
@@ -978,9 +1027,9 @@ export async function writeFramedInputToSession({
 	// this text and its Enter and get submitted by it.
 	const previous = session.followUpWriteChain ?? Promise.resolve();
 	const task = previous.then(
-		async (): Promise<{ success: true } | { error: string }> => {
+		async (): Promise<{ success: true } | TerminalSessionError> => {
 			if (session.exited) {
-				return { error: "Terminal session has exited" };
+				return { kind: "SESSION_EXITED", error: "Terminal session has exited" };
 			}
 			const framed = session.modeTracker.isBracketedPasteActive()
 				? `\x1b[200~${text}\x1b[201~`
@@ -993,7 +1042,10 @@ export async function writeFramedInputToSession({
 				session.pty.write(framed);
 				await new Promise((r) => setTimeout(r, FOLLOW_UP_ENTER_DELAY_MS));
 				if (session.exited) {
-					return { error: "Terminal session has exited" };
+					return {
+						kind: "SESSION_EXITED",
+						error: "Terminal session has exited",
+					};
 				}
 			}
 			session.pty.write("\r");
@@ -1024,7 +1076,7 @@ export async function snapshotSession({
 	maxLines?: number;
 	db: HostDb;
 	eventBus?: EventBus;
-}): Promise<({ success: true } & TerminalSnapshot) | { error: string }> {
+}): Promise<({ success: true } & TerminalSnapshot) | TerminalSessionError> {
 	const session = await getOrAdoptSession({
 		terminalId,
 		workspaceId,
@@ -2309,12 +2361,7 @@ function getTerminalWorkspaceMismatchError({
 	return `Terminal session "${terminalId}" belongs to workspace "${ownerWorkspaceId}", not "${requestedWorkspaceId}".`;
 }
 
-/**
- * `transient: true` = the daemon couldn't be reached (stalled, restarting,
- * bootstrap pending) — the session may still come up under the same id; the
- * attach path tells the renderer to keep retrying instead of going dead.
- */
-type CreateSessionError = { error: string; transient?: boolean };
+type CreateSessionError = TerminalSessionError;
 
 export async function createTerminalSessionInternal({
 	terminalId,
@@ -2340,7 +2387,8 @@ export async function createTerminalSessionInternal({
 			ownerWorkspaceId: existing.workspaceId,
 			requestedWorkspaceId: workspaceId,
 		});
-		if (mismatchError) return { error: mismatchError };
+		if (mismatchError)
+			return { kind: "SESSION_WRONG_WORKSPACE", error: mismatchError };
 
 		if (listed) existing.listed = true;
 		if (initialCommand) queueInitialCommand(existing, initialCommand);
@@ -2355,17 +2403,19 @@ export async function createTerminalSessionInternal({
 		ownerWorkspaceId: existingRecord?.originWorkspaceId,
 		requestedWorkspaceId: workspaceId,
 	});
-	if (recordMismatchError) return { error: recordMismatchError };
+	if (recordMismatchError)
+		return { kind: "SESSION_WRONG_WORKSPACE", error: recordMismatchError };
 
 	const workspace = db.query.workspaces
 		.findFirst({ where: eq(workspaces.id, workspaceId) })
 		.sync();
 
 	if (!workspace) {
-		return { error: "Workspace not found" };
+		return { kind: "WORKSPACE_NOT_FOUND", error: "Workspace not found" };
 	}
 	if (!existsSync(workspace.worktreePath)) {
 		return {
+			kind: "WORKTREE_GONE",
 			error: `Workspace worktree no longer exists: ${workspace.worktreePath}`,
 		};
 	}
@@ -2431,10 +2481,12 @@ export async function createTerminalSessionInternal({
 		// daemon binary, no socket path, crash circuit open, handshake
 		// rejection) are permanent — surfacing them beats silently retrying
 		// a bootstrap that will fail the same way forever.
+		const unreachable = error instanceof DaemonUnavailableError;
 		return {
+			kind: unreachable ? "DAEMON_UNAVAILABLE" : "TERMINAL_START_FAILED",
 			error:
 				error instanceof Error ? error.message : "Failed to start terminal",
-			transient: error instanceof DaemonUnavailableError,
+			transient: unreachable,
 		};
 	}
 	let openResult: { pid: number };
@@ -2446,6 +2498,7 @@ export async function createTerminalSessionInternal({
 			);
 			if (!found) {
 				return {
+					kind: "SESSION_NOT_ACTIVE",
 					error: `Terminal session "${terminalId}" is not active; create it before connecting.`,
 				};
 			}
@@ -2498,10 +2551,12 @@ export async function createTerminalSessionInternal({
 			}
 		}
 	} catch (error) {
+		const unreachable = error instanceof DaemonUnavailableError;
 		return {
+			kind: unreachable ? "DAEMON_UNAVAILABLE" : "TERMINAL_START_FAILED",
 			error:
 				error instanceof Error ? error.message : "Failed to start terminal",
-			transient: error instanceof DaemonUnavailableError,
+			transient: unreachable,
 		};
 	}
 	const pty: DaemonPty = makeDaemonPty(daemon, terminalId, openResult.pid);

@@ -20,6 +20,7 @@ import { createTerminalSessionInternal } from "../../../terminal/terminal";
 import type { HostServiceContext } from "../../../types";
 import { protectedProcedure, router } from "../../index";
 import { resolveAttachmentPath } from "../attachments/storage";
+import { toTerminalSessionError } from "../terminal/errors";
 
 interface ResolvedHostAgentConfig {
 	id: string;
@@ -394,10 +395,7 @@ async function runTerminalAgent(
 	});
 
 	if ("error" in result) {
-		throw new TRPCError({
-			code: "INTERNAL_SERVER_ERROR",
-			message: result.error,
-		});
+		throw toTerminalSessionError(result);
 	}
 
 	return {

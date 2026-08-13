@@ -17,30 +17,7 @@ import {
 } from "../../../terminal/terminal";
 import type { HostServiceContext } from "../../../types";
 import { protectedProcedure, router } from "../../index";
-
-function toTerminalIoError(message: string): TRPCError {
-	if (message.includes("belong")) {
-		return new TRPCError({ code: "FORBIDDEN", message });
-	}
-	// A worktree deleted underneath an open terminal is a routine lifecycle
-	// state, not a bug — the runtime reports it as a plain string, so match
-	// the stable prefix here to keep it out of Sentry.
-	if (message.startsWith("Workspace worktree no longer exists")) {
-		return new TRPCError({
-			code: "NOT_FOUND",
-			message,
-			cause: { kind: "WORKTREE_GONE" },
-		});
-	}
-	if (
-		message.includes("not found") ||
-		message.includes("not active") ||
-		message.includes("exited")
-	) {
-		return new TRPCError({ code: "NOT_FOUND", message });
-	}
-	return new TRPCError({ code: "INTERNAL_SERVER_ERROR", message });
-}
+import { toTerminalSessionError } from "./errors";
 
 const createSessionInputSchema = z.object({
 	workspaceId: z.string(),
@@ -73,10 +50,7 @@ async function createTerminalSessionFromInput({
 	});
 
 	if ("error" in result) {
-		throw new TRPCError({
-			code: "INTERNAL_SERVER_ERROR",
-			message: result.error,
-		});
+		throw toTerminalSessionError(result);
 	}
 
 	return {
@@ -180,10 +154,7 @@ export const terminalRouter = router({
 		.mutation(({ input }) => {
 			const result = writeInputToSession(input);
 			if ("error" in result) {
-				throw new TRPCError({
-					code: "NOT_FOUND",
-					message: result.error,
-				});
+				throw toTerminalSessionError(result);
 			}
 			return { success: true as const };
 		}),
@@ -207,7 +178,7 @@ export const terminalRouter = router({
 				eventBus: ctx.eventBus,
 			});
 			if ("error" in result) {
-				throw toTerminalIoError(result.error);
+				throw toTerminalSessionError(result);
 			}
 			return { terminalId: input.terminalId, submitted: input.submit };
 		}),
@@ -229,7 +200,7 @@ export const terminalRouter = router({
 				eventBus: ctx.eventBus,
 			});
 			if ("error" in result) {
-				throw toTerminalIoError(result.error);
+				throw toTerminalSessionError(result);
 			}
 			const { success: _success, ...snapshot } = result;
 			return { terminalId: input.terminalId, ...snapshot };
