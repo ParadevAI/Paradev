@@ -1,4 +1,5 @@
 import { TRPCError } from "@trpc/server";
+import type { SimpleGitOptions } from "simple-git";
 import { z } from "zod";
 import { publicProcedure, router } from "../..";
 import { getCurrentBranch } from "../workspaces/utils/git";
@@ -10,6 +11,7 @@ import {
 	isUpstreamMissingError,
 } from "./git-utils";
 import { assertRegisteredWorktree } from "./security/path-validation";
+import { rethrowCommitFailure } from "./utils/commit-failure";
 import {
 	fetchCurrentBranch,
 	getTrackingBranchStatus,
@@ -28,8 +30,11 @@ import { clearWorktreeStatusCaches } from "./utils/worktree-status-caches";
 
 export { isUpstreamMissingError };
 
-async function getGitWithShellPath(worktreePath: string) {
-	return getSimpleGitWithShellPath(worktreePath);
+async function getGitWithShellPath(
+	worktreePath: string,
+	overrides?: Partial<SimpleGitOptions>,
+) {
+	return getSimpleGitWithShellPath(worktreePath, overrides);
 }
 
 /** Runs a git-backed operation, rethrowing environmental git failures
@@ -120,8 +125,23 @@ export const createGitOperationsRouter = () => {
 					assertRegisteredWorktree(input.worktreePath);
 
 					return runGitOperation(async () => {
-						const git = await getGitWithShellPath(input.worktreePath);
-						const result = await git.commit(input.message);
+						// Commits run the user's own hooks, whose output becomes the
+						// failure message. Keep git's exit status for the classifier so
+						// it never has to read that output.
+						let exitCode: number | undefined;
+						const git = await getGitWithShellPath(input.worktreePath, {
+							errors(error, result) {
+								exitCode = result.exitCode;
+								return error;
+							},
+						});
+
+						let result: Awaited<ReturnType<typeof git.commit>>;
+						try {
+							result = await git.commit(input.message);
+						} catch (error) {
+							rethrowCommitFailure(error, exitCode);
+						}
 						clearStatusCacheForWorktree(input.worktreePath);
 						return { success: true, hash: result.commit };
 					});
