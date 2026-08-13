@@ -15,6 +15,7 @@ import {
 	updateLocalProject,
 } from "../../../projects/local-project-store";
 import { createUserSimpleGit } from "../../../runtime/git/simple-git";
+import type { HostServiceContext } from "../../../types";
 import { deleteLocalWorkspace } from "../../../workspaces/local-workspace-store";
 import { protectedProcedure, router } from "../../index";
 import {
@@ -59,6 +60,48 @@ export interface FindByPathCandidate {
 	repoCloneUrl: string | null;
 	source: "local-path" | "remote";
 	matchesExpected: boolean;
+}
+
+interface CloudProjectNotFoundCause {
+	kind: "CLOUD_PROJECT_NOT_FOUND";
+}
+
+/** Upstream tRPC client rejections cross a bundle boundary and lose their
+ * prototype, so match on `name` rather than `instanceof`. */
+function isCloudProjectNotFound(error: unknown): boolean {
+	if (!error || typeof error !== "object") return false;
+	if ((error as { name?: unknown }).name !== "TRPCClientError") return false;
+	const code = (error as { data?: { code?: unknown } }).data?.code;
+	if (typeof code === "string") return code === "NOT_FOUND";
+	const message = (error as { message?: unknown }).message;
+	return typeof message === "string" && /not found/i.test(message);
+}
+
+/** Legacy cloud lookup for `setup`. A not-found upstream is an ordinary
+ * outcome — the project was deleted cloud-side, or an older client is trying
+ * to adopt one it cannot see — so it is classified as NOT_FOUND here instead
+ * of reaching the Sentry middleware as a 500. Network failures, cloud 5xx and
+ * auth errors still propagate untouched. */
+async function fetchCloudProjectForSetup(
+	ctx: HostServiceContext,
+	projectId: string,
+) {
+	try {
+		return await ctx.api.v2Project.get.query({
+			organizationId: ctx.organizationId,
+			id: projectId,
+		});
+	} catch (error) {
+		if (!isCloudProjectNotFound(error)) throw error;
+		const message = (error as { message?: unknown }).message;
+		throw new TRPCError({
+			code: "NOT_FOUND",
+			message: typeof message === "string" && message ? message : "Not found",
+			cause: {
+				kind: "CLOUD_PROJECT_NOT_FOUND",
+			} satisfies CloudProjectNotFoundCause,
+		});
+	}
 }
 
 export const projectRouter = router({
@@ -602,10 +645,7 @@ export const projectRouter = router({
 			const cloudProject =
 				existing || input.origin
 					? null
-					: await ctx.api.v2Project.get.query({
-							organizationId: ctx.organizationId,
-							id: input.projectId,
-						});
+					: await fetchCloudProjectForSetup(ctx, input.projectId);
 			const origin = cloudProject
 				? { repoCloneUrl: cloudProject.repoCloneUrl, name: cloudProject.name }
 				: {
