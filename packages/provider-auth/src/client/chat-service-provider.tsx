@@ -1,7 +1,7 @@
 import type { QueryClient } from "@tanstack/react-query";
 import { createTRPCReact } from "@trpc/react-query";
 import { createContext, type ReactNode } from "react";
-import type { ChatServiceRouter } from "../../server/desktop";
+import type { ChatServiceRouter } from "../server";
 
 const chatServiceTrpcContext = createContext<unknown>(null);
 

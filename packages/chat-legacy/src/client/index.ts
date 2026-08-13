@@ -7,12 +7,9 @@ export {
 export {
 	type ChatRuntimeServiceClient,
 	ChatRuntimeServiceProvider,
-	type ChatServiceClient,
-	ChatServiceProvider,
 	type CreateChatRuntimeServiceClientOptions,
 	type CreateChatRuntimeServiceHttpClientOptions,
 	chatRuntimeServiceTrpc,
-	chatServiceTrpc,
 	createChatRuntimeServiceClient,
 	createChatRuntimeServiceHttpClient,
 } from "./provider";

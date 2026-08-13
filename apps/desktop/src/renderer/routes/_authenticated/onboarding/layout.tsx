@@ -1,4 +1,4 @@
-import { ChatServiceProvider } from "@superset/chat-legacy/client";
+import { ChatServiceProvider } from "@superset/provider-auth/client";
 import {
 	createFileRoute,
 	Outlet,

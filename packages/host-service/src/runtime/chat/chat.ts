@@ -5,7 +5,7 @@ import { Memory } from "@mastra/memory";
 import {
 	getSlashCommands as getSlashCommandsFromCwd,
 	resolveSlashCommand as resolveSlashCommandFromCwd,
-} from "@superset/chat-legacy/server/desktop";
+} from "@superset/provider-auth/server";
 import { eq } from "drizzle-orm";
 import { createMastraCode } from "mastracode";
 import type { HostDb } from "../../db";

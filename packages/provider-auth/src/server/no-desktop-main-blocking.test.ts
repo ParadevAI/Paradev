@@ -1,6 +1,6 @@
-// Ratchet: src/server/desktop is imported by the Electron main process (the
-// desktop chat-service / chat-runtime-service tRPC routers), so blocking
-// calls here stall every electronTrpc response — the desktop app's own
+// Ratchet: src/server is imported by the Electron main process (the desktop
+// chat-service / chat-runtime-service tRPC routers), so blocking calls here
+// stall every electronTrpc response — the desktop app's own
 // no-main-process-blocking ratchet cannot see across the package boundary.
 //
 // Counts are per-file matching-line counts, not a file allowlist, so an
@@ -25,7 +25,7 @@ const SELF = path.resolve(
 interface Rule {
 	name: string;
 	pattern: RegExp;
-	/** Repo-relative (from server/desktop/) file → matching-line count allowed. */
+	/** Repo-relative (from src/server/) file → matching-line count allowed. */
 	allowedCounts: Record<string, number>;
 	advice: string;
 }

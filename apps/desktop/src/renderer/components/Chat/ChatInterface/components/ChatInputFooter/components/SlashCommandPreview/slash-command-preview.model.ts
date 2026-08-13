@@ -4,7 +4,7 @@ import {
 	type ParsedNamedSlashArgument,
 	parseNamedSlashArgumentToken,
 	tokenizeSlashCommandArguments,
-} from "@superset/chat-legacy/shared";
+} from "@superset/provider-auth/shared";
 
 export type NamedArgEntry = ParsedNamedSlashArgument;
 

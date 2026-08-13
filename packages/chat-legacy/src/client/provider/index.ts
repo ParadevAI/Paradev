@@ -1,9 +1,4 @@
 export {
-	type ChatServiceClient,
-	ChatServiceProvider,
-	chatServiceTrpc,
-} from "./chat-service-provider";
-export {
 	type CreateChatRuntimeServiceClientOptions,
 	type CreateChatRuntimeServiceHttpClientOptions,
 	createChatRuntimeServiceClient,

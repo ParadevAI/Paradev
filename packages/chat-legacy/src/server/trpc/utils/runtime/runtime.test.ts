@@ -17,7 +17,7 @@ const generateTitleFromMessageMock = mock(
 	) => Promise<string>,
 );
 
-mock.module("../../../desktop", () => ({
+mock.module("@superset/provider-auth/server", () => ({
 	generateTitleFromMessage: generateTitleFromMessageMock,
 }));
 

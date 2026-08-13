@@ -92,7 +92,7 @@
 			"includes": [
 				"apps/desktop/src/main/lib/agent-setup/utils.ts",
 				"apps/desktop/src/main/lib/terminal-host/client.ts",
-				"packages/chat-legacy/src/server/desktop/auth/anthropic/anthropic.ts",
+				"packages/provider-auth/src/server/auth/anthropic/anthropic.ts",
 				"packages/host-service/src/providers/model-providers/LocalModelProvider/utils/resolveAnthropicCredential.ts",
 				"packages/pty-daemon/src/process-tree.ts",
 				"packages/shared/src/host-info.ts"

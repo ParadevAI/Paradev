@@ -92,6 +92,7 @@
 		"@superset/macos-process-metrics": "workspace:*",
 		"@superset/panes": "workspace:*",
 		"@superset/port-scanner": "workspace:*",
+		"@superset/provider-auth": "workspace:*",
 		"@superset/pty-daemon": "workspace:*",
 		"@superset/shared": "workspace:*",
 		"@superset/trpc": "workspace:*",

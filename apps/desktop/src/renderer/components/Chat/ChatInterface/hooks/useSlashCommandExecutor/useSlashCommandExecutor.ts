@@ -1,4 +1,4 @@
-import { chatServiceTrpc } from "@superset/chat-legacy/client";
+import { chatServiceTrpc } from "@superset/provider-auth/client";
 import { toast } from "@superset/ui/sonner";
 import { useCallback } from "react";
 import type {

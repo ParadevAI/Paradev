@@ -1,9 +1,9 @@
 import {
 	chatRuntimeServiceTrpc,
-	chatServiceTrpc,
 	type UseChatDisplayReturn,
 	useChatDisplay,
 } from "@superset/chat-legacy/client";
+import { chatServiceTrpc } from "@superset/provider-auth/client";
 import {
 	PromptInputAttachment,
 	type PromptInputMessage,
