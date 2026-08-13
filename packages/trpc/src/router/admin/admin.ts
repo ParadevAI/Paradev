@@ -1,8 +1,15 @@
 import { auth } from "@superset/auth/server";
+import { stripeClient } from "@superset/auth/stripe";
 import { db } from "@superset/db/client";
-import { accounts, users } from "@superset/db/schema";
+import {
+	accounts,
+	members,
+	organizations,
+	subscriptions,
+	users,
+} from "@superset/db/schema";
 import type { TRPCRouterRecord } from "@trpc/server";
-import { and, desc, eq } from "drizzle-orm";
+import { and, count, desc, eq, ne } from "drizzle-orm";
 import { z } from "zod";
 
 import { adminProcedure } from "../../trpc";
@@ -14,10 +21,76 @@ export const adminRouter = {
 		});
 	}),
 
+	/** Hard purge — the terminal step of account deletion (grace period is
+	 * user-facing, see user.deleteAccount). Sole-member orgs go too, with
+	 * their Stripe subscriptions cancelled first since raw org deletes bypass
+	 * beforeDeleteOrganization. Shared orgs get their seat quantity
+	 * decremented here because the member-row FK cascade never fires
+	 * afterRemoveMember. Deliberately silent — no removal or billing emails. */
 	deleteUser: adminProcedure
 		.input(z.object({ userId: z.string() }))
 		.mutation(async ({ input }) => {
-			// Delete user - Better Auth handles cascading session cleanup
+			const memberships = await db.query.members.findMany({
+				where: eq(members.userId, input.userId),
+			});
+			for (const membership of memberships) {
+				const [otherMembers] = await db
+					.select({ value: count() })
+					.from(members)
+					.where(
+						and(
+							eq(members.organizationId, membership.organizationId),
+							ne(members.userId, input.userId),
+						),
+					);
+				const remainingSeats = otherMembers?.value ?? 0;
+
+				if (remainingSeats > 0) {
+					const subscription = await db.query.subscriptions.findFirst({
+						where: and(
+							eq(subscriptions.referenceId, membership.organizationId),
+							eq(subscriptions.status, "active"),
+						),
+					});
+					if (
+						subscription?.stripeSubscriptionId &&
+						subscription.plan !== "enterprise"
+					) {
+						const stripeSub = await stripeClient.subscriptions.retrieve(
+							subscription.stripeSubscriptionId,
+						);
+						const itemId = stripeSub.items.data[0]?.id;
+						if (itemId) {
+							await stripeClient.subscriptions.update(
+								subscription.stripeSubscriptionId,
+								{
+									items: [{ id: itemId, quantity: remainingSeats }],
+									proration_behavior: "create_prorations",
+								},
+							);
+						}
+					}
+					continue;
+				}
+
+				const organization = await db.query.organizations.findFirst({
+					where: eq(organizations.id, membership.organizationId),
+					columns: { id: true, stripeCustomerId: true },
+				});
+				if (organization?.stripeCustomerId) {
+					const activeSubscriptions = await stripeClient.subscriptions.list({
+						customer: organization.stripeCustomerId,
+						status: "active",
+					});
+					for (const subscription of activeSubscriptions.data) {
+						await stripeClient.subscriptions.cancel(subscription.id);
+					}
+				}
+				await db
+					.delete(organizations)
+					.where(eq(organizations.id, membership.organizationId));
+			}
+
 			await db.delete(users).where(eq(users.id, input.userId));
 			return { success: true };
 		}),

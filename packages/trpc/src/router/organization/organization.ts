@@ -16,7 +16,7 @@ import {
 import { findOrgMembership } from "@superset/db/utils";
 import { canRemoveMember, type OrganizationRole } from "@superset/shared/auth";
 import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
-import { and, desc, eq, ne, sql } from "drizzle-orm";
+import { and, desc, eq, isNull, ne, sql } from "drizzle-orm";
 import { z } from "zod";
 import { generateImagePathname, uploadImage } from "../../lib/upload";
 import { jwtProcedure, protectedProcedure, publicProcedure } from "../../trpc";
@@ -79,20 +79,34 @@ export const organizationRouter = {
 			.orderBy(organizations.name);
 	}),
 
-	listMembers: protectedProcedure.query(async ({ ctx }) => {
-		const organizationId = await requireActiveOrgMembership(ctx);
-		return db
-			.select({
-				id: members.id,
-				role: members.role,
-				createdAt: members.createdAt,
-				userId: members.userId,
-				user: users,
-			})
-			.from(members)
-			.innerJoin(users, eq(members.userId, users.id))
-			.where(eq(members.organizationId, organizationId));
-	}),
+	listMembers: protectedProcedure
+		.input(
+			z.object({ includeDeactivated: z.boolean().default(false) }).nullish(),
+		)
+		.query(async ({ ctx, input }) => {
+			const organizationId = await requireActiveOrgMembership(ctx);
+			const conditions = [eq(members.organizationId, organizationId)];
+			if (!input?.includeDeactivated) {
+				conditions.push(isNull(users.deletionRequestedAt));
+			}
+			return db
+				.select({
+					id: members.id,
+					role: members.role,
+					createdAt: members.createdAt,
+					userId: members.userId,
+					user: {
+						id: users.id,
+						name: users.name,
+						email: users.email,
+						image: users.image,
+						deletionRequestedAt: users.deletionRequestedAt,
+					},
+				})
+				.from(members)
+				.innerJoin(users, eq(members.userId, users.id))
+				.where(and(...conditions));
+		}),
 
 	listInvitations: protectedProcedure.query(async ({ ctx }) => {
 		const organizationId = await requireActiveOrgMembership(ctx);

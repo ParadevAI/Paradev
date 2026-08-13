@@ -43,7 +43,7 @@ export function MembersSettings({ visibleItems }: MembersSettingsProps) {
 	);
 
 	const { data: membersData, isPending } =
-		cloudTrpc.organization.listMembers.useQuery(undefined);
+		cloudTrpc.organization.listMembers.useQuery({ includeDeactivated: true });
 
 	const { data: orgData } = cloudTrpc.organization.list.useQuery(undefined);
 	const organization = orgData?.find((org) => org.id === activeOrganizationId);
@@ -60,6 +60,7 @@ export function MembersSettings({ visibleItems }: MembersSettingsProps) {
 				name: m.user.name,
 				email: m.user.email,
 				image: m.user.image,
+				deletionRequestedAt: m.user.deletionRequestedAt,
 			}))
 			.sort((a, b) => {
 				const priorityDiff =
@@ -159,7 +160,13 @@ export function MembersSettings({ visibleItems }: MembersSettingsProps) {
 																	image={member.image}
 																/>
 																<div className="flex items-center gap-2">
-																	<span className="font-medium">
+																	<span
+																		className={
+																			member.deletionRequestedAt
+																				? "font-medium text-muted-foreground"
+																				: "font-medium"
+																		}
+																	>
 																		{member.name || "Unknown"}
 																	</span>
 																	{isCurrentUserRow && (
@@ -168,6 +175,14 @@ export function MembersSettings({ visibleItems }: MembersSettingsProps) {
 																			className="text-xs"
 																		>
 																			You
+																		</Badge>
+																	)}
+																	{member.deletionRequestedAt && (
+																		<Badge
+																			variant="outline"
+																			className="text-xs text-muted-foreground"
+																		>
+																			Deactivated
 																		</Badge>
 																	)}
 																</div>

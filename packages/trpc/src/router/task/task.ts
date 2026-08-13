@@ -158,10 +158,12 @@ async function getScopedAssigneeId(
 					userId: members.userId,
 				})
 				.from(members)
+				.innerJoin(users, eq(members.userId, users.id))
 				.where(
 					and(
 						eq(members.organizationId, organizationId),
 						eq(members.userId, assigneeId),
+						isNull(users.deletionRequestedAt),
 					),
 				)
 				.limit(1);

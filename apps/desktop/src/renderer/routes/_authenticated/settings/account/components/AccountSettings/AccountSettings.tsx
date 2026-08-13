@@ -1,3 +1,15 @@
+import { ACCOUNT_DELETION_GRACE_DAYS } from "@superset/shared/constants";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from "@superset/ui/alert-dialog";
 import { Avatar } from "@superset/ui/atoms/Avatar";
 import { Button } from "@superset/ui/button";
 import { Input } from "@superset/ui/input";
@@ -33,6 +45,10 @@ export function AccountSettings({ visibleItems }: AccountSettingsProps) {
 		SETTING_ITEM_ID.ACCOUNT_SIGNOUT,
 		visibleItems,
 	);
+	const showDelete = isItemVisible(
+		SETTING_ITEM_ID.ACCOUNT_DELETE,
+		visibleItems,
+	);
 
 	const {
 		data: session,
@@ -45,8 +61,23 @@ export function AccountSettings({ visibleItems }: AccountSettingsProps) {
 	const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
 	const signOut = useSignOut();
+	const [isDeleting, setIsDeleting] = useState(false);
 
 	const selectImageMutation = electronTrpc.window.selectImageFile.useMutation();
+
+	async function handleDeleteAccount() {
+		setIsDeleting(true);
+		try {
+			await apiTrpcClient.user.deleteAccount.mutate();
+			await signOut();
+		} catch (error) {
+			toast.error(
+				error instanceof Error ? error.message : "Failed to delete account",
+			);
+		} finally {
+			setIsDeleting(false);
+		}
+	}
 
 	useEffect(() => {
 		if (!user) return;
@@ -166,6 +197,39 @@ export function AccountSettings({ visibleItems }: AccountSettingsProps) {
 							>
 								Sign out
 							</Button>
+						</SettingRow>
+					</div>
+				)}
+
+				{showDelete && (
+					<div className="pt-5">
+						<SettingRow label="Delete account">
+							<AlertDialog>
+								<AlertDialogTrigger asChild>
+									<Button variant="destructive" disabled={isDeleting}>
+										{isDeleting ? "Deleting…" : "Delete account"}
+									</Button>
+								</AlertDialogTrigger>
+								<AlertDialogContent>
+									<AlertDialogHeader>
+										<AlertDialogTitle>Delete account?</AlertDialogTitle>
+										<AlertDialogDescription>
+											All of your data will be permanently deleted after{" "}
+											{ACCOUNT_DELETION_GRACE_DAYS} days — sign back in before
+											then to restore your account.
+										</AlertDialogDescription>
+									</AlertDialogHeader>
+									<AlertDialogFooter>
+										<AlertDialogCancel>Cancel</AlertDialogCancel>
+										<AlertDialogAction
+											variant="destructive"
+											onClick={handleDeleteAccount}
+										>
+											Delete account
+										</AlertDialogAction>
+									</AlertDialogFooter>
+								</AlertDialogContent>
+							</AlertDialog>
 						</SettingRow>
 					</div>
 				)}

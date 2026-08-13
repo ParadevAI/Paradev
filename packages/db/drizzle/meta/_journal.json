@@ -463,6 +463,13 @@
       "when": 1786489809031,
       "tag": "0065_drop_chat_sessions_v2_workspace_fk",
       "breakpoints": true
+    },
+    {
+      "idx": 66,
+      "version": "7",
+      "when": 1786584902692,
+      "tag": "0066_add_user_deletion_requested_at",
+      "breakpoints": true
     }
   ]
 }

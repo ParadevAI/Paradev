@@ -3,8 +3,20 @@ import {
 	getRoleSortPriority,
 	type OrganizationRole,
 } from "@superset/shared/auth";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from "@superset/ui/alert-dialog";
 import { Avatar } from "@superset/ui/atoms/Avatar";
 import { Badge } from "@superset/ui/badge";
+import { Button } from "@superset/ui/button";
 import { Input } from "@superset/ui/input";
 import { Label } from "@superset/ui/label";
 import { Skeleton } from "@superset/ui/skeleton";
@@ -18,6 +30,7 @@ import {
 	TableRow,
 } from "@superset/ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
+import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import {
 	HiOutlineClipboardDocument,
@@ -79,14 +92,17 @@ function SettingsRow({ label, hint, htmlFor, children }: SettingsRowProps) {
 export function OrganizationSettings({
 	visibleItems,
 }: OrganizationSettingsProps) {
-	const { data: session } = authClient.useSession();
+	const { data: session, refetch: refetchSession } = authClient.useSession();
 	const activeOrganizationId = session?.session?.activeOrganizationId;
 	const utils = cloudTrpc.useUtils();
+	const navigate = useNavigate();
 	const searchQuery = useSettingsSearchQuery();
 
 	const [isSlugDialogOpen, setIsSlugDialogOpen] = useState(false);
 	const [logoPreview, setLogoPreview] = useState<string | null>(null);
 	const [nameValue, setNameValue] = useState("");
+	const [deleteConfirmValue, setDeleteConfirmValue] = useState("");
+	const [isDeletingOrg, setIsDeletingOrg] = useState(false);
 
 	const { data: organizations, isPending } =
 		cloudTrpc.organization.list.useQuery(undefined);
@@ -118,13 +134,17 @@ export function OrganizationSettings({
 	);
 	const showId = isItemVisible(SETTING_ITEM_ID.ORGANIZATION_ID, visibleItems);
 	const { copyToClipboard, copied } = useCopyToClipboard();
+	const showDelete = isItemVisible(
+		SETTING_ITEM_ID.ORGANIZATION_DELETE,
+		visibleItems,
+	);
 	const showMembersList = isItemVisible(
 		SETTING_ITEM_ID.ORGANIZATION_MEMBERS_LIST,
 		visibleItems,
 	);
 
 	const { data: membersData, isPending: membersPending } =
-		cloudTrpc.organization.listMembers.useQuery(undefined);
+		cloudTrpc.organization.listMembers.useQuery({ includeDeactivated: true });
 
 	const members: TeamMember[] = useMemo(() => {
 		if (!activeOrganizationId) return [];
@@ -138,6 +158,7 @@ export function OrganizationSettings({
 				name: m.user.name,
 				email: m.user.email,
 				image: m.user.image,
+				deletionRequestedAt: m.user.deletionRequestedAt,
 			}))
 			.sort((a, b) => {
 				const priorityDiff =
@@ -190,6 +211,42 @@ export function OrganizationSettings({
 			console.error("[organization-settings] Logo upload failed:", error);
 			toast.error("Failed to update logo");
 		}
+	}
+
+	async function deleteOrganization(): Promise<void> {
+		if (!organization) return;
+		const { error } = await authClient.organization.delete({
+			organizationId: organization.id,
+		});
+		if (error) throw new Error(error.message);
+
+		// The server nulls the active org during deletion; explicitly move the
+		// session to the next org (or none) and re-enter the root gates, same
+		// as the leave-organization flow.
+		const remaining = (organizations ?? []).filter(
+			(o) => o.id !== organization.id,
+		);
+		await authClient.organization.setActive({
+			organizationId: remaining[0]?.id ?? null,
+		});
+		await refetchSession();
+		await utils.invalidate();
+		navigate({ to: "/" });
+	}
+
+	function handleDeleteOrganization(): void {
+		setIsDeletingOrg(true);
+		toast.promise(
+			deleteOrganization().finally(() => {
+				setIsDeletingOrg(false);
+				setDeleteConfirmValue("");
+			}),
+			{
+				loading: "Deleting organization...",
+				success: "Organization deleted",
+				error: (err) => err.message || "Failed to delete organization",
+			},
+		);
 	}
 
 	async function handleNameBlur(): Promise<void> {
@@ -453,7 +510,13 @@ export function OrganizationSettings({
 																			image={member.image}
 																		/>
 																		<div className="flex items-center gap-2">
-																			<span className="font-medium">
+																			<span
+																				className={
+																					member.deletionRequestedAt
+																						? "font-medium text-muted-foreground"
+																						: "font-medium"
+																				}
+																			>
 																				{member.name || "Unknown"}
 																			</span>
 																			{isCurrentUserRow && (
@@ -462,6 +525,14 @@ export function OrganizationSettings({
 																					className="text-[10px] h-4 px-1.5"
 																				>
 																					You
+																				</Badge>
+																			)}
+																			{member.deletionRequestedAt && (
+																				<Badge
+																					variant="outline"
+																					className="text-[10px] h-4 px-1.5 text-muted-foreground"
+																				>
+																					Deactivated
 																				</Badge>
 																			)}
 																		</div>
@@ -510,6 +581,52 @@ export function OrganizationSettings({
 									)}
 								</div>
 							)}
+						</section>
+					)}
+
+					{showDelete && isOwner && (
+						<section>
+							<SettingsRow label="Delete organization">
+								<AlertDialog
+									onOpenChange={(open) => {
+										if (!open) setDeleteConfirmValue("");
+									}}
+								>
+									<AlertDialogTrigger asChild>
+										<Button variant="destructive" disabled={isDeletingOrg}>
+											{isDeletingOrg ? "Deleting…" : "Delete organization"}
+										</Button>
+									</AlertDialogTrigger>
+									<AlertDialogContent>
+										<AlertDialogHeader>
+											<AlertDialogTitle>
+												Delete {organization.name}?
+											</AlertDialogTitle>
+											<AlertDialogDescription>
+												{members.length > 1
+													? `All data will be permanently deleted for all ${members.length} members — this cannot be undone.`
+													: "All of the organization's data will be permanently deleted — this cannot be undone."}{" "}
+												Type the organization name to confirm.
+											</AlertDialogDescription>
+										</AlertDialogHeader>
+										<Input
+											value={deleteConfirmValue}
+											onChange={(e) => setDeleteConfirmValue(e.target.value)}
+											placeholder={organization.name}
+										/>
+										<AlertDialogFooter>
+											<AlertDialogCancel>Cancel</AlertDialogCancel>
+											<AlertDialogAction
+												variant="destructive"
+												disabled={deleteConfirmValue !== organization.name}
+												onClick={handleDeleteOrganization}
+											>
+												Delete organization
+											</AlertDialogAction>
+										</AlertDialogFooter>
+									</AlertDialogContent>
+								</AlertDialog>
+							</SettingsRow>
 						</section>
 					)}
 				</div>

@@ -72,6 +72,9 @@ export const TOKEN_CONFIG = {
 // Workspace teardown
 export const TEARDOWN_TIMEOUT_MS = 60_000;
 
+/** Days a pending-deletion account stays recoverable before it may be purged. */
+export const ACCOUNT_DELETION_GRACE_DAYS = 30;
+
 // PostHog
 export const POSTHOG_COOKIE_NAME = "superset";
 

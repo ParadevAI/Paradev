@@ -3,6 +3,7 @@ import type { SettingsSection } from "renderer/stores/settings-state";
 export const SETTING_ITEM_ID = {
 	ACCOUNT_PROFILE: "account-profile",
 	ACCOUNT_SIGNOUT: "account-signout",
+	ACCOUNT_DELETE: "account-delete",
 
 	ORGANIZATION_LOGO: "organization-logo",
 	ORGANIZATION_NAME: "organization-name",
@@ -12,6 +13,7 @@ export const SETTING_ITEM_ID = {
 	ORGANIZATION_MEMBERS_INVITE: "organization-members-invite",
 	ORGANIZATION_MEMBERS_PENDING_INVITATIONS:
 		"organization-members-pending-invitations",
+	ORGANIZATION_DELETE: "organization-delete",
 
 	TEAMS_LIST: "teams-list",
 
@@ -119,6 +121,7 @@ export type SettingVariant = "v1" | "v2" | "shared";
 export const SETTING_ITEM_VARIANT: Record<SettingItemId, SettingVariant> = {
 	[SETTING_ITEM_ID.ACCOUNT_PROFILE]: "shared",
 	[SETTING_ITEM_ID.ACCOUNT_SIGNOUT]: "shared",
+	[SETTING_ITEM_ID.ACCOUNT_DELETE]: "shared",
 
 	[SETTING_ITEM_ID.ORGANIZATION_LOGO]: "shared",
 	[SETTING_ITEM_ID.ORGANIZATION_NAME]: "shared",
@@ -127,6 +130,7 @@ export const SETTING_ITEM_VARIANT: Record<SettingItemId, SettingVariant> = {
 	[SETTING_ITEM_ID.ORGANIZATION_MEMBERS_LIST]: "shared",
 	[SETTING_ITEM_ID.ORGANIZATION_MEMBERS_INVITE]: "shared",
 	[SETTING_ITEM_ID.ORGANIZATION_MEMBERS_PENDING_INVITATIONS]: "shared",
+	[SETTING_ITEM_ID.ORGANIZATION_DELETE]: "shared",
 
 	[SETTING_ITEM_ID.TEAMS_LIST]: "shared",
 
@@ -252,6 +256,21 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 		],
 	},
 	{
+		id: SETTING_ITEM_ID.ACCOUNT_DELETE,
+		section: "account",
+		title: "Delete Account",
+		description: "Permanently delete your account",
+		keywords: [
+			"account",
+			"delete",
+			"remove",
+			"close",
+			"deactivate",
+			"gdpr",
+			"erase",
+		],
+	},
+	{
 		id: SETTING_ITEM_ID.ORGANIZATION_LOGO,
 		section: "organization",
 		title: "Organization Logo",
@@ -365,6 +384,20 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 			"cancel",
 			"resend",
 			"email",
+		],
+	},
+	{
+		id: SETTING_ITEM_ID.ORGANIZATION_DELETE,
+		section: "organization",
+		title: "Delete Organization",
+		description: "Permanently delete this organization",
+		keywords: [
+			"organization",
+			"delete",
+			"remove",
+			"close",
+			"disband",
+			"danger",
 		],
 	},
 	{

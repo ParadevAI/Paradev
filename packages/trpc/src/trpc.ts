@@ -91,6 +91,13 @@ const clientTelemetry = t.middleware(async ({ ctx, path, next }) => {
 
 export const publicProcedure = t.procedure.use(clientTelemetry);
 
+/** The only procedures a pending-deletion account may call. */
+const PENDING_DELETION_ALLOWED_PROCEDURES = new Set([
+	"user.me",
+	"user.deleteAccount",
+	"user.reactivateAccount",
+]);
+
 export const protectedProcedure = t.procedure
 	.use(clientTelemetry)
 	.use(async ({ ctx, next }) => {
@@ -102,6 +109,18 @@ export const protectedProcedure = t.procedure
 		}
 
 		return next({ ctx: { ...ctx, session: ctx.session } });
+	})
+	.use(async ({ ctx, path, next }) => {
+		if (
+			ctx.session.user.deletionRequestedAt &&
+			!PENDING_DELETION_ALLOWED_PROCEDURES.has(path)
+		) {
+			throw new TRPCError({
+				code: "FORBIDDEN",
+				message: "Account is pending deletion.",
+			});
+		}
+		return next();
 	})
 	.use(async ({ ctx, next }) => {
 		const sessionOrgId = ctx.session.session.activeOrganizationId ?? null;
