@@ -513,9 +513,9 @@ export const v2Workspaces = pgTable(
 		organizationId: uuid("organization_id")
 			.notNull()
 			.references(() => organizations.id, { onDelete: "cascade" }),
-		projectId: uuid("project_id")
-			.notNull()
-			.references(() => v2Projects.id, { onDelete: "cascade" }),
+		// FK dropped ahead of the v2_projects table removal; the column stays
+		// as a bare uuid, same shape as automations.v2_project_id (0062).
+		projectId: uuid("project_id").notNull(),
 		hostId: text("host_id").notNull(),
 		name: text().notNull(),
 		branch: text().notNull(),

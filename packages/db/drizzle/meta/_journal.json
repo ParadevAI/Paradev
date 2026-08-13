@@ -484,6 +484,13 @@
       "when": 1786646300533,
       "tag": "0068_drop_device_presence",
       "breakpoints": true
+    },
+    {
+      "idx": 69,
+      "version": "7",
+      "when": 1786649583806,
+      "tag": "0069_drop_v2_workspaces_project_fk",
+      "breakpoints": true
     }
   ]
 }
