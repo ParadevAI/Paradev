@@ -20,19 +20,17 @@ import {
 	type OrgPullRequest,
 	usePullRequests,
 } from "@/screens/(authenticated)/hooks/usePullRequests";
+import { usePinnedWorkspacesStore } from "@/screens/(authenticated)/stores/pinnedWorkspacesStore";
 import { HostOfflineView } from "./components/HostOfflineView";
 import { NewChatWidget } from "./components/NewChatWidget";
 import { OrganizationHeaderButton } from "./components/OrganizationHeaderButton";
 import { OrganizationSwitcherSheet } from "./components/OrganizationSwitcherSheet";
-import { SessionRow } from "./components/SessionRow";
 import { WorkspaceRow } from "./components/WorkspaceRow";
-import { useHostAcpSessions } from "./hooks/useHostAcpSessions";
-import { useHostTerminalAgents } from "./hooks/useHostTerminalAgents";
+import { useHostTerminals } from "./hooks/useHostTerminals";
 import { useVisibleDiffStats } from "./hooks/useVisibleDiffStats";
 import { useWorkspacesFilterStore } from "./stores/workspacesFilterStore";
 import { activityDateGroup } from "./utils/activityDateGroup";
 import { prStateFor } from "./utils/prStateFor";
-import { buildSessionRows, type SessionRowData } from "./utils/sessionRows";
 
 const VIEWABILITY_CONFIG = {
 	itemVisiblePercentThreshold: 50,
@@ -45,24 +43,12 @@ const NAVIGATION_BAR_HEIGHT = 44;
 
 type HomeListItem =
 	| { kind: "dateHeader"; label: string }
-	| { kind: "workspace"; workspace: HostWorkspaceItem }
-	| {
-			kind: "session";
-			workspaceId: string;
-			row: SessionRowData;
-			groupFirst: boolean;
-			groupLast: boolean;
-	  };
+	| { kind: "workspace"; workspace: HostWorkspaceItem };
 
 function homeListItemKey(item: HomeListItem): string {
-	switch (item.kind) {
-		case "dateHeader":
-			return `date:${item.label}`;
-		case "workspace":
-			return `ws:${item.workspace.id}`;
-		case "session":
-			return `session:${item.row.id}`;
-	}
+	return item.kind === "dateHeader"
+		? `date:${item.label}`
+		: `ws:${item.workspace.id}`;
 }
 
 export function HomeScreen() {
@@ -86,53 +72,59 @@ export function HomeScreen() {
 	} = useOrganizations();
 
 	const selectedHost = useSelectedHost();
+	const pinnedAt = usePinnedWorkspacesStore((state) => state.pinnedAt);
 	const { workspaces, isReady, cache } = useHostWorkspaces(selectedHost);
-	const attentionByWorkspace = useHostTerminalAgents(selectedHost);
+	const { terminalsByWorkspace, attentionByWorkspace } =
+		useHostTerminals(selectedHost);
 
 	// Projects are fully local — served by the selected host, not the cloud.
 	const { projects } = useHostProjects(selectedHost);
 	const pullRequests = usePullRequests();
-	const { sessionsByWorkspace } = useHostAcpSessions(selectedHost);
 
 	const sortedProjects = useMemo(
 		() => [...projects].sort((a, b) => a.name.localeCompare(b.name)),
 		[projects],
 	);
 
-	const selectedProjectId = projectFilter ?? sortedProjects[0]?.id ?? null;
+	// Default to where the user actually works — the most recently updated
+	// workspace's project — not the alphabetically first project.
+	const defaultProjectId = useMemo(() => {
+		let newest: HostWorkspaceItem | null = null;
+		for (const workspace of workspaces) {
+			if (!workspace.projectId) continue;
+			if (!newest || isAfter(workspace.updatedAt, newest.updatedAt)) {
+				newest = workspace;
+			}
+		}
+		return newest?.projectId ?? sortedProjects[0]?.id ?? null;
+	}, [workspaces, sortedProjects]);
+
+	const selectedProjectId = projectFilter ?? defaultProjectId;
 
 	const projectNamesById = useMemo(
 		() => new Map(projects.map((project) => [project.id, project.name])),
 		[projects],
 	);
 
-	const sessionRowsByWorkspace = useMemo(() => {
-		const rowsByWorkspace = new Map<string, SessionRowData[]>();
-		for (const [workspaceId, sessions] of sessionsByWorkspace) {
-			rowsByWorkspace.set(workspaceId, buildSessionRows(sessions));
-		}
-		return rowsByWorkspace;
-	}, [sessionsByWorkspace]);
-
 	// Recency ranks a group by its latest activity — the newest of the
-	// workspace's own update and its sessions' updates.
+	// workspace's own update and its terminals' activity.
 	const activityTs = useCallback(
 		(workspace: HostWorkspaceItem) => {
 			const workspaceTs = new Date(workspace[sort]).getTime();
 			if (sort !== "updatedAt") return workspaceTs;
-			const sessionTs = (sessionRowsByWorkspace.get(workspace.id) ?? []).reduce(
+			const terminalTs = (terminalsByWorkspace.get(workspace.id) ?? []).reduce(
 				(newest, row) => Math.max(newest, row.ts),
 				0,
 			);
-			return Math.max(workspaceTs, sessionTs);
+			return Math.max(workspaceTs, terminalTs);
 		},
-		[sort, sessionRowsByWorkspace],
+		[sort, terminalsByWorkspace],
 	);
 
 	const visibleWorkspaces = useMemo<HostWorkspaceItem[]>(() => {
 		const needle = searchQuery.trim().toLowerCase();
 		const sessionsMatch = (workspaceId: string) =>
-			(sessionRowsByWorkspace.get(workspaceId) ?? []).some((row) =>
+			(terminalsByWorkspace.get(workspaceId) ?? []).some((row) =>
 				row.title.toLowerCase().includes(needle),
 			);
 		// A record whose worktree folder is gone from the host's disk is a
@@ -159,15 +151,26 @@ export function HomeScreen() {
 						workspace.projectId === selectedProjectId &&
 						workspace.hostId === selectedHost?.machineId,
 				);
-		return matches.sort((a, b) => activityTs(b) - activityTs(a));
+		// Pinned first (oldest pin leads, desktop's ordering), then activity.
+		return matches.sort((a, b) => {
+			const aPin = pinnedAt[a.id];
+			const bPin = pinnedAt[b.id];
+			if (aPin !== undefined || bPin !== undefined) {
+				if (aPin === undefined) return 1;
+				if (bPin === undefined) return -1;
+				return aPin - bPin;
+			}
+			return activityTs(b) - activityTs(a);
+		});
 	}, [
 		workspaces,
 		selectedProjectId,
 		selectedHost,
 		searchQuery,
 		projectNamesById,
-		sessionRowsByWorkspace,
+		terminalsByWorkspace,
 		activityTs,
+		pinnedAt,
 	]);
 
 	const listItems = useMemo<HomeListItem[]>(() => {
@@ -180,19 +183,9 @@ export function HomeScreen() {
 				lastGroup = group;
 			}
 			items.push({ kind: "workspace", workspace });
-			const rows = sessionRowsByWorkspace.get(workspace.id) ?? [];
-			rows.forEach((row, rowIndex) => {
-				items.push({
-					kind: "session",
-					workspaceId: workspace.id,
-					row,
-					groupFirst: rowIndex === 0,
-					groupLast: rowIndex === rows.length - 1,
-				});
-			});
 		}
 		return items;
-	}, [visibleWorkspaces, sessionRowsByWorkspace, activityTs]);
+	}, [visibleWorkspaces, activityTs]);
 
 	const workspacesById = useMemo(
 		() => new Map(workspaces.map((workspace) => [workspace.id, workspace])),
@@ -253,7 +246,9 @@ export function HomeScreen() {
 		void queryClient.invalidateQueries({
 			queryKey: ["host-service", "workspaces", "list"],
 		});
-		void queryClient.invalidateQueries({ queryKey: ["acp-sessions", "list"] });
+		void queryClient.invalidateQueries({
+			queryKey: ["host-terminals", "list"],
+		});
 		void queryClient.invalidateQueries({ queryKey: ["diff-stats"] });
 	}, [queryClient]);
 
@@ -286,69 +281,46 @@ export function HomeScreen() {
 
 	const renderItem = useCallback(
 		({ item, index }: { item: HomeListItem; index: number }) => {
-			switch (item.kind) {
-				case "dateHeader":
-					return (
-						<Text
-							className={cn(
-								"text-muted-foreground px-4 pb-1 font-semibold text-xs",
-								index === 0 ? undefined : "mt-6",
-							)}
-						>
-							{item.label}
-						</Text>
-					);
-				case "workspace": {
-					const { workspace } = item;
-					const repoPrefix = workspace.projectId
-						? repoPrefixesByProject.get(workspace.projectId)
-						: undefined;
-					return (
-						<WorkspaceRow
-							workspace={workspace}
-							pullRequest={
-								repoPrefix
-									? pullRequestsByRepoBranch.get(
-											`${repoPrefix}::${workspace.branch}`,
-										)
-									: undefined
-							}
-							diffStats={diffStats.get(workspace.id) ?? null}
-							cache={cache}
-							attention={attentionByWorkspace.get(workspace.id) ?? null}
-						/>
-					);
-				}
-				case "session":
-					return (
-						<View className={cn("ml-7", item.groupLast && "mb-2")}>
-							<View
-								className={cn(
-									"bg-border absolute left-0 w-[1.5px] rounded-full",
-									item.groupFirst ? "top-1" : "top-0",
-									item.groupLast ? "bottom-3" : "bottom-0",
-								)}
-							/>
-							<SessionRow
-								row={item.row}
-								className="gap-2.5 py-2 pr-4 pl-4"
-								onPress={() =>
-									router.push(
-										`/(authenticated)/workspace/${item.workspaceId}/chat/acp/${item.row.id}`,
-									)
-								}
-							/>
-						</View>
-					);
+			if (item.kind === "dateHeader") {
+				return (
+					<Text
+						className={cn(
+							"text-muted-foreground px-4 pb-1 font-semibold text-xs",
+							index === 0 ? undefined : "mt-6",
+						)}
+					>
+						{item.label}
+					</Text>
+				);
 			}
+			const { workspace } = item;
+			const repoPrefix = workspace.projectId
+				? repoPrefixesByProject.get(workspace.projectId)
+				: undefined;
+			return (
+				<WorkspaceRow
+					workspace={workspace}
+					pullRequest={
+						repoPrefix
+							? pullRequestsByRepoBranch.get(
+									`${repoPrefix}::${workspace.branch}`,
+								)
+							: undefined
+					}
+					diffStats={diffStats.get(workspace.id) ?? null}
+					cache={cache}
+					attention={attentionByWorkspace.get(workspace.id) ?? null}
+					sessions={terminalsByWorkspace.get(workspace.id) ?? []}
+				/>
+			);
 		},
 		[
 			pullRequestsByRepoBranch,
 			repoPrefixesByProject,
 			diffStats,
 			cache,
-			router,
 			attentionByWorkspace,
+			terminalsByWorkspace,
 		],
 	);
 

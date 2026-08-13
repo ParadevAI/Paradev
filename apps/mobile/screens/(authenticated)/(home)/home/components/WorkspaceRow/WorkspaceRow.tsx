@@ -1,13 +1,14 @@
 import type { SelectGithubPullRequest } from "@superset/db/schema";
 import { useRouter } from "expo-router";
 import {
+	FolderGit2,
 	GitMerge,
 	GitPullRequest,
 	GitPullRequestClosed,
 	GitPullRequestDraft,
 	Plus,
 } from "lucide-react-native";
-import { Linking, View } from "react-native";
+import { Pressable, View } from "react-native";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
@@ -15,8 +16,15 @@ import type {
 	HostWorkspaceItem,
 	HostWorkspacesCacheOps,
 } from "@/hooks/useHostWorkspaces";
+import { useTheme } from "@/hooks/useTheme";
 import { cn } from "@/lib/utils";
-import { PressableScale } from "@/screens/(authenticated)/components/PressableScale";
+import { AgentMark } from "@/screens/(authenticated)/(home)/new-session/agent";
+import { AsciiSpinner } from "@/screens/(authenticated)/components/AsciiSpinner";
+import { PingDot } from "@/screens/(authenticated)/components/PingDot";
+import type {
+	TerminalAttention,
+	TerminalRowData,
+} from "../../hooks/useHostTerminals";
 import type { DiffStats } from "../../hooks/useVisibleDiffStats";
 import { useChatTargetStore } from "../../stores/chatTargetStore";
 import { type PrBadgeState, prStateFor } from "../../utils/prStateFor";
@@ -34,20 +42,25 @@ const PR_ICON_CONFIG: Record<
 	open: { icon: GitPullRequest, iconClassName: "text-emerald-500" },
 };
 
+const MAX_SESSION_MARKS = 3;
+
 export function WorkspaceRow({
 	workspace,
 	pullRequest,
 	diffStats,
 	cache,
 	attention,
+	sessions,
 }: {
 	workspace: HostWorkspaceItem;
 	pullRequest?: SelectGithubPullRequest;
 	diffStats: DiffStats | null;
 	cache: HostWorkspacesCacheOps;
-	attention?: "permission" | "working" | null;
+	attention?: TerminalAttention | null;
+	sessions: TerminalRowData[];
 }) {
 	const router = useRouter();
+	const theme = useTheme();
 	const prIcon = pullRequest ? PR_ICON_CONFIG[prStateFor(pullRequest)] : null;
 	const setTarget = useChatTargetStore((state) => state.setTarget);
 	const targeted = useChatTargetStore(
@@ -57,7 +70,9 @@ export function WorkspaceRow({
 
 	return (
 		<WorkspaceRowMenu workspace={workspace} cache={cache}>
-			<PressableScale
+			{/* Default press behavior on purpose: the system context-menu lift
+			    owns the hold animation, and custom press feedback fights it. */}
+			<Pressable
 				className={cn(
 					"flex-row items-center gap-3 rounded-xl px-4 py-2.5",
 					targeted ? "bg-foreground/5" : "bg-background",
@@ -66,33 +81,50 @@ export function WorkspaceRow({
 					router.push(`/(authenticated)/workspace/${workspace.id}`)
 				}
 			>
-				{prIcon && pullRequest ? (
-					<Button
-						accessibilityLabel={`Open pull request #${pullRequest.prNumber}`}
-						variant="ghost"
-						size="icon"
-						className="size-6"
-						hitSlop={8}
-						onPress={() => void Linking.openURL(pullRequest.url)}
-					>
-						<Icon
-							as={prIcon.icon}
-							className={`size-5 ${prIcon.iconClassName}`}
-							strokeWidth={1.75}
-						/>
-					</Button>
+				{/* Desktop WorkspaceIcon semantics: working replaces the icon with
+				    the braille spinner; other statuses overlay a corner ping on the
+				    base icon (PR state when one exists, else the workspace mark). */}
+				{attention === "working" ? (
+					<View className="size-6 items-center justify-center">
+						<AsciiSpinner />
+					</View>
 				) : (
 					<View className="size-6 items-center justify-center">
-						<View
-							className={cn(
-								"size-2.5 rounded-full",
-								attention === "permission"
-									? "bg-red-500"
-									: attention === "working"
-										? "bg-amber-500"
-										: "bg-muted-foreground/40",
-							)}
-						/>
+						{prIcon && pullRequest ? (
+							<Button
+								accessibilityLabel={`Pull request #${pullRequest.prNumber}`}
+								variant="ghost"
+								size="icon"
+								className="size-6"
+								hitSlop={8}
+								onPress={() =>
+									router.push(`/(authenticated)/workspace/${workspace.id}/diff`)
+								}
+							>
+								<Icon
+									as={prIcon.icon}
+									className={`size-5 ${prIcon.iconClassName}`}
+									strokeWidth={1.75}
+								/>
+							</Button>
+						) : (
+							<Icon
+								as={FolderGit2}
+								className="text-muted-foreground/80 size-4.5"
+								strokeWidth={1.75}
+							/>
+						)}
+						{attention === "permission" ? (
+							<View className="absolute -right-0.5 -top-0.5">
+								<PingDot color="#eab308" size={7} />
+							</View>
+						) : attention === "failed" ? (
+							<View className="absolute -right-0.5 -top-0.5">
+								<PingDot color="#ef4444" size={7} />
+							</View>
+						) : attention === "review" ? (
+							<View className="bg-green-500 absolute -right-0.5 -top-0.5 size-2 rounded-full" />
+						) : null}
 					</View>
 				)}
 				<View className="flex-1">
@@ -117,8 +149,34 @@ export function WorkspaceRow({
 						) : null}
 					</View>
 				</View>
+				{sessions.length > 0 ? (
+					// Overlapping avatar-style stack — stays ~fixed-width as sessions
+					// grow instead of eating the row.
+					<View className="flex-row items-center">
+						{sessions.slice(0, MAX_SESSION_MARKS).map((session, index) => (
+							<View
+								key={session.terminalId}
+								className={cn(
+									"bg-secondary size-6 items-center justify-center rounded-full",
+									index > 0 && "-ml-2",
+								)}
+							>
+								<AgentMark
+									agentId={session.agentId ?? ""}
+									size={12}
+									color={theme.mutedForeground}
+								/>
+							</View>
+						))}
+						{sessions.length > MAX_SESSION_MARKS ? (
+							<Text className="text-muted-foreground pl-1 text-[11px]">
+								+{sessions.length - MAX_SESSION_MARKS}
+							</Text>
+						) : null}
+					</View>
+				) : null}
 				<Button
-					accessibilityLabel={`New chat in ${workspace.name}`}
+					accessibilityLabel={`New agent in ${workspace.name}`}
 					variant="ghost"
 					size="icon"
 					disabled={!canChat}
@@ -133,7 +191,7 @@ export function WorkspaceRow({
 				>
 					<Icon as={Plus} className="text-muted-foreground size-5" />
 				</Button>
-			</PressableScale>
+			</Pressable>
 		</WorkspaceRowMenu>
 	);
 }

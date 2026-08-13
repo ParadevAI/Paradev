@@ -13,6 +13,7 @@
 			"!**/*.template.sh",
 			"!**/*.template.ts",
 			"!**/plans",
+			"!**/*.generated.ts",
 			"!apps/mobile/uniwind-types.d.ts",
 			"!packages/sdk/src"
 		]

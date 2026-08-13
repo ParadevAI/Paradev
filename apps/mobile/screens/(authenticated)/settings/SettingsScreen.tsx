@@ -96,6 +96,24 @@ export function SettingsScreen() {
 			<ListRow
 				icon={
 					<Ionicons
+						name="sparkles-outline"
+						size={20}
+						color={theme.mutedForeground}
+					/>
+				}
+				label="Agent presets"
+				trailing={
+					<Ionicons
+						name="chevron-forward"
+						size={18}
+						color={theme.mutedForeground}
+					/>
+				}
+				onPress={() => router.push("/(authenticated)/settings/presets")}
+			/>
+			<ListRow
+				icon={
+					<Ionicons
 						name="card-outline"
 						size={20}
 						color={theme.mutedForeground}

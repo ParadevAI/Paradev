@@ -10,11 +10,10 @@ import {
 	XCircle,
 } from "lucide-react-native";
 import { useCallback, useState } from "react";
-import { RefreshControl, ScrollView, View } from "react-native";
+import { Pressable, RefreshControl, ScrollView, View } from "react-native";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { cn } from "@/lib/utils";
-import { PressableScale } from "@/screens/(authenticated)/components/PressableScale";
 import { useWorkspaceChangeset } from "../hooks/useWorkspaceChangeset";
 import { useWorkspaceCommits } from "../hooks/useWorkspaceCommits";
 import { useWorkspacePullRequest } from "../hooks/useWorkspacePullRequest";
@@ -43,9 +42,12 @@ function CardRow({
 	onPress?: () => void;
 }) {
 	return (
-		<PressableScale
+		// Plain Pressable: a press-scale row fires its shrink animation the
+		// moment a scroll drag starts on it, which reads as the page refusing
+		// to scroll.
+		<Pressable
 			className={cn(
-				"flex-row items-center gap-3 px-4 py-3.5",
+				"flex-row items-center gap-3 px-4 py-3.5 active:opacity-70",
 				!first && "border-border/60 border-t",
 			)}
 			disabled={!onPress}
@@ -61,7 +63,7 @@ function CardRow({
 			{onPress ? (
 				<Icon as={ChevronRight} className="text-muted-foreground/60 size-4" />
 			) : null}
-		</PressableScale>
+		</Pressable>
 	);
 }
 

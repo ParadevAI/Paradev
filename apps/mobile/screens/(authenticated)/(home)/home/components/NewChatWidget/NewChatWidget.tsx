@@ -35,7 +35,6 @@ import {
 	tint,
 	truncationMode,
 } from "@expo/ui/swift-ui/modifiers";
-import { SUPERSET_CHAT_MODELS } from "@superset/shared/agent-models";
 import { useQuery } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
@@ -65,11 +64,12 @@ import {
 } from "../../stores/chatTargetStore";
 import { VoiceControl } from "./components/VoiceControl";
 import { FOREGROUND, MUTED } from "./constants";
-import { useCreateChatWorkspace } from "./hooks/useCreateChatWorkspace";
+import { useAgentIconUri } from "./hooks/useAgentIconUri";
+import { useCreateTerminalWorkspace } from "./hooks/useCreateTerminalWorkspace";
 import { useNewChatTargets } from "./hooks/useNewChatTargets";
-import { useStartWorkspaceChat } from "./hooks/useStartWorkspaceChat";
+import { useStartWorkspaceTerminal } from "./hooks/useStartWorkspaceTerminal";
 import { useVoiceDictation } from "./hooks/useVoiceDictation";
-import { useNewChatPreferencesStore } from "./stores/newChatPreferencesStore";
+import { useNewSessionPreferencesStore } from "./stores/newSessionPreferencesStore";
 
 const PILL_RADIUS = 26;
 
@@ -98,10 +98,10 @@ export function NewChatWidget({
 
 	const [focused, setFocused] = useState(false);
 
-	const modelId = useNewChatPreferencesStore((state) => state.modelId);
-	const targetKey = useNewChatPreferencesStore((state) => state.targetKey);
-	const baseBranch = useNewChatPreferencesStore((state) => state.baseBranch);
-	const setBaseBranch = useNewChatPreferencesStore(
+	const agentId = useNewSessionPreferencesStore((state) => state.agentId);
+	const targetKey = useNewSessionPreferencesStore((state) => state.targetKey);
+	const baseBranch = useNewSessionPreferencesStore((state) => state.baseBranch);
+	const setBaseBranch = useNewSessionPreferencesStore(
 		(state) => state.setBaseBranch,
 	);
 
@@ -131,10 +131,23 @@ export function NewChatWidget({
 		},
 	});
 
-	const createChatWorkspace = useCreateChatWorkspace();
-	const selectedModel = SUPERSET_CHAT_MODELS.find(
-		(model) => model.id === modelId,
+	const createTerminalWorkspace = useCreateTerminalWorkspace();
+	const { data: agentConfigs } = useQuery({
+		queryKey: ["host-agent-configs", selectedTarget?.machineId ?? null],
+		enabled: selectedTarget !== null,
+		staleTime: 60_000,
+		networkMode: "always" as const,
+		queryFn: async () => {
+			if (!selectedTarget) return [];
+			return getHostServiceClientByUrl(
+				selectedTarget.hostUrl,
+			).settings.agentConfigs.list.query();
+		},
+	});
+	const selectedAgent = agentConfigs?.find(
+		(config) => config.presetId === agentId,
 	);
+	const agentIconUri = useAgentIconUri(selectedAgent?.iconId ?? agentId);
 	const branchLabel = baseBranch ?? branchData?.defaultBranch ?? "default";
 	const draftRef = useRef("");
 	const [hasText, setHasText] = useState(false);
@@ -148,7 +161,7 @@ export function NewChatWidget({
 	const storeTarget = useChatTargetStore((state) => state.target);
 	const clearChatTarget = useChatTargetStore((state) => state.clearTarget);
 	const chatTarget = fixedTarget ?? storeTarget;
-	const startWorkspaceChat = useStartWorkspaceChat(workspaces);
+	const startWorkspaceTerminal = useStartWorkspaceTerminal(workspaces);
 
 	// Collapse whenever the keyboard is away — a draft just clamps to one line.
 	// A picked workspace target keeps the composer open so its chip stays
@@ -184,7 +197,7 @@ export function NewChatWidget({
 	});
 	const voiceActive = dictation.status !== "idle";
 	const isSending =
-		createChatWorkspace.isPending || startWorkspaceChat.isPending;
+		createTerminalWorkspace.isPending || startWorkspaceTerminal.isPending;
 	const showSend = (hasDraft || isSending) && !voiceActive;
 
 	const dismiss = () => {
@@ -226,8 +239,12 @@ export function NewChatWidget({
 		const attachments = controller.attachments.attachments;
 		if (text.trim().length === 0 && attachments.length === 0) return;
 		if (chatTarget) {
-			startWorkspaceChat
-				.mutateAsync({ target: chatTarget, message: { text, attachments } })
+			startWorkspaceTerminal
+				.mutateAsync({
+					target: chatTarget,
+					message: { text, attachments },
+					agentId,
+				})
 				.then(() => {
 					clearChatTarget();
 					clearComposer();
@@ -239,11 +256,11 @@ export function NewChatWidget({
 			Alert.alert("No project on an online host");
 			return;
 		}
-		createChatWorkspace
+		createTerminalWorkspace
 			.mutateAsync({
 				target: selectedTarget,
 				baseBranch,
-				modelId,
+				agentId,
 				message: { text, attachments },
 			})
 			.then((result) => {
@@ -280,7 +297,7 @@ export function NewChatWidget({
 			<Image
 				systemName="plus"
 				size={16}
-				modifiers={[frame({ width: 26, height: 26 })]}
+				modifiers={[frame({ width: 16, height: 16 })]}
 			/>
 		</Button>
 	);
@@ -303,7 +320,7 @@ export function NewChatWidget({
 				systemName="arrow.up"
 				size={16}
 				color="#1c1c1e"
-				modifiers={[frame({ width: 26, height: 26 })]}
+				modifiers={[frame({ width: 16, height: 16 })]}
 			/>
 		</Button>
 	);
@@ -405,7 +422,7 @@ export function NewChatWidget({
 										clipped(),
 									]}
 								>
-									<Text modifiers={[foregroundStyle(MUTED)]}>New chat in</Text>
+									<Text modifiers={[foregroundStyle(MUTED)]}>New agent in</Text>
 									<Text
 										modifiers={[
 											bold(),
@@ -440,7 +457,9 @@ export function NewChatWidget({
 											void Haptics.impactAsync(
 												Haptics.ImpactFeedbackStyle.Light,
 											);
-											router.push("/(authenticated)/(home)/new-chat/project");
+											router.push(
+												"/(authenticated)/(home)/new-session/project",
+											);
 										}}
 										modifiers={[
 											buttonStyle("borderless"),
@@ -453,7 +472,7 @@ export function NewChatWidget({
 											void Haptics.impactAsync(
 												Haptics.ImpactFeedbackStyle.Light,
 											);
-											router.push("/(authenticated)/(home)/new-chat/branch");
+											router.push("/(authenticated)/(home)/new-session/branch");
 										}}
 										modifiers={[
 											buttonStyle("borderless"),
@@ -510,7 +529,10 @@ export function NewChatWidget({
 							</HStack>
 							<HStack
 								spacing={6}
-								modifiers={[padding({ horizontal: 2, vertical: 6 })]}
+								// Tuned on-device: the bordered button style carries intrinsic
+								// inset around its visible circle; these values land the
+								// circle ~8pt off every pill edge.
+								modifiers={[padding({ horizontal: 1, vertical: 4 })]}
 							>
 								<HStack
 									modifiers={[
@@ -599,12 +621,22 @@ export function NewChatWidget({
 											void Haptics.impactAsync(
 												Haptics.ImpactFeedbackStyle.Light,
 											);
-											router.push("/(authenticated)/(home)/new-chat/model");
+											router.push("/(authenticated)/(home)/new-session/agent");
 										}}
 										modifiers={[buttonStyle("borderless"), tint(FOREGROUND)]}
 									>
-										<HStack spacing={4}>
-											<Text>{selectedModel?.label ?? "Model"}</Text>
+										<HStack spacing={5}>
+											{agentIconUri ? (
+												<Image
+													uiImage={agentIconUri}
+													modifiers={[
+														resizable(),
+														aspectRatio({ contentMode: "fit" }),
+														frame({ width: 15, height: 15 }),
+													]}
+												/>
+											) : null}
+											<Text>{selectedAgent?.label ?? "Claude"}</Text>
 											<Image systemName="chevron.down" size={11} />
 										</HStack>
 									</Button>

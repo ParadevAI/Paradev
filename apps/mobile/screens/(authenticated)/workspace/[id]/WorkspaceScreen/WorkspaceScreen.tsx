@@ -1,191 +1,310 @@
-import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect";
+import { buildHostRoutingKey } from "@superset/shared/host-routing";
+import { useQueryClient } from "@tanstack/react-query";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { GitPullRequestArrow } from "lucide-react-native";
-import { useMemo } from "react";
-import { ScrollView, useWindowDimensions, View } from "react-native";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+	ActivityIndicator,
+	Keyboard,
+	LayoutAnimation,
+	Pressable,
+	View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
-import type { HostWorkspaceItem } from "@/hooks/useHostWorkspaces";
 import { useWorkspaceHost } from "@/hooks/useWorkspaceHost";
-import { cn } from "@/lib/utils";
-import { NewChatWidget } from "@/screens/(authenticated)/(home)/home/components/NewChatWidget";
-import { SessionRow } from "@/screens/(authenticated)/(home)/home/components/SessionRow";
-import { useHostAcpSessions } from "@/screens/(authenticated)/(home)/home/hooks/useHostAcpSessions";
-import { buildSessionRows } from "@/screens/(authenticated)/(home)/home/utils/sessionRows";
+import {
+	buildRelayHostUrl,
+	getHostServiceClientByUrl,
+} from "@/lib/host-service/client";
+import {
+	getHostTerminalsQueryKey,
+	useHostTerminals,
+} from "@/screens/(authenticated)/(home)/home/hooks/useHostTerminals";
 import { PressableScale } from "@/screens/(authenticated)/components/PressableScale";
+import { useTerminalSeenStore } from "@/screens/(authenticated)/stores/terminalSeenStore";
+import {
+	TerminalComposer,
+	type TerminalQuickKey,
+} from "../components/TerminalComposer";
+import { TerminalTabs } from "../components/TerminalTabs";
+import {
+	type TerminalConnectionState,
+	type TerminalControlMessage,
+	TerminalWebView,
+	type TerminalWebViewHandle,
+} from "../components/TerminalWebView";
 import { useWorkspaceChangeset } from "../hooks/useWorkspaceChangeset";
-import { useWorkspaceHeaderActions } from "../hooks/useWorkspaceHeaderActions";
-import { useWorkspacePullRequest } from "../hooks/useWorkspacePullRequest";
 
-const GLASS = isLiquidGlassAvailable();
-
-const NAVIGATION_BAR_HEIGHT = 44;
-
-const glassHeaderOptions = {
+const headerOptions = {
 	headerShown: true,
-	headerTransparent: true,
-	headerLargeTitle: false,
 	headerBackButtonDisplayMode: "minimal",
 	headerShadowVisible: false,
-	...(GLASS ? {} : { headerBlurEffect: "systemUltraThinMaterial" as const }),
-	headerStyle: { backgroundColor: "transparent" },
+	fullScreenGestureEnabled: false,
 } as const;
 
+const STATE_BANNERS: Partial<Record<TerminalConnectionState, string>> = {
+	connecting: "Connecting…",
+	reconnecting: "Reconnecting…",
+	denied: "You don't have access to this terminal.",
+};
+
+/**
+ * The workspace IS the terminal: sessions render as tabs (agent mark + name),
+ * the active tab is the one live attached stream, and the + menu launches a
+ * new session from the host's agent presets (or a plain shell). Chrome: the
+ * compact header (name → action sheet, Review pill) and the terminal composer.
+ */
 export function WorkspaceScreen() {
-	const { id } = useLocalSearchParams<{ id: string }>();
+	const params = useLocalSearchParams<{ id: string; tab?: string }>();
+	const id = params.id;
 	const router = useRouter();
-	const { height: windowHeight } = useWindowDimensions();
 	const insets = useSafeAreaInsets();
+	const queryClient = useQueryClient();
 
-	const { workspace, host } = useWorkspaceHost(id ?? null);
-	const { sessionsByWorkspace, isReady } = useHostAcpSessions(host);
-	const { renameWorkspace, deleteWorkspace, copyId, shareWorkspace } =
-		useWorkspaceHeaderActions(workspace, host);
+	const { workspace, host, isResolving } = useWorkspaceHost(id ?? null);
+	const { terminalsByWorkspace, isReady } = useHostTerminals(host);
 	const changeset = useWorkspaceChangeset(id ?? null);
-	const pullRequest = useWorkspacePullRequest(id ?? null);
 
-	const sessionRows = useMemo(
-		() => buildSessionRows(id ? (sessionsByWorkspace.get(id) ?? []) : []),
-		[sessionsByWorkspace, id],
+	// Tabs hold creation order — the hook's activity sort is right for home
+	// rows but makes tabs swap places under the user whenever relative
+	// activity changes.
+	const rows = useMemo(
+		() =>
+			(id ? (terminalsByWorkspace.get(id) ?? []) : [])
+				.slice()
+				.sort((a, b) => a.createdAt - b.createdAt),
+		[terminalsByWorkspace, id],
 	);
 
-	const widgetWorkspaces = useMemo<HostWorkspaceItem[]>(
-		() => (workspace ? [{ ...workspace, hostReachable: true }] : []),
-		[workspace],
+	// Active tab: the deep-linked ?tab= until the user switches, else the
+	// first session. Falls back gracefully when the active terminal dies.
+	const [pickedTerminalId, setPickedTerminalId] = useState<string | null>(null);
+	const activeTerminalId = useMemo(() => {
+		for (const candidate of [pickedTerminalId, params.tab]) {
+			if (candidate && rows.some((row) => row.terminalId === candidate)) {
+				return candidate;
+			}
+		}
+		return rows[0]?.terminalId ?? null;
+	}, [pickedTerminalId, params.tab, rows]);
+
+	const hostUrl = host
+		? buildRelayHostUrl(host.organizationId, host.machineId)
+		: null;
+	const routingKey = host
+		? buildHostRoutingKey(host.organizationId, host.machineId)
+		: null;
+
+	// The + sheet lands back here via dismissTo with the new session in
+	// ?tab= — adopt it over any manual pick so the fresh tab activates.
+	useEffect(() => {
+		if (params.tab) setPickedTerminalId(params.tab);
+	}, [params.tab]);
+
+	// Port of desktop's useClearActivePaneAttention: viewing the tab clears
+	// its `review` state by advancing the seen mark to the binding's last
+	// event (host clock — never the device clock).
+	const markTerminalSeen = useTerminalSeenStore(
+		(state) => state.markTerminalSeen,
+	);
+	const activeRow = rows.find((row) => row.terminalId === activeTerminalId);
+	useEffect(() => {
+		if (activeRow?.attention !== "review") return;
+		if (activeRow.lastEventAt === null) return;
+		markTerminalSeen(activeRow.terminalId, activeRow.lastEventAt);
+	}, [activeRow, markTerminalSeen]);
+
+	const invalidateTerminals = useCallback(() => {
+		if (!host) return;
+		void queryClient.invalidateQueries({
+			queryKey: getHostTerminalsQueryKey(host.machineId),
+		});
+	}, [host, queryClient]);
+
+	const openAddMenu = useCallback(() => {
+		router.push(`/(authenticated)/workspace/${id}/new-session`);
+	}, [router, id]);
+
+	const killTerminal = useCallback(
+		(terminalId: string) => {
+			if (!workspace || !hostUrl) return;
+			void getHostServiceClientByUrl(hostUrl)
+				.terminal.killSession.mutate({ terminalId, workspaceId: workspace.id })
+				.finally(invalidateTerminals);
+		},
+		[workspace, hostUrl, invalidateTerminals],
 	);
 
+	// --- active terminal connection (one live stream; tabs switch it) ---
+	const terminalRef = useRef<TerminalWebViewHandle>(null);
+	const [connectionState, setConnectionState] =
+		useState<TerminalConnectionState>("connecting");
+	const [composerHeight, setComposerHeight] = useState(0);
+	const [keyboardHeight, setKeyboardHeight] = useState(0);
+
+	useEffect(() => {
+		const show = Keyboard.addListener("keyboardWillShow", (event) => {
+			LayoutAnimation.configureNext({
+				duration: event.duration || 250,
+				update: { type: LayoutAnimation.Types.keyboard },
+			});
+			setKeyboardHeight(event.endCoordinates.height);
+		});
+		const hide = Keyboard.addListener("keyboardWillHide", (event) => {
+			LayoutAnimation.configureNext({
+				duration: event.duration || 250,
+				update: { type: LayoutAnimation.Types.keyboard },
+			});
+			setKeyboardHeight(0);
+		});
+		return () => {
+			show.remove();
+			hide.remove();
+		};
+	}, []);
+
+	const composerBottom = keyboardHeight > 0 ? keyboardHeight : insets.bottom;
+
+	const handleControl = useCallback(
+		(message: TerminalControlMessage) => {
+			// Session ended under us — refresh the tab row; the active tab falls
+			// back to the next session automatically.
+			if (message.type === "exit") invalidateTerminals();
+		},
+		[invalidateTerminals],
+	);
+
+	const handleSubmit = useCallback((text: string) => {
+		const framed = text.includes("\n")
+			? `\u001b[200~${text}\u001b[201~\r`
+			: `${text}\r`;
+		terminalRef.current?.sendInput(framed);
+	}, []);
+
+	const handleQuickKey = useCallback((key: TerminalQuickKey) => {
+		if (key.data) terminalRef.current?.sendInput(key.data);
+	}, []);
+
+	const banner = STATE_BANNERS[connectionState];
 	const hasChanges = changeset.files.length > 0;
+	const showComposer = activeTerminalId !== null && routingKey !== null;
 
 	return (
 		<View className="bg-background flex-1">
-			<Stack.Screen options={{ ...glassHeaderOptions, title: "Workspace" }}>
+			<Stack.Screen options={{ ...headerOptions, title: "Workspace" }}>
 				<Stack.Title asChild>
-					<View className="max-w-64 items-center">
-						<Text className="font-semibold text-[17px]" numberOfLines={1}>
-							{workspace?.name ?? ""}
-						</Text>
-						{workspace?.branch ? (
-							<Text className="text-muted-foreground text-xs" numberOfLines={1}>
-								{workspace.branch}
-							</Text>
-						) : null}
-					</View>
-				</Stack.Title>
-				<Stack.Toolbar placement="right">
-					<Stack.Toolbar.Menu
-						icon="ellipsis"
-						accessibilityLabel="Workspace options"
-						hidden={!workspace}
+					<PressableScale
+						onPress={() =>
+							router.push(`/(authenticated)/workspace/${id}/actions`)
+						}
+						disabled={!workspace}
 					>
-						<Stack.Toolbar.MenuAction
-							icon="pencil"
-							onPress={() => void renameWorkspace()}
-						>
-							Rename
-						</Stack.Toolbar.MenuAction>
-						{workspace?.type !== "main" ? (
-							<Stack.Toolbar.MenuAction icon="trash" onPress={deleteWorkspace}>
-								Delete
-							</Stack.Toolbar.MenuAction>
-						) : null}
-						<Stack.Toolbar.Menu inline>
-							<Stack.Toolbar.MenuAction icon="doc.on.doc" onPress={copyId}>
-								Copy ID
-							</Stack.Toolbar.MenuAction>
-							<Stack.Toolbar.MenuAction
-								icon="square.and.arrow.up"
-								onPress={shareWorkspace}
-							>
-								Share
-							</Stack.Toolbar.MenuAction>
-						</Stack.Toolbar.Menu>
-					</Stack.Toolbar.Menu>
-				</Stack.Toolbar>
-			</Stack.Screen>
-			<ScrollView
-				className="flex-1"
-				contentInsetAdjustmentBehavior="automatic"
-				contentContainerStyle={{
-					paddingTop: 4,
-					paddingBottom: 132,
-					// Short content doesn't engage the scroll pan below the last row —
-					// stretch the container to the viewport (same fix as HomeScreen).
-					minHeight:
-						windowHeight - insets.top - NAVIGATION_BAR_HEIGHT - insets.bottom,
-				}}
-				keyboardDismissMode="interactive"
-			>
-				{sessionRows.map((row, index) => (
-					<View key={row.id}>
-						{index > 0 && <View className="border-border/40 ml-12 border-t" />}
-						<SessionRow
-							row={row}
-							className="px-4 py-3"
+						{/* Width budget: the back capsule and Review button leave ~210pt
+						    of bar on a 390pt screen — wider and the title collides with
+						    the back button under iOS 26's floating bar items. */}
+						<View className="max-w-52">
+							<Text className="font-semibold text-[17px]" numberOfLines={1}>
+								{workspace?.name ?? ""}
+							</Text>
+						</View>
+					</PressableScale>
+				</Stack.Title>
+				{hasChanges ? (
+					<Stack.Toolbar placement="right">
+						<Stack.Toolbar.Button
+							icon="plus.forwardslash.minus"
+							accessibilityLabel="Review changes"
 							onPress={() =>
-								router.push(
-									`/(authenticated)/workspace/${id}/chat/acp/${row.id}`,
-								)
+								router.push(`/(authenticated)/workspace/${id}/diff`)
 							}
 						/>
-					</View>
-				))}
-				{sessionRows.length === 0 && isReady && (
-					<View className="items-center py-20">
-						<Text className="text-muted-foreground text-sm">
-							No chats in this workspace yet.
+					</Stack.Toolbar>
+				) : null}
+			</Stack.Screen>
+
+			<TerminalTabs
+				rows={rows}
+				activeTerminalId={activeTerminalId}
+				onSelect={setPickedTerminalId}
+				onAdd={openAddMenu}
+				onClose={killTerminal}
+			/>
+
+			{banner && activeTerminalId ? (
+				<View className="bg-muted px-3 py-1.5">
+					<Text className="text-muted-foreground text-center text-xs">
+						{banner}
+					</Text>
+				</View>
+			) : null}
+			{connectionState === "error" && activeTerminalId ? (
+				<View className="bg-muted flex-row items-center justify-center gap-3 px-3 py-1.5">
+					<Text className="text-muted-foreground text-xs">
+						Connection failed.
+					</Text>
+					<Pressable onPress={() => terminalRef.current?.retry()}>
+						<Text className="text-foreground text-xs font-medium">Retry</Text>
+					</Pressable>
+				</View>
+			) : null}
+
+			<View
+				className="flex-1"
+				style={{
+					marginBottom: showComposer ? composerHeight + composerBottom : 0,
+				}}
+			>
+				{activeTerminalId && routingKey && id ? (
+					<TerminalWebView
+						ref={terminalRef}
+						workspaceId={id}
+						terminalId={activeTerminalId}
+						routingKey={routingKey}
+						onStateChange={setConnectionState}
+						onControl={handleControl}
+					/>
+				) : isResolving || (!isReady && host) ? (
+					<Centered>
+						<ActivityIndicator />
+					</Centered>
+				) : !host ? (
+					<Centered>
+						<Text className="text-muted-foreground px-8 text-center text-sm">
+							The host that owns this workspace is offline.
 						</Text>
-					</View>
+					</Centered>
+				) : (
+					<Centered>
+						<Text className="text-muted-foreground text-sm">
+							No sessions yet.
+						</Text>
+						<Pressable onPress={openAddMenu} className="mt-3 active:opacity-60">
+							<Text className="text-foreground text-sm font-medium">
+								Start one +
+							</Text>
+						</Pressable>
+					</Centered>
 				)}
-			</ScrollView>
-			{workspace ? (
-				<NewChatWidget
-					workspaces={widgetWorkspaces}
-					fixedTarget={{
-						workspaceId: workspace.id,
-						workspaceName: workspace.name,
-						branch: workspace.branch,
-						hostId: workspace.hostId,
-					}}
-					above={
-						hasChanges ? (
-							<PressableScale
-								onPress={() =>
-									router.push(`/(authenticated)/workspace/${id}/diff`)
-								}
-							>
-								<GlassView
-									colorScheme="dark"
-									glassEffectStyle="regular"
-									style={{ borderRadius: 999, overflow: "hidden" }}
-								>
-									<View
-										className={cn(
-											"flex-row items-center gap-2 px-4 py-3",
-											!GLASS && "bg-card border-border rounded-full border",
-										)}
-									>
-										<Icon
-											as={GitPullRequestArrow}
-											className="text-foreground size-5"
-											strokeWidth={1.75}
-										/>
-										<Text className="font-medium text-[15px]">
-											{pullRequest ? "View PR" : "View changes"}
-										</Text>
-										<Text className="text-green-500 font-semibold text-[15px]">
-											+{changeset.additions.toLocaleString()}
-										</Text>
-										<Text className="text-red-500 font-semibold text-[15px]">
-											−{changeset.deletions.toLocaleString()}
-										</Text>
-									</View>
-								</GlassView>
-							</PressableScale>
-						) : undefined
+			</View>
+
+			{showComposer ? (
+				<View
+					className="absolute inset-x-0"
+					style={{ bottom: composerBottom }}
+					onLayout={(event) =>
+						setComposerHeight(event.nativeEvent.layout.height)
 					}
-				/>
+				>
+					<TerminalComposer
+						onSubmit={handleSubmit}
+						onQuickKey={handleQuickKey}
+					/>
+				</View>
 			) : null}
 		</View>
 	);
+}
+
+function Centered({ children }: { children: React.ReactNode }) {
+	return <View className="flex-1 items-center justify-center">{children}</View>;
 }

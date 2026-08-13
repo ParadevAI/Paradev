@@ -10,7 +10,7 @@ import {
 	getHostServiceClientByUrl,
 } from "@/lib/host-service/client";
 import { useWorkspacesFilterStore } from "../../../../stores/workspacesFilterStore";
-import { useNewChatPreferencesStore } from "../../stores/newChatPreferencesStore";
+import { useNewSessionPreferencesStore } from "../../stores/newSessionPreferencesStore";
 
 export interface NewChatTarget {
 	key: string;
@@ -37,7 +37,7 @@ export function useNewChatTargets(workspaces: HostWorkspaceItem[] = []): {
 	defaultTarget: NewChatTarget | null;
 } {
 	const hosts = useOrgHosts();
-	const persistedTargetKey = useNewChatPreferencesStore(
+	const persistedTargetKey = useNewSessionPreferencesStore(
 		(state) => state.targetKey,
 	);
 	const projectFilter = useWorkspacesFilterStore(

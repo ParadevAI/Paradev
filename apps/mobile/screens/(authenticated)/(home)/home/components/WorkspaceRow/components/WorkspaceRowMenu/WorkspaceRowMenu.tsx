@@ -9,6 +9,7 @@ import type {
 } from "@/hooks/useHostWorkspaces";
 import { getHostServiceClientByUrl } from "@/lib/host-service/client";
 import { isTrpcErrorWithData } from "@/lib/host-service/errors";
+import { workspaceShareUrl } from "@/lib/web-links";
 
 export function WorkspaceRowMenu({
 	workspace,
@@ -133,7 +134,7 @@ export function WorkspaceRowMenu({
 						icon="square.and.arrow.up"
 						onPress={() =>
 							void Share.share({
-								url: `https://app.superset.sh/workspaces/${workspace.id}`,
+								url: workspaceShareUrl(workspace.id),
 							})
 						}
 					>

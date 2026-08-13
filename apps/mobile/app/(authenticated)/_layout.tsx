@@ -55,12 +55,18 @@ export default function AuthenticatedLayout() {
 					options={settingsScreenOptions("Billing")}
 				/>
 				<Stack.Screen
-					name="workspace/[id]/chat/[sessionId]"
-					options={{ ...glassHeaderOptions, title: "Chat" }}
+					name="settings/presets"
+					options={settingsScreenOptions("Agent presets")}
 				/>
 				<Stack.Screen
-					name="workspace/[id]/chat/acp/[sessionId]"
-					options={{ ...glassHeaderOptions, title: "Chat" }}
+					name="workspace/[id]/index"
+					options={{
+						headerShown: true,
+						headerBackButtonDisplayMode: "minimal",
+						headerShadowVisible: false,
+						title: "Workspace",
+						fullScreenGestureEnabled: false,
+					}}
 				/>
 				<Stack.Screen
 					name="workspace/[id]/diff"
@@ -69,12 +75,10 @@ export default function AuthenticatedLayout() {
 				<Stack.Screen
 					name="workspace/[id]/files-changed"
 					options={{
-						// Solid themed header (matches the sticky file bars), not glass.
 						headerShown: true,
 						headerBackButtonDisplayMode: "minimal",
 						headerShadowVisible: false,
 						title: "Files changed",
-						// Right-swipes are horizontal diff scrolling — back stays edge-only.
 						fullScreenGestureEnabled: false,
 					}}
 				/>
@@ -114,6 +118,25 @@ export default function AuthenticatedLayout() {
 						sheetGrabberVisible: true,
 						...glassHeaderOptions,
 						title: "Finish review",
+					}}
+				/>
+				<Stack.Screen
+					name="workspace/[id]/actions"
+					options={{
+						presentation: "formSheet",
+						sheetAllowedDetents: [0.65],
+						sheetGrabberVisible: true,
+						headerShown: false,
+					}}
+				/>
+				<Stack.Screen
+					name="workspace/[id]/new-session"
+					options={{
+						presentation: "formSheet",
+						sheetAllowedDetents: [0.5],
+						sheetGrabberVisible: true,
+						...glassHeaderOptions,
+						title: "New session",
 					}}
 				/>
 				<Stack.Screen

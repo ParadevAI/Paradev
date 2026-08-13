@@ -19,7 +19,7 @@ export default function HomeLayout() {
 				}}
 			/>
 			<Stack.Screen
-				name="new-chat"
+				name="new-session"
 				options={{
 					presentation: "formSheet",
 					headerShown: false,
