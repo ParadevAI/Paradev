@@ -330,6 +330,13 @@
       "when": 1786597239253,
       "tag": "0046_drop_dead_persist_terminal_column",
       "breakpoints": true
+    },
+    {
+      "idx": 47,
+      "version": "6",
+      "when": 1786655483726,
+      "tag": "0047_restore_persist_terminal_column",
+      "breakpoints": true
     }
   ]
 }

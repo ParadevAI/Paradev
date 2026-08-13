@@ -333,6 +333,7 @@ export const EXCLUDED_SETTINGS_COLUMNS: Record<string, string> = {
 	agentCustomDefinitions: "structured JSON; use superset agents",
 	agentPresetPermissionsMigratedAt: "internal migration marker",
 	disabledAgentHooks: "agent-id list; use the app UI",
+	terminalPersistence: "dead column; nothing reads it, retained for rollback",
 	deleteLocalBranch: "v2 reads renderer localStorage, unreachable externally",
 	exposeHostServiceViaRelay:
 		"security-sensitive; app gates it behind plan check + confirm dialog",
