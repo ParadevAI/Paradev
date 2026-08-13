@@ -152,6 +152,10 @@
 			"types": "./src/host-info.ts",
 			"default": "./src/host-info.ts"
 		},
+		"./rotating-log": {
+			"types": "./src/rotating-log.ts",
+			"default": "./src/rotating-log.ts"
+		},
 		"./host-routing": {
 			"types": "./src/host-routing.ts",
 			"default": "./src/host-routing.ts"

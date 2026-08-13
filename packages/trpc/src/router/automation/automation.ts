@@ -56,7 +56,7 @@ async function verifyHostAccess(
 	if (!host) {
 		throw new TRPCError({
 			code: "NOT_FOUND",
-			message: "Host not found",
+			message: `Host ${hostId} is not registered in this organization`,
 		});
 	}
 
