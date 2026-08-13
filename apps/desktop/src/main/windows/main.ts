@@ -8,6 +8,7 @@ import log from "electron-log/main";
 import { createWindow } from "lib/electron-app/factories/windows/create";
 import { createAppRouter } from "lib/trpc/routers";
 import { localDb } from "main/lib/local-db";
+import { isExpectedRendererExit } from "main/lib/renderer-exit";
 import { NOTIFICATION_EVENTS, PLATFORM } from "shared/constants";
 import {
 	env,
@@ -346,13 +347,19 @@ export async function MainWindow() {
 		// The Sentry SDK's own capture for this event runs off the app-level
 		// listener it registered at init, so it fires before this one and cannot
 		// be tagged retroactively — report the details separately.
-		Sentry.captureMessage(`renderer process gone (${details.reason})`, {
-			level: "error",
-			tags: {
-				renderer_gone_reason: details.reason,
-				renderer_gone_exit_code: String(details.exitCode),
-			},
-		});
+		//
+		// Deliberately an exclude-list, not an allow-list: a reason Electron adds
+		// in a future version reports by default. Silence has to be opted into
+		// one reason at a time, so a new crash mode is never lost to this filter.
+		if (!isExpectedRendererExit(details.reason)) {
+			Sentry.captureMessage(`renderer process gone (${details.reason})`, {
+				level: "error",
+				tags: {
+					renderer_gone_reason: details.reason,
+					renderer_gone_exit_code: String(details.exitCode),
+				},
+			});
+		}
 	});
 
 	window.webContents.on("preload-error", (_event, preloadPath, error) => {
