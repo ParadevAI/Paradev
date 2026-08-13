@@ -8,6 +8,7 @@ import { signIn } from "@/lib/auth/client";
 import { env } from "@/lib/env";
 
 import { DevSignInOptions } from "./components/DevSignInOptions";
+import { EmailSignInLink } from "./components/EmailSignInLink";
 import type { SocialProvider } from "./components/SocialButton";
 import { SocialButton } from "./components/SocialButton";
 
@@ -116,6 +117,7 @@ export function SignInScreen() {
 					className="w-4/5"
 				/>
 				{(__DEV__ || env.EXPO_PUBLIC_E2E === "1") && <DevSignInOptions />}
+				<EmailSignInLink onError={setError} />
 			</View>
 
 			{error && (

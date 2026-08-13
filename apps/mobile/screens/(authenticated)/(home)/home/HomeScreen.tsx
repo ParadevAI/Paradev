@@ -339,10 +339,14 @@ export function HomeScreen() {
 					setSheetOpen(true);
 				}}
 			/>
+			{/* placement="integratedButton" + allowToolbarIntegration={false}
+			    evicts the custom left toolbar view (org switcher) a few seconds
+			    after mount on iOS 26 — "stacked" is the only placement that
+			    coexists with it. */}
 			<Stack.SearchBar
-				placeholder="Search workspaces & sessions"
-				placement="integratedButton"
-				allowToolbarIntegration={false}
+				placeholder="Search workspaces"
+				placement="stacked"
+				hideWhenScrolling={false}
 				hideNavigationBar={false}
 				textColor={THEME.dark.foreground}
 				hintTextColor={THEME.dark.mutedForeground}

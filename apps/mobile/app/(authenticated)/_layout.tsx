@@ -1,7 +1,8 @@
 import { isLiquidGlassAvailable } from "expo-glass-effect";
-import { Stack } from "expo-router";
+import { Redirect, Stack, usePathname } from "expo-router";
 import { PromptInputProvider } from "@/components/ai-elements/prompt-input";
 import { usePrimeRelayUrl } from "@/hooks/usePrimeRelayUrl";
+import { useSession } from "@/lib/auth/client";
 
 const settingsScreenOptions = (title: string) => ({
 	headerShown: true,
@@ -25,6 +26,17 @@ const glassHeaderOptions = {
 export default function AuthenticatedLayout() {
 	usePrimeRelayUrl();
 
+	const { data: session } = useSession();
+	const pathname = usePathname();
+
+	// Unpaid sessions may only see home (which renders the paywall) and
+	// settings — App Review requires sign-out, org switching, and account
+	// deletion to stay reachable behind a gate.
+	const unpaid = !!session && !session.session.plan;
+	if (unpaid && pathname !== "/" && !pathname.startsWith("/settings")) {
+		return <Redirect href="/(authenticated)/(home)" />;
+	}
+
 	return (
 		<PromptInputProvider>
 			<Stack screenOptions={{ headerShown: false }}>
@@ -37,10 +49,6 @@ export default function AuthenticatedLayout() {
 					options={settingsScreenOptions("Settings")}
 				/>
 				<Stack.Screen
-					name="settings/account"
-					options={settingsScreenOptions("Account")}
-				/>
-				<Stack.Screen
 					name="settings/organization"
 					options={settingsScreenOptions("Organization")}
 				/>
@@ -49,12 +57,12 @@ export default function AuthenticatedLayout() {
 					options={settingsScreenOptions("Hosts")}
 				/>
 				<Stack.Screen
-					name="settings/billing"
-					options={settingsScreenOptions("Billing")}
-				/>
-				<Stack.Screen
 					name="settings/presets"
 					options={settingsScreenOptions("Agent presets")}
+				/>
+				<Stack.Screen
+					name="workspace/[id]/chat/[sessionId]"
+					options={{ ...glassHeaderOptions, title: "Chat" }}
 				/>
 				<Stack.Screen
 					name="workspace/[id]/index"

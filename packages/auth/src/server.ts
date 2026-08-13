@@ -165,10 +165,14 @@ export const auth = betterAuth({
 			generateId: false,
 		},
 	},
+	// Credential sign-IN stays available in production for the App Store
+	// review demo account (see seed-review-account.ts); sign-UP remains
+	// dev/preview-only.
 	emailAndPassword: {
-		enabled:
-			process.env.NODE_ENV === "development" ||
-			process.env.VERCEL_ENV === "preview",
+		enabled: true,
+		disableSignUp:
+			process.env.NODE_ENV !== "development" &&
+			process.env.VERCEL_ENV !== "preview",
 		autoSignIn: true,
 	},
 	socialProviders: {

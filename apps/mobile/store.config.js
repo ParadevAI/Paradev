@@ -1,3 +1,5 @@
+// Dynamic so the demo-account credentials never enter the repo:
+// set APP_REVIEW_EMAIL / APP_REVIEW_PASSWORD when running `eas metadata:push`.
 module.exports = {
 	configVersion: 0,
 	apple: {
@@ -34,9 +36,11 @@ module.exports = {
 			lastName: "Patel",
 			email: "support@superset.sh",
 			phone: "+1 510 519 1602",
-			demoRequired: false,
+			demoRequired: true,
+			demoUsername: process.env.APP_REVIEW_EMAIL ?? "",
+			demoPassword: process.env.APP_REVIEW_PASSWORD ?? "",
 			notes:
-				"Sign in with Apple, GitHub, or Google. Signing in with Apple creates a free account instantly, so no demo credentials are needed. Superset is a companion app for the Superset desktop product (https://superset.sh): it lets developers monitor and chat with AI coding agents running in their own workspaces. A fresh account with no connected desktop host will show an empty state after onboarding. Account deletion is available in Settings > Account.",
+				"Superset Mobile is a companion app for the Superset desktop product (https://superset.sh): developers monitor and chat with AI coding agents running in their own workspaces. Access requires a Superset Pro subscription purchased outside the app (multiplatform service; there are no in-app purchases). Please use the provided demo account (sign in via the 'Sign in with email' link) to access a Pro workspace with sample data. Sign in with Apple, GitHub, or Google also works and creates a free account instantly, which shows the subscription-required screen. Account deletion is available from Settings > Account and from the subscription screen.",
 		},
 	},
 };
