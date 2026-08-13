@@ -80,7 +80,12 @@ export function AttachmentsScreen() {
 			<Stack.Toolbar placement="left">
 				<Stack.Toolbar.Button icon="xmark" onPress={() => router.back()} />
 			</Stack.Toolbar>
-			<View className="pt-3">
+			{/* collapsable={false} keeps RN's view flattening from hoisting these
+			    wrappers' children into the sheet container. react-native-screens
+			    lays a formSheet out expecting at most 2 subviews next to a
+			    ScrollView; flattened to 6 it mis-sizes the carousel's native
+			    frames (SUPER-1199) while Yoga still reports correct boxes. */}
+			<View className="pt-3" collapsable={false}>
 				<PhotoCarousel selected={selected} onToggle={toggleAsset} />
 				<View className="px-5 pt-4">
 					{mainRows.map((row) => (
