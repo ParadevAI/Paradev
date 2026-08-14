@@ -18,9 +18,7 @@ import { and, eq } from "drizzle-orm";
 import { fetchRelayPresence } from "../../lib/relay-presence";
 import { RelayDispatchError, relayMutation } from "./relay-client";
 
-type AgentRunResult =
-	| { kind: "terminal"; sessionId: string; label: string }
-	| { kind: "chat"; sessionId: string; label: string };
+type AgentRunResult = { kind: "terminal"; sessionId: string; label: string };
 
 export type DispatchOutcome =
 	| { status: "dispatched"; runId: string }
@@ -165,8 +163,8 @@ export async function dispatchAutomation(
 			.set({
 				status: "dispatched",
 				sessionKind: result.kind,
-				chatSessionId: result.kind === "chat" ? result.sessionId : null,
-				terminalSessionId: result.kind === "terminal" ? result.sessionId : null,
+				chatSessionId: null,
+				terminalSessionId: result.sessionId,
 				v2WorkspaceId: workspaceId,
 				dispatchedAt: new Date(),
 			})

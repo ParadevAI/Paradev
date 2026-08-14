@@ -52,7 +52,6 @@ export function PreviousRunsList({ runs }: PreviousRunsListProps) {
 			params: { workspaceId: run.v2WorkspaceId },
 			search: {
 				terminalId: run.terminalSessionId ?? undefined,
-				chatSessionId: run.chatSessionId ?? undefined,
 			},
 		});
 	};

@@ -181,7 +181,7 @@ export interface AutomationSummary {
 	organizationId: string;
 	ownerUserId: string;
 	name: string;
-	/** Host agent instance id (UUID) or presetId. 'superset' = built-in chat. */
+	/** Host agent instance id (UUID) or presetId. */
 	agent: string;
 	targetHostId: string | null;
 	/** Null = session automation: runs use project-less session workspaces. */
@@ -217,7 +217,7 @@ export interface AutomationListParams {
 export interface AutomationCreateParams {
 	name: string;
 	prompt: string;
-	/** Host agent instance id (UUID) or presetId. 'superset' = built-in chat. */
+	/** Host agent instance id (UUID) or presetId. */
 	agent: string;
 	rrule: string;
 	timezone: string;

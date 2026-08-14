@@ -111,7 +111,6 @@ export function AutomationRow({
 			params: { workspaceId: lastRun.v2WorkspaceId },
 			search: {
 				terminalId: lastRun.terminalSessionId ?? undefined,
-				chatSessionId: lastRun.chatSessionId ?? undefined,
 			},
 		});
 	};

@@ -123,16 +123,10 @@ function AuthenticatedLayout() {
 				void navigate({
 					to: "/v2-workspace/$workspaceId",
 					params: { workspaceId: event.data.workspaceId },
-					search:
-						source.type === "terminal"
-							? {
-									terminalId: source.id,
-									focusRequestId: crypto.randomUUID(),
-								}
-							: {
-									chatSessionId: source.id,
-									focusRequestId: crypto.randomUUID(),
-								},
+					search: {
+						terminalId: source.id,
+						focusRequestId: crypto.randomUUID(),
+					},
 				});
 				return;
 			}
