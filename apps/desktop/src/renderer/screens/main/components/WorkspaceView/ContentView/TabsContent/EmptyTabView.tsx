@@ -5,6 +5,7 @@ import type { IconType } from "react-icons";
 import { BsTerminalPlus } from "react-icons/bs";
 import { LuExternalLink, LuSearch, LuTrash2 } from "react-icons/lu";
 import { TbMessageCirclePlus, TbWorld } from "react-icons/tb";
+import { GitHubStarPill } from "renderer/components/GitHubStarPill";
 import { getAppOption } from "renderer/components/OpenInExternalDropdown";
 import { useHotkeyDisplay } from "renderer/hotkeys";
 import { electronTrpc } from "renderer/lib/electron-trpc";
@@ -169,6 +170,7 @@ export function EmptyTabView({
 						Delete workspace
 					</button>
 				)}
+				<GitHubStarPill className="mt-6" />
 			</div>
 			{workspace && (
 				<DeleteWorkspaceDialog
