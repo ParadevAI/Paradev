@@ -12,6 +12,10 @@ interface TransitionEndEvents {
  * transition animation finishes — the earliest point a second modal
  * presentation or a keyboard request succeeds. The returned unsubscribe
  * cancels a still-pending action.
+ *
+ * Only the navigator owning the animating screen emits `transitionEnd`, so
+ * this is useful to a caller presenting from its OWN stack. Waiting on a sheet
+ * one stack up never fires — set state directly instead.
  */
 export function useAfterTransitionEnd(): (action: () => void) => () => void {
 	const navigation = useNavigation() as unknown as TransitionEndEvents;

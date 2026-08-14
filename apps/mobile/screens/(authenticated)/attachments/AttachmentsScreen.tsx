@@ -6,7 +6,7 @@ import { Alert, Pressable, View } from "react-native";
 import { usePromptInputAttachments } from "@/components/ai-elements/prompt-input";
 import { Text } from "@/components/ui/text";
 import { useTheme } from "@/hooks/useTheme";
-import { useAfterTransitionEnd } from "@/screens/(authenticated)/(home)/hooks/useAfterTransitionEnd";
+import { useAfterTransitionEnd } from "@/screens/(authenticated)/hooks/useAfterTransitionEnd";
 import { AddSelectedButton } from "./components/AddSelectedButton";
 import { PhotoCarousel } from "./components/PhotoCarousel";
 import { useAttachmentsSelectionStore } from "./stores/attachmentsSelectionStore";
@@ -59,8 +59,7 @@ export function AttachmentsScreen() {
 		{
 			icon: "scan-outline" as const,
 			label: "Screenshots",
-			onPress: () =>
-				router.push("/(authenticated)/(home)/attachments/screenshots"),
+			onPress: () => router.push("/(authenticated)/attachments/screenshots"),
 			showsChevron: true,
 		},
 		{
