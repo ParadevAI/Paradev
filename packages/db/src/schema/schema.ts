@@ -689,17 +689,8 @@ export const automations = pgTable(
 		v2ProjectId: uuid("v2_project_id"),
 		v2WorkspaceId: uuid("v2_workspace_id"),
 
-		// Dead: the schedule lives in the automation's `schedule` trigger. Nothing
-		// reads or writes these; nullable so the writes could stop, dropped next.
-		rrule: text(),
-		dtstart: timestamp("dtstart", { withTimezone: true }),
-		timezone: text(),
-
+		// The schedule lives in the automation's `schedule` trigger.
 		enabled: boolean().notNull().default(true),
-
-		mcpScope: jsonb("mcp_scope").$type<string[]>().notNull().default([]),
-
-		nextRunAt: timestamp("next_run_at", { withTimezone: true }),
 
 		createdAt: timestamp("created_at", { withTimezone: true })
 			.notNull()
@@ -710,7 +701,7 @@ export const automations = pgTable(
 			.$onUpdate(() => new Date()),
 	},
 	(t) => [
-		index("automations_dispatcher_idx").on(t.enabled, t.nextRunAt),
+		// No dispatcher index here — the dispatcher scans automation_triggers.
 		// Target for automation_triggers' composite FK.
 		unique("automations_id_org_unique").on(t.id, t.organizationId),
 		index("automations_owner_idx").on(t.ownerUserId),
