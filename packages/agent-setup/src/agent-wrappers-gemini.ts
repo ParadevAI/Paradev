@@ -19,7 +19,7 @@ import { getHooksDir } from "./paths";
 export const GEMINI_HOOK_SCRIPT_NAME = "gemini-hook.sh";
 
 const GEMINI_HOOK_SIGNATURE = "# Superset gemini hook";
-const GEMINI_HOOK_VERSION = "v5";
+const GEMINI_HOOK_VERSION = "v6";
 export const GEMINI_HOOK_MARKER = `${GEMINI_HOOK_SIGNATURE} ${GEMINI_HOOK_VERSION}`;
 
 interface GeminiHookDefinition {

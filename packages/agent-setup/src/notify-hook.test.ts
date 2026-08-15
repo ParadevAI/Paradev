@@ -1,5 +1,7 @@
 import { describe, expect, it } from "bun:test";
-import { readFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
 import { getTemplatePath } from "./config";
 import { NOTIFY_SCRIPT_MARKER } from "./notify-hook";
 
@@ -7,31 +9,102 @@ function readNotifyHookTemplate(): string {
 	return readFileSync(getTemplatePath("notify-hook.template.sh"), "utf-8");
 }
 
+// The script scans ${SUPERSET_HOME_DIR:-$HOME/.superset}/host/*/manifest.json
+// at call time. Tests must never resolve the developer's real manifests (this
+// test process can itself run inside a Superset terminal), so the default env
+// points at an empty home.
+const emptyHome = mkdtempSync(path.join(tmpdir(), "notify-hook-empty-home-"));
+
+function renderNotifyHookScript(): string {
+	return readNotifyHookTemplate()
+		.replaceAll("{{MARKER}}", NOTIFY_SCRIPT_MARKER)
+		.replaceAll("{{DEFAULT_PORT}}", "48763");
+}
+
+function hookEnv(envOverrides: Record<string, string>) {
+	return {
+		...process.env,
+		SUPERSET_AGENT_ID: "grok",
+		SUPERSET_DEBUG_HOOKS: "1",
+		SUPERSET_TERMINAL_ID: "terminal-test",
+		SUPERSET_HOME_DIR: emptyHome,
+		...envOverrides,
+	};
+}
+
 function runNotifyHook(
 	input: Record<string, unknown>,
 	envOverrides: Record<string, string> = {},
 ) {
-	const script = readNotifyHookTemplate()
-		.replaceAll("{{MARKER}}", NOTIFY_SCRIPT_MARKER)
-		.replaceAll("{{DEFAULT_PORT}}", "48763");
 	return Bun.spawnSync({
-		cmd: ["bash", "-c", script],
-		env: {
-			...process.env,
-			SUPERSET_AGENT_ID: "grok",
-			SUPERSET_DEBUG_HOOKS: "1",
-			SUPERSET_TERMINAL_ID: "terminal-test",
-			...envOverrides,
-		},
+		cmd: ["bash", "-c", renderNotifyHookScript()],
+		env: hookEnv(envOverrides),
 		stdin: Buffer.from(JSON.stringify(input)),
 		stdout: "pipe",
 		stderr: "pipe",
 	});
 }
 
+/**
+ * Async variant for tests that stand up an in-process Bun.serve fake
+ * host-service: spawnSync would block the event loop and deadlock the
+ * hook's curl against that server.
+ */
+async function runNotifyHookAsync(
+	input: Record<string, unknown>,
+	envOverrides: Record<string, string> = {},
+) {
+	const proc = Bun.spawn({
+		cmd: ["bash", "-c", renderNotifyHookScript()],
+		env: hookEnv(envOverrides),
+		stdin: Buffer.from(JSON.stringify(input)),
+		stdout: "pipe",
+		stderr: "pipe",
+	});
+	const [exitCode, stderr] = await Promise.all([
+		proc.exited,
+		new Response(proc.stderr).text(),
+	]);
+	return { exitCode, stderr };
+}
+
+/** Fake host-service answering notifications.hook like the real router. */
+function fakeHostService(ignored: boolean) {
+	const requests: Array<{ json: { terminalId?: string } }> = [];
+	const server = Bun.serve({
+		port: 0,
+		fetch: async (req) => {
+			requests.push((await req.json()) as (typeof requests)[number]);
+			return Response.json({
+				result: { data: { json: { success: true, ignored } } },
+			});
+		},
+	});
+	return {
+		requests,
+		url: `http://127.0.0.1:${server.port}`,
+		stop: () => server.stop(true),
+	};
+}
+
+function writeHookManifest(home: string, orgId: string, endpoint: string) {
+	const dir = path.join(home, "host", orgId);
+	mkdirSync(dir, { recursive: true });
+	writeFileSync(
+		path.join(dir, "manifest.json"),
+		JSON.stringify({
+			pid: 1,
+			endpoint,
+			authToken: "test-token",
+			startedAt: 0,
+			organizationId: orgId,
+		}),
+	);
+}
+
 describe("getNotifyScriptContent", () => {
 	it("bumps the notify hook marker when hook semantics change", () => {
-		expect(NOTIFY_SCRIPT_MARKER).toBe("# Superset agent notification hook v8");
+		expect(NOTIFY_SCRIPT_MARKER).toBe("# Superset agent notification hook v9");
 	});
 
 	it("ignores hooks fired inside a subagent (agent_id present)", () => {
@@ -84,16 +157,25 @@ describe("getNotifyScriptContent", () => {
 		const script = readNotifyHookTemplate();
 
 		expect(script).toContain(
-			'curl -sX POST "$SUPERSET_HOST_AGENT_HOOK_URL" \\\n    --connect-timeout 2 --max-time 5',
+			'curl -sX POST "$HOOK_URL" \\\n      --connect-timeout 2 --max-time 5',
 		);
+	});
+
+	it("resolves the endpoint at call time from org manifests, not only the frozen env URL", () => {
+		const script = readNotifyHookTemplate();
+
+		expect(script).toContain("SUPERSET_HOME_DIR:-$HOME/.superset");
+		expect(script).toContain("/host/*/manifest.json; do");
+		expect(script).toContain(
+			'HOOK_CANDIDATE_URLS="$SUPERSET_HOST_AGENT_HOOK_URL"',
+		);
+		expect(script).toContain("/trpc/notifications.hook");
 	});
 
 	it("falls back to the v1 Electron hook when v2 is unavailable", () => {
 		const script = readNotifyHookTemplate();
 
-		expect(script).toContain(
-			'if [ -n "$SUPERSET_HOST_AGENT_HOOK_URL" ] && [ -n "$SUPERSET_TERMINAL_ID" ]; then',
-		);
+		expect(script).toContain('if [ -n "$SUPERSET_TERMINAL_ID" ]; then');
 		expect(script).toContain(
 			'[ -z "$SUPERSET_TAB_ID" ] && [ -z "$SESSION_ID" ] && [ -z "$SUPERSET_TERMINAL_ID" ] && exit 0',
 		);
@@ -195,10 +277,10 @@ describe("per-agent hook scripts dispatch to v2", () => {
 				'[ -n "$SUPERSET_TERMINAL_ID" ] || [ -n "$SUPERSET_TAB_ID" ] || exit 0',
 			);
 			expect(script).toContain(buildExpectedV2Payload(agentIdVar));
-			expect(script).toContain('curl -sX POST "$SUPERSET_HOST_AGENT_HOOK_URL"');
-			expect(script).toContain(
-				'if [ -n "$SUPERSET_HOST_AGENT_HOOK_URL" ] && [ -n "$SUPERSET_TERMINAL_ID" ]; then',
-			);
+			expect(script).toContain('curl -sX POST "$HOOK_URL"');
+			expect(script).toContain("SUPERSET_HOME_DIR:-$HOME/.superset");
+			expect(script).toContain("/host/*/manifest.json; do");
+			expect(script).toContain('if [ -n "$SUPERSET_TERMINAL_ID" ]; then');
 			expect(script).toContain("/hook/complete");
 			expect(script).toContain('V1_EVENT_TYPE="$EVENT_TYPE"');
 			expect(script).toContain("eventType=$V1_EVENT_TYPE");
@@ -207,4 +289,74 @@ describe("per-agent hook scripts dispatch to v2", () => {
 			expect(script).toContain("SUPERSET_PANE_ID");
 		});
 	}
+});
+
+describe("call-time endpoint resolution (frozen-port healing)", () => {
+	const stopEvent = { hook_event_name: "Stop", session_id: "s1" };
+	// A guaranteed-dead localhost URL, standing in for the port a previous
+	// host-service instance captured into the agent's env before restarting.
+	const deadUrl = "http://127.0.0.1:1/trpc/notifications.hook";
+
+	it("delivers via the org manifest when the env hook URL points at a dead port", async () => {
+		const live = fakeHostService(false);
+		const home = mkdtempSync(path.join(tmpdir(), "notify-hook-home-"));
+		writeHookManifest(home, "org-a", live.url);
+		try {
+			const result = await runNotifyHookAsync(stopEvent, {
+				SUPERSET_HOME_DIR: home,
+				SUPERSET_HOST_AGENT_HOOK_URL: deadUrl,
+			});
+
+			expect(result.exitCode).toBe(0);
+			expect(live.requests).toHaveLength(1);
+			expect(live.requests[0]?.json.terminalId).toBe("terminal-test");
+			expect(result.stderr).toContain("status=000");
+			expect(result.stderr).toContain(`status=200 url=${live.url}`);
+		} finally {
+			live.stop();
+		}
+	});
+
+	it("keeps probing past a host that does not own the terminal (ignored:true)", async () => {
+		const wrongOrg = fakeHostService(true);
+		const owningOrg = fakeHostService(false);
+		const home = mkdtempSync(path.join(tmpdir(), "notify-hook-home-"));
+		// org-a sorts before org-b in the manifest glob, so the wrong host is
+		// probed first and must not terminate the dispatch.
+		writeHookManifest(home, "org-a", wrongOrg.url);
+		writeHookManifest(home, "org-b", owningOrg.url);
+		try {
+			const result = await runNotifyHookAsync(stopEvent, {
+				SUPERSET_HOME_DIR: home,
+				SUPERSET_HOST_AGENT_HOOK_URL: deadUrl,
+			});
+
+			expect(result.exitCode).toBe(0);
+			expect(wrongOrg.requests).toHaveLength(1);
+			expect(owningOrg.requests).toHaveLength(1);
+		} finally {
+			wrongOrg.stop();
+			owningOrg.stop();
+		}
+	});
+
+	it("uses the env URL fast path without probing manifests when it answers", async () => {
+		const envHost = fakeHostService(false);
+		const manifestHost = fakeHostService(false);
+		const home = mkdtempSync(path.join(tmpdir(), "notify-hook-home-"));
+		writeHookManifest(home, "org-a", manifestHost.url);
+		try {
+			const result = await runNotifyHookAsync(stopEvent, {
+				SUPERSET_HOME_DIR: home,
+				SUPERSET_HOST_AGENT_HOOK_URL: `${envHost.url}/trpc/notifications.hook`,
+			});
+
+			expect(result.exitCode).toBe(0);
+			expect(envHost.requests).toHaveLength(1);
+			expect(manifestHost.requests).toHaveLength(0);
+		} finally {
+			envHost.stop();
+			manifestHost.stop();
+		}
+	});
 });

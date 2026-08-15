@@ -112,23 +112,56 @@ json_escape() {
   printf '%s' "$1" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g'
 }
 
-if [ -n "$SUPERSET_HOST_AGENT_HOOK_URL" ] && [ -n "$SUPERSET_TERMINAL_ID" ]; then
+# Resolve the host-service endpoint at call time. SUPERSET_HOST_AGENT_HOOK_URL
+# is frozen into the agent's env at terminal creation; after a host-service
+# restart on a new port it would point at a dead socket forever (a live
+# process's env can't change). Each org's manifest
+# (~/.superset/host/<orgId>/manifest.json) is rewritten with the live endpoint
+# on every start, so it never goes stale. Try the env URL first (fast path),
+# then every org manifest's endpoint. Only the host that owns this terminal
+# answers "ignored":false; probing the other orgs' hosts is a harmless no-op.
+if [ -n "$SUPERSET_TERMINAL_ID" ]; then
   PAYLOAD="{\"json\":{\"terminalId\":\"$(json_escape "$SUPERSET_TERMINAL_ID")\",\"eventType\":\"$(json_escape "$EVENT_TYPE")\",\"agent\":{\"agentId\":\"$(json_escape "$SUPERSET_AGENT_ID")\",\"sessionId\":\"$(json_escape "$SESSION_ID")\"}}}"
 
-  STATUS_CODE=$(curl -sX POST "$SUPERSET_HOST_AGENT_HOOK_URL" \
-    --connect-timeout 2 --max-time 5 \
-    -H "Content-Type: application/json" \
-    -d "$PAYLOAD" \
-    -o /dev/null -w "%{http_code}" 2>/dev/null)
+  HOOK_CANDIDATE_URLS="$SUPERSET_HOST_AGENT_HOOK_URL"
+  for MANIFEST_FILE in "${SUPERSET_HOME_DIR:-$HOME/.superset}"/host/*/manifest.json; do
+    [ -f "$MANIFEST_FILE" ] || continue
+    MANIFEST_ENDPOINT=$(grep -oE '"endpoint"[[:space:]]*:[[:space:]]*"[^"]*"' "$MANIFEST_FILE" | head -1 | grep -oE '"[^"]*"$' | tr -d '"')
+    [ -n "$MANIFEST_ENDPOINT" ] || continue
+    HOOK_CANDIDATE_URLS="$HOOK_CANDIDATE_URLS $MANIFEST_ENDPOINT/trpc/notifications.hook"
+  done
 
-  if [ "$DEBUG_HOOKS_ENABLED" = "1" ]; then
-    echo "[notify-hook] host-service dispatched status=$STATUS_CODE" >&2
-  fi
-  debug_log "host-service status=$STATUS_CODE url=$SUPERSET_HOST_AGENT_HOOK_URL"
+  HOOK_DELIVERED_2XX="0"
+  SEEN_HOOK_URLS=""
+  for HOOK_URL in $HOOK_CANDIDATE_URLS; do
+    case " $SEEN_HOOK_URLS " in *" $HOOK_URL "*) continue ;; esac
+    SEEN_HOOK_URLS="$SEEN_HOOK_URLS $HOOK_URL"
 
-  case "$STATUS_CODE" in
-    2*) exit 0 ;;
-  esac
+    RESPONSE=$(curl -sX POST "$HOOK_URL" \
+      --connect-timeout 2 --max-time 5 \
+      -H "Content-Type: application/json" \
+      -d "$PAYLOAD" \
+      -w "|%{http_code}" 2>/dev/null)
+    STATUS_CODE="${RESPONSE##*|}"
+    BODY="${RESPONSE%|*}"
+
+    if [ "$DEBUG_HOOKS_ENABLED" = "1" ]; then
+      echo "[notify-hook] host-service dispatched status=$STATUS_CODE url=$HOOK_URL" >&2
+    fi
+    debug_log "host-service status=$STATUS_CODE url=$HOOK_URL"
+
+    # "ignored":false means the owning host accepted and fanned out the event.
+    case "$BODY" in
+      *'"ignored":false'*|*'"ignored": false'*) exit 0 ;;
+    esac
+    case "$STATUS_CODE" in
+      2*) HOOK_DELIVERED_2XX="1" ;;
+    esac
+  done
+
+  # Delivered somewhere (2xx) but no host owned the terminal: keep the
+  # pre-existing "any 2xx wins" behavior and skip the v1 fallback.
+  [ "$HOOK_DELIVERED_2XX" = "1" ] && exit 0
 fi
 
 # v1 fallback: Electron localhost hook server. Kept while v1 terminals exist.
