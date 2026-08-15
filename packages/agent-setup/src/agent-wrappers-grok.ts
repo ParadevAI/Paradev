@@ -103,10 +103,10 @@ export function createGrokHooksJson(): void {
 }
 
 function isManagedCompatTable(lines: string[]): boolean {
-	const header = lines[0]?.match(/^\s*\[compat\.([a-z-]+)\]\s*$/);
+	const vendor = lines[0]?.match(/^\s*\[compat\.([a-z-]+)\]\s*$/)?.[1];
 	return (
-		!!header &&
-		(GROK_COMPAT_HOOK_VENDORS as readonly string[]).includes(header[1])
+		vendor !== undefined &&
+		(GROK_COMPAT_HOOK_VENDORS as readonly string[]).includes(vendor)
 	);
 }
 

@@ -23,13 +23,6 @@ const TEST_OPENCODE_CONFIG_DIR = path.join(TEST_HOOKS_DIR, "opencode");
 const TEST_OPENCODE_PLUGIN_DIR = path.join(TEST_OPENCODE_CONFIG_DIR, "plugin");
 let mockedHomeDir = path.join(TEST_ROOT, "home");
 
-mock.module("shared/env.shared", () => ({
-	env: {
-		DESKTOP_NOTIFICATIONS_PORT: 7777,
-	},
-	getWorkspaceName: () => undefined,
-}));
-
 mock.module("./notify-hook", () => ({
 	NOTIFY_SCRIPT_NAME: "notify.sh",
 	NOTIFY_SCRIPT_MARKER: "# Superset agent notification hook v8",
@@ -39,12 +32,13 @@ mock.module("./notify-hook", () => ({
 }));
 
 mock.module("./paths", () => ({
-	BIN_DIR: TEST_BIN_DIR,
-	HOOKS_DIR: TEST_HOOKS_DIR,
-	ZSH_DIR: TEST_ZSH_DIR,
-	BASH_DIR: TEST_BASH_DIR,
-	OPENCODE_CONFIG_DIR: TEST_OPENCODE_CONFIG_DIR,
-	OPENCODE_PLUGIN_DIR: TEST_OPENCODE_PLUGIN_DIR,
+	resolveSupersetHomeDir: () => path.join(TEST_ROOT, "superset"),
+	getBinDir: () => TEST_BIN_DIR,
+	getHooksDir: () => TEST_HOOKS_DIR,
+	getZshDir: () => TEST_ZSH_DIR,
+	getBashDir: () => TEST_BASH_DIR,
+	getOpenCodeConfigDir: () => TEST_OPENCODE_CONFIG_DIR,
+	getOpenCodePluginDir: () => TEST_OPENCODE_PLUGIN_DIR,
 }));
 
 mock.module("node:os", () => ({
@@ -1842,7 +1836,7 @@ describe("grok hooks json", () => {
 
 	it("keeps the notify template's subtype filter in sync with the matcher", () => {
 		const template = readFileSync(
-			path.join(import.meta.dir, "templates", "notify-hook.template.sh"),
+			path.join(import.meta.dir, "..", "templates", "notify-hook.template.sh"),
 			"utf-8",
 		);
 		expect(template).toContain(

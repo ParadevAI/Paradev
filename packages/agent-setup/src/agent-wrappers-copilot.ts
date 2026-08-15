@@ -1,12 +1,12 @@
 import fs from "node:fs";
 import path from "node:path";
-import { env } from "shared/env.shared";
 import {
 	buildWrapperScript,
 	createWrapper,
 	writeFileIfChanged,
 } from "./agent-wrappers-common";
-import { HOOKS_DIR } from "./paths";
+import { getTemplatePath, getV1NotificationsPort } from "./config";
+import { getHooksDir } from "./paths";
 
 export const COPILOT_HOOK_SCRIPT_NAME = "copilot-hook.sh";
 
@@ -14,21 +14,18 @@ const COPILOT_HOOK_SIGNATURE = "# Superset copilot hook";
 const COPILOT_HOOK_VERSION = "v4";
 export const COPILOT_HOOK_MARKER = `${COPILOT_HOOK_SIGNATURE} ${COPILOT_HOOK_VERSION}`;
 
-const COPILOT_HOOK_TEMPLATE_PATH = path.join(
-	__dirname,
-	"templates",
-	"copilot-hook.template.sh",
-);
-
 export function getCopilotHookScriptPath(): string {
-	return path.join(HOOKS_DIR, COPILOT_HOOK_SCRIPT_NAME);
+	return path.join(getHooksDir(), COPILOT_HOOK_SCRIPT_NAME);
 }
 
 export function getCopilotHookScriptContent(): string {
-	const template = fs.readFileSync(COPILOT_HOOK_TEMPLATE_PATH, "utf-8");
+	const template = fs.readFileSync(
+		getTemplatePath("copilot-hook.template.sh"),
+		"utf-8",
+	);
 	return template
 		.replace("{{MARKER}}", COPILOT_HOOK_MARKER)
-		.replaceAll("{{DEFAULT_PORT}}", String(env.DESKTOP_NOTIFICATIONS_PORT));
+		.replaceAll("{{DEFAULT_PORT}}", String(getV1NotificationsPort()));
 }
 
 export function createCopilotHookScript(): void {

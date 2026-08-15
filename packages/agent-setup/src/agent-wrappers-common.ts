@@ -1,8 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
-import { SUPERSET_MANAGED_BINARIES } from "./desktop-agent-capabilities";
+import { SUPERSET_MANAGED_BINARIES } from "./agent-setup-targets";
 import { NOTIFY_SCRIPT_NAME } from "./notify-hook";
-import { BIN_DIR } from "./paths";
+import { getBinDir } from "./paths";
 
 export const WRAPPER_MARKER = "# Superset agent-wrapper v3";
 export { SUPERSET_MANAGED_BINARIES };
@@ -35,26 +35,9 @@ export function getManagedNotifyHookCommand(agentId: string): string {
 const SUPERSET_MANAGED_HOOK_PATH_PATTERN =
 	/\/(?:\.superset(?:-[^/'"\s\\]+)?|superset-dev-data)\//;
 
-export function writeFileIfChanged(
-	filePath: string,
-	content: string,
-	mode: number,
-): boolean {
-	const existing = fs.existsSync(filePath)
-		? fs.readFileSync(filePath, "utf-8")
-		: null;
-	if (existing === content) {
-		try {
-			fs.chmodSync(filePath, mode);
-		} catch {
-			// Best effort.
-		}
-		return false;
-	}
+import { writeFileIfChanged } from "./write-file-if-changed";
 
-	fs.writeFileSync(filePath, content, { mode });
-	return true;
-}
+export { writeFileIfChanged };
 
 /**
  * Deletes a wholly Superset-owned file, gated on its content signature so a
@@ -110,7 +93,7 @@ function buildRealBinaryResolver(): string {
     [ -z "$dir" ] && continue
     dir="\${dir%/}"
     case "$dir" in
-      "${BIN_DIR}"|"$HOME"/.superset/bin|"$HOME"/.superset-*/bin) continue ;;
+      "${getBinDir()}"|"$HOME"/.superset/bin|"$HOME"/.superset-*/bin) continue ;;
     esac
     if [ -x "$dir/$name" ] && [ ! -d "$dir/$name" ]; then
       printf "%s\\n" "$dir/$name"
@@ -127,7 +110,7 @@ function getMissingBinaryMessage(name: string): string {
 }
 
 export function getWrapperPath(binaryName: string): string {
-	return path.join(BIN_DIR, binaryName);
+	return path.join(getBinDir(), binaryName);
 }
 
 export interface BuildWrapperScriptOptions {

@@ -1,4 +1,8 @@
 import {
+	AGENT_SETUP_TARGETS,
+	type AgentSetupTargetId,
+} from "./agent-setup-targets";
+import {
 	cleanupGlobalOpenCodePlugin,
 	createAmpPlugin,
 	createAmpWrapper,
@@ -40,10 +44,6 @@ import {
 	removePiExtension,
 	removeVibeManagedHooks,
 } from "./agent-wrappers";
-import {
-	DESKTOP_AGENT_SETUP_TARGETS,
-	type DesktopAgentSetupTargetId,
-} from "./desktop-agent-capabilities";
 import { createManagedSkills } from "./managed-skills";
 import { createNotifyScript } from "./notify-hook";
 
@@ -73,7 +73,7 @@ interface AgentSetupDefinition {
 }
 
 const AGENT_SETUP_DEFINITIONS: Record<
-	DesktopAgentSetupTargetId,
+	AgentSetupTargetId,
 	AgentSetupDefinition
 > = {
 	amp: {
@@ -169,7 +169,7 @@ function warnOnFailures(failed: string[]): void {
 	}
 }
 
-interface SetupDesktopAgentCapabilitiesOptions {
+interface SetupAgentCapabilitiesOptions {
 	/**
 	 * Agents whose hook integration the user disabled. Their teardown actions
 	 * run instead of setup, actively reaping entries written by older app
@@ -178,16 +178,16 @@ interface SetupDesktopAgentCapabilitiesOptions {
 	disabledAgentIds?: readonly string[];
 }
 
-export function setupDesktopAgentCapabilities({
+export function setupAgentCapabilities({
 	disabledAgentIds = [],
-}: SetupDesktopAgentCapabilitiesOptions = {}): void {
+}: SetupAgentCapabilitiesOptions = {}): void {
 	const disabled = new Set(disabledAgentIds);
 	const failed: string[] = [];
 	for (const [label, action] of BOOTSTRAP_SETUP) {
 		if (!runSetupAction(label, action)) failed.push(label);
 	}
 
-	for (const target of DESKTOP_AGENT_SETUP_TARGETS) {
+	for (const target of AGENT_SETUP_TARGETS) {
 		const definition = AGENT_SETUP_DEFINITIONS[target.id];
 		runAgentActions(
 			target.id,
@@ -205,8 +205,7 @@ export function setupDesktopAgentCapabilities({
  * isn't self-sufficient. Returns `false` for unknown ids.
  */
 export function setupSingleAgent(agentId: string): boolean {
-	const definition =
-		AGENT_SETUP_DEFINITIONS[agentId as DesktopAgentSetupTargetId];
+	const definition = AGENT_SETUP_DEFINITIONS[agentId as AgentSetupTargetId];
 	if (!definition) return false;
 	const failed: string[] = [];
 	for (const [label, action] of BOOTSTRAP_SETUP) {
@@ -223,8 +222,7 @@ export function setupSingleAgent(agentId: string): boolean {
  * actions (no global footprint to remove).
  */
 export function teardownSingleAgent(agentId: string): boolean {
-	const definition =
-		AGENT_SETUP_DEFINITIONS[agentId as DesktopAgentSetupTargetId];
+	const definition = AGENT_SETUP_DEFINITIONS[agentId as AgentSetupTargetId];
 	if (!definition) return false;
 	const failed: string[] = [];
 	runAgentActions(agentId, definition.teardown, failed);

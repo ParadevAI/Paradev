@@ -48,9 +48,9 @@ function stripOrphanedManagedBlock(
 	let cut = lines.length;
 
 	for (let index = 1; index < lines.length; index++) {
-		if (!isTomlTableHeader(lines[index])) continue;
+		if (!isTomlTableHeader(lines[index] ?? "")) continue;
 		let end = index + 1;
-		while (end < lines.length && !isTomlTableHeader(lines[end])) end++;
+		while (end < lines.length && !isTomlTableHeader(lines[end] ?? "")) end++;
 		if (spec.isManagedTable(lines.slice(index, end))) {
 			index = end - 1;
 			continue;
@@ -62,7 +62,8 @@ function stripOrphanedManagedBlock(
 
 	while (
 		cut > 1 &&
-		(lines[cut - 1].trim() === "" || lines[cut - 1].trimStart().startsWith("#"))
+		((lines[cut - 1] ?? "").trim() === "" ||
+			(lines[cut - 1] ?? "").trimStart().startsWith("#"))
 	) {
 		cut--;
 	}

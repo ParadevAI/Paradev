@@ -72,6 +72,7 @@
 		"@mastra/core": "1.33.1",
 		"@octokit/rest": "22.0.1",
 		"@sentry/node": "10.68.0",
+		"@superset/agent-setup": "workspace:*",
 		"@superset/chat": "workspace:*",
 		"@superset/chat-runtime": "workspace:*",
 		"@superset/port-scanner": "workspace:*",

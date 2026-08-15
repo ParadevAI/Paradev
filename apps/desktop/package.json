@@ -79,6 +79,7 @@
 		"@replit/codemirror-css-color-picker": "6.3.0",
 		"@sentry/electron": "7.16.0",
 		"@streamdown/mermaid": "1.0.2",
+		"@superset/agent-setup": "workspace:*",
 		"@superset/auth": "workspace:*",
 		"@superset/chat": "workspace:*",
 		"@superset/db": "workspace:*",

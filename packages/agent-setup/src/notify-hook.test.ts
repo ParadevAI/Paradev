@@ -1,16 +1,10 @@
 import { describe, expect, it } from "bun:test";
 import { readFileSync } from "node:fs";
-import path from "node:path";
+import { getTemplatePath } from "./config";
 import { NOTIFY_SCRIPT_MARKER } from "./notify-hook";
 
-const notifyHookTemplatePath = path.join(
-	import.meta.dir,
-	"templates",
-	"notify-hook.template.sh",
-);
-
 function readNotifyHookTemplate(): string {
-	return readFileSync(notifyHookTemplatePath, "utf-8");
+	return readFileSync(getTemplatePath("notify-hook.template.sh"), "utf-8");
 }
 
 function runNotifyHook(
@@ -179,7 +173,7 @@ describe("per-agent hook scripts dispatch to v2", () => {
 
 	it("cursor auto-approves permission requests before the outside-Superset bail-out", () => {
 		const script = readFileSync(
-			path.join(import.meta.dir, "templates", "cursor-hook.template.sh"),
+			getTemplatePath("cursor-hook.template.sh"),
 			"utf-8",
 		);
 		const approveIndex = script.indexOf("printf '{\"continue\":true}\\n'");
@@ -196,10 +190,7 @@ describe("per-agent hook scripts dispatch to v2", () => {
 		["gemini-hook.template.sh", "SUPERSET_AGENT_ID"],
 	] as const) {
 		it(`${template} posts v2 first and falls back to v1`, () => {
-			const script = readFileSync(
-				path.join(import.meta.dir, "templates", template),
-				"utf-8",
-			);
+			const script = readFileSync(getTemplatePath(template), "utf-8");
 			expect(script).toContain(
 				'[ -n "$SUPERSET_TERMINAL_ID" ] || [ -n "$SUPERSET_TAB_ID" ] || exit 0',
 			);

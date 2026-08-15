@@ -4,8 +4,9 @@ import path from "node:path";
 import {
 	SUPERSET_MANAGED_BINARIES,
 	type SupersetManagedBinary,
-} from "./desktop-agent-capabilities";
-import { BASH_DIR, BIN_DIR, ZSH_DIR } from "./paths";
+} from "./agent-setup-targets";
+import { getBashDir, getBinDir, getZshDir } from "./paths";
+import { writeFileIfChanged } from "./write-file-if-changed";
 
 export interface ShellWrapperPaths {
 	BIN_DIR: string;
@@ -13,11 +14,15 @@ export interface ShellWrapperPaths {
 	BASH_DIR: string;
 }
 
-const DEFAULT_PATHS: ShellWrapperPaths = {
-	BIN_DIR,
-	ZSH_DIR,
-	BASH_DIR,
-};
+// Resolved lazily (as a default-parameter expression) so SUPERSET_HOME_DIR
+// changes made during boot are picked up.
+function getDefaultPaths(): ShellWrapperPaths {
+	return {
+		BIN_DIR: getBinDir(),
+		ZSH_DIR: getZshDir(),
+		BASH_DIR: getBashDir(),
+	};
+}
 
 const modeDiagnosticsLogged = new Set<string>();
 
@@ -52,32 +57,6 @@ function logModeDiagnostics(shellName: string): void {
 	console.debug(
 		`[agent-setup] shell integration mode=native shell=${shellName}`,
 	);
-}
-
-function writeFileIfChanged(
-	filePath: string,
-	content: string,
-	mode: number,
-): boolean {
-	const existing = fs.existsSync(filePath)
-		? fs.readFileSync(filePath, "utf-8")
-		: null;
-	if (existing === content) {
-		try {
-			fs.chmodSync(filePath, mode);
-		} catch {
-			// Best effort.
-		}
-		return false;
-	}
-
-	fs.writeFileSync(filePath, content, { mode });
-	try {
-		fs.chmodSync(filePath, mode);
-	} catch {
-		// Best effort.
-	}
-	return true;
 }
 
 /**
@@ -154,7 +133,7 @@ function escapeFishDoubleQuoted(value: string): string {
 }
 
 export function createZshWrapper(
-	paths: ShellWrapperPaths = DEFAULT_PATHS,
+	paths: ShellWrapperPaths = getDefaultPaths(),
 ): void {
 	logModeDiagnostics("zsh");
 	const quotedZshDir = quoteShellLiteral(paths.ZSH_DIR);
@@ -240,7 +219,7 @@ export ZDOTDIR="$_superset_home"
 }
 
 export function createBashWrapper(
-	paths: ShellWrapperPaths = DEFAULT_PATHS,
+	paths: ShellWrapperPaths = getDefaultPaths(),
 ): void {
 	logModeDiagnostics("bash");
 
@@ -296,7 +275,7 @@ fi
 
 export function getShellEnv(
 	shell: string,
-	paths: ShellWrapperPaths = DEFAULT_PATHS,
+	paths: ShellWrapperPaths = getDefaultPaths(),
 ): Record<string, string> {
 	const shellName = getShellName(shell);
 	if (shellName === "zsh") {
@@ -310,7 +289,7 @@ export function getShellEnv(
 
 export function getShellArgs(
 	shell: string,
-	paths: ShellWrapperPaths = DEFAULT_PATHS,
+	paths: ShellWrapperPaths = getDefaultPaths(),
 ): string[] {
 	const shellName = getShellName(shell);
 	logModeDiagnostics(shellName);
@@ -355,7 +334,7 @@ export function getShellArgs(
 export function getCommandShellArgs(
 	shell: string,
 	command: string,
-	paths: ShellWrapperPaths = DEFAULT_PATHS,
+	paths: ShellWrapperPaths = getDefaultPaths(),
 ): string[] {
 	const shellName = getShellName(shell);
 	logModeDiagnostics(shellName);

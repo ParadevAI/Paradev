@@ -3,6 +3,7 @@ import { cp, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { writeFileIfChanged } from "./agent-wrappers-common";
+import { getBundledPluginDir } from "./config";
 
 export const MANAGED_SKILL_MARKER = "<!-- superset-managed-skill v1 -->";
 
@@ -224,9 +225,9 @@ export async function createManagedSkills(
 	options: ManagedSkillsOptions = {},
 ): Promise<void> {
 	const homeDir = options.homeDir ?? os.homedir();
-	const templatesDir =
-		options.templatesDir ?? path.join(__dirname, "templates");
-	const bundledPluginDir = path.join(templatesDir, "plugin");
+	const bundledPluginDir = options.templatesDir
+		? path.join(options.templatesDir, "plugin")
+		: getBundledPluginDir();
 
 	if (!fs.existsSync(path.join(bundledPluginDir, "skills"))) {
 		console.warn(

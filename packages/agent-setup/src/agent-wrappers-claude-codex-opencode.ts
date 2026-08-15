@@ -8,6 +8,7 @@ import {
 	isManagedNotifyCommand,
 	writeFileIfChanged,
 } from "./agent-wrappers-common";
+import { getTemplatePath } from "./config";
 import {
 	buildNestedDesiredEntries,
 	cleanNestedHookDefinition,
@@ -17,7 +18,7 @@ import {
 	removeManagedJsonHooks,
 } from "./managed-json-hooks";
 import { getNotifyScriptPath } from "./notify-hook";
-import { OPENCODE_CONFIG_DIR, OPENCODE_PLUGIN_DIR } from "./paths";
+import { getOpenCodeConfigDir, getOpenCodePluginDir } from "./paths";
 
 export const OPENCODE_PLUGIN_FILE = "superset-notify.js";
 
@@ -25,22 +26,11 @@ const OPENCODE_PLUGIN_SIGNATURE = "// Superset opencode plugin";
 const OPENCODE_PLUGIN_VERSION = "v8";
 export const OPENCODE_PLUGIN_MARKER = `${OPENCODE_PLUGIN_SIGNATURE} ${OPENCODE_PLUGIN_VERSION}`;
 
-const OPENCODE_PLUGIN_TEMPLATE_PATH = path.join(
-	__dirname,
-	"templates",
-	"opencode-plugin.template.js",
-);
-const CODEX_WRAPPER_EXEC_TEMPLATE_PATH = path.join(
-	__dirname,
-	"templates",
-	"codex-wrapper-exec.template.sh",
-);
-
 /**
  * Returns the environment-scoped OpenCode plugin path under Superset home.
  */
 export function getOpenCodePluginPath(): string {
-	return path.join(OPENCODE_PLUGIN_DIR, OPENCODE_PLUGIN_FILE);
+	return path.join(getOpenCodePluginDir(), OPENCODE_PLUGIN_FILE);
 }
 
 /** @see https://opencode.ai/docs/plugins */
@@ -227,7 +217,10 @@ export function removeCodexManagedHooks(): void {
  * Renders the OpenCode plugin file content with the current notify script path.
  */
 export function getOpenCodePluginContent(notifyPath: string): string {
-	const template = fs.readFileSync(OPENCODE_PLUGIN_TEMPLATE_PATH, "utf-8");
+	const template = fs.readFileSync(
+		getTemplatePath("opencode-plugin.template.js"),
+		"utf-8",
+	);
 	return template
 		.replace("{{MARKER}}", OPENCODE_PLUGIN_MARKER)
 		.replace("{{NOTIFY_PATH}}", notifyPath);
@@ -262,7 +255,10 @@ export function createCodexWrapper(): void {
  * Builds the Codex wrapper exec block from the shell template.
  */
 export function buildCodexWrapperExecLine(notifyPath: string): string {
-	const template = fs.readFileSync(CODEX_WRAPPER_EXEC_TEMPLATE_PATH, "utf-8");
+	const template = fs.readFileSync(
+		getTemplatePath("codex-wrapper-exec.template.sh"),
+		"utf-8",
+	);
 	return template.replaceAll("{{NOTIFY_PATH}}", notifyPath);
 }
 
@@ -310,7 +306,7 @@ export function cleanupGlobalOpenCodePlugin(): void {
 export function createOpenCodeWrapper(): void {
 	const script = buildWrapperScript(
 		"opencode",
-		`export OPENCODE_CONFIG_DIR="${OPENCODE_CONFIG_DIR}"\nexec "$REAL_BIN" "$@"`,
+		`export OPENCODE_CONFIG_DIR="${getOpenCodeConfigDir()}"\nexec "$REAL_BIN" "$@"`,
 		{ agentId: "opencode" },
 	);
 	createWrapper("opencode", script);

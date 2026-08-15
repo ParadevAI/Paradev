@@ -7,6 +7,7 @@ import {
 	removeOwnedFileIfMarked,
 	writeFileIfChanged,
 } from "./agent-wrappers-common";
+import { getTemplatePath } from "./config";
 
 /**
  * Creates the Amp wrapper that preserves Superset's terminal environment.
@@ -24,11 +25,6 @@ export const AMP_PLUGIN_FILE = "superset-lifecycle.ts";
 const AMP_PLUGIN_SIGNATURE = "// Superset Amp lifecycle plugin";
 const AMP_PLUGIN_VERSION = "v3";
 export const AMP_PLUGIN_MARKER = `${AMP_PLUGIN_SIGNATURE} ${AMP_PLUGIN_VERSION}`;
-const AMP_PLUGIN_TEMPLATE_PATH = path.join(
-	__dirname,
-	"templates",
-	"amp-plugin.template.ts",
-);
 
 /**
  * Amp loads system plugins from ~/.config/amp/plugins/*.ts.
@@ -45,7 +41,10 @@ export function getAmpGlobalPluginPath(): string {
  * so this plugin stays small and avoids duplicating mapping logic.
  */
 export function getAmpPluginContent(): string {
-	const template = fs.readFileSync(AMP_PLUGIN_TEMPLATE_PATH, "utf-8");
+	const template = fs.readFileSync(
+		getTemplatePath("amp-plugin.template.ts"),
+		"utf-8",
+	);
 	return template.replace("{{MARKER}}", AMP_PLUGIN_MARKER);
 }
 

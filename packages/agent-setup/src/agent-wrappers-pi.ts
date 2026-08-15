@@ -5,18 +5,13 @@ import {
 	removeOwnedFileIfMarked,
 	writeFileIfChanged,
 } from "./agent-wrappers-common";
+import { getTemplatePath } from "./config";
 
 export const PI_EXTENSION_FILE = "superset-hooks.ts";
 
 const PI_EXTENSION_SIGNATURE = "// Superset pi extension";
 const PI_EXTENSION_VERSION = "v1";
 export const PI_EXTENSION_MARKER = `${PI_EXTENSION_SIGNATURE} ${PI_EXTENSION_VERSION}`;
-
-const PI_EXTENSION_TEMPLATE_PATH = path.join(
-	__dirname,
-	"templates",
-	"pi-extension.template.ts",
-);
 
 /**
  * Returns the global pi extensions directory used by pi's auto-discovery.
@@ -45,7 +40,10 @@ export function getPiExtensionPath(): string {
  * for both dev and prod installs).
  */
 export function getPiExtensionContent(): string {
-	const template = fs.readFileSync(PI_EXTENSION_TEMPLATE_PATH, "utf-8");
+	const template = fs.readFileSync(
+		getTemplatePath("pi-extension.template.ts"),
+		"utf-8",
+	);
 	return template.replace("{{MARKER}}", PI_EXTENSION_MARKER);
 }
 

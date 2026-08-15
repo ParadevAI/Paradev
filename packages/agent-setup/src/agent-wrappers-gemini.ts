@@ -1,32 +1,26 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { env } from "shared/env.shared";
 import {
 	buildWrapperScript,
 	createWrapper,
 	isSupersetManagedHookCommand,
 	writeFileIfChanged,
 } from "./agent-wrappers-common";
+import { getTemplatePath, getV1NotificationsPort } from "./config";
 import {
 	ensureManagedJsonHooks,
 	getManagedJsonHooksContent,
 	type ManagedJsonHooksSpec,
 	removeManagedJsonHooks,
 } from "./managed-json-hooks";
-import { HOOKS_DIR } from "./paths";
+import { getHooksDir } from "./paths";
 
 export const GEMINI_HOOK_SCRIPT_NAME = "gemini-hook.sh";
 
 const GEMINI_HOOK_SIGNATURE = "# Superset gemini hook";
 const GEMINI_HOOK_VERSION = "v5";
 export const GEMINI_HOOK_MARKER = `${GEMINI_HOOK_SIGNATURE} ${GEMINI_HOOK_VERSION}`;
-
-const GEMINI_HOOK_TEMPLATE_PATH = path.join(
-	__dirname,
-	"templates",
-	"gemini-hook.template.sh",
-);
 
 interface GeminiHookDefinition {
 	matcher?: string;
@@ -36,7 +30,7 @@ interface GeminiHookDefinition {
 }
 
 export function getGeminiHookScriptPath(): string {
-	return path.join(HOOKS_DIR, GEMINI_HOOK_SCRIPT_NAME);
+	return path.join(getHooksDir(), GEMINI_HOOK_SCRIPT_NAME);
 }
 
 export function getGeminiSettingsJsonPath(): string {
@@ -44,10 +38,13 @@ export function getGeminiSettingsJsonPath(): string {
 }
 
 export function getGeminiHookScriptContent(): string {
-	const template = fs.readFileSync(GEMINI_HOOK_TEMPLATE_PATH, "utf-8");
+	const template = fs.readFileSync(
+		getTemplatePath("gemini-hook.template.sh"),
+		"utf-8",
+	);
 	return template
 		.replace("{{MARKER}}", GEMINI_HOOK_MARKER)
-		.replaceAll("{{DEFAULT_PORT}}", String(env.DESKTOP_NOTIFICATIONS_PORT));
+		.replaceAll("{{DEFAULT_PORT}}", String(getV1NotificationsPort()));
 }
 
 // HookEventName values from gemini-cli's packages/core/src/hooks/types.ts.

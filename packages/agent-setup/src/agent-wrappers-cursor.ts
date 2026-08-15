@@ -1,20 +1,20 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { env } from "shared/env.shared";
 import {
 	buildWrapperScript,
 	createWrapper,
 	isSupersetManagedHookCommand,
 	writeFileIfChanged,
 } from "./agent-wrappers-common";
+import { getTemplatePath, getV1NotificationsPort } from "./config";
 import {
 	ensureManagedJsonHooks,
 	getManagedJsonHooksContent,
 	type ManagedJsonHooksSpec,
 	removeManagedJsonHooks,
 } from "./managed-json-hooks";
-import { HOOKS_DIR } from "./paths";
+import { getHooksDir } from "./paths";
 
 export const CURSOR_HOOK_SCRIPT_NAME = "cursor-hook.sh";
 
@@ -22,19 +22,13 @@ const CURSOR_HOOK_SIGNATURE = "# Superset cursor hook";
 const CURSOR_HOOK_VERSION = "v6";
 export const CURSOR_HOOK_MARKER = `${CURSOR_HOOK_SIGNATURE} ${CURSOR_HOOK_VERSION}`;
 
-const CURSOR_HOOK_TEMPLATE_PATH = path.join(
-	__dirname,
-	"templates",
-	"cursor-hook.template.sh",
-);
-
 interface CursorHookEntry {
 	command: string;
 	[key: string]: unknown;
 }
 
 export function getCursorHookScriptPath(): string {
-	return path.join(HOOKS_DIR, CURSOR_HOOK_SCRIPT_NAME);
+	return path.join(getHooksDir(), CURSOR_HOOK_SCRIPT_NAME);
 }
 
 export function getCursorGlobalHooksJsonPath(): string {
@@ -42,10 +36,13 @@ export function getCursorGlobalHooksJsonPath(): string {
 }
 
 export function getCursorHookScriptContent(): string {
-	const template = fs.readFileSync(CURSOR_HOOK_TEMPLATE_PATH, "utf-8");
+	const template = fs.readFileSync(
+		getTemplatePath("cursor-hook.template.sh"),
+		"utf-8",
+	);
 	return template
 		.replace("{{MARKER}}", CURSOR_HOOK_MARKER)
-		.replaceAll("{{DEFAULT_PORT}}", String(env.DESKTOP_NOTIFICATIONS_PORT));
+		.replaceAll("{{DEFAULT_PORT}}", String(getV1NotificationsPort()));
 }
 
 // Cursor invokes the hook script with the event name as argv; the script
