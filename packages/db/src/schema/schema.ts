@@ -768,6 +768,12 @@ export const automationTriggers = pgTable(
 			.on(t.organizationId, t.kind)
 			.where(sql`enabled`),
 		index("automation_triggers_automation_idx").on(t.automationId),
+		// At most one schedule trigger per automation. The dispatcher reads
+		// triggers, so a duplicate would double-dispatch; this also gives the
+		// dual-write and the lazy repair a conflict target.
+		uniqueIndex("automation_triggers_schedule_unique")
+			.on(t.automationId)
+			.where(sql`kind = 'schedule'`),
 	],
 );
 

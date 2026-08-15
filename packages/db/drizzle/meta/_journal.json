@@ -512,6 +512,13 @@
       "when": 1786746530402,
       "tag": "0072_backfill_schedule_triggers",
       "breakpoints": true
+    },
+    {
+      "idx": 73,
+      "version": "7",
+      "when": 1786825016352,
+      "tag": "0073_automation_schedule_trigger_unique",
+      "breakpoints": true
     }
   ]
 }

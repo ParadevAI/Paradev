@@ -22,6 +22,7 @@ import {
 	getAutomationForUser,
 	promptSourceFromSession,
 	recordPromptVersion,
+	syncScheduleTrigger,
 } from "./helpers";
 import {
 	createAutomationSchema,
@@ -271,6 +272,16 @@ export const automationRouter = {
 					});
 				}
 
+				await syncScheduleTrigger(tx, {
+					automationId: row.id,
+					organizationId,
+					rrule: input.rrule,
+					dtstart,
+					timezone: input.timezone,
+					nextRunAt,
+					enabled: row.enabled,
+				});
+
 				await recordPromptVersion(tx, {
 					automationId: row.id,
 					authorUserId: ctx.session.user.id,
@@ -397,21 +408,42 @@ export const automationRouter = {
 					}).nextRunAt
 				: existing.nextRunAt;
 
-			const [updated] = await dbWs
-				.update(automations)
-				.set({
-					name: input.name ?? existing.name,
-					agent: input.agent ?? existing.agent,
-					targetHostId: nextTargetHostId,
-					v2ProjectId: nextProjectId,
-					v2WorkspaceId: nextWorkspaceId,
+			const updated = await dbWs.transaction(async (tx) => {
+				const [row] = await tx
+					.update(automations)
+					.set({
+						name: input.name ?? existing.name,
+						agent: input.agent ?? existing.agent,
+						targetHostId: nextTargetHostId,
+						v2ProjectId: nextProjectId,
+						v2WorkspaceId: nextWorkspaceId,
+						rrule: nextRrule,
+						dtstart: nextDtstart,
+						timezone: nextTimezone,
+						nextRunAt: recomputedNextRunAt,
+					})
+					.where(eq(automations.id, input.id))
+					.returning();
+
+				if (!row) {
+					throw new TRPCError({
+						code: "NOT_FOUND",
+						message: "Automation not found",
+					});
+				}
+
+				await syncScheduleTrigger(tx, {
+					automationId: row.id,
+					organizationId,
 					rrule: nextRrule,
 					dtstart: nextDtstart,
 					timezone: nextTimezone,
 					nextRunAt: recomputedNextRunAt,
-				})
-				.where(eq(automations.id, input.id))
-				.returning();
+					enabled: row.enabled,
+				});
+
+				return row;
+			});
 
 			return { ...updated, scheduleText: safeDescribeRrule(updated) };
 		}),
@@ -515,11 +547,32 @@ export const automationRouter = {
 				}).nextRunAt;
 			}
 
-			const [updated] = await dbWs
-				.update(automations)
-				.set(patch)
-				.where(eq(automations.id, input.id))
-				.returning();
+			const updated = await dbWs.transaction(async (tx) => {
+				const [row] = await tx
+					.update(automations)
+					.set(patch)
+					.where(eq(automations.id, input.id))
+					.returning();
+
+				if (!row) {
+					throw new TRPCError({
+						code: "NOT_FOUND",
+						message: "Automation not found",
+					});
+				}
+
+				await syncScheduleTrigger(tx, {
+					automationId: row.id,
+					organizationId,
+					rrule: row.rrule,
+					dtstart: row.dtstart,
+					timezone: row.timezone,
+					nextRunAt: row.nextRunAt,
+					enabled: row.enabled,
+				});
+
+				return row;
+			});
 
 			return { ...updated, scheduleText: safeDescribeRrule(updated) };
 		}),

@@ -4,6 +4,8 @@ import {
 	type AutomationPromptSource,
 	automationPromptVersions,
 	automations,
+	automationTriggers,
+	type ScheduleTriggerConfig,
 } from "@superset/db/schema";
 import { TRPCError } from "@trpc/server";
 import { and, eq, sql } from "drizzle-orm";
@@ -27,6 +29,51 @@ export function promptSourceFromSession(session: {
 export type AutomationDbExecutor =
 	| typeof dbWs
 	| Parameters<Parameters<typeof dbWs.transaction>[0]>[0];
+
+/**
+ * Mirrors an automation's schedule onto its `schedule` trigger. The dispatcher
+ * reads triggers; the legacy `automations` columns stay written until they drop,
+ * so a revert of this code is a clean revert.
+ */
+export async function syncScheduleTrigger(
+	tx: AutomationDbExecutor,
+	params: {
+		automationId: string;
+		organizationId: string;
+		rrule: string;
+		dtstart: Date;
+		timezone: string;
+		nextRunAt: Date | null;
+		enabled: boolean;
+	},
+) {
+	const config: ScheduleTriggerConfig = {
+		kind: "schedule",
+		rrule: params.rrule,
+		dtstart: params.dtstart.toISOString(),
+		timezone: params.timezone,
+	};
+
+	await tx
+		.insert(automationTriggers)
+		.values({
+			automationId: params.automationId,
+			organizationId: params.organizationId,
+			kind: "schedule",
+			config,
+			enabled: params.enabled,
+			nextRunAt: params.nextRunAt,
+		})
+		.onConflictDoUpdate({
+			target: automationTriggers.automationId,
+			targetWhere: sql`kind = 'schedule'`,
+			set: {
+				config,
+				enabled: params.enabled,
+				nextRunAt: params.nextRunAt,
+			},
+		});
+}
 
 export async function recordPromptVersion(
 	tx: AutomationDbExecutor,
