@@ -40,9 +40,6 @@ export function useNewChatTargets(workspaces: HostWorkspaceItem[] = []): {
 	const persistedTargetKey = useNewSessionPreferencesStore(
 		(state) => state.targetKey,
 	);
-	const projectFilter = useWorkspacesFilterStore(
-		(state) => state.projectFilter,
-	);
 	const preferencesHydrated = useNewSessionPreferencesStore(
 		(state) => state.hasHydrated,
 	);
@@ -108,9 +105,9 @@ export function useNewChatTargets(workspaces: HostWorkspaceItem[] = []): {
 		const sortedWorkspaces = [...workspaces].sort((a, b) =>
 			compareDesc(a.updatedAt, b.updatedAt),
 		);
-		const candidateProjectIds = projectFilter
-			? [projectFilter]
-			: sortedWorkspaces.map((workspace) => workspace.projectId);
+		const candidateProjectIds = sortedWorkspaces.map(
+			(workspace) => workspace.projectId,
+		);
 		for (const projectId of candidateProjectIds) {
 			const recentWorkspace = sortedWorkspaces.find(
 				(workspace) => workspace.projectId === projectId,
@@ -127,7 +124,6 @@ export function useNewChatTargets(workspaces: HostWorkspaceItem[] = []): {
 	}, [
 		targets,
 		persistedTargetKey,
-		projectFilter,
 		workspaces,
 		preferencesHydrated,
 		filtersHydrated,
