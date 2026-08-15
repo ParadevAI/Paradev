@@ -29,6 +29,7 @@ import { DaemonAutoUpdateFailureDialog } from "renderer/routes/_authenticated/co
 import { DashboardNewWorkspaceModal } from "renderer/routes/_authenticated/components/DashboardNewWorkspaceModal";
 import { DiffThemeSync } from "renderer/routes/_authenticated/components/DiffThemeSync";
 import { PendingDeletionScreen } from "renderer/routes/_authenticated/components/PendingDeletionScreen";
+import { StarNagObserver } from "renderer/routes/_authenticated/components/StarNagObserver";
 import {
 	V1AutoMigration,
 	V1MigrationContinuity,
@@ -295,6 +296,7 @@ function AuthenticatedLayout() {
 							<FileMenuListener />
 							<V2NotificationController />
 							<DockBadgeController />
+							<StarNagObserver />
 							<DaemonAutoUpdateFailureDialog />
 							<Outlet />
 							<V1ImportModal />
