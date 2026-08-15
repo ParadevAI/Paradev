@@ -149,6 +149,16 @@ export default function AuthenticatedLayout() {
 					}}
 				/>
 				<Stack.Screen
+					name="workspace/[id]/sessions"
+					options={{
+						presentation: "formSheet",
+						sheetAllowedDetents: [0.5],
+						sheetGrabberVisible: true,
+						...glassHeaderOptions,
+						title: "Sessions",
+					}}
+				/>
+				<Stack.Screen
 					name="workspace/[id]/new-session"
 					options={{
 						presentation: "formSheet",

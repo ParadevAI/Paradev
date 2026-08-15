@@ -24,6 +24,7 @@ import {
 import type { GlassComposerHandle } from "@/screens/(authenticated)/components/GlassComposer";
 import { PressableScale } from "@/screens/(authenticated)/components/PressableScale";
 import { useTerminalSeenStore } from "@/screens/(authenticated)/stores/terminalSeenStore";
+import { useTerminalTabOrderStore } from "@/screens/(authenticated)/stores/terminalTabOrderStore";
 import {
 	TerminalComposer,
 	type TerminalQuickKey,
@@ -36,6 +37,7 @@ import {
 	type TerminalWebViewHandle,
 } from "../components/TerminalWebView";
 import { useWorkspaceChangeset } from "../hooks/useWorkspaceChangeset";
+import { orderTerminalRows } from "../utils/orderTerminalRows";
 
 const headerOptions = {
 	headerShown: true,
@@ -67,15 +69,20 @@ export function WorkspaceScreen() {
 	const { terminalsByWorkspace, isReady } = useHostTerminals(host);
 	const changeset = useWorkspaceChangeset(id ?? null);
 
-	// Tabs hold creation order — the hook's activity sort is right for home
-	// rows but makes tabs swap places under the user whenever relative
-	// activity changes.
+	// Tabs hold the arrangement the user dragged in the sessions sheet, falling
+	// back to creation order — the hook's activity sort is right for home rows
+	// but makes tabs swap places under the user whenever relative activity
+	// changes.
+	const savedOrder = useTerminalTabOrderStore((state) =>
+		id ? state.orderByWorkspace[id] : undefined,
+	);
 	const rows = useMemo(
 		() =>
-			(id ? (terminalsByWorkspace.get(id) ?? []) : [])
-				.slice()
-				.sort((a, b) => a.createdAt - b.createdAt),
-		[terminalsByWorkspace, id],
+			orderTerminalRows(
+				id ? (terminalsByWorkspace.get(id) ?? []) : [],
+				savedOrder,
+			),
+		[terminalsByWorkspace, id, savedOrder],
 	);
 
 	// Active tab: the deep-linked ?tab= until the user switches, else the
@@ -103,6 +110,13 @@ export function WorkspaceScreen() {
 		if (params.tab) setPickedTerminalId(params.tab);
 	}, [params.tab]);
 
+	// Pin whatever ended up active, including the implicit first row: without
+	// this, reordering in the sessions sheet moves a different row into first
+	// place and the terminal you're watching switches out from under you.
+	useEffect(() => {
+		if (activeTerminalId) setPickedTerminalId(activeTerminalId);
+	}, [activeTerminalId]);
+
 	// Port of desktop's useClearActivePaneAttention: viewing the tab clears
 	// its `review` state by advancing the seen mark to the binding's last
 	// event (host clock — never the device clock).
@@ -126,6 +140,12 @@ export function WorkspaceScreen() {
 	const openAddMenu = useCallback(() => {
 		router.push(`/(authenticated)/workspace/${id}/new-session`);
 	}, [router, id]);
+
+	const openSessions = useCallback(() => {
+		router.push(
+			`/(authenticated)/workspace/${id}/sessions?active=${activeTerminalId ?? ""}`,
+		);
+	}, [router, id, activeTerminalId]);
 
 	const killTerminal = useCallback(
 		(terminalId: string) => {
@@ -239,6 +259,7 @@ export function WorkspaceScreen() {
 				activeTerminalId={activeTerminalId}
 				onSelect={setPickedTerminalId}
 				onAdd={openAddMenu}
+				onManage={openSessions}
 				onClose={killTerminal}
 			/>
 
