@@ -261,10 +261,6 @@ export const automationRouter = {
 						targetHostId,
 						v2ProjectId,
 						v2WorkspaceId: input.v2WorkspaceId ?? null,
-						rrule: input.rrule,
-						dtstart,
-						timezone: input.timezone,
-						nextRunAt,
 					})
 					.returning();
 
@@ -296,7 +292,16 @@ export const automationRouter = {
 				return row;
 			});
 
-			return { ...created, scheduleText: safeDescribeRrule(created) };
+			// The schedule comes from the input rather than the row: it now lives on
+			// the trigger, so the columns on `created` are null.
+			return {
+				...created,
+				rrule: input.rrule,
+				dtstart,
+				timezone: input.timezone,
+				nextRunAt,
+				scheduleText: describeSchedule(input.rrule),
+			};
 		}),
 
 	update: protectedProcedure
@@ -421,12 +426,6 @@ export const automationRouter = {
 						targetHostId: nextTargetHostId,
 						v2ProjectId: nextProjectId,
 						v2WorkspaceId: nextWorkspaceId,
-						rrule: nextRrule,
-						dtstart: nextDtstart,
-						timezone: nextTimezone,
-						// undefined leaves the column alone. Null only arises from a
-						// trigger with no next occurrence, which is already disabled.
-						nextRunAt: recomputedNextRunAt ?? undefined,
 					})
 					.where(eq(automations.id, input.id))
 					.returning();
@@ -451,7 +450,14 @@ export const automationRouter = {
 				return row;
 			});
 
-			return { ...updated, scheduleText: safeDescribeRrule(updated) };
+			return {
+				...updated,
+				rrule: nextRrule,
+				dtstart: nextDtstart,
+				timezone: nextTimezone,
+				nextRunAt: recomputedNextRunAt,
+				scheduleText: describeSchedule(nextRrule),
+			};
 		}),
 
 	getPrompt: protectedProcedure
@@ -515,7 +521,15 @@ export const automationRouter = {
 				return row;
 			});
 
-			return { ...updated, scheduleText: safeDescribeRrule(updated) };
+			// `updated` is the automations row; the schedule comes from the trigger.
+			return {
+				...updated,
+				rrule: existing.rrule,
+				dtstart: existing.dtstart,
+				timezone: existing.timezone,
+				nextRunAt: existing.nextRunAt,
+				scheduleText: describeSchedule(existing.rrule),
+			};
 		}),
 
 	delete: protectedProcedure
@@ -539,24 +553,22 @@ export const automationRouter = {
 				input.id,
 			);
 
-			// When resuming, recompute next_run_at from now so we don't fire stale
+			// When resuming, recompute the next run from now so we don't fire stale
 			// occurrences that accumulated while paused.
-			const patch: { enabled: boolean; nextRunAt?: Date } = {
-				enabled: input.enabled,
-			};
-			if (input.enabled && !existing.enabled) {
-				patch.nextRunAt = parseRrule({
-					rrule: existing.rrule,
-					dtstart: existing.dtstart,
-					timezone: existing.timezone,
-					after: new Date(),
-				}).nextRunAt;
-			}
+			const resumedNextRunAt =
+				input.enabled && !existing.enabled
+					? parseRrule({
+							rrule: existing.rrule,
+							dtstart: existing.dtstart,
+							timezone: existing.timezone,
+							after: new Date(),
+						}).nextRunAt
+					: existing.nextRunAt;
 
 			const updated = await dbWs.transaction(async (tx) => {
 				const [row] = await tx
 					.update(automations)
-					.set(patch)
+					.set({ enabled: input.enabled })
 					.where(eq(automations.id, input.id))
 					.returning();
 
@@ -570,17 +582,24 @@ export const automationRouter = {
 				await syncScheduleTrigger(tx, {
 					automationId: row.id,
 					organizationId,
-					rrule: row.rrule,
-					dtstart: row.dtstart,
-					timezone: row.timezone,
-					nextRunAt: row.nextRunAt,
+					rrule: existing.rrule,
+					dtstart: existing.dtstart,
+					timezone: existing.timezone,
+					nextRunAt: resumedNextRunAt,
 					enabled: row.enabled,
 				});
 
 				return row;
 			});
 
-			return { ...updated, scheduleText: safeDescribeRrule(updated) };
+			return {
+				...updated,
+				rrule: existing.rrule,
+				dtstart: existing.dtstart,
+				timezone: existing.timezone,
+				nextRunAt: resumedNextRunAt,
+				scheduleText: describeSchedule(existing.rrule),
+			};
 		}),
 
 	runNow: protectedProcedure

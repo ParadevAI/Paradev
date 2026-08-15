@@ -689,15 +689,17 @@ export const automations = pgTable(
 		v2ProjectId: uuid("v2_project_id"),
 		v2WorkspaceId: uuid("v2_workspace_id"),
 
-		rrule: text().notNull(),
-		dtstart: timestamp("dtstart", { withTimezone: true }).notNull(),
-		timezone: text().notNull(),
+		// Dead: the schedule lives in the automation's `schedule` trigger. Nothing
+		// reads or writes these; nullable so the writes could stop, dropped next.
+		rrule: text(),
+		dtstart: timestamp("dtstart", { withTimezone: true }),
+		timezone: text(),
 
 		enabled: boolean().notNull().default(true),
 
 		mcpScope: jsonb("mcp_scope").$type<string[]>().notNull().default([]),
 
-		nextRunAt: timestamp("next_run_at", { withTimezone: true }).notNull(),
+		nextRunAt: timestamp("next_run_at", { withTimezone: true }),
 
 		createdAt: timestamp("created_at", { withTimezone: true })
 			.notNull()
