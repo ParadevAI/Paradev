@@ -2,6 +2,7 @@ import { db, dbWs } from "@superset/db/client";
 import {
 	automationRuns,
 	automations,
+	automationTriggers,
 	v2Hosts,
 	v2UsersHosts,
 	v2Workspaces,
@@ -12,16 +13,19 @@ import {
 	parseRrule,
 } from "@superset/shared/rrule";
 import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
-import { and, desc, eq, getTableColumns, ilike } from "drizzle-orm";
+import { and, desc, eq, ilike } from "drizzle-orm";
 import { z } from "zod";
 import { resolveUserRelayUrl } from "../../lib/relay-url";
 import { protectedProcedure } from "../../trpc";
 import { requireActiveOrgMembership } from "../utils/active-org";
 import { dispatchAutomation } from "./dispatch";
 import {
+	automationBaseColumns,
 	getAutomationForUser,
+	onScheduleTrigger,
 	promptSourceFromSession,
 	recordPromptVersion,
+	scheduleTriggerColumns,
 	syncScheduleTrigger,
 } from "./helpers";
 import {
@@ -131,10 +135,10 @@ export const automationRouter = {
 		.query(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
 
-			const { prompt: _prompt, ...summaryCols } = getTableColumns(automations);
 			const rows = await db
-				.select(summaryCols)
+				.select({ ...automationBaseColumns, ...scheduleTriggerColumns })
 				.from(automations)
+				.innerJoin(automationTriggers, onScheduleTrigger)
 				.where(
 					and(
 						eq(automations.organizationId, organizationId),
@@ -161,10 +165,10 @@ export const automationRouter = {
 		.query(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
 
-			const { prompt: _prompt, ...summaryCols } = getTableColumns(automations);
 			const [row] = await db
-				.select(summaryCols)
+				.select({ ...automationBaseColumns, ...scheduleTriggerColumns })
 				.from(automations)
+				.innerJoin(automationTriggers, onScheduleTrigger)
 				.where(
 					and(
 						eq(automations.id, input.id),
@@ -420,7 +424,9 @@ export const automationRouter = {
 						rrule: nextRrule,
 						dtstart: nextDtstart,
 						timezone: nextTimezone,
-						nextRunAt: recomputedNextRunAt,
+						// undefined leaves the column alone. Null only arises from a
+						// trigger with no next occurrence, which is already disabled.
+						nextRunAt: recomputedNextRunAt ?? undefined,
 					})
 					.where(eq(automations.id, input.id))
 					.returning();

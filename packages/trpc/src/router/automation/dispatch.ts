@@ -26,8 +26,25 @@ export type DispatchOutcome =
 	| { status: "dispatch_failed"; runId: string | null; error: string }
 	| { status: "conflict" };
 
+/**
+ * Only what dispatch actually reads. Deliberately excludes the schedule
+ * columns, which live on the automation's trigger.
+ */
+export type DispatchableAutomation = Pick<
+	SelectAutomation,
+	| "id"
+	| "name"
+	| "organizationId"
+	| "ownerUserId"
+	| "agent"
+	| "prompt"
+	| "targetHostId"
+	| "v2ProjectId"
+	| "v2WorkspaceId"
+>;
+
 export interface DispatchOptions {
-	automation: SelectAutomation;
+	automation: DispatchableAutomation;
 	scheduledFor: Date;
 	relayUrl: string;
 }
@@ -187,7 +204,7 @@ export async function dispatchAutomation(
 }
 
 async function resolveCandidateHosts(
-	automation: SelectAutomation,
+	automation: DispatchableAutomation,
 ): Promise<Array<typeof v2Hosts.$inferSelect>> {
 	if (automation.targetHostId) {
 		const [host] = await dbWs
@@ -238,7 +255,7 @@ async function resolveCandidateHosts(
  * candidate wins, preserving the updatedAt ordering.
  */
 async function pickOnlineHost(
-	automation: SelectAutomation,
+	automation: DispatchableAutomation,
 	relayUrl: string,
 	candidates: Array<typeof v2Hosts.$inferSelect>,
 ): Promise<typeof v2Hosts.$inferSelect | null> {
@@ -265,7 +282,7 @@ async function pickOnlineHost(
 }
 
 async function recordSkipped(
-	automation: SelectAutomation,
+	automation: DispatchableAutomation,
 	scheduledFor: Date,
 	hostId: string | null,
 	error: string,
@@ -294,7 +311,7 @@ async function createWorkspaceOnHost(args: {
 	hostId: string;
 	jwt: string;
 	projectId: string | null;
-	automation: SelectAutomation;
+	automation: DispatchableAutomation;
 	runId: string;
 }): Promise<{ workspaceId: string }> {
 	// Session automation: no project, no branch. The host allocates a managed

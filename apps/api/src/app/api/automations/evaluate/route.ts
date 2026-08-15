@@ -73,7 +73,9 @@ export async function POST(request: Request): Promise<Response> {
 			jsonb_build_object(
 				'kind', 'schedule',
 				'rrule', a.rrule,
-				'dtstart', to_char(a.dtstart AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"'),
+				-- Milliseconds included so the config is a lossless mirror of the
+				-- column; Date.toISOString() on the write path carries them too.
+				'dtstart', to_char(a.dtstart AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
 				'timezone', a.timezone
 			),
 			a.enabled, a.next_run_at
