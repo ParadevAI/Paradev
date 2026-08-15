@@ -533,6 +533,13 @@
       "when": 1786834191894,
       "tag": "0075_drop_automations_schedule_columns",
       "breakpoints": true
+    },
+    {
+      "idx": 76,
+      "version": "7",
+      "when": 1786836474565,
+      "tag": "0076_webhook_payload_nullable",
+      "breakpoints": true
     }
   ]
 }
