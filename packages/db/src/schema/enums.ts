@@ -44,21 +44,19 @@ export const commandStatusValues = [
 export const commandStatusEnum = z.enum(commandStatusValues);
 export type CommandStatus = z.infer<typeof commandStatusEnum>;
 
-export const sandboxStatusValues = [
-	"pending",
-	"spawning",
-	"connecting",
-	"warming",
-	"syncing",
+/**
+ * No sleep/wake states: the provider wakes a sandbox on the first inbound
+ * connection, so "asleep" is invisible to callers and could only ever be
+ * reported stale. `ready` means addressable, awake or not.
+ */
+export const cloudWorkspaceStatusValues = [
+	"provisioning",
 	"ready",
-	"running",
-	"stale",
-	"snapshotting",
-	"stopped",
 	"failed",
+	"deleted",
 ] as const;
-export const sandboxStatusEnum = z.enum(sandboxStatusValues);
-export type SandboxStatus = z.infer<typeof sandboxStatusEnum>;
+export const cloudWorkspaceStatusEnum = z.enum(cloudWorkspaceStatusValues);
+export type CloudWorkspaceStatus = z.infer<typeof cloudWorkspaceStatusEnum>;
 
 export const workspaceTypeValues = ["local", "cloud"] as const;
 export const workspaceTypeEnum = z.enum(workspaceTypeValues);

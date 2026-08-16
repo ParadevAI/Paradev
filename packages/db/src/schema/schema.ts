@@ -22,6 +22,7 @@ import {
 	automationRunStatusValues,
 	automationSessionKindValues,
 	automationTriggerKindValues,
+	cloudWorkspaceStatusValues,
 	commandStatusValues,
 	desktopNoticeCtaActionValues,
 	desktopNoticeSeverityValues,
@@ -45,6 +46,10 @@ export const integrationProvider = pgEnum(
 	integrationProviderValues,
 );
 export const commandStatus = pgEnum("command_status", commandStatusValues);
+export const cloudWorkspaceStatus = pgEnum(
+	"cloud_workspace_status",
+	cloudWorkspaceStatusValues,
+);
 export const v2ClientType = pgEnum("v2_client_type", v2ClientTypeValues);
 export const v2UsersHostRole = pgEnum(
 	"v2_users_host_role",
@@ -407,6 +412,58 @@ export const v2Projects = pgTable(
 
 export type InsertV2Project = typeof v2Projects.$inferInsert;
 export type SelectV2Project = typeof v2Projects.$inferSelect;
+
+/**
+ * Deliberately not a `v2_hosts` row: a sandbox is 1:1 with a workspace rather
+ * than a machine hosting many, and registering one would both put it in the
+ * device picker and require an outbound relay socket, which fights the
+ * provider's wake-on-inbound sleep. Clients reach it directly at `sandbox_url`
+ * with a token brokered by the cloud.
+ */
+export const cloudWorkspaces = pgTable(
+	"cloud_workspaces",
+	{
+		id: uuid().primaryKey().defaultRandom(),
+		organizationId: uuid("organization_id")
+			.notNull()
+			.references(() => organizations.id, { onDelete: "cascade" }),
+		projectId: uuid("project_id")
+			.notNull()
+			.references(() => v2Projects.id, { onDelete: "cascade" }),
+		// Creation inputs, not the workspace's identity: the sandbox's own
+		// host.db owns the workspace row (name, branch) once it is seeded, the
+		// same way every other host does. Read these to provision a sandbox,
+		// never to display one — a rename lands on the sandbox and leaves these
+		// behind.
+		name: text().notNull(),
+		branch: text().notNull(),
+		provider: text().notNull().default("blaxel"),
+		providerSandboxId: text("provider_sandbox_id").notNull(),
+		sandboxUrl: text("sandbox_url"),
+		status: cloudWorkspaceStatus().notNull().default("provisioning"),
+		createdByUserId: uuid("created_by_user_id").references(() => users.id, {
+			onDelete: "set null",
+		}),
+		createdAt: timestamp("created_at", { withTimezone: true })
+			.notNull()
+			.defaultNow(),
+		updatedAt: timestamp("updated_at", { withTimezone: true })
+			.notNull()
+			.defaultNow()
+			.$onUpdate(() => new Date()),
+	},
+	(table) => [
+		index("cloud_workspaces_organization_id_idx").on(table.organizationId),
+		index("cloud_workspaces_project_id_idx").on(table.projectId),
+		unique("cloud_workspaces_provider_sandbox_id_unique").on(
+			table.provider,
+			table.providerSandboxId,
+		),
+	],
+);
+
+export type InsertCloudWorkspace = typeof cloudWorkspaces.$inferInsert;
+export type SelectCloudWorkspace = typeof cloudWorkspaces.$inferSelect;
 
 export const v2Hosts = pgTable(
 	"v2_hosts",
