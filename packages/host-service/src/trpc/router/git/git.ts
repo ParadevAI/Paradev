@@ -109,6 +109,18 @@ function assertSafeRelativePath(filePath: string): void {
 	}
 }
 
+/** Delete for a discard. Recursive because an untracked or staged-as-added
+ * path can be a directory (an embedded git repository is reported as one
+ * entry, never expanded into files), and confined to the worktree because
+ * assertSafeRelativePath runs on the caller-relative path first. */
+async function removeFromWorktree(
+	worktreePath: string,
+	relativePath: string,
+): Promise<void> {
+	assertSafeRelativePath(relativePath);
+	await rm(join(worktreePath, relativePath), { recursive: true, force: true });
+}
+
 /** Upper bound for one getDiffStatsByWorkspaces call — a page's host rarely
  * has more than a few dozen workspaces; anything larger is a runaway caller. */
 export const MAX_DIFF_STATS_BATCH = 500;
@@ -463,7 +475,7 @@ export const gitRouter = router({
 			const status = await git.status();
 			const isUntracked = status.not_added.includes(input.filePath);
 			if (isUntracked) {
-				await rm(join(worktreePath, input.filePath), { force: true });
+				await removeFromWorktree(worktreePath, input.filePath);
 			} else {
 				await git.raw(["checkout", "HEAD", "--", input.filePath]);
 			}
@@ -527,7 +539,7 @@ export const gitRouter = router({
 				await git.raw(["checkout", "HEAD", "--", ...checkoutHeadPaths]);
 			}
 			for (const filePath of deletePaths) {
-				await rm(join(worktreePath, filePath), { force: true });
+				await removeFromWorktree(worktreePath, filePath);
 			}
 			return { success: true };
 		}),
