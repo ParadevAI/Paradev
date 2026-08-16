@@ -43,11 +43,15 @@ export type DispatchableAutomation = Pick<
 	| "v2WorkspaceId"
 >;
 
-export interface DispatchOptions {
+/** What caused this run: a schedule with a due minute, or a matched event. */
+export type DispatchCause =
+	| { scheduledFor: Date; trigger?: null }
+	| { scheduledFor?: null; trigger: { triggerId: string; eventId: string } };
+
+export type DispatchOptions = {
 	automation: DispatchableAutomation;
-	scheduledFor: Date;
 	relayUrl: string;
-}
+} & DispatchCause;
 
 /**
  * Run one automation: resolve host, (maybe) create a workspace, start the
@@ -59,7 +63,9 @@ export interface DispatchOptions {
 export async function dispatchAutomation(
 	opts: DispatchOptions,
 ): Promise<DispatchOutcome> {
-	const { automation, scheduledFor, relayUrl } = opts;
+	const { automation, relayUrl } = opts;
+	const scheduledFor = opts.scheduledFor ?? null;
+	const trigger = opts.trigger ?? null;
 
 	const candidates = await resolveCandidateHosts(automation);
 	if (candidates.length === 0) {
@@ -87,6 +93,8 @@ export async function dispatchAutomation(
 			organizationId: automation.organizationId,
 			title: automation.name,
 			scheduledFor,
+			triggerId: trigger?.triggerId ?? null,
+			eventId: trigger?.eventId ?? null,
 			hostId: host.machineId,
 			status: "dispatching",
 		})
@@ -283,7 +291,7 @@ async function pickOnlineHost(
 
 async function recordSkipped(
 	automation: DispatchableAutomation,
-	scheduledFor: Date,
+	scheduledFor: Date | null,
 	hostId: string | null,
 	error: string,
 ): Promise<{ id: string } | undefined> {

@@ -52,10 +52,20 @@ export function isEmptyActor(actor: TriggerActor): boolean {
 const rrule = z.string().min(1).max(500);
 const iana = z.string().min(1);
 
-/** A free-text match over a comment body, optionally as a regex. */
+/**
+ * A free-text match over a comment body.
+ *
+ * `isRegex` is pinned to false. A user-supplied pattern is evaluated on the
+ * webhook path, and JavaScript's engine backtracks: `^(a+)+$` against a
+ * non-matching body doubles in cost every two characters — 408ms at 28
+ * characters, and never finishing at a realistic comment length. Truncating the
+ * body bounds nothing, because the blowup happens within the first few dozen
+ * characters. Substring matching covers the common case; regex returns with a
+ * linear-time engine.
+ */
 export const textFilterSchema = z.object({
 	pattern: z.string().max(500),
-	isRegex: z.boolean().default(false),
+	isRegex: z.literal(false).default(false),
 });
 export type TextFilter = z.infer<typeof textFilterSchema>;
 

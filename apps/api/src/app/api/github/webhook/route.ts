@@ -2,7 +2,12 @@ import { db } from "@superset/db/client";
 import { webhookEvents } from "@superset/db/schema";
 import { eq, sql } from "drizzle-orm";
 import { stripNullChars } from "@/lib/strip-null-chars";
-import { recordAutomationEvent } from "./recordAutomationEvent";
+import { dispatchMatchingTriggers } from "./dispatchMatchingTriggers";
+import {
+	type GithubPayload,
+	qualifiedEventType,
+	recordAutomationEvent,
+} from "./recordAutomationEvent";
 import { webhooks } from "./webhooks";
 
 export async function POST(request: Request) {
@@ -86,7 +91,25 @@ export async function POST(request: Request) {
 				payload,
 				webhookEventId: webhookEvent.id,
 			});
-			if (!recorded.recorded) {
+			if (recorded.recorded && recorded.eventId && recorded.organizationId) {
+				const result = await dispatchMatchingTriggers({
+					organizationId: recorded.organizationId,
+					eventId: recorded.eventId,
+					eventType: qualifiedEventType(
+						eventType ?? "unknown",
+						payload as GithubPayload,
+					),
+					repositoryId: recorded.repositoryId ?? null,
+					ref: recorded.ref ?? null,
+					payload: payload as GithubPayload,
+				});
+				if (result.matched > 0) {
+					console.log(
+						`[github/webhook] ${result.matched}/${result.considered} triggers matched:`,
+						eventId,
+					);
+				}
+			} else {
 				console.log(
 					`[github/webhook] Not recorded as automation event (${recorded.reason}):`,
 					eventId,

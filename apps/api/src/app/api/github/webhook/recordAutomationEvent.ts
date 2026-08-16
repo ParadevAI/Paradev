@@ -27,15 +27,17 @@ export type GithubPayload = {
 	author_association?: string;
 	pull_request?: {
 		number?: number;
+		labels?: Array<{ name?: string }>;
 		title?: string;
 		html_url?: string;
-		head?: { ref?: string };
+		head?: { ref?: string; repo?: { fork?: boolean } };
 		user?: { login?: string };
 		draft?: boolean;
 		author_association?: string;
 	};
 	issue?: {
 		number?: number;
+		labels?: Array<{ name?: string }>;
 		title?: string;
 		html_url?: string;
 		user?: { login?: string };
@@ -46,7 +48,12 @@ export type GithubPayload = {
 		user?: { login?: string };
 		author_association?: string;
 	};
-	review?: { state?: string; html_url?: string; user?: { login?: string } };
+	review?: {
+		state?: string;
+		body?: string;
+		html_url?: string;
+		user?: { login?: string };
+	};
 	ref?: string;
 	workflow_run?: { conclusion?: string; html_url?: string; name?: string };
 	check_suite?: { conclusion?: string };
@@ -102,6 +109,17 @@ export function actorIsExternalFor(payload: GithubPayload): boolean | null {
 	return !["OWNER", "MEMBER", "COLLABORATOR"].includes(association);
 }
 
+/**
+ * `action` is what distinguishes opened from closed from labeled; the bare
+ * event name is too coarse to match on.
+ */
+export function qualifiedEventType(
+	eventType: string,
+	payload: GithubPayload,
+): string {
+	return payload.action ? `${eventType}.${payload.action}` : eventType;
+}
+
 export function urlFor(payload: GithubPayload): string | null {
 	return (
 		payload.comment?.html_url ??
@@ -118,7 +136,14 @@ export async function recordAutomationEvent(params: {
 	deliveryId: string;
 	payload: unknown;
 	webhookEventId: string;
-}): Promise<{ recorded: boolean; reason?: string }> {
+}): Promise<{
+	recorded: boolean;
+	reason?: string;
+	eventId?: string;
+	organizationId?: string;
+	repositoryId?: string | null;
+	ref?: string | null;
+}> {
 	const payload = params.payload as GithubPayload;
 
 	const installationId = payload.installation?.id;
@@ -138,13 +163,13 @@ export async function recordAutomationEvent(params: {
 		return { recorded: false, reason: "unknown installation" };
 	}
 
-	// `action` is what distinguishes opened from closed from labeled; the bare
-	// event name is too coarse to match on.
-	const qualified = payload.action
-		? `${params.eventType}.${payload.action}`
-		: params.eventType;
+	const qualified = qualifiedEventType(params.eventType, payload);
 
-	await db
+	const repositoryId =
+		payload.repository?.id !== undefined ? String(payload.repository.id) : null;
+	const ref = payload.pull_request?.head?.ref ?? payload.ref ?? null;
+
+	const [inserted] = await db
 		.insert(automationEvents)
 		.values({
 			organizationId: installation.organizationId,
@@ -159,11 +184,8 @@ export async function recordAutomationEvent(params: {
 			url: urlFor(payload),
 			// The numeric id, not the full name: a repository can be renamed and
 			// triggers must keep matching it afterwards.
-			repositoryId:
-				payload.repository?.id !== undefined
-					? String(payload.repository.id)
-					: null,
-			ref: payload.pull_request?.head?.ref ?? payload.ref ?? null,
+			repositoryId,
+			ref,
 			actorLogin: payload.sender?.login ?? null,
 			actorIsExternal: actorIsExternalFor(payload),
 			// jsonb rejects \u0000, and a payload carrying one would otherwise
@@ -178,7 +200,18 @@ export async function recordAutomationEvent(params: {
 				automationEvents.provider,
 				automationEvents.externalEventId,
 			],
-		});
+		})
+		.returning({ id: automationEvents.id });
 
-	return { recorded: true };
+	// Empty on a redelivery the dedupe swallowed; the first delivery already
+	// dispatched whatever this event matches.
+	if (!inserted) return { recorded: false, reason: "duplicate delivery" };
+
+	return {
+		recorded: true,
+		eventId: inserted.id,
+		organizationId: installation.organizationId,
+		repositoryId,
+		ref,
+	};
 }
