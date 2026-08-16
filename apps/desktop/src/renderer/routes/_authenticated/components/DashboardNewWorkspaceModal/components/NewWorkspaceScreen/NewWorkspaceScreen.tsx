@@ -119,6 +119,12 @@ export function NewWorkspaceScreen({
 	const setLastHostId = useV2WorkspaceCreateDefaultsStore(
 		(state) => state.setLastHostId,
 	);
+	const samplePromptsDismissed = useV2WorkspaceCreateDefaultsStore(
+		(state) => state.samplePromptsDismissed,
+	);
+	const setSamplePromptsDismissed = useV2WorkspaceCreateDefaultsStore(
+		(state) => state.setSamplePromptsDismissed,
+	);
 
 	useEffect(() => {
 		if (!isOpen) return;
@@ -357,6 +363,13 @@ export function NewWorkspaceScreen({
 	}, [draft.hostId, machineId, activeHostUrl, activeOrganizationId, relayUrl]);
 
 	const promptCardsVariant = useNewWorkspacePromptCardsVariant(isOpen);
+	// Logged so the prompt-cards experiment can account for lost exposure.
+	const handleDismissSamplePrompts = useCallback(() => {
+		track("new_workspace_sample_prompts_dismissed", {
+			layout: promptCardsVariant === "test" ? "cards" : "rows",
+		});
+		setSamplePromptsDismissed(true);
+	}, [promptCardsVariant, setSamplePromptsDismissed]);
 
 	const { agents: v2Agents, isFetched: v2AgentsFetched } =
 		useV2AgentChoices(launchHostUrl);
@@ -601,26 +614,32 @@ export function NewWorkspaceScreen({
 			</div>
 			<div className="relative flex w-full max-w-[640px] flex-col px-6 pb-8">
 				<AnimatePresence initial={false}>
-					{isPromptEmpty && promptCardsVariant !== null && (
-						<motion.div
-							key="sample-prompts"
-							initial={{ opacity: 0, y: 12 }}
-							animate={{ opacity: 1, y: 0 }}
-							exit={{ opacity: 0, transition: { duration: 0 } }}
-							transition={{ type: "tween", duration: 0.15, ease: "easeOut" }}
-							className="absolute inset-x-6 bottom-full mb-1"
-						>
-							{promptCardsVariant === "test" ? (
-								<SamplePromptCards
-									hostUrl={launchHostUrl}
-									projectId={projectId}
-									onSelect={applyPrompt}
-								/>
-							) : (
-								<SamplePrompts onSelect={applyPrompt} />
-							)}
-						</motion.div>
-					)}
+					{isPromptEmpty &&
+						promptCardsVariant !== null &&
+						!samplePromptsDismissed && (
+							<motion.div
+								key="sample-prompts"
+								initial={{ opacity: 0, y: 12 }}
+								animate={{ opacity: 1, y: 0 }}
+								exit={{ opacity: 0, transition: { duration: 0 } }}
+								transition={{ type: "tween", duration: 0.15, ease: "easeOut" }}
+								className="absolute inset-x-6 bottom-full mb-1"
+							>
+								{promptCardsVariant === "test" ? (
+									<SamplePromptCards
+										hostUrl={launchHostUrl}
+										projectId={projectId}
+										onSelect={applyPrompt}
+										onDismiss={handleDismissSamplePrompts}
+									/>
+								) : (
+									<SamplePrompts
+										onSelect={applyPrompt}
+										onDismiss={handleDismissSamplePrompts}
+									/>
+								)}
+							</motion.div>
+						)}
 				</AnimatePresence>
 				<PromptInput
 					onSubmit={handleSubmit}
