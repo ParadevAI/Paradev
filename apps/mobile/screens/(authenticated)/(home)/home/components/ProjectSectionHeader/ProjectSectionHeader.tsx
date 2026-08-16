@@ -29,7 +29,7 @@ export function ProjectSectionHeader({
 	return (
 		<Pressable
 			onPress={onToggle}
-			accessibilityLabel={`${name}, ${count} workspaces`}
+			accessibilityLabel={`${name}, ${count} ${count === 1 ? "workspace" : "workspaces"}`}
 			accessibilityState={{ expanded: !collapsed }}
 			className="flex-row items-center gap-2.5 px-4 pb-1 pt-4 active:opacity-60"
 		>

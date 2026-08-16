@@ -211,8 +211,10 @@ export function HomeScreen() {
 				project,
 				workspaces: (byProject.get(project.id) ?? []).sort(byPinThenActivity),
 			}))
-			// A search shouldn't advertise projects it found nothing in.
-			.filter((section) => !searching || section.workspaces.length > 0)
+			// An empty section is a row that says nothing and does nothing — the
+			// composer's project picker is where you start work in a project that
+			// has none yet.
+			.filter((section) => section.workspaces.length > 0)
 			.sort((a, b) => {
 				// Sections rank by their liveliest workspace, so the project you
 				// were last in leads; empty ones fall to the bottom alphabetically.
