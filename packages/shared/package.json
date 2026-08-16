@@ -4,6 +4,10 @@
 	"private": true,
 	"type": "module",
 	"exports": {
+		"./automation-triggers": {
+			"types": "./src/automation-triggers.ts",
+			"default": "./src/automation-triggers.ts"
+		},
 		"./constants": {
 			"types": "./src/constants.ts",
 			"default": "./src/constants.ts"

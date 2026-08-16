@@ -142,8 +142,11 @@ export const scheduleTriggerColumns = {
 };
 
 /**
- * Joins an automation to its schedule trigger. Inner join is safe: every
- * automation has exactly one, enforced by a partial unique index.
+ * Joins an automation to its schedule trigger, if it has one.
+ *
+ * Left, not inner: an automation whose triggers are all event-based has no
+ * schedule row, and an inner join would drop it from every listing — the
+ * automation would look deleted rather than event-driven.
  */
 export const onScheduleTrigger = and(
 	eq(automationTriggers.automationId, automations.id),
@@ -181,7 +184,7 @@ export async function getAutomationForUser(
 			...scheduleTriggerColumns,
 		})
 		.from(automations)
-		.innerJoin(automationTriggers, onScheduleTrigger)
+		.leftJoin(automationTriggers, onScheduleTrigger)
 		.where(
 			and(
 				eq(automations.id, id),
