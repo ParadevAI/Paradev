@@ -1,15 +1,23 @@
 import { SparklesIcon } from "lucide-react";
+import { useState } from "react";
 import { track } from "renderer/lib/analytics";
-import { SAMPLE_PROMPTS } from "./constants";
+import { shuffledSamplePrompts } from "./constants";
+
+/** The rows layout stays scannable at 4; the pool is bigger for variety. */
+const ROW_COUNT = 4;
 
 interface SamplePromptsProps {
 	onSelect: (prompt: string) => void;
 }
 
 export function SamplePrompts({ onSelect }: SamplePromptsProps) {
+	// Shuffled once per mount so every prompt in the pool gets exposure;
+	// re-shuffling per render would reorder rows under the pointer.
+	const [shuffledPrompts] = useState(shuffledSamplePrompts);
+
 	return (
 		<div className="flex flex-col items-start gap-0.5 px-1 pb-2">
-			{SAMPLE_PROMPTS.map((sample) => (
+			{shuffledPrompts.slice(0, ROW_COUNT).map((sample) => (
 				<button
 					key={sample.id}
 					type="button"

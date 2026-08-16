@@ -1,16 +1,28 @@
 import { useQuery } from "@tanstack/react-query";
-import { BookOpenIcon, BugIcon, WrenchIcon } from "lucide-react";
+import {
+	BookOpenIcon,
+	BugIcon,
+	FlaskConicalIcon,
+	ListChecksIcon,
+	ScrollTextIcon,
+	WrenchIcon,
+} from "lucide-react";
+import { useState } from "react";
 import { track } from "renderer/lib/analytics";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
-import { SAMPLE_PROMPTS } from "../SamplePrompts/constants";
+import { shuffledSamplePrompts } from "../SamplePrompts/constants";
+import { AgentLogoCluster } from "./components/AgentLogoCluster";
 
 const CARD_ICONS: Record<string, typeof WrenchIcon> = {
 	"set-up-project": WrenchIcon,
 	"explain-repo": BookOpenIcon,
 	"fix-small-bug": BugIcon,
+	"improve-agent-docs": ScrollTextIcon,
+	"add-missing-tests": FlaskConicalIcon,
+	"clean-up-todos": ListChecksIcon,
 };
 
-const CARD_COUNT = 2;
+const CARD_COUNT = 4;
 
 interface SamplePromptCardsProps {
 	hostUrl: string | null;
@@ -23,6 +35,10 @@ export function SamplePromptCards({
 	projectId,
 	onSelect,
 }: SamplePromptCardsProps) {
+	// Shuffled once per mount so every prompt in the pool gets exposure;
+	// re-shuffling per render would reorder cards under the pointer.
+	const [shuffledPrompts] = useState(shuffledSamplePrompts);
+
 	// Setup takes 75% of all prompt clicks, so it leads — but pitching setup for
 	// a project that already has setup/teardown/run commands reads as noise.
 	// Same query the v2 sidebar setup card uses.
@@ -41,37 +57,47 @@ export function SamplePromptCards({
 	// Deciding mid-flight would swap a card out from under the pointer.
 	if (canCheckSetup && isPending) return null;
 
-	const cards = SAMPLE_PROMPTS.filter(
-		(sample) => sample.id !== "set-up-project" || needsSetupScripts === true,
-	).slice(0, CARD_COUNT);
+	const setupCard = shuffledPrompts.find(
+		(sample) => sample.id === "set-up-project",
+	);
+	const cards = [
+		...(needsSetupScripts === true && setupCard ? [setupCard] : []),
+		...shuffledPrompts.filter((sample) => sample.id !== "set-up-project"),
+	].slice(0, CARD_COUNT);
 
 	return (
-		<div className="grid grid-cols-2 gap-2 px-1 pb-2">
-			{cards.map((sample) => {
-				const Icon = CARD_ICONS[sample.id] ?? WrenchIcon;
-				return (
-					<button
-						key={sample.id}
-						type="button"
-						className="flex cursor-pointer flex-col items-start gap-1.5 rounded-xl border-[0.5px] border-border bg-foreground/[0.02] p-3 text-left transition-colors hover:border-foreground/20 hover:bg-foreground/[0.05]"
-						onClick={() => {
-							track("new_workspace_sample_prompt_clicked", {
-								prompt_id: sample.id,
-								layout: "cards",
-							});
-							onSelect(sample.prompt);
-						}}
-					>
-						<Icon className="size-3.5 shrink-0 text-muted-foreground" />
-						<span className="text-sm font-medium text-foreground/90">
-							{sample.label}
-						</span>
-						<span className="text-xs text-muted-foreground">
-							{sample.description}
-						</span>
-					</button>
-				);
-			})}
+		<div className="px-1 pb-2">
+			<div className="grid grid-cols-2 gap-1.5 rounded-2xl border-[0.5px] border-border/60 bg-foreground/[0.03] p-1.5">
+				{cards.map((sample) => {
+					const Icon = CARD_ICONS[sample.id] ?? WrenchIcon;
+					return (
+						<button
+							key={sample.id}
+							type="button"
+							className="flex cursor-pointer flex-col items-start gap-1.5 rounded-[11px] bg-background/70 p-3 text-left transition-colors hover:bg-foreground/[0.06]"
+							onClick={() => {
+								track("new_workspace_sample_prompt_clicked", {
+									prompt_id: sample.id,
+									layout: "cards",
+								});
+								onSelect(sample.prompt);
+							}}
+						>
+							{sample.id === "improve-agent-docs" ? (
+								<AgentLogoCluster />
+							) : (
+								<Icon className="size-3.5 shrink-0 text-muted-foreground" />
+							)}
+							<span className="text-sm font-medium text-foreground/90">
+								{sample.label}
+							</span>
+							<span className="text-xs text-muted-foreground">
+								{sample.description}
+							</span>
+						</button>
+					);
+				})}
+			</div>
 		</div>
 	);
 }

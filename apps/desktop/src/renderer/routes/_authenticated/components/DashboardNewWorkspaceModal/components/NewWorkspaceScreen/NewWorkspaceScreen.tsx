@@ -76,6 +76,7 @@ import { useSelectedHostProjectIds } from "../DashboardNewWorkspaceModalContent/
 import { AttachmentCard } from "./components/AttachmentCard";
 import { SamplePromptCards } from "./components/SamplePromptCards";
 import { SamplePrompts } from "./components/SamplePrompts";
+import { PROMPT_PLACEHOLDERS } from "./components/SamplePrompts/constants";
 
 interface NewWorkspaceScreenProps {
 	isOpen: boolean;
@@ -257,6 +258,26 @@ export function NewWorkspaceScreen({
 		selectSession,
 		updateDraft,
 	]);
+
+	// One suggestion per open. resetKey only bumps on resetDraft, so ordinary
+	// modal reopens roll their own counter; the tiptap Placeholder extension
+	// freezes its text at editor mount, so the roll also rides the editor key.
+	const [placeholderRoll, setPlaceholderRoll] = useState(0);
+	const wasOpenRef = useRef(isOpen);
+	useEffect(() => {
+		if (isOpen && !wasOpenRef.current) {
+			setPlaceholderRoll((roll) => roll + 1);
+		}
+		wasOpenRef.current = isOpen;
+	}, [isOpen]);
+	// biome-ignore lint/correctness/useExhaustiveDependencies: re-roll per draft reset and per open
+	const promptPlaceholder = useMemo(
+		() =>
+			PROMPT_PLACEHOLDERS[
+				Math.floor(Math.random() * PROMPT_PLACEHOLDERS.length)
+			] ?? "What do you want to do?",
+		[resetKey, placeholderRoll],
+	);
 
 	const projectId = draft.selectedProjectId;
 	const selectedProject = projects.find((project) => project.id === projectId);
@@ -664,13 +685,13 @@ export function NewWorkspaceScreen({
 						</div>
 					)}
 					<MarkdownEditor
-						key={`${resetKey}-${promptSeed}`}
+						key={`${resetKey}-${promptSeed}-${placeholderRoll}`}
 						content={draft.prompt}
 						onChange={(markdown) => updateDraft({ prompt: markdown })}
 						onPasteFiles={(files) => attachments.add(files)}
 						onEnterSubmit={handleSubmit}
 						autoFocus={draft.prompt ? "end" : "start"}
-						placeholder="What do you want to do?"
+						placeholder={promptPlaceholder}
 						className="flex flex-col min-h-[80px] max-h-[200px] px-3 pt-3"
 						editorClassName="overflow-y-auto text-sm"
 						features={{
@@ -699,6 +720,7 @@ export function NewWorkspaceScreen({
 									models={modelSupport.models}
 									value={selectedModel}
 									onValueChange={setSelectedModel}
+									defaultLabel="Default model"
 									triggerClassName={`${PILL_BUTTON_CLASS} px-1.5 gap-1 text-foreground w-auto max-w-[160px]`}
 								/>
 							)}
@@ -707,6 +729,7 @@ export function NewWorkspaceScreen({
 									models={effortSupport.efforts}
 									value={selectedEffort}
 									onValueChange={setSelectedEffort}
+									defaultLabel="Default effort"
 									triggerClassName={`${PILL_BUTTON_CLASS} px-1.5 gap-1 text-foreground w-auto max-w-[160px]`}
 								/>
 							)}

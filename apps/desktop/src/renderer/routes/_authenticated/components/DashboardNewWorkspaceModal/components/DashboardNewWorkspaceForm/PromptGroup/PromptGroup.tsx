@@ -576,6 +576,7 @@ export function PromptGroup({
 								models={modelSupport.models}
 								value={selectedModel}
 								onValueChange={setSelectedModel}
+								defaultLabel="Default model"
 								triggerClassName={`${PILL_BUTTON_CLASS} px-1.5 gap-1 text-foreground w-auto max-w-[160px]`}
 							/>
 						)}
@@ -584,6 +585,7 @@ export function PromptGroup({
 								models={effortSupport.efforts}
 								value={selectedEffort}
 								onValueChange={setSelectedEffort}
+								defaultLabel="Default effort"
 								triggerClassName={`${PILL_BUTTON_CLASS} px-1.5 gap-1 text-foreground w-auto max-w-[160px]`}
 							/>
 						)}
