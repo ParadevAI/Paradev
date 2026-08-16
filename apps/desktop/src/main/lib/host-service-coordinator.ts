@@ -312,11 +312,23 @@ export class HostServiceCoordinator extends EventEmitter {
 			try {
 				if (instance.pid > 0) killProcess(instance.pid, "SIGTERM");
 			} catch {}
-			removeManifest(organizationId);
+			this.removeManifestIfHeldBy(organizationId, instance.pid);
 		}
 
 		this.instances.delete(organizationId);
 		this.emitStatus(organizationId, "stopped", previousStatus);
+	}
+
+	/**
+	 * Remove the manifest only when `pid` holds it. Another live instance may
+	 * have claimed it since we spawned; deleting that claim would strand the
+	 * CLI ("host service isn't running") while the claimant still serves. An
+	 * unreadable manifest is left alone too — a torn read of a concurrent
+	 * writer's claim must not read as license to delete.
+	 */
+	private removeManifestIfHeldBy(organizationId: string, pid: number): void {
+		if (readManifest(organizationId)?.pid !== pid) return;
+		removeManifest(organizationId);
 	}
 
 	stopAll(): void {
@@ -781,7 +793,12 @@ export class HostServiceCoordinator extends EventEmitter {
 			if (this.instances.get(organizationId) === instance) {
 				this.instances.delete(organizationId);
 			}
-			if (!isStartAllowed()) removeManifest(organizationId);
+			// Whether cancelled or failed-to-start, the dying child must not
+			// leave a manifest naming its dead pid (the CLI would report
+			// "manifest is stale" instead of the clean no-manifest path).
+			if (childPid != null) {
+				this.removeManifestIfHeldBy(organizationId, childPid);
+			}
 			throw new Error(
 				!isStartAllowed()
 					? "Host service start cancelled"
@@ -918,7 +935,7 @@ export class HostServiceCoordinator extends EventEmitter {
 		const previousStatus = current.status;
 		this.rememberPort(organizationId, current.port);
 		this.instances.delete(organizationId);
-		removeManifest(organizationId);
+		this.removeManifestIfHeldBy(organizationId, childPid);
 		this.emitStatus(organizationId, "stopped", previousStatus);
 
 		if (previousStatus !== "running") return;

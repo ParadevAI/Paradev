@@ -1,6 +1,6 @@
 import { getEventBus } from "@superset/workspace-client";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useKnownHosts } from "renderer/hooks/known-hosts/useKnownHosts";
 import { useRelayUrl } from "renderer/hooks/useRelayUrl";
 import { getHostServiceWsToken } from "renderer/lib/host-service-auth";
@@ -12,6 +12,7 @@ import {
 	getHostWorkspacesQueryKey,
 	type HostWorkspaceItem,
 	type HostWorkspaceRow,
+	isEventBusReopen,
 	loadHostWorkspacesSnapshot,
 	mergeHostWorkspaces,
 	saveHostWorkspacesSnapshot,
@@ -34,6 +35,16 @@ export interface HostWorkspacesCacheOps {
 	removeWorkspace: (hostId: string, workspaceId: string) => void;
 	/** Rollback hammer: refetch a host's list after a failed write. */
 	invalidateHost: (hostId: string) => void;
+	/** True once at least one host resolved to a reachable URL. */
+	hasLiveTargets: boolean;
+	/**
+	 * Force-refetch every reachable host's live list; resolves when all
+	 * settle (success or error). The workspace route's miss verdict awaits
+	 * this so "not found" is never declared from data older than the request
+	 * — the mirror converges through fire-and-forget events plus a slow
+	 * fallback refetch, so a just-created row can trail its own deep link.
+	 */
+	refetchAll: () => Promise<void>;
 }
 
 export interface UseHostWorkspacesResult {
@@ -43,6 +54,13 @@ export interface UseHostWorkspacesResult {
 	 * empty states only — existing rows always render (cache-first rule).
 	 */
 	isReady: boolean;
+	/**
+	 * The org's host list itself is trustworthy (useKnownHosts settled) —
+	 * weaker than isReady: it does not wait for any host's list to answer, so
+	 * one unreachable host cannot hold it. Until this is true the fan-out may
+	 * cover only the local host.
+	 */
+	hostsSettled: boolean;
 	cache: HostWorkspacesCacheOps;
 }
 
@@ -185,6 +203,8 @@ export function useHostWorkspacesSource(
 		})),
 	});
 
+	const busEverOpenedRef = useRef<Set<string>>(new Set());
+
 	// Live updates: each reachable host's workspace:changed patches its own
 	// cached list without a refetch.
 	useEffect(() => {
@@ -234,9 +254,35 @@ export function useHostWorkspacesSource(
 					}
 				},
 			);
+			// Resync on reopen: events broadcast while the socket was down are
+			// lost (no replay), so every reopen is a potential gap. Invalidate
+			// all of this host's mirrors — workspaces, projects, ports share the
+			// "host-service" key prefix + machineId. Flap cost is bounded by the
+			// bus's own reconnect backoff (≥1s) and scoped to the one host.
+			// Whether this bus ever opened must survive effect re-runs: targets
+			// churn on presence flips, which correlate with outages — a re-run
+			// mid-outage that re-derived "never opened" from current state would
+			// silently skip the gap resync on the next reopen.
+			if (bus.getConnectionStatus().state === "open") {
+				busEverOpenedRef.current.add(hostUrl);
+			}
+			const removeStatusListener = bus.subscribeConnectionStatus((status) => {
+				const reopened = isEventBusReopen(
+					busEverOpenedRef.current.has(hostUrl),
+					status.state,
+				);
+				if (status.state === "open") busEverOpenedRef.current.add(hostUrl);
+				if (!reopened) return;
+				void queryClient.invalidateQueries({
+					predicate: (query) =>
+						query.queryKey[0] === "host-service" &&
+						query.queryKey.includes(target.machineId),
+				});
+			});
 			const releaseBus = bus.retain();
 			cleanups.push(() => {
 				removeListener();
+				removeStatusListener();
 				releaseBus();
 			});
 		}
@@ -338,8 +384,20 @@ export function useHostWorkspacesSource(
 					queryKey: getHostWorkspacesQueryKey(target),
 				});
 			},
+			hasLiveTargets: targets.some((target) => target.hostUrl !== null),
+			refetchAll: async () => {
+				await Promise.all(
+					targets
+						.filter((target) => target.hostUrl !== null)
+						.map((target) =>
+							queryClient.refetchQueries({
+								queryKey: getHostWorkspacesQueryKey(target),
+							}),
+						),
+				);
+			},
 		};
 	}, [targets, queryClient]);
 
-	return { workspaces, isReady, cache };
+	return { workspaces, isReady, hostsSettled: knownHostsSettled, cache };
 }
