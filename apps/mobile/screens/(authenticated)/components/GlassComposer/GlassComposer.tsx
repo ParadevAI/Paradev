@@ -324,6 +324,29 @@ export const GlassComposer = forwardRef<
 		</Button>
 	);
 
+	// Same chip shape as the quick keys it sits beside, rather than the circular
+	// bottom-row buttons — it belongs to that row visually, not to send/mic.
+	const newlineChip = (
+		<Button
+			onPress={() => {
+				void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+				appendToDraft("\n");
+			}}
+			modifiers={[
+				buttonStyle("bordered"),
+				buttonBorderShape("roundedRectangle", 10),
+				tint(FOREGROUND),
+				accessibilityLabel("New line"),
+			]}
+		>
+			<Image
+				systemName="return"
+				size={13}
+				modifiers={[frame({ width: 24, height: 17 })]}
+			/>
+		</Button>
+	);
+
 	const voiceControl = <VoiceControl dictation={dictation} />;
 
 	// Inserted beside the mic when a draft exists: the animated layout change
@@ -369,7 +392,12 @@ export const GlassComposer = forwardRef<
 						onGeometryChange(reportHeight),
 					]}
 				>
-					{above}
+					{above ? (
+						<HStack spacing={8} modifiers={[padding({ horizontal: 2 })]}>
+							{newlineChip}
+							{above}
+						</HStack>
+					) : null}
 					<VStack
 						spacing={0}
 						modifiers={[
@@ -536,7 +564,7 @@ export const GlassComposer = forwardRef<
 							>
 								{plusButton}
 							</HStack>
-							{newlineButton}
+							{above ? null : newlineButton}
 							{toolbarLeading}
 							<Spacer />
 							{/* Bordered buttons carry ~6pt of invisible tap-target inset
