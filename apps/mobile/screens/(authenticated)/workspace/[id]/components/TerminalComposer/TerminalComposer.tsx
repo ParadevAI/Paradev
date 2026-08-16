@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useRef } from "react";
+import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import { Alert, View } from "react-native";
 import type { PromptInputMessage } from "@/components/ai-elements/prompt-input";
 import {
@@ -14,8 +14,8 @@ import {
 
 interface TerminalComposerProps {
 	placeholder?: string;
-	/** Submit the current draft to the PTY. */
-	onSubmit: (text: string) => void;
+	/** Submit the current draft to the PTY. Rejects if it never got there. */
+	onSubmit: (text: string) => Promise<void>;
 	onQuickKey: (key: TerminalQuickKey) => void;
 	/** Where attachments land; null while the workspace or host is unresolved. */
 	attachmentTarget: TerminalAttachmentTarget | null;
@@ -61,25 +61,36 @@ export const TerminalComposer = forwardRef<
 	}));
 	const writeAttachments = useWriteTerminalAttachments();
 
-	const submit = ({ text, attachments }: PromptInputMessage) => {
-		if (attachments.length === 0) {
-			onSubmit(text);
+	const [isSubmitting, setIsSubmitting] = useState(false);
+
+	const submit = async ({ text, attachments }: PromptInputMessage) => {
+		let body = text;
+		if (attachments.length > 0) {
+			if (!attachmentTarget) {
+				Alert.alert("Attachments need an online host");
+				return;
+			}
+			// A PTY takes bytes, not files: the agent gets the attachments as
+			// worktree-relative paths appended to the message. The hook alerts on
+			// its own failures.
+			const paths = await writeAttachments
+				.mutateAsync({ target: attachmentTarget, attachments })
+				.catch(() => null);
+			if (!paths) return;
+			body = text ? `${text}\n\n${paths.join("\n")}` : paths.join("\n");
+		}
+		setIsSubmitting(true);
+		try {
+			await onSubmit(body);
 			composerRef.current?.clear();
-			return;
+		} catch (cause) {
+			Alert.alert(
+				"Could not send",
+				cause instanceof Error ? cause.message : String(cause),
+			);
+		} finally {
+			setIsSubmitting(false);
 		}
-		if (!attachmentTarget) {
-			Alert.alert("Attachments need an online host");
-			return;
-		}
-		writeAttachments
-			.mutateAsync({ target: attachmentTarget, attachments })
-			.then((paths) => {
-				// A PTY takes bytes, not files: the agent gets the attachments as
-				// worktree-relative paths appended to the message.
-				onSubmit(text ? `${text}\n\n${paths.join("\n")}` : paths.join("\n"));
-				composerRef.current?.clear();
-			})
-			.catch(() => {});
 	};
 
 	return (
@@ -87,7 +98,7 @@ export const TerminalComposer = forwardRef<
 			<GlassComposer
 				ref={composerRef}
 				above={<QuickKeysRow onKey={onQuickKey} />}
-				isSending={writeAttachments.isPending}
+				isSending={writeAttachments.isPending || isSubmitting}
 				showAttachments={allowAttachments}
 				onActiveChange={onActiveChange}
 				onSubmit={submit}

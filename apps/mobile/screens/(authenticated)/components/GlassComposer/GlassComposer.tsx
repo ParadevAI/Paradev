@@ -12,6 +12,7 @@ import {
 } from "@expo/ui/swift-ui";
 import {
 	Animation,
+	accessibilityLabel,
 	animation,
 	aspectRatio,
 	buttonBorderShape,
@@ -153,6 +154,18 @@ export const GlassComposer = forwardRef<
 		setHasText(text.trim().length > 0);
 	};
 
+	// Appends to the draft and leaves the caret after it. The field never
+	// reports where its cursor actually is — both onSelectionChange and a
+	// `selection` state read back {0,0} once you've typed — so the end is the
+	// only position an insert can be sure of. Setting the caret does work.
+	const appendToDraft = (insert: string) => {
+		const next = draftRef.current + insert;
+		writeDraft(next);
+		void fieldRef.current
+			?.setText(next)
+			.then(() => fieldRef.current?.setSelection(next.length, next.length));
+	};
+
 	const attachments = showAttachments
 		? controller.attachments.attachments
 		: NO_ATTACHMENTS;
@@ -276,10 +289,35 @@ export const GlassComposer = forwardRef<
 				buttonStyle("bordered"),
 				buttonBorderShape("circle"),
 				tint(FOREGROUND),
+				accessibilityLabel("Add attachment"),
 			]}
 		>
 			<Image
 				systemName="plus"
+				size={16}
+				modifiers={[frame({ width: 16, height: 16 })]}
+			/>
+		</Button>
+	);
+
+	// Explicit line break for multi-line messages: expo-ui's TextField exposes
+	// nothing for the soft keyboard's return key, so this is the only way to
+	// put a newline in a draft.
+	const newlineButton = (
+		<Button
+			onPress={() => {
+				void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+				appendToDraft("\n");
+			}}
+			modifiers={[
+				buttonStyle("bordered"),
+				buttonBorderShape("circle"),
+				tint(FOREGROUND),
+				accessibilityLabel("New line"),
+			]}
+		>
+			<Image
+				systemName="return"
 				size={16}
 				modifiers={[frame({ width: 16, height: 16 })]}
 			/>
@@ -298,6 +336,9 @@ export const GlassComposer = forwardRef<
 				buttonBorderShape("circle"),
 				tint("#ffffff"),
 				disabled(isSending),
+				// Distinct from the terminal quick-key row's up arrow, which is
+				// otherwise the same `arrow.up` symbol to VoiceOver.
+				accessibilityLabel("Send"),
 			]}
 		>
 			<Image
@@ -495,6 +536,7 @@ export const GlassComposer = forwardRef<
 							>
 								{plusButton}
 							</HStack>
+							{newlineButton}
 							{toolbarLeading}
 							<Spacer />
 							{/* Bordered buttons carry ~6pt of invisible tap-target inset

@@ -13,9 +13,10 @@ interface ProjectSectionHeaderProps {
 }
 
 /**
- * A quiet band, not a title: the workspaces under it are what you came to tap,
- * so the header labels them rather than competing with them. The count is what
- * keeps a collapsed section informative.
+ * Reads as the parent of the rows under it through the type scale alone —
+ * `large` against their 15px — rather than through caps and letterspacing,
+ * which shout at a list you're meant to scan. The count is what keeps a
+ * collapsed section informative.
  */
 export function ProjectSectionHeader({
 	name,
@@ -39,10 +40,7 @@ export function ProjectSectionHeader({
 			<View className="size-6 items-center justify-center">
 				<ProjectAvatar name={name} iconUrl={iconUrl} size={20} />
 			</View>
-			<Text
-				className="text-foreground font-semibold text-[15px] uppercase tracking-wider"
-				numberOfLines={1}
-			>
+			<Text variant="large" numberOfLines={1}>
 				{name}
 			</Text>
 			<Text className="text-muted-foreground font-mono text-[13px]">

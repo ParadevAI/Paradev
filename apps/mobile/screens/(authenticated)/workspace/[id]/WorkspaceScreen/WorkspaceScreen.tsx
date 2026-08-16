@@ -198,12 +198,25 @@ export function WorkspaceScreen() {
 		[invalidateTerminals],
 	);
 
-	const handleSubmit = useCallback((text: string) => {
-		const framed = text.includes("\n")
-			? `\u001b[200~${text}\u001b[201~\r`
-			: `${text}\r`;
-		terminalRef.current?.sendInput(framed);
-	}, []);
+	// Submits go through the host's terminal.send instead of the attached
+	// stream. An Enter written together with the text arrives in the same read,
+	// and a TUI agent takes that burst for a paste — the message lands in the
+	// draft with a newline appended instead of being submitted (#6284). The host
+	// separates and delays the Enter, and frames the text as a bracketed paste
+	// only when the running program actually has that mode on.
+	const handleSubmit = useCallback(
+		async (text: string) => {
+			if (!hostUrl || !activeTerminalId || !id) {
+				throw new Error("Terminal is not connected");
+			}
+			await getHostServiceClientByUrl(hostUrl).terminal.send.mutate({
+				terminalId: activeTerminalId,
+				workspaceId: id,
+				text,
+			});
+		},
+		[hostUrl, activeTerminalId, id],
+	);
 
 	const handleQuickKey = useCallback((key: TerminalQuickKey) => {
 		if (key.data) terminalRef.current?.sendInput(key.data);
