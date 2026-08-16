@@ -291,6 +291,7 @@
         "react-mosaic-component": "6.1.1",
         "react-resizable-panels": "3.0.6",
         "react-syntax-highlighter": "16.1.1",
+        "recharts": "2.15.4",
         "rehype-raw": "7.0.0",
         "rehype-sanitize": "6.0.0",
         "remark-gfm": "4.0.1",
