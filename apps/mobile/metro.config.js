@@ -1,4 +1,4 @@
-const { getDefaultConfig } = require("expo/metro-config");
+const { getSentryExpoConfig } = require("@sentry/react-native/metro");
 const { withUniwindConfig } = require("uniwind/metro");
 const { withStorybook } = require("@storybook/react-native/withStorybook");
 const {
@@ -9,7 +9,7 @@ const path = require("node:path");
 const projectRoot = __dirname;
 const monorepoRoot = path.resolve(projectRoot, "../..");
 
-let config = getDefaultConfig(projectRoot);
+let config = getSentryExpoConfig(projectRoot);
 
 // Watch all files in the monorepo
 config.watchFolders = [monorepoRoot];

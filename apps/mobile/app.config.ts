@@ -45,6 +45,13 @@ export default ({ config }: ConfigContext) => ({
 	},
 	plugins: [
 		"expo-router",
+		[
+			"@sentry/react-native/expo",
+			{
+				organization: "superset-sh",
+				project: "mobile",
+			},
+		],
 		"expo-localization",
 		"expo-apple-authentication",
 		[
