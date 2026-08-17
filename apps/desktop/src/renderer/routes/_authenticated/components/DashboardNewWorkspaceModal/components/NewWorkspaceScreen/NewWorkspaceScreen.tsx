@@ -667,7 +667,11 @@ export function NewWorkspaceScreen({
 								animate={{ opacity: 1, y: 0 }}
 								exit={{ opacity: 0, transition: { duration: 0 } }}
 								transition={{ type: "tween", duration: 0.15, ease: "easeOut" }}
-								className="absolute inset-x-6 bottom-full mb-1"
+								// In flow, not absolute: the heading above is the flex-1
+								// spacer, so it absorbs this block's height and the composer
+								// stays put. Positioning it out of flow let tall suggestion
+								// sets overlap the heading instead.
+								className="mb-1"
 							>
 								{promptCardsVariant === "control" ? (
 									<SamplePrompts

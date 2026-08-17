@@ -61,7 +61,7 @@ export const SAMPLE_PROMPTS: Record<string, SamplePrompt> = {
 	},
 	"explain-superset": {
 		id: "explain-superset",
-		label: "Show me how to get more out of Superset",
+		label: "Get more out of Superset",
 		description:
 			"Learn the workflow that fits this repo — parallel workspaces and agent setup.",
 		prompt:
