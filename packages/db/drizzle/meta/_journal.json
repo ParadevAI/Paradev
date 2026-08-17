@@ -575,6 +575,13 @@
       "when": 1786926353155,
       "tag": "0081_drop_users_slack_users",
       "breakpoints": true
+    },
+    {
+      "idx": 82,
+      "version": "7",
+      "when": 1786989576969,
+      "tag": "0082_allow_multiple_schedule_triggers",
+      "breakpoints": true
     }
   ]
 }

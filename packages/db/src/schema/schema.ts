@@ -863,10 +863,12 @@ export const automationTriggers = pgTable(
 			.on(t.organizationId, t.kind)
 			.where(sql`enabled`),
 		index("automation_triggers_automation_idx").on(t.automationId),
-		// At most one schedule trigger per automation. The dispatcher reads
-		// triggers, so a duplicate would double-dispatch; this also gives the
-		// dual-write and the lazy repair a conflict target.
-		uniqueIndex("automation_triggers_schedule_unique")
+		// Deliberately not unique on (automation_id) where kind = 'schedule'. An
+		// automation may carry several schedules — "every weekday at 9" and "on
+		// Sunday at 6" is one automation, not two. The dispatcher already selects
+		// trigger rows rather than automations and gates on automations.enabled,
+		// so each schedule advances its own next_run_at independently.
+		index("automation_triggers_schedule_idx")
 			.on(t.automationId)
 			.where(sql`kind = 'schedule'`),
 	],

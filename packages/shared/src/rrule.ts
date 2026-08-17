@@ -451,6 +451,30 @@ const DATE_TIME_IN_TIMEZONE_FORMAT_OPTIONS: Intl.DateTimeFormatOptions = {
 };
 
 /** Format a real UTC instant in the automation's configured timezone. */
+/**
+ * "America/Los_Angeles" → "PDT".
+ *
+ * DST-dependent, so it is resolved against an instant rather than the zone
+ * alone — the same zone reads PST for half the year.
+ */
+export function timezoneAbbreviation(
+	timezone: string,
+	at: Date = new Date(),
+): string {
+	try {
+		return (
+			new Intl.DateTimeFormat("en-US", {
+				timeZone: timezone,
+				timeZoneName: "short",
+			})
+				.formatToParts(at)
+				.find((part) => part.type === "timeZoneName")?.value ?? timezone
+		);
+	} catch {
+		return timezone;
+	}
+}
+
 export function formatDateTimeInTimezone(
 	date: Date,
 	timezone: string,

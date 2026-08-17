@@ -255,15 +255,6 @@ export function describeTriggerProblems(
 		add(-1, "triggers", "Add at least one trigger.");
 	}
 
-	// A partial unique index enforces this in the database; catching it here
-	// turns a save-time constraint violation into a message next to the row.
-	const scheduleIndexes = triggers.flatMap((t, i) =>
-		t.config.kind === "schedule" ? [i] : [],
-	);
-	for (const index of scheduleIndexes.slice(1)) {
-		add(index, "config", "An automation can only have one schedule.");
-	}
-
 	triggers.forEach((trigger, index) => {
 		const config = trigger.config;
 		switch (config.kind) {

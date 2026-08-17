@@ -3,6 +3,8 @@ import {
 	githubInstallations,
 	githubPullRequests,
 	githubRepositories,
+	userIdentities,
+	users,
 } from "@superset/db/schema";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { TRPCError } from "@trpc/server";
@@ -94,6 +96,44 @@ export const githubRouter = {
 			}
 
 			return { success: true };
+		}),
+
+	/**
+	 * People a GitHub trigger can filter on, as GitHub identities.
+	 *
+	 * The ids are GitHub's, not Superset's, because that is what an event
+	 * carries and what matching compares — a login can be renamed, an id
+	 * cannot. Today this is org members who have linked GitHub; it widens to
+	 * repository collaborators when those are synced, and the shape does not
+	 * change when it does.
+	 */
+	listLinkedPeople: protectedProcedure
+		.input(z.object({ organizationId: z.string().uuid() }))
+		.query(async ({ ctx, input }) => {
+			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
+
+			const rows = await db
+				.select({
+					githubUserId: userIdentities.externalId,
+					handle: userIdentities.handle,
+					name: users.name,
+					email: users.email,
+				})
+				.from(userIdentities)
+				.innerJoin(users, eq(users.id, userIdentities.userId))
+				.where(
+					and(
+						eq(userIdentities.organizationId, input.organizationId),
+						eq(userIdentities.provider, "github"),
+					),
+				);
+
+			return rows.map((row) => ({
+				id: row.githubUserId,
+				// The handle is not always known — a sign-in gives the id without it
+				// — so fall back to the person we do know.
+				label: row.handle ?? row.name ?? row.email,
+			}));
 		}),
 
 	listRepositories: protectedProcedure

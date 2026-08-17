@@ -15,7 +15,7 @@ import {
 	parseRrule,
 } from "@superset/shared/rrule";
 import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
-import { and, desc, eq, ilike } from "drizzle-orm";
+import { and, asc, desc, eq, ilike } from "drizzle-orm";
 import { z } from "zod";
 import { resolveUserRelayUrl } from "../../lib/relay-url";
 import { protectedProcedure } from "../../trpc";
@@ -24,10 +24,12 @@ import { dispatchAutomation } from "./dispatch";
 import {
 	automationBaseColumns,
 	getAutomationForUser,
-	onScheduleTrigger,
+	NO_SCHEDULE,
 	promptSourceFromSession,
 	recordPromptVersion,
-	scheduleTriggerColumns,
+	refreshScheduleNextRuns,
+	scheduleSummariesFor,
+	summarizeSchedules,
 	syncScheduleTrigger,
 } from "./helpers";
 import {
@@ -129,7 +131,7 @@ function withSchedule<T>(
 	legacy: {
 		rrule: string;
 		dtstart: Date;
-		timezone: string;
+		timezone: string | null;
 		nextRunAt: Date;
 	} | null,
 ) {
@@ -195,9 +197,8 @@ export const automationRouter = {
 			const organizationId = await requireActiveOrgMembership(ctx);
 
 			const rows = await db
-				.select({ ...automationBaseColumns, ...scheduleTriggerColumns })
+				.select(automationBaseColumns)
 				.from(automations)
-				.leftJoin(automationTriggers, onScheduleTrigger)
 				.where(
 					and(
 						eq(automations.organizationId, organizationId),
@@ -208,10 +209,18 @@ export const automationRouter = {
 				)
 				.orderBy(desc(automations.createdAt));
 
-			return rows.map((row) => ({
-				...row,
-				scheduleText: safeDescribeRrule(row),
-			}));
+			// Fetched separately rather than joined: an automation can hold more
+			// than one schedule, and a join would list it once per schedule.
+			const summaries = await scheduleSummariesFor(rows.map((row) => row.id));
+
+			return rows.map((row) => {
+				const schedule = summaries.get(row.id) ?? NO_SCHEDULE;
+				return {
+					...row,
+					...schedule,
+					scheduleText: safeDescribeRrule(schedule),
+				};
+			});
 		}),
 
 	/**
@@ -225,9 +234,8 @@ export const automationRouter = {
 			const organizationId = await requireActiveOrgMembership(ctx);
 
 			const [row] = await db
-				.select({ ...automationBaseColumns, ...scheduleTriggerColumns })
+				.select(automationBaseColumns)
 				.from(automations)
-				.leftJoin(automationTriggers, onScheduleTrigger)
 				.where(
 					and(
 						eq(automations.id, input.id),
@@ -245,7 +253,28 @@ export const automationRouter = {
 				});
 			}
 
-			return { ...row, scheduleText: safeDescribeRrule(row) };
+			// The whole set, since the editor saves it as one and needs the ids to
+			// update rows in place rather than replacing them.
+			const triggers = await db
+				.select({
+					id: automationTriggers.id,
+					kind: automationTriggers.kind,
+					config: automationTriggers.config,
+					enabled: automationTriggers.enabled,
+					nextRunAt: automationTriggers.nextRunAt,
+				})
+				.from(automationTriggers)
+				.where(eq(automationTriggers.automationId, input.id))
+				.orderBy(asc(automationTriggers.createdAt));
+
+			// Derived from the set just fetched rather than a second query.
+			const schedule = summarizeSchedules(triggers);
+			return {
+				...row,
+				...schedule,
+				triggers,
+				scheduleText: safeDescribeRrule(schedule),
+			};
 		}),
 
 	create: protectedProcedure
@@ -478,13 +507,14 @@ export const automationRouter = {
 				input.dtstart !== undefined ||
 				input.timezone !== undefined;
 
-			const recomputedNextRunAt = recurrenceChanged
-				? parseRrule({
-						rrule: nextRrule,
-						dtstart: nextDtstart,
-						timezone: nextTimezone,
-					}).nextRunAt
-				: existing.nextRunAt;
+			const recomputedNextRunAt =
+				recurrenceChanged && nextRrule && nextDtstart && nextTimezone
+					? parseRrule({
+							rrule: nextRrule,
+							dtstart: nextDtstart,
+							timezone: nextTimezone,
+						}).nextRunAt
+					: existing.nextRunAt;
 
 			const updated = await dbWs.transaction(async (tx) => {
 				const [row] = await tx
@@ -512,7 +542,7 @@ export const automationRouter = {
 						organizationId,
 						triggers: input.triggers,
 					});
-				} else {
+				} else if (nextRrule && nextDtstart && nextTimezone) {
 					await syncScheduleTrigger(tx, {
 						automationId: row.id,
 						organizationId,
@@ -532,7 +562,7 @@ export const automationRouter = {
 			return withSchedule(
 				updated,
 				input.triggers ?? null,
-				nextRrule && recomputedNextRunAt
+				nextRrule && nextDtstart && recomputedNextRunAt
 					? {
 							rrule: nextRrule,
 							dtstart: nextDtstart,
@@ -611,7 +641,7 @@ export const automationRouter = {
 				dtstart: existing.dtstart,
 				timezone: existing.timezone,
 				nextRunAt: existing.nextRunAt,
-				scheduleText: describeSchedule(existing.rrule),
+				scheduleText: safeDescribeRrule(existing),
 			};
 		}),
 
@@ -636,17 +666,7 @@ export const automationRouter = {
 				input.id,
 			);
 
-			// When resuming, recompute the next run from now so we don't fire stale
-			// occurrences that accumulated while paused.
-			const resumedNextRunAt =
-				input.enabled && !existing.enabled
-					? parseRrule({
-							rrule: existing.rrule,
-							dtstart: existing.dtstart,
-							timezone: existing.timezone,
-							after: new Date(),
-						}).nextRunAt
-					: existing.nextRunAt;
+			const resuming = input.enabled && !existing.enabled;
 
 			const updated = await dbWs.transaction(async (tx) => {
 				const [row] = await tx
@@ -662,26 +682,22 @@ export const automationRouter = {
 					});
 				}
 
-				await syncScheduleTrigger(tx, {
-					automationId: row.id,
-					organizationId,
-					rrule: existing.rrule,
-					dtstart: existing.dtstart,
-					timezone: existing.timezone,
-					nextRunAt: resumedNextRunAt,
-					enabled: row.enabled,
-				});
+				// Every schedule, not the soonest one: rewriting through the
+				// single-schedule shape would collapse the rest into it.
+				if (resuming) await refreshScheduleNextRuns(tx, row.id);
 
 				return row;
 			});
 
+			// Re-read rather than echo the input: the resume just recomputed every
+			// schedule's next run, and the soonest of them is what changed.
+			const schedule =
+				(await scheduleSummariesFor([updated.id])).get(updated.id) ??
+				NO_SCHEDULE;
 			return {
 				...updated,
-				rrule: existing.rrule,
-				dtstart: existing.dtstart,
-				timezone: existing.timezone,
-				nextRunAt: resumedNextRunAt,
-				scheduleText: describeSchedule(existing.rrule),
+				...schedule,
+				scheduleText: safeDescribeRrule(schedule),
 			};
 		}),
 
@@ -795,8 +811,11 @@ function bucketToMinute(date: Date): Date {
 	return copy;
 }
 
-function safeDescribeRrule(row: { rrule: string } | null | undefined): string {
-	if (!row) return "";
+/** Empty when there is no schedule, which is normal for an event-only automation. */
+function safeDescribeRrule(
+	row: { rrule: string | null } | null | undefined,
+): string {
+	if (!row?.rrule) return "";
 	try {
 		return describeSchedule(row.rrule);
 	} catch {
