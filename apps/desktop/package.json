@@ -238,6 +238,7 @@
 		"use-resize-observer": "9.1.0",
 		"utf-8-validate": "6.0.6",
 		"uuid": "14.0.0",
+		"ws": "8.18.3",
 		"zod": "4.4.3",
 		"zustand": "5.0.12"
 	},
@@ -262,6 +263,7 @@
 		"@types/react-syntax-highlighter": "15.5.13",
 		"@types/semver": "7.7.1",
 		"@types/shell-quote": "1.7.5",
+		"@types/ws": "8.18.1",
 		"@vitejs/plugin-react": "5.2.0",
 		"code-inspector-plugin": "1.4.5",
 		"cross-env": "10.1.0",

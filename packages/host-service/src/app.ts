@@ -13,6 +13,7 @@ import { EventBus, GitWatcher, registerEventBusRoute } from "./events";
 import type { ApiAuthProvider } from "./providers/auth";
 import type { HostAuthProvider } from "./providers/host-auth";
 import { runArchivedWorkspaceReconcile } from "./runtime/archived-workspace-reconcile";
+import { registerBrowserCdpRoute } from "./runtime/browser-bridge/browser-cdp-route";
 import { WorkspaceFilesystemManager } from "./runtime/filesystem";
 import type { GitCredentialProvider } from "./runtime/git";
 import { createGitEnvResolver, createGitFactory } from "./runtime/git";
@@ -29,7 +30,7 @@ import {
 	execGh as defaultExecGh,
 	type ExecGh,
 } from "./trpc/router/workspace-creation/utils/exec-gh";
-import type { ApiClient } from "./types";
+import type { ApiClient, BrowserBridgeConfig } from "./types";
 import { getHostWorkerPool } from "./workers/host-worker-pool";
 import { gitWorkspaceRefsTask } from "./workers/tasks/git";
 
@@ -40,6 +41,8 @@ export interface CreateAppOptions {
 		cloudApiUrl: string;
 		migrationsFolder: string;
 		allowedOrigins: string[];
+		/** Loopback surface for driving desktop browser panes; desktop-only. */
+		browserBridge?: BrowserBridgeConfig;
 	};
 	providers: {
 		auth: ApiAuthProvider;
@@ -240,8 +243,14 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 	app.use("/terminal/*", wsAuth);
 	app.use("/events", wsAuth);
 	app.use("/chat-v3/*", wsAuth);
+	app.use("/browser/*", wsAuth);
 
 	registerEventBusRoute({ app, eventBus, upgradeWebSocket });
+	registerBrowserCdpRoute({
+		app,
+		upgradeWebSocket,
+		getBridge: () => config.browserBridge,
+	});
 	registerWorkspaceTerminalRoute({
 		app,
 		db,
@@ -270,6 +279,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 					isAuthenticated,
 					clientMachineId:
 						c.req.header("x-superset-client-machine-id") ?? undefined,
+					browserBridge: config.browserBridge,
 				} as Record<string, unknown>;
 			},
 		}),

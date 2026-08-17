@@ -32,6 +32,7 @@ import {
 import { initAppState } from "./lib/app-state";
 import { requestAppleEventsAccess } from "./lib/apple-events-permission";
 import { isUpdateReadyToInstall, setupAutoUpdater } from "./lib/auto-updater";
+import { startBrowserBridge } from "./lib/browser/browser-bridge";
 import { installBundledCliShim } from "./lib/bundled-cli";
 import { resolveDevWorkspaceName } from "./lib/dev-workspace-name";
 import { setWorkspaceDockIcon } from "./lib/dock-icon";
@@ -416,6 +417,15 @@ if (!gotTheLock) {
 		// Must happen before renderer restore runs
 		await reconcileDaemonSessions();
 		prewarmTerminalRuntime();
+
+		// Must be listening before any host-service spawns: the child learns the
+		// bridge endpoint/secret from its env, so a late bridge means browser
+		// control stays dark until the next respawn.
+		try {
+			await startBrowserBridge();
+		} catch (error) {
+			console.error("[main] Failed to start browser bridge:", error);
+		}
 
 		const hostServiceCoordinator = getHostServiceCoordinator();
 		hostServiceCoordinator.setConfigProvider(async () => {

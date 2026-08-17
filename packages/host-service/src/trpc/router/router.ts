@@ -2,6 +2,7 @@ import { router } from "../index";
 import { agentsRouter } from "./agents";
 import { attachmentsRouter } from "./attachments";
 import { authRouter } from "./auth";
+import { browserRouter } from "./browser/browser";
 import { configRouter } from "./config";
 import { filesystemRouter } from "./filesystem";
 import { gitRouter } from "./git";
@@ -26,6 +27,7 @@ export const appRouter = router({
 	agents: agentsRouter,
 	attachments: attachmentsRouter,
 	auth: authRouter,
+	browser: browserRouter,
 	health: healthRouter,
 	host: hostRouter,
 	config: configRouter,

@@ -12,6 +12,7 @@ import { env as sharedEnv } from "shared/env.shared";
 import { getProcessEnvWithShellPath } from "../../lib/trpc/routers/workspaces/utils/shell-env";
 import { env as mainEnv } from "../env.main";
 import { SUPERSET_HOME_DIR } from "./app-environment";
+import { getBrowserBridgeInfo } from "./browser/browser-bridge-info";
 import { acquireSpawnLock } from "./host-service-lock";
 import {
 	isProcessAlive,
@@ -702,9 +703,13 @@ export class HostServiceCoordinator extends EventEmitter {
 			status: "starting",
 			spawnedAt: Date.now(),
 			outputTail: "",
-			redactions: [secret, config.authToken].filter((value): value is string =>
-				Boolean(value),
-			),
+			// Redact every live credential in the child env from crash tails
+			// shipped to Sentry — incl. the browser-bridge secret.
+			redactions: [
+				secret,
+				config.authToken,
+				getBrowserBridgeInfo()?.secret,
+			].filter((value): value is string => Boolean(value)),
 			owned: true,
 		};
 		this.instances.set(organizationId, instance);
@@ -824,6 +829,7 @@ export class HostServiceCoordinator extends EventEmitter {
 		const organizationDir = manifestDir(organizationId);
 		const row = localDb.select().from(settings).get();
 		const exposeViaRelay = row?.exposeHostServiceViaRelay ?? false;
+		const browserBridge = getBrowserBridgeInfo();
 
 		const childEnv = await getProcessEnvWithShellPath({
 			...(process.env as Record<string, string>),
@@ -861,6 +867,9 @@ export class HostServiceCoordinator extends EventEmitter {
 			SUPERSET_LEGACY_WORKTREE_BASE_DIR: row?.worktreeBaseDir ?? "",
 			SUPERSET_AGENT_HOOK_PORT: String(sharedEnv.DESKTOP_NOTIFICATIONS_PORT),
 			SUPERSET_AGENT_HOOK_VERSION: HOOK_PROTOCOL_VERSION,
+			// BROWSER_BRIDGE_URL/SECRET are set (or stripped) after the shell-env
+			// merge below, alongside RELAY_URL, so an inherited value can't leak
+			// into a standalone host.
 			AUTH_TOKEN: config.authToken,
 			SUPERSET_AUTH_CONFIG_PATH: path.join(SUPERSET_HOME_DIR, "config.json"),
 			SUPERSET_API_URL: config.cloudApiUrl,
@@ -890,6 +899,17 @@ export class HostServiceCoordinator extends EventEmitter {
 			childEnv.RELAY_URL = effectiveRelayUrl;
 		} else {
 			delete childEnv.RELAY_URL;
+		}
+
+		// Same enforce-after-merge for the browser bridge: when this process has
+		// no bridge, strip any inherited BROWSER_BRIDGE_* so the child can't
+		// connect to a stale/unintended bridge from the shell env.
+		if (browserBridge) {
+			childEnv.BROWSER_BRIDGE_URL = browserBridge.endpoint;
+			childEnv.BROWSER_BRIDGE_SECRET = browserBridge.secret;
+		} else {
+			delete childEnv.BROWSER_BRIDGE_URL;
+			delete childEnv.BROWSER_BRIDGE_SECRET;
 		}
 
 		return childEnv;

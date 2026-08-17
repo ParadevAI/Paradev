@@ -31,4 +31,11 @@ export interface HostServiceContext {
 	organizationId: string;
 	isAuthenticated: boolean;
 	clientMachineId?: string;
+	/** Present only when a desktop app spawned this host (has browser panes). */
+	browserBridge?: BrowserBridgeConfig;
+}
+
+export interface BrowserBridgeConfig {
+	url: string;
+	secret: string;
 }

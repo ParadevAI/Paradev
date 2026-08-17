@@ -15,6 +15,7 @@ import {
 	JwtApiAuthProvider,
 	LocalGitCredentialProvider,
 	PskHostAuthProvider,
+	resolveBrowserBridgeFromEnv,
 	startTerminalReaper,
 } from "@superset/host-service";
 import {
@@ -114,6 +115,7 @@ async function main(): Promise<void> {
 				`http://localhost:${env.DESKTOP_VITE_PORT}`,
 				`http://127.0.0.1:${env.DESKTOP_VITE_PORT}`,
 			],
+			browserBridge: resolveBrowserBridgeFromEnv(env),
 		},
 		providers: {
 			auth: authProvider,
