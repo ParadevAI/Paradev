@@ -42,6 +42,18 @@ export const V2_WORKSPACES_AGENT_STATUS_LABELS: Record<
 	failed: "Failed",
 };
 
+export const V2_WORKSPACES_PIN_FILTERS = ["all", "pinned", "unpinned"] as const;
+export type V2WorkspacesPinFilter = (typeof V2_WORKSPACES_PIN_FILTERS)[number];
+
+export const V2_WORKSPACES_PIN_FILTER_LABELS: Record<
+	V2WorkspacesPinFilter,
+	string
+> = {
+	all: "All workspaces",
+	pinned: "Pinned",
+	unpinned: "Unpinned",
+};
+
 export type V2WorkspacesViewMode = "list" | "board";
 
 export const V2_WORKSPACES_SORT_MODES = [
@@ -77,6 +89,8 @@ interface V2WorkspacesFilterState {
 	prStateFilters: V2WorkspacesPrStateFilter[];
 	/** Empty = any agent status. */
 	agentStatusFilters: V2WorkspacesAgentStatusFilter[];
+	/** Sidebar visibility: pinned, unpinned, or both ("all"). */
+	pinFilter: V2WorkspacesPinFilter;
 	viewMode: V2WorkspacesViewMode;
 	/** Row order inside status groups (both views). */
 	sortMode: V2WorkspacesSortMode;
@@ -89,6 +103,7 @@ interface V2WorkspacesFilterState {
 	setAgentStatusFilters: (
 		agentStatusFilters: V2WorkspacesAgentStatusFilter[],
 	) => void;
+	setPinFilter: (pinFilter: V2WorkspacesPinFilter) => void;
 	setViewMode: (viewMode: V2WorkspacesViewMode) => void;
 	setSortMode: (sortMode: V2WorkspacesSortMode) => void;
 	setArchivedWindow: (archivedWindow: V2WorkspacesArchivedWindow) => void;
@@ -103,6 +118,7 @@ export const useV2WorkspacesFilterStore = create<V2WorkspacesFilterState>()(
 		projectFilters: [],
 		prStateFilters: [],
 		agentStatusFilters: [],
+		pinFilter: "all",
 		viewMode: "list",
 		sortMode: "activity",
 		archivedWindow: "week",
@@ -111,6 +127,7 @@ export const useV2WorkspacesFilterStore = create<V2WorkspacesFilterState>()(
 		setProjectFilters: (projectFilters) => set({ projectFilters }),
 		setPrStateFilters: (prStateFilters) => set({ prStateFilters }),
 		setAgentStatusFilters: (agentStatusFilters) => set({ agentStatusFilters }),
+		setPinFilter: (pinFilter) => set({ pinFilter }),
 		setViewMode: (viewMode) => set({ viewMode }),
 		setSortMode: (sortMode) => set({ sortMode }),
 		setArchivedWindow: (archivedWindow) => set({ archivedWindow }),
@@ -121,6 +138,7 @@ export const useV2WorkspacesFilterStore = create<V2WorkspacesFilterState>()(
 				projectFilters: [],
 				prStateFilters: [],
 				agentStatusFilters: [],
+				pinFilter: "all",
 				archivedWindow: "week",
 			}),
 	}),
