@@ -74,10 +74,6 @@ export default function AuthenticatedLayout() {
 					options={settingsScreenOptions("Agent presets")}
 				/>
 				<Stack.Screen
-					name="workspace/[id]/chat/[sessionId]"
-					options={{ ...glassHeaderOptions, title: "Chat" }}
-				/>
-				<Stack.Screen
 					name="workspace/[id]/index"
 					options={{
 						headerShown: true,
@@ -86,10 +82,6 @@ export default function AuthenticatedLayout() {
 						title: "Workspace",
 						fullScreenGestureEnabled: false,
 					}}
-				/>
-				<Stack.Screen
-					name="workspace/[id]/diff"
-					options={{ ...glassHeaderOptions, title: "Changes" }}
 				/>
 				<Stack.Screen
 					name="workspace/[id]/files-changed"
@@ -166,6 +158,50 @@ export default function AuthenticatedLayout() {
 						sheetGrabberVisible: true,
 						...glassHeaderOptions,
 						title: "New session",
+					}}
+				/>
+				<Stack.Screen
+					name="workspace/[id]/pull-requests"
+					options={{
+						presentation: "formSheet",
+						sheetAllowedDetents: [0.5],
+						sheetGrabberVisible: true,
+						...glassHeaderOptions,
+					}}
+				/>
+				<Stack.Screen
+					name="workspace/[id]/pull-request/[pullRequestId]/index"
+					options={{
+						...glassHeaderOptions,
+						title: "Pull request",
+						fullScreenGestureEnabled: false,
+					}}
+				/>
+				<Stack.Screen
+					name="workspace/[id]/pull-request/[pullRequestId]/checks"
+					options={{
+						presentation: "formSheet",
+						sheetAllowedDetents: [0.75],
+						sheetGrabberVisible: true,
+						...glassHeaderOptions,
+					}}
+				/>
+				<Stack.Screen
+					name="workspace/[id]/pull-request/[pullRequestId]/reviewers"
+					options={{
+						presentation: "formSheet",
+						sheetAllowedDetents: [0.5],
+						sheetGrabberVisible: true,
+						...glassHeaderOptions,
+					}}
+				/>
+				<Stack.Screen
+					name="workspace/[id]/pull-request/[pullRequestId]/check"
+					options={{
+						presentation: "formSheet",
+						sheetAllowedDetents: [0.6],
+						sheetGrabberVisible: true,
+						...glassHeaderOptions,
 					}}
 				/>
 				<Stack.Screen

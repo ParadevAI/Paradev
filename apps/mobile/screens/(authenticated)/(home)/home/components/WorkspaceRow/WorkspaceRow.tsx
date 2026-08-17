@@ -1,13 +1,6 @@
 import type { SelectGithubPullRequest } from "@superset/db/schema";
 import { useRouter } from "expo-router";
-import {
-	FolderGit2,
-	GitMerge,
-	GitPullRequest,
-	GitPullRequestClosed,
-	GitPullRequestDraft,
-	Plus,
-} from "lucide-react-native";
+import { FolderGit2, Plus } from "lucide-react-native";
 import { Pressable, View } from "react-native";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
@@ -21,27 +14,20 @@ import { cn } from "@/lib/utils";
 import { AgentMark } from "@/screens/(authenticated)/(home)/new-session/agent";
 import { AsciiSpinner } from "@/screens/(authenticated)/components/AsciiSpinner";
 import { PingDot } from "@/screens/(authenticated)/components/PingDot";
+import {
+	PULL_REQUEST_STATUS,
+	pullRequestStatus,
+} from "@/screens/(authenticated)/workspace/[id]/utils/pullRequest";
 import type {
 	TerminalAttention,
 	TerminalRowData,
 } from "../../hooks/useHostTerminals";
 import type { DiffStats } from "../../hooks/useVisibleDiffStats";
 import { useChatTargetStore } from "../../stores/chatTargetStore";
-import { type PrBadgeState, prStateFor } from "../../utils/prStateFor";
 import { WorkspaceRowMenu } from "./components/WorkspaceRowMenu";
 
 // PR state replaces the host icon in the icon slot — same treatment as
 // desktop's DashboardSidebarWorkspaceIcon.
-const PR_ICON_CONFIG: Record<
-	PrBadgeState,
-	{ icon: typeof GitMerge; iconClassName: string }
-> = {
-	closed: { icon: GitPullRequestClosed, iconClassName: "text-destructive" },
-	draft: { icon: GitPullRequestDraft, iconClassName: "text-muted-foreground" },
-	merged: { icon: GitMerge, iconClassName: "text-purple-500" },
-	open: { icon: GitPullRequest, iconClassName: "text-emerald-500" },
-};
-
 const MAX_SESSION_MARKS = 3;
 
 export function WorkspaceRow({
@@ -61,7 +47,9 @@ export function WorkspaceRow({
 }) {
 	const router = useRouter();
 	const theme = useTheme();
-	const prIcon = pullRequest ? PR_ICON_CONFIG[prStateFor(pullRequest)] : null;
+	const prIcon = pullRequest
+		? PULL_REQUEST_STATUS[pullRequestStatus(pullRequest)]
+		: null;
 	const setTarget = useChatTargetStore((state) => state.setTarget);
 	const targeted = useChatTargetStore(
 		(state) => state.target?.workspaceId === workspace.id,
@@ -98,12 +86,14 @@ export function WorkspaceRow({
 								className="size-6"
 								hitSlop={8}
 								onPress={() =>
-									router.push(`/(authenticated)/workspace/${workspace.id}/diff`)
+									router.push(
+										`/(authenticated)/workspace/${workspace.id}/pull-request/${pullRequest.prNumber}`,
+									)
 								}
 							>
 								<Icon
 									as={prIcon.icon}
-									className={`size-5 ${prIcon.iconClassName}`}
+									className={`size-5 ${prIcon.ink}`}
 									strokeWidth={1.75}
 								/>
 							</Button>

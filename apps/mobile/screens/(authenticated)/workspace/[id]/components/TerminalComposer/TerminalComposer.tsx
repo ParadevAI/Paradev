@@ -41,7 +41,7 @@ export const TerminalComposer = forwardRef<
 	TerminalComposerProps
 >(function TerminalComposer(
 	{
-		placeholder = "Send input",
+		placeholder = "Type a message...",
 		onSubmit,
 		onQuickKey,
 		attachmentTarget,

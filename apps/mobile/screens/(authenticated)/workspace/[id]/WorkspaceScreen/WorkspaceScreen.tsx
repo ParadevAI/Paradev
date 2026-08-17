@@ -1,6 +1,7 @@
 import { buildHostRoutingKey } from "@superset/shared/host-routing";
 import { useQueryClient } from "@tanstack/react-query";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { CloudOff, Plus, SquareTerminal } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
 	ActivityIndicator,
@@ -11,6 +12,7 @@ import {
 	View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { useWorkspaceHost } from "@/hooks/useWorkspaceHost";
 import {
@@ -25,6 +27,7 @@ import type { GlassComposerHandle } from "@/screens/(authenticated)/components/G
 import { PressableScale } from "@/screens/(authenticated)/components/PressableScale";
 import { useTerminalSeenStore } from "@/screens/(authenticated)/stores/terminalSeenStore";
 import { useTerminalTabOrderStore } from "@/screens/(authenticated)/stores/terminalTabOrderStore";
+import { PullRequestsButton } from "../components/PullRequestsButton";
 import {
 	TerminalComposer,
 	type TerminalQuickKey,
@@ -36,8 +39,9 @@ import {
 	TerminalWebView,
 	type TerminalWebViewHandle,
 } from "../components/TerminalWebView";
-import { useWorkspaceChangeset } from "../hooks/useWorkspaceChangeset";
+import { useWorkspacePullRequests } from "../hooks/useWorkspacePullRequest";
 import { orderTerminalRows } from "../utils/orderTerminalRows";
+import { WorkspacePlaceholder } from "./components/WorkspacePlaceholder";
 
 const headerOptions = {
 	headerShown: true,
@@ -67,7 +71,7 @@ export function WorkspaceScreen() {
 
 	const { workspace, host, isResolving } = useWorkspaceHost(id ?? null);
 	const { terminalsByWorkspace, isReady } = useHostTerminals(host);
-	const changeset = useWorkspaceChangeset(id ?? null);
+	const pullRequests = useWorkspacePullRequests(id ?? null);
 
 	// Tabs hold the arrangement the user dragged in the sessions sheet, falling
 	// back to creation order — the hook's activity sort is right for home rows
@@ -136,6 +140,17 @@ export function WorkspaceScreen() {
 			queryKey: getHostTerminalsQueryKey(host.machineId),
 		});
 	}, [host, queryClient]);
+
+	const [refreshing, setRefreshing] = useState(false);
+	const onRefresh = useCallback(async () => {
+		setRefreshing(true);
+		await queryClient
+			.refetchQueries({ queryKey: ["host-service", "workspaces", "list"] })
+			.catch(() => {});
+		invalidateTerminals();
+		void queryClient.invalidateQueries({ queryKey: ["cloud"] });
+		setRefreshing(false);
+	}, [queryClient, invalidateTerminals]);
 
 	const openAddMenu = useCallback(() => {
 		router.push(`/(authenticated)/workspace/${id}/new-session`);
@@ -223,7 +238,6 @@ export function WorkspaceScreen() {
 	}, []);
 
 	const banner = STATE_BANNERS[connectionState];
-	const hasChanges = changeset.files.length > 0;
 	const showComposer = activeTerminalId !== null && routingKey !== null;
 
 	const attachmentTarget = useMemo(
@@ -254,17 +268,6 @@ export function WorkspaceScreen() {
 						</View>
 					</PressableScale>
 				</Stack.Title>
-				{hasChanges ? (
-					<Stack.Toolbar placement="right">
-						<Stack.Toolbar.Button
-							icon="plus.forwardslash.minus"
-							accessibilityLabel="Review changes"
-							onPress={() =>
-								router.push(`/(authenticated)/workspace/${id}/diff`)
-							}
-						/>
-					</Stack.Toolbar>
-				) : null}
 			</Stack.Screen>
 
 			<TerminalTabs
@@ -326,26 +329,35 @@ export function WorkspaceScreen() {
 						<ActivityIndicator />
 					</Centered>
 				) : !host ? (
-					<Centered>
-						<Text className="text-muted-foreground px-8 text-center text-sm">
-							The host that owns this workspace is offline.
-						</Text>
-					</Centered>
+					<WorkspacePlaceholder
+						body="It will reconnect on its own once the machine is back. Pull to check again."
+						icon={CloudOff}
+						onRefresh={onRefresh}
+						refreshing={refreshing}
+						title="This workspace's host is offline"
+					/>
 				) : (
-					<Centered>
-						<Text className="text-muted-foreground text-sm">
-							No sessions yet.
-						</Text>
-						<Pressable onPress={openAddMenu} className="mt-3 active:opacity-60">
-							<Text className="text-foreground text-sm font-medium">
-								Start one +
-							</Text>
-						</Pressable>
-					</Centered>
+					<WorkspacePlaceholder
+						action={
+							<Pressable
+								accessibilityRole="button"
+								className="bg-secondary h-[38px] flex-row items-center justify-center gap-1.5 rounded-md px-5 active:opacity-80"
+								onPress={openAddMenu}
+							>
+								<Icon as={Plus} className="text-foreground size-4" />
+								<Text className="font-medium text-[15px]">Start a session</Text>
+							</Pressable>
+						}
+						body="Start an agent or a terminal to begin working in this workspace."
+						icon={SquareTerminal}
+						onRefresh={onRefresh}
+						refreshing={refreshing}
+						title="No sessions yet"
+					/>
 				)}
 			</View>
 
-			{showComposer ? (
+			{showComposer || pullRequests.length > 0 ? (
 				<View
 					className="absolute inset-x-0"
 					style={{ bottom: composerBottom }}
@@ -353,14 +365,40 @@ export function WorkspaceScreen() {
 						setComposerHeight(event.nativeEvent.layout.height)
 					}
 				>
-					<TerminalComposer
-						ref={composerRef}
-						onSubmit={handleSubmit}
-						onQuickKey={handleQuickKey}
-						attachmentTarget={attachmentTarget}
-						allowAttachments={activeRow?.agentId != null}
-						onActiveChange={setComposerActive}
-					/>
+					{pullRequests.length > 0 ? (
+						<View className="px-4 pb-2">
+							<PullRequestsButton
+								onPress={() =>
+									pullRequests.length > 1
+										? router.push({
+												pathname: "/workspace/[id]/pull-requests",
+												params: { id },
+											})
+										: router.push({
+												pathname:
+													"/workspace/[id]/pull-request/[pullRequestId]",
+												params: {
+													id,
+													pullRequestId: String(
+														pullRequests[0]?.prNumber ?? "",
+													),
+												},
+											})
+								}
+								pullRequests={pullRequests}
+							/>
+						</View>
+					) : null}
+					{showComposer ? (
+						<TerminalComposer
+							allowAttachments={activeRow?.agentId != null}
+							attachmentTarget={attachmentTarget}
+							onActiveChange={setComposerActive}
+							onQuickKey={handleQuickKey}
+							onSubmit={handleSubmit}
+							ref={composerRef}
+						/>
+					) : null}
 				</View>
 			) : null}
 		</View>

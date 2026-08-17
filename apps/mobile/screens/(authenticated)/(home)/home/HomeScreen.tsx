@@ -20,6 +20,7 @@ import {
 	usePullRequests,
 } from "@/screens/(authenticated)/hooks/usePullRequests";
 import { usePinnedWorkspacesStore } from "@/screens/(authenticated)/stores/pinnedWorkspacesStore";
+import { pullRequestStatus } from "@/screens/(authenticated)/workspace/[id]/utils/pullRequest";
 import { HostOfflineView } from "./components/HostOfflineView";
 import { NewChatWidget } from "./components/NewChatWidget";
 import { OrganizationHeaderButton } from "./components/OrganizationHeaderButton";
@@ -37,7 +38,6 @@ import {
 	SORT_OPTIONS,
 	useWorkspacesFilterStore,
 } from "./stores/workspacesFilterStore";
-import { prStateFor } from "./utils/prStateFor";
 
 const VIEWABILITY_CONFIG = {
 	itemVisiblePercentThreshold: 50,
@@ -83,6 +83,7 @@ export function HomeScreen() {
 	const insets = useSafeAreaInsets();
 	const queryClient = useQueryClient();
 	const {
+		isLoadingOrganizations,
 		organizations,
 		activeOrganization,
 		activeOrganizationId,
@@ -283,7 +284,13 @@ export function HomeScreen() {
 	);
 
 	const pullRequestsByRepoBranch = useMemo(() => {
-		const rank = { closed: 3, draft: 1, merged: 2, open: 0 } as const;
+		const rank = {
+			closed: 3,
+			draft: 1,
+			merged: 2,
+			open: 0,
+			queued: 0,
+		} as const;
 		const byRepoBranch = new Map<string, OrgPullRequest>();
 		for (const pullRequest of pullRequests) {
 			// Key on repo coordinates from the PR URL — host projects don't
@@ -297,7 +304,9 @@ export function HomeScreen() {
 				byRepoBranch.set(key, pullRequest);
 				continue;
 			}
-			const cmp = rank[prStateFor(pullRequest)] - rank[prStateFor(existing)];
+			const cmp =
+				rank[pullRequestStatus(pullRequest)] -
+				rank[pullRequestStatus(existing)];
 			if (
 				cmp < 0 ||
 				(cmp === 0 && isAfter(pullRequest.updatedAt, existing.updatedAt))
@@ -451,6 +460,7 @@ export function HomeScreen() {
 	return (
 		<>
 			<OrganizationHeaderButton
+				isLoading={isLoadingOrganizations}
 				name={activeOrganization?.name}
 				logo={activeOrganization?.logo}
 				onPress={() => {
@@ -505,7 +515,7 @@ export function HomeScreen() {
 						<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
 					}
 					ListEmptyComponent={
-						isReady && hasHydrated ? (
+						isReady && hasHydrated && !isLoadingOrganizations ? (
 							<View className="items-center justify-center py-20">
 								<Text className="text-center text-muted-foreground">
 									{searching
