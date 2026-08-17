@@ -11,21 +11,36 @@ import { track } from "renderer/lib/analytics";
 
 interface GitHubStarPillProps {
 	className?: string;
+	/** Analytics surface tag; defaults to "empty_state" for the original callers. */
+	surface?: "empty_state" | "new_workspace";
+	/**
+	 * Keep the pill's layout box mounted (just faded to invisible) instead of
+	 * unmounting it once starred. The empty-state screens sit at the bottom of
+	 * a plain block, so a height collapse there is harmless; the new-workspace
+	 * screen centers its content with `justify-center`, where that same
+	 * collapse re-centers everything above it. Off by default so the two
+	 * existing callers keep their original unmount-on-hide behavior.
+	 */
+	reserveSpace?: boolean;
 }
 
 /**
  * Small, always-optional "Star Superset on GitHub" pill for the empty
- * "no pane open" screens (v1 EmptyTabView and v2 WorkspaceEmptyState).
- * Renders straight from live `state`, with no nag-suppression layer — unlike
- * the sidebar card/toast, this is a low-key status indicator, not an
- * interruptive campaign, so it's allowed to be fully truthful: it hides the
- * instant `state` is "starred" and reappears the instant a later unstar is
- * confirmed, without waiting on any mute grace window. It briefly stays
- * mounted past that point so the confetti/label animation on a fresh star
- * has time to play, then dissolves out (fade + soft blur) instead of
- * vanishing instantly.
+ * "no pane open" screens (v1 EmptyTabView and v2 WorkspaceEmptyState) and
+ * the new-workspace screen. Renders straight from live `state`, with no
+ * nag-suppression layer — unlike the sidebar card/toast, this is a low-key
+ * status indicator, not an interruptive campaign, so it's allowed to be
+ * fully truthful: it hides the instant `state` is "starred" and reappears
+ * the instant a later unstar is confirmed, without waiting on any mute
+ * grace window. It briefly stays mounted past that point so the
+ * confetti/label animation on a fresh star has time to play, then
+ * dissolves out (fade + soft blur) instead of vanishing instantly.
  */
-export function GitHubStarPill({ className }: GitHubStarPillProps) {
+export function GitHubStarPill({
+	className,
+	surface = "empty_state",
+	reserveSpace = false,
+}: GitHubStarPillProps) {
 	const { state, activate, isBusy } = useGithubStarAction();
 	const prevStateRef = useRef<GithubStarActionState | null>(null);
 
@@ -69,35 +84,58 @@ export function GitHubStarPill({ className }: GitHubStarPillProps) {
 		}
 	}, [state]);
 
-	// Fire at most once per showing — reset once starred so a later unstar
-	// that re-shows the pill tracks a fresh "shown" impression instead of
-	// staying silent forever after the first one.
-	const trackedShownRef = useRef(false);
+	// Fire at most once per showing per surface — reset once starred so a
+	// later unstar re-shows the pill and tracks a fresh "shown" impression,
+	// and reset again if `surface` itself changes so a re-purposed mounted
+	// instance still gets its own impression instead of inheriting the prior
+	// surface's guard.
+	const trackedShownSurfaceRef = useRef<NonNullable<
+		GitHubStarPillProps["surface"]
+	> | null>(null);
 	useEffect(() => {
 		if (state === "starred") {
-			trackedShownRef.current = false;
+			trackedShownSurfaceRef.current = null;
 			return;
 		}
-		if (trackedShownRef.current) return;
+		if (trackedShownSurfaceRef.current === surface) return;
 		if (state !== "not_starred" && state !== "unknown") return;
-		trackedShownRef.current = true;
-		track("star_nag_shown", { surface: "empty_state" });
-	}, [state]);
+		trackedShownSurfaceRef.current = surface;
+		track("star_nag_shown", { surface });
+	}, [state, surface]);
 
-	if (state === "loading") return null;
+	if (state === "loading" && !reserveSpace) return null;
 
-	const isVisible = !(
-		state === "starred" &&
-		!justStarred &&
-		!staysVisibleForAnimation
-	);
+	const isVisible =
+		state !== "loading" &&
+		!(state === "starred" && !justStarred && !staysVisibleForAnimation);
 
 	const handleClick = () => {
 		track(state === "unknown" ? "star_nag_opened_web" : "star_nag_starred", {
-			surface: "empty_state",
+			surface,
 		});
 		activate();
 	};
+
+	if (reserveSpace) {
+		// Always mounted so the button's box keeps occupying its slot — only
+		// opacity/interactivity change, never the layout.
+		return (
+			<motion.div
+				animate={{ opacity: isVisible ? 1 : 0 }}
+				transition={{ duration: 0.32, ease: "easeOut" }}
+				style={{ pointerEvents: isVisible ? "auto" : "none" }}
+				aria-hidden={!isVisible}
+				inert={!isVisible}
+				className={cn("flex items-center justify-center", className)}
+			>
+				<AnimatedStarButton
+					state={state}
+					busy={isBusy}
+					onActivate={handleClick}
+				/>
+			</motion.div>
+		);
+	}
 
 	return (
 		<AnimatePresence>

@@ -29,6 +29,7 @@ import { LuGitPullRequest } from "react-icons/lu";
 import { SiLinear } from "react-icons/si";
 import { AgentModelSelect } from "renderer/components/AgentModelSelect";
 import { AgentSelect } from "renderer/components/AgentSelect";
+import { GitHubStarPill } from "renderer/components/GitHubStarPill";
 import { IssueLinkCommand } from "renderer/components/IssueLinkCommand";
 import { LinkedIssuePill } from "renderer/components/LinkedIssuePill";
 import { MarkdownEditor } from "renderer/components/MarkdownEditor";
@@ -655,6 +656,7 @@ export function NewWorkspaceScreen({
 				<h1 className="text-center text-3xl font-medium text-foreground/90">
 					What should we build next?
 				</h1>
+				<GitHubStarPill surface="new_workspace" reserveSpace />
 			</div>
 			<div className="relative flex w-full max-w-[640px] flex-col px-6 pb-8">
 				<AnimatePresence initial={false}>
