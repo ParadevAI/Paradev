@@ -131,7 +131,7 @@ export function V2WorkspacesList({
 		pinFilter !== "all" ||
 		// A narrowed archive window can hide every row (e.g. all tombstones
 		// with "Hide archived") — that's a filter, not an empty account.
-		archivedWindow !== "week";
+		archivedWindow !== "none";
 
 	// Sections, not the input rows: the archived window can drop everything.
 	if (sections.length === 0) {

@@ -29,7 +29,7 @@ export type V2WorkspacesSearch = {
 	agent?: string;
 	/** Sidebar pin visibility; omitted = "all". */
 	pin?: V2WorkspacesPinFilter;
-	view?: "board";
+	view?: V2WorkspacesViewMode;
 	archived?: V2WorkspacesArchivedWindow;
 };
 
@@ -66,7 +66,10 @@ export const Route = createFileRoute(
 		pin: V2_WORKSPACES_PIN_FILTERS.includes(search.pin as V2WorkspacesPinFilter)
 			? (search.pin as V2WorkspacesPinFilter)
 			: undefined,
-		view: search.view === "board" ? "board" : undefined,
+		view:
+			search.view === "board" || search.view === "list"
+				? search.view
+				: undefined,
 		archived: V2_WORKSPACES_ARCHIVED_WINDOWS.includes(
 			search.archived as V2WorkspacesArchivedWindow,
 		)
@@ -127,9 +130,7 @@ function V2WorkspacesPage() {
 				),
 			}),
 			...(search.pin !== undefined && { pinFilter: search.pin }),
-			...(search.view !== undefined && {
-				viewMode: "board" as V2WorkspacesViewMode,
-			}),
+			...(search.view !== undefined && { viewMode: search.view }),
 			...(search.archived !== undefined && {
 				archivedWindow: search.archived,
 			}),
@@ -148,8 +149,8 @@ function V2WorkspacesPage() {
 					? agentStatusFilters.join(",")
 					: undefined,
 				pin: pinFilter !== "all" ? pinFilter : undefined,
-				view: viewMode === "board" ? "board" : undefined,
-				archived: archivedWindow !== "week" ? archivedWindow : undefined,
+				view: viewMode !== "board" ? viewMode : undefined,
+				archived: archivedWindow !== "none" ? archivedWindow : undefined,
 			},
 			replace: true,
 		});
