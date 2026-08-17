@@ -153,11 +153,17 @@ export const FEATURE_FLAGS = {
 	 */
 	NEW_WORKSPACE_SCREEN_OVERRIDE: "new-workspace-screen-override",
 	/**
-	 * Experiment flag (control/test) nested inside the shipped new-workspace
-	 * screen: control keeps the inline sample-prompt rows, test replaces them
-	 * with two cards above the composer. Prompt text is identical in both arms
-	 * so the comparison isolates presentation. Evaluated when the screen opens,
-	 * like NEW_WORKSPACE_SCREEN, so exposure matches the population that sees it.
+	 * Three-arm experiment flag nested inside the shipped new-workspace screen,
+	 * testing form factor only: `control` keeps the inline sample-prompt rows,
+	 * `cards2` shows two cards above the composer, `cards4` shows four in a 2x2
+	 * grid. Every arm slices a nested prefix of one fixed prompt pool and shares
+	 * the same selection rule, so content is identical and only layout and count
+	 * vary. Evaluated when the screen opens, like NEW_WORKSPACE_SCREEN, so
+	 * exposure matches the population that sees it.
+	 *
+	 * Anything other than `cards2`/`cards4` renders control — which is why the
+	 * flag must not go live before a build carrying those arms ships, or older
+	 * builds would be assigned a card arm and shown rows.
 	 *
 	 * Eligibility (new accounts only) is a release condition on the flag, not
 	 * code: a `created_at` person property cutoff, which the renderer sends with
@@ -166,7 +172,7 @@ export const FEATURE_FLAGS = {
 	 */
 	NEW_WORKSPACE_PROMPT_CARDS: "new-workspace-prompt-cards",
 	/**
-	 * Boolean override that forces the prompt cards without evaluating the
+	 * Boolean override that forces the `cards2` arm without evaluating the
 	 * experiment flag — no exposure event, so team and dev accounts can look at
 	 * the cards without entering the analysis. Checked before the experiment
 	 * flag, same as NEW_WORKSPACE_SCREEN_OVERRIDE.
