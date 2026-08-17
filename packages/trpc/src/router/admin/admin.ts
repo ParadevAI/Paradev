@@ -11,8 +11,8 @@ import {
 	sessions,
 	subscriptions,
 	teamMembers,
+	userIdentities,
 	users,
-	usersSlackUsers,
 	v2Clients,
 	v2UsersHosts,
 } from "@superset/db/schema";
@@ -122,8 +122,8 @@ export const adminRouter = {
 					.where(eq(v2UsersHosts.userId, input.userId));
 				await tx.delete(v2Clients).where(eq(v2Clients.userId, input.userId));
 				await tx
-					.delete(usersSlackUsers)
-					.where(eq(usersSlackUsers.userId, input.userId));
+					.delete(userIdentities)
+					.where(eq(userIdentities.userId, input.userId));
 
 				// The row survives so authorship still resolves, but carries nothing
 				// identifying. The email is rewritten rather than blanked so it is

@@ -19,6 +19,9 @@ export type MatchableEvent = {
 	eventType: string;
 	repositoryId: string | null;
 	ref: string | null;
+	/** GitHub's numeric id; what people filters compare against. */
+	actorId: string | null;
+	/** Display only — a login can be renamed, the id cannot. */
 	actorLogin: string | null;
 	actorIsExternal: boolean | null;
 	labels: string[];
@@ -27,7 +30,7 @@ export type MatchableEvent = {
 	/** Fork pull requests carry attacker-controlled content into a checkout. */
 	isFork: boolean;
 	/** Who opened the thing being commented on. */
-	subjectAuthorLogin: string | null;
+	subjectAuthorId: string | null;
 };
 
 export type MatchResult =
@@ -59,15 +62,19 @@ export function scopeAllowsAny(scope: TriggerScope, values: string[]): boolean {
 	return values.some((v) => scope.ids.includes(v));
 }
 
+/**
+ * `ownerIds` is a set: a person may link both a work and a personal account, and
+ * a pull request opened from either is still theirs.
+ */
 export function actorAllows(
 	actor: TriggerActor,
-	login: string | null,
-	ownerLogin: string | null,
+	actorId: string | null,
+	ownerIds: string[],
 ): boolean {
 	if (actor === "anyone") return true;
-	if (actor === "me") return login !== null && login === ownerLogin;
-	if (login === null) return false;
-	return actor.ids.includes(login);
+	if (actorId === null) return false;
+	if (actor === "me") return ownerIds.includes(actorId);
+	return actor.ids.includes(actorId);
 }
 
 /**
@@ -176,7 +183,7 @@ export function githubTriggerMatches(
 		includeForks: boolean;
 	},
 	event: MatchableEvent,
-	context: { names: GithubTriggerEvent[]; ownerLogin: string | null },
+	context: { names: GithubTriggerEvent[]; ownerIds: string[] },
 ): MatchResult {
 	if (!context.names.includes(config.event as GithubTriggerEvent)) {
 		return no("event");
@@ -192,16 +199,12 @@ export function githubTriggerMatches(
 	if (config.labels !== null && !scopeAllowsAny(config.labels, event.labels)) {
 		return no("label");
 	}
-	if (!actorAllows(config.actor, event.actorLogin, context.ownerLogin)) {
+	if (!actorAllows(config.actor, event.actorId, context.ownerIds)) {
 		return no("actor");
 	}
 	if (
 		config.subjectAuthor !== undefined &&
-		!actorAllows(
-			config.subjectAuthor,
-			event.subjectAuthorLogin,
-			context.ownerLogin,
-		)
+		!actorAllows(config.subjectAuthor, event.subjectAuthorId, context.ownerIds)
 	) {
 		return no("subjectAuthor");
 	}

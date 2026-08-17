@@ -21,7 +21,7 @@ export type GithubPayload = {
 	action?: string;
 	installation?: { id?: number | string };
 	repository?: { id?: number | string; full_name?: string };
-	sender?: { login?: string; type?: string };
+	sender?: { id?: number | string; login?: string; type?: string };
 	// GitHub's own membership signal, present on comment, PR and review
 	// payloads. The only trustworthy source for "is this person one of us".
 	author_association?: string;
@@ -31,7 +31,7 @@ export type GithubPayload = {
 		title?: string;
 		html_url?: string;
 		head?: { ref?: string; repo?: { fork?: boolean } };
-		user?: { login?: string };
+		user?: { id?: number | string; login?: string };
 		draft?: boolean;
 		author_association?: string;
 	};
@@ -40,7 +40,7 @@ export type GithubPayload = {
 		labels?: Array<{ name?: string }>;
 		title?: string;
 		html_url?: string;
-		user?: { login?: string };
+		user?: { id?: number | string; login?: string };
 	};
 	comment?: {
 		body?: string;

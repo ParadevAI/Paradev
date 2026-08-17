@@ -36,7 +36,11 @@ import {
 	workspaceTypeValues,
 } from "./enums";
 import { githubRepositories } from "./github";
-import type { IntegrationConfig, TriggerConfig } from "./types";
+import type {
+	IntegrationConfig,
+	TriggerConfig,
+	UserIdentityMetadata,
+} from "./types";
 import type { WorkspaceConfig } from "./zod";
 
 export const taskStatus = pgEnum("task_status", taskStatusEnumValues);
@@ -321,6 +325,72 @@ export const agentCommands = pgTable(
 
 export type InsertAgentCommand = typeof agentCommands.$inferInsert;
 export type SelectAgentCommand = typeof agentCommands.$inferSelect;
+
+/**
+ * A person's identity at an external provider, per organization.
+ *
+ * Org-scoped rather than global, matching how Linear handles it: connecting
+ * GitHub in one workspace leaves another workspace untouched, and the same
+ * account can be connected in both. Verified by experiment — their docs claim
+ * one workspace per account, and the product does not enforce it.
+ *
+ * Not one table per provider. `users__slack_users` predates this and is the
+ * shape being replaced.
+ */
+export const userIdentities = pgTable(
+	"user_identities",
+	{
+		id: uuid().primaryKey().defaultRandom(),
+		userId: uuid("user_id")
+			.notNull()
+			.references(() => users.id, { onDelete: "cascade" }),
+		organizationId: uuid("organization_id")
+			.notNull()
+			.references(() => organizations.id, { onDelete: "cascade" }),
+
+		// Text rather than integration_provider: this also holds sign-in providers
+		// like google, which have no connection row behind them.
+		provider: text().notNull(),
+		// The provider's stable id. Matching keys off this because a handle can be
+		// renamed and an id cannot.
+		externalId: text("external_id").notNull(),
+		// The workspace, tenant or account the id belongs to, for providers whose
+		// user ids are not global. Null for GitHub and Google, set for Slack,
+		// Linear, Teams and PagerDuty.
+		externalScopeId: text("external_scope_id"),
+
+		// Display only, and nullable: an OAuth sign-in yields the id without the
+		// handle ever being fetched.
+		handle: text(),
+		displayName: text("display_name"),
+
+		// Provider-specific extras, typed as a union per provider rather than a
+		// free blob. Slack's chosen model lives here; it is the only occupant.
+		metadata: jsonb().$type<UserIdentityMetadata>(),
+
+		createdAt: timestamp("created_at", { withTimezone: true })
+			.notNull()
+			.defaultNow(),
+		updatedAt: timestamp("updated_at", { withTimezone: true })
+			.notNull()
+			.defaultNow()
+			.$onUpdate(() => new Date()),
+	},
+	(t) => [
+		// One external account per org. NULLS NOT DISTINCT so providers with a
+		// null scope still collide with themselves.
+		unique("user_identities_account_unique")
+			.on(t.organizationId, t.provider, t.externalScopeId, t.externalId)
+			.nullsNotDistinct(),
+		// Deliberately no constraint limiting a person to one account per
+		// provider: linking both a work and a personal account is supported.
+		index("user_identities_user_idx").on(t.userId),
+		index("user_identities_org_provider_idx").on(t.organizationId, t.provider),
+	],
+);
+
+export type InsertUserIdentity = typeof userIdentities.$inferInsert;
+export type SelectUserIdentity = typeof userIdentities.$inferSelect;
 
 export const usersSlackUsers = pgTable(
 	"users__slack_users",

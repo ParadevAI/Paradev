@@ -71,3 +71,16 @@ export type TriggerConfig =
 	| SlackTriggerConfig
 	| LinearTriggerConfig
 	| SentryTriggerConfig;
+
+/**
+ * Provider-specific extras on a user identity.
+ *
+ * A union rather than a free jsonb blob: each provider declares what it may
+ * store, so growth is visible in the type instead of hidden in the column. When
+ * a provider's entry stops being a couple of fields, that is the signal to give
+ * it a table.
+ */
+export type UserIdentityMetadata =
+	| { provider: "slack"; modelPreference?: string }
+	| { provider: "github" }
+	| { provider: "google" };

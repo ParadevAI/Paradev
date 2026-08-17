@@ -3,6 +3,7 @@ import {
 	automations,
 	automationTriggers,
 	type GithubTriggerConfig,
+	userIdentities,
 } from "@superset/db/schema";
 import {
 	githubEventNames,
@@ -34,6 +35,8 @@ function matchableFrom(
 		eventType,
 		repositoryId,
 		ref,
+		actorId:
+			payload.sender?.id !== undefined ? String(payload.sender.id) : null,
 		actorLogin: payload.sender?.login ?? null,
 		actorIsExternal: null,
 		labels: (payload.pull_request?.labels ?? payload.issue?.labels ?? [])
@@ -43,8 +46,11 @@ function matchableFrom(
 		isFork: payload.pull_request?.head?.repo?.fork === true,
 		// Who opened the thing being commented on, which is a different person
 		// from whoever wrote the comment.
-		subjectAuthorLogin:
-			payload.pull_request?.user?.login ?? payload.issue?.user?.login ?? null,
+		subjectAuthorId: (() => {
+			const id =
+				payload.pull_request?.user?.id ?? payload.issue?.user?.id ?? undefined;
+			return id !== undefined ? String(id) : null;
+		})(),
 	};
 }
 
@@ -93,6 +99,28 @@ export async function dispatchMatchingTriggers(params: {
 
 	if (candidates.length === 0) return { matched: 0, considered: 0 };
 
+	// Every GitHub identity linked in this org, so `me` can resolve to the
+	// automation owner. A person may link more than one account — work and
+	// personal — so this is a set per user, not a value.
+	const identities = await dbWs
+		.select({
+			userId: userIdentities.userId,
+			externalId: userIdentities.externalId,
+		})
+		.from(userIdentities)
+		.where(
+			and(
+				eq(userIdentities.organizationId, params.organizationId),
+				eq(userIdentities.provider, "github"),
+			),
+		);
+	const githubIdsByUser = new Map<string, string[]>();
+	for (const row of identities) {
+		const existing = githubIdsByUser.get(row.userId);
+		if (existing) existing.push(row.externalId);
+		else githubIdsByUser.set(row.userId, [row.externalId]);
+	}
+
 	const event = matchableFrom(
 		params.payload,
 		params.eventType,
@@ -106,10 +134,9 @@ export async function dispatchMatchingTriggers(params: {
 		return githubTriggerMatches(
 			config as never,
 			event,
-			// `me` cannot resolve yet: the owner is a Superset user id and the
-			// event carries a GitHub login, so there is nothing to compare. Passing
-			// null makes `me` match nobody rather than match the wrong person.
-			{ names, ownerLogin: null },
+			// Resolved per candidate: two automations can watch the same event on
+			// behalf of different owners.
+			{ names, ownerIds: githubIdsByUser.get(candidate.ownerUserId) ?? [] },
 		).matches;
 	});
 

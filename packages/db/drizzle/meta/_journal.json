@@ -554,6 +554,20 @@
       "when": 1786921238279,
       "tag": "0078_cloud_workspaces",
       "breakpoints": true
+    },
+    {
+      "idx": 79,
+      "version": "7",
+      "when": 1786923721261,
+      "tag": "0079_user_identities",
+      "breakpoints": true
+    },
+    {
+      "idx": 80,
+      "version": "7",
+      "when": 1786923733322,
+      "tag": "0080_backfill_identities",
+      "breakpoints": true
     }
   ]
 }
