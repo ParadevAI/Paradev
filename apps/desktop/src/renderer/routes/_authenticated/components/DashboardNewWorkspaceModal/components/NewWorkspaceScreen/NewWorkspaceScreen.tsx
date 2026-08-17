@@ -43,12 +43,16 @@ import { authClient } from "renderer/lib/auth-client";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { showHostServiceUnavailableToast } from "renderer/lib/host-service-unavailable";
 import { SupersetIcon } from "renderer/routes/_authenticated/onboarding/providers/components/SupersetIcon";
+import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { newWorkspaceAttachmentPaths } from "renderer/stores/new-workspace-attachments";
 import { useNewWorkspacePromptContext } from "renderer/stores/new-workspace-prompt-context";
 import { useV2WorkspaceCreateDefaultsStore } from "renderer/stores/v2-workspace-create-defaults";
 import { useDashboardNewWorkspaceDraft } from "../../DashboardNewWorkspaceDraftContext";
-import { useNewWorkspacePromptCardsVariant } from "../../hooks/useNewWorkspacePromptCardsVariant";
+import {
+	type PromptCardsVariant,
+	useNewWorkspacePromptCardsVariant,
+} from "../../hooks/useNewWorkspacePromptCardsVariant";
 import { DevicePicker } from "../DashboardNewWorkspaceForm/components/DevicePicker";
 import { CLOUD_HOST_ID } from "../DashboardNewWorkspaceForm/components/DevicePicker/DevicePicker";
 import { useWorkspaceHostOptions } from "../DashboardNewWorkspaceForm/components/DevicePicker/hooks/useWorkspaceHostOptions";
@@ -78,6 +82,20 @@ import { AttachmentCard } from "./components/AttachmentCard";
 import { SamplePromptCards } from "./components/SamplePromptCards";
 import { SamplePrompts } from "./components/SamplePrompts";
 import { PROMPT_PLACEHOLDERS } from "./components/SamplePrompts/constants";
+import { useSamplePromptSelection } from "./hooks/useSamplePromptSelection";
+
+/** Nested prefixes of one fixed pool — only the form factor varies by arm. */
+const PROMPT_COUNTS: Record<PromptCardsVariant, number> = {
+	control: 3,
+	cards2: 2,
+	cards4: 4,
+};
+
+const PROMPT_LAYOUTS: Record<PromptCardsVariant, string> = {
+	control: "rows",
+	cards2: "cards2",
+	cards4: "cards4",
+};
 
 interface NewWorkspaceScreenProps {
 	isOpen: boolean;
@@ -367,13 +385,31 @@ export function NewWorkspaceScreen({
 	}, [draft.hostId, machineId, activeHostUrl, activeOrganizationId, relayUrl]);
 
 	const promptCardsVariant = useNewWorkspacePromptCardsVariant(isOpen);
+	const promptLayout =
+		promptCardsVariant === null ? "rows" : PROMPT_LAYOUTS[promptCardsVariant];
+
+	// One signal drives both the prompt tier and the dismiss affordance: has
+	// this person shipped anything yet. `main` is auto-created for every new
+	// account, so it cannot count.
+	const { workspaces: hostWorkspaces } = useHostWorkspaces();
+	const hasRealWorkspace = hostWorkspaces.some(
+		(workspace) => workspace.type !== "main",
+	);
+
+	const samplePromptTier = hasRealWorkspace ? "returning" : "first-run";
+	const { prompts: samplePrompts, isPending: samplePromptsPending } =
+		useSamplePromptSelection(
+			samplePromptTier,
+			launchHostUrl,
+			projectId,
+			promptCardsVariant === null ? 0 : PROMPT_COUNTS[promptCardsVariant],
+		);
+
 	// Logged so the prompt-cards experiment can account for lost exposure.
 	const handleDismissSamplePrompts = useCallback(() => {
-		track("new_workspace_sample_prompts_dismissed", {
-			layout: promptCardsVariant === "test" ? "cards" : "rows",
-		});
+		track("new_workspace_sample_prompts_dismissed", { layout: promptLayout });
 		setSamplePromptsDismissed(true);
-	}, [promptCardsVariant, setSamplePromptsDismissed]);
+	}, [promptLayout, setSamplePromptsDismissed]);
 
 	const { agents: v2Agents, isFetched: v2AgentsFetched } =
 		useV2AgentChoices(launchHostUrl);
@@ -623,6 +659,7 @@ export function NewWorkspaceScreen({
 				<AnimatePresence initial={false}>
 					{isPromptEmpty &&
 						promptCardsVariant !== null &&
+						!samplePromptsPending &&
 						!samplePromptsDismissed && (
 							<motion.div
 								key="sample-prompts"
@@ -632,17 +669,22 @@ export function NewWorkspaceScreen({
 								transition={{ type: "tween", duration: 0.15, ease: "easeOut" }}
 								className="absolute inset-x-6 bottom-full mb-1"
 							>
-								{promptCardsVariant === "test" ? (
-									<SamplePromptCards
-										hostUrl={launchHostUrl}
-										projectId={projectId}
+								{promptCardsVariant === "control" ? (
+									<SamplePrompts
+										prompts={samplePrompts}
 										onSelect={applyPrompt}
 										onDismiss={handleDismissSamplePrompts}
+										canDismiss={hasRealWorkspace}
+										tier={samplePromptTier}
 									/>
 								) : (
-									<SamplePrompts
+									<SamplePromptCards
+										prompts={samplePrompts}
 										onSelect={applyPrompt}
 										onDismiss={handleDismissSamplePrompts}
+										canDismiss={hasRealWorkspace}
+										layout={promptLayout}
+										tier={samplePromptTier}
 									/>
 								)}
 							</motion.div>

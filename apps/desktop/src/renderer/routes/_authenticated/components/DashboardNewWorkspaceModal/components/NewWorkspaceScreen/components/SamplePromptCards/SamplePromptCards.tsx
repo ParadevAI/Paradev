@@ -1,95 +1,60 @@
-import { useQuery } from "@tanstack/react-query";
 import {
 	BookOpenIcon,
 	BugIcon,
 	FlaskConicalIcon,
-	ListChecksIcon,
 	ScrollTextIcon,
 	WrenchIcon,
-	XIcon,
 } from "lucide-react";
-import { useState } from "react";
 import { track } from "renderer/lib/analytics";
-import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
-import { shuffledSamplePrompts } from "../SamplePrompts/constants";
+import { DismissSuggestionsButton } from "../DismissSuggestionsButton";
+import type {
+	SamplePrompt,
+	SamplePromptTier,
+} from "../SamplePrompts/constants";
 import { AgentLogoCluster } from "./components/AgentLogoCluster";
 
 const CARD_ICONS: Record<string, typeof WrenchIcon> = {
 	"set-up-project": WrenchIcon,
 	"explain-repo": BookOpenIcon,
 	"fix-small-bug": BugIcon,
-	"improve-agent-docs": ScrollTextIcon,
 	"add-missing-tests": FlaskConicalIcon,
-	"clean-up-todos": ListChecksIcon,
+	"improve-agent-docs": ScrollTextIcon,
 };
 
-const CARD_COUNT = 4;
-
 interface SamplePromptCardsProps {
-	hostUrl: string | null;
-	projectId: string | null;
+	prompts: SamplePrompt[];
 	onSelect: (prompt: string) => void;
 	onDismiss: () => void;
+	canDismiss: boolean;
+	/** Distinguishes the 2-card and 4-card arms in the click event. */
+	layout: string;
+	tier: SamplePromptTier;
 }
 
 export function SamplePromptCards({
-	hostUrl,
-	projectId,
+	prompts,
 	onSelect,
 	onDismiss,
+	canDismiss,
+	layout,
+	tier,
 }: SamplePromptCardsProps) {
-	// Shuffled once per mount so every prompt in the pool gets exposure;
-	// re-shuffling per render would reorder cards under the pointer.
-	const [shuffledPrompts] = useState(shuffledSamplePrompts);
-
-	// Setup takes 75% of all prompt clicks, so it leads — but pitching setup for
-	// a project that already has setup/teardown/run commands reads as noise.
-	// Same query the v2 sidebar setup card uses.
-	const canCheckSetup = Boolean(hostUrl && projectId);
-	const { data: needsSetupScripts, isPending } = useQuery({
-		queryKey: ["host-config", "shouldShowSetupCard", hostUrl, projectId],
-		queryFn: () =>
-			hostUrl && projectId
-				? getHostServiceClientByUrl(hostUrl).config.shouldShowSetupCard.query({
-						projectId,
-					})
-				: false,
-		enabled: canCheckSetup,
-	});
-
-	// Deciding mid-flight would swap a card out from under the pointer.
-	if (canCheckSetup && isPending) return null;
-
-	const setupCard = shuffledPrompts.find(
-		(sample) => sample.id === "set-up-project",
-	);
-	const cards = [
-		...(needsSetupScripts === true && setupCard ? [setupCard] : []),
-		...shuffledPrompts.filter((sample) => sample.id !== "set-up-project"),
-	].slice(0, CARD_COUNT);
-
 	return (
 		<div className="group relative px-1 pb-2">
-			<button
-				type="button"
-				aria-label="Dismiss suggestions"
-				onClick={onDismiss}
-				className="absolute -top-2 right-0 z-10 flex size-5 cursor-pointer items-center justify-center rounded-full border-[0.5px] border-border bg-popover text-muted-foreground opacity-0 shadow-sm transition-opacity hover:text-foreground focus-visible:opacity-100 group-hover:opacity-100"
-			>
-				<XIcon className="size-3" />
-			</button>
+			{canDismiss && <DismissSuggestionsButton onDismiss={onDismiss} />}
 			<div className="grid grid-cols-2 gap-2">
-				{cards.map((sample) => {
+				{prompts.map((sample) => {
 					const Icon = CARD_ICONS[sample.id] ?? WrenchIcon;
 					return (
 						<button
 							key={sample.id}
 							type="button"
-							className="flex cursor-pointer flex-col items-start gap-1.5 rounded-xl bg-foreground/[0.03] p-3 text-left transition-colors hover:bg-foreground/[0.06]"
+							className="flex cursor-pointer flex-col items-start gap-1.5 rounded-xl border-[0.5px] border-border bg-foreground/[0.02] p-3 text-left transition-colors hover:border-foreground/20 hover:bg-foreground/[0.05]"
 							onClick={() => {
 								track("new_workspace_sample_prompt_clicked", {
 									prompt_id: sample.id,
-									layout: "cards",
+									layout,
+									tier,
 								});
 								onSelect(sample.prompt);
 							}}
