@@ -37,6 +37,10 @@ import {
 	tasksSearchFromFilters,
 	useTasksFilterStore,
 } from "renderer/routes/_authenticated/_dashboard/tasks/stores/tasks-filter-state";
+import {
+	getUsageLastSection,
+	usageSectionPath,
+} from "renderer/routes/_authenticated/_dashboard/usage/utils/usageLastSection";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { STROKE_WIDTH_THICK } from "renderer/screens/main/components/WorkspaceSidebar/constants";
 import {
@@ -166,7 +170,9 @@ export function DashboardSidebarHeader({
 	};
 
 	const handleUsageClick = () => {
-		navigate({ to: "/usage" });
+		// Reopen whichever Usage section (token / machine resources) was
+		// visited last.
+		navigate({ to: usageSectionPath(getUsageLastSection()) });
 	};
 
 	const handlePullRequestsClick = () => {
