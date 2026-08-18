@@ -1,4 +1,4 @@
-import { createHmac } from "node:crypto";
+import { createHmac, timingSafeEqual } from "node:crypto";
 import { auth } from "@superset/auth/server";
 import { db } from "@superset/db/client";
 import { integrationConnections, userIdentities } from "@superset/db/schema";
@@ -23,7 +23,12 @@ export async function GET(request: Request) {
 			.update(decoded)
 			.digest("hex");
 
-		if (sig !== expectedSig) {
+		const provided = Buffer.from(sig, "hex");
+		const expected = Buffer.from(expectedSig, "hex");
+		if (
+			provided.length !== expected.length ||
+			!timingSafeEqual(provided, expected)
+		) {
 			return new Response("Invalid signature", { status: 401 });
 		}
 

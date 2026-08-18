@@ -6,6 +6,7 @@ import { and, eq, isNull } from "drizzle-orm";
 import { dispatchMatchingTriggers } from "@/lib/automations/dispatchMatchingTriggers";
 import {
 	isChannelMessage,
+	isMessageReaction,
 	normalizeSlackEvent,
 	type SlackAutomationEnvelope,
 } from "./normalize";
@@ -29,6 +30,7 @@ export function isAutomationEvent(envelope: {
 		case "message":
 			return isChannelMessage(event, envelope);
 		case "reaction_added":
+			return isMessageReaction(event, envelope);
 		case "channel_created":
 			return true;
 		default:

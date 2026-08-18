@@ -7,9 +7,12 @@ import { createSignedState } from "@/lib/oauth-state";
 const SLACK_SCOPES = [
 	"app_mentions:read",
 	"chat:write",
+	"reactions:read",
 	"reactions:write",
 	"channels:history",
+	"channels:read",
 	"groups:history",
+	"groups:read",
 	"im:history",
 	"im:read",
 	"im:write",

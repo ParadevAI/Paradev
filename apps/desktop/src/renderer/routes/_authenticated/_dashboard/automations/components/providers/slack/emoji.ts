@@ -1,3 +1,5 @@
+import { slackEmojiName } from "@superset/shared/automation-matching";
+
 /**
  * Glyphs for the standard reactions people type most, keyed by Slack short
  * name, so the chip can show "🐛 bug" instead of ":bug:". Display only: any
@@ -53,7 +55,7 @@ export function emojiLabel(name: string): string {
 export function parseEmojiNames(text: string): string[] {
 	const seen = new Set<string>();
 	for (const raw of text.split(/[\s,]+/)) {
-		const name = raw.replace(/^:+|:+$/g, "").trim();
+		const name = slackEmojiName(raw);
 		if (name) seen.add(name);
 	}
 	return [...seen];

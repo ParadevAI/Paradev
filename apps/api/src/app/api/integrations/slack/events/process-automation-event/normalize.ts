@@ -9,6 +9,7 @@ import type {
 } from "@slack/types";
 import {
 	type SlackMatchableEvent,
+	slackEmojiName,
 	slackEventNames,
 } from "@superset/shared/automation-matching";
 
@@ -60,6 +61,23 @@ const MESSAGE_SUBTYPES = new Set<string | undefined>([
 	"thread_broadcast",
 ]);
 
+type OwnBotEnvelope = Pick<
+	SlackAutomationEnvelope,
+	"api_app_id" | "authorizations"
+>;
+
+/**
+ * The bot user ids this delivery was authorized for. Slack omits `is_bot` on
+ * some deliveries; only an explicit `false` marks the authorization as a
+ * person's user token rather than the bot's.
+ */
+function ownBotUserIds(envelope: OwnBotEnvelope): string[] {
+	return (envelope.authorizations ?? [])
+		.filter((a) => a.is_bot !== false)
+		.map((a) => a.user_id)
+		.filter((id): id is string => typeof id === "string");
+}
+
 /**
  * Whether a message event is one triggers should see: posted in a channel
  * (public or private, not a DM), a real post rather than an edit, and not
@@ -68,7 +86,7 @@ const MESSAGE_SUBTYPES = new Set<string | undefined>([
  */
 export function isChannelMessage(
 	event: MessageEvent,
-	envelope: Pick<SlackAutomationEnvelope, "api_app_id" | "authorizations">,
+	envelope: OwnBotEnvelope,
 ): event is ChannelMessageEvent {
 	// The union's members disagree on which of these they carry; read them
 	// loosely and let the subtype allow-list do the narrowing.
@@ -82,10 +100,9 @@ export function isChannelMessage(
 		return false;
 	}
 	if (!MESSAGE_SUBTYPES.has(message.subtype)) return false;
-	const ownBotUserIds = (envelope.authorizations ?? [])
-		.map((a) => a.user_id)
-		.filter((id): id is string => typeof id === "string");
-	if (message.user && ownBotUserIds.includes(message.user)) return false;
+	if (message.user && ownBotUserIds(envelope).includes(message.user)) {
+		return false;
+	}
 	if (
 		envelope.api_app_id !== undefined &&
 		message.bot_profile?.app_id === envelope.api_app_id
@@ -95,14 +112,28 @@ export function isChannelMessage(
 	return true;
 }
 
+/**
+ * Whether a reaction is one triggers should see: on a message (Slack also
+ * delivers `item.type` of `file` and `file_comment`, which carry no channel
+ * or ts) and not added by this app's own bot, whose completion reactions
+ * would otherwise re-enter as events.
+ */
+export function isMessageReaction(
+	event: ReactionAddedEvent,
+	envelope: OwnBotEnvelope,
+): boolean {
+	const item = event.item as {
+		type?: string;
+		channel?: string;
+		ts?: string;
+	};
+	if (item.type !== "message" || !item.channel || !item.ts) return false;
+	return !ownBotUserIds(envelope).includes(event.user);
+}
+
 /** Slack's canonical permalink; slack.com redirects to the workspace domain. */
 function permalink(channel: string, ts: string): string {
 	return `https://slack.com/archives/${channel}/p${ts.replace(".", "")}`;
-}
-
-/** `:bug::skin-tone-2:` arrives as `bug::skin-tone-2`; the trigger names `bug`. */
-export function reactionName(reaction: string): string {
-	return reaction.split("::")[0] ?? reaction;
 }
 
 const MAX_TITLE = 120;
@@ -149,9 +180,12 @@ export function normalizeSlackEvent(
 					body: event.text ?? null,
 					reaction: null,
 					// A reply carries its root's ts; a root's thread_ts, when set,
-					// is its own ts.
+					// is its own ts. A broadcast reply is also shown at the top
+					// level, which is where a top-level-only trigger is looking.
 					isThreadReply:
-						event.thread_ts !== undefined && event.thread_ts !== event.ts,
+						event.subtype !== "thread_broadcast" &&
+						event.thread_ts !== undefined &&
+						event.thread_ts !== event.ts,
 				}),
 				resourceKey: `slack:${event.channel}:${root}`,
 				title: titleFromText(event.text, `Message in ${event.channel}`),
@@ -164,11 +198,11 @@ export function normalizeSlackEvent(
 					channelId: event.item.channel,
 					actorId: event.user ?? null,
 					body: null,
-					reaction: reactionName(event.reaction),
+					reaction: slackEmojiName(event.reaction),
 					isThreadReply: false,
 				}),
 				resourceKey: `slack:${event.item.channel}:${event.item.ts}`,
-				title: `:${reactionName(event.reaction)}: reaction`,
+				title: `:${slackEmojiName(event.reaction)}: reaction`,
 				url: permalink(event.item.channel, event.item.ts),
 			};
 		case "channel_created":
