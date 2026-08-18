@@ -6,6 +6,7 @@ export const posthogConfig = {
 	options: {
 		enableSessionReplay: true,
 		sessionReplayConfig: {
+			sampleRate: 1,
 			screenshotModeBackgroundCapture: true,
 		},
 		debug: env.NODE_ENV === "development",
