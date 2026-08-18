@@ -179,6 +179,7 @@ interface BuildV2TerminalEnvParams {
 	baseEnv: Record<string, string>;
 	shell: string;
 	supersetHomeDir: string;
+	organizationId: string;
 	themeType?: "dark" | "light";
 	cwd: string;
 	terminalId: string;
@@ -208,6 +209,7 @@ export function buildV2TerminalEnv(
 		baseEnv,
 		shell,
 		supersetHomeDir,
+		organizationId,
 		themeType,
 		cwd,
 		terminalId,
@@ -247,6 +249,13 @@ export function buildV2TerminalEnv(
 	env.PWD = cwd;
 
 	env.SUPERSET_TERMINAL_ID = terminalId;
+	// Scope CLI commands launched in this terminal to the same organization as
+	// the org-specific host-service that owns the workspace. This is routing
+	// metadata, not a credential; the CLI still uses its own authenticated
+	// session, but no longer consults that session's unrelated active-org choice.
+	if (organizationId) {
+		env.SUPERSET_ORGANIZATION_ID = organizationId;
+	}
 	env.SUPERSET_WORKSPACE_ID = workspaceId;
 	env.SUPERSET_WORKSPACE_PATH = workspacePath;
 	env.SUPERSET_ROOT_PATH = rootPath;

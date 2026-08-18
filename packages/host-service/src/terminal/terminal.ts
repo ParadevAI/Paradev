@@ -2466,6 +2466,7 @@ export async function createTerminalSessionInternal({
 			baseEnv,
 			shell,
 			supersetHomeDir,
+			organizationId: process.env.ORGANIZATION_ID || "",
 			themeType,
 			cwd,
 			terminalId,
