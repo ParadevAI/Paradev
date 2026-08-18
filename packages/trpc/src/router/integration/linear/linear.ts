@@ -5,8 +5,6 @@ import {
 	type LinearConfig,
 	taskStatuses,
 	tasks,
-	userIdentities,
-	users,
 } from "@superset/db/schema";
 import { seedDefaultStatuses } from "@superset/db/seed-default-statuses";
 import type { TRPCRouterRecord } from "@trpc/server";
@@ -70,6 +68,27 @@ async function fetchAllTriggerOptions(
 		}
 	}
 	return result;
+}
+
+const MAX_PEOPLE = 1000;
+
+async function fetchAllPeople(
+	client: LinearClient,
+): Promise<Array<{ id: string; label: string }>> {
+	const people: Array<{ id: string; label: string }> = [];
+	let page = await client.users({
+		first: 250,
+		filter: { active: { eq: true } },
+	});
+	while (true) {
+		for (const user of page.nodes) {
+			if (user.active === false) continue;
+			people.push({ id: user.id, label: user.displayName || user.name });
+		}
+		if (!page.pageInfo.hasNextPage || people.length >= MAX_PEOPLE) break;
+		page = await page.fetchNext();
+	}
+	return people;
 }
 
 export const linearRouter = {
@@ -236,30 +255,17 @@ export const linearRouter = {
 			};
 		}),
 
-	/** People in the org who have linked a Linear account, as assignee options. */
-	listLinkedPeople: protectedProcedure
+	/**
+	 * The workspace's active members, keyed by Linear user id — what a
+	 * webhook's `assigneeId` and actor id carry.
+	 */
+	listPeople: protectedProcedure
 		.input(z.object({ organizationId: z.uuid() }))
 		.query(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
-			const rows = await db
-				.select({
-					linearUserId: userIdentities.externalId,
-					displayName: userIdentities.displayName,
-					name: users.name,
-					email: users.email,
-				})
-				.from(userIdentities)
-				.innerJoin(users, eq(users.id, userIdentities.userId))
-				.where(
-					and(
-						eq(userIdentities.organizationId, input.organizationId),
-						eq(userIdentities.provider, "linear"),
-					),
-				);
-			return rows.map((row) => ({
-				id: row.linearUserId,
-				label: row.displayName ?? row.name ?? row.email,
-			}));
+			const people = await callLinear(input.organizationId, fetchAllPeople);
+			if (!people) return [];
+			return people.sort((a, b) => a.label.localeCompare(b.label));
 		}),
 
 	updateConfig: protectedProcedure

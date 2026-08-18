@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import type { ProviderOptions } from "../types";
 
-/** The pickable values a Slack sentence needs: channels and linked people. */
+/** The pickable values a Slack sentence needs: channels and workspace members. */
 export function useSlackOptions(organizationId: string): ProviderOptions {
 	// Channel ids, not names — a channel can be renamed and the trigger must
 	// keep matching it afterwards. Same for people: Slack user ids.
@@ -10,7 +10,7 @@ export function useSlackOptions(organizationId: string): ProviderOptions {
 		{ organizationId },
 		{ enabled: Boolean(organizationId) },
 	);
-	const people = cloudTrpc.integration.slack.listLinkedPeople.useQuery(
+	const people = cloudTrpc.integration.slack.listPeople.useQuery(
 		{ organizationId },
 		{ enabled: Boolean(organizationId) },
 	);

@@ -4,14 +4,14 @@ import type { ProviderOptions } from "../types";
 
 /**
  * The pickable values a Linear sentence needs: teams, projects, labels and
- * workflow states from Linear, plus the people who have linked a Linear account.
+ * workflow states and members, all from Linear.
  */
 export function useLinearOptions(organizationId: string): ProviderOptions {
 	const options = cloudTrpc.integration.linear.getTriggerOptions.useQuery(
 		{ organizationId },
 		{ enabled: Boolean(organizationId) },
 	);
-	const people = cloudTrpc.integration.linear.listLinkedPeople.useQuery(
+	const people = cloudTrpc.integration.linear.listPeople.useQuery(
 		{ organizationId },
 		{ enabled: Boolean(organizationId) },
 	);
