@@ -35,6 +35,13 @@ export async function dispatchMatchingTriggers(params: {
 	organizationId: string;
 	eventId: string;
 	event: MatchableEvent;
+	/**
+	 * Restrict candidates to one automation. Provider webhooks fan out across
+	 * the org because the provider does not know which automation cares; a
+	 * raw webhook is addressed to one automation by URL, so fanning out to
+	 * every webhook trigger in the org would be wrong.
+	 */
+	automationId?: string;
 }): Promise<{ matched: number; considered: number }> {
 	const { event } = params;
 
@@ -56,6 +63,9 @@ export async function dispatchMatchingTriggers(params: {
 				eq(automationTriggers.kind, event.provider as never),
 				eq(automationTriggers.enabled, true),
 				eq(automations.enabled, true),
+				params.automationId
+					? eq(automations.id, params.automationId)
+					: undefined,
 			),
 		);
 
@@ -73,7 +83,7 @@ export async function dispatchMatchingTriggers(params: {
 		.where(
 			and(
 				eq(userIdentities.organizationId, params.organizationId),
-				eq(userIdentities.provider, event.provider),
+				eq(userIdentities.provider, event.identityProvider ?? event.provider),
 			),
 		);
 	const idsByUser = new Map<string, string[]>();

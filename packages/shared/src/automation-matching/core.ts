@@ -18,6 +18,13 @@ import type { TriggerActor, TriggerScope } from "../automation-triggers";
  */
 export type BaseMatchableEvent = {
 	provider: string;
+	/**
+	 * Which `user_identities.provider` resolves `me` for this event, when it
+	 * differs from `provider`. Google Calendar and Gmail are two trigger kinds
+	 * behind one Google identity, so both set this to "google". Defaults to
+	 * `provider`; every other provider leaves it unset.
+	 */
+	identityProvider?: string;
 	/** Qualified with its action, e.g. `pull_request.opened`. */
 	eventType: string;
 	/** The provider's id for whoever caused the event; what people filters compare against. */
