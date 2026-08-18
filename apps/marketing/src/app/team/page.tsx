@@ -22,7 +22,7 @@ const micro5 = Micro_5({
 export const metadata: Metadata = {
 	title: "About",
 	description:
-		"Meet the team behind Superset, building parallel coding agents for developers.",
+		"What Superset is, who builds it, and who it's for. A San Francisco team of three ex-YC CTOs building the workspace for parallel coding agents.",
 	alternates: {
 		canonical: "/team",
 	},
@@ -61,7 +61,7 @@ export default function TeamPage() {
 					</h1>
 
 					<p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-xl mb-8">
-						Superset is built by a team of 3 ex YC CTOs. We want to create the
+						Superset is built by a team of 3 ex-YC CTOs. We want to create the
 						best team that has fun working together.
 						<br />
 						Success will be a lagging indicator.
@@ -74,6 +74,74 @@ export default function TeamPage() {
 						Read more on our blog
 						<ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
 					</Link>
+				</section>
+
+				{/* What is Superset */}
+				<section className="mb-20 md:mb-28">
+					<h2 className="text-2xl md:text-3xl font-normal text-foreground mb-6">
+						What is Superset?
+					</h2>
+					<div className="space-y-4 text-muted-foreground leading-relaxed max-w-2xl">
+						<p>
+							Superset is a local-first workspace for running parallel coding
+							agents. Every task gets its own isolated Git worktree and a
+							persistent terminal session, so Claude Code, Codex, OpenCode, or
+							any other CLI agent can work on many branches of one repository at
+							once without collisions. Around that core: review diffs, preview
+							dev servers in an in-app browser, schedule recurring runs, and
+							script the whole fleet over MCP.
+						</p>
+						<p>
+							It's built for developers who have outgrown a single agent
+							session: solo builders dispatching a handful of tasks in parallel,
+							and engineering teams running dozens of agent tasks a day.
+							Superset is the orchestration layer, not the agent; you bring your
+							own agents and API keys, and nothing is proxied through us.
+						</p>
+					</div>
+
+					<dl className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-6 max-w-2xl text-sm">
+						<div>
+							<dt className="text-foreground font-medium mb-1">Team</dt>
+							<dd className="text-muted-foreground">
+								Three ex-YC CTOs in San Francisco
+							</dd>
+						</div>
+						<div>
+							<dt className="text-foreground font-medium mb-1">License</dt>
+							<dd className="text-muted-foreground">
+								Source-available on GitHub under Elastic License 2.0
+							</dd>
+						</div>
+						<div>
+							<dt className="text-foreground font-medium mb-1">Platforms</dt>
+							<dd className="text-muted-foreground">
+								macOS desktop app, experimental Linux AppImage, plus a CLI,
+								TypeScript SDK, and MCP server
+							</dd>
+						</div>
+						<div>
+							<dt className="text-foreground font-medium mb-1">Agents</dt>
+							<dd className="text-muted-foreground">
+								Any CLI agent: Claude Code, Codex, OpenCode, Gemini, Copilot,
+								and more
+							</dd>
+						</div>
+						<div>
+							<dt className="text-foreground font-medium mb-1">Pricing</dt>
+							<dd className="text-muted-foreground">
+								Free tier plus paid seats; your API keys, never proxied
+							</dd>
+						</div>
+						<div>
+							<dt className="text-foreground font-medium mb-1">
+								Not to be confused with
+							</dt>
+							<dd className="text-muted-foreground">
+								Apache Superset, the unrelated business-intelligence tool
+							</dd>
+						</div>
+					</dl>
 				</section>
 
 				{/* Founders Grid */}
