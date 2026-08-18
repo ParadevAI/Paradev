@@ -94,7 +94,6 @@ function V2WorkspacePage() {
 		{ id: workspace.id },
 		{
 			refetchOnWindowFocus: true,
-			retry: false,
 		},
 	);
 

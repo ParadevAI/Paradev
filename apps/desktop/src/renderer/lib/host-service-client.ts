@@ -1,5 +1,9 @@
 import type { AppRouter } from "@superset/host-service";
-import { createTRPCClient, httpBatchStreamLink } from "@trpc/client";
+import {
+	createTRPCClient,
+	httpBatchStreamLink,
+	TRPCClientError,
+} from "@trpc/client";
 import superjson from "superjson";
 import { getHostServiceHeaders } from "./host-service-auth";
 
@@ -36,4 +40,39 @@ export function getHostServiceClientByUrl(hostUrl: string): HostServiceClient {
 
 	clientCache.set(hostUrl, client);
 	return client;
+}
+
+const HOST_SERVICE_MAX_RETRIES = 3;
+const HOST_SERVICE_RETRY_DELAY_MS = 700;
+
+/**
+ * True for a failed host-service request that never got a real response —
+ * connection-refused during a restart, a dropped stream, DNS failure. tRPC
+ * only populates `data` from a parsed server error envelope, so its absence
+ * means the failure was transport-level rather than the server rejecting the
+ * request (404, validation, etc.), which should never be retried here.
+ */
+export function isHostServiceConnectionError(error: unknown): boolean {
+	return error instanceof TRPCClientError && error.data == null;
+}
+
+/**
+ * Query-level `retry` for host-service requests: bounded retries with
+ * backoff for connection-level failures only, so a query in flight during a
+ * host-service restart self-heals instead of settling into a permanent
+ * "Failed to fetch" that only a manual "Try again" click clears. Real
+ * application errors (404s, validation) still fail on the first attempt.
+ */
+export function hostServiceQueryRetry(
+	failureCount: number,
+	error: unknown,
+): boolean {
+	return (
+		isHostServiceConnectionError(error) &&
+		failureCount < HOST_SERVICE_MAX_RETRIES
+	);
+}
+
+export function hostServiceQueryRetryDelay(attempt: number): number {
+	return HOST_SERVICE_RETRY_DELAY_MS * (attempt + 1);
 }
