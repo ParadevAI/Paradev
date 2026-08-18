@@ -1,3 +1,4 @@
+import { db } from "@superset/db/client";
 import {
 	eventEnd,
 	eventStart,
@@ -6,6 +7,7 @@ import {
 } from "@superset/trpc/integrations/google";
 import { z } from "zod";
 import { dispatchMatchingTriggers } from "@/lib/automations/dispatchMatchingTriggers";
+import { recordAutomationEvent } from "@/lib/automations/recordAutomationEvent";
 import {
 	accountDomain,
 	accountEmail,
@@ -13,7 +15,6 @@ import {
 	matchableCalendarEvent,
 	resourceKeyFor,
 } from "../../lib/calendarEvents";
-import { recordGoogleEvent } from "../../lib/recordGoogleEvent";
 import { verifyQstashRequest } from "../../lib/verifyQstash";
 
 export const maxDuration = 60;
@@ -77,9 +78,9 @@ export async function POST(request: Request) {
 		domain: accountDomain(connection),
 		minutesBefore: fire.minutesBefore ?? undefined,
 	});
-	const inserted = await recordGoogleEvent({
+	const inserted = await recordAutomationEvent(db, {
 		organizationId: connection.organizationId,
-		connectionId: connection.id,
+		integrationConnectionId: connection.id,
 		provider: "google_calendar",
 		eventType,
 		externalEventId: `${fire.calendarId}:${fire.eventId}:${fire.expectedAt}:${fire.fire}:${fire.minutesBefore ?? ""}`,
@@ -98,8 +99,8 @@ export async function POST(request: Request) {
 
 	const result = await dispatchMatchingTriggers({
 		organizationId: connection.organizationId,
-		eventId: inserted.eventId,
+		eventId: inserted.id,
 		event: matchable,
 	});
-	return Response.json({ ok: true, eventId: inserted.eventId, ...result });
+	return Response.json({ ok: true, eventId: inserted.id, ...result });
 }

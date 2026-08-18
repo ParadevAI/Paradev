@@ -12,7 +12,7 @@ import { z } from "zod";
 
 import { env } from "@/env";
 import { dispatchMatchingTriggers } from "@/lib/automations/dispatchMatchingTriggers";
-import { stripNullChars } from "@/lib/strip-null-chars";
+import { recordAutomationEvent } from "@/lib/automations/recordAutomationEvent";
 
 export const dynamic = "force-dynamic";
 
@@ -163,30 +163,20 @@ export async function POST(
 	}
 	const meeting = parsed.data;
 
-	const [inserted] = await dbWs
-		.insert(automationEvents)
-		.values({
-			organizationId: trigger.organizationId,
-			integrationConnectionId: null,
-			provider: "circleback",
-			eventType: EVENT_TYPE,
-			// Per trigger: the same meeting legitimately reaches every trigger
-			// whose URL is configured in Circleback, and a redelivery to one of
-			// them is still a duplicate for that one.
-			externalEventId: `${triggerId}:${meeting.id}`,
-			resourceKey: `circleback:${meeting.id}`,
-			title: meeting.name || meeting.id,
-			url: `https://circleback.ai/meetings/${meeting.id}`,
-			payload: stripNullChars(json) as Record<string, unknown>,
-		})
-		.onConflictDoNothing({
-			target: [
-				automationEvents.integrationConnectionId,
-				automationEvents.provider,
-				automationEvents.externalEventId,
-			],
-		})
-		.returning({ id: automationEvents.id });
+	const inserted = await recordAutomationEvent(dbWs, {
+		organizationId: trigger.organizationId,
+		integrationConnectionId: null,
+		provider: "circleback",
+		eventType: EVENT_TYPE,
+		// Per trigger: the same meeting legitimately reaches every trigger
+		// whose URL is configured in Circleback, and a redelivery to one of
+		// them is still a duplicate for that one.
+		externalEventId: `${triggerId}:${meeting.id}`,
+		resourceKey: `circleback:${meeting.id}`,
+		title: meeting.name || meeting.id,
+		url: `https://circleback.ai/meetings/${meeting.id}`,
+		payload: json,
+	});
 
 	if (!inserted) {
 		return Response.json({ ok: true, duplicate: true });

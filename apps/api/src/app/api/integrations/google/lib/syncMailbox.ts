@@ -1,3 +1,4 @@
+import { db } from "@superset/db/client";
 import type { SelectIntegrationConnection } from "@superset/db/schema";
 import type { GmailMatchableEvent } from "@superset/shared/automation-matching";
 import {
@@ -12,7 +13,7 @@ import {
 	patchGmailState,
 } from "@superset/trpc/integrations/google";
 import { dispatchMatchingTriggers } from "@/lib/automations/dispatchMatchingTriggers";
-import { recordGoogleEvent } from "./recordGoogleEvent";
+import { recordAutomationEvent } from "@/lib/automations/recordAutomationEvent";
 
 /** Labels that mean the message left this mailbox rather than arrived in it. */
 const OUTGOING_LABELS = new Set(["SENT", "DRAFT"]);
@@ -103,9 +104,9 @@ export async function recordMessage(
 		hasAttachment: messageHasAttachment(message),
 	};
 
-	const inserted = await recordGoogleEvent({
+	const inserted = await recordAutomationEvent(db, {
 		organizationId: connection.organizationId,
-		connectionId: connection.id,
+		integrationConnectionId: connection.id,
 		provider: "gmail",
 		eventType: "message.received",
 		externalEventId: message.id,
@@ -135,7 +136,7 @@ export async function recordMessage(
 
 	const { matched } = await dispatchMatchingTriggers({
 		organizationId: connection.organizationId,
-		eventId: inserted.eventId,
+		eventId: inserted.id,
 		event: matchable,
 	});
 	return { matched };

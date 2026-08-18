@@ -6,8 +6,8 @@ import { dispatchMatchingTriggers } from "./dispatchMatchingTriggers";
 import {
 	type GithubPayload,
 	qualifiedEventType,
-	recordAutomationEvent,
-} from "./recordAutomationEvent";
+	recordGithubEvent,
+} from "./recordGithubEvent";
 import { webhooks } from "./webhooks";
 
 export const maxDuration = 60;
@@ -92,13 +92,13 @@ export async function POST(request: Request) {
 		// nothing reads these rows yet, so a failure here must not fail a
 		// delivery GitHub would then retry.
 		try {
-			const recorded = await recordAutomationEvent({
+			const recorded = await recordGithubEvent({
 				eventType: eventType ?? "unknown",
 				deliveryId: eventId,
 				payload,
 				webhookEventId: webhookEvent.id,
 			});
-			if (recorded.recorded && recorded.eventId && recorded.organizationId) {
+			if (recorded.recorded) {
 				const result = await dispatchMatchingTriggers({
 					organizationId: recorded.organizationId,
 					eventId: recorded.eventId,
@@ -106,8 +106,8 @@ export async function POST(request: Request) {
 						eventType ?? "unknown",
 						payload as GithubPayload,
 					),
-					repositoryId: recorded.repositoryId ?? null,
-					ref: recorded.ref ?? null,
+					repositoryId: recorded.repositoryId,
+					ref: recorded.ref,
 					payload: payload as GithubPayload,
 				});
 				if (result.matched > 0) {
@@ -123,7 +123,7 @@ export async function POST(request: Request) {
 				);
 			}
 		} catch (error) {
-			console.error("[github/webhook] recordAutomationEvent failed:", error);
+			console.error("[github/webhook] recordGithubEvent failed:", error);
 		}
 
 		await db

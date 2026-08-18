@@ -8,9 +8,9 @@ import { env } from "@/env";
 import { dispatchMatchingTriggers } from "@/lib/automations/dispatchMatchingTriggers";
 import {
 	matchableFrom,
-	recordAutomationEvent,
+	recordSentryEvent,
 	type SentryIssuePayload,
-} from "./recordAutomationEvent";
+} from "./recordSentryEvent";
 
 /**
  * Webhooks from the public Sentry integration.
@@ -113,19 +113,19 @@ export async function POST(request: Request) {
 	const event = matchableFrom(payload, `issue.${payload.action}`);
 	const deliveryId = requestId ?? `sentry-${crypto.randomUUID()}`;
 
-	const recorded = await recordAutomationEvent({
+	const recorded = await recordSentryEvent({
 		organizationId: connection.organizationId,
 		connectionId: connection.id,
 		event,
 		deliveryId,
 		payload,
 	});
-	if (!recorded.recorded || !recorded.eventId) {
+	if (!recorded) {
 		console.log(
-			`[sentry/webhook] Not recorded as automation event (${recorded.reason}):`,
+			"[sentry/webhook] Not recorded as automation event (duplicate delivery):",
 			deliveryId,
 		);
-		return Response.json({ success: true, message: recorded.reason });
+		return Response.json({ success: true, message: "duplicate delivery" });
 	}
 
 	// Nothing in the product names this action, so there is nothing to match.
@@ -139,7 +139,7 @@ export async function POST(request: Request) {
 
 	const result = await dispatchMatchingTriggers({
 		organizationId: connection.organizationId,
-		eventId: recorded.eventId,
+		eventId: recorded.id,
 		event,
 	});
 	if (result.matched > 0) {

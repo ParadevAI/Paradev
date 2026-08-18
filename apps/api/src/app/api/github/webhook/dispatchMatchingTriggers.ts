@@ -3,7 +3,7 @@ import {
 	githubEventNames,
 } from "@superset/shared/automation-matching";
 import { dispatchMatchingTriggers as dispatch } from "@/lib/automations/dispatchMatchingTriggers";
-import type { GithubPayload } from "./recordAutomationEvent";
+import type { GithubPayload } from "./recordGithubEvent";
 
 /**
  * Normalizes a GitHub delivery into what GitHub triggers filter on. Every

@@ -1,8 +1,8 @@
 import { db } from "@superset/db/client";
-import { automationEvents, githubInstallations } from "@superset/db/schema";
+import { githubInstallations } from "@superset/db/schema";
 import { eq } from "drizzle-orm";
 
-import { stripNullChars } from "@/lib/strip-null-chars";
+import { recordAutomationEvent } from "@/lib/automations/recordAutomationEvent";
 
 /**
  * Records an incoming GitHub delivery as an `automation_events` row.
@@ -134,19 +134,21 @@ export function urlFor(payload: GithubPayload): string | null {
 	);
 }
 
-export async function recordAutomationEvent(params: {
+export async function recordGithubEvent(params: {
 	eventType: string;
 	deliveryId: string;
 	payload: unknown;
 	webhookEventId: string;
-}): Promise<{
-	recorded: boolean;
-	reason?: string;
-	eventId?: string;
-	organizationId?: string;
-	repositoryId?: string | null;
-	ref?: string | null;
-}> {
+}): Promise<
+	| {
+			recorded: true;
+			eventId: string;
+			organizationId: string;
+			repositoryId: string | null;
+			ref: string | null;
+	  }
+	| { recorded: false; reason: string }
+> {
 	const payload = params.payload as GithubPayload;
 
 	const installationId = payload.installation?.id;
@@ -166,48 +168,31 @@ export async function recordAutomationEvent(params: {
 		return { recorded: false, reason: "unknown installation" };
 	}
 
-	const qualified = qualifiedEventType(params.eventType, payload);
-
 	const repositoryId =
 		payload.repository?.id !== undefined ? String(payload.repository.id) : null;
 	const ref = payload.pull_request?.head?.ref ?? payload.ref ?? null;
 
-	const [inserted] = await db
-		.insert(automationEvents)
-		.values({
-			organizationId: installation.organizationId,
-			// GitHub installs are their own connection record, not an
-			// integration_connections row, so provenance is the delivery below.
-			integrationConnectionId: null,
-			provider: "github",
-			eventType: qualified,
-			externalEventId: params.deliveryId,
-			resourceKey: resourceKeyFor(payload, params.eventType),
-			title: titleFor(payload, params.eventType),
-			url: urlFor(payload),
-			// The numeric id, not the full name: a repository can be renamed and
-			// triggers must keep matching it afterwards.
-			repositoryId,
-			ref,
-			actorLogin: payload.sender?.login ?? null,
-			actorIsExternal: actorIsExternalFor(payload),
-			// jsonb rejects \u0000, and a payload carrying one would otherwise
-			// throw and lose the event.
-			payload: stripNullChars(payload) as Record<string, unknown>,
-			webhookEventId: params.webhookEventId,
-		})
-		// A redelivery of the same GitHub delivery id is the same event.
-		.onConflictDoNothing({
-			target: [
-				automationEvents.integrationConnectionId,
-				automationEvents.provider,
-				automationEvents.externalEventId,
-			],
-		})
-		.returning({ id: automationEvents.id });
-
-	// Empty on a redelivery the dedupe swallowed; the first delivery already
-	// dispatched whatever this event matches.
+	// A redelivery of the same GitHub delivery id is the same event.
+	const inserted = await recordAutomationEvent(db, {
+		organizationId: installation.organizationId,
+		// GitHub installs are their own connection record, not an
+		// integration_connections row, so provenance is the delivery below.
+		integrationConnectionId: null,
+		provider: "github",
+		eventType: qualifiedEventType(params.eventType, payload),
+		externalEventId: params.deliveryId,
+		resourceKey: resourceKeyFor(payload, params.eventType),
+		title: titleFor(payload, params.eventType),
+		url: urlFor(payload),
+		// The numeric id, not the full name: a repository can be renamed and
+		// triggers must keep matching it afterwards.
+		repositoryId,
+		ref,
+		actorLogin: payload.sender?.login ?? null,
+		actorIsExternal: actorIsExternalFor(payload),
+		payload,
+		webhookEventId: params.webhookEventId,
+	});
 	if (!inserted) return { recorded: false, reason: "duplicate delivery" };
 
 	return {

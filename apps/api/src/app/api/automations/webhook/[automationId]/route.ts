@@ -18,7 +18,7 @@ import { z } from "zod";
 
 import { env } from "@/env";
 import { dispatchMatchingTriggers } from "@/lib/automations/dispatchMatchingTriggers";
-import { stripNullChars } from "@/lib/strip-null-chars";
+import { recordAutomationEvent } from "@/lib/automations/recordAutomationEvent";
 
 export const dynamic = "force-dynamic";
 
@@ -124,25 +124,15 @@ export async function POST(
 		);
 	}
 
-	const [inserted] = await db
-		.insert(automationEvents)
-		.values({
-			organizationId,
-			integrationConnectionId: null,
-			provider: "webhook",
-			eventType: EVENT_TYPE,
-			externalEventId: randomUUID(),
-			resourceKey: null,
-			title: "Webhook",
-			url: null,
-			repositoryId: null,
-			ref: null,
-			actorLogin: null,
-			actorIsExternal: null,
-			payload: stripNullChars(payload),
-			webhookEventId: null,
-		})
-		.returning({ id: automationEvents.id });
+	const inserted = await recordAutomationEvent(db, {
+		organizationId,
+		integrationConnectionId: null,
+		provider: "webhook",
+		eventType: EVENT_TYPE,
+		externalEventId: randomUUID(),
+		title: "Webhook",
+		payload,
+	});
 
 	if (!inserted) {
 		return Response.json({ error: "Failed to record event" }, { status: 500 });

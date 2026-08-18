@@ -28,8 +28,8 @@ import { stripNullChars } from "@/lib/strip-null-chars";
 import {
 	type LinearDelivery,
 	matchableFrom,
-	recordAutomationEvent,
-} from "./recordAutomationEvent";
+	recordLinearEvent,
+} from "./recordLinearEvent";
 
 const webhookClient = new LinearWebhookClient(env.LINEAR_WEBHOOK_SECRET);
 
@@ -242,15 +242,15 @@ async function recordAndDispatch(
 		deliveryHeader ??
 		`${delivery.type}:${delivery.data.id}:${delivery.webhookTimestamp}`;
 
-	const recorded = await recordAutomationEvent({
+	const recorded = await recordLinearEvent({
 		delivery,
 		deliveryId,
 		connection,
 		webhookEventId,
 	});
-	if (!recorded.recorded || !recorded.eventId) {
+	if (!recorded) {
 		console.log(
-			`[linear/webhook] Not recorded as automation event (${recorded.reason}):`,
+			"[linear/webhook] Not recorded as automation event (duplicate delivery):",
 			deliveryId,
 		);
 		return;
@@ -258,7 +258,7 @@ async function recordAndDispatch(
 
 	const result = await dispatchMatchingTriggers({
 		organizationId: connection.organizationId,
-		eventId: recorded.eventId,
+		eventId: recorded.id,
 		event,
 	});
 	if (result.matched > 0) {

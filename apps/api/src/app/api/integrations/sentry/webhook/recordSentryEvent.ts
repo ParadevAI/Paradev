@@ -1,11 +1,10 @@
 import { db } from "@superset/db/client";
-import { automationEvents } from "@superset/db/schema";
 import {
 	type SentryMatchableEvent,
 	sentryEventNames,
 } from "@superset/shared/automation-matching";
 
-import { stripNullChars } from "@/lib/strip-null-chars";
+import { recordAutomationEvent } from "@/lib/automations/recordAutomationEvent";
 
 /**
  * Records a Sentry issue webhook as an `automation_events` row.
@@ -84,49 +83,25 @@ function titleFor(payload: SentryIssuePayload, eventType: string): string {
 	);
 }
 
-export async function recordAutomationEvent(params: {
+export async function recordSentryEvent(params: {
 	organizationId: string;
 	connectionId: string;
 	event: SentryMatchableEvent;
 	deliveryId: string;
 	payload: SentryIssuePayload;
-}): Promise<{ recorded: boolean; reason?: string; eventId?: string }> {
+}): Promise<{ id: string } | null> {
 	const { payload, event } = params;
-
-	const [inserted] = await db
-		.insert(automationEvents)
-		.values({
-			organizationId: params.organizationId,
-			integrationConnectionId: params.connectionId,
-			provider: "sentry",
-			eventType: event.eventType,
-			externalEventId: params.deliveryId,
-			resourceKey: resourceKeyFor(payload),
-			title: titleFor(payload, event.eventType),
-			url:
-				payload.data?.issue?.web_url ?? payload.data?.issue?.permalink ?? null,
-			repositoryId: null,
-			ref: null,
-			actorLogin: event.actorLogin,
-			actorIsExternal: null,
-			// jsonb rejects NUL, and a payload carrying one would otherwise throw
-			// and lose the event.
-			payload: stripNullChars(payload) as Record<string, unknown>,
-			webhookEventId: null,
-		})
-		// A redelivery of the same Sentry request id is the same event.
-		.onConflictDoNothing({
-			target: [
-				automationEvents.integrationConnectionId,
-				automationEvents.provider,
-				automationEvents.externalEventId,
-			],
-		})
-		.returning({ id: automationEvents.id });
-
-	// Empty on a redelivery the dedupe swallowed; the first delivery already
-	// dispatched whatever this event matches.
-	if (!inserted) return { recorded: false, reason: "duplicate delivery" };
-
-	return { recorded: true, eventId: inserted.id };
+	// A redelivery of the same Sentry request id is the same event.
+	return recordAutomationEvent(db, {
+		organizationId: params.organizationId,
+		integrationConnectionId: params.connectionId,
+		provider: "sentry",
+		eventType: event.eventType,
+		externalEventId: params.deliveryId,
+		resourceKey: resourceKeyFor(payload),
+		title: titleFor(payload, event.eventType),
+		url: payload.data?.issue?.web_url ?? payload.data?.issue?.permalink ?? null,
+		actorLogin: event.actorLogin,
+		payload,
+	});
 }

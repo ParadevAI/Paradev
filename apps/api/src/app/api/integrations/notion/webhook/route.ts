@@ -1,17 +1,14 @@
 import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 import { db } from "@superset/db/client";
 import type { SelectIntegrationConnection } from "@superset/db/schema";
-import {
-	automationEvents,
-	integrationConnections,
-	webhookEvents,
-} from "@superset/db/schema";
+import { integrationConnections, webhookEvents } from "@superset/db/schema";
 import type { NotionMatchableEvent } from "@superset/shared/automation-matching";
 import { NotionApiError } from "@superset/trpc/integrations/notion";
 import { and, asc, eq, isNull, sql } from "drizzle-orm";
 
 import { env } from "@/env";
 import { dispatchMatchingTriggers } from "@/lib/automations/dispatchMatchingTriggers";
+import { recordAutomationEvent } from "@/lib/automations/recordAutomationEvent";
 import { stripNullChars } from "@/lib/strip-null-chars";
 import {
 	type FetchedNotionEvent,
@@ -212,33 +209,19 @@ async function processForConnection(
 			throw error;
 		}
 
-		const [inserted] = await db
-			.insert(automationEvents)
-			.values({
-				organizationId: connection.organizationId,
-				integrationConnectionId: connection.id,
-				provider: "notion",
-				eventType: event.type,
-				externalEventId: event.id,
-				resourceKey: fetched.resourceKey,
-				title: fetched.title,
-				url: fetched.url,
-				repositoryId: null,
-				ref: null,
-				actorLogin: null,
-				actorIsExternal: null,
-				payload: stripNullChars(fetched.payload) as Record<string, unknown>,
-				webhookEventId: webhookEvent.id,
-			})
-			// A redelivery of the same Notion event id is the same event.
-			.onConflictDoNothing({
-				target: [
-					automationEvents.integrationConnectionId,
-					automationEvents.provider,
-					automationEvents.externalEventId,
-				],
-			})
-			.returning({ id: automationEvents.id });
+		// A redelivery of the same Notion event id is the same event.
+		const inserted = await recordAutomationEvent(db, {
+			organizationId: connection.organizationId,
+			integrationConnectionId: connection.id,
+			provider: "notion",
+			eventType: event.type,
+			externalEventId: event.id,
+			resourceKey: fetched.resourceKey,
+			title: fetched.title,
+			url: fetched.url,
+			payload: fetched.payload,
+			webhookEventId: webhookEvent.id,
+		});
 
 		// Not inside the failure path: the event row above already dedupes a
 		// redelivery, so failing the delivery here would make Notion retry

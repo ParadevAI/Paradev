@@ -1,3 +1,4 @@
+import { db } from "@superset/db/client";
 import {
 	type GraphChannel,
 	type GraphChatMessage,
@@ -8,12 +9,12 @@ import {
 } from "@superset/trpc/integrations/microsoft-teams";
 
 import { dispatchMatchingTriggers } from "@/lib/automations/dispatchMatchingTriggers";
+import { recordAutomationEvent } from "@/lib/automations/recordAutomationEvent";
 import {
 	type AuthenticatedConnection,
 	type ChangeNotification,
 	parseTeamsResource,
 } from "./notifications";
-import { recordTeamsEvent } from "./recordTeamsEvent";
 
 const TITLE_LENGTH = 120;
 
@@ -106,9 +107,10 @@ export async function ingestChannelMessage(
 		message.from?.application?.displayName ??
 		null;
 
-	const recorded = await recordTeamsEvent({
+	const recorded = await recordAutomationEvent(db, {
 		organizationId: connection.organizationId,
-		connectionId: connection.id,
+		integrationConnectionId: connection.id,
+		provider: "microsoft_teams",
 		eventType: "message_in_channel",
 		externalEventId: `${resource.channelId}:${messageId}`,
 		// The thread, so replies debounce with the message they answer.
@@ -122,12 +124,12 @@ export async function ingestChannelMessage(
 			message,
 		},
 	});
-	if (!recorded.recorded) {
+	if (!recorded) {
 		return { outcome: "skipped", reason: "duplicate delivery" };
 	}
 	const result = await dispatchMatchingTriggers({
 		organizationId: connection.organizationId,
-		eventId: recorded.eventId,
+		eventId: recorded.id,
 		event: {
 			provider: "microsoft_teams",
 			eventType: "message_in_channel",
@@ -138,7 +140,7 @@ export async function ingestChannelMessage(
 			body: text,
 		},
 	});
-	return { outcome: "recorded", eventId: recorded.eventId, ...result };
+	return { outcome: "recorded", eventId: recorded.id, ...result };
 }
 
 /** Records a fetched channel and dispatches what it matches. */
@@ -148,9 +150,10 @@ export async function ingestChannel(
 	channel: GraphChannel,
 ): Promise<NotificationOutcome> {
 	const name = channel.displayName ?? resource.channelId;
-	const recorded = await recordTeamsEvent({
+	const recorded = await recordAutomationEvent(db, {
 		organizationId: connection.organizationId,
-		connectionId: connection.id,
+		integrationConnectionId: connection.id,
+		provider: "microsoft_teams",
 		eventType: "channel_created",
 		externalEventId: resource.channelId,
 		resourceKey: `microsoft_teams:${resource.teamId}:${resource.channelId}`,
@@ -159,12 +162,12 @@ export async function ingestChannel(
 		actorLogin: null,
 		payload: { teamId: resource.teamId, channel },
 	});
-	if (!recorded.recorded) {
+	if (!recorded) {
 		return { outcome: "skipped", reason: "duplicate delivery" };
 	}
 	const result = await dispatchMatchingTriggers({
 		organizationId: connection.organizationId,
-		eventId: recorded.eventId,
+		eventId: recorded.id,
 		event: {
 			provider: "microsoft_teams",
 			eventType: "channel_created",
@@ -175,7 +178,7 @@ export async function ingestChannel(
 			body: name,
 		},
 	});
-	return { outcome: "recorded", eventId: recorded.eventId, ...result };
+	return { outcome: "recorded", eventId: recorded.id, ...result };
 }
 
 function titleFor(subject: string | null | undefined, text: string | null) {

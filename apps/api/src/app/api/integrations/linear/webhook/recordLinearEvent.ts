@@ -1,10 +1,9 @@
 import { db } from "@superset/db/client";
-import { automationEvents } from "@superset/db/schema";
 import {
 	type LinearMatchableEvent,
 	linearEventNames,
 } from "@superset/shared/automation-matching";
-import { stripNullChars } from "@/lib/strip-null-chars";
+import { recordAutomationEvent } from "@/lib/automations/recordAutomationEvent";
 
 /**
  * Records a Linear delivery as an `automation_events` row, per connection.
@@ -84,42 +83,25 @@ export function titleFor(delivery: LinearDelivery): string {
 	return `${delivery.type}.${delivery.action}`;
 }
 
-export async function recordAutomationEvent(params: {
+export async function recordLinearEvent(params: {
 	delivery: LinearDelivery;
 	/** Linear's delivery id when the header carried one; a redelivery reuses it. */
 	deliveryId: string;
 	connection: { id: string; organizationId: string };
 	webhookEventId: string;
-}): Promise<{ recorded: boolean; reason?: string; eventId?: string }> {
+}): Promise<{ id: string } | null> {
 	const { delivery, connection } = params;
-
-	const [inserted] = await db
-		.insert(automationEvents)
-		.values({
-			organizationId: connection.organizationId,
-			integrationConnectionId: connection.id,
-			provider: "linear",
-			eventType: `${delivery.type}.${delivery.action}`,
-			externalEventId: params.deliveryId,
-			resourceKey: resourceKeyFor(delivery),
-			title: titleFor(delivery),
-			url: delivery.url ?? delivery.data.url ?? null,
-			repositoryId: null,
-			ref: null,
-			actorLogin: delivery.actor?.name ?? null,
-			actorIsExternal: null,
-			payload: stripNullChars(delivery) as Record<string, unknown>,
-			webhookEventId: params.webhookEventId,
-		})
-		.onConflictDoNothing({
-			target: [
-				automationEvents.integrationConnectionId,
-				automationEvents.provider,
-				automationEvents.externalEventId,
-			],
-		})
-		.returning({ id: automationEvents.id });
-
-	if (!inserted) return { recorded: false, reason: "duplicate delivery" };
-	return { recorded: true, eventId: inserted.id };
+	return recordAutomationEvent(db, {
+		organizationId: connection.organizationId,
+		integrationConnectionId: connection.id,
+		provider: "linear",
+		eventType: `${delivery.type}.${delivery.action}`,
+		externalEventId: params.deliveryId,
+		resourceKey: resourceKeyFor(delivery),
+		title: titleFor(delivery),
+		url: delivery.url ?? delivery.data.url ?? null,
+		actorLogin: delivery.actor?.name ?? null,
+		payload: delivery,
+		webhookEventId: params.webhookEventId,
+	});
 }

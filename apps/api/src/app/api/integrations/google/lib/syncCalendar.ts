@@ -14,6 +14,7 @@ import {
 } from "@superset/trpc/integrations/google";
 import { and, desc, eq } from "drizzle-orm";
 import { dispatchMatchingTriggers } from "@/lib/automations/dispatchMatchingTriggers";
+import { recordAutomationEvent } from "@/lib/automations/recordAutomationEvent";
 import {
 	accountDomain,
 	accountEmail,
@@ -21,7 +22,6 @@ import {
 	matchableCalendarEvent,
 	resourceKeyFor,
 } from "./calendarEvents";
-import { recordGoogleEvent } from "./recordGoogleEvent";
 import {
 	loadFirePlan,
 	scheduleFires,
@@ -232,9 +232,9 @@ async function recordChange(params: {
 		event,
 		domain: params.domain,
 	});
-	const inserted = await recordGoogleEvent({
+	const inserted = await recordAutomationEvent(db, {
 		organizationId: connection.organizationId,
-		connectionId: connection.id,
+		integrationConnectionId: connection.id,
 		provider: "google_calendar",
 		eventType,
 		// A stable key: an item carrying neither `updated` nor `etag` collapses
@@ -251,7 +251,7 @@ async function recordChange(params: {
 
 	const { matched } = await dispatchMatchingTriggers({
 		organizationId: connection.organizationId,
-		eventId: inserted.eventId,
+		eventId: inserted.id,
 		event: matchable,
 	});
 	return { matched };
