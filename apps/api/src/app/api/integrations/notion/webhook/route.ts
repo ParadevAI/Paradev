@@ -21,6 +21,8 @@ import {
 	notionWebhookEventSchema,
 } from "./fetchNotionEvent";
 
+export const maxDuration = 60;
+
 /**
  * Notion signs every delivery with the verification token it sent when the
  * subscription was created: `sha256=` + HMAC-SHA256(token, raw body).

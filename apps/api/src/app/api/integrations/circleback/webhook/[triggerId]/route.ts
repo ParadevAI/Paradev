@@ -1,15 +1,32 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { dbWs } from "@superset/db/client";
-import { automationEvents, automationTriggers } from "@superset/db/schema";
+import {
+	automationEvents,
+	automations,
+	automationTriggers,
+} from "@superset/db/schema";
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 
+import { env } from "@/env";
 import { dispatchMatchingTriggers } from "@/lib/automations/dispatchMatchingTriggers";
 import { stripNullChars } from "@/lib/strip-null-chars";
 
 export const dynamic = "force-dynamic";
 
+const rateLimit = new Ratelimit({
+	redis: new Redis({
+		url: env.KV_REST_API_URL,
+		token: env.KV_REST_API_TOKEN,
+	}),
+	limiter: Ratelimit.slidingWindow(300, "1 m"),
+	prefix: "ratelimit:integrations:circleback:webhook",
+});
+
 const EVENT_TYPE = "meeting.completed";
+const MAX_BODY_BYTES = 1024 * 1024;
 
 /**
  * The fields matching and the row need. Everything else — notes, action items,
@@ -61,6 +78,16 @@ export async function POST(
 		return Response.json({ error: "Unknown trigger" }, { status: 404 });
 	}
 
+	const { success: withinLimit } = await rateLimit.limit(triggerId);
+	if (!withinLimit) {
+		return Response.json({ error: "Rate limit exceeded" }, { status: 429 });
+	}
+
+	const contentLength = Number(request.headers.get("content-length"));
+	if (contentLength > MAX_BODY_BYTES) {
+		return Response.json({ error: "Body too large" }, { status: 413 });
+	}
+
 	const [trigger] = await dbWs
 		.select({
 			organizationId: automationTriggers.organizationId,
@@ -68,8 +95,11 @@ export async function POST(
 			// For an HMAC provider the column holds the signing key itself — a
 			// hash could not verify a signature.
 			secret: automationTriggers.secretHash,
+			triggerEnabled: automationTriggers.enabled,
+			automationEnabled: automations.enabled,
 		})
 		.from(automationTriggers)
+		.innerJoin(automations, eq(automations.id, automationTriggers.automationId))
 		.where(
 			and(
 				eq(automationTriggers.id, triggerId),
@@ -83,6 +113,9 @@ export async function POST(
 	}
 
 	const body = await request.text();
+	if (Buffer.byteLength(body) > MAX_BODY_BYTES) {
+		return Response.json({ error: "Body too large" }, { status: 413 });
+	}
 
 	// A trigger with no secret yet cannot tell Circleback from anyone who has
 	// seen the URL, so it accepts nothing until one is pasted in.
@@ -103,6 +136,15 @@ export async function POST(
 			triggerId,
 		);
 		return Response.json({ error: "Invalid signature" }, { status: 401 });
+	}
+
+	// Refused before the event row exists: the dedupe key is permanent, so a
+	// delivery recorded during a pause would swallow the redelivery too.
+	if (!trigger.automationEnabled) {
+		return Response.json({ error: "Automation is disabled" }, { status: 400 });
+	}
+	if (!trigger.triggerEnabled) {
+		return Response.json({ error: "Trigger is disabled" }, { status: 409 });
 	}
 
 	let json: unknown;
@@ -150,11 +192,11 @@ export async function POST(
 		return Response.json({ ok: true, duplicate: true });
 	}
 
-	// The event is recorded either way; a failure past this point must not
-	// fail the delivery, since a redelivery would dedupe against the row and
-	// never get the run enqueued either. Same stance as the GitHub route.
+	// A dispatch failure removes the row so Circleback's retry is not deduped
+	// against a delivery that never got its run enqueued.
+	let result: { matched: number; considered: number };
 	try {
-		const result = await dispatchMatchingTriggers({
+		result = await dispatchMatchingTriggers({
 			organizationId: trigger.organizationId,
 			eventId: inserted.id,
 			// Addressed: Circleback was configured with this trigger's URL, so
@@ -175,13 +217,20 @@ export async function POST(
 				),
 			},
 		});
-		console.log(
-			`[circleback/webhook] ${result.matched}/${result.considered} triggers matched:`,
-			inserted.id,
-		);
-		return Response.json({ ok: true, matched: result.matched > 0 });
 	} catch (error) {
-		console.error("[circleback/webhook] dispatch failed:", error);
-		return Response.json({ ok: true, dispatched: false });
+		console.error(
+			`[circleback/webhook] dispatch failed for event ${inserted.id}:`,
+			error,
+		);
+		await dbWs
+			.delete(automationEvents)
+			.where(eq(automationEvents.id, inserted.id));
+		return Response.json({ error: "Dispatch failed" }, { status: 500 });
 	}
+
+	console.log(
+		`[circleback/webhook] ${result.matched}/${result.considered} triggers matched:`,
+		inserted.id,
+	);
+	return Response.json({ ok: true, matched: result.matched > 0 });
 }

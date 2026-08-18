@@ -10,6 +10,8 @@ import {
 } from "./recordAutomationEvent";
 import { webhooks } from "./webhooks";
 
+export const maxDuration = 60;
+
 export async function POST(request: Request) {
 	const body = await request.text();
 	const signature = request.headers.get("x-hub-signature-256");
