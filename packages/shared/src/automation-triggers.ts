@@ -330,6 +330,71 @@ export const microsoftTeamsTriggerConfigSchema = z.object({
 });
 
 /**
+ * Google Calendar events carry different filters, so the config is a union on
+ * the event: a change carries the external-attendee narrowing, a starting-soon
+ * fire carries how far ahead it fires, and a cancellation carries neither.
+ */
+export const googleCalendarTriggerEventValues = [
+	"event.created",
+	"event.updated",
+	"event.cancelled",
+	"event.starting_soon",
+	"event.ended",
+] as const;
+export type GoogleCalendarTriggerEvent =
+	(typeof googleCalendarTriggerEventValues)[number];
+
+const googleCalendarCommon = {
+	kind: z.literal("google_calendar"),
+	calendars: triggerScopeSchema,
+	// Anyone on the event: organizer, creator or invitee. Ids are email
+	// addresses, since that is what a calendar event names people by.
+	attendee: triggerActorSchema,
+	titleFilter: textFilterSchema.nullable().default(null),
+};
+
+const googleCalendarChangeEvent = z.object({
+	...googleCalendarCommon,
+	event: z.enum(["event.created", "event.updated"]),
+	// A boolean rather than a scope: false is "do not narrow", true requires
+	// someone from outside the connected account's domain to be on the event.
+	hasExternalAttendee: z.boolean().default(false),
+});
+
+const googleCalendarStartingSoonEvent = z.object({
+	...googleCalendarCommon,
+	event: z.literal("event.starting_soon"),
+	minutesBefore: z.number().int().min(1).max(1440).default(15),
+});
+
+const googleCalendarSimpleEvent = z.object({
+	...googleCalendarCommon,
+	event: z.enum(["event.cancelled", "event.ended"]),
+});
+
+export const googleCalendarTriggerConfigSchema = z.union([
+	googleCalendarChangeEvent,
+	googleCalendarStartingSoonEvent,
+	googleCalendarSimpleEvent,
+]);
+
+export const gmailTriggerEventValues = ["message.received"] as const;
+export type GmailTriggerEvent = (typeof gmailTriggerEventValues)[number];
+
+export const gmailTriggerConfigSchema = z.object({
+	kind: z.literal("gmail"),
+	event: z.enum(gmailTriggerEventValues),
+	// Addresses or bare domains ("acme.com"), free-form: a sender is not a
+	// pickable value the way a channel is.
+	from: triggerScopeSchema,
+	to: triggerScopeSchema,
+	subjectFilter: textFilterSchema.nullable().default(null),
+	// Gmail label ids, not names: a label can be renamed, its id cannot.
+	labels: triggerScopeSchema,
+	hasAttachment: z.boolean().default(false),
+});
+
+/**
  * Structurally valid — the shape is right, but a scope may still select nothing.
  * This is what the editor holds while someone is still filling a trigger in.
  */
@@ -349,6 +414,8 @@ export const draftTriggerSchema = z.object({
 		notionTriggerConfigSchema,
 		circlebackTriggerConfigSchema,
 		microsoftTeamsTriggerConfigSchema,
+		googleCalendarTriggerConfigSchema,
+		gmailTriggerConfigSchema,
 	]),
 });
 export type DraftTrigger = z.infer<typeof draftTriggerSchema>;
@@ -464,6 +531,32 @@ export function describeTriggerProblems(
 			case "sentry": {
 				if (isEmptyScope(config.projects)) {
 					add(index, "projects", "Specify at least one project.");
+				}
+				break;
+			}
+			case "google_calendar": {
+				if (isEmptyScope(config.calendars)) {
+					add(index, "calendars", "Specify at least one calendar.");
+				}
+				if (isEmptyActor(config.attendee)) {
+					add(
+						index,
+						"attendee",
+						"Specify at least one person, or choose Anyone.",
+					);
+				}
+				break;
+			}
+			case "gmail": {
+				// The sender is the primary scope, as the repository is for GitHub:
+				// a mailbox-wide trigger has to be chosen ("Any sender"), never
+				// arrived at by leaving the chip empty.
+				if (isEmptyScope(config.from)) {
+					add(
+						index,
+						"from",
+						"Specify at least one sender, or choose Any sender.",
+					);
 				}
 				break;
 			}

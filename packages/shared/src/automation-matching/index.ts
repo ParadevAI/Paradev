@@ -5,6 +5,12 @@ import {
 } from "./circleback";
 import type { BaseMatchableEvent, MatchContext, MatchResult } from "./core";
 import { type GithubMatchableEvent, githubTriggerMatches } from "./github";
+import {
+	type GmailMatchableEvent,
+	type GoogleCalendarMatchableEvent,
+	gmailTriggerMatches,
+	googleCalendarTriggerMatches,
+} from "./google";
 import { type LinearMatchableEvent, linearTriggerMatches } from "./linear";
 import {
 	type MicrosoftTeamsMatchableEvent,
@@ -18,6 +24,7 @@ import { type WebhookMatchableEvent, webhookTriggerMatches } from "./webhook";
 export * from "./circleback";
 export * from "./core";
 export * from "./github";
+export * from "./google";
 export * from "./linear";
 export * from "./microsoft-teams";
 export * from "./notion";
@@ -42,7 +49,9 @@ export type MatchableEvent =
 	| SlackMatchableEvent
 	| CirclebackMatchableEvent
 	| MicrosoftTeamsMatchableEvent
-	| SentryMatchableEvent;
+	| SentryMatchableEvent
+	| GoogleCalendarMatchableEvent
+	| GmailMatchableEvent;
 
 /**
  * Whether a trigger config accepts an event, whatever provider it belongs to.
@@ -109,6 +118,18 @@ export function triggerMatches(
 		case "microsoft_teams":
 			return microsoftTeamsTriggerMatches(
 				config as Extract<TriggerConfigInput, { kind: "microsoft_teams" }>,
+				event,
+				context,
+			);
+		case "google_calendar":
+			return googleCalendarTriggerMatches(
+				config as Extract<TriggerConfigInput, { kind: "google_calendar" }>,
+				event,
+				context,
+			);
+		case "gmail":
+			return gmailTriggerMatches(
+				config as Extract<TriggerConfigInput, { kind: "gmail" }>,
 				event,
 				context,
 			);

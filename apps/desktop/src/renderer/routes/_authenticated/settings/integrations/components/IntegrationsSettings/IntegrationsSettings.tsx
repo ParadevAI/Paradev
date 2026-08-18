@@ -1,7 +1,7 @@
 import { Button } from "@superset/ui/button";
 import { Skeleton } from "@superset/ui/skeleton";
 import { useCallback, useEffect, useState } from "react";
-import { FaGithub, FaSlack } from "react-icons/fa";
+import { FaGithub, FaGoogle, FaSlack } from "react-icons/fa";
 import { HiOutlineArrowTopRightOnSquare } from "react-icons/hi2";
 import { SiLinear } from "react-icons/si";
 import { env } from "renderer/env.renderer";
@@ -38,6 +38,14 @@ export function IntegrationsSettings({
 
 	const { data: integrations, isPending: isIntegrationsPending } =
 		cloudTrpc.integration.list.useQuery(
+			{ organizationId: activeOrganizationId ?? "" },
+			{ enabled: !!activeOrganizationId },
+		);
+
+	// Google is per member, not per org, so the caller's own connection rather
+	// than whichever row integration.list happens to return first.
+	const { data: googleConnection, isPending: isGooglePending } =
+		cloudTrpc.integration.google.getConnection.useQuery(
 			{ organizationId: activeOrganizationId ?? "" },
 			{ enabled: !!activeOrganizationId },
 		);
@@ -82,10 +90,16 @@ export function IntegrationsSettings({
 	const slackConnection = integrations?.find((i) => i.provider === "slack");
 	const isLinearConnected = !!linearConnection;
 	const isSlackConnected = !!slackConnection;
+	const isGoogleConnected =
+		!!googleConnection && !googleConnection.needsReconnect;
 	const isGithubConnected =
 		!!githubInstallation && !githubInstallation.suspended;
 	const showSlack = isItemVisible(
 		SETTING_ITEM_ID.INTEGRATIONS_SLACK,
+		visibleItems,
+	);
+	const showGoogle = isItemVisible(
+		SETTING_ITEM_ID.INTEGRATIONS_GOOGLE,
 		visibleItems,
 	);
 
@@ -152,6 +166,18 @@ export function IntegrationsSettings({
 						connectedOrgName={slackConnection?.externalOrgName}
 						isLoading={isIntegrationsPending}
 						onManage={() => handleOpenWeb("/integrations/slack")}
+					/>
+				)}
+
+				{showGoogle && (
+					<IntegrationRow
+						name={<HighlightText text="Google" query={searchQuery} />}
+						description="Trigger automations from Google Calendar and Gmail."
+						icon={<FaGoogle className="size-5" />}
+						isConnected={isGoogleConnected}
+						connectedOrgName={googleConnection?.email}
+						isLoading={isGooglePending}
+						onManage={() => handleOpenWeb("/integrations/google")}
 					/>
 				)}
 			</div>

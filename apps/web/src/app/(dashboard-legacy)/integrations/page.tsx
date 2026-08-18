@@ -1,7 +1,7 @@
 "use client";
 
 import { BsMicrosoftTeams } from "react-icons/bs";
-import { FaGithub, FaSlack } from "react-icons/fa";
+import { FaGithub, FaGoogle, FaSlack } from "react-icons/fa";
 import { SiLinear, SiNotion, SiSentry } from "react-icons/si";
 import {
 	IntegrationCard,
@@ -56,6 +56,14 @@ const integrations: IntegrationCardProps[] = [
 		category: "Monitoring",
 		accentColor: "#362D59",
 		icon: <SiSentry className="size-8" />,
+	},
+	{
+		id: "google",
+		name: "Google",
+		description: "Trigger automations from Google Calendar and Gmail.",
+		category: "Productivity",
+		accentColor: "#4285F4",
+		icon: <FaGoogle className="size-8" />,
 	},
 ];
 

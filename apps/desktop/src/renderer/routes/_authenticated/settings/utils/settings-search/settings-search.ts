@@ -65,6 +65,7 @@ export const SETTING_ITEM_ID = {
 	INTEGRATIONS_LINEAR: "integrations-linear",
 	INTEGRATIONS_GITHUB: "integrations-github",
 	INTEGRATIONS_SLACK: "integrations-slack",
+	INTEGRATIONS_GOOGLE: "integrations-google",
 
 	BILLING_OVERVIEW: "billing-overview",
 	BILLING_PLANS: "billing-plans",
@@ -185,6 +186,7 @@ export const SETTING_ITEM_VARIANT: Record<SettingItemId, SettingVariant> = {
 	[SETTING_ITEM_ID.INTEGRATIONS_LINEAR]: "shared",
 	[SETTING_ITEM_ID.INTEGRATIONS_GITHUB]: "shared",
 	[SETTING_ITEM_ID.INTEGRATIONS_SLACK]: "shared",
+	[SETTING_ITEM_ID.INTEGRATIONS_GOOGLE]: "shared",
 
 	[SETTING_ITEM_ID.BILLING_OVERVIEW]: "shared",
 	[SETTING_ITEM_ID.BILLING_PLANS]: "shared",
@@ -1183,6 +1185,25 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 			"connect",
 			"connected",
 			"communication",
+		],
+	},
+	{
+		id: SETTING_ITEM_ID.INTEGRATIONS_GOOGLE,
+		section: "integrations",
+		title: "Google",
+		description: "Trigger automations from Google Calendar and Gmail",
+		keywords: [
+			"integrations",
+			"google",
+			"calendar",
+			"gmail",
+			"email",
+			"mail",
+			"events",
+			"triggers",
+			"automations",
+			"connect",
+			"connected",
 		],
 	},
 	{

@@ -50,11 +50,45 @@ export type SentryConfig = {
 	regionUrl?: string;
 };
 
+/**
+ * One watched calendar's sync state. Google's push carries no payload, only
+ * "something changed"; the sync token is what turns that into a diff, and the
+ * channel is what has to be renewed before it expires.
+ */
+export type GoogleCalendarWatchState = {
+	summary?: string;
+	syncToken?: string;
+	/** When the calendar was first synced; earlier events are never "created". */
+	watchedSince?: string;
+	channelId?: string;
+	resourceId?: string;
+	/**
+	 * SHA-256 of the token Google echoes back as `X-Goog-Channel-Token`. A
+	 * hash because this column is read by every member's client through
+	 * `integration.list`; the token itself is what authenticates a push.
+	 */
+	channelTokenHash?: string;
+	/** Epoch milliseconds, as Google reports it. */
+	channelExpiresAt?: number;
+};
+
+export type GoogleConfig = {
+	provider: "google";
+	calendars?: Record<string, GoogleCalendarWatchState>;
+	gmail?: {
+		/** Where the next history.list starts. */
+		historyId?: string;
+		/** Epoch milliseconds; users.watch lasts seven days at most. */
+		watchExpiresAt?: number;
+	};
+};
+
 export type IntegrationConfig =
 	| LinearConfig
 	| SlackConfig
 	| MicrosoftTeamsConfig
-	| SentryConfig;
+	| SentryConfig
+	| GoogleConfig;
 
 /**
  * The trigger config column, typed from the zod schema that validates every
@@ -80,6 +114,11 @@ export type MicrosoftTeamsTriggerConfig = Extract<
 	TriggerConfig,
 	{ kind: "microsoft_teams" }
 >;
+export type GoogleCalendarTriggerConfig = Extract<
+	TriggerConfig,
+	{ kind: "google_calendar" }
+>;
+export type GmailTriggerConfig = Extract<TriggerConfig, { kind: "gmail" }>;
 
 /**
  * Provider-specific extras on a user identity.
@@ -92,4 +131,6 @@ export type MicrosoftTeamsTriggerConfig = Extract<
 export type UserIdentityMetadata =
 	| { provider: "slack"; modelPreference?: string }
 	| { provider: "github" }
-	| { provider: "google" };
+	// The external id is the account address, since that is what calendar
+	// events and mail headers name people by; the stable subject id rides here.
+	| { provider: "google"; sub?: string };

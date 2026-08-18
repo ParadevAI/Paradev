@@ -15,6 +15,11 @@ export const env = createEnv({
 		GOOGLE_CLIENT_SECRET: z.string().min(1),
 		GH_CLIENT_ID: z.string().min(1),
 		GH_CLIENT_SECRET: z.string().min(1),
+		// Gmail push: the Pub/Sub topic `users.watch` publishes to, and the
+		// shared secret the push subscription appends to our URL. Absent means
+		// Gmail triggers are configured but never watched.
+		GOOGLE_PUBSUB_TOPIC: z.string().min(1).optional(),
+		GOOGLE_PUBSUB_PUSH_TOKEN: z.string().min(1).optional(),
 		BETTER_AUTH_SECRET: z.string(),
 		LINEAR_CLIENT_ID: z.string().min(1),
 		LINEAR_CLIENT_SECRET: z.string().min(1),

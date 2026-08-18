@@ -5,6 +5,7 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { protectedProcedure } from "../../trpc";
 import { githubRouter } from "./github";
+import { googleRouter } from "./google";
 import { linearRouter } from "./linear";
 import { microsoftTeamsRouter } from "./microsoft-teams";
 import { notionRouter } from "./notion";
@@ -14,6 +15,7 @@ import { verifyOrgMembership } from "./utils";
 
 export const integrationRouter = {
 	github: githubRouter,
+	google: googleRouter,
 	linear: linearRouter,
 	microsoftTeams: microsoftTeamsRouter,
 	notion: notionRouter,

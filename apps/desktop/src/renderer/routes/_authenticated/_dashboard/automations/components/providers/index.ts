@@ -1,6 +1,8 @@
 import type { TriggerConfigInput } from "@superset/shared/automation-triggers";
 import { circlebackProvider } from "./circleback/circleback";
 import { githubProvider } from "./github/github";
+import { gmailProvider } from "./google/gmail";
+import { googleCalendarProvider } from "./google/googleCalendar";
 import { linearProvider } from "./linear/linear";
 import { microsoftTeamsProvider } from "./microsoftTeams/microsoftTeams";
 import { notionProvider } from "./notion/notion";
@@ -33,6 +35,8 @@ export const TRIGGER_PROVIDERS: TriggerProvider[] = [
 	webhookProvider as TriggerProvider,
 	circlebackProvider as TriggerProvider,
 	microsoftTeamsProvider as TriggerProvider,
+	googleCalendarProvider as TriggerProvider,
+	gmailProvider as TriggerProvider,
 ];
 
 const byKind = new Map(TRIGGER_PROVIDERS.map((p) => [p.kind, p]));
