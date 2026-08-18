@@ -43,10 +43,17 @@ export type DispatchableAutomation = Pick<
 	| "v2WorkspaceId"
 >;
 
-/** What caused this run: a schedule with a due minute, or a matched event. */
+/**
+ * What caused this run: a schedule with a due minute (and the schedule trigger
+ * that was due, when the caller knows it), or a matched event.
+ */
 export type DispatchCause =
-	| { scheduledFor: Date; trigger?: null }
-	| { scheduledFor?: null; trigger: { triggerId: string; eventId: string } };
+	| { scheduledFor: Date; triggerId?: string; trigger?: null }
+	| {
+			scheduledFor?: null;
+			triggerId?: null;
+			trigger: { triggerId: string; eventId: string };
+	  };
 
 export type DispatchOptions = {
 	automation: DispatchableAutomation;
@@ -64,13 +71,12 @@ export async function dispatchAutomation(
 	opts: DispatchOptions,
 ): Promise<DispatchOutcome> {
 	const { automation, relayUrl } = opts;
-	const scheduledFor = opts.scheduledFor ?? null;
-	const trigger = opts.trigger ?? null;
+	const cause = runCause(opts);
 
 	const candidates = await resolveCandidateHosts(automation);
 	if (candidates.length === 0) {
 		const error = "no host available";
-		const inserted = await recordSkipped(automation, scheduledFor, null, error);
+		const inserted = await recordSkipped(automation, cause, null, error);
 		return { status: "skipped_offline", runId: inserted?.id ?? null, error };
 	}
 
@@ -79,7 +85,7 @@ export async function dispatchAutomation(
 		const error = "target host offline";
 		const inserted = await recordSkipped(
 			automation,
-			scheduledFor,
+			cause,
 			candidates[0]?.machineId ?? null,
 			error,
 		);
@@ -92,16 +98,11 @@ export async function dispatchAutomation(
 			automationId: automation.id,
 			organizationId: automation.organizationId,
 			title: automation.name,
-			scheduledFor,
-			triggerId: trigger?.triggerId ?? null,
-			eventId: trigger?.eventId ?? null,
+			...cause,
 			hostId: host.machineId,
 			status: "dispatching",
 		})
-		.onConflictDoNothing({
-			target: [automationRuns.automationId, automationRuns.scheduledFor],
-			where: sql`${automationRuns.scheduledFor} IS NOT NULL`,
-		})
+		.onConflictDoNothing(runDedupTarget(cause))
 		.returning();
 
 	if (!run) return { status: "conflict" };
@@ -289,9 +290,50 @@ async function pickOnlineHost(
 	);
 }
 
+/** The run row columns that identify the cause, in either shape. */
+type RunCause = {
+	scheduledFor: Date | null;
+	triggerId: string | null;
+	eventId: string | null;
+};
+
+function runCause(opts: DispatchCause): RunCause {
+	if (opts.trigger) {
+		return {
+			scheduledFor: null,
+			triggerId: opts.trigger.triggerId,
+			eventId: opts.trigger.eventId,
+		};
+	}
+	return {
+		scheduledFor: opts.scheduledFor,
+		triggerId: opts.triggerId ?? null,
+		eventId: null,
+	};
+}
+
+/**
+ * The partial unique index a run of this shape can collide on:
+ * automation_runs_schedule_dedup_idx for scheduled runs,
+ * automation_runs_event_dedup_idx for event runs. Postgres only matches
+ * ON CONFLICT against an index whose predicate the target clause repeats,
+ * so the two shapes need different targets, not one that names both.
+ */
+function runDedupTarget(cause: RunCause) {
+	return cause.eventId !== null
+		? {
+				target: [automationRuns.triggerId, automationRuns.eventId],
+				where: sql`${automationRuns.eventId} IS NOT NULL`,
+			}
+		: {
+				target: [automationRuns.automationId, automationRuns.scheduledFor],
+				where: sql`${automationRuns.scheduledFor} IS NOT NULL`,
+			};
+}
+
 async function recordSkipped(
 	automation: DispatchableAutomation,
-	scheduledFor: Date | null,
+	cause: RunCause,
 	hostId: string | null,
 	error: string,
 ): Promise<{ id: string } | undefined> {
@@ -301,15 +343,12 @@ async function recordSkipped(
 			automationId: automation.id,
 			organizationId: automation.organizationId,
 			title: automation.name,
-			scheduledFor,
+			...cause,
 			hostId,
 			status: "skipped_offline",
 			error,
 		})
-		.onConflictDoNothing({
-			target: [automationRuns.automationId, automationRuns.scheduledFor],
-			where: sql`${automationRuns.scheduledFor} IS NOT NULL`,
-		})
+		.onConflictDoNothing(runDedupTarget(cause))
 		.returning({ id: automationRuns.id });
 	return row;
 }

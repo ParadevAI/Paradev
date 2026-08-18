@@ -3,10 +3,9 @@ import { automations } from "@superset/db/schema";
 import { dispatchAutomation } from "@superset/trpc/automation-dispatch";
 import { Receiver } from "@upstash/qstash";
 import { eq } from "drizzle-orm";
-import { z } from "zod";
-
 import { env } from "@/env";
 import { getRelayUrl } from "@/lib/relay-url";
+import { runPayloadSchema } from "../../runPayloadSchema";
 
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
@@ -15,29 +14,6 @@ const receiver = new Receiver({
 	currentSigningKey: env.QSTASH_CURRENT_SIGNING_KEY,
 	nextSigningKey: env.QSTASH_NEXT_SIGNING_KEY,
 });
-
-/**
- * A run comes from a schedule or from an event, never both. Scheduled runs
- * carry the minute they were due, which is also their dedupe key; event runs
- * carry the trigger and the event instead, and have no scheduled time.
- */
-const payloadSchema = z.union([
-	// Strict, so a payload carrying both causes is rejected rather than
-	// silently treated as whichever branch happens to match first.
-	z
-		.object({
-			automationId: z.string().uuid(),
-			scheduledFor: z.string().datetime(),
-		})
-		.strict(),
-	z
-		.object({
-			automationId: z.string().uuid(),
-			triggerId: z.string().uuid(),
-			eventId: z.string().uuid(),
-		})
-		.strict(),
-]);
 
 export async function POST(
 	request: Request,
@@ -59,7 +35,7 @@ export async function POST(
 		return Response.json({ error: "Invalid signature" }, { status: 401 });
 	}
 
-	const parsed = payloadSchema.safeParse(JSON.parse(body));
+	const parsed = runPayloadSchema.safeParse(JSON.parse(body));
 	if (!parsed.success) {
 		console.error("[automations/dispatch] invalid payload", parsed.error);
 		return Response.json({ error: "Invalid payload" }, { status: 400 });
@@ -87,6 +63,7 @@ export async function POST(
 					automation,
 					relayUrl,
 					scheduledFor: new Date(parsed.data.scheduledFor),
+					triggerId: parsed.data.triggerId,
 				}
 			: {
 					automation,

@@ -64,6 +64,7 @@ export async function POST(request: Request): Promise<Response> {
 	const rows = await dbWs
 		.select({
 			automationId: automations.id,
+			triggerId: automationTriggers.id,
 			nextRunAt: automationTriggers.nextRunAt,
 			config: automationTriggers.config,
 		})
@@ -91,6 +92,7 @@ export async function POST(request: Request): Promise<Response> {
 	// while its next_run_at stayed put.
 	const planned: Array<{
 		automationId: string;
+		triggerId: string;
 		scheduledFor: Date;
 		next: Date | null;
 	}> = [];
@@ -108,6 +110,7 @@ export async function POST(request: Request): Promise<Response> {
 		try {
 			planned.push({
 				automationId: row.automationId,
+				triggerId: row.triggerId,
 				scheduledFor: bucketToMinute(row.nextRunAt),
 				next: nextOccurrenceAfter({ ...schedule, after: row.nextRunAt }),
 			});
@@ -130,10 +133,11 @@ export async function POST(request: Request): Promise<Response> {
 	}
 
 	await qstash.batchJSON(
-		planned.map(({ automationId, scheduledFor }) => ({
+		planned.map(({ automationId, triggerId, scheduledFor }) => ({
 			url: `${env.NEXT_PUBLIC_API_URL}/api/automations/dispatch/${automationId}`,
 			body: {
 				automationId,
+				triggerId,
 				scheduledFor: scheduledFor.toISOString(),
 			},
 			deduplicationId: `${automationId}_${scheduledFor.getTime()}`,
@@ -143,16 +147,11 @@ export async function POST(request: Request): Promise<Response> {
 	);
 
 	const advanceResults = await Promise.allSettled(
-		planned.map(async ({ automationId, next }) => {
+		planned.map(async ({ triggerId, next }) => {
 			await dbWs
 				.update(automationTriggers)
 				.set(next ? { nextRunAt: next } : { enabled: false })
-				.where(
-					and(
-						eq(automationTriggers.automationId, automationId),
-						eq(automationTriggers.kind, "schedule"),
-					),
-				);
+				.where(eq(automationTriggers.id, triggerId));
 		}),
 	);
 
@@ -162,7 +161,11 @@ export async function POST(request: Request): Promise<Response> {
 	const advanceFailures = advanceResults.flatMap((result, index) => {
 		if (result.status !== "rejected") return [];
 		return [
-			{ automationId: planned[index]?.automationId, reason: result.reason },
+			{
+				automationId: planned[index]?.automationId,
+				triggerId: planned[index]?.triggerId,
+				reason: result.reason,
+			},
 		];
 	});
 	if (advanceFailures.length > 0) {
