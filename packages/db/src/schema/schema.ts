@@ -832,7 +832,8 @@ export const automationTriggers = pgTable(
 		// indexes and sorts on it.
 		nextRunAt: timestamp("next_run_at", { withTimezone: true }),
 
-		// Webhook kind only. Argon2 hash, never the raw key.
+		// Bearer kinds store a SHA-256 hash of the token; HMAC kinds store the
+		// raw signing secret. Never returned by the API.
 		secretHash: text("secret_hash"),
 		secretPrefix: text("secret_prefix"),
 		secretRotatedAt: timestamp("secret_rotated_at", { withTimezone: true }),

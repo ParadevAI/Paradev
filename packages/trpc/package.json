@@ -20,6 +20,10 @@
 			"types": "./src/router/automation/dispatch.ts",
 			"default": "./src/router/automation/dispatch.ts"
 		},
+		"./automation-webhook-secret": {
+			"types": "./src/router/automation/webhookSecret.ts",
+			"default": "./src/router/automation/webhookSecret.ts"
+		},
 		"./insight-registry": {
 			"types": "./src/router/analytics/insight-registry.ts",
 			"default": "./src/router/analytics/insight-registry.ts"

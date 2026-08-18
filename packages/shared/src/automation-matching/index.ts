@@ -1,9 +1,11 @@
 import type { TriggerConfigInput } from "../automation-triggers";
 import type { BaseMatchableEvent, MatchContext, MatchResult } from "./core";
 import { type GithubMatchableEvent, githubTriggerMatches } from "./github";
+import { type WebhookMatchableEvent, webhookTriggerMatches } from "./webhook";
 
 export * from "./core";
 export * from "./github";
+export * from "./webhook";
 
 /**
  * Every provider's normalized event, discriminated by `provider`.
@@ -14,7 +16,7 @@ export * from "./github";
  * on the event, never on `MatchContext` — a Slack matcher must not need to
  * know that a GitHub context key exists.
  */
-export type MatchableEvent = GithubMatchableEvent;
+export type MatchableEvent = GithubMatchableEvent | WebhookMatchableEvent;
 
 /**
  * Whether a trigger config accepts an event, whatever provider it belongs to.
@@ -46,6 +48,8 @@ export function triggerMatches(
 				event,
 				context,
 			);
+		case "webhook":
+			return webhookTriggerMatches();
 	}
 	// Reached only when a provider is in the union but has no case above.
 	return {

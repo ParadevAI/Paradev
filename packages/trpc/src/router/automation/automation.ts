@@ -41,6 +41,7 @@ import {
 } from "./schema";
 import { saveTriggerSet } from "./triggerSet";
 import { automationVersionsRouter } from "./versions";
+import { generateWebhookToken, hashWebhookToken } from "./webhookSecret";
 
 function escapeLikePattern(value: string): string {
 	return value.replace(/[\\%_]/g, (match) => `\\${match}`);
@@ -262,6 +263,8 @@ export const automationRouter = {
 					config: automationTriggers.config,
 					enabled: automationTriggers.enabled,
 					nextRunAt: automationTriggers.nextRunAt,
+					secretPrefix: automationTriggers.secretPrefix,
+					secretRotatedAt: automationTriggers.secretRotatedAt,
 				})
 				.from(automationTriggers)
 				.where(eq(automationTriggers.automationId, input.id))
@@ -736,6 +739,111 @@ export const automationRouter = {
 				});
 			}
 			return { automationId: automation.id, runId: outcome.runId };
+		}),
+
+	/**
+	 * Issues a new bearer token for a webhook trigger, replacing any previous
+	 * one. The token is returned once; only its hash is stored.
+	 */
+	rotateWebhookSecret: protectedProcedure
+		.input(z.object({ triggerId: z.string().uuid() }))
+		.mutation(async ({ ctx, input }) => {
+			const organizationId = await requireActiveOrgMembership(ctx);
+
+			const [trigger] = await db
+				.select({
+					id: automationTriggers.id,
+					kind: automationTriggers.kind,
+					automationId: automationTriggers.automationId,
+				})
+				.from(automationTriggers)
+				.where(
+					and(
+						eq(automationTriggers.id, input.triggerId),
+						eq(automationTriggers.organizationId, organizationId),
+					),
+				)
+				.limit(1);
+
+			if (!trigger || trigger.kind !== "webhook") {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Webhook trigger not found",
+				});
+			}
+			await getAutomationForUser(
+				ctx.session.user.id,
+				organizationId,
+				trigger.automationId,
+			);
+
+			const { token, prefix } = generateWebhookToken();
+			const rotatedAt = new Date();
+			await db
+				.update(automationTriggers)
+				.set({
+					secretHash: hashWebhookToken(token),
+					secretPrefix: prefix,
+					secretRotatedAt: rotatedAt,
+				})
+				.where(eq(automationTriggers.id, trigger.id));
+
+			return { triggerId: trigger.id, token, prefix, rotatedAt };
+		}),
+
+	/**
+	 * Stores a provider-issued signing secret on a trigger, verbatim — an HMAC
+	 * verifier needs the raw key. Bearer-token kinds use `rotateWebhookSecret`.
+	 */
+	setTriggerSecret: protectedProcedure
+		.input(
+			z.object({
+				triggerId: z.string().uuid(),
+				secret: z.string().min(1).max(500),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const organizationId = await requireActiveOrgMembership(ctx);
+
+			const [trigger] = await db
+				.select({
+					id: automationTriggers.id,
+					kind: automationTriggers.kind,
+					automationId: automationTriggers.automationId,
+				})
+				.from(automationTriggers)
+				.where(
+					and(
+						eq(automationTriggers.id, input.triggerId),
+						eq(automationTriggers.organizationId, organizationId),
+					),
+				)
+				.limit(1);
+
+			if (!trigger || trigger.kind === "webhook") {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Trigger not found",
+				});
+			}
+			await getAutomationForUser(
+				ctx.session.user.id,
+				organizationId,
+				trigger.automationId,
+			);
+
+			const prefix = input.secret.slice(0, 12);
+			const rotatedAt = new Date();
+			await db
+				.update(automationTriggers)
+				.set({
+					secretHash: input.secret,
+					secretPrefix: prefix,
+					secretRotatedAt: rotatedAt,
+				})
+				.where(eq(automationTriggers.id, trigger.id));
+
+			return { triggerId: trigger.id, prefix, rotatedAt };
 		}),
 
 	/** Run history for a given automation (paginated). */
