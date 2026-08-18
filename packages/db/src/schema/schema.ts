@@ -224,10 +224,25 @@ export const integrationConnections = pgTable(
 			.$onUpdate(() => new Date()),
 	},
 	(table) => [
-		unique("integration_connections_unique").on(
-			table.organizationId,
-			table.provider,
-		),
+		// One connection per organization for org-scoped providers (Linear,
+		// Slack, ...). Google is the exception: Calendar and Gmail are one
+		// person's, so each member connects their own account. Two partial
+		// indexes rather than one constraint, and callers name the predicate in
+		// their ON CONFLICT target so Postgres can infer the right one.
+		//
+		// The predicate names the enum literal 'google', which 0083 added. Postgres
+		// refuses to USE a new enum value in the same transaction that added it,
+		// and drizzle runs every pending migration in one transaction — so 0083
+		// must be committed before 0084 runs. It is: 0083 merged to main and
+		// deploys ahead of this. A DB that skipped 0083 (a stale preview branch)
+		// must apply it first; do not "fix" that by casting to text — enum::text
+		// is not IMMUTABLE and cannot sit in an index predicate.
+		uniqueIndex("integration_connections_org_provider_unique")
+			.on(table.organizationId, table.provider)
+			.where(sql`${table.provider} <> 'google'`),
+		uniqueIndex("integration_connections_google_user_unique")
+			.on(table.organizationId, table.provider, table.connectedByUserId)
+			.where(sql`${table.provider} = 'google'`),
 		uniqueIndex("integration_connections_slack_external_org_active_unique")
 			.on(table.externalOrgId)
 			.where(
