@@ -16,17 +16,9 @@ export async function POST(request: Request) {
 	const eventType = request.headers.get("x-github-event");
 	const deliveryId = request.headers.get("x-github-delivery");
 
-	let payload: unknown;
-	try {
-		payload = JSON.parse(body);
-	} catch {
-		console.error("[github/webhook] Invalid JSON payload");
-		return Response.json({ error: "Invalid JSON payload" }, { status: 400 });
-	}
-
-	// Verify signature BEFORE storing to prevent spam from unverified requests.
-	// `verify` returns false on a mismatch and only throws when the signature is
-	// missing, so both outcomes have to be checked.
+	// Verify signature BEFORE parsing or storing so unauthenticated bodies get
+	// no further. `verify` returns false on a mismatch and only throws when the
+	// signature is missing, so both outcomes have to be checked.
 	let signatureValid = false;
 	try {
 		signatureValid = await webhooks.verify(body, signature ?? "");
@@ -35,6 +27,14 @@ export async function POST(request: Request) {
 	}
 	if (!signatureValid) {
 		return Response.json({ error: "Invalid signature" }, { status: 401 });
+	}
+
+	let payload: unknown;
+	try {
+		payload = JSON.parse(body);
+	} catch {
+		console.error("[github/webhook] Invalid JSON payload");
+		return Response.json({ error: "Invalid JSON payload" }, { status: 400 });
 	}
 
 	// Store verified event with idempotent handling

@@ -33,6 +33,7 @@ export type GithubPayload = {
 		head?: { ref?: string; repo?: { fork?: boolean } };
 		user?: { id?: number | string; login?: string };
 		draft?: boolean;
+		merged?: boolean;
 		author_association?: string;
 	};
 	issue?: {
@@ -41,6 +42,8 @@ export type GithubPayload = {
 		title?: string;
 		html_url?: string;
 		user?: { id?: number | string; login?: string };
+		// Present when the "issue" is a pull request.
+		pull_request?: { url?: string };
 	};
 	comment?: {
 		body?: string;

@@ -23,9 +23,10 @@ function matchableFrom(
 		names: githubEventNames({
 			eventType,
 			isDraft: payload.pull_request?.draft === true,
+			isMerged: payload.pull_request?.merged === true,
+			isPullRequestComment: payload.issue?.pull_request !== undefined,
 			reviewState: payload.review?.state ?? null,
 			runConclusion: payload.workflow_run?.conclusion ?? null,
-			threadResolved: null,
 		}),
 		repositoryId,
 		ref,
@@ -37,6 +38,8 @@ function matchableFrom(
 			.map((l) => l?.name)
 			.filter((n): n is string => typeof n === "string"),
 		body: payload.comment?.body ?? payload.review?.body ?? null,
+		// Only PR-shaped payloads carry the head repo; an issue_comment on a fork
+		// PR cannot be told apart and is treated as not a fork.
 		isFork: payload.pull_request?.head?.repo?.fork === true,
 		// Who opened the thing being commented on, which is a different person
 		// from whoever wrote the comment.

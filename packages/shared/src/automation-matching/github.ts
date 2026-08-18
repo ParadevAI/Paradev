@@ -38,9 +38,11 @@ const no = (reason: string): MatchResult => ({ matches: false, reason });
 export function githubEventNames(event: {
 	eventType: string;
 	isDraft: boolean;
+	isMerged: boolean;
+	/** `issue_comment` fires for PR comments too; GitHub marks those on the issue. */
+	isPullRequestComment: boolean;
 	reviewState: string | null;
 	runConclusion: string | null;
-	threadResolved: boolean | null;
 }): GithubTriggerEvent[] {
 	const t = event.eventType;
 	switch (t) {
@@ -51,7 +53,8 @@ export function githubEventNames(event: {
 		case "pull_request.synchronize":
 			return ["pull_request.pushed"];
 		case "pull_request.closed":
-			return ["pull_request.merged"];
+			// Closed without merging names nothing; there is no closed trigger.
+			return event.isMerged ? ["pull_request.merged"] : [];
 		case "pull_request.labeled":
 		case "pull_request.unlabeled":
 			return ["label_change"];
@@ -60,7 +63,7 @@ export function githubEventNames(event: {
 		case "check_suite.completed":
 			return ["checks_completed"];
 		case "issue_comment.created":
-			return ["comment_added", "issue_comment"];
+			return event.isPullRequestComment ? ["comment_added"] : ["issue_comment"];
 		case "pull_request_review_comment.created":
 			return ["pr_review_comment", "comment_added"];
 		case "pull_request_review.submitted": {
