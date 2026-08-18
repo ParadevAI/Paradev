@@ -37,6 +37,8 @@ export interface HostWorkspacesCacheOps {
 	removeWorkspace: (hostId: string, workspaceId: string) => void;
 	/** Rollback hammer: refetch the host's list after a failed write. */
 	invalidateHost: (hostId: string) => void;
+	/** Refetch and resolve with the host's fresh list (undefined = unreachable). */
+	refetchHost: (hostId: string) => Promise<HostWorkspaceRow[] | undefined>;
 }
 
 export interface UseHostWorkspacesResult {
@@ -116,6 +118,11 @@ export function useHostWorkspaces(
 			invalidateHost: (hostId) => {
 				if (hostId !== machineId) return;
 				void queryClient.invalidateQueries({ queryKey: key });
+			},
+			refetchHost: async (hostId) => {
+				if (hostId !== machineId) return undefined;
+				await queryClient.refetchQueries({ queryKey: key });
+				return queryClient.getQueryData<HostWorkspaceRow[]>(key);
 			},
 		};
 	}, [machineId, hostUrl, queryClient]);

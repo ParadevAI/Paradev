@@ -1,7 +1,7 @@
 import type { SelectGithubPullRequest } from "@superset/db/schema";
 import { useRouter } from "expo-router";
 import { FolderGit2, Plus } from "lucide-react-native";
-import { Pressable, View } from "react-native";
+import { ActivityIndicator, Pressable, View } from "react-native";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
@@ -25,6 +25,7 @@ import type {
 import type { DiffStats } from "../../hooks/useVisibleDiffStats";
 import { useChatTargetStore } from "../../stores/chatTargetStore";
 import { WorkspaceRowMenu } from "./components/WorkspaceRowMenu";
+import { useWorkspaceRowActions } from "./hooks/useWorkspaceRowActions";
 
 // PR state replaces the host icon in the icon slot — same treatment as
 // desktop's DashboardSidebarWorkspaceIcon.
@@ -55,24 +56,44 @@ export function WorkspaceRow({
 		(state) => state.target?.workspaceId === workspace.id,
 	);
 	const canChat = workspace.hostReachable && workspace.worktreeExists !== false;
+	const {
+		isDeleting,
+		renameWorkspace,
+		deleteWorkspace,
+		copyId,
+		shareWorkspace,
+	} = useWorkspaceRowActions(workspace, cache);
 
 	return (
-		<WorkspaceRowMenu workspace={workspace} cache={cache}>
+		<WorkspaceRowMenu
+			canDelete={workspace.type !== "main"}
+			onRename={() => void renameWorkspace()}
+			onDelete={deleteWorkspace}
+			onCopyId={copyId}
+			onShare={shareWorkspace}
+		>
 			{/* Default press behavior on purpose: the system context-menu lift
 			    owns the hold animation, and custom press feedback fights it. */}
 			<Pressable
 				className={cn(
 					"flex-row items-center gap-3 rounded-xl py-2 pl-10 pr-3",
 					targeted ? "bg-foreground/5" : "bg-background",
+					isDeleting && "opacity-40",
 				)}
+				disabled={isDeleting}
 				onPress={() =>
 					router.push(`/(authenticated)/workspace/${workspace.id}`)
 				}
 			>
 				{/* Desktop WorkspaceIcon semantics: working replaces the icon with
 				    the braille spinner; other statuses overlay a corner ping on the
-				    base icon (PR state when one exists, else the workspace mark). */}
-				{attention === "working" ? (
+				    base icon (PR state when one exists, else the workspace mark).
+				    A delete in flight takes the slot over everything else. */}
+				{isDeleting ? (
+					<View className="size-6 items-center justify-center">
+						<ActivityIndicator size="small" color={theme.mutedForeground} />
+					</View>
+				) : attention === "working" ? (
 					<View className="size-6 items-center justify-center">
 						<AsciiSpinner />
 					</View>
@@ -175,7 +196,7 @@ export function WorkspaceRow({
 					accessibilityLabel={`New agent in ${workspace.name}`}
 					variant="ghost"
 					size="icon"
-					disabled={!canChat}
+					disabled={!canChat || isDeleting}
 					onPress={() =>
 						setTarget({
 							workspaceId: workspace.id,

@@ -46,7 +46,15 @@ export function useWorkspaceHeaderActions(
 		});
 	};
 
-	const destroyWorkspace = async (force: boolean) => {
+	const destroyWorkspace = async ({
+		force,
+		skipTeardown,
+	}: {
+		/** Git-destructive consent only: skips the dirty-worktree preflight. */
+		force: boolean;
+		/** Consent to abandon the teardown script — set once it has already failed. */
+		skipTeardown: boolean;
+	}) => {
 		if (!workspace || !host) return;
 		const hostUrl = buildRelayHostUrl(host.organizationId, host.machineId);
 		try {
@@ -54,6 +62,7 @@ export function useWorkspaceHeaderActions(
 				workspaceId: workspace.id,
 				deleteBranch: false,
 				force,
+				skipTeardown,
 			});
 			void queryClient.invalidateQueries({
 				queryKey: ["host-service", "workspaces", "list"],
@@ -65,25 +74,29 @@ export function useWorkspaceHeaderActions(
 					Alert.alert("Delete already in progress");
 					return;
 				}
-				if (error.data.code === "CONFLICT" || error.data.teardownFailure) {
-					Alert.alert(
-						error.data.teardownFailure
-							? "Teardown script failed"
-							: "Worktree has uncommitted changes",
-						undefined,
-						[
-							{ style: "cancel", text: "Cancel" },
-							{
-								onPress: () => void destroyWorkspace(true),
-								style: "destructive",
-								text: "Force delete",
-							},
-						],
-					);
+				// A failing teardown script shouldn't hold the delete hostage on a
+				// phone: it already ran, so let the workspace go without it.
+				if (error.data.teardownFailure && !skipTeardown) {
+					await destroyWorkspace({ force: true, skipTeardown: true });
+					return;
+				}
+				if (error.data.code === "CONFLICT") {
+					Alert.alert("Worktree has uncommitted changes", undefined, [
+						{ style: "cancel", text: "Cancel" },
+						{
+							onPress: () =>
+								void destroyWorkspace({ force: true, skipTeardown }),
+							style: "destructive",
+							text: "Delete anyway",
+						},
+					]);
 					return;
 				}
 			}
-			Alert.alert("Delete failed");
+			Alert.alert(
+				"Delete failed",
+				error instanceof Error ? error.message : undefined,
+			);
 		}
 	};
 
@@ -99,7 +112,8 @@ export function useWorkspaceHeaderActions(
 			[
 				{ style: "cancel", text: "Cancel" },
 				{
-					onPress: () => void destroyWorkspace(false),
+					onPress: () =>
+						void destroyWorkspace({ force: false, skipTeardown: false }),
 					style: "destructive",
 					text: "Delete",
 				},
