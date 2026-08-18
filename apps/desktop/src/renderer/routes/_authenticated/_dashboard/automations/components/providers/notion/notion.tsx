@@ -59,7 +59,7 @@ function renderPart(
 					actor={c.actor}
 					onChange={(v) => set({ actor: v })}
 					className={mark("actor")}
-					people={options.notion?.users ?? []}
+					people={options.notion?.people ?? []}
 					disabled={disabled}
 				/>
 			);
@@ -70,7 +70,7 @@ function renderPart(
 					actor={c.mentionedUser}
 					onChange={(v) => set({ mentionedUser: v })}
 					className={mark("mentionedUser")}
-					people={options.notion?.users ?? []}
+					people={options.notion?.people ?? []}
 					disabled={disabled}
 				/>
 			);

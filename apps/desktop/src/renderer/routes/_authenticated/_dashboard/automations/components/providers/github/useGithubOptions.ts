@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import type { ProviderOptions } from "../types";
 
-/** The pickable values a GitHub sentence needs: repositories and linked people. */
+/** The pickable values a GitHub sentence needs: repositories and the installation's people. */
 export function useGithubOptions(organizationId: string): ProviderOptions {
 	// repoId is GitHub's numeric id, which is what the matcher compares against —
 	// a full name would stop matching the moment someone renames the repo.
@@ -10,7 +10,7 @@ export function useGithubOptions(organizationId: string): ProviderOptions {
 		{ organizationId },
 		{ enabled: Boolean(organizationId) },
 	);
-	const people = cloudTrpc.integration.github.listLinkedPeople.useQuery(
+	const people = cloudTrpc.integration.github.listPeople.useQuery(
 		{ organizationId },
 		{ enabled: Boolean(organizationId) },
 	);

@@ -5,8 +5,12 @@ import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import { protectedProcedure } from "../../../trpc";
 import { verifyOrgAdmin, verifyOrgMembership } from "../utils";
-import { findTeamsConnection, getGraphAccessToken } from "./graph";
-import { listChannels, listTeams } from "./resources";
+import {
+	findTeamsConnection,
+	getGraphAccessToken,
+	isGraphAuthError,
+} from "./graph";
+import { listChannels, listTeams, listUsers } from "./resources";
 import { deleteTeamsSubscriptions } from "./subscriptions";
 
 /** How many teams' channel lists are fetched at once when building the
@@ -103,6 +107,34 @@ export const microsoftTeamsRouter = {
 			return teams
 				.map((team) => ({ id: team.id, label: team.displayName ?? team.id }))
 				.sort((a, b) => a.label.localeCompare(b.label));
+		}),
+
+	listPeople: protectedProcedure
+		.input(z.object({ organizationId: z.uuid() }))
+		.query(async ({ ctx, input }) => {
+			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
+			const auth = await requireAccessToken(input.organizationId);
+			if (!auth) return [];
+
+			try {
+				const users = await listUsers(auth.accessToken);
+				return users
+					.map((user) => ({
+						id: user.id,
+						label:
+							user.displayName ??
+							user.mail ??
+							user.userPrincipalName ??
+							user.id,
+					}))
+					.sort((a, b) => a.label.localeCompare(b.label));
+			} catch (error) {
+				// The tenant consented before User.ReadBasic.All was asked for: an
+				// empty picker, not a red editor.
+				if (!isGraphAuthError(error)) throw error;
+				console.warn("[microsoft-teams] listPeople refused:", error);
+				return [];
+			}
 		}),
 
 	listChannels: protectedProcedure

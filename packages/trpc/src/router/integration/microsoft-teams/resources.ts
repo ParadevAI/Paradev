@@ -37,6 +37,27 @@ export function listTeams(accessToken: string): Promise<GraphTeam[]> {
 	return graphList<GraphTeam>(accessToken, "/teams?$select=id,displayName");
 }
 
+const MAX_PEOPLE = 1000;
+
+export type GraphUser = {
+	id: string;
+	displayName: string | null;
+	mail?: string | null;
+	userPrincipalName?: string | null;
+};
+
+/**
+ * The tenant's people, as Entra object ids — what a channel message's
+ * `from.user.id` carries. Needs the User.ReadBasic.All application permission.
+ */
+export function listUsers(accessToken: string): Promise<GraphUser[]> {
+	return graphList<GraphUser>(
+		accessToken,
+		"/users?$select=id,displayName,mail,userPrincipalName&$top=999",
+		MAX_PEOPLE,
+	);
+}
+
 export function listChannels(
 	accessToken: string,
 	teamId: string,

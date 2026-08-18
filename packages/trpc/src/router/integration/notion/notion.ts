@@ -111,7 +111,7 @@ export const notionRouter = {
 	 * The people in the connected workspace, for the actor and mention chips.
 	 * Notion user ids, since that is what a comment's author and mentions carry.
 	 */
-	listUsers: protectedProcedure
+	listPeople: protectedProcedure
 		.input(z.object({ organizationId: z.uuid() }))
 		.query(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
@@ -120,9 +120,11 @@ export const notionRouter = {
 			if (!connection) return [];
 
 			const users = await listOrEmpty(() => listUsers(connection.accessToken));
-			return users.map((user) => ({
-				id: user.id,
-				label: user.name || user.person?.email || user.id,
-			}));
+			return users
+				.map((user) => ({
+					id: user.id,
+					label: user.name || user.person?.email || user.id,
+				}))
+				.sort((a, b) => a.label.localeCompare(b.label));
 		}),
 } satisfies TRPCRouterRecord;

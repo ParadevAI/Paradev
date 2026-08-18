@@ -51,16 +51,13 @@ function renderPart(
 				/>
 			);
 		case "actor":
-			// Anyone or Me only. The shared people list holds GitHub ids, which is
-			// the wrong id space; Teams people are Entra object ids, resolved for
-			// `me` through user_identities at match time.
 			return (
 				<ActorChip
 					key={index}
 					actor={config.actor}
 					onChange={(v) => set({ actor: v })}
 					className={mark("actor")}
-					people={[]}
+					people={options.microsoftTeams?.people ?? []}
 					disabled={disabled}
 				/>
 			);

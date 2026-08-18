@@ -12,7 +12,7 @@ export function useNotionOptions(organizationId: string): ProviderOptions {
 		{ organizationId },
 		{ enabled: Boolean(organizationId) },
 	);
-	const users = cloudTrpc.integration.notion.listUsers.useQuery(
+	const people = cloudTrpc.integration.notion.listPeople.useQuery(
 		{ organizationId },
 		{ enabled: Boolean(organizationId) },
 	);
@@ -21,9 +21,9 @@ export function useNotionOptions(organizationId: string): ProviderOptions {
 		() => ({
 			notion: {
 				dataSources: dataSources.data ?? [],
-				users: users.data ?? [],
+				people: people.data ?? [],
 			},
 		}),
-		[dataSources.data, users.data],
+		[dataSources.data, people.data],
 	);
 }

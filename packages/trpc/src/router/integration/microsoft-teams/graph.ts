@@ -231,14 +231,15 @@ export async function graphRequest<T>(
 	return json as T;
 }
 
-/** A collection, following `@odata.nextLink` up to a page cap. */
+/** A collection, following `@odata.nextLink` up to a page cap or `limit` items. */
 export async function graphList<T>(
 	accessToken: string,
 	path: string,
+	limit = Number.POSITIVE_INFINITY,
 ): Promise<T[]> {
 	const items: T[] = [];
 	let next: string | undefined = path;
-	for (let page = 0; next && page < MAX_PAGES; page++) {
+	for (let page = 0; next && page < MAX_PAGES && items.length < limit; page++) {
 		const body: { value?: T[]; "@odata.nextLink"?: string } =
 			await graphRequest(accessToken, next);
 		items.push(...(body.value ?? []));
