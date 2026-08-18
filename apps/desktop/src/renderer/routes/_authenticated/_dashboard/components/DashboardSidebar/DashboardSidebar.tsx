@@ -265,7 +265,7 @@ export function DashboardSidebar({
 									workspaceShortcutLabels={workspaceShortcutLabels}
 									onReorderProjects={handleReorderProjects}
 								>
-									<div className="flex h-full flex-col border-r border-border bg-muted/45 dark:bg-muted/35">
+									<div className="flex h-full flex-col border-r border-border bg-sidebar dark:bg-muted/35">
 										<DashboardSidebarHeader isCollapsed={isCollapsed} />
 
 										<OverflowFadeContainer
