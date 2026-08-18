@@ -238,6 +238,22 @@ export const sentryTriggerConfigSchema = z.object({
 	level: triggerScopeSchema,
 });
 
+export const circlebackTriggerEventValues = ["meeting.completed"] as const;
+
+/**
+ * Circleback has no connection: it posts to a per-trigger URL and signs the
+ * body with a secret it generates and shows in its own UI. That secret is
+ * pasted into the trigger row and lives on the trigger row's secret column,
+ * never in this config — the config is returned to every member of the org.
+ */
+export const circlebackTriggerConfigSchema = z.object({
+	kind: z.literal("circleback"),
+	event: z.enum(circlebackTriggerEventValues),
+	tags: triggerScopeSchema,
+	attendees: triggerScopeSchema,
+	nameFilter: textFilterSchema.nullable().default(null),
+});
+
 /**
  * Notion. `comment.mentioned` is not a Notion event: it is `comment.created`
  * narrowed to comments whose rich text mentions a user, which the webhook
@@ -304,6 +320,7 @@ export const draftTriggerSchema = z.object({
 		linearTriggerConfigSchema,
 		sentryTriggerConfigSchema,
 		notionTriggerConfigSchema,
+		circlebackTriggerConfigSchema,
 	]),
 });
 export type DraftTrigger = z.infer<typeof draftTriggerSchema>;
@@ -402,6 +419,7 @@ export function describeTriggerProblems(
 				break;
 			}
 			case "sentry":
+			case "circleback":
 				break;
 			case "schedule":
 			case "webhook":

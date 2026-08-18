@@ -1,4 +1,5 @@
 import type { TriggerConfigInput } from "@superset/shared/automation-triggers";
+import { circlebackProvider } from "./circleback/circleback";
 import { githubProvider } from "./github/github";
 import { linearProvider } from "./linear/linear";
 import { notionProvider } from "./notion/notion";
@@ -27,6 +28,7 @@ export const TRIGGER_PROVIDERS: TriggerProvider[] = [
 	notionProvider as TriggerProvider,
 	slackProvider as TriggerProvider,
 	webhookProvider as TriggerProvider,
+	circlebackProvider as TriggerProvider,
 ];
 
 const byKind = new Map(TRIGGER_PROVIDERS.map((p) => [p.kind, p]));

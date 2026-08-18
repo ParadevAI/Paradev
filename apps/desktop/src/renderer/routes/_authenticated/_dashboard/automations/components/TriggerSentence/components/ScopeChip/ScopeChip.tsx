@@ -4,8 +4,11 @@ import {
 	DropdownMenuCheckboxItem,
 	DropdownMenuContent,
 	DropdownMenuItem,
+	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
+import { Input } from "@superset/ui/input";
+import { useState } from "react";
 import type { ScopeOption } from "../../scopeOption";
 import { ChipButton } from "../ChipButton";
 
@@ -31,6 +34,9 @@ function scopeLabel(
  * "Any" is its own entry rather than the empty state, because an empty
  * selection matches nothing — that asymmetry is what stops a half-built trigger
  * firing on everything, so choosing "any" has to be deliberate.
+ *
+ * `allowCustom` adds a field for values that are not pickable — an email
+ * address, a domain — which then sit in the list like any chosen option.
  */
 export function ScopeChip({
 	scope,
@@ -38,6 +44,7 @@ export function ScopeChip({
 	options,
 	emptyLabel,
 	anyLabel,
+	allowCustom,
 	disabled,
 	className,
 }: {
@@ -46,12 +53,14 @@ export function ScopeChip({
 	options: ScopeOption[];
 	emptyLabel: string;
 	anyLabel: string;
+	allowCustom?: { placeholder: string };
 	disabled?: boolean;
 	className?: string;
 }) {
 	const selected = scope !== null && scope.mode === "list" ? scope.ids : [];
 	const isAny = scope !== null && scope.mode === "any";
 	const empty = scope === null || (scope.mode === "list" && !scope.ids.length);
+	const [custom, setCustom] = useState("");
 
 	const toggle = (id: string) => {
 		const next = selected.includes(id)
@@ -59,6 +68,20 @@ export function ScopeChip({
 			: [...selected, id];
 		onChange(next.length ? { mode: "list", ids: next } : null);
 	};
+
+	const addCustom = () => {
+		const value = custom.trim();
+		if (!value) return;
+		if (!selected.includes(value)) {
+			onChange({ mode: "list", ids: [...selected, value] });
+		}
+		setCustom("");
+	};
+
+	// Typed values that no option describes still need a row to be unticked.
+	const customSelected = selected.filter(
+		(id) => !options.some((option) => option.id === id),
+	);
 
 	return (
 		<DropdownMenu>
@@ -88,8 +111,41 @@ export function ScopeChip({
 						{option.label}
 					</DropdownMenuCheckboxItem>
 				))}
-				{options.length === 0 && (
+				{allowCustom &&
+					customSelected.map((id) => (
+						<DropdownMenuCheckboxItem
+							key={id}
+							checked
+							onCheckedChange={() => toggle(id)}
+						>
+							{id}
+						</DropdownMenuCheckboxItem>
+					))}
+				{options.length === 0 && !allowCustom && (
 					<DropdownMenuItem disabled>Nothing to choose yet</DropdownMenuItem>
+				)}
+				{allowCustom && (
+					<>
+						<DropdownMenuSeparator />
+						<div className="p-1">
+							<Input
+								value={custom}
+								placeholder={allowCustom.placeholder}
+								disabled={disabled}
+								onChange={(event) => setCustom(event.target.value)}
+								// The menu owns arrow keys and typeahead; the field keeps
+								// what it types.
+								onKeyDown={(event) => {
+									event.stopPropagation();
+									if (event.key === "Enter") {
+										event.preventDefault();
+										addCustom();
+									}
+								}}
+								className="h-7 text-[13px]"
+							/>
+						</div>
+					</>
 				)}
 			</DropdownMenuContent>
 		</DropdownMenu>
