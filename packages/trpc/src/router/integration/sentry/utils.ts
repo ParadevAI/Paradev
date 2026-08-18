@@ -100,20 +100,41 @@ export async function verifySentryInstall(
 	installationUuid: string,
 	token: string,
 ) {
-	await fetch(
-		`${SENTRY_URL}/api/0/sentry-app-installations/${installationUuid}/`,
-		{
-			method: "PUT",
-			headers: {
-				"Content-Type": "application/json",
-				Authorization: `Bearer ${token}`,
+	// Best-effort: the token already works, and a failure here only leaves the
+	// install in "pending" on Sentry's side.
+	try {
+		const response = await fetch(
+			`${SENTRY_URL}/api/0/sentry-app-installations/${installationUuid}/`,
+			{
+				method: "PUT",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${token}`,
+				},
+				body: JSON.stringify({ status: "installed" }),
 			},
-			body: JSON.stringify({ status: "installed" }),
-		},
-	).catch(() => {
-		// Verify Install is best-effort: the token already works, and a failure
-		// here only leaves the install in "pending" on Sentry's side.
-	});
+		);
+		if (!response.ok) {
+			console.warn(
+				`[sentry] Verify Install returned ${response.status} for ${installationUuid}`,
+			);
+		}
+	} catch (error) {
+		console.warn(
+			`[sentry] Verify Install failed for ${installationUuid}:`,
+			error,
+		);
+	}
+}
+
+/** A revoked or already-used refresh token comes back as 400 invalid_grant. */
+async function isInvalidGrant(response: Response): Promise<boolean> {
+	try {
+		const body = (await response.json()) as { error?: unknown };
+		return body?.error === "invalid_grant";
+	} catch {
+		return false;
+	}
 }
 
 type TokenResult =
@@ -172,7 +193,11 @@ export async function getSentryAccessToken(
 			}),
 		});
 		if (!response.ok) {
-			if (response.status === 401 || response.status === 403) {
+			if (
+				response.status === 401 ||
+				response.status === 403 ||
+				(response.status === 400 && (await isInvalidGrant(response)))
+			) {
 				await tx
 					.update(integrationConnections)
 					.set({

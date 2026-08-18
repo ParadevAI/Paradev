@@ -31,6 +31,9 @@ export function sentryEventNames(eventType: string): SentryTriggerEvent[] {
 		case "issue.archived":
 		case "issue.unresolved":
 			return [eventType, "issue.any"];
+		// Sentry's older wire name for Archive; both spellings still arrive.
+		case "issue.ignored":
+			return ["issue.archived", "issue.any"];
 		default:
 			return [];
 	}

@@ -2,8 +2,7 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 import { db } from "@superset/db/client";
 import { integrationConnections } from "@superset/db/schema";
 import { disconnectSentry } from "@superset/trpc/integrations/sentry";
-import { and, eq, isNull, sql } from "drizzle-orm";
-import { z } from "zod";
+import { and, eq, sql } from "drizzle-orm";
 
 import { env } from "@/env";
 import { dispatchMatchingTriggers } from "@/lib/automations/dispatchMatchingTriggers";
@@ -19,10 +18,20 @@ import {
  * Every delivery is signed with the app's one client secret, an env var, so the
  * signature is verified before anything is looked up. The payload names no
  * Superset org, only the installation's uuid — and that uuid is what the
- * install callback stored on the connection, so it is how a delivery finds the
- * org it belongs to. (`?organization=` stays a fallback for a delivery that
- * somehow carries no installation.)
+ * install callback stored on the connection, so it is the only way a delivery
+ * finds the org it belongs to.
  */
+
+/** How far a delivery's `sentry-hook-timestamp` may sit from our clock. */
+const TIMESTAMP_TOLERANCE_MS = 5 * 60 * 1000;
+
+/** Sentry sends unix seconds; a stale or future timestamp is a replay. */
+function timestampFresh(header: string | null): boolean {
+	if (!header) return false;
+	const seconds = Number(header);
+	if (!Number.isFinite(seconds)) return false;
+	return Math.abs(Date.now() - seconds * 1000) <= TIMESTAMP_TOLERANCE_MS;
+}
 
 /** Constant-time compare of Sentry's hex HMAC-SHA256 against ours. */
 function signatureMatches(
@@ -51,12 +60,16 @@ async function connectionByInstallation(installationUuid: string) {
 export async function POST(request: Request) {
 	const body = await request.text();
 	const signature = request.headers.get("sentry-hook-signature");
+	const timestamp = request.headers.get("sentry-hook-timestamp");
 	const resource = request.headers.get("sentry-hook-resource");
 	const requestId = request.headers.get("request-id");
 
 	const secret = env.SENTRY_CLIENT_SECRET;
 	if (!secret || !signature || !signatureMatches(body, signature, secret)) {
 		return Response.json({ error: "Invalid signature" }, { status: 401 });
+	}
+	if (!timestampFresh(timestamp)) {
+		return Response.json({ error: "Stale timestamp" }, { status: 401 });
 	}
 
 	let payload: SentryIssuePayload;
@@ -87,22 +100,12 @@ export async function POST(request: Request) {
 		return Response.json({ success: true, message: "Ignored" });
 	}
 
-	// The install uuid picks the connection; the URL param is only a fallback.
-	const urlOrg = new URL(request.url).searchParams.get("organization");
 	const connection = installationUuid
 		? await connectionByInstallation(installationUuid)
-		: urlOrg && z.uuid().safeParse(urlOrg).success
-			? await db.query.integrationConnections.findFirst({
-					where: and(
-						eq(integrationConnections.organizationId, urlOrg),
-						eq(integrationConnections.provider, "sentry"),
-						isNull(integrationConnections.disconnectedAt),
-					),
-					columns: { id: true, organizationId: true, disconnectedAt: true },
-				})
-			: null;
+		: null;
 
 	// No active connection for this install: nothing to attribute the event to.
+	// 200 so Sentry does not retry what can never resolve.
 	if (!connection || connection.disconnectedAt) {
 		return Response.json({ success: true, message: "No connection" });
 	}
@@ -127,6 +130,10 @@ export async function POST(request: Request) {
 
 	// Nothing in the product names this action, so there is nothing to match.
 	if (event.names.length === 0) {
+		console.log(
+			`[sentry/webhook] Unhandled action ${resource}.${payload.action}, recorded only:`,
+			deliveryId,
+		);
 		return Response.json({ success: true, message: "Recorded" });
 	}
 

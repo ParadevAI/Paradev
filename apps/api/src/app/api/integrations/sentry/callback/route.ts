@@ -15,8 +15,18 @@ import { env } from "@/env";
 import { verifySignedState } from "@/lib/oauth-state";
 import { SENTRY_STATE_COOKIE } from "../connect/route";
 
-const web = (params: string) =>
-	Response.redirect(`${env.NEXT_PUBLIC_WEB_URL}/integrations/sentry${params}`);
+/**
+ * Redirect back to the web integration page, clearing the one-shot state
+ * cookie on every exit so a failed callback does not leave it live for its TTL.
+ */
+const web = (params = "") =>
+	new Response(null, {
+		status: 302,
+		headers: {
+			Location: `${env.NEXT_PUBLIC_WEB_URL}/integrations/sentry${params}`,
+			"Set-Cookie": `${SENTRY_STATE_COOKIE}=; HttpOnly; SameSite=Lax; Path=/api/integrations/sentry; Max-Age=0`,
+		},
+	});
 
 /**
  * Finishes a Sentry install: exchanges the grant code for a token pair and
@@ -111,14 +121,7 @@ export async function GET(request: Request) {
 	// Verify Install, if the app has it on; best-effort, the token already works.
 	await verifySentryInstall(installationId, token.token);
 
-	// Clear the one-shot state cookie on the way back.
-	return new Response(null, {
-		status: 302,
-		headers: {
-			Location: `${env.NEXT_PUBLIC_WEB_URL}/integrations/sentry`,
-			"Set-Cookie": `${SENTRY_STATE_COOKIE}=; HttpOnly; SameSite=Lax; Path=/api/integrations/sentry; Max-Age=0`,
-		},
-	});
+	return web();
 }
 
 /** One cookie value from a request's Cookie header. */
