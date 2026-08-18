@@ -1,8 +1,9 @@
 // Tracks terminal-mode state (kitty keyboard, bracketed paste, focus, mouse,
-// app cursor, …) by feeding every PTY-output chunk through a headless
-// xterm.js. `buildPreamble()` returns the byte sequence that brings a freshly
-// reattached renderer xterm back to the modes the running program already
-// believes are active.
+// app cursor, cursor visibility, …) by feeding every PTY-output chunk through
+// a headless xterm.js. `buildPreamble()` returns the byte sequence that brings
+// an attaching renderer xterm — fresh, rebuilt from a persisted snapshot, or
+// long-lived with arbitrarily diverged mode state — to the modes the running
+// program believes are active.
 //
 // Live programs typically set these modes ONCE at startup (e.g. codex emits
 // `\x1b[>7u` to enable kitty keyboard). Those bytes are broadcast straight to
@@ -91,18 +92,33 @@ export function createModeTracker(cols: number, rows: number): ModeTracker {
 		const m = term.modes;
 		const parts: string[] = [];
 
-		if (m.applicationCursorKeysMode) parts.push("\x1b[?1h");
-		if (m.applicationKeypadMode) parts.push("\x1b[?66h");
-		if (m.bracketedPasteMode) parts.push("\x1b[?2004h");
-		if (m.insertMode) parts.push("\x1b[4h");
+		// The preamble is an authoritative resync, not a diff against xterm
+		// defaults: the attaching xterm is not always fresh. It may be rebuilt
+		// from a persisted SerializeAddon snapshot (which bakes in whatever
+		// modes were active at capture — e.g. `?25l` when the snapshot caught
+		// an agent CLI mid-repaint, stranding the cursor invisible), or be a
+		// long-lived xterm reattaching after a gap whose mode restores were
+		// lost. So every mode is asserted in BOTH directions, the way tmux
+		// resyncs a client tty on attach (tty.c: tty->mode = ALL_MODES, then
+		// diff down). The two exceptions below are modes whose set/reset has
+		// side effects beyond the flag itself.
+		parts.push(m.applicationCursorKeysMode ? "\x1b[?1h" : "\x1b[?1l");
+		parts.push(m.applicationKeypadMode ? "\x1b[?66h" : "\x1b[?66l");
+		parts.push(m.bracketedPasteMode ? "\x1b[?2004h" : "\x1b[?2004l");
+		parts.push(m.insertMode ? "\x1b[4h" : "\x1b[4l");
+		// Exception: DECOM (?6) is asserted only when set — both DECSET and
+		// DECRST home the cursor, so an unconditional `?6l` would teleport
+		// the client's cursor on every attach.
 		if (m.originMode) parts.push("\x1b[?6h");
-		if (m.reverseWraparoundMode) parts.push("\x1b[?45h");
-		if (m.sendFocusMode) parts.push("\x1b[?1004h");
-		// Inverted: defaults true, only emit when explicitly disabled.
-		if (!m.showCursor) parts.push("\x1b[?25l");
-		if (!m.wraparoundMode) parts.push("\x1b[?7l");
-		// synchronizedOutputMode intentionally omitted — re-asserting it on
-		// attach would suspend rendering until the next end-marker.
+		parts.push(m.reverseWraparoundMode ? "\x1b[?45h" : "\x1b[?45l");
+		parts.push(m.sendFocusMode ? "\x1b[?1004h" : "\x1b[?1004l");
+		parts.push(m.showCursor ? "\x1b[?25h" : "\x1b[?25l");
+		parts.push(m.wraparoundMode ? "\x1b[?7h" : "\x1b[?7l");
+		// Exception: synchronized output (?2026) is only ever cleared —
+		// re-asserting `h` would suspend the client's rendering until the
+		// program's next end-marker, while `l` un-wedges a client whose
+		// end-marker was lost in a reattach gap.
+		if (!m.synchronizedOutputMode) parts.push("\x1b[?2026l");
 
 		switch (m.mouseTrackingMode) {
 			case "x10":
@@ -118,17 +134,18 @@ export function createModeTracker(cols: number, rows: number): ModeTracker {
 				parts.push("\x1b[?1003h");
 				break;
 			case "none":
+				// Any mouse level's reset clears the whole protocol, so one
+				// `?1003l` disarms a client whose TUI died with tracking on.
+				parts.push("\x1b[?1003l");
 				break;
 		}
 
 		const kittyFlags = internals._core?.coreService?.kittyKeyboard?.flags ?? 0;
-		if (kittyFlags > 0) {
-			// `=N;1u` sets flags directly — restoring effective state to a
-			// fresh peer, not modeling the program's push/pop stack.
-			parts.push(`\x1b[=${kittyFlags};1u`);
-		}
+		// `=N;1u` sets flags directly — restoring effective state to the
+		// peer, not modeling the program's push/pop stack. `=0;1u` likewise
+		// disarms a client left CSI-u encoded by an uncleanly killed TUI.
+		parts.push(`\x1b[=${kittyFlags};1u`);
 
-		if (parts.length === 0) return null;
 		return new TextEncoder().encode(parts.join(""));
 	};
 
