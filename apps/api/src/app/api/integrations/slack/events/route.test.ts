@@ -22,6 +22,11 @@ mock.module("./process-app-home-opened", () => ({
 	processAppHomeOpened: mock(async () => ({})),
 }));
 
+mock.module("./process-automation-event", () => ({
+	isAutomationEvent: () => false,
+	processAutomationEvent: mock(async () => ({ recorded: false })),
+}));
+
 mock.module("./process-entity-details", () => ({
 	processEntityDetails: mock(async () => ({})),
 }));

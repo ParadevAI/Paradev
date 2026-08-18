@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useGithubOptions } from "./github/useGithubOptions";
 import { useLinearOptions } from "./linear/useLinearOptions";
 import { useNotionOptions } from "./notion/useNotionOptions";
+import { useSlackOptions } from "./slack/useSlackOptions";
 import type { ProviderOptions } from "./types";
 
 /**
@@ -16,8 +17,9 @@ export function useProviderOptions(organizationId: string): ProviderOptions {
 	const github = useGithubOptions(organizationId);
 	const linear = useLinearOptions(organizationId);
 	const notion = useNotionOptions(organizationId);
+	const slack = useSlackOptions(organizationId);
 	return useMemo(
-		() => ({ ...github, ...linear, ...notion }),
-		[github, linear, notion],
+		() => ({ ...github, ...linear, ...notion, ...slack }),
+		[github, linear, notion, slack],
 	);
 }

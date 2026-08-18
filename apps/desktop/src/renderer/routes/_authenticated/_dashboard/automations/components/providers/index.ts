@@ -3,6 +3,7 @@ import { githubProvider } from "./github/github";
 import { linearProvider } from "./linear/linear";
 import { notionProvider } from "./notion/notion";
 import { scheduleProvider } from "./schedule/schedule";
+import { slackProvider } from "./slack/slack";
 import type { TriggerProvider } from "./types";
 import { webhookProvider } from "./webhook/webhook";
 
@@ -24,6 +25,7 @@ export const TRIGGER_PROVIDERS: TriggerProvider[] = [
 	githubProvider as TriggerProvider,
 	linearProvider as TriggerProvider,
 	notionProvider as TriggerProvider,
+	slackProvider as TriggerProvider,
 	webhookProvider as TriggerProvider,
 ];
 

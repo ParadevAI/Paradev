@@ -3,12 +3,14 @@ import type { BaseMatchableEvent, MatchContext, MatchResult } from "./core";
 import { type GithubMatchableEvent, githubTriggerMatches } from "./github";
 import { type LinearMatchableEvent, linearTriggerMatches } from "./linear";
 import { type NotionMatchableEvent, notionTriggerMatches } from "./notion";
+import { type SlackMatchableEvent, slackTriggerMatches } from "./slack";
 import { type WebhookMatchableEvent, webhookTriggerMatches } from "./webhook";
 
 export * from "./core";
 export * from "./github";
 export * from "./linear";
 export * from "./notion";
+export * from "./slack";
 export * from "./webhook";
 
 /**
@@ -24,7 +26,8 @@ export type MatchableEvent =
 	| GithubMatchableEvent
 	| WebhookMatchableEvent
 	| NotionMatchableEvent
-	| LinearMatchableEvent;
+	| LinearMatchableEvent
+	| SlackMatchableEvent;
 
 /**
  * Whether a trigger config accepts an event, whatever provider it belongs to.
@@ -67,6 +70,12 @@ export function triggerMatches(
 		case "linear":
 			return linearTriggerMatches(
 				config as Extract<TriggerConfigInput, { kind: "linear" }>,
+				event,
+				context,
+			);
+		case "slack":
+			return slackTriggerMatches(
+				config as Extract<TriggerConfigInput, { kind: "slack" }>,
 				event,
 				context,
 			);
