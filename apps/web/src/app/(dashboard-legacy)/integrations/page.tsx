@@ -2,7 +2,7 @@
 
 import { BsMicrosoftTeams } from "react-icons/bs";
 import { FaGithub, FaSlack } from "react-icons/fa";
-import { SiLinear, SiNotion } from "react-icons/si";
+import { SiLinear, SiNotion, SiSentry } from "react-icons/si";
 import {
 	IntegrationCard,
 	type IntegrationCardProps,
@@ -48,6 +48,14 @@ const integrations: IntegrationCardProps[] = [
 		category: "Communication",
 		accentColor: "#5B5FC7",
 		icon: <BsMicrosoftTeams className="size-8" />,
+	},
+	{
+		id: "sentry",
+		name: "Sentry",
+		description: "Run automations when Sentry issues change.",
+		category: "Monitoring",
+		accentColor: "#362D59",
+		icon: <SiSentry className="size-8" />,
 	},
 ];
 

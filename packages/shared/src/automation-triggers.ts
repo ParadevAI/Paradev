@@ -230,11 +230,14 @@ export const sentryTriggerEventValues = [
 	"issue.unresolved",
 	"issue.any",
 ] as const;
+export type SentryTriggerEvent = (typeof sentryTriggerEventValues)[number];
 
 export const sentryTriggerConfigSchema = z.object({
 	kind: z.literal("sentry"),
 	event: z.enum(sentryTriggerEventValues),
+	// Sentry's numeric project ids: a slug can be renamed, the id cannot.
 	projects: triggerScopeSchema,
+	// Optional narrowing over fatal/error/warning/info/debug; "any" by default.
 	level: triggerScopeSchema,
 });
 
@@ -458,7 +461,12 @@ export function describeTriggerProblems(
 				}
 				break;
 			}
-			case "sentry":
+			case "sentry": {
+				if (isEmptyScope(config.projects)) {
+					add(index, "projects", "Specify at least one project.");
+				}
+				break;
+			}
 			case "circleback":
 				break;
 			case "schedule":

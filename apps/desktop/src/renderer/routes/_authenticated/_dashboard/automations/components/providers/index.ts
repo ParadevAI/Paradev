@@ -5,6 +5,7 @@ import { linearProvider } from "./linear/linear";
 import { microsoftTeamsProvider } from "./microsoftTeams/microsoftTeams";
 import { notionProvider } from "./notion/notion";
 import { scheduleProvider } from "./schedule/schedule";
+import { sentryProvider } from "./sentry/sentry";
 import { slackProvider } from "./slack/slack";
 import type { TriggerProvider } from "./types";
 import { webhookProvider } from "./webhook/webhook";
@@ -25,6 +26,7 @@ export type {
 export const TRIGGER_PROVIDERS: TriggerProvider[] = [
 	scheduleProvider as TriggerProvider,
 	githubProvider as TriggerProvider,
+	sentryProvider as TriggerProvider,
 	linearProvider as TriggerProvider,
 	notionProvider as TriggerProvider,
 	slackProvider as TriggerProvider,

@@ -52,6 +52,12 @@ export const env = createEnv({
 		STRIPE_PRO_YEARLY_PRICE_ID: z.string(),
 		SLACK_BILLING_WEBHOOK_URL: z.string().url(),
 		SENTRY_AUTH_TOKEN: z.string().optional(),
+		// Public Sentry integration (OAuth app). Optional: unset where the app
+		// is not registered yet, in which case the connect flow 400s.
+		SENTRY_CLIENT_ID: z.string().optional(),
+		SENTRY_CLIENT_SECRET: z.string().optional(),
+		// The published app's slug, used to build the install URL.
+		SENTRY_APP_SLUG: z.string().optional(),
 		RELAY_URL: z.string().url(),
 	},
 	client: {

@@ -11,6 +11,7 @@ import {
 	microsoftTeamsTriggerMatches,
 } from "./microsoft-teams";
 import { type NotionMatchableEvent, notionTriggerMatches } from "./notion";
+import { type SentryMatchableEvent, sentryTriggerMatches } from "./sentry";
 import { type SlackMatchableEvent, slackTriggerMatches } from "./slack";
 import { type WebhookMatchableEvent, webhookTriggerMatches } from "./webhook";
 
@@ -20,6 +21,7 @@ export * from "./github";
 export * from "./linear";
 export * from "./microsoft-teams";
 export * from "./notion";
+export * from "./sentry";
 export * from "./slack";
 export * from "./webhook";
 
@@ -39,7 +41,8 @@ export type MatchableEvent =
 	| LinearMatchableEvent
 	| SlackMatchableEvent
 	| CirclebackMatchableEvent
-	| MicrosoftTeamsMatchableEvent;
+	| MicrosoftTeamsMatchableEvent
+	| SentryMatchableEvent;
 
 /**
  * Whether a trigger config accepts an event, whatever provider it belongs to.
@@ -68,6 +71,12 @@ export function triggerMatches(
 		case "github":
 			return githubTriggerMatches(
 				config as Extract<TriggerConfigInput, { kind: "github" }>,
+				event,
+				context,
+			);
+		case "sentry":
+			return sentryTriggerMatches(
+				config as Extract<TriggerConfigInput, { kind: "sentry" }>,
 				event,
 				context,
 			);
