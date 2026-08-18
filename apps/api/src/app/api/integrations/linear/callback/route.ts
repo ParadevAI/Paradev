@@ -1,6 +1,10 @@
 import { LinearClient } from "@linear/sdk";
 import { db } from "@superset/db/client";
-import { integrationConnections, members } from "@superset/db/schema";
+import {
+	integrationConnections,
+	members,
+	userIdentities,
+} from "@superset/db/schema";
 import { linearTokenResponseSchema } from "@superset/trpc/integrations/linear";
 import { Client } from "@upstash/qstash";
 import { and, eq } from "drizzle-orm";
@@ -111,6 +115,34 @@ export async function GET(request: Request) {
 				externalOrgName: linearOrg.name,
 				connectedByUserId: userId,
 				updatedAt: new Date(),
+			},
+		});
+
+	// The person who connected is the one Linear account we know for certain
+	// belongs to a Superset user, so link it: it is what automation triggers
+	// resolve "me" through. Linear user ids are scoped to the Linear workspace.
+	await db
+		.insert(userIdentities)
+		.values({
+			userId,
+			organizationId,
+			provider: "linear",
+			externalId: viewer.id,
+			externalScopeId: linearOrg.id,
+			handle: viewer.displayName,
+			displayName: viewer.name,
+		})
+		.onConflictDoUpdate({
+			target: [
+				userIdentities.organizationId,
+				userIdentities.provider,
+				userIdentities.externalScopeId,
+				userIdentities.externalId,
+			],
+			set: {
+				userId,
+				handle: viewer.displayName,
+				displayName: viewer.name,
 			},
 		});
 

@@ -1,5 +1,6 @@
 import type { TriggerConfigInput } from "@superset/shared/automation-triggers";
 import { githubProvider } from "./github/github";
+import { linearProvider } from "./linear/linear";
 import { notionProvider } from "./notion/notion";
 import { scheduleProvider } from "./schedule/schedule";
 import type { TriggerProvider } from "./types";
@@ -21,6 +22,7 @@ export type {
 export const TRIGGER_PROVIDERS: TriggerProvider[] = [
 	scheduleProvider as TriggerProvider,
 	githubProvider as TriggerProvider,
+	linearProvider as TriggerProvider,
 	notionProvider as TriggerProvider,
 	webhookProvider as TriggerProvider,
 ];

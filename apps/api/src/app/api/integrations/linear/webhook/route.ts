@@ -20,7 +20,13 @@ import {
 } from "@superset/trpc/integrations/linear";
 import { and, asc, eq, isNull, sql } from "drizzle-orm";
 import { env } from "@/env";
+import { dispatchMatchingTriggers } from "@/lib/automations/dispatchMatchingTriggers";
 import { stripNullChars } from "@/lib/strip-null-chars";
+import {
+	type LinearDelivery,
+	matchableFrom,
+	recordAutomationEvent,
+} from "./recordAutomationEvent";
 
 const webhookClient = new LinearWebhookClient(env.LINEAR_WEBHOOK_SECRET);
 
@@ -33,6 +39,7 @@ export async function POST(request: Request) {
 	}
 
 	const payload = webhookClient.parseData(Buffer.from(body), signature);
+	const deliveryId = request.headers.get("linear-delivery");
 
 	const connections = await db.query.integrationConnections.findMany({
 		where: and(
@@ -53,7 +60,7 @@ export async function POST(request: Request) {
 
 	const results = await Promise.all(
 		connections.map((connection) =>
-			processForConnection(payload, connection).catch((error) => ({
+			processForConnection(payload, deliveryId, connection).catch((error) => ({
 				connectionId: connection.id,
 				outcome: "failed" as const,
 				error: error instanceof Error ? error.message : "Unknown error",
@@ -81,6 +88,7 @@ export async function POST(request: Request) {
 
 async function processForConnection(
 	payload: ReturnType<LinearWebhookClient["parseData"]>,
+	deliveryId: string | null,
 	connection: SelectIntegrationConnection,
 ): Promise<{
 	connectionId: string;
@@ -135,6 +143,21 @@ async function processForConnection(
 			);
 		}
 
+		// Deliberately not allowed to fail the delivery: a bad automation row
+		// must not make Linear retry the task sync above.
+		if (isEntityDelivery(payload)) {
+			try {
+				await recordAndDispatch(
+					payload,
+					deliveryId,
+					connection,
+					webhookEvent.id,
+				);
+			} catch (error) {
+				console.error("[linear/webhook] recordAndDispatch failed:", error);
+			}
+		}
+
 		await db
 			.update(webhookEvents)
 			.set({ status: outcome, processedAt: new Date() })
@@ -153,6 +176,56 @@ async function processForConnection(
 			.where(eq(webhookEvents.id, webhookEvent.id));
 
 		return { connectionId: connection.id, outcome: "failed", error: message };
+	}
+}
+
+/** Entity deliveries carry `data`; OAuth and notification payloads do not. */
+function isEntityDelivery(payload: unknown): payload is LinearDelivery {
+	const data = (payload as { data?: { id?: unknown } }).data;
+	return typeof data?.id === "string";
+}
+
+async function recordAndDispatch(
+	delivery: LinearDelivery,
+	deliveryHeader: string | null,
+	connection: SelectIntegrationConnection,
+	webhookEventId: string,
+): Promise<void> {
+	const event = matchableFrom(delivery);
+	// Nothing in the product names this delivery, so there is nothing to record.
+	if (event.names.length === 0) return;
+
+	// Linear's per-delivery id is stable across its retries. The payload itself
+	// carries no such id, so without the header the entity and send time stand
+	// in for one.
+	const deliveryId =
+		deliveryHeader ??
+		`${delivery.type}:${delivery.data.id}:${delivery.webhookTimestamp}`;
+
+	const recorded = await recordAutomationEvent({
+		delivery,
+		deliveryId,
+		connection,
+		webhookEventId,
+	});
+	if (!recorded.recorded || !recorded.eventId) {
+		console.log(
+			`[linear/webhook] Not recorded as automation event (${recorded.reason}):`,
+			deliveryId,
+		);
+		return;
+	}
+
+	const result = await dispatchMatchingTriggers({
+		organizationId: connection.organizationId,
+		eventId: recorded.eventId,
+		event,
+	});
+	if (result.matched > 0) {
+		console.log(
+			`[linear/webhook] ${result.matched}/${result.considered} triggers matched:`,
+			deliveryId,
+		);
 	}
 }
 

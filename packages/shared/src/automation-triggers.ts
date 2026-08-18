@@ -184,14 +184,26 @@ export const slackTriggerConfigSchema = z.object({
 export const linearTriggerEventValues = [
 	"issue.created",
 	"issue.status_changed",
+	"issue.assigned",
 	"cycle.ended",
 ] as const;
+export type LinearTriggerEvent = (typeof linearTriggerEventValues)[number];
 
+/**
+ * One flat shape for every Linear event. Filters an event has no use for —
+ * labels on a cycle — sit at "any" and never narrow.
+ */
 export const linearTriggerConfigSchema = z.object({
 	kind: z.literal("linear"),
 	event: z.enum(linearTriggerEventValues),
 	teams: triggerScopeSchema,
 	projects: triggerScopeSchema,
+	labels: triggerScopeSchema,
+	// Workflow state ids the issue moved into. Only meaningful for
+	// issue.status_changed; "any" elsewhere.
+	toStatus: triggerScopeSchema,
+	// The issue's assignee, not who made the change. Ids are Linear user ids.
+	assignee: triggerActorSchema,
 });
 
 export const sentryTriggerEventValues = [
@@ -348,7 +360,25 @@ export function describeTriggerProblems(
 				}
 				break;
 			}
-			case "linear":
+			case "linear": {
+				if (isEmptyScope(config.teams)) {
+					add(index, "teams", "Specify at least one team.");
+				}
+				// Only the events whose sentence shows an assignee; a created or
+				// cycle trigger has no chip to clear such a problem with.
+				if (
+					(config.event === "issue.status_changed" ||
+						config.event === "issue.assigned") &&
+					isEmptyActor(config.assignee)
+				) {
+					add(
+						index,
+						"assignee",
+						"Specify at least one person, or choose Anyone.",
+					);
+				}
+				break;
+			}
 			case "sentry":
 				break;
 			case "schedule":

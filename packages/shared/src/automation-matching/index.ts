@@ -1,11 +1,13 @@
 import type { TriggerConfigInput } from "../automation-triggers";
 import type { BaseMatchableEvent, MatchContext, MatchResult } from "./core";
 import { type GithubMatchableEvent, githubTriggerMatches } from "./github";
+import { type LinearMatchableEvent, linearTriggerMatches } from "./linear";
 import { type NotionMatchableEvent, notionTriggerMatches } from "./notion";
 import { type WebhookMatchableEvent, webhookTriggerMatches } from "./webhook";
 
 export * from "./core";
 export * from "./github";
+export * from "./linear";
 export * from "./notion";
 export * from "./webhook";
 
@@ -21,7 +23,8 @@ export * from "./webhook";
 export type MatchableEvent =
 	| GithubMatchableEvent
 	| WebhookMatchableEvent
-	| NotionMatchableEvent;
+	| NotionMatchableEvent
+	| LinearMatchableEvent;
 
 /**
  * Whether a trigger config accepts an event, whatever provider it belongs to.
@@ -58,6 +61,12 @@ export function triggerMatches(
 		case "notion":
 			return notionTriggerMatches(
 				config as Extract<TriggerConfigInput, { kind: "notion" }>,
+				event,
+				context,
+			);
+		case "linear":
+			return linearTriggerMatches(
+				config as Extract<TriggerConfigInput, { kind: "linear" }>,
 				event,
 				context,
 			);

@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { useGithubOptions } from "./github/useGithubOptions";
+import { useLinearOptions } from "./linear/useLinearOptions";
 import { useNotionOptions } from "./notion/useNotionOptions";
 import type { ProviderOptions } from "./types";
 
@@ -13,6 +14,10 @@ import type { ProviderOptions } from "./types";
  */
 export function useProviderOptions(organizationId: string): ProviderOptions {
 	const github = useGithubOptions(organizationId);
+	const linear = useLinearOptions(organizationId);
 	const notion = useNotionOptions(organizationId);
-	return useMemo(() => ({ ...github, ...notion }), [github, notion]);
+	return useMemo(
+		() => ({ ...github, ...linear, ...notion }),
+		[github, linear, notion],
+	);
 }
