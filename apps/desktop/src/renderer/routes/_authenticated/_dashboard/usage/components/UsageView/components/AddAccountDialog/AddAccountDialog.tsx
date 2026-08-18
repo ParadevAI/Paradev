@@ -50,7 +50,6 @@ function addAccountCommand(provider: Provider, slug: string): string {
 	return `mkdir -p "$HOME/.codex-${slug}" && CODEX_HOME="$HOME/.codex-${slug}" codex login`;
 }
 
-
 /** The sign-in that landed after the dialog opened, if any. */
 function findNewLogin(
 	provider: Provider,
