@@ -211,6 +211,54 @@ export const sentryTriggerConfigSchema = z.object({
 });
 
 /**
+ * Notion. `comment.mentioned` is not a Notion event: it is `comment.created`
+ * narrowed to comments whose rich text mentions a user, which the webhook
+ * route works out after fetching the comment.
+ */
+export const notionTriggerEventValues = [
+	"data_source.content_updated",
+	"comment.created",
+	"comment.mentioned",
+] as const;
+export type NotionTriggerEvent = (typeof notionTriggerEventValues)[number];
+
+const notionCommon = {
+	kind: z.literal("notion"),
+	dataSources: triggerScopeSchema,
+};
+
+const notionContentUpdatedEvent = z.object({
+	...notionCommon,
+	event: z.literal("data_source.content_updated"),
+});
+
+/**
+ * Comments live on a page, which may itself be a row of a data source, so
+ * both narrow: the data source the page belongs to and the page itself.
+ */
+const notionCommentCreatedEvent = z.object({
+	...notionCommon,
+	event: z.literal("comment.created"),
+	pages: triggerScopeSchema,
+	actor: triggerActorSchema,
+});
+
+const notionCommentMentionedEvent = z.object({
+	...notionCommon,
+	event: z.literal("comment.mentioned"),
+	pages: triggerScopeSchema,
+	// Who has to be @-mentioned for the comment to count. "me" is the common
+	// case; "anyone" fires on any comment that mentions somebody.
+	mentionedUser: triggerActorSchema,
+});
+
+export const notionTriggerConfigSchema = z.union([
+	notionContentUpdatedEvent,
+	notionCommentCreatedEvent,
+	notionCommentMentionedEvent,
+]);
+
+/**
  * Structurally valid — the shape is right, but a scope may still select nothing.
  * This is what the editor holds while someone is still filling a trigger in.
  */
@@ -227,6 +275,7 @@ export const draftTriggerSchema = z.object({
 		slackTriggerConfigSchema,
 		linearTriggerConfigSchema,
 		sentryTriggerConfigSchema,
+		notionTriggerConfigSchema,
 	]),
 });
 export type DraftTrigger = z.infer<typeof draftTriggerSchema>;
@@ -280,6 +329,22 @@ export function describeTriggerProblems(
 				}
 				if (config.event === "reaction_added" && isEmptyScope(config.emoji)) {
 					add(index, "emoji", "Specify at least one reaction.");
+				}
+				break;
+			}
+			case "notion": {
+				if (isEmptyScope(config.dataSources)) {
+					add(index, "dataSources", "Specify at least one data source.");
+				}
+				if ("actor" in config && isEmptyActor(config.actor)) {
+					add(index, "actor", "Specify at least one person, or choose Anyone.");
+				}
+				if ("mentionedUser" in config && isEmptyActor(config.mentionedUser)) {
+					add(
+						index,
+						"mentionedUser",
+						"Specify at least one person, or choose Anyone.",
+					);
 				}
 				break;
 			}

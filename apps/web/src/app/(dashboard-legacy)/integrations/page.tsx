@@ -1,7 +1,7 @@
 "use client";
 
 import { FaGithub, FaSlack } from "react-icons/fa";
-import { SiLinear } from "react-icons/si";
+import { SiLinear, SiNotion } from "react-icons/si";
 import {
 	IntegrationCard,
 	type IntegrationCardProps,
@@ -31,6 +31,14 @@ const integrations: IntegrationCardProps[] = [
 		category: "Communication",
 		accentColor: "#4A154B",
 		icon: <FaSlack className="size-8" />,
+	},
+	{
+		id: "notion",
+		name: "Notion",
+		description: "Run automations on data source and comment activity.",
+		category: "Knowledge",
+		accentColor: "#5F5E5B",
+		icon: <SiNotion className="size-8" />,
 	},
 ];
 

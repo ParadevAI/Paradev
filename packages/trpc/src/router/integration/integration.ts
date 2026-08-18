@@ -6,12 +6,14 @@ import { z } from "zod";
 import { protectedProcedure } from "../../trpc";
 import { githubRouter } from "./github";
 import { linearRouter } from "./linear";
+import { notionRouter } from "./notion";
 import { slackRouter } from "./slack";
 import { verifyOrgMembership } from "./utils";
 
 export const integrationRouter = {
 	github: githubRouter,
 	linear: linearRouter,
+	notion: notionRouter,
 	slack: slackRouter,
 
 	list: protectedProcedure

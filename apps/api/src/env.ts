@@ -19,6 +19,13 @@ export const env = createEnv({
 		LINEAR_CLIENT_ID: z.string().min(1),
 		LINEAR_CLIENT_SECRET: z.string().min(1),
 		LINEAR_WEBHOOK_SECRET: z.string().min(1),
+		// Optional until the Notion integration is provisioned per environment;
+		// the Notion routes answer 503 while any of these is unset.
+		NOTION_CLIENT_ID: z.string().min(1).optional(),
+		NOTION_CLIENT_SECRET: z.string().min(1).optional(),
+		// The verification token Notion sends when the webhook subscription is
+		// created; it is also the HMAC key every later delivery is signed with.
+		NOTION_WEBHOOK_VERIFICATION_TOKEN: z.string().min(1).optional(),
 		GH_APP_SLUG: z.string().min(1),
 		GH_APP_ID: z.string().min(1),
 		GH_APP_PRIVATE_KEY: z.string().min(1),
