@@ -9,6 +9,7 @@ import {
 	RiTwitterXFill,
 } from "react-icons/ri";
 import { getAllPeople } from "@/lib/people";
+import { CTASection } from "../components/CTASection";
 import { TeamBio } from "./components/TeamBio";
 
 // Loaded here instead of the root layout so other pages don't preload it
@@ -42,110 +43,209 @@ export const metadata: Metadata = {
 	},
 };
 
+const MILESTONES = [
+	{
+		date: "Nov 2025",
+		title: "The hackathon",
+		description:
+			"Superset starts as a hackathon project at YC HQ: a simple desktop app for managing worktrees.",
+	},
+	{
+		date: "May 2026",
+		title: "Public launch",
+		description:
+			"Superset launches publicly. Engineers running parallel agents finally have one place to run them.",
+	},
+	{
+		date: "Jul 2026",
+		title: "$11M seed",
+		description:
+			"Raised from the best investors in Silicon Valley to build the platform for software factories.",
+	},
+	{
+		date: "Next",
+		title: "100 agents",
+		description:
+			"The goal for 2026: one developer, 100 agents running in parallel.",
+		href: "/blog/roadmap-to-100-agents",
+	},
+];
+
+const PRINCIPLES = [
+	{
+		title: "Built in Superset",
+		description:
+			"We're our own #1 users. Every feature ships through the same worktrees, agents, and automations we ask you to trust, so we feel our own bugs before you do.",
+	},
+	{
+		title: "Small and in person",
+		description:
+			"A flat, talent-dense team in one room in San Francisco. No managers, no handoffs, no waiting for a meeting to decide.",
+	},
+	{
+		title: "Fun is the strategy",
+		description:
+			"We want to create the best team that has fun working together. Success will be a lagging indicator.",
+	},
+];
+
+const FACTS = [
+	{
+		term: "Founded",
+		definition: "November 2025, San Francisco",
+	},
+	{
+		term: "License",
+		definition: "Source-available on GitHub under Elastic License 2.0",
+	},
+	{
+		term: "Platforms",
+		definition:
+			"macOS desktop app, experimental Linux AppImage, plus a CLI, TypeScript SDK, and MCP server",
+	},
+	{
+		term: "Agents",
+		definition:
+			"Any CLI agent: Claude Code, Codex, OpenCode, Gemini, Copilot, and more",
+	},
+	{
+		term: "Pricing",
+		definition: "Free tier plus paid seats; your API keys, never proxied",
+	},
+	{
+		term: "Not to be confused with",
+		definition: "Apache Superset, the unrelated business-intelligence tool",
+	},
+];
+
 export default function TeamPage() {
 	const people = getAllPeople();
 
 	return (
 		<main className={`relative min-h-screen bg-background ${micro5.variable}`}>
 			<div className="max-w-5xl mx-auto px-6 py-24 md:py-32">
-				{/* Header Section */}
-				<section className="mb-20 md:mb-28">
-					<h1 className="text-4xl sm:text-5xl md:text-6xl font-normal text-foreground mb-8">
-						Meet the{" "}
-						<span
-							className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl ml-2 font-light tracking-wide"
-							style={{ fontFamily: "var(--font-micro5)" }}
-						>
-							FOUNDERS
+				{/* Hero */}
+				<section className="mb-24 md:mb-32">
+					<p className="font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground mb-6">
+						About Superset
+					</p>
+					<h1 className="text-4xl sm:text-5xl md:text-6xl font-normal leading-[1.05] text-foreground max-w-4xl mb-8">
+						Building the last piece of software.
+						<br />
+						<span className="text-muted-foreground">
+							Give teams the tools to build software that improves itself.
 						</span>
 					</h1>
-
-					<p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-xl mb-8">
-						Superset is built by a team of 3 ex-YC CTOs. We want to create the
-						best team that has fun working together.
-						<br />
-						Success will be a lagging indicator.
+					<p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-2xl">
+						Superset is the workspace for parallel coding agents: Claude Code,
+						Codex, or any CLI agent, each in its own isolated worktree. It's
+						built by three ex-YC CTOs in San Francisco, for the way we work
+						ourselves.
 					</p>
-
-					<Link
-						href="/blog"
-						className="inline-flex items-center gap-2 text-foreground hover:text-foreground/80 transition-colors group"
-					>
-						Read more on our blog
-						<ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
-					</Link>
 				</section>
 
-				{/* What is Superset */}
-				<section className="mb-20 md:mb-28">
-					<h2 className="text-2xl md:text-3xl font-normal text-foreground mb-6">
-						What is Superset?
-					</h2>
-					<div className="space-y-4 text-muted-foreground leading-relaxed max-w-2xl">
-						<p>
-							Superset is a local-first workspace for running parallel coding
-							agents. Every task gets its own isolated Git worktree and a
-							persistent terminal session, so Claude Code, Codex, OpenCode, or
-							any other CLI agent can work on many branches of one repository at
-							once without collisions. Around that core: review diffs, preview
-							dev servers in an in-app browser, schedule recurring runs, and
-							script the whole fleet over MCP.
-						</p>
-						<p>
-							It's built for developers who have outgrown a single agent
-							session: solo builders dispatching a handful of tasks in parallel,
-							and engineering teams running dozens of agent tasks a day.
-							Superset is the orchestration layer, not the agent; you bring your
-							own agents and API keys, and nothing is proxied through us.
-						</p>
+				{/* Our Story */}
+				<section className="mb-24 md:mb-32">
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-start">
+						<div>
+							<h2 className="text-2xl md:text-3xl font-normal text-foreground mb-6">
+								From worktree manager to software factories
+							</h2>
+							<div className="space-y-4 text-muted-foreground leading-relaxed">
+								<p>
+									Superset started as a hackathon project in November 2025. It
+									was a simple desktop app for managing worktrees.
+								</p>
+								<p>
+									In just a few months,{" "}
+									<span className="text-foreground">
+										tens of thousands of engineers
+									</span>{" "}
+									run Superset as their primary IDE, at companies like Wix,
+									DoorDash, and Netflix.
+								</p>
+								<p>
+									Now, we've raised{" "}
+									<span className="text-foreground">$11M</span> from the best
+									investors in Silicon Valley to build the platform for software
+									factories.
+								</p>
+							</div>
+						</div>
+						<figure className="m-0 md:sticky md:top-24">
+							<div className="relative aspect-[8/5] rounded-lg overflow-hidden bg-muted border border-border">
+								<Image
+									src="/join-us/founders.jpg"
+									alt="The Superset founders at a hackathon, YC HQ San Francisco"
+									fill
+									className="object-cover"
+									sizes="(max-width: 768px) 100vw, 480px"
+								/>
+							</div>
+							<figcaption className="mt-3 text-xs text-muted-foreground">
+								The founders at the hackathon where Superset started{" "}
+								<span className="text-muted-foreground/40">|</span> YC HQ,
+								November 2025
+							</figcaption>
+						</figure>
 					</div>
+				</section>
 
-					<dl className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-6 max-w-2xl text-sm">
-						<div>
-							<dt className="text-foreground font-medium mb-1">Team</dt>
-							<dd className="text-muted-foreground">
-								Three ex-YC CTOs in San Francisco
-							</dd>
-						</div>
-						<div>
-							<dt className="text-foreground font-medium mb-1">License</dt>
-							<dd className="text-muted-foreground">
-								Source-available on GitHub under Elastic License 2.0
-							</dd>
-						</div>
-						<div>
-							<dt className="text-foreground font-medium mb-1">Platforms</dt>
-							<dd className="text-muted-foreground">
-								macOS desktop app, experimental Linux AppImage, plus a CLI,
-								TypeScript SDK, and MCP server
-							</dd>
-						</div>
-						<div>
-							<dt className="text-foreground font-medium mb-1">Agents</dt>
-							<dd className="text-muted-foreground">
-								Any CLI agent: Claude Code, Codex, OpenCode, Gemini, Copilot,
-								and more
-							</dd>
-						</div>
-						<div>
-							<dt className="text-foreground font-medium mb-1">Pricing</dt>
-							<dd className="text-muted-foreground">
-								Free tier plus paid seats; your API keys, never proxied
-							</dd>
-						</div>
-						<div>
-							<dt className="text-foreground font-medium mb-1">
-								Not to be confused with
-							</dt>
-							<dd className="text-muted-foreground">
-								Apache Superset, the unrelated business-intelligence tool
-							</dd>
-						</div>
-					</dl>
+				{/* Timeline */}
+				<section className="mb-24 md:mb-32">
+					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-10">
+						{MILESTONES.map((milestone) => (
+							<div key={milestone.date} className="border-t border-border pt-5">
+								<p
+									className="text-2xl md:text-3xl text-foreground mb-3 tracking-wide uppercase"
+									style={{ fontFamily: "var(--font-micro5)" }}
+								>
+									{milestone.date}
+								</p>
+								<h3 className="text-base font-medium text-foreground mb-2">
+									{milestone.title}
+								</h3>
+								<p className="text-sm text-muted-foreground leading-relaxed">
+									{milestone.description}
+								</p>
+								{milestone.href && (
+									<Link
+										href={milestone.href}
+										className="mt-3 inline-flex items-center gap-1.5 text-sm text-foreground hover:text-foreground/80 transition-colors group"
+									>
+										Read the plan
+										<ArrowRight className="size-3.5 transition-transform group-hover:translate-x-1" />
+									</Link>
+								)}
+							</div>
+						))}
+					</div>
+				</section>
+
+				{/* How We Work */}
+				<section className="mb-24 md:mb-32">
+					<h2 className="text-2xl md:text-3xl font-normal text-foreground mb-10">
+						How we work
+					</h2>
+					<div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-10">
+						{PRINCIPLES.map((principle) => (
+							<div key={principle.title}>
+								<h3 className="text-base font-medium text-foreground mb-2">
+									{principle.title}
+								</h3>
+								<p className="text-sm text-muted-foreground leading-relaxed">
+									{principle.description}
+								</p>
+							</div>
+						))}
+					</div>
 				</section>
 
 				{/* Founders Grid */}
-				<section>
+				<section className="mb-24 md:mb-32">
+					<h2 className="text-2xl md:text-3xl font-normal text-foreground mb-10">
+						The founders
+					</h2>
 					{people.length === 0 ? (
 						<p className="text-muted-foreground">No team members yet.</p>
 					) : (
@@ -182,9 +282,9 @@ export default function TeamPage() {
 										</Link>
 
 										<Link href={`/team/${person.id}`}>
-											<h2 className="text-xl font-medium text-foreground hover:text-foreground/80 transition-colors">
+											<h3 className="text-xl font-medium text-foreground hover:text-foreground/80 transition-colors">
 												{person.name}
-											</h2>
+											</h3>
 										</Link>
 										<p className="text-sm text-muted-foreground mt-1">
 											{person.role}
@@ -233,8 +333,36 @@ export default function TeamPage() {
 							})}
 						</div>
 					)}
+					<div className="mt-14 text-center">
+						<Link
+							href="/join-us"
+							className="inline-flex items-center gap-2 text-foreground hover:text-foreground/80 transition-colors group"
+						>
+							We're hiring in San Francisco
+							<ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+						</Link>
+					</div>
+				</section>
+
+				{/* Superset at a Glance */}
+				<section>
+					<h2 className="text-2xl md:text-3xl font-normal text-foreground mb-8">
+						Superset at a glance
+					</h2>
+					<dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-6 max-w-2xl text-sm">
+						{FACTS.map((fact) => (
+							<div key={fact.term}>
+								<dt className="text-foreground font-medium mb-1">
+									{fact.term}
+								</dt>
+								<dd className="text-muted-foreground">{fact.definition}</dd>
+							</div>
+						))}
+					</dl>
 				</section>
 			</div>
+
+			<CTASection />
 		</main>
 	);
 }
