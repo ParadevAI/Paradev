@@ -36,12 +36,16 @@ export async function dispatchMatchingTriggers(params: {
 	eventId: string;
 	event: MatchableEvent;
 	/**
-	 * Restrict candidates to one automation. Provider webhooks fan out across
-	 * the org because the provider does not know which automation cares; a
-	 * raw webhook is addressed to one automation by URL, so fanning out to
-	 * every webhook trigger in the org would be wrong.
+	 * Restrict candidates. Provider webhooks fan out across the org because
+	 * the provider does not know which automation cares. Two kinds of inbound
+	 * URL are narrower than that and must not fan out:
+	 * - a raw webhook is addressed to one AUTOMATION by URL → `automationId`
+	 * - a Circleback webhook is addressed to one TRIGGER by URL → `triggerId`
+	 * Without the narrowing, one automation holding two triggers of that kind
+	 * with overlapping filters would run once per URL.
 	 */
 	automationId?: string;
+	triggerId?: string;
 }): Promise<{ matched: number; considered: number }> {
 	const { event } = params;
 
@@ -66,6 +70,9 @@ export async function dispatchMatchingTriggers(params: {
 				params.automationId
 					? eq(automations.id, params.automationId)
 					: undefined,
+				params.triggerId
+					? eq(automationTriggers.id, params.triggerId)
+					: undefined,
 			),
 		);
 
@@ -74,6 +81,14 @@ export async function dispatchMatchingTriggers(params: {
 	// Every identity linked in this org for this provider, so `me` can resolve
 	// to the automation owner. A person may link more than one account — work
 	// and personal — so this is a set per user, not a value.
+	//
+	// Not scoped by external_scope_id. That is safe only because
+	// integration_connections is unique on (organization_id, provider): one
+	// Slack workspace per org means every Slack identity here shares one scope,
+	// so ids cannot collide across workspaces. The day a provider allows more
+	// than one connection per org — per-user Google is the first candidate —
+	// this must also filter by the connection's scope, or a Slack user id from
+	// workspace A will match `me` for workspace B.
 	const identities = await dbWs
 		.select({
 			userId: userIdentities.userId,
