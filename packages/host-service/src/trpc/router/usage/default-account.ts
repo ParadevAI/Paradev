@@ -6,9 +6,9 @@
  */
 
 import { existsSync } from "node:fs";
-import type { HostDb } from "../../../db";
-import { hostSettings } from "../../../db/schema";
-import type { UsageProvider } from "./types";
+import type { HostDb } from "../../../db/index.ts";
+import { hostSettings } from "../../../db/schema.ts";
+import type { UsageProvider } from "./types.ts";
 
 export interface DefaultAccountSelections {
 	/** CLAUDE_CONFIG_DIR to inject, or null for the system-default login. */
