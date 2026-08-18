@@ -33,6 +33,10 @@ export const env = createEnv({
 		SLACK_CLIENT_ID: z.string().min(1),
 		SLACK_CLIENT_SECRET: z.string().min(1),
 		SLACK_SIGNING_SECRET: z.string(),
+		// Optional: the Teams integration is off wherever these are unset, and
+		// every other environment keeps booting.
+		MICROSOFT_CLIENT_ID: z.string().min(1).optional(),
+		MICROSOFT_CLIENT_SECRET: z.string().min(1).optional(),
 		ANTHROPIC_API_KEY: z.string(),
 		QSTASH_TOKEN: z.string().min(1),
 		QSTASH_URL: z.string().url(),

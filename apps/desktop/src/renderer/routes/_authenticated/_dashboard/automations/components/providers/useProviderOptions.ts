@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useGithubOptions } from "./github/useGithubOptions";
 import { useLinearOptions } from "./linear/useLinearOptions";
+import { useTeamsOptions } from "./microsoftTeams/useTeamsOptions";
 import { useNotionOptions } from "./notion/useNotionOptions";
 import { useSlackOptions } from "./slack/useSlackOptions";
 import type { ProviderOptions } from "./types";
@@ -18,8 +19,9 @@ export function useProviderOptions(organizationId: string): ProviderOptions {
 	const linear = useLinearOptions(organizationId);
 	const notion = useNotionOptions(organizationId);
 	const slack = useSlackOptions(organizationId);
+	const teams = useTeamsOptions(organizationId);
 	return useMemo(
-		() => ({ ...github, ...linear, ...notion, ...slack }),
-		[github, linear, notion, slack],
+		() => ({ ...github, ...linear, ...notion, ...slack, ...teams }),
+		[github, linear, notion, slack, teams],
 	);
 }

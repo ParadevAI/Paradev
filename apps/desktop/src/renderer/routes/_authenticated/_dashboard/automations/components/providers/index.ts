@@ -2,6 +2,7 @@ import type { TriggerConfigInput } from "@superset/shared/automation-triggers";
 import { circlebackProvider } from "./circleback/circleback";
 import { githubProvider } from "./github/github";
 import { linearProvider } from "./linear/linear";
+import { microsoftTeamsProvider } from "./microsoftTeams/microsoftTeams";
 import { notionProvider } from "./notion/notion";
 import { scheduleProvider } from "./schedule/schedule";
 import { slackProvider } from "./slack/slack";
@@ -29,6 +30,7 @@ export const TRIGGER_PROVIDERS: TriggerProvider[] = [
 	slackProvider as TriggerProvider,
 	webhookProvider as TriggerProvider,
 	circlebackProvider as TriggerProvider,
+	microsoftTeamsProvider as TriggerProvider,
 ];
 
 const byKind = new Map(TRIGGER_PROVIDERS.map((p) => [p.kind, p]));

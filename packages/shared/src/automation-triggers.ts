@@ -302,6 +302,30 @@ export const notionTriggerConfigSchema = z.union([
 	notionCommentMentionedEvent,
 ]);
 
+export const microsoftTeamsTriggerEventValues = [
+	"message_in_channel",
+	"channel_created",
+] as const;
+export type MicrosoftTeamsTriggerEvent =
+	(typeof microsoftTeamsTriggerEventValues)[number];
+
+/**
+ * Teams triggers scope by team, then by channel within it. `channel_created`
+ * has no channel to filter on — the channel is the thing being created — so it
+ * carries `channels: null` and reads `messageFilter` as a pattern over the new
+ * channel's name.
+ */
+export const microsoftTeamsTriggerConfigSchema = z.object({
+	kind: z.literal("microsoft_teams"),
+	event: z.enum(microsoftTeamsTriggerEventValues),
+	teams: triggerScopeSchema,
+	// Only meaningful for message_in_channel; null elsewhere.
+	channels: triggerScopeSchema,
+	// Only meaningful for message_in_channel; "anyone" elsewhere.
+	actor: triggerActorSchema,
+	messageFilter: textFilterSchema.nullable().default(null),
+});
+
 /**
  * Structurally valid — the shape is right, but a scope may still select nothing.
  * This is what the editor holds while someone is still filling a trigger in.
@@ -321,6 +345,7 @@ export const draftTriggerSchema = z.object({
 		sentryTriggerConfigSchema,
 		notionTriggerConfigSchema,
 		circlebackTriggerConfigSchema,
+		microsoftTeamsTriggerConfigSchema,
 	]),
 });
 export type DraftTrigger = z.infer<typeof draftTriggerSchema>;
@@ -415,6 +440,21 @@ export function describeTriggerProblems(
 						"assignee",
 						"Specify at least one person, or choose Anyone.",
 					);
+				}
+				break;
+			}
+			case "microsoft_teams": {
+				if (isEmptyScope(config.teams)) {
+					add(index, "teams", "Specify at least one team.");
+				}
+				if (
+					config.event === "message_in_channel" &&
+					isEmptyScope(config.channels)
+				) {
+					add(index, "channels", "Specify at least one channel.");
+				}
+				if (isEmptyActor(config.actor)) {
+					add(index, "actor", "Specify at least one person, or choose Anyone.");
 				}
 				break;
 			}

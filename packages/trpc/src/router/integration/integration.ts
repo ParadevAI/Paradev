@@ -6,6 +6,7 @@ import { z } from "zod";
 import { protectedProcedure } from "../../trpc";
 import { githubRouter } from "./github";
 import { linearRouter } from "./linear";
+import { microsoftTeamsRouter } from "./microsoft-teams";
 import { notionRouter } from "./notion";
 import { slackRouter } from "./slack";
 import { verifyOrgMembership } from "./utils";
@@ -13,6 +14,7 @@ import { verifyOrgMembership } from "./utils";
 export const integrationRouter = {
 	github: githubRouter,
 	linear: linearRouter,
+	microsoftTeams: microsoftTeamsRouter,
 	notion: notionRouter,
 	slack: slackRouter,
 

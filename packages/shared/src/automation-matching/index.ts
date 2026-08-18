@@ -6,6 +6,10 @@ import {
 import type { BaseMatchableEvent, MatchContext, MatchResult } from "./core";
 import { type GithubMatchableEvent, githubTriggerMatches } from "./github";
 import { type LinearMatchableEvent, linearTriggerMatches } from "./linear";
+import {
+	type MicrosoftTeamsMatchableEvent,
+	microsoftTeamsTriggerMatches,
+} from "./microsoft-teams";
 import { type NotionMatchableEvent, notionTriggerMatches } from "./notion";
 import { type SlackMatchableEvent, slackTriggerMatches } from "./slack";
 import { type WebhookMatchableEvent, webhookTriggerMatches } from "./webhook";
@@ -14,6 +18,7 @@ export * from "./circleback";
 export * from "./core";
 export * from "./github";
 export * from "./linear";
+export * from "./microsoft-teams";
 export * from "./notion";
 export * from "./slack";
 export * from "./webhook";
@@ -33,7 +38,8 @@ export type MatchableEvent =
 	| NotionMatchableEvent
 	| LinearMatchableEvent
 	| SlackMatchableEvent
-	| CirclebackMatchableEvent;
+	| CirclebackMatchableEvent
+	| MicrosoftTeamsMatchableEvent;
 
 /**
  * Whether a trigger config accepts an event, whatever provider it belongs to.
@@ -88,6 +94,12 @@ export function triggerMatches(
 		case "circleback":
 			return circlebackTriggerMatches(
 				config as Extract<TriggerConfigInput, { kind: "circleback" }>,
+				event,
+				context,
+			);
+		case "microsoft_teams":
+			return microsoftTeamsTriggerMatches(
+				config as Extract<TriggerConfigInput, { kind: "microsoft_teams" }>,
 				event,
 				context,
 			);

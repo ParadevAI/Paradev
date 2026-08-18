@@ -1,5 +1,6 @@
 "use client";
 
+import { BsMicrosoftTeams } from "react-icons/bs";
 import { FaGithub, FaSlack } from "react-icons/fa";
 import { SiLinear, SiNotion } from "react-icons/si";
 import {
@@ -39,6 +40,14 @@ const integrations: IntegrationCardProps[] = [
 		category: "Knowledge",
 		accentColor: "#5F5E5B",
 		icon: <SiNotion className="size-8" />,
+	},
+	{
+		id: "microsoft-teams",
+		name: "Microsoft Teams",
+		description: "Trigger automations from Teams channel messages.",
+		category: "Communication",
+		accentColor: "#5B5FC7",
+		icon: <BsMicrosoftTeams className="size-8" />,
 	},
 ];
 

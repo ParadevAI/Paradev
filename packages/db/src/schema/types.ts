@@ -13,7 +13,32 @@ export type SlackConfig = {
 	provider: "slack";
 };
 
-export type IntegrationConfig = LinearConfig | SlackConfig;
+/**
+ * One Graph change-notification subscription this connection holds. Kept on
+ * the connection because it is the connection's: renewed by the cron, replaced
+ * on reconnect, deleted on disconnect.
+ */
+export type MicrosoftTeamsSubscription = {
+	id: string;
+	expiresAt: string;
+};
+
+export type MicrosoftTeamsConfig = {
+	provider: "microsoft_teams";
+	tenantId: string;
+	// Graph echoes this in every notification; it is the only thing that says a
+	// POST to the notify route came from Graph and not from anyone with the URL.
+	clientState: string;
+	subscriptions: {
+		channelMessages?: MicrosoftTeamsSubscription;
+		channels?: MicrosoftTeamsSubscription;
+	};
+};
+
+export type IntegrationConfig =
+	| LinearConfig
+	| SlackConfig
+	| MicrosoftTeamsConfig;
 
 /**
  * The trigger config column, typed from the zod schema that validates every
@@ -35,6 +60,10 @@ export type GithubTriggerConfig = Extract<TriggerConfig, { kind: "github" }>;
 export type SlackTriggerConfig = Extract<TriggerConfig, { kind: "slack" }>;
 export type LinearTriggerConfig = Extract<TriggerConfig, { kind: "linear" }>;
 export type SentryTriggerConfig = Extract<TriggerConfig, { kind: "sentry" }>;
+export type MicrosoftTeamsTriggerConfig = Extract<
+	TriggerConfig,
+	{ kind: "microsoft_teams" }
+>;
 
 /**
  * Provider-specific extras on a user identity.
