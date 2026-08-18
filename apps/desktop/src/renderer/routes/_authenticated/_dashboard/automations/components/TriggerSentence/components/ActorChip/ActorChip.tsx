@@ -4,13 +4,17 @@ import {
 	DropdownMenuCheckboxItem,
 	DropdownMenuContent,
 	DropdownMenuItem,
+	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
+import { Input } from "@superset/ui/input";
+import { useState } from "react";
 import type { ScopeOption } from "../../scopeOption";
 import { ChipButton } from "../ChipButton";
 
 function actorLabel(actor: TriggerActor, people: ScopeOption[]): string {
 	if (actor === "anyone") return "Anyone";
+	// Legacy rows only; the picker no longer offers "me".
 	if (actor === "me") return "Me";
 	if (actor.ids.length === 0) return "Select people";
 	if (actor.ids.length === 1) {
@@ -20,21 +24,49 @@ function actorLabel(actor: TriggerActor, people: ScopeOption[]): string {
 	return `${actor.ids.length} people`;
 }
 
+/**
+ * Multi-select over the provider's own people, plus "Anyone".
+ *
+ * `allowCustom` adds a field for values that are not pickable — an email
+ * address — which then sit in the list like any chosen person.
+ */
 export function ActorChip({
 	actor,
 	onChange,
 	people,
+	allowCustom,
 	disabled,
 	className,
 }: {
 	actor: TriggerActor;
 	onChange: (next: TriggerActor) => void;
 	people: ScopeOption[];
+	allowCustom?: { placeholder: string };
 	disabled?: boolean;
 	className?: string;
 }) {
 	const ids = typeof actor === "string" ? [] : actor.ids;
 	const empty = typeof actor !== "string" && ids.length === 0;
+	const [custom, setCustom] = useState("");
+
+	const toggle = (id: string) => {
+		const next = ids.includes(id) ? ids.filter((p) => p !== id) : [...ids, id];
+		onChange(next.length ? { ids: next } : "anyone");
+	};
+
+	const addCustom = () => {
+		const value = custom.trim();
+		if (!value) return;
+		if (!ids.includes(value)) {
+			onChange({ ids: [...ids, value] });
+		}
+		setCustom("");
+	};
+
+	// Typed values that no person describes still need a row to be unticked.
+	const customSelected = ids.filter(
+		(id) => !people.some((person) => person.id === id),
+	);
 
 	return (
 		<DropdownMenu>
@@ -55,28 +87,50 @@ export function ActorChip({
 				>
 					Anyone
 				</DropdownMenuCheckboxItem>
-				<DropdownMenuCheckboxItem
-					checked={actor === "me"}
-					onCheckedChange={() => onChange("me")}
-				>
-					Me
-				</DropdownMenuCheckboxItem>
 				{people.map((person) => (
 					<DropdownMenuCheckboxItem
 						key={person.id}
 						checked={ids.includes(person.id)}
-						onCheckedChange={() => {
-							const next = ids.includes(person.id)
-								? ids.filter((p) => p !== person.id)
-								: [...ids, person.id];
-							onChange(next.length ? { ids: next } : "anyone");
-						}}
+						onCheckedChange={() => toggle(person.id)}
 					>
 						{person.label}
 					</DropdownMenuCheckboxItem>
 				))}
-				{people.length === 0 && (
-					<DropdownMenuItem disabled>No linked accounts yet</DropdownMenuItem>
+				{allowCustom &&
+					customSelected.map((id) => (
+						<DropdownMenuCheckboxItem
+							key={id}
+							checked
+							onCheckedChange={() => toggle(id)}
+						>
+							{id}
+						</DropdownMenuCheckboxItem>
+					))}
+				{people.length === 0 && !allowCustom && (
+					<DropdownMenuItem disabled>No people to choose yet</DropdownMenuItem>
+				)}
+				{allowCustom && (
+					<>
+						<DropdownMenuSeparator />
+						<div className="p-1">
+							<Input
+								value={custom}
+								placeholder={allowCustom.placeholder}
+								disabled={disabled}
+								onChange={(event) => setCustom(event.target.value)}
+								// The menu owns arrow keys and typeahead; the field keeps
+								// what it types.
+								onKeyDown={(event) => {
+									event.stopPropagation();
+									if (event.key === "Enter") {
+										event.preventDefault();
+										addCustom();
+									}
+								}}
+								className="h-7 text-[13px]"
+							/>
+						</div>
+					</>
 				)}
 			</DropdownMenuContent>
 		</DropdownMenu>

@@ -52,6 +52,7 @@ function renderPart(
 					onChange={(v) => set({ attendee: v })}
 					className={mark("attendee")}
 					people={options.google?.people ?? []}
+					allowCustom={{ placeholder: "Type an email, press Enter" }}
 					disabled={disabled}
 				/>
 			);
