@@ -178,7 +178,9 @@ export const cloudWorkspaceRouter = {
 				/** Omitted when the user didn't type one; then `prompt` names it. */
 				name: z.string().min(1).max(200).optional(),
 				prompt: z.string().max(20000).optional(),
-				branch: z.string().min(1).max(300),
+				/** Omitted = the repo's default branch, resolved here — a client
+				 * whose branch query hadn't answered must not guess "main". */
+				branch: z.string().min(1).max(300).optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
@@ -198,6 +200,11 @@ export const cloudWorkspaceRouter = {
 				});
 			}
 
+			const branch =
+				input.branch ??
+				(await repoForProject(input.projectId))?.defaultBranch ??
+				"main";
+
 			// The id is generated here rather than by the database so the sandbox
 			// name can be derived before the insert. A placeholder would briefly
 			// leave two rows sharing ("blaxel", ""), which the unique constraint
@@ -211,7 +218,7 @@ export const cloudWorkspaceRouter = {
 					organizationId: input.organizationId,
 					projectId: input.projectId,
 					name: input.name ?? FALLBACK_NAME,
-					branch: input.branch,
+					branch,
 					provider: "blaxel",
 					providerSandboxId,
 					status: "provisioning",

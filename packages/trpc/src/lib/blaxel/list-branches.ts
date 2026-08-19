@@ -21,6 +21,8 @@ export interface RemoteBranchPage {
 }
 
 const PER_PAGE = 100;
+/** Enough for a query to reach deep branches without unbounded API walks. */
+const MAX_PAGES = 10;
 
 export async function listRemoteBranches(
 	projectId: string,
@@ -49,11 +51,17 @@ export async function listRemoteBranches(
 	let data: Array<{ name: string }>;
 	try {
 		const octokit = await installationOctokit(installation.installationId);
-		const response = await octokit.request(
-			"GET /repos/{owner}/{repo}/branches",
-			{ owner: repo.owner, repo: repo.name, per_page: PER_PAGE },
-		);
-		data = response.data;
+		// Paginated: a repo easily holds more than one page of branches, and a
+		// single request would make everything past it unfindable.
+		data = [];
+		for (let page = 1; page <= MAX_PAGES; page++) {
+			const response = await octokit.request(
+				"GET /repos/{owner}/{repo}/branches",
+				{ owner: repo.owner, repo: repo.name, per_page: PER_PAGE, page },
+			);
+			data.push(...response.data);
+			if (response.data.length < PER_PAGE) break;
+		}
 	} catch (error) {
 		// An installation that stopped matching the App (uninstalled, or a dev
 		// environment pointed at another App's data) shouldn't break the

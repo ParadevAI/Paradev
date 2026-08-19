@@ -45,7 +45,9 @@ export function useCreateCloudWorkspace() {
 				organizationId,
 				projectId: target.projectId,
 				prompt: message.text.trim() || undefined,
-				branch: branch ?? "main",
+				// Omitted when unresolved: the server falls back to the repo's
+				// actual default branch, which the client must not guess.
+				branch: branch ?? undefined,
 			});
 		},
 		onSuccess: (row: CloudWorkspaceRow) => {
