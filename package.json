@@ -22,11 +22,10 @@
 	"private": true,
 	"scripts": {
 		"predev": "bun scripts/check-dev-ports.ts",
-		"dev": "turbo run dev dev:caddy --filter=@superset/api --filter=@superset/web --filter=@superset/desktop --filter=electric-proxy --filter=//",
+		"dev": "turbo run dev --filter=@superset/api --filter=@superset/web --filter=@superset/desktop --filter=//",
 		"dev:all": "turbo dev --concurrency=15",
 		"predev:desktop": "bun scripts/check-dev-ports.ts",
-		"dev:desktop": "turbo run dev dev:caddy --filter=@superset/api --filter=@superset/desktop --filter=electric-proxy --filter=//",
-		"dev:caddy": "dotenv -- caddy run --config Caddyfile",
+		"dev:desktop": "turbo run dev --filter=@superset/api --filter=@superset/desktop --filter=//",
 		"dev:docs": "turbo dev --filter=@superset/docs",
 		"dev:marketing": "turbo dev --filter=@superset/marketing --filter=@superset/docs",
 		"dev:relay": "turbo dev --filter=@superset/relay",
