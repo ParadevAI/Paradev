@@ -123,3 +123,19 @@ code path is `ensureSandboxAccess` at dial + invalidate on `AppState` active).
 Setup traps hit: Metro `.worklets` ENOENT in a fresh worktree; local API's
 GitHub App doesn't match the branch DB's installation, so create fails at the
 token step here (that is what produced the failed row).
+
+## PR B + image rebuild (2026-08-19)
+
+- Sandbox image `superset-hostsvc` rebuilt from main and deployed. Verified
+  end to end with a throwaway sandbox: `settings.agentConfigs.list` (which
+  lazily seeds the builtin agents — anything calling `agents.run` cold must
+  call it first) then `agents.run` with Claude boots the TUI under root with
+  "bypass permissions on" and no dialogs. Probe sandbox deleted after.
+- PR B implemented per the decisions: interim `cloudWorkspace.listProjects` +
+  App-token `listBranches` (degrades to the default branch when the
+  installation can't be authenticated — which is also the local-dev state,
+  where the .env App doesn't match the branch DB's installations), sectioned
+  project sheet, cloud branch source, agent chip hidden for cloud targets,
+  one-call create → seed list → navigate.
+- Verified locally over curl: listProjects returns the org's repo-bearing
+  projects; listBranches returns `main` + degradation path.
