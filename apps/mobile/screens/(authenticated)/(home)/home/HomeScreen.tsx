@@ -2,12 +2,13 @@ import { LegendList } from "@legendapp/list/react-native";
 import { useQueryClient } from "@tanstack/react-query";
 import { isAfter } from "date-fns";
 import * as Haptics from "expo-haptics";
-import { Stack, useFocusEffect, useRouter } from "expo-router";
-import { Cloud } from "lucide-react-native";
+import { useFocusEffect, useRouter } from "expo-router";
+import { Cloud, Search } from "lucide-react-native";
 import { useCallback, useMemo, useState } from "react";
 import { RefreshControl, useWindowDimensions, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Icon } from "@/components/ui/icon";
+import { Input } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 import {
 	type CloudWorkspaceStatus,
@@ -18,7 +19,6 @@ import {
 	type HostWorkspaceItem,
 	useHostWorkspaces,
 } from "@/hooks/useHostWorkspaces";
-import { THEME } from "@/lib/theme";
 import { useSelectedHost } from "@/screens/(authenticated)/(home)/hooks/useSelectedHost";
 import { useOrganizations } from "@/screens/(authenticated)/hooks/useOrganizations";
 import {
@@ -577,6 +577,37 @@ export function HomeScreen() {
 		/>
 	);
 
+	// Search lives in the page, not the native header: activating a
+	// UISearchController on iOS 26 lays an invisible view over the screen's
+	// content that swallows every touch — results can't be tapped and search
+	// won't dismiss (unfixed through rns 4.27 / iOS 26.5).
+	const listHeader = (
+		<>
+			<View className="px-4 pb-1 pt-1">
+				<View className="relative justify-center">
+					<View className="absolute left-3 z-10">
+						<Icon
+							as={Search}
+							className="text-muted-foreground size-4"
+							strokeWidth={2}
+						/>
+					</View>
+					<Input
+						autoCapitalize="none"
+						autoCorrect={false}
+						className="rounded-full pl-9"
+						clearButtonMode="always"
+						returnKeyType="search"
+						onChangeText={setSearchQuery}
+						placeholder="Search workspaces"
+						value={searchQuery}
+					/>
+				</View>
+			</View>
+			{scopeBar}
+		</>
+	);
+
 	return (
 		<>
 			<OrganizationHeaderButton
@@ -587,21 +618,6 @@ export function HomeScreen() {
 					void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 					setSheetOpen(true);
 				}}
-			/>
-			{/* placement="integratedButton" + allowToolbarIntegration={false}
-			    evicts the custom left toolbar view (org switcher) a few seconds
-			    after mount on iOS 26 — "stacked" is the only placement that
-			    coexists with it. */}
-			<Stack.SearchBar
-				placeholder="Search workspaces"
-				placement="stacked"
-				hideWhenScrolling={false}
-				hideNavigationBar={false}
-				textColor={THEME.dark.foreground}
-				hintTextColor={THEME.dark.mutedForeground}
-				tintColor={THEME.dark.foreground}
-				onChangeText={(event) => setSearchQuery(event.nativeEvent.text)}
-				onCancelButtonPress={() => setSearchQuery("")}
 			/>
 			{selectedHost &&
 			!selectedHost.isOnline &&
@@ -621,6 +637,8 @@ export function HomeScreen() {
 				<LegendList
 					className="flex-1 bg-background"
 					contentInsetAdjustmentBehavior="automatic"
+					keyboardDismissMode="on-drag"
+					keyboardShouldPersistTaps="handled"
 					contentContainerStyle={{
 						minHeight:
 							windowHeight - insets.top - NAVIGATION_BAR_HEIGHT - insets.bottom,
@@ -631,7 +649,7 @@ export function HomeScreen() {
 					extraData={renderItem}
 					keyExtractor={homeListItemKey}
 					renderItem={renderItem}
-					ListHeaderComponent={scopeBar}
+					ListHeaderComponent={listHeader}
 					viewabilityConfig={VIEWABILITY_CONFIG}
 					onViewableItemsChanged={onViewableItemsChanged}
 					refreshControl={
