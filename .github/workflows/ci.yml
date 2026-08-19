@@ -102,11 +102,6 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen --ignore-scripts
 
-      # The guard scripts run by `bun run lint` scan with ripgrep, which is not
-      # on the runner image.
-      - name: Install ripgrep
-        run: sudo apt-get update && sudo apt-get install -y ripgrep
-
       - name: Lint
         run: bun run lint
 
@@ -131,13 +126,6 @@ jobs:
 
       - name: Install dependencies
         run: bun install --frozen --ignore-scripts
-
-      - name: Install Linux native build deps
-        run: sudo apt-get update && sudo apt-get install -y libx11-dev libxkbfile-dev
-
-      - name: Install desktop native dependencies
-        working-directory: apps/desktop
-        run: bun run install:deps
 
       - name: Test
         env:
