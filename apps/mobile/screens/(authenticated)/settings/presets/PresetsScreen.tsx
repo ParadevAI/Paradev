@@ -5,8 +5,8 @@ import { useHostsPresence } from "@/hooks/useHostsPresence";
 import { useOrgHosts } from "@/hooks/useOrgHosts";
 import { useTheme } from "@/hooks/useTheme";
 import {
-	buildRelayHostUrl,
 	getHostServiceClientByUrl,
+	hostServiceUrl,
 } from "@/lib/host-service/client";
 import { AgentMark } from "@/screens/(authenticated)/(home)/new-session/agent";
 import { ListRow } from "@/screens/(authenticated)/components/ListRow";
@@ -37,7 +37,7 @@ export function PresetsScreen() {
 			networkMode: "always" as const,
 			queryFn: () =>
 				getHostServiceClientByUrl(
-					buildRelayHostUrl(host.organizationId, host.machineId),
+					hostServiceUrl(host.organizationId, host.machineId),
 				).settings.agentConfigs.list.query(),
 		})),
 	});

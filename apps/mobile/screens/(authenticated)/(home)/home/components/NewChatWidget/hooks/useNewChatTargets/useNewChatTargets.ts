@@ -6,8 +6,8 @@ import { useHostsPresence } from "@/hooks/useHostsPresence";
 import type { HostWorkspaceItem } from "@/hooks/useHostWorkspaces";
 import { useOrgHosts } from "@/hooks/useOrgHosts";
 import {
-	buildRelayHostUrl,
 	getHostServiceClientByUrl,
+	hostServiceUrl,
 } from "@/lib/host-service/client";
 import { useWorkspacesFilterStore } from "../../../../stores/workspacesFilterStore";
 import { useNewSessionPreferencesStore } from "../../stores/newSessionPreferencesStore";
@@ -55,7 +55,7 @@ export function useNewChatTargets(workspaces: HostWorkspaceItem[] = []): {
 				.map((host) => ({
 					machineId: host.machineId,
 					name: host.name,
-					hostUrl: buildRelayHostUrl(host.organizationId, host.machineId),
+					hostUrl: hostServiceUrl(host.organizationId, host.machineId),
 				})),
 		[hosts, presence],
 	);
