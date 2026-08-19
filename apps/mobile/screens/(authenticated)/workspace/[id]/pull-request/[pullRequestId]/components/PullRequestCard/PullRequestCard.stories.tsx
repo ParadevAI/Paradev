@@ -66,6 +66,9 @@ export const DraftWithChangesRequested: Story = {
 export const DraftWithChecksRunning: Story = {
 	args: { name: "draftChecksRunning" },
 };
+export const DraftCheckFailedWhileOthersRun: Story = {
+	args: { name: "draftOneCheckFailedRestRunning" },
+};
 export const ConflictsWithBotComment: Story = {
 	args: { name: "openConflictsBotCommented" },
 };

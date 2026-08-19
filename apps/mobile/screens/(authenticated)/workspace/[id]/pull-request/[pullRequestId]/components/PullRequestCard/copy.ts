@@ -6,7 +6,7 @@ const plural = (count: number, word: string) =>
 
 /**
  * The headline names what the pull request is waiting on. Wording follows the
- * mocks: a "Waiting for X" family, counts where a count is the point, and
+ * designs: a "Waiting for X" family, counts where a count is the point, and
  * "Ready for Review" rather than "Ready to Merge" while it's still a draft.
  */
 export function headlineFor(
@@ -48,8 +48,9 @@ const MERGE_LABEL: Record<MergeMethod, string> = {
 };
 
 /**
- * Agent labels name the blocker rather than borrowing one generic sentence —
- * we would otherwise say "Fix Checks with Agent" on a pull request with no checks.
+ * Labels follow the designs verbatim. Conflicts deliberately reuse the checks
+ * agent label — even on a card with no checks — so don't rename that button
+ * to name the blocker.
  */
 export function actionLabelFor(
 	action: ActionId,
@@ -67,7 +68,6 @@ export function actionLabelFor(
 		case "dequeue":
 			return "Remove from Queue";
 		case "ask-resolve-conflicts":
-			return "Resolve Conflicts with Agent";
 		case "ask-fix-checks":
 			return "Fix Checks with Agent";
 		case "ask-address-comments":

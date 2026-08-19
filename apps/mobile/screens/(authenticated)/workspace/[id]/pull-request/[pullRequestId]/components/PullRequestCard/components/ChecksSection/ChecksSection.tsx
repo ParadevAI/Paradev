@@ -9,12 +9,13 @@ import type {
 import { CheckRow } from "../../../CheckRow";
 import { CardRow } from "../CardRow";
 import { ChecksRing } from "../ChecksRing";
+import { checksRowMode } from "./utils/checksRowMode";
 
 /**
- * Three voices, one per situation the designs show. While checks run it is a ring
- * and a count; once they settle with failures it lists what is wrong and hides
- * what is fine, with a way through to the rest; when everything passes it is a
- * single line.
+ * Three voices, one per situation the designs show. Any failure lists what is
+ * wrong and hides what is fine — even while other checks still run — with a way
+ * through to the rest; the ring is for in-flight-and-so-far-fine; when
+ * everything passes it is a single line.
  */
 export function ChecksSection({
 	tally,
@@ -26,8 +27,9 @@ export function ChecksSection({
 	onOpenCheck?: (check: PullRequestCheck) => void;
 }) {
 	if (tally.total === 0) return null;
+	const mode = checksRowMode(tally);
 
-	if (tally.failing.length > 0 && tally.running === 0) {
+	if (mode === "failures") {
 		return (
 			<View className="gap-3">
 				{tally.failing.map((check) => (
@@ -50,7 +52,7 @@ export function ChecksSection({
 		);
 	}
 
-	if (tally.running > 0) {
+	if (mode === "ring") {
 		return (
 			<CardRow
 				label={`${tally.passed}/${tally.total} Checks Passing`}

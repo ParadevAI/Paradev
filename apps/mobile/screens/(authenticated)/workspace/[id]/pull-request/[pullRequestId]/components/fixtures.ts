@@ -194,6 +194,37 @@ export const SCENARIOS = {
 		capabilities: { merge: false },
 	}),
 
+	draftOneCheckFailedRestRunning: scenario(
+		"Draft · 1 failed · 2 running · 16 passed",
+		{
+			pullRequest: {
+				number: 6649,
+				title: "Fix Superset terminal CLI auth",
+				additions: 290,
+				deletions: 20,
+				changedFiles: 11,
+				isDraft: true,
+			},
+			checks: [
+				...Array.from({ length: 16 }, (_, index) =>
+					check(`CI / Passed ${index + 1}`, { isRequired: index < 2 }),
+				),
+				check("CI / Typecheck", {
+					conclusion: "FAILURE",
+					isRequired: true,
+					...minutes("2026-08-15T15:30:00Z", 5),
+				}),
+				...Array.from({ length: 2 }, (_, index) =>
+					check(`Deploy Preview / Job ${index + 1}`, {
+						status: "IN_PROGRESS",
+						conclusion: null,
+					}),
+				),
+			],
+			capabilities: { merge: false },
+		},
+	),
+
 	openConflictsBotCommented: scenario("Open · conflicts · bot commented", {
 		pullRequest: {
 			number: 6498,
@@ -336,7 +367,9 @@ export const SCENARIOS = {
 		mergeability: { requiredApprovals: 0 },
 	}),
 
-	merged: scenario("Merged", {
+	// Checks, reviewers and required approvals are all present so the story
+	// proves the rows are dropped by state, not by absent data.
+	merged: scenario("Merged · rows collapse to the receipt", {
 		pullRequest: {
 			number: 1,
 			title: "Add basic README documentation",
@@ -346,11 +379,11 @@ export const SCENARIOS = {
 			mergedAt: new Date("2026-08-15T22:25:00Z"),
 			mergedBy: { login: "saddlepaddle", avatarUrl: avatar("saddlepaddle") },
 		},
-		checks: [],
-		mergeability: { requiredApprovals: 0 },
+		reviewers: [{ ...KIET, state: "APPROVED" }],
+		mergeability: { approvals: 1 },
 	}),
 
-	closed: scenario("Closed", {
+	closed: scenario("Closed · status rows dropped", {
 		pullRequest: {
 			number: 3489,
 			title: "Archive the legacy onboarding flow",
@@ -359,11 +392,10 @@ export const SCENARIOS = {
 			deletions: 0,
 			changedFiles: 8,
 		},
-		checks: [],
-		mergeability: { requiredApprovals: 0 },
+		reviewers: [KIET],
 	}),
 
-	queued: scenario("Queued to merge · no mock", {
+	queued: scenario("Queued to merge", {
 		reviewers: [{ ...KIET, state: "APPROVED" }],
 		mergeability: {
 			approvals: 1,
@@ -371,7 +403,7 @@ export const SCENARIOS = {
 		},
 	}),
 
-	blocked: scenario("Blocked by branch rules · no mock", {
+	blocked: scenario("Blocked by branch rules", {
 		reviewers: [{ ...KIET, state: "APPROVED" }],
 		mergeability: { approvals: 1, mergeStateStatus: "BLOCKED" },
 		capabilities: {},

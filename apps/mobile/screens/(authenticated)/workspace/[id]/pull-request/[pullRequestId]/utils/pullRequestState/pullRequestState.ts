@@ -1,11 +1,13 @@
-import {
-	effectiveCheckStatus,
-	type PullRequest,
-	type PullRequestCapabilities,
-	type PullRequestDetail,
-	type PullRequestMergeability,
-	type PullRequestReviewer,
-} from "../../../../utils/pullRequest";
+// Imported from the concrete modules, not the barrel: status.ts pulls in
+// lucide-react-native, which bun test cannot load.
+import { effectiveCheckStatus } from "../../../../utils/pullRequest/checks";
+import type {
+	PullRequest,
+	PullRequestCapabilities,
+	PullRequestDetail,
+	PullRequestMergeability,
+	PullRequestReviewer,
+} from "../../../../utils/pullRequest/types";
 
 export type PullRequestState =
 	| "merged"
@@ -108,7 +110,10 @@ export function resolveActions(
 	if (state === "queued") return capabilities.dequeue ? ["dequeue"] : [];
 
 	if (pullRequest.isDraft) {
-		return capabilities.markReady ? ["mark-ready"] : [];
+		const actions: ActionId[] = capabilities.markReady ? ["mark-ready"] : [];
+		// Failing checks are fixable before the draft goes out; every other blocker waits for Mark Ready.
+		if (state === "checks-failed") actions.push("ask-fix-checks");
+		return actions;
 	}
 
 	const actions: ActionId[] = [];
@@ -140,7 +145,7 @@ export function isMergeabilityPending(
 	);
 }
 
-export function showsReviewers(
+function showsReviewers(
 	reviewers: PullRequestReviewer[],
 	mergeability: PullRequestMergeability,
 ): boolean {
@@ -149,4 +154,24 @@ export function showsReviewers(
 		mergeability.requiredApprovals > 0 ||
 		mergeability.reviewDecision === "REVIEW_REQUIRED"
 	);
+}
+
+export type CardRowId = "checks" | "reviewers" | "merged-by";
+
+/**
+ * Which rows the card shows, top to bottom. A merged pull request keeps only
+ * its receipt and a closed one drops every status row — checks and reviewers
+ * only matter while the pull request is still going somewhere.
+ */
+export function resolveCardRows(
+	state: PullRequestState,
+	{ pullRequest, checks, reviewers, mergeability }: PullRequestDetail,
+): CardRowId[] {
+	if (state === "merged") return pullRequest.mergedBy ? ["merged-by"] : [];
+	if (state === "closed") return [];
+
+	const rows: CardRowId[] = [];
+	if (checks.length > 0) rows.push("checks");
+	if (showsReviewers(reviewers, mergeability)) rows.push("reviewers");
+	return rows;
 }

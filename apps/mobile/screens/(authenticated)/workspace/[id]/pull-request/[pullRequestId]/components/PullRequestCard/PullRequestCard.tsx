@@ -14,8 +14,8 @@ import {
 	type ActionId,
 	isMergeabilityPending,
 	resolveActions,
+	resolveCardRows,
 	resolvePullRequestState,
-	showsReviewers,
 } from "../../utils/pullRequestState";
 import { ReviewerAvatar } from "../ReviewerAvatar";
 import { ActionButton } from "./components/ActionButton";
@@ -23,6 +23,7 @@ import { CardRow } from "./components/CardRow";
 import { ChecksSection } from "./components/ChecksSection";
 import { ReviewersRow } from "./components/ReviewersRow";
 import { actionLabelFor, headlineFor } from "./copy";
+import { mergedSubLabel } from "./utils/mergedSubLabel";
 
 /** What the pull request needs next and what you can do about it; props in, callbacks out. */
 export function PullRequestCard({
@@ -54,39 +55,48 @@ export function PullRequestCard({
 	const tally = tallyChecks(checks);
 	const mergeMethod = mergeability.allowedMergeMethods[0] ?? "squash";
 
-	const rows: ReactElement[] = [
-		tally.total > 0 ? (
-			<ChecksSection
-				key="checks"
-				onOpenCheck={onOpenCheck}
-				onOpenChecks={onOpenChecks}
-				tally={tally}
-			/>
-		) : null,
-		showsReviewers(reviewers, mergeability) ? (
-			<ReviewersRow
-				key="reviewers"
-				onPress={reviewers.length > 0 ? onOpenReviewers : undefined}
-				reviewers={reviewers}
-			/>
-		) : null,
-		pullRequest.mergedBy ? (
+	const rows: ReactElement[] = resolveCardRows(state, detail).flatMap((row) => {
+		if (row === "checks") {
+			return (
+				<ChecksSection
+					key="checks"
+					onOpenCheck={onOpenCheck}
+					onOpenChecks={onOpenChecks}
+					tally={tally}
+				/>
+			);
+		}
+		if (row === "reviewers") {
+			return (
+				<ReviewersRow
+					key="reviewers"
+					onPress={reviewers.length > 0 ? onOpenReviewers : undefined}
+					reviewers={reviewers}
+				/>
+			);
+		}
+		const mergedBy = pullRequest.mergedBy;
+		if (!mergedBy) return [];
+		return (
 			<CardRow
 				key="merged-by"
-				label={`Merged by ${pullRequest.mergedBy.login}`}
+				label={`Merged by ${mergedBy.login}`}
 				leading={
 					<ReviewerAvatar
 						reviewer={{
-							login: pullRequest.mergedBy.login,
-							avatarUrl: pullRequest.mergedBy.avatarUrl,
+							login: mergedBy.login,
+							avatarUrl: mergedBy.avatarUrl,
 							isTeam: false,
 							state: "APPROVED",
 						}}
 					/>
 				}
+				subLabel={
+					pullRequest.mergedAt ? mergedSubLabel(pullRequest.mergedAt) : null
+				}
 			/>
-		) : null,
-	].filter((row) => row !== null);
+		);
+	});
 
 	return (
 		<View className="bg-card border-border mx-4 overflow-hidden rounded-xl border">
