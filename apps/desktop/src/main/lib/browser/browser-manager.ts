@@ -2,6 +2,12 @@ import { EventEmitter } from "node:events";
 import { clipboard, Menu, webContents } from "electron";
 import { safeOpenExternal } from "main/lib/safe-url";
 import { chordFromInput } from "shared/hotkey-chord";
+import {
+	forwardSessionFor,
+	handleTargetCommand,
+	shimIds,
+	tagEventSession,
+} from "./cdp-target-shim";
 
 interface ConsoleEntry {
 	level: "log" | "warn" | "error" | "info" | "debug";
@@ -254,6 +260,23 @@ class BrowserManager extends EventEmitter {
 		}
 		wc.debugger.attach("1.3");
 
+		// A browser-level CDP client (browser-use, Playwright) expects one `page`
+		// target to attach to, but the guest debugger answers `Target.*` with the
+		// whole process's target list (webview + host app shell). The shim in
+		// `cdp-target-shim` presents this pane as a single page target and maps a
+		// synthetic flatten session to the debugger's root channel.
+		const ids = shimIds(paneId);
+		let flatSessionId: string | null = null;
+		let autoAttachEmitted = false;
+		const paneUrlTitle = () => {
+			try {
+				return { url: wc.getURL(), title: wc.getTitle() };
+			} catch {
+				// webContents may be mid-navigation or destroyed
+				return { url: "", title: "" };
+			}
+		};
+
 		let closed = false;
 		const handleMessage = (
 			_event: Electron.Event,
@@ -261,11 +284,12 @@ class BrowserManager extends EventEmitter {
 			params: unknown,
 			sessionId?: string,
 		) => {
+			const outSessionId = tagEventSession(sessionId, flatSessionId);
 			onMessage(
 				JSON.stringify({
 					method,
 					params,
-					...(sessionId ? { sessionId } : {}),
+					...(outSessionId ? { sessionId: outSessionId } : {}),
 				}),
 			);
 		};
@@ -322,6 +346,41 @@ class BrowserManager extends EventEmitter {
 					);
 					return;
 				}
+				const reply = (result: unknown) => {
+					onMessage(
+						JSON.stringify({
+							id,
+							result,
+							...(sessionId ? { sessionId } : {}),
+						}),
+					);
+				};
+				// Present this pane as a single `page` target to a browser-level
+				// client, instead of the guest debugger's process-wide list.
+				const { url, title } = paneUrlTitle();
+				const targetRes = handleTargetCommand(method, params, {
+					ids,
+					url,
+					title,
+					flatSessionId,
+					autoAttachEmitted,
+				});
+				if (targetRes) {
+					flatSessionId = targetRes.flatSessionId;
+					autoAttachEmitted = targetRes.autoAttachEmitted;
+					for (const ev of targetRes.events) onMessage(JSON.stringify(ev));
+					reply(targetRes.result);
+					// createTarget reuses the pane as the new target, so honor the
+					// requested navigation here (guarded by the scheme allowlist).
+					if (targetRes.navigateTo && isAllowedGuestUrl(targetRes.navigateTo)) {
+						wc.debugger
+							.sendCommand("Page.navigate", { url: targetRes.navigateTo })
+							.catch(() => {
+								// pane may be mid-teardown; navigation is best-effort
+							});
+					}
+					return;
+				}
 				// `will-navigate` doesn't fire for CDP-initiated navigations, so the
 				// scheme allowlist is re-checked here — otherwise `Page.navigate`
 				// could point the guest at file:// / chrome:// and read it back.
@@ -341,8 +400,12 @@ class BrowserManager extends EventEmitter {
 						return;
 					}
 				}
+				// The synthetic flatten session maps to the debugger's root
+				// channel, so strip it before forwarding; the response still
+				// echoes the client's original sessionId above.
+				const forwardSessionId = forwardSessionFor(sessionId, flatSessionId);
 				wc.debugger
-					.sendCommand(method, params, sessionId)
+					.sendCommand(method, params, forwardSessionId)
 					.then((result) => {
 						if (closed) return;
 						onMessage(
