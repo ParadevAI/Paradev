@@ -52,6 +52,16 @@ export interface ForwardedKey {
 
 const MAX_CONSOLE_ENTRIES = 500;
 
+// A hidden pane presents no compositor frames, so `capturePage` can hang
+// indefinitely or fail ("UnknownVizError" / an empty bitmap). The agent wake
+// makes the renderer re-park the webview presentable, and the capture
+// request itself forces a frame — but on a deeply idled guest that first
+// frame lands seconds later, resolving the *next* attempt instantly. So:
+// bound each attempt, retry until the deadline.
+const CAPTURE_DEADLINE_MS = 15_000;
+const CAPTURE_ATTEMPT_TIMEOUT_MS = 1_500;
+const CAPTURE_RETRY_INTERVAL_MS = 100;
+
 function sanitizeUrl(url: string): string {
 	if (/^https?:\/\//i.test(url) || url.startsWith("about:")) {
 		return url;
@@ -110,6 +120,26 @@ export function resolveGuestUrl(input: string): string {
 /** Thrown when a pane already has a live CDP session (a single one is allowed). */
 export class CdpBusyError extends Error {}
 
+function withTimeout<T>(
+	promise: Promise<T>,
+	ms: number,
+	message: string,
+): Promise<T> {
+	return new Promise<T>((resolve, reject) => {
+		const timer = setTimeout(() => reject(new Error(message)), ms);
+		promise.then(
+			(value) => {
+				clearTimeout(timer);
+				resolve(value);
+			},
+			(err: unknown) => {
+				clearTimeout(timer);
+				reject(err);
+			},
+		);
+	});
+}
+
 class BrowserManager extends EventEmitter {
 	private panes = new Map<string, PaneRegistration>();
 	private consoleLogs = new Map<string, ConsoleEntry[]>();
@@ -118,6 +148,11 @@ class BrowserManager extends EventEmitter {
 	private beforeInputListeners = new Map<string, () => void>();
 	private navigationListeners = new Map<string, () => void>();
 	private cdpDetachers = new Map<string, () => void>();
+	// Ref-count of in-flight agent work per pane (a live CDP session, a
+	// screenshot capture). While present the guest renderer stays
+	// un-throttled — see acquireAgentWake. The entry object's identity ties
+	// releases to the registration generation they were acquired under.
+	private agentWakes = new Map<string, { count: number }>();
 	// Canonical chords to suppress in the focused guest and forward for the
 	// renderer to replay. Kept override/layout-aware by the renderer.
 	private forwardableChords = new Set<string>();
@@ -150,9 +185,12 @@ class BrowserManager extends EventEmitter {
 		});
 		const wc = webContents.fromId(webContentsId);
 		if (wc) {
-			// Keep throttling enabled so parked/offscreen persistent webviews don't
-			// run at full speed in the background.
-			wc.setBackgroundThrottling(true);
+			// Throttling stays enabled by default so parked/offscreen persistent
+			// webviews don't run at full speed in the background — except while
+			// agent work is in flight on the pane (see acquireAgentWake), where a
+			// throttled+hidden guest stops presenting frames and CDP input and
+			// screenshots silently break.
+			this.applyThrottling(paneId, wc);
 			wc.setWindowOpenHandler(({ url }) => {
 				if (url && url !== "about:blank") {
 					this.emit(`new-window:${paneId}`, url);
@@ -186,6 +224,60 @@ class BrowserManager extends EventEmitter {
 		this.cdpDetachers.get(paneId)?.();
 		this.panes.delete(paneId);
 		this.consoleLogs.delete(paneId);
+		// Tell subscribers when a live wake dies with the pane, so the renderer
+		// doesn't keep a stale pane id in its exemption set.
+		if (this.agentWakes.delete(paneId)) this.emitAgentActive();
+	}
+
+	/**
+	 * Keep the pane's guest responsive while agent work is in flight (a live
+	 * CDP session, an in-flight screenshot). Two halves, both required: this
+	 * disables background throttling on the guest, and the `agent-active`
+	 * event tells the renderer registry to park the pane's webview
+	 * presentable (`opacity: 0`) instead of `visibility: hidden` — a
+	 * visibility-hidden webview stops getting compositor frames entirely, so
+	 * `capturePage`/`Page.captureScreenshot` hang or fail ("UnknownVizError").
+	 * Ref-counted so overlapping work (a CDP session plus a screenshot)
+	 * doesn't drop the wake early. Each release is bound to the wake entry it
+	 * incremented: unregister() discards the entry, so a release held by
+	 * work that outlived the pane (a capture can run up to 15 s) cannot
+	 * decrement a wake acquired after the pane re-registered. Returns an
+	 * idempotent release.
+	 */
+	private acquireAgentWake(paneId: string): () => void {
+		let entry = this.agentWakes.get(paneId);
+		if (entry) {
+			entry.count += 1;
+		} else {
+			entry = { count: 1 };
+			this.agentWakes.set(paneId, entry);
+			const wc = this.getWebContents(paneId);
+			if (wc) this.applyThrottling(paneId, wc);
+			this.emitAgentActive();
+		}
+		let released = false;
+		return () => {
+			if (released) return;
+			released = true;
+			// A different (or missing) entry means the pane's wake state was
+			// reset since this wake was acquired — this release is stale.
+			if (this.agentWakes.get(paneId) !== entry) return;
+			entry.count -= 1;
+			if (entry.count <= 0) {
+				this.agentWakes.delete(paneId);
+				const wc = this.getWebContents(paneId);
+				if (wc) this.applyThrottling(paneId, wc);
+				this.emitAgentActive();
+			}
+		};
+	}
+
+	private applyThrottling(paneId: string, wc: Electron.WebContents): void {
+		try {
+			wc.setBackgroundThrottling(!this.agentWakes.has(paneId));
+		} catch {
+			// webContents may be destroyed
+		}
 	}
 
 	unregisterAll(): void {
@@ -259,6 +351,9 @@ class BrowserManager extends EventEmitter {
 			);
 		}
 		wc.debugger.attach("1.3");
+		// Hold the wake for the whole session so input dispatch and screenshots
+		// keep working while the pane's workspace is not the visible view.
+		const releaseWake = this.acquireAgentWake(paneId);
 
 		// A browser-level CDP client (browser-use, Playwright) expects one `page`
 		// target to attach to, but the guest debugger answers `Target.*` with the
@@ -303,6 +398,7 @@ class BrowserManager extends EventEmitter {
 			wc.debugger.off("message", handleMessage);
 			wc.debugger.off("detach", handleDetach);
 			this.cdpDetachers.delete(paneId);
+			releaseWake();
 		};
 		wc.debugger.on("message", handleMessage);
 		wc.debugger.on("detach", handleDetach);
@@ -315,7 +411,14 @@ class BrowserManager extends EventEmitter {
 				// webContents may be destroyed
 			}
 		};
-		this.cdpDetachers.set(paneId, detach);
+		// The forced path (pane unregistered while a client is attached) must
+		// tell the client, so it sees a clear close instead of every later
+		// command failing with "No webContents for pane …".
+		this.cdpDetachers.set(paneId, () => {
+			const wasOpen = !closed;
+			detach();
+			if (wasOpen) onDetach("pane closed");
+		});
 
 		return {
 			send: (rawMessage: string) => {
@@ -381,6 +484,62 @@ class BrowserManager extends EventEmitter {
 					}
 					return;
 				}
+				// The renderer-side `Page.captureScreenshot` waits for the guest's
+				// next BeginFrame, which a hidden (parked) pane may never produce —
+				// the field failure mode was 2-minute hangs. `capturePage` from the
+				// main process forces a frame reliably, so serve the common case
+				// (default viewport capture as png/jpeg) through it. Requests
+				// capturePage can't honor faithfully — `clip`, `captureBeyondViewport`
+				// (puppeteer full-page), or another format — keep the native path
+				// rather than silently returning the wrong image. The reply echoes
+				// the client's sessionId, so flattened (shim-session) requests get a
+				// correctly-tagged response too.
+				const shotParams = params as
+					| {
+							clip?: unknown;
+							captureBeyondViewport?: unknown;
+							format?: unknown;
+							quality?: unknown;
+							fromSurface?: unknown;
+							optimizeForSpeed?: unknown;
+					  }
+					| undefined;
+				const format = shotParams?.format;
+				if (
+					method === "Page.captureScreenshot" &&
+					shotParams?.clip == null &&
+					shotParams?.captureBeyondViewport !== true &&
+					shotParams?.fromSurface !== false &&
+					shotParams?.optimizeForSpeed !== true &&
+					(format == null || format === "png" || format === "jpeg")
+				) {
+					const quality = shotParams?.quality;
+					this.capturePageImage(paneId)
+						.then((image) => {
+							if (closed) return;
+							const data =
+								format === "jpeg"
+									? image
+											.toJPEG(typeof quality === "number" ? quality : 80)
+											.toString("base64")
+									: image.toPNG().toString("base64");
+							reply({ data });
+						})
+						.catch((err: unknown) => {
+							if (closed) return;
+							onMessage(
+								JSON.stringify({
+									id,
+									error: {
+										code: -32000,
+										message: err instanceof Error ? err.message : String(err),
+									},
+									...(sessionId ? { sessionId } : {}),
+								}),
+							);
+						});
+					return;
+				}
 				// `will-navigate` doesn't fire for CDP-initiated navigations, so the
 				// scheme allowlist is re-checked here — otherwise `Page.navigate`
 				// could point the guest at file:// / chrome:// and read it back.
@@ -434,6 +593,18 @@ class BrowserManager extends EventEmitter {
 		};
 	}
 
+	/**
+	 * Panes with agent work in flight (live CDP session or capture). The
+	 * renderer parks these presentable and exempts them from LRU eviction.
+	 */
+	getAgentActivePaneIds(): string[] {
+		return [...this.agentWakes.keys()];
+	}
+
+	private emitAgentActive(): void {
+		this.emit("agent-active", { paneIds: this.getAgentActivePaneIds() });
+	}
+
 	navigate(paneId: string, url: string, workspaceId?: string): void {
 		// Resolve first: a disallowed scheme throws here rather than silently
 		// becoming a web search, so the caller gets a clear error.
@@ -461,7 +632,38 @@ class BrowserManager extends EventEmitter {
 	): Promise<Electron.NativeImage> {
 		const wc = this.getWebContents(paneId, workspaceId);
 		if (!wc) throw new Error(`No webContents for pane ${paneId}`);
-		return wc.capturePage();
+		// Transient wake: a hidden pane presents no frames, so an un-waked
+		// capture hangs or fails with "UnknownVizError".
+		const releaseWake = this.acquireAgentWake(paneId);
+		try {
+			const deadline = Date.now() + CAPTURE_DEADLINE_MS;
+			let lastError: unknown = null;
+			do {
+				try {
+					// An abandoned attempt is not wasted: its copy request still
+					// forces a frame, which the next attempt captures instantly.
+					const image = await withTimeout(
+						wc.capturePage(),
+						CAPTURE_ATTEMPT_TIMEOUT_MS,
+						`Screenshot attempt for pane ${paneId} timed out`,
+					);
+					if (!image.isEmpty()) return image;
+					lastError = new Error(
+						`Captured an empty image for pane ${paneId} — its renderer produced no frame`,
+					);
+				} catch (err) {
+					lastError = err;
+				}
+				await new Promise((resolve) =>
+					setTimeout(resolve, CAPTURE_RETRY_INTERVAL_MS),
+				);
+			} while (Date.now() < deadline);
+			throw lastError instanceof Error
+				? lastError
+				: new Error(`Screenshot failed for pane ${paneId}`);
+		} finally {
+			releaseWake();
+		}
 	}
 
 	async evaluateJS(
