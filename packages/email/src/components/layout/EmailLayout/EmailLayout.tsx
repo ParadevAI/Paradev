@@ -122,22 +122,6 @@ export function EmailLayout({
 										alt="Superset"
 										width="232"
 									/>
-									<Text style={{ margin: "40px 0 0 0" }}>
-										<Img
-											src={`${assets}/badge-appstore.png`}
-											alt="App Store"
-											width="108"
-											height="32"
-											style={{ display: "inline-block", marginRight: "16px" }}
-										/>
-										<Img
-											src={`${assets}/badge-googleplay.png`}
-											alt="Google Play"
-											width="108"
-											height="32"
-											style={{ display: "inline-block" }}
-										/>
-									</Text>
 								</Column>
 								<Column style={{ width: "50%", verticalAlign: "top" }}>
 									<Section style={{ width: "248px", margin: "0 auto" }}>
