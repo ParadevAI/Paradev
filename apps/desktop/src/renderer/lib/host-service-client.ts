@@ -34,6 +34,15 @@ export function getHostServiceClientByUrl(hostUrl: string): HostServiceClient {
 				url: `${hostUrl}/trpc`,
 				transformer: superjson,
 				headers: () => getHostServiceHeaders(hostUrl),
+				// host-service is a local connection with no HTTP cache in front of
+				// it, so there's no upside to GET. Forcing POST puts query inputs in
+				// the request body instead of the URL — without this, a same-tick
+				// batch across many workspaces (terminalAgents.listByWorkspace,
+				// ports.getAll, etc.) can produce a GET URL long enough to blow past
+				// the server's HTTP header-size limit, failing even the CORS
+				// preflight before it reaches the route. See the identical fix on
+				// WorkspaceClientProvider in @superset/workspace-client.
+				methodOverride: "POST",
 			}),
 		],
 	});

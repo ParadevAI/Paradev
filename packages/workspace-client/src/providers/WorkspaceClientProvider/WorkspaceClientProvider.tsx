@@ -98,6 +98,13 @@ function getWorkspaceClients(
 				url: `${hostUrl}/trpc`,
 				transformer: superjson,
 				headers: headers ?? (() => ({})),
+				// host-service is a local connection with no HTTP cache in front of
+				// it, so there's no upside to GET. Forcing POST puts query inputs in
+				// the request body instead of the URL — without this, a query with a
+				// large input (e.g. git.getDiffBulk's file-path list) can produce a
+				// GET URL long enough to blow past the server's HTTP header-size
+				// limit, failing even the CORS preflight before it reaches the route.
+				methodOverride: "POST",
 			}),
 		],
 	});

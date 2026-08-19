@@ -1,6 +1,7 @@
 import {
 	type CodeViewItem,
 	type DiffLineAnnotation,
+	type FileDiffMetadata,
 	type LineAnnotation,
 	parseDiffFromFile,
 } from "@pierre/diffs";
@@ -8,8 +9,8 @@ import type { AppRouter } from "@superset/host-service";
 import { useWorkspaceClient, workspaceTrpc } from "@superset/workspace-client";
 import { useQueries } from "@tanstack/react-query";
 import { getQueryKey } from "@trpc/react-query";
-import type { inferRouterInputs } from "@trpc/server";
-import { useMemo } from "react";
+import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
+import { useMemo, useRef } from "react";
 import {
 	type ChangesetFile,
 	getChangesetFileKey,
@@ -17,6 +18,11 @@ import {
 import type { DiffAnnotationMetadata } from "../useDiffAnnotations";
 
 type GetDiffInput = inferRouterInputs<AppRouter>["git"]["getDiff"];
+type GetDiffBulkInput = inferRouterInputs<AppRouter>["git"]["getDiffBulk"];
+type DiffContent = Omit<
+	inferRouterOutputs<AppRouter>["git"]["getDiffBulk"]["diffs"][number],
+	"path"
+>;
 
 interface UseDiffCodeViewItemsOptions {
 	workspaceId: string;
@@ -41,6 +47,26 @@ interface UseDiffCodeViewItemsResult {
 	hasDiffError: boolean;
 }
 
+/** A file's diff request, grouped with every other file that shares the same
+ * (category, baseBranch, commitHash, fromHash) — i.e. the same `getDiffBulk`
+ * call. A DiffPane's file list can mix categories (e.g. staged + unstaged +
+ * against-base all in one "changes" view), so this is usually 1-3 groups,
+ * never one per file. */
+interface DiffGroup {
+	key: string;
+	bulkInput: Omit<GetDiffBulkInput, "workspaceId" | "paths">;
+	members: { file: ChangesetFile; itemId: string; path: string }[];
+}
+
+function groupKeyFor(input: GetDiffInput): string {
+	return [
+		input.category,
+		input.baseBranch ?? "",
+		input.commitHash ?? "",
+		input.fromHash ?? "",
+	].join("\0");
+}
+
 export function useDiffCodeViewItems({
 	workspaceId,
 	files,
@@ -61,13 +87,75 @@ export function useDiffCodeViewItems({
 		[files, workspaceId],
 	);
 
-	const diffQueries = useQueries({
-		queries: diffRequests.map(({ input }) => ({
-			queryKey: getQueryKey(workspaceTrpc.git.getDiff, input, "query"),
-			queryFn: () => trpcClient.git.getDiff.query(input),
-			staleTime: Number.POSITIVE_INFINITY,
-		})),
+	const diffGroups = useMemo<DiffGroup[]>(() => {
+		const groups = new Map<string, DiffGroup>();
+		for (const { file, input } of diffRequests) {
+			const key = groupKeyFor(input);
+			let group = groups.get(key);
+			if (!group) {
+				group = {
+					key,
+					bulkInput: {
+						category: input.category,
+						baseBranch: input.baseBranch,
+						commitHash: input.commitHash,
+						fromHash: input.fromHash,
+					},
+					members: [],
+				};
+				groups.set(key, group);
+			}
+			group.members.push({
+				file,
+				itemId: getDiffItemId(file),
+				path: input.path,
+			});
+		}
+		return [...groups.values()];
+	}, [diffRequests]);
+
+	const diffGroupQueries = useQueries({
+		queries: diffGroups.map((group) => {
+			const input: GetDiffBulkInput = {
+				workspaceId,
+				paths: group.members.map((member) => member.path),
+				...group.bulkInput,
+			};
+			return {
+				queryKey: getQueryKey(workspaceTrpc.git.getDiffBulk, input, "query"),
+				queryFn: () => trpcClient.git.getDiffBulk.query(input),
+				staleTime: Number.POSITIVE_INFINITY,
+			};
+		}),
 	});
+
+	// One lookup per group resolution (not per file, not per render) — keeps
+	// the per-file work below linear in file count instead of the quadratic
+	// rebuild the old per-file `useQueries` produced. `revision` is a hash of
+	// this file's own contents, not the group's fetch timestamp — a group
+	// query covers every file sharing a category, so keying off
+	// `dataUpdatedAt` would invalidate every other file's parsed-diff and
+	// highlight caches whenever any one file in the group changed.
+	const diffContentByItemId = useMemo(() => {
+		const map = new Map<string, DiffContent & { revision: number }>();
+		diffGroups.forEach((group, index) => {
+			const query = diffGroupQueries[index];
+			if (!query?.data) return;
+			const byPath = new Map(query.data.diffs.map((d) => [d.path, d]));
+			for (const member of group.members) {
+				const entry = byPath.get(member.path);
+				if (!entry) continue;
+				map.set(member.itemId, {
+					oldFile: entry.oldFile,
+					newFile: entry.newFile,
+					revision: hashString(
+						`${entry.oldFile.contents}\0${entry.newFile.contents}`,
+					),
+				});
+			}
+		});
+		return map;
+	}, [diffGroups, diffGroupQueries]);
 
 	const fileByItemId = useMemo(() => {
 		const map = new Map<string, ChangesetFile>();
@@ -77,17 +165,23 @@ export function useDiffCodeViewItems({
 		return map;
 	}, [files]);
 
+	// Parsing a file's diff (parseDiffFromFile) is the expensive part of
+	// building an item — cache it per item id, keyed by the file's content
+	// revision, so a render triggered by something unrelated (collapsed
+	// state, an annotation on a different file, another file in the same
+	// group refetching) doesn't re-parse every file.
+	const fileDiffCacheRef = useRef(
+		new Map<string, { revision: number; fileDiff: FileDiffMetadata }>(),
+	);
+
 	const items = useMemo<CodeViewItem<DiffAnnotationMetadata>[]>(() => {
 		const nextItems: CodeViewItem<DiffAnnotationMetadata>[] = [];
-		const queryByItemId = new Map(
-			diffRequests.map((request, index) => [
-				getDiffItemId(request.file),
-				diffQueries[index],
-			]),
-		);
+		const cache = fileDiffCacheRef.current;
+		const liveItemIds = new Set<string>();
 
 		for (const file of files) {
 			const itemId = getDiffItemId(file);
+			liveItemIds.add(itemId);
 			const collapsed = collapsedSet.has(getChangesetFileKey(file));
 
 			if (file.isBinary) {
@@ -144,8 +238,35 @@ export function useDiffCodeViewItems({
 				continue;
 			}
 
-			const query = queryByItemId.get(itemId);
-			if (!query?.data) continue;
+			const content = diffContentByItemId.get(itemId);
+			if (!content) continue;
+
+			const cached = cache.get(itemId);
+			const fileDiff =
+				cached && cached.revision === content.revision
+					? cached.fileDiff
+					: parseDiffFromFile(
+							{
+								...content.oldFile,
+								name: file.oldPath ?? file.path,
+								// Lets @pierre/diffs' WorkerPoolManager reuse an
+								// already-highlighted AST across remounts (e.g.
+								// navigating away from a workspace and back), which
+								// this hook's own fileDiffCacheRef can't cover since
+								// it's wiped on unmount. revision changes only when
+								// this file's own contents change, not when a
+								// sibling in the same bulk group refetches.
+								cacheKey: `${itemId}:${content.revision}:old`,
+							},
+							{
+								...content.newFile,
+								name: file.path,
+								cacheKey: `${itemId}:${content.revision}:new`,
+							},
+						);
+			if (!cached || cached.revision !== content.revision) {
+				cache.set(itemId, { revision: content.revision, fileDiff });
+			}
 
 			const baseAnnotations = getAnnotationsForFile(annotationsByPath, file);
 			const extra = extraAnnotationsByItemId?.get(itemId);
@@ -153,19 +274,9 @@ export function useDiffCodeViewItems({
 				baseAnnotations && extra
 					? [...baseAnnotations, ...extra]
 					: (extra ?? baseAnnotations);
-			const fileDiff = parseDiffFromFile(
-				{
-					...query.data.oldFile,
-					name: file.oldPath ?? file.path,
-				},
-				{
-					...query.data.newFile,
-					name: file.path,
-				},
-			);
 			const version = hashString(
 				[
-					query.dataUpdatedAt,
+					content.revision,
 					file.path,
 					file.oldPath ?? "",
 					file.status,
@@ -186,11 +297,16 @@ export function useDiffCodeViewItems({
 			});
 		}
 
+		// Drop cache entries for files no longer in the changeset so the map
+		// doesn't grow unbounded as the user navigates between diffs.
+		for (const key of cache.keys()) {
+			if (!liveItemIds.has(key)) cache.delete(key);
+		}
+
 		return nextItems;
 	}, [
 		files,
-		diffRequests,
-		diffQueries,
+		diffContentByItemId,
 		annotationsByPath,
 		collapsedSet,
 		extraAnnotationsByItemId,
@@ -199,8 +315,8 @@ export function useDiffCodeViewItems({
 	return {
 		items,
 		fileByItemId,
-		hasPendingDiff: diffQueries.some((query) => query.isPending),
-		hasDiffError: diffQueries.some((query) => query.isError),
+		hasPendingDiff: diffGroupQueries.some((query) => query.isPending),
+		hasDiffError: diffGroupQueries.some((query) => query.isError),
 	};
 }
 
