@@ -3,6 +3,9 @@ import { workspaceTrpc } from "@superset/workspace-client";
 import type { FsWatchEvent } from "@superset/workspace-fs/client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useWorkspaceEvent } from "renderer/hooks/host-service/useWorkspaceEvent";
+import { useWorkspaceHostUrl } from "renderer/hooks/host-service/useWorkspaceHostUrl";
+import { getHostEventBus } from "renderer/lib/host-event-bus";
+import { isHostServiceConnectionError } from "renderer/lib/host-service-client";
 import type { TreeBookkeeping } from "../../utils/treeBookkeeping";
 import { purgeDirectory, rekeyDirectory } from "../../utils/treeBookkeeping";
 import {
@@ -12,6 +15,15 @@ import {
 	toAbs,
 	toRel,
 } from "../../utils/treePath";
+
+// Failed listings retry on their own with exponential backoff: a listing can
+// fail while the host socket stays open (relay 502s, a host-service restart
+// racing the request), and without a retry the directory sat empty until the
+// user left and re-entered the workspace. Bounded — the connection-status
+// subscription below covers outages that outlast the backoff window.
+const FETCH_RETRY_BASE_MS = 1_000;
+const FETCH_RETRY_MAX_MS = 15_000;
+const FETCH_RETRY_MAX_ATTEMPTS = 5;
 
 interface UseFilesTabBridgeOptions {
 	model: FileTree;
@@ -111,6 +123,10 @@ export function useFilesTabBridge({
 	// check these candidates instead of iterating the entire knownPaths set.
 	const unloadedDirCandidatesRef = useRef(new Set<string>());
 
+	// Consecutive listing failures per directory, cleared on success and on
+	// workspace switch. Drives the bounded retry backoff in fetchDir.
+	const fetchFailuresRef = useRef(new Map<string, number>());
+
 	// The three path-keyed sets always move together on a rename or removal, so
 	// hand them to the helpers as one value rather than passing them separately
 	// and risking one being forgotten.
@@ -137,6 +153,7 @@ export function useFilesTabBridge({
 			const startVersion = versionRef.current;
 			const startTreeRevision = treeRevisionRef.current;
 			let shouldRetry = false;
+			let retryDelayMs = 0;
 			const promise = (async () => {
 				try {
 					const result = await utils.filesystem.listDirectory.fetch({
@@ -150,6 +167,7 @@ export function useFilesTabBridge({
 						shouldRetry = versionRef.current === startVersion;
 						return;
 					}
+					fetchFailuresRef.current.delete(relDir);
 					const ops: { type: "add"; path: string }[] = [];
 					for (const entry of result.entries) {
 						const rel = toRel(rootPath, entry.absolutePath);
@@ -180,6 +198,15 @@ export function useFilesTabBridge({
 						relDir,
 						error,
 					});
+					const attempt = (fetchFailuresRef.current.get(relDir) ?? 0) + 1;
+					fetchFailuresRef.current.set(relDir, attempt);
+					if (attempt <= FETCH_RETRY_MAX_ATTEMPTS) {
+						shouldRetry = true;
+						retryDelayMs = Math.min(
+							FETCH_RETRY_BASE_MS * 2 ** (attempt - 1),
+							FETCH_RETRY_MAX_MS,
+						);
+					}
 				}
 			})();
 			inflightDirsRef.current.set(relDir, promise);
@@ -195,14 +222,22 @@ export function useFilesTabBridge({
 				// Root is always relevant. Nested directories are retried only when
 				// they still exist at the same path and remain expanded; a renamed or
 				// removed directory must not produce a request against its old path.
-				if (relDir === "") {
-					void fetchDirectory(relDir);
-					return;
+				const retryIfStillRelevant = () => {
+					if (versionRef.current !== startVersion) return;
+					if (relDir === "") {
+						if (!loadedDirsRef.current.has("")) void fetchDirectory(relDir);
+						return;
+					}
+					const dirKey = `${relDir}/`;
+					if (!knownPathsRef.current.has(dirKey)) return;
+					const handle = asDirectoryHandle(model.getItem(dirKey));
+					if (handle?.isExpanded()) void fetchDirectory(relDir);
+				};
+				if (retryDelayMs > 0) {
+					setTimeout(retryIfStillRelevant, retryDelayMs);
+				} else {
+					retryIfStillRelevant();
 				}
-				const dirKey = `${relDir}/`;
-				if (!knownPathsRef.current.has(dirKey)) return;
-				const handle = asDirectoryHandle(model.getItem(dirKey));
-				if (handle?.isExpanded()) void fetchDirectory(relDir);
 			});
 			return promise;
 		},
@@ -215,9 +250,13 @@ export function useFilesTabBridge({
 		const startVersion = versionRef.current;
 		const startTreeRevision = treeRevisionRef.current;
 		try {
-			const dirsToReload = Array.from(loadedDirsRef.current).sort(
-				(a, b) => a.split("/").length - b.split("/").length,
-			);
+			// Always include the root: when the initial load failed (host
+			// restarting, relay flap) nothing is in loadedDirs, and a refresh
+			// that only re-lists loaded dirs would silently do nothing — the
+			// one moment the button matters most.
+			const dirsToReload = Array.from(
+				new Set(["", ...loadedDirsRef.current]),
+			).sort((a, b) => a.split("/").length - b.split("/").length);
 			// Collect fresh listings into a flat set then resetPaths so what
 			// Pierre shows can't drift from what we think we know. Keep the live
 			// loaded-dir set untouched until commit so a stale refresh can abort
@@ -252,6 +291,14 @@ export function useFilesTabBridge({
 						dir,
 						error,
 					});
+					// A transport-level failure (host unreachable mid-refresh) says
+					// nothing about what exists on disk — committing would wipe the
+					// dir's whole subtree from the tree. Abort and keep the current
+					// state instead. Typed errors (e.g. NOT_FOUND for a directory
+					// deleted since it was loaded) legitimately drop the dir.
+					if (isHostServiceConnectionError(error)) {
+						return;
+					}
 				}
 			}
 			if (
@@ -291,9 +338,38 @@ export function useFilesTabBridge({
 		loadedDirsRef.current.clear();
 		inflightDirsRef.current.clear();
 		unloadedDirCandidatesRef.current.clear();
+		fetchFailuresRef.current.clear();
 		model.resetPaths([]);
 		void fetchDir("");
 	}, [model, rootPath, workspaceId, fetchDir, invalidateTreeListings]);
+
+	// Recover listings lost to a host outage. A listing that failed while the
+	// host was down exhausts its retries against a dead socket; when the
+	// connection (re)opens, fetch whatever is still missing — the root when
+	// the initial load never landed, plus any expanded dirs awaiting children.
+	// Without this, the tab sat empty until the user left and re-entered the
+	// workspace (Refresh used to no-op here too — see doRefresh).
+	const hostUrl = useWorkspaceHostUrl(workspaceId || null);
+	useEffect(() => {
+		if (!hostUrl || !workspaceId || !rootPath) return;
+		const bus = getHostEventBus(hostUrl);
+		const releaseRetain = bus.retain();
+		const unsubscribe = bus.subscribeConnectionStatus((status) => {
+			if (status.state !== "open") return;
+			fetchFailuresRef.current.clear();
+			if (!loadedDirsRef.current.has("")) {
+				void fetchDir("");
+			}
+			for (const dirRel of unloadedDirCandidatesRef.current) {
+				const handle = asDirectoryHandle(model.getItem(`${dirRel}/`));
+				if (handle?.isExpanded()) void fetchDir(dirRel);
+			}
+		});
+		return () => {
+			unsubscribe();
+			releaseRetain();
+		};
+	}, [hostUrl, workspaceId, rootPath, model, fetchDir]);
 
 	// On every model change, check only unloaded directory candidates for
 	// expansion. Pierre doesn't surface an explicit "expand" event, so we
