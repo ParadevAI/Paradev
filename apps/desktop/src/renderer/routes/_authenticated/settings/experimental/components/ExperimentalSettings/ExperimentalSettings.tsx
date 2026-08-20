@@ -8,8 +8,8 @@ import {
 import { track } from "renderer/lib/analytics";
 import { HighlightText } from "renderer/routes/_authenticated/settings/components/HighlightText";
 import {
-	useInlineWorkspacePortsEnabled,
 	useInlineWorkspacePortsStore,
+	usePortsDisplayMode,
 } from "renderer/stores/inline-workspace-ports";
 import { useSettingsSearchQuery } from "renderer/stores/settings-state";
 import { useOpenV1ImportModal } from "renderer/stores/v1-import-modal";
@@ -57,9 +57,9 @@ export function ExperimentalSettings({
 	const isV2OnlyUser = useIsV2OnlyUser();
 	const setOptInV2 = useV2LocalOverrideStore((state) => state.setOptInV2);
 	const openV1ImportModal = useOpenV1ImportModal();
-	const inlineWorkspacePortsEnabled = useInlineWorkspacePortsEnabled();
-	const setInlineWorkspacePortsEnabled = useInlineWorkspacePortsStore(
-		(state) => state.setEnabled,
+	const portsDisplayMode = usePortsDisplayMode();
+	const setPortsDisplayMode = useInlineWorkspacePortsStore(
+		(state) => state.setMode,
 	);
 	const workspaceAgentsEnabled = useWorkspaceAgentsRowEnabled();
 	const setWorkspaceAgentsEnabled = useWorkspaceAgentsRowStore(
@@ -143,21 +143,23 @@ export function ExperimentalSettings({
 								className="text-sm font-medium"
 							>
 								<HighlightText
-									text="Inline workspace ports"
+									text="Ports in top bar dropdown"
 									query={searchQuery}
 								/>
 							</Label>
 							<p className="text-xs text-muted-foreground">
 								<HighlightText
-									text="Show detected ports under each workspace in the sidebar instead of a single panel at the bottom."
+									text="Show detected ports as a dropdown in the top bar instead of a chip under each workspace in the sidebar."
 									query={searchQuery}
 								/>
 							</p>
 						</div>
 						<Switch
 							id="inline-workspace-ports"
-							checked={inlineWorkspacePortsEnabled}
-							onCheckedChange={setInlineWorkspacePortsEnabled}
+							checked={portsDisplayMode === "topbar"}
+							onCheckedChange={(checked) =>
+								setPortsDisplayMode(checked ? "topbar" : "inline")
+							}
 						/>
 					</div>
 				)}

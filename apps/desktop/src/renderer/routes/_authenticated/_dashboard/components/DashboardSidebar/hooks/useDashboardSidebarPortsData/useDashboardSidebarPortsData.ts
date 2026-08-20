@@ -26,7 +26,7 @@ export type {
 const PORTS_FALLBACK_REFETCH_INTERVAL_MS = 30_000;
 const PORT_EVENT_CACHE_BATCH_DELAY_MS = 100;
 
-export function useDashboardSidebarPortsData(): {
+export function useDashboardSidebarPortsData(enabled = true): {
 	workspacePortGroups: DashboardSidebarPortGroup[];
 	totalPortCount: number;
 	portLoadErrors: DashboardSidebarPortsLoadError[];
@@ -51,17 +51,32 @@ export function useDashboardSidebarPortsData(): {
 		[allWorkspaces, visibleWorkspaceIds],
 	);
 
+	// Skip per-host queries, polling, and `port:changed` subscriptions when
+	// nothing will render ports (e.g. inline mode with the sidebar collapsed).
+	// `enabled` gates this list directly instead of the caller conditionally
+	// mounting this hook's provider, so toggling it only resubscribes the
+	// effect below rather than remounting the provider's subtree.
 	const hostsToQuery = useMemo(
 		() =>
-			deriveHostPortQueryTargets({
-				activeHostUrl,
-				hosts,
-				machineId,
-				relayUrl,
-				workspaces,
-				fallbackOrganizationId: knownHostsOrgId,
-			}),
-		[activeHostUrl, hosts, knownHostsOrgId, machineId, relayUrl, workspaces],
+			enabled
+				? deriveHostPortQueryTargets({
+						activeHostUrl,
+						hosts,
+						machineId,
+						relayUrl,
+						workspaces,
+						fallbackOrganizationId: knownHostsOrgId,
+					})
+				: [],
+		[
+			enabled,
+			activeHostUrl,
+			hosts,
+			knownHostsOrgId,
+			machineId,
+			relayUrl,
+			workspaces,
+		],
 	);
 
 	const queries = useQueries({
