@@ -10,6 +10,8 @@ import { cn } from "@superset/ui/utils";
 import { useState } from "react";
 import {
 	LuCheck,
+	LuCircle,
+	LuCircleCheck,
 	LuCopy,
 	LuEllipsis,
 	LuPlus,
@@ -86,12 +88,16 @@ function creditsLine(account: UsageAccount): string | null {
 	return null;
 }
 
+const DEFAULT_TITLE =
+	"New agent launches use this account. Relaunch a running agent to switch it.";
+
 function AccountCard({
 	account,
 	onMakeDefault,
 	onSwitchSignIn,
 	onRemove,
 	isSwitching,
+	selectable,
 }: {
 	account: UsageAccount;
 	onMakeDefault: () => void;
@@ -99,14 +105,41 @@ function AccountCard({
 	/** Null on the system-default card — the main login is never removable. */
 	onRemove: (() => void) | null;
 	isSwitching: boolean;
+	/** True when the provider has several accounts, so the cards read as a
+	 * radio group: the default gets a check + accent border, the rest get a
+	 * selectable circle. */
+	selectable: boolean;
 }) {
 	const credits = creditsLine(account);
 	const { copyToClipboard, copied } = useCopyToClipboard();
 	const expiredCommand =
 		account.status === "token_expired" ? switchSignInCommand(account) : null;
 	return (
-		<div className="group rounded-lg border bg-card/40 p-2.5">
+		<div
+			className={cn(
+				"group rounded-lg border bg-card/40 p-2.5",
+				selectable &&
+					account.isDefault &&
+					"border-primary/60 bg-primary/[0.04] ring-1 ring-primary/40",
+			)}
+		>
 			<div className="flex items-baseline gap-1.5">
+				{selectable &&
+					(account.isDefault ? (
+						<span className="shrink-0 self-center" title={DEFAULT_TITLE}>
+							<LuCircleCheck className="size-3.5 text-primary" />
+						</span>
+					) : (
+						<button
+							type="button"
+							className="shrink-0 self-center text-muted-foreground/50 transition-colors hover:text-primary disabled:pointer-events-none"
+							disabled={isSwitching}
+							title="Make default — launch new terminals and agents on this account."
+							onClick={onMakeDefault}
+						>
+							<LuCircle className="size-3.5" />
+						</button>
+					))}
 				<span className="truncate text-xs font-medium">
 					{account.email ?? PROVIDER_LABELS[account.provider]}
 				</span>
@@ -124,38 +157,17 @@ function AccountCard({
 								: "Unavailable"}
 					</span>
 				)}
-				{account.isDefault ? (
-					<span
-						className="rounded bg-primary/15 px-1 text-[9px] font-medium uppercase tracking-wide text-primary"
-						title="New terminals and agents use this account. Existing ones keep theirs."
-					>
-						Default
-					</span>
-				) : (
-					<Button
-						variant="ghost"
-						size="sm"
-						className="h-4 rounded px-1 text-[9px] font-medium uppercase tracking-wide text-muted-foreground opacity-0 transition-opacity focus-visible:opacity-100 group-hover:opacity-100"
-						disabled={isSwitching}
-						title="Launch new terminals and agents on this account. Existing ones keep theirs."
-						onClick={onMakeDefault}
-					>
-						Make default
-					</Button>
-				)}
 				<span className="ml-auto shrink-0 text-[10px] text-muted-foreground">
 					{/* Source label always shows — it is the only thing that tells two
 					    profiles of the same account apart. */}
-					{credits
-						? `${credits} · ${account.sourceLabel}`
-						: account.sourceLabel}
+					{account.sourceLabel}
 				</span>
 				<DropdownMenu modal={false}>
 					<DropdownMenuTrigger asChild>
 						<Button
 							variant="ghost"
 							size="icon"
-							className="size-4 shrink-0 self-center opacity-0 transition-opacity focus-visible:opacity-100 group-hover:opacity-100 data-[state=open]:opacity-100"
+							className="size-4 shrink-0 self-center text-muted-foreground"
 						>
 							<LuEllipsis className="size-3" />
 						</Button>
@@ -205,6 +217,39 @@ function AccountCard({
 					{account.statusDetail ?? "Usage unavailable."}
 				</div>
 			)}
+			{/* The radio + accent border already mark the default when the cards
+			    read as a group; the footer label only carries it for a lone card. */}
+			{(!account.isDefault || !selectable || credits) && (
+				<div className="mt-2 flex items-center gap-2 border-t pt-1.5">
+					{account.isDefault ? (
+						!selectable && (
+							<span
+								className="inline-flex items-center gap-1 text-[10px] font-medium text-primary"
+								title={DEFAULT_TITLE}
+							>
+								<LuCircleCheck className="size-3" />
+								Default for new agents
+							</span>
+						)
+					) : (
+						<Button
+							variant="outline"
+							size="sm"
+							className="h-5 rounded px-1.5 text-[10px]"
+							disabled={isSwitching}
+							title={DEFAULT_TITLE}
+							onClick={onMakeDefault}
+						>
+							Make default
+						</Button>
+					)}
+					{credits && (
+						<span className="ml-auto text-[10px] text-muted-foreground tabular-nums">
+							{credits}
+						</span>
+					)}
+				</div>
+			)}
 		</div>
 	);
 }
@@ -231,10 +276,9 @@ export function UsageView({ hostUrl }: { hostUrl: string | null }) {
 			{
 				onSuccess: () => {
 					toast.success(
-						`New ${PROVIDER_LABELS[account.provider]} terminals and agents will use ${account.email ?? account.sourceLabel}.`,
+						`New ${PROVIDER_LABELS[account.provider]} agents will use ${account.email ?? account.sourceLabel}.`,
 						{
-							description:
-								"Running sessions keep their current account — restart them to switch.",
+							description: "Relaunch running agents to switch them.",
 						},
 					);
 				},
@@ -333,6 +377,7 @@ export function UsageView({ hostUrl }: { hostUrl: string | null }) {
 													: () => setRemoveTarget(account)
 											}
 											isSwitching={setDefault.isPending}
+											selectable={providerAccounts.length > 1}
 										/>
 									))}
 								</div>

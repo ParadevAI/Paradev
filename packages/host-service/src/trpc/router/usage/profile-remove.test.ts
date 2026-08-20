@@ -1,5 +1,13 @@
 import { describe, expect, it } from "bun:test";
-import { homedir } from "node:os";
+import {
+	existsSync,
+	mkdirSync,
+	mkdtempSync,
+	rmSync,
+	symlinkSync,
+	writeFileSync,
+} from "node:fs";
+import { homedir, tmpdir } from "node:os";
 import { join } from "node:path";
 import {
 	assertRemovableProfileDir,
@@ -56,5 +64,36 @@ describe("remove functions refuse protected dirs before touching the disk", () =
 		await expect(removeCodexHome(join(homedir(), ".codex"))).rejects.toThrow(
 			/system-default/,
 		);
+	});
+});
+
+// A provisioned profile links its capability dirs at the default account's
+// (packages/agent-setup/src/provider-profiles.ts). Removing the profile must
+// unlink those, never delete through them.
+describe("removeClaudeProfile with shared-config links", () => {
+	it("leaves the default account's linked dirs intact", async () => {
+		const root = mkdtempSync(join(tmpdir(), "superset-profile-remove-"));
+		try {
+			const sharedSkills = join(root, "default-skills");
+			mkdirSync(join(sharedSkills, "redesign"), { recursive: true });
+			writeFileSync(join(sharedSkills, "redesign", "SKILL.md"), "# redesign");
+
+			// Under the home dir so the removal guards accept it.
+			const profile = mkdtempSync(join(homedir(), ".claude-remove-test-"));
+			try {
+				symlinkSync(sharedSkills, join(profile, "skills"), "dir");
+
+				await removeClaudeProfile(profile);
+
+				expect(existsSync(profile)).toBe(false);
+				expect(existsSync(join(sharedSkills, "redesign", "SKILL.md"))).toBe(
+					true,
+				);
+			} finally {
+				rmSync(profile, { recursive: true, force: true });
+			}
+		} finally {
+			rmSync(root, { recursive: true, force: true });
+		}
 	});
 });

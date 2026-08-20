@@ -2480,8 +2480,8 @@ export async function createTerminalSessionInternal({
 			hostAgentHookUrl: getHostAgentHookUrl(),
 		}),
 		// Usage-tab default account: provider CLIs typed or preset-launched in
-		// this terminal run on the selected login. Baked at spawn — existing
-		// terminals keep the account they started with.
+		// this terminal run on the selected login. Baked at spawn as the fast
+		// path; the agent wrappers re-resolve later switches at launch time.
 		...resolveDefaultAccountTerminalEnv(db),
 	};
 

@@ -30,6 +30,7 @@ import {
 	TerminalAgentStore,
 } from "./terminal-agents";
 import { appRouter } from "./trpc/router";
+import { provisionSelectedAccounts } from "./trpc/router/usage/account-provisioning";
 import {
 	execGh as defaultExecGh,
 	type ExecGh,
@@ -238,6 +239,12 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 			isAuthenticated: true,
 		}).catch((err) => {
 			console.warn("[host-service] archived-workspace reconcile failed:", err);
+		});
+		// Re-share the default account's Claude/Codex config into the selected
+		// provider profiles. Last: it touches no host state the sweeps above
+		// repair, and a slow filesystem must not delay them.
+		await provisionSelectedAccounts(db).catch((err) => {
+			console.warn("[host-service] account provisioning failed:", err);
 		});
 	})();
 

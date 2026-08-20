@@ -1,16 +1,14 @@
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { basename, join } from "node:path";
-import {
-	ensureClaudeManagedHooksAt,
-	ensureCodexManagedHooksAt,
-} from "@superset/agent-setup";
+import { provisionCodexProfile } from "@superset/agent-setup";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { projects, workspaces } from "../../../db/schema";
 import { usageHistoryTask } from "../../../workers/tasks/usage";
 import { protectedProcedure, queryProcedure, router } from "../../index";
 import { offLoop } from "../../off-loop";
+import { provisionClaudeAccount } from "./account-provisioning";
 import { fetchClaudeAccounts, readDefaultLoginEmail } from "./claude";
 import { fetchCodexAccounts } from "./codex";
 import {
@@ -18,7 +16,6 @@ import {
 	setDefaultAccountSelection,
 } from "./default-account";
 import { removeClaudeProfile, removeCodexHome } from "./profile-remove";
-import { seedClaudeProfileOnboarding } from "./profile-seed";
 import { discoverClaudeProfiles, discoverCodexHomes } from "./profiles";
 import type { UsageAccount } from "./types";
 
@@ -146,22 +143,22 @@ export const usageRouter = router({
 				}
 			}
 			setDefaultAccountSelection(ctx.db, input.provider, input.selection);
-			// Secondary profiles read hooks from their own dir, so agents launched
-			// there would otherwise lose lifecycle/status reporting; fresh Claude
-			// profiles also need onboarding marked done or the first launch runs
-			// the first-boot wizard. Best-effort: a failed merge must not undo
-			// the switch.
+			// A profile dir is a whole config root, not just a login: without
+			// provisioning, agents launched there lose the user's skills,
+			// plugins, MCP servers and settings along with Superset's lifecycle
+			// hooks — and, for Claude, the shared session history. Best-effort —
+			// a failed share must not undo the switch, and provisioning retries
+			// on the next switch and at host boot.
 			if (input.selection !== null) {
 				try {
-					if (input.provider === "claude") {
-						ensureClaudeManagedHooksAt(input.selection);
-						seedClaudeProfileOnboarding(input.selection);
-					} else {
-						ensureCodexManagedHooksAt(input.selection);
-					}
-				} catch {
-					// Agents still run without hooks; provisioning retries on the
-					// next switch.
+					await (input.provider === "claude"
+						? provisionClaudeAccount(input.selection)
+						: provisionCodexProfile(input.selection));
+				} catch (error) {
+					console.warn(
+						`[host-service] provisioning ${input.provider} account ${input.selection} failed (continuing):`,
+						error,
+					);
 				}
 			}
 			return { success: true as const };
@@ -214,21 +211,33 @@ export const usageRouter = router({
 		}),
 
 	/**
-	 * One-time preparation for a freshly added Claude profile: mark onboarding
-	 * complete so the first agent launch doesn't open the first-boot wizard.
-	 * Only accepts discovered profile dirs.
+	 * Preparation for a freshly added profile: share the default account's
+	 * config into it (and, for Claude, mark onboarding complete), so its first
+	 * agent launch opens the prompt with the user's usual setup instead of the
+	 * first-boot wizard on an empty install. Only accepts discovered profile
+	 * dirs.
 	 */
-	prepareClaudeProfile: protectedProcedure
-		.input(z.object({ configDir: z.string() }))
+	prepareAccount: protectedProcedure
+		.input(
+			z.object({
+				provider: z.enum(["claude", "codex"]),
+				selection: z.string(),
+			}),
+		)
 		.mutation(async ({ input }) => {
-			const profiles = await discoverClaudeProfiles();
-			if (!profiles.some((profile) => profile.configDir === input.configDir)) {
+			const discovered =
+				input.provider === "claude"
+					? (await discoverClaudeProfiles()).map((profile) => profile.configDir)
+					: (await discoverCodexHomes()).map((home) => home.home);
+			if (!discovered.includes(input.selection)) {
 				throw new TRPCError({
 					code: "BAD_REQUEST",
-					message: `No Claude profile found at ${input.configDir}.`,
+					message: `No ${input.provider} profile found at ${input.selection}.`,
 				});
 			}
-			seedClaudeProfileOnboarding(input.configDir);
+			await (input.provider === "claude"
+				? provisionClaudeAccount(input.selection)
+				: provisionCodexProfile(input.selection));
 			return { success: true as const };
 		}),
 

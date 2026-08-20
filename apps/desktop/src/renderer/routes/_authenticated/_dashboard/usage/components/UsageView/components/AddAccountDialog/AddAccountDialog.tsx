@@ -155,13 +155,14 @@ export function AddAccountDialog({
 		}
 		if (found) return;
 
-		const seedProfile = (configDir: string) => {
-			// A fresh (or re-signed) Claude profile may have the CLI's first-boot
-			// wizard armed; mark onboarding done so its first agent launch opens
-			// the prompt.
+		const provisionProfile = (selection: string) => {
+			// Shares the default account's skills, plugins, MCP servers, and
+			// settings into the new profile dir — a bare login there would boot
+			// the CLI on an empty install (and, for Claude, into the first-boot
+			// wizard).
 			if (!hostUrl) return;
 			void getHostServiceClientByUrl(hostUrl)
-				.usage.prepareClaudeProfile.mutate({ configDir })
+				.usage.prepareAccount.mutate({ provider, selection })
 				.catch(() => {});
 		};
 
@@ -174,9 +175,8 @@ export function AddAccountDialog({
 			if (change) {
 				setFound({ selection: null, label: change.label });
 				onAccountAdded();
-				if (switchTarget.provider === "claude" && switchTarget.selection) {
-					seedProfile(switchTarget.selection);
-				}
+				// The system default (null) is the share's source, not a target.
+				if (switchTarget.selection) provisionProfile(switchTarget.selection);
 			}
 			return;
 		}
@@ -184,7 +184,7 @@ export function AddAccountDialog({
 		if (fresh) {
 			setFound(fresh);
 			onAccountAdded();
-			if (provider === "claude") seedProfile(fresh.selection);
+			provisionProfile(fresh.selection);
 		}
 	}, [
 		open,
@@ -225,7 +225,7 @@ export function AddAccountDialog({
 					</DialogTitle>
 					<DialogDescription>
 						{switchDescription ??
-							"Sign in to a second subscription as a separate profile. Your current login is untouched."}
+							"Sign in to a second subscription as a separate profile. Your current login is untouched, and the new profile shares your skills, plugins, MCP servers, and settings."}
 					</DialogDescription>
 				</DialogHeader>
 
