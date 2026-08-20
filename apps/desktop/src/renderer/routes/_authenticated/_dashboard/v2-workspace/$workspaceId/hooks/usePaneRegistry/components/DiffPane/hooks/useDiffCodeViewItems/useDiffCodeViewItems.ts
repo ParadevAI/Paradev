@@ -19,10 +19,8 @@ import type { DiffAnnotationMetadata } from "../useDiffAnnotations";
 
 type GetDiffInput = inferRouterInputs<AppRouter>["git"]["getDiff"];
 type GetDiffBulkInput = inferRouterInputs<AppRouter>["git"]["getDiffBulk"];
-type DiffContent = Omit<
-	inferRouterOutputs<AppRouter>["git"]["getDiffBulk"]["diffs"][number],
-	"path"
->;
+type GetDiffBulkOutput = inferRouterOutputs<AppRouter>["git"]["getDiffBulk"];
+type DiffContent = Omit<GetDiffBulkOutput["diffs"][number], "path">;
 
 interface UseDiffCodeViewItemsOptions {
 	workspaceId: string;
@@ -129,6 +127,18 @@ export function useDiffCodeViewItems({
 		}),
 	});
 
+	// The query key includes each group's full `paths` array, so an ordinary
+	// worktree change (a file added/removed) rotates the key and drops
+	// `query.data` to undefined until the refetch lands. `useQueries` matches
+	// observers to `diffGroups` by array *position*, not by `group.key` — and
+	// a category going from zero files to some (or vice versa) inserts/removes
+	// a whole group, shifting every later group's index. `placeholderData:
+	// keepPreviousData` would then hand back the wrong group's stale data at
+	// that shifted position. Cache the last successful response per
+	// `group.key` instead, so a rotated/shifted query still finds the right
+	// group's prior content — its items stay visible while it refetches.
+	const groupDataCacheRef = useRef(new Map<string, GetDiffBulkOutput>());
+
 	// One lookup per group resolution (not per file, not per render) — keeps
 	// the per-file work below linear in file count instead of the quadratic
 	// rebuild the old per-file `useQueries` produced. `revision` is a hash of
@@ -138,10 +148,15 @@ export function useDiffCodeViewItems({
 	// highlight caches whenever any one file in the group changed.
 	const diffContentByItemId = useMemo(() => {
 		const map = new Map<string, DiffContent & { revision: number }>();
+		const cache = groupDataCacheRef.current;
+		const liveGroupKeys = new Set<string>();
 		diffGroups.forEach((group, index) => {
+			liveGroupKeys.add(group.key);
 			const query = diffGroupQueries[index];
-			if (!query?.data) return;
-			const byPath = new Map(query.data.diffs.map((d) => [d.path, d]));
+			if (query?.data) cache.set(group.key, query.data);
+			const data = query?.data ?? cache.get(group.key);
+			if (!data) return;
+			const byPath = new Map(data.diffs.map((d) => [d.path, d]));
 			for (const member of group.members) {
 				const entry = byPath.get(member.path);
 				if (!entry) continue;
@@ -154,6 +169,11 @@ export function useDiffCodeViewItems({
 				});
 			}
 		});
+		// Drop cached groups that no longer exist so this doesn't grow
+		// unbounded as the user changes base branch or navigates diffs.
+		for (const key of cache.keys()) {
+			if (!liveGroupKeys.has(key)) cache.delete(key);
+		}
 		return map;
 	}, [diffGroups, diffGroupQueries]);
 
