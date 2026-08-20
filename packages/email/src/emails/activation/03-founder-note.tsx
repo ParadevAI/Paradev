@@ -27,13 +27,14 @@ export function ActivationNudge2({
 					running yet.
 				</Text>
 				<Text style={paragraph}>
-					No worries at all — I&apos;m just trying to understand where people
-					get stuck. Was it the download? Setup? Not wanting to point an agent
-					at your repo yet? Just busy?
+					No worries at all, I&apos;m just trying to understand where people get
+					stuck. Was it the download? Setup? Not wanting to point an agent at
+					your repo yet? Just busy?
 				</Text>
 				<Text style={paragraph}>
-					Even a one-line reply helps us a lot. And if you hit something broken,
-					tell me and I&apos;ll get it fixed this week.
+					Even a one-word reply helps: download, setup, trust, or busy. And if
+					you hit something broken, tell me and I&apos;ll get it fixed this
+					week.
 				</Text>
 				<Text style={{ ...paragraph, margin: 0 }}>Kiet</Text>
 			</Body>
