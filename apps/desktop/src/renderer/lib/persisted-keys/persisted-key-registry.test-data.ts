@@ -172,7 +172,7 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 		["superset.terminalRichInputOpen"],
 	],
 	[
-		"src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/AgentCommentComposer/hooks/useDiffCommentTarget/useDiffCommentTarget.ts",
+		"src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/AgentCommentComposer/hooks/useDiffCommentTarget/useDiffCommentTarget.ts",
 		[
 			"lastSelectedDiffCommentNewAgentConfigId",
 			"lastSelectedDiffCommentPlacement",

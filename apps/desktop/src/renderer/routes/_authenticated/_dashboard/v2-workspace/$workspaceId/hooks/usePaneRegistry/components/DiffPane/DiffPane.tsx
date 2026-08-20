@@ -23,7 +23,7 @@ import {
 import { useOpenInExternalEditor } from "../../../useOpenInExternalEditor";
 import { useSidebarDiffRef } from "../../../useSidebarDiffRef";
 import { useViewedFiles } from "../../../useViewedFiles";
-import { AgentCommentComposer } from "./components/AgentCommentComposer";
+import { AgentCommentComposer } from "../AgentCommentComposer";
 import { CommentThread } from "./components/CommentThread";
 import { DiffHeaderMetadata } from "./components/DiffHeaderMetadata";
 import { DiffHeaderPrefix } from "./components/DiffHeaderPrefix";
@@ -254,8 +254,12 @@ export function DiffPane({
 				return (
 					<AgentCommentComposer
 						workspaceId={workspaceId}
-						startLine={m.startLine}
-						endLine={m.endLine}
+						contextLabel={
+							m.startLine === m.endLine
+								? `Line ${m.startLine}`
+								: `Lines ${m.startLine}–${m.endLine}`
+						}
+						placeholder="Ask the AI about these lines…"
 						onCancel={clearComposer}
 						onSubmit={submitComposer}
 					/>

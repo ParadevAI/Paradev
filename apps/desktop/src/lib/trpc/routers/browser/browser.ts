@@ -89,6 +89,54 @@ export const createBrowserRouter = () => {
 				return { result };
 			}),
 
+		// --- Design mode (element picker) ---
+		// Enable injects the picker overlay into the guest; disable cancels any
+		// in-flight selection and removes the overlay.
+		designModeSet: publicProcedure
+			.input(z.object({ paneId: z.string(), enabled: z.boolean() }))
+			.mutation(async ({ input }) => {
+				const ok = await browserManager.setDesignMode(
+					input.paneId,
+					input.enabled,
+				);
+				return { ok };
+			}),
+
+		// Long-lived by design: resolves when the user clicks an element, cancels,
+		// navigates away, or the controller's hard timeout fires.
+		designModeAwaitSelection: publicProcedure
+			.input(z.object({ paneId: z.string(), opId: z.string() }))
+			.mutation(({ input }) => {
+				return browserManager.awaitDesignSelection(input.paneId, input.opId);
+			}),
+
+		designModeCancel: publicProcedure
+			.input(z.object({ paneId: z.string() }))
+			.mutation(({ input }) => {
+				browserManager.cancelDesignSelection(input.paneId);
+				return { success: true };
+			}),
+
+		designModeScreenshot: publicProcedure
+			.input(
+				z.object({
+					paneId: z.string(),
+					rect: z.object({
+						x: z.number(),
+						y: z.number(),
+						width: z.number(),
+						height: z.number(),
+					}),
+				}),
+			)
+			.mutation(async ({ input }) => {
+				const screenshot = await browserManager.captureDesignScreenshot(
+					input.paneId,
+					input.rect,
+				);
+				return { screenshot };
+			}),
+
 		getConsoleLogs: publicProcedure
 			.input(z.object({ paneId: z.string() }))
 			.query(({ input }) => {

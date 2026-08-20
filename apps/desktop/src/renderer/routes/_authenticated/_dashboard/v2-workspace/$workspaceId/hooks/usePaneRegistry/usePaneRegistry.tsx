@@ -46,6 +46,7 @@ import type {
 	PaneViewerData,
 	TerminalPaneData,
 } from "../../types";
+import { focusOrAddTerminalPane } from "../../utils/focusTerminalPane";
 import type { TerminalLauncher } from "../useV2TerminalLauncher";
 import { BrowserPane, BrowserPaneToolbar } from "./components/BrowserPane";
 import { ChatV3Pane } from "./components/ChatV3Pane";
@@ -206,6 +207,13 @@ export function usePaneRegistry({
 			}
 		},
 		[runAgent, store, workspaceId],
+	);
+
+	const focusAgentTerminal = useCallback(
+		(terminalId: string) => {
+			focusOrAddTerminalPane(store, terminalId);
+		},
+		[store],
 	);
 
 	return useMemo<PaneRegistry<PaneViewerData>>(
@@ -492,7 +500,11 @@ export function usePaneRegistry({
 					return "Browser";
 				},
 				renderPane: (ctx: RendererContext<PaneViewerData>) => (
-					<BrowserPane ctx={ctx} />
+					<BrowserPane
+						ctx={ctx}
+						onCreateNewAgentSession={createNewAgentSession}
+						onFocusAgentTerminal={focusAgentTerminal}
+					/>
 				),
 				renderToolbar: (ctx: RendererContext<PaneViewerData>) => (
 					<BrowserPaneToolbar ctx={ctx} />
@@ -587,6 +599,7 @@ export function usePaneRegistry({
 			onOpenFile,
 			onRevealPath,
 			createNewAgentSession,
+			focusAgentTerminal,
 			workspaceTrpcUtils,
 		],
 	);

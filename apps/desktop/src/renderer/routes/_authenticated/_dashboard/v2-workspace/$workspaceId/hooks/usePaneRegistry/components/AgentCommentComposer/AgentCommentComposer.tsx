@@ -19,8 +19,11 @@ export type {
 
 interface AgentCommentComposerProps {
 	workspaceId: string;
-	startLine: number;
-	endLine: number;
+	/** Short description of what the comment is anchored to ("Lines 3–7",
+	 *  a selected element, …), shown in the composer header. */
+	contextLabel: string;
+	placeholder?: string;
+	submitLabel?: string;
 	onCancel: () => void;
 	onSubmit: (input: {
 		comment: string;
@@ -30,8 +33,9 @@ interface AgentCommentComposerProps {
 
 export function AgentCommentComposer({
 	workspaceId,
-	startLine,
-	endLine,
+	contextLabel,
+	placeholder = "Ask the AI…",
+	submitLabel = "Comment",
 	onCancel,
 	onSubmit,
 }: AgentCommentComposerProps) {
@@ -62,10 +66,6 @@ export function AgentCommentComposer({
 		el.setSelectionRange(len, len);
 	}, []);
 
-	const lineLabel =
-		startLine === endLine
-			? `Line ${startLine}`
-			: `Lines ${startLine}–${endLine}`;
 	const canSubmit =
 		comment.trim().length > 0 && !submitting && resolved != null;
 	const showPlacement = resolved?.kind === "new";
@@ -107,8 +107,8 @@ export function AgentCommentComposer({
 			}}
 		>
 			<div className="flex items-center justify-between px-3 pt-2 pb-1">
-				<span className="text-[11px] font-medium tracking-tight text-muted-foreground">
-					{lineLabel}
+				<span className="min-w-0 truncate text-[11px] font-medium tracking-tight text-muted-foreground">
+					{contextLabel}
 				</span>
 				<span className="text-[10px] tracking-tight text-muted-foreground/70">
 					esc to dismiss
@@ -120,7 +120,7 @@ export function AgentCommentComposer({
 					ref={textareaRef}
 					value={comment}
 					onChange={(e) => setComment(e.target.value)}
-					placeholder="Ask the AI about these lines…"
+					placeholder={placeholder}
 					rows={3}
 					className={cn(
 						"block w-full resize-none bg-transparent text-[13px] leading-snug text-foreground",
@@ -130,7 +130,7 @@ export function AgentCommentComposer({
 				/>
 			</div>
 
-			<div className="flex items-center justify-between gap-2 border-t border-border/60 bg-muted/30 px-2.5 py-1.5">
+			<div className="flex flex-wrap items-center justify-between gap-2 border-t border-border/60 bg-muted/30 px-2.5 py-1.5">
 				<AgentPickerSelect
 					value={value}
 					onValueChange={onValueChange}
@@ -167,7 +167,7 @@ export function AgentCommentComposer({
 						{submitting ? (
 							<LuLoaderCircle className="size-3 animate-spin" />
 						) : null}
-						<span>{submitting ? "Sending…" : "Comment"}</span>
+						<span>{submitting ? "Sending…" : submitLabel}</span>
 						{submitting ? null : <KbdEnter />}
 					</Button>
 				</div>

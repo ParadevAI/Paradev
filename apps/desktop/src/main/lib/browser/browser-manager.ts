@@ -1,6 +1,11 @@
 import { EventEmitter } from "node:events";
 import { clipboard, Menu, webContents } from "electron";
 import { safeOpenExternal } from "main/lib/safe-url";
+import type {
+	DesignModeRect,
+	DesignModeScreenshot,
+	DesignModeSelectionResult,
+} from "shared/browser-design-mode";
 import { chordFromInput } from "shared/hotkey-chord";
 import {
 	forwardSessionFor,
@@ -8,6 +13,9 @@ import {
 	shimIds,
 	tagEventSession,
 } from "./cdp-target-shim";
+import { DesignModeController } from "./design-mode-controller";
+import { captureDesignModeScreenshot } from "./design-mode-screenshot";
+import { buildDesignModeScript } from "./design-mode-script";
 
 interface ConsoleEntry {
 	level: "log" | "warn" | "error" | "info" | "debug";
@@ -156,6 +164,7 @@ class BrowserManager extends EventEmitter {
 	// Canonical chords to suppress in the focused guest and forward for the
 	// renderer to replay. Kept override/layout-aware by the renderer.
 	private forwardableChords = new Set<string>();
+	private designMode = new DesignModeController();
 
 	setForwardableChords(chords: string[]): void {
 		this.forwardableChords = new Set(chords);
@@ -222,6 +231,7 @@ class BrowserManager extends EventEmitter {
 			}
 		}
 		this.cdpDetachers.get(paneId)?.();
+		this.designMode.cancel(paneId, "destroyed");
 		this.panes.delete(paneId);
 		this.consoleLogs.delete(paneId);
 		// Tell subscribers when a live wake dies with the pane, so the renderer
@@ -696,6 +706,69 @@ class BrowserManager extends EventEmitter {
 	getConsoleLogs(paneId: string, workspaceId?: string): ConsoleEntry[] {
 		if (!this.getWebContents(paneId, workspaceId)) return [];
 		return this.consoleLogs.get(paneId) ?? [];
+	}
+
+	/**
+	 * Enable/disable design mode on a pane. Enabling injects the element-picker
+	 * overlay into the guest; disabling cancels any in-flight selection and
+	 * tears the overlay down. Re-injection is idempotent.
+	 */
+	async setDesignMode(paneId: string, enabled: boolean): Promise<boolean> {
+		const wc = this.getWebContents(paneId);
+		if (!wc) return false;
+		if (!enabled) {
+			const hadActiveOp = this.designMode.hasActiveOp(paneId);
+			this.designMode.cancel(paneId, "user");
+			// Cancelling an active op already injects the teardown; only a bare
+			// overlay (selection settled, composer showing) still needs one.
+			if (hadActiveOp) return true;
+			try {
+				await wc.executeJavaScript(buildDesignModeScript("teardown"));
+				return true;
+			} catch {
+				return false;
+			}
+		}
+		try {
+			await wc.executeJavaScript(buildDesignModeScript("arm"));
+			return true;
+		} catch {
+			return false;
+		}
+	}
+
+	/** Await one design-mode element selection; resolves exactly once. */
+	awaitDesignSelection(
+		paneId: string,
+		opId: string,
+	): Promise<DesignModeSelectionResult> {
+		const wc = this.getWebContents(paneId);
+		if (!wc) {
+			return Promise.resolve({
+				opId,
+				kind: "error",
+				reason: `No webContents for pane ${paneId}`,
+			});
+		}
+		return this.designMode.awaitSelection(paneId, opId, wc);
+	}
+
+	cancelDesignSelection(paneId: string): void {
+		this.designMode.cancel(paneId, "user");
+	}
+
+	/** Screenshot of the guest cropped to a selected element's viewport rect. */
+	async captureDesignScreenshot(
+		paneId: string,
+		rect: DesignModeRect,
+	): Promise<DesignModeScreenshot | null> {
+		const wc = this.getWebContents(paneId);
+		if (!wc) return null;
+		// capturePageImage brings the agent wake + per-attempt timeout + retry —
+		// a bare capturePage() hangs on a pane that goes hidden mid-capture.
+		return captureDesignModeScreenshot(rect, wc, () =>
+			this.capturePageImage(paneId),
+		);
 	}
 
 	openDevTools(paneId: string): void {
