@@ -7,18 +7,24 @@ import {
 	AlertDialogTitle,
 } from "@superset/ui/alert-dialog";
 import { Button } from "@superset/ui/button";
+import { useEffect } from "react";
 import { getBaseName } from "renderer/lib/pathBasename";
 import { useGitInitConfirmStore } from "renderer/stores/git-init-confirm";
 
 /**
  * Confirms initializing git in a folder the user picked to import that isn't a
  * git repo yet. Driven imperatively by `useGitInitConfirmStore.request()` from
- * the folder-first import flow; mounted once via AddRepositoryModals.
+ * the folder-first import flow; mounted once in the authenticated layout so it
+ * covers every route that can start the flow (dashboard, onboarding, File
+ * menu) — #6666.
  */
 export function GitInitConfirmDialog() {
 	const isOpen = useGitInitConfirmStore((s) => s.isOpen);
 	const repoPath = useGitInitConfirmStore((s) => s.repoPath);
 	const resolve = useGitInitConfirmStore((s) => s.resolve);
+	const registerConsumer = useGitInitConfirmStore((s) => s.registerConsumer);
+
+	useEffect(() => registerConsumer(), [registerConsumer]);
 
 	const folderName = repoPath ? getBaseName(repoPath) : "this folder";
 
