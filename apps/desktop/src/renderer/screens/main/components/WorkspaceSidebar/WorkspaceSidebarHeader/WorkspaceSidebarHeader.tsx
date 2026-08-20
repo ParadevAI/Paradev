@@ -58,6 +58,7 @@ export function WorkspaceSidebarHeader({
 		authorFilter: lastPullRequestsAuthorFilter,
 		reviewFilter: lastPullRequestsReviewFilter,
 		includeClosed: lastPullRequestsIncludeClosed,
+		mergedOnly: lastPullRequestsMergedOnly,
 	} = usePullRequestsFilterStore();
 
 	const handleTasksClick = () => {
@@ -87,6 +88,7 @@ export function WorkspaceSidebarHeader({
 					authorFilter: lastPullRequestsAuthorFilter,
 					reviewFilter: lastPullRequestsReviewFilter,
 					includeClosed: lastPullRequestsIncludeClosed,
+					mergedOnly: lastPullRequestsMergedOnly,
 				}),
 			});
 		});
