@@ -16,19 +16,14 @@ import {
 } from "@superset/shared/host-routing";
 import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
 import { and, count, desc, eq, inArray } from "drizzle-orm";
-import { Resend } from "resend";
 import { z } from "zod";
-import { env } from "../../env";
+import { emitAppFirstOpened } from "../../lib/activation-events";
 import { fetchRelayPresence } from "../../lib/relay-presence";
 import { resolveUserRelayUrl } from "../../lib/relay-url";
 import { jwtProcedure } from "../../trpc";
 
-const resend = new Resend(env.RESEND_API_KEY);
-const FIRST_OPEN_EVENT_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
-
-// Emits `app.first_opened` when a recent signup registers their first host,
-// so the Resend activation automation can branch installed-but-no-workspace
-// users away from the download nudge.
+// Registering a first host means the app is installed and running, so it
+// also marks the user as first-opened for the activation automation.
 async function emitFirstHostEvent(userId: string) {
 	try {
 		const [hostCount] = await db
@@ -41,17 +36,8 @@ async function emitFirstHostEvent(userId: string) {
 			columns: { email: true, createdAt: true },
 			where: eq(users.id, userId),
 		});
-		const isRecentSignup =
-			user &&
-			Date.now() - user.createdAt.getTime() < FIRST_OPEN_EVENT_WINDOW_MS;
-		if (!user || !isRecentSignup) return;
-
-		const { error } = await resend.events.send({
-			event: "app.first_opened",
-			email: user.email,
-			payload: { userId },
-		});
-		if (error) throw new Error(error.message);
+		if (!user) return;
+		await emitAppFirstOpened(user, userId, "host.ensure");
 	} catch (error) {
 		console.error(
 			`[host.ensure] Failed to emit first-open event for ${userId}:`,

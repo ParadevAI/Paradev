@@ -11,6 +11,7 @@ import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
 import { and, count, desc, eq, ne } from "drizzle-orm";
 import { z } from "zod";
 
+import { emitAppFirstOpened } from "../../lib/activation-events";
 import { generateImagePathname, uploadImage } from "../../lib/upload";
 import { protectedProcedure } from "../../trpc";
 
@@ -139,11 +140,22 @@ export const userRouter = {
 	}),
 
 	completeOnboarding: protectedProcedure.mutation(async ({ ctx }) => {
+		const userId = ctx.session.user.id;
+		const existing = await db.query.users.findFirst({
+			columns: { email: true, createdAt: true, onboardedAt: true },
+			where: eq(users.id, userId),
+		});
 		const [updatedUser] = await db
 			.update(users)
 			.set({ onboardedAt: new Date() })
-			.where(eq(users.id, ctx.session.user.id))
+			.where(eq(users.id, userId))
 			.returning();
+		// Onboarding completes inside the installed app, which makes it the
+		// broadest first-opened signal (~84% of signups vs ~5% via v2 host
+		// registration); only the first completion counts.
+		if (existing && !existing.onboardedAt) {
+			await emitAppFirstOpened(existing, userId, "user.completeOnboarding");
+		}
 		return updatedUser;
 	}),
 
