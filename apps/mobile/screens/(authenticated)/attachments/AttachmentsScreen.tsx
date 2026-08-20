@@ -3,10 +3,12 @@ import * as ImagePicker from "expo-image-picker";
 import { Stack, useRouter } from "expo-router";
 import { useEffect } from "react";
 import { Alert, Pressable, View } from "react-native";
-import { usePromptInputAttachments } from "@/components/ai-elements/prompt-input";
+import {
+	imageAssetToAttachment,
+	usePromptInputAttachments,
+} from "@/components/ai-elements/prompt-input";
 import { Text } from "@/components/ui/text";
 import { useTheme } from "@/hooks/useTheme";
-import { useAfterTransitionEnd } from "@/screens/(authenticated)/hooks/useAfterTransitionEnd";
 import { AddSelectedButton } from "./components/AddSelectedButton";
 import { PhotoCarousel } from "./components/PhotoCarousel";
 import { useAttachmentsSelectionStore } from "./stores/attachmentsSelectionStore";
@@ -15,7 +17,6 @@ export function AttachmentsScreen() {
 	const router = useRouter();
 	const theme = useTheme();
 	const attachments = usePromptInputAttachments();
-	const afterTransitionEnd = useAfterTransitionEnd();
 	const selected = useAttachmentsSelectionStore((store) => store.selected);
 	const toggleAsset = useAttachmentsSelectionStore(
 		(store) => store.toggleAsset,
@@ -24,37 +25,37 @@ export function AttachmentsScreen() {
 
 	useEffect(() => clear, [clear]);
 
-	// Pickers present their own view controller; iOS drops the second
-	// presentation unless the sheet's dismissal has fully finished.
-	const runAfterDismiss = (action: () => void) => {
-		afterTransitionEnd(action);
-		router.back();
+	// Pickers present on top of this sheet; dismissing it first loses the
+	// launch (the screen unmounts before its transition events fire).
+	const closeAfter = async (pick: () => Promise<boolean>) => {
+		if (await pick()) router.dismiss();
 	};
 
 	const openCamera = async () => {
 		const permission = await ImagePicker.requestCameraPermissionsAsync();
 		if (!permission.granted) {
 			Alert.alert("Camera access is not allowed");
-			return;
+			return false;
 		}
-		const result = await ImagePicker.launchCameraAsync({ quality: 0.8 });
-		if (result.canceled) return;
-		attachments.add(
-			result.assets.map((asset) => ({
-				mediaType: asset.mimeType,
-				name: asset.fileName ?? undefined,
-				size: asset.fileSize,
-				type: "image" as const,
-				uri: asset.uri,
-			})),
-		);
+		let result: ImagePicker.ImagePickerResult;
+		try {
+			result = await ImagePicker.launchCameraAsync({ quality: 0.8 });
+		} catch {
+			// Rejects where there is no camera (simulator).
+			Alert.alert("Camera is not available");
+			return false;
+		}
+		if (result.canceled) return false;
+		const items = await Promise.all(result.assets.map(imageAssetToAttachment));
+		attachments.add(items.filter((item) => item !== null));
+		return true;
 	};
 
 	const mainRows = [
 		{
 			icon: "images-outline" as const,
 			label: "Photos",
-			onPress: () => runAfterDismiss(() => void attachments.openImagePicker()),
+			onPress: () => void closeAfter(attachments.openImagePicker),
 		},
 		{
 			icon: "scan-outline" as const,
@@ -65,12 +66,12 @@ export function AttachmentsScreen() {
 		{
 			icon: "camera-outline" as const,
 			label: "Camera",
-			onPress: () => runAfterDismiss(() => void openCamera()),
+			onPress: () => void closeAfter(openCamera),
 		},
 		{
 			icon: "document-outline" as const,
 			label: "Files",
-			onPress: () => runAfterDismiss(() => void attachments.openFilePicker()),
+			onPress: () => void closeAfter(attachments.openFilePicker),
 		},
 	];
 
