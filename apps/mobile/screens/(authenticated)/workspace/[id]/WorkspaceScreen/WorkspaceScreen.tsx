@@ -1,6 +1,11 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { CloudOff, Plus, SquareTerminal } from "lucide-react-native";
+import {
+	CloudOff,
+	Plus,
+	SquareTerminal,
+	TriangleAlert,
+} from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
 	ActivityIndicator,
@@ -13,6 +18,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
+import { getHostWorkspacesQueryKey } from "@/hooks/useHostWorkspaces";
 import { useWorkspaceHost } from "@/hooks/useWorkspaceHost";
 import {
 	getHostServiceClientByUrl,
@@ -25,6 +31,8 @@ import {
 import type { GlassComposerHandle } from "@/screens/(authenticated)/components/GlassComposer";
 import { PressableScale } from "@/screens/(authenticated)/components/PressableScale";
 import { useAppReviewPrompt } from "@/screens/(authenticated)/hooks/useAppReviewPrompt";
+import { useCreateTerminalWorkspace } from "@/screens/(authenticated)/hooks/useCreateTerminalWorkspace";
+import { usePendingWorkspaceCreatesStore } from "@/screens/(authenticated)/stores/pendingWorkspaceCreatesStore";
 import { useTerminalSeenStore } from "@/screens/(authenticated)/stores/terminalSeenStore";
 import { useTerminalTabOrderStore } from "@/screens/(authenticated)/stores/terminalTabOrderStore";
 import { CloudWorkspaceProvisioningState } from "../components/CloudWorkspaceProvisioningState";
@@ -42,8 +50,11 @@ import {
 	TerminalWebView,
 	type TerminalWebViewHandle,
 } from "../components/TerminalWebView";
+import { useHostCompatibility } from "../hooks/useHostCompatibility";
 import { useWorkspacePullRequests } from "../hooks/useWorkspacePullRequest";
 import { orderTerminalRows } from "../utils/orderTerminalRows";
+import { WorkspaceCreateFailedState } from "./components/WorkspaceCreateFailedState";
+import { WorkspaceCreatingState } from "./components/WorkspaceCreatingState";
 import { WorkspacePlaceholder } from "./components/WorkspacePlaceholder";
 
 const NOTICE_MS = 1500;
@@ -54,6 +65,12 @@ const headerOptions = {
 	headerShadowVisible: false,
 	fullScreenGestureEnabled: false,
 } as const;
+
+const PENDING_CREATE_POLL_MS = 2_000;
+/** Worktree add + base fetch on monorepo-scale repos; failed state past this. */
+const PENDING_CREATE_ROW_TIMEOUT_MS = 5 * 60_000;
+/** The row landed but the launched agent never produced a session. */
+const PENDING_CREATE_SESSION_TIMEOUT_MS = 60_000;
 
 const STATE_BANNERS: Partial<Record<TerminalConnectionState, string>> = {
 	connecting: "Connecting…",
@@ -106,9 +123,107 @@ export function WorkspaceScreen() {
 		return rows[0]?.terminalId ?? null;
 	}, [pickedTerminalId, params.tab, rows]);
 
+	// --- pending create (enqueued via `workspaces.createEnqueued`) ---
+	// The settled event only exists on the desktop's event bus, so poll the
+	// creating host until the row and its first session appear.
+	const pendingCreate = usePendingWorkspaceCreatesStore((state) =>
+		id ? state.pendingById[id] : undefined,
+	);
+	const clearPendingCreate = usePendingWorkspaceCreatesStore(
+		(state) => state.clear,
+	);
+	const failPendingCreate = usePendingWorkspaceCreatesStore(
+		(state) => state.fail,
+	);
+	const createWorkspace = useCreateTerminalWorkspace();
+	const isCreating =
+		!!pendingCreate && !pendingCreate.error && rows.length === 0;
+	const workspaceResolved = workspace !== null;
+	const createFailed =
+		!!pendingCreate?.error && !workspaceResolved && rows.length === 0;
+
+	// Poll through the failed state too: a relay timeout can reject a create
+	// the host actually finished, and the row arriving is what heals it.
+	const pollingActive = isCreating || createFailed;
+	useEffect(() => {
+		if (!pollingActive || !pendingCreate) return;
+		const interval = setInterval(() => {
+			void queryClient.invalidateQueries({
+				queryKey: getHostWorkspacesQueryKey(
+					pendingCreate.hostId,
+					pendingCreate.hostUrl,
+				),
+			});
+			void queryClient.invalidateQueries({
+				queryKey: getHostTerminalsQueryKey(pendingCreate.hostId),
+			});
+		}, PENDING_CREATE_POLL_MS);
+		return () => clearInterval(interval);
+	}, [pollingActive, pendingCreate, queryClient]);
+
+	// The launched session arrived — the create is done for this screen.
+	useEffect(() => {
+		if (pendingCreate && !pendingCreate.error && rows.length > 0) {
+			clearPendingCreate(pendingCreate.workspaceId);
+		}
+	}, [pendingCreate, rows.length, clearPendingCreate]);
+
+	// The create "failed" but the workspace actually exists (e.g. a legacy
+	// synchronous create that timed out at the relay while the host finished
+	// anyway) — the real workspace wins over the failed state.
+	useEffect(() => {
+		if (pendingCreate?.error && workspaceResolved) {
+			clearPendingCreate(pendingCreate.workspaceId);
+		}
+	}, [pendingCreate, workspaceResolved, clearPendingCreate]);
+
+	// No row within the backstop: the create died host-side and there is no
+	// event channel to say so. Resolve to the failed state rather than spin.
+	useEffect(() => {
+		if (!pendingCreate || pendingCreate.error || workspaceResolved) return;
+		const workspaceId = pendingCreate.workspaceId;
+		const remaining = Math.max(
+			0,
+			pendingCreate.startedAt + PENDING_CREATE_ROW_TIMEOUT_MS - Date.now(),
+		);
+		const timer = setTimeout(() => {
+			failPendingCreate(
+				workspaceId,
+				"Timed out waiting for the host to create the workspace.",
+			);
+		}, remaining);
+		return () => clearTimeout(timer);
+	}, [pendingCreate, workspaceResolved, failPendingCreate]);
+
+	// Row landed but no session followed (agent failed to launch): fall
+	// through to the regular empty state instead of spinning.
+	useEffect(() => {
+		if (!pendingCreate || pendingCreate.error || !workspaceResolved) return;
+		const workspaceId = pendingCreate.workspaceId;
+		const timer = setTimeout(
+			() => clearPendingCreate(workspaceId),
+			PENDING_CREATE_SESSION_TIMEOUT_MS,
+		);
+		return () => clearTimeout(timer);
+	}, [pendingCreate, workspaceResolved, clearPendingCreate]);
+
+	// Retry mints a fresh id and re-enters Creating via replace, so back
+	// never returns to the dead failed state (desktop's `replace: true`).
+	const retryCreate = useCallback(() => {
+		if (!pendingCreate) return;
+		clearPendingCreate(pendingCreate.workspaceId);
+		createWorkspace.mutate({ ...pendingCreate.input, replace: true });
+	}, [pendingCreate, clearPendingCreate, createWorkspace]);
+
+	const dismissFailedCreate = useCallback(() => {
+		if (pendingCreate) clearPendingCreate(pendingCreate.workspaceId);
+		router.back();
+	}, [pendingCreate, clearPendingCreate, router]);
+
 	const hostUrl = host
 		? hostServiceUrl(host.organizationId, host.machineId)
 		: null;
+	const hostCompatibility = useHostCompatibility(hostUrl);
 
 	// The + sheet lands back here via dismissTo with the new session in
 	// ?tab= — adopt it over any manual pick so the fresh tab activates.
@@ -263,7 +378,10 @@ export function WorkspaceScreen() {
 	);
 
 	const banner = STATE_BANNERS[connectionState];
-	const showComposer = activeTerminalId !== null && host !== null;
+	const showComposer =
+		activeTerminalId !== null &&
+		host !== null &&
+		!hostCompatibility.incompatible;
 
 	const attachmentTarget = useMemo(
 		() =>
@@ -272,6 +390,36 @@ export function WorkspaceScreen() {
 				: null,
 		[id, hostUrl, workspace],
 	);
+
+	// Full-body takeover while the enqueued create is unresolved — the
+	// mobile equivalent of desktop's layout gate: same route, no navigation,
+	// and none of the chrome that assumes a workspace exists (tab strip,
+	// composer, sheets). The native header stays so back keeps working.
+	if ((isCreating || createFailed) && pendingCreate) {
+		const subtitle = `${pendingCreate.input.target.projectName} · ${pendingCreate.input.branchLabel}`;
+		return (
+			<View className="bg-background flex-1">
+				<Stack.Screen options={{ ...headerOptions, title: "New workspace" }} />
+				{createFailed ? (
+					<WorkspaceCreateFailedState
+						subtitle={subtitle}
+						errorMessage={pendingCreate.error ?? ""}
+						prompt={pendingCreate.input.message.text.trim()}
+						onRetry={retryCreate}
+						onDismiss={dismissFailedCreate}
+					/>
+				) : (
+					<WorkspaceCreatingState
+						subtitle={subtitle}
+						agentLabel={pendingCreate.input.agentLabel}
+						startedAt={pendingCreate.startedAt}
+						workspaceResolved={workspaceResolved}
+						onBackHome={() => router.back()}
+					/>
+				)}
+			</View>
+		);
+	}
 
 	return (
 		<View className="bg-background flex-1">
@@ -349,7 +497,15 @@ export function WorkspaceScreen() {
 					marginBottom: showComposer ? composerHeight + composerBottom : 0,
 				}}
 			>
-				{activeTerminalId && host && id ? (
+				{hostCompatibility.incompatible ? (
+					<WorkspacePlaceholder
+						body={`${host?.name ?? "This host"} is running host service ${hostCompatibility.hostVersion} — this app needs ${hostCompatibility.minVersion} or newer. Update Superset on that machine.`}
+						icon={TriangleAlert}
+						onRefresh={onRefresh}
+						refreshing={refreshing}
+						title="This host needs an update"
+					/>
+				) : activeTerminalId && host && id ? (
 					<>
 						<TerminalWebView
 							ref={terminalRef}
