@@ -1,4 +1,5 @@
 import { buildHostRoutingKey } from "@superset/shared/host-routing";
+import * as Clipboard from "expo-clipboard";
 import {
 	forwardRef,
 	useCallback,
@@ -7,7 +8,7 @@ import {
 	useMemo,
 	useRef,
 } from "react";
-import { AppState } from "react-native";
+import { AppState, Linking } from "react-native";
 import { WebView, type WebViewMessageEvent } from "react-native-webview";
 import { withUniwind } from "uniwind";
 import { getHostAuthToken, getRelayUrl } from "@/lib/host/client";
@@ -31,6 +32,11 @@ export interface TerminalControlMessage {
 	signal?: number;
 }
 
+export interface TerminalSelectState {
+	active: boolean;
+	hasSelection: boolean;
+}
+
 export interface TerminalWebViewHandle {
 	/** Write raw bytes into the PTY (quick keys, native composers). */
 	sendInput: (data: string) => void;
@@ -38,6 +44,8 @@ export interface TerminalWebViewHandle {
 	focus: () => void;
 	/** Reset the reconnect budget and redial (also the resume path). */
 	retry: () => void;
+	/** Copy the select-mode selection to the clipboard and leave select mode. */
+	copySelection: () => void;
 }
 
 export interface TerminalHost {
@@ -52,25 +60,43 @@ interface TerminalWebViewProps {
 	host: TerminalHost;
 	onStateChange: (state: TerminalConnectionState) => void;
 	onControl: (message: TerminalControlMessage) => void;
+	/** Select mode entered/left, or the selection emptied — drives the
+	 *  native Copy Selection row, which lives outside the WebView. */
+	onSelectChange?: (select: TerminalSelectState) => void;
+	/** Select-mode text landed on the clipboard (either copy path). */
+	onCopied?: () => void;
 }
 
 type PageMessage =
 	| { type: "ready" }
 	| { type: "dial"; id: number; replay: "0" | "1" }
 	| { type: "state"; state: TerminalConnectionState }
-	| { type: "control"; message: TerminalControlMessage };
+	| { type: "control"; message: TerminalControlMessage }
+	| { type: "openUrl"; url: string }
+	| { type: "copy"; text: string }
+	| { type: "select"; active: boolean; hasSelection: boolean };
 
 /**
  * Hosts the xterm.js page (terminalHtml.generated.ts) and speaks its bridge
  * protocol. The WebSocket lives inside the page so PTY output never crosses
  * the RN bridge; this side only signs dial URLs (fresh JWT per attempt, same
- * contract as web's TerminalConnection) and relays UI intents.
+ * contract as web's TerminalConnection), relays UI intents, and lends the
+ * page what a WebView can't do itself: open a tapped link, write the
+ * clipboard from select mode.
  */
 export const TerminalWebView = forwardRef<
 	TerminalWebViewHandle,
 	TerminalWebViewProps
 >(function TerminalWebView(
-	{ workspaceId, terminalId, host, onStateChange, onControl },
+	{
+		workspaceId,
+		terminalId,
+		host,
+		onStateChange,
+		onControl,
+		onSelectChange,
+		onCopied,
+	},
 	ref,
 ) {
 	const webViewRef = useRef<WebView>(null);
@@ -80,6 +106,10 @@ export const TerminalWebView = forwardRef<
 	onStateChangeRef.current = onStateChange;
 	const onControlRef = useRef(onControl);
 	onControlRef.current = onControl;
+	const onSelectChangeRef = useRef(onSelectChange);
+	onSelectChangeRef.current = onSelectChange;
+	const onCopiedRef = useRef(onCopied);
+	onCopiedRef.current = onCopied;
 
 	// Parsing the ~400KB generated module is deferred to first mount instead of
 	// app startup (expo-router requires route modules eagerly).
@@ -150,6 +180,19 @@ export const TerminalWebView = forwardRef<
 				onStateChangeRef.current(message.state);
 			} else if (message.type === "control") {
 				onControlRef.current(message.message);
+			} else if (message.type === "openUrl") {
+				void Linking.openURL(message.url).catch(() => {});
+			} else if (message.type === "copy") {
+				void Clipboard.setStringAsync(message.text).then(
+					() => onCopiedRef.current?.(),
+					// Failed write: stay quiet rather than toast a false "Copied".
+					() => {},
+				);
+			} else if (message.type === "select") {
+				onSelectChangeRef.current?.({
+					active: message.active,
+					hasSelection: message.hasSelection,
+				});
 			}
 		},
 		[buildDialUrl, postToPage],
@@ -180,6 +223,7 @@ export const TerminalWebView = forwardRef<
 			sendInput: (data: string) => postToPage({ type: "input", data }),
 			focus: () => postToPage({ type: "focus" }),
 			retry: () => postToPage({ type: "resume" }),
+			copySelection: () => postToPage({ type: "copySelection" }),
 		}),
 		[postToPage],
 	);
