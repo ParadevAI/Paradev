@@ -1072,6 +1072,42 @@ export const themeListings: ThemeListing[] = [
 			cyan: "#7dcfff",
 		},
 	},
+	{
+		slug: "obsidian",
+		name: "Obsidian",
+		type: "dark",
+		author: "joaobnobre",
+		submittedBy: "joaobnobre",
+		description: "A calm, cool-toned dark theme for focused work.",
+		addedOn: "August 18, 2026",
+		source: {
+			label: "Download",
+			href: "/marketplace/themes/obsidian.json",
+		},
+		tags: ["Dark", "Cool-toned", "Focused"],
+		ui: {
+			background: "oklch(0.1408 0.0044 265)",
+			foreground: "oklch(0.9824 0.0013 265)",
+			card: "oklch(0.1703 0.0085 265)",
+			cardForeground: "oklch(0.9824 0.0013 265)",
+			primary: "oklch(0.9824 0.0013 265)",
+			accent: "oklch(0.2502 0.016 265)",
+			border: "oklch(0.278 0.015 265)",
+			sidebar: "oklch(0.1408 0.0044 265)",
+			sidebarForeground: "oklch(0.9824 0.0013 265)",
+		},
+		terminal: {
+			background: "oklch(0.1408 0.0044 265)",
+			foreground: "oklch(0.9824 0.0013 265)",
+			cursor: "oklch(0.9824 0.0013 265)",
+			red: "oklch(0.72 0.27 25)",
+			green: "oklch(0.78 0.25 155)",
+			yellow: "oklch(0.82 0.24 85)",
+			blue: "oklch(0.74 0.2 265)",
+			magenta: "oklch(0.72 0.2 315)",
+			cyan: "oklch(0.76 0.15 205)",
+		},
+	},
 ];
 
 function buildIssueUrl(title: string) {
