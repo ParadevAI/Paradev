@@ -16,17 +16,24 @@ export function usePaymentFailedCard({
 	surface: "v1" | "v2";
 }): SidebarCardEntry | null {
 	const { data: session } = authClient.useSession();
-	const { data: activeOrg } = authClient.useActiveOrganization();
 	const { data: activePlan } = cloudTrpc.billing.activePlan.useQuery(undefined);
+	const isFailing = isPaymentFailingStatus(activePlan?.status);
+	// Ownership is judged against the org being billed, which is the org THIS
+	// window shows. The session's active organization is shared by every
+	// window, so its membership could belong to whatever org another window
+	// last switched to. This list is scoped server-side by the window's org header.
+	const { data: members } = cloudTrpc.organization.listMembers.useQuery(
+		{ includeDeactivated: false },
+		{ enabled: isFailing },
+	);
 	const navigate = useNavigate();
 
-	if (!isPaymentFailingStatus(activePlan?.status)) return null;
+	if (!isFailing) return null;
 
 	// Non-owners are rejected by requireBillingOwner at the portal, so they get
 	// the warning without an action that would dead-end.
 	const isOwner =
-		activeOrg?.members?.find((m) => m.userId === session?.user?.id)?.role ===
-		"owner";
+		members?.find((m) => m.userId === session?.user?.id)?.role === "owner";
 
 	return {
 		id: "payment-failed",

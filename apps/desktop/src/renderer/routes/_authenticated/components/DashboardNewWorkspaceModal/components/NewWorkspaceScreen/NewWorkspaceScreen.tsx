@@ -35,13 +35,13 @@ import { LinkedIssuePill } from "renderer/components/LinkedIssuePill";
 import { MarkdownEditor } from "renderer/components/MarkdownEditor";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { resolveHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
+import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useAgentEffortPreference } from "renderer/hooks/useAgentEffortPreference";
 import { useAgentLaunchPreferences } from "renderer/hooks/useAgentLaunchPreferences";
 import { useAgentModelPreference } from "renderer/hooks/useAgentModelPreference";
 import { useRelayUrl } from "renderer/hooks/useRelayUrl";
 import { useV2AgentChoices } from "renderer/hooks/useV2AgentChoices";
 import { track } from "renderer/lib/analytics";
-import { authClient } from "renderer/lib/auth-client";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { showHostServiceUnavailableToast } from "renderer/lib/host-service-unavailable";
 import { SupersetIcon } from "renderer/routes/_authenticated/onboarding/providers/components/SupersetIcon";
@@ -139,8 +139,7 @@ export function NewWorkspaceScreen({
 	const hostService = useLocalHostService();
 	const { activeHostUrl, machineId } = hostService;
 	const relayUrl = useRelayUrl();
-	const { data: session } = authClient.useSession();
-	const activeOrganizationId = session?.session?.activeOrganizationId;
+	const activeOrganizationId = useActiveOrganizationId();
 	const setLastProjectId = useV2WorkspaceCreateDefaultsStore(
 		(state) => state.setLastProjectId,
 	);

@@ -38,7 +38,7 @@ export const createAppRouter = (getWindow: () => BrowserWindow | null) => {
 		browserHistory: createBrowserHistoryRouter(),
 		auth: createAuthRouter(),
 		autoUpdate: createAutoUpdateRouter(),
-		window: createWindowRouter(getWindow),
+		window: createWindowRouter(),
 		projects: createProjectsRouter(getWindow),
 		workspaces: createWorkspacesRouter(),
 		terminal: createTerminalRouter(),
