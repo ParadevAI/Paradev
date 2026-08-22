@@ -1,4 +1,5 @@
 {
+	"$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
 	"name": "superset",
 	"version": "0.3.0",
 	"description": "Use Superset to spawn agents, create workspaces, manage tasks, and schedule automations from Claude Code.",
