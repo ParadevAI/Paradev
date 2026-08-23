@@ -12,6 +12,7 @@ interface NativeComposerRef {
 interface NativeComposerViewProps {
 	ref?: Ref<NativeComposerRef>;
 	placeholder?: string;
+	initialDraft?: string;
 	backdrop?: ComposerBackdrop;
 	attachments?: ComposerAttachment[];
 	selectedModel?: ComposerMenuOption;
@@ -27,6 +28,8 @@ interface NativeComposerViewProps {
 	onChipPress?: (event: { nativeEvent: { id: string } }) => void;
 	onQuickKeyPress?: (event: { nativeEvent: { id: string } }) => void;
 	onHeightChange?: (event: { nativeEvent: { height: number } }) => void;
+	onPaste?: (event: { nativeEvent: { items: ComposerPastedItem[] } }) => void;
+	onDraftChange?: (event: { nativeEvent: { text: string } }) => void;
 	onRemoveAttachment?: (event: { nativeEvent: { id: string } }) => void;
 	onAttachmentPress?: (event: { nativeEvent: { id: string } }) => void;
 	onExpandedChange?: (event: { nativeEvent: { expanded: boolean } }) => void;
@@ -99,6 +102,16 @@ export interface ComposerQuickKey {
 	symbol?: string;
 }
 
+/**
+ * A file or image pasted into the field, already written to disk by the native
+ * side — the tray takes URIs, the same shape the pickers produce.
+ */
+export interface ComposerPastedItem {
+	uri: string;
+	name: string;
+	kind: "image" | "file";
+}
+
 export interface ComposerHandle {
 	/** Empties the draft. */
 	clear: () => void;
@@ -117,6 +130,13 @@ export interface ComposerHandle {
 
 export interface ComposerProps {
 	placeholder?: string;
+	/**
+	 * Whatever this surface had typed when it was last open, put back as the
+	 * composer is set up. Read once by the caller and never changed after: this
+	 * is a starting value, not a binding, and the composer owns its text from
+	 * here on. There is deliberately no `value` prop — see `onDraftChange`.
+	 */
+	initialDraft?: string;
 	backdrop?: ComposerBackdrop;
 	attachments?: ComposerAttachment[];
 	/**
@@ -170,6 +190,20 @@ export interface ComposerProps {
 	 * the caller already tracks and gets a duration and curve for.
 	 */
 	onHeightChange?: (height: number) => void;
+	/**
+	 * Files and images pasted into the field. A plain text field only ever takes
+	 * strings, so the composer owns its text view to offer Paste for these and
+	 * writes them out; adding them to the tray is the caller's job, because the
+	 * tray is the caller's.
+	 */
+	onPaste?: (items: ComposerPastedItem[]) => void;
+	/**
+	 * Every keystroke, so a caller can keep a shadow copy of the draft and put
+	 * it back later. Outward only, like `onHeightChange`: the composer owns its
+	 * text while it is live and takes nothing back mid-edit, which is why there
+	 * is no `value` prop. Restore through the ref at mount instead.
+	 */
+	onDraftChange?: (text: string) => void;
 	onRemoveAttachment?: (id: string) => void;
 	/**
 	 * Fires only for non-image attachments. Images open in the composer's own
@@ -200,6 +234,7 @@ export const Composer = forwardRef<ComposerHandle, ComposerProps>(
 	function Composer(
 		{
 			placeholder = "",
+			initialDraft = "",
 			backdrop = "dim",
 			attachments,
 			selectedModel,
@@ -215,6 +250,8 @@ export const Composer = forwardRef<ComposerHandle, ComposerProps>(
 			onChipPress,
 			onQuickKeyPress,
 			onHeightChange,
+			onPaste,
+			onDraftChange,
 			onRemoveAttachment,
 			onAttachmentPress,
 			onExpandedChange,
@@ -234,6 +271,7 @@ export const Composer = forwardRef<ComposerHandle, ComposerProps>(
 			<NativeComposerView
 				ref={nativeRef}
 				placeholder={placeholder}
+				initialDraft={initialDraft}
 				backdrop={backdrop}
 				attachments={attachments}
 				selectedModel={selectedModel}
@@ -251,6 +289,8 @@ export const Composer = forwardRef<ComposerHandle, ComposerProps>(
 				onChipPress={(event) => onChipPress?.(event.nativeEvent.id)}
 				onQuickKeyPress={(event) => onQuickKeyPress?.(event.nativeEvent.id)}
 				onHeightChange={(event) => onHeightChange?.(event.nativeEvent.height)}
+				onPaste={(event) => onPaste?.(event.nativeEvent.items)}
+				onDraftChange={(event) => onDraftChange?.(event.nativeEvent.text)}
 				onRemoveAttachment={(event) =>
 					onRemoveAttachment?.(event.nativeEvent.id)
 				}

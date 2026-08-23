@@ -14,6 +14,8 @@ public final class ComposerModule: Module {
         "onModelPress",
         "onChipPress",
         "onQuickKeyPress",
+        "onPaste",
+        "onDraftChange",
         "onHeightChange",
         "onRemoveAttachment",
         "onAttachmentPress",
@@ -22,6 +24,12 @@ public final class ComposerModule: Module {
 
       Prop("placeholder") { (view: ComposerAnchorView, placeholder: String) in
         view.overlay.model.placeholder = placeholder
+      }
+
+      /// Whatever this surface had typed when it was last open. Applied once —
+      /// see `ComposerModel.applyInitialDraft`.
+      Prop("initialDraft") { (view: ComposerAnchorView, text: String) in
+        view.overlay.model.applyInitialDraft(text)
       }
 
       Prop("backdrop") { (view: ComposerAnchorView, backdrop: String) in
@@ -83,7 +91,7 @@ public final class ComposerModule: Module {
       /// React Native clears the draft once its own delivery succeeded, so a
       /// failed send keeps what the user typed.
       AsyncFunction("clear") { (view: ComposerAnchorView) in
-        view.overlay.model.setDraft("")
+        view.overlay.model.clearDraft()
       }.runOnQueue(.main)
 
       /// Re-open after something else took first responder — an attachments
@@ -120,6 +128,8 @@ final class ComposerAnchorView: ExpoView {
   private let onModelPress = EventDispatcher()
   private let onChipPress = EventDispatcher()
   private let onQuickKeyPress = EventDispatcher()
+  private let onPaste = EventDispatcher()
+  private let onDraftChange = EventDispatcher()
   private let onHeightChange = EventDispatcher()
   private let onRemoveAttachment = EventDispatcher()
   private let onAttachmentPress = EventDispatcher()
@@ -136,6 +146,16 @@ final class ComposerAnchorView: ExpoView {
     overlay.model.onModelPress = { [weak self] in self?.onModelPress([:]) }
     overlay.model.onQuickKeyPress = { [weak self] id in
       self?.onQuickKeyPress(["id": id])
+    }
+    overlay.model.onPaste = { [weak self] items in
+      self?.onPaste([
+        "items": items.map { item in
+          ["uri": item.uri, "name": item.name, "kind": item.isImage ? "image" : "file"]
+        }
+      ])
+    }
+    overlay.model.onDraftChange = { [weak self] text in
+      self?.onDraftChange(["text": text])
     }
     overlay.model.onHeightChange = { [weak self] height in
       self?.onHeightChange(["height": height])
