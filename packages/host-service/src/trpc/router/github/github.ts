@@ -195,43 +195,56 @@ export const githubRouter = router({
 				});
 			}
 
-			const checks = (pr.statusCheckRollup?.contexts?.nodes ?? []).flatMap(
-				(node) => {
-					if (!node) return [];
-					if (node.__typename === "CheckRun") {
-						return [
-							{
-								name: node.name ?? "Check",
-								status: node.status ?? "COMPLETED",
-								conclusion: node.conclusion ?? null,
-								isRequired: node.isRequired ?? false,
-								startedAt: node.startedAt ?? null,
-								completedAt: node.completedAt ?? null,
-								detailsUrl: node.detailsUrl ?? null,
-							},
-						];
-					}
-					// A commit status has no runtime of its own, only a verdict.
-					return [
-						{
-							name: node.context ?? "Status",
-							status: "COMPLETED",
-							conclusion:
-								node.state === "SUCCESS"
-									? "SUCCESS"
-									: node.state === "PENDING"
-										? null
-										: "FAILURE",
-							isRequired: node.isRequired ?? false,
-							startedAt: null,
-							completedAt: node.createdAt ?? null,
-							detailsUrl: node.targetUrl ?? null,
-						},
-					];
-				},
+			// Both connections page at 100; anything past the first page must be
+			// fetched before grading, or a failing check or open thread there is
+			// silently invisible.
+			const [restThreads, restContexts] = await Promise.all([
+				drainReviewThreads(octokit, input, pr.reviewThreads?.pageInfo),
+				drainCheckContexts(
+					octokit,
+					input,
+					pr.statusCheckRollup?.contexts?.pageInfo,
+				),
+			]);
+			const contextNodes = (pr.statusCheckRollup?.contexts?.nodes ?? []).concat(
+				restContexts,
 			);
 
-			const threads = pr.reviewThreads?.nodes ?? [];
+			const checks = contextNodes.flatMap((node) => {
+				if (!node) return [];
+				if (node.__typename === "CheckRun") {
+					return [
+						{
+							name: node.name ?? "Check",
+							status: node.status ?? "COMPLETED",
+							conclusion: node.conclusion ?? null,
+							isRequired: node.isRequired ?? false,
+							startedAt: node.startedAt ?? null,
+							completedAt: node.completedAt ?? null,
+							detailsUrl: node.detailsUrl ?? null,
+						},
+					];
+				}
+				// A commit status has no runtime of its own, only a verdict.
+				return [
+					{
+						name: node.context ?? "Status",
+						status: "COMPLETED",
+						conclusion:
+							node.state === "SUCCESS"
+								? "SUCCESS"
+								: node.state === "PENDING"
+									? null
+									: "FAILURE",
+						isRequired: node.isRequired ?? false,
+						startedAt: null,
+						completedAt: node.createdAt ?? null,
+						detailsUrl: node.targetUrl ?? null,
+					},
+				];
+			});
+
+			const threads = (pr.reviewThreads?.nodes ?? []).concat(restThreads);
 			const allowed: string[] = [];
 			if (data.repository?.squashMergeAllowed) allowed.push("squash");
 			if (data.repository?.mergeCommitAllowed) allowed.push("merge");
@@ -496,9 +509,49 @@ query($owner: String!, $name: String!, $number: Int!) {
 					}
 				}
 			}
-			reviewThreads(first: 100) { nodes { isResolved isOutdated } }
+			reviewThreads(first: 100) {
+				pageInfo { hasNextPage endCursor }
+				nodes { isResolved isOutdated }
+			}
 			statusCheckRollup {
 				contexts(first: 100) {
+					pageInfo { hasNextPage endCursor }
+					nodes {
+						__typename
+						... on CheckRun {
+							name status conclusion detailsUrl startedAt completedAt
+							isRequired(pullRequestNumber: $number)
+						}
+						... on StatusContext {
+							context state targetUrl createdAt
+							isRequired(pullRequestNumber: $number)
+						}
+					}
+				}
+			}
+		}
+	}
+}`;
+
+const REVIEW_THREADS_PAGE_QUERY = `
+query($owner: String!, $name: String!, $number: Int!, $cursor: String!) {
+	repository(owner: $owner, name: $name) {
+		pullRequest(number: $number) {
+			reviewThreads(first: 100, after: $cursor) {
+				pageInfo { hasNextPage endCursor }
+				nodes { isResolved isOutdated }
+			}
+		}
+	}
+}`;
+
+const CHECK_CONTEXTS_PAGE_QUERY = `
+query($owner: String!, $name: String!, $number: Int!, $cursor: String!) {
+	repository(owner: $owner, name: $name) {
+		pullRequest(number: $number) {
+			statusCheckRollup {
+				contexts(first: 100, after: $cursor) {
+					pageInfo { hasNextPage endCursor }
 					nodes {
 						__typename
 						... on CheckRun {
@@ -564,29 +617,160 @@ interface PullRequestDetailQuery {
 					} | null;
 				} | null)[];
 			} | null;
-			reviewThreads: {
-				nodes: ({ isResolved: boolean; isOutdated: boolean } | null)[];
-			} | null;
+			reviewThreads: ReviewThreadsConnection | null;
 			statusCheckRollup: {
-				contexts: {
-					nodes: ({
-						__typename: string;
-						name?: string;
-						status?: string;
-						conclusion?: string | null;
-						detailsUrl?: string | null;
-						startedAt?: string | null;
-						completedAt?: string | null;
-						context?: string;
-						state?: string;
-						targetUrl?: string | null;
-						createdAt?: string | null;
-						isRequired?: boolean;
-					} | null)[];
-				} | null;
+				contexts: CheckContextsConnection | null;
 			} | null;
 		} | null;
 	} | null;
+}
+
+interface ConnectionPageInfo {
+	hasNextPage: boolean;
+	endCursor: string | null;
+}
+
+interface ReviewThreadNode {
+	isResolved: boolean;
+	isOutdated: boolean;
+}
+
+interface ReviewThreadsConnection {
+	pageInfo: ConnectionPageInfo;
+	nodes: (ReviewThreadNode | null)[];
+}
+
+interface CheckContextNode {
+	__typename: string;
+	name?: string;
+	status?: string;
+	conclusion?: string | null;
+	detailsUrl?: string | null;
+	startedAt?: string | null;
+	completedAt?: string | null;
+	context?: string;
+	state?: string;
+	targetUrl?: string | null;
+	createdAt?: string | null;
+	isRequired?: boolean;
+}
+
+interface CheckContextsConnection {
+	pageInfo: ConnectionPageInfo;
+	nodes: (CheckContextNode | null)[];
+}
+
+interface GithubGraphqlClient {
+	graphql: <T>(query: string, variables: Record<string, unknown>) => Promise<T>;
+}
+
+/**
+ * 100 nodes is GitHub's page cap, not a promise of completeness — a failing
+ * required check or an open thread past the first page would otherwise never
+ * be seen, and the card would grade a partial pull request as ready. Drains
+ * the connection; a handful of round trips at most.
+ */
+// GitHub's own flags are trusted but not absolutely: a stuck cursor from a
+// GitHub-side pagination bug must not turn one detail query into an infinite
+// loop that pins the host and burns the token's rate limit. 20 pages is
+// 2,000 nodes — far past any real pull request.
+const MAX_DRAIN_PAGES = 20;
+
+async function drainReviewThreads(
+	octokit: GithubGraphqlClient,
+	input: { owner: string; repo: string; pullNumber: number },
+	pageInfo: ConnectionPageInfo | undefined,
+): Promise<(ReviewThreadNode | null)[]> {
+	const nodes: (ReviewThreadNode | null)[] = [];
+	let page = pageInfo ?? null;
+	let pages = 0;
+	while (page?.hasNextPage) {
+		// hasNextPage with no cursor would end the loop on a partial set —
+		// the silent truncation this drain exists to remove.
+		if (!page.endCursor) {
+			throw new TRPCError({
+				code: "CONFLICT",
+				message: `GitHub reported more review threads but no cursor for pull request #${input.pullNumber}.`,
+			});
+		}
+		if (++pages > MAX_DRAIN_PAGES) {
+			throw new TRPCError({
+				code: "CONFLICT",
+				message: `Pull request #${input.pullNumber} did not finish paginating review threads after ${MAX_DRAIN_PAGES} pages.`,
+			});
+		}
+		const data = await octokit.graphql<{
+			repository: {
+				pullRequest: { reviewThreads: ReviewThreadsConnection | null } | null;
+			} | null;
+		}>(REVIEW_THREADS_PAGE_QUERY, {
+			owner: input.owner,
+			name: input.repo,
+			number: input.pullNumber,
+			cursor: page.endCursor,
+		});
+		const connection = data.repository?.pullRequest?.reviewThreads;
+		// A missing page mid-drain would silently re-create the truncation this
+		// drain exists to remove — fail the query instead of grading on less.
+		if (!connection) {
+			throw new TRPCError({
+				code: "CONFLICT",
+				message: `GitHub returned no reviewThreads page for pull request #${input.pullNumber} while paginating.`,
+			});
+		}
+		nodes.push(...connection.nodes);
+		page = connection.pageInfo;
+	}
+	return nodes;
+}
+
+async function drainCheckContexts(
+	octokit: GithubGraphqlClient,
+	input: { owner: string; repo: string; pullNumber: number },
+	pageInfo: ConnectionPageInfo | undefined,
+): Promise<(CheckContextNode | null)[]> {
+	const nodes: (CheckContextNode | null)[] = [];
+	let page = pageInfo ?? null;
+	let pages = 0;
+	while (page?.hasNextPage) {
+		if (!page.endCursor) {
+			throw new TRPCError({
+				code: "CONFLICT",
+				message: `GitHub reported more checks but no cursor for pull request #${input.pullNumber}.`,
+			});
+		}
+		if (++pages > MAX_DRAIN_PAGES) {
+			throw new TRPCError({
+				code: "CONFLICT",
+				message: `Pull request #${input.pullNumber} did not finish paginating checks after ${MAX_DRAIN_PAGES} pages.`,
+			});
+		}
+		const data = await octokit.graphql<{
+			repository: {
+				pullRequest: {
+					statusCheckRollup: {
+						contexts: CheckContextsConnection | null;
+					} | null;
+				} | null;
+			} | null;
+		}>(CHECK_CONTEXTS_PAGE_QUERY, {
+			owner: input.owner,
+			name: input.repo,
+			number: input.pullNumber,
+			cursor: page.endCursor,
+		});
+		const connection =
+			data.repository?.pullRequest?.statusCheckRollup?.contexts;
+		if (!connection) {
+			throw new TRPCError({
+				code: "CONFLICT",
+				message: `GitHub returned no check contexts page for pull request #${input.pullNumber} while paginating.`,
+			});
+		}
+		nodes.push(...connection.nodes);
+		page = connection.pageInfo;
+	}
+	return nodes;
 }
 
 /**
