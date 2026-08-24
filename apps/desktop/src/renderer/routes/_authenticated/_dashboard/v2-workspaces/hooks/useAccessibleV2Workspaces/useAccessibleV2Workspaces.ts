@@ -95,8 +95,6 @@ export interface AccessibleV2Workspace {
 	/** Most recent agent event across the workspace's terminals (epoch ms);
 	 * null when no agent has ever run here. */
 	lastAgentEventAt: number | null;
-	/** Distinct agents bound to this workspace's terminals, most recent first. */
-	agentIds: string[];
 	/** Working-tree + against-base churn; null until the host answers. */
 	diffStats: V2WorkspaceDiffStats | null;
 	/** Non-null = archived tombstone (soft-deleted workspace). */
@@ -698,9 +696,6 @@ export function useAccessibleV2Workspaces(
 				agentStatus: agentActivityByWorkspaceId.get(row.id)?.status ?? "idle",
 				lastAgentEventAt:
 					agentActivityByWorkspaceId.get(row.id)?.lastEventAt ?? null,
-				agentIds: (agentActivityByWorkspaceId.get(row.id)?.agents ?? [])
-					.sort((a, b) => b[1] - a[1])
-					.map(([agentId]) => agentId),
 				diffStats: diffStatsByWorkspaceId.get(row.id) ?? null,
 				archivedAt: row.archivedAt,
 				archiveReason: row.archiveReason,
