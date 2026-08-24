@@ -231,6 +231,17 @@ export const BUILTIN_TERMINAL_AGENTS = [
 		resumeCommand: "fx resume",
 		nonInteractiveCommand: "fx ask --auto",
 	}),
+	createBuiltinTerminalAgent({
+		id: "hermes",
+		label: "Hermes",
+		description:
+			"Nous Research's autonomous agent for coding, research, and terminal workflows.",
+		command: "hermes chat --yolo",
+		promptCommand: "hermes chat --yolo -q",
+		promptCommandSuffix: "; hermes chat --yolo -c",
+		resumeCommand: "hermes chat --yolo -r",
+		nonInteractiveCommand: "hermes chat -q",
+	}),
 ] as const;
 
 export type BuiltinTerminalAgentType =
