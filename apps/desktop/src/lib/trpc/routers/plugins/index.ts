@@ -3,9 +3,12 @@ import { TRPCError } from "@trpc/server";
 import {
 	getBundledSkillContent,
 	getBundledSkillIcons,
+	getBundledSkillPath,
+	getDisabledSkills,
 	getInstalledPlugins,
 	installPlugin,
 	setPluginEnabled,
+	setSkillEnabled,
 	uninstallPlugin,
 } from "main/lib/plugin-installs";
 import { z } from "zod";
@@ -36,11 +39,32 @@ export const createPluginsRouter = () => {
 			return getBundledSkillIcons();
 		}),
 
-		/** SKILL.md body of a bundled managed skill, for the preview modal. */
+		/** SKILL.md body and absolute path of a bundled managed skill, for the preview modal. */
 		getSkillContent: publicProcedure
 			.input(z.object({ name: z.string().min(1) }))
 			.query(({ input }) => {
-				return { content: getBundledSkillContent(input.name) };
+				return {
+					content: getBundledSkillContent(input.name),
+					path: getBundledSkillPath(input.name),
+				};
+			}),
+
+		/** Names of bundled managed skills the user disabled. */
+		getDisabledSkills: publicProcedure.query(() => {
+			return getDisabledSkills();
+		}),
+
+		setSkillEnabled: publicProcedure
+			.input(z.object({ name: z.string().min(1), enabled: z.boolean() }))
+			.mutation(({ input }) => {
+				const disabled = setSkillEnabled(input.name, input.enabled);
+				if (disabled === null) {
+					throw new TRPCError({
+						code: "NOT_FOUND",
+						message: `Unknown skill: ${input.name}`,
+					});
+				}
+				return { disabled };
 			}),
 
 		install: publicProcedure
