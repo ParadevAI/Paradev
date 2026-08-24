@@ -208,6 +208,18 @@ export const BUILTIN_TERMINAL_AGENTS = [
 		resumeCommand: "kiro-cli chat --trust-all-tools --resume-id",
 		nonInteractiveCommand: "kiro-cli chat --no-interactive",
 	}),
+	createBuiltinTerminalAgent({
+		// Google's Antigravity CLI. The id matches the binary name (`agy`), the
+		// same way every other builtin id is the command users type.
+		id: "agy",
+		label: "Antigravity",
+		description:
+			"Google's Antigravity CLI for reasoning, editing, and running code from the terminal.",
+		command: "agy --mode accept-edits",
+		promptCommand: "agy --mode accept-edits -i",
+		resumeCommand: "agy --mode accept-edits --conversation",
+		nonInteractiveCommand: "agy -p",
+	}),
 ] as const;
 
 export type BuiltinTerminalAgentType =
