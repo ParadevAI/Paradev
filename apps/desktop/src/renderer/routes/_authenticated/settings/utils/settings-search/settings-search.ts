@@ -867,6 +867,8 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 			"moonshot",
 			"grok",
 			"xai",
+			"kiro",
+			"aws",
 		],
 	},
 	{
@@ -928,6 +930,8 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 			"moonshot",
 			"grok",
 			"xai",
+			"kiro",
+			"aws",
 		],
 	},
 	{
