@@ -13,6 +13,7 @@ import {
 	getHostServiceClientByUrl,
 	hostServiceUrl,
 } from "@/lib/host-service/client";
+import { posthog } from "@/lib/posthog";
 import { apiClient } from "@/lib/trpc/client";
 import { CLOUD_TARGET_ID } from "@/screens/(authenticated)/(home)/home/components/NewChatWidget/hooks/useNewChatTargets";
 import { useNewSessionPreferencesStore } from "@/screens/(authenticated)/(home)/home/components/NewChatWidget/stores/newSessionPreferencesStore";
@@ -28,7 +29,11 @@ function BranchRow({
 }) {
 	const theme = useTheme();
 	return (
-		<Pressable className="flex-row items-center gap-2 py-2.5" onPress={onPress}>
+		<Pressable
+			className="flex-row items-center gap-2 py-2.5"
+			onPress={onPress}
+			ph-label="new-session-branch-row"
+		>
 			<Text
 				className="flex-1 text-sm"
 				numberOfLines={1}
@@ -119,6 +124,9 @@ export function BranchPickerScreen() {
 
 	const selectAndClose = (branch: string | null) => {
 		setBaseBranch(branch);
+		posthog.capture("new_session_branch_selected", {
+			is_default_branch: branch === null || branch === defaultBranch,
+		});
 		router.back();
 	};
 

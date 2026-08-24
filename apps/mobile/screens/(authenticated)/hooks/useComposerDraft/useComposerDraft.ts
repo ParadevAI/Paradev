@@ -8,10 +8,17 @@ import {
 	imageAssetToAttachment,
 	type PromptInputAttachmentInput,
 } from "@/components/ai-elements/prompt-input";
+import { posthog } from "@/lib/posthog";
 import {
 	EMPTY_DRAFT,
+	HOME_DRAFT_KEY,
 	useComposerDraftsStore,
 } from "@/screens/(authenticated)/stores/composerDraftsStore";
+
+export type AttachmentSource = "camera" | "photos" | "files" | "paste";
+
+const composerName = (key: string) =>
+	key === HOME_DRAFT_KEY ? "home" : "workspace";
 
 /**
  * One composer surface's draft — its text and its attachment tray.
@@ -55,18 +62,26 @@ export function useComposerDraft(key: string) {
 	);
 
 	const add = useCallback(
-		(items: PromptInputAttachmentInput[]) => {
+		(items: PromptInputAttachmentInput[], source: AttachmentSource) => {
 			if (items.length === 0) return;
 			addForKey(
 				key,
 				items.map((item) => ({ ...item, id: createAttachmentId() })),
 			);
+			posthog.capture("attachment_added", {
+				source,
+				count: items.length,
+				composer: composerName(key),
+			});
 		},
 		[key, addForKey],
 	);
 
 	const remove = useCallback(
-		(id: string) => removeForKey(key, id),
+		(id: string) => {
+			removeForKey(key, id);
+			posthog.capture("attachment_removed", { composer: composerName(key) });
+		},
 		[key, removeForKey],
 	);
 
@@ -87,7 +102,10 @@ export function useComposerDraft(key: string) {
 			const items = await Promise.all(
 				result.assets.map(imageAssetToAttachment),
 			);
-			add(items.filter((item) => item !== null));
+			add(
+				items.filter((item) => item !== null),
+				"photos",
+			);
 			return true;
 		} catch {
 			Alert.alert("Could not open Photos");
@@ -99,7 +117,10 @@ export function useComposerDraft(key: string) {
 		try {
 			const result = await DocumentPicker.getDocumentAsync({ multiple: true });
 			if (result.canceled) return false;
-			add(await Promise.all(result.assets.map(documentAssetToAttachment)));
+			add(
+				await Promise.all(result.assets.map(documentAssetToAttachment)),
+				"files",
+			);
 			return true;
 		} catch {
 			Alert.alert("Could not open Files");

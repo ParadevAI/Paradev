@@ -6,6 +6,7 @@ import {
 import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import { Alert, View } from "react-native";
 import type { PromptInputMessage } from "@/components/ai-elements/prompt-input";
+import { posthog } from "@/lib/posthog";
 import { useAttachmentsSheet } from "@/screens/(authenticated)/hooks/useAttachmentsSheet";
 import { useComposerDraft } from "@/screens/(authenticated)/hooks/useComposerDraft";
 import { usePasteAttachments } from "@/screens/(authenticated)/hooks/usePasteAttachments";
@@ -135,6 +136,13 @@ export const TerminalComposer = forwardRef<
 		setIsSubmitting(true);
 		try {
 			await onSubmit(body);
+			posthog.capture("terminal_rich_input_submitted", {
+				workspace_id: workspaceId,
+				message_length: text.trim().length,
+				line_count: text.split("\n").length,
+				has_attachments: allowAttachments && files.length > 0,
+				attachment_count: allowAttachments ? files.length : 0,
+			});
 			// Clear what actually went out, and only that. The text always did.
 			// The tray only did if this session could carry it — a plain shell
 			// submits without attachments, and the draft belongs to the workspace

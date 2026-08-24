@@ -25,6 +25,7 @@ import {
 	getHostServiceClientByUrl,
 	hostServiceUrl,
 } from "@/lib/host-service/client";
+import { posthog } from "@/lib/posthog";
 import {
 	getHostTerminalsQueryKey,
 	useHostTerminals,
@@ -225,6 +226,14 @@ export function WorkspaceScreen() {
 		: null;
 	const hostCompatibility = useHostCompatibility(hostUrl);
 
+	useEffect(() => {
+		if (!id) return;
+		posthog.capture("workspace_opened", {
+			workspace_id: id,
+			source: router.canGoBack() ? "list" : "deeplink",
+		});
+	}, [id, router]);
+
 	// The + sheet lands back here via dismissTo with the new session in
 	// ?tab= — adopt it once its row arrives, since the terminals query hasn't
 	// heard of the session when the sheet closes. Otherwise pin whatever ended
@@ -241,8 +250,14 @@ export function WorkspaceScreen() {
 		(terminalId: string) => {
 			adoptedTabRef.current = params.tab ?? null;
 			setPickedTerminalId(terminalId);
+			if (terminalId !== activeTerminalId) {
+				posthog.capture("session_switched", {
+					workspace_id: id ?? null,
+					source: "tab_strip",
+				});
+			}
 		},
-		[params.tab],
+		[params.tab, activeTerminalId, id],
 	);
 	useEffect(() => {
 		if (
@@ -399,6 +414,15 @@ export function WorkspaceScreen() {
 		},
 		[handleSubmit],
 	);
+
+	useEffect(() => {
+		if (connectionState !== "error" && connectionState !== "denied") return;
+		posthog.capture("terminal_connect_failed", {
+			workspace_id: id ?? null,
+			terminal_id: activeTerminalId,
+			category: connectionState,
+		});
+	}, [connectionState, id, activeTerminalId]);
 
 	const banner = STATE_BANNERS[connectionState];
 	const showComposer =

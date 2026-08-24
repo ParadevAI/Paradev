@@ -11,6 +11,7 @@ import { useOrgHostsQuery } from "@/hooks/useOrgHosts";
 import { useTheme } from "@/hooks/useTheme";
 import { agentIconSource } from "@/lib/agent-icons";
 import { hostServiceUrl } from "@/lib/host-service/client";
+import { posthog } from "@/lib/posthog";
 import { CLOUD_TARGET_ID } from "@/screens/(authenticated)/(home)/home/components/NewChatWidget/hooks/useNewChatTargets";
 import { useNewSessionPreferencesStore } from "@/screens/(authenticated)/(home)/home/components/NewChatWidget/stores/newSessionPreferencesStore";
 import { useHostAgentConfigs } from "@/screens/(authenticated)/hooks/useHostAgentConfigs";
@@ -134,9 +135,13 @@ export function AgentPickerScreen() {
 							key={config.id}
 							onPress={() => {
 								setAgentId(config.presetId);
+								posthog.capture("new_session_agent_selected", {
+									agent: config.presetId,
+								});
 								router.back();
 							}}
 							className="flex-row items-center gap-2.5 py-2.5"
+							ph-label="new-session-agent-row"
 						>
 							<AgentMark
 								agentId={config.iconId ?? config.presetId}

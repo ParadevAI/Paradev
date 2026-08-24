@@ -6,6 +6,7 @@ import { Pressable, ScrollView, View } from "react-native";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { useTheme } from "@/hooks/useTheme";
+import { posthog } from "@/lib/posthog";
 import { ProjectAvatar } from "@/screens/(authenticated)/(home)/filter/components/ProjectAvatar";
 import {
 	type NewChatTarget,
@@ -51,7 +52,12 @@ export function ProjectPickerScreen() {
 	}, [targets]);
 
 	const select = (key: string) => {
+		const picked = targets.find((target) => target.key === key);
 		setTargetKey(key);
+		posthog.capture("new_session_project_selected", {
+			project_id: picked?.projectId ?? null,
+			target_kind: picked?.kind ?? null,
+		});
 		router.back();
 	};
 
@@ -60,6 +66,7 @@ export function ProjectPickerScreen() {
 			key={target.key}
 			onPress={() => select(target.key)}
 			className="flex-row items-center gap-2.5 py-2.5"
+			ph-label="new-session-project-row"
 		>
 			<ProjectAvatar
 				name={target.projectName}

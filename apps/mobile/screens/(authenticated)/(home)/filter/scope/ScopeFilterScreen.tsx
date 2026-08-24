@@ -5,6 +5,7 @@ import { ScrollView } from "react-native";
 import { Icon } from "@/components/ui/icon";
 import { useHostsPresence } from "@/hooks/useHostsPresence";
 import { useOrgHosts } from "@/hooks/useOrgHosts";
+import { posthog } from "@/lib/posthog";
 import { useWorkspacesFilterStore } from "@/screens/(authenticated)/(home)/home/stores/workspacesFilterStore";
 import { useSelectedHost } from "@/screens/(authenticated)/(home)/hooks/useSelectedHost";
 import {
@@ -48,11 +49,13 @@ export function ScopeFilterScreen() {
 
 	const selectHost = (machineId: string) => {
 		setHostFilter(machineId);
+		posthog.capture("filter_applied", { filter: "host", value: "machine" });
 		router.back();
 	};
 
 	const selectCloud = () => {
 		setScopeCloud();
+		posthog.capture("filter_applied", { filter: "host", value: "cloud" });
 		router.back();
 	};
 

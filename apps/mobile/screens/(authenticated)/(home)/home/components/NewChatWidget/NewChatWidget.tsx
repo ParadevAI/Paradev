@@ -8,6 +8,7 @@ import type { PromptInputMessage } from "@/components/ai-elements/prompt-input";
 import type { HostWorkspaceItem } from "@/hooks/useHostWorkspaces";
 import { useSession } from "@/lib/auth/client";
 import { getHostServiceClientByUrl } from "@/lib/host-service/client";
+import { posthog } from "@/lib/posthog";
 import { apiClient } from "@/lib/trpc/client";
 import { useAttachmentsSheet } from "@/screens/(authenticated)/hooks/useAttachmentsSheet";
 import { useComposerDraft } from "@/screens/(authenticated)/hooks/useComposerDraft";
@@ -141,6 +142,20 @@ export function NewChatWidget({
 	};
 
 	const submit = (message: PromptInputMessage) => {
+		posthog.capture("chat_message_sent", {
+			has_attachments: message.attachments.length > 0,
+			attachment_count: message.attachments.length,
+			message_length: message.text.trim().length,
+			draft_restored: initialDraft.length > 0,
+			// A cloud create launches nothing today — the prompt only feeds the
+			// server-side auto-name — so there is no agent to name.
+			agent: chatTarget || !isCloudTarget ? agentId : null,
+			destination: chatTarget
+				? "existing_workspace"
+				: isCloudTarget
+					? "new_cloud_workspace"
+					: "new_workspace",
+		});
 		if (chatTarget) {
 			startWorkspaceTerminal
 				.mutateAsync({ target: chatTarget, message, agentId })
@@ -250,6 +265,14 @@ export function NewChatWidget({
 			onDraftChange={draft.setText}
 			onRemoveAttachment={(id) => draft.remove(id)}
 			onExpandedChange={(expanded) => {
+				// Only where the project/branch/agent rows are live: pinned to a
+				// workspace, expanding the composer starts a message, not a session.
+				if (expanded && !wasExpanded.current && !fixedTarget && !storeTarget) {
+					posthog.capture("new_session_started", {
+						target_kind: selectedTarget?.kind ?? null,
+						agent: isCloudTarget ? null : agentId,
+					});
+				}
 				wasExpanded.current = expanded;
 			}}
 			onPaste={addPasted}

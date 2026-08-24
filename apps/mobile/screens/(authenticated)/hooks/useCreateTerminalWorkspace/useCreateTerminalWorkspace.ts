@@ -5,6 +5,7 @@ import { File } from "expo-file-system";
 import { useRouter } from "expo-router";
 import { getHostWorkspacesQueryKey } from "@/hooks/useHostWorkspaces";
 import { getHostServiceClientByUrl } from "@/lib/host-service/client";
+import { posthog } from "@/lib/posthog";
 import { getHostTerminalsQueryKey } from "@/screens/(authenticated)/(home)/home/hooks/useHostTerminals";
 import {
 	type PendingWorkspaceCreateInput,
@@ -107,12 +108,26 @@ export function useCreateTerminalWorkspace() {
 						queryKey: getHostTerminalsQueryKey(target.machineId),
 					});
 				}
+				// The host emits `workspace_created` itself when the row lands; this
+				// is only the client asking, and counting both would double.
+				posthog.capture("workspace_create_requested", {
+					workspace_id: workspaceId,
+					project_id: target.projectId,
+					host_kind: "remote",
+					source: "mobile_composer",
+					base_branch: baseBranch,
+					agent: agentId,
+				});
 				return { workspaceId };
 			} catch (error) {
-				failPending(
-					workspaceId,
-					error instanceof Error ? error.message : String(error),
-				);
+				const failureReason =
+					error instanceof Error ? error.message : String(error);
+				failPending(workspaceId, failureReason);
+				posthog.capture("workspace_create_failed", {
+					project_id: target.projectId,
+					host_kind: "remote",
+					source: "mobile_composer",
+				});
 				throw error;
 			}
 		},
