@@ -19,6 +19,8 @@ function toThreads(rows: ServerThread[]): CommentThread[] {
 							path: row.anchor.path,
 							tag: row.anchor.tag,
 							text: row.anchorText ?? "",
+							offsetX: row.anchor.offsetX,
+							offsetY: row.anchor.offsetY,
 						},
 						resolved: row.resolved,
 						comments: row.comments.map((comment) => ({
@@ -82,7 +84,12 @@ export function usePageCommentStore({
 					pageId,
 					version,
 					anchorKind: "element",
-					anchor: { path: anchor.path, tag: anchor.tag },
+					anchor: {
+						path: anchor.path,
+						tag: anchor.tag,
+						offsetX: anchor.offsetX,
+						offsetY: anchor.offsetY,
+					},
 					anchorText: anchorText.slice(0, 500) || null,
 					body,
 				});

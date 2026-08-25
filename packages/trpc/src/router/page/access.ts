@@ -12,7 +12,7 @@ export function assertPageWritable(page: SelectPage, userId: string): void {
 	if (page.createdByUserId !== userId) {
 		throw new TRPCError({
 			code: "FORBIDDEN",
-			message: "Only the person who created this page can publish new versions",
+			message: "Only the person who created this page can change it",
 		});
 	}
 }

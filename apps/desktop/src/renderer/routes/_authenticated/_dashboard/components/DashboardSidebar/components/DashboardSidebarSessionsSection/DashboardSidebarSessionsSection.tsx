@@ -78,7 +78,7 @@ export function DashboardSidebarSessionsSection({
 	}
 
 	return (
-		<div className="pb-1">
+		<div className="mt-3 pb-1 first:mt-0">
 			<DashboardSidebarSectionHeader label="Sessions" section="sessions">
 				<Tooltip delayDuration={700}>
 					<TooltipTrigger asChild>

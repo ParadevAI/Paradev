@@ -17,6 +17,7 @@ import {
 	activateAgentThreadsSchema,
 	createPageCommentThreadSchema,
 	deletePageCommentThreadSchema,
+	type ElementAnchor,
 	editPageCommentSchema,
 	listPageCommentsSchema,
 	replyPageCommentSchema,
@@ -146,7 +147,7 @@ export const pageCommentRouter = {
 			return threadRows.map((thread) => ({
 				id: thread.id,
 				anchorKind: thread.anchorKind,
-				anchor: thread.anchor as { path: string; tag: string } | null,
+				anchor: thread.anchor as ElementAnchor | null,
 				anchorText: thread.anchorText,
 				resolved: thread.resolvedAt !== null,
 				createdAt: thread.createdAt,

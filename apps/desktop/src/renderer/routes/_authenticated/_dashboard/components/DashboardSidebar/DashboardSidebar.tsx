@@ -303,9 +303,11 @@ export function DashboardSidebar({
 											onWorkspaceHover={refreshWorkspacePullRequest}
 										/>
 										{!isCollapsed && (
-											<DashboardSidebarBulkActions projects={orderedGroups}>
-												<DashboardSidebarWorkspacesHeader />
-											</DashboardSidebarBulkActions>
+											<div className="mt-3 first:mt-0">
+												<DashboardSidebarBulkActions projects={orderedGroups}>
+													<DashboardSidebarWorkspacesHeader />
+												</DashboardSidebarBulkActions>
+											</div>
 										)}
 										{(isCollapsed || !workspacesListCollapsed) && (
 											<SortableContext

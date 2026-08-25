@@ -65,10 +65,13 @@ import { DiffPaneHeaderExtras } from "./components/DiffPane/components/DiffPaneH
 import { FilePane } from "./components/FilePane";
 import { FilePaneHeaderExtras } from "./components/FilePane/components/FilePaneHeaderExtras";
 import { PagePane } from "./components/PagePane";
+import { PagePaneHeaderExtras } from "./components/PagePaneHeaderExtras";
+import { PagePaneTitle } from "./components/PagePaneTitle";
 import { TerminalPane } from "./components/TerminalPane";
 import { TerminalPaneHeaderExtras } from "./components/TerminalPane/components/TerminalPaneHeaderExtras";
 import { TerminalPaneIcon } from "./components/TerminalPane/components/TerminalPaneIcon";
 import { TerminalSessionDropdown } from "./components/TerminalPane/components/TerminalSessionDropdown";
+import { pagePaneLabel } from "./utils/pagePaneLabel";
 
 function getFileName(filePath: string): string {
 	return getBaseName(filePath);
@@ -587,9 +590,29 @@ export function usePaneRegistry({
 				? {
 						page: {
 							getIcon: () => <FileText className="size-3.5" />,
-							getTitle: (pane) => (pane.data as PagePaneData).title,
+							getTitle: (pane) => pagePaneLabel(pane.data as PagePaneData),
+							renderTitle: (ctx: RendererContext<PaneViewerData>) => (
+								<PagePaneTitle
+									data={ctx.pane.data as PagePaneData}
+									paneId={ctx.pane.id}
+									onClose={() => ctx.actions.close()}
+								/>
+							),
+							renderHeaderExtras: (ctx: RendererContext<PaneViewerData>) => (
+								<PagePaneHeaderExtras
+									data={ctx.pane.data as PagePaneData}
+									paneId={ctx.pane.id}
+									workspaceId={workspaceId}
+								/>
+							),
 							renderPane: (ctx: RendererContext<PaneViewerData>) => (
-								<PagePane data={ctx.pane.data as PagePaneData} />
+								<PagePane
+									data={ctx.pane.data as PagePaneData}
+									paneId={ctx.pane.id}
+									onDataChange={(data) =>
+										ctx.actions.updateData(data as PaneViewerData)
+									}
+								/>
 							),
 							contextMenuActions: (_ctx, defaults) =>
 								defaults.map((d) =>
