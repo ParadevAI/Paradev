@@ -67,6 +67,10 @@ interface TerminalWebViewProps {
 	onSelectChange?: (select: TerminalSelectState) => void;
 	/** Select-mode text landed on the clipboard (either copy path). */
 	onCopied?: () => void;
+	/** A plain tap on the terminal — not a link, not a long-press. The screen
+	 *  uses it to dismiss the keyboard, since no overlay sits above the
+	 *  WebView any more (an overlay would eat scroll drags). */
+	onTap?: () => void;
 	/** The viewport reached or left the bottom of the scrollback — drives the
 	 *  scroll-to-bottom button, which lives outside the WebView. */
 	onScrollChange?: (atBottom: boolean) => void;
@@ -80,6 +84,7 @@ type PageMessage =
 	| { type: "openUrl"; url: string }
 	| { type: "copy"; text: string }
 	| { type: "select"; active: boolean; hasSelection: boolean }
+	| { type: "tap" }
 	| { type: "scroll"; atBottom: boolean };
 
 /**
@@ -102,6 +107,7 @@ export const TerminalWebView = forwardRef<
 		onControl,
 		onSelectChange,
 		onCopied,
+		onTap,
 		onScrollChange,
 	},
 	ref,
@@ -117,6 +123,8 @@ export const TerminalWebView = forwardRef<
 	onSelectChangeRef.current = onSelectChange;
 	const onCopiedRef = useRef(onCopied);
 	onCopiedRef.current = onCopied;
+	const onTapRef = useRef(onTap);
+	onTapRef.current = onTap;
 	const onScrollChangeRef = useRef(onScrollChange);
 	onScrollChangeRef.current = onScrollChange;
 
@@ -202,6 +210,8 @@ export const TerminalWebView = forwardRef<
 					active: message.active,
 					hasSelection: message.hasSelection,
 				});
+			} else if (message.type === "tap") {
+				onTapRef.current?.();
 			} else if (message.type === "scroll") {
 				onScrollChangeRef.current?.(message.atBottom);
 			}

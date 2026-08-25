@@ -715,7 +715,13 @@ const runtimeJs = /* js */ `
 			return;
 		}
 		if (event.type !== "touchend" || Date.now() - touch.at > TAP_MAX_MS) return;
-		if (activateLinkAt(touch.x, touch.y)) event.preventDefault();
+		if (activateLinkAt(touch.x, touch.y)) {
+			event.preventDefault();
+			return;
+		}
+		// A plain tap on the terminal. The app uses it to dismiss the keyboard
+		// now that no overlay sits above the WebView eating scroll drags.
+		post({ type: "tap" });
 	}
 	termEl.addEventListener("touchend", endTermTouch, { passive: false });
 	termEl.addEventListener("touchcancel", endTermTouch, { passive: false });
