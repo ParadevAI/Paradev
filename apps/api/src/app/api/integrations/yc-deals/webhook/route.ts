@@ -106,9 +106,6 @@ async function grantSubscription(
 		eq(members.organizationId, org.id),
 	);
 
-	// The subscription syncs into our subscriptions table through the existing
-	// better-auth Stripe webhook (customer.subscription.created), which
-	// resolves the org by stripeCustomerId. Nothing to write here.
 	const subscription = await stripeClient.subscriptions.create({
 		customer: customerId,
 		items: [
@@ -123,6 +120,25 @@ async function grantSubscription(
 			organizationId: org.id,
 			ycRedemptionId: String(payload.id),
 		},
+	});
+
+	// The better-auth Stripe plugin's customer.subscription.created handler
+	// cannot resolve an org from a customer id (it only does that when the
+	// plugin is configured with `organization.enabled`, which we don't set), so
+	// a subscription created through the API never reaches our table. Write the
+	// row here. Later updates and cancels do reconcile through the plugin,
+	// which finds this row by stripeSubscriptionId.
+	const item = subscription.items.data[0];
+	await db.insert(subscriptions).values({
+		plan: "pro",
+		referenceId: org.id,
+		stripeCustomerId: customerId,
+		stripeSubscriptionId: subscription.id,
+		status: subscription.status,
+		periodStart: item ? new Date(item.current_period_start * 1000) : null,
+		periodEnd: item ? new Date(item.current_period_end * 1000) : null,
+		seats: item?.quantity ?? Math.max(seatCount, 1),
+		billingInterval: item?.price.recurring?.interval ?? "month",
 	});
 
 	return {
