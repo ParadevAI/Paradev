@@ -574,8 +574,8 @@ export function connect(
 	// Recreate per connect so the coalescer always targets the current terminal;
 	// dispose flushes anything the previous socket left pending.
 	transport._writeCoalescer?.dispose();
-	transport._writeCoalescer = createWriteCoalescer((data) =>
-		terminal.write(data),
+	transport._writeCoalescer = createWriteCoalescer((data, done) =>
+		terminal.write(data, done),
 	);
 	setupLiveness(transport);
 	setConnectionState(transport, "connecting");
@@ -661,11 +661,12 @@ function attachSocketListeners(
 		// channel; renderer treats them identically). Pipe straight into xterm.
 		if (data instanceof ArrayBuffer) {
 			// Queue PTY bytes; the coalescer batches them into one xterm.write per
-			// animation frame. There's no output ACK back to host-service:
-			// back-pressure lives entirely on the host side, which bounds this
-			// socket's send buffer and drops us (we reconnect and catch up by
-			// seq) if we fall hopelessly behind. A slow renderer can never wedge
-			// the shell.
+			// animation frame and holds the next batch until xterm reports the
+			// last one parsed. There's no output ACK back to host-service:
+			// socket-level back-pressure lives entirely on the host side, which
+			// bounds this socket's send buffer and drops us (we reconnect and
+			// catch up by seq) if we fall hopelessly behind. A slow renderer can
+			// never wedge the shell.
 			if (transport._seqCounting && transport.seqAnchor) {
 				transport.seqAnchor.seq += data.byteLength;
 			}
