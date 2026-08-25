@@ -1,3 +1,4 @@
+import { resolveAgentLaunchPresetId } from "@superset/shared/agent-models";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { useFeatureFlagEnabled } from "posthog-js/react";
 import { useMemo } from "react";
@@ -33,6 +34,10 @@ export function useV2AgentChoices(
 				// URI); fall back to the preset-implied icon.
 				iconId: config.iconId ?? config.presetId,
 				presetId: config.presetId,
+				launchPresetId: resolveAgentLaunchPresetId(
+					config.presetId,
+					config.command,
+				),
 			}),
 		);
 		return isChatV3Enabled

@@ -27,6 +27,7 @@ import {
 	createKimiWrapper,
 	createMastraHooksJson,
 	createMastraWrapper,
+	createOmpExtension,
 	createOpenCodePlugin,
 	createOpenCodeWrapper,
 	createPiExtension,
@@ -41,6 +42,7 @@ import {
 	removeGrokManagedHooks,
 	removeKimiManagedHooks,
 	removeMastraManagedHooks,
+	removeOmpExtension,
 	removePiExtension,
 	removeVibeManagedHooks,
 } from "./agent-wrappers";
@@ -91,6 +93,10 @@ const AGENT_SETUP_DEFINITIONS: Record<
 	},
 	opencode: {
 		setup: [createOpenCodePlugin, createOpenCodeWrapper],
+	},
+	omp: {
+		setup: [createOmpExtension],
+		teardown: [removeOmpExtension],
 	},
 	pi: {
 		setup: [createPiExtension],
