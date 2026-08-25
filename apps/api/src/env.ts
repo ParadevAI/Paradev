@@ -62,6 +62,12 @@ export const env = createEnv({
 		STRIPE_WEBHOOK_SECRET: z.string(),
 		STRIPE_PRO_MONTHLY_PRICE_ID: z.string(),
 		STRIPE_PRO_YEARLY_PRICE_ID: z.string(),
+		// YC Bookface deal redemption webhook (deal 13843). The route answers
+		// 503 while the secret is unset. The secret lives on the Bookface deal
+		// edit page, under the webhook documentation.
+		YC_DEALS_WEBHOOK_SECRET: z.string().min(1).optional(),
+		YC_BOOKFACE_DEAL_ID: z.coerce.number().default(13843),
+		YC_BOOKFACE_COUPON_ID: z.string().min(1).default("yc-bookface-6mo"),
 		SLACK_BILLING_WEBHOOK_URL: z.string().url(),
 		SENTRY_AUTH_TOKEN: z.string().optional(),
 		// Public Sentry integration (OAuth app). Optional: unset where the app
