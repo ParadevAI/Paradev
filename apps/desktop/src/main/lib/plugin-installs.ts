@@ -100,13 +100,17 @@ function resolveBundledSkillPath(name: string): string | null {
 	return path.join(getBundledPluginDir(), "skills", name, "SKILL.md");
 }
 
-/** SKILL.md body (frontmatter stripped) of a bundled managed skill, for the preview modal. */
+/**
+ * Raw SKILL.md content (including frontmatter) of a bundled managed skill,
+ * for the preview modal. Frontmatter must stay in — the in-app editor's
+ * markdown view splits/reattaches it around edits, so a stripped read here
+ * would delete it on the next save.
+ */
 export function getBundledSkillContent(name: string): string | null {
 	const skillPath = resolveBundledSkillPath(name);
 	if (!skillPath) return null;
 	try {
-		const raw = fs.readFileSync(skillPath, "utf-8");
-		return raw.replace(/^---\n[\s\S]*?\n---\n*/, "");
+		return fs.readFileSync(skillPath, "utf-8");
 	} catch {
 		return null;
 	}
@@ -189,16 +193,30 @@ export function getDisabledSkills(): string[] {
 	return localDb.select().from(settings).get()?.disabledSkills ?? [];
 }
 
-// Serializes the createManagedSkills resyncs triggered by setSkillEnabled so
-// overlapping toggles can't interleave: createManagedSkills does multi-await
-// fs work, and without this a second toggle's resync could finish before the
-// first's, leaving disk state contradicting whichever DB write actually
-// happened last.
+// Serializes the createManagedSkills resyncs triggered by setSkillEnabled and
+// writeBundledSkillContent so overlapping calls can't interleave:
+// createManagedSkills does multi-await fs work, and without this a second
+// call's resync could finish before the first's, leaving disk state
+// contradicting whichever write actually happened last.
 let managedSkillsSyncQueue: Promise<void> = Promise.resolve();
 function queueManagedSkillsSync(disabledSkills: readonly string[]): void {
 	managedSkillsSyncQueue = managedSkillsSyncQueue
-		.catch(() => {}) // a prior failure must not stall later toggles
+		.catch(() => {}) // a prior failure must not stall later syncs
 		.then(() => createManagedSkills({ disabledSkills }));
+}
+
+/**
+ * Overwrites a bundled skill's SKILL.md, then re-provisions it out to
+ * ~/.agents/skills, the Claude plugin mirror, and the slash-command file —
+ * same convention as setSkillEnabled below.
+ */
+export function writeBundledSkillContent(name: string, content: string): void {
+	const skillPath = resolveBundledSkillPath(name);
+	if (!skillPath) {
+		throw new Error(`Unknown skill: ${name}`);
+	}
+	fs.writeFileSync(skillPath, content, "utf-8");
+	queueManagedSkillsSync(resolveDisabledSkillIds(getDisabledSkills()));
 }
 
 /**

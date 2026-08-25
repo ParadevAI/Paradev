@@ -15,24 +15,22 @@ import {
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
 import { toast } from "@superset/ui/sonner";
-import { Spinner } from "@superset/ui/spinner";
 import { Switch } from "@superset/ui/switch";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { XIcon } from "lucide-react";
 import { useRef } from "react";
 import {
-	LuCheck,
 	LuCopy,
 	LuEllipsis,
 	LuExternalLink,
 	LuFolderOpen,
 } from "react-icons/lu";
-import { MarkdownRenderer } from "renderer/components/MarkdownRenderer";
+import { FileEditPane } from "renderer/components/FileEditPane";
 import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
-import { electronTrpc } from "renderer/lib/electron-trpc";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
 import { SkillIcon } from "renderer/routes/_authenticated/_dashboard/plugins/components/SkillIcon";
 import { useSkillMutations } from "../../hooks/useSkillMutations";
+import { useSkillDocument } from "./hooks/useSkillDocument";
 
 interface SkillPreviewDialogProps {
 	skill: { name: string; description: string } | null;
@@ -43,21 +41,16 @@ export function SkillPreviewDialog({
 	skill,
 	onClose,
 }: SkillPreviewDialogProps) {
-	const { data, isLoading } = electronTrpc.plugins.getSkillContent.useQuery(
-		{ name: skill?.name ?? "" },
-		{ enabled: skill !== null },
-	);
+	const { document, path } = useSkillDocument({ name: skill?.name ?? "" });
 	const { disabledSkills, setEnabled, isBusy } = useSkillMutations();
 	const isEnabled = skill !== null && !disabledSkills.has(skill.name);
-	const { copyToClipboard, copied } = useCopyToClipboard();
+	const { copyToClipboard } = useCopyToClipboard();
 	const initialFocusRef = useRef<HTMLDivElement>(null);
 
 	const handleOpen = async () => {
-		if (!data?.path) return;
+		if (!path) return;
 		try {
-			await electronTrpcClient.external.openFileInEditor.mutate({
-				path: data.path,
-			});
+			await electronTrpcClient.external.openFileInEditor.mutate({ path });
 		} catch (error) {
 			toast.error(
 				`Failed to open file: ${error instanceof Error ? error.message : "Unknown error"}`,
@@ -66,9 +59,9 @@ export function SkillPreviewDialog({
 	};
 
 	const handleRevealInFinder = async () => {
-		if (!data?.path) return;
+		if (!path) return;
 		try {
-			await electronTrpcClient.external.openInFinder.mutate(data.path);
+			await electronTrpcClient.external.openInFinder.mutate(path);
 		} catch (error) {
 			toast.error(
 				`Failed to reveal in Finder: ${error instanceof Error ? error.message : "Unknown error"}`,
@@ -77,16 +70,27 @@ export function SkillPreviewDialog({
 	};
 
 	const handleCopyMarkdown = () => {
-		if (!data?.content) return;
-		toast.promise(copyToClipboard(data.content), {
+		if (document.content.kind !== "text") return;
+		toast.promise(copyToClipboard(document.content.value), {
 			success: "Markdown copied",
 			error: (err: unknown) =>
 				`Failed to copy markdown: ${err instanceof Error ? err.message : "Unknown error"}`,
 		});
 	};
 
+	// Simplest safe default for a low-stakes local file: save silently on
+	// close instead of prompting. `document` still reflects the skill that
+	// was open (skill flips to null only after this handler returns).
+	const handleOpenChange = (open: boolean) => {
+		if (open) return;
+		if (document.dirty) {
+			void document.save();
+		}
+		onClose();
+	};
+
 	return (
-		<Dialog open={skill !== null} onOpenChange={(open) => !open && onClose()}>
+		<Dialog open={skill !== null} onOpenChange={handleOpenChange}>
 			{/* Fixed height so every skill opens the same-size modal; content
 			    scrolls. bg-card lifts it off the page background; the sm:
 			    variant is needed to beat the dialog's built-in sm:max-w-lg. */}
@@ -161,23 +165,20 @@ export function SkillPreviewDialog({
 									</Button>
 								</DropdownMenuTrigger>
 								<DropdownMenuContent align="end">
-									<DropdownMenuItem
-										onSelect={handleOpen}
-										disabled={!data?.path}
-									>
+									<DropdownMenuItem onSelect={handleOpen} disabled={!path}>
 										<LuExternalLink className="size-4" />
 										Open
 									</DropdownMenuItem>
 									<DropdownMenuItem
 										onSelect={handleRevealInFinder}
-										disabled={!data?.path}
+										disabled={!path}
 									>
 										<LuFolderOpen className="size-4" />
 										Reveal in Finder
 									</DropdownMenuItem>
 									<DropdownMenuItem
 										onSelect={handleCopyMarkdown}
-										disabled={!data?.content}
+										disabled={document.content.kind !== "text"}
 									>
 										<LuCopy className="size-4" />
 										Copy Markdown
@@ -191,37 +192,10 @@ export function SkillPreviewDialog({
 						</DialogClose>
 					</div>
 				</div>
-				<div className="relative min-h-0 flex-1 overflow-hidden rounded-lg border border-border/60 bg-background">
-					{data?.content && (
-						<Button
-							variant="ghost"
-							size="icon-xs"
-							className="absolute top-2 right-2 z-10 text-muted-foreground"
-							aria-label="Copy markdown"
-							onClick={handleCopyMarkdown}
-						>
-							{copied ? (
-								<LuCheck className="size-4" />
-							) : (
-								<LuCopy className="size-4" />
-							)}
-						</Button>
+				<div className="min-h-0 flex-1 overflow-hidden rounded-lg border border-border/60 bg-background">
+					{skill !== null && (
+						<FileEditPane document={document} filePath={path ?? skill.name} />
 					)}
-					{/* zoom scales the whole markdown type ramp down without fighting
-					    the renderer's own rem-based stylesheet. */}
-					<div className="h-full overflow-y-auto p-4 [zoom:0.85]">
-						{isLoading ? (
-							<div className="flex justify-center py-8">
-								<Spinner className="size-5" />
-							</div>
-						) : data?.content ? (
-							<MarkdownRenderer content={data.content} />
-						) : (
-							<p className="text-sm text-muted-foreground">
-								Could not load this skill's content.
-							</p>
-						)}
-					</div>
 				</div>
 			</DialogContent>
 		</Dialog>
