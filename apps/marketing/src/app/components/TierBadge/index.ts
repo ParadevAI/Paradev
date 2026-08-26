@@ -1,1 +1,7 @@
-export { TIER_NAMES, TierBadge, tierLabel } from "./TierBadge";
+export {
+	TIER_NAMES,
+	TIER_RGB,
+	TierBadge,
+	tierLabel,
+	tierRgb,
+} from "./TierBadge";

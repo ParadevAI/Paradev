@@ -2,6 +2,7 @@ import { COMPANY } from "@superset/shared/constants";
 import type { Metadata } from "next";
 import { Silkscreen } from "next/font/google";
 import Link from "next/link";
+import { FactoryBackdrop } from "@/app/components/FactoryBackdrop";
 import { fetchStandings, fetchStats } from "@/app/utils/fetchLeaderboard";
 import { LeaderboardBoard } from "./components/LeaderboardBoard";
 
@@ -45,6 +46,8 @@ export default async function LeaderboardPage() {
 
 	return (
 		<main className="relative min-h-screen">
+			<FactoryBackdrop />
+
 			<div className="relative max-w-4xl mx-auto px-6 py-10 md:py-14">
 				<header className="text-center pt-6 md:pt-10">
 					<h1

@@ -4,12 +4,15 @@ import { Silkscreen } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { FactoryBackdrop } from "@/app/components/FactoryBackdrop";
 import {
 	buildModelColors,
 	ModelBars,
 	toTokenRows,
 } from "@/app/components/ModelBars";
 import { StatStrip } from "@/app/components/StatStrip";
+import { tierRgb } from "@/app/components/TierBadge";
+import { TierIcon } from "@/app/components/TierIcon";
 import { TierTube } from "@/app/components/TierTube";
 import { TokenSplitBar } from "@/app/components/TokenSplitBar";
 import { avatarUrl } from "@/app/utils/avatarUrl";
@@ -86,8 +89,13 @@ export default async function UserProfilePage({ params }: PageProps) {
 		profile.allTime.tokens,
 	)} tokens of agent usage.`;
 
+	const tier = profile.factory?.tier ?? 0;
+	const tint = tier >= 1 ? tierRgb(tier) : undefined;
+
 	return (
 		<main className="relative min-h-screen">
+			<FactoryBackdrop tint={tint} halfWidth={384} />
+
 			<div className="relative max-w-3xl mx-auto px-6 py-10 md:py-14">
 				<Link
 					href="/leaderboard"
@@ -97,14 +105,31 @@ export default async function UserProfilePage({ params }: PageProps) {
 				</Link>
 
 				<header className="text-center pt-8 md:pt-10">
-					<Image
-						src={avatarUrl(profile.handle)}
-						alt=""
-						width={72}
-						height={72}
-						unoptimized
-						className="size-18 mx-auto rounded-[3px] bg-foreground/[0.04]"
-					/>
+					<div className="relative mx-auto w-fit">
+						<Image
+							src={avatarUrl(profile.handle)}
+							alt=""
+							width={72}
+							height={72}
+							unoptimized
+							className="size-18 rounded-[3px] bg-foreground/[0.04]"
+							style={
+								tint
+									? {
+											boxShadow: `0 0 0 1px rgba(${tint},0.45), 0 0 28px rgba(${tint},0.22)`,
+										}
+									: undefined
+							}
+						/>
+						{tier >= 1 && (
+							<span
+								className="absolute -bottom-2 -right-2 flex size-7 items-center justify-center border border-border bg-background"
+								style={{ color: `rgb(${tint})` }}
+							>
+								<TierIcon tier={tier} size={18} />
+							</span>
+						)}
+					</div>
 					<h1
 						className={`${pixel.className} text-2xl md:text-3xl text-foreground mt-5`}
 					>

@@ -2,6 +2,7 @@ import { COMPANY } from "@superset/shared/constants";
 import type { Metadata } from "next";
 import { Silkscreen } from "next/font/google";
 import Link from "next/link";
+import { FactoryBackdrop } from "@/app/components/FactoryBackdrop";
 import { fetchStats } from "@/app/utils/fetchLeaderboard";
 import { formatDayRange } from "@/app/utils/formatUsage";
 import { StatsBody } from "./components/StatsBody";
@@ -42,7 +43,9 @@ export default async function StatsPage() {
 
 	return (
 		<main className="relative min-h-screen">
-			<div className="max-w-4xl mx-auto px-6 py-10 md:py-14">
+			<FactoryBackdrop />
+
+			<div className="relative max-w-4xl mx-auto px-6 py-10 md:py-14">
 				<header className="text-center pt-6 md:pt-10">
 					<h1
 						className={`${pixel.className} text-3xl md:text-4xl text-foreground`}

@@ -1,11 +1,7 @@
-import { TIER_NAMES } from "@/app/components/TierBadge";
+import { TIER_NAMES, TIER_RGB } from "@/app/components/TierBadge";
+import { TierIcon } from "@/app/components/TierIcon";
 
-const ZONES = [
-	{ tier: 1, rgb: "138,144,153" },
-	{ tier: 2, rgb: "91,157,251" },
-	{ tier: 3, rgb: "63,207,127" },
-	{ tier: 4, rgb: "242,163,60" },
-] as const;
+const ZONES = TIER_RGB.map((rgb, index) => ({ tier: index + 1, rgb }));
 
 const railLeft = (position: number) =>
 	position <= 0 ? 0 : ((position - 0.5) / ZONES.length) * 100;
@@ -121,9 +117,7 @@ export function TierTube({
 									isActive ? "animate-station-pulse" : ""
 								}`}
 								style={{
-									borderColor: reached
-										? `rgb(${rgb})`
-										: "rgba(255,255,255,0.16)",
+									borderColor: reached ? `rgb(${rgb})` : `rgba(${rgb},0.4)`,
 									background: reached ? `rgb(${rgb})` : "transparent",
 									boxShadow: isActive
 										? `0 0 0 4px rgba(${rgb},0.16)`
@@ -160,15 +154,19 @@ export function TierTube({
 								/>
 							)}
 							<div
-								className={`text-xl leading-none ${
-									pixelClassName || "font-mono tracking-tight"
-								}`}
+								className="flex items-center gap-3"
 								style={{
-									color: reached ? `rgb(${rgb})` : undefined,
-									opacity: reached ? 1 : 0.35,
+									color: reached ? `rgb(${rgb})` : `rgba(${rgb},0.38)`,
 								}}
 							>
-								{value}
+								<TierIcon tier={tier} size={27} />
+								<span
+									className={`text-xl leading-none ${
+										pixelClassName || "font-mono tracking-tight"
+									}`}
+								>
+									{value}
+								</span>
 							</div>
 							<div className="font-mono text-[0.65rem] uppercase tracking-[0.12em] text-muted-foreground mt-2">
 								{TIER_NAMES[tier - 1]}
