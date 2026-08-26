@@ -27,7 +27,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { FaGithub } from "react-icons/fa";
-import { LuCheck, LuChevronRight, LuGitBranch } from "react-icons/lu";
+import { LuCheck, LuChevronRight, LuGitBranch, LuPencil } from "react-icons/lu";
 import { VscChevronDown, VscGitMerge } from "react-icons/vsc";
 import { MarkdownRenderer } from "renderer/components/MarkdownRenderer";
 import { useHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
@@ -276,11 +276,11 @@ function PullRequestDetailPage() {
 				    both hidden until they have real functionality wired up. */}
 			</div>
 
-			<div className="flex items-start justify-between gap-3 px-4 pb-3">
+			<div className="flex flex-wrap items-start justify-between gap-3 px-4 pb-3">
 				{isLoading ? (
 					<Skeleton className="h-6 w-72 max-w-full" />
 				) : (
-					<h1 className="min-w-0 select-text truncate text-xl font-semibold leading-tight">
+					<h1 className="min-w-[12rem] flex-1 select-text truncate text-xl font-semibold leading-tight">
 						{data?.title ??
 							(itemNumber === null ? "Pull request" : `#${itemNumber}`)}
 					</h1>
@@ -437,49 +437,53 @@ function PullRequestDetailPage() {
 							{data.author}
 						</span>
 					)}
-					<span aria-hidden>·</span>
-					<span className="shrink-0 font-mono tabular-nums">
-						#{data.number}
+					<span className="inline-flex shrink-0 items-center gap-2">
+						<span aria-hidden>·</span>
+						<span className="font-mono tabular-nums">#{data.number}</span>
 					</span>
-					<span aria-hidden>·</span>
-					<Tooltip delayDuration={1000}>
-						<TooltipTrigger asChild>
-							<button
-								type="button"
-								onClick={() => {
-									copyBranch(data.branch)
-										.then(() => {
-											toast.success("Branch copied", {
-												description: data.branch,
-												icon: (
-													<span className="flex size-4 items-center justify-center rounded-full bg-emerald-500">
-														<LuCheck
-															className="size-2.5 text-white"
-															strokeWidth={3}
-														/>
-													</span>
-												),
+					<span className="inline-flex min-w-0 shrink items-center gap-2">
+						<span aria-hidden>·</span>
+						<Tooltip delayDuration={1000}>
+							<TooltipTrigger asChild>
+								<button
+									type="button"
+									onClick={() => {
+										copyBranch(data.branch)
+											.then(() => {
+												toast.success("Branch copied", {
+													description: data.branch,
+													icon: (
+														<span className="flex size-4 items-center justify-center rounded-full bg-emerald-500">
+															<LuCheck
+																className="size-2.5 text-white"
+																strokeWidth={3}
+															/>
+														</span>
+													),
+												});
+											})
+											.catch(() => {
+												toast.error("Couldn't copy branch name");
 											});
-										})
-										.catch(() => {
-											toast.error("Couldn't copy branch name");
-										});
-								}}
-								className="flex min-w-0 shrink items-center gap-1 font-mono text-muted-foreground hover:text-foreground"
-							>
-								<LuGitBranch className="size-3 shrink-0" />
-								<span className="truncate hover:underline">{data.branch}</span>
-							</button>
-						</TooltipTrigger>
-						<TooltipContent side="bottom">
-							{branchCopied ? "Copied" : "Click to copy"}
-						</TooltipContent>
-					</Tooltip>
+									}}
+									className="flex min-w-0 shrink items-center gap-1 font-mono text-muted-foreground hover:text-foreground"
+								>
+									<LuGitBranch className="size-3 shrink-0" />
+									<span className="truncate hover:underline">
+										{data.branch}
+									</span>
+								</button>
+							</TooltipTrigger>
+							<TooltipContent side="bottom">
+								{branchCopied ? "Copied" : "Click to copy"}
+							</TooltipContent>
+						</Tooltip>
+					</span>
 					{createdAtLabel !== null && (
-						<>
+						<span className="inline-flex shrink-0 items-center gap-2">
 							<span aria-hidden>·</span>
-							<span className="shrink-0">{createdAtLabel}</span>
-						</>
+							<span>{createdAtLabel}</span>
+						</span>
 					)}
 				</div>
 			)}
@@ -633,8 +637,17 @@ function PullRequestDetailPage() {
 				className={cn("min-h-0 flex-1", activeTab !== "summary" && "hidden")}
 			>
 				<ScrollArea className="h-full">
-					<div className="grid w-full gap-8 px-4 py-6 @md:px-6 @4xl:grid-cols-[minmax(0,1fr)_20rem] @4xl:py-8">
-						<article className="min-w-0">
+					<div className="grid w-full gap-8 px-4 pt-3 pb-6 @md:px-6 @md:pt-4 @3xl:grid-cols-[minmax(0,1fr)_20rem] @3xl:pb-8">
+						<article className="group/description relative min-w-0">
+							<a
+								href={data.url}
+								target="_blank"
+								rel="noopener noreferrer"
+								aria-label="Edit description"
+								className="absolute right-0 top-0 flex size-6 shrink-0 items-center justify-center rounded text-muted-foreground opacity-0 transition-opacity hover:bg-fill-hover hover:text-foreground focus-visible:opacity-100 group-hover/description:opacity-100"
+							>
+								<LuPencil className="size-3.5" />
+							</a>
 							{data.body.trim() ? (
 								<MarkdownRenderer content={data.body} />
 							) : (
@@ -644,7 +657,7 @@ function PullRequestDetailPage() {
 							)}
 						</article>
 
-						<aside className="min-w-0 @4xl:sticky @4xl:top-6 @4xl:self-start">
+						<aside className="min-w-0 @3xl:sticky @3xl:top-4 @3xl:self-start">
 							<PullRequestChecksSection checks={data.checks} />
 						</aside>
 					</div>
