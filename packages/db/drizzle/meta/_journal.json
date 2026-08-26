@@ -659,6 +659,13 @@
       "when": 1787673566186,
       "tag": "0093_deal_redemptions",
       "breakpoints": true
+    },
+    {
+      "idx": 94,
+      "version": "7",
+      "when": 1787720351737,
+      "tag": "0094_add_leaderboard_and_tier_tables",
+      "breakpoints": true
     }
   ]
 }

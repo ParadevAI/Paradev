@@ -31,6 +31,7 @@ import type {
 import { useHostUsageQuota } from "../../hooks/useHostUsageQuota";
 import { useRemoveUsageAccount } from "../../hooks/useRemoveUsageAccount";
 import { useSetDefaultUsageAccount } from "../../hooks/useSetDefaultUsageAccount";
+import { LeaderboardPrompt } from "../LeaderboardPrompt";
 import { UsageHistorySection } from "../UsageHistorySection";
 import type { SwitchSignInTarget } from "./components/AddAccountDialog";
 import { AddAccountDialog } from "./components/AddAccountDialog";
@@ -321,6 +322,7 @@ export function UsageView({ hostUrl }: { hostUrl: string | null }) {
 
 	return (
 		<div className="mx-auto flex min-h-full w-full max-w-5xl flex-col gap-3 px-6 py-4">
+			<LeaderboardPrompt hostUrl={hostUrl} />
 			<div className="flex items-center gap-2">
 				<span className="ml-auto text-[10px] text-muted-foreground">
 					Official quota · refreshes every 5 min
