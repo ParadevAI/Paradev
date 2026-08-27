@@ -395,6 +395,8 @@ export async function createPlatformWindow({
 		webPreferences: {
 			preload: join(__dirname, "../preload/index.js"),
 			webviewTag: true,
+			// Chromium's built-in PDF viewer, used by the file pane's PDF view
+			plugins: true,
 			// Isolate Electron session from system browser cookies
 			// This ensures desktop uses bearer token auth, not web cookies
 			partition: "persist:superset",
