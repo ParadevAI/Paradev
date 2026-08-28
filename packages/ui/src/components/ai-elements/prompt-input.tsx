@@ -35,6 +35,7 @@ import {
 	useState,
 	useSyncExternalStore,
 } from "react";
+import { getClipboardFiles } from "../../lib/clipboard-files";
 import { isEnterSubmit } from "../../lib/keyboard";
 import { cn } from "../../lib/utils";
 import { Button } from "../ui/button";
@@ -1102,23 +1103,7 @@ export const PromptInputTextarea = ({
 	};
 
 	const handlePaste: ClipboardEventHandler<HTMLTextAreaElement> = (event) => {
-		const items = event.clipboardData?.items;
-
-		if (!items) {
-			return;
-		}
-
-		const files: File[] = [];
-
-		for (const item of items) {
-			if (item.kind === "file") {
-				const file = item.getAsFile();
-				if (file) {
-					files.push(file);
-				}
-			}
-		}
-
+		const files = getClipboardFiles(event.clipboardData);
 		if (files.length > 0) {
 			event.preventDefault();
 			attachments.add(files);

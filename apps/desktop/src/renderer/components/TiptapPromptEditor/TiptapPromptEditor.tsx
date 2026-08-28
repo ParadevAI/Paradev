@@ -10,6 +10,7 @@ import {
 	CommandItem,
 	CommandList,
 } from "@superset/ui/command";
+import { getClipboardFiles } from "@superset/ui/lib/clipboard-files";
 import { Popover, PopoverAnchor, PopoverContent } from "@superset/ui/popover";
 import { cn } from "@superset/ui/utils";
 import { type Editor, Extension } from "@tiptap/core";
@@ -572,12 +573,7 @@ export function TiptapPromptEditor({
 			},
 
 			handlePaste: (_view, event) => {
-				const clipItems = event.clipboardData?.items;
-				if (!clipItems) return false;
-				const files = Array.from(clipItems)
-					.filter((i) => i.kind === "file")
-					.map((i) => i.getAsFile())
-					.filter((f): f is File => f !== null);
+				const files = getClipboardFiles(event.clipboardData);
 				if (files.length > 0) {
 					event.preventDefault();
 					attachmentsRef.current.add(files);

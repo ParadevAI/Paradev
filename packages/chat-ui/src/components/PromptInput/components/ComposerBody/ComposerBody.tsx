@@ -6,6 +6,7 @@ import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { PlainTextPlugin } from "@lexical/react/LexicalPlainTextPlugin";
 import { LexicalTypeaheadMenuPlugin } from "@lexical/react/LexicalTypeaheadMenuPlugin";
+import { getClipboardFiles } from "@superset/ui/lib/clipboard-files";
 import { cn } from "@superset/ui/utils";
 import {
 	$createNodeSelection,
@@ -325,9 +326,9 @@ export function ComposerBody({
 		const unregisterPaste = editor.registerCommand<ClipboardEvent>(
 			PASTE_COMMAND,
 			(event) => {
-				const files =
-					event instanceof ClipboardEvent ? event.clipboardData?.files : null;
-				if (files && files.length > 0) {
+				if (!(event instanceof ClipboardEvent)) return false;
+				const files = getClipboardFiles(event.clipboardData);
+				if (files.length > 0) {
 					event.preventDefault();
 					addFilesRef.current(files);
 					return true;
