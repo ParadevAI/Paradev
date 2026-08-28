@@ -24702,6 +24702,16 @@ msgid "settings.terminal.commandsEditor.placeholder"
 msgstr "コマンド..."
 
 #. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/settings/terminal/components/TerminalSettings/components/CopyOnSelectSetting.tsx
+msgid "settings.terminal.copyOnSelect.hint"
+msgstr "ターミナルでテキストを選択すると、行末の空白を取り除いてすぐにクリップボードへコピーします"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/settings/terminal/components/TerminalSettings/components/CopyOnSelectSetting.tsx
+msgid "settings.terminal.copyOnSelect.label"
+msgstr "選択でコピー"
+
+#. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/settings/terminal/components/TerminalSettings/components/LinkBehaviorSetting.tsx
 msgid "settings.terminal.linkBehavior.externalEditor"
 msgstr "外部エディタ"
@@ -34626,6 +34636,11 @@ msgstr "このタブを閉じると実行中のプロセスが終了します。
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useTabCloseGuard/useTabCloseGuard.ts
 msgid "workspace.tabCloseGuard.processRunningTitle"
 msgstr "このタブではプロセスがまだ実行中です"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/TerminalPane/components/TerminalCopiedIndicator/TerminalCopiedIndicator.tsx
+msgid "workspace.terminal.copiedIndicator"
+msgstr "コピーしました"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/TerminalPane/components/TerminalPaneHeaderExtras/components/TerminalIdCopyMenu/TerminalIdCopyMenu.tsx

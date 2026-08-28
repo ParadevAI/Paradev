@@ -24703,6 +24703,16 @@ msgid "settings.terminal.commandsEditor.placeholder"
 msgstr "Command..."
 
 #. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/settings/terminal/components/TerminalSettings/components/CopyOnSelectSetting.tsx
+msgid "settings.terminal.copyOnSelect.hint"
+msgstr "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/settings/terminal/components/TerminalSettings/components/CopyOnSelectSetting.tsx
+msgid "settings.terminal.copyOnSelect.label"
+msgstr "Copy on select"
+
+#. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/settings/terminal/components/TerminalSettings/components/LinkBehaviorSetting.tsx
 msgid "settings.terminal.linkBehavior.externalEditor"
 msgstr "External editor"
@@ -34627,6 +34637,11 @@ msgstr "Closing this tab will end the running process."
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useTabCloseGuard/useTabCloseGuard.ts
 msgid "workspace.tabCloseGuard.processRunningTitle"
 msgstr "A process is still running in this tab"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/TerminalPane/components/TerminalCopiedIndicator/TerminalCopiedIndicator.tsx
+msgid "workspace.terminal.copiedIndicator"
+msgstr "Copied"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/TerminalPane/components/TerminalPaneHeaderExtras/components/TerminalIdCopyMenu/TerminalIdCopyMenu.tsx
