@@ -35,6 +35,11 @@ import {
 	useState,
 	useSyncExternalStore,
 } from "react";
+import {
+	type AttachmentConstraintError,
+	type AttachmentConstraints,
+	applyAttachmentConstraints,
+} from "../../lib/attachment-constraints";
 import { getClipboardFiles } from "../../lib/clipboard-files";
 import { isEnterSubmit } from "../../lib/keyboard";
 import { cn } from "../../lib/utils";
@@ -107,6 +112,19 @@ export type PromptInputControllerProps = {
 	__registerTextarea: (ref: RefObject<HTMLTextAreaElement | null>) => void;
 	/** INTERNAL: Allows TiptapPromptEditor (or similar) to override focus behavior */
 	__registerFocusCallback: (cb: (() => void) | null) => void;
+	/**
+	 * INTERNAL: Lets PromptInput publish its accept/maxFiles/maxFileSize into
+	 * the controller. The constraints are declared on PromptInput but the files
+	 * live here, and consumers commonly call useProviderAttachments() *above*
+	 * PromptInput, so validation has to happen at the store rather than in a
+	 * context PromptInput's subtree alone can see.
+	 */
+	__registerConstraints: (
+		registration: {
+			constraints: AttachmentConstraints;
+			onError?: (error: AttachmentConstraintError) => void;
+		} | null,
+	) => void;
 };
 
 const PromptInputController = createContext<PromptInputControllerProps | null>(
@@ -261,9 +279,33 @@ export function PromptInputProvider({
 	const fileInputRef = useRef<HTMLInputElement | null>(null);
 	const openRef = useRef<() => void>(() => {});
 
+	const constraintsRef = useRef<{
+		constraints: AttachmentConstraints;
+		onError?: (error: AttachmentConstraintError) => void;
+	} | null>(null);
+	const __registerConstraints = useCallback(
+		(registration: typeof constraintsRef.current) => {
+			constraintsRef.current = registration;
+		},
+		[],
+	);
+	// Read at call time so `add` stays stable while still seeing the live count.
+	const attachmentCountRef = useRef(0);
+	attachmentCountRef.current = attachmentFiles.length;
+
 	const add = useCallback(
 		(files: File[] | FileList) => {
-			const incoming = Array.from(files);
+			const registration = constraintsRef.current;
+			// Validated here, not in PromptInput: this is the only point every
+			// caller funnels through, wherever it grabbed the context.
+			const incoming = registration
+				? applyAttachmentConstraints({
+						files,
+						currentCount: attachmentCountRef.current,
+						constraints: registration.constraints,
+						onError: registration.onError,
+					})
+				: Array.from(files);
 			if (incoming.length === 0) {
 				return;
 			}
@@ -389,6 +431,7 @@ export function PromptInputProvider({
 			__registerFileInput,
 			__registerTextarea,
 			__registerFocusCallback,
+			__registerConstraints,
 		}),
 		[
 			textInput,
@@ -398,6 +441,7 @@ export function PromptInputProvider({
 			__registerFileInput,
 			__registerTextarea,
 			__registerFocusCallback,
+			__registerConstraints,
 		],
 	);
 
@@ -655,77 +699,34 @@ export const PromptInput = ({
 		inputRef.current?.click();
 	}, []);
 
-	const matchesAccept = useCallback(
-		(f: File) => {
-			if (!accept || accept.trim() === "") {
-				return true;
-			}
-
-			const patterns = accept
-				.split(",")
-				.map((s) => s.trim())
-				.filter(Boolean);
-
-			return patterns.some((pattern) => {
-				if (pattern.endsWith("/*")) {
-					const prefix = pattern.slice(0, -1); // e.g: image/* -> image/
-					return f.type.startsWith(prefix);
-				}
-				return f.type === pattern;
-			});
-		},
-		[accept],
+	const applyConstraints = useCallback(
+		(fileList: File[] | FileList, currentCount: number): File[] =>
+			applyAttachmentConstraints({
+				files: fileList,
+				currentCount,
+				constraints: { accept, maxFiles, maxFileSize },
+				onError,
+			}),
+		[accept, maxFiles, maxFileSize, onError],
 	);
 
 	const addLocal = useCallback(
 		(fileList: File[] | FileList) => {
-			const incoming = Array.from(fileList);
-			const accepted = incoming.filter((f) => matchesAccept(f));
-			if (incoming.length && accepted.length === 0) {
-				onError?.({
-					code: "accept",
-					message: "No files match the accepted types.",
-				});
-				return;
-			}
-			const withinSize = (f: File) =>
-				maxFileSize ? f.size <= maxFileSize : true;
-			const sized = accepted.filter(withinSize);
-			if (accepted.length > 0 && sized.length === 0) {
-				onError?.({
-					code: "max_file_size",
-					message: "All files exceed the maximum size.",
-				});
-				return;
-			}
-
 			setItems((prev) => {
-				const capacity =
-					typeof maxFiles === "number"
-						? Math.max(0, maxFiles - prev.length)
-						: undefined;
-				const capped =
-					typeof capacity === "number" ? sized.slice(0, capacity) : sized;
-				if (typeof capacity === "number" && sized.length > capacity) {
-					onError?.({
-						code: "max_files",
-						message: "Too many files. Some were not added.",
-					});
-				}
-				const next: (FileUIPart & { id: string })[] = [];
-				for (const file of capped) {
-					next.push({
+				const capped = applyConstraints(fileList, prev.length);
+				if (capped.length === 0) return prev;
+				return prev.concat(
+					capped.map((file) => ({
 						id: nanoid(),
-						type: "file",
+						type: "file" as const,
 						url: URL.createObjectURL(file),
 						mediaType: file.type,
 						filename: file.name,
-					});
-				}
-				return prev.concat(next);
+					})),
+				);
 			});
 		},
-		[matchesAccept, maxFiles, maxFileSize, onError],
+		[applyConstraints],
 	);
 
 	const removeLocal = useCallback(
@@ -776,6 +777,19 @@ export const PromptInput = ({
 		}
 		return takenFiles;
 	}, []);
+
+	// Publish this PromptInput's constraints to the controller so the store
+	// enforces them for every caller, including the many that read
+	// useProviderAttachments() above this component.
+	const registerConstraints = controller?.__registerConstraints;
+	useEffect(() => {
+		if (!registerConstraints) return;
+		registerConstraints({
+			constraints: { accept, maxFiles, maxFileSize },
+			onError,
+		});
+		return () => registerConstraints(null);
+	}, [registerConstraints, accept, maxFiles, maxFileSize, onError]);
 
 	const add = usingProvider ? controller.attachments.add : addLocal;
 	const setFiles = usingProvider
