@@ -2,6 +2,10 @@ import { Tabs, TabsList, TabsTrigger } from "@superset/ui/tabs";
 import { cn } from "@superset/ui/utils";
 import { useState } from "react";
 import { LuX } from "react-icons/lu";
+import {
+	getPresetIcon,
+	useIsDarkTheme,
+} from "renderer/assets/app-icons/preset-icons";
 import { useHostUsageHistory } from "../../hooks/useHostUsageHistory";
 import { UsageAreaChart } from "./components/UsageAreaChart";
 import { UsageMetricTiles } from "./components/UsageMetricTiles";
@@ -10,6 +14,7 @@ import { UsageProjectBars } from "./components/UsageProjectBars";
 import type { HistoryMetric } from "./constants";
 import {
 	PROVIDER_CHART_CONFIG,
+	PROVIDER_ICON_KEY,
 	PROVIDER_ORDER,
 	RANGE_OPTIONS,
 } from "./constants";
@@ -26,6 +31,7 @@ export function UsageHistorySection({ hostUrl }: { hostUrl: string | null }) {
 	const [selectedDay, setSelectedDay] = useState<string | null>(null);
 	const historyQuery = useHostUsageHistory(hostUrl, days);
 	const history = historyQuery.data ?? null;
+	const isDark = useIsDarkTheme();
 
 	const firstDay = history?.buckets[0]?.day;
 	const lastDay = history?.buckets[history.buckets.length - 1]?.day;
@@ -34,14 +40,37 @@ export function UsageHistorySection({ hostUrl }: { hostUrl: string | null }) {
 			? (history.buckets.find((bucket) => bucket.day === selectedDay) ?? null)
 			: null;
 
+	// Only providers with usage in range get a share row — nine zero rows
+	// would drown the two that matter. No usage at all: show the classic two.
+	const activeProviders = (() => {
+		const withUsage = PROVIDER_ORDER.filter((provider) =>
+			history?.buckets.some((bucket) => bucket.providers[provider]),
+		);
+		return withUsage.length > 0
+			? withUsage
+			: (["claude", "codex"] satisfies Provider[]);
+	})();
+
+	// A range switch can leave every active series hidden by stale toggles —
+	// ignore the stored hides then, rather than render an empty chart.
+	const effectiveHidden = activeProviders.some(
+		(provider) => !hiddenProviders.has(provider),
+	)
+		? hiddenProviders
+		: new Set<Provider>();
+
 	const toggleProvider = (provider: Provider) => {
 		setHiddenProviders((previous) => {
 			const next = new Set(previous);
 			if (next.has(provider)) {
 				next.delete(provider);
-			} else if (next.size < PROVIDER_ORDER.length - 1) {
-				// Never hide the last visible series — an empty chart reads as broken.
-				next.add(provider);
+			} else {
+				// Never hide the last visible series — an empty chart reads as
+				// broken. Count only active providers; hidden inactive ones don't.
+				const visibleActive = activeProviders.filter(
+					(active) => !next.has(active),
+				).length;
+				if (visibleActive > 1) next.add(provider);
 			}
 			return next;
 		});
@@ -125,7 +154,7 @@ export function UsageHistorySection({ hostUrl }: { hostUrl: string | null }) {
 								)}
 							</div>
 							<div className="flex flex-col gap-1.5">
-								{PROVIDER_ORDER.map((provider) => {
+								{activeProviders.map((provider) => {
 									const totalsFor = history.buckets.reduce(
 										(acc, bucket) => {
 											const slot = bucket.providers[provider];
@@ -144,7 +173,11 @@ export function UsageHistorySection({ hostUrl }: { hostUrl: string | null }) {
 											? (metric === "usd" ? totalsFor.usd : totalsFor.tokens) /
 												denominator
 											: 0;
-									const hidden = hiddenProviders.has(provider);
+									const hidden = effectiveHidden.has(provider);
+									const icon = getPresetIcon(
+										PROVIDER_ICON_KEY[provider],
+										isDark,
+									);
 									return (
 										<button
 											key={provider}
@@ -165,6 +198,9 @@ export function UsageHistorySection({ hostUrl }: { hostUrl: string | null }) {
 													background: PROVIDER_CHART_CONFIG[provider].color,
 												}}
 											/>
+											{icon && (
+												<img src={icon} alt="" className="size-3.5 shrink-0" />
+											)}
 											<span className="min-w-0 truncate">
 												{PROVIDER_CHART_CONFIG[provider].label}
 											</span>
@@ -195,9 +231,13 @@ export function UsageHistorySection({ hostUrl }: { hostUrl: string | null }) {
 											<LuX className="size-3" />
 										</button>
 									</div>
-									{PROVIDER_ORDER.map((provider) => {
+									{activeProviders.map((provider) => {
 										const slot = selectedBucket.providers[provider];
 										if (!slot) return null;
+										const icon = getPresetIcon(
+											PROVIDER_ICON_KEY[provider],
+											isDark,
+										);
 										return (
 											<div
 												key={provider}
@@ -209,6 +249,9 @@ export function UsageHistorySection({ hostUrl }: { hostUrl: string | null }) {
 														background: PROVIDER_CHART_CONFIG[provider].color,
 													}}
 												/>
+												{icon && (
+													<img src={icon} alt="" className="size-3 shrink-0" />
+												)}
 												<span className="text-muted-foreground">
 													{PROVIDER_CHART_CONFIG[provider].label}
 												</span>
@@ -228,7 +271,7 @@ export function UsageHistorySection({ hostUrl }: { hostUrl: string | null }) {
 						<UsageAreaChart
 							history={history}
 							metric={metric}
-							hiddenProviders={hiddenProviders}
+							hiddenProviders={effectiveHidden}
 							selectedDay={selectedDay}
 							onSelectDay={setSelectedDay}
 						/>

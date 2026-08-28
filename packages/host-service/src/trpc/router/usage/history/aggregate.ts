@@ -170,6 +170,7 @@ export async function computeUsageHistory(
 	const { entries, sessionLabels, scannedFiles } = await collectUsageEntries(
 		days,
 		cutoffMs,
+		{ cwdCandidates: cwdLabels.map((label) => label.prefix) },
 	);
 
 	const bucketsByDay = new Map<string, UsageDailyBucket>();
@@ -232,7 +233,10 @@ export async function computeUsageHistory(
 
 	for (const entry of entries) {
 		const rate = matchModelRate(entry.provider, entry.model);
-		const usd = costUsd(rate, entry);
+		// A harness-reported real cost beats the API-list-rate estimate, and an
+		// entry priced by its own harness is never "approximate".
+		const estimated = entry.costUsd === undefined;
+		const usd = entry.costUsd ?? costUsd(rate, entry);
 		const tokens = entryTokens(entry);
 
 		const day = dayKey(entry.timestampMs);
@@ -259,10 +263,11 @@ export async function computeUsageHistory(
 				model: entry.model,
 				usd: 0,
 				tokens: 0,
-				approximate: rate.approximate,
+				approximate: false,
 			};
 			modelsByKey.set(modelKey, model);
 		}
+		model.approximate ||= estimated && rate.approximate;
 		model.usd += usd;
 		model.tokens += tokens;
 
@@ -313,8 +318,13 @@ export async function computeUsageHistory(
 		totals.cacheWrite += entry.cacheWrite5m + entry.cacheWrite1h;
 		totals.output += entry.output;
 		totals.reasoningOutput += entry.reasoningOutput;
-		totals.cacheSavingsUsd += cacheSavingsUsd(rate, entry);
-		totals.approximate ||= rate.approximate;
+		// Savings are rate-derived; for harness-priced entries the matched rate
+		// may be a fallback, so only estimate savings where the cost itself is
+		// a rate estimate too.
+		if (estimated) {
+			totals.cacheSavingsUsd += cacheSavingsUsd(rate, entry);
+			totals.approximate ||= rate.approximate;
+		}
 	}
 
 	// Emit a contiguous day series so charts show gaps as zero, not missing.

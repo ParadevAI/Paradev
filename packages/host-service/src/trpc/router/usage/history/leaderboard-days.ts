@@ -79,9 +79,9 @@ export function groupEntriesByDay(entries: UsageLogEntry[]): LeaderboardDay[] {
 		bucket.cacheWrite1h += entry.cacheWrite1h;
 		bucket.output += entry.output;
 		bucket.reasoningOutput += entry.reasoningOutput;
-		bucket.usdEstimate += costUsd(rate, entry);
+		bucket.usdEstimate += entry.costUsd ?? costUsd(rate, entry);
 
-		bucket.approximate ||= rate.approximate;
+		bucket.approximate ||= entry.costUsd === undefined && rate.approximate;
 		bucket.sessionIds.add(entry.sessionId);
 	}
 

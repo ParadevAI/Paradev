@@ -35,6 +35,20 @@ describe("groupEntriesByDay", () => {
 		});
 	});
 
+	test("a harness-reported cost replaces the rate estimate", () => {
+		const [row] = groupEntriesByDay([
+			entry({
+				provider: "opencode",
+				model: "some-unknown-model",
+				costUsd: 1.25,
+			}),
+		]);
+		expect(row?.usdEstimate).toBe(1.25);
+		// Priced by the harness itself — not an approximation, even though the
+		// model is absent from the rate table.
+		expect(row?.approximate).toBe(false);
+	});
+
 	test("splits the same day across models", () => {
 		const rows = groupEntriesByDay([
 			entry(),

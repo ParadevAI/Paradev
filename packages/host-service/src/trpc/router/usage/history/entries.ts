@@ -2,9 +2,15 @@ import { realpath } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { discoverClaudeProfiles, discoverCodexHomes } from "../profiles";
+import { collectCopilotEntries } from "./copilot";
+import { collectCursorEntries } from "./cursor";
+import { collectFxEntries } from "./fx";
+import { collectGrokEntries, grokHomes } from "./grok";
 import { collectLogFiles, dedupeLogFiles } from "./logs";
+import { collectOpencodeEntries } from "./opencode";
 import type { UsageLogEntry } from "./parse";
 import { parseClaudeLogFile, parseCodexLogFile } from "./parse";
+import { collectPiEntries } from "./pi";
 
 export interface CollectedUsage {
 	entries: UsageLogEntry[];
@@ -14,9 +20,16 @@ export interface CollectedUsage {
 	scannedFiles: number;
 }
 
+export interface CollectUsageOptions {
+	/** Known workspace/project roots — cursor's only way to attribute a cwd
+	 * (its chat dirs are keyed by md5 of the launch cwd). */
+	cwdCandidates?: readonly string[];
+}
+
 export async function collectUsageEntries(
 	days: number,
 	cutoffMs: number,
+	options: CollectUsageOptions = {},
 ): Promise<CollectedUsage> {
 	const home = homedir();
 
@@ -90,9 +103,66 @@ export async function collectUsageEntries(
 		await parseCodexLogFile(file, cutoffMs, entries, sessionLabels);
 	}
 
+	// The remaining providers are independent of each other and of the two
+	// above; each contributes into its own array so concurrent pushes can't
+	// interleave, and one provider's failure never takes down the rest.
+	let extraScannedFiles = 0;
+	const collectors: Array<{
+		run: (out: UsageLogEntry[]) => Promise<number | undefined>;
+	}> = [
+		...grokHomes().map((grokHome) => ({
+			run: (out: UsageLogEntry[]) =>
+				collectGrokEntries(grokHome, cutoffMs, out, sessionLabels),
+		})),
+		{
+			run: (out: UsageLogEntry[]) =>
+				collectOpencodeEntries(cutoffMs, out, sessionLabels),
+		},
+		{
+			run: (out: UsageLogEntry[]) =>
+				collectPiEntries("pi", days, cutoffMs, out, sessionLabels),
+		},
+		{
+			run: (out: UsageLogEntry[]) =>
+				collectPiEntries("omp", days, cutoffMs, out, sessionLabels),
+		},
+		{ run: (out: UsageLogEntry[]) => collectFxEntries(cutoffMs, out) },
+		{
+			run: (out: UsageLogEntry[]) =>
+				Promise.resolve(collectCopilotEntries(cutoffMs, out, sessionLabels)),
+		},
+		{
+			// Cursor is the one networked collector (no local token counts
+			// exist) — a signed-out CLI or an offline host contributes nothing.
+			run: async (out: UsageLogEntry[]) => {
+				await collectCursorEntries(
+					cutoffMs,
+					out,
+					sessionLabels,
+					options.cwdCandidates ?? [],
+				);
+				return 0;
+			},
+		},
+	];
+	const results = await Promise.allSettled(
+		collectors.map(async ({ run }) => {
+			const out: UsageLogEntry[] = [];
+			const scanned = await run(out);
+			return { out, scanned: scanned ?? 0 };
+		}),
+	);
+	for (const result of results) {
+		if (result.status !== "fulfilled") continue;
+		extraScannedFiles += result.value.scanned;
+		for (const entry of result.value.out) {
+			entries.push(entry);
+		}
+	}
+
 	return {
 		entries,
 		sessionLabels,
-		scannedFiles: claudeFiles.length + codexFiles.length,
+		scannedFiles: claudeFiles.length + codexFiles.length + extraScannedFiles,
 	};
 }

@@ -44,12 +44,24 @@ export function UsageAreaChart({
 }) {
 	const data = useMemo(
 		() =>
-			history.buckets.map((bucket) => ({
-				day: bucket.day,
-				claude: bucket.providers.claude?.[metric] ?? 0,
-				codex: bucket.providers.codex?.[metric] ?? 0,
-			})),
+			history.buckets.map((bucket) => {
+				const values: Partial<Record<Provider, number>> = {};
+				for (const provider of PROVIDER_ORDER) {
+					values[provider] = bucket.providers[provider]?.[metric] ?? 0;
+				}
+				return { day: bucket.day, ...values };
+			}),
 		[history, metric],
+	);
+
+	// Providers with no usage in range draw nothing — nine flat baselines
+	// would read as noise.
+	const presentProviders = useMemo(
+		() =>
+			PROVIDER_ORDER.filter((provider) =>
+				history.buckets.some((bucket) => bucket.providers[provider]),
+			),
+		[history],
 	);
 
 	const formatValue = metric === "usd" ? formatUsd : formatTokens;
@@ -130,21 +142,21 @@ export function UsageAreaChart({
 						strokeDasharray="4 3"
 					/>
 				)}
-				{PROVIDER_ORDER.filter(
-					(provider) => !hiddenProviders.has(provider),
-				).map((provider) => (
-					<Area
-						key={provider}
-						dataKey={provider}
-						type="monotone"
-						stroke={`var(--color-${provider})`}
-						fill={`var(--color-${provider})`}
-						strokeWidth={2}
-						fillOpacity={0.12}
-						dot={false}
-						isAnimationActive={false}
-					/>
-				))}
+				{presentProviders
+					.filter((provider) => !hiddenProviders.has(provider))
+					.map((provider) => (
+						<Area
+							key={provider}
+							dataKey={provider}
+							type="monotone"
+							stroke={`var(--color-${provider})`}
+							fill={`var(--color-${provider})`}
+							strokeWidth={2}
+							fillOpacity={0.12}
+							dot={false}
+							isAnimationActive={false}
+						/>
+					))}
 			</AreaChart>
 		</ChartContainer>
 	);
