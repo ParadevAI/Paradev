@@ -6562,6 +6562,22 @@ msgid "dashboard.plugins.title"
 msgstr "插件"
 
 #. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/components/PortForwardBusyActions/PortForwardBusyActions.tsx
+msgid "dashboard.ports.busy.stopFailed"
+msgstr "无法停止"
+
+#. js-lingui-explicit-id
+#. placeholder {0}: owner.processName
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/components/PortForwardBusyActions/PortForwardBusyActions.tsx
+msgid "dashboard.ports.busy.stopLocal"
+msgstr "停止本地 {0}"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/components/PortForwardBusyActions/PortForwardBusyActions.tsx
+msgid "dashboard.ports.busy.useAnotherPort"
+msgstr "使用其他端口"
+
+#. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/project/$projectId/page.tsx
 msgid "dashboard.project.onboarding.addCommands"
 msgstr "添加命令"

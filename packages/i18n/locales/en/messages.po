@@ -6562,6 +6562,22 @@ msgid "dashboard.plugins.title"
 msgstr "Plugins"
 
 #. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/components/PortForwardBusyActions/PortForwardBusyActions.tsx
+msgid "dashboard.ports.busy.stopFailed"
+msgstr "Could not stop it"
+
+#. js-lingui-explicit-id
+#. placeholder {0}: owner.processName
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/components/PortForwardBusyActions/PortForwardBusyActions.tsx
+msgid "dashboard.ports.busy.stopLocal"
+msgstr "Stop local {0}"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/components/PortForwardBusyActions/PortForwardBusyActions.tsx
+msgid "dashboard.ports.busy.useAnotherPort"
+msgstr "Use another port"
+
+#. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/project/$projectId/page.tsx
 msgid "dashboard.project.onboarding.addCommands"
 msgstr "Add commands"

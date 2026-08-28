@@ -6562,6 +6562,22 @@ msgid "dashboard.plugins.title"
 msgstr "プラグイン"
 
 #. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/components/PortForwardBusyActions/PortForwardBusyActions.tsx
+msgid "dashboard.ports.busy.stopFailed"
+msgstr "停止できませんでした"
+
+#. js-lingui-explicit-id
+#. placeholder {0}: owner.processName
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/components/PortForwardBusyActions/PortForwardBusyActions.tsx
+msgid "dashboard.ports.busy.stopLocal"
+msgstr "ローカルの {0} を停止"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/components/PortForwardBusyActions/PortForwardBusyActions.tsx
+msgid "dashboard.ports.busy.useAnotherPort"
+msgstr "別のポートを使用"
+
+#. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/project/$projectId/page.tsx
 msgid "dashboard.project.onboarding.addCommands"
 msgstr "コマンドを追加"
