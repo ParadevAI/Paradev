@@ -11,7 +11,7 @@ import { Button } from "@superset/ui/button";
 import { useRef } from "react";
 
 export interface RestartSessionsPrompt {
-	provider: "claude" | "codex";
+	agent: "claude" | "codex";
 	/** "Claude Code" / "Codex". */
 	providerLabel: string;
 	/** The account just made default, as shown on its card. */

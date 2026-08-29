@@ -1,4 +1,4 @@
 export {
-	type UsageAccountProvider,
+	type RestartableUsageAgent,
 	useRestartAgentSessions,
 } from "./useRestartAgentSessions";
