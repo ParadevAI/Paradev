@@ -56,7 +56,27 @@ To see it working after implementation: `curl -s https://superset.sh/ja/pricing 
 
 ## Outcomes & Retrospective
 
-- (to be filled at completion)
+Shipped and verified in production on 2026-08-29 (PR #7002, squash f5f671bb0). Every marketing
+page serves 17 locales at /{locale} paths with English at bare URLs; production smoke confirmed
+/ja/pricing renders lang="ja" with Japanese content, the bare /pricing stays English even under
+a ja Accept-Language header, /en/pricing 308s to the bare URL, and the sitemap carries 2,754
+localized entries with hreflang alternates. Follow-ups that landed in the same arc: the
+deterministic-first-render hydration fix (PR #7005), the docs compact switcher icon (#7001),
+and the Figma-style footer picker (#7006).
+
+Retrospective. What went well: the proxy rewrite plus root-params design survived contact with
+production unchanged, and the decision to keep English at bare URLs meant zero backlink
+breakage. What cost time: a falsely reported merge (the lesson is now a standing rule — verify
+PR state MERGED and main's tip before saying "merged"); Turbopack panics from branch-switching
+under a running dev server; and three environment traps recorded in Surprises (rootParams
+gating, [lang] as a glob character class, camelCased hrefLang in SSR output). Remaining
+user-owned steps: submit the sitemap in Search Console; create VERCEL_AUTOMATION_BYPASS_SECRET
+so preview smoke stops being vacuous behind SSO (#6993). Docs-body translation was evaluated
+and deliberately declined on 2026-08-29 (high churn, prose re-translation automation cost,
+correctness risk); revisit only with evidence of non-English docs demand or a Japan enterprise
+motion.
+
+Note (2026-08-29): closeout added and plan moved to done/ on completion of the arc.
 
 ## Context and Orientation
 

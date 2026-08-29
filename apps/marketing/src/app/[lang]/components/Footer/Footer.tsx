@@ -2,14 +2,22 @@
 
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
+	i18n,
 	isSupportedLocale,
 	LOCALE_COOKIE,
+	LOCALE_LABELS,
+	SUPPORTED_LOCALES,
 	type SupportedLocale,
 } from "@superset/i18n";
-import { LanguageSwitcher } from "@superset/i18n/react";
 import { COMPANY } from "@superset/shared/constants";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@superset/ui/dropdown-menu";
 import { m } from "framer-motion";
-import { ArrowUpRight, Globe } from "lucide-react";
+import { ArrowUpRight, Check, ChevronDown, Languages } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
@@ -281,18 +289,51 @@ function FooterLanguageSwitcher({ locale }: { locale?: SupportedLocale }) {
 				: `/${next}${barePath === "/" ? "" : barePath}`,
 		);
 	};
+	// The server passes the URL's locale; every switch is a full navigation,
+	// so the value never changes within a page's lifetime and needs no
+	// subscription. The i18n fallback covers renders outside the [lang] tree.
+	const current = locale ?? (i18n.locale as SupportedLocale);
 	return (
-		<div className="flex w-max items-center gap-2 text-sm text-muted-foreground transition-colors focus-within:text-foreground hover:text-foreground">
-			<Globe aria-hidden className="size-4 shrink-0" />
-			<LanguageSwitcher
-				locale={locale}
-				onSelect={selectLocale}
-				label={t({
+		<DropdownMenu modal={false}>
+			<DropdownMenuTrigger
+				aria-label={`${t({
 					id: "marketing.footer.languageLabel",
 					message: "Language",
-				})}
-				className="cursor-pointer appearance-none bg-transparent pr-1 outline-none [&>option]:text-foreground [&>option]:bg-background"
-			/>
-		</div>
+				})}: ${LOCALE_LABELS[current]}`}
+				className="group flex w-max cursor-pointer items-center gap-2 text-sm text-muted-foreground outline-none transition-colors hover:text-foreground focus-visible:text-foreground"
+			>
+				<Languages aria-hidden className="size-4 shrink-0" />
+				<span lang={current}>{LOCALE_LABELS[current]}</span>
+				<ChevronDown
+					aria-hidden
+					className="size-3.5 shrink-0 transition-transform group-data-[state=open]:rotate-180"
+				/>
+			</DropdownMenuTrigger>
+			<DropdownMenuContent
+				side="bottom"
+				align="start"
+				sideOffset={8}
+				className="max-h-[min(38rem,var(--radix-dropdown-menu-content-available-height))] w-48 overflow-y-auto rounded-[5px] border border-border bg-background p-1 shadow-lg"
+			>
+				{SUPPORTED_LOCALES.map((option) => (
+					<DropdownMenuItem
+						key={option}
+						lang={option}
+						aria-current={option === current || undefined}
+						onClick={() => {
+							// Re-selecting the active locale would be a pointless
+							// full navigation to the same URL.
+							if (option !== current) selectLocale(option);
+						}}
+						className="flex cursor-pointer items-center justify-between gap-3 rounded-[3px] px-2.5 py-1.5 text-sm"
+					>
+						{LOCALE_LABELS[option]}
+						{option === current && (
+							<Check aria-hidden className="size-3.5 shrink-0" />
+						)}
+					</DropdownMenuItem>
+				))}
+			</DropdownMenuContent>
+		</DropdownMenu>
 	);
 }
