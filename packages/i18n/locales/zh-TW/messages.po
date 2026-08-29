@@ -4709,6 +4709,16 @@ msgid "dashboard.automations.statCards.showFailedTitle"
 msgstr "只顯示上次執行失敗的自動化"
 
 #. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/TriggersCard/components/AutomationTagsPicker/AutomationTagsPicker.tsx
+msgid "dashboard.automations.tagsPicker.empty"
+msgstr "無標籤"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/TriggersCard/components/AutomationTagsPicker/AutomationTagsPicker.tsx
+msgid "dashboard.automations.tagsPicker.placeholder"
+msgstr "新增標籤…"
+
+#. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/templates/data.ts
 msgid "dashboard.automations.templates.docsFresh.description"
 msgstr "每週三上午9點，回顧本週合併的PR，更新被它們改過時的文件。"
@@ -4756,7 +4766,7 @@ msgstr "下次執行"
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/TriggersCard/TriggersCard.tsx
 msgid "dashboard.automations.triggersCard.scopeSentence"
-msgstr "<0>專案：</0><1/> <2>裝置：</2><3/> <4>工作區：</4><5/>"
+msgstr "<0>專案：</0><1/> <2>裝置：</2><3/> <4>工作區：</4><5/> <6>標籤：</6><7/>"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/TriggersCard/TriggersCard.tsx

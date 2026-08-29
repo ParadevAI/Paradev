@@ -13,8 +13,24 @@ import {
 	getPrependTabOrder,
 	isSidebarWorkspaceVisible,
 } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
+import {
+	normalizeWorkspaceTag,
+	normalizeWorkspaceTags,
+} from "@superset/shared/workspace-tags";
+import { useOptimisticActions } from "renderer/routes/_authenticated/hooks/useOptimisticActions";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
+import {
+	applyFolderTagChange,
+	buildSidebarFolderKey,
+	deriveTagFolders,
+	getProjectFolderTagIndex,
+	mintFolderTag,
+	parseSidebarFolderKey,
+	resolveWorkspaceSectionId,
+	type TagFolderRef,
+	type TagFolderWorkspaceInput,
+} from "renderer/routes/_authenticated/utils/workspaceTagFolders";
 import { PROJECT_CUSTOM_COLORS } from "shared/constants/project-colors";
 import {
 	createEmptyPaneLayout,
@@ -45,17 +61,39 @@ function compareProjectTopLevelItems(
 
 function getProjectTopLevelItems(
 	collections: ProjectTopLevelCollections,
+	// Host rows carry the tags that decide folder membership — a workspace
+	// whose tag resolves into a folder must NOT count as top-level, or every
+	// insert index computed against this lane is shifted by phantom siblings.
+	// Same resolver as the sidebar builder and the flatten pass.
+	hostWorkspaces: readonly TagFolderWorkspaceInput[],
 	// Null scopes to the Sessions section (project-less workspaces).
 	projectId: string | null,
 	options: { excludeWorkspaceId?: string; excludeSectionId?: string } = {},
 ): ProjectTopLevelItem[] {
+	const folderIndex: ReadonlyMap<string, TagFolderRef> =
+		projectId === null
+			? new Map()
+			: getProjectFolderTagIndex(
+					deriveTagFolders(
+						Array.from(collections.v2SidebarSections.state.values()),
+						hostWorkspaces,
+					),
+					projectId,
+				);
+	const hostTagsByWorkspaceId = new Map(
+		hostWorkspaces.map((workspace) => [workspace.id, workspace.tags]),
+	);
 	return [
 		...Array.from(collections.v2WorkspaceLocalState.state.values())
 			.filter(
 				(item) =>
 					item.sidebarState.projectId === projectId &&
 					isSidebarWorkspaceVisible(item) &&
-					item.sidebarState.sectionId === null &&
+					resolveWorkspaceSectionId({
+						tags: hostTagsByWorkspaceId.get(item.workspaceId),
+						localSectionId: item.sidebarState.sectionId,
+						index: folderIndex,
+					}) === null &&
 					item.workspaceId !== options.excludeWorkspaceId,
 			)
 			.map((item) => ({
@@ -63,6 +101,8 @@ function getProjectTopLevelItems(
 				id: item.workspaceId,
 				tabOrder: item.sidebarState.tabOrder,
 			})),
+		// Stored rows only: a derived-only folder has no row to renumber, and
+		// its synthetic tabOrder floor must never feed getNextTabOrder math.
 		...Array.from(collections.v2SidebarSections.state.values())
 			.filter(
 				(item) =>
@@ -75,6 +115,47 @@ function getProjectTopLevelItems(
 				tabOrder: item.tabOrder,
 			})),
 	].sort(compareProjectTopLevelItems);
+}
+
+function getProjectFolderIndex(
+	collections: Pick<AppCollections, "v2SidebarSections">,
+	hostWorkspaces: readonly TagFolderWorkspaceInput[],
+	projectId: string | null,
+): ReadonlyMap<string, TagFolderRef> {
+	if (projectId === null) return new Map();
+	return getProjectFolderTagIndex(
+		deriveTagFolders(
+			Array.from(collections.v2SidebarSections.state.values()),
+			hostWorkspaces,
+		),
+		projectId,
+	);
+}
+
+function getHostWorkspaceTags(
+	hostWorkspaces: readonly TagFolderWorkspaceInput[],
+	workspaceId: string,
+): string[] {
+	return normalizeWorkspaceTags(
+		hostWorkspaces.find((workspace) => workspace.id === workspaceId)?.tags,
+	);
+}
+
+/** Effective container of a local row — the shared resolver, over host tags. */
+function getEffectiveSectionId(
+	collections: Pick<AppCollections, "v2SidebarSections">,
+	hostWorkspaces: readonly TagFolderWorkspaceInput[],
+	row: { workspaceId: string; sidebarState: { projectId: string | null; sectionId: string | null } },
+): string | null {
+	return resolveWorkspaceSectionId({
+		tags: getHostWorkspaceTags(hostWorkspaces, row.workspaceId),
+		localSectionId: row.sidebarState.sectionId,
+		index: getProjectFolderIndex(
+			collections,
+			hostWorkspaces,
+			row.sidebarState.projectId,
+		),
+	});
 }
 
 function getFirstSectionIndex(items: ProjectTopLevelItem[]): number {
@@ -136,6 +217,7 @@ function ensureSidebarWorkspaceRecord(
 		AppCollections,
 		"v2SidebarSections" | "v2WorkspaceLocalState"
 	>,
+	hostWorkspaces: readonly TagFolderWorkspaceInput[],
 	workspaceId: string,
 	// Null places the workspace in the Sessions section.
 	projectId: string | null,
@@ -145,7 +227,11 @@ function ensureSidebarWorkspaceRecord(
 		return;
 	}
 
-	const topLevelItems = getProjectTopLevelItems(collections, projectId);
+	const topLevelItems = getProjectTopLevelItems(
+		collections,
+		hostWorkspaces,
+		projectId,
+	);
 
 	if (existing) {
 		collections.v2WorkspaceLocalState.update(workspaceId, (draft) => {
@@ -194,6 +280,49 @@ export function useDashboardSidebarState() {
 	const collections = useCollections();
 	const { workspaces: hostWorkspaces } = useHostWorkspaces();
 	const { machineId } = useLocalHostService();
+	const { v2Workspaces } = useOptimisticActions();
+
+	// Folder membership lives in host-side tags; every membership write is a
+	// host call through the optimistic path (cache upsert → workspace.update
+	// → invalidate + toast on failure).
+	const writeWorkspaceTags = useCallback(
+		(workspaceId: string, tags: string[]) => {
+			const transaction = v2Workspaces.updateWorkspace(workspaceId, { tags });
+			// Resolves once the host accepted the write (rejection already
+			// rolled back the cache and toasted); rename gates its rekey on it.
+			return transaction?.isPersisted.promise ?? Promise.reject();
+		},
+		[v2Workspaces],
+	);
+
+	/**
+	 * Materialize-on-interaction: a derived folder has no stored row, so
+	 * color/rename/collapse/reorder mint one first (keyed by the composite
+	 * `${projectId}:${tag}` — the tag is recoverable from the key alone).
+	 * Returns the row, or null when the id is neither stored nor parseable.
+	 */
+	const ensureSectionRow = useCallback(
+		(sectionId: string) => {
+			const existing = collections.v2SidebarSections.get(sectionId);
+			if (existing) return existing;
+			const parsed = parseSidebarFolderKey(sectionId);
+			if (!parsed) return null;
+			collections.v2SidebarSections.insert({
+				sectionId,
+				projectId: parsed.projectId,
+				name: parsed.tag,
+				tag: parsed.tag,
+				createdAt: new Date(),
+				tabOrder: getNextTabOrder(
+					getProjectTopLevelItems(collections, hostWorkspaces, parsed.projectId),
+				),
+				isCollapsed: false,
+				color: null,
+			});
+			return collections.v2SidebarSections.get(sectionId) ?? null;
+		},
+		[collections, hostWorkspaces],
+	);
 
 	const ensureProjectInSidebar = useCallback(
 		(projectId: string) => {
@@ -209,9 +338,14 @@ export function useDashboardSidebarState() {
 			if (projectId !== null) {
 				ensureSidebarProjectRecord(collections, projectId);
 			}
-			ensureSidebarWorkspaceRecord(collections, workspaceId, projectId);
+			ensureSidebarWorkspaceRecord(
+				collections,
+				hostWorkspaces,
+				workspaceId,
+				projectId,
+			);
 		},
-		[collections],
+		[collections, hostWorkspaces],
 	);
 
 	const toggleProjectCollapsed = useCallback(
@@ -255,10 +389,29 @@ export function useDashboardSidebarState() {
 			projectId: string | null,
 			orderedItems: Array<{ type: "workspace" | "section"; id: string }>,
 		) => {
+			// A workspace item in the lane list is EXPLICITLY top-level. Local
+			// sectionId writes alone can't deliver that for a tag-filed row —
+			// the tag would keep it in its folder and a drag out of a folder
+			// would silently snap back — so strip the project's folder tags on
+			// its host too (folder tags only; unrelated tags survive).
+			const folderIndex = getProjectFolderIndex(
+				collections,
+				hostWorkspaces,
+				projectId,
+			);
 			orderedItems.forEach((item, index) => {
 				const tabOrder = index + 1;
 				if (item.type === "workspace") {
 					if (!collections.v2WorkspaceLocalState.get(item.id)) return;
+					const currentTags = getHostWorkspaceTags(hostWorkspaces, item.id);
+					const strippedTags = applyFolderTagChange(
+						currentTags,
+						folderIndex.keys(),
+						null,
+					);
+					if (strippedTags.join("\n") !== currentTags.join("\n")) {
+						writeWorkspaceTags(item.id, strippedTags);
+					}
 					collections.v2WorkspaceLocalState.update(item.id, (draft) => {
 						draft.sidebarState.tabOrder = tabOrder;
 						draft.sidebarState.sectionId = null;
@@ -266,14 +419,16 @@ export function useDashboardSidebarState() {
 						draft.sidebarState.isHidden = false;
 					});
 				} else {
-					if (!collections.v2SidebarSections.get(item.id)) return;
+					// Reordering the lane is a customisation: a derived folder in
+					// the ordered list materializes its row so the order sticks.
+					if (!ensureSectionRow(item.id)) return;
 					collections.v2SidebarSections.update(item.id, (draft) => {
 						draft.tabOrder = tabOrder;
 					});
 				}
 			});
 		},
-		[collections],
+		[collections, ensureSectionRow, hostWorkspaces, writeWorkspaceTags],
 	);
 
 	const moveWorkspaceToSectionAtIndex = useCallback(
@@ -285,6 +440,24 @@ export function useDashboardSidebarState() {
 		) => {
 			const existing = collections.v2WorkspaceLocalState.get(workspaceId);
 			if (!existing) return;
+			// Same rule as moveWorkspaceToSection: the tag comes from the key;
+			// members are found through the shared resolver, not the pointer.
+			const targetTag = parseSidebarFolderKey(sectionId)?.tag ?? null;
+			if (targetTag !== null) {
+				const folderIndex = getProjectFolderIndex(
+					collections,
+					hostWorkspaces,
+					projectId,
+				);
+				writeWorkspaceTags(
+					workspaceId,
+					applyFolderTagChange(
+						getHostWorkspaceTags(hostWorkspaces, workspaceId),
+						folderIndex.keys(),
+						targetTag,
+					),
+				);
+			}
 			const siblings = Array.from(
 				collections.v2WorkspaceLocalState.state.values(),
 			)
@@ -293,7 +466,8 @@ export function useDashboardSidebarState() {
 						item.sidebarState.projectId === projectId &&
 						isSidebarWorkspaceVisible(item) &&
 						item.workspaceId !== workspaceId &&
-						item.sidebarState.sectionId === sectionId,
+						getEffectiveSectionId(collections, hostWorkspaces, item) ===
+							sectionId,
 				)
 				.sort((a, b) => a.sidebarState.tabOrder - b.sidebarState.tabOrder);
 			const reordered = [...siblings];
@@ -301,13 +475,13 @@ export function useDashboardSidebarState() {
 			reordered.forEach((item, i) => {
 				collections.v2WorkspaceLocalState.update(item.workspaceId, (draft) => {
 					draft.sidebarState.tabOrder = i + 1;
-					draft.sidebarState.sectionId = sectionId;
+					draft.sidebarState.sectionId = targetTag !== null ? null : sectionId;
 					draft.sidebarState.projectId = projectId;
 					draft.sidebarState.isHidden = false;
 				});
 			});
 		},
-		[collections],
+		[collections, hostWorkspaces, writeWorkspaceTags],
 	);
 
 	const createSection = useCallback(
@@ -315,14 +489,21 @@ export function useDashboardSidebarState() {
 			const { name = "New group" } = options;
 			ensureSidebarProjectRecord(collections, projectId);
 
-			const sectionId = crypto.randomUUID();
+			// A folder IS a tag: mint one from the name (collisions get -2)
+			// and key the presentation row by it.
+			const tag = mintFolderTag(
+				name,
+				getProjectFolderIndex(collections, hostWorkspaces, projectId).keys(),
+			);
+			const sectionId = buildSidebarFolderKey(projectId, tag);
+			if (collections.v2SidebarSections.get(sectionId)) return sectionId;
 			const randomColor =
 				PROJECT_CUSTOM_COLORS[
 					Math.floor(Math.random() * PROJECT_CUSTOM_COLORS.length)
 				].value;
 
 			const tabOrder = getNextTabOrder(
-				getProjectTopLevelItems(collections, projectId),
+				getProjectTopLevelItems(collections, hostWorkspaces, projectId),
 			);
 
 			collections.v2SidebarSections.insert({
@@ -333,41 +514,117 @@ export function useDashboardSidebarState() {
 				tabOrder,
 				isCollapsed: false,
 				color: randomColor,
+				tag,
 			});
 
 			return sectionId;
 		},
-		[collections],
+		[collections, hostWorkspaces],
 	);
 
 	const toggleSectionCollapsed = useCallback(
 		(sectionId: string) => {
-			if (!collections.v2SidebarSections.get(sectionId)) return;
+			if (!ensureSectionRow(sectionId)) return;
 			collections.v2SidebarSections.update(sectionId, (draft) => {
 				draft.isCollapsed = !draft.isCollapsed;
 			});
 		},
-		[collections],
+		[collections, ensureSectionRow],
 	);
 
 	const renameSection = useCallback(
 		(sectionId: string, name: string) => {
-			if (!collections.v2SidebarSections.get(sectionId)) return;
-			collections.v2SidebarSections.update(sectionId, (draft) => {
-				draft.name = name.trim();
-			});
+			const trimmed = name.trim();
+			if (!trimmed) return;
+			const existing = collections.v2SidebarSections.get(sectionId);
+			const parsed = parseSidebarFolderKey(sectionId);
+			const currentTag = normalizeWorkspaceTag(existing?.tag) ?? parsed?.tag ?? null;
+			if (currentTag === null) {
+				// Unconverted legacy row: label-only rename; the migration pass
+				// converts it (with this name) once its host is reachable.
+				if (!existing) return;
+				collections.v2SidebarSections.update(sectionId, (draft) => {
+					draft.name = trimmed;
+				});
+				return;
+			}
+			const projectId = existing?.projectId ?? parsed?.projectId;
+			if (!projectId) return;
+			const takenTags = [
+				...getProjectFolderIndex(collections, hostWorkspaces, projectId).keys(),
+			].filter((tag) => tag !== currentTag);
+			const newTag = mintFolderTag(trimmed, takenTags);
+			if (newTag === currentTag) {
+				// Same tag — label-only change on the (materialized) row.
+				if (!ensureSectionRow(sectionId)) return;
+				collections.v2SidebarSections.update(sectionId, (draft) => {
+					draft.name = trimmed;
+				});
+				return;
+			}
+			// Retag every member BEFORE rekeying the row — swap the row first
+			// and the old tag survives on every member as litter that silently
+			// recaptures them if a folder by that name is ever recreated. The
+			// rekey waits for the hosts to ACCEPT the retags: a rejected write
+			// rolls back that member's cached tags, and rekeying anyway would
+			// leave it in neither folder.
+			const memberWrites: Promise<unknown>[] = [];
+			for (const workspace of hostWorkspaces) {
+				if (workspace.projectId !== projectId) continue;
+				const tags = normalizeWorkspaceTags(workspace.tags);
+				if (!tags.includes(currentTag)) continue;
+				memberWrites.push(
+					writeWorkspaceTags(
+						workspace.id,
+						normalizeWorkspaceTags([
+							...tags.filter((tag) => tag !== currentTag),
+							newTag,
+						]),
+					),
+				);
+			}
+			void Promise.all(memberWrites)
+				.then(() => {
+					const newSectionId = buildSidebarFolderKey(projectId, newTag);
+					if (!collections.v2SidebarSections.get(newSectionId)) {
+						collections.v2SidebarSections.insert({
+							sectionId: newSectionId,
+							projectId,
+							name: trimmed,
+							tag: newTag,
+							createdAt: existing?.createdAt ?? new Date(),
+							tabOrder:
+								existing?.tabOrder ??
+								getNextTabOrder(
+									getProjectTopLevelItems(
+										collections,
+										hostWorkspaces,
+										projectId,
+									),
+								),
+							isCollapsed: existing?.isCollapsed ?? false,
+							color: existing?.color ?? null,
+						});
+					}
+					if (existing) collections.v2SidebarSections.delete(sectionId);
+				})
+				.catch(() => {
+					// A member write was rejected (already rolled back + toasted).
+					// The row keeps its old key; successfully retagged members sit
+					// in the new tag's derived folder until the user retries.
+				});
 		},
-		[collections],
+		[collections, ensureSectionRow, hostWorkspaces, writeWorkspaceTags],
 	);
 
 	const setSectionColor = useCallback(
 		(sectionId: string, color: string | null) => {
-			if (!collections.v2SidebarSections.get(sectionId)) return;
+			if (!ensureSectionRow(sectionId)) return;
 			collections.v2SidebarSections.update(sectionId, (draft) => {
 				draft.color = color;
 			});
 		},
-		[collections],
+		[collections, ensureSectionRow],
 	);
 
 	const moveWorkspaceToSection = useCallback(
@@ -378,27 +635,53 @@ export function useDashboardSidebarState() {
 		) => {
 			const existing = collections.v2WorkspaceLocalState.get(workspaceId);
 			if (!existing) return;
+			const folderIndex = getProjectFolderIndex(
+				collections,
+				hostWorkspaces,
+				projectId,
+			);
+			const currentTags = getHostWorkspaceTags(hostWorkspaces, workspaceId);
 
 			if (sectionId === null) {
-				const currentSectionId = existing.sidebarState.sectionId;
+				// The DERIVED container decides the no-op, not the raw local
+				// pointer: a tag-filed member has sectionId null already, and
+				// checking that field made "Ungroup" a guaranteed no-op.
+				const effectiveSectionId = getEffectiveSectionId(
+					collections,
+					hostWorkspaces,
+					existing,
+				);
 				const sameProject = existing.sidebarState.projectId === projectId;
-				// Already ungrouped in this project — nothing to move.
 				if (
-					currentSectionId === null &&
+					effectiveSectionId === null &&
 					sameProject &&
 					isSidebarWorkspaceVisible(existing)
 				) {
 					return;
 				}
-				const topLevelItems = getProjectTopLevelItems(collections, projectId, {
-					excludeWorkspaceId: workspaceId,
-				});
+				// Strip only the project's folder tags — an agent's unrelated
+				// tag survives the ungroup.
+				const strippedTags = applyFolderTagChange(
+					currentTags,
+					folderIndex.keys(),
+					null,
+				);
+				if (strippedTags.join("\n") !== currentTags.join("\n")) {
+					writeWorkspaceTags(workspaceId, strippedTags);
+				}
+				const topLevelItems = getProjectTopLevelItems(
+					collections,
+					hostWorkspaces,
+					projectId,
+					{ excludeWorkspaceId: workspaceId },
+				);
 				// Groups interleave with ungrouped rows, so "before the first
 				// section" can be far from the row's group. Keep the row in
 				// place: land it directly below its former group.
 				const sectionIndex = sameProject
 					? topLevelItems.findIndex(
-							(item) => item.type === "section" && item.id === currentSectionId,
+							(item) =>
+								item.type === "section" && item.id === effectiveSectionId,
 						)
 					: -1;
 				const insertIndex =
@@ -414,6 +697,11 @@ export function useDashboardSidebarState() {
 				return;
 			}
 
+			// A move into a tag-backed folder reads the tag from the KEY — a
+			// missing row means "derived", never "legacy" (treating it as
+			// legacy would write a sectionId pointing at nothing).
+			const targetTag = parseSidebarFolderKey(sectionId)?.tag ?? null;
+
 			const siblingRows = Array.from(
 				collections.v2WorkspaceLocalState.state.values(),
 			)
@@ -422,31 +710,48 @@ export function useDashboardSidebarState() {
 						item.sidebarState.projectId === projectId &&
 						isSidebarWorkspaceVisible(item) &&
 						item.workspaceId !== workspaceId &&
-						item.sidebarState.sectionId === sectionId,
+						getEffectiveSectionId(collections, hostWorkspaces, item) ===
+							sectionId,
 				)
 				.map((item) => ({ tabOrder: item.sidebarState.tabOrder }));
 
+			if (targetTag !== null) {
+				writeWorkspaceTags(
+					workspaceId,
+					applyFolderTagChange(currentTags, folderIndex.keys(), targetTag),
+				);
+			}
 			collections.v2WorkspaceLocalState.update(workspaceId, (draft) => {
 				draft.sidebarState.projectId = projectId;
-				draft.sidebarState.sectionId = sectionId;
+				// Tag-backed membership lives in the tags; a pointer at the
+				// folder would only go stale. Legacy (unconverted) targets keep
+				// the pointer until the migration converts them.
+				draft.sidebarState.sectionId = targetTag !== null ? null : sectionId;
 				draft.sidebarState.tabOrder = getNextTabOrder(siblingRows);
 				draft.sidebarState.isHidden = false;
 			});
 		},
-		[collections],
+		[collections, hostWorkspaces, writeWorkspaceTags],
 	);
 
 	const deleteSection = useCallback(
 		(sectionId: string) => {
 			const section = collections.v2SidebarSections.get(sectionId);
-			if (!section) return;
+			const parsed = parseSidebarFolderKey(sectionId);
+			// A derived folder has no row but is still deletable — deleting it
+			// means untagging its members.
+			if (!section && !parsed) return;
+			const projectId = section?.projectId ?? parsed?.projectId;
+			if (!projectId) return;
+			const folderTag = normalizeWorkspaceTag(section?.tag) ?? parsed?.tag ?? null;
 
 			// Groups interleave with ungrouped rows, so replace the deleted
 			// section's own slot with its members instead of dumping them
 			// "before the first section" (which may be far away).
 			const withSection = getProjectTopLevelItems(
 				collections,
-				section.projectId,
+				hostWorkspaces,
+				projectId,
 			);
 			const sectionIndex = withSection.findIndex(
 				(item) => item.type === "section" && item.id === sectionId,
@@ -454,14 +759,18 @@ export function useDashboardSidebarState() {
 			const topLevelItems = withSection.filter(
 				(item) => !(item.type === "section" && item.id === sectionId),
 			);
+			// Members come from the shared resolver — matching only rows whose
+			// raw sectionId pointer equals the deleted id stranded every
+			// tag-derived member.
 			const sectionWorkspaces = Array.from(
 				collections.v2WorkspaceLocalState.state.values(),
 			)
 				.filter(
 					(item) =>
-						item.sidebarState.projectId === section.projectId &&
+						item.sidebarState.projectId === projectId &&
 						isSidebarWorkspaceVisible(item) &&
-						item.sidebarState.sectionId === sectionId,
+						getEffectiveSectionId(collections, hostWorkspaces, item) ===
+							sectionId,
 				)
 				.sort(
 					(left, right) =>
@@ -481,11 +790,26 @@ export function useDashboardSidebarState() {
 					tabOrder: 0,
 				})),
 			);
-			writeProjectTopLevelOrder(collections, section.projectId, topLevelItems);
+			writeProjectTopLevelOrder(collections, projectId, topLevelItems);
 
-			collections.v2SidebarSections.delete(sectionId);
+			// Untag every member on its host — the folder is the tag, so this
+			// is what actually deletes it. Members that carry the tag without a
+			// local row (filed from another machine) get untagged too.
+			if (folderTag !== null) {
+				for (const workspace of hostWorkspaces) {
+					if (workspace.projectId !== projectId) continue;
+					const tags = normalizeWorkspaceTags(workspace.tags);
+					if (!tags.includes(folderTag)) continue;
+					writeWorkspaceTags(
+						workspace.id,
+						tags.filter((tag) => tag !== folderTag),
+					);
+				}
+			}
+
+			if (section) collections.v2SidebarSections.delete(sectionId);
 		},
-		[collections],
+		[collections, hostWorkspaces, writeWorkspaceTags],
 	);
 
 	const setWorkspacePinned = useCallback(
@@ -499,7 +823,12 @@ export function useDashboardSidebarState() {
 				if (projectId !== null) {
 					ensureSidebarProjectRecord(collections, projectId);
 				}
-				ensureSidebarWorkspaceRecord(collections, workspaceId, projectId);
+				ensureSidebarWorkspaceRecord(
+					collections,
+					hostWorkspaces,
+					workspaceId,
+					projectId,
+				);
 			}
 			// Strictly greater than every existing pin so same-millisecond pins
 			// still order by pin sequence instead of collection iteration order.
@@ -519,7 +848,7 @@ export function useDashboardSidebarState() {
 				}
 			});
 		},
-		[collections],
+		[collections, hostWorkspaces],
 	);
 
 	const reorderPinnedWorkspaces = useCallback(
@@ -554,7 +883,12 @@ export function useDashboardSidebarState() {
 					if (projectId !== null) {
 						ensureSidebarProjectRecord(collections, projectId);
 					}
-					ensureSidebarWorkspaceRecord(collections, workspaceId, projectId);
+					ensureSidebarWorkspaceRecord(
+						collections,
+						hostWorkspaces,
+						workspaceId,
+						projectId,
+					);
 				}
 				collections.v2WorkspaceLocalState.update(workspaceId, (draft) => {
 					draft.sidebarState.pinnedAt = base + index;
@@ -562,7 +896,7 @@ export function useDashboardSidebarState() {
 				});
 			});
 		},
-		[collections],
+		[collections, hostWorkspaces],
 	);
 
 	const removeWorkspaceFromSidebar = useCallback(

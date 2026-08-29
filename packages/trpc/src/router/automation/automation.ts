@@ -372,6 +372,9 @@ export const automationRouter = {
 						targetHostId,
 						v2ProjectId,
 						v2WorkspaceId: input.v2WorkspaceId ?? null,
+						// Every automation groups its runs out of the box; explicit
+						// tags (including []) override the default.
+						tags: input.tags ?? ["automation"],
 					})
 					.returning();
 
@@ -546,6 +549,7 @@ export const automationRouter = {
 						targetHostId: nextTargetHostId,
 						v2ProjectId: nextProjectId,
 						v2WorkspaceId: nextWorkspaceId,
+						tags: input.tags ?? existing.tags,
 					})
 					.where(eq(automations.id, input.id))
 					.returning();

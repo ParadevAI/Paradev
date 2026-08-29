@@ -687,6 +687,13 @@
       "when": 1787960672440,
       "tag": "0097_add_page_watch_columns",
       "breakpoints": true
+    },
+    {
+      "idx": 98,
+      "version": "7",
+      "when": 1788022153311,
+      "tag": "0098_automation_tags",
+      "breakpoints": true
     }
   ]
 }
