@@ -294,7 +294,7 @@ async function createPage({
 			createdByUserId: userId,
 			title,
 			description: input.description ?? null,
-			visibility: input.visibility ?? "just_me",
+			visibility: input.visibility ?? "org",
 		})
 		.returning();
 

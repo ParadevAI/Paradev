@@ -170,12 +170,15 @@ export const pageRouter = {
 					sharedVersion: pages.sharedVersion,
 					createdAt: pages.createdAt,
 					updatedAt: pages.updatedAt,
+					createdByUserId: pages.createdByUserId,
+					ownerName: users.name,
 					latestVersion: latest.version,
 					contentType: latest.contentType,
 					sizeBytes: latest.sizeBytes,
 					publishedAt: latest.publishedAt,
 				})
 				.from(pages)
+				.leftJoin(users, eq(users.id, pages.createdByUserId))
 				.leftJoinLateral(latest, sql`true`);
 
 			const scoped = input?.workspaceId

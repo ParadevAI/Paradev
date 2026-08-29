@@ -6086,6 +6086,11 @@ msgstr "Créée"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pages/components/PagesGrid/components/PageCard/PageCard.tsx
+msgid "dashboard.pages.pageCard.delete"
+msgstr "Supprimer"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pages/components/PagesGrid/components/PageCard/PageCard.tsx
 msgid "dashboard.pages.pageCard.edited"
 msgstr "Modifiée"
 
@@ -6103,6 +6108,11 @@ msgstr "Épingler"
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pages/components/PagesGrid/components/PageCard/PageCard.tsx
 msgid "dashboard.pages.pageCard.unpin"
 msgstr "Désépingler"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pages/components/PagesView/PagesView.tsx
+msgid "dashboard.pages.pageDeleted"
+msgstr "Page supprimée"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pages/components/PagesView/PagesView.tsx

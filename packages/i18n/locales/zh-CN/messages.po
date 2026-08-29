@@ -6086,6 +6086,11 @@ msgstr "创建于"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pages/components/PagesGrid/components/PageCard/PageCard.tsx
+msgid "dashboard.pages.pageCard.delete"
+msgstr "删除"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pages/components/PagesGrid/components/PageCard/PageCard.tsx
 msgid "dashboard.pages.pageCard.edited"
 msgstr "编辑于"
 
@@ -6103,6 +6108,11 @@ msgstr "置顶"
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pages/components/PagesGrid/components/PageCard/PageCard.tsx
 msgid "dashboard.pages.pageCard.unpin"
 msgstr "取消置顶"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pages/components/PagesView/PagesView.tsx
+msgid "dashboard.pages.pageDeleted"
+msgstr "页面已删除"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pages/components/PagesView/PagesView.tsx

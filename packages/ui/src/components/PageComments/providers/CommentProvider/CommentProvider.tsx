@@ -84,6 +84,20 @@ export function useComments(): CommentContextValue {
 	return value;
 }
 
+function sameRect(
+	a: FrameRect | null | undefined,
+	b: FrameRect | null | undefined,
+): boolean {
+	if (a === b) return true;
+	if (!a || !b) return false;
+	return (
+		a.top === b.top &&
+		a.left === b.left &&
+		a.width === b.width &&
+		a.height === b.height
+	);
+}
+
 export function CommentProvider({
 	user,
 	store,
@@ -146,7 +160,14 @@ export function CommentProvider({
 
 	const setRects = useCallback(
 		(entries: { id: string; rect: FrameRect | null }[]) => {
-			setRectState(Object.fromEntries(entries.map((e) => [e.id, e.rect])));
+			setRectState((previous) => {
+				const next = Object.fromEntries(entries.map((e) => [e.id, e.rect]));
+				const keys = Object.keys(next);
+				if (keys.length !== Object.keys(previous).length) return next;
+				return keys.every((key) => sameRect(previous[key], next[key]))
+					? previous
+					: next;
+			});
 		},
 		[],
 	);

@@ -6086,6 +6086,11 @@ msgstr "作成"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pages/components/PagesGrid/components/PageCard/PageCard.tsx
+msgid "dashboard.pages.pageCard.delete"
+msgstr "削除"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pages/components/PagesGrid/components/PageCard/PageCard.tsx
 msgid "dashboard.pages.pageCard.edited"
 msgstr "編集"
 
@@ -6103,6 +6108,11 @@ msgstr "ピン留め"
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pages/components/PagesGrid/components/PageCard/PageCard.tsx
 msgid "dashboard.pages.pageCard.unpin"
 msgstr "ピン留めを解除"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pages/components/PagesView/PagesView.tsx
+msgid "dashboard.pages.pageDeleted"
+msgstr "ページを削除しました"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pages/components/PagesView/PagesView.tsx

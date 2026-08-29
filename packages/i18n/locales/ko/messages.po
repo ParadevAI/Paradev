@@ -6086,6 +6086,11 @@ msgstr "생성됨"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pages/components/PagesGrid/components/PageCard/PageCard.tsx
+msgid "dashboard.pages.pageCard.delete"
+msgstr "삭제"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pages/components/PagesGrid/components/PageCard/PageCard.tsx
 msgid "dashboard.pages.pageCard.edited"
 msgstr "수정됨"
 
@@ -6103,6 +6108,11 @@ msgstr "고정"
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pages/components/PagesGrid/components/PageCard/PageCard.tsx
 msgid "dashboard.pages.pageCard.unpin"
 msgstr "고정 해제"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pages/components/PagesView/PagesView.tsx
+msgid "dashboard.pages.pageDeleted"
+msgstr "페이지를 삭제했습니다"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pages/components/PagesView/PagesView.tsx
