@@ -1,4 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import { FORK_SESSION_ID_TOKEN } from "@superset/shared/agent-definition";
 import type { PromptTransport } from "@superset/shared/agent-prompt-launch";
 import { Input } from "@superset/ui/input";
 import { Label } from "@superset/ui/label";
@@ -51,12 +52,15 @@ interface AgentLaunchFieldsProps {
 	resumeArgsText: string;
 	onResumeArgsTextChange: (value: string) => void;
 	onResumeArgsBlur?: () => void;
+	forkArgsText: string;
+	onForkArgsTextChange: (value: string) => void;
+	onForkArgsBlur?: () => void;
 	promptTransport: PromptTransport;
 	onPromptTransportChange: (next: PromptTransport) => void;
 }
 
 /**
- * The "Launch" section (command, prompt-only args, resume args, transport).
+ * The "Launch" section (command, prompt-only args, resume/fork args, transport).
  * The edit pane wires the blur callbacks to autosave; the create pane omits
  * them and reads the controlled values on submit.
  */
@@ -71,10 +75,17 @@ export function AgentLaunchFields({
 	resumeArgsText,
 	onResumeArgsTextChange,
 	onResumeArgsBlur,
+	forkArgsText,
+	onForkArgsTextChange,
+	onForkArgsBlur,
 	promptTransport,
 	onPromptTransportChange,
 }: AgentLaunchFieldsProps) {
 	const { t } = useLingui();
+	// Named `sessionId` on purpose: the macro takes the placeholder name from
+	// this identifier, and an inline "{sessionId}" literal would be inlined
+	// into the message and then read back as an ICU argument with no value.
+	const sessionId = FORK_SESSION_ID_TOKEN;
 	return (
 		<Section
 			title={t({ id: "settings.agents.form.launchSection", message: "Launch" })}
@@ -144,6 +155,30 @@ export function AgentLaunchFields({
 					onChange={(e) => onResumeArgsTextChange(e.target.value)}
 					onBlur={onResumeArgsBlur}
 					placeholder="--resume"
+				/>
+			</StackedField>
+
+			<StackedField
+				label={t({
+					id: "settings.agents.form.forkArgsLabel",
+					message: "Fork args",
+				})}
+				hint={
+					<Trans id="settings.agents.form.forkArgsHint">
+						Used to clone a previous session without changing it. Put{" "}
+						<code>{sessionId}</code> where the source id belongs, or leave empty
+						if the agent cannot fork sessions.
+					</Trans>
+				}
+				htmlFor={`${idPrefix}-fork-args`}
+			>
+				<Input
+					id={`${idPrefix}-fork-args`}
+					className="font-mono text-xs"
+					value={forkArgsText}
+					onChange={(e) => onForkArgsTextChange(e.target.value)}
+					onBlur={onForkArgsBlur}
+					placeholder="--resume {sessionId} --fork-session"
 				/>
 			</StackedField>
 

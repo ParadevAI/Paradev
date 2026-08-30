@@ -20412,6 +20412,16 @@ msgstr "Команда"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/settings/agents/components/V2AgentsSettings/components/AgentFormControls/AgentFormControls.tsx
+msgid "settings.agents.form.forkArgsHint"
+msgstr "Используется, чтобы склонировать предыдущую сессию, не изменяя её. Поставьте <0>{sessionId}</0> там, где должен быть идентификатор источника, или оставьте пустым, если агент не умеет форкать сессии."
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/settings/agents/components/V2AgentsSettings/components/AgentFormControls/AgentFormControls.tsx
+msgid "settings.agents.form.forkArgsLabel"
+msgstr "Аргументы форка"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/settings/agents/components/V2AgentsSettings/components/AgentFormControls/AgentFormControls.tsx
 msgid "settings.agents.form.launchSection"
 msgstr "Запуск"
 
@@ -34864,6 +34874,50 @@ msgid "workspace.terminalPane.connectionAria"
 msgstr "Соединение терминала: {label}"
 
 #. js-lingui-explicit-id
+#. placeholder {0}: formatNumber(transcript.length)
+#. placeholder {1}: formatNumber(estimateTokens(transcript.length))
+#. placeholder {2}: selectedConfig.label
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/TerminalPane/components/TerminalPaneHeaderExtras/components/TerminalSessionHandoffMenu/TerminalSessionHandoffMenu.tsx
+msgid "workspace.terminalPane.contextDisclosureSized"
+msgstr "Отправит {0} символов контекста терминала (примерно {1} токенов) агенту {2}."
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/TerminalPane/components/TerminalPaneHeaderExtras/components/TerminalSessionHandoffMenu/TerminalSessionHandoffMenu.tsx
+msgid "workspace.terminalPane.contextEmpty"
+msgstr "В этом терминале пока нет вывода, который можно передать."
+
+#. js-lingui-explicit-id
+#. placeholder {0}: selectedConfig.label
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/TerminalPane/components/TerminalPaneHeaderExtras/components/TerminalSessionHandoffMenu/TerminalSessionHandoffMenu.tsx
+msgid "workspace.terminalPane.contextMeasuring"
+msgstr "Измеряем контекст для отправки агенту {0}…"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/TerminalPane/components/TerminalPaneHeaderExtras/components/TerminalSessionHandoffMenu/TerminalSessionHandoffMenu.tsx
+msgid "workspace.terminalPane.contextUnavailable"
+msgstr "Не удалось прочитать контекст этого терминала."
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/TerminalPane/components/TerminalPaneHeaderExtras/components/TerminalSessionHandoffMenu/TerminalSessionHandoffMenu.tsx
+msgid "workspace.terminalPane.continueWithAgent"
+msgstr "Продолжить с другим агентом…"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/TerminalPane/components/TerminalPaneHeaderExtras/components/TerminalSessionHandoffMenu/TerminalSessionHandoffMenu.tsx
+msgid "workspace.terminalPane.continueWithAgentConfirm"
+msgstr "Продолжить"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/TerminalPane/components/TerminalPaneHeaderExtras/components/TerminalSessionHandoffMenu/TerminalSessionHandoffMenu.tsx
+msgid "workspace.terminalPane.continueWithAgentDescription"
+msgstr "Запускает новую сессию агента с недавним контекстом этого терминала. Источником истины остаются файлы рабочего пространства."
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/TerminalPane/components/TerminalPaneHeaderExtras/components/TerminalSessionHandoffMenu/TerminalSessionHandoffMenu.tsx
+msgid "workspace.terminalPane.continueWithAgentTitle"
+msgstr "Продолжить с другим агентом"
+
+#. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/TerminalPane/components/TerminalPaneHeaderExtras/components/TerminalIdCopyMenu/TerminalIdCopyMenu.tsx
 msgid "workspace.terminalPane.copiedIdTooltip"
 msgstr "Скопировано: {copiedLabel}"
@@ -34909,9 +34963,40 @@ msgid "workspace.terminalPane.dismissResumeAria"
 msgstr "Закрыть предложение возобновить"
 
 #. js-lingui-explicit-id
+#. placeholder {0}: sourceConfig?.label ?? binding.agentId
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/TerminalPane/components/TerminalPaneHeaderExtras/components/TerminalSessionHandoffMenu/TerminalSessionHandoffMenu.tsx
+msgid "workspace.terminalPane.forkProvider"
+msgstr "Провайдер: {0}"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/TerminalPane/components/TerminalPaneHeaderExtras/components/TerminalSessionHandoffMenu/TerminalSessionHandoffMenu.tsx
+msgid "workspace.terminalPane.forkSession"
+msgstr "Форкнуть сессию…"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/TerminalPane/components/TerminalPaneHeaderExtras/components/TerminalSessionHandoffMenu/TerminalSessionHandoffMenu.tsx
+msgid "workspace.terminalPane.forkSessionConfirm"
+msgstr "Форкнуть сессию"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/TerminalPane/components/TerminalPaneHeaderExtras/components/TerminalSessionHandoffMenu/TerminalSessionHandoffMenu.tsx
+msgid "workspace.terminalPane.forkSessionDescription"
+msgstr "Создаёт нативный форк на стороне провайдера с тем же контекстом разговора. Исходная сессия остаётся без изменений."
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/TerminalPane/components/TerminalPaneHeaderExtras/components/TerminalSessionHandoffMenu/TerminalSessionHandoffMenu.tsx
+msgid "workspace.terminalPane.forkSessionTitle"
+msgstr "Форкнуть сессию"
+
+#. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/TerminalPane/components/TerminalPaneHeaderExtras/components/TerminalConnectionIndicator/TerminalConnectionIndicator.tsx
 msgid "workspace.terminalPane.hideLog"
 msgstr "Скрыть лог"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/TerminalPane/components/TerminalPaneHeaderExtras/components/TerminalSessionHandoffMenu/TerminalSessionHandoffMenu.tsx
+msgid "workspace.terminalPane.newTab"
+msgstr "Новая вкладка"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/TerminalPane/components/TerminalSessionDropdown/TerminalSessionDropdown.tsx
@@ -34927,6 +35012,11 @@ msgstr "Новый терминал"
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/TerminalPane/components/TerminalSessionDropdown/TerminalSessionDropdown.tsx
 msgid "workspace.terminalPane.noLiveSessions"
 msgstr "Нет активных сессий"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/TerminalPane/components/TerminalPaneHeaderExtras/components/TerminalSessionHandoffMenu/TerminalSessionHandoffMenu.tsx
+msgid "workspace.terminalPane.openSessionIn"
+msgstr "Открыть сессию в"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/TerminalPane/TerminalPane.tsx
@@ -35046,6 +35136,21 @@ msgid "workspace.terminalPane.richInputPlaceholder"
 msgstr "Попросите внести изменения"
 
 #. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/TerminalPane/components/TerminalPaneHeaderExtras/components/TerminalSessionHandoffMenu/TerminalSessionHandoffMenu.tsx
+msgid "workspace.terminalPane.selectAgent"
+msgstr "Выберите агента"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/TerminalPane/components/TerminalPaneHeaderExtras/components/TerminalSessionHandoffMenu/TerminalSessionHandoffMenu.tsx
+msgid "workspace.terminalPane.sessionActionCancel"
+msgstr "Отмена"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/TerminalPane/components/TerminalPaneHeaderExtras/components/TerminalSessionHandoffMenu/TerminalSessionHandoffMenu.tsx
+msgid "workspace.terminalPane.sessionActions"
+msgstr "Продолжить или форкнуть сессию"
+
+#. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/TerminalPane/components/TerminalSessionDropdown/TerminalSessionDropdown.tsx
 msgid "workspace.terminalPane.sessionCreating"
 msgstr "Создание"
@@ -35086,6 +35191,16 @@ msgid "workspace.terminalPane.sessionStatusStarting"
 msgstr "Запуск"
 
 #. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/TerminalPane/components/TerminalPaneHeaderExtras/components/TerminalSessionHandoffMenu/TerminalSessionHandoffMenu.tsx
+msgid "workspace.terminalPane.splitPane"
+msgstr "Разделённая панель"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/TerminalPane/components/TerminalPaneHeaderExtras/components/TerminalSessionHandoffMenu/TerminalSessionHandoffMenu.tsx
+msgid "workspace.terminalPane.startingSession"
+msgstr "Запуск…"
+
+#. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/TerminalPane/components/TerminalPaneHeaderExtras/components/TerminalConnectionIndicator/TerminalConnectionIndicator.tsx
 msgid "workspace.terminalPane.statusDisconnected"
 msgstr "Отключено"
@@ -35099,6 +35214,11 @@ msgstr "Переподключение…"
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/TerminalPane/components/TerminalPaneHeaderExtras/components/TerminalConnectionIndicator/TerminalConnectionIndicator.tsx
 msgid "workspace.terminalPane.statusUnresponsive"
 msgstr "Терминалы не отвечают"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/TerminalPane/components/TerminalPaneHeaderExtras/components/TerminalSessionHandoffMenu/TerminalSessionHandoffMenu.tsx
+msgid "workspace.terminalPane.targetAgent"
+msgstr "Целевой агент"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/TerminalPane/components/TerminalPaneHeaderExtras/components/TerminalIdCopyMenu/TerminalIdCopyMenu.tsx

@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "c938c3a9-df79-4c3f-b66d-9770d1d743c7",
-  "prevId": "cabb9da2-eb6f-4a9e-87a0-c465d4faca47",
+  "id": "5787b028-bb6a-4586-9d81-5f79e4a607dc",
+  "prevId": "1577d952-42b0-4930-95d7-547d4e03196e",
   "tables": {
     "host_agent_configs": {
       "name": "host_agent_configs",
@@ -67,6 +67,14 @@
         },
         "resume_args_json": {
           "name": "resume_args_json",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'[]'"
+        },
+        "fork_args_json": {
+          "name": "fork_args_json",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -764,6 +772,80 @@
             "pull_request_id"
           ],
           "name": "workspace_pull_requests_workspace_id_pull_request_id_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "workspace_tag_settings": {
+      "name": "workspace_tag_settings",
+      "columns": {
+        "project_id": {
+          "name": "project_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "tag": {
+          "name": "tag",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "display_name": {
+          "name": "display_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "color": {
+          "name": "color",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "tab_order": {
+          "name": "tab_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "workspace_tag_settings_project_id_projects_id_fk": {
+          "name": "workspace_tag_settings_project_id_projects_id_fk",
+          "tableFrom": "workspace_tag_settings",
+          "tableTo": "projects",
+          "columnsFrom": [
+            "project_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "workspace_tag_settings_project_id_tag_pk": {
+          "columns": [
+            "project_id",
+            "tag"
+          ],
+          "name": "workspace_tag_settings_project_id_tag_pk"
         }
       },
       "uniqueConstraints": {},

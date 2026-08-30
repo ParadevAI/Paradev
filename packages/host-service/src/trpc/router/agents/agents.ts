@@ -1,3 +1,4 @@
+import { FORK_SESSION_ID_TOKEN } from "@superset/shared/agent-definition";
 import {
 	buildAgentEffortArgs,
 	buildAgentModeArgs,
@@ -19,6 +20,7 @@ import { asc, eq } from "drizzle-orm";
 import { z } from "zod";
 import type { HostDb } from "../../../db";
 import { hostAgentConfigs, workspaces } from "../../../db/schema";
+import { hasHarnessSession } from "../../../terminal/harness-transcript";
 import { createTerminalSessionInternal } from "../../../terminal/terminal";
 import type { HostServiceContext } from "../../../types";
 import { protectedProcedure, router } from "../../index";
@@ -36,6 +38,7 @@ interface ResolvedHostAgentConfig {
 	promptTransport: "argv" | "stdin";
 	promptArgs: string[];
 	resumeArgs: string[];
+	forkArgs: string[];
 	env: Record<string, string>;
 }
 
@@ -83,6 +86,7 @@ function rowToConfig(
 		promptTransport: row.promptTransport as "argv" | "stdin",
 		promptArgs: parseArgv(row.promptArgsJson),
 		resumeArgs: parseArgv(row.resumeArgsJson),
+		forkArgs: parseArgv(row.forkArgsJson),
 		env: parseEnv(row.envJson),
 	};
 }
@@ -133,18 +137,26 @@ export function buildAgentCommandString(
 	config: ResolvedHostAgentConfig,
 	rawPrompt: string,
 	modelArgs: string[] = [],
-	options: { resumeSessionId?: string; randomId?: string } = {},
+	options: {
+		resumeSessionId?: string;
+		forkSessionId?: string;
+		randomId?: string;
+	} = {},
 ): string {
 	const randomId = options.randomId ?? crypto.randomUUID();
 	const prompt = sanitizePromptForPty(rawPrompt);
 	const resumeArgv = options.resumeSessionId
 		? [...config.resumeArgs, sanitizePromptForPty(options.resumeSessionId)]
 		: [];
+	const forkArgv = options.forkSessionId
+		? buildForkArgv(config.forkArgs, options.forkSessionId)
+		: [];
 	const baseArgv = [
 		config.command,
 		...config.args,
 		...modelArgs,
 		...resumeArgv,
+		...forkArgv,
 	];
 
 	if (prompt === "") {
@@ -163,6 +175,20 @@ export function buildAgentCommandString(
 		prompt,
 		randomId,
 	});
+}
+
+function buildForkArgv(forkArgs: string[], rawSessionId: string): string[] {
+	const sessionId = sanitizePromptForPty(rawSessionId);
+	let replaced = false;
+	const argv = forkArgs.map((arg) => {
+		if (!arg.includes(FORK_SESSION_ID_TOKEN)) return arg;
+		replaced = true;
+		// Substituted within the argument, since the settings hint invites
+		// forms like `--session-id={sessionId}`; whole-arg matching passed the
+		// literal token through and appended the id as a stray extra.
+		return arg.replaceAll(FORK_SESSION_ID_TOKEN, sessionId);
+	});
+	return replaced ? argv : [...argv, sessionId];
 }
 
 function buildAttachmentBlock(
@@ -186,6 +212,8 @@ export interface AgentRunInput {
 	/** Session id of a previous run of this agent to restore (e.g. a killed
 	 * session's `agentSessionId`). The prompt may be empty when resuming. */
 	resumeSessionId?: string;
+	/** Session id to clone into a new provider-owned session. */
+	forkSessionId?: string;
 }
 
 export type AgentRunResult = {
@@ -306,6 +334,71 @@ export function validateAgentResumeSelection(
 	}
 }
 
+export function validateAgentForkSelection(
+	config: Pick<ResolvedHostAgentConfig, "label" | "forkArgs">,
+	forkSessionId: string | undefined,
+): void {
+	if (forkSessionId === undefined) return;
+
+	if (config.forkArgs.length === 0) {
+		throw new TRPCError({
+			code: "BAD_REQUEST",
+			message: `${config.label} does not support forking a session by id. Omit forkSessionId to start a new session.`,
+		});
+	}
+
+	if (sanitizePromptForPty(forkSessionId).trim() === "") {
+		throw new TRPCError({
+			code: "BAD_REQUEST",
+			message: `Invalid fork session id for ${config.label}.`,
+		});
+	}
+}
+
+/**
+ * Refuse a fork the harness can no longer resolve.
+ *
+ * Providers prune their session stores, and a `codex exec` session leaves no
+ * rollout at all. Without this the launch succeeds, the pane opens, and the
+ * harness reports "no rollout found for thread id" inside it — an error about
+ * a click the user made somewhere else entirely.
+ *
+ * Only a confident `false` refuses. A harness that keeps sessions server-side
+ * (grok) or in a layout we do not read answers `null`, and those launch as
+ * before rather than being blocked on our ignorance.
+ */
+function validateForkSessionIsResolvable(
+	db: HostDb,
+	config: ResolvedHostAgentConfig,
+	input: AgentRunInput,
+): void {
+	if (!input.forkSessionId) return;
+	const worktreePath = db
+		.select({ path: workspaces.worktreePath })
+		.from(workspaces)
+		.where(eq(workspaces.id, input.workspaceId))
+		.get()?.path;
+	// The same env the launch will run under: an agent pinned to its own
+	// provider account keeps its sessions in that account's directory, and
+	// looking in the default one would refuse a fork that would have worked.
+	const launchEnv = {
+		...resolveDefaultAccountEnv(db, config.presetId),
+		...config.env,
+	};
+	const resolvable = hasHarnessSession({
+		agentId: config.presetId,
+		sessionId: input.forkSessionId,
+		worktreePath,
+		env: launchEnv,
+	});
+	if (resolvable === false) {
+		throw new TRPCError({
+			code: "BAD_REQUEST",
+			message: `${config.label} no longer has session ${input.forkSessionId}, so there is nothing to fork. Start a new session instead.`,
+		});
+	}
+}
+
 /**
  * Preflight a host-scoped launch before any larger workflow (such as
  * workspace creation) performs side effects.
@@ -359,7 +452,17 @@ export function buildTerminalAgentLaunch(
 	validateAgentModelSelection(launchPresetId, config.label, input.model);
 	validateAgentEffortSelection(launchPresetId, config.label, input.effort);
 	validateAgentModeSelection(launchPresetId, config.label, input.mode);
+	// Ahead of the per-field validators: passing both is its own mistake, and
+	// "this agent cannot fork" would send the caller after the wrong one.
+	if (input.resumeSessionId && input.forkSessionId) {
+		throw new TRPCError({
+			code: "BAD_REQUEST",
+			message: "Choose either resumeSessionId or forkSessionId, not both.",
+		});
+	}
 	validateAgentResumeSelection(config, input.resumeSessionId);
+	validateAgentForkSelection(config, input.forkSessionId);
+	validateForkSessionIsResolvable(db, config, input);
 
 	const resolvedAttachments: Array<{ attachmentId: string; path: string }> = [];
 	for (const attachmentId of input.attachmentIds ?? []) {
@@ -381,7 +484,10 @@ export function buildTerminalAgentLaunch(
 		config,
 		prompt,
 		[...modelArgs, ...effortArgs, ...modeArgs],
-		{ resumeSessionId: input.resumeSessionId },
+		{
+			resumeSessionId: input.resumeSessionId,
+			forkSessionId: input.forkSessionId,
+		},
 	);
 	const modelEnv = buildAgentModelEnv(launchPresetId, input.model);
 	// Host-default provider account (Usage tab switcher). Per-agent env wins,
@@ -462,6 +568,7 @@ export const agentsRouter = router({
 				effort: z.string().min(1).optional(),
 				mode: z.string().min(1).optional(),
 				resumeSessionId: z.string().min(1).optional(),
+				forkSessionId: z.string().min(1).optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => runAgentInWorkspace(ctx, input)),

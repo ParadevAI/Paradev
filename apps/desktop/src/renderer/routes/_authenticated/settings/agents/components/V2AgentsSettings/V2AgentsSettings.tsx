@@ -37,6 +37,7 @@ const KNOWN_PRESETS: HostAgentPreset[] = HOST_AGENT_PRESETS.map((preset) => ({
 	args: [...preset.args],
 	promptArgs: [...preset.promptArgs],
 	resumeArgs: [...preset.resumeArgs],
+	forkArgs: [...preset.forkArgs],
 	env: { ...preset.env },
 }));
 

@@ -93,6 +93,9 @@ export function AgentDetail({
 	const [resumeArgsText, setResumeArgsText] = useState(
 		joinArgs(config.resumeArgs),
 	);
+	const [forkArgsText, setForkArgsText] = useState(
+		joinArgs(config.forkArgs ?? []),
+	);
 	const [promptTransport, setPromptTransport] = useState<PromptTransport>(
 		config.promptTransport,
 	);
@@ -108,6 +111,7 @@ export function AgentDetail({
 		);
 		setPromptArgsText(joinArgs(config.promptArgs));
 		setResumeArgsText(joinArgs(config.resumeArgs));
+		setForkArgsText(joinArgs(config.forkArgs ?? []));
 		setPromptTransport(config.promptTransport);
 	}, [
 		config.label,
@@ -116,6 +120,7 @@ export function AgentDetail({
 		config.env,
 		config.promptArgs,
 		config.resumeArgs,
+		config.forkArgs,
 		config.promptTransport,
 	]);
 
@@ -252,6 +257,14 @@ export function AgentDetail({
 		if (changed) updateMutation.mutate({ resumeArgs: args });
 	};
 
+	const handleForkArgsBlur = () => {
+		const args = parseArgs(forkArgsText);
+		const changed =
+			args.length !== (config.forkArgs ?? []).length ||
+			args.some((arg, i) => arg !== (config.forkArgs ?? [])[i]);
+		if (changed) updateMutation.mutate({ forkArgs: args });
+	};
+
 	const handleTransportChange = (next: PromptTransport) => {
 		if (next === promptTransport) return;
 		const prev = promptTransport;
@@ -312,6 +325,9 @@ export function AgentDetail({
 					resumeArgsText={resumeArgsText}
 					onResumeArgsTextChange={setResumeArgsText}
 					onResumeArgsBlur={handleResumeArgsBlur}
+					forkArgsText={forkArgsText}
+					onForkArgsTextChange={setForkArgsText}
+					onForkArgsBlur={handleForkArgsBlur}
 					promptTransport={promptTransport}
 					onPromptTransportChange={handleTransportChange}
 				/>

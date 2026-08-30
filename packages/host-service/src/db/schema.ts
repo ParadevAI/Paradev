@@ -192,6 +192,8 @@ export const hostAgentConfigs = sqliteTable(
 		// Args that resume a previous session; the session id is appended after
 		// them. Empty means the agent has no id-based resume.
 		resumeArgsJson: text("resume_args_json").notNull().default("[]"),
+		// Args that fork a previous session into a new provider session id.
+		forkArgsJson: text("fork_args_json").notNull().default("[]"),
 		envJson: text("env_json").notNull().default("{}"),
 		displayOrder: integer("display_order").notNull(),
 		createdAt: integer("created_at")

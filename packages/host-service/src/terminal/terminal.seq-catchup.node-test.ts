@@ -45,6 +45,7 @@ import {
 	getDaemonClient,
 } from "./daemon-client-singleton.ts";
 import { initTerminalBaseEnv } from "./env.ts";
+import { HeadlessTerminal } from "./headless-xterm.ts";
 import {
 	__resetSessionsForTesting,
 	createTerminalSessionInternal,
@@ -55,10 +56,7 @@ import {
 } from "./terminal.ts";
 import { __setAccountShellForTesting } from "./user-shell.ts";
 
-const require = (await import("node:module")).createRequire(import.meta.url);
-const { Terminal: HeadlessTerminal } =
-	require("@xterm/headless") as typeof import("@xterm/headless");
-type Headless = InstanceType<typeof HeadlessTerminal>;
+type Headless = HeadlessTerminal;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TEST_HOME = path.join(os.tmpdir(), `host-svc-seqcatchup-${process.pid}`);

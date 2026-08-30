@@ -1,8 +1,10 @@
 import { Database } from "bun:sqlite";
 import { describe, expect, it } from "bun:test";
+import { mkdirSync, mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { resolve } from "node:path";
+import { join, resolve } from "node:path";
 import { TRPCError } from "@trpc/server";
+import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
 import type { HostDb } from "../../../db";
@@ -12,6 +14,7 @@ import {
 	buildAgentCommandString,
 	buildTerminalAgentLaunch,
 	validateAgentEffortSelection,
+	validateAgentForkSelection,
 	validateAgentModelSelection,
 	validateAgentModeSelection,
 	validateAgentResumeSelection,
@@ -26,6 +29,7 @@ const argvConfig = {
 	promptTransport: "argv" as const,
 	promptArgs: [],
 	resumeArgs: ["--resume"],
+	forkArgs: ["--resume", "{sessionId}", "--fork-session"],
 	env: {},
 };
 
@@ -38,6 +42,7 @@ const stdinConfig = {
 	promptTransport: "stdin" as const,
 	promptArgs: [],
 	resumeArgs: ["threads", "continue"],
+	forkArgs: [],
 	env: {},
 };
 
@@ -158,6 +163,29 @@ describe("buildAgentCommandString", () => {
 			"'claude' '--dangerously-skip-permissions' '--resume' 'x'\\''; rm -rf /'",
 		);
 	});
+
+	it("uses placeholder-based native fork args", () => {
+		expect(
+			buildAgentCommandString(argvConfig, "", [], {
+				forkSessionId: "abc-123",
+				randomId: RANDOM_ID,
+			}),
+		).toBe(
+			"'claude' '--dangerously-skip-permissions' '--resume' 'abc-123' '--fork-session'",
+		);
+	});
+
+	it("appends a session id when native fork args omit a placeholder", () => {
+		const config = { ...argvConfig, command: "codex", forkArgs: ["fork"] };
+		expect(
+			buildAgentCommandString(config, "continue", [], {
+				forkSessionId: "thread-42",
+				randomId: RANDOM_ID,
+			}),
+		).toBe(
+			"'codex' '--dangerously-skip-permissions' 'fork' 'thread-42' 'continue'",
+		);
+	});
 });
 
 describe("validateAgentResumeSelection", () => {
@@ -201,6 +229,27 @@ describe("validateAgentResumeSelection", () => {
 	});
 });
 
+describe("validateAgentForkSelection", () => {
+	it("accepts a native fork id when the config has fork args", () => {
+		expect(() =>
+			validateAgentForkSelection(argvConfig, "abc-123"),
+		).not.toThrow();
+	});
+
+	it("rejects forking a config without fork args", () => {
+		try {
+			validateAgentForkSelection({ ...argvConfig, forkArgs: [] }, "abc-123");
+			throw new Error("Expected validation to fail");
+		} catch (error) {
+			expect(error).toBeInstanceOf(TRPCError);
+			expect((error as TRPCError).code).toBe("BAD_REQUEST");
+			expect((error as Error).message).toBe(
+				"Claude does not support forking a session by id. Omit forkSessionId to start a new session.",
+			);
+		}
+	});
+});
+
 const MIGRATIONS_FOLDER = resolve(import.meta.dir, "../../../../drizzle");
 
 function createTestDb(): HostDb {
@@ -222,6 +271,11 @@ describe("buildTerminalAgentLaunch", () => {
 				promptTransport: "argv",
 				promptArgsJson: "[]",
 				resumeArgsJson: JSON.stringify(["--resume"]),
+				forkArgsJson: JSON.stringify([
+					"--resume",
+					"{sessionId}",
+					"--fork-session",
+				]),
 				envJson: JSON.stringify({ FOO: "bar" }),
 				displayOrder: 0,
 			})
@@ -254,6 +308,128 @@ describe("buildTerminalAgentLaunch", () => {
 		expect(launch.fullCommand).toBe(
 			"FOO='bar' 'claude' '--dangerously-skip-permissions' '--resume' 'abc-123'",
 		);
+	});
+
+	it("forks a previous provider session without changing the source", () => {
+		const db = createTestDb();
+		seedConfig(db);
+		const launch = buildTerminalAgentLaunch(db, {
+			workspaceId: "11111111-1111-1111-1111-111111111111",
+			agent: "claude",
+			prompt: "",
+			forkSessionId: "session-source",
+		});
+		expect(launch.fullCommand).toContain(
+			"'--resume' 'session-source' '--fork-session'",
+		);
+	});
+
+	it("rejects combining resume and fork", () => {
+		const db = createTestDb();
+		seedConfig(db);
+		expect(() =>
+			buildTerminalAgentLaunch(db, {
+				workspaceId: "11111111-1111-1111-1111-111111111111",
+				agent: "claude",
+				prompt: "",
+				resumeSessionId: "session-source",
+				forkSessionId: "session-source",
+			}),
+		).toThrow("Choose either resumeSessionId or forkSessionId, not both.");
+	});
+
+	it("refuses a fork of a session the harness no longer has", () => {
+		const db = createTestDb();
+		seedConfig(db);
+		// A refusal is only justified when the harness's project directory is
+		// visible and holds no such session, so the fixture has to provide one.
+		// Pinning the agent to a temp CLAUDE_CONFIG_DIR keeps it out of ~/.claude.
+		const configDir = mkdtempSync(join(tmpdir(), "fork-preflight-"));
+		const worktreePath = mkdtempSync(join(tmpdir(), "fork-worktree-"));
+		mkdirSync(
+			join(configDir, "projects", worktreePath.replaceAll(/[/.]/g, "-")),
+			{ recursive: true },
+		);
+		db.insert(schema.workspaces)
+			.values({
+				id: "11111111-1111-1111-1111-111111111111",
+				worktreePath,
+				branch: "main",
+				name: "fixture",
+			})
+			.run();
+		db.update(schema.hostAgentConfigs)
+			.set({ envJson: JSON.stringify({ CLAUDE_CONFIG_DIR: configDir }) })
+			.where(eq(schema.hostAgentConfigs.presetId, "claude"))
+			.run();
+		// The claude locator reads ~/.claude/projects/<encoded cwd>/<id>.jsonl,
+		// and this workspace has no such file, so the answer is a confident no.
+		expect(() =>
+			buildTerminalAgentLaunch(db, {
+				workspaceId: "11111111-1111-1111-1111-111111111111",
+				agent: "claude",
+				prompt: "",
+				forkSessionId: "99999999-9999-4999-8999-999999999999",
+			}),
+		).toThrow(/no longer has session/);
+	});
+
+	it("still forks when the harness keeps sessions somewhere we cannot read", () => {
+		const db = createTestDb();
+		db.insert(schema.hostAgentConfigs)
+			.values({
+				id: "00000000-0000-0000-0000-00000000000d",
+				presetId: "grok",
+				label: "Grok",
+				command: "grok",
+				argsJson: "[]",
+				promptTransport: "argv",
+				promptArgsJson: "[]",
+				resumeArgsJson: JSON.stringify(["--resume"]),
+				forkArgsJson: JSON.stringify([
+					"--resume",
+					"{sessionId}",
+					"--fork-session",
+				]),
+				envJson: "{}",
+				displayOrder: 3,
+			})
+			.run();
+		// Server-side sessions answer "unknown"; unknown must not block.
+		const launch = buildTerminalAgentLaunch(db, {
+			workspaceId: "11111111-1111-1111-1111-111111111111",
+			agent: "grok",
+			prompt: "",
+			forkSessionId: "99999999-9999-4999-8999-999999999999",
+		});
+		expect(launch.fullCommand).toContain("--fork-session");
+	});
+
+	it("names the conflict even when the agent cannot fork at all", () => {
+		const db = createTestDb();
+		db.insert(schema.hostAgentConfigs)
+			.values({
+				id: "00000000-0000-0000-0000-00000000000c",
+				presetId: "no-fork",
+				label: "No Fork",
+				command: "no-fork",
+				argsJson: "[]",
+				promptTransport: "argv",
+				promptArgsJson: "[]",
+				resumeArgsJson: JSON.stringify(["--resume"]),
+				envJson: "{}",
+				displayOrder: 2,
+			})
+			.run();
+		expect(() =>
+			buildTerminalAgentLaunch(db, {
+				workspaceId: "11111111-1111-1111-1111-111111111111",
+				agent: "no-fork",
+				prompt: "",
+				resumeSessionId: "session-source",
+				forkSessionId: "session-source",
+			}),
+		).toThrow("Choose either resumeSessionId or forkSessionId, not both.");
 	});
 
 	it("rejects a resume when the agent config has no resume args", () => {

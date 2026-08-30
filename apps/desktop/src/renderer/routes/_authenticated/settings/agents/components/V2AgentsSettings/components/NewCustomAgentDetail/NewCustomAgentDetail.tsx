@@ -20,6 +20,7 @@ export interface CreateCustomAgentInput {
 	promptTransport: PromptTransport;
 	promptArgs: string[];
 	resumeArgs: string[];
+	forkArgs: string[];
 	env: Record<string, string>;
 	presetId: string;
 	iconId?: string;
@@ -43,6 +44,7 @@ export function NewCustomAgentDetail({
 	const [commandText, setCommandText] = useState("");
 	const [promptArgsText, setPromptArgsText] = useState("");
 	const [resumeArgsText, setResumeArgsText] = useState("");
+	const [forkArgsText, setForkArgsText] = useState("");
 	const [promptTransport, setPromptTransport] =
 		useState<PromptTransport>("argv");
 
@@ -62,6 +64,7 @@ export function NewCustomAgentDetail({
 			promptTransport,
 			promptArgs: parseArgs(promptArgsText),
 			resumeArgs: parseArgs(resumeArgsText),
+			forkArgs: parseArgs(forkArgsText),
 			env: parsedCommand.env,
 			presetId: "custom",
 			iconId: iconId ?? undefined,
@@ -137,6 +140,8 @@ export function NewCustomAgentDetail({
 					onPromptArgsTextChange={setPromptArgsText}
 					resumeArgsText={resumeArgsText}
 					onResumeArgsTextChange={setResumeArgsText}
+					forkArgsText={forkArgsText}
+					onForkArgsTextChange={setForkArgsText}
 					promptTransport={promptTransport}
 					onPromptTransportChange={setPromptTransport}
 				/>
