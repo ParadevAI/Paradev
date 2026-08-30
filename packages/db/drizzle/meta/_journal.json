@@ -694,6 +694,13 @@
       "when": 1788022153311,
       "tag": "0098_automation_tags",
       "breakpoints": true
+    },
+    {
+      "idx": 99,
+      "version": "7",
+      "when": 1788022153312,
+      "tag": "0099_add_leaderboard_axis_cost",
+      "breakpoints": true
     }
   ]
 }

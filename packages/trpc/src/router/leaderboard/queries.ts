@@ -356,6 +356,7 @@ export async function getParticipant(
 			axisWidth: leaderboardParticipants.axisWidth,
 			axisDepth: leaderboardParticipants.axisDepth,
 			axisOutput: leaderboardParticipants.axisOutput,
+			axisCost: leaderboardParticipants.axisCost,
 		})
 		.from(leaderboardParticipants)
 		.innerJoin(users, eq(users.id, leaderboardParticipants.userId))
@@ -465,6 +466,7 @@ export async function getParticipant(
 					depth: Number(participant.axisDepth),
 					output: Number(participant.axisOutput),
 					sustain: Number(participant.activeDays),
+					cost: Number(participant.axisCost),
 				},
 				Number(participant.tier) as Tier,
 			),

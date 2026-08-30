@@ -483,7 +483,7 @@ jobs:
             / /pricing /enterprise /download /join-us /community /contact \
             /blog /changelog /compare /roadmap /leaderboard /marketplace \
             /agent-orchestration /parallel-coding-agents /factory-2026 \
-            /mcp-install /stats /team /starchart
+            /mcp-install /stats /team /starchart /the-production-run
 
       - name: Save marketing success status
         run: |

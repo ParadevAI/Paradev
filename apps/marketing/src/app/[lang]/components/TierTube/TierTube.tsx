@@ -7,7 +7,7 @@ const ZONES = TIER_RGB.map((rgb, index) => ({ tier: index + 1, rgb }));
 const railLeft = (position: number) =>
 	position <= 0 ? 0 : ((position - 0.5) / ZONES.length) * 100;
 
-const MONTHS_PER_TIER = 8;
+const MONTHS_PER_TIER = 7;
 
 function forecastLabel(tier: number, position: number): string | null {
 	if (position <= 0) return null;

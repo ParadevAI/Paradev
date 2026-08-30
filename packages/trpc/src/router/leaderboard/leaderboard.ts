@@ -271,6 +271,7 @@ async function recomputeTier(userId: string): Promise<void> {
 				sessions: sql<number>`coalesce(sum(${leaderboardDailyFactory.sessions}), 0)::int`,
 				parallelSessions: sql<string>`coalesce(max(${leaderboardDailyFactory.parallelSessions}), 0)`,
 				agentPrsMerged: sql<number>`coalesce(max(${leaderboardDailyFactory.agentPrsMerged}), 0)::int`,
+				agentPrsAllHosts: sql<number>`coalesce(sum(${leaderboardDailyFactory.agentPrsMerged}), 0)::int`,
 			})
 			.from(leaderboardDailyFactory)
 			.where(
@@ -284,6 +285,7 @@ async function recomputeTier(userId: string): Promise<void> {
 			.select({
 				day: leaderboardDaily.day,
 				tokens: sql<number>`coalesce(sum(${leaderboardDaily.tokens}), 0)::bigint`,
+				usd: sql<string>`coalesce(sum(${leaderboardDaily.usdEstimate}), 0)`,
 			})
 			.from(leaderboardDaily)
 			.where(
@@ -300,6 +302,7 @@ async function recomputeTier(userId: string): Promise<void> {
 			.limit(1),
 	]);
 
+	const usdByDay = new Map(tokenRows.map((row) => [row.day, Number(row.usd)]));
 	const tokensByDay = new Map(
 		tokenRows.map((row) => [row.day, Number(row.tokens)]),
 	);
@@ -310,6 +313,8 @@ async function recomputeTier(userId: string): Promise<void> {
 		sessions: Number(row.sessions),
 		parallelSessions: Number(row.parallelSessions),
 		agentPrsMerged: Number(row.agentPrsMerged),
+		agentPrsAllHosts: Number(row.agentPrsAllHosts),
+		usd: usdByDay.get(row.day) ?? 0,
 	}));
 
 	const result = computeTier(rows, (current[0]?.tier ?? 0) as Tier);
@@ -323,6 +328,7 @@ async function recomputeTier(userId: string): Promise<void> {
 			axisWidth: result.axisWidth.toFixed(2),
 			axisDepth: result.axisDepth,
 			axisOutput: result.axisOutput.toFixed(2),
+			axisCost: result.axisCost.toFixed(2),
 		})
 		.where(eq(leaderboardParticipants.userId, userId));
 }

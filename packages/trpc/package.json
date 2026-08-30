@@ -24,6 +24,10 @@
 			"types": "./src/router/leaderboard/periods.ts",
 			"default": "./src/router/leaderboard/periods.ts"
 		},
+		"./leaderboard-tier": {
+			"types": "./src/router/leaderboard/tier.ts",
+			"default": "./src/router/leaderboard/tier.ts"
+		},
 		"./leaderboard-types": {
 			"types": "./src/router/leaderboard/types.ts",
 			"default": "./src/router/leaderboard/types.ts"

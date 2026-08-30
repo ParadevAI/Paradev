@@ -14,17 +14,19 @@ export const tierName = (tier: Tier): TierName | null =>
 
 export const FLOORS = {
 	width: [1, 2, 3, 10],
-	depth: [0, 500_000, 2_000_000, 8_000_000],
+	depth: [0, 2_500_000, 10_000_000, 40_000_000],
 	output: [0, 1, 3, 10],
 	sustain: [8, 10, 15, 20],
 } as const;
+
+export const COST_CEILINGS: readonly number[] = [15, 9, 7, 3.5];
 
 const MIN_ACTIVE_DAYS = FLOORS.sustain[0];
 const PROMOTE_SHARE = 0.6;
 const DEMOTE_SHARE = 0.4;
 const OUTPUT_WINDOW_DAYS = 7;
 
-function floorTier(value: number, floors: readonly number[]): Tier {
+export function floorTier(value: number, floors: readonly number[]): Tier {
 	let tier = 0;
 	for (let i = 0; i < floors.length; i++) {
 		if (value >= (floors[i] ?? Number.POSITIVE_INFINITY)) tier = i + 1;
@@ -41,12 +43,25 @@ export const outputTier = (agentPrsPerWeek: number): Tier =>
 export const sustainTier = (activeDays: number): Tier =>
 	floorTier(activeDays, FLOORS.sustain);
 
+export const costTier = (usdPerMergedPr: number): Tier => {
+	if (!Number.isFinite(usdPerMergedPr) || usdPerMergedPr <= 0) return 0;
+	let tier: Tier = 0;
+	for (let i = 0; i < COST_CEILINGS.length; i++) {
+		if (usdPerMergedPr <= (COST_CEILINGS[i] ?? Number.NEGATIVE_INFINITY)) {
+			tier = (i + 1) as Tier;
+		}
+	}
+	return tier;
+};
+
 export interface FactoryDayRow {
 	day: string;
 	tokens: number;
 	sessions: number;
 	parallelSessions: number;
 	agentPrsMerged: number;
+	agentPrsAllHosts: number;
+	usd: number;
 }
 
 export interface TierResult {
@@ -55,8 +70,9 @@ export interface TierResult {
 	axisWidth: number;
 	axisDepth: number;
 	axisOutput: number;
+	axisCost: number;
 
-	limitedBy: Array<"width" | "depth" | "output" | "sustain">;
+	limitedBy: Array<"width" | "depth" | "output" | "sustain" | "cost">;
 }
 
 const UNRANKED: TierResult = {
@@ -65,6 +81,7 @@ const UNRANKED: TierResult = {
 	axisWidth: 0,
 	axisDepth: 0,
 	axisOutput: 0,
+	axisCost: 0,
 	limitedBy: ["sustain"],
 };
 
@@ -138,8 +155,13 @@ export function computeTier(
 				? held
 				: previousTier;
 
+	const windowUsd = active.reduce((sum, row) => sum + row.usd, 0);
+	const windowPrs = active.reduce((sum, row) => sum + row.agentPrsAllHosts, 0);
+	const axisCost = windowPrs > 0 ? windowUsd / windowPrs : 0;
+
 	const sustain = sustainTier(activeDays);
-	const tier = Math.min(dayTier, sustain) as Tier;
+	const cost = windowPrs > 0 ? Math.max(1, costTier(axisCost)) : dayTier;
+	const tier = Math.min(dayTier, sustain, cost) as Tier;
 
 	const axisWidth = median(widths);
 	const axisDepth = median(depths);
@@ -151,6 +173,7 @@ export function computeTier(
 		if (depthTier(axisDepth) === tier) limitedBy.push("depth");
 		if (outputTier(axisOutput) === tier) limitedBy.push("output");
 		if (sustain === tier) limitedBy.push("sustain");
+		if (cost === tier) limitedBy.push("cost");
 	}
 
 	return {
@@ -159,6 +182,7 @@ export function computeTier(
 		axisWidth: Number(axisWidth.toFixed(2)),
 		axisDepth: Math.round(axisDepth),
 		axisOutput: Number(axisOutput.toFixed(2)),
+		axisCost: Number(axisCost.toFixed(2)),
 		limitedBy,
 	};
 }
@@ -168,6 +192,7 @@ export interface AxisValues {
 	depth: number;
 	output: number;
 	sustain: number;
+	cost: number;
 }
 
 export function tierProgress(values: AxisValues, tier: Tier): number {
@@ -181,14 +206,21 @@ export function tierProgress(values: AxisValues, tier: Tier): number {
 		[values.sustain, FLOORS.sustain],
 	];
 
-	let lowest = 1;
+	let total = 0;
 	for (const [value, floors] of axes) {
 		const from = floors[tier - 1] ?? 0;
 		const to = floors[tier] ?? from;
 		const span = to - from;
-		const progress =
-			span <= 0 ? 1 : Math.min(1, Math.max(0, (value - from) / span));
-		lowest = Math.min(lowest, progress);
+		total += span <= 0 ? 1 : Math.min(1, Math.max(0, (value - from) / span));
 	}
-	return Number(lowest.toFixed(3));
+
+	const costFrom = COST_CEILINGS[tier - 1] ?? 0;
+	const costTo = COST_CEILINGS[tier] ?? costFrom;
+	const costSpan = costFrom - costTo;
+	total +=
+		values.cost <= 0 || costSpan <= 0
+			? 0
+			: Math.min(1, Math.max(0, (costFrom - values.cost) / costSpan));
+
+	return Number((total / (axes.length + 1)).toFixed(3));
 }

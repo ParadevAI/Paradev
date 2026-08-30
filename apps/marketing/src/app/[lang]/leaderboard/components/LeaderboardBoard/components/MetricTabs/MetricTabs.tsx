@@ -3,8 +3,8 @@
 import type { MessageDescriptor } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
+import { PillTabs } from "@/app/[lang]/components/PillTabs";
 import type { LeaderboardMetric } from "@/app/[lang]/utils/fetchLeaderboard";
-import { PillTabs } from "../PillTabs";
 
 const METRICS: Array<{ id: LeaderboardMetric; label: MessageDescriptor }> = [
 	{

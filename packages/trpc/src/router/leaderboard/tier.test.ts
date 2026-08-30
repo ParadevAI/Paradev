@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import {
 	computeTier,
+	costTier,
 	depthTier,
 	type FactoryDayRow,
 	outputTier,
@@ -18,10 +19,12 @@ function days(
 	const start = Date.parse(`${from}T00:00:00Z`);
 	return Array.from({ length: count }, (_, i) => ({
 		day: new Date(start + i * 86_400_000).toISOString().slice(0, 10),
-		tokens: 24_000_000,
+		tokens: 120_000_000,
 		sessions: 8,
 		parallelSessions: 3,
 		agentPrsMerged: 1,
+		agentPrsAllHosts: 1,
+		usd: 7,
 		...over,
 	}));
 }
@@ -40,8 +43,8 @@ describe("axis floors", () => {
 
 	test("depth grades tokens per session", () => {
 		expect(depthTier(100_000)).toBe(1);
-		expect(depthTier(500_000)).toBe(2);
-		expect(depthTier(8_000_000)).toBe(4);
+		expect(depthTier(2_500_000)).toBe(2);
+		expect(depthTier(40_000_000)).toBe(4);
 	});
 
 	test("output grades weekly merged agent PRs", () => {
@@ -69,6 +72,7 @@ describe("computeTier", () => {
 				tokens: 200_000_000,
 				sessions: 10,
 				agentPrsMerged: 0,
+				agentPrsAllHosts: 0,
 			}),
 		);
 		expect(result.tier).toBe(1);
@@ -79,9 +83,10 @@ describe("computeTier", () => {
 		const result = computeTier(
 			days(22, {
 				parallelSessions: 12,
-				tokens: 120_000_000,
+				tokens: 400_000_000,
 				sessions: 10,
 				agentPrsMerged: 2,
+				agentPrsAllHosts: 2,
 			}),
 		);
 		expect(result.tier).toBe(4);
@@ -91,16 +96,17 @@ describe("computeTier", () => {
 	test("activeDays caps the tier however good the days are", () => {
 		const strong = {
 			parallelSessions: 12,
-			tokens: 120_000_000,
+			tokens: 400_000_000,
 			sessions: 10,
 			agentPrsMerged: 2,
+			agentPrsAllHosts: 2,
 		};
 		expect(computeTier(days(22, strong)).tier).toBe(4);
 		expect(computeTier(days(9, strong)).tier).toBe(1);
 	});
 
 	test("output reads a trailing 7-day rate, not a single day", () => {
-		const rows = days(20, { agentPrsMerged: 0 });
+		const rows = days(20, { agentPrsMerged: 0, agentPrsAllHosts: 0, usd: 3 });
 		for (let i = 0; i < rows.length; i += 7) {
 			const row = rows[i];
 			if (row) row.agentPrsMerged = 3;
@@ -132,6 +138,7 @@ describe("computeTier", () => {
 				tokens: 900_000_000,
 				sessions: 1,
 				agentPrsMerged: 20,
+				agentPrsAllHosts: 20,
 			}),
 		);
 		expect(result.tier).toBe(1);
@@ -139,8 +146,38 @@ describe("computeTier", () => {
 	});
 });
 
+describe("costTier", () => {
+	test("cheaper per merged PR earns a higher tier", () => {
+		expect(costTier(15)).toBe(1);
+		expect(costTier(9)).toBe(2);
+		expect(costTier(7)).toBe(3);
+		expect(costTier(3.5)).toBe(4);
+		expect(costTier(20)).toBe(0);
+	});
+
+	test("no merges leaves the axis unranked rather than free", () => {
+		expect(costTier(0)).toBe(0);
+		expect(costTier(Number.POSITIVE_INFINITY)).toBe(0);
+	});
+
+	test("an expensive first PR caps the tier but never unranks", () => {
+		const rows = days(10, { agentPrsMerged: 0, agentPrsAllHosts: 0, usd: 5 });
+		const first = rows[0];
+		if (first) {
+			first.agentPrsMerged = 1;
+			first.agentPrsAllHosts = 1;
+			first.usd = 50;
+		}
+		expect(
+			computeTier(days(10, { agentPrsMerged: 0, agentPrsAllHosts: 0 })).tier,
+		).toBe(1);
+		expect(computeTier(rows).tier).toBe(1);
+		expect(computeTier(rows, 2).tier).toBe(1);
+	});
+});
+
 describe("tierProgress", () => {
-	const full = { width: 10, depth: 8e6, output: 10, sustain: 20 };
+	const full = { width: 10, depth: 40e6, output: 10, sustain: 20, cost: 3.5 };
 
 	test("unranked has no progress", () => {
 		expect(tierProgress(full, 0)).toBe(0);
@@ -152,19 +189,28 @@ describe("tierProgress", () => {
 
 	test("halfway on every axis reads as halfway", () => {
 		expect(
-			tierProgress({ width: 1.5, depth: 250_000, output: 0.5, sustain: 9 }, 1),
+			tierProgress(
+				{ width: 1.5, depth: 1_250_000, output: 0.5, sustain: 9, cost: 12 },
+				1,
+			),
 		).toBe(0.5);
 	});
 
-	test("the weakest axis governs, not the average", () => {
+	test("one dead axis no longer zeroes the whole bar", () => {
 		expect(
-			tierProgress({ width: 2, depth: 500_000, output: 1, sustain: 8 }, 1),
-		).toBe(0);
+			tierProgress(
+				{ width: 2, depth: 2_500_000, output: 1, sustain: 8, cost: 9 },
+				1,
+			),
+		).toBe(0.8);
 	});
 
 	test("overshooting an axis does not push past the next station", () => {
 		expect(
-			tierProgress({ width: 99, depth: 9e9, output: 99, sustain: 30 }, 1),
+			tierProgress(
+				{ width: 99, depth: 9e9, output: 99, sustain: 30, cost: 0.01 },
+				1,
+			),
 		).toBe(1);
 	});
 });

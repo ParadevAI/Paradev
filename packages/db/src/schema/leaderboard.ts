@@ -81,6 +81,9 @@ export const leaderboardParticipants = pgTable(
 		axisOutput: numeric("axis_output", { precision: 8, scale: 2 })
 			.notNull()
 			.default("0"),
+		axisCost: numeric("axis_cost", { precision: 10, scale: 2 })
+			.notNull()
+			.default("0"),
 
 		createdAt: timestamp("created_at", { withTimezone: true })
 			.notNull()
