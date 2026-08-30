@@ -94,7 +94,6 @@ export function DiffHeaderMetadata({
 		onSuccess: () => {
 			void utils.git.getStatus.invalidate({ workspaceId });
 			void utils.git.getDiff.invalidate({ workspaceId });
-			void utils.git.getDiffBulk.invalidate({ workspaceId });
 		},
 		onError: (err) => {
 			toast.error(
