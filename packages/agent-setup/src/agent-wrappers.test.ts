@@ -251,7 +251,7 @@ describe("agent-wrappers copilot", () => {
 		expect(wrapper).not.toContain("-c 'notify=");
 		expect(wrapper).toContain('export SUPERSET_AGENT_ID="codex"');
 
-		expect(wrapper).toContain("# Superset agent-wrapper v3");
+		expect(wrapper).toContain("# Superset agent-wrapper v4");
 
 		// Native hooks remain enabled, but the process-scoped TUI session log is
 		// the reliable Start signal for installed Codex TUI builds.
