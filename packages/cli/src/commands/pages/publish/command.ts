@@ -14,6 +14,7 @@ import {
 	externalEntryPath,
 	resolveEntryPath,
 } from "./utils/resolveEntryPath";
+import { resolvePageId } from "./utils/resolvePageId";
 import { uploadAssets } from "./utils/uploadAssets";
 
 const VISIBILITIES = ["just_me", "org"] as const;
@@ -24,7 +25,7 @@ export default command({
 		positional("path")
 			.required()
 			.desc(
-				"Path to the .html file, or a directory whose index.html is the page",
+				"Path to the .html file, or a directory whose index.html is the page. Files the HTML references by relative path — images, CSS, fonts — are uploaded with it; unchanged ones are reused from the previous version",
 			),
 	],
 	options: {
@@ -33,7 +34,9 @@ export default command({
 		label: string()
 			.alias("l")
 			.desc("What changed in this version, shown in the version history"),
-		visibility: string().desc(`One of: ${VISIBILITIES.join(", ")}`),
+		visibility: string().desc(
+			`One of: ${VISIBILITIES.join(", ")} (new pages default to org)`,
+		),
 		page: string().desc(
 			"Publish a new version of this page id, instead of resolving by workspace",
 		),
@@ -112,29 +115,35 @@ export default command({
 			: undefined;
 		const link = workspaceId ? { entryPath, workspaceId } : undefined;
 
-		const uploaded = await uploadAssets({
-			api: ctx.api,
-			assets,
-			target: options.page ? { pageId: options.page } : (link ?? null),
-		});
-
-		const defaultTitle =
-			isDirectory && !options.title
+		const title =
+			options.title ??
+			(isDirectory
 				? basename(inputPath).replace(/[-_]+/g, " ").trim()
-				: undefined;
+				: undefined);
+
+		// Assets stage against a page, so a directory publish resolves or creates
+		// one before uploading. A single-file publish still lets `publish` mint it.
+		const pageId =
+			assets.length > 0
+				? await resolvePageId({
+						api: ctx.api,
+						explicitPageId: options.page,
+						link,
+						title,
+					})
+				: options.page;
+
+		const uploaded =
+			assets.length > 0 && pageId
+				? await uploadAssets({ api: ctx.api, assets, pageId })
+				: { uploaded: 0, reused: 0, warnings: [] };
 
 		const page = await ctx.api.page.publish.mutate({
 			content: Buffer.from(html, "utf8").toString("base64"),
 			contentType: "text/html",
 			filename: basename(entryFilePath),
-			...(link ?? {}),
-			...(uploaded.published.length > 0 ? { assets: uploaded.published } : {}),
-			...(options.page ? { pageId: options.page } : {}),
-			...(options.title
-				? { title: options.title }
-				: defaultTitle
-					? { title: defaultTitle }
-					: {}),
+			...(pageId ? { pageId } : (link ?? {})),
+			...(title ? { title } : {}),
 			...(options.description ? { description: options.description } : {}),
 			...(options.label ? { label: options.label } : {}),
 			...(options.visibility

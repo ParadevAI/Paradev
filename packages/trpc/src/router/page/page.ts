@@ -1,4 +1,4 @@
-import { db } from "@superset/db/client";
+import { db, dbWs } from "@superset/db/client";
 import {
 	attachments,
 	files,
@@ -10,6 +10,7 @@ import {
 	users,
 	workspacePages,
 } from "@superset/db/schema";
+import { mintPageSlug } from "@superset/shared/page-slug";
 import {
 	fileOriginalKey,
 	pageManifestKey,
@@ -24,10 +25,13 @@ import { deleteObjects, presignedGetUrl } from "../../lib/r2";
 import { protectedProcedure, userError } from "../../trpc";
 import { requireActiveOrgMembership } from "../utils/active-org";
 import { assertPageReadable, assertPageWritable } from "./access";
+import { pageAssetRouter } from "./assets";
 import { pageUrl } from "./page-url";
 import { publishPage } from "./publish";
+import { isEntryPathConflict } from "./publish-rules";
 import {
 	clearPageWatchSchema,
+	createPageSchema,
 	deletePageSchema,
 	listPagesSchema,
 	pageFields,
@@ -143,6 +147,78 @@ async function latestVersionNumber(pageId: string): Promise<number | null> {
 }
 
 export const pageRouter = {
+	assets: pageAssetRouter,
+
+	/**
+	 * A page with no versions yet. Assets stage against a page id, so a first
+	 * publish that carries them creates the page here and publishes into it.
+	 * A publish with no assets still mints its own page and never needs this.
+	 */
+	create: protectedProcedure
+		.input(createPageSchema)
+		.mutation(async ({ ctx, input }) => {
+			const organizationId = await requireActiveOrgMembership(ctx);
+			const userId = ctx.session.user.id;
+			const title = input.title ?? "Untitled";
+			// neon-http has no transactions; the pooled client does.
+			return await dbWs.transaction(async (tx) => {
+				const [page] = await tx
+					.insert(pages)
+					.values({
+						slug: mintPageSlug(title),
+						organizationId,
+						createdByUserId: userId,
+						title,
+						description: input.description ?? null,
+						visibility: input.visibility ?? "org",
+					})
+					.returning();
+				if (!page) {
+					throw userError({
+						code: "INTERNAL_SERVER_ERROR",
+						message: "Failed to create page",
+						i18nKey: "serverError.page.failedToCreatePage",
+					});
+				}
+				if (input.workspaceId && input.entryPath) {
+					await assertWorkspaceAccess({
+						executor: tx,
+						workspaceId: input.workspaceId,
+						organizationId,
+					});
+					try {
+						await tx
+							.insert(workspacePages)
+							.values({
+								workspaceId: input.workspaceId,
+								pageId: page.id,
+								entryPath: input.entryPath,
+							})
+							// Targeted at the primary key, so it stays a no-op for a page
+							// already linked to this path. It deliberately does not cover
+							// the (workspace, entryPath) unique index — a colleague's page
+							// holding this path has to surface, not be swallowed.
+							.onConflictDoNothing({
+								target: [workspacePages.workspaceId, workspacePages.pageId],
+							});
+					} catch (error) {
+						if (!isEntryPathConflict(error)) throw error;
+						throw new TRPCError({
+							code: "CONFLICT",
+							message: `Someone else has already published ${input.entryPath} from this workspace. Publish with an explicit page id to add a version to their page, or move the file.`,
+						});
+					}
+				}
+				return {
+					id: page.id,
+					slug: page.slug,
+					url: pageUrl(page.slug),
+					title: page.title,
+					visibility: page.visibility,
+				};
+			});
+		}),
+
 	publish: protectedProcedure
 		.input(publishPageSchema)
 		.mutation(async ({ ctx, input }) => {

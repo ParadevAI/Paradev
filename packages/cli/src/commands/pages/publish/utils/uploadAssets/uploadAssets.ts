@@ -9,85 +9,76 @@ import {
 	videoCodecWarning,
 } from "../collectDirectoryPublish";
 
+const UPLOAD_CONCURRENCY = 8;
+
 export interface UploadedAssets {
-	published: { path: string; fileId: string }[];
+	uploaded: number;
 	reused: number;
 	warnings: string[];
 }
 
 /**
- * Uploads a directory's assets, reusing unchanged files from the previous
- * version by sha256. The lookup is best effort: a failure just means every
- * asset uploads.
+ * Stages a directory's assets against the page, so the version published
+ * next carries them from the moment it exists.
+ *
+ * Reuse is the server's call: it answers by content hash out of the page's
+ * own lineage, so an unchanged asset costs one round trip and no bytes.
+ * Assets are addressed by the path they hold in the document — the file
+ * identity behind that path never reaches this side.
  */
 export async function uploadAssets({
 	api,
 	assets,
-	target,
+	pageId,
 }: {
 	api: ApiClient;
 	assets: DirectoryAsset[];
-	target:
-		| { pageId: string }
-		| { workspaceId: string; entryPath: string }
-		| null;
+	pageId: string;
 }): Promise<UploadedAssets> {
-	let previous: Map<string, { fileId: string; sha256: string }> | null = null;
-	if (assets.length > 0 && target) {
-		try {
-			const resolved = await api.page.resolveByEntryPath.query(target);
-			if (resolved?.latestVersionId) {
-				const listed = await api.file.list.query({
-					parentKind: "page_version",
-					parentId: resolved.latestVersionId,
-				});
-				previous = new Map();
-				for (const item of listed) {
-					if (item.path) {
-						previous.set(item.path, {
-							fileId: item.file.id,
-							sha256: item.file.sha256,
-						});
-					}
-				}
-			}
-		} catch {
-			previous = null;
-		}
-	}
-
 	const warnings: string[] = [];
-	const published: { path: string; fileId: string }[] = [];
+	let uploaded = 0;
 	let reused = 0;
-	for (const asset of assets) {
-		const bytes = readFileSync(asset.filePath);
-		const sha256 = createHash("sha256").update(bytes).digest("hex");
-		const warning = videoCodecWarning(asset.path, bytes.subarray(0, 16));
-		if (warning) warnings.push(warning);
 
-		const match = previous?.get(asset.path);
-		if (match && match.sha256 === sha256) {
-			published.push({ path: asset.path, fileId: match.fileId });
-			reused += 1;
-			continue;
-		}
+	// Staging one asset costs a round trip to the API and, on a miss, a second
+	// to storage. Serially that is minutes for a large directory, and each
+	// asset is independent — only the bounded width keeps a big publish from
+	// opening a connection per file.
+	const queue = [...assets];
+	const worker = async (): Promise<void> => {
+		for (let asset = queue.shift(); asset; asset = queue.shift()) {
+			const bytes = readFileSync(asset.filePath);
+			const warning = videoCodecWarning(asset.path, bytes.subarray(0, 16));
+			if (warning) warnings.push(warning);
 
-		const created = await api.file.createUpload.mutate({
-			name: basename(asset.path),
-			contentType: lookupMimeType(asset.path) || "application/octet-stream",
-			sizeBytes: asset.sizeBytes,
-			sha256,
-		});
-		const response = await fetch(created.uploadUrl, {
-			method: "PUT",
-			headers: created.headers,
-			body: bytes,
-		});
-		if (!response.ok) {
-			throw new CLIError(`Uploading ${asset.path} failed (${response.status})`);
+			const staged = await api.page.assets.upload.mutate({
+				pageId,
+				path: asset.path,
+				name: basename(asset.path),
+				contentType: lookupMimeType(asset.path) || "application/octet-stream",
+				sizeBytes: asset.sizeBytes,
+				sha256: createHash("sha256").update(bytes).digest("hex"),
+			});
+			if (staged.reused) {
+				reused += 1;
+				continue;
+			}
+
+			const response = await fetch(staged.uploadUrl, {
+				method: "PUT",
+				headers: staged.headers,
+				body: bytes,
+			});
+			if (!response.ok) {
+				throw new CLIError(
+					`Uploading ${asset.path} failed (${response.status})`,
+				);
+			}
+			uploaded += 1;
 		}
-		await api.file.complete.mutate({ id: created.id });
-		published.push({ path: asset.path, fileId: created.id });
-	}
-	return { published, reused, warnings };
+	};
+	await Promise.all(
+		Array.from({ length: Math.min(UPLOAD_CONCURRENCY, assets.length) }, worker),
+	);
+
+	return { uploaded, reused, warnings };
 }
