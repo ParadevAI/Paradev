@@ -13,6 +13,7 @@ export {
 } from "./keys";
 export {
 	type PageManifest,
+	type PageManifestAsset,
 	type PageManifestVersion,
 	type PageVisibility,
 	parsePageManifest,

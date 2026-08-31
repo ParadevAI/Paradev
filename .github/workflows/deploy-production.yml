@@ -531,7 +531,7 @@ jobs:
         run: bunx wrangler deploy
 
   deploy-content:
-    name: Deploy Content Worker to Cloudflare
+    name: Deploy Usercontent Worker to Cloudflare
     runs-on: ubuntu-latest
     environment: production
 

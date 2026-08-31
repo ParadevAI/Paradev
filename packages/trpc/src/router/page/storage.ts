@@ -1,12 +1,20 @@
 import { db } from "@superset/db/client";
-import { pages, pageVersions, type SelectPage } from "@superset/db/schema";
 import {
+	attachments,
+	files,
+	pages,
+	pageVersions,
+	type SelectPage,
+} from "@superset/db/schema";
+import {
+	fileOriginalKey,
 	type PageManifest,
+	type PageManifestAsset,
 	pageManifestKey,
 	pageThumbnailKey,
 	signPageTicket,
 } from "@superset/shared/usercontent";
-import { asc, eq } from "drizzle-orm";
+import { and, asc, eq, inArray } from "drizzle-orm";
 import { env } from "../../env";
 import { deleteObjects, putObject } from "../../lib/r2";
 
@@ -47,6 +55,7 @@ export async function writePageManifest(pageId: string): Promise<void> {
 
 	const rows = await db
 		.select({
+			id: pageVersions.id,
 			version: pageVersions.version,
 			key: pageVersions.storageKey,
 			contentType: pageVersions.contentType,
@@ -54,6 +63,37 @@ export async function writePageManifest(pageId: string): Promise<void> {
 		.from(pageVersions)
 		.where(eq(pageVersions.pageId, pageId))
 		.orderBy(asc(pageVersions.version));
+
+	const assetsByVersion = new Map<string, Record<string, PageManifestAsset>>();
+	if (rows.length > 0) {
+		const assetRows = await db
+			.select({
+				versionId: attachments.parentId,
+				path: attachments.path,
+				fileId: files.id,
+				contentType: files.contentType,
+			})
+			.from(attachments)
+			.innerJoin(files, eq(files.id, attachments.fileId))
+			.where(
+				and(
+					eq(attachments.parentKind, "page_version"),
+					inArray(
+						attachments.parentId,
+						rows.map((row) => row.id),
+					),
+				),
+			);
+		for (const asset of assetRows) {
+			if (asset.path === null) continue;
+			const entry = assetsByVersion.get(asset.versionId) ?? {};
+			entry[asset.path] = {
+				key: fileOriginalKey(asset.fileId),
+				contentType: asset.contentType,
+			};
+			assetsByVersion.set(asset.versionId, entry);
+		}
+	}
 
 	const manifest: PageManifest = {
 		v: 1,
@@ -63,10 +103,17 @@ export async function writePageManifest(pageId: string): Promise<void> {
 		sharedVersion: page.sharedVersion,
 		latestVersion: rows.at(-1)?.version ?? null,
 		versions: Object.fromEntries(
-			rows.map((row) => [
-				String(row.version),
-				{ key: row.key, contentType: row.contentType },
-			]),
+			rows.map((row) => {
+				const assets = assetsByVersion.get(row.id);
+				return [
+					String(row.version),
+					{
+						key: row.key,
+						contentType: row.contentType,
+						...(assets ? { assets } : {}),
+					},
+				];
+			}),
 		),
 	};
 

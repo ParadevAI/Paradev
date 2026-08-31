@@ -1,6 +1,8 @@
 import { randomUUID } from "node:crypto";
 import { dbWs } from "@superset/db/client";
 import {
+	attachments,
+	files,
 	pages,
 	pageVersions,
 	type SelectPage,
@@ -10,7 +12,7 @@ import {
 import { mintPageSlug } from "@superset/shared/page-slug";
 import { pageVersionKey } from "@superset/shared/usercontent";
 import { TRPCError } from "@trpc/server";
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, inArray } from "drizzle-orm";
 import { userError } from "../../i18n-error";
 import { putObject } from "../../lib/r2";
 import { assertPageWritable } from "./access";
@@ -19,6 +21,7 @@ import {
 	isEntryPathConflict,
 	isVersionConflict,
 	titleFromFilename,
+	validateAssetPaths,
 	validatePublishContent,
 } from "./publish-rules";
 import type { PublishPageInput } from "./schema";
@@ -53,6 +56,7 @@ export async function publishPage({
 	userId: string;
 }) {
 	const { buffer, sha256 } = validatePublishContent(input);
+	validateAssetPaths(input.assets);
 
 	for (let attempt = 1; ; attempt += 1) {
 		try {
@@ -98,6 +102,12 @@ async function runPublish({
 		input,
 		organizationId,
 		userId,
+	});
+	await verifyPublishAssets({
+		assets: input.assets,
+		organizationId,
+		userId,
+		pageId: target?.id ?? null,
 	});
 	const pageId = target?.id ?? randomUUID();
 	const version = (target ? await latestVersionNumber(dbWs, target.id) : 0) + 1;
@@ -178,6 +188,17 @@ async function runPublish({
 		// a committed object or delete another's. A rollback after this
 		// upload strands the object under a number the next attempt
 		// reuses and overwrites.
+		if (input.assets && input.assets.length > 0) {
+			await tx.insert(attachments).values(
+				input.assets.map((asset) => ({
+					fileId: asset.fileId,
+					parentKind: "page_version" as const,
+					parentId: row.id,
+					path: asset.path,
+				})),
+			);
+		}
+
 		await putObject({ key, body: buffer, contentType: input.contentType });
 		return {
 			id: page.id,
@@ -202,6 +223,68 @@ async function runPublish({
 		version: published.version,
 	});
 	return published;
+}
+
+/**
+ * An asset may only ride a publish if the caller uploaded it, or it already
+ * belongs to this page's lineage (the republish-reuse path). Without the
+ * ownership check, any org-visible file id could be republished to a wider
+ * audience on someone's `everyone` page.
+ */
+async function verifyPublishAssets({
+	assets,
+	organizationId,
+	userId,
+	pageId,
+}: {
+	assets: PublishPageInput["assets"];
+	organizationId: string;
+	userId: string;
+	pageId: string | null;
+}): Promise<void> {
+	if (!assets || assets.length === 0) return;
+	const ids = [...new Set(assets.map((asset) => asset.fileId))];
+	const rows = await dbWs
+		.select({
+			id: files.id,
+			status: files.status,
+			createdByUserId: files.createdByUserId,
+		})
+		.from(files)
+		.where(
+			and(inArray(files.id, ids), eq(files.organizationId, organizationId)),
+		);
+	const lineage = new Set<string>();
+	if (pageId) {
+		const attached = await dbWs
+			.select({ fileId: attachments.fileId })
+			.from(attachments)
+			.innerJoin(pageVersions, eq(pageVersions.id, attachments.parentId))
+			.where(
+				and(
+					eq(attachments.parentKind, "page_version"),
+					eq(pageVersions.pageId, pageId),
+					inArray(attachments.fileId, ids),
+				),
+			);
+		for (const row of attached) lineage.add(row.fileId);
+	}
+	const allowed = new Set(
+		rows
+			.filter(
+				(row) =>
+					row.status === "ready" &&
+					(row.createdByUserId === userId || lineage.has(row.id)),
+			)
+			.map((row) => row.id),
+	);
+	const refused = ids.find((id) => !allowed.has(id));
+	if (refused) {
+		throw new TRPCError({
+			code: "BAD_REQUEST",
+			message: `Asset file ${refused} is missing, not completed, or not yours to attach`,
+		});
+	}
 }
 
 type Tx = Parameters<Parameters<typeof dbWs.transaction>[0]>[0];

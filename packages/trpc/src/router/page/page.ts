@@ -19,6 +19,7 @@ import {
 } from "@superset/shared/usercontent";
 import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
 import { and, desc, eq, inArray, or, type SQL, sql } from "drizzle-orm";
+import { z } from "zod";
 import { deleteObjects, presignedGetUrl } from "../../lib/r2";
 import { protectedProcedure, userError } from "../../trpc";
 import { requireActiveOrgMembership } from "../utils/active-org";
@@ -29,6 +30,7 @@ import {
 	clearPageWatchSchema,
 	deletePageSchema,
 	listPagesSchema,
+	pageFields,
 	pageRefSchema,
 	publishPageSchema,
 	pullPageSchema,
@@ -277,6 +279,70 @@ export const pageRouter = {
 			watch: watchState(page, Date.now()),
 		};
 	}),
+
+	/**
+	 * The page a workspace path anchors to, for the CLI's directory publish:
+	 * it compares each asset's hash against the previous version and reuses
+	 * unchanged files instead of re-uploading. Mirrors the republish lookup —
+	 * only the caller's own pages match.
+	 */
+	resolveByEntryPath: protectedProcedure
+		.input(
+			z
+				.object({
+					workspaceId: pageFields.workspaceId.optional(),
+					entryPath: pageFields.entryPath.optional(),
+					pageId: pageFields.id.optional(),
+				})
+				.refine(
+					(value) =>
+						value.pageId !== undefined ||
+						(value.workspaceId !== undefined && value.entryPath !== undefined),
+					{ message: "Provide pageId, or workspaceId and entryPath together" },
+				),
+		)
+		.query(async ({ ctx, input }) => {
+			const organizationId = await requireActiveOrgMembership(ctx);
+			const userId = ctx.session.user.id;
+			const [row] = input.pageId
+				? await db
+						.select({ page: pages })
+						.from(pages)
+						.where(
+							and(
+								eq(pages.id, input.pageId),
+								eq(pages.organizationId, organizationId),
+								eq(pages.createdByUserId, userId),
+							),
+						)
+						.limit(1)
+				: await db
+						.select({ page: pages })
+						.from(workspacePages)
+						.innerJoin(pages, eq(pages.id, workspacePages.pageId))
+						.where(
+							and(
+								eq(workspacePages.workspaceId, input.workspaceId ?? ""),
+								eq(workspacePages.entryPath, input.entryPath ?? ""),
+								eq(pages.organizationId, organizationId),
+								eq(pages.createdByUserId, userId),
+							),
+						)
+						.limit(1);
+			if (!row) return null;
+			const [latest] = await db
+				.select({ id: pageVersions.id, version: pageVersions.version })
+				.from(pageVersions)
+				.where(eq(pageVersions.pageId, row.page.id))
+				.orderBy(desc(pageVersions.version))
+				.limit(1);
+			return {
+				id: row.page.id,
+				slug: row.page.slug,
+				latestVersion: latest?.version ?? null,
+				latestVersionId: latest?.id ?? null,
+			};
+		}),
 
 	setVisibility: protectedProcedure
 		.input(setPageVisibilitySchema)
