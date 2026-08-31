@@ -15,3 +15,8 @@ export function pageVersionKey(pageId: string, version: number): string {
 export function pageThumbnailKey(pageId: string, version: number): string {
 	return `pages/${pageId}/versions/${version}/thumbnail.jpg`;
 }
+
+/** A file is a folder: `original` now, derived siblings (a poster) later. */
+export function fileOriginalKey(fileId: string): string {
+	return `files/${fileId}/original`;
+}

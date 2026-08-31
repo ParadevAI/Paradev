@@ -1,6 +1,16 @@
 export { pageContentSecurityPolicy } from "./csp";
+export {
+	FILE_CONTENT_SECURITY_POLICY,
+	type FileResponsePolicy,
+	fileResponsePolicy,
+} from "./file-policy";
 export { injectScriptTag, RUNTIME_SCRIPT_PATH } from "./inject";
-export { pageManifestKey, pageThumbnailKey, pageVersionKey } from "./keys";
+export {
+	fileOriginalKey,
+	pageManifestKey,
+	pageThumbnailKey,
+	pageVersionKey,
+} from "./keys";
 export {
 	type PageManifest,
 	type PageManifestVersion,
@@ -9,11 +19,15 @@ export {
 	servedVersionOf,
 } from "./manifest";
 export {
+	type FileTicketClaims,
 	type PageTicketClaims,
+	signFileTicket,
 	signPageTicket,
+	verifyFileTicket,
 	verifyPageTicket,
 } from "./ticket";
 export {
+	fileUrl,
 	pageIdFromHost,
 	pageOrigin,
 	pageThumbnailUrl,

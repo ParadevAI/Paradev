@@ -17,6 +17,7 @@ export const env = createEnv({
 		// Endpoint override for S3-compatible emulators (MinIO) in tests/dev.
 		R2_ENDPOINT: z.string().url().optional(),
 		USERCONTENT_URL: z.string().url().optional(),
+		MEDIA_URL: z.string().url().optional(),
 		USERCONTENT_TOKEN_SECRET: z.string().min(32).optional(),
 		// Optional: page thumbnails are skipped wherever this is unset.
 		CLOUDFLARE_BROWSER_RENDERING_TOKEN: z.string().min(1).optional(),

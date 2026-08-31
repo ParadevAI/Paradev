@@ -10,6 +10,8 @@ import { z } from "zod";
 const envSchema = z.object({
 	/** Base URL framed content hangs off, e.g. https://frame.supersetusercontent.com */
 	USERCONTENT_URL: z.string().url(),
+	/** Base URL for app-referenced files, e.g. https://media.supersetusercontent.com */
+	MEDIA_URL: z.string().url(),
 	/** Where a reader without a ticket is sent to sign in and come back. */
 	APP_URL: z.string().url(),
 	/** Space-separated CSP sources allowed to frame a page. */

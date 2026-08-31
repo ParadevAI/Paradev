@@ -1,5 +1,6 @@
 import { desc, sql } from "drizzle-orm";
 import {
+	bigint,
 	boolean,
 	check,
 	foreignKey,
@@ -1285,6 +1286,96 @@ export const workspacePages = pgTable(
 
 export type InsertWorkspacePage = typeof workspacePages.$inferInsert;
 export type SelectWorkspacePage = typeof workspacePages.$inferSelect;
+
+export const fileStatus = pgEnum("file_status", ["pending", "ready"]);
+
+export const attachmentParentKind = pgEnum("attachment_parent_kind", [
+	"page_version",
+	"issue",
+	"doc",
+	"chat_session",
+	"comment",
+]);
+
+/**
+ * The library: one row per uploaded object, bytes at
+ * `files/<id>/original` in the private bucket. `contentType` holds the
+ * client's declaration while `pending` and the server-sniffed type once
+ * `ready` — the serve-time policy keys on it, so it is never trusted from
+ * the client. A file with no attachments left is deleted; `pending` rows
+ * older than a day are swept.
+ */
+export const files = pgTable(
+	"files",
+	{
+		id: uuid().primaryKey().defaultRandom(),
+		organizationId: uuid("organization_id")
+			.notNull()
+			.references(() => organizations.id, { onDelete: "cascade" }),
+		name: text().notNull(),
+		contentType: text("content_type").notNull(),
+		sizeBytes: bigint("size_bytes", { mode: "number" }).notNull(),
+		sha256: text().notNull(),
+		status: fileStatus().notNull().default("pending"),
+		createdByUserId: uuid("created_by_user_id").references(() => users.id, {
+			onDelete: "set null",
+		}),
+		createdAt: timestamp("created_at", { withTimezone: true })
+			.notNull()
+			.defaultNow(),
+		updatedAt: timestamp("updated_at", { withTimezone: true })
+			.notNull()
+			.defaultNow()
+			.$onUpdate(() => new Date()),
+	},
+	(table) => [
+		index("files_organization_id_created_at_idx").on(
+			table.organizationId,
+			desc(table.createdAt),
+		),
+		index("files_status_created_at_idx").on(table.status, table.createdAt),
+	],
+);
+
+export type InsertFile = typeof files.$inferInsert;
+export type SelectFile = typeof files.$inferSelect;
+
+/**
+ * Places a file on a parent — a page version, an issue, a doc, a chat
+ * session, a comment. Access to the bytes always derives from access to the
+ * parent; no foreign key on the parent because the kinds live in different
+ * tables (and some don't exist yet). `path` is the relative path a page
+ * asset was published at, unique within its version; null for everything
+ * else.
+ */
+export const attachments = pgTable(
+	"attachments",
+	{
+		id: uuid().primaryKey().defaultRandom(),
+		fileId: uuid("file_id")
+			.notNull()
+			.references(() => files.id, { onDelete: "cascade" }),
+		parentKind: attachmentParentKind("parent_kind").notNull(),
+		parentId: uuid("parent_id").notNull(),
+		path: text(),
+		createdAt: timestamp("created_at", { withTimezone: true })
+			.notNull()
+			.defaultNow(),
+	},
+	(table) => [
+		index("attachments_file_id_idx").on(table.fileId),
+		index("attachments_parent_kind_parent_id_idx").on(
+			table.parentKind,
+			table.parentId,
+		),
+		uniqueIndex("attachments_parent_path_unique")
+			.on(table.parentKind, table.parentId, table.path)
+			.where(sql`${table.path} is not null`),
+	],
+);
+
+export type InsertAttachment = typeof attachments.$inferInsert;
+export type SelectAttachment = typeof attachments.$inferSelect;
 
 export const pageCommentThreads = pgTable(
 	"page_comment_threads",

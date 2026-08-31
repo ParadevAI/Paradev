@@ -1,5 +1,7 @@
 import { db } from "@superset/db/client";
 import {
+	attachments,
+	files,
 	members,
 	organizations,
 	pages,
@@ -9,13 +11,14 @@ import {
 	workspacePages,
 } from "@superset/db/schema";
 import {
+	fileOriginalKey,
 	pageManifestKey,
 	pageThumbnailKey,
 	pageThumbnailUrl,
 	pageViewUrl,
 } from "@superset/shared/usercontent";
 import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
-import { and, desc, eq, or, type SQL, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, or, type SQL, sql } from "drizzle-orm";
 import { deleteObjects, presignedGetUrl } from "../../lib/r2";
 import { protectedProcedure, userError } from "../../trpc";
 import { requireActiveOrgMembership } from "../utils/active-org";
@@ -412,6 +415,7 @@ export const pageRouter = {
 
 			const rows = await db
 				.select({
+					id: pageVersions.id,
 					version: pageVersions.version,
 					key: pageVersions.storageKey,
 				})
@@ -431,6 +435,37 @@ export const pageRouter = {
 					pageId: page.id,
 					versions: rows,
 				});
+				// `attachments.parentId` carries no foreign key (its parent kind
+				// varies), so the version cascade leaves attachment rows behind;
+				// files referenced by nothing else go with them, bytes included.
+				const versionIds = rows.map((row) => row.id);
+				if (versionIds.length > 0) {
+					const removed = await db
+						.delete(attachments)
+						.where(
+							and(
+								eq(attachments.parentKind, "page_version"),
+								inArray(attachments.parentId, versionIds),
+							),
+						)
+						.returning({ fileId: attachments.fileId });
+					const fileIds = [...new Set(removed.map((row) => row.fileId))];
+					if (fileIds.length > 0) {
+						const stillReferenced = new Set(
+							(
+								await db
+									.select({ fileId: attachments.fileId })
+									.from(attachments)
+									.where(inArray(attachments.fileId, fileIds))
+							).map((row) => row.fileId),
+						);
+						const orphans = fileIds.filter((id) => !stillReferenced.has(id));
+						if (orphans.length > 0) {
+							await deleteObjects(orphans.map(fileOriginalKey));
+							await db.delete(files).where(inArray(files.id, orphans));
+						}
+					}
+				}
 			} catch (error) {
 				console.error("[pages] storage cleanup failed after delete", {
 					pageId: page.id,

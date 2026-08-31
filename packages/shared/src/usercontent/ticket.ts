@@ -1,10 +1,10 @@
 /**
- * The ticket for a non-public page: minted by the API after it has checked
- * the session against the page's visibility, verified by the usercontent Worker
- * with nothing but the shared secret. It carries no identity — it says
- * "this page (and optionally this version) may be read until `exp`", nothing
- * more. HMAC-SHA256 over WebCrypto so the same code runs in Node, Workers,
- * and browsers.
+ * Tickets: short signed statements from the API — "this page (or file) may
+ * be read until `exp`" — verified by the content Worker with nothing but the
+ * shared secret. They carry no identity; access was already decided by the
+ * API when one was minted. HMAC-SHA256 over WebCrypto so the same code runs
+ * in Node, Workers, and browsers. A `kind` claim keeps a page ticket from
+ * ever opening a file and the other way round.
  */
 export interface PageTicketClaims {
 	pageId: string;
@@ -14,12 +14,19 @@ export interface PageTicketClaims {
 	exp: number;
 }
 
-const KIND = "page";
-
-/** What gets signed: the claims plus a kind, so a page ticket can never open something else. */
-interface WireClaims extends PageTicketClaims {
-	kind: typeof KIND;
+export interface FileTicketClaims {
+	fileId: string;
+	/**
+	 * The server-sniffed content type, carried in the ticket so the media
+	 * route can apply the serve-time policy without a database.
+	 */
+	contentType: string;
+	/** Expiry, in seconds since the epoch. */
+	exp: number;
 }
+
+const PAGE_KIND = "page";
+const FILE_KIND = "file";
 
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
@@ -58,16 +65,7 @@ function hmacKey(secret: string) {
 	);
 }
 
-export async function signPageTicket(
-	secret: string,
-	claims: PageTicketClaims,
-): Promise<string> {
-	const wire: WireClaims = {
-		kind: KIND,
-		pageId: claims.pageId,
-		exp: claims.exp,
-		...(claims.version !== undefined ? { version: claims.version } : {}),
-	};
+async function signClaims(secret: string, wire: object): Promise<string> {
 	const payload = toBase64Url(encoder.encode(JSON.stringify(wire)));
 	const signature = await crypto.subtle.sign(
 		"HMAC",
@@ -78,14 +76,16 @@ export async function signPageTicket(
 }
 
 /**
+ * Returns the parsed wire claims when the signature checks out against any
+ * secret in the list and the ticket has not expired; null otherwise.
  * `secrets` is the current secret first, then any previous one still in its
  * grace period, so rotation never invalidates tickets already handed out.
  */
-export async function verifyPageTicket(
+async function verifyClaims(
 	secrets: string | readonly string[],
 	ticket: string,
-	now: number = Date.now(),
-): Promise<PageTicketClaims | null> {
+	now: number,
+): Promise<Record<string, unknown> | null> {
 	const dot = ticket.indexOf(".");
 	if (dot === -1) return null;
 	const payload = ticket.slice(0, dot);
@@ -114,15 +114,81 @@ export async function verifyPageTicket(
 		return null;
 	}
 	if (!wire || typeof wire !== "object") return null;
-	const { kind, pageId, version, exp } = wire as Partial<WireClaims>;
+	const { exp } = wire as { exp?: unknown };
+	if (typeof exp !== "number" || exp * 1000 <= now) return null;
+	return wire as Record<string, unknown>;
+}
+
+export async function signPageTicket(
+	secret: string,
+	claims: PageTicketClaims,
+): Promise<string> {
+	return signClaims(secret, {
+		kind: PAGE_KIND,
+		pageId: claims.pageId,
+		exp: claims.exp,
+		...(claims.version !== undefined ? { version: claims.version } : {}),
+	});
+}
+
+export async function verifyPageTicket(
+	secrets: string | readonly string[],
+	ticket: string,
+	now: number = Date.now(),
+): Promise<PageTicketClaims | null> {
+	const wire = await verifyClaims(secrets, ticket, now);
+	if (!wire) return null;
+	const { kind, pageId, version, exp } = wire as {
+		kind?: unknown;
+		pageId?: unknown;
+		version?: unknown;
+		exp: number;
+	};
 	if (
-		kind !== KIND ||
+		kind !== PAGE_KIND ||
 		typeof pageId !== "string" ||
-		typeof exp !== "number" ||
 		(version !== undefined && !Number.isInteger(version))
 	) {
 		return null;
 	}
-	if (exp * 1000 <= now) return null;
-	return { pageId, exp, ...(version !== undefined ? { version } : {}) };
+	return {
+		pageId,
+		exp,
+		...(version !== undefined ? { version: version as number } : {}),
+	};
+}
+
+export async function signFileTicket(
+	secret: string,
+	claims: FileTicketClaims,
+): Promise<string> {
+	return signClaims(secret, {
+		kind: FILE_KIND,
+		fileId: claims.fileId,
+		contentType: claims.contentType,
+		exp: claims.exp,
+	});
+}
+
+export async function verifyFileTicket(
+	secrets: string | readonly string[],
+	ticket: string,
+	now: number = Date.now(),
+): Promise<FileTicketClaims | null> {
+	const wire = await verifyClaims(secrets, ticket, now);
+	if (!wire) return null;
+	const { kind, fileId, contentType, exp } = wire as {
+		kind?: unknown;
+		fileId?: unknown;
+		contentType?: unknown;
+		exp: number;
+	};
+	if (
+		kind !== FILE_KIND ||
+		typeof fileId !== "string" ||
+		typeof contentType !== "string"
+	) {
+		return null;
+	}
+	return { fileId, contentType, exp };
 }

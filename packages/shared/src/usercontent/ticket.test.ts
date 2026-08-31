@@ -1,5 +1,10 @@
 import { describe, expect, test } from "bun:test";
-import { signPageTicket, verifyPageTicket } from "./ticket";
+import {
+	signFileTicket,
+	signPageTicket,
+	verifyFileTicket,
+	verifyPageTicket,
+} from "./ticket";
 
 const SECRET = "a".repeat(32);
 const OTHER = "b".repeat(32);
@@ -81,5 +86,34 @@ describe("page tickets", () => {
 		for (const bad of ["", "abc", "a.b", "!!.!!", "a.b.c"]) {
 			expect(await verifyPageTicket(SECRET, bad, NOW)).toBeNull();
 		}
+	});
+});
+
+describe("file tickets", () => {
+	test("round-trips claims and refuses the other kind", async () => {
+		const file = await signFileTicket(SECRET, {
+			fileId: PAGE,
+			contentType: "video/mp4",
+			exp: EXP,
+		});
+		expect(await verifyFileTicket(SECRET, file, NOW)).toEqual({
+			fileId: PAGE,
+			contentType: "video/mp4",
+			exp: EXP,
+		});
+		expect(await verifyPageTicket(SECRET, file, NOW)).toBeNull();
+
+		const page = await signPageTicket(SECRET, { pageId: PAGE, exp: EXP });
+		expect(await verifyFileTicket(SECRET, page, NOW)).toBeNull();
+	});
+
+	test("rejects expiry and wrong secret like page tickets", async () => {
+		const file = await signFileTicket(SECRET, {
+			fileId: PAGE,
+			contentType: "image/png",
+			exp: EXP,
+		});
+		expect(await verifyFileTicket(SECRET, file, EXP * 1000)).toBeNull();
+		expect(await verifyFileTicket(OTHER, file, NOW)).toBeNull();
 	});
 });

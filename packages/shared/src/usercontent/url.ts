@@ -65,3 +65,27 @@ export function pageIdFromHost(host: string, baseHost: string): string | null {
 	const label = host.slice(0, -suffix.length);
 	return PAGE_ID_LABEL.test(label) ? label : null;
 }
+
+/**
+ * `/files/<fileId>` on the media host — app-rendered attachments (issues,
+ * chat, comments). The optional filename suffix is cosmetic: it names the
+ * download, the Worker resolves only the id.
+ */
+export function fileUrl({
+	baseUrl,
+	fileId,
+	filename,
+	ticket,
+}: {
+	baseUrl: string;
+	fileId: string;
+	filename?: string;
+	ticket?: string;
+}): string {
+	const path = filename
+		? `/files/${fileId}/${encodeURIComponent(filename)}`
+		: `/files/${fileId}`;
+	const url = new URL(path, baseUrl);
+	if (ticket) url.searchParams.set(TICKET_QUERY_PARAM, ticket);
+	return url.toString();
+}

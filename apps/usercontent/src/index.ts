@@ -1,6 +1,9 @@
 import * as Sentry from "@sentry/cloudflare";
 import { PAGE_COMMENTS_RUNTIME_SOURCE } from "@superset/shared/page-comments-runtime";
 import {
+	FILE_CONTENT_SECURITY_POLICY,
+	fileOriginalKey,
+	fileResponsePolicy,
 	injectScriptTag,
 	type PageManifest,
 	type PageTicketClaims,
@@ -13,6 +16,7 @@ import {
 	servedVersionOf,
 	THUMBNAIL_FILENAME,
 	TICKET_QUERY_PARAM,
+	verifyFileTicket,
 	verifyPageTicket,
 } from "@superset/shared/usercontent";
 import { type Context, Hono } from "hono";
@@ -175,6 +179,121 @@ async function serveThumbnail(c: Context<AppContext>): Promise<Response> {
 	});
 }
 
+const FILE_ID =
+	/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+
+function parseRange(
+	header: string | undefined,
+): { offset: number; length?: number } | { suffix: number } | undefined {
+	if (!header) return undefined;
+	const match = /^bytes=(\d*)-(\d*)$/.exec(header.trim());
+	if (!match) return undefined;
+	const [, startRaw = "", endRaw = ""] = match;
+	if (startRaw === "" && endRaw !== "") return { suffix: Number(endRaw) };
+	if (startRaw === "") return undefined;
+	const offset = Number(startRaw);
+	if (endRaw === "") return { offset };
+	const end = Number(endRaw);
+	if (end < offset) return undefined;
+	return { offset, length: end - offset + 1 };
+}
+
+function contentDisposition(
+	disposition: "inline" | "attachment",
+	filename: string,
+): string {
+	const fallback =
+		filename.replace(/[^\x20-\x7e]+/g, "_").replace(/["\\]/g, "_") || "file";
+	return `${disposition}; filename="${fallback}"; filename*=UTF-8''${encodeURIComponent(filename)}`;
+}
+
+/**
+ * `/files/<fileId>` on the media host: app-referenced attachments. The
+ * ticket carries the server-sniffed content type, so serving needs no
+ * database; the policy decides what a browser may do with it, and `Range`
+ * makes video seek.
+ */
+async function serveFile(c: Context<AppContext>): Promise<Response> {
+	if (requestHost(c) !== new URL(c.env.MEDIA_URL).host) return notFound();
+	const fileId = c.req.param("fileId") ?? "";
+	if (!FILE_ID.test(fileId)) return notFound();
+	const ticket = c.req.query(TICKET_QUERY_PARAM);
+	if (!ticket) return notFound();
+	const claims = await verifyFileTicket(
+		[
+			c.env.USERCONTENT_TOKEN_SECRET,
+			c.env.USERCONTENT_TOKEN_SECRET_PREVIOUS ?? "",
+		],
+		ticket,
+	);
+	if (!claims || claims.fileId !== fileId) return notFound();
+
+	const key = fileOriginalKey(fileId);
+	const range = parseRange(c.req.header("range"));
+	let object: R2ObjectBody | null;
+	try {
+		object = await c.env.PRIVATE.get(key, range ? { range } : undefined);
+	} catch {
+		return new Response("Range not satisfiable", {
+			status: 416,
+			headers: { "Cache-Control": "no-store" },
+		});
+	}
+	if (!object) return notFound();
+
+	const policy = fileResponsePolicy({
+		contentType: claims.contentType,
+		fetchDest: c.req.header("sec-fetch-dest"),
+	});
+	const filenameParam = c.req.param("filename");
+	let filename = fileId;
+	if (filenameParam) {
+		try {
+			filename = decodeURIComponent(filenameParam);
+		} catch {
+			filename = filenameParam;
+		}
+	}
+
+	const headers = new Headers({
+		"Content-Type": policy.contentType,
+		"Content-Disposition": contentDisposition(policy.disposition, filename),
+		"Content-Security-Policy": FILE_CONTENT_SECURITY_POLICY,
+		"Superset-Storage-Key": key,
+		"X-Content-Type-Options": "nosniff",
+		"Referrer-Policy": "no-referrer",
+		"X-Robots-Tag": "noindex, nofollow",
+		"Accept-Ranges": "bytes",
+		// Like thumbnails: the browser may keep the bytes only as long as the
+		// ticket that fetched them, so revocation is bounded by ticket life.
+		"Cache-Control": `private, max-age=${Math.max(
+			0,
+			Math.min(claims.exp - Math.floor(Date.now() / 1000), 86400),
+		)}, immutable`,
+	});
+	if (range && object.range) {
+		const offset =
+			"offset" in object.range && object.range.offset !== undefined
+				? object.range.offset
+				: Math.max(
+						object.size - (object.range as { suffix: number }).suffix,
+						0,
+					);
+		const length =
+			"length" in object.range && object.range.length !== undefined
+				? object.range.length
+				: object.size - offset;
+		headers.set(
+			"Content-Range",
+			`bytes ${offset}-${offset + length - 1}/${object.size}`,
+		);
+		headers.set("Content-Length", String(length));
+		return new Response(object.body, { status: 206, headers });
+	}
+	headers.set("Content-Length", String(object.size));
+	return new Response(object.body, { headers });
+}
+
 // Pages hang off `frame.<zone>`; the zone apex and `frame.` itself have
 // nothing to serve, so readers arriving there belong in the app.
 app.use("*", async (c, next) => {
@@ -182,7 +301,9 @@ app.use("*", async (c, next) => {
 	const host = requestHost(c);
 	const base = baseHost(c);
 	const apex = base.slice(base.indexOf(".") + 1);
-	if (host !== base && host !== apex) return next();
+	const media = new URL(c.env.MEDIA_URL).host;
+	if (host !== base && host !== apex && host !== media) return next();
+	if (host === media && c.req.path.startsWith("/files/")) return next();
 	if (c.req.path === "/health") return c.json({ ok: true });
 	return c.redirect(c.env.APP_URL, 302);
 });
@@ -212,6 +333,8 @@ app.get("/versions/:version/", servePage);
 app.get("/versions/:version/:ticket{~[^/]+}", addTrailingSlash);
 app.get("/versions/:version/:ticket{~[^/]+}/", servePage);
 app.get(`/versions/:version/${THUMBNAIL_FILENAME}`, serveThumbnail);
+app.get("/files/:fileId", serveFile);
+app.get("/files/:fileId/:filename", serveFile);
 app.notFound(() => notFound());
 
 // Exceptions only; no-op until SENTRY_DSN is set.

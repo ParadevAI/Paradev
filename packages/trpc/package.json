@@ -16,6 +16,10 @@
 			"types": "./src/router/page/thumbnail.ts",
 			"default": "./src/router/page/thumbnail.ts"
 		},
+		"./file-sweep": {
+			"types": "./src/router/file/sweep.ts",
+			"default": "./src/router/file/sweep.ts"
+		},
 		"./storage": {
 			"types": "./src/lib/r2.ts",
 			"default": "./src/lib/r2.ts"
@@ -94,6 +98,7 @@
 		"@upstash/redis": "1.37.0",
 		"@vercel/blob": "2.3.2",
 		"@vercel/kv": "3.0.0",
+		"aws4fetch": "1.0.20",
 		"drizzle-orm": "0.45.2",
 		"gaxios": "7.3.1",
 		"google-auth-library": "10.5.0",
