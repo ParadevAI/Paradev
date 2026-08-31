@@ -9,8 +9,10 @@ import { drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
 import type { HostDb } from "../../../db";
 import * as schema from "../../../db/schema";
+import { TerminalAgentStore } from "../../../terminal-agents";
 import { setDefaultAccountSelection } from "../usage/default-account";
 import {
+	bindResumedSession,
 	buildAgentCommandString,
 	buildTerminalAgentLaunch,
 	validateAgentEffortSelection,
@@ -747,5 +749,96 @@ describe("validateAgentModeSelection", () => {
 		expect(() =>
 			validateAgentModeSelection("claude", "Claude", "plan"),
 		).toThrow("Claude does not support a launch mode override");
+	});
+});
+
+describe("bindResumedSession", () => {
+	function seedCodexConfig(db: HostDb) {
+		db.insert(schema.hostAgentConfigs)
+			.values({
+				id: "00000000-0000-0000-0000-00000000000c",
+				presetId: "codex",
+				label: "Codex",
+				command: "codex",
+				argsJson: "[]",
+				promptTransport: "argv",
+				promptArgsJson: JSON.stringify(["--"]),
+				resumeArgsJson: JSON.stringify(["resume"]),
+				forkArgsJson: JSON.stringify(["fork", "{sessionId}"]),
+				envJson: "{}",
+				displayOrder: 0,
+			})
+			.run();
+	}
+
+	const WORKSPACE_ID = "11111111-1111-1111-1111-111111111111";
+	const TERMINAL_ID = "22222222-2222-2222-2222-222222222222";
+
+	it("binds the resumed session id without waiting for a hook", () => {
+		const db = createTestDb();
+		seedCodexConfig(db);
+		const store = new TerminalAgentStore();
+
+		bindResumedSession(
+			{ db, terminalAgentStore: store },
+			{
+				workspaceId: WORKSPACE_ID,
+				agent: "codex",
+				prompt: "",
+				resumeSessionId: "01a058a7-3990-7921-bb87-66c7370b999e",
+			},
+			TERMINAL_ID,
+		);
+
+		expect(store.list()).toMatchObject([
+			{
+				terminalId: TERMINAL_ID,
+				agentId: "codex",
+				agentSessionId: "01a058a7-3990-7921-bb87-66c7370b999e",
+				lastEventType: "Attached",
+			},
+		]);
+	});
+
+	it("leaves a fresh (non-resumed) launch unbound", () => {
+		const db = createTestDb();
+		seedCodexConfig(db);
+		const store = new TerminalAgentStore();
+
+		bindResumedSession(
+			{ db, terminalAgentStore: store },
+			{ workspaceId: WORKSPACE_ID, agent: "codex", prompt: "go" },
+			TERMINAL_ID,
+		);
+
+		expect(store.list()).toEqual([]);
+	});
+
+	it("keeps the bound id when the wrapper's launch report arrives without one", () => {
+		const db = createTestDb();
+		seedCodexConfig(db);
+		const store = new TerminalAgentStore();
+
+		bindResumedSession(
+			{ db, terminalAgentStore: store },
+			{
+				workspaceId: WORKSPACE_ID,
+				agent: "codex",
+				prompt: "",
+				resumeSessionId: "01a058a7-3990-7921-bb87-66c7370b999e",
+			},
+			TERMINAL_ID,
+		);
+		store.recordEvent({
+			terminalId: TERMINAL_ID,
+			workspaceId: WORKSPACE_ID,
+			eventType: "Attached",
+			agentId: "codex",
+			occurredAt: Date.now(),
+		});
+
+		expect(store.list()[0]?.agentSessionId).toBe(
+			"01a058a7-3990-7921-bb87-66c7370b999e",
+		);
 	});
 });
