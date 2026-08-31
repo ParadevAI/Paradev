@@ -4,6 +4,14 @@
 	"private": true,
 	"type": "module",
 	"exports": {
+		"./usercontent": {
+			"types": "./src/usercontent/index.ts",
+			"default": "./src/usercontent/index.ts"
+		},
+		"./page-comments-runtime": {
+			"types": "./src/page-comments-runtime.ts",
+			"default": "./src/page-comments-runtime.ts"
+		},
 		"./automation-matching": {
 			"types": "./src/automation-matching/index.ts",
 			"default": "./src/automation-matching/index.ts"

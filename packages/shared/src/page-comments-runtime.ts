@@ -47,7 +47,13 @@ export type FrameMessage =
 			entries: { id: string; rect: FrameRect | null }[];
 	  };
 
-const RUNTIME_SOURCE = `(() => {
+/**
+ * Runs inside the served page. It is generic — it never reads page content,
+ * it only measures and reports DOM elements the host asks about — and it is
+ * inert until the host sends `set-mode`. The usercontent origin serves it
+ * same-origin at `RUNTIME_SCRIPT_PATH` and injects one script tag per page.
+ */
+export const PAGE_COMMENTS_RUNTIME_SOURCE = `(() => {
 	const HOST = ${JSON.stringify(HOST_CHANNEL)};
 	const FRAME = ${JSON.stringify(FRAME_CHANNEL)};
 
@@ -257,10 +263,3 @@ const RUNTIME_SOURCE = `(() => {
 
 	post({ type: "ready" });
 })();`;
-
-export function injectCommentRuntime(html: string): string {
-	const tag = `<script>${RUNTIME_SOURCE}</script>`;
-	const close = html.lastIndexOf("</body>");
-	if (close === -1) return html + tag;
-	return html.slice(0, close) + tag + html.slice(close);
-}

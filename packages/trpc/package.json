@@ -12,6 +12,14 @@
 			"types": "./src/router/page/schema.ts",
 			"default": "./src/router/page/schema.ts"
 		},
+		"./page-thumbnail": {
+			"types": "./src/router/page/thumbnail.ts",
+			"default": "./src/router/page/thumbnail.ts"
+		},
+		"./storage": {
+			"types": "./src/lib/r2.ts",
+			"default": "./src/lib/r2.ts"
+		},
 		"./leaderboard-queries": {
 			"types": "./src/router/leaderboard/queries.ts",
 			"default": "./src/router/leaderboard/queries.ts"
@@ -64,6 +72,8 @@
 	},
 	"dependencies": {
 		"@anthropic-ai/sdk": "0.78.0",
+		"@aws-sdk/client-s3": "3.899.0",
+		"@aws-sdk/s3-request-presigner": "3.899.0",
 		"@azure/msal-node": "5.5.0",
 		"@blaxel/core": "0.3.11",
 		"@googleapis/calendar": "16.0.0",

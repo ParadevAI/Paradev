@@ -12,9 +12,9 @@ org can open. Every publish mints a version, so a page has history. Readers can
 pin a comment to any element on it, and those comments come back to an agent to
 fix. That is what makes a page a working surface rather than an export.
 
-Pages are served inside a locked-down iframe. Most of the work in this skill is
-respecting that sandbox; a page that ignores it looks fine locally and breaks
-silently once published.
+Pages are served from their own origin under a strict content policy. Most of
+the work in this skill is respecting that policy; a page that ignores it looks
+fine locally and breaks silently once published.
 
 ## When a page is the right surface
 
@@ -29,70 +29,66 @@ database, or a login. A page has none of those.
 If you're unsure, ask. Publishing is cheap and reversible, but a page the user
 didn't want is noise in their org's list.
 
-## The sandbox, which is what actually bites
+## The content policy, which is what actually bites
 
-The frame is `sandbox="allow-scripts allow-forms allow-popups"` with
-`referrerPolicy="no-referrer"`. **`allow-same-origin` is deliberately absent**,
-so the page runs in an *opaque origin*. Consequences, all of them silent in a
-local browser and fatal once published:
+Every page gets its own origin, `https://<pageId>.frame.supersetusercontent.com`, and
+is framed with `sandbox="allow-scripts allow-same-origin allow-forms
+allow-popups"`. So the page is a real origin of its own, and a locked-down
+one. The policy is `default-src 'none'` with a short allowlist, and it is
+enforced identically in the desktop pane and the web viewer:
 
-- **Every storage API throws on access.** `localStorage`, `sessionStorage`,
-  `indexedDB`, `caches`, and `document.cookie`. Not "returns null", not "returns
-  an empty string": a `SecurityError` that takes the rest of your script with
-  it. `document.cookie` is the one that catches people, because everywhere else
-  on the web it degrades quietly. Hold state in a plain variable, and wrap any
-  access you cannot avoid in `try`/`catch`.
-- **`navigator.serviceWorker` is unavailable** for the same reason.
-- **`fetch`/`XHR`/WebSocket send `Origin: null`**, which almost every API and
-  CORS policy rejects. Write pages that need no network for their data: bake it
-  into the document as a literal.
-- **`fetch("data:...")` is blocked as well.** `connect-src` permits no `data:`
-  on either viewer, so a page cannot read its own inlined data URIs back out.
-  That is counterintuitive when the rule next to it says to inline everything,
-  and it is exactly the workaround people reach for. Decode base64 in
-  JavaScript instead (`atob`, then `Uint8Array.from`), or emit the value as a
-  JavaScript literal so nothing has to be decoded at all.
-- **No parent access.** Reading `window.parent.document`, `window.top.location`
-  or `window.frameElement` throws a `SecurityError`. `postMessage` to the parent
-  is the exception; it does not throw, it simply has nothing listening, so
-  don't build a handshake on it.
+- **No network from script.** `fetch`, `XHR`, `EventSource` and WebSockets are
+  all blocked, and so is `fetch("data:...")`: a page cannot read its own
+  inlined data URIs back out. Write pages that need no network at all: bake
+  the data into the document as a literal, or decode base64 in JavaScript
+  (`atob`, then `Uint8Array.from`).
+- **No compiling code at runtime.** `script-src` carries no `'unsafe-eval'`,
+  so `eval()` and `new Function()` both raise an `EvalError`. This rules out
+  inlining any library that builds functions at runtime, which includes
+  several chart and templating libraries and a number of date and expression
+  helpers. Check for it before you reach for a dependency: the page renders
+  nothing and gives no visible reason why.
+- **No external scripts or stylesheets.** `<script src="https://…">` and
+  `<link rel="stylesheet" href="https://…">` are blocked, Google Fonts
+  `<link>` tags included. Inline all CSS and JS. A remote font *file* is
+  allowed, so an inline `@font-face { src: url(https://…) }` works.
+- **Images, video and audio may be remote** (`https:`, `data:` or `blob:`),
+  but prefer `data:` URIs for anything the page cannot do without: a reader
+  with the network off sees nothing, and a remote image makes every reader's
+  browser call that host directly, which hands a third party the IP address
+  of everyone who opens the page.
+- **Storage works** and is scoped to the page: `localStorage`,
+  `sessionStorage`, `indexedDB` and cookies persist across reloads and across
+  versions of the same page. Use it for a chosen tab or filter, never for
+  anything the page cannot rebuild from its own content.
+- **No parent access.** The viewer is a different origin, so
+  `window.parent.document` and `window.top.location` throw. Superset injects
+  one script into the page for comment anchoring; nothing else listens to
+  `postMessage`, so don't build a handshake on it.
+- **No form submission.** `form-action 'none'`: a `<form>` may exist for its
+  controls, but submitting it goes nowhere. Handle inputs in script.
 
-`location.origin` is not your app's origin: the desktop pane serves the page
-under a `superset-page://` scheme and the web viewer frames it as `srcdoc`, and
-either way cross-frame checks see the origin as `null`.
-
-Scripts, forms, and popups *do* work. Inline JS runs normally, so charts,
-filters, sorting, tabs, and interactive controls are all fine, as long as
-everything they need is already in the file.
+Scripts and popups *do* work. Inline JS runs normally, so charts, filters,
+sorting, tabs, and interactive controls are all fine, as long as everything
+they need is already in the file.
 
 ## The other hard limits
 
 1. **`.html` only.** Any other extension is rejected at the CLI.
-2. **One file.** There is no asset upload. Inline all CSS and JS. No CDN
-   links, no external stylesheets, and no web fonts from a remote host:
-   scripts and stylesheets are refused outright, and a remote font fails CORS
-   from an opaque origin.
-3. **No compiling code at runtime.** `script-src` carries no `'unsafe-eval'`,
-   so `eval()` and `new Function()` both raise an `EvalError`. This rules out
-   inlining any library that builds functions at runtime, which includes
-   several chart and templating libraries and a number of date and expression
-   helpers. Check for it before you reach for a dependency: the page renders
-   nothing and gives no visible reason why.
-4. **Remote images do load,** on both viewers, so `<img src="https://...">`
-   works. Prefer a `data:` URI anyway. A remote image makes every reader's
-   browser call that host directly, which hands a third party the IP address
-   of everyone who opens the page, and it breaks the moment the host does.
-5. **3 MB maximum**, and base64 `data:` URIs count toward it at ~1.37× their
+2. **One file.** There is no asset upload. Inline all CSS and JS, and embed
+   images as `data:` URIs unless they are genuinely optional. No CDN links and
+   no external stylesheets; the policy blocks them.
+3. **3 MB maximum**, and base64 `data:` URIs count toward it at ~1.37× their
    raw size. A few small SVGs or PNGs are fine; a photo gallery is not.
-6. **Full-bleed frame with a white default background.** Set your own `body`
+4. **Full-bleed frame with a white default background.** Set your own `body`
    background explicitly rather than inheriting.
 
-Check before publishing: no remote script, stylesheet, or font URLs, no `eval`
-or `new Function` anywhere in the file or in anything you inlined, no `fetch`
-of any kind including of a `data:` URI, no bare `localStorage`, and the page
-fits in 3 MB. Opened from `file://` with the network disabled it should still
-render, with remote images the one permitted exception: they go blank offline,
-which is the price of not inlining them.
+Check before publishing: no `<script src>` or `<link rel="stylesheet">` pointing
+at a remote host, no `fetch` of any kind including of a `data:` URI, no `eval`
+or `new Function` anywhere in the file or in anything you inlined, page fits in
+3 MB, opens correctly from `file://` with the network disabled. Remote images
+are the one permitted exception: they go blank offline, which is the price of
+not inlining them.
 
 ## Design
 
@@ -224,6 +220,7 @@ Reopen with `superset pages comments resolve --thread <id> --reopen`.
 | Publish rejected on size | Over 3 MB; the `data:` URIs are almost always why |
 | A new page appeared instead of a version | Published from outside the workspace, or the path changed; use `--page <id>` |
 | Reader gets a 404 | Page is `just_me`, either set that way or created before `org` became the default; widen it with `--visibility org` |
-| Page is blank once published, fine locally | A script threw: usually `localStorage`, or a fetch of any kind |
-| A chart or widget renders nothing and logs no error | The library compiles code with `new Function` or `eval`, which the sandbox refuses; pick one that does not |
-| Fonts missing when published | Remote font URLs; a font fails CORS from an opaque origin, so inline it as a `data:` URI |
+| Page is blank once published, fine locally | A script threw, or the page loads a script or stylesheet from a remote host |
+| A chart or widget renders nothing and logs no error | The library compiles code with `new Function` or `eval`, which the policy refuses; pick one that does not |
+| Fonts missing when published | A Google Fonts `<link>`; inline the `@font-face` instead |
+| Images missing when published | `http://` URLs, or the reader is offline; embed as `data:` URIs |

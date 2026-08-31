@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test";
+import type { FrameRect } from "@superset/shared/page-comments-runtime";
 import type { CommentThread } from "../../../../providers/CommentProvider";
-import type { FrameRect } from "../../../../utils/commentRuntime";
 import { groupThreads, newestActivity } from "./groupThreads";
 
 const rect: FrameRect = { top: 0, left: 0, width: 10, height: 10 };

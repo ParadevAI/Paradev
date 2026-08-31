@@ -701,6 +701,13 @@
       "when": 1788022153312,
       "tag": "0099_add_leaderboard_axis_cost",
       "breakpoints": true
+    },
+    {
+      "idx": 100,
+      "version": "7",
+      "when": 1788134015857,
+      "tag": "0100_drop_chat_attachments_rename_page_version_storage_key",
+      "breakpoints": true
     }
   ]
 }

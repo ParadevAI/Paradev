@@ -19573,11 +19573,6 @@ msgstr "Sohbet oturumu bulunamadı"
 
 #. js-lingui-explicit-id
 #: src/server-errors.ts
-msgid "serverError.chat.failedToRecordChatAttachment"
-msgstr "Sohbet eki kaydedilemedi"
-
-#. js-lingui-explicit-id
-#: src/server-errors.ts
 msgid "serverError.chat.noActiveOrganizationSelected"
 msgstr "Etkin kuruluş seçilmedi"
 

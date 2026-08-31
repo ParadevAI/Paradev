@@ -1,14 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useComments } from "../../providers/CommentProvider";
 import {
 	FRAME_CHANNEL,
 	type FrameMessage,
 	HOST_CHANNEL,
 	type HostMessageBody,
-	injectCommentRuntime,
-} from "../../utils/commentRuntime";
+} from "@superset/shared/page-comments-runtime";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useComments } from "../../providers/CommentProvider";
 import { CommentBubble, pinClassName } from "./components/CommentBubble";
 import { CommentPopover, initialsOf } from "./components/CommentPopover";
 import { PageFrame } from "./components/PageFrame";
@@ -20,17 +19,16 @@ import {
 } from "./utils/pinLayout";
 
 interface PageCommentsViewProps {
-	html: string;
+	/** The page's own origin, which serves it with the comment runtime injected. */
+	src: string;
 	title: string;
-	serveHtml?: (injectedHtml: string) => Promise<string>;
 	initialScrollY?: number;
 	onScrollYChange?: (y: number) => void;
 }
 
 export function PageCommentsView({
-	html,
+	src,
 	title,
-	serveHtml,
 	initialScrollY,
 	onScrollYChange,
 }: PageCommentsViewProps) {
@@ -65,25 +63,7 @@ export function PageCommentsView({
 		deleteThread,
 	} = useComments();
 
-	const injected = useMemo(() => injectCommentRuntime(html), [html]);
-
-	const [servedSrc, setServedSrc] = useState<string | null>(null);
-	useEffect(() => {
-		if (!serveHtml) return;
-		let active = true;
-		setServedSrc(null);
-		serveHtml(injected).then(
-			(url) => {
-				if (active) setServedSrc(url);
-			},
-			() => {
-				if (active) setServedSrc(null);
-			},
-		);
-		return () => {
-			active = false;
-		};
-	}, [injected, serveHtml]);
+	const frameOrigin = useMemo(() => new URL(src).origin, [src]);
 
 	/**
 	 * Escape peels one layer at a time: the draft you are composing, then an
@@ -118,12 +98,15 @@ export function PageCommentsView({
 		return () => window.removeEventListener("keydown", onKeyDown);
 	}, [dismiss]);
 
-	const send = useCallback((message: HostMessageBody) => {
-		frameRef.current?.contentWindow?.postMessage(
-			{ channel: HOST_CHANNEL, ...message },
-			"*",
-		);
-	}, []);
+	const send = useCallback(
+		(message: HostMessageBody) => {
+			frameRef.current?.contentWindow?.postMessage(
+				{ channel: HOST_CHANNEL, ...message },
+				frameOrigin,
+			);
+		},
+		[frameOrigin],
+	);
 
 	const popoverOpen = Boolean(draft || activeThreadId);
 	useEffect(() => {
@@ -147,6 +130,7 @@ export function PageCommentsView({
 
 	useEffect(() => {
 		const onMessage = (event: MessageEvent) => {
+			if (event.origin !== frameOrigin) return;
 			if (event.source !== frameRef.current?.contentWindow) return;
 			const data = event.data as FrameMessage | undefined;
 			if (!data || data.channel !== FRAME_CHANNEL) return;
@@ -181,6 +165,7 @@ export function PageCommentsView({
 	}, [
 		discardDraft,
 		dismiss,
+		frameOrigin,
 		notifyFramePointerDown,
 		openDraft,
 		send,
@@ -228,14 +213,12 @@ export function PageCommentsView({
 
 	return (
 		<div ref={containerRef} className="relative h-full w-full">
-			{servedSrc || !serveHtml ? (
-				<PageFrame
-					ref={frameRef}
-					{...(serveHtml ? { src: servedSrc as string } : { html: injected })}
-					title={title}
-					onLoad={() => setFrameEpoch((epoch) => epoch + 1)}
-				/>
-			) : null}
+			<PageFrame
+				ref={frameRef}
+				src={src}
+				title={title}
+				onLoad={() => setFrameEpoch((epoch) => epoch + 1)}
+			/>
 
 			<div className="pointer-events-none absolute inset-0 overflow-hidden">
 				{enabled && hoverRect ? (

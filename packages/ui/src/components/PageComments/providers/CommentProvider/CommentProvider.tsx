@@ -1,5 +1,9 @@
 "use client";
 
+import type {
+	CommentAnchor,
+	FrameRect,
+} from "@superset/shared/page-comments-runtime";
 import {
 	createContext,
 	type ReactNode,
@@ -9,7 +13,6 @@ import {
 	useRef,
 	useState,
 } from "react";
-import type { CommentAnchor, FrameRect } from "../../utils/commentRuntime";
 
 export interface PageCommentUser {
 	id: string;

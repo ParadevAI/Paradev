@@ -7,6 +7,19 @@ export const env = createEnv({
 			.enum(["development", "production", "test"])
 			.default("development"),
 		BLOB_READ_WRITE_TOKEN: z.string().min(1),
+		// Cloudflare: R2 holds page bytes and chat attachments, and the
+		// usercontent origin serves pages from it. Optional so a checkout
+		// without them still boots; the storage call is what fails.
+		CLOUDFLARE_ACCOUNT_ID: z.string().min(1).optional(),
+		R2_ACCESS_KEY_ID: z.string().min(1).optional(),
+		R2_SECRET_ACCESS_KEY: z.string().min(1).optional(),
+		R2_PRIVATE_BUCKET: z.string().min(1).optional(),
+		// Endpoint override for S3-compatible emulators (MinIO) in tests/dev.
+		R2_ENDPOINT: z.string().url().optional(),
+		USERCONTENT_URL: z.string().url().optional(),
+		USERCONTENT_TOKEN_SECRET: z.string().min(32).optional(),
+		// Optional: page thumbnails are skipped wherever this is unset.
+		CLOUDFLARE_BROWSER_RENDERING_TOKEN: z.string().min(1).optional(),
 		POSTHOG_API_KEY: z.string(),
 		POSTHOG_API_HOST: z.string().url().default("https://us.posthog.com"),
 		POSTHOG_PROJECT_ID: z.string(),

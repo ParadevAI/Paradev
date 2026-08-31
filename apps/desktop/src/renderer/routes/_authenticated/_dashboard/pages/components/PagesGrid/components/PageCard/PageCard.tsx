@@ -27,6 +27,7 @@ export interface PageCardItem {
 	slug: string;
 	title: string;
 	url: string;
+	thumbnailUrl: string | null;
 	visibility: string;
 	createdAt: Date | string;
 	updatedAt: Date | string;
@@ -91,11 +92,7 @@ export function PageCard({
 				onClick={(event) => onOpen(page, event)}
 				className="flex flex-1 flex-col text-left"
 			>
-				<PageThumbnail
-					pageId={page.id}
-					version={page.sharedVersion ?? page.latestVersion}
-					accountId={currentUserId}
-				/>
+				<PageThumbnail src={page.thumbnailUrl} />
 				<div className="flex flex-col gap-1 border-border/60 border-t px-3 py-2.5">
 					<span className="truncate font-medium text-sm">{page.title}</span>
 					<span className="flex items-center gap-1.5 text-muted-foreground text-xs">

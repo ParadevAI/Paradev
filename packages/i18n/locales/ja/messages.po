@@ -19572,11 +19572,6 @@ msgstr "チャットセッションが見つかりません"
 
 #. js-lingui-explicit-id
 #: src/server-errors.ts
-msgid "serverError.chat.failedToRecordChatAttachment"
-msgstr "チャットの添付ファイルの記録に失敗しました"
-
-#. js-lingui-explicit-id
-#: src/server-errors.ts
 msgid "serverError.chat.noActiveOrganizationSelected"
 msgstr "アクティブな組織が選択されていません"
 

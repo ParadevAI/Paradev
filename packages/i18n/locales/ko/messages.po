@@ -19573,11 +19573,6 @@ msgstr "채팅 세션을 찾을 수 없습니다"
 
 #. js-lingui-explicit-id
 #: src/server-errors.ts
-msgid "serverError.chat.failedToRecordChatAttachment"
-msgstr "채팅 첨부 파일을 기록하지 못했습니다"
-
-#. js-lingui-explicit-id
-#: src/server-errors.ts
 msgid "serverError.chat.noActiveOrganizationSelected"
 msgstr "선택된 활성 조직이 없습니다"
 

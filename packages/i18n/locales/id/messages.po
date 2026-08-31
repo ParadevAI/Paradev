@@ -19573,11 +19573,6 @@ msgstr "Sesi chat tidak ditemukan"
 
 #. js-lingui-explicit-id
 #: src/server-errors.ts
-msgid "serverError.chat.failedToRecordChatAttachment"
-msgstr "Gagal mencatat lampiran chat"
-
-#. js-lingui-explicit-id
-#: src/server-errors.ts
 msgid "serverError.chat.noActiveOrganizationSelected"
 msgstr "Tidak ada organisasi aktif yang dipilih"
 

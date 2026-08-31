@@ -1,3 +1,7 @@
+export type {
+	CommentAnchor,
+	FrameRect,
+} from "@superset/shared/page-comments-runtime";
 export {
 	CommentModeButton,
 	CommentModeToggle,
@@ -30,7 +34,3 @@ export {
 	type CommentAuthor,
 	commentAuthor,
 } from "./utils/commentAuthor";
-export type {
-	CommentAnchor,
-	FrameRect,
-} from "./utils/commentRuntime";

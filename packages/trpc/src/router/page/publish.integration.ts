@@ -1,19 +1,32 @@
 import { afterAll, beforeAll, describe, expect, mock, test } from "bun:test";
 
-const blobStore = new Map<string, Buffer>();
-let putCalls = 0;
-mock.module("@vercel/blob", () => ({
-	put: async (pathname: string, body: Buffer, _opts: unknown) => {
-		putCalls += 1;
-		const stored = `${pathname}-${putCalls}`;
-		blobStore.set(stored, body);
-		return { pathname: stored, url: `https://blob.test/${stored}` };
+const objectStore = new Map<string, Uint8Array | string>();
+mock.module("../../lib/r2", () => ({
+	storageEnv: () => ({
+		accountId: "test",
+		accessKeyId: "test",
+		secretAccessKey: "test",
+		bucket: "test",
+	}),
+	putObject: async ({
+		key,
+		body,
+	}: {
+		key: string;
+		body: Uint8Array | string;
+	}) => {
+		objectStore.set(key, body);
 	},
-	head: async (pathname: string) => {
-		if (!blobStore.has(pathname)) throw new Error("blob not found");
-		return { url: `https://blob.test/${pathname}`, pathname };
+	objectExists: async (key: string) => objectStore.has(key),
+	getObject: async (key: string) =>
+		objectStore.has(key) ? new Response(objectStore.get(key)) : null,
+	deleteObjects: async (keys: string[]) => {
+		for (const key of keys) objectStore.delete(key);
 	},
-	del: async () => {},
+	presignedGetUrl: async (key: string) => {
+		if (!objectStore.has(key)) throw new Error("object not found");
+		return `https://storage.test/${key}`;
+	},
 }));
 
 const { db, dbWs } = await import("@superset/db/client");
@@ -301,8 +314,9 @@ describe("publish", () => {
 
 		expect(row?.sizeBytes).toBe(Buffer.byteLength(body));
 		expect(row?.sha256).toHaveLength(64);
-		expect(row?.blobPathname).toContain(`pages/${ORG}/`);
-		expect(row?.blobPathname).toContain(row?.sha256 ?? "no-hash");
+		expect(row?.storageKey).toBe(
+			`pages/${result.id}/versions/${result.version}/index.html`,
+		);
 	});
 });
 

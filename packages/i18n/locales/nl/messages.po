@@ -19573,11 +19573,6 @@ msgstr "Chatsessie niet gevonden"
 
 #. js-lingui-explicit-id
 #: src/server-errors.ts
-msgid "serverError.chat.failedToRecordChatAttachment"
-msgstr "Vastleggen van chatbijlage mislukt"
-
-#. js-lingui-explicit-id
-#: src/server-errors.ts
 msgid "serverError.chat.noActiveOrganizationSelected"
 msgstr "Geen actieve organisatie geselecteerd"
 

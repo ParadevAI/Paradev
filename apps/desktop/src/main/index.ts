@@ -37,11 +37,6 @@ import { resolveAppLocale } from "./lib/language";
 import { localDb } from "./lib/local-db";
 import { requestLocalNetworkAccess } from "./lib/local-network-permission";
 import { menuEmitter } from "./lib/menu-events";
-import { PAGE_SCHEME, pageProtocolHandler } from "./lib/pageContent";
-import {
-	THUMBNAIL_SCHEME,
-	thumbnailProtocolHandler,
-} from "./lib/pageThumbnails";
 import {
 	initTanstackDbPersistence,
 	shutdownTanstackDbPersistence,
@@ -360,6 +355,12 @@ if (process.env.NODE_ENV === "development") {
 	parentCheckInterval.unref();
 }
 
+// Chromium refuses to cache any single entry larger than about an eighth
+// of the disk cache, and the default cache is a few hundred MB — too
+// small for a video inside a page. 1 GiB lifts the per-entry cap to
+// roughly 128 MB.
+app.commandLine.appendSwitch("disk-cache-size", String(1024 * 1024 * 1024));
+
 protocol.registerSchemesAsPrivileged([
 	{
 		scheme: "superset-icon",
@@ -372,22 +373,6 @@ protocol.registerSchemesAsPrivileged([
 	},
 	{
 		scheme: "superset-font",
-		privileges: {
-			standard: true,
-			secure: true,
-			bypassCSP: true,
-			supportFetchAPI: true,
-		},
-	},
-	{
-		scheme: PAGE_SCHEME,
-		privileges: {
-			standard: true,
-			secure: true,
-		},
-	},
-	{
-		scheme: THUMBNAIL_SCHEME,
 		privileges: {
 			standard: true,
 			secure: true,
@@ -456,16 +441,6 @@ if (!gotTheLock) {
 		session
 			.fromPartition("persist:superset")
 			.protocol.handle("superset-icon", iconProtocolHandler);
-
-		protocol.handle(PAGE_SCHEME, pageProtocolHandler);
-		session
-			.fromPartition("persist:superset")
-			.protocol.handle(PAGE_SCHEME, pageProtocolHandler);
-
-		protocol.handle(THUMBNAIL_SCHEME, thumbnailProtocolHandler);
-		session
-			.fromPartition("persist:superset")
-			.protocol.handle(THUMBNAIL_SCHEME, thumbnailProtocolHandler);
 
 		// Serve system fonts (e.g. SF Mono on macOS) via custom protocol
 		// so the renderer can use @font-face with font-src 'self' CSP

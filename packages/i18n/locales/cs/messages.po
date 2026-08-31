@@ -19573,11 +19573,6 @@ msgstr "Relace chatu nenalezena"
 
 #. js-lingui-explicit-id
 #: src/server-errors.ts
-msgid "serverError.chat.failedToRecordChatAttachment"
-msgstr "Nepodařilo se zaznamenat přílohu chatu"
-
-#. js-lingui-explicit-id
-#: src/server-errors.ts
 msgid "serverError.chat.noActiveOrganizationSelected"
 msgstr "Není vybraná žádná aktivní organizace"
 

@@ -19572,11 +19572,6 @@ msgstr "Session de chat introuvable"
 
 #. js-lingui-explicit-id
 #: src/server-errors.ts
-msgid "serverError.chat.failedToRecordChatAttachment"
-msgstr "Échec de l'enregistrement de la pièce jointe du chat"
-
-#. js-lingui-explicit-id
-#: src/server-errors.ts
 msgid "serverError.chat.noActiveOrganizationSelected"
 msgstr "Aucune organisation active sélectionnée"
 

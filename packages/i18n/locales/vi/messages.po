@@ -19573,11 +19573,6 @@ msgstr "Không tìm thấy phiên chat"
 
 #. js-lingui-explicit-id
 #: src/server-errors.ts
-msgid "serverError.chat.failedToRecordChatAttachment"
-msgstr "Không thể ghi nhận tệp đính kèm chat"
-
-#. js-lingui-explicit-id
-#: src/server-errors.ts
 msgid "serverError.chat.noActiveOrganizationSelected"
 msgstr "Chưa chọn tổ chức hoạt động"
 

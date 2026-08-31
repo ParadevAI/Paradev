@@ -19573,11 +19573,6 @@ msgstr "未找到聊天會話"
 
 #. js-lingui-explicit-id
 #: src/server-errors.ts
-msgid "serverError.chat.failedToRecordChatAttachment"
-msgstr "記錄聊天附件失敗"
-
-#. js-lingui-explicit-id
-#: src/server-errors.ts
 msgid "serverError.chat.noActiveOrganizationSelected"
 msgstr "未選擇活動組織"
 

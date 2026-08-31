@@ -19573,11 +19573,6 @@ msgstr "Sessione di chat non trovata"
 
 #. js-lingui-explicit-id
 #: src/server-errors.ts
-msgid "serverError.chat.failedToRecordChatAttachment"
-msgstr "Registrazione dell'allegato della chat non riuscita"
-
-#. js-lingui-explicit-id
-#: src/server-errors.ts
 msgid "serverError.chat.noActiveOrganizationSelected"
 msgstr "Nessuna organizzazione attiva selezionata"
 

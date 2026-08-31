@@ -1,15 +1,18 @@
+import { randomUUID } from "node:crypto";
 import { dbWs } from "@superset/db/client";
 import {
 	pages,
 	pageVersions,
 	type SelectPage,
+	type SelectPageVersion,
 	workspacePages,
 } from "@superset/db/schema";
 import { mintPageSlug } from "@superset/shared/page-slug";
+import { pageVersionKey } from "@superset/shared/usercontent";
 import { TRPCError } from "@trpc/server";
-import { del, put } from "@vercel/blob";
 import { and, desc, eq } from "drizzle-orm";
 import { userError } from "../../i18n-error";
+import { putObject } from "../../lib/r2";
 import { assertPageWritable } from "./access";
 import { pageUrl } from "./page-url";
 import {
@@ -19,9 +22,26 @@ import {
 	validatePublishContent,
 } from "./publish-rules";
 import type { PublishPageInput } from "./schema";
+import { writePageManifest } from "./storage";
+import { enqueuePageThumbnail } from "./thumbnail";
 import { assertWorkspaceAccess } from "./workspace-access";
 
 const MAX_PUBLISH_ATTEMPTS = 5;
+
+type PublishedVersion = Pick<
+	SelectPage,
+	"id" | "slug" | "title" | "description" | "visibility"
+> &
+	Pick<
+		SelectPageVersion,
+		"version" | "label" | "contentType" | "sizeBytes" | "createdAt"
+	> & { url: string };
+
+/**
+ * The page this publish reserved its version under was created or removed
+ * by another publish in the meantime, so the bytes sit under the wrong id.
+ */
+class TargetPageChanged extends Error {}
 
 export async function publishPage({
 	input,
@@ -44,7 +64,9 @@ export async function publishPage({
 				sha256,
 			});
 		} catch (error) {
-			if (!isVersionConflict(error)) throw error;
+			if (!isVersionConflict(error) && !(error instanceof TargetPageChanged)) {
+				throw error;
+			}
 			if (attempt < MAX_PUBLISH_ATTEMPTS) continue;
 			throw userError({
 				code: "CONFLICT",
@@ -68,126 +90,136 @@ async function runPublish({
 	buffer: Buffer;
 	sha256: string;
 }) {
-	await resolveTargetPage({ executor: dbWs, input, organizationId, userId });
+	// The version number is reserved before the bytes move so the key can
+	// name it. A concurrent publish of the same page collides on the unique
+	// (page, version) index and retries under the next number.
+	const target = await resolveTargetPage({
+		executor: dbWs,
+		input,
+		organizationId,
+		userId,
+	});
+	const pageId = target?.id ?? randomUUID();
+	const version = (target ? await latestVersionNumber(dbWs, target.id) : 0) + 1;
+	const key = pageVersionKey(pageId, version);
 
-	const blob = await put(
-		`pages/${organizationId}/${sha256}/${input.filename}`,
-		buffer,
-		{
-			access: "public",
-			contentType: input.contentType,
-			addRandomSuffix: true,
-		},
-	);
-	const uploadedUrl: string = blob.url;
-
-	let bodyCompleted = false;
-	try {
-		return await dbWs.transaction(async (tx) => {
-			const existing = await resolveTargetPage({
-				executor: tx,
-				input,
-				organizationId,
-				userId,
-			});
-
-			const page = existing
-				? await applyMetadata({ tx, page: existing, input })
-				: await createPage({ tx, input, organizationId, userId });
-
-			if (!input.pageId && input.workspaceId && input.entryPath) {
-				await assertWorkspaceAccess({
-					executor: tx,
-					workspaceId: input.workspaceId,
-					organizationId,
-				});
-				try {
-					await tx
-						.insert(workspacePages)
-						.values({
-							workspaceId: input.workspaceId,
-							pageId: page.id,
-							entryPath: input.entryPath,
-						})
-						// Targeted at the primary key, so re-linking a page to the path it
-						// already holds stays a no-op. An untargeted version would also
-						// swallow the entry-path collision below, committing a page linked
-						// to no workspace and reporting it as a success.
-						.onConflictDoNothing({
-							target: [workspacePages.workspaceId, workspacePages.pageId],
-						});
-				} catch (error) {
-					if (!isEntryPathConflict(error)) throw error;
-					// Reachable because the republish lookup only matches the caller's own
-					// pages: a colleague's page holding this path is invisible to it.
-					throw new TRPCError({
-						code: "CONFLICT",
-						message: `Someone else has already published ${input.entryPath} from this workspace. Publish with an explicit page id to add a version to their page, or move the file.`,
-					});
-				}
-			}
-
-			const [latest] = await tx
-				.select({ version: pageVersions.version })
-				.from(pageVersions)
-				.where(eq(pageVersions.pageId, page.id))
-				.orderBy(desc(pageVersions.version))
-				.limit(1);
-			const version = (latest?.version ?? 0) + 1;
-
-			const [row] = await tx
-				.insert(pageVersions)
-				.values({
-					pageId: page.id,
-					version,
-					label: input.label ?? null,
-					blobPathname: blob.pathname,
-					contentType: input.contentType,
-					sizeBytes: buffer.length,
-					sha256,
-					createdByUserId: userId,
-				})
-				.returning();
-
-			if (!row) {
-				throw userError({
-					code: "INTERNAL_SERVER_ERROR",
-					message: "Failed to record page version",
-					i18nKey: "serverError.page.failedToRecordPageVersion",
-				});
-			}
-
-			bodyCompleted = true;
-			return {
-				id: page.id,
-				slug: page.slug,
-				url: pageUrl(page.slug),
-				title: page.title,
-				description: page.description,
-				visibility: page.visibility,
-				version: row.version,
-				label: row.label,
-				contentType: row.contentType,
-				sizeBytes: row.sizeBytes,
-				createdAt: row.createdAt,
-			};
+	const published: PublishedVersion = await dbWs.transaction(async (tx) => {
+		const existing = await resolveTargetPage({
+			executor: tx,
+			input,
+			organizationId,
+			userId,
 		});
-	} catch (error) {
-		if (!bodyCompleted) {
-			await del(uploadedUrl).catch((cleanupError) => {
-				console.error("[pages] failed to clean up orphaned blob", {
-					url: uploadedUrl,
-					cleanupError,
+		if ((existing?.id ?? null) !== (target?.id ?? null)) {
+			throw new TargetPageChanged();
+		}
+
+		const page = existing
+			? await applyMetadata({ tx, page: existing, input })
+			: await createPage({ tx, id: pageId, input, organizationId, userId });
+
+		if (!input.pageId && input.workspaceId && input.entryPath) {
+			await assertWorkspaceAccess({
+				executor: tx,
+				workspaceId: input.workspaceId,
+				organizationId,
+			});
+			try {
+				await tx
+					.insert(workspacePages)
+					.values({
+						workspaceId: input.workspaceId,
+						pageId: page.id,
+						entryPath: input.entryPath,
+					})
+					// Targeted at the primary key, so re-linking a page to the path it
+					// already holds stays a no-op. An untargeted version would also
+					// swallow the entry-path collision below, committing a page linked
+					// to no workspace and reporting it as a success.
+					.onConflictDoNothing({
+						target: [workspacePages.workspaceId, workspacePages.pageId],
+					});
+			} catch (error) {
+				if (!isEntryPathConflict(error)) throw error;
+				// Reachable because the republish lookup only matches the caller's own
+				// pages: a colleague's page holding this path is invisible to it.
+				throw new TRPCError({
+					code: "CONFLICT",
+					message: `Someone else has already published ${input.entryPath} from this workspace. Publish with an explicit page id to add a version to their page, or move the file.`,
 				});
+			}
+		}
+
+		const [row] = await tx
+			.insert(pageVersions)
+			.values({
+				pageId: page.id,
+				version,
+				label: input.label ?? null,
+				storageKey: key,
+				contentType: input.contentType,
+				sizeBytes: buffer.length,
+				sha256,
+				createdByUserId: userId,
+			})
+			.returning();
+
+		if (!row) {
+			throw userError({
+				code: "INTERNAL_SERVER_ERROR",
+				message: "Failed to record page version",
+				i18nKey: "serverError.page.failedToRecordPageVersion",
 			});
 		}
-		throw error;
-	}
+
+		// Upload while the transaction holds the unique (page, version)
+		// slot: a concurrent publish of this number conflicts on the
+		// insert above before its own upload, so no attempt can overwrite
+		// a committed object or delete another's. A rollback after this
+		// upload strands the object under a number the next attempt
+		// reuses and overwrites.
+		await putObject({ key, body: buffer, contentType: input.contentType });
+		return {
+			id: page.id,
+			slug: page.slug,
+			url: pageUrl(page.slug),
+			title: page.title,
+			description: page.description,
+			visibility: page.visibility,
+			version: row.version,
+			label: row.label,
+			contentType: row.contentType,
+			sizeBytes: row.sizeBytes,
+			createdAt: row.createdAt,
+		};
+	});
+
+	// The manifest is what the page's origin serves from, so the publish is
+	// not done until it is written. The thumbnail is best effort.
+	await writePageManifest(published.id);
+	void enqueuePageThumbnail({
+		pageId: published.id,
+		version: published.version,
+	});
+	return published;
 }
 
 type Tx = Parameters<Parameters<typeof dbWs.transaction>[0]>[0];
 
 type Executor = Pick<Tx, "select">;
+
+async function latestVersionNumber(
+	executor: Executor,
+	pageId: string,
+): Promise<number> {
+	const [latest] = await executor
+		.select({ version: pageVersions.version })
+		.from(pageVersions)
+		.where(eq(pageVersions.pageId, pageId))
+		.orderBy(desc(pageVersions.version))
+		.limit(1);
+	return latest?.version ?? 0;
+}
 
 async function resolveTargetPage({
 	executor,
@@ -267,11 +299,13 @@ async function applyMetadata({
 
 async function createPage({
 	tx,
+	id,
 	input,
 	organizationId,
 	userId,
 }: {
 	tx: Tx;
+	id: string;
 	input: PublishPageInput;
 	organizationId: string;
 	userId: string;
@@ -280,6 +314,7 @@ async function createPage({
 	const [page] = await tx
 		.insert(pages)
 		.values({
+			id,
 			slug: mintPageSlug(title),
 			organizationId,
 			createdByUserId: userId,
