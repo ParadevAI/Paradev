@@ -34,6 +34,7 @@ export function TokenField({
 	header,
 	onReset,
 	separators = SEPARATORS,
+	stripLeadingAt = false,
 }: {
 	values: string[];
 	onChange: (next: string[]) => void;
@@ -45,6 +46,12 @@ export function TokenField({
 	onReset?: () => void;
 	/** Defaults to commas and newlines; see SEPARATORS_WITH_SPACE. */
 	separators?: RegExp;
+	/**
+	 * Drops a leading "@" on commit. Only for logins, where the @ is display
+	 * sugar people paste along with the name — a branch may legitimately be
+	 * called "@next", and stripping it there stores a ref that does not exist.
+	 */
+	stripLeadingAt?: boolean;
 }) {
 	const [draft, setDraft] = useState("");
 	const inputRef = useRef<HTMLInputElement>(null);
@@ -53,8 +60,12 @@ export function TokenField({
 	const commit = (text: string) => {
 		const added = text
 			.split(separators)
-			// People copy names with the @ still attached; it is not part of a login.
-			.map((part) => part.trim().replace(/^@/, ""))
+			.map((part) => {
+				const trimmed = part.trim();
+				// People copy names with the @ still attached; it is not part of a
+				// login. Values that can legitimately start with one keep it.
+				return stripLeadingAt ? trimmed.replace(/^@/, "") : trimmed;
+			})
 			.filter(Boolean);
 		if (added.length === 0) return false;
 		const next = [...values];

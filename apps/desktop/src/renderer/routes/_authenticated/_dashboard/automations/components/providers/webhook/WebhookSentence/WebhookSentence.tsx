@@ -124,7 +124,12 @@ export function WebhookSentence({ triggerId, disabled }: WebhookSentenceProps) {
 			{token && (
 				<Tooltip>
 					<TooltipTrigger asChild>
-						<button type="button" onClick={copyHeader} className={cn(CHIP)}>
+						<button
+							type="button"
+							disabled={disabled}
+							onClick={copyHeader}
+							className={cn(CHIP)}
+						>
 							<span className="truncate">Copy auth header</span>
 						</button>
 					</TooltipTrigger>

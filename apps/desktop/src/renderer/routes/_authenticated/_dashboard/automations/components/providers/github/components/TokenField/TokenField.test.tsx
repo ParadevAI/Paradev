@@ -106,10 +106,19 @@ describe("TokenField committing", () => {
 		expect(field.values).toEqual(["alice", "bob", "carol"]);
 	});
 
-	test("strips a leading @, which is how people copy a handle", async () => {
-		const field = await setup();
+	test("strips a leading @ for logins, which is how people copy a handle", async () => {
+		const field = await setup([], { stripLeadingAt: true });
 		await field.typeAndCommit("@alice,");
 		expect(field.values).toEqual(["alice"]);
+	});
+
+	// Off by default: the same field takes branches and labels, and a branch
+	// may legitimately be called "@next" — stripping there stores a ref that
+	// does not exist.
+	test("keeps a leading @ where it can be part of the value", async () => {
+		const field = await setup();
+		await field.typeAndCommit("@next,");
+		expect(field.values).toEqual(["@next"]);
 	});
 
 	test("ignores a repeat rather than showing it twice", async () => {

@@ -176,6 +176,18 @@ describe("a custom row", () => {
 		expect(text).not.toContain("Next run Friday");
 	});
 
+	// Clearing the field is an edit that cannot save, but an empty rule has no
+	// parse error to report — without this it sat blank under the old next run.
+	test("says so when the rule is cleared rather than left invalid", async () => {
+		const { ui, view } = await row(CUSTOM, { nextRun: "Next run Friday" });
+		await act(async () => {
+			fireEvent.change(ui.getByRole("textbox"), { target: { value: "" } });
+		});
+		const text = view.container.textContent ?? "";
+		expect(text).toContain("Enter a recurrence rule — changes aren't saved");
+		expect(text).not.toContain("Next run Friday");
+	});
+
 	// A saved rule can be exhausted (a run-once schedule that already ran);
 	// that is history, not an edit gone wrong, so it is not complained about.
 	test("does not complain about the saved rule until it is edited", async () => {

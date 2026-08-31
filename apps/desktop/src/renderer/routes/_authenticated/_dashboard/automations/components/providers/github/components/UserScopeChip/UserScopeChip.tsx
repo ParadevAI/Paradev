@@ -85,6 +85,7 @@ export function UserScopeChip({
 			{isList ? (
 				<PopoverContent align="start" className="w-72 p-2">
 					<TokenField
+						stripLeadingAt
 						values={values}
 						onChange={(ids) => onChange({ mode: "list", ids })}
 						placeholder="GitHub username..."

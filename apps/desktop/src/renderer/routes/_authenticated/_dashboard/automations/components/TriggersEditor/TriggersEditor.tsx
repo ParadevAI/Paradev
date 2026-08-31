@@ -13,10 +13,18 @@ import {
 import { Input } from "@superset/ui/input";
 import { Separator } from "@superset/ui/separator";
 import { useFeatureFlagPayload } from "posthog-js/react";
-import { type ReactNode, useMemo, useState } from "react";
+import {
+	type ReactNode,
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import { LuPlus, LuTriangleAlert } from "react-icons/lu";
 import { useCurrentPlan } from "renderer/hooks/useCurrentPlan";
 import { providerFor, TRIGGER_PROVIDERS } from "../providers";
+import type { OptionGroupState } from "../providers/types";
 import { useProviderConnections } from "../providers/useProviderConnections";
 import { useProviderOptions } from "../providers/useProviderOptions";
 import { TriggerSentence } from "../TriggerSentence";
@@ -74,6 +82,19 @@ export function TriggersEditor({
 	// meant a new row was saved, refused, and dropped on the next render. Saving
 	// silently once it happened to become valid is no better: nothing tells you
 	// which edit crossed the line, or that anything was written at all.
+	const optionStateRef = useRef<Record<string, OptionGroupState>>({});
+	// Saving joins the bot to the public channels a Slack trigger watches, which
+	// flips `botMember` on the cached channel list. Without a refetch the
+	// membership warning outlives the save that fixed it.
+	const saveTriggers = useCallback(
+		async (next: DraftTrigger[]) => {
+			const result = await onChange(next);
+			optionStateRef.current.slack?.refetch();
+			return result;
+		},
+		[onChange],
+	);
+
 	const {
 		drafts,
 		dirty,
@@ -84,11 +105,16 @@ export function TriggersEditor({
 		add,
 		save,
 		discard,
-	} = useTriggerDrafts(triggers, onChange);
+	} = useTriggerDrafts(triggers, saveTriggers);
 	const { options, state: optionState } = useProviderOptions(
 		organizationId,
 		drafts,
 	);
+	// Read through a ref: the save handler is defined before this hook runs, and
+	// it only needs whichever refetch exists by the time a save resolves.
+	useEffect(() => {
+		optionStateRef.current = optionState;
+	}, [optionState]);
 
 	// Unlike problems, these show without waiting for a save attempt: they
 	// describe the world (a channel the bot is not in), not an unfinished edit,

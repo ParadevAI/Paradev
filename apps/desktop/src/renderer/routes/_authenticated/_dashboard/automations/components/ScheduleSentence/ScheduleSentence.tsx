@@ -94,8 +94,13 @@ export function ScheduleSentence({
 	// ran); that is history, not an edit gone wrong, so only a changed draft
 	// gets the complaint.
 	const draftEdited = customDraft !== "" && customDraft !== rrule;
+	// Clearing a saved rule is an edit that cannot save, but it has no problem
+	// to report — an empty field parses as nothing at all — so it needs saying
+	// separately, or the row sits blank under the previous rule's next run.
+	const draftCleared = customDraft === "" && rrule !== "";
 	const showsProblem =
-		state.kind === "custom" && draftEdited && !!customProblem;
+		state.kind === "custom" &&
+		(draftCleared || (draftEdited && !!customProblem));
 
 	const showsTime = state.kind === "daily" || state.kind === "weekly";
 
@@ -165,9 +170,11 @@ export function ScheduleSentence({
 				    reads as a contradiction. */}
 			{showsProblem ? (
 				<span className="ml-1 truncate text-[13px] text-destructive">
-					{customProblem === "exhausted"
-						? "No upcoming runs — changes aren't saved"
-						: "Invalid recurrence rule — changes aren't saved"}
+					{draftCleared
+						? "Enter a recurrence rule — changes aren't saved"
+						: customProblem === "exhausted"
+							? "No upcoming runs — changes aren't saved"
+							: "Invalid recurrence rule — changes aren't saved"}
 				</span>
 			) : (
 				nextRun && (
