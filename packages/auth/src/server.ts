@@ -326,13 +326,15 @@ export const auth = betterAuth({
 					// to it without selection bias. Kill switch for the nudges is still
 					// the Resend automation toggle.
 					//
-					// CAUTION: `user.signed_up` triggers BOTH activation-drip and
-					// habit-drip, so withholding it withholds both. That is only safe
-					// while habit-drip stays disabled. Before re-arming habit-drip with
-					// this flag on, split enrolment into its own event (emit
-					// `user.signed_up` unconditionally, add an activation-only event and
-					// repoint activation-drip's trigger at it in sync-automations.ts),
-					// or control users silently drop out of the habit campaign too.
+					// CAUTION: withholding this event withholds it from EVERY consumer,
+					// not just the activation drip. Safe today because activation-drip
+					// is the only automation in sync-automations.ts triggering on
+					// `user.signed_up` — but that script is create-only and Resend can
+					// hold automations it never defined, so check the live account
+					// before trusting that. A second consumer means splitting enrolment
+					// first: emit `user.signed_up` unconditionally and gate an
+					// activation-only event instead, or the control arm silently drops
+					// out of that campaign too.
 					if ((await getActivationVariant(user.id)) === "test") {
 						try {
 							const { error } = await resend.events.send({
