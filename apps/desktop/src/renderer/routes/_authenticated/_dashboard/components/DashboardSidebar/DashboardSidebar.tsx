@@ -136,7 +136,8 @@ export function DashboardSidebar({
 		refreshWorkspacePullRequest,
 		toggleProjectCollapsed,
 	} = useDashboardSidebarData();
-	const { reorderProjects } = useDashboardSidebarState();
+	const { deleteSection, reorderProjects, renameSection, setSectionColor } =
+		useDashboardSidebarState();
 	// Converts legacy uuid-keyed folders to tag-backed folders in the
 	// background; retries whenever the workspace cache changes.
 	useMigrateLegacySidebarFolders();
@@ -311,6 +312,9 @@ export function DashboardSidebar({
 											isCollapsed={isCollapsed}
 											workspaceShortcutLabels={workspaceShortcutLabels}
 											onWorkspaceHover={refreshWorkspacePullRequest}
+											onDeleteTagGroup={deleteSection}
+											onRenameTagGroup={renameSection}
+											onSetTagGroupColor={setSectionColor}
 										/>
 										{!isCollapsed && (
 											<div className="mt-3 first:mt-0">

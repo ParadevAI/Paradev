@@ -1,8 +1,10 @@
 import { normalizeWorkspaceTags } from "@superset/shared/workspace-tags";
 import {
+	deriveSessionTagFolders,
 	getProjectFolderTagIndex,
 	resolveWorkspaceSectionId,
 	type TagFolderRef,
+	type TagFolderSettingInput,
 } from "renderer/routes/_authenticated/utils/workspaceTagFolders";
 import type { WorkspaceTransactionSnapshot } from "renderer/stores/workspace-creates";
 import { getV2WorkspaceDisplayName } from "renderer/utils/getV2WorkspaceDisplayName";
@@ -188,15 +190,18 @@ export function buildDashboardSidebarSessionWorkspaces({
 	sessionSidebarWorkspaces,
 	machineId,
 	pullRequestsByWorkspaceId,
+	tagFolderSettings,
 }: {
 	sessionSidebarWorkspaces: SidebarWorkspaceInput[];
 	machineId: string;
 	pullRequestsByWorkspaceId: Map<string, SidebarPullRequest>;
+	tagFolderSettings: readonly TagFolderSettingInput[];
 }): DashboardSidebarWorkspace[] {
 	return buildDashboardSidebarSessions({
 		sessionSidebarWorkspaces,
 		machineId,
 		pullRequestsByWorkspaceId,
+		tagFolderSettings,
 	}).orderedWorkspaces;
 }
 
@@ -215,11 +220,18 @@ export function buildDashboardSidebarSessions({
 	sessionSidebarWorkspaces,
 	machineId,
 	pullRequestsByWorkspaceId,
+	tagFolderSettings,
 }: {
 	sessionSidebarWorkspaces: SidebarWorkspaceInput[];
 	machineId: string;
 	pullRequestsByWorkspaceId: Map<string, SidebarPullRequest>;
+	tagFolderSettings: readonly TagFolderSettingInput[];
 }): DashboardSidebarSessions {
+	const presentationByTag = new Map(
+		deriveSessionTagFolders(sessionSidebarWorkspaces, tagFolderSettings).map(
+			(folder) => [folder.tag, folder],
+		),
+	);
 	const sorted = sessionSidebarWorkspaces
 		.slice()
 		.sort(
@@ -248,7 +260,15 @@ export function buildDashboardSidebarSessions({
 
 	const tagGroups = [...groupsByTag.entries()]
 		.sort(([left], [right]) => left.localeCompare(right))
-		.map(([tag, workspaces]) => ({ tag, workspaces }));
+		.map(([tag, workspaces]) => {
+			const presentation = presentationByTag.get(tag);
+			return {
+				tag,
+				name: presentation?.name ?? tag,
+				color: presentation?.color ?? null,
+				workspaces,
+			};
+		});
 	const orderedWorkspaces = [
 		...ungroupedWorkspaces,
 		...tagGroups.flatMap((group) => group.workspaces),

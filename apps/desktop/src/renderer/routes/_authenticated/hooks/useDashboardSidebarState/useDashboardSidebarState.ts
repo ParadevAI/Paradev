@@ -2,10 +2,12 @@ import type { Pane } from "@superset/panes";
 import {
 	normalizeWorkspaceTag,
 	normalizeWorkspaceTags,
+	SESSIONS_TAG_SCOPE,
 } from "@superset/shared/workspace-tags";
 import { useCallback } from "react";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
+import { isMissingProcedureError } from "renderer/lib/isMissingProcedureError";
 import { terminalRuntimeRegistry } from "renderer/lib/terminal/terminal-runtime-registry";
 import { browserRuntimeRegistry } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/BrowserPane/browserRuntimeRegistry";
 import {
@@ -295,7 +297,7 @@ export function useDashboardSidebarState() {
 	const collections = useCollections();
 	const { workspaces: hostWorkspaces, cache: hostWorkspacesCache } =
 		useHostWorkspaces();
-	const { machineId } = useLocalHostService();
+	const { machineId, activeHostUrl } = useLocalHostService();
 	const { v2Workspaces } = useOptimisticActions();
 	const tagFolderContext = useTagFolderContext();
 
@@ -312,57 +314,90 @@ export function useDashboardSidebarState() {
 		[v2Workspaces],
 	);
 
-	// Folder presentation (label, color) lives host-side so it follows the
-	// user across devices; write to every host serving the project so
-	// replicas stay aligned. The project:changed broadcast re-renders every
-	// window and device.
+	// Folder presentation (label, color) is host-owned beside its workspaces.
+	// Projects can have a row on multiple serving hosts, so project writes fan
+	// out; the Sessions scope stays on the active host.
 	const { projects: hostProjects } = useHostProjects();
+	/**
+	 * Hosts to write a folder's presentation to. A project's folders go to
+	 * every host serving that project; the Sessions lane has no project, so
+	 * its folders live on the active host alongside the sessions themselves.
+	 */
+	const resolveTagFolderHostUrls = useCallback(
+		(scope: string): string[] => {
+			if (scope === SESSIONS_TAG_SCOPE) {
+				return activeHostUrl ? [activeHostUrl] : [];
+			}
+			const project = hostProjects.find((item) => item.projectKey === scope);
+			return (project?.hostIds ?? [])
+				.map((hostId) => hostWorkspacesCache.resolveHostUrl(hostId))
+				.filter((url): url is string => url != null);
+		},
+		[activeHostUrl, hostProjects, hostWorkspacesCache],
+	);
 	const writeTagSetting = useCallback(
 		(
-			projectId: string,
+			scope: string,
 			tag: string,
 			patch: {
 				displayName?: string | null;
 				color?: string | null;
 			},
 		) => {
-			const project = hostProjects.find(
-				(item) => item.projectKey === projectId,
-			);
-			for (const hostId of project?.hostIds ?? []) {
-				const url = hostWorkspacesCache.resolveHostUrl(hostId);
-				if (!url) continue;
-				void getHostServiceClientByUrl(url)
-					.project.setTagSetting.mutate({ projectId, tag, ...patch })
-					.catch((error) => {
+			for (const url of resolveTagFolderHostUrls(scope)) {
+				const client = getHostServiceClientByUrl(url);
+				void client.tagFolders.upsert
+					.mutate({ scope, tag, ...patch })
+					.catch((error: unknown) => {
+						if (
+							scope !== SESSIONS_TAG_SCOPE &&
+							isMissingProcedureError(error)
+						) {
+							return client.project.setTagSetting.mutate({
+								projectId: scope,
+								tag,
+								...patch,
+							});
+						}
+						throw error;
+					})
+					.catch((error: unknown) => {
 						console.warn(
-							`[sidebar] tag setting write failed on host ${hostId}:`,
+							`[sidebar] tag setting write failed on host ${url}:`,
 							error,
 						);
 					});
 			}
 		},
-		[hostProjects, hostWorkspacesCache],
+		[resolveTagFolderHostUrls],
 	);
 	const removeTagSetting = useCallback(
-		(projectId: string, tag: string) => {
-			const project = hostProjects.find(
-				(item) => item.projectKey === projectId,
-			);
-			for (const hostId of project?.hostIds ?? []) {
-				const url = hostWorkspacesCache.resolveHostUrl(hostId);
-				if (!url) continue;
-				void getHostServiceClientByUrl(url)
-					.project.deleteTagSetting.mutate({ projectId, tag })
-					.catch((error) => {
+		(scope: string, tag: string) => {
+			for (const url of resolveTagFolderHostUrls(scope)) {
+				const client = getHostServiceClientByUrl(url);
+				void client.tagFolders.delete
+					.mutate({ scope, tag })
+					.catch((error: unknown) => {
+						if (
+							scope !== SESSIONS_TAG_SCOPE &&
+							isMissingProcedureError(error)
+						) {
+							return client.project.deleteTagSetting.mutate({
+								projectId: scope,
+								tag,
+							});
+						}
+						throw error;
+					})
+					.catch((error: unknown) => {
 						console.warn(
-							`[sidebar] tag setting delete failed on host ${hostId}:`,
+							`[sidebar] tag setting delete failed on host ${url}:`,
 							error,
 						);
 					});
 			}
 		},
-		[hostProjects, hostWorkspacesCache],
+		[resolveTagFolderHostUrls],
 	);
 
 	/**
@@ -614,8 +649,7 @@ export function useDashboardSidebarState() {
 				color: randomColor,
 				tag,
 			});
-			// Seed the host-side presentation so the typed casing and colour
-			// follow the user to every device.
+			// Seed presentation beside the host-owned membership tags.
 			writeTagSetting(projectId, tag, {
 				displayName: name,
 				color: randomColor,
@@ -657,8 +691,7 @@ export function useDashboardSidebarState() {
 			if (!projectId) return;
 			// One row on the host: the tag stays the stable slug agents target,
 			// the display name is what the sidebar shows — no member retagging,
-			// nothing to half-land on a flaky host, and the label follows the
-			// user to every device.
+			// nothing to half-land on a flaky host.
 			writeTagSetting(projectId, currentTag, { displayName: trimmed });
 		},
 		[collections, writeTagSetting],
@@ -671,7 +704,7 @@ export function useDashboardSidebarState() {
 			const tag = normalizeWorkspaceTag(existing?.tag) ?? parsed?.tag ?? null;
 			const projectId = existing?.projectId ?? parsed?.projectId;
 			if (tag !== null && projectId) {
-				// Host-side so the colour follows the user across devices.
+				// Host-side beside the folder's membership tags.
 				writeTagSetting(projectId, tag, { color });
 				return;
 			}
@@ -808,6 +841,20 @@ export function useDashboardSidebarState() {
 			if (!projectId) return;
 			const folderTag =
 				normalizeWorkspaceTag(section?.tag) ?? parsed?.tag ?? null;
+			if (projectId === SESSIONS_TAG_SCOPE) {
+				if (folderTag === null) return;
+				for (const workspace of hostWorkspaces) {
+					if (workspace.projectId !== null) continue;
+					const tags = normalizeWorkspaceTags(workspace.tags);
+					if (!tags.includes(folderTag)) continue;
+					writeWorkspaceTags(
+						workspace.id,
+						tags.filter((tag) => tag !== folderTag),
+					);
+				}
+				removeTagSetting(projectId, folderTag);
+				return;
+			}
 
 			// Groups interleave with ungrouped rows, so replace the deleted
 			// section's own slot with its members instead of dumping them

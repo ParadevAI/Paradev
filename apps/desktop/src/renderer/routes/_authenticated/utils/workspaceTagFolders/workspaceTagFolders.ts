@@ -1,6 +1,7 @@
 import {
 	normalizeWorkspaceTag,
 	normalizeWorkspaceTags,
+	SESSIONS_TAG_SCOPE,
 	WORKSPACE_TAG_MAX_LENGTH,
 } from "@superset/shared/workspace-tags";
 
@@ -59,7 +60,7 @@ export interface TagFolderWorkspaceInput {
 	tags?: readonly string[] | null;
 }
 
-/** One tag folder's host-side presentation (workspace_tag_settings). */
+/** One tag folder's host-side presentation (`tag_folder_settings`). */
 export interface TagFolderSettingInput {
 	projectId: string;
 	tag: string;
@@ -69,9 +70,9 @@ export interface TagFolderSettingInput {
 }
 
 /**
- * Cross-cutting presentation context for the union: host-side settings
- * (display name, color, order that follow the user across devices) and the
- * per-project hidden-tag list (a hidden folder leaves the union entirely —
+ * Cross-cutting presentation context for the union: host-local settings
+ * (display name, color, order) and the per-project hidden-tag list (a hidden
+ * folder leaves the union entirely —
  * members render top-level — without touching anyone's tags). REQUIRED so
  * every membership pass applies the same view; two passes disagreeing on
  * hidden is the same bug class as two membership derivations.
@@ -90,6 +91,43 @@ export interface TagFolderSection extends TagFolderSectionInput {
 	tag: string | null;
 	/** True when no stored presentation row exists — the tag alone made it. */
 	isDerived: boolean;
+}
+
+export interface SessionTagFolder {
+	tag: string;
+	name: string;
+	color: string | null;
+}
+
+/**
+ * The project-less Sessions folders, with host presentation applied. Keeping
+ * this beside `deriveTagFolders` gives the sidebar and move menus one rule for
+ * names, colours, normalization, and scope isolation.
+ */
+export function deriveSessionTagFolders(
+	workspaces: readonly TagFolderWorkspaceInput[],
+	settings: readonly TagFolderSettingInput[],
+): SessionTagFolder[] {
+	const settingsByTag = new Map(
+		settings.flatMap((setting) => {
+			if (setting.projectId !== SESSIONS_TAG_SCOPE) return [];
+			const tag = normalizeWorkspaceTag(setting.tag);
+			return tag == null ? [] : [[tag, setting] as const];
+		}),
+	);
+	const tags = new Set<string>();
+	for (const workspace of workspaces) {
+		if (workspace.projectId !== null) continue;
+		for (const tag of normalizeWorkspaceTags(workspace.tags)) tags.add(tag);
+	}
+	return [...tags].sort().map((tag) => {
+		const setting = settingsByTag.get(tag);
+		return {
+			tag,
+			name: setting?.displayName ?? tag,
+			color: setting?.color ?? null,
+		};
+	});
 }
 
 /** `${projectId}:${tag}` — addressable without a stored row; the tag is

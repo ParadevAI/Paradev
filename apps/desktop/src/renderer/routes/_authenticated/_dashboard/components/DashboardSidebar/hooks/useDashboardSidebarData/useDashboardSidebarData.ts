@@ -545,8 +545,14 @@ export function useDashboardSidebarData() {
 				sessionSidebarWorkspaces: sessionRows,
 				machineId,
 				pullRequestsByWorkspaceId,
+				tagFolderSettings: tagFolderContext.tagSettings,
 			}),
-		[machineId, pullRequestsByWorkspaceId, sessionRows],
+		[
+			machineId,
+			pullRequestsByWorkspaceId,
+			sessionRows,
+			tagFolderContext.tagSettings,
+		],
 	);
 	const sessions = useJsonStable(computedSessions);
 	const sessionWorkspaces = sessions.orderedWorkspaces;

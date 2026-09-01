@@ -1,4 +1,5 @@
 import { describe, expect, it } from "bun:test";
+import { SESSIONS_TAG_SCOPE } from "@superset/shared/workspace-tags";
 import {
 	buildSidebarFolderKey,
 	deriveTagFolders,
@@ -280,6 +281,7 @@ describe("sessions (null projectId)", () => {
 			],
 			machineId: MACHINE_ID,
 			pullRequestsByWorkspaceId: new Map(),
+			tagFolderSettings: [],
 		});
 
 		expect(rows.map((row) => row.id)).toEqual(["session-a", "session-b"]);
@@ -322,6 +324,14 @@ describe("sessions (null projectId)", () => {
 			],
 			machineId: MACHINE_ID,
 			pullRequestsByWorkspaceId: new Map(),
+			tagFolderSettings: [
+				{
+					projectId: SESSIONS_TAG_SCOPE,
+					tag: "zeta",
+					displayName: "Session QA",
+					color: "#3b82f6",
+				},
+			],
 		});
 
 		expect(sessions.ungroupedWorkspaces.map((row) => row.id)).toEqual([
@@ -335,6 +345,10 @@ describe("sessions (null projectId)", () => {
 			"tagged-early",
 			"tagged-late",
 		]);
+		expect(sessions.tagGroups[1]).toMatchObject({
+			name: "Session QA",
+			color: "#3b82f6",
+		});
 		expect(sessions.orderedWorkspaces.map((row) => row.id)).toEqual([
 			"untagged",
 			"multi-tag",

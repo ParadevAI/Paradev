@@ -275,15 +275,21 @@ export function deleteLocalWorkspace(
 ): void {
 	const existing = getLocalWorkspace(ctx.db, id);
 	ctx.db.delete(workspaces).where(eq(workspaces.id, id)).run();
-	if (existing) {
-		ctx.eventBus.broadcastWorkspaceChanged({
-			workspaceId: id,
-			eventType: "deleted",
-			workspace: null,
-			occurredAt: Date.now(),
-		});
-		trackWorkspaceEvent(ctx, "workspace_deleted", existing);
-	}
+	if (existing) emitLocalWorkspaceDeleted(ctx, existing);
+}
+
+/** Broadcast/track a row deleted by a larger transaction (for example project removal). */
+export function emitLocalWorkspaceDeleted(
+	ctx: WorkspaceStoreContext,
+	row: HostWorkspaceRow,
+): void {
+	ctx.eventBus.broadcastWorkspaceChanged({
+		workspaceId: row.id,
+		eventType: "deleted",
+		workspace: null,
+		occurredAt: Date.now(),
+	});
+	trackWorkspaceEvent(ctx, "workspace_deleted", row);
 }
 
 /**

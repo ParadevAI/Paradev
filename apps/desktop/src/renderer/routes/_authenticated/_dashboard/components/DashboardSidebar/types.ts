@@ -75,10 +75,11 @@ export interface DashboardSidebarSection {
 	workspaces: DashboardSidebarWorkspace[];
 }
 
-/** A derived Sessions lane. Sessions have no project-scoped folder settings,
- * so the normalized workspace tag is both its identity and display name. */
+/** A derived Sessions lane. The normalized tag is its stable identity. */
 export interface DashboardSidebarSessionTagGroup {
 	tag: string;
+	name: string;
+	color: string | null;
 	workspaces: DashboardSidebarWorkspace[];
 }
 

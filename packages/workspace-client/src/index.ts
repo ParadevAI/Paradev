@@ -14,6 +14,7 @@ export {
 	type ProjectChangedPayload,
 	type ProjectSnapshotPayload,
 	reconnectEventBusIfDown,
+	type TagFoldersChangedPayload,
 	type TerminalLifecyclePayload,
 	type WorkspaceChangedPayload,
 	type WorkspaceCreateSettledPayload,
