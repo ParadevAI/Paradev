@@ -2,12 +2,6 @@ import { afterAll, beforeAll, describe, expect, mock, test } from "bun:test";
 
 const objectStore = new Map<string, Uint8Array | string>();
 mock.module("../../lib/r2", () => ({
-	storageEnv: () => ({
-		accountId: "test",
-		accessKeyId: "test",
-		secretAccessKey: "test",
-		bucket: "test",
-	}),
 	putObject: async ({
 		key,
 		body,
