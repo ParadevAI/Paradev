@@ -1,6 +1,6 @@
 import { Database } from "bun:sqlite";
-import { describe, expect, it } from "bun:test";
-import { mkdirSync, mkdtempSync } from "node:fs";
+import { afterEach, beforeEach, describe, expect, it } from "bun:test";
+import { mkdirSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { TRPCError } from "@trpc/server";
@@ -532,6 +532,28 @@ describe("buildTerminalAgentLaunch", () => {
 describe("buildTerminalAgentLaunch default account env", () => {
 	// tmpdir always exists, which is all resolveDefaultAccountEnv checks.
 	const existingDir = tmpdir();
+
+	// setDefaultAccountSelection also publishes the host-wide pointer files
+	// under SUPERSET_HOME_DIR, which agent launches read on every start. Give
+	// each case its own home: without one these writes land in the real
+	// ~/.superset and repoint the developer's Codex and Claude accounts at
+	// $TMPDIR. scripts/test-preload.ts keeps that off the real home even if
+	// this hook is lost; the per-test dir also keeps the cases independent.
+	let previousSupersetHome: string | undefined;
+	let supersetHome = "";
+
+	beforeEach(() => {
+		previousSupersetHome = process.env.SUPERSET_HOME_DIR;
+		supersetHome = mkdtempSync(join(tmpdir(), "agents-default-account-"));
+		process.env.SUPERSET_HOME_DIR = supersetHome;
+	});
+
+	afterEach(() => {
+		if (previousSupersetHome === undefined)
+			delete process.env.SUPERSET_HOME_DIR;
+		else process.env.SUPERSET_HOME_DIR = previousSupersetHome;
+		rmSync(supersetHome, { recursive: true, force: true });
+	});
 
 	function seedClaude(db: HostDb, env: Record<string, string> = {}) {
 		db.insert(schema.hostAgentConfigs)
