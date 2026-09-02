@@ -431,6 +431,22 @@ export const HOTKEYS_REGISTRY = {
 			message: "Split the current pane and open a new browser pane",
 		}),
 	},
+	SPLIT_WITH_DESKTOP: {
+		key: {
+			mac: L("meta+shift+y"),
+			windows: L("ctrl+shift+alt+y"),
+			linux: L("ctrl+shift+alt+y"),
+		},
+		label: msg({
+			id: "hotkeys.splitWithDesktop.label",
+			message: "Split with Desktop",
+		}),
+		category: "Layout",
+		description: msg({
+			id: "hotkeys.splitWithDesktop.description",
+			message: "Split the current pane and open the sandbox desktop",
+		}),
+	},
 	EQUALIZE_PANE_SPLITS: {
 		key: {
 			mac: L("meta+shift+0"),

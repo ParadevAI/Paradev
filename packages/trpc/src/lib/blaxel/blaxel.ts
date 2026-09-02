@@ -8,7 +8,7 @@
  * token — no relay hop, so websockets work and the sandbox can still sleep.
  */
 
-import { SandboxInstance, settings } from "@blaxel/core";
+import { SandboxInstance, settings, updateSandbox } from "@blaxel/core";
 import { SANDBOX_CREDENTIAL_PLACEHOLDER } from "@superset/shared/constants";
 import { env } from "../../env";
 import { userError } from "../../i18n-error";
@@ -69,9 +69,51 @@ export interface ProvisionedSandbox {
  * Creates the sandbox and its private preview. Returns once the preview URL
  * exists — not once anything is listening on it, which is the caller's job.
  */
+export interface SandboxEnvironment {
+	sourceKind: "image" | "fork";
+	sourceRef: string;
+}
+
+async function forkSandbox(
+	name: string,
+	sourceSandbox: string,
+	workspaceEnv: Record<string, string>,
+): Promise<SandboxInstance> {
+	const source = await SandboxInstance.get(sourceSandbox);
+	await source.fork(name);
+	const forked = await SandboxInstance.get(name);
+
+	const spec = structuredClone(forked.spec) as {
+		runtime?: { envs?: Array<{ name: string; value: string }> };
+	};
+	const inherited = spec.runtime?.envs ?? [];
+	const replaced = new Set<string>();
+	const envs = inherited.map((entry) => {
+		const override = workspaceEnv[entry.name];
+		if (override === undefined) return entry;
+		replaced.add(entry.name);
+		return { name: entry.name, value: override };
+	});
+	for (const [key, value] of Object.entries(workspaceEnv)) {
+		if (!replaced.has(key)) envs.push({ name: key, value });
+	}
+	if (!spec.runtime) spec.runtime = {};
+	spec.runtime.envs = envs;
+
+	await updateSandbox({
+		path: { sandboxName: name },
+		body: {
+			...(forked as never as { sandbox: object }).sandbox,
+			spec,
+		} as never,
+		throwOnError: true,
+	});
+	return await SandboxInstance.get(name);
+}
+
 export async function provisionSandbox(args: {
 	name: string;
-	image: string;
+	environment: SandboxEnvironment;
 	/**
 	 * Everything the sandbox needs to configure itself. It reads these on boot
 	 * and seeds its own project and workspace rows, which is why provisioning
@@ -82,7 +124,7 @@ export async function provisionSandbox(args: {
 	region?: string;
 }): Promise<ProvisionedSandbox> {
 	configureBlaxel();
-	const memoryMb = args.memoryMb ?? 4096;
+	const memoryMb = args.memoryMb ?? 8192;
 	const region = args.region ?? env.BLAXEL_REGION;
 	const { envs: credentialEnvs, routing } = agentCredentialRoutes();
 	const envs = [
@@ -93,20 +135,27 @@ export async function provisionSandbox(args: {
 		})),
 	];
 
-	const sandbox = await SandboxInstance.createIfNotExists({
-		name: args.name,
-		image: args.image,
-		memory: memoryMb,
-		// Without disk-backed root the writable layer is tmpfs in RAM, and a
-		// checkout plus node_modules is write-heavy enough to exhaust it.
-		storageMb: 20480,
-		ports: [{ target: HOST_SERVICE_PORT, protocol: "HTTP" }],
-		region,
-		envs,
-		// Routing is fixed at creation, so a sandbox can never be re-pointed at
-		// a different secret later in its life.
-		network: { proxy: { routing } },
-	} as never);
+	const sandbox =
+		args.environment.sourceKind === "fork"
+			? await forkSandbox(
+					args.name,
+					args.environment.sourceRef,
+					args.workspaceEnv,
+				)
+			: await SandboxInstance.createIfNotExists({
+					name: args.name,
+					image: args.environment.sourceRef,
+					memory: memoryMb,
+					// Without disk-backed root the writable layer is tmpfs in RAM, and a
+					// checkout plus node_modules is write-heavy enough to exhaust it.
+					storageMb: 20480,
+					ports: [{ target: HOST_SERVICE_PORT, protocol: "HTTP" }],
+					region,
+					envs,
+					// Routing is fixed at creation, so a sandbox can never be re-pointed at
+					// a different secret later in its life.
+					network: { proxy: { routing } },
+				} as never);
 
 	// The desktop renderer is a browser: without CORS on the provider's edge
 	// every request to the sandbox fails preflight. The wildcard origin grants
@@ -147,6 +196,79 @@ export async function provisionSandbox(args: {
 	} as never);
 
 	return { providerSandboxId: args.name, sandboxUrl };
+}
+
+const INHERITED_IDENTITY: Array<[path: string, recursive: boolean]> = [
+	["/data/host.db", false],
+	["/data/host.db-wal", false],
+	["/data/host.db-shm", false],
+	["/data/.workspace-bootstrapped", false],
+	["/root/.superset/host", true],
+	["/root/.gitconfig", false],
+];
+
+const INHERITED_IDENTITY_ENVS = new Set([
+	"ORGANIZATION_ID",
+	"SUPERSET_SANDBOX_BRANCH",
+	"SUPERSET_SANDBOX_GIT_TOKEN",
+	"SUPERSET_SANDBOX_PROJECT_NAME",
+	"SUPERSET_SANDBOX_REPO_URL",
+	"SUPERSET_SANDBOX_WORKSPACE_ID",
+	"SUPERSET_SANDBOX_WORKSPACE_NAME",
+]);
+
+export async function promoteSandboxToEnvironment(args: {
+	sourceSandbox: string;
+	goldenName: string;
+}): Promise<string> {
+	configureBlaxel();
+	const source = await SandboxInstance.get(args.sourceSandbox);
+	await source.fork(args.goldenName);
+
+	const golden = await SandboxInstance.get(args.goldenName);
+
+	for (const name of ["host-service", "diag-start"]) {
+		await golden.process.stop(name).catch((error) => {
+			if (!isSandboxNotFound(error)) throw error;
+		});
+	}
+
+	for (const [path, recursive] of INHERITED_IDENTITY) {
+		await golden.fs.rm(path, recursive).catch((error) => {
+			if (!isSandboxNotFound(error)) throw error;
+		});
+	}
+
+	await golden.process.exec({
+		name: "prepare-environment",
+		command: "pkill -f pty-daemon.js || true",
+		waitForCompletion: true,
+	} as never);
+
+	// Blaxel copies the source's env into the fork and env is immutable after
+	// creation, so the promoting workspace's credentials would otherwise ride
+	// into a shared environment every later workspace forks from. The git token
+	// is the dangerous one: provisioning only sets it when the clone needs it,
+	// so a public-repo workspace would inherit the promoter's instead.
+	const current = await SandboxInstance.get(args.goldenName);
+	const spec = structuredClone(current.spec) as {
+		runtime?: { envs?: Array<{ name: string; value: string }> };
+	};
+	if (spec.runtime?.envs) {
+		spec.runtime.envs = spec.runtime.envs.filter(
+			(entry) => !INHERITED_IDENTITY_ENVS.has(entry.name),
+		);
+		await updateSandbox({
+			path: { sandboxName: args.goldenName },
+			body: {
+				...(current as never as { sandbox: object }).sandbox,
+				spec,
+			} as never,
+			throwOnError: true,
+		});
+	}
+
+	return args.goldenName;
 }
 
 export interface PreviewAccess {

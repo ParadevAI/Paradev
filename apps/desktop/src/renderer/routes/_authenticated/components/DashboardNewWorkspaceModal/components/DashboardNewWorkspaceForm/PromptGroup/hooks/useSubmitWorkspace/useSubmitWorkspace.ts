@@ -3,7 +3,7 @@ import { toast } from "@superset/ui/sonner";
 import { useMatchRoute, useNavigate } from "@tanstack/react-router";
 import { useCallback } from "react";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
-import { cloudTrpc } from "renderer/lib/cloud-trpc";
+import { cloudTrpc, cloudTrpcClient } from "renderer/lib/cloud-trpc";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import type { NewWorkspacePromptContextApi } from "renderer/stores/new-workspace-prompt-context";
 import { usePromptHistoryStore } from "renderer/stores/prompt-history";
@@ -104,11 +104,18 @@ export function useSubmitWorkspace(
 		// Cloud workspaces are provisioned by the API, not the local host, so
 		// they bypass the host `workspaces.create` path entirely.
 		if (hostId === CLOUD_HOST_ID) {
-			if (!projectId) {
+			const environments = await cloudTrpcClient.environment.list.query({
+				organizationId: activeOrganizationId,
+			});
+			const environment =
+				environments.find((row) => row.id === draft.environmentId) ??
+				environments[0];
+			if (!environment) {
 				toast.error(
 					t({
-						id: "dashboard.newWorkspaceModal.submit.cloudRequiresProject",
-						message: "Cloud workspaces require a project",
+						id: "dashboard.newWorkspaceModal.submit.cloudRequiresEnvironment",
+						message:
+							"Add an environment in Settings before creating a cloud workspace",
 					}),
 				);
 				return;
@@ -120,7 +127,7 @@ export function useSubmitWorkspace(
 				// provisioned behind it, which the workspace screen renders.
 				const created = await createCloudWorkspace.mutateAsync({
 					organizationId: activeOrganizationId,
-					projectId,
+					environmentId: environment.id,
 					name: workspaceName ?? undefined,
 					prompt: draft.prompt.trim() || undefined,
 					branch: branchName ?? "main",

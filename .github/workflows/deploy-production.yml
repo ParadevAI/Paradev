@@ -145,6 +145,7 @@ jobs:
           BLAXEL_WORKSPACE: ${{ secrets.BLAXEL_WORKSPACE }}
           BLAXEL_REGION: ${{ secrets.BLAXEL_REGION }}
           BLAXEL_SANDBOX_IMAGE: ${{ secrets.BLAXEL_SANDBOX_IMAGE }}
+          SENTRY_DSN_SANDBOX: ${{ secrets.SENTRY_DSN_SANDBOX }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GH_APP_SLUG: ${{ vars.GH_APP_SLUG }}
         run: |
@@ -222,6 +223,7 @@ jobs:
             --env BLAXEL_WORKSPACE=$BLAXEL_WORKSPACE \
             --env BLAXEL_REGION=$BLAXEL_REGION \
             --env BLAXEL_SANDBOX_IMAGE=$BLAXEL_SANDBOX_IMAGE \
+            --env SENTRY_DSN_SANDBOX=$SENTRY_DSN_SANDBOX \
             --env OPENAI_API_KEY=$OPENAI_API_KEY \
             --env GH_APP_SLUG=$GH_APP_SLUG
 

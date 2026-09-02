@@ -35,7 +35,7 @@ import { OrganizationHeaderButton } from "./components/OrganizationHeaderButton"
 import { ProjectSectionHeader } from "./components/ProjectSectionHeader";
 import { ScopeBar } from "./components/ScopeBar";
 import { WorkspaceRow } from "./components/WorkspaceRow";
-import { useCloudRepoPrefixes } from "./hooks/useCloudRepoPrefixes";
+import { useCloudRepoPrefix } from "./hooks/useCloudRepoPrefixes";
 import {
 	type TerminalsHost,
 	useHostsTerminals,
@@ -411,11 +411,10 @@ export function HomeScreen() {
 	// Projects are fully local: PR rows are matched by repo coordinates
 	// parsed from the PR URL (cloud repo UUIDs aren't known host-side).
 	// Cloud rows' projects come from the API instead.
-	const cloudRepoPrefixes = useCloudRepoPrefixes(cloudItems);
+	const cloudRepoPrefix = useCloudRepoPrefix();
 	const repoPrefixesByProject = useMemo(
 		() =>
 			new Map<string, string | null>([
-				...cloudRepoPrefixes,
 				...projects.map((project): [string, string | null] => [
 					project.id,
 					project.repoOwner && project.repoName
@@ -423,7 +422,7 @@ export function HomeScreen() {
 						: null,
 				]),
 			]),
-		[projects, cloudRepoPrefixes],
+		[projects],
 	);
 
 	const renderItem = useCallback(
@@ -463,9 +462,11 @@ export function HomeScreen() {
 				);
 			}
 			const { workspace, cloudStatus } = item;
-			const repoPrefix = workspace.projectId
-				? repoPrefixesByProject.get(workspace.projectId)
-				: undefined;
+			const repoPrefix = cloudStatus
+				? cloudRepoPrefix
+				: workspace.projectId
+					? repoPrefixesByProject.get(workspace.projectId)
+					: undefined;
 			return (
 				<WorkspaceRow
 					workspace={workspace}
@@ -486,6 +487,7 @@ export function HomeScreen() {
 		},
 		[
 			pullRequestsByRepoBranch,
+			cloudRepoPrefix,
 			repoPrefixesByProject,
 			diffStats,
 			cache,

@@ -5,13 +5,14 @@ import {
 	DropdownMenuSeparator,
 } from "@superset/ui/dropdown-menu";
 import { BsTerminalPlus } from "react-icons/bs";
-import { TbMessageCirclePlus, TbWorld } from "react-icons/tb";
+import { TbDeviceDesktop, TbMessageCirclePlus, TbWorld } from "react-icons/tb";
 import { HotkeyMenuShortcut } from "renderer/components/HotkeyMenuShortcut";
 
 interface AddTabMenuProps {
 	onAddTerminal: () => void;
 	onAddChatV3?: (() => void) | undefined;
 	onAddBrowser: () => void;
+	onAddDesktop?: (() => void) | undefined;
 	showPresetsBar: boolean;
 	onToggleShowPresetsBar: (enabled: boolean) => void;
 }
@@ -20,6 +21,7 @@ export function AddTabMenu({
 	onAddTerminal,
 	onAddChatV3,
 	onAddBrowser,
+	onAddDesktop,
 	showPresetsBar,
 	onToggleShowPresetsBar,
 }: AddTabMenuProps) {
@@ -47,6 +49,15 @@ export function AddTabMenu({
 				</span>
 				<HotkeyMenuShortcut hotkeyId="NEW_BROWSER" />
 			</DropdownMenuItem>
+			{onAddDesktop && (
+				<DropdownMenuItem className="gap-2" onClick={onAddDesktop}>
+					<TbDeviceDesktop className="size-4" />
+					<span>
+						<Trans id="workspace.addTabMenu.desktop">Desktop</Trans>
+					</span>
+					<HotkeyMenuShortcut hotkeyId="SPLIT_WITH_DESKTOP" />
+				</DropdownMenuItem>
+			)}
 			<DropdownMenuSeparator />
 			<DropdownMenuCheckboxItem
 				checked={showPresetsBar}

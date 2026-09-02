@@ -66,7 +66,8 @@ function itemFromCloudRow(
 	return {
 		id: cloud.id,
 		organizationId: cloud.organizationId,
-		projectId: cloud.projectId,
+		// Cloud workspaces have no project; the row shape still wants one.
+		projectId: "",
 		hostId: cloud.id,
 		name: cloud.name,
 		branch: served?.branch ?? cloud.branch,

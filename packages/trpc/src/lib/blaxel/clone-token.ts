@@ -11,7 +11,7 @@ import { db } from "@superset/db/client";
 import { githubInstallations, githubRepositories } from "@superset/db/schema";
 import { eq } from "drizzle-orm";
 import { env } from "../../env";
-import { repoForProject } from "./repo-for-project";
+import type { CloudRepo } from "./cloud-repo";
 
 /** Shared by the clone and branch-listing paths. */
 export async function installationOctokit(installationId: string) {
@@ -36,11 +36,8 @@ export interface CloneTarget {
  * back to an unauthenticated clone, which works for public repos.
  */
 export async function resolveCloneTarget(
-	projectId: string,
+	repo: CloudRepo,
 ): Promise<CloneTarget | null> {
-	const repo = await repoForProject(projectId);
-	if (!repo) return null;
-
 	const cloneUrl = `https://github.com/${repo.owner}/${repo.name}.git`;
 	if (!repo.repositoryId || !env.GH_APP_ID || !env.GH_APP_PRIVATE_KEY) {
 		return { cloneUrl, token: null, defaultBranch: repo.defaultBranch };

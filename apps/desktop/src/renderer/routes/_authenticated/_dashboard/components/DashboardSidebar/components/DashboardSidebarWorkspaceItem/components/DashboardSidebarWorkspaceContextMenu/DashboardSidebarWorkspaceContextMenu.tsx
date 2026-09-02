@@ -14,6 +14,7 @@ import {
 	LuArrowRightLeft,
 	LuArrowUp,
 	LuBellOff,
+	LuBox,
 	LuCopy,
 	LuEye,
 	LuEyeOff,
@@ -59,6 +60,8 @@ interface DashboardSidebarWorkspaceContextMenuProps {
 	onCopyBranchName: () => void;
 	onRemoveFromSidebar: () => void;
 	onRename?: () => void;
+	/** Cloud workspaces only: turn this sandbox into a reusable environment. */
+	onPromoteToEnvironment?: () => void;
 	onDelete?: () => void;
 	onToggleUnread: () => void;
 	onClearStatus: () => void;
@@ -86,6 +89,7 @@ export function DashboardSidebarWorkspaceContextMenu({
 	onCopyBranchName,
 	onRemoveFromSidebar,
 	onRename,
+	onPromoteToEnvironment,
 	onDelete,
 	onToggleUnread,
 	onClearStatus,
@@ -151,6 +155,17 @@ export function DashboardSidebarWorkspaceContextMenu({
 					</>
 				)}
 				{!isLocalWorkspace && onRename && <ContextMenuSeparator />}
+				{onPromoteToEnvironment && (
+					<>
+						<ContextMenuItem onSelect={onPromoteToEnvironment}>
+							<LuBox className="h-4 w-4" />
+							<Trans id="dashboard.sidebar.workspaceContextMenu.promoteToEnvironment">
+								Save as environment
+							</Trans>
+						</ContextMenuItem>
+						<ContextMenuSeparator />
+					</>
+				)}
 				<ContextMenuItem onSelect={onCopyBranchName}>
 					<LuGitBranch className="size-4 mr-2" />
 					<Trans id="dashboard.sidebar.workspaceMenu.copyBranchName">

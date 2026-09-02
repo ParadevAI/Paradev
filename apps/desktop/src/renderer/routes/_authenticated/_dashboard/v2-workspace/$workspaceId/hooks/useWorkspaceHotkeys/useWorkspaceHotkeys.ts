@@ -14,6 +14,7 @@ import { useRightSidebarToggleIntent } from "renderer/stores/right-sidebar-toggl
 import type { StoreApi } from "zustand";
 import type {
 	BrowserPaneData,
+	DesktopPaneData,
 	DiffPaneData,
 	PaneViewerData,
 	TerminalPaneData,
@@ -29,6 +30,7 @@ export function useWorkspaceHotkeys({
 	paneRegistry,
 	launcher,
 	onBeforeCloseTab,
+	isSandbox,
 }: {
 	store: StoreApi<WorkspaceStore<PaneViewerData>>;
 	matchedPresets: V2TerminalPresetRow[];
@@ -36,6 +38,7 @@ export function useWorkspaceHotkeys({
 	addTerminalTab: () => Promise<void>;
 	paneRegistry: PaneRegistry<PaneViewerData>;
 	launcher: TerminalLauncher;
+	isSandbox: boolean;
 	onBeforeCloseTab?: WorkspaceProps<PaneViewerData>["onBeforeCloseTab"];
 }) {
 	const { setRightSidebarOpen, setRightSidebarTab } = useV2UserPreferences();
@@ -271,6 +274,25 @@ export function useWorkspaceHotkeys({
 			},
 		});
 	});
+
+	useHotkey(
+		"SPLIT_WITH_DESKTOP",
+		() => {
+			const state = store.getState();
+			const active = state.getActivePane();
+			if (!active) return;
+			state.splitPane({
+				tabId: active.tabId,
+				paneId: active.pane.id,
+				position: "right",
+				newPane: {
+					kind: "desktop",
+					data: { kind: "desktop" } as DesktopPaneData,
+				},
+			});
+		},
+		{ enabled: isSandbox },
+	);
 
 	useHotkey("SPLIT_WITH_BROWSER", () => {
 		const state = store.getState();

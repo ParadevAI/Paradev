@@ -42,6 +42,7 @@ import { useAgentModePreference } from "renderer/hooks/useAgentModePreference";
 import { useRelayUrl } from "renderer/hooks/useRelayUrl";
 import { useV2AgentChoices } from "renderer/hooks/useV2AgentChoices";
 import { PLATFORM } from "renderer/hotkeys";
+import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { showHostServiceUnavailableToast } from "renderer/lib/host-service-unavailable";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { useNewWorkspaceModalOpen } from "renderer/stores/new-workspace-modal";
@@ -53,6 +54,7 @@ import { CLOUD_HOST_ID } from "../components/DevicePicker/DevicePicker";
 import { useWorkspaceHostOptions } from "../components/DevicePicker/hooks/useWorkspaceHostOptions";
 import { AttachmentButtons } from "./components/AttachmentButtons";
 import { CompareBaseBranchPicker } from "./components/CompareBaseBranchPicker";
+import { EnvironmentPickerPill } from "./components/EnvironmentPickerPill";
 import { GitHubIssueLinkCommand } from "./components/GitHubIssueLinkCommand";
 import { LinkedGitHubIssuePill } from "./components/LinkedGitHubIssuePill";
 import { LinkedPRPill } from "./components/LinkedPRPill";
@@ -160,6 +162,15 @@ export function PromptGroup({
 		linkedIssues,
 		linkedPR,
 	} = draft;
+
+	const environmentsQuery = cloudTrpc.environment.list.useQuery(
+		{ organizationId: activeOrganizationId ?? "" },
+		{ enabled: hostId === CLOUD_HOST_ID && !!activeOrganizationId },
+	);
+	const environmentOptions = environmentsQuery.data ?? [];
+	const selectedEnvironment =
+		environmentOptions.find((row) => row.id === draft.environmentId) ??
+		environmentOptions[0];
 
 	// ── Agent configs (v2 host_agent_configs) ───────────────────────
 	// Scoped to the launch host, not the local active host: agent UUIDs only
@@ -787,12 +798,23 @@ export function PromptGroup({
 							updateDraft({ hostId: next });
 						}}
 					/>
-					<ProjectPickerPill
-						selectedProject={selectedProject}
-						projects={recentProjects}
-						isSessionSelected={isSessionSelected}
-						onSelectProject={onSelectProject}
-					/>
+					{hostId !== CLOUD_HOST_ID && (
+						<ProjectPickerPill
+							selectedProject={selectedProject}
+							projects={recentProjects}
+							isSessionSelected={isSessionSelected}
+							onSelectProject={onSelectProject}
+						/>
+					)}
+					{hostId === CLOUD_HOST_ID && (
+						<EnvironmentPickerPill
+							selectedEnvironment={selectedEnvironment}
+							environments={environmentOptions}
+							onSelectEnvironment={(next) =>
+								updateDraft({ environmentId: next })
+							}
+						/>
+					)}
 					<AnimatePresence mode="wait" initial={false}>
 						{linkedPR ? (
 							<motion.span

@@ -17,6 +17,7 @@ import type { ApiAuthProvider } from "./providers/auth";
 import type { HostAuthProvider } from "./providers/host-auth";
 import { runArchivedWorkspaceReconcile } from "./runtime/archived-workspace-reconcile";
 import { registerBrowserCdpRoute } from "./runtime/browser-bridge/browser-cdp-route";
+import { registerDesktopRoute } from "./runtime/desktop";
 import { WorkspaceFilesystemManager } from "./runtime/filesystem";
 import type { GitCredentialProvider } from "./runtime/git";
 import { createGitEnvResolver, createGitFactory } from "./runtime/git";
@@ -302,6 +303,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 	app.use("/events", wsAuth);
 	app.use("/chat-v3/*", wsAuth);
 	app.use("/browser/*", wsAuth);
+	app.use("/desktop/*", wsAuth);
 	app.use("/fwd", wsAuth);
 
 	registerEventBusRoute({ app, eventBus, upgradeWebSocket });
@@ -310,6 +312,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		upgradeWebSocket,
 		getBridge: () => config.browserBridge,
 	});
+	registerDesktopRoute({ app, upgradeWebSocket });
 	registerForwardMuxRoute({
 		app,
 		upgradeWebSocket,

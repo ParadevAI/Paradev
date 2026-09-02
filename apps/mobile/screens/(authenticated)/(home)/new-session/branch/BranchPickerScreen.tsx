@@ -103,7 +103,6 @@ export function BranchPickerScreen() {
 				if (!organizationId) return null;
 				return apiClient.cloudWorkspace.listBranches.query({
 					organizationId,
-					projectId,
 					query: trimmedQuery || undefined,
 				});
 			}

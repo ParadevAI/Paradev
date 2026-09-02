@@ -29,6 +29,15 @@ export default function NewSessionLayout() {
 					title: t({ id: "mobile.nav.project.title", message: "Project" }),
 				}}
 			/>
+			<Stack.Screen
+				name="environment"
+				options={{
+					title: t({
+						id: "mobile.nav.environment.title",
+						message: "Environment",
+					}),
+				}}
+			/>
 		</Stack>
 	);
 }

@@ -10,14 +10,18 @@ import {
 	LuColumns2,
 	LuEqual,
 	LuGlobe,
+	LuMonitor,
 	LuMoveRight,
 	LuPlus,
 	LuRows2,
 	LuX,
 } from "react-icons/lu";
+import { useWorkspaceHostTarget } from "renderer/hooks/host-service/useWorkspaceHostUrl";
 import { useHotkeyDisplay } from "renderer/hotkeys";
+import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import type {
 	BrowserPaneData,
+	DesktopPaneData,
 	PaneViewerData,
 	TerminalPaneData,
 } from "../../types";
@@ -40,6 +44,9 @@ export function useDefaultContextMenuActions({
 	).text;
 	const closePaneShortcut = useHotkeyDisplay("CLOSE_PANE").text;
 	const defaultBrowserUrl = useDefaultBrowserUrl();
+	const { workspace } = useWorkspace();
+	const host = useWorkspaceHostTarget(workspace.id);
+	const isSandbox = host.status === "ready" && host.kind === "sandbox";
 
 	return useMemo<ContextMenuActionConfig<PaneViewerData>[]>(
 		() => [
@@ -101,6 +108,24 @@ export function useDefaultContextMenuActions({
 					});
 				},
 			},
+			...(isSandbox
+				? [
+						{
+							key: "split-with-desktop",
+							label: t({
+								id: "workspace.paneContextMenu.splitWithDesktop",
+								message: "Split with Desktop",
+							}),
+							icon: <LuMonitor />,
+							onSelect: (ctx) => {
+								ctx.actions.split("right", {
+									kind: "desktop",
+									data: { kind: "desktop" } as DesktopPaneData,
+								});
+							},
+						} satisfies ContextMenuActionConfig<PaneViewerData>,
+					]
+				: []),
 			{
 				key: "equalize-splits",
 				label: t({
@@ -178,6 +203,7 @@ export function useDefaultContextMenuActions({
 			launcher,
 			defaultBrowserUrl,
 			t,
+			isSandbox,
 		],
 	);
 }
