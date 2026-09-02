@@ -24,7 +24,7 @@ export function ChecksSummary({ checks, status }: ChecksSummaryProps) {
 		},
 		failure: {
 			icon: LuX,
-			className: "text-destructive-foreground",
+			className: "text-destructive",
 		},
 		pending: {
 			icon: LuLoaderCircle,

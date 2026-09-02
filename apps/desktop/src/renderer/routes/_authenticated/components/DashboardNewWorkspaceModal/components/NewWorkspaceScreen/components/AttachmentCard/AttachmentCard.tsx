@@ -66,7 +66,7 @@ export function AttachmentCard({
 			)}
 		>
 			{isError ? (
-				<TriangleAlert className="size-4 text-destructive-foreground" />
+				<TriangleAlert className="size-4 text-destructive" />
 			) : (
 				<Loader2 className="size-4 animate-spin text-muted-foreground" />
 			)}

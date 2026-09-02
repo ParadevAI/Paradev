@@ -7,7 +7,7 @@ interface OrphanedBannerProps {
 
 export function OrphanedBanner({ dirty, onDiscard }: OrphanedBannerProps) {
 	return (
-		<div className="flex items-center gap-2 border-b border-border bg-destructive/10 px-3 py-1.5 text-xs text-destructive-foreground">
+		<div className="flex items-center gap-2 border-b border-border bg-destructive/10 px-3 py-1.5 text-xs text-destructive">
 			<span>
 				{dirty ? (
 					<Trans id="workspace.filePane.deletedOnDiskDirty">

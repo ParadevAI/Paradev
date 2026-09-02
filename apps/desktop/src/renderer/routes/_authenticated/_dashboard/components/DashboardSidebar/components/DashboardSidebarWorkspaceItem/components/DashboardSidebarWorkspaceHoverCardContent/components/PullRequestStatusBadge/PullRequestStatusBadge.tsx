@@ -20,7 +20,7 @@ export function PullRequestStatusBadge({ state }: PullRequestStatusBadgeProps) {
 		open: "bg-emerald-500/15 text-emerald-500",
 		draft: "bg-muted text-muted-foreground",
 		merged: "bg-violet-500/15 text-violet-500",
-		closed: "bg-destructive/15 text-destructive-foreground",
+		closed: "bg-destructive/15 text-destructive",
 		queued: "bg-amber-500/15 text-amber-500",
 	};
 

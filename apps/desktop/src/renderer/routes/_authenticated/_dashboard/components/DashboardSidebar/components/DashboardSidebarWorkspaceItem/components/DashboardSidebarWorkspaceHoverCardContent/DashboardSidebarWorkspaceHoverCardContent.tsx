@@ -159,9 +159,7 @@ export function DashboardSidebarWorkspaceHoverCardContent({
 						{diffStats && (
 							<div className="flex items-center gap-1.5 text-xs font-mono shrink-0">
 								<span className="text-emerald-500">+{diffStats.additions}</span>
-								<span className="text-destructive-foreground">
-									-{diffStats.deletions}
-								</span>
+								<span className="text-destructive">-{diffStats.deletions}</span>
 							</div>
 						)}
 					</div>

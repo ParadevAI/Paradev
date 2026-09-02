@@ -23,7 +23,7 @@ export function ReviewStatus({
 				id: "dashboard.sidebar.reviewStatus.changesRequested",
 				message: "Changes requested",
 			}),
-			className: "bg-destructive/15 text-destructive-foreground",
+			className: "bg-destructive/15 text-destructive",
 		},
 		pending: {
 			label:
