@@ -3075,6 +3075,11 @@ msgstr "所選裝置上已不存在這個代理程式（它的代理程式可能
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
+msgid "dashboard.automations.body.discard"
+msgstr "捨棄"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
 msgid "dashboard.automations.body.instructions"
 msgstr "說明"
 
@@ -3096,13 +3101,23 @@ msgstr "新增提示詞，例如：在$sentry中查詢崩潰"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
-msgid "dashboard.automations.body.promptUpdateFailedToast"
-msgstr "更新提示詞失敗"
+msgid "dashboard.automations.body.resumeAriaLabel"
+msgstr "恢復自動化"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
-msgid "dashboard.automations.body.resumeAriaLabel"
-msgstr "恢復自動化"
+msgid "dashboard.automations.body.save"
+msgstr "儲存"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
+msgid "dashboard.automations.body.savedToast"
+msgstr "自動化已儲存"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
+msgid "dashboard.automations.body.saving"
+msgstr "正在儲存..."
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
@@ -3133,11 +3148,6 @@ msgstr "某位隊友"
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
 msgid "dashboard.automations.body.titlePlaceholder"
 msgstr "自動化標題"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
-msgid "dashboard.automations.body.triggersSavedToast"
-msgstr "觸發器已儲存"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx

@@ -3075,6 +3075,11 @@ msgstr "Bu ajan seçili cihazda artık yok (ajanları sıfırlanmış olabilir).
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
+msgid "dashboard.automations.body.discard"
+msgstr "Vazgeç"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
 msgid "dashboard.automations.body.instructions"
 msgstr "Yönergeler"
 
@@ -3096,13 +3101,23 @@ msgstr "İstem ekleyin, örn. $sentry içinde çökmeleri ara"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
-msgid "dashboard.automations.body.promptUpdateFailedToast"
-msgstr "İstem güncellenemedi"
+msgid "dashboard.automations.body.resumeAriaLabel"
+msgstr "Otomasyonu sürdür"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
-msgid "dashboard.automations.body.resumeAriaLabel"
-msgstr "Otomasyonu sürdür"
+msgid "dashboard.automations.body.save"
+msgstr "Kaydet"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
+msgid "dashboard.automations.body.savedToast"
+msgstr "Otomasyon kaydedildi"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
+msgid "dashboard.automations.body.saving"
+msgstr "Kaydediliyor..."
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
@@ -3133,11 +3148,6 @@ msgstr "bir takım arkadaşı"
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
 msgid "dashboard.automations.body.titlePlaceholder"
 msgstr "Otomasyon başlığı"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
-msgid "dashboard.automations.body.triggersSavedToast"
-msgstr "Tetikleyiciler kaydedildi"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx

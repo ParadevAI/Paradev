@@ -3075,6 +3075,11 @@ msgstr "Tento agent už na vybraném zařízení neexistuje (jeho agenti mohli b
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
+msgid "dashboard.automations.body.discard"
+msgstr "Zahodit"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
 msgid "dashboard.automations.body.instructions"
 msgstr "Instrukce"
 
@@ -3096,13 +3101,23 @@ msgstr "Přidejte prompt, např. hledej pády v $sentry"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
-msgid "dashboard.automations.body.promptUpdateFailedToast"
-msgstr "Nepodařilo se aktualizovat prompt"
+msgid "dashboard.automations.body.resumeAriaLabel"
+msgstr "Pokračovat v automatizaci"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
-msgid "dashboard.automations.body.resumeAriaLabel"
-msgstr "Pokračovat v automatizaci"
+msgid "dashboard.automations.body.save"
+msgstr "Uložit"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
+msgid "dashboard.automations.body.savedToast"
+msgstr "Automatizace uložena"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
+msgid "dashboard.automations.body.saving"
+msgstr "Ukládání…"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
@@ -3133,11 +3148,6 @@ msgstr "kolega"
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
 msgid "dashboard.automations.body.titlePlaceholder"
 msgstr "Název automatizace"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
-msgid "dashboard.automations.body.triggersSavedToast"
-msgstr "Spouštěče uloženy"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx

@@ -3075,6 +3075,11 @@ msgstr "Diesen Agenten gibt es auf dem gewählten Gerät nicht mehr (seine Agent
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
+msgid "dashboard.automations.body.discard"
+msgstr "Verwerfen"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
 msgid "dashboard.automations.body.instructions"
 msgstr "Anweisungen"
 
@@ -3096,13 +3101,23 @@ msgstr "Prompt hinzufügen, z. B. in $sentry nach Abstürzen suchen"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
-msgid "dashboard.automations.body.promptUpdateFailedToast"
-msgstr "Prompt konnte nicht aktualisiert werden"
+msgid "dashboard.automations.body.resumeAriaLabel"
+msgstr "Automatisierung fortsetzen"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
-msgid "dashboard.automations.body.resumeAriaLabel"
-msgstr "Automatisierung fortsetzen"
+msgid "dashboard.automations.body.save"
+msgstr "Speichern"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
+msgid "dashboard.automations.body.savedToast"
+msgstr "Automatisierung gespeichert"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
+msgid "dashboard.automations.body.saving"
+msgstr "Wird gespeichert..."
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
@@ -3133,11 +3148,6 @@ msgstr "ein Teammitglied"
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
 msgid "dashboard.automations.body.titlePlaceholder"
 msgstr "Titel der Automatisierung"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
-msgid "dashboard.automations.body.triggersSavedToast"
-msgstr "Trigger gespeichert"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx

@@ -3075,6 +3075,11 @@ msgstr "Este agente não existe mais no dispositivo selecionado (os agentes pode
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
+msgid "dashboard.automations.body.discard"
+msgstr "Descartar"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
 msgid "dashboard.automations.body.instructions"
 msgstr "Instruções"
 
@@ -3096,13 +3101,23 @@ msgstr "Adicione um prompt, ex.: procure travamentos no $sentry"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
-msgid "dashboard.automations.body.promptUpdateFailedToast"
-msgstr "Falha ao atualizar o prompt"
+msgid "dashboard.automations.body.resumeAriaLabel"
+msgstr "Retomar automação"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
-msgid "dashboard.automations.body.resumeAriaLabel"
-msgstr "Retomar automação"
+msgid "dashboard.automations.body.save"
+msgstr "Salvar"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
+msgid "dashboard.automations.body.savedToast"
+msgstr "Automação salva"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
+msgid "dashboard.automations.body.saving"
+msgstr "Salvando..."
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
@@ -3133,11 +3148,6 @@ msgstr "um colega de equipe"
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
 msgid "dashboard.automations.body.titlePlaceholder"
 msgstr "Título da automação"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx
-msgid "dashboard.automations.body.triggersSavedToast"
-msgstr "Gatilhos salvos"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/AutomationBody/AutomationBody.tsx

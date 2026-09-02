@@ -10,7 +10,7 @@ if (!alreadyRegistered) GlobalRegistrator.register();
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
 const { act, cleanup, renderHook } = await import("@testing-library/react");
-const { useTriggerDrafts } = await import("./useTriggerDrafts");
+const { useAutomationDraft } = await import("./useAutomationDraft");
 
 afterEach(cleanup);
 afterAll(async () => {
@@ -20,13 +20,14 @@ afterAll(async () => {
 /**
  * When the editor may write, and what it says while it may not.
  *
- *   ┌ Triggers ─────────────────── Discard   Save triggers ┐
- *   │  rows…                                               │
- *   └──────────────────────────────────────────────────────┘
+ *   ┌ Automation ───────────────────────── Discard   Save ┐
+ *   │  title · triggers · scope · agent · prompt           │
+ *   └─────────────────────────────────────────────────────┘
  *
- * The set saves on request rather than as you type, because a trigger is
+ * The page saves on request rather than as you type, because a trigger is
  * invalid the moment it is added and the API rejects the whole set: autosaving
- * meant a new row was saved, refused, and dropped on the next render.
+ * meant a new row was saved, refused, and dropped on the next render. The rest
+ * of the page shares that Save so there is only one habit to learn.
  */
 
 /** Valid: an hourly schedule needs nothing filled in. */
@@ -53,13 +54,27 @@ const unfinishedGithub = () => ({
 	},
 });
 
+/** The non-trigger half of the draft, which these cases never vary. */
+const REST = {
+	name: "An automation",
+	prompt: "",
+	agent: "claude",
+	targetHostId: null,
+	v2ProjectId: null,
+	v2WorkspaceId: null,
+	tags: [],
+};
+
 const setup = (
 	triggers: unknown[] = [],
 	onChange: (next: never) => undefined | Promise<unknown> = () => undefined,
 ) =>
 	renderHook(
 		({ saved }: { saved: unknown[] }) =>
-			useTriggerDrafts(saved as never, onChange as never),
+			useAutomationDraft(
+				{ ...REST, triggers: saved } as never,
+				onChange as never,
+			),
 		{ initialProps: { saved: triggers } },
 	);
 
@@ -71,7 +86,7 @@ describe("an editor nobody has touched", () => {
 
 	test("holds the saved rows", () => {
 		const { result } = setup([schedule("t1")]);
-		expect(result.current.drafts).toHaveLength(1);
+		expect(result.current.draft.triggers).toHaveLength(1);
 	});
 
 	// The complaint must not land before the work: every trigger is incomplete
@@ -87,16 +102,16 @@ describe("adding a row", () => {
 	test("makes the editor dirty", () => {
 		const { result } = setup([]);
 		act(() => {
-			result.current.add(schedule().config as never);
+			result.current.addTrigger(schedule().config as never);
 		});
 		expect(result.current.dirty).toBe(true);
-		expect(result.current.drafts).toHaveLength(1);
+		expect(result.current.draft.triggers).toHaveLength(1);
 	});
 
 	test("still says nothing is wrong until a save is attempted", () => {
 		const { result } = setup([]);
 		act(() => {
-			result.current.add(unfinishedGithub().config as never);
+			result.current.addTrigger(unfinishedGithub().config as never);
 		});
 		expect(result.current.shownProblems).toEqual([]);
 	});
@@ -107,7 +122,7 @@ describe("saving a valid set", () => {
 		const onChange = mock(() => Promise.resolve());
 		const { result } = setup([], onChange);
 		act(() => {
-			result.current.add(schedule().config as never);
+			result.current.addTrigger(schedule().config as never);
 		});
 		await act(async () => {
 			await result.current.save();
@@ -141,7 +156,7 @@ describe("saving a set that cannot be written", () => {
 		expect(result.current.shownProblems.length).toBeGreaterThan(0);
 
 		act(() => {
-			result.current.edit([schedule()] as never);
+			result.current.editTriggers([schedule()] as never);
 		});
 		expect(result.current.shownProblems).toEqual([]);
 		expect(result.current.banner).toBeNull();
@@ -155,12 +170,12 @@ describe("a save the server refuses", () => {
 		const onChange = mock(() => Promise.reject(new Error("refused")));
 		const { result } = setup([], onChange);
 		act(() => {
-			result.current.add(schedule().config as never);
+			result.current.addTrigger(schedule().config as never);
 		});
 		await act(async () => {
 			await result.current.save();
 		});
-		expect(result.current.drafts).toHaveLength(1);
+		expect(result.current.draft.triggers).toHaveLength(1);
 		expect(result.current.dirty).toBe(true);
 		expect(result.current.saving).toBe(false);
 	});
@@ -170,21 +185,21 @@ describe("discarding", () => {
 	test("puts the saved rows back", () => {
 		const { result } = setup([schedule("t1")]);
 		act(() => {
-			result.current.add(schedule().config as never);
+			result.current.addTrigger(schedule().config as never);
 		});
-		expect(result.current.drafts).toHaveLength(2);
+		expect(result.current.draft.triggers).toHaveLength(2);
 
 		act(() => {
 			result.current.discard();
 		});
-		expect(result.current.drafts).toHaveLength(1);
+		expect(result.current.draft.triggers).toHaveLength(1);
 		expect(result.current.dirty).toBe(false);
 	});
 
 	test("clears complaints from an earlier attempt", async () => {
 		const { result } = setup([schedule("t1")]);
 		act(() => {
-			result.current.add(unfinishedGithub().config as never);
+			result.current.addTrigger(unfinishedGithub().config as never);
 		});
 		await act(async () => {
 			await result.current.save();
@@ -203,17 +218,17 @@ describe("the saved set changing underneath", () => {
 	test("is adopted when there is nothing to lose", () => {
 		const { result, rerender } = setup([schedule("t1")]);
 		rerender({ saved: [schedule("t1"), schedule("t2")] });
-		expect(result.current.drafts).toHaveLength(2);
+		expect(result.current.draft.triggers).toHaveLength(2);
 	});
 
 	// Edits here were by definition never sent, so adopting would discard them.
 	test("is ignored while there are unsaved edits", () => {
 		const { result, rerender } = setup([schedule("t1")]);
 		act(() => {
-			result.current.add(schedule().config as never);
+			result.current.addTrigger(schedule().config as never);
 		});
 		rerender({ saved: [schedule("t1"), schedule("t2"), schedule("t3")] });
-		expect(result.current.drafts).toHaveLength(2);
+		expect(result.current.draft.triggers).toHaveLength(2);
 		expect(result.current.dirty).toBe(true);
 	});
 });
