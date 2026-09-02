@@ -47,6 +47,11 @@ export const SUPERSET_CHAT_MODELS: readonly SupersetChatModel[] = [
 	{ id: "anthropic/claude-opus-5", label: "Opus 5", provider: "Anthropic" },
 	{ id: "anthropic/claude-opus-4-8", label: "Opus 4.8", provider: "Anthropic" },
 	{ id: "anthropic/claude-opus-4-7", label: "Opus 4.7", provider: "Anthropic" },
+	{
+		id: "anthropic/claude-fable-5-1",
+		label: "Fable 5.1",
+		provider: "Anthropic",
+	},
 	{ id: "anthropic/claude-fable-5", label: "Fable 5", provider: "Anthropic" },
 	{
 		id: "anthropic/claude-sonnet-4-6",
@@ -89,6 +94,7 @@ export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 			{ id: "opus", label: "Opus", group: LATEST_GROUP },
 			{ id: "sonnet", label: "Sonnet", group: LATEST_GROUP },
 			{ id: "haiku", label: "Haiku", group: LATEST_GROUP },
+			{ id: "claude-fable-5-1", label: "Fable 5.1", group: PINNED_GROUP },
 			{ id: "claude-fable-5", label: "Fable 5", group: PINNED_GROUP },
 			{ id: "claude-opus-5", label: "Opus 5", group: PINNED_GROUP },
 			{ id: "claude-sonnet-5", label: "Sonnet 5", group: PINNED_GROUP },
@@ -166,8 +172,10 @@ export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 			// openai ids verified against `opencode models` (2026-08-05), which
 			// no longer lists the old `openai/gpt-5`. anthropic ids follow the
 			// same models.dev catalog but need an authed anthropic provider to
-			// appear in that listing.
+			// appear in that listing; `claude-fable-5-1` was checked against
+			// models.dev directly (2026-09-01).
 			{ id: "anthropic/claude-opus-5", label: "Claude Opus 5" },
+			{ id: "anthropic/claude-fable-5-1", label: "Claude Fable 5.1" },
 			{ id: "anthropic/claude-fable-5", label: "Claude Fable 5" },
 			{ id: "anthropic/claude-sonnet-4-5", label: "Claude Sonnet 4.5" },
 			{ id: "openai/gpt-5.6-sol", label: "GPT-5.6 Sol" },
@@ -181,11 +189,13 @@ export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 		models: [
 			// OMP accepts configured role aliases as well as exact
 			// provider/model selectors. Exact ids verified against
-			// `omp models --json` in OMP 18.0.1.
+			// `omp models --json` in OMP 18.0.1; `claude-fable-5-1` against the
+			// catalog bundled in OMP 18.1.2.
 			{ id: "@smol", label: "Configured fast model" },
 			{ id: "@slow", label: "Configured slow model" },
 			{ id: "@plan", label: "Configured plan model" },
 			{ id: "anthropic/claude-opus-5", label: "Claude Opus 5" },
+			{ id: "anthropic/claude-fable-5-1", label: "Claude Fable 5.1" },
 			{ id: "anthropic/claude-fable-5", label: "Claude Fable 5" },
 			{
 				id: "anthropic/claude-sonnet-4-6",

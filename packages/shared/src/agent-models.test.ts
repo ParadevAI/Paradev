@@ -52,9 +52,10 @@ describe("AGENT_MODEL_SUPPORT", () => {
 });
 
 describe("SUPERSET_CHAT_MODELS", () => {
-	it("includes opus 5 and the GPT-5.6 Codex models", () => {
+	it("includes opus 5, fable 5.1 and the GPT-5.6 Codex models", () => {
 		const ids = SUPERSET_CHAT_MODELS.map((model) => model.id);
 		expect(ids).toContain("anthropic/claude-opus-5");
+		expect(ids).toContain("anthropic/claude-fable-5-1");
 		expect(ids).toContain("openai/gpt-5.6-sol");
 		expect(ids).toContain("openai/gpt-5.6-terra");
 		expect(ids).toContain("openai/gpt-5.6-luna");
@@ -112,6 +113,7 @@ describe("buildAgentModelArgs", () => {
 		// Aliases follow the CLI's newest model; teams standardising on one
 		// release need an id that stays put.
 		expect(ids).toContain("opus");
+		expect(ids).toContain("claude-fable-5-1");
 		expect(ids).toContain("claude-opus-4-8");
 		expect(ids).toContain("claude-opus-4-7");
 		expect(ids).toContain("claude-sonnet-4-6");
@@ -124,6 +126,7 @@ describe("buildAgentModelArgs", () => {
 			models.find((model) => model.id === id)?.group;
 		expect(groupOf("opus")).toBe("Latest");
 		expect(groupOf("claude-opus-4-8")).toBe("Pinned releases");
+		expect(groupOf("claude-fable-5-1")).toBe("Pinned releases");
 		// The header carries the distinction, so labels stay bare.
 		expect(models.find((model) => model.id === "opus")?.label).toBe("Opus");
 	});
@@ -165,6 +168,18 @@ describe("buildAgentModelArgs", () => {
 		expect(buildAgentModelArgs("opencode", "anthropic/claude-fable-5")).toEqual(
 			["--model", "anthropic/claude-fable-5"],
 		);
+	});
+
+	it("includes fable 5.1 as a pinned claude release and for the models.dev harnesses", () => {
+		expect(buildAgentModelArgs("claude", "claude-fable-5-1")).toEqual([
+			"--model",
+			"claude-fable-5-1",
+		]);
+		for (const preset of ["opencode", "omp"]) {
+			expect(buildAgentModelArgs(preset, "anthropic/claude-fable-5-1")).toEqual(
+				["--model", "anthropic/claude-fable-5-1"],
+			);
+		}
 	});
 
 	it("includes every GPT-5.6 Codex model", () => {
