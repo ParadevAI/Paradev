@@ -16862,11 +16862,6 @@ msgid "mobile.agentPicker.agentsLoadFailed"
 msgstr "Tidak bisa memuat agen dari {0}"
 
 #. js-lingui-explicit-id
-#: ../../apps/mobile/screens/(authenticated)/(home)/new-session/agent/AgentPickerScreen.tsx
-msgid "mobile.agentPicker.cloudNoAgent"
-msgstr "Workspace cloud belum menjalankan agen"
-
-#. js-lingui-explicit-id
 #. placeholder {0}: host.name
 #: ../../apps/mobile/screens/(authenticated)/(home)/new-session/agent/AgentPickerScreen.tsx
 msgid "mobile.agentPicker.hostOffline"

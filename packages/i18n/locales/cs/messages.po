@@ -16862,11 +16862,6 @@ msgid "mobile.agentPicker.agentsLoadFailed"
 msgstr "Nepodařilo se načíst agenty z {0}"
 
 #. js-lingui-explicit-id
-#: ../../apps/mobile/screens/(authenticated)/(home)/new-session/agent/AgentPickerScreen.tsx
-msgid "mobile.agentPicker.cloudNoAgent"
-msgstr "Cloudové pracovní prostory zatím agenta nespouštějí"
-
-#. js-lingui-explicit-id
 #. placeholder {0}: host.name
 #: ../../apps/mobile/screens/(authenticated)/(home)/new-session/agent/AgentPickerScreen.tsx
 msgid "mobile.agentPicker.hostOffline"

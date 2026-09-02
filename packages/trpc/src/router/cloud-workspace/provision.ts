@@ -1,6 +1,10 @@
 import { db, dbWs } from "@superset/db/client";
 import { cloudWorkspaces } from "@superset/db/schema";
 import {
+	type CloudAgentLaunch,
+	cloudAgentLaunchToEnv,
+} from "@superset/shared/cloud-agent-launch";
+import {
 	SANDBOX_HOST_DB_PATH,
 	SANDBOX_WORKSPACE_PATH,
 } from "@superset/shared/constants";
@@ -26,6 +30,8 @@ export interface ProvisionCloudWorkspaceInput {
 	 * `FALLBACK_NAME` and this is what the workspace gets named from.
 	 */
 	namingPrompt?: string;
+	/** A built-in agent to run once the sandbox is up; see cloud-agent-launch. */
+	launch?: CloudAgentLaunch;
 }
 
 export type ProvisionCloudWorkspaceOutcome =
@@ -124,6 +130,7 @@ export async function provisionCloudWorkspace(
 						: {}),
 					SUPERSET_SANDBOX_IMAGE_TAG: environment.sourceRef,
 					SUPERSET_SANDBOX_PROVIDER: row.provider,
+					...cloudAgentLaunchToEnv(input.launch),
 				},
 			}),
 			nameWrite,

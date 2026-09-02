@@ -94,13 +94,14 @@ the edge.** A sandbox whose preview is ever made public is open to anyone with
 the URL. Treat preview configuration (`public: false`) as the security-
 critical setting it now is.
 
-**Model credentials never enter the sandbox.** The provider's egress proxy
+**Model credentials never enter an image sandbox.** (A fork is the exception;
+see "A fork can never have the egress proxy" below.) The provider's egress proxy
 substitutes them at the edge from a `{{SECRET:...}}` routing rule; the sandbox
 env holds only `SANDBOX_CREDENTIAL_PLACEHOLDER`. The placeholder must still be
 *set* — an unset key reads as "not logged in" and produces no request for the
 proxy to rewrite.
 
-**Credentials are fixed at creation, so a sandbox can't gain one later.** The
+**Proxy credentials are fixed at creation, so a sandbox can't gain one later.** The
 routing rules that carry them are part of the create call, which is the
 property that stops a sandbox being re-pointed at a different secret mid-life.
 The cost is that adding a provider, or rotating a key, reaches only sandboxes
@@ -245,6 +246,22 @@ every fork inherits that size along with the files. Filling the disk is what a
 space are volumes (one per sandbox, attached at creation, not forkable) and
 Agent Drive; neither fits the golden-and-fork model, which is why memory is the
 lever.
+
+**A fork can never have the egress proxy.** The proxy routing that injects
+the org's model keys (`network.proxy.routing`) exists only on sandboxes created
+with it: Blaxel's docs say enabling the proxy on a sandbox created without it
+requires a new sandbox, and a fork is created without it (its `spec.network`
+is null, and a source that carries routing hands its forks unresolved
+`{{file(/var/run/secrets/…)}}` proxy templates, so every outbound request
+fails with "Unsupported proxy syntax"). Applying routing to a fork with
+`updateSandbox` is worse than useless: the platform builds a new instance from
+the image, and the fork comes back without `node_modules`, the tools, or
+anything else the environment carried (verified 2026-09-02 on a release
+probe). So a workspace forked from an environment gets its model keys the
+plain way, as `ANTHROPIC_API_KEY` / `OPENAI_API_KEY` in the environment's
+variables, and host-service approves that key for Claude Code before an
+unattended launch so it does not stop on the "use this custom API key?"
+prompt. Image sandboxes keep the proxy and the placeholder keys.
 
 **host-service has no HTTP health route.** Readiness is the `health.check` tRPC
 procedure; `GET /health` 404s. A probe on the wrong path looks exactly like a

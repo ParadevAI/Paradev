@@ -111,6 +111,9 @@ if (SKIP_BASE) {
 // 2. internal golden
 const golden = `env-internal-${Date.now().toString(36)}`;
 log(`golden: creating ${golden} from ${IMAGE}`);
+// No credential routing here on purpose: a fork inherits a source's proxy
+// variables as unresolved templates and loses egress entirely. provisioning
+// applies the routing to each fork instead, and the probe below checks it.
 const sandbox = await SandboxInstance.createIfNotExists({
 	name: golden,
 	image: IMAGE,
@@ -426,11 +429,24 @@ if (ENV_FILE) {
 	if (PROBE_NEON) {
 		const stamp = await probeRun(
 			"db-branch",
-			"cat /workspace/.superset-db-branch 2>/dev/null; tail -n 3 /tmp/superset-workspace-db.log 2>/dev/null",
+			"cat /data/.superset-db-branch 2>/dev/null; tail -n 3 /tmp/superset-workspace-db.log 2>/dev/null",
 		);
 		const ok = stamp.includes(probeBranch);
 		log(
 			`${ok ? "ok  " : "FAIL"} database branch: ${stamp.trim().split("\n").pop() ?? "(no output)"}`,
+		);
+		if (!ok) probeFailed++;
+	}
+	{
+		const status = await probeRun(
+			"agent-credentials",
+			"curl -s -o /dev/null -w '%{http_code}' --max-time 15 -H \"x-api-key: $ANTHROPIC_API_KEY\" -H 'anthropic-version: 2023-06-01' https://api.anthropic.com/v1/models" +
+				"; echo; curl -s -o /dev/null -w '%{http_code}' --max-time 15 -H \"Authorization: Bearer $OPENAI_API_KEY\" https://api.openai.com/v1/models",
+		);
+		const codes = status.trim().split(/\s+/);
+		const ok = codes.length === 2 && codes.every((code) => code === "200");
+		log(
+			`${ok ? "ok  " : "FAIL"} agent credentials (Anthropic, OpenAI; keys from the env file): ${codes.join(" ") || "(no output)"}`,
 		);
 		if (!ok) probeFailed++;
 	}

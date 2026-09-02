@@ -9,6 +9,7 @@
  */
 
 import { SandboxInstance, settings, updateSandbox } from "@blaxel/core";
+import { CLOUD_AGENT_LAUNCH_ENV_NAMES } from "@superset/shared/cloud-agent-launch";
 import { SANDBOX_CREDENTIAL_PLACEHOLDER } from "@superset/shared/constants";
 import { env } from "../../env";
 import { userError } from "../../i18n-error";
@@ -202,6 +203,8 @@ const INHERITED_IDENTITY: Array<[path: string, recursive: boolean]> = [
 	["/data/host.db-wal", false],
 	["/data/host.db-shm", false],
 	["/data/.workspace-bootstrapped", false],
+	["/data/.sandbox-agent-launched", false],
+	["/data/.superset-db-branch", false],
 	["/root/.superset/host", true],
 	["/root/.gitconfig", false],
 ];
@@ -214,6 +217,7 @@ const INHERITED_IDENTITY_ENVS = new Set([
 	"SUPERSET_SANDBOX_REPO_URL",
 	"SUPERSET_SANDBOX_WORKSPACE_ID",
 	"SUPERSET_SANDBOX_WORKSPACE_NAME",
+	...CLOUD_AGENT_LAUNCH_ENV_NAMES,
 ]);
 
 export async function promoteSandboxToEnvironment(args: {

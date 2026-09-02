@@ -74,7 +74,8 @@ cat > /usr/local/bin/superset-workspace-db <<'WORKSPACEDB'
 #!/usr/bin/env bash
 set -u
 ENV_FILE="${1:-/workspace/.env}"
-STAMP="/workspace/.superset-db-branch"
+# Outside the checkout: a stamp inside it shows up as an unstaged change.
+STAMP="/data/.superset-db-branch"
 [ -f "$ENV_FILE" ] || exit 0
 [ -f "$STAMP" ] && exit 0
 [ "${SUPERSET_RELEASE_PROBE:-}" = "1" ] && exit 0

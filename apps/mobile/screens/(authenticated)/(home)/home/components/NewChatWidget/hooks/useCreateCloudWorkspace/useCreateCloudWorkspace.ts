@@ -14,6 +14,8 @@ interface CreateCloudWorkspaceArgs {
 	branch: string | null;
 	/** Null when no environment exists yet; create cannot proceed without one. */
 	environmentId: string | null;
+	/** Built-in agent to launch with the message as its prompt; null for none. */
+	agent: string | null;
 	message: PromptInputMessage;
 }
 
@@ -33,6 +35,7 @@ export function useCreateCloudWorkspace() {
 		mutationFn: async ({
 			branch,
 			environmentId,
+			agent,
 			message,
 		}: CreateCloudWorkspaceArgs) => {
 			if (!organizationId) throw new Error("No active organization");
@@ -55,9 +58,11 @@ export function useCreateCloudWorkspace() {
 				// Omitted when unresolved: the server falls back to the repo's
 				// actual default branch, which the client must not guess.
 				branch: branch ?? undefined,
+				// Only with something to say: an empty prompt leaves it idle.
+				agent: agent && message.text.trim() ? agent : undefined,
 			});
 		},
-		onSuccess: (row: CloudWorkspaceRow, { branch }) => {
+		onSuccess: (row: CloudWorkspaceRow, { branch, agent, message }) => {
 			// The API emits `workspace_created`; this is only the client asking.
 			posthog.capture("workspace_create_requested", {
 				workspace_id: row.id,
@@ -65,9 +70,7 @@ export function useCreateCloudWorkspace() {
 				host_kind: "cloud",
 				source: "mobile_composer",
 				base_branch: branch,
-				// Nothing launches on a cloud create today; the prompt only feeds
-				// the server-side auto-name.
-				agent: null,
+				agent: agent && message.text.trim() ? agent : null,
 			});
 			// Seed the list before navigating: the workspace screen decides
 			// between "provisioning" and "not found" off this cache, and even

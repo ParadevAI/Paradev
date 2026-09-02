@@ -24,6 +24,10 @@
 			"types": "./src/automation-triggers.ts",
 			"default": "./src/automation-triggers.ts"
 		},
+		"./cloud-agent-launch": {
+			"types": "./src/cloud-agent-launch.ts",
+			"default": "./src/cloud-agent-launch.ts"
+		},
 		"./constants": {
 			"types": "./src/constants.ts",
 			"default": "./src/constants.ts"

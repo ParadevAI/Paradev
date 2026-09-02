@@ -45,6 +45,7 @@ import { useAgentModelPreference } from "renderer/hooks/useAgentModelPreference"
 import { useAgentModePreference } from "renderer/hooks/useAgentModePreference";
 import { useRelayUrl } from "renderer/hooks/useRelayUrl";
 import { useV2AgentChoices } from "renderer/hooks/useV2AgentChoices";
+import { CLOUD_AGENT_CHOICES } from "renderer/hooks/useV2AgentChoices/cloud-agent-choices";
 import { track } from "renderer/lib/analytics";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { electronTrpc } from "renderer/lib/electron-trpc";
@@ -453,8 +454,12 @@ export function NewWorkspaceScreen({
 		setSamplePromptsDismissed(true);
 	}, [promptLayout, setSamplePromptsDismissed]);
 
-	const { agents: v2Agents, isFetched: v2AgentsFetched } =
+	const { agents: hostAgents, isFetched: hostAgentsFetched } =
 		useV2AgentChoices(launchHostUrl);
+	// Under Cloud the built-in presets stand in for a host's agent list.
+	const v2Agents =
+		draft.hostId === CLOUD_HOST_ID ? CLOUD_AGENT_CHOICES : hostAgents;
+	const v2AgentsFetched = draft.hostId === CLOUD_HOST_ID || hostAgentsFetched;
 	const selectableAgentIds = useMemo(
 		() => v2Agents.map((agent) => agent.id),
 		[v2Agents],

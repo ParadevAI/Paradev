@@ -41,6 +41,7 @@ import { useAgentModelPreference } from "renderer/hooks/useAgentModelPreference"
 import { useAgentModePreference } from "renderer/hooks/useAgentModePreference";
 import { useRelayUrl } from "renderer/hooks/useRelayUrl";
 import { useV2AgentChoices } from "renderer/hooks/useV2AgentChoices";
+import { CLOUD_AGENT_CHOICES } from "renderer/hooks/useV2AgentChoices/cloud-agent-choices";
 import { PLATFORM } from "renderer/hotkeys";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { showHostServiceUnavailableToast } from "renderer/lib/host-service-unavailable";
@@ -179,6 +180,9 @@ export function PromptGroup({
 	// recognize.
 	const launchHostUrl = useMemo(() => {
 		const id = draft.hostId ?? machineId;
+		// "cloud" is a sentinel, not a host: resolving it would query a relay
+		// address for a machine that does not exist.
+		if (id === CLOUD_HOST_ID) return null;
 		if (!id || !activeOrganizationId) return null;
 		return (
 			resolveHostUrl({
@@ -190,8 +194,12 @@ export function PromptGroup({
 			}) ?? null
 		);
 	}, [draft.hostId, machineId, activeHostUrl, activeOrganizationId, relayUrl]);
-	const { agents: v2Agents, isFetched: v2AgentsFetched } =
+	const { agents: hostAgents, isFetched: hostAgentsFetched } =
 		useV2AgentChoices(launchHostUrl);
+	// A cloud workspace has no host to ask, so it offers the built-in presets;
+	// custom agents follow once they live in the cloud (SUPER-2127).
+	const v2Agents = hostId === CLOUD_HOST_ID ? CLOUD_AGENT_CHOICES : hostAgents;
+	const v2AgentsFetched = hostId === CLOUD_HOST_ID || hostAgentsFetched;
 	const selectableAgentIds = useMemo(
 		() => v2Agents.map((agent) => agent.id),
 		[v2Agents],
