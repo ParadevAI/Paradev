@@ -507,6 +507,17 @@ jobs:
             /agent-orchestration /parallel-coding-agents /factory-2026 \
             /mcp-install /stats /team /starchart /the-production-run
 
+      # Non-page endpoints, checked without --localized because they serve
+      # markdown and text rather than an <html> document. These are the paths
+      # src/proxy.ts must NOT rewrite into the [lang] tree: the matcher there
+      # swallowed /ingest and /monitoring for four days in 2026-08 and nothing
+      # noticed, because the pages above all kept returning 200.
+      - name: Smoke test marketing non-page endpoints
+        run: |
+          bun scripts/smoke-routes.ts "https://${{ env.MARKETING_ALIAS }}" \
+            /md/page/pricing /ja/md/page/pricing /llms.txt /agents.md \
+            /index.md /robots.txt /sitemap.xml /.well-known/mcp
+
       - name: Save marketing success status
         run: |
           cat > marketing-status.env << EOF

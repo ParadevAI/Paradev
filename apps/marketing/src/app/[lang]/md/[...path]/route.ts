@@ -1,5 +1,9 @@
 import type { MessageDescriptor } from "@lingui/core";
-import { i18n, initI18n } from "@superset/i18n";
+import { i18n, isSupportedLocale } from "@superset/i18n";
+import {
+	initServerI18n as activateServerI18n,
+	preloadServerLocale,
+} from "@superset/i18n/server";
 import { COMPANY } from "@superset/shared/constants";
 import { MCP_CAPABILITIES } from "@/app/[lang]/mcp-install/components/McpCapabilities/constants";
 import {
@@ -20,10 +24,6 @@ import {
 } from "@/lib/llms";
 import { markdownNotFound } from "@/lib/markdown-not-found";
 import { getAllPeople } from "@/lib/people";
-
-// Route handlers render outside the root layout, so the shared i18n instance
-// is not seeded for them. Idempotent.
-initI18n();
 
 interface MarkdownPage {
 	title: string;
@@ -261,9 +261,22 @@ function loadPage(section: string, slug: string): MarkdownPage | undefined {
 
 export async function GET(
 	_request: Request,
-	{ params }: { params: Promise<{ path: string[] }> },
+	{ params }: { params: Promise<{ lang: string; path: string[] }> },
 ) {
-	const { path } = await params;
+	// Route handlers render outside the root layout, so the shared i18n
+	// instance is not seeded for them. Activate the language the URL names —
+	// /md/... is English, /ja/md/... is Japanese.
+	//
+	// The locale comes from the route's own params rather than
+	// next/root-params: [lang] is a parent segment, so it is already in
+	// params here, and that works the same in a route handler as in a server
+	// component. app/i18n-server.ts reads root-params instead, which is a
+	// server-component API — using it here would risk 404ing every twin.
+	const { lang, path } = await params;
+	if (!isSupportedLocale(lang)) return markdownNotFound();
+	await preloadServerLocale(lang);
+	activateServerI18n(lang);
+	const locale = lang;
 	const [section, slug] = path;
 	const page =
 		path.length === 2 && section && slug ? loadPage(section, slug) : undefined;
@@ -271,17 +284,27 @@ export async function GET(
 		return markdownNotFound();
 	}
 
+	// The document a localized twin is the markdown of is the localized page,
+	// not the English one.
+	const canonical =
+		locale === "en"
+			? page.url
+			: page.url.replace(
+					COMPANY.MARKETING_URL,
+					`${COMPANY.MARKETING_URL}/${locale}`,
+				);
+
 	const lines = [
 		...buildFrontmatter({
 			title: page.title,
 			description: page.description ?? page.title,
-			canonical: page.url,
+			canonical,
 			lastUpdated: page.date,
 		}),
 		`# ${page.title}`,
 		"",
 		...(page.description ? [page.description, ""] : []),
-		`URL: ${page.url}`,
+		`URL: ${canonical}`,
 		...(page.date ? [`Date: ${page.date}`] : []),
 		...(page.author ? [`Author: ${page.author}`] : []),
 		"",
