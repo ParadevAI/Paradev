@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { SandboxInstance, settings } from "@blaxel/core";
 
-const IMAGE = process.env.BLAXEL_SANDBOX_IMAGE ?? "superset-hostsvc";
+const IMAGE = "superset-hostsvc";
 const REGION = process.env.BLAXEL_REGION ?? "us-pdx-1";
 const SETUP = join(import.meta.dir, "internal-setup.sh");
 const WORKSPACE = process.env.SUPERSET_SANDBOX_WORKSPACE_PATH ?? "/workspace";

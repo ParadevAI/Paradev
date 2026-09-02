@@ -197,8 +197,8 @@ What it needs, roughly in order of how much it buys:
   push the branch, provision a fresh sandbox, restore the checkout. Slower,
   but it must exist for the cases where in-place fails.
 
-Note that the *image tag* is a deploy-time env var (`BLAXEL_SANDBOX_IMAGE`),
-so new sandboxes pick up a rebuilt image for free. It is only existing ones
+Note that the *image tag* lives on the environment row (`sourceRef`, seeded from
+the `SANDBOX_IMAGE_NAME` constant), so new sandboxes pick up a rebuilt image for free. It is only existing ones
 that strand — which is why this reads as fine right up until the first
 long-lived workspace.
 

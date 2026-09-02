@@ -1,4 +1,3 @@
-import { SANDBOX_IMAGE_NAME } from "@superset/shared/constants";
 import { createEnv } from "@t3-oss/env-core";
 import { z } from "zod";
 
@@ -51,7 +50,6 @@ export const env = createEnv({
 		BLAXEL_API_KEY: z.string().min(1),
 		BLAXEL_WORKSPACE: z.string().min(1),
 		BLAXEL_REGION: z.string().min(1),
-		BLAXEL_SANDBOX_IMAGE: z.string().min(1).default(SANDBOX_IMAGE_NAME),
 		SENTRY_DSN_SANDBOX: z.string().optional(),
 		NEXT_PUBLIC_SENTRY_ENVIRONMENT: z
 			.enum(["development", "preview", "production"])

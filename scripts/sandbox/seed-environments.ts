@@ -16,7 +16,7 @@ const SHARED_ORGANIZATION = {
 } as const;
 
 export async function seedSharedEnvironments(
-	imageRef = process.env.BLAXEL_SANDBOX_IMAGE ?? SANDBOX_IMAGE_NAME,
+	imageRef = SANDBOX_IMAGE_NAME,
 ): Promise<{ imageRef: string }> {
 	await db
 		.insert(organizations)

@@ -1,10 +1,12 @@
 import { db, dbWs } from "@superset/db/client";
 import { cloudWorkspaces, environments } from "@superset/db/schema";
-import { SHARED_ENVIRONMENT_ORGANIZATION_ID } from "@superset/shared/constants";
+import {
+	SANDBOX_IMAGE_NAME,
+	SHARED_ENVIRONMENT_ORGANIZATION_ID,
+} from "@superset/shared/constants";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { and, asc, eq, inArray, isNull } from "drizzle-orm";
 import { z } from "zod";
-import { env } from "../../env";
 import { promoteSandboxToEnvironment } from "../../lib/blaxel";
 import { assertInternal, assertMember } from "../../lib/cloud-guards";
 import { jwtProcedure, userError } from "../../trpc";
@@ -103,7 +105,7 @@ export const environmentRouter = {
 					name: input.name,
 					provider: "blaxel",
 					sourceKind: "image",
-					sourceRef: env.BLAXEL_SANDBOX_IMAGE,
+					sourceRef: SANDBOX_IMAGE_NAME,
 				})
 				.returning();
 			return row;

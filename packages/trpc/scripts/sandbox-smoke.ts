@@ -71,7 +71,7 @@ try {
 			id: "smoke",
 			provider: "blaxel",
 			sourceKind: "image",
-			sourceRef: process.env.BLAXEL_SANDBOX_IMAGE ?? SANDBOX_IMAGE_NAME,
+			sourceRef: SANDBOX_IMAGE_NAME,
 			envs: {},
 		},
 		workspaceEnv: {
