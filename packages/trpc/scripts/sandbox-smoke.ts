@@ -7,6 +7,9 @@
  *
  *   bun run sandbox:smoke              # from the repo root; reads .env
  *   bun run sandbox:smoke -- --keep    # leave the sandbox up for poking at
+ *   SMOKE_SOURCE_KIND=fork SMOKE_SOURCE_REF=env-internal-… bun run sandbox:smoke
+ *                                      # provision from a golden, as the internal
+ *                                      # environment does; also checks dependencies
  *
  * Skips the API's own wrapper on purpose: the workspace row, the QStash
  * delivery and the GitHub App token mint. The mint needs the production App
@@ -27,6 +30,8 @@ import {
 const REPO_URL = "https://github.com/superset-sh/superset.git";
 const BRANCH = process.env.SMOKE_BRANCH ?? "main";
 const KEEP = process.argv.includes("--keep");
+const SOURCE_KIND = process.env.SMOKE_SOURCE_KIND === "fork" ? "fork" : "image";
+const SOURCE_REF = process.env.SMOKE_SOURCE_REF ?? SANDBOX_IMAGE_NAME;
 const HEALTH_ATTEMPTS = 40;
 const VNC_TIMEOUT_MS = 30_000;
 
@@ -70,8 +75,8 @@ try {
 		environment: {
 			id: "smoke",
 			provider: "blaxel",
-			sourceKind: "image",
-			sourceRef: SANDBOX_IMAGE_NAME,
+			sourceKind: SOURCE_KIND,
+			sourceRef: SOURCE_REF,
 			envs: {},
 		},
 		workspaceEnv: {
@@ -118,6 +123,7 @@ try {
 		`git -C ${SANDBOX_WORKSPACE_PATH} remote get-url origin`,
 		`git -C ${SANDBOX_WORKSPACE_PATH} rev-parse --abbrev-ref HEAD`,
 		"test -f /data/.workspace-bootstrapped && echo bootstrapped",
+		`test -d ${SANDBOX_WORKSPACE_PATH}/node_modules && echo deps`,
 		"pgrep -x Xvfb >/dev/null && echo xvfb",
 		"pgrep -x x11vnc >/dev/null && echo x11vnc",
 	].join("; ");
@@ -133,6 +139,12 @@ try {
 	check("repo", lines[0] === REPO_URL, lines[0] ?? "(no origin)");
 	check("branch", lines[1] === BRANCH, lines[1] ?? "(none)");
 	check("bootstrap", lines.includes("bootstrapped"), "marker present");
+	if (SOURCE_KIND === "fork")
+		check("dependencies", lines.includes("deps"), "node_modules present");
+	else
+		console.log(
+			`${at()} info dependencies: ${lines.includes("deps") ? "present" : "absent (base image bakes none)"}`,
+		);
 	check(
 		"display",
 		lines.includes("xvfb") && lines.includes("x11vnc"),

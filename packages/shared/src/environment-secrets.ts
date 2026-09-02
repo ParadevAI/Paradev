@@ -69,7 +69,9 @@ export function validateSecretKey(
 export function validateSecretValue(
 	value: string,
 ): { valid: true } | { valid: false; error: string } {
-	if (Buffer.byteLength(value) > MAX_VALUE_SIZE)
+	// TextEncoder, not Buffer: this runs in the desktop renderer, which has no
+	// Node globals, and a ReferenceError here silently killed every save.
+	if (new TextEncoder().encode(value).byteLength > MAX_VALUE_SIZE)
 		return {
 			valid: false,
 			error: `Value must be <= ${MAX_VALUE_SIZE / 1024}KB`,

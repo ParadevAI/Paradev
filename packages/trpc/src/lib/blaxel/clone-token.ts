@@ -55,9 +55,21 @@ export async function resolveCloneTarget(
 		return { cloneUrl, token: null, defaultBranch: repo.defaultBranch };
 	}
 
-	const octokit = await installationOctokit(installation.installationId);
-	const { token } = (await octokit.auth({ type: "installation" })) as {
-		token: string;
-	};
-	return { cloneUrl, token, defaultBranch: repo.defaultBranch };
+	try {
+		const octokit = await installationOctokit(installation.installationId);
+		const { token } = (await octokit.auth({ type: "installation" })) as {
+			token: string;
+		};
+		return { cloneUrl, token, defaultBranch: repo.defaultBranch };
+	} catch (error) {
+		// A public repo clones without a token, so a mint that fails (an App
+		// that isn't installed here, a stale installation) shouldn't fail the
+		// workspace. Private repos still need the token, so they still throw.
+		if (row.isPrivate) throw error;
+		console.warn(
+			`[cloud-workspace] GitHub App token mint failed for public ${repo.owner}/${repo.name}; cloning without one`,
+			error instanceof Error ? error.message : error,
+		);
+		return { cloneUrl, token: null, defaultBranch: repo.defaultBranch };
+	}
 }

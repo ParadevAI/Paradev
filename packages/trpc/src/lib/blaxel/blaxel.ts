@@ -145,10 +145,9 @@ export async function provisionSandbox(args: {
 			: await SandboxInstance.createIfNotExists({
 					name: args.name,
 					image: args.environment.sourceRef,
+					// The writable root is tmpfs sized at half of this; there is no
+					// separate disk (docs/cloud-sandbox-mismatches.md).
 					memory: memoryMb,
-					// Without disk-backed root the writable layer is tmpfs in RAM, and a
-					// checkout plus node_modules is write-heavy enough to exhaust it.
-					storageMb: 20480,
 					ports: [{ target: HOST_SERVICE_PORT, protocol: "HTTP" }],
 					region,
 					envs,

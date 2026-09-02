@@ -69,7 +69,9 @@ if command -v Xvfb >/dev/null 2>&1; then
   Xvfb :1 -screen 0 1440x900x24 -nolisten tcp >/dev/null 2>&1 &
   (
     for _ in $(seq 1 40); do [ -S /tmp/.X11-unix/X1 ] && break; sleep 0.25; done
-    openbox >/dev/null 2>&1 &
+    # openbox-session, not openbox: only the session wrapper runs
+    # ~/.config/openbox/autostart, where the golden puts its terminal and dev stack.
+    openbox-session >/dev/null 2>&1 &
     x11vnc -display :1 -localhost -rfbport 5900 -forever -shared -nopw -quiet >/dev/null 2>&1 &
   ) &
 fi

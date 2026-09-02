@@ -227,6 +227,25 @@ not the product (which is how a 5s path got reported here as 40s), and most of
 the weight is packages host-service imports at module load and never calls, so
 the lever is that import graph rather than anything about sandboxes.
 
+**The writable disk is half of memory, and there is no disk-size parameter.**
+Documented, not a quirk: "Blaxel sandboxes reserve, when possible, approximately
+50% of the available memory for the tmpfs filesystem" (Sandboxes → Overview,
+"Memory and filesystem"). The root is an overlay over a read-only EROFS image
+with a tmpfs upper layer, so 8 GB of memory gives 3.9 GB of disk, 16 GB gives
+7.9 GB, 32 GB gives 16 GB (and 8 CPUs), and every file written also occupies
+RAM. The `storageMb` our code used to pass was never a Blaxel field — the SDK
+has `memory`, `region`, `ttl`, `expires` and `volumes`, nothing for disk — and
+the `as never` cast let it through unnoticed (measured: 40960 still gave
+3.9 GB). `/bl` is the provider's control mount, not storage. A checkout plus
+`bun install` of this monorepo is ~6 GB, so a golden that carries
+`node_modules` and expects to run the dev stack needs 32 GB of memory, and
+every fork inherits that size along with the files. Filling the disk is what a
+"wedged" sandbox looks like: every `process.exec`, even `echo`, returns
+`status: failed` with empty logs from then on. The documented ways to get more
+space are volumes (one per sandbox, attached at creation, not forkable) and
+Agent Drive; neither fits the golden-and-fork model, which is why memory is the
+lever.
+
 **host-service has no HTTP health route.** Readiness is the `health.check` tRPC
 procedure; `GET /health` 404s. A probe on the wrong path looks exactly like a
 sandbox that never came up, which cost an afternoon here.

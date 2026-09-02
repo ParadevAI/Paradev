@@ -49,7 +49,12 @@ function pinnedVersion(dep: string): string {
 	return version;
 }
 
-const BUN_VERSION = "1.4.0";
+// The repo pins bun once, in .bun-version; a sandbox on any other version
+// rejects the frozen lockfile and every dependency install fails.
+const BUN_VERSION = readFileSync(
+	join(import.meta.dir, "..", "..", ".bun-version"),
+	"utf8",
+).trim();
 
 const AGENT_CLI_VERSIONS = {
 	claudeCode: "2.1.257",
