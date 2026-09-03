@@ -1,1 +1,5 @@
-export { openChangesPaneInStore } from "./openChangesPaneInStore";
+export {
+	closeVisibleChangesPane,
+	findVisibleChangesPane,
+	openChangesPaneInStore,
+} from "./openChangesPaneInStore";

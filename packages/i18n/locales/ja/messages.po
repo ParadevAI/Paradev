@@ -25654,6 +25654,10 @@ msgid "workspace.changesList.groupUnstaged"
 msgstr "未ステージ"
 
 #. js-lingui-explicit-id
+msgid "workspace.changesPill.closeChanges"
+msgstr "変更を閉じる"
+
+#. js-lingui-explicit-id
 msgid "workspace.changesPill.openChanges"
 msgstr "変更を開く"
 
@@ -25713,6 +25717,10 @@ msgstr "変更をステージ解除できませんでした"
 #. js-lingui-explicit-id
 msgid "workspace.changesTab.changeBaseBranchFailed"
 msgstr "ベースブランチの変更に失敗しました"
+
+#. js-lingui-explicit-id
+msgid "workspace.changesTab.label"
+msgstr "変更"
 
 #. js-lingui-explicit-id
 msgid "workspace.changesTab.loading"

@@ -25655,6 +25655,10 @@ msgid "workspace.changesList.groupUnstaged"
 msgstr "Fora do stage"
 
 #. js-lingui-explicit-id
+msgid "workspace.changesPill.closeChanges"
+msgstr "Fechar alterações"
+
+#. js-lingui-explicit-id
 msgid "workspace.changesPill.openChanges"
 msgstr "Abrir alterações"
 
@@ -25714,6 +25718,10 @@ msgstr "Não foi possível remover as alterações do stage"
 #. js-lingui-explicit-id
 msgid "workspace.changesTab.changeBaseBranchFailed"
 msgstr "Falha ao trocar a branch base"
+
+#. js-lingui-explicit-id
+msgid "workspace.changesTab.label"
+msgstr "Alterações"
 
 #. js-lingui-explicit-id
 msgid "workspace.changesTab.loading"

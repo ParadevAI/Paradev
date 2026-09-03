@@ -36,19 +36,23 @@ interface PRStatusGroupProps {
 	state: PRFlowState;
 	workspaceId: string;
 	onRefresh?: () => void;
+	/** Whether a Changes pane is in view — the face reads as pressed. */
+	isChangesOpen?: boolean;
+	/** Accessible name for the face's toggle ("Open changes" / "Close changes"). */
+	toggleLabel?: string;
 	/**
-	 * Opens the Changes pane — the badge's main click, since it replaced the
-	 * diff-stat pill as the control's face once a PR exists.
+	 * Toggles the Changes pane — the badge's main click, since it replaced
+	 * the diff-stat pill as the control's face once a PR exists.
 	 */
-	onOpenChanges?: () => void;
+	onToggleChanges?: () => void;
 }
 
 /**
  * Top-bar PR badge — status icon + number + compact CI/review indicators,
  * with a dropdown for merge actions (open, non-draft PRs), marking a draft
  * ready for review, the in-app PR view, and a GitHub link.
- * Clicking the badge opens the Changes pane; the in-app PR view lives in the
- * menu (hidden for session workspaces — null projectId — since the PR route
+ * Clicking the badge toggles the Changes pane; the in-app PR view lives in
+ * the menu (hidden for session workspaces — null projectId — since the PR route
  * is project-scoped). Hovering surfaces a rich detail popover (title,
  * branch, CI summary, last activity).
  *
@@ -59,7 +63,9 @@ export function PRStatusGroup({
 	state,
 	workspaceId,
 	onRefresh,
-	onOpenChanges,
+	isChangesOpen = false,
+	toggleLabel,
+	onToggleChanges,
 }: PRStatusGroupProps) {
 	const { t } = useLingui();
 	const navigate = useNavigate();
@@ -199,7 +205,14 @@ export function PRStatusGroup({
 	const badgeContent = (
 		<>
 			<PRIcon state={linkState} className="size-4" />
-			<span className="font-mono text-xs text-muted-foreground">
+			{/* The number brightens while pressed — the state tint alone moves
+			    the fill too little to read as a toggle. */}
+			<span
+				className={cn(
+					"font-mono text-xs",
+					isChangesOpen ? "text-foreground" : "text-muted-foreground",
+				)}
+			>
 				#{pr.number}
 			</span>
 			{showIndicators && <PRStatusIndicators checks={checks} />}
@@ -208,6 +221,7 @@ export function PRStatusGroup({
 	const badgeClass = cn(
 		"flex h-full items-center gap-1 px-1.5 outline-none transition-colors",
 		tint.hover,
+		isChangesOpen && tint.pressed,
 	);
 
 	return (
@@ -219,14 +233,20 @@ export function PRStatusGroup({
 		>
 			<HoverCard openDelay={150} closeDelay={120}>
 				<HoverCardTrigger asChild>
-					{/* The face opens the Changes pane — the badge replaced the
+					{/* The face toggles the Changes pane — the badge replaced the
 					    diff-stat pill, so its click keeps that pill's job; the PR
 					    view is one menu entry (or the hover card) away. */}
-					{onOpenChanges != null ? (
+					{onToggleChanges != null ? (
 						<button
 							type="button"
 							className={badgeClass}
-							onClick={onOpenChanges}
+							aria-pressed={isChangesOpen}
+							// The visible text is only the PR number; name the action
+							// and keep the number so the badge is still identifiable.
+							aria-label={
+								toggleLabel ? `${toggleLabel}, #${pr.number}` : undefined
+							}
+							onClick={onToggleChanges}
 						>
 							{badgeContent}
 						</button>
@@ -381,6 +401,8 @@ export function PRStatusGroup({
 function stateTintClasses(state: PRState): {
 	container: string;
 	hover: string;
+	/** Face fill while the Changes pane it toggles is in view. */
+	pressed: string;
 	divider: string;
 } {
 	switch (state) {
@@ -388,30 +410,35 @@ function stateTintClasses(state: PRState): {
 			return {
 				container: "bg-emerald-500/10",
 				hover: "hover:bg-emerald-500/15 focus-visible:bg-emerald-500/15",
+				pressed: "bg-emerald-500/20",
 				divider: "bg-emerald-500/30",
 			};
 		case "merged":
 			return {
 				container: "bg-violet-500/10",
 				hover: "hover:bg-violet-500/15 focus-visible:bg-violet-500/15",
+				pressed: "bg-violet-500/20",
 				divider: "bg-violet-500/30",
 			};
 		case "closed":
 			return {
 				container: "bg-rose-500/10",
 				hover: "hover:bg-rose-500/15 focus-visible:bg-rose-500/15",
+				pressed: "bg-rose-500/20",
 				divider: "bg-rose-500/30",
 			};
 		case "draft":
 			return {
 				container: "bg-muted/40",
 				hover: "hover:bg-muted/60 focus-visible:bg-muted/60",
+				pressed: "bg-muted/70",
 				divider: "bg-border",
 			};
 		case "queued":
 			return {
 				container: "bg-amber-500/10",
 				hover: "hover:bg-amber-500/15 focus-visible:bg-amber-500/15",
+				pressed: "bg-amber-500/20",
 				divider: "bg-amber-500/30",
 			};
 	}

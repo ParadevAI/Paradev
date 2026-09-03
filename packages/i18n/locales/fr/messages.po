@@ -25654,6 +25654,10 @@ msgid "workspace.changesList.groupUnstaged"
 msgstr "Non indexés"
 
 #. js-lingui-explicit-id
+msgid "workspace.changesPill.closeChanges"
+msgstr "Fermer les modifications"
+
+#. js-lingui-explicit-id
 msgid "workspace.changesPill.openChanges"
 msgstr "Ouvrir les modifications"
 
@@ -25713,6 +25717,10 @@ msgstr "Impossible de désindexer les modifications"
 #. js-lingui-explicit-id
 msgid "workspace.changesTab.changeBaseBranchFailed"
 msgstr "Échec du changement de branche de base"
+
+#. js-lingui-explicit-id
+msgid "workspace.changesTab.label"
+msgstr "Modifications"
 
 #. js-lingui-explicit-id
 msgid "workspace.changesTab.loading"

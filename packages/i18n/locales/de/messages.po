@@ -25655,6 +25655,10 @@ msgid "workspace.changesList.groupUnstaged"
 msgstr "Nicht gestaged"
 
 #. js-lingui-explicit-id
+msgid "workspace.changesPill.closeChanges"
+msgstr "Änderungen schließen"
+
+#. js-lingui-explicit-id
 msgid "workspace.changesPill.openChanges"
 msgstr "Änderungen öffnen"
 
@@ -25714,6 +25718,10 @@ msgstr "Stagen konnte nicht aufgehoben werden"
 #. js-lingui-explicit-id
 msgid "workspace.changesTab.changeBaseBranchFailed"
 msgstr "Basis-Branch konnte nicht geändert werden"
+
+#. js-lingui-explicit-id
+msgid "workspace.changesTab.label"
+msgstr "Änderungen"
 
 #. js-lingui-explicit-id
 msgid "workspace.changesTab.loading"

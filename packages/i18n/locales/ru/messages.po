@@ -25655,6 +25655,10 @@ msgid "workspace.changesList.groupUnstaged"
 msgstr "Не проиндексировано"
 
 #. js-lingui-explicit-id
+msgid "workspace.changesPill.closeChanges"
+msgstr "Закрыть изменения"
+
+#. js-lingui-explicit-id
 msgid "workspace.changesPill.openChanges"
 msgstr "Открыть изменения"
 
@@ -25714,6 +25718,10 @@ msgstr "Не удалось снять индексацию"
 #. js-lingui-explicit-id
 msgid "workspace.changesTab.changeBaseBranchFailed"
 msgstr "Не удалось изменить базовую ветку"
+
+#. js-lingui-explicit-id
+msgid "workspace.changesTab.label"
+msgstr "Изменения"
 
 #. js-lingui-explicit-id
 msgid "workspace.changesTab.loading"

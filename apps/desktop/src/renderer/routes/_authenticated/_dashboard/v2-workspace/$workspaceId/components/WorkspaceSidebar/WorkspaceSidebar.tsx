@@ -12,16 +12,18 @@ import {
 	type WorkspaceSidebarTab,
 } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal/schema";
 import { useSettings } from "renderer/stores/settings";
+import { useRowlessSidebarTabStore } from "../../state/rowlessSidebarTabStore";
 import type { CommentPaneData, DiffFocusSide } from "../../types";
+import {
+	DEFAULT_WORKSPACE_SIDEBAR_TAB,
+	setWorkspaceSidebarTab,
+} from "../../utils/setWorkspaceSidebarTab";
 import { FilesTab } from "./components/FilesTab";
 import { PRActionHeader } from "./components/PRActionHeader";
 import { SidebarHeader } from "./components/SidebarHeader";
+import { type SelectedDiffTarget, useChangesTab } from "./hooks/useChangesTab";
 import { useReviewTab } from "./hooks/useReviewTab";
 import type { SidebarTabDefinition } from "./types";
-
-// Gates the "Create PR" button only — the chat-driven create flow doesn't
-// exist in v2 yet. The PR status group (link + merge dropdown for an open PR)
-// always renders so users can see PR state and merge once a PR exists.
 
 const LABELLED_TAB_WIDTH = 88;
 const LABEL_HYSTERESIS = 20;
@@ -49,6 +51,8 @@ interface WorkspaceSidebarProps {
 	onOpenComment?: (comment: CommentPaneData) => void;
 	onSearch?: () => void;
 	selectedFilePath?: string;
+	/** The diff pane's current file, highlighted in the Changes tab. */
+	selectedDiffTarget?: SelectedDiffTarget;
 	pendingReveal?: PendingReveal | null;
 	workspaceId: string;
 }
@@ -59,6 +63,7 @@ export function WorkspaceSidebar({
 	onOpenComment,
 	onSearch,
 	selectedFilePath,
+	selectedDiffTarget,
 	pendingReveal,
 	workspaceId,
 }: WorkspaceSidebarProps) {
@@ -72,21 +77,45 @@ export function WorkspaceSidebar({
 				.where(({ localState }) => eq(localState.workspaceId, workspaceId)),
 		[collections, workspaceId],
 	);
+	// Workspaces without a local row (auto-included local mains) keep their
+	// tab in the session-only fallback that setWorkspaceSidebarTab writes.
+	const rowlessTab = useRowlessSidebarTabStore((s) => s.tabs[workspaceId]);
+	const clearRowlessTab = useRowlessSidebarTabStore((s) => s.clearTab);
+	// The live query can lag a render when the workspace switches; a row that
+	// still belongs to the previous workspace must not speak for this one.
+	const row = localState?.workspaceId === workspaceId ? localState : undefined;
 	const activeTab: SidebarTabId =
-		localState && isSidebarTabId(localState.sidebarState.activeTab)
-			? localState.sidebarState.activeTab
-			: "files";
+		row && isSidebarTabId(row.sidebarState.activeTab)
+			? row.sidebarState.activeTab
+			: (rowlessTab ?? DEFAULT_WORKSPACE_SIDEBAR_TAB);
+
+	// A row created while a rowless choice is pending (pinning a local main)
+	// starts on the default tab: carry the choice into the row once, then
+	// drop the session entry so it can't resurface if the row goes away.
+	const hasRow = row != null;
+	useEffect(() => {
+		if (!hasRow || rowlessTab === undefined) return;
+		setWorkspaceSidebarTab(collections, workspaceId, rowlessTab);
+		clearRowlessTab(workspaceId);
+	}, [hasRow, rowlessTab, collections, workspaceId, clearRowlessTab]);
 
 	function setActiveTab(tab: string) {
 		if (!isSidebarTabId(tab)) return;
-		if (!collections.v2WorkspaceLocalState.get(workspaceId)) return;
-		collections.v2WorkspaceLocalState.update(workspaceId, (draft) => {
-			draft.sidebarState.activeTab = tab;
-		});
+		setWorkspaceSidebarTab(collections, workspaceId, tab);
 	}
 
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [compact, setCompact] = useState(false);
+
+	const changesTab = useChangesTab({
+		workspaceId,
+		selectedDiffTarget,
+		onSelectFile: onSelectDiffFile
+			? (path, openInNewTab, changeKey) =>
+					onSelectDiffFile(path, openInNewTab, undefined, undefined, changeKey)
+			: undefined,
+		onOpenFile: onSelectFile,
+	});
 
 	// PR review comments are always relative to the base branch, so they map
 	// onto the "against-base" source group — matching the same query (and
@@ -143,7 +172,7 @@ export function WorkspaceSidebar({
 		),
 	};
 
-	const tabs: SidebarTabDefinition[] = [filesTab, reviewTab];
+	const tabs: SidebarTabDefinition[] = [filesTab, changesTab, reviewTab];
 	const activeTabDef = tabs.find((t) => t.id === activeTab) ?? tabs[0];
 
 	const tabCount = tabs.length;

@@ -11,7 +11,6 @@ import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
 import { useHotkey } from "renderer/hotkeys";
 import type { V2TerminalPresetRow } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
 import { useRightSidebarToggleIntent } from "renderer/stores/right-sidebar-toggle-intent";
-import { useSettings } from "renderer/stores/settings";
 import type { StoreApi } from "zustand";
 import type {
 	BrowserPaneData,
@@ -19,7 +18,6 @@ import type {
 	PaneViewerData,
 	TerminalPaneData,
 } from "../../types";
-import { openChangesPaneInStore } from "../../utils/openChangesPaneInStore";
 import { useDefaultBrowserUrl } from "../useDefaultBrowserUrl";
 import type { TerminalLauncher } from "../useV2TerminalLauncher";
 
@@ -28,6 +26,7 @@ export function useWorkspaceHotkeys({
 	matchedPresets,
 	executePreset,
 	addTerminalTab,
+	openChangesPane,
 	paneRegistry,
 	launcher,
 	onBeforeCloseTab,
@@ -37,6 +36,7 @@ export function useWorkspaceHotkeys({
 	matchedPresets: V2TerminalPresetRow[];
 	executePreset: (preset: V2TerminalPresetRow) => void | Promise<void>;
 	addTerminalTab: () => Promise<void>;
+	openChangesPane: () => void;
 	paneRegistry: PaneRegistry<PaneViewerData>;
 	launcher: TerminalLauncher;
 	isSandbox: boolean;
@@ -81,7 +81,7 @@ export function useWorkspaceHotkeys({
 	});
 
 	useHotkey("OPEN_DIFF_VIEWER", () => {
-		openChangesPaneInStore(store, useSettings.getState().changesOpenTarget);
+		openChangesPane();
 	});
 
 	// --- Tab management ---

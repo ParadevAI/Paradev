@@ -87,7 +87,7 @@ export function ShipControl({
 	// against) — measuring against the repo default gets stacked branches
 	// exactly backwards. Same 10s cadence as the PR/sync queries so
 	// committing (here or in a terminal) enables it promptly; both queries
-	// dedupe with ChangesPanel's identical ones.
+	// dedupe with the sidebar Changes tab's identical ones.
 	const baseBranchQuery = workspaceTrpc.git.getBaseBranch.useQuery(
 		{ workspaceId },
 		{ enabled: canCreatePr, staleTime: Number.POSITIVE_INFINITY },

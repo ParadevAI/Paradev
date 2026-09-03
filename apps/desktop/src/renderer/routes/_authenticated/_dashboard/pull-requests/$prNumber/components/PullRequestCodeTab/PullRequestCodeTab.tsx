@@ -900,9 +900,11 @@ export function PullRequestCodeTab({
 				)}
 				<div className="flex min-h-0 flex-1 flex-col">
 					<DiffViewToolbar
-						fileCount={files.length}
-						isTreeCollapsed={isTreeCollapsed}
-						onToggleTree={() => setManualTreeCollapsed(!isTreeCollapsed)}
+						tree={{
+							fileCount: files.length,
+							isCollapsed: isTreeCollapsed,
+							onToggle: () => setManualTreeCollapsed(!isTreeCollapsed),
+						}}
 						areAllFilesCollapsed={areAllFilesCollapsed}
 						onToggleCollapseAll={() =>
 							setAllFilesCollapsed(

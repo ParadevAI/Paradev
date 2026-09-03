@@ -25655,6 +25655,10 @@ msgid "workspace.changesList.groupUnstaged"
 msgstr "Chưa stage"
 
 #. js-lingui-explicit-id
+msgid "workspace.changesPill.closeChanges"
+msgstr "Đóng thay đổi"
+
+#. js-lingui-explicit-id
 msgid "workspace.changesPill.openChanges"
 msgstr "Mở thay đổi"
 
@@ -25714,6 +25718,10 @@ msgstr "Không thể bỏ stage các thay đổi"
 #. js-lingui-explicit-id
 msgid "workspace.changesTab.changeBaseBranchFailed"
 msgstr "Không thể đổi nhánh gốc"
+
+#. js-lingui-explicit-id
+msgid "workspace.changesTab.label"
+msgstr "Thay đổi"
 
 #. js-lingui-explicit-id
 msgid "workspace.changesTab.loading"

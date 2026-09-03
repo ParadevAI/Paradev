@@ -25655,6 +25655,10 @@ msgid "workspace.changesList.groupUnstaged"
 msgstr "Nepřipravené"
 
 #. js-lingui-explicit-id
+msgid "workspace.changesPill.closeChanges"
+msgstr "Zavřít změny"
+
+#. js-lingui-explicit-id
 msgid "workspace.changesPill.openChanges"
 msgstr "Otevřít změny"
 
@@ -25714,6 +25718,10 @@ msgstr "Nepodařilo se zrušit přípravu změn"
 #. js-lingui-explicit-id
 msgid "workspace.changesTab.changeBaseBranchFailed"
 msgstr "Nepodařilo se změnit základní větev"
+
+#. js-lingui-explicit-id
+msgid "workspace.changesTab.label"
+msgstr "Změny"
 
 #. js-lingui-explicit-id
 msgid "workspace.changesTab.loading"

@@ -12,6 +12,7 @@ import {
 import { useStore } from "zustand";
 import type { StoreApi } from "zustand/vanilla";
 import type { FilePaneData, PaneViewerData } from "../../types";
+import { setWorkspaceSidebarTab } from "../../utils/setWorkspaceSidebarTab";
 import {
 	type RecentFile,
 	useRecentlyViewedFiles,
@@ -189,13 +190,8 @@ export function useWorkspaceFileNavigation({
 				return;
 			}
 			setRightSidebarOpen(true);
-			// The workspace sidebar reads its active tab from per-workspace local
-			// state — switch it so the reveal doesn't land behind the Review tab.
-			if (collections.v2WorkspaceLocalState.get(workspace.id)) {
-				collections.v2WorkspaceLocalState.update(workspace.id, (draft) => {
-					draft.sidebarState.activeTab = "files";
-				});
-			}
+			// Switch the sidebar's tab too, or the reveal lands behind Changes/Review.
+			setWorkspaceSidebarTab(collections, workspace.id, "files");
 			setSelectedFilePath(path);
 			setPendingReveal({ path, isDirectory });
 		},

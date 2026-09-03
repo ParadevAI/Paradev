@@ -1,5 +1,8 @@
 import type { WorkspaceStore } from "@superset/panes";
 import { useCallback } from "react";
+import type { V2UserPreferencesApi } from "renderer/hooks/useV2UserPreferences";
+import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
+import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import type { V2TerminalPresetRow } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
 import { useSettings } from "renderer/stores/settings";
 import type { StoreApi } from "zustand/vanilla";
@@ -13,8 +16,15 @@ import type {
 	PaneViewerData,
 	TerminalPaneData,
 } from "../../types";
-import { openChangesPaneInStore } from "../../utils/openChangesPaneInStore";
+import {
+	closeVisibleChangesPane,
+	openChangesPaneInStore,
+} from "../../utils/openChangesPaneInStore";
 import { openPagePaneInStore } from "../../utils/openPagePaneInStore";
+import {
+	getWorkspaceSidebarTab,
+	setWorkspaceSidebarTab,
+} from "../../utils/setWorkspaceSidebarTab";
 import { useDefaultBrowserUrl } from "../useDefaultBrowserUrl";
 import type { TerminalLauncher } from "../useV2TerminalLauncher";
 
@@ -23,6 +33,7 @@ export function useWorkspacePaneOpeners({
 	launcher,
 	newTabPresets,
 	executePreset,
+	setRightSidebarOpen,
 }: {
 	store: StoreApi<WorkspaceStore<PaneViewerData>>;
 	launcher: TerminalLauncher;
@@ -31,6 +42,7 @@ export function useWorkspacePaneOpeners({
 		preset: V2TerminalPresetRow,
 		options?: { target?: "new-tab" | "active-tab" },
 	) => void | Promise<void>;
+	setRightSidebarOpen: V2UserPreferencesApi["setRightSidebarOpen"];
 }): {
 	openDiffPane: (
 		filePath: string,
@@ -43,6 +55,8 @@ export function useWorkspacePaneOpeners({
 	addChatV3Tab: () => void;
 	addBrowserTab: () => void;
 	openChangesPane: () => void;
+	/** Close the visible Changes pane, or open/focus one when none is showing. */
+	toggleChangesPane: () => void;
 	openCommentPane: (comment: CommentPaneData) => void;
 	openPagePane: (page: PagePaneData) => void;
 } {
@@ -195,9 +209,29 @@ export function useWorkspacePaneOpeners({
 		[store],
 	);
 
+	const { workspace } = useWorkspace();
+	const collections = useCollections();
+	// The changed-files list lives in the sidebar's Changes tab, so opening
+	// Changes reveals it alongside the pane — with the sidebar closed the pane
+	// alone would have no file picker.
 	const openChangesPane = useCallback(() => {
+		setRightSidebarOpen(true);
+		setWorkspaceSidebarTab(collections, workspace.id, "changes");
 		openChangesPaneInStore(store, useSettings.getState().changesOpenTarget);
-	}, [store]);
+	}, [store, setRightSidebarOpen, collections, workspace.id]);
+
+	// Opening brings the sidebar along on Changes, so closing takes it back
+	// down — unless the sidebar has since moved to Files or Review, where
+	// it's serving something else and stays.
+	const toggleChangesPane = useCallback(() => {
+		if (closeVisibleChangesPane(store)) {
+			if (getWorkspaceSidebarTab(collections, workspace.id) === "changes") {
+				setRightSidebarOpen(false);
+			}
+			return;
+		}
+		openChangesPane();
+	}, [store, openChangesPane, collections, workspace.id, setRightSidebarOpen]);
 
 	const openPagePane = useCallback(
 		(page: PagePaneData) => {
@@ -212,6 +246,7 @@ export function useWorkspacePaneOpeners({
 		addChatV3Tab,
 		addBrowserTab,
 		openChangesPane,
+		toggleChangesPane,
 		openCommentPane,
 		openPagePane,
 	};

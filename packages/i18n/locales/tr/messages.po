@@ -25655,6 +25655,10 @@ msgid "workspace.changesList.groupUnstaged"
 msgstr "Hazırlanmamış"
 
 #. js-lingui-explicit-id
+msgid "workspace.changesPill.closeChanges"
+msgstr "Değişiklikleri kapat"
+
+#. js-lingui-explicit-id
 msgid "workspace.changesPill.openChanges"
 msgstr "Değişiklikleri aç"
 
@@ -25714,6 +25718,10 @@ msgstr "Değişiklikler hazırlıktan çıkarılamadı"
 #. js-lingui-explicit-id
 msgid "workspace.changesTab.changeBaseBranchFailed"
 msgstr "Temel dal değiştirilemedi"
+
+#. js-lingui-explicit-id
+msgid "workspace.changesTab.label"
+msgstr "Değişiklikler"
 
 #. js-lingui-explicit-id
 msgid "workspace.changesTab.loading"

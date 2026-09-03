@@ -1,6 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
+import type { ReactNode } from "react";
 import {
 	LuChevronDown,
 	LuChevronUp,
@@ -21,20 +22,28 @@ export interface DiffViewToolbarCommentNav {
 	onNext: () => void;
 }
 
-interface DiffViewToolbarProps {
+export interface DiffViewToolbarTreeToggle {
 	fileCount: number;
-	isTreeCollapsed: boolean;
-	onToggleTree: () => void;
+	isCollapsed: boolean;
+	onToggle: () => void;
+}
+
+interface DiffViewToolbarProps {
+	/** File-tree pill; omitted where the file list lives outside the diff (the
+	 * workspace Changes pane defers to the sidebar's Changes tab). */
+	tree?: DiffViewToolbarTreeToggle | null;
 	areAllFilesCollapsed: boolean;
 	onToggleCollapseAll: () => void;
 	/** Prev/next review-comment cluster; hidden when null or total is 0. */
 	commentNav?: DiffViewToolbarCommentNav | null;
+	/** Rendered after the left-hand controls — the DiffPane's section label. */
+	children?: ReactNode;
 }
 
 /**
  * Toolbar row above a card-styled diff (the PR Code tab and the v2-workspace
- * DiffPane): file-tree toggle + collapse/expand-all on the left, comment
- * navigation + unified/split on the right. The unified/split toggles
+ * DiffPane): optional file-tree toggle + collapse/expand-all on the left,
+ * comment navigation + unified/split on the right. The unified/split toggles
  * read/write the persisted app setting directly — the same one every diff
  * surface renders from — so a toggle made here carries across surfaces
  * instead of silently overriding the user's saved preference with a local
@@ -45,12 +54,11 @@ interface DiffViewToolbarProps {
  * every existing translation valid.
  */
 export function DiffViewToolbar({
-	fileCount,
-	isTreeCollapsed,
-	onToggleTree,
+	tree,
 	areAllFilesCollapsed,
 	onToggleCollapseAll,
 	commentNav,
+	children,
 }: DiffViewToolbarProps) {
 	const { t } = useLingui();
 	const diffStyle = useSettings((s) => s.diffStyle);
@@ -67,43 +75,45 @@ export function DiffViewToolbar({
 	return (
 		<div className="flex shrink-0 items-center justify-between gap-1 border-b border-border/20 px-2 py-1.5">
 			<div className="flex items-center gap-1">
-				<button
-					type="button"
-					onClick={onToggleTree}
-					aria-pressed={!isTreeCollapsed}
-					aria-label={
-						isTreeCollapsed
-							? t({
-									id: "dashboard.pullRequests.codeTab.showFileTree",
-									message: "Show file tree",
-								})
-							: t({
-									id: "dashboard.pullRequests.codeTab.hideFileTree",
-									message: "Hide file tree",
-								})
-					}
-					className={cn(
-						"flex items-center gap-1.5 rounded-md px-1.5 py-1 transition-colors",
-						isTreeCollapsed
-							? "text-muted-foreground hover:bg-fill-hover hover:text-foreground"
-							: "bg-secondary text-foreground",
-					)}
-				>
-					<LuFiles className="size-3.5 shrink-0" strokeWidth={1.5} />
-					<span className="text-[11px] font-medium">
-						<Trans id="dashboard.pullRequests.codeTab.files">Files</Trans>
-					</span>
-					<span
+				{tree != null && (
+					<button
+						type="button"
+						onClick={tree.onToggle}
+						aria-pressed={!tree.isCollapsed}
+						aria-label={
+							tree.isCollapsed
+								? t({
+										id: "dashboard.pullRequests.codeTab.showFileTree",
+										message: "Show file tree",
+									})
+								: t({
+										id: "dashboard.pullRequests.codeTab.hideFileTree",
+										message: "Hide file tree",
+									})
+						}
 						className={cn(
-							"text-[11px] tabular-nums",
-							isTreeCollapsed
-								? "text-muted-foreground/70"
-								: "text-muted-foreground",
+							"flex items-center gap-1.5 rounded-md px-1.5 py-1 transition-colors",
+							tree.isCollapsed
+								? "text-muted-foreground hover:bg-fill-hover hover:text-foreground"
+								: "bg-secondary text-foreground",
 						)}
 					>
-						{fileCount}
-					</span>
-				</button>
+						<LuFiles className="size-3.5 shrink-0" strokeWidth={1.5} />
+						<span className="text-[11px] font-medium">
+							<Trans id="dashboard.pullRequests.codeTab.files">Files</Trans>
+						</span>
+						<span
+							className={cn(
+								"text-[11px] tabular-nums",
+								tree.isCollapsed
+									? "text-muted-foreground/70"
+									: "text-muted-foreground",
+							)}
+						>
+							{tree.fileCount}
+						</span>
+					</button>
+				)}
 				<Tooltip>
 					<TooltipTrigger asChild>
 						<button
@@ -141,6 +151,12 @@ export function DiffViewToolbar({
 						)}
 					</TooltipContent>
 				</Tooltip>
+				{children != null && (
+					<>
+						<div className="mx-0.5 h-4 w-px bg-border" />
+						{children}
+					</>
+				)}
 			</div>
 			<div className="flex items-center gap-1">
 				{commentNav != null && commentNav.total > 0 && (

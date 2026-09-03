@@ -120,9 +120,8 @@ export const workspaceRunTerminalStateSchema = z.object({
 	stopRequestedAt: z.number().optional(),
 });
 
-// "changes" and "pages" are retired tabs: the Changes surface moved into the
-// workspace's Changes pane, so persisted rows heal to "files" below.
-export const WORKSPACE_SIDEBAR_TABS = ["files", "review"] as const;
+// "pages" is a retired tab; persisted rows on it heal to "changes" below.
+export const WORKSPACE_SIDEBAR_TABS = ["changes", "files", "review"] as const;
 
 const WORKSPACE_SIDEBAR_TAB_SCHEMA = z.enum(WORKSPACE_SIDEBAR_TABS);
 
@@ -144,7 +143,7 @@ export const workspaceLocalStateSchema = z.object({
 		sectionId: z.string().min(1).nullable().default(null),
 		changesFilter: changesFilterSchema.default({ kind: "all" }),
 		changesViewMode: z.enum(["folders", "tree"]).default("folders"),
-		activeTab: WORKSPACE_SIDEBAR_TAB_SCHEMA.default("files"),
+		activeTab: WORKSPACE_SIDEBAR_TAB_SCHEMA.default("changes"),
 		isHidden: z.boolean().default(false),
 		// Epoch ms when the user pinned this workspace to the sidebar's Pinned
 		// section; null = not pinned. Ordering is pinnedAt ascending.
@@ -188,7 +187,7 @@ const SIDEBAR_STATE_DEFAULTS = {
 	sectionId: null,
 	changesFilter: { kind: "all" },
 	changesViewMode: "folders",
-	activeTab: "files",
+	activeTab: "changes",
 	isHidden: false,
 	pinnedAt: null,
 } as const;
@@ -498,7 +497,7 @@ export function healWorkspaceLocalState(raw: unknown): WorkspaceLocalStateRow {
 		sidebarState: {
 			...SIDEBAR_STATE_DEFAULTS,
 			...sidebar,
-			activeTab: WORKSPACE_SIDEBAR_TAB_SCHEMA.catch("files").parse(
+			activeTab: WORKSPACE_SIDEBAR_TAB_SCHEMA.catch("changes").parse(
 				sidebar.activeTab,
 			),
 		} as WorkspaceLocalStateRow["sidebarState"],

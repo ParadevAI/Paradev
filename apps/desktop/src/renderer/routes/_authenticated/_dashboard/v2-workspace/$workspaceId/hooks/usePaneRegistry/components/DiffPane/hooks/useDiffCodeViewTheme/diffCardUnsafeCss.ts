@@ -61,6 +61,19 @@ export function diffCardUnsafeCss(
 		border-top-left-radius: 0;
 		border-top-right-radius: 0;
 	}
+	/* Each file gets its own shadow root — header, icon sprite, then the
+	 * [data-diff] body (confirmed live) — and collapsing a file drops the
+	 * body from that root, leaving the header as the whole card with no
+	 * bottom edge. Close it: full border and rounded corners all around. A
+	 * collapsed header's sticky box is only as tall as itself, so nothing
+	 * ever scrolls behind its corners and the notch concern above doesn't
+	 * apply. Any body element counts — Pierre renders plain-file items as
+	 * [data-code] rather than [data-diff]. Same specificity as the sticky
+	 * rule; later, so it wins. */
+	[data-diffs-header='default']:not(:has(~ [data-diff], ~ [data-code], ~ [data-file])) {
+		border-bottom: 1px solid var(--border);
+		border-radius: 0.75rem;
+	}
 	/* Pierre renders the full relative path as one plain-text node here;
 	 * replaced by our own filename/directory split rendered through
 	 * renderHeaderFilenameSuffix, which sits right after this in the DOM so
@@ -78,6 +91,14 @@ export function diffCardUnsafeCss(
 	[data-diffs-header='default'] slot[name='header-filename-suffix']::slotted(*) {
 		min-width: 0;
 		overflow: hidden;
+	}
+	/* Pierre lays [data-metadata] out as the +/- counts first, then the
+	 * slotted header actions. The actions keep their width while hidden
+	 * (opacity 0 until hover), which parked the counts a couple hundred
+	 * pixels in from the card's right edge. Ordering the slotted actions
+	 * first keeps the counts at the edge; the actions surface to their left. */
+	[data-diffs-header='default'] [data-metadata] slot[name='header-metadata']::slotted(*) {
+		order: -1;
 	}
 	/* Match PullRequestRow's diff-stat colors (the PR list view) instead of
 	 * the shared hook's own green/red, which use a different palette. */

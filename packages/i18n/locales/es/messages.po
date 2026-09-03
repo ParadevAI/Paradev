@@ -25655,6 +25655,10 @@ msgid "workspace.changesList.groupUnstaged"
 msgstr "Sin preparar"
 
 #. js-lingui-explicit-id
+msgid "workspace.changesPill.closeChanges"
+msgstr "Cerrar cambios"
+
+#. js-lingui-explicit-id
 msgid "workspace.changesPill.openChanges"
 msgstr "Abrir cambios"
 
@@ -25714,6 +25718,10 @@ msgstr "No se pudieron quitar los cambios de preparados"
 #. js-lingui-explicit-id
 msgid "workspace.changesTab.changeBaseBranchFailed"
 msgstr "No se pudo cambiar la rama base"
+
+#. js-lingui-explicit-id
+msgid "workspace.changesTab.label"
+msgstr "Cambios"
 
 #. js-lingui-explicit-id
 msgid "workspace.changesTab.loading"

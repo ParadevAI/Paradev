@@ -25655,6 +25655,10 @@ msgid "workspace.changesList.groupUnstaged"
 msgstr "未暫存"
 
 #. js-lingui-explicit-id
+msgid "workspace.changesPill.closeChanges"
+msgstr "關閉更改"
+
+#. js-lingui-explicit-id
 msgid "workspace.changesPill.openChanges"
 msgstr "開啟更改"
 
@@ -25714,6 +25718,10 @@ msgstr "無法取消暫存更改"
 #. js-lingui-explicit-id
 msgid "workspace.changesTab.changeBaseBranchFailed"
 msgstr "更改基準分支失敗"
+
+#. js-lingui-explicit-id
+msgid "workspace.changesTab.label"
+msgstr "更改"
 
 #. js-lingui-explicit-id
 msgid "workspace.changesTab.loading"

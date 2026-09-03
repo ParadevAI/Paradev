@@ -283,7 +283,7 @@ describe("withReadHeal end-to-end via real localStorageCollectionOptions", () =>
 		expect(row?.recentlyViewedFiles).toEqual([]);
 		expect(row?.workspaceRunTerminals).toEqual({});
 		// Nested sidebarState defaults filled.
-		expect(row?.sidebarState.activeTab).toBe("files");
+		expect(row?.sidebarState.activeTab).toBe("changes");
 		expect(row?.sidebarState.changesFilter).toEqual({ kind: "all" });
 		expect(row?.sidebarState.isHidden).toBe(false);
 	});

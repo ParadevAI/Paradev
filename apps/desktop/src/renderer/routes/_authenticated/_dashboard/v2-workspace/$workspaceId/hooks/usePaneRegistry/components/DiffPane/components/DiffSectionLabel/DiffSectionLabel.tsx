@@ -15,24 +15,22 @@ const GROUP_TITLES: Record<GroupKey, MessageDescriptor> = {
 	commit: msg({ id: "workspace.changes.groupCommitted", message: "Committed" }),
 };
 
-interface DiffSectionBarProps {
+interface DiffSectionLabelProps {
 	kind: GroupKey;
 	count: number;
 }
 
 /**
- * Sticky section bar above the diff scroll area. Shows the source group
- * (unstaged / staged / committed …) of the topmost visible file so the current
- * section stays pinned — like the sidebar's ChangesSection — while you scroll.
+ * Current-section label in the diff toolbar row. Names the source group
+ * (unstaged / staged / committed …) of the topmost visible file so the
+ * section stays in view — like the sidebar's ChangesSection headers — while
+ * you scroll, without spending a row of its own.
  */
-export function DiffSectionBar({ kind, count }: DiffSectionBarProps) {
+export function DiffSectionLabel({ kind, count }: DiffSectionLabelProps) {
 	return (
 		// Announce section changes (e.g. Unstaged → Staged) as they scroll past.
-		<div
-			aria-live="polite"
-			className="flex shrink-0 items-center gap-2 border-border/20 border-b bg-muted/40 px-4 py-1.5"
-		>
-			<span className="font-medium text-[11px] text-muted-foreground uppercase tracking-wider">
+		<div aria-live="polite" className="flex min-w-0 items-center gap-1.5">
+			<span className="truncate font-medium text-[11px] text-muted-foreground uppercase tracking-wider">
 				{i18n._(GROUP_TITLES[kind])}
 			</span>
 			<span className="text-[11px] text-muted-foreground/60 tabular-nums">

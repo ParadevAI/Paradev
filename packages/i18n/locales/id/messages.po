@@ -25655,6 +25655,10 @@ msgid "workspace.changesList.groupUnstaged"
 msgstr "Belum di-stage"
 
 #. js-lingui-explicit-id
+msgid "workspace.changesPill.closeChanges"
+msgstr "Tutup perubahan"
+
+#. js-lingui-explicit-id
 msgid "workspace.changesPill.openChanges"
 msgstr "Buka perubahan"
 
@@ -25714,6 +25718,10 @@ msgstr "Tidak bisa meng-unstage perubahan"
 #. js-lingui-explicit-id
 msgid "workspace.changesTab.changeBaseBranchFailed"
 msgstr "Gagal mengubah branch dasar"
+
+#. js-lingui-explicit-id
+msgid "workspace.changesTab.label"
+msgstr "Perubahan"
 
 #. js-lingui-explicit-id
 msgid "workspace.changesTab.loading"

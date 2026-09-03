@@ -2,7 +2,8 @@ import { useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
 import { toast } from "@superset/ui/sonner";
 import { workspaceTrpc } from "@superset/workspace-client";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
+import { LuGitCompareArrows } from "react-icons/lu";
 import { useChangeset } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useChangeset";
 import { useOpenInExternalEditor } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useOpenInExternalEditor";
 import { useSidebarDiffRef } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useSidebarDiffRef";
@@ -13,14 +14,21 @@ import type {
 	ChangesViewMode,
 } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal/schema";
 import { toAbsoluteWorkspacePath } from "shared/absolute-paths";
+import type { SidebarTabDefinition } from "../../types";
 import { ChangesTabContent } from "./components/ChangesTabContent";
 
-interface ChangesPanelProps {
+export interface SelectedDiffTarget {
+	/** Worktree-relative path of the file the diff pane last navigated to. */
+	path: string;
+	/** Disambiguates a path present in several sections (staged + unstaged). */
+	changeKey?: string;
+}
+
+interface UseChangesTabParams {
 	workspaceId: string;
-	/** Absolute path of this pane's current diff target (selection echo). */
-	selectedFilePath?: string;
-	selectedChangeKey?: string;
-	/** openInNewTab=false navigates this pane; true opens a new diff tab. */
+	/** The diff pane's current target — echoed back as the row highlight. */
+	selectedDiffTarget?: SelectedDiffTarget;
+	/** openInNewTab=false navigates the workspace's diff pane; true opens a new diff tab. */
 	onSelectFile?: (
 		path: string,
 		openInNewTab?: boolean,
@@ -30,19 +38,21 @@ interface ChangesPanelProps {
 }
 
 /**
- * The Changes pane's left panel: branch header, commit filter, totals, and the
- * sectioned changed-files list. This is the former sidebar Changes tab moved
- * wholesale — the pane is now the one Changes surface. Re-renders on any
- * sidebarState change through useSidebarDiffRef's whole-row live query, so the
- * plain collection reads below stay fresh.
+ * The sidebar's Changes tab: one scope row (commit filter, "vs <base>",
+ * view-mode and fold utilities) over the sectioned changed-files list with
+ * per-section diffstats, staging, hover discard, context menus, and
+ * drag-to-terminal. Rows navigate the workspace's diff pane through
+ * onSelectFile, and the pane's target comes back as selectedDiffTarget so the
+ * list highlights what the pane is showing. Re-renders on any sidebarState
+ * change through useSidebarDiffRef's whole-row live query, so the plain
+ * collection reads below stay fresh.
  */
-export function ChangesPanel({
+export function useChangesTab({
 	workspaceId,
-	selectedFilePath,
-	selectedChangeKey,
+	selectedDiffTarget,
 	onSelectFile,
 	onOpenFile,
-}: ChangesPanelProps) {
+}: UseChangesTabParams): SidebarTabDefinition {
 	const { t } = useLingui();
 	const status = useWorkspaceGitStatus();
 	const collections = useCollections();
@@ -173,7 +183,23 @@ export function ChangesPanel({
 
 	const canRenameBranch = !status.data?.currentBranch.upstream;
 
-	return (
+	// The list compares absolute paths — the contract its rows share with the
+	// Files tab — while the pane records worktree-relative targets.
+	const selectedFilePath =
+		selectedDiffTarget && worktreePath
+			? toAbsoluteWorkspacePath(worktreePath, selectedDiffTarget.path)
+			: undefined;
+
+	// Each path counts once even when it sits in two sections (staged +
+	// unstaged). Under the default scope that is the top-bar control's total;
+	// a narrower scope (uncommitted, one commit, a range) counts what the tab
+	// lists instead.
+	const changedPathCount = useMemo(
+		() => new Set(files.map((file) => file.path)).size,
+		[files],
+	);
+
+	const content = (
 		<ChangesTabContent
 			workspaceId={workspaceId}
 			status={status}
@@ -186,7 +212,7 @@ export function ChangesPanel({
 			isLoading={isLoading}
 			worktreePath={worktreePath}
 			selectedFilePath={selectedFilePath}
-			selectedChangeKey={selectedChangeKey}
+			selectedChangeKey={selectedDiffTarget?.changeKey}
 			onSelectFile={onSelectFile}
 			onOpenFile={onOpenFile}
 			onOpenInEditor={handleOpenInEditor}
@@ -197,4 +223,12 @@ export function ChangesPanel({
 			canRenameBranch={canRenameBranch}
 		/>
 	);
+
+	return {
+		id: "changes",
+		label: t({ id: "workspace.changesTab.label", message: "Changes" }),
+		icon: LuGitCompareArrows,
+		badge: changedPathCount > 0 ? changedPathCount : undefined,
+		content,
+	};
 }
