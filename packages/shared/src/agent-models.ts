@@ -63,6 +63,7 @@ export const SUPERSET_CHAT_MODELS: readonly SupersetChatModel[] = [
 		label: "Haiku 4.5",
 		provider: "Anthropic",
 	},
+	{ id: "openai/gpt-6-astra", label: "GPT-6 Astra", provider: "OpenAI" },
 	{ id: "openai/gpt-5.6-sol", label: "GPT-5.6 Sol", provider: "OpenAI" },
 	{
 		id: "openai/gpt-5.6-terra",
@@ -110,6 +111,11 @@ export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 		presetId: "codex",
 		modelFlag: "--model",
 		models: [
+			// GPT-6 Astra is the slug Codex's model docs publish (2026-09-03) and
+			// the API's only GPT-6 id. OpenAI is enabling it account by account,
+			// so it shows up in a login's live catalog (`codex app-server` →
+			// `model/list`) only once that account has access.
+			{ id: "gpt-6-astra", label: "GPT-6 Astra", group: CURRENT_GROUP },
 			{ id: "gpt-5.6-sol", label: "GPT-5.6 Sol", group: CURRENT_GROUP },
 			{ id: "gpt-5.6-terra", label: "GPT-5.6 Terra", group: CURRENT_GROUP },
 			{ id: "gpt-5.6-luna", label: "GPT-5.6 Luna", group: CURRENT_GROUP },
@@ -316,11 +322,13 @@ export const AGENT_EFFORT_SUPPORT: readonly AgentEffortSupport[] = [
 			// Per-model support taken from Codex's own model catalog
 			// (`supported_reasoning_levels`, codex-cli 0.149.1): every GPT-5.6
 			// model takes `max`, and `ultra` — max reasoning plus automatic
-			// task delegation — is Sol and Terra only.
+			// task delegation — is Sol and Terra only. GPT-6 Astra documents
+			// `max` (API `reasoning.effort`); `ultra` stays off until its live
+			// catalog entry confirms it.
 			{
 				id: "max",
 				label: "Max",
-				models: ["gpt-5.6-sol", "gpt-5.6-terra", "gpt-5.6-luna"],
+				models: ["gpt-6-astra", "gpt-5.6-sol", "gpt-5.6-terra", "gpt-5.6-luna"],
 			},
 			{ id: "ultra", label: "Ultra", models: ["gpt-5.6-sol", "gpt-5.6-terra"] },
 		],

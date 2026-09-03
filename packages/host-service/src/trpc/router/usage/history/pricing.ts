@@ -8,7 +8,7 @@ import type { UsageAgent } from "../types";
  * Longest-prefix match on the lowercased model id; unknown models fall back
  * to the agent's cheapest rate and mark the result approximate.
  */
-export const PRICING_TABLE_UPDATED = "2026-09-01";
+export const PRICING_TABLE_UPDATED = "2026-09-03";
 
 export interface ModelRate {
 	inputPerM: number;
@@ -49,6 +49,8 @@ const CLAUDE_RATES: Record<string, ModelRate> = {
 };
 
 const CODEX_RATES: Record<string, ModelRate> = {
+	// GPT-6 Astra (2026-09-03): cached input is $1/M, the usual 0.1x.
+	"gpt-6-astra": { inputPerM: 10, outputPerM: 50 },
 	// Sol's promotional price, published as lasting at least through
 	// 2026-11-21; the bare `gpt-5.6` id follows Sol.
 	"gpt-5.6-sol": { inputPerM: 4, outputPerM: 20 },

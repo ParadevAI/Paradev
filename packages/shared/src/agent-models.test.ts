@@ -52,10 +52,11 @@ describe("AGENT_MODEL_SUPPORT", () => {
 });
 
 describe("SUPERSET_CHAT_MODELS", () => {
-	it("includes opus 5, fable 5.1 and the GPT-5.6 Codex models", () => {
+	it("includes opus 5, fable 5.1, GPT-6 Astra and the GPT-5.6 Codex models", () => {
 		const ids = SUPERSET_CHAT_MODELS.map((model) => model.id);
 		expect(ids).toContain("anthropic/claude-opus-5");
 		expect(ids).toContain("anthropic/claude-fable-5-1");
+		expect(ids).toContain("openai/gpt-6-astra");
 		expect(ids).toContain("openai/gpt-5.6-sol");
 		expect(ids).toContain("openai/gpt-5.6-terra");
 		expect(ids).toContain("openai/gpt-5.6-luna");
@@ -186,6 +187,17 @@ describe("buildAgentModelArgs", () => {
 		for (const model of ["gpt-5.6-sol", "gpt-5.6-terra", "gpt-5.6-luna"]) {
 			expect(buildAgentModelArgs("codex", model)).toEqual(["--model", model]);
 		}
+	});
+
+	it("offers GPT-6 Astra in codex's current section", () => {
+		expect(buildAgentModelArgs("codex", "gpt-6-astra")).toEqual([
+			"--model",
+			"gpt-6-astra",
+		]);
+		const models = getAgentModelSupport("codex")?.models ?? [];
+		expect(models.find((model) => model.id === "gpt-6-astra")?.group).toBe(
+			"Current",
+		);
 	});
 
 	it("includes opus 5 and the GPT-5.6 models for the other CLIs", () => {
@@ -357,6 +369,13 @@ describe("getAgentEfforts", () => {
 			"xhigh",
 			"max",
 			"ultra",
+		]);
+		expect(getAgentEfforts("codex", "gpt-6-astra").map((e) => e.id)).toEqual([
+			"low",
+			"medium",
+			"high",
+			"xhigh",
+			"max",
 		]);
 		expect(getAgentEfforts("codex", "gpt-5.6-luna").map((e) => e.id)).toEqual([
 			"low",

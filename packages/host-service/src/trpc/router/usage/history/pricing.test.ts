@@ -20,6 +20,19 @@ describe("matchModelRate", () => {
 		expect(rate.inputPerM).toBe(2);
 	});
 
+	test("prices GPT-6 Astra for codex and vendor-qualified harness ids", () => {
+		expect(matchModelRate("codex", "gpt-6-astra")).toMatchObject({
+			inputPerM: 10,
+			outputPerM: 50,
+			approximate: false,
+		});
+		expect(matchModelRate("omp", "openai-codex/gpt-6-astra")).toMatchObject({
+			inputPerM: 10,
+			outputPerM: 50,
+			approximate: false,
+		});
+	});
+
 	test("prices Fable 5.1 and Mythos 5.1 cache reads at their own rate, not the usual 0.1x", () => {
 		const fable51 = matchModelRate("claude", "claude-fable-5-1");
 		const fable5 = matchModelRate("claude", "claude-fable-5");
