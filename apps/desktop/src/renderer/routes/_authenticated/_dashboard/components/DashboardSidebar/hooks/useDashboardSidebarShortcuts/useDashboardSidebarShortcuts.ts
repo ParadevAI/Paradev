@@ -53,10 +53,21 @@ function useStableWorkspaceShortcutLabels(
 	}, [workspaces]);
 }
 
+interface UseDashboardSidebarShortcutsOptions {
+	/**
+	 * Expand a collapsed project/folder so the target row is visible after the
+	 * jump. Off while the Projects filter is active: the filtered view already
+	 * shows matches expanded through derived objects, so the toggle would
+	 * only rewrite the persisted collapse state behind the user's back.
+	 */
+	revealCollapsed?: boolean;
+}
+
 export function useDashboardSidebarShortcuts(
 	groups: DashboardSidebarProject[],
 	sessionWorkspaces: DashboardSidebarWorkspace[] = [],
 	sessionChildren: DashboardSidebarProjectChild[] = [],
+	{ revealCollapsed = true }: UseDashboardSidebarShortcutsOptions = {},
 ) {
 	const navigate = useNavigate();
 	const { toggleProjectCollapsed, toggleSectionCollapsed } =
@@ -141,11 +152,11 @@ export function useDashboardSidebarShortcuts(
 		(index: number) => {
 			const workspace = flattenedWorkspaces[index];
 			if (workspace) {
-				revealWorkspace(workspace.id);
+				if (revealCollapsed) revealWorkspace(workspace.id);
 				navigateToV2Workspace(workspace.id, navigate);
 			}
 		},
-		[flattenedWorkspaces, navigate, revealWorkspace],
+		[flattenedWorkspaces, navigate, revealCollapsed, revealWorkspace],
 	);
 
 	useHotkey("JUMP_TO_WORKSPACE_1", () => switchToWorkspace(0));

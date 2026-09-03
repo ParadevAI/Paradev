@@ -395,6 +395,19 @@ function isCompleteLinkTierMap(
 	);
 }
 
+const sidebarProjectSortModeSchema = z.enum(["manual", "active", "created"]);
+
+export type SidebarProjectSortMode = z.infer<
+	typeof sidebarProjectSortModeSchema
+>;
+
+// `.catch`, not `.default`: #5956 persisted a since-retired "updated" value
+// for some users, and an enum failure must degrade to manual rather than
+// drop the whole preferences row. Also applied at heal time (below) because
+// the localStorage collection only runs the schema on writes.
+const persistedSidebarProjectSortModeSchema =
+	sidebarProjectSortModeSchema.catch("manual");
+
 export const v2UserPreferencesSchema = z.object({
 	id: z.literal("preferences"),
 	fileLinks: linkTierMapSchema.default(DEFAULT_LINK_TIER_MAP),
@@ -408,6 +421,8 @@ export const v2UserPreferencesSchema = z.object({
 	rightSidebarWidth: z.number().default(340),
 	deleteLocalBranch: z.boolean().default(false),
 	showPresetsBar: z.boolean().default(true),
+	// Ordering of the dashboard sidebar's Projects list; manual = drag order.
+	sidebarProjectSortMode: persistedSidebarProjectSortModeSchema,
 	// Built-in (synthetic, app-shipped) presets the user hid from the preset
 	// bar. Synthetic presets have no v2TerminalPresets row, so visibility can't
 	// live on the row's pinnedToBar like user presets. Pruned against
@@ -444,6 +459,7 @@ export const DEFAULT_V2_USER_PREFERENCES: V2UserPreferencesRow = {
 	rightSidebarWidth: 340,
 	deleteLocalBranch: false,
 	showPresetsBar: true,
+	sidebarProjectSortMode: "manual",
 	hiddenBuiltinPresetIds: [],
 	favoritePageIds: [],
 	hiddenTagFolders: {},
@@ -530,6 +546,9 @@ export function healV2UserPreferences(raw: unknown): V2UserPreferencesRow {
 			...DEFAULT_V2_USER_PREFERENCES.folderLinks,
 			...r.folderLinks,
 		},
+		sidebarProjectSortMode: persistedSidebarProjectSortModeSchema.parse(
+			r.sidebarProjectSortMode,
+		),
 		// Prune retired/stray built-in ids so the array stays bounded.
 		hiddenBuiltinPresetIds: (Array.isArray(r.hiddenBuiltinPresetIds)
 			? r.hiddenBuiltinPresetIds

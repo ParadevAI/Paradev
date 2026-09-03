@@ -16,6 +16,7 @@ import {
 	loadHostWorkspacesSnapshot,
 	mergeHostWorkspaces,
 	saveHostWorkspacesSnapshot,
+	toHostWorkspaceItem,
 } from "./useHostWorkspaces.utils";
 
 export type { HostWorkspaceItem } from "./useHostWorkspaces.utils";
@@ -337,14 +338,13 @@ export function useHostWorkspacesSource(
 		const archived: HostWorkspaceItem[] = targets.flatMap((_target, index) => {
 			const query = archivedQueries[index];
 			const rows = query?.data ?? [];
-			return rows
-				.filter((row) => !liveIds.has(row.id))
-				.map((row) => ({
-					...row,
+			return (
+				rows
+					.filter((row) => !liveIds.has(row.id))
 					// react-query retains prior data across a failed refetch —
 					// don't report a host as answering when it did not.
-					hostReachable: !query?.isError,
-				}));
+					.map((row) => toHostWorkspaceItem(row, !query?.isError))
+			);
 		});
 		return [...merged, ...archived];
 	}, [targets, queries, includeArchived, archivedQueries, snapshots]);

@@ -86,6 +86,9 @@ export function DashboardSidebarCloudSection({
 					// behind it to report on.
 					hostIsOnline: null,
 					accentColor: null,
+					// The sandbox host stamps this like any other host; null until
+					// its list has answered.
+					lastActivityAt: served?.lastActivityAt ?? null,
 					name: cloud.name,
 					branch: served?.branch ?? cloud.branch,
 					pullRequest: null,

@@ -77,6 +77,8 @@ function itemFromCloudRow(
 		tags: served?.tags ?? [],
 		createdAt: cloud.createdAt,
 		updatedAt: served?.updatedAt ?? cloud.updatedAt,
+		// Agent activity is stamped by the sandbox host; unknown until it serves.
+		lastActivityAt: served?.lastActivityAt ?? null,
 		worktreePath: served?.worktreePath ?? "",
 		worktreeExists: served ? served.worktreeExists : true,
 		projectName: served?.projectName ?? null,

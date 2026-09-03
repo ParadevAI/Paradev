@@ -60,6 +60,8 @@ export interface SidebarWorkspaceInput {
 	taskId: string | null;
 	createdAt: Date;
 	updatedAt: Date;
+	/** Host-stamped agent activity; null from a host that predates it. */
+	lastActivityAt: number | null;
 	tabOrder: number;
 	sectionId: string | null;
 	/** Host tag set; absent when served by an older host. */
@@ -118,6 +120,7 @@ function decorateSidebarWorkspace(
 		behindCount: null,
 		createdAt: workspace.createdAt,
 		updatedAt: workspace.updatedAt,
+		lastActivityAt: workspace.lastActivityAt,
 		taskId: workspace.taskId,
 		isPinned: workspace.pinnedAt != null,
 		pendingTransaction: workspace.pendingTransaction,

@@ -48,6 +48,12 @@ export interface DashboardSidebarWorkspace {
 	behindCount: number | null;
 	createdAt: Date;
 	updatedAt: Date;
+	/**
+	 * Epoch ms of the newest agent lifecycle event, stamped by the workspace's
+	 * host. Null when the host predates the column (rank by `updatedAt`).
+	 * Unlike `updatedAt` it never moves on metadata writes.
+	 */
+	lastActivityAt: number | null;
 	taskId: string | null;
 	isPinned: boolean;
 	pendingTransaction: WorkspaceTransactionSnapshot | null;

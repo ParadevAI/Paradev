@@ -24,6 +24,13 @@ export type HostShapedWorkspace = Omit<
 	 * field ABSENT; consumers must guard with `== null` / `?? []`.
 	 */
 	tags?: string[];
+	/**
+	 * Epoch ms of the newest agent lifecycle event, stamped by the host (it
+	 * never moves on metadata writes, unlike `updatedAt`). Optional for the
+	 * same reason as `tags`; null when the host predates the column. Merged
+	 * items (`HostWorkspaceItem`) always carry it, normalized to null.
+	 */
+	lastActivityAt?: number | null;
 };
 
 /**
@@ -42,6 +49,7 @@ export interface HostWorkspaceRow extends HostShapedWorkspace {
 export interface HostWorkspaceItem extends HostShapedWorkspace {
 	worktreePath?: string;
 	worktreeExists?: boolean;
+	lastActivityAt: number | null;
 	/** False when the host didn't answer. */
 	hostReachable: boolean;
 	/** Non-null = archived tombstone (only present on `includeArchived`). */
@@ -240,6 +248,9 @@ export function applyWorkspaceChangedEvent(
 		tags: snapshot.tags ?? existing?.tags,
 		createdAt: new Date(snapshot.createdAt),
 		updatedAt: new Date(snapshot.updatedAt),
+		// Same runtime-optionality as tags: an older host's events omit it, so
+		// keep the row's last known stamp rather than wiping it.
+		lastActivityAt: snapshot.lastActivityAt ?? existing?.lastActivityAt ?? null,
 		worktreePath: snapshot.worktreePath,
 		// A host broadcasting created/updated just acted on the worktree;
 		// keep a known value over assuming.
@@ -249,6 +260,22 @@ export function applyWorkspaceChangedEvent(
 	return existing
 		? rows.map((row) => (row.id === nextRow.id ? nextRow : row))
 		: [...rows, nextRow];
+}
+
+/**
+ * The one place a served/cached row becomes a consumer-facing item: fields
+ * an older host (or an older snapshot) omits are normalized here so nothing
+ * downstream has to know which host version produced the row.
+ */
+export function toHostWorkspaceItem(
+	row: HostWorkspaceRow,
+	hostReachable: boolean,
+): HostWorkspaceItem {
+	return {
+		...row,
+		lastActivityAt: row.lastActivityAt ?? null,
+		hostReachable,
+	};
 }
 
 /**
@@ -272,10 +299,7 @@ export function mergeHostWorkspaces({
 		for (const row of result.rows) {
 			if (seenIds.has(row.id)) continue;
 			seenIds.add(row.id);
-			items.push({
-				...row,
-				hostReachable: result.reachable,
-			});
+			items.push(toHostWorkspaceItem(row, result.reachable));
 		}
 	}
 

@@ -1,4 +1,5 @@
 import {
+	type Activators,
 	type CollisionDetection,
 	closestCenter,
 	type DragEndEvent,
@@ -10,6 +11,8 @@ import {
 	MouseSensor,
 	pointerWithin,
 	rectIntersection,
+	type Sensor,
+	type SensorOptions,
 	TouchSensor,
 	type UniqueIdentifier,
 	useSensor,
@@ -304,13 +307,51 @@ export function useDashboardSidebarDnd(): DashboardSidebarDndValue {
 
 // ── Hook ─────────────────────────────────────────────────────────────
 
+type GatedSensorOptions<Options extends SensorOptions> = Options & {
+	/** True = never activate a drag, whatever the pointer does. */
+	disabled?: boolean;
+};
+
+/**
+ * A sensor that declines to activate while `disabled` is set in its options.
+ * dnd-kit spreads the sensor list into a hook dependency array, so disabling
+ * by swapping in an empty list trips React's "changed size between renders"
+ * warning; keeping the list constant and gating at the activator keeps every
+ * sortable, listener, and hook exactly as it is in the enabled state.
+ */
+function gateSensor<Options extends SensorOptions>(
+	Base: Sensor<Options>,
+): Sensor<GatedSensorOptions<Options>> {
+	const activators: Activators<GatedSensorOptions<Options>> =
+		Base.activators.map(({ eventName, handler }) => ({
+			eventName,
+			handler: (event, options, context) =>
+				options.disabled ? false : handler(event, options, context),
+		}));
+	return class extends Base {
+		static activators = activators;
+	};
+}
+
+const GatedMouseSensor = gateSensor(MouseSensor);
+const GatedTouchSensor = gateSensor(TouchSensor);
+const GatedKeyboardSensor = gateSensor(KeyboardSensor);
+
 interface UseSidebarDndOptions {
-	/** Projects in their current display order. */
+	/** Projects in their current display order (already sorted/filtered). */
 	projects: DashboardSidebarProject[];
 	pinnedWorkspaces: DashboardSidebarPinnedWorkspace[];
 	/** The Sessions lane, shaped like a project's children (rows + folders). */
 	sessionChildren: DashboardSidebarProjectChild[];
 	onReorderProjects: (projectIds: string[]) => void;
+	/**
+	 * True while a non-manual sort or an active filter means the rendered
+	 * lists are a transformed view of the manual order. Committing a drop in
+	 * that state would rewrite tabOrder against the view and corrupt the real
+	 * order of hidden/reordered siblings, so every drag (projects, workspaces,
+	 * folders, pinned, sessions) is inert.
+	 */
+	disabled?: boolean;
 }
 
 export function useSidebarDnd({
@@ -318,6 +359,7 @@ export function useSidebarDnd({
 	pinnedWorkspaces,
 	sessionChildren,
 	onReorderProjects,
+	disabled = false,
 }: UseSidebarDndOptions) {
 	const {
 		reorderPinnedWorkspaces,
@@ -332,12 +374,17 @@ export function useSidebarDnd({
 		// clicks. The trailing click after an activated drag is already
 		// swallowed by dnd-kit (capture-phase document click listener installed
 		// at activation, detached one event loop after the drag ends).
-		useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
-		useSensor(TouchSensor, {
-			activationConstraint: { delay: 200, tolerance: 5 },
+		useSensor(GatedMouseSensor, {
+			activationConstraint: { distance: 5 },
+			disabled,
 		}),
-		useSensor(KeyboardSensor, {
+		useSensor(GatedTouchSensor, {
+			activationConstraint: { delay: 200, tolerance: 5 },
+			disabled,
+		}),
+		useSensor(GatedKeyboardSensor, {
 			coordinateGetter: sortableKeyboardCoordinates,
+			disabled,
 		}),
 	);
 

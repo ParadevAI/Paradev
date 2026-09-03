@@ -8552,6 +8552,11 @@ msgid "dashboard.sidebar.workspacesHeader.addProjectAriaLabel"
 msgstr "프로젝트 추가"
 
 #. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/components/DashboardSidebarWorkspacesHeader/components/DashboardSidebarProjectsFilterInput/DashboardSidebarProjectsFilterInput.tsx
+msgid "dashboard.sidebar.workspacesHeader.clearFilter"
+msgstr "필터 지우기"
+
+#. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/components/DashboardSidebarWorkspacesHeader/DashboardSidebarWorkspacesHeader.tsx
 msgid "dashboard.sidebar.workspacesHeader.cloneFromUrl"
 msgstr "URL에서 클론"
@@ -8560,6 +8565,16 @@ msgstr "URL에서 클론"
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/components/DashboardSidebarWorkspacesHeader/DashboardSidebarWorkspacesHeader.tsx
 msgid "dashboard.sidebar.workspacesHeader.createNewProject"
 msgstr "새 프로젝트 만들기"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/components/DashboardSidebarWorkspacesHeader/components/DashboardSidebarProjectsFilterInput/DashboardSidebarProjectsFilterInput.tsx
+msgid "dashboard.sidebar.workspacesHeader.filterPlaceholder"
+msgstr "프로젝트 필터…"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/components/DashboardSidebarWorkspacesHeader/components/DashboardSidebarProjectsFilterInput/DashboardSidebarProjectsFilterInput.tsx
+msgid "dashboard.sidebar.workspacesHeader.filterProjects"
+msgstr "프로젝트 필터"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/components/DashboardSidebarWorkspacesHeader/DashboardSidebarWorkspacesHeader.tsx
@@ -8578,6 +8593,11 @@ msgid "dashboard.sidebar.workspacesHeader.importMultipleProjects"
 msgstr "여러 프로젝트가 이 리포지토리({0})를 사용합니다. 설정에서 프로젝트를 선택해 이 기기에 설정하세요."
 
 #. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/DashboardSidebar.tsx
+msgid "dashboard.sidebar.workspacesHeader.noProjectsMatch"
+msgstr "\"{trimmedFilterQuery}\"와(과) 일치하는 프로젝트 없음"
+
+#. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/components/DashboardSidebarWorkspacesHeader/DashboardSidebarWorkspacesHeader.tsx
 msgid "dashboard.sidebar.workspacesHeader.openProject"
 msgstr "프로젝트 열기"
@@ -8591,6 +8611,41 @@ msgstr "프로젝트 열기"
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/components/DashboardSidebarWorkspacesHeader/DashboardSidebarWorkspacesHeader.tsx
 msgid "dashboard.sidebar.workspacesHeader.projectReady"
 msgstr "프로젝트 준비 완료 — 사이드바에서 열어 보세요."
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/components/DashboardSidebarWorkspacesHeader/components/DashboardSidebarProjectsSortMenu/DashboardSidebarProjectsSortMenu.tsx
+msgid "dashboard.sidebar.workspacesHeader.sortBy"
+msgstr "정렬 기준"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/components/DashboardSidebarWorkspacesHeader/components/DashboardSidebarProjectsSortMenu/DashboardSidebarProjectsSortMenu.tsx
+msgid "dashboard.sidebar.workspacesHeader.sortDateCreated"
+msgstr "생성일"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/components/DashboardSidebarWorkspacesHeader/components/DashboardSidebarProjectsSortMenu/DashboardSidebarProjectsSortMenu.tsx
+msgid "dashboard.sidebar.workspacesHeader.sortDragHint"
+msgstr "수동 정렬에서 드래그하여 순서 변경"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/components/DashboardSidebarWorkspacesHeader/components/DashboardSidebarProjectsSortMenu/DashboardSidebarProjectsSortMenu.tsx
+msgid "dashboard.sidebar.workspacesHeader.sortLastActive"
+msgstr "최근 활동"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/components/DashboardSidebarWorkspacesHeader/components/DashboardSidebarProjectsSortMenu/DashboardSidebarProjectsSortMenu.tsx
+msgid "dashboard.sidebar.workspacesHeader.sortManual"
+msgstr "수동 정렬"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/components/DashboardSidebarWorkspacesHeader/components/DashboardSidebarProjectsSortMenu/DashboardSidebarProjectsSortMenu.tsx
+msgid "dashboard.sidebar.workspacesHeader.sortProjects"
+msgstr "프로젝트 정렬 ({currentLabel})"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/components/DashboardSidebarWorkspacesHeader/components/DashboardSidebarProjectsSortMenu/DashboardSidebarProjectsSortMenu.tsx
+msgid "dashboard.sidebar.workspacesHeader.sortProjectsAriaLabel"
+msgstr "프로젝트 정렬"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/components/DashboardSidebarWorkspacesHeader/DashboardSidebarWorkspacesHeader.tsx

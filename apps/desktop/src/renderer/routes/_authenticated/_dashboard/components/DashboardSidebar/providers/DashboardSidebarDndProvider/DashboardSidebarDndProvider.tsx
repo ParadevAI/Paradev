@@ -27,6 +27,11 @@ interface DashboardSidebarDndProviderProps {
 	isSidebarCollapsed: boolean;
 	workspaceShortcutLabels: Map<string, string>;
 	onReorderProjects: (projectIds: string[]) => void;
+	/**
+	 * True while `projects` is a sorted/filtered view rather than the manual
+	 * order — see useSidebarDnd's `disabled` option.
+	 */
+	isDragDisabled?: boolean;
 	children: ReactNode;
 }
 
@@ -43,6 +48,7 @@ export function DashboardSidebarDndProvider({
 	isSidebarCollapsed,
 	workspaceShortcutLabels,
 	onReorderProjects,
+	isDragDisabled = false,
 	children,
 }: DashboardSidebarDndProviderProps) {
 	const {
@@ -58,6 +64,7 @@ export function DashboardSidebarDndProvider({
 		pinnedWorkspaces,
 		sessionChildren,
 		onReorderProjects,
+		disabled: isDragDisabled,
 	});
 
 	// Dragging sweeps the pointer across rows, which would otherwise drive the

@@ -7,6 +7,7 @@ import {
 	healV2UserPreferences,
 	healWorkspaceLocalState,
 	sanitizePaneLayout,
+	v2UserPreferencesSchema,
 	workspaceLocalStateSchema,
 } from "./schema";
 
@@ -117,6 +118,38 @@ describe("healV2UserPreferences", () => {
 		const healed = healV2UserPreferences({ urlLinks: customized });
 
 		expect(healed.urlLinks).toEqual(customized);
+	});
+});
+
+describe("healV2UserPreferences sidebarProjectSortMode", () => {
+	it("defaults to manual on rows written before the field existed", () => {
+		expect(healV2UserPreferences({}).sidebarProjectSortMode).toBe("manual");
+	});
+
+	it("preserves a valid stored mode", () => {
+		expect(
+			healV2UserPreferences({ sidebarProjectSortMode: "active" })
+				.sidebarProjectSortMode,
+		).toBe("active");
+	});
+
+	it("degrades a retired mode to manual instead of dropping the row", () => {
+		// #5956 persisted "updated" before its revert; an unknown value must
+		// heal to the default, and the rest of the row must survive.
+		const healed = healV2UserPreferences({
+			sidebarProjectSortMode: "updated",
+			rightSidebarWidth: 500,
+		});
+		expect(healed.sidebarProjectSortMode).toBe("manual");
+		expect(healed.rightSidebarWidth).toBe(500);
+	});
+
+	it("degrades a retired mode on the write-path schema too", () => {
+		const parsed = v2UserPreferencesSchema.parse({
+			id: "preferences",
+			sidebarProjectSortMode: "updated",
+		});
+		expect(parsed.sidebarProjectSortMode).toBe("manual");
 	});
 });
 
