@@ -8,6 +8,7 @@ import {
 	SelectValue,
 } from "@superset/ui/select";
 import { toast } from "@superset/ui/sonner";
+import { track } from "renderer/lib/analytics";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { HighlightText } from "renderer/routes/_authenticated/settings/components/HighlightText";
@@ -78,9 +79,14 @@ export function LanguageSection() {
 			</div>
 			<Select
 				value={language ?? AUTO}
-				onValueChange={(value) =>
-					setLanguage.mutate({ language: value === AUTO ? null : value })
-				}
+				onValueChange={(value) => {
+					track("language_changed", {
+						from: language ?? AUTO,
+						to: value,
+						surface: "settings",
+					});
+					setLanguage.mutate({ language: value === AUTO ? null : value });
+				}}
 			>
 				<SelectTrigger size="sm" className="w-auto min-w-44 px-2">
 					<SelectValue />

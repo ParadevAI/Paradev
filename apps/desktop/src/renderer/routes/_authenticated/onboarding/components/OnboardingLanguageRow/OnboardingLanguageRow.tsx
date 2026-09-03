@@ -12,6 +12,7 @@ import {
 	SelectValue,
 } from "@superset/ui/select";
 import { HiOutlineLanguage } from "react-icons/hi2";
+import { track } from "renderer/lib/analytics";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 
@@ -57,12 +58,17 @@ export function OnboardingLanguageRow() {
 			</div>
 			<Select
 				value={language ?? AUTO}
-				onValueChange={(value) =>
+				onValueChange={(value) => {
+					track("language_changed", {
+						from: language ?? AUTO,
+						to: value,
+						surface: "onboarding",
+					});
 					setLanguage.mutate({
 						language:
 							value === AUTO || !isSupportedLocale(value) ? null : value,
-					})
-				}
+					});
+				}}
 			>
 				<SelectTrigger
 					size="sm"

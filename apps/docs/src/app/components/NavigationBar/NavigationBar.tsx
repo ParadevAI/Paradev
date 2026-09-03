@@ -5,6 +5,7 @@ import { LanguageSwitcher } from "@superset/i18n/react";
 import { COMPANY } from "@superset/shared/constants";
 import { Languages, Menu } from "lucide-react";
 import Link from "next/link";
+import posthog from "posthog-js";
 import { MobileSearchIcon } from "@/app/(docs)/[[...slug]]/components/DocsPageLayout/components/PageClient/components/MobileSearchIcon";
 import {
 	NavigationMobile,
@@ -103,6 +104,13 @@ export default function NavigationBar() {
 							<LanguageSwitcher
 								label={t({ id: "docs.nav.languageLabel", message: "Language" })}
 								className="absolute inset-0 cursor-pointer opacity-0"
+								onChange={(next, current) =>
+									posthog.capture("language_switched", {
+										from: current,
+										to: next,
+										surface: "docs-nav",
+									})
+								}
 							/>
 						</li>
 						<a

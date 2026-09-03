@@ -21,6 +21,7 @@ import { ArrowUpRight, Check, ChevronDown, Languages } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import { track } from "@/lib/analytics";
 import { Soc2Badge } from "../Soc2Badge";
 import { SocialLinks } from "../SocialLinks";
 
@@ -271,11 +272,16 @@ function FooterLinkItem({ link }: { link: FooterLink }) {
 function FooterLanguageSwitcher({ locale }: { locale?: SupportedLocale }) {
 	const { t } = useLingui();
 	const pathname = usePathname() ?? "/";
+	// The server passes the URL's locale; every switch is a full navigation,
+	// so the value never changes within a page's lifetime and needs no
+	// subscription. The i18n fallback covers renders outside the [lang] tree.
+	const current = locale ?? (i18n.locale as SupportedLocale);
 	// The URL carries the locale, so applying a choice is a navigation: strip
 	// any current locale prefix, then go to the same page under the new one
 	// (bare for English). The cookie still records the choice for the
 	// client-resolved apps (docs, web).
 	const selectLocale = (next: SupportedLocale) => {
+		track("language_switched", { from: current, to: next, surface: "footer" });
 		const segments = pathname.split("/");
 		const barePath = isSupportedLocale(segments[1] ?? "")
 			? `/${segments.slice(2).join("/")}`
@@ -288,10 +294,6 @@ function FooterLanguageSwitcher({ locale }: { locale?: SupportedLocale }) {
 				: `/${next}${barePath === "/" ? "" : barePath}`,
 		);
 	};
-	// The server passes the URL's locale; every switch is a full navigation,
-	// so the value never changes within a page's lifetime and needs no
-	// subscription. The i18n fallback covers renders outside the [lang] tree.
-	const current = locale ?? (i18n.locale as SupportedLocale);
 	return (
 		<DropdownMenu modal={false}>
 			<DropdownMenuTrigger
