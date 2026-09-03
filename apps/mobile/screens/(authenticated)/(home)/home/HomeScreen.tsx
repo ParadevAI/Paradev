@@ -20,6 +20,7 @@ import {
 } from "@/hooks/useHostWorkspaces";
 import { useSelectedHost } from "@/screens/(authenticated)/(home)/hooks/useSelectedHost";
 import { useWorkspaceScope } from "@/screens/(authenticated)/(home)/hooks/useWorkspaceScope";
+import { HeaderNotice } from "@/screens/(authenticated)/components/HeaderNotice";
 import { useOrganizations } from "@/screens/(authenticated)/hooks/useOrganizations";
 import {
 	type OrgPullRequest,
@@ -96,6 +97,8 @@ function homeListItemKey(item: HomeListItem): string {
 	}
 }
 
+const NOTICE_MS = 1500;
+
 export function HomeScreen() {
 	const { t } = useLingui();
 	const router = useRouter();
@@ -103,6 +106,20 @@ export function HomeScreen() {
 	const hasHydrated = useWorkspacesFilterStore((store) => store.hasHydrated);
 	const [visibleIds, setVisibleIds] = useState<string[]>([]);
 	const [refreshing, setRefreshing] = useState(false);
+	// seq gives each notice its own identity: a repeat copy while "Copied" is
+	// still up remounts HeaderNotice, restarting its timer.
+	const [notice, setNotice] = useState<{ text: string; seq: number } | null>(
+		null,
+	);
+	const hideNotice = useCallback(() => setNotice(null), []);
+	const handleCopied = useCallback(
+		() =>
+			setNotice((prev) => ({
+				text: t({ id: "mobile.workspaceRow.copied", message: "Copied" }),
+				seq: (prev?.seq ?? 0) + 1,
+			})),
+		[t],
+	);
 	const { height: windowHeight } = useWindowDimensions();
 	const insets = useSafeAreaInsets();
 	const queryClient = useQueryClient();
@@ -482,6 +499,7 @@ export function HomeScreen() {
 					attention={attentionByWorkspace.get(workspace.id) ?? null}
 					sessions={terminalsByWorkspace.get(workspace.id) ?? []}
 					cloudStatus={cloudStatus}
+					onCopied={handleCopied}
 				/>
 			);
 		},
@@ -498,6 +516,7 @@ export function HomeScreen() {
 			selectedHost,
 			setTargetKey,
 			requestComposerFocus,
+			handleCopied,
 		],
 	);
 
@@ -537,6 +556,20 @@ export function HomeScreen() {
 			    over the content that swallows every touch (#6659); on the sheet's
 			    own header the same bar works. Hidden while the host is
 			    offline — its list isn't shown, so there is nothing to search. */}
+			<Stack.Screen
+				options={{
+					headerTitle: notice
+						? () => (
+								<HeaderNotice
+									key={notice.seq}
+									onHidden={hideNotice}
+									text={notice.text}
+									visibleFor={NOTICE_MS}
+								/>
+							)
+						: undefined,
+				}}
+			/>
 			{!cloudScope && selectedHost && !selectedHost.isOnline ? null : (
 				<Stack.Toolbar placement="right">
 					<Stack.Toolbar.Button

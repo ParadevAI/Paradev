@@ -19050,6 +19050,11 @@ msgid "mobile.workspaceCreate.typical"
 msgstr "tipik ~{TYPICAL_SECONDS} sn"
 
 #. js-lingui-explicit-id
+#: ../../apps/mobile/screens/(authenticated)/(home)/home/HomeScreen.tsx
+msgid "mobile.workspaceRow.copied"
+msgstr "Kopyalandı"
+
+#. js-lingui-explicit-id
 #: ../../apps/mobile/screens/(authenticated)/(home)/home/components/WorkspaceRow/components/WorkspaceRowMenu/WorkspaceRowMenu.tsx
 msgid "mobile.workspaceRow.copyId"
 msgstr "Kimliği kopyala"

@@ -22,6 +22,8 @@ export function useWorkspaceRowActions(
 	sessions: TerminalRowData[],
 	/** Set for a cloud workspace, whose name and lifetime the API owns. */
 	cloudStatus?: CloudWorkspaceStatus,
+	/** Runs once the id is on the pasteboard, for the screen's "Copied" notice. */
+	onCopied?: () => void,
 ) {
 	const { t } = useLingui();
 	const cloud = useCloudWorkspaceActions();
@@ -114,7 +116,8 @@ export function useWorkspaceRowActions(
 			isCloud,
 		});
 
-	const copyId = () => void Clipboard.setStringAsync(workspace.id);
+	const copyId = () =>
+		void Clipboard.setStringAsync(workspace.id).then(onCopied);
 
 	const shareWorkspace = () =>
 		void Share.share({ url: workspaceShareUrl(workspace.id) });

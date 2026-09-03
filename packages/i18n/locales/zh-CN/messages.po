@@ -19049,6 +19049,11 @@ msgid "mobile.workspaceCreate.typical"
 msgstr "通常约{TYPICAL_SECONDS}秒"
 
 #. js-lingui-explicit-id
+#: ../../apps/mobile/screens/(authenticated)/(home)/home/HomeScreen.tsx
+msgid "mobile.workspaceRow.copied"
+msgstr "已复制"
+
+#. js-lingui-explicit-id
 #: ../../apps/mobile/screens/(authenticated)/(home)/home/components/WorkspaceRow/components/WorkspaceRowMenu/WorkspaceRowMenu.tsx
 msgid "mobile.workspaceRow.copyId"
 msgstr "复制ID"

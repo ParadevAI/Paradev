@@ -40,6 +40,7 @@ import {
 	getHostTerminalsQueryKey,
 	useHostTerminals,
 } from "@/screens/(authenticated)/(home)/home/hooks/useHostTerminals";
+import { HeaderNotice } from "@/screens/(authenticated)/components/HeaderNotice";
 import { PressableScale } from "@/screens/(authenticated)/components/PressableScale";
 import { useAgentIconUris } from "@/screens/(authenticated)/hooks/useAgentIconUris";
 import { useAppReviewPrompt } from "@/screens/(authenticated)/hooks/useAppReviewPrompt";
@@ -50,7 +51,6 @@ import { useTerminalSeenStore } from "@/screens/(authenticated)/stores/terminalS
 import { useTerminalTabOrderStore } from "@/screens/(authenticated)/stores/terminalTabOrderStore";
 import { useUnreadWorkspacesStore } from "@/screens/(authenticated)/stores/unreadWorkspacesStore";
 import { CloudWorkspaceProvisioningState } from "../components/CloudWorkspaceProvisioningState";
-import { HeaderNotice } from "../components/HeaderNotice";
 import { ScrollToBottomButton } from "../components/ScrollToBottomButton";
 import {
 	TerminalComposer,

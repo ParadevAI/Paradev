@@ -19050,6 +19050,11 @@ msgid "mobile.workspaceCreate.typical"
 msgstr "~{TYPICAL_SECONDS} dtk biasanya"
 
 #. js-lingui-explicit-id
+#: ../../apps/mobile/screens/(authenticated)/(home)/home/HomeScreen.tsx
+msgid "mobile.workspaceRow.copied"
+msgstr "Tersalin"
+
+#. js-lingui-explicit-id
 #: ../../apps/mobile/screens/(authenticated)/(home)/home/components/WorkspaceRow/components/WorkspaceRowMenu/WorkspaceRowMenu.tsx
 msgid "mobile.workspaceRow.copyId"
 msgstr "Salin ID"
