@@ -6555,32 +6555,37 @@ msgid "dashboard.pullRequests.checkStatus.skipped"
 msgstr "Ignorada"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.collapseAllFiles"
 msgstr "Recolher todos os arquivos"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffFileCollapseButton/DiffFileCollapseButton.tsx
 msgid "dashboard.pullRequests.codeTab.collapseFile"
 msgstr "Recolher arquivo"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
+msgid "dashboard.pullRequests.codeTab.commentsLabel"
+msgstr "Comentários"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.expandAllFiles"
 msgstr "Expandir todos os arquivos"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffFileCollapseButton/DiffFileCollapseButton.tsx
 msgid "dashboard.pullRequests.codeTab.expandFile"
 msgstr "Expandir arquivo"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.files"
 msgstr "Arquivos"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.hideFileTree"
 msgstr "Ocultar a árvore de arquivos"
 
@@ -6613,7 +6618,7 @@ msgid "dashboard.pullRequests.codeTab.loadingDiff"
 msgstr "Carregando o diff…"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.nextComment"
 msgstr "Próximo comentário"
 
@@ -6633,7 +6638,7 @@ msgid "dashboard.pullRequests.codeTab.postReplyFailed"
 msgstr "Não foi possível publicar a resposta"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.previousComment"
 msgstr "Comentário anterior"
 
@@ -6648,17 +6653,17 @@ msgid "dashboard.pullRequests.codeTab.sentToAgent"
 msgstr "Enviado ao agente"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.showFileTree"
 msgstr "Mostrar a árvore de arquivos"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.splitView"
 msgstr "Visualização lado a lado"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.unifiedView"
 msgstr "Visualização unificada"
 
@@ -11667,12 +11672,12 @@ msgstr "Abrir a paleta de comandos"
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/hotkeys/registry.ts
 msgid "hotkeys.openDiffViewer.description"
-msgstr "Abrir o visualizador de diff em uma nova aba ou focar o visualizador existente"
+msgstr "Abre o painel de alterações em uma nova aba ou foca o existente"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/hotkeys/registry.ts
 msgid "hotkeys.openDiffViewer.label"
-msgstr "Abrir o visualizador de diff"
+msgstr "Abrir alterações"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/hotkeys/registry.ts
@@ -11897,7 +11902,7 @@ msgstr "Dividir com área de trabalho"
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/hotkeys/registry.ts
 msgid "hotkeys.toggleSidebar.label"
-msgstr "Alternar a aba Alterações"
+msgstr "Alternar barra lateral"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/hotkeys/registry.ts
@@ -20941,6 +20946,26 @@ msgstr "Tipografia do terminal"
 #: ../../apps/desktop/src/renderer/routes/_authenticated/settings/appearance/components/AppearanceSettings/components/FontSettingSection/FontSettingSection.tsx
 msgid "settings.appearance.typography.title"
 msgstr "Tipografia"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/settings/behavior/components/BehaviorSettings/BehaviorSettings.tsx
+msgid "settings.behavior.changesOpenTarget.hint"
+msgstr "Escolha como a visualização de alterações abre pela barra superior"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/settings/behavior/components/BehaviorSettings/BehaviorSettings.tsx
+msgid "settings.behavior.changesOpenTarget.label"
+msgstr "Destino ao abrir alterações"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/settings/behavior/components/BehaviorSettings/BehaviorSettings.tsx
+msgid "settings.behavior.changesOpenTarget.pane"
+msgstr "Painel na aba atual"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/settings/behavior/components/BehaviorSettings/BehaviorSettings.tsx
+msgid "settings.behavior.changesOpenTarget.tab"
+msgstr "Nova aba"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/settings/behavior/components/BehaviorSettings/BehaviorSettings.tsx
@@ -31209,6 +31234,11 @@ msgstr "Navegador"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/AddTabMenu/AddTabMenu.tsx
+msgid "workspace.addTabMenu.changes"
+msgstr "Alterações"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/AddTabMenu/AddTabMenu.tsx
 msgid "workspace.addTabMenu.chatV3"
 msgstr "Chat v3"
 
@@ -31338,12 +31368,12 @@ msgid "workspace.backgroundTerminals.untitledSession"
 msgstr "Terminal"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/BaseBranchSelector/BaseBranchSelector.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/BaseBranchSelector/BaseBranchSelector.tsx
 msgid "workspace.baseBranchSelector.empty"
 msgstr "Nenhuma branch encontrada"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/BaseBranchSelector/BaseBranchSelector.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/BaseBranchSelector/BaseBranchSelector.tsx
 msgid "workspace.baseBranchSelector.searchPlaceholder"
 msgstr "Buscar branches..."
 
@@ -32040,223 +32070,203 @@ msgid "workspace.changes.groupUnstaged"
 msgstr "Fora do stage"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/ChangesFileList.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/ChangesFileList.tsx
 msgid "workspace.changesFileList.empty"
 msgstr "Nenhuma alteração"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/ChangesFileList.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/ChangesFileList.tsx
 msgid "workspace.changesFileList.loading"
 msgstr "Carregando..."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesFoldersView/ChangesFoldersView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesFoldersView/ChangesFoldersView.tsx
 msgid "workspace.changesFoldersView.rootFolder"
-msgstr "Caminho raiz"
+msgstr "./"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesHeader/ChangesHeader.tsx
-msgid "workspace.changesHeader.fromBase"
-msgstr "<0>a partir de</0> <1/>"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/ChangesFileList.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/ChangesFileList.tsx
 msgid "workspace.changesList.groupAgainstBase"
 msgstr "Em relação à base"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/ChangesFileList.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/ChangesFileList.tsx
 msgid "workspace.changesList.groupCommitted"
 msgstr "Com commit"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/ChangesFileList.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/ChangesFileList.tsx
 msgid "workspace.changesList.groupStaged"
 msgstr "No stage"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/ChangesFileList.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/ChangesFileList.tsx
 msgid "workspace.changesList.groupUnstaged"
 msgstr "Fora do stage"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/ChangesControl.tsx
+msgid "workspace.changesPill.openChanges"
+msgstr "Abrir alterações"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardAllStagedAria"
 msgstr "Descartar todas as alterações no stage"
 
 #. js-lingui-explicit-id
 #. placeholder {0}: stagingActions.kind
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardAllTooltip"
 msgstr "Descartar todas as {0}"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardAllUnstagedAria"
 msgstr "Descartar todas as alterações fora do stage"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardStagedConfirmBody"
 msgstr "Isso remove do stage e reverte todas as alterações no stage. Arquivos novos no stage serão excluídos. Não dá para desfazer."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardStagedConfirmTitle"
 msgstr "Descartar todas as alterações no stage?"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardStagedFailed"
 msgstr "Não foi possível descartar as alterações no stage"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardUnstagedConfirmBody"
 msgstr "Isso reverte todas as modificações fora do stage e exclui os arquivos não rastreados. Não dá para desfazer."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardUnstagedConfirmTitle"
 msgstr "Descartar todas as alterações fora do stage?"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardUnstagedFailed"
 msgstr "Não foi possível descartar as alterações fora do stage"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.stageAll"
 msgstr "Adicionar tudo ao stage"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.stageFailed"
 msgstr "Não foi possível adicionar as alterações ao stage"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.unstageAll"
 msgstr "Remover tudo do stage"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.unstageFailed"
 msgstr "Não foi possível remover as alterações do stage"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/useChangesTab.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/ChangesPanel.tsx
 msgid "workspace.changesTab.changeBaseBranchFailed"
 msgstr "Falha ao trocar a branch base"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/useChangesTab.tsx
-msgid "workspace.changesTab.label"
-msgstr "Alterações"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesTabContent/ChangesTabContent.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesTabContent/ChangesTabContent.tsx
 msgid "workspace.changesTab.loading"
 msgstr "Carregando as alterações..."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/useChangesTab.tsx
-msgid "workspace.changesTab.refreshFailed"
-msgstr "Falha ao atualizar as alterações"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/useChangesTab.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/ChangesPanel.tsx
 msgid "workspace.changesTab.renameBranchFailed"
 msgstr "Falha ao renomear a branch"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/useChangesTab.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/ChangesPanel.tsx
 msgid "workspace.changesTab.renameBranchLoading"
 msgstr "Renomeando a branch para {newName}..."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/useChangesTab.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/ChangesPanel.tsx
 msgid "workspace.changesTab.renameBranchSuccess"
 msgstr "Branch renomeada para {newName}"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesTabContent/ChangesTabContent.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesTabContent/ChangesTabContent.tsx
 msgid "workspace.changesTab.statusError"
 msgstr "Não foi possível carregar o status do git"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesToolbar/ChangesToolbar.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesToolbar/ChangesToolbar.tsx
 msgid "workspace.changesToolbar.collapseAll"
 msgstr "Recolher tudo"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesToolbar/ChangesToolbar.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesToolbar/ChangesToolbar.tsx
 msgid "workspace.changesToolbar.expandAll"
 msgstr "Expandir tudo"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesToolbar/ChangesToolbar.tsx
-msgid "workspace.changesToolbar.fileCount"
-msgstr "{totalFiles, plural, one {# arquivo} other {# arquivos}}"
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesToolbar/ChangesToolbar.tsx
+msgid "workspace.changesToolbar.vsBase"
+msgstr "<0>vs</0> <1/>"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesToolbar/ChangesToolbar.tsx
-msgid "workspace.changesToolbar.refreshAria"
-msgstr "Atualizar as alterações"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesToolbar/ChangesToolbar.tsx
-msgid "workspace.changesToolbar.refreshTooltip"
-msgstr "Atualizar as alterações"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.deleteConfirmAction"
 msgstr "Excluir"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.deleteConfirmBody"
 msgstr "Isso exclui este arquivo permanentemente. Não dá para desfazer."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.deleteConfirmTitle"
 msgstr "Excluir \"{discardBasename}\"?"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.discardChangesAria"
 msgstr "Descartar alterações"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.discardChangesTooltip"
 msgstr "Descartar alterações"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.discardConfirmAction"
 msgstr "Descartar"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.discardConfirmBody"
 msgstr "Isso reverte todas as alterações neste arquivo. Não dá para desfazer."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.discardConfirmTitle"
 msgstr "Descartar as alterações em \"{discardBasename}\"?"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.discardFailed"
 msgstr "Não foi possível descartar as alterações"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/ShadowRowHoverActions/ShadowRowHoverActions.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/ShadowRowHoverActions/ShadowRowHoverActions.tsx
 msgid "workspace.changesTreeView.moreActionsAria"
 msgstr "Mais ações"
 
@@ -32637,27 +32647,37 @@ msgid "workspace.commentsSection.viewCommentByAria"
 msgstr "Ver o comentário de {0}"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/CommitFilterDropdown.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/CommitFilterDropdown.tsx
 msgid "workspace.commitFilter.allChanges"
-msgstr "Todas as alterações"
+msgstr "Todos os commits"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/CommitFilterDropdown.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/CommitFilterDropdown.tsx
+msgid "workspace.commitFilter.commitsLabel"
+msgstr "Commits"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/CommitFilterDropdown.tsx
 msgid "workspace.commitFilter.filesChangedCount"
 msgstr "{uncommittedCount, plural, one {# arquivo alterado} other {# arquivos alterados}}"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/CommitFilterDropdown.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/CommitFilterDropdown.tsx
+msgid "workspace.commitFilter.renameBranchLabel"
+msgstr "Renomear branch"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/CommitFilterDropdown.tsx
 msgid "workspace.commitFilter.selectRange"
 msgstr "Selecionar intervalo..."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/CommitFilterDropdown.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/CommitFilterDropdown.tsx
 msgid "workspace.commitFilter.uncommitted"
 msgstr "Sem commit"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/CommitFilterDropdown.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/CommitFilterDropdown.tsx
 msgid "workspace.commitFilter.uncommittedChanges"
 msgstr "Alterações sem commit"
 
@@ -32700,11 +32720,6 @@ msgstr "Cancelar as edições"
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffHeaderMetadata/DiffHeaderMetadata.tsx
 msgid "workspace.diffPane.cancelEditsAria"
 msgstr "Cancelar as edições"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffHeaderPrefix/DiffHeaderPrefix.tsx
-msgid "workspace.diffPane.collapseFileAria"
-msgstr "Recolher arquivo"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/CommentThread/CommentThread.tsx
@@ -32821,11 +32836,6 @@ msgid "workspace.diffPane.dontSave"
 msgstr "Não salvar"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffHeaderPrefix/DiffHeaderPrefix.tsx
-msgid "workspace.diffPane.expandFileAria"
-msgstr "Expandir arquivo"
-
-#. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/CommentThread/CommentThread.tsx
 msgid "workspace.diffPane.expandThreadAria"
 msgstr "Expandir a thread"
@@ -32915,6 +32925,23 @@ msgstr "Abrir no visualizador de arquivos"
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/CommentThread/CommentThread.tsx
 msgid "workspace.diffPane.openOnGithubAria"
 msgstr "Abrir no GitHub"
+
+#. js-lingui-explicit-id
+#. placeholder {0}: pr.number
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffPaneHeaderExtras/components/DiffPanePRLink/DiffPanePRLink.tsx
+msgid "workspace.diffPane.openPrChip"
+msgstr "Abrir PR #{0}"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffPaneHeaderExtras/components/DiffPanePRLink/DiffPanePRLink.tsx
+msgid "workspace.diffPane.openPullRequest"
+msgstr "Abrir pull request"
+
+#. js-lingui-explicit-id
+#. placeholder {0}: pr.number
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffPaneHeaderExtras/components/DiffPanePRLink/DiffPanePRLink.tsx
+msgid "workspace.diffPane.openPullRequestAria"
+msgstr "Abrir pull request #{0}"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffHeaderMetadata/DiffHeaderMetadata.tsx
@@ -33037,16 +33064,6 @@ msgid "workspace.diffPane.showReviewCommentsAria"
 msgstr "Mostrar os comentários de revisão do PR"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffPaneHeaderExtras/DiffPaneHeaderExtras.tsx
-msgid "workspace.diffPane.splitView"
-msgstr "Visualização lado a lado"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffPaneHeaderExtras/DiffPaneHeaderExtras.tsx
-msgid "workspace.diffPane.splitViewAria"
-msgstr "Visualização lado a lado"
-
-#. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/DiffPane.tsx
 msgid "workspace.diffPane.thisFileFallback"
 msgstr "este arquivo"
@@ -33060,16 +33077,6 @@ msgstr "Desatualizada"
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/CommentThread/CommentThread.tsx
 msgid "workspace.diffPane.threadResolved"
 msgstr "Resolvida"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffPaneHeaderExtras/DiffPaneHeaderExtras.tsx
-msgid "workspace.diffPane.unifiedView"
-msgstr "Visualização unificada"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffPaneHeaderExtras/DiffPaneHeaderExtras.tsx
-msgid "workspace.diffPane.unifiedViewAria"
-msgstr "Visualização unificada"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/CommentThread/CommentThread.tsx
@@ -33132,6 +33139,11 @@ msgstr "Descartar"
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceEmptyState/WorkspaceEmptyState.tsx
 msgid "workspace.emptyState.openBrowser"
 msgstr "Abrir navegador"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceEmptyState/WorkspaceEmptyState.tsx
+msgid "workspace.emptyState.openChanges"
+msgstr "Abrir alterações"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceEmptyState/WorkspaceEmptyState.tsx
@@ -33375,147 +33387,147 @@ msgid "workspace.filePane.viewVideo"
 msgstr "Vídeo"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.contextOpenDiff"
 msgstr "Abrir o diff"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.contextOpenDiffNewTab"
 msgstr "Abrir o diff em nova aba"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.contextOpenFile"
 msgstr "Abrir arquivo"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.contextOpenFileNewTab"
 msgstr "Abrir o arquivo em nova aba"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.contextOpenInEditor"
 msgstr "Abrir no editor"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.deleteConfirmAction"
 msgstr "Excluir"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.deleteConfirmBody"
 msgstr "Isso exclui este arquivo permanentemente. Não dá para desfazer."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.deleteConfirmTitle"
 msgstr "Excluir \"{basename}\"?"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.discardChangesAria"
 msgstr "Descartar alterações"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.discardChangesTooltip"
 msgstr "Descartar alterações"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.discardConfirmAction"
 msgstr "Descartar"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.discardConfirmBody"
 msgstr "Isso reverte todas as alterações neste arquivo. Não dá para desfazer."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.discardConfirmTitle"
 msgstr "Descartar as alterações em \"{basename}\"?"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.discardFailed"
 msgstr "Não foi possível descartar as alterações"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.menuDelete"
 msgstr "Excluir"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.menuDiscardChanges"
 msgstr "Descartar alterações"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.menuOpenDiff"
 msgstr "Abrir o diff"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.menuOpenDiffNewTab"
 msgstr "Abrir o diff em nova aba"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.menuOpenFile"
 msgstr "Abrir arquivo"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.menuOpenFileNewTab"
 msgstr "Abrir o arquivo em nova aba"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.menuOpenInEditor"
 msgstr "Abrir no editor"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.moreActionsAria"
 msgstr "Mais ações"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
 msgid "workspace.fileRowContextMenuItems.delete"
 msgstr "Excluir"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
 msgid "workspace.fileRowContextMenuItems.discardChanges"
 msgstr "Descartar alterações"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
 msgid "workspace.fileRowMenuItems.openDiff"
 msgstr "Abrir o diff"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
 msgid "workspace.fileRowMenuItems.openDiffNewTab"
 msgstr "Abrir o diff em nova aba"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
 msgid "workspace.fileRowMenuItems.openFile"
 msgstr "Abrir arquivo"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
 msgid "workspace.fileRowMenuItems.openFileNewTab"
 msgstr "Abrir o arquivo em nova aba"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
 msgid "workspace.fileRowMenuItems.openInEditor"
 msgstr "Abrir no editor"
 
@@ -33751,7 +33763,7 @@ msgid "workspace.folderMenuItems.newFolder"
 msgstr "Nova pasta..."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/FolderContextMenuItems/FolderContextMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/FolderContextMenuItems/FolderContextMenuItems.tsx
 msgid "workspace.folderMenuItems.openInEditor"
 msgstr "Abrir no editor"
 
@@ -34133,147 +34145,122 @@ msgid "workspace.pathActions.unknownError"
 msgstr "Erro desconhecido"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.contextCopyPath"
 msgstr "Copiar caminho"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.contextCopyRelativePath"
 msgstr "Copiar o caminho relativo"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.contextRevealInFinder"
 msgstr "Mostrar no Finder"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.copyPathFailed"
 msgstr "Falha ao copiar o caminho: {reason}"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.dropdownCopyPath"
 msgstr "Copiar caminho"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.dropdownCopyRelativePath"
 msgstr "Copiar o caminho relativo"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.dropdownRevealInFinder"
 msgstr "Mostrar no Finder"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.pathCopied"
 msgstr "Caminho copiado"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.relativePathCopied"
 msgstr "Caminho relativo copiado"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.revealInFinderFailed"
 msgstr "Falha ao mostrar no Finder: {reason}"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.unknownError"
 msgstr "Erro desconhecido"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/PRActionHeader.tsx
-msgid "workspace.prActionHeader.createPrComingSoon"
-msgstr "Criar PR chega em breve"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/PRActionHeader.tsx
-msgid "workspace.prActionHeader.defaultBranchTooltip"
-msgstr "Mude para uma branch de feature para criar um pull request"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/PRActionHeader.tsx
-msgid "workspace.prActionHeader.detachedHeadTooltip"
-msgstr "Faça checkout de uma branch para criar um pull request"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/PRActionHeader.tsx
-msgid "workspace.prActionHeader.noRepoTooltip"
-msgstr "Nenhum repositório do GitHub conectado"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/PRActionHeader.tsx
-msgid "workspace.prActionHeader.retryLoadingPr"
-msgstr "Tentar carregar o pull request de novo"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.allChecksPassed"
 msgstr "{total, plural, one {A verificação passou} other {Todas as # verificações passaram}}"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.checksFailingMany"
 msgstr "{failing} de {total} verificações falhando"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.checksFailingOne"
 msgstr "{failing} de {total} verificação falhando"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.checksRunningMany"
 msgstr "{pending} de {total} verificações em execução"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.checksRunningOne"
 msgstr "{pending} de {total} verificação em execução"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.noChecksReported"
 msgstr "Nenhuma verificação reportada"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.stateClosed"
 msgstr "Fechado"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.stateDraft"
 msgstr "Rascunho"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.stateMerged"
 msgstr "Mesclado"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.stateOpen"
 msgstr "Aberto"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.stateQueued"
 msgstr "Na fila"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.updatedAt"
 msgstr "Atualizado {updatedRelative}"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.viewOnGitHub"
 msgstr "Ver no GitHub"
 
@@ -34328,73 +34315,109 @@ msgid "workspace.prHeader.reviewPending"
 msgstr "Revisão pendente"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.createMergeCommit"
 msgstr "Criar commit de merge"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
+msgid "workspace.prStatusGroup.markedReady"
+msgstr "PR pronto para revisão"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
+msgid "workspace.prStatusGroup.markedReadyRefreshFailed"
+msgstr "Marcado como pronto, mas não foi possível atualizar o estado do PR — tente novamente em instantes"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
+msgid "workspace.prStatusGroup.markingReady"
+msgstr "Marcando como pronto para revisão…"
+
+#. js-lingui-explicit-id
+#. placeholder {0}: error.message
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
+msgid "workspace.prStatusGroup.markReadyFailed"
+msgstr "Falha ao marcar como pronto para revisão: {0}"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.merged"
 msgstr "PR mesclado"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.mergedRefreshFailed"
 msgstr "Mesclado, mas não foi possível atualizar o estado do PR — tente de novo em instantes"
 
 #. js-lingui-explicit-id
 #. placeholder {0}: error.message
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.mergeFailed"
 msgstr "Falha no merge: {0}"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.mergeMenuLabel"
 msgstr "Merge"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.merging"
 msgstr "Fazendo merge do PR..."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.mergingAria"
 msgstr "Fazendo merge do pull request"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
-msgid "workspace.prStatusGroup.openMergeOptionsAria"
-msgstr "Abrir as opções de merge"
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
+msgid "workspace.prStatusGroup.openPrOptionsAria"
+msgstr "Abrir opções do pull request"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
+msgid "workspace.prStatusGroup.openPullRequest"
+msgstr "Abrir pull request"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
+msgid "workspace.prStatusGroup.readyForReview"
+msgstr "Pronto para revisão"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.rebaseAndMerge"
 msgstr "Rebase e merge"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.squashAndMerge"
 msgstr "Squash e merge"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/components/RangeModal/RangeModal.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
+msgid "workspace.prStatusGroup.viewOnGitHub"
+msgstr "Ver no GitHub"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/components/RangeModal/RangeModal.tsx
 msgid "workspace.rangeModal.apply"
 msgstr "Aplicar"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/components/RangeModal/RangeModal.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/components/RangeModal/RangeModal.tsx
 msgid "workspace.rangeModal.cancel"
 msgstr "Cancelar"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/components/RangeModal/RangeModal.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/components/RangeModal/RangeModal.tsx
 msgid "workspace.rangeModal.description"
 msgstr "Clique em dois commits para definir o intervalo."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/components/RangeModal/RangeModal.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/components/RangeModal/RangeModal.tsx
 msgid "workspace.rangeModal.title"
 msgstr "Selecionar o intervalo de commits"
 
@@ -34482,6 +34505,106 @@ msgstr "Parar"
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/V2WorkspaceRunButton/V2WorkspaceRunButton.tsx
 msgid "workspace.runButton.stopAria"
 msgstr "Parar o comando de execução da área de trabalho"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.commit"
+msgstr "Fazer commit"
+
+#. js-lingui-explicit-id
+#. placeholder {0}: error.message
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.commitFailed"
+msgstr "Falha no commit: {0}"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.committed"
+msgstr "Commit realizado"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.createPr"
+msgstr "Criar PR"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.createPrAction"
+msgstr "Criar pull request"
+
+#. js-lingui-explicit-id
+#. placeholder {0}: error instanceof Error ? error.message : String(error)
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.createPrFailed"
+msgstr "Falha ao criar o PR: {0}"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.creatingPr"
+msgstr "Criando PR…"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.draft"
+msgstr "Rascunho"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.noCommitsTooltip"
+msgstr "Nenhum commit para abrir um pull request"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.openPrToastAction"
+msgstr "Abrir"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.openShipOptionsAria"
+msgstr "Abrir opções de envio"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.prBodyPlaceholder"
+msgstr "Descrição (opcional)"
+
+#. js-lingui-explicit-id
+#. placeholder {0}: created.number
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.prCreated"
+msgstr "PR #{0} criado"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.prTitlePlaceholder"
+msgstr "Título do pull request"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.prUrlLink"
+msgstr "URL do PR"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.push"
+msgstr "Push"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.pushed"
+msgstr "Push realizado"
+
+#. js-lingui-explicit-id
+#. placeholder {0}: error instanceof Error ? error.message : String(error)
+#. placeholder {0}: error.message
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.pushFailed"
+msgstr "Falha no push: {0}"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.pushing"
+msgstr "Fazendo push…"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/WorkspaceSidebar.tsx
@@ -35208,12 +35331,12 @@ msgid "workspace.terminalPane.workspaceRunState"
 msgstr "Execução da área de trabalho: {workspaceRunState}"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesHeader/components/ViewModeToggle/ViewModeToggle.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesToolbar/components/ViewModeToggle/ViewModeToggle.tsx
 msgid "workspace.viewModeToggle.folderView"
 msgstr "Visualização por pastas"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesHeader/components/ViewModeToggle/ViewModeToggle.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesToolbar/components/ViewModeToggle/ViewModeToggle.tsx
 msgid "workspace.viewModeToggle.treeView"
 msgstr "Visualização em árvore"
 

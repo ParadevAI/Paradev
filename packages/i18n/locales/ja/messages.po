@@ -6555,32 +6555,37 @@ msgid "dashboard.pullRequests.checkStatus.skipped"
 msgstr "スキップ"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.collapseAllFiles"
 msgstr "すべてのファイルを折りたたむ"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffFileCollapseButton/DiffFileCollapseButton.tsx
 msgid "dashboard.pullRequests.codeTab.collapseFile"
 msgstr "ファイルを折りたたむ"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
+msgid "dashboard.pullRequests.codeTab.commentsLabel"
+msgstr "コメント"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.expandAllFiles"
 msgstr "すべてのファイルを展開"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffFileCollapseButton/DiffFileCollapseButton.tsx
 msgid "dashboard.pullRequests.codeTab.expandFile"
 msgstr "ファイルを展開"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.files"
 msgstr "ファイル"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.hideFileTree"
 msgstr "ファイルツリーを隠す"
 
@@ -6613,7 +6618,7 @@ msgid "dashboard.pullRequests.codeTab.loadingDiff"
 msgstr "差分を読み込み中…"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.nextComment"
 msgstr "次のコメント"
 
@@ -6633,7 +6638,7 @@ msgid "dashboard.pullRequests.codeTab.postReplyFailed"
 msgstr "返信を投稿できませんでした"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.previousComment"
 msgstr "前のコメント"
 
@@ -6648,17 +6653,17 @@ msgid "dashboard.pullRequests.codeTab.sentToAgent"
 msgstr "エージェントに送信しました"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.showFileTree"
 msgstr "ファイルツリーを表示"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.splitView"
 msgstr "分割表示"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.unifiedView"
 msgstr "統合表示"
 
@@ -11667,12 +11672,12 @@ msgstr "コマンドパレットを開く"
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/hotkeys/registry.ts
 msgid "hotkeys.openDiffViewer.description"
-msgstr "差分ビューアを新しいタブで開く、または既存の差分ビューアにフォーカスする"
+msgstr "変更ペインを新しいタブで開くか、既存のペインにフォーカスします"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/hotkeys/registry.ts
 msgid "hotkeys.openDiffViewer.label"
-msgstr "差分ビューアを開く"
+msgstr "変更を開く"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/hotkeys/registry.ts
@@ -11897,7 +11902,7 @@ msgstr "デスクトップで分割"
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/hotkeys/registry.ts
 msgid "hotkeys.toggleSidebar.label"
-msgstr "変更タブを切り替え"
+msgstr "サイドバーを切り替え"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/hotkeys/registry.ts
@@ -20940,6 +20945,26 @@ msgstr "ターミナルのタイポグラフィ"
 #: ../../apps/desktop/src/renderer/routes/_authenticated/settings/appearance/components/AppearanceSettings/components/FontSettingSection/FontSettingSection.tsx
 msgid "settings.appearance.typography.title"
 msgstr "タイポグラフィ"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/settings/behavior/components/BehaviorSettings/BehaviorSettings.tsx
+msgid "settings.behavior.changesOpenTarget.hint"
+msgstr "トップバーから変更ビューをどのように開くかを選択します"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/settings/behavior/components/BehaviorSettings/BehaviorSettings.tsx
+msgid "settings.behavior.changesOpenTarget.label"
+msgstr "変更ビューの開き先"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/settings/behavior/components/BehaviorSettings/BehaviorSettings.tsx
+msgid "settings.behavior.changesOpenTarget.pane"
+msgstr "現在のタブ内のペイン"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/settings/behavior/components/BehaviorSettings/BehaviorSettings.tsx
+msgid "settings.behavior.changesOpenTarget.tab"
+msgstr "新しいタブ"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/settings/behavior/components/BehaviorSettings/BehaviorSettings.tsx
@@ -31208,6 +31233,11 @@ msgstr "ブラウザ"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/AddTabMenu/AddTabMenu.tsx
+msgid "workspace.addTabMenu.changes"
+msgstr "変更"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/AddTabMenu/AddTabMenu.tsx
 msgid "workspace.addTabMenu.chatV3"
 msgstr "チャットv3"
 
@@ -31337,12 +31367,12 @@ msgid "workspace.backgroundTerminals.untitledSession"
 msgstr "ターミナル"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/BaseBranchSelector/BaseBranchSelector.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/BaseBranchSelector/BaseBranchSelector.tsx
 msgid "workspace.baseBranchSelector.empty"
 msgstr "ブランチが見つかりません"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/BaseBranchSelector/BaseBranchSelector.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/BaseBranchSelector/BaseBranchSelector.tsx
 msgid "workspace.baseBranchSelector.searchPlaceholder"
 msgstr "ブランチを検索..."
 
@@ -32039,223 +32069,203 @@ msgid "workspace.changes.groupUnstaged"
 msgstr "未ステージ"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/ChangesFileList.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/ChangesFileList.tsx
 msgid "workspace.changesFileList.empty"
 msgstr "変更なし"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/ChangesFileList.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/ChangesFileList.tsx
 msgid "workspace.changesFileList.loading"
 msgstr "読み込み中..."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesFoldersView/ChangesFoldersView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesFoldersView/ChangesFoldersView.tsx
 msgid "workspace.changesFoldersView.rootFolder"
-msgstr "ルートパス"
+msgstr "./"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesHeader/ChangesHeader.tsx
-msgid "workspace.changesHeader.fromBase"
-msgstr "<0>基準:</0> <1/>"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/ChangesFileList.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/ChangesFileList.tsx
 msgid "workspace.changesList.groupAgainstBase"
 msgstr "ベースとの差分"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/ChangesFileList.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/ChangesFileList.tsx
 msgid "workspace.changesList.groupCommitted"
 msgstr "コミット済み"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/ChangesFileList.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/ChangesFileList.tsx
 msgid "workspace.changesList.groupStaged"
 msgstr "ステージ済み"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/ChangesFileList.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/ChangesFileList.tsx
 msgid "workspace.changesList.groupUnstaged"
 msgstr "未ステージ"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/ChangesControl.tsx
+msgid "workspace.changesPill.openChanges"
+msgstr "変更を開く"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardAllStagedAria"
 msgstr "ステージ済みの変更をすべて破棄"
 
 #. js-lingui-explicit-id
 #. placeholder {0}: stagingActions.kind
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardAllTooltip"
 msgstr "{0}件をすべて破棄"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardAllUnstagedAria"
 msgstr "未ステージの変更をすべて破棄"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardStagedConfirmBody"
 msgstr "ステージ済みの変更をすべてステージ解除して元に戻します。ステージ済みの新規ファイルは削除されます。元に戻せません。"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardStagedConfirmTitle"
 msgstr "ステージ済みの変更をすべて破棄しますか?"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardStagedFailed"
 msgstr "ステージ済みの変更を破棄できませんでした"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardUnstagedConfirmBody"
 msgstr "未ステージの変更をすべて元に戻し、追跡されていないファイルを削除します。元に戻せません。"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardUnstagedConfirmTitle"
 msgstr "未ステージの変更をすべて破棄しますか?"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardUnstagedFailed"
 msgstr "未ステージの変更を破棄できませんでした"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.stageAll"
 msgstr "すべてステージ"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.stageFailed"
 msgstr "変更をステージできませんでした"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.unstageAll"
 msgstr "すべてステージ解除"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.unstageFailed"
 msgstr "変更をステージ解除できませんでした"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/useChangesTab.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/ChangesPanel.tsx
 msgid "workspace.changesTab.changeBaseBranchFailed"
 msgstr "ベースブランチの変更に失敗しました"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/useChangesTab.tsx
-msgid "workspace.changesTab.label"
-msgstr "変更"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesTabContent/ChangesTabContent.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesTabContent/ChangesTabContent.tsx
 msgid "workspace.changesTab.loading"
 msgstr "変更を読み込み中..."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/useChangesTab.tsx
-msgid "workspace.changesTab.refreshFailed"
-msgstr "変更の更新に失敗しました"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/useChangesTab.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/ChangesPanel.tsx
 msgid "workspace.changesTab.renameBranchFailed"
 msgstr "ブランチ名の変更に失敗しました"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/useChangesTab.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/ChangesPanel.tsx
 msgid "workspace.changesTab.renameBranchLoading"
 msgstr "ブランチ名を{newName}に変更中..."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/useChangesTab.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/ChangesPanel.tsx
 msgid "workspace.changesTab.renameBranchSuccess"
 msgstr "ブランチ名を{newName}に変更しました"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesTabContent/ChangesTabContent.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesTabContent/ChangesTabContent.tsx
 msgid "workspace.changesTab.statusError"
 msgstr "gitステータスを読み込めません"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesToolbar/ChangesToolbar.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesToolbar/ChangesToolbar.tsx
 msgid "workspace.changesToolbar.collapseAll"
 msgstr "すべて折りたたむ"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesToolbar/ChangesToolbar.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesToolbar/ChangesToolbar.tsx
 msgid "workspace.changesToolbar.expandAll"
 msgstr "すべて展開"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesToolbar/ChangesToolbar.tsx
-msgid "workspace.changesToolbar.fileCount"
-msgstr "{totalFiles, plural, one {#個のファイル} other {#個のファイル}}"
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesToolbar/ChangesToolbar.tsx
+msgid "workspace.changesToolbar.vsBase"
+msgstr "<0>vs</0> <1/>"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesToolbar/ChangesToolbar.tsx
-msgid "workspace.changesToolbar.refreshAria"
-msgstr "変更を更新"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesToolbar/ChangesToolbar.tsx
-msgid "workspace.changesToolbar.refreshTooltip"
-msgstr "変更を更新"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.deleteConfirmAction"
 msgstr "削除"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.deleteConfirmBody"
 msgstr "このファイルを完全に削除します。この操作は元に戻せません。"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.deleteConfirmTitle"
 msgstr "「{discardBasename}」を削除しますか?"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.discardChangesAria"
 msgstr "変更を破棄"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.discardChangesTooltip"
 msgstr "変更を破棄"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.discardConfirmAction"
 msgstr "破棄"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.discardConfirmBody"
 msgstr "このファイルへの変更をすべて元に戻します。この操作は元に戻せません。"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.discardConfirmTitle"
 msgstr "「{discardBasename}」への変更を破棄しますか?"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.discardFailed"
 msgstr "変更を破棄できませんでした"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/ShadowRowHoverActions/ShadowRowHoverActions.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/ShadowRowHoverActions/ShadowRowHoverActions.tsx
 msgid "workspace.changesTreeView.moreActionsAria"
 msgstr "その他の操作"
 
@@ -32636,27 +32646,37 @@ msgid "workspace.commentsSection.viewCommentByAria"
 msgstr "{0}のコメントを表示"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/CommitFilterDropdown.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/CommitFilterDropdown.tsx
 msgid "workspace.commitFilter.allChanges"
-msgstr "すべての変更"
+msgstr "すべてのコミット"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/CommitFilterDropdown.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/CommitFilterDropdown.tsx
+msgid "workspace.commitFilter.commitsLabel"
+msgstr "コミット"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/CommitFilterDropdown.tsx
 msgid "workspace.commitFilter.filesChangedCount"
 msgstr "{uncommittedCount, plural, one {#件のファイルが変更されました} other {#件のファイルが変更されました}}"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/CommitFilterDropdown.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/CommitFilterDropdown.tsx
+msgid "workspace.commitFilter.renameBranchLabel"
+msgstr "ブランチ名を変更"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/CommitFilterDropdown.tsx
 msgid "workspace.commitFilter.selectRange"
 msgstr "範囲を選択..."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/CommitFilterDropdown.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/CommitFilterDropdown.tsx
 msgid "workspace.commitFilter.uncommitted"
 msgstr "未コミット"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/CommitFilterDropdown.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/CommitFilterDropdown.tsx
 msgid "workspace.commitFilter.uncommittedChanges"
 msgstr "未コミットの変更"
 
@@ -32699,11 +32719,6 @@ msgstr "編集をキャンセル"
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffHeaderMetadata/DiffHeaderMetadata.tsx
 msgid "workspace.diffPane.cancelEditsAria"
 msgstr "編集をキャンセル"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffHeaderPrefix/DiffHeaderPrefix.tsx
-msgid "workspace.diffPane.collapseFileAria"
-msgstr "ファイルを折りたたむ"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/CommentThread/CommentThread.tsx
@@ -32820,11 +32835,6 @@ msgid "workspace.diffPane.dontSave"
 msgstr "保存しない"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffHeaderPrefix/DiffHeaderPrefix.tsx
-msgid "workspace.diffPane.expandFileAria"
-msgstr "ファイルを展開"
-
-#. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/CommentThread/CommentThread.tsx
 msgid "workspace.diffPane.expandThreadAria"
 msgstr "スレッドを展開"
@@ -32914,6 +32924,23 @@ msgstr "ファイルビューアで開く"
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/CommentThread/CommentThread.tsx
 msgid "workspace.diffPane.openOnGithubAria"
 msgstr "GitHubで開く"
+
+#. js-lingui-explicit-id
+#. placeholder {0}: pr.number
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffPaneHeaderExtras/components/DiffPanePRLink/DiffPanePRLink.tsx
+msgid "workspace.diffPane.openPrChip"
+msgstr "PR #{0} を開く"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffPaneHeaderExtras/components/DiffPanePRLink/DiffPanePRLink.tsx
+msgid "workspace.diffPane.openPullRequest"
+msgstr "プルリクエストを開く"
+
+#. js-lingui-explicit-id
+#. placeholder {0}: pr.number
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffPaneHeaderExtras/components/DiffPanePRLink/DiffPanePRLink.tsx
+msgid "workspace.diffPane.openPullRequestAria"
+msgstr "プルリクエスト #{0} を開く"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffHeaderMetadata/DiffHeaderMetadata.tsx
@@ -33036,16 +33063,6 @@ msgid "workspace.diffPane.showReviewCommentsAria"
 msgstr "PRレビューコメントを表示"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffPaneHeaderExtras/DiffPaneHeaderExtras.tsx
-msgid "workspace.diffPane.splitView"
-msgstr "分割表示"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffPaneHeaderExtras/DiffPaneHeaderExtras.tsx
-msgid "workspace.diffPane.splitViewAria"
-msgstr "分割表示"
-
-#. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/DiffPane.tsx
 msgid "workspace.diffPane.thisFileFallback"
 msgstr "このファイル"
@@ -33059,16 +33076,6 @@ msgstr "古いコメント"
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/CommentThread/CommentThread.tsx
 msgid "workspace.diffPane.threadResolved"
 msgstr "解決済み"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffPaneHeaderExtras/DiffPaneHeaderExtras.tsx
-msgid "workspace.diffPane.unifiedView"
-msgstr "統合表示"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffPaneHeaderExtras/DiffPaneHeaderExtras.tsx
-msgid "workspace.diffPane.unifiedViewAria"
-msgstr "統合表示"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/CommentThread/CommentThread.tsx
@@ -33131,6 +33138,11 @@ msgstr "破棄"
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceEmptyState/WorkspaceEmptyState.tsx
 msgid "workspace.emptyState.openBrowser"
 msgstr "ブラウザを開く"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceEmptyState/WorkspaceEmptyState.tsx
+msgid "workspace.emptyState.openChanges"
+msgstr "変更を開く"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceEmptyState/WorkspaceEmptyState.tsx
@@ -33374,147 +33386,147 @@ msgid "workspace.filePane.viewVideo"
 msgstr "動画"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.contextOpenDiff"
 msgstr "差分を開く"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.contextOpenDiffNewTab"
 msgstr "新しいタブで差分を開く"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.contextOpenFile"
 msgstr "ファイルを開く"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.contextOpenFileNewTab"
 msgstr "新しいタブでファイルを開く"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.contextOpenInEditor"
 msgstr "エディタで開く"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.deleteConfirmAction"
 msgstr "削除"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.deleteConfirmBody"
 msgstr "このファイルを完全に削除します。この操作は元に戻せません。"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.deleteConfirmTitle"
 msgstr "「{basename}」を削除しますか?"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.discardChangesAria"
 msgstr "変更を破棄"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.discardChangesTooltip"
 msgstr "変更を破棄"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.discardConfirmAction"
 msgstr "破棄"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.discardConfirmBody"
 msgstr "このファイルへの変更をすべて元に戻します。この操作は元に戻せません。"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.discardConfirmTitle"
 msgstr "「{basename}」への変更を破棄しますか?"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.discardFailed"
 msgstr "変更を破棄できませんでした"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.menuDelete"
 msgstr "削除"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.menuDiscardChanges"
 msgstr "変更を破棄"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.menuOpenDiff"
 msgstr "差分を開く"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.menuOpenDiffNewTab"
 msgstr "新しいタブで差分を開く"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.menuOpenFile"
 msgstr "ファイルを開く"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.menuOpenFileNewTab"
 msgstr "新しいタブでファイルを開く"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.menuOpenInEditor"
 msgstr "エディタで開く"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.moreActionsAria"
 msgstr "その他の操作"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
 msgid "workspace.fileRowContextMenuItems.delete"
 msgstr "削除"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
 msgid "workspace.fileRowContextMenuItems.discardChanges"
 msgstr "変更を破棄"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
 msgid "workspace.fileRowMenuItems.openDiff"
 msgstr "差分を開く"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
 msgid "workspace.fileRowMenuItems.openDiffNewTab"
 msgstr "新しいタブで差分を開く"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
 msgid "workspace.fileRowMenuItems.openFile"
 msgstr "ファイルを開く"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
 msgid "workspace.fileRowMenuItems.openFileNewTab"
 msgstr "新しいタブでファイルを開く"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
 msgid "workspace.fileRowMenuItems.openInEditor"
 msgstr "エディタで開く"
 
@@ -33750,7 +33762,7 @@ msgid "workspace.folderMenuItems.newFolder"
 msgstr "新規フォルダ..."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/FolderContextMenuItems/FolderContextMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/FolderContextMenuItems/FolderContextMenuItems.tsx
 msgid "workspace.folderMenuItems.openInEditor"
 msgstr "エディタで開く"
 
@@ -34132,147 +34144,122 @@ msgid "workspace.pathActions.unknownError"
 msgstr "不明なエラー"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.contextCopyPath"
 msgstr "パスをコピー"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.contextCopyRelativePath"
 msgstr "相対パスをコピー"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.contextRevealInFinder"
 msgstr "Finderに表示"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.copyPathFailed"
 msgstr "パスのコピーに失敗しました: {reason}"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.dropdownCopyPath"
 msgstr "パスをコピー"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.dropdownCopyRelativePath"
 msgstr "相対パスをコピー"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.dropdownRevealInFinder"
 msgstr "Finderに表示"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.pathCopied"
 msgstr "パスをコピーしました"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.relativePathCopied"
 msgstr "相対パスをコピーしました"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.revealInFinderFailed"
 msgstr "Finderでの表示に失敗しました: {reason}"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.unknownError"
 msgstr "不明なエラー"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/PRActionHeader.tsx
-msgid "workspace.prActionHeader.createPrComingSoon"
-msgstr "PRの作成は近日公開"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/PRActionHeader.tsx
-msgid "workspace.prActionHeader.defaultBranchTooltip"
-msgstr "プルリクエストを作成するにはフィーチャーブランチに切り替えてください"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/PRActionHeader.tsx
-msgid "workspace.prActionHeader.detachedHeadTooltip"
-msgstr "プルリクエストを作成するにはブランチをチェックアウトしてください"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/PRActionHeader.tsx
-msgid "workspace.prActionHeader.noRepoTooltip"
-msgstr "GitHubリポジトリが接続されていません"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/PRActionHeader.tsx
-msgid "workspace.prActionHeader.retryLoadingPr"
-msgstr "プルリクエストを再読み込み"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.allChecksPassed"
 msgstr "{total, plural, one {#件のチェックにすべて成功しました} other {#件のチェックにすべて成功しました}}"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.checksFailingMany"
 msgstr "{total}件中{failing}件のチェックが失敗"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.checksFailingOne"
 msgstr "{total}件中{failing}件のチェックが失敗"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.checksRunningMany"
 msgstr "{total}件中{pending}件のチェックが実行中"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.checksRunningOne"
 msgstr "{total}件中{pending}件のチェックが実行中"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.noChecksReported"
 msgstr "チェックの報告はありません"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.stateClosed"
 msgstr "クローズ済み"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.stateDraft"
 msgstr "ドラフト"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.stateMerged"
 msgstr "マージ済み"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.stateOpen"
 msgstr "オープン"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.stateQueued"
 msgstr "キュー待ち"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.updatedAt"
 msgstr "{updatedRelative}に更新"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.viewOnGitHub"
 msgstr "GitHubで表示"
 
@@ -34327,73 +34314,109 @@ msgid "workspace.prHeader.reviewPending"
 msgstr "レビュー待ち"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.createMergeCommit"
 msgstr "マージコミットを作成"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
+msgid "workspace.prStatusGroup.markedReady"
+msgstr "PRがレビュー準備完了になりました"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
+msgid "workspace.prStatusGroup.markedReadyRefreshFailed"
+msgstr "準備完了にしましたが、PRの状態を更新できませんでした — しばらくしてからもう一度お試しください"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
+msgid "workspace.prStatusGroup.markingReady"
+msgstr "レビュー準備完了にしています…"
+
+#. js-lingui-explicit-id
+#. placeholder {0}: error.message
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
+msgid "workspace.prStatusGroup.markReadyFailed"
+msgstr "レビュー準備完了にできませんでした: {0}"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.merged"
 msgstr "PRをマージしました"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.mergedRefreshFailed"
 msgstr "マージしましたが、PRの状態を更新できませんでした — 少し待って再試行してください"
 
 #. js-lingui-explicit-id
 #. placeholder {0}: error.message
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.mergeFailed"
 msgstr "マージに失敗しました: {0}"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.mergeMenuLabel"
 msgstr "マージ"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.merging"
 msgstr "PRをマージ中..."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.mergingAria"
 msgstr "プルリクエストをマージ中"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
-msgid "workspace.prStatusGroup.openMergeOptionsAria"
-msgstr "マージオプションを開く"
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
+msgid "workspace.prStatusGroup.openPrOptionsAria"
+msgstr "プルリクエストのオプションを開く"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
+msgid "workspace.prStatusGroup.openPullRequest"
+msgstr "プルリクエストを開く"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
+msgid "workspace.prStatusGroup.readyForReview"
+msgstr "レビュー準備完了にする"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.rebaseAndMerge"
 msgstr "リベースしてマージ"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.squashAndMerge"
 msgstr "スカッシュしてマージ"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/components/RangeModal/RangeModal.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
+msgid "workspace.prStatusGroup.viewOnGitHub"
+msgstr "GitHubで表示"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/components/RangeModal/RangeModal.tsx
 msgid "workspace.rangeModal.apply"
 msgstr "適用"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/components/RangeModal/RangeModal.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/components/RangeModal/RangeModal.tsx
 msgid "workspace.rangeModal.cancel"
 msgstr "キャンセル"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/components/RangeModal/RangeModal.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/components/RangeModal/RangeModal.tsx
 msgid "workspace.rangeModal.description"
 msgstr "2つのコミットをクリックして範囲を指定してください。"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/components/RangeModal/RangeModal.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/components/RangeModal/RangeModal.tsx
 msgid "workspace.rangeModal.title"
 msgstr "コミット範囲を選択"
 
@@ -34481,6 +34504,106 @@ msgstr "停止"
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/V2WorkspaceRunButton/V2WorkspaceRunButton.tsx
 msgid "workspace.runButton.stopAria"
 msgstr "ワークスペースの実行コマンドを停止"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.commit"
+msgstr "コミット"
+
+#. js-lingui-explicit-id
+#. placeholder {0}: error.message
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.commitFailed"
+msgstr "コミットに失敗しました: {0}"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.committed"
+msgstr "コミットしました"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.createPr"
+msgstr "PRを作成"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.createPrAction"
+msgstr "プルリクエストを作成"
+
+#. js-lingui-explicit-id
+#. placeholder {0}: error instanceof Error ? error.message : String(error)
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.createPrFailed"
+msgstr "PRの作成に失敗しました: {0}"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.creatingPr"
+msgstr "PRを作成中…"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.draft"
+msgstr "ドラフト"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.noCommitsTooltip"
+msgstr "プルリクエストを作成できるコミットがありません"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.openPrToastAction"
+msgstr "開く"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.openShipOptionsAria"
+msgstr "送信オプションを開く"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.prBodyPlaceholder"
+msgstr "説明（任意）"
+
+#. js-lingui-explicit-id
+#. placeholder {0}: created.number
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.prCreated"
+msgstr "PR #{0} を作成しました"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.prTitlePlaceholder"
+msgstr "プルリクエストのタイトル"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.prUrlLink"
+msgstr "PRのURL"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.push"
+msgstr "プッシュ"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.pushed"
+msgstr "プッシュしました"
+
+#. js-lingui-explicit-id
+#. placeholder {0}: error instanceof Error ? error.message : String(error)
+#. placeholder {0}: error.message
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.pushFailed"
+msgstr "プッシュに失敗しました: {0}"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.pushing"
+msgstr "プッシュ中…"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/WorkspaceSidebar.tsx
@@ -35207,12 +35330,12 @@ msgid "workspace.terminalPane.workspaceRunState"
 msgstr "ワークスペース実行: {workspaceRunState}"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesHeader/components/ViewModeToggle/ViewModeToggle.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesToolbar/components/ViewModeToggle/ViewModeToggle.tsx
 msgid "workspace.viewModeToggle.folderView"
 msgstr "フォルダ表示"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesHeader/components/ViewModeToggle/ViewModeToggle.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesToolbar/components/ViewModeToggle/ViewModeToggle.tsx
 msgid "workspace.viewModeToggle.treeView"
 msgstr "ツリー表示"
 

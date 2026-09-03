@@ -6555,32 +6555,37 @@ msgid "dashboard.pullRequests.checkStatus.skipped"
 msgstr "已跳過"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.collapseAllFiles"
 msgstr "摺疊所有檔案"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffFileCollapseButton/DiffFileCollapseButton.tsx
 msgid "dashboard.pullRequests.codeTab.collapseFile"
 msgstr "摺疊檔案"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
+msgid "dashboard.pullRequests.codeTab.commentsLabel"
+msgstr "評論"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.expandAllFiles"
 msgstr "展開所有檔案"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffFileCollapseButton/DiffFileCollapseButton.tsx
 msgid "dashboard.pullRequests.codeTab.expandFile"
 msgstr "展開檔案"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.files"
 msgstr "檔案"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.hideFileTree"
 msgstr "隱藏檔案樹"
 
@@ -6613,7 +6618,7 @@ msgid "dashboard.pullRequests.codeTab.loadingDiff"
 msgstr "正在載入差異…"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.nextComment"
 msgstr "下一條評論"
 
@@ -6633,7 +6638,7 @@ msgid "dashboard.pullRequests.codeTab.postReplyFailed"
 msgstr "無法釋出回覆"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.previousComment"
 msgstr "上一條評論"
 
@@ -6648,17 +6653,17 @@ msgid "dashboard.pullRequests.codeTab.sentToAgent"
 msgstr "已傳送給代理程式"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.showFileTree"
 msgstr "顯示檔案樹"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.splitView"
 msgstr "分欄檢視"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.unifiedView"
 msgstr "統一檢視"
 
@@ -11667,12 +11672,12 @@ msgstr "開啟命令面板"
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/hotkeys/registry.ts
 msgid "hotkeys.openDiffViewer.description"
-msgstr "在新分頁中開啟差異檢視器，或聚焦已有的差異檢視器"
+msgstr "在新分頁中開啟更改面板，或聚焦現有面板"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/hotkeys/registry.ts
 msgid "hotkeys.openDiffViewer.label"
-msgstr "開啟差異檢視器"
+msgstr "開啟更改"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/hotkeys/registry.ts
@@ -11897,7 +11902,7 @@ msgstr "分割並開啟桌面"
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/hotkeys/registry.ts
 msgid "hotkeys.toggleSidebar.label"
-msgstr "切換更改分頁"
+msgstr "切換側邊欄"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/hotkeys/registry.ts
@@ -20941,6 +20946,26 @@ msgstr "終端排版"
 #: ../../apps/desktop/src/renderer/routes/_authenticated/settings/appearance/components/AppearanceSettings/components/FontSettingSection/FontSettingSection.tsx
 msgid "settings.appearance.typography.title"
 msgstr "排版"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/settings/behavior/components/BehaviorSettings/BehaviorSettings.tsx
+msgid "settings.behavior.changesOpenTarget.hint"
+msgstr "選擇從頂欄開啟變更檢視的方式"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/settings/behavior/components/BehaviorSettings/BehaviorSettings.tsx
+msgid "settings.behavior.changesOpenTarget.label"
+msgstr "變更檢視開啟位置"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/settings/behavior/components/BehaviorSettings/BehaviorSettings.tsx
+msgid "settings.behavior.changesOpenTarget.pane"
+msgstr "目前分頁中的窗格"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/settings/behavior/components/BehaviorSettings/BehaviorSettings.tsx
+msgid "settings.behavior.changesOpenTarget.tab"
+msgstr "新分頁"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/settings/behavior/components/BehaviorSettings/BehaviorSettings.tsx
@@ -31209,6 +31234,11 @@ msgstr "瀏覽器"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/AddTabMenu/AddTabMenu.tsx
+msgid "workspace.addTabMenu.changes"
+msgstr "更改"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/AddTabMenu/AddTabMenu.tsx
 msgid "workspace.addTabMenu.chatV3"
 msgstr "聊天v3"
 
@@ -31338,12 +31368,12 @@ msgid "workspace.backgroundTerminals.untitledSession"
 msgstr "終端"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/BaseBranchSelector/BaseBranchSelector.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/BaseBranchSelector/BaseBranchSelector.tsx
 msgid "workspace.baseBranchSelector.empty"
 msgstr "未找到分支"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/BaseBranchSelector/BaseBranchSelector.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/BaseBranchSelector/BaseBranchSelector.tsx
 msgid "workspace.baseBranchSelector.searchPlaceholder"
 msgstr "搜尋分支..."
 
@@ -32040,223 +32070,203 @@ msgid "workspace.changes.groupUnstaged"
 msgstr "未暫存"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/ChangesFileList.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/ChangesFileList.tsx
 msgid "workspace.changesFileList.empty"
 msgstr "沒有更改"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/ChangesFileList.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/ChangesFileList.tsx
 msgid "workspace.changesFileList.loading"
 msgstr "載入中..."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesFoldersView/ChangesFoldersView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesFoldersView/ChangesFoldersView.tsx
 msgid "workspace.changesFoldersView.rootFolder"
-msgstr "根路徑"
+msgstr "./"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesHeader/ChangesHeader.tsx
-msgid "workspace.changesHeader.fromBase"
-msgstr "<0>基於</0> <1/>"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/ChangesFileList.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/ChangesFileList.tsx
 msgid "workspace.changesList.groupAgainstBase"
 msgstr "對比基準分支"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/ChangesFileList.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/ChangesFileList.tsx
 msgid "workspace.changesList.groupCommitted"
 msgstr "已提交"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/ChangesFileList.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/ChangesFileList.tsx
 msgid "workspace.changesList.groupStaged"
 msgstr "已暫存"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/ChangesFileList.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/ChangesFileList.tsx
 msgid "workspace.changesList.groupUnstaged"
 msgstr "未暫存"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/ChangesControl.tsx
+msgid "workspace.changesPill.openChanges"
+msgstr "開啟更改"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardAllStagedAria"
 msgstr "放棄所有已暫存的更改"
 
 #. js-lingui-explicit-id
 #. placeholder {0}: stagingActions.kind
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardAllTooltip"
 msgstr "放棄所有{0}"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardAllUnstagedAria"
 msgstr "放棄所有未暫存的更改"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardStagedConfirmBody"
 msgstr "這將取消暫存並還原所有已暫存的更改。已暫存的新檔案將被刪除。此操作無法復原。"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardStagedConfirmTitle"
 msgstr "放棄所有已暫存的更改？"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardStagedFailed"
 msgstr "無法放棄已暫存的更改"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardUnstagedConfirmBody"
 msgstr "這將還原所有未暫存的修改並刪除未追蹤的檔案。此操作無法復原。"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardUnstagedConfirmTitle"
 msgstr "放棄所有未暫存的更改？"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardUnstagedFailed"
 msgstr "無法放棄未暫存的更改"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.stageAll"
 msgstr "全部暫存"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.stageFailed"
 msgstr "無法暫存更改"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.unstageAll"
 msgstr "全部取消暫存"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.unstageFailed"
 msgstr "無法取消暫存更改"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/useChangesTab.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/ChangesPanel.tsx
 msgid "workspace.changesTab.changeBaseBranchFailed"
 msgstr "更改基準分支失敗"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/useChangesTab.tsx
-msgid "workspace.changesTab.label"
-msgstr "更改"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesTabContent/ChangesTabContent.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesTabContent/ChangesTabContent.tsx
 msgid "workspace.changesTab.loading"
 msgstr "正在載入更改..."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/useChangesTab.tsx
-msgid "workspace.changesTab.refreshFailed"
-msgstr "重新整理更改失敗"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/useChangesTab.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/ChangesPanel.tsx
 msgid "workspace.changesTab.renameBranchFailed"
 msgstr "重新命名分支失敗"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/useChangesTab.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/ChangesPanel.tsx
 msgid "workspace.changesTab.renameBranchLoading"
 msgstr "正在將分支重新命名為{newName}..."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/useChangesTab.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/ChangesPanel.tsx
 msgid "workspace.changesTab.renameBranchSuccess"
 msgstr "分支已重新命名為{newName}"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesTabContent/ChangesTabContent.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesTabContent/ChangesTabContent.tsx
 msgid "workspace.changesTab.statusError"
 msgstr "無法載入git狀態"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesToolbar/ChangesToolbar.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesToolbar/ChangesToolbar.tsx
 msgid "workspace.changesToolbar.collapseAll"
 msgstr "全部摺疊"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesToolbar/ChangesToolbar.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesToolbar/ChangesToolbar.tsx
 msgid "workspace.changesToolbar.expandAll"
 msgstr "全部展開"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesToolbar/ChangesToolbar.tsx
-msgid "workspace.changesToolbar.fileCount"
-msgstr "{totalFiles, plural, one {# 個檔案} other {# 個檔案}}"
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesToolbar/ChangesToolbar.tsx
+msgid "workspace.changesToolbar.vsBase"
+msgstr "<0>對比</0> <1/>"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesToolbar/ChangesToolbar.tsx
-msgid "workspace.changesToolbar.refreshAria"
-msgstr "重新整理更改"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesToolbar/ChangesToolbar.tsx
-msgid "workspace.changesToolbar.refreshTooltip"
-msgstr "重新整理更改"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.deleteConfirmAction"
 msgstr "刪除"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.deleteConfirmBody"
 msgstr "這將永久刪除此檔案。此操作無法復原。"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.deleteConfirmTitle"
 msgstr "刪除「{discardBasename}」？"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.discardChangesAria"
 msgstr "放棄更改"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.discardChangesTooltip"
 msgstr "放棄更改"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.discardConfirmAction"
 msgstr "放棄"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.discardConfirmBody"
 msgstr "這將還原對此檔案的所有更改。此操作無法復原。"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.discardConfirmTitle"
 msgstr "放棄對「{discardBasename}」的更改？"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.discardFailed"
 msgstr "無法放棄更改"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/ShadowRowHoverActions/ShadowRowHoverActions.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/ShadowRowHoverActions/ShadowRowHoverActions.tsx
 msgid "workspace.changesTreeView.moreActionsAria"
 msgstr "更多操作"
 
@@ -32637,27 +32647,37 @@ msgid "workspace.commentsSection.viewCommentByAria"
 msgstr "檢視{0}的評論"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/CommitFilterDropdown.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/CommitFilterDropdown.tsx
 msgid "workspace.commitFilter.allChanges"
-msgstr "所有更改"
+msgstr "所有提交"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/CommitFilterDropdown.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/CommitFilterDropdown.tsx
+msgid "workspace.commitFilter.commitsLabel"
+msgstr "提交"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/CommitFilterDropdown.tsx
 msgid "workspace.commitFilter.filesChangedCount"
 msgstr "{uncommittedCount, plural, one {#個檔案已更改} other {#個檔案已更改}}"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/CommitFilterDropdown.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/CommitFilterDropdown.tsx
+msgid "workspace.commitFilter.renameBranchLabel"
+msgstr "重新命名分支"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/CommitFilterDropdown.tsx
 msgid "workspace.commitFilter.selectRange"
 msgstr "選擇範圍..."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/CommitFilterDropdown.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/CommitFilterDropdown.tsx
 msgid "workspace.commitFilter.uncommitted"
 msgstr "未提交"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/CommitFilterDropdown.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/CommitFilterDropdown.tsx
 msgid "workspace.commitFilter.uncommittedChanges"
 msgstr "未提交的更改"
 
@@ -32700,11 +32720,6 @@ msgstr "取消編輯"
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffHeaderMetadata/DiffHeaderMetadata.tsx
 msgid "workspace.diffPane.cancelEditsAria"
 msgstr "取消編輯"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffHeaderPrefix/DiffHeaderPrefix.tsx
-msgid "workspace.diffPane.collapseFileAria"
-msgstr "摺疊檔案"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/CommentThread/CommentThread.tsx
@@ -32821,11 +32836,6 @@ msgid "workspace.diffPane.dontSave"
 msgstr "不儲存"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffHeaderPrefix/DiffHeaderPrefix.tsx
-msgid "workspace.diffPane.expandFileAria"
-msgstr "展開檔案"
-
-#. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/CommentThread/CommentThread.tsx
 msgid "workspace.diffPane.expandThreadAria"
 msgstr "展開討論串"
@@ -32915,6 +32925,23 @@ msgstr "在檔案檢視器中開啟"
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/CommentThread/CommentThread.tsx
 msgid "workspace.diffPane.openOnGithubAria"
 msgstr "在GitHub上開啟"
+
+#. js-lingui-explicit-id
+#. placeholder {0}: pr.number
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffPaneHeaderExtras/components/DiffPanePRLink/DiffPanePRLink.tsx
+msgid "workspace.diffPane.openPrChip"
+msgstr "開啟PR #{0}"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffPaneHeaderExtras/components/DiffPanePRLink/DiffPanePRLink.tsx
+msgid "workspace.diffPane.openPullRequest"
+msgstr "開啟拉取請求"
+
+#. js-lingui-explicit-id
+#. placeholder {0}: pr.number
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffPaneHeaderExtras/components/DiffPanePRLink/DiffPanePRLink.tsx
+msgid "workspace.diffPane.openPullRequestAria"
+msgstr "開啟拉取請求 #{0}"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffHeaderMetadata/DiffHeaderMetadata.tsx
@@ -33037,16 +33064,6 @@ msgid "workspace.diffPane.showReviewCommentsAria"
 msgstr "顯示PR評審評論"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffPaneHeaderExtras/DiffPaneHeaderExtras.tsx
-msgid "workspace.diffPane.splitView"
-msgstr "分欄檢視"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffPaneHeaderExtras/DiffPaneHeaderExtras.tsx
-msgid "workspace.diffPane.splitViewAria"
-msgstr "分欄檢視"
-
-#. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/DiffPane.tsx
 msgid "workspace.diffPane.thisFileFallback"
 msgstr "該檔案"
@@ -33060,16 +33077,6 @@ msgstr "已過期"
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/CommentThread/CommentThread.tsx
 msgid "workspace.diffPane.threadResolved"
 msgstr "已解決"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffPaneHeaderExtras/DiffPaneHeaderExtras.tsx
-msgid "workspace.diffPane.unifiedView"
-msgstr "統一檢視"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffPaneHeaderExtras/DiffPaneHeaderExtras.tsx
-msgid "workspace.diffPane.unifiedViewAria"
-msgstr "統一檢視"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/CommentThread/CommentThread.tsx
@@ -33132,6 +33139,11 @@ msgstr "放棄"
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceEmptyState/WorkspaceEmptyState.tsx
 msgid "workspace.emptyState.openBrowser"
 msgstr "開啟瀏覽器"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceEmptyState/WorkspaceEmptyState.tsx
+msgid "workspace.emptyState.openChanges"
+msgstr "開啟更改"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceEmptyState/WorkspaceEmptyState.tsx
@@ -33375,147 +33387,147 @@ msgid "workspace.filePane.viewVideo"
 msgstr "影片"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.contextOpenDiff"
 msgstr "開啟差異"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.contextOpenDiffNewTab"
 msgstr "在新分頁中開啟差異"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.contextOpenFile"
 msgstr "開啟檔案"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.contextOpenFileNewTab"
 msgstr "在新分頁中開啟檔案"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.contextOpenInEditor"
 msgstr "在編輯器中開啟"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.deleteConfirmAction"
 msgstr "刪除"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.deleteConfirmBody"
 msgstr "這將永久刪除此檔案。此操作無法復原。"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.deleteConfirmTitle"
 msgstr "刪除「{basename}」？"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.discardChangesAria"
 msgstr "放棄更改"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.discardChangesTooltip"
 msgstr "放棄更改"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.discardConfirmAction"
 msgstr "放棄"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.discardConfirmBody"
 msgstr "這將還原對此檔案的所有更改。此操作無法復原。"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.discardConfirmTitle"
 msgstr "放棄對「{basename}」的更改？"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.discardFailed"
 msgstr "無法放棄更改"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.menuDelete"
 msgstr "刪除"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.menuDiscardChanges"
 msgstr "放棄更改"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.menuOpenDiff"
 msgstr "開啟差異"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.menuOpenDiffNewTab"
 msgstr "在新分頁中開啟差異"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.menuOpenFile"
 msgstr "開啟檔案"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.menuOpenFileNewTab"
 msgstr "在新分頁中開啟檔案"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.menuOpenInEditor"
 msgstr "在編輯器中開啟"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.moreActionsAria"
 msgstr "更多操作"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
 msgid "workspace.fileRowContextMenuItems.delete"
 msgstr "刪除"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
 msgid "workspace.fileRowContextMenuItems.discardChanges"
 msgstr "放棄更改"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
 msgid "workspace.fileRowMenuItems.openDiff"
 msgstr "開啟差異"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
 msgid "workspace.fileRowMenuItems.openDiffNewTab"
 msgstr "在新分頁中開啟差異"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
 msgid "workspace.fileRowMenuItems.openFile"
 msgstr "開啟檔案"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
 msgid "workspace.fileRowMenuItems.openFileNewTab"
 msgstr "在新分頁中開啟檔案"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
 msgid "workspace.fileRowMenuItems.openInEditor"
 msgstr "在編輯器中開啟"
 
@@ -33751,7 +33763,7 @@ msgid "workspace.folderMenuItems.newFolder"
 msgstr "新建資料夾..."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/FolderContextMenuItems/FolderContextMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/FolderContextMenuItems/FolderContextMenuItems.tsx
 msgid "workspace.folderMenuItems.openInEditor"
 msgstr "在編輯器中開啟"
 
@@ -34133,147 +34145,122 @@ msgid "workspace.pathActions.unknownError"
 msgstr "未知錯誤"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.contextCopyPath"
 msgstr "複製路徑"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.contextCopyRelativePath"
 msgstr "複製相對路徑"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.contextRevealInFinder"
 msgstr "在Finder中顯示"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.copyPathFailed"
 msgstr "複製路徑失敗：{reason}"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.dropdownCopyPath"
 msgstr "複製路徑"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.dropdownCopyRelativePath"
 msgstr "複製相對路徑"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.dropdownRevealInFinder"
 msgstr "在Finder中顯示"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.pathCopied"
 msgstr "已複製路徑"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.relativePathCopied"
 msgstr "已複製相對路徑"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.revealInFinderFailed"
 msgstr "在Finder中顯示失敗：{reason}"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.unknownError"
 msgstr "未知錯誤"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/PRActionHeader.tsx
-msgid "workspace.prActionHeader.createPrComingSoon"
-msgstr "建立PR功能即將推出"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/PRActionHeader.tsx
-msgid "workspace.prActionHeader.defaultBranchTooltip"
-msgstr "切換到功能分支以建立拉取請求"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/PRActionHeader.tsx
-msgid "workspace.prActionHeader.detachedHeadTooltip"
-msgstr "檢出一個分支以建立拉取請求"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/PRActionHeader.tsx
-msgid "workspace.prActionHeader.noRepoTooltip"
-msgstr "未連線GitHub儲存庫"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/PRActionHeader.tsx
-msgid "workspace.prActionHeader.retryLoadingPr"
-msgstr "重新載入拉取請求"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.allChecksPassed"
 msgstr "{total, plural, one {#項檢查全部通過} other {#項檢查全部通過}}"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.checksFailingMany"
 msgstr "{total}項檢查中有{failing}項失敗"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.checksFailingOne"
 msgstr "{total}項檢查中有{failing}項失敗"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.checksRunningMany"
 msgstr "{total}項檢查中有{pending}項執行中"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.checksRunningOne"
 msgstr "{total}項檢查中有{pending}項執行中"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.noChecksReported"
 msgstr "沒有檢查結果"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.stateClosed"
 msgstr "已關閉"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.stateDraft"
 msgstr "草稿"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.stateMerged"
 msgstr "已合併"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.stateOpen"
 msgstr "開放"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.stateQueued"
 msgstr "已排隊"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.updatedAt"
 msgstr "更新於{updatedRelative}"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.viewOnGitHub"
 msgstr "在GitHub上檢視"
 
@@ -34328,73 +34315,109 @@ msgid "workspace.prHeader.reviewPending"
 msgstr "待評審"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.createMergeCommit"
 msgstr "建立合併提交"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
+msgid "workspace.prStatusGroup.markedReady"
+msgstr "PR已可審查"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
+msgid "workspace.prStatusGroup.markedReadyRefreshFailed"
+msgstr "已標記為可審查，但無法重新整理PR狀態 — 請稍後重試"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
+msgid "workspace.prStatusGroup.markingReady"
+msgstr "正在標記為可審查…"
+
+#. js-lingui-explicit-id
+#. placeholder {0}: error.message
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
+msgid "workspace.prStatusGroup.markReadyFailed"
+msgstr "標記為可審查失敗：{0}"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.merged"
 msgstr "PR已合併"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.mergedRefreshFailed"
 msgstr "已合併，但無法重新整理PR狀態 — 請稍後重試"
 
 #. js-lingui-explicit-id
 #. placeholder {0}: error.message
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.mergeFailed"
 msgstr "合併失敗：{0}"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.mergeMenuLabel"
 msgstr "合併"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.merging"
 msgstr "正在合併PR..."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.mergingAria"
 msgstr "正在合併拉取請求"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
-msgid "workspace.prStatusGroup.openMergeOptionsAria"
-msgstr "開啟合併選項"
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
+msgid "workspace.prStatusGroup.openPrOptionsAria"
+msgstr "開啟拉取請求選項"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
+msgid "workspace.prStatusGroup.openPullRequest"
+msgstr "開啟拉取請求"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
+msgid "workspace.prStatusGroup.readyForReview"
+msgstr "標記為可審查"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.rebaseAndMerge"
 msgstr "變基併合併"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.squashAndMerge"
 msgstr "壓縮併合併"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/components/RangeModal/RangeModal.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
+msgid "workspace.prStatusGroup.viewOnGitHub"
+msgstr "在GitHub上檢視"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/components/RangeModal/RangeModal.tsx
 msgid "workspace.rangeModal.apply"
 msgstr "應用"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/components/RangeModal/RangeModal.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/components/RangeModal/RangeModal.tsx
 msgid "workspace.rangeModal.cancel"
 msgstr "取消"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/components/RangeModal/RangeModal.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/components/RangeModal/RangeModal.tsx
 msgid "workspace.rangeModal.description"
 msgstr "點選兩個提交以確定範圍。"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/components/RangeModal/RangeModal.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/components/RangeModal/RangeModal.tsx
 msgid "workspace.rangeModal.title"
 msgstr "選擇提交範圍"
 
@@ -34482,6 +34505,106 @@ msgstr "停止"
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/V2WorkspaceRunButton/V2WorkspaceRunButton.tsx
 msgid "workspace.runButton.stopAria"
 msgstr "停止工作區執行命令"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.commit"
+msgstr "提交"
+
+#. js-lingui-explicit-id
+#. placeholder {0}: error.message
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.commitFailed"
+msgstr "提交失敗：{0}"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.committed"
+msgstr "已提交"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.createPr"
+msgstr "建立PR"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.createPrAction"
+msgstr "建立拉取請求"
+
+#. js-lingui-explicit-id
+#. placeholder {0}: error instanceof Error ? error.message : String(error)
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.createPrFailed"
+msgstr "建立PR失敗：{0}"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.creatingPr"
+msgstr "正在建立PR…"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.draft"
+msgstr "草稿"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.noCommitsTooltip"
+msgstr "沒有可用於建立拉取請求的提交"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.openPrToastAction"
+msgstr "開啟"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.openShipOptionsAria"
+msgstr "開啟發布選項"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.prBodyPlaceholder"
+msgstr "描述（選填）"
+
+#. js-lingui-explicit-id
+#. placeholder {0}: created.number
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.prCreated"
+msgstr "已建立PR #{0}"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.prTitlePlaceholder"
+msgstr "拉取請求標題"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.prUrlLink"
+msgstr "PR連結"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.push"
+msgstr "推送"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.pushed"
+msgstr "已推送"
+
+#. js-lingui-explicit-id
+#. placeholder {0}: error instanceof Error ? error.message : String(error)
+#. placeholder {0}: error.message
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.pushFailed"
+msgstr "推送失敗：{0}"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.pushing"
+msgstr "正在推送…"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/WorkspaceSidebar.tsx
@@ -35208,12 +35331,12 @@ msgid "workspace.terminalPane.workspaceRunState"
 msgstr "工作區執行：{workspaceRunState}"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesHeader/components/ViewModeToggle/ViewModeToggle.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesToolbar/components/ViewModeToggle/ViewModeToggle.tsx
 msgid "workspace.viewModeToggle.folderView"
 msgstr "資料夾檢視"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesHeader/components/ViewModeToggle/ViewModeToggle.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesToolbar/components/ViewModeToggle/ViewModeToggle.tsx
 msgid "workspace.viewModeToggle.treeView"
 msgstr "樹狀檢視"
 

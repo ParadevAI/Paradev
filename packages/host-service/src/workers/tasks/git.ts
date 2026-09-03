@@ -18,6 +18,7 @@ import { buildDiffPatch } from "../../trpc/router/git/utils/diff-patch.ts";
 import {
 	type DiffCategory,
 	getChangedFilesForDiff,
+	getDefaultBranchName,
 	loadFileDiffContent,
 	mapWithConcurrency,
 	resolveDiffCategoryRefs,
@@ -298,6 +299,138 @@ export const gitDeleteBranchTask = defineWorkerTask<
 	},
 });
 
+export const gitCommitTask = defineWorkerTask<
+	{
+		worktreePath: string;
+		message: string;
+		stageAll: boolean;
+		gitEnv: GitTaskEnv;
+	},
+	{ ok: true; hash: string } | { ok: false; reason: "nothing-to-commit" }
+>({
+	type: "git/commit",
+	handler: async ({ worktreePath, message, stageAll, gitEnv }) => {
+		const git = createUserSimpleGit(worktreePath).env(gitEnv);
+		if (stageAll) await git.raw(["add", "-A"]);
+		// Read the staged file list instead of `--quiet` exit codes:
+		// simple-git treats a non-zero exit with empty stderr as success, so
+		// `diff --quiet`'s exit-1 signal never surfaces as a rejection.
+		const staged = (await git.raw(["diff", "--cached", "--name-only"])).trim();
+		if (!staged) return { ok: false, reason: "nothing-to-commit" };
+		await git.raw(["commit", "-m", message]);
+		const hash = (await git.revparse(["HEAD"])).trim();
+		return { ok: true, hash };
+	},
+});
+
+export const gitPushTask = defineWorkerTask<
+	{
+		worktreePath: string;
+		/** The workspace's linked PR head branch, when one exists. */
+		linkedPrHeadBranch: string | null;
+		gitEnv: GitTaskEnv;
+	},
+	{ ok: true } | { ok: false; reason: "detached-head" | "no-remote" }
+>({
+	type: "git/push",
+	handler: async ({ worktreePath, linkedPrHeadBranch, gitEnv }) => {
+		const git = createUserSimpleGit(worktreePath).env(gitEnv);
+		const branch = (
+			await git.revparse(["--abbrev-ref", "HEAD"]).catch(() => "")
+		).trim();
+		if (!branch || branch === "HEAD")
+			return { ok: false, reason: "detached-head" };
+
+		// Workspace branches fork from the base branch, so git's
+		// autoSetupMerge usually leaves them tracking e.g. origin/main — a
+		// plain `git push` refuses that name mismatch, and honoring it would
+		// mean pushing to main. But a different-name upstream is deliberate
+		// for PR-checkout workspaces (local alice/feature-x tracking the PR
+		// head feature-x), so the linked PR's head branch decides: matching
+		// upstream → push to it; anything else → publish under the branch's
+		// own name and re-point the upstream there (v1's push flow).
+		const upstreamRef = await git
+			.raw(["rev-parse", "--abbrev-ref", "@{upstream}"])
+			.then(
+				(ref) => ref.trim(),
+				() => null,
+			);
+		// `branch.<name>.remote` distinguishes remote tracking from tracking
+		// a local branch ("."), where @{upstream} prints a bare branch name
+		// that must never be mistaken for a remote.
+		const configuredRemote = (
+			await git.raw(["config", `branch.${branch}.remote`]).catch(() => "")
+		).trim();
+		const hasRemoteUpstream =
+			upstreamRef != null && !!configuredRemote && configuredRemote !== ".";
+		const upstreamBranch = !hasRemoteUpstream
+			? null
+			: upstreamRef.startsWith(`${configuredRemote}/`)
+				? upstreamRef.slice(configuredRemote.length + 1)
+				: upstreamRef.split("/").slice(1).join("/");
+
+		if (hasRemoteUpstream && upstreamBranch === branch) {
+			await git.raw(["push"]);
+			return { ok: true };
+		}
+
+		const remotes = await git.getRemotes(false).catch(() => []);
+		const fallbackRemote =
+			remotes.find((r) => r.name === "origin")?.name ?? remotes[0]?.name;
+		const remote = hasRemoteUpstream ? configuredRemote : fallbackRemote;
+		if (!remote) return { ok: false, reason: "no-remote" };
+
+		if (
+			hasRemoteUpstream &&
+			upstreamBranch != null &&
+			linkedPrHeadBranch === upstreamBranch
+		) {
+			// PR checkout: the upstream deliberately points at the PR's head
+			// under a different local name. Push there and keep the tracking.
+			await git.raw(["push", remote, `HEAD:refs/heads/${upstreamBranch}`]);
+			return { ok: true };
+		}
+
+		// HEAD refspec avoids resolving the branch name as a local ref —
+		// more reliable in worktrees (mirrors v1's pushWithSetUpstream).
+		await git.raw([
+			"push",
+			"--set-upstream",
+			remote,
+			`HEAD:refs/heads/${branch}`,
+		]);
+		return { ok: true };
+	},
+});
+
+export const gitPrHeadBaseTask = defineWorkerTask<
+	{ worktreePath: string; gitEnv: GitTaskEnv },
+	{
+		head: string | null;
+		configuredBase: string | null;
+		defaultBranch: string | null;
+	}
+>({
+	type: "git/prHeadBase",
+	handler: async ({ worktreePath, gitEnv }) => {
+		const git = createUserSimpleGit(worktreePath).env(gitEnv);
+		const rawHead = (
+			await git.revparse(["--abbrev-ref", "HEAD"]).catch(() => "")
+		).trim();
+		const head = !rawHead || rawHead === "HEAD" ? null : rawHead;
+		const configuredBase = head
+			? (
+					await git.raw(["config", `branch.${head}.base`]).catch(() => "")
+				).trim() || null
+			: null;
+		return {
+			head,
+			configuredBase,
+			defaultBranch: await getDefaultBranchName(git),
+		};
+	},
+});
+
 export const gitTasks = [
 	gitStatusSnapshotTask,
 	gitFetchBaseRefTask,
@@ -309,4 +442,7 @@ export const gitTasks = [
 	gitWorktreeStateTask,
 	gitWorktreeRemoveTask,
 	gitDeleteBranchTask,
+	gitCommitTask,
+	gitPushTask,
+	gitPrHeadBaseTask,
 ];

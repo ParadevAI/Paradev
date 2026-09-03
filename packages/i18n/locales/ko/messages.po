@@ -6555,32 +6555,37 @@ msgid "dashboard.pullRequests.checkStatus.skipped"
 msgstr "건너뜀"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.collapseAllFiles"
 msgstr "모든 파일 접기"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffFileCollapseButton/DiffFileCollapseButton.tsx
 msgid "dashboard.pullRequests.codeTab.collapseFile"
 msgstr "파일 접기"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
+msgid "dashboard.pullRequests.codeTab.commentsLabel"
+msgstr "댓글"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.expandAllFiles"
 msgstr "모든 파일 펼치기"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffFileCollapseButton/DiffFileCollapseButton.tsx
 msgid "dashboard.pullRequests.codeTab.expandFile"
 msgstr "파일 펼치기"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.files"
 msgstr "파일"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.hideFileTree"
 msgstr "파일 트리 숨기기"
 
@@ -6613,7 +6618,7 @@ msgid "dashboard.pullRequests.codeTab.loadingDiff"
 msgstr "차이 불러오는 중…"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.nextComment"
 msgstr "다음 코멘트"
 
@@ -6633,7 +6638,7 @@ msgid "dashboard.pullRequests.codeTab.postReplyFailed"
 msgstr "답글을 게시하지 못했습니다"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.previousComment"
 msgstr "이전 코멘트"
 
@@ -6648,17 +6653,17 @@ msgid "dashboard.pullRequests.codeTab.sentToAgent"
 msgstr "에이전트에 보냄"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.showFileTree"
 msgstr "파일 트리 표시"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.splitView"
 msgstr "분할 보기"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.unifiedView"
 msgstr "통합 보기"
 
@@ -11667,12 +11672,12 @@ msgstr "명령 팔레트 열기"
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/hotkeys/registry.ts
 msgid "hotkeys.openDiffViewer.description"
-msgstr "새 탭에서 차이 뷰어를 열거나 기존 차이 뷰어에 포커스합니다"
+msgstr "변경 패널을 새 탭에서 열거나 기존 패널에 포커스합니다"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/hotkeys/registry.ts
 msgid "hotkeys.openDiffViewer.label"
-msgstr "차이 뷰어 열기"
+msgstr "변경 열기"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/hotkeys/registry.ts
@@ -11897,7 +11902,7 @@ msgstr "데스크톱으로 분할"
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/hotkeys/registry.ts
 msgid "hotkeys.toggleSidebar.label"
-msgstr "변경 사항 탭 전환"
+msgstr "사이드바 토글"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/hotkeys/registry.ts
@@ -20941,6 +20946,26 @@ msgstr "터미널 타이포그래피"
 #: ../../apps/desktop/src/renderer/routes/_authenticated/settings/appearance/components/AppearanceSettings/components/FontSettingSection/FontSettingSection.tsx
 msgid "settings.appearance.typography.title"
 msgstr "타이포그래피"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/settings/behavior/components/BehaviorSettings/BehaviorSettings.tsx
+msgid "settings.behavior.changesOpenTarget.hint"
+msgstr "상단 바에서 변경 사항 보기를 여는 방식을 선택합니다"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/settings/behavior/components/BehaviorSettings/BehaviorSettings.tsx
+msgid "settings.behavior.changesOpenTarget.label"
+msgstr "변경 사항 열기 대상"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/settings/behavior/components/BehaviorSettings/BehaviorSettings.tsx
+msgid "settings.behavior.changesOpenTarget.pane"
+msgstr "현재 탭의 패널"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/settings/behavior/components/BehaviorSettings/BehaviorSettings.tsx
+msgid "settings.behavior.changesOpenTarget.tab"
+msgstr "새 탭"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/settings/behavior/components/BehaviorSettings/BehaviorSettings.tsx
@@ -31209,6 +31234,11 @@ msgstr "브라우저"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/AddTabMenu/AddTabMenu.tsx
+msgid "workspace.addTabMenu.changes"
+msgstr "변경"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/AddTabMenu/AddTabMenu.tsx
 msgid "workspace.addTabMenu.chatV3"
 msgstr "Chat v3"
 
@@ -31338,12 +31368,12 @@ msgid "workspace.backgroundTerminals.untitledSession"
 msgstr "터미널"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/BaseBranchSelector/BaseBranchSelector.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/BaseBranchSelector/BaseBranchSelector.tsx
 msgid "workspace.baseBranchSelector.empty"
 msgstr "브랜치를 찾을 수 없습니다"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/BaseBranchSelector/BaseBranchSelector.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/BaseBranchSelector/BaseBranchSelector.tsx
 msgid "workspace.baseBranchSelector.searchPlaceholder"
 msgstr "브랜치 검색..."
 
@@ -32040,223 +32070,203 @@ msgid "workspace.changes.groupUnstaged"
 msgstr "스테이징 안 됨"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/ChangesFileList.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/ChangesFileList.tsx
 msgid "workspace.changesFileList.empty"
 msgstr "변경 사항 없음"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/ChangesFileList.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/ChangesFileList.tsx
 msgid "workspace.changesFileList.loading"
 msgstr "불러오는 중..."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesFoldersView/ChangesFoldersView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesFoldersView/ChangesFoldersView.tsx
 msgid "workspace.changesFoldersView.rootFolder"
-msgstr "루트 경로"
+msgstr "./"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesHeader/ChangesHeader.tsx
-msgid "workspace.changesHeader.fromBase"
-msgstr "<1/> <0>기준</0>"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/ChangesFileList.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/ChangesFileList.tsx
 msgid "workspace.changesList.groupAgainstBase"
 msgstr "기준 대비"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/ChangesFileList.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/ChangesFileList.tsx
 msgid "workspace.changesList.groupCommitted"
 msgstr "커밋됨"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/ChangesFileList.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/ChangesFileList.tsx
 msgid "workspace.changesList.groupStaged"
 msgstr "스테이징됨"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/ChangesFileList.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/ChangesFileList.tsx
 msgid "workspace.changesList.groupUnstaged"
 msgstr "스테이징 안 됨"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/ChangesControl.tsx
+msgid "workspace.changesPill.openChanges"
+msgstr "변경 열기"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardAllStagedAria"
 msgstr "스테이징된 변경 사항 모두 버리기"
 
 #. js-lingui-explicit-id
 #. placeholder {0}: stagingActions.kind
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardAllTooltip"
 msgstr "{0} 모두 버리기"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardAllUnstagedAria"
 msgstr "스테이징되지 않은 변경 사항 모두 버리기"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardStagedConfirmBody"
 msgstr "스테이징된 변경 사항을 모두 스테이징 해제하고 되돌립니다. 스테이징된 새 파일은 삭제됩니다. 되돌릴 수 없습니다."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardStagedConfirmTitle"
 msgstr "스테이징된 변경 사항을 모두 버릴까요?"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardStagedFailed"
 msgstr "스테이징된 변경 사항을 버리지 못했습니다"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardUnstagedConfirmBody"
 msgstr "스테이징되지 않은 수정 사항을 모두 되돌리고 추적되지 않는 파일을 삭제합니다. 되돌릴 수 없습니다."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardUnstagedConfirmTitle"
 msgstr "스테이징되지 않은 변경 사항을 모두 버릴까요?"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardUnstagedFailed"
 msgstr "스테이징되지 않은 변경 사항을 버리지 못했습니다"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.stageAll"
 msgstr "모두 스테이징"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.stageFailed"
 msgstr "변경 사항을 스테이징하지 못했습니다"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.unstageAll"
 msgstr "스테이징 모두 해제"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.unstageFailed"
 msgstr "스테이징을 해제하지 못했습니다"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/useChangesTab.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/ChangesPanel.tsx
 msgid "workspace.changesTab.changeBaseBranchFailed"
 msgstr "기준 브랜치를 변경하지 못했습니다"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/useChangesTab.tsx
-msgid "workspace.changesTab.label"
-msgstr "변경"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesTabContent/ChangesTabContent.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesTabContent/ChangesTabContent.tsx
 msgid "workspace.changesTab.loading"
 msgstr "변경 사항을 불러오는 중..."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/useChangesTab.tsx
-msgid "workspace.changesTab.refreshFailed"
-msgstr "변경 사항을 새로 고치지 못했습니다"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/useChangesTab.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/ChangesPanel.tsx
 msgid "workspace.changesTab.renameBranchFailed"
 msgstr "브랜치 이름을 변경하지 못했습니다"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/useChangesTab.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/ChangesPanel.tsx
 msgid "workspace.changesTab.renameBranchLoading"
 msgstr "브랜치 이름을 {newName}(으)로 변경하는 중..."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/useChangesTab.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/ChangesPanel.tsx
 msgid "workspace.changesTab.renameBranchSuccess"
 msgstr "브랜치 이름을 {newName}(으)로 변경했습니다"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesTabContent/ChangesTabContent.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesTabContent/ChangesTabContent.tsx
 msgid "workspace.changesTab.statusError"
 msgstr "git 상태를 불러올 수 없습니다"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesToolbar/ChangesToolbar.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesToolbar/ChangesToolbar.tsx
 msgid "workspace.changesToolbar.collapseAll"
 msgstr "모두 접기"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesToolbar/ChangesToolbar.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesToolbar/ChangesToolbar.tsx
 msgid "workspace.changesToolbar.expandAll"
 msgstr "모두 펼치기"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesToolbar/ChangesToolbar.tsx
-msgid "workspace.changesToolbar.fileCount"
-msgstr "{totalFiles, plural, one {파일 #개} other {파일 #개}}"
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesToolbar/ChangesToolbar.tsx
+msgid "workspace.changesToolbar.vsBase"
+msgstr "<0>vs</0> <1/>"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesToolbar/ChangesToolbar.tsx
-msgid "workspace.changesToolbar.refreshAria"
-msgstr "변경 사항 새로 고침"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesToolbar/ChangesToolbar.tsx
-msgid "workspace.changesToolbar.refreshTooltip"
-msgstr "변경 사항 새로 고침"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.deleteConfirmAction"
 msgstr "삭제"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.deleteConfirmBody"
 msgstr "이 파일을 영구히 삭제합니다. 되돌릴 수 없습니다."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.deleteConfirmTitle"
 msgstr "\"{discardBasename}\"을(를) 삭제할까요?"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.discardChangesAria"
 msgstr "변경 사항 버리기"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.discardChangesTooltip"
 msgstr "변경 사항 버리기"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.discardConfirmAction"
 msgstr "버리기"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.discardConfirmBody"
 msgstr "이 파일의 모든 변경 사항을 되돌립니다. 되돌릴 수 없습니다."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.discardConfirmTitle"
 msgstr "\"{discardBasename}\"의 변경 사항을 버릴까요?"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.discardFailed"
 msgstr "변경 사항을 버리지 못했습니다"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/ShadowRowHoverActions/ShadowRowHoverActions.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/ShadowRowHoverActions/ShadowRowHoverActions.tsx
 msgid "workspace.changesTreeView.moreActionsAria"
 msgstr "추가 작업"
 
@@ -32637,27 +32647,37 @@ msgid "workspace.commentsSection.viewCommentByAria"
 msgstr "{0}의 코멘트 보기"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/CommitFilterDropdown.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/CommitFilterDropdown.tsx
 msgid "workspace.commitFilter.allChanges"
-msgstr "모든 변경 사항"
+msgstr "모든 커밋"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/CommitFilterDropdown.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/CommitFilterDropdown.tsx
+msgid "workspace.commitFilter.commitsLabel"
+msgstr "커밋"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/CommitFilterDropdown.tsx
 msgid "workspace.commitFilter.filesChangedCount"
 msgstr "{uncommittedCount, plural, one {파일 #개 변경} other {파일 #개 변경}}"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/CommitFilterDropdown.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/CommitFilterDropdown.tsx
+msgid "workspace.commitFilter.renameBranchLabel"
+msgstr "브랜치 이름 바꾸기"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/CommitFilterDropdown.tsx
 msgid "workspace.commitFilter.selectRange"
 msgstr "범위 선택..."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/CommitFilterDropdown.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/CommitFilterDropdown.tsx
 msgid "workspace.commitFilter.uncommitted"
 msgstr "커밋 안 됨"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/CommitFilterDropdown.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/CommitFilterDropdown.tsx
 msgid "workspace.commitFilter.uncommittedChanges"
 msgstr "커밋되지 않은 변경 사항"
 
@@ -32700,11 +32720,6 @@ msgstr "편집 취소"
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffHeaderMetadata/DiffHeaderMetadata.tsx
 msgid "workspace.diffPane.cancelEditsAria"
 msgstr "편집 취소"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffHeaderPrefix/DiffHeaderPrefix.tsx
-msgid "workspace.diffPane.collapseFileAria"
-msgstr "파일 접기"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/CommentThread/CommentThread.tsx
@@ -32821,11 +32836,6 @@ msgid "workspace.diffPane.dontSave"
 msgstr "저장 안 함"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffHeaderPrefix/DiffHeaderPrefix.tsx
-msgid "workspace.diffPane.expandFileAria"
-msgstr "파일 펼치기"
-
-#. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/CommentThread/CommentThread.tsx
 msgid "workspace.diffPane.expandThreadAria"
 msgstr "스레드 펼치기"
@@ -32915,6 +32925,23 @@ msgstr "파일 뷰어에서 열기"
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/CommentThread/CommentThread.tsx
 msgid "workspace.diffPane.openOnGithubAria"
 msgstr "GitHub에서 열기"
+
+#. js-lingui-explicit-id
+#. placeholder {0}: pr.number
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffPaneHeaderExtras/components/DiffPanePRLink/DiffPanePRLink.tsx
+msgid "workspace.diffPane.openPrChip"
+msgstr "PR #{0} 열기"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffPaneHeaderExtras/components/DiffPanePRLink/DiffPanePRLink.tsx
+msgid "workspace.diffPane.openPullRequest"
+msgstr "풀 리퀘스트 열기"
+
+#. js-lingui-explicit-id
+#. placeholder {0}: pr.number
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffPaneHeaderExtras/components/DiffPanePRLink/DiffPanePRLink.tsx
+msgid "workspace.diffPane.openPullRequestAria"
+msgstr "풀 리퀘스트 #{0} 열기"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffHeaderMetadata/DiffHeaderMetadata.tsx
@@ -33037,16 +33064,6 @@ msgid "workspace.diffPane.showReviewCommentsAria"
 msgstr "PR 리뷰 코멘트 표시"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffPaneHeaderExtras/DiffPaneHeaderExtras.tsx
-msgid "workspace.diffPane.splitView"
-msgstr "분할 보기"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffPaneHeaderExtras/DiffPaneHeaderExtras.tsx
-msgid "workspace.diffPane.splitViewAria"
-msgstr "분할 보기"
-
-#. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/DiffPane.tsx
 msgid "workspace.diffPane.thisFileFallback"
 msgstr "이 파일"
@@ -33060,16 +33077,6 @@ msgstr "오래됨"
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/CommentThread/CommentThread.tsx
 msgid "workspace.diffPane.threadResolved"
 msgstr "해결됨"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffPaneHeaderExtras/DiffPaneHeaderExtras.tsx
-msgid "workspace.diffPane.unifiedView"
-msgstr "통합 보기"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffPaneHeaderExtras/DiffPaneHeaderExtras.tsx
-msgid "workspace.diffPane.unifiedViewAria"
-msgstr "통합 보기"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/CommentThread/CommentThread.tsx
@@ -33132,6 +33139,11 @@ msgstr "버리기"
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceEmptyState/WorkspaceEmptyState.tsx
 msgid "workspace.emptyState.openBrowser"
 msgstr "브라우저 열기"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceEmptyState/WorkspaceEmptyState.tsx
+msgid "workspace.emptyState.openChanges"
+msgstr "변경 열기"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceEmptyState/WorkspaceEmptyState.tsx
@@ -33375,147 +33387,147 @@ msgid "workspace.filePane.viewVideo"
 msgstr "동영상"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.contextOpenDiff"
 msgstr "차이 열기"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.contextOpenDiffNewTab"
 msgstr "새 탭에서 차이 열기"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.contextOpenFile"
 msgstr "파일 열기"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.contextOpenFileNewTab"
 msgstr "새 탭에서 파일 열기"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.contextOpenInEditor"
 msgstr "에디터에서 열기"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.deleteConfirmAction"
 msgstr "삭제"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.deleteConfirmBody"
 msgstr "이 파일을 영구히 삭제합니다. 되돌릴 수 없습니다."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.deleteConfirmTitle"
 msgstr "\"{basename}\"을(를) 삭제할까요?"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.discardChangesAria"
 msgstr "변경 사항 버리기"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.discardChangesTooltip"
 msgstr "변경 사항 버리기"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.discardConfirmAction"
 msgstr "버리기"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.discardConfirmBody"
 msgstr "이 파일의 모든 변경 사항을 되돌립니다. 되돌릴 수 없습니다."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.discardConfirmTitle"
 msgstr "\"{basename}\"의 변경 사항을 버릴까요?"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.discardFailed"
 msgstr "변경 사항을 버리지 못했습니다"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.menuDelete"
 msgstr "삭제"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.menuDiscardChanges"
 msgstr "변경 사항 버리기"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.menuOpenDiff"
 msgstr "차이 열기"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.menuOpenDiffNewTab"
 msgstr "새 탭에서 차이 열기"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.menuOpenFile"
 msgstr "파일 열기"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.menuOpenFileNewTab"
 msgstr "새 탭에서 파일 열기"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.menuOpenInEditor"
 msgstr "에디터에서 열기"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.moreActionsAria"
 msgstr "추가 작업"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
 msgid "workspace.fileRowContextMenuItems.delete"
 msgstr "삭제"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
 msgid "workspace.fileRowContextMenuItems.discardChanges"
 msgstr "변경 사항 버리기"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
 msgid "workspace.fileRowMenuItems.openDiff"
 msgstr "차이 열기"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
 msgid "workspace.fileRowMenuItems.openDiffNewTab"
 msgstr "새 탭에서 차이 열기"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
 msgid "workspace.fileRowMenuItems.openFile"
 msgstr "파일 열기"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
 msgid "workspace.fileRowMenuItems.openFileNewTab"
 msgstr "새 탭에서 파일 열기"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
 msgid "workspace.fileRowMenuItems.openInEditor"
 msgstr "에디터에서 열기"
 
@@ -33751,7 +33763,7 @@ msgid "workspace.folderMenuItems.newFolder"
 msgstr "새 폴더..."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/FolderContextMenuItems/FolderContextMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/FolderContextMenuItems/FolderContextMenuItems.tsx
 msgid "workspace.folderMenuItems.openInEditor"
 msgstr "에디터에서 열기"
 
@@ -34133,147 +34145,122 @@ msgid "workspace.pathActions.unknownError"
 msgstr "알 수 없는 오류"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.contextCopyPath"
 msgstr "경로 복사"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.contextCopyRelativePath"
 msgstr "상대 경로 복사"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.contextRevealInFinder"
 msgstr "Finder에서 보기"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.copyPathFailed"
 msgstr "경로를 복사하지 못했습니다: {reason}"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.dropdownCopyPath"
 msgstr "경로 복사"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.dropdownCopyRelativePath"
 msgstr "상대 경로 복사"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.dropdownRevealInFinder"
 msgstr "Finder에서 보기"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.pathCopied"
 msgstr "경로 복사됨"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.relativePathCopied"
 msgstr "상대 경로 복사됨"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.revealInFinderFailed"
 msgstr "Finder에서 표시하지 못했습니다: {reason}"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.unknownError"
 msgstr "알 수 없는 오류"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/PRActionHeader.tsx
-msgid "workspace.prActionHeader.createPrComingSoon"
-msgstr "PR 만들기 기능은 곧 지원됩니다"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/PRActionHeader.tsx
-msgid "workspace.prActionHeader.defaultBranchTooltip"
-msgstr "풀 리퀘스트를 만들려면 기능 브랜치로 전환하세요"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/PRActionHeader.tsx
-msgid "workspace.prActionHeader.detachedHeadTooltip"
-msgstr "풀 리퀘스트를 만들려면 브랜치를 체크아웃하세요"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/PRActionHeader.tsx
-msgid "workspace.prActionHeader.noRepoTooltip"
-msgstr "연결된 GitHub 리포지토리가 없습니다"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/PRActionHeader.tsx
-msgid "workspace.prActionHeader.retryLoadingPr"
-msgstr "풀 리퀘스트 다시 불러오기"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.allChecksPassed"
 msgstr "{total, plural, one {#개 검사를 모두 통과했습니다} other {#개 검사를 모두 통과했습니다}}"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.checksFailingMany"
 msgstr "검사 {total}개 중 {failing}개 실패"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.checksFailingOne"
 msgstr "검사 {total}개 중 {failing}개 실패"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.checksRunningMany"
 msgstr "검사 {total}개 중 {pending}개 실행 중"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.checksRunningOne"
 msgstr "검사 {total}개 중 {pending}개 실행 중"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.noChecksReported"
 msgstr "보고된 검사 없음"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.stateClosed"
 msgstr "닫힘"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.stateDraft"
 msgstr "초안"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.stateMerged"
 msgstr "머지됨"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.stateOpen"
 msgstr "열림"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.stateQueued"
 msgstr "대기열"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.updatedAt"
 msgstr "{updatedRelative} 업데이트됨"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.viewOnGitHub"
 msgstr "GitHub에서 보기"
 
@@ -34328,73 +34315,109 @@ msgid "workspace.prHeader.reviewPending"
 msgstr "리뷰 대기 중"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.createMergeCommit"
 msgstr "머지 커밋 만들기"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
+msgid "workspace.prStatusGroup.markedReady"
+msgstr "PR이 리뷰 준비 완료되었습니다"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
+msgid "workspace.prStatusGroup.markedReadyRefreshFailed"
+msgstr "준비 완료로 표시했지만 PR 상태를 새로 고칠 수 없습니다 — 잠시 후 다시 시도하세요"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
+msgid "workspace.prStatusGroup.markingReady"
+msgstr "리뷰 준비 완료로 표시하는 중…"
+
+#. js-lingui-explicit-id
+#. placeholder {0}: error.message
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
+msgid "workspace.prStatusGroup.markReadyFailed"
+msgstr "리뷰 준비 완료 표시 실패: {0}"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.merged"
 msgstr "PR 머지됨"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.mergedRefreshFailed"
 msgstr "머지했지만 PR 상태를 새로 고치지 못했습니다 — 잠시 후 다시 시도하세요"
 
 #. js-lingui-explicit-id
 #. placeholder {0}: error.message
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.mergeFailed"
 msgstr "머지 실패: {0}"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.mergeMenuLabel"
 msgstr "머지"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.merging"
 msgstr "PR을 머지하는 중..."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.mergingAria"
 msgstr "풀 리퀘스트 머지 중"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
-msgid "workspace.prStatusGroup.openMergeOptionsAria"
-msgstr "머지 옵션 열기"
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
+msgid "workspace.prStatusGroup.openPrOptionsAria"
+msgstr "풀 리퀘스트 옵션 열기"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
+msgid "workspace.prStatusGroup.openPullRequest"
+msgstr "풀 리퀘스트 열기"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
+msgid "workspace.prStatusGroup.readyForReview"
+msgstr "리뷰 준비 완료"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.rebaseAndMerge"
 msgstr "리베이스 후 머지"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.squashAndMerge"
 msgstr "스쿼시 후 머지"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/components/RangeModal/RangeModal.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
+msgid "workspace.prStatusGroup.viewOnGitHub"
+msgstr "GitHub에서 보기"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/components/RangeModal/RangeModal.tsx
 msgid "workspace.rangeModal.apply"
 msgstr "적용"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/components/RangeModal/RangeModal.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/components/RangeModal/RangeModal.tsx
 msgid "workspace.rangeModal.cancel"
 msgstr "취소"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/components/RangeModal/RangeModal.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/components/RangeModal/RangeModal.tsx
 msgid "workspace.rangeModal.description"
 msgstr "커밋 두 개를 클릭해 범위를 지정하세요."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/components/RangeModal/RangeModal.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/components/RangeModal/RangeModal.tsx
 msgid "workspace.rangeModal.title"
 msgstr "커밋 범위 선택"
 
@@ -34482,6 +34505,106 @@ msgstr "중지"
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/V2WorkspaceRunButton/V2WorkspaceRunButton.tsx
 msgid "workspace.runButton.stopAria"
 msgstr "워크스페이스 실행 명령 중지"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.commit"
+msgstr "커밋"
+
+#. js-lingui-explicit-id
+#. placeholder {0}: error.message
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.commitFailed"
+msgstr "커밋 실패: {0}"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.committed"
+msgstr "커밋 완료"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.createPr"
+msgstr "PR 만들기"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.createPrAction"
+msgstr "풀 리퀘스트 만들기"
+
+#. js-lingui-explicit-id
+#. placeholder {0}: error instanceof Error ? error.message : String(error)
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.createPrFailed"
+msgstr "PR 생성 실패: {0}"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.creatingPr"
+msgstr "PR 생성 중…"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.draft"
+msgstr "초안"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.noCommitsTooltip"
+msgstr "풀 리퀘스트를 만들 커밋이 없습니다"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.openPrToastAction"
+msgstr "열기"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.openShipOptionsAria"
+msgstr "배포 옵션 열기"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.prBodyPlaceholder"
+msgstr "설명(선택 사항)"
+
+#. js-lingui-explicit-id
+#. placeholder {0}: created.number
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.prCreated"
+msgstr "PR #{0} 생성됨"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.prTitlePlaceholder"
+msgstr "풀 리퀘스트 제목"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.prUrlLink"
+msgstr "PR URL"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.push"
+msgstr "푸시"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.pushed"
+msgstr "푸시 완료"
+
+#. js-lingui-explicit-id
+#. placeholder {0}: error instanceof Error ? error.message : String(error)
+#. placeholder {0}: error.message
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.pushFailed"
+msgstr "푸시 실패: {0}"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.pushing"
+msgstr "푸시 중…"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/WorkspaceSidebar.tsx
@@ -35208,12 +35331,12 @@ msgid "workspace.terminalPane.workspaceRunState"
 msgstr "워크스페이스 실행: {workspaceRunState}"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesHeader/components/ViewModeToggle/ViewModeToggle.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesToolbar/components/ViewModeToggle/ViewModeToggle.tsx
 msgid "workspace.viewModeToggle.folderView"
 msgstr "폴더 보기"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesHeader/components/ViewModeToggle/ViewModeToggle.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesToolbar/components/ViewModeToggle/ViewModeToggle.tsx
 msgid "workspace.viewModeToggle.treeView"
 msgstr "트리 보기"
 

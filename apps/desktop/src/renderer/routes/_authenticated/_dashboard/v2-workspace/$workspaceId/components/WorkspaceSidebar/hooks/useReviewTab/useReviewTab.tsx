@@ -8,7 +8,7 @@ import type { CommentPaneData, DiffFocusSide } from "../../../../types";
 import {
 	coerceCheckStatus,
 	computeChecksRollup,
-} from "../../components/PRActionHeader/utils/computeChecksStatus";
+} from "../../../../utils/computeChecksStatus";
 import type { SidebarTabDefinition } from "../../types";
 import { ReviewTabContent } from "./components/ReviewTabContent";
 import type { NormalizedComment, NormalizedPR } from "./types";

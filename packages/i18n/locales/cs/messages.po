@@ -6555,32 +6555,37 @@ msgid "dashboard.pullRequests.checkStatus.skipped"
 msgstr "Přeskočeno"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.collapseAllFiles"
 msgstr "Sbalit všechny soubory"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffFileCollapseButton/DiffFileCollapseButton.tsx
 msgid "dashboard.pullRequests.codeTab.collapseFile"
 msgstr "Sbalit soubor"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
+msgid "dashboard.pullRequests.codeTab.commentsLabel"
+msgstr "Komentáře"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.expandAllFiles"
 msgstr "Rozbalit všechny soubory"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffFileCollapseButton/DiffFileCollapseButton.tsx
 msgid "dashboard.pullRequests.codeTab.expandFile"
 msgstr "Rozbalit soubor"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.files"
 msgstr "Soubory"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.hideFileTree"
 msgstr "Skrýt strom souborů"
 
@@ -6613,7 +6618,7 @@ msgid "dashboard.pullRequests.codeTab.loadingDiff"
 msgstr "Načítám rozdíly…"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.nextComment"
 msgstr "Další komentář"
 
@@ -6633,7 +6638,7 @@ msgid "dashboard.pullRequests.codeTab.postReplyFailed"
 msgstr "Nepodařilo se odeslat odpověď"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.previousComment"
 msgstr "Předchozí komentář"
 
@@ -6648,17 +6653,17 @@ msgid "dashboard.pullRequests.codeTab.sentToAgent"
 msgstr "Odesláno agentovi"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.showFileTree"
 msgstr "Zobrazit strom souborů"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.splitView"
 msgstr "Rozdělené zobrazení"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests/$prNumber/components/PullRequestCodeTab/PullRequestCodeTab.tsx
+#: ../../apps/desktop/src/renderer/screens/main/components/DiffViewToolbar/DiffViewToolbar.tsx
 msgid "dashboard.pullRequests.codeTab.unifiedView"
 msgstr "Sjednocené zobrazení"
 
@@ -11667,12 +11672,12 @@ msgstr "Otevřít paletu příkazů"
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/hotkeys/registry.ts
 msgid "hotkeys.openDiffViewer.description"
-msgstr "Otevřít prohlížeč rozdílů na nové kartě nebo zaměřit stávající"
+msgstr "Otevře panel Změny na nové kartě, nebo zaměří existující"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/hotkeys/registry.ts
 msgid "hotkeys.openDiffViewer.label"
-msgstr "Otevřít prohlížeč rozdílů"
+msgstr "Otevřít změny"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/hotkeys/registry.ts
@@ -11897,7 +11902,7 @@ msgstr "Rozdělit s plochou"
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/hotkeys/registry.ts
 msgid "hotkeys.toggleSidebar.label"
-msgstr "Přepnout kartu Změny"
+msgstr "Přepnout postranní panel"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/hotkeys/registry.ts
@@ -20941,6 +20946,26 @@ msgstr "Typografie terminálu"
 #: ../../apps/desktop/src/renderer/routes/_authenticated/settings/appearance/components/AppearanceSettings/components/FontSettingSection/FontSettingSection.tsx
 msgid "settings.appearance.typography.title"
 msgstr "Typografie"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/settings/behavior/components/BehaviorSettings/BehaviorSettings.tsx
+msgid "settings.behavior.changesOpenTarget.hint"
+msgstr "Zvolte, jak se zobrazení změn otevírá z horní lišty"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/settings/behavior/components/BehaviorSettings/BehaviorSettings.tsx
+msgid "settings.behavior.changesOpenTarget.label"
+msgstr "Cíl otevření změn"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/settings/behavior/components/BehaviorSettings/BehaviorSettings.tsx
+msgid "settings.behavior.changesOpenTarget.pane"
+msgstr "Panel v aktuální kartě"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/settings/behavior/components/BehaviorSettings/BehaviorSettings.tsx
+msgid "settings.behavior.changesOpenTarget.tab"
+msgstr "Nová karta"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/settings/behavior/components/BehaviorSettings/BehaviorSettings.tsx
@@ -31209,6 +31234,11 @@ msgstr "Prohlížeč"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/AddTabMenu/AddTabMenu.tsx
+msgid "workspace.addTabMenu.changes"
+msgstr "Změny"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/AddTabMenu/AddTabMenu.tsx
 msgid "workspace.addTabMenu.chatV3"
 msgstr "Chat v3"
 
@@ -31338,12 +31368,12 @@ msgid "workspace.backgroundTerminals.untitledSession"
 msgstr "Terminál"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/BaseBranchSelector/BaseBranchSelector.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/BaseBranchSelector/BaseBranchSelector.tsx
 msgid "workspace.baseBranchSelector.empty"
 msgstr "Nenalezeny žádné větve"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/BaseBranchSelector/BaseBranchSelector.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/BaseBranchSelector/BaseBranchSelector.tsx
 msgid "workspace.baseBranchSelector.searchPlaceholder"
 msgstr "Hledat větve..."
 
@@ -32040,223 +32070,203 @@ msgid "workspace.changes.groupUnstaged"
 msgstr "Nepřipravené"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/ChangesFileList.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/ChangesFileList.tsx
 msgid "workspace.changesFileList.empty"
 msgstr "Žádné změny"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/ChangesFileList.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/ChangesFileList.tsx
 msgid "workspace.changesFileList.loading"
 msgstr "Načítám..."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesFoldersView/ChangesFoldersView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesFoldersView/ChangesFoldersView.tsx
 msgid "workspace.changesFoldersView.rootFolder"
-msgstr "Kořenová cesta"
+msgstr "./"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesHeader/ChangesHeader.tsx
-msgid "workspace.changesHeader.fromBase"
-msgstr "<0>od</0> <1/>"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/ChangesFileList.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/ChangesFileList.tsx
 msgid "workspace.changesList.groupAgainstBase"
 msgstr "Proti základní větvi"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/ChangesFileList.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/ChangesFileList.tsx
 msgid "workspace.changesList.groupCommitted"
 msgstr "Commitnuté"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/ChangesFileList.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/ChangesFileList.tsx
 msgid "workspace.changesList.groupStaged"
 msgstr "Připravené"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/ChangesFileList.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/ChangesFileList.tsx
 msgid "workspace.changesList.groupUnstaged"
 msgstr "Nepřipravené"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/ChangesControl.tsx
+msgid "workspace.changesPill.openChanges"
+msgstr "Otevřít změny"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardAllStagedAria"
 msgstr "Zahodit všechny připravené změny"
 
 #. js-lingui-explicit-id
 #. placeholder {0}: stagingActions.kind
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardAllTooltip"
 msgstr "Zahodit vše: {0}"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardAllUnstagedAria"
 msgstr "Zahodit všechny nepřipravené změny"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardStagedConfirmBody"
 msgstr "Tímto zrušíte přípravu a vrátíte všechny připravené změny. Připravené nové soubory budou smazány. Tuto akci nelze vrátit zpět."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardStagedConfirmTitle"
 msgstr "Zahodit všechny připravené změny?"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardStagedFailed"
 msgstr "Nepodařilo se zahodit připravené změny"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardUnstagedConfirmBody"
 msgstr "Tímto se vrátí všechny nepřipravené úpravy a smažou se nesledované soubory. Tuto akci nelze vrátit zpět."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardUnstagedConfirmTitle"
 msgstr "Zahodit všechny nepřipravené změny?"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.discardUnstagedFailed"
 msgstr "Nepodařilo se zahodit nepřipravené změny"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.stageAll"
 msgstr "Připravit vše"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.stageFailed"
 msgstr "Nepodařilo se připravit změny"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.unstageAll"
 msgstr "Zrušit přípravu u všech"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesSection/ChangesSection.tsx
 msgid "workspace.changesSection.unstageFailed"
 msgstr "Nepodařilo se zrušit přípravu změn"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/useChangesTab.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/ChangesPanel.tsx
 msgid "workspace.changesTab.changeBaseBranchFailed"
 msgstr "Nepodařilo se změnit základní větev"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/useChangesTab.tsx
-msgid "workspace.changesTab.label"
-msgstr "Změny"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesTabContent/ChangesTabContent.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesTabContent/ChangesTabContent.tsx
 msgid "workspace.changesTab.loading"
 msgstr "Načítám změny..."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/useChangesTab.tsx
-msgid "workspace.changesTab.refreshFailed"
-msgstr "Nepodařilo se obnovit změny"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/useChangesTab.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/ChangesPanel.tsx
 msgid "workspace.changesTab.renameBranchFailed"
 msgstr "Nepodařilo se přejmenovat větev"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/useChangesTab.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/ChangesPanel.tsx
 msgid "workspace.changesTab.renameBranchLoading"
 msgstr "Přejmenovávám větev na {newName}..."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/useChangesTab.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/ChangesPanel.tsx
 msgid "workspace.changesTab.renameBranchSuccess"
 msgstr "Větev přejmenována na {newName}"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesTabContent/ChangesTabContent.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesTabContent/ChangesTabContent.tsx
 msgid "workspace.changesTab.statusError"
 msgstr "Nelze načíst stav gitu"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesToolbar/ChangesToolbar.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesToolbar/ChangesToolbar.tsx
 msgid "workspace.changesToolbar.collapseAll"
 msgstr "Sbalit vše"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesToolbar/ChangesToolbar.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesToolbar/ChangesToolbar.tsx
 msgid "workspace.changesToolbar.expandAll"
 msgstr "Rozbalit vše"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesToolbar/ChangesToolbar.tsx
-msgid "workspace.changesToolbar.fileCount"
-msgstr "{totalFiles, plural, one {# soubor} few {# soubory} many {# souboru} other {# souborů}}"
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesToolbar/ChangesToolbar.tsx
+msgid "workspace.changesToolbar.vsBase"
+msgstr "<0>vs</0> <1/>"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesToolbar/ChangesToolbar.tsx
-msgid "workspace.changesToolbar.refreshAria"
-msgstr "Obnovit změny"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesToolbar/ChangesToolbar.tsx
-msgid "workspace.changesToolbar.refreshTooltip"
-msgstr "Obnovit změny"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.deleteConfirmAction"
 msgstr "Smazat"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.deleteConfirmBody"
 msgstr "Tímto se soubor trvale smaže. Tuto akci nelze vrátit zpět."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.deleteConfirmTitle"
 msgstr "Smazat „{discardBasename}“?"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.discardChangesAria"
 msgstr "Zahodit změny"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.discardChangesTooltip"
 msgstr "Zahodit změny"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.discardConfirmAction"
 msgstr "Zahodit"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.discardConfirmBody"
 msgstr "Tímto se vrátí všechny změny v tomto souboru. Tuto akci nelze vrátit zpět."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.discardConfirmTitle"
 msgstr "Zahodit změny v souboru „{discardBasename}“?"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/ChangesTreeView.tsx
 msgid "workspace.changesTreeView.discardFailed"
 msgstr "Nepodařilo se zahodit změny"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/ShadowRowHoverActions/ShadowRowHoverActions.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/ShadowRowHoverActions/ShadowRowHoverActions.tsx
 msgid "workspace.changesTreeView.moreActionsAria"
 msgstr "Další akce"
 
@@ -32637,27 +32647,37 @@ msgid "workspace.commentsSection.viewCommentByAria"
 msgstr "Zobrazit komentář od {0}"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/CommitFilterDropdown.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/CommitFilterDropdown.tsx
 msgid "workspace.commitFilter.allChanges"
-msgstr "Všechny změny"
+msgstr "Všechny commity"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/CommitFilterDropdown.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/CommitFilterDropdown.tsx
+msgid "workspace.commitFilter.commitsLabel"
+msgstr "Commity"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/CommitFilterDropdown.tsx
 msgid "workspace.commitFilter.filesChangedCount"
 msgstr "{uncommittedCount, plural, one {# změněný soubor} few {# změněné soubory} many {# změněného souboru} other {# změněných souborů}}"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/CommitFilterDropdown.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/CommitFilterDropdown.tsx
+msgid "workspace.commitFilter.renameBranchLabel"
+msgstr "Přejmenovat větev"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/CommitFilterDropdown.tsx
 msgid "workspace.commitFilter.selectRange"
 msgstr "Vyberte rozsah..."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/CommitFilterDropdown.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/CommitFilterDropdown.tsx
 msgid "workspace.commitFilter.uncommitted"
 msgstr "Necommitnuto"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/CommitFilterDropdown.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/CommitFilterDropdown.tsx
 msgid "workspace.commitFilter.uncommittedChanges"
 msgstr "Necommitnuté změny"
 
@@ -32700,11 +32720,6 @@ msgstr "Zrušit úpravy"
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffHeaderMetadata/DiffHeaderMetadata.tsx
 msgid "workspace.diffPane.cancelEditsAria"
 msgstr "Zrušit úpravy"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffHeaderPrefix/DiffHeaderPrefix.tsx
-msgid "workspace.diffPane.collapseFileAria"
-msgstr "Sbalit soubor"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/CommentThread/CommentThread.tsx
@@ -32821,11 +32836,6 @@ msgid "workspace.diffPane.dontSave"
 msgstr "Neukládat"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffHeaderPrefix/DiffHeaderPrefix.tsx
-msgid "workspace.diffPane.expandFileAria"
-msgstr "Rozbalit soubor"
-
-#. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/CommentThread/CommentThread.tsx
 msgid "workspace.diffPane.expandThreadAria"
 msgstr "Rozbalit vlákno"
@@ -32915,6 +32925,23 @@ msgstr "Otevřít v prohlížeči souborů"
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/CommentThread/CommentThread.tsx
 msgid "workspace.diffPane.openOnGithubAria"
 msgstr "Otevřít na GitHubu"
+
+#. js-lingui-explicit-id
+#. placeholder {0}: pr.number
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffPaneHeaderExtras/components/DiffPanePRLink/DiffPanePRLink.tsx
+msgid "workspace.diffPane.openPrChip"
+msgstr "Otevřít PR #{0}"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffPaneHeaderExtras/components/DiffPanePRLink/DiffPanePRLink.tsx
+msgid "workspace.diffPane.openPullRequest"
+msgstr "Otevřít pull request"
+
+#. js-lingui-explicit-id
+#. placeholder {0}: pr.number
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffPaneHeaderExtras/components/DiffPanePRLink/DiffPanePRLink.tsx
+msgid "workspace.diffPane.openPullRequestAria"
+msgstr "Otevřít pull request #{0}"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffHeaderMetadata/DiffHeaderMetadata.tsx
@@ -33037,16 +33064,6 @@ msgid "workspace.diffPane.showReviewCommentsAria"
 msgstr "Zobrazit komentáře z revize PR"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffPaneHeaderExtras/DiffPaneHeaderExtras.tsx
-msgid "workspace.diffPane.splitView"
-msgstr "Rozdělené zobrazení"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffPaneHeaderExtras/DiffPaneHeaderExtras.tsx
-msgid "workspace.diffPane.splitViewAria"
-msgstr "Rozdělené zobrazení"
-
-#. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/DiffPane.tsx
 msgid "workspace.diffPane.thisFileFallback"
 msgstr "tento soubor"
@@ -33060,16 +33077,6 @@ msgstr "Zastaralé"
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/CommentThread/CommentThread.tsx
 msgid "workspace.diffPane.threadResolved"
 msgstr "Vyřešeno"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffPaneHeaderExtras/DiffPaneHeaderExtras.tsx
-msgid "workspace.diffPane.unifiedView"
-msgstr "Sjednocené zobrazení"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/DiffPaneHeaderExtras/DiffPaneHeaderExtras.tsx
-msgid "workspace.diffPane.unifiedViewAria"
-msgstr "Sjednocené zobrazení"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/CommentThread/CommentThread.tsx
@@ -33132,6 +33139,11 @@ msgstr "Zahodit"
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceEmptyState/WorkspaceEmptyState.tsx
 msgid "workspace.emptyState.openBrowser"
 msgstr "Otevřít prohlížeč"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceEmptyState/WorkspaceEmptyState.tsx
+msgid "workspace.emptyState.openChanges"
+msgstr "Otevřít změny"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceEmptyState/WorkspaceEmptyState.tsx
@@ -33375,147 +33387,147 @@ msgid "workspace.filePane.viewVideo"
 msgstr "Video"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.contextOpenDiff"
 msgstr "Otevřít diff"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.contextOpenDiffNewTab"
 msgstr "Otevřít diff na nové kartě"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.contextOpenFile"
 msgstr "Otevřít soubor"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.contextOpenFileNewTab"
 msgstr "Otevřít soubor na nové kartě"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.contextOpenInEditor"
 msgstr "Otevřít v editoru"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.deleteConfirmAction"
 msgstr "Smazat"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.deleteConfirmBody"
 msgstr "Tímto se soubor trvale smaže. Tuto akci nelze vrátit zpět."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.deleteConfirmTitle"
 msgstr "Smazat „{basename}“?"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.discardChangesAria"
 msgstr "Zahodit změny"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.discardChangesTooltip"
 msgstr "Zahodit změny"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.discardConfirmAction"
 msgstr "Zahodit"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.discardConfirmBody"
 msgstr "Tímto se vrátí všechny změny v tomto souboru. Tuto akci nelze vrátit zpět."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.discardConfirmTitle"
 msgstr "Zahodit změny v souboru „{basename}“?"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.discardFailed"
 msgstr "Nepodařilo se zahodit změny"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.menuDelete"
 msgstr "Smazat"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.menuDiscardChanges"
 msgstr "Zahodit změny"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.menuOpenDiff"
 msgstr "Otevřít diff"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.menuOpenDiffNewTab"
 msgstr "Otevřít diff na nové kartě"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.menuOpenFile"
 msgstr "Otevřít soubor"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.menuOpenFileNewTab"
 msgstr "Otevřít soubor na nové kartě"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.menuOpenInEditor"
 msgstr "Otevřít v editoru"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/FileRow/FileRow.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/FileRow/FileRow.tsx
 msgid "workspace.fileRow.moreActionsAria"
 msgstr "Další akce"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
 msgid "workspace.fileRowContextMenuItems.delete"
 msgstr "Smazat"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
 msgid "workspace.fileRowContextMenuItems.discardChanges"
 msgstr "Zahodit změny"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
 msgid "workspace.fileRowMenuItems.openDiff"
 msgstr "Otevřít diff"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
 msgid "workspace.fileRowMenuItems.openDiffNewTab"
 msgstr "Otevřít diff na nové kartě"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
 msgid "workspace.fileRowMenuItems.openFile"
 msgstr "Otevřít soubor"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
 msgid "workspace.fileRowMenuItems.openFileNewTab"
 msgstr "Otevřít soubor na nové kartě"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/FileRowContextMenuItems/FileRowContextMenuItems.tsx
 msgid "workspace.fileRowMenuItems.openInEditor"
 msgstr "Otevřít v editoru"
 
@@ -33751,7 +33763,7 @@ msgid "workspace.folderMenuItems.newFolder"
 msgstr "Nová složka..."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesFileList/components/ChangesTreeView/components/FolderContextMenuItems/FolderContextMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/ChangesTreeView/components/FolderContextMenuItems/FolderContextMenuItems.tsx
 msgid "workspace.folderMenuItems.openInEditor"
 msgstr "Otevřít v editoru"
 
@@ -34133,147 +34145,122 @@ msgid "workspace.pathActions.unknownError"
 msgstr "Neznámá chyba"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.contextCopyPath"
 msgstr "Kopírovat cestu"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.contextCopyRelativePath"
 msgstr "Kopírovat relativní cestu"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.contextRevealInFinder"
 msgstr "Zobrazit ve Finderu"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.copyPathFailed"
 msgstr "Nepodařilo se zkopírovat cestu: {reason}"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.dropdownCopyPath"
 msgstr "Kopírovat cestu"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.dropdownCopyRelativePath"
 msgstr "Kopírovat relativní cestu"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.dropdownRevealInFinder"
 msgstr "Zobrazit ve Finderu"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.pathCopied"
 msgstr "Cesta zkopírována"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.relativePathCopied"
 msgstr "Relativní cesta zkopírována"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.revealInFinderFailed"
 msgstr "Nepodařilo se zobrazit ve Finderu: {reason}"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PathActionsMenuItems/PathActionsMenuItems.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesFileList/components/PathActionsMenuItems/PathActionsMenuItems.tsx
 msgid "workspace.pathActionsMenuItems.unknownError"
 msgstr "Neznámá chyba"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/PRActionHeader.tsx
-msgid "workspace.prActionHeader.createPrComingSoon"
-msgstr "Vytváření PR už brzy"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/PRActionHeader.tsx
-msgid "workspace.prActionHeader.defaultBranchTooltip"
-msgstr "Pro vytvoření pull requestu přepněte na feature větev"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/PRActionHeader.tsx
-msgid "workspace.prActionHeader.detachedHeadTooltip"
-msgstr "Pro vytvoření pull requestu si udělejte checkout větve"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/PRActionHeader.tsx
-msgid "workspace.prActionHeader.noRepoTooltip"
-msgstr "Není připojený žádný GitHub repozitář"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/PRActionHeader.tsx
-msgid "workspace.prActionHeader.retryLoadingPr"
-msgstr "Zkusit načíst pull request znovu"
-
-#. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.allChecksPassed"
 msgstr "{total, plural, one {Kontrola prošla} few {Všechny # kontroly prošly} many {Všech # kontroly prošlo} other {Všech # kontrol prošlo}}"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.checksFailingMany"
 msgstr "Selhává {failing} z {total} kontrol"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.checksFailingOne"
 msgstr "Selhává {failing} z {total} kontroly"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.checksRunningMany"
 msgstr "Běží {pending} z {total} kontrol"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.checksRunningOne"
 msgstr "Běží {pending} z {total} kontroly"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.noChecksReported"
 msgstr "Žádné hlášené kontroly"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.stateClosed"
 msgstr "Uzavřený"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.stateDraft"
 msgstr "Koncept"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.stateMerged"
 msgstr "Sloučený"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.stateOpen"
 msgstr "Otevřený"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.stateQueued"
 msgstr "Ve frontě"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.updatedAt"
 msgstr "Aktualizováno {updatedRelative}"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/components/PRDetailCard/PRDetailCard.tsx
 msgid "workspace.prDetailCard.viewOnGitHub"
 msgstr "Zobrazit na GitHubu"
 
@@ -34328,73 +34315,109 @@ msgid "workspace.prHeader.reviewPending"
 msgstr "Čeká na revizi"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.createMergeCommit"
 msgstr "Vytvořit merge commit"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
+msgid "workspace.prStatusGroup.markedReady"
+msgstr "PR je připraven k revizi"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
+msgid "workspace.prStatusGroup.markedReadyRefreshFailed"
+msgstr "Označeno jako připravené, ale nepodařilo se obnovit stav PR — zkuste to za chvíli znovu"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
+msgid "workspace.prStatusGroup.markingReady"
+msgstr "Označování jako připravené k revizi…"
+
+#. js-lingui-explicit-id
+#. placeholder {0}: error.message
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
+msgid "workspace.prStatusGroup.markReadyFailed"
+msgstr "Označení jako připravené k revizi se nezdařilo: {0}"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.merged"
 msgstr "PR sloučen"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.mergedRefreshFailed"
 msgstr "Sloučeno, ale nepodařilo se obnovit stav PR — zkuste to za chvíli znovu"
 
 #. js-lingui-explicit-id
 #. placeholder {0}: error.message
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.mergeFailed"
 msgstr "Sloučení selhalo: {0}"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.mergeMenuLabel"
 msgstr "Sloučit"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.merging"
 msgstr "Slučuji PR..."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.mergingAria"
 msgstr "Slučuji pull request"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
-msgid "workspace.prStatusGroup.openMergeOptionsAria"
-msgstr "Otevřít možnosti sloučení"
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
+msgid "workspace.prStatusGroup.openPrOptionsAria"
+msgstr "Otevřít možnosti pull requestu"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
+msgid "workspace.prStatusGroup.openPullRequest"
+msgstr "Otevřít pull request"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
+msgid "workspace.prStatusGroup.readyForReview"
+msgstr "Připraveno k revizi"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.rebaseAndMerge"
 msgstr "Rebase a sloučit"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/components/PRActionHeader/components/PRStatusGroup/PRStatusGroup.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
 msgid "workspace.prStatusGroup.squashAndMerge"
 msgstr "Squash a sloučit"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/components/RangeModal/RangeModal.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx
+msgid "workspace.prStatusGroup.viewOnGitHub"
+msgstr "Zobrazit na GitHubu"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/components/RangeModal/RangeModal.tsx
 msgid "workspace.rangeModal.apply"
 msgstr "Použít"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/components/RangeModal/RangeModal.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/components/RangeModal/RangeModal.tsx
 msgid "workspace.rangeModal.cancel"
 msgstr "Zrušit"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/components/RangeModal/RangeModal.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/components/RangeModal/RangeModal.tsx
 msgid "workspace.rangeModal.description"
 msgstr "Kliknutím na dva commity určíte rozsah."
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown/components/RangeModal/RangeModal.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/CommitFilterDropdown/components/RangeModal/RangeModal.tsx
 msgid "workspace.rangeModal.title"
 msgstr "Vyberte rozsah commitů"
 
@@ -34482,6 +34505,106 @@ msgstr "Zastavit"
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/V2WorkspaceRunButton/V2WorkspaceRunButton.tsx
 msgid "workspace.runButton.stopAria"
 msgstr "Zastavit spouštěcí příkaz pracovního prostoru"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.commit"
+msgstr "Commitnout"
+
+#. js-lingui-explicit-id
+#. placeholder {0}: error.message
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.commitFailed"
+msgstr "Commit se nezdařil: {0}"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.committed"
+msgstr "Commitnuto"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.createPr"
+msgstr "Vytvořit PR"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.createPrAction"
+msgstr "Vytvořit pull request"
+
+#. js-lingui-explicit-id
+#. placeholder {0}: error instanceof Error ? error.message : String(error)
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.createPrFailed"
+msgstr "Vytvoření PR se nezdařilo: {0}"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.creatingPr"
+msgstr "Vytváření PR…"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.draft"
+msgstr "Návrh"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.noCommitsTooltip"
+msgstr "Žádné commity, ze kterých by šel otevřít pull request"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.openPrToastAction"
+msgstr "Otevřít"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.openShipOptionsAria"
+msgstr "Otevřít možnosti odeslání"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.prBodyPlaceholder"
+msgstr "Popis (volitelné)"
+
+#. js-lingui-explicit-id
+#. placeholder {0}: created.number
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.prCreated"
+msgstr "PR #{0} vytvořen"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.prTitlePlaceholder"
+msgstr "Název pull requestu"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.prUrlLink"
+msgstr "URL PR"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.push"
+msgstr "Push"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.pushed"
+msgstr "Pushnuto"
+
+#. js-lingui-explicit-id
+#. placeholder {0}: error instanceof Error ? error.message : String(error)
+#. placeholder {0}: error.message
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.pushFailed"
+msgstr "Push se nezdařil: {0}"
+
+#. js-lingui-explicit-id
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesControl/components/ShipControl/ShipControl.tsx
+msgid "workspace.shipControl.pushing"
+msgstr "Pushování…"
 
 #. js-lingui-explicit-id
 #: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/WorkspaceSidebar.tsx
@@ -35208,12 +35331,12 @@ msgid "workspace.terminalPane.workspaceRunState"
 msgstr "Spuštění pracovního prostoru: {workspaceRunState}"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesHeader/components/ViewModeToggle/ViewModeToggle.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesToolbar/components/ViewModeToggle/ViewModeToggle.tsx
 msgid "workspace.viewModeToggle.folderView"
 msgstr "Zobrazení složek"
 
 #. js-lingui-explicit-id
-#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceSidebar/hooks/useChangesTab/components/ChangesHeader/components/ViewModeToggle/ViewModeToggle.tsx
+#: ../../apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/components/ChangesPanel/components/ChangesToolbar/components/ViewModeToggle/ViewModeToggle.tsx
 msgid "workspace.viewModeToggle.treeView"
 msgstr "Stromové zobrazení"
 

@@ -37,6 +37,7 @@ export const SETTING_ITEM_ID = {
 	KEYBOARD_SHORTCUTS: "keyboard-shortcuts",
 	BEHAVIOR_CONFIRM_QUIT: "behavior-confirm-quit",
 	BEHAVIOR_FILE_OPEN_MODE: "behavior-file-open-mode",
+	BEHAVIOR_CHANGES_OPEN_TARGET: "behavior-changes-open-target",
 	BEHAVIOR_RESOURCE_MONITOR: "behavior-resource-monitor",
 	BEHAVIOR_OPEN_LINKS_IN_APP: "behavior-open-links-in-app",
 	BEHAVIOR_STAR_GITHUB: "behavior-star-github",
@@ -182,6 +183,8 @@ export const SETTING_ITEM_VARIANT: Record<SettingItemId, SettingVariant> = {
 
 	[SETTING_ITEM_ID.BEHAVIOR_CONFIRM_QUIT]: "shared",
 	[SETTING_ITEM_ID.BEHAVIOR_FILE_OPEN_MODE]: "v1",
+	// The top-bar Changes control is a v2-only surface.
+	[SETTING_ITEM_ID.BEHAVIOR_CHANGES_OPEN_TARGET]: "v2",
 	[SETTING_ITEM_ID.BEHAVIOR_RESOURCE_MONITOR]: "shared",
 	[SETTING_ITEM_ID.BEHAVIOR_OPEN_LINKS_IN_APP]: "v1",
 	[SETTING_ITEM_ID.BEHAVIOR_STAR_GITHUB]: "shared",
@@ -806,6 +809,24 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 			"tab",
 			"new tab",
 			"split pane",
+			"viewer",
+			"behavior",
+		],
+	},
+	{
+		id: SETTING_ITEM_ID.BEHAVIOR_CHANGES_OPEN_TARGET,
+		section: "behavior",
+		title: "Changes open target",
+		description:
+			"Open the Changes view as a pane in the current tab or as its own tab",
+		keywords: [
+			"changes",
+			"diff",
+			"open",
+			"pane",
+			"tab",
+			"split",
+			"new tab",
 			"viewer",
 			"behavior",
 		],

@@ -343,7 +343,7 @@ export const HOTKEYS_REGISTRY = {
 		},
 		label: msg({
 			id: "hotkeys.toggleSidebar.label",
-			message: "Toggle Changes Tab",
+			message: "Toggle Sidebar",
 		}),
 		category: "Layout",
 	},
@@ -355,13 +355,12 @@ export const HOTKEYS_REGISTRY = {
 		},
 		label: msg({
 			id: "hotkeys.openDiffViewer.label",
-			message: "Open Diff Viewer",
+			message: "Open Changes",
 		}),
 		category: "Layout",
 		description: msg({
 			id: "hotkeys.openDiffViewer.description",
-			message:
-				"Open the diff viewer in a new tab, or focus the existing diff viewer",
+			message: "Open the Changes pane in a new tab, or focus the existing one",
 		}),
 	},
 	TOGGLE_WORKSPACE_SIDEBAR: {

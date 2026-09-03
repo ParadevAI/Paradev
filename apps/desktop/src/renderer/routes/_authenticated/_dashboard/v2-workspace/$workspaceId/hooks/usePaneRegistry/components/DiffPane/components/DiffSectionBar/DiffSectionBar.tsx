@@ -30,7 +30,7 @@ export function DiffSectionBar({ kind, count }: DiffSectionBarProps) {
 		// Announce section changes (e.g. Unstaged → Staged) as they scroll past.
 		<div
 			aria-live="polite"
-			className="flex shrink-0 items-center gap-2 border-border border-b bg-muted/40 px-4 py-1.5"
+			className="flex shrink-0 items-center gap-2 border-border/20 border-b bg-muted/40 px-4 py-1.5"
 		>
 			<span className="font-medium text-[11px] text-muted-foreground uppercase tracking-wider">
 				{i18n._(GROUP_TITLES[kind])}

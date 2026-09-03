@@ -11,6 +11,7 @@ import {
 import { Switch } from "@superset/ui/switch";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { HighlightText } from "renderer/routes/_authenticated/settings/components/HighlightText";
+import { type ChangesOpenTarget, useSettings } from "renderer/stores/settings";
 import { useSettingsSearchQuery } from "renderer/stores/settings-state";
 import {
 	isItemVisible,
@@ -34,6 +35,10 @@ export function BehaviorSettings({ visibleItems }: BehaviorSettingsProps) {
 		SETTING_ITEM_ID.BEHAVIOR_FILE_OPEN_MODE,
 		visibleItems,
 	);
+	const showChangesOpenTarget = isItemVisible(
+		SETTING_ITEM_ID.BEHAVIOR_CHANGES_OPEN_TARGET,
+		visibleItems,
+	);
 	const showResourceMonitor = isItemVisible(
 		SETTING_ITEM_ID.BEHAVIOR_RESOURCE_MONITOR,
 		visibleItems,
@@ -48,6 +53,8 @@ export function BehaviorSettings({ visibleItems }: BehaviorSettingsProps) {
 	);
 
 	const utils = electronTrpc.useUtils();
+	const changesOpenTarget = useSettings((s) => s.changesOpenTarget);
+	const updateSetting = useSettings((s) => s.update);
 
 	const { data: confirmOnQuit, isLoading: isConfirmLoading } =
 		electronTrpc.settings.getConfirmOnQuit.useQuery();
@@ -179,7 +186,7 @@ export function BehaviorSettings({ visibleItems }: BehaviorSettingsProps) {
 				{showFileOpenMode && (
 					<div className="flex items-center justify-between">
 						<div className="space-y-0.5">
-							<Label className="text-sm font-medium">
+							<Label htmlFor="file-open-mode" className="text-sm font-medium">
 								<HighlightText
 									text={t({
 										id: "settings.behavior.fileOpenMode.label",
@@ -201,7 +208,7 @@ export function BehaviorSettings({ visibleItems }: BehaviorSettingsProps) {
 							}
 							disabled={isFileOpenModeLoading || setFileOpenMode.isPending}
 						>
-							<SelectTrigger className="w-[180px]">
+							<SelectTrigger id="file-open-mode" className="w-[180px]">
 								<SelectValue />
 							</SelectTrigger>
 							<SelectContent>
@@ -212,6 +219,52 @@ export function BehaviorSettings({ visibleItems }: BehaviorSettingsProps) {
 								</SelectItem>
 								<SelectItem value="new-tab">
 									<Trans id="settings.behavior.fileOpenMode.newTab">
+										New tab
+									</Trans>
+								</SelectItem>
+							</SelectContent>
+						</Select>
+					</div>
+				)}
+
+				{showChangesOpenTarget && (
+					<div className="flex items-center justify-between">
+						<div className="space-y-0.5">
+							<Label
+								htmlFor="changes-open-target"
+								className="text-sm font-medium"
+							>
+								<HighlightText
+									text={t({
+										id: "settings.behavior.changesOpenTarget.label",
+										message: "Changes open target",
+									})}
+									query={searchQuery}
+								/>
+							</Label>
+							<p className="text-xs text-muted-foreground">
+								<Trans id="settings.behavior.changesOpenTarget.hint">
+									Choose how the Changes view opens from the top bar
+								</Trans>
+							</p>
+						</div>
+						<Select
+							value={changesOpenTarget}
+							onValueChange={(value) =>
+								updateSetting("changesOpenTarget", value as ChangesOpenTarget)
+							}
+						>
+							<SelectTrigger id="changes-open-target" className="w-[180px]">
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectItem value="pane">
+									<Trans id="settings.behavior.changesOpenTarget.pane">
+										Pane in current tab
+									</Trans>
+								</SelectItem>
+								<SelectItem value="tab">
+									<Trans id="settings.behavior.changesOpenTarget.tab">
 										New tab
 									</Trans>
 								</SelectItem>

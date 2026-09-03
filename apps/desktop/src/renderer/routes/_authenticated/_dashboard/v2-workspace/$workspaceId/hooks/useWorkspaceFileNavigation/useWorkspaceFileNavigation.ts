@@ -26,11 +26,9 @@ interface PendingReveal {
 export function useWorkspaceFileNavigation({
 	store,
 	setRightSidebarOpen,
-	setRightSidebarTab,
 }: {
 	store: StoreApi<WorkspaceStore<PaneViewerData>>;
 	setRightSidebarOpen: V2UserPreferencesApi["setRightSidebarOpen"];
-	setRightSidebarTab: V2UserPreferencesApi["setRightSidebarTab"];
 }): {
 	openFilePane: (filePath: string, openInNewTab?: boolean) => void;
 	openFilePaneFromTreeClick: (filePath: string, openInNewTab?: boolean) => void;
@@ -191,10 +189,8 @@ export function useWorkspaceFileNavigation({
 				return;
 			}
 			setRightSidebarOpen(true);
-			setRightSidebarTab("files");
 			// The workspace sidebar reads its active tab from per-workspace local
-			// state, not the global preference above — switch it too, or the
-			// reveal lands behind the Changes tab.
+			// state — switch it so the reveal doesn't land behind the Review tab.
 			if (collections.v2WorkspaceLocalState.get(workspace.id)) {
 				collections.v2WorkspaceLocalState.update(workspace.id, (draft) => {
 					draft.sidebarState.activeTab = "files";
@@ -205,7 +201,6 @@ export function useWorkspaceFileNavigation({
 		},
 		[
 			setRightSidebarOpen,
-			setRightSidebarTab,
 			worktreePath,
 			revealInFinder,
 			collections,

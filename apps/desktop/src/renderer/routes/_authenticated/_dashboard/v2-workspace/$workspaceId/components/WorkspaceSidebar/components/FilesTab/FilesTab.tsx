@@ -33,8 +33,8 @@ import {
 	createPierreTreeStyle,
 	PIERRE_TREE_UNSAFE_CSS,
 } from "renderer/lib/pierreTree";
+import { PierreRowContextMenu } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/PierreRowContextMenu";
 import { useOpenInExternalEditor } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useOpenInExternalEditor";
-import { PierreRowContextMenu } from "../PierreRowContextMenu";
 import { FileMenuItems } from "./components/FileMenuItems";
 import { FilesTabDropOverlay } from "./components/FilesTabDropOverlay";
 import { FilesTabHeaderButton } from "./components/FilesTabHeaderButton";

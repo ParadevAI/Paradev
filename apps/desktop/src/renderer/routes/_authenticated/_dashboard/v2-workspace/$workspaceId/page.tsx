@@ -28,6 +28,7 @@ import { StateScreenShell } from "../components/StateScreenShell";
 import { useWorkspace } from "../providers/WorkspaceProvider";
 import { AddTabMenu } from "./components/AddTabMenu";
 import { BackgroundTerminalsButton } from "./components/BackgroundTerminalsButton";
+import { ChangesControl } from "./components/ChangesControl";
 import { V2NotificationStatusIndicator } from "./components/V2NotificationStatusIndicator";
 import { V2PresetsBar } from "./components/V2PresetsBar";
 import { V2WorkspaceRunButton } from "./components/V2WorkspaceRunButton";
@@ -134,7 +135,6 @@ function V2WorkspaceContent() {
 	const {
 		preferences: v2UserPreferences,
 		setRightSidebarOpen,
-		setRightSidebarTab,
 		setRightSidebarWidth,
 		setShowPresetsBar,
 	} = useV2UserPreferences();
@@ -183,24 +183,14 @@ function V2WorkspaceContent() {
 	} = useWorkspaceFileNavigation({
 		store,
 		setRightSidebarOpen,
-		setRightSidebarTab,
 	});
 
-	const paneRegistry = usePaneRegistry({
-		onOpenFile: openFilePaneFromTreeClick,
-		onRevealPath: revealPath,
-		launcher,
-		store,
-	});
-	const defaultContextMenuActions = useDefaultContextMenuActions({
-		paneRegistry,
-		launcher,
-	});
 	const {
 		openDiffPane,
 		addTerminalTab,
 		addChatV3Tab,
 		addBrowserTab,
+		openChangesPane,
 		openCommentPane,
 		openPagePane,
 	} = useWorkspacePaneOpeners({
@@ -208,6 +198,23 @@ function V2WorkspaceContent() {
 		launcher,
 		newTabPresets,
 		executePreset,
+	});
+	const openDiffInNewTab = useCallback(
+		(path: string, changeKey?: string) => {
+			openDiffPane(path, true, undefined, undefined, changeKey);
+		},
+		[openDiffPane],
+	);
+	const paneRegistry = usePaneRegistry({
+		onOpenFile: openFilePaneFromTreeClick,
+		onOpenDiffInNewTab: openDiffInNewTab,
+		onRevealPath: revealPath,
+		launcher,
+		store,
+	});
+	const defaultContextMenuActions = useDefaultContextMenuActions({
+		paneRegistry,
+		launcher,
 	});
 
 	usePagePaneIntentOpener({ workspaceId, isLayoutReady, openPagePane });
@@ -241,10 +248,9 @@ function V2WorkspaceContent() {
 	const handleQuickOpenSelectFile = useCallback(
 		(filePath: string, openInNewTab?: boolean) => {
 			setRightSidebarOpen(true);
-			setRightSidebarTab("files");
 			openFilePaneFromTreeClick(filePath, openInNewTab);
 		},
-		[openFilePaneFromTreeClick, setRightSidebarOpen, setRightSidebarTab],
+		[openFilePaneFromTreeClick, setRightSidebarOpen],
 	);
 	const defaultPaneActions = useDefaultPaneActions({ launcher });
 	const onBeforeCloseTab = useTabCloseGuard();
@@ -309,11 +315,7 @@ function V2WorkspaceContent() {
 
 	return (
 		<FileDocumentStoreProvider>
-			<WorkspaceGitStatusProvider
-				workspaceId={workspaceId}
-				store={store}
-				sidebarOpen={sidebarOpen}
-			>
+			<WorkspaceGitStatusProvider workspaceId={workspaceId}>
 				<div className="flex min-h-0 min-w-0 flex-1">
 					<div
 						className="flex min-h-0 min-w-[320px] flex-1 flex-col overflow-hidden"
@@ -345,6 +347,7 @@ function V2WorkspaceContent() {
 									onAddTerminal={addTerminalTab}
 									onAddChatV3={isChatV3Enabled ? addChatV3Tab : undefined}
 									onAddBrowser={addBrowserTab}
+									onAddChanges={openChangesPane}
 									onAddDesktop={isSandbox ? addDesktopTab : undefined}
 									showPresetsBar={showPresetsBar}
 									onToggleShowPresetsBar={setShowPresetsBar}
@@ -392,6 +395,12 @@ function V2WorkspaceContent() {
 											store={store}
 										/>
 									)}
+									{isLayoutReady && (
+										<ChangesControl
+											workspaceId={workspaceId}
+											onOpenChanges={openChangesPane}
+										/>
+									)}
 									{workspaceRunButton}
 									<RightSidebarToggle />
 									{!isMac && <WindowControls />}
@@ -400,6 +409,7 @@ function V2WorkspaceContent() {
 							renderEmptyState={() => (
 								<WorkspaceEmptyState
 									onOpenBrowser={addBrowserTab}
+									onOpenChanges={openChangesPane}
 									onOpenChatV3={isChatV3Enabled ? addChatV3Tab : undefined}
 									onOpenQuickOpen={handleQuickOpen}
 									onOpenTerminal={addTerminalTab}

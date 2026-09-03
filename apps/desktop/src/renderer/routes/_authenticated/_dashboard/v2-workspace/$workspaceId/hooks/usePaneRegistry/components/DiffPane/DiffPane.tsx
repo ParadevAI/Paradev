@@ -26,6 +26,10 @@ import {
 	getPaneScrollState,
 	savePaneScrollState,
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/state/paneScrollStateCache";
+import { DiffFileCollapseButton } from "renderer/screens/main/components/DiffFileCollapseButton";
+import { DiffFileHeaderName } from "renderer/screens/main/components/DiffFileHeaderName";
+import { DiffViewToolbar } from "renderer/screens/main/components/DiffViewToolbar";
+import { ResizablePanel } from "renderer/screens/main/components/ResizablePanel";
 import { MarkdownSearch } from "renderer/screens/main/components/WorkspaceView/ContentView/TabsContent/TabView/FileViewerPane/components/MarkdownSearch";
 import { toAbsoluteWorkspacePath } from "shared/absolute-paths";
 import type { DiffPaneData, PaneViewerData } from "../../../../types";
@@ -38,10 +42,10 @@ import { useOpenInExternalEditor } from "../../../useOpenInExternalEditor";
 import { useSidebarDiffRef } from "../../../useSidebarDiffRef";
 import { useViewedFiles } from "../../../useViewedFiles";
 import { AgentCommentComposer } from "../AgentCommentComposer";
+import { ChangesPanel } from "./components/ChangesPanel";
 import { CommentThread } from "./components/CommentThread";
 import { DeferredDiffPlaceholder } from "./components/DeferredDiffPlaceholder";
 import { DiffHeaderMetadata } from "./components/DiffHeaderMetadata";
-import { DiffHeaderPrefix } from "./components/DiffHeaderPrefix";
 import { DiffSectionBar } from "./components/DiffSectionBar";
 import { useDiffActiveSection } from "./hooks/useDiffActiveSection";
 import {
@@ -50,12 +54,22 @@ import {
 } from "./hooks/useDiffAnnotations";
 import { useDiffCodeViewItems } from "./hooks/useDiffCodeViewItems";
 import { useDiffCodeViewScroll } from "./hooks/useDiffCodeViewScroll";
-import { useDiffCodeViewTheme } from "./hooks/useDiffCodeViewTheme";
+import { useDiffCardCodeViewTheme } from "./hooks/useDiffCodeViewTheme";
 import { useDiffCommentComposer } from "./hooks/useDiffCommentComposer";
+import { useDiffCommentNavigation } from "./hooks/useDiffCommentNavigation";
 import { useDiffPaneSearch } from "./hooks/useDiffPaneSearch";
 import { createGetDiffInput } from "./utils/createGetDiffInput";
 import { isDiffContentTooLarge } from "./utils/diffLoadingGuards";
 import { getCharacterOffsetAtClientX } from "./utils/getCharacterOffsetAtClientX";
+
+// Panel sizing tracks the old workspace sidebar's (240–640, the range the
+// changes header/toolbar were designed for) rather than the PR Code tab's
+// slimmer tree. Below the hide threshold even a min-width panel leaves too
+// little diff, so it auto-hides and the toolbar's Files pill brings it back.
+const DEFAULT_TREE_WIDTH = 320;
+const MIN_TREE_WIDTH = 240;
+const MAX_TREE_WIDTH = 640;
+const HIDE_TREE_PANE_WIDTH_THRESHOLD = 820;
 
 interface CreateNewAgentSessionInput {
 	configId: string;
@@ -67,6 +81,8 @@ interface DiffPaneProps {
 	context: RendererContext<PaneViewerData>;
 	workspaceId: string;
 	onOpenFile: (path: string, openInNewTab?: boolean) => void;
+	/** ⇧-click / "Open Diff in New Tab" from the changes panel. */
+	onOpenDiffInNewTab?: (path: string, changeKey?: string) => void;
 	onCreateNewAgentSession?: (
 		input: CreateNewAgentSessionInput,
 	) => Promise<{ terminalId: string } | null>;
@@ -87,12 +103,34 @@ export function DiffPane({
 	context,
 	workspaceId,
 	onOpenFile,
+	onOpenDiffInNewTab,
 	onCreateNewAgentSession,
 }: DiffPaneProps) {
 	const { t } = useLingui();
 	const data = context.pane.data as DiffPaneData;
 	const codeViewRef = useRef<CodeViewHandle<DiffAnnotationMetadata>>(null);
 	const searchContainerRef = useRef<HTMLDivElement>(null);
+	const rootRef = useRef<HTMLDivElement>(null);
+	const [containerWidth, setContainerWidth] = useState<number | null>(null);
+	// null = no explicit user choice yet; auto collapse/expand follows the
+	// pane width until the first manual toggle, which then sticks.
+	const [manualTreeCollapsed, setManualTreeCollapsed] = useState<
+		boolean | null
+	>(null);
+	const [treeWidth, setTreeWidth] = useState(DEFAULT_TREE_WIDTH);
+	const [isResizingTree, setIsResizingTree] = useState(false);
+	// Same-kind panes render through one unkeyed component instance, so a
+	// recreated Changes pane would otherwise inherit the previous pane's
+	// manual tree choice/width (verified live: a closed pane's "show tree"
+	// override kept the tree open in a fresh 330px pane). Render-phase reset
+	// (React's documented state-reset-on-prop-change pattern) instead of an
+	// effect so the stale choice never paints.
+	const lastPaneIdRef = useRef(context.pane.id);
+	if (lastPaneIdRef.current !== context.pane.id) {
+		lastPaneIdRef.current = context.pane.id;
+		setManualTreeCollapsed(null);
+		setTreeWidth(DEFAULT_TREE_WIDTH);
+	}
 
 	const ref = useSidebarDiffRef(workspaceId);
 	const scrollStateKey = useMemo(
@@ -151,6 +189,26 @@ export function DiffPane({
 				? [...collapsed, changeKey]
 				: collapsed.filter((key) => key !== changeKey);
 			updateData({ ...current, collapsedFiles: next } as PaneViewerData);
+		},
+		[updateData],
+	);
+
+	// Collapsing the sticky navigation target has to release the target in the
+	// same write — useDiffCodeViewScroll keeps the last-clicked file expanded
+	// while its sticky tracking is armed, so a plain setCollapsed on that file
+	// gets immediately undone (verified live: collapse-all left the clicked
+	// file open).
+	const clearTargetAndCollapse = useCallback(
+		(collapsedFiles: string[]) => {
+			updateData({
+				...dataRef.current,
+				path: "",
+				changeKey: undefined,
+				focusLine: undefined,
+				focusSide: undefined,
+				focusTick: undefined,
+				collapsedFiles,
+			} as PaneViewerData);
 		},
 		[updateData],
 	);
@@ -374,6 +432,96 @@ export function DiffPane({
 		initialScrollState,
 	});
 
+	const commentNav = useDiffCommentNavigation({
+		codeViewRef,
+		items,
+		fileByItemId,
+		collapsedSet,
+		setCollapsed,
+	});
+
+	// Tracks the pane's own rendered width (panes are split/resized well below
+	// window width). The shell always renders now — loading/empty live in the
+	// diff column — so rootRef is mounted for the pane's whole lifetime.
+	useEffect(() => {
+		const el = rootRef.current;
+		if (!el) return;
+		const update = () => setContainerWidth(el.getBoundingClientRect().width);
+		update();
+		const observer = new ResizeObserver(update);
+		observer.observe(el);
+		return () => observer.disconnect();
+	}, []);
+	const isTreeCollapsed =
+		manualTreeCollapsed ??
+		(containerWidth != null && containerWidth < HIDE_TREE_PANE_WIDTH_THRESHOLD);
+
+	// The tree shows each path once even when it appears in two sections
+	// (staged + unstaged), so the Files count matches the tree's row count,
+	// not the section item count.
+	const uniqueFileCount = useMemo(
+		() => new Set(files.map((f) => f.path)).size,
+		[files],
+	);
+	const areAllFilesCollapsed =
+		files.length > 0 &&
+		files.every((f) => collapsedSet.has(getChangesetFileKey(f)));
+	const handleToggleCollapseAll = useCallback(() => {
+		if (areAllFilesCollapsed) {
+			updateData({
+				...dataRef.current,
+				collapsedFiles: [],
+			} as PaneViewerData);
+			return;
+		}
+		clearTargetAndCollapse(files.map((f) => getChangesetFileKey(f)));
+	}, [updateData, areAllFilesCollapsed, files, clearTargetAndCollapse]);
+
+	// Mirrors openDiffPane's pane-data write: useDiffCodeViewScroll owns the
+	// scroll, sticky re-assert, and auto-expand for the target file, and the
+	// panel's selection echo follows the same data.
+	const handleSelectTreeFile = useCallback(
+		(target: { path: string; changeKey?: string }) => {
+			const current = dataRef.current;
+			updateData({
+				...current,
+				path: target.path,
+				changeKey: target.changeKey,
+				// Only the navigated file's key can be pruned; without a change
+				// key we can't identify it, so leave the set intact.
+				collapsedFiles: target.changeKey
+					? (current.collapsedFiles ?? []).filter(
+							(key) => key !== target.changeKey,
+						)
+					: (current.collapsedFiles ?? []),
+				focusLine: undefined,
+				focusSide: undefined,
+				focusTick: Date.now(),
+			} as PaneViewerData);
+		},
+		[updateData],
+	);
+
+	// The panel's click policy funnels here: plain/meta-plain clicks navigate
+	// this pane; ⇧-tier clicks open a separate diff tab via the page-level
+	// opener (openDiffPane targets the first diff pane in tab order, which
+	// would be wrong for in-pane navigation but right for a new tab).
+	const handlePanelSelectFile = useCallback(
+		(path: string, openInNewTab?: boolean, changeKey?: string) => {
+			if (openInNewTab) {
+				onOpenDiffInNewTab?.(path, changeKey);
+				return;
+			}
+			handleSelectTreeFile({ path, changeKey });
+		},
+		[onOpenDiffInNewTab, handleSelectTreeFile],
+	);
+	const worktreePath = workspaceQuery.data?.worktreePath;
+	const selectedAbsolutePath =
+		data.path && worktreePath
+			? toAbsoluteWorkspacePath(worktreePath, data.path)
+			: undefined;
+
 	// The section bar lives outside the scroller: Pierre pins one header at a
 	// time within its own box, so a body-less in-flow section item couldn't stay
 	// pinned across its group.
@@ -391,7 +539,7 @@ export function DiffPane({
 		},
 		[scrollStateKey, onScroll, notifyScroll],
 	);
-	const { options, style } = useDiffCodeViewTheme();
+	const { options, style } = useDiffCardCodeViewTheme();
 
 	// Patches carry hunks with three lines of context; @pierre/diffs calls this
 	// when it needs the rest of a file — expanding context, or entering edit
@@ -492,15 +640,42 @@ export function DiffPane({
 			const file = fileByItemId.get(item.id);
 			if (!file) return null;
 			const changeKey = getChangesetFileKey(file);
+			const collapsed = collapsedSet.has(changeKey);
 			return (
-				<DiffHeaderPrefix
-					file={file}
-					collapsed={collapsedSet.has(changeKey)}
-					onSetCollapsed={(value) => setCollapsed(changeKey, value)}
+				<DiffFileCollapseButton
+					collapsed={collapsed}
+					onToggle={() => {
+						if (!collapsed && item.id === targetItemId) {
+							clearTargetAndCollapse([
+								...(dataRef.current.collapsedFiles ?? []),
+								changeKey,
+							]);
+							return;
+						}
+						setCollapsed(changeKey, !collapsed);
+					}}
 				/>
 			);
 		},
-		[fileByItemId, collapsedSet, setCollapsed],
+		[
+			fileByItemId,
+			collapsedSet,
+			setCollapsed,
+			targetItemId,
+			clearTargetAndCollapse,
+		],
+	);
+
+	// The card CSS hides Pierre's native [data-title] (the full relative
+	// path), so this suffix is the header's only title: filename first, then
+	// the containing directory in the muted color.
+	const renderHeaderFilenameSuffix = useCallback(
+		(item: CodeViewItem<DiffAnnotationMetadata>) => {
+			const file = fileByItemId.get(item.id);
+			if (!file) return null;
+			return <DiffFileHeaderName path={file.path} />;
+		},
+		[fileByItemId],
 	);
 
 	const renderHeaderMetadata = useCallback(
@@ -663,7 +838,13 @@ export function DiffPane({
 					isOutdated={m.isOutdated}
 					url={m.url}
 					comments={m.comments}
-					focusTick={focused ? data.focusTick : undefined}
+					focusTick={
+						focused
+							? data.focusTick
+							: commentNav.isNavFocused(m.threadId)
+								? commentNav.navFocusTick
+								: undefined
+					}
 				/>
 			);
 		},
@@ -678,59 +859,101 @@ export function DiffPane({
 			fileByItemId,
 			requestDiff,
 			onOpenFile,
+			commentNav.isNavFocused,
+			commentNav.navFocusTick,
 			t,
 		],
 	);
 
-	if (files.length === 0) {
-		return (
-			<div className="flex h-full w-full items-center justify-center text-sm text-muted-foreground">
-				{isLoading
-					? t({ id: "workspace.diffPane.loading", message: "Loading…" })
-					: t({ id: "workspace.diffPane.noChanges", message: "No changes" })}
-			</div>
-		);
-	}
-
 	return (
-		<div className="flex h-full w-full flex-col">
-			{currentSection ? (
-				<DiffSectionBar
-					kind={currentSection.kind}
-					count={currentSection.count}
-				/>
-			) : null}
-			<div
-				ref={searchContainerRef}
-				className="relative min-h-0 w-full flex-1"
-				onKeyDownCapture={handleEditorKeyDownCapture}
-			>
-				<MarkdownSearch
-					isOpen={search.isSearchOpen}
-					query={search.query}
-					caseSensitive={search.caseSensitive}
-					matchCount={search.matchCount}
-					activeMatchIndex={search.activeMatchIndex}
-					onQueryChange={search.setQuery}
-					onCaseSensitiveChange={search.setCaseSensitive}
-					onFindNext={search.findNext}
-					onFindPrevious={search.findPrevious}
-					onClose={search.closeSearch}
-				/>
-				<EditProvider<DiffAnnotationMetadata> createEditor={createEditor}>
-					<CodeView<DiffAnnotationMetadata>
-						ref={codeViewRef}
-						className="h-full w-full overflow-y-auto overflow-x-clip overscroll-contain [overflow-anchor:none]"
-						style={style}
-						items={items}
-						options={codeViewOptions}
-						onScroll={handleScroll}
-						renderHeaderPrefix={renderHeaderPrefix}
-						renderHeaderMetadata={renderHeaderMetadata}
-						renderAnnotation={renderAnnotation}
-						onItemEditChange={handleItemEditChange}
+		<div ref={rootRef} className="flex h-full w-full">
+			{!isTreeCollapsed && (
+				<ResizablePanel
+					width={treeWidth}
+					onWidthChange={setTreeWidth}
+					isResizing={isResizingTree}
+					onResizingChange={setIsResizingTree}
+					minWidth={MIN_TREE_WIDTH}
+					maxWidth={MAX_TREE_WIDTH}
+					handleSide="right"
+					onDoubleClickHandle={() => setTreeWidth(DEFAULT_TREE_WIDTH)}
+					className="flex min-h-0 flex-col border-border/20 border-r"
+				>
+					<ChangesPanel
+						workspaceId={workspaceId}
+						selectedFilePath={selectedAbsolutePath}
+						selectedChangeKey={data.changeKey}
+						onSelectFile={handlePanelSelectFile}
+						onOpenFile={onOpenFile}
 					/>
-				</EditProvider>
+				</ResizablePanel>
+			)}
+			<div className="flex min-h-0 min-w-0 flex-1 flex-col">
+				<DiffViewToolbar
+					fileCount={uniqueFileCount}
+					isTreeCollapsed={isTreeCollapsed}
+					onToggleTree={() => setManualTreeCollapsed(!isTreeCollapsed)}
+					areAllFilesCollapsed={areAllFilesCollapsed}
+					onToggleCollapseAll={handleToggleCollapseAll}
+					commentNav={{
+						focusedIndex: commentNav.focusedThreadIndex,
+						total: commentNav.orderedThreads.length,
+						onPrev: commentNav.goToPrevComment,
+						onNext: commentNav.goToNextComment,
+					}}
+				/>
+				{currentSection ? (
+					<DiffSectionBar
+						kind={currentSection.kind}
+						count={currentSection.count}
+					/>
+				) : null}
+				{files.length === 0 ? (
+					// The panel stays up so the filter/branch controls remain
+					// reachable exactly when the current filter yields nothing.
+					<div className="flex flex-1 items-center justify-center text-sm text-muted-foreground">
+						{isLoading
+							? t({ id: "workspace.diffPane.loading", message: "Loading…" })
+							: t({
+									id: "workspace.diffPane.noChanges",
+									message: "No changes",
+								})}
+					</div>
+				) : (
+					<div
+						ref={searchContainerRef}
+						className="relative min-h-0 w-full flex-1"
+						onKeyDownCapture={handleEditorKeyDownCapture}
+					>
+						<MarkdownSearch
+							isOpen={search.isSearchOpen}
+							query={search.query}
+							caseSensitive={search.caseSensitive}
+							matchCount={search.matchCount}
+							activeMatchIndex={search.activeMatchIndex}
+							onQueryChange={search.setQuery}
+							onCaseSensitiveChange={search.setCaseSensitive}
+							onFindNext={search.findNext}
+							onFindPrevious={search.findPrevious}
+							onClose={search.closeSearch}
+						/>
+						<EditProvider<DiffAnnotationMetadata> createEditor={createEditor}>
+							<CodeView<DiffAnnotationMetadata>
+								ref={codeViewRef}
+								className="h-full w-full overflow-y-auto overflow-x-clip overscroll-contain px-3 [overflow-anchor:none]"
+								style={style}
+								items={items}
+								options={codeViewOptions}
+								onScroll={handleScroll}
+								renderHeaderPrefix={renderHeaderPrefix}
+								renderHeaderFilenameSuffix={renderHeaderFilenameSuffix}
+								renderHeaderMetadata={renderHeaderMetadata}
+								renderAnnotation={renderAnnotation}
+								onItemEditChange={handleItemEditChange}
+							/>
+						</EditProvider>
+					</div>
+				)}
 			</div>
 		</div>
 	);

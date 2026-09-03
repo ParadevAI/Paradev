@@ -172,7 +172,7 @@ describe("healWorkspaceLocalState", () => {
 			tabOrder: 3,
 			sectionId: null,
 			changesFilter: { kind: "all" },
-			activeTab: "changes",
+			activeTab: "files",
 			isHidden: false,
 		},
 		viewedFiles: ["a.ts"],
@@ -220,7 +220,7 @@ describe("healWorkspaceLocalState", () => {
 		expect(healed.sidebarState.tabOrder).toBe(0);
 		expect(healed.sidebarState.sectionId).toBeNull();
 		expect(healed.sidebarState.changesFilter).toEqual({ kind: "all" });
-		expect(healed.sidebarState.activeTab).toBe("changes");
+		expect(healed.sidebarState.activeTab).toBe("files");
 		expect(healed.sidebarState.isHidden).toBe(false);
 		expect(healed.sidebarState.pinnedAt).toBeNull();
 	});
@@ -392,10 +392,18 @@ describe("workspace sidebar activeTab retirement", () => {
 		},
 	};
 
-	it("prunes a row persisted on the retired pages tab back to changes", () => {
+	it("prunes a row persisted on the retired pages tab back to files", () => {
 		expect(healWorkspaceLocalState(stored).sidebarState.activeTab).toBe(
-			"changes",
+			"files",
 		);
+	});
+
+	it("prunes a row persisted on the retired changes tab back to files", () => {
+		const healed = healWorkspaceLocalState({
+			...stored,
+			sidebarState: { ...stored.sidebarState, activeTab: "changes" },
+		});
+		expect(healed.sidebarState.activeTab).toBe("files");
 	});
 
 	it("leaves a surviving tab untouched", () => {
@@ -406,16 +414,18 @@ describe("workspace sidebar activeTab retirement", () => {
 		expect(healed.sidebarState.activeTab).toBe("review");
 	});
 
-	it("rejects the retired value at the schema edge", () => {
-		expect(
-			workspaceLocalStateSchema.safeParse({
-				...stored,
-				sidebarState: {
-					projectId: stored.sidebarState.projectId,
-					activeTab: "pages",
-				},
-			}).success,
-		).toBe(false);
+	it("rejects the retired values at the schema edge", () => {
+		for (const retired of ["pages", "changes"]) {
+			expect(
+				workspaceLocalStateSchema.safeParse({
+					...stored,
+					sidebarState: {
+						projectId: stored.sidebarState.projectId,
+						activeTab: retired,
+					},
+				}).success,
+			).toBe(false);
+		}
 	});
 });
 
