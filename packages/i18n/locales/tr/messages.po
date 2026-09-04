@@ -13343,9 +13343,6 @@ msgstr "Metin alanı"
 msgid "Thanks for reaching out"
 msgstr "Bize ulaştığınız için teşekkürler"
 
-msgid "That device is online (region {region}) but the connection couldn't be established — usually relay routing rather than the device itself. Retry, and if it persists restart Superset on that device."
-msgstr "O cihaz çevrimiçi ({region} bölgesi) ancak bağlantı kurulamadı — bu genellikle cihazdan değil, röle yönlendirmesinden kaynaklanır. Yeniden deneyin; sorun sürerse o cihazda Superset'i yeniden başlatın."
-
 msgid "That device is online but the connection couldn't be established — usually relay routing rather than the device itself. Retry, and if it persists restart Superset on that device."
 msgstr "O cihaz çevrimiçi ancak bağlantı kurulamadı — bu genellikle cihazdan değil, röle yönlendirmesinden kaynaklanır. Yeniden deneyin; sorun sürerse o cihazda Superset'i yeniden başlatın."
 

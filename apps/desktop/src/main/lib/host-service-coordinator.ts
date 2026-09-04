@@ -36,7 +36,6 @@ import {
 	pollHealthCheck,
 } from "./host-service-utils";
 import { localDb } from "./local-db";
-import { getRelayUrl } from "./relay-url";
 import { HOOK_PROTOCOL_VERSION } from "./terminal/env";
 
 export type HostServiceStatus = "starting" | "running" | "stopped";
@@ -1002,8 +1001,8 @@ export class HostServiceCoordinator extends EventEmitter {
 		// which in dev has `RELAY_URL` set. Enforce the toggle *after* that merge
 		// so the child definitely doesn't see a relay URL when disabled. This is
 		// only the child's fallback; it asks the API for the relay once
-		// authenticated (see main/lib/relay-url).
-		const effectiveRelayUrl = getRelayUrl();
+		// authenticated.
+		const effectiveRelayUrl = mainEnv.RELAY_URL;
 		if (exposeViaRelay && effectiveRelayUrl) {
 			childEnv.RELAY_URL = effectiveRelayUrl;
 		} else {

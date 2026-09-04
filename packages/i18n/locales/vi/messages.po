@@ -13343,9 +13343,6 @@ msgstr "Textarea"
 msgid "Thanks for reaching out"
 msgstr "Cảm ơn bạn đã liên hệ"
 
-msgid "That device is online (region {region}) but the connection couldn't be established — usually relay routing rather than the device itself. Retry, and if it persists restart Superset on that device."
-msgstr "Thiết bị đó đang trực tuyến (vùng {region}) nhưng không thiết lập được kết nối — thường là do định tuyến relay chứ không phải bản thân thiết bị. Hãy thử lại, và nếu vẫn vậy thì khởi động lại Superset trên thiết bị đó."
-
 msgid "That device is online but the connection couldn't be established — usually relay routing rather than the device itself. Retry, and if it persists restart Superset on that device."
 msgstr "Thiết bị đó đang trực tuyến nhưng không thiết lập được kết nối — thường là do định tuyến relay chứ không phải bản thân thiết bị. Hãy thử lại, và nếu vẫn vậy thì khởi động lại Superset trên thiết bị đó."
 

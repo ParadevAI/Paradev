@@ -1,12 +1,12 @@
-// E2E acceptance instrument for relay2 (tunnel v2). Spins up a fake local
-// host-service (echo WS + JSON HTTP), connects the REAL TunnelClientV2 to the
+// E2E acceptance instrument for the relay. Spins up a fake local
+// host-service (echo WS + JSON HTTP), connects the REAL TunnelClient to the
 // relay under test, then probes through the client-facing routes exactly as
 // desktop/web would. Exits non-zero on any failure.
 //
-//   SUPERSET_API_KEY=sk_live_… bun apps/relay2/scripts/e2e-probe.ts \
+//   SUPERSET_API_KEY=sk_live_… bun apps/relay/scripts/e2e-probe.ts \
 //     [--relay http://localhost:8787] [--host-id <orgId>:<machineId>]
 
-import { TunnelClientV2 } from "../../../packages/host-service/src/tunnel/tunnel-client-v2";
+import { TunnelClient } from "../../../packages/host-service/src/tunnel/tunnel-client";
 
 const API_URL = "https://api.superset.sh";
 const relayArg = process.argv.indexOf("--relay");
@@ -62,9 +62,9 @@ const local = Bun.serve({
 });
 console.log(`[probe] fake local service on :${local.port}`);
 
-// ── Host side: real TunnelClientV2 ──────────────────────────────────
+// ── Host side: real TunnelClient ──────────────────────────────────
 
-const tunnel = new TunnelClientV2({
+const tunnel = new TunnelClient({
 	relayUrl: RELAY,
 	hostId: HOST_ID,
 	getAuthToken: mintJwt,

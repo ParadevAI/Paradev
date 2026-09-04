@@ -13343,9 +13343,6 @@ msgstr "텍스트 영역"
 msgid "Thanks for reaching out"
 msgstr "연락해 주셔서 감사합니다"
 
-msgid "That device is online (region {region}) but the connection couldn't be established — usually relay routing rather than the device itself. Retry, and if it persists restart Superset on that device."
-msgstr "해당 기기는 온라인({region} 리전)이지만 연결을 맺지 못했습니다. 보통 기기 자체보다는 릴레이 라우팅 문제입니다. 다시 시도하고, 계속되면 해당 기기에서 Superset을 다시 시작하세요."
-
 msgid "That device is online but the connection couldn't be established — usually relay routing rather than the device itself. Retry, and if it persists restart Superset on that device."
 msgstr "해당 기기는 온라인이지만 연결을 맺지 못했습니다. 보통 기기 자체보다는 릴레이 라우팅 문제입니다. 다시 시도하고, 계속되면 해당 기기에서 Superset을 다시 시작하세요."
 

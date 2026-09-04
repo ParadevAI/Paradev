@@ -13343,9 +13343,6 @@ msgstr "Área de texto"
 msgid "Thanks for reaching out"
 msgstr "Gracias por escribirnos"
 
-msgid "That device is online (region {region}) but the connection couldn't be established — usually relay routing rather than the device itself. Retry, and if it persists restart Superset on that device."
-msgstr "Ese dispositivo está en línea (región {region}), pero no se pudo establecer la conexión: suele ser cosa del enrutado del relay, no del dispositivo. Reinténtalo y, si persiste, reinicia Superset en ese dispositivo."
-
 msgid "That device is online but the connection couldn't be established — usually relay routing rather than the device itself. Retry, and if it persists restart Superset on that device."
 msgstr "Ese dispositivo está en línea, pero no se pudo establecer la conexión: suele ser cosa del enrutado del relay, no del dispositivo. Reinténtalo y, si persiste, reinicia Superset en ese dispositivo."
 

@@ -13343,9 +13343,6 @@ msgstr "多行文本框"
 msgid "Thanks for reaching out"
 msgstr "感谢联系"
 
-msgid "That device is online (region {region}) but the connection couldn't be established — usually relay routing rather than the device itself. Retry, and if it persists restart Superset on that device."
-msgstr "该设备在线（区域{region}），但无法建立连接 — 通常是中继路由问题，而非设备本身。请重试；若持续如此，请在该设备上重启Superset。"
-
 msgid "That device is online but the connection couldn't be established — usually relay routing rather than the device itself. Retry, and if it persists restart Superset on that device."
 msgstr "该设备在线，但无法建立连接 — 通常是中继路由问题，而非设备本身。请重试；若持续如此，请在该设备上重启Superset。"
 

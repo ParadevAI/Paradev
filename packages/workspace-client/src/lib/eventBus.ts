@@ -4,9 +4,9 @@ import type {
 	ServerMessage,
 } from "@superset/host-service/events";
 import type { AgentIdentity } from "@superset/shared/agent-identity";
-import { DIAL_TIMEOUT_MS } from "@superset/shared/tunnel-v2-protocol";
+import { DIAL_TIMEOUT_MS } from "@superset/shared/tunnel-protocol";
 import type { FsWatchEvent } from "@superset/workspace-fs/host";
-import type { RelayAffinityProbe } from "./primeRelayAffinity";
+import type { RelayHostProbe } from "./probeRelayHost";
 import { createRelaySocket, type RelaySocket } from "./relaySocket";
 
 export type { AgentIdentity };
@@ -180,7 +180,7 @@ export interface HostConnectionStatus {
 	 * 401/403 unauthorized, null for a direct (non-relay) host URL or when the
 	 * relay itself couldn't be reached. Names *why* the socket is down.
 	 */
-	probe: RelayAffinityProbe | null;
+	probe: RelayHostProbe | null;
 }
 
 type ConnectionStatusListener = (status: HostConnectionStatus) => void;
@@ -202,17 +202,17 @@ function fileWatchKey(workspaceId: string, absolutePath: string): string {
 }
 
 function probesEqual(
-	left: RelayAffinityProbe | null,
-	right: RelayAffinityProbe | null,
+	left: RelayHostProbe | null,
+	right: RelayHostProbe | null,
 ): boolean {
 	if (left === right) return true;
 	if (left === null || right === null) return false;
-	return left.status === right.status && left.region === right.region;
+	return left.status === right.status;
 }
 
 function setConnectionStatus(
 	state: ConnectionState,
-	next: { state?: HostConnectionState; probe?: RelayAffinityProbe | null },
+	next: { state?: HostConnectionState; probe?: RelayHostProbe | null },
 ): void {
 	const current = state.status;
 	const nextState = next.state ?? current.state;
@@ -373,7 +373,7 @@ function getOrCreateConnection(
 	const existing = connections.get(key);
 	if (existing) return existing;
 
-	// createRelaySocket runs the fly-affinity preflight and re-signs the URL
+	// createRelaySocket runs the host probe and re-signs the URL
 	// with a fresh token before every attempt; backoff and reconnection live
 	// inside partysocket. Buffering is disabled so command semantics stay
 	// "send only while open" — watches are replayed from state on each open.

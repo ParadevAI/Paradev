@@ -3,7 +3,7 @@ import {
 	type HttpDialFrame,
 	type StreamDial,
 	type StreamDialFailed,
-} from "@superset/shared/tunnel-v2-protocol";
+} from "@superset/shared/tunnel-protocol";
 import ReconnectingWebSocket from "partysocket/ws";
 
 import { reportTunnelRescue } from "../sentry";
@@ -51,7 +51,7 @@ const STRIPPED_RESPONSE_HEADERS = new Set([
 	"transfer-encoding",
 ]);
 
-export interface TunnelClientV2Options {
+export interface TunnelClientOptions {
 	relayUrl: string;
 	hostId: string;
 	getAuthToken: () => Promise<string | null>;
@@ -67,11 +67,11 @@ function toWs(url: string): string {
 	return url.replace(/^https:/, "wss:").replace(/^http:/, "ws:");
 }
 
-// Tunnel v2 host client. One reconnecting control WebSocket (partysocket owns
+// Tunnel host client. One reconnecting control WebSocket (partysocket owns
 // backoff/jitter/retry); each proxied stream is a fresh dial-back socket piped
 // byte-for-byte to the local host-service — no multiplexing, no envelopes.
-export class TunnelClientV2 {
-	private readonly options: TunnelClientV2Options;
+export class TunnelClient {
+	private readonly options: TunnelClientOptions;
 	private control: ReconnectingWebSocket | null = null;
 	private pingTimer: ReturnType<typeof setInterval> | null = null;
 	private watchdogTimer: ReturnType<typeof setInterval> | null = null;
@@ -80,7 +80,7 @@ export class TunnelClientV2 {
 	private relayUrl: string;
 	private closed = false;
 
-	constructor(options: TunnelClientV2Options) {
+	constructor(options: TunnelClientOptions) {
 		this.options = options;
 		this.relayUrl = options.relayUrl;
 	}
@@ -107,10 +107,10 @@ export class TunnelClientV2 {
 				token = await withTimeout(this.options.getAuthToken(), null);
 			} catch (error) {
 				console.warn(
-					"[host-service:tunnel-v2] token fetch failed; connecting unauthenticated so the retry cycle survives:",
+					"[host-service:tunnel] token fetch failed; connecting unauthenticated so the retry cycle survives:",
 					error instanceof Error ? error.message : error,
 				);
-				reportTunnelRescue("v2_token_fetch_failed", {
+				reportTunnelRescue("token_fetch_failed", {
 					message: error instanceof Error ? error.message.slice(0, 200) : "",
 				});
 			}
@@ -131,7 +131,7 @@ export class TunnelClientV2 {
 		control.addEventListener("open", () => {
 			this.lastInboundAt = Date.now();
 			console.log(
-				`[host-service:tunnel-v2] control connected for ${this.options.hostId}`,
+				`[host-service:tunnel] control connected for ${this.options.hostId}`,
 			);
 		});
 
@@ -152,7 +152,7 @@ export class TunnelClientV2 {
 			const described = describeRelayClose(event.code) ?? "";
 			if (event.code === 1008 || described) {
 				console.warn(
-					`[host-service:tunnel-v2] relay closed control (${event.code} ${described}): ${event.reason ?? ""}; partysocket will retry`,
+					`[host-service:tunnel] relay closed control (${event.code} ${described}): ${event.reason ?? ""}; partysocket will retry`,
 				);
 			}
 		});
@@ -168,7 +168,7 @@ export class TunnelClientV2 {
 				const silentFor = Date.now() - this.lastInboundAt;
 				if (silentFor > INBOUND_SILENCE_TIMEOUT_MS) {
 					console.warn(
-						`[host-service:tunnel-v2] no inbound traffic for ${silentFor}ms, forcing reconnect`,
+						`[host-service:tunnel] no inbound traffic for ${silentFor}ms, forcing reconnect`,
 					);
 					control.reconnect();
 				}
@@ -181,9 +181,9 @@ export class TunnelClientV2 {
 				// window for as long as it stays down.
 				this.notOpenSince = Date.now();
 				console.warn(
-					`[host-service:tunnel-v2] control not open for ${stuckFor}ms, kicking reconnect`,
+					`[host-service:tunnel] control not open for ${stuckFor}ms, kicking reconnect`,
 				);
-				reportTunnelRescue("v2_control_stuck", { stuckForMs: stuckFor });
+				reportTunnelRescue("control_stuck", { stuckForMs: stuckFor });
 				control.reconnect();
 			}
 		}, WATCHDOG_INTERVAL_MS);
@@ -275,7 +275,7 @@ export class TunnelClientV2 {
 
 	private reportDialFailed(ticket: string): void {
 		console.warn(
-			`[host-service:tunnel-v2] dial-back failed after ${DIAL_ATTEMPTS} attempts; reporting to relay`,
+			`[host-service:tunnel] dial-back failed after ${DIAL_ATTEMPTS} attempts; reporting to relay`,
 		);
 		if (this.control?.readyState !== WebSocket.OPEN) return;
 		this.control.send(
@@ -376,7 +376,7 @@ export class TunnelClientV2 {
 			}
 			relayWs.send('{"type":"http:end"}');
 		} catch (error) {
-			console.error("[host-service:tunnel-v2] HTTP proxy failed", error);
+			console.error("[host-service:tunnel] HTTP proxy failed", error);
 			relayWs.send(
 				JSON.stringify({ type: "http:response", status: 502, headers: {} }),
 			);

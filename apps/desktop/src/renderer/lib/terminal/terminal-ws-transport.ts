@@ -1,5 +1,5 @@
-import { DIAL_TIMEOUT_MS } from "@superset/shared/tunnel-v2-protocol";
-import type { RelayAffinityProbe } from "@superset/workspace-client";
+import { DIAL_TIMEOUT_MS } from "@superset/shared/tunnel-protocol";
+import type { RelayHostProbe } from "@superset/workspace-client";
 import {
 	createRelaySocket,
 	type RelaySocket,
@@ -130,7 +130,7 @@ export interface TerminalTransport {
 	 * (already logged); its guaranteed follow-up close skips the generic log. */
 	_connHadRetryableError: boolean;
 	/** Internal: last `_whoowns` preflight probe, used to classify a failure. */
-	_lastProbe: RelayAffinityProbe | null;
+	_lastProbe: RelayHostProbe | null;
 	/**
 	 * Token carried on the URL the caller passed. Reused as-is for local (PSK)
 	 * hosts, whose token doesn't rotate; relay hosts re-sign per dial via
@@ -268,7 +268,6 @@ function maybeSurfaceDiagnosis(
 				? closeEvent.reason || undefined
 				: undefined,
 		preflight_status: transport._lastProbe?.status ?? null,
-		tunnel_region: transport._lastProbe?.region ?? null,
 		reconnect_attempts: effectiveFailureCount(
 			transport._attachRetry,
 			transport._socket?.retryCount ?? 0,
@@ -646,7 +645,6 @@ export function connect(
 			posthog.capture("terminal_connect_failed", {
 				endpoint: formatWsEndpoint(transport.currentUrl),
 				preflight_status: transport._lastProbe?.status ?? null,
-				tunnel_region: transport._lastProbe?.region ?? null,
 				reconnect_attempts: transport._socket?.retryCount ?? 0,
 				category: diagnosis.category,
 			});

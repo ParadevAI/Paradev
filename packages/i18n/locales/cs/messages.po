@@ -13343,9 +13343,6 @@ msgstr "Textové pole"
 msgid "Thanks for reaching out"
 msgstr "Díky, že jste se ozvali"
 
-msgid "That device is online (region {region}) but the connection couldn't be established — usually relay routing rather than the device itself. Retry, and if it persists restart Superset on that device."
-msgstr "To zařízení je online (region {region}), ale spojení se nepodařilo navázat — obvykle jde o směrování relay, ne o zařízení samotné. Zkuste to znovu, a pokud potíže přetrvávají, restartujte na něm Superset."
-
 msgid "That device is online but the connection couldn't be established — usually relay routing rather than the device itself. Retry, and if it persists restart Superset on that device."
 msgstr "To zařízení je online, ale spojení se nepodařilo navázat — obvykle jde o směrování relay, ne o zařízení samotné. Zkuste to znovu, a pokud potíže přetrvávají, restartujte na něm Superset."
 

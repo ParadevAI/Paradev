@@ -13343,9 +13343,6 @@ msgstr "Textarea"
 msgid "Thanks for reaching out"
 msgstr "お問い合わせありがとうございます"
 
-msgid "That device is online (region {region}) but the connection couldn't be established — usually relay routing rather than the device itself. Retry, and if it persists restart Superset on that device."
-msgstr "そのデバイスはオンライン(リージョン{region})ですが、接続を確立できませんでした — 通常はデバイス自体ではなくリレーのルーティングが原因です。再試行し、解消しない場合はそのデバイスでSupersetを再起動してください。"
-
 msgid "That device is online but the connection couldn't be established — usually relay routing rather than the device itself. Retry, and if it persists restart Superset on that device."
 msgstr "そのデバイスはオンラインですが、接続を確立できませんでした — 通常はデバイス自体ではなくリレーのルーティングが原因です。再試行し、解消しない場合はそのデバイスでSupersetを再起動してください。"
 

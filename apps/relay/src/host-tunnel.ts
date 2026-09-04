@@ -3,7 +3,7 @@ import {
 	type HostControlMessage,
 	RELAY_CLOSE,
 	type StreamDial,
-} from "@superset/shared/tunnel-v2-protocol";
+} from "@superset/shared/tunnel-protocol";
 import { type Connection, type ConnectionContext, Server } from "partyserver";
 import {
 	type HttpExchangeRequest,
@@ -145,7 +145,7 @@ export class HostTunnel extends Server<RelayEnv> {
 			}
 			await this.ctx.storage.put("lastHostSeenAt", Date.now());
 			await this.ctx.storage.setAlarm(Date.now() + LIVENESS_SWEEP_MS);
-			console.log(`[relay2] host connected: ${hostId}`);
+			console.log(`[relay] host connected: ${hostId}`);
 			return;
 		}
 
@@ -291,7 +291,7 @@ export class HostTunnel extends Server<RelayEnv> {
 			this.httpExchanges.abortAll();
 			// A replaced socket's close lands after the new one registered.
 			if (!this.hostConn()) {
-				console.log(`[relay2] host disconnected: ${state.hostId}`);
+				console.log(`[relay] host disconnected: ${state.hostId}`);
 			}
 			return;
 		}
@@ -323,7 +323,7 @@ export class HostTunnel extends Server<RelayEnv> {
 			// flips this object's socket state — and the socket *is* presence.
 			const state = host.state as ConnState | undefined;
 			console.log(
-				`[relay2] host stale, closing: ${state?.kind === "host" ? state.hostId : this.name}`,
+				`[relay] host stale, closing: ${state?.kind === "host" ? state.hostId : this.name}`,
 			);
 			closeQuietly(host, RELAY_CLOSE.staleHost, "No keepalive from host");
 			return;

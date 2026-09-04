@@ -63,6 +63,17 @@ export type DispatchOptions = {
 	relayUrl: string;
 } & DispatchCause;
 
+type HostCandidate = Pick<
+	typeof v2Hosts.$inferSelect,
+	| "organizationId"
+	| "machineId"
+	| "name"
+	| "wakeCommand"
+	| "createdByUserId"
+	| "createdAt"
+	| "updatedAt"
+>;
+
 /**
  * Run one automation: resolve host, (maybe) create a workspace, start the
  * agent session. Writes an automation_runs row regardless of outcome. Does
@@ -265,7 +276,7 @@ export async function dispatchAutomation(
 
 async function resolveCandidateHosts(
 	automation: DispatchableAutomation,
-): Promise<Array<typeof v2Hosts.$inferSelect>> {
+): Promise<HostCandidate[]> {
 	if (automation.targetHostId) {
 		const [host] = await db
 			.select()
@@ -286,7 +297,6 @@ async function resolveCandidateHosts(
 			organizationId: v2Hosts.organizationId,
 			machineId: v2Hosts.machineId,
 			name: v2Hosts.name,
-			isOnline: v2Hosts.isOnline,
 			wakeCommand: v2Hosts.wakeCommand,
 			createdByUserId: v2Hosts.createdByUserId,
 			createdAt: v2Hosts.createdAt,
@@ -310,15 +320,14 @@ async function resolveCandidateHosts(
 }
 
 /**
- * The relay's DOs are the presence authority; the DB flag only decides for
- * hosts still on the v1 relay (which keeps writing it). First online
+ * The relay's Durable Objects are the presence authority. First online
  * candidate wins, preserving the updatedAt ordering.
  */
 async function pickOnlineHost(
 	automation: DispatchableAutomation,
 	relayUrl: string,
-	candidates: Array<typeof v2Hosts.$inferSelect>,
-): Promise<typeof v2Hosts.$inferSelect | null> {
+	candidates: HostCandidate[],
+): Promise<HostCandidate | null> {
 	const jwt = await mintUserJwt({
 		userId: automation.ownerUserId,
 		organizationIds: [automation.organizationId],
@@ -336,7 +345,7 @@ async function pickOnlineHost(
 		candidates.find((host) => {
 			const info =
 				presence?.[buildHostRoutingKey(host.organizationId, host.machineId)];
-			return info ? info.online : host.isOnline;
+			return info?.online ?? false;
 		}) ?? null
 	);
 }

@@ -13343,9 +13343,6 @@ msgstr "Textarea"
 msgid "Thanks for reaching out"
 msgstr "Terima kasih sudah menghubungi"
 
-msgid "That device is online (region {region}) but the connection couldn't be established — usually relay routing rather than the device itself. Retry, and if it persists restart Superset on that device."
-msgstr "Perangkat itu online (region {region}) tapi koneksinya tidak bisa dibangun — biasanya soal perutean relay, bukan perangkatnya. Coba lagi, dan kalau terus terjadi mulai ulang Superset di perangkat itu."
-
 msgid "That device is online but the connection couldn't be established — usually relay routing rather than the device itself. Retry, and if it persists restart Superset on that device."
 msgstr "Perangkat itu online tapi koneksinya tidak bisa dibangun — biasanya soal perutean relay, bukan perangkatnya. Coba lagi, dan kalau terus terjadi mulai ulang Superset di perangkat itu."
 

@@ -71,7 +71,6 @@ export const hostRouter = {
 				.select({
 					machineId: v2Hosts.machineId,
 					name: v2Hosts.name,
-					isOnline: v2Hosts.isOnline,
 					wakeCommand: v2Hosts.wakeCommand,
 					organizationId: v2Hosts.organizationId,
 				})
@@ -90,9 +89,8 @@ export const hostRouter = {
 					),
 				);
 
-			// The relay's DOs are the presence authority; the DB flag is only
-			// the fallback for hosts still on the v1 relay, which keeps writing
-			// it. Callers' own bearer token is forwarded for the access checks.
+			// The relay's Durable Objects are the presence authority. Callers'
+			// own bearer token is forwarded for the access checks.
 			const bearer = ctx.headers.get("authorization")?.slice("Bearer ".length);
 			const presence = bearer
 				? await fetchRelayPresence(
@@ -109,7 +107,7 @@ export const hostRouter = {
 				name: row.name,
 				online:
 					presence?.[buildHostRoutingKey(row.organizationId, row.machineId)]
-						?.online ?? row.isOnline,
+						?.online ?? false,
 				wakeCommand: row.wakeCommand,
 				organizationId: row.organizationId,
 			}));
@@ -225,53 +223,6 @@ export const hostRouter = {
 				isPaidPlan(row.subscriptionPlan) &&
 				isActiveSubscriptionStatus(row.subscriptionStatus);
 			return { allowed, paidPlan };
-		}),
-
-	setOnline: jwtProcedure
-		.input(z.object({ hostId: z.string().min(1), isOnline: z.boolean() }))
-		.mutation(async ({ ctx, input }) => {
-			const parsed = parseHostRoutingKey(input.hostId);
-			if (!parsed) {
-				throw userError({
-					code: "BAD_REQUEST",
-					message: "Invalid hostId",
-					i18nKey: "serverError.host.invalidHostid",
-				});
-			}
-			if (!ctx.organizationIds.includes(parsed.organizationId)) {
-				throw userError({
-					code: "FORBIDDEN",
-					message: "No access to this host",
-					i18nKey: "serverError.host.noAccessToThisHost",
-				});
-			}
-
-			const access = await db.query.v2UsersHosts.findFirst({
-				where: and(
-					eq(v2UsersHosts.userId, ctx.userId),
-					eq(v2UsersHosts.organizationId, parsed.organizationId),
-					eq(v2UsersHosts.hostId, parsed.machineId),
-				),
-				columns: { hostId: true },
-			});
-			if (!access) {
-				throw userError({
-					code: "FORBIDDEN",
-					message: "No access to this host",
-					i18nKey: "serverError.host.noAccessToThisHost",
-				});
-			}
-
-			await db
-				.update(v2Hosts)
-				.set({ isOnline: input.isOnline })
-				.where(
-					and(
-						eq(v2Hosts.organizationId, parsed.organizationId),
-						eq(v2Hosts.machineId, parsed.machineId),
-					),
-				);
-			return { success: true };
 		}),
 
 	setWakeCommand: jwtProcedure

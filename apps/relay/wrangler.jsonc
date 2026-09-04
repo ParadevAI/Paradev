@@ -1,6 +1,6 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "superset-relay2",
+	"name": "superset-relay",
 	"main": "src/index.ts",
 	// relay.superset.sh is the relay: it is what every shipped build bakes into
 	// its CSP and what the API hands out. The Workers route is how the hostname

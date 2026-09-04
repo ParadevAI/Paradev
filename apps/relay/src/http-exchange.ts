@@ -1,7 +1,7 @@
 import type {
 	HttpDialFrame,
 	HttpResponseHeader,
-} from "@superset/shared/tunnel-v2-protocol";
+} from "@superset/shared/tunnel-protocol";
 
 const EXCHANGE_TIMEOUT_MS = 30_000;
 // Chunked below the Durable Object's per-message ceiling.

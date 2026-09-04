@@ -70,7 +70,7 @@ export async function placeHost(
 	await env.PLACEMENT.put(key(hostId), JSON.stringify(placement));
 	cache.set(hostId, { placement, expiresAt: Date.now() + CACHE_TTL_MS });
 	console.log(
-		`[relay2] placed host ${hostId} generation ${generation} at ${colo} (${continent})${current ? ` replacing ${current.colo}` : ""}`,
+		`[relay] placed host ${hostId} generation ${generation} at ${colo} (${continent})${current ? ` replacing ${current.colo}` : ""}`,
 	);
 	return placement;
 }
