@@ -1,3 +1,4 @@
+import { DIAL_TIMEOUT_MS } from "@superset/shared/tunnel-v2-protocol";
 import type { RelayAffinityProbe } from "@superset/workspace-client";
 import {
 	createRelaySocket,
@@ -655,6 +656,10 @@ export function connect(
 		},
 		minReconnectionDelay: BASE_RECONNECT_DELAY,
 		maxReconnectionDelay: MAX_RECONNECT_DELAY,
+		// The relay holds the upgrade until the host dials back, up to
+		// DIAL_TIMEOUT_MS. partysocket's 4s default cancelled attempts the host
+		// was still answering, and every retry cost the host another dial.
+		connectionTimeout: DIAL_TIMEOUT_MS + 2_000,
 		// send() is a no-op unless open; we gate writes on connectionState anyway.
 		maxEnqueuedMessages: 0,
 	});

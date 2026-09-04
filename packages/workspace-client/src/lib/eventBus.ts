@@ -4,6 +4,7 @@ import type {
 	ServerMessage,
 } from "@superset/host-service/events";
 import type { AgentIdentity } from "@superset/shared/agent-identity";
+import { DIAL_TIMEOUT_MS } from "@superset/shared/tunnel-v2-protocol";
 import type { FsWatchEvent } from "@superset/workspace-fs/host";
 import type { RelayAffinityProbe } from "./primeRelayAffinity";
 import { createRelaySocket, type RelaySocket } from "./relaySocket";
@@ -390,6 +391,9 @@ function getOrCreateConnection(
 		accessDeniedRetryMs: ACCESS_DENIED_RETRY_MS,
 		minReconnectionDelay: RECONNECT_BASE_MS,
 		maxReconnectionDelay: RECONNECT_MAX_MS,
+		// Relay upgrades wait for the host's dial-back (DIAL_TIMEOUT_MS);
+		// partysocket's 4s default gave up on attempts the host was answering.
+		connectionTimeout: DIAL_TIMEOUT_MS + 2_000,
 		maxEnqueuedMessages: 0,
 		onProbe: (probe) => {
 			setConnectionStatus(state, { probe });

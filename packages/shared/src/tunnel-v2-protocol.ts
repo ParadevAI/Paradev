@@ -19,6 +19,16 @@ export interface ControlPing {
 	type: "ping";
 }
 
+/** Host → relay: the dial-back for `ticket` could not be opened (connect
+ * failed or timed out after the host's own retries). The relay fails the
+ * waiting client at once instead of letting the dial window run out. */
+export interface StreamDialFailed {
+	type: "stream:dial-failed";
+	ticket: string;
+}
+
+export type HostControlMessage = ControlPing | StreamDialFailed;
+
 // ── Close codes ─────────────────────────────────────────────────────
 // Application close codes (4400-4499) with fixed recovery semantics, so
 // every leg logs the same name and no client infers behavior from reason
@@ -85,5 +95,7 @@ export interface HttpEnd {
 
 export type HttpDialFrame = HttpRequestHeader | HttpResponseHeader | HttpEnd;
 
-/** How long the host has to dial back before the relay abandons the stream. */
+/** How long the host has to dial back before the relay abandons the stream.
+ * The host's own connect budget (attempts × per-attempt timeout) stays inside
+ * this so a `stream:dial-failed` report still finds the relay waiting. */
 export const DIAL_TIMEOUT_MS = 10_000;

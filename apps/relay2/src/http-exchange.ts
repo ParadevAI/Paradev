@@ -21,7 +21,7 @@ export type HttpExchangeResult =
 			headers: Record<string, string>;
 			body: Uint8Array<ArrayBuffer>;
 	  }
-	| { ok: false; reason: "timeout" };
+	| { ok: false; reason: "timeout" | "dial-failed" };
 
 interface Exchange {
 	request: HttpExchangeRequest;
@@ -129,6 +129,15 @@ export class HttpExchanges {
 			});
 			dial.close(1000, "Exchange complete");
 		}
+	}
+
+	/** The host reported it could not dial back: fail now, not at the deadline. */
+	fail(ticket: string): void {
+		const exchange = this.exchanges.get(ticket);
+		if (!exchange) return;
+		clearTimeout(exchange.timer);
+		this.exchanges.delete(ticket);
+		exchange.resolve({ ok: false, reason: "dial-failed" });
 	}
 
 	abortAll(): void {

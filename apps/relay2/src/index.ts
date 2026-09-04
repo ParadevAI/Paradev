@@ -8,6 +8,7 @@ import { getServerByName } from "partyserver";
 import { accessDenialMessage, checkHostAccess } from "./access";
 import { type AuthContext, verifyJWT } from "./auth";
 import { HostTunnel } from "./host-tunnel";
+import { placeHost, readPlacement } from "./placement";
 import { isTrpcPath, trpcErrorResponse } from "./trpc-error";
 import type { RelayEnv } from "./types";
 
@@ -32,8 +33,12 @@ function extractToken(c: Context<AppContext>): string | null {
 	return c.req.query("token") ?? null;
 }
 
-function tunnelStub(c: Context<AppContext>, hostId: string) {
-	return getServerByName(c.env.HostTunnel, hostId);
+// Null when the host has never connected: nothing may create its object but
+// the host itself, so callers answer "offline" instead of instantiating one
+// wherever they happen to be.
+async function tunnelStub(c: Context<AppContext>, hostId: string) {
+	const placement = await readPlacement(c.env, hostId);
+	return placement ? getServerByName(c.env.HostTunnel, placement.name) : null;
 }
 
 function isWsUpgrade(c: Context<AppContext>): boolean {
@@ -98,7 +103,12 @@ app.get("/v2/control", async (c) => {
 		);
 	}
 
-	const stub = await tunnelStub(c, hostId);
+	const placement = await placeHost(
+		c.env,
+		hostId,
+		c.req.raw.cf as IncomingRequestCfProperties | undefined,
+	);
+	const stub = await getServerByName(c.env.HostTunnel, placement.name);
 	return stub.fetch(
 		`https://relay2/register?hostId=${encodeURIComponent(hostId)}`,
 		{ headers: { Upgrade: "websocket", "x-relay-token": result.token } },
@@ -119,6 +129,8 @@ app.get("/v2/dial", async (c) => {
 	if (!hostId || !ticket)
 		return acceptAndClose(RELAY_CLOSE.badRequest, "Missing hostId or ticket");
 	const stub = await tunnelStub(c, hostId);
+	if (!stub)
+		return acceptAndClose(RELAY_CLOSE.unknownTicket, "Host not placed");
 	return stub.fetch(
 		`https://relay2/dial?ticket=${encodeURIComponent(ticket)}`,
 		{
@@ -156,6 +168,7 @@ app.get("/presence", async (c) => {
 			);
 			if (!access.ok) return null;
 			const stub = await tunnelStub(c, hostId);
+			if (!stub) return [hostId, { online: false, lastSeenAt: null }] as const;
 			return [hostId, await stub.presenceInfo()] as const;
 		}),
 	);
@@ -181,7 +194,7 @@ app.get("/hosts/:hostId/_whoowns", async (c) => {
 		return c.json({ error: result.message }, result.status);
 	}
 	const stub = await tunnelStub(c, hostId);
-	if (!(await stub.isConnected())) {
+	if (!stub || !(await stub.isConnected())) {
 		return c.json({ error: "Host not connected" }, 503);
 	}
 	return c.json({ ok: true, region: "cf" });
@@ -218,6 +231,9 @@ app.all("/hosts/:hostId/trpc/*", async (c) => {
 	const headers = buildUpstreamHeaders(c.req.raw.headers, c.get("auth").sub);
 
 	const stub = await tunnelStub(c, hostId);
+	if (!stub) {
+		return trpcErrorResponse(c, "SERVICE_UNAVAILABLE", "Host is not online");
+	}
 	const result = await stub.proxyHttp({
 		method: c.req.method,
 		pathWithQuery: query ? `${path}?${query}` : path,
@@ -225,6 +241,13 @@ app.all("/hosts/:hostId/trpc/*", async (c) => {
 		body: new Uint8Array(await c.req.raw.arrayBuffer()),
 	});
 	if (!result.ok) {
+		if (result.reason === "dial-failed") {
+			return trpcErrorResponse(
+				c,
+				"BAD_GATEWAY",
+				"Host could not reach the relay",
+			);
+		}
 		return (await stub.isConnected())
 			? trpcErrorResponse(c, "BAD_GATEWAY", "Request timed out")
 			: trpcErrorResponse(c, "SERVICE_UNAVAILABLE", "Host is not online");
@@ -249,12 +272,16 @@ app.get("/hosts/:hostId/*", async (c) => {
 	// The 101 is deferred until the host has dialed, so offline hosts fail
 	// before the handshake instead of open-then-close.
 	const stub = await tunnelStub(c, hostId);
+	if (!stub) return c.json({ error: "Host not connected" }, 503);
 	const prepared = await stub.prepareStream(ticket, path, query || undefined);
 	if (prepared === "no-host") {
 		return c.json({ error: "Host not connected" }, 503);
 	}
 	if (prepared === "timeout") {
 		return c.json({ error: "Host did not answer" }, 504);
+	}
+	if (prepared === "dial-failed") {
+		return c.json({ error: "Host could not reach the relay" }, 502);
 	}
 	return stub.fetch(
 		`https://relay2/client?ticket=${encodeURIComponent(ticket)}`,

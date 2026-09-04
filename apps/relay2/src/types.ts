@@ -5,4 +5,6 @@ export interface RelayEnv {
 	/** Optional; Sentry capture is a no-op until the secret is set. */
 	SENTRY_DSN?: string;
 	HostTunnel: DurableObjectNamespace<HostTunnel>;
+	/** Host → tunnel object placement records; see placement.ts. */
+	PLACEMENT: KVNamespace;
 }

@@ -23,6 +23,11 @@
 	"durable_objects": {
 		"bindings": [{ "name": "HostTunnel", "class_name": "HostTunnel" }]
 	},
+	// Which Durable Object serves each host, written only by the host's own
+	// control connect so the object is created at the host's ingress.
+	"kv_namespaces": [
+		{ "binding": "PLACEMENT", "id": "7ebff5dc36db4edcb31172e37e40eb31" }
+	],
 	"migrations": [{ "tag": "v1", "new_sqlite_classes": ["HostTunnel"] }],
 	"observability": { "enabled": true }
 }

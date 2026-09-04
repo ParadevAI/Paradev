@@ -2,6 +2,7 @@ import {
 	describeRelayClose,
 	type HttpDialFrame,
 	type StreamDial,
+	type StreamDialFailed,
 } from "@superset/shared/tunnel-v2-protocol";
 import ReconnectingWebSocket from "partysocket/ws";
 
@@ -32,6 +33,12 @@ function withTimeout<T>(promise: Promise<T>, fallback: T): Promise<T> {
 		}),
 	]);
 }
+// Each dial-back gets its own connect budget, kept inside the relay's
+// DIAL_TIMEOUT_MS: two 3s attempts leave the relay time to hear the failure
+// report and answer the client at once instead of after the 10s stream or 30s
+// exchange window. A lost SYN or a slow resolver used to cost the whole window.
+const DIAL_CONNECT_TIMEOUT_MS = 3_000;
+const DIAL_ATTEMPTS = 2;
 const MAX_BUFFERED_FRAMES = 256;
 // Bodies are chunked below the Durable Object's per-message ceiling; large
 // tRPC payloads (file contents, diffs) would otherwise fail outright.
@@ -201,12 +208,9 @@ export class TunnelClientV2 {
 
 	private handleDial(dial: StreamDial): void {
 		if (dial.kind === "http") {
-			this.handleHttpDial(dial);
+			this.dialRelay(dial.ticket, (relayWs) => this.serveHttpDial(relayWs));
 			return;
 		}
-
-		const relayWs = new WebSocket(this.dialUrl(dial.ticket));
-		relayWs.binaryType = "arraybuffer";
 
 		const localUrl = new URL(`ws://127.0.0.1:${this.options.localPort}`);
 		localUrl.pathname = dial.path;
@@ -216,17 +220,73 @@ export class TunnelClientV2 {
 				if (key !== "token") localUrl.searchParams.set(key, value);
 			}
 		}
-		const localWs = new WebSocket(localUrl.toString());
-		localWs.binaryType = "arraybuffer";
-
-		pipe(relayWs, localWs);
-		pipe(localWs, relayWs);
+		this.dialRelay(dial.ticket, (relayWs) => {
+			const localWs = new WebSocket(localUrl.toString());
+			localWs.binaryType = "arraybuffer";
+			pipe(relayWs, localWs);
+			pipe(localWs, relayWs);
+		});
 	}
 
-	private handleHttpDial(dial: StreamDial): void {
-		const relayWs = new WebSocket(this.dialUrl(dial.ticket));
-		relayWs.binaryType = "arraybuffer";
+	// Opens the dial-back socket, retrying a connect that fails or stalls, and
+	// hands the open socket over synchronously inside its open event so no
+	// frame can land before the caller's handlers are attached. When every
+	// attempt fails the relay is told, so the waiting client gets a fast 502
+	// rather than the dial window.
+	private dialRelay(
+		ticket: string,
+		attach: (relayWs: WebSocket) => void,
+	): void {
+		const attempt = (n: number) => {
+			const ws = new WebSocket(this.dialUrl(ticket));
+			ws.binaryType = "arraybuffer";
+			const listeners = new AbortController();
+			const retry = () => {
+				if (n < DIAL_ATTEMPTS) attempt(n + 1);
+				else this.reportDialFailed(ticket);
+			};
+			const timer = setTimeout(() => {
+				listeners.abort();
+				closeQuietly(ws, 1000, "Dial connect timed out");
+				retry();
+			}, DIAL_CONNECT_TIMEOUT_MS);
+			ws.addEventListener(
+				"open",
+				() => {
+					clearTimeout(timer);
+					listeners.abort();
+					attach(ws);
+				},
+				{ signal: listeners.signal },
+			);
+			// close always follows error
+			ws.addEventListener(
+				"close",
+				() => {
+					clearTimeout(timer);
+					listeners.abort();
+					retry();
+				},
+				{ signal: listeners.signal },
+			);
+		};
+		attempt(1);
+	}
 
+	private reportDialFailed(ticket: string): void {
+		console.warn(
+			`[host-service:tunnel-v2] dial-back failed after ${DIAL_ATTEMPTS} attempts; reporting to relay`,
+		);
+		if (this.control?.readyState !== WebSocket.OPEN) return;
+		this.control.send(
+			JSON.stringify({
+				type: "stream:dial-failed",
+				ticket,
+			} satisfies StreamDialFailed),
+		);
+	}
+
+	private serveHttpDial(relayWs: WebSocket): void {
 		let header: {
 			method: string;
 			path: string;
