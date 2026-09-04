@@ -288,6 +288,23 @@ app.get("/hosts/:hostId/*", async (c) => {
 	);
 });
 
+// A WebSocket ending is not a defect, but the runtime reports it as one: when a
+// peer goes away — a host restarting, a laptop sleeping, a deploy — the
+// invocation that opened the socket throws. Every control channel ends this
+// way, about 5,600 times an hour, which is 100% of the exceptions this Worker
+// currently raises. Sending them would spend the key's whole rate limit on
+// noise within the first minute of each hour and bury the real errors behind
+// it, so they are dropped before they leave the isolate.
+function isPeerGone(message: string): boolean {
+	return (
+		message === "Network connection lost." ||
+		// Hibernation or eviction closed the object under an in-flight handler.
+		message.startsWith(
+			"Connection closed: this Durable Object instance is no longer active",
+		)
+	);
+}
+
 // Exceptions only — console/breadcrumb capture stays off: retaining every log
 // line is a memory leak at relay volume. No-op until SENTRY_DSN is set.
 const sentryOptions = (env: RelayEnv): Sentry.CloudflareOptions => ({
@@ -296,6 +313,10 @@ const sentryOptions = (env: RelayEnv): Sentry.CloudflareOptions => ({
 	sendDefaultPii: false,
 	integrations: (defaults) =>
 		defaults.filter((integration) => integration.name !== "Console"),
+	beforeSend: (event) => {
+		const message = event.exception?.values?.[0]?.value;
+		return message && isPeerGone(message) ? null : event;
+	},
 });
 
 const InstrumentedHostTunnel = Sentry.instrumentDurableObjectWithSentry(
