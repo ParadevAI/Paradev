@@ -78,6 +78,12 @@ class BrowserRuntimeRegistryImpl {
 	private globalListenersInstalled = false;
 	private windowDragPassthrough = false;
 	private shellInteractionPassthrough = false;
+	// Panes whose host popover (the toolbar's overflow menu) is open. The
+	// webview swallows pointer events, so a click on the page would never
+	// reach the document listener Radix dismisses on; passing the click
+	// through to the host lets it dismiss the popover instead, as in a real
+	// browser. Keyed by pane so one pane closing can't drop another's.
+	private hostPopoverOpenPaneIds = new Set<string>();
 	// Panes an agent is driving (live CDP session or in-flight capture, fed
 	// by the main process). Parked presentable instead of hidden — a
 	// visibility-hidden webview gets no compositor frames, so CDP
@@ -193,8 +199,19 @@ class BrowserRuntimeRegistryImpl {
 		this.applyPointerPassthroughIfChanged(wasActive);
 	}
 
+	setHostPopoverOpen(paneId: string, open: boolean): void {
+		const wasActive = this.isPointerPassthroughActive();
+		if (open) this.hostPopoverOpenPaneIds.add(paneId);
+		else this.hostPopoverOpenPaneIds.delete(paneId);
+		this.applyPointerPassthroughIfChanged(wasActive);
+	}
+
 	private isPointerPassthroughActive() {
-		return this.windowDragPassthrough || this.shellInteractionPassthrough;
+		return (
+			this.windowDragPassthrough ||
+			this.shellInteractionPassthrough ||
+			this.hostPopoverOpenPaneIds.size > 0
+		);
 	}
 
 	private applyPointerPassthroughIfChanged(wasActive: boolean) {
