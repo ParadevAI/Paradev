@@ -2,13 +2,17 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "superset-relay2",
 	"main": "src/index.ts",
-	// The workers.dev URL is load-bearing: it is the flag payload every shipped
-	// build's CSP allows. Adding routes below silently disables it on deploy
-	// unless pinned on — that took the fleet down on 2026-08-21.
+	// relay.superset.sh is the relay: it is what every shipped build bakes into
+	// its CSP and what the API hands out. The Workers route is how the hostname
+	// reaches this script, so removing it from this list takes the relay down
+	// on the next deploy. relay2.superset.sh and the workers.dev URL are
+	// interim aliases from the migration off the Fly relay; they serve the same
+	// Durable Objects and can go once nothing dials them.
 	"workers_dev": true,
-	// Also reachable at the workers.dev URL; both serve the same Durable
-	// Objects, so hosts and clients may mix hostnames during migration.
-	"routes": [{ "pattern": "relay2.superset.sh", "custom_domain": true }],
+	"routes": [
+		{ "pattern": "relay.superset.sh/*", "zone_name": "superset.sh" },
+		{ "pattern": "relay2.superset.sh", "custom_domain": true }
+	],
 	"compatibility_date": "2026-07-01",
 	"compatibility_flags": ["nodejs_als"],
 	"vars": {

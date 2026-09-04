@@ -1000,10 +1000,9 @@ export class HostServiceCoordinator extends EventEmitter {
 
 		// `getProcessEnvWithShellPath` merges in the user's interactive shell env,
 		// which in dev has `RELAY_URL` set. Enforce the toggle *after* that merge
-		// so the child definitely doesn't see a relay URL when disabled. The
-		// effective URL comes from the PostHog `relay-url-override` flag with
-		// `env.RELAY_URL` as fallback (see main/lib/relay-url) so we can A/B-test
-		// alternate relay deployments per-user.
+		// so the child definitely doesn't see a relay URL when disabled. This is
+		// only the child's fallback; it asks the API for the relay once
+		// authenticated (see main/lib/relay-url).
 		const effectiveRelayUrl = getRelayUrl();
 		if (exposeViaRelay && effectiveRelayUrl) {
 			childEnv.RELAY_URL = effectiveRelayUrl;

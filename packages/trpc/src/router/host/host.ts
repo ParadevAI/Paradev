@@ -17,9 +17,9 @@ import {
 import type { TRPCRouterRecord } from "@trpc/server";
 import { and, count, desc, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
+import { env } from "../../env";
 import { emitAppFirstOpened } from "../../lib/activation-events";
 import { fetchRelayPresence } from "../../lib/relay-presence";
-import { resolveUserRelayUrl } from "../../lib/relay-url";
 import { jwtProcedure, userError } from "../../trpc";
 
 // Registering a first host means the app is installed and running, so it
@@ -48,13 +48,12 @@ async function emitFirstHostEvent(userId: string) {
 
 export const hostRouter = {
 	/**
-	 * The relay every client and host of this user must use. Resolved here so
-	 * one authenticated answer serves the desktop, its host-service, the CLI
-	 * and the web app — client-side flag evaluation raced identification and
-	 * silently fell back, which split hosts and clients across two relays.
+	 * The relay every client and host of this user must use. Answered here so
+	 * the desktop, its host-service, the CLI and the web app all read one
+	 * value instead of resolving it separately and landing on different relays.
 	 */
-	relayEndpoint: jwtProcedure.query(async ({ ctx }) => {
-		return { url: await resolveUserRelayUrl(ctx.userId) };
+	relayEndpoint: jwtProcedure.query(() => {
+		return { url: env.RELAY_URL };
 	}),
 
 	list: jwtProcedure
@@ -97,7 +96,7 @@ export const hostRouter = {
 			const bearer = ctx.headers.get("authorization")?.slice("Bearer ".length);
 			const presence = bearer
 				? await fetchRelayPresence(
-						await resolveUserRelayUrl(ctx.userId),
+						env.RELAY_URL,
 						bearer,
 						rows.map((row) =>
 							buildHostRoutingKey(row.organizationId, row.machineId),
