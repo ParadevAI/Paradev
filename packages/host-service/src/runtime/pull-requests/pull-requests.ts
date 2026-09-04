@@ -268,11 +268,25 @@ export class PullRequestRuntimeManager {
 		// are deduplicated by `inFlightProjects`. We additionally serialize per
 		// workspace so two debounce-separated bursts can't race their git reads
 		// and have the slower one overwrite the newer snapshot.
+		//
+		// Deliberately never calls `gitWatcher.watchWorkspace()` here: this
+		// manager cares about every non-session workspace (see
+		// `syncWorkspaceBranches`'s scan below), the same scope `GitWatcher`
+		// used to watch unconditionally before #6729/#6848. Establishing that
+		// same interest here would put every workspace back under a live
+		// fs.watch permanently, regardless of whether any renderer is looking
+		// at it — reintroducing the exact watcher/subprocess fan-out #6848
+		// fixed, just from a different caller. So for a workspace no renderer
+		// currently watches, branch/HEAD/upstream sync degrades to the
+		// `SAFETY_NET_INTERVAL_MS` sweep below instead of firing instantly —
+		// an accepted staleness tradeoff, not a gap to close by watching more.
 		this.unsubscribeFromGitWatcher = this.gitWatcher.onChanged((event) => {
 			void this.enqueueWorkspaceSync(event.workspaceId);
 		});
 
-		// Long-cadence safety net for `GitWatcher` overflow / error paths.
+		// Long-cadence safety net for `GitWatcher` overflow / error paths, and —
+		// per the comment above — the primary (not just backup) sync path for
+		// any workspace nobody currently holds a live git-watch on.
 		this.safetyNetTimer = setInterval(() => {
 			void this.syncWorkspaceBranches();
 		}, SAFETY_NET_INTERVAL_MS);
