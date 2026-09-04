@@ -395,6 +395,16 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		} catch (err) {
 			console.warn("[host-service] chatV3.dispose failed:", err);
 		}
+		// Retire the host-worker threads (and reap their in-flight git
+		// children) here rather than leaving them to process.exit(): exit joins
+		// every Worker, and a worker wedged in native code hangs that join
+		// forever. The desktop entry point bounds this dispose with a deadline
+		// and hard-exits past it.
+		try {
+			await getHostWorkerPool().dispose();
+		} catch (err) {
+			console.warn("[host-service] hostWorkerPool.dispose failed:", err);
+		}
 		try {
 			eventBus.close();
 		} catch (err) {
