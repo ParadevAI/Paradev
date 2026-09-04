@@ -13,6 +13,7 @@ import {
 	gitCommitTask,
 	gitDiffBulkTask,
 	gitDiffPatchTask,
+	gitDiffSideBlobTask,
 	gitFetchBaseRefTask,
 	gitPushTask,
 	gitStatusSnapshotTask,
@@ -192,6 +193,7 @@ const getDiffInputShape = z.object({
  * changeset we expect the Changes pane to render, while still bounding a
  * runaway/malicious request. */
 const MAX_DIFF_BULK_PATHS = 2000;
+const DIFF_SIDE_FILE_MAX_BYTES = 10 * 1024 * 1024;
 
 export const gitRouter = router({
 	listBranches: queryProcedure
@@ -649,6 +651,52 @@ export const gitRouter = router({
 				input.category,
 				input.path,
 				refs,
+			);
+		}),
+
+	// One side of a binary file's diff, read from the git object the text
+	// diff would compare (index, HEAD, merge-base or a commit) so an image or
+	// PDF preview shows the same "before" and "after" as the hunks around it.
+	// The unstaged "new" side is the working tree and is not served here;
+	// callers read it through `filesystem.readFile`.
+	readDiffSideFile: queryProcedure
+		.meta({ timeoutMs: 30_000 })
+		.input(
+			getDiffInputShape.extend({
+				side: z.enum(["old", "new"]),
+				maxBytes: z
+					.number()
+					.int()
+					.positive()
+					.max(DIFF_SIDE_FILE_MAX_BYTES)
+					.optional(),
+			}),
+		)
+		.query(async ({ ctx, input }) => {
+			assertSafeRelativePath(input.path);
+			if (input.category === "unstaged" && input.side === "new") {
+				throw new TRPCError({
+					code: "BAD_REQUEST",
+					message:
+						"The unstaged new side is the working tree, not a git object",
+				});
+			}
+			const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
+			const gitEnv = await resolveGitTaskEnv(ctx, worktreePath);
+			return getHostWorkerPool().run(
+				gitDiffSideBlobTask,
+				{
+					worktreePath,
+					category: input.category,
+					side: input.side,
+					path: input.path,
+					maxBytes: input.maxBytes ?? DIFF_SIDE_FILE_MAX_BYTES,
+					baseBranch: input.baseBranch,
+					commitHash: input.commitHash,
+					fromHash: input.fromHash,
+					gitEnv,
+				},
+				{ timeoutMs: 30_000 },
 			);
 		}),
 

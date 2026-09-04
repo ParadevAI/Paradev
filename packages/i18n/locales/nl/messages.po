@@ -1390,6 +1390,9 @@ msgstr "Beheerders kunnen leden niet tot eigenaar promoveren"
 msgid "Advanced options"
 msgstr "Geavanceerde opties"
 
+msgid "After"
+msgstr "Na"
+
 msgid "Against base"
 msgstr "Ten opzichte van basis"
 
@@ -2203,6 +2206,9 @@ msgstr "gebaseerd op PR #{0}"
 #. placeholder {1}: preview.providers.join(" and ")
 msgid "Based on {0} tokens in the last 30 days, counting {1}."
 msgstr "Op basis van {0} tokens in de laatste 30 dagen, gerekend over {1}."
+
+msgid "Before"
+msgstr "Voor"
 
 msgid "Behavior"
 msgstr "Gedrag"
@@ -7544,9 +7550,6 @@ msgstr "Lettertypen laden..."
 
 msgid "Loading groups…"
 msgstr "Groepen laden…"
-
-msgid "Loading image…"
-msgstr "Afbeelding laden…"
 
 msgid "Loading issue…"
 msgstr "Issue laden…"

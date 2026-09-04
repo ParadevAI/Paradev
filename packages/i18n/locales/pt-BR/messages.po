@@ -1390,6 +1390,9 @@ msgstr "Administradores não podem promover membros a proprietário"
 msgid "Advanced options"
 msgstr "Opções avançadas"
 
+msgid "After"
+msgstr "Depois"
+
 msgid "Against base"
 msgstr "Em relação à base"
 
@@ -2203,6 +2206,9 @@ msgstr "baseado no PR #{0}"
 #. placeholder {1}: preview.providers.join(" and ")
 msgid "Based on {0} tokens in the last 30 days, counting {1}."
 msgstr "Com base em {0} tokens nos últimos 30 dias, contando {1}."
+
+msgid "Before"
+msgstr "Antes"
 
 msgid "Behavior"
 msgstr "Comportamento"
@@ -7544,9 +7550,6 @@ msgstr "Carregando as fontes..."
 
 msgid "Loading groups…"
 msgstr "Carregando grupos…"
-
-msgid "Loading image…"
-msgstr "Carregando imagem…"
 
 msgid "Loading issue…"
 msgstr "Carregando a issue…"

@@ -1390,6 +1390,9 @@ msgstr "Администраторы не могут повышать участ
 msgid "Advanced options"
 msgstr "Дополнительные параметры"
 
+msgid "After"
+msgstr "После"
+
 msgid "Against base"
 msgstr "Против базовой ветки"
 
@@ -2203,6 +2206,9 @@ msgstr "на основе PR #{0}"
 #. placeholder {1}: preview.providers.join(" and ")
 msgid "Based on {0} tokens in the last 30 days, counting {1}."
 msgstr "На основе {0} токенов за последние 30 дней, учитывая {1}."
+
+msgid "Before"
+msgstr "До"
 
 msgid "Behavior"
 msgstr "Поведение"
@@ -7544,9 +7550,6 @@ msgstr "Загрузка шрифтов..."
 
 msgid "Loading groups…"
 msgstr "Загрузка групп…"
-
-msgid "Loading image…"
-msgstr "Загрузка изображения…"
 
 msgid "Loading issue…"
 msgstr "Загрузка задачи…"
