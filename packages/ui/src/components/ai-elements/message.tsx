@@ -1,7 +1,6 @@
 "use client";
 
 import { Trans, useLingui } from "@lingui/react/macro";
-import { mermaid } from "@streamdown/mermaid";
 import type { FileUIPart, UIMessage } from "ai";
 import {
 	ChevronLeftIcon,
@@ -10,9 +9,16 @@ import {
 	XIcon,
 } from "lucide-react";
 import type { ComponentProps, HTMLAttributes, ReactElement } from "react";
-import { createContext, memo, useContext, useEffect, useState } from "react";
-import type { PluginConfig } from "streamdown";
+import {
+	createContext,
+	memo,
+	useContext,
+	useEffect,
+	useMemo,
+	useState,
+} from "react";
 import { Streamdown } from "streamdown";
+import { mermaidConfig, mermaidPlugins } from "../../lib/mermaid";
 import { cn } from "../../lib/utils";
 import { Button } from "../ui/button";
 import { ButtonGroup, ButtonGroupText } from "../ui/button-group";
@@ -23,9 +29,6 @@ import {
 	TooltipTrigger,
 } from "../ui/tooltip";
 
-const streamdownPlugins: PluginConfig = {
-	mermaid: mermaid as unknown as PluginConfig["mermaid"],
-};
 const defaultMessageAnimation = {
 	animation: "blurIn",
 	sep: "char",
@@ -342,21 +345,34 @@ export const TOOL_CALL_MD_CLASSNAME =
 export type MessageResponseProps = ComponentProps<typeof Streamdown>;
 
 export const MessageResponse = memo(
-	({ className, animated, isAnimating, ...props }: MessageResponseProps) => (
-		<Streamdown
-			animated={animated ?? defaultMessageAnimation}
-			className={cn(
-				"text-foreground [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&_ol]:list-outside [&_ol]:pl-6 [&_ul]:list-outside [&_ul]:pl-6 [&_li]:break-words [&_li]:whitespace-pre-wrap [&_p]:break-words [&_p]:whitespace-pre-wrap [&_:not(pre)>code]:break-all [&_[data-streamdown=table-wrapper]]:overflow-hidden [&_[data-streamdown=table-wrapper]]:bg-transparent [&_[data-streamdown=table-wrapper]]:p-0 [&_[data-streamdown=table-wrapper]]:gap-0 [&_[data-streamdown=table-wrapper]>div]:border-0 [&_[data-streamdown=table-wrapper]>div]:bg-transparent [&_[data-streamdown=table-wrapper]>div]:rounded-none [&_thead]:bg-muted/50",
-				className,
-			)}
-			controls={{ table: false }}
-			isAnimating={isAnimating}
-			linkSafety={{ enabled: false }}
-			mode="streaming"
-			plugins={isAnimating ? undefined : streamdownPlugins}
-			{...props}
-		/>
-	),
+	({
+		className,
+		animated,
+		isAnimating,
+		mermaid,
+		...props
+	}: MessageResponseProps) => {
+		const mermaidOptions = useMemo(
+			() => ({ ...mermaid, ...mermaidConfig(mermaid?.config) }),
+			[mermaid],
+		);
+		return (
+			<Streamdown
+				animated={animated ?? defaultMessageAnimation}
+				className={cn(
+					"text-foreground [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&_ol]:list-outside [&_ol]:pl-6 [&_ul]:list-outside [&_ul]:pl-6 [&_li]:break-words [&_li]:whitespace-pre-wrap [&_p]:break-words [&_p]:whitespace-pre-wrap [&_:not(pre)>code]:break-all [&_[data-streamdown=table-wrapper]]:overflow-hidden [&_[data-streamdown=table-wrapper]]:bg-transparent [&_[data-streamdown=table-wrapper]]:p-0 [&_[data-streamdown=table-wrapper]]:gap-0 [&_[data-streamdown=table-wrapper]>div]:border-0 [&_[data-streamdown=table-wrapper]>div]:bg-transparent [&_[data-streamdown=table-wrapper]>div]:rounded-none [&_thead]:bg-muted/50",
+					className,
+				)}
+				controls={{ table: false }}
+				isAnimating={isAnimating}
+				linkSafety={{ enabled: false }}
+				mermaid={mermaidOptions}
+				mode="streaming"
+				plugins={isAnimating ? undefined : mermaidPlugins}
+				{...props}
+			/>
+		);
+	},
 	(prevProps, nextProps) =>
 		prevProps.children === nextProps.children &&
 		prevProps.isAnimating === nextProps.isAnimating &&
