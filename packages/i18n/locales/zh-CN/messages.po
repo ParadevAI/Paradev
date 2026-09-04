@@ -309,7 +309,7 @@ msgstr "{0}已停用"
 
 #. placeholder {0}: displayName(variables.name)
 #. placeholder {0}: plugin.interface.displayName
-#. placeholder {0}: plugin?.interface.displayName ?? entry.name
+#. placeholder {0}: skill.name
 msgid "{0} enabled"
 msgstr "{0}已启用"
 
@@ -352,6 +352,11 @@ msgstr "{0}使用的是免费版。Superset Mobile面向使用专业版的组织
 #. placeholder {2}: hostCompatibility.minVersion
 msgid "{0} is running host service {1} — this app needs {2} or newer. Update Superset on that machine."
 msgstr "{0}运行的主机服务是{1} — 此应用需要{2}或更新版本。请在那台机器上更新Superset。"
+
+#. placeholder {0}: displayName(name)
+#. placeholder {0}: displayName(variables.name)
+msgid "{0} is set up on this machine, but not on your account"
+msgstr "{0} 已在本机设置，但未在你的账户中设置"
 
 #. placeholder {0}: v.toLocaleString()
 msgid "{0} mo"
@@ -422,6 +427,10 @@ msgstr "最近30天 {0} 个 token。以 <0>{handle}</0> 身份发布。"
 #. placeholder {0}: displayName(variables.name)
 msgid "{0} uninstalled"
 msgstr "{0}已卸载"
+
+#. placeholder {0}: displayName(variables.name)
+msgid "{0} updated"
+msgstr "{0} 已更新"
 
 #. placeholder {0}: file.path
 msgid "{0} was deleted in this change."
@@ -659,6 +668,18 @@ msgstr "{months}个月前"
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "你有{myFailedCount}个自动化上次运行失败"
 
+#. js-lingui-explicit-id
+msgid "serverError.plugins.marketplaceBuiltinRemove"
+msgstr "{name} 是内置的，无法移除"
+
+#. js-lingui-explicit-id
+msgid "serverError.plugins.marketplaceReserved"
+msgstr "{name} 是内置的，无法替换"
+
+#. js-lingui-explicit-id
+msgid "serverError.plugins.marketplaceNotAdded"
+msgstr "{name} 尚未添加"
+
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {请至少指定一个人员，或选择{choice}。} sender {请至少指定一个发件人，或选择{choice}。} other {请至少指定一个条目，或选择{choice}。}}"
 
@@ -705,6 +726,14 @@ msgstr "{provider}标志"
 
 msgid "{readPercent}% read"
 msgstr "已读{readPercent}%"
+
+#. js-lingui-explicit-id
+msgid "serverError.plugins.ambiguousPlugin"
+msgstr "{reason}"
+
+#. js-lingui-explicit-id
+msgid "serverError.plugins.dispatchFailed"
+msgstr "{reason}"
 
 msgid "{received} of {total}"
 msgstr "{received}/{total}"
@@ -1146,6 +1175,10 @@ msgstr "手风琴"
 msgid "Account"
 msgstr "账户"
 
+#. js-lingui-explicit-id
+msgid "serverError.plugins.marketplaceNotResolvable"
+msgstr "账户安装仅解析第一方清单，因此来自 {marketplace} 的 {plugin} 暂时无法安装到你的账户。它仍安装在本机上。"
+
 msgid "Account is pending deletion."
 msgstr "账户正在等待删除。"
 
@@ -1275,6 +1308,9 @@ msgstr "从侧边栏菜单中添加一个即可开始。"
 
 msgid "Add photos or files"
 msgstr "添加照片或文件"
+
+msgid "Add plugin"
+msgstr "添加插件"
 
 msgid "Add project"
 msgstr "添加项目"
@@ -1968,6 +2004,9 @@ msgstr "2026年8月"
 msgid "Auth token"
 msgstr "认证令牌"
 
+msgid "Authenticate your {displayName} account"
+msgstr "验证你的 {displayName} 账户"
+
 msgid "Authentication"
 msgstr "认证"
 
@@ -2573,6 +2612,9 @@ msgstr "现金 — 总余额（Mercury）"
 msgid "Cash ÷ net burn at the current run rate"
 msgstr "按当前速率计算的现金 ÷ 净支出"
 
+msgid "Category"
+msgstr "分类"
+
 msgid "Certificate Authority Invalid"
 msgstr "证书颁发机构无效"
 
@@ -2642,9 +2684,6 @@ msgstr "已要求修改"
 
 msgid "Changes saved"
 msgstr "更改已保存"
-
-msgid "Changes take effect in new agent sessions."
-msgstr "改动会在新的智能体会话中生效。"
 
 msgid "Changing..."
 msgstr "正在更改..."
@@ -3385,6 +3424,10 @@ msgstr "连接你的Slack工作区，直接在对话中管理任务。"
 msgid "Connected"
 msgstr "已连接"
 
+#. placeholder {0}: formatDate(new Date(connection.createdAt))
+msgid "connected {0}"
+msgstr "连接于 {0}"
+
 msgid "Connected as"
 msgstr "已连接为"
 
@@ -3439,11 +3482,18 @@ msgstr "连接已关闭"
 msgid "Connection failed."
 msgstr "连接失败。"
 
+#. js-lingui-explicit-id
+msgid "serverError.plugins.connectionNotFound"
+msgstr "未找到连接"
+
 msgid "Connection Refused"
 msgstr "连接被拒绝"
 
 msgid "Connection Timed Out"
 msgstr "连接超时"
+
+msgid "Connections"
+msgstr "连接"
 
 msgid "Consent finished but Microsoft did not issue a token for the tenant."
 msgstr "授权同意已完成，但Microsoft没有为该租户签发令牌。"
@@ -3749,6 +3799,9 @@ msgstr "无法加载环境"
 msgid "Could not load environments."
 msgstr "无法加载环境。"
 
+msgid "Could not load plugins. Check your connection and try again."
+msgstr "无法加载插件。请检查网络连接后重试。"
+
 msgid "Could not load presets from the host"
 msgstr "无法从主机加载预设"
 
@@ -3841,6 +3894,10 @@ msgstr "无法更新技能"
 
 msgid "Could not update the branch"
 msgstr "无法更新分支"
+
+#. js-lingui-explicit-id
+msgid "serverError.plugins.credentialUnverified"
+msgstr "无法验证凭据：{reason}"
 
 msgid "Could not watch this page"
 msgstr "无法关注此页面"
@@ -4586,9 +4643,6 @@ msgstr "已分离"
 msgid "Details"
 msgstr "详情"
 
-msgid "Detected in your agent configs"
-msgstr "在你的智能体配置中检测到"
-
 msgid "Dev"
 msgstr "开发"
 
@@ -4649,9 +4703,6 @@ msgstr "停用技能"
 msgid "Disabled"
 msgstr "已停用"
 
-msgid "Disabled — kept installed, but Superset writes nothing into your agent configs."
-msgstr "已停用，插件仍保留安装，但Superset不会向你的智能体配置写入任何内容。"
-
 msgid "Disabled toggle"
 msgstr "禁用的切换控件"
 
@@ -4703,6 +4754,10 @@ msgstr "已放弃——不再询问"
 
 msgid "Disconnect"
 msgstr "断开连接"
+
+#. placeholder {0}: connection.account ?? displayName
+msgid "Disconnect {0}"
+msgstr "断开 {0}"
 
 msgid "Disconnect GitHub?"
 msgstr "断开GitHub连接？"
@@ -5078,9 +5133,6 @@ msgstr "启用中继访问…"
 msgid "Enable skill"
 msgstr "启用技能"
 
-msgid "Enabled — servers are written into your agent configs."
-msgstr "已启用，服务器会写入你的智能体配置。"
-
 msgid "Engineering deep-dives and launches."
 msgstr "工程深度文章与新功能发布。"
 
@@ -5113,12 +5165,6 @@ msgstr "企业版"
 
 msgid "Enterprise ARR by account"
 msgstr "按客户划分的企业版ARR"
-
-msgid "Entries you added yourself stay active in your agent config."
-msgstr "你自己添加的条目在智能体配置里仍然有效。"
-
-msgid "Entries you added yourself stay in your agent config."
-msgstr "你自己添加的条目会保留在智能体配置里。"
 
 msgid "Environment"
 msgstr "环境"
@@ -6818,6 +6864,9 @@ msgstr "行业中位数，为我们的估计。虚线为预测。第一批F4团�
 msgid "Info"
 msgstr "信息"
 
+msgid "Information"
+msgstr "信息"
+
 msgid "Initialize Git"
 msgstr "初始化Git"
 
@@ -6864,9 +6913,6 @@ msgstr "来自Superset团队的洞见，关于并行编码智能体与开发者�
 msgid "Inspecting {0}"
 msgstr "正在检查{0}"
 
-msgid "Install"
-msgstr "安装"
-
 msgid "Install & restart"
 msgstr "安装并重启"
 
@@ -6894,9 +6940,9 @@ msgstr "在一处为所有工作区安装、授权并划定MCP服务器的权限
 msgid "Installed"
 msgstr "已安装"
 
-#. placeholder {0}: record.installedAt.slice(0, 10)
-msgid "installed {0}"
-msgstr "安装于{0}"
+#. js-lingui-explicit-id
+msgid "serverError.plugins.marketplaceHasInstalls"
+msgstr "已安装的插件来自 {name}：{plugins}。请先移除它们。"
 
 msgid "Installing..."
 msgstr "正在安装..."
@@ -7367,6 +7413,9 @@ msgstr "不到一分钟前"
 msgid "Letter spacing (px)"
 msgstr "字间距（px）"
 
+msgid "License"
+msgstr "许可证"
+
 msgid "Lifecycle scripts"
 msgstr "生命周期脚本"
 
@@ -7829,9 +7878,6 @@ msgstr "MCP管理器"
 msgid "MCP Server"
 msgstr "MCP服务器"
 
-msgid "MCP servers"
-msgstr "MCP服务器"
-
 msgid "Mean"
 msgstr "平均"
 
@@ -7991,6 +8037,10 @@ msgstr "缺少必需的授权参数。"
 
 msgid "Missing required fields."
 msgstr "缺少必填字段。"
+
+#. js-lingui-explicit-id
+msgid "serverError.plugins.missingInput"
+msgstr "缺少必填输入 {input}"
 
 msgid "Mobile"
 msgstr "移动端"
@@ -8603,9 +8653,6 @@ msgstr "没有活动会话"
 msgid "no logins"
 msgstr "无登录信息"
 
-msgid "no longer in the catalog"
-msgstr "已不在目录中"
-
 msgid "No match"
 msgstr "无匹配项"
 
@@ -8665,6 +8712,9 @@ msgstr "没有待处理的邀请"
 
 msgid "No people found."
 msgstr "未找到成员。"
+
+msgid "No plugins available yet."
+msgstr "暂无可用插件。"
 
 #. placeholder {0}: search.trim()
 msgid "No plugins match \"{0}\""
@@ -9016,6 +9066,9 @@ msgstr "如今，我们已从硅谷最好的投资人那里融资<0>1100万美�
 msgid "Numbered list"
 msgstr "编号列表"
 
+msgid "OAuth 2.0"
+msgstr "OAuth 2.0"
+
 msgid "OAuth by default, API keys for CI"
 msgstr "默认用OAuth，CI用API密钥"
 
@@ -9171,6 +9224,10 @@ msgstr "开启"
 #. placeholder {0}: linkedAgent?.label ?? t({ message: "agent settings", })
 msgid "Open {0}"
 msgstr "打开{0}"
+
+#. placeholder {0}: plugin.interface.displayName
+msgid "Open {0} website"
+msgstr "打开 {0} 官网"
 
 msgid "Open {filePath}"
 msgstr "打开{filePath}"
@@ -10053,6 +10110,14 @@ msgstr "请选择一个组织"
 msgid "Please try signing in again from the desktop app."
 msgstr "请从桌面应用重新登录。"
 
+#. js-lingui-explicit-id
+msgid "serverError.plugins.noApiKeyAuth"
+msgstr "插件 {plugin} 未使用 api_key 认证"
+
+#. js-lingui-explicit-id
+msgid "serverError.plugins.notInstalled"
+msgstr "插件 {plugin} 未安装"
+
 msgid "Plugin marketplace"
 msgstr "插件市场"
 
@@ -10415,9 +10480,6 @@ msgstr "属性"
 
 msgid "Provide either id or slug"
 msgstr "请提供id或slug"
-
-msgid "Provided by entries in your own agent config."
-msgstr "由你自己的智能体配置中的条目提供。"
 
 #. placeholder {0}: sourceConfig?.label ?? binding.agentId
 msgid "Provider: {0}"
@@ -10791,9 +10853,6 @@ msgstr "远程访问"
 
 msgid "Remote MCP server — connects over HTTP"
 msgstr "远程MCP服务器，通过HTTP连接"
-
-msgid "Remote servers sign you in the first time an agent uses them."
-msgstr "远程服务器会在智能体第一次使用时让你登录。"
 
 msgid "Remote workspace"
 msgstr "远程工作区"
@@ -13838,6 +13897,9 @@ msgstr "此路径存在，但不是目录。"
 msgid "This path is a directory"
 msgstr "该路径是一个目录"
 
+msgid "This plugin needs no account — its skills are ready to use."
+msgstr "此插件无需账户 — 它的技能可直接使用。"
+
 msgid "This port is still in use"
 msgstr "此端口仍在使用中"
 
@@ -14323,10 +14385,7 @@ msgstr "取消选中工作区的分组"
 msgid "Unified view"
 msgstr "统一视图"
 
-msgid "Uninstall"
-msgstr "卸载"
-
-#. placeholder {0}: plugin?.interface.displayName ?? entry.name
+#. placeholder {0}: plugin.interface.displayName
 msgid "Uninstall {0}"
 msgstr "卸载{0}"
 
@@ -14363,6 +14422,10 @@ msgstr "未知主机"
 
 msgid "Unknown Host"
 msgstr "未知主机"
+
+#. js-lingui-explicit-id
+msgid "serverError.plugins.unknownPlugin"
+msgstr "未知插件 {plugin}"
 
 msgid "Unknown project"
 msgstr "未知项目"
@@ -14439,6 +14502,9 @@ msgstr "即将运行"
 
 msgid "Up Next"
 msgstr "即将开始"
+
+msgid "Update"
+msgstr "更新"
 
 msgid "Update available"
 msgstr "有可用更新"
@@ -15168,9 +15234,6 @@ msgstr "你"
 
 msgid "YOU"
 msgstr "你"
-
-msgid "You added these yourself — Superset never touches them, and never writes duplicates of servers you already have."
-msgstr "这些是你自己添加的，Superset从不改动它们，也不会为你已有的服务器写入重复项。"
 
 msgid "You appear to be offline"
 msgstr "你似乎处于离线状态"
