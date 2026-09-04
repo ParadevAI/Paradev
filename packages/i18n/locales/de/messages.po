@@ -160,6 +160,10 @@ msgstr "{0, plural, one {# bestanden} other {# bestanden}}"
 msgid "{0, plural, one {# project selected.} other {# projects selected.}}"
 msgstr "{0, plural, one {# Projekt ausgewählt.} other {# Projekte ausgewählt.}}"
 
+#. placeholder {0}: projectFilters.length
+msgid "{0, plural, one {# project} other {# projects}}"
+msgstr "{0, plural, one {# Projekt} other {# Projekte}}"
+
 #. placeholder {0}: repositories.length
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
@@ -272,6 +276,10 @@ msgstr "{0} – {1} · Schätzung zum API-Preis aus lokalen Sitzungs-Logs"
 #. placeholder {0}: error.message
 msgid "{0} — try the Superset tray menu > Host Service > Restart."
 msgstr "{0} — versuche es über das Superset-Menü in der Menüleiste > Host Service > Restart."
+
+#. placeholder {0}: creator.name
+msgid "{0} (you)"
+msgstr "{0} (du)"
 
 #. placeholder {0}: actor.login
 msgid "{0} {actorVerb}"
@@ -621,6 +629,9 @@ msgstr "{level} · {gate} · {statusLabel}"
 
 msgid "{level} {gate}: {statusLabel}"
 msgstr "{level} {gate}: {statusLabel}"
+
+msgid "{localHostName} (this device)"
+msgstr "{localHostName} (dieses Gerät)"
 
 #. placeholder {0}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} result for &ldquo;{query}&rdquo; </>
 #. placeholder {1}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} results for &ldquo;{query}&rdquo; </>
@@ -4109,6 +4120,9 @@ msgstr "Erstellt <0>· 7 T.</0>"
 msgid "Created 1 folder in {where}"
 msgstr "1 Ordner in {where} erstellt"
 
+msgid "Created by"
+msgstr "Erstellt von"
+
 msgid "Created team \"{trimmedName}\""
 msgstr "Team \"{trimmedName}\" erstellt"
 
@@ -4589,9 +4603,6 @@ msgstr "Entwickler"
 
 msgid "Developers"
 msgstr "Entwickler"
-
-msgid "Device"
-msgstr "Gerät"
 
 msgid "Device: {selectedLabel}"
 msgstr "Gerät: {selectedLabel}"
@@ -5880,6 +5891,9 @@ msgstr "Agenten filtern..."
 msgid "Filter by @{normalizedSearch}"
 msgstr "Nach @{normalizedSearch} filtern"
 
+msgid "Filter by device"
+msgstr "Nach Gerät filtern"
+
 msgid "Filter by reviews"
 msgstr "Nach Reviews filtern"
 
@@ -6755,6 +6769,9 @@ msgstr "Verbesserter Diff-Betrachter"
 
 msgid "in a terminal on this host."
 msgstr "in einem Terminal auf diesem Host aus."
+
+msgid "In all projects"
+msgstr "In allen Projekten"
 
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Superset as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "In nur wenigen Monaten nutzen <0>Zehntausende Entwickler</0> Superset als ihre primäre IDE, in Unternehmen wie Wix, DoorDash und Netflix."
@@ -8573,6 +8590,9 @@ msgstr "Keine Issues gefunden."
 
 msgid "No items"
 msgstr "Keine Einträge"
+
+msgid "No known creators"
+msgstr "Keine bekannten Ersteller"
 
 msgid "No labels"
 msgstr "Keine Labels"

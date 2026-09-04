@@ -160,6 +160,10 @@ msgstr "{0, plural, one {#개 통과} other {#개 통과}}"
 msgid "{0, plural, one {# project selected.} other {# projects selected.}}"
 msgstr "{0, plural, one {프로젝트 #개를 선택했습니다.} other {프로젝트 #개를 선택했습니다.}}"
 
+#. placeholder {0}: projectFilters.length
+msgid "{0, plural, one {# project} other {# projects}}"
+msgstr "{0, plural, one {프로젝트 #개} other {프로젝트 #개}}"
+
 #. placeholder {0}: repositories.length
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
@@ -272,6 +276,10 @@ msgstr "{0} – {1} · 로컬 세션 로그 기반 API 요금 추정치"
 #. placeholder {0}: error.message
 msgid "{0} — try the Superset tray menu > Host Service > Restart."
 msgstr "{0} — Superset 트레이 메뉴 > Host Service > Restart를 사용해 보세요."
+
+#. placeholder {0}: creator.name
+msgid "{0} (you)"
+msgstr "{0} (나)"
 
 #. placeholder {0}: actor.login
 msgid "{0} {actorVerb}"
@@ -621,6 +629,9 @@ msgstr "{level} · {gate} · {statusLabel}"
 
 msgid "{level} {gate}: {statusLabel}"
 msgstr "{level} {gate}: {statusLabel}"
+
+msgid "{localHostName} (this device)"
+msgstr "{localHostName} (이 기기)"
 
 #. placeholder {0}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} result for &ldquo;{query}&rdquo; </>
 #. placeholder {1}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} results for &ldquo;{query}&rdquo; </>
@@ -4109,6 +4120,9 @@ msgstr "생성됨 <0>· 7일</0>"
 msgid "Created 1 folder in {where}"
 msgstr "{where}에 폴더 1개를 만들었습니다"
 
+msgid "Created by"
+msgstr "만든 사람"
+
 msgid "Created team \"{trimmedName}\""
 msgstr "\"{trimmedName}\" 팀을 만들었습니다"
 
@@ -4589,9 +4603,6 @@ msgstr "개발자"
 
 msgid "Developers"
 msgstr "개발자"
-
-msgid "Device"
-msgstr "기기"
 
 msgid "Device: {selectedLabel}"
 msgstr "기기: {selectedLabel}"
@@ -5880,6 +5891,9 @@ msgstr "에이전트 필터..."
 msgid "Filter by @{normalizedSearch}"
 msgstr "@{normalizedSearch}(으)로 필터링"
 
+msgid "Filter by device"
+msgstr "기기별 필터"
+
 msgid "Filter by reviews"
 msgstr "리뷰로 필터링"
 
@@ -6755,6 +6769,9 @@ msgstr "차이 뷰어 개선"
 
 msgid "in a terminal on this host."
 msgstr "(이 호스트의 터미널에서)"
+
+msgid "In all projects"
+msgstr "모든 프로젝트"
 
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Superset as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "몇 달 만에 <0>수만 명의 엔지니어</0>가 Wix, DoorDash, Netflix 같은 회사에서 Superset을 주력 IDE로 사용하고 있습니다."
@@ -8573,6 +8590,9 @@ msgstr "이슈를 찾을 수 없습니다."
 
 msgid "No items"
 msgstr "항목 없음"
+
+msgid "No known creators"
+msgstr "알려진 만든 사람이 없습니다"
 
 msgid "No labels"
 msgstr "레이블 없음"

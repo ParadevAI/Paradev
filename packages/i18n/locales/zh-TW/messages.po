@@ -160,6 +160,10 @@ msgstr "{0, plural, one {#項通過} other {#項通過}}"
 msgid "{0, plural, one {# project selected.} other {# projects selected.}}"
 msgstr "{0, plural, one {已選擇#個專案。} other {已選擇#個專案。}}"
 
+#. placeholder {0}: projectFilters.length
+msgid "{0, plural, one {# project} other {# projects}}"
+msgstr "{0, plural, one {# 個專案} other {# 個專案}}"
+
 #. placeholder {0}: repositories.length
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
@@ -272,6 +276,10 @@ msgstr "{0} – {1} · 根據本地會話日誌按API價格估算"
 #. placeholder {0}: error.message
 msgid "{0} — try the Superset tray menu > Host Service > Restart."
 msgstr "{0} — 請嘗試Superset托盤選單 > 主機服務 > 重啟。"
+
+#. placeholder {0}: creator.name
+msgid "{0} (you)"
+msgstr "{0}（你）"
 
 #. placeholder {0}: actor.login
 msgid "{0} {actorVerb}"
@@ -621,6 +629,9 @@ msgstr "{level} · {gate} · {statusLabel}"
 
 msgid "{level} {gate}: {statusLabel}"
 msgstr "{level} {gate}：{statusLabel}"
+
+msgid "{localHostName} (this device)"
+msgstr "{localHostName}（此裝置）"
 
 #. placeholder {0}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} result for &ldquo;{query}&rdquo; </>
 #. placeholder {1}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} results for &ldquo;{query}&rdquo; </>
@@ -4109,6 +4120,9 @@ msgstr "已建立 <0>· 7天</0>"
 msgid "Created 1 folder in {where}"
 msgstr "已在{where}建立1個資料夾"
 
+msgid "Created by"
+msgstr "建立者"
+
 msgid "Created team \"{trimmedName}\""
 msgstr "已建立團隊「{trimmedName}」"
 
@@ -4589,9 +4603,6 @@ msgstr "開發者"
 
 msgid "Developers"
 msgstr "開發者"
-
-msgid "Device"
-msgstr "裝置"
 
 msgid "Device: {selectedLabel}"
 msgstr "裝置：{selectedLabel}"
@@ -5880,6 +5891,9 @@ msgstr "篩選代理程式..."
 msgid "Filter by @{normalizedSearch}"
 msgstr "按@{normalizedSearch}篩選"
 
+msgid "Filter by device"
+msgstr "依裝置篩選"
+
 msgid "Filter by reviews"
 msgstr "按審查篩選"
 
@@ -6755,6 +6769,9 @@ msgstr "更好的差異檢視器"
 
 msgid "in a terminal on this host."
 msgstr "（在此主機的終端中）。"
+
+msgid "In all projects"
+msgstr "全部專案"
 
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Superset as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "短短幾個月，<0>數萬名工程師</0>把Superset當作主力IDE，他們來自Wix、DoorDash、Netflix這樣的公司。"
@@ -8573,6 +8590,9 @@ msgstr "未找到議題。"
 
 msgid "No items"
 msgstr "暫無條目"
+
+msgid "No known creators"
+msgstr "沒有已知的建立者"
 
 msgid "No labels"
 msgstr "無標籤"

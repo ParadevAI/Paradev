@@ -160,6 +160,10 @@ msgstr "{0, plural, one {#件成功} other {#件成功}}"
 msgid "{0, plural, one {# project selected.} other {# projects selected.}}"
 msgstr "{0, plural, one {#件のプロジェクトを選択中。} other {#件のプロジェクトを選択中。}}"
 
+#. placeholder {0}: projectFilters.length
+msgid "{0, plural, one {# project} other {# projects}}"
+msgstr "{0, plural, one {# 件のプロジェクト} other {# 件のプロジェクト}}"
+
 #. placeholder {0}: repositories.length
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
@@ -272,6 +276,10 @@ msgstr "{0} – {1} · ローカルセッションログからのAPI定価換算
 #. placeholder {0}: error.message
 msgid "{0} — try the Superset tray menu > Host Service > Restart."
 msgstr "{0} — Supersetのトレイメニュー > ホストサービス > 再起動をお試しください。"
+
+#. placeholder {0}: creator.name
+msgid "{0} (you)"
+msgstr "{0}（自分）"
 
 #. placeholder {0}: actor.login
 msgid "{0} {actorVerb}"
@@ -621,6 +629,9 @@ msgstr "{level} · {gate} · {statusLabel}"
 
 msgid "{level} {gate}: {statusLabel}"
 msgstr "{level} {gate}: {statusLabel}"
+
+msgid "{localHostName} (this device)"
+msgstr "{localHostName}（このデバイス）"
 
 #. placeholder {0}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} result for &ldquo;{query}&rdquo; </>
 #. placeholder {1}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} results for &ldquo;{query}&rdquo; </>
@@ -4109,6 +4120,9 @@ msgstr "作成 <0>· 7日</0>"
 msgid "Created 1 folder in {where}"
 msgstr "1件のフォルダを{where}に作成しました"
 
+msgid "Created by"
+msgstr "作成者"
+
 msgid "Created team \"{trimmedName}\""
 msgstr "チーム「{trimmedName}」を作成しました"
 
@@ -4589,9 +4603,6 @@ msgstr "開発者"
 
 msgid "Developers"
 msgstr "開発者"
-
-msgid "Device"
-msgstr "デバイス"
 
 msgid "Device: {selectedLabel}"
 msgstr "デバイス: {selectedLabel}"
@@ -5880,6 +5891,9 @@ msgstr "エージェントを絞り込み..."
 msgid "Filter by @{normalizedSearch}"
 msgstr "@{normalizedSearch}で絞り込む"
 
+msgid "Filter by device"
+msgstr "デバイスで絞り込む"
+
 msgid "Filter by reviews"
 msgstr "レビューで絞り込む"
 
@@ -6755,6 +6769,9 @@ msgstr "差分ビューアの改善"
 
 msgid "in a terminal on this host."
 msgstr "このホストのターミナルで実行してください。"
+
+msgid "In all projects"
+msgstr "すべてのプロジェクト"
 
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Superset as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "わずか数か月で、Wix、DoorDash、Netflixといった企業を含め<0>数万人のエンジニア</0>がSupersetを主要なIDEとして使っています。"
@@ -8573,6 +8590,9 @@ msgstr "Issueが見つかりません。"
 
 msgid "No items"
 msgstr "項目なし"
+
+msgid "No known creators"
+msgstr "既知の作成者はいません"
 
 msgid "No labels"
 msgstr "ラベルなし"

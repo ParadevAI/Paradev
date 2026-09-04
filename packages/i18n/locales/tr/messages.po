@@ -160,6 +160,10 @@ msgstr "{0, plural, one {# geçti} other {# geçti}}"
 msgid "{0, plural, one {# project selected.} other {# projects selected.}}"
 msgstr "{0, plural, one {# proje seçildi.} other {# proje seçildi.}}"
 
+#. placeholder {0}: projectFilters.length
+msgid "{0, plural, one {# project} other {# projects}}"
+msgstr "{0, plural, one {# proje} other {# proje}}"
+
 #. placeholder {0}: repositories.length
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
@@ -272,6 +276,10 @@ msgstr "{0} – {1} · yerel oturum günlüklerinden API tarifesi tahmini"
 #. placeholder {0}: error.message
 msgid "{0} — try the Superset tray menu > Host Service > Restart."
 msgstr "{0} — Superset tepsi menüsünde Host hizmeti > Yeniden başlat yolunu deneyin."
+
+#. placeholder {0}: creator.name
+msgid "{0} (you)"
+msgstr "{0} (siz)"
 
 #. placeholder {0}: actor.login
 msgid "{0} {actorVerb}"
@@ -621,6 +629,9 @@ msgstr "{level} · {gate} · {statusLabel}"
 
 msgid "{level} {gate}: {statusLabel}"
 msgstr "{level} {gate}: {statusLabel}"
+
+msgid "{localHostName} (this device)"
+msgstr "{localHostName} (bu cihaz)"
 
 #. placeholder {0}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} result for &ldquo;{query}&rdquo; </>
 #. placeholder {1}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} results for &ldquo;{query}&rdquo; </>
@@ -4109,6 +4120,9 @@ msgstr "Oluşturulan <0>· 7g</0>"
 msgid "Created 1 folder in {where}"
 msgstr "{where} konumunda 1 klasör oluşturuldu"
 
+msgid "Created by"
+msgstr "Oluşturan"
+
 msgid "Created team \"{trimmedName}\""
 msgstr "\"{trimmedName}\" takımı oluşturuldu"
 
@@ -4589,9 +4603,6 @@ msgstr "Geliştirici"
 
 msgid "Developers"
 msgstr "Geliştiriciler"
-
-msgid "Device"
-msgstr "Cihaz"
 
 msgid "Device: {selectedLabel}"
 msgstr "Cihaz: {selectedLabel}"
@@ -5880,6 +5891,9 @@ msgstr "Ajanları filtrele..."
 msgid "Filter by @{normalizedSearch}"
 msgstr "@{normalizedSearch} ile filtrele"
 
+msgid "Filter by device"
+msgstr "Cihaza göre filtrele"
+
 msgid "Filter by reviews"
 msgstr "İncelemeye göre filtrele"
 
@@ -6755,6 +6769,9 @@ msgstr "Geliştirilmiş fark görüntüleyici"
 
 msgid "in a terminal on this host."
 msgstr "komutunu çalıştırın."
+
+msgid "In all projects"
+msgstr "Tüm projelerde"
 
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Superset as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "Yalnızca birkaç ayda <0>on binlerce mühendis</0> Superset'i birincil IDE'si olarak kullanmaya başladı; Wix, DoorDash ve Netflix gibi şirketlerde."
@@ -8573,6 +8590,9 @@ msgstr "Issue bulunamadı."
 
 msgid "No items"
 msgstr "Öğe yok"
+
+msgid "No known creators"
+msgstr "Bilinen oluşturan yok"
 
 msgid "No labels"
 msgstr "Etiket yok"

@@ -160,6 +160,10 @@ msgstr "{0, plural, one {# prošlo} few {# prošlo} many {# prošlo} other {# pr
 msgid "{0, plural, one {# project selected.} other {# projects selected.}}"
 msgstr "{0, plural, one {Vybrán # projekt.} few {Vybrány # projekty.} many {Vybráno # projektu.} other {Vybráno # projektů.}}"
 
+#. placeholder {0}: projectFilters.length
+msgid "{0, plural, one {# project} other {# projects}}"
+msgstr "{0, plural, one {# projekt} few {# projekty} many {# projektu} other {# projektů}}"
+
 #. placeholder {0}: repositories.length
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
@@ -272,6 +276,10 @@ msgstr "{0} – {1} · odhad v sazbách API z lokálních logů relací"
 #. placeholder {0}: error.message
 msgid "{0} — try the Superset tray menu > Host Service > Restart."
 msgstr "{0} — zkuste nabídku Superset v liště > Host Service > Restart."
+
+#. placeholder {0}: creator.name
+msgid "{0} (you)"
+msgstr "{0} (vy)"
 
 #. placeholder {0}: actor.login
 msgid "{0} {actorVerb}"
@@ -621,6 +629,9 @@ msgstr "{level} · {gate} · {statusLabel}"
 
 msgid "{level} {gate}: {statusLabel}"
 msgstr "{level} {gate}: {statusLabel}"
+
+msgid "{localHostName} (this device)"
+msgstr "{localHostName} (toto zařízení)"
 
 #. placeholder {0}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} result for &ldquo;{query}&rdquo; </>
 #. placeholder {1}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} results for &ldquo;{query}&rdquo; </>
@@ -4109,6 +4120,9 @@ msgstr "Vytvořeno <0>· 7 d</0>"
 msgid "Created 1 folder in {where}"
 msgstr "Vytvořena 1 složka v {where}"
 
+msgid "Created by"
+msgstr "Vytvořil(a)"
+
 msgid "Created team \"{trimmedName}\""
 msgstr "Tým „{trimmedName}“ vytvořen"
 
@@ -4589,9 +4603,6 @@ msgstr "Vývojář"
 
 msgid "Developers"
 msgstr "Vývojáři"
-
-msgid "Device"
-msgstr "Zařízení"
 
 msgid "Device: {selectedLabel}"
 msgstr "Zařízení: {selectedLabel}"
@@ -5880,6 +5891,9 @@ msgstr "Filtrovat agenty..."
 msgid "Filter by @{normalizedSearch}"
 msgstr "Filtrovat podle @{normalizedSearch}"
 
+msgid "Filter by device"
+msgstr "Filtrovat podle zařízení"
+
 msgid "Filter by reviews"
 msgstr "Filtrovat podle revizí"
 
@@ -6755,6 +6769,9 @@ msgstr "Vylepšený prohlížeč rozdílů"
 
 msgid "in a terminal on this host."
 msgstr "v terminálu na tomto hostu."
+
+msgid "In all projects"
+msgstr "Ve všech projektech"
 
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Superset as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "Za pouhých pár měsíců používají Superset jako hlavní IDE <0>desítky tisíc inženýrů</0>, ve firmách jako Wix, DoorDash nebo Netflix."
@@ -8573,6 +8590,9 @@ msgstr "Nenalezeny žádné issues."
 
 msgid "No items"
 msgstr "Žádné položky"
+
+msgid "No known creators"
+msgstr "Žádní známí autoři"
 
 msgid "No labels"
 msgstr "Žádné štítky"

@@ -160,6 +160,10 @@ msgstr "{0, plural, one {# đã qua} other {# đã qua}}"
 msgid "{0, plural, one {# project selected.} other {# projects selected.}}"
 msgstr "{0, plural, one {Đã chọn # dự án.} other {Đã chọn # dự án.}}"
 
+#. placeholder {0}: projectFilters.length
+msgid "{0, plural, one {# project} other {# projects}}"
+msgstr "{0, plural, one {# dự án} other {# dự án}}"
+
 #. placeholder {0}: repositories.length
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
@@ -272,6 +276,10 @@ msgstr "{0} – {1} · ước tính theo giá API từ log phiên cục bộ"
 #. placeholder {0}: error.message
 msgid "{0} — try the Superset tray menu > Host Service > Restart."
 msgstr "{0} — hãy thử menu khay Superset > Dịch vụ host > Khởi động lại."
+
+#. placeholder {0}: creator.name
+msgid "{0} (you)"
+msgstr "{0} (bạn)"
 
 #. placeholder {0}: actor.login
 msgid "{0} {actorVerb}"
@@ -621,6 +629,9 @@ msgstr "{level} · {gate} · {statusLabel}"
 
 msgid "{level} {gate}: {statusLabel}"
 msgstr "{level} {gate}: {statusLabel}"
+
+msgid "{localHostName} (this device)"
+msgstr "{localHostName} (thiết bị này)"
 
 #. placeholder {0}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} result for &ldquo;{query}&rdquo; </>
 #. placeholder {1}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} results for &ldquo;{query}&rdquo; </>
@@ -4109,6 +4120,9 @@ msgstr "Đã tạo <0>· 7 ngày</0>"
 msgid "Created 1 folder in {where}"
 msgstr "Đã tạo 1 thư mục trong {where}"
 
+msgid "Created by"
+msgstr "Người tạo"
+
 msgid "Created team \"{trimmedName}\""
 msgstr "Đã tạo nhóm \"{trimmedName}\""
 
@@ -4589,9 +4603,6 @@ msgstr "Lập trình viên"
 
 msgid "Developers"
 msgstr "Lập trình viên"
-
-msgid "Device"
-msgstr "Thiết bị"
 
 msgid "Device: {selectedLabel}"
 msgstr "Thiết bị: {selectedLabel}"
@@ -5880,6 +5891,9 @@ msgstr "Lọc agent..."
 msgid "Filter by @{normalizedSearch}"
 msgstr "Lọc theo @{normalizedSearch}"
 
+msgid "Filter by device"
+msgstr "Lọc theo thiết bị"
+
 msgid "Filter by reviews"
 msgstr "Lọc theo review"
 
@@ -6755,6 +6769,9 @@ msgstr "Khung xem diff cải tiến"
 
 msgid "in a terminal on this host."
 msgstr "trong một terminal trên host này."
+
+msgid "In all projects"
+msgstr "Trong tất cả dự án"
 
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Superset as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "Chỉ trong vài tháng, <0>hàng chục nghìn kỹ sư</0> dùng Superset làm IDE chính, tại các công ty như Wix, DoorDash và Netflix."
@@ -8573,6 +8590,9 @@ msgstr "Không tìm thấy issue nào."
 
 msgid "No items"
 msgstr "Không có mục nào"
+
+msgid "No known creators"
+msgstr "Không có người tạo nào được biết"
 
 msgid "No labels"
 msgstr "Không có nhãn"
