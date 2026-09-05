@@ -4096,6 +4096,10 @@ msgstr "creada"
 msgid "Created"
 msgstr "Creado"
 
+msgctxt "github release action"
+msgid "Created"
+msgstr "Creada"
+
 #. placeholder {0}: result.task.slug
 msgid "Created {0}"
 msgstr "Se creó {0}"
@@ -4474,6 +4478,10 @@ msgstr "¿Eliminar el espacio de trabajo \"{workspaceName}\"?"
 
 msgid "Deleted"
 msgstr "Eliminados"
+
+msgctxt "github release action"
+msgid "Deleted"
+msgstr "Eliminada"
 
 msgid "Deleted \"{deletedName}\""
 msgstr "\"{deletedName}\" eliminado"
@@ -5011,6 +5019,10 @@ msgstr "Editar el script"
 
 msgid "Edited"
 msgstr "Editado"
+
+msgctxt "github release action"
+msgid "Edited"
+msgstr "Editada"
 
 msgid "Editing file..."
 msgstr "Editando archivo..."
@@ -10434,6 +10446,10 @@ msgstr "Publica una página desde un agente o la CLI y aparecerá aquí."
 msgid "Published"
 msgstr "Publicada"
 
+msgctxt "github release action"
+msgid "Published"
+msgstr "Publicada"
+
 msgid "Publishes your token counts and model names, never repo names, file paths or prompts. You can leave at any time, which deletes everything you've published."
 msgstr "Publica los recuentos de tokens y los nombres de los modelos; nunca nombres de repositorios, rutas de archivos ni prompts. Se puede salir en cualquier momento, lo que borra todo lo publicado."
 
@@ -10751,6 +10767,9 @@ msgstr "Vuelve a lanzar los agentes en marcha para cambiarlos."
 
 msgid "Relay access enabled, connecting to the relay…"
 msgstr "Acceso por relay habilitado, conectando al relay…"
+
+msgid "Release…"
+msgstr "Versión…"
 
 msgid "Reload"
 msgstr "Recargar"
@@ -14384,6 +14403,10 @@ msgstr "Sin pagar"
 
 msgid "Unpin"
 msgstr "Desfijar"
+
+msgctxt "github release action"
+msgid "Unpublished"
+msgstr "Despublicada"
 
 msgid "Unpushed"
 msgstr "Sin push"
