@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { TRPCClientError } from "@trpc/client";
@@ -7,6 +7,8 @@ import { ApiHttpError } from "../../../lib/api-client";
 import submitCommand, {
 	MAX_ATTACHMENT_TOTAL_BASE64_CHARS,
 	MAX_ATTACHMENT_TOTAL_BYTES,
+	planAttachmentUploads,
+	readTailBytes,
 } from "./command";
 
 interface SubmittedAttachment {
@@ -137,6 +139,52 @@ describe("feedback submit attachments", () => {
 		expect(error.message).toContain("host-service.log");
 		expect(error.message).toContain("main.log");
 		expect(submitted).toBeUndefined();
+	});
+
+	test("rejects an overflowing list before reading any of its files", async () => {
+		const each = Math.ceil(MAX_ATTACHMENT_TOTAL_BYTES * 0.6);
+		const first = writeFixture("host-service.log", patterned(each));
+		const second = writeFixture("main.log", patterned(each));
+		// Unreadable after sizing: a read before the rejection fails with
+		// EACCES instead of the limit message.
+		chmodSync(first, 0o000);
+		chmodSync(second, 0o000);
+
+		const error = await invoke([first, second]).catch((thrown) => thrown);
+		expect(error.message).toContain("total limit");
+		expect(error.message).not.toContain("EACCES");
+		expect(submitted).toBeUndefined();
+	});
+
+	test("readTailBytes clamps to a file that shrank since it was planned", () => {
+		const path = writeFixture("rotated.log", patterned(1_000));
+		// Planned at a larger size, read after rotation left 1,000 bytes.
+		const tail = readTailBytes(path, 50_000);
+		expect(tail.length).toBe(1_000);
+		expect(Buffer.compare(tail, patterned(1_000))).toBe(0);
+		expect(readTailBytes(path, 0).length).toBe(0);
+	});
+
+	test("planAttachmentUploads works from sizes alone", () => {
+		const lone = planAttachmentUploads([
+			{
+				path: "/x/a.log",
+				filename: "a.log",
+				size: MAX_ATTACHMENT_TOTAL_BYTES * 3,
+			},
+		]);
+		expect(lone.files[0]?.bytes).toBe(MAX_ATTACHMENT_TOTAL_BYTES);
+		expect(lone.notices).toHaveLength(1);
+		expect(() =>
+			planAttachmentUploads([
+				{
+					path: "/x/a.log",
+					filename: "a.log",
+					size: MAX_ATTACHMENT_TOTAL_BYTES,
+				},
+				{ path: "/x/b.log", filename: "b.log", size: 10 },
+			]),
+		).toThrow(/total limit.*a\.log, b\.log/);
 	});
 
 	test("surfaces a 413 from the platform with its status, text, and the limit hint", async () => {
