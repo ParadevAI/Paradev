@@ -63,19 +63,33 @@ if [ ! -x /usr/local/bin/gh ]; then
   rm -rf /tmp/gh.tar.gz "/tmp/gh_${GH_VERSION}_linux_amd64"
 fi
 
-# Demo repositories the reviewer browses. Real git repos with no remote.
+# Demo repositories the reviewer browses.
+#
+# acme is a CLONE of the public superset-sh/acme-demo, and that matters: its open
+# PR #1 is what puts the pull-request chip on a workspace, and the chip is the
+# only route to the diff the store listing promises. A `git init` here instead of
+# a clone leaves no origin, no refs/remotes/origin/HEAD, and therefore no diff
+# base and no PR — which is exactly what happened once.
+#
+# The guard is on the remote URL, not on .git: a host provisioned by the earlier
+# version already has /demo/acme-ios/.git from a `git init`, and a presence check
+# would leave that fabricated repo in place forever — no origin, no PR, exactly
+# the state this replaced.
 mkdir -p /demo
-if [ ! -d /demo/acme/.git ]; then
-  git config --global user.email "appreview@superset.sh"
-  git config --global user.name "Superset"
-  git config --global init.defaultBranch main
-  for repo in /demo/*; do
-    [ -d "$repo" ] || continue
-    git -C "$repo" init -q
-    git -C "$repo" add -A
-    git -C "$repo" commit -qm "Initial commit"
-  done
-fi
+clone_demo() {
+  DIR="$1"
+  URL="$2"
+  if [ "$(git -C "$DIR" remote get-url origin 2>/dev/null)" = "$URL" ]; then
+    git -C "$DIR" fetch -q origin
+    return
+  fi
+  rm -rf "$DIR"
+  git clone -q "$URL" "$DIR"
+}
+clone_demo /demo/acme https://github.com/superset-sh/acme-demo.git
+clone_demo /demo/acme-ios https://github.com/superset-sh/acme-ios-demo.git
+git config --global user.email "appreview@superset.sh"
+git config --global user.name "Superset"
 
 install -m0755 /opt/review-host/run.sh /opt/review-host/run.sh 2>/dev/null || true
 
@@ -101,6 +115,11 @@ Wants=network-online.target
 [Service]
 Type=exec
 Environment=REVIEW_ORG_ID=${REVIEW_ORG_ID}
+# GH_TOKEN for the host's octokit — ctx.github() throws NO_GITHUB_TOKEN without
+# one, so the pull-request chip stays empty even on a public repo. Kept in a
+# 0600 file rather than inline: unit files are world-readable. Optional (-) so a
+# box without it still boots.
+EnvironmentFile=-/etc/superset-review-host.env
 ExecStart=/opt/review-host/run.sh
 BindReadOnlyPaths=/opt/review-host/machine-id:/etc/machine-id
 Restart=always
