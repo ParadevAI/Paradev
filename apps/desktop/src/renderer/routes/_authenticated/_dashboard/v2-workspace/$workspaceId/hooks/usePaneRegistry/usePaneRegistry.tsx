@@ -62,7 +62,10 @@ import {
 	type SubagentPaneData,
 	type TerminalPaneData,
 } from "../../types";
-import { focusOrAddTerminalPane } from "../../utils/focusTerminalPane";
+import {
+	findTerminalPaneLocation,
+	focusOrAddTerminalPane,
+} from "../../utils/focusTerminalPane";
 import { openSubagentPaneInStore } from "../../utils/openSubagentPaneInStore";
 import type { TerminalLauncher } from "../useV2TerminalLauncher";
 import { BrowserPane, BrowserPaneToolbar } from "./components/BrowserPane";
@@ -441,6 +444,13 @@ export function usePaneRegistry({
 				},
 				onAfterClose: (pane) => {
 					const { terminalId } = pane.data as TerminalPaneData;
+					// Another pane still shows this terminal (one that followed a
+					// resumed session while its adopted duplicate closes): only
+					// this pane's runtime goes, the session stays.
+					if (findTerminalPaneLocation(store.getState(), terminalId)) {
+						terminalRuntimeRegistry.release(terminalId, pane.id);
+						return;
+					}
 					if (consumeTerminalBackgroundIntent(terminalId)) {
 						terminalRuntimeRegistry.release(terminalId);
 						return;
@@ -857,6 +867,7 @@ export function usePaneRegistry({
 			},
 		}),
 		[
+			store,
 			workspaceId,
 			isChatV3Enabled,
 			isPagesEnabled,
