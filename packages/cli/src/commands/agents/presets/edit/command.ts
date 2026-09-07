@@ -24,9 +24,7 @@ export default command({
 			.desc("How the prompt reaches the agent"),
 		promptArg: string()
 			.variadic()
-			.desc(
-				"Replace the prompt args; repeat for several. Use --prompt-arg=-p for a flag-shaped one",
-			),
+			.desc("Replace the prompt args; repeat for several"),
 		env: string()
 			.variadic()
 			.desc(

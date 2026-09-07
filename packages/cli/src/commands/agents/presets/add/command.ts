@@ -22,9 +22,7 @@ export default command({
 			.desc("How the prompt reaches the agent"),
 		promptArg: string()
 			.variadic()
-			.desc(
-				"Arg inserted before the prompt; repeat for several. Use --prompt-arg=-p for a flag-shaped one",
-			),
+			.desc("Arg inserted before the prompt; repeat for several"),
 		env: string()
 			.variadic()
 			.desc("Environment variable as KEY=VALUE; repeat for several"),
