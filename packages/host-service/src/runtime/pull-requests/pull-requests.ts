@@ -33,6 +33,10 @@ import type {
 	GitHubPullRequestReviewDecision,
 } from "./utils/github-query/types";
 import {
+	GitHubReachabilityGate,
+	GitHubUnreachableError,
+} from "./utils/github-reachability";
+import {
 	type ChecksStatus,
 	coerceChecksStatus,
 	coercePullRequestState,
@@ -208,6 +212,9 @@ export class PullRequestRuntimeManager {
 	private unsubscribeFromGitWatcher: (() => void) | null = null;
 	private unsubscribeFromWorkspaceEvents: (() => void) | null = null;
 	private readonly inFlightProjects = new Map<string, Promise<void>>();
+	// One gate for every GitHub call the runtime makes: an unreachable GitHub
+	// is a property of this host's network, not of any repo.
+	private readonly githubGate = new GitHubReachabilityGate();
 	private readonly workspaceSyncState = new Map<
 		string,
 		{ running: Promise<void>; rerunPending: boolean }
@@ -1146,12 +1153,70 @@ export class PullRequestRuntimeManager {
 		return rowId;
 	}
 
+	/**
+	 * Runs a GitHub lookup through `gh` with an Octokit fallback, behind the
+	 * reachability gate. A transport failure from `gh` (DNS, timeout, refused)
+	 * skips the fallback: Octokit would hit the same network and hang the same
+	 * way. HTTP failures still fall through to Octokit, which may hold a
+	 * different credential.
+	 */
+	private async fetchFromGitHub<T>(
+		what: string,
+		context: Record<string, unknown>,
+		viaGh: () => Promise<T>,
+		viaOctokit: () => Promise<T>,
+		options: { probe?: boolean } = {},
+	): Promise<T> {
+		// An explicit refresh (PR just created, user asked) is allowed through a
+		// hold: it is one call, and its success is what reopens the gate early
+		// once the network is back.
+		if (!options.probe) this.githubGate.assertReachable();
+		try {
+			const result = await viaGh();
+			this.githubGate.recordSuccess();
+			return result;
+		} catch (ghError) {
+			if (this.noteGitHubFailure(ghError)) throw ghError;
+			console.warn(
+				`[host-service:pull-request-runtime] gh ${what} failed; falling back to Octokit`,
+				{ ...context, error: ghError },
+			);
+		}
+		try {
+			const result = await viaOctokit();
+			this.githubGate.recordSuccess();
+			return result;
+		} catch (octokitError) {
+			this.noteGitHubFailure(octokitError);
+			throw octokitError;
+		}
+	}
+
+	/**
+	 * Records a failure with the gate. True for a transport failure, in which
+	 * case the caller skips its Octokit fallback. Logs only for the failure
+	 * that opened a hold; the concurrent failures of the same outage are silent.
+	 */
+	private noteGitHubFailure(error: unknown): boolean {
+		if (error instanceof GitHubUnreachableError) return true;
+		const hold = this.githubGate.recordFailure(error);
+		if (hold === null) return false;
+		if (hold.opened) {
+			console.warn(
+				`[host-service:pull-request-runtime] GitHub unreachable; holding GitHub lookups for ${Math.round(hold.holdMs / 1000)}s`,
+				{ error },
+			);
+		}
+		return true;
+	}
+
 	// Keep failed promises cached for the full TTL so subsequent polls share
 	// the rejection without firing new GitHub calls. Evicting on every error
 	// caused a self-perpetuating storm under rate-limit / abuse-detection
 	// responses: the failure invalidated the cache, the next 20s tick
 	// retried, hit the same 403, and re-evicted. Network blips heal at the
-	// next TTL boundary instead.
+	// next TTL boundary instead. Gate-held calls are the exception: they never
+	// reached GitHub, and must retry as soon as another lookup restores access.
 	private cachedGitHubFetch<T>(
 		cache: Map<
 			string,
@@ -1185,7 +1250,12 @@ export class PullRequestRuntimeManager {
 			() => {
 				entry.consecutiveFailures = 0;
 			},
-			() => {
+			(error: unknown) => {
+				if (error instanceof GitHubUnreachableError) {
+					// Do not remove a newer bypass-cache request for the same key.
+					if (cache.get(cacheKey) === entry) cache.delete(cacheKey);
+					return;
+				}
 				// Re-anchor at the failure: a fetch that out-lives its own backoff
 				// window before rejecting must not be retried immediately.
 				entry.fetchedAt = Date.now();
@@ -1214,26 +1284,24 @@ export class PullRequestRuntimeManager {
 			this.pullRequestHeadCache,
 			cacheKey,
 			options,
-			async () => {
-				try {
-					return await fetchPullRequestByHeadFromGh(
-						this.execGh,
-						{ owner: repo.owner, name: repo.name },
-						head,
-					);
-				} catch (ghError) {
-					console.warn(
-						"[host-service:pull-request-runtime] gh PR head lookup failed; falling back to Octokit",
-						{ owner: repo.owner, name: repo.name, head, error: ghError },
-					);
-					const octokit = await this.github();
-					return fetchPullRequestByHead(
-						octokit,
-						{ owner: repo.owner, name: repo.name },
-						head,
-					);
-				}
-			},
+			() =>
+				this.fetchFromGitHub(
+					"PR head lookup",
+					{ owner: repo.owner, name: repo.name, head },
+					() =>
+						fetchPullRequestByHeadFromGh(
+							this.execGh,
+							{ owner: repo.owner, name: repo.name },
+							head,
+						),
+					async () =>
+						fetchPullRequestByHead(
+							await this.github(),
+							{ owner: repo.owner, name: repo.name },
+							head,
+						),
+					{ probe: options.bypassCache === true },
+				),
 		);
 	}
 
@@ -1249,24 +1317,22 @@ export class PullRequestRuntimeManager {
 			this.openPullRequestsCache,
 			cacheKey,
 			options,
-			async () => {
-				try {
-					return await fetchOpenPullRequestsFromGh(this.execGh, {
-						owner: repo.owner,
-						name: repo.name,
-					});
-				} catch (ghError) {
-					console.warn(
-						"[host-service:pull-request-runtime] gh open-PR sweep failed; falling back to Octokit",
-						{ owner: repo.owner, name: repo.name, error: ghError },
-					);
-					const octokit = await this.github();
-					return fetchOpenPullRequests(octokit, {
-						owner: repo.owner,
-						name: repo.name,
-					});
-				}
-			},
+			() =>
+				this.fetchFromGitHub(
+					"open-PR sweep",
+					{ owner: repo.owner, name: repo.name },
+					() =>
+						fetchOpenPullRequestsFromGh(this.execGh, {
+							owner: repo.owner,
+							name: repo.name,
+						}),
+					async () =>
+						fetchOpenPullRequests(await this.github(), {
+							owner: repo.owner,
+							name: repo.name,
+						}),
+					{ probe: options.bypassCache === true },
+				),
 		);
 	}
 
@@ -1377,6 +1443,7 @@ export class PullRequestRuntimeManager {
 		await Promise.all(
 			Array.from(latestByKey.values()).map(async (node) => {
 				try {
+					this.githubGate.assertReachable();
 					const [reviewDecision, checks] = await Promise.all([
 						fetchPullRequestReviewDecisionFromGh(
 							this.execGh,
@@ -1386,9 +1453,13 @@ export class PullRequestRuntimeManager {
 						),
 						fetchPullRequestChecksFromGh(this.execGh, repo, node.headRefOid),
 					]);
+					this.githubGate.recordSuccess();
 					reviewDecisionByNumber.set(node.number, reviewDecision);
 					checksByNumber.set(node.number, checks);
 				} catch (ghError) {
+					// A held gate or a transport failure: Octokit would hit the same
+					// network. Last-known review, checks, and queue state stand.
+					if (this.noteGitHubFailure(ghError)) return;
 					try {
 						const octokit = await getOctokit();
 						const [reviewDecision, checks] = await Promise.all([
@@ -1400,9 +1471,11 @@ export class PullRequestRuntimeManager {
 							),
 							fetchPullRequestChecks(octokit, repo, node.headRefOid),
 						]);
+						this.githubGate.recordSuccess();
 						reviewDecisionByNumber.set(node.number, reviewDecision);
 						checksByNumber.set(node.number, checks);
 					} catch (error) {
+						this.noteGitHubFailure(error);
 						console.warn(
 							"[host-service:pull-request-runtime] Failed to fetch PR review/check state",
 							{
@@ -1423,6 +1496,7 @@ export class PullRequestRuntimeManager {
 				// review/checks fetch above would let that failure stale their data.
 				if (node.state !== "OPEN" || node.isDraft) return;
 				try {
+					this.githubGate.assertReachable();
 					mergeQueueByNumber.set(
 						node.number,
 						await fetchPullRequestMergeQueueStateFromGh(
@@ -1431,7 +1505,9 @@ export class PullRequestRuntimeManager {
 							node.number,
 						),
 					);
+					this.githubGate.recordSuccess();
 				} catch (ghError) {
+					if (this.noteGitHubFailure(ghError)) return;
 					try {
 						mergeQueueByNumber.set(
 							node.number,
@@ -1441,7 +1517,9 @@ export class PullRequestRuntimeManager {
 								node.number,
 							),
 						);
+						this.githubGate.recordSuccess();
 					} catch (error) {
+						this.noteGitHubFailure(error);
 						console.warn(
 							"[host-service:pull-request-runtime] Failed to fetch PR merge-queue state",
 							{
