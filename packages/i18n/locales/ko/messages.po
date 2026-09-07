@@ -90,6 +90,9 @@ msgstr "(비활성화됨)"
 msgid "(external)"
 msgstr "(외부)"
 
+msgid "(no output)"
+msgstr "(출력 없음)"
+
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
 msgstr "{0, plural, one {활성 포트 #개 — 세부 정보 숨기기} other {활성 포트 #개 — 세부 정보 숨기기}}"
@@ -198,6 +201,10 @@ msgstr "{0, plural, one {세션 #개 실행 중} other {세션 #개 실행 중}}
 #. placeholder {0}: summary.skipped
 msgid "{0, plural, one {# skipped} other {# skipped}}"
 msgstr "{0, plural, one {#개 건너뜀} other {#개 건너뜀}}"
+
+#. placeholder {0}: subagents.length
+msgid "{0, plural, one {# subagent} other {# subagents}}"
+msgstr "{0, plural, other {서브 에이전트 #개}}"
 
 #. placeholder {0}: TASKS.length
 msgid "{0, plural, one {# task} other {# tasks}}"
@@ -835,6 +842,9 @@ msgstr "{skipped, plural, one {#개 건너뜀} other {#개 건너뜀}}"
 
 msgid "{starCount} stars and counting"
 msgstr "스타 {starCount}개, 계속 늘어나는 중"
+
+msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
+msgstr "{subagentCount, plural, other {서브 에이전트 #개 실행 중}}"
 
 msgid "{successCount, plural, one {Created # workspace, {failCount} failed} other {Created # workspaces, {failCount} failed}}"
 msgstr "{successCount, plural, one {워크스페이스 #개를 만들었고 {failCount}개는 실패했습니다} other {워크스페이스 #개를 만들었고 {failCount}개는 실패했습니다}}"
@@ -6200,6 +6210,9 @@ msgstr "Finder"
 msgid "Finish review"
 msgstr "리뷰 마치기"
 
+msgid "Finished"
+msgstr "완료"
+
 msgid "finished · worked for 7s"
 msgstr "완료 · 7초 작업"
 
@@ -9509,6 +9522,9 @@ msgstr "{0} 웹사이트 열기"
 
 msgid "Open {filePath}"
 msgstr "{filePath} 열기"
+
+msgid "Open {parentLabel}"
+msgstr "{parentLabel} 열기"
 
 msgid "Open {path} in file pane"
 msgstr "파일 패널에서 {path} 열기"
@@ -13266,6 +13282,12 @@ msgstr "구조, 스크롤, 오버플로 처리"
 msgid "Structured progress: chain of thought, tasks, plans"
 msgstr "구조화된 진행 상황: 생각의 흐름, 작업, 계획"
 
+msgid "Subagent"
+msgstr "서브 에이전트"
+
+msgid "Subagents"
+msgstr "서브 에이전트"
+
 msgid "Subject contains..."
 msgstr "제목에 포함..."
 
@@ -14126,6 +14148,9 @@ msgstr "워크스페이스를 만들 때 이 명령이 자동으로 실행됩니
 msgid "These ports are still in use"
 msgstr "이 포트들은 아직 사용 중입니다"
 
+msgid "Thinking"
+msgstr "생각"
+
 msgid "Thinking about the approach"
 msgstr "접근 방식을 생각하는 중"
 
@@ -14308,6 +14333,9 @@ msgstr "이미 사용 중인 슬러그입니다"
 
 msgid "This stops every Teams trigger in your organization and removes the notification subscriptions from your tenant. You can reconnect at any time."
 msgstr "조직의 모든 Teams 트리거가 중지되고 테넌트에서 알림 구독이 제거됩니다. 언제든지 다시 연결할 수 있습니다."
+
+msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
+msgstr "이 서브 에이전트는 더 이상 호스트에서 추적되지 않습니다. 기록은 에이전트의 세션 디렉터리에 디스크로 남아 있습니다."
 
 msgid "This terminal has no output to hand over yet."
 msgstr "이 터미널에는 아직 넘길 출력이 없습니다."
@@ -15224,6 +15252,9 @@ msgstr "리뷰 대기 중"
 
 msgid "Waiting for sign-in…"
 msgstr "로그인 대기 중…"
+
+msgid "Waiting for the subagent's first message…"
+msgstr "서브 에이전트의 첫 메시지를 기다리는 중…"
 
 msgid "Waitlist signups"
 msgstr "대기자 명단 가입"

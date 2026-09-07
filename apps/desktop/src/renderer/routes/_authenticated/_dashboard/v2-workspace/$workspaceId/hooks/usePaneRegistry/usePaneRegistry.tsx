@@ -23,6 +23,7 @@ import { useFeatureFlagEnabled } from "posthog-js/react";
 import { useCallback, useMemo } from "react";
 import {
 	LuArrowDownToLine,
+	LuBot,
 	LuClipboard,
 	LuClipboardCopy,
 	LuEraser,
@@ -49,17 +50,20 @@ import {
 	getDocument,
 	useSharedFileDocument,
 } from "../../state/fileDocumentStore";
-import type {
-	BrowserPaneData,
-	ChatV3PaneData,
-	CommentPaneData,
-	DevtoolsPaneData,
-	FilePaneData,
-	PagePaneData,
-	PaneViewerData,
-	TerminalPaneData,
+import {
+	type BrowserPaneData,
+	type ChatV3PaneData,
+	type CommentPaneData,
+	type DevtoolsPaneData,
+	type FilePaneData,
+	type PagePaneData,
+	type PaneViewerData,
+	SUBAGENT_PANE_KIND,
+	type SubagentPaneData,
+	type TerminalPaneData,
 } from "../../types";
 import { focusOrAddTerminalPane } from "../../utils/focusTerminalPane";
+import { openSubagentPaneInStore } from "../../utils/openSubagentPaneInStore";
 import type { TerminalLauncher } from "../useV2TerminalLauncher";
 import { BrowserPane, BrowserPaneToolbar } from "./components/BrowserPane";
 import { ChatV3Pane } from "./components/ChatV3Pane";
@@ -74,6 +78,7 @@ import { FilePaneHeaderExtras } from "./components/FilePane/components/FilePaneH
 import { PagePane } from "./components/PagePane";
 import { PagePaneHeaderExtras } from "./components/PagePaneHeaderExtras";
 import { PagePaneTitle } from "./components/PagePaneTitle";
+import { SubagentPane } from "./components/SubagentPane";
 import { TerminalPane } from "./components/TerminalPane";
 import { TerminalPaneHeaderExtras } from "./components/TerminalPane/components/TerminalPaneHeaderExtras";
 import { TerminalPaneIcon } from "./components/TerminalPane/components/TerminalPaneIcon";
@@ -464,6 +469,9 @@ export function usePaneRegistry({
 							terminalId={terminalId}
 							terminalInstanceId={ctx.pane.id}
 							onCreateNewAgentSession={createNewAgentSession}
+							onOpenSubagent={(data) =>
+								openSubagentPaneInStore(ctx.store, data)
+							}
 						/>
 					);
 				},
@@ -770,6 +778,25 @@ export function usePaneRegistry({
 								}
 							: d,
 					),
+			},
+			[SUBAGENT_PANE_KIND]: {
+				getIcon: () => <LuBot className="size-3.5" />,
+				getTitle: (pane) => {
+					const { agentType } = pane.data as SubagentPaneData;
+					const label = t({ message: "Subagent" });
+					return agentType ? `${label} · ${agentType}` : label;
+				},
+				renderPane: (ctx: RendererContext<PaneViewerData>) => (
+					<SubagentPane
+						data={ctx.pane.data as SubagentPaneData}
+						onOpenParent={() =>
+							focusOrAddTerminalPane(
+								ctx.store,
+								(ctx.pane.data as SubagentPaneData).terminalId,
+							)
+						}
+					/>
+				),
 			},
 			...(isPagesEnabled
 				? {

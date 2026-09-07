@@ -90,6 +90,9 @@ msgstr "（已停用）"
 msgid "(external)"
 msgstr "（外部）"
 
+msgid "(no output)"
+msgstr "（無輸出）"
+
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
 msgstr "{0, plural, one {#個活動埠 — 隱藏詳情} other {#個活動埠 — 隱藏詳情}}"
@@ -198,6 +201,10 @@ msgstr "{0, plural, one {#個會話執行中} other {#個會話執行中}}"
 #. placeholder {0}: summary.skipped
 msgid "{0, plural, one {# skipped} other {# skipped}}"
 msgstr "{0, plural, one {#項已跳過} other {#項已跳過}}"
+
+#. placeholder {0}: subagents.length
+msgid "{0, plural, one {# subagent} other {# subagents}}"
+msgstr "{0, plural, other {# 個子代理程式}}"
 
 #. placeholder {0}: TASKS.length
 msgid "{0, plural, one {# task} other {# tasks}}"
@@ -835,6 +842,9 @@ msgstr "{skipped, plural, one {#項已跳過} other {#項已跳過}}"
 
 msgid "{starCount} stars and counting"
 msgstr "{starCount}個星標，還在成長"
+
+msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
+msgstr "{subagentCount, plural, other {# 個子代理程式執行中}}"
 
 msgid "{successCount, plural, one {Created # workspace, {failCount} failed} other {Created # workspaces, {failCount} failed}}"
 msgstr "{successCount, plural, one {已建立#個工作區，{failCount}個失敗} other {已建立#個工作區，{failCount}個失敗}}"
@@ -6200,6 +6210,9 @@ msgstr "Finder"
 msgid "Finish review"
 msgstr "完成審查"
 
+msgid "Finished"
+msgstr "已完成"
+
 msgid "finished · worked for 7s"
 msgstr "已完成 · 用時7秒"
 
@@ -9509,6 +9522,9 @@ msgstr "開啟 {0} 官網"
 
 msgid "Open {filePath}"
 msgstr "開啟{filePath}"
+
+msgid "Open {parentLabel}"
+msgstr "開啟 {parentLabel}"
 
 msgid "Open {path} in file pane"
 msgstr "在檔案面板中開啟{path}"
@@ -13266,6 +13282,12 @@ msgstr "結構、滾動與溢位處理"
 msgid "Structured progress: chain of thought, tasks, plans"
 msgstr "結構化進度：思維鏈、任務、計劃"
 
+msgid "Subagent"
+msgstr "子代理程式"
+
+msgid "Subagents"
+msgstr "子代理程式"
+
 msgid "Subject contains..."
 msgstr "主題包含..."
 
@@ -14126,6 +14148,9 @@ msgstr "建立工作區時會自動執行這些命令。<0>閱讀文件<1/></0>"
 msgid "These ports are still in use"
 msgstr "這些埠仍在使用中"
 
+msgid "Thinking"
+msgstr "思考"
+
 msgid "Thinking about the approach"
 msgstr "正在思考實現方式"
 
@@ -14308,6 +14333,9 @@ msgstr "此slug已被佔用"
 
 msgid "This stops every Teams trigger in your organization and removes the notification subscriptions from your tenant. You can reconnect at any time."
 msgstr "這會停止你組織中所有的Teams觸發器，並從你的租戶中移除通知訂閱。你可以隨時重新連線。"
+
+msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
+msgstr "主機已不再追蹤此子代理程式。其逐字稿仍保留在磁碟上的代理程式工作階段目錄中。"
 
 msgid "This terminal has no output to hand over yet."
 msgstr "這個終端還沒有可交接的輸出。"
@@ -15224,6 +15252,9 @@ msgstr "等待審查"
 
 msgid "Waiting for sign-in…"
 msgstr "等待登入…"
+
+msgid "Waiting for the subagent's first message…"
+msgstr "正在等待子代理程式的第一則訊息…"
 
 msgid "Waitlist signups"
 msgstr "候補名單註冊"

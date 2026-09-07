@@ -90,6 +90,9 @@ msgstr "(vypnuto)"
 msgid "(external)"
 msgstr "(externí)"
 
+msgid "(no output)"
+msgstr "(žádný výstup)"
+
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
 msgstr "{0, plural, one {# aktivní port — skrýt podrobnosti} few {# aktivní porty — skrýt podrobnosti} many {# aktivního portu — skrýt podrobnosti} other {# aktivních portů — skrýt podrobnosti}}"
@@ -198,6 +201,10 @@ msgstr "{0, plural, one {běží # relace} few {běží # relace} many {běží 
 #. placeholder {0}: summary.skipped
 msgid "{0, plural, one {# skipped} other {# skipped}}"
 msgstr "{0, plural, one {# přeskočeno} few {# přeskočeno} many {# přeskočeno} other {# přeskočeno}}"
+
+#. placeholder {0}: subagents.length
+msgid "{0, plural, one {# subagent} other {# subagents}}"
+msgstr "{0, plural, one {# subagent} few {# subagenti} many {# subagenta} other {# subagentů}}"
 
 #. placeholder {0}: TASKS.length
 msgid "{0, plural, one {# task} other {# tasks}}"
@@ -835,6 +842,9 @@ msgstr "{skipped, plural, one {# přeskočeno} few {# přeskočeno} many {# pře
 
 msgid "{starCount} stars and counting"
 msgstr "{starCount} hvězd a přibývá"
+
+msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
+msgstr "{subagentCount, plural, one {# subagent běží} few {# subagenti běží} many {# subagenta běží} other {# subagentů běží}}"
 
 msgid "{successCount, plural, one {Created # workspace, {failCount} failed} other {Created # workspaces, {failCount} failed}}"
 msgstr "{successCount, plural, one {Vytvořen # pracovní prostor, {failCount} selhalo} few {Vytvořeny # pracovní prostory, {failCount} selhalo} many {Vytvořeno # pracovního prostoru, {failCount} selhalo} other {Vytvořeno # pracovních prostorů, {failCount} selhalo}}"
@@ -6200,6 +6210,9 @@ msgstr "Finder"
 msgid "Finish review"
 msgstr "Dokončit revizi"
 
+msgid "Finished"
+msgstr "Dokončeno"
+
 msgid "finished · worked for 7s"
 msgstr "hotovo · pracoval 7 s"
 
@@ -9509,6 +9522,9 @@ msgstr "Otevřít web {0}"
 
 msgid "Open {filePath}"
 msgstr "Otevřít {filePath}"
+
+msgid "Open {parentLabel}"
+msgstr "Otevřít {parentLabel}"
 
 msgid "Open {path} in file pane"
 msgstr "Otevřít {path} v panelu souboru"
@@ -13266,6 +13282,12 @@ msgstr "Struktura, posuv a práce s přetečením"
 msgid "Structured progress: chain of thought, tasks, plans"
 msgstr "Strukturovaný postup: řetězec úvah, úkoly, plány"
 
+msgid "Subagent"
+msgstr "Subagent"
+
+msgid "Subagents"
+msgstr "Subagenti"
+
 msgid "Subject contains..."
 msgstr "Předmět obsahuje..."
 
@@ -14126,6 +14148,9 @@ msgstr "Tyto příkazy se spustí automaticky při vytvoření pracovního prost
 msgid "These ports are still in use"
 msgstr "Tyto porty se stále používají"
 
+msgid "Thinking"
+msgstr "Uvažování"
+
 msgid "Thinking about the approach"
 msgstr "Přemýšlím o postupu"
 
@@ -14308,6 +14333,9 @@ msgstr "Tento slug je již obsazený"
 
 msgid "This stops every Teams trigger in your organization and removes the notification subscriptions from your tenant. You can reconnect at any time."
 msgstr "Tím se zastaví všechny spouštěče Teams ve vaší organizaci a z tenantu se odeberou odběry oznámení. Kdykoli se můžete připojit znovu."
+
+msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
+msgstr "Tento subagent už není hostitelem sledován. Jeho přepis zůstává na disku v adresáři relace agenta."
 
 msgid "This terminal has no output to hand over yet."
 msgstr "Tento terminál zatím nemá žádný výstup k předání."
@@ -15224,6 +15252,9 @@ msgstr "Čeká na revizi"
 
 msgid "Waiting for sign-in…"
 msgstr "Čeká se na přihlášení…"
+
+msgid "Waiting for the subagent's first message…"
+msgstr "Čekání na první zprávu subagenta…"
 
 msgid "Waitlist signups"
 msgstr "Zápisy na čekací listinu"

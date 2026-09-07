@@ -90,6 +90,9 @@ msgstr "(uitgeschakeld)"
 msgid "(external)"
 msgstr "(extern)"
 
+msgid "(no output)"
+msgstr "(geen uitvoer)"
+
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
 msgstr "{0, plural, one {# actieve poort — details verbergen} other {# actieve poorten — details verbergen}}"
@@ -198,6 +201,10 @@ msgstr "{0, plural, one {# sessie actief} other {# sessies actief}}"
 #. placeholder {0}: summary.skipped
 msgid "{0, plural, one {# skipped} other {# skipped}}"
 msgstr "{0, plural, one {# overgeslagen} other {# overgeslagen}}"
+
+#. placeholder {0}: subagents.length
+msgid "{0, plural, one {# subagent} other {# subagents}}"
+msgstr "{0, plural, one {# subagent} other {# subagents}}"
 
 #. placeholder {0}: TASKS.length
 msgid "{0, plural, one {# task} other {# tasks}}"
@@ -835,6 +842,9 @@ msgstr "{skipped, plural, one {# overgeslagen} other {# overgeslagen}}"
 
 msgid "{starCount} stars and counting"
 msgstr "{starCount} sterren en het worden er meer"
+
+msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
+msgstr "{subagentCount, plural, one {# subagent actief} other {# subagents actief}}"
 
 msgid "{successCount, plural, one {Created # workspace, {failCount} failed} other {Created # workspaces, {failCount} failed}}"
 msgstr "{successCount, plural, one {# werkruimte aangemaakt, {failCount} mislukt} other {# werkruimtes aangemaakt, {failCount} mislukt}}"
@@ -6200,6 +6210,9 @@ msgstr "Finder"
 msgid "Finish review"
 msgstr "Review afronden"
 
+msgid "Finished"
+msgstr "Voltooid"
+
 msgid "finished · worked for 7s"
 msgstr "klaar · 7s gewerkt"
 
@@ -9509,6 +9522,9 @@ msgstr "Website van {0} openen"
 
 msgid "Open {filePath}"
 msgstr "{filePath} openen"
+
+msgid "Open {parentLabel}"
+msgstr "{parentLabel} openen"
 
 msgid "Open {path} in file pane"
 msgstr "{path} openen in bestandspaneel"
@@ -13266,6 +13282,12 @@ msgstr "Structuur, scrollen en overflow-afhandeling"
 msgid "Structured progress: chain of thought, tasks, plans"
 msgstr "Gestructureerde voortgang: gedachtegang, taken, plannen"
 
+msgid "Subagent"
+msgstr "Subagent"
+
+msgid "Subagents"
+msgstr "Subagents"
+
 msgid "Subject contains..."
 msgstr "Onderwerp bevat..."
 
@@ -14126,6 +14148,9 @@ msgstr "Deze commando's draaien automatisch wanneer een werkruimte wordt aangema
 msgid "These ports are still in use"
 msgstr "Deze poorten zijn nog in gebruik"
 
+msgid "Thinking"
+msgstr "Redenering"
+
 msgid "Thinking about the approach"
 msgstr "Nadenken over de aanpak"
 
@@ -14308,6 +14333,9 @@ msgstr "Deze slug is al bezet"
 
 msgid "This stops every Teams trigger in your organization and removes the notification subscriptions from your tenant. You can reconnect at any time."
 msgstr "Hiermee stoppen alle Teams-triggers in je organisatie en worden de meldingsabonnementen uit je tenant verwijderd. Je kunt op elk moment opnieuw verbinden."
+
+msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
+msgstr "Deze subagent wordt niet meer gevolgd door de host. Het transcript blijft op schijf in de sessiemap van de agent."
 
 msgid "This terminal has no output to hand over yet."
 msgstr "Deze terminal heeft nog geen uitvoer om over te dragen."
@@ -15224,6 +15252,9 @@ msgstr "Wachten op review"
 
 msgid "Waiting for sign-in…"
 msgstr "Wachten op login…"
+
+msgid "Waiting for the subagent's first message…"
+msgstr "Wachten op het eerste bericht van de subagent…"
 
 msgid "Waitlist signups"
 msgstr "Wachtlijstaanmeldingen"

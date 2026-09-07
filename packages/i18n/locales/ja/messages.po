@@ -90,6 +90,9 @@ msgstr "(無効)"
 msgid "(external)"
 msgstr "(外部)"
 
+msgid "(no output)"
+msgstr "（出力なし）"
+
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
 msgstr "{0, plural, one {#個のアクティブなポート — 詳細を隠す} other {#個のアクティブなポート — 詳細を隠す}}"
@@ -198,6 +201,10 @@ msgstr "{0, plural, one {#件のセッションが実行中} other {#件のセ�
 #. placeholder {0}: summary.skipped
 msgid "{0, plural, one {# skipped} other {# skipped}}"
 msgstr "{0, plural, one {#件スキップ} other {#件スキップ}}"
+
+#. placeholder {0}: subagents.length
+msgid "{0, plural, one {# subagent} other {# subagents}}"
+msgstr "{0, plural, other {サブエージェント # 件}}"
 
 #. placeholder {0}: TASKS.length
 msgid "{0, plural, one {# task} other {# tasks}}"
@@ -835,6 +842,9 @@ msgstr "{skipped, plural, one {#件スキップ} other {#件スキップ}}"
 
 msgid "{starCount} stars and counting"
 msgstr "スター{starCount}件、まだ増えています"
+
+msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
+msgstr "{subagentCount, plural, other {# 件のサブエージェントが実行中}}"
 
 msgid "{successCount, plural, one {Created # workspace, {failCount} failed} other {Created # workspaces, {failCount} failed}}"
 msgstr "{successCount, plural, one {#件のワークスペースを作成、{failCount}件失敗} other {#件のワークスペースを作成、{failCount}件失敗}}"
@@ -6200,6 +6210,9 @@ msgstr "Finder"
 msgid "Finish review"
 msgstr "レビューを完了"
 
+msgid "Finished"
+msgstr "完了"
+
 msgid "finished · worked for 7s"
 msgstr "完了 · 7秒稼働"
 
@@ -9509,6 +9522,9 @@ msgstr "{0} のウェブサイトを開く"
 
 msgid "Open {filePath}"
 msgstr "{filePath}を開く"
+
+msgid "Open {parentLabel}"
+msgstr "{parentLabel}を開く"
 
 msgid "Open {path} in file pane"
 msgstr "{path}をファイルペインで開く"
@@ -13266,6 +13282,12 @@ msgstr "構造、スクロール、オーバーフローの処理"
 msgid "Structured progress: chain of thought, tasks, plans"
 msgstr "構造化された進捗: 思考の連鎖、タスク、計画"
 
+msgid "Subagent"
+msgstr "サブエージェント"
+
+msgid "Subagents"
+msgstr "サブエージェント"
+
 msgid "Subject contains..."
 msgstr "件名に含む..."
 
@@ -14126,6 +14148,9 @@ msgstr "これらのコマンドはワークスペース作成時に自動的に
 msgid "These ports are still in use"
 msgstr "これらのポートはまだ使用中です"
 
+msgid "Thinking"
+msgstr "思考"
+
 msgid "Thinking about the approach"
 msgstr "進め方を検討中"
 
@@ -14308,6 +14333,9 @@ msgstr "このスラッグは使用済みです"
 
 msgid "This stops every Teams trigger in your organization and removes the notification subscriptions from your tenant. You can reconnect at any time."
 msgstr "組織内のすべてのTeamsトリガーが停止し、テナントから通知サブスクリプションが削除されます。いつでも再接続できます。"
+
+msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
+msgstr "このサブエージェントはホストで追跡されなくなりました。トランスクリプトはエージェントのセッションディレクトリにディスク上で残ります。"
 
 msgid "This terminal has no output to hand over yet."
 msgstr "このターミナルには引き継げる出力がまだありません。"
@@ -15224,6 +15252,9 @@ msgstr "レビューを待機中"
 
 msgid "Waiting for sign-in…"
 msgstr "サインインを待機中…"
+
+msgid "Waiting for the subagent's first message…"
+msgstr "サブエージェントの最初のメッセージを待っています…"
 
 msgid "Waitlist signups"
 msgstr "ウェイトリスト登録"

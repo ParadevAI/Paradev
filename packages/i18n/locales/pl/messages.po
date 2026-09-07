@@ -90,6 +90,9 @@ msgstr "(wyłączona)"
 msgid "(external)"
 msgstr "(zewnętrzny)"
 
+msgid "(no output)"
+msgstr "(brak wyniku)"
+
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
 msgstr "{0, plural, one {# aktywny port — ukryj szczegóły} few {# aktywne porty — ukryj szczegóły} many {# aktywnych portów — ukryj szczegóły} other {# aktywnego portu — ukryj szczegóły}}"
@@ -198,6 +201,10 @@ msgstr "{0, plural, one {# sesja działa} few {# sesje działają} many {# sesji
 #. placeholder {0}: summary.skipped
 msgid "{0, plural, one {# skipped} other {# skipped}}"
 msgstr "{0, plural, one {# pominięty} few {# pominięte} many {# pominiętych} other {# pominiętego}}"
+
+#. placeholder {0}: subagents.length
+msgid "{0, plural, one {# subagent} other {# subagents}}"
+msgstr "{0, plural, one {# subagent} few {# subagenty} many {# subagentów} other {# subagenta}}"
 
 #. placeholder {0}: TASKS.length
 msgid "{0, plural, one {# task} other {# tasks}}"
@@ -835,6 +842,9 @@ msgstr "{skipped, plural, one {# pominięty} few {# pominięte} many {# pominię
 
 msgid "{starCount} stars and counting"
 msgstr "{starCount} gwiazdek i rośnie"
+
+msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
+msgstr "{subagentCount, plural, one {# subagent działa} few {# subagenty działają} many {# subagentów działa} other {# subagenta działa}}"
 
 msgid "{successCount, plural, one {Created # workspace, {failCount} failed} other {Created # workspaces, {failCount} failed}}"
 msgstr "{successCount, plural, one {Utworzono # obszar roboczy, {failCount} nieudanych} few {Utworzono # obszary robocze, {failCount} nieudanych} many {Utworzono # obszarów roboczych, {failCount} nieudanych} other {Utworzono # obszaru roboczego, {failCount} nieudanych}}"
@@ -6200,6 +6210,9 @@ msgstr "Finder"
 msgid "Finish review"
 msgstr "Zakończ przegląd"
 
+msgid "Finished"
+msgstr "Zakończono"
+
 msgid "finished · worked for 7s"
 msgstr "zakończono · pracował 7 s"
 
@@ -9509,6 +9522,9 @@ msgstr "Otwórz stronę {0}"
 
 msgid "Open {filePath}"
 msgstr "Otwórz {filePath}"
+
+msgid "Open {parentLabel}"
+msgstr "Otwórz {parentLabel}"
 
 msgid "Open {path} in file pane"
 msgstr "Otwórz {path} w panelu plików"
@@ -13266,6 +13282,12 @@ msgstr "Struktura, przewijanie i obsługa przepełnienia"
 msgid "Structured progress: chain of thought, tasks, plans"
 msgstr "Ustrukturyzowany postęp: tok rozumowania, zadania, plany"
 
+msgid "Subagent"
+msgstr "Subagent"
+
+msgid "Subagents"
+msgstr "Subagenci"
+
 msgid "Subject contains..."
 msgstr "Temat zawiera..."
 
@@ -14126,6 +14148,9 @@ msgstr "Te polecenia uruchamiają się automatycznie przy tworzeniu obszaru robo
 msgid "These ports are still in use"
 msgstr "Te porty są nadal używane"
 
+msgid "Thinking"
+msgstr "Rozumowanie"
+
 msgid "Thinking about the approach"
 msgstr "Myślenie nad podejściem"
 
@@ -14308,6 +14333,9 @@ msgstr "Ten slug jest już zajęty"
 
 msgid "This stops every Teams trigger in your organization and removes the notification subscriptions from your tenant. You can reconnect at any time."
 msgstr "Zatrzyma to wszystkie wyzwalacze Teams w Twojej organizacji i usunie subskrypcje powiadomień z tenanta. Możesz połączyć ponownie w dowolnej chwili."
+
+msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
+msgstr "Ten subagent nie jest już śledzony przez hosta. Jego zapis pozostaje na dysku w katalogu sesji agenta."
 
 msgid "This terminal has no output to hand over yet."
 msgstr "Ten terminal nie ma jeszcze danych do przekazania."
@@ -15224,6 +15252,9 @@ msgstr "Oczekiwanie na przegląd"
 
 msgid "Waiting for sign-in…"
 msgstr "Oczekiwanie na logowanie…"
+
+msgid "Waiting for the subagent's first message…"
+msgstr "Oczekiwanie na pierwszą wiadomość subagenta…"
 
 msgid "Waitlist signups"
 msgstr "Zapisy na listę oczekujących"

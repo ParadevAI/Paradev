@@ -90,6 +90,9 @@ msgstr "(đã tắt)"
 msgid "(external)"
 msgstr "(bên ngoài)"
 
+msgid "(no output)"
+msgstr "(không có đầu ra)"
+
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
 msgstr "{0, plural, one {# cổng đang hoạt động — ẩn chi tiết} other {# cổng đang hoạt động — ẩn chi tiết}}"
@@ -198,6 +201,10 @@ msgstr "{0, plural, one {# phiên đang chạy} other {# phiên đang chạy}}"
 #. placeholder {0}: summary.skipped
 msgid "{0, plural, one {# skipped} other {# skipped}}"
 msgstr "{0, plural, one {# bỏ qua} other {# bỏ qua}}"
+
+#. placeholder {0}: subagents.length
+msgid "{0, plural, one {# subagent} other {# subagents}}"
+msgstr "{0, plural, other {# agent con}}"
 
 #. placeholder {0}: TASKS.length
 msgid "{0, plural, one {# task} other {# tasks}}"
@@ -835,6 +842,9 @@ msgstr "{skipped, plural, one {# bỏ qua} other {# bỏ qua}}"
 
 msgid "{starCount} stars and counting"
 msgstr "{starCount} star và còn tăng"
+
+msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
+msgstr "{subagentCount, plural, other {# agent con đang chạy}}"
 
 msgid "{successCount, plural, one {Created # workspace, {failCount} failed} other {Created # workspaces, {failCount} failed}}"
 msgstr "{successCount, plural, one {Đã tạo # workspace, {failCount} thất bại} other {Đã tạo # workspace, {failCount} thất bại}}"
@@ -6200,6 +6210,9 @@ msgstr "Finder"
 msgid "Finish review"
 msgstr "Hoàn tất review"
 
+msgid "Finished"
+msgstr "Đã xong"
+
 msgid "finished · worked for 7s"
 msgstr "đã xong · làm trong 7s"
 
@@ -9509,6 +9522,9 @@ msgstr "Mở website {0}"
 
 msgid "Open {filePath}"
 msgstr "Mở {filePath}"
+
+msgid "Open {parentLabel}"
+msgstr "Mở {parentLabel}"
 
 msgid "Open {path} in file pane"
 msgstr "Mở {path} trong khung tệp"
@@ -13266,6 +13282,12 @@ msgstr "Cấu trúc, cuộn và xử lý tràn nội dung"
 msgid "Structured progress: chain of thought, tasks, plans"
 msgstr "Tiến độ có cấu trúc: chuỗi suy luận, tác vụ, kế hoạch"
 
+msgid "Subagent"
+msgstr "Agent con"
+
+msgid "Subagents"
+msgstr "Agent con"
+
 msgid "Subject contains..."
 msgstr "Tiêu đề chứa..."
 
@@ -14126,6 +14148,9 @@ msgstr "Các lệnh này chạy tự động khi một workspace được tạo.
 msgid "These ports are still in use"
 msgstr "Các cổng này vẫn đang được dùng"
 
+msgid "Thinking"
+msgstr "Suy luận"
+
 msgid "Thinking about the approach"
 msgstr "Đang nghĩ về hướng tiếp cận"
 
@@ -14308,6 +14333,9 @@ msgstr "Slug này đã có người dùng"
 
 msgid "This stops every Teams trigger in your organization and removes the notification subscriptions from your tenant. You can reconnect at any time."
 msgstr "Thao tác này dừng mọi trigger Teams trong tổ chức của bạn và gỡ các đăng ký thông báo khỏi tenant. Bạn có thể kết nối lại bất cứ lúc nào."
+
+msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
+msgstr "Máy chủ không còn theo dõi agent con này. Bản ghi vẫn nằm trên đĩa trong thư mục phiên của agent."
 
 msgid "This terminal has no output to hand over yet."
 msgstr "Terminal này chưa có kết quả nào để bàn giao."
@@ -15224,6 +15252,9 @@ msgstr "Đang chờ review"
 
 msgid "Waiting for sign-in…"
 msgstr "Đang chờ đăng nhập…"
+
+msgid "Waiting for the subagent's first message…"
+msgstr "Đang chờ tin nhắn đầu tiên của agent con…"
 
 msgid "Waitlist signups"
 msgstr "Đăng ký danh sách chờ"
