@@ -3166,6 +3166,9 @@ msgstr "Zavřít náhled"
 msgid "Close pull request"
 msgstr "Zavřít pull request"
 
+msgid "Close Pull Request"
+msgstr "Zavřít pull request"
+
 msgid "Close review filter"
 msgstr "Zavřít filtr revizí"
 
@@ -9701,6 +9704,9 @@ msgstr "Otevřít na nové kartě"
 msgid "Open in PostHog"
 msgstr "Otevřít v PostHog"
 
+msgid "Open in Pull Requests"
+msgstr "Otevřít v Pull requestech"
+
 msgid "Open in Scira AI"
 msgstr "Otevřít v Scira AI"
 
@@ -10816,6 +10822,7 @@ msgstr "Zveřejňujete jako <0>{handle}</0>. Jen počty tokenů a názvy modelů
 msgid "Pull request"
 msgstr "Pull request"
 
+#. placeholder {0}: data.prNumber
 #. placeholder {0}: pullRequest.prNumber
 msgid "Pull request #{0}"
 msgstr "Pull request #{0}"

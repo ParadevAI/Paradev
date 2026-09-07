@@ -53,6 +53,11 @@ export interface CommentPaneData {
 	line?: number;
 }
 
+/** The workspace's linked PR, shown as its summary (description, checks, merge). */
+export interface PullRequestPaneData {
+	prNumber: number;
+}
+
 export interface PagePaneData {
 	slug: string;
 	pageId?: string;
@@ -88,6 +93,7 @@ export type PaneViewerData =
 	| DevtoolsPaneData
 	| DiffPaneData
 	| CommentPaneData
+	| PullRequestPaneData
 	| PagePaneData
 	| DesktopPaneData
 	| SubagentPaneData;

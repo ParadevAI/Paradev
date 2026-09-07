@@ -3166,6 +3166,9 @@ msgstr "プレビューを閉じる"
 msgid "Close pull request"
 msgstr "プルリクエストをクローズ"
 
+msgid "Close Pull Request"
+msgstr "プルリクエストを閉じる"
+
 msgid "Close review filter"
 msgstr "レビューフィルターを閉じる"
 
@@ -9701,6 +9704,9 @@ msgstr "新しいタブで開く"
 msgid "Open in PostHog"
 msgstr "PostHogで開く"
 
+msgid "Open in Pull Requests"
+msgstr "プルリクエスト画面で開く"
+
 msgid "Open in Scira AI"
 msgstr "Scira AIで開く"
 
@@ -10816,6 +10822,7 @@ msgstr "<0>{handle}</0>として公開中。トークン数とモデル名のみ
 msgid "Pull request"
 msgstr "プルリクエスト"
 
+#. placeholder {0}: data.prNumber
 #. placeholder {0}: pullRequest.prNumber
 msgid "Pull request #{0}"
 msgstr "プルリクエスト #{0}"

@@ -53,6 +53,7 @@ import { useDiffPaneTarget } from "./hooks/useDiffPaneTarget";
 import { usePagePaneIntentOpener } from "./hooks/usePagePaneIntentOpener";
 import { usePaneRegistry } from "./hooks/usePaneRegistry";
 import { renderBrowserTabIcon } from "./hooks/usePaneRegistry/components/BrowserPane";
+import { usePullRequestPaneIntentOpener } from "./hooks/usePullRequestPaneIntentOpener";
 import { useRunWorkspaceCreationPresets } from "./hooks/useRunWorkspaceCreationPresets";
 import { useShellInteractionPassthrough } from "./hooks/useShellInteractionPassthrough";
 import { useSlotElement } from "./hooks/useSlotElement";
@@ -236,6 +237,7 @@ function V2WorkspaceContent() {
 		toggleChangesPane,
 		openCommentPane,
 		openPagePane,
+		openPullRequestPane,
 	} = useWorkspacePaneOpeners({
 		store,
 		launcher,
@@ -260,6 +262,11 @@ function V2WorkspaceContent() {
 	);
 
 	usePagePaneIntentOpener({ workspaceId, isLayoutReady, openPagePane });
+	usePullRequestPaneIntentOpener({
+		workspaceId,
+		isLayoutReady,
+		openPullRequestPane,
+	});
 	const hostTarget = useWorkspaceHostTarget(workspaceId);
 	const isSandbox =
 		hostTarget.status === "ready" && hostTarget.kind === "sandbox";
@@ -443,6 +450,7 @@ function V2WorkspaceContent() {
 											workspaceId={workspaceId}
 											isChangesOpen={isChangesPaneOpen}
 											onToggleChanges={toggleChangesPane}
+											onOpenPullRequest={openPullRequestPane}
 										/>
 									)}
 									{/* Open-in must not depend on the right sidebar being open,
@@ -488,6 +496,7 @@ function V2WorkspaceContent() {
 								onSelectFile={openFilePaneFromTreeClick}
 								onSelectDiffFile={openDiffPane}
 								onOpenComment={openCommentPane}
+								onOpenPullRequest={openPullRequestPane}
 								onSearch={handleQuickOpen}
 								selectedFilePath={selectedFilePath}
 								selectedDiffTarget={diffPaneTarget}
