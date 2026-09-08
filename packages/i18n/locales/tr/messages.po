@@ -1240,6 +1240,9 @@ msgstr "Daveti kabul et"
 msgid "Accept terms"
 msgstr "Koşulları kabul et"
 
+msgid "Access denied"
+msgstr "Erişim reddedildi"
+
 msgid "Access your email address"
 msgstr "E-posta adresinize erişme"
 
