@@ -8,6 +8,7 @@ import { msg } from "@lingui/core/macro";
 import { i18n } from "@superset/i18n";
 import { organizations, settings } from "@superset/local-db";
 import { getHostId, getHostName } from "@superset/shared/host-info";
+import { HOST_INSTALL_SOURCE_ENV } from "@superset/shared/host-version";
 import { eq } from "drizzle-orm";
 import { app, dialog } from "electron";
 import log from "electron-log/main";
@@ -907,6 +908,15 @@ export class HostServiceCoordinator extends EventEmitter {
 				// Avoid a flashing CMD window on Windows.
 				windowsHide: true,
 			});
+			// ENOENT/EACCES arrive on the child asynchronously, even when the
+			// missing-pid check below has already rejected and cleaned up startup.
+			// Keep a listener attached so a failed launcher cannot crash Electron.
+			child.on("error", (error) => {
+				log.error(
+					`[host-service:${organizationId}] failed to launch host service`,
+					error,
+				);
+			});
 		} catch (error) {
 			logStream?.end();
 			throw error;
@@ -1004,6 +1014,10 @@ export class HostServiceCoordinator extends EventEmitter {
 			HOST_SERVICE_SECRET: secret,
 			HOST_SERVICE_PORT: String(port),
 			HOST_MANIFEST_DIR: organizationDir,
+			// This host-service lives inside the app bundle and only the app's
+			// auto-updater can replace it; the host-service reports that so a
+			// remote client never offers an in-place update for it.
+			[HOST_INSTALL_SOURCE_ENV]: "desktop",
 			HOST_DB_PATH: path.join(organizationDir, "host.db"),
 			HOST_MIGRATIONS_FOLDER: app.isPackaged
 				? path.join(process.resourcesPath, "resources/host-migrations")
