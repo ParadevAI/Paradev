@@ -18,8 +18,8 @@ import {
 	useTerminalAgentStatuses,
 } from "../useTerminalAgentStatuses";
 import {
-	type DockAttentionWorkspaceType,
 	countsTowardDockAttention,
+	type DockAttentionWorkspaceType,
 } from "./countsTowardDockAttention";
 
 const TERMINAL_PREFIX = "terminal:";
@@ -102,11 +102,11 @@ export function useV2AttentionWorkspaceCount(): number {
 	// biome-ignore lint/correctness/useExhaustiveDependencies: cacheVersion re-reads the query cache
 	return useMemo(() => {
 		const workspaceTypeById = new Map<string, DockAttentionWorkspaceType>();
-		const hostWorkspaceEntries = queryClient.getQueriesData<
-			HostWorkspaceRow[]
-		>({
-			queryKey: ["host-service", "workspaces", "list"],
-		});
+		const hostWorkspaceEntries = queryClient.getQueriesData<HostWorkspaceRow[]>(
+			{
+				queryKey: ["host-service", "workspaces", "list"],
+			},
+		);
 		for (const [, rows] of hostWorkspaceEntries) {
 			for (const row of rows ?? []) {
 				workspaceTypeById.set(row.id, row.type);
