@@ -19,9 +19,12 @@ export function countsTowardDockAttention({
 }): boolean {
 	if (status === "permission" || status === "failed") return true;
 	if (status === "review") {
-		// Unknown type stays counted (fail closed on missing cache); only an
-		// explicit session is excluded, matching deriveBoardColumn's
-		// `type !== "session"` gate.
+		// Unknown type stays counted: a row missing from the cache is treated
+		// as a checkout, never silently dropped. Rows from the IndexedDB
+		// snapshot before the live host list lands sit in component state, not
+		// the query cache, so a session can badge briefly after boot then drop
+		// once the live list arrives. Only an explicit session is excluded,
+		// matching deriveBoardColumn's `type !== "session"` gate.
 		return workspaceType !== "session";
 	}
 	return false;

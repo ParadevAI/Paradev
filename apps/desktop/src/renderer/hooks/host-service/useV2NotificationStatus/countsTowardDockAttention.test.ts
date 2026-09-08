@@ -56,7 +56,7 @@ describe("countsTowardDockAttention", () => {
 		).toBe(false);
 	});
 
-	it("counts review when workspace type is unknown (fail closed)", () => {
+	it("counts review when the workspace type is not cached yet", () => {
 		expect(
 			countsTowardDockAttention({
 				status: "review",

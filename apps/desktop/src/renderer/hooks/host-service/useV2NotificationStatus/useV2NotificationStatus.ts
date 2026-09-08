@@ -92,7 +92,9 @@ export function useV2AttentionWorkspaceCount(): number {
 			const key0 = event.query.queryKey[0];
 			if (
 				key0 === "terminal-agent-bindings" ||
-				(key0 === "host-service" && event.query.queryKey[1] === "workspaces")
+				(key0 === "host-service" &&
+					event.query.queryKey[1] === "workspaces" &&
+					event.query.queryKey[2] === "list")
 			) {
 				setCacheVersion((version) => version + 1);
 			}
