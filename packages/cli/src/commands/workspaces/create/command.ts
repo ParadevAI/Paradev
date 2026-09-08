@@ -213,7 +213,12 @@ export default command({
 		});
 
 		if (options.agent) {
-			requireAgentsLaunched(result.agents, result.workspace.id, options.agent, target.hostId);
+			requireAgentsLaunched(
+				result.agents,
+				result.workspace.id,
+				options.agent,
+				target.hostId,
+			);
 		}
 
 		return {

@@ -169,7 +169,9 @@ describe("workspaces create", () => {
 			prompt: "Implement the feature",
 		}).catch((err: Error & { suggestion?: string }) => err);
 
-		expect((error as { suggestion?: string }).suggestion).toContain("--host host-1");
+		expect((error as { suggestion?: string }).suggestion).toContain(
+			"--host host-1",
+		);
 	});
 
 	test("reports every failed launch, not just the first", async () => {
