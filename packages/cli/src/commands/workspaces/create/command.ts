@@ -3,6 +3,29 @@ import { command } from "../../../lib/command";
 import { requireHostTarget, resolveHostTarget } from "../../../lib/host-target";
 import { uploadAttachments } from "../../../lib/upload-attachments";
 
+/**
+ * The host keeps the workspace when a requested agent fails to spawn: the
+ * launch outcome comes back per entry in `agents[]` instead of throwing. A
+ * caller that passed --agent asked for work to start, so a spawn failure is
+ * a failed create — exit non-zero instead of printing "Created workspace …"
+ * over an empty worktree (#5767).
+ */
+function requireAgentsLaunched(
+	agents: readonly { ok: boolean; error?: string }[] | undefined,
+	workspaceId: string,
+	agentId: string,
+): void {
+	const errors = (agents ?? [])
+		.filter((agent) => !agent.ok)
+		.map((agent) => agent.error ?? "unknown error");
+	if (errors.length === 0) return;
+
+	throw new CLIError(
+		`Agent launch failed: ${errors.join("; ")}`,
+		`Workspace ${workspaceId} exists without the agent. Retry with: superset agents create --workspace ${workspaceId} --agent ${agentId} --prompt "…"`,
+	);
+}
+
 export default command({
 	description: "Create a workspace on a host",
 	options: {
@@ -158,6 +181,13 @@ export default command({
 				agents,
 				command: options.command ?? undefined,
 			});
+			if (options.agent) {
+				requireAgentsLaunched(
+					result.agents,
+					result.workspace.id,
+					options.agent,
+				);
+			}
 			return {
 				data: result,
 				message: `Created session "${result.workspace.name}" on host ${target.hostId}`,
@@ -179,6 +209,10 @@ export default command({
 			command: options.command ?? undefined,
 			...(options.tag?.length ? { tags: options.tag } : {}),
 		});
+
+		if (options.agent) {
+			requireAgentsLaunched(result.agents, result.workspace.id, options.agent);
+		}
 
 		return {
 			data: result,
