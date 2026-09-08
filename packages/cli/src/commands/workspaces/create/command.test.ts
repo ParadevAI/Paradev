@@ -161,6 +161,17 @@ describe("workspaces create", () => {
 		expect((error as { suggestion?: string }).suggestion).toContain("ws-1");
 	});
 
+	test("retry hint includes --host so remote creates stay retryable", async () => {
+		agentsResult = [{ ok: false, error: "spawn failed" }];
+
+		const error = await invoke({
+			agent: "claude",
+			prompt: "Implement the feature",
+		}).catch((err: Error & { suggestion?: string }) => err);
+
+		expect((error as { suggestion?: string }).suggestion).toContain("--host host-1");
+	});
+
 	test("reports every failed launch, not just the first", async () => {
 		agentsResult = [
 			{ ok: false, error: "first failure" },

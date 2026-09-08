@@ -14,6 +14,7 @@ function requireAgentsLaunched(
 	agents: readonly { ok: boolean; error?: string }[] | undefined,
 	workspaceId: string,
 	agentId: string,
+	hostId: string,
 ): void {
 	const errors = (agents ?? [])
 		.filter((agent) => !agent.ok)
@@ -22,7 +23,7 @@ function requireAgentsLaunched(
 
 	throw new CLIError(
 		`Agent launch failed: ${errors.join("; ")}`,
-		`Workspace ${workspaceId} exists without the agent. Retry with: superset agents create --workspace ${workspaceId} --agent ${agentId} --prompt "…"`,
+		`Workspace ${workspaceId} exists without the agent. Retry with: superset agents create --workspace ${workspaceId} --host ${hostId} --agent ${agentId} --prompt "…"`,
 	);
 }
 
@@ -186,6 +187,7 @@ export default command({
 					result.agents,
 					result.workspace.id,
 					options.agent,
+					target.hostId,
 				);
 			}
 			return {
@@ -211,7 +213,7 @@ export default command({
 		});
 
 		if (options.agent) {
-			requireAgentsLaunched(result.agents, result.workspace.id, options.agent);
+			requireAgentsLaunched(result.agents, result.workspace.id, options.agent, target.hostId);
 		}
 
 		return {
