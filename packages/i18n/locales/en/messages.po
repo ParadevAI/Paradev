@@ -2354,6 +2354,9 @@ msgstr "based off PR #{0}"
 msgid "Based on {0} tokens in the last 30 days, counting {1}."
 msgstr "Based on {0} tokens in the last 30 days, counting {1}."
 
+msgid "Become a design partner"
+msgstr "Become a design partner"
+
 msgid "Before"
 msgstr "Before"
 
@@ -2555,6 +2558,9 @@ msgstr "Browsing history"
 
 msgid "Bug"
 msgstr "Bug"
+
+msgid "Build the future of Superset in the cloud"
+msgstr "Build the future of Superset in the cloud"
 
 msgid "Building the last piece of software"
 msgstr "Building the last piece of software"
@@ -3262,6 +3268,9 @@ msgstr "Closing this terminal will end the running process."
 
 msgid "Cloud"
 msgstr "Cloud"
+
+msgid "Cloud is coming. Become a design partner"
+msgstr "Cloud is coming. Become a design partner"
 
 msgid "Cloud sandboxes"
 msgstr "Cloud sandboxes"
@@ -15472,17 +15481,14 @@ msgstr "We'll only use this to send your download link."
 msgid "We're hiring"
 msgstr "We're hiring"
 
-msgid "We're hiring engineers"
-msgstr "We're hiring engineers"
-
-msgid "We're hiring engineers in San Francisco"
-msgstr "We're hiring engineers in San Francisco"
-
 msgid "We're hiring engineers in San Francisco. Help us build the first software factory platform."
 msgstr "We're hiring engineers in San Francisco. Help us build the first software factory platform."
 
 msgid "We're hiring in San Francisco"
 msgstr "We're hiring in San Francisco"
+
+msgid "We're looking for design partners to help shape our cloud offering. Tell us about your workflow and we'll be in touch to explore working together."
+msgstr "We're looking for design partners to help shape our cloud offering. Tell us about your workflow and we'll be in touch to explore working together."
 
 msgid "We're rebuilding this feature. Check back soon."
 msgstr "We're rebuilding this feature. Check back soon."
@@ -15605,6 +15611,9 @@ msgstr "What We're Building"
 msgid "What we're building now and next."
 msgstr "What we're building now and next."
 
+msgid "What would you like to build with Superset in the cloud?"
+msgstr "What would you like to build with Superset in the cloud?"
+
 msgid "What would you like to know?"
 msgstr "What would you like to know?"
 
@@ -15691,6 +15700,9 @@ msgstr "With label"
 
 msgid "with or without attachments"
 msgstr "with or without attachments"
+
+msgid "Work email"
+msgstr "Work email"
 
 msgid "Work from tickets"
 msgstr "Work from tickets"
