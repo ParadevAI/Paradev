@@ -1,3 +1,4 @@
+export { countsTowardDockAttention } from "./countsTowardDockAttention";
 export {
 	useV2AttentionWorkspaceCount,
 	useV2PaneNotificationStatus,
