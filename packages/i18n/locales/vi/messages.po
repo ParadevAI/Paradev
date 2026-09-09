@@ -676,6 +676,9 @@ msgstr "{hidden, plural, one {# dòng ẩn} other {# dòng ẩn}}"
 msgid "{hidden, plural, one {Show # hidden line} other {Show # hidden lines}}"
 msgstr "{hidden, plural, one {Hiện # dòng ẩn} other {Hiện # dòng ẩn}}"
 
+msgid "{hidden, plural, one {Show # reply} other {Show # replies}}"
+msgstr "{hidden, plural, one {Hiển thị # phản hồi} other {Hiển thị # phản hồi}}"
+
 msgid "{hiddenCount, plural, one {Show # more frame} other {Show # more frames}}"
 msgstr "{hiddenCount, plural, one {Hiện thêm # frame} other {Hiện thêm # frame}}"
 
@@ -1651,6 +1654,9 @@ msgstr "Tất cả check đã qua"
 
 msgid "All checks skipped or cancelled"
 msgstr "Tất cả check bị bỏ qua hoặc hủy"
+
+msgid "All comments"
+msgstr "Tất cả bình luận"
 
 msgid "All commits"
 msgstr "Tất cả commit"
@@ -3155,6 +3161,9 @@ msgid "Close Chat"
 msgstr "Đóng chat"
 
 msgid "Close Comment"
+msgstr "Đóng bình luận"
+
+msgid "Close comments"
 msgstr "Đóng bình luận"
 
 msgid "Close Diff"
@@ -6812,6 +6821,9 @@ msgstr "Ẩn danh sách pull request"
 msgid "Hide pull request preview"
 msgstr "Ẩn xem trước pull request"
 
+msgid "Hide resolved ({resolvedCount})"
+msgstr "Ẩn các mục đã xử lý ({resolvedCount})"
+
 msgid "Hide review comments"
 msgstr "Ẩn bình luận review"
 
@@ -7913,6 +7925,9 @@ msgstr "Chỉ báo đang tải và hoạt động đang diễn ra"
 msgid "Loading changes..."
 msgstr "Đang tải thay đổi..."
 
+msgid "Loading comments…"
+msgstr "Đang tải bình luận…"
+
 msgid "Loading contributors…"
 msgstr "Đang tải người đóng góp…"
 
@@ -8889,6 +8904,9 @@ msgstr "Không có nội dung bình luận"
 msgid "No comments yet."
 msgstr "Chưa có bình luận nào."
 
+msgid "No comments yet. Turn on comment mode and click anything on the page to start one."
+msgstr "Chưa có bình luận nào. Bật chế độ bình luận rồi nhấp vào bất kỳ phần nào của trang để bắt đầu."
+
 msgid "No commits on this branch yet."
 msgstr "Chưa có commit nào trên nhánh này."
 
@@ -9354,6 +9372,9 @@ msgstr "Để sau"
 
 msgid "Not on the leaderboard. Opt in first."
 msgstr "Chưa có trên bảng xếp hạng. Hãy tham gia trước."
+
+msgid "Not on this version"
+msgstr "Không có trong phiên bản này"
 
 msgid "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
 msgstr "Chưa nhận được sự kiện: Microsoft Graph đã từ chối các đăng ký thông báo. Hãy kiểm tra phần cấp quyền quản trị và phê duyệt API bảo vệ của ứng dụng, rồi kết nối lại."
@@ -12688,6 +12709,9 @@ msgstr "Hiện tất cả {count}"
 msgid "Show all automations again"
 msgstr "Hiện lại tất cả tự động hóa"
 
+msgid "Show all comments"
+msgstr "Hiển thị tất cả bình luận"
+
 msgid "Show all lines"
 msgstr "Hiện tất cả các dòng"
 
@@ -12777,6 +12801,9 @@ msgstr "Hiện danh sách pull request"
 
 msgid "Show pull request preview"
 msgstr "Hiện xem trước pull request"
+
+msgid "Show resolved ({resolvedCount})"
+msgstr "Hiện các mục đã xử lý ({resolvedCount})"
 
 msgid "Show review comments"
 msgstr "Hiện bình luận review"
@@ -15610,6 +15637,9 @@ msgstr "Superset là gì, ai xây dựng nó và dành cho ai. Một đội ngũ
 
 msgid "What the content is doing: which pages sessions start on, and how much is being published."
 msgstr "Nội dung đang làm gì: phiên bắt đầu ở trang nào và có bao nhiêu được xuất bản."
+
+msgid "What these were written against is no longer on the page, so they have no pin."
+msgstr "Nội dung mà chúng được viết cho đã không còn trên trang, nên chúng không có ghim."
 
 msgid "What We're Building"
 msgstr "Chúng tôi đang xây gì"

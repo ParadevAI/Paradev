@@ -1,5 +1,9 @@
 import { msg } from "@lingui/core/macro";
-import { CommentsSidebar, PageCommentsView } from "@superset/ui/page-comments";
+import {
+	AllCommentsButton,
+	CommentsPanel,
+	PageCommentsView,
+} from "@superset/ui/page-comments";
 import { TRPCClientError } from "@trpc/client";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -73,6 +77,7 @@ export default async function PublishedPage({ params }: PageProps) {
 		<PageCommentsShell
 			pageId={page.id}
 			version={page.version}
+			pageOwnerId={page.createdByUserId}
 			user={{
 				id: session?.user.id ?? "",
 				name: session?.user.name ?? i18n._(msg({ message: "You" })),
@@ -100,11 +105,12 @@ export default async function PublishedPage({ params }: PageProps) {
 					watchAgentId={page.watch.agentId}
 				/>
 
-				<div className="flex min-h-0 flex-1">
+				<div className="relative flex min-h-0 flex-1">
 					<main className="min-h-0 flex-1">
 						<PageCommentsView src={page.viewUrl} title={page.title} />
 					</main>
-					<CommentsSidebar servedVersion={page.version} />
+					<AllCommentsButton />
+					<CommentsPanel servedVersion={page.version} />
 				</div>
 			</div>
 		</PageCommentsShell>

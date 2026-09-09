@@ -676,6 +676,9 @@ msgstr "{hidden, plural, one {# ausgeblendete Zeile} other {# ausgeblendete Zeil
 msgid "{hidden, plural, one {Show # hidden line} other {Show # hidden lines}}"
 msgstr "{hidden, plural, one {# ausgeblendete Zeile anzeigen} other {# ausgeblendete Zeilen anzeigen}}"
 
+msgid "{hidden, plural, one {Show # reply} other {Show # replies}}"
+msgstr "{hidden, plural, one {# Antwort anzeigen} other {# Antworten anzeigen}}"
+
 msgid "{hiddenCount, plural, one {Show # more frame} other {Show # more frames}}"
 msgstr "{hiddenCount, plural, one {# weiteren Frame anzeigen} other {# weitere Frames anzeigen}}"
 
@@ -1651,6 +1654,9 @@ msgstr "Alle Prüfungen bestanden"
 
 msgid "All checks skipped or cancelled"
 msgstr "Alle Prüfungen übersprungen oder abgebrochen"
+
+msgid "All comments"
+msgstr "Alle Kommentare"
 
 msgid "All commits"
 msgstr "Alle Commits"
@@ -3156,6 +3162,9 @@ msgstr "Chat schließen"
 
 msgid "Close Comment"
 msgstr "Kommentar schließen"
+
+msgid "Close comments"
+msgstr "Kommentare schließen"
 
 msgid "Close Diff"
 msgstr "Diff schließen"
@@ -6812,6 +6821,9 @@ msgstr "Pull-Request-Liste ausblenden"
 msgid "Hide pull request preview"
 msgstr "Pull-Request-Vorschau ausblenden"
 
+msgid "Hide resolved ({resolvedCount})"
+msgstr "Aufgelöste ausblenden ({resolvedCount})"
+
 msgid "Hide review comments"
 msgstr "Review-Kommentare ausblenden"
 
@@ -7913,6 +7925,9 @@ msgstr "Lade- und Aktivitätsanzeigen"
 msgid "Loading changes..."
 msgstr "Änderungen werden geladen..."
 
+msgid "Loading comments…"
+msgstr "Kommentare werden geladen…"
+
 msgid "Loading contributors…"
 msgstr "Mitwirkende werden geladen…"
 
@@ -8889,6 +8904,9 @@ msgstr "Kein Kommentartext"
 msgid "No comments yet."
 msgstr "Noch keine Kommentare."
 
+msgid "No comments yet. Turn on comment mode and click anything on the page to start one."
+msgstr "Noch keine Kommentare. Aktiviere den Kommentarmodus und klicke auf ein beliebiges Element der Seite, um einen Kommentar zu schreiben."
+
 msgid "No commits on this branch yet."
 msgstr "Noch keine Commits auf diesem Branch."
 
@@ -9354,6 +9372,9 @@ msgstr "Jetzt nicht"
 
 msgid "Not on the leaderboard. Opt in first."
 msgstr "Nicht im Leaderboard. Nimm zuerst teil."
+
+msgid "Not on this version"
+msgstr "Nicht in dieser Version"
 
 msgid "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
 msgstr "Es kommen noch keine Ereignisse an: Microsoft Graph hat die Benachrichtigungs-Abos abgelehnt. Prüfe die Admin-Zustimmung der App und die Freigabe der geschützten API und verbinde dann neu."
@@ -12688,6 +12709,9 @@ msgstr "Alle {count} anzeigen"
 msgid "Show all automations again"
 msgstr "Wieder alle Automatisierungen anzeigen"
 
+msgid "Show all comments"
+msgstr "Alle Kommentare anzeigen"
+
 msgid "Show all lines"
 msgstr "Alle Zeilen anzeigen"
 
@@ -12777,6 +12801,9 @@ msgstr "Pull-Request-Liste anzeigen"
 
 msgid "Show pull request preview"
 msgstr "Pull-Request-Vorschau anzeigen"
+
+msgid "Show resolved ({resolvedCount})"
+msgstr "Aufgelöste anzeigen ({resolvedCount})"
 
 msgid "Show review comments"
 msgstr "Review-Kommentare anzeigen"
@@ -15610,6 +15637,9 @@ msgstr "Was Superset ist, wer es baut und für wen es gedacht ist. Ein Team aus 
 
 msgid "What the content is doing: which pages sessions start on, and how much is being published."
 msgstr "Was die Inhalte leisten: auf welchen Seiten Sitzungen beginnen und wie viel veröffentlicht wird."
+
+msgid "What these were written against is no longer on the page, so they have no pin."
+msgstr "Worauf sie sich bezogen, steht nicht mehr auf der Seite, daher haben sie keine Markierung."
 
 msgid "What We're Building"
 msgstr "Was wir bauen"

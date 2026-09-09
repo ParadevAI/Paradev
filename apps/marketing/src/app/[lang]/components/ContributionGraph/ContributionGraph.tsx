@@ -2,7 +2,7 @@
 
 import { Trans, useLingui } from "@lingui/react/macro";
 import { formatDate } from "@superset/i18n/format";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { formatTokens } from "@/app/[lang]/utils/formatUsage";
 import {
 	buildCalendar,
@@ -65,7 +65,13 @@ export function ContributionGraph({
 }: ContributionGraphProps) {
 	const { t, i18n } = useLingui();
 	const [active, setActive] = useState<CalendarCell | null>(null);
+	const scroller = useRef<HTMLDivElement>(null);
 	const calendar = buildCalendar(daily, endDay);
+
+	useEffect(() => {
+		const element = scroller.current;
+		if (element) element.scrollLeft = element.scrollWidth;
+	}, []);
 
 	const clear = (cell: CalendarCell) =>
 		setActive((current) => (current?.day === cell.day ? null : current));
@@ -93,7 +99,7 @@ export function ContributionGraph({
 				</span>
 			</div>
 
-			<div className="overflow-x-auto">
+			<div ref={scroller} className="overflow-x-auto">
 				<div className="flex" style={{ gap: GAP }}>
 					<div
 						className="flex flex-col shrink-0 pr-1"

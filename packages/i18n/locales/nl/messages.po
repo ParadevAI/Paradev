@@ -676,6 +676,9 @@ msgstr "{hidden, plural, one {# verborgen regel} other {# verborgen regels}}"
 msgid "{hidden, plural, one {Show # hidden line} other {Show # hidden lines}}"
 msgstr "{hidden, plural, one {# verborgen regel tonen} other {# verborgen regels tonen}}"
 
+msgid "{hidden, plural, one {Show # reply} other {Show # replies}}"
+msgstr "{hidden, plural, one {# reactie tonen} other {# reacties tonen}}"
+
 msgid "{hiddenCount, plural, one {Show # more frame} other {Show # more frames}}"
 msgstr "{hiddenCount, plural, one {# frame meer tonen} other {# frames meer tonen}}"
 
@@ -1651,6 +1654,9 @@ msgstr "Alle checks geslaagd"
 
 msgid "All checks skipped or cancelled"
 msgstr "Alle checks overgeslagen of geannuleerd"
+
+msgid "All comments"
+msgstr "Alle opmerkingen"
 
 msgid "All commits"
 msgstr "Alle commits"
@@ -3156,6 +3162,9 @@ msgstr "Chat sluiten"
 
 msgid "Close Comment"
 msgstr "Opmerking sluiten"
+
+msgid "Close comments"
+msgstr "Opmerkingen sluiten"
 
 msgid "Close Diff"
 msgstr "Diff sluiten"
@@ -6812,6 +6821,9 @@ msgstr "Lijst met pull requests verbergen"
 msgid "Hide pull request preview"
 msgstr "Voorbeeld van pull request verbergen"
 
+msgid "Hide resolved ({resolvedCount})"
+msgstr "Opgeloste verbergen ({resolvedCount})"
+
 msgid "Hide review comments"
 msgstr "Reviewopmerkingen verbergen"
 
@@ -7689,7 +7701,7 @@ msgid "Leave and delete"
 msgstr "Verlaten en verwijderen"
 
 msgid "Leave comment mode"
-msgstr "Reactiemodus verlaten"
+msgstr "Opmerkingsmodus verlaten"
 
 msgid "Leave Organization"
 msgstr "Organisatie verlaten"
@@ -7912,6 +7924,9 @@ msgstr "Laad- en activiteitsindicatoren"
 
 msgid "Loading changes..."
 msgstr "Wijzigingen laden..."
+
+msgid "Loading comments…"
+msgstr "Opmerkingen laden…"
 
 msgid "Loading contributors…"
 msgstr "Contributors laden…"
@@ -8889,6 +8904,9 @@ msgstr "Geen tekst in de opmerking"
 msgid "No comments yet."
 msgstr "Nog geen opmerkingen."
 
+msgid "No comments yet. Turn on comment mode and click anything on the page to start one."
+msgstr "Nog geen opmerkingen. Zet de opmerkingsmodus aan en klik op iets op de pagina om er een te plaatsen."
+
 msgid "No commits on this branch yet."
 msgstr "Nog geen commits op deze branch."
 
@@ -9354,6 +9372,9 @@ msgstr "Niet nu"
 
 msgid "Not on the leaderboard. Opt in first."
 msgstr "Niet op de ranglijst. Doe eerst mee."
+
+msgid "Not on this version"
+msgstr "Niet in deze versie"
 
 msgid "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
 msgstr "Er komen nog geen gebeurtenissen binnen: Microsoft Graph heeft de meldingsabonnementen geweigerd. Controleer de beheerderstoestemming en de goedkeuring van de beveiligde API van de app, en verbind opnieuw."
@@ -12688,6 +12709,9 @@ msgstr "Alle {count} tonen"
 msgid "Show all automations again"
 msgstr "Weer alle automatiseringen tonen"
 
+msgid "Show all comments"
+msgstr "Alle opmerkingen tonen"
+
 msgid "Show all lines"
 msgstr "Alle regels tonen"
 
@@ -12777,6 +12801,9 @@ msgstr "Lijst met pull requests tonen"
 
 msgid "Show pull request preview"
 msgstr "Voorbeeld van pull request tonen"
+
+msgid "Show resolved ({resolvedCount})"
+msgstr "Opgeloste tonen ({resolvedCount})"
 
 msgid "Show review comments"
 msgstr "Reviewopmerkingen tonen"
@@ -15610,6 +15637,9 @@ msgstr "Wat Superset is, wie het bouwt en voor wie het bedoeld is. Een team uit 
 
 msgid "What the content is doing: which pages sessions start on, and how much is being published."
 msgstr "Wat de content doet: op welke pagina's sessies beginnen en hoeveel er wordt gepubliceerd."
+
+msgid "What these were written against is no longer on the page, so they have no pin."
+msgstr "Waar deze op sloegen staat niet meer op de pagina, dus ze hebben geen markering."
 
 msgid "What We're Building"
 msgstr "Wat we bouwen"

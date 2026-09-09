@@ -676,6 +676,9 @@ msgstr "{hidden, plural, one {# hidden line} other {# hidden lines}}"
 msgid "{hidden, plural, one {Show # hidden line} other {Show # hidden lines}}"
 msgstr "{hidden, plural, one {Show # hidden line} other {Show # hidden lines}}"
 
+msgid "{hidden, plural, one {Show # reply} other {Show # replies}}"
+msgstr "{hidden, plural, one {Show # reply} other {Show # replies}}"
+
 msgid "{hiddenCount, plural, one {Show # more frame} other {Show # more frames}}"
 msgstr "{hiddenCount, plural, one {Show # more frame} other {Show # more frames}}"
 
@@ -1651,6 +1654,9 @@ msgstr "All Checks Passed"
 
 msgid "All checks skipped or cancelled"
 msgstr "All checks skipped or cancelled"
+
+msgid "All comments"
+msgstr "All comments"
 
 msgid "All commits"
 msgstr "All commits"
@@ -3156,6 +3162,9 @@ msgstr "Close Chat"
 
 msgid "Close Comment"
 msgstr "Close Comment"
+
+msgid "Close comments"
+msgstr "Close comments"
 
 msgid "Close Diff"
 msgstr "Close Diff"
@@ -6812,6 +6821,9 @@ msgstr "Hide pull request list"
 msgid "Hide pull request preview"
 msgstr "Hide pull request preview"
 
+msgid "Hide resolved ({resolvedCount})"
+msgstr "Hide resolved ({resolvedCount})"
+
 msgid "Hide review comments"
 msgstr "Hide review comments"
 
@@ -7913,6 +7925,9 @@ msgstr "Loading and in-flight activity indicators"
 msgid "Loading changes..."
 msgstr "Loading changes..."
 
+msgid "Loading comments…"
+msgstr "Loading comments…"
+
 msgid "Loading contributors…"
 msgstr "Loading contributors…"
 
@@ -8889,6 +8904,9 @@ msgstr "No comment body"
 msgid "No comments yet."
 msgstr "No comments yet."
 
+msgid "No comments yet. Turn on comment mode and click anything on the page to start one."
+msgstr "No comments yet. Turn on comment mode and click anything on the page to start one."
+
 msgid "No commits on this branch yet."
 msgstr "No commits on this branch yet."
 
@@ -9354,6 +9372,9 @@ msgstr "Not now"
 
 msgid "Not on the leaderboard. Opt in first."
 msgstr "Not on the leaderboard. Opt in first."
+
+msgid "Not on this version"
+msgstr "Not on this version"
 
 msgid "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
 msgstr "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
@@ -12688,6 +12709,9 @@ msgstr "Show all {count}"
 msgid "Show all automations again"
 msgstr "Show all automations again"
 
+msgid "Show all comments"
+msgstr "Show all comments"
+
 msgid "Show all lines"
 msgstr "Show all lines"
 
@@ -12777,6 +12801,9 @@ msgstr "Show pull request list"
 
 msgid "Show pull request preview"
 msgstr "Show pull request preview"
+
+msgid "Show resolved ({resolvedCount})"
+msgstr "Show resolved ({resolvedCount})"
 
 msgid "Show review comments"
 msgstr "Show review comments"
@@ -15610,6 +15637,9 @@ msgstr "What Superset is, who builds it, and who it's for. A San Francisco team 
 
 msgid "What the content is doing: which pages sessions start on, and how much is being published."
 msgstr "What the content is doing: which pages sessions start on, and how much is being published."
+
+msgid "What these were written against is no longer on the page, so they have no pin."
+msgstr "What these were written against is no longer on the page, so they have no pin."
 
 msgid "What We're Building"
 msgstr "What We're Building"

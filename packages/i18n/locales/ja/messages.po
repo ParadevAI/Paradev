@@ -676,6 +676,9 @@ msgstr "{hidden, plural, one {非表示の#行} other {非表示の#行}}"
 msgid "{hidden, plural, one {Show # hidden line} other {Show # hidden lines}}"
 msgstr "{hidden, plural, one {非表示の#行を表示} other {非表示の#行を表示}}"
 
+msgid "{hidden, plural, one {Show # reply} other {Show # replies}}"
+msgstr "{hidden, plural, one {#件の返信を表示} other {#件の返信を表示}}"
+
 msgid "{hiddenCount, plural, one {Show # more frame} other {Show # more frames}}"
 msgstr "{hiddenCount, plural, one {さらに#件のフレームを表示} other {さらに#件のフレームを表示}}"
 
@@ -1651,6 +1654,9 @@ msgstr "すべてのチェックが成功"
 
 msgid "All checks skipped or cancelled"
 msgstr "すべてのチェックがスキップまたはキャンセルされました"
+
+msgid "All comments"
+msgstr "すべてのコメント"
 
 msgid "All commits"
 msgstr "すべてのコミット"
@@ -3155,6 +3161,9 @@ msgid "Close Chat"
 msgstr "チャットを閉じる"
 
 msgid "Close Comment"
+msgstr "コメントを閉じる"
+
+msgid "Close comments"
 msgstr "コメントを閉じる"
 
 msgid "Close Diff"
@@ -6812,6 +6821,9 @@ msgstr "プルリクエスト一覧を隠す"
 msgid "Hide pull request preview"
 msgstr "プルリクエストのプレビューを隠す"
 
+msgid "Hide resolved ({resolvedCount})"
+msgstr "解決済みを非表示 ({resolvedCount})"
+
 msgid "Hide review comments"
 msgstr "レビューコメントを隠す"
 
@@ -7913,6 +7925,9 @@ msgstr "読み込みと実行中の活動を示すインジケーター"
 msgid "Loading changes..."
 msgstr "変更を読み込み中..."
 
+msgid "Loading comments…"
+msgstr "コメントを読み込み中…"
+
 msgid "Loading contributors…"
 msgstr "コントリビューターを読み込み中…"
 
@@ -8889,6 +8904,9 @@ msgstr "コメント本文はありません"
 msgid "No comments yet."
 msgstr "コメントはまだありません。"
 
+msgid "No comments yet. Turn on comment mode and click anything on the page to start one."
+msgstr "まだコメントはありません。コメントモードをオンにして、ページ上の要素をクリックすると開始できます。"
+
 msgid "No commits on this branch yet."
 msgstr "このブランチにはまだコミットがありません。"
 
@@ -9354,6 +9372,9 @@ msgstr "あとで"
 
 msgid "Not on the leaderboard. Opt in first."
 msgstr "リーダーボードに参加していません。先に参加してください。"
+
+msgid "Not on this version"
+msgstr "このバージョンにはありません"
 
 msgid "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
 msgstr "まだイベントを受信していません: Microsoft Graphが通知サブスクリプションを拒否しました。アプリの管理者同意と保護されたAPIの承認を確認してから、再接続してください。"
@@ -12688,6 +12709,9 @@ msgstr "{count}件すべて表示"
 msgid "Show all automations again"
 msgstr "すべてのオートメーションを再表示"
 
+msgid "Show all comments"
+msgstr "すべてのコメントを表示"
+
 msgid "Show all lines"
 msgstr "すべての行を表示"
 
@@ -12777,6 +12801,9 @@ msgstr "プルリクエスト一覧を表示"
 
 msgid "Show pull request preview"
 msgstr "プルリクエストのプレビューを表示"
+
+msgid "Show resolved ({resolvedCount})"
+msgstr "解決済みを表示 ({resolvedCount})"
 
 msgid "Show review comments"
 msgstr "レビューコメントを表示"
@@ -15610,6 +15637,9 @@ msgstr "Supersetとは何か、誰が作っていて、誰のためのものか�
 
 msgid "What the content is doing: which pages sessions start on, and how much is being published."
 msgstr "コンテンツの状況: セッションがどのページから始まるか、どれだけ公開されているか。"
+
+msgid "What these were written against is no longer on the page, so they have no pin."
+msgstr "これらが書かれた対象はページ上に存在しないため、ピンがありません。"
 
 msgid "What We're Building"
 msgstr "いま作っているもの"

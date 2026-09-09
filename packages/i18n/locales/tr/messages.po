@@ -676,6 +676,9 @@ msgstr "{hidden, plural, one {# gizli satır} other {# gizli satır}}"
 msgid "{hidden, plural, one {Show # hidden line} other {Show # hidden lines}}"
 msgstr "{hidden, plural, one {# gizli satırı göster} other {# gizli satırı göster}}"
 
+msgid "{hidden, plural, one {Show # reply} other {Show # replies}}"
+msgstr "{hidden, plural, one {# yanıtı göster} other {# yanıtı göster}}"
+
 msgid "{hiddenCount, plural, one {Show # more frame} other {Show # more frames}}"
 msgstr "{hiddenCount, plural, one {# çerçeve daha göster} other {# çerçeve daha göster}}"
 
@@ -1651,6 +1654,9 @@ msgstr "Tüm kontroller geçti"
 
 msgid "All checks skipped or cancelled"
 msgstr "Tüm kontroller atlandı veya iptal edildi"
+
+msgid "All comments"
+msgstr "Tüm yorumlar"
 
 msgid "All commits"
 msgstr "Tüm commit'ler"
@@ -3156,6 +3162,9 @@ msgstr "Sohbeti kapat"
 
 msgid "Close Comment"
 msgstr "Yorumu kapat"
+
+msgid "Close comments"
+msgstr "Yorumları kapat"
 
 msgid "Close Diff"
 msgstr "Farkı kapat"
@@ -6812,6 +6821,9 @@ msgstr "Pull request listesini gizle"
 msgid "Hide pull request preview"
 msgstr "Pull request önizlemesini gizle"
 
+msgid "Hide resolved ({resolvedCount})"
+msgstr "Çözülenleri gizle ({resolvedCount})"
+
 msgid "Hide review comments"
 msgstr "İnceleme yorumlarını gizle"
 
@@ -7913,6 +7925,9 @@ msgstr "Yükleme ve devam eden etkinlik göstergeleri"
 msgid "Loading changes..."
 msgstr "Değişiklikler yükleniyor..."
 
+msgid "Loading comments…"
+msgstr "Yorumlar yükleniyor…"
+
 msgid "Loading contributors…"
 msgstr "Katkıda bulunanlar yükleniyor…"
 
@@ -8889,6 +8904,9 @@ msgstr "Yorum gövdesi yok"
 msgid "No comments yet."
 msgstr "Henüz yorum yok."
 
+msgid "No comments yet. Turn on comment mode and click anything on the page to start one."
+msgstr "Henüz yorum yok. Yorum modunu açıp sayfadaki herhangi bir öğeye tıklayarak başlayın."
+
 msgid "No commits on this branch yet."
 msgstr "Bu dalda henüz commit yok."
 
@@ -9354,6 +9372,9 @@ msgstr "Şimdi değil"
 
 msgid "Not on the leaderboard. Opt in first."
 msgstr "Lider tablosunda değilsiniz. Önce katılın."
+
+msgid "Not on this version"
+msgstr "Bu sürümde yok"
 
 msgid "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
 msgstr "Henüz olay alınmıyor: Microsoft Graph bildirim aboneliklerini reddetti. Uygulamanın yönetici onayını ve korumalı API onayını kontrol edip yeniden bağlanın."
@@ -12688,6 +12709,9 @@ msgstr "Tümünü göster ({count})"
 msgid "Show all automations again"
 msgstr "Tüm otomasyonları yeniden göster"
 
+msgid "Show all comments"
+msgstr "Tüm yorumları göster"
+
 msgid "Show all lines"
 msgstr "Tüm satırları göster"
 
@@ -12777,6 +12801,9 @@ msgstr "Pull request listesini göster"
 
 msgid "Show pull request preview"
 msgstr "Pull request önizlemesini göster"
+
+msgid "Show resolved ({resolvedCount})"
+msgstr "Çözülenleri göster ({resolvedCount})"
 
 msgid "Show review comments"
 msgstr "İnceleme yorumlarını göster"
@@ -15610,6 +15637,9 @@ msgstr "Superset nedir, kimler geliştiriyor ve kimler için. Paralel kodlama aj
 
 msgid "What the content is doing: which pages sessions start on, and how much is being published."
 msgstr "İçerik ne yapıyor: oturumlar hangi sayfalarda başlıyor ve ne kadar yayınlanıyor."
+
+msgid "What these were written against is no longer on the page, so they have no pin."
+msgstr "Yazıldıkları öğe artık sayfada olmadığı için işaretleri yok."
 
 msgid "What We're Building"
 msgstr "Ne geliştiriyoruz"

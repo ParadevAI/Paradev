@@ -676,6 +676,9 @@ msgstr "{hidden, plural, one {숨겨진 #줄} other {숨겨진 #줄}}"
 msgid "{hidden, plural, one {Show # hidden line} other {Show # hidden lines}}"
 msgstr "{hidden, plural, one {숨겨진 #줄 보기} other {숨겨진 #줄 보기}}"
 
+msgid "{hidden, plural, one {Show # reply} other {Show # replies}}"
+msgstr "{hidden, plural, one {답글 #개 표시} other {답글 #개 표시}}"
+
 msgid "{hiddenCount, plural, one {Show # more frame} other {Show # more frames}}"
 msgstr "{hiddenCount, plural, one {프레임 #개 더 보기} other {프레임 #개 더 보기}}"
 
@@ -1651,6 +1654,9 @@ msgstr "모든 검사 통과"
 
 msgid "All checks skipped or cancelled"
 msgstr "모든 검사를 건너뛰었거나 취소함"
+
+msgid "All comments"
+msgstr "모든 댓글"
 
 msgid "All commits"
 msgstr "모든 커밋"
@@ -3156,6 +3162,9 @@ msgstr "채팅 닫기"
 
 msgid "Close Comment"
 msgstr "코멘트 닫기"
+
+msgid "Close comments"
+msgstr "댓글 닫기"
 
 msgid "Close Diff"
 msgstr "차이 닫기"
@@ -6812,6 +6821,9 @@ msgstr "풀 리퀘스트 목록 숨기기"
 msgid "Hide pull request preview"
 msgstr "풀 리퀘스트 미리보기 숨기기"
 
+msgid "Hide resolved ({resolvedCount})"
+msgstr "해결된 항목 숨기기 ({resolvedCount})"
+
 msgid "Hide review comments"
 msgstr "리뷰 코멘트 숨기기"
 
@@ -7913,6 +7925,9 @@ msgstr "로딩 및 진행 중 활동 표시기"
 msgid "Loading changes..."
 msgstr "변경 사항을 불러오는 중..."
 
+msgid "Loading comments…"
+msgstr "댓글 불러오는 중…"
+
 msgid "Loading contributors…"
 msgstr "기여자 불러오는 중…"
 
@@ -8889,6 +8904,9 @@ msgstr "코멘트 본문 없음"
 msgid "No comments yet."
 msgstr "아직 코멘트가 없습니다."
 
+msgid "No comments yet. Turn on comment mode and click anything on the page to start one."
+msgstr "아직 댓글이 없습니다. 댓글 모드를 켜고 페이지의 아무 곳이나 클릭해 시작하세요."
+
 msgid "No commits on this branch yet."
 msgstr "이 브랜치에는 아직 커밋이 없습니다."
 
@@ -9354,6 +9372,9 @@ msgstr "나중에"
 
 msgid "Not on the leaderboard. Opt in first."
 msgstr "리더보드에 없습니다. 먼저 참여하세요."
+
+msgid "Not on this version"
+msgstr "이 버전에는 없음"
 
 msgid "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
 msgstr "아직 이벤트를 받지 못하고 있습니다. Microsoft Graph가 알림 구독을 거부했습니다. 앱의 관리자 동의와 보호된 API 승인을 확인한 뒤 다시 연결하세요."
@@ -12688,6 +12709,9 @@ msgstr "{count}개 모두 보기"
 msgid "Show all automations again"
 msgstr "모든 자동화 다시 표시"
 
+msgid "Show all comments"
+msgstr "모든 댓글 표시"
+
 msgid "Show all lines"
 msgstr "모든 줄 표시"
 
@@ -12777,6 +12801,9 @@ msgstr "풀 리퀘스트 목록 표시"
 
 msgid "Show pull request preview"
 msgstr "풀 리퀘스트 미리보기 표시"
+
+msgid "Show resolved ({resolvedCount})"
+msgstr "해결된 항목 표시 ({resolvedCount})"
 
 msgid "Show review comments"
 msgstr "리뷰 코멘트 표시"
@@ -15610,6 +15637,9 @@ msgstr "Superset이 무엇이고, 누가 만들며, 누구를 위한 것인지. 
 
 msgid "What the content is doing: which pages sessions start on, and how much is being published."
 msgstr "콘텐츠 현황: 세션이 어느 페이지에서 시작되는지, 얼마나 발행되고 있는지."
+
+msgid "What these were written against is no longer on the page, so they have no pin."
+msgstr "작성 기준이 된 대상이 페이지에 더 이상 없어 핀이 없습니다."
 
 msgid "What We're Building"
 msgstr "우리가 만들고 있는 것"
