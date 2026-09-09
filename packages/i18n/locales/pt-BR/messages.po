@@ -1530,6 +1530,9 @@ msgstr "Independência de agente"
 msgid "Agent launch configuration"
 msgstr "Configuração de execução do agente"
 
+msgid "Agent launch failed: {detail}"
+msgstr "Falha ao iniciar o agente: {detail}"
+
 msgid "Agent picker (Claude, Codex, Cursor…) used by every session-creation flow"
 msgstr "Seletor de agente (Claude, Codex, Cursor…) usado em todo fluxo de criação de sessão"
 

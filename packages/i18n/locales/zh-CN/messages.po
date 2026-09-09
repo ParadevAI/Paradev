@@ -1530,6 +1530,9 @@ msgstr "智能体无关"
 msgid "Agent launch configuration"
 msgstr "智能体启动配置"
 
+msgid "Agent launch failed: {detail}"
+msgstr "智能体启动失败：{detail}"
+
 msgid "Agent picker (Claude, Codex, Cursor…) used by every session-creation flow"
 msgstr "智能体选择器（Claude、Codex、Cursor…），所有创建会话的流程都在用"
 

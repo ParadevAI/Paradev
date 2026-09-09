@@ -1530,6 +1530,9 @@ msgstr "Ajan bağımsızlığı"
 msgid "Agent launch configuration"
 msgstr "Ajan başlatma yapılandırması"
 
+msgid "Agent launch failed: {detail}"
+msgstr "Ajan başlatılamadı: {detail}"
+
 msgid "Agent picker (Claude, Codex, Cursor…) used by every session-creation flow"
 msgstr "Her oturum oluşturma akışının kullandığı ajan seçici (Claude, Codex, Cursor…)"
 

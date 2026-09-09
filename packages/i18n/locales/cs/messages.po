@@ -1530,6 +1530,9 @@ msgstr "Nezávislost na agentovi"
 msgid "Agent launch configuration"
 msgstr "Konfigurace spuštění agenta"
 
+msgid "Agent launch failed: {detail}"
+msgstr "Spuštění agenta se nezdařilo: {detail}"
+
 msgid "Agent picker (Claude, Codex, Cursor…) used by every session-creation flow"
 msgstr "Výběr agenta (Claude, Codex, Cursor…) používaný ve všech tocích vytváření relace"
 

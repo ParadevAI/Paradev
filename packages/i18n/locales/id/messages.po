@@ -1530,6 +1530,9 @@ msgstr "Independensi Agen"
 msgid "Agent launch configuration"
 msgstr "Konfigurasi peluncuran agen"
 
+msgid "Agent launch failed: {detail}"
+msgstr "Gagal meluncurkan agen: {detail}"
+
 msgid "Agent picker (Claude, Codex, Cursor…) used by every session-creation flow"
 msgstr "Pemilih agen (Claude, Codex, Cursor…) yang dipakai tiap alur pembuatan sesi"
 

@@ -1530,6 +1530,9 @@ msgstr "エージェント非依存"
 msgid "Agent launch configuration"
 msgstr "エージェント起動設定"
 
+msgid "Agent launch failed: {detail}"
+msgstr "エージェントの起動に失敗しました: {detail}"
+
 msgid "Agent picker (Claude, Codex, Cursor…) used by every session-creation flow"
 msgstr "すべてのセッション作成フローで使うエージェントピッカー(Claude、Codex、Cursor…)"
 

@@ -1530,6 +1530,9 @@ msgstr "Độc lập với agent"
 msgid "Agent launch configuration"
 msgstr "Cấu hình khởi chạy agent"
 
+msgid "Agent launch failed: {detail}"
+msgstr "Khởi chạy agent thất bại: {detail}"
+
 msgid "Agent picker (Claude, Codex, Cursor…) used by every session-creation flow"
 msgstr "Bộ chọn agent (Claude, Codex, Cursor…) dùng trong mọi luồng tạo phiên"
 

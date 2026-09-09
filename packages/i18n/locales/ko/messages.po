@@ -1530,6 +1530,9 @@ msgstr "에이전트 독립성"
 msgid "Agent launch configuration"
 msgstr "에이전트 실행 구성"
 
+msgid "Agent launch failed: {detail}"
+msgstr "에이전트 실행 실패: {detail}"
+
 msgid "Agent picker (Claude, Codex, Cursor…) used by every session-creation flow"
 msgstr "모든 세션 생성 흐름에서 쓰는 에이전트 선택기(Claude, Codex, Cursor…)"
 

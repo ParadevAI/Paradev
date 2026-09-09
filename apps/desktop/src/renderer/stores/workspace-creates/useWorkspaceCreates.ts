@@ -24,6 +24,7 @@ import type {
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { useStarNagStore } from "renderer/stores/star-nag";
+import { agentLaunchFailureDetail } from "./agentLaunchFailures";
 import { queueWorkspaceCreationPresets } from "./queueWorkspaceCreationPresets";
 import { useWorkspaceTransactionsStore } from "./workspaceTransactions";
 import { writeWorkspacePaneLayout } from "./writeWorkspacePaneLayout";
@@ -410,6 +411,29 @@ export function useWorkspaceCreates(): UseWorkspaceCreatesApi {
 					if (result.workspace.id !== workspaceId) {
 						deleteWorkspaceLocalState(workspaceId);
 						hostWorkspacesCache.removeWorkspace(args.hostId, workspaceId);
+					}
+					// Requested agents that never spawned: keep the workspace (and any
+					// panes already written) but fail the submit outcome so create
+					// toasts cannot soft-succeed over an empty agent pane.
+					if (snapshot.agents?.length) {
+						const detail = agentLaunchFailureDetail(
+							result.agents,
+							i18n._(
+								msg({
+									message: "Unknown error",
+								}),
+							),
+						);
+						if (detail) {
+							return {
+								ok: false,
+								error: i18n._(
+									msg({
+										message: `Agent launch failed: ${detail}`,
+									}),
+								),
+							};
+						}
 					}
 					// Only genuinely new worktrees count as created — never reopened
 					// ones or project-less sessions (createSession has no
