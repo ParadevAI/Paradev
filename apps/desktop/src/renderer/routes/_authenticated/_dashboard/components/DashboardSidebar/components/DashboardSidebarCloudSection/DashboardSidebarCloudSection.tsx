@@ -7,11 +7,11 @@ import { useMemo } from "react";
 import { LuPlus } from "react-icons/lu";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
+import { useOpenNewWorkspaceForHost } from "renderer/hooks/useOpenNewWorkspace";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { CLOUD_HOST_ID } from "renderer/routes/_authenticated/components/DashboardNewWorkspaceModal/components/DashboardNewWorkspaceForm/components/DevicePicker/DevicePicker";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
-import { useOpenNewWorkspaceModalForHost } from "renderer/stores/new-workspace-modal";
 import { useSidebarSectionsCollapseStore } from "renderer/stores/sidebar-sections-collapse";
 import {
 	type CloudPullRequestRef,
@@ -50,7 +50,7 @@ export function DashboardSidebarCloudSection({
 	// haven't resolved, which is neither a yes nor a no.
 	const cloudFlag = useFeatureFlagEnabled(FEATURE_FLAGS.CLOUD_WORKSPACES);
 	const isCloudEnabled = cloudFlag === true;
-	const openNewWorkspaceModalForHost = useOpenNewWorkspaceModalForHost();
+	const openNewWorkspaceForHost = useOpenNewWorkspaceForHost();
 	const isSectionCollapsed = useSidebarSectionsCollapseStore(
 		(s) => s.collapsed.cloud,
 	);
@@ -232,7 +232,7 @@ export function DashboardSidebarCloudSection({
 								aria-label={t({ message: "New cloud workspace" })}
 								onClick={(event) => {
 									event.stopPropagation();
-									openNewWorkspaceModalForHost(CLOUD_HOST_ID);
+									openNewWorkspaceForHost(CLOUD_HOST_ID);
 								}}
 								onKeyDown={(event) => event.stopPropagation()}
 								className="flex size-6 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-fill-hover hover:text-foreground"
