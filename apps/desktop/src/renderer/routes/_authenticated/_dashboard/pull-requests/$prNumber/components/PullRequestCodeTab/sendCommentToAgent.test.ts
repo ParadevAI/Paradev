@@ -4,6 +4,7 @@ import type { SubmitOutcome } from "renderer/stores/workspace-creates";
 import {
 	type CachedLinkedWorkspace,
 	mergeLinkedWorkspace,
+	reconcileCachedLinkedWorkspace,
 } from "./mergeLinkedWorkspace";
 import {
 	liveWorkspaceIdsForHost,
@@ -52,6 +53,12 @@ function harness(outcomes: SubmitOutcome[]) {
 		async (_args: { workspaceId: string; agent: string; prompt: string }) =>
 			undefined,
 	);
+	/** The host's `workspace:changed` broadcast landing a row in the mirror. */
+	const list = (workspaceId: string) => {
+		if (!live.some((workspace) => workspace.id === workspaceId)) {
+			live.push({ id: workspaceId, hostId: "host-1" });
+		}
+	};
 	const archive = (workspaceId: string) => {
 		const index = live.findIndex((workspace) => workspace.id === workspaceId);
 		if (index >= 0) live.splice(index, 1);
@@ -66,35 +73,52 @@ function harness(outcomes: SubmitOutcome[]) {
 			),
 		);
 	};
-	const mount = (): SendCommentToAgentDeps => ({
-		hostId: "host-1",
-		projectId: "project-1",
-		prNumber: 42,
-		getLinkedWorkspaceId: () =>
-			resolveLinkedWorkspaceId({
-				workspaceId:
-					queryClient.getQueryData<CachedLinkedWorkspace>(LINKED_WORKSPACE_KEY)
-						?.workspaceId,
-				liveWorkspaceIds: liveWorkspaceIdsForHost({
-					hostId: "host-1",
-					workspaces: live,
-					answeredHostIds,
-				}),
+	const mount = (): SendCommentToAgentDeps => {
+		// The tab's reconcile effect, on the values the render computes it
+		// from: what the host's list proves about the cached id is written
+		// down, so later silence has nothing to hand back.
+		const write = reconcileCachedLinkedWorkspace({
+			cached:
+				queryClient.getQueryData<CachedLinkedWorkspace>(LINKED_WORKSPACE_KEY),
+			liveWorkspaceIds: liveWorkspaceIdsForHost({
+				hostId: "host-1",
+				workspaces: live,
+				answeredHostIds,
 			}),
-		writeTerminalInput: mock(async () => undefined),
-		runAgent,
-		submitWorkspaceCreate,
-		onWorkspaceCreated: (workspaceId) => {
-			queryClient.setQueryData(LINKED_WORKSPACE_KEY, {
-				workspaceId,
-				seeded: true,
-			});
-		},
-	});
+		});
+		if (write) queryClient.setQueryData(LINKED_WORKSPACE_KEY, write);
+		return {
+			hostId: "host-1",
+			projectId: "project-1",
+			prNumber: 42,
+			getLinkedWorkspaceId: () =>
+				resolveLinkedWorkspaceId({
+					workspaceId:
+						queryClient.getQueryData<CachedLinkedWorkspace>(
+							LINKED_WORKSPACE_KEY,
+						)?.workspaceId,
+					liveWorkspaceIds: liveWorkspaceIdsForHost({
+						hostId: "host-1",
+						workspaces: live,
+						answeredHostIds,
+					}),
+				}),
+			writeTerminalInput: mock(async () => undefined),
+			runAgent,
+			submitWorkspaceCreate,
+			onWorkspaceCreated: (workspaceId) => {
+				queryClient.setQueryData(LINKED_WORKSPACE_KEY, {
+					workspaceId,
+					seeded: true,
+				});
+			},
+		};
+	};
 	return {
 		mount,
 		submitWorkspaceCreate,
 		runAgent,
+		list,
 		archive,
 		refetchLink,
 		answeredHostIds,
@@ -181,6 +205,53 @@ test("a host that stopped answering its workspace list does not lose the workspa
 	);
 	// The list query errors out: no rows, and no statement about ws-1 either.
 	answeredHostIds.delete("host-1");
+	await sendCommentToAgent(mount(), input);
+
+	expect(submitWorkspaceCreate).toHaveBeenCalledTimes(1);
+	expect(runAgent.mock.calls[0][0]).toMatchObject({ workspaceId: "ws-1" });
+});
+
+test("a workspace the host proved gone stays gone once its list errors", async () => {
+	const { mount, submitWorkspaceCreate, runAgent, archive, answeredHostIds } =
+		harness([
+			{ ok: false, workspaceId: "ws-1", error: "Agent launch failed: boom" },
+			{ ok: true, workspaceId: "ws-2" },
+		]);
+
+	await expect(sendCommentToAgent(mount(), input)).rejects.toThrow(
+		"Agent launch failed: boom",
+	);
+	// The tab renders on with the workspace the failed launch left behind:
+	// the host lists it, which is what makes a later list without it proof.
+	mount();
+	// The user deletes ws-1. The host keeps answering `null` about the link
+	// forever — it filters archived rows out — so only its workspace list can
+	// prove the id gone, and here it does.
+	archive("ws-1");
+	mount();
+	// Then one `workspace.list` refetch fails. The host says nothing at all,
+	// which must not hand back the workspace its own answer already retired.
+	answeredHostIds.delete("host-1");
+	await sendCommentToAgent(mount(), input);
+
+	expect(submitWorkspaceCreate).toHaveBeenCalledTimes(2);
+	expect(runAgent).not.toHaveBeenCalled();
+});
+
+test("a workspace the host has not listed yet is not retired", async () => {
+	const { mount, submitWorkspaceCreate, runAgent, archive, list } = harness([
+		{ ok: false, workspaceId: "ws-1", error: "Agent launch failed: boom" },
+	]);
+
+	await expect(sendCommentToAgent(mount(), input)).rejects.toThrow(
+		"Agent launch failed: boom",
+	);
+	// A create the host answers with a different canonical id than the
+	// optimistic row leaves the tab holding an id the list has not caught up
+	// to. Retiring it here would check the PR out a second time.
+	archive("ws-1");
+	mount();
+	list("ws-1");
 	await sendCommentToAgent(mount(), input);
 
 	expect(submitWorkspaceCreate).toHaveBeenCalledTimes(1);

@@ -33,6 +33,7 @@ import { PullRequestCommentThread } from "../PullRequestCommentThread";
 import {
 	type CachedLinkedWorkspace,
 	mergeLinkedWorkspace,
+	reconcileCachedLinkedWorkspace,
 } from "./mergeLinkedWorkspace";
 import {
 	liveWorkspaceIdsForHost,
@@ -423,12 +424,10 @@ export function PullRequestCodeTab({
 			);
 		},
 	});
-	const linkedWorkspaceQueryKey = [
-		"pull-request-linked-workspace",
-		projectId,
-		hostUrl,
-		prNumber,
-	];
+	const linkedWorkspaceQueryKey = useMemo(
+		() => ["pull-request-linked-workspace", projectId, hostUrl, prNumber],
+		[projectId, hostUrl, prNumber],
+	);
 	const { data: linkedWorkspaceData } = useQuery<CachedLinkedWorkspace>({
 		queryKey: linkedWorkspaceQueryKey,
 		queryFn: async () => {
@@ -463,6 +462,23 @@ export function PullRequestCodeTab({
 		workspaceId: linkedWorkspaceData?.workspaceId,
 		liveWorkspaceIds,
 	});
+	useEffect(() => {
+		// Write down what the host's list proves instead of only recomputing
+		// it every render: a seeded id survives every `null` the host answers,
+		// so an id left in the cache comes back the moment a failed
+		// `workspace.list` refetch takes the evidence against it away.
+		const write = reconcileCachedLinkedWorkspace({
+			cached: linkedWorkspaceData,
+			liveWorkspaceIds,
+		});
+		if (!write) return;
+		queryClient.setQueryData(linkedWorkspaceQueryKey, write);
+	}, [
+		linkedWorkspaceData,
+		liveWorkspaceIds,
+		queryClient,
+		linkedWorkspaceQueryKey,
+	]);
 	const { submit: submitWorkspaceCreate } = useWorkspaceCreates();
 
 	const sendCommentToAgent = useMutation({

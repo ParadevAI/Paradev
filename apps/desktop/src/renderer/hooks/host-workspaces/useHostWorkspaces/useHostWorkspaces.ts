@@ -72,11 +72,13 @@ export interface UseHostWorkspacesResult {
 	 */
 	hostsSettled: boolean;
 	/**
-	 * Hosts whose live list answered this session. Absence of a workspace
-	 * from `workspaces` is evidence that it is gone only for these hosts: a
-	 * host that errored, is still loading, or is serving nothing but a
-	 * saved snapshot contributes no rows, and its silence is not a statement
-	 * about any particular workspace.
+	 * Hosts whose live list is currently answering — membership is the
+	 * query's `isSuccess` right now, not a record of having answered once,
+	 * so a host that answered and then failed a refetch leaves the set.
+	 * Absence of a workspace from `workspaces` is evidence that it is gone
+	 * only for these hosts: having rows is not the same as having answered,
+	 * because a host still renders its saved snapshot and keeps its prior
+	 * rows across a failed refetch.
 	 */
 	answeredHostIds: ReadonlySet<string>;
 	cache: HostWorkspacesCacheOps;
