@@ -31,7 +31,11 @@ import { useWorkspaceCreates } from "renderer/stores/workspace-creates/useWorksp
 import { PullRequestCommentComposer } from "../PullRequestCommentComposer";
 import { PullRequestCommentThread } from "../PullRequestCommentThread";
 import {
-	type LinkedWorkspace,
+	type CachedLinkedWorkspace,
+	mergeLinkedWorkspace,
+} from "./mergeLinkedWorkspace";
+import {
+	liveWorkspaceIdsForHost,
 	resolveLinkedWorkspaceId,
 } from "./resolveLinkedWorkspaceId";
 import {
@@ -425,26 +429,35 @@ export function PullRequestCodeTab({
 		hostUrl,
 		prNumber,
 	];
-	const { data: linkedWorkspaceData } = useQuery<LinkedWorkspace>({
+	const { data: linkedWorkspaceData } = useQuery<CachedLinkedWorkspace>({
 		queryKey: linkedWorkspaceQueryKey,
 		queryFn: async () => {
 			const client = getHostServiceClientByUrl(hostUrl);
-			return client.pullRequests.getLinkedWorkspace.query({
+			const answered = await client.pullRequests.getLinkedWorkspace.query({
 				projectId,
 				prNumber,
 			});
+			// The host's pull-request sync can trail this tab's own create by
+			// minutes, so a `null` here does not retire an id we seeded.
+			return mergeLinkedWorkspace(
+				queryClient.getQueryData<CachedLinkedWorkspace>(
+					linkedWorkspaceQueryKey,
+				),
+				answered,
+			);
 		},
 		staleTime: 30_000,
 		gcTime: 10 * 60_000,
 	});
-	const { workspaces: liveWorkspaces, isReady: liveWorkspacesReady } =
-		useHostWorkspaces();
+	const { workspaces: liveWorkspaces, answeredHostIds } = useHostWorkspaces();
 	const liveWorkspaceIds = useMemo(
 		() =>
-			liveWorkspacesReady
-				? new Set(liveWorkspaces.map((workspace) => workspace.id))
-				: null,
-		[liveWorkspaces, liveWorkspacesReady],
+			liveWorkspaceIdsForHost({
+				hostId,
+				workspaces: liveWorkspaces,
+				answeredHostIds,
+			}),
+		[hostId, liveWorkspaces, answeredHostIds],
 	);
 	const linkedWorkspaceId = resolveLinkedWorkspaceId({
 		workspaceId: linkedWorkspaceData?.workspaceId,
@@ -464,7 +477,7 @@ export function PullRequestCodeTab({
 					// follows must see it.
 					getLinkedWorkspaceId: () =>
 						resolveLinkedWorkspaceId({
-							workspaceId: queryClient.getQueryData<LinkedWorkspace>(
+							workspaceId: queryClient.getQueryData<CachedLinkedWorkspace>(
 								linkedWorkspaceQueryKey,
 							)?.workspaceId,
 							liveWorkspaceIds,
@@ -477,12 +490,15 @@ export function PullRequestCodeTab({
 					// A create whose agent failed still leaves the PR checked out,
 					// and the next send belongs in that workspace. The host links
 					// `workspaces.pullRequestId` from its own PR sync, which can
-					// land after this tab refetches, so seed the answer rather
-					// than invalidating: a cached `null` would survive the tab's
-					// unmount for the query's whole staleTime and check the PR
-					// out a second time.
+					// land long after this tab refetches, so seed the answer
+					// rather than invalidating. `seeded` is what keeps it: the
+					// merge above holds it against every `null` the host answers
+					// until the host confirms a link.
 					onWorkspaceCreated: (workspaceId) => {
-						queryClient.setQueryData(linkedWorkspaceQueryKey, { workspaceId });
+						queryClient.setQueryData(linkedWorkspaceQueryKey, {
+							workspaceId,
+							seeded: true,
+						});
 					},
 				},
 				input,
@@ -490,8 +506,8 @@ export function PullRequestCodeTab({
 		onSuccess: () => {
 			// No invalidation: the only send that changes which workspace is
 			// linked is the create branch, and that one seeds the id above. A
-			// refetch here would race the host's PR sync and could replace a
-			// known id with the `null` it has not linked yet.
+			// refetch here would race the host's PR sync for nothing — the
+			// merge would answer with the seeded id anyway.
 			toast.success(
 				t({
 					message: "Sent to agent",

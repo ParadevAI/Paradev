@@ -71,6 +71,14 @@ export interface UseHostWorkspacesResult {
 	 * cover only the local host.
 	 */
 	hostsSettled: boolean;
+	/**
+	 * Hosts whose live list answered this session. Absence of a workspace
+	 * from `workspaces` is evidence that it is gone only for these hosts: a
+	 * host that errored, is still loading, or is serving nothing but a
+	 * saved snapshot contributes no rows, and its silence is not a statement
+	 * about any particular workspace.
+	 */
+	answeredHostIds: ReadonlySet<string>;
 	cache: HostWorkspacesCacheOps;
 }
 
@@ -403,6 +411,19 @@ export function useHostWorkspacesSource(
 					query.isSuccess || query.isError || targets[index]?.hostUrl === null,
 			));
 
+	// Success only: react-query retains a host's prior rows across a failed
+	// refetch, and an offline host renders from its IndexedDB snapshot, so
+	// having rows is not the same as having answered.
+	const answeredHostIds = useMemo(
+		() =>
+			new Set(
+				targets
+					.filter((_target, index) => queries[index]?.isSuccess)
+					.map((target) => target.machineId),
+			),
+		[targets, queries],
+	);
+
 	const cache = useMemo<HostWorkspacesCacheOps>(() => {
 		const targetFor = (hostId: string) =>
 			targets.find((target) => target.machineId === hostId);
@@ -455,5 +476,11 @@ export function useHostWorkspacesSource(
 		};
 	}, [targets, queryClient]);
 
-	return { workspaces, isReady, hostsSettled: knownHostsSettled, cache };
+	return {
+		workspaces,
+		isReady,
+		hostsSettled: knownHostsSettled,
+		answeredHostIds,
+		cache,
+	};
 }

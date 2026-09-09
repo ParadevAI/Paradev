@@ -41,7 +41,15 @@ export function useBatchWorkspaceCreateReport() {
 					}),
 				);
 			}
-			return lines.join(" ");
+			// Every line ends with a raw host error, which carries no
+			// punctuation of its own, so a bare space runs the two sentences
+			// together: "...is not running The agents didn't start...". Close
+			// each line another one follows; the last stays as it reads alone.
+			return lines
+				.map((line, index) =>
+					index === lines.length - 1 || /[.!?]$/.test(line) ? line : `${line}.`,
+				)
+				.join(" ");
 		},
 		[t],
 	);

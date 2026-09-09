@@ -2,7 +2,11 @@ import { expect, mock, test } from "bun:test";
 import { QueryClient } from "@tanstack/react-query";
 import type { SubmitOutcome } from "renderer/stores/workspace-creates";
 import {
-	type LinkedWorkspace,
+	type CachedLinkedWorkspace,
+	mergeLinkedWorkspace,
+} from "./mergeLinkedWorkspace";
+import {
+	liveWorkspaceIdsForHost,
 	resolveLinkedWorkspaceId,
 } from "./resolveLinkedWorkspaceId";
 import {
@@ -30,12 +34,14 @@ const LINKED_WORKSPACE_KEY = ["pull-request-linked-workspace", "project-1", 42];
  */
 function harness(outcomes: SubmitOutcome[]) {
 	const queryClient = new QueryClient();
-	const liveWorkspaceIds = new Set<string>();
+	const live: { id: string; hostId: string }[] = [];
+	// The host answers its workspace list until a test says it stopped.
+	const answeredHostIds = new Set(["host-1"]);
 	const submitWorkspaceCreate = mock(() => {
 		const outcome = outcomes.shift();
 		if (!outcome) throw new Error("unexpected create");
 		if (outcome.workspaceId !== undefined) {
-			liveWorkspaceIds.add(outcome.workspaceId);
+			live.push({ id: outcome.workspaceId, hostId: "host-1" });
 		}
 		return {
 			workspaceId: "optimistic",
@@ -46,6 +52,20 @@ function harness(outcomes: SubmitOutcome[]) {
 		async (_args: { workspaceId: string; agent: string; prompt: string }) =>
 			undefined,
 	);
+	const archive = (workspaceId: string) => {
+		const index = live.findIndex((workspace) => workspace.id === workspaceId);
+		if (index >= 0) live.splice(index, 1);
+	};
+	/** The linked-workspace query answering, exactly as the tab caches it. */
+	const refetchLink = (answered: string | null) => {
+		queryClient.setQueryData(
+			LINKED_WORKSPACE_KEY,
+			mergeLinkedWorkspace(
+				queryClient.getQueryData<CachedLinkedWorkspace>(LINKED_WORKSPACE_KEY),
+				{ workspaceId: answered },
+			),
+		);
+	};
 	const mount = (): SendCommentToAgentDeps => ({
 		hostId: "host-1",
 		projectId: "project-1",
@@ -53,18 +73,32 @@ function harness(outcomes: SubmitOutcome[]) {
 		getLinkedWorkspaceId: () =>
 			resolveLinkedWorkspaceId({
 				workspaceId:
-					queryClient.getQueryData<LinkedWorkspace>(LINKED_WORKSPACE_KEY)
+					queryClient.getQueryData<CachedLinkedWorkspace>(LINKED_WORKSPACE_KEY)
 						?.workspaceId,
-				liveWorkspaceIds,
+				liveWorkspaceIds: liveWorkspaceIdsForHost({
+					hostId: "host-1",
+					workspaces: live,
+					answeredHostIds,
+				}),
 			}),
 		writeTerminalInput: mock(async () => undefined),
 		runAgent,
 		submitWorkspaceCreate,
 		onWorkspaceCreated: (workspaceId) => {
-			queryClient.setQueryData(LINKED_WORKSPACE_KEY, { workspaceId });
+			queryClient.setQueryData(LINKED_WORKSPACE_KEY, {
+				workspaceId,
+				seeded: true,
+			});
 		},
 	});
-	return { mount, submitWorkspaceCreate, runAgent, liveWorkspaceIds };
+	return {
+		mount,
+		submitWorkspaceCreate,
+		runAgent,
+		archive,
+		refetchLink,
+		answeredHostIds,
+	};
 }
 
 test("a retry after a failed agent launch reuses the workspace instead of creating a second one", async () => {
@@ -103,7 +137,7 @@ test("the workspace survives leaving the Code tab and coming back", async () => 
 });
 
 test("a workspace archived after the failed launch is not sent into", async () => {
-	const { mount, submitWorkspaceCreate, runAgent, liveWorkspaceIds } = harness([
+	const { mount, submitWorkspaceCreate, runAgent, archive } = harness([
 		{ ok: false, workspaceId: "ws-1", error: "Agent launch failed: boom" },
 		{ ok: true, workspaceId: "ws-2" },
 	]);
@@ -113,11 +147,44 @@ test("a workspace archived after the failed launch is not sent into", async () =
 	);
 	// Deleting a workspace archives it; the live mirror drops the row while the
 	// seeded id and the host's own row both survive.
-	liveWorkspaceIds.delete("ws-1");
+	archive("ws-1");
 	await sendCommentToAgent(mount(), input);
 
 	expect(submitWorkspaceCreate).toHaveBeenCalledTimes(2);
 	expect(runAgent).not.toHaveBeenCalled();
+});
+
+test("a link refetch that has not caught up does not check the PR out twice", async () => {
+	const { mount, submitWorkspaceCreate, runAgent, refetchLink } = harness([
+		{ ok: false, workspaceId: "ws-1", error: "Agent launch failed: boom" },
+	]);
+
+	await expect(sendCommentToAgent(mount(), input)).rejects.toThrow(
+		"Agent launch failed: boom",
+	);
+	// Past the query's staleness window the tab refetches, and the host's PR
+	// sync has not linked the workspace yet.
+	refetchLink(null);
+	await sendCommentToAgent(mount(), input);
+
+	expect(submitWorkspaceCreate).toHaveBeenCalledTimes(1);
+	expect(runAgent.mock.calls[0][0]).toMatchObject({ workspaceId: "ws-1" });
+});
+
+test("a host that stopped answering its workspace list does not lose the workspace", async () => {
+	const { mount, submitWorkspaceCreate, runAgent, answeredHostIds } = harness([
+		{ ok: false, workspaceId: "ws-1", error: "Agent launch failed: boom" },
+	]);
+
+	await expect(sendCommentToAgent(mount(), input)).rejects.toThrow(
+		"Agent launch failed: boom",
+	);
+	// The list query errors out: no rows, and no statement about ws-1 either.
+	answeredHostIds.delete("host-1");
+	await sendCommentToAgent(mount(), input);
+
+	expect(submitWorkspaceCreate).toHaveBeenCalledTimes(1);
+	expect(runAgent.mock.calls[0][0]).toMatchObject({ workspaceId: "ws-1" });
 });
 
 test("a create that produced no workspace leaves the next send on the create path", async () => {
