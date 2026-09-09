@@ -4006,6 +4006,9 @@ msgstr "Không kết nối được tới host để tải pull request này."
 msgid "Could not reach the host to start the update. Check that it is online and try again."
 msgstr "Không thể kết nối tới máy chủ để bắt đầu cập nhật. Hãy kiểm tra máy chủ đang trực tuyến rồi thử lại."
 
+msgid "Could not reach the server."
+msgstr "Không thể kết nối tới máy chủ."
+
 msgid "Could not reach this workspace's machine"
 msgstr "Không kết nối được tới máy của workspace này"
 
@@ -4250,6 +4253,9 @@ msgstr "Tạo một nhóm"
 
 msgid "Create a workspace for the auth feature on my MacBook"
 msgstr "Tạo một workspace cho tính năng xác thực trên MacBook của tôi"
+
+msgid "Create again"
+msgstr "Tạo lại"
 
 msgid "Create an account"
 msgstr "Tạo tài khoản"
@@ -4872,6 +4878,9 @@ msgstr "Đọc chính tả"
 
 msgid "Dictation is not available on this device"
 msgstr "Đọc chính tả không khả dụng trên thiết bị này"
+
+msgid "Didn't hear back"
+msgstr "Không có phản hồi"
 
 msgid "diff"
 msgstr "diff"
@@ -8975,6 +8984,9 @@ msgstr "Không có biểu tượng"
 
 msgid "No Internet Connection"
 msgstr "Không có kết nối internet"
+
+msgid "No internet connection."
+msgstr "Không có kết nối Internet."
 
 msgid "No issues found."
 msgstr "Không tìm thấy issue nào."
@@ -13327,6 +13339,9 @@ msgstr "Bước {0} / 2"
 msgid "Step {step}: {name}"
 msgstr "Bước {step}: {name}"
 
+msgid "Still can't reach the host."
+msgstr "Vẫn không thể kết nối tới host."
+
 msgid "Still working — large repos can take a few minutes. You can leave; the workspace will appear on Home when it's ready."
 msgstr "Vẫn đang xử lý — repo lớn có thể mất vài phút. Bạn có thể rời đi; workspace sẽ xuất hiện ở Trang chủ khi sẵn sàng."
 
@@ -14055,6 +14070,9 @@ msgstr "Máy chủ đã trở lại với {0}, không phải {targetVersion}."
 msgid "The host did not come back within fifteen minutes."
 msgstr "Máy chủ không hoạt động trở lại trong vòng mười lăm phút."
 
+msgid "The host hasn't answered."
+msgstr "Host không phản hồi."
+
 msgid "The host isn't connected to the Superset relay. If it's this device, turn on \"Allow remote access to this device via relay\" in Settings > Remote Access, then try again."
 msgstr "Host chưa kết nối tới relay của Superset. Nếu đó là thiết bị này, hãy bật \"Cho phép truy cập từ xa vào thiết bị này qua relay\" trong Cài đặt > Truy cập từ xa, rồi thử lại."
 
@@ -14220,6 +14238,9 @@ msgstr "Giao diện agent trên web hiện chỉ là bản xem trước chỉ đ
 
 msgid "The workspace is not ready yet. Try again."
 msgstr "Workspace chưa sẵn sàng. Hãy thử lại."
+
+msgid "The workspace may still have been created. This screen opens it if it appears."
+msgstr "Workspace vẫn có thể đã được tạo. Màn hình này sẽ mở nó nếu xuất hiện."
 
 msgid "The worktree and any uncommitted changes will be removed. This cannot be undone."
 msgstr "Worktree và mọi thay đổi chưa commit sẽ bị gỡ. Không thể hoàn tác."
@@ -14542,9 +14563,6 @@ msgstr "Hạng"
 
 msgid "Time range"
 msgstr "Khoảng thời gian"
-
-msgid "Timed out waiting for the host to create the workspace."
-msgstr "Quá thời gian chờ host tạo workspace."
 
 msgid "Title"
 msgstr "Tiêu đề"

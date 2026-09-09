@@ -4006,6 +4006,9 @@ msgstr "Не удалось связаться с хостом, чтобы за�
 msgid "Could not reach the host to start the update. Check that it is online and try again."
 msgstr "Не удалось связаться с хостом, чтобы начать обновление. Убедитесь, что он в сети, и попробуйте снова."
 
+msgid "Could not reach the server."
+msgstr "Не удалось подключиться к серверу."
+
 msgid "Could not reach this workspace's machine"
 msgstr "Не удалось связаться с машиной этой рабочей области"
 
@@ -4250,6 +4253,9 @@ msgstr "Создать команду"
 
 msgid "Create a workspace for the auth feature on my MacBook"
 msgstr "Создай рабочую область для фичи авторизации на моём MacBook"
+
+msgid "Create again"
+msgstr "Создать заново"
 
 msgid "Create an account"
 msgstr "Создать аккаунт"
@@ -4872,6 +4878,9 @@ msgstr "Диктовать"
 
 msgid "Dictation is not available on this device"
 msgstr "Диктовка недоступна на этом устройстве"
+
+msgid "Didn't hear back"
+msgstr "Ответа не поступило"
 
 msgid "diff"
 msgstr "diff"
@@ -8975,6 +8984,9 @@ msgstr "Без иконки"
 
 msgid "No Internet Connection"
 msgstr "Нет подключения к интернету"
+
+msgid "No internet connection."
+msgstr "Нет подключения к интернету."
 
 msgid "No issues found."
 msgstr "Задачи не найдены."
@@ -13327,6 +13339,9 @@ msgstr "Шаг {0} из 2"
 msgid "Step {step}: {name}"
 msgstr "Шаг {step}: {name}"
 
+msgid "Still can't reach the host."
+msgstr "Хост по-прежнему недоступен."
+
 msgid "Still working — large repos can take a few minutes. You can leave; the workspace will appear on Home when it's ready."
 msgstr "Ещё работаем — большие репозитории могут занять несколько минут. Можно выйти; рабочая область появится на главной, когда будет готова."
 
@@ -14055,6 +14070,9 @@ msgstr "Хост вернулся с версией {0}, а не {targetVersion}
 msgid "The host did not come back within fifteen minutes."
 msgstr "Хост не восстановил работу в течение пятнадцати минут."
 
+msgid "The host hasn't answered."
+msgstr "Хост не ответил."
+
 msgid "The host isn't connected to the Superset relay. If it's this device, turn on \"Allow remote access to this device via relay\" in Settings > Remote Access, then try again."
 msgstr "Хост не подключён к реле Superset. Если это текущее устройство, включите «Разрешить удалённый доступ к этому устройству через реле» в Настройки > Удалённый доступ и повторите."
 
@@ -14220,6 +14238,9 @@ msgstr "Веб-интерфейс агентов пока доступен то�
 
 msgid "The workspace is not ready yet. Try again."
 msgstr "Рабочая область ещё не готова. Повторите."
+
+msgid "The workspace may still have been created. This screen opens it if it appears."
+msgstr "Рабочая область всё же могла быть создана. Этот экран откроет её, когда она появится."
 
 msgid "The worktree and any uncommitted changes will be removed. This cannot be undone."
 msgstr "Worktree и все незакоммиченные изменения будут удалены. Отменить нельзя."
@@ -14542,9 +14563,6 @@ msgstr "Уровень"
 
 msgid "Time range"
 msgstr "Период"
-
-msgid "Timed out waiting for the host to create the workspace."
-msgstr "Истекло время ожидания, пока хост создаст рабочую область."
 
 msgid "Title"
 msgstr "Название"

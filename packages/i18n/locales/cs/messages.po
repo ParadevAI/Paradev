@@ -4006,6 +4006,9 @@ msgstr "Nepodařilo se spojit s hostem a načíst tento pull request."
 msgid "Could not reach the host to start the update. Check that it is online and try again."
 msgstr "Nepodařilo se spojit s hostitelem a zahájit aktualizaci. Zkontrolujte, že je online, a zkuste to znovu."
 
+msgid "Could not reach the server."
+msgstr "Nepodařilo se spojit se serverem."
+
 msgid "Could not reach this workspace's machine"
 msgstr "Nepodařilo se spojit s počítačem tohoto pracovního prostoru"
 
@@ -4250,6 +4253,9 @@ msgstr "Vytvořit tým"
 
 msgid "Create a workspace for the auth feature on my MacBook"
 msgstr "Vytvoř na mém MacBooku pracovní prostor pro funkci auth"
+
+msgid "Create again"
+msgstr "Vytvořit znovu"
 
 msgid "Create an account"
 msgstr "Vytvořit účet"
@@ -4872,6 +4878,9 @@ msgstr "Diktovat"
 
 msgid "Dictation is not available on this device"
 msgstr "Diktování není na tomto zařízení dostupné"
+
+msgid "Didn't hear back"
+msgstr "Bez odpovědi"
 
 msgid "diff"
 msgstr "rozdíl"
@@ -8975,6 +8984,9 @@ msgstr "Bez ikony"
 
 msgid "No Internet Connection"
 msgstr "Bez připojení k internetu"
+
+msgid "No internet connection."
+msgstr "Není připojení k internetu."
 
 msgid "No issues found."
 msgstr "Nenalezeny žádné issues."
@@ -13327,6 +13339,9 @@ msgstr "Krok {0} ze 2"
 msgid "Step {step}: {name}"
 msgstr "Krok {step}: {name}"
 
+msgid "Still can't reach the host."
+msgstr "Host je stále nedostupný."
+
 msgid "Still working — large repos can take a few minutes. You can leave; the workspace will appear on Home when it's ready."
 msgstr "Stále pracuji — u velkých repozitářů to může trvat pár minut. Můžete odejít; pracovní prostor se objeví na úvodní obrazovce, až bude hotový."
 
@@ -14055,6 +14070,9 @@ msgstr "Hostitel se vrátil s verzí {0}, ne {targetVersion}."
 msgid "The host did not come back within fifteen minutes."
 msgstr "Hostitel se neobnovil do patnácti minut."
 
+msgid "The host hasn't answered."
+msgstr "Host neodpověděl."
+
 msgid "The host isn't connected to the Superset relay. If it's this device, turn on \"Allow remote access to this device via relay\" in Settings > Remote Access, then try again."
 msgstr "Host není připojený k Superset relay. Pokud jde o toto zařízení, zapněte „Povolit vzdálený přístup k tomuto zařízení přes relay“ v Nastavení > Vzdálený přístup a zkuste to znovu."
 
@@ -14220,6 +14238,9 @@ msgstr "Webové rozhraní agentů je zatím náhled jen pro čtení."
 
 msgid "The workspace is not ready yet. Try again."
 msgstr "Pracovní prostor ještě není připravený. Zkuste to znovu."
+
+msgid "The workspace may still have been created. This screen opens it if it appears."
+msgstr "Pracovní prostor mohl přesto vzniknout. Tato obrazovka ho otevře, jakmile se objeví."
 
 msgid "The worktree and any uncommitted changes will be removed. This cannot be undone."
 msgstr "Worktree a všechny necommitnuté změny budou odstraněny. Tuto akci nelze vrátit zpět."
@@ -14542,9 +14563,6 @@ msgstr "Tarif"
 
 msgid "Time range"
 msgstr "Časové období"
-
-msgid "Timed out waiting for the host to create the workspace."
-msgstr "Vypršel čas při čekání, až host vytvoří pracovní prostor."
 
 msgid "Title"
 msgstr "Název"

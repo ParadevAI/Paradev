@@ -4006,6 +4006,9 @@ msgstr "No se pudo contactar con el host para cargar esta pull request."
 msgid "Could not reach the host to start the update. Check that it is online and try again."
 msgstr "No se pudo contactar con el host para iniciar la actualización. Comprueba que está en línea y vuelve a intentarlo."
 
+msgid "Could not reach the server."
+msgstr "No se pudo conectar con el servidor."
+
 msgid "Could not reach this workspace's machine"
 msgstr "No se pudo contactar con la máquina de este espacio de trabajo"
 
@@ -4250,6 +4253,9 @@ msgstr "Crear un equipo"
 
 msgid "Create a workspace for the auth feature on my MacBook"
 msgstr "Crea un espacio de trabajo para la función de autenticación en mi MacBook"
+
+msgid "Create again"
+msgstr "Crear de nuevo"
 
 msgid "Create an account"
 msgstr "Crear una cuenta"
@@ -4872,6 +4878,9 @@ msgstr "Dictar"
 
 msgid "Dictation is not available on this device"
 msgstr "El dictado no está disponible en este dispositivo"
+
+msgid "Didn't hear back"
+msgstr "Sin respuesta"
 
 msgid "diff"
 msgstr "diff"
@@ -8975,6 +8984,9 @@ msgstr "Sin icono"
 
 msgid "No Internet Connection"
 msgstr "Sin conexión a internet"
+
+msgid "No internet connection."
+msgstr "Sin conexión a Internet."
 
 msgid "No issues found."
 msgstr "No se encontraron issues."
@@ -13327,6 +13339,9 @@ msgstr "Paso {0} de 2"
 msgid "Step {step}: {name}"
 msgstr "Paso {step}: {name}"
 
+msgid "Still can't reach the host."
+msgstr "El host sigue sin responder."
+
 msgid "Still working — large repos can take a few minutes. You can leave; the workspace will appear on Home when it's ready."
 msgstr "Sigue en marcha: los repositorios grandes pueden tardar unos minutos. Puedes salir; el espacio de trabajo aparecerá en Inicio cuando esté listo."
 
@@ -14055,6 +14070,9 @@ msgstr "El host volvió con {0}, no con {targetVersion}."
 msgid "The host did not come back within fifteen minutes."
 msgstr "El host no volvió a estar disponible en quince minutos."
 
+msgid "The host hasn't answered."
+msgstr "El host no ha respondido."
+
 msgid "The host isn't connected to the Superset relay. If it's this device, turn on \"Allow remote access to this device via relay\" in Settings > Remote Access, then try again."
 msgstr "El host no está conectado al relay de Superset. Si es este dispositivo, activa \"Permitir que los espacios de trabajo remotos accedan a este dispositivo mediante el relay\" en Configuración > Acceso remoto y vuelve a intentarlo."
 
@@ -14220,6 +14238,9 @@ msgstr "La interfaz web de agentes es, por ahora, una vista previa de solo lectu
 
 msgid "The workspace is not ready yet. Try again."
 msgstr "El espacio de trabajo aún no está listo. Inténtalo de nuevo."
+
+msgid "The workspace may still have been created. This screen opens it if it appears."
+msgstr "Puede que el espacio de trabajo se haya creado igualmente. Esta pantalla lo abre si aparece."
 
 msgid "The worktree and any uncommitted changes will be removed. This cannot be undone."
 msgstr "Se eliminarán el worktree y los cambios sin commit. Esto no se puede deshacer."
@@ -14542,9 +14563,6 @@ msgstr "Nivel"
 
 msgid "Time range"
 msgstr "Periodo"
-
-msgid "Timed out waiting for the host to create the workspace."
-msgstr "Se agotó el tiempo de espera para que el host creara el espacio de trabajo."
 
 msgid "Title"
 msgstr "Título"
