@@ -9,14 +9,10 @@ import { parsePatchFiles } from "@pierre/diffs";
 import { CodeView, type CodeViewHandle } from "@pierre/diffs/react";
 import { FileTree as PierreFileTree, useFileTree } from "@pierre/trees/react";
 import { errorMessage } from "@superset/i18n/errors";
-import { sanitizePromptForPty } from "@superset/shared/agent-prompt-launch";
 import { toast } from "@superset/ui/sonner";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import {
-	type AgentPromptFileSide,
-	formatAgentPromptWithFileContext,
-} from "renderer/hooks/host-service/useSendToTerminalAgent";
+import type { AgentPromptFileSide } from "renderer/hooks/host-service/useSendToTerminalAgent";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import {
 	createPierreTreeStyle,
@@ -24,9 +20,7 @@ import {
 	PIERRE_TREE_UNSAFE_CSS,
 	type PierreGitStatus,
 } from "renderer/lib/pierreTree";
-import { normalizeTerminalCommand } from "renderer/lib/terminal/launch-command";
 import { WorkItemDetailState } from "renderer/routes/_authenticated/_dashboard/components/WorkItemDetailState";
-import type { AgentTarget } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/AgentCommentComposer/hooks/useDiffCommentTarget";
 import { useDiffCardCodeViewTheme } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/hooks/useDiffCodeViewTheme";
 import { DiffFileCollapseButton } from "renderer/screens/main/components/DiffFileCollapseButton";
 import { DiffFileHeaderName } from "renderer/screens/main/components/DiffFileHeaderName";
@@ -35,6 +29,10 @@ import { ResizablePanel } from "renderer/screens/main/components/ResizablePanel"
 import { useWorkspaceCreates } from "renderer/stores/workspace-creates/useWorkspaceCreates";
 import { PullRequestCommentComposer } from "../PullRequestCommentComposer";
 import { PullRequestCommentThread } from "../PullRequestCommentThread";
+import {
+	type SendCommentToAgentInput,
+	sendCommentToAgent as sendCommentToAgentRequest,
+} from "./sendCommentToAgent";
 
 interface PullRequestCodeTabProps {
 	projectId: string;
@@ -434,73 +432,50 @@ export function PullRequestCodeTab({
 		staleTime: 30_000,
 		gcTime: 10 * 60_000,
 	});
-	const linkedWorkspaceId = linkedWorkspaceData?.workspaceId ?? null;
+	// A PR-checkout workspace this tab created. It outlives a failed agent
+	// launch and stays linked to the PR, so it is the workspace the next send
+	// belongs in — the linked-workspace query alone would keep returning `null`
+	// for up to its 30s staleTime and check the PR out a second time. Tagged
+	// with the PR it was created for; this component is reused across PRs.
+	const createdWorkspaceRef = useRef<{
+		projectId: string;
+		prNumber: number;
+		workspaceId: string;
+	} | null>(null);
+	const readCreatedWorkspaceId = useCallback(() => {
+		const created = createdWorkspaceRef.current;
+		if (created === null) return null;
+		if (created.projectId !== projectId) return null;
+		if (created.prNumber !== prNumber) return null;
+		return created.workspaceId;
+	}, [projectId, prNumber]);
+	const linkedWorkspaceId =
+		linkedWorkspaceData?.workspaceId ?? readCreatedWorkspaceId();
 	const { submit: submitWorkspaceCreate } = useWorkspaceCreates();
 
-	// Mirrors DiffPane's split between "send to an existing terminal" and
-	// "create a new agent session", but the PR tab has no fixed workspace to
-	// launch a new session *in* — when no workspace is linked to this PR yet,
-	// "new" means spinning up a whole PR-checkout workspace (via the same
-	// useWorkspaceCreates path "Start Workspace" uses) with the prompt baked
-	// into its first agent launch, not just a fresh terminal in one that
-	// already exists.
 	const sendCommentToAgent = useMutation({
-		mutationFn: async (input: {
-			comment: string;
-			target: AgentTarget;
-			path: string;
-			startLine: number;
-			endLine: number;
-			side: AgentPromptFileSide;
-		}) => {
-			const text = formatAgentPromptWithFileContext({
-				comment: input.comment,
-				file: {
-					path: input.path,
-					startLine: input.startLine,
-					endLine: input.endLine,
-					side: input.side,
-				},
-			});
-
-			if (input.target.kind === "existing") {
-				if (!linkedWorkspaceId) {
-					throw new Error("No workspace open for this session");
-				}
-				const client = getHostServiceClientByUrl(hostUrl);
-				await client.terminal.writeInput.mutate({
-					workspaceId: linkedWorkspaceId,
-					terminalId: input.target.terminalId,
-					data: normalizeTerminalCommand(sanitizePromptForPty(text)),
-				});
-				return;
-			}
-
-			if (linkedWorkspaceId) {
-				const client = getHostServiceClientByUrl(hostUrl);
-				await client.agents.run.mutate({
-					workspaceId: linkedWorkspaceId,
-					agent: input.target.configId,
-					prompt: text,
-				});
-				return;
-			}
-
-			if (!hostId) {
-				throw new Error("No host available to create a workspace");
-			}
-			const { completed } = submitWorkspaceCreate({
-				hostId,
-				snapshot: {
-					id: crypto.randomUUID(),
+		mutationFn: (input: SendCommentToAgentInput) =>
+			sendCommentToAgentRequest(
+				{
+					hostId,
 					projectId,
-					pr: prNumber,
-					agents: [{ agent: input.target.configId, prompt: text }],
+					prNumber,
+					getLinkedWorkspaceId: () =>
+						linkedWorkspaceData?.workspaceId ?? readCreatedWorkspaceId(),
+					writeTerminalInput: (args) =>
+						getHostServiceClientByUrl(hostUrl).terminal.writeInput.mutate(args),
+					runAgent: (args) =>
+						getHostServiceClientByUrl(hostUrl).agents.run.mutate(args),
+					submitWorkspaceCreate,
+					onWorkspaceCreated: (workspaceId) => {
+						createdWorkspaceRef.current = { projectId, prNumber, workspaceId };
+						void queryClient.invalidateQueries({
+							queryKey: linkedWorkspaceQueryKey,
+						});
+					},
 				},
-			});
-			const outcome = await completed;
-			if (!outcome.ok) throw new Error(outcome.error);
-		},
+				input,
+			),
 		onSuccess: () => {
 			void queryClient.invalidateQueries({ queryKey: linkedWorkspaceQueryKey });
 			toast.success(
