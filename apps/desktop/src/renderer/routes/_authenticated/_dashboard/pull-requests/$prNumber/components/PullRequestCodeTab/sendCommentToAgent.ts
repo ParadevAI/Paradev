@@ -17,7 +17,8 @@ export interface SendCommentToAgentDeps {
 	/**
 	 * Read when the send runs, not when the composer rendered. A create whose
 	 * agent failed to launch still leaves a workspace checked out on this PR,
-	 * and the next send must reuse it instead of checking the PR out again.
+	 * and the next send must reuse it instead of checking the PR out again —
+	 * unless it has since been archived, which this must not hand back.
 	 */
 	getLinkedWorkspaceId: () => string | null;
 	writeTerminalInput: (args: {

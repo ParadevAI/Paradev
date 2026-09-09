@@ -46,6 +46,16 @@ describe("agentLaunchFailureDetail", () => {
 		).toBe(UNKNOWN);
 	});
 
+	test("stands in for a host that omitted `error` instead of throwing", () => {
+		// A union-violating payload: nothing validates the event on the way in,
+		// and a throw here would be caught as a *create* failure and delete a
+		// workspace the host kept.
+		const malformed = [{ ok: false }] as unknown as Parameters<
+			typeof agentLaunchFailureDetail
+		>[0];
+		expect(agentLaunchFailureDetail(malformed, UNKNOWN)).toBe(UNKNOWN);
+	});
+
 	test("keeps the stand-in in place when only one of several is blank", () => {
 		expect(
 			agentLaunchFailureDetail(

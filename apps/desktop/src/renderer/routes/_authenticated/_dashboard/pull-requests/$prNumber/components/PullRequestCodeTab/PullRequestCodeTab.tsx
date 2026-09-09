@@ -22,6 +22,7 @@ import {
 } from "renderer/lib/pierreTree";
 import { WorkItemDetailState } from "renderer/routes/_authenticated/_dashboard/components/WorkItemDetailState";
 import { useDiffCardCodeViewTheme } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/hooks/useDiffCodeViewTheme";
+import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { DiffFileCollapseButton } from "renderer/screens/main/components/DiffFileCollapseButton";
 import { DiffFileHeaderName } from "renderer/screens/main/components/DiffFileHeaderName";
 import { DiffViewToolbar } from "renderer/screens/main/components/DiffViewToolbar";
@@ -29,6 +30,10 @@ import { ResizablePanel } from "renderer/screens/main/components/ResizablePanel"
 import { useWorkspaceCreates } from "renderer/stores/workspace-creates/useWorkspaceCreates";
 import { PullRequestCommentComposer } from "../PullRequestCommentComposer";
 import { PullRequestCommentThread } from "../PullRequestCommentThread";
+import {
+	type LinkedWorkspace,
+	resolveLinkedWorkspaceId,
+} from "./resolveLinkedWorkspaceId";
 import {
 	type SendCommentToAgentInput,
 	sendCommentToAgent as sendCommentToAgentRequest,
@@ -420,7 +425,7 @@ export function PullRequestCodeTab({
 		hostUrl,
 		prNumber,
 	];
-	const { data: linkedWorkspaceData } = useQuery({
+	const { data: linkedWorkspaceData } = useQuery<LinkedWorkspace>({
 		queryKey: linkedWorkspaceQueryKey,
 		queryFn: async () => {
 			const client = getHostServiceClientByUrl(hostUrl);
@@ -432,25 +437,19 @@ export function PullRequestCodeTab({
 		staleTime: 30_000,
 		gcTime: 10 * 60_000,
 	});
-	// A PR-checkout workspace this tab created. It outlives a failed agent
-	// launch and stays linked to the PR, so it is the workspace the next send
-	// belongs in — the linked-workspace query alone would keep returning `null`
-	// for up to its 30s staleTime and check the PR out a second time. Tagged
-	// with the PR it was created for; this component is reused across PRs.
-	const createdWorkspaceRef = useRef<{
-		projectId: string;
-		prNumber: number;
-		workspaceId: string;
-	} | null>(null);
-	const readCreatedWorkspaceId = useCallback(() => {
-		const created = createdWorkspaceRef.current;
-		if (created === null) return null;
-		if (created.projectId !== projectId) return null;
-		if (created.prNumber !== prNumber) return null;
-		return created.workspaceId;
-	}, [projectId, prNumber]);
-	const linkedWorkspaceId =
-		linkedWorkspaceData?.workspaceId ?? readCreatedWorkspaceId();
+	const { workspaces: liveWorkspaces, isReady: liveWorkspacesReady } =
+		useHostWorkspaces();
+	const liveWorkspaceIds = useMemo(
+		() =>
+			liveWorkspacesReady
+				? new Set(liveWorkspaces.map((workspace) => workspace.id))
+				: null,
+		[liveWorkspaces, liveWorkspacesReady],
+	);
+	const linkedWorkspaceId = resolveLinkedWorkspaceId({
+		workspaceId: linkedWorkspaceData?.workspaceId,
+		liveWorkspaceIds,
+	});
 	const { submit: submitWorkspaceCreate } = useWorkspaceCreates();
 
 	const sendCommentToAgent = useMutation({
@@ -460,24 +459,39 @@ export function PullRequestCodeTab({
 					hostId,
 					projectId,
 					prNumber,
+					// The cache, not the render's copy of it: a create earlier in
+					// this same send seeds the id there, and the retry that
+					// follows must see it.
 					getLinkedWorkspaceId: () =>
-						linkedWorkspaceData?.workspaceId ?? readCreatedWorkspaceId(),
+						resolveLinkedWorkspaceId({
+							workspaceId: queryClient.getQueryData<LinkedWorkspace>(
+								linkedWorkspaceQueryKey,
+							)?.workspaceId,
+							liveWorkspaceIds,
+						}),
 					writeTerminalInput: (args) =>
 						getHostServiceClientByUrl(hostUrl).terminal.writeInput.mutate(args),
 					runAgent: (args) =>
 						getHostServiceClientByUrl(hostUrl).agents.run.mutate(args),
 					submitWorkspaceCreate,
+					// A create whose agent failed still leaves the PR checked out,
+					// and the next send belongs in that workspace. The host links
+					// `workspaces.pullRequestId` from its own PR sync, which can
+					// land after this tab refetches, so seed the answer rather
+					// than invalidating: a cached `null` would survive the tab's
+					// unmount for the query's whole staleTime and check the PR
+					// out a second time.
 					onWorkspaceCreated: (workspaceId) => {
-						createdWorkspaceRef.current = { projectId, prNumber, workspaceId };
-						void queryClient.invalidateQueries({
-							queryKey: linkedWorkspaceQueryKey,
-						});
+						queryClient.setQueryData(linkedWorkspaceQueryKey, { workspaceId });
 					},
 				},
 				input,
 			),
 		onSuccess: () => {
-			void queryClient.invalidateQueries({ queryKey: linkedWorkspaceQueryKey });
+			// No invalidation: the only send that changes which workspace is
+			// linked is the create branch, and that one seeds the id above. A
+			// refetch here would race the host's PR sync and could replace a
+			// known id with the `null` it has not linked yet.
 			toast.success(
 				t({
 					message: "Sent to agent",
