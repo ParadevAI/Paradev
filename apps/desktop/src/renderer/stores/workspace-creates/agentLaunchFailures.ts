@@ -5,16 +5,21 @@
  * a failed create outcome — surface the host errors instead of soft-succeeding
  * with "Workspace created" / "Sent to agent" over an empty agent pane.
  *
- * Returns the host's own error text, which is not translated; `unknownError`
- * carries the caller's translated stand-in for a failure the host left blank.
+ * Returns the host's own error text, which is not translated. The host builds
+ * that text from `err.message`, so it can be blank; `unknownError` carries the
+ * caller's translated stand-in for those.
  */
 export function agentLaunchFailureDetail(
-	agents: ReadonlyArray<{ ok: boolean; error?: string }> | undefined,
+	agents:
+		| ReadonlyArray<{ ok: true } | { ok: false; error: string }>
+		| undefined,
 	unknownError: string,
 ): string | null {
-	const errors = (agents ?? [])
-		.filter((agent) => !agent.ok)
-		.map((agent) => agent.error ?? unknownError);
+	const errors: string[] = [];
+	for (const agent of agents ?? []) {
+		if (agent.ok) continue;
+		errors.push(agent.error.trim() || unknownError);
+	}
 	if (errors.length === 0) return null;
 	return errors.join("; ");
 }

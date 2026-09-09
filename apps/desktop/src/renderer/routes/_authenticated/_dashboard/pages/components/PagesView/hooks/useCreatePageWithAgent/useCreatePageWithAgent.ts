@@ -49,8 +49,11 @@ export function useCreatePageWithAgent() {
 				agents: [{ agent, prompt: PAGE_AGENT_PROMPT }],
 			},
 		});
-		// The store shows creation failures on the optimistic sidebar row; this
-		// just re-arms the button if the user navigates back.
+		// The store shows a create that never produced a workspace on the
+		// optimistic sidebar row. An agent that fails to launch inside a created
+		// workspace is not shown there — the user is already in the workspace and
+		// sees the missing agent pane. This just re-arms the button if the user
+		// navigates back.
 		void completed.finally(() => setCreatingWithAgent(false));
 		navigate({
 			to: "/v2-workspace/$workspaceId",

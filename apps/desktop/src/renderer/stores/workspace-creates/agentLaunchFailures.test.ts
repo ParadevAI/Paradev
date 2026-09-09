@@ -11,10 +11,7 @@ describe("agentLaunchFailureDetail", () => {
 
 	test("returns null when every launch succeeded", () => {
 		expect(
-			agentLaunchFailureDetail(
-				[{ ok: true }, { ok: true, error: "ignored" }],
-				UNKNOWN,
-			),
+			agentLaunchFailureDetail([{ ok: true }, { ok: true }], UNKNOWN),
 		).toBeNull();
 	});
 
@@ -40,7 +37,24 @@ describe("agentLaunchFailureDetail", () => {
 		).toBe("first failure; second failure");
 	});
 
-	test("falls back to the caller's stand-in when the host omitted a message", () => {
-		expect(agentLaunchFailureDetail([{ ok: false }], UNKNOWN)).toBe(UNKNOWN);
+	test("stands in for a blank host message instead of returning a falsy detail", () => {
+		expect(agentLaunchFailureDetail([{ ok: false, error: "" }], UNKNOWN)).toBe(
+			UNKNOWN,
+		);
+		expect(
+			agentLaunchFailureDetail([{ ok: false, error: "   " }], UNKNOWN),
+		).toBe(UNKNOWN);
+	});
+
+	test("keeps the stand-in in place when only one of several is blank", () => {
+		expect(
+			agentLaunchFailureDetail(
+				[
+					{ ok: false, error: "" },
+					{ ok: false, error: "boom" },
+				],
+				UNKNOWN,
+			),
+		).toBe(`${UNKNOWN}; boom`);
 	});
 });

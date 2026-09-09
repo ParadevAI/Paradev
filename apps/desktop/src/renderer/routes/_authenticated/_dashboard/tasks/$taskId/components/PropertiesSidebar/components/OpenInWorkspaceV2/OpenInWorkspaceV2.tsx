@@ -253,8 +253,13 @@ export function OpenInWorkspaceV2({ task }: OpenInWorkspaceV2Props) {
 		});
 
 		void completed.then((outcome) => {
-			if (!outcome.ok) return;
-			if (outcome.workspaceId !== snapshotId) {
+			// A failed agent launch is the one failure the store records no
+			// failed-create row for, so this toast is its only channel.
+			if (!outcome.ok) toast.error(outcome.error);
+			if (
+				outcome.workspaceId !== undefined &&
+				outcome.workspaceId !== snapshotId
+			) {
 				void navigate({
 					to: "/v2-workspace/$workspaceId",
 					params: { workspaceId: outcome.workspaceId },

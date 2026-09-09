@@ -290,10 +290,15 @@ export function useSubmitWorkspace(
 		};
 
 		void completed.then((outcome) => {
-			if (!outcome.ok) return;
+			// A failed agent launch is the one failure the store records no
+			// failed-create row for, so this toast is its only channel.
+			if (!outcome.ok) toast.error(outcome.error);
 
 			// The server can resolve the optimistic workspace to a different
 			// canonical id; follow it only if we're still on the optimistic route.
+			// The failure outcome carries that id too — the local state behind the
+			// optimistic route has already been deleted.
+			if (outcome.workspaceId === undefined) return;
 			if (outcome.workspaceId === workspaceId) return;
 			if (!isViewingOptimisticWorkspace()) return;
 			void navigate({
