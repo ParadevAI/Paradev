@@ -1066,7 +1066,8 @@ export class PullRequestRuntimeManager {
 
 		let identity: Omit<NormalizedRepoIdentity, "defaultBranch"> | null = null;
 		if (
-			(project.repoProvider === "github" || project.repoProvider === "gitlab") &&
+			(project.repoProvider === "github" ||
+				project.repoProvider === "gitlab") &&
 			project.repoOwner &&
 			project.repoName &&
 			project.repoUrl &&
@@ -1456,24 +1457,23 @@ export class PullRequestRuntimeManager {
 							head,
 							repo.repoPath,
 						)
-					:
-				this.fetchFromGitHub(
-					"PR head lookup",
-					{ owner: repo.owner, name: repo.name, head },
-					() =>
-						fetchPullRequestByHeadFromGh(
-							this.execGh,
-							{ owner: repo.owner, name: repo.name },
-							head,
+					: this.fetchFromGitHub(
+							"PR head lookup",
+							{ owner: repo.owner, name: repo.name, head },
+							() =>
+								fetchPullRequestByHeadFromGh(
+									this.execGh,
+									{ owner: repo.owner, name: repo.name },
+									head,
+								),
+							async () =>
+								fetchPullRequestByHead(
+									await this.github(),
+									{ owner: repo.owner, name: repo.name },
+									head,
+								),
+							{ probe: options.bypassCache === true },
 						),
-					async () =>
-						fetchPullRequestByHead(
-							await this.github(),
-							{ owner: repo.owner, name: repo.name },
-							head,
-						),
-					{ probe: options.bypassCache === true },
-				),
 		);
 	}
 
@@ -1596,22 +1596,21 @@ export class PullRequestRuntimeManager {
 							{ owner: repo.owner, name: repo.name },
 							repo.repoPath,
 						)
-					:
-				this.fetchFromGitHub(
-					"open-PR sweep",
-					{ owner: repo.owner, name: repo.name },
-					() =>
-						fetchOpenPullRequestsFromGh(this.execGh, {
-							owner: repo.owner,
-							name: repo.name,
-						}),
-					async () =>
-						fetchOpenPullRequests(await this.github(), {
-							owner: repo.owner,
-							name: repo.name,
-						}),
-					{ probe: options.bypassCache === true },
-				),
+					: this.fetchFromGitHub(
+							"open-PR sweep",
+							{ owner: repo.owner, name: repo.name },
+							() =>
+								fetchOpenPullRequestsFromGh(this.execGh, {
+									owner: repo.owner,
+									name: repo.name,
+								}),
+							async () =>
+								fetchOpenPullRequests(await this.github(), {
+									owner: repo.owner,
+									name: repo.name,
+								}),
+							{ probe: options.bypassCache === true },
+						),
 		);
 	}
 

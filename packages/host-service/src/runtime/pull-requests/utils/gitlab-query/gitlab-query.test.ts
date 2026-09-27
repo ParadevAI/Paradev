@@ -47,10 +47,35 @@ describe("GitLab merge request queries", () => {
 			state: "OPEN",
 			headRefName: "feat/gitlab",
 			headRefOid: "abc123",
+			mergedAt: null,
 		});
 		expect(calls[0]?.cwd).toBe("/repo");
 		expect(calls[0]?.args).toContain("projects/acme%2Fapp/merge_requests");
 		expect(calls[0]?.args).toContain("source_branch=feat/gitlab");
+	});
+
+	test.each([
+		["2026-08-21T10:00:00Z", Date.parse("2026-08-21T10:00:00Z")],
+		["invalid", null],
+	] as const)("maps merge timestamp %s", async (mergedAt, expected) => {
+		const { execGlab } = fakeGlab([
+			{
+				iid: 42,
+				title: "Merged request",
+				web_url: "https://gitlab.com/acme/app/-/merge_requests/42",
+				state: "merged",
+				source_branch: "feat/gitlab",
+				sha: "abc123",
+				merged_at: mergedAt,
+			},
+		]);
+		const result = await fetchPullRequestByHeadFromGlab(
+			execGlab,
+			REPOSITORY,
+			{ owner: "acme", repo: "app", branch: "feat/gitlab" },
+			"/repo",
+		);
+		expect(result?.mergedAt).toBe(expected);
 	});
 
 	test("filters merge requests from forked source projects", async () => {

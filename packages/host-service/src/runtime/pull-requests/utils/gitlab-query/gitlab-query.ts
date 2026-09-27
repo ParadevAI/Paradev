@@ -1,4 +1,5 @@
 import type { ExecGlab } from "../../../../trpc/router/workspace-creation/utils/exec-glab";
+import { parseMergedAt } from "../github-query";
 import type {
 	GitHubCheckContextNode,
 	GitHubPullRequestHeadRef,
@@ -19,6 +20,7 @@ interface GitLabMergeRequest {
 	source_branch?: string;
 	sha?: string;
 	updated_at?: string;
+	merged_at?: string | null;
 	source_project_id?: number;
 	target_project_id?: number;
 }
@@ -83,6 +85,7 @@ function normalizePullRequest(
 		headRepositoryOwner: { login: head.owner },
 		headRepository: { name: head.repo },
 		updatedAt: raw.updated_at ?? new Date(0).toISOString(),
+		mergedAt: parseMergedAt(raw.merged_at ?? null),
 	};
 }
 
