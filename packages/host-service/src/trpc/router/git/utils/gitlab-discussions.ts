@@ -1,3 +1,5 @@
+import { TRPCError } from "@trpc/server";
+import { z } from "zod";
 import type { ExecGlab } from "../../workspace-creation/utils/exec-glab";
 import type {
 	IssueComment,
@@ -38,7 +40,7 @@ export interface GitLabDiscussionResult {
 	conversationComments: IssueComment[];
 }
 
-type Repository = { owner: string; name: string };
+type Repository = { owner: string; name: string; host?: string };
 
 function projectApiPath(repository: Repository): string {
 	return `projects/${encodeURIComponent(`${repository.owner}/${repository.name}`)}`;
@@ -127,7 +129,7 @@ export async function fetchPullRequestDiscussionsFromGlab(
 			"--paginate",
 			`${projectApiPath(repository)}/merge_requests/${mergeRequestNumber}/discussions`,
 		],
-		{ cwd, timeout: 30_000 },
+		{ cwd, hostname: repository.host, timeout: 30_000 },
 	);
 	return parseGitLabDiscussions(raw, mergeRequestUrl);
 }
@@ -149,6 +151,47 @@ export async function setPullRequestDiscussionResolutionFromGlab(
 			"-F",
 			`resolved=${resolved}`,
 		],
-		{ cwd },
+		{ cwd, hostname: repository.host },
 	);
+}
+
+export async function replyToGitLabReviewComment(
+	execGlab: ExecGlab,
+	repository: Repository,
+	number: number,
+	commentId: number,
+	body: string,
+	cwd: string,
+): Promise<{ id: number }> {
+	const raw = await execGlab(
+		[
+			"api",
+			"--method",
+			"GET",
+			"--paginate",
+			`${projectApiPath(repository)}/merge_requests/${number}/discussions`,
+		],
+		{ cwd, hostname: repository.host },
+	);
+	const { reviewThreads } = parseGitLabDiscussions(raw, "");
+	const thread = reviewThreads.find((item) =>
+		item.comments.some((note) => note.databaseId === commentId),
+	);
+	if (!thread)
+		throw new TRPCError({
+			code: "NOT_FOUND",
+			message: "Review comment does not belong to this merge request",
+		});
+	const note = await execGlab(
+		[
+			"api",
+			"--method",
+			"POST",
+			`${projectApiPath(repository)}/merge_requests/${number}/discussions/${encodeURIComponent(thread.id)}/notes`,
+			"-f",
+			`body=${body}`,
+		],
+		{ cwd, hostname: repository.host },
+	);
+	return z.object({ id: z.number().int().positive() }).parse(note);
 }

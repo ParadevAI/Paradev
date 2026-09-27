@@ -8,7 +8,7 @@ import type {
 } from "../github-query/types";
 
 type PullRequestState = GitHubPullRequestNode["state"];
-type Repository = { owner: string; name: string };
+type Repository = { owner: string; name: string; host?: string };
 
 interface GitLabMergeRequest {
 	iid?: number;
@@ -135,7 +135,7 @@ export async function fetchPullRequestByHeadFromGlab(
 			"-f",
 			"per_page=20",
 		],
-		{ cwd },
+		{ cwd, hostname: repository.host },
 	);
 
 	return normalizePullRequestCandidates(raw, head);
@@ -162,7 +162,7 @@ export async function fetchOpenPullRequestsFromGlab(
 			"-f",
 			"per_page=100",
 		],
-		{ cwd },
+		{ cwd, hostname: repository.host },
 	);
 	const head = { ...repository, repo: repository.name, branch: "" };
 	return asArray(raw)
@@ -205,7 +205,7 @@ export async function fetchPullRequestReviewDecisionFromGlab(
 			"GET",
 			`${projectApiPath(repository)}/merge_requests/${number}/approvals`,
 		],
-		{ cwd },
+		{ cwd, hostname: repository.host },
 	);
 	return mapReviewDecision(raw, prState);
 }
@@ -258,7 +258,7 @@ export async function fetchPullRequestChecksFromGlab(
 			"-f",
 			"per_page=100",
 		],
-		{ cwd },
+		{ cwd, hostname: repository.host },
 	);
 	return asArray(raw)
 		.map((item) => toCheckRunNode(item as GitLabCommitStatus))
@@ -280,14 +280,15 @@ export async function mergePullRequestFromGlab(
 		"merge",
 		String(number),
 		"--repo",
-		`${repository.owner}/${repository.name}`,
+		(repository.host ? `https://${repository.host}/` : "") +
+			`${repository.owner}/${repository.name}`,
 		"--auto-merge=false",
 		"--yes",
 	];
 	if (mergeMethod === "squash") args.push("--squash");
 	if (mergeMethod === "rebase") args.push("--rebase");
 	if (commitMessage) args.push("--message", commitMessage);
-	await execGlab(args, { cwd, timeout: 60_000 });
+	await execGlab(args, { cwd, hostname: repository.host, timeout: 60_000 });
 }
 
 export async function fetchJobLogsFromGlab(
@@ -303,7 +304,12 @@ export async function fetchJobLogsFromGlab(
 			"GET",
 			`${projectApiPath(repository)}/jobs/${jobId}/trace`,
 		],
-		{ cwd, timeout: 30_000, maxBuffer: 50 * 1024 * 1024 },
+		{
+			cwd,
+			hostname: repository.host,
+			timeout: 30_000,
+			maxBuffer: 50 * 1024 * 1024,
+		},
 	);
 	return typeof logs === "string" ? logs : String(logs);
 }

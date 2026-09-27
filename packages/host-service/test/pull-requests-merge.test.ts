@@ -75,7 +75,7 @@ describe("pullRequests.mergePR", () => {
 						"merge",
 						"42",
 						"--repo",
-						"acme/app",
+						"https://gitlab.com/acme/app",
 						"--auto-merge=false",
 						"--yes",
 						"--squash",

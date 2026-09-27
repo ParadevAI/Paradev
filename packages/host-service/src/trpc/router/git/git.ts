@@ -50,6 +50,7 @@ import { gitStatusRefreshLimiter } from "./utils/git-status-refresh-limiter";
 import { gitStatusStore } from "./utils/git-status-store";
 import {
 	fetchPullRequestDiscussionsFromGlab,
+	replyToGitLabReviewComment,
 	setPullRequestDiscussionResolutionFromGlab,
 } from "./utils/gitlab-discussions";
 import {
@@ -1062,7 +1063,11 @@ export const gitRouter = router({
 
 				const logs = await fetchJobLogsFromGlab(
 					ctx.execGlab,
-					{ owner: pr.repoOwner, name: pr.repoName },
+					{
+						owner: pr.repoOwner,
+						name: pr.repoName,
+						host: new URL(pr.url).host,
+					},
 					Number(jobId),
 					resolveWorktreePath(ctx, input.workspaceId),
 				);
@@ -1125,7 +1130,11 @@ export const gitRouter = router({
 				try {
 					return await fetchPullRequestDiscussionsFromGlab(
 						ctx.execGlab,
-						{ owner: pr.repoOwner, name: pr.repoName },
+						{
+							owner: pr.repoOwner,
+							name: pr.repoName,
+							host: new URL(pr.url).host,
+						},
 						pr.prNumber,
 						pr.url,
 						resolveWorktreePath(ctx, input.workspaceId),
@@ -1241,7 +1250,11 @@ export const gitRouter = router({
 					try {
 						await setPullRequestDiscussionResolutionFromGlab(
 							ctx.execGlab,
-							{ owner: pr.repoOwner, name: pr.repoName },
+							{
+								owner: pr.repoOwner,
+								name: pr.repoName,
+								host: new URL(pr.url).host,
+							},
 							pr.prNumber,
 							input.threadId,
 							input.resolved,
@@ -1314,6 +1327,21 @@ export const gitRouter = router({
 					code: "INTERNAL_SERVER_ERROR",
 					message: `Pull request ${workspace.pullRequestId} not found in database`,
 				});
+			}
+
+			if (pr.repoProvider === "gitlab") {
+				return replyToGitLabReviewComment(
+					ctx.execGlab,
+					{
+						owner: pr.repoOwner,
+						name: pr.repoName,
+						host: new URL(pr.url).host,
+					},
+					pr.prNumber,
+					input.commentId,
+					input.body,
+					resolveWorktreePath(ctx, input.workspaceId),
+				);
 			}
 
 			// The PR row already names the repo the PR lives in, so there's no

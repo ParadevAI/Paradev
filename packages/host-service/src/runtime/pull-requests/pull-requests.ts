@@ -1453,7 +1453,11 @@ export class PullRequestRuntimeManager {
 				repo.provider === "gitlab"
 					? fetchPullRequestByHeadFromGlab(
 							this.execGlab,
-							{ owner: repo.owner, name: repo.name },
+							{
+								owner: repo.owner,
+								name: repo.name,
+								host: new URL(repo.url).host,
+							},
 							head,
 							repo.repoPath,
 						)
@@ -1500,14 +1504,14 @@ export class PullRequestRuntimeManager {
 					const [reviewDecision, checks] = await Promise.all([
 						fetchPullRequestReviewDecisionFromGlab(
 							this.execGlab,
-							repo,
+							{ ...repo, host: new URL(repo.url).host },
 							node.number,
 							node.state,
 							repo.repoPath,
 						),
 						fetchPullRequestChecksFromGlab(
 							this.execGlab,
-							repo,
+							{ ...repo, host: new URL(repo.url).host },
 							node.headRefOid,
 							repo.repoPath,
 						),
@@ -1593,7 +1597,11 @@ export class PullRequestRuntimeManager {
 				repo.provider === "gitlab"
 					? fetchOpenPullRequestsFromGlab(
 							this.execGlab,
-							{ owner: repo.owner, name: repo.name },
+							{
+								owner: repo.owner,
+								name: repo.name,
+								host: new URL(repo.url).host,
+							},
 							repo.repoPath,
 						)
 					: this.fetchFromGitHub(

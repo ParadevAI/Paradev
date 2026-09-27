@@ -6,6 +6,7 @@ const execFileAsync = promisify(execFile);
 
 export interface ExecGlabOptions {
 	cwd?: string;
+	hostname?: string;
 	timeout?: number;
 	maxBuffer?: number;
 }
@@ -23,7 +24,11 @@ export const execGlab: ExecGlab = async (args, options) => {
 	const env = await getStrictShellEnvironment().catch(
 		() => process.env as Record<string, string>,
 	);
-	const { stdout } = await execFileAsync("glab", args, {
+	const commandArgs =
+		options?.hostname && args[0] === "api"
+			? [...args, "--hostname", options.hostname]
+			: args;
+	const { stdout } = await execFileAsync("glab", commandArgs, {
 		encoding: "utf8",
 		timeout: options?.timeout ?? 10_000,
 		maxBuffer: options?.maxBuffer ?? 10 * 1024 * 1024,
