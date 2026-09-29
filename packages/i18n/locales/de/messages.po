@@ -3509,6 +3509,9 @@ msgstr "Pfade aus Remote-Arbeitsbereichen lassen sich nicht im externen Editor Ã
 msgid "Can't open remote workspace paths in Finder"
 msgstr "Pfade aus Remote-Arbeitsbereichen lassen sich nicht im Finder Ã¶ffnen"
 
+msgid "Can't reach {apiHost}. Check your network, VPN, or DNS filter."
+msgstr "Can't reach {apiHost}. Check your network, VPN, or DNS filter."
+
 msgid "Can't reach the host"
 msgstr "Host nicht erreichbar"
 

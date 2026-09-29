@@ -19,7 +19,10 @@ import { track } from "renderer/lib/analytics";
 import { setAuthToken } from "renderer/lib/auth-client";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { SupersetLogo } from "./components/SupersetLogo";
-import { useSessionRecovery } from "./hooks/useSessionRecovery";
+import {
+	isNetworkFetchError,
+	useSessionRecovery,
+} from "./hooks/useSessionRecovery";
 
 export const Route = createFileRoute("/sign-in/")({
 	component: SignInPage,
@@ -40,7 +43,7 @@ function readLastUsedMethod(): AuthMethod | null {
 		: null;
 }
 
-function SignInPage() {
+export function SignInPage() {
 	const signInMutation = electronTrpc.auth.signIn.useMutation();
 	const persistToken = electronTrpc.auth.persistToken.useMutation();
 	const navigate = useNavigate();
@@ -50,7 +53,13 @@ function SignInPage() {
 	const [browserProvider, setBrowserProvider] = useState<AuthProvider | null>(
 		null,
 	);
-	const { hasLocalToken, isPending, session } = useSessionRecovery();
+	const { hasLocalToken, isPending, session, sessionError, refetchSession } =
+		useSessionRecovery();
+	// A session fetch that died on the network (blocked DNS, intercepted TLS,
+	// VPN down) leaves a signed-in user on this screen with no explanation, so
+	// name the API it could not reach instead of showing the sign-in form.
+	const apiHost = new URL(env.NEXT_PUBLIC_API_URL).host;
+	const apiUnreachable = hasLocalToken && isNetworkFetchError(sessionError);
 	// A session fetch that never settles must not trap the user on a spinner —
 	// fall through to the sign-in buttons after a while (#5729).
 	const pendingTimedOut = useDelayElapsed(
@@ -213,13 +222,55 @@ function SignInPage() {
 						</>
 					) : (
 						<>
-							<p className="mb-6 text-sm text-muted-foreground">
-								{hasLocalToken ? (
-									<Trans>Restoring your session</Trans>
-								) : (
+							<div className="text-center mb-8">
+								<h1 className="text-xl font-semibold text-foreground mb-2">
 									<Trans>Welcome to Paradev</Trans>
-								)}
-							</p>
+								</h1>
+								<p className="text-sm text-muted-foreground">
+									{hasLocalToken ? (
+										<Trans>Restoring your session</Trans>
+									) : (
+										<Trans>Sign in to get started</Trans>
+									)}
+								</p>
+							</div>
+
+							{apiUnreachable && (
+								<div className="flex flex-col items-center gap-3 mb-8">
+									<p className="text-sm text-destructive text-center select-text cursor-text">
+										<Trans>
+											Can't reach {apiHost}. Check your network, VPN, or DNS
+											filter.
+										</Trans>
+									</p>
+									<Button
+										variant="outline"
+										size="sm"
+										onClick={() => refetchSession()}
+									>
+										<Trans>Retry</Trans>
+									</Button>
+								</div>
+							)}
+
+							{env.NODE_ENV === "development" && (
+								<Button
+									variant="outline"
+									size="lg"
+									onClick={signInAsDev}
+									className="w-full gap-3"
+									disabled={isLoadingDev}
+								>
+									{isLoadingDev
+										? "Signing in..."
+										: "Sign in as Local Admin (dev)"}
+								</Button>
+							)}
+							{devError && (
+								<p className="text-xs text-destructive text-center select-text cursor-text">
+									{devError}
+								</p>
+							)}
 
 							<div className="flex w-full flex-col gap-3">
 								{providerButtons.map(({ provider, icon, label }) => (
