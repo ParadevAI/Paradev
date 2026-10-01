@@ -41,7 +41,15 @@ const realRouter = await import("@tanstack/react-router");
 mock.module("@tanstack/react-router", () => ({
 	...realRouter,
 	createFileRoute: () => (options: unknown) => options,
-	useNavigate: () => () => {},
+	useNavigate: () => () => Promise.resolve(),
+	// The dev-bypass case renders <Redirect>, which resolves its destination
+	// through the router. Outside a RouterProvider the real hook returns null
+	// and `router.buildLocation` throws, so stub just enough of it.
+	useRouter: () => ({
+		buildLocation: (options: unknown) => ({
+			href: String((options as { to?: string })?.to ?? "/"),
+		}),
+	}),
 }));
 mock.module("renderer/lib/analytics", () => ({ track: () => {} }));
 // A full stub rather than a spread: the real client is a proxy, so spreading it
@@ -56,9 +64,13 @@ mock.module("renderer/lib/electron-trpc", () => ({
 	},
 }));
 const realEnv = await import("renderer/env.renderer");
+// One mutable env object the cases can flip. The page reads `env.X` at render
+// time, so a property change is visible without re-registering the mock — which
+// is what lets a case exercise the SKIP_ENV_VALIDATION bypass below.
+const mockedEnv = { ...realEnv.env, NODE_ENV: "production" as const };
 mock.module("renderer/env.renderer", () => ({
 	...realEnv,
-	env: { ...realEnv.env, NODE_ENV: "production" },
+	env: mockedEnv,
 }));
 
 const { SignInPage } = await import("./page");
@@ -123,5 +135,25 @@ describe("SignInPage", () => {
 		const { container } = render(<SignInPage />);
 
 		expect(container.textContent).not.toContain("Can't reach");
+	});
+
+	test("still runs the dev bypass when the API URL is malformed", () => {
+		// Under SKIP_ENV_VALIDATION the renderer reads raw env values, so the URL
+		// is whatever the developer exported. The page used to parse it
+		// unconditionally, ABOVE the bypass, so `new URL("")` threw out of the
+		// render and the bypass never ran — a blank screen instead of the
+		// workspace redirect (#7881 review).
+		setSession({ hasLocalToken: true, sessionError: NETWORK_ERROR });
+		mockedEnv.SKIP_ENV_VALIDATION = true;
+		mockedEnv.NEXT_PUBLIC_API_URL = "";
+
+		try {
+			const { container } = render(<SignInPage />);
+
+			expect(container.textContent).not.toContain("Sign in to get started");
+		} finally {
+			mockedEnv.SKIP_ENV_VALIDATION = false;
+			mockedEnv.NEXT_PUBLIC_API_URL = "https://api.superset.sh";
+		}
 	});
 });

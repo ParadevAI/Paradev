@@ -36,6 +36,20 @@ const SESSION_PENDING_TIMEOUT_MS = 15_000;
 
 type AuthMethod = AuthProvider | "dev";
 
+/**
+ * The host of a configured API URL, or the raw value when it cannot be parsed.
+ * The sign-in screen names the API it could not reach; under
+ * SKIP_ENV_VALIDATION that value is whatever the developer exported, so parsing
+ * it must not be able to throw out of the render (#7881 review).
+ */
+function safeHost(url: string): string {
+	try {
+		return new URL(url).host;
+	} catch {
+		return url;
+	}
+}
+
 function readLastUsedMethod(): AuthMethod | null {
 	const stored = window.localStorage.getItem(LAST_USED_METHOD_KEY);
 	return stored === "github" || stored === "google" || stored === "dev"
@@ -58,8 +72,12 @@ export function SignInPage() {
 	// A session fetch that died on the network (blocked DNS, intercepted TLS,
 	// VPN down) leaves a signed-in user on this screen with no explanation, so
 	// name the API it could not reach instead of showing the sign-in form.
-	const apiHost = new URL(env.NEXT_PUBLIC_API_URL).host;
 	const apiUnreachable = hasLocalToken && isNetworkFetchError(sessionError);
+	// Parsed only when it is going to be shown, and through a guard: this sits
+	// above the dev bypass below, and with SKIP_ENV_VALIDATION the renderer uses
+	// raw env values, so an empty or malformed NEXT_PUBLIC_API_URL would throw
+	// out of the render before that bypass could run (#7881 review).
+	const apiHost = apiUnreachable ? safeHost(env.NEXT_PUBLIC_API_URL) : "";
 	// A session fetch that never settles must not trap the user on a spinner —
 	// fall through to the sign-in buttons after a while (#5729).
 	const pendingTimedOut = useDelayElapsed(
