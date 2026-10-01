@@ -391,9 +391,28 @@ export const gitWorktreeRemoveTask = defineWorkerTask<
 		// registry entry). This also shrinks the #6730 surface: git no longer
 		// owns a walk that can fail mid-way and unregister while leaving an
 		// orphaned folder.
+		// Why files can be left behind, whichever step failed. Declared before
+		// the native delete because that step can fail on its own.
+		let removeError: string | undefined;
 		if (nativeRm) {
 			reportPhase?.("delete-files");
-			await rm(target, { recursive: true, force: true, maxRetries: 3 });
+			// The native delete must not take the whole task down with it: an
+			// EPERM/EBUSY (antivirus, a file still open, a synced folder) would
+			// otherwise reject the handler here, before git ever unregisters, and
+			// the caller would report a removal failure for a worktree git could
+			// still have dropped from its registry. Recorded into the same
+			// `removeError` the git step below uses, so the caller sees which
+			// step failed and its own guarded fallback still owns the disk
+			// recheck (#6887 review).
+			try {
+				await rm(target, { recursive: true, force: true, maxRetries: 3 });
+			} catch (err) {
+				removeError = (err instanceof Error ? err.message : String(err)).trim();
+				console.warn("[git/removeWorktree] native rm failed", {
+					target,
+					error: removeError,
+				});
+			}
 		}
 		// The registry read below decides "registered or not" (the command's
 		// exit text is locale- and version-dependent), but registration is
@@ -404,7 +423,6 @@ export const gitWorktreeRemoveTask = defineWorkerTask<
 		// worktree whose directory is already gone, so no separate prune
 		// (which would clobber other stale worktrees' metadata) is needed.
 		reportPhase?.("worktree-remove");
-		let removeError: string | undefined;
 		await git
 			.raw(
 				force

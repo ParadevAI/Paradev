@@ -1,6 +1,7 @@
 import { afterEach, expect, test } from "bun:test";
 import { execFileSync } from "node:child_process";
 import {
+	chmodSync,
 	existsSync,
 	mkdirSync,
 	mkdtempSync,
@@ -68,6 +69,7 @@ test("nativeRm deletes the directory with the native rm before git unregisters",
 	const { repo, worktree } = makeRepoWithHeavyWorktree();
 
 	const phases: string[] = [];
+	const dirAtPhase: Record<string, boolean> = {};
 	const result = await gitWorktreeRemoveTask.handler(
 		{
 			repoPath: repo,
@@ -75,7 +77,10 @@ test("nativeRm deletes the directory with the native rm before git unregisters",
 			gitEnv: {} as GitTaskEnv,
 			nativeRm: true,
 		},
-		(phase) => phases.push(phase),
+		(phase) => {
+			phases.push(phase);
+			dirAtPhase[phase] = existsSync(worktree);
+		},
 	);
 
 	// The native rm path actually ran — this is the #6887 speedup, not just
@@ -84,6 +89,14 @@ test("nativeRm deletes the directory with the native rm before git unregisters",
 	// is what discriminates the new code path from the git-only fallback.
 	expect(phases).toContain("delete-files");
 	expect(phases).toContain("worktree-remove");
+
+	// Order, not just membership (#6887 review): the delete has to be FINISHED
+	// when git's unregister starts. Both phases firing with the directory still
+	// on disk would mean git owns the recursive walk this change exists to
+	// avoid, while the `existsSync` assertion below would still hold at the end
+	// — a git-only removal leaves the directory missing too.
+	expect(dirAtPhase["delete-files"]).toBe(true);
+	expect(dirAtPhase["worktree-remove"]).toBe(false);
 
 	// The directory is gone — the #6887 guarantee: before this change git's
 	// own remove_dir_recursively could not finish a heavy tree in budget, so
@@ -94,6 +107,34 @@ test("nativeRm deletes the directory with the native rm before git unregisters",
 
 	// The working tree of the main repo is untouched.
 	expect(readdirSync(repo)).toContain("readme.md");
+});
+
+test("a failing native rm still lets git unregister, and reports why", async () => {
+	const { repo, worktree } = makeRepoWithHeavyWorktree();
+	// Make the recursive delete fail for real instead of mocking it: an
+	// unreadable directory stops `rm -r` with EACCES for a non-root user.
+	const blocked = join(worktree, "node_modules", "pkg-a");
+	chmodSync(blocked, 0o000);
+	try {
+		const phases: string[] = [];
+		const result = await gitWorktreeRemoveTask.handler(
+			{
+				repoPath: repo,
+				worktreePath: worktree,
+				gitEnv: {} as GitTaskEnv,
+				nativeRm: true,
+			},
+			(phase) => phases.push(phase),
+		);
+
+		// The point of the guard: the handler does not reject at the delete step.
+		// Before it, an EPERM/EBUSY escaped the task and the caller reported a
+		// removal failure for a worktree git could still have unregistered.
+		expect(phases).toContain("worktree-remove");
+		expect(result.removeError).toBeTruthy();
+	} finally {
+		chmodSync(blocked, 0o700);
+	}
 });
 
 test("without nativeRm the task still unregisters via git (caller falls back)", async () => {
