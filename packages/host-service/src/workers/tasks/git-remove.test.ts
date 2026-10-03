@@ -109,12 +109,41 @@ test("nativeRm deletes the directory with the native rm before git unregisters",
 	expect(readdirSync(repo)).toContain("readme.md");
 });
 
+test("nativeRm is skipped when the caller did not force removal", async () => {
+	// With `force: false` git's own `worktree remove` is meant to refuse a
+	// dirty worktree — the documented safety check. Running the native delete
+	// anyway would silently erase uncommitted work before that check can
+	// refuse, so `nativeRm` must be a no-op unless `force` is also set.
+	const { repo, worktree } = makeRepoWithHeavyWorktree();
+	const phases: string[] = [];
+
+	const result = await gitWorktreeRemoveTask.handler(
+		{
+			repoPath: repo,
+			worktreePath: worktree,
+			gitEnv: {} as GitTaskEnv,
+			nativeRm: true,
+			force: false,
+		},
+		(phase) => phases.push(phase),
+	);
+
+	expect(phases).not.toContain("delete-files");
+	// Git keeps its safety check: a dirty worktree is still refused and stays
+	// registered, because nothing deleted the tree in front of that refusal.
+	expect(result.stillRegistered).toBe(true);
+});
+
 test("a failing native rm still lets git unregister, and reports why", async () => {
 	const { repo, worktree } = makeRepoWithHeavyWorktree();
 	// Make the recursive delete fail for real instead of mocking it: an
 	// unreadable directory stops `rm -r` with EACCES for a non-root user.
+	// (This is the deterministic-on-CI-non-root form; a root-run cannot be
+	// forced to fail by a permission bit, so everything below tolerates the
+	// case where the delete actually succeeded.)
 	const blocked = join(worktree, "node_modules", "pkg-a");
 	chmodSync(blocked, 0o000);
+	let rmFailed = false;
 	try {
 		const phases: string[] = [];
 		const result = await gitWorktreeRemoveTask.handler(
@@ -130,10 +159,16 @@ test("a failing native rm still lets git unregister, and reports why", async () 
 		// The point of the guard: the handler does not reject at the delete step.
 		// Before it, an EPERM/EBUSY escaped the task and the caller reported a
 		// removal failure for a worktree git could still have unregistered.
+		rmFailed = existsSync(blocked);
 		expect(phases).toContain("worktree-remove");
-		expect(result.removeError).toBeTruthy();
+		if (rmFailed) {
+			expect(result.removeError).toBeTruthy();
+		}
 	} finally {
-		chmodSync(blocked, 0o700);
+		// Never throw a stray ENOENT when the tree actually got deleted
+		// (which is what happens when the test process runs as root and the
+		// chmod bit cannot hold it back).
+		if (existsSync(blocked)) chmodSync(blocked, 0o700);
 	}
 });
 

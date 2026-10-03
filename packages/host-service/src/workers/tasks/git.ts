@@ -394,7 +394,11 @@ export const gitWorktreeRemoveTask = defineWorkerTask<
 		// Why files can be left behind, whichever step failed. Declared before
 		// the native delete because that step can fail on its own.
 		let removeError: string | undefined;
-		if (nativeRm) {
+		if (nativeRm && force) {
+			// Only run the native delete when the caller asks for a forced
+			// removal: with `force: false` git's own `worktree remove` is
+			// supposed to refuse a dirty worktree, and deleting the tree here
+			// first would silently skip that documented safety check.
 			reportPhase?.("delete-files");
 			// The native delete must not take the whole task down with it: an
 			// EPERM/EBUSY (antivirus, a file still open, a synced folder) would
