@@ -84,6 +84,15 @@ export function SignInPage() {
 		isPending,
 		SESSION_PENDING_TIMEOUT_MS,
 	);
+	// refetchSession is the raw better-auth refetch, which rejects when the API
+	// is still unreachable (a fetch TypeError). An unhandled rejection would
+	// surface in the console exactly when this Retry button is the only path
+	// left, so swallow and log it the same way the recovery hook does.
+	const onRetrySession = () => {
+		void Promise.resolve(refetchSession()).catch((error: unknown) => {
+			console.warn("[sign-in] session retry refetch failed", error);
+		});
+	};
 
 	// Dev bypass: skip sign-in entirely
 	if (env.SKIP_ENV_VALIDATION) {
@@ -264,7 +273,7 @@ export function SignInPage() {
 									<Button
 										variant="outline"
 										size="sm"
-										onClick={() => refetchSession()}
+										onClick={() => onRetrySession()}
 									>
 										<Trans>Retry</Trans>
 									</Button>

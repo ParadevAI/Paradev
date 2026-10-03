@@ -1,4 +1,12 @@
-import { afterAll, afterEach, describe, expect, mock, test } from "bun:test";
+import {
+	afterAll,
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	mock,
+	test,
+} from "bun:test";
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 
 // happy-dom over the preloaded plain-object document: the page renders real
@@ -95,6 +103,8 @@ function setSession(next: {
 }
 
 describe("SignInPage", () => {
+	beforeEach(() => retrySession.mockClear());
+
 	test("names the unreachable API host when the session fetch fails on the network", () => {
 		setSession({ hasLocalToken: true, sessionError: NETWORK_ERROR });
 
@@ -107,6 +117,35 @@ describe("SignInPage", () => {
 
 		fireEvent.click(screen.getByRole("button", { name: "Retry" }));
 		expect(retrySession).toHaveBeenCalledTimes(1);
+	});
+
+	test("handles a rejecting session refetch from the Retry button", async () => {
+		setSession({ hasLocalToken: true, sessionError: NETWORK_ERROR });
+
+		const warnSpy = mock((..._args: unknown[]) => {});
+		const originalWarn = console.warn;
+		(console as unknown as { warn: unknown }).warn =
+			warnSpy as unknown as typeof console.warn;
+		try {
+			retrySession.mockImplementation(() =>
+				Promise.reject(new Error("still down")),
+			);
+
+			render(<SignInPage />);
+			fireEvent.click(screen.getByRole("button", { name: "Retry" }));
+
+			// Give the rejection's catch a microtask to run.
+			await new Promise((resolve) => setTimeout(resolve, 0));
+
+			expect(retrySession).toHaveBeenCalledTimes(1);
+			expect(warnSpy).toHaveBeenCalled();
+			expect(String(warnSpy.mock.calls[0]?.[0])).toContain(
+				"session retry refetch failed",
+			);
+		} finally {
+			(console as unknown as { warn: unknown }).warn = originalWarn;
+			retrySession.mockImplementation(() => {});
+		}
 	});
 
 	test("stays quiet while the session request is still in flight", () => {
