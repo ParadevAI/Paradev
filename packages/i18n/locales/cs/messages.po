@@ -10018,6 +10018,9 @@ msgstr "Neplatný štítek"
 msgid "Invalid OAuth response. Please try again."
 msgstr "Neplatná odpověď OAuth. Zkuste to prosím znovu."
 
+msgid "Invalid regular expression"
+msgstr "Neplatný regulární výraz"
+
 msgid "Invalid Request"
 msgstr "Neplatný požadavek"
 
@@ -11207,11 +11210,17 @@ msgstr "Označování jako připravené k revizi…"
 msgid "Marking ready…"
 msgstr "Označuje se jako připravený…"
 
+msgid "Match case"
+msgstr "Rozlišovat velká a malá písmena"
+
 msgid "Match existing patterns"
 msgstr "Dodrž stávající vzory"
 
 msgid "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
 msgstr "Přiřadit zkratky k popiskům na vaší klávesnici (např. ⌘Z se vždy spustí na klávese označené „Z“ — fyzicky KeyY na QWERTZ). Když je vypnuto, zkratky se vážou k fyzickým pozicím kláves a ignorují aktuální vstupní zdroj."
+
+msgid "Match whole word"
+msgstr "Shoda celých slov"
 
 msgid "Max"
 msgstr "Max"
@@ -16577,6 +16586,9 @@ msgstr "Prohledat historii"
 msgid "Search in {frameTitle}…"
 msgstr "Hledat v {frameTitle}…"
 
+msgid "Search in Files"
+msgstr "Hledat v souborech"
+
 msgid "Search issues…"
 msgstr "Hledat issues…"
 
@@ -16695,6 +16707,9 @@ msgstr "Hledání"
 
 msgid "Searching for Kbd usages"
 msgstr "Hledám použití Kbd"
+
+msgid "Searching…"
+msgstr "Hledání…"
 
 #. placeholder {0}: format(new Date(periodEnd), "MMMM d, yyyy")
 #. placeholder {0}: formatDate(periodEnd)
@@ -17425,6 +17440,9 @@ msgstr "Zobrazit aktivitu pracovního prostoru"
 
 msgid "showArrow opt-in"
 msgstr "showArrow zapnuto"
+
+msgid "Showing the first 500 results."
+msgstr "Zobrazuje se prvních 500 výsledků."
 
 msgid "Shown in launchers and this list."
 msgstr "Zobrazuje se ve spouštěčích a v tomto seznamu."
@@ -20562,6 +20580,9 @@ msgstr "Používejte Paradev na mobilu"
 
 msgid "Use Paradev on your phone with Pro."
 msgstr "Používejte Paradev na telefonu s Pro."
+
+msgid "Use regular expression"
+msgstr "Použít regulární výraz"
 
 msgid "Use the desktop app to start running parallel coding agents."
 msgstr "Pro spouštění paralelních kódovacích agentů použijte desktopovou aplikaci."

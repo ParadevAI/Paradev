@@ -10018,6 +10018,9 @@ msgstr "Ungültiges Label"
 msgid "Invalid OAuth response. Please try again."
 msgstr "Ungültige OAuth-Antwort. Bitte versuche es erneut."
 
+msgid "Invalid regular expression"
+msgstr "Ungültiger regulärer Ausdruck"
+
 msgid "Invalid Request"
 msgstr "Ungültige Anfrage"
 
@@ -11207,11 +11210,17 @@ msgstr "Wird als bereit zur Review markiert…"
 msgid "Marking ready…"
 msgstr "Wird als bereit markiert…"
 
+msgid "Match case"
+msgstr "Groß-/Kleinschreibung beachten"
+
 msgid "Match existing patterns"
 msgstr "An bestehende Muster anpassen"
 
 msgid "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
 msgstr "Kürzel an die Beschriftung deiner Tastatur binden (z. B. löst ⌘Z immer auf der mit \"Z\" beschrifteten Taste aus — physisch KeyY auf QWERTZ). Wenn ausgeschaltet, hängen Kürzel an physischen Tastenpositionen und ignorieren die aktuelle Eingabequelle."
+
+msgid "Match whole word"
+msgstr "Nur ganzes Wort"
 
 msgid "Max"
 msgstr "Max"
@@ -16577,6 +16586,9 @@ msgstr "Verlauf durchsuchen"
 msgid "Search in {frameTitle}…"
 msgstr "In {frameTitle} suchen…"
 
+msgid "Search in Files"
+msgstr "In Dateien suchen"
+
 msgid "Search issues…"
 msgstr "Issues suchen…"
 
@@ -16695,6 +16707,9 @@ msgstr "Suchen"
 
 msgid "Searching for Kbd usages"
 msgstr "Suche nach Kbd-Verwendungen"
+
+msgid "Searching…"
+msgstr "Suche…"
 
 #. placeholder {0}: format(new Date(periodEnd), "MMMM d, yyyy")
 #. placeholder {0}: formatDate(periodEnd)
@@ -17425,6 +17440,9 @@ msgstr "Arbeitsbereichsaktivität anzeigen"
 
 msgid "showArrow opt-in"
 msgstr "showArrow aktiviert"
+
+msgid "Showing the first 500 results."
+msgstr "Die ersten 500 Ergebnisse werden angezeigt."
 
 msgid "Shown in launchers and this list."
 msgstr "Wird in Startern und in dieser Liste angezeigt."
@@ -20562,6 +20580,9 @@ msgstr "Paradev auf dem Handy nutzen"
 
 msgid "Use Paradev on your phone with Pro."
 msgstr "Nutze Paradev mit Pro auf deinem Smartphone."
+
+msgid "Use regular expression"
+msgstr "Regulären Ausdruck verwenden"
 
 msgid "Use the desktop app to start running parallel coding agents."
 msgstr "Nutze die Desktop-App, um parallele Coding-Agenten laufen zu lassen."
