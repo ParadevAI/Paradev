@@ -9,6 +9,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useFeatureFlagEnabled } from "posthog-js/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { openQuickOpen } from "renderer/commandPalette";
+import { useContentSearchStore } from "renderer/commandPalette/ui/ContentSearch/contentSearchStore";
 import { useQuickOpenStore } from "renderer/commandPalette/ui/QuickOpen";
 import { useWorkspaceHostTarget } from "renderer/hooks/host-service/useWorkspaceHostUrl";
 import { useParadevShell } from "renderer/hooks/useParadevShell";
@@ -418,6 +419,12 @@ function WorkspaceContent() {
 	const registerQuickOpen = useQuickOpenStore((s) => s.register);
 	const unregisterQuickOpen = useQuickOpenStore((s) => s.unregister);
 	const handleQuickOpen = useCallback(() => openQuickOpen(), []);
+	const contentSearchOpen = useContentSearchStore((state) => state.open && state.target?.workspaceId === workspaceId);
+	useEffect(() => {
+		if (contentSearchOpen && !isRightPaneAreaEnabled) setRightSidebarOpen(true);
+	}, [contentSearchOpen, isRightPaneAreaEnabled, setRightSidebarOpen]);
+	const openContentSearch = useContentSearchStore((state) => state.openFor);
+	const handleContentSearch = useCallback(() => openContentSearch({ workspaceId }), [openContentSearch, workspaceId]);
 	// Picking a file from Quick Open should surface the sidebar/Files tab so
 	// the reveal (expand + highlight + scroll) is actually visible.
 	const handleQuickOpenSelectFile = useCallback(
@@ -623,6 +630,7 @@ function WorkspaceContent() {
 		activeAreaRef,
 	});
 	useHotkey("QUICK_OPEN", handleQuickOpen);
+	useHotkey("SEARCH_IN_FILES", handleContentSearch, { enabled: !isRightPaneAreaEnabled });
 	useHotkey("NEW_CHAT", addChatTab);
 	useHotkey("RUN_WORKSPACE_COMMAND", () => {
 		void workspaceRun.toggleWorkspaceRun();

@@ -4,9 +4,11 @@ import {
 	FileIcon,
 	LinkIcon,
 	PlusIcon,
+	SearchIcon,
 	Trash2Icon,
 	ZapIcon,
 } from "lucide-react";
+import { useContentSearchStore } from "renderer/commandPalette/ui/ContentSearch/contentSearchStore";
 import { useDeleteWorkspaceIntent } from "renderer/stores/delete-workspace-intent";
 import { useQuickCreateWorkspaceIntent } from "renderer/stores/quick-create-workspace-intent";
 import { useRemoveFromSidebarIntent } from "renderer/stores/remove-workspace-from-sidebar-intent";
@@ -70,6 +72,18 @@ export const workspaceProvider: CommandProvider = {
 			},
 			quickCreate,
 			quickOpenCommand,
+			{
+				id: "files.searchContents",
+				title: msg({ message: "Search in Files" }),
+				section: "workspace",
+				icon: SearchIcon,
+				keywords: ["content", "find", "grep"],
+				hotkeyId: "SEARCH_IN_FILES",
+				run: () =>
+					useContentSearchStore.getState().openFor({
+						workspaceId: workspace.id,
+					}),
+			},
 			{
 				id: "workspace.linkTask",
 				title: msg({
