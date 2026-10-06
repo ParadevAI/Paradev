@@ -9600,6 +9600,9 @@ msgstr "无效的标签"
 msgid "Invalid OAuth response. Please try again."
 msgstr "OAuth响应无效。请重试。"
 
+msgid "Invalid regular expression"
+msgstr "无效的正则表达式"
+
 msgid "Invalid Request"
 msgstr "无效请求"
 
@@ -10764,11 +10767,17 @@ msgstr "正在标记为可评审…"
 msgid "Marking ready…"
 msgstr "正在标记为就绪…"
 
+msgid "Match case"
+msgstr "区分大小写"
+
 msgid "Match existing patterns"
 msgstr "沿用现有模式"
 
 msgid "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
 msgstr "让快捷键匹配键盘上的标签（例如⌘Z始终触发标有“Z”的按键——在QWERTZ上是物理KeyY）。关闭后，快捷键锚定在物理按键位置，忽略当前输入源。"
+
+msgid "Match whole word"
+msgstr "全字匹配"
 
 msgid "Max"
 msgstr "最大"
@@ -16007,6 +16016,9 @@ msgstr "搜索历史"
 msgid "Search in {frameTitle}…"
 msgstr "在{frameTitle}中搜索…"
 
+msgid "Search in Files"
+msgstr "在文件中搜索"
+
 msgid "Search issues..."
 msgstr "搜索议题..."
 
@@ -16828,6 +16840,9 @@ msgstr "在侧边栏显示用量选项卡"
 
 msgid "showArrow opt-in"
 msgstr "showArrow按需开启"
+
+msgid "Showing the first 500 results."
+msgstr "正在显示前 500 个结果。"
 
 msgid "Shown in launchers and this list."
 msgstr "会显示在启动器和此列表中。"
@@ -19852,6 +19867,9 @@ msgstr "在手机上使用 Paradev"
 
 msgid "Use Paradev on your phone with Pro."
 msgstr "通过 Pro 在手机上使用 Paradev。"
+
+msgid "Use regular expression"
+msgstr "使用正则表达式"
 
 msgid "Use the desktop app to start running parallel coding agents."
 msgstr "使用桌面应用开始并行运行编码智能体。"

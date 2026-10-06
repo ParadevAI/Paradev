@@ -9600,6 +9600,9 @@ msgstr "Ongeldig label"
 msgid "Invalid OAuth response. Please try again."
 msgstr "Ongeldig OAuth-antwoord. Probeer het opnieuw."
 
+msgid "Invalid regular expression"
+msgstr "Ongeldige reguliere expressie"
+
 msgid "Invalid Request"
 msgstr "Ongeldig verzoek"
 
@@ -10764,11 +10767,17 @@ msgstr "Markeren als klaar voor review…"
 msgid "Marking ready…"
 msgstr "Markeren als klaar…"
 
+msgid "Match case"
+msgstr "Hoofdlettergevoelig"
+
 msgid "Match existing patterns"
 msgstr "Volg bestaande patronen"
 
 msgid "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
 msgstr "Koppel sneltoetsen aan de opschriften op je toetsenbord (bijv. ⌘Z werkt altijd op de toets met \"Z\" — fysiek KeyY op QWERTZ). Staat dit uit, dan zijn sneltoetsen aan fysieke toetsposities gekoppeld en negeren ze de huidige invoerbron."
+
+msgid "Match whole word"
+msgstr "Heel woord"
 
 msgid "Max"
 msgstr "Max"
@@ -16007,6 +16016,9 @@ msgstr "Geschiedenis doorzoeken"
 msgid "Search in {frameTitle}…"
 msgstr "Zoeken in {frameTitle}…"
 
+msgid "Search in Files"
+msgstr "Zoeken in bestanden"
+
 msgid "Search issues..."
 msgstr "Issues zoeken..."
 
@@ -16828,6 +16840,9 @@ msgstr "Gebruikstabblad tonen in zijbalk"
 
 msgid "showArrow opt-in"
 msgstr "showArrow inschakelen"
+
+msgid "Showing the first 500 results."
+msgstr "De eerste 500 resultaten worden weergegeven."
 
 msgid "Shown in launchers and this list."
 msgstr "Wordt getoond in launchers en in deze lijst."
@@ -19852,6 +19867,9 @@ msgstr "Gebruik Paradev op je mobiel"
 
 msgid "Use Paradev on your phone with Pro."
 msgstr "Gebruik Paradev op je telefoon met Pro."
+
+msgid "Use regular expression"
+msgstr "Reguliere expressie gebruiken"
 
 msgid "Use the desktop app to start running parallel coding agents."
 msgstr "Gebruik de desktop-app om parallelle coding agents te draaien."

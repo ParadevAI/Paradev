@@ -9600,6 +9600,9 @@ msgstr "Nhãn không hợp lệ"
 msgid "Invalid OAuth response. Please try again."
 msgstr "Phản hồi OAuth không hợp lệ. Vui lòng thử lại."
 
+msgid "Invalid regular expression"
+msgstr "Biểu thức chính quy không hợp lệ"
+
 msgid "Invalid Request"
 msgstr "Yêu cầu không hợp lệ"
 
@@ -10764,11 +10767,17 @@ msgstr "Đang đánh dấu sẵn sàng để review…"
 msgid "Marking ready…"
 msgstr "Đang đánh dấu sẵn sàng…"
 
+msgid "Match case"
+msgstr "Phân biệt chữ hoa chữ thường"
+
 msgid "Match existing patterns"
 msgstr "Bám theo mẫu hiện có"
 
 msgid "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
 msgstr "Khớp phím tắt với ký tự in trên bàn phím của bạn (ví dụ ⌘Z luôn kích hoạt ở phím có nhãn \"Z\" — tức phím vật lý KeyY trên QWERTZ). Khi tắt, phím tắt gắn với vị trí phím vật lý và bỏ qua nguồn nhập hiện tại."
+
+msgid "Match whole word"
+msgstr "Khớp toàn bộ từ"
 
 msgid "Max"
 msgstr "Tối đa"
@@ -16007,6 +16016,9 @@ msgstr "Tìm trong lịch sử"
 msgid "Search in {frameTitle}…"
 msgstr "Tìm trong {frameTitle}…"
 
+msgid "Search in Files"
+msgstr "Tìm kiếm trong tệp"
+
 msgid "Search issues..."
 msgstr "Tìm issue..."
 
@@ -16828,6 +16840,9 @@ msgstr "Hiển thị thẻ mức sử dụng trên thanh bên"
 
 msgid "showArrow opt-in"
 msgstr "bật showArrow"
+
+msgid "Showing the first 500 results."
+msgstr "Hiển thị 500 kết quả đầu tiên."
 
 msgid "Shown in launchers and this list."
 msgstr "Hiển thị trong trình khởi chạy và danh sách này."
@@ -19852,6 +19867,9 @@ msgstr "Dùng Paradev trên điện thoại"
 
 msgid "Use Paradev on your phone with Pro."
 msgstr "Dùng Paradev trên điện thoại với Pro."
+
+msgid "Use regular expression"
+msgstr "Sử dụng biểu thức chính quy"
 
 msgid "Use the desktop app to start running parallel coding agents."
 msgstr "Dùng ứng dụng máy tính để chạy song song nhiều agent lập trình."

@@ -4,7 +4,8 @@ import { cn } from "@superset/ui/utils";
 import { workspaceTrpc } from "@superset/workspace-client";
 import { createFileRoute } from "@tanstack/react-router";
 import { useFeatureFlagEnabled } from "posthog-js/react";
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useContentSearchStore } from "renderer/commandPalette/ui/ContentSearch/contentSearchStore";
 import { useQuickOpenStore } from "renderer/commandPalette/ui/QuickOpen/quickOpenStore";
 import { useWorkspaceHostTarget } from "renderer/hooks/host-service/useWorkspaceHostUrl";
 import { useAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
@@ -398,11 +399,22 @@ function V2WorkspaceContent() {
 	const quickOpenOpen = useQuickOpenStore(
 		(s) => s.open && s.target?.workspaceId === workspaceId,
 	);
+	const contentSearchOpen = useContentSearchStore(
+		(state) => state.open && state.target?.workspaceId === workspaceId,
+	);
+	useEffect(() => {
+		if (contentSearchOpen && !isRightPaneAreaEnabled) setRightSidebarOpen(true);
+	}, [contentSearchOpen, isRightPaneAreaEnabled, setRightSidebarOpen]);
 	const closeQuickOpen = useQuickOpenStore((s) => s.close);
 	const openQuickOpenFor = useQuickOpenStore((s) => s.openFor);
+	const openContentSearchFor = useContentSearchStore((s) => s.openFor);
 	const handleQuickOpen = useCallback(
 		() => openQuickOpenFor({ workspaceId }),
 		[openQuickOpenFor, workspaceId],
+	);
+	const handleContentSearch = useCallback(
+		() => openContentSearchFor({ workspaceId }),
+		[openContentSearchFor, workspaceId],
 	);
 	const handleQuickOpenChange = useCallback(
 		(next: boolean) => {
@@ -524,6 +536,9 @@ function V2WorkspaceContent() {
 		isMobilePaneEnabled,
 	});
 	useHotkey("QUICK_OPEN", handleQuickOpen);
+	useHotkey("SEARCH_IN_FILES", handleContentSearch, {
+		enabled: !isRightPaneAreaEnabled,
+	});
 	useHotkey("NEW_CHAT", addChatTab, { enabled: acpChat !== "disabled" });
 	useHotkey("RUN_WORKSPACE_COMMAND", () => {
 		void workspaceRun.toggleWorkspaceRun();

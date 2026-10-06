@@ -9600,6 +9600,9 @@ msgstr "Etichetta non valida"
 msgid "Invalid OAuth response. Please try again."
 msgstr "Risposta OAuth non valida. Riprova."
 
+msgid "Invalid regular expression"
+msgstr "Espressione regolare non valida"
+
 msgid "Invalid Request"
 msgstr "Richiesta non valida"
 
@@ -10764,11 +10767,17 @@ msgstr "Contrassegno come pronta per la revisione…"
 msgid "Marking ready…"
 msgstr "Contrassegno come pronta…"
 
+msgid "Match case"
+msgstr "Maiuscole/minuscole"
+
 msgid "Match existing patterns"
 msgstr "Segui i pattern esistenti"
 
 msgid "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
 msgstr "Adatta le scorciatoie alle etichette della tua tastiera (es. ⌘Z si attiva sempre sul tasto etichettato \"Z\" — fisicamente KeyY su QWERTZ). Quando è disattivata, le scorciatoie sono ancorate alle posizioni fisiche dei tasti e ignorano la sorgente di input attuale."
+
+msgid "Match whole word"
+msgstr "Parola intera"
 
 msgid "Max"
 msgstr "Max"
@@ -16007,6 +16016,9 @@ msgstr "Cerca nella cronologia"
 msgid "Search in {frameTitle}…"
 msgstr "Cerca in {frameTitle}…"
 
+msgid "Search in Files"
+msgstr "Cerca nei file"
+
 msgid "Search issues..."
 msgstr "Cerca nelle issue..."
 
@@ -16828,6 +16840,9 @@ msgstr "Mostra la scheda di utilizzo nella barra laterale"
 
 msgid "showArrow opt-in"
 msgstr "showArrow opzionale"
+
+msgid "Showing the first 500 results."
+msgstr "Visualizzazione dei primi 500 risultati."
 
 msgid "Shown in launchers and this list."
 msgstr "Mostrata nei launcher e in questo elenco."
@@ -19852,6 +19867,9 @@ msgstr "Usa Paradev sul cellulare"
 
 msgid "Use Paradev on your phone with Pro."
 msgstr "Usa Paradev sul telefono con Pro."
+
+msgid "Use regular expression"
+msgstr "Usa espressione regolare"
 
 msgid "Use the desktop app to start running parallel coding agents."
 msgstr "Usa l'app desktop per iniziare a eseguire agenti di programmazione in parallelo."

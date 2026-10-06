@@ -9600,6 +9600,9 @@ msgstr "잘못된 라벨"
 msgid "Invalid OAuth response. Please try again."
 msgstr "OAuth 응답이 올바르지 않습니다. 다시 시도해 주세요."
 
+msgid "Invalid regular expression"
+msgstr "잘못된 정규식"
+
 msgid "Invalid Request"
 msgstr "잘못된 요청"
 
@@ -10764,11 +10767,17 @@ msgstr "리뷰 준비 완료로 표시하는 중…"
 msgid "Marking ready…"
 msgstr "준비 완료로 표시하는 중…"
 
+msgid "Match case"
+msgstr "대/소문자 구분"
+
 msgid "Match existing patterns"
 msgstr "기존 패턴을 따라 주세요"
 
 msgid "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
 msgstr "키보드에 인쇄된 문자에 맞춰 단축키를 매핑합니다(예: ⌘Z는 항상 \"Z\"라고 적힌 키에서 동작하며, QWERTZ에서는 물리 키 KeyY입니다). 끄면 단축키가 물리적 키 위치에 고정되며 현재 입력 소스를 무시합니다."
+
+msgid "Match whole word"
+msgstr "단어 단위로 일치"
 
 msgid "Max"
 msgstr "최대"
@@ -16007,6 +16016,9 @@ msgstr "기록 검색"
 msgid "Search in {frameTitle}…"
 msgstr "{frameTitle}에서 검색…"
 
+msgid "Search in Files"
+msgstr "파일에서 검색"
+
 msgid "Search issues..."
 msgstr "이슈 검색..."
 
@@ -16828,6 +16840,9 @@ msgstr "사이드바에 사용량 탭 표시"
 
 msgid "showArrow opt-in"
 msgstr "showArrow 선택 사용"
+
+msgid "Showing the first 500 results."
+msgstr "처음 500개 결과를 표시합니다."
 
 msgid "Shown in launchers and this list."
 msgstr "실행기와 이 목록에 표시됩니다."
@@ -19852,6 +19867,9 @@ msgstr "모바일에서 Paradev 사용하기"
 
 msgid "Use Paradev on your phone with Pro."
 msgstr "Pro로 휴대폰에서 Paradev를 사용하세요."
+
+msgid "Use regular expression"
+msgstr "정규식 사용"
 
 msgid "Use the desktop app to start running parallel coding agents."
 msgstr "데스크톱 앱에서 병렬 코딩 에이전트를 실행하세요."

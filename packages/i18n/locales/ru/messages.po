@@ -9600,6 +9600,9 @@ msgstr "Недопустимая метка"
 msgid "Invalid OAuth response. Please try again."
 msgstr "Некорректный ответ OAuth. Попробуйте ещё раз."
 
+msgid "Invalid regular expression"
+msgstr "Недопустимое регулярное выражение"
+
 msgid "Invalid Request"
 msgstr "Некорректный запрос"
 
@@ -10764,11 +10767,17 @@ msgstr "Помечается как готово к ревью…"
 msgid "Marking ready…"
 msgstr "Помечаем как готовый…"
 
+msgid "Match case"
+msgstr "Учитывать регистр"
+
 msgid "Match existing patterns"
 msgstr "Следуй существующим шаблонам"
 
 msgid "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
 msgstr "Привязывать сочетания к обозначениям на вашей клавиатуре (например, ⌘Z всегда срабатывает на клавише с надписью «Z» — физическая KeyY на QWERTZ). Когда выключено, сочетания привязаны к физическим позициям клавиш и не зависят от текущего источника ввода."
+
+msgid "Match whole word"
+msgstr "Слово целиком"
 
 msgid "Max"
 msgstr "Макс."
@@ -16007,6 +16016,9 @@ msgstr "Поиск по истории"
 msgid "Search in {frameTitle}…"
 msgstr "Поиск в {frameTitle}…"
 
+msgid "Search in Files"
+msgstr "Поиск в файлах"
+
 msgid "Search issues..."
 msgstr "Поиск задач..."
 
@@ -16828,6 +16840,9 @@ msgstr "Показывать вкладку использования на бо
 
 msgid "showArrow opt-in"
 msgstr "showArrow по желанию"
+
+msgid "Showing the first 500 results."
+msgstr "Показаны первые 500 результатов."
 
 msgid "Shown in launchers and this list."
 msgstr "Показывается в запускалках и в этом списке."
@@ -19852,6 +19867,9 @@ msgstr "Используйте Paradev на телефоне"
 
 msgid "Use Paradev on your phone with Pro."
 msgstr "Используйте Paradev на телефоне с Pro."
+
+msgid "Use regular expression"
+msgstr "Использовать регулярное выражение"
 
 msgid "Use the desktop app to start running parallel coding agents."
 msgstr "Используйте десктопное приложение, чтобы запускать параллельных кодовых агентов."
