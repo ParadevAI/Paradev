@@ -197,7 +197,10 @@ describe.skipIf(process.platform !== "linux")("directory watch backend", () => {
 		});
 		let settled = false;
 		attaching.then(
-			() => (settled = true),
+			(subscription) => {
+				settled = true;
+				cleanups.push(() => subscription.unsubscribe());
+			},
 			() => (settled = true),
 		);
 		while (!settled && inotifyWatchCount() - before < 5) {

@@ -62,8 +62,9 @@ class DirectoryWatch implements NativeWatchSubscription {
 		signal?.addEventListener("abort", onAbort, { once: true });
 		try {
 			await this.addDirectory(rootPath, false);
-			// Changes made during the crawl were queued; settle them before ready.
-			await this.drain();
+			// Settle what changed during the crawl; a steady stream of later
+			// changes must not hold up the attach, so those drain afterwards.
+			await this.drain(this.queue.size);
 			signal?.throwIfAborted();
 			if (this.attachError !== undefined) throw this.attachError;
 			if (this.closed) throw new Error("Watch closed during attach");
@@ -71,6 +72,7 @@ class DirectoryWatch implements NativeWatchSubscription {
 				throw new Error(`Cannot watch path: ${rootPath}`);
 			}
 			this.attached = true;
+			if (this.queue.size > 0) void this.drainInBackground();
 		} catch (error) {
 			await this.unsubscribe();
 			throw error;
@@ -123,10 +125,10 @@ class DirectoryWatch implements NativeWatchSubscription {
 		if (!this.closed && this.queue.size > 0) void this.drainInBackground();
 	}
 
-	private async drain(): Promise<void> {
+	private async drain(limit = Number.POSITIVE_INFINITY): Promise<void> {
 		// Let the rest of the inotify read batch join the queue first.
 		await nextTurn();
-		while (!this.closed && this.queue.size > 0) {
+		for (let n = 0; n < limit && !this.closed && this.queue.size > 0; n++) {
 			const target = this.queue.values().next().value as string;
 			this.queue.delete(target);
 			await this.reconcile(target);
