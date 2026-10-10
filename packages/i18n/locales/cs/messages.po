@@ -4894,6 +4894,9 @@ msgstr "Pokračování se nezdařilo"
 msgid "Could not resume the chat"
 msgstr "V chatu se nepodařilo pokračovat"
 
+msgid "Could not resume this conversation"
+msgstr "Tuto konverzaci se nepodařilo obnovit"
+
 msgid "Could not send"
 msgstr "Nepodařilo se odeslat"
 
@@ -13497,6 +13500,9 @@ msgstr "Znovu otevřít zavřenou kartu"
 msgid "Reopen PR"
 msgstr "Znovu otevřít PR"
 
+msgid "Reopen the saved conversation in the same workspace. No message is sent. Background work is not transferred."
+msgstr "Znovu otevřít uloženou konverzaci ve stejném pracovním prostoru. Žádná zpráva se neodešle. Práce na pozadí se nepřenáší."
+
 msgid "Reopen thread"
 msgstr "Znovu otevřít vlákno"
 
@@ -13840,6 +13846,12 @@ msgstr "Argumenty pro pokračování"
 
 msgid "Resume automation"
 msgstr "Pokračovat v automatizaci"
+
+msgid "Resume conversation"
+msgstr "Obnovit konverzaci"
+
+msgid "Resume with another account"
+msgstr "Obnovit s jiným účtem"
 
 #. placeholder {0}: candidate.agentLabel
 msgid "Resuming {0}…"
@@ -17065,6 +17077,12 @@ msgstr "Tím se zavře pracovní prostor a jeho terminály. Soubory, větve a os
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Tento cloudový workspace se probouzí, což může po nečinnosti trvat až 30 sekund."
+
+msgid "This conversation cannot be resumed with another account."
+msgstr "Tuto konverzaci nelze obnovit s jiným účtem."
+
+msgid "This conversation is no longer available to resume."
+msgstr "Tato konverzace již není k dispozici pro obnovení."
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "Tímto se smaže uložený scrollback používaný k obnovení po restartu nebo pádu."

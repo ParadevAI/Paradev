@@ -4894,6 +4894,9 @@ msgstr "No se pudo reanudar"
 msgid "Could not resume the chat"
 msgstr "No se pudo reanudar el chat"
 
+msgid "Could not resume this conversation"
+msgstr "No se pudo reanudar esta conversación"
+
 msgid "Could not send"
 msgstr "No se pudo enviar"
 
@@ -13497,6 +13500,9 @@ msgstr "Reabrir pestaña cerrada"
 msgid "Reopen PR"
 msgstr "Reabrir PR"
 
+msgid "Reopen the saved conversation in the same workspace. No message is sent. Background work is not transferred."
+msgstr "Vuelve a abrir la conversación guardada en el mismo espacio de trabajo. No se envía ningún mensaje. El trabajo en segundo plano no se transfiere."
+
 msgid "Reopen thread"
 msgstr "Reabrir el hilo"
 
@@ -13840,6 +13846,12 @@ msgstr "Argumentos de reanudación"
 
 msgid "Resume automation"
 msgstr "Reanudar la automatización"
+
+msgid "Resume conversation"
+msgstr "Reanudar conversación"
+
+msgid "Resume with another account"
+msgstr "Reanudar con otra cuenta"
 
 #. placeholder {0}: candidate.agentLabel
 msgid "Resuming {0}…"
@@ -17065,6 +17077,12 @@ msgstr "Esto cierra el espacio de trabajo y sus terminales. Los archivos, las ra
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Este espacio de trabajo en la nube se está reactivando, lo que puede tardar hasta 30 segundos tras un periodo de inactividad."
+
+msgid "This conversation cannot be resumed with another account."
+msgstr "Esta conversación no se puede reanudar con otra cuenta."
+
+msgid "This conversation is no longer available to resume."
+msgstr "Esta conversación ya no está disponible para reanudarla."
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "Esto elimina el historial guardado que se usa para recuperarse tras un reinicio o un cierre inesperado."

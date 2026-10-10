@@ -4894,6 +4894,9 @@ msgstr "Fortsetzen nicht möglich"
 msgid "Could not resume the chat"
 msgstr "Der Chat konnte nicht fortgesetzt werden"
 
+msgid "Could not resume this conversation"
+msgstr "Diese Unterhaltung konnte nicht fortgesetzt werden"
+
 msgid "Could not send"
 msgstr "Senden nicht möglich"
 
@@ -13497,6 +13500,9 @@ msgstr "Geschlossenen Tab wieder öffnen"
 msgid "Reopen PR"
 msgstr "PR wieder öffnen"
 
+msgid "Reopen the saved conversation in the same workspace. No message is sent. Background work is not transferred."
+msgstr "Die gespeicherte Unterhaltung im selben Workspace erneut öffnen. Es wird keine Nachricht gesendet. Hintergrundaufgaben werden nicht übertragen."
+
 msgid "Reopen thread"
 msgstr "Thread wieder öffnen"
 
@@ -13840,6 +13846,12 @@ msgstr "Resume-Argumente"
 
 msgid "Resume automation"
 msgstr "Automatisierung fortsetzen"
+
+msgid "Resume conversation"
+msgstr "Unterhaltung fortsetzen"
+
+msgid "Resume with another account"
+msgstr "Mit anderem Konto fortsetzen"
 
 #. placeholder {0}: candidate.agentLabel
 msgid "Resuming {0}…"
@@ -17065,6 +17077,12 @@ msgstr "Dadurch werden der Arbeitsbereich und seine Terminals geschlossen. Die D
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Dieser Cloud-Workspace wird gerade aufgeweckt. Nach Inaktivität kann das bis zu 30 Sekunden dauern."
+
+msgid "This conversation cannot be resumed with another account."
+msgstr "Diese Unterhaltung kann nicht mit einem anderen Konto fortgesetzt werden."
+
+msgid "This conversation is no longer available to resume."
+msgstr "Diese Unterhaltung kann nicht mehr fortgesetzt werden."
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "Damit wird der gespeicherte Scrollback gelöscht, der für Neustart- und Absturzwiederherstellung genutzt wird."

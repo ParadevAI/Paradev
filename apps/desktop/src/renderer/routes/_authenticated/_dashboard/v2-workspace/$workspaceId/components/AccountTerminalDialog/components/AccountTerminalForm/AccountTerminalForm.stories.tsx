@@ -12,14 +12,19 @@ import { AccountTerminalForm } from "./AccountTerminalForm";
 const meta = {
 	component: AccountTerminalForm,
 	decorators: [
-		(Story) => (
+		(Story, context) => (
 			<Dialog open>
 				<DialogContent className="sm:max-w-md">
 					<DialogHeader>
-						<DialogTitle>Agent terminal with account</DialogTitle>
+						<DialogTitle>
+							{context.args.mode === "resume"
+								? "Resume with another account"
+								: "Agent terminal with account"}
+						</DialogTitle>
 						<DialogDescription>
-							Start a new terminal using an existing login. Other chats and your
-							default account stay unchanged.
+							{context.args.mode === "resume"
+								? "Reopen the saved conversation in the same workspace. No message is sent. Background work is not transferred."
+								: "Start a new terminal using an existing login. Other chats and your default account stay unchanged."}
 						</DialogDescription>
 					</DialogHeader>
 					<Story />
@@ -62,6 +67,28 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
+
+export const Resume: Story = {
+	args: { mode: "resume", configs: [{ id: "review-claude", label: "Claude" }] },
+	play: async ({ canvasElement }) => {
+		const dialog = within(canvasElement.ownerDocument.body);
+		await userEvent.click(
+			dialog.getByRole("radio", { name: /work@example.test/ }),
+		);
+		await expect(
+			dialog.getByRole("button", { name: "Resume conversation" }),
+		).toBeEnabled();
+		await expect(dialog.getByRole("combobox")).toBeDisabled();
+	},
+};
+
+export const ResumeUnavailable: Story = {
+	args: {
+		mode: "resume",
+		error:
+			"The selected account cannot access this saved conversation. Nothing was restarted.",
+	},
+};
 
 export const Selected: Story = {
 	play: async ({ canvasElement }) => {

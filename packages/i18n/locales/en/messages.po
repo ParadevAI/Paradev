@@ -4894,6 +4894,9 @@ msgstr "Could not resume"
 msgid "Could not resume the chat"
 msgstr "Could not resume the chat"
 
+msgid "Could not resume this conversation"
+msgstr "Could not resume this conversation"
+
 msgid "Could not send"
 msgstr "Could not send"
 
@@ -13497,6 +13500,9 @@ msgstr "Reopen Closed Tab"
 msgid "Reopen PR"
 msgstr "Reopen PR"
 
+msgid "Reopen the saved conversation in the same workspace. No message is sent. Background work is not transferred."
+msgstr "Reopen the saved conversation in the same workspace. No message is sent. Background work is not transferred."
+
 msgid "Reopen thread"
 msgstr "Reopen thread"
 
@@ -13840,6 +13846,12 @@ msgstr "Resume args"
 
 msgid "Resume automation"
 msgstr "Resume automation"
+
+msgid "Resume conversation"
+msgstr "Resume conversation"
+
+msgid "Resume with another account"
+msgstr "Resume with another account"
 
 #. placeholder {0}: candidate.agentLabel
 msgid "Resuming {0}…"
@@ -17065,6 +17077,12 @@ msgstr "This closes the workspace and its terminals. The project's files, branch
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
+
+msgid "This conversation cannot be resumed with another account."
+msgstr "This conversation cannot be resumed with another account."
+
+msgid "This conversation is no longer available to resume."
+msgstr "This conversation is no longer available to resume."
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "This deletes the saved scrollback used for reboot/crash recovery."

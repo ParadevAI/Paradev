@@ -4894,6 +4894,9 @@ msgstr "Tidak dapat melanjutkan"
 msgid "Could not resume the chat"
 msgstr "Tidak dapat melanjutkan obrolan"
 
+msgid "Could not resume this conversation"
+msgstr "Tidak dapat melanjutkan percakapan ini"
+
 msgid "Could not send"
 msgstr "Tidak bisa mengirim"
 
@@ -13497,6 +13500,9 @@ msgstr "Buka Lagi Tab yang Ditutup"
 msgid "Reopen PR"
 msgstr "Buka Lagi PR"
 
+msgid "Reopen the saved conversation in the same workspace. No message is sent. Background work is not transferred."
+msgstr "Buka kembali percakapan tersimpan di ruang kerja yang sama. Tidak ada pesan yang dikirim. Pekerjaan latar belakang tidak dipindahkan."
+
 msgid "Reopen thread"
 msgstr "Buka lagi thread"
 
@@ -13840,6 +13846,12 @@ msgstr "Argumen resume"
 
 msgid "Resume automation"
 msgstr "Lanjutkan otomatisasi"
+
+msgid "Resume conversation"
+msgstr "Lanjutkan percakapan"
+
+msgid "Resume with another account"
+msgstr "Lanjutkan dengan akun lain"
 
 #. placeholder {0}: candidate.agentLabel
 msgid "Resuming {0}…"
@@ -17065,6 +17077,12 @@ msgstr "Ini menutup workspace beserta terminalnya. File, branch, dan workspace l
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Workspace cloud ini sedang dibangunkan, yang bisa memakan waktu hingga 30 detik setelah tidak aktif."
+
+msgid "This conversation cannot be resumed with another account."
+msgstr "Percakapan ini tidak dapat dilanjutkan dengan akun lain."
+
+msgid "This conversation is no longer available to resume."
+msgstr "Percakapan ini tidak lagi tersedia untuk dilanjutkan."
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "Ini menghapus scrollback tersimpan yang dipakai untuk pemulihan setelah reboot/crash."

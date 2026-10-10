@@ -4894,6 +4894,9 @@ msgstr "Devam ettirilemedi"
 msgid "Could not resume the chat"
 msgstr "Sohbete devam edilemedi"
 
+msgid "Could not resume this conversation"
+msgstr "Bu konuşma sürdürülemedi"
+
 msgid "Could not send"
 msgstr "Gönderilemedi"
 
@@ -13497,6 +13500,9 @@ msgstr "Kapatılan sekmeyi yeniden aç"
 msgid "Reopen PR"
 msgstr "PR'ı yeniden aç"
 
+msgid "Reopen the saved conversation in the same workspace. No message is sent. Background work is not transferred."
+msgstr "Kaydedilen konuşmayı aynı çalışma alanında yeniden açın. Mesaj gönderilmez. Arka plan görevleri aktarılmaz."
+
 msgid "Reopen thread"
 msgstr "Konuyu yeniden aç"
 
@@ -13840,6 +13846,12 @@ msgstr "Sürdürme argümanları"
 
 msgid "Resume automation"
 msgstr "Otomasyonu sürdür"
+
+msgid "Resume conversation"
+msgstr "Konuşmayı sürdür"
+
+msgid "Resume with another account"
+msgstr "Başka bir hesapla sürdür"
 
 #. placeholder {0}: candidate.agentLabel
 msgid "Resuming {0}…"
@@ -17065,6 +17077,12 @@ msgstr "Bu, çalışma alanını ve terminallerini kapatır. Projenin dosyaları
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Bu bulut çalışma alanı uyandırılıyor; bir süre kullanılmadıysa bu işlem 30 saniyeye kadar sürebilir."
+
+msgid "This conversation cannot be resumed with another account."
+msgstr "Bu konuşma başka bir hesapla sürdürülemez."
+
+msgid "This conversation is no longer available to resume."
+msgstr "Bu konuşma artık sürdürülemiyor."
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "Bu işlem, yeniden başlatma/çökme kurtarma için saklanan kaydırma geçmişini siler."

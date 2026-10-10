@@ -4894,6 +4894,9 @@ msgstr "Не удалось возобновить"
 msgid "Could not resume the chat"
 msgstr "Не удалось продолжить чат"
 
+msgid "Could not resume this conversation"
+msgstr "Не удалось возобновить этот разговор"
+
 msgid "Could not send"
 msgstr "Не удалось отправить"
 
@@ -13497,6 +13500,9 @@ msgstr "Открыть заново закрытую вкладку"
 msgid "Reopen PR"
 msgstr "Открыть PR заново"
 
+msgid "Reopen the saved conversation in the same workspace. No message is sent. Background work is not transferred."
+msgstr "Открыть сохранённый разговор в том же рабочем пространстве. Сообщение не отправляется. Фоновые задачи не переносятся."
+
 msgid "Reopen thread"
 msgstr "Снова открыть ветку"
 
@@ -13840,6 +13846,12 @@ msgstr "Аргументы возобновления"
 
 msgid "Resume automation"
 msgstr "Возобновить автоматизацию"
+
+msgid "Resume conversation"
+msgstr "Возобновить разговор"
+
+msgid "Resume with another account"
+msgstr "Возобновить с другой учётной записью"
 
 #. placeholder {0}: candidate.agentLabel
 msgid "Resuming {0}…"
@@ -17065,6 +17077,12 @@ msgstr "Рабочая область и её терминалы будут за
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Облачное рабочее пространство запускается. После простоя это может занять до 30 секунд."
+
+msgid "This conversation cannot be resumed with another account."
+msgstr "Этот разговор нельзя возобновить с другой учётной записью."
+
+msgid "This conversation is no longer available to resume."
+msgstr "Этот разговор больше недоступен для возобновления."
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "Это удалит сохранённую прокрутку, используемую для восстановления после перезагрузки или сбоя."

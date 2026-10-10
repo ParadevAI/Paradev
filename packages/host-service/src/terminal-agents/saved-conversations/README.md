@@ -1,8 +1,10 @@
 # Saved conversation identity foundation
 
 These pure adapters validate supplied snapshots. They do not discover files,
-import records, read credentials, launch providers or authorize a resume. No
-production path calls them yet. Synthetic tests exercise the supported shapes.
+import records, read credentials, launch providers or authorize a resume. The
+ended-terminal account-resume path uses native validation alongside independent
+store, writer, account and launch-claim guards. T3 import integration remains
+follow-up work. Synthetic tests exercise the supported shapes.
 
 `validateNativeConversation` checks complete Claude or Codex JSONL against an
 explicit provider, native UUID and canonical working folder. It returns a digest

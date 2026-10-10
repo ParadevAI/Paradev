@@ -5,6 +5,43 @@ import { AccountTerminalForm } from "./AccountTerminalForm";
 
 afterEach(cleanup);
 
+test("resume keeps the provider fixed and requires explicit account selection", async () => {
+	const input = props();
+	const view = render(<AccountTerminalForm {...input} mode="resume" />);
+	expect((view.getByRole("combobox") as HTMLButtonElement).disabled).toBe(true);
+	const submit = view.getByRole("button", {
+		name: "Resume conversation",
+	}) as HTMLButtonElement;
+	expect(submit.disabled).toBe(true);
+	fireEvent.click(view.getByRole("radio"));
+	await act(async () => {
+		fireEvent.click(submit);
+	});
+	expect(input.onLaunch).toHaveBeenCalledWith({
+		selection: null,
+		identity: "alice",
+	});
+	expect(input.onConfigChange).not.toHaveBeenCalled();
+});
+
+test("resume rejection retains the selection and never retries automatically", async () => {
+	const input = props();
+	input.onLaunch = mock(async () => {
+		throw new Error("Saved history is unavailable to this account");
+	});
+	const view = render(<AccountTerminalForm {...input} mode="resume" />);
+	fireEvent.click(view.getByRole("radio"));
+	await act(async () => {
+		fireEvent.click(view.getByRole("button", { name: "Resume conversation" }));
+	});
+	expect(view.getByRole("alert").textContent).toBe(
+		"Saved history is unavailable to this account",
+	);
+	expect((view.getByRole("radio") as HTMLInputElement).checked).toBe(true);
+	expect(input.onLaunch).toHaveBeenCalledTimes(1);
+	expect(input.onCancel).not.toHaveBeenCalled();
+});
+
 function props(): ComponentProps<typeof AccountTerminalForm> {
 	return {
 		configs: [{ id: "claude-config", label: "Claude" }],

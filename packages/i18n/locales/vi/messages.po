@@ -4894,6 +4894,9 @@ msgstr "Không thể tiếp tục"
 msgid "Could not resume the chat"
 msgstr "Không thể tiếp tục cuộc trò chuyện"
 
+msgid "Could not resume this conversation"
+msgstr "Không thể tiếp tục cuộc trò chuyện này"
+
 msgid "Could not send"
 msgstr "Không thể gửi"
 
@@ -13497,6 +13500,9 @@ msgstr "Mở lại tab vừa đóng"
 msgid "Reopen PR"
 msgstr "Mở lại PR"
 
+msgid "Reopen the saved conversation in the same workspace. No message is sent. Background work is not transferred."
+msgstr "Mở lại cuộc trò chuyện đã lưu trong cùng không gian làm việc. Không gửi tin nhắn. Công việc chạy nền không được chuyển sang."
+
 msgid "Reopen thread"
 msgstr "Mở lại luồng"
 
@@ -13840,6 +13846,12 @@ msgstr "Tham số resume"
 
 msgid "Resume automation"
 msgstr "Tiếp tục tự động hóa"
+
+msgid "Resume conversation"
+msgstr "Tiếp tục cuộc trò chuyện"
+
+msgid "Resume with another account"
+msgstr "Tiếp tục bằng tài khoản khác"
 
 #. placeholder {0}: candidate.agentLabel
 msgid "Resuming {0}…"
@@ -17065,6 +17077,12 @@ msgstr "Thao tác này đóng workspace và các terminal của nó. Tệp, nhá
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Không gian làm việc đám mây này đang được đánh thức, có thể mất tới 30 giây sau một thời gian không hoạt động."
+
+msgid "This conversation cannot be resumed with another account."
+msgstr "Không thể tiếp tục cuộc trò chuyện này bằng tài khoản khác."
+
+msgid "This conversation is no longer available to resume."
+msgstr "Cuộc trò chuyện này không còn khả dụng để tiếp tục."
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "Thao tác này xóa phần scrollback đã lưu dùng để khôi phục sau khi khởi động lại hoặc crash."

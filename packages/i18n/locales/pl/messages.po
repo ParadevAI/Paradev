@@ -4894,6 +4894,9 @@ msgstr "Nie udało się wznowić"
 msgid "Could not resume the chat"
 msgstr "Nie udało się wznowić czatu"
 
+msgid "Could not resume this conversation"
+msgstr "Nie udało się wznowić tej rozmowy"
+
 msgid "Could not send"
 msgstr "Nie udało się wysłać"
 
@@ -13497,6 +13500,9 @@ msgstr "Otwórz ponownie zamkniętą kartę"
 msgid "Reopen PR"
 msgstr "Otwórz PR ponownie"
 
+msgid "Reopen the saved conversation in the same workspace. No message is sent. Background work is not transferred."
+msgstr "Otwórz ponownie zapisaną rozmowę w tej samej przestrzeni roboczej. Żadna wiadomość nie zostanie wysłana. Zadania w tle nie zostaną przeniesione."
+
 msgid "Reopen thread"
 msgstr "Otwórz wątek ponownie"
 
@@ -13840,6 +13846,12 @@ msgstr "Argumenty wznawiania"
 
 msgid "Resume automation"
 msgstr "Wznów automatyzację"
+
+msgid "Resume conversation"
+msgstr "Wznów rozmowę"
+
+msgid "Resume with another account"
+msgstr "Wznów z innym kontem"
 
 #. placeholder {0}: candidate.agentLabel
 msgid "Resuming {0}…"
@@ -17065,6 +17077,12 @@ msgstr "Spowoduje to zamknięcie obszaru roboczego i jego terminali. Pliki, gał
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Ten obszar roboczy w chmurze jest wybudzany. Po okresie bezczynności może to potrwać do 30 sekund."
+
+msgid "This conversation cannot be resumed with another account."
+msgstr "Nie można wznowić tej rozmowy z innym kontem."
+
+msgid "This conversation is no longer available to resume."
+msgstr "Ta rozmowa nie jest już dostępna do wznowienia."
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "Usuwa to zapisany bufor przewijania używany do odzyskiwania po restarcie lub awarii."

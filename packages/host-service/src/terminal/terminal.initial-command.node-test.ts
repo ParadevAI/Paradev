@@ -21,7 +21,10 @@ import { fileURLToPath } from "node:url";
 import { Server } from "@superset/pty-daemon";
 import { createDb, type HostDb } from "../db/index.ts";
 import { projects, workspaces } from "../db/schema.ts";
-import { disposeDaemonClient } from "./daemon-client-singleton.ts";
+import {
+	disposeDaemonClient,
+	getDaemonClient,
+} from "./daemon-client-singleton.ts";
 import { initTerminalBaseEnv } from "./env.ts";
 import {
 	__resetSessionsForTesting,
@@ -91,6 +94,97 @@ after(async () => {
 });
 
 describe("initialCommand delivery", () => {
+	test("a recovery guard runs after shell setup and prevents refused commands", async () => {
+		const terminalId = `e2e-guard-${randomUUID().slice(0, 8)}`;
+		const sentinel = path.join(TEST_HOME, `guard-ran-${terminalId}`);
+		let guarded = false;
+		try {
+			await assert.rejects(
+				createTerminalSessionInternal({
+					terminalId,
+					workspaceId,
+					db,
+					initialCommand: `echo ran > "${sentinel}"`,
+					beforeInitialCommand: async () => {
+						guarded = true;
+						assert.ok(
+							db.query.terminalSessions
+								.findFirst({
+									where: (table, { eq }) => eq(table.id, terminalId),
+								})
+								.sync(),
+						);
+						throw new Error("saved identity changed");
+					},
+				}),
+				/saved identity changed/,
+			);
+			assert.equal(guarded, true);
+			assert.equal(fs.existsSync(sentinel), false);
+		} finally {
+			await disposeSessionAndWait(terminalId, db);
+		}
+	});
+
+	test("a passing recovery guard authorizes one initial command", async () => {
+		const terminalId = `e2e-guard-pass-${randomUUID().slice(0, 8)}`;
+		const sentinel = path.join(TEST_HOME, `guard-pass-${terminalId}`);
+		let guarded = 0;
+		try {
+			const session = await createTerminalSessionInternal({
+				terminalId,
+				workspaceId,
+				db,
+				initialCommand: `echo ran > "${sentinel}"`,
+				beforeInitialCommand: async () => {
+					guarded++;
+				},
+			});
+			assert.ok(!("error" in session));
+			await waitFor(() => fs.existsSync(sentinel), 5000);
+			assert.equal(guarded, 1);
+			assert.equal(fs.readFileSync(sentinel, "utf8"), "ran\n");
+		} finally {
+			await disposeSessionAndWait(terminalId, db);
+		}
+	});
+
+	test("an exited fixture shell cannot authorize a saved-conversation launch", async () => {
+		const terminalId = `e2e-guard-exit-${randomUUID().slice(0, 8)}`;
+		const sentinel = path.join(TEST_HOME, `guard-exit-${terminalId}`);
+		let authorized = false;
+		try {
+			await assert.rejects(
+				createTerminalSessionInternal({
+					terminalId,
+					workspaceId,
+					db,
+					initialCommand: `echo ran > "${sentinel}"`,
+					beforeInitialCommand: async () => {
+						await (await getDaemonClient()).close(terminalId, "SIGHUP");
+						await waitFor(
+							() =>
+								db.query.terminalSessions
+									.findFirst({
+										where: (table, { eq }) => eq(table.id, terminalId),
+									})
+									.sync()?.status === "exited",
+							5000,
+						);
+					},
+					onInitialCommandReady: () => {
+						authorized = true;
+					},
+				}),
+				/new terminal exited/,
+			);
+			assert.equal(authorized, false);
+			assert.equal(fs.existsSync(sentinel), false);
+		} finally {
+			await disposeSessionAndWait(terminalId, db);
+		}
+	});
+
 	test("a >2KB initialCommand executes fully (no MAX_CANON truncation)", async () => {
 		const terminalId = `e2e-longcmd-${randomUUID().slice(0, 8)}`;
 		const outFile = path.join(TEST_HOME, `long-${terminalId}`);

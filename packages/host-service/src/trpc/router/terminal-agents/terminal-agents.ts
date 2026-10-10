@@ -36,6 +36,10 @@ import { protectedProcedure, router } from "../../index";
 import { type AgentRunResult, runAgentInWorkspace } from "../agents/agents";
 import { toTerminalSessionError } from "../terminal/errors";
 import type { SessionAccount } from "../usage/session-account/session-account";
+import {
+	accountResumeSource,
+	resumeTerminalWithAccount,
+} from "./resume-account";
 
 type GetOrCreateResult = {
 	binding: TerminalAgentBinding;
@@ -396,6 +400,39 @@ const GET_OR_CREATE_TIMEOUT_MS = 10_000;
 const MAX_AGENT_TRANSCRIPT_CHARS = 400_000;
 
 export const terminalAgentsRouter = router({
+	accountResumeSource: protectedProcedure
+		.input(
+			z.object({ workspaceId: z.string(), terminalId: z.string() }).strict(),
+		)
+		.query(({ ctx, input }) => accountResumeSource(ctx.db, input)),
+
+	resumeWithAccount: protectedProcedure
+		.input(
+			z
+				.object({
+					workspaceId: z.string(),
+					terminalId: z.string(),
+					expectedRevision: z.string().regex(/^[a-f0-9]{64}$/),
+					account: z
+						.object({
+							selection: z.string().max(4096).nullable(),
+							identity: z.string().regex(/^[a-f0-9]{64}$/),
+						})
+						.strict(),
+				})
+				.strict(),
+		)
+		.mutation(({ ctx, input }) =>
+			resumeTerminalWithAccount(
+				{
+					db: ctx.db,
+					runAgent: (runInput) => runAgentInWorkspace(ctx, runInput),
+					eventBus: ctx.eventBus,
+				},
+				input,
+			),
+		),
+
 	list: protectedProcedure.query(({ ctx }) => {
 		return ctx.terminalAgentStore.list();
 	}),

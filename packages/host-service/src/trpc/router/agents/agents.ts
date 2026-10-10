@@ -143,6 +143,12 @@ function buildAttachmentBlock(
 }
 
 export interface AgentRunInput {
+	/** Internal recovery transaction; never accepted by a public input schema. */
+	terminalLaunch?: {
+		terminalId: string;
+		beforeInitialCommand: () => Promise<void>;
+		onInitialCommandReady: () => void;
+	};
 	/** Internal, validated explicit selection. Public callers use runWithAccount. */
 	account?: SessionAccount;
 	colors?: TerminalColors;
@@ -538,7 +544,7 @@ async function runTerminalAgent(
 ): Promise<AgentRunResult> {
 	const { fullCommand, label } = buildTerminalAgentLaunch(ctx.db, input);
 
-	const terminalId = crypto.randomUUID();
+	const terminalId = input.terminalLaunch?.terminalId ?? crypto.randomUUID();
 	const result = await createTerminalSessionInternal({
 		terminalId,
 		workspaceId: input.workspaceId,
@@ -546,13 +552,24 @@ async function runTerminalAgent(
 		eventBus: ctx.eventBus,
 		initialCommand: fullCommand,
 		colors: input.colors,
+		...(input.terminalLaunch
+			? {
+					beforeInitialCommand: input.terminalLaunch.beforeInitialCommand,
+					onInitialCommandReady: () => {
+						ctx.db.transaction(() => {
+							bindResumedSession(ctx, input, terminalId);
+							input.terminalLaunch?.onInitialCommandReady();
+						});
+					},
+				}
+			: {}),
 	});
 
 	if ("error" in result) {
 		throw toTerminalSessionError(result);
 	}
 
-	bindResumedSession(ctx, input, result.terminalId);
+	if (!input.terminalLaunch) bindResumedSession(ctx, input, result.terminalId);
 
 	return {
 		kind: "terminal",
@@ -819,6 +836,15 @@ export async function runAgentInWorkspace(
 	ctx: HostServiceContext,
 	input: AgentRunInput,
 ): Promise<AgentRunResult> {
+	if (
+		input.terminalLaunch &&
+		(!input.account || !input.resumeSessionId || input.surface !== "terminal")
+	)
+		throw new TRPCError({
+			code: "BAD_REQUEST",
+			message:
+				"A guarded launch requires exact account-bound terminal recovery.",
+		});
 	if (input.account) {
 		if (
 			input.surface === "chat" ||

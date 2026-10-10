@@ -20,6 +20,7 @@ interface LaunchAccount {
 }
 
 interface AccountTerminalFormProps {
+	mode?: "start" | "resume";
 	configs: Array<{ id: string; label: string }>;
 	configId: string;
 	onConfigChange: (id: string) => void;
@@ -40,6 +41,7 @@ function accountKey(account: LaunchAccount) {
 }
 
 export function AccountTerminalForm({
+	mode = "start",
 	configs,
 	configId,
 	onConfigChange,
@@ -76,7 +78,7 @@ export function AccountTerminalForm({
 			: null);
 	return (
 		<form
-			className="space-y-4"
+			className="min-w-0 space-y-4"
 			onSubmit={async (event) => {
 				event.preventDefault();
 				if (!canLaunch || !account || inFlight.current) return;
@@ -91,7 +93,9 @@ export function AccountTerminalForm({
 					setLaunchError(
 						errorMessage(
 							cause,
-							t({ message: "Could not start agent terminal" }),
+							mode === "resume"
+								? t({ message: "Could not resume this conversation" })
+								: t({ message: "Could not start agent terminal" }),
 						),
 					);
 				} finally {
@@ -106,7 +110,7 @@ export function AccountTerminalForm({
 				<Select
 					value={configId}
 					onValueChange={onConfigChange}
-					disabled={launching || configs.length === 0}
+					disabled={mode === "resume" || launching || configs.length === 0}
 				>
 					<SelectTrigger id={agentId} className="w-full">
 						<SelectValue placeholder={t({ message: "Select agent" })} />
@@ -120,7 +124,7 @@ export function AccountTerminalForm({
 					</SelectContent>
 				</Select>
 			</div>
-			<fieldset disabled={launching} className="space-y-2">
+			<fieldset disabled={launching} className="min-w-0 space-y-2">
 				<legend className="text-sm font-medium">
 					<Trans>Account</Trans>
 				</legend>
@@ -176,7 +180,7 @@ export function AccountTerminalForm({
 					{failure}
 				</p>
 			)}
-			<div className="flex items-center justify-between gap-2">
+			<div className="flex flex-wrap items-center justify-between gap-2">
 				<Button
 					type="button"
 					variant="ghost"
@@ -189,7 +193,7 @@ export function AccountTerminalForm({
 				>
 					<Trans>Refresh</Trans>
 				</Button>
-				<div className="flex gap-2">
+				<div className="ml-auto flex max-w-full flex-wrap justify-end gap-2">
 					<Button
 						type="button"
 						variant="outline"
@@ -200,7 +204,11 @@ export function AccountTerminalForm({
 					</Button>
 					<Button type="submit" disabled={!canLaunch}>
 						{launching && <Loader2 className="size-4 animate-spin" />}
-						<Trans>Start terminal</Trans>
+						{mode === "resume" ? (
+							<Trans>Resume conversation</Trans>
+						) : (
+							<Trans>Start terminal</Trans>
+						)}
 					</Button>
 				</div>
 			</div>

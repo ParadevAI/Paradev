@@ -4894,6 +4894,9 @@ msgstr "無法繼續"
 msgid "Could not resume the chat"
 msgstr "無法繼續聊天"
 
+msgid "Could not resume this conversation"
+msgstr "無法繼續此對話"
+
 msgid "Could not send"
 msgstr "無法傳送"
 
@@ -13497,6 +13500,9 @@ msgstr "重新開啟已關閉的分頁"
 msgid "Reopen PR"
 msgstr "重新開啟PR"
 
+msgid "Reopen the saved conversation in the same workspace. No message is sent. Background work is not transferred."
+msgstr "在同一工作區中重新開啟已儲存的對話。不會傳送訊息，也不會轉移背景工作。"
+
 msgid "Reopen thread"
 msgstr "重新開啟討論串"
 
@@ -13840,6 +13846,12 @@ msgstr "恢復引數"
 
 msgid "Resume automation"
 msgstr "恢復自動化"
+
+msgid "Resume conversation"
+msgstr "繼續對話"
+
+msgid "Resume with another account"
+msgstr "使用其他帳戶繼續"
 
 #. placeholder {0}: candidate.agentLabel
 msgid "Resuming {0}…"
@@ -17065,6 +17077,12 @@ msgstr "這將關閉該工作區及其終端機。專案的檔案、分支和其
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "正在喚醒此雲端工作區。如果它已閒置一段時間，可能需要最多 30 秒。"
+
+msgid "This conversation cannot be resumed with another account."
+msgstr "無法使用其他帳戶繼續此對話。"
+
+msgid "This conversation is no longer available to resume."
+msgstr "此對話已無法繼續。"
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "這將刪除用於重啟/崩潰恢復的已儲存回滾緩衝。"

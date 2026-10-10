@@ -4894,6 +4894,9 @@ msgstr "再開できませんでした"
 msgid "Could not resume the chat"
 msgstr "チャットを再開できませんでした"
 
+msgid "Could not resume this conversation"
+msgstr "この会話を再開できませんでした"
+
 msgid "Could not send"
 msgstr "送信できませんでした"
 
@@ -13497,6 +13500,9 @@ msgstr "閉じたタブを再度開く"
 msgid "Reopen PR"
 msgstr "PRを再オープン"
 
+msgid "Reopen the saved conversation in the same workspace. No message is sent. Background work is not transferred."
+msgstr "同じワークスペースで保存済みの会話を再度開きます。メッセージは送信されません。バックグラウンドの作業は引き継がれません。"
+
 msgid "Reopen thread"
 msgstr "スレッドを再開"
 
@@ -13840,6 +13846,12 @@ msgstr "再開時の引数"
 
 msgid "Resume automation"
 msgstr "オートメーションを再開"
+
+msgid "Resume conversation"
+msgstr "会話を再開"
+
+msgid "Resume with another account"
+msgstr "別のアカウントで再開"
 
 #. placeholder {0}: candidate.agentLabel
 msgid "Resuming {0}…"
@@ -17065,6 +17077,12 @@ msgstr "ワークスペースとそのターミナルを閉じます。プロジ
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "このクラウドワークスペースを起動しています。しばらく使われていなかった場合は、最大30秒かかることがあります。"
+
+msgid "This conversation cannot be resumed with another account."
+msgstr "この会話は別のアカウントでは再開できません。"
+
+msgid "This conversation is no longer available to resume."
+msgstr "この会話は再開できなくなりました。"
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "再起動やクラッシュからの復旧に使う保存済みスクロールバックを削除します。"

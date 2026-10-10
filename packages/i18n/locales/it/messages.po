@@ -4894,6 +4894,9 @@ msgstr "Impossibile riprendere"
 msgid "Could not resume the chat"
 msgstr "Impossibile riprendere la chat"
 
+msgid "Could not resume this conversation"
+msgstr "Impossibile riprendere questa conversazione"
+
 msgid "Could not send"
 msgstr "Impossibile inviare"
 
@@ -13497,6 +13500,9 @@ msgstr "Riapri la scheda chiusa"
 msgid "Reopen PR"
 msgstr "Riapri la PR"
 
+msgid "Reopen the saved conversation in the same workspace. No message is sent. Background work is not transferred."
+msgstr "Riapri la conversazione salvata nello stesso spazio di lavoro. Nessun messaggio viene inviato. Le attività in background non vengono trasferite."
+
 msgid "Reopen thread"
 msgstr "Riapri il thread"
 
@@ -13840,6 +13846,12 @@ msgstr "Argomenti di ripresa"
 
 msgid "Resume automation"
 msgstr "Riprendi l'automazione"
+
+msgid "Resume conversation"
+msgstr "Riprendi conversazione"
+
+msgid "Resume with another account"
+msgstr "Riprendi con un altro account"
 
 #. placeholder {0}: candidate.agentLabel
 msgid "Resuming {0}…"
@@ -17065,6 +17077,12 @@ msgstr "Questo chiude il workspace e i suoi terminali. I file, i branch e gli al
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Questo workspace cloud si sta riattivando: dopo un periodo di inattività possono volerci fino a 30 secondi."
+
+msgid "This conversation cannot be resumed with another account."
+msgstr "Questa conversazione non può essere ripresa con un altro account."
+
+msgid "This conversation is no longer available to resume."
+msgstr "Questa conversazione non è più disponibile per la ripresa."
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "Questo elimina lo scrollback salvato usato per il ripristino dopo riavvio o crash."
