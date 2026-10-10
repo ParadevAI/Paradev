@@ -3461,6 +3461,12 @@ msgstr "Relace chatu nenalezena"
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "Plochy chatu: zprávy, uvažování, návrhy"
 
+msgid "Chat with account"
+msgstr "Chat s účtem"
+
+msgid "Chat with account…"
+msgstr "Chat s účtem…"
+
 msgid "Check again"
 msgstr "Zkontrolovat znovu"
 
@@ -4761,6 +4767,9 @@ msgstr "Soubor se nepodařilo smazat"
 msgid "Could not delete this page"
 msgstr "Tuto stránku se nepodařilo smazat"
 
+msgid "Could not discard the queued message."
+msgstr "Zprávu ve frontě se nepodařilo zahodit."
+
 msgid "Could not disconnect."
 msgstr "Odpojení se nezdařilo."
 
@@ -4855,6 +4864,9 @@ msgstr "Nepodařilo se spojit s počítačem tohoto pracovního prostoru"
 msgid "Could not reactivate"
 msgstr "Nepodařilo se obnovit"
 
+msgid "Could not read queued messages."
+msgstr "Zprávy ve frontě se nepodařilo přečíst."
+
 msgid "Could not read selected file"
 msgstr "Vybraný soubor se nepodařilo přečíst"
 
@@ -4909,6 +4921,9 @@ msgstr "Nepodařilo se spustit agenta"
 msgid "Could not start agent terminal"
 msgstr "Terminál agenta se nepodařilo spustit"
 
+msgid "Could not start chat"
+msgstr "Chat se nepodařilo spustit"
+
 msgid "Could not start checkout. Please try again."
 msgstr "Platbu se nepodařilo zahájit. Zkuste to znovu."
 
@@ -4929,6 +4944,9 @@ msgstr "Nepodařilo se ho zastavit"
 
 msgid "Could not stop the agent"
 msgstr "Agenta se nepodařilo zastavit"
+
+msgid "Could not stop the agent. Review queued messages or update this host, then try again."
+msgstr "Agenta se nepodařilo zastavit. Zkontrolujte zprávy ve frontě nebo aktualizujte tohoto hostitele a zkuste to znovu."
 
 msgid "Could not stop the task"
 msgstr "Úlohu se nepodařilo zastavit"
@@ -6071,6 +6089,9 @@ msgstr "Zahodit změny v souboru „{discardBasename}“?"
 
 msgid "Discard changes?"
 msgstr "Zahodit změny?"
+
+msgid "Discard queued message"
+msgstr "Zahodit zprávu ve frontě"
 
 msgid "Discard recording"
 msgstr "Zahodit nahrávku"
@@ -10203,6 +10224,9 @@ msgstr "Zařaďte nové větve tohoto projektu pod jmenný prostor. Ve výchozí
 
 msgid "Naming instructions"
 msgstr "Pravidla pojmenování"
+
+msgid "Native chat is not enabled"
+msgstr "Nativní chat není povolen"
 
 msgid "Native PR reviews"
 msgstr "Nativní revize PR"
@@ -15676,6 +15700,9 @@ msgstr "Začněte konverzaci a zprávy se objeví tady"
 msgid "Start a fresh agent session seeded with this terminal's recent context. Workspace files remain the source of truth."
 msgstr "Spustí novou relaci agenta s nedávným kontextem tohoto terminálu. Zdrojem pravdy zůstávají soubory v pracovním prostoru."
 
+msgid "Start a native chat using an existing login. Recovery keeps this account and working folder."
+msgstr "Spusťte nativní chat pomocí existujícího přihlášení. Obnovení zachová tento účet i pracovní složku."
+
 msgid "Start a new agent session each run"
 msgstr "Při každém spuštění začít novou relaci agenta"
 
@@ -15705,6 +15732,9 @@ msgstr "Začněte prohlížet"
 
 msgid "Start building in two."
 msgstr "Začněte stavět ve dvou."
+
+msgid "Start chat"
+msgstr "Spustit chat"
 
 msgid "Start coding agents, follow them live, and review the diff from your iPhone or iPad. Available on the App Store; Android is coming soon."
 msgstr "Spouštějte kódovací agenty, sledujte je živě a kontrolujte diff z iPhonu nebo iPadu. K dispozici v App Storu; Android brzy."
@@ -15838,6 +15868,12 @@ msgstr "Zastavit {0}"
 msgid "Stop {label}"
 msgstr "Zastavit {label}"
 
+msgid "Stop agent"
+msgstr "Zastavit agenta"
+
+msgid "Stop agent and background work"
+msgstr "Zastavit agenta a úlohy na pozadí"
+
 msgid "Stop all agent background processes"
 msgstr "Zastavit všechny procesy agentů na pozadí"
 
@@ -15856,6 +15892,9 @@ msgstr "Ukončete tady Superset, ať ho smažete z jiného zařízení."
 
 msgid "Stop the agent and send this now"
 msgstr "Zastavit agenta a odeslat hned"
+
+msgid "Stop this agent and its background work?"
+msgstr "Zastavit tohoto agenta a jeho úlohy na pozadí?"
 
 msgid "Stop watching"
 msgstr "Přestat sledovat"
@@ -16888,6 +16927,9 @@ msgstr "Stejná aplikace běží na iPadu nativně, na výšku i na šířku."
 msgid "The scorecard"
 msgstr "Hodnocení"
 
+msgid "The selected account chat could not be verified in saved layout data. Nothing was launched by this attempt. If storage is full, free space, then rename this tab to save its layout before retrying. Keep this tab open if it still fails."
+msgstr "Chat vybraného účtu se nepodařilo ověřit v uložených datech rozvržení. Tento pokus nic nespustil. Pokud je úložiště plné, uvolněte místo a poté přejmenujte tuto kartu, aby se před dalším pokusem uložilo její rozvržení. Pokud problém přetrvává, ponechte kartu otevřenou."
+
 msgid "The selected login changed. Choose an account again."
 msgstr "Vybrané přihlášení se změnilo. Vyberte účet znovu."
 
@@ -16981,6 +17023,9 @@ msgstr "Tyto příkazy se spustí automaticky při vytvoření pracovního prost
 msgid "These folders still have your files, but they did not come over to the new Superset on their own."
 msgstr "Tyto složky stále obsahují vaše soubory, ale do nového Supersetu se samy nepřenesly."
 
+msgid "These messages were not sent. Copy anything you need, then discard the queue before resuming."
+msgstr "Tyto zprávy nebyly odeslány. Zkopírujte, co potřebujete, a před pokračováním vyprázdněte frontu."
+
 msgid "These ports are still in use"
 msgstr "Tyto porty se stále používají"
 
@@ -17041,6 +17086,9 @@ msgstr "Tato automatizace je v jiné organizaci"
 
 msgid "This cannot be undone."
 msgstr "Nelze vrátit zpět."
+
+msgid "This chat could not be opened with its saved account."
+msgstr "Tento chat se nepodařilo otevřít s uloženým účtem."
 
 msgid "This chat has ended."
 msgstr "Tento chat skončil."
@@ -17110,6 +17158,9 @@ msgstr "Tato instalace GitHubu je už připojená k jiné organizaci Superset. O
 
 msgid "This host"
 msgstr "Tento host"
+
+msgid "This host does not support account selection for native chats."
+msgstr "Tento hostitel nepodporuje výběr účtu pro nativní chaty."
 
 msgid "This host has not reported a version yet."
 msgstr "Tento hostitel zatím nenahlásil verzi."
@@ -17260,6 +17311,9 @@ msgstr "Tento slug je již obsazený"
 
 msgid "This stops every Teams trigger in your organization and removes the notification subscriptions from your tenant. You can reconnect at any time."
 msgstr "Tím se zastaví všechny spouštěče Teams ve vaší organizaci a z tenantu se odeberou odběry oznámení. Kdykoli se můžete připojit znovu."
+
+msgid "This stops the agent process and any background work it owns. Your saved conversation stays available. Review and discard any queued messages first. You can then choose Resume."
+msgstr "Tím se zastaví proces agenta a všechny jeho úlohy na pozadí. Uložená konverzace zůstane dostupná. Nejprve zkontrolujte a zahoďte zprávy ve frontě. Poté můžete zvolit Pokračovat."
 
 msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
 msgstr "Tento subagent už není hostitelem sledován. Jeho přepis zůstává na disku v adresáři relace agenta."
@@ -19209,57 +19263,3 @@ msgstr "Oddálit"
 
 msgid "zsh"
 msgstr "zsh"
-
-msgid "Chat with account"
-msgstr "Chat s účtem"
-
-msgid "Chat with account…"
-msgstr "Chat s účtem…"
-
-msgid "Could not discard the queued message."
-msgstr "Zprávu ve frontě se nepodařilo zahodit."
-
-msgid "Could not read queued messages."
-msgstr "Zprávy ve frontě se nepodařilo přečíst."
-
-msgid "Could not start chat"
-msgstr "Chat se nepodařilo spustit"
-
-msgid "Could not stop the agent. Review queued messages or update this host, then try again."
-msgstr "Agenta se nepodařilo zastavit. Zkontrolujte zprávy ve frontě nebo aktualizujte tohoto hostitele a zkuste to znovu."
-
-msgid "Discard queued message"
-msgstr "Zahodit zprávu ve frontě"
-
-msgid "Native chat is not enabled"
-msgstr "Nativní chat není povolen"
-
-msgid "Start a native chat using an existing login. Recovery keeps this account and working folder."
-msgstr "Spusťte nativní chat pomocí existujícího přihlášení. Obnovení zachová tento účet i pracovní složku."
-
-msgid "Start chat"
-msgstr "Spustit chat"
-
-msgid "Stop agent"
-msgstr "Zastavit agenta"
-
-msgid "Stop agent and background work"
-msgstr "Zastavit agenta a úlohy na pozadí"
-
-msgid "Stop this agent and its background work?"
-msgstr "Zastavit tohoto agenta a jeho úlohy na pozadí?"
-
-msgid "The selected account chat could not be verified in saved layout data. Nothing was launched by this attempt. If storage is full, free space, then rename this tab to save its layout before retrying. Keep this tab open if it still fails."
-msgstr "Chat vybraného účtu se nepodařilo ověřit v uložených datech rozvržení. Tento pokus nic nespustil. Pokud je úložiště plné, uvolněte místo a poté přejmenujte tuto kartu, aby se před dalším pokusem uložilo její rozvržení. Pokud problém přetrvává, ponechte kartu otevřenou."
-
-msgid "These messages were not sent. Copy anything you need, then discard the queue before resuming."
-msgstr "Tyto zprávy nebyly odeslány. Zkopírujte, co potřebujete, a před pokračováním vyprázdněte frontu."
-
-msgid "This chat could not be opened with its saved account."
-msgstr "Tento chat se nepodařilo otevřít s uloženým účtem."
-
-msgid "This host does not support account selection for native chats."
-msgstr "Tento hostitel nepodporuje výběr účtu pro nativní chaty."
-
-msgid "This stops the agent process and any background work it owns. Your saved conversation stays available. Review and discard any queued messages first. You can then choose Resume."
-msgstr "Tím se zastaví proces agenta a všechny jeho úlohy na pozadí. Uložená konverzace zůstane dostupná. Nejprve zkontrolujte a zahoďte zprávy ve frontě. Poté můžete zvolit Pokračovat."

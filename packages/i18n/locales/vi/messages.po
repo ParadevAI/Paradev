@@ -3461,6 +3461,12 @@ msgstr "Không tìm thấy phiên chat"
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "Các bề mặt chat: tin nhắn, suy luận, gợi ý"
 
+msgid "Chat with account"
+msgstr "Trò chuyện bằng tài khoản"
+
+msgid "Chat with account…"
+msgstr "Trò chuyện bằng tài khoản…"
+
 msgid "Check again"
 msgstr "Kiểm tra lại"
 
@@ -4761,6 +4767,9 @@ msgstr "Không thể xóa tệp"
 msgid "Could not delete this page"
 msgstr "Không thể xóa trang này"
 
+msgid "Could not discard the queued message."
+msgstr "Không thể xóa tin nhắn đang chờ."
+
 msgid "Could not disconnect."
 msgstr "Không thể ngắt kết nối."
 
@@ -4855,6 +4864,9 @@ msgstr "Không kết nối được tới máy của workspace này"
 msgid "Could not reactivate"
 msgstr "Không thể kích hoạt lại"
 
+msgid "Could not read queued messages."
+msgstr "Không thể đọc các tin nhắn đang chờ."
+
 msgid "Could not read selected file"
 msgstr "Không thể đọc tệp đã chọn"
 
@@ -4909,6 +4921,9 @@ msgstr "Không thể khởi động agent"
 msgid "Could not start agent terminal"
 msgstr "Không thể khởi động thiết bị đầu cuối của tác nhân"
 
+msgid "Could not start chat"
+msgstr "Không thể bắt đầu trò chuyện"
+
 msgid "Could not start checkout. Please try again."
 msgstr "Không thể bắt đầu thanh toán. Vui lòng thử lại."
 
@@ -4929,6 +4944,9 @@ msgstr "Không thể dừng"
 
 msgid "Could not stop the agent"
 msgstr "Không thể dừng agent"
+
+msgid "Could not stop the agent. Review queued messages or update this host, then try again."
+msgstr "Không thể dừng tác nhân. Hãy xem lại các tin nhắn đang chờ hoặc cập nhật máy chủ này rồi thử lại."
 
 msgid "Could not stop the task"
 msgstr "Không thể dừng tác vụ"
@@ -6071,6 +6089,9 @@ msgstr "Bỏ thay đổi với \"{discardBasename}\"?"
 
 msgid "Discard changes?"
 msgstr "Bỏ thay đổi?"
+
+msgid "Discard queued message"
+msgstr "Xóa tin nhắn đang chờ"
 
 msgid "Discard recording"
 msgstr "Bỏ bản ghi"
@@ -10203,6 +10224,9 @@ msgstr "Đặt không gian tên cho nhánh mới của dự án này. Mặc đ�
 
 msgid "Naming instructions"
 msgstr "Hướng dẫn đặt tên"
+
+msgid "Native chat is not enabled"
+msgstr "Trò chuyện tích hợp chưa được bật"
 
 msgid "Native PR reviews"
 msgstr "Review PR ngay trong ứng dụng"
@@ -15676,6 +15700,9 @@ msgstr "Bắt đầu một cuộc trò chuyện để thấy tin nhắn ở đâ
 msgid "Start a fresh agent session seeded with this terminal's recent context. Workspace files remain the source of truth."
 msgstr "Bắt đầu một phiên agent mới với ngữ cảnh gần đây của terminal này. Tệp trong workspace vẫn là nguồn đáng tin cậy."
 
+msgid "Start a native chat using an existing login. Recovery keeps this account and working folder."
+msgstr "Bắt đầu trò chuyện tích hợp bằng phiên đăng nhập hiện có. Khi khôi phục, tài khoản và thư mục làm việc này được giữ nguyên."
+
 msgid "Start a new agent session each run"
 msgstr "Bắt đầu một phiên agent mới mỗi lần chạy"
 
@@ -15705,6 +15732,9 @@ msgstr "Bắt đầu duyệt web"
 
 msgid "Start building in two."
 msgstr "Bắt đầu xây dựng trong hai bước."
+
+msgid "Start chat"
+msgstr "Bắt đầu trò chuyện"
 
 msgid "Start coding agents, follow them live, and review the diff from your iPhone or iPad. Available on the App Store; Android is coming soon."
 msgstr "Khởi chạy agent lập trình, theo dõi trực tiếp và xem xét diff từ iPhone hoặc iPad. Có trên App Store; Android sắp ra mắt."
@@ -15838,6 +15868,12 @@ msgstr "Dừng {0}"
 msgid "Stop {label}"
 msgstr "Dừng {label}"
 
+msgid "Stop agent"
+msgstr "Dừng tác nhân"
+
+msgid "Stop agent and background work"
+msgstr "Dừng tác nhân và tác vụ nền"
+
 msgid "Stop all agent background processes"
 msgstr "Dừng tất cả tiến trình nền của tác tử"
 
@@ -15856,6 +15892,9 @@ msgstr "Hãy dừng Superset ở đây để xóa từ thiết bị khác."
 
 msgid "Stop the agent and send this now"
 msgstr "Dừng tác tử và gửi ngay"
+
+msgid "Stop this agent and its background work?"
+msgstr "Dừng tác nhân này và các tác vụ nền của nó?"
 
 msgid "Stop watching"
 msgstr "Ngừng theo dõi"
@@ -16888,6 +16927,9 @@ msgstr "Cùng một ứng dụng chạy native trên iPad, ở cả chế độ 
 msgid "The scorecard"
 msgstr "Bảng điểm"
 
+msgid "The selected account chat could not be verified in saved layout data. Nothing was launched by this attempt. If storage is full, free space, then rename this tab to save its layout before retrying. Keep this tab open if it still fails."
+msgstr "Không thể xác minh cuộc trò chuyện của tài khoản đã chọn trong dữ liệu bố cục đã lưu. Lần thử này chưa khởi chạy gì. Nếu bộ nhớ đã đầy, hãy giải phóng dung lượng, rồi đổi tên thẻ này để lưu bố cục trước khi thử lại. Giữ thẻ này mở nếu vẫn không thành công."
+
 msgid "The selected login changed. Choose an account again."
 msgstr "Thông tin đăng nhập đã chọn đã thay đổi. Hãy chọn lại tài khoản."
 
@@ -16981,6 +17023,9 @@ msgstr "Các lệnh này chạy tự động khi một workspace được tạo.
 msgid "These folders still have your files, but they did not come over to the new Superset on their own."
 msgstr "Các thư mục này vẫn còn tệp của bạn, nhưng chưa tự chuyển sang Superset mới."
 
+msgid "These messages were not sent. Copy anything you need, then discard the queue before resuming."
+msgstr "Các tin nhắn này chưa được gửi. Sao chép nội dung bạn cần, rồi xóa hàng đợi trước khi tiếp tục."
+
 msgid "These ports are still in use"
 msgstr "Các cổng này vẫn đang được dùng"
 
@@ -17041,6 +17086,9 @@ msgstr "Tự động hóa này nằm trong một tổ chức khác"
 
 msgid "This cannot be undone."
 msgstr "Không thể hoàn tác."
+
+msgid "This chat could not be opened with its saved account."
+msgstr "Không thể mở cuộc trò chuyện này bằng tài khoản đã lưu."
 
 msgid "This chat has ended."
 msgstr "Chat này đã kết thúc."
@@ -17110,6 +17158,9 @@ msgstr "Bản cài đặt GitHub này đã kết nối với một tổ chức S
 
 msgid "This host"
 msgstr "Host này"
+
+msgid "This host does not support account selection for native chats."
+msgstr "Máy chủ này không hỗ trợ chọn tài khoản cho trò chuyện tích hợp."
 
 msgid "This host has not reported a version yet."
 msgstr "Máy chủ này chưa báo cáo phiên bản."
@@ -17260,6 +17311,9 @@ msgstr "Slug này đã có người dùng"
 
 msgid "This stops every Teams trigger in your organization and removes the notification subscriptions from your tenant. You can reconnect at any time."
 msgstr "Thao tác này dừng mọi trigger Teams trong tổ chức của bạn và gỡ các đăng ký thông báo khỏi tenant. Bạn có thể kết nối lại bất cứ lúc nào."
+
+msgid "This stops the agent process and any background work it owns. Your saved conversation stays available. Review and discard any queued messages first. You can then choose Resume."
+msgstr "Thao tác này dừng tiến trình tác nhân và mọi tác vụ nền do tiến trình đó quản lý. Cuộc hội thoại đã lưu vẫn còn. Trước tiên, hãy xem lại và xóa các tin nhắn đang chờ. Sau đó bạn có thể chọn Tiếp tục."
 
 msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
 msgstr "Máy chủ không còn theo dõi agent con này. Bản ghi vẫn nằm trên đĩa trong thư mục phiên của agent."
@@ -19209,57 +19263,3 @@ msgstr "Thu nhỏ"
 
 msgid "zsh"
 msgstr "zsh"
-
-msgid "Chat with account"
-msgstr "Trò chuyện bằng tài khoản"
-
-msgid "Chat with account…"
-msgstr "Trò chuyện bằng tài khoản…"
-
-msgid "Could not discard the queued message."
-msgstr "Không thể xóa tin nhắn đang chờ."
-
-msgid "Could not read queued messages."
-msgstr "Không thể đọc các tin nhắn đang chờ."
-
-msgid "Could not start chat"
-msgstr "Không thể bắt đầu trò chuyện"
-
-msgid "Could not stop the agent. Review queued messages or update this host, then try again."
-msgstr "Không thể dừng tác nhân. Hãy xem lại các tin nhắn đang chờ hoặc cập nhật máy chủ này rồi thử lại."
-
-msgid "Discard queued message"
-msgstr "Xóa tin nhắn đang chờ"
-
-msgid "Native chat is not enabled"
-msgstr "Trò chuyện tích hợp chưa được bật"
-
-msgid "Start a native chat using an existing login. Recovery keeps this account and working folder."
-msgstr "Bắt đầu trò chuyện tích hợp bằng phiên đăng nhập hiện có. Khi khôi phục, tài khoản và thư mục làm việc này được giữ nguyên."
-
-msgid "Start chat"
-msgstr "Bắt đầu trò chuyện"
-
-msgid "Stop agent"
-msgstr "Dừng tác nhân"
-
-msgid "Stop agent and background work"
-msgstr "Dừng tác nhân và tác vụ nền"
-
-msgid "Stop this agent and its background work?"
-msgstr "Dừng tác nhân này và các tác vụ nền của nó?"
-
-msgid "The selected account chat could not be verified in saved layout data. Nothing was launched by this attempt. If storage is full, free space, then rename this tab to save its layout before retrying. Keep this tab open if it still fails."
-msgstr "Không thể xác minh cuộc trò chuyện của tài khoản đã chọn trong dữ liệu bố cục đã lưu. Lần thử này chưa khởi chạy gì. Nếu bộ nhớ đã đầy, hãy giải phóng dung lượng, rồi đổi tên thẻ này để lưu bố cục trước khi thử lại. Giữ thẻ này mở nếu vẫn không thành công."
-
-msgid "These messages were not sent. Copy anything you need, then discard the queue before resuming."
-msgstr "Các tin nhắn này chưa được gửi. Sao chép nội dung bạn cần, rồi xóa hàng đợi trước khi tiếp tục."
-
-msgid "This chat could not be opened with its saved account."
-msgstr "Không thể mở cuộc trò chuyện này bằng tài khoản đã lưu."
-
-msgid "This host does not support account selection for native chats."
-msgstr "Máy chủ này không hỗ trợ chọn tài khoản cho trò chuyện tích hợp."
-
-msgid "This stops the agent process and any background work it owns. Your saved conversation stays available. Review and discard any queued messages first. You can then choose Resume."
-msgstr "Thao tác này dừng tiến trình tác nhân và mọi tác vụ nền do tiến trình đó quản lý. Cuộc hội thoại đã lưu vẫn còn. Trước tiên, hãy xem lại và xóa các tin nhắn đang chờ. Sau đó bạn có thể chọn Tiếp tục."

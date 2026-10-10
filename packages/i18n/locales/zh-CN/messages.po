@@ -3461,6 +3461,12 @@ msgstr "未找到聊天会话"
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "聊天界面：消息、推理、建议"
 
+msgid "Chat with account"
+msgstr "使用指定账户聊天"
+
+msgid "Chat with account…"
+msgstr "使用指定账户聊天…"
+
 msgid "Check again"
 msgstr "重新检查"
 
@@ -4761,6 +4767,9 @@ msgstr "无法删除文件"
 msgid "Could not delete this page"
 msgstr "无法删除这个页面"
 
+msgid "Could not discard the queued message."
+msgstr "无法丢弃队列中的消息。"
+
 msgid "Could not disconnect."
 msgstr "无法断开连接。"
 
@@ -4855,6 +4864,9 @@ msgstr "无法连接到这个工作区所在的机器"
 msgid "Could not reactivate"
 msgstr "无法重新激活"
 
+msgid "Could not read queued messages."
+msgstr "无法读取队列中的消息。"
+
 msgid "Could not read selected file"
 msgstr "无法读取所选文件"
 
@@ -4909,6 +4921,9 @@ msgstr "无法启动智能体"
 msgid "Could not start agent terminal"
 msgstr "无法启动代理终端"
 
+msgid "Could not start chat"
+msgstr "无法启动聊天"
+
 msgid "Could not start checkout. Please try again."
 msgstr "无法开始结账，请重试。"
 
@@ -4929,6 +4944,9 @@ msgstr "无法停止"
 
 msgid "Could not stop the agent"
 msgstr "无法停止智能体"
+
+msgid "Could not stop the agent. Review queued messages or update this host, then try again."
+msgstr "无法停止智能体。请检查队列中的消息或更新此主机，然后重试。"
 
 msgid "Could not stop the task"
 msgstr "无法停止任务"
@@ -6071,6 +6089,9 @@ msgstr "放弃对“{discardBasename}”的更改？"
 
 msgid "Discard changes?"
 msgstr "放弃更改？"
+
+msgid "Discard queued message"
+msgstr "丢弃队列中的消息"
 
 msgid "Discard recording"
 msgstr "放弃录音"
@@ -10203,6 +10224,9 @@ msgstr "为此项目的新分支设置命名空间。默认使用主机全局的
 
 msgid "Naming instructions"
 msgstr "命名说明"
+
+msgid "Native chat is not enabled"
+msgstr "未启用原生聊天"
 
 msgid "Native PR reviews"
 msgstr "原生PR审查"
@@ -15676,6 +15700,9 @@ msgstr "开始一段对话，消息会显示在这里"
 msgid "Start a fresh agent session seeded with this terminal's recent context. Workspace files remain the source of truth."
 msgstr "以该终端最近的上下文启动一个新的智能体会话。工作区中的文件仍是准确来源。"
 
+msgid "Start a native chat using an existing login. Recovery keeps this account and working folder."
+msgstr "使用现有登录启动原生聊天。恢复时将保留此账户和工作文件夹。"
+
 msgid "Start a new agent session each run"
 msgstr "每次运行都启动新的智能体会话"
 
@@ -15705,6 +15732,9 @@ msgstr "开始浏览"
 
 msgid "Start building in two."
 msgstr "两步开始构建。"
+
+msgid "Start chat"
+msgstr "启动聊天"
 
 msgid "Start coding agents, follow them live, and review the diff from your iPhone or iPad. Available on the App Store; Android is coming soon."
 msgstr "在 iPhone 或 iPad 上启动编程智能体、实时跟进并审查差异。已在 App Store 上架；Android 版即将推出。"
@@ -15838,6 +15868,12 @@ msgstr "停止{0}"
 msgid "Stop {label}"
 msgstr "停止 {label}"
 
+msgid "Stop agent"
+msgstr "停止智能体"
+
+msgid "Stop agent and background work"
+msgstr "停止智能体及后台任务"
+
 msgid "Stop all agent background processes"
 msgstr "停止所有代理后台进程"
 
@@ -15856,6 +15892,9 @@ msgstr "在此停止Superset，然后从其他设备删除。"
 
 msgid "Stop the agent and send this now"
 msgstr "停止智能体并立即发送"
+
+msgid "Stop this agent and its background work?"
+msgstr "停止此智能体及其后台任务？"
 
 msgid "Stop watching"
 msgstr "停止关注"
@@ -16888,6 +16927,9 @@ msgstr "同一个应用在 iPad 上原生运行，支持竖屏和横屏。"
 msgid "The scorecard"
 msgstr "评分表"
 
+msgid "The selected account chat could not be verified in saved layout data. Nothing was launched by this attempt. If storage is full, free space, then rename this tab to save its layout before retrying. Keep this tab open if it still fails."
+msgstr "无法在已保存的布局数据中验证所选账户的聊天。本次尝试未启动任何内容。如果存储空间已满，请释放空间，然后重命名此标签页以保存布局，再重试。如果仍然失败，请保持此标签页打开。"
+
 msgid "The selected login changed. Choose an account again."
 msgstr "所选登录已更改。请重新选择账户。"
 
@@ -16981,6 +17023,9 @@ msgstr "创建工作区时会自动运行这些命令。<0>阅读文档<1/></0>"
 msgid "These folders still have your files, but they did not come over to the new Superset on their own."
 msgstr "这些文件夹中仍有你的文件，但没有自动迁移到新版 Superset。"
 
+msgid "These messages were not sent. Copy anything you need, then discard the queue before resuming."
+msgstr "这些消息尚未发送。请复制需要的内容，然后在恢复前清空队列。"
+
 msgid "These ports are still in use"
 msgstr "这些端口仍在使用中"
 
@@ -17041,6 +17086,9 @@ msgstr "此自动化位于其他组织"
 
 msgid "This cannot be undone."
 msgstr "此操作无法撤销。"
+
+msgid "This chat could not be opened with its saved account."
+msgstr "无法使用已保存的账户打开此聊天。"
 
 msgid "This chat has ended."
 msgstr "此聊天已结束。"
@@ -17110,6 +17158,9 @@ msgstr "这个GitHub安装已连接到另一个Superset组织。请先在那里�
 
 msgid "This host"
 msgstr "此主机"
+
+msgid "This host does not support account selection for native chats."
+msgstr "此主机不支持为原生聊天选择账户。"
 
 msgid "This host has not reported a version yet."
 msgstr "此主机尚未报告版本。"
@@ -17260,6 +17311,9 @@ msgstr "此slug已被占用"
 
 msgid "This stops every Teams trigger in your organization and removes the notification subscriptions from your tenant. You can reconnect at any time."
 msgstr "这会停止你组织中所有的Teams触发器，并从你的租户中移除通知订阅。你可以随时重新连接。"
+
+msgid "This stops the agent process and any background work it owns. Your saved conversation stays available. Review and discard any queued messages first. You can then choose Resume."
+msgstr "这将停止智能体进程及其管理的所有后台任务。已保存的对话仍然可用。请先检查并丢弃队列中的消息，然后选择“恢复”。"
 
 msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
 msgstr "主机不再跟踪该子智能体。其记录仍保存在磁盘上的智能体会话目录中。"
@@ -19209,57 +19263,3 @@ msgstr "缩小"
 
 msgid "zsh"
 msgstr "zsh"
-
-msgid "Chat with account"
-msgstr "使用指定账户聊天"
-
-msgid "Chat with account…"
-msgstr "使用指定账户聊天…"
-
-msgid "Could not discard the queued message."
-msgstr "无法丢弃队列中的消息。"
-
-msgid "Could not read queued messages."
-msgstr "无法读取队列中的消息。"
-
-msgid "Could not start chat"
-msgstr "无法启动聊天"
-
-msgid "Could not stop the agent. Review queued messages or update this host, then try again."
-msgstr "无法停止智能体。请检查队列中的消息或更新此主机，然后重试。"
-
-msgid "Discard queued message"
-msgstr "丢弃队列中的消息"
-
-msgid "Native chat is not enabled"
-msgstr "未启用原生聊天"
-
-msgid "Start a native chat using an existing login. Recovery keeps this account and working folder."
-msgstr "使用现有登录启动原生聊天。恢复时将保留此账户和工作文件夹。"
-
-msgid "Start chat"
-msgstr "启动聊天"
-
-msgid "Stop agent"
-msgstr "停止智能体"
-
-msgid "Stop agent and background work"
-msgstr "停止智能体及后台任务"
-
-msgid "Stop this agent and its background work?"
-msgstr "停止此智能体及其后台任务？"
-
-msgid "The selected account chat could not be verified in saved layout data. Nothing was launched by this attempt. If storage is full, free space, then rename this tab to save its layout before retrying. Keep this tab open if it still fails."
-msgstr "无法在已保存的布局数据中验证所选账户的聊天。本次尝试未启动任何内容。如果存储空间已满，请释放空间，然后重命名此标签页以保存布局，再重试。如果仍然失败，请保持此标签页打开。"
-
-msgid "These messages were not sent. Copy anything you need, then discard the queue before resuming."
-msgstr "这些消息尚未发送。请复制需要的内容，然后在恢复前清空队列。"
-
-msgid "This chat could not be opened with its saved account."
-msgstr "无法使用已保存的账户打开此聊天。"
-
-msgid "This host does not support account selection for native chats."
-msgstr "此主机不支持为原生聊天选择账户。"
-
-msgid "This stops the agent process and any background work it owns. Your saved conversation stays available. Review and discard any queued messages first. You can then choose Resume."
-msgstr "这将停止智能体进程及其管理的所有后台任务。已保存的对话仍然可用。请先检查并丢弃队列中的消息，然后选择“恢复”。"

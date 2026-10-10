@@ -3461,6 +3461,12 @@ msgstr "Chatsessie niet gevonden"
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "Chatoppervlakken: berichten, redeneren, suggesties"
 
+msgid "Chat with account"
+msgstr "Chat met account"
+
+msgid "Chat with account…"
+msgstr "Chat met account…"
+
 msgid "Check again"
 msgstr "Opnieuw controleren"
 
@@ -4761,6 +4767,9 @@ msgstr "Kan bestand niet verwijderen"
 msgid "Could not delete this page"
 msgstr "Kan deze pagina niet verwijderen"
 
+msgid "Could not discard the queued message."
+msgstr "Het bericht in de wachtrij kon niet worden verwijderd."
+
 msgid "Could not disconnect."
 msgstr "Loskoppelen is mislukt."
 
@@ -4855,6 +4864,9 @@ msgstr "Kan de machine van deze werkruimte niet bereiken"
 msgid "Could not reactivate"
 msgstr "Reactiveren mislukt"
 
+msgid "Could not read queued messages."
+msgstr "Berichten in de wachtrij konden niet worden gelezen."
+
 msgid "Could not read selected file"
 msgstr "Kan het gekozen bestand niet lezen"
 
@@ -4909,6 +4921,9 @@ msgstr "Kan agent niet starten"
 msgid "Could not start agent terminal"
 msgstr "Agentterminal kon niet worden gestart"
 
+msgid "Could not start chat"
+msgstr "Chat kon niet worden gestart"
+
 msgid "Could not start checkout. Please try again."
 msgstr "Kon het afrekenen niet starten. Probeer het opnieuw."
 
@@ -4929,6 +4944,9 @@ msgstr "Kon niet worden gestopt"
 
 msgid "Could not stop the agent"
 msgstr "Kan de agent niet stoppen"
+
+msgid "Could not stop the agent. Review queued messages or update this host, then try again."
+msgstr "De agent kon niet worden gestopt. Controleer de berichten in de wachtrij of werk deze host bij en probeer het opnieuw."
 
 msgid "Could not stop the task"
 msgstr "Kan de taak niet stoppen"
@@ -6071,6 +6089,9 @@ msgstr "Wijzigingen in \"{discardBasename}\" verwerpen?"
 
 msgid "Discard changes?"
 msgstr "Wijzigingen verwerpen?"
+
+msgid "Discard queued message"
+msgstr "Bericht uit wachtrij verwijderen"
 
 msgid "Discard recording"
 msgstr "Opname verwerpen"
@@ -10203,6 +10224,9 @@ msgstr "Geef nieuwe branches van dit project een eigen naamruimte. Standaard gel
 
 msgid "Naming instructions"
 msgstr "Naamgevingsinstructies"
+
+msgid "Native chat is not enabled"
+msgstr "Native chat is niet ingeschakeld"
 
 msgid "Native PR reviews"
 msgstr "Native PR-reviews"
@@ -15676,6 +15700,9 @@ msgstr "Begin een gesprek om hier berichten te zien"
 msgid "Start a fresh agent session seeded with this terminal's recent context. Workspace files remain the source of truth."
 msgstr "Start een nieuwe agentsessie met de recente context van deze terminal. De bestanden in de workspace blijven de bron van waarheid."
 
+msgid "Start a native chat using an existing login. Recovery keeps this account and working folder."
+msgstr "Start een native chat met een bestaande aanmelding. Bij herstel blijven dit account en deze werkmap behouden."
+
 msgid "Start a new agent session each run"
 msgstr "Start bij elke run een nieuwe agentsessie"
 
@@ -15705,6 +15732,9 @@ msgstr "Begin met browsen"
 
 msgid "Start building in two."
 msgstr "Begin met bouwen in twee."
+
+msgid "Start chat"
+msgstr "Chat starten"
 
 msgid "Start coding agents, follow them live, and review the diff from your iPhone or iPad. Available on the App Store; Android is coming soon."
 msgstr "Start coding agents, volg ze live en review de diff vanaf je iPhone of iPad. Beschikbaar in de App Store; Android komt binnenkort."
@@ -15838,6 +15868,12 @@ msgstr "{0} stoppen"
 msgid "Stop {label}"
 msgstr "{label} stoppen"
 
+msgid "Stop agent"
+msgstr "Agent stoppen"
+
+msgid "Stop agent and background work"
+msgstr "Agent en achtergrondtaken stoppen"
+
 msgid "Stop all agent background processes"
 msgstr "Alle achtergrondprocessen van agents stoppen"
 
@@ -15856,6 +15892,9 @@ msgstr "Stop Superset hier om vanaf een ander apparaat te verwijderen."
 
 msgid "Stop the agent and send this now"
 msgstr "Agent stoppen en nu verzenden"
+
+msgid "Stop this agent and its background work?"
+msgstr "Deze agent en zijn achtergrondtaken stoppen?"
 
 msgid "Stop watching"
 msgstr "Stoppen met volgen"
@@ -16888,6 +16927,9 @@ msgstr "Dezelfde app draait native op iPad, staand en liggend."
 msgid "The scorecard"
 msgstr "De scorekaart"
 
+msgid "The selected account chat could not be verified in saved layout data. Nothing was launched by this attempt. If storage is full, free space, then rename this tab to save its layout before retrying. Keep this tab open if it still fails."
+msgstr "De chat van het geselecteerde account kon niet worden bevestigd in de opgeslagen indelingsgegevens. Deze poging heeft niets gestart. Als de opslag vol is, maak dan ruimte vrij en hernoem dit tabblad om de indeling op te slaan voordat je het opnieuw probeert. Houd dit tabblad open als het nog steeds mislukt."
+
 msgid "The selected login changed. Choose an account again."
 msgstr "De geselecteerde aanmelding is gewijzigd. Kies opnieuw een account."
 
@@ -16981,6 +17023,9 @@ msgstr "Deze commando's draaien automatisch wanneer een werkruimte wordt aangema
 msgid "These folders still have your files, but they did not come over to the new Superset on their own."
 msgstr "Deze mappen bevatten nog je bestanden, maar zijn niet vanzelf naar het nieuwe Superset overgezet."
 
+msgid "These messages were not sent. Copy anything you need, then discard the queue before resuming."
+msgstr "Deze berichten zijn niet verzonden. Kopieer wat je nodig hebt en maak de wachtrij leeg voordat je hervat."
+
 msgid "These ports are still in use"
 msgstr "Deze poorten zijn nog in gebruik"
 
@@ -17041,6 +17086,9 @@ msgstr "Deze automatisering staat in een andere organisatie"
 
 msgid "This cannot be undone."
 msgstr "Dit kan niet ongedaan worden gemaakt."
+
+msgid "This chat could not be opened with its saved account."
+msgstr "Deze chat kon niet worden geopend met het opgeslagen account."
 
 msgid "This chat has ended."
 msgstr "Deze chat is beëindigd."
@@ -17110,6 +17158,9 @@ msgstr "Deze GitHub-installatie is al gekoppeld aan een andere Superset-organisa
 
 msgid "This host"
 msgstr "Deze host"
+
+msgid "This host does not support account selection for native chats."
+msgstr "Deze host ondersteunt geen accountselectie voor native chats."
 
 msgid "This host has not reported a version yet."
 msgstr "Deze host heeft nog geen versie gemeld."
@@ -17260,6 +17311,9 @@ msgstr "Deze slug is al bezet"
 
 msgid "This stops every Teams trigger in your organization and removes the notification subscriptions from your tenant. You can reconnect at any time."
 msgstr "Hiermee stoppen alle Teams-triggers in je organisatie en worden de meldingsabonnementen uit je tenant verwijderd. Je kunt op elk moment opnieuw verbinden."
+
+msgid "This stops the agent process and any background work it owns. Your saved conversation stays available. Review and discard any queued messages first. You can then choose Resume."
+msgstr "Dit stopt het agentproces en alle bijbehorende achtergrondtaken. Je opgeslagen gesprek blijft beschikbaar. Controleer en verwijder eerst de berichten in de wachtrij. Daarna kun je Hervatten kiezen."
 
 msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
 msgstr "Deze subagent wordt niet meer gevolgd door de host. Het transcript blijft op schijf in de sessiemap van de agent."
@@ -19209,57 +19263,3 @@ msgstr "Uitzoomen"
 
 msgid "zsh"
 msgstr "zsh"
-
-msgid "Chat with account"
-msgstr "Chat met account"
-
-msgid "Chat with account…"
-msgstr "Chat met account…"
-
-msgid "Could not discard the queued message."
-msgstr "Het bericht in de wachtrij kon niet worden verwijderd."
-
-msgid "Could not read queued messages."
-msgstr "Berichten in de wachtrij konden niet worden gelezen."
-
-msgid "Could not start chat"
-msgstr "Chat kon niet worden gestart"
-
-msgid "Could not stop the agent. Review queued messages or update this host, then try again."
-msgstr "De agent kon niet worden gestopt. Controleer de berichten in de wachtrij of werk deze host bij en probeer het opnieuw."
-
-msgid "Discard queued message"
-msgstr "Bericht uit wachtrij verwijderen"
-
-msgid "Native chat is not enabled"
-msgstr "Native chat is niet ingeschakeld"
-
-msgid "Start a native chat using an existing login. Recovery keeps this account and working folder."
-msgstr "Start een native chat met een bestaande aanmelding. Bij herstel blijven dit account en deze werkmap behouden."
-
-msgid "Start chat"
-msgstr "Chat starten"
-
-msgid "Stop agent"
-msgstr "Agent stoppen"
-
-msgid "Stop agent and background work"
-msgstr "Agent en achtergrondtaken stoppen"
-
-msgid "Stop this agent and its background work?"
-msgstr "Deze agent en zijn achtergrondtaken stoppen?"
-
-msgid "The selected account chat could not be verified in saved layout data. Nothing was launched by this attempt. If storage is full, free space, then rename this tab to save its layout before retrying. Keep this tab open if it still fails."
-msgstr "De chat van het geselecteerde account kon niet worden bevestigd in de opgeslagen indelingsgegevens. Deze poging heeft niets gestart. Als de opslag vol is, maak dan ruimte vrij en hernoem dit tabblad om de indeling op te slaan voordat je het opnieuw probeert. Houd dit tabblad open als het nog steeds mislukt."
-
-msgid "These messages were not sent. Copy anything you need, then discard the queue before resuming."
-msgstr "Deze berichten zijn niet verzonden. Kopieer wat je nodig hebt en maak de wachtrij leeg voordat je hervat."
-
-msgid "This chat could not be opened with its saved account."
-msgstr "Deze chat kon niet worden geopend met het opgeslagen account."
-
-msgid "This host does not support account selection for native chats."
-msgstr "Deze host ondersteunt geen accountselectie voor native chats."
-
-msgid "This stops the agent process and any background work it owns. Your saved conversation stays available. Review and discard any queued messages first. You can then choose Resume."
-msgstr "Dit stopt het agentproces en alle bijbehorende achtergrondtaken. Je opgeslagen gesprek blijft beschikbaar. Controleer en verwijder eerst de berichten in de wachtrij. Daarna kun je Hervatten kiezen."

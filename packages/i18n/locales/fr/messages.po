@@ -3461,6 +3461,12 @@ msgstr "Session de chat introuvable"
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "Surfaces de chat : messages, raisonnement, suggestions"
 
+msgid "Chat with account"
+msgstr "Conversation avec un compte"
+
+msgid "Chat with account…"
+msgstr "Conversation avec un compte…"
+
 msgid "Check again"
 msgstr "Vérifier à nouveau"
 
@@ -4761,6 +4767,9 @@ msgstr "Impossible de supprimer le fichier"
 msgid "Could not delete this page"
 msgstr "Impossible de supprimer cette page"
 
+msgid "Could not discard the queued message."
+msgstr "Impossible de supprimer le message en attente."
+
 msgid "Could not disconnect."
 msgstr "Impossible de déconnecter."
 
@@ -4855,6 +4864,9 @@ msgstr "Impossible de joindre la machine de cet espace de travail"
 msgid "Could not reactivate"
 msgstr "Réactivation impossible"
 
+msgid "Could not read queued messages."
+msgstr "Impossible de lire les messages en attente."
+
 msgid "Could not read selected file"
 msgstr "Impossible de lire le fichier sélectionné"
 
@@ -4909,6 +4921,9 @@ msgstr "Impossible de démarrer l'agent"
 msgid "Could not start agent terminal"
 msgstr "Impossible de démarrer le terminal d’agent"
 
+msgid "Could not start chat"
+msgstr "Impossible de démarrer la conversation"
+
 msgid "Could not start checkout. Please try again."
 msgstr "Impossible de lancer le paiement. Veuillez réessayer."
 
@@ -4929,6 +4944,9 @@ msgstr "Impossible de l'arrêter"
 
 msgid "Could not stop the agent"
 msgstr "Impossible d'arrêter l'agent"
+
+msgid "Could not stop the agent. Review queued messages or update this host, then try again."
+msgstr "Impossible d’arrêter l’agent. Vérifiez les messages en attente ou mettez cet hôte à jour, puis réessayez."
 
 msgid "Could not stop the task"
 msgstr "Impossible d'arrêter la tâche"
@@ -6071,6 +6089,9 @@ msgstr "Abandonner les modifications de « {discardBasename} » ?"
 
 msgid "Discard changes?"
 msgstr "Abandonner les modifications ?"
+
+msgid "Discard queued message"
+msgstr "Supprimer le message en attente"
 
 msgid "Discard recording"
 msgstr "Supprimer l'enregistrement"
@@ -10203,6 +10224,9 @@ msgstr "Préfixe les nouvelles branches de ce projet. Par défaut, reprend le pa
 
 msgid "Naming instructions"
 msgstr "Instructions de nommage"
+
+msgid "Native chat is not enabled"
+msgstr "Le chat natif n’est pas activé"
 
 msgid "Native PR reviews"
 msgstr "Revues de pull requests natives"
@@ -15676,6 +15700,9 @@ msgstr "Démarrez une conversation pour voir les messages ici"
 msgid "Start a fresh agent session seeded with this terminal's recent context. Workspace files remain the source of truth."
 msgstr "Démarre une nouvelle session d'agent avec le contexte récent de ce terminal. Les fichiers de l'espace de travail restent la source de vérité."
 
+msgid "Start a native chat using an existing login. Recovery keeps this account and working folder."
+msgstr "Démarrez un chat natif avec une connexion existante. La récupération conserve ce compte et ce dossier de travail."
+
 msgid "Start a new agent session each run"
 msgstr "Démarrer une nouvelle session d'agent à chaque exécution"
 
@@ -15705,6 +15732,9 @@ msgstr "Commencer à naviguer"
 
 msgid "Start building in two."
 msgstr "Commencez à construire en deux."
+
+msgid "Start chat"
+msgstr "Démarrer une conversation"
 
 msgid "Start coding agents, follow them live, and review the diff from your iPhone or iPad. Available on the App Store; Android is coming soon."
 msgstr "Lancez des agents de code, suivez-les en direct et relisez le diff depuis votre iPhone ou iPad. Disponible sur l'App Store ; Android arrive bientôt."
@@ -15838,6 +15868,12 @@ msgstr "Arrêter {0}"
 msgid "Stop {label}"
 msgstr "Arrêter {label}"
 
+msgid "Stop agent"
+msgstr "Arrêter l’agent"
+
+msgid "Stop agent and background work"
+msgstr "Arrêter l’agent et ses tâches en arrière-plan"
+
 msgid "Stop all agent background processes"
 msgstr "Arrêter tous les processus en arrière-plan des agents"
 
@@ -15856,6 +15892,9 @@ msgstr "Arrêtez Superset ici pour le supprimer depuis un autre appareil."
 
 msgid "Stop the agent and send this now"
 msgstr "Arrêter l'agent et envoyer maintenant"
+
+msgid "Stop this agent and its background work?"
+msgstr "Arrêter cet agent et ses tâches en arrière-plan ?"
 
 msgid "Stop watching"
 msgstr "Arrêter la surveillance"
@@ -16888,6 +16927,9 @@ msgstr "La même app fonctionne nativement sur iPad, en portrait comme en paysag
 msgid "The scorecard"
 msgstr "Le bilan"
 
+msgid "The selected account chat could not be verified in saved layout data. Nothing was launched by this attempt. If storage is full, free space, then rename this tab to save its layout before retrying. Keep this tab open if it still fails."
+msgstr "Le chat du compte sélectionné n’a pas pu être vérifié dans les données de disposition enregistrées. Cette tentative n’a rien lancé. Si le stockage est plein, libérez de l’espace, puis renommez cet onglet pour enregistrer sa disposition avant de réessayer. Gardez cet onglet ouvert si le problème persiste."
+
 msgid "The selected login changed. Choose an account again."
 msgstr "La connexion sélectionnée a changé. Choisissez à nouveau un compte."
 
@@ -16981,6 +17023,9 @@ msgstr "Ces commandes s'exécutent automatiquement lorsqu'un espace de travail e
 msgid "These folders still have your files, but they did not come over to the new Superset on their own."
 msgstr "Ces dossiers contiennent toujours vos fichiers, mais ils n’ont pas été transférés seuls vers le nouveau Superset."
 
+msgid "These messages were not sent. Copy anything you need, then discard the queue before resuming."
+msgstr "Ces messages n’ont pas été envoyés. Copiez ce dont vous avez besoin, puis videz la file d’attente avant de reprendre."
+
 msgid "These ports are still in use"
 msgstr "Ces ports sont toujours utilisés"
 
@@ -17041,6 +17086,9 @@ msgstr "Cette automatisation se trouve dans une autre organisation"
 
 msgid "This cannot be undone."
 msgstr "Cette action est irréversible."
+
+msgid "This chat could not be opened with its saved account."
+msgstr "Impossible d’ouvrir ce chat avec son compte enregistré."
 
 msgid "This chat has ended."
 msgstr "Ce chat est terminé."
@@ -17110,6 +17158,9 @@ msgstr "Cette installation GitHub est déjà connectée à une autre organisatio
 
 msgid "This host"
 msgstr "Cet hôte"
+
+msgid "This host does not support account selection for native chats."
+msgstr "Cet hôte ne permet pas de sélectionner un compte pour les chats natifs."
 
 msgid "This host has not reported a version yet."
 msgstr "Cet hôte n'a pas encore signalé de version."
@@ -17260,6 +17311,9 @@ msgstr "Ce slug est déjà pris"
 
 msgid "This stops every Teams trigger in your organization and removes the notification subscriptions from your tenant. You can reconnect at any time."
 msgstr "Cela arrête tous les déclencheurs Teams de votre organisation et supprime les abonnements aux notifications de votre tenant. Vous pouvez vous reconnecter à tout moment."
+
+msgid "This stops the agent process and any background work it owns. Your saved conversation stays available. Review and discard any queued messages first. You can then choose Resume."
+msgstr "Cette action arrête le processus de l’agent et toutes ses tâches en arrière-plan. Votre conversation enregistrée reste disponible. Vérifiez et supprimez d’abord les messages en attente. Vous pourrez ensuite choisir Reprendre."
 
 msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
 msgstr "Cet sous-agent n'est plus suivi par l'hôte. Sa transcription reste sur le disque dans le répertoire de session de l'agent."
@@ -19209,57 +19263,3 @@ msgstr "Zoom arrière"
 
 msgid "zsh"
 msgstr "zsh"
-
-msgid "Chat with account"
-msgstr "Conversation avec un compte"
-
-msgid "Chat with account…"
-msgstr "Conversation avec un compte…"
-
-msgid "Could not discard the queued message."
-msgstr "Impossible de supprimer le message en attente."
-
-msgid "Could not read queued messages."
-msgstr "Impossible de lire les messages en attente."
-
-msgid "Could not start chat"
-msgstr "Impossible de démarrer la conversation"
-
-msgid "Could not stop the agent. Review queued messages or update this host, then try again."
-msgstr "Impossible d’arrêter l’agent. Vérifiez les messages en attente ou mettez cet hôte à jour, puis réessayez."
-
-msgid "Discard queued message"
-msgstr "Supprimer le message en attente"
-
-msgid "Native chat is not enabled"
-msgstr "Le chat natif n’est pas activé"
-
-msgid "Start a native chat using an existing login. Recovery keeps this account and working folder."
-msgstr "Démarrez un chat natif avec une connexion existante. La récupération conserve ce compte et ce dossier de travail."
-
-msgid "Start chat"
-msgstr "Démarrer une conversation"
-
-msgid "Stop agent"
-msgstr "Arrêter l’agent"
-
-msgid "Stop agent and background work"
-msgstr "Arrêter l’agent et ses tâches en arrière-plan"
-
-msgid "Stop this agent and its background work?"
-msgstr "Arrêter cet agent et ses tâches en arrière-plan ?"
-
-msgid "The selected account chat could not be verified in saved layout data. Nothing was launched by this attempt. If storage is full, free space, then rename this tab to save its layout before retrying. Keep this tab open if it still fails."
-msgstr "Le chat du compte sélectionné n’a pas pu être vérifié dans les données de disposition enregistrées. Cette tentative n’a rien lancé. Si le stockage est plein, libérez de l’espace, puis renommez cet onglet pour enregistrer sa disposition avant de réessayer. Gardez cet onglet ouvert si le problème persiste."
-
-msgid "These messages were not sent. Copy anything you need, then discard the queue before resuming."
-msgstr "Ces messages n’ont pas été envoyés. Copiez ce dont vous avez besoin, puis videz la file d’attente avant de reprendre."
-
-msgid "This chat could not be opened with its saved account."
-msgstr "Impossible d’ouvrir ce chat avec son compte enregistré."
-
-msgid "This host does not support account selection for native chats."
-msgstr "Cet hôte ne permet pas de sélectionner un compte pour les chats natifs."
-
-msgid "This stops the agent process and any background work it owns. Your saved conversation stays available. Review and discard any queued messages first. You can then choose Resume."
-msgstr "Cette action arrête le processus de l’agent et toutes ses tâches en arrière-plan. Votre conversation enregistrée reste disponible. Vérifiez et supprimez d’abord les messages en attente. Vous pourrez ensuite choisir Reprendre."

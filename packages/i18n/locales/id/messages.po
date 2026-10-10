@@ -3461,6 +3461,12 @@ msgstr "Sesi chat tidak ditemukan"
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "Permukaan chat: pesan, penalaran, saran"
 
+msgid "Chat with account"
+msgstr "Obrolan dengan akun"
+
+msgid "Chat with account…"
+msgstr "Obrolan dengan akun…"
+
 msgid "Check again"
 msgstr "Periksa lagi"
 
@@ -4761,6 +4767,9 @@ msgstr "Tidak bisa menghapus file"
 msgid "Could not delete this page"
 msgstr "Tidak bisa menghapus halaman ini"
 
+msgid "Could not discard the queued message."
+msgstr "Pesan dalam antrean tidak dapat dibuang."
+
 msgid "Could not disconnect."
 msgstr "Tidak dapat memutuskan."
 
@@ -4855,6 +4864,9 @@ msgstr "Tidak bisa menjangkau mesin workspace ini"
 msgid "Could not reactivate"
 msgstr "Tidak bisa mengaktifkan kembali"
 
+msgid "Could not read queued messages."
+msgstr "Pesan dalam antrean tidak dapat dibaca."
+
 msgid "Could not read selected file"
 msgstr "Tidak bisa membaca file yang dipilih"
 
@@ -4909,6 +4921,9 @@ msgstr "Tidak bisa memulai agen"
 msgid "Could not start agent terminal"
 msgstr "Tidak dapat memulai terminal agen"
 
+msgid "Could not start chat"
+msgstr "Obrolan tidak dapat dimulai"
+
 msgid "Could not start checkout. Please try again."
 msgstr "Tidak dapat memulai checkout. Coba lagi."
 
@@ -4929,6 +4944,9 @@ msgstr "Tidak bisa dihentikan"
 
 msgid "Could not stop the agent"
 msgstr "Tidak dapat menghentikan agen"
+
+msgid "Could not stop the agent. Review queued messages or update this host, then try again."
+msgstr "Agen tidak dapat dihentikan. Tinjau pesan dalam antrean atau perbarui host ini, lalu coba lagi."
 
 msgid "Could not stop the task"
 msgstr "Tidak dapat menghentikan tugas"
@@ -6071,6 +6089,9 @@ msgstr "Buang perubahan pada \"{discardBasename}\"?"
 
 msgid "Discard changes?"
 msgstr "Buang perubahan?"
+
+msgid "Discard queued message"
+msgstr "Buang pesan dalam antrean"
 
 msgid "Discard recording"
 msgstr "Buang rekaman"
@@ -10203,6 +10224,9 @@ msgstr "Beri namespace untuk branch baru di proyek ini. Bawaannya mengikuti peng
 
 msgid "Naming instructions"
 msgstr "Instruksi penamaan"
+
+msgid "Native chat is not enabled"
+msgstr "Obrolan bawaan belum diaktifkan"
 
 msgid "Native PR reviews"
 msgstr "Review PR native"
@@ -15676,6 +15700,9 @@ msgstr "Mulai percakapan untuk melihat pesan di sini"
 msgid "Start a fresh agent session seeded with this terminal's recent context. Workspace files remain the source of truth."
 msgstr "Memulai sesi agen baru dengan konteks terbaru dari terminal ini. Berkas di ruang kerja tetap menjadi sumber kebenaran."
 
+msgid "Start a native chat using an existing login. Recovery keeps this account and working folder."
+msgstr "Mulai obrolan bawaan menggunakan login yang ada. Pemulihan mempertahankan akun dan folder kerja ini."
+
 msgid "Start a new agent session each run"
 msgstr "Mulai sesi agen baru setiap kali dijalankan"
 
@@ -15705,6 +15732,9 @@ msgstr "Mulai menjelajah"
 
 msgid "Start building in two."
 msgstr "Mulai membangun dalam dua."
+
+msgid "Start chat"
+msgstr "Mulai obrolan"
 
 msgid "Start coding agents, follow them live, and review the diff from your iPhone or iPad. Available on the App Store; Android is coming soon."
 msgstr "Mulai agen coding, ikuti secara langsung, dan tinjau diff dari iPhone atau iPad Anda. Tersedia di App Store; Android segera hadir."
@@ -15838,6 +15868,12 @@ msgstr "Hentikan {0}"
 msgid "Stop {label}"
 msgstr "Hentikan {label}"
 
+msgid "Stop agent"
+msgstr "Hentikan agen"
+
+msgid "Stop agent and background work"
+msgstr "Hentikan agen dan tugas latar belakang"
+
 msgid "Stop all agent background processes"
 msgstr "Hentikan semua proses latar belakang agen"
 
@@ -15856,6 +15892,9 @@ msgstr "Hentikan Superset di sini untuk menghapus dari perangkat lain."
 
 msgid "Stop the agent and send this now"
 msgstr "Hentikan agen dan kirim sekarang"
+
+msgid "Stop this agent and its background work?"
+msgstr "Hentikan agen ini dan tugas latar belakangnya?"
 
 msgid "Stop watching"
 msgstr "Berhenti memantau"
@@ -16888,6 +16927,9 @@ msgstr "Aplikasi yang sama berjalan native di iPad, dalam mode potret dan lanska
 msgid "The scorecard"
 msgstr "Kartu skor"
 
+msgid "The selected account chat could not be verified in saved layout data. Nothing was launched by this attempt. If storage is full, free space, then rename this tab to save its layout before retrying. Keep this tab open if it still fails."
+msgstr "Obrolan akun yang dipilih tidak dapat diverifikasi dalam data tata letak tersimpan. Tidak ada yang diluncurkan pada percobaan ini. Jika penyimpanan penuh, kosongkan ruang, lalu ganti nama tab ini untuk menyimpan tata letaknya sebelum mencoba lagi. Biarkan tab ini terbuka jika masih gagal."
+
 msgid "The selected login changed. Choose an account again."
 msgstr "Login yang dipilih telah berubah. Pilih akun lagi."
 
@@ -16981,6 +17023,9 @@ msgstr "Perintah ini berjalan otomatis saat workspace dibuat. <0>Baca dokumentas
 msgid "These folders still have your files, but they did not come over to the new Superset on their own."
 msgstr "Folder ini masih berisi file Anda, tetapi tidak otomatis dipindahkan ke Superset yang baru."
 
+msgid "These messages were not sent. Copy anything you need, then discard the queue before resuming."
+msgstr "Pesan-pesan ini belum dikirim. Salin yang Anda perlukan, lalu kosongkan antrean sebelum melanjutkan."
+
 msgid "These ports are still in use"
 msgstr "Port ini masih dipakai"
 
@@ -17041,6 +17086,9 @@ msgstr "Otomatisasi ini berada di organisasi lain"
 
 msgid "This cannot be undone."
 msgstr "Ini tidak bisa dibatalkan."
+
+msgid "This chat could not be opened with its saved account."
+msgstr "Obrolan ini tidak dapat dibuka dengan akun tersimpannya."
 
 msgid "This chat has ended."
 msgstr "Chat ini telah berakhir."
@@ -17110,6 +17158,9 @@ msgstr "Instalasi GitHub ini sudah terhubung ke organisasi Superset lain. Putusk
 
 msgid "This host"
 msgstr "Host ini"
+
+msgid "This host does not support account selection for native chats."
+msgstr "Host ini tidak mendukung pemilihan akun untuk obrolan bawaan."
 
 msgid "This host has not reported a version yet."
 msgstr "Host ini belum melaporkan versi."
@@ -17260,6 +17311,9 @@ msgstr "Slug ini sudah dipakai"
 
 msgid "This stops every Teams trigger in your organization and removes the notification subscriptions from your tenant. You can reconnect at any time."
 msgstr "Ini menghentikan setiap pemicu Teams di organisasi Anda dan menghapus langganan notifikasi dari tenant Anda. Anda bisa menghubungkan ulang kapan saja."
+
+msgid "This stops the agent process and any background work it owns. Your saved conversation stays available. Review and discard any queued messages first. You can then choose Resume."
+msgstr "Tindakan ini menghentikan proses agen dan semua tugas latar belakang yang dikelolanya. Percakapan tersimpan Anda tetap tersedia. Tinjau dan buang pesan dalam antrean terlebih dahulu. Setelah itu, Anda dapat memilih Lanjutkan."
 
 msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
 msgstr "Subagen ini tidak lagi dilacak oleh host. Transkripnya tetap tersimpan di disk pada direktori sesi agen."
@@ -19209,57 +19263,3 @@ msgstr "Perkecil"
 
 msgid "zsh"
 msgstr "zsh"
-
-msgid "Chat with account"
-msgstr "Obrolan dengan akun"
-
-msgid "Chat with account…"
-msgstr "Obrolan dengan akun…"
-
-msgid "Could not discard the queued message."
-msgstr "Pesan dalam antrean tidak dapat dibuang."
-
-msgid "Could not read queued messages."
-msgstr "Pesan dalam antrean tidak dapat dibaca."
-
-msgid "Could not start chat"
-msgstr "Obrolan tidak dapat dimulai"
-
-msgid "Could not stop the agent. Review queued messages or update this host, then try again."
-msgstr "Agen tidak dapat dihentikan. Tinjau pesan dalam antrean atau perbarui host ini, lalu coba lagi."
-
-msgid "Discard queued message"
-msgstr "Buang pesan dalam antrean"
-
-msgid "Native chat is not enabled"
-msgstr "Obrolan bawaan belum diaktifkan"
-
-msgid "Start a native chat using an existing login. Recovery keeps this account and working folder."
-msgstr "Mulai obrolan bawaan menggunakan login yang ada. Pemulihan mempertahankan akun dan folder kerja ini."
-
-msgid "Start chat"
-msgstr "Mulai obrolan"
-
-msgid "Stop agent"
-msgstr "Hentikan agen"
-
-msgid "Stop agent and background work"
-msgstr "Hentikan agen dan tugas latar belakang"
-
-msgid "Stop this agent and its background work?"
-msgstr "Hentikan agen ini dan tugas latar belakangnya?"
-
-msgid "The selected account chat could not be verified in saved layout data. Nothing was launched by this attempt. If storage is full, free space, then rename this tab to save its layout before retrying. Keep this tab open if it still fails."
-msgstr "Obrolan akun yang dipilih tidak dapat diverifikasi dalam data tata letak tersimpan. Tidak ada yang diluncurkan pada percobaan ini. Jika penyimpanan penuh, kosongkan ruang, lalu ganti nama tab ini untuk menyimpan tata letaknya sebelum mencoba lagi. Biarkan tab ini terbuka jika masih gagal."
-
-msgid "These messages were not sent. Copy anything you need, then discard the queue before resuming."
-msgstr "Pesan-pesan ini belum dikirim. Salin yang Anda perlukan, lalu kosongkan antrean sebelum melanjutkan."
-
-msgid "This chat could not be opened with its saved account."
-msgstr "Obrolan ini tidak dapat dibuka dengan akun tersimpannya."
-
-msgid "This host does not support account selection for native chats."
-msgstr "Host ini tidak mendukung pemilihan akun untuk obrolan bawaan."
-
-msgid "This stops the agent process and any background work it owns. Your saved conversation stays available. Review and discard any queued messages first. You can then choose Resume."
-msgstr "Tindakan ini menghentikan proses agen dan semua tugas latar belakang yang dikelolanya. Percakapan tersimpan Anda tetap tersedia. Tinjau dan buang pesan dalam antrean terlebih dahulu. Setelah itu, Anda dapat memilih Lanjutkan."
