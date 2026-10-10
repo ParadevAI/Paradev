@@ -87,6 +87,37 @@ export const terminalAgentBindings = sqliteTable(
 	],
 );
 
+/** Saved native history belongs to a conversation, not to a disposable PTY. */
+export const savedConversations = sqliteTable(
+	"saved_conversations",
+	{
+		id: text().primaryKey(),
+		workspaceId: text("workspace_id").notNull(),
+		provider: text().notNull(),
+		nativeSessionId: text("native_session_id").notNull(),
+		storePath: text("store_path").notNull(),
+		transcriptPath: text("transcript_path").notNull(),
+		cwd: text().notNull(),
+		definitionId: text("definition_id").notNull(),
+		accountJson: text("account_json").notNull(),
+		// Immutable source evidence; later opens use current local history.
+		provenanceJson: text("provenance_json").notNull(),
+		adoptedAt: integer("adopted_at").notNull(),
+		state: text().notNull().default("adopted"),
+		// Deliberately no cascading foreign key: closing/deleting a terminal
+		// must not erase the saved conversation or its last launch claim.
+		terminalId: text("terminal_id"),
+	},
+	(table) => [
+		uniqueIndex("saved_conversations_native_store_idx").on(
+			table.provider,
+			table.nativeSessionId,
+			table.storePath,
+		),
+		index("saved_conversations_workspace_idx").on(table.workspaceId),
+	],
+);
+
 export const projects = sqliteTable(
 	"projects",
 	{
