@@ -223,6 +223,9 @@ export function ComposerBody({
 		[editor, focusAtEnd],
 	);
 	const [attachments, setAttachments] = useState<PromptInputAttachment[]>([]);
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const submitting = useRef(false);
+	const draftRevision = useRef(0);
 	const [isEmpty, setIsEmpty] = useState(true);
 	const [dragging, setDragging] = useState(false);
 	const [mentionQuery, setMentionQuery] = useState<string | null>(null);
@@ -300,10 +303,15 @@ export function ComposerBody({
 	onChangeRef.current = onChange;
 	useEffect(
 		() =>
-			editor.registerUpdateListener(({ editorState }) => {
-				const text = editorState.read(() => $getRoot().getTextContent());
-				onChangeRef.current?.(text);
-			}),
+			editor.registerUpdateListener(
+				({ editorState, dirtyElements, dirtyLeaves }) => {
+					if (dirtyElements.size > 0 || dirtyLeaves.size > 0) {
+						draftRevision.current += 1;
+					}
+					const text = editorState.read(() => $getRoot().getTextContent());
+					onChangeRef.current?.(text);
+				},
+			),
 		[editor],
 	);
 
@@ -435,7 +443,8 @@ export function ComposerBody({
 		if (attachment.previewUrl) URL.revokeObjectURL(attachment.previewUrl);
 	};
 
-	const submit = ({ steer = false }: { steer?: boolean } = {}) => {
+	const submit = async ({ steer = false }: { steer?: boolean } = {}) => {
+		if (submitting.current) return;
 		if (
 			stateRef.current.status === "streaming" &&
 			!stateRef.current.submitWhileStreaming
@@ -451,16 +460,43 @@ export function ComposerBody({
 		if (!text && files.length === 0 && !stateRef.current.allowEmptySubmit) {
 			return;
 		}
-		if (stateRef.current.onSubmit?.({ text, files, mentions, steer }) === false)
-			return;
-		historyNavigationRef.current?.reset();
-		if (!stateRef.current.clearOnSubmit) return;
-		editor.update(() => $getRoot().clear());
-		setAttachments((previous) => {
-			for (const attachment of previous) releaseAttachment(attachment);
-			return [];
-		});
-		setPanel(null);
+		const submittedRevision = draftRevision.current;
+		const submittedAttachments = new Set(
+			stateRef.current.attachments.map((attachment) => attachment.id),
+		);
+		submitting.current = true;
+		setIsSubmitting(true);
+		try {
+			if (
+				(await stateRef.current.onSubmit?.({
+					text,
+					files,
+					mentions,
+					steer,
+				})) === false
+			) {
+				return;
+			}
+			historyNavigationRef.current?.reset();
+			if (!stateRef.current.clearOnSubmit) return;
+			// A delayed acceptance must not erase a newer draft or its Lexical chips.
+			if (editor.read(() => draftRevision.current) === submittedRevision) {
+				editor.update(() => $getRoot().clear());
+			}
+			setAttachments((previous) =>
+				previous.filter((attachment) => {
+					if (!submittedAttachments.has(attachment.id)) return true;
+					releaseAttachment(attachment);
+					return false;
+				}),
+			);
+			setPanel(null);
+		} catch {
+			// The caller owns error feedback. Keep the editor intact for manual retry.
+		} finally {
+			submitting.current = false;
+			setIsSubmitting(false);
+		}
 	};
 	const submitRef = useRef(submit);
 	submitRef.current = submit;
@@ -494,7 +530,7 @@ export function ComposerBody({
 				if (event?.shiftKey || event?.isComposing || event?.keyCode === 229)
 					return false;
 				event?.preventDefault();
-				submitRef.current({
+				void submitRef.current({
 					steer: Boolean(event?.metaKey || event?.ctrlKey),
 				});
 				return true;
@@ -1012,10 +1048,11 @@ export function ComposerBody({
 								aria-label={t({
 									message: "Send message",
 								})}
-								disabled={!canSend}
-								onClick={() => submit()}
+								disabled={!canSend || isSubmitting}
+								aria-busy={isSubmitting}
+								onClick={() => void submit()}
 								className={
-									canSend
+									canSend && !isSubmitting
 										? cn(
 												FOOTER_BUTTON_CLASS,
 												"cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90",
