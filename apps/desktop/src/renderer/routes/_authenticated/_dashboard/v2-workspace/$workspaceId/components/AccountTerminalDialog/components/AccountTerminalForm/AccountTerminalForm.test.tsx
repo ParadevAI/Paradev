@@ -133,3 +133,28 @@ test("refresh clears the chosen account until the user selects it again", async 
 			.disabled,
 	).toBe(true);
 });
+
+test("native chat mode submits the selected login once and keeps failure visible", async () => {
+	const input = props();
+	input.onLaunch = mock(async () => {
+		throw new Error("Account chat unavailable on this host");
+	});
+	const view = render(<AccountTerminalForm {...input} mode="chat" />);
+	const submit = view.getByRole("button", {
+		name: "Start chat",
+	}) as HTMLButtonElement;
+	expect(submit.disabled).toBe(true);
+	fireEvent.click(view.getByRole("radio"));
+	await act(async () => {
+		fireEvent.click(submit);
+	});
+	expect(input.onLaunch).toHaveBeenCalledTimes(1);
+	expect(input.onLaunch).toHaveBeenCalledWith({
+		selection: null,
+		identity: "alice",
+	});
+	expect(view.getByRole("alert").textContent).toBe(
+		"Account chat unavailable on this host",
+	);
+	expect(input.onCancel).not.toHaveBeenCalled();
+});

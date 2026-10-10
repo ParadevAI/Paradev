@@ -12,6 +12,7 @@ import { HotkeyMenuShortcut } from "renderer/components/HotkeyMenuShortcut";
 interface AddTabMenuProps {
 	onAddTerminal: () => void;
 	onAddAccountTerminal?: () => void;
+	onAddAccountChat?: () => void;
 	onAddBrowser: () => void;
 	onAddChanges: () => void;
 	onAddDesktop?: (() => void) | undefined;
@@ -22,6 +23,7 @@ interface AddTabMenuProps {
 export function AddTabMenu({
 	onAddTerminal,
 	onAddAccountTerminal,
+	onAddAccountChat,
 	onAddBrowser,
 	onAddChanges,
 	onAddDesktop,
@@ -37,6 +39,12 @@ export function AddTabMenu({
 				</span>
 				<HotkeyMenuShortcut hotkeyId="NEW_GROUP" />
 			</DropdownMenuItem>
+			{onAddAccountChat && (
+				<DropdownMenuItem className="gap-2" onClick={onAddAccountChat}>
+					<BsTerminalPlus className="size-4" />
+					<Trans>Chat with account…</Trans>
+				</DropdownMenuItem>
+			)}
 			{onAddAccountTerminal && (
 				<DropdownMenuItem className="gap-2" onClick={onAddAccountTerminal}>
 					<BsTerminalPlus className="size-4" />

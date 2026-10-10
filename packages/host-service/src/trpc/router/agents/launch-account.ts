@@ -140,7 +140,19 @@ export async function resolveLaunchAccount(
 ): Promise<SessionAccount> {
 	const reason = accountLaunchUnsupportedReason(config);
 	if (reason) throw new TRPCError({ code: "BAD_REQUEST", message: reason });
-	const accounts = await discover(config.presetId as "claude" | "codex");
+	return resolveProviderLaunchAccount(
+		config.presetId as "claude" | "codex",
+		choice,
+		discover,
+	);
+}
+
+export async function resolveProviderLaunchAccount(
+	provider: "claude" | "codex",
+	choice: LaunchAccountChoice,
+	discover = discoverSessionAccounts,
+): Promise<SessionAccount> {
+	const accounts = await discover(provider);
 	const account = accounts.find(
 		(candidate) =>
 			candidate.selection === choice.selection &&
@@ -204,6 +216,20 @@ export function pinnedAccountEnv(
 			: { CLAUDE_CONFIG_DIR: account.directory as string };
 	}
 	return { CODEX_HOME: account.directory as string };
+}
+
+export function withPinnedAccountEnv(
+	account: SessionAccount,
+	env: Record<string, string>,
+): Record<string, string> {
+	const result = { ...env };
+	for (const key of AUTH_ENV[account.agent]) delete result[key];
+	return {
+		...result,
+		...pinnedAccountEnv(account),
+		SUPERSET_PINNED_ACCOUNT:
+			account.agent === "claude" ? "CLAUDE_CONFIG_DIR" : "CODEX_HOME",
+	};
 }
 
 export function pinnedAccountCommandPrefix(

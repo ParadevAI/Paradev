@@ -19209,3 +19209,57 @@ msgstr "缩小"
 
 msgid "zsh"
 msgstr "zsh"
+
+msgid "Chat with account"
+msgstr "使用指定账户聊天"
+
+msgid "Chat with account…"
+msgstr "使用指定账户聊天…"
+
+msgid "Could not discard the queued message."
+msgstr "无法丢弃队列中的消息。"
+
+msgid "Could not read queued messages."
+msgstr "无法读取队列中的消息。"
+
+msgid "Could not start chat"
+msgstr "无法启动聊天"
+
+msgid "Could not stop the agent. Review queued messages or update this host, then try again."
+msgstr "无法停止智能体。请检查队列中的消息或更新此主机，然后重试。"
+
+msgid "Discard queued message"
+msgstr "丢弃队列中的消息"
+
+msgid "Native chat is not enabled"
+msgstr "未启用原生聊天"
+
+msgid "Start a native chat using an existing login. Recovery keeps this account and working folder."
+msgstr "使用现有登录启动原生聊天。恢复时将保留此账户和工作文件夹。"
+
+msgid "Start chat"
+msgstr "启动聊天"
+
+msgid "Stop agent"
+msgstr "停止智能体"
+
+msgid "Stop agent and background work"
+msgstr "停止智能体及后台任务"
+
+msgid "Stop this agent and its background work?"
+msgstr "停止此智能体及其后台任务？"
+
+msgid "The selected account chat could not be verified in saved layout data. Nothing was launched by this attempt. If storage is full, free space, then rename this tab to save its layout before retrying. Keep this tab open if it still fails."
+msgstr "无法在已保存的布局数据中验证所选账户的聊天。本次尝试未启动任何内容。如果存储空间已满，请释放空间，然后重命名此标签页以保存布局，再重试。如果仍然失败，请保持此标签页打开。"
+
+msgid "These messages were not sent. Copy anything you need, then discard the queue before resuming."
+msgstr "这些消息尚未发送。请复制需要的内容，然后在恢复前清空队列。"
+
+msgid "This chat could not be opened with its saved account."
+msgstr "无法使用已保存的账户打开此聊天。"
+
+msgid "This host does not support account selection for native chats."
+msgstr "此主机不支持为原生聊天选择账户。"
+
+msgid "This stops the agent process and any background work it owns. Your saved conversation stays available. Review and discard any queued messages first. You can then choose Resume."
+msgstr "这将停止智能体进程及其管理的所有后台任务。已保存的对话仍然可用。请先检查并丢弃队列中的消息，然后选择“恢复”。"

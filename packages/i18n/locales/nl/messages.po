@@ -19209,3 +19209,57 @@ msgstr "Uitzoomen"
 
 msgid "zsh"
 msgstr "zsh"
+
+msgid "Chat with account"
+msgstr "Chat met account"
+
+msgid "Chat with account…"
+msgstr "Chat met account…"
+
+msgid "Could not discard the queued message."
+msgstr "Het bericht in de wachtrij kon niet worden verwijderd."
+
+msgid "Could not read queued messages."
+msgstr "Berichten in de wachtrij konden niet worden gelezen."
+
+msgid "Could not start chat"
+msgstr "Chat kon niet worden gestart"
+
+msgid "Could not stop the agent. Review queued messages or update this host, then try again."
+msgstr "De agent kon niet worden gestopt. Controleer de berichten in de wachtrij of werk deze host bij en probeer het opnieuw."
+
+msgid "Discard queued message"
+msgstr "Bericht uit wachtrij verwijderen"
+
+msgid "Native chat is not enabled"
+msgstr "Native chat is niet ingeschakeld"
+
+msgid "Start a native chat using an existing login. Recovery keeps this account and working folder."
+msgstr "Start een native chat met een bestaande aanmelding. Bij herstel blijven dit account en deze werkmap behouden."
+
+msgid "Start chat"
+msgstr "Chat starten"
+
+msgid "Stop agent"
+msgstr "Agent stoppen"
+
+msgid "Stop agent and background work"
+msgstr "Agent en achtergrondtaken stoppen"
+
+msgid "Stop this agent and its background work?"
+msgstr "Deze agent en zijn achtergrondtaken stoppen?"
+
+msgid "The selected account chat could not be verified in saved layout data. Nothing was launched by this attempt. If storage is full, free space, then rename this tab to save its layout before retrying. Keep this tab open if it still fails."
+msgstr "De chat van het geselecteerde account kon niet worden bevestigd in de opgeslagen indelingsgegevens. Deze poging heeft niets gestart. Als de opslag vol is, maak dan ruimte vrij en hernoem dit tabblad om de indeling op te slaan voordat je het opnieuw probeert. Houd dit tabblad open als het nog steeds mislukt."
+
+msgid "These messages were not sent. Copy anything you need, then discard the queue before resuming."
+msgstr "Deze berichten zijn niet verzonden. Kopieer wat je nodig hebt en maak de wachtrij leeg voordat je hervat."
+
+msgid "This chat could not be opened with its saved account."
+msgstr "Deze chat kon niet worden geopend met het opgeslagen account."
+
+msgid "This host does not support account selection for native chats."
+msgstr "Deze host ondersteunt geen accountselectie voor native chats."
+
+msgid "This stops the agent process and any background work it owns. Your saved conversation stays available. Review and discard any queued messages first. You can then choose Resume."
+msgstr "Dit stopt het agentproces en alle bijbehorende achtergrondtaken. Je opgeslagen gesprek blijft beschikbaar. Controleer en verwijder eerst de berichten in de wachtrij. Daarna kun je Hervatten kiezen."

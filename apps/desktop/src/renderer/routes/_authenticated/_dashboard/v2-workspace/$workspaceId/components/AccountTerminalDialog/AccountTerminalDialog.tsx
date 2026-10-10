@@ -14,18 +14,28 @@ import { useState } from "react";
 import { useV2AgentConfigs } from "renderer/hooks/useV2AgentConfigs";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import type { CreateAccountTerminal } from "../../hooks/useAgentSessionLauncher";
+import { useChatWiring } from "../../hooks/usePaneRegistry/components/ChatSession/hooks/useSessionClient";
 import { AccountTerminalForm } from "./components/AccountTerminalForm";
 
 export function AccountTerminalDialog({
 	onClose,
 	onLaunch,
+	surface = "terminal",
 }: {
+	surface?: "terminal" | "chat";
 	onClose: () => void;
 	onLaunch: CreateAccountTerminal;
 }) {
 	const { t } = useLingui();
 	const { hostUrl } = useWorkspaceClient();
 	const configs = useV2AgentConfigs(hostUrl);
+	const wiring = useChatWiring();
+	const capabilities = useQuery({
+		queryKey: ["account-chat-capabilities", hostUrl],
+		enabled: surface === "chat" && Boolean(hostUrl),
+		queryFn: () => wiring.transport.accountCapabilities(),
+		retry: false,
+	});
 	const [configId, setConfigId] = useState("");
 	const [launching, setLaunching] = useState(false);
 	const choices = (configs.data ?? []).filter(
@@ -51,53 +61,86 @@ export function AccountTerminalDialog({
 		accounts.error instanceof TRPCClientError &&
 		accounts.error.data?.code === "NOT_FOUND" &&
 		accounts.error.message.includes("agents.launchAccounts");
-	const error = !hostUrl
-		? t({ message: "Host service is not running" })
-		: unsupportedHost
-			? t({
-					message: "Update this host to choose an account for a new terminal.",
-				})
-			: configs.isError || accounts.isError
-				? errorMessage(
-						configs.error ?? accounts.error,
-						t({ message: "Could not load accounts" }),
-					)
-				: !configs.isPending && !selectedConfigExists
-					? t({ message: "No agent is configured on this host" })
-					: accounts.data?.supported === false
-						? t({
-								message:
-									"This agent configuration does not support account selection.",
-							})
-						: null;
+	const preset = choices.find(
+		(config) => config.id === selectedConfigId,
+	)?.presetId;
+	const chatUnsupported =
+		surface === "chat" &&
+		!capabilities.isPending &&
+		(capabilities.isError ||
+			!capabilities.data?.harnesses.includes(
+				`${preset}-acp` as "claude-acp" | "codex-acp",
+			));
+	const error = chatUnsupported
+		? t({
+				message:
+					"This host does not support account selection for native chats.",
+			})
+		: !hostUrl
+			? t({ message: "Host service is not running" })
+			: unsupportedHost
+				? t({
+						message:
+							"Update this host to choose an account for a new terminal.",
+					})
+				: configs.isError || accounts.isError
+					? errorMessage(
+							configs.error ?? accounts.error,
+							t({ message: "Could not load accounts" }),
+						)
+					: !configs.isPending && !selectedConfigExists
+						? t({ message: "No agent is configured on this host" })
+						: accounts.data?.supported === false
+							? t({
+									message:
+										"This agent configuration does not support account selection.",
+								})
+							: null;
 	return (
 		<Dialog open onOpenChange={(open) => !open && !launching && onClose()}>
 			<DialogContent className="sm:max-w-md" showCloseButton={!launching}>
 				<DialogHeader>
 					<DialogTitle>
-						<Trans>Agent terminal with account</Trans>
+						{surface === "chat" ? (
+							<Trans>Chat with account</Trans>
+						) : (
+							<Trans>Agent terminal with account</Trans>
+						)}
 					</DialogTitle>
 					<DialogDescription>
-						<Trans>
-							Start a new terminal using an existing login. Other chats and your
-							default account stay unchanged.
-						</Trans>
+						{surface === "chat" ? (
+							<Trans>
+								Start a native chat using an existing login. Recovery keeps this
+								account and working folder.
+							</Trans>
+						) : (
+							<Trans>
+								Start a new terminal using an existing login. Other chats and
+								your default account stay unchanged.
+							</Trans>
+						)}
 					</DialogDescription>
 				</DialogHeader>
 				<AccountTerminalForm
+					mode={surface === "chat" ? "chat" : "start"}
 					key={`${hostUrl}:${selectedConfigId}`}
 					configs={choices}
 					configId={selectedConfigId}
 					onConfigChange={setConfigId}
 					accounts={accounts.data?.supported ? accounts.data.accounts : []}
 					loading={
-						configs.isPending || (selectedConfigExists && accounts.isPending)
+						configs.isPending ||
+						(selectedConfigExists && accounts.isPending) ||
+						(surface === "chat" && capabilities.isPending)
 					}
 					refreshing={accounts.isFetching}
 					error={error}
 					launching={launching}
 					onRefresh={async () => {
-						await accounts.refetch();
+						await Promise.all([
+							accounts.refetch(),
+							...(surface === "chat" ? [capabilities.refetch()] : []),
+						]);
 					}}
 					onCancel={onClose}
 					onLaunch={async (account) => {

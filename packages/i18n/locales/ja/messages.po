@@ -19209,3 +19209,57 @@ msgstr "縮小"
 
 msgid "zsh"
 msgstr "zsh"
+
+msgid "Chat with account"
+msgstr "アカウントを指定してチャット"
+
+msgid "Chat with account…"
+msgstr "アカウントを指定してチャット…"
+
+msgid "Could not discard the queued message."
+msgstr "キュー内のメッセージを破棄できませんでした。"
+
+msgid "Could not read queued messages."
+msgstr "キュー内のメッセージを読み取れませんでした。"
+
+msgid "Could not start chat"
+msgstr "チャットを開始できませんでした"
+
+msgid "Could not stop the agent. Review queued messages or update this host, then try again."
+msgstr "エージェントを停止できませんでした。キュー内のメッセージを確認するか、このホストを更新してから再試行してください。"
+
+msgid "Discard queued message"
+msgstr "キュー内のメッセージを破棄"
+
+msgid "Native chat is not enabled"
+msgstr "ネイティブチャットが有効になっていません"
+
+msgid "Start a native chat using an existing login. Recovery keeps this account and working folder."
+msgstr "既存のログインを使ってネイティブチャットを開始します。復旧時もこのアカウントと作業フォルダを維持します。"
+
+msgid "Start chat"
+msgstr "チャットを開始"
+
+msgid "Stop agent"
+msgstr "エージェントを停止"
+
+msgid "Stop agent and background work"
+msgstr "エージェントとバックグラウンド作業を停止"
+
+msgid "Stop this agent and its background work?"
+msgstr "このエージェントとバックグラウンド作業を停止しますか？"
+
+msgid "The selected account chat could not be verified in saved layout data. Nothing was launched by this attempt. If storage is full, free space, then rename this tab to save its layout before retrying. Keep this tab open if it still fails."
+msgstr "選択したアカウントのチャットを、保存済みのレイアウトデータで確認できませんでした。今回の試行では何も起動していません。ストレージがいっぱいの場合は空き容量を確保し、このタブの名前を変更してレイアウトを保存してから再試行してください。それでも失敗する場合は、このタブを開いたままにしてください。"
+
+msgid "These messages were not sent. Copy anything you need, then discard the queue before resuming."
+msgstr "これらのメッセージは送信されていません。必要な内容をコピーし、再開する前にキューを破棄してください。"
+
+msgid "This chat could not be opened with its saved account."
+msgstr "保存されたアカウントでこのチャットを開けませんでした。"
+
+msgid "This host does not support account selection for native chats."
+msgstr "このホストはネイティブチャットのアカウント選択に対応していません。"
+
+msgid "This stops the agent process and any background work it owns. Your saved conversation stays available. Review and discard any queued messages first. You can then choose Resume."
+msgstr "エージェントのプロセスと、そのプロセスが管理するバックグラウンド作業を停止します。保存済みの会話は引き続き利用できます。まずキュー内のメッセージを確認して破棄してください。その後で「再開」を選択できます。"

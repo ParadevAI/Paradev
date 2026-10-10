@@ -19209,3 +19209,57 @@ msgstr "축소"
 
 msgid "zsh"
 msgstr "zsh"
+
+msgid "Chat with account"
+msgstr "계정을 선택해 채팅"
+
+msgid "Chat with account…"
+msgstr "계정을 선택해 채팅…"
+
+msgid "Could not discard the queued message."
+msgstr "대기 중인 메시지를 삭제하지 못했습니다."
+
+msgid "Could not read queued messages."
+msgstr "대기 중인 메시지를 읽지 못했습니다."
+
+msgid "Could not start chat"
+msgstr "채팅을 시작하지 못했습니다"
+
+msgid "Could not stop the agent. Review queued messages or update this host, then try again."
+msgstr "에이전트를 중지하지 못했습니다. 대기 중인 메시지를 확인하거나 이 호스트를 업데이트한 후 다시 시도하세요."
+
+msgid "Discard queued message"
+msgstr "대기 중인 메시지 삭제"
+
+msgid "Native chat is not enabled"
+msgstr "네이티브 채팅이 활성화되지 않았습니다"
+
+msgid "Start a native chat using an existing login. Recovery keeps this account and working folder."
+msgstr "기존 로그인을 사용해 네이티브 채팅을 시작합니다. 복구 시 이 계정과 작업 폴더가 유지됩니다."
+
+msgid "Start chat"
+msgstr "채팅 시작"
+
+msgid "Stop agent"
+msgstr "에이전트 중지"
+
+msgid "Stop agent and background work"
+msgstr "에이전트 및 백그라운드 작업 중지"
+
+msgid "Stop this agent and its background work?"
+msgstr "이 에이전트와 백그라운드 작업을 중지할까요?"
+
+msgid "The selected account chat could not be verified in saved layout data. Nothing was launched by this attempt. If storage is full, free space, then rename this tab to save its layout before retrying. Keep this tab open if it still fails."
+msgstr "저장된 레이아웃 데이터에서 선택한 계정의 채팅을 확인하지 못했습니다. 이번 시도에서는 아무것도 실행되지 않았습니다. 저장 공간이 가득 찼다면 공간을 확보한 다음 이 탭의 이름을 바꿔 레이아웃을 저장하고 다시 시도하세요. 계속 실패하면 이 탭을 열어 두세요."
+
+msgid "These messages were not sent. Copy anything you need, then discard the queue before resuming."
+msgstr "이 메시지들은 전송되지 않았습니다. 필요한 내용을 복사한 다음 재개하기 전에 대기열을 비우세요."
+
+msgid "This chat could not be opened with its saved account."
+msgstr "저장된 계정으로 이 채팅을 열지 못했습니다."
+
+msgid "This host does not support account selection for native chats."
+msgstr "이 호스트는 네이티브 채팅의 계정 선택을 지원하지 않습니다."
+
+msgid "This stops the agent process and any background work it owns. Your saved conversation stays available. Review and discard any queued messages first. You can then choose Resume."
+msgstr "에이전트 프로세스와 해당 프로세스가 관리하는 모든 백그라운드 작업이 중지됩니다. 저장된 대화는 계속 사용할 수 있습니다. 먼저 대기 중인 메시지를 검토하고 삭제하세요. 그런 다음 재개를 선택할 수 있습니다."

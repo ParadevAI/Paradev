@@ -214,9 +214,11 @@ function V2WorkspaceContent() {
 	);
 	const launcher = useV2TerminalLauncher();
 	const [accountTerminalOpen, setAccountTerminalOpen] = useState(false);
+	const [accountChatOpen, setAccountChatOpen] = useState(false);
 	const {
 		createNewAgentSession,
 		createAccountTerminal,
+		createAccountChat,
 		openAgentChat,
 		focusAgentTerminal,
 	} = useAgentSessionLauncher({ workspaceId, store });
@@ -686,6 +688,9 @@ function V2WorkspaceContent() {
 									renderAddTabMenu={() => (
 										<AddTabMenu
 											onAddTerminal={addTerminalTab}
+											onAddAccountChat={
+												isSandbox ? undefined : () => setAccountChatOpen(true)
+											}
 											onAddAccountTerminal={
 												isSandbox
 													? undefined
@@ -799,6 +804,14 @@ function V2WorkspaceContent() {
 				recentlyViewedFiles={recentFiles}
 				openFilePaths={openFilePaths}
 			/>
+			{accountChatOpen && (
+				<AccountTerminalDialog
+					key={`${workspaceId}:chat`}
+					surface="chat"
+					onClose={() => setAccountChatOpen(false)}
+					onLaunch={createAccountChat}
+				/>
+			)}
 			{accountTerminalOpen && (
 				<AccountTerminalDialog
 					key={workspaceId}

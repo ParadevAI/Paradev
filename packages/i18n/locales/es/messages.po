@@ -19209,3 +19209,57 @@ msgstr "Alejar"
 
 msgid "zsh"
 msgstr "zsh"
+
+msgid "Chat with account"
+msgstr "Chat con cuenta"
+
+msgid "Chat with account…"
+msgstr "Chat con cuenta…"
+
+msgid "Could not discard the queued message."
+msgstr "No se pudo descartar el mensaje en cola."
+
+msgid "Could not read queued messages."
+msgstr "No se pudieron leer los mensajes en cola."
+
+msgid "Could not start chat"
+msgstr "No se pudo iniciar el chat"
+
+msgid "Could not stop the agent. Review queued messages or update this host, then try again."
+msgstr "No se pudo detener el agente. Revisa los mensajes en cola o actualiza este host y vuelve a intentarlo."
+
+msgid "Discard queued message"
+msgstr "Descartar mensaje en cola"
+
+msgid "Native chat is not enabled"
+msgstr "El chat nativo no está habilitado"
+
+msgid "Start a native chat using an existing login. Recovery keeps this account and working folder."
+msgstr "Inicia un chat nativo con una sesión de acceso existente. La recuperación mantiene esta cuenta y carpeta de trabajo."
+
+msgid "Start chat"
+msgstr "Iniciar chat"
+
+msgid "Stop agent"
+msgstr "Detener agente"
+
+msgid "Stop agent and background work"
+msgstr "Detener agente y tareas en segundo plano"
+
+msgid "Stop this agent and its background work?"
+msgstr "¿Detener este agente y sus tareas en segundo plano?"
+
+msgid "The selected account chat could not be verified in saved layout data. Nothing was launched by this attempt. If storage is full, free space, then rename this tab to save its layout before retrying. Keep this tab open if it still fails."
+msgstr "No se pudo verificar el chat de la cuenta seleccionada en los datos de diseño guardados. Este intento no inició nada. Si el almacenamiento está lleno, libera espacio y cambia el nombre de esta pestaña para guardar su diseño antes de volver a intentarlo. Mantén esta pestaña abierta si el problema persiste."
+
+msgid "These messages were not sent. Copy anything you need, then discard the queue before resuming."
+msgstr "Estos mensajes no se enviaron. Copia lo que necesites y luego vacía la cola antes de reanudar."
+
+msgid "This chat could not be opened with its saved account."
+msgstr "No se pudo abrir este chat con su cuenta guardada."
+
+msgid "This host does not support account selection for native chats."
+msgstr "Este host no admite la selección de cuentas para chats nativos."
+
+msgid "This stops the agent process and any background work it owns. Your saved conversation stays available. Review and discard any queued messages first. You can then choose Resume."
+msgstr "Esto detiene el proceso del agente y sus tareas en segundo plano. La conversación guardada seguirá disponible. Primero revisa y descarta los mensajes en cola. Después puedes elegir Reanudar."

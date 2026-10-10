@@ -19209,3 +19209,57 @@ msgstr "Zoom arrière"
 
 msgid "zsh"
 msgstr "zsh"
+
+msgid "Chat with account"
+msgstr "Conversation avec un compte"
+
+msgid "Chat with account…"
+msgstr "Conversation avec un compte…"
+
+msgid "Could not discard the queued message."
+msgstr "Impossible de supprimer le message en attente."
+
+msgid "Could not read queued messages."
+msgstr "Impossible de lire les messages en attente."
+
+msgid "Could not start chat"
+msgstr "Impossible de démarrer la conversation"
+
+msgid "Could not stop the agent. Review queued messages or update this host, then try again."
+msgstr "Impossible d’arrêter l’agent. Vérifiez les messages en attente ou mettez cet hôte à jour, puis réessayez."
+
+msgid "Discard queued message"
+msgstr "Supprimer le message en attente"
+
+msgid "Native chat is not enabled"
+msgstr "Le chat natif n’est pas activé"
+
+msgid "Start a native chat using an existing login. Recovery keeps this account and working folder."
+msgstr "Démarrez un chat natif avec une connexion existante. La récupération conserve ce compte et ce dossier de travail."
+
+msgid "Start chat"
+msgstr "Démarrer une conversation"
+
+msgid "Stop agent"
+msgstr "Arrêter l’agent"
+
+msgid "Stop agent and background work"
+msgstr "Arrêter l’agent et ses tâches en arrière-plan"
+
+msgid "Stop this agent and its background work?"
+msgstr "Arrêter cet agent et ses tâches en arrière-plan ?"
+
+msgid "The selected account chat could not be verified in saved layout data. Nothing was launched by this attempt. If storage is full, free space, then rename this tab to save its layout before retrying. Keep this tab open if it still fails."
+msgstr "Le chat du compte sélectionné n’a pas pu être vérifié dans les données de disposition enregistrées. Cette tentative n’a rien lancé. Si le stockage est plein, libérez de l’espace, puis renommez cet onglet pour enregistrer sa disposition avant de réessayer. Gardez cet onglet ouvert si le problème persiste."
+
+msgid "These messages were not sent. Copy anything you need, then discard the queue before resuming."
+msgstr "Ces messages n’ont pas été envoyés. Copiez ce dont vous avez besoin, puis videz la file d’attente avant de reprendre."
+
+msgid "This chat could not be opened with its saved account."
+msgstr "Impossible d’ouvrir ce chat avec son compte enregistré."
+
+msgid "This host does not support account selection for native chats."
+msgstr "Cet hôte ne permet pas de sélectionner un compte pour les chats natifs."
+
+msgid "This stops the agent process and any background work it owns. Your saved conversation stays available. Review and discard any queued messages first. You can then choose Resume."
+msgstr "Cette action arrête le processus de l’agent et toutes ses tâches en arrière-plan. Votre conversation enregistrée reste disponible. Vérifiez et supprimez d’abord les messages en attente. Vous pourrez ensuite choisir Reprendre."

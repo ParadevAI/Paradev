@@ -19209,3 +19209,57 @@ msgstr "Zoom Out"
 
 msgid "zsh"
 msgstr "zsh"
+
+msgid "Chat with account"
+msgstr "Chat with account"
+
+msgid "Chat with account…"
+msgstr "Chat with account…"
+
+msgid "Could not discard the queued message."
+msgstr "Could not discard the queued message."
+
+msgid "Could not read queued messages."
+msgstr "Could not read queued messages."
+
+msgid "Could not start chat"
+msgstr "Could not start chat"
+
+msgid "Could not stop the agent. Review queued messages or update this host, then try again."
+msgstr "Could not stop the agent. Review queued messages or update this host, then try again."
+
+msgid "Discard queued message"
+msgstr "Discard queued message"
+
+msgid "Native chat is not enabled"
+msgstr "Native chat is not enabled"
+
+msgid "Start a native chat using an existing login. Recovery keeps this account and working folder."
+msgstr "Start a native chat using an existing login. Recovery keeps this account and working folder."
+
+msgid "Start chat"
+msgstr "Start chat"
+
+msgid "Stop agent"
+msgstr "Stop agent"
+
+msgid "Stop agent and background work"
+msgstr "Stop agent and background work"
+
+msgid "Stop this agent and its background work?"
+msgstr "Stop this agent and its background work?"
+
+msgid "The selected account chat could not be verified in saved layout data. Nothing was launched by this attempt. If storage is full, free space, then rename this tab to save its layout before retrying. Keep this tab open if it still fails."
+msgstr "The selected account chat could not be verified in saved layout data. Nothing was launched by this attempt. If storage is full, free space, then rename this tab to save its layout before retrying. Keep this tab open if it still fails."
+
+msgid "These messages were not sent. Copy anything you need, then discard the queue before resuming."
+msgstr "These messages were not sent. Copy anything you need, then discard the queue before resuming."
+
+msgid "This chat could not be opened with its saved account."
+msgstr "This chat could not be opened with its saved account."
+
+msgid "This host does not support account selection for native chats."
+msgstr "This host does not support account selection for native chats."
+
+msgid "This stops the agent process and any background work it owns. Your saved conversation stays available. Review and discard any queued messages first. You can then choose Resume."
+msgstr "This stops the agent process and any background work it owns. Your saved conversation stays available. Review and discard any queued messages first. You can then choose Resume."

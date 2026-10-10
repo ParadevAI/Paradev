@@ -19209,3 +19209,57 @@ msgstr "縮小"
 
 msgid "zsh"
 msgstr "zsh"
+
+msgid "Chat with account"
+msgstr "使用指定帳戶聊天"
+
+msgid "Chat with account…"
+msgstr "使用指定帳戶聊天…"
+
+msgid "Could not discard the queued message."
+msgstr "無法捨棄佇列中的訊息。"
+
+msgid "Could not read queued messages."
+msgstr "無法讀取佇列中的訊息。"
+
+msgid "Could not start chat"
+msgstr "無法啟動聊天"
+
+msgid "Could not stop the agent. Review queued messages or update this host, then try again."
+msgstr "無法停止代理程式。請檢查佇列中的訊息或更新此主機，然後重試。"
+
+msgid "Discard queued message"
+msgstr "捨棄佇列中的訊息"
+
+msgid "Native chat is not enabled"
+msgstr "未啟用原生聊天"
+
+msgid "Start a native chat using an existing login. Recovery keeps this account and working folder."
+msgstr "使用現有登入啟動原生聊天。復原時會保留此帳戶和工作資料夾。"
+
+msgid "Start chat"
+msgstr "啟動聊天"
+
+msgid "Stop agent"
+msgstr "停止代理程式"
+
+msgid "Stop agent and background work"
+msgstr "停止代理程式及背景工作"
+
+msgid "Stop this agent and its background work?"
+msgstr "停止此代理程式及其背景工作？"
+
+msgid "The selected account chat could not be verified in saved layout data. Nothing was launched by this attempt. If storage is full, free space, then rename this tab to save its layout before retrying. Keep this tab open if it still fails."
+msgstr "無法在已儲存的版面配置資料中驗證所選帳戶的聊天。本次嘗試未啟動任何內容。如果儲存空間已滿，請釋出空間，然後重新命名此分頁以儲存版面配置，再重試。如果仍然失敗，請保持此分頁開啟。"
+
+msgid "These messages were not sent. Copy anything you need, then discard the queue before resuming."
+msgstr "這些訊息尚未傳送。請複製需要的內容，然後在繼續前清空佇列。"
+
+msgid "This chat could not be opened with its saved account."
+msgstr "無法使用已儲存的帳戶開啟此聊天。"
+
+msgid "This host does not support account selection for native chats."
+msgstr "此主機不支援為原生聊天選取帳戶。"
+
+msgid "This stops the agent process and any background work it owns. Your saved conversation stays available. Review and discard any queued messages first. You can then choose Resume."
+msgstr "這會停止代理程式的處理程序及其管理的所有背景工作。已儲存的對話仍可使用。請先檢查並捨棄佇列中的訊息，然後選擇「恢復」。"

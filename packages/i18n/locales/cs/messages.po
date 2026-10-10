@@ -19209,3 +19209,57 @@ msgstr "Oddálit"
 
 msgid "zsh"
 msgstr "zsh"
+
+msgid "Chat with account"
+msgstr "Chat s účtem"
+
+msgid "Chat with account…"
+msgstr "Chat s účtem…"
+
+msgid "Could not discard the queued message."
+msgstr "Zprávu ve frontě se nepodařilo zahodit."
+
+msgid "Could not read queued messages."
+msgstr "Zprávy ve frontě se nepodařilo přečíst."
+
+msgid "Could not start chat"
+msgstr "Chat se nepodařilo spustit"
+
+msgid "Could not stop the agent. Review queued messages or update this host, then try again."
+msgstr "Agenta se nepodařilo zastavit. Zkontrolujte zprávy ve frontě nebo aktualizujte tohoto hostitele a zkuste to znovu."
+
+msgid "Discard queued message"
+msgstr "Zahodit zprávu ve frontě"
+
+msgid "Native chat is not enabled"
+msgstr "Nativní chat není povolen"
+
+msgid "Start a native chat using an existing login. Recovery keeps this account and working folder."
+msgstr "Spusťte nativní chat pomocí existujícího přihlášení. Obnovení zachová tento účet i pracovní složku."
+
+msgid "Start chat"
+msgstr "Spustit chat"
+
+msgid "Stop agent"
+msgstr "Zastavit agenta"
+
+msgid "Stop agent and background work"
+msgstr "Zastavit agenta a úlohy na pozadí"
+
+msgid "Stop this agent and its background work?"
+msgstr "Zastavit tohoto agenta a jeho úlohy na pozadí?"
+
+msgid "The selected account chat could not be verified in saved layout data. Nothing was launched by this attempt. If storage is full, free space, then rename this tab to save its layout before retrying. Keep this tab open if it still fails."
+msgstr "Chat vybraného účtu se nepodařilo ověřit v uložených datech rozvržení. Tento pokus nic nespustil. Pokud je úložiště plné, uvolněte místo a poté přejmenujte tuto kartu, aby se před dalším pokusem uložilo její rozvržení. Pokud problém přetrvává, ponechte kartu otevřenou."
+
+msgid "These messages were not sent. Copy anything you need, then discard the queue before resuming."
+msgstr "Tyto zprávy nebyly odeslány. Zkopírujte, co potřebujete, a před pokračováním vyprázdněte frontu."
+
+msgid "This chat could not be opened with its saved account."
+msgstr "Tento chat se nepodařilo otevřít s uloženým účtem."
+
+msgid "This host does not support account selection for native chats."
+msgstr "Tento hostitel nepodporuje výběr účtu pro nativní chaty."
+
+msgid "This stops the agent process and any background work it owns. Your saved conversation stays available. Review and discard any queued messages first. You can then choose Resume."
+msgstr "Tím se zastaví proces agenta a všechny jeho úlohy na pozadí. Uložená konverzace zůstane dostupná. Nejprve zkontrolujte a zahoďte zprávy ve frontě. Poté můžete zvolit Pokračovat."

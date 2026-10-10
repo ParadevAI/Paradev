@@ -19209,3 +19209,57 @@ msgstr "Отдалить"
 
 msgid "zsh"
 msgstr "zsh"
+
+msgid "Chat with account"
+msgstr "Чат с выбранным аккаунтом"
+
+msgid "Chat with account…"
+msgstr "Чат с выбранным аккаунтом…"
+
+msgid "Could not discard the queued message."
+msgstr "Не удалось удалить сообщение из очереди."
+
+msgid "Could not read queued messages."
+msgstr "Не удалось прочитать сообщения в очереди."
+
+msgid "Could not start chat"
+msgstr "Не удалось начать чат"
+
+msgid "Could not stop the agent. Review queued messages or update this host, then try again."
+msgstr "Не удалось остановить агента. Проверьте сообщения в очереди или обновите этот хост, затем повторите попытку."
+
+msgid "Discard queued message"
+msgstr "Удалить сообщение из очереди"
+
+msgid "Native chat is not enabled"
+msgstr "Встроенный чат не включён"
+
+msgid "Start a native chat using an existing login. Recovery keeps this account and working folder."
+msgstr "Начните встроенный чат с существующим входом в аккаунт. При восстановлении сохраняются этот аккаунт и рабочая папка."
+
+msgid "Start chat"
+msgstr "Начать чат"
+
+msgid "Stop agent"
+msgstr "Остановить агента"
+
+msgid "Stop agent and background work"
+msgstr "Остановить агента и фоновые задачи"
+
+msgid "Stop this agent and its background work?"
+msgstr "Остановить этого агента и его фоновые задачи?"
+
+msgid "The selected account chat could not be verified in saved layout data. Nothing was launched by this attempt. If storage is full, free space, then rename this tab to save its layout before retrying. Keep this tab open if it still fails."
+msgstr "Не удалось подтвердить чат выбранного аккаунта в сохранённых данных расположения вкладок. Эта попытка ничего не запустила. Если хранилище заполнено, освободите место, затем переименуйте эту вкладку, чтобы сохранить её расположение перед повторной попыткой. Если ошибка повторится, оставьте вкладку открытой."
+
+msgid "These messages were not sent. Copy anything you need, then discard the queue before resuming."
+msgstr "Эти сообщения не были отправлены. Скопируйте всё нужное, затем очистите очередь перед возобновлением."
+
+msgid "This chat could not be opened with its saved account."
+msgstr "Не удалось открыть этот чат с сохранённым аккаунтом."
+
+msgid "This host does not support account selection for native chats."
+msgstr "Этот хост не поддерживает выбор аккаунта для встроенных чатов."
+
+msgid "This stops the agent process and any background work it owns. Your saved conversation stays available. Review and discard any queued messages first. You can then choose Resume."
+msgstr "Это остановит процесс агента и все принадлежащие ему фоновые задачи. Сохранённый разговор останется доступным. Сначала проверьте и удалите сообщения в очереди. Затем можно выбрать «Возобновить»."
