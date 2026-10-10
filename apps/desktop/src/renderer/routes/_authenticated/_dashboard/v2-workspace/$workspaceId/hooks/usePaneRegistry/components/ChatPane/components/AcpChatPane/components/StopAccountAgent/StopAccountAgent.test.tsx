@@ -46,9 +46,7 @@ function mount(
 test("opening then canceling stop confirmation does not stop or resume anything", async () => {
 	const close = mock(async () => {});
 	const view = mount(close);
-	fireEvent.click(
-		view.getByRole("button", { name: "Stop agent", exact: true }),
-	);
+	fireEvent.click(view.getByRole("button", { name: "Stop agent" }));
 	const dialog = await view.findByRole("alertdialog");
 	expect(within(dialog).getByText(/any background work it owns/)).toBeTruthy();
 	expect(close).not.toHaveBeenCalled();
@@ -74,9 +72,7 @@ test("confirmation stops only the exact session once and invalidates only its ho
 	const otherHost = ["acp-chat-session", "http://other.test", "session-a"];
 	for (const key of [target, queue, otherSession, otherHost])
 		view.client.setQueryData(key, { live: true });
-	fireEvent.click(
-		view.getByRole("button", { name: "Stop agent", exact: true }),
-	);
+	fireEvent.click(view.getByRole("button", { name: "Stop agent" }));
 	const dialog = await view.findByRole("alertdialog");
 	const confirm = within(dialog).getByRole("button", {
 		name: "Stop agent and background work",
@@ -101,9 +97,7 @@ test("a refused stop keeps confirmation and retry controls without automatic ret
 		throw new Error("Unsent queue remains");
 	});
 	const view = mount(close);
-	fireEvent.click(
-		view.getByRole("button", { name: "Stop agent", exact: true }),
-	);
+	fireEvent.click(view.getByRole("button", { name: "Stop agent" }));
 	const dialog = await view.findByRole("alertdialog");
 	fireEvent.click(
 		within(dialog).getByRole("button", {
@@ -131,9 +125,7 @@ test("an older host missing the strict endpoint fails visibly without another ac
 		throw new Error("NOT_FOUND: closeStoppedAccountSession");
 	});
 	const view = mount(close);
-	fireEvent.click(
-		view.getByRole("button", { name: "Stop agent", exact: true }),
-	);
+	fireEvent.click(view.getByRole("button", { name: "Stop agent" }));
 	const dialog = await view.findByRole("alertdialog");
 	fireEvent.click(
 		within(dialog).getByRole("button", {
@@ -148,9 +140,7 @@ test("an older host missing the strict endpoint fails visibly without another ac
 test("changing the pane session dismisses the old confirmation instead of stopping a different chat", async () => {
 	const close = mock(async () => {});
 	const view = mount(close);
-	fireEvent.click(
-		view.getByRole("button", { name: "Stop agent", exact: true }),
-	);
+	fireEvent.click(view.getByRole("button", { name: "Stop agent" }));
 	await view.findByRole("alertdialog");
 	view.rerender(view.component("session-b"));
 	await waitFor(() => expect(view.queryByRole("alertdialog")).toBeNull());
