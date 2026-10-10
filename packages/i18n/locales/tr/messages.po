@@ -3089,6 +3089,9 @@ msgstr "Toplulukça paylaşılan becerilere, MCP sunucularına ve ajan yapıland
 msgid "Browse for directory"
 msgstr "Dizine gözat"
 
+msgid "Browse saved history"
+msgstr "Kayıtlı geçmişe göz at"
+
 msgid "Browse shared themes and future agent configs for Superset."
 msgstr "Superset için paylaşılan temalara ve gelecekteki ajan yapılandırmalarına göz atın."
 
@@ -3353,6 +3356,9 @@ msgstr "Sertifika hatası"
 
 msgid "Chain of Thought"
 msgstr "Düşünce zinciri"
+
+msgid "Change account"
+msgstr "Hesabı değiştir"
 
 msgid "Change assignee"
 msgstr "Atananı değiştir"
@@ -4798,6 +4804,9 @@ msgstr "Eklentiler yüklenemedi. Bağlantınızı kontrol edip tekrar deneyin."
 msgid "Could not load presets from the host"
 msgstr "Host'tan hazır ayarlar yüklenemedi"
 
+msgid "Could not load saved conversations"
+msgstr "Kayıtlı konuşmalar yüklenemedi"
+
 msgid "Could not load this diff"
 msgstr "Bu fark yüklenemedi"
 
@@ -4821,6 +4830,9 @@ msgstr "Bağlantı açılamadı"
 
 msgid "Could not open Photos"
 msgstr "Fotoğraflar açılamadı"
+
+msgid "Could not open saved conversation"
+msgstr "Kayıtlı konuşma açılamadı"
 
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
@@ -8366,6 +8378,9 @@ msgstr "Doğrudan telefonumdan Mac’imde yerel bir çalışma ağacı ortamı b
 msgid "I can be in a café with my coffee while the work keeps moving forward."
 msgstr "Ben kafede kahvemi içerken iş ilerlemeye devam edebiliyor."
 
+msgid "I exited this conversation in the original app. No tools or background jobs are still running."
+msgstr "Bu konuşmadan özgün uygulamada çıktım. Çalışan araç veya arka plan görevi kalmadı."
+
 msgid "I start my morning walks with an idea, and end with a pull request."
 msgstr "Sabah yürüyüşlerime bir fikirle başlıyor, bir pull request ile bitiriyorum."
 
@@ -9545,6 +9560,9 @@ msgstr "Depolar yükleniyor..."
 msgid "Loading review..."
 msgstr "İnceleme yükleniyor..."
 
+msgid "Loading saved conversations…"
+msgstr "Kayıtlı konuşmalar yükleniyor…"
+
 msgid "Loading terminal scripts..."
 msgstr "Terminal betikleri yükleniyor..."
 
@@ -10563,6 +10581,9 @@ msgstr "Kontrol bildirilmedi."
 msgid "No Chrome, Brave, Arc, or other Chromium browsers were found."
 msgstr "Chrome, Brave, Arc veya başka bir Chromium tarayıcısı bulunamadı."
 
+msgid "No Claude agent is configured on this host."
+msgstr "Bu ana makinede yapılandırılmış bir Claude ajanı yok."
+
 msgid "No Claude or Codex usage found on this machine yet. Join now and you'll appear once you've used an agent."
 msgstr "Bu makinede henüz Claude veya Codex kullanımı bulunamadı. Şimdi katılın; bir ajan kullandığınızda listede görüneceksiniz."
 
@@ -10908,6 +10929,9 @@ msgstr "Bana uyan bir pozisyon yok. Yine de iletişime geçmeli miyim?"
 
 msgid "No runs yet"
 msgstr "Henüz çalıştırma yok"
+
+msgid "No saved Claude conversations were found in this account for the current workspace."
+msgstr "Bu hesapta geçerli çalışma alanı için kayıtlı Claude konuşması bulunamadı."
 
 msgid "No screenshots yet"
 msgstr "Henüz ekran görüntüsü yok"
@@ -11482,6 +11506,9 @@ msgstr "Komut paletini aç"
 msgid "Open comment on GitHub"
 msgstr "Yorumu GitHub'da aç"
 
+msgid "Open conversation"
+msgstr "Konuşmayı aç"
+
 msgid "Open details"
 msgstr "Ayrıntıları aç"
 
@@ -11509,6 +11536,9 @@ msgstr "Çekmeceyi aç"
 msgid "Open existing PR or create a new one on GitHub"
 msgstr "Mevcut PR'ı aç veya GitHub'da yeni bir tane oluştur"
 
+msgid "Open existing terminal"
+msgstr "Mevcut terminali aç"
+
 msgid "open file"
 msgstr "dosyayı aç"
 
@@ -11529,6 +11559,9 @@ msgstr "Tam ekranda aç"
 
 msgid "Open host"
 msgstr "Host'u aç"
+
+msgid "Open history from this account in the current workspace. After adoption, later opens use its current local history. Background work is not transferred."
+msgstr "Bu hesabın geçmişini geçerli çalışma alanında açın. İçe aktarıldıktan sonra sonraki açılışlarda güncel yerel geçmiş kullanılır. Arka plan görevleri aktarılmaz."
 
 msgid "Open importer"
 msgstr "İçe aktarıcıyı aç"
@@ -11733,6 +11766,12 @@ msgstr "Son kullanılanı aç"
 
 msgid "Open roles"
 msgstr "Açık pozisyonlar"
+
+msgid "Open saved Claude conversation"
+msgstr "Kayıtlı Claude konuşmasını aç"
+
+msgid "Open saved Claude conversation…"
+msgstr "Kayıtlı Claude konuşmasını aç…"
 
 msgid "Open session in"
 msgstr "Oturumu şurada aç"
@@ -14264,6 +14303,12 @@ msgstr "Kaydedildi"
 #. placeholder {0}: created?.name ?? name.trim()
 msgid "Saved \"{0}\" as an environment"
 msgstr "\"{0}\" ortam olarak kaydedildi"
+
+msgid "Saved conversations"
+msgstr "Kayıtlı konuşmalar"
+
+msgid "Saved in Superset"
+msgstr "Superset içinde kaydedildi"
 
 msgid "Saved to Downloads"
 msgstr "İndirilenler klasörüne kaydedildi"
@@ -17264,6 +17309,9 @@ msgstr "Bu işlem; etiketini, komutunu, argümanlarını, istem ve sürdürme ay
 msgid "This repository does not allow merging from here."
 msgstr "Bu depo buradan birleştirmeye izin vermiyor."
 
+msgid "This saved history changed. Select it again before opening."
+msgstr "Bu kayıtlı geçmiş değişti. Açmadan önce yeniden seçin."
+
 msgid "This screen doesn't exist"
 msgstr "Bu ekran mevcut değil"
 
@@ -18023,6 +18071,9 @@ msgstr "dal ön ekini güncelleme"
 
 msgid "Update this host to choose an account for a new terminal."
 msgstr "Yeni bir terminal için hesap seçmek üzere bu sunucuyu güncelleyin."
+
+msgid "Update this host to open saved Claude history."
+msgstr "Kayıtlı Claude geçmişini açmak için bu ana makineyi güncelleyin."
 
 msgid "Updated"
 msgstr "Güncellendi"

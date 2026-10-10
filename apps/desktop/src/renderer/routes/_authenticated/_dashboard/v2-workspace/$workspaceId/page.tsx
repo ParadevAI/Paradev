@@ -30,6 +30,7 @@ import { AddTabMenu } from "./components/AddTabMenu";
 import { ChangesControl } from "./components/ChangesControl";
 import { CloudWorkspaceTabBarControls } from "./components/CloudWorkspaceTabBarControls";
 import { RightPaneArea, type RightPaneKind } from "./components/RightPaneArea";
+import { SavedConversationsDialog } from "./components/SavedConversationsDialog";
 import { V2NotificationStatusIndicator } from "./components/V2NotificationStatusIndicator";
 import { V2PresetsBar } from "./components/V2PresetsBar";
 import { V2WorkspaceOpenInButton } from "./components/V2WorkspaceOpenInButton";
@@ -214,6 +215,7 @@ function V2WorkspaceContent() {
 	);
 	const launcher = useV2TerminalLauncher();
 	const [accountTerminalOpen, setAccountTerminalOpen] = useState(false);
+	const [savedConversationsOpen, setSavedConversationsOpen] = useState(false);
 	const {
 		createNewAgentSession,
 		createAccountTerminal,
@@ -686,6 +688,11 @@ function V2WorkspaceContent() {
 									renderAddTabMenu={() => (
 										<AddTabMenu
 											onAddTerminal={addTerminalTab}
+											onOpenSavedConversation={
+												isSandbox
+													? undefined
+													: () => setSavedConversationsOpen(true)
+											}
 											onAddAccountTerminal={
 												isSandbox
 													? undefined
@@ -799,6 +806,14 @@ function V2WorkspaceContent() {
 				recentlyViewedFiles={recentFiles}
 				openFilePaths={openFilePaths}
 			/>
+			{savedConversationsOpen && (
+				<SavedConversationsDialog
+					key={workspaceId}
+					workspaceId={workspaceId}
+					onClose={() => setSavedConversationsOpen(false)}
+					onOpenTerminal={focusAgentTerminal}
+				/>
+			)}
 			{accountTerminalOpen && (
 				<AccountTerminalDialog
 					key={workspaceId}

@@ -3,7 +3,11 @@ import { isAbsolute } from "node:path";
 import { TRPCError } from "@trpc/server";
 import { and, eq, inArray, isNull, ne, or } from "drizzle-orm";
 import type { HostDb } from "../../../db";
-import { terminalAgentBindings, workspaces } from "../../../db/schema";
+import {
+	savedConversations,
+	terminalAgentBindings,
+	workspaces,
+} from "../../../db/schema";
 import type { EventBus } from "../../../events";
 import { resolveHostAgentConfig } from "../../../terminal-agents/agent-config";
 import { validateAccountAuthRouting } from "../agents/account-auth-routing";
@@ -157,7 +161,18 @@ function assertNoCompetingBinding(
 			),
 		)
 		.get();
-	if (competing)
+	const adoptedLaunch = db
+		.select({ id: savedConversations.id })
+		.from(savedConversations)
+		.where(
+			and(
+				eq(savedConversations.provider, source.agentId),
+				eq(savedConversations.nativeSessionId, source.agentSessionId as string),
+				eq(savedConversations.state, "opening"),
+			),
+		)
+		.get();
+	if (competing || adoptedLaunch)
 		throw new TRPCError({
 			code: "PRECONDITION_FAILED",
 			message:
@@ -335,6 +350,27 @@ export async function resumeTerminalWithAccount(
 						.update(terminalAgentBindings)
 						.set({ endReason: "resumed" })
 						.where(eq(terminalAgentBindings.terminalId, input.terminalId))
+						.run();
+					// Adoption follows the local continuation, never its original
+					// import account or source snapshot. This shares the target
+					// binding/source-successor transaction above.
+					deps.db
+						.update(savedConversations)
+						.set({
+							terminalId,
+							accountJson: JSON.stringify(target),
+							state: "bound",
+						})
+						.where(
+							and(
+								eq(savedConversations.terminalId, input.terminalId),
+								eq(savedConversations.provider, source.binding.agentId),
+								eq(
+									savedConversations.nativeSessionId,
+									source.binding.agentSessionId as string,
+								),
+							),
+						)
 						.run();
 					launchAuthorized = true;
 				},

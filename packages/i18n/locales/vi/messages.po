@@ -3089,6 +3089,9 @@ msgstr "Duyệt và cài skill, server MCP và cấu hình agent do cộng đồ
 msgid "Browse for directory"
 msgstr "Duyệt thư mục"
 
+msgid "Browse saved history"
+msgstr "Duyệt lịch sử đã lưu"
+
 msgid "Browse shared themes and future agent configs for Superset."
 msgstr "Duyệt các theme được chia sẻ và những cấu hình agent sắp tới cho Superset."
 
@@ -3353,6 +3356,9 @@ msgstr "Lỗi chứng chỉ"
 
 msgid "Chain of Thought"
 msgstr "Chuỗi suy luận"
+
+msgid "Change account"
+msgstr "Đổi tài khoản"
 
 msgid "Change assignee"
 msgstr "Đổi người phụ trách"
@@ -4798,6 +4804,9 @@ msgstr "Không tải được plugin. Hãy kiểm tra kết nối và thử lạ
 msgid "Could not load presets from the host"
 msgstr "Không thể tải preset từ host"
 
+msgid "Could not load saved conversations"
+msgstr "Không thể tải các cuộc hội thoại đã lưu"
+
 msgid "Could not load this diff"
 msgstr "Không thể tải diff này"
 
@@ -4821,6 +4830,9 @@ msgstr "Không thể mở liên kết"
 
 msgid "Could not open Photos"
 msgstr "Không thể mở Photos"
+
+msgid "Could not open saved conversation"
+msgstr "Không thể mở cuộc hội thoại đã lưu"
 
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
@@ -8366,6 +8378,9 @@ msgstr "Tôi cũng rất thích việc có thể khởi tạo môi trường câ
 msgid "I can be in a café with my coffee while the work keeps moving forward."
 msgstr "Tôi có thể ngồi trong quán cà phê thưởng thức cà phê trong khi công việc vẫn tiếp tục tiến triển."
 
+msgid "I exited this conversation in the original app. No tools or background jobs are still running."
+msgstr "Tôi đã thoát cuộc hội thoại này trong ứng dụng gốc. Không còn công cụ hay tác vụ nền nào đang chạy."
+
 msgid "I start my morning walks with an idea, and end with a pull request."
 msgstr "Tôi bắt đầu buổi đi bộ sáng với một ý tưởng và kết thúc với một pull request."
 
@@ -9545,6 +9560,9 @@ msgstr "Đang tải repository..."
 msgid "Loading review..."
 msgstr "Đang tải review..."
 
+msgid "Loading saved conversations…"
+msgstr "Đang tải các cuộc hội thoại đã lưu…"
+
 msgid "Loading terminal scripts..."
 msgstr "Đang tải script terminal..."
 
@@ -10563,6 +10581,9 @@ msgstr "Không có check nào."
 msgid "No Chrome, Brave, Arc, or other Chromium browsers were found."
 msgstr "Không tìm thấy Chrome, Brave, Arc hay trình duyệt Chromium nào khác."
 
+msgid "No Claude agent is configured on this host."
+msgstr "Chưa có tác nhân Claude nào được cấu hình trên máy chủ này."
+
 msgid "No Claude or Codex usage found on this machine yet. Join now and you'll appear once you've used an agent."
 msgstr "Chưa tìm thấy mức sử dụng Claude hay Codex nào trên máy này. Hãy tham gia ngay và bạn sẽ xuất hiện khi đã dùng một agent."
 
@@ -10908,6 +10929,9 @@ msgstr "Không có vị trí nào phù hợp với tôi. Tôi có nên liên h�
 
 msgid "No runs yet"
 msgstr "Chưa có lần chạy nào"
+
+msgid "No saved Claude conversations were found in this account for the current workspace."
+msgstr "Không tìm thấy cuộc hội thoại Claude đã lưu nào trong tài khoản này cho không gian làm việc hiện tại."
 
 msgid "No screenshots yet"
 msgstr "Chưa có ảnh chụp màn hình nào"
@@ -11482,6 +11506,9 @@ msgstr "Mở bảng lệnh"
 msgid "Open comment on GitHub"
 msgstr "Mở bình luận trên GitHub"
 
+msgid "Open conversation"
+msgstr "Mở cuộc hội thoại"
+
 msgid "Open details"
 msgstr "Mở chi tiết"
 
@@ -11509,6 +11536,9 @@ msgstr "Mở drawer"
 msgid "Open existing PR or create a new one on GitHub"
 msgstr "Mở PR hiện có hoặc tạo PR mới trên GitHub"
 
+msgid "Open existing terminal"
+msgstr "Mở cửa sổ dòng lệnh hiện có"
+
 msgid "open file"
 msgstr "mở tệp"
 
@@ -11529,6 +11559,9 @@ msgstr "Mở toàn màn hình"
 
 msgid "Open host"
 msgstr "Mở host"
+
+msgid "Open history from this account in the current workspace. After adoption, later opens use its current local history. Background work is not transferred."
+msgstr "Mở lịch sử của tài khoản này trong không gian làm việc hiện tại. Sau khi nhập, các lần mở tiếp theo dùng lịch sử cục bộ mới nhất. Các tác vụ nền không được chuyển sang."
 
 msgid "Open importer"
 msgstr "Mở trình nhập"
@@ -11733,6 +11766,12 @@ msgstr "Mở gần đây"
 
 msgid "Open roles"
 msgstr "Vị trí đang tuyển"
+
+msgid "Open saved Claude conversation"
+msgstr "Mở cuộc hội thoại Claude đã lưu"
+
+msgid "Open saved Claude conversation…"
+msgstr "Mở cuộc hội thoại Claude đã lưu…"
 
 msgid "Open session in"
 msgstr "Mở phiên trong"
@@ -14264,6 +14303,12 @@ msgstr "Đã lưu"
 #. placeholder {0}: created?.name ?? name.trim()
 msgid "Saved \"{0}\" as an environment"
 msgstr "Đã lưu \"{0}\" thành một environment"
+
+msgid "Saved conversations"
+msgstr "Các cuộc hội thoại đã lưu"
+
+msgid "Saved in Superset"
+msgstr "Đã lưu trong Superset"
 
 msgid "Saved to Downloads"
 msgstr "Đã lưu vào Downloads"
@@ -17264,6 +17309,9 @@ msgstr "Thao tác này thay nhãn, lệnh, tham số, cài đặt prompt và res
 msgid "This repository does not allow merging from here."
 msgstr "Repository này không cho phép merge từ đây."
 
+msgid "This saved history changed. Select it again before opening."
+msgstr "Lịch sử đã lưu này đã thay đổi. Hãy chọn lại trước khi mở."
+
 msgid "This screen doesn't exist"
 msgstr "Màn hình này không tồn tại"
 
@@ -18023,6 +18071,9 @@ msgstr "cập nhật tiền tố nhánh"
 
 msgid "Update this host to choose an account for a new terminal."
 msgstr "Cập nhật máy chủ này để chọn tài khoản cho thiết bị đầu cuối mới."
+
+msgid "Update this host to open saved Claude history."
+msgstr "Cập nhật máy chủ này để mở lịch sử Claude đã lưu."
 
 msgid "Updated"
 msgstr "Đã cập nhật"

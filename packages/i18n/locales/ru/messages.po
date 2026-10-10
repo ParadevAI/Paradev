@@ -3089,6 +3089,9 @@ msgstr "Просматривайте и устанавливайте навык�
 msgid "Browse for directory"
 msgstr "Выбрать папку"
 
+msgid "Browse saved history"
+msgstr "Просмотреть сохранённую историю"
+
 msgid "Browse shared themes and future agent configs for Superset."
 msgstr "Смотрите общедоступные темы и будущие конфигурации агентов для Superset."
 
@@ -3353,6 +3356,9 @@ msgstr "Ошибка сертификата"
 
 msgid "Chain of Thought"
 msgstr "Цепочка рассуждений"
+
+msgid "Change account"
+msgstr "Сменить аккаунт"
 
 msgid "Change assignee"
 msgstr "Изменить исполнителя"
@@ -4798,6 +4804,9 @@ msgstr "Не удалось загрузить плагины. Проверьт�
 msgid "Could not load presets from the host"
 msgstr "Не удалось загрузить пресеты с хоста"
 
+msgid "Could not load saved conversations"
+msgstr "Не удалось загрузить сохранённые разговоры"
+
 msgid "Could not load this diff"
 msgstr "Не удалось загрузить этот diff"
 
@@ -4821,6 +4830,9 @@ msgstr "Не удалось открыть ссылку"
 
 msgid "Could not open Photos"
 msgstr "Не удалось открыть «Фото»"
+
+msgid "Could not open saved conversation"
+msgstr "Не удалось открыть сохранённый разговор"
 
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
@@ -8366,6 +8378,9 @@ msgstr "Ещё мне очень нравится, что я могу прямо
 msgid "I can be in a café with my coffee while the work keeps moving forward."
 msgstr "Я могу сидеть в кафе с чашкой кофе, а работа тем временем продолжается."
 
+msgid "I exited this conversation in the original app. No tools or background jobs are still running."
+msgstr "Этот разговор завершён мной в исходном приложении. Инструменты и фоновые задачи больше не выполняются."
+
 msgid "I start my morning walks with an idea, and end with a pull request."
 msgstr "Я начинаю утреннюю прогулку с идеей, а заканчиваю с пул-реквестом."
 
@@ -9545,6 +9560,9 @@ msgstr "Загрузка репозиториев..."
 msgid "Loading review..."
 msgstr "Загрузка ревью..."
 
+msgid "Loading saved conversations…"
+msgstr "Загрузка сохранённых разговоров…"
+
 msgid "Loading terminal scripts..."
 msgstr "Загрузка скриптов терминала..."
 
@@ -10563,6 +10581,9 @@ msgstr "Проверок нет."
 msgid "No Chrome, Brave, Arc, or other Chromium browsers were found."
 msgstr "Chrome, Brave, Arc и другие браузеры на Chromium не найдены."
 
+msgid "No Claude agent is configured on this host."
+msgstr "На этом хосте не настроен агент Claude."
+
 msgid "No Claude or Codex usage found on this machine yet. Join now and you'll appear once you've used an agent."
 msgstr "На этой машине пока нет данных об использовании Claude или Codex. Присоединяйтесь — вы появитесь, как только поработаете с агентом."
 
@@ -10908,6 +10929,9 @@ msgstr "Мне не подходит ни одна вакансия. Стоит 
 
 msgid "No runs yet"
 msgstr "Запусков пока нет"
+
+msgid "No saved Claude conversations were found in this account for the current workspace."
+msgstr "В этом аккаунте не найдены сохранённые разговоры Claude для текущего рабочего пространства."
 
 msgid "No screenshots yet"
 msgstr "Скриншотов пока нет"
@@ -11482,6 +11506,9 @@ msgstr "Открыть палитру команд"
 msgid "Open comment on GitHub"
 msgstr "Открыть комментарий на GitHub"
 
+msgid "Open conversation"
+msgstr "Открыть разговор"
+
 msgid "Open details"
 msgstr "Открыть подробности"
 
@@ -11509,6 +11536,9 @@ msgstr "Открыть шторку"
 msgid "Open existing PR or create a new one on GitHub"
 msgstr "Открыть существующий PR или создать новый на GitHub"
 
+msgid "Open existing terminal"
+msgstr "Открыть существующий терминал"
+
 msgid "open file"
 msgstr "открыть файл"
 
@@ -11529,6 +11559,9 @@ msgstr "Открыть во весь экран"
 
 msgid "Open host"
 msgstr "Открыть хост"
+
+msgid "Open history from this account in the current workspace. After adoption, later opens use its current local history. Background work is not transferred."
+msgstr "Откройте историю этого аккаунта в текущем рабочем пространстве. После импорта при последующих открытиях используется актуальная локальная история. Фоновые задачи не переносятся."
 
 msgid "Open importer"
 msgstr "Открыть импортёр"
@@ -11733,6 +11766,12 @@ msgstr "Открыть недавние"
 
 msgid "Open roles"
 msgstr "Вакансии"
+
+msgid "Open saved Claude conversation"
+msgstr "Открыть сохранённый разговор Claude"
+
+msgid "Open saved Claude conversation…"
+msgstr "Открыть сохранённый разговор Claude…"
 
 msgid "Open session in"
 msgstr "Открыть сессию в"
@@ -14264,6 +14303,12 @@ msgstr "Сохранено"
 #. placeholder {0}: created?.name ?? name.trim()
 msgid "Saved \"{0}\" as an environment"
 msgstr "«{0}» сохранено как окружение"
+
+msgid "Saved conversations"
+msgstr "Сохранённые разговоры"
+
+msgid "Saved in Superset"
+msgstr "Сохранено в Superset"
 
 msgid "Saved to Downloads"
 msgstr "Сохранено в «Загрузки»"
@@ -17264,6 +17309,9 @@ msgstr "Это заменит его название, команду, аргу�
 msgid "This repository does not allow merging from here."
 msgstr "Этот репозиторий не разрешает слияние отсюда."
 
+msgid "This saved history changed. Select it again before opening."
+msgstr "Эта сохранённая история изменилась. Выберите её ещё раз перед открытием."
+
 msgid "This screen doesn't exist"
 msgstr "Такого экрана нет"
 
@@ -18023,6 +18071,9 @@ msgstr "обновить префикс ветки"
 
 msgid "Update this host to choose an account for a new terminal."
 msgstr "Обновите этот хост, чтобы выбрать аккаунт для нового терминала."
+
+msgid "Update this host to open saved Claude history."
+msgstr "Обновите этот хост, чтобы открыть сохранённую историю Claude."
 
 msgid "Updated"
 msgstr "Обновлено"

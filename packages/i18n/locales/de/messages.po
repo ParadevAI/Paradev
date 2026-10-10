@@ -3089,6 +3089,9 @@ msgstr "Von der Community geteilte Skills, MCP-Server und Agenten-Konfiguratione
 msgid "Browse for directory"
 msgstr "Verzeichnis auswählen"
 
+msgid "Browse saved history"
+msgstr "Gespeicherten Verlauf durchsuchen"
+
 msgid "Browse shared themes and future agent configs for Superset."
 msgstr "Durchstöbere geteilte Themes und künftige Agent-Konfigurationen für Superset."
 
@@ -3353,6 +3356,9 @@ msgstr "Zertifikatsfehler"
 
 msgid "Chain of Thought"
 msgstr "Gedankenkette"
+
+msgid "Change account"
+msgstr "Konto wechseln"
 
 msgid "Change assignee"
 msgstr "Zuständigkeit ändern"
@@ -4798,6 +4804,9 @@ msgstr "Plugins konnten nicht geladen werden. Prüfe deine Verbindung und versuc
 msgid "Could not load presets from the host"
 msgstr "Presets konnten nicht vom Host geladen werden"
 
+msgid "Could not load saved conversations"
+msgstr "Gespeicherte Unterhaltungen konnten nicht geladen werden"
+
 msgid "Could not load this diff"
 msgstr "Dieser Diff konnte nicht geladen werden"
 
@@ -4821,6 +4830,9 @@ msgstr "Link konnte nicht geöffnet werden"
 
 msgid "Could not open Photos"
 msgstr "Fotos konnte nicht geöffnet werden"
+
+msgid "Could not open saved conversation"
+msgstr "Gespeicherte Unterhaltung konnte nicht geöffnet werden"
 
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
@@ -8366,6 +8378,9 @@ msgstr "Ich finde es auch toll, direkt von meinem Handy aus eine lokale Worktree
 msgid "I can be in a café with my coffee while the work keeps moving forward."
 msgstr "Ich kann mit meinem Kaffee im Café sitzen, während die Arbeit weitergeht."
 
+msgid "I exited this conversation in the original app. No tools or background jobs are still running."
+msgstr "Ich habe diese Unterhaltung in der ursprünglichen App beendet. Es laufen keine Werkzeuge oder Hintergrundaufgaben mehr."
+
 msgid "I start my morning walks with an idea, and end with a pull request."
 msgstr "Ich beginne meine Morgenspaziergänge mit einer Idee und beende sie mit einem Pull Request."
 
@@ -9545,6 +9560,9 @@ msgstr "Repositories werden geladen..."
 msgid "Loading review..."
 msgstr "Review wird geladen..."
 
+msgid "Loading saved conversations…"
+msgstr "Gespeicherte Unterhaltungen werden geladen…"
+
 msgid "Loading terminal scripts..."
 msgstr "Terminal-Skripte werden geladen..."
 
@@ -10563,6 +10581,9 @@ msgstr "Keine Prüfungen gemeldet."
 msgid "No Chrome, Brave, Arc, or other Chromium browsers were found."
 msgstr "Es wurden keine Chromium-Browser wie Chrome, Brave oder Arc gefunden."
 
+msgid "No Claude agent is configured on this host."
+msgstr "Auf diesem Host ist kein Claude-Agent konfiguriert."
+
 msgid "No Claude or Codex usage found on this machine yet. Join now and you'll appear once you've used an agent."
 msgstr "Auf diesem Rechner wurde noch keine Claude- oder Codex-Nutzung gefunden. Tritt jetzt bei und du erscheinst, sobald du einen Agenten genutzt hast."
 
@@ -10908,6 +10929,9 @@ msgstr "Keine Stelle passt zu mir. Soll ich mich trotzdem melden?"
 
 msgid "No runs yet"
 msgstr "Noch keine Läufe"
+
+msgid "No saved Claude conversations were found in this account for the current workspace."
+msgstr "Für den aktuellen Arbeitsbereich wurden in diesem Konto keine gespeicherten Claude-Unterhaltungen gefunden."
 
 msgid "No screenshots yet"
 msgstr "Noch keine Screenshots"
@@ -11482,6 +11506,9 @@ msgstr "Befehlspalette öffnen"
 msgid "Open comment on GitHub"
 msgstr "Kommentar auf GitHub öffnen"
 
+msgid "Open conversation"
+msgstr "Unterhaltung öffnen"
+
 msgid "Open details"
 msgstr "Details öffnen"
 
@@ -11509,6 +11536,9 @@ msgstr "Drawer öffnen"
 msgid "Open existing PR or create a new one on GitHub"
 msgstr "Vorhandenen PR öffnen oder einen neuen auf GitHub erstellen"
 
+msgid "Open existing terminal"
+msgstr "Vorhandenes Terminal öffnen"
+
 msgid "open file"
 msgstr "Datei öffnen"
 
@@ -11529,6 +11559,9 @@ msgstr "Im Vollbild öffnen"
 
 msgid "Open host"
 msgstr "Host öffnen"
+
+msgid "Open history from this account in the current workspace. After adoption, later opens use its current local history. Background work is not transferred."
+msgstr "Öffne den Verlauf dieses Kontos im aktuellen Arbeitsbereich. Nach der Übernahme wird beim erneuten Öffnen der aktuelle lokale Verlauf verwendet. Hintergrundaufgaben werden nicht übertragen."
 
 msgid "Open importer"
 msgstr "Importer öffnen"
@@ -11733,6 +11766,12 @@ msgstr "Zuletzt geöffnet"
 
 msgid "Open roles"
 msgstr "Offene Stellen"
+
+msgid "Open saved Claude conversation"
+msgstr "Gespeicherte Claude-Unterhaltung öffnen"
+
+msgid "Open saved Claude conversation…"
+msgstr "Gespeicherte Claude-Unterhaltung öffnen…"
 
 msgid "Open session in"
 msgstr "Sitzung öffnen in"
@@ -14264,6 +14303,12 @@ msgstr "Gespeichert"
 #. placeholder {0}: created?.name ?? name.trim()
 msgid "Saved \"{0}\" as an environment"
 msgstr "„{0}“ als Umgebung gespeichert"
+
+msgid "Saved conversations"
+msgstr "Gespeicherte Unterhaltungen"
+
+msgid "Saved in Superset"
+msgstr "In Superset gespeichert"
 
 msgid "Saved to Downloads"
 msgstr "In Downloads gespeichert"
@@ -17264,6 +17309,9 @@ msgstr "Damit werden Bezeichnung, Befehl, Argumente, Prompt- und Resume-Einstell
 msgid "This repository does not allow merging from here."
 msgstr "Dieses Repository erlaubt kein Zusammenführen von hier aus."
 
+msgid "This saved history changed. Select it again before opening."
+msgstr "Dieser gespeicherte Verlauf hat sich geändert. Wähle ihn vor dem Öffnen erneut aus."
+
 msgid "This screen doesn't exist"
 msgstr "Diesen Bildschirm gibt es nicht"
 
@@ -18023,6 +18071,9 @@ msgstr "das Branch-Präfix aktualisieren"
 
 msgid "Update this host to choose an account for a new terminal."
 msgstr "Aktualisiere diesen Host, um ein Konto für ein neues Terminal auszuwählen."
+
+msgid "Update this host to open saved Claude history."
+msgstr "Aktualisiere diesen Host, um gespeicherten Claude-Verlauf zu öffnen."
 
 msgid "Updated"
 msgstr "Aktualisiert"

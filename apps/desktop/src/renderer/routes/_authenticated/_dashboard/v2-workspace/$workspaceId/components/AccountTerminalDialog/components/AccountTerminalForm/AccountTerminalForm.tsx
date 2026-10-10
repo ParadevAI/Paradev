@@ -20,7 +20,7 @@ interface LaunchAccount {
 }
 
 interface AccountTerminalFormProps {
-	mode?: "start" | "resume";
+	mode?: "start" | "resume" | "browse";
 	configs: Array<{ id: string; label: string }>;
 	configId: string;
 	onConfigChange: (id: string) => void;
@@ -95,7 +95,9 @@ export function AccountTerminalForm({
 							cause,
 							mode === "resume"
 								? t({ message: "Could not resume this conversation" })
-								: t({ message: "Could not start agent terminal" }),
+								: mode === "browse"
+									? t({ message: "Could not load saved conversations" })
+									: t({ message: "Could not start agent terminal" }),
 						),
 					);
 				} finally {
@@ -206,6 +208,8 @@ export function AccountTerminalForm({
 						{launching && <Loader2 className="size-4 animate-spin" />}
 						{mode === "resume" ? (
 							<Trans>Resume conversation</Trans>
+						) : mode === "browse" ? (
+							<Trans>Browse saved history</Trans>
 						) : (
 							<Trans>Start terminal</Trans>
 						)}

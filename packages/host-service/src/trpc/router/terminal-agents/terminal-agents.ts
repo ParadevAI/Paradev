@@ -4,8 +4,10 @@ import {
 } from "@superset/shared/agent-catalog";
 import { boundTranscriptText } from "@superset/shared/terminal-session-handoff";
 import { TRPCError } from "@trpc/server";
+import { eq } from "drizzle-orm";
 import { z } from "zod";
 import type { HostDb } from "../../../db";
+import { savedConversations } from "../../../db/schema";
 import type { EventBus } from "../../../events";
 import { reconcileMissingTerminalSessions } from "../../../terminal/reaper/reaper";
 import {
@@ -127,6 +129,16 @@ export async function resumeTerminalAgentSession(
 	input: { workspaceId: string; terminalId: string },
 ): Promise<ResumeResult> {
 	const { workspaceId, terminalId } = input;
+	// Adopted history must use its exact, current local reference. This older
+	// recovery path can start fresh when a transcript is missing.
+	if (
+		deps.db
+			.select({ id: savedConversations.id })
+			.from(savedConversations)
+			.where(eq(savedConversations.terminalId, terminalId))
+			.get()
+	)
+		return { resumed: false };
 	const key = `${workspaceId}::${terminalId}`;
 	const pending = resumeInflight.get(key);
 	if (pending) return pending;

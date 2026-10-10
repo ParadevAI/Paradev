@@ -3089,6 +3089,9 @@ msgstr "커뮤니티가 공유한 스킬, MCP 서버, 에이전트 설정을 둘
 msgid "Browse for directory"
 msgstr "디렉터리 찾아보기"
 
+msgid "Browse saved history"
+msgstr "저장된 기록 찾아보기"
+
 msgid "Browse shared themes and future agent configs for Superset."
 msgstr "Superset에 공유된 테마와 앞으로 추가될 에이전트 설정을 둘러보세요."
 
@@ -3353,6 +3356,9 @@ msgstr "인증서 오류"
 
 msgid "Chain of Thought"
 msgstr "생각의 흐름"
+
+msgid "Change account"
+msgstr "계정 변경"
 
 msgid "Change assignee"
 msgstr "담당자 변경"
@@ -4798,6 +4804,9 @@ msgstr "플러그인을 불러오지 못했습니다. 연결을 확인하고 다
 msgid "Could not load presets from the host"
 msgstr "호스트에서 프리셋을 불러올 수 없습니다"
 
+msgid "Could not load saved conversations"
+msgstr "저장된 대화를 불러오지 못했습니다"
+
 msgid "Could not load this diff"
 msgstr "이 차이를 불러올 수 없습니다"
 
@@ -4821,6 +4830,9 @@ msgstr "링크를 열 수 없습니다"
 
 msgid "Could not open Photos"
 msgstr "사진 앱을 열지 못했습니다"
+
+msgid "Could not open saved conversation"
+msgstr "저장된 대화를 열지 못했습니다"
 
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
@@ -8366,6 +8378,9 @@ msgstr "휴대폰에서 바로 Mac에 로컬 작업 트리 환경을 띄울 수 
 msgid "I can be in a café with my coffee while the work keeps moving forward."
 msgstr "카페에서 커피를 마시는 동안에도 작업은 계속 진행됩니다."
 
+msgid "I exited this conversation in the original app. No tools or background jobs are still running."
+msgstr "원래 앱에서 이 대화를 종료했습니다. 실행 중인 도구나 백그라운드 작업이 없습니다."
+
 msgid "I start my morning walks with an idea, and end with a pull request."
 msgstr "아이디어 하나로 아침 산책을 시작하고, 풀 리퀘스트 하나로 마무리합니다."
 
@@ -9545,6 +9560,9 @@ msgstr "리포지토리를 불러오는 중..."
 msgid "Loading review..."
 msgstr "리뷰를 불러오는 중..."
 
+msgid "Loading saved conversations…"
+msgstr "저장된 대화 불러오는 중…"
+
 msgid "Loading terminal scripts..."
 msgstr "터미널 스크립트를 불러오는 중..."
 
@@ -10563,6 +10581,9 @@ msgstr "보고된 검사가 없습니다."
 msgid "No Chrome, Brave, Arc, or other Chromium browsers were found."
 msgstr "Chrome, Brave, Arc 등 Chromium 기반 브라우저를 찾을 수 없습니다."
 
+msgid "No Claude agent is configured on this host."
+msgstr "이 호스트에 Claude 에이전트가 구성되어 있지 않습니다."
+
 msgid "No Claude or Codex usage found on this machine yet. Join now and you'll appear once you've used an agent."
 msgstr "이 컴퓨터에서 아직 Claude 또는 Codex 사용량을 찾지 못했습니다. 지금 참여하면 에이전트를 사용한 뒤 순위에 표시됩니다."
 
@@ -10908,6 +10929,9 @@ msgstr "맞는 포지션이 없어요. 그래도 연락해도 될까요?"
 
 msgid "No runs yet"
 msgstr "아직 실행 기록이 없습니다"
+
+msgid "No saved Claude conversations were found in this account for the current workspace."
+msgstr "이 계정에서 현재 작업 공간에 해당하는 저장된 Claude 대화를 찾지 못했습니다."
 
 msgid "No screenshots yet"
 msgstr "아직 스크린샷이 없습니다"
@@ -11482,6 +11506,9 @@ msgstr "명령 팔레트 열기"
 msgid "Open comment on GitHub"
 msgstr "GitHub에서 코멘트 열기"
 
+msgid "Open conversation"
+msgstr "대화 열기"
+
 msgid "Open details"
 msgstr "세부 정보 열기"
 
@@ -11509,6 +11536,9 @@ msgstr "드로어 열기"
 msgid "Open existing PR or create a new one on GitHub"
 msgstr "기존 PR을 열거나 GitHub에서 새 PR을 만듭니다"
 
+msgid "Open existing terminal"
+msgstr "기존 터미널 열기"
+
 msgid "open file"
 msgstr "파일 열기"
 
@@ -11529,6 +11559,9 @@ msgstr "전체 화면으로 열기"
 
 msgid "Open host"
 msgstr "호스트 열기"
+
+msgid "Open history from this account in the current workspace. After adoption, later opens use its current local history. Background work is not transferred."
+msgstr "현재 작업 공간에서 이 계정의 기록을 엽니다. 가져온 후에는 다시 열 때 최신 로컬 기록을 사용합니다. 백그라운드 작업은 이전되지 않습니다."
 
 msgid "Open importer"
 msgstr "가져오기 도구 열기"
@@ -11733,6 +11766,12 @@ msgstr "최근 항목 열기"
 
 msgid "Open roles"
 msgstr "채용 공고"
+
+msgid "Open saved Claude conversation"
+msgstr "저장된 Claude 대화 열기"
+
+msgid "Open saved Claude conversation…"
+msgstr "저장된 Claude 대화 열기…"
 
 msgid "Open session in"
 msgstr "세션 열기 위치"
@@ -14264,6 +14303,12 @@ msgstr "저장됨"
 #. placeholder {0}: created?.name ?? name.trim()
 msgid "Saved \"{0}\" as an environment"
 msgstr "\"{0}\"을(를) 환경으로 저장했습니다"
+
+msgid "Saved conversations"
+msgstr "저장된 대화"
+
+msgid "Saved in Superset"
+msgstr "Superset에 저장됨"
 
 msgid "Saved to Downloads"
 msgstr "다운로드 폴더에 저장했습니다"
@@ -17264,6 +17309,9 @@ msgstr "레이블, 명령, 인수, 프롬프트 및 재개 설정, 환경 변수
 msgid "This repository does not allow merging from here."
 msgstr "이 리포지토리는 여기에서 머지하는 것을 허용하지 않습니다."
 
+msgid "This saved history changed. Select it again before opening."
+msgstr "이 저장된 기록이 변경되었습니다. 열기 전에 다시 선택하세요."
+
 msgid "This screen doesn't exist"
 msgstr "이 화면은 존재하지 않습니다"
 
@@ -18023,6 +18071,9 @@ msgstr "브랜치 접두사를 업데이트할"
 
 msgid "Update this host to choose an account for a new terminal."
 msgstr "새 터미널의 계정을 선택하려면 이 호스트를 업데이트하세요."
+
+msgid "Update this host to open saved Claude history."
+msgstr "저장된 Claude 기록을 열려면 이 호스트를 업데이트하세요."
 
 msgid "Updated"
 msgstr "업데이트됨"

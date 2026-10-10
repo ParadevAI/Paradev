@@ -12,6 +12,7 @@ import { HotkeyMenuShortcut } from "renderer/components/HotkeyMenuShortcut";
 interface AddTabMenuProps {
 	onAddTerminal: () => void;
 	onAddAccountTerminal?: () => void;
+	onOpenSavedConversation?: () => void;
 	onAddBrowser: () => void;
 	onAddChanges: () => void;
 	onAddDesktop?: (() => void) | undefined;
@@ -22,6 +23,7 @@ interface AddTabMenuProps {
 export function AddTabMenu({
 	onAddTerminal,
 	onAddAccountTerminal,
+	onOpenSavedConversation,
 	onAddBrowser,
 	onAddChanges,
 	onAddDesktop,
@@ -41,6 +43,12 @@ export function AddTabMenu({
 				<DropdownMenuItem className="gap-2" onClick={onAddAccountTerminal}>
 					<BsTerminalPlus className="size-4" />
 					<Trans>Agent terminal with account…</Trans>
+				</DropdownMenuItem>
+			)}
+			{onOpenSavedConversation && (
+				<DropdownMenuItem className="gap-2" onClick={onOpenSavedConversation}>
+					<BsTerminalPlus className="size-4" />
+					<Trans>Open saved Claude conversation…</Trans>
 				</DropdownMenuItem>
 			)}
 			<DropdownMenuItem className="gap-2" onClick={onAddBrowser}>
