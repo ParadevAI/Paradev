@@ -148,22 +148,53 @@ export const notificationsRouter = router({
 		const preview = trimOrUndefined(input.preview);
 
 		const prior = ctx.terminalAgentStore.get(input.terminalId);
-		const account =
-			verifyAttributionToken(input.terminalId, input.attributionToken) &&
-			eventType === "Attached" &&
-			input.accountProfile !== undefined &&
-			(!prior?.account ||
-				prior.agentId !== agent?.agentId ||
+		const verifiedAttribution = verifyAttributionToken(
+			input.terminalId,
+			input.attributionToken,
+		);
+		if (
+			(prior?.account?.pinned || prior?.accountInvalid) &&
+			!verifiedAttribution &&
+			((agent?.agentId && agent.agentId !== prior.agentId) ||
 				(input.launchId && input.launchId !== prior.launchId) ||
 				(agent?.sessionId &&
 					prior.agentSessionId &&
 					agent.sessionId !== prior.agentSessionId))
-				? await captureSessionAccount(
-						agent?.agentId,
-						input.accountProfile,
-						input.apiKey ?? false,
-					).catch(() => undefined)
-				: undefined;
+		)
+			return { success: true, ignored: true as const };
+		const captureAccount =
+			verifiedAttribution &&
+			eventType === "Attached" &&
+			input.accountProfile !== undefined &&
+			(prior?.account?.pinned ||
+				!prior?.account ||
+				prior.agentId !== agent?.agentId ||
+				(input.launchId && input.launchId !== prior.launchId) ||
+				(agent?.sessionId &&
+					prior.agentSessionId &&
+					agent.sessionId !== prior.agentSessionId));
+		let account = captureAccount
+			? await captureSessionAccount(
+					agent?.agentId,
+					input.accountProfile as string,
+					input.apiKey ?? false,
+				).catch(() => undefined)
+			: undefined;
+		// A same-launch mismatch cannot downgrade a pin to default-account
+		// recovery. Retain the requested identity with a conflict marker instead.
+		// A genuinely new CLI in the shell gets its own unpinned attribution.
+		if (
+			captureAccount &&
+			prior?.account?.pinned &&
+			(!prior.launchId || prior.launchId === input.launchId)
+		) {
+			const matches =
+				account &&
+				prior.account.agent === account.agent &&
+				prior.account.identity === account.identity &&
+				prior.account.directory === account.directory;
+			account = matches ? prior.account : { ...prior.account, conflict: true };
+		}
 		ctx.terminalAgentStore.recordEvent({
 			account,
 			launchId: trimOrUndefined(input.launchId),

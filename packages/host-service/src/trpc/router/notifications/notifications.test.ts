@@ -609,6 +609,71 @@ describe("reported transcript path", () => {
 });
 
 describe("login attribution authentication", () => {
+	it("retains a conflicting explicit pin instead of falling back to the default account", async () => {
+		const { ctx, terminalAgentStore } = createContext("workspace-1");
+		const account = {
+			agent: "claude" as const,
+			selection: "/selected",
+			directory: "/selected",
+			credentialKind: "subscription" as const,
+			identity: "a".repeat(64),
+			pinned: true as const,
+		};
+		terminalAgentStore.recordEvent({
+			terminalId: "terminal-1",
+			workspaceId: "workspace-1",
+			agentId: "claude",
+			account,
+			launchId: "one",
+			eventType: "Attached",
+			occurredAt: 1,
+		});
+		await notificationsRouter.createCaller(ctx).hook({
+			terminalId: "terminal-1",
+			eventType: "SessionStart",
+			agent: { agentId: "claude", sessionId: "native" },
+			launchId: "one",
+			accountProfile: "",
+			apiKey: true,
+			attributionToken: issueAttributionToken("terminal-1"),
+		});
+		expect(terminalAgentStore.get("terminal-1")?.account).toEqual({
+			...account,
+			conflict: true,
+		});
+	});
+
+	it("does not let unauthenticated launch metadata erase an explicit pin", async () => {
+		const { ctx, terminalAgentStore } = createContext("workspace-1");
+		const account = {
+			agent: "claude" as const,
+			selection: "/selected",
+			directory: "/selected",
+			credentialKind: "subscription" as const,
+			identity: "a".repeat(64),
+			pinned: true as const,
+		};
+		terminalAgentStore.recordEvent({
+			terminalId: "terminal-1",
+			workspaceId: "workspace-1",
+			agentId: "claude",
+			agentSessionId: "native",
+			account,
+			launchId: "one",
+			eventType: "Attached",
+			occurredAt: 1,
+		});
+		await notificationsRouter.createCaller(ctx).hook({
+			terminalId: "terminal-1",
+			eventType: "SessionStart",
+			agent: { agentId: "claude", sessionId: "other" },
+			launchId: "other-launch",
+			accountProfile: "",
+			apiKey: true,
+		});
+		expect(terminalAgentStore.get("terminal-1")?.account).toEqual(account);
+		expect(terminalAgentStore.get("terminal-1")?.agentSessionId).toBe("native");
+	});
 	it("publishes launch events after the binding and account are readable", async () => {
 		const { ctx, terminalAgentStore, broadcastAgentLifecycle } =
 			createContext("workspace-1");
