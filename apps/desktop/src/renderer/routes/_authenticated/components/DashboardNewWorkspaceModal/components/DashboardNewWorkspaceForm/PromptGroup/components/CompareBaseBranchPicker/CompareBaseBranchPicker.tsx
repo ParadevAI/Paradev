@@ -33,6 +33,7 @@ interface CompareBaseBranchPickerProps {
 	isBranchesLoading: boolean;
 	isBranchesError: boolean;
 	branchesError: unknown;
+	isBranchesRefetching: boolean;
 	onRetryBranches: () => void;
 	isHostOffline: boolean;
 	branches: BranchRow[];
@@ -59,6 +60,7 @@ export function CompareBaseBranchPicker({
 	isBranchesLoading,
 	isBranchesError,
 	branchesError,
+	isBranchesRefetching,
 	onRetryBranches,
 	isHostOffline,
 	branches,
@@ -114,24 +116,27 @@ export function CompareBaseBranchPicker({
 		);
 	}
 
-	if (isBranchesError) {
-		return (
-			<span className="flex min-w-0 items-center gap-1.5 text-[11px]">
-				<span
-					className="min-w-0 cursor-help truncate text-destructive"
-					title={errorMessage(branchesError)}
-				>
-					<Trans>Failed to load branches</Trans>
-				</span>
-				<button
-					type="button"
-					onClick={onRetryBranches}
-					className="shrink-0 text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
-				>
-					<Trans>Retry</Trans>
-				</button>
+	const branchesFailure = (
+		<span className="flex min-w-0 items-center gap-1.5 text-[11px]">
+			<span
+				className="min-w-0 cursor-help truncate text-destructive"
+				title={errorMessage(branchesError)}
+			>
+				<Trans>Failed to load branches</Trans>
 			</span>
-		);
+			<button
+				type="button"
+				onClick={onRetryBranches}
+				disabled={isBranchesRefetching}
+				className="shrink-0 text-muted-foreground underline-offset-2 hover:text-foreground hover:underline disabled:no-underline disabled:opacity-60"
+			>
+				{isBranchesRefetching ? <Trans>Retrying…</Trans> : <Trans>Retry</Trans>}
+			</button>
+		</span>
+	);
+
+	if (isBranchesError && branches.length === 0) {
+		return branchesFailure;
 	}
 
 	return (
@@ -290,13 +295,17 @@ export function CompareBaseBranchPicker({
 								</CommandItem>
 							);
 						})}
-						{hasNextPage && (
-							<div
-								ref={sentinelRef}
-								className="py-2 text-center text-[11px] text-muted-foreground/60"
-							>
-								{isFetchingNextPage ? <Trans>Loading more...</Trans> : ""}
-							</div>
+						{isBranchesError ? (
+							<div className="flex justify-center py-2">{branchesFailure}</div>
+						) : (
+							hasNextPage && (
+								<div
+									ref={sentinelRef}
+									className="py-2 text-center text-[11px] text-muted-foreground/60"
+								>
+									{isFetchingNextPage ? <Trans>Loading more...</Trans> : ""}
+								</div>
+							)
 						)}
 					</CommandList>
 				</Command>

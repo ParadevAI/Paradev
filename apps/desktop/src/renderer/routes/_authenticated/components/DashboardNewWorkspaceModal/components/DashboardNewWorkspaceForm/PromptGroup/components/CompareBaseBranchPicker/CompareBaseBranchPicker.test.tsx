@@ -4,7 +4,7 @@ import { afterEach, describe, expect, mock, test } from "bun:test";
 	globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
-const { cleanup, fireEvent, render, within } = await import(
+const { act, cleanup, fireEvent, render, within } = await import(
 	"@testing-library/react"
 );
 const { CompareBaseBranchPicker } = await import("./CompareBaseBranchPicker");
@@ -20,6 +20,7 @@ function renderPicker(
 			isBranchesLoading={false}
 			isBranchesError={false}
 			branchesError={null}
+			isBranchesRefetching={false}
 			onRetryBranches={() => {}}
 			isHostOffline={false}
 			branches={[]}
@@ -59,5 +60,38 @@ describe("CompareBaseBranchPicker load failures", () => {
 		).toBe("Project directory is no longer a directory on disk");
 		fireEvent.click(page.getByRole("button", { name: "Retry" }));
 		expect(onRetryBranches).toHaveBeenCalledTimes(1);
+	});
+
+	test("keeps loaded branches usable when a later fetch fails", async () => {
+		const page = renderPicker({
+			effectiveCompareBaseBranch: "main",
+			isBranchesError: true,
+			branches: [
+				{
+					name: "main",
+					lastCommitDate: 0,
+					isLocal: true,
+					isRemote: false,
+					recency: null,
+					worktreePath: null,
+					hasWorkspace: false,
+					isCheckedOut: false,
+				},
+			],
+		});
+		await act(async () => {
+			fireEvent.click(page.getByRole("button", { name: "main" }));
+		});
+		expect(page.getByRole("option", { name: /main/ })).toBeTruthy();
+		expect(page.getByText("Failed to load branches")).toBeTruthy();
+	});
+
+	test("disables Retry while the retry is running", () => {
+		const page = renderPicker({
+			isBranchesError: true,
+			isBranchesRefetching: true,
+		});
+		const retry = page.getByRole("button", { name: "Retrying…" });
+		expect((retry as HTMLButtonElement).disabled).toBe(true);
 	});
 });
