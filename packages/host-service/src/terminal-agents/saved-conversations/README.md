@@ -23,19 +23,31 @@ used. Matching names, folders, timestamps or text never merge conversations.
 
 ## Integration boundary
 
-A future discovery/import service must validate source schema and read consistency,
-canonicalize paths, bind a selected account/store, verify all writers, back up saved
-history, persist a launch claim and confirm the launched native ID through provider
-events. Its reference can populate the existing `HarnessSessionRef` fields
-`agentId`, `sessionId`, `worktreePath` and `reportedPath`; account environment must
-come from the account service, not source metadata. Never use `--continue`, `--last`,
-a title or an app-thread ID as a substitute for an exact native UUID.
+The host's `trpc/router/saved-conversations` service and desktop's **Open saved
+Claude conversation…** action use native validation to discover and adopt Claude
+history in an existing matching workspace. The service binds the selected account
+and canonical store, preserves a private recovery checkpoint and immutable source
+provenance, and records terminal successors. Reopening follows the current local
+history and successor instead of replaying the initial checkpoint.
 
-Original import provenance and confirmed local continuation must be stored
-separately. Reopening a locally continued conversation must validate its current
-local transcript. A changed or missing original archive cannot justify replaying
-that archive over newer local work. An imported catalog row alone does not prove
-local adoption. Those persistence, launch and UI paths are follow-up work.
+Before launch, the service revalidates complete stable history, account identity,
+known writers and its durable launch claim. It uses the exact native UUID with an
+empty prompt. Provider hooks supply later native-session attribution. Detected
+writers are a refusal condition, not a global exclusive-writer guarantee; the UI
+requires the original conversation to be exited. Saved identity validation and
+synthetic tests do not prove authenticated provider replay or background-job
+restoration.
+
+T3 discovery/import, Codex import and terminal-to-ACP conversion remain separate
+work. Their adapters do not authorize a launch. Future consumers must validate
+source schema and read consistency, preserve native lineage and resolve the launch
+environment through the account service. Never use `--continue`, `--last`, a title
+or an app-thread ID as a substitute for an exact native UUID.
+
+Original provenance remains separate from current local continuation. A changed
+or missing original archive cannot justify replacing newer local work. Checkpoints
+remain with adopted records, including after workspace deletion; automatic
+reclamation requires a separate retention policy.
 
 ## Official evidence checked October 9, 2026
 
