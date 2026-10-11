@@ -1,7 +1,7 @@
 "use client";
 
 import { Trans, useLingui } from "@lingui/react/macro";
-import { useFormat } from "@superset/i18n/react";
+import { useFormat } from "@superset/i18n/use-format";
 import { ChevronDownIcon } from "lucide-react";
 import type { ComponentProps, ReactNode } from "react";
 import { createContext, useContext, useEffect, useState } from "react";

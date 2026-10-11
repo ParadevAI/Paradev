@@ -35,6 +35,10 @@
 		"./server": {
 			"types": "./src/server.ts",
 			"default": "./src/server.ts"
+		},
+		"./use-format": {
+			"types": "./src/hooks/useFormat/index.ts",
+			"default": "./src/hooks/useFormat/index.ts"
 		}
 	},
 	"scripts": {
