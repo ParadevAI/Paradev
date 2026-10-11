@@ -141,16 +141,18 @@ export function V1TerminalsNotice({
 				const paneIds = await source.listMigratedPaneIds(organizationId);
 				if (cancelled || paneIds.length === 0) return;
 				writeNoticeState(organizationId, "pending");
-				const sessions = await source
-					.readAgentSessions(paneIds)
-					.catch(() => ({}));
+				// Same rule as the resume path: a failed read waits for the next launch.
+				const sessions = await source.readAgentSessions(paneIds);
 				if (cancelled) return;
 				setNotice({
 					organizationId,
 					resumedAgentLabels: listResumedAgentLabels(sessions),
 				});
 			} catch (err) {
-				console.warn("[v1-terminals-notice] ledger read failed", err);
+				console.warn(
+					"[v1-terminals-notice] migrated terminals read failed",
+					err,
+				);
 			}
 		})();
 		return () => {

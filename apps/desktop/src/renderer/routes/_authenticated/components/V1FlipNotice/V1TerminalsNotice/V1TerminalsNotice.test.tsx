@@ -138,4 +138,18 @@ describe("V1TerminalsNotice", () => {
 		const again = await renderNotice(source());
 		expect(again.container.innerHTML).toBe("");
 	});
+
+	test("a failed session read waits for the next launch instead of a generic notice", async () => {
+		const failing: Source = {
+			listMigratedPaneIds: async () => ["pane-1"],
+			readAgentSessions: () => Promise.reject(new Error("main busy")),
+		};
+		const view = await renderNotice(failing);
+		settlePass();
+		await act(async () => {});
+		expect(view.container.innerHTML).toBe("");
+		expect(
+			localStorage.getItem(`v1-terminals-notice-${activeOrganizationId}`),
+		).toBe("pending");
+	});
 });
