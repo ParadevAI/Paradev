@@ -11,6 +11,8 @@ import {
 	ContextMenuTrigger,
 } from "@superset/ui/context-menu";
 import { useRunAfterMenuClose } from "@superset/ui/hooks/use-run-after-menu-close";
+import { type KeyboardEvent, useMemo } from "react";
+import { HiOutlineClipboardDocumentList } from "react-icons/hi2";
 import {
 	LuArchive,
 	LuArrowRightLeft,
@@ -32,11 +34,18 @@ import {
 	LuX,
 } from "react-icons/lu";
 import { useHotkeyDisplay } from "renderer/hotkeys";
+import type { CloudTask } from "renderer/routes/_authenticated/_dashboard/components/CloudTaskRow";
 import { parseSidebarFolderKey } from "renderer/routes/_authenticated/utils/workspaceTagFolders";
 import { useDashboardSidebarPortKill } from "../../../../hooks/useDashboardSidebarPortKill";
 import { useProjectTagFolderSections } from "../../../../hooks/useProjectTagFolderSections";
 import { useDashboardSidebarHoverActions } from "../../../../providers/DashboardSidebarHoverProvider";
 import { useDashboardSidebarWorkspacePorts } from "../../../../providers/DashboardSidebarPortsProvider";
+import { LinkTaskCommand } from "../../../LinkTaskCommand";
+
+/** The menu's typeahead and arrow keys would otherwise steal keystrokes from a submenu's search field. */
+function keepKeysInSearch(event: KeyboardEvent) {
+	if (event.key !== "Escape") event.stopPropagation();
+}
 
 interface DashboardSidebarWorkspaceContextMenuProps {
 	workspaceId: string;
@@ -56,6 +65,7 @@ interface DashboardSidebarWorkspaceContextMenuProps {
 	isUnread: boolean;
 	hasStatus: boolean;
 	hasPullRequest: boolean;
+	taskId: string | null;
 	showDeleteHotkey?: boolean;
 	onTogglePin: () => void;
 	onCreateSection: () => void;
@@ -71,6 +81,7 @@ interface DashboardSidebarWorkspaceContextMenuProps {
 	onToggleUnread: () => void;
 	onClearStatus: () => void;
 	onRemovePullRequest: () => void;
+	onToggleTask: (task: CloudTask, isLinked: boolean) => void;
 	children: React.ReactNode;
 }
 
@@ -85,6 +96,7 @@ export function DashboardSidebarWorkspaceContextMenu({
 	isUnread,
 	hasStatus,
 	hasPullRequest,
+	taskId,
 	showDeleteHotkey = false,
 	onTogglePin,
 	onCreateSection,
@@ -99,6 +111,7 @@ export function DashboardSidebarWorkspaceContextMenu({
 	onToggleUnread,
 	onClearStatus,
 	onRemovePullRequest,
+	onToggleTask,
 	children,
 }: DashboardSidebarWorkspaceContextMenuProps) {
 	const { runAfterClose, onCloseAutoFocus } = useRunAfterMenuClose();
@@ -121,6 +134,10 @@ export function DashboardSidebarWorkspaceContextMenu({
 		: allSections;
 	const canCreateGroup = !isCloudWorkspace;
 	const canJoinGroup = projectId !== null || isSessionWorkspace;
+	const linkedTaskIds = useMemo(
+		() => new Set(taskId ? [taskId] : []),
+		[taskId],
+	);
 	const handleCloseAllPorts = () => {
 		if (isKillingPorts) return;
 		void killPorts(ports);
@@ -196,6 +213,21 @@ export function DashboardSidebarWorkspaceContextMenu({
 						<LuUnlink className="size-4 mr-2" />
 						<Trans>Remove PR Link</Trans>
 					</ContextMenuItem>
+				)}
+				{!isCloudWorkspace && (
+					<ContextMenuSub>
+						<ContextMenuSubTrigger>
+							<HiOutlineClipboardDocumentList className="size-4 mr-2" />
+							<Trans>Link task</Trans>
+						</ContextMenuSubTrigger>
+						<ContextMenuSubContent className="w-80 p-0">
+							<LinkTaskCommand
+								linkedTaskIds={linkedTaskIds}
+								onToggle={onToggleTask}
+								onKeyDown={keepKeysInSearch}
+							/>
+						</ContextMenuSubContent>
+					</ContextMenuSub>
 				)}
 				{/* Group actions mutate placement (sectionId/tabOrder), which a pinned
 				    row doesn't display — the change would only surface on unpin. */}
