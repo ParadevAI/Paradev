@@ -29,6 +29,7 @@ import {
 	HistoryIcon,
 	PaperclipIcon,
 	Settings2Icon,
+	XIcon,
 } from "lucide-react";
 import {
 	type DragEvent as ReactDragEvent,
@@ -117,6 +118,7 @@ import { PROMPT_PLACEHOLDERS } from "./components/SamplePrompts/constants";
 import { SupersetIcon } from "./components/SupersetIcon";
 import { useProjectPreselection } from "./hooks/useProjectPreselection";
 import { useSamplePromptSelection } from "./hooks/useSamplePromptSelection";
+import { isCloseShortcut } from "./utils/isCloseShortcut";
 
 /** Nested prefixes of one fixed pool — only the form factor varies by arm. */
 const PROMPT_COUNTS: Record<PromptCardsVariant, number> = {
@@ -138,6 +140,7 @@ interface NewWorkspaceScreenProps {
 	preSelectedSession?: boolean;
 	/** Open targeting this host instead of the remembered one. */
 	preSelectedHostId?: string | null;
+	onClose?: () => void;
 }
 
 /**
@@ -149,6 +152,7 @@ export function NewWorkspaceScreen({
 	preSelectedProjectId,
 	preSelectedSession = false,
 	preSelectedHostId = null,
+	onClose,
 }: NewWorkspaceScreenProps) {
 	const { t } = useLingui();
 	const navigate = useNavigate();
@@ -700,6 +704,17 @@ export function NewWorkspaceScreen({
 		return () => window.removeEventListener("keydown", handler);
 	}, [isOpen, handleSubmit]);
 
+	useEffect(() => {
+		if (!isOpen || !onClose) return;
+		const handler = (e: KeyboardEvent) => {
+			if (!isCloseShortcut(e)) return;
+			e.preventDefault();
+			onClose();
+		};
+		window.addEventListener("keydown", handler);
+		return () => window.removeEventListener("keydown", handler);
+	}, [isOpen, onClose]);
+
 	// ── Render ───────────────────────────────────────────────────────
 	return (
 		// biome-ignore lint/a11y/noStaticElementInteractions: drag-and-drop target; keyboard users attach via the composer's file picker
@@ -769,6 +784,25 @@ export function NewWorkspaceScreen({
 								<HistoryIcon className="size-4" />
 							</Button>
 						</PromptHistoryCommand>
+						{onClose && (
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<Button
+										type="button"
+										variant="ghost"
+										size="icon"
+										aria-label={t({ message: "Close" })}
+										className="size-7 text-muted-foreground"
+										onClick={onClose}
+									>
+										<XIcon className="size-4" />
+									</Button>
+								</TooltipTrigger>
+								<TooltipContent>
+									<Trans>Close</Trans>
+								</TooltipContent>
+							</Tooltip>
+						)}
 					</div>
 				}
 			/>

@@ -1,0 +1,1 @@
+export { isCloseShortcut } from "./isCloseShortcut";

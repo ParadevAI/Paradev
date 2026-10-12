@@ -166,6 +166,9 @@ export function V2ScriptsEditor({
 		}) => getHostServiceClientByUrl(hostUrl).config.updateConfig.mutate(input),
 		onSuccess: () => {
 			void queryClient.invalidateQueries({ queryKey: configQueryKey });
+			void queryClient.invalidateQueries({
+				queryKey: ["host-config", "shouldShowSetupCard", hostUrl, projectId],
+			});
 		},
 	});
 
@@ -279,7 +282,11 @@ export function V2ScriptsEditor({
 
 	if (isLoading) {
 		return (
-			<div className={cn("space-y-3", className)} aria-busy="true">
+			<div
+				id="project-scripts"
+				className={cn("space-y-3", className)}
+				aria-busy="true"
+			>
 				<div className="flex h-9 items-center gap-5 border-b border-border px-2">
 					<Skeleton className="h-3 w-10" />
 					<Skeleton className="h-3 w-14" />
@@ -291,7 +298,7 @@ export function V2ScriptsEditor({
 	}
 
 	return (
-		<div className={cn("space-y-3", className)}>
+		<div id="project-scripts" className={cn("space-y-3", className)}>
 			<Tabs defaultValue="setup">
 				<div className="flex items-center justify-between gap-2 border-b border-border">
 					<TabsList className="h-auto gap-0 rounded-none bg-transparent p-0">
