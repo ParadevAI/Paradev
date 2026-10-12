@@ -690,6 +690,9 @@ msgstr "{actor} melepas tautan workspace {workspace}"
 msgid "{actual} so far · ~{projected} projected"
 msgstr "{actual} sejauh ini · ~{projected} diperkirakan"
 
+msgid "{agents} sessions resume when you open their workspace."
+msgstr "Sesi {agents} dilanjutkan saat Anda membuka workspace-nya."
+
 msgid "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 msgstr "{behindCount, plural, one {Tertinggal # commit dari main, perlu rebase} other {Tertinggal # commit dari main, perlu rebase}}"
 
@@ -16022,9 +16025,6 @@ msgstr "Superset menaruh skill dan tool plugin di tempat agen-agen ini mencariny
 msgid "Superset raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "Superset meraih pendanaan seed sebesar 11,5 juta dolar AS yang dipimpin oleh Union Square Ventures, bersama Y Combinator dan Paul Graham. TechCrunch menyebutnya sebagai salah satu startup unggulan dari YC Demo Day."
 
-msgid "Superset resumes the agent sessions it recorded ({agents}) when you open their workspace."
-msgstr "Superset melanjutkan sesi agen yang tercatat ({agents}) saat Anda membuka workspace-nya."
-
 msgid "Superset runs locally on your developers' machines. We don't store your code or AI conversations, and Superset has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at trust.superset.sh."
 msgstr "Superset berjalan lokal di mesin developer Anda. Kami tidak menyimpan kode atau percakapan AI Anda, dan Superset telah menyelesaikan audit SOC 2 Type II dengan auditor independen. Minta laporannya dan tinjau dokumentasi keamanan kami di trust.superset.sh."
 
@@ -16434,9 +16434,6 @@ msgstr "Terminal tidak merespons"
 
 msgid "Terminals restarted"
 msgstr "Terminal dimulai ulang"
-
-msgid "Terminals that were running in the previous version of Superset did not carry over. Each workspace now has new terminals that open in the same folders."
-msgstr "Terminal yang berjalan di versi Superset sebelumnya tidak ikut dipindahkan. Setiap workspace kini memiliki terminal baru yang terbuka di folder yang sama."
 
 msgid "Terms"
 msgstr "Ketentuan"
@@ -17144,6 +17141,9 @@ msgstr "Thread ini tidak punya komentar untuk dibalas."
 msgid "This thread is not open to agents. A person has to comment on it before an agent can reply."
 msgstr "Thread ini belum diserahkan ke agen. Seseorang harus menyerahkannya dari halaman itu dulu."
 
+msgid "This update restarted your terminals once. New ones open in the same folders."
+msgstr "Pembaruan ini memulai ulang terminal Anda satu kali saja. Terminal baru terbuka di folder yang sama."
+
 msgid "This user runs the host service for this device and can't be removed."
 msgstr "Pengguna ini menjalankan layanan host untuk perangkat ini dan tidak bisa dihapus."
 
@@ -17253,11 +17253,11 @@ msgstr "Judul"
 msgid "To"
 msgstr "Ke"
 
-msgid "To get back a different agent conversation, run this in a terminal in its folder:"
-msgstr "Untuk mendapatkan kembali percakapan agen lain, jalankan ini di terminal di foldernya:"
+msgid "To resume an agent conversation, run this in its folder:"
+msgstr "Untuk melanjutkan percakapan agen, jalankan ini di foldernya:"
 
-msgid "To get back an agent conversation, run this in a terminal in its folder:"
-msgstr "Untuk mendapatkan kembali percakapan agen, jalankan ini di terminal di foldernya:"
+msgid "To resume another agent conversation, run this in its folder:"
+msgstr "Untuk melanjutkan percakapan agen lain, jalankan ini di foldernya:"
 
 msgid "Toast (Sonner)"
 msgstr "Toast (Sonner)"

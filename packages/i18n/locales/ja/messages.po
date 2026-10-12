@@ -690,6 +690,9 @@ msgstr "{actor}がワークスペース {workspace} のリンクを解除しま�
 msgid "{actual} so far · ~{projected} projected"
 msgstr "現時点で{actual} · 予測は約{projected}"
 
+msgid "{agents} sessions resume when you open their workspace."
+msgstr "{agents} のセッションは、そのワークスペースを開くと再開されます。"
+
 msgid "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 msgstr "{behindCount, plural, one {mainより#コミット遅れています。リベースが必要です} other {mainより#コミット遅れています。リベースが必要です}}"
 
@@ -16022,9 +16025,6 @@ msgstr "Supersetは、これらのエージェントが参照する場所にプ�
 msgid "Superset raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "Superset は、Union Square Ventures がリードし、Y Combinator と Paul Graham が参加した 1,150 万ドルのシードラウンドを調達しました。TechCrunch は Superset を YC Demo Day の注目スタートアップの 1 社に選びました。"
 
-msgid "Superset resumes the agent sessions it recorded ({agents}) when you open their workspace."
-msgstr "Superset は記録したエージェントセッション({agents})を、そのワークスペースを開いたときに再開します。"
-
 msgid "Superset runs locally on your developers' machines. We don't store your code or AI conversations, and Superset has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at trust.superset.sh."
 msgstr "Supersetは開発者のマシン上でローカルに動作します。コードやAIとの会話を当社が保存することはありません。また、Supersetは独立監査人によるSOC 2 Type II監査を完了しています。レポートのご請求やセキュリティ関連ドキュメントの確認はtrust.superset.shから行えます。"
 
@@ -16434,9 +16434,6 @@ msgstr "ターミナルが応答していません"
 
 msgid "Terminals restarted"
 msgstr "ターミナルを再起動しました"
-
-msgid "Terminals that were running in the previous version of Superset did not carry over. Each workspace now has new terminals that open in the same folders."
-msgstr "以前のバージョンの Superset で実行中だったターミナルは移行されませんでした。各ワークスペースには、同じフォルダで開く新しいターミナルがあります。"
 
 msgid "Terms"
 msgstr "利用規約"
@@ -17144,6 +17141,9 @@ msgstr "このスレッドには返信できるコメントがありません。
 msgid "This thread is not open to agents. A person has to comment on it before an agent can reply."
 msgstr "このスレッドはエージェントに公開されていません。エージェントが返信するには、まず人がコメントする必要があります。"
 
+msgid "This update restarted your terminals once. New ones open in the same folders."
+msgstr "このアップデートでターミナルが一度だけ再起動しました。新しいターミナルは同じフォルダで開きます。"
+
 msgid "This user runs the host service for this device and can't be removed."
 msgstr "このユーザーはこのデバイスのホストサービスを実行しているため、削除できません。"
 
@@ -17253,11 +17253,11 @@ msgstr "タイトル"
 msgid "To"
 msgstr "移動先"
 
-msgid "To get back a different agent conversation, run this in a terminal in its folder:"
-msgstr "別のエージェントとの会話を取り戻すには、そのフォルダのターミナルで次を実行してください:"
+msgid "To resume an agent conversation, run this in its folder:"
+msgstr "エージェントとの会話を再開するには、そのフォルダで次を実行します:"
 
-msgid "To get back an agent conversation, run this in a terminal in its folder:"
-msgstr "エージェントとの会話を取り戻すには、そのフォルダのターミナルで次を実行してください:"
+msgid "To resume another agent conversation, run this in its folder:"
+msgstr "別のエージェントとの会話を再開するには、そのフォルダで次を実行します:"
 
 msgid "Toast (Sonner)"
 msgstr "Toast (Sonner)"

@@ -206,13 +206,13 @@ export function V1TerminalsNotice({
 		translate(
 			msg({
 				message:
-					"Terminals that were running in the previous version of Superset did not carry over. Each workspace now has new terminals that open in the same folders.",
+					"This update restarted your terminals once. New ones open in the same folders.",
 			}),
 		),
 		notice.resumedAgentLabels.length > 0
 			? translate(
 					msg({
-						message: `Superset resumes the agent sessions it recorded (${agents}) when you open their workspace.`,
+						message: `${agents} sessions resume when you open their workspace.`,
 					}),
 				)
 			: null,
@@ -233,13 +233,13 @@ export function V1TerminalsNotice({
 						? translate(
 								msg({
 									message:
-										"To get back a different agent conversation, run this in a terminal in its folder:",
+										"To resume another agent conversation, run this in its folder:",
 								}),
 							)
 						: translate(
 								msg({
 									message:
-										"To get back an agent conversation, run this in a terminal in its folder:",
+										"To resume an agent conversation, run this in its folder:",
 								}),
 							)}
 				</p>

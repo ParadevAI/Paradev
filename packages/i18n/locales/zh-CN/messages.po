@@ -690,6 +690,9 @@ msgstr "{actor} 取消关联工作区 {workspace}"
 msgid "{actual} so far · ~{projected} projected"
 msgstr "目前{actual} · 预计约{projected}"
 
+msgid "{agents} sessions resume when you open their workspace."
+msgstr "打开对应工作区时，{agents} 会话会恢复。"
+
 msgid "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 msgstr "{behindCount, plural, one {落后main #个提交，需要变基} other {落后main #个提交，需要变基}}"
 
@@ -16022,9 +16025,6 @@ msgstr "Superset 会把插件的技能和工具放到这些智能体会查找的
 msgid "Superset raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "Superset 完成了 1150 万美元的种子轮融资，由 Union Square Ventures 领投，Y Combinator 和 Paul Graham 参投。TechCrunch 将其评为 YC Demo Day 的杰出初创公司之一。"
 
-msgid "Superset resumes the agent sessions it recorded ({agents}) when you open their workspace."
-msgstr "Superset 会在你打开对应工作区时恢复它记录的智能体会话（{agents}）。"
-
 msgid "Superset runs locally on your developers' machines. We don't store your code or AI conversations, and Superset has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at trust.superset.sh."
 msgstr "Superset在你的开发者机器上本地运行。我们不存储你的代码或AI对话，并且Superset已通过独立审计机构的SOC 2 Type II审计。可在trust.superset.sh索取报告并查阅我们的安全文档。"
 
@@ -16434,9 +16434,6 @@ msgstr "终端没有响应"
 
 msgid "Terminals restarted"
 msgstr "终端已重启"
-
-msgid "Terminals that were running in the previous version of Superset did not carry over. Each workspace now has new terminals that open in the same folders."
-msgstr "上一版本 Superset 中正在运行的终端没有迁移过来。每个工作区现在都有在相同文件夹中打开的新终端。"
 
 msgid "Terms"
 msgstr "条款"
@@ -17144,6 +17141,9 @@ msgstr "这个讨论里没有可回复的评论。"
 msgid "This thread is not open to agents. A person has to comment on it before an agent can reply."
 msgstr "此讨论串尚未对智能体开放。需要先有人评论，智能体才能回复。"
 
+msgid "This update restarted your terminals once. New ones open in the same folders."
+msgstr "此次更新仅重启了一次你的终端。新终端会在相同文件夹中打开。"
+
 msgid "This user runs the host service for this device and can't be removed."
 msgstr "此用户在此设备上运行主机服务，无法被移除。"
 
@@ -17253,11 +17253,11 @@ msgstr "标题"
 msgid "To"
 msgstr "到"
 
-msgid "To get back a different agent conversation, run this in a terminal in its folder:"
-msgstr "要找回另一个智能体对话，请在其文件夹的终端中运行："
+msgid "To resume an agent conversation, run this in its folder:"
+msgstr "要恢复与智能体的对话，请在其文件夹中运行："
 
-msgid "To get back an agent conversation, run this in a terminal in its folder:"
-msgstr "要找回智能体对话，请在其文件夹的终端中运行："
+msgid "To resume another agent conversation, run this in its folder:"
+msgstr "要恢复其他与智能体的对话，请在其文件夹中运行："
 
 msgid "Toast (Sonner)"
 msgstr "Toast（Sonner）"

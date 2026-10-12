@@ -72,7 +72,7 @@ describe("V1TerminalsNotice", () => {
 		await act(async () => {});
 		expect(view.container.textContent).toContain("Your terminals restarted");
 		expect(view.container.textContent).toContain("claude --resume");
-		expect(view.container.textContent).not.toContain("Superset resumes");
+		expect(view.container.textContent).not.toContain("sessions resume");
 	});
 
 	test("names the agents whose recorded sessions resume", async () => {
@@ -96,7 +96,7 @@ describe("V1TerminalsNotice", () => {
 		settlePass();
 		await act(async () => {});
 		const text = view.container.textContent ?? "";
-		expect(text).toContain("Superset resumes the agent sessions it recorded");
+		expect(text).toContain("sessions resume when you open their workspace");
 		expect(text).toContain("Claude");
 		expect(text).not.toContain("Codex");
 	});

@@ -690,6 +690,9 @@ msgstr "{actor} desvinculou o espaço de trabalho {workspace}"
 msgid "{actual} so far · ~{projected} projected"
 msgstr "{actual} até agora · ~{projected} projetadas"
 
+msgid "{agents} sessions resume when you open their workspace."
+msgstr "As sessões de {agents} são retomadas quando você abre o workspace delas."
+
 msgid "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 msgstr "{behindCount, plural, one {# commit atrás da main, precisa de rebase} other {# commits atrás da main, precisa de rebase}}"
 
@@ -16022,9 +16025,6 @@ msgstr "O Superset coloca as skills e as ferramentas dos plugins onde esses agen
 msgid "Superset raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "O Superset captou uma rodada seed de US$ 11,5 milhões liderada pela Union Square Ventures, com Y Combinator e Paul Graham. O TechCrunch o apontou como uma das startups de destaque do YC Demo Day."
 
-msgid "Superset resumes the agent sessions it recorded ({agents}) when you open their workspace."
-msgstr "O Superset retoma as sessões de agente que registrou ({agents}) quando você abrir o workspace delas."
-
 msgid "Superset runs locally on your developers' machines. We don't store your code or AI conversations, and Superset has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at trust.superset.sh."
 msgstr "O Superset roda localmente nas máquinas do seu time. Não guardamos seu código nem suas conversas com a IA, e o Superset concluiu uma auditoria SOC 2 Tipo II com um auditor independente. Solicite o relatório e veja nossa documentação de segurança em trust.superset.sh."
 
@@ -16434,9 +16434,6 @@ msgstr "Os terminais não estão respondendo"
 
 msgid "Terminals restarted"
 msgstr "Terminais reiniciados"
-
-msgid "Terminals that were running in the previous version of Superset did not carry over. Each workspace now has new terminals that open in the same folders."
-msgstr "Os terminais que estavam em execução na versão anterior do Superset não foram trazidos. Cada workspace agora tem terminais novos que abrem nas mesmas pastas."
 
 msgid "Terms"
 msgstr "Termos"
@@ -17144,6 +17141,9 @@ msgstr "Esta thread não tem comentário para responder."
 msgid "This thread is not open to agents. A person has to comment on it before an agent can reply."
 msgstr "Esta thread não foi passada para um agente. Alguém precisa repassá-la pela página primeiro."
 
+msgid "This update restarted your terminals once. New ones open in the same folders."
+msgstr "Esta atualização reiniciou seus terminais uma única vez. Os novos abrem nas mesmas pastas."
+
 msgid "This user runs the host service for this device and can't be removed."
 msgstr "Este usuário roda o serviço de host deste dispositivo e não pode ser removido."
 
@@ -17253,11 +17253,11 @@ msgstr "Título"
 msgid "To"
 msgstr "Para"
 
-msgid "To get back a different agent conversation, run this in a terminal in its folder:"
-msgstr "Para recuperar outra conversa de agente, rode isto em um terminal na pasta dela:"
+msgid "To resume an agent conversation, run this in its folder:"
+msgstr "Para retomar uma conversa com um agente, execute isto na pasta dela:"
 
-msgid "To get back an agent conversation, run this in a terminal in its folder:"
-msgstr "Para recuperar uma conversa de agente, rode isto em um terminal na pasta dela:"
+msgid "To resume another agent conversation, run this in its folder:"
+msgstr "Para retomar outra conversa com um agente, execute isto na pasta dela:"
 
 msgid "Toast (Sonner)"
 msgstr "Toast (Sonner)"

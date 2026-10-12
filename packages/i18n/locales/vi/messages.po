@@ -690,6 +690,9 @@ msgstr "{actor} đã hủy liên kết không gian làm việc {workspace}"
 msgid "{actual} so far · ~{projected} projected"
 msgstr "{actual} đến hiện tại · dự kiến ~{projected}"
 
+msgid "{agents} sessions resume when you open their workspace."
+msgstr "Các phiên {agents} sẽ tiếp tục khi bạn mở workspace của chúng."
+
 msgid "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 msgstr "{behindCount, plural, one {Chậm hơn main # commit, cần rebase} other {Chậm hơn main # commit, cần rebase}}"
 
@@ -16022,9 +16025,6 @@ msgstr "Superset đặt skill và công cụ của plugin ở nơi các agent n�
 msgid "Superset raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "Superset đã gọi được vòng hạt giống 11,5 triệu USD do Union Square Ventures dẫn dắt, cùng Y Combinator và Paul Graham. TechCrunch đã chọn Superset là một trong những startup nổi bật tại YC Demo Day."
 
-msgid "Superset resumes the agent sessions it recorded ({agents}) when you open their workspace."
-msgstr "Superset sẽ tiếp tục các phiên agent đã ghi lại ({agents}) khi bạn mở workspace của chúng."
-
 msgid "Superset runs locally on your developers' machines. We don't store your code or AI conversations, and Superset has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at trust.superset.sh."
 msgstr "Superset chạy cục bộ trên máy của lập trình viên. Chúng tôi không lưu code hay hội thoại AI của bạn, và Superset đã hoàn tất kiểm toán SOC 2 Type II với một đơn vị kiểm toán độc lập. Hãy yêu cầu báo cáo và xem tài liệu bảo mật tại trust.superset.sh."
 
@@ -16434,9 +16434,6 @@ msgstr "Terminal không phản hồi"
 
 msgid "Terminals restarted"
 msgstr "Đã khởi động lại terminal"
-
-msgid "Terminals that were running in the previous version of Superset did not carry over. Each workspace now has new terminals that open in the same folders."
-msgstr "Các terminal đang chạy trong phiên bản Superset trước không được chuyển sang. Mỗi workspace giờ có terminal mới mở trong cùng các thư mục."
 
 msgid "Terms"
 msgstr "Điều khoản"
@@ -17144,6 +17141,9 @@ msgstr "Luồng này không có bình luận nào để trả lời."
 msgid "This thread is not open to agents. A person has to comment on it before an agent can reply."
 msgstr "Luồng này chưa được chuyển cho agent. Ai đó phải chuyển nó từ trang trước."
 
+msgid "This update restarted your terminals once. New ones open in the same folders."
+msgstr "Bản cập nhật này đã khởi động lại terminal của bạn một lần duy nhất. Terminal mới mở trong cùng các thư mục."
+
 msgid "This user runs the host service for this device and can't be removed."
 msgstr "Người dùng này đang chạy dịch vụ host cho thiết bị này nên không thể gỡ."
 
@@ -17253,11 +17253,11 @@ msgstr "Tiêu đề"
 msgid "To"
 msgstr "Đến"
 
-msgid "To get back a different agent conversation, run this in a terminal in its folder:"
-msgstr "Để lấy lại một cuộc trò chuyện agent khác, hãy chạy lệnh này trong terminal ở thư mục của nó:"
+msgid "To resume an agent conversation, run this in its folder:"
+msgstr "Để tiếp tục một cuộc trò chuyện với agent, hãy chạy lệnh này trong thư mục của nó:"
 
-msgid "To get back an agent conversation, run this in a terminal in its folder:"
-msgstr "Để lấy lại cuộc trò chuyện agent, hãy chạy lệnh này trong terminal ở thư mục của nó:"
+msgid "To resume another agent conversation, run this in its folder:"
+msgstr "Để tiếp tục một cuộc trò chuyện khác với agent, hãy chạy lệnh này trong thư mục của nó:"
 
 msgid "Toast (Sonner)"
 msgstr "Toast (Sonner)"

@@ -690,6 +690,9 @@ msgstr "{actor} zrušil(a) propojení pracovního prostoru {workspace}"
 msgid "{actual} so far · ~{projected} projected"
 msgstr "zatím {actual} · odhad ~{projected}"
 
+msgid "{agents} sessions resume when you open their workspace."
+msgstr "Relace {agents} se obnoví, když otevřete jejich pracovní prostor."
+
 msgid "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 msgstr "{behindCount, plural, one {Zaostává za main o # commit, je potřeba rebase} few {Zaostává za main o # commity, je potřeba rebase} many {Zaostává za main o # commitu, je potřeba rebase} other {Zaostává za main o # commitů, je potřeba rebase}}"
 
@@ -16022,9 +16025,6 @@ msgstr "Superset umístí skills a nástroje pluginů tam, kde je tito agenti hl
 msgid "Superset raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "Superset získal 11,5 milionu dolarů v seed kole, které vedl fond Union Square Ventures za účasti Y Combinatoru a Paula Grahama. TechCrunch ho zařadil mezi nejvýraznější startupy YC Demo Day."
 
-msgid "Superset resumes the agent sessions it recorded ({agents}) when you open their workspace."
-msgstr "Superset obnoví zaznamenané relace agentů ({agents}), když otevřete jejich pracovní prostor."
-
 msgid "Superset runs locally on your developers' machines. We don't store your code or AI conversations, and Superset has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at trust.superset.sh."
 msgstr "Superset běží lokálně na počítačích vašich vývojářů. Neukládáme váš kód ani konverzace s AI a Superset prošel auditem SOC 2 Type II u nezávislého auditora. Vyžádejte si zprávu a projděte si dokumentaci k bezpečnosti na trust.superset.sh."
 
@@ -16434,9 +16434,6 @@ msgstr "Terminály neodpovídají"
 
 msgid "Terminals restarted"
 msgstr "Terminály restartovány"
-
-msgid "Terminals that were running in the previous version of Superset did not carry over. Each workspace now has new terminals that open in the same folders."
-msgstr "Terminály, které běžely v předchozí verzi Superset, se nepřenesly. Každý pracovní prostor má nyní nové terminály, které se otevírají ve stejných složkách."
 
 msgid "Terms"
 msgstr "Podmínky"
@@ -17144,6 +17141,9 @@ msgstr "V tomto vlákně není komentář, na který by šlo odpovědět."
 msgid "This thread is not open to agents. A person has to comment on it before an agent can reply."
 msgstr "Toto vlákno nebylo předáno agentovi. Nejprve ho někdo musí ze stránky předat."
 
+msgid "This update restarted your terminals once. New ones open in the same folders."
+msgstr "Tato aktualizace jednorázově restartovala vaše terminály. Nové se otevírají ve stejných složkách."
+
 msgid "This user runs the host service for this device and can't be removed."
 msgstr "Tento uživatel provozuje host service pro toto zařízení a nelze ho odebrat."
 
@@ -17253,11 +17253,11 @@ msgstr "Název"
 msgid "To"
 msgstr "Do"
 
-msgid "To get back a different agent conversation, run this in a terminal in its folder:"
-msgstr "Chcete-li získat zpět jinou konverzaci s agentem, spusťte toto v terminálu v její složce:"
+msgid "To resume an agent conversation, run this in its folder:"
+msgstr "Chcete-li obnovit konverzaci s agentem, spusťte toto v její složce:"
 
-msgid "To get back an agent conversation, run this in a terminal in its folder:"
-msgstr "Chcete-li získat zpět konverzaci s agentem, spusťte toto v terminálu v její složce:"
+msgid "To resume another agent conversation, run this in its folder:"
+msgstr "Chcete-li obnovit jinou konverzaci s agentem, spusťte toto v její složce:"
 
 msgid "Toast (Sonner)"
 msgstr "Toast (Sonner)"
