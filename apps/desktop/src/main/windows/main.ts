@@ -524,7 +524,9 @@ export async function createPlatformWindow({
 			saveWindowState(state);
 			persistedZoomLevel = state.zoomLevel;
 			// Keep the multi-window restore set fresh as windows move/resize.
-			persistOpenWindows();
+			if (!appQuitting) {
+				persistOpenWindows();
+			}
 		}, 500);
 	};
 	window.on("move", debouncedSave);
