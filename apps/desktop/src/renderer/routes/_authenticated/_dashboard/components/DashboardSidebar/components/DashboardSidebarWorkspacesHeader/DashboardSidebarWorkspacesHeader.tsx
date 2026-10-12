@@ -17,7 +17,10 @@ import {
 } from "react-icons/vsc";
 import { useOpenNewWorkspaceForLocalProject } from "renderer/hooks/useOpenNewWorkspace";
 import { useFolderFirstImport } from "renderer/routes/_authenticated/_dashboard/components/AddRepositoryModals/hooks/useFolderFirstImport";
-import type { SidebarProjectSortMode } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal/schema";
+import type {
+	SidebarProjectSortDirection,
+	SidebarProjectSortMode,
+} from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal/schema";
 import {
 	useOpenEmptyProjectModal,
 	useOpenNewProjectModal,
@@ -32,6 +35,8 @@ import { useProjectFilterExpanded } from "./hooks/useProjectFilterExpanded";
 interface DashboardSidebarWorkspacesHeaderProps {
 	sortMode: SidebarProjectSortMode;
 	onSortModeChange: (mode: SidebarProjectSortMode) => void;
+	sortDirection: SidebarProjectSortDirection;
+	onSortDirectionChange: (direction: SidebarProjectSortDirection) => void;
 	filterQuery: string;
 	onFilterQueryChange: (query: string) => void;
 }
@@ -39,6 +44,8 @@ interface DashboardSidebarWorkspacesHeaderProps {
 export function DashboardSidebarWorkspacesHeader({
 	sortMode,
 	onSortModeChange,
+	sortDirection,
+	onSortDirectionChange,
 	filterQuery,
 	onFilterQueryChange,
 }: DashboardSidebarWorkspacesHeaderProps) {
@@ -133,6 +140,8 @@ export function DashboardSidebarWorkspacesHeader({
 			<DashboardSidebarProjectsSortMenu
 				sortMode={sortMode}
 				onSortModeChange={onSortModeChange}
+				sortDirection={sortDirection}
+				onSortDirectionChange={onSortDirectionChange}
 			/>
 			<DropdownMenu>
 				<Tooltip delayDuration={700}>

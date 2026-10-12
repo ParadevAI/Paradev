@@ -75,6 +75,33 @@ describe("sortDashboardSidebarProjects", () => {
 		expect(sorted).toBe(older);
 	});
 
+	it("passes oldest-first direction through to each project's children", () => {
+		const project = makeProject({
+			id: "p-ascending",
+			name: "Ascending",
+			children: [
+				{
+					type: "workspace",
+					workspace: makeWorkspace({
+						id: "w-new",
+						name: "new",
+						createdAt: new Date("2026-06-01"),
+					}),
+				},
+				{
+					type: "workspace",
+					workspace: makeWorkspace({
+						id: "w-old",
+						name: "old",
+						createdAt: new Date("2026-01-01"),
+					}),
+				},
+			],
+		});
+		const [sorted] = sortDashboardSidebarProjects([project], "created", "asc");
+		expect(childIds(sorted?.children ?? [])).toEqual(["w-old", "w-new"]);
+	});
+
 	// Persisted caches can revive Date columns as ISO strings; sorting must
 	// coerce them, never throw mid-render.
 	it("sorts children whose timestamps are ISO strings at runtime", () => {
@@ -261,6 +288,63 @@ describe("sortDashboardSidebarProjectChildren", () => {
 		expect(childIds(sorted)).toEqual(["w-created-late", "w-created-early"]);
 	});
 
+	it("sorts oldest first by creation date", () => {
+		const sorted = sortDashboardSidebarProjectChildren(
+			[oldWorktree, newWorktree, section],
+			"created",
+			"asc",
+		);
+		expect(childIds(sorted)).toEqual(["s1", "w-new", "w-old"]);
+	});
+
+	it("sorts section members and sections by activity in ascending order", () => {
+		const sorted = sortDashboardSidebarProjectChildren(
+			[newWorktree, section, oldWorktree],
+			"active",
+			"asc",
+		);
+		expect(childIds(sorted)).toEqual(["w-old", "s1", "w-new"]);
+		const sortedSection = sorted.find((child) => child.type === "section");
+		expect(
+			sortedSection?.type === "section"
+				? sortedSection.section.workspaces.map((workspace) => workspace.id)
+				: [],
+		).toEqual(["w-s-old", "w-s-new"]);
+	});
+
+	it("sinks undated workspaces and sections in both directions", () => {
+		const undatedWorkspace: DashboardSidebarProjectChild = {
+			type: "workspace",
+			workspace: makeWorkspace({
+				id: "w-undated",
+				name: "Undated",
+				createdAt: null as unknown as Date,
+			}),
+		};
+		const undatedSection: DashboardSidebarProjectChild = {
+			type: "section",
+			section: makeSection({
+				id: "s-undated",
+				name: "Section undated",
+				createdAt: "invalid" as unknown as Date,
+			}),
+		};
+		const children = [
+			undatedWorkspace,
+			oldWorktree,
+			undatedSection,
+			newWorktree,
+		];
+		expect(
+			childIds(sortDashboardSidebarProjectChildren(children, "created", "asc")),
+		).toEqual(["w-new", "w-old", "s-undated", "w-undated"]);
+		expect(
+			childIds(
+				sortDashboardSidebarProjectChildren(children, "created", "desc"),
+			),
+		).toEqual(["w-old", "w-new", "s-undated", "w-undated"]);
+	});
+
 	it("breaks timestamp ties by name, then id", () => {
 		const tie = at("2026-05-01");
 		const apple = makeWorkspace({
@@ -357,6 +441,37 @@ describe("sortDashboardSidebarProjectChildren", () => {
 		const sorted = sortDashboardSidebarProjectChildren(children, "active");
 		expect(sorted).toBe(children);
 		expect(sorted[1]).toBe(orderedSection);
+	});
+
+	it("keeps array and section identity when already sorted oldest first", () => {
+		const orderedSection: DashboardSidebarProjectChild = {
+			type: "section",
+			section: makeSection({
+				id: "s-ordered-asc",
+				name: "Ordered",
+				createdAt: new Date("2026-01-01"),
+				workspaces: [
+					makeWorkspace({
+						id: "w-a",
+						name: "a",
+						createdAt: new Date("2026-01-01"),
+					}),
+					makeWorkspace({
+						id: "w-b",
+						name: "b",
+						createdAt: new Date("2026-02-01"),
+					}),
+				],
+			}),
+		};
+		const children = [orderedSection, newWorktree, oldWorktree];
+		const sorted = sortDashboardSidebarProjectChildren(
+			children,
+			"created",
+			"asc",
+		);
+		expect(sorted).toBe(children);
+		expect(sorted[0]).toBe(orderedSection);
 	});
 });
 

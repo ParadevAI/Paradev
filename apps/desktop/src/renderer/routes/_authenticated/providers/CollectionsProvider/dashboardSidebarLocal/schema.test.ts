@@ -160,6 +160,36 @@ describe("healV2UserPreferences sidebarProjectSortMode", () => {
 	});
 });
 
+describe("healV2UserPreferences sidebarProjectSortDirection", () => {
+	it("defaults to newest first for existing rows", () => {
+		expect(healV2UserPreferences({}).sidebarProjectSortDirection).toBe("desc");
+	});
+
+	it("preserves oldest first", () => {
+		expect(
+			healV2UserPreferences({ sidebarProjectSortDirection: "asc" })
+				.sidebarProjectSortDirection,
+		).toBe("asc");
+	});
+
+	it("heals an invalid direction without dropping other preferences", () => {
+		const healed = healV2UserPreferences({
+			sidebarProjectSortDirection: "sideways",
+			rightSidebarWidth: 500,
+		});
+		expect(healed.sidebarProjectSortDirection).toBe("desc");
+		expect(healed.rightSidebarWidth).toBe(500);
+	});
+
+	it("heals an invalid direction on writes", () => {
+		const parsed = v2UserPreferencesSchema.parse({
+			id: "preferences",
+			sidebarProjectSortDirection: "sideways",
+		});
+		expect(parsed.sidebarProjectSortDirection).toBe("desc");
+	});
+});
+
 describe("healV2UserPreferences favoritePageIds", () => {
 	it("defaults to an empty list on rows written before the field existed", () => {
 		expect(healV2UserPreferences({}).favoritePageIds).toEqual([]);

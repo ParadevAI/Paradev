@@ -10304,6 +10304,9 @@ msgstr "Bu uygulamadan daha yeni"
 msgid "Newer than this app. Everything works; update the app to match."
 msgstr "Bu uygulamadan daha yeni. Her şey çalışıyor; eşitlemek için uygulamayı güncelleyin."
 
+msgid "Newest first"
+msgstr "En yeniler önce"
+
 msgid "News & Updates"
 msgstr "Haberler ve güncellemeler"
 
@@ -11152,6 +11155,9 @@ msgstr "Çevrimdışı / yerel öncelikli mod"
 
 msgid "Older"
 msgstr "Daha eski"
+
+msgid "Oldest first"
+msgstr "En eskiler önce"
 
 msgid "on {offScopeHostName} — won't run here"
 msgstr "{offScopeHostName} üzerinde — burada çalışmaz"
@@ -15359,6 +15365,9 @@ msgstr "Sıralama ölçütü"
 
 msgid "Sort by {label}, currently {sortLabel}"
 msgstr "{label} ölçütüne göre sırala, şu anda {sortLabel}"
+
+msgid "Sort direction"
+msgstr "Sıralama yönü"
 
 msgid "Sort workspaces"
 msgstr "Çalışma alanlarını sırala"
