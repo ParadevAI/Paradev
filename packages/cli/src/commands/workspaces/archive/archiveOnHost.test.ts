@@ -71,7 +71,63 @@ test("an older host whose follow-up check fails reports the id as failed", async
 	]);
 });
 
+test("forwards deleteBranch and reports what each host did with the branch", async () => {
+	const inputs: unknown[] = [];
+	const host = {
+		workspace: {
+			delete: {
+				mutate: async (input: { id: string; deleteBranch?: boolean }) => {
+					inputs.push(input);
+					// "old-host" stands for a host that drops the unknown field.
+					return {
+						success: true,
+						warnings: [],
+						found: true,
+						branchDeleted: input.id !== "old-host" && input.deleteBranch,
+					};
+				},
+			},
+			get: { query: async () => ({}) },
+		},
+	} as never;
+
+	expect(await archiveOnHost(host, ["ws-1"])).toEqual([
+		{ id: "ws-1", status: "deleted", warnings: [] },
+	]);
+	expect(await archiveOnHost(host, ["ws-1", "old-host"], true)).toEqual([
+		{ id: "ws-1", status: "deleted", warnings: [], branchDeleted: true },
+		{ id: "old-host", status: "deleted", warnings: [], branchDeleted: false },
+	]);
+	expect(inputs).toEqual([
+		{ id: "ws-1", deleteBranch: false },
+		{ id: "ws-1", deleteBranch: true },
+		{ id: "old-host", deleteBranch: true },
+	]);
+});
+
 describe("reportHostOutcomes", () => {
+	test("notes each branch only when --delete-branch was passed", () => {
+		expect(
+			reportHostOutcomes(
+				[
+					{ id: "ws-1", status: "deleted", warnings: [], branchDeleted: true },
+					{ id: "ws-2", status: "deleted", warnings: [], branchDeleted: false },
+				],
+				"h",
+			),
+		).toEqual({
+			data: {
+				deleted: ["ws-1", "ws-2"],
+				branchesDeleted: ["ws-1"],
+				notFound: [],
+				failed: [],
+				warnings: [],
+			},
+			message:
+				"Archived workspace ws-1 (branch deleted)\nArchived workspace ws-2 (branch not deleted)",
+		});
+	});
+
 	test("a mixed batch fails with every id in its data", () => {
 		let error: unknown;
 		try {
