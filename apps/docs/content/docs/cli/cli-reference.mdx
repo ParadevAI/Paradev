@@ -646,12 +646,66 @@ host server running on this machine, use [`start`](#start),
 	humanColumns={["NAME", "ONLINE", "ID"]}
 	quiet="host IDs"
 >
-List hosts registered to the active organization. Host registration
-happens via `superset start` on each machine. There is no
-separate registration command.
+List hosts registered to the active organization. A machine registers
+itself when `superset start` runs on it, or when you set it up over SSH
+with [`hosts add`](#hosts).
 
 ```bash
 superset hosts list
+```
+</Command>
+
+<Command
+	name="superset hosts add <target>"
+	args={[
+		{ name: "target", required: true, description: "SSH destination, as you would pass it to ssh (`user@box` or a Host alias)." },
+	]}
+	options={[
+		{ flag: "--name <name>", description: "Name for the host. Default: its hostname." },
+		{ flag: "--no-service", description: "Run the host as a plain background process instead of a systemd user service or LaunchAgent. It does not survive a reboot." },
+		{ flag: "--yes", description: "Install and enable without asking." },
+		{ flag: "--org <id>", description: "Organization (id, slug, or name). Default: the active organization." },
+	]}
+	output={`{
+  hostId: string;
+  name: string;
+  organizationId: string;
+  platform: "darwin-arm64" | "darwin-x64" | "linux-arm64" | "linux-x64";
+  runsAs: "systemd" | "launchd" | "daemon";
+  credential: "signed-in" | "kept";
+}`}
+>
+Set up a machine you can SSH into as a host, with nothing typed on it:
+installs this CLI's version there, signs it in with a new API key sent over
+ssh stdin, runs it as a user service, and waits for it to come online.
+Running it again on the same target repairs only what is wrong.
+
+The remote must be macOS or glibc Linux on x64 or arm64 (not Alpine or
+Windows) and have `curl`. On Linux it also needs a valid `/etc/machine-id`,
+and lingering (`loginctl enable-linger`) to keep running after you log out.
+Install and sign in `gh` there to clone private repos.
+
+```bash
+superset hosts add me@build-box
+superset hosts add build-box --name "Build box" --yes
+```
+</Command>
+
+<Command
+	name="superset hosts remove <target>"
+	args={[
+		{ name: "target", required: true, description: "SSH destination the host was added with." },
+	]}
+	options={[
+		{ flag: "--yes", description: "Skip the confirmation prompt." },
+		{ flag: "--org <id>", description: "Organization the host was added to. Default: the active organization." },
+	]}
+>
+Undo `hosts add`: stop the host over SSH, remove its service, and revoke its
+API key.
+
+```bash
+superset hosts remove me@build-box
 ```
 </Command>
 
