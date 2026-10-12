@@ -295,7 +295,6 @@ function stopSharedServices(): void {
 // Set during app quit so per-window close handlers don't shrink the persisted
 // set as windows close one-by-one — the full set is snapshotted in before-quit.
 let appQuitting = false;
-
 export function snapshotWindowsForQuit(): void {
 	if (appQuitting) return;
 	appQuitting = true;
@@ -308,11 +307,7 @@ export function cancelAppQuitting(): void {
 
 function snapshotWindowState(window: BrowserWindow): WindowState {
 	const isMaximized = window.isMaximized();
-	const bounds = getRestorableBounds({
-		bounds: window.getBounds(),
-		normalBounds: window.getNormalBounds(),
-		isMaximized,
-	});
+	const bounds = getRestorableBounds(window);
 	return {
 		x: bounds.x,
 		y: bounds.y,
@@ -520,13 +515,20 @@ export async function createPlatformWindow({
 		if (saveTimeout) clearTimeout(saveTimeout);
 		saveTimeout = setTimeout(() => {
 			if (window.isDestroyed()) return;
-			const state = snapshotWindowState(window);
-			saveWindowState(state);
-			persistedZoomLevel = state.zoomLevel;
+			const isMaximized = window.isMaximized();
+			const bounds = getRestorableBounds(window);
+			const zoomLevel = window.webContents.getZoomLevel();
+			saveWindowState({
+				x: bounds.x,
+				y: bounds.y,
+				width: bounds.width,
+				height: bounds.height,
+				isMaximized,
+				zoomLevel,
+			});
+			persistedZoomLevel = zoomLevel;
 			// Keep the multi-window restore set fresh as windows move/resize.
-			if (!appQuitting) {
-				persistOpenWindows();
-			}
+			if (!appQuitting) persistOpenWindows();
 		}, 500);
 	};
 	window.on("move", debouncedSave);
@@ -605,9 +607,18 @@ export async function createPlatformWindow({
 			return;
 		}
 		// Save window state first, before any cleanup
-		const state = snapshotWindowState(window);
-		saveWindowState(state);
-		persistedZoomLevel = state.zoomLevel;
+		const isMaximized = window.isMaximized();
+		const bounds = getRestorableBounds(window);
+		const zoomLevel = window.webContents.getZoomLevel();
+		saveWindowState({
+			x: bounds.x,
+			y: bounds.y,
+			width: bounds.width,
+			height: bounds.height,
+			isMaximized,
+			zoomLevel,
+		});
+		persistedZoomLevel = zoomLevel;
 
 		ipcHandler?.detachWindow(window);
 		unregisterWindow(window.id);

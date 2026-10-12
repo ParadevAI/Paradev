@@ -54,26 +54,18 @@ export function isVisibleOnAnyDisplay(bounds: Rectangle): boolean {
 	});
 }
 
-function isSameRectangle(a: Rectangle, b: Rectangle): boolean {
-	return (
-		a.x === b.x && a.y === b.y && a.width === b.width && a.height === b.height
-	);
-}
-
-export function getRestorableBounds({
-	bounds,
-	normalBounds,
-	isMaximized,
-}: {
-	bounds: Rectangle;
-	normalBounds: Rectangle;
-	isMaximized: boolean;
+// macOS keeps normal bounds on the display a window was first maximized on.
+export function getRestorableBounds(window: {
+	isMaximized(): boolean;
+	getBounds(): Rectangle;
+	getNormalBounds(): Rectangle;
 }): Rectangle {
-	if (!isMaximized) return bounds;
-	const screen = getScreen();
-	const currentDisplay = screen.getDisplayMatching(bounds);
-	const normalDisplay = screen.getDisplayMatching(normalBounds);
-	return isSameRectangle(currentDisplay.bounds, normalDisplay.bounds)
+	const bounds = window.getBounds();
+	if (!window.isMaximized()) return bounds;
+	const normalBounds = window.getNormalBounds();
+	const current = getScreen().getDisplayMatching(bounds).bounds;
+	const normal = getScreen().getDisplayMatching(normalBounds).bounds;
+	return current.x === normal.x && current.y === normal.y
 		? normalBounds
 		: bounds;
 }

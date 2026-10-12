@@ -464,8 +464,15 @@ describe("getRestorableBounds", () => {
 		bounds: { x: 1512, y: 0, width: 2560, height: 1440 },
 		workAreaSize: { width: 2560, height: 1415 },
 	};
-	const onBuiltIn = { x: 0, y: 33, width: 1512, height: 949 };
-	const onExternal = { x: 1512, y: 25, width: 2560, height: 1415 };
+	const maximizedOnExternal = { x: 1512, y: 25, width: 2560, height: 1415 };
+
+	function maximizedWindow(normalBounds: typeof maximizedOnExternal) {
+		return {
+			isMaximized: () => true,
+			getBounds: () => maximizedOnExternal,
+			getNormalBounds: () => normalBounds,
+		};
+	}
 
 	beforeEach(() => {
 		(
@@ -475,34 +482,17 @@ describe("getRestorableBounds", () => {
 		);
 	});
 
-	it("returns the current bounds when not maximized", () => {
-		expect(
-			getRestorableBounds({
-				bounds: onExternal,
-				normalBounds: onBuiltIn,
-				isMaximized: false,
-			}),
-		).toEqual(onExternal);
-	});
-
 	it("returns the normal bounds when maximized on the same display", () => {
 		const normalBounds = { x: 1600, y: 100, width: 1200, height: 800 };
-		expect(
-			getRestorableBounds({
-				bounds: onExternal,
-				normalBounds,
-				isMaximized: true,
-			}),
-		).toEqual(normalBounds);
+		expect(getRestorableBounds(maximizedWindow(normalBounds))).toEqual(
+			normalBounds,
+		);
 	});
 
-	it("returns the current bounds when maximized on a different display than the normal bounds", () => {
-		expect(
-			getRestorableBounds({
-				bounds: onExternal,
-				normalBounds: onBuiltIn,
-				isMaximized: true,
-			}),
-		).toEqual(onExternal);
+	it("returns the maximized bounds when the normal bounds are on another display", () => {
+		const normalBounds = { x: 0, y: 33, width: 1512, height: 949 };
+		expect(getRestorableBounds(maximizedWindow(normalBounds))).toEqual(
+			maximizedOnExternal,
+		);
 	});
 });
