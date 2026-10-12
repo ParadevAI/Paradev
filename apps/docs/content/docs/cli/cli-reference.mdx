@@ -701,8 +701,10 @@ superset hosts add build-box --name "Build box" --yes
 		{ flag: "--org <id>", description: "Organization the host was added to. Default: the active organization." },
 	]}
 >
-Undo `hosts add`: stop the host over SSH, remove its service, and revoke its
-API key.
+Undo `hosts add`: stop the host over SSH and remove its service. If it finds
+the API key `hosts add` created, it revokes it and signs the host out;
+otherwise it leaves the host's sign-in alone. The CLI stays installed, and the
+host stays listed (offline) until you delete it in Settings → Hosts.
 
 ```bash
 superset hosts remove me@build-box
