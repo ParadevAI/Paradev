@@ -21,22 +21,31 @@ beforeEach(() => {
 });
 afterEach(cleanup);
 
+const LAUNCH_STARTED_AT = 1_000;
+
 function source({
 	paneIds = ["pane-1"],
+	migratedAt = LAUNCH_STARTED_AT,
 	sessions = {},
 }: {
 	paneIds?: string[];
+	migratedAt?: number;
 	sessions?: Awaited<ReturnType<Source["readAgentSessions"]>>;
 } = {}): Source {
 	return {
-		listMigratedPaneIds: async () => paneIds,
+		listMigratedTerminals: async () =>
+			paneIds.map((paneId) => ({ paneId, migratedAt })),
 		readAgentSessions: async () => sessions,
 	};
 }
 
 async function renderNotice(input: Source) {
 	const view = render(
-		<V1TerminalsNotice organizationId={activeOrganizationId} source={input} />,
+		<V1TerminalsNotice
+			organizationId={activeOrganizationId}
+			source={input}
+			launchStartedAt={LAUNCH_STARTED_AT}
+		/>,
 	);
 	await act(async () => {});
 	return view;
@@ -102,6 +111,18 @@ describe("V1TerminalsNotice", () => {
 		).toBeNull();
 	});
 
+	test("stays hidden when the terminals came over in an earlier launch", async () => {
+		const view = await renderNotice(
+			source({ migratedAt: LAUNCH_STARTED_AT - 1 }),
+		);
+		settlePass();
+		await act(async () => {});
+		expect(view.container.innerHTML).toBe("");
+		expect(
+			localStorage.getItem(`v1-terminals-notice-${activeOrganizationId}`),
+		).toBeNull();
+	});
+
 	test("yields this launch to the welcome card and shows on the next", async () => {
 		localStorage.setItem(
 			`v1-migration-welcome-pending-${activeOrganizationId}`,
@@ -141,7 +162,9 @@ describe("V1TerminalsNotice", () => {
 
 	test("a failed session read waits for the next launch instead of a generic notice", async () => {
 		const failing: Source = {
-			listMigratedPaneIds: async () => ["pane-1"],
+			listMigratedTerminals: async () => [
+				{ paneId: "pane-1", migratedAt: LAUNCH_STARTED_AT },
+			],
 			readAgentSessions: () => Promise.reject(new Error("main busy")),
 		};
 		const view = await renderNotice(failing);

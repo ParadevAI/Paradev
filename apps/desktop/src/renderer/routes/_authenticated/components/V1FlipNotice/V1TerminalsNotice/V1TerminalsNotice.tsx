@@ -12,7 +12,6 @@ import {
 	isV1MigrationComplete,
 	isV1WelcomePending,
 } from "renderer/lib/v1-migration/completion";
-import { electronV1MigrationIpc } from "renderer/lib/v1-migration/ipc";
 import {
 	resolveMigratedPaneResume,
 	type V1PaneAgentSessionSnapshot,
@@ -27,21 +26,30 @@ const NOTICE_PREFIX = "v1-terminals-notice-";
 
 const RESUME_COMMANDS = ["claude --resume", "codex resume"];
 
+const LAUNCH_STARTED_AT = Date.now();
+
 type NoticeState = "pending" | "dismissed";
 
+export interface MigratedTerminal {
+	paneId: string;
+	migratedAt: number;
+}
+
 export interface V1TerminalsNoticeSource {
-	listMigratedPaneIds(organizationId: string): Promise<string[]>;
+	listMigratedTerminals(organizationId: string): Promise<MigratedTerminal[]>;
 	readAgentSessions(
 		paneIds: string[],
 	): Promise<Record<string, V1PaneAgentSessionSnapshot>>;
 }
 
 const electronSource: V1TerminalsNoticeSource = {
-	listMigratedPaneIds: async (organizationId) => {
-		const rows = await electronV1MigrationIpc.ledgerList(organizationId);
+	listMigratedTerminals: async (organizationId) => {
+		const rows = await electronTrpcClient.migration.ledgerList.query({
+			organizationId,
+		});
 		return rows
 			.filter((row) => row.kind === "terminal" && row.status === "success")
-			.map((row) => row.v1Id);
+			.map((row) => ({ paneId: row.v1Id, migratedAt: row.migratedAt }));
 	},
 	readAgentSessions: (paneIds) =>
 		electronTrpcClient.migration.readV1PaneAgentSessions.query({ paneIds }),
@@ -103,9 +111,11 @@ interface Notice {
 export function V1TerminalsNotice({
 	organizationId,
 	source = electronSource,
+	launchStartedAt = LAUNCH_STARTED_AT,
 }: {
 	organizationId: string;
 	source?: V1TerminalsNoticeSource;
+	launchStartedAt?: number;
 }) {
 	const { _: translate } = useTranslation();
 	const statusOrganizationId = useV1MigrationStatusStore(
@@ -138,7 +148,13 @@ export function V1TerminalsNotice({
 		let cancelled = false;
 		void (async () => {
 			try {
-				const paneIds = await source.listMigratedPaneIds(organizationId);
+				const terminals = await source.listMigratedTerminals(organizationId);
+				const paneIds = terminals
+					.filter(
+						(terminal) =>
+							stored === "pending" || terminal.migratedAt >= launchStartedAt,
+					)
+					.map((terminal) => terminal.paneId);
 				if (cancelled || paneIds.length === 0) return;
 				writeNoticeState(organizationId, "pending");
 				// Same rule as the resume path: a failed read waits for the next launch.
@@ -158,7 +174,7 @@ export function V1TerminalsNotice({
 		return () => {
 			cancelled = true;
 		};
-	}, [organizationId, waitsForPass, source]);
+	}, [organizationId, waitsForPass, source, launchStartedAt]);
 
 	const visible =
 		!!notice &&
