@@ -8,6 +8,7 @@ import { FolderImportMount } from "./ui/FolderImportMount/FolderImportMount";
 import { QuickCreateWorkspaceMount } from "./ui/QuickCreateWorkspaceMount/QuickCreateWorkspaceMount";
 import { RemoveFromSidebarMount } from "./ui/RemoveFromSidebarMount/RemoveFromSidebarMount";
 import { SetPreferredOpenInAppMount } from "./ui/SetPreferredOpenInAppMount/SetPreferredOpenInAppMount";
+import { UndoMount } from "./ui/UndoMount";
 
 export function CommandPaletteHost({ children }: { children?: ReactNode }) {
 	useEffect(() => {
@@ -24,6 +25,7 @@ export function CommandPaletteHost({ children }: { children?: ReactNode }) {
 			<SetPreferredOpenInAppMount />
 			<FolderImportMount />
 			<QuickCreateWorkspaceMount />
+			<UndoMount />
 			{children}
 		</CommandContextProvider>
 	);

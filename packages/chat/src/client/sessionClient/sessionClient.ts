@@ -28,6 +28,7 @@ export type PromptOptions = {
 	content: UserContent[];
 	clientId: string;
 	commandId?: string;
+	steer?: { expectedTurnId: string };
 };
 
 export type SessionSubscribeOptions = {
@@ -53,11 +54,14 @@ export type SessionClient = {
 	sessionId: string;
 	getSession(): Promise<ChatRouterOutputs["getSession"]>;
 	getItems(page?: GetItemsPage): Promise<ChatRouterOutputs["getItems"]>;
+	getOutline(): Promise<ChatRouterOutputs["getOutline"]>;
+	getItemBodies(itemIds: string[]): Promise<ChatRouterOutputs["getItemBodies"]>;
 	prompt(options: PromptOptions): Promise<ChatRouterOutputs["prompt"]>;
 	removeQueuedPrompt(itemId: string): Promise<void>;
 	steerQueuedPrompt(itemId: string): Promise<void>;
 	resumeQueue(): Promise<void>;
 	cancelTurn(turnId: string, options?: { pauseQueue?: boolean }): Promise<void>;
+	stopBackgroundTask(taskId: string): Promise<boolean>;
 	respondToApproval(approvalId: string, decision: Decision): Promise<void>;
 	setMode(modeId: string): Promise<void>;
 	setConfigOption(configId: string, value: string): Promise<void>;
@@ -84,12 +88,18 @@ export function createSessionClient(
 				limit: page.limit,
 			}),
 
+		getOutline: () => options.transport.getOutline({ sessionId }),
+
+		getItemBodies: (itemIds) =>
+			options.transport.getItemBodies({ sessionId, itemIds }),
+
 		prompt: (promptOptions) =>
 			options.transport.prompt({
 				commandId: promptOptions.commandId ?? mintId(),
 				sessionId,
 				clientId: promptOptions.clientId,
 				content: promptOptions.content,
+				...(promptOptions.steer ? { steer: promptOptions.steer } : {}),
 			}),
 
 		removeQueuedPrompt: async (itemId) => {
@@ -120,6 +130,13 @@ export function createSessionClient(
 				...(cancelOptions?.pauseQueue ? { pauseQueue: true } : {}),
 			});
 		},
+
+		stopBackgroundTask: (taskId) =>
+			options.transport.stopBackgroundTask({
+				commandId: mintId(),
+				sessionId,
+				taskId,
+			}),
 
 		respondToApproval: async (approvalId, decision) => {
 			await options.transport.respondToApproval({

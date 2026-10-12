@@ -1,6 +1,7 @@
 import { db } from "@superset/db/client";
 import { apikeys } from "@superset/db/schema";
-import { desc, eq } from "drizzle-orm";
+import { TRPCError } from "@trpc/server";
+import { and, desc, eq } from "drizzle-orm";
 import { z } from "zod";
 
 import { protectedProcedure, userError } from "../../trpc";
@@ -35,9 +36,11 @@ export const apiKeyRouter = {
 				});
 			}
 
+			// A server call naming the user, since better-auth cannot resolve the
+			// synthesized session of a CLI OAuth token from the request headers.
 			const result = await ctx.auth.api.createApiKey({
-				headers: ctx.headers,
 				body: {
+					userId: ctx.session.user.id,
 					name: input.name,
 					metadata: { organizationId },
 				},
@@ -49,9 +52,20 @@ export const apiKeyRouter = {
 	revoke: protectedProcedure
 		.input(z.object({ id: z.uuid() }))
 		.mutation(async ({ ctx, input }) => {
-			await ctx.auth.api.deleteApiKey({
-				headers: ctx.headers,
-				body: { keyId: input.id },
-			});
+			const [deleted] = await db
+				.delete(apikeys)
+				.where(
+					and(
+						eq(apikeys.id, input.id),
+						eq(apikeys.referenceId, ctx.session.user.id),
+					),
+				)
+				.returning({ id: apikeys.id });
+			if (!deleted) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "API key not found",
+				});
+			}
 		}),
 };

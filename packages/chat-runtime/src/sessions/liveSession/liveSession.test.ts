@@ -6,6 +6,7 @@ import {
 	reduceMany,
 } from "@superset/chat/core";
 import type { DurableEnvelope, UserMessage } from "@superset/chat/protocol";
+import { isDurableEnvelope } from "@superset/chat/protocol";
 import type { FakeHarnessScript } from "../../harness/fake";
 import type { ChatRuntime } from "../../index";
 import {
@@ -35,6 +36,18 @@ function startSession(script: FakeHarnessScript): {
 		cwd: "/tmp/workspace",
 	});
 	return { runtime, sessionId };
+}
+
+function startSessionWithAdapters(script: FakeHarnessScript) {
+	const { harnesses, adapters } = fakeHarnessRegistry(script);
+	const runtime = createTestRuntime({ harnesses });
+	const { sessionId } = runtime.commands.createSession({
+		commandId: randomUUID(),
+		scopeId: "workspace-1",
+		harness: FAKE_HARNESS,
+		cwd: "/tmp/workspace",
+	});
+	return { runtime, sessionId, adapters };
 }
 
 function sendPrompt(runtime: ChatRuntime, sessionId: string, text: string) {
@@ -104,6 +117,41 @@ describe("LiveSession", () => {
 		expect(snapshot.items.get(result.itemId)?.turnId).toBe("t1");
 		expect(snapshot.items.size).toBe(2);
 		expect(snapshot.session?.status).toBe("idle");
+		await runtime.dispose();
+	});
+
+	test("a queued prompt is counted by the time it is published", async () => {
+		const countsAtPublish: number[] = [];
+		const { harnesses } = fakeHarnessRegistry({
+			turns: [[{ kind: "turn", turn: turn("t1") }]],
+		});
+		const runtime = createTestRuntime({
+			harnesses,
+			observer: {
+				started: () => {},
+				stopped: () => {},
+				published: (envelope, session) => {
+					if (!isDurableEnvelope(envelope)) return;
+					const { event } = envelope;
+					if (
+						event.type === "item" &&
+						event.item.kind === "user_message" &&
+						(event.item as UserMessage).queued
+					) {
+						countsAtPublish.push(session.queuedCount);
+					}
+				},
+			},
+		});
+		const { sessionId } = runtime.commands.createSession({
+			commandId: randomUUID(),
+			scopeId: "workspace-1",
+			harness: FAKE_HARNESS,
+			cwd: "/tmp/workspace",
+		});
+		sendPrompt(runtime, sessionId, "first");
+		sendPrompt(runtime, sessionId, "second");
+		expect(countsAtPublish).toEqual([1]);
 		await runtime.dispose();
 	});
 
@@ -248,6 +296,301 @@ describe("LiveSession", () => {
 		);
 	}
 
+	const HELD_THEN_QUICK: FakeHarnessScript = {
+		turns: [
+			[
+				{ kind: "turn", turn: turn("t1") },
+				{ kind: "session", session: { awaitingBackground: true } },
+				{ kind: "item", item: approvalRequest("ap1"), turnId: "t1" },
+				{
+					kind: "turn",
+					turn: turn("t1", { status: "completed", completedAtMs: 2 }),
+				},
+				{
+					kind: "session",
+					session: { status: "idle", awaitingBackground: false },
+				},
+			],
+			...GATED_THEN_QUICK.turns.slice(1),
+		],
+	};
+
+	function snapshotOf(runtime: ChatRuntime, sessionId: string) {
+		return reduceMany(emptySnapshot(), journalEnvelopes(runtime, sessionId));
+	}
+
+	function answerApproval(runtime: ChatRuntime, sessionId: string) {
+		runtime.commands.respondToApproval({
+			commandId: randomUUID(),
+			sessionId,
+			approvalId: "ap1",
+			decision: { type: "accept" },
+		});
+	}
+
+	test("a prompt sent while the turn only waits on background work joins it", async () => {
+		const { runtime, sessionId } = startSession({
+			...HELD_THEN_QUICK,
+			steer: true,
+		});
+		sendPrompt(runtime, sessionId, "first");
+		await waitForApproval(runtime, sessionId);
+		const second = sendPrompt(runtime, sessionId, "second");
+
+		expect(second.queued).toBe(false);
+		expect(runtime.sessions.get(sessionId)?.queuedCount).toBe(0);
+		const snapshot = snapshotOf(runtime, sessionId);
+		expect(snapshot.items.get(second.itemId)?.turnId).toBe("t1");
+		expect(snapshot.items.get(second.itemId)?.item).not.toHaveProperty(
+			"queued",
+		);
+		await runtime.dispose();
+	});
+
+	test("a prompt sent while the agent is working is queued, not steered", async () => {
+		const { runtime, sessionId } = startSession({
+			...GATED_THEN_QUICK,
+			steer: true,
+		});
+		sendPrompt(runtime, sessionId, "first");
+		await waitForApproval(runtime, sessionId);
+		const second = sendPrompt(runtime, sessionId, "second");
+
+		expect(second.queued).toBe(true);
+		await runtime.dispose();
+	});
+
+	test("prompts queued while the agent worked join the turn once it only waits on background work", async () => {
+		const { runtime, sessionId } = startSession({
+			turns: [
+				[
+					{ kind: "turn", turn: turn("t1") },
+					{ kind: "item", item: approvalRequest("ap1"), turnId: "t1" },
+					{ kind: "session", session: { awaitingBackground: true } },
+					{ kind: "item", item: approvalRequest("ap2"), turnId: "t1" },
+				],
+			],
+			steer: true,
+		});
+		sendPrompt(runtime, sessionId, "first");
+		await waitForApproval(runtime, sessionId);
+		const second = sendPrompt(runtime, sessionId, "second");
+		const third = sendPrompt(runtime, sessionId, "third");
+		expect(runtime.sessions.get(sessionId)?.queuedCount).toBe(2);
+
+		answerApproval(runtime, sessionId);
+
+		await waitFor(() => runtime.sessions.get(sessionId)?.queuedCount === 0);
+		const snapshot = snapshotOf(runtime, sessionId);
+		expect(snapshot.items.get(second.itemId)?.turnId).toBe("t1");
+		expect(snapshot.items.get(third.itemId)?.turnId).toBe("t1");
+		await runtime.dispose();
+	});
+
+	test("a prompt sent with steer joins the running turn when the agent can steer", async () => {
+		const { runtime, sessionId } = startSession({
+			...GATED_THEN_QUICK,
+			steer: true,
+		});
+		sendPrompt(runtime, sessionId, "first");
+		await waitForApproval(runtime, sessionId);
+		const steered = runtime.commands.prompt({
+			commandId: randomUUID(),
+			sessionId,
+			clientId: "client-steered",
+			content: [{ type: "text", text: "steered" }],
+			steer: { expectedTurnId: "t1" },
+		});
+
+		expect(steered.queued).toBe(false);
+		const snapshot = snapshotOf(runtime, sessionId);
+		expect(snapshot.items.get(steered.itemId)?.turnId).toBe("t1");
+		expect(snapshot.turns.get("t1")?.status).toBe("running");
+		await runtime.dispose();
+	});
+
+	test("a prompt the agent does not take into the turn is queued", async () => {
+		const { runtime, sessionId } = startSession({
+			...HELD_THEN_QUICK,
+			steer: false,
+		});
+		sendPrompt(runtime, sessionId, "first");
+		await waitForApproval(runtime, sessionId);
+		const second = sendPrompt(runtime, sessionId, "second");
+
+		await waitFor(() => runtime.sessions.get(sessionId)?.queuedCount === 1);
+		expect(
+			deriveQueuedPrompts(snapshotOf(runtime, sessionId)).map(
+				(item) => item.id,
+			),
+		).toEqual([second.itemId]);
+		await runtime.dispose();
+	});
+
+	test("steerQueuedPrompt joins the running turn when the agent can steer", async () => {
+		const { runtime, sessionId } = startSession({
+			...GATED_THEN_QUICK,
+			steer: true,
+		});
+		sendPrompt(runtime, sessionId, "first");
+		const second = sendPrompt(runtime, sessionId, "second");
+		expect(second.queued).toBe(true);
+		await waitForApproval(runtime, sessionId);
+
+		runtime.commands.steerQueuedPrompt({
+			commandId: randomUUID(),
+			sessionId,
+			itemId: second.itemId,
+		});
+
+		expect(runtime.sessions.get(sessionId)?.queuedCount).toBe(0);
+		const snapshot = snapshotOf(runtime, sessionId);
+		expect(snapshot.items.get(second.itemId)?.turnId).toBe("t1");
+		expect(snapshot.turns.get("t1")?.status).toBe("running");
+		await runtime.dispose();
+	});
+
+	test("prompts the agent does not take into the turn are queued in send order", async () => {
+		const { runtime, sessionId } = startSession({
+			...HELD_THEN_QUICK,
+			steer: false,
+			steerDelayMs: 5,
+		});
+		sendPrompt(runtime, sessionId, "first");
+		await waitForApproval(runtime, sessionId);
+		const second = sendPrompt(runtime, sessionId, "second");
+		const third = sendPrompt(runtime, sessionId, "third");
+
+		await waitFor(() => runtime.sessions.get(sessionId)?.queuedCount === 2);
+		expect(
+			deriveQueuedPrompts(snapshotOf(runtime, sessionId)).map(
+				(item) => item.id,
+			),
+		).toEqual([second.itemId, third.itemId]);
+		await runtime.dispose();
+	});
+
+	test("a prompt sent after the turn ends does not overtake a pending steer", async () => {
+		const { runtime, sessionId } = startSession({
+			...HELD_THEN_QUICK,
+			steer: false,
+			steerDelayMs: 30,
+		});
+		sendPrompt(runtime, sessionId, "first");
+		await waitForApproval(runtime, sessionId);
+		const second = sendPrompt(runtime, sessionId, "second");
+		answerApproval(runtime, sessionId);
+		await waitFor(
+			() =>
+				snapshotOf(runtime, sessionId).turns.get("t1")?.status === "completed",
+		);
+		const third = sendPrompt(runtime, sessionId, "third");
+		expect(third.queued).toBe(true);
+
+		await waitFor(
+			() =>
+				snapshotOf(runtime, sessionId).items.get(third.itemId)?.turnId === "t3",
+		);
+		expect(
+			snapshotOf(runtime, sessionId).items.get(second.itemId)?.turnId,
+		).toBe("t2");
+		await runtime.dispose();
+	});
+
+	test("a prompt steered at a turn that is no longer running is queued, not steered", async () => {
+		const { runtime, sessionId } = startSession({
+			...GATED_THEN_QUICK,
+			steer: true,
+		});
+		sendPrompt(runtime, sessionId, "first");
+		await waitForApproval(runtime, sessionId);
+		const late = runtime.commands.prompt({
+			commandId: randomUUID(),
+			sessionId,
+			clientId: "client-late",
+			content: [{ type: "text", text: "late" }],
+			steer: { expectedTurnId: "t0" },
+		});
+
+		expect(late.queued).toBe(true);
+		await runtime.dispose();
+	});
+
+	test("a queued prompt whose steer is refused still runs next", async () => {
+		const { runtime, sessionId } = startSession({
+			...GATED_THEN_QUICK,
+			steer: false,
+		});
+		sendPrompt(runtime, sessionId, "first");
+		const second = sendPrompt(runtime, sessionId, "second");
+		const third = sendPrompt(runtime, sessionId, "third");
+		await waitForApproval(runtime, sessionId);
+
+		runtime.commands.steerQueuedPrompt({
+			commandId: randomUUID(),
+			sessionId,
+			itemId: third.itemId,
+		});
+
+		await waitFor(
+			() =>
+				snapshotOf(runtime, sessionId).items.get(second.itemId)?.turnId ===
+				"t3",
+		);
+		const snapshot = snapshotOf(runtime, sessionId);
+		expect(snapshot.turns.get("t1")?.status).toBe("interrupted");
+		expect(snapshot.items.get(third.itemId)?.turnId).toBe("t2");
+		await runtime.dispose();
+	});
+
+	test("a steer still waiting when the turn is stopped is not sent, and stays paused", async () => {
+		const { runtime, sessionId, adapters } = startSessionWithAdapters({
+			...HELD_THEN_QUICK,
+			steer: true,
+			steerDelayMs: 20,
+		});
+		sendPrompt(runtime, sessionId, "first");
+		await waitForApproval(runtime, sessionId);
+		sendPrompt(runtime, sessionId, "blocker");
+		const second = sendPrompt(runtime, sessionId, "second");
+		await waitFor(() => adapters[0]?.steered.length === 1);
+
+		runtime.commands.cancelTurn({
+			commandId: randomUUID(),
+			sessionId,
+			turnId: "t1",
+			pauseQueue: true,
+		});
+
+		await waitFor(() => runtime.sessions.get(sessionId)?.queuedCount === 1);
+		const snapshot = snapshotOf(runtime, sessionId);
+		expect(snapshot.session?.queuePaused).toBe(true);
+		expect(deriveQueuedPrompts(snapshot).map((item) => item.id)).toEqual([
+			second.itemId,
+		]);
+		expect(adapters[0]?.steered).toEqual(["blocker"]);
+		await runtime.dispose();
+	});
+
+	test("a prompt still being steered when the session stops is discarded", async () => {
+		const { runtime, sessionId } = startSession({
+			...HELD_THEN_QUICK,
+			steer: true,
+			steerDelayMs: 20,
+		});
+		sendPrompt(runtime, sessionId, "first");
+		await waitForApproval(runtime, sessionId);
+		const second = sendPrompt(runtime, sessionId, "second");
+
+		await runtime.live.get(sessionId)?.dispose();
+		expect(
+			snapshotOf(runtime, sessionId).items.get(second.itemId)?.item,
+		).toMatchObject({
+			discarded: true,
+		});
+		await runtime.dispose();
+	});
+
 	test("removeQueuedPrompt drops a queued prompt so it never reaches the agent", async () => {
 		const { runtime, sessionId } = startSession(GATED_THEN_QUICK);
 		sendPrompt(runtime, sessionId, "first");
@@ -303,6 +646,56 @@ describe("LiveSession", () => {
 		expect(snapshot.turns.get("t1")?.status).toBe("interrupted");
 		expect(snapshot.items.get(third.itemId)?.turnId).toBe("t2");
 		expect(snapshot.items.get(second.itemId)?.turnId).toBe("t3");
+		await runtime.dispose();
+	});
+
+	test("a prompt sent with steer for the running turn interrupts it and runs next", async () => {
+		const { runtime, sessionId } = startSession(GATED_THEN_QUICK);
+		sendPrompt(runtime, sessionId, "first");
+		await waitForApproval(runtime, sessionId);
+		const second = sendPrompt(runtime, sessionId, "second");
+		const steered = runtime.commands.prompt({
+			commandId: randomUUID(),
+			sessionId,
+			clientId: "client-steered",
+			content: [{ type: "text", text: "steered" }],
+			steer: { expectedTurnId: "t1" },
+		});
+
+		await waitFor(() => {
+			const snapshot = reduceMany(
+				emptySnapshot(),
+				journalEnvelopes(runtime, sessionId),
+			);
+			return snapshot.items.get(second.itemId)?.turnId === "t3";
+		});
+		const snapshot = reduceMany(
+			emptySnapshot(),
+			journalEnvelopes(runtime, sessionId),
+		);
+		expect(snapshot.turns.get("t1")?.status).toBe("interrupted");
+		expect(snapshot.items.get(steered.itemId)?.turnId).toBe("t2");
+		await runtime.dispose();
+	});
+
+	test("a prompt sent with steer for a turn that is no longer running only queues", async () => {
+		const { runtime, sessionId } = startSession(GATED_THEN_QUICK);
+		sendPrompt(runtime, sessionId, "first");
+		await waitForApproval(runtime, sessionId);
+		runtime.commands.prompt({
+			commandId: randomUUID(),
+			sessionId,
+			clientId: "client-late",
+			content: [{ type: "text", text: "late" }],
+			steer: { expectedTurnId: "t0" },
+		});
+
+		expect(runtime.sessions.get(sessionId)?.queuedCount).toBe(1);
+		const snapshot = reduceMany(
+			emptySnapshot(),
+			journalEnvelopes(runtime, sessionId),
+		);
+		expect(snapshot.turns.get("t1")?.status).toBe("running");
 		await runtime.dispose();
 	});
 

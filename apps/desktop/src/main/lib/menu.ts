@@ -38,13 +38,14 @@ export function createApplicationMenu() {
 					},
 				},
 				{ type: "separator" },
+				// No accelerator: on macOS it is always live and would bypass the
+				// user's OPEN_PROJECT / OPEN_IN_APP bindings (Settings > Keyboard).
 				{
 					label: i18n._(
 						msg({
-							message: "Open Repo...",
+							message: "Add Project from Folder...",
 						}),
 					),
-					accelerator: "CmdOrCtrl+O",
 					click: () => {
 						menuEmitter.emit("open-project");
 					},

@@ -799,20 +799,48 @@ superset workspaces create --project prj_… --name "perf-spike" --branch perf/s
 </Command>
 
 <Command
-	name="superset workspaces delete <id...>"
+	name="superset workspaces archive <id...>"
 	args={[
-		{ name: "id", required: true, variadic: true, description: "Workspace IDs to delete." },
+		{ name: "id", required: true, variadic: true, description: "Workspace IDs to archive." },
 	]}
 	options={[
 		{ flag: "--host <id>", description: "Host the workspaces live on." },
-		{ flag: "--local", description: "Target this machine (the default)." },
+		{ flag: "--local", description: "Target this machine." },
 	]}
 	output={`{ deleted: string[]; warnings: string[] }`}
 >
-Delete one or more workspaces on the target host (default: this machine).
+Archive one or more workspaces. Without `--host` or `--local`, this targets
+cloud workspaces if your account has them, else this machine. The old name
+`delete` remains an alias.
+
+- **Cloud workspace:** the sandbox stops within a minute and is deleted after
+  7 days. A restore within those 7 days keeps its disk; after that, the
+  workspace starts again from a fresh sandbox.
+- **Worktree workspace on a host:** its folder is removed, with any uncommitted
+  changes. Its branch stays, so a restore brings back only committed work. A
+  workspace that shares the project's own checkout keeps that folder.
+
+`deleted` lists the archived IDs; the field keeps its old name so existing
+scripts still work.
 
 ```bash
-superset workspaces delete ws_a ws_b ws_c
+superset workspaces archive ws_a ws_b ws_c
+```
+</Command>
+
+<Command
+	name="superset workspaces sleep [id]"
+	args={[
+		{ name: "id", description: "Cloud workspace ID. Defaults to the cloud workspace the command runs in." },
+	]}
+	output={`{ id: string; stopped: boolean }`}
+>
+Put a cloud workspace to sleep. Its sandbox stops, every terminal and agent in
+it ends, and it costs storage only. Files are kept, and opening the workspace
+wakes it. An agent can run this as its last step, inside its own workspace.
+
+```bash
+superset workspaces sleep ws_a
 ```
 </Command>
 
@@ -976,7 +1004,8 @@ superset agents list --host host_…
 	name="superset agents create"
 	options={[
 		{ flag: "--workspace <id>", required: true, description: "Workspace UUID to create the agent session in." },
-		{ flag: "--host <id>", description: "Host the workspace lives on (default: this machine)." },
+		{ flag: "--host <id>", description: "Host the workspace lives on (default: the cloud if your account has cloud workspaces, else this machine)." },
+		{ flag: "--local", description: "The workspace is on this machine." },
 		{ flag: "--agent <preset|uuid|superset>", required: true, description: "Agent preset id (e.g. `claude`, `codex`), HostAgentConfig instance UUID, or `superset`." },
 		{ flag: "--prompt <text>", description: "Prompt sent to the agent. Required unless `--resume-session`, `--fork-session`, or `--from-terminal` is set. Not allowed with `--from-terminal`." },
 		{ flag: "--resume-session <id>", description: "Agent session id of a previous run to restore instead of starting fresh (e.g. `claude --resume <id>`). Fails for agents without an id-based resume." },
@@ -1039,6 +1068,75 @@ The transcript object in JSON mode, or its text in human-readable mode.
 </CommandReturns>
 </Command>
 
+<Command
+	name="superset agents wait"
+	options={[
+		{ flag: "--workspace <id>", required: true, description: "Workspace UUID." },
+		{ flag: "--terminal <id>", required: true, description: "Terminal the agent runs in (the sessionId from agents create)." },
+		{ flag: "--until <state>", description: "settled (default: finished its turn or needs input), idle, blocked, or working." },
+		{ flag: "--timeout <seconds>", description: "Give up after this long. Default 600." },
+		{ flag: "--host <id>", description: "Host the workspace lives on (default: the cloud if your account has cloud workspaces, else this machine)." },
+		{ flag: "--local", description: "The workspace is on this machine." },
+	]}
+>
+Block until an agent reaches a state, instead of polling `terminals read`.
+Returns at once if it is already there. Exits 1 on timeout, and at once if the
+agent exits.
+
+```bash
+T=$(superset agents create --workspace ws_… --agent claude --prompt "Add a /health route" --json | jq -r .sessionId)
+superset agents wait --workspace ws_… --terminal "$T"
+```
+
+<CommandReturns>
+<JsonOutput>
+```ts
+{
+  terminalId: string;
+  state: "starting" | "working" | "blocked" | "idle";
+  lastEventType: string | null;
+}
+```
+</JsonOutput>
+</CommandReturns>
+</Command>
+
+<Command
+	name="superset agents explain"
+	options={[
+		{ flag: "--workspace <id>", required: true, description: "Workspace UUID." },
+		{ flag: "--terminal <id>", required: true, description: "Terminal the agent runs in." },
+		{ flag: "--host <id>", description: "Host the workspace lives on (default: the cloud if your account has cloud workspaces, else this machine)." },
+		{ flag: "--local", description: "The workspace is on this machine." },
+	]}
+>
+Explain why an agent shows its state: its last hook event and when it arrived,
+how an ended session ended, or that no hook has arrived (an agent Superset
+can't see). Useful when `agents wait` or `panes list` shows something
+unexpected.
+
+```text
+claude is idle.
+Why: its recorded event is Stop, which means its turn ended: it finished, or it was interrupted.
+The last hook arrived 1 second ago; the session started 2 seconds ago.
+```
+
+<CommandReturns>
+<JsonOutput>
+```ts
+{
+  terminalId: string;
+  state: "starting" | "working" | "blocked" | "idle" | "exited" | "none";
+  because: string;
+  details: string[];
+  lastEventType: string | null;
+  lastEventAt: number | null;
+}
+```
+</JsonOutput>
+</CommandReturns>
+</Command>
+
 #### Agent models
 
 Model is an explicit override for one launch. If you omit `--model`, Superset
@@ -1080,7 +1178,8 @@ a one-off command in a worktree or to open an interactive shell.
 	name="superset terminals create"
 	options={[
 		{ flag: "--workspace <id>", required: true, description: "Workspace UUID to create the terminal in." },
-		{ flag: "--host <id>", description: "Host the workspace lives on (default: this machine)." },
+		{ flag: "--host <id>", description: "Host the workspace lives on (default: the cloud if your account has cloud workspaces, else this machine)." },
+		{ flag: "--local", description: "The workspace is on this machine." },
 		{ flag: "--command <cmd>", description: "Shell command to run in the terminal. Omit to open an interactive shell." },
 		{ flag: "--cwd <path>", description: "Working directory for the terminal. Defaults to the worktree." },
 	]}
@@ -1102,7 +1201,8 @@ superset terminals create --workspace ws_…
 	name="superset terminals list"
 	options={[
 		{ flag: "--workspace <id>", required: true, description: "Workspace UUID." },
-		{ flag: "--host <id>", description: "Host the workspace lives on (default: this machine)." },
+		{ flag: "--host <id>", description: "Host the workspace lives on (default: the cloud if your account has cloud workspaces, else this machine)." },
+		{ flag: "--local", description: "The workspace is on this machine." },
 	]}
 	output={`{
   sessions: Array<TerminalSession>;
@@ -1117,7 +1217,8 @@ PTY exists, not that an agent inside it is working or idle.
 	options={[
 		{ flag: "--workspace <id>", required: true, description: "Workspace UUID." },
 		{ flag: "--terminal <id>", required: true, description: "Terminal session ID." },
-		{ flag: "--host <id>", description: "Host the workspace lives on (default: this machine)." },
+		{ flag: "--host <id>", description: "Host the workspace lives on (default: the cloud if your account has cloud workspaces, else this machine)." },
+		{ flag: "--local", description: "The workspace is on this machine." },
 		{ flag: "--max-lines <n>", description: "Limit how many trailing lines to return." },
 	]}
 	output={`{
@@ -1139,13 +1240,75 @@ superset terminals read --workspace ws_… --terminal term_… --max-lines 240
 	options={[
 		{ flag: "--workspace <id>", required: true, description: "Workspace UUID." },
 		{ flag: "--terminal <id>", required: true, description: "Terminal session ID." },
-		{ flag: "--text <string>", required: true, description: "Text to deliver to the terminal." },
+		{ flag: "--text <string>", description: "Text to deliver to the terminal. Pass this or --keys." },
 		{ flag: "--no-submit", description: "Stage the text without pressing Enter." },
-		{ flag: "--host <id>", description: "Host the workspace lives on (default: this machine)." },
+		{ flag: "--keys <list>", description: "Comma-separated key presses instead of text: a single character, esc, enter, tab, shift+tab, up, down, left, right, home, end, pageup, pagedown, delete, f1-f12, ctrl+<letter> (or C-c), alt+<key>, comma." },
+		{ flag: "--wait", description: "Block until the agent in the terminal reaches --until. A text send must cause a new hook event, and fails after 10s with none (a prompt left in the input box). After an interrupt key (esc, ctrl+c) it waits for the resulting state. Errors when no agent runs in the terminal." },
+		{ flag: "--until <state>", description: "With --wait: settled (default), idle, blocked, or working." },
+		{ flag: "--timeout <seconds>", description: "With --wait: give up after this long. Default 600." },
+		{ flag: "--host <id>", description: "Host the workspace lives on (default: the cloud if your account has cloud workspaces, else this machine)." },
+		{ flag: "--local", description: "The workspace is on this machine." },
 	]}
 >
-Send a follow-up message to a terminal already running in a workspace, e.g. to
-give an agent new instructions mid-session.
+Send a follow-up message or key presses to a terminal already running in a
+workspace, e.g. to give an agent new instructions mid-session, approve a
+prompt, or interrupt it.
+
+```bash
+superset terminals send --workspace ws_… --terminal term_… --text "Now add a test" --wait
+superset terminals send --workspace ws_… --terminal term_… --keys esc
+```
+</Command>
+
+<Command
+	name="superset terminals wait"
+	options={[
+		{ flag: "--workspace <id>", required: true, description: "Workspace UUID." },
+		{ flag: "--terminal <id>", required: true, description: "Terminal session ID." },
+		{ flag: "--match <regex>", required: true, description: "Regular expression to look for on the screen. Text already on screen counts." },
+		{ flag: "--max-lines <n>", description: "Only search this many rows from the bottom." },
+		{ flag: "--timeout <seconds>", description: "Give up after this long. Default 600." },
+		{ flag: "--host <id>", description: "Host the workspace lives on (default: the cloud if your account has cloud workspaces, else this machine)." },
+		{ flag: "--local", description: "The workspace is on this machine." },
+	]}
+>
+Block until a terminal's screen matches a pattern, e.g. a dev server's
+"listening on". `matched` is the text the pattern matched, which can span
+lines. Exits 1 on timeout, or at once if the terminal exits first.
+
+```bash
+superset terminals wait --workspace ws_… --terminal term_… --match "listening on :\d+"
+```
+
+<CommandReturns>
+<JsonOutput>
+```ts
+{
+  terminalId: string;
+  matched: string;
+}
+```
+</JsonOutput>
+</CommandReturns>
+</Command>
+
+<Command
+	name="superset terminals attach"
+	options={[
+		{ flag: "--workspace <id>", required: true, description: "Workspace UUID." },
+		{ flag: "--terminal <id>", required: true, description: "Terminal session ID." },
+		{ flag: "--host <id>", description: "Host the workspace lives on (default: the cloud if your account has cloud workspaces, else this machine). Remote hosts go through the relay." },
+		{ flag: "--local", description: "The workspace is on this machine." },
+		{ flag: "--ssh <user@machine>", description: "Instead of --host or --local (it cannot be combined with them): run superset terminals attach --local on that machine over ssh -t. Needs superset installed and signed in there." },
+	]}
+>
+Attach this shell to a running terminal. `Ctrl+]` detaches; the terminal keeps running. Needs an interactive terminal and refuses
+to run in CI.
+
+```bash
+superset terminals attach --workspace ws_… --terminal term_…
+superset terminals attach --ssh me@build-box --workspace ws_… --terminal term_…
+```
 </Command>
 
 <Command
@@ -1153,13 +1316,183 @@ give an agent new instructions mid-session.
 	options={[
 		{ flag: "--workspace <id>", required: true, description: "Workspace UUID." },
 		{ flag: "--terminal <id>", required: true, description: "Terminal session ID." },
-		{ flag: "--host <id>", description: "Host the workspace lives on (default: this machine)." },
+		{ flag: "--host <id>", description: "Host the workspace lives on (default: the cloud if your account has cloud workspaces, else this machine)." },
+		{ flag: "--local", description: "The workspace is on this machine." },
 	]}
 >
 Close (dispose) a terminal running in a workspace. This ends the session.
 </Command>
 
 ---
+
+### snapshot
+
+<Command
+	name="superset snapshot"
+	options={[
+		{ flag: "--host <id>", description: "Host to read (default: this machine)." },
+		{ flag: "--workspace <id>", description: "Only this workspace." },
+	]}
+>
+One read of a host: every workspace, its live terminals, the agent in each with
+its state, and the pane layout when the desktop app is attached. Use it instead
+of listing terminals and panes workspace by workspace. An unknown `--workspace`
+is an error.
+
+```text
+acme-web / health-check  [health-check]  ws_…
+  terminal ebed…  "/health route README section"  claude · working
+  terminal 63c9…
+```
+
+<CommandReturns>
+<JsonOutput>
+```ts
+{
+  workspaces: Array<{
+    id: string; name: string; project: string | null; branch: string | null;
+    terminals: Array<{ id: string; title: string | null; agent: { id: string; state: "starting" | "working" | "blocked" | "idle" } | null }>;
+    layout: PaneLayout | null; // as in `panes list`; null without a desktop app
+    layoutError: string | null; // set when a desktop app is attached but the layout could not be read
+  }>;
+}
+```
+</JsonOutput>
+</CommandReturns>
+</Command>
+
+### panes
+
+Script the pane layout of a workspace in the desktop app. Commands go to the
+host, then to the desktop app, which applies them to the live layout. Works for
+workspaces on the machine running the desktop app. Only `focus` moves focus.
+
+<Command
+	name="superset panes list"
+	options={[
+		{ flag: "--workspace <id>", required: true, description: "Workspace UUID." },
+		{ flag: "--host <id>", description: "Host whose desktop app to ask (default: this machine)." },
+	]}
+>
+Tabs and the split tree. `row` splits are side by side and `column` splits are
+stacked, as in CSS flexbox; `ratio` is the first pane's share. Each terminal
+pane carries its title and the agent running in it with its state.
+
+```text
+row 50/50
+  pane-5f00…  terminal  terminal 63c9…  (active)
+  pane-03e1…  terminal  "/health route README section"  claude · working  terminal ebed…
+```
+
+<CommandReturns>
+<JsonOutput>
+```ts
+{
+  activeTabId: string | null;
+  tabs: Array<{
+    id: string; active: boolean; activePaneId: string | null;
+    layout: PaneNode; // { type: "split", direction: "row" | "column", ratio, first, second } | { type: "pane", paneId }
+    panes: Array<{
+      id: string; kind: string; title: string | null; terminalId: string | null; active: boolean;
+      terminalTitle?: string | null;
+      agent?: { id: string; state: "starting" | "working" | "blocked" | "idle" } | null;
+    }>;
+  }>;
+}
+```
+</JsonOutput>
+</CommandReturns>
+</Command>
+
+<Command
+	name="superset panes new-tab"
+	options={[
+		{ flag: "--workspace <id>", required: true, description: "Workspace UUID." },
+		{ flag: "--terminal <id>", description: "Show this existing terminal. Otherwise a new one is created." },
+		{ flag: "--command <cmd>", description: "Command to run in the new terminal." },
+		{ flag: "--host <id>", description: "Host whose desktop app to change (default: this machine)." },
+	]}
+>
+Open a new tab with a terminal pane, without moving focus.
+</Command>
+
+<Command
+	name="superset panes split"
+	options={[
+		{ flag: "--workspace <id>", required: true, description: "Workspace UUID." },
+		{ flag: "--pane <id>", required: true, description: "Pane to split." },
+		{ flag: "--direction <side>", required: true, description: "right, left, down, or up." },
+		{ flag: "--terminal <id>", description: "Show this existing terminal. Otherwise a new one is created." },
+		{ flag: "--command <cmd>", description: "Command to run in the new terminal." },
+		{ flag: "--host <id>", description: "Host whose desktop app to change (default: this machine)." },
+	]}
+>
+Split a pane and show a terminal in the new half.
+</Command>
+
+<Command
+	name="superset panes resize"
+	options={[
+		{ flag: "--workspace <id>", required: true, description: "Workspace UUID." },
+		{ flag: "--pane <id>", required: true, description: "Pane to resize." },
+		{ flag: "--ratio <0.05-0.95>", required: true, description: "The pane's share of its split." },
+		{ flag: "--host <id>", description: "Host whose desktop app to change (default: this machine)." },
+	]}
+>
+Set a pane's share of the split it sits in. `superset panes equalize
+--workspace <id> [--tab <id>]` evens out every split instead.
+</Command>
+
+<Command
+	name="superset panes move"
+	options={[
+		{ flag: "--workspace <id>", required: true, description: "Workspace UUID." },
+		{ flag: "--pane <id>", required: true, description: "Pane to move." },
+		{ flag: "--to <id>", description: "Place it beside this pane, in the same tab or another one." },
+		{ flag: "--direction <side>", description: "With --to: right, left, down, or up." },
+		{ flag: "--new-tab", description: "Move it into a tab of its own instead." },
+		{ flag: "--host <id>", description: "Host whose desktop app to change (default: this machine)." },
+	]}
+>
+Move a pane. A tab left empty closes. `superset panes swap --workspace <id>
+--pane A --with B` exchanges two panes, and `superset panes focus --workspace <id>
+--pane P` focuses one.
+</Command>
+
+<Command
+	name="superset panes close"
+	options={[
+		{ flag: "--workspace <id>", required: true, description: "Workspace UUID." },
+		{ flag: "--pane <id>", required: true, description: "Pane to close." },
+		{ flag: "--keep-terminal", description: "Keep the terminal running in the background instead of ending it." },
+		{ flag: "--host <id>", description: "Host whose desktop app to change (default: this machine)." },
+	]}
+>
+Close a pane and end its terminal, as the close button in the app does.
+</Command>
+
+### notifications
+
+<Command
+	name="superset notifications show"
+	args={[{ name: "title", required: true, description: "Notification title." }]}
+	options={[
+		{ flag: "--body <text>", description: "Text under the title." },
+		{ flag: "--sound", description: "Play the notification sound set in the app (respects its mute)." },
+		{ flag: "--workspace <id>", description: "Workspace to open on click (default: the calling terminal's, when --host is not given)." },
+		{ flag: "--terminal <id>", description: "Terminal to open on click (default: the calling terminal, when --host is not given)." },
+		{ flag: "--host <id>", description: "Host whose desktop app shows it (default: this machine)." },
+	]}
+>
+Show a desktop notification. Run from a Superset terminal, clicking it opens
+that terminal, so an agent can say "tests pass" and take you straight back.
+With `--host`, pass `--workspace` and `--terminal` for a click target; without
+them the click only brings the app forward.
+
+```bash
+superset notifications show "Tests pass" --body "12 passed" --sound
+```
+</Command>
 
 ### browser
 
@@ -1356,6 +1689,29 @@ Delete a page and every version. Interactive terminals ask for confirmation
 unless `--yes` is passed; non-interactive input does not prompt.
 </Command>
 
+<Command
+	name="superset pages storage <page>"
+	args={[
+		{ name: "page", required: true, description: "Page ID or slug." },
+	]}
+	options={[
+		{ flag: "--key <key>", description: "Show each person's value for this key." },
+	]}
+	output="{ pageId, keys: Array<{ key, records, updatedAt }> } | { pageId, key, records: Array<{ userId, name, image, value, updatedAt }> }"
+>
+Read what viewers stored with `window.superset.storage` on a page.
+Without `--key`, lists each key with its record count (KEY, RECORDS, UPDATED).
+With `--key`, lists each person's value for that key (NAME, VALUE, UPDATED).
+On a `just_me` page only the creator can read storage. On an `org` or
+`everyone` page, members of the page's organization can read it, even when the
+page is public.
+
+```bash
+superset pages storage weekly-report
+superset pages storage weekly-report --key votes --json
+```
+</Command>
+
 ---
 
 ### tasks (alias: `t`)
@@ -1378,9 +1734,6 @@ Linear, Superset tasks are not listed or resolved, and the reverse. Pass
 		{ flag: "--assignee-me, -m", description: "Tasks assigned to the current user." },
 		{ flag: "--creator-me", description: "Tasks created by the current user." },
 		{ flag: "--search <query>, -s", description: "Substring search on title or description." },
-		{ flag: "--project <id>", description: "Filter by Linear project id." },
-		{ flag: "--project-name <name>", description: "Filter by Linear project name (prefix, case-insensitive)." },
-		{ flag: "--cycle <id>", description: "Filter by Linear cycle id." },
 		{ flag: "--due-from <date>", description: "Tasks due on or after this date (YYYY-MM-DD)." },
 		{ flag: "--due-to <date>", description: "Tasks due on or before this date (YYYY-MM-DD)." },
 		{ flag: "--sort-by <field>", description: "createdAt | updatedAt | dueDate | priority. Default: createdAt." },

@@ -10,9 +10,17 @@
 
 import { randomBytes, timingSafeEqual } from "node:crypto";
 import type { IncomingMessage, Server } from "node:http";
+import { desktopNotificationSchema } from "@superset/shared/desktop-notification";
+import { paneLayoutRequestSchema } from "@superset/shared/pane-layout-ops";
 import log from "electron-log";
 import express, { type Request, type Response } from "express";
 import { type WebSocket, WebSocketServer } from "ws";
+import { z } from "zod";
+import { showCliNotification } from "../notifications/show-cli-notification";
+import {
+	PaneLayoutRequestError,
+	paneLayoutRequests,
+} from "../pane-layout/pane-layout-requests";
 import { setBrowserBridgeInfo } from "./browser-bridge-info";
 import {
 	type BrowserOpenRequest,
@@ -20,9 +28,12 @@ import {
 	CdpBusyError,
 	resolveGuestUrl,
 } from "./browser-manager";
-import { importCookiesIntoSession } from "./chrome-cookie-import";
 import {
-	listChromeImportSources,
+	hasSafeStorageKey,
+	importCookiesIntoSession,
+} from "./chrome-cookie-import";
+import {
+	listLoginImportSources,
 	resolveImportProfile,
 } from "./chrome-history-import";
 
@@ -285,9 +296,36 @@ export async function startBrowserBridge(): Promise<void> {
 		});
 	});
 
+	app.post("/pane-layout", (req, res) => {
+		const parsed = paneLayoutRequestSchema.safeParse(req.body);
+		if (!parsed.success) {
+			res.status(400).json({ error: z.prettifyError(parsed.error) });
+			return;
+		}
+		paneLayoutRequests
+			.request(parsed.data.workspaceId, parsed.data.op)
+			.then((result) => res.json(result))
+			.catch((err) =>
+				res
+					.status(err instanceof PaneLayoutRequestError ? err.status : 500)
+					.json({ error: errorMessage(err) }),
+			);
+	});
+
+	app.post("/notify", (req, res) => {
+		const parsed = desktopNotificationSchema.safeParse(req.body);
+		if (!parsed.success) {
+			res.status(400).json({ error: z.prettifyError(parsed.error) });
+			return;
+		}
+		res.json({ shown: showCliNotification(parsed.data) });
+	});
+
 	// Chromium browsers/profiles whose history and logins can be imported.
 	app.get("/import-sources", (_req, res) => {
-		res.json({ sources: listChromeImportSources() });
+		listLoginImportSources(hasSafeStorageKey)
+			.then((sources) => res.json({ sources }))
+			.catch((err) => res.status(500).json({ error: errorMessage(err) }));
 	});
 
 	// Import logins (cookies) from a system browser into this pane's session.

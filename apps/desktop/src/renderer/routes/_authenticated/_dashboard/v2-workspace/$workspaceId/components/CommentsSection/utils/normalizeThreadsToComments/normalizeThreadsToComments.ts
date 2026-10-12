@@ -15,6 +15,7 @@ export function normalizeThreadsToComments(
 		for (const comment of thread.comments) {
 			comments.push({
 				id: comment.id,
+				databaseId: comment.databaseId ?? undefined,
 				authorLogin: comment.author.login,
 				avatarUrl: comment.author.avatarUrl || undefined,
 				body: comment.body,

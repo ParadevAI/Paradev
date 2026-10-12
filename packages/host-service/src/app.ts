@@ -1,7 +1,10 @@
 import { createNodeWebSocket } from "@hono/node-ws";
 import { trpcServer } from "@hono/trpc-server";
 import { Octokit } from "@octokit/rest";
-import { SUPERSET_USER_ID_HEADER } from "@superset/shared/host-routing";
+import {
+	SUPERSET_RELAYED_HEADER,
+	SUPERSET_USER_ID_HEADER,
+} from "@superset/shared/host-routing";
 import { SANDBOX_PORTS } from "@superset/shared/sandbox-contract";
 
 /** One frame of a 1920x1200 display is ~9 MB; this is a stalled reader, not a burst. */
@@ -13,7 +16,12 @@ import type { MiddlewareHandler } from "hono";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { createApiClient } from "./api";
-import { createChatV3Mount, registerChatV3Routes } from "./chat-v3";
+import {
+	createChatAgentBridge,
+	createChatV3Mount,
+	promptChatSession,
+	registerChatV3Routes,
+} from "./chat-v3";
 import { createDb, type HostDb } from "./db";
 import { EventBus, GitWatcher, registerEventBusRoute } from "./events";
 import { agentIsBusy, PageWatchManager } from "./page-watch/index.ts";
@@ -46,6 +54,7 @@ import {
 	SqliteTerminalAgentBindingPersistence,
 	TerminalAgentStore,
 } from "./terminal-agents";
+import { matchesAgentBinding } from "./terminal-agents/matches-agent-binding";
 import { appRouter } from "./trpc/router";
 import { gitStatusStore } from "./trpc/router/git/utils/git-status-store";
 import {
@@ -188,13 +197,6 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 	});
 	pullRequestRuntime.start();
 
-	// Chat v3 runtime (plans/chat-v3-pane-mount.md). Registered unconditionally:
-	// the routes sit behind the same auth as every other host route, and the
-	// runtime is built on first request, so chat.db is never created on a host
-	// nobody chats with. Exposure is a client concern — the renderer gates the
-	// pane on the `chat-v3` PostHog flag.
-	const chatV3 = createChatV3Mount({ db, dbPath: config.dbPath });
-
 	const app = new Hono();
 	const { injectWebSocket, upgradeWebSocket } = createNodeWebSocket({ app });
 
@@ -253,6 +255,21 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 			text,
 			signal,
 		}) => {
+			const chat = terminalAgentStore.getChat(terminalId);
+			const chatSessionId = chat?.chatSessionId;
+			if (chatSessionId) {
+				if (!matchesAgentBinding(chat, expectedAgent)) {
+					throw new Error("The chat's agent changed before delivery");
+				}
+				await promptChatSession({
+					runtime: chatV3.runtime(),
+					chatSessionId,
+					text,
+					acquireDelivery,
+					signal,
+				});
+				return;
+			}
 			const result = await sendAgentMessage({
 				terminalId,
 				workspaceId,
@@ -270,12 +287,22 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 				throw new Error(result.error);
 			}
 		},
-		isTerminalAlive: (terminalId, workspaceId) =>
-			isAgentTerminalAlive({ terminalId, workspaceId, db, eventBus }),
+		isTerminalAlive: (terminalId, workspaceId) => {
+			const chat = terminalAgentStore.getChat(terminalId);
+			if (chat) return chat.lastEventType !== "Failed";
+			return isAgentTerminalAlive({ terminalId, workspaceId, db, eventBus });
+		},
 		isAgentBusy: (terminalId) =>
-			agentIsBusy(terminalAgentStore.get(terminalId)?.lastEventType),
+			agentIsBusy(
+				(
+					terminalAgentStore.getChat(terminalId) ??
+					terminalAgentStore.get(terminalId)
+				)?.lastEventType,
+			),
 		getAgent: (terminalId) => {
-			const binding = terminalAgentStore.get(terminalId);
+			const binding =
+				terminalAgentStore.getChat(terminalId) ??
+				terminalAgentStore.get(terminalId);
 			return binding?.endedAt === undefined ? binding : undefined;
 		},
 	});
@@ -285,7 +312,39 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		filesystem,
 		pullRequests: pullRequestRuntime,
 		pageWatch,
+		chat: () => chatV3.runtime(),
+		closeChats: (scopeId: string) => chatV3.closeScope(scopeId),
 	};
+
+	// Chat v3 runtime (plans/chat-v3-pane-mount.md). Registered unconditionally:
+	// the routes sit behind the same auth as every other host route, and the
+	// runtime is built on first request, so chat.db is never created on a host
+	// nobody chats with. Exposure is a client concern — the renderer gates the
+	// pane on the `chat-v3` PostHog flag.
+	const chatAgentContext: HostServiceContext = {
+		git,
+		credentials: providers.credentials,
+		github,
+		execGh,
+		api,
+		db,
+		runtime,
+		eventBus,
+		terminalAgentStore,
+		organizationId: config.organizationId,
+		isAuthenticated: true,
+		browserBridge: config.browserBridge,
+	};
+	const chatV3 = createChatV3Mount({
+		db,
+		dbPath: config.dbPath,
+		agents: createChatAgentBridge(chatAgentContext),
+		onSessionChanged: ({ scopeId, occurredAt }) =>
+			eventBus.broadcastChatSessionsChanged({
+				workspaceId: scopeId,
+				occurredAt,
+			}),
+	});
 
 	// Startup sweeps run in the background so they don't block server
 	// startup.
@@ -460,6 +519,8 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 						c.req.header("x-superset-client-machine-id") ?? undefined,
 					userId: c.req.header(SUPERSET_USER_ID_HEADER)?.trim() || undefined,
 					browserBridge: config.browserBridge,
+					apiAuth: providers.auth,
+					isLocalCaller: c.req.header(SUPERSET_RELAYED_HEADER) === undefined,
 				} as Record<string, unknown>;
 			},
 		}),

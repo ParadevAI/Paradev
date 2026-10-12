@@ -1,6 +1,6 @@
 ---
 name: browser
-description: Open, navigate, screenshot, read, click, and type in web pages from an agent. Use when the user asks to open a URL, preview or verify a running web app, check a page's console, fill a form, click through a web flow, or automate anything in a browser, including "open localhost:3000", "screenshot the page", "what does the console say", "click the submit button". Drives the in-app browser pane of a Superset workspace by default and Browser Use for browsers the panes cannot reach.
+description: Open, navigate, screenshot, read, click, and type in web pages from an agent. Use when the user asks to open a URL, preview or verify a running web app, check a page's console, fill a form, click through a web flow, or automate anything in a browser, including "open localhost:3000", "screenshot the page", "what does the console say", "click the submit button", "I'm logged in on Chrome". Drives the in-app browser pane of a Superset workspace by default and Browser Use for browsers the panes cannot reach.
 argument-hint: URL or what to do in the browser
 allowed-tools: Bash(superset:*) Bash(curl:*)
 ---
@@ -38,8 +38,10 @@ the pane verbs already cover those.
 
 ## Establish the control surface
 
-1. Run `superset browser --help` and require `list`, `open`, `navigate`,
-   `screenshot`, `eval`, `console`, and `cdp`. If absent, run `superset update`
+1. Run `superset schema 2>/dev/null | jq -re '.commands[] | select(.path==["browser"]) | .commands[].path[1]' || superset browser --help`
+   and require `list`, `open`, `navigate`, `screenshot`, `eval`, `console`, and
+   `cdp`. The `--help` fallback covers a CLI older than 1.34.0 (no `schema`) and
+   a machine without `jq`. If the verbs are absent, run `superset update`
    and recheck. The app-bundled CLI (`~/.superset/bin/superset`) updates only
    with the desktop app, so if it lacks `browser`, updating the app is the fix;
    check `type -a superset` for another install before giving up.
@@ -97,12 +99,24 @@ rejected with a clear error.
 to the sites the user already uses. It imports every cookie that profile has on
 disk, not just the one site, and panes share a profile, so say that when
 offering and run it only with the user's go-ahead. Offering it is how most
-users discover it: when a pane hits a login wall for a site the user uses in
-their own browser, suggest importing that login instead of stopping. The user
-always picks the source browser; people run several Chromium browsers (Chrome,
-Edge, Brave, Arc, Dia, Comet) and only they know which holds the session. macOS
-only; it reads the browser's Keychain key (first run prompts them to allow it)
-and never modifies the source browser.
+users discover it, so reach for it in two cases:
+
+- The user says they're already signed in somewhere ("I'm logged in on
+  Chrome", "use my Arc session", "it works in my browser"). Ask once before you
+  navigate, and wait for a yes: "Want me to import your logins from
+  <browser>? It copies all of that browser's cookies into the Superset
+  browser, not just this site." Naming the browser is not consent to the full
+  scope; the yes to this question is.
+- A pane hits a login wall for a site the user uses in their own browser:
+  suggest importing that login instead of stopping.
+
+Prefer this over attaching Browser Use to their own browser: the work stays in
+the pane they can see. The user always picks the source browser; people run
+several Chromium browsers (Chrome, Edge, Brave, Arc, Dia, Comet) and only they
+know which holds the session. macOS only; it reads the browser's Keychain key
+(first run prompts them to allow it) and never modifies the source browser. On
+another OS, or for a non-Chromium browser like Safari or Firefox, say it can't
+import and leave sign-in to the user.
 
 1. List the installed browsers and let the user choose:
    `superset browser import-login --workspace <id> --pane <paneId>`
@@ -119,7 +133,8 @@ Keychain prompt was denied; ask them to allow it and retry.
 ## Full interaction over raw CDP
 
 For clicking, typing, scrolling, waiting on selectors, or any Playwright-class
-flow, get the pane's CDP WebSocket endpoint:
+flow, get the pane's CDP WebSocket endpoint. This pattern is for panes only;
+for the user's own browser, follow `references/browser-use.md`:
 
 ```bash
 superset browser cdp --workspace <id> --pane <paneId> --json

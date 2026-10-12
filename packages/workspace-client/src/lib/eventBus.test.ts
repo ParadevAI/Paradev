@@ -79,6 +79,32 @@ describe("eventBus", () => {
 		expect(other.length).toBe(0);
 	});
 
+	it("delivers chat:sessions-changed to listeners for its workspace", async () => {
+		const host = makeHostServer();
+		const bus = getEventBus(host.hostUrl, () => "tok");
+		const received: Array<[string, unknown]> = [];
+		cleanups.push(
+			bus.on("chat:sessions-changed", "ws-1", (workspaceId, payload) =>
+				received.push([workspaceId, payload]),
+			),
+		);
+		cleanups.push(() => host.server.stop(true));
+
+		await waitFor(() => host.clientCount() === 1);
+		host.push({
+			type: "chat:sessions-changed",
+			workspaceId: "ws-2",
+			occurredAt: 1,
+		});
+		host.push({
+			type: "chat:sessions-changed",
+			workspaceId: "ws-1",
+			occurredAt: 2,
+		});
+		await waitFor(() => received.length === 1);
+		expect(received).toEqual([["ws-1", { occurredAt: 2 }]]);
+	});
+
 	it("shares one connection per hostUrl across handles", async () => {
 		const host = makeHostServer();
 		const busA = getEventBus(host.hostUrl, () => "tok");

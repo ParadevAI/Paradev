@@ -26,3 +26,11 @@ export function getInitials(
 	// Fallback to first character of email
 	return email?.[0]?.toUpperCase() ?? "";
 }
+
+/**
+ * First name from a full name: "Priya Sharma" → "Priya". The whole trimmed
+ * name when it has no spaces, and "" when there is no name at all.
+ */
+export function firstName(name?: string | null): string {
+	return name?.trim().split(/\s+/)[0] ?? "";
+}

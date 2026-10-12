@@ -24,7 +24,7 @@ import { terminalRuntimeRegistry } from "renderer/lib/terminal/terminal-runtime-
 import {
 	PasteUploadLimitError,
 	uploadPastedFiles,
-} from "../../uploadPastedFiles";
+} from "../../../../utils/uploadPastedFiles";
 import { TerminalPaneIcon } from "../TerminalPaneIcon";
 import { prepareTerminalSubmission } from "./prepareTerminalSubmission";
 

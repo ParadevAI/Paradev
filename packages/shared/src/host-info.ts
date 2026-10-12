@@ -61,6 +61,14 @@ export function getMachineId(): string {
 
 let cachedHashedId: string | null = null;
 
+/** The host id a machine with this raw machine id registers under. */
+export function hostIdFromMachineId(machineId: string): string {
+	return createHmac("sha256", APP_HOST_SALT)
+		.update(machineId)
+		.digest("hex")
+		.slice(0, 32);
+}
+
 /**
  * Stable host id safe for cloud transmission.
  * HMAC of the raw machine id; non-reversible and app-specific.
@@ -68,11 +76,7 @@ let cachedHashedId: string | null = null;
  */
 export function getHostId(): string {
 	if (!cachedHashedId) {
-		const machineId = getMachineId();
-		cachedHashedId = createHmac("sha256", APP_HOST_SALT)
-			.update(machineId)
-			.digest("hex")
-			.slice(0, 32);
+		cachedHashedId = hostIdFromMachineId(getMachineId());
 	}
 	return cachedHashedId;
 }

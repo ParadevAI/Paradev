@@ -122,7 +122,8 @@ describe("codexAdapter fixtures", () => {
 		expect(sessionStates[0]).toEqual({ status: "starting" });
 		expect(sessionStates[1]).toMatchObject({
 			status: "idle",
-			modeId: "auto",
+			harnessSessionId: "019fd2fb-7896-7791-b199-a568c89d4986",
+			modeId: "full-access",
 			modelId: "gpt-5.5",
 			availableModes: [
 				{ id: "read-only", label: "Read Only" },

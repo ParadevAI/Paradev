@@ -57,6 +57,8 @@ export const CLAUDE_MODES = [
 	{ id: "bypassPermissions", label: "Full access" },
 ] as const satisfies readonly { id: ClaudePermissionMode; label: string }[];
 
+export const DEFAULT_CLAUDE_MODE: ClaudePermissionMode = "bypassPermissions";
+
 function claudeMode(modeId: string | undefined): ClaudePermissionMode {
 	return CLAUDE_MODES.find((mode) => mode.id === modeId)?.id ?? "default";
 }
@@ -179,6 +181,7 @@ export class ClaudeAdapter implements HarnessAdapter {
 	private readonly abortController = new AbortController();
 	private translator: ClaudeTranslator | null = null;
 	private session: ClaudeSession | null = null;
+	private sessionId: string | null = null;
 	private modeId: ClaudePermissionMode = "default";
 	private pump: Promise<void> | null = null;
 	private disposed = false;
@@ -193,7 +196,10 @@ export class ClaudeAdapter implements HarnessAdapter {
 		});
 		this.translator = translator;
 
-		this.modeId = claudeMode(startOptions.modeId);
+		this.modeId = claudeMode(
+			startOptions.modeId ??
+				(startOptions.resume ? undefined : DEFAULT_CLAUDE_MODE),
+		);
 		this.events.push({
 			kind: "session",
 			session: { modeId: this.modeId, availableModes: [...CLAUDE_MODES] },
@@ -320,6 +326,7 @@ export class ClaudeAdapter implements HarnessAdapter {
 		try {
 			for await (const message of stream) {
 				if (this.disposed) return;
+				this.reportSessionId(message);
 				for (const event of translator.translate(message)) {
 					this.events.push(event);
 				}
@@ -329,6 +336,17 @@ export class ClaudeAdapter implements HarnessAdapter {
 				this.events.push(event);
 			}
 		}
+	}
+
+	private reportSessionId(message: unknown): void {
+		if (typeof message !== "object" || message === null) return;
+		const sessionId = (message as { session_id?: unknown }).session_id;
+		if (typeof sessionId !== "string" || sessionId === this.sessionId) return;
+		this.sessionId = sessionId;
+		this.events.push({
+			kind: "session",
+			session: { harnessSessionId: sessionId },
+		});
 	}
 
 	private requestApproval(

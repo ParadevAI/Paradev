@@ -20,8 +20,12 @@ import {
 	PinOff,
 	Trash2,
 } from "lucide-react";
-import { type MouseEvent, useState } from "react";
-import { PageThumbnail } from "./components/PageThumbnail";
+import { type MouseEvent, useId, useState } from "react";
+import { PageThumbnail } from "renderer/routes/_authenticated/_dashboard/components/PageThumbnail";
+import { CommentCount } from "./components/CommentCount";
+import { CommentPreviewPanel } from "./components/CommentPreviewPanel";
+import { useCommentPreview } from "./hooks/useCommentPreview";
+import type { PageCardCommentPreview } from "./types";
 
 export interface PageCardItem {
 	id: string;
@@ -36,6 +40,8 @@ export interface PageCardItem {
 	sharedVersion: number | null;
 	createdByUserId: string | null;
 	ownerName: string | null;
+	commentCount: number;
+	commentPreview: PageCardCommentPreview | null;
 }
 
 interface PageCardProps {
@@ -73,6 +79,10 @@ export function PageCard({
 	const wasEdited = edited - created > 60_000;
 	const timestamp = formatRelativeTime(wasEdited ? edited : created);
 
+	const preview = page.commentPreview;
+	const trigger = useCommentPreview({ eligible: preview !== null });
+	const panelDomId = useId();
+
 	const copyLink = async () => {
 		try {
 			await navigator.clipboard.writeText(page.url);
@@ -91,31 +101,67 @@ export function PageCard({
 	};
 
 	return (
-		<div className="group relative flex flex-col overflow-hidden rounded-lg border border-border bg-card transition-colors hover:border-muted-foreground/30">
-			<button
-				type="button"
-				onClick={(event) => onOpen(page, event)}
-				className="flex flex-1 flex-col text-left"
-			>
-				<PageThumbnail src={page.thumbnailUrl} />
-				<div className="flex flex-col gap-1 border-border/60 border-t px-3 py-2.5">
-					<span className="truncate font-medium text-sm">{page.title}</span>
-					<span className="flex items-center gap-1.5 text-muted-foreground text-xs">
-						<VisibilityIcon className="size-3 shrink-0" />
-						<span aria-hidden="true">·</span>
-						<span className="truncate">
-							{wasEdited ? <Trans>Edited</Trans> : <Trans>Created</Trans>}{" "}
-							{timestamp}
-						</span>
-						{ownerName ? (
-							<>
-								<span aria-hidden="true">·</span>
-								<span className="truncate">{ownerName}</span>
-							</>
-						) : null}
-					</span>
+		<div
+			ref={trigger.cardRef}
+			className={cn(
+				"group relative flex flex-col rounded-lg border border-border bg-card transition-colors hover:border-muted-foreground/30",
+				trigger.open && "z-10",
+			)}
+			{...trigger.cardProps}
+		>
+			<div className="relative">
+				<div aria-hidden="true" className="overflow-hidden rounded-t-[7px]">
+					<PageThumbnail src={page.thumbnailUrl} />
 				</div>
-			</button>
+				{preview ? (
+					<CommentPreviewPanel
+						slug={page.slug}
+						preview={preview}
+						panelId={panelDomId}
+						open={trigger.open}
+						triggerProps={trigger.panelProps}
+					/>
+				) : null}
+			</div>
+
+			<div className="flex flex-col gap-1 border-border/60 border-t px-3 py-2.5">
+				<div className="flex items-center justify-between gap-2">
+					<button
+						type="button"
+						onClick={(event) => onOpen(page, event)}
+						className="min-w-0 flex-1 text-left after:absolute after:inset-0 after:rounded-lg focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-ring"
+					>
+						<span className="block truncate font-medium text-sm">
+							{page.title}
+						</span>
+					</button>
+					{page.commentCount > 0 ? (
+						<CommentCount
+							slug={page.slug}
+							count={page.commentCount}
+							unread={preview?.unread ?? false}
+							open={trigger.open}
+							panelId={preview ? panelDomId : undefined}
+							countRef={trigger.countRef}
+							triggerProps={trigger.countProps}
+						/>
+					) : null}
+				</div>
+				<span className="flex items-center gap-1.5 text-muted-foreground text-xs">
+					<VisibilityIcon className="size-3 shrink-0" />
+					<span aria-hidden="true">·</span>
+					<span className="truncate">
+						{wasEdited ? <Trans>Edited</Trans> : <Trans>Created</Trans>}{" "}
+						{timestamp}
+					</span>
+					{ownerName ? (
+						<>
+							<span aria-hidden="true">·</span>
+							<span className="truncate">{ownerName}</span>
+						</>
+					) : null}
+				</span>
+			</div>
 
 			{isPinned && (
 				<Pin className="absolute top-2 left-2 size-3.5 fill-current text-muted-foreground" />

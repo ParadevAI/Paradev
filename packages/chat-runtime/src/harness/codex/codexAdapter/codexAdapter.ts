@@ -139,7 +139,14 @@ export class CodexAdapter implements HarnessAdapter {
 
 	start(startOptions: HarnessStartOptions): AsyncIterable<AdapterEvent> {
 		this.cwd = startOptions.cwd;
-		this.modeId = startOptions.modeId ?? DEFAULT_CODEX_MODE;
+		const requested = CODEX_MODES.find(
+			(mode) => mode.id === startOptions.modeId,
+		)?.id;
+		this.modeId =
+			requested ??
+			(startOptions.modeId || startOptions.resume
+				? "auto"
+				: DEFAULT_CODEX_MODE);
 		this.modelId = startOptions.modelId;
 		void this.bootstrap(startOptions);
 		return this.queue.iterable();
@@ -262,6 +269,7 @@ export class CodexAdapter implements HarnessAdapter {
 
 			this.emitSession({
 				status: "idle",
+				harnessSessionId: this.threadId,
 				modeId: this.modeId,
 				availableModes: [...CODEX_MODES],
 				...(this.modelId ? { modelId: this.modelId } : {}),

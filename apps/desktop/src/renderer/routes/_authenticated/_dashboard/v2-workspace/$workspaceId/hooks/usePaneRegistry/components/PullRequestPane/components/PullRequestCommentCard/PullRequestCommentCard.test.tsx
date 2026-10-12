@@ -1,41 +1,41 @@
 import { afterAll, afterEach, describe, expect, mock, test } from "bun:test";
-import { GlobalRegistrator } from "@happy-dom/global-registrator";
+import { PullRequestActivityReplyProvider } from "renderer/routes/_authenticated/_dashboard/pull-requests/providers/PullRequestActivityReplyProvider";
+import type { PullRequestCommentCardProps } from "./PullRequestCommentCard";
 
-const registered = GlobalRegistrator.isRegistered;
-if (!registered) GlobalRegistrator.register();
-(
-	globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
-).IS_REACT_ACT_ENVIRONMENT = true;
-mock.module("@superset/workspace-client", () => ({
-	workspaceTrpc: {
-		useUtils: () => ({
-			git: { getPullRequestThreads: { invalidate: () => {} } },
-		}),
-		git: {
-			setReviewThreadResolution: {
-				useMutation: () => ({ mutate: () => {}, isPending: false }),
-			},
-		},
-	},
-}));
-mock.module("renderer/components/MarkdownRenderer/components", () => ({
-	SafeImage: () => null,
-}));
-mock.module("renderer/lib/trpc-client", () => ({
-	electronTrpcClient: { external: { copyText: { mutate: async () => {} } } },
-}));
-mock.module("renderer/stores", () => ({ useTheme: () => ({ type: "dark" }) }));
-mock.module("renderer/components/CommentMarkdown", () => ({
-	CommentMarkdown: ({ body }: { body: string }) => <p>{body}</p>,
-}));
+const reactActGlobal = globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean };
+const previousActEnvironment = reactActGlobal.IS_REACT_ACT_ENVIRONMENT;
+reactActGlobal.IS_REACT_ACT_ENVIRONMENT = true;
 const { cleanup, fireEvent, render } = await import("@testing-library/react");
+const { QueryClient } = await import("@tanstack/react-query");
+const { workspaceTrpc } = await import("@superset/workspace-client");
 const { PullRequestCommentCard } = await import("./PullRequestCommentCard");
+
+function renderCard(
+	props: Pick<
+		PullRequestCommentCardProps,
+		"comment" | "replies" | "onOpenInDiff"
+	>,
+	requestReply: ((target: { commentId: number }) => void) | null = null,
+) {
+	return render(
+		<workspaceTrpc.Provider
+			client={workspaceTrpc.createClient({ links: [] })}
+			queryClient={new QueryClient()}
+		>
+			<PullRequestActivityReplyProvider value={requestReply}>
+				<PullRequestCommentCard workspaceId="ws" {...props} />
+			</PullRequestActivityReplyProvider>
+		</workspaceTrpc.Provider>,
+	);
+}
 afterEach(cleanup);
 afterAll(async () => {
-	if (!registered) await GlobalRegistrator.unregister();
+	reactActGlobal.IS_REACT_ACT_ENVIRONMENT = previousActEnvironment;
 });
 const comment = {
 	id: "c1",
+	databaseId: 4242,
+	url: "https://github.com/example/repo/pull/1#discussion_r4242",
 	authorLogin: "reviewer",
 	body: "Keep the **selected line** visible.\n\nRead [the context](https://github.com/example/repo/pull/1).",
 	kind: "review" as const,
@@ -45,36 +45,74 @@ const comment = {
 	isResolved: false,
 };
 describe("review cards", () => {
+	test("the header names the author, the file and its state, and replies sit under the body", () => {
+		const view = renderCard({
+			comment: { ...comment, threadId: "T1", isResolved: true },
+			replies: [
+				{
+					...comment,
+					id: "c2",
+					authorLogin: "author",
+					body: "Fixed in the next push.",
+				},
+			],
+		});
+		const header = view.getByText("reviewer").closest("header");
+		expect(header?.textContent).toContain("src/app.ts:42");
+		expect(header?.textContent).toContain("Resolved");
+		expect(header?.textContent).not.toContain("Keep the");
+		const card = header?.parentElement;
+		const root = view.getByText(/Keep the/);
+		const reply = view.getByText("Fixed in the next push.");
+		expect(card?.contains(root)).toBe(true);
+		expect(card?.contains(reply)).toBe(true);
+		expect(
+			Boolean(
+				root.compareDocumentPosition(reply) & Node.DOCUMENT_POSITION_FOLLOWING,
+			),
+		).toBe(true);
+		expect(view.getByRole("button", { name: "Unresolve" })).toBeTruthy();
+	});
 	test("renders the full comment body without making it a navigation button", () => {
 		const onOpenInDiff = mock(() => {});
-		const view = render(
-			<PullRequestCommentCard
-				workspaceId="ws"
-				comment={comment}
-				onOpenComment={() => {}}
-				onOpenInDiff={onOpenInDiff}
-			/>,
-		);
+		const view = renderCard({ comment, onOpenInDiff });
 		const body = view.getByText(/Keep the/);
-		expect(body.textContent).toBe(comment.body);
+		expect(body.textContent).toBe("Keep the selected line visible.");
+		expect(view.getByText("selected line").tagName).toBe("STRONG");
+		expect(view.getByRole("link", { name: "the context" })).toHaveProperty(
+			"href",
+			"https://github.com/example/repo/pull/1",
+		);
 		expect(body.closest("button")).toBeNull();
 		fireEvent.click(body);
 		expect(onOpenInDiff).not.toHaveBeenCalled();
+	});
+	test("Reply hands the thread to the composer, or opens GitHub when nothing can take it", () => {
+		const requestReply = mock((_target: { commentId: number }) => {});
+		const inline = renderCard({ comment }, requestReply);
+		fireEvent.click(inline.getByRole("button", { name: "Reply" }));
+		expect(requestReply).toHaveBeenCalledWith({
+			commentId: 4242,
+			author: { login: "reviewer", avatarUrl: undefined },
+		});
+		inline.unmount();
+		const fallback = renderCard({ comment });
+		expect(fallback.getByRole("link", { name: "Reply" })).toHaveProperty(
+			"href",
+			comment.url,
+		);
+		expect(fallback.queryByRole("button", { name: "Reply" })).toBeNull();
 	});
 	test.each([
 		["LEFT", "deletions"],
 		["RIGHT", "additions"],
 	] as const)("opens the %s diff from the file link", (diffSide, side) => {
 		const onOpenInDiff = mock(() => {});
-		const view = render(
-			<PullRequestCommentCard
-				workspaceId="ws"
-				comment={{ ...comment, diffSide }}
-				onOpenComment={() => {}}
-				onOpenInDiff={onOpenInDiff}
-			/>,
-		);
-		fireEvent.click(view.getByRole("button", { name: /src\/app.ts/ }));
+		const view = renderCard({
+			comment: { ...comment, diffSide },
+			onOpenInDiff,
+		});
+		fireEvent.click(view.getByRole("button", { name: /^src\/app\.ts/ }));
 		expect(onOpenInDiff).toHaveBeenCalledWith(
 			"src/app.ts",
 			42,

@@ -2,7 +2,7 @@
 	"name": "@superset/desktop",
 	"productName": "Superset",
 	"description": "The last developer tool you'll ever need",
-	"version": "1.35.0",
+	"version": "1.37.0",
 	"main": "./dist/main/index.js",
 	"resources": "src/resources",
 	"repository": {
@@ -38,7 +38,7 @@
 		"generate:routes": "tsr generate",
 		"pretypecheck": "bun run generate:icons && bun run generate:routes",
 		"typecheck": "tsc --noEmit",
-		"test": "bun test --isolate"
+		"test": "bun test"
 	},
 	"dependencies": {
 		"@agentclientprotocol/claude-agent-acp": "0.85.0",
@@ -233,9 +233,9 @@
 		"remark-parse": "11.0.0",
 		"semver": "7.7.4",
 		"shell-env": "4.0.3",
-		"shell-quote": "1.9.0",
+		"shell-quote": "1.11.0",
 		"shiki": "3.23.0",
-		"simple-git": "3.36.0",
+		"simple-git": "4.0.2",
 		"streamdown": "2.5.0",
 		"strip-ansi": "7.2.0",
 		"superjson": "2.2.6",

@@ -1,0 +1,684 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Comment preview popover on document cards</title>
+<style>
+  :root {
+    --paper: #f7f5f1;
+    --ink: #232019;
+    --sub: #736f64;
+    --faint: #a9a291;
+    --rule: #e5e1d6;
+    --canvas: #e9eaee;
+    --card: #ffffff;
+    --blue: #3b82f6;
+    --codebg: rgba(35, 32, 25, 0.055);
+    --serif: "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 43rem; margin: 0 auto; padding: 0 24px; }
+  .wide { max-width: 62rem; margin: 0 auto; padding: 0 24px; }
+
+  /* ---------- masthead ---------- */
+  .masthead { padding: 72px 0 8px; }
+  .kicker {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+  h1 {
+    font-family: var(--serif);
+    font-size: clamp(28px, 5vw, 36px);
+    line-height: 1.15;
+    font-weight: 700;
+    margin: 10px 0 12px;
+    letter-spacing: -0.01em;
+  }
+  .lede { font-size: 18px; color: var(--sub); margin: 0; max-width: 36rem; }
+  .tokens {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--sub);
+    margin-top: 22px;
+    padding-top: 14px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 22px;
+  }
+  .tokens b { font-weight: 600; color: var(--ink); }
+
+  /* ---------- prose ---------- */
+  section.prose { margin-top: 46px; }
+  h2 {
+    font-family: var(--serif);
+    font-size: 21px;
+    font-weight: 700;
+    margin: 0 0 12px;
+  }
+  h2 .no {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--faint);
+    letter-spacing: 0.08em;
+    margin-right: 12px;
+    position: relative;
+    top: -1px;
+  }
+  p { margin: 0 0 14px; }
+  code {
+    font-family: var(--mono);
+    font-size: 0.83em;
+    background: var(--codebg);
+    padding: 1.5px 5px;
+    border-radius: 4px;
+  }
+  ul.spec { list-style: none; margin: 0; padding: 0; }
+  ul.spec li { position: relative; padding-left: 20px; margin-bottom: 10px; }
+  ul.spec li::before { content: "–"; position: absolute; left: 2px; color: var(--faint); }
+
+  /* ---------- demo ---------- */
+  .demo-block { margin-top: 54px; }
+  .demo-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px; margin-bottom: 14px; }
+  .demo-head h2 { margin: 0; }
+  .demo-hint { font-size: 13px; color: var(--sub); }
+  .canvas {
+    background: var(--canvas);
+    border-radius: 14px;
+    padding: 26px;
+    box-shadow: inset 0 0 0 1px rgba(35, 32, 25, 0.05);
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(212px, 1fr));
+    gap: 22px;
+  }
+  figure.slot { margin: 0; min-width: 0; }
+  figcaption {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #8f929c;
+    margin-top: 10px;
+    text-align: center;
+  }
+  .demo-note { font-size: 13px; color: var(--sub); margin-top: 12px; }
+
+  /* document card */
+  .dcard {
+    position: relative;
+    z-index: 1;
+    background: var(--card);
+    border-radius: 12px;
+    box-shadow: 0 0 0 1px rgba(35, 32, 25, 0.07), 0 1px 3px rgba(35, 32, 25, 0.06);
+  }
+  .dcard.open { z-index: 10; }
+  .dbody { position: relative; }
+  .thumb {
+    border-radius: 12px 12px 0 0;
+    overflow: hidden;
+    aspect-ratio: 16 / 10;
+  }
+  .thumb svg { display: block; width: 100%; height: 100%; }
+  .dfoot { padding: 10px 12px 11px; }
+  .trow { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .dtitle {
+    font-size: 13.5px;
+    font-weight: 600;
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+  .dmeta { font-size: 12px; color: var(--sub); margin-top: 3px; }
+
+  /* comment count */
+  .count {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 7px;
+    margin: -3px -7px -3px 0;
+    border-radius: 7px;
+    text-decoration: none;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--sub);
+    cursor: pointer;
+  }
+  .dcard:hover .count,
+  .count:hover,
+  .count:focus-visible,
+  .dcard.open .count {
+    background: rgba(35, 32, 25, 0.067);
+    color: #45423b;
+  }
+  .cicon { position: relative; display: inline-flex; }
+  .count .dot { display: none; }
+  .count.unread .cnum { color: var(--ink); }
+  .count.unread .dot {
+    display: block;
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--blue);
+    box-shadow: 0 0 0 1.5px var(--card);
+  }
+
+  /* preview panel */
+  .preview {
+    position: absolute;
+    right: 12px;
+    bottom: 0;
+    width: min(300px, calc(100vw - 72px));
+    background: var(--card);
+    border-radius: 10px;
+    box-shadow:
+      0 0 0 1px rgba(35, 32, 25, 0.08),
+      0 12px 32px -8px rgba(35, 32, 25, 0.22),
+      0 4px 12px -6px rgba(35, 32, 25, 0.14);
+    padding: 12px 14px 14px;
+    text-decoration: none;
+    display: block;
+    z-index: 5;
+    opacity: 0;
+    transform: translateY(4px);
+    pointer-events: none;
+    transition: opacity 140ms ease-out, transform 140ms ease-out;
+  }
+  .dcard.open .preview { opacity: 1; transform: none; pointer-events: auto; }
+  .pv-head { display: flex; align-items: center; gap: 8px; }
+  .pv-avatar {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9.5px;
+    font-weight: 600;
+  }
+  .pv-byline { font-size: 13px; color: var(--sub); }
+  .pv-body {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    margin-top: 8px;
+    font-size: 15px;
+    line-height: 20px;
+    color: var(--ink);
+  }
+
+  .count:focus-visible, .preview:focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .preview { transition: none; transform: none; }
+  }
+
+  /* ---------- checklist ---------- */
+  .check {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--rule);
+    cursor: pointer;
+  }
+  .check:first-of-type { border-top: 1px solid var(--rule); }
+  .check input {
+    flex: none;
+    width: 15px;
+    height: 15px;
+    margin: 5px 0 0;
+    accent-color: var(--blue);
+    cursor: pointer;
+  }
+  .check-note { font-size: 12.5px; color: var(--faint); margin-top: 10px; }
+
+  /* ---------- footer ---------- */
+  .endnote {
+    margin: 60px 0 0;
+    padding: 18px 0 72px;
+    border-top: 1px solid var(--rule);
+    font-size: 14px;
+    color: var(--sub);
+  }
+
+  /* ---------- toast ---------- */
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: 28px;
+    transform: translateX(-50%) translateY(8px);
+    background: #211f1c;
+    color: #f5f3ef;
+    font-size: 13.5px;
+    line-height: 1.4;
+    padding: 9px 14px;
+    border-radius: 9px;
+    max-width: calc(100vw - 48px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    z-index: 99;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%); }
+  @media (prefers-reduced-motion: reduce) {
+    .toast { transition: none; transform: translateX(-50%); }
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead wrap">
+  <div class="kicker">Interaction spec</div>
+  <h1>Comment preview popover on document cards</h1>
+  <p class="lede">The comment count becomes the trigger, and the preview panel anchors to it — hovering the card no longer opens anything.</p>
+  <div class="tokens">
+    <span>intent <b>100ms</b></span>
+    <span>grace <b>200ms</b></span>
+    <span>panel <b>300px</b></span>
+    <span>radius <b>10px</b></span>
+    <span>motion <b>140ms ease-out</b></span>
+    <span>clamp <b>2 lines</b></span>
+  </div>
+</header>
+
+<section class="prose wrap">
+  <h2><span class="no">00</span>Context</h2>
+  <p>Document cards have a thumbnail, then a footer with a title row (title on the left, comment count on the right) and a meta row (&ldquo;Kiet&nbsp;·&nbsp;Edited 18s ago&rdquo;). Today, hovering anywhere on the card opens a floating panel over the thumbnail showing the newest reply, centered with no relationship to the count.</p>
+  <p>Change this so the count is the trigger and the panel is anchored to it. Keep the existing visual tokens (colors, radii, type scale, popover shadow) and component conventions. Don&rsquo;t introduce new tokens unless something below has no equivalent.</p>
+</section>
+
+<div class="demo-block wide">
+  <div class="demo-head">
+    <h2>The behavior, live</h2>
+    <span class="demo-hint">Rest the pointer on a count · Tab reaches it, Esc closes · on touch, first tap opens and the next follows the link</span>
+  </div>
+  <div class="canvas">
+    <div class="grid">
+
+      <figure class="slot">
+        <article class="dcard">
+          <div class="dbody">
+            <div class="thumb" aria-hidden="true">
+              <svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice">
+                <rect width="320" height="200" fill="#f4f1ea"/>
+                <rect x="52" y="30" width="216" height="150" rx="3" fill="#fdfcfa"/>
+                <rect x="72" y="52" width="120" height="9" rx="2" fill="#ded8ca"/>
+                <rect x="72" y="74" width="176" height="5" rx="2" fill="#e9e4d9"/>
+                <rect x="72" y="86" width="176" height="5" rx="2" fill="#e9e4d9"/>
+                <rect x="72" y="98" width="140" height="5" rx="2" fill="#e9e4d9"/>
+                <rect x="72" y="118" width="176" height="5" rx="2" fill="#e9e4d9"/>
+                <rect x="72" y="130" width="158" height="5" rx="2" fill="#e9e4d9"/>
+              </svg>
+            </div>
+            <a class="preview" id="pv-1" href="#thread-1">
+              <span class="pv-head">
+                <span class="pv-avatar" style="background:#dbe5f2;color:#3c5a82" aria-hidden="true">P</span>
+                <span class="pv-byline">Priya · 2h</span>
+              </span>
+              <span class="pv-body">I reran the numbers with the September close included and the mid-market segment flips — we&rsquo;re at 1.42M, not 1.31M like the deck says. Can we update the summary slide and both charts that quote it before Thursday&rsquo;s review?</span>
+            </a>
+          </div>
+          <div class="dfoot">
+            <div class="trow">
+              <span class="dtitle">Q3 pipeline review</span>
+              <a class="count unread" href="#thread-1" aria-label="5 comments, new replies" aria-describedby="pv-1">
+                <span class="cicon" aria-hidden="true">
+                  <svg viewBox="0 0 16 16" width="14" height="14" fill="none"><path d="M8 2.6c3.1 0 5.4 2.1 5.4 4.9S11.1 12.4 8 12.4c-.6 0-1.2-.1-1.7-.2L3.6 13.4l.6-2.2C3.2 10.3 2.6 9 2.6 7.5 2.6 4.7 4.9 2.6 8 2.6Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+                  <i class="dot"></i>
+                </span>
+                <span class="cnum">5</span>
+              </a>
+            </div>
+            <div class="dmeta">Kiet · Edited 18s ago</div>
+          </div>
+        </article>
+        <figcaption>Unread · long reply clamps</figcaption>
+      </figure>
+
+      <figure class="slot">
+        <article class="dcard">
+          <div class="dbody">
+            <div class="thumb" aria-hidden="true">
+              <svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice">
+                <rect width="320" height="200" fill="#eef2f5"/>
+                <rect x="46" y="42" width="228" height="116" rx="4" fill="#fdfdfd"/>
+                <rect x="64" y="66" width="96" height="10" rx="2" fill="#cfd9e2"/>
+                <rect x="64" y="90" width="150" height="5" rx="2" fill="#dfe6ec"/>
+                <rect x="64" y="102" width="150" height="5" rx="2" fill="#dfe6ec"/>
+                <rect x="64" y="124" width="70" height="16" rx="8" fill="#d8e3f0"/>
+              </svg>
+            </div>
+            <a class="preview" id="pv-2" href="#thread-2">
+              <span class="pv-head">
+                <span class="pv-avatar" style="background:#e3ddf0;color:#5b4a86" aria-hidden="true">N</span>
+                <span class="pv-byline">Noah · 1d</span>
+              </span>
+              <span class="pv-body">Swapped the second paragraph for the shorter version we discussed.</span>
+            </a>
+          </div>
+          <div class="dfoot">
+            <div class="trow">
+              <span class="dtitle">Onboarding flow copy</span>
+              <a class="count" href="#thread-2" aria-label="2 comments" aria-describedby="pv-2">
+                <span class="cicon" aria-hidden="true">
+                  <svg viewBox="0 0 16 16" width="14" height="14" fill="none"><path d="M8 2.6c3.1 0 5.4 2.1 5.4 4.9S11.1 12.4 8 12.4c-.6 0-1.2-.1-1.7-.2L3.6 13.4l.6-2.2C3.2 10.3 2.6 9 2.6 7.5 2.6 4.7 4.9 2.6 8 2.6Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+                  <i class="dot"></i>
+                </span>
+                <span class="cnum">2</span>
+              </a>
+            </div>
+            <div class="dmeta">Noah · Edited 2d ago</div>
+          </div>
+        </article>
+        <figcaption>Read · no dot</figcaption>
+      </figure>
+
+      <figure class="slot">
+        <article class="dcard">
+          <div class="dbody">
+            <div class="thumb" aria-hidden="true">
+              <svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice">
+                <rect width="320" height="200" fill="#f5eff0"/>
+                <rect x="42" y="34" width="110" height="80" rx="3" fill="#e7d9dd"/>
+                <rect x="164" y="34" width="114" height="52" rx="3" fill="#d9dee7"/>
+                <rect x="164" y="98" width="114" height="68" rx="3" fill="#e2e7d9"/>
+                <rect x="42" y="126" width="110" height="40" rx="3" fill="#efe6d4"/>
+              </svg>
+            </div>
+            <a class="preview" id="pv-3" href="#thread-3">
+              <span class="pv-head">
+                <span class="pv-avatar" style="background:#d8ecdf;color:#33684a" aria-hidden="true">T</span>
+                <span class="pv-byline">Tomás · 4h</span>
+              </span>
+              <span class="pv-body">Tomás attached an image</span>
+            </a>
+          </div>
+          <div class="dfoot">
+            <div class="trow">
+              <span class="dtitle">Brand refresh moodboard</span>
+              <a class="count unread" href="#thread-3" aria-label="3 comments, new replies" aria-describedby="pv-3">
+                <span class="cicon" aria-hidden="true">
+                  <svg viewBox="0 0 16 16" width="14" height="14" fill="none"><path d="M8 2.6c3.1 0 5.4 2.1 5.4 4.9S11.1 12.4 8 12.4c-.6 0-1.2-.1-1.7-.2L3.6 13.4l.6-2.2C3.2 10.3 2.6 9 2.6 7.5 2.6 4.7 4.9 2.6 8 2.6Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+                  <i class="dot"></i>
+                </span>
+                <span class="cnum">3</span>
+              </a>
+            </div>
+            <div class="dmeta">Ana · Edited 4h ago</div>
+          </div>
+        </article>
+        <figcaption>Unread · image-only reply</figcaption>
+      </figure>
+
+      <figure class="slot">
+        <article class="dcard">
+          <div class="dbody">
+            <div class="thumb" aria-hidden="true">
+              <svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice">
+                <rect width="320" height="200" fill="#f0f3ef"/>
+                <rect x="52" y="36" width="216" height="18" rx="3" fill="#fdfdfc"/>
+                <rect x="52" y="62" width="216" height="18" rx="3" fill="#fdfdfc"/>
+                <rect x="52" y="88" width="216" height="18" rx="3" fill="#fdfdfc"/>
+                <rect x="52" y="114" width="216" height="18" rx="3" fill="#fdfdfc"/>
+                <rect x="52" y="140" width="216" height="18" rx="3" fill="#fdfdfc"/>
+                <rect x="62" y="42" width="60" height="6" rx="2" fill="#dde3dc"/>
+                <rect x="62" y="68" width="84" height="6" rx="2" fill="#dde3dc"/>
+                <rect x="62" y="94" width="52" height="6" rx="2" fill="#dde3dc"/>
+                <rect x="62" y="120" width="74" height="6" rx="2" fill="#dde3dc"/>
+                <rect x="62" y="146" width="64" height="6" rx="2" fill="#dde3dc"/>
+              </svg>
+            </div>
+          </div>
+          <div class="dfoot">
+            <div class="trow">
+              <span class="dtitle">Empty states audit</span>
+            </div>
+            <div class="dmeta">Avi · Edited just now</div>
+          </div>
+        </article>
+        <figcaption>Zero comments · count hidden</figcaption>
+      </figure>
+
+    </div>
+  </div>
+  <p class="demo-note">Implements the timings and layout below, including keyboard, touch, and <code>prefers-reduced-motion</code>. Links show a toast here instead of navigating.</p>
+</div>
+
+<section class="prose wrap">
+  <h2><span class="no">01</span>Trigger</h2>
+  <ul class="spec">
+    <li>Hovering the card no longer opens the panel. Card hover only puts the count into its chip state (light rounded background, darker text), the same state it already shows on direct hover.</li>
+    <li>The count opens the panel on hover, keyboard focus, or tap.</li>
+    <li>Hover uses a 100ms intent delay before opening. Leaving the count starts a 200ms grace timer so the pointer can travel onto the panel; entering the panel cancels the close, leaving the panel or the card closes it.</li>
+    <li>The count stays in its chip state while the panel is open.</li>
+    <li>Clicking the count navigates to the document&rsquo;s comment thread. On touch devices (<code>hover: none</code>), the first tap opens the panel and a tap on the open panel navigates.</li>
+    <li>Esc closes the panel and returns focus to the count. Clicking or tapping outside the card closes it.</li>
+  </ul>
+</section>
+
+<section class="prose wrap">
+  <h2><span class="no">02</span>Placement</h2>
+  <ul class="spec">
+    <li>Position the panel absolutely inside the card. Right edge aligned to the count chip&rsquo;s right edge (the footer&rsquo;s horizontal padding). Bottom edge docked to the seam between thumbnail and footer, with no gap, so nothing from the thumbnail peeks out beneath it. It should read as coming from the &ldquo;5&rdquo;.</li>
+    <li>Width 300px. No caret. Radius 10px, white surface, the existing popover shadow plus a 1px hairline ring.</li>
+    <li>The card never changes size. No layout shift on open or close.</li>
+  </ul>
+</section>
+
+<section class="prose wrap">
+  <h2><span class="no">03</span>Content</h2>
+  <ul class="spec">
+    <li>Header row: 18px avatar, then &ldquo;FirstName&nbsp;·&nbsp;2h&rdquo; as a single span in the secondary text color at 13px. No space-between layout and no separate timestamp on the right.</li>
+    <li>Body: the comment text, 15px/20px, primary text color, 8px below the header. Clamp to two lines with an ellipsis. Panel padding 12px 14px 14px.</li>
+    <li>The entire panel is a link to the thread, scrolled to that comment.</li>
+    <li>Which comment to show: the newest reply not written by the viewer. Prefer an unread one if any exist; prefer one that @mentions the viewer above that. Skip resolved threads. If the newest eligible comment is image-only, show &ldquo;FirstName attached an image&rdquo;. If there is no eligible comment, the count doesn&rsquo;t open a panel.</li>
+    <li>Hide the count entirely when a document has zero comments.</li>
+  </ul>
+</section>
+
+<section class="prose wrap">
+  <h2><span class="no">04</span>Unread state</h2>
+  <ul class="spec">
+    <li>When the thread has replies the viewer hasn&rsquo;t seen: number in the primary text color instead of secondary, plus a 6px dot in the product&rsquo;s accent color at the top-right of the bubble icon, with a 1.5px ring in the card background color so it separates from the icon stroke.</li>
+    <li>Read state: number in the secondary color, no dot.</li>
+  </ul>
+</section>
+
+<section class="prose wrap">
+  <h2><span class="no">05</span>Motion</h2>
+  <ul class="spec">
+    <li>Open: fade in and rise 4px over 140ms, ease-out. Close: the reverse.</li>
+    <li>Under <code>prefers-reduced-motion: reduce</code>, no transform and no transition.</li>
+  </ul>
+</section>
+
+<section class="prose wrap">
+  <h2><span class="no">06</span>Semantics and accessibility</h2>
+  <ul class="spec">
+    <li>Count: an anchor to the thread with <code>aria-label</code> of &ldquo;{n} comments&rdquo; or &ldquo;{n} comments, new replies&rdquo;, and <code>aria-describedby</code> pointing at the panel so screen readers get the preview on focus.</li>
+    <li>Panel: an anchor to the specific comment. Keep it in the DOM when closed (hidden with opacity and <code>pointer-events: none</code>, not <code>display: none</code>) so the description resolves. Focusing the panel link also opens it.</li>
+    <li>Don&rsquo;t place the panel inside any <code>aria-hidden</code> container (the decorative thumbnail is <code>aria-hidden</code>; the panel must be a sibling of it, not a child).</li>
+    <li>Visible focus rings on both the count and the panel.</li>
+  </ul>
+</section>
+
+<section class="prose wrap">
+  <h2><span class="no">07</span>Done when</h2>
+  <label class="check"><input type="checkbox" data-ck="sweep"><span>Sweeping the pointer across a grid of cards changes only chip states; no panel appears until the pointer rests on a count.</span></label>
+  <label class="check"><input type="checkbox" data-ck="openclose"><span>The panel opens from hover, focus, and tap; stays open while moving from the count to the panel; closes on leave, Esc, and outside click.</span></label>
+  <label class="check"><input type="checkbox" data-ck="clamp"><span>A four-line comment shows two lines with an ellipsis and the card doesn&rsquo;t grow.</span></label>
+  <label class="check"><input type="checkbox" data-ck="states"><span>Unread and read counts are visually distinct at rest.</span></label>
+  <label class="check"><input type="checkbox" data-ck="keyboard"><span>A keyboard-only walkthrough works end to end, and reduced motion produces no movement.</span></label>
+  <p class="check-note">Ticks are saved only in this browser — use them while verifying an implementation.</p>
+</section>
+
+<footer class="endnote wrap">
+  The interaction prototype (<code>comment-preview-light.html</code>, &ldquo;Variant&nbsp;C&rdquo;) is the reference for timings and layout if anything above is ambiguous; the demo on this page implements the same rules.
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  var HOVER_INTENT = 100;
+  var GRACE = 200;
+  var TOUCH = window.matchMedia("(hover: none)").matches;
+
+  var toastEl = document.getElementById("toast");
+  var toastT = null;
+  function toast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add("show");
+    clearTimeout(toastT);
+    toastT = setTimeout(function () { toastEl.classList.remove("show"); }, 1900);
+  }
+
+  var cards = Array.prototype.slice.call(document.querySelectorAll(".dcard"));
+
+  cards.forEach(function (card) {
+    var count = card.querySelector(".count");
+    var panel = card.querySelector(".preview");
+    if (!count || !panel) return;
+
+    var openT = null;
+    var closeT = null;
+    var suppressFocusOpen = false;
+
+    function isOpen() { return card.classList.contains("open"); }
+
+    function open() {
+      cards.forEach(function (c) {
+        if (c !== card && c.__close) c.__close();
+      });
+      clearTimeout(closeT); closeT = null;
+      clearTimeout(openT); openT = null;
+      card.classList.add("open");
+    }
+
+    function close() {
+      clearTimeout(openT); openT = null;
+      clearTimeout(closeT); closeT = null;
+      card.classList.remove("open");
+    }
+    card.__close = close;
+
+    function scheduleClose() {
+      clearTimeout(closeT);
+      closeT = setTimeout(close, GRACE);
+    }
+
+    /* hover: 100ms intent to open, 200ms grace to travel onto the panel */
+    count.addEventListener("pointerenter", function (e) {
+      if (e.pointerType === "touch") return;
+      clearTimeout(closeT); closeT = null;
+      if (!isOpen()) {
+        clearTimeout(openT);
+        openT = setTimeout(open, HOVER_INTENT);
+      }
+    });
+    count.addEventListener("pointerleave", function (e) {
+      if (e.pointerType === "touch") return;
+      clearTimeout(openT); openT = null;
+      if (isOpen()) scheduleClose();
+    });
+    panel.addEventListener("pointerenter", function (e) {
+      if (e.pointerType === "touch") return;
+      clearTimeout(closeT); closeT = null;
+    });
+    panel.addEventListener("pointerleave", function (e) {
+      if (e.pointerType === "touch") return;
+      if (isOpen()) scheduleClose();
+    });
+    card.addEventListener("pointerleave", function (e) {
+      if (e.pointerType === "touch") return;
+      close();
+    });
+
+    /* keyboard focus opens immediately; leaving the card's controls closes */
+    card.addEventListener("focusin", function (e) {
+      if (suppressFocusOpen) return;
+      var t = e.target;
+      if (t !== count && t !== panel) return;
+      var keyboard = true;
+      try { keyboard = t.matches(":focus-visible"); } catch (err) {}
+      if (keyboard) open();
+    });
+    card.addEventListener("focusout", function (e) {
+      var to = e.relatedTarget;
+      if (!to || !card.contains(to)) close();
+    });
+    card.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && isOpen()) {
+        e.preventDefault();
+        close();
+        suppressFocusOpen = true;
+        count.focus();
+        suppressFocusOpen = false;
+      }
+    });
+
+    /* click navigates; on touch the first tap opens instead */
+    count.addEventListener("click", function (e) {
+      e.preventDefault();
+      if (TOUCH && !isOpen()) { open(); return; }
+      toast("In the product, this opens the document’s comment thread.");
+    });
+    panel.addEventListener("click", function (e) {
+      e.preventDefault();
+      toast("In the product, this opens the thread scrolled to this comment.");
+    });
+  });
+
+  /* clicking or tapping outside a card closes its panel */
+  document.addEventListener("pointerdown", function (e) {
+    cards.forEach(function (c) {
+      if (c.__close && !c.contains(e.target)) c.__close();
+    });
+  });
+
+  /* "Done when" checklist, persisted per browser */
+  var CK = "cpp-donewhen-v1";
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem(CK) || "{}"); } catch (err) {}
+  Array.prototype.slice.call(document.querySelectorAll(".check input")).forEach(function (box) {
+    if (saved[box.dataset.ck]) box.checked = true;
+    box.addEventListener("change", function () {
+      saved[box.dataset.ck] = box.checked;
+      try { localStorage.setItem(CK, JSON.stringify(saved)); } catch (err) {}
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
