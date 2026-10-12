@@ -82,6 +82,7 @@ interface DashboardSidebarWorkspaceContextMenuProps {
 	onClearStatus: () => void;
 	onRemovePullRequest: () => void;
 	onToggleTask: (task: CloudTask, isLinked: boolean) => void;
+	onUnlinkTask: () => void;
 	children: React.ReactNode;
 }
 
@@ -112,6 +113,7 @@ export function DashboardSidebarWorkspaceContextMenu({
 	onClearStatus,
 	onRemovePullRequest,
 	onToggleTask,
+	onUnlinkTask,
 	children,
 }: DashboardSidebarWorkspaceContextMenuProps) {
 	const { runAfterClose, onCloseAutoFocus } = useRunAfterMenuClose();
@@ -215,19 +217,27 @@ export function DashboardSidebarWorkspaceContextMenu({
 					</ContextMenuItem>
 				)}
 				{!isCloudWorkspace && (
-					<ContextMenuSub>
-						<ContextMenuSubTrigger>
-							<HiOutlineClipboardDocumentList className="size-4 mr-2" />
-							<Trans>Link task</Trans>
-						</ContextMenuSubTrigger>
-						<ContextMenuSubContent className="w-80 p-0">
-							<LinkTaskCommand
-								linkedTaskIds={linkedTaskIds}
-								onToggle={onToggleTask}
-								onKeyDown={keepKeysInSearch}
-							/>
-						</ContextMenuSubContent>
-					</ContextMenuSub>
+					<>
+						<ContextMenuSub>
+							<ContextMenuSubTrigger>
+								<HiOutlineClipboardDocumentList className="size-4 mr-2" />
+								<Trans>Link task</Trans>
+							</ContextMenuSubTrigger>
+							<ContextMenuSubContent className="w-80 p-0">
+								<LinkTaskCommand
+									linkedTaskIds={linkedTaskIds}
+									onToggle={onToggleTask}
+									onKeyDown={keepKeysInSearch}
+								/>
+							</ContextMenuSubContent>
+						</ContextMenuSub>
+						{taskId && (
+							<ContextMenuItem onSelect={onUnlinkTask}>
+								<LuUnlink className="size-4 mr-2" />
+								<Trans>Unlink task</Trans>
+							</ContextMenuItem>
+						)}
+					</>
 				)}
 				{/* Group actions mutate placement (sectionId/tabOrder), which a pinned
 				    row doesn't display — the change would only surface on unpin. */}
