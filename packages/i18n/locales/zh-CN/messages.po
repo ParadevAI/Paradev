@@ -14054,9 +14054,6 @@ msgstr "在此设备上运行"
 msgid "Running terminal processes continue, but older output may no longer be available after restarting the app."
 msgstr "运行中的终端进程会继续，但重启应用后可能无法再看到较早的输出。"
 
-msgid "Running terminals from v1 did not carry over. Each v1 workspace now has new terminals that open in the same folders."
-msgstr "v1 中正在运行的终端没有迁移过来。每个 v1 工作区现在都有在相同文件夹中打开的新终端。"
-
 msgid "Runs a local command on your machine"
 msgstr "在你的机器上运行本地命令"
 
@@ -16437,6 +16434,9 @@ msgstr "终端没有响应"
 
 msgid "Terminals restarted"
 msgstr "终端已重启"
+
+msgid "Terminals that were running in the previous version of Superset did not carry over. Each workspace now has new terminals that open in the same folders."
+msgstr "上一版本 Superset 中正在运行的终端没有迁移过来。每个工作区现在都有在相同文件夹中打开的新终端。"
 
 msgid "Terms"
 msgstr "条款"

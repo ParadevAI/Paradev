@@ -14054,9 +14054,6 @@ msgstr "Berjalan di perangkat ini"
 msgid "Running terminal processes continue, but older output may no longer be available after restarting the app."
 msgstr "Proses terminal yang berjalan tetap lanjut, tapi output lama mungkin tidak tersedia lagi setelah aplikasi dimulai ulang."
 
-msgid "Running terminals from v1 did not carry over. Each v1 workspace now has new terminals that open in the same folders."
-msgstr "Terminal yang berjalan dari v1 tidak ikut dipindahkan. Setiap workspace v1 kini memiliki terminal baru yang terbuka di folder yang sama."
-
 msgid "Runs a local command on your machine"
 msgstr "Menjalankan perintah lokal di mesin Anda"
 
@@ -16437,6 +16434,9 @@ msgstr "Terminal tidak merespons"
 
 msgid "Terminals restarted"
 msgstr "Terminal dimulai ulang"
+
+msgid "Terminals that were running in the previous version of Superset did not carry over. Each workspace now has new terminals that open in the same folders."
+msgstr "Terminal yang berjalan di versi Superset sebelumnya tidak ikut dipindahkan. Setiap workspace kini memiliki terminal baru yang terbuka di folder yang sama."
 
 msgid "Terms"
 msgstr "Ketentuan"

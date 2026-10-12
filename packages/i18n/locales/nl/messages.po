@@ -14054,9 +14054,6 @@ msgstr "Draait op dit apparaat"
 msgid "Running terminal processes continue, but older output may no longer be available after restarting the app."
 msgstr "Draaiende terminalprocessen gaan door, maar oudere uitvoer is na het herstarten van de app mogelijk niet meer beschikbaar."
 
-msgid "Running terminals from v1 did not carry over. Each v1 workspace now has new terminals that open in the same folders."
-msgstr "Draaiende terminals uit v1 zijn niet meegekomen. Elke v1-workspace heeft nu nieuwe terminals die in dezelfde mappen openen."
-
 msgid "Runs a local command on your machine"
 msgstr "Voert een lokaal commando uit op je machine"
 
@@ -16437,6 +16434,9 @@ msgstr "Terminals reageren niet"
 
 msgid "Terminals restarted"
 msgstr "Terminals herstart"
+
+msgid "Terminals that were running in the previous version of Superset did not carry over. Each workspace now has new terminals that open in the same folders."
+msgstr "Terminals die in de vorige versie van Superset draaiden, zijn niet meegekomen. Elke workspace heeft nu nieuwe terminals die in dezelfde mappen openen."
 
 msgid "Terms"
 msgstr "Voorwaarden"

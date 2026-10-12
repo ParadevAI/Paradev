@@ -206,7 +206,7 @@ export function V1TerminalsNotice({
 		translate(
 			msg({
 				message:
-					"Running terminals from v1 did not carry over. Each v1 workspace now has new terminals that open in the same folders.",
+					"Terminals that were running in the previous version of Superset did not carry over. Each workspace now has new terminals that open in the same folders.",
 			}),
 		),
 		notice.resumedAgentLabels.length > 0
