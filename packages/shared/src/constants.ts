@@ -296,18 +296,11 @@ export const SHARED_ENVIRONMENT_ORGANIZATION_ID =
 
 export const SHARED_ENVIRONMENT_NAME = "Default";
 
-// Terminal identity presented to shell programs via TERM_PROGRAM. kitty:
-// agent TUIs (claude-code especially) tune wheel-scroll compensation per
-// TERM_PROGRAM, and our terminals install the full-fidelity wheel handler
-// (@superset/shared/terminal-wheel-handler) that produces a native
-// kitty/iTerm-grade report stream. Under kitty-class identities TUIs trust
-// that stream as-is; a vscode identity would make claude-code amplify each
-// report (its compensation for xterm.js's damped stock stream) and
-// over-scroll ~3x. The identity and the wheel handler must ship together —
-// reverting one without the other reintroduces slow or runaway scrolling.
-// Kitty *keyboard protocol* support is advertised separately via the CSI-u
-// capability probe.
-export const TERMINAL_TERM_PROGRAM = "kitty";
-// A plausible kitty version: TUIs may version-gate quirk handling against
-// real kitty releases, so keep this roughly current when touching terminal code.
-export const TERMINAL_TERM_PROGRAM_VERSION = "0.42.0";
+// Terminals set no TERM_PROGRAM, like xterm. Agents take kitty-only paths
+// under "kitty" that xterm.js cannot serve, and under "vscode" Claude Code
+// amplifies the full-fidelity wheel stream ~2x. Without it, agents identify
+// the terminal from its XTVERSION reply ("xterm.js") and the CSI-u probe.
+export const TERMINAL_IDENTITY_ENV_KEYS = [
+	"TERM_PROGRAM",
+	"TERM_PROGRAM_VERSION",
+] as const;
