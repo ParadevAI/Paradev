@@ -761,7 +761,12 @@ export const auth = betterAuth({
 					await syncCustomerName(
 						organization.stripeCustomerId,
 						organization.name,
-					);
+					).catch((error) => {
+						console.error(
+							"[org/after-update] Failed to sync Stripe customer name:",
+							error,
+						);
+					});
 				},
 
 				beforeAddMember: async ({ organization, user }) => {
