@@ -46,12 +46,13 @@ export function AccountTerminalDialog({
 		(config) => config.id === selectedConfigId,
 	);
 	const accounts = useQuery({
-		queryKey: ["agent-launch-accounts", hostUrl, selectedConfigId],
+		queryKey: ["agent-launch-accounts", hostUrl, surface, selectedConfigId],
 		enabled: Boolean(hostUrl && selectedConfigExists),
 		queryFn: () => {
 			if (!hostUrl) throw new Error("Host unavailable");
 			return getHostServiceClientByUrl(hostUrl).agents.launchAccounts.query({
 				agent: selectedConfigId,
+				surface,
 			});
 		},
 		retry: false,

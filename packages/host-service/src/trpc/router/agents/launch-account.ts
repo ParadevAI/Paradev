@@ -117,7 +117,13 @@ function selectableAccount(account: SessionAccount): boolean {
 export async function listLaunchAccounts(
 	config: ResolvedHostAgentConfig,
 	discover = discoverSessionAccounts,
+	surface: "terminal" | "chat" = "terminal",
 ) {
+	if (
+		surface === "chat" &&
+		(config.presetId === "claude" || config.presetId === "codex")
+	)
+		return listProviderLaunchAccounts(config.presetId, discover);
 	const reason = accountLaunchUnsupportedReason(config);
 	if (reason) return { supported: false, accounts: [], reason };
 	return listProviderLaunchAccounts(

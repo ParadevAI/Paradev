@@ -12,7 +12,6 @@ import {
 import {
 	accountLaunchUnsupportedReason,
 	listLaunchAccounts,
-	listProviderLaunchAccounts,
 	pinnedAccountCommandPrefix,
 	resolveLaunchAccount,
 	validatePinnedLaunchAccount,
@@ -78,7 +77,13 @@ describe("explicit terminal account selection", () => {
 				discover,
 			),
 		).toMatchObject({ supported: false, accounts: [] });
-		expect(await listProviderLaunchAccounts("claude", discover)).toEqual({
+		expect(
+			await listLaunchAccounts(
+				{ ...config, args: ["--model", "fixture"] },
+				discover,
+				"chat",
+			),
+		).toEqual({
 			supported: true,
 			accounts: [
 				{

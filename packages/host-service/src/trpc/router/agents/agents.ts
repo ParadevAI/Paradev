@@ -884,7 +884,12 @@ export async function runAgentInWorkspace(
 
 export const agentsRouter = router({
 	launchAccounts: protectedProcedure
-		.input(z.object({ agent: z.string().min(1) }))
+		.input(
+			z.object({
+				agent: z.string().min(1),
+				surface: z.enum(["terminal", "chat"]).optional(),
+			}),
+		)
 		.query(async ({ ctx, input }) => {
 			const config = resolveHostAgentConfig(ctx.db, input.agent);
 			if (!config)
@@ -892,7 +897,7 @@ export const agentsRouter = router({
 					code: "NOT_FOUND",
 					message: "The selected agent is no longer available.",
 				});
-			return listLaunchAccounts(config);
+			return listLaunchAccounts(config, undefined, input.surface);
 		}),
 	// Separate procedure so an older host cannot strip the selection and launch
 	// with its default. Explicit choices must never fall back to agents.run.
