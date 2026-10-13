@@ -376,6 +376,25 @@ export const gitWorktreeRemoveTask = defineWorkerTask<
 		// indistinguishable from one reported by a build without this.
 		reportPhase?.("resolve-path");
 		const git = createUserSimpleGit(repoPath, { env: gitEnv });
+		// A stored path that is itself a symlink is refused outright: both
+		// the app delete and git receive the resolved path, and a link can
+		// resolve into a neighboring workspace's registered worktree, which
+		// either would then remove. The parent-dir symlinks
+		// normalizeWorktreePath exists for (macOS /var) are fine; only the
+		// leaf is checked. stillRegistered: true makes the caller block and
+		// un-archive instead of reporting a removal that never happened.
+		let leafIsSymlink = false;
+		try {
+			leafIsSymlink = lstatSync(worktreePath).isSymbolicLink();
+		} catch {}
+		if (leafIsSymlink) {
+			return {
+				stillRegistered: true,
+				removedByApp: false,
+				removeError:
+					"stored worktree path is a symbolic link; refusing to remove through it",
+			};
+		}
 		// Remove against git's canonical path so a symlinked stored path
 		// (macOS `/var` → `/private/var`) still matches its registration.
 		// `realpathSync.native` is a blocking syscall, hence its own phase.
@@ -394,22 +413,11 @@ export const gitWorktreeRemoveTask = defineWorkerTask<
 		let removeError: string | undefined;
 		let appDeleteEligible =
 			force && isInsideProjectWorktreesRoot(target, project, worktreeBaseDir);
-		// Two more conditions keep the fast delete from touching anything git
-		// would have refused. The stored path must not itself be a symlink:
-		// resolving one can land inside another workspace's registered
-		// worktree, which the root guard cannot tell apart (the parent-dir
-		// symlinks normalizeWorktreePath exists for, like macOS /var, are
-		// fine; only the leaf is checked). And the resolved path must be a
-		// worktree this repository actually lists, which is the validation
-		// git itself performed back when it owned the delete. Anything that
-		// fails either check falls through to git untouched.
-		if (appDeleteEligible) {
-			try {
-				appDeleteEligible = !lstatSync(worktreePath).isSymbolicLink();
-			} catch {
-				appDeleteEligible = false;
-			}
-		}
+		// One more condition keeps the fast delete from touching anything git
+		// would have refused: the resolved path must be a worktree this
+		// repository actually lists, which is the validation git itself
+		// performed back when it owned the delete. An unlisted path falls
+		// through to git untouched.
 		if (appDeleteEligible) {
 			appDeleteEligible = parseWorktreeList(
 				await git.raw(["worktree", "list", "--porcelain"]),

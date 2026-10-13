@@ -93,7 +93,7 @@ describe("gitWorktreeRemoveTask", () => {
 		expect(fs.existsSync(worktreePath)).toBe(false);
 	});
 
-	test("leaves a symlinked stored path to git instead of deleting through it", async () => {
+	test("refuses a symlinked stored path instead of removing what it resolves to", async () => {
 		const realWorktree = path.join(worktreesBase, "demo", "wt-real");
 		addWorktree(realWorktree, "feature/real");
 		const linkPath = path.join(worktreesBase, "demo", "wt-link");
@@ -110,7 +110,12 @@ describe("gitWorktreeRemoveTask", () => {
 			undefined,
 		);
 
+		// Neither the app nor git may delete the neighboring worktree the
+		// link resolves to; the caller sees a blocked removal with a reason.
 		expect(result.removedByApp).toBe(false);
+		expect(result.stillRegistered).toBe(true);
+		expect(result.removeError).toContain("symbolic link");
+		expect(fs.existsSync(path.join(realWorktree, "node_modules"))).toBe(true);
 	});
 
 	test("leaves an unregistered folder inside the managed root to git", async () => {
