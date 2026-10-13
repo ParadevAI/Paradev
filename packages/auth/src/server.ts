@@ -758,6 +758,11 @@ export const auth = betterAuth({
 				afterUpdateOrganization: async ({ organization }) => {
 					if (!organization?.stripeCustomerId) return;
 
+					const customer = await stripeClient.customers.retrieve(
+						organization.stripeCustomerId,
+					);
+					if (customer.deleted || customer.business_name) return;
+
 					await stripeClient.customers.update(organization.stripeCustomerId, {
 						name: organization.name,
 					});
@@ -1225,6 +1230,10 @@ export const auth = betterAuth({
 							customer: org?.stripeCustomerId ?? undefined,
 							allow_promotion_codes: !annual,
 							billing_address_collection: "required",
+							tax_id_collection: { enabled: true },
+							...(org?.stripeCustomerId && {
+								customer_update: { name: "auto", address: "auto" },
+							}),
 							metadata: {
 								organizationId: org?.id ?? "",
 								initiatedByUserId: user.id,
