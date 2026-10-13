@@ -374,7 +374,7 @@ export async function adoptNativeConversation(
 			deps.db.insert(savedConversations).values(row).run();
 		});
 		persisted = true;
-		return present(row);
+		return present(readSaved(deps.db, input.workspaceId, id), deps.db);
 	} finally {
 		if (checkpoint && !persisted) await unlink(checkpoint);
 		inFlight.delete(key);

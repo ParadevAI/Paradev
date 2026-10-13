@@ -257,6 +257,26 @@ describe("saved native Claude adoption", () => {
 		expect((await stat(checkpoint)).mode & 0o777).toBe(0o600);
 		expect((await stat(f.deps.checkpointDirectory)).mode & 0o777).toBe(0o700);
 	});
+	test("opens using revisions returned by adoption, repeated adoption and listing", async () => {
+		const f = await fixture();
+		const open = (saved: { id: string; revision: string }) =>
+			openSavedConversation(f.deps, {
+				workspaceId: "workspace",
+				conversationId: saved.id,
+				expectedRevision: saved.revision,
+				originalSessionExited: true,
+			});
+		const adopted = await f.adopt();
+		const first = await open(adopted);
+		const repeated = await f.adopt();
+		expect((await open(repeated)).terminalId).toBe(first.terminalId);
+		const page = await listSavedConversations(f.deps, f.input);
+		const listed = page.conversations.find((saved) => saved.id === adopted.id);
+		if (!listed) throw new Error("missing listed adoption");
+		expect((await open(listed)).terminalId).toBe(first.terminalId);
+		expect(f.launches).toHaveLength(1);
+		expect(f.launches[0]?.resumeSessionId).toBe(firstId);
+	});
 	test("rejects a stale discovery revision", async () => {
 		const f = await fixture();
 		const page = await listSavedConversations(f.deps, f.input);

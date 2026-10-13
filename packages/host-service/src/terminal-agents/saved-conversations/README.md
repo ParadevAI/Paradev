@@ -38,8 +38,8 @@ requires the original conversation to be exited. Saved identity validation and
 synthetic tests do not prove authenticated provider replay or background-job
 restoration.
 
-T3 discovery/import, Codex import and terminal-to-ACP conversion remain separate
-work. Their adapters do not authorize a launch. Future consumers must validate
+T3 discovery/import, standalone Codex import and terminal-to-ACP conversion remain
+separate work. Future consumers must validate
 source schema and read consistency, preserve native lineage and resolve the launch
 environment through the account service. Never use `--continue`, `--last`, a title
 or an app-thread ID as a substitute for an exact native UUID.
