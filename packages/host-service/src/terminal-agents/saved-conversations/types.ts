@@ -40,11 +40,7 @@ export type SavedConversationIssue =
 	| "missing_cwd"
 	| "subagent_transcript"
 	| "empty_conversation"
-	| "head_mismatch"
-	| "unsupported_source"
-	| "invalid_source"
-	| "source_identity_mismatch"
-	| "source_not_idle";
+	| "head_mismatch";
 
 export type SavedConversationResult<T> =
 	| { ok: true; value: T }

@@ -12,11 +12,11 @@ export const MAX_TRANSCRIPT_BYTES = 64 * 1024 * 1024;
 const MAX_RECORD_BYTES = 8 * 1024 * 1024;
 const MAX_RECORDS = 100_000;
 
-export function isNativeSessionId(value: unknown): value is string {
+function isNativeSessionId(value: unknown): value is string {
 	return typeof value === "string" && UUID.test(value);
 }
 
-export function hasControlCharacters(value: string): boolean {
+function hasControlCharacters(value: string): boolean {
 	for (const character of value) {
 		const code = character.charCodeAt(0);
 		if (code < 32 || code === 127) return true;
@@ -24,7 +24,7 @@ export function hasControlCharacters(value: string): boolean {
 	return false;
 }
 
-export function isCanonicalPathInput(value: unknown): value is string {
+function isCanonicalPathInput(value: unknown): value is string {
 	return (
 		typeof value === "string" &&
 		isAbsolute(value) &&
@@ -33,7 +33,7 @@ export function isCanonicalPathInput(value: unknown): value is string {
 	);
 }
 
-export function object(value: unknown): Record<string, unknown> | null {
+function object(value: unknown): Record<string, unknown> | null {
 	return value !== null && typeof value === "object" && !Array.isArray(value)
 		? (value as Record<string, unknown>)
 		: null;

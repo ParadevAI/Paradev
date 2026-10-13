@@ -1,10 +1,9 @@
 # Saved conversation identity foundation
 
-These pure adapters validate supplied snapshots. They do not discover files,
+The pure native validator checks supplied snapshots. It does not discover files,
 import records, read credentials, launch providers or authorize a resume. The
-ended-terminal account-resume path uses native validation alongside independent
-store, writer, account and launch-claim guards. T3 import integration remains
-follow-up work. Synthetic tests exercise the supported shapes.
+ended-terminal account-resume path combines it with independent store, writer,
+account and launch-claim guards. Synthetic tests exercise supported native shapes.
 
 `validateNativeConversation` checks complete Claude or Codex JSONL against an
 explicit provider, native UUID and canonical working folder. It returns a digest
@@ -21,16 +20,6 @@ Claude sessions with changed working folders or mixed compaction-session identit
 are refused pending a qualified lineage adapter. Multiple Codex rollout revisions
 are refused pending authoritative revision selection. No newest-file heuristic is
 used. Matching names, folders, timestamps or text never merge conversations.
-
-`adaptT3Conversation` accepts the `t3-provider-thread-v2` object shape. It preserves
-source-store, app-thread, provider-thread and native identities separately. Claude's
-normal null conversation head means the provider's default saved head. An explicit
-rollback cursor is retained even when T3 calls it weak; native validation must then
-find it as the final assistant record. An earlier branch point fails rather than
-silently resuming a later branch. Other T3 models, including legacy runtime cursor
-rows, require separate adapters. This function does not certify a database version,
-projection consistency, inactivity or parity with T3's rendered messages. Recorded
-`idle` alone cannot establish that no process or background task is using a chat.
 
 ## Integration boundary
 
@@ -61,9 +50,3 @@ local adoption. Those persistence, launch and UI paths are follow-up work.
 - [Codex protocol, 4bad6d7](https://github.com/openai/codex/blob/4bad6d78e9b50f9fa8bd941f1db012ed491ad2da/codex-rs/protocol/src/protocol.rs)
   defines `SessionMeta.id` as the thread identity; `session_id` can identify its root.
   Creator account metadata is historical, not the account used for this launch.
-- [T3 Claude adapter, 5fe9d02](https://github.com/pingdotgg/t3code/blob/5fe9d024d9b1c28ec93d495cf1441c57e47ae7ce/apps/server/src/orchestration-v2/Adapters/ClaudeAdapterV2.ts)
-  stores strong native thread references, uses a weak conversation-head reference
-  for rollback and clears it after a completed turn.
-- [T3 Codex adapter, the same revision](https://github.com/pingdotgg/t3code/blob/5fe9d024d9b1c28ec93d495cf1441c57e47ae7ce/apps/server/src/orchestration-v2/Adapters/CodexAdapterV2.ts)
-  stores the native thread ID separately from app/provider thread IDs. This adapter
-  deliberately does not infer the native ID from either wrapper ID.
