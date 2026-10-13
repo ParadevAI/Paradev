@@ -213,3 +213,33 @@ test("a submission keeps its original draft key across navigation", () => {
 	expect(window.localStorage.getItem(firstKey)).toBeNull();
 	expect(window.localStorage.getItem(secondKey)).toBe("next chat draft");
 });
+
+test("acceptance clears the mounted seed before navigating back to the same draft", () => {
+	const key = "chat-v3-draft:submission-seeded-navigation";
+	window.localStorage.setItem(key, "submitted");
+	const composer = renderHook(({ key }) => useComposerDraft(key), {
+		initialProps: { key },
+	});
+	const finish = composer.result.current.beginSubmission("submitted");
+	act(() => finish(true));
+	composer.rerender({
+		key: "chat-v3-draft:submission-seeded-navigation-other",
+	});
+	composer.rerender({ key });
+	expect(composer.result.current.storedDraft).toBeUndefined();
+});
+
+test("acceptance cannot restore the seed of a replacement mount", () => {
+	const key = "chat-v3-draft:submission-replacement-seed";
+	window.localStorage.setItem(key, "submitted");
+	const first = renderHook(() => useComposerDraft(key));
+	const finish = first.result.current.beginSubmission("submitted");
+	const replacement = renderHook(({ key }) => useComposerDraft(key), {
+		initialProps: { key },
+	});
+	first.unmount();
+	finish(true);
+	replacement.rerender({ key: "chat-v3-draft:submission-replacement-other" });
+	replacement.rerender({ key });
+	expect(replacement.result.current.storedDraft).toBeUndefined();
+});

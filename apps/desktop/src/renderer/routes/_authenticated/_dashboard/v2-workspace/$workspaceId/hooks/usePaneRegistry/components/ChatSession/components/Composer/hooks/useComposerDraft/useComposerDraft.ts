@@ -105,8 +105,9 @@ export function useComposerDraft(draftKey: string) {
 		setSeed({ draftKey, text: undefined });
 	}, [draftKey]);
 
+	const currentDraft = readDraft(draftKey);
 	const storedDraft =
-		seed.draftKey === draftKey ? seed.text : readDraft(draftKey);
+		currentDraft && seed.draftKey === draftKey ? seed.text : currentDraft;
 
 	return { storedDraft, onChange, clearDraft, beginSubmission };
 }
