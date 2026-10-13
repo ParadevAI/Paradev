@@ -15,7 +15,7 @@ import {
 import { toast } from "@superset/ui/sonner";
 import { cn } from "@superset/ui/utils";
 import { workspaceTrpc } from "@superset/workspace-client";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { LuArrowUpRight } from "react-icons/lu";
 import {
 	VscChevronDown,
@@ -27,6 +27,20 @@ import {
 	type PullRequestRef,
 	pullRequestRefFromUrl,
 } from "renderer/lib/github/pullRequestRef";
+import {
+	PullRequestStackMergeDialog,
+	type StackMergeMethod,
+} from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestStackMergeDialog";
+import { PullRequestStackPopover } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestStackPopover";
+import { useMergePullRequestStack } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/useMergePullRequestStack";
+import { useInvalidatePullRequestDetail } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/usePullRequestDetail";
+import { usePullRequestStack } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/usePullRequestStack";
+import { usePullRequestStackCopy } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/usePullRequestStackCopy";
+import {
+	resolveStackMergeBlocker,
+	stackMergeTargets,
+} from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/assessPullRequestStack";
+import { useOpenStackLayer } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useOpenStackLayer";
 import { computeChecksRollup } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/computeChecksStatus";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import { PRIcon, type PRState } from "renderer/screens/main/components/PRIcon";
@@ -75,7 +89,8 @@ export function PRStatusGroup({
 	paneAreaStyle = false,
 }: PRStatusGroupProps) {
 	const { t } = useLingui();
-	const { workspace } = useWorkspace();
+	const stackCopy = usePullRequestStackCopy();
+	const { workspace, hostUrl } = useWorkspace();
 	const isSession = workspace.type === "session";
 	const pr =
 		state.kind === "pr-exists"
@@ -83,6 +98,19 @@ export function PRStatusGroup({
 			: state.kind === "busy" || state.kind === "error"
 				? state.pr
 				: null;
+	const prNumber = pr?.number ?? null;
+	const projectId = workspace.projectId ?? null;
+	const stackQuery = usePullRequestStack({ projectId, hostUrl, prNumber });
+	const openStackLayer = useOpenStackLayer(onOpenPullRequest);
+	const [stackMerge, setStackMerge] = useState<{
+		open: boolean;
+		method: StackMergeMethod;
+	}>({ open: false, method: "squash" });
+	const invalidatePullRequest = useInvalidatePullRequestDetail({
+		projectId,
+		hostUrl,
+		prNumber,
+	});
 
 	// Triggers a GitHub→host-service-DB sync for this workspace's PR. Without
 	// this, post-merge UI state lags by up to ~30s waiting for the next
@@ -163,6 +191,21 @@ export function PRStatusGroup({
 			},
 		});
 
+	const mergeStackMutation = useMergePullRequestStack({
+		projectId,
+		hostUrl,
+		prNumber,
+		onMerged: async () => {
+			try {
+				await refreshPRMutation.mutateAsync({ workspaceIds: [workspaceId] });
+			} catch (error) {
+				console.warn("Failed to refresh PR state after stack merge", error);
+			}
+			await invalidatePullRequest();
+			onRefresh?.();
+		},
+	});
+
 	const checks = useMemo(
 		() => (pr ? computeChecksRollup(pr.checks) : null),
 		[pr],
@@ -186,7 +229,22 @@ export function PRStatusGroup({
 	// Queued PRs are still actively running checks, so keep CI/review indicators.
 	const showIndicators = pr.state === "open" || pr.state === "queued";
 
+	const stack = stackQuery.stack;
+	const stackBlocker = resolveStackMergeBlocker({
+		stack,
+		isIncomplete: stackQuery.isIncomplete,
+	});
+	const stackMergeCount = stack ? stackMergeTargets(stack).length : null;
+	const isMerging = mergePRMutation.isPending || mergeStackMutation.isPending;
+	const isBusy = isMerging || markReadyMutation.isPending;
+	const mergeUnavailable =
+		isMerging || stackQuery.isLoading || stackBlocker !== null;
+
 	const handleMerge = (mergeMethod: "merge" | "squash" | "rebase") => {
+		if (stack) {
+			setStackMerge({ open: true, method: mergeMethod });
+			return;
+		}
 		mergePRMutation.mutate({
 			owner: pr.repoOwner,
 			repo: pr.repoName,
@@ -228,10 +286,7 @@ export function PRStatusGroup({
 	return (
 		// A segment of ChangesControl's split button — the parent owns the
 		// border and rounding; the state tint lives in this segment's fill.
-		<div
-			className={cn("flex items-center", tint.container)}
-			aria-busy={mergePRMutation.isPending || markReadyMutation.isPending}
-		>
+		<div className={cn("flex items-center", tint.container)} aria-busy={isBusy}>
 			<HoverCard openDelay={150} closeDelay={120}>
 				<HoverCardTrigger asChild>
 					{/* The face toggles the Changes pane — the badge replaced the
@@ -271,6 +326,17 @@ export function PRStatusGroup({
 				</HoverCardContent>
 			</HoverCard>
 
+			{stack ? (
+				<>
+					<div className={cn("h-full w-px", tint.divider)} />
+					<PullRequestStackPopover
+						stack={stack}
+						appearance="segment"
+						className={cn(paneAreaStyle && "px-2", tint.hover)}
+						onSelectLayer={openStackLayer}
+					/>
+				</>
+			) : null}
 			<div className={cn("h-full w-px", tint.divider)} />
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
@@ -281,9 +347,9 @@ export function PRStatusGroup({
 							paneAreaStyle ? "w-7 justify-center" : "px-1",
 							tint.hover,
 						)}
-						disabled={mergePRMutation.isPending || markReadyMutation.isPending}
+						disabled={isBusy}
 						aria-label={
-							mergePRMutation.isPending
+							isMerging
 								? t({
 										message: "Merging pull request",
 									})
@@ -292,7 +358,7 @@ export function PRStatusGroup({
 									})
 						}
 					>
-						{mergePRMutation.isPending || markReadyMutation.isPending ? (
+						{isBusy ? (
 							<VscLoading className="size-3 animate-spin text-muted-foreground" />
 						) : (
 							<VscChevronDown className="size-3 text-muted-foreground" />
@@ -301,7 +367,7 @@ export function PRStatusGroup({
 				</DropdownMenuTrigger>
 				<DropdownMenuContent
 					align="end"
-					className={paneAreaStyle ? "w-56" : "w-44"}
+					className={stack ? "w-64" : paneAreaStyle ? "w-56" : "w-44"}
 				>
 					{canMarkReady && (
 						<>
@@ -330,12 +396,26 @@ export function PRStatusGroup({
 									menuItemClass,
 								)}
 							>
-								<Trans>Merge</Trans>
+								{stack ? (
+									<span className="flex items-center gap-1.5">
+										<Trans>Merge stack</Trans>
+										<span className="rounded-full bg-foreground/10 px-1.5 text-[11px] leading-4 tabular-nums">
+											{stackMergeCount}
+										</span>
+									</span>
+								) : (
+									<Trans>Merge</Trans>
+								)}
 							</DropdownMenuLabel>
+							{stackBlocker ? (
+								<p className="px-2 pb-1.5 text-xs text-muted-foreground">
+									{stackCopy.blocker(stackBlocker)}
+								</p>
+							) : null}
 							<DropdownMenuItem
 								onClick={() => handleMerge("squash")}
 								className={menuItemClass}
-								disabled={mergePRMutation.isPending}
+								disabled={mergeUnavailable}
 							>
 								<VscGitMerge className={menuIconClass} />
 								<Trans>Squash and merge</Trans>
@@ -343,7 +423,7 @@ export function PRStatusGroup({
 							<DropdownMenuItem
 								onClick={() => handleMerge("merge")}
 								className={menuItemClass}
-								disabled={mergePRMutation.isPending}
+								disabled={mergeUnavailable}
 							>
 								<VscGitMerge className={menuIconClass} />
 								<Trans>Create merge commit</Trans>
@@ -351,7 +431,7 @@ export function PRStatusGroup({
 							<DropdownMenuItem
 								onClick={() => handleMerge("rebase")}
 								className={menuItemClass}
-								disabled={mergePRMutation.isPending}
+								disabled={mergeUnavailable}
 							>
 								<VscGitMerge className={menuIconClass} />
 								<Trans>Rebase and merge</Trans>
@@ -380,6 +460,21 @@ export function PRStatusGroup({
 					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>
+			{stack ? (
+				<PullRequestStackMergeDialog
+					open={stackMerge.open}
+					onOpenChange={(open) =>
+						setStackMerge((current) => ({ ...current, open }))
+					}
+					stack={stack}
+					prNumber={pr.number}
+					method={stackMerge.method}
+					onConfirm={() => {
+						setStackMerge((current) => ({ ...current, open: false }));
+						mergeStackMutation.mutate(stackMerge.method);
+					}}
+				/>
+			) : null}
 		</div>
 	);
 }

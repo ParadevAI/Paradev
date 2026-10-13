@@ -1,7 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
 import { PageHeader } from "renderer/routes/_authenticated/_dashboard/components/PageHeader";
+import { useOpenPullRequestInApp } from "renderer/routes/_authenticated/_dashboard/hooks/useOpenPullRequestInApp";
 import { useProjectHost } from "renderer/routes/_authenticated/_dashboard/hooks/useProjectHost";
 import { PullRequestActions } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestActions";
 import { PullRequestDetailContent } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestDetailContent";
@@ -10,8 +11,12 @@ import {
 	PullRequestDetailTabs,
 } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestDetailTabs";
 import { PullRequestListToggle } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestListToggle";
+import { PullRequestStackNotice } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestStackNotice";
+import { PullRequestStackPopover } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestStackPopover";
 import { usePullRequestDetail } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/usePullRequestDetail";
+import { usePullRequestStack } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/usePullRequestStack";
 import { parsePositiveIntegerParam } from "renderer/routes/_authenticated/_dashboard/utils/parsePositiveIntegerParam";
+import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { Route as PullRequestsLayoutRoute } from "../layout";
 
 export const Route = createFileRoute(
@@ -42,6 +47,13 @@ function PullRequestDetailPage() {
 		repoFullName: search.repo,
 	});
 	const data = detail.data ?? null;
+	const stack = usePullRequestStack({
+		projectId: detail.projectId,
+		hostUrl,
+		prNumber,
+	});
+	const navigate = useNavigate();
+	const openPullRequestInApp = useOpenPullRequestInApp();
 	const diffStat =
 		data?.additions !== undefined && data.deletions !== undefined
 			? { additions: data.additions, deletions: data.deletions }
@@ -73,6 +85,19 @@ function PullRequestDetailPage() {
 						/>
 					</div>
 					<div className="drag h-full min-w-4 flex-1" />
+					{stack.stack ? (
+						<PullRequestStackPopover
+							stack={stack.stack}
+							appearance="badge"
+							onSelectLayer={(layer) => {
+								if (layer.workspaceId) {
+									void navigateToV2Workspace(layer.workspaceId, navigate);
+								} else {
+									openPullRequestInApp(layer.url);
+								}
+							}}
+						/>
+					) : null}
 					<PullRequestActions
 						projectId={detail.projectId}
 						hostId={hostId}
@@ -80,9 +105,13 @@ function PullRequestDetailPage() {
 						prNumber={prNumber}
 						data={detail.data}
 						isLoading={detail.isLoading}
+						stack={stack}
 					/>
 				</div>
 			</PageHeader>
+			{stack.isIncomplete && data?.state === "open" ? (
+				<PullRequestStackNotice onRefresh={stack.refetch} />
+			) : null}
 			<PullRequestDetailContent
 				activeTab={activeTab}
 				detail={detail}

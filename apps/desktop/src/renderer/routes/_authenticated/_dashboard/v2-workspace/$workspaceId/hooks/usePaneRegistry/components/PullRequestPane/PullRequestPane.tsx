@@ -3,6 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
 	isSamePullRequest,
+	type PullRequestRef,
 	pullRequestRefFromUrl,
 } from "renderer/lib/github/pullRequestRef";
 import { PullRequestActions } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestActions";
@@ -12,9 +13,13 @@ import {
 	type PullRequestDetailTab,
 	PullRequestDetailTabs,
 } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestDetailTabs";
+import { PullRequestStackNotice } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestStackNotice";
+import { PullRequestStackPopover } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestStackPopover";
+import { usePullRequestStack } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/usePullRequestStack";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import { normalizeThreadsToComments } from "../../../../components/CommentsSection/utils/normalizeThreadsToComments";
 import type { PagePaneData, PullRequestPaneData } from "../../../../types";
+import { useOpenStackLayer } from "../../../useOpenStackLayer";
 import {
 	type OpenReviewDiff,
 	useReviewCommentNavigation,
@@ -28,17 +33,26 @@ interface PullRequestPaneProps {
 	data: PullRequestPaneData;
 	onOpenDiff: OpenReviewDiff;
 	onOpenPage: (page: PagePaneData) => void;
+	/** Shows another PR here; a stack layer without its own workspace opens this way. */
+	onOpenPullRequest: (ref: PullRequestRef) => void;
 }
 
 export function PullRequestPane({
 	data,
 	onOpenDiff,
 	onOpenPage,
+	onOpenPullRequest,
 }: PullRequestPaneProps) {
 	const navigate = useNavigate();
 	const [activeTab, setActiveTab] = useState<PullRequestDetailTab>("summary");
 	const { workspace, hostUrl: workspaceHostUrl } = useWorkspace();
 	const detail = usePullRequestPaneDetail(data);
+	const stack = usePullRequestStack({
+		projectId: detail.projectId,
+		hostUrl: workspaceHostUrl,
+		prNumber: data.number,
+	});
+	const openStackLayer = useOpenStackLayer(onOpenPullRequest);
 
 	// Review threads and the header's actions still go through the host that
 	// pushed the PR, so they exist only when this workspace's linked PR is
@@ -117,7 +131,14 @@ export function PullRequestPane({
 						diffStat={diffStat}
 					/>
 				</div>
-				<div className="ml-auto flex shrink-0 items-center">
+				<div className="ml-auto flex shrink-0 items-center gap-1.5">
+					{stack.stack ? (
+						<PullRequestStackPopover
+							stack={stack.stack}
+							appearance="badge"
+							onSelectLayer={openStackLayer}
+						/>
+					) : null}
 					<PullRequestActions
 						projectId={projectId}
 						hostId={hostId}
@@ -125,10 +146,14 @@ export function PullRequestPane({
 						prNumber={data.number}
 						data={detail.data}
 						isLoading={detail.isLoading}
+						stack={stack}
 						showStartWorkspace={false}
 					/>
 				</div>
 			</div>
+			{stack.isIncomplete && detail.data?.state === "open" ? (
+				<PullRequestStackNotice onRefresh={stack.refetch} />
+			) : null}
 			<PullRequestDetailContent
 				activeTab={activeTab}
 				detail={detail}

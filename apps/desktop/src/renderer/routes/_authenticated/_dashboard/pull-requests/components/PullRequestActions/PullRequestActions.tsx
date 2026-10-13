@@ -43,12 +43,19 @@ import {
 	type LinkedPR,
 	useNewWorkspaceDraftStore,
 } from "renderer/stores/new-workspace-draft";
+import { useMergePullRequestStack } from "../../hooks/useMergePullRequestStack";
 import { usePullRequestAgentHandoff } from "../../hooks/usePullRequestAgentHandoff";
 import {
 	type PullRequestDetail,
 	useInvalidatePullRequestDetail,
 } from "../../hooks/usePullRequestDetail";
 import { usePullRequestDraftMutation } from "../../hooks/usePullRequestDraftMutation";
+import type { PullRequestStackQuery } from "../../hooks/usePullRequestStack";
+import { usePullRequestStackCopy } from "../../hooks/usePullRequestStackCopy";
+import {
+	resolveStackMergeBlocker,
+	stackMergeTargets,
+} from "../../utils/assessPullRequestStack";
 import {
 	buildFixFindingsPrompt,
 	buildResolveConflictsPrompt,
@@ -61,6 +68,7 @@ import {
 	PullRequestMenuSeparator,
 } from "../PullRequestMenu";
 import { PullRequestSkeleton as Skeleton } from "../PullRequestSkeleton";
+import { PullRequestStackMergeDialog } from "../PullRequestStackMergeDialog";
 
 type MergeMethod = "merge" | "squash" | "rebase";
 
@@ -76,6 +84,8 @@ interface PullRequestActionsProps {
 	prNumber: number | null;
 	data: PullRequestDetail | null | undefined;
 	isLoading: boolean;
+	/** The PR's stack; a stacked PR merges as a stack. */
+	stack: PullRequestStackQuery;
 	/**
 	 * Offer "Start workspace". Off inside a workspace pane, where the PR is
 	 * already the workspace's own and a second one would be a duplicate.
@@ -121,9 +131,11 @@ export function PullRequestActions({
 	prNumber,
 	data,
 	isLoading,
+	stack: stackQuery,
 	showStartWorkspace = true,
 }: PullRequestActionsProps) {
 	const { t } = useLingui();
+	const stackCopy = usePullRequestStackCopy();
 	const mergeMethodLabels: Record<MergeMethod, string> = {
 		squash: t({ message: "Squash and merge" }),
 		merge: t({ message: "Merge commit" }),
@@ -144,6 +156,10 @@ export function PullRequestActions({
 		null,
 	);
 	const [mergeComment, setMergeComment] = useState("");
+	const [stackMerge, setStackMerge] = useState<{
+		open: boolean;
+		method: MergeMethod;
+	}>({ open: false, method: "squash" });
 	const { copyToClipboard: copyLink, copied: linkCopied } =
 		useCopyToClipboard();
 	const invalidatePullRequestQueries = useInvalidatePullRequestDetail({
@@ -213,10 +229,16 @@ export function PullRequestActions({
 		},
 	});
 
+	const mergeStack = useMergePullRequestStack({
+		projectId,
+		hostUrl,
+		prNumber,
+		onMerged: invalidatePullRequestQueries,
+	});
+
+	const isMerging = mergePullRequest.isPending || mergeStack.isPending;
 	const isActionPending =
-		setPullRequestState.isPending ||
-		mergePullRequest.isPending ||
-		setDraft.isPending;
+		setPullRequestState.isPending || isMerging || setDraft.isPending;
 
 	const handleConfirmAction = () => {
 		if (!pendingAction) return;
@@ -287,7 +309,22 @@ export function PullRequestActions({
 	const canAct = !!hostUrl && !!projectId && prNumber !== null;
 	const canToggleDraft = canAct && data.mergeability !== undefined;
 	const isDraft = data.state === "open" && data.isDraft;
-	const mergeBlocked = data.mergeability === "conflicting";
+	const stack = stackQuery.stack;
+	const stackBlocker = resolveStackMergeBlocker({
+		stack,
+		isIncomplete: stackQuery.isIncomplete,
+	});
+	const mergeBlockedReason = stackBlocker
+		? stackCopy.blocker(stackBlocker)
+		: !stack && data.mergeability === "conflicting"
+			? t({ message: `Resolve the conflicts with ${data.base.ref} first` })
+			: null;
+	const mergeBlocked = mergeBlockedReason !== null;
+	const stackMergeCount = stack ? stackMergeTargets(stack).length : null;
+	const openMerge = (method: MergeMethod) => {
+		if (stack) setStackMerge({ open: true, method });
+		else setPendingAction({ kind: "merge", method });
+	};
 	const copyLinkLabel = linkCopied
 		? t({ message: "Copied" })
 		: t({ message: "Copy link" });
@@ -360,33 +397,47 @@ export function PullRequestActions({
 										"h-7 gap-1.5 rounded-l-full rounded-r-none px-3",
 										mergeBlocked && "cursor-not-allowed text-muted-foreground",
 									)}
-									disabled={isActionPending}
+									disabled={isActionPending || stackQuery.isLoading}
 									aria-disabled={mergeBlocked || undefined}
-									aria-busy={mergePullRequest.isPending}
+									aria-busy={isMerging}
 									onClick={() => {
 										if (mergeBlocked) return;
-										setPendingAction({ kind: "merge", method: "squash" });
+										openMerge("squash");
 									}}
 								>
-									{mergePullRequest.isPending ? (
+									{isMerging ? (
 										<LoaderCircle className="size-3.5 animate-spin motion-reduce:animate-none" />
 									) : (
 										<GitMerge strokeWidth={1.75} className="size-3.5" />
 									)}
 									<span className="@max-[23rem]/topbar:sr-only">
-										{mergePullRequest.isPending ? (
+										{mergeStack.isPending ? (
+											<Trans>Merging stack…</Trans>
+										) : mergePullRequest.isPending ? (
 											<Trans>Merging…</Trans>
+										) : stack ? (
+											<Trans>Merge stack</Trans>
 										) : (
 											<Trans>Merge</Trans>
 										)}
 									</span>
+									{stackMergeCount !== null && !mergeStack.isPending ? (
+										<span
+											className={cn(
+												"rounded-full px-1.5 text-[11px] leading-4 tabular-nums",
+												mergeBlocked
+													? "bg-foreground/10"
+													: "bg-primary-foreground/15",
+											)}
+										>
+											{stackMergeCount}
+										</span>
+									) : null}
 								</Button>
 							</TooltipTrigger>
-							{mergeBlocked ? (
-								<TooltipContent side="bottom">
-									<Trans>
-										Resolve the conflicts with {data.base.ref} first
-									</Trans>
+							{mergeBlockedReason ? (
+								<TooltipContent side="bottom" className="max-w-72">
+									{mergeBlockedReason}
 								</TooltipContent>
 							) : null}
 						</Tooltip>
@@ -443,15 +494,19 @@ export function PullRequestActions({
 								</>
 							) : (
 								<>
-									<div className="p-1.5 pb-1">
-										<Textarea
-											value={mergeComment}
-											onChange={(e) => setMergeComment(e.target.value)}
-											onKeyDown={(e) => e.stopPropagation()}
-											placeholder={t({ message: "Commit message (optional)" })}
-											className="min-h-16 resize-none rounded-[0.625rem] border-border/60 bg-background/60 text-xs shadow-none"
-										/>
-									</div>
+									{stack ? null : (
+										<div className="p-1.5 pb-1">
+											<Textarea
+												value={mergeComment}
+												onChange={(e) => setMergeComment(e.target.value)}
+												onKeyDown={(e) => e.stopPropagation()}
+												placeholder={t({
+													message: "Commit message (optional)",
+												})}
+												className="min-h-16 resize-none rounded-[0.625rem] border-border/60 bg-background/60 text-xs shadow-none"
+											/>
+										</div>
+									)}
 									<PullRequestMenuLabel className="pt-1">
 										<Trans>Select method</Trans>
 									</PullRequestMenuLabel>
@@ -460,9 +515,7 @@ export function PullRequestActions({
 											key={method}
 											className="flex-col items-start gap-0 py-1.5"
 											disabled={mergeBlocked}
-											onClick={() =>
-												setPendingAction({ kind: "merge", method })
-											}
+											onClick={() => openMerge(method)}
 										>
 											<span className="flex items-center gap-2">
 												<GitMerge
@@ -476,7 +529,7 @@ export function PullRequestActions({
 											</span>
 										</PullRequestMenuItem>
 									))}
-									{data.checksStatus === "failure" && (
+									{data.checksStatus === "failure" && !stack && (
 										<>
 											<PullRequestMenuSeparator />
 											<PullRequestMenuItem
@@ -543,6 +596,21 @@ export function PullRequestActions({
 				</Button>
 			) : null}
 
+			{stack && prNumber !== null ? (
+				<PullRequestStackMergeDialog
+					open={stackMerge.open}
+					onOpenChange={(open) =>
+						setStackMerge((current) => ({ ...current, open }))
+					}
+					stack={stack}
+					prNumber={prNumber}
+					method={stackMerge.method}
+					onConfirm={() => {
+						setStackMerge((current) => ({ ...current, open: false }));
+						mergeStack.mutate(stackMerge.method);
+					}}
+				/>
+			) : null}
 			<AlertDialog
 				open={pendingAction !== null}
 				onOpenChange={(open) => {

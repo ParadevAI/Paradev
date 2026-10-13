@@ -36,6 +36,15 @@ mock.module(
 	`${root}/v2-workspace/$workspaceId/hooks/useReviewCommentNavigation`,
 	() => ({ useReviewCommentNavigation: () => mock() }),
 );
+mock.module(`${root}/pull-requests/hooks/usePullRequestStack`, () => ({
+	PULL_REQUEST_STACK_QUERY_KEY_PREFIX: ["pull-request-stack"],
+	usePullRequestStack: () => ({
+		stack: null,
+		isLoading: false,
+		isIncomplete: false,
+		refetch: mock(),
+	}),
+}));
 mock.module(`${root}/pull-requests/components/PullRequestActions`, () => ({
 	PullRequestActions: () => null,
 }));
@@ -113,6 +122,7 @@ for (const state of ["loading", "error"] as const) {
 				data={{ repoFullName: "owner/repo", number: 12 }}
 				onOpenDiff={mock()}
 				onOpenPage={mock()}
+				onOpenPullRequest={mock()}
 			/>,
 		);
 		expect(view.queryByTestId("code")).toBeNull();
@@ -141,6 +151,7 @@ test("matching projects retain project actions even while Summary loads", async 
 			data={{ repoFullName: "owner/repo", number: 12 }}
 			onOpenDiff={mock()}
 			onOpenPage={mock()}
+			onOpenPullRequest={mock()}
 		/>,
 	);
 	fireEvent.click(view.getByRole("button", { name: "Changes" }));

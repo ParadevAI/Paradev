@@ -10,6 +10,7 @@ import {
 	type PullRequestProject,
 	resolvePullRequestTarget,
 } from "../../utils/resolvePullRequestTarget";
+import { PULL_REQUEST_STACK_QUERY_KEY_PREFIX } from "../usePullRequestStack";
 import { fetchPullRequestDetail } from "./utils/fetchPullRequestDetail";
 
 export type PullRequestMergeability = "mergeable" | "conflicting" | "unknown";
@@ -168,6 +169,9 @@ export function useInvalidatePullRequestDetail(key: PullRequestDetailKey) {
 			});
 			void client.invalidateQueries({
 				queryKey: V2_WORKSPACES_PULL_REQUEST_QUERY_KEY_PREFIX,
+			});
+			void client.invalidateQueries({
+				queryKey: PULL_REQUEST_STACK_QUERY_KEY_PREFIX,
 			});
 		}
 		// The workspace pane's review threads live on the context client under

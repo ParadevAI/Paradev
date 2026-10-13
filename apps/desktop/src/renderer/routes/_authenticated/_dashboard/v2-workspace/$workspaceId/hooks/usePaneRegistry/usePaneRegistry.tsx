@@ -73,6 +73,7 @@ import {
 	focusOrAddTerminalPane,
 } from "../../utils/focusTerminalPane";
 import { openPagePaneInStore } from "../../utils/openPagePaneInStore";
+import { openPullRequestPaneInStore } from "../../utils/openPullRequestPaneInStore";
 import { openSubagentPaneInStore } from "../../utils/openSubagentPaneInStore";
 import { useAgentSessionLauncher } from "../useAgentSessionLauncher";
 import type { OpenReviewDiff } from "../useReviewCommentNavigation";
@@ -902,6 +903,9 @@ export function usePaneRegistry({
 						data={ctx.pane.data as PullRequestPaneData}
 						onOpenDiff={onOpenDiff}
 						onOpenPage={(page) => openPagePaneInStore(ctx.store, page)}
+						onOpenPullRequest={(ref) =>
+							openPullRequestPaneInStore(ctx.store, ref)
+						}
 					/>
 				),
 				renderHeaderExtras: (ctx: RendererContext<PaneViewerData>) => (
