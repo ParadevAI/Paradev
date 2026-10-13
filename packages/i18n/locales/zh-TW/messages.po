@@ -11557,11 +11557,11 @@ msgstr "從資料夾開啟"
 msgid "Open full screen"
 msgstr "全螢幕開啟"
 
-msgid "Open host"
-msgstr "開啟主機"
-
 msgid "Open history from this account in the current workspace. After adoption, later opens use its current local history. Background work is not transferred."
 msgstr "在目前工作區中開啟此帳戶的歷史記錄。匯入後，再次開啟時會使用最新的本機歷史記錄。背景工作不會轉移。"
+
+msgid "Open host"
+msgstr "開啟主機"
 
 msgid "Open importer"
 msgstr "開啟匯入器"

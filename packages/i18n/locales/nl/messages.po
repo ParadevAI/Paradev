@@ -11557,11 +11557,11 @@ msgstr "Openen vanuit map"
 msgid "Open full screen"
 msgstr "Openen op volledig scherm"
 
-msgid "Open host"
-msgstr "Host openen"
-
 msgid "Open history from this account in the current workspace. After adoption, later opens use its current local history. Background work is not transferred."
 msgstr "Open de geschiedenis van dit account in de huidige werkruimte. Na het importeren wordt bij opnieuw openen de actuele lokale geschiedenis gebruikt. Achtergrondtaken worden niet overgedragen."
+
+msgid "Open host"
+msgstr "Host openen"
 
 msgid "Open importer"
 msgstr "Importer openen"

@@ -11557,11 +11557,11 @@ msgstr "Otevřít ze složky"
 msgid "Open full screen"
 msgstr "Otevřít na celou obrazovku"
 
-msgid "Open host"
-msgstr "Otevřít host"
-
 msgid "Open history from this account in the current workspace. After adoption, later opens use its current local history. Background work is not transferred."
 msgstr "Otevřete historii tohoto účtu v aktuálním pracovním prostoru. Po importu se při dalších otevřeních použije aktuální místní historie. Úlohy na pozadí se nepřenášejí."
+
+msgid "Open host"
+msgstr "Otevřít host"
 
 msgid "Open importer"
 msgstr "Otevřít import"

@@ -11557,11 +11557,11 @@ msgstr "Klasörden aç"
 msgid "Open full screen"
 msgstr "Tam ekranda aç"
 
-msgid "Open host"
-msgstr "Host'u aç"
-
 msgid "Open history from this account in the current workspace. After adoption, later opens use its current local history. Background work is not transferred."
 msgstr "Bu hesabın geçmişini geçerli çalışma alanında açın. İçe aktarıldıktan sonra sonraki açılışlarda güncel yerel geçmiş kullanılır. Arka plan görevleri aktarılmaz."
+
+msgid "Open host"
+msgstr "Host'u aç"
 
 msgid "Open importer"
 msgstr "İçe aktarıcıyı aç"

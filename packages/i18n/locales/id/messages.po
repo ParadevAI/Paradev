@@ -11557,11 +11557,11 @@ msgstr "Buka dari folder"
 msgid "Open full screen"
 msgstr "Buka layar penuh"
 
-msgid "Open host"
-msgstr "Buka host"
-
 msgid "Open history from this account in the current workspace. After adoption, later opens use its current local history. Background work is not transferred."
 msgstr "Buka riwayat akun ini di ruang kerja saat ini. Setelah diimpor, pembukaan berikutnya menggunakan riwayat lokal terkini. Tugas latar belakang tidak dipindahkan."
+
+msgid "Open host"
+msgstr "Buka host"
 
 msgid "Open importer"
 msgstr "Buka importer"

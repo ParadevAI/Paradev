@@ -11557,11 +11557,11 @@ msgstr "폴더에서 열기"
 msgid "Open full screen"
 msgstr "전체 화면으로 열기"
 
-msgid "Open host"
-msgstr "호스트 열기"
-
 msgid "Open history from this account in the current workspace. After adoption, later opens use its current local history. Background work is not transferred."
 msgstr "현재 작업 공간에서 이 계정의 기록을 엽니다. 가져온 후에는 다시 열 때 최신 로컬 기록을 사용합니다. 백그라운드 작업은 이전되지 않습니다."
+
+msgid "Open host"
+msgstr "호스트 열기"
 
 msgid "Open importer"
 msgstr "가져오기 도구 열기"

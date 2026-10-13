@@ -11557,11 +11557,11 @@ msgstr "Abrir desde una carpeta"
 msgid "Open full screen"
 msgstr "Abrir en pantalla completa"
 
-msgid "Open host"
-msgstr "Abrir host"
-
 msgid "Open history from this account in the current workspace. After adoption, later opens use its current local history. Background work is not transferred."
 msgstr "Abre el historial de esta cuenta en el espacio de trabajo actual. Después de importarlo, las siguientes aperturas usarán su historial local actualizado. No se transfieren las tareas en segundo plano."
+
+msgid "Open host"
+msgstr "Abrir host"
 
 msgid "Open importer"
 msgstr "Abrir el importador"

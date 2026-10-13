@@ -11557,11 +11557,11 @@ msgstr "Mở từ thư mục"
 msgid "Open full screen"
 msgstr "Mở toàn màn hình"
 
-msgid "Open host"
-msgstr "Mở host"
-
 msgid "Open history from this account in the current workspace. After adoption, later opens use its current local history. Background work is not transferred."
 msgstr "Mở lịch sử của tài khoản này trong không gian làm việc hiện tại. Sau khi nhập, các lần mở tiếp theo dùng lịch sử cục bộ mới nhất. Các tác vụ nền không được chuyển sang."
+
+msgid "Open host"
+msgstr "Mở host"
 
 msgid "Open importer"
 msgstr "Mở trình nhập"
