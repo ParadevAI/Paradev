@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, mock, test } from "bun:test";
+import { CLOUD_HOST_ID } from "@superset/shared/host-routing";
 
 // Capture what the command hands to the target resolver and the update
 // mutation. The command imports the resolver from the parent directory, so
@@ -116,6 +117,18 @@ describe("automations update pin clearing (#6523)", () => {
 		expect(resolverCalls).toHaveLength(0);
 		expect(updateCalls[0]?.v2WorkspaceId).toBeNull();
 		expect("targetHostId" in (updateCalls[0] ?? {})).toBe(false);
+	});
+
+	test('--workspace "" on a cloud automation clears the cloud pin explicitly', async () => {
+		existingAutomation = {
+			...existingAutomation,
+			targetHostId: CLOUD_HOST_ID,
+			environmentId: "33333333-2222-4333-8444-555555555555",
+		};
+		await invoke({ workspace: "" });
+		expect(resolverCalls).toHaveLength(0);
+		expect(updateCalls[0]?.cloudWorkspaceId).toBeNull();
+		expect("v2WorkspaceId" in (updateCalls[0] ?? {})).toBe(false);
 	});
 
 	test('--workspace "" combined with --project keeps the project and clears the pin', async () => {

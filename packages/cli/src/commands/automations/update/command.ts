@@ -32,7 +32,7 @@ export default command({
 		local: boolean().desc("Retarget the automation to this machine"),
 		project: string().desc("New v2 project id"),
 		workspace: string().desc(
-			'New v2 workspace id to reuse every run; with --cloud, a cloud workspace id. Pass "" to clear the pin so each run creates a fresh workspace',
+			'New v2 workspace id to reuse every run; with --cloud, a cloud workspace id. Pass "" to clear the pin: host runs create a fresh workspace, cloud runs start from the environment',
 		),
 		cloud: boolean().desc(
 			"Run in the cloud: each run starts a cloud workspace from --environment, or reuses the one --workspace names",
@@ -141,10 +141,17 @@ export default command({
 					api: ctx.api,
 					organizationId,
 					environment: options.environment ?? undefined,
-					workspaceId: options.workspace ?? undefined,
+					workspaceId: options.workspace || undefined,
 					requirePlacement: !alreadyCloud,
 				})
 			).target;
+			// An empty --workspace clears a cloud pin the same way it clears
+			// a host pin (#6523): runs fall back to the automation's
+			// environment, and the server rejects the clear with a precise
+			// message when no environment remains.
+			if (options.workspace === "") {
+				cloudTarget = { ...cloudTarget, cloudWorkspaceId: null };
+			}
 		} else if (options.workspace || options.project) {
 			const organizationId = ctx.config.organizationId;
 			if (!organizationId) {
