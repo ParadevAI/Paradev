@@ -120,7 +120,7 @@ export const Composer = memo(function Composer({
 	const cloudUtils = cloudTrpc.useUtils();
 	const uploadAttachments = useUploadAttachments(workspaceId);
 	const attachmentPreview = useAttachmentPreview();
-	const { storedDraft, onChange } = useComposerDraft(draftKey);
+	const { storedDraft, onChange, beginSubmission } = useComposerDraft(draftKey);
 	const promptInputRef = useRef<PromptInputHandle>(null);
 	const queueActions = useQueueActions(promptQueue, promptInputRef);
 	useImperativeHandle(
@@ -264,7 +264,7 @@ export const Composer = memo(function Composer({
 	);
 
 	const handleSubmit = useCallback(
-		({ text, files, mentions, steer }: PromptInputSubmitPayload) => {
+		async ({ text, files, mentions, steer }: PromptInputSubmitPayload) => {
 			if (disabled || (text.trim() === "" && files.length === 0)) return false;
 			const name = LEADING_COMMAND.exec(text.trim())?.[1];
 			if (
@@ -275,12 +275,27 @@ export const Composer = memo(function Composer({
 				toast.error(t({ message: `Unknown command /${name}` }));
 				return false;
 			}
-			return submitMessage(
-				{ text, files, mentions, steer },
-				{ uploadAttachments, onSend },
-			);
+			const finishSubmission = beginSubmission(text);
+			try {
+				const result = await submitMessage(
+					{ text, files, mentions, steer },
+					{ uploadAttachments, onSend },
+				);
+				finishSubmission(result !== false);
+				return result;
+			} catch (error) {
+				finishSubmission(false);
+				throw error;
+			}
 		},
-		[availableCommands, disabled, onSend, uploadAttachments, t],
+		[
+			availableCommands,
+			disabled,
+			onSend,
+			uploadAttachments,
+			t,
+			beginSubmission,
+		],
 	);
 
 	const queueListRef = useRef<HTMLUListElement>(null);
