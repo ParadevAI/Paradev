@@ -930,6 +930,24 @@ describe("session login metadata", () => {
 });
 
 describe("notify hook process hygiene", () => {
+	it("keeps the payload valid JSON when an env value carries control characters", async () => {
+		const host = fakeHostService(false);
+		try {
+			await runNotifyHookAsync(
+				{ hook_event_name: "Stop", session_id: "s-1" },
+				{
+					SUPERSET_HOST_AGENT_HOOK_URL: `${host.url}/trpc/notifications.hook`,
+					SUPERSET_ACCOUNT_ATTRIBUTION_TOKEN: "line1\nline2\ttabbed",
+				},
+			);
+			expect(host.requests[0]?.json).toMatchObject({
+				attributionToken: "line1\nline2\ttabbed",
+			});
+		} finally {
+			host.stop();
+		}
+	});
+
 	// The hook runs synchronously on every agent lifecycle event, so each
 	// external program it launches is paid dozens of times per prompt; on
 	// macOS under load that reached multi-second prompts and 30 s hook

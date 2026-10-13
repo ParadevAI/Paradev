@@ -140,9 +140,21 @@ debug_log() {
   printf '%s [notify-hook] %s\n' "$(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || date)" "$*" >> "${SUPERSET_HOOK_DEBUG_LOG:-/tmp/superset-agent-hooks.log}" 2>/dev/null || true
 }
 
+# Values from json_field cannot hold raw control characters (JSON encodes
+# them), but environment-derived values can: a newline or tab smuggled into
+# something like SUPERSET_TERMINAL_ID or an account profile path would
+# otherwise break the payload this builds. The old sed version had the same
+# gap. Rarer C0 characters are left to the producers; these five cover what
+# shells and config files realistically carry.
 json_escape() {
   local V="${1//\\/\\\\}"
-  printf '%s' "${V//\"/\\\"}"
+  V="${V//\"/\\\"}"
+  V="${V//$'\n'/\\n}"
+  V="${V//$'\r'/\\r}"
+  V="${V//$'\t'/\\t}"
+  V="${V//$'\b'/\\b}"
+  V="${V//$'\f'/\\f}"
+  printf '%s' "$V"
 }
 
 # Resolve the host-service endpoint at call time. SUPERSET_HOST_AGENT_HOOK_URL
