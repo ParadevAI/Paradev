@@ -455,7 +455,6 @@ export function buildTerminalEnv(params: {
 		...baseEnv,
 		...shellEnv,
 		COLORTERM: "truecolor",
-		FORCE_HYPERLINK: "1",
 		COLORFGBG: colorFgBg,
 		TERM_THEME: termTheme,
 		LANG: locale,

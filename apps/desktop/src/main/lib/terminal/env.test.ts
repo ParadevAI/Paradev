@@ -681,11 +681,6 @@ describe("env", () => {
 				expect(result.TERM_PROGRAM_VERSION).toBeUndefined();
 			});
 
-			it("should set FORCE_HYPERLINK so agents emit clickable links", () => {
-				const result = buildTerminalEnv(baseParams);
-				expect(result.FORCE_HYPERLINK).toBe("1");
-			});
-
 			it("should set COLORTERM to truecolor", () => {
 				const result = buildTerminalEnv(baseParams);
 				expect(result.COLORTERM).toBe("truecolor");

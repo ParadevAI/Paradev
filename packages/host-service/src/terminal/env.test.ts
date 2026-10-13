@@ -504,7 +504,6 @@ describe("buildV2TerminalEnv", () => {
 		expect(env).toMatchObject({
 			TERM: "xterm-256color",
 			COLORTERM: "truecolor",
-			FORCE_HYPERLINK: "1",
 			PWD: "/tmp/workspace",
 			SUPERSET_TERMINAL_ID: "term-1",
 			SUPERSET_ORGANIZATION_ID: "org-1",
@@ -530,14 +529,6 @@ describe("buildV2TerminalEnv", () => {
 		});
 		expect(env.TERM_PROGRAM).toBeUndefined();
 		expect(env.TERM_PROGRAM_VERSION).toBeUndefined();
-	});
-
-	test("keeps a FORCE_HYPERLINK the user set", () => {
-		const env = buildV2TerminalEnv({
-			...baseParams,
-			baseEnv: { ...baseParams.baseEnv, FORCE_HYPERLINK: "0" },
-		});
-		expect(env.FORCE_HYPERLINK).toBe("0");
 	});
 
 	test("sets SHELL to the selected launch shell even when base env was stale", () => {
