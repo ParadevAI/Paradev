@@ -3531,11 +3531,35 @@ async function createTerminalSessionUnlocked({
 
 	if (initialCommand) {
 		if (beforeInitialCommand && !session.initialCommandQueued) {
-			await authorizeGuardedInitialCommand(
-				session,
-				beforeInitialCommand,
-				onInitialCommandReady,
-			);
+			try {
+				await authorizeGuardedInitialCommand(
+					session,
+					beforeInitialCommand,
+					onInitialCommandReady,
+				);
+			} catch (error) {
+				// This invocation owns only a fresh, never-launched target. Existing
+				// records and adopted shells belong to the user and must survive.
+				if (
+					!record &&
+					!isAdopted &&
+					sessions.get(terminalId) === session &&
+					!session.initialCommandQueued
+				) {
+					db.update(terminalSessions)
+						.set({ disposeRequestedAt: Date.now() })
+						.where(eq(terminalSessions.id, terminalId))
+						.run();
+					// Already under this terminal's lifecycle lock: do not reacquire it.
+					const disposed = await disposeSessionUnlocked(terminalId, db);
+					if (!disposed.daemonCloseSucceeded)
+						console.warn(
+							"[terminal] refused launch target could not be closed",
+							{ terminalId },
+						);
+				}
+				throw error;
+			}
 		}
 		queueInitialCommand(session, initialCommand);
 	}
