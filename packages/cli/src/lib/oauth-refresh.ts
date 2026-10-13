@@ -54,6 +54,13 @@ export function defaultRefreshDeps(): RefreshDeps {
 	};
 }
 
+/** A live holder outlasted the wait budget; the command should retry, not re-login. */
+export class RefreshInProgressError extends Error {
+	constructor() {
+		super("session refresh still in progress elsewhere");
+	}
+}
+
 export function isAuthFresh(
 	auth: NonNullable<SupersetConfig["auth"]>,
 	now: number,
@@ -69,20 +76,36 @@ export function isAuthFresh(
 export async function refreshStoredAuth(
 	deps: RefreshDeps = defaultRefreshDeps(),
 ): Promise<SupersetConfig> {
-	const release = await acquireLock(deps);
+	const lock = await acquireLock(deps);
 	try {
 		const latest = deps.readConfig();
 		const auth = latest.auth;
 		// Whoever held the lock before us may have done the work already.
 		if (auth && isAuthFresh(auth, deps.now())) return latest;
 		if (!auth?.refreshToken) throw new Error("session expired");
+		if (lock.state === "timed-out") {
+			// A live holder outlasted the whole wait budget. Spending the
+			// stored token beside it is the exact race this module exists to
+			// prevent, so fail this one command instead; the holder's own
+			// outcome lands in the config for the next invocation.
+			throw new RefreshInProgressError();
+		}
+		// Consume the token from disk before spending it. A refresh the
+		// client aborts or crashes out of is ambiguous: the server may have
+		// rotated anyway, and replaying the old token later reads as theft
+		// and revokes the user's tokens on every machine. Worst case of
+		// consuming first is one re-login on this machine.
+		deps.writeConfig({
+			...latest,
+			auth: { ...auth, refreshToken: undefined },
+		});
 		let refreshed: Awaited<ReturnType<RefreshDeps["refresh"]>>;
 		try {
 			refreshed = await deps.refresh(auth.refreshToken);
 		} catch (error) {
 			// The refresh token may have just been spent by a writer the lock
-			// could not see (a lock takeover, or a non-CLI writer). A fresh
-			// token on disk means the race was lost benignly; use the
+			// could not see (an unlockable filesystem, or a non-CLI writer).
+			// A fresh token on disk means the race was lost benignly; use the
 			// winner's token instead of failing the command.
 			const rechecked = deps.readConfig();
 			if (rechecked.auth && isAuthFresh(rechecked.auth, deps.now())) {
@@ -101,7 +124,7 @@ export async function refreshStoredAuth(
 		deps.writeConfig(next);
 		return next;
 	} finally {
-		release();
+		lock.release();
 	}
 }
 
@@ -116,7 +139,15 @@ export async function refreshStoredAuth(
  * past every bound and blocking auth forever is worse, and the re-read
  * paths in refreshStoredAuth still cover the degraded case.
  */
-async function acquireLock(deps: RefreshDeps): Promise<() => void> {
+type AcquiredLock = {
+	/** "held" owns the lock; "unlockable" means the filesystem cannot lock at
+	 * all (then no process can, so there is nobody to race); "timed-out"
+	 * means a live holder outlasted the wait budget. */
+	state: "held" | "unlockable" | "timed-out";
+	release: () => void;
+};
+
+async function acquireLock(deps: RefreshDeps): Promise<AcquiredLock> {
 	const token = `${process.pid} ${randomUUID()}`;
 	const deadline = deps.now() + deps.lockTimeoutMs;
 	for (;;) {
@@ -124,23 +155,29 @@ async function acquireLock(deps: RefreshDeps): Promise<() => void> {
 			const fd = fs.openSync(deps.lockPath, "wx");
 			fs.writeSync(fd, token);
 			fs.closeSync(fd);
-			return () => {
-				try {
-					if (fs.readFileSync(deps.lockPath, "utf-8") === token) {
-						fs.unlinkSync(deps.lockPath);
-					}
-				} catch {}
+			return {
+				state: "held",
+				release: () => {
+					try {
+						if (fs.readFileSync(deps.lockPath, "utf-8") === token) {
+							fs.unlinkSync(deps.lockPath);
+						}
+					} catch {}
+				},
 			};
 		} catch (error) {
 			if ((error as NodeJS.ErrnoException).code !== "EEXIST") {
 				// The home dir is missing or the filesystem refuses locks.
-				// Proceed unlocked rather than make auth impossible.
-				return () => {};
+				// No other process can lock here either, so proceeding is
+				// not a race, and blocking auth would be worse.
+				return { state: "unlockable", release: () => {} };
 			}
 		}
 		// Checked before any takeover work so no error path below can spin
 		// without ever reaching the deadline.
-		if (deps.now() >= deadline) return () => {};
+		if (deps.now() >= deadline) {
+			return { state: "timed-out", release: () => {} };
+		}
 		try {
 			const observed = fs.readFileSync(deps.lockPath, "utf-8");
 			const age = deps.now() - fs.statSync(deps.lockPath).mtimeMs;
@@ -152,14 +189,15 @@ async function acquireLock(deps: RefreshDeps): Promise<() => void> {
 					continue;
 				}
 				// The lock changed hands between the read and the rename:
-				// that is a live holder, not a corpse. Put it back.
+				// that is a live holder, not a corpse. Give it back with a
+				// hard link, which cannot replace a lock a third process
+				// created at the path in the meantime (rename would).
 				try {
-					fs.renameSync(corpse, deps.lockPath);
-				} catch {
-					try {
-						fs.unlinkSync(corpse);
-					} catch {}
-				}
+					fs.linkSync(corpse, deps.lockPath);
+				} catch {}
+				try {
+					fs.unlinkSync(corpse);
+				} catch {}
 			}
 		} catch {
 			// Holder released between open and stat, or the filesystem

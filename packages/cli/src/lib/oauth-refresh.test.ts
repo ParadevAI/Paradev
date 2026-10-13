@@ -171,7 +171,7 @@ describe("refreshStoredAuth", () => {
 		}
 	});
 
-	it("gives up on a wedged foreign lock at the wait budget and still refreshes once", async () => {
+	it("refuses to spend the stored token beside a live holder that outlasts the wait", async () => {
 		const h = makeHarness(staleAuth());
 		// A live foreign lock that never goes stale within this test.
 		fs.writeFileSync(h.deps.lockPath, "wedged-holder");
@@ -179,10 +179,11 @@ describe("refreshStoredAuth", () => {
 		h.deps.lockTimeoutMs = 40;
 		h.deps.pollMs = 5;
 		try {
-			const result = await refreshStoredAuth(h.deps);
-			expect(h.refreshCalls).toBe(1);
-			expect(result.auth?.accessToken).toBe("fresh-1");
+			await expect(refreshStoredAuth(h.deps)).rejects.toThrow(/in progress/);
+			expect(h.refreshCalls).toBe(0);
 			expect(h.sleepCalls).toBeGreaterThan(0);
+			// The stored refresh token survives for whoever holds the lock.
+			expect(h.stored.auth?.refreshToken).toBe("stale-refresh");
 			// The foreign lock was neither stolen nor removed.
 			expect(fs.readFileSync(h.deps.lockPath, "utf-8")).toBe("wedged-holder");
 		} finally {
@@ -190,21 +191,39 @@ describe("refreshStoredAuth", () => {
 		}
 	});
 
-	it("releases the lock after a failed refresh so the next caller can try", async () => {
+	it("consumes the refresh token from disk before spending it", async () => {
 		const h = makeHarness(staleAuth());
-		let failFirst = true;
 		const realRefresh = h.deps.refresh;
-		h.deps.refresh = async () => {
-			if (failFirst) {
-				failFirst = false;
-				throw new Error("network down");
-			}
-			return realRefresh("stale-refresh");
+		let tokenOnDiskDuringRefresh: string | undefined = "unread";
+		h.deps.refresh = async (refreshToken) => {
+			tokenOnDiskDuringRefresh = h.stored.auth?.refreshToken;
+			return realRefresh(refreshToken);
 		};
 		try {
-			await expect(refreshStoredAuth(h.deps)).rejects.toThrow();
 			const result = await refreshStoredAuth(h.deps);
-			expect(result.auth?.accessToken).toBe("fresh-1");
+			// A crash mid-refresh must leave nothing replayable on disk.
+			expect(tokenOnDiskDuringRefresh).toBeUndefined();
+			expect(result.auth?.refreshToken).toBe("rotated-1");
+			expect(h.stored.auth?.refreshToken).toBe("rotated-1");
+		} finally {
+			h.cleanup();
+		}
+	});
+
+	it("a failed refresh burns the token, so no later caller can replay it", async () => {
+		const h = makeHarness(staleAuth());
+		h.deps.refresh = async () => {
+			throw new Error("network down");
+		};
+		try {
+			await expect(refreshStoredAuth(h.deps)).rejects.toThrow(/network down/);
+			// An ambiguous failure may have rotated server-side; a replay of
+			// the old token would read as theft and revoke every machine.
+			// The second caller must not touch the network at all.
+			await expect(refreshStoredAuth(h.deps)).rejects.toThrow(
+				/session expired/,
+			);
+			expect(h.refreshCalls).toBe(0);
 			expect(h.sleepCalls).toBe(0);
 		} finally {
 			h.cleanup();

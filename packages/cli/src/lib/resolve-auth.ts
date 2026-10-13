@@ -6,7 +6,11 @@ import {
 	type SupersetConfig,
 } from "./config";
 import { readHostApiToken } from "./host-api-token";
-import { isAuthFresh, refreshStoredAuth } from "./oauth-refresh";
+import {
+	isAuthFresh,
+	RefreshInProgressError,
+	refreshStoredAuth,
+} from "./oauth-refresh";
 
 export type AuthSource = "override" | "host" | "config" | "oauth" | "sandbox";
 
@@ -52,7 +56,13 @@ export async function resolveAuth(
 			// revokes the whole login (GH #8426).
 			try {
 				config = await refreshStoredAuth();
-			} catch {
+			} catch (error) {
+				if (error instanceof RefreshInProgressError) {
+					throw new CLIError(
+						"Another superset command is renewing the login",
+						"Retry in a few seconds",
+					);
+				}
 				throw new CLIError("Session expired", "Run: superset auth login");
 			}
 			bearer = config.auth?.accessToken;
