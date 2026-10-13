@@ -1,6 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
 import { useFormat } from "@superset/i18n/react";
+import { BUILTIN_TERMINAL_AGENT_LABELS } from "@superset/shared/builtin-terminal-agents";
 import { Button } from "@superset/ui/button";
 import { Loader2 } from "lucide-react";
 import { useId, useRef, useState } from "react";
@@ -133,7 +134,8 @@ export function SavedConversationsForm({
 						/>
 						<span className="min-w-0 flex-1 space-y-1">
 							<span className="block text-sm font-medium">
-								Claude · {row.nativeSessionId.slice(0, 8)}
+								{BUILTIN_TERMINAL_AGENT_LABELS.claude} ·{" "}
+								{row.nativeSessionId.slice(0, 8)}
 							</span>
 							<code
 								className="block truncate text-xs text-muted-foreground"
