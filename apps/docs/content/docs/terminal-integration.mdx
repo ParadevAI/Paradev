@@ -45,6 +45,15 @@ Right-click in the terminal for quick actions:
 
 Copying follows Ghostty's whitespace rules: trailing spaces on each line and trailing blank lines are removed, indentation and blank lines between text are kept, and lines that wrapped only because of the pane width are joined back into one line. The same rules apply to ⌘C, copy on select, and rectangular selections.
 
+## Copy From Agents
+
+Agents such as Codex and Claude Code capture the mouse, so a drag selects text inside the agent instead of the terminal:
+
+- **Drag, then ⌘C** - copies what the agent highlighted. Most agents also copy as soon as you release the mouse.
+- **Option-drag, then ⌘C** - makes a normal terminal selection over the agent, using Superset's whitespace rules.
+
+On macOS, Ctrl+C stops the running program. It does not copy.
+
 ## Cmd/Ctrl-Click Links
 
 Hold `Cmd` (macOS) or `Ctrl` and click links in terminal output:
