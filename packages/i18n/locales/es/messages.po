@@ -10552,7 +10552,7 @@ msgid "No automations match"
 msgstr "Ninguna automatización coincide"
 
 msgid "No available subscription accounts. Add or sign in to an account in Usage, then refresh."
-msgstr "No hay cuentas de suscripción disponibles. Añade una cuenta o inicia sesión en Uso y luego actualiza."
+msgstr "No hay cuentas de suscripción disponibles. Ve a Uso para añadir una cuenta o iniciar sesión en ella y luego actualiza."
 
 msgid "No branches found"
 msgstr "No se encontraron ramas"
@@ -15740,7 +15740,7 @@ msgid "Start a new chat"
 msgstr "Iniciar un chat nuevo"
 
 msgid "Start a new terminal using an existing login. Other chats and your default account stay unchanged."
-msgstr "Inicia un nuevo terminal con una sesión existente. Los demás chats y tu cuenta predeterminada no cambiarán."
+msgstr "Inicia un nuevo terminal usando una cuenta ya conectada. Los demás chats y tu cuenta predeterminada no cambiarán."
 
 msgid "Start a session"
 msgstr "Iniciar una sesión"

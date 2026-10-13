@@ -16946,7 +16946,7 @@ msgid "The scorecard"
 msgstr "Таблица оценок"
 
 msgid "The selected login changed. Choose an account again."
-msgstr "Выбранные данные входа изменились. Выберите аккаунт заново."
+msgstr "Выбранный аккаунт изменился. Выберите аккаунт заново."
 
 msgid "The self-driving software factory"
 msgstr "Самоуправляемая софтверная фабрика"

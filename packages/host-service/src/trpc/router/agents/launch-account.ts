@@ -1,4 +1,8 @@
 import { isAbsolute } from "node:path";
+import {
+	ensureClaudeManagedHooksAt,
+	ensureCodexManagedHooksAt,
+} from "@superset/agent-setup";
 import { buildArgvCommand } from "@superset/shared/agent-prompt-launch";
 import { TRPCError } from "@trpc/server";
 import type { ResolvedHostAgentConfig } from "../../../terminal-agents/agent-config";
@@ -203,7 +207,10 @@ export function pinnedAccountEnv(
 			? {}
 			: { CLAUDE_CONFIG_DIR: account.directory as string };
 	}
-	return { CODEX_HOME: account.directory as string };
+	return {
+		CODEX_HOME: account.directory as string,
+		SUPERSET_DEFAULT_CODEX_HOME: account.directory as string,
+	};
 }
 
 export function pinnedAccountCommandPrefix(
@@ -221,4 +228,25 @@ export function pinnedAccountCommandPrefix(
 			SUPERSET_PINNED_ACCOUNT: variable,
 		}).map(([key, value]) => `${key}=${value}`),
 	])} `;
+}
+
+/** Prepare lifecycle tracking without changing login, default selection or history. */
+export function prepareLaunchAccountHooks(account: SessionAccount): void {
+	const directory = account.directory;
+	if (!account.pinned || !directory)
+		throw new TRPCError({
+			code: "PRECONDITION_FAILED",
+			message:
+				"The selected account cannot prepare its hooks. Nothing was launched.",
+		});
+	const prepared =
+		account.agent === "claude"
+			? ensureClaudeManagedHooksAt(directory)
+			: ensureCodexManagedHooksAt(directory);
+	if (!prepared)
+		throw new TRPCError({
+			code: "PRECONDITION_FAILED",
+			message:
+				"The selected account's hooks could not be prepared. Fix its settings before launching.",
+		});
 }

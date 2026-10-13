@@ -20,7 +20,7 @@ import { after, before, describe, test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { Server } from "@superset/pty-daemon";
 import { createDb, type HostDb } from "../db/index.ts";
-import { projects, workspaces } from "../db/schema.ts";
+import { projects, terminalSessions, workspaces } from "../db/schema.ts";
 import {
 	disposeDaemonClient,
 	getDaemonClient,
@@ -30,6 +30,7 @@ import {
 	__resetSessionsForTesting,
 	createTerminalSessionInternal,
 	disposeSessionAndWait,
+	listTerminalSessions,
 	snapshotSession,
 } from "./terminal.ts";
 import { __setAccountShellForTesting } from "./user-shell.ts";
@@ -121,6 +122,145 @@ describe("initialCommand delivery", () => {
 			);
 			assert.equal(guarded, true);
 			assert.equal(fs.existsSync(sentinel), false);
+		} finally {
+			await disposeSessionAndWait(terminalId, db);
+		}
+	});
+
+	test("a refused new launch closes only its never-launched target shell", async () => {
+		const sourceId = `e2e-source-${randomUUID().slice(0, 8)}`;
+		const targetId = `e2e-refused-${randomUUID().slice(0, 8)}`;
+		const source = await createTerminalSessionInternal({
+			terminalId: sourceId,
+			workspaceId,
+			db,
+		});
+		assert.ok(!("error" in source));
+		try {
+			await assert.rejects(
+				createTerminalSessionInternal({
+					terminalId: targetId,
+					workspaceId,
+					db,
+					initialCommand: "echo must-not-launch",
+					beforeInitialCommand: async () => {
+						throw new Error("fixture identity changed");
+					},
+				}),
+				/fixture identity changed/,
+			);
+			assert.equal(
+				listTerminalSessions().some(
+					(session) => session.terminalId === targetId,
+				),
+				false,
+			);
+			assert.equal(
+				listTerminalSessions().some(
+					(session) => session.terminalId === sourceId && !session.exited,
+				),
+				true,
+			);
+			const daemonSessions = await (await getDaemonClient()).list();
+			assert.equal(
+				daemonSessions.some((session) => session.id === targetId),
+				false,
+			);
+			assert.equal(
+				daemonSessions.some((session) => session.id === sourceId),
+				true,
+			);
+			assert.equal(
+				db.query.terminalSessions
+					.findFirst({ where: (table, { eq }) => eq(table.id, targetId) })
+					.sync()?.status,
+				"disposed",
+			);
+		} finally {
+			await disposeSessionAndWait(targetId, db);
+			await disposeSessionAndWait(sourceId, db);
+		}
+	});
+
+	test("a guard rejection keeps an already-existing user shell alive", async () => {
+		const sourceId = `e2e-existing-${randomUUID().slice(0, 8)}`;
+		const source = await createTerminalSessionInternal({
+			terminalId: sourceId,
+			workspaceId,
+			db,
+		});
+		assert.ok(!("error" in source));
+		try {
+			await assert.rejects(
+				createTerminalSessionInternal({
+					terminalId: sourceId,
+					workspaceId,
+					db,
+					initialCommand: "echo must-not-launch",
+					beforeInitialCommand: async () => {
+						throw new Error("fixture identity changed");
+					},
+				}),
+				/fixture identity changed/,
+			);
+			assert.equal(
+				listTerminalSessions().some(
+					(session) => session.terminalId === sourceId && !session.exited,
+				),
+				true,
+			);
+			assert.equal(
+				(await (await getDaemonClient()).list()).some(
+					(session) => session.id === sourceId,
+				),
+				true,
+			);
+		} finally {
+			await disposeSessionAndWait(sourceId, db);
+		}
+	});
+
+	test("a guard rejection preserves a cold-restored existing terminal record", async () => {
+		const terminalId = `e2e-restored-${randomUUID().slice(0, 8)}`;
+		db.insert(terminalSessions)
+			.values({
+				id: terminalId,
+				originWorkspaceId: workspaceId,
+				createdAt: Date.now(),
+				status: "active",
+			})
+			.run();
+		try {
+			await assert.rejects(
+				createTerminalSessionInternal({
+					terminalId,
+					workspaceId,
+					db,
+					initialCommand: "echo must-not-launch",
+					beforeInitialCommand: async () => {
+						throw new Error("fixture identity changed");
+					},
+				}),
+				/fixture identity changed/,
+			);
+			assert.equal(
+				listTerminalSessions().some(
+					(session) => session.terminalId === terminalId && !session.exited,
+				),
+				true,
+			);
+			assert.equal(
+				(await (await getDaemonClient()).list()).some(
+					(session) => session.id === terminalId,
+				),
+				true,
+			);
+			assert.equal(
+				db.query.terminalSessions
+					.findFirst({ where: (table, { eq }) => eq(table.id, terminalId) })
+					.sync()?.status,
+				"active",
+			);
 		} finally {
 			await disposeSessionAndWait(terminalId, db);
 		}

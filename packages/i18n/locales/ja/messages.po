@@ -1912,10 +1912,10 @@ msgid "agent settings"
 msgstr "エージェント設定"
 
 msgid "Agent terminal with account"
-msgstr "アカウントを指定してエージェント端末を起動"
+msgstr "アカウントを指定してエージェントターミナルを起動"
 
 msgid "Agent terminal with account…"
-msgstr "アカウントを指定してエージェント端末を起動…"
+msgstr "アカウントを指定してエージェントターミナルを起動…"
 
 msgid "Agent usage rankings"
 msgstr "エージェント使用量ランキング"
@@ -4922,7 +4922,7 @@ msgid "Could not start agent"
 msgstr "エージェントを起動できませんでした"
 
 msgid "Could not start agent terminal"
-msgstr "エージェント端末を起動できませんでした"
+msgstr "エージェントターミナルを起動できませんでした"
 
 msgid "Could not start checkout. Please try again."
 msgstr "チェックアウトを開始できませんでした。もう一度お試しください。"
@@ -15740,7 +15740,7 @@ msgid "Start a new chat"
 msgstr "新しいチャットを開始"
 
 msgid "Start a new terminal using an existing login. Other chats and your default account stay unchanged."
-msgstr "既存のログインを使って新しい端末を起動します。他のチャットと既定のアカウントは変更されません。"
+msgstr "既存のログインを使って新しいターミナルを起動します。他のチャットと既定のアカウントは変更されません。"
 
 msgid "Start a session"
 msgstr "セッションを開始"
@@ -15788,7 +15788,7 @@ msgid "Start or stop the workspace run command"
 msgstr "ワークスペースの実行コマンドを開始または停止する"
 
 msgid "Start terminal"
-msgstr "端末を起動"
+msgstr "ターミナルを起動"
 
 msgid "Start voice mode"
 msgstr "音声モードを開始"
@@ -18070,7 +18070,7 @@ msgid "update the branch prefix"
 msgstr "ブランチのプレフィックスを更新する"
 
 msgid "Update this host to choose an account for a new terminal."
-msgstr "新しい端末のアカウントを選択するには、このホストを更新してください。"
+msgstr "新しいターミナルのアカウントを選択するには、このホストを更新してください。"
 
 msgid "Update this host to open saved Claude history."
 msgstr "保存済みの Claude の履歴を開くには、このホストを更新してください。"
