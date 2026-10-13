@@ -10,6 +10,17 @@ export interface TerminalKeyEventHandlerOptions {
 	platform?: string;
 }
 
+// An app that captures the mouse draws its own selection; one that also reads
+// kitty keys can receive Cmd+C to copy it. xterm exposes the kitty flags only
+// on its private core service.
+function appOwnsSelection(terminal: XTerm): boolean {
+	if (terminal.modes.mouseTrackingMode === "none") return false;
+	const internal = terminal as XTerm & {
+		_core?: { coreService?: { kittyKeyboard?: { flags?: number } } };
+	};
+	return (internal._core?.coreService?.kittyKeyboard?.flags ?? 0) > 0;
+}
+
 function resolvePlatform(options: TerminalKeyEventHandlerOptions): string {
 	const raw =
 		options.platform !== undefined
@@ -69,6 +80,7 @@ export function createTerminalKeyEventHandler(
 				isMac,
 				isWindows,
 				hasSelection: terminal.hasSelection(),
+				appOwnsSelection: appOwnsSelection(terminal),
 			})
 		) {
 			// Do NOT preventDefault: the browser keydown -> paste pipeline is what
