@@ -1,7 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
-import { errorMessage } from "@superset/i18n/errors";
 import type { WorkspaceProps, WorkspaceStore } from "@superset/panes";
-import { toast } from "@superset/ui/sonner";
 import { workspaceTrpc } from "@superset/workspace-client";
 import { useCallback } from "react";
 import {
@@ -12,7 +10,6 @@ import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-works
 import type { StoreApi } from "zustand";
 import type { PaneViewerData, TerminalPaneData } from "../../types";
 import { useDirtyTabCloseGuard } from "../useDirtyTabCloseGuard";
-import { ideRuntimeRegistry } from "../usePaneRegistry/components/IdePane/ideRuntimeRegistry";
 
 type OnBeforeCloseTab = NonNullable<
 	WorkspaceProps<PaneViewerData>["onBeforeCloseTab"]
@@ -56,22 +53,7 @@ export function useTabCloseGuard(
 			);
 			if (!allowed) return false;
 
-			if (!(await dirtyGuard(tab))) return false;
-			try {
-				const idePaneIds = Object.values(tab.panes)
-					.filter((pane) => pane.kind === "ide")
-					.map((pane) => pane.id);
-				if (!(await ideRuntimeRegistry.canCloseAll(idePaneIds))) {
-					toast.error(
-						t({ message: "Save your files before closing the IDE." }),
-					);
-					return false;
-				}
-			} catch (error) {
-				toast.error(errorMessage(error));
-				return false;
-			}
-			return true;
+			return dirtyGuard(tab);
 		},
 		[t, utils, workspaceId, dirtyGuard],
 	);

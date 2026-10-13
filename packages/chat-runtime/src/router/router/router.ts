@@ -3,7 +3,9 @@ import {
 	closeSessionInputSchema,
 	createSessionInputSchema,
 	forkSessionInputSchema,
+	getItemBodiesInputSchema,
 	getItemsInputSchema,
+	getOutlineInputSchema,
 	getSessionInputSchema,
 	listSessionsInputSchema,
 	promptInputSchema,
@@ -12,6 +14,7 @@ import {
 	resumeQueueInputSchema,
 	setConfigOptionInputSchema,
 	setModeInputSchema,
+	stopBackgroundTaskInputSchema,
 } from "@superset/chat/protocol";
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 import { initTRPC, TRPCError } from "@trpc/server";
@@ -113,6 +116,12 @@ export function createChatRouter(
 				guarded(() => runtime.commands.cancelTurn(input)),
 			),
 
+		stopBackgroundTask: t.procedure
+			.input(stopBackgroundTaskInputSchema)
+			.mutation(({ input }) =>
+				guarded(() => runtime.commands.stopBackgroundTask(input)),
+			),
+
 		respondToApproval: t.procedure
 			.input(respondToApprovalInputSchema)
 			.mutation(({ input }) =>
@@ -163,6 +172,14 @@ export function createChatRouter(
 		getItems: t.procedure
 			.input(getItemsInputSchema)
 			.query(({ input }) => runtime.commands.getItems(input)),
+
+		getOutline: t.procedure
+			.input(getOutlineInputSchema)
+			.query(({ input }) => runtime.commands.getOutline(input)),
+
+		getItemBodies: t.procedure
+			.input(getItemBodiesInputSchema)
+			.query(({ input }) => runtime.commands.getItemBodies(input)),
 	});
 }
 

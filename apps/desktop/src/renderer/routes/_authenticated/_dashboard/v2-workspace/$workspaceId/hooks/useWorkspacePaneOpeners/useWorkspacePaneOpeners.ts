@@ -9,7 +9,6 @@ import { useSettings } from "renderer/stores/settings";
 import type { StoreApi } from "zustand/vanilla";
 import type {
 	BrowserPaneData,
-	ChatV3PaneData,
 	CommentPaneData,
 	DiffFocusSide,
 	DiffPaneData,
@@ -21,14 +20,12 @@ import {
 	closeVisibleChangesPane,
 	openChangesPaneInStore,
 } from "../../utils/openChangesPaneInStore";
-import { openIdePaneInStore } from "../../utils/openIdePaneInStore";
 import { openPagePaneInStore } from "../../utils/openPagePaneInStore";
 import { openPullRequestPaneInStore } from "../../utils/openPullRequestPaneInStore";
 import {
 	getWorkspaceSidebarTab,
 	setWorkspaceSidebarTab,
 } from "../../utils/setWorkspaceSidebarTab";
-import { showAllWorkspaceChanges } from "../../utils/showAllWorkspaceChanges";
 import { useDefaultBrowserUrl } from "../useDefaultBrowserUrl";
 import type { TerminalLauncher } from "../useV2TerminalLauncher";
 
@@ -56,9 +53,7 @@ export function useWorkspacePaneOpeners({
 		changeKey?: string,
 	) => void;
 	addTerminalTab: () => Promise<void>;
-	addChatV3Tab: () => void;
 	addBrowserTab: () => void;
-	openIde: () => void;
 	openChangesPane: () => void;
 	/** Close the visible Changes pane, or open/focus one when none is showing. */
 	toggleChangesPane: () => void;
@@ -164,25 +159,7 @@ export function useWorkspacePaneOpeners({
 		}
 	}, [addBlankTerminalTab, executePreset, newTabPresets]);
 
-	const addChatV3Tab = useCallback(() => {
-		store.getState().addTab({
-			panes: [
-				{
-					kind: "chat-v3",
-					data: { sessionId: null } as ChatV3PaneData,
-				},
-			],
-		});
-	}, [store]);
-
 	const defaultBrowserUrl = useDefaultBrowserUrl();
-	const { workspace } = useWorkspace();
-	const collections = useCollections();
-	const openIde = useCallback(() => {
-		if (!openIdePaneInStore(store, workspace.id)) return;
-		showAllWorkspaceChanges(collections, workspace.id);
-		setRightSidebarOpen(true);
-	}, [store, workspace.id, collections, setRightSidebarOpen]);
 	const addBrowserTab = useCallback(() => {
 		store.getState().addTab({
 			panes: [
@@ -223,6 +200,8 @@ export function useWorkspacePaneOpeners({
 		[store],
 	);
 
+	const { workspace } = useWorkspace();
+	const collections = useCollections();
 	// The changed-files list lives in the sidebar's Changes tab, so opening
 	// Changes reveals it alongside the pane — with the sidebar closed the pane
 	// alone would have no file picker.
@@ -262,9 +241,7 @@ export function useWorkspacePaneOpeners({
 	return {
 		openDiffPane,
 		addTerminalTab,
-		addChatV3Tab,
 		addBrowserTab,
-		openIde,
 		openChangesPane,
 		toggleChangesPane,
 		openCommentPane,

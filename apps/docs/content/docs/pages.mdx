@@ -106,4 +106,61 @@ superset pages versions <page-id-or-slug>
 superset pages pull <page-id-or-slug> --version 1 > original-design.html
 ```
 
-Agents connecting through MCP can publish, retrieve versions, and reply to or resolve comments with the [Pages tools](/mcp-server#pages).
+## Read What Viewers Stored
+
+A page can keep values under each key with `window.superset.storage`. Each call takes an optional `{ scope }`:
+
+| Scope | What it holds |
+|-------|---------------|
+| `slot` (default) | One value per person. Everyone can read all of them. Good for votes and RSVPs. |
+| `private` | One value per person. Only that person can read it. Good for drafts and settings. |
+| `shared` | One value per key for the whole page. Any member of the page's organization can overwrite it. |
+
+To find keys, `list` returns the keys in one scope that start with a prefix, sorted by key:
+
+```js
+const keys = await window.superset.storage.list("pipeline:", { scope: "shared" });
+// [{ key: "pipeline:1", records: 1, updatedAt: "2026-10-12T09:30:00.000Z" }]
+```
+
+A page can store up to 20 MiB in total. You can read what viewers stored:
+
+```bash
+superset pages storage <page-id-or-slug>
+superset pages storage <page-id-or-slug> --key votes
+```
+
+The first command lists each key and how many people stored a value under it. With `--key`, it prints each person's value and when they last changed it. With `--scope private`, you see only your own value. Add `--scope` to pick `slot`, `private` or `shared`. Add `--json` for the raw records. On a `just_me` page only the creator can read storage. On an `org` or `everyone` page, members of the page's organization can read it, even when the page is public.
+
+You can also write storage as yourself, for example to refresh data from an automation without a new publish. Both `--set` and `--remove` need `--key`, and `--set` takes a JSON value:
+
+```bash
+superset pages storage <page-id-or-slug> --key data --scope shared --set '{"deals": 42}'
+superset pages storage <page-id-or-slug> --key data --scope shared --remove
+```
+
+Only signed-in members of the page's organization can write storage, and on a `just_me` page only the creator can. Anyone who can write can overwrite or remove a `shared` value. Someone outside the organization who opens an `everyone` page can read the page, but not its storage. Reading storage and writing it both need membership in the page's organization.
+
+## Show Live Data from Your Tools
+
+A page can call a tool from a plugin, such as a read-only database query or a web search, and show the result. The call runs as the person viewing the page, through their own connected account. The page itself makes no network request; Superset makes the call.
+
+```js
+const tools = window.superset?.tools;
+if (await tools?.ready) {
+  const result = await tools.call("neon-readonly", "run_sql", {
+    sql: "select count(*) from organizations",
+  });
+}
+```
+
+- **Consent.** The first time a page calls a plugin, the viewer sees a dialog and chooses whether to allow it. The choice applies to that page and that plugin, for every tool of the plugin, including tools that change data, and for future versions of the page. The viewer may also be asked to install the plugin, connect an account, or choose which account to use.
+- **Trust.** A page can send what it reads to other websites, for example in an image URL. Only allow pages you trust.
+- **Their data.** Each viewer sees results from their own account, so two people can see different numbers. A signed-out viewer cannot use tools.
+- **Read-only databases.** Use the `neon-readonly` plugin for dashboards. Read-only is not enforced yet for an account connected with write access, so do not rely on it for safety. The `exa` plugin gives a page Exa's search tools.
+- **Errors.** A call fails with a code in `error.code`: `needs_install`, `needs_connection`, `denied`, `unavailable_signed_out`, `rate_limited`, `invalid`, `tool_error` or `unavailable`. A tool that fails returns `tool_error` with the tool's message. A call times out after 60 seconds. Time the viewer spends in the dialog does not count.
+- **Not on mobile.** Tools work in the desktop app and on the web, not in the mobile app.
+
+Removing a page's tool access from the app is not available yet.
+
+Agents connecting through MCP can publish, retrieve versions, read a page's storage, and reply to or resolve comments with the [Pages tools](/mcp-server#pages).

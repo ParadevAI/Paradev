@@ -17,6 +17,7 @@
 		"orchestration",
 		"---Core Features---",
 		"workspaces",
+		"multiple-windows",
 		"diff-viewer",
 		"editor",
 		"terminal-integration",

@@ -407,6 +407,7 @@ const STATE_TYPES_BY_FILTER: Record<
 	Exclude<LinearStatusFilter, "all">,
 	LinearStateType[]
 > = {
+	open: ["triage", "backlog", "unstarted", "started"],
 	active: ["unstarted", "started"],
 	backlog: ["triage", "backlog"],
 	unstarted: ["unstarted"],

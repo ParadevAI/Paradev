@@ -10,7 +10,6 @@ import {
 import { cn } from "@superset/ui/utils";
 import { ChevronDown } from "lucide-react";
 import { useTerminalAgentBinding } from "renderer/hooks/host-service/useTerminalAgentBindings";
-import { getSubagentLabel } from "renderer/routes/_authenticated/_dashboard/utils/subagent-label";
 import type { SubagentPaneData } from "../../../../../../../../types";
 
 interface TerminalSubagentsMenuProps {
@@ -78,7 +77,7 @@ export function TerminalSubagentsMenu({
 						}
 					>
 						<span className="min-w-0 flex-1 truncate">
-							{getSubagentLabel(subagent)}
+							{subagent.agentType ?? <Trans>Subagent</Trans>}
 						</span>
 						<span className="shrink-0 text-[10px] text-muted-foreground">
 							<Trans>Running</Trans>

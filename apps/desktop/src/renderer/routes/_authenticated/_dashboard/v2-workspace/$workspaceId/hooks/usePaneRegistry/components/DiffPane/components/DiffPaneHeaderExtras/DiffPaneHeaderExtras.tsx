@@ -2,7 +2,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import type { WorkspaceStore } from "@superset/panes";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
-import { MessageSquare, MessageSquareOff } from "lucide-react";
+import { Eye, EyeOff, MessageSquare, MessageSquareOff } from "lucide-react";
 import { useSettings } from "renderer/stores/settings";
 import type { StoreApi } from "zustand/vanilla";
 import type { PaneViewerData } from "../../../../../../types";
@@ -13,12 +13,16 @@ interface DiffPaneHeaderExtrasProps {
 	store: StoreApi<WorkspaceStore<PaneViewerData>>;
 }
 
+// Unified/split moved into the in-pane DiffViewToolbar (shared with the PR
+// Code tab); what stays here is workspace-specific: the PR link and the
+// toggles that change what the diff shows rather than how it's laid out.
 export function DiffPaneHeaderExtras({
 	workspaceId,
 	store,
 }: DiffPaneHeaderExtrasProps) {
 	const { t } = useLingui();
 	const showDiffComments = useSettings((s) => s.showDiffComments);
+	const expandUnchanged = useSettings((s) => s.expandUnchanged);
 	const updateSetting = useSettings((s) => s.update);
 
 	const buttonClass = (active: boolean) =>
@@ -61,6 +65,38 @@ export function DiffPaneHeaderExtras({
 						<Trans>Hide review comments</Trans>
 					) : (
 						<Trans>Show review comments</Trans>
+					)}
+				</TooltipContent>
+			</Tooltip>
+			<Tooltip>
+				<TooltipTrigger asChild>
+					<button
+						type="button"
+						onClick={() => updateSetting("expandUnchanged", !expandUnchanged)}
+						aria-label={
+							expandUnchanged
+								? t({
+										message: "Hide unchanged regions",
+									})
+								: t({
+										message: "Show all lines",
+									})
+						}
+						aria-pressed={expandUnchanged}
+						className={buttonClass(expandUnchanged)}
+					>
+						{expandUnchanged ? (
+							<EyeOff className="size-3.5" />
+						) : (
+							<Eye className="size-3.5" />
+						)}
+					</button>
+				</TooltipTrigger>
+				<TooltipContent side="bottom">
+					{expandUnchanged ? (
+						<Trans>Hide unchanged regions</Trans>
+					) : (
+						<Trans>Show all lines</Trans>
 					)}
 				</TooltipContent>
 			</Tooltip>

@@ -24,6 +24,7 @@ import {
 	filterByAudience,
 	routeCommand,
 } from "./router";
+import { wrapText } from "./wrap-text";
 
 export interface CommandTree {
 	commands: CliCommand[];
@@ -175,7 +176,9 @@ async function handleError(
 	signal?: AbortSignal,
 ): Promise<never> {
 	const { message, hint } = formatError(error, cliName);
-	const text = `Error: ${message}\n${hint ? `Hint: ${hint}\n` : ""}`;
+	const columns = process.stderr.isTTY ? process.stderr.columns : 0;
+	const wrap = (line: string) => (columns ? wrapText(line, columns) : line);
+	const text = `${wrap(`Error: ${message}`)}\n${hint ? `${wrap(`Hint: ${hint}`)}\n` : ""}`;
 	// Same drain rule as stdout (see writeStream): exiting before the pipe
 	// reader catches up would drop the message. Best effort; a failed stderr
 	// write must not mask the exit code.

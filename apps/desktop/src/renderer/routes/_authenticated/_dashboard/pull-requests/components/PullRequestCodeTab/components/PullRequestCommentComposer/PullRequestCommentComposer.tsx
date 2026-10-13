@@ -25,7 +25,7 @@ interface PullRequestCommentComposerProps {
 	 *  create, not just a new terminal in an existing one). */
 	linkedWorkspaceId: string | null;
 	onCancel: () => void;
-	onPostComment: (comment: string) => Promise<void>;
+	onPostComment?: (comment: string) => Promise<void>;
 	onSubmit: (input: {
 		comment: string;
 		target: AgentTarget;
@@ -86,7 +86,7 @@ export function PullRequestCommentComposer({
 		inFlight.current = true;
 		setSubmitting(true);
 		try {
-			if (destination === "github") await onPostComment(comment.trim());
+			if (destination === "github") await onPostComment?.(comment.trim());
 			else if (resolved)
 				await onSubmit({ comment: comment.trim(), target: resolved });
 		} catch (error) {

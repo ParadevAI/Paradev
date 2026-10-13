@@ -3,8 +3,21 @@ export const STORAGE_HOST_CHANNEL = "superset-storage/host";
 
 export const MAX_PAGE_STORAGE_VALUE_BYTES = 64 * 1024;
 export const MAX_PAGE_STORAGE_KEYS_PER_USER = 500;
-export const MAX_PAGE_STORAGE_BYTES = 4 * 1024 * 1024;
+export const MAX_PAGE_STORAGE_BYTES = 20 * 1024 * 1024;
 export const MAX_PAGE_STORAGE_KEY_LENGTH = 128;
+export const MAX_PAGE_STORAGE_LIST_KEYS = 1000;
+
+export const pageStorageScopeValues = ["slot", "private", "shared"] as const;
+export type PageStorageScope = (typeof pageStorageScopeValues)[number];
+
+export const SHARED_RECORD_OWNER = "";
+
+export function parsePageStorageScope(value: unknown): PageStorageScope | null {
+	if (value === undefined) return "slot";
+	return pageStorageScopeValues.includes(value as PageStorageScope)
+		? (value as PageStorageScope)
+		: null;
+}
 
 export const PAGE_STORAGE_TICKET_SECONDS = 60;
 
@@ -30,17 +43,41 @@ export interface PageStorageRecord {
 	updatedAt: string;
 }
 
+export interface PageStorageKeySummary {
+	key: string;
+	scope: PageStorageScope;
+	records: number;
+	updatedAt: string;
+}
+
+export type PageStorageListEntry = Omit<PageStorageKeySummary, "scope">;
+
+export type PageStorageReadback =
+	| { pageId: string; keys: PageStorageKeySummary[] }
+	| {
+			pageId: string;
+			key: string;
+			scope: PageStorageScope;
+			records: PageStorageRecord[];
+	  };
+
 export type PageStorageOp =
-	| { op: "get"; key: string }
-	| { op: "getAll"; key: string }
-	| { op: "set"; key: string; value: unknown }
-	| { op: "remove"; key: string };
+	| { op: "get"; key: string; scope?: PageStorageScope }
+	| { op: "getAll"; key: string; scope?: PageStorageScope }
+	| { op: "set"; key: string; value: unknown; scope?: PageStorageScope }
+	| { op: "remove"; key: string; scope?: PageStorageScope }
+	| { op: "list"; prefix?: string; scope?: PageStorageScope };
+
+export type PageStorageWriteRequest =
+	| { op: "set"; key: string; value: unknown; scope?: PageStorageScope }
+	| { op: "remove"; key: string; scope?: PageStorageScope };
 
 export type PageStorageResult =
 	| { op: "get"; value: unknown }
 	| { op: "getAll"; records: PageStorageRecord[] }
 	| { op: "set" }
-	| { op: "remove" };
+	| { op: "remove" }
+	| { op: "list"; keys: PageStorageListEntry[] };
 
 export type PageStorageSocketCall = {
 	type: "call";
@@ -54,6 +91,7 @@ export type PageStorageSocketMessage =
 			viewer: PageStorageViewer;
 			author: boolean;
 			writable: boolean;
+			scopes?: true;
 	  }
 	| { type: "result"; id: string; ok: true; result: PageStorageResult }
 	| {
@@ -63,7 +101,12 @@ export type PageStorageSocketMessage =
 			code: PageStorageErrorCode;
 			message: string;
 	  }
-	| { type: "records"; key: string; records: PageStorageRecord[] }
+	| {
+			type: "records";
+			key: string;
+			scope: PageStorageScope;
+			records: PageStorageRecord[];
+	  }
 	| { type: "revoked" };
 
 export type PageStorageHostMessage = {

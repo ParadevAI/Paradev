@@ -1,6 +1,7 @@
 import { spawn } from "node:child_process";
 
 export type AcpTransport = {
+	pid?: number;
 	send(line: string): void;
 	close(): Promise<void>;
 };
@@ -18,6 +19,17 @@ export type SpawnAcpOptions = {
 	env?: NodeJS.ProcessEnv;
 };
 
+const OWN_PROCESS_GROUP = process.platform !== "win32";
+const CLOSE_GRACE_MS = 2000;
+const EXIT_FLUSH_MS = 500;
+
+function killProcessGroup(pid: number | undefined): void {
+	if (!OWN_PROCESS_GROUP || pid === undefined) return;
+	try {
+		process.kill(-pid, "SIGKILL");
+	} catch {}
+}
+
 export function spawnAcpTransport(
 	options: SpawnAcpOptions,
 	handlers: AcpTransportHandlers,
@@ -26,6 +38,29 @@ export function spawnAcpTransport(
 		cwd: options.cwd,
 		env: options.env ?? process.env,
 		stdio: ["pipe", "pipe", "pipe"],
+		detached: OWN_PROCESS_GROUP,
+	});
+
+	let exited = false;
+	let reported = false;
+	let exitFlush: ReturnType<typeof setTimeout> | undefined;
+	const reportExit = (code: number | null, signal: string | null) => {
+		clearTimeout(exitFlush);
+		exited = true;
+		if (reported) return;
+		reported = true;
+		killProcessGroup(child.pid);
+		handlers.onExit(code, signal);
+	};
+
+	child.on("error", (error) => {
+		handlers.onStderr(`${error.message}\n`);
+		reportExit(null, null);
+	});
+	child.stdin.on("error", (error) => {
+		handlers.onStderr(`stdin: ${error.message}\n`);
+		killProcessGroup(child.pid);
+		child.kill("SIGKILL");
 	});
 
 	let pending = "";
@@ -42,25 +77,25 @@ export function spawnAcpTransport(
 	});
 	child.stderr.setEncoding("utf8");
 	child.stderr.on("data", (chunk: string) => handlers.onStderr(chunk));
-	child.on("exit", (code, signal) => handlers.onExit(code, signal));
-
-	let exited = false;
-	child.on("close", () => {
-		exited = true;
+	child.on("exit", (code, signal) => {
+		exitFlush = setTimeout(() => reportExit(code, signal), EXIT_FLUSH_MS);
 	});
+	child.on("close", (code, signal) => reportExit(code, signal));
 
 	return {
+		pid: child.pid,
 		send: (line) => {
-			if (!exited) child.stdin.write(`${line}\n`);
+			if (!exited && child.stdin.writable) child.stdin.write(`${line}\n`);
 		},
 		close: async () => {
 			if (exited) return;
 			child.stdin.end();
 			await new Promise<void>((resolve) => {
 				const timer = setTimeout(() => {
+					killProcessGroup(child.pid);
 					child.kill("SIGKILL");
 					resolve();
-				}, 2000);
+				}, CLOSE_GRACE_MS);
 				child.once("close", () => {
 					clearTimeout(timer);
 					resolve();
@@ -97,6 +132,18 @@ export class AcpRpcError extends Error {
 	}
 }
 
+export class AcpTimeoutError extends Error {
+	constructor(
+		readonly method: string,
+		timeoutMs: number,
+	) {
+		const wait =
+			timeoutMs < 1000 ? `${timeoutMs}ms` : `${Math.round(timeoutMs / 1000)}s`;
+		super(`${method}: the agent did not answer within ${wait}`);
+		this.name = "AcpTimeoutError";
+	}
+}
+
 type PendingRequest = {
 	method: string;
 	resolve(result: unknown): void;
@@ -122,13 +169,34 @@ export class AcpRpcClient {
 		});
 	}
 
-	request(method: string, params?: unknown): Promise<unknown> {
+	request(
+		method: string,
+		params?: unknown,
+		timeoutMs?: number,
+	): Promise<unknown> {
 		if (this.closed) {
 			return Promise.reject(new Error(`${method}: acp agent closed`));
 		}
 		const id = this.nextId++;
 		return new Promise((resolve, reject) => {
-			this.pending.set(id, { method, resolve, reject });
+			const timer =
+				timeoutMs === undefined
+					? undefined
+					: setTimeout(() => {
+							if (!this.pending.delete(id)) return;
+							reject(new AcpTimeoutError(method, timeoutMs));
+						}, timeoutMs);
+			this.pending.set(id, {
+				method,
+				resolve: (result) => {
+					clearTimeout(timer);
+					resolve(result);
+				},
+				reject: (error) => {
+					clearTimeout(timer);
+					reject(error);
+				},
+			});
 			this.write({ jsonrpc: "2.0", id, method, params: params ?? {} });
 		});
 	}

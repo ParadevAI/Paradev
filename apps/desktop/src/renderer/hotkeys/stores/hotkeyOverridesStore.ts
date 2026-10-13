@@ -12,6 +12,24 @@ interface HotkeyOverridesState {
 	resetAll: () => void;
 }
 
+type PersistedOverrides = Pick<HotkeyOverridesState, "overrides">;
+
+export function migrateHotkeyOverrides(
+	persisted: unknown,
+	version: number,
+): PersistedOverrides {
+	const state = persisted as PersistedOverrides;
+	if (version >= 1 || !state?.overrides) return state;
+	const { UNDO_ARCHIVE_WORKSPACE, ...overrides } = state.overrides;
+	return {
+		...state,
+		overrides:
+			UNDO_ARCHIVE_WORKSPACE === undefined
+				? overrides
+				: { ...overrides, UNDO: UNDO_ARCHIVE_WORKSPACE },
+	};
+}
+
 export const useHotkeyOverridesStore = create<HotkeyOverridesState>()(
 	persist(
 		(set) => ({
@@ -32,6 +50,8 @@ export const useHotkeyOverridesStore = create<HotkeyOverridesState>()(
 			name: "hotkey-overrides",
 			storage: createJSONStorage(() => localStorage),
 			partialize: (state) => ({ overrides: state.overrides }),
+			version: 1,
+			migrate: migrateHotkeyOverrides,
 		},
 	),
 );

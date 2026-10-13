@@ -125,7 +125,7 @@ superset ws create --local --project PROJECT_ID --branch BRANCH --agent claude -
 superset agents create --workspace WORKSPACE_ID --agent claude --prompt "..."
 superset ws list --local
 superset terminals read --workspace WORKSPACE_ID --terminal TERMINAL_ID
-superset ws delete --local WORKSPACE_ID
+superset ws archive --local WORKSPACE_ID
 ```
 
 In order: an isolated workspace with an agent already working in it, another agent in an existing
@@ -137,8 +137,16 @@ of scattering across the project. `ws list --local --tag SOME_TAG` filters to th
 `ws update WORKSPACE_ID --tag ...` retags (`--clear-tags` ungroups). Automation-created workspaces
 are tagged `automation` by default and collect in an "automation" folder.
 
-`superset <command> --help` covers the rest (tasks, automations, hosts, settings). Pass `--json` for
-parsable output; it's on by default under agent environments.
+`superset schema` prints every command, option and argument as JSON; read it with `jq` to learn the
+rest (tasks, automations, hosts, settings) instead of parsing `--help` text. To check only that a
+command exists, the exit code of `superset <command> --help` is enough. Details and the version
+caveat: `docs/agent-tooling.md`.
+
+```bash
+superset schema | jq '.commands[] | select(.path==["terminals"]) | .commands[] | {path, options: [.options[].name]}'
+```
+
+Pass `--json` for parsable output; it's on by default under agent environments.
 
 ## Internationalization
 
@@ -200,7 +208,7 @@ earns its place by catching a regression quickly.
 - **One test per behaviour.** Stress, fuzz and "adversarial" suites that build many real git
   repositories or processes do not go in the repo. When a probe finds a bug, keep the one
   regression test for it.
-- **Any order, clean checkout.** Suites run with `bun test --isolate`, in an order that differs
+- **Any order, clean checkout.** Each package's suite runs in one process, in an order that differs
   between machines, with no root `.env`. Do not `mock.module` a module that other files import for
   real (`env`, a client, a logger). Give the code its input instead: a parameter, a placeholder in
   the package's test preload, or a local server.

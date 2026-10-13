@@ -1,0 +1,258 @@
+import { msg } from "@lingui/core/macro";
+import { useLingui as useTranslation } from "@lingui/react";
+import { formatList } from "@superset/i18n/format";
+import {
+	BUILTIN_AGENT_IDS,
+	BUILTIN_AGENT_LABELS,
+} from "@superset/shared/agent-catalog";
+import { useEffect, useRef, useState } from "react";
+import { track } from "renderer/lib/analytics";
+import { electronTrpcClient } from "renderer/lib/trpc-client";
+import {
+	isV1MigrationComplete,
+	isV1WelcomePending,
+} from "renderer/lib/v1-migration/completion";
+import {
+	resolveMigratedPaneResume,
+	type V1PaneAgentSessionSnapshot,
+} from "renderer/lib/v1-migration/terminals";
+import {
+	isStatusCardVisible,
+	useV1MigrationStatusStore,
+} from "renderer/stores/v1-migration-status";
+import { FlipNoticeCard } from "../components/FlipNoticeCard";
+
+const NOTICE_PREFIX = "v1-terminals-notice-";
+
+const RESUME_COMMANDS = ["claude --resume", "codex resume"];
+
+const LAUNCH_STARTED_AT = Date.now();
+
+type NoticeState = "pending" | "dismissed";
+
+export interface MigratedTerminal {
+	paneId: string;
+	migratedAt: number;
+}
+
+export interface V1TerminalsNoticeSource {
+	listMigratedTerminals(organizationId: string): Promise<MigratedTerminal[]>;
+	readAgentSessions(
+		paneIds: string[],
+	): Promise<Record<string, V1PaneAgentSessionSnapshot>>;
+}
+
+const electronSource: V1TerminalsNoticeSource = {
+	listMigratedTerminals: async (organizationId) => {
+		const rows = await electronTrpcClient.migration.ledgerList.query({
+			organizationId,
+		});
+		return rows
+			.filter((row) => row.kind === "terminal" && row.status === "success")
+			.map((row) => ({ paneId: row.v1Id, migratedAt: row.migratedAt }));
+	},
+	readAgentSessions: (paneIds) =>
+		electronTrpcClient.migration.readV1PaneAgentSessions.query({ paneIds }),
+};
+
+interface BootSnapshot {
+	migrationCompleteAtBoot: boolean;
+	welcomePendingAtBoot: boolean;
+}
+
+// Read once per org per launch: the pass marks completion and arms the
+// welcome card mid-session, and both must not move this card's rule.
+const bootSnapshots = new Map<string, BootSnapshot>();
+
+function readBootSnapshot(organizationId: string): BootSnapshot {
+	let snapshot = bootSnapshots.get(organizationId);
+	if (!snapshot) {
+		snapshot = {
+			migrationCompleteAtBoot: isV1MigrationComplete(organizationId),
+			welcomePendingAtBoot: isV1WelcomePending(organizationId),
+		};
+		bootSnapshots.set(organizationId, snapshot);
+	}
+	return snapshot;
+}
+
+function readNoticeState(organizationId: string): NoticeState | null {
+	try {
+		const value = localStorage.getItem(NOTICE_PREFIX + organizationId);
+		return value === "pending" || value === "dismissed" ? value : null;
+	} catch {
+		return null;
+	}
+}
+
+function writeNoticeState(organizationId: string, state: NoticeState): void {
+	try {
+		localStorage.setItem(NOTICE_PREFIX + organizationId, state);
+	} catch {}
+}
+
+function listResumedAgentLabels(
+	sessions: Record<string, V1PaneAgentSessionSnapshot>,
+): string[] {
+	const labels = new Set<string>();
+	for (const session of Object.values(sessions)) {
+		const resume = resolveMigratedPaneResume(session);
+		const agentId = BUILTIN_AGENT_IDS.find((id) => id === resume?.agentId);
+		if (agentId) labels.add(BUILTIN_AGENT_LABELS[agentId]);
+	}
+	return [...labels].sort();
+}
+
+interface Notice {
+	organizationId: string;
+	resumedAgentLabels: string[];
+}
+
+export function V1TerminalsNotice({
+	organizationId,
+	source = electronSource,
+	launchStartedAt = LAUNCH_STARTED_AT,
+}: {
+	organizationId: string;
+	source?: V1TerminalsNoticeSource;
+	launchStartedAt?: number;
+}) {
+	const { _: translate } = useTranslation();
+	const statusOrganizationId = useV1MigrationStatusStore(
+		(state) => state.organizationId,
+	);
+	const status = useV1MigrationStatusStore((state) => state.status);
+	const statusCardShowing = useV1MigrationStatusStore((state) =>
+		isStatusCardVisible(state, organizationId),
+	);
+	const [notice, setNotice] = useState<Notice | null>(null);
+	const trackedRef = useRef<string | null>(null);
+
+	const boot = readBootSnapshot(organizationId);
+	const statusForOrg = statusOrganizationId === organizationId ? status : null;
+	const waitsForPass =
+		!boot.migrationCompleteAtBoot &&
+		(statusForOrg === null || statusForOrg === "running");
+
+	useEffect(() => {
+		if (waitsForPass) return;
+		const stored = readNoticeState(organizationId);
+		if (stored === "dismissed") return;
+		const snapshot = readBootSnapshot(organizationId);
+		const cameFromV1 =
+			stored === "pending" ||
+			!snapshot.migrationCompleteAtBoot ||
+			snapshot.welcomePendingAtBoot;
+		if (!cameFromV1) return;
+
+		let cancelled = false;
+		void (async () => {
+			try {
+				const terminals = await source.listMigratedTerminals(organizationId);
+				const paneIds = terminals
+					.filter(
+						(terminal) =>
+							stored === "pending" || terminal.migratedAt >= launchStartedAt,
+					)
+					.map((terminal) => terminal.paneId);
+				if (cancelled || paneIds.length === 0) return;
+				writeNoticeState(organizationId, "pending");
+				// Same rule as the resume path: a failed read waits for the next launch.
+				const sessions = await source.readAgentSessions(paneIds);
+				if (cancelled) return;
+				setNotice({
+					organizationId,
+					resumedAgentLabels: listResumedAgentLabels(sessions),
+				});
+			} catch (err) {
+				console.warn(
+					"[v1-terminals-notice] migrated terminals read failed",
+					err,
+				);
+			}
+		})();
+		return () => {
+			cancelled = true;
+		};
+	}, [organizationId, waitsForPass, source, launchStartedAt]);
+
+	const visible =
+		!!notice &&
+		notice.organizationId === organizationId &&
+		!statusCardShowing &&
+		!boot.welcomePendingAtBoot;
+
+	useEffect(() => {
+		if (!visible || !notice || trackedRef.current === notice.organizationId) {
+			return;
+		}
+		trackedRef.current = notice.organizationId;
+		track("v1_terminals_notice_shown", {
+			resumed_agent_count: notice.resumedAgentLabels.length,
+		});
+	}, [visible, notice]);
+
+	if (!visible || !notice) return null;
+
+	const dismiss = () => {
+		track("v1_terminals_notice_dismissed");
+		writeNoticeState(notice.organizationId, "dismissed");
+		setNotice(null);
+	};
+
+	const agents = formatList(notice.resumedAgentLabels);
+
+	const body = [
+		translate(
+			msg({
+				message:
+					"This update restarted your terminals once. New ones open in the same folders.",
+			}),
+		),
+		notice.resumedAgentLabels.length > 0
+			? translate(
+					msg({
+						message: `${agents} sessions resume when you open their workspace.`,
+					}),
+				)
+			: null,
+	]
+		.filter(Boolean)
+		.join(" ");
+
+	return (
+		<FlipNoticeCard
+			title={translate(msg({ message: "Your terminals restarted" }))}
+			body={body}
+			ctaLabel={translate(msg({ message: "Got it" }))}
+			onDismiss={dismiss}
+		>
+			<div className="space-y-1.5">
+				<p className="text-muted-foreground text-sm">
+					{notice.resumedAgentLabels.length > 0
+						? translate(
+								msg({
+									message:
+										"To resume another agent conversation, run this in its folder:",
+								}),
+							)
+						: translate(
+								msg({
+									message:
+										"To resume an agent conversation, run this in its folder:",
+								}),
+							)}
+				</p>
+				<ul className="space-y-1">
+					{RESUME_COMMANDS.map((command) => (
+						<li key={command}>
+							<code className="bg-muted px-1.5 py-0.5 font-mono text-xs">
+								{command}
+							</code>
+						</li>
+					))}
+				</ul>
+			</div>
+		</FlipNoticeCard>
+	);
+}

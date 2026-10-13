@@ -1,10 +1,13 @@
 import { useLingui } from "@lingui/react/macro";
-import type { ToolCall } from "@superset/chat/protocol";
+import type { ToolCall, ToolContent } from "@superset/chat/protocol";
 import { ShimmerLabel } from "@superset/ui/ai-elements/shimmer-label";
 import { useMemo } from "react";
 import { DiffStatText } from "../../../../../../../../../../components/DiffStatText";
 import { diffStats } from "../../../../utils/diffStats";
 import type { FileChange } from "../../../../utils/fileChange";
+import { FileChangePreview } from "../FileChangePreview";
+
+type DiffToolContent = Extract<ToolContent, { type: "diff" }>;
 
 /**
  * "Edited README.md +5 −1": the verb says what happened and whether it is
@@ -14,17 +17,28 @@ import type { FileChange } from "../../../../utils/fileChange";
 export function FileChangeTitle({
 	change,
 	item,
+	onToggle,
 	running,
 }: {
 	change: FileChange;
 	item: ToolCall;
+	/** What a click on the file name does; the row around it does the same. */
+	onToggle?: (() => void) | undefined;
 	running: boolean;
 }) {
 	const { t } = useLingui();
+	const diff = item.content.find(
+		(content): content is DiffToolContent => content.type === "diff",
+	);
 	const stats = useMemo(() => {
-		const diff = item.content.find((content) => content.type === "diff");
-		return diff && diff.type === "diff" ? diffStats(diff) : null;
-	}, [item.content]);
+		const counted = diff ? diffStats(diff) : null;
+		return counted
+			? {
+					additions: change.kind === "deleted" ? 0 : counted.additions,
+					deletions: change.kind === "added" ? 0 : counted.deletions,
+				}
+			: null;
+	}, [change.kind, diff]);
 	const verb = running
 		? change.kind === "added"
 			? t({ message: "Creating", context: "file change" })
@@ -47,17 +61,29 @@ export function FileChangeTitle({
 					verb
 				)}
 			</span>
-			<span
-				className="min-w-0 truncate rounded bg-foreground/[0.06] px-1 py-0.5 font-mono text-[13px] text-foreground/70"
-				title={change.path}
-			>
-				{change.name}
-			</span>
+			{diff ? (
+				<FileChangePreview
+					change={change}
+					content={diff}
+					onClick={onToggle}
+					stats={stats}
+					status={item.status}
+				>
+					{change.name}
+				</FileChangePreview>
+			) : (
+				<span
+					className="min-w-0 truncate rounded bg-foreground/[0.06] px-1 py-0.5 font-mono text-[13px] text-foreground/70"
+					title={change.path}
+				>
+					{change.name}
+				</span>
+			)}
 			{stats && !running && (
 				<span className="shrink-0 whitespace-nowrap font-mono text-xs tabular-nums">
 					<DiffStatText
-						additions={change.kind === "deleted" ? 0 : stats.additions}
-						deletions={change.kind === "added" ? 0 : stats.deletions}
+						additions={stats.additions}
+						deletions={stats.deletions}
 					/>
 				</span>
 			)}

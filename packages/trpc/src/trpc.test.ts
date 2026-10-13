@@ -1,23 +1,18 @@
-import { describe, expect, mock, test } from "bun:test";
+import { describe, expect, test } from "bun:test";
+import { db } from "@superset/db/client";
 import type { TRPCError } from "@trpc/server";
+import { stub } from "../test/stub";
+import { posthog } from "./lib/analytics";
 
 const CREATOR_ORGS = ["box-org", "other-org"];
+let membership: { id: string } | undefined = { id: "membership" };
 
-mock.module("@superset/db/client", () => ({
-	db: {
-		query: {
-			members: {
-				findMany: async () =>
-					CREATOR_ORGS.map((organizationId) => ({ organizationId })),
-				findFirst: async () => ({ id: "membership" }),
-			},
-		},
-	},
-	dbWs: {},
-}));
-mock.module("./lib/analytics", () => ({
-	posthog: { capture: () => {}, isFeatureEnabled: async () => false },
-}));
+stub(db.query.members, {
+	findMany: async () =>
+		CREATOR_ORGS.map((organizationId) => ({ organizationId })),
+	findFirst: async () => membership,
+});
+stub(posthog, { capture: () => {}, isFeatureEnabled: async () => false });
 
 const {
 	createCallerFactory,
@@ -157,5 +152,26 @@ describe("the organization a cloud workspace acts in", () => {
 		});
 		expect(await client.cloudWorkspace.list()).toEqual(CREATOR_ORGS);
 		expect(await client.user.myOrganization()).toBe("other-org");
+	});
+});
+
+describe("a caller outside the organization it asks for", () => {
+	test("is told which account it is signed in as and how to fix it", async () => {
+		membership = undefined;
+		try {
+			const client = callerFor({
+				sandboxCaller: null,
+				organization: "foreign-org",
+			});
+			const error = (await client.user
+				.myOrganization()
+				.catch((thrown: unknown) => thrown)) as TRPCError;
+			expect(error.code).toBe("FORBIDDEN");
+			expect(error.message).toContain("foreign-org");
+			expect(error.message).toContain("creator@example.com");
+			expect(error.message).toContain("superset auth login");
+		} finally {
+			membership = { id: "membership" };
+		}
 	});
 });

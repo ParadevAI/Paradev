@@ -17,6 +17,7 @@ export const createSessionInputSchema = z.object({
 	modeId: z.string().optional(),
 	modelId: z.string().optional(),
 	resume: z.object({ harnessSessionId: z.string().min(1) }).optional(),
+	terminalId: z.string().min(1).optional(),
 });
 export type CreateSessionInput = z.infer<typeof createSessionInputSchema>;
 
@@ -24,6 +25,7 @@ export const promptInputSchema = z.object({
 	...commandBaseFields,
 	clientId: z.string().min(1),
 	content: z.array(userContentSchema).min(1),
+	steer: z.object({ expectedTurnId: z.string().min(1) }).optional(),
 });
 export type PromptInput = z.infer<typeof promptInputSchema>;
 
@@ -49,6 +51,14 @@ export const cancelTurnInputSchema = z.object({
 	pauseQueue: z.boolean().optional(),
 });
 export type CancelTurnInput = z.infer<typeof cancelTurnInputSchema>;
+
+export const stopBackgroundTaskInputSchema = z.object({
+	...commandBaseFields,
+	taskId: z.string().min(1),
+});
+export type StopBackgroundTaskInput = z.infer<
+	typeof stopBackgroundTaskInputSchema
+>;
 
 export const respondToApprovalInputSchema = z.object({
 	...commandBaseFields,
@@ -110,3 +120,14 @@ export const getItemsInputSchema = z.object({
 	limit: z.number().int().positive().max(500).default(200),
 });
 export type GetItemsInput = z.infer<typeof getItemsInputSchema>;
+
+export const getOutlineInputSchema = z.object({
+	sessionId: z.string().min(1),
+});
+export type GetOutlineInput = z.infer<typeof getOutlineInputSchema>;
+
+export const getItemBodiesInputSchema = z.object({
+	sessionId: z.string().min(1),
+	itemIds: z.array(z.string().min(1)).min(1).max(100),
+});
+export type GetItemBodiesInput = z.infer<typeof getItemBodiesInputSchema>;

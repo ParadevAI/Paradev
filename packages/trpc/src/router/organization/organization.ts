@@ -5,6 +5,7 @@ import { taskTrackerEnum } from "@superset/db/enums";
 import {
 	members,
 	organizations,
+	taskSequences,
 	teamMembers,
 	teams,
 	users,
@@ -94,6 +95,7 @@ export const organizationRouter = {
 				name: organizations.name,
 				slug: organizations.slug,
 				logo: organizations.logo,
+				taskTracker: organizations.taskTracker,
 			})
 			.from(organizations)
 			.innerJoin(members, eq(members.organizationId, organizations.id))
@@ -167,9 +169,11 @@ export const organizationRouter = {
 					id: teams.id,
 					name: teams.name,
 					slug: teams.slug,
+					taskKey: taskSequences.key,
 					createdAt: teams.createdAt,
 				})
 				.from(teams)
+				.leftJoin(taskSequences, eq(taskSequences.teamId, teams.id))
 				.where(eq(teams.organizationId, organizationId))
 				.orderBy(teams.name),
 			db

@@ -1,0 +1,1 @@
+export { acceptsFrameMessage } from "./acceptsFrameMessage";

@@ -15,6 +15,7 @@ import { msg } from "@lingui/core/macro";
 export type {
 	ComposerActionContext,
 	ComposerChip,
+	ComposerChipMatch,
 	ComposerMentionEntry,
 	ComposerMentionProvider,
 	ComposerMentionSource,
@@ -43,6 +44,7 @@ export function PromptInput({
 	toolbar,
 	toolbarEnd,
 	defaultValue,
+	findChips,
 	onChange,
 	onSubmit,
 	onStop,
@@ -55,6 +57,7 @@ export function PromptInput({
 	onMentionHighlight,
 	onAttachmentClick,
 	onChipClick,
+	history,
 	className,
 }: PromptInputProps) {
 	const [initialConfig] = useState<InitialConfigType>(() => ({
@@ -80,6 +83,7 @@ export function PromptInput({
 					toolbar={toolbar}
 					toolbarEnd={toolbarEnd}
 					defaultValue={defaultValue}
+					findChips={findChips}
 					onChange={onChange}
 					onSubmit={onSubmit}
 					onStop={onStop}
@@ -92,6 +96,7 @@ export function PromptInput({
 					onMentionHighlight={onMentionHighlight}
 					onAttachmentClick={onAttachmentClick}
 					onChipClick={onChipClick}
+					history={history}
 				/>
 			</LexicalRoot>
 		</div>

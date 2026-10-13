@@ -147,6 +147,10 @@ main() {
     update_path
 
     printf "\n${GREEN}${BOLD}Installed!${RESET}\n"
+    # `superset hosts add` signs the machine in itself, so it skips this advice.
+    if [ "${1:-}" = "--no-next-steps" ]; then
+        return
+    fi
     printf "Run ${BOLD}exec \$SHELL${RESET} (or open a new terminal) to load the updated PATH.\n"
     printf "Then run ${BOLD}superset auth login${RESET} to get started.\n"
 }

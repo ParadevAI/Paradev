@@ -51,10 +51,9 @@ import { ensureProjectIconsDir, getProjectIconPath } from "./lib/project-icons";
 import { runQuitCleanup } from "./lib/quit-sequence";
 import { startResourceJournal } from "./lib/resource-metrics/resource-journal";
 import { initSentry } from "./lib/sentry";
-import {
-	prewarmTerminalRuntime,
-	reconcileDaemonSessions,
-} from "./lib/terminal";
+import { stopPtyDaemons } from "./lib/stop-pty-daemons";
+import { stopMigratedV1SessionsOnBoot } from "./lib/terminal";
+import { readMigratedV1WorkspaceIds } from "./lib/terminal/stop-v1-sessions/migrated-v1-workspaces";
 import {
 	disposeTerminalHostClient,
 	getTerminalHostClient,
@@ -220,6 +219,7 @@ let isQuitting = false;
 let skipQuitConfirmation = false;
 let quitAttemptPending = false;
 let forceFullCleanup = false;
+let holdingQuitForCleanup = false;
 
 export function setSkipQuitConfirmation(): void {
 	skipQuitConfirmation = true;
@@ -304,6 +304,7 @@ app.on("before-quit", async (event) => {
 			isUpdateInstalling,
 			stopHostServices: () => getHostServiceCoordinator().stopAll(),
 			teardownTerminalHost,
+			stopPtyDaemons,
 			disposeTerminalHostClient,
 			disposeTray,
 			forceExit: (code) => {
@@ -472,9 +473,7 @@ if (!gotTheLock) {
 
 		await loadWebviewBrowserExtension();
 
-		// Must happen before renderer restore runs
-		await reconcileDaemonSessions();
-		prewarmTerminalRuntime();
+		await stopMigratedV1SessionsOnBoot(readMigratedV1WorkspaceIds());
 
 		// Must be listening before any host-service spawns: the child learns the
 		// bridge endpoint/secret from its env, so a late bridge means browser

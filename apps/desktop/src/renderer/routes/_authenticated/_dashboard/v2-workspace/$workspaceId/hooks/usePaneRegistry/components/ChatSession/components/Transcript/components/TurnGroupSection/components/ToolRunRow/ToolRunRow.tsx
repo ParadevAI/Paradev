@@ -10,15 +10,11 @@ import { ChevronRight } from "lucide-react";
 import { memo } from "react";
 import { toolKindIcon } from "../../../../utils/toolKindIcon";
 import { ToolCallRow } from "../../../ToolCallRow";
+import { RailStep } from "../RailStep";
 import { dominantKind } from "./utils/dominantKind";
 import { stepSummary } from "./utils/stepSummary";
 
 const SUMMARY_SWEEP_SECONDS = 1.6;
-
-// The spine runs under the header icon; each step branches off it with a
-// quarter curve that lands on the middle of its 28px row.
-const RAIL_STEP =
-	"relative pl-5 [--rail:color-mix(in_oklab,var(--color-foreground)_14%,var(--color-background))] before:absolute before:top-0 before:left-[6px] before:h-full before:w-px before:bg-(--rail) last:before:h-[7px] after:absolute after:top-[6px] after:left-[6px] after:size-2 after:rounded-bl-[8px] after:border-(--rail) after:border-b after:border-l";
 
 type ToolRunRowProps = {
 	rowKey: string;
@@ -77,9 +73,9 @@ export const ToolRunRow = memo(function ToolRunRow({
 			</CollapsibleTrigger>
 			<CollapsibleContent>
 				{items.map((tool) => (
-					<div className={RAIL_STEP} key={tool.id}>
-						<ToolCallRow bare item={tool} />
-					</div>
+					<RailStep key={tool.id}>
+						<ToolCallRow item={tool} />
+					</RailStep>
 				))}
 			</CollapsibleContent>
 		</Collapsible>

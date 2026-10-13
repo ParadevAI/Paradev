@@ -49,6 +49,9 @@
 			// build them before anything imports @superset/i18n. Scoped to that one
 			// package so starting dev doesn't drag in every other build.
 			"dependsOn": ["@superset/i18n#build"],
+			// launchd gives the GUI session its ssh-agent socket; without it, ssh
+			// in dev-app terminals cannot use agent keys.
+			"passThroughEnv": ["SSH_AUTH_SOCK"],
 			"cache": false,
 			"persistent": true
 		},

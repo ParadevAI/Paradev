@@ -51,12 +51,16 @@ function devStackAddresses(): Array<[string, string]> {
 	const api = process.env.NEXT_PUBLIC_API_URL;
 	const web = process.env.NEXT_PUBLIC_WEB_URL;
 	const dataDir = process.env.SUPERSET_HOME_DIR;
+	const realtime = process.env.REALTIME_URL;
 	return [
 		...(dataDir
 			? ([["SUPERSET_HOME_DIR", dataDir]] as Array<[string, string]>)
 			: []),
 		...(api ? ([["SUPERSET_API_URL", api]] as Array<[string, string]>) : []),
 		...(web ? ([["SUPERSET_WEB_URL", web]] as Array<[string, string]>) : []),
+		...(realtime
+			? ([["REALTIME_URL", realtime]] as Array<[string, string]>)
+			: []),
 	];
 }
 

@@ -1,8 +1,12 @@
 import type { SelectPage } from "@superset/db/schema";
 import { userError } from "../../i18n-error";
 
+export function isPageReadable(page: SelectPage, userId: string): boolean {
+	return page.visibility !== "just_me" || page.createdByUserId === userId;
+}
+
 export function assertPageReadable(page: SelectPage, userId: string): void {
-	if (page.visibility === "just_me" && page.createdByUserId !== userId) {
+	if (!isPageReadable(page, userId)) {
 		throw userError({
 			code: "NOT_FOUND",
 			message: "Page not found",

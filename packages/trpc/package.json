@@ -8,6 +8,10 @@
 			"types": "./src/index.ts",
 			"default": "./src/index.ts"
 		},
+		"./i18n-error": {
+			"types": "./src/i18n-error.ts",
+			"default": "./src/i18n-error.ts"
+		},
 		"./billing": {
 			"types": "./src/lib/billing/plan.ts",
 			"default": "./src/lib/billing/plan.ts"
@@ -109,16 +113,8 @@
 			"default": "./src/router/automation/webhookSecret.ts"
 		},
 		"./star-history": {
-			"types": "./src/lib/growth/star-history.ts",
-			"default": "./src/lib/growth/star-history.ts"
-		},
-		"./insight-registry": {
-			"types": "./src/router/analytics/insight-registry.ts",
-			"default": "./src/router/analytics/insight-registry.ts"
-		},
-		"./business-metrics": {
-			"types": "./src/router/analytics/business.ts",
-			"default": "./src/router/analytics/business.ts"
+			"types": "./src/lib/star-history.ts",
+			"default": "./src/lib/star-history.ts"
 		},
 		"./account-purge": {
 			"types": "./src/lib/account-purge/index.ts",
@@ -136,7 +132,7 @@
 	"scripts": {
 		"clean": "git clean -xdf .cache .turbo dist node_modules",
 		"typecheck": "tsc --noEmit --emitDeclarationOnly false",
-		"test": "bun test --isolate"
+		"test": "bun test"
 	},
 	"dependencies": {
 		"@anthropic-ai/sdk": "0.78.0",
@@ -147,7 +143,7 @@
 		"@googleapis/gmail": "18.0.0",
 		"@linear/sdk": "68.1.1",
 		"@microsoft/microsoft-graph-client": "3.0.7",
-		"@modelcontextprotocol/sdk": "1.30.0",
+		"@modelcontextprotocol/sdk": "1.31.0",
 		"@notionhq/client": "5.25.2",
 		"@octokit/app": "16.1.2",
 		"@sentry/core": "10.68.0",

@@ -3,6 +3,7 @@ import { Button } from "@superset/ui/button";
 import {
 	CommentModeButton,
 	PageHeader as PageTitleBar,
+	PageViewers,
 } from "@superset/ui/page-comments";
 import { Spinner } from "@superset/ui/spinner";
 import { useNavigate } from "@tanstack/react-router";
@@ -14,9 +15,15 @@ import { usePageHeaderData } from "renderer/routes/_authenticated/_dashboard/hoo
 
 interface PageDetailViewProps {
 	slug: string;
+	initialThreadId?: string | null;
+	initialPanelOpen?: boolean;
 }
 
-export function PageDetailView({ slug }: PageDetailViewProps) {
+export function PageDetailView({
+	slug,
+	initialThreadId = null,
+	initialPanelOpen = false,
+}: PageDetailViewProps) {
 	const { t } = useLingui();
 	const navigate = useNavigate();
 	const [commentsEnabled, setCommentsEnabled] = useState(false);
@@ -65,11 +72,16 @@ export function PageDetailView({ slug }: PageDetailViewProps) {
 						currentUserId={currentUserId}
 						leading={backButton}
 						trailing={
-							<CommentModeButton
-								enabled={commentsEnabled}
-								openCount={threads.filter((thread) => !thread.resolved).length}
-								onToggle={() => setCommentsEnabled(!commentsEnabled)}
-							/>
+							<>
+								<PageViewers pageId={page.id} className="mr-1" />
+								<CommentModeButton
+									enabled={commentsEnabled}
+									openCount={
+										threads.filter((thread) => !thread.resolved).length
+									}
+									onToggle={() => setCommentsEnabled(!commentsEnabled)}
+								/>
+							</>
 						}
 						onSetVisibility={onSetVisibility}
 						onSetSharedVersion={onSetSharedVersion}
@@ -104,6 +116,8 @@ export function PageDetailView({ slug }: PageDetailViewProps) {
 					version={previewVersion}
 					commentsEnabled={commentsEnabled}
 					onCommentsEnabledChange={setCommentsEnabled}
+					initialThreadId={initialThreadId}
+					initialPanelOpen={initialPanelOpen}
 				/>
 			</div>
 		</div>

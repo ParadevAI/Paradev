@@ -5,16 +5,13 @@ import {
 	DropdownMenuSeparator,
 } from "@superset/ui/dropdown-menu";
 import { BsTerminalPlus } from "react-icons/bs";
-import { LuCodeXml, LuGitCompareArrows } from "react-icons/lu";
-import { TbDeviceDesktop, TbMessageCirclePlus, TbWorld } from "react-icons/tb";
+import { LuGitCompareArrows } from "react-icons/lu";
+import { TbDeviceDesktop, TbWorld } from "react-icons/tb";
 import { HotkeyMenuShortcut } from "renderer/components/HotkeyMenuShortcut";
-import { useFeaturePreferences } from "renderer/stores/feature-preferences";
 
 interface AddTabMenuProps {
 	onAddTerminal: () => void;
-	onAddChatV3?: (() => void) | undefined;
 	onAddBrowser: () => void;
-	onOpenIde: () => void;
 	onAddChanges: () => void;
 	onAddDesktop?: (() => void) | undefined;
 	showPresetsBar: boolean;
@@ -23,15 +20,12 @@ interface AddTabMenuProps {
 
 export function AddTabMenu({
 	onAddTerminal,
-	onAddChatV3,
 	onAddBrowser,
-	onOpenIde,
 	onAddChanges,
 	onAddDesktop,
 	showPresetsBar,
 	onToggleShowPresetsBar,
 }: AddTabMenuProps) {
-	const ideEnabled = useFeaturePreferences((state) => state.embeddedIde);
 	return (
 		<>
 			<DropdownMenuItem className="gap-2" onClick={onAddTerminal}>
@@ -41,14 +35,6 @@ export function AddTabMenu({
 				</span>
 				<HotkeyMenuShortcut hotkeyId="NEW_GROUP" />
 			</DropdownMenuItem>
-			{onAddChatV3 && (
-				<DropdownMenuItem className="gap-2" onClick={onAddChatV3}>
-					<TbMessageCirclePlus className="size-4" />
-					<span>
-						<Trans>Chat v3</Trans>
-					</span>
-				</DropdownMenuItem>
-			)}
 			<DropdownMenuItem className="gap-2" onClick={onAddBrowser}>
 				<TbWorld className="size-4" />
 				<span>
@@ -56,15 +42,6 @@ export function AddTabMenu({
 				</span>
 				<HotkeyMenuShortcut hotkeyId="NEW_BROWSER" />
 			</DropdownMenuItem>
-			{ideEnabled && (
-				<DropdownMenuItem className="gap-2" onClick={onOpenIde}>
-					<LuCodeXml className="size-4" />
-					<span>
-						<Trans>IDE</Trans>
-					</span>
-				</DropdownMenuItem>
-			)}
-
 			<DropdownMenuItem className="gap-2" onClick={onAddChanges}>
 				<LuGitCompareArrows className="size-4" />
 				<span>

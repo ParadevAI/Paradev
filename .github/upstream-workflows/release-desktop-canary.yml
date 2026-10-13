@@ -20,6 +20,7 @@ jobs:
     if: github.repository == 'superset-sh/superset'
     name: Check for changes
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     outputs:
       should_build: ${{ steps.check.outputs.should_build }}
       short_sha: ${{ steps.check.outputs.short_sha }}
@@ -85,6 +86,7 @@ jobs:
     needs: [check-changes, build]
     if: needs.check-changes.outputs.should_build == 'true'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout code

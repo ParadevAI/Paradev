@@ -1,13 +1,17 @@
 import * as Sentry from "@sentry/cloudflare";
 import { PAGE_COMMENTS_RUNTIME_SOURCE } from "@superset/shared/page-comments-runtime";
 import { PAGE_STORAGE_RUNTIME_SOURCE } from "@superset/shared/page-storage-runtime";
+import { PAGE_TOOLS_RUNTIME_SOURCE } from "@superset/shared/page-tools-runtime";
 import {
+	contentRevision,
+	documentEtag,
 	FILE_CONTENT_SECURITY_POLICY,
 	fileOriginalKey,
 	fileResponsePolicy,
 	injectHeadScriptTag,
 	injectScriptTag,
 	injectStyleTag,
+	isRuntimeScriptPath,
 	PAGE_THEME_CSS,
 	type PageManifest,
 	type PageTicketClaims,
@@ -19,10 +23,11 @@ import {
 	parsePageManifest,
 	publiclyReadable,
 	RUNTIME_SCRIPT_PATH,
-	STORAGE_SCRIPT_PATH,
 	servedVersionOf,
+	storageScriptPath,
 	THUMBNAIL_FILENAME,
 	TICKET_QUERY_PARAM,
+	toolsScriptPath,
 	verifyFileTicket,
 	verifyPageTicket,
 } from "@superset/shared/usercontent";
@@ -61,16 +66,6 @@ function documentCacheKey(storageKey: string): Request {
 
 const CACHED_DOCUMENT_TTL_SECONDS = 24 * 60 * 60;
 
-/** Expires anything built from `input` when `input` changes. */
-function revisionOf(input: string): string {
-	let hash = 0x811c9dc5;
-	for (let index = 0; index < input.length; index++) {
-		hash ^= input.charCodeAt(index);
-		hash = Math.imul(hash, 0x01000193);
-	}
-	return (hash >>> 0).toString(36);
-}
-
 function weakTag(value: string): string {
 	return value.startsWith("W/") ? value.slice(2) : value;
 }
@@ -89,9 +84,15 @@ function ifNoneMatchSatisfied(
 		.some((candidate) => weakTag(candidate.trim()) === target);
 }
 
+const STORAGE_SCRIPT_REVISION_PATH = storageScriptPath(
+	PAGE_STORAGE_RUNTIME_SOURCE,
+);
+
+const TOOLS_SCRIPT_REVISION_PATH = toolsScriptPath(PAGE_TOOLS_RUNTIME_SOURCE);
+
 /** A deploy that moves either has to miss the cache, not serve stale styling. */
-const RENDER_REVISION = revisionOf(
-	`${RUNTIME_SCRIPT_PATH}\u0000${STORAGE_SCRIPT_PATH}\u0000${PAGE_THEME_CSS}`,
+const RENDER_REVISION = contentRevision(
+	`${RUNTIME_SCRIPT_PATH}\u0000${STORAGE_SCRIPT_REVISION_PATH}\u0000${TOOLS_SCRIPT_REVISION_PATH}\u0000${PAGE_THEME_CSS}`,
 );
 
 function baseHost(c: Context<AppContext>): string {
@@ -201,8 +202,9 @@ async function servePage(c: Context<AppContext>): Promise<Response> {
 		c.env.FRAME_ANCESTORS.split(/\s+/).filter(Boolean),
 		new URL(c.env.REALTIME_URL).origin,
 	);
-	// The policy is in the tag because a 304 has no other way to refresh it.
-	const etag = `W/"${version}.${revisionOf(policy)}"`;
+	// The policy and render revision are in the tag because a 304 has no
+	// other way to refresh them.
+	const etag = documentEtag(version, policy, RENDER_REVISION);
 	if (ifNoneMatchSatisfied(c.req.header("if-none-match"), etag)) {
 		return new Response(null, {
 			status: 304,
@@ -259,11 +261,14 @@ async function servePage(c: Context<AppContext>): Promise<Response> {
 	}
 
 	const html = injectHeadScriptTag(
-		injectStyleTag(
-			injectScriptTag(await object.text(), RUNTIME_SCRIPT_PATH),
-			PAGE_THEME_CSS,
+		injectHeadScriptTag(
+			injectStyleTag(
+				injectScriptTag(await object.text(), RUNTIME_SCRIPT_PATH),
+				PAGE_THEME_CSS,
+			),
+			TOOLS_SCRIPT_REVISION_PATH,
 		),
-		STORAGE_SCRIPT_PATH,
+		STORAGE_SCRIPT_REVISION_PATH,
 	);
 	if (documentCache)
 		c.executionCtx.waitUntil(
@@ -556,9 +561,15 @@ app.get(RUNTIME_SCRIPT_PATH, (c) =>
 	c.body(PAGE_COMMENTS_RUNTIME_SOURCE, 200, SCRIPT_HEADERS),
 );
 
-app.get(STORAGE_SCRIPT_PATH, (c) =>
-	c.body(PAGE_STORAGE_RUNTIME_SOURCE, 200, SCRIPT_HEADERS),
-);
+app.get("/_superset/:script", async (c, next) => {
+	if (isRuntimeScriptPath(c.req.path, "storage")) {
+		return c.body(PAGE_STORAGE_RUNTIME_SOURCE, 200, SCRIPT_HEADERS);
+	}
+	if (isRuntimeScriptPath(c.req.path, "tools")) {
+		return c.body(PAGE_TOOLS_RUNTIME_SOURCE, 200, SCRIPT_HEADERS);
+	}
+	await next();
+});
 
 // Relative references resolve against the directory the document was
 // served from, so slashless forms redirect — never a second address — and a
