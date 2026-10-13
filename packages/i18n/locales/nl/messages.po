@@ -196,6 +196,10 @@ msgstr "{0, plural, one {# project geselecteerd.} other {# projecten geselecteer
 msgid "{0, plural, one {# project} other {# projects}}"
 msgstr "{0, plural, one {# project} other {# projecten}}"
 
+#. placeholder {0}: stack.layers.length
+msgid "{0, plural, one {# pull request · targets {base}} other {# pull requests · targets {base}}}"
+msgstr "{0, plural, one {# pull request · naar {base}} other {# pull requests · naar {base}}}"
+
 #. placeholder {0}: repositories.length
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
@@ -787,6 +791,9 @@ msgstr "{count, plural, one {# pagina opgehaald} other {# pagina's opgehaald}}"
 msgid "{count, plural, one {Import # worktree} other {Import # worktrees}}"
 msgstr "{count, plural, one {# worktree importeren} other {# worktrees importeren}}"
 
+msgid "{count, plural, one {Merge # pull request?} other {Merge # pull requests?}}"
+msgstr "{count, plural, one {# pull request mergen?} other {# pull requests mergen?}}"
+
 msgid "{count, plural, one {Project opened} other {# projects opened}}"
 msgstr "{count, plural, one {Project geopend} other {# projecten geopend}}"
 
@@ -1167,6 +1174,15 @@ msgid "#{0} {1}\n"
 msgstr "#{0} {1}\n"
 "\n"
 "This merges into {2} and cannot be undone here."
+
+msgid "#{number} is closed without being merged."
+msgstr "#{number} is gesloten zonder te zijn gemerged."
+
+msgid "#{number} is not ready to merge."
+msgstr "#{number} is niet klaar om te mergen."
+
+msgid "#{number} is still a draft."
+msgstr "#{number} is nog een concept."
 
 msgid "#engineering"
 msgstr "#engineering"
@@ -5030,6 +5046,9 @@ msgstr "Kon niet markeren als klaar voor review"
 
 msgid "Couldn't merge pull request"
 msgstr "Kan pull request niet mergen"
+
+msgid "Couldn't merge stack"
+msgstr "Stack mergen mislukt"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Kon \"{name}\" niet automatisch een naam geven"
@@ -9843,6 +9862,9 @@ msgstr "Mergen"
 msgid "Merge #{0}?"
 msgstr "#{0} mergen?"
 
+msgid "Merge #{number} first. A stack built from base branches merges one pull request at a time."
+msgstr "Merge eerst #{number}. Een stack van basisbranches merget één pull request tegelijk."
+
 msgid "Merge commit"
 msgstr "Merge-commit"
 
@@ -9862,11 +9884,20 @@ msgstr "Pull request mergen"
 msgid "Merge pull requests without leaving Superset, plus a round of chat fixes and polish."
 msgstr "Merge pull requests zonder Superset te verlaten, plus een ronde chatfixes en poetswerk."
 
+msgid "Merge stack"
+msgstr "Stack mergen"
+
 msgid "Merge status"
 msgstr "Mergestatus"
 
+msgid "Merge status pending"
+msgstr "Mergestatus in behandeling"
+
 msgid "Merge status unknown"
 msgstr "Mergestatus onbekend"
+
+msgid "Mergeable with failing checks"
+msgstr "Mergebaar met mislukte checks"
 
 msgid "Merged"
 msgstr "Gemerged"
@@ -9883,6 +9914,9 @@ msgstr "PR mergen..."
 
 msgid "Merging pull request"
 msgstr "Pull request mergen"
+
+msgid "Merging stack…"
+msgstr "Stack wordt gemerged…"
 
 msgid "Merging…"
 msgstr "Bezig met mergen…"
@@ -12425,6 +12459,9 @@ msgstr "Antwoord plaatsen"
 msgid "PR"
 msgstr "PR"
 
+msgid "PR {position} of {size} · targets {base}"
+msgstr "PR {position} van {size} · naar {base}"
+
 #. placeholder {0}: pullRequest.number
 #. placeholder {1}: i18n._(PR_STATE_LABEL[pullRequest.state])
 msgid "PR #{0} — {1}"
@@ -12853,6 +12890,9 @@ msgstr "Pull requests"
 msgid "Pull Requests"
 msgstr "Pull requests"
 
+msgid "Pull requests above it will remain open and GitHub will retarget them."
+msgstr "Pull requests erboven blijven open en GitHub past hun doel aan."
+
 msgid "Purple"
 msgstr "Paars"
 
@@ -13057,6 +13097,10 @@ msgstr "Klaar voor review"
 #. placeholder {0}: error.message
 msgid "Ready for review failed: {0}"
 msgstr "Markeren als klaar voor review mislukt: {0}"
+
+msgctxt "stack verdict"
+msgid "Ready to merge"
+msgstr "Klaar om te mergen"
 
 msgid "Ready to Merge"
 msgstr "Klaar om te mergen"
@@ -15546,6 +15590,28 @@ msgstr "SSO/SAML"
 msgid "Stability improvements"
 msgstr "Stabiliteitsverbeteringen"
 
+msgid "Stack #{stackNumber} · PR {position} of {size} · targets {base}"
+msgstr "Stack #{stackNumber} · PR {position} van {size} · naar {base}"
+
+msgid "Stack #{stackNumber} · targets {base}"
+msgstr "Stack #{stackNumber} · naar {base}"
+
+msgid "Stack added to merge queue"
+msgstr "Stack toegevoegd aan de mergewachtrij"
+
+msgid "Stack details could not be loaded. Refresh before merging."
+msgstr "Stackgegevens konden niet worden geladen. Vernieuw voordat je merget."
+
+msgid "Stack merged"
+msgstr "Stack gemerged"
+
+msgctxt "stack verdict"
+msgid "Stack merged"
+msgstr "Stack gemerged"
+
+msgid "Stack needs attention"
+msgstr "Stack vraagt aandacht"
+
 msgid "Stacked"
 msgstr "Gestapeld"
 
@@ -17222,6 +17288,15 @@ msgstr "Deze weergave liep tegen een fout aan"
 msgid "This week"
 msgstr "Deze week"
 
+msgid "This will atomically merge every open pull request through #{prNumber} into {base} using a merge commit."
+msgstr "Hiermee worden alle open pull requests tot en met #{prNumber} atomair in {base} gemerged met een mergecommit."
+
+msgid "This will atomically merge every open pull request through #{prNumber} into {base} using rebase."
+msgstr "Hiermee worden alle open pull requests tot en met #{prNumber} atomair in {base} gemerged met rebase."
+
+msgid "This will atomically merge every open pull request through #{prNumber} into {base} using squash."
+msgstr "Hiermee worden alle open pull requests tot en met #{prNumber} atomair in {base} gemerged met squash."
+
 msgid "This will change your organization's public URL. Make sure to update any bookmarks or shared links."
 msgstr "Hiermee verandert de publieke URL van je organisatie. Werk bladwijzers en gedeelde links bij."
 
@@ -18250,6 +18325,12 @@ msgstr "Releasenotes bekijken"
 
 msgid "View releases on GitHub"
 msgstr "Releases bekijken op GitHub"
+
+msgid "View stack {stackNumber}, pull request {position} of {size}"
+msgstr "Stack {stackNumber} bekijken, pull request {position} van {size}"
+
+msgid "View stack, pull request {position} of {size}"
+msgstr "Stack bekijken, pull request {position} van {size}"
 
 msgid "View Superset repository on GitHub"
 msgstr "Superset-repository bekijken op GitHub"

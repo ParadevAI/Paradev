@@ -196,6 +196,10 @@ msgstr "{0, plural, one {已选择#个项目。} other {已选择#个项目。}}
 msgid "{0, plural, one {# project} other {# projects}}"
 msgstr "{0, plural, one {# 个项目} other {# 个项目}}"
 
+#. placeholder {0}: stack.layers.length
+msgid "{0, plural, one {# pull request · targets {base}} other {# pull requests · targets {base}}}"
+msgstr "{0, plural, other {# 个拉取请求 · 目标 {base}}}"
+
 #. placeholder {0}: repositories.length
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
@@ -787,6 +791,9 @@ msgstr "{count, plural, one {获取了 # 个页面} other {获取了 # 个页面
 msgid "{count, plural, one {Import # worktree} other {Import # worktrees}}"
 msgstr "{count, plural, one {导入#个worktree} other {导入#个worktree}}"
 
+msgid "{count, plural, one {Merge # pull request?} other {Merge # pull requests?}}"
+msgstr "{count, plural, other {合并 # 个拉取请求?}}"
+
 msgid "{count, plural, one {Project opened} other {# projects opened}}"
 msgstr "{count, plural, one {已打开#个项目} other {已打开#个项目}}"
 
@@ -1167,6 +1174,15 @@ msgid "#{0} {1}\n"
 msgstr "#{0} {1}\n"
 "\n"
 "这将合并到 {2}，且无法在此撤销。"
+
+msgid "#{number} is closed without being merged."
+msgstr "#{number} 已关闭且未合并。"
+
+msgid "#{number} is not ready to merge."
+msgstr "#{number} 尚未准备好合并。"
+
+msgid "#{number} is still a draft."
+msgstr "#{number} 仍是草稿。"
 
 msgid "#engineering"
 msgstr "#engineering"
@@ -5030,6 +5046,9 @@ msgstr "无法标记为可评审"
 
 msgid "Couldn't merge pull request"
 msgstr "无法合并拉取请求"
+
+msgid "Couldn't merge stack"
+msgstr "无法合并堆栈"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "无法自动命名“{name}”"
@@ -9843,6 +9862,9 @@ msgstr "合并"
 msgid "Merge #{0}?"
 msgstr "合并#{0}？"
 
+msgid "Merge #{number} first. A stack built from base branches merges one pull request at a time."
+msgstr "请先合并 #{number}。基于基础分支的堆栈一次只能合并一个拉取请求。"
+
 msgid "Merge commit"
 msgstr "合并提交"
 
@@ -9862,11 +9884,20 @@ msgstr "合并拉取请求"
 msgid "Merge pull requests without leaving Superset, plus a round of chat fixes and polish."
 msgstr "不离开Superset就能合并拉取请求，另有一轮聊天修复与打磨。"
 
+msgid "Merge stack"
+msgstr "合并堆栈"
+
 msgid "Merge status"
 msgstr "合并状态"
 
+msgid "Merge status pending"
+msgstr "合并状态待定"
+
 msgid "Merge status unknown"
 msgstr "合并状态未知"
+
+msgid "Mergeable with failing checks"
+msgstr "可合并，但检查失败"
 
 msgid "Merged"
 msgstr "已合并"
@@ -9883,6 +9914,9 @@ msgstr "正在合并PR..."
 
 msgid "Merging pull request"
 msgstr "正在合并拉取请求"
+
+msgid "Merging stack…"
+msgstr "正在合并堆栈…"
 
 msgid "Merging…"
 msgstr "正在合并…"
@@ -12425,6 +12459,9 @@ msgstr "发表回复"
 msgid "PR"
 msgstr "PR"
 
+msgid "PR {position} of {size} · targets {base}"
+msgstr "PR {position}/{size} · 目标 {base}"
+
 #. placeholder {0}: pullRequest.number
 #. placeholder {1}: i18n._(PR_STATE_LABEL[pullRequest.state])
 msgid "PR #{0} — {1}"
@@ -12853,6 +12890,9 @@ msgstr "拉取请求"
 msgid "Pull Requests"
 msgstr "拉取请求"
 
+msgid "Pull requests above it will remain open and GitHub will retarget them."
+msgstr "其上的拉取请求将保持打开，GitHub 会更改它们的目标分支。"
+
 msgid "Purple"
 msgstr "紫色"
 
@@ -13057,6 +13097,10 @@ msgstr "待审查"
 #. placeholder {0}: error.message
 msgid "Ready for review failed: {0}"
 msgstr "标记为可评审失败：{0}"
+
+msgctxt "stack verdict"
+msgid "Ready to merge"
+msgstr "可以合并"
 
 msgid "Ready to Merge"
 msgstr "可以合并"
@@ -15546,6 +15590,28 @@ msgstr "SSO/SAML"
 msgid "Stability improvements"
 msgstr "稳定性改进"
 
+msgid "Stack #{stackNumber} · PR {position} of {size} · targets {base}"
+msgstr "堆栈 #{stackNumber} · PR {position}/{size} · 目标 {base}"
+
+msgid "Stack #{stackNumber} · targets {base}"
+msgstr "堆栈 #{stackNumber} · 目标 {base}"
+
+msgid "Stack added to merge queue"
+msgstr "堆栈已加入合并队列"
+
+msgid "Stack details could not be loaded. Refresh before merging."
+msgstr "无法加载堆栈详情。请在合并前刷新。"
+
+msgid "Stack merged"
+msgstr "堆栈已合并"
+
+msgctxt "stack verdict"
+msgid "Stack merged"
+msgstr "堆栈已合并"
+
+msgid "Stack needs attention"
+msgstr "堆栈需要处理"
+
 msgid "Stacked"
 msgstr "堆叠"
 
@@ -17222,6 +17288,15 @@ msgstr "此视图出错了"
 msgid "This week"
 msgstr "本周"
 
+msgid "This will atomically merge every open pull request through #{prNumber} into {base} using a merge commit."
+msgstr "这将使用合并提交把截至 #{prNumber} 的所有打开的拉取请求原子地合并到 {base}。"
+
+msgid "This will atomically merge every open pull request through #{prNumber} into {base} using rebase."
+msgstr "这将使用变基把截至 #{prNumber} 的所有打开的拉取请求原子地合并到 {base}。"
+
+msgid "This will atomically merge every open pull request through #{prNumber} into {base} using squash."
+msgstr "这将使用压缩把截至 #{prNumber} 的所有打开的拉取请求原子地合并到 {base}。"
+
 msgid "This will change your organization's public URL. Make sure to update any bookmarks or shared links."
 msgstr "这会更改组织的公开URL。请记得更新书签和已分享的链接。"
 
@@ -18250,6 +18325,12 @@ msgstr "查看发布说明"
 
 msgid "View releases on GitHub"
 msgstr "在GitHub上查看发布"
+
+msgid "View stack {stackNumber}, pull request {position} of {size}"
+msgstr "查看堆栈 {stackNumber}，拉取请求 {position}/{size}"
+
+msgid "View stack, pull request {position} of {size}"
+msgstr "查看堆栈，拉取请求 {position}/{size}"
 
 msgid "View Superset repository on GitHub"
 msgstr "在GitHub上查看Superset仓库"

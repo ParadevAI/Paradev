@@ -196,6 +196,10 @@ msgstr "{0, plural, one {Đã chọn # dự án.} other {Đã chọn # dự án.
 msgid "{0, plural, one {# project} other {# projects}}"
 msgstr "{0, plural, one {# dự án} other {# dự án}}"
 
+#. placeholder {0}: stack.layers.length
+msgid "{0, plural, one {# pull request · targets {base}} other {# pull requests · targets {base}}}"
+msgstr "{0, plural, other {# pull request · vào {base}}}"
+
 #. placeholder {0}: repositories.length
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
@@ -787,6 +791,9 @@ msgstr "{count, plural, one {đã tải # trang} other {đã tải # trang}}"
 msgid "{count, plural, one {Import # worktree} other {Import # worktrees}}"
 msgstr "{count, plural, one {Nhập # worktree} other {Nhập # worktree}}"
 
+msgid "{count, plural, one {Merge # pull request?} other {Merge # pull requests?}}"
+msgstr "{count, plural, other {Merge # pull request?}}"
+
 msgid "{count, plural, one {Project opened} other {# projects opened}}"
 msgstr "{count, plural, one {Đã mở dự án} other {Đã mở # dự án}}"
 
@@ -1167,6 +1174,15 @@ msgid "#{0} {1}\n"
 msgstr "#{0} {1}\n"
 "\n"
 "This merges into {2} and cannot be undone here."
+
+msgid "#{number} is closed without being merged."
+msgstr "#{number} đã đóng mà không được merge."
+
+msgid "#{number} is not ready to merge."
+msgstr "#{number} chưa sẵn sàng để merge."
+
+msgid "#{number} is still a draft."
+msgstr "#{number} vẫn là bản nháp."
 
 msgid "#engineering"
 msgstr "#engineering"
@@ -5030,6 +5046,9 @@ msgstr "Không thể đánh dấu sẵn sàng để review"
 
 msgid "Couldn't merge pull request"
 msgstr "Không thể merge pull request"
+
+msgid "Couldn't merge stack"
+msgstr "Không thể merge stack"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Không thể tự động đặt tên cho \"{name}\""
@@ -9843,6 +9862,9 @@ msgstr "Merge"
 msgid "Merge #{0}?"
 msgstr "Merge #{0}?"
 
+msgid "Merge #{number} first. A stack built from base branches merges one pull request at a time."
+msgstr "Hãy merge #{number} trước. Stack dựng từ các nhánh cơ sở được merge lần lượt từng pull request."
+
 msgid "Merge commit"
 msgstr "Merge commit"
 
@@ -9862,11 +9884,20 @@ msgstr "Merge pull request"
 msgid "Merge pull requests without leaving Superset, plus a round of chat fixes and polish."
 msgstr "Merge pull request mà không cần rời Superset, kèm một đợt sửa lỗi và trau chuốt chat."
 
+msgid "Merge stack"
+msgstr "Merge stack"
+
 msgid "Merge status"
 msgstr "Trạng thái merge"
 
+msgid "Merge status pending"
+msgstr "Trạng thái merge đang chờ"
+
 msgid "Merge status unknown"
 msgstr "Trạng thái merge không xác định"
+
+msgid "Mergeable with failing checks"
+msgstr "Có thể merge dù kiểm tra thất bại"
 
 msgid "Merged"
 msgstr "Đã merge"
@@ -9883,6 +9914,9 @@ msgstr "Đang merge PR..."
 
 msgid "Merging pull request"
 msgstr "Đang merge pull request"
+
+msgid "Merging stack…"
+msgstr "Đang merge stack…"
 
 msgid "Merging…"
 msgstr "Đang merge…"
@@ -12425,6 +12459,9 @@ msgstr "Đăng trả lời"
 msgid "PR"
 msgstr "PR"
 
+msgid "PR {position} of {size} · targets {base}"
+msgstr "PR {position}/{size} · vào {base}"
+
 #. placeholder {0}: pullRequest.number
 #. placeholder {1}: i18n._(PR_STATE_LABEL[pullRequest.state])
 msgid "PR #{0} — {1}"
@@ -12853,6 +12890,9 @@ msgstr "Pull request"
 msgid "Pull Requests"
 msgstr "Pull request"
 
+msgid "Pull requests above it will remain open and GitHub will retarget them."
+msgstr "Các pull request phía trên sẽ vẫn mở và GitHub sẽ đổi nhánh đích của chúng."
+
 msgid "Purple"
 msgstr "Tím"
 
@@ -13057,6 +13097,10 @@ msgstr "Sẵn sàng review"
 #. placeholder {0}: error.message
 msgid "Ready for review failed: {0}"
 msgstr "Đánh dấu sẵn sàng để review thất bại: {0}"
+
+msgctxt "stack verdict"
+msgid "Ready to merge"
+msgstr "Sẵn sàng merge"
 
 msgid "Ready to Merge"
 msgstr "Sẵn sàng merge"
@@ -15546,6 +15590,28 @@ msgstr "SSO/SAML"
 msgid "Stability improvements"
 msgstr "Cải thiện độ ổn định"
 
+msgid "Stack #{stackNumber} · PR {position} of {size} · targets {base}"
+msgstr "Stack #{stackNumber} · PR {position}/{size} · vào {base}"
+
+msgid "Stack #{stackNumber} · targets {base}"
+msgstr "Stack #{stackNumber} · vào {base}"
+
+msgid "Stack added to merge queue"
+msgstr "Đã thêm stack vào hàng đợi merge"
+
+msgid "Stack details could not be loaded. Refresh before merging."
+msgstr "Không thể tải chi tiết stack. Hãy làm mới trước khi merge."
+
+msgid "Stack merged"
+msgstr "Đã merge stack"
+
+msgctxt "stack verdict"
+msgid "Stack merged"
+msgstr "Stack đã merge"
+
+msgid "Stack needs attention"
+msgstr "Stack cần chú ý"
+
 msgid "Stacked"
 msgstr "Xếp chồng"
 
@@ -17222,6 +17288,15 @@ msgstr "Khung hiển thị này gặp lỗi"
 msgid "This week"
 msgstr "Tuần này"
 
+msgid "This will atomically merge every open pull request through #{prNumber} into {base} using a merge commit."
+msgstr "Thao tác này sẽ merge nguyên tử mọi pull request đang mở cho đến #{prNumber} vào {base} bằng commit merge."
+
+msgid "This will atomically merge every open pull request through #{prNumber} into {base} using rebase."
+msgstr "Thao tác này sẽ merge nguyên tử mọi pull request đang mở cho đến #{prNumber} vào {base} bằng rebase."
+
+msgid "This will atomically merge every open pull request through #{prNumber} into {base} using squash."
+msgstr "Thao tác này sẽ merge nguyên tử mọi pull request đang mở cho đến #{prNumber} vào {base} bằng squash."
+
 msgid "This will change your organization's public URL. Make sure to update any bookmarks or shared links."
 msgstr "Thao tác này sẽ đổi URL công khai của tổ chức. Hãy nhớ cập nhật các dấu trang hoặc liên kết đã chia sẻ."
 
@@ -18250,6 +18325,12 @@ msgstr "Xem ghi chú phát hành"
 
 msgid "View releases on GitHub"
 msgstr "Xem bản phát hành trên GitHub"
+
+msgid "View stack {stackNumber}, pull request {position} of {size}"
+msgstr "Xem stack {stackNumber}, pull request {position}/{size}"
+
+msgid "View stack, pull request {position} of {size}"
+msgstr "Xem stack, pull request {position}/{size}"
 
 msgid "View Superset repository on GitHub"
 msgstr "Xem repository Superset trên GitHub"

@@ -196,6 +196,10 @@ msgstr "{0, plural, one {已選擇#個專案。} other {已選擇#個專案。}}
 msgid "{0, plural, one {# project} other {# projects}}"
 msgstr "{0, plural, one {# 個專案} other {# 個專案}}"
 
+#. placeholder {0}: stack.layers.length
+msgid "{0, plural, one {# pull request · targets {base}} other {# pull requests · targets {base}}}"
+msgstr "{0, plural, other {# 個拉取請求 · 目標 {base}}}"
+
 #. placeholder {0}: repositories.length
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
@@ -787,6 +791,9 @@ msgstr "{count, plural, one {擷取了 # 個頁面} other {擷取了 # 個頁面
 msgid "{count, plural, one {Import # worktree} other {Import # worktrees}}"
 msgstr "{count, plural, one {匯入#個worktree} other {匯入#個worktree}}"
 
+msgid "{count, plural, one {Merge # pull request?} other {Merge # pull requests?}}"
+msgstr "{count, plural, other {合併 # 個拉取請求?}}"
+
 msgid "{count, plural, one {Project opened} other {# projects opened}}"
 msgstr "{count, plural, one {已開啟#個專案} other {已開啟#個專案}}"
 
@@ -1167,6 +1174,15 @@ msgid "#{0} {1}\n"
 msgstr "#{0} {1}\n"
 "\n"
 "This merges into {2} and cannot be undone here."
+
+msgid "#{number} is closed without being merged."
+msgstr "#{number} 已關閉且未合併。"
+
+msgid "#{number} is not ready to merge."
+msgstr "#{number} 尚未準備好合併。"
+
+msgid "#{number} is still a draft."
+msgstr "#{number} 仍是草稿。"
 
 msgid "#engineering"
 msgstr "#engineering"
@@ -5030,6 +5046,9 @@ msgstr "無法標記為可供審查"
 
 msgid "Couldn't merge pull request"
 msgstr "無法合併拉取請求"
+
+msgid "Couldn't merge stack"
+msgstr "無法合併堆疊"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "無法自動命名「{name}」"
@@ -9843,6 +9862,9 @@ msgstr "合併"
 msgid "Merge #{0}?"
 msgstr "合併#{0}？"
 
+msgid "Merge #{number} first. A stack built from base branches merges one pull request at a time."
+msgstr "請先合併 #{number}。以基礎分支建立的堆疊一次只能合併一個拉取請求。"
+
 msgid "Merge commit"
 msgstr "合併提交"
 
@@ -9862,11 +9884,20 @@ msgstr "合併拉取請求"
 msgid "Merge pull requests without leaving Superset, plus a round of chat fixes and polish."
 msgstr "不離開Superset就能合併拉取請求，另有一輪聊天修復與打磨。"
 
+msgid "Merge stack"
+msgstr "合併堆疊"
+
 msgid "Merge status"
 msgstr "合併狀態"
 
+msgid "Merge status pending"
+msgstr "合併狀態待定"
+
 msgid "Merge status unknown"
 msgstr "合併狀態不明"
+
+msgid "Mergeable with failing checks"
+msgstr "可合併，但檢查失敗"
 
 msgid "Merged"
 msgstr "已合併"
@@ -9883,6 +9914,9 @@ msgstr "正在合併PR..."
 
 msgid "Merging pull request"
 msgstr "正在合併拉取請求"
+
+msgid "Merging stack…"
+msgstr "正在合併堆疊…"
 
 msgid "Merging…"
 msgstr "正在合併…"
@@ -12425,6 +12459,9 @@ msgstr "發表回覆"
 msgid "PR"
 msgstr "PR"
 
+msgid "PR {position} of {size} · targets {base}"
+msgstr "PR {position}/{size} · 目標 {base}"
+
 #. placeholder {0}: pullRequest.number
 #. placeholder {1}: i18n._(PR_STATE_LABEL[pullRequest.state])
 msgid "PR #{0} — {1}"
@@ -12853,6 +12890,9 @@ msgstr "拉取請求"
 msgid "Pull Requests"
 msgstr "拉取請求"
 
+msgid "Pull requests above it will remain open and GitHub will retarget them."
+msgstr "其上的拉取請求將保持開啟，GitHub 會變更它們的目標分支。"
+
 msgid "Purple"
 msgstr "紫色"
 
@@ -13057,6 +13097,10 @@ msgstr "待審查"
 #. placeholder {0}: error.message
 msgid "Ready for review failed: {0}"
 msgstr "標記為可審查失敗：{0}"
+
+msgctxt "stack verdict"
+msgid "Ready to merge"
+msgstr "可以合併"
 
 msgid "Ready to Merge"
 msgstr "可以合併"
@@ -15546,6 +15590,28 @@ msgstr "SSO/SAML"
 msgid "Stability improvements"
 msgstr "穩定性改進"
 
+msgid "Stack #{stackNumber} · PR {position} of {size} · targets {base}"
+msgstr "堆疊 #{stackNumber} · PR {position}/{size} · 目標 {base}"
+
+msgid "Stack #{stackNumber} · targets {base}"
+msgstr "堆疊 #{stackNumber} · 目標 {base}"
+
+msgid "Stack added to merge queue"
+msgstr "堆疊已加入合併佇列"
+
+msgid "Stack details could not be loaded. Refresh before merging."
+msgstr "無法載入堆疊詳細資料。請在合併前重新整理。"
+
+msgid "Stack merged"
+msgstr "堆疊已合併"
+
+msgctxt "stack verdict"
+msgid "Stack merged"
+msgstr "堆疊已合併"
+
+msgid "Stack needs attention"
+msgstr "堆疊需要處理"
+
 msgid "Stacked"
 msgstr "堆疊"
 
@@ -17222,6 +17288,15 @@ msgstr "此檢視出錯了"
 msgid "This week"
 msgstr "本週"
 
+msgid "This will atomically merge every open pull request through #{prNumber} into {base} using a merge commit."
+msgstr "這會使用合併提交將截至 #{prNumber} 的所有開啟的拉取請求以不可分割的方式合併到 {base}。"
+
+msgid "This will atomically merge every open pull request through #{prNumber} into {base} using rebase."
+msgstr "這會使用變基將截至 #{prNumber} 的所有開啟的拉取請求以不可分割的方式合併到 {base}。"
+
+msgid "This will atomically merge every open pull request through #{prNumber} into {base} using squash."
+msgstr "這會使用壓縮將截至 #{prNumber} 的所有開啟的拉取請求以不可分割的方式合併到 {base}。"
+
 msgid "This will change your organization's public URL. Make sure to update any bookmarks or shared links."
 msgstr "這會更改組織的公開URL。請記得更新書籤和已分享的連結。"
 
@@ -18250,6 +18325,12 @@ msgstr "查看版本說明"
 
 msgid "View releases on GitHub"
 msgstr "在GitHub上檢視釋出"
+
+msgid "View stack {stackNumber}, pull request {position} of {size}"
+msgstr "檢視堆疊 {stackNumber}，拉取請求 {position}/{size}"
+
+msgid "View stack, pull request {position} of {size}"
+msgstr "檢視堆疊，拉取請求 {position}/{size}"
 
 msgid "View Superset repository on GitHub"
 msgstr "在GitHub上檢視Superset儲存庫"

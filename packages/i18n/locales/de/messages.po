@@ -196,6 +196,10 @@ msgstr "{0, plural, one {# Projekt ausgewählt.} other {# Projekte ausgewählt.}
 msgid "{0, plural, one {# project} other {# projects}}"
 msgstr "{0, plural, one {# Projekt} other {# Projekte}}"
 
+#. placeholder {0}: stack.layers.length
+msgid "{0, plural, one {# pull request · targets {base}} other {# pull requests · targets {base}}}"
+msgstr "{0, plural, one {# Pull Request · Ziel {base}} other {# Pull Requests · Ziel {base}}}"
+
 #. placeholder {0}: repositories.length
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
@@ -787,6 +791,9 @@ msgstr "{count, plural, one {# Seite abgerufen} other {# Seiten abgerufen}}"
 msgid "{count, plural, one {Import # worktree} other {Import # worktrees}}"
 msgstr "{count, plural, one {# Worktree importieren} other {# Worktrees importieren}}"
 
+msgid "{count, plural, one {Merge # pull request?} other {Merge # pull requests?}}"
+msgstr "{count, plural, one {# Pull Request zusammenführen?} other {# Pull Requests zusammenführen?}}"
+
 msgid "{count, plural, one {Project opened} other {# projects opened}}"
 msgstr "{count, plural, one {Projekt geöffnet} other {# Projekte geöffnet}}"
 
@@ -1167,6 +1174,15 @@ msgid "#{0} {1}\n"
 msgstr "#{0} {1}\n"
 "\n"
 "Dies wird in {2} gemergt und kann hier nicht rückgängig gemacht werden."
+
+msgid "#{number} is closed without being merged."
+msgstr "#{number} wurde geschlossen, ohne zusammengeführt zu werden."
+
+msgid "#{number} is not ready to merge."
+msgstr "#{number} ist nicht bereit zum Zusammenführen."
+
+msgid "#{number} is still a draft."
+msgstr "#{number} ist noch ein Entwurf."
 
 msgid "#engineering"
 msgstr "#engineering"
@@ -5030,6 +5046,9 @@ msgstr "Konnte nicht als bereit zum Review markiert werden"
 
 msgid "Couldn't merge pull request"
 msgstr "Pull Request konnte nicht zusammengeführt werden"
+
+msgid "Couldn't merge stack"
+msgstr "Stack konnte nicht zusammengeführt werden"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "„{name}“ konnte nicht automatisch benannt werden"
@@ -9843,6 +9862,9 @@ msgstr "Zusammenführen"
 msgid "Merge #{0}?"
 msgstr "#{0} zusammenführen?"
 
+msgid "Merge #{number} first. A stack built from base branches merges one pull request at a time."
+msgstr "Führe zuerst #{number} zusammen. Ein Stack aus Basis-Branches wird ein Pull Request nach dem anderen zusammengeführt."
+
 msgid "Merge commit"
 msgstr "Merge-Commit"
 
@@ -9862,11 +9884,20 @@ msgstr "Pull Request zusammenführen"
 msgid "Merge pull requests without leaving Superset, plus a round of chat fixes and polish."
 msgstr "Pull Requests zusammenführen, ohne Superset zu verlassen, plus eine Runde Chat-Fixes und Feinschliff."
 
+msgid "Merge stack"
+msgstr "Stack zusammenführen"
+
 msgid "Merge status"
 msgstr "Merge-Status"
 
+msgid "Merge status pending"
+msgstr "Merge-Status ausstehend"
+
 msgid "Merge status unknown"
 msgstr "Merge-Status unbekannt"
+
+msgid "Mergeable with failing checks"
+msgstr "Zusammenführbar mit fehlschlagenden Checks"
 
 msgid "Merged"
 msgstr "Zusammengeführt"
@@ -9883,6 +9914,9 @@ msgstr "PR wird zusammengeführt..."
 
 msgid "Merging pull request"
 msgstr "Pull Request wird zusammengeführt"
+
+msgid "Merging stack…"
+msgstr "Stack wird zusammengeführt…"
 
 msgid "Merging…"
 msgstr "Wird zusammengeführt…"
@@ -12425,6 +12459,9 @@ msgstr "Antwort posten"
 msgid "PR"
 msgstr "PR"
 
+msgid "PR {position} of {size} · targets {base}"
+msgstr "PR {position} von {size} · Ziel {base}"
+
 #. placeholder {0}: pullRequest.number
 #. placeholder {1}: i18n._(PR_STATE_LABEL[pullRequest.state])
 msgid "PR #{0} — {1}"
@@ -12853,6 +12890,9 @@ msgstr "Pull Requests"
 msgid "Pull Requests"
 msgstr "Pull Requests"
 
+msgid "Pull requests above it will remain open and GitHub will retarget them."
+msgstr "Pull Requests darüber bleiben offen und GitHub ändert ihr Ziel."
+
 msgid "Purple"
 msgstr "Lila"
 
@@ -13057,6 +13097,10 @@ msgstr "Bereit für Review"
 #. placeholder {0}: error.message
 msgid "Ready for review failed: {0}"
 msgstr "Als bereit zur Review markieren fehlgeschlagen: {0}"
+
+msgctxt "stack verdict"
+msgid "Ready to merge"
+msgstr "Bereit zum Zusammenführen"
 
 msgid "Ready to Merge"
 msgstr "Bereit zum Zusammenführen"
@@ -15546,6 +15590,28 @@ msgstr "SSO/SAML"
 msgid "Stability improvements"
 msgstr "Stabilitätsverbesserungen"
 
+msgid "Stack #{stackNumber} · PR {position} of {size} · targets {base}"
+msgstr "Stack #{stackNumber} · PR {position} von {size} · Ziel {base}"
+
+msgid "Stack #{stackNumber} · targets {base}"
+msgstr "Stack #{stackNumber} · Ziel {base}"
+
+msgid "Stack added to merge queue"
+msgstr "Stack zur Merge-Warteschlange hinzugefügt"
+
+msgid "Stack details could not be loaded. Refresh before merging."
+msgstr "Stack-Details konnten nicht geladen werden. Aktualisiere vor dem Zusammenführen."
+
+msgid "Stack merged"
+msgstr "Stack zusammengeführt"
+
+msgctxt "stack verdict"
+msgid "Stack merged"
+msgstr "Stack zusammengeführt"
+
+msgid "Stack needs attention"
+msgstr "Stack braucht Aufmerksamkeit"
+
 msgid "Stacked"
 msgstr "Gestapelt"
 
@@ -17222,6 +17288,15 @@ msgstr "In dieser Ansicht ist ein Fehler aufgetreten"
 msgid "This week"
 msgstr "Diese Woche"
 
+msgid "This will atomically merge every open pull request through #{prNumber} into {base} using a merge commit."
+msgstr "Damit werden alle offenen Pull Requests bis #{prNumber} atomar per Merge-Commit in {base} zusammengeführt."
+
+msgid "This will atomically merge every open pull request through #{prNumber} into {base} using rebase."
+msgstr "Damit werden alle offenen Pull Requests bis #{prNumber} atomar per Rebase in {base} zusammengeführt."
+
+msgid "This will atomically merge every open pull request through #{prNumber} into {base} using squash."
+msgstr "Damit werden alle offenen Pull Requests bis #{prNumber} atomar per Squash in {base} zusammengeführt."
+
 msgid "This will change your organization's public URL. Make sure to update any bookmarks or shared links."
 msgstr "Damit ändert sich die öffentliche URL deiner Organisation. Denk daran, Lesezeichen oder geteilte Links zu aktualisieren."
 
@@ -18250,6 +18325,12 @@ msgstr "Release Notes ansehen"
 
 msgid "View releases on GitHub"
 msgstr "Releases auf GitHub ansehen"
+
+msgid "View stack {stackNumber}, pull request {position} of {size}"
+msgstr "Stack {stackNumber} anzeigen, Pull Request {position} von {size}"
+
+msgid "View stack, pull request {position} of {size}"
+msgstr "Stack anzeigen, Pull Request {position} von {size}"
 
 msgid "View Superset repository on GitHub"
 msgstr "Superset-Repository auf GitHub ansehen"

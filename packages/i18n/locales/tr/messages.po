@@ -196,6 +196,10 @@ msgstr "{0, plural, one {# proje seçildi.} other {# proje seçildi.}}"
 msgid "{0, plural, one {# project} other {# projects}}"
 msgstr "{0, plural, one {# proje} other {# proje}}"
 
+#. placeholder {0}: stack.layers.length
+msgid "{0, plural, one {# pull request · targets {base}} other {# pull requests · targets {base}}}"
+msgstr "{0, plural, one {# pull request · hedef {base}} other {# pull request · hedef {base}}}"
+
 #. placeholder {0}: repositories.length
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
@@ -787,6 +791,9 @@ msgstr "{count, plural, one {# sayfa alındı} other {# sayfa alındı}}"
 msgid "{count, plural, one {Import # worktree} other {Import # worktrees}}"
 msgstr "{count, plural, one {# worktree'yi içe aktar} other {# worktree'yi içe aktar}}"
 
+msgid "{count, plural, one {Merge # pull request?} other {Merge # pull requests?}}"
+msgstr "{count, plural, one {# pull request birleştirilsin mi?} other {# pull request birleştirilsin mi?}}"
+
 msgid "{count, plural, one {Project opened} other {# projects opened}}"
 msgstr "{count, plural, one {Proje açıldı} other {# proje açıldı}}"
 
@@ -1167,6 +1174,15 @@ msgid "#{0} {1}\n"
 msgstr "#{0} {1}\n"
 "\n"
 "This merges into {2} and cannot be undone here."
+
+msgid "#{number} is closed without being merged."
+msgstr "#{number} birleştirilmeden kapatıldı."
+
+msgid "#{number} is not ready to merge."
+msgstr "#{number} birleştirilmeye hazır değil."
+
+msgid "#{number} is still a draft."
+msgstr "#{number} hâlâ taslak."
 
 msgid "#engineering"
 msgstr "#engineering"
@@ -5030,6 +5046,9 @@ msgstr "İncelemeye hazır olarak işaretlenemedi"
 
 msgid "Couldn't merge pull request"
 msgstr "Pull request birleştirilemedi"
+
+msgid "Couldn't merge stack"
+msgstr "Yığın birleştirilemedi"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "\"{name}\" otomatik olarak adlandırılamadı"
@@ -9843,6 +9862,9 @@ msgstr "Birleştir"
 msgid "Merge #{0}?"
 msgstr "#{0} birleştirilsin mi?"
 
+msgid "Merge #{number} first. A stack built from base branches merges one pull request at a time."
+msgstr "Önce #{number} birleştirin. Temel dallardan oluşan bir yığın her seferinde bir pull request birleştirir."
+
 msgid "Merge commit"
 msgstr "Birleştirme commit'i"
 
@@ -9862,11 +9884,20 @@ msgstr "Pull request'i birleştir"
 msgid "Merge pull requests without leaving Superset, plus a round of chat fixes and polish."
 msgstr "Superset'ten çıkmadan pull request birleştirin; ayrıca bir dizi sohbet düzeltmesi ve rötuş."
 
+msgid "Merge stack"
+msgstr "Yığını birleştir"
+
 msgid "Merge status"
 msgstr "Birleştirme durumu"
 
+msgid "Merge status pending"
+msgstr "Birleştirme durumu bekleniyor"
+
 msgid "Merge status unknown"
 msgstr "Birleştirme durumu bilinmiyor"
+
+msgid "Mergeable with failing checks"
+msgstr "Başarısız denetimlerle birleştirilebilir"
 
 msgid "Merged"
 msgstr "Birleştirildi"
@@ -9883,6 +9914,9 @@ msgstr "PR birleştiriliyor..."
 
 msgid "Merging pull request"
 msgstr "Pull request birleştiriliyor"
+
+msgid "Merging stack…"
+msgstr "Yığın birleştiriliyor…"
 
 msgid "Merging…"
 msgstr "Birleştiriliyor…"
@@ -12425,6 +12459,9 @@ msgstr "Yanıt gönder"
 msgid "PR"
 msgstr "PR"
 
+msgid "PR {position} of {size} · targets {base}"
+msgstr "PR {position} / {size} · hedef {base}"
+
 #. placeholder {0}: pullRequest.number
 #. placeholder {1}: i18n._(PR_STATE_LABEL[pullRequest.state])
 msgid "PR #{0} — {1}"
@@ -12853,6 +12890,9 @@ msgstr "Pull request'ler"
 msgid "Pull Requests"
 msgstr "Pull request'ler"
 
+msgid "Pull requests above it will remain open and GitHub will retarget them."
+msgstr "Üstteki pull request'ler açık kalır ve GitHub hedeflerini değiştirir."
+
 msgid "Purple"
 msgstr "Mor"
 
@@ -13057,6 +13097,10 @@ msgstr "İncelemeye hazır"
 #. placeholder {0}: error.message
 msgid "Ready for review failed: {0}"
 msgstr "İncelemeye hazır olarak işaretlenemedi: {0}"
+
+msgctxt "stack verdict"
+msgid "Ready to merge"
+msgstr "Birleştirmeye hazır"
 
 msgid "Ready to Merge"
 msgstr "Birleştirmeye hazır"
@@ -15546,6 +15590,28 @@ msgstr "SSO/SAML"
 msgid "Stability improvements"
 msgstr "Kararlılık iyileştirmeleri"
 
+msgid "Stack #{stackNumber} · PR {position} of {size} · targets {base}"
+msgstr "Yığın #{stackNumber} · PR {position} / {size} · hedef {base}"
+
+msgid "Stack #{stackNumber} · targets {base}"
+msgstr "Yığın #{stackNumber} · hedef {base}"
+
+msgid "Stack added to merge queue"
+msgstr "Yığın birleştirme kuyruğuna eklendi"
+
+msgid "Stack details could not be loaded. Refresh before merging."
+msgstr "Yığın ayrıntıları yüklenemedi. Birleştirmeden önce yenileyin."
+
+msgid "Stack merged"
+msgstr "Yığın birleştirildi"
+
+msgctxt "stack verdict"
+msgid "Stack merged"
+msgstr "Yığın birleştirildi"
+
+msgid "Stack needs attention"
+msgstr "Yığın ilgi bekliyor"
+
 msgid "Stacked"
 msgstr "Üst üste"
 
@@ -17222,6 +17288,15 @@ msgstr "Bu görünüm bir hatayla karşılaştı"
 msgid "This week"
 msgstr "Bu hafta"
 
+msgid "This will atomically merge every open pull request through #{prNumber} into {base} using a merge commit."
+msgstr "#{prNumber} dahil tüm açık pull request'ler birleştirme commit'i ile {base} dalına atomik olarak birleştirilecek."
+
+msgid "This will atomically merge every open pull request through #{prNumber} into {base} using rebase."
+msgstr "#{prNumber} dahil tüm açık pull request'ler rebase ile {base} dalına atomik olarak birleştirilecek."
+
+msgid "This will atomically merge every open pull request through #{prNumber} into {base} using squash."
+msgstr "#{prNumber} dahil tüm açık pull request'ler squash ile {base} dalına atomik olarak birleştirilecek."
+
 msgid "This will change your organization's public URL. Make sure to update any bookmarks or shared links."
 msgstr "Bu, kuruluşunuzun herkese açık URL'sini değiştirir. Yer imlerinizi veya paylaşılan bağlantıları güncellemeyi unutmayın."
 
@@ -18250,6 +18325,12 @@ msgstr "Sürüm notlarını görüntüle"
 
 msgid "View releases on GitHub"
 msgstr "Sürümleri GitHub'da görüntüle"
+
+msgid "View stack {stackNumber}, pull request {position} of {size}"
+msgstr "Yığın {stackNumber} görüntüle, pull request {position} / {size}"
+
+msgid "View stack, pull request {position} of {size}"
+msgstr "Yığını görüntüle, pull request {position} / {size}"
 
 msgid "View Superset repository on GitHub"
 msgstr "Superset deposunu GitHub'da görüntüle"

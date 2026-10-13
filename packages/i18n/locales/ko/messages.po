@@ -196,6 +196,10 @@ msgstr "{0, plural, one {프로젝트 #개를 선택했습니다.} other {프로
 msgid "{0, plural, one {# project} other {# projects}}"
 msgstr "{0, plural, one {프로젝트 #개} other {프로젝트 #개}}"
 
+#. placeholder {0}: stack.layers.length
+msgid "{0, plural, one {# pull request · targets {base}} other {# pull requests · targets {base}}}"
+msgstr "{0, plural, other {풀 리퀘스트 #개 · 대상 {base}}}"
+
 #. placeholder {0}: repositories.length
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
@@ -787,6 +791,9 @@ msgstr "{count, plural, one {페이지 #개 가져옴} other {페이지 #개 가
 msgid "{count, plural, one {Import # worktree} other {Import # worktrees}}"
 msgstr "{count, plural, one {worktree #개 가져오기} other {worktree #개 가져오기}}"
 
+msgid "{count, plural, one {Merge # pull request?} other {Merge # pull requests?}}"
+msgstr "{count, plural, other {풀 리퀘스트 #개를 머지할까요?}}"
+
 msgid "{count, plural, one {Project opened} other {# projects opened}}"
 msgstr "{count, plural, one {프로젝트 #개를 열었습니다} other {프로젝트 #개를 열었습니다}}"
 
@@ -1167,6 +1174,15 @@ msgid "#{0} {1}\n"
 msgstr "#{0} {1}\n"
 "\n"
 "This merges into {2} and cannot be undone here."
+
+msgid "#{number} is closed without being merged."
+msgstr "#{number}이(가) 머지되지 않고 닫혔습니다."
+
+msgid "#{number} is not ready to merge."
+msgstr "#{number}은(는) 아직 머지할 준비가 되지 않았습니다."
+
+msgid "#{number} is still a draft."
+msgstr "#{number}은(는) 아직 초안입니다."
 
 msgid "#engineering"
 msgstr "#engineering"
@@ -5030,6 +5046,9 @@ msgstr "리뷰 준비 완료로 표시할 수 없습니다"
 
 msgid "Couldn't merge pull request"
 msgstr "풀 리퀘스트를 머지하지 못했습니다"
+
+msgid "Couldn't merge stack"
+msgstr "스택을 머지하지 못했습니다"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "\"{name}\"의 이름을 자동으로 지정하지 못했습니다"
@@ -9843,6 +9862,9 @@ msgstr "머지"
 msgid "Merge #{0}?"
 msgstr "#{0}을(를) 머지할까요?"
 
+msgid "Merge #{number} first. A stack built from base branches merges one pull request at a time."
+msgstr "#{number}을(를) 먼저 머지하세요. 기본 브랜치로 쌓은 스택은 풀 리퀘스트를 하나씩 머지합니다."
+
 msgid "Merge commit"
 msgstr "머지 커밋"
 
@@ -9862,11 +9884,20 @@ msgstr "풀 리퀘스트 머지"
 msgid "Merge pull requests without leaving Superset, plus a round of chat fixes and polish."
 msgstr "Superset을 벗어나지 않고 풀 리퀘스트를 머지하세요. 채팅 수정과 다듬기도 함께 들어갑니다."
 
+msgid "Merge stack"
+msgstr "스택 머지"
+
 msgid "Merge status"
 msgstr "머지 상태"
 
+msgid "Merge status pending"
+msgstr "머지 상태 확인 중"
+
 msgid "Merge status unknown"
 msgstr "머지 상태 알 수 없음"
+
+msgid "Mergeable with failing checks"
+msgstr "실패한 검사가 있지만 머지 가능"
 
 msgid "Merged"
 msgstr "머지됨"
@@ -9883,6 +9914,9 @@ msgstr "PR을 머지하는 중..."
 
 msgid "Merging pull request"
 msgstr "풀 리퀘스트 머지 중"
+
+msgid "Merging stack…"
+msgstr "스택 머지 중…"
 
 msgid "Merging…"
 msgstr "머지 중…"
@@ -12425,6 +12459,9 @@ msgstr "답글 게시"
 msgid "PR"
 msgstr "PR"
 
+msgid "PR {position} of {size} · targets {base}"
+msgstr "PR {position}/{size} · 대상 {base}"
+
 #. placeholder {0}: pullRequest.number
 #. placeholder {1}: i18n._(PR_STATE_LABEL[pullRequest.state])
 msgid "PR #{0} — {1}"
@@ -12853,6 +12890,9 @@ msgstr "풀 리퀘스트"
 msgid "Pull Requests"
 msgstr "풀 리퀘스트"
 
+msgid "Pull requests above it will remain open and GitHub will retarget them."
+msgstr "위에 있는 풀 리퀘스트는 열린 상태로 유지되고 GitHub가 대상 브랜치를 변경합니다."
+
 msgid "Purple"
 msgstr "보라"
 
@@ -13057,6 +13097,10 @@ msgstr "리뷰 준비됨"
 #. placeholder {0}: error.message
 msgid "Ready for review failed: {0}"
 msgstr "리뷰 준비 완료 표시 실패: {0}"
+
+msgctxt "stack verdict"
+msgid "Ready to merge"
+msgstr "머지 준비됨"
 
 msgid "Ready to Merge"
 msgstr "머지 준비됨"
@@ -15546,6 +15590,28 @@ msgstr "SSO/SAML"
 msgid "Stability improvements"
 msgstr "안정성 개선"
 
+msgid "Stack #{stackNumber} · PR {position} of {size} · targets {base}"
+msgstr "스택 #{stackNumber} · PR {position}/{size} · 대상 {base}"
+
+msgid "Stack #{stackNumber} · targets {base}"
+msgstr "스택 #{stackNumber} · 대상 {base}"
+
+msgid "Stack added to merge queue"
+msgstr "스택을 머지 대기열에 추가했습니다"
+
+msgid "Stack details could not be loaded. Refresh before merging."
+msgstr "스택 세부 정보를 불러오지 못했습니다. 머지하기 전에 새로 고치세요."
+
+msgid "Stack merged"
+msgstr "스택을 머지했습니다"
+
+msgctxt "stack verdict"
+msgid "Stack merged"
+msgstr "스택 머지됨"
+
+msgid "Stack needs attention"
+msgstr "스택에 확인이 필요합니다"
+
 msgid "Stacked"
 msgstr "스택"
 
@@ -17222,6 +17288,15 @@ msgstr "이 화면에서 오류가 발생했습니다"
 msgid "This week"
 msgstr "이번 주"
 
+msgid "This will atomically merge every open pull request through #{prNumber} into {base} using a merge commit."
+msgstr "#{prNumber}까지의 모든 열린 풀 리퀘스트를 머지 커밋으로 {base}에 원자적으로 머지합니다."
+
+msgid "This will atomically merge every open pull request through #{prNumber} into {base} using rebase."
+msgstr "#{prNumber}까지의 모든 열린 풀 리퀘스트를 리베이스으로 {base}에 원자적으로 머지합니다."
+
+msgid "This will atomically merge every open pull request through #{prNumber} into {base} using squash."
+msgstr "#{prNumber}까지의 모든 열린 풀 리퀘스트를 스쿼시으로 {base}에 원자적으로 머지합니다."
+
 msgid "This will change your organization's public URL. Make sure to update any bookmarks or shared links."
 msgstr "조직의 공개 URL이 바뀝니다. 북마크나 공유한 링크도 함께 업데이트하세요."
 
@@ -18250,6 +18325,12 @@ msgstr "릴리스 노트 보기"
 
 msgid "View releases on GitHub"
 msgstr "GitHub에서 릴리스 보기"
+
+msgid "View stack {stackNumber}, pull request {position} of {size}"
+msgstr "스택 {stackNumber} 보기, 풀 리퀘스트 {position}/{size}"
+
+msgid "View stack, pull request {position} of {size}"
+msgstr "스택 보기, 풀 리퀘스트 {position}/{size}"
 
 msgid "View Superset repository on GitHub"
 msgstr "GitHub에서 Superset 리포지토리 보기"
