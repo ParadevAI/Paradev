@@ -245,13 +245,24 @@ test("preserves the newer draft saved by history navigation while a send is pend
 	view.submit();
 	await view.write("Next task draft");
 	await act(async () => {
-		view.editor.update(() => $getRoot().selectStart(), { discrete: true });
-		view.editor.dispatchCommand(KEY_ARROW_UP_COMMAND, null);
+		view.editor.update(
+			() => {
+				$getRoot().selectStart();
+				view.editor.dispatchCommand(KEY_ARROW_UP_COMMAND, null);
+			},
+			{ discrete: true },
+		);
 	});
 	expect(view.text()).toBe("Earlier question");
 	await act(async () => pending.resolve());
 	await act(async () => {
-		view.editor.dispatchCommand(KEY_ARROW_DOWN_COMMAND, null);
+		view.editor.update(
+			() => {
+				$getRoot().selectEnd();
+				view.editor.dispatchCommand(KEY_ARROW_DOWN_COMMAND, null);
+			},
+			{ discrete: true },
+		);
 	});
 	expect(view.text()).toBe("Next task draft");
 });
