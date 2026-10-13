@@ -1221,24 +1221,14 @@ export const auth = betterAuth({
 						(ctx?.body as { annual?: boolean } | undefined)?.annual,
 					);
 
-					const hasTaxId = org?.stripeCustomerId
-						? (
-								await stripeClient.customers.listTaxIds(org.stripeCustomerId, {
-									limit: 1,
-								})
-							).data.length > 0
-						: false;
-
 					return {
 						params: {
 							customer: org?.stripeCustomerId ?? undefined,
 							allow_promotion_codes: !annual,
 							billing_address_collection: "required",
-							...(!hasTaxId && {
-								tax_id_collection: { enabled: true },
-								...(org?.stripeCustomerId && {
-									customer_update: { name: "auto", address: "auto" },
-								}),
+							tax_id_collection: { enabled: true },
+							...(org?.stripeCustomerId && {
+								customer_update: { name: "auto", address: "auto" },
 							}),
 							metadata: {
 								organizationId: org?.id ?? "",
