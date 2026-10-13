@@ -116,6 +116,39 @@ describe("SqliteTerminalAgentBindingPersistence live reads", () => {
 			new SqliteTerminalAgentBindingPersistence(db).load()[0]?.accountInvalid,
 		).toBe(true);
 	});
+	it("persists a positively replaced account after restoring invalid context", () => {
+		const db = createTestDb();
+		seedSession(db, { id: "replaced", status: "active", workspaceId: "ws-1" });
+		db.update(terminalAgentBindings)
+			.set({ accountJson: '{"pinned":true}' })
+			.where(eq(terminalAgentBindings.terminalId, "replaced"))
+			.run();
+		const store = new TerminalAgentStore(
+			new SqliteTerminalAgentBindingPersistence(db),
+		);
+		const account = {
+			agent: "claude" as const,
+			selection: "/fixture",
+			directory: "/fixture",
+			credentialKind: "subscription" as const,
+			identity: "alice",
+			pinned: true as const,
+		};
+		store.recordEvent({
+			terminalId: "replaced",
+			workspaceId: "ws-1",
+			agentId: "claude",
+			agentSessionId: "verified",
+			account,
+			eventType: "Attached",
+			occurredAt: 3,
+		});
+		const restored = new TerminalAgentStore(
+			new SqliteTerminalAgentBindingPersistence(db),
+		).get("replaced");
+		expect(restored?.accountInvalid).toBeUndefined();
+		expect(restored?.account).toEqual(account);
+	});
 	it("hides bindings whose session is not active or workspace-less", () => {
 		const db = createTestDb();
 		// The workspaces FK on originWorkspaceId is nullable and unenforced in

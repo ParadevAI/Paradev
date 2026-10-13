@@ -55,6 +55,7 @@ import { validateAccountAuthRouting } from "./account-auth-routing";
 import {
 	listLaunchAccounts,
 	pinnedAccountCommandPrefix,
+	prepareLaunchAccountHooks,
 	resolveLaunchAccount,
 	validatePinnedLaunchAccount,
 } from "./launch-account";
@@ -884,8 +885,10 @@ export async function runAgentInWorkspace(
 			message: `Workspace ${input.workspaceId} not found on this host — it may have been deleted.`,
 		});
 	}
-	if (input.account)
+	if (input.account) {
 		await validateAccountAuthRouting(input.account, workspace.worktreePath);
+		prepareLaunchAccountHooks(input.account);
+	}
 	// Ahead of the launch path: continuing costs no pty and no trust seeding.
 	const continued =
 		continueChatAgent(ctx, input) ?? (await continueTerminalAgent(ctx, input));
