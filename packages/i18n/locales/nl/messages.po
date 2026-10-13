@@ -10555,7 +10555,7 @@ msgid "No automations match"
 msgstr "Geen overeenkomende automatiseringen"
 
 msgid "No available subscription accounts. Add or sign in to an account in Usage, then refresh."
-msgstr "Geen beschikbare accounts met een abonnement. Voeg een account toe of meld je aan bij Gebruik en vernieuw daarna."
+msgstr "Geen beschikbare accounts met een abonnement. Voeg een account toe of meld je via Gebruik aan bij een account, en vernieuw daarna."
 
 msgid "No branches found"
 msgstr "Geen branches gevonden"
