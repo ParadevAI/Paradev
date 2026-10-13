@@ -227,7 +227,7 @@ export class TerminalAgentStore extends EventEmitter {
 			agentSessionId: agentSessionId ?? prior?.agentSessionId,
 			definitionId: definitionId ?? prior?.definitionId,
 			launchId: input.launchId ?? prior?.launchId,
-			accountInvalid: prior?.accountInvalid,
+			accountInvalid: input.account ? undefined : prior?.accountInvalid,
 			account:
 				input.account ??
 				(prior && (!sessionChanged || prior.agentSessionId === undefined)
