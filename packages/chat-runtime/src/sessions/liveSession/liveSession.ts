@@ -311,10 +311,11 @@ export class LiveSession {
 					}
 				} else if (
 					this.options.retainQueuedOnStop &&
-					(event.turn.status === "failed" ||
-						event.turn.status === "interrupted")
+					event.turn.status === "failed" &&
+					this.steerTarget === null &&
+					this.queue.length > 0
 				) {
-					this.queuePaused = true;
+					this.pauseQueue();
 				} else {
 					this.deliverNextQueued();
 				}
@@ -463,7 +464,8 @@ export class LiveSession {
 			: [];
 		this.discardPending();
 		this.queue.push(...retained);
-		if (this.options.retainQueuedOnStop) this.queuePaused = true;
+		if (this.options.retainQueuedOnStop && this.queue.length > 0)
+			this.pauseQueue();
 	}
 
 	private discardPending(): void {
@@ -490,6 +492,12 @@ export class LiveSession {
 		const next = this.queue.shift();
 		if (!next) return;
 		this.deliver(next);
+	}
+
+	private pauseQueue(): void {
+		if (this.queuePaused) return;
+		this.queuePaused = true;
+		this.emitSession({ queuePaused: true });
 	}
 
 	private unpauseIfEmpty(): void {
