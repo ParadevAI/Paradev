@@ -29,6 +29,8 @@ const {
 	$createTextNode,
 	$getRoot,
 	$isElementNode,
+	KEY_ARROW_DOWN_COMMAND,
+	KEY_ARROW_UP_COMMAND,
 	KEY_ENTER_COMMAND,
 } = await import("lexical");
 const { MentionChipNode } = await import("../../nodes/mentionChipNode");
@@ -44,7 +46,10 @@ function EditorProbe({
 	return null;
 }
 
-async function setup(onSubmit: ComposerBodyProps["onSubmit"]) {
+async function setup(
+	onSubmit: ComposerBodyProps["onSubmit"],
+	{ history }: Pick<ComposerBodyProps, "history"> = {},
+) {
 	let editor: LexicalEditor | undefined;
 	const view = render(
 		<LexicalComposer
@@ -67,6 +72,7 @@ async function setup(onSubmit: ComposerBodyProps["onSubmit"]) {
 				submitWhileStreaming={false}
 				placement="top"
 				clearOnSubmit
+				history={history}
 				onSubmit={onSubmit}
 			/>
 		</LexicalComposer>,
@@ -229,6 +235,25 @@ test("preserves a draft edited back to its original text while pending", async (
 	await view.write("Review the file");
 	await act(async () => pending.resolve());
 	expect(view.text()).toBe("Review the file");
+});
+
+test("preserves the newer draft saved by history navigation while a send is pending", async () => {
+	const pending = deferred<void>();
+	const view = await setup(() => pending.promise, {
+		history: ["Earlier question"],
+	});
+	view.submit();
+	await view.write("Next task draft");
+	await act(async () => {
+		view.editor.update(() => $getRoot().selectStart(), { discrete: true });
+		view.editor.dispatchCommand(KEY_ARROW_UP_COMMAND, null);
+	});
+	expect(view.text()).toBe("Earlier question");
+	await act(async () => pending.resolve());
+	await act(async () => {
+		view.editor.dispatchCommand(KEY_ARROW_DOWN_COMMAND, null);
+	});
+	expect(view.text()).toBe("Next task draft");
 });
 
 test("selection changes do not keep an otherwise accepted unchanged draft", async () => {

@@ -477,10 +477,10 @@ export function ComposerBody({
 			) {
 				return;
 			}
-			historyNavigationRef.current?.reset();
 			if (!stateRef.current.clearOnSubmit) return;
 			// A delayed acceptance must not erase a newer draft or its Lexical chips.
 			if (editor.read(() => draftRevision.current) === submittedRevision) {
+				historyNavigationRef.current?.reset();
 				editor.update(() => $getRoot().clear());
 			}
 			setAttachments((previous) =>
