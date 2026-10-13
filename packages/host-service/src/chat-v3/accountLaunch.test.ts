@@ -130,6 +130,7 @@ describe("native chat account launch", () => {
 		);
 		expect(env).toEqual({
 			CODEX_HOME: "/fixture/codex",
+			SUPERSET_DEFAULT_CODEX_HOME: "/fixture/codex",
 			SUPERSET_PINNED_ACCOUNT: "CODEX_HOME",
 		});
 	});
