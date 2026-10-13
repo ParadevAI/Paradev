@@ -54,7 +54,7 @@ import {
 	resolveSessionOrganizationState,
 	type SessionOrganizationContext,
 } from "./lib/resolve-session-organization-state";
-import { stripeClient } from "./stripe";
+import { stripeClient, syncCustomerName } from "./stripe";
 import {
 	countBillableSeats,
 	formatPrice,
@@ -758,14 +758,10 @@ export const auth = betterAuth({
 				afterUpdateOrganization: async ({ organization }) => {
 					if (!organization?.stripeCustomerId) return;
 
-					const customer = await stripeClient.customers.retrieve(
+					await syncCustomerName(
 						organization.stripeCustomerId,
+						organization.name,
 					);
-					if (customer.deleted || customer.business_name) return;
-
-					await stripeClient.customers.update(organization.stripeCustomerId, {
-						name: organization.name,
-					});
 				},
 
 				beforeAddMember: async ({ organization, user }) => {
