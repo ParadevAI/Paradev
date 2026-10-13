@@ -85,21 +85,25 @@ test("saved-history migration preserves recovery data through terminal and works
 				"INSERT INTO saved_conversations (id, workspace_id, provider, native_session_id, store_path, transcript_path, cwd, definition_id, account_json, provenance_json, adopted_at, state, terminal_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
 			)
 			.run(...Object.values(saved));
-		sqlite.exec(
-			"DELETE FROM terminal_sessions WHERE id='old-terminal'",
-		);
+		sqlite.exec("DELETE FROM terminal_sessions WHERE id='old-terminal'");
 		expect(
 			sqlite.query("SELECT * FROM terminal_agent_bindings").get(),
 		).toBeNull();
-		expect(sqlite.query("SELECT * FROM saved_conversations").get()).toEqual(saved);
+		expect(sqlite.query("SELECT * FROM saved_conversations").get()).toEqual(
+			saved,
+		);
 		sqlite.exec("DELETE FROM workspaces WHERE id='workspace'");
 		expect(sqlite.query("SELECT * FROM workspaces").get()).toBeNull();
-		expect(sqlite.query("SELECT * FROM saved_conversations").get()).toEqual(saved);
+		expect(sqlite.query("SELECT * FROM saved_conversations").get()).toEqual(
+			saved,
+		);
 		sqlite.close();
 		sqlite = new Database(dbPath);
 		sqlite.exec("PRAGMA foreign_keys=ON");
 		runMigrations(drizzle(sqlite), folder);
-		expect(sqlite.query("SELECT * FROM saved_conversations").get()).toEqual(saved);
+		expect(sqlite.query("SELECT * FROM saved_conversations").get()).toEqual(
+			saved,
+		);
 	} finally {
 		sqlite.close();
 		rmSync(directory, { recursive: true, force: true });
