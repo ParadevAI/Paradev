@@ -3,12 +3,16 @@ import { SESSIONS_TAG_SCOPE } from "@superset/shared/workspace-tags";
 import {
 	applyFolderTagChange,
 	buildSidebarFolderKey,
+	canCreateSubFolder,
 	DERIVED_TAG_FOLDER_TAB_ORDER_BASE,
 	deriveSessionTagFolders,
 	deriveTagFolders,
 	EMPTY_TAG_FOLDER_CONTEXT,
+	getFolderTagPath,
+	getParentFolderTag,
 	getProjectFolderTagIndex,
 	mintFolderTag,
+	orderFolderTree,
 	parseSidebarFolderKey,
 	resolveWorkspaceFolder,
 	resolveWorkspaceSectionId,
@@ -586,5 +590,147 @@ describe("deriveTagFolders with host settings and hidden folders", () => {
 					`${folder.projectId === PROJECT_B ? "B" : "A"}:${folder.tag}`,
 			),
 		).toEqual(["A:null", "B:perf"]);
+	});
+});
+
+describe("nested folder tags", () => {
+	it("splits a tag into path segments only when every segment is clean", () => {
+		expect(getFolderTagPath("features/auth")).toEqual(["features", "auth"]);
+		expect(getParentFolderTag("features/auth/login")).toBe("features/auth");
+		expect(getParentFolderTag("features")).toBeNull();
+		for (const flat of ["a//b", "/a", "a/", "a / b"]) {
+			expect(getFolderTagPath(flat)).toEqual([flat]);
+			expect(getParentFolderTag(flat)).toBeNull();
+		}
+	});
+
+	it("a nested tag derives its parent folder, named by the leaf", () => {
+		const folders = deriveTagFolders(
+			[],
+			[makeWorkspace({ id: "w1", tags: ["features/auth"] })],
+			EMPTY_TAG_FOLDER_CONTEXT,
+		);
+		const parentKey = buildSidebarFolderKey(PROJECT_A, "features");
+		expect(folders).toHaveLength(2);
+		expect(folders[0]).toMatchObject({
+			sectionId: parentKey,
+			name: "features",
+			parentId: null,
+			isDerived: true,
+		});
+		expect(folders[1]).toMatchObject({
+			sectionId: buildSidebarFolderKey(PROJECT_A, "features/auth"),
+			name: "auth",
+			parentId: parentKey,
+		});
+	});
+
+	it("an empty stored sub-folder keeps its derived parent on screen", () => {
+		const folders = deriveTagFolders(
+			[
+				makeSection({
+					sectionId: buildSidebarFolderKey(PROJECT_A, "features/new group"),
+					name: "New group",
+					tag: "features/new group",
+				}),
+			],
+			[],
+			EMPTY_TAG_FOLDER_CONTEXT,
+		);
+		expect(folders.map((folder) => folder.tag)).toEqual([
+			"features/new group",
+			"features",
+		]);
+		expect(folders[0]?.parentId).toBe(
+			buildSidebarFolderKey(PROJECT_A, "features"),
+		);
+	});
+
+	it("hiding a folder hides its sub-folders", () => {
+		const folders = deriveTagFolders(
+			[],
+			[makeWorkspace({ id: "w1", tags: ["features/auth", "perf"] })],
+			{
+				tagSettings: [],
+				hiddenTagsByProject: new Map([[PROJECT_A, new Set(["features"])]]),
+			},
+		);
+		expect(folders.map((folder) => folder.tag)).toEqual(["perf"]);
+	});
+
+	it("a workspace tagged with a folder and its sub-folder renders in the sub-folder", () => {
+		const index = getProjectFolderTagIndex(
+			deriveTagFolders(
+				[
+					makeSection({
+						sectionId: buildSidebarFolderKey(PROJECT_A, "features"),
+						tag: "features",
+						tabOrder: 1,
+					}),
+				],
+				[makeWorkspace({ id: "w1", tags: ["features", "features/auth"] })],
+				EMPTY_TAG_FOLDER_CONTEXT,
+			),
+			PROJECT_A,
+		);
+		expect(
+			resolveWorkspaceFolder(["features", "features/auth"], index)?.tag,
+		).toBe("features/auth");
+	});
+
+	it("mints sub-folder tags under the parent, never nesting by accident", () => {
+		expect(mintFolderTag("New group", [], "features")).toBe(
+			"features/new group",
+		);
+		expect(mintFolderTag("a/b", [])).toBe("a-b");
+		expect(mintFolderTag("Auth", ["features/auth"], "features")).toBe(
+			"features/auth-2",
+		);
+		const parent = "p".repeat(50);
+		const minted = mintFolderTag("x".repeat(40), [], parent);
+		expect(minted.length).toBeLessThanOrEqual(64);
+		expect(minted.startsWith(`${parent}/x`)).toBe(true);
+	});
+
+	it("offers sub-folders only within the depth limit and tag length", () => {
+		expect(canCreateSubFolder("a")).toBe(true);
+		expect(canCreateSubFolder("a/b")).toBe(true);
+		expect(canCreateSubFolder("a/b/c")).toBe(false);
+		expect(canCreateSubFolder("p".repeat(60))).toBe(false);
+		expect(canCreateSubFolder(null)).toBe(false);
+	});
+});
+
+describe("orderFolderTree", () => {
+	const byName = (left: { id: string }, right: { id: string }) =>
+		left.id.localeCompare(right.id);
+
+	it("walks pre-order with depths", () => {
+		expect(
+			orderFolderTree(
+				[
+					{ id: "b", parentId: null },
+					{ id: "a/2", parentId: "a" },
+					{ id: "a", parentId: null },
+					{ id: "a/1", parentId: "a" },
+					{ id: "a/1/x", parentId: "a/1" },
+				],
+				byName,
+			).map(({ folder, depth }) => [folder.id, depth]),
+		).toEqual([
+			["a", 0],
+			["a/1", 1],
+			["a/1/x", 2],
+			["a/2", 1],
+			["b", 0],
+		]);
+	});
+
+	it("treats a folder whose parent is missing as a root", () => {
+		expect(
+			orderFolderTree([{ id: "a/1", parentId: "a" }], byName).map(
+				({ folder, depth }) => [folder.id, depth],
+			),
+		).toEqual([["a/1", 0]]);
 	});
 });

@@ -8,7 +8,8 @@ import type { SortingStrategy } from "@dnd-kit/sortable";
 
 /**
  * A section drag sorts *units*, not rows: a section header carries its member
- * rows with it, and an ungrouped row is a unit of its own. The project's flat
+ * rows and its sub-sections with it, and an ungrouped row is a unit of its
+ * own. The project's flat
  * item list stays intact (every row keeps its index, DOM node, and height),
  * so nothing shifts at pickup — the strategy below just moves every row of a
  * unit by the same amount.
@@ -24,25 +25,77 @@ export function buildTopLevelUnits(
 	list: UniqueIdentifier[],
 	membership: Record<string, string>,
 	isSection: (id: UniqueIdentifier) => boolean,
+	sectionParents: Record<string, string> = {},
 ): TopLevelUnit[] {
+	return buildSiblingUnits(list, {
+		membership,
+		sectionParents,
+		isSection,
+		parent: null,
+	});
+}
+
+/**
+ * Units one level down the folder tree: everything whose chain of owners
+ * reaches `parent` belongs to the unit of its ancestor directly under
+ * `parent`. A section header owns its sub-section headers (via
+ * `sectionParents`) and its rows (via `membership`), so a unit is a whole
+ * subtree. Items outside `parent`'s subtree belong to no unit and stay put.
+ *
+ * `sectionsOnly` drops the parent's own rows from the result: inside a group
+ * its rows always come before its sub-groups, so a sub-group only trades
+ * places with its sibling sub-groups.
+ */
+export function buildSiblingUnits(
+	list: UniqueIdentifier[],
+	{
+		membership,
+		sectionParents,
+		isSection,
+		parent,
+		sectionsOnly = false,
+	}: {
+		membership: Record<string, string>;
+		sectionParents: Record<string, string>;
+		isSection: (id: UniqueIdentifier) => boolean;
+		/** Flat id of the enclosing section; null for the top of the lane. */
+		parent: UniqueIdentifier | null;
+		sectionsOnly?: boolean;
+	},
+): TopLevelUnit[] {
+	const ownerOf = (id: UniqueIdentifier): string | null =>
+		(isSection(id) ? sectionParents[String(id)] : membership[String(id)]) ??
+		null;
+	const parentKey = parent == null ? null : String(parent);
+	const unitKeyOf = (id: UniqueIdentifier): UniqueIdentifier | null => {
+		let cursor = id;
+		const seen = new Set<string>();
+		for (;;) {
+			const owner = ownerOf(cursor);
+			if (owner === parentKey) return cursor;
+			if (owner === null || seen.has(owner)) return null;
+			seen.add(owner);
+			cursor = owner;
+		}
+	};
+
 	const units: TopLevelUnit[] = [];
-	const unitBySection = new Map<string, TopLevelUnit>();
+	const unitByKey = new Map<string, TopLevelUnit>();
 	for (const id of list) {
-		if (isSection(id)) {
-			const unit: TopLevelUnit = { key: id, ids: [id] };
-			units.push(unit);
-			unitBySection.set(String(id), unit);
+		const key = unitKeyOf(id);
+		if (key == null) continue;
+		const existing = unitByKey.get(String(key));
+		if (existing) {
+			existing.ids.push(id);
 			continue;
 		}
-		const sectionFlatId = membership[String(id)];
-		const owner = sectionFlatId ? unitBySection.get(sectionFlatId) : undefined;
-		if (owner) {
-			owner.ids.push(id);
-		} else {
-			units.push({ key: id, ids: [id] });
-		}
+		// Headers precede their members, so a member arriving before its
+		// unit exists has no header in this list: it stands alone.
+		const unit: TopLevelUnit = { key: id, ids: [id] };
+		units.push(unit);
+		unitByKey.set(String(id), unit);
 	}
-	return units;
+	return sectionsOnly ? units.filter((unit) => isSection(unit.key)) : units;
 }
 
 export function findUnitIndex(
@@ -114,7 +167,17 @@ export function createSectionUnitSortingStrategy(
 	membership: Record<string, string>,
 	isSection: (id: UniqueIdentifier) => boolean,
 ): SortingStrategy {
-	const units = buildTopLevelUnits(items, membership, isSection);
+	return createUnitSortingStrategy(
+		items,
+		buildTopLevelUnits(items, membership, isSection),
+	);
+}
+
+/** The unit strategy over any unit set; rows in no unit never move. */
+export function createUnitSortingStrategy(
+	items: UniqueIdentifier[],
+	units: TopLevelUnit[],
+): SortingStrategy {
 	const unitIndexByItemIndex = new Map<number, number>();
 	const indexById = new Map<UniqueIdentifier, number>();
 	items.forEach((id, index) => {

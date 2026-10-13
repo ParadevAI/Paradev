@@ -14,7 +14,13 @@ import {
 	DropdownMenuSubTrigger,
 } from "@superset/ui/dropdown-menu";
 import { HiCheck } from "react-icons/hi2";
-import { LuEyeOff, LuPalette, LuPencil, LuTrash2 } from "react-icons/lu";
+import {
+	LuEyeOff,
+	LuFolderPlus,
+	LuPalette,
+	LuPencil,
+	LuTrash2,
+} from "react-icons/lu";
 import {
 	PROJECT_COLOR_DEFAULT,
 	PROJECT_COLORS,
@@ -36,6 +42,7 @@ export function SectionActionsMenuItems({
 	onSetColor,
 	onDelete,
 	onHide,
+	onCreateSubGroup,
 }: SectionActionsMenuItemsProps) {
 	const { t } = useLingui();
 	const selectedValue = color ?? PROJECT_COLOR_DEFAULT;
@@ -131,6 +138,17 @@ export function SectionActionsMenuItems({
 
 	return (
 		<>
+			{onCreateSubGroup
+				? renderItem({
+						onSelect: onCreateSubGroup,
+						children: (
+							<>
+								<LuFolderPlus className={iconClassName} />
+								<Trans>New sub-group</Trans>
+							</>
+						),
+					})
+				: null}
 			{renderItem({
 				onSelect: onRename,
 				children: (

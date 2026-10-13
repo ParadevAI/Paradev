@@ -48,10 +48,11 @@ import type {
 } from "../../types";
 import { DRAG_ACTIVATION_DISTANCE_PX } from "./constants";
 import {
-	buildTopLevelUnits,
+	buildSiblingUnits,
 	closestUnitCenter,
-	createSectionUnitSortingStrategy,
+	createUnitSortingStrategy,
 	findUnitIndex,
+	type TopLevelUnit,
 } from "./sectionUnits";
 
 // ── ID helpers ───────────────────────────────────────────────────────
@@ -109,6 +110,11 @@ interface SidebarDndItems {
 	 * update the dragged row's entry from its landing neighbors.
 	 */
 	membership: Record<string, string>;
+	/**
+	 * Sub-section header flat id → its parent header's flat id. Fixed for a
+	 * drag: a section drag reorders siblings and never re-parents.
+	 */
+	sectionParents: Record<string, string>;
 }
 
 /**
@@ -200,6 +206,74 @@ function buildMembership(
 	return membership;
 }
 
+function collectSectionParents(
+	children: DashboardSidebarProjectChild[],
+	into: Record<string, string>,
+): void {
+	for (const child of children) {
+		if (child.type !== "section" || child.section.parentId === null) continue;
+		into[secId(child.section.id)] = secId(child.section.parentId);
+	}
+}
+
+function buildSectionParents(
+	projects: DashboardSidebarProject[],
+	sessionChildren: DashboardSidebarProjectChild[],
+): Record<string, string> {
+	const sectionParents: Record<string, string> = {};
+	for (const project of projects) {
+		collectSectionParents(project.children, sectionParents);
+	}
+	collectSectionParents(sessionChildren, sectionParents);
+	return sectionParents;
+}
+
+/**
+ * The units a section drag sorts: the dragged header's siblings. A top-level
+ * header trades places with every top-level unit; a sub-section header only
+ * with the sub-sections of its own parent.
+ */
+function getSectionDragUnits(
+	items: SidebarDndItems,
+	container: string,
+	activeId: UniqueIdentifier,
+): TopLevelUnit[] {
+	const parent = items.sectionParents[String(activeId)] ?? null;
+	return buildSiblingUnits(getContainerList(items, container), {
+		membership: items.membership,
+		sectionParents: items.sectionParents,
+		isSection: isSec,
+		parent,
+		sectionsOnly: parent !== null,
+	});
+}
+
+/**
+ * The list with `units` reordered in place. Sibling units always sit in one
+ * contiguous run of the list (a lane, or the tail of a parent's subtree);
+ * returns null if they don't, rather than scramble rows outside them.
+ */
+function moveUnitInList(
+	list: UniqueIdentifier[],
+	units: TopLevelUnit[],
+	oldIndex: number,
+	newIndex: number,
+): UniqueIdentifier[] | null {
+	const moved = arrayMove(units, oldIndex, newIndex).flatMap(
+		(unit) => unit.ids,
+	);
+	const unitIds = new Set(moved);
+	const start = list.findIndex((id) => unitIds.has(id));
+	if (start === -1) return null;
+	const span = list.slice(start, start + moved.length);
+	if (!span.every((id) => unitIds.has(id))) return null;
+	return [
+		...list.slice(0, start),
+		...moved,
+		...list.slice(start + moved.length),
+	];
+}
+
 function fingerprintChildren(children: DashboardSidebarProjectChild[]): string {
 	return children
 		.map((c) =>
@@ -266,19 +340,35 @@ function membershipFromNeighbors(
 interface ParsedFlatItems {
 	topLevel: Array<{ type: "workspace" | "section"; id: string }>;
 	sections: Record<string, string[]>;
+	/** Parent section real id → its sub-sections' real ids, in order. */
+	subSections: Record<string, string[]>;
 }
 
 function parseFlatItems(
 	items: UniqueIdentifier[],
 	membership: Record<string, string>,
+	sectionParents: Record<string, string> = {},
 ): ParsedFlatItems {
-	const result: ParsedFlatItems = { topLevel: [], sections: {} };
+	const result: ParsedFlatItems = {
+		topLevel: [],
+		sections: {},
+		subSections: {},
+	};
 
 	for (const id of items) {
 		const parsed = parseId(id);
 		if (!parsed) continue;
 		if (parsed.type === "section") {
-			result.topLevel.push({ type: "section", id: parsed.realId });
+			const parentFlatId = sectionParents[String(id)];
+			const parentRealId = parentFlatId
+				? parseId(parentFlatId)?.realId
+				: undefined;
+			if (parentRealId && result.sections[parentRealId]) {
+				result.subSections[parentRealId] ??= [];
+				result.subSections[parentRealId].push(parsed.realId);
+			} else {
+				result.topLevel.push({ type: "section", id: parsed.realId });
+			}
 			result.sections[parsed.realId] ??= [];
 		} else if (parsed.type === "workspace") {
 			const sectionFlatId = membership[String(id)];
@@ -422,6 +512,7 @@ export function useSidebarDnd({
 	const {
 		reorderPinnedWorkspaces,
 		reorderProjectChildren,
+		reorderSubSections,
 		setSectionWorkspaceOrder,
 		setWorkspacePinned,
 	} = useDashboardSidebarState();
@@ -468,6 +559,7 @@ export function useSidebarDnd({
 			projects.map((project) => [project.id, buildFlatItems(project.children)]),
 		),
 		membership: buildMembership(projects, sessionChildren),
+		sectionParents: buildSectionParents(projects, sessionChildren),
 	}));
 	// Drag handlers read AND write these refs synchronously: pointer events can
 	// batch faster than React re-renders (especially under main-thread stalls),
@@ -565,6 +657,7 @@ export function useSidebarDnd({
 					]),
 				),
 				membership: buildMembership(projects, sessionChildren),
+				sectionParents: buildSectionParents(projects, sessionChildren),
 			});
 		}
 	}, [
@@ -617,7 +710,9 @@ export function useSidebarDnd({
 	const collapsedSectionIds = useMemo(() => {
 		const set = new Set<string>();
 		for (const section of sectionsById.values()) {
-			if (section.isCollapsed) set.add(section.id);
+			if (section.isCollapsed || section.isAncestorCollapsed) {
+				set.add(section.id);
+			}
 		}
 		return set;
 	}, [sectionsById]);
@@ -702,16 +797,19 @@ export function useSidebarDnd({
 	// block, the dragged group included.
 	const getContainerSortingStrategy = useCallback(
 		(containerId: string): SortingStrategy => {
-			if (activeType === "section" && activeContainer === containerId) {
-				return createSectionUnitSortingStrategy(
+			if (
+				activeId &&
+				activeType === "section" &&
+				activeContainer === containerId
+			) {
+				return createUnitSortingStrategy(
 					getContainerList(items, containerId),
-					items.membership,
-					isSec,
+					getSectionDragUnits(items, containerId, activeId),
 				);
 			}
 			return verticalListSortingStrategy;
 		},
-		[items, activeType, activeContainer],
+		[items, activeId, activeType, activeContainer],
 	);
 
 	// ── Collision detection ──────────────────────────────────────────
@@ -765,15 +863,11 @@ export function useSidebarDnd({
 				// come from the transform-agnostic droppable rects, so the hop
 				// past a group happens when the ghost's center crosses the group's
 				// un-displaced center — no feedback from the displacement itself.
-				const current = itemsRef.current;
 				const container = containerByIdRef.current.get(args.active.id);
 				if (!container) return [];
-				const units = buildTopLevelUnits(
-					getContainerList(current, container),
-					current.membership,
-					isSec,
-				);
-				return closestUnitCenter(units)(args);
+				return closestUnitCenter(
+					getSectionDragUnits(itemsRef.current, container, args.active.id),
+				)(args);
 			}
 
 			if (type === "workspace") {
@@ -829,7 +923,11 @@ export function useSidebarDnd({
 			membership: Record<string, string>,
 		) => {
 			const projectId = laneProjectIdForScope(container);
-			const parsed = parseFlatItems(list, membership);
+			const parsed = parseFlatItems(
+				list,
+				membership,
+				itemsRef.current.sectionParents,
+			);
 
 			// Top-level order (ungrouped workspaces + sections interleaved)
 			reorderProjectChildren(projectId, parsed.topLevel);
@@ -838,8 +936,13 @@ export function useSidebarDnd({
 			for (const [sectionId, wsIds] of Object.entries(parsed.sections)) {
 				setSectionWorkspaceOrder(projectId, sectionId, wsIds);
 			}
+
+			// Each section's sub-section order
+			for (const childIds of Object.values(parsed.subSections)) {
+				reorderSubSections(childIds);
+			}
 		},
-		[reorderProjectChildren, setSectionWorkspaceOrder],
+		[reorderProjectChildren, reorderSubSections, setSectionWorkspaceOrder],
 	);
 
 	const persistWorkspaceDrop = useCallback(
@@ -998,19 +1101,17 @@ export function useSidebarDnd({
 				}
 				const list = getContainerList(current, container);
 
-				// Section drag: reorder among top-level units (a section unit
-				// carries its member rows) and flatten back out. Sections sort
-				// against ungrouped rows exactly like any other item.
-				const units = buildTopLevelUnits(list, current.membership, isSec);
+				// Section drag: reorder among sibling units (a section unit
+				// carries its rows and sub-sections) and splice back in place.
+				// Top-level sections sort against ungrouped rows like any
+				// other item; sub-sections only among their siblings.
+				const units = getSectionDragUnits(current, container, active.id);
 				const oldIdx = findUnitIndex(units, active.id);
 				const newIdx = findUnitIndex(units, over.id);
 				if (oldIdx === -1 || newIdx === -1 || oldIdx === newIdx) return;
 
-				const rebuilt = arrayMove(units, oldIdx, newIdx).flatMap(
-					(unit) => unit.ids,
-				);
-
-				const newList = rebuilt;
+				const newList = moveUnitInList(list, units, oldIdx, newIdx);
+				if (!newList) return;
 				commitDragItems(withContainerList(current, container, newList));
 				dropWriteIdsRef.current = workspaceIdsOf(newList);
 				commitContainerToDb(container, newList, current.membership);

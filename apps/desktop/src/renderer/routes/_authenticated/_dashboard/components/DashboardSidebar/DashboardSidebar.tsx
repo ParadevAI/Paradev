@@ -271,7 +271,9 @@ export function DashboardSidebar({
 				// Members of collapsed groups are hidden and unclickable; keeping
 				// them selected would leave invisible rows armed for bulk actions
 				// (including Delete), so collapsing prunes them from the selection.
-				if (child.section.isCollapsed) continue;
+				if (child.section.isCollapsed || child.section.isAncestorCollapsed) {
+					continue;
+				}
 				for (const workspace of child.section.workspaces) {
 					addWorkspace(workspace);
 				}

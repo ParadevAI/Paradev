@@ -5,6 +5,7 @@ import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/Host
 import {
 	deriveSessionTagFolders,
 	deriveTagFolders,
+	orderFolderTree,
 	useTagFolderContext,
 } from "renderer/routes/_authenticated/utils/workspaceTagFolders";
 
@@ -12,6 +13,8 @@ export interface ProjectTagFolderSection {
 	id: string;
 	name: string;
 	color: string | null;
+	/** 0 for a top-level folder; menus indent sub-folders by it. */
+	depth: number;
 }
 
 /**
@@ -49,20 +52,25 @@ export function useProjectTagFolderSections(projectId: string | null): {
 			return deriveSessionTagFolders(
 				hostWorkspaces,
 				tagFolderContext.tagSettings,
-			).map(({ tag, name, color }) => ({ id: tag, name, color }));
+			).map(({ tag, name, color }) => ({ id: tag, name, color, depth: 0 }));
 		}
-		return deriveTagFolders(storedSections, hostWorkspaces, tagFolderContext)
+		const folders = deriveTagFolders(
+			storedSections,
+			hostWorkspaces,
+			tagFolderContext,
+		)
 			.filter((section) => section.projectId === projectId)
-			.sort(
-				(left, right) =>
-					left.tabOrder - right.tabOrder ||
-					left.sectionId.localeCompare(right.sectionId),
-			)
-			.map((section) => ({
-				id: section.sectionId,
-				name: section.name,
-				color: section.color,
-			}));
+			.map((section) => ({ ...section, id: section.sectionId }));
+		return orderFolderTree(
+			folders,
+			(left, right) =>
+				left.tabOrder - right.tabOrder || left.id.localeCompare(right.id),
+		).map(({ folder, depth }) => ({
+			id: folder.id,
+			name: folder.name,
+			color: folder.color,
+			depth,
+		}));
 	}, [projectId, storedSections, hostWorkspaces, tagFolderContext]);
 	// Derived folders come from host rows, so "ready" needs the host fan-out
 	// too — otherwise the menu claims a complete list before tags arrive.

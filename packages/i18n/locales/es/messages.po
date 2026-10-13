@@ -10301,6 +10301,9 @@ msgstr "Nueva shell"
 msgid "New stars"
 msgstr "Estrellas nuevas"
 
+msgid "New sub-group"
+msgstr "Nuevo subgrupo"
+
 msgid "new tab"
 msgstr "pestaña nueva"
 

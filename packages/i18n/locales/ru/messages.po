@@ -10301,6 +10301,9 @@ msgstr "Новая оболочка"
 msgid "New stars"
 msgstr "Новые звёзды"
 
+msgid "New sub-group"
+msgstr "Новая подгруппа"
+
 msgid "new tab"
 msgstr "новая вкладка"
 

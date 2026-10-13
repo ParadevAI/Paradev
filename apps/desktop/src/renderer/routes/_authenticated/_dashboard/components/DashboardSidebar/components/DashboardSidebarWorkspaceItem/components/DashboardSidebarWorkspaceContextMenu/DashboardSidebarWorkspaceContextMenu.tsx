@@ -31,7 +31,10 @@ import {
 } from "react-icons/lu";
 import { useHotkeyDisplay } from "renderer/hotkeys";
 import { useDashboardSidebarPortKill } from "../../../../hooks/useDashboardSidebarPortKill";
-import { useProjectTagFolderSections } from "../../../../hooks/useProjectTagFolderSections";
+import {
+	MENU_SUB_GROUP_INDENT_PX,
+	useProjectTagFolderSections,
+} from "../../../../hooks/useProjectTagFolderSections";
 import { useRunAfterMenuClose } from "../../../../hooks/useRunAfterMenuClose";
 import { useDashboardSidebarHoverActions } from "../../../../providers/DashboardSidebarHoverProvider";
 import { useDashboardSidebarWorkspacePorts } from "../../../../providers/DashboardSidebarPortsProvider";
@@ -200,6 +203,15 @@ export function DashboardSidebarWorkspaceContextMenu({
 										key={section.id}
 										onSelect={() => onMoveToSection(section.id)}
 									>
+										{section.depth > 0 && (
+											<span
+												aria-hidden
+												className="shrink-0"
+												style={{
+													width: section.depth * MENU_SUB_GROUP_INDENT_PX,
+												}}
+											/>
+										)}
 										{section.color && (
 											<span
 												className="size-2 shrink-0 rounded-full mr-2"

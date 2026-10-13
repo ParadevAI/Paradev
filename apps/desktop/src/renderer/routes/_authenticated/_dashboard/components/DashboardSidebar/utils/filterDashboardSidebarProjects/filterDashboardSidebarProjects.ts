@@ -2,6 +2,7 @@ import type {
 	DashboardSidebarProject,
 	DashboardSidebarProjectChild,
 } from "../../types";
+import { groupProjectChildrenByTopLevel } from "../projectChildren";
 
 function matches(text: string, normalizedQuery: string): boolean {
 	return text.toLowerCase().includes(normalizedQuery);
@@ -16,39 +17,102 @@ function expandProject(
 	return project.isCollapsed ? { ...project, isCollapsed: false } : project;
 }
 
+type SectionChild = Extract<DashboardSidebarProjectChild, { type: "section" }>;
+
 function expandSection(
-	child: Extract<DashboardSidebarProjectChild, { type: "section" }>,
+	child: SectionChild,
+	workspaces = child.section.workspaces,
 ): DashboardSidebarProjectChild {
-	return child.section.isCollapsed
-		? { type: "section", section: { ...child.section, isCollapsed: false } }
-		: child;
+	const { section } = child;
+	if (
+		!section.isCollapsed &&
+		!section.isAncestorCollapsed &&
+		workspaces === section.workspaces
+	) {
+		return child;
+	}
+	return {
+		type: "section",
+		section: {
+			...section,
+			isCollapsed: false,
+			isAncestorCollapsed: false,
+			workspaces,
+		},
+	};
+}
+
+/**
+ * One top-level group and its sub-groups. A group stays when its name
+ * matches (whole, with everything below it), when it holds a matching row,
+ * or when a sub-group below it stays — so a match is never cut off from the
+ * groups that lead to it.
+ */
+function filterSectionUnit(
+	unit: SectionChild[],
+	normalizedQuery: string,
+): DashboardSidebarProjectChild[] {
+	const keptWorkspaces = new Map<
+		string,
+		SectionChild["section"]["workspaces"]
+	>();
+	const isNameMatchedById = new Map<string, boolean>();
+	for (const child of unit) {
+		const { section } = child;
+		const isNameMatched =
+			matches(section.name, normalizedQuery) ||
+			(section.parentId !== null &&
+				(isNameMatchedById.get(section.parentId) ?? false));
+		isNameMatchedById.set(section.id, isNameMatched);
+		const workspaces = isNameMatched
+			? section.workspaces
+			: section.workspaces.filter((workspace) =>
+					matches(workspace.name, normalizedQuery),
+				);
+		if (isNameMatched || workspaces.length > 0) {
+			keptWorkspaces.set(section.id, workspaces);
+		}
+	}
+	// Children follow their parent, so a reverse walk sees every kept
+	// sub-group before deciding on its parent.
+	for (const child of [...unit].reverse()) {
+		const { section } = child;
+		if (!keptWorkspaces.has(section.id) || section.parentId === null) continue;
+		if (!keptWorkspaces.has(section.parentId)) {
+			keptWorkspaces.set(section.parentId, []);
+		}
+	}
+	return unit.flatMap((child) => {
+		const workspaces = keptWorkspaces.get(child.section.id);
+		if (!workspaces) return [];
+		return [
+			expandSection(
+				child,
+				workspaces.length === child.section.workspaces.length
+					? child.section.workspaces
+					: workspaces,
+			),
+		];
+	});
 }
 
 function filterChildren(
 	children: DashboardSidebarProjectChild[],
 	normalizedQuery: string,
 ): DashboardSidebarProjectChild[] {
-	return children.flatMap((child): DashboardSidebarProjectChild[] => {
-		if (child.type === "workspace") {
-			return matches(child.workspace.name, normalizedQuery) ? [child] : [];
-		}
-		if (matches(child.section.name, normalizedQuery)) {
-			return [expandSection(child)];
-		}
-		const workspaces = child.section.workspaces.filter((workspace) =>
-			matches(workspace.name, normalizedQuery),
-		);
-		if (workspaces.length === 0) return [];
-		if (workspaces.length === child.section.workspaces.length) {
-			return [expandSection(child)];
-		}
-		return [
-			{
-				type: "section",
-				section: { ...child.section, isCollapsed: false, workspaces },
-			},
-		];
-	});
+	return groupProjectChildrenByTopLevel(children).flatMap(
+		(unit): DashboardSidebarProjectChild[] => {
+			const [head] = unit;
+			if (!head) return [];
+			if (head.type === "workspace") {
+				return matches(head.workspace.name, normalizedQuery) ? [head] : [];
+			}
+			return filterSectionUnit(
+				unit.filter((child): child is SectionChild => child.type === "section"),
+				normalizedQuery,
+			);
+		},
+	);
 }
 
 /**

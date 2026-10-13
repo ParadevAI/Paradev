@@ -10301,6 +10301,9 @@ msgstr "新しいシェル"
 msgid "New stars"
 msgstr "新規スター"
 
+msgid "New sub-group"
+msgstr "新規サブグループ"
+
 msgid "new tab"
 msgstr "新しいタブ"
 

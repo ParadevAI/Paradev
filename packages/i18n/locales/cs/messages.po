@@ -10301,6 +10301,9 @@ msgstr "Nový shell"
 msgid "New stars"
 msgstr "Nové hvězdy"
 
+msgid "New sub-group"
+msgstr "Nová podskupina"
+
 msgid "new tab"
 msgstr "nová karta"
 

@@ -10301,6 +10301,9 @@ msgstr "新建 Shell"
 msgid "New stars"
 msgstr "新增星标"
 
+msgid "New sub-group"
+msgstr "新建子分组"
+
 msgid "new tab"
 msgstr "新标签页"
 

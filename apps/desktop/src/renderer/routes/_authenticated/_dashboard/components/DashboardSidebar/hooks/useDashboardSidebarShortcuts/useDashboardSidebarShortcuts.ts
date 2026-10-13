@@ -10,14 +10,17 @@ import type {
 	DashboardSidebarProjectChild,
 	DashboardSidebarWorkspace,
 } from "../../types";
-import { getProjectChildrenWorkspaces } from "../../utils/projectChildren";
+import {
+	getCollapsedSectionLineage,
+	getProjectChildrenWorkspaces,
+} from "../../utils/projectChildren";
 
 interface WorkspaceLocation {
 	/** Null for the Sessions section — no project row to expand. */
 	projectId: string | null;
 	projectIsCollapsed: boolean;
-	sectionId: string | null;
-	sectionIsCollapsed: boolean;
+	/** Collapsed groups hiding the row: its own and any enclosing group. */
+	collapsedSectionIds: string[];
 }
 
 const MAX_SHORTCUT_COUNT = 9;
@@ -104,13 +107,13 @@ export function useDashboardSidebarShortcuts(
 	const workspaceLocations = useMemo(() => {
 		const map = new Map<string, WorkspaceLocation>();
 		for (const project of groups) {
+			const collapsedLineage = getCollapsedSectionLineage(project.children);
 			for (const child of project.children) {
 				if (child.type === "workspace") {
 					map.set(child.workspace.id, {
 						projectId: project.id,
 						projectIsCollapsed: project.isCollapsed,
-						sectionId: null,
-						sectionIsCollapsed: false,
+						collapsedSectionIds: [],
 					});
 					continue;
 				}
@@ -118,8 +121,7 @@ export function useDashboardSidebarShortcuts(
 					map.set(workspace.id, {
 						projectId: project.id,
 						projectIsCollapsed: project.isCollapsed,
-						sectionId: child.section.id,
-						sectionIsCollapsed: child.section.isCollapsed,
+						collapsedSectionIds: collapsedLineage.get(child.section.id) ?? [],
 					});
 				}
 			}
@@ -128,18 +130,18 @@ export function useDashboardSidebarShortcuts(
 			map.set(workspace.id, {
 				projectId: null,
 				projectIsCollapsed: false,
-				sectionId: null,
-				sectionIsCollapsed: false,
+				collapsedSectionIds: [],
 			});
 		}
+		const sessionCollapsedLineage = getCollapsedSectionLineage(sessionChildren);
 		for (const child of sessionChildren) {
 			if (child.type !== "section") continue;
 			for (const workspace of child.section.workspaces) {
 				map.set(workspace.id, {
 					projectId: null,
 					projectIsCollapsed: false,
-					sectionId: child.section.id,
-					sectionIsCollapsed: child.section.isCollapsed,
+					collapsedSectionIds:
+						sessionCollapsedLineage.get(child.section.id) ?? [],
 				});
 			}
 		}
@@ -163,8 +165,8 @@ export function useDashboardSidebarShortcuts(
 			if (location.projectId !== null && location.projectIsCollapsed) {
 				toggleProjectCollapsed(location.projectId);
 			}
-			if (location.sectionId && location.sectionIsCollapsed) {
-				toggleSectionCollapsed(location.sectionId);
+			for (const sectionId of location.collapsedSectionIds) {
+				toggleSectionCollapsed(sectionId);
 			}
 		},
 		[

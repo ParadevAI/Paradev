@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import type { ClientRect } from "@dnd-kit/core";
 import {
+	buildSiblingUnits,
 	buildTopLevelUnits,
 	closestUnitCenter,
 	createSectionUnitSortingStrategy,
@@ -172,5 +173,53 @@ describe("closestUnitCenter", () => {
 		expect(at(100)).toBe("sec::a"); // over B's header row, still nearer A
 		expect(at(130)).toBe("sec::b");
 		expect(at(230)).toBe("ws::tail");
+	});
+});
+
+describe("units with sub-sections", () => {
+	// Section A holds a row and sub-sections A/x and A/y; then a loose row.
+	const nestedItems = [
+		"sec::a",
+		"ws::a1",
+		"sec::a/x",
+		"ws::x1",
+		"sec::a/y",
+		"ws::y1",
+		"ws::tail",
+	];
+	const nestedMembership = {
+		"ws::a1": "sec::a",
+		"ws::x1": "sec::a/x",
+		"ws::y1": "sec::a/y",
+	};
+	const sectionParents = { "sec::a/x": "sec::a", "sec::a/y": "sec::a" };
+
+	test("a top-level section unit carries its sub-sections and their rows", () => {
+		expect(
+			buildTopLevelUnits(
+				nestedItems,
+				nestedMembership,
+				isSection,
+				sectionParents,
+			).map((unit) => unit.ids),
+		).toEqual([
+			["sec::a", "ws::a1", "sec::a/x", "ws::x1", "sec::a/y", "ws::y1"],
+			["ws::tail"],
+		]);
+	});
+
+	test("a sub-section sorts only among its sibling sub-sections", () => {
+		expect(
+			buildSiblingUnits(nestedItems, {
+				membership: nestedMembership,
+				sectionParents,
+				isSection,
+				parent: "sec::a",
+				sectionsOnly: true,
+			}).map((unit) => unit.ids),
+		).toEqual([
+			["sec::a/x", "ws::x1"],
+			["sec::a/y", "ws::y1"],
+		]);
 	});
 });

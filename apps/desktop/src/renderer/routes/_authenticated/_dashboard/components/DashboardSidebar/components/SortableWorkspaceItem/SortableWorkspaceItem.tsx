@@ -17,6 +17,8 @@ interface SortableWorkspaceItemProps {
 	accentColor?: string | null;
 	isInSection?: boolean;
 	indentation?: DashboardSidebarWorkspaceIndentation;
+	/** Left offset for a row inside a sub-group. */
+	nestingOffsetPx?: number;
 	onHoverCardOpen?: (workspaceId: string) => void | Promise<void>;
 	shortcutLabel?: string;
 	disabled?: boolean;
@@ -44,6 +46,7 @@ export function SortableWorkspaceItem({
 	accentColor,
 	isInSection,
 	indentation,
+	nestingOffsetPx,
 	onHoverCardOpen,
 	shortcutLabel,
 	disabled,
@@ -102,6 +105,7 @@ export function SortableWorkspaceItem({
 				transition,
 				opacity: isDragging || isDragPlaceholder ? 0.5 : undefined,
 				boxShadow: accentColor ? `inset 3px 0 ${accentColor}` : undefined,
+				marginLeft: nestingOffsetPx || undefined,
 			}}
 			{...getBlockedDragProps(isChildDragDisabled)}
 			{...attributes}

@@ -5,6 +5,8 @@ export interface DashboardSidebarSectionActionsProps {
 	onDelete: () => void;
 	/** Tag-backed folders only: hide the folder without untagging anyone. */
 	onHide?: () => void;
+	/** Set when the folder can hold another level of sub-folders. */
+	onCreateSubGroup?: () => void;
 }
 
 export type SectionActionsMenuKind = "context" | "dropdown";

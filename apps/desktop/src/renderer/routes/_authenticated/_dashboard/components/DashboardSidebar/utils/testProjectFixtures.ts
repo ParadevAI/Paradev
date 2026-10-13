@@ -40,6 +40,9 @@ export function makeSection(
 		isCollapsed: false,
 		tabOrder: 0,
 		color: null,
+		parentId: null,
+		depth: 0,
+		isAncestorCollapsed: false,
 		workspaces: [],
 		...overrides,
 	};

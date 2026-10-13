@@ -10301,6 +10301,9 @@ msgstr "Yeni kabuk"
 msgid "New stars"
 msgstr "Yeni yıldızlar"
 
+msgid "New sub-group"
+msgstr "Yeni alt grup"
+
 msgid "new tab"
 msgstr "yeni sekme"
 

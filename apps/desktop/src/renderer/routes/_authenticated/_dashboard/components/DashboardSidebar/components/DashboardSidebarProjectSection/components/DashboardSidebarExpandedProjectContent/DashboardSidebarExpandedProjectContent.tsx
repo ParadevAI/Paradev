@@ -17,6 +17,7 @@ import { WorkspaceBulkMenuScope } from "../../../DashboardSidebarWorkspaceItem/c
 import { SidebarDropZone } from "../../../SidebarDropZone";
 import { SortableSectionHeader } from "../../../SortableSectionHeader";
 import { SortableWorkspaceItem } from "../../../SortableWorkspaceItem";
+import { SUB_GROUP_INDENT_PX } from "./constants";
 
 const isBulkSelectable = (workspace: DashboardSidebarWorkspace) =>
 	workspace.pendingTransaction?.type !== "insert";
@@ -81,6 +82,19 @@ export function DashboardSidebarExpandedProjectContent({
 		[projectItems, sessionItems, containerId],
 	);
 	const sortingStrategy = getContainerSortingStrategy(containerId);
+	// Rows of a dragged group's sub-groups travel with it, so they dim too.
+	const isInActiveSection = (sectionId: string): boolean => {
+		if (activeSectionId === null) return false;
+		let cursor = sectionsById.get(sectionId);
+		while (cursor) {
+			if (cursor.id === activeSectionId) return true;
+			cursor =
+				cursor.parentId === null
+					? undefined
+					: sectionsById.get(cursor.parentId);
+		}
+		return false;
+	};
 	const { isWorkspaceSelected, selectWorkspaceFromEvent } =
 		useDashboardSidebarSelection();
 
@@ -135,6 +149,11 @@ export function DashboardSidebarExpandedProjectContent({
 												sortableId={String(id)}
 												section={section}
 												indentation={topLevelIndentation}
+												nestingOffsetPx={section.depth * SUB_GROUP_INDENT_PX}
+												isDragPlaceholder={
+													section.parentId !== null &&
+													isInActiveSection(section.parentId)
+												}
 												onDelete={onDeleteSection}
 												onRename={onRenameSection}
 												onToggleCollapse={onToggleSectionCollapse}
@@ -149,7 +168,10 @@ export function DashboardSidebarExpandedProjectContent({
 									const isInCollapsedSection =
 										isInSection && collapsedSectionIds.has(group.sectionId);
 									const inDraggedSection =
-										isInSection && group.sectionId === activeSectionId;
+										isInSection && isInActiveSection(group.sectionId);
+									const sectionDepth = isInSection
+										? (sectionsById.get(group.sectionId)?.depth ?? 0)
+										: 0;
 									const canBulkSelect = isBulkSelectable(workspace);
 
 									// The zero-height collapse lives inside the sortable wrapper
@@ -167,6 +189,7 @@ export function DashboardSidebarExpandedProjectContent({
 											indentation={
 												isInSection ? groupedIndentation : topLevelIndentation
 											}
+											nestingOffsetPx={sectionDepth * SUB_GROUP_INDENT_PX}
 											onHoverCardOpen={onWorkspaceHover}
 											shortcutLabel={workspaceShortcutLabels.get(parsed.realId)}
 											isSelected={

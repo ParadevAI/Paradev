@@ -78,6 +78,13 @@ export interface DashboardSidebarSection {
 	isCollapsed: boolean;
 	tabOrder: number;
 	color: string | null;
+	/** The enclosing group; null for a group at the top of the lane. */
+	parentId: string | null;
+	/** 0 for a top-level group, 1 for its sub-groups, and so on. */
+	depth: number;
+	/** Some enclosing group is collapsed, so this one is out of view. */
+	isAncestorCollapsed: boolean;
+	/** Direct members only; sub-group members live on the sub-group. */
 	workspaces: DashboardSidebarWorkspace[];
 }
 
@@ -92,6 +99,11 @@ export interface DashboardSidebarSessions {
 	workspaces: DashboardSidebarWorkspace[];
 }
 
+/**
+ * A lane's children are flat: a group is followed by its sub-groups in
+ * pre-order, each carrying `parentId` and `depth`, so every consumer that
+ * walks groups and their members sees each workspace exactly once.
+ */
 export type DashboardSidebarProjectChild =
 	| {
 			type: "workspace";

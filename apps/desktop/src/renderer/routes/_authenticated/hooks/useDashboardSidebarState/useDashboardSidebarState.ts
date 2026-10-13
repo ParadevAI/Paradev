@@ -28,8 +28,13 @@ import { useLocalHostService } from "renderer/routes/_authenticated/providers/Lo
 import {
 	applyFolderTagChange,
 	buildSidebarFolderKey,
+	canCreateSubFolder,
 	deriveTagFolders,
+	getFolderTagLeaf,
+	getFolderTagPath,
+	getParentFolderTag,
 	getProjectFolderTagIndex,
+	isFolderTagWithin,
 	laneProjectIdForScope,
 	mintFolderTag,
 	parseSidebarFolderKey,
@@ -59,6 +64,20 @@ type ProjectTopLevelCollections = Pick<
 	AppCollections,
 	"v2SidebarSections" | "v2WorkspaceLocalState"
 >;
+
+/** A stored folder row that renders inside another folder, not in the lane. */
+function isSubFolderRow(row: { tag?: string | null }): boolean {
+	const tag = normalizeWorkspaceTag(row.tag);
+	return tag !== null && getParentFolderTag(tag) !== null;
+}
+
+/** The top-level folder a (possibly nested) folder key lives under. */
+function getRootFolderId(sectionId: string | null): string | null {
+	const parsed = parseSidebarFolderKey(sectionId);
+	if (!parsed) return sectionId;
+	const [rootTag = parsed.tag] = getFolderTagPath(parsed.tag);
+	return buildSidebarFolderKey(parsed.projectId, rootTag);
+}
 
 function compareProjectTopLevelItems(
 	left: ProjectTopLevelItem,
@@ -114,10 +133,12 @@ function getProjectTopLevelItems(
 			})),
 		// Stored rows only: a derived-only folder has no row to renumber, and
 		// its synthetic tabOrder floor must never feed getNextTabOrder math.
+		// Sub-folders order among their siblings, not in the lane.
 		...Array.from(collections.v2SidebarSections.state.values())
 			.filter(
 				(item) =>
 					item.projectId === scope &&
+					!isSubFolderRow(item) &&
 					item.sectionId !== options.excludeSectionId,
 			)
 			.map((item) => ({
@@ -126,6 +147,24 @@ function getProjectTopLevelItems(
 				tabOrder: item.tabOrder,
 			})),
 	].sort(compareProjectTopLevelItems);
+}
+
+/** Stored rows of the sub-folders directly under `parentTag`. */
+function getSubFolderRows(
+	collections: Pick<AppCollections, "v2SidebarSections">,
+	scope: string,
+	parentTag: string,
+) {
+	return Array.from(collections.v2SidebarSections.state.values()).filter(
+		(item) => {
+			const tag = normalizeWorkspaceTag(item.tag);
+			return (
+				item.projectId === scope &&
+				tag !== null &&
+				getParentFolderTag(tag) === parentTag
+			);
+		},
+	);
 }
 
 function getProjectFolderIndex(
@@ -400,21 +439,24 @@ export function useDashboardSidebarState() {
 					setting.projectId === parsed.projectId &&
 					normalizeWorkspaceTag(setting.tag) === parsed.tag,
 			)?.tabOrder;
+			const parentTag = getParentFolderTag(parsed.tag);
 			collections.v2SidebarSections.insert({
 				sectionId,
 				projectId: parsed.projectId,
-				name: parsed.tag,
+				name: getFolderTagLeaf(parsed.tag),
 				tag: parsed.tag,
 				createdAt: new Date(),
 				tabOrder:
 					hostOrder ??
 					getNextTabOrder(
-						getProjectTopLevelItems(
-							collections,
-							hostWorkspaces,
-							tagFolderContext,
-							laneProjectIdForScope(parsed.projectId),
-						),
+						parentTag !== null
+							? getSubFolderRows(collections, parsed.projectId, parentTag)
+							: getProjectTopLevelItems(
+									collections,
+									hostWorkspaces,
+									tagFolderContext,
+									laneProjectIdForScope(parsed.projectId),
+								),
 					),
 				isCollapsed: false,
 				color: null,
@@ -545,6 +587,19 @@ export function useDashboardSidebarState() {
 		],
 	);
 
+	/** Writes sibling sub-folders' order; derived ones get a row so it sticks. */
+	const reorderSubSections = useCallback(
+		(sectionIds: string[]) => {
+			sectionIds.forEach((sectionId, index) => {
+				if (!ensureSectionRow(sectionId)) return;
+				collections.v2SidebarSections.update(sectionId, (draft) => {
+					draft.tabOrder = index + 1;
+				});
+			});
+		},
+		[collections, ensureSectionRow],
+	);
+
 	/**
 	 * Writes one folder's full member order. The caller hands over exactly the
 	 * rows the folder holds, so nothing is re-derived from the collection:
@@ -667,6 +722,52 @@ export function useDashboardSidebarState() {
 		[collections, hostWorkspaces, tagFolderContext, writeTagSetting],
 	);
 
+	/**
+	 * A folder inside `parentSectionId`: its tag is the parent's tag plus a
+	 * `/leaf`, so a CLI or agent can file into it the same way. Returns null
+	 * when the parent can't hold one (legacy folder, too deep, tag too long).
+	 */
+	const createSubSection = useCallback(
+		(parentSectionId: string, options: { name?: string } = {}) => {
+			const { name = "New group" } = options;
+			const parent = parseSidebarFolderKey(parentSectionId);
+			if (!parent || !canCreateSubFolder(parent.tag)) return null;
+			const scope = parent.projectId;
+			const folderIndex = getProjectFolderIndex(
+				collections,
+				hostWorkspaces,
+				tagFolderContext,
+				laneProjectIdForScope(scope),
+			);
+			const tag = mintFolderTag(name, folderIndex.keys(), parent.tag);
+			const sectionId = buildSidebarFolderKey(scope, tag);
+			if (collections.v2SidebarSections.get(sectionId)) return sectionId;
+
+			collections.v2SidebarSections.insert({
+				sectionId,
+				projectId: scope,
+				name,
+				createdAt: new Date(),
+				tabOrder: getNextTabOrder(
+					getSubFolderRows(collections, scope, parent.tag),
+				),
+				isCollapsed: false,
+				// No color of its own: it shows its parent's.
+				color: null,
+				tag,
+			});
+			writeTagSetting(scope, tag, { displayName: name });
+
+			if (collections.v2SidebarSections.get(parentSectionId)?.isCollapsed) {
+				collections.v2SidebarSections.update(parentSectionId, (draft) => {
+					draft.isCollapsed = false;
+				});
+			}
+			return sectionId;
+		},
+		[collections, hostWorkspaces, tagFolderContext, writeTagSetting],
+	);
+
 	const toggleSectionCollapsed = useCallback(
 		(sectionId: string) => {
 			if (!ensureSectionRow(sectionId)) return;
@@ -777,10 +878,10 @@ export function useDashboardSidebarState() {
 				// Groups interleave with ungrouped rows, so "before the first
 				// section" can be far from the row's group. Keep the row in
 				// place: land it directly below its former group.
+				const rootSectionId = getRootFolderId(effectiveSectionId);
 				const sectionIndex = sameProject
 					? topLevelItems.findIndex(
-							(item) =>
-								item.type === "section" && item.id === effectiveSectionId,
+							(item) => item.type === "section" && item.id === rootSectionId,
 						)
 					: -1;
 				const insertIndex =
@@ -852,76 +953,129 @@ export function useDashboardSidebarState() {
 			const projectId = laneProjectIdForScope(scope);
 			const folderTag =
 				normalizeWorkspaceTag(section?.tag) ?? parsed?.tag ?? null;
-
-			// Groups interleave with ungrouped rows, so replace the deleted
-			// section's own slot with its members instead of dumping them
-			// "before the first section" (which may be far away).
-			const withSection = getProjectTopLevelItems(
-				collections,
-				hostWorkspaces,
-				tagFolderContext,
-				projectId,
-			);
-			const sectionIndex = withSection.findIndex(
-				(item) => item.type === "section" && item.id === sectionId,
-			);
-			const topLevelItems = withSection.filter(
-				(item) => !(item.type === "section" && item.id === sectionId),
-			);
-			// Members come from the shared resolver — matching only rows whose
-			// raw sectionId pointer equals the deleted id stranded every
-			// tag-derived member.
-			const sectionWorkspaces = Array.from(
-				collections.v2WorkspaceLocalState.state.values(),
-			)
-				.filter(
-					(item) =>
-						item.sidebarState.projectId === projectId &&
-						isSidebarWorkspaceVisible(item) &&
-						getEffectiveSectionId(
-							collections,
-							hostWorkspaces,
-							tagFolderContext,
-							item,
-						) === sectionId,
-				)
-				.sort(
-					(left, right) =>
-						left.sidebarState.tabOrder - right.sidebarState.tabOrder,
+			const parentTag =
+				folderTag !== null ? getParentFolderTag(folderTag) : null;
+			// The folder takes its sub-folders with it.
+			const isInDeletedTree = (tag: string | null | undefined) => {
+				const normalized = normalizeWorkspaceTag(tag);
+				return (
+					folderTag !== null &&
+					normalized !== null &&
+					isFolderTagWithin(normalized, folderTag)
 				);
+			};
+			const isDeletedSection = (id: string | null) =>
+				id === sectionId ||
+				(folderTag !== null && isInDeletedTree(parseSidebarFolderKey(id)?.tag));
 
-			const insertIndex =
-				sectionIndex === -1
-					? getFirstSectionIndex(topLevelItems)
-					: sectionIndex;
-			topLevelItems.splice(
-				insertIndex,
-				0,
-				...sectionWorkspaces.map((workspace) => ({
-					type: "workspace" as const,
-					id: workspace.workspaceId,
-					tabOrder: 0,
-				})),
-			);
-			writeProjectTopLevelOrder(collections, projectId, topLevelItems);
+			if (parentTag === null) {
+				// Groups interleave with ungrouped rows, so replace the deleted
+				// section's own slot with its members instead of dumping them
+				// "before the first section" (which may be far away).
+				const withSection = getProjectTopLevelItems(
+					collections,
+					hostWorkspaces,
+					tagFolderContext,
+					projectId,
+				);
+				const sectionIndex = withSection.findIndex(
+					(item) => item.type === "section" && item.id === sectionId,
+				);
+				const topLevelItems = withSection.filter(
+					(item) => !(item.type === "section" && item.id === sectionId),
+				);
+				// Members come from the shared resolver — matching only rows
+				// whose raw sectionId pointer equals the deleted id stranded
+				// every tag-derived member.
+				const sectionWorkspaces = Array.from(
+					collections.v2WorkspaceLocalState.state.values(),
+				)
+					.filter(
+						(item) =>
+							item.sidebarState.projectId === projectId &&
+							isSidebarWorkspaceVisible(item) &&
+							isDeletedSection(
+								getEffectiveSectionId(
+									collections,
+									hostWorkspaces,
+									tagFolderContext,
+									item,
+								),
+							),
+					)
+					.sort(
+						(left, right) =>
+							left.sidebarState.tabOrder - right.sidebarState.tabOrder,
+					);
+
+				const insertIndex =
+					sectionIndex === -1
+						? getFirstSectionIndex(topLevelItems)
+						: sectionIndex;
+				topLevelItems.splice(
+					insertIndex,
+					0,
+					...sectionWorkspaces.map((workspace) => ({
+						type: "workspace" as const,
+						id: workspace.workspaceId,
+						tabOrder: 0,
+					})),
+				);
+				writeProjectTopLevelOrder(collections, projectId, topLevelItems);
+			}
 
 			// Untag every member on its host — the folder is the tag, so this
 			// is what actually deletes it. Members that carry the tag without a
-			// local row (filed from another machine) get untagged too.
+			// local row (filed from another machine) get untagged too. A
+			// sub-folder's members move up into its parent folder.
+			const removedTags = new Set<string>();
 			if (folderTag !== null) {
+				const folderIndex =
+					parentTag !== null
+						? getProjectFolderIndex(
+								collections,
+								hostWorkspaces,
+								tagFolderContext,
+								projectId,
+							)
+						: null;
 				for (const workspace of hostWorkspaces) {
 					if (workspace.projectId !== projectId) continue;
 					const tags = normalizeWorkspaceTags(workspace.tags);
-					if (!tags.includes(folderTag)) continue;
+					const deletedTags = tags.filter(isInDeletedTree);
+					if (deletedTags.length === 0) continue;
+					for (const tag of deletedTags) removedTags.add(tag);
 					writeWorkspaceTags(
 						workspace.id,
-						tags.filter((tag) => tag !== folderTag),
+						folderIndex
+							? applyFolderTagChange(tags, folderIndex.keys(), parentTag)
+							: tags.filter((tag) => !isInDeletedTree(tag)),
 					);
 				}
+				removedTags.add(folderTag);
 			}
 
-			if (folderTag !== null) removeTagSetting(scope, folderTag);
-			if (section) collections.v2SidebarSections.delete(sectionId);
+			const deletedRows = Array.from(
+				collections.v2SidebarSections.state.values(),
+			).filter(
+				(item) =>
+					item.sectionId === sectionId ||
+					(item.projectId === scope && isInDeletedTree(item.tag)),
+			);
+			for (const row of deletedRows) {
+				const tag = normalizeWorkspaceTag(row.tag);
+				if (tag !== null) removedTags.add(tag);
+			}
+			for (const setting of tagFolderContext.tagSettings) {
+				if (setting.projectId === scope && isInDeletedTree(setting.tag)) {
+					const tag = normalizeWorkspaceTag(setting.tag);
+					if (tag !== null) removedTags.add(tag);
+				}
+			}
+			for (const tag of removedTags) removeTagSetting(scope, tag);
+			for (const row of deletedRows) {
+				collections.v2SidebarSections.delete(row.sectionId);
+			}
 		},
 		[
 			collections,
@@ -1052,6 +1206,7 @@ export function useDashboardSidebarState() {
 
 	return {
 		createSection,
+		createSubSection,
 		deleteSection,
 		ensureProjectInSidebar,
 		ensureWorkspaceInSidebar,
@@ -1061,6 +1216,7 @@ export function useDashboardSidebarState() {
 		setProjectHidden,
 		reorderPinnedWorkspaces,
 		reorderProjectChildren,
+		reorderSubSections,
 		removeWorkspaceFromSidebar,
 		reorderProjects,
 		reorderWorkspaces,

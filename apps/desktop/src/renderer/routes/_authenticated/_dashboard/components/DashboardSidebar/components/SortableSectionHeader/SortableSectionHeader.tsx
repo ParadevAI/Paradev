@@ -1,11 +1,15 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { SESSIONS_TAG_SCOPE } from "@superset/shared/workspace-tags";
+import { cn } from "@superset/ui/utils";
 import { useCallback, useEffect, useState } from "react";
 import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
 import { useDashboardSidebarSectionRename } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/components/DashboardSidebarSectionRenameContext";
 import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
-import { parseSidebarFolderKey } from "renderer/routes/_authenticated/utils/workspaceTagFolders";
+import {
+	canCreateSubFolder,
+	parseSidebarFolderKey,
+} from "renderer/routes/_authenticated/utils/workspaceTagFolders";
 import { RenameInput } from "renderer/screens/main/components/WorkspaceSidebar/RenameInput";
 import { PROJECT_COLOR_DEFAULT } from "shared/constants/project-colors";
 import { getBlockedDragProps } from "../../hooks/useBlockedDragNotice";
@@ -25,6 +29,10 @@ interface SortableSectionHeaderProps {
 	section: DashboardSidebarSection;
 	/** Column of the lane's ungrouped rows; the header lines up with them. */
 	indentation?: Exclude<DashboardSidebarWorkspaceIndentation, "grouped">;
+	/** Left offset for a sub-group header. */
+	nestingOffsetPx?: number;
+	/** An enclosing group is being dragged: dim like the rows travelling with it. */
+	isDragPlaceholder?: boolean;
 	onDelete: (sectionId: string) => void;
 	onRename: (sectionId: string, name: string) => void;
 	onToggleCollapse: (sectionId: string) => void;
@@ -34,14 +42,19 @@ export function SortableSectionHeader({
 	sortableId,
 	section,
 	indentation,
+	nestingOffsetPx,
+	isDragPlaceholder = false,
 	onDelete,
 	onRename,
 	onToggleCollapse,
 }: SortableSectionHeaderProps) {
 	const { isChildDragDisabled } = useDashboardSidebarDnd();
-	const { setSectionColor } = useDashboardSidebarState();
-	const { clearPendingSectionRename, pendingRenameSectionId } =
-		useDashboardSidebarSectionRename();
+	const { createSubSection, setSectionColor } = useDashboardSidebarState();
+	const {
+		clearPendingSectionRename,
+		pendingRenameSectionId,
+		requestSectionRename,
+	} = useDashboardSidebarSectionRename();
 	const [isRenaming, setIsRenaming] = useState(false);
 	const [renameValue, setRenameValue] = useState(section.name);
 
@@ -53,6 +66,16 @@ export function SortableSectionHeader({
 		folderKey && folderKey.projectId !== SESSIONS_TAG_SCOPE
 			? () => setTagFolderHidden(folderKey.projectId, folderKey.tag, true)
 			: undefined;
+	const onCreateSubGroup =
+		folderKey && canCreateSubFolder(folderKey.tag)
+			? () => {
+					const subSectionId = createSubSection(section.id);
+					if (subSectionId) requestSectionRename(subSectionId);
+				}
+			: undefined;
+	// Out of view under a collapsed parent: stays mounted (like a collapsed
+	// row) so it animates, but takes no space, focus, or drops.
+	const isHidden = section.isAncestorCollapsed;
 	const {
 		attributes,
 		listeners,
@@ -60,7 +83,10 @@ export function SortableSectionHeader({
 		transform,
 		transition,
 		isDragging,
-	} = useSortable({ id: sortableId, disabled: isChildDragDisabled });
+	} = useSortable({
+		id: sortableId,
+		disabled: isChildDragDisabled || isHidden,
+	});
 
 	const hasColor =
 		section.color != null && section.color !== PROJECT_COLOR_DEFAULT;
@@ -92,55 +118,65 @@ export function SortableSectionHeader({
 			style={{
 				transform: CSS.Translate.toString(transform),
 				transition,
-				opacity: isDragging ? 0.5 : undefined,
+				opacity: isDragging || isDragPlaceholder ? 0.5 : undefined,
 				boxShadow: hasColor
 					? `inset 3px 0 ${section.color}`
 					: "inset 2px 0 var(--color-border)",
+				marginLeft: nestingOffsetPx || undefined,
 			}}
+			className={cn(
+				"grid transition-[grid-template-rows,opacity] duration-150 ease-out",
+				isHidden ? "grid-rows-[0fr] opacity-0" : "grid-rows-[1fr] opacity-100",
+			)}
+			inert={isHidden}
 			{...getBlockedDragProps(isChildDragDisabled)}
 		>
-			<DashboardSidebarSectionContextMenu
-				color={section.color}
-				onRename={startRename}
-				onSetColor={(color) => setSectionColor(section.id, color)}
-				onDelete={() => onDelete(section.id)}
-				onHide={onHide}
-			>
-				<DashboardSidebarGroupHeader
-					label={
-						isRenaming ? (
-							<RenameInput
-								value={renameValue}
-								onChange={setRenameValue}
-								onSubmit={handleSubmitRename}
-								onCancel={() => {
-									setRenameValue(section.name);
-									setIsRenaming(false);
-								}}
-								className="-ml-1 h-5 w-full min-w-0 border-none bg-transparent px-1 py-0 text-[13px] font-medium text-muted-foreground outline-none"
+			<div className="min-h-0 overflow-hidden">
+				<DashboardSidebarSectionContextMenu
+					color={section.color}
+					onRename={startRename}
+					onSetColor={(color) => setSectionColor(section.id, color)}
+					onDelete={() => onDelete(section.id)}
+					onHide={onHide}
+					onCreateSubGroup={onCreateSubGroup}
+				>
+					<DashboardSidebarGroupHeader
+						label={
+							isRenaming ? (
+								<RenameInput
+									value={renameValue}
+									onChange={setRenameValue}
+									onSubmit={handleSubmitRename}
+									onCancel={() => {
+										setRenameValue(section.name);
+										setIsRenaming(false);
+									}}
+									className="-ml-1 h-5 w-full min-w-0 border-none bg-transparent px-1 py-0 text-[13px] font-medium text-muted-foreground outline-none"
+								/>
+							) : (
+								<span className="truncate">{section.name}</span>
+							)
+						}
+						isCollapsed={section.isCollapsed}
+						isEditing={isRenaming}
+						isDraggable={!isChildDragDisabled}
+						indentation={indentation}
+						onToggleCollapse={() => onToggleCollapse(section.id)}
+						actions={
+							<DashboardSidebarSectionActionsDropdown
+								color={section.color}
+								onRename={startRename}
+								onSetColor={(color) => setSectionColor(section.id, color)}
+								onDelete={() => onDelete(section.id)}
+								onHide={onHide}
+								onCreateSubGroup={onCreateSubGroup}
 							/>
-						) : (
-							<span className="truncate">{section.name}</span>
-						)
-					}
-					isCollapsed={section.isCollapsed}
-					isEditing={isRenaming}
-					isDraggable={!isChildDragDisabled}
-					indentation={indentation}
-					onToggleCollapse={() => onToggleCollapse(section.id)}
-					actions={
-						<DashboardSidebarSectionActionsDropdown
-							color={section.color}
-							onRename={startRename}
-							onSetColor={(color) => setSectionColor(section.id, color)}
-							onDelete={() => onDelete(section.id)}
-							onHide={onHide}
-						/>
-					}
-					{...attributes}
-					{...listeners}
-				/>
-			</DashboardSidebarSectionContextMenu>
+						}
+						{...attributes}
+						{...listeners}
+					/>
+				</DashboardSidebarSectionContextMenu>
+			</div>
 		</div>
 	);
 }

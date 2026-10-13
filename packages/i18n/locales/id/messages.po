@@ -10301,6 +10301,9 @@ msgstr "Shell baru"
 msgid "New stars"
 msgstr "Star baru"
 
+msgid "New sub-group"
+msgstr "Subgrup baru"
+
 msgid "new tab"
 msgstr "tab baru"
 

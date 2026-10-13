@@ -10301,6 +10301,9 @@ msgstr "Nowa powłoka"
 msgid "New stars"
 msgstr "Nowe gwiazdki"
 
+msgid "New sub-group"
+msgstr "Nowa podgrupa"
+
 msgid "new tab"
 msgstr "nowa karta"
 

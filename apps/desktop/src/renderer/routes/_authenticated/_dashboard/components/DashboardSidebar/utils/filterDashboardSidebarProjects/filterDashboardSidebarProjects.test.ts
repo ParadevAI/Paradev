@@ -114,3 +114,60 @@ describe("filterDashboardSidebarProjects", () => {
 		expect(section.section.workspaces).toHaveLength(2);
 	});
 });
+
+describe("filterDashboardSidebarProjects with sub-groups", () => {
+	const nested = [
+		makeProject({
+			id: "p",
+			name: "Project",
+			children: [
+				{
+					type: "section",
+					section: makeSection({
+						id: "features",
+						name: "Features",
+						isCollapsed: true,
+						workspaces: [makeWorkspace({ id: "w1", name: "polish" })],
+					}),
+				},
+				{
+					type: "section",
+					section: makeSection({
+						id: "auth",
+						name: "Auth",
+						parentId: "features",
+						depth: 1,
+						isAncestorCollapsed: true,
+						workspaces: [makeWorkspace({ id: "w2", name: "login-flow" })],
+					}),
+				},
+			],
+		}),
+	];
+
+	it("keeps the parent of a matching sub-group, expanded and without its non-matching rows", () => {
+		const [project] = filterDashboardSidebarProjects(nested, "login");
+		const sections = project?.children.flatMap((child) =>
+			child.type === "section" ? [child.section] : [],
+		);
+		expect(sections?.map((section) => section.id)).toEqual([
+			"features",
+			"auth",
+		]);
+		expect(sections?.[0]?.workspaces).toEqual([]);
+		expect(sections?.[0]?.isCollapsed).toBe(false);
+		expect(sections?.[1]?.isAncestorCollapsed).toBe(false);
+		expect(sections?.[1]?.workspaces.map((w) => w.id)).toEqual(["w2"]);
+	});
+
+	it("a matching parent name keeps everything below it", () => {
+		const [project] = filterDashboardSidebarProjects(nested, "features");
+		expect(
+			project?.children.flatMap((child) =>
+				child.type === "section"
+					? child.section.workspaces.map((w) => w.id)
+					: [],
+			),
+		).toEqual(["w1", "w2"]);
+	});
+});

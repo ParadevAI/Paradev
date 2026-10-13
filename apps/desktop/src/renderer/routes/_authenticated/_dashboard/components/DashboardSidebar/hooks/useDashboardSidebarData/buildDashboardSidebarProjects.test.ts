@@ -544,3 +544,79 @@ describe("buildDashboardSidebarProjects with tag-derived folders", () => {
 		expect(folder.section.workspaces[0]?.accentColor).toBe("#ff0000");
 	});
 });
+
+describe("buildDashboardSidebarProjects with sub-groups", () => {
+	const featuresKey = buildSidebarFolderKey("project-1", "features");
+	const authKey = buildSidebarFolderKey("project-1", "features/auth");
+	const sectionsFor = (
+		workspaces: SidebarWorkspaceInput[],
+		stored: Parameters<typeof deriveTagFolders>[0] = [],
+	) =>
+		deriveTagFolders(stored, workspaces, EMPTY_TAG_FOLDER_CONTEXT).map(
+			(section) => ({ ...section, id: section.sectionId }),
+		);
+
+	it("places a sub-group right after its parent, members in the deepest folder", () => {
+		const workspaces = [
+			makeWorkspace({ id: "loose", tabOrder: 1 }),
+			makeWorkspace({ id: "in-features", tags: ["features"], tabOrder: 2 }),
+			makeWorkspace({
+				id: "in-auth",
+				tags: ["features", "features/auth"],
+				tabOrder: 3,
+			}),
+		];
+		const [project] = build({
+			sidebarSections: sectionsFor(workspaces),
+			visibleSidebarWorkspaces: workspaces,
+		});
+
+		expect(
+			project.children.map((child) =>
+				child.type === "workspace"
+					? child.workspace.id
+					: `${child.section.id}@${child.section.depth}`,
+			),
+		).toEqual(["loose", `${featuresKey}@0`, `${authKey}@1`]);
+		const [, features, auth] = project.children;
+		if (features?.type !== "section" || auth?.type !== "section") {
+			throw new Error("expected sections");
+		}
+		expect(features.section.workspaces.map((w) => w.id)).toEqual([
+			"in-features",
+		]);
+		expect(auth.section.parentId).toBe(featuresKey);
+		expect(auth.section.workspaces.map((w) => w.id)).toEqual(["in-auth"]);
+	});
+
+	it("a sub-group without a color shows its parent's, and hides under a collapsed parent", () => {
+		const workspaces = [
+			makeWorkspace({ id: "in-auth", tags: ["features/auth"] }),
+		];
+		const [project] = build({
+			sidebarSections: sectionsFor(workspaces, [
+				{
+					sectionId: featuresKey,
+					projectId: "project-1",
+					name: "Features",
+					createdAt: DATE,
+					isCollapsed: true,
+					tabOrder: 1,
+					color: "#ff0000",
+					tag: "features",
+				},
+			]),
+			visibleSidebarWorkspaces: workspaces,
+		});
+		const auth = project.children.find(
+			(child) => child.type === "section" && child.section.id === authKey,
+		);
+		if (auth?.type !== "section") throw new Error("expected sub-group");
+		expect(auth.section.color).toBe("#ff0000");
+		expect(auth.section.isCollapsed).toBe(false);
+		expect(auth.section.isAncestorCollapsed).toBe(true);
+		expect(auth.section.workspaces.map((accent) => accent.accentColor)).toEqual(
+			["#ff0000"],
+		);
+	});
+});

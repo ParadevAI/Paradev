@@ -1,6 +1,7 @@
 import { SESSIONS_TAG_SCOPE } from "@superset/shared/workspace-tags";
 import {
 	getProjectFolderTagIndex,
+	orderFolderTree,
 	resolveWorkspaceSectionId,
 	type TagFolderRef,
 } from "renderer/routes/_authenticated/utils/workspaceTagFolders";
@@ -46,6 +47,8 @@ export interface SidebarSectionInput {
 	 * tag-only folders exist here too.
 	 */
 	tag?: string | null;
+	/** Enclosing folder's id for a sub-folder; null/absent at the top. */
+	parentId?: string | null;
 }
 
 export interface SidebarWorkspaceInput {
@@ -68,6 +71,71 @@ export interface SidebarWorkspaceInput {
 	tags?: readonly string[] | null;
 	pinnedAt: number | null;
 	pendingTransaction: WorkspaceTransactionSnapshot | null;
+}
+
+interface SectionForest {
+	sectionMap: Map<string, DashboardSidebarSection>;
+	roots: DashboardSidebarSection[];
+	/** Each top-level group's sub-groups, in pre-order. */
+	descendantsByRootId: Map<string, DashboardSidebarSection[]>;
+}
+
+/**
+ * One lane's groups as a forest. A sub-group with no color of its own shows
+ * its parent's, and collapsing a group hides every group below it.
+ */
+function buildSectionForest(sections: SidebarSectionInput[]): SectionForest {
+	const sectionMap = new Map<string, DashboardSidebarSection>();
+	const roots: DashboardSidebarSection[] = [];
+	const descendantsByRootId = new Map<string, DashboardSidebarSection[]>();
+	let currentRootId: string | null = null;
+	const ordered = orderFolderTree(
+		sections,
+		(left, right) =>
+			left.tabOrder - right.tabOrder || left.id.localeCompare(right.id),
+	);
+	for (const { folder, depth } of ordered) {
+		const parent =
+			depth > 0 && folder.parentId != null
+				? sectionMap.get(folder.parentId)
+				: undefined;
+		const section: DashboardSidebarSection = {
+			...folder,
+			color: folder.color ?? parent?.color ?? null,
+			parentId: parent?.id ?? null,
+			depth,
+			isAncestorCollapsed: parent
+				? parent.isCollapsed || parent.isAncestorCollapsed
+				: false,
+			workspaces: [],
+		};
+		sectionMap.set(section.id, section);
+		if (depth === 0 || currentRootId === null) {
+			roots.push(section);
+			descendantsByRootId.set(section.id, []);
+			currentRootId = section.id;
+		} else {
+			descendantsByRootId.get(currentRootId)?.push(section);
+		}
+	}
+	return { sectionMap, roots, descendantsByRootId };
+}
+
+/** Puts each top-level group's sub-groups right after it. */
+function withSubSections(
+	children: DashboardSidebarProjectChild[],
+	descendantsByRootId: ReadonlyMap<string, DashboardSidebarSection[]>,
+): DashboardSidebarProjectChild[] {
+	return children.flatMap((child): DashboardSidebarProjectChild[] =>
+		child.type === "section"
+			? [
+					child,
+					...(descendantsByRootId.get(child.section.id) ?? []).map(
+						(section) => ({ type: "section" as const, section }),
+					),
+				]
+			: [child],
+	);
 }
 
 /**
@@ -201,28 +269,22 @@ export function buildDashboardSidebarSessions({
 	machineId: string;
 	pullRequestsByWorkspaceId: Map<string, SidebarPullRequest>;
 }): DashboardSidebarSessions {
-	const sectionMap = new Map<string, DashboardSidebarSection>();
+	const { sectionMap, roots, descendantsByRootId } = buildSectionForest(
+		sidebarSections.filter(
+			(section) => section.projectId === SESSIONS_TAG_SCOPE,
+		),
+	);
 	const childEntries: Array<{
 		tabOrder: number;
 		child: DashboardSidebarProjectChild;
-	}> = [];
+	}> = roots.map((section) => ({
+		tabOrder: section.tabOrder,
+		child: { type: "section", section },
+	}));
 	const orphaned: Array<{
 		tabOrder: number;
 		workspace: DashboardSidebarWorkspace;
 	}> = [];
-
-	for (const section of sidebarSections) {
-		if (section.projectId !== SESSIONS_TAG_SCOPE) continue;
-		const sidebarSection: DashboardSidebarSection = {
-			...section,
-			workspaces: [],
-		};
-		sectionMap.set(section.id, sidebarSection);
-		childEntries.push({
-			tabOrder: section.tabOrder,
-			child: { type: "section", section: sidebarSection },
-		});
-	}
 
 	const folderIndex = getProjectFolderTagIndex(
 		sidebarSections.map((section) => ({
@@ -285,10 +347,11 @@ export function buildDashboardSidebarSessions({
 		);
 	}
 
-	const workspaces = children.flatMap((child) =>
+	const nestedChildren = withSubSections(children, descendantsByRootId);
+	const workspaces = nestedChildren.flatMap((child) =>
 		child.type === "workspace" ? [child.workspace] : child.section.workspaces,
 	);
-	return { children, workspaces };
+	return { children: nestedChildren, workspaces };
 }
 
 export interface BuildDashboardSidebarProjectsParams {
@@ -310,6 +373,7 @@ export function buildDashboardSidebarProjects({
 		string,
 		DashboardSidebarProject & {
 			sectionMap: Map<string, DashboardSidebarSection>;
+			descendantsByRootId: Map<string, DashboardSidebarSection[]>;
 			childEntries: Array<{
 				tabOrder: number;
 				child: DashboardSidebarProjectChild;
@@ -321,32 +385,27 @@ export function buildDashboardSidebarProjects({
 		}
 	>();
 
+	const sectionsByProjectId = new Map<string, SidebarSectionInput[]>();
+	for (const section of sidebarSections) {
+		const projectSections = sectionsByProjectId.get(section.projectId);
+		if (projectSections) projectSections.push(section);
+		else sectionsByProjectId.set(section.projectId, [section]);
+	}
+
 	for (const project of sidebarProjects) {
+		const { sectionMap, roots, descendantsByRootId } = buildSectionForest(
+			sectionsByProjectId.get(project.id) ?? [],
+		);
 		projectsById.set(project.id, {
 			...project,
 			children: [],
-			sectionMap: new Map(),
-			childEntries: [],
+			sectionMap,
+			descendantsByRootId,
+			childEntries: roots.map((section) => ({
+				tabOrder: section.tabOrder,
+				child: { type: "section", section },
+			})),
 			orphanedWorkspaces: [],
-		});
-	}
-
-	for (const section of sidebarSections) {
-		const project = projectsById.get(section.projectId);
-		if (!project) continue;
-
-		const sidebarSection: DashboardSidebarSection = {
-			...section,
-			workspaces: [],
-		};
-
-		project.sectionMap.set(section.id, sidebarSection);
-		project.childEntries.push({
-			tabOrder: section.tabOrder,
-			child: {
-				type: "section",
-				section: sidebarSection,
-			},
 		});
 	}
 
@@ -420,6 +479,7 @@ export function buildDashboardSidebarProjects({
 		const {
 			childEntries,
 			sectionMap: _sectionMap,
+			descendantsByRootId,
 			orphanedWorkspaces,
 			...sidebarProject
 		} = resolvedProject;
@@ -455,7 +515,7 @@ export function buildDashboardSidebarProjects({
 			);
 		}
 
-		sidebarProject.children = children;
+		sidebarProject.children = withSubSections(children, descendantsByRootId);
 		return [sidebarProject];
 	});
 }

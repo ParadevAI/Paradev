@@ -493,3 +493,41 @@ describe("lastActivityAt in active mode", () => {
 		expect(childIds(sorted)).toEqual(["s1", "w-loose"]);
 	});
 });
+
+describe("sortDashboardSidebarProjectChildren with sub-groups", () => {
+	it("moves a group with its sub-groups, ranked by activity anywhere inside", () => {
+		const children: DashboardSidebarProjectChild[] = [
+			{
+				type: "workspace",
+				workspace: makeWorkspace({
+					id: "loose",
+					name: "loose",
+					lastActivityAt: at("2026-05-01"),
+				}),
+			},
+			{
+				type: "section",
+				section: makeSection({ id: "features", name: "Features" }),
+			},
+			{
+				type: "section",
+				section: makeSection({
+					id: "auth",
+					name: "Auth",
+					parentId: "features",
+					depth: 1,
+					workspaces: [
+						makeWorkspace({
+							id: "w-auth",
+							name: "auth-work",
+							lastActivityAt: at("2026-06-01"),
+						}),
+					],
+				}),
+			},
+		];
+		expect(
+			childIds(sortDashboardSidebarProjectChildren(children, "active")),
+		).toEqual(["features", "auth", "loose"]);
+	});
+});

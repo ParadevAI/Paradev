@@ -10301,6 +10301,9 @@ msgstr "Shell mới"
 msgid "New stars"
 msgstr "Star mới"
 
+msgid "New sub-group"
+msgstr "Nhóm con mới"
+
 msgid "new tab"
 msgstr "tab mới"
 

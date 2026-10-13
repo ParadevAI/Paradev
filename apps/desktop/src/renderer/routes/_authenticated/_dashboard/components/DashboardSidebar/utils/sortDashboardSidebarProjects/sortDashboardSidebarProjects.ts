@@ -8,6 +8,7 @@ import type {
 	DashboardSidebarProjectChild,
 	DashboardSidebarWorkspace,
 } from "../../types";
+import { groupProjectChildrenByTopLevel } from "../projectChildren";
 
 // An item with no usable timestamp sinks below everything dated. Mapping
 // NaN to -Infinity keeps the comparator a consistent total order instead of
@@ -45,19 +46,34 @@ function getWorkspaceTimestamp(
 }
 
 // Mirrors the project-level rules one level down: "created" uses the
-// section's own createdAt, "active" uses its most recently active workspace
-// (falling back to createdAt when empty).
-function getChildTimestamp(
-	child: DashboardSidebarProjectChild,
+// section's own createdAt, "active" uses the most recently active workspace
+// anywhere in it, sub-groups included (falling back to createdAt when empty).
+function getUnitTimestamp(
+	unit: DashboardSidebarProjectChild[],
 	mode: SidebarProjectSortMode,
 ): number {
-	if (child.type === "workspace") {
-		return getWorkspaceTimestamp(child.workspace, mode);
+	const [head] = unit;
+	if (!head) return Number.NaN;
+	if (head.type === "workspace") {
+		return getWorkspaceTimestamp(head.workspace, mode);
 	}
-	const { section } = child;
-	if (mode === "created") return toTime(section.createdAt);
-	const activity = newest(section.workspaces.map(getWorkspaceActivityTime));
-	return Number.isNaN(activity) ? toTime(section.createdAt) : activity;
+	if (mode === "created") return toTime(head.section.createdAt);
+	const activity = newest(
+		unit.flatMap((child) =>
+			child.type === "section"
+				? child.section.workspaces.map(getWorkspaceActivityTime)
+				: [],
+		),
+	);
+	return Number.isNaN(activity) ? toTime(head.section.createdAt) : activity;
+}
+
+function getUnitHead(
+	unit: DashboardSidebarProjectChild[],
+): DashboardSidebarProjectChild {
+	const [head] = unit;
+	if (!head) throw new Error("empty sidebar unit");
+	return head;
 }
 
 function haveSameItems<Item>(left: Item[], right: Item[]): boolean {
@@ -69,8 +85,9 @@ function haveSameItems<Item>(left: Item[], right: Item[]): boolean {
 
 /**
  * Orders a project's children for a non-manual sort mode: workspaces inside
- * each section sort by the mode, sections reorder among the loose workspaces
- * by their own timestamp. Returns the input array (and the input section objects) when nothing
+ * each section sort by the mode, top-level sections (carrying their
+ * sub-groups, which keep their manual order) reorder among the loose
+ * workspaces by their own timestamp. Returns the input array (and the input section objects) when nothing
  * moves, so memoized rows keep their identity.
  */
 export function sortDashboardSidebarProjectChildren(
@@ -84,12 +101,18 @@ export function sortDashboardSidebarProjectChildren(
 		(workspace) => workspace.name,
 		(workspace) => workspace.id,
 	);
-	const compareChildren = makeStableComparator<DashboardSidebarProjectChild>(
-		(child) => getChildTimestamp(child, mode),
-		(child) =>
-			child.type === "workspace" ? child.workspace.name : child.section.name,
-		(child) =>
-			child.type === "workspace" ? child.workspace.id : child.section.id,
+	const compareUnits = makeStableComparator<DashboardSidebarProjectChild[]>(
+		(unit) => getUnitTimestamp(unit, mode),
+		(unit) => {
+			const head = getUnitHead(unit);
+			return head.type === "workspace"
+				? head.workspace.name
+				: head.section.name;
+		},
+		(unit) => {
+			const head = getUnitHead(unit);
+			return head.type === "workspace" ? head.workspace.id : head.section.id;
+		},
 	);
 
 	const sortedInside = children.map((child) => {
@@ -100,7 +123,9 @@ export function sortDashboardSidebarProjectChildren(
 			: { ...child, section: { ...child.section, workspaces } };
 	});
 
-	const sorted = [...sortedInside].sort(compareChildren);
+	const sorted = groupProjectChildrenByTopLevel(sortedInside)
+		.sort(compareUnits)
+		.flat();
 	return haveSameItems(sorted, children) ? children : sorted;
 }
 

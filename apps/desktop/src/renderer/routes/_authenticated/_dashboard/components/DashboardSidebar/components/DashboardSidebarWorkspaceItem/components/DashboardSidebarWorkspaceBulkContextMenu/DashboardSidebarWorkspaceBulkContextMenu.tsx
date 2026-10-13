@@ -18,6 +18,7 @@ import {
 	LuX,
 } from "react-icons/lu";
 import { useBulkWorkspaceMoveActions } from "../../../../hooks/useBulkWorkspaceMoveActions";
+import { MENU_SUB_GROUP_INDENT_PX } from "../../../../hooks/useProjectTagFolderSections";
 import { useDashboardSidebarHoverActions } from "../../../../providers/DashboardSidebarHoverProvider";
 import { useDashboardSidebarSelection } from "../../../../providers/DashboardSidebarSelectionProvider";
 import { useBulkDeleteWorkspacesIntent } from "../../../../stores/bulkDeleteWorkspacesIntent";
@@ -68,6 +69,13 @@ export function DashboardSidebarWorkspaceBulkContextMenu({
 								key={section.id}
 								onSelect={() => moveSelectionToSection(section.id)}
 							>
+								{section.depth > 0 && (
+									<span
+										aria-hidden
+										className="shrink-0"
+										style={{ width: section.depth * MENU_SUB_GROUP_INDENT_PX }}
+									/>
+								)}
 								{section.color && (
 									<span
 										className="size-2 shrink-0 rounded-full mr-2"

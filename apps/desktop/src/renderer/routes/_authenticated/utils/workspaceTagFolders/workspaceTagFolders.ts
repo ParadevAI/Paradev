@@ -25,6 +25,17 @@ import {
  */
 export const DERIVED_TAG_FOLDER_TAB_ORDER_BASE = 2 ** 31;
 
+/**
+ * A folder tag with this separator is a sub-folder: `features/auth` renders
+ * inside `features`. Any actor that can tag can nest — `--tag features/auth`
+ * from the CLI files the workspace two levels deep, and the parent folder
+ * exists because its child does.
+ */
+export const FOLDER_TAG_PATH_SEPARATOR = "/";
+
+/** Levels the sidebar offers to create (top level included). */
+export const MAX_FOLDER_DEPTH = 3;
+
 export interface TagFolderRef {
 	sectionId: string;
 	projectId: string;
@@ -95,6 +106,65 @@ export interface TagFolderSection extends TagFolderSectionInput {
 	tag: string | null;
 	/** True when no stored presentation row exists — the tag alone made it. */
 	isDerived: boolean;
+	/** Folder key of the enclosing folder; null at the top of the lane. */
+	parentId: string | null;
+}
+
+/**
+ * The path segments of a folder tag. A tag only nests when every segment is
+ * non-empty and untrimmed-equal: `a//b`, `/a` or `a / b` stay flat folders,
+ * because their "parent" could never match a normalized tag.
+ */
+export function getFolderTagPath(tag: string): string[] {
+	const segments = tag.split(FOLDER_TAG_PATH_SEPARATOR);
+	if (segments.length === 1) return segments;
+	const isNestable = segments.every(
+		(segment) => segment.length > 0 && segment.trim() === segment,
+	);
+	return isNestable ? segments : [tag];
+}
+
+export function getParentFolderTag(tag: string): string | null {
+	const path = getFolderTagPath(tag);
+	return path.length > 1
+		? path.slice(0, -1).join(FOLDER_TAG_PATH_SEPARATOR)
+		: null;
+}
+
+/** The last path segment: what a folder is called when nobody named it. */
+export function getFolderTagLeaf(tag: string): string {
+	return getFolderTagPath(tag).at(-1) ?? tag;
+}
+
+/** The tag and every ancestor tag, outermost first. */
+function getFolderTagLineage(tag: string): string[] {
+	const path = getFolderTagPath(tag);
+	return path.map((_, index) =>
+		path.slice(0, index + 1).join(FOLDER_TAG_PATH_SEPARATOR),
+	);
+}
+
+export function isFolderTagWithin(tag: string, ancestorTag: string): boolean {
+	return getFolderTagLineage(tag).includes(ancestorTag);
+}
+
+/** Shortest leaf plus a collision suffix that must still fit under a parent. */
+const MIN_SUB_FOLDER_LEAF_LENGTH = 4;
+
+/**
+ * Whether the sidebar may create a sub-folder under `parentTag`: within
+ * {@link MAX_FOLDER_DEPTH} and with room left for a leaf in the tag cap.
+ */
+export function canCreateSubFolder(parentTag: string | null): boolean {
+	if (parentTag == null) return false;
+	const path = getFolderTagPath(parentTag);
+	const leafBudget =
+		WORKSPACE_TAG_MAX_LENGTH -
+		parentTag.length -
+		FOLDER_TAG_PATH_SEPARATOR.length;
+	return (
+		path.length < MAX_FOLDER_DEPTH && leafBudget >= MIN_SUB_FOLDER_LEAF_LENGTH
+	);
 }
 
 export interface SessionTagFolder {
@@ -171,7 +241,8 @@ export function parseSidebarFolderKey(
  * Union of stored presentation rows and tag-only folders. A folder exists
  * for every (project, tag) some workspace carries; a stored row only adds
  * presentation. Derived folders are appended per project in tag order at
- * {@link DERIVED_TAG_FOLDER_TAB_ORDER_BASE}.
+ * {@link DERIVED_TAG_FOLDER_TAB_ORDER_BASE}, and every ancestor of a nested
+ * tag exists too, so a sub-folder always has its parent.
  */
 export function deriveTagFolders(
 	sections: readonly TagFolderSectionInput[],
@@ -199,15 +270,30 @@ export function deriveTagFolders(
 				: folder.tabOrder,
 		};
 	};
-	const isHidden = (folder: TagFolderSection): boolean =>
-		folder.tag != null &&
-		(context.hiddenTagsByProject.get(folder.projectId)?.has(folder.tag) ??
-			false);
+	const isHidden = (folder: TagFolderSection): boolean => {
+		if (folder.tag == null) return false;
+		const hiddenTags = context.hiddenTagsByProject.get(folder.projectId);
+		if (!hiddenTags) return false;
+		// Hiding a folder hides its sub-folders with it.
+		return getFolderTagLineage(folder.tag).some((tag) => hiddenTags.has(tag));
+	};
+	const withParent = (folder: TagFolderSection): TagFolderSection => {
+		const parentTag =
+			folder.tag == null ? null : getParentFolderTag(folder.tag);
+		return {
+			...folder,
+			parentId:
+				parentTag == null
+					? null
+					: buildSidebarFolderKey(folder.projectId, parentTag),
+		};
+	};
 
 	const result: TagFolderSection[] = sections.map((section) => ({
 		...section,
 		tag: normalizeWorkspaceTag(section.tag),
 		isDerived: false,
+		parentId: null,
 	}));
 
 	// Tags already covered by a stored row, per project.
@@ -223,16 +309,26 @@ export function deriveTagFolders(
 	}
 
 	const uncoveredTagsByProjectId = new Map<string, Set<string>>();
-	for (const workspace of workspaces) {
-		const scope = tagFolderScope(workspace.projectId);
-		for (const tag of normalizeWorkspaceTags(workspace.tags)) {
-			if (coveredTagsByProjectId.get(scope)?.has(tag)) continue;
+	const addUncovered = (scope: string, tag: string) => {
+		// A sub-folder needs its whole lineage on screen, so every ancestor
+		// of a carried or stored tag exists too.
+		for (const lineageTag of getFolderTagLineage(tag)) {
+			if (coveredTagsByProjectId.get(scope)?.has(lineageTag)) continue;
 			let uncovered = uncoveredTagsByProjectId.get(scope);
 			if (!uncovered) {
 				uncovered = new Set();
 				uncoveredTagsByProjectId.set(scope, uncovered);
 			}
-			uncovered.add(tag);
+			uncovered.add(lineageTag);
+		}
+	};
+	for (const section of result) {
+		if (section.tag != null) addUncovered(section.projectId, section.tag);
+	}
+	for (const workspace of workspaces) {
+		const scope = tagFolderScope(workspace.projectId);
+		for (const tag of normalizeWorkspaceTags(workspace.tags)) {
+			addUncovered(scope, tag);
 		}
 	}
 
@@ -241,18 +337,58 @@ export function deriveTagFolders(
 			result.push({
 				sectionId: buildSidebarFolderKey(projectId, tag),
 				projectId,
-				name: tag,
+				name: getFolderTagLeaf(tag),
 				tag,
 				tabOrder: DERIVED_TAG_FOLDER_TAB_ORDER_BASE + index,
 				isCollapsed: false,
 				color: null,
 				createdAt: new Date(0),
 				isDerived: true,
+				parentId: null,
 			});
 		});
 	}
 
-	return result.map(applySettings).filter((folder) => !isHidden(folder));
+	return result
+		.map(applySettings)
+		.map(withParent)
+		.filter((folder) => !isHidden(folder));
+}
+
+/**
+ * Pre-order walk of a folder forest: each folder is followed by its
+ * sub-folders, siblings by `compare`. A folder whose parent is absent from
+ * the input (hidden, or not loaded yet) is treated as a root, so nothing
+ * ever disappears because its parent did.
+ */
+export function orderFolderTree<
+	Folder extends { id: string; parentId?: string | null },
+>(
+	folders: readonly Folder[],
+	compare: (left: Folder, right: Folder) => number,
+): Array<{ folder: Folder; depth: number }> {
+	const ids = new Set(folders.map((folder) => folder.id));
+	const childrenByParentId = new Map<string | null, Folder[]>();
+	for (const folder of folders) {
+		const parentId =
+			folder.parentId != null && ids.has(folder.parentId)
+				? folder.parentId
+				: null;
+		const siblings = childrenByParentId.get(parentId);
+		if (siblings) siblings.push(folder);
+		else childrenByParentId.set(parentId, [folder]);
+	}
+	const ordered: Array<{ folder: Folder; depth: number }> = [];
+	const visit = (parentId: string | null, depth: number) => {
+		const children = childrenByParentId.get(parentId);
+		if (!children) return;
+		for (const folder of [...children].sort(compare)) {
+			ordered.push({ folder, depth });
+			visit(folder.id, depth + 1);
+		}
+	};
+	visit(null, 0);
+	return ordered;
 }
 
 /**
@@ -287,17 +423,26 @@ export function getProjectFolderTagIndex(
 /**
  * The one container a workspace's tags place it in, or null. A workspace
  * renders in exactly one container — ordering, DnD, selection and keyboard
- * nav all assume it — so ties resolve to the lowest tabOrder, then the
- * lexicographically smallest tag.
+ * nav all assume it — so a folder loses to its own sub-folder, and other
+ * ties resolve to the lowest tabOrder, then the lexicographically smallest
+ * tag.
  */
 export function resolveWorkspaceFolder(
 	tags: readonly string[] | null | undefined,
 	index: ReadonlyMap<string, TagFolderRef>,
 ): TagFolderRef | null {
+	const folderTags = normalizeWorkspaceTags(tags).filter((tag) =>
+		index.has(tag),
+	);
 	let winner: TagFolderRef | null = null;
-	for (const tag of normalizeWorkspaceTags(tags)) {
+	for (const tag of folderTags) {
 		const ref = index.get(tag);
 		if (!ref) continue;
+		// `features` and `features/auth` together mean the deeper folder.
+		const isAncestorOfAnother = folderTags.some(
+			(other) => other !== tag && isFolderTagWithin(other, tag),
+		);
+		if (isAncestorOfAnother) continue;
 		if (
 			!winner ||
 			ref.tabOrder < winner.tabOrder ||
@@ -332,27 +477,38 @@ export function resolveWorkspaceSectionId(args: {
 /**
  * Mint a tag for a folder from its display name: normalize (trim+lowercase —
  * tags allow spaces, no further slugging), fall back to "group" for a name
- * that can't be a tag, and suffix `-2`, `-3`, … while the tag is taken.
+ * that can't be a tag, and suffix `-2`, `-3`, … while the tag is taken. A
+ * `/` in the name would nest the folder, so it becomes `-`; a `parentTag`
+ * mints the folder as that folder's child.
  */
 export function mintFolderTag(
 	name: string | null | undefined,
 	takenTags: Iterable<string>,
+	parentTag: string | null = null,
 ): string {
 	const taken = new Set<string>();
 	for (const tag of takenTags) {
 		const normalized = normalizeWorkspaceTag(tag);
 		if (normalized != null) taken.add(normalized);
 	}
-	const base = normalizeWorkspaceTag(name) ?? "group";
+	const prefix =
+		parentTag == null ? "" : `${parentTag}${FOLDER_TAG_PATH_SEPARATOR}`;
+	const leafBudget = WORKSPACE_TAG_MAX_LENGTH - prefix.length;
+	const flatName = name?.replaceAll(FOLDER_TAG_PATH_SEPARATOR, "-");
+	const leaf =
+		(parentTag == null
+			? normalizeWorkspaceTag(flatName)
+			: normalizeWorkspaceTag(flatName?.trim().slice(0, leafBudget))) ??
+		"group";
+	const base = `${prefix}${leaf}`;
 	if (!taken.has(base)) return base;
 	let counter = 2;
 	for (;;) {
 		const suffix = `-${counter}`;
-		// Trim the base so the suffixed tag stays within the length cap —
+		// Trim the leaf so the suffixed tag stays within the length cap —
 		// the host rejects (never trims) over-length tags.
 		const candidate =
-			base.slice(0, WORKSPACE_TAG_MAX_LENGTH - suffix.length).trimEnd() +
-			suffix;
+			prefix + leaf.slice(0, leafBudget - suffix.length).trimEnd() + suffix;
 		if (!taken.has(candidate)) return candidate;
 		counter += 1;
 	}

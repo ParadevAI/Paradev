@@ -312,6 +312,7 @@ export function useDashboardSidebarData() {
 				tabOrder: section.tabOrder,
 				color: section.color,
 				tag: section.tag,
+				parentId: section.parentId,
 			})),
 		[hostWorkspaces, storedSidebarSections, tagFolderContext],
 	);

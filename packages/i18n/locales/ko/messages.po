@@ -10301,6 +10301,9 @@ msgstr "새 셸"
 msgid "New stars"
 msgstr "신규 스타"
 
+msgid "New sub-group"
+msgstr "새 하위 그룹"
+
 msgid "new tab"
 msgstr "새 탭"
 
