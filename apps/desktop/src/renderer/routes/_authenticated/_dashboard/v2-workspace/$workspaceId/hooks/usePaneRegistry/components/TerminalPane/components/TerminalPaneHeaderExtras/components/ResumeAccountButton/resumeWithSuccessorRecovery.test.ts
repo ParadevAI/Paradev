@@ -21,7 +21,7 @@ test("a lost response follows the durable successor without retrying the resume"
 				return successor;
 			},
 		);
-		expect(client.getQueryData(key)).toEqual(successor);
+		expect(client.getQueryData<typeof successor>(key)).toEqual(successor);
 		expect(attempts).toBe(1);
 		expect(lookups).toBe(1);
 	} finally {
