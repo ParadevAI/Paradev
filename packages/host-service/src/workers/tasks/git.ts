@@ -3,7 +3,7 @@
 // host-service event loop. Credential env is resolved in-process (it needs
 // the credential provider) and crosses as plain data.
 
-import { mkdirSync } from "node:fs";
+import { lstatSync, mkdirSync } from "node:fs";
 import { dirname } from "node:path";
 import {
 	getGitAuthorName,
@@ -392,10 +392,30 @@ export const gitWorktreeRemoveTask = defineWorkerTask<
 		reportPhase?.("worktree-rm");
 		let removedByApp = false;
 		let removeError: string | undefined;
-		if (
-			force &&
-			isInsideProjectWorktreesRoot(target, project, worktreeBaseDir)
-		) {
+		let appDeleteEligible =
+			force && isInsideProjectWorktreesRoot(target, project, worktreeBaseDir);
+		// Two more conditions keep the fast delete from touching anything git
+		// would have refused. The stored path must not itself be a symlink:
+		// resolving one can land inside another workspace's registered
+		// worktree, which the root guard cannot tell apart (the parent-dir
+		// symlinks normalizeWorktreePath exists for, like macOS /var, are
+		// fine; only the leaf is checked). And the resolved path must be a
+		// worktree this repository actually lists, which is the validation
+		// git itself performed back when it owned the delete. Anything that
+		// fails either check falls through to git untouched.
+		if (appDeleteEligible) {
+			try {
+				appDeleteEligible = !lstatSync(worktreePath).isSymbolicLink();
+			} catch {
+				appDeleteEligible = false;
+			}
+		}
+		if (appDeleteEligible) {
+			appDeleteEligible = parseWorktreeList(
+				await git.raw(["worktree", "list", "--porcelain"]),
+			).some((w) => normalizeWorktreePath(w.path) === target);
+		}
+		if (appDeleteEligible) {
 			try {
 				await removeDirectoryTree(target);
 				removedByApp = true;

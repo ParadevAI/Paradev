@@ -93,6 +93,46 @@ describe("gitWorktreeRemoveTask", () => {
 		expect(fs.existsSync(worktreePath)).toBe(false);
 	});
 
+	test("leaves a symlinked stored path to git instead of deleting through it", async () => {
+		const realWorktree = path.join(worktreesBase, "demo", "wt-real");
+		addWorktree(realWorktree, "feature/real");
+		const linkPath = path.join(worktreesBase, "demo", "wt-link");
+		fs.symlinkSync(realWorktree, linkPath);
+
+		const result = await gitWorktreeRemoveTask.handler(
+			{
+				repoPath,
+				worktreePath: linkPath,
+				gitEnv,
+				project,
+				worktreeBaseDir: worktreesBase,
+			},
+			undefined,
+		);
+
+		expect(result.removedByApp).toBe(false);
+	});
+
+	test("leaves an unregistered folder inside the managed root to git", async () => {
+		const impostor = path.join(worktreesBase, "demo", "not-a-worktree");
+		fs.mkdirSync(impostor, { recursive: true });
+		fs.writeFileSync(path.join(impostor, "precious.txt"), "do not delete\n");
+
+		const result = await gitWorktreeRemoveTask.handler(
+			{
+				repoPath,
+				worktreePath: impostor,
+				gitEnv,
+				project,
+				worktreeBaseDir: worktreesBase,
+			},
+			undefined,
+		);
+
+		expect(result.removedByApp).toBe(false);
+		expect(fs.existsSync(path.join(impostor, "precious.txt"))).toBe(true);
+	});
+
 	test("unregisters a worktree whose directory is already gone", async () => {
 		const worktreePath = path.join(worktreesBase, "demo", "wt-3");
 		addWorktree(worktreePath, "feature/gone");
