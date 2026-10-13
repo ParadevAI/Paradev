@@ -23,7 +23,10 @@ import {
 	waitFor,
 } from "../../testing/testUtils";
 
-function startSession(script: FakeHarnessScript): {
+function startSession(
+	script: FakeHarnessScript,
+	accountBound = false,
+): {
 	runtime: ChatRuntime;
 	sessionId: string;
 } {
@@ -34,6 +37,22 @@ function startSession(script: FakeHarnessScript): {
 		scopeId: "workspace-1",
 		harness: FAKE_HARNESS,
 		cwd: "/tmp/workspace",
+		...(accountBound
+			? {
+					terminalId: "account-pane",
+					launchContext: {
+						v: 1 as const,
+						cwd: "/tmp/workspace",
+						terminalId: "account-pane",
+						account: {
+							agent: "claude" as const,
+							selection: "/fixture/account",
+							directory: "/fixture/account",
+							identity: "a".repeat(64),
+						},
+					},
+				}
+			: {}),
 	});
 	return { runtime, sessionId };
 }
@@ -914,6 +933,58 @@ describe("LiveSession", () => {
 		expect(snapshot.items.get(second.itemId)?.item).toMatchObject({
 			discarded: true,
 		});
+		await runtime.dispose();
+	});
+
+	test("an account-bound agent crash keeps unsent messages for explicit review", async () => {
+		const { runtime, sessionId } = startSession(
+			{
+				turns: [
+					[
+						{ kind: "turn", turn: turn("t1") },
+						{
+							kind: "turn",
+							turn: turn("t1", { status: "failed", completedAtMs: 2 }),
+							delayMs: 1,
+						},
+						{ kind: "session", session: { status: "dead" } },
+					],
+				],
+			},
+			true,
+		);
+		sendPrompt(runtime, sessionId, "first");
+		const pending = sendPrompt(runtime, sessionId, "second");
+		await waitFor(() => runtime.sessions.get(sessionId)?.status === "dead");
+		expect(
+			runtime.commands
+				.getQueue({ sessionId })
+				.prompts.map((item) => item.itemId),
+		).toEqual([pending.itemId]);
+		await runtime.commands.closeSession({ sessionId });
+		const stored = runtime.commands.getQueue({ sessionId });
+		expect(stored.live).toBe(false);
+		expect(stored.prompts.map((item) => item.itemId)).toEqual([pending.itemId]);
+		runtime.commands.removeQueuedPrompt({
+			sessionId,
+			itemId: pending.itemId,
+			commandId: randomUUID(),
+		});
+		expect(runtime.commands.getQueue({ sessionId }).prompts).toEqual([]);
+		await runtime.dispose();
+	});
+
+	test("closing an account-bound session keeps its unsent queue", async () => {
+		const { runtime, sessionId } = startSession(GATED_THEN_QUICK, true);
+		sendPrompt(runtime, sessionId, "first");
+		await waitForApproval(runtime, sessionId);
+		const pending = sendPrompt(runtime, sessionId, "second");
+		await runtime.commands.closeSession({ sessionId });
+		expect(
+			runtime.commands
+				.getQueue({ sessionId })
+				.prompts.map((item) => item.itemId),
+		).toEqual([pending.itemId]);
 		await runtime.dispose();
 	});
 

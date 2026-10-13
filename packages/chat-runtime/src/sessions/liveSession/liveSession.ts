@@ -20,6 +20,7 @@ export type LiveSessionOptions = {
 	scopeId: string;
 	harness: string;
 	terminalId?: string;
+	retainQueuedOnStop?: boolean;
 	journal: ChatJournal;
 	publish: (envelope: Envelope) => void;
 	adapter: HarnessAdapter;
@@ -277,7 +278,7 @@ export class LiveSession {
 
 	async dispose(): Promise<void> {
 		this.stopped = true;
-		this.discardPending();
+		this.settlePendingOnStop();
 		await this.options.adapter.dispose();
 		await this.pump;
 	}
@@ -308,13 +309,19 @@ export class LiveSession {
 					if (steered && this.queue[0]?.item.id === steered) {
 						this.options.adapter.cancelTurn();
 					}
+				} else if (
+					this.options.retainQueuedOnStop &&
+					(event.turn.status === "failed" ||
+						event.turn.status === "interrupted")
+				) {
+					this.queuePaused = true;
 				} else {
 					this.deliverNextQueued();
 				}
 				return;
 			}
 			case "session":
-				if (event.session.status === "dead") this.discardPending();
+				if (event.session.status === "dead") this.settlePendingOnStop();
 				this.emitSession(event.session);
 				if (event.session.awaitingBackground) this.steerQueueIntoHeldTurn();
 				return;
@@ -426,7 +433,7 @@ export class LiveSession {
 			};
 			this.appendDurable({ type: "turn", turn: this.currentTurn });
 		}
-		this.discardPending();
+		this.settlePendingOnStop();
 		this.appendDurable({
 			type: "item",
 			item: {
@@ -448,6 +455,15 @@ export class LiveSession {
 			item: { ...withoutQueued(prompt.item), discarded: true },
 			turnId: prompt.turnId,
 		});
+	}
+
+	private settlePendingOnStop(): void {
+		const retained = this.options.retainQueuedOnStop
+			? this.queue.splice(0)
+			: [];
+		this.discardPending();
+		this.queue.push(...retained);
+		if (this.options.retainQueuedOnStop) this.queuePaused = true;
 	}
 
 	private discardPending(): void {

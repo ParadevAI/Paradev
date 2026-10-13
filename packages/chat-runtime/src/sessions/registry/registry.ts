@@ -57,6 +57,7 @@ export class LiveSessionRegistry {
 			scopeId: options.scopeId,
 			harness: options.harness,
 			terminalId: options.terminalId,
+			retainQueuedOnStop: options.launchContext !== undefined,
 			journal: this.options.journal,
 			publish: (envelope) => {
 				this.options.publish(envelope);
