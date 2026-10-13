@@ -15683,7 +15683,7 @@ msgid "Start a new chat"
 msgstr "Yeni sohbet başlat"
 
 msgid "Start a new terminal using an existing login. Other chats and your default account stay unchanged."
-msgstr "Mevcut bir oturumla yeni terminal başlatın. Diğer sohbetler ve varsayılan hesabınız değişmez."
+msgstr "Mevcut bir hesapla yeni terminal başlatın. Diğer sohbetler ve varsayılan hesabınız değişmez."
 
 msgid "Start a session"
 msgstr "Bir oturum başlat"
@@ -16889,7 +16889,7 @@ msgid "The scorecard"
 msgstr "Puan tablosu"
 
 msgid "The selected login changed. Choose an account again."
-msgstr "Seçilen oturum değişti. Yeniden bir hesap seçin."
+msgstr "Seçilen hesap değişti. Yeniden bir hesap seçin."
 
 msgid "The self-driving software factory"
 msgstr "Kendi kendini süren yazılım fabrikası"

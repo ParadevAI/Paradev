@@ -10531,7 +10531,7 @@ msgid "No automations match"
 msgstr "Nenhuma automação corresponde"
 
 msgid "No available subscription accounts. Add or sign in to an account in Usage, then refresh."
-msgstr "Nenhuma conta de assinatura disponível. Adicione uma conta ou entre em Uso e atualize a lista."
+msgstr "Nenhuma conta de assinatura disponível. Adicione uma conta ou faça login em uma conta na seção Uso; depois, atualize a lista."
 
 msgid "No branches found"
 msgstr "Nenhuma branch encontrada"
