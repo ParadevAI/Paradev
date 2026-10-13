@@ -60,7 +60,7 @@ export function TerminalPaneHeaderExtras({
 	return (
 		<div className="flex items-center gap-1">
 			<ResumeAccountButton
-				key={`${workspaceId}:${terminalId}`}
+				key={`resume-account:${workspaceId}:${terminalId}`}
 				workspaceId={workspaceId}
 				terminalId={terminalId}
 			/>
