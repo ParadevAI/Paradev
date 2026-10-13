@@ -238,8 +238,38 @@ test("acceptance cannot restore the seed of a replacement mount", () => {
 		initialProps: { key },
 	});
 	first.unmount();
-	finish(true);
+	act(() => finish(true));
 	replacement.rerender({ key: "chat-v3-draft:submission-replacement-other" });
 	replacement.rerender({ key });
 	expect(replacement.result.current.storedDraft).toBeUndefined();
+});
+
+test("a temporary storage read failure keeps the mounted draft seed", () => {
+	const key = "chat-v3-draft:seed-read-failure";
+	window.localStorage.setItem(key, "keep this draft");
+	const composer = renderHook(() => useComposerDraft(key));
+	const getItem = spyOn(window.localStorage, "getItem").mockImplementation(
+		() => {
+			throw new Error("SecurityError");
+		},
+	);
+	try {
+		composer.rerender();
+		expect(composer.result.current.storedDraft).toBe("keep this draft");
+	} finally {
+		getItem.mockRestore();
+	}
+});
+
+test("acceptance while navigated away clears the original cached seed", () => {
+	const key = "chat-v3-draft:submission-away-seed";
+	window.localStorage.setItem(key, "submitted");
+	const composer = renderHook(({ key }) => useComposerDraft(key), {
+		initialProps: { key },
+	});
+	const finish = composer.result.current.beginSubmission("submitted");
+	composer.rerender({ key: "chat-v3-draft:submission-away-other" });
+	finish(true);
+	composer.rerender({ key });
+	expect(composer.result.current.storedDraft).toBeUndefined();
 });

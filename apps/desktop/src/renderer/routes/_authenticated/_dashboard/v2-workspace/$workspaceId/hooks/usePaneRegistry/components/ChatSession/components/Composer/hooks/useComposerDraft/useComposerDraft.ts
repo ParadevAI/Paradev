@@ -5,6 +5,7 @@ const DRAFT_DEBOUNCE_MS = 300;
 const unsavedDrafts = new Map<string, string>();
 const recoveredAfterRead = new Map<string, string[]>();
 const pendingSubmissions = new Map<string, { text: string }>();
+const clearedDraftListeners = new Map<string, Set<() => void>>();
 
 function persistDraft(draftKey: string, text: string): boolean {
 	try {
@@ -17,13 +18,19 @@ function persistDraft(draftKey: string, text: string): boolean {
 	}
 }
 
-function readDraft(draftKey: string): string | undefined {
+function clearStoredDraft(draftKey: string) {
+	unsavedDrafts.set(draftKey, "");
+	if (persistDraft(draftKey, "")) unsavedDrafts.delete(draftKey);
+	for (const notify of clearedDraftListeners.get(draftKey) ?? []) notify();
+}
+
+function readDraft(draftKey: string, fallback?: string): string | undefined {
 	const unsaved = unsavedDrafts.get(draftKey);
 	if (unsaved !== undefined) return unsaved;
 	try {
 		return window.localStorage.getItem(draftKey) ?? undefined;
 	} catch {
-		return undefined;
+		return fallback;
 	}
 }
 
@@ -78,6 +85,27 @@ export function useComposerDraft(draftKey: string) {
 		return { draftKey, text: readDraft(draftKey) };
 	});
 
+	useEffect(() => {
+		setSeed((current) => {
+			const text = readDraft(
+				draftKey,
+				current.draftKey === draftKey ? current.text : undefined,
+			);
+			return current.draftKey === draftKey && current.text === text
+				? current
+				: { draftKey, text };
+		});
+		const listeners =
+			clearedDraftListeners.get(draftKey) ?? new Set<() => void>();
+		const clearSeed = () => setSeed({ draftKey, text: undefined });
+		listeners.add(clearSeed);
+		clearedDraftListeners.set(draftKey, listeners);
+		return () => {
+			listeners.delete(clearSeed);
+			if (listeners.size === 0) clearedDraftListeners.delete(draftKey);
+		};
+	}, [draftKey]);
+
 	const beginSubmission = useCallback(
 		(text: string) => {
 			pendingSubmissions.delete(draftKey);
@@ -88,8 +116,7 @@ export function useComposerDraft(draftKey: string) {
 				if (pendingSubmissions.get(draftKey) !== submitted) return;
 				pendingSubmissions.delete(draftKey);
 				if (!accepted || (readDraft(draftKey) ?? "") !== submitted.text) return;
-				unsavedDrafts.set(draftKey, "");
-				if (persistDraft(draftKey, "")) unsavedDrafts.delete(draftKey);
+				clearStoredDraft(draftKey);
 			};
 		},
 		[draftKey],
@@ -100,14 +127,11 @@ export function useComposerDraft(draftKey: string) {
 		if (draftTimer.current) clearTimeout(draftTimer.current);
 		draftTimer.current = null;
 		pendingDraftKey.current = null;
-		unsavedDrafts.set(draftKey, "");
-		if (persistDraft(draftKey, "")) unsavedDrafts.delete(draftKey);
-		setSeed({ draftKey, text: undefined });
+		clearStoredDraft(draftKey);
 	}, [draftKey]);
 
-	const currentDraft = readDraft(draftKey);
 	const storedDraft =
-		currentDraft && seed.draftKey === draftKey ? seed.text : currentDraft;
+		seed.draftKey === draftKey ? seed.text : readDraft(draftKey);
 
 	return { storedDraft, onChange, clearDraft, beginSubmission };
 }
