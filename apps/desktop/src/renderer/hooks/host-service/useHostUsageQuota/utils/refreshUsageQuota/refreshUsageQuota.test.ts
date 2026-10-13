@@ -64,6 +64,41 @@ test("only the newest forced refresh can publish across callers", async () => {
 	expect(queryClient.getQueryData<typeof accountA>(queryKey)).toEqual(accountB);
 });
 
+test("a newer refresh blocks an older result while cancellation is pending", async () => {
+	const queryClient = client();
+	const cancellationStarted = deferred<void>();
+	const releaseCancellation = deferred<void>();
+	const cancelQueries = queryClient.cancelQueries.bind(queryClient);
+	let firstCancellation = true;
+	queryClient.cancelQueries = async (...args) => {
+		if (firstCancellation) {
+			firstCancellation = false;
+			cancellationStarted.resolve();
+			await releaseCancellation.promise;
+		}
+		return cancelQueries(...args);
+	};
+	const older = refreshUsageQuota({
+		queryClient,
+		queryKey,
+		load: async () => accountA,
+	});
+	await cancellationStarted.promise;
+	const response = deferred<typeof accountB>();
+	const newer = refreshUsageQuota({
+		queryClient,
+		queryKey,
+		load: () => response.promise,
+	});
+	releaseCancellation.resolve();
+	await older;
+	const whileNewerIsPending = queryClient.getQueryData(queryKey);
+	response.resolve(accountB);
+	await newer;
+	expect(whileNewerIsPending).toBeUndefined();
+	expect(queryClient.getQueryData<typeof accountB>(queryKey)).toEqual(accountB);
+});
+
 test("a failed newer refresh preserves saved data and blocks older results", async () => {
 	const queryClient = client();
 	queryClient.setQueryData(queryKey, accountB);
