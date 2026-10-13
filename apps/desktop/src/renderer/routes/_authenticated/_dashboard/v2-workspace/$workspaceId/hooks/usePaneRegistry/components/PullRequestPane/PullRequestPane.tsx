@@ -136,6 +136,8 @@ export function PullRequestPane({
 						<PullRequestStackPopover
 							stack={stack.stack}
 							appearance="badge"
+							workspaceNumber={linkedPR.data?.number ?? null}
+							viewingNumber={data.number}
 							onSelectLayer={openStackLayer}
 						/>
 					) : null}

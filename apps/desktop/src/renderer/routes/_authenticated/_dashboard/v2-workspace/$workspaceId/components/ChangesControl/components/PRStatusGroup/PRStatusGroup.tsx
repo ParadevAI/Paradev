@@ -63,6 +63,8 @@ interface PRStatusGroupProps {
 	onToggleChanges?: () => void;
 	/** Opens the PR's summary pane in the workspace (the menu's "Open pull request"). */
 	onOpenPullRequest: (ref: PullRequestRef) => void;
+	/** The PR the workspace's pull-request pane shows, if one is in view. */
+	viewingPullRequestNumber?: number | null;
 	paneAreaStyle?: boolean;
 }
 
@@ -86,6 +88,7 @@ export function PRStatusGroup({
 	toggleLabel,
 	onToggleChanges,
 	onOpenPullRequest,
+	viewingPullRequestNumber = null,
 	paneAreaStyle = false,
 }: PRStatusGroupProps) {
 	const { t } = useLingui();
@@ -333,6 +336,8 @@ export function PRStatusGroup({
 						stack={stack}
 						appearance="segment"
 						className={cn(paneAreaStyle && "px-2", tint.hover)}
+						workspaceNumber={pr.number}
+						viewingNumber={viewingPullRequestNumber}
 						onSelectLayer={openStackLayer}
 					/>
 				</>

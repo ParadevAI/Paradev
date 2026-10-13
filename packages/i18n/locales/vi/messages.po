@@ -18341,6 +18341,10 @@ msgstr "Xem repository Superset trên GitHub"
 msgid "View usage"
 msgstr "Xem mức sử dụng"
 
+msgctxt "stack layer"
+msgid "Viewing"
+msgstr "Đang xem"
+
 msgid "Violence or harassment"
 msgstr "Bạo lực hoặc quấy rối"
 

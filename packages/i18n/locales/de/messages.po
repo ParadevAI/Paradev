@@ -18341,6 +18341,10 @@ msgstr "Superset-Repository auf GitHub ansehen"
 msgid "View usage"
 msgstr "Nutzung ansehen"
 
+msgctxt "stack layer"
+msgid "Viewing"
+msgstr "Angezeigt"
+
 msgid "Violence or harassment"
 msgstr "Gewalt oder Belästigung"
 

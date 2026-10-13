@@ -18341,6 +18341,10 @@ msgstr "在GitHub上檢視Superset儲存庫"
 msgid "View usage"
 msgstr "檢視用量"
 
+msgctxt "stack layer"
+msgid "Viewing"
+msgstr "正在檢視"
+
 msgid "Violence or harassment"
 msgstr "暴力或騷擾"
 

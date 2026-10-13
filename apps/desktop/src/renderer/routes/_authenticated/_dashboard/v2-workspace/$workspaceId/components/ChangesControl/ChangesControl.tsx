@@ -18,6 +18,8 @@ interface ChangesControlProps {
 	onToggleChanges: () => void;
 	/** Open or focus the pane showing the linked PR's summary. */
 	onOpenPullRequest: (ref: PullRequestRef) => void;
+	/** The PR the workspace's pull-request pane shows, if one is in view. */
+	viewingPullRequestNumber?: number | null;
 	paneAreaStyle?: boolean;
 }
 
@@ -41,6 +43,7 @@ export const ChangesControl = memo(function ChangesControl({
 	isChangesOpen,
 	onToggleChanges,
 	onOpenPullRequest,
+	viewingPullRequestNumber = null,
 	paneAreaStyle = false,
 }: ChangesControlProps) {
 	const { t } = useLingui();
@@ -104,6 +107,7 @@ export const ChangesControl = memo(function ChangesControl({
 					toggleLabel={label}
 					onToggleChanges={onToggleChanges}
 					onOpenPullRequest={onOpenPullRequest}
+					viewingPullRequestNumber={viewingPullRequestNumber}
 					paneAreaStyle={paneAreaStyle}
 				/>
 			)}

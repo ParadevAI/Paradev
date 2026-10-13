@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { badgeVariants } from "@superset/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@superset/ui/popover";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
@@ -32,14 +33,21 @@ export function PullRequestStackPopover({
 	stack,
 	appearance,
 	className,
+	workspaceNumber = null,
+	viewingNumber = null,
 	onSelectLayer,
 }: {
 	stack: PullRequestStack;
 	/** `badge` stands alone; `segment` is one part of a bordered split button. */
 	appearance: "badge" | "segment";
 	className?: string;
+	/** The PR of the workspace this chip sits in. */
+	workspaceNumber?: number | null;
+	/** The PR open in the pane, when it is another layer than the workspace's. */
+	viewingNumber?: number | null;
 	onSelectLayer: (layer: PullRequestStackLayer) => void;
 }) {
+	const { t } = useLingui();
 	const [open, setOpen] = useState(false);
 	const copy = usePullRequestStackCopy();
 	const { verdict } = assessPullRequestStack(stack);
@@ -79,6 +87,13 @@ export function PullRequestStackPopover({
 						<PullRequestStackLayerRow
 							key={layer.number}
 							layer={layer}
+							tag={
+								layer.number === workspaceNumber
+									? t({ message: "This workspace" })
+									: layer.number === viewingNumber
+										? t({ message: "Viewing", context: "stack layer" })
+										: null
+							}
 							onSelect={(selected) => {
 								setOpen(false);
 								if (!selected.isCurrent) onSelectLayer(selected);

@@ -19,9 +19,12 @@ function layerGlyphState(layer: PullRequestStackLayer): PullRequestGlyphState {
 
 export function PullRequestStackLayerRow({
 	layer,
+	tag,
 	onSelect,
 }: {
 	layer: PullRequestStackLayer;
+	/** Where this layer stands for the reader ("This workspace", "Viewing"). */
+	tag: string | null;
 	onSelect: (layer: PullRequestStackLayer) => void;
 }) {
 	const { t } = useLingui();
@@ -63,8 +66,15 @@ export function PullRequestStackLayerRow({
 					<span className="block truncate text-sm leading-5 text-foreground">
 						{layer.title}
 					</span>
-					<span className="block truncate text-xs leading-4 text-muted-foreground">
-						#{layer.number} · {layer.headRefName}
+					<span className="flex min-w-0 items-center gap-1.5 text-xs leading-4 text-muted-foreground">
+						<span className="truncate">
+							#{layer.number} · {layer.headRefName}
+						</span>
+						{tag ? (
+							<span className="shrink-0 rounded-full border border-border px-1.5 text-[10px] leading-4">
+								{tag}
+							</span>
+						) : null}
 					</span>
 				</span>
 				{layer.isCurrent ? null : (

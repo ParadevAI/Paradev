@@ -38,3 +38,14 @@ export function openPullRequestPaneInStore(
 		pane: { kind: "pull-request", data: data as PaneViewerData },
 	});
 }
+
+/** The PR the active tab's pull-request pane shows, if that tab has one. */
+export function findVisiblePullRequestNumber(
+	state: WorkspaceStore<PaneViewerData>,
+): number | null {
+	const activeTab = state.tabs.find((tab) => tab.id === state.activeTabId);
+	const pane = activeTab
+		? Object.values(activeTab.panes).find((p) => p.kind === "pull-request")
+		: undefined;
+	return pane ? (pane.data as PullRequestPaneData).number : null;
+}

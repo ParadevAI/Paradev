@@ -18341,6 +18341,10 @@ msgstr "Zobrazit repozitář Superset na GitHubu"
 msgid "View usage"
 msgstr "Zobrazit využití"
 
+msgctxt "stack layer"
+msgid "Viewing"
+msgstr "Zobrazeno"
+
 msgid "Violence or harassment"
 msgstr "Násilí nebo obtěžování"
 

@@ -78,6 +78,7 @@ import {
 	findVisibleChangesPane,
 	openChangesPaneInStore,
 } from "./utils/openChangesPaneInStore";
+import { findVisiblePullRequestNumber } from "./utils/openPullRequestPaneInStore";
 import type { V2WorkspaceUrlOpenTarget } from "./utils/openUrlInV2Workspace";
 
 interface WorkspaceSearch {
@@ -351,6 +352,10 @@ function V2WorkspaceContent() {
 		store,
 		(state) => findVisibleChangesPane(state) != null,
 	);
+	const viewingPullRequestNumber = useStore(
+		store,
+		findVisiblePullRequestNumber,
+	);
 	const isRightChangesTabOpen = useStore(
 		rightStore,
 		(state) => findVisibleChangesPane(state) != null,
@@ -583,6 +588,7 @@ function V2WorkspaceContent() {
 			isChangesOpen={isChangesOpen}
 			onToggleChanges={toggleChanges}
 			onOpenPullRequest={openPullRequestPane}
+			viewingPullRequestNumber={viewingPullRequestNumber}
 			paneAreaStyle={isRightPaneAreaEnabled}
 		/>
 	);

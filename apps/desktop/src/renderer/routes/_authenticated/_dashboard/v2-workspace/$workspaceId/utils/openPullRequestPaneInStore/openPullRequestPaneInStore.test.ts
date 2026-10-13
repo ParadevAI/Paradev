@@ -7,7 +7,10 @@ import {
 } from "@superset/panes";
 import type { StoreApi } from "zustand/vanilla";
 import type { PaneViewerData, PullRequestPaneData } from "../../types";
-import { openPullRequestPaneInStore } from "./openPullRequestPaneInStore";
+import {
+	findVisiblePullRequestNumber,
+	openPullRequestPaneInStore,
+} from "./openPullRequestPaneInStore";
 
 const REPO = "superset-sh/superset";
 
@@ -143,5 +146,27 @@ describe("openPullRequestPaneInStore", () => {
 			repoFullName: "superset-sh/docs",
 			number: 42,
 		});
+	});
+});
+
+describe("findVisiblePullRequestNumber", () => {
+	it("reads the pull-request pane of the active tab only", () => {
+		const existing = {
+			tabId: "tab-2",
+			paneId: "pane-2",
+			data: { repoFullName: REPO, number: 8437 },
+		};
+		const background = workspaceState(existing);
+		expect(
+			findVisiblePullRequestNumber(
+				background as WorkspaceStore<PaneViewerData>,
+			),
+		).toBeNull();
+		expect(
+			findVisiblePullRequestNumber({
+				...background,
+				activeTabId: "tab-2",
+			} as WorkspaceStore<PaneViewerData>),
+		).toBe(8437);
 	});
 });
