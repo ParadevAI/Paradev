@@ -75,8 +75,31 @@ test("chat account migration preserves legacy data and durably enforces unique l
 				sqlite.exec(
 					`INSERT INTO chat_sessions_local (session_id, scope_id, harness, epoch, status, updated_at, ${field}) SELECT 'duplicate', 'workspace', 'claude-acp', 'epoch', 'idle', 1, ${field} FROM chat_sessions_local WHERE session_id='old'`,
 				),
-			).toThrow();
+			).toThrow(`UNIQUE constraint failed: chat_sessions_local.${field}`);
 		}
+		const insertLegacy = sqlite.query(
+			"INSERT INTO chat_sessions_local (session_id, scope_id, harness, epoch, status, updated_at) VALUES (?, 'workspace', 'claude-acp', 'epoch', 'idle', 1)",
+		);
+		insertLegacy.run("null-a");
+		insertLegacy.run("null-b");
+		expect(
+			sqlite
+				.query(
+					"SELECT session_id, create_command_id, predecessor_session_id FROM chat_sessions_local WHERE session_id IN ('null-a', 'null-b') ORDER BY session_id",
+				)
+				.all(),
+		).toEqual([
+			{
+				session_id: "null-a",
+				create_command_id: null,
+				predecessor_session_id: null,
+			},
+			{
+				session_id: "null-b",
+				create_command_id: null,
+				predecessor_session_id: null,
+			},
+		]);
 	} finally {
 		sqlite.close();
 		rmSync(dir, { recursive: true, force: true });

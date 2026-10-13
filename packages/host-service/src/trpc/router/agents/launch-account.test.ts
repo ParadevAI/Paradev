@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { execFileSync } from "node:child_process";
-import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { buildArgvCommand } from "@superset/shared/agent-prompt-launch";
 import type { ResolvedHostAgentConfig } from "../../../terminal-agents/agent-config";
 import {
@@ -13,6 +13,7 @@ import {
 	accountLaunchUnsupportedReason,
 	listLaunchAccounts,
 	pinnedAccountCommandPrefix,
+	prepareLaunchAccountHooks,
 	resolveLaunchAccount,
 	validatePinnedLaunchAccount,
 } from "./launch-account";
@@ -262,4 +263,71 @@ describe("explicit terminal account selection", () => {
 		});
 		expect(result).toBe(`${pinned.directory}|unset|CLAUDE_CONFIG_DIR`);
 	});
+});
+
+test("pinned Codex launch preserves the true ambient home for nested hosts", () => {
+	const selected = {
+		...account,
+		agent: "codex" as const,
+		directory: "/profiles/codex",
+		selection: "/profiles/codex",
+		pinned: true as const,
+	};
+	const probe = `import {resolveAmbientCodexHome} from ${JSON.stringify(resolve(import.meta.dir, "../../../../../agent-setup/src/provider-profiles.ts"))}; console.log(resolveAmbientCodexHome("/fixture-user"));`;
+	const command =
+		pinnedAccountCommandPrefix(selected, {}) +
+		buildArgvCommand([process.execPath, "-e", probe]);
+	expect(
+		execFileSync("/bin/sh", ["-c", command], {
+			encoding: "utf8",
+			env: {
+				PATH: process.env.PATH,
+				CODEX_HOME: "/profiles/previous",
+				SUPERSET_DEFAULT_CODEX_HOME: "/profiles/previous",
+				SUPERSET_AMBIENT_CODEX_HOME: "/profiles/system",
+			},
+		}).trim(),
+	).toBe("/profiles/system");
+});
+
+test("prepares only managed hooks in a selected profile and preserves its login and settings", async () => {
+	const dir = await mkdtemp(join(tmpdir(), "superset-profile-hooks-"));
+	directories.push(dir);
+	await writeFile(join(dir, ".claude.json"), '{"fixture":"login bytes"}');
+	await writeFile(
+		join(dir, "settings.json"),
+		JSON.stringify({
+			theme: "dark",
+			hooks: { Stop: [{ hooks: [{ type: "command", command: "user-hook" }] }] },
+		}),
+	);
+	prepareLaunchAccountHooks({
+		...account,
+		directory: dir,
+		selection: dir,
+		pinned: true,
+	});
+	const settings = JSON.parse(
+		await readFile(join(dir, "settings.json"), "utf8"),
+	);
+	expect(settings.theme).toBe("dark");
+	expect(
+		settings.hooks.Stop.some((entry: { hooks: { command: string }[] }) =>
+			entry.hooks.some((hook) => hook.command === "user-hook"),
+		),
+	).toBe(true);
+	expect(JSON.stringify(settings.hooks)).toContain("notify.sh");
+	expect(await readFile(join(dir, ".claude.json"), "utf8")).toBe(
+		'{"fixture":"login bytes"}',
+	);
+	await writeFile(join(dir, "settings.json"), "{");
+	expect(() =>
+		prepareLaunchAccountHooks({
+			...account,
+			directory: dir,
+			selection: dir,
+			pinned: true,
+		}),
+	).toThrow("hooks");
+	expect(await readFile(join(dir, "settings.json"), "utf8")).toBe("{");
 });
