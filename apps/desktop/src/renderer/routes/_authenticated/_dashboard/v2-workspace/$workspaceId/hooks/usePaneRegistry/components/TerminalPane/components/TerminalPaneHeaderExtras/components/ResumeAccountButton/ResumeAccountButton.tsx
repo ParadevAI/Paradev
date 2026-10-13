@@ -18,7 +18,7 @@ import { useWorkspaceHostUrl } from "renderer/hooks/host-service/useWorkspaceHos
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { AccountTerminalForm } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/AccountTerminalDialog/components/AccountTerminalForm";
 
-import { cacheResumedSuccessor } from "./cacheResumedSuccessor";
+import { resumeWithSuccessorRecovery } from "./resumeWithSuccessorRecovery";
 
 export function ResumeAccountButton({
 	workspaceId,
@@ -164,28 +164,35 @@ export function ResumeAccountButton({
 							if (!candidate?.ready || !hostUrl || binding) return;
 							setResuming(true);
 							try {
-								const result = await getHostServiceClientByUrl(
-									hostUrl,
-								).terminalAgents.resumeWithAccount.mutate({
-									workspaceId,
-									terminalId,
-									expectedRevision: candidate.revision,
-									account,
-								});
-								if (!result.resumed)
-									throw new Error(
-										t({
-											message:
-												"This conversation is no longer available to resume.",
-										}),
-									);
-								await cacheResumedSuccessor(
+								const client = getHostServiceClientByUrl(hostUrl);
+								await resumeWithSuccessorRecovery(
 									queryClient,
 									getTerminalResumedSuccessorQueryKey(workspaceId, terminalId),
-									{
-										terminalId: result.terminalId,
-										label: result.label,
+									async () => {
+										const result =
+											await client.terminalAgents.resumeWithAccount.mutate({
+												workspaceId,
+												terminalId,
+												expectedRevision: candidate.revision,
+												account,
+											});
+										if (!result.resumed)
+											throw new Error(
+												t({
+													message:
+														"This conversation is no longer available to resume.",
+												}),
+											);
+										return {
+											terminalId: result.terminalId,
+											label: result.label,
+										};
 									},
+									() =>
+										client.terminalAgents.resumedSuccessor.query({
+											workspaceId,
+											terminalId,
+										}),
 								);
 								setOpen(false);
 							} finally {
