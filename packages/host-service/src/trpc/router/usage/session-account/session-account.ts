@@ -56,6 +56,23 @@ export function parsePersistedSessionAccount(
 	}
 }
 
+/** Compare durable routing context independently of JSON order and display metadata. */
+export function sameSessionAccountContext(
+	left: SessionAccount | null | undefined,
+	right: SessionAccount | null | undefined,
+): boolean {
+	if (!left || !right) return false;
+	return (
+		left.agent === right.agent &&
+		left.credentialKind === right.credentialKind &&
+		left.identity === right.identity &&
+		left.selection === right.selection &&
+		left.directory === right.directory &&
+		(left.pinned === true) === (right.pinned === true) &&
+		(left.conflict === true) === (right.conflict === true)
+	);
+}
+
 async function hasApiMarker(
 	agent: string,
 	directory: string,
