@@ -231,3 +231,18 @@ describe("exact shared history required for account resume", () => {
 		);
 	});
 });
+
+test("worker refusal retains the public precondition error without transcript details", async () => {
+	const { file, input } = await fixture();
+	await writeFile(file, "{private synthetic invalid content}\n");
+	try {
+		await inspectAccountResumeHistory(input);
+		throw new Error("Expected refusal");
+	} catch (error) {
+		expect(error).toMatchObject({
+			code: "PRECONDITION_FAILED",
+			message:
+				"The exact saved conversation is unavailable or ambiguous in the selected account. Shared conversation history is required. Nothing was launched.",
+		});
+	}
+});
