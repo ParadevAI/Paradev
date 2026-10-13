@@ -209,6 +209,13 @@ function V2WorkspaceContent() {
 		hasRow,
 	});
 	const linkedPaneStores = useMemo(() => [rightStore], [rightStore]);
+	const linkedTerminalStores = useMemo(
+		() =>
+			isRightPaneAreaEnabled
+				? [{ store: rightStore, reveal: () => setRightSidebarOpen(true) }]
+				: [],
+		[isRightPaneAreaEnabled, rightStore, setRightSidebarOpen],
+	);
 	const fileDocumentStores = useMemo(
 		() => [store, rightStore],
 		[store, rightStore],
@@ -221,7 +228,11 @@ function V2WorkspaceContent() {
 		createAccountTerminal,
 		openAgentChat,
 		focusAgentTerminal,
-	} = useAgentSessionLauncher({ workspaceId, store });
+	} = useAgentSessionLauncher({
+		workspaceId,
+		store,
+		linkedStores: linkedTerminalStores,
+	});
 	const {
 		matchedPresets,
 		newTabPresets,
