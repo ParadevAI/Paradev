@@ -1,5 +1,4 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { errorMessage } from "@superset/i18n/errors";
 import {
 	Command,
 	CommandEmpty,
@@ -20,6 +19,7 @@ import {
 	FORM_PICKER_MENU_CLASS,
 	FormPickerTrigger,
 } from "../FormPickerTrigger";
+import { BranchLoadFailure } from "./components/BranchLoadFailure";
 import {
 	type OpenWorkspaceTarget,
 	toOpenWorkspaceTarget,
@@ -35,6 +35,7 @@ interface CompareBaseBranchPickerProps {
 	branchesError: unknown;
 	isBranchesRefetching: boolean;
 	onRetryBranches: () => void;
+	onChangeProjectLocation?: () => void;
 	isHostOffline: boolean;
 	branches: BranchRow[];
 	branchSearch: string;
@@ -62,6 +63,7 @@ export function CompareBaseBranchPicker({
 	branchesError,
 	isBranchesRefetching,
 	onRetryBranches,
+	onChangeProjectLocation,
 	isHostOffline,
 	branches,
 	branchSearch,
@@ -117,25 +119,15 @@ export function CompareBaseBranchPicker({
 	}
 
 	const branchesFailure = (
-		<span className="flex min-w-0 items-center gap-1.5 text-[11px]">
-			<span
-				className="min-w-0 cursor-help truncate text-destructive"
-				title={errorMessage(branchesError)}
-			>
-				<Trans>Failed to load branches</Trans>
-			</span>
-			<button
-				type="button"
-				onClick={onRetryBranches}
-				disabled={isBranchesRefetching}
-				className="shrink-0 text-muted-foreground underline-offset-2 hover:text-foreground hover:underline disabled:no-underline disabled:opacity-60"
-			>
-				{isBranchesRefetching ? <Trans>Retrying…</Trans> : <Trans>Retry</Trans>}
-			</button>
-		</span>
+		<BranchLoadFailure
+			error={branchesError}
+			isRetrying={isBranchesRefetching}
+			onRetry={onRetryBranches}
+			onChangeProjectLocation={onChangeProjectLocation}
+		/>
 	);
 
-	if (isBranchesError && branches.length === 0) {
+	if (isBranchesError && branches.length === 0 && !open) {
 		return branchesFailure;
 	}
 
@@ -207,11 +199,13 @@ export function CompareBaseBranchPicker({
 						</TabsList>
 					</Tabs>
 					<CommandList className="max-h-[420px]">
-						{!isBranchesLoading && branches.length === 0 && (
-							<CommandEmpty>
-								<Trans>No branches found</Trans>
-							</CommandEmpty>
-						)}
+						{!isBranchesLoading &&
+							!isBranchesError &&
+							branches.length === 0 && (
+								<CommandEmpty>
+									<Trans>No branches found</Trans>
+								</CommandEmpty>
+							)}
 						{branches.map((branch) => {
 							const isRemoteOnly = branch.isRemote && !branch.isLocal;
 							const isWorktree = Boolean(branch.worktreePath);

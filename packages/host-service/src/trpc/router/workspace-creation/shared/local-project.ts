@@ -3,6 +3,7 @@ import { TRPCError } from "@trpc/server";
 import { and, eq, isNull, ne } from "drizzle-orm";
 import { projects } from "../../../../db/schema";
 import type { HostServiceContext } from "../../../../types";
+import type { ProjectDirMissingCause } from "../../../error-types";
 import { projectNotSetupError } from "./project-helpers";
 import { resolveProjectWorktreesFolder } from "./worktree-paths";
 
@@ -55,7 +56,10 @@ export function requireProjectRepoPath(localProject: LocalProject): string {
 		throw new TRPCError({
 			code: "NOT_FOUND",
 			message: "Project directory is no longer a directory on disk",
-			cause: { kind: "PROJECT_DIR_MISSING", repoPath: localProject.repoPath },
+			cause: {
+				kind: "PROJECT_DIR_MISSING",
+				repoPath: localProject.repoPath,
+			} satisfies ProjectDirMissingCause,
 		});
 	}
 	return localProject.repoPath;

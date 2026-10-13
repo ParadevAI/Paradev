@@ -86,6 +86,57 @@ describe("CompareBaseBranchPicker load failures", () => {
 		expect(page.getByText("Failed to load branches")).toBeTruthy();
 	});
 
+	test("keeps the list open when a search fails while it is open", async () => {
+		const main = {
+			name: "main",
+			lastCommitDate: 0,
+			isLocal: true,
+			isRemote: false,
+			recency: null,
+			worktreePath: null,
+			hasWorkspace: false,
+			isCheckedOut: false,
+		};
+		const props = (
+			overrides: Partial<React.ComponentProps<typeof CompareBaseBranchPicker>>,
+		) => (
+			<CompareBaseBranchPicker
+				effectiveCompareBaseBranch="main"
+				defaultBranch="main"
+				isBranchesLoading={false}
+				isBranchesError={false}
+				branchesError={null}
+				isBranchesRefetching={false}
+				onRetryBranches={() => {}}
+				isHostOffline={false}
+				branches={[main]}
+				branchSearch=""
+				onBranchSearchChange={() => {}}
+				branchFilter="all"
+				onBranchFilterChange={() => {}}
+				isFetchingNextPage={false}
+				hasNextPage={false}
+				onLoadMore={() => {}}
+				onSelectCompareBaseBranch={() => {}}
+				onOpenWorkspace={() => {}}
+				{...overrides}
+			/>
+		);
+		const { rerender } = render(props({}));
+		const page = within(document.body);
+		await act(async () => {
+			fireEvent.click(page.getByRole("button", { name: "main" }));
+		});
+		await act(async () => {
+			rerender(
+				props({ branches: [], branchSearch: "fix", isBranchesError: true }),
+			);
+		});
+		expect(page.getByRole("combobox")).toBeTruthy();
+		expect(page.getByText("Failed to load branches")).toBeTruthy();
+		expect(page.queryByText("No branches found")).toBeNull();
+	});
+
 	test("disables Retry while the retry is running", () => {
 		const page = renderPicker({
 			isBranchesError: true,
