@@ -12,6 +12,7 @@ import {
 import {
 	accountLaunchUnsupportedReason,
 	listLaunchAccounts,
+	listProviderLaunchAccounts,
 	pinnedAccountCommandPrefix,
 	resolveLaunchAccount,
 	validatePinnedLaunchAccount,
@@ -60,6 +61,34 @@ describe("explicit terminal account selection", () => {
 				label: account.selection,
 			},
 		]);
+	});
+
+	test("native discovery ignores terminal-only settings and keeps subscription eligibility", async () => {
+		const discover = async (provider: "claude" | "codex") => {
+			expect(provider).toBe("claude");
+			return [
+				account,
+				{ ...account, credentialKind: "api_key" as const },
+				{ ...account, directory: "relative" },
+			];
+		};
+		expect(
+			await listLaunchAccounts(
+				{ ...config, args: ["--model", "fixture"] },
+				discover,
+			),
+		).toMatchObject({ supported: false, accounts: [] });
+		expect(await listProviderLaunchAccounts("claude", discover)).toEqual({
+			supported: true,
+			accounts: [
+				{
+					selection: account.selection,
+					identity: account.identity,
+					email: account.email,
+					label: account.selection,
+				},
+			],
+		});
 	});
 
 	test("rejects undiscovered paths, stale identities and terminal control characters", async () => {

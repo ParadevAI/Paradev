@@ -120,7 +120,17 @@ export async function listLaunchAccounts(
 ) {
 	const reason = accountLaunchUnsupportedReason(config);
 	if (reason) return { supported: false, accounts: [], reason };
-	const accounts = await discover(config.presetId as "claude" | "codex");
+	return listProviderLaunchAccounts(
+		config.presetId as "claude" | "codex",
+		discover,
+	);
+}
+
+export async function listProviderLaunchAccounts(
+	provider: "claude" | "codex",
+	discover = discoverSessionAccounts,
+) {
+	const accounts = await discover(provider);
 	return {
 		supported: true,
 		accounts: accounts.filter(selectableAccount).map((account) => ({
