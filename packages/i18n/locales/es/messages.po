@@ -15701,7 +15701,7 @@ msgid "Start a fresh agent session seeded with this terminal's recent context. W
 msgstr "Inicia una nueva sesión de agente con el contexto reciente de este terminal. Los archivos del espacio de trabajo siguen siendo la fuente de verdad."
 
 msgid "Start a native chat using an existing login. Recovery keeps this account and working folder."
-msgstr "Inicia un chat nativo con una sesión de acceso existente. La recuperación mantiene esta cuenta y carpeta de trabajo."
+msgstr "Inicia un chat nativo usando una cuenta ya conectada. La recuperación mantiene esta cuenta y carpeta de trabajo."
 
 msgid "Start a new agent session each run"
 msgstr "Iniciar una nueva sesión de agente en cada ejecución"
