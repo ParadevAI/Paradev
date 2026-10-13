@@ -1253,6 +1253,17 @@ export const auth = betterAuth({
 
 					if (plan.name === "enterprise") return;
 
+					if (org.stripeCustomerId) {
+						await syncCustomerName(org.stripeCustomerId, org.name).catch(
+							(error) => {
+								console.error(
+									"[stripe/subscription-complete] Failed to restore customer name:",
+									error,
+								);
+							},
+						);
+					}
+
 					const owners = await getOrganizationOwners(subscription.referenceId);
 
 					const interval = stripeSubscription.items.data[0]?.price?.recurring
