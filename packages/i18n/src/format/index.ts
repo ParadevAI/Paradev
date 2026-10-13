@@ -1,4 +1,4 @@
-import { i18n } from "../index";
+import { i18n } from "@lingui/core";
 import { DEFAULT_LOCALE } from "../locales";
 
 // Locale-aware wrappers around Intl.*. Every user-facing number, currency,

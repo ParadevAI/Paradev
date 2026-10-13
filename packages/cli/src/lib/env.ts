@@ -8,6 +8,7 @@
 
 export const env = {
 	RELAY_URL: process.env.RELAY_URL || "http://127.0.0.1:1",
+	REALTIME_URL: process.env.REALTIME_URL || "http://127.0.0.1:1",
 	SUPERSET_API_URL: process.env.SUPERSET_API_URL || "http://127.0.0.1:1",
 	SUPERSET_WEB_URL: process.env.SUPERSET_WEB_URL || "http://127.0.0.1:1",
 	VERSION: process.env.SUPERSET_VERSION || "0.0.0-dev",

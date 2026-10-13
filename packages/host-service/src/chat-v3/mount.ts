@@ -7,6 +7,7 @@ import type { DeltaChannel } from "@superset/chat/protocol";
 import { parseCursor } from "@superset/chat/protocol";
 import type {
 	ChatRuntime,
+	ChatSessionChange,
 	HarnessFactory,
 	HarnessRegistry,
 	WsSinkSocket,
@@ -25,6 +26,7 @@ import { cliFloor } from "./acpCatalogue";
 import { acpHarnessEntries } from "./acpHarnesses";
 import { resolveAgentCli } from "./agentCli";
 import { buildChatAgentEnv } from "./agentEnv";
+import type { ChatAgentBridge } from "./chatAgentBridge";
 import { createResolveCwd } from "./resolveCwd";
 
 export const CHAT_V3_TRPC_PATH = "/chat-v3/trpc";
@@ -45,7 +47,10 @@ function migrationsFolder(): string {
 	return existsSync(sideBySide) ? sideBySide : DEFAULT_MIGRATIONS_FOLDER;
 }
 
-function harnessRegistry(db: HostDb): HarnessRegistry {
+function harnessRegistry(
+	db: HostDb,
+	agents: ChatAgentBridge | undefined,
+): HarnessRegistry {
 	const entries: [string, HarnessFactory][] = [
 		[
 			"claude-code",
@@ -60,6 +65,7 @@ function harnessRegistry(db: HostDb): HarnessRegistry {
 									db,
 									cwd: options.cwd,
 									workspaceId: options.scopeId,
+									terminalId: options.terminalId,
 								}),
 						});
 						return {
@@ -83,19 +89,21 @@ function harnessRegistry(db: HostDb): HarnessRegistry {
 									db,
 									cwd: options.cwd,
 									workspaceId: options.scopeId,
+									terminalId: options.terminalId,
 								}),
 						});
 						return { command: cli.command, env: cli.env };
 					},
 				}),
 		],
-		...acpHarnessEntries(db),
+		...acpHarnessEntries(db, agents),
 	];
 	return new Map(entries);
 }
 
 export type ChatV3Mount = {
 	runtime(): ChatRuntime;
+	closeScope(scopeId: string): Promise<void>;
 	dispose(): Promise<void>;
 };
 
@@ -106,6 +114,8 @@ export type ChatV3Mount = {
 export function createChatV3Mount(options: {
 	db: HostDb;
 	dbPath: string;
+	agents?: ChatAgentBridge;
+	onSessionChanged?: (change: ChatSessionChange) => void;
 }): ChatV3Mount {
 	let built: ChatRuntime | null = null;
 
@@ -114,13 +124,18 @@ export function createChatV3Mount(options: {
 		built = createChatRuntime({
 			dataDir: dirname(options.dbPath),
 			migrationsFolder: migrationsFolder(),
-			harnesses: harnessRegistry(options.db),
+			harnesses: harnessRegistry(options.db, options.agents),
+			observer: options.agents,
+			onSessionChanged: options.onSessionChanged,
 		});
 		return built;
 	};
 
 	return {
 		runtime,
+		closeScope: async (scopeId) => {
+			await built?.commands.closeScope(scopeId);
+		},
 		dispose: async () => {
 			const current = built;
 			built = null;
@@ -179,7 +194,8 @@ export function registerChatV3Routes(options: {
 							(channel): channel is DeltaChannel =>
 								channel === "text" ||
 								channel === "tool_input" ||
-								channel === "terminal",
+								channel === "terminal" ||
+								channel === "background",
 						);
 
 					const subscription = options.mount

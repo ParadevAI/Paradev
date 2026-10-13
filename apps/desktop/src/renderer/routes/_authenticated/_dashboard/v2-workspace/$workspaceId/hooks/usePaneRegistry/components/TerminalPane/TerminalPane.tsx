@@ -1,11 +1,8 @@
-import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
-import { i18n } from "@superset/i18n";
 import type { RendererContext } from "@superset/panes";
 import { toast } from "@superset/ui/sonner";
 import { cn } from "@superset/ui/utils";
 import { workspaceTrpc } from "@superset/workspace-client";
-import { usePagesEnabled } from "renderer/hooks/usePagesEnabled";
 import { terminalQueryColors } from "renderer/lib/terminal/terminal-query-colors";
 import type { OpenFile } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
 import "@xterm/xterm/css/xterm.css";
@@ -35,6 +32,7 @@ import {
 } from "renderer/lib/terminal/terminal-runtime-registry";
 import { useOpenInExternalEditor } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useOpenInExternalEditor";
 import { useRevealInFinder } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useRevealInFinder";
+import { useRightPaneLinkTarget } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/providers/RightPaneLinkTargetProvider";
 import type {
 	PaneViewerData,
 	TerminalPaneData,
@@ -54,6 +52,10 @@ import {
 	runUrlLinkAction,
 	type TerminalLinkActionDeps,
 } from "../../utils/runTerminalLinkAction";
+import {
+	PasteUploadLimitError,
+	uploadPastedFiles,
+} from "../../utils/uploadPastedFiles";
 import { TerminalAgentAutoResume } from "./components/TerminalAgentAutoResume";
 import { TerminalCopiedIndicator } from "./components/TerminalCopiedIndicator";
 import { TerminalNarrowedBanner } from "./components/TerminalNarrowedBanner";
@@ -66,7 +68,6 @@ import {
 	terminalRichInputOpenStore,
 	useTerminalRichInputOpen,
 } from "./richInputOpenStore";
-import { PasteUploadLimitError, uploadPastedFiles } from "./uploadPastedFiles";
 import { shellEscapePaths } from "./utils";
 
 interface TerminalPaneProps {
@@ -86,7 +87,6 @@ export function TerminalPane({
 	const filePolicy = useTerminalFilePolicy();
 	const getUrlAction = useUrlLinkAction("4-tier");
 	const folderPolicy = useTerminalFolderPolicy();
-	const isPagesEnabled = usePagesEnabled() ?? false;
 	const {
 		hoveredLink,
 		liveHoveredLinkRef,
@@ -96,6 +96,9 @@ export function TerminalPane({
 	const { hint, showHint } = useLinkClickHint();
 	const openInExternalEditor = useOpenInExternalEditor(workspaceId);
 	const revealInFinder = useRevealInFinder(workspaceId);
+	// The "reveal" intent falls back to Finder for folders outside the
+	// worktree (revealPath's containment check); the hover label needs the
+	// same knowledge so it doesn't promise a sidebar reveal it can't do.
 	const workspaceQuery = workspaceTrpc.workspace.get.useQuery({
 		id: workspaceId,
 	});
@@ -107,23 +110,24 @@ export function TerminalPane({
 	// Link actions are fired from event handlers (xterm clicks, context-menu
 	// selections) that outlive the render they were registered in, so the deps
 	// are read through a ref.
+	const rightPane = useRightPaneLinkTarget();
 	const linkActionDepsRef = useRef<TerminalLinkActionDeps>({
 		store: ctx.store,
-		isPagesEnabled,
 		onOpenFile,
 		onRevealPath,
 		openInExternalEditor,
 		revealInFinder,
 		worktreePath,
+		rightPane,
 	});
 	linkActionDepsRef.current = {
 		store: ctx.store,
-		isPagesEnabled,
 		onOpenFile,
 		onRevealPath,
 		openInExternalEditor,
 		revealInFinder,
 		worktreePath,
+		rightPane,
 	};
 	const [isSearchOpen, setIsSearchOpen] = useState(false);
 	// Open/closed is tracked per terminalId in a shared store so the header
@@ -695,6 +699,8 @@ function resolveHoverLabel(
 	}
 	if (hovered.info.isDirectory) {
 		const intent = folderPolicy.getIntent(event);
+		// A folder outside the worktree can't be revealed in the sidebar —
+		// clicking falls back to Finder (revealPath), so say that instead.
 		if (
 			intent === "reveal" &&
 			worktreePath &&
@@ -703,13 +709,8 @@ function resolveHoverLabel(
 		) {
 			return folderIntentLabel("finder");
 		}
-		return intent === "reveal"
-			? i18n._(msg({ message: "Open IDE" }))
-			: folderIntentLabel(intent);
+		return folderIntentLabel(intent);
 	}
 	const action = filePolicy.getAction(event);
-	if (!action) return null;
-	return action === "external"
-		? actionLabel(action, "file")
-		: i18n._(msg({ message: "Open IDE" }));
+	return action ? actionLabel(action, "file") : null;
 }

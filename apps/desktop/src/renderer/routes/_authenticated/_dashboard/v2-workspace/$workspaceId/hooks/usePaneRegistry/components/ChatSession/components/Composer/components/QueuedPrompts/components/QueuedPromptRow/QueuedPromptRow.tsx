@@ -1,4 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import { userMessageText } from "@superset/chat/core";
 import type { UserMessage } from "@superset/chat/protocol";
 import {
 	QueueItem,
@@ -14,7 +15,7 @@ import {
 } from "@superset/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { CornerDownRight, Ellipsis, ListEnd, Trash2 } from "lucide-react";
-import { userMessageText } from "../../../../../../utils/userMessageText";
+import { parseAttachmentTags } from "../../../../../../utils/attachmentTags";
 
 export function QueuedPromptRow({
 	prompt,
@@ -30,13 +31,23 @@ export function QueuedPromptRow({
 	onSteer: (id: string) => void;
 }) {
 	const { t } = useLingui();
-	const text = userMessageText(prompt);
-	const attachmentNames = prompt.content.flatMap((content) =>
-		content.type === "attachment" ? [content.name] : [],
-	);
+	const { text, attachments } = parseAttachmentTags(userMessageText(prompt));
+	const attachmentNames = [
+		...attachments.map(
+			(attachment) => attachment.path.split("/").pop() ?? attachment.path,
+		),
+		...prompt.content.flatMap((content) =>
+			content.type === "attachment" ? [content.name] : [],
+		),
+	];
 
 	return (
-		<QueueItem className="flex-row items-center gap-2 pr-2 pl-3">
+		<QueueItem
+			aria-label={text || attachmentNames.join(", ")}
+			className="flex-row items-center gap-2 pr-2 pl-3 outline-none focus-visible:bg-muted focus-visible:ring-1 focus-visible:ring-ring"
+			data-queue-row
+			tabIndex={actionable ? -1 : undefined}
+		>
 			<ListEnd className="size-4 shrink-0 text-muted-foreground" />
 			<QueueItemContent className="min-w-0 truncate text-foreground">
 				{text || attachmentNames.join(", ")}

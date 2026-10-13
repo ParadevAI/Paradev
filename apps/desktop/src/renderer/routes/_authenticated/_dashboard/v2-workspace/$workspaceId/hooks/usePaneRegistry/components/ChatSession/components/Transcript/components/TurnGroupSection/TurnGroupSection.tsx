@@ -1,8 +1,21 @@
 import type { OutboxEntry, SessionSnapshot } from "@superset/chat/core";
 import { displayText } from "@superset/chat/core";
-import type { Decision, UserMessage } from "@superset/chat/protocol";
+import type {
+	ApprovalRequest,
+	AvailableCommand,
+	Decision,
+	ImageAttachment,
+	Item,
+	ToolCall,
+	UserMessage,
+} from "@superset/chat/protocol";
+import { isImageAttachment } from "@superset/chat/protocol";
+import type { ReactNode } from "react";
 import type { ChatForkTarget } from "../../../../types";
+import type { PageLink } from "../../../../utils/pageLinks";
+import { PageLinkCard } from "../../../PageLinkCard";
 import type { TranscriptRow } from "../../utils/transcriptRows";
+import { AttachmentRail } from "../AttachmentRail";
 import { ItemRow } from "./components/ItemRow";
 import { ToolRunRow } from "./components/ToolRunRow";
 import { TurnStatusRow } from "./components/TurnStatusRow";
@@ -18,6 +31,39 @@ function outboxMessage(entry: OutboxEntry): UserMessage {
 	};
 }
 
+function pageCards(pages: readonly PageLink[] | undefined): ReactNode {
+	return pages?.map((page) => (
+		<PageLinkCard
+			className="mt-1 mb-1.5"
+			key={page.slug}
+			slug={page.slug}
+			url={page.url}
+		/>
+	));
+}
+
+function toolImages(tools: readonly ToolCall[]): ImageAttachment[] {
+	return tools.flatMap((tool) =>
+		(tool.attachments ?? []).filter(isImageAttachment),
+	);
+}
+
+function imageRail(tools: readonly ToolCall[]): ReactNode {
+	const images = toolImages(tools);
+	return images.length > 0 ? (
+		<AttachmentRail className="mt-1 mb-2 pl-5" images={images} />
+	) : null;
+}
+
+function approvalTarget(
+	snapshot: SessionSnapshot,
+	item: Item,
+): Item | undefined {
+	if (item.kind !== "approval_request") return undefined;
+	const targetId = (item as ApprovalRequest).targetItemId;
+	return targetId ? snapshot.items.get(targetId)?.item : undefined;
+}
+
 export type TurnGroupSectionProps = {
 	row: TranscriptRow;
 	lastReply: boolean;
@@ -29,6 +75,7 @@ export type TurnGroupSectionProps = {
 	onDiscardPrompt: (clientId: string) => void;
 	onFork?: ((target: ChatForkTarget) => void) | undefined;
 	canForkToWorktree?: boolean;
+	commands?: ReadonlyMap<string, AvailableCommand> | undefined;
 };
 
 /**
@@ -39,6 +86,7 @@ export type TurnGroupSectionProps = {
  */
 export function TurnGroupSection({
 	canForkToWorktree,
+	commands,
 	lastReply,
 	isEntryCollapsed,
 	onDiscardPrompt,
@@ -60,19 +108,28 @@ export function TurnGroupSection({
 			);
 		case "item":
 			return (
-				<ItemRow
-					canForkToWorktree={canForkToWorktree}
-					lastReply={lastReply}
-					harness={harness}
-					item={row.item}
-					onFork={onFork}
-					onRespond={onRespond}
-					text={displayText(snapshot, row.item.id)}
-				/>
+				<>
+					<ItemRow
+						afterTarget={row.afterTarget}
+						approvalTarget={approvalTarget(snapshot, row.item)}
+						canForkToWorktree={canForkToWorktree}
+						commands={commands}
+						lastReply={lastReply}
+						harness={harness}
+						item={row.item}
+						onFork={onFork}
+						onRespond={onRespond}
+						pagesShownEarlier={row.pagesShownEarlier}
+						text={displayText(snapshot, row.item.id)}
+					/>
+					{row.item.kind === "tool_call" && imageRail([row.item as ToolCall])}
+					{pageCards(row.pages)}
+				</>
 			);
 		case "outbox":
 			return (
 				<ItemRow
+					commands={commands}
 					harness={harness}
 					item={outboxMessage(row.entry)}
 					onRespond={onRespond}
@@ -86,12 +143,16 @@ export function TurnGroupSection({
 			);
 		case "tool_run":
 			return (
-				<ToolRunRow
-					collapsed={isEntryCollapsed(row.key, row.defaultCollapsed)}
-					items={row.items}
-					onToggle={onToggleEntry}
-					rowKey={row.key}
-				/>
+				<>
+					<ToolRunRow
+						collapsed={isEntryCollapsed(row.key, row.defaultCollapsed)}
+						items={row.items}
+						onToggle={onToggleEntry}
+						rowKey={row.key}
+					/>
+					{imageRail(row.items)}
+					{pageCards(row.pages)}
+				</>
 			);
 		case "turn_status":
 			return <TurnStatusRow message={row.message} status={row.status} />;

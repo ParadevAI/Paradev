@@ -44,8 +44,6 @@ import { loadLanguageSupport } from "./loadLanguageSupport";
 import { getCodeSyntaxHighlighting } from "./syntax-highlighting";
 
 interface CodeEditorProps {
-	revealPosition?: { line: number; column: number };
-	onRevealComplete?: () => void;
 	value: string;
 	language: string;
 	readOnly?: boolean;
@@ -72,8 +70,6 @@ export function CodeEditor({
 	onSave,
 	initialScrollPosition,
 	onScrollPositionChange,
-	revealPosition,
-	onRevealComplete,
 }: CodeEditorProps) {
 	const containerRef = useRef<HTMLDivElement | null>(null);
 	const viewRef = useRef<EditorView | null>(null);
@@ -192,7 +188,7 @@ export function CodeEditor({
 			passive: true,
 		});
 		const savedScrollPosition = initialScrollPositionRef.current;
-		if (savedScrollPosition && !revealPosition) {
+		if (savedScrollPosition) {
 			view.requestMeasure({
 				read: () => savedScrollPosition,
 				write: (position) => {
@@ -235,24 +231,6 @@ export function CodeEditor({
 			isExternalUpdateRef.current = false;
 		}
 	}, [value]);
-
-	useEffect(() => {
-		const view = viewRef.current;
-		if (!view || !revealPosition) return;
-		const line = view.state.doc.line(
-			Math.min(view.state.doc.lines, Math.max(1, revealPosition.line)),
-		);
-		const position = Math.min(
-			line.to,
-			line.from + Math.max(0, revealPosition.column - 1),
-		);
-		view.dispatch({
-			selection: { anchor: position },
-			effects: EditorView.scrollIntoView(position, { y: "center" }),
-		});
-		view.focus();
-		onRevealComplete?.();
-	}, [revealPosition, onRevealComplete]);
 
 	useEffect(() => {
 		const view = viewRef.current;

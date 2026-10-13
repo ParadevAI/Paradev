@@ -12,5 +12,7 @@
 /** Per file. Large enough for an asset bundle a coding agent is given. */
 export const MAX_ATTACHMENT_BYTES = 200 * 1024 * 1024;
 
+export const MAX_CHAT_IMAGE_BYTES = 50 * 1024 * 1024;
+
 /** Per send, matching what the desktop terminal composer accepts. */
 export const MAX_ATTACHMENTS = 10;

@@ -4,6 +4,7 @@ import {
 	MAX_PAGE_STORAGE_KEYS_PER_USER,
 	MAX_PAGE_STORAGE_VALUE_BYTES,
 	pageStorageRefusal,
+	parsePageStorageScope,
 } from "./page-storage";
 
 const empty = {
@@ -80,4 +81,26 @@ describe("pageStorageRefusal", () => {
 			),
 		).toMatchObject({ code: "quota_exceeded" });
 	});
+});
+
+describe("parsePageStorageScope", () => {
+	test("no scope is a slot", () => {
+		expect(parsePageStorageScope(undefined)).toBe("slot");
+	});
+
+	test("accepts each scope", () => {
+		for (const scope of ["slot", "private", "shared"] as const) {
+			expect(parsePageStorageScope(scope)).toBe(scope);
+		}
+	});
+
+	test("refuses anything else", () => {
+		expect(parsePageStorageScope("public")).toBeNull();
+		expect(parsePageStorageScope(1)).toBeNull();
+		expect(parsePageStorageScope(null)).toBeNull();
+	});
+});
+
+test("a page stores up to 20 MiB", () => {
+	expect(MAX_PAGE_STORAGE_BYTES).toBe(20 * 1024 * 1024);
 });

@@ -1,8 +1,12 @@
-import { boolean, CLIError } from "@superset/cli-framework";
+import { boolean, CLIError, string } from "@superset/cli-framework";
 import { command } from "../../lib/command";
 import { readManifest, removeManifestIfOwnedBy } from "../../lib/host/manifest";
 import { stopTerminalDaemon } from "../../lib/host/terminal-daemon";
 import { terminateProcess } from "../../lib/host/terminate";
+import { resolveOrganizationFromContext } from "../../lib/resolve-org";
+
+const ORGANIZATION_ID =
+	/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export default command({
 	sandbox: false,
@@ -11,9 +15,20 @@ export default command({
 		terminals: boolean().desc(
 			"Also stop the terminal daemon, ending every terminal and agent",
 		),
+		org: string().desc(
+			"Organization the host runs under (id, slug, or name); defaults to active. An id needs no network, so it works with a revoked key",
+		),
 	},
 	run: async ({ ctx, options }) => {
-		const organization = await ctx.api.user.myOrganization.query();
+		const organization = options.org
+			? ORGANIZATION_ID.test(options.org)
+				? { id: options.org, name: options.org }
+				: await resolveOrganizationFromContext(
+						ctx.api,
+						ctx.config.organizationId,
+						options.org,
+					)
+			: await ctx.api.user.myOrganization.query();
 		if (!organization)
 			throw new CLIError("No active organization", "Run: superset auth login");
 

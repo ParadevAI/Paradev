@@ -1,1 +1,4 @@
-export { PullRequestCommentCard } from "./PullRequestCommentCard";
+export {
+	PullRequestCommentCard,
+	type PullRequestCommentCardProps,
+} from "./PullRequestCommentCard";

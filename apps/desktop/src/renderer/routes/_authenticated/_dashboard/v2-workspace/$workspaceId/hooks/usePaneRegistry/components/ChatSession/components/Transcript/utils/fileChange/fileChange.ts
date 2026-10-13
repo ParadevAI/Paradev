@@ -25,6 +25,11 @@ export function fileChangeKind(
 	return "modified";
 }
 
+/** The path without its file name and the separator before it. */
+export function directoryOf(path: string, name: string): string {
+	return path.slice(0, path.length - name.length).replace(/[\\/]+$/, "");
+}
+
 export function fileName(path: string): string {
 	const trimmed = path.replace(/[\\/]+$/, "");
 	const index = Math.max(trimmed.lastIndexOf("/"), trimmed.lastIndexOf("\\"));

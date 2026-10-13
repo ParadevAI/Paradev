@@ -256,6 +256,7 @@ function ensureSidebarWorkspaceRecord(
 			isHidden: false,
 		},
 		paneLayout: createEmptyPaneLayout(),
+		rightSidebarOpen: false,
 	});
 }
 

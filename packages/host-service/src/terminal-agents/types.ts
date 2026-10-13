@@ -1,3 +1,4 @@
+import type { BackgroundTask } from "@superset/chat/protocol";
 import type {
 	AgentDefinitionId,
 	AgentIdentityId,
@@ -66,4 +67,7 @@ export interface TerminalAgentBinding {
 	endReason?: TerminalAgentEndReason;
 	/** Live subagents under this agent, oldest first. Absent when none. */
 	subagents?: TerminalSubagent[];
+	chatSessionId?: string;
+	backgroundTasks?: BackgroundTask[];
+	queuedPrompts?: number;
 }

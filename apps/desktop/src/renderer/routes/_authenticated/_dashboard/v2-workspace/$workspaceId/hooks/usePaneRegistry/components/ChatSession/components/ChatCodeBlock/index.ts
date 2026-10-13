@@ -1,1 +1,2 @@
-export { CHAT_CODE_COMPONENTS, ChatCodeBlock } from "./ChatCodeBlock";
+export { ChatCodeBlock } from "./ChatCodeBlock";
+export { CODE_CARD_CLASSNAME } from "./constants";

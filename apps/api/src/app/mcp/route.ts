@@ -72,6 +72,7 @@ async function handle(req: Request): Promise<Response> {
 		ctx = await resolveMcpContext(req, {
 			apiUrl: env.NEXT_PUBLIC_API_URL,
 			relayUrl: env.RELAY_URL,
+			realtimeUrl: env.REALTIME_URL,
 		});
 	} catch (error) {
 		if (isMcpUnauthorized(error)) {

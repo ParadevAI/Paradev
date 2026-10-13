@@ -1,0 +1,1 @@
+export { usePullRequestActivityWidthLayout } from "./usePullRequestActivityWidthLayout";

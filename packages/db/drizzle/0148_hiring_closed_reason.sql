@@ -1,0 +1,2 @@
+CREATE TYPE "public"."hiring_closed_reason" AS ENUM('visa_or_sponsorship', 'location_or_remote', 'seniority_or_fit', 'frontend_depth_gap', 'live_venture_conflict', 'lean_hire_no_decision', 'slow_loop_role_filled', 'ghosted_no_reply', 'above_experience_ceiling', 'below_experience_band', 'pedigree_bar', 'other');--> statement-breakpoint
+ALTER TABLE "hiring_applications" ADD COLUMN "closed_reason" "hiring_closed_reason";

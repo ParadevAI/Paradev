@@ -1,6 +1,7 @@
 import { auth, mintUserJwt } from "@superset/auth/server";
 import { db } from "@superset/db/client";
 import { members, users } from "@superset/db/schema";
+import { ORGANIZATION_HEADER } from "@superset/shared/constants";
 import { SANDBOX_API_CREDENTIAL_HEADER } from "@superset/shared/sandbox-gate";
 import {
 	resolveSandboxCaller,
@@ -8,6 +9,10 @@ import {
 } from "@superset/trpc/lib/sandbox";
 import { verifyAccessToken } from "better-auth/oauth2";
 import { eq } from "drizzle-orm";
+import {
+	TokenOrganizationError,
+	tokenOrganizationId,
+} from "./token-organization";
 
 export interface McpContext {
 	userId: string;
@@ -19,6 +24,7 @@ export interface McpContext {
 	requestId: string;
 	bearerToken: string;
 	relayUrl: string;
+	realtimeUrl: string;
 }
 
 const MCP_UNAUTHORIZED = Symbol("MCP_UNAUTHORIZED");
@@ -127,6 +133,7 @@ async function resolveApiKey(token: string): Promise<{
 async function resolveOAuth(
 	token: string,
 	apiUrl: string,
+	requestedOrganizationId: string | null,
 ): Promise<{
 	userId: string;
 	organizationId: string;
@@ -152,8 +159,14 @@ async function resolveOAuth(
 	if (typeof payload.sub !== "string" || !payload.sub) {
 		throw new McpUnauthorizedError("OAuth token missing sub claim");
 	}
-	if (typeof payload.organizationId !== "string" || !payload.organizationId) {
-		throw new McpUnauthorizedError("OAuth token missing organizationId claim");
+	let organizationId: string;
+	try {
+		organizationId = tokenOrganizationId(payload, requestedOrganizationId);
+	} catch (error) {
+		if (error instanceof TokenOrganizationError) {
+			throw new McpUnauthorizedError(error.message);
+		}
+		throw error;
 	}
 	const clientLabel =
 		typeof payload.client_name === "string" && payload.client_name
@@ -161,7 +174,7 @@ async function resolveOAuth(
 			: null;
 	return {
 		userId: payload.sub,
-		organizationId: payload.organizationId,
+		organizationId,
 		clientLabel,
 	};
 }
@@ -169,12 +182,14 @@ async function resolveOAuth(
 export interface ResolveMcpContextOptions {
 	apiUrl: string;
 	relayUrl: string;
+	realtimeUrl: string;
 	sandboxCredential?: boolean;
 }
 
 async function sandboxContext(
 	caller: SandboxCaller,
 	relayUrl: string,
+	realtimeUrl: string,
 ): Promise<McpContext> {
 	const { email, organizationIds } = await loadUserAndOrgs(caller.userId);
 	return {
@@ -187,6 +202,7 @@ async function sandboxContext(
 		requestId: crypto.randomUUID(),
 		bearerToken: "",
 		relayUrl,
+		realtimeUrl,
 	};
 }
 
@@ -194,13 +210,13 @@ export async function resolveMcpContext(
 	req: Request,
 	options: ResolveMcpContextOptions,
 ): Promise<McpContext> {
-	const { apiUrl, relayUrl } = options;
+	const { apiUrl, relayUrl, realtimeUrl } = options;
 
 	if (options.sandboxCredential) {
 		const caller = await resolveSandboxCaller(
 			req.headers.get(SANDBOX_API_CREDENTIAL_HEADER),
 		);
-		if (caller) return await sandboxContext(caller, relayUrl);
+		if (caller) return await sandboxContext(caller, relayUrl, realtimeUrl);
 	}
 
 	const token = extractBearer(req);
@@ -220,6 +236,7 @@ export async function resolveMcpContext(
 		({ userId, organizationId, clientLabel } = await resolveOAuth(
 			token,
 			apiUrl,
+			req.headers.get(ORGANIZATION_HEADER)?.trim() || null,
 		));
 		source = "oauth";
 	} else {
@@ -252,5 +269,6 @@ export async function resolveMcpContext(
 		requestId: crypto.randomUUID(),
 		bearerToken,
 		relayUrl,
+		realtimeUrl,
 	};
 }

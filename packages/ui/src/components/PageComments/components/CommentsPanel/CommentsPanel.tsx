@@ -1,7 +1,7 @@
 "use client";
 
 import { Trans, useLingui } from "@lingui/react/macro";
-import { useFormat } from "@superset/i18n/react";
+import { useFormat } from "@superset/i18n/use-format";
 import { differenceInCalendarDays } from "date-fns";
 import { X } from "lucide-react";
 import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";

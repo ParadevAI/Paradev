@@ -9,6 +9,10 @@
 			"default": "./src/worktree-deletion.ts"
 		},
 		"./terminal-colors": "./src/terminal-colors.ts",
+		"./voice": {
+			"types": "./src/voice/index.ts",
+			"default": "./src/voice/index.ts"
+		},
 		"./connectors": {
 			"types": "./src/connectors/index.ts",
 			"default": "./src/connectors/index.ts"
@@ -20,6 +24,14 @@
 		"./page-zoom": {
 			"types": "./src/page-zoom.ts",
 			"default": "./src/page-zoom.ts"
+		},
+		"./desktop-notification": {
+			"types": "./src/desktop-notification.ts",
+			"default": "./src/desktop-notification.ts"
+		},
+		"./pane-layout-ops": {
+			"types": "./src/pane-layout-ops.ts",
+			"default": "./src/pane-layout-ops.ts"
 		},
 		"./usercontent": {
 			"types": "./src/usercontent/index.ts",
@@ -33,6 +45,14 @@
 			"types": "./src/page-storage-runtime.ts",
 			"default": "./src/page-storage-runtime.ts"
 		},
+		"./page-tools": {
+			"types": "./src/page-tools.ts",
+			"default": "./src/page-tools.ts"
+		},
+		"./page-tools-runtime": {
+			"types": "./src/page-tools-runtime.ts",
+			"default": "./src/page-tools-runtime.ts"
+		},
 		"./page-storage-hub": {
 			"types": "./src/page-storage-hub.ts",
 			"default": "./src/page-storage-hub.ts"
@@ -40,6 +60,18 @@
 		"./page-storage": {
 			"types": "./src/page-storage.ts",
 			"default": "./src/page-storage.ts"
+		},
+		"./page-storage-records": {
+			"types": "./src/page-storage-records.ts",
+			"default": "./src/page-storage-records.ts"
+		},
+		"./page-presence": {
+			"types": "./src/page-presence.ts",
+			"default": "./src/page-presence.ts"
+		},
+		"./page-presence-client": {
+			"types": "./src/page-presence-client.ts",
+			"default": "./src/page-presence-client.ts"
 		},
 		"./page-comments": {
 			"types": "./src/page-comments/index.ts",
@@ -393,7 +425,7 @@
 	"scripts": {
 		"clean": "git clean -xdf .cache .turbo dist node_modules",
 		"typecheck": "tsc --noEmit --emitDeclarationOnly false",
-		"test": "bun test --isolate"
+		"test": "bun test"
 	},
 	"dependencies": {
 		"@date-fns/tz": "1.4.1",

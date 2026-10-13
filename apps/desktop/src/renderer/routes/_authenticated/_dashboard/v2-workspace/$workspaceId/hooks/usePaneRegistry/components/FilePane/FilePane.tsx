@@ -3,8 +3,8 @@ import { useWorkspaceClient, workspaceTrpc } from "@superset/workspace-client";
 import { useCallback, useEffect } from "react";
 import { FileSaveConflictDialog } from "renderer/components/FileSaveConflictDialog";
 import { MarkdownResourceProvider } from "renderer/components/MarkdownRenderer/providers/MarkdownResourceProvider";
-import { usePagesEnabled } from "renderer/hooks/usePagesEnabled";
 import type { LinkAction } from "renderer/lib/clickPolicy";
+import { useRightPaneLinkTarget } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/providers/RightPaneLinkTargetProvider";
 import { getPathDirectory } from "shared/absolute-paths";
 import { useStore } from "zustand";
 import {
@@ -27,7 +27,6 @@ interface FilePaneProps {
 }
 
 export function FilePane({ context, workspaceId }: FilePaneProps) {
-	const isPagesEnabled = usePagesEnabled();
 	const data = context.pane.data as FilePaneData;
 	const { filePath } = data;
 	const isActiveTab = useStore(
@@ -107,11 +106,12 @@ export function FilePane({ context, workspaceId }: FilePaneProps) {
 		[context.actions, data],
 	);
 
+	const rightPane = useRightPaneLinkTarget();
 	const handleOpenUrl = useCallback(
 		(url: string, action: LinkAction) => {
-			runUrlLinkAction({ store: context.store, isPagesEnabled }, url, action);
+			runUrlLinkAction({ store: context.store, rightPane }, url, action);
 		},
-		[context.store, isPagesEnabled],
+		[context.store, rightPane],
 	);
 
 	const handlePositionRevealed = useCallback(() => {

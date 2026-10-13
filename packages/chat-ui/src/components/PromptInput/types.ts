@@ -6,7 +6,14 @@ export type ComposerChip = {
 	brandColor?: string;
 	// Icon as a URL string so chips stay serializable data.
 	iconUrl?: string;
+	description?: string;
 	data?: unknown;
+};
+
+export type ComposerChipMatch = {
+	start: number;
+	end: number;
+	chip: ComposerChip;
 };
 
 export type ComposerActionContext = {
@@ -60,6 +67,7 @@ export type ComposerMentionProvider = {
 export type PromptInputCommand = {
 	id: string;
 	title: string;
+	hint?: string;
 	description?: string;
 	icon?: ReactNode;
 	rightIcon?: ReactNode;
@@ -79,6 +87,7 @@ export type PromptInputSubmitPayload = {
 	text: string;
 	files: File[];
 	mentions: ComposerChip[];
+	steer: boolean;
 };
 
 export type PromptInputDictationError = {
@@ -116,7 +125,13 @@ export type PromptInputProps = {
 	defaultValue?: string;
 	// Plain text of the composer as it is typed, for persisting a draft.
 	onChange?: (text: string) => void;
-	onSubmit?: (payload: PromptInputSubmitPayload) => void;
+	// Spans of a stored draft that were chips before it was serialized, so
+	// they come back as chips. Runs on the draft as read, never on typing.
+	findChips?: (text: string) => ComposerChipMatch[];
+	/** Returning `false` keeps the draft in the editor. */
+	onSubmit?: (
+		payload: PromptInputSubmitPayload,
+	) => false | void | Promise<void>;
 	onStop?: () => void;
 	header?: ReactNode;
 	onAddFiles?: (files: File[]) => void;
@@ -127,5 +142,6 @@ export type PromptInputProps = {
 	onMentionHighlight?: (entry: ComposerMentionEntry | null) => void;
 	onAttachmentClick?: (attachment: PromptInputAttachment) => void;
 	onChipClick?: (chip: ComposerChip) => void;
+	history?: string[];
 	className?: string;
 };

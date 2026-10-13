@@ -18,6 +18,10 @@ import {
 	writeFile,
 } from "../fs";
 import { normalizeAbsolutePath } from "../paths";
+import {
+	type FileReferenceMatch,
+	resolveFileReference,
+} from "../resolve-file-reference";
 import type { SearchContentOptions } from "../search";
 import { searchContent, searchFiles } from "../search";
 import type { FsWatchEvent } from "../types";
@@ -48,6 +52,12 @@ export interface FsHostService extends FsService {
 		absolutePath: string;
 		revision: string;
 	}): Promise<FsRemoveFileIfUnchangedResult>;
+
+	/** Host-only: finds the file a shortened or misplaced path refers to. */
+	resolveFileReference(input: {
+		reference: string;
+		preferredRelativePaths?: readonly string[];
+	}): Promise<FileReferenceMatch | null>;
 }
 
 export interface FsHostServiceOptions {
@@ -275,6 +285,10 @@ export function createFsHostService(
 				limit: input.limit,
 			});
 			return { matches };
+		},
+
+		resolveFileReference(input) {
+			return resolveFileReference({ rootPath, ...input });
 		},
 
 		async searchContent(input) {

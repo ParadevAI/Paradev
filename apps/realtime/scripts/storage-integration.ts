@@ -21,9 +21,13 @@ const ORG = "11111111-1111-4111-8111-111111111111";
 const AUTHOR = "22222222-2222-4222-8222-222222222222";
 const MEMBER = "33333333-3333-4333-8333-333333333333";
 const OUTSIDER = "44444444-4444-4444-8444-444444444444";
+const BUSY_WRITER = "55555555-5555-4555-8555-555555555555";
 const ORG_PAGE = "aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa";
 const LEGACY_PAGE = "bbbbbbbb-2222-4222-8222-bbbbbbbbbbbb";
 const PRIVATE_PAGE = "cccccccc-3333-4333-8333-cccccccccccc";
+const PUBLIC_PAGE = "eeeeeeee-5555-4555-8555-eeeeeeeeeeee";
+const GUEST = "f0f0f0f0-6666-4666-8666-f0f0f0f0f0f0";
+const SHARED_ONLY_WRITER = "66666666-6666-4666-8666-666666666666";
 
 let failures = 0;
 const check = (name: string, ok: boolean, detail?: unknown) => {
@@ -130,6 +134,14 @@ async function main() {
 		}),
 	);
 	seed(LEGACY_PAGE, manifest(LEGACY_PAGE, { visibility: "org" }));
+	seed(
+		PUBLIC_PAGE,
+		manifest(PUBLIC_PAGE, {
+			visibility: "everyone",
+			organizationId: ORG,
+			createdByUserId: AUTHOR,
+		}),
+	);
 
 	writeFileSync(
 		join(import.meta.dir, "..", ".dev.vars.integration"),
@@ -355,11 +367,12 @@ async function main() {
 	}
 	const hello = first.first as Record<string, unknown>;
 	check(
-		"hello carries viewer, author and writable",
+		"hello carries viewer, author, writable and scopes",
 		hello.type === "hello" &&
 			(hello.viewer as Record<string, unknown>).userId === AUTHOR &&
 			hello.author === true &&
-			hello.writable === true,
+			hello.writable === true &&
+			hello.scopes === true,
 		hello,
 	);
 
@@ -432,6 +445,500 @@ async function main() {
 		(push as { type?: string }).type === "records" &&
 			((push as { records: unknown[] }).records ?? []).length === 2,
 		push,
+	);
+
+	console.log("\nreadback route");
+	const readback = async (pageId: string, jwt: string | null, key?: string) => {
+		const query = key === undefined ? "" : `?key=${encodeURIComponent(key)}`;
+		const response = await fetch(
+			`${base}/v2/page/${pageId}/storage/records${query}`,
+			{ headers: jwt ? { authorization: `Bearer ${jwt}` } : {} },
+		);
+		return {
+			status: response.status,
+			body: (await response.json().catch(() => null)) as Record<
+				string,
+				unknown
+			> | null,
+		};
+	};
+
+	const readbackNoAuth = await readback(ORG_PAGE, null);
+	check(
+		"readback refuses a request with no JWT",
+		readbackNoAuth.status === 401,
+		readbackNoAuth,
+	);
+
+	const memberKeys = await readback(ORG_PAGE, memberJwt);
+	const memberRecords = await readback(ORG_PAGE, memberJwt, "vote");
+	const memberKeyList = (memberKeys.body?.keys ?? []) as Record<
+		string,
+		unknown
+	>[];
+	check(
+		"readback lets an org member who did not create the page read it",
+		memberKeys.status === 200 &&
+			memberKeyList.length === 1 &&
+			memberKeyList[0]?.key === "vote" &&
+			memberKeyList[0]?.records === 2 &&
+			memberRecords.status === 200 &&
+			((memberRecords.body?.records ?? []) as unknown[]).length === 2,
+		{ memberKeys, memberRecords },
+	);
+
+	const readbackOutsider = await readback(ORG_PAGE, outsiderJwt);
+	check(
+		"readback refuses a viewer from another organization",
+		readbackOutsider.status === 403,
+		readbackOutsider,
+	);
+
+	const readbackPrivate = await readback(PRIVATE_PAGE, memberJwt);
+	check(
+		"readback refuses a just_me page to a non-author",
+		readbackPrivate.status === 403,
+		readbackPrivate,
+	);
+
+	const readbackMissing = await readback(
+		"dddddddd-4444-4444-8444-dddddddddddd",
+		authorJwt,
+	);
+	check(
+		"readback 404s a page with no manifest",
+		readbackMissing.status === 404,
+		readbackMissing,
+	);
+
+	const readbackEmptyKey = await readback(ORG_PAGE, authorJwt, "");
+	check(
+		"readback refuses an empty key",
+		readbackEmptyKey.status === 400,
+		readbackEmptyKey,
+	);
+
+	const keyList = await readback(ORG_PAGE, authorJwt);
+	const keys = (keyList.body?.keys ?? []) as Record<string, unknown>[];
+	check(
+		"readback lists each key with its record count for the author",
+		keyList.status === 200 &&
+			keys.length === 1 &&
+			keys[0]?.key === "vote" &&
+			keys[0]?.records === 2,
+		keyList,
+	);
+
+	const keyRecords = await readback(ORG_PAGE, authorJwt, "vote");
+	const slots = (keyRecords.body?.records ?? []) as Record<string, unknown>[];
+	check(
+		"readback returns every person's slot for one key",
+		keyRecords.status === 200 &&
+			slots.map((slot) => `${slot.name}=${slot.value}`).join(",") ===
+				"Ada=Ramen,Grace=Tacos",
+		keyRecords,
+	);
+
+	const oauthJwt = await new SignJWT({
+		organizationId: ORG,
+		organizationIds: [ORG],
+		azp: "superset-cli",
+		scope: "openid profile email offline_access",
+	})
+		.setProtectedHeader({ alg: "RS256", kid: "test-key" })
+		.setIssuer(issuer)
+		.setAudience(issuer)
+		.setSubject(AUTHOR)
+		.setIssuedAt()
+		.setExpirationTime("10m")
+		.sign(privateKey as KeyLike);
+	const readbackOAuth = await readback(ORG_PAGE, oauthJwt);
+	check(
+		"readback accepts a token shaped like the CLI's OAuth access token",
+		readbackOAuth.status === 200,
+		readbackOAuth,
+	);
+
+	console.log("\nscopes");
+	const scopedReadback = async (jwt: string, key: string, scope: string) => {
+		const response = await fetch(
+			`${base}/v2/page/${ORG_PAGE}/storage/records?key=${encodeURIComponent(key)}&scope=${scope}`,
+			{ headers: { authorization: `Bearer ${jwt}` } },
+		);
+		return {
+			status: response.status,
+			body: (await response.json().catch(() => null)) as Record<
+				string,
+				unknown
+			> | null,
+		};
+	};
+	const recordsOf = (reply: Record<string, unknown>) =>
+		((reply.result as { records?: Record<string, unknown>[] } | undefined)
+			?.records ?? []) as Record<string, unknown>[];
+
+	const privateWrite = await rpc(
+		other.socket,
+		{ op: "set", key: "note", value: "secret", scope: "private" },
+		"s1",
+	);
+	const ownPrivate = await rpc(
+		other.socket,
+		{ op: "getAll", key: "note", scope: "private" },
+		"s2",
+	);
+	check(
+		"a member reads back their own private record",
+		privateWrite.ok === true &&
+			recordsOf(ownPrivate).length === 1 &&
+			recordsOf(ownPrivate)[0]?.value === "secret",
+		{ privateWrite, ownPrivate },
+	);
+
+	const peekAll = await rpc(
+		first.socket,
+		{ op: "getAll", key: "note", scope: "private" },
+		"s3",
+	);
+	const peekOne = await rpc(
+		first.socket,
+		{ op: "get", key: "note", scope: "private" },
+		"s4",
+	);
+	const peekReadback = await scopedReadback(authorJwt, "note", "private");
+	const peekKeys = await readback(ORG_PAGE, authorJwt);
+	check(
+		"another member never sees a private record over getAll, get or readback",
+		recordsOf(peekAll).length === 0 &&
+			(peekOne.result as { value?: unknown } | undefined)?.value === null &&
+			peekReadback.status === 200 &&
+			((peekReadback.body?.records ?? []) as unknown[]).length === 0 &&
+			!((peekKeys.body?.keys ?? []) as Record<string, unknown>[]).some(
+				(entry) => entry.key === "note",
+			),
+		{ peekAll, peekOne, peekReadback, peekKeys },
+	);
+
+	const sharedFirst = await rpc(
+		first.socket,
+		{ op: "set", key: "board", value: "A", scope: "shared" },
+		"s5",
+	);
+	const sharedSecond = await rpc(
+		other.socket,
+		{ op: "set", key: "board", value: "B", scope: "shared" },
+		"s6",
+	);
+	const sharedRead = await rpc(
+		first.socket,
+		{ op: "getAll", key: "board", scope: "shared" },
+		"s7",
+	);
+	const sharedReadback = await scopedReadback(authorJwt, "board", "shared");
+	const sharedRecords = (sharedReadback.body?.records ?? []) as Record<
+		string,
+		unknown
+	>[];
+	check(
+		"a shared write overwrites the last one and names the last writer",
+		sharedFirst.ok === true &&
+			sharedSecond.ok === true &&
+			recordsOf(sharedRead).length === 1 &&
+			recordsOf(sharedRead)[0]?.value === "B" &&
+			sharedReadback.status === 200 &&
+			sharedReadback.body?.scope === "shared" &&
+			sharedRecords.length === 1 &&
+			sharedRecords[0]?.value === "B" &&
+			sharedRecords[0]?.userId === MEMBER &&
+			sharedRecords[0]?.name === "Grace",
+		{ sharedRead, sharedReadback },
+	);
+
+	const badScopeReadback = await scopedReadback(authorJwt, "board", "global");
+	check(
+		"readback refuses an unknown scope",
+		badScopeReadback.status === 400,
+		badScopeReadback,
+	);
+
+	const keysOf = (reply: Record<string, unknown>) =>
+		(
+			((reply.result as { keys?: { key: string }[] } | undefined)?.keys ??
+				[]) as { key: string }[]
+		).map((entry) => entry.key);
+	await rpc(
+		first.socket,
+		{ op: "set", key: "list:private", value: 1, scope: "private" },
+		"l1",
+	);
+	await rpc(
+		first.socket,
+		{ op: "set", key: "list:shared", value: 1, scope: "shared" },
+		"l2",
+	);
+	await rpc(first.socket, { op: "set", key: "list:slot", value: 1 }, "l3");
+	await rpc(first.socket, { op: "set", key: "other:slot", value: 1 }, "l4");
+	const ownList = await rpc(
+		first.socket,
+		{ op: "list", prefix: "list:", scope: "private" },
+		"l5",
+	);
+	const peekList = await rpc(
+		other.socket,
+		{ op: "list", prefix: "list:", scope: "private" },
+		"l6",
+	);
+	const sharedList = await rpc(
+		other.socket,
+		{ op: "list", prefix: "list:", scope: "shared" },
+		"l7",
+	);
+	const slotList = await rpc(
+		other.socket,
+		{ op: "list", prefix: "list:" },
+		"l8",
+	);
+	check(
+		"list shows another member's shared and slot keys under a prefix, never their private keys",
+		keysOf(ownList).join() === "list:private" &&
+			keysOf(peekList).length === 0 &&
+			peekList.ok === true &&
+			keysOf(sharedList).join() === "list:shared" &&
+			keysOf(slotList).join() === "list:slot",
+		{ ownList, peekList, sharedList, slotList },
+	);
+
+	console.log("\nwrite route");
+	const writeRoute = async (jwt: string | null, body: unknown) => {
+		const response = await fetch(
+			`${base}/v2/page/${ORG_PAGE}/storage/records`,
+			{
+				method: "POST",
+				headers: {
+					"content-type": "application/json",
+					...(jwt ? { authorization: `Bearer ${jwt}` } : {}),
+				},
+				body: JSON.stringify(body),
+			},
+		);
+		return {
+			status: response.status,
+			body: (await response.json().catch(() => null)) as Record<
+				string,
+				unknown
+			> | null,
+		};
+	};
+
+	const agentWrite = await writeRoute(memberJwt, {
+		op: "set",
+		key: "agent",
+		value: "from the agent",
+	});
+	const agentReadback = await readback(ORG_PAGE, authorJwt, "agent");
+	const agentRecords = (agentReadback.body?.records ?? []) as Record<
+		string,
+		unknown
+	>[];
+	check(
+		"a member's write through the route is visible in readback",
+		agentWrite.status === 200 &&
+			agentWrite.body?.ok === true &&
+			agentRecords.length === 1 &&
+			agentRecords[0]?.userId === MEMBER &&
+			agentRecords[0]?.value === "from the agent",
+		{ agentWrite, agentReadback },
+	);
+
+	const outsiderWrite = await writeRoute(outsiderJwt, {
+		op: "set",
+		key: "agent",
+		value: "nope",
+	});
+	check(
+		"the write route refuses a viewer from another organization",
+		outsiderWrite.status === 403,
+		outsiderWrite,
+	);
+
+	const anonymousWrite = await writeRoute(null, {
+		op: "set",
+		key: "agent",
+		value: "nope",
+	});
+	check(
+		"the write route refuses a request with no JWT",
+		anonymousWrite.status === 401,
+		anonymousWrite,
+	);
+
+	const badScopeWrite = await writeRoute(memberJwt, {
+		op: "set",
+		key: "agent",
+		value: "nope",
+		scope: "global",
+	});
+	check(
+		"the write route refuses an unknown scope",
+		badScopeWrite.status === 400,
+		badScopeWrite,
+	);
+
+	const namelessWrite = await writeRoute(oauthJwt, {
+		op: "set",
+		key: "agent-named",
+		value: "from the CLI",
+	});
+	const namelessReadback = await readback(ORG_PAGE, memberJwt, "agent-named");
+	const namelessRecords = (namelessReadback.body?.records ?? []) as Record<
+		string,
+		unknown
+	>[];
+	check(
+		"a write with a token that has no name keeps the writer's stored name",
+		namelessWrite.status === 200 &&
+			namelessRecords.length === 1 &&
+			namelessRecords[0]?.userId === AUTHOR &&
+			namelessRecords[0]?.name === "Ada",
+		{ namelessWrite, namelessReadback },
+	);
+
+	const oversizedWrite = await writeRoute(memberJwt, {
+		op: "set",
+		key: "agent",
+		value: "x".repeat(70 * 1024),
+	});
+	check(
+		"the write route refuses a body larger than one value",
+		oversizedWrite.status === 413 &&
+			oversizedWrite.body?.code === "quota_exceeded",
+		oversizedWrite,
+	);
+
+	const chunk = new TextEncoder().encode("x".repeat(8 * 1024));
+	let chunksSent = 0;
+	const streamedWrite = await fetch(
+		`${base}/v2/page/${ORG_PAGE}/storage/records`,
+		{
+			method: "POST",
+			headers: {
+				"content-type": "application/json",
+				authorization: `Bearer ${memberJwt}`,
+			},
+			body: new ReadableStream<Uint8Array>({
+				pull(controller) {
+					if (chunksSent++ >= 12) controller.close();
+					else controller.enqueue(chunk);
+				},
+			}),
+			duplex: "half",
+		} as RequestInit,
+	);
+	const streamedBody = (await streamedWrite.json().catch(() => null)) as {
+		code?: string;
+	} | null;
+	check(
+		"the write route refuses an oversized body sent with no Content-Length",
+		streamedWrite.status === 413 && streamedBody?.code === "quota_exceeded",
+		{ status: streamedWrite.status, streamedBody },
+	);
+
+	const busyJwt = await mint(BUSY_WRITER, [ORG], "Busy");
+	let throttled: Awaited<ReturnType<typeof writeRoute>> | null = null;
+	for (let n = 0; n < 130 && !throttled; n++) {
+		const write = await writeRoute(busyJwt, {
+			op: "set",
+			key: "busy",
+			value: n,
+		});
+		if (write.status === 429) throttled = write;
+	}
+	check(
+		"the write route is rate-limited per writer",
+		throttled?.body?.code === "rate_limited",
+		throttled,
+	);
+
+	console.log("\nscoped pushes");
+	const inbox = (socket: WebSocket) => {
+		const seen: Record<string, unknown>[] = [];
+		socket.addEventListener("message", (event) => {
+			const data = JSON.parse(String(event.data));
+			if (data.type === "records") seen.push(data);
+		});
+		return seen;
+	};
+	const unscoped = await open(
+		String((await ticket(ORG_PAGE, authorJwt)).url),
+		pageOrigin,
+	);
+	const unscopedSeen = inbox(unscoped.socket);
+	const authorSeen = inbox(first.socket);
+	const memberSeen = inbox(other.socket);
+
+	await rpc(
+		other.socket,
+		{ op: "set", key: "vote", value: "Shared", scope: "shared" },
+		"p1",
+	);
+	await new Promise((r) => setTimeout(r, 300));
+	check(
+		"a socket that never sent a scoped op gets no shared push",
+		unscopedSeen.length === 0 &&
+			authorSeen.some((m) => m.scope === "shared" && m.key === "vote"),
+		{ unscopedSeen, authorSeen },
+	);
+
+	authorSeen.length = 0;
+	memberSeen.length = 0;
+	await rpc(
+		other.socket,
+		{ op: "set", key: "vote", value: "Mine", scope: "private" },
+		"p2",
+	);
+	await new Promise((r) => setTimeout(r, 300));
+	check(
+		"a private push reaches only its owner",
+		unscopedSeen.length === 0 &&
+			authorSeen.length === 0 &&
+			memberSeen.some((m) => m.scope === "private" && m.key === "vote"),
+		{ unscopedSeen, authorSeen, memberSeen },
+	);
+	unscoped.socket.close();
+
+	const sharedOnlyJwt = await mint(SHARED_ONLY_WRITER, [ORG], "Lin");
+	await writeRoute(sharedOnlyJwt, {
+		op: "set",
+		key: "anonymized",
+		value: "kept",
+		scope: "shared",
+	});
+	await new Promise((r) => setTimeout(r, 300));
+	memberSeen.length = 0;
+	const anonymizedPurge = await fetch(
+		`${base}/v2/page/${ORG_PAGE}/storage/admin`,
+		{
+			method: "POST",
+			headers: {
+				authorization: `Bearer ${SECRET}`,
+				"content-type": "application/json",
+			},
+			body: JSON.stringify({ op: "clearUser", userId: SHARED_ONLY_WRITER }),
+		},
+	);
+	const anonymizedBody = (await anonymizedPurge.json()) as {
+		cleared?: number;
+	};
+	await new Promise((r) => setTimeout(r, 300));
+	const anonymizedPush = memberSeen.findLast(
+		(m) => m.scope === "shared" && m.key === "anonymized",
+	) as { records?: { userId?: string; value?: unknown }[] } | undefined;
+	check(
+		"clearUser pushes a shared key it only anonymized",
+		anonymizedBody.cleared === 0 &&
+			anonymizedPush?.records?.[0]?.value === "kept" &&
+			anonymizedPush?.records?.[0]?.userId === "",
+		{ anonymizedBody, anonymizedPush },
 	);
 
 	console.log("\nrevocation");
@@ -521,6 +1028,203 @@ async function main() {
 		wiped.ok && (wipedBody.cleared ?? 0) >= 1,
 		wipedBody,
 	);
+
+	console.log("\npresence");
+	const presenceUrl = (pageId: string, query: string) =>
+		`ws://127.0.0.1:${PORT}/v2/page/${pageId}/presence${query}`;
+	const enter = (pageId: string, query: string) => {
+		const inbox: Record<string, unknown>[] = [];
+		const socket = new WebSocket(presenceUrl(pageId, query));
+		let closed: { code: number; reason: string } | null = null;
+		socket.addEventListener("message", (event) => {
+			const data = String(event.data);
+			inbox.push(data === "pong" ? { type: "pong" } : JSON.parse(data));
+		});
+		socket.addEventListener("close", (event) => {
+			closed = { code: event.code, reason: event.reason };
+		});
+		const waitFor = async (
+			match: (message: Record<string, unknown>) => boolean,
+		) => {
+			for (let tries = 0; tries < 80; tries++) {
+				const found = inbox.findLast(match);
+				if (found) return found;
+				await new Promise((r) => setTimeout(r, 100));
+			}
+			return null;
+		};
+		const waitClosed = async () => {
+			for (let tries = 0; tries < 80 && closed === null; tries++) {
+				await new Promise((r) => setTimeout(r, 100));
+			}
+			return closed as { code: number; reason: string } | null;
+		};
+		return { socket, inbox, waitFor, waitClosed };
+	};
+	const viewersOf = (message: Record<string, unknown> | null) =>
+		(message?.viewers ?? []) as {
+			key: string;
+			name: string;
+			guest: boolean;
+			guestNumber: number | null;
+			color: number;
+		}[];
+
+	const anonymous = enter(PUBLIC_PAGE, "");
+	check(
+		"presence refuses a socket with neither a token nor a guest id",
+		(await anonymous.waitClosed())?.code === 4401,
+	);
+
+	const outsiderPresence = enter(PUBLIC_PAGE, `?token=${outsiderJwt}`);
+	check(
+		"presence refuses a signed-in viewer outside the org (they join as guests)",
+		(await outsiderPresence.waitClosed())?.code === 4403,
+	);
+
+	const privateGuest = enter(PRIVATE_PAGE, `?guest=${GUEST}`);
+	check(
+		"presence refuses a guest on a page not shared with everyone",
+		(await privateGuest.waitClosed())?.code === 4403,
+	);
+
+	const badPage = enter("not-a-page", `?guest=${GUEST}`);
+	check(
+		"presence refuses a malformed page id",
+		(await badPage.waitClosed())?.code === 4403,
+	);
+
+	const member = enter(PUBLIC_PAGE, `?token=${memberJwt}`);
+	await member.waitFor((m) => m.type === "presence");
+	const guest = enter(PUBLIC_PAGE, `?guest=${GUEST}`);
+	const guestSees = await guest.waitFor(
+		(m) =>
+			m.type === "presence" && viewersOf(m).some((v) => v.name === "Grace"),
+	);
+	check("a guest sees the member already here", Boolean(guestSees));
+	const memberSees = await member.waitFor(
+		(m) => m.type === "presence" && viewersOf(m).some((v) => v.guest),
+	);
+	check("the member is told a guest arrived", Boolean(memberSees));
+	check(
+		"nobody is listed to themselves, and the first guest is Guest 1",
+		!viewersOf(memberSees).some((v) => v.name === "Grace") &&
+			viewersOf(memberSees).find((v) => v.guest)?.guestNumber === 1,
+		memberSees,
+	);
+
+	const memberList = await guest.waitFor(
+		(m) => m.type === "presence" && viewersOf(m).length > 0,
+	);
+	const sent = JSON.stringify(memberList);
+	check(
+		"viewers get an opaque per-page key, never an internal user id",
+		!sent.includes(MEMBER) &&
+			!sent.includes(GUEST) &&
+			viewersOf(memberList).every((v) => /^[0-9a-f]{16}$/.test(v.key)),
+		memberList,
+	);
+	check(
+		"the member and the guest are given different colours",
+		viewersOf(memberSees)[0]?.color !== viewersOf(memberList)[0]?.color,
+		{ member: viewersOf(memberList), guest: viewersOf(memberSees) },
+	);
+
+	member.socket.send("ping");
+	check(
+		"the hub answers a heartbeat ping",
+		Boolean(await member.waitFor((m) => m.type === "pong")),
+	);
+
+	guest.socket.send(
+		JSON.stringify({
+			type: "call",
+			id: "g1",
+			request: { op: "getAll", key: "vote" },
+		}),
+	);
+	const writer = await open(
+		String((await ticket(PUBLIC_PAGE, memberJwt, "Grace")).url),
+		`http://${PUBLIC_PAGE}.frame.usercontent.localhost:9999`,
+	);
+	await rpc(writer.socket, { op: "set", key: "vote", value: "Ramen" }, "w1");
+	await new Promise((r) => setTimeout(r, 300));
+	check(
+		"presence sockets never answer storage calls or receive storage records",
+		!guest.inbox.some((m) => m.id === "g1" || m.type === "records") &&
+			!member.inbox.some((m) => m.type === "records"),
+	);
+	writer.socket.close();
+
+	const otherGuest = crypto.randomUUID();
+	const tabs = [
+		enter(PUBLIC_PAGE, `?guest=${otherGuest}`),
+		enter(PUBLIC_PAGE, `?guest=${otherGuest}`),
+	];
+	const numbered = await member.waitFor(
+		(m) =>
+			m.type === "presence" && viewersOf(m).filter((v) => v.guest).length === 3,
+	);
+	check(
+		"guests are numbered, and one guest in two tabs keeps one number",
+		viewersOf(numbered)
+			.filter((v) => v.guest)
+			.map((v) => v.guestNumber)
+			.sort()
+			.join(",") === "1,2,2",
+		viewersOf(numbered),
+	);
+	for (const tab of tabs) tab.socket.close();
+	await member.waitFor(
+		(m) =>
+			m.type === "presence" && viewersOf(m).filter((v) => v.guest).length === 1,
+	);
+
+	const crowd = [];
+	for (let n = 0; n < 19; n++) {
+		const extra = enter(PUBLIC_PAGE, `?guest=${crypto.randomUUID()}`);
+		await extra.waitFor((m) => m.type === "presence");
+		crowd.push(extra);
+	}
+	const turnedAway = enter(PUBLIC_PAGE, `?guest=${crypto.randomUUID()}`);
+	check(
+		"the 21st guest on a page is turned away as full",
+		(await turnedAway.waitClosed())?.code === 4429,
+	);
+	for (const extra of crowd) extra.socket.close();
+
+	seed(
+		PUBLIC_PAGE,
+		manifest(PUBLIC_PAGE, {
+			visibility: "org",
+			organizationId: ORG,
+			createdByUserId: AUTHOR,
+		}),
+	);
+	await fetch(`${base}/v2/page/${PUBLIC_PAGE}/storage/manifest-changed`, {
+		method: "POST",
+		headers: { authorization: `Bearer ${SECRET}` },
+	});
+	check(
+		"un-sharing a page closes its guests",
+		(await guest.waitClosed())?.code === 4403,
+	);
+	const afterGuest = await member.waitFor(
+		(m) => m.type === "presence" && !viewersOf(m).some((v) => v.guest),
+	);
+	check(
+		"members stay, and are told the guest left",
+		Boolean(afterGuest) && member.socket.readyState === WebSocket.OPEN,
+	);
+	member.socket.close();
+
+	let limited = false;
+	for (let n = 0; n < 130 && !limited; n++) {
+		const knock = enter(PUBLIC_PAGE, `?guest=${crypto.randomUUID()}`);
+		const closed = await knock.waitClosed();
+		limited = closed?.code === 4429 && closed.reason === "Too many requests";
+	}
+	check("guest presence is rate-limited per client", limited);
 
 	shutdown();
 

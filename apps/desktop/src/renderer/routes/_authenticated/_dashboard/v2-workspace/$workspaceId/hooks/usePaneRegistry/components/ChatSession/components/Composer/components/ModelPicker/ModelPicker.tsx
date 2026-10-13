@@ -1,27 +1,30 @@
-import { Trans } from "@lingui/react/macro";
 import type { SessionConfigOption } from "@superset/chat/protocol";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
+	DropdownMenuPortal,
 	DropdownMenuSub,
 	DropdownMenuSubContent,
 	DropdownMenuSubTrigger,
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
 import { cn } from "@superset/ui/utils";
-import { type KeyboardEvent, useRef, useState } from "react";
-import { LuCheck, LuChevronDown, LuZap } from "react-icons/lu";
+import { type KeyboardEvent, useMemo, useRef, useState } from "react";
+import { LuCheck, LuChevronDown } from "react-icons/lu";
 import {
 	getPresetIcon,
 	useIsDarkTheme,
 } from "renderer/assets/app-icons/preset-icons";
 import {
+	MENU_PANEL_CLASS,
 	MENU_ROW_CLASS,
 	PILL_CHEVRON_CLASS,
 	PILL_TRIGGER_CLASS,
 } from "../../constants";
-import { ModelFlyout } from "./components/ModelFlyout";
+import { useOptimisticSelections } from "../../hooks/useOptimisticSelections";
+import { EffortSliderCard } from "./components/EffortSliderCard";
+import { ModelPanel } from "./components/ModelPanel";
 import type { AgentSwitcher } from "./types";
 
 export type ModelPickerProps = {
@@ -30,7 +33,10 @@ export type ModelPickerProps = {
 	agentSwitcher?: AgentSwitcher;
 };
 
-const SUB_TRIGGER_CLASS = cn(MENU_ROW_CLASS, "h-9 text-[13px]");
+const TRAIT_ROW_CLASS = cn(
+	MENU_ROW_CLASS,
+	"[&>svg:last-child]:size-3 [&>svg:last-child]:text-muted-foreground/70",
+);
 
 function isToggle(option: SessionConfigOption) {
 	return (
@@ -52,29 +58,52 @@ export function ModelPicker({
 }: ModelPickerProps) {
 	const [open, setOpen] = useState(false);
 	const searchRef = useRef<HTMLInputElement>(null);
+	const settingsRef = useRef<HTMLDivElement>(null);
 	const isDark = useIsDarkTheme();
+	const settled = useMemo(
+		() =>
+			Object.fromEntries(
+				configOptions.map((option) => [option.id, option.currentValue]),
+			),
+		[configOptions],
+	);
+	const { shown, select } = useOptimisticSelections(settled);
+	const options = useMemo(
+		() =>
+			configOptions.map((option) => {
+				const value = shown(option.id) ?? option.currentValue;
+				return value === option.currentValue
+					? option
+					: { ...option, currentValue: value };
+			}),
+		[configOptions, shown],
+	);
+	const choose = (configId: string, value: string) =>
+		select(configId, value, () => onSelect(configId, value));
 	const agentIcon = agentSwitcher
 		? getPresetIcon(agentSwitcher.currentPresetId, isDark)
 		: undefined;
-	const model = configOptions.find(
+	const model = options.find(
 		(option) => option.category === "model" && option.options.length > 0,
 	);
 	const canSwitchAgent = (agentSwitcher?.agents.length ?? 0) > 1;
-	const settings = configOptions.filter(
+	const settings = options.filter(
 		(option) =>
 			option.category !== "model" &&
 			option.category !== "mode" &&
 			option.options.length > 0,
 	);
-	const toggles = settings.filter(isToggle);
-	const selects = settings.filter((option) => !isToggle(option));
-	const fastOn = toggles.some(
-		(option) => option.id === "fast" && option.currentValue === "on",
+	const fast = settings.find(
+		(option) => option.id === "fast" && isToggle(option),
 	);
-	const effortLabel = currentLabel(
-		settings.find((option) => option.category === "thought_level"),
+	const effort = settings.find((option) => option.category === "thought_level");
+	const effortLabel = currentLabel(effort);
+	// The slider card owns effort and the fast toggle; the rest stay as rows.
+	const rows = settings.filter(
+		(option) => option !== effort && (effort ? option !== fast : true),
 	);
 	if (!model && settings.length === 0 && !canSwitchAgent) return null;
+	const showsModels = Boolean(model) || canSwitchAgent;
 	const currentAgentLabel = agentSwitcher?.agents.find(
 		(agent) => agent.presetId === agentSwitcher.currentPresetId,
 	)?.label;
@@ -84,17 +113,37 @@ export function ModelPicker({
 		currentAgentLabel ??
 		settings[0]?.label;
 	const pick = (option: SessionConfigOption, value: string) => {
-		if (value !== option.currentValue) onSelect(option.id, value);
+		if (value !== option.currentValue) choose(option.id, value);
 		setOpen(false);
 	};
-	// Hovering a row moves menu focus to it; typing must still reach the search.
-	const sendTypingToSearch = (event: KeyboardEvent<HTMLDivElement>) => {
-		const search = searchRef.current;
-		if (!search || event.target === search) return;
-		if (event.key.length !== 1 || event.key === " ") return;
-		if (event.metaKey || event.ctrlKey || event.altKey) return;
+	// Radix traps Tab inside the menu, so the settings row below the model
+	// panel is only reachable by hand: Tab past the last agent tab lands on
+	// its first control, Tab past its last control returns to the search.
+	const settingsControls = () =>
+		Array.from(
+			settingsRef.current?.querySelectorAll<HTMLElement>(
+				'button:not([tabindex="-1"]), [data-slot="slider-thumb"], [role="menuitem"]',
+			) ?? [],
+		);
+	const leavePanel = (direction: 1 | -1) => {
+		const controls = settingsControls();
+		(direction === 1 ? controls[0] : controls.at(-1))?.focus();
+	};
+	const onSettingsKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+		if (event.key !== "Tab") return;
+		event.preventDefault();
 		event.stopPropagation();
-		search.focus();
+		const controls = settingsControls();
+		const next =
+			controls.indexOf(document.activeElement as HTMLElement) +
+			(event.shiftKey ? -1 : 1);
+		if (next >= 0 && next < controls.length) {
+			controls[next]?.focus();
+		} else if (searchRef.current) {
+			searchRef.current.focus();
+		} else {
+			controls.at(next < 0 ? -1 : 0)?.focus();
+		}
 	};
 
 	return (
@@ -105,6 +154,7 @@ export function ModelPicker({
 						<img
 							alt=""
 							className="size-3.5 shrink-0 object-contain"
+							draggable={false}
 							src={agentIcon}
 						/>
 					) : null}
@@ -114,113 +164,83 @@ export function ModelPicker({
 							{effortLabel}
 						</span>
 					) : null}
-					{fastOn ? <LuZap className="size-3 shrink-0 fill-current" /> : null}
 					<LuChevronDown className={PILL_CHEVRON_CLASS} />
 				</button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent
-				align="start"
-				className="w-[250px] rounded-xl"
-				onKeyDownCapture={sendTypingToSearch}
+				align="end"
+				className={cn(
+					MENU_PANEL_CLASS,
+					"flex w-[296px] flex-col overflow-hidden p-0",
+				)}
 				side="top"
 			>
-				{toggles.map((option) => {
-					const on = option.currentValue === "on";
-					return (
-						<DropdownMenuItem
-							aria-checked={on}
-							className={SUB_TRIGGER_CLASS}
-							key={option.id}
-							onSelect={(event) => {
-								event.preventDefault();
-								onSelect(option.id, on ? "off" : "on");
-							}}
-							role="menuitemcheckbox"
-						>
-							<span className="min-w-0 flex-1 truncate">{option.label}</span>
-							<span
-								aria-hidden="true"
-								className={cn(
-									"relative h-5 w-9 shrink-0 rounded-full transition-colors",
-									on ? "bg-foreground/40" : "bg-foreground/15",
-								)}
-							>
-								<span
-									className={cn(
-										"absolute top-0.5 size-4 rounded-full bg-foreground shadow-sm transition-transform",
-										on ? "translate-x-[18px]" : "translate-x-0.5",
-									)}
-								/>
-							</span>
-						</DropdownMenuItem>
-					);
-				})}
-				{selects.map((option) => (
-					<DropdownMenuSub key={option.id}>
-						<DropdownMenuSubTrigger className={SUB_TRIGGER_CLASS}>
-							<span className="min-w-0 flex-1 truncate">{option.label}</span>
-							<span className="max-w-28 truncate text-muted-foreground">
-								{currentLabel(option)}
-							</span>
-						</DropdownMenuSubTrigger>
-						<DropdownMenuSubContent className="w-[210px] rounded-xl">
-							{option.options.map((entry) => (
-								<DropdownMenuItem
-									className={MENU_ROW_CLASS}
-									key={entry.id}
-									onSelect={() => pick(option, entry.id)}
-									title={entry.description}
-								>
-									<span className="min-w-0 flex-1 truncate">{entry.label}</span>
-									{entry.id === option.currentValue ? (
-										<LuCheck className="size-3.5 shrink-0" />
-									) : null}
-								</DropdownMenuItem>
-							))}
-						</DropdownMenuSubContent>
-					</DropdownMenuSub>
-				))}
-				{model || canSwitchAgent ? (
-					<DropdownMenuSub>
-						<DropdownMenuSubTrigger className={SUB_TRIGGER_CLASS}>
-							<span className="min-w-0 flex-1 truncate">
-								<Trans>Model</Trans>
-							</span>
-							<span className="flex max-w-36 min-w-0 items-center gap-1 text-muted-foreground">
-								{agentIcon ? (
-									<img
-										alt=""
-										className="size-3.5 shrink-0 object-contain"
-										src={agentIcon}
-									/>
-								) : null}
-								<span className="truncate">
-									{currentLabel(model) ?? <Trans>Default</Trans>}
-								</span>
-							</span>
-						</DropdownMenuSubTrigger>
-						<DropdownMenuSubContent
-							className="flex h-[min(20rem,var(--radix-dropdown-menu-content-available-height))] w-[310px] flex-row overflow-hidden rounded-xl p-0"
-							onKeyDownCapture={sendTypingToSearch}
-						>
-							<ModelFlyout
-								agentSwitcher={
-									agentSwitcher && {
-										...agentSwitcher,
-										onSwitch: (presetId, picked) => {
-											setOpen(false);
-											agentSwitcher.onSwitch(presetId, picked);
-										},
-									}
-								}
-								model={model}
-								onPick={(modelId) => {
-									if (model) pick(model, modelId);
-								}}
-								searchRef={searchRef}
-							/>
-						</DropdownMenuSubContent>
-					</DropdownMenuSub>
+				{showsModels ? (
+					<ModelPanel
+						agentSwitcher={
+							agentSwitcher && {
+								...agentSwitcher,
+								onSwitch: (presetId, picked) => {
+									setOpen(false);
+									agentSwitcher.onSwitch(presetId, picked);
+								},
+							}
+						}
+						model={model}
+						onLeave={settings.length > 0 ? leavePanel : undefined}
+						onPick={(modelId) => {
+							if (model) pick(model, modelId);
+						}}
+						searchRef={searchRef}
+					/>
+				) : null}
+				{settings.length > 0 ? (
+					<div
+						className={cn(
+							"flex flex-col gap-px p-1",
+							showsModels && "border-t",
+						)}
+						onKeyDownCapture={onSettingsKeyDown}
+						ref={settingsRef}
+					>
+						{effort ? (
+							<EffortSliderCard effort={effort} fast={fast} onSelect={choose} />
+						) : null}
+						{rows.map((option) => (
+							<DropdownMenuSub key={option.id}>
+								<DropdownMenuSubTrigger className={TRAIT_ROW_CLASS}>
+									<span className="min-w-0 flex-1 truncate">
+										{option.label}
+									</span>
+									<span className="max-w-28 truncate text-muted-foreground">
+										{currentLabel(option)}
+									</span>
+								</DropdownMenuSubTrigger>
+								{/* Portaled: the panel's backdrop-blur would otherwise contain and clip it. */}
+								<DropdownMenuPortal>
+									<DropdownMenuSubContent
+										className={cn(MENU_PANEL_CLASS, "w-[200px]")}
+									>
+										{option.options.map((entry) => (
+											<DropdownMenuItem
+												className={MENU_ROW_CLASS}
+												key={entry.id}
+												onSelect={() => pick(option, entry.id)}
+												title={entry.description}
+											>
+												<span className="min-w-0 flex-1 truncate">
+													{entry.label}
+												</span>
+												{entry.id === option.currentValue ? (
+													<LuCheck className="size-3.5 shrink-0" />
+												) : null}
+											</DropdownMenuItem>
+										))}
+									</DropdownMenuSubContent>
+								</DropdownMenuPortal>
+							</DropdownMenuSub>
+						))}
+					</div>
 				) : null}
 			</DropdownMenuContent>
 		</DropdownMenu>

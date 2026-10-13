@@ -5,7 +5,6 @@ import {
 	getAgentSetupTemplatesDir,
 	mcpHeadersHelperCommand,
 	readEnabledPlugins,
-	readPluginConnections,
 	reconcileMcpServers,
 	setAgentSetupTemplatesDir,
 	setupAgentIntegrations,
@@ -68,11 +67,14 @@ export async function provisionAgentIntegrations(): Promise<void> {
 		// An unreadable ledger is not an empty one, and reconciling reaps
 		// whatever is absent from the desired set: a torn write would take the
 		// agent's managed servers with it.
-		const enabled = readEnabledPlugins();
+		const enabled =
+			process.env.NODE_ENV === "development" ||
+			process.env.SUPERSET_ENV === "development"
+				? null
+				: readEnabledPlugins();
 		const reports = enabled
 			? reconcileMcpServers(
 					desiredPluginMcpServers(enabled, {
-						connections: readPluginConnections(),
 						headersHelper: mcpHeadersHelperCommand(),
 					}),
 				)

@@ -141,7 +141,7 @@ export const DashboardSidebarCloudRow = forwardRef<
 								onArchive();
 							}}
 							aria-label={t({ message: "Archive workspace" })}
-							className="hidden size-5 items-center justify-center rounded text-muted-foreground group-hover:flex group-has-[:focus-visible]:flex hover:bg-foreground/10 hover:text-foreground"
+							className="-mr-[3px] hidden size-5 items-center justify-center rounded text-muted-foreground group-hover:flex group-has-[:focus-visible]:flex hover:bg-foreground/10 hover:text-foreground"
 						>
 							<LuArchive className="size-3.5" />
 						</button>

@@ -1,5 +1,12 @@
 import * as Sentry from "@sentry/cloudflare";
-import { PAGE_STORAGE_TICKET_SECONDS } from "@superset/shared/page-storage";
+import {
+	MAX_PAGE_STORAGE_KEY_LENGTH,
+	MAX_PAGE_STORAGE_VALUE_BYTES,
+	PAGE_STORAGE_TICKET_SECONDS,
+	type PageStorageReadback,
+	type PageStorageWriteRequest,
+	parsePageStorageScope,
+} from "@superset/shared/page-storage";
 import { readable, writableFor } from "@superset/shared/page-storage-access";
 import type { PageStorageHubRequest } from "@superset/shared/page-storage-hub";
 import {
@@ -18,10 +25,21 @@ import { getServerByName } from "partyserver";
 import { OrgHub } from "./org-hub";
 import { CLAIMS_HEADER, PageHub } from "./page-hub";
 import type { RealtimeEnv } from "./types";
+import { readBodyWithin } from "./utils/readBodyWithin";
 
 type AppContext = { Bindings: RealtimeEnv };
 
 const app = new Hono<AppContext>();
+
+const MAX_STORAGE_WRITE_BODY_BYTES = MAX_PAGE_STORAGE_VALUE_BYTES + 4 * 1024;
+
+function parseJson(text: string): unknown {
+	try {
+		return JSON.parse(text);
+	} catch {
+		return null;
+	}
+}
 
 app.use("*", cors());
 
@@ -93,7 +111,7 @@ app.post("/v2/page/:pageId/storage/ticket", async (c) => {
 	const token = extractToken(c);
 	if (!token) return c.json({ error: "Unauthorized" }, 401);
 	const auth = await verifyJWT(token, c.env.NEXT_PUBLIC_API_URL);
-	if (!auth) return c.json({ error: "Unauthorized" }, 401);
+	if (!auth?.sub) return c.json({ error: "Unauthorized" }, 401);
 
 	const stub = await getServerByName(c.env.PageHub, pageId);
 	const manifest = await stub.readManifest();
@@ -120,6 +138,121 @@ app.post("/v2/page/:pageId/storage/ticket", async (c) => {
 	return c.json({ ticket });
 });
 
+app.get("/v2/page/:pageId/storage/records", async (c) => {
+	const pageId = c.req.param("pageId");
+	const token = extractToken(c);
+	if (!token) return c.json({ error: "Unauthorized" }, 401);
+	const auth = await verifyJWT(token, c.env.NEXT_PUBLIC_API_URL);
+	if (!auth?.sub) return c.json({ error: "Unauthorized" }, 401);
+
+	const key = c.req.query("key");
+	if (
+		key !== undefined &&
+		(key.length === 0 || key.length > MAX_PAGE_STORAGE_KEY_LENGTH)
+	) {
+		return c.json(
+			{
+				error: `A storage key is 1 to ${MAX_PAGE_STORAGE_KEY_LENGTH} characters`,
+			},
+			400,
+		);
+	}
+	const scope = parsePageStorageScope(c.req.query("scope"));
+	if (!scope) {
+		return c.json({ error: "A storage scope is slot, private or shared" }, 400);
+	}
+
+	const stub = await getServerByName(c.env.PageHub, pageId);
+	const manifest = await stub.readManifest();
+	if (!manifest) return c.json({ error: "Not found" }, 404);
+
+	const viewer = { userId: auth.sub, organizationIds: auth.organizationIds };
+	if (!readable(manifest, viewer)) {
+		return c.json({ error: "You cannot read this page's storage" }, 403);
+	}
+
+	const body: PageStorageReadback =
+		key === undefined
+			? { pageId, keys: await stub.storageKeys(auth.sub) }
+			: {
+					pageId,
+					key,
+					scope,
+					records: await stub.storageRecords(key, scope, auth.sub),
+				};
+	return c.json(body);
+});
+
+app.post("/v2/page/:pageId/storage/records", async (c) => {
+	const pageId = c.req.param("pageId");
+	const token = extractToken(c);
+	if (!token) return c.json({ error: "Unauthorized" }, 401);
+	const auth = await verifyJWT(token, c.env.NEXT_PUBLIC_API_URL);
+	if (!auth?.sub) return c.json({ error: "Unauthorized" }, 401);
+
+	const tooLarge = () =>
+		c.json(
+			{
+				error: `A stored value is at most ${MAX_PAGE_STORAGE_VALUE_BYTES} bytes`,
+				code: "quota_exceeded",
+			},
+			413,
+		);
+	if (
+		Number(c.req.header("content-length") ?? 0) > MAX_STORAGE_WRITE_BODY_BYTES
+	) {
+		return tooLarge();
+	}
+	const text = await readBodyWithin(
+		c.req.raw.body,
+		MAX_STORAGE_WRITE_BODY_BYTES,
+	).catch(() => "");
+	if (text === null) return tooLarge();
+
+	const request = parseJson(text) as PageStorageWriteRequest | null;
+	if (
+		!request ||
+		(request.op !== "set" && request.op !== "remove") ||
+		typeof request.key !== "string" ||
+		request.key.length === 0 ||
+		request.key.length > MAX_PAGE_STORAGE_KEY_LENGTH
+	) {
+		return c.json(
+			{
+				error: `A write needs op set or remove and a key of 1 to ${MAX_PAGE_STORAGE_KEY_LENGTH} characters`,
+			},
+			400,
+		);
+	}
+
+	const stub = await getServerByName(c.env.PageHub, pageId);
+	const manifest = await stub.readManifest();
+	if (!manifest) return c.json({ error: "Not found" }, 404);
+
+	const viewer = { userId: auth.sub, organizationIds: auth.organizationIds };
+	if (!writableFor(manifest, viewer)) {
+		return c.json({ error: "You cannot write this page's storage" }, 403);
+	}
+
+	const result = await stub.storageWrite(
+		{
+			userId: auth.sub,
+			name: auth.name ?? null,
+			image: auth.image ?? null,
+		},
+		request,
+	);
+	if (result.ok) return c.json({ ok: true });
+	return c.json(
+		{ error: result.message, code: result.code },
+		result.code === "quota_exceeded"
+			? 413
+			: result.code === "rate_limited"
+				? 429
+				: 400,
+	);
+});
+
 app.get("/v2/page/:pageId/storage/socket", async (c) => {
 	if (c.req.header("Upgrade")?.toLowerCase() !== "websocket") {
 		return c.json({ error: "WebSocket upgrade required" }, 426);
@@ -128,7 +261,7 @@ app.get("/v2/page/:pageId/storage/socket", async (c) => {
 	const ticket = c.req.query("ticket");
 	if (!ticket) return acceptAndClose(4401, "Unauthorized");
 	const claims = await verifyPageConnectTicket(c.env.NUDGE_SECRET, ticket);
-	if (!claims || claims.pageId !== pageId) {
+	if (!claims || claims.pageId !== pageId || !claims.userId) {
 		return acceptAndClose(4401, "Unauthorized");
 	}
 
@@ -147,6 +280,60 @@ app.get("/v2/page/:pageId/storage/socket", async (c) => {
 	const origin = c.req.header("origin");
 	if (origin) headers.set("origin", origin);
 	return stub.fetch("https://realtime/subscribe", { headers });
+});
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+
+app.get("/v2/page/:pageId/presence", async (c) => {
+	if (c.req.header("Upgrade")?.toLowerCase() !== "websocket") {
+		return c.json({ error: "WebSocket upgrade required" }, 426);
+	}
+	const pageId = c.req.param("pageId");
+	if (!UUID.test(pageId)) return acceptAndClose(4403, "Not found");
+
+	let claims: {
+		userId: string;
+		name: string;
+		image: string | null;
+		organizationIds: string[];
+		guest: boolean;
+	};
+	const token = extractToken(c);
+	const guestId = c.req.query("guest");
+	if (token) {
+		const auth = await verifyJWT(token, c.env.NEXT_PUBLIC_API_URL);
+		if (!auth) return acceptAndClose(4401, "Unauthorized");
+		claims = {
+			userId: auth.sub,
+			name: auth.name ?? "Someone",
+			image: auth.image ?? null,
+			organizationIds: auth.organizationIds,
+			guest: false,
+		};
+	} else if (guestId && UUID.test(guestId)) {
+		const ip = c.req.header("cf-connecting-ip") ?? "unknown";
+		const [byIp, byPage] = await Promise.all([
+			c.env.GUEST_PRESENCE_BY_IP.limit({ key: ip }),
+			c.env.GUEST_PRESENCE_BY_PAGE.limit({ key: pageId }),
+		]);
+		if (!byIp.success || !byPage.success) {
+			return acceptAndClose(4429, "Too many requests");
+		}
+		claims = {
+			userId: `guest:${guestId}`,
+			name: "",
+			image: null,
+			organizationIds: [],
+			guest: true,
+		};
+	} else {
+		return acceptAndClose(4401, "Unauthorized");
+	}
+
+	const stub = await getServerByName(c.env.PageHub, pageId);
+	const headers = new Headers({ Upgrade: "websocket" });
+	headers.set(CLAIMS_HEADER, JSON.stringify({ ...claims, presence: true }));
+	return stub.fetch("https://realtime/presence", { headers });
 });
 
 // ── Emit: the API, after a write ────────────────────────────────────

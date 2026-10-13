@@ -1,0 +1,50 @@
+---
+title: Multiple Windows
+description: Keep several workspaces or organizations on screen at once
+---
+
+Open more than one Superset window to watch several workspaces at the same time, or to put two organizations side by side.
+
+## Open a New Window
+
+- **File → New Window** (**Ctrl+Alt+N** on Linux)
+- **New window** in the organization menu
+- **New window** in the command palette (**⌘⇧K**)
+- On Linux, **New Window** in the launcher or dock menu for Superset. An AppImage shows it only when it is integrated with your desktop.
+
+A new window uses the same organization as the window you opened it from, and opens on the page you visited last in any window.
+
+## Switch and Close Windows
+
+Each window's title is the name of its organization. On macOS, the **Window** menu lists the open windows by that name.
+
+To close the focused window, use **Window → Close** (**⌘⇧Q**) or **File → Close Window**.
+
+## What Each Window Has
+
+Each window has its own:
+
+- **Page and workspace** - each window navigates on its own
+- **Organization** - switching organization in one window doesn't change any other window
+- **Active tab and focused pane**
+- **Size, position, and zoom level**
+
+All windows share:
+
+- **Settings**, including theme and keyboard shortcuts
+- **Workspaces, terminals, and agents** - they run on the host, so closing a window doesn't stop them
+- **Sidebar projects and sections, and each workspace's tabs and panes**, for windows on the same organization
+
+The organization you switch to last is also the default for a window that opens without one, such as the window macOS opens when you click the Dock icon with no windows open.
+
+Clicking a desktop notification brings the window you used last to the front, and every open window navigates to that notification's workspace.
+
+## Same Workspace in Two Windows
+
+You can open one workspace in two windows. Its tabs and panes stay in sync: a tab you open, close, or split in one window appears in the other. The selection stays local, so switching tabs or focusing a pane in one window doesn't move the other. If the other window closes your active tab, your window moves to the nearest remaining tab.
+
+## Restore on Relaunch
+
+When you quit, Superset saves every open window with its position, size, zoom level, and organization. On the next launch, each window opens again on its organization. Restored windows all open on the same page, the one you visited last before you quit, not on the pages they each showed.
+
+Closing a window without quitting removes it from the saved set. On macOS, closing the last window keeps Superset running, and the next launch opens one window. On Linux, closing the last window quits Superset, and that window comes back on the next launch.

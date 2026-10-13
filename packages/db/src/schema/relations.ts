@@ -18,6 +18,7 @@ import {
 	chatSessions,
 	connections,
 	integrationConnections,
+	pageCommentReads,
 	pageComments,
 	pageCommentThreads,
 	pages,
@@ -405,6 +406,20 @@ export const pageCommentsRelations = relations(pageComments, ({ one }) => ({
 		references: [users.id],
 	}),
 }));
+
+export const pageCommentReadsRelations = relations(
+	pageCommentReads,
+	({ one }) => ({
+		page: one(pages, {
+			fields: [pageCommentReads.pageId],
+			references: [pages.id],
+		}),
+		user: one(users, {
+			fields: [pageCommentReads.userId],
+			references: [users.id],
+		}),
+	}),
+);
 
 export const workspacePagesRelations = relations(workspacePages, ({ one }) => ({
 	page: one(pages, {

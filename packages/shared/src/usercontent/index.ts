@@ -6,11 +6,17 @@ export {
 	pageAssetResponsePolicy,
 } from "./file-policy";
 export {
+	contentRevision,
+	documentEtag,
 	injectHeadScriptTag,
 	injectScriptTag,
 	injectStyleTag,
+	isRuntimeScriptPath,
 	RUNTIME_SCRIPT_PATH,
 	STORAGE_SCRIPT_PATH,
+	storageScriptPath,
+	TOOLS_SCRIPT_PATH,
+	toolsScriptPath,
 } from "./inject";
 export {
 	fileOriginalKey,

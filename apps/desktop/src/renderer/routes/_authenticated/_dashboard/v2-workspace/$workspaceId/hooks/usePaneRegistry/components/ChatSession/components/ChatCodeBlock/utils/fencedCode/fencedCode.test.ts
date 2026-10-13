@@ -1,9 +1,11 @@
 import { describe, expect, test } from "bun:test";
 import {
+	fenceInfo,
 	fenceLanguage,
 	fenceText,
 	isDiffLanguage,
 	isSingleFilePatch,
+	parseFence,
 } from "./fencedCode";
 
 describe("fenceLanguage", () => {
@@ -15,6 +17,63 @@ describe("fenceLanguage", () => {
 		expect(fenceLanguage("")).toBeNull();
 		expect(fenceLanguage(undefined)).toBeNull();
 		expect(fenceLanguage("hljs")).toBeNull();
+	});
+});
+
+describe("parseFence", () => {
+	test("keeps the case of a path the class carries", () => {
+		expect(fenceInfo("language-ts:src/App.tsx")).toBe("ts:src/App.tsx");
+		expect(fenceInfo("hljs")).toBeNull();
+	});
+
+	test("reads a language and a path", () => {
+		expect(parseFence("TS:packages/chat/src/acpAdapter.ts")).toEqual({
+			language: "ts",
+			file: {
+				path: "packages/chat/src/acpAdapter.ts",
+				fileName: "acpAdapter.ts",
+				href: "packages/chat/src/acpAdapter.ts:1",
+			},
+		});
+	});
+
+	test("reads a line range and a path, and opens at the first line", () => {
+		expect(parseFence("994:1002:src/harness/acpAdapter.ts")).toEqual({
+			language: null,
+			file: {
+				path: "src/harness/acpAdapter.ts",
+				fileName: "acpAdapter.ts",
+				href: "src/harness/acpAdapter.ts:994",
+			},
+		});
+	});
+
+	test("reads a bare path, with or without a line", () => {
+		expect(parseFence("src/app.ts").file?.href).toBe("src/app.ts:1");
+		expect(parseFence("package.json").file?.fileName).toBe("package.json");
+		expect(parseFence("src/app.ts:12:4").file).toEqual({
+			path: "src/app.ts:12:4",
+			fileName: "app.ts",
+			href: "src/app.ts:12:4",
+		});
+		expect(parseFence("docker/Dockerfile").file?.fileName).toBe("Dockerfile");
+	});
+
+	test.each([
+		["ts", "ts"],
+		["TypeScript", "typescript"],
+		["c++", "c++"],
+		["dockerfile", "dockerfile"],
+		["Makefile", "makefile"],
+		["python:3", "python:3"],
+		["12:20", "12:20"],
+		["https://example.com/a.ts", "https://example.com/a.ts"],
+	])("leaves %s a language", (info, language) => {
+		expect(parseFence(info)).toEqual({ language, file: null });
+	});
+
+	test("an unmarked fence has neither", () => {
+		expect(parseFence(null)).toEqual({ language: null, file: null });
 	});
 });
 

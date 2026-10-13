@@ -6,3 +6,5 @@ export const portManager = new PortManager({
 });
 
 export const workspacePortScanner = new WorkspacePortScanner();
+
+export const chatPortTerminalIds = new Set<string>();

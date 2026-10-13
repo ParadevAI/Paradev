@@ -4,7 +4,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { COMPANY } from "@superset/shared/constants";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { FaApple, FaGithub, FaMobileAlt } from "react-icons/fa";
+import { FaApple, FaGithub } from "react-icons/fa";
 import { DownloadButton } from "../DownloadButton";
 import { WaitlistModal } from "../WaitlistModal";
 import { BoidsBackground } from "./components/BoidsBackground";
@@ -34,13 +34,13 @@ export function HeroSection() {
 			// reflowing down once it outgrows the width. Needs the h1's
 			// whitespace-pre-line to render.
 			text: `${t({
-				message: "Bring Any Agent.",
+				message: "Bring Any Agent",
 			})}\n`,
 		},
 		{
 			id: "emphasis",
 			text: t({
-				message: "Orchestrate Them All.",
+				message: "Orchestrate Them All",
 			}),
 			// Beat on the empty second line before the payoff line types
 			delayBefore: 450,
@@ -58,15 +58,19 @@ export function HeroSection() {
 				<div className="relative w-full max-w-7xl mx-auto px-6 sm:px-8">
 					<div className="flex flex-col items-center text-center">
 						<Link
-							href={i18n.locale === "en" ? "/mobile" : `/${i18n.locale}/mobile`}
+							href={
+								i18n.locale === "en"
+									? "/blog/a-new-name"
+									: `/${i18n.locale}/blog/a-new-name`
+							}
 							className="group mb-6 sm:mb-8 inline-flex max-w-full items-center gap-2 rounded-[2px] border border-border bg-background/80 px-3 py-1.5 text-xs font-mono text-muted-foreground transition-colors hover:text-foreground hover:border-foreground/[0.2]"
 						>
-							<FaMobileAlt
+							<span
 								aria-hidden="true"
-								className="size-3.5 text-foreground shrink-0"
+								className="size-1.5 shrink-0 rounded-full bg-brand"
 							/>
 							<span>
-								<Trans>Superset Mobile is here</Trans>
+								<Trans>Superset is getting a new name soon</Trans>
 							</span>
 							<span
 								aria-hidden="true"
@@ -125,7 +129,7 @@ export function HeroSection() {
 											? "/mobile"
 											: `/${i18n.locale}/mobile`
 								}
-								aria-label={t({ message: "Superset for iPhone" })}
+								aria-label={t({ message: "Superset for iPhone and iPad" })}
 								className="flex size-11 shrink-0 items-center justify-center border border-border bg-background text-foreground transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand sm:size-12"
 							>
 								<FaApple aria-hidden="true" className="size-5" />

@@ -902,6 +902,19 @@ export const serverErrorMessages: Record<
 				message: "Too many support reports. Try again later.",
 			}),
 		),
+	"serverError.team.taskKeyInvalid": () =>
+		i18n._(
+			msg({
+				message:
+					"A task key is 1 to 5 letters or numbers and starts with a letter.",
+			}),
+		),
+	"serverError.team.taskKeyTaken": (params) =>
+		i18n._(
+			msg({
+				message: `${params?.key} is already used for tasks in this organization.`,
+			}),
+		),
 	"serverError.team.teamNotFoundInThisOrganization": () =>
 		i18n._(
 			msg({
@@ -1005,6 +1018,18 @@ export const serverErrorMessages: Record<
 		i18n._(
 			msg({
 				message: "Not a member of this organization",
+			}),
+		),
+	"serverError.workspaces.restoreBranchMissing": (params) =>
+		i18n._(
+			msg({
+				message: `Branch "${params?.branch}" is not on this device or on ${params?.remote}. Only pushed commits can be restored.`,
+			}),
+		),
+	"serverError.workspaces.restoreFetchFailed": (params) =>
+		i18n._(
+			msg({
+				message: `Could not reach ${params?.remote} to look for branch "${params?.branch}". Check your connection and access to ${params?.remote}, then try again.`,
 			}),
 		),
 };

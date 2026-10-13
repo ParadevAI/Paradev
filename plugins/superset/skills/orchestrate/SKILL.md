@@ -12,8 +12,8 @@ Coordinate terminal agents with Superset's workspace, agent, and terminal comman
 ## Establish the control surface
 
 1. Run `superset auth whoami --json`.
-2. Run `superset terminals --help` and require `list`, `read`, `send`, and `close`.
-3. If those commands are absent, run `superset update` and recheck. Do not invent or substitute unsupported orchestration commands.
+2. Run `superset schema 2>/dev/null | jq -re '.commands[] | select(.path==["terminals"]) | .commands[].path[1]' || superset terminals --help` and require `list`, `read`, `send`, and `close`. The `--help` fallback covers a CLI older than 1.34.0 (no `schema`) and a machine without `jq`.
+3. If those commands are absent, run `superset update` and recheck. Do not invent or substitute unsupported orchestration commands. `hosts add`, `terminals send --keys`, `terminals wait`, `terminals attach`, `panes`, and `notifications show` are newer than CLI 1.37.0; when one is still missing after an update, skip it and fall back to `terminals read` and `send`.
 4. Resolve the workspace, host, and terminal-capable agent before dispatching:
 
 ```bash
@@ -22,7 +22,7 @@ superset agents list --local --json
 superset workspaces list --local --json
 ```
 
-When coordinating from inside the target workspace, pass `--workspace "$SUPERSET_WORKSPACE_ID"` explicitly to agent and terminal commands. Only `workspaces get` defaults its workspace ID from that environment variable. Pass `--host <id>` consistently for a remote host. If the target host is offline, use `hosts wake <id>` and confirm it is online before dispatching. Do not use `--agent superset`: it creates a chat session, and terminal read/send cannot control it.
+When coordinating from inside the target workspace, pass `--workspace "$SUPERSET_WORKSPACE_ID"` explicitly to agent and terminal commands. Only `workspaces get` defaults its workspace ID from that environment variable. Pass `--host <id>` consistently for a remote host. If the target host is offline, use `hosts wake <id>` and confirm it is online before dispatching. To run workers on a machine that is not a host yet but that the user can SSH into, `superset hosts add <ssh-target>` installs the CLI there, signs it in, and keeps it running as a user service. It changes that machine, so get the user's go-ahead first and pass `--yes` only after they agree. It needs `ssh <ssh-target>` to already work from here, and on the remote: macOS or glibc Linux (x64 or arm64, not Alpine or Windows), `curl`, and on Linux a valid `/etc/machine-id` and systemd user services. Without `gh` signed in there, private repos will not clone on that host. Running it again on the same target repairs a broken setup, and `superset hosts remove <ssh-target>` undoes it. Do not use `--agent superset`: it creates a chat session, and terminal read/send cannot control it.
 
 ## Plan the work
 
@@ -129,7 +129,31 @@ superset terminals send \
   --json
 ```
 
-Poll at a measured cadence and read all running workers in each pass. Prefer several short monitoring passes over one long blocking shell loop so progress and user updates remain visible.
+To answer a permission prompt or interrupt a worker, send key presses instead of text: `--keys enter` approves, and `--keys esc` interrupts the agent's turn. Avoid `ctrl+c` on an agent, since some agents quit on it. `--keys` takes a comma-separated list (`--keys down,enter`). Read the screen first so you know which prompt you are answering.
+
+To wait for something on the screen that is not an agent state, such as a dev server's "listening on", use `superset terminals wait --terminal <terminal-id> --match "<regex>"` with the same workspace and host flags.
+
+Wait for a worker instead of polling its screen:
+
+```bash
+superset agents wait \
+  --workspace <workspace-id> \
+  --host <host-id> \
+  --terminal <terminal-id> \
+  --until settled \
+  --timeout 120 \
+  --json
+```
+
+`settled` returns once the agent finishes its turn or needs input; the JSON `state` says which (`idle` or `blocked`). It exits 1 on timeout and at once if the agent exits. Keep timeouts short and wait on each running worker in turn, so progress and user updates stay visible between waits. Then read the screen for the envelope as above. To send a follow-up and wait for the turn it starts, add `--wait` to `terminals send`.
+
+If `superset agents wait` is not available (an older CLI), poll `terminals read` at a measured cadence instead.
+
+To see every worker at once (each terminal, its agent and state), read the host in one call with `superset snapshot --host <host-id> --json`. `superset agents explain` says why a worker shows the state it does.
+
+When the user wants to watch workers in the desktop app, lay them out with `superset panes`: `panes new-tab --workspace <id> --terminal <terminal-id>` opens a worker in its own tab, and `panes split --workspace <id> --pane <pane-id> --direction right --terminal <terminal-id>` puts two side by side. Get pane IDs from `panes list --workspace <id> --json`. These commands do not move focus; only `panes focus` does. They work only for workspaces on the machine running the desktop app.
+
+If the user wants to take over a worker from their own shell, give them the command rather than running it: `superset terminals attach --workspace <id> --terminal <terminal-id>` (add `--ssh <user@machine>` for a worker on another machine). It needs an interactive terminal, and `Ctrl+]` detaches without stopping the worker.
 
 ## Advance the workflow
 
@@ -145,6 +169,12 @@ For isolated branches, ask each implementation worker to commit or otherwise pro
 ## Finish and clean up
 
 Summarize each task's outcome, workspace/branch, files changed, checks, blockers, and integration order. Distinguish worker claims from checks the coordinator independently ran.
+
+A long run usually finishes while the user is looking elsewhere. Tell them with a desktop notification; run from a Superset terminal, clicking it brings them back to the coordinator:
+
+```bash
+superset notifications show "Parallel run finished" --body "4 done, 1 blocked" --sound
+```
 
 A run across several workspaces is worth a page. One link carrying every outcome, branch, and
 check reads better than a long terminal block, it survives the session, and reviewers can pin

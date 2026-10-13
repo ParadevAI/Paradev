@@ -13,6 +13,7 @@ import { protectedProcedure, queryProcedure, router } from "../../index";
 
 type FsErrnoCode =
 	| "ENOENT"
+	| "EEXIST"
 	| "EISDIR"
 	| "ENOTDIR"
 	| "EACCES"
@@ -26,6 +27,7 @@ interface FsErrnoCause {
 
 const ERRNO_TO_TRPC: Record<FsErrnoCode, TRPCError["code"]> = {
 	ENOENT: "NOT_FOUND",
+	EEXIST: "CONFLICT",
 	EISDIR: "BAD_REQUEST",
 	ENOTDIR: "BAD_REQUEST",
 	EACCES: "FORBIDDEN",
@@ -486,6 +488,26 @@ export const filesystemRouter = router({
 			const { workspaceId, ...serviceInput } = input;
 			const service = getFilesystemService(ctx, workspaceId);
 			return await withFsErrorTranslation(() => service.copyPath(serviceInput));
+		}),
+
+	resolveFileReference: queryProcedure
+		.meta({ timeoutMs: 30_000 })
+		.input(
+			z.object({
+				workspaceId: z.string(),
+				reference: z.string(),
+				preferredRelativePaths: z.array(z.string()).optional(),
+			}),
+		)
+		.query(async ({ ctx, input }): Promise<{ resolvedPath: string } | null> => {
+			const service = getFilesystemService(ctx, input.workspaceId);
+			const match = await withFsErrorTranslation(() =>
+				service.resolveFileReference({
+					reference: input.reference,
+					preferredRelativePaths: input.preferredRelativePaths,
+				}),
+			);
+			return match ? { resolvedPath: match.absolutePath } : null;
 		}),
 
 	searchFiles: queryProcedure

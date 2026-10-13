@@ -6,6 +6,7 @@
 	"scripts": {
 		"deploy": "wrangler deploy",
 		"dev": "wrangler dev",
+		"test": "bun test",
 		"test:integration": "bun scripts/storage-integration.ts",
 		"typecheck": "tsc --noEmit --emitDeclarationOnly false"
 	},

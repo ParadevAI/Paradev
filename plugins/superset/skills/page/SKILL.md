@@ -34,8 +34,9 @@ both stay the same, which is the identity of a page: a job that runs somewhere
 new each time needs `--page <id>` instead.
 
 Don't publish when the artifact belongs in the repo (source, docs, config: put
-those in files and commit them), or when it genuinely needs a server, a
-database, or a login. A page has none of those.
+those in files and commit them), or when it needs its own server, database
+connection, or login flow. A page has none of those, but it can show live data
+from the viewer's connected plugins (see `references/storage-and-tools.md`).
 
 If you're unsure, ask. Publishing is cheap and reversible, but a page the user
 didn't want is noise in their org's list.
@@ -103,7 +104,8 @@ enforced identically in the desktop pane and the web viewer:
   all blocked, and so is `fetch("data:...")`: a page cannot read its own
   inlined data URIs back out. Write pages that need no network at all: bake
   the data into the document as a literal, or decode base64 in JavaScript
-  (`atob`, then `Uint8Array.from`).
+  (`atob`, then `Uint8Array.from`). For live data, use `window.superset.tools`
+  (`references/storage-and-tools.md`).
 - **No compiling code at runtime.** `script-src` carries no `'unsafe-eval'`,
   so `eval()` and `new Function()` both raise an `EvalError`. This rules out
   inlining any library that builds functions at runtime, which includes
@@ -166,7 +168,7 @@ Rules that matter when you write one:
 - **Derive, don't accumulate.** A tally is computed from `getAll` on every
   render. Never keep a running count in a record.
 - **Values are JSON and bounded**: at most 64 KiB each, 500 keys per person,
-  and 4 MiB for the whole page. An over-size write rejects.
+  and 20 MiB for the whole page. An over-size write rejects.
 - **Branch on `error.code`**, never on the message: `quota_exceeded`,
   `rate_limited`, `unauthenticated`, `invalid`, `unavailable`, and `revoked`.
   `revoked` is terminal: the page's access changed while it was open, so
@@ -178,6 +180,8 @@ Rules that matter when you write one:
 - **Signed-in viewers of the page's organization only.** A signed-out reader
   of an `everyone` page gets no storage, so the page must still render.
 - Writes are per-person, so there is nothing to merge and no need for a CRDT.
+- **Private and shared values, and writes from an agent:** read
+  `references/storage-and-tools.md`.
 
 ## The other hard limits
 

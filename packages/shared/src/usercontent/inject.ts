@@ -2,6 +2,40 @@ export const RUNTIME_SCRIPT_PATH = "/_superset/runtime.js";
 
 export const STORAGE_SCRIPT_PATH = "/_superset/storage.js";
 
+export const TOOLS_SCRIPT_PATH = "/_superset/tools.js";
+
+export function contentRevision(input: string): string {
+	let hash = 0x811c9dc5;
+	for (let index = 0; index < input.length; index++) {
+		hash ^= input.charCodeAt(index);
+		hash = Math.imul(hash, 0x01000193);
+	}
+	return (hash >>> 0).toString(36);
+}
+
+export function storageScriptPath(source: string): string {
+	return `/_superset/storage.${contentRevision(source)}.js`;
+}
+
+export function toolsScriptPath(source: string): string {
+	return `/_superset/tools.${contentRevision(source)}.js`;
+}
+
+export function isRuntimeScriptPath(
+	path: string,
+	script: "storage" | "tools",
+): boolean {
+	return new RegExp(`^/_superset/${script}(?:\\.[0-9a-z]+)?\\.js$`).test(path);
+}
+
+export function documentEtag(
+	version: number,
+	policy: string,
+	renderRevision: string,
+): string {
+	return `W/"${version}.${renderRevision}.${contentRevision(policy)}"`;
+}
+
 /**
  * The origin's one edit to a published document: a same-origin script tag
  * before `</body>` (or appended when there is none), so the runtime can

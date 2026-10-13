@@ -1009,6 +1009,55 @@
       "when": 1791059309196,
       "tag": "0143_task_numbers_per_team",
       "breakpoints": true
+    },
+    {
+      "idx": 144,
+      "version": "7",
+      "when": 1791403363715,
+      "tag": "0144_drop_task_external_columns",
+      "breakpoints": true
+    },
+    {
+      "idx": 145,
+      "version": "7",
+      "when": 1791438525111,
+      "tag": "0145_organization_plugins",
+      "breakpoints": true
+    },
+    {
+      "idx": 146,
+      "version": "7",
+      "when": 1791660269127,
+      "tag": "0146_hiring_ats",
+      "breakpoints": true
+    },
+    {
+      "idx": 147,
+      "version": "7",
+      "when": 1791687391864,
+      "tag": "0147_page_comment_reads",
+      "breakpoints": true
+    },
+    {
+      "idx": 148,
+      "version": "7",
+      "when": 1791691951376,
+      "tag": "0148_hiring_closed_reason",
+      "breakpoints": true
+    },
+    {
+      "idx": 149,
+      "version": "7",
+      "when": 1791747989808,
+      "tag": "0149_page_tool_grants",
+      "breakpoints": true
+    },
+    {
+      "idx": 150,
+      "version": "7",
+      "when": 1791845922148,
+      "tag": "0150_drop_hiring_ats",
+      "breakpoints": true
     }
   ]
 }

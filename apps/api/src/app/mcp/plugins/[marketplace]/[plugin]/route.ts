@@ -82,6 +82,7 @@ async function handle(
 		ctx = await resolveMcpContext(req, {
 			apiUrl: env.NEXT_PUBLIC_API_URL,
 			relayUrl: env.RELAY_URL,
+			realtimeUrl: env.REALTIME_URL,
 			sandboxCredential: true,
 		});
 	} catch (error) {

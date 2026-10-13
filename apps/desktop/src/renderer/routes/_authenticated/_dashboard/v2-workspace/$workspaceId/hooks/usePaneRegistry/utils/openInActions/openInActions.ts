@@ -10,6 +10,9 @@ import {
 	runUrlLinkAction,
 } from "../runTerminalLinkAction";
 
+// Destinations, not sentences: these read under an "Open in" submenu trigger.
+// They name the same three targets as Settings → Links, so the menu and the
+// modifier-click bindings describe one set of destinations.
 const URL_LABELS = [
 	msg({ message: "Split Pane" }),
 	msg({ message: "New Tab" }),
@@ -17,16 +20,22 @@ const URL_LABELS = [
 ] as const;
 
 const FILE_LABELS = [
-	msg({ message: "IDE" }),
+	msg({ message: "Tab" }),
+	msg({ message: "New Tab" }),
 	msg({ message: "Editor" }),
 ] as const;
 
 const FOLDER_LABELS = [
-	msg({ message: "IDE" }),
+	msg({ message: "Sidebar" }),
 	msg({ message: "Editor" }),
 	msg({ message: "Finder" }),
 ] as const;
 
+/**
+ * The three destinations for whatever link the last right-click landed on.
+ * Empty when it landed on nothing — the "Open in" entry is hidden in that
+ * case, so the submenu is never reachable while empty.
+ */
 export function openInActions(
 	ctx: RendererContext<PaneViewerData>,
 ): ContextMenuActionConfig<PaneViewerData>[] {
@@ -59,6 +68,10 @@ export function openInActions(
 	if (!path) return [];
 
 	if (link.isDirectory) {
+		//  falls back to Finder for folders outside the worktree
+		// (revealPath's containment check), so offering "Sidebar" there would
+		// both lie and duplicate the Finder entry. The hover tooltip makes the
+		// same swap — see resolveHoverLabel in TerminalPane.
 		const canReveal =
 			!entry.deps.worktreePath ||
 			isWithinWorkspacePath(entry.deps.worktreePath, path);
@@ -66,7 +79,7 @@ export function openInActions(
 			...(canReveal
 				? [
 						{
-							key: "open-in-ide",
+							key: "open-in-sidebar",
 							label: i18n._(FOLDER_LABELS[0]),
 							onSelect: () => runFolderLinkAction(entry.deps, path, "reveal"),
 						},
@@ -88,13 +101,18 @@ export function openInActions(
 	const file = { path, row: link.row, col: link.col };
 	return [
 		{
-			key: "open-in-ide",
+			key: "open-in-pane",
 			label: i18n._(FILE_LABELS[0]),
 			onSelect: () => runFileLinkAction(entry.deps, file, "pane"),
 		},
 		{
-			key: "open-in-editor",
+			key: "open-in-new-tab",
 			label: i18n._(FILE_LABELS[1]),
+			onSelect: () => runFileLinkAction(entry.deps, file, "newTab"),
+		},
+		{
+			key: "open-in-editor",
+			label: i18n._(FILE_LABELS[2]),
 			onSelect: () => runFileLinkAction(entry.deps, file, "external"),
 		},
 	];

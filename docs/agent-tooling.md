@@ -78,6 +78,40 @@ non-default profile from the default account (`~/.claude`, `~/.codex`):
 Provisioning is idempotent and runs when an account is added, when one is selected, and at host
 boot for the selected accounts (`usage/account-provisioning.ts`).
 
+## Discovering Superset CLI commands
+
+Agent-facing text (`AGENTS.md`, skills, prompts) should point agents at `superset schema` to learn
+what commands and options exist, not at `--help` text. It prints every command, option and argument
+as JSON, so an agent reads exact names and types with `jq` instead of parsing help text. Keep
+`--help` for text a human reads.
+
+```bash
+superset schema | jq -c '[.commands[] | recurse(.commands[]?) | .path]'
+superset schema | jq '.commands[] | select(.path==["terminals"]) | .commands[] | {path, options: [.options[].name]}'
+```
+
+Each command carries `path`, `description`, `options`, `args` and nested `commands`; the top level
+also has `globalOptions`. The whole document is about 100 KB, so always filter it. For a command that
+exists only in this worktree, read the from-source CLI with
+`bun run --cwd packages/cli dev schema 2>/dev/null | jq ...`; it can list commands the installed
+CLI does not have yet.
+
+`superset schema` exists from CLI 1.34.0, and the probes need `jq`. Skills ship with the plugin, not
+with the CLI, so a skill cannot assume either. For a bare "does this command exist" check, use the
+exit code of `--help` instead; it works on every CLI version, needs no `jq`, and prints nothing:
+
+```bash
+superset feedback --help >/dev/null 2>&1 && echo supported
+```
+
+When a skill wants the schema's output and must still work on an older CLI, pipe through `jq -e`
+and fall back to `--help`. `-e` matters: without it, `jq` exits 0 on the empty input an old CLI
+produces, and the fallback never runs.
+
+```bash
+superset schema 2>/dev/null | jq -re '.commands[] | select(.path==["terminals"]) | .commands[].path[1]' || superset terminals --help
+```
+
 ## Testing the CLI and skills against the dev app
 
 The dev desktop app is local-first: it registers its host service under a

@@ -239,12 +239,19 @@ export const FileRow = memo(function FileRow({
 							disabled={!onOpenFile || !absolutePath}
 						>
 							<FileText />
-							<Trans>Open IDE</Trans>
+							<Trans>Open File</Trans>
 							{fileTier && (
 								<DropdownMenuShortcut>
 									{modifierLabel(fileTier)}
 								</DropdownMenuShortcut>
 							)}
+						</DropdownMenuItem>
+						<DropdownMenuItem
+							onSelect={() => absolutePath && onOpenFile?.(absolutePath, true)}
+							disabled={!onOpenFile || !absolutePath}
+						>
+							<SquarePlus />
+							<Trans>Open File in New Tab</Trans>
 						</DropdownMenuItem>
 						<DropdownMenuItem
 							onSelect={() => onOpenInEditor?.(file.path)}
@@ -313,10 +320,17 @@ export const FileRow = memo(function FileRow({
 					disabled={!onOpenFile || !absolutePath}
 				>
 					<FileText />
-					<Trans>Open IDE</Trans>
+					<Trans>Open File</Trans>
 					{fileTier && (
 						<ContextMenuShortcut>{modifierLabel(fileTier)}</ContextMenuShortcut>
 					)}
+				</ContextMenuItem>
+				<ContextMenuItem
+					onSelect={() => absolutePath && onOpenFile?.(absolutePath, true)}
+					disabled={!onOpenFile || !absolutePath}
+				>
+					<SquarePlus />
+					<Trans>Open File in New Tab</Trans>
 				</ContextMenuItem>
 				<ContextMenuItem
 					onSelect={() => onOpenInEditor?.(file.path)}

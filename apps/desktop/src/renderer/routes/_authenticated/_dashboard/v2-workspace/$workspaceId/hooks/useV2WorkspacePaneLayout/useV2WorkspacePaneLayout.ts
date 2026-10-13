@@ -4,14 +4,12 @@ import { useLiveQuery } from "@tanstack/react-db";
 import { useEffect, useMemo, useRef } from "react";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
+import { registerV2PaneLayoutStore } from "renderer/stores/v2-pane-layout-stores";
 import {
 	applyRememberedV2PaneSelection,
 	rememberV2PaneSelection,
 } from "renderer/stores/v2-pane-selection";
-import { getDocument } from "../../state/fileDocumentStore";
 import type { PaneViewerData } from "../../types";
-import { ideRuntimeRegistry } from "../usePaneRegistry/components/IdePane/ideRuntimeRegistry";
-import { migrateLegacyFilePanes } from "./utils/migrateLegacyFilePanes";
 import {
 	getSharedPaneLayoutSnapshot,
 	preserveLocalPaneSelection,
@@ -27,9 +25,17 @@ function getSnapshot(state: WorkspaceState<PaneViewerData>): string {
 	return getSharedPaneLayoutSnapshot(state);
 }
 
-export function useV2WorkspacePaneLayout() {
+export type PaneLayoutSlot = "paneLayout" | "rightPaneLayout";
+
+export function useV2WorkspacePaneLayout({
+	slot = "paneLayout",
+}: {
+	slot?: PaneLayoutSlot;
+} = {}) {
 	const { workspace } = useWorkspace();
 	const workspaceId = workspace.id;
+	const selectionKey =
+		slot === "paneLayout" ? workspaceId : `${workspaceId}:${slot}`;
 	const collections = useCollections();
 	// Keep the volatile pane store scoped to the route workspace. During fast
 	// workspace switches, live queries can briefly return stale rows; sharing
@@ -43,25 +49,21 @@ export function useV2WorkspacePaneLayout() {
 	// effect-cycle late.
 	const workspaceRuntime = useMemo(() => {
 		const persistedLayout =
-			(collections.v2WorkspaceLocalState.get(workspaceId)?.paneLayout as
+			(collections.v2WorkspaceLocalState.get(workspaceId)?.[slot] as
 				| WorkspaceState<PaneViewerData>
 				| undefined) ?? EMPTY_STATE;
-		const migration = migrateLegacyFilePanes({
-			state: applyRememberedV2PaneSelection(workspaceId, persistedLayout),
-			workspaceId,
-			getDocument: (filePath) => getDocument(workspaceId, filePath),
-		});
-		const seededLayout = migration.state;
+		const seededLayout = applyRememberedV2PaneSelection(
+			selectionKey,
+			persistedLayout,
+		);
 		return {
 			workspaceId,
-			migratedFiles: migration.files,
-			queuedFiles: new Set<string>(),
 			seededSnapshot: getSnapshot(seededLayout),
 			store: createWorkspaceStore<PaneViewerData>({
 				initialState: seededLayout,
 			}),
 		};
-	}, [collections, workspaceId]);
+	}, [collections, workspaceId, slot, selectionKey]);
 	const { store } = workspaceRuntime;
 	const syncStateRef = useRef({
 		workspaceId,
@@ -81,21 +83,15 @@ export function useV2WorkspacePaneLayout() {
 	const localWorkspaceState =
 		localWorkspaceRows.find((row) => row.workspaceId === workspaceId) ?? null;
 
-	const persistedMigration = useMemo(
+	const persistedPaneLayout = useMemo(
 		() =>
-			migrateLegacyFilePanes({
-				state:
-					localWorkspaceState?.workspaceId === workspaceId
-						? ((localWorkspaceState.paneLayout as
-								| WorkspaceState<PaneViewerData>
-								| undefined) ?? EMPTY_STATE)
-						: EMPTY_STATE,
-				workspaceId,
-				getDocument: (filePath) => getDocument(workspaceId, filePath),
-			}),
-		[localWorkspaceState, workspaceId],
+			localWorkspaceState?.workspaceId === workspaceId
+				? ((localWorkspaceState[slot] as
+						| WorkspaceState<PaneViewerData>
+						| undefined) ?? EMPTY_STATE)
+				: EMPTY_STATE,
+		[localWorkspaceState, workspaceId, slot],
 	);
-	const persistedPaneLayout = persistedMigration.state;
 
 	useEffect(() => {
 		syncStateRef.current = {
@@ -113,44 +109,22 @@ export function useV2WorkspacePaneLayout() {
 		if (!isLayoutReady) return;
 
 		const nextSnapshot = getSnapshot(persistedPaneLayout);
-		if (nextSnapshot !== syncStateRef.current.lastSyncedSnapshot) {
-			syncStateRef.current.lastSyncedSnapshot = nextSnapshot;
-			store
-				.getState()
-				.replaceState((current) =>
-					preserveLocalPaneSelection(current, persistedPaneLayout),
-				);
+		if (nextSnapshot === syncStateRef.current.lastSyncedSnapshot) {
+			return;
 		}
-		for (const file of [
-			...workspaceRuntime.migratedFiles,
-			...persistedMigration.files,
-		]) {
-			if (workspaceRuntime.queuedFiles.has(file.sourcePaneId)) continue;
-			if (!store.getState().getPane(file.paneId)) continue;
-			workspaceRuntime.queuedFiles.add(file.sourcePaneId);
-			ideRuntimeRegistry.queueFile(file.paneId, file.request);
-		}
-		if (
-			persistedMigration.files.length > 0 ||
-			(localWorkspaceState?.paneLayout &&
-				getSnapshot(
-					localWorkspaceState.paneLayout as WorkspaceState<PaneViewerData>,
-				) !== nextSnapshot)
-		) {
-			collections.v2WorkspaceLocalState.update(workspaceId, (draft) => {
-				draft.paneLayout = persistedPaneLayout;
-			});
-		}
-	}, [
-		persistedPaneLayout,
-		persistedMigration.files,
-		store,
-		isLayoutReady,
-		workspaceRuntime,
-		localWorkspaceState,
-		collections,
-		workspaceId,
-	]);
+
+		syncStateRef.current.lastSyncedSnapshot = nextSnapshot;
+		store
+			.getState()
+			.replaceState((current) =>
+				preserveLocalPaneSelection(current, persistedPaneLayout),
+			);
+	}, [persistedPaneLayout, store, isLayoutReady]);
+
+	useEffect(() => {
+		if (slot !== "paneLayout") return;
+		return registerV2PaneLayoutStore(workspaceId, store);
+	}, [store, workspaceId, slot]);
 
 	useEffect(() => {
 		const unsubscribe = store.subscribe((nextStore) => {
@@ -159,7 +133,7 @@ export function useV2WorkspacePaneLayout() {
 				tabs: nextStore.tabs,
 				activeTabId: nextStore.activeTabId,
 			};
-			rememberV2PaneSelection(workspaceId, nextWorkspaceState);
+			rememberV2PaneSelection(selectionKey, nextWorkspaceState);
 			const nextSnapshot = getSnapshot(nextWorkspaceState);
 			if (nextSnapshot === syncStateRef.current.lastSyncedSnapshot) {
 				return;
@@ -170,7 +144,7 @@ export function useV2WorkspacePaneLayout() {
 			}
 
 			collections.v2WorkspaceLocalState.update(workspaceId, (draft) => {
-				draft.paneLayout = nextWorkspaceState;
+				draft[slot] = nextWorkspaceState;
 			});
 			syncStateRef.current.lastSyncedSnapshot = nextSnapshot;
 		});
@@ -178,7 +152,7 @@ export function useV2WorkspacePaneLayout() {
 		return () => {
 			unsubscribe();
 		};
-	}, [collections, store, workspaceId]);
+	}, [collections, store, workspaceId, slot, selectionKey]);
 
-	return { store, isLayoutReady };
+	return { store, isLayoutReady, hasRow: localWorkspaceState != null };
 }
