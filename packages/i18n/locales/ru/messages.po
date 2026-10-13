@@ -197,8 +197,8 @@ msgid "{0, plural, one {# project} other {# projects}}"
 msgstr "{0, plural, one {# проект} few {# проекта} many {# проектов} other {# проекта}}"
 
 #. placeholder {0}: stack.layers.length
-msgid "{0, plural, one {# pull request · targets {base}} other {# pull requests · targets {base}}}"
-msgstr "{0, plural, one {# пул-реквест · в {base}} few {# пул-реквеста · в {base}} many {# пул-реквестов · в {base}} other {# пул-реквеста · в {base}}}"
+msgid "{0, plural, one {# pull request} other {# pull requests}}"
+msgstr "{0, plural, one {# пул-реквест} few {# пул-реквеста} many {# пул-реквестов} other {# пул-реквеста}}"
 
 #. placeholder {0}: repositories.length
 #. placeholder {0}: selectedProjects.length
@@ -1042,6 +1042,9 @@ msgstr "логотип {provider}"
 
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, one {# PR} few {# PR} many {# PR} other {# PR}}"
+
+msgid "{pullRequests} · targets {base}"
+msgstr "{pullRequests} · в {base}"
 
 msgid "{queued, plural, one {# message waiting in the queue} other {# messages waiting in the queue}}"
 msgstr "{queued, plural, one {# сообщение ждёт в очереди} few {# сообщения ждут в очереди} many {# сообщений ждут в очереди} other {# сообщения ждут в очереди}}"

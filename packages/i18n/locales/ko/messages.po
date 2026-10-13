@@ -197,8 +197,8 @@ msgid "{0, plural, one {# project} other {# projects}}"
 msgstr "{0, plural, one {프로젝트 #개} other {프로젝트 #개}}"
 
 #. placeholder {0}: stack.layers.length
-msgid "{0, plural, one {# pull request · targets {base}} other {# pull requests · targets {base}}}"
-msgstr "{0, plural, other {풀 리퀘스트 #개 · 대상 {base}}}"
+msgid "{0, plural, one {# pull request} other {# pull requests}}"
+msgstr "{0, plural, other {풀 리퀘스트 #개}}"
 
 #. placeholder {0}: repositories.length
 #. placeholder {0}: selectedProjects.length
@@ -1042,6 +1042,9 @@ msgstr "{provider} 로고"
 
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, other {PR #개}}"
+
+msgid "{pullRequests} · targets {base}"
+msgstr "{pullRequests} · 대상 {base}"
 
 msgid "{queued, plural, one {# message waiting in the queue} other {# messages waiting in the queue}}"
 msgstr "{queued, plural, one {대기열에서 대기 중인 메시지 #개} other {대기열에서 대기 중인 메시지 #개}}"

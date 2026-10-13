@@ -197,8 +197,8 @@ msgid "{0, plural, one {# project} other {# projects}}"
 msgstr "{0, plural, one {# 件のプロジェクト} other {# 件のプロジェクト}}"
 
 #. placeholder {0}: stack.layers.length
-msgid "{0, plural, one {# pull request · targets {base}} other {# pull requests · targets {base}}}"
-msgstr "{0, plural, other {# 件のプルリクエスト · {base} 向け}}"
+msgid "{0, plural, one {# pull request} other {# pull requests}}"
+msgstr "{0, plural, other {# 件のプルリクエスト}}"
 
 #. placeholder {0}: repositories.length
 #. placeholder {0}: selectedProjects.length
@@ -1042,6 +1042,9 @@ msgstr "{provider}のロゴ"
 
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, other {# 件の PR}}"
+
+msgid "{pullRequests} · targets {base}"
+msgstr "{pullRequests} · {base} 向け"
 
 msgid "{queued, plural, one {# message waiting in the queue} other {# messages waiting in the queue}}"
 msgstr "{queued, plural, one {キューで待機中のメッセージ #件} other {キューで待機中のメッセージ #件}}"

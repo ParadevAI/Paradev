@@ -64,12 +64,13 @@ export function usePullRequestStackCopy() {
 				if (stackNumber !== null) {
 					return t({ message: `Stack #${stackNumber} · targets ${base}` });
 				}
-				return t({
+				const pullRequests = t({
 					message: plural(stack.layers.length, {
-						one: `# pull request · targets ${base}`,
-						other: `# pull requests · targets ${base}`,
+						one: "# pull request",
+						other: "# pull requests",
 					}),
 				});
+				return t({ message: `${pullRequests} · targets ${base}` });
 			},
 			position(stack: StackIdentity): string {
 				const base = stack.baseRefName;
