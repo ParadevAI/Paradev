@@ -27,6 +27,8 @@ import {
 	workspaces,
 } from "../../../db/schema";
 import { claudeProjectDirName } from "../../../terminal-agents/harness-sessions/claude";
+import { SqliteTerminalAgentBindingPersistence } from "../../../terminal-agents/persistence";
+import { TerminalAgentStore } from "../../../terminal-agents/store";
 import type { AgentRunInput } from "../agents/agents";
 import {
 	accountResumeSource,
@@ -345,6 +347,43 @@ describe("saved native Claude adoption", () => {
 		const second = await f.openSaved(saved.id);
 		expect(second.terminalId).toBe(first.terminalId);
 		expect(f.launches).toHaveLength(1);
+	});
+	test("a host-store reload and ordinary hook preserve saved-account focus and reopening", async () => {
+		const f = await fixture();
+		f.deps.resolveAccount = async () => ({
+			agent: f.account.agent,
+			selection: f.account.selection,
+			credentialKind: f.account.credentialKind,
+			identity: f.account.identity,
+			email: f.account.email,
+			directory: f.account.directory,
+			pinned: true,
+		});
+		const saved = await f.adopt();
+		const first = await f.openSaved(saved.id);
+		const reloaded = new TerminalAgentStore(
+			new SqliteTerminalAgentBindingPersistence(f.db),
+		);
+		reloaded.recordEvent({
+			terminalId: first.terminalId,
+			workspaceId: "workspace",
+			eventType: "Start",
+			agentId: "claude",
+			agentSessionId: firstId,
+			occurredAt: 2,
+		});
+		const page = await listSavedConversations(f.deps, f.input);
+		expect(page.conversations[0]?.canFocusExisting).toBe(true);
+		expect((await f.openSaved(saved.id)).terminalId).toBe(first.terminalId);
+		expect(f.launches).toHaveLength(1);
+		f.db
+			.update(terminalAgentBindings)
+			.set({ endedAt: 3, endReason: "detached" })
+			.where(eq(terminalAgentBindings.terminalId, first.terminalId))
+			.run();
+		expect((await f.openSaved(saved.id)).terminalId).not.toBe(first.terminalId);
+		expect(f.launches).toHaveLength(2);
+		expect(f.launches[1]?.resumeSessionId).toBe(firstId);
 	});
 	test("only new launches require exit confirmation", async () => {
 		const f = await fixture();

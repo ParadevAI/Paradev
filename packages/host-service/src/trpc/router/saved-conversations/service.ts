@@ -25,7 +25,10 @@ import {
 	assertAccountResumeTerminalIdle,
 	assertNoRecordedClaudeWriter,
 } from "../terminal-agents/account-resume-processes";
-import { parsePersistedSessionAccount } from "../usage/session-account/session-account";
+import {
+	parsePersistedSessionAccount,
+	sameSessionAccountContext,
+} from "../usage/session-account/session-account";
 import {
 	checkpointNativeHistory,
 	discoverNativeMetadata,
@@ -141,7 +144,10 @@ function present(saved: SavedConversation, db?: HostDb) {
 				binding.agentId === saved.provider &&
 				binding.agentSessionId === saved.nativeSessionId &&
 				binding.workspaceId === saved.workspaceId &&
-				binding.accountJson === saved.accountJson &&
+				sameSessionAccountContext(
+					parsePersistedSessionAccount(binding.accountJson),
+					parsePersistedSessionAccount(saved.accountJson),
+				) &&
 				(!binding.transcriptPath ||
 					binding.transcriptPath === saved.transcriptPath),
 		),
@@ -306,7 +312,10 @@ export async function adoptNativeConversation(
 				existing.workspaceId !== input.workspaceId ||
 				existing.cwd !== current.cwd ||
 				existing.transcriptPath !== metadata.path ||
-				existing.accountJson !== JSON.stringify(current.account)
+				!sameSessionAccountContext(
+					parsePersistedSessionAccount(existing.accountJson),
+					current.account,
+				)
 			)
 				unavailable(
 					"This conversation is already adopted with a different workspace or account. Open its existing saved record.",
@@ -414,7 +423,10 @@ export async function openSavedConversation(
 			active.agentId === original.provider &&
 			active.agentSessionId === original.nativeSessionId &&
 			active.workspaceId === original.workspaceId &&
-			active.accountJson === original.accountJson &&
+			sameSessionAccountContext(
+				parsePersistedSessionAccount(active.accountJson),
+				parsePersistedSessionAccount(original.accountJson),
+			) &&
 			(!active.transcriptPath ||
 				active.transcriptPath === original.transcriptPath) &&
 			workspace &&
@@ -450,7 +462,7 @@ export async function openSavedConversation(
 	if (
 		current.cwd !== original.cwd ||
 		current.storePath !== original.storePath ||
-		JSON.stringify(current.account) !== original.accountJson
+		!sameSessionAccountContext(account, current.account)
 	)
 		unavailable(
 			"The saved conversation's account or working folder changed. Nothing was launched.",
@@ -477,7 +489,10 @@ export async function openSavedConversation(
 					binding.agentId !== "claude" ||
 					binding.agentSessionId !== original.nativeSessionId ||
 					binding.workspaceId !== original.workspaceId ||
-					binding.accountJson !== original.accountJson ||
+					!sameSessionAccountContext(
+						parsePersistedSessionAccount(binding.accountJson),
+						account,
+					) ||
 					(binding.transcriptPath &&
 						binding.transcriptPath !== original.transcriptPath)
 				)
@@ -605,7 +620,10 @@ export async function openSavedConversation(
 						bound.agentId !== "claude" ||
 						bound.agentSessionId !== original.nativeSessionId ||
 						bound.workspaceId !== original.workspaceId ||
-						bound.accountJson !== original.accountJson
+						!sameSessionAccountContext(
+							parsePersistedSessionAccount(bound.accountJson),
+							account,
+						)
 					)
 						unavailable(
 							"The new terminal binding does not match the saved conversation. Nothing was launched.",
