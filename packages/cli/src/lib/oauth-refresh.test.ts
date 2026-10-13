@@ -151,6 +151,45 @@ describe("refreshStoredAuth", () => {
 		}
 	});
 
+	it("does not remove a lock that was taken over while it was refreshing", async () => {
+		const h = makeHarness(staleAuth());
+		h.deps.refresh = async () => {
+			// A takeover happens mid-refresh: someone replaces the lock.
+			fs.writeFileSync(h.deps.lockPath, "intruder");
+			return {
+				accessToken: "fresh-1",
+				refreshToken: "rotated-1",
+				expiresAt: Date.now() + 60 * 60 * 1000,
+			};
+		};
+		try {
+			await refreshStoredAuth(h.deps);
+			// Release must leave the new holder's lock alone.
+			expect(fs.readFileSync(h.deps.lockPath, "utf-8")).toBe("intruder");
+		} finally {
+			h.cleanup();
+		}
+	});
+
+	it("gives up on a wedged foreign lock at the wait budget and still refreshes once", async () => {
+		const h = makeHarness(staleAuth());
+		// A live foreign lock that never goes stale within this test.
+		fs.writeFileSync(h.deps.lockPath, "wedged-holder");
+		h.deps.lockStaleMs = 10_000;
+		h.deps.lockTimeoutMs = 40;
+		h.deps.pollMs = 5;
+		try {
+			const result = await refreshStoredAuth(h.deps);
+			expect(h.refreshCalls).toBe(1);
+			expect(result.auth?.accessToken).toBe("fresh-1");
+			expect(h.sleepCalls).toBeGreaterThan(0);
+			// The foreign lock was neither stolen nor removed.
+			expect(fs.readFileSync(h.deps.lockPath, "utf-8")).toBe("wedged-holder");
+		} finally {
+			h.cleanup();
+		}
+	});
+
 	it("releases the lock after a failed refresh so the next caller can try", async () => {
 		const h = makeHarness(staleAuth());
 		let failFirst = true;

@@ -43,8 +43,11 @@ export function defaultRefreshDeps(): RefreshDeps {
 		readConfig,
 		writeConfig,
 		lockPath: join(getSupersetHomeDir(), "auth-refresh.lock"),
+		// Three times the bounded refresh call (REFRESH_TIMEOUT_MS), so a
+		// live holder can never be mistaken for a dead one; the wait budget
+		// exceeds the stale threshold so a waiter outlives one takeover.
 		lockStaleMs: 30_000,
-		lockTimeoutMs: 10_000,
+		lockTimeoutMs: 45_000,
 		pollMs: 25,
 		now: () => Date.now(),
 		sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
@@ -103,22 +106,29 @@ export async function refreshStoredAuth(
 }
 
 /**
- * Exclusive-create lock file. A stale lock is stolen with a rename so only
- * one waiter can win the steal; losers see ENOENT and retry the create. On
- * timeout the caller proceeds without the lock: blocking auth forever is
- * worse than the race this protects against, and the recheck-on-failure in
- * refreshStoredAuth still covers the degraded path.
+ * Exclusive-create lock file holding an ownership token. The token makes
+ * release and takeover honest: release removes the lock only while it still
+ * holds this acquisition's token, and a stale takeover is confirmed by
+ * re-reading the renamed file; a lock that changed hands in between is
+ * given back. Staleness is sound because the refresh call itself is bounded
+ * (REFRESH_TIMEOUT_MS in auth.ts), so a live holder can never look dead.
+ * On timeout the caller proceeds without the lock: by then the holder is
+ * past every bound and blocking auth forever is worse, and the re-read
+ * paths in refreshStoredAuth still cover the degraded case.
  */
 async function acquireLock(deps: RefreshDeps): Promise<() => void> {
+	const token = `${process.pid} ${randomUUID()}`;
 	const deadline = deps.now() + deps.lockTimeoutMs;
 	for (;;) {
 		try {
 			const fd = fs.openSync(deps.lockPath, "wx");
-			fs.writeSync(fd, String(process.pid));
+			fs.writeSync(fd, token);
 			fs.closeSync(fd);
 			return () => {
 				try {
-					fs.unlinkSync(deps.lockPath);
+					if (fs.readFileSync(deps.lockPath, "utf-8") === token) {
+						fs.unlinkSync(deps.lockPath);
+					}
 				} catch {}
 			};
 		} catch (error) {
@@ -128,21 +138,34 @@ async function acquireLock(deps: RefreshDeps): Promise<() => void> {
 				return () => {};
 			}
 		}
+		// Checked before any takeover work so no error path below can spin
+		// without ever reaching the deadline.
+		if (deps.now() >= deadline) return () => {};
 		try {
+			const observed = fs.readFileSync(deps.lockPath, "utf-8");
 			const age = deps.now() - fs.statSync(deps.lockPath).mtimeMs;
 			if (age > deps.lockStaleMs) {
 				const corpse = `${deps.lockPath}.${randomUUID()}.stale`;
 				fs.renameSync(deps.lockPath, corpse);
-				try {
+				if (fs.readFileSync(corpse, "utf-8") === observed) {
 					fs.unlinkSync(corpse);
-				} catch {}
-				continue;
+					continue;
+				}
+				// The lock changed hands between the read and the rename:
+				// that is a live holder, not a corpse. Put it back.
+				try {
+					fs.renameSync(corpse, deps.lockPath);
+				} catch {
+					try {
+						fs.unlinkSync(corpse);
+					} catch {}
+				}
 			}
 		} catch {
-			// The holder released between our open and stat; retry at once.
-			continue;
+			// Holder released between open and stat, or the filesystem
+			// refused the takeover; the sleep below keeps either case from
+			// spinning hot.
 		}
-		if (deps.now() >= deadline) return () => {};
 		await deps.sleep(deps.pollMs);
 	}
 }
