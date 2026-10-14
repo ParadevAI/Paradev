@@ -1,6 +1,7 @@
 import { afterEach, expect, test } from "bun:test";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
+	act,
 	cleanup,
 	fireEvent,
 	render,
@@ -127,7 +128,9 @@ test("two real hook consumers share refresh and failure state through the deskto
 	});
 	expect(reads).toBe(before + 1);
 	offline = true;
-	await store.read("http://127.0.0.1:1234");
+	await act(async () => {
+		await store.read("http://127.0.0.1:1234");
+	});
 	await waitFor(() => {
 		expect(screen.getByTestId("left").textContent).toBe("second:offline");
 		expect(screen.getByTestId("right").textContent).toBe("second:offline");
