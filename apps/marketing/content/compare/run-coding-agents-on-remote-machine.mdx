@@ -99,7 +99,7 @@ You can then check on agents from your laptop when it wakes, or from [Superset f
 
 Yes. Superset runs `claude` and `codex` in a login shell in a real terminal on the host, with the host user's own Claude and Codex logins, and it does not route their network traffic. We checked on October 14, 2026, with Claude Code 2.1.300 and Codex CLI 0.162.1 started in a Superset workspace: `/remote-control` connected the session to claude.ai, and `codex cloud list` reached Codex cloud.
 
-- **Claude Code Remote Control** follows one session from the Claude app. Per [Anthropic's docs](https://code.claude.com/docs/en/remote-control) (accessed October 14, 2026), it needs a claude.ai login on a Pro, Max, Team, or Enterprise plan, not an API key or a third-party provider, and it is off when `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC` is set. The terminal pane must stay open: closing it ends the `claude` process.
+- **Claude Code Remote Control** follows one session from the Claude app. Per [Anthropic's docs](https://code.claude.com/docs/en/remote-control) (accessed October 14, 2026), it needs a claude.ai login on a Pro, Max, Team, or Enterprise plan, not an API key or a third-party provider, and it is off when `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC` is set. The terminal must stay open: closing its last pane ends the `claude` process.
 - **Codex cloud** runs the task in OpenAI's environment, so it keeps going while the host sleeps. From the host's terminal, `codex cloud exec` submits a task and `codex cloud apply` brings the diff back into the workspace, where Superset's Changes pane shows it. See [OpenAI's Codex cloud docs](https://learn.chatgpt.com/docs/cloud).
 
 Use Superset to see every agent on every host in one place. Add Remote Control when you want the Claude app on one Claude Code session, and Codex cloud when a task needs nothing from the host.
@@ -165,7 +165,7 @@ Yes. Install Claude Code on the server and connect with SSH and tmux, VS Code Re
 
 ### Can I use Claude Code Remote Control on a Superset host?
 
-Yes. Start Claude Code in a workspace on the host and type `/remote-control`. The session appears in the Claude app and at claude.ai/code, and it also stays visible in Superset's desktop and iPhone apps. You need a claude.ai login on a Pro, Max, Team, or Enterprise plan, and the workspace's terminal pane must stay open.
+Yes. Start Claude Code in a workspace on the host and type `/remote-control`. The session appears in the Claude app and at claude.ai/code, and it also stays visible in Superset's desktop and iPhone apps. You need a claude.ai login on a Pro, Max, Team, or Enterprise plan, and the workspace's terminal must stay open in at least one pane.
 
 ### Do I need to keep my laptop open for agents to keep working?
 

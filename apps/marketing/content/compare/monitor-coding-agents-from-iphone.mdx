@@ -53,7 +53,7 @@ If you already run Claude Code in Superset, you don't have to choose. Superset l
 What to know:
 
 - **Your Claude account decides.** Remote Control needs a claude.ai login on a Pro, Max, Team, or Enterprise plan. It does not work with an API key, Amazon Bedrock, Google Cloud, Microsoft Foundry, a non-Anthropic `ANTHROPIC_BASE_URL`, or `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC`. Superset sets none of these in workspaces on your own machines, but your shell profile might. If you picked another Claude account in Superset, the session uses that account.
-- **Keep the pane open.** Superset terminals run in a background service, so the session keeps going when you quit the desktop app. Closing the terminal pane or deleting the workspace ends the `claude` process, and Remote Control goes offline with it.
+- **Keep the terminal open.** Superset terminals run in a background service, so the session keeps going when you quit the desktop app. Closing the terminal's last open pane or deleting the workspace ends the `claude` process, and Remote Control goes offline with it.
 - **Two views, one session.** The Claude app follows that one Claude Code session. Superset for iPhone shows the same terminal next to your other agents and hosts.
 
 If you want the whole machine, not only the Claude conversation, use the classic stack:
@@ -134,7 +134,7 @@ If the app shows **One step left**, that computer has never connected. **Offline
 
 ### Can I use Claude Code Remote Control inside Superset?
 
-Yes. Superset runs the real `claude` CLI in an interactive terminal with your own login, so `/remote-control` works in a Superset workspace and the session appears in the Claude app. You need a claude.ai login on a Pro, Max, Team, or Enterprise plan, and the terminal pane must stay open. Superset for iPhone shows the same session next to your other agents.
+Yes. Superset runs the real `claude` CLI in an interactive terminal with your own login, so `/remote-control` works in a Superset workspace and the session appears in the Claude app. You need a claude.ai login on a Pro, Max, Team, or Enterprise plan, and the terminal must stay open in at least one pane. Superset for iPhone shows the same session next to your other agents.
 
 ### Can I use Claude Code from my phone without an extra app?
 
