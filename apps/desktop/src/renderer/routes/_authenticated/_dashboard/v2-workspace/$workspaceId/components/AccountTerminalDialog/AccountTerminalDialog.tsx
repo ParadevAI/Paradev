@@ -1,12 +1,5 @@
-import { Trans, useLingui } from "@lingui/react/macro";
+import { useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
-import {
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogHeader,
-	DialogTitle,
-} from "@superset/ui/dialog";
 import { useWorkspaceClient } from "@superset/workspace-client";
 import { useQuery } from "@tanstack/react-query";
 import { TRPCClientError } from "@trpc/client";
@@ -15,14 +8,17 @@ import { useV2AgentConfigs } from "renderer/hooks/useV2AgentConfigs";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import type { CreateAccountTerminal } from "../../hooks/useAgentSessionLauncher";
 import { useChatWiring } from "../../hooks/usePaneRegistry/components/ChatSession/hooks/useSessionClient";
+import { AccountTerminalDialogFrame } from "./components/AccountTerminalDialogFrame";
 import { AccountTerminalForm } from "./components/AccountTerminalForm";
 
 export function AccountTerminalDialog({
 	onClose,
 	onLaunch,
 	surface = "terminal",
+	returnFocus,
 }: {
 	surface?: "terminal" | "chat";
+	returnFocus: HTMLElement | null;
 	onClose: () => void;
 	onLaunch: CreateAccountTerminal;
 }) {
@@ -98,63 +94,44 @@ export function AccountTerminalDialog({
 								})
 							: null;
 	return (
-		<Dialog open onOpenChange={(open) => !open && !launching && onClose()}>
-			<DialogContent className="sm:max-w-md" showCloseButton={!launching}>
-				<DialogHeader>
-					<DialogTitle>
-						{surface === "chat" ? (
-							<Trans>Chat with account</Trans>
-						) : (
-							<Trans>Agent terminal with account</Trans>
-						)}
-					</DialogTitle>
-					<DialogDescription>
-						{surface === "chat" ? (
-							<Trans>
-								Start a native chat using an existing login. Recovery keeps this
-								account and working folder.
-							</Trans>
-						) : (
-							<Trans>
-								Start a new terminal using an existing login. Other chats and
-								your default account stay unchanged.
-							</Trans>
-						)}
-					</DialogDescription>
-				</DialogHeader>
-				<AccountTerminalForm
-					mode={surface === "chat" ? "chat" : "start"}
-					key={`${hostUrl}:${selectedConfigId}`}
-					configs={choices}
-					configId={selectedConfigId}
-					onConfigChange={setConfigId}
-					accounts={accounts.data?.supported ? accounts.data.accounts : []}
-					loading={
-						configs.isPending ||
-						(selectedConfigExists && accounts.isPending) ||
-						(surface === "chat" && capabilities.isPending)
+		<AccountTerminalDialogFrame
+			launching={launching}
+			onClose={onClose}
+			returnFocus={returnFocus}
+			surface={surface}
+		>
+			<AccountTerminalForm
+				mode={surface === "chat" ? "chat" : "start"}
+				key={`${hostUrl}:${selectedConfigId}`}
+				configs={choices}
+				configId={selectedConfigId}
+				onConfigChange={setConfigId}
+				accounts={accounts.data?.supported ? accounts.data.accounts : []}
+				loading={
+					configs.isPending ||
+					(selectedConfigExists && accounts.isPending) ||
+					(surface === "chat" && capabilities.isPending)
+				}
+				refreshing={accounts.isFetching}
+				error={error}
+				launching={launching}
+				onRefresh={async () => {
+					await Promise.all([
+						accounts.refetch(),
+						...(surface === "chat" ? [capabilities.refetch()] : []),
+					]);
+				}}
+				onCancel={onClose}
+				onLaunch={async (account) => {
+					setLaunching(true);
+					try {
+						await onLaunch({ configId: selectedConfigId, account });
+						onClose();
+					} finally {
+						setLaunching(false);
 					}
-					refreshing={accounts.isFetching}
-					error={error}
-					launching={launching}
-					onRefresh={async () => {
-						await Promise.all([
-							accounts.refetch(),
-							...(surface === "chat" ? [capabilities.refetch()] : []),
-						]);
-					}}
-					onCancel={onClose}
-					onLaunch={async (account) => {
-						setLaunching(true);
-						try {
-							await onLaunch({ configId: selectedConfigId, account });
-							onClose();
-						} finally {
-							setLaunching(false);
-						}
-					}}
-				/>
-			</DialogContent>
-		</Dialog>
+				}}
+			/>
+		</AccountTerminalDialogFrame>
 	);
 }

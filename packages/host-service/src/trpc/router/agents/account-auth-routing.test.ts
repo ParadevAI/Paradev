@@ -132,6 +132,37 @@ describe("explicit account authentication routing", () => {
 		).rejects.toThrow("managed authentication policy");
 	});
 
+	test("refuses an inconclusive managed preference probe", async () => {
+		await put(options.managedPreferencesDir, "not a directory");
+		await expect(
+			validateAccountAuthRouting(account, cwd, { ...options, os: "darwin" }),
+		).rejects.toThrow("managed authentication policy");
+	});
+
+	test.each([
+		"claude",
+		"codex",
+	] as const)("accepts ordinary macOS %s preferences but refuses managed preferences", async (agent) => {
+		account = { ...account, agent };
+		const domain =
+			agent === "claude" ? "com.anthropic.claudecode" : "com.openai.codex";
+		await put(
+			join(options.homeDir, "Library/Preferences", `${domain}.plist`),
+			"ordinary preferences",
+		);
+		const macOptions = { ...options, os: "darwin" as const };
+		await expect(
+			validateAccountAuthRouting(account, cwd, macOptions),
+		).resolves.toBeUndefined();
+		await put(
+			join(options.managedPreferencesDir, options.username, `${domain}.plist`),
+			"managed preferences",
+		);
+		await expect(
+			validateAccountAuthRouting(account, cwd, macOptions),
+		).rejects.toThrow("managed authentication policy");
+	});
+
 	test("accepts ordinary Codex configuration with real TOML syntax", async () => {
 		account = { ...account, agent: "codex" };
 		await put(

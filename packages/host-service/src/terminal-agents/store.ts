@@ -201,7 +201,7 @@ export class TerminalAgentStore extends EventEmitter {
 				: undefined;
 
 		const sessionChanged =
-			prior !== undefined &&
+			prior?.agentSessionId !== undefined &&
 			agentSessionId !== undefined &&
 			prior.agentSessionId !== agentSessionId;
 
@@ -242,6 +242,27 @@ export class TerminalAgentStore extends EventEmitter {
 		this.byTerminal.set(terminalId, next);
 		this.persistence?.upsert(next);
 		this.emit("change", workspaceId);
+	}
+
+	updateMetadata(
+		terminalId: string,
+		metadata: Pick<
+			RecordEventInput,
+			"account" | "agentSessionId" | "definitionId"
+		>,
+	): void {
+		const prior = this.byTerminal.get(terminalId);
+		if (!prior || this.persistence?.getEnded?.(terminalId)) return;
+		const next = {
+			...prior,
+			account: metadata.account ?? prior.account,
+			accountInvalid: metadata.account ? undefined : prior.accountInvalid,
+			agentSessionId: metadata.agentSessionId ?? prior.agentSessionId,
+			definitionId: metadata.definitionId ?? prior.definitionId,
+		};
+		this.byTerminal.set(terminalId, next);
+		this.persistence?.upsert(next);
+		this.emit("change", prior.workspaceId);
 	}
 
 	recordChatEvent(

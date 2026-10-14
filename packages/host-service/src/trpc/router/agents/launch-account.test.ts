@@ -3,6 +3,7 @@ import { execFileSync } from "node:child_process";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
+import { writeSharedDisabledAgentIds } from "@superset/agent-setup";
 import { buildArgvCommand } from "@superset/shared/agent-prompt-launch";
 import type { ResolvedHostAgentConfig } from "../../../terminal-agents/agent-config";
 import {
@@ -331,3 +332,49 @@ test("prepares only managed hooks in a selected profile and preserves its login 
 	).toThrow("hooks");
 	expect(await readFile(join(dir, "settings.json"), "utf8")).toBe("{");
 });
+
+for (const agent of ["claude", "codex"] as const) {
+	test(`leaves disabled ${agent} hooks and profile bytes unchanged`, async () => {
+		const dir = await mkdtemp(
+			join(tmpdir(), "superset-disabled-profile-hooks-"),
+		);
+		directories.push(dir);
+		const state = await mkdtemp(
+			join(tmpdir(), "superset-disabled-hooks-state-"),
+		);
+		directories.push(state);
+		const originalHome = process.env.SUPERSET_HOME_DIR;
+		const originalDisabled = process.env.SUPERSET_DISABLED_AGENT_HOOKS;
+		process.env.SUPERSET_HOME_DIR = state;
+		delete process.env.SUPERSET_DISABLED_AGENT_HOOKS;
+		const filename = agent === "claude" ? "settings.json" : "config.toml";
+		const contents =
+			agent === "claude"
+				? '{"theme":"dark","hooks":{"Stop":[{"hooks":[{"type":"command","command":"user-hook"}]}]}}'
+				: 'model = "fixture"\n';
+		await writeFile(join(dir, filename), contents);
+		const hookBytes =
+			'{"hooks":{"Stop":[{"hooks":[{"type":"command","command":"user-hook"}]}]}}';
+		if (agent === "codex") await writeFile(join(dir, "hooks.json"), hookBytes);
+		try {
+			if (agent === "claude") writeSharedDisabledAgentIds([agent]);
+			else process.env.SUPERSET_DISABLED_AGENT_HOOKS = agent;
+			prepareLaunchAccountHooks({
+				...account,
+				agent,
+				directory: dir,
+				selection: agent === "claude" ? null : dir,
+				pinned: true,
+			});
+			expect(await readFile(join(dir, filename), "utf8")).toBe(contents);
+			if (agent === "codex")
+				expect(await readFile(join(dir, "hooks.json"), "utf8")).toBe(hookBytes);
+		} finally {
+			if (originalHome === undefined) delete process.env.SUPERSET_HOME_DIR;
+			else process.env.SUPERSET_HOME_DIR = originalHome;
+			if (originalDisabled === undefined)
+				delete process.env.SUPERSET_DISABLED_AGENT_HOOKS;
+			else process.env.SUPERSET_DISABLED_AGENT_HOOKS = originalDisabled;
+		}
+	});
+}
