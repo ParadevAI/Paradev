@@ -138,7 +138,9 @@ test("pending opening and unmount use committed callbacks without reporting afte
 		const view = render(content(first));
 		await waitFor(() => expect(view.getByRole("radio")).toBeTruthy());
 		fireEvent.click(view.getByRole("radio"));
-		fireEvent.submit(view.container.querySelector("form")!);
+		const form = view.container.querySelector("form");
+		if (!form) throw new Error("Saved conversation form missing");
+		fireEvent.submit(form);
 		await act(async () => started.promise);
 		expect(first).toHaveBeenCalledWith(true);
 		view.rerender(content(latest));
