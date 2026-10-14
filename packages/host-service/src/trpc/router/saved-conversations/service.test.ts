@@ -651,6 +651,63 @@ describe("saved native Claude adoption", () => {
 		expect(result).toEqual({ resumed: false });
 		expect(f.launches).toHaveLength(1);
 	});
+	test("account authorization rolls back its source binding when saved-lineage update fails", async () => {
+		const f = await fixture();
+		const saved = await f.adopt();
+		const opened = await f.openSaved(saved.id);
+		f.db
+			.update(terminalAgentBindings)
+			.set({ endedAt: 2, endReason: "terminal-exited" })
+			.run();
+		const previousBinding = f.db.select().from(terminalAgentBindings).get();
+		const previousSaved = f.db.select().from(savedConversations).get();
+		if (!previousBinding || !previousSaved)
+			throw new Error("fixture source unavailable");
+		const source = accountResumeSource(f.db, {
+			workspaceId: "workspace",
+			terminalId: opened.terminalId,
+		});
+		if (!source?.ready) throw new Error("fixture source unavailable");
+		const targetProfile = join(f.directory, "target-profile");
+		await mkdir(targetProfile);
+		await symlink(join(f.profile, "projects"), join(targetProfile, "projects"));
+		const target: SessionAccount = {
+			...f.account,
+			identity: "b".repeat(64),
+			selection: targetProfile,
+			directory: targetProfile,
+		};
+		f.sqlite.exec(
+			`CREATE TRIGGER reject_lineage_update BEFORE UPDATE ON saved_conversations WHEN NEW.terminal_id <> OLD.terminal_id BEGIN SELECT RAISE(ABORT, 'synthetic lineage failure'); END;`,
+		);
+		await expect(
+			resumeTerminalWithAccount(
+				{
+					db: f.db,
+					runAgent: f.deps.runAgent as NonNullable<
+						SavedConversationDeps["runAgent"]
+					>,
+					eventBus: { broadcastTerminalLifecycle: () => {} },
+					resolveAccount: async () => target,
+					validateRouting: async () => {},
+					assertIdle: async () => {},
+					assertNoClaudeWriter: async () => {},
+				},
+				{
+					workspaceId: "workspace",
+					terminalId: opened.terminalId,
+					expectedRevision: source.revision,
+					account: target,
+				},
+			),
+		).rejects.toThrow();
+		expect(f.db.select().from(terminalAgentBindings).all()).toEqual([
+			previousBinding,
+		]);
+		expect(f.db.select().from(savedConversations).get()).toEqual(previousSaved);
+		expect(f.db.select().from(terminalSessions).all()).toHaveLength(1);
+	});
+
 	test("explicit account recovery advances local lineage without changing import provenance", async () => {
 		const f = await fixture();
 		const saved = await f.adopt();
