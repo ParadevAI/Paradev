@@ -21,7 +21,7 @@ export function useV2ProjectDefaultApp(projectId: string | undefined) {
 	const collections = useCollections();
 	const { ensureProjectInSidebar } = useDashboardSidebarState();
 
-	const { data: rows = [] } = useLiveQuery(
+	const { data: rows = [], isReady: isProjectAppReady } = useLiveQuery(
 		(q) =>
 			q
 				.from({ sp: collections.v2SidebarProjects })
@@ -49,7 +49,7 @@ export function useV2ProjectDefaultApp(projectId: string | undefined) {
 	return {
 		app,
 		resolvedApp,
-		isResolving: !app && isGlobalDefaultPending,
+		isResolving: !isProjectAppReady || (!app && isGlobalDefaultPending),
 		setApp,
 	};
 }

@@ -65,14 +65,15 @@ export function CommandContextProvider({ children }: { children: ReactNode }) {
 	}, [hostWorkspaces, v2WorkspaceId]);
 	const projectId = v2Workspace?.projectId ?? null;
 
-	const { data: preferredAppRows = [] } = useLiveQuery(
-		(q) =>
-			q
-				.from({ sp: collections.v2SidebarProjects })
-				.where(({ sp }) => eq(sp.projectId, projectId ?? ""))
-				.select(({ sp }) => ({ defaultOpenInApp: sp.defaultOpenInApp })),
-		[collections, projectId],
-	);
+	const { data: preferredAppRows = [], isReady: isProjectOpenInAppReady } =
+		useLiveQuery(
+			(q) =>
+				q
+					.from({ sp: collections.v2SidebarProjects })
+					.where(({ sp }) => eq(sp.projectId, projectId ?? ""))
+					.select(({ sp }) => ({ defaultOpenInApp: sp.defaultOpenInApp })),
+			[collections, projectId],
+		);
 	const projectOpenInApp = preferredAppRows[0]?.defaultOpenInApp as
 		| ExternalApp
 		| null
@@ -80,7 +81,7 @@ export function CommandContextProvider({ children }: { children: ReactNode }) {
 	const { data: globalDefaultEditor, isPending: isGlobalDefaultPending } =
 		electronTrpc.settings.getDefaultEditor.useQuery();
 	const preferredOpenInApp =
-		projectOpenInApp || !isGlobalDefaultPending
+		isProjectOpenInAppReady && (projectOpenInApp || !isGlobalDefaultPending)
 			? resolveV2OpenInApp(projectOpenInApp, globalDefaultEditor)
 			: undefined;
 
