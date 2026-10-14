@@ -1,4 +1,5 @@
 import type { QueryClient, QueryKey } from "@tanstack/react-query";
+import { TRPCClientError } from "@trpc/client";
 import { cacheResumedSuccessor } from "./cacheResumedSuccessor";
 
 interface Successor {
@@ -16,6 +17,7 @@ export async function resumeWithSuccessorRecovery(
 	try {
 		successor = await resume();
 	} catch (error) {
+		if (!(error instanceof TRPCClientError) || error.shape != null) throw error;
 		const saved = await lookupSuccessor().catch(() => null);
 		if (!saved) throw error;
 		successor = saved;
