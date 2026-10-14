@@ -1,4 +1,4 @@
-import type { BackgroundTask, UserMessage } from "@superset/chat/protocol";
+import type { UserMessage } from "@superset/chat/protocol";
 import { create } from "zustand";
 
 interface ChatMode {
@@ -9,13 +9,11 @@ interface ChatMode {
 export interface ActiveChat {
 	modes: ChatMode[];
 	currentModeId: string | undefined;
-	backgroundTasks: BackgroundTask[];
 	running: boolean;
 	queued: UserMessage[];
 	queuePaused: boolean;
 	queueControls: boolean;
 	selectMode: (modeId: string) => void;
-	stopTask: (taskId: string) => void;
 	stop: () => void;
 	steerQueued: (itemId: string) => void;
 	removeQueued: (itemId: string) => void;
@@ -27,13 +25,11 @@ const noop = () => {};
 const EMPTY: ActiveChat = {
 	modes: [],
 	currentModeId: undefined,
-	backgroundTasks: [],
 	running: false,
 	queued: [],
 	queuePaused: false,
 	queueControls: false,
 	selectMode: noop,
-	stopTask: noop,
 	stop: noop,
 	steerQueued: noop,
 	removeQueued: noop,

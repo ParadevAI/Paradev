@@ -4921,9 +4921,6 @@ msgstr "Nepodařilo se ho zastavit"
 msgid "Could not stop the agent"
 msgstr "Agenta se nepodařilo zastavit"
 
-msgid "Could not stop the task"
-msgstr "Úlohu se nepodařilo zastavit"
-
 msgid "Could not stop watching"
 msgstr "Nepodařilo se přestat sledovat"
 
@@ -14147,9 +14144,6 @@ msgstr "Běžící agenti na tomto profilu ztratí přístup."
 
 msgid "Running bun test…"
 msgstr "Spouštím bun test…"
-
-msgid "Running in the background"
-msgstr "Běží na pozadí"
 
 msgid "Running now"
 msgstr "Spouštím"

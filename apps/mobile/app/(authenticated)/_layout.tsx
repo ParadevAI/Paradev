@@ -256,15 +256,6 @@ export default function AuthenticatedLayout() {
 					}}
 				/>
 				<Stack.Screen
-					name="workspace/[id]/background-tasks"
-					options={{
-						presentation: "formSheet",
-						sheetAllowedDetents: sheetDetents([0.5]),
-						sheetGrabberVisible: true,
-						...glassHeaderOptions,
-					}}
-				/>
-				<Stack.Screen
 					name="workspace/[id]/queued"
 					options={{
 						presentation: "formSheet",

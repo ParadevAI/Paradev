@@ -4921,9 +4921,6 @@ msgstr "停止できませんでした"
 msgid "Could not stop the agent"
 msgstr "エージェントを停止できませんでした"
 
-msgid "Could not stop the task"
-msgstr "タスクを停止できませんでした"
-
 msgid "Could not stop watching"
 msgstr "監視を停止できませんでした"
 
@@ -14147,9 +14144,6 @@ msgstr "このプロファイルで実行中のエージェントはアクセス
 
 msgid "Running bun test…"
 msgstr "bun testを実行中…"
-
-msgid "Running in the background"
-msgstr "バックグラウンドで実行中"
 
 msgid "Running now"
 msgstr "実行中"

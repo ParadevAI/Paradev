@@ -4921,9 +4921,6 @@ msgstr "Impossible de l'arrêter"
 msgid "Could not stop the agent"
 msgstr "Impossible d'arrêter l'agent"
 
-msgid "Could not stop the task"
-msgstr "Impossible d'arrêter la tâche"
-
 msgid "Could not stop watching"
 msgstr "Impossible d'arrêter la surveillance"
 
@@ -14147,9 +14144,6 @@ msgstr "Les agents en cours sur ce profil perdent l'accès."
 
 msgid "Running bun test…"
 msgstr "Exécution de bun test…"
-
-msgid "Running in the background"
-msgstr "En arrière-plan"
 
 msgid "Running now"
 msgstr "Exécution en cours"

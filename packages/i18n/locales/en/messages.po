@@ -4921,9 +4921,6 @@ msgstr "Could not stop it"
 msgid "Could not stop the agent"
 msgstr "Could not stop the agent"
 
-msgid "Could not stop the task"
-msgstr "Could not stop the task"
-
 msgid "Could not stop watching"
 msgstr "Could not stop watching"
 
@@ -14147,9 +14144,6 @@ msgstr "Running agents on this profile lose access."
 
 msgid "Running bun test…"
 msgstr "Running bun test…"
-
-msgid "Running in the background"
-msgstr "Running in the background"
 
 msgid "Running now"
 msgstr "Running now"

@@ -4921,9 +4921,6 @@ msgstr "Konnte nicht beendet werden"
 msgid "Could not stop the agent"
 msgstr "Agent konnte nicht gestoppt werden"
 
-msgid "Could not stop the task"
-msgstr "Die Aufgabe konnte nicht gestoppt werden"
-
 msgid "Could not stop watching"
 msgstr "Beobachten ließ sich nicht beenden"
 
@@ -14147,9 +14144,6 @@ msgstr "Laufende Agenten dieses Profils verlieren den Zugriff."
 
 msgid "Running bun test…"
 msgstr "bun test läuft…"
-
-msgid "Running in the background"
-msgstr "Läuft im Hintergrund"
 
 msgid "Running now"
 msgstr "Läuft jetzt"

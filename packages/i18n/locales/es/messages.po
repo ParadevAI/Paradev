@@ -4921,9 +4921,6 @@ msgstr "No se pudo detener"
 msgid "Could not stop the agent"
 msgstr "No se pudo detener el agente"
 
-msgid "Could not stop the task"
-msgstr "No se pudo detener la tarea"
-
 msgid "Could not stop watching"
 msgstr "No se pudo dejar de observar"
 
@@ -14147,9 +14144,6 @@ msgstr "Los agentes en marcha en este perfil perderán el acceso."
 
 msgid "Running bun test…"
 msgstr "Ejecutando bun test…"
-
-msgid "Running in the background"
-msgstr "En segundo plano"
 
 msgid "Running now"
 msgstr "Ejecutando ahora"

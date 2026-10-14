@@ -4921,9 +4921,6 @@ msgstr "Durdurulamadı"
 msgid "Could not stop the agent"
 msgstr "Ajan durdurulamadı"
 
-msgid "Could not stop the task"
-msgstr "Görev durdurulamadı"
-
 msgid "Could not stop watching"
 msgstr "İzleme durdurulamadı"
 
@@ -14147,9 +14144,6 @@ msgstr "Bu profildeki çalışan ajanlar erişimini kaybeder."
 
 msgid "Running bun test…"
 msgstr "bun test çalışıyor…"
-
-msgid "Running in the background"
-msgstr "Arka planda çalışıyor"
 
 msgid "Running now"
 msgstr "Şimdi çalıştırılıyor"

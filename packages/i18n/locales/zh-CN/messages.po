@@ -4921,9 +4921,6 @@ msgstr "无法停止"
 msgid "Could not stop the agent"
 msgstr "无法停止智能体"
 
-msgid "Could not stop the task"
-msgstr "无法停止任务"
-
 msgid "Could not stop watching"
 msgstr "无法停止关注"
 
@@ -14147,9 +14144,6 @@ msgstr "使用此配置文件运行中的智能体将失去访问权限。"
 
 msgid "Running bun test…"
 msgstr "正在运行bun test…"
-
-msgid "Running in the background"
-msgstr "正在后台运行"
 
 msgid "Running now"
 msgstr "正在运行"

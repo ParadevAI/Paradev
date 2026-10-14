@@ -4921,9 +4921,6 @@ msgstr "중지할 수 없습니다"
 msgid "Could not stop the agent"
 msgstr "에이전트를 중지할 수 없습니다"
 
-msgid "Could not stop the task"
-msgstr "작업을 중지할 수 없습니다"
-
 msgid "Could not stop watching"
 msgstr "감시를 중지할 수 없습니다"
 
@@ -14147,9 +14144,6 @@ msgstr "이 프로필에서 실행 중인 에이전트는 접근 권한을 잃�
 
 msgid "Running bun test…"
 msgstr "bun test 실행 중…"
-
-msgid "Running in the background"
-msgstr "백그라운드에서 실행 중"
 
 msgid "Running now"
 msgstr "지금 실행 중"

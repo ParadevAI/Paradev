@@ -4921,9 +4921,6 @@ msgstr "Не удалось остановить"
 msgid "Could not stop the agent"
 msgstr "Не удалось остановить агента"
 
-msgid "Could not stop the task"
-msgstr "Не удалось остановить задачу"
-
 msgid "Could not stop watching"
 msgstr "Не удалось прекратить отслеживание"
 
@@ -14147,9 +14144,6 @@ msgstr "Работающие агенты этого профиля потеря
 
 msgid "Running bun test…"
 msgstr "Выполняется bun test…"
-
-msgid "Running in the background"
-msgstr "Выполняется в фоне"
 
 msgid "Running now"
 msgstr "Запускается"

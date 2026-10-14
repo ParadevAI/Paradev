@@ -4921,9 +4921,6 @@ msgstr "無法停止"
 msgid "Could not stop the agent"
 msgstr "無法停止代理程式"
 
-msgid "Could not stop the task"
-msgstr "無法停止任務"
-
 msgid "Could not stop watching"
 msgstr "無法停止關注"
 
@@ -14147,9 +14144,6 @@ msgstr "使用此配置檔案執行中的代理程式將失去存取權限。"
 
 msgid "Running bun test…"
 msgstr "正在執行bun test…"
-
-msgid "Running in the background"
-msgstr "正在背景執行"
 
 msgid "Running now"
 msgstr "正在執行"

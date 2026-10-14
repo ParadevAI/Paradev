@@ -4921,9 +4921,6 @@ msgstr "Kon niet worden gestopt"
 msgid "Could not stop the agent"
 msgstr "Kan de agent niet stoppen"
 
-msgid "Could not stop the task"
-msgstr "Kan de taak niet stoppen"
-
 msgid "Could not stop watching"
 msgstr "Kon niet stoppen met volgen"
 
@@ -14147,9 +14144,6 @@ msgstr "Draaiende agents op dit profiel verliezen toegang."
 
 msgid "Running bun test…"
 msgstr "bun test uitvoeren…"
-
-msgid "Running in the background"
-msgstr "Draait op de achtergrond"
 
 msgid "Running now"
 msgstr "Wordt nu uitgevoerd"

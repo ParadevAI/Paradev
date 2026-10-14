@@ -4921,9 +4921,6 @@ msgstr "Tidak bisa dihentikan"
 msgid "Could not stop the agent"
 msgstr "Tidak dapat menghentikan agen"
 
-msgid "Could not stop the task"
-msgstr "Tidak dapat menghentikan tugas"
-
 msgid "Could not stop watching"
 msgstr "Tidak bisa berhenti memantau"
 
@@ -14147,9 +14144,6 @@ msgstr "Agen yang berjalan di profil ini kehilangan akses."
 
 msgid "Running bun test…"
 msgstr "Menjalankan bun test…"
-
-msgid "Running in the background"
-msgstr "Berjalan di latar belakang"
 
 msgid "Running now"
 msgstr "Berjalan sekarang"

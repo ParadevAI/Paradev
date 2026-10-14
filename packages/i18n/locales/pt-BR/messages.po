@@ -4921,9 +4921,6 @@ msgstr "Não foi possível parar"
 msgid "Could not stop the agent"
 msgstr "Não foi possível parar o agente"
 
-msgid "Could not stop the task"
-msgstr "Não foi possível parar a tarefa"
-
 msgid "Could not stop watching"
 msgstr "Não foi possível parar de observar"
 
@@ -14147,9 +14144,6 @@ msgstr "Os agentes em execução neste perfil perdem o acesso."
 
 msgid "Running bun test…"
 msgstr "Executando bun test…"
-
-msgid "Running in the background"
-msgstr "Em segundo plano"
 
 msgid "Running now"
 msgstr "Executando agora"

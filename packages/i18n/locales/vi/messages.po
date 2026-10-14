@@ -4921,9 +4921,6 @@ msgstr "Không thể dừng"
 msgid "Could not stop the agent"
 msgstr "Không thể dừng agent"
 
-msgid "Could not stop the task"
-msgstr "Không thể dừng tác vụ"
-
 msgid "Could not stop watching"
 msgstr "Không thể ngừng theo dõi"
 
@@ -14147,9 +14144,6 @@ msgstr "Các agent đang chạy trên hồ sơ này sẽ mất quyền truy cậ
 
 msgid "Running bun test…"
 msgstr "Đang chạy bun test…"
-
-msgid "Running in the background"
-msgstr "Đang chạy nền"
 
 msgid "Running now"
 msgstr "Đang chạy ngay"

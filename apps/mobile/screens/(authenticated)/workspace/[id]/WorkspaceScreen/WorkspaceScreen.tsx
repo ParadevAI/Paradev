@@ -478,12 +478,9 @@ export function WorkspaceScreen() {
 	const activeRow = rows.find((row) => row.terminalId === activeTerminalId);
 	const activeIsChat = activeRow?.kind === "chat";
 	const acpChat = Boolean(useFeatureFlag(FEATURE_FLAGS.ACP_CHAT));
-	const {
-		running: chatRunning,
-		stop: stopChat,
-		backgroundTasks: chatTasks,
-	} = useActiveChat(activeIsChat ? activeTerminalId : null);
-	const chatTaskCount = chatTasks.length;
+	const { running: chatRunning, stop: stopChat } = useActiveChat(
+		activeIsChat ? activeTerminalId : null,
+	);
 	const slashCommands = useSlashCommands({
 		machineId: host?.machineId ?? null,
 		hostUrl,
@@ -985,17 +982,6 @@ export function WorkspaceScreen() {
 			{workspace ? <TitlePress onPress={openActions} /> : null}
 			{workspace ? (
 				<Stack.Toolbar placement="right">
-					{acpChat && activeIsChat && chatTaskCount > 0 ? (
-						<Stack.Toolbar.Button
-							accessibilityLabel={t({ message: "Running in the background" })}
-							icon="cpu"
-							onPress={() =>
-								router.push(
-									`/(authenticated)/workspace/${id}/background-tasks?session=${activeTerminalId}`,
-								)
-							}
-						/>
-					) : null}
 					{acpChat ? (
 						<Stack.Toolbar.Button
 							accessibilityLabel={t({ message: "Manage sessions" })}

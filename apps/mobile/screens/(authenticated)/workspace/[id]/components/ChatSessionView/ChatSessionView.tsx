@@ -190,19 +190,6 @@ export const ChatSessionView = forwardRef<
 			.catch(failAlert(t({ message: "Could not stop the agent" })));
 	}, [chat, turnId, failAlert, t]);
 
-	const stopTask = useCallback(
-		(taskId: string) => {
-			const title = t({ message: "Could not stop the task" });
-			void chat
-				.stopBackgroundTask(taskId)
-				.then((stopped) => {
-					if (!stopped) Alert.alert(title);
-				})
-				.catch(failAlert(title));
-		},
-		[chat, failAlert, t],
-	);
-
 	const branchFrom = useCallback(
 		(itemId: string) => {
 			ActionSheetIOS.showActionSheetWithOptions(
@@ -283,10 +270,8 @@ export const ChatSessionView = forwardRef<
 		[chat, failAlert, t],
 	);
 
-	const backgroundTasks = session?.backgroundTasks;
 	const actions = {
 		selectMode,
-		stopTask,
 		stop,
 		steerQueued,
 		removeQueued,
@@ -298,13 +283,11 @@ export const ChatSessionView = forwardRef<
 		useActiveChatStore.getState().publish(sessionId, {
 			modes,
 			currentModeId: pendingModeId ?? confirmedModeId,
-			backgroundTasks: backgroundTasks ?? [],
 			running: turnId !== null,
 			queued,
 			queuePaused,
 			queueControls,
 			selectMode: (modeId) => actionsRef.current.selectMode(modeId),
-			stopTask: (taskId) => actionsRef.current.stopTask(taskId),
 			stop: () => actionsRef.current.stop(),
 			steerQueued: (itemId) => actionsRef.current.steerQueued(itemId),
 			removeQueued: (itemId) => actionsRef.current.removeQueued(itemId),
@@ -315,7 +298,6 @@ export const ChatSessionView = forwardRef<
 		modes,
 		pendingModeId,
 		confirmedModeId,
-		backgroundTasks,
 		turnId,
 		queued,
 		queuePaused,
