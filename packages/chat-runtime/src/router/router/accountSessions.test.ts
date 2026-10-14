@@ -518,12 +518,10 @@ describe("explicit failed account agent stop", () => {
 		).rejects.toThrow("provider exit unconfirmed");
 		expect(f.state.runtime.live.isClosing(source.sessionId)).toBe(true);
 		await expect(
-			f
-				.caller()
-				.recoverAccountSession({
-					commandId: randomUUID(),
-					sessionId: source.sessionId,
-				}),
+			f.caller().recoverAccountSession({
+				commandId: randomUUID(),
+				sessionId: source.sessionId,
+			}),
 		).rejects.toThrow("still closing");
 		await expect(
 			f.caller().closeStoppedAccountSession({ sessionId: source.sessionId }),
