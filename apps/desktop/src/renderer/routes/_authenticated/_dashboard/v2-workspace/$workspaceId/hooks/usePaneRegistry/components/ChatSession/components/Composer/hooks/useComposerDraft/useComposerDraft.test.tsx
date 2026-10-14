@@ -1,6 +1,8 @@
 import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
 
-const { act, cleanup, renderHook } = await import("@testing-library/react");
+const { act, cleanup, fireEvent, render, renderHook } = await import(
+	"@testing-library/react"
+);
 const { prependToDraft, takeRecoveredDraftText, useComposerDraft } =
 	await import("./useComposerDraft");
 
@@ -272,4 +274,57 @@ test("acceptance while navigated away clears the original cached seed", () => {
 	finish(true);
 	composer.rerender({ key });
 	expect(composer.result.current.storedDraft).toBeUndefined();
+});
+
+test("a late plugin chip stays saved when a send is accepted after close", async () => {
+	const { PromptInput } = await import("@superset/chat-ui/PromptInput");
+	type Props = import("@superset/chat-ui/PromptInput").PromptInputProps;
+	const key = "chat-v3-draft:late-plugin-hydration";
+	const text = "Review @example.ts";
+	window.localStorage.setItem(key, text);
+	const accepted = Promise.withResolvers<void>();
+	function DraftComposer({ findChips }: Pick<Props, "findChips">) {
+		const { storedDraft, onChange, beginSubmission } = useComposerDraft(key);
+		return (
+			<PromptInput
+				placeholder="Write a message"
+				mentionProviders={[]}
+				commands={[]}
+				defaultValue={storedDraft}
+				findChips={findChips}
+				onChange={onChange}
+				onSubmit={async (payload) => {
+					const finish = beginSubmission(
+						payload.text,
+						payload.isDraftUnchanged,
+					);
+					await accepted.promise;
+					finish(true);
+				}}
+			/>
+		);
+	}
+	const composer = render(<DraftComposer />);
+	await act(async () => {});
+	fireEvent.click(composer.getByRole("button", { name: "Send message" }));
+	composer.rerender(
+		<DraftComposer
+			findChips={() => [
+				{
+					start: 7,
+					end: text.length,
+					chip: { label: "Example file", serialized: "@example.ts" },
+				},
+			]}
+		/>,
+	);
+	await act(async () => {});
+	expect(composer.getByText("Example file")).toBeTruthy();
+	expect(composer.getByRole("textbox").textContent).toBe("Review Example file");
+	composer.unmount();
+	await act(async () => accepted.resolve());
+	expect(window.localStorage.getItem(key)).toBe(text);
+	const reopened = render(<DraftComposer />);
+	await act(async () => {});
+	expect(reopened.getByRole("textbox").textContent).toBe(text);
 });

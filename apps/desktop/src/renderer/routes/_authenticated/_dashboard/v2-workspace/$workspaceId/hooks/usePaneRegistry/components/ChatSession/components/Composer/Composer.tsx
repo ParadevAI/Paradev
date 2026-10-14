@@ -264,7 +264,13 @@ export const Composer = memo(function Composer({
 	);
 
 	const handleSubmit = useCallback(
-		async ({ text, files, mentions, steer }: PromptInputSubmitPayload) => {
+		async ({
+			text,
+			files,
+			mentions,
+			steer,
+			isDraftUnchanged,
+		}: PromptInputSubmitPayload) => {
 			if (disabled || (text.trim() === "" && files.length === 0)) return false;
 			const name = LEADING_COMMAND.exec(text.trim())?.[1];
 			if (
@@ -275,7 +281,7 @@ export const Composer = memo(function Composer({
 				toast.error(t({ message: `Unknown command /${name}` }));
 				return false;
 			}
-			const finishSubmission = beginSubmission(text);
+			const finishSubmission = beginSubmission(text, isDraftUnchanged);
 			try {
 				const result = await submitMessage(
 					{ text, files, mentions, steer },

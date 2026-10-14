@@ -107,7 +107,7 @@ export function useComposerDraft(draftKey: string) {
 	}, [draftKey]);
 
 	const beginSubmission = useCallback(
-		(text: string) => {
+		(text: string, isDraftUnchanged?: () => boolean) => {
 			pendingSubmissions.delete(draftKey);
 			const submitted = { text: readDraft(draftKey) ?? "" };
 			if (submitted.text.trim() !== text.trim()) return () => {};
@@ -115,7 +115,12 @@ export function useComposerDraft(draftKey: string) {
 			return (accepted: boolean) => {
 				if (pendingSubmissions.get(draftKey) !== submitted) return;
 				pendingSubmissions.delete(draftKey);
-				if (!accepted || (readDraft(draftKey) ?? "") !== submitted.text) return;
+				if (
+					!accepted ||
+					isDraftUnchanged?.() === false ||
+					(readDraft(draftKey) ?? "") !== submitted.text
+				)
+					return;
 				clearStoredDraft(draftKey);
 			};
 		},

@@ -292,3 +292,35 @@ test("flushes a pending Lexical edit before deciding whether to clear it", async
 	});
 	expect(view.text()).toBe("Review the file with more context");
 });
+
+test("submission exposes the flushed content revision used for draft clearing", async () => {
+	const pending = deferred<void>();
+	let isDraftUnchanged: (() => boolean) | undefined;
+	const view = await setup((payload) => {
+		isDraftUnchanged = payload.isDraftUnchanged;
+		return pending.promise;
+	});
+	await view.write("@example.ts");
+	view.submit();
+	expect(isDraftUnchanged?.()).toBe(true);
+	await act(async () => {
+		view.editor.update(() => $getRoot().selectStart(), { discrete: true });
+	});
+	expect(isDraftUnchanged?.()).toBe(true);
+	await act(async () => {
+		view.editor.update(() => {
+			const paragraph = $getRoot().getFirstChildOrThrow();
+			if (!$isElementNode(paragraph)) throw new Error("Expected a paragraph");
+			paragraph.clear().append(
+				MentionChipNode.fromChip({
+					label: "Example file",
+					serialized: "@example.ts",
+				}),
+			);
+		});
+		expect(isDraftUnchanged?.()).toBe(false);
+	});
+	await act(async () => pending.resolve());
+	expect(view.text()).toBe("@example.ts");
+	expect(view.getByText("Example file")).toBeTruthy();
+});

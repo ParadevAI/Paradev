@@ -84,6 +84,7 @@ export type PromptInputAttachment = {
 };
 
 export type PromptInputSubmitPayload = {
+	isDraftUnchanged?: () => boolean;
 	text: string;
 	files: File[];
 	mentions: ComposerChip[];

@@ -461,6 +461,8 @@ export function ComposerBody({
 			return;
 		}
 		const submittedRevision = draftRevision.current;
+		const isDraftUnchanged = () =>
+			editor.read(() => draftRevision.current === submittedRevision);
 		const submittedAttachments = new Set(
 			stateRef.current.attachments.map((attachment) => attachment.id),
 		);
@@ -469,6 +471,7 @@ export function ComposerBody({
 		try {
 			if (
 				(await stateRef.current.onSubmit?.({
+					isDraftUnchanged,
 					text,
 					files,
 					mentions,
@@ -479,7 +482,7 @@ export function ComposerBody({
 			}
 			if (!stateRef.current.clearOnSubmit) return;
 			// A delayed acceptance must not erase a newer draft or its Lexical chips.
-			if (editor.read(() => draftRevision.current) === submittedRevision) {
+			if (isDraftUnchanged()) {
 				historyNavigationRef.current?.reset();
 				editor.update(() => $getRoot().clear());
 			}
