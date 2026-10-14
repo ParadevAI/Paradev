@@ -743,3 +743,76 @@ describe("recordTerminalAgentTranscriptPath", () => {
 		);
 	});
 });
+
+describe("durable account provenance after ended-row recreation", () => {
+	const account = {
+		agent: "claude" as const,
+		selection: "/fixture/profile",
+		directory: "/fixture/profile",
+		credentialKind: "subscription" as const,
+		identity: "a".repeat(64),
+		pinned: true as const,
+	};
+	const attach = {
+		terminalId: "durable",
+		workspaceId: "ws-1",
+		agentId: "claude" as const,
+		agentSessionId: "native-session",
+		launchId: "native-launch",
+		eventType: "Attached",
+		occurredAt: 3,
+	};
+	function seeded(
+		reason: "detached" | "terminal-exited" | "resumed" | "disposed",
+	) {
+		const db = createTestDb();
+		seedSession(db, { id: "durable", status: "active", workspaceId: "ws-1" });
+		new TerminalAgentStore(
+			new SqliteTerminalAgentBindingPersistence(db),
+		).recordEvent({ ...attach, account });
+		markTerminalAgentBindingEnded(db, "durable", reason, 4);
+		const original = db.query.terminalAgentBindings.findFirst().sync();
+		if (!original) throw new Error("Missing synthetic binding");
+		return {
+			db,
+			startedAt: original.startedAt,
+			store: new TerminalAgentStore(
+				new SqliteTerminalAgentBindingPersistence(db),
+			),
+		};
+	}
+	it("preserves exact native-launch account and start time after detached or terminal-exited recreation", () => {
+		for (const reason of ["detached", "terminal-exited"] as const) {
+			const { db, store, startedAt } = seeded(reason);
+			store.recordEvent({ ...attach, occurredAt: 5 });
+			expect(store.get("durable")?.account).toEqual(account);
+			expect(store.get("durable")?.startedAt).toBe(startedAt);
+			expect(
+				new SqliteTerminalAgentBindingPersistence(db).load()[0]?.account,
+			).toEqual(account);
+		}
+	});
+	it("does not revive consumed or deliberately disposed native launches", () => {
+		for (const reason of ["resumed", "disposed"] as const) {
+			const { db, store } = seeded(reason);
+			store.recordEvent({ ...attach, occurredAt: 5 });
+			expect(store.get("durable")).toBeUndefined();
+			expect(db.query.terminalAgentBindings.findFirst().sync()?.endReason).toBe(
+				reason,
+			);
+		}
+	});
+	it("does not transfer saved account provenance to a different workspace, provider, native session or launch", () => {
+		for (const change of [
+			{ workspaceId: "ws-2" },
+			{ agentId: "codex" as const },
+			{ agentSessionId: "other-native" },
+			{ launchId: "other-launch" },
+			{ launchId: undefined },
+		]) {
+			const { store } = seeded("detached");
+			store.recordEvent({ ...attach, ...change, occurredAt: 5 });
+			expect(store.get("durable")?.account).toBeUndefined();
+		}
+	});
+});
