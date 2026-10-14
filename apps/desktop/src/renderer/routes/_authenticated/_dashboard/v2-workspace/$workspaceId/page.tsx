@@ -701,7 +701,10 @@ function V2WorkspaceContent() {
 											onAddAccountTerminal={
 												isSandbox
 													? undefined
-													: () => setAccountTerminalOpen(true)
+													: (returnFocus) => {
+															accountTerminalReturnFocus.current = returnFocus;
+															setAccountTerminalOpen(true);
+														}
 											}
 											onAddBrowser={addBrowserTab}
 											onAddChanges={openChanges}
