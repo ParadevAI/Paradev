@@ -45,6 +45,7 @@ async function exactSessionFile(
 	provider: "claude" | "codex",
 	sessionId: string,
 ): Promise<string> {
+	const codexFilename = new RegExp(`-${sessionId}(?:_[\\w-]+)?\\.jsonl(?:\\.zst)?$`);
 	const pending = [root];
 	const matches: string[] = [];
 	let visited = 0;
@@ -58,9 +59,7 @@ async function exactSessionFile(
 			const nameMatches =
 				provider === "claude"
 					? entry.name === `${sessionId}.jsonl`
-					: new RegExp(`-${sessionId}(?:_[\\w-]+)?\\.jsonl(?:\\.zst)?$`).test(
-							entry.name,
-						);
+					: codexFilename.test(entry.name);
 			if (nameMatches) {
 				if (!entry.isFile() || entry.name.endsWith(".zst")) refuse();
 				matches.push(path);
