@@ -123,7 +123,9 @@ export class HostTunnel extends Server<RelayEnv> {
 		const arrived = new Promise<PrepareStreamResult>((resolve) => {
 			this.pendingDials.set(ticket, resolve);
 			setTimeout(() => {
-				if (this.pendingDials.delete(ticket)) resolve("timeout");
+				if (!this.pendingDials.delete(ticket)) return;
+				resolve("timeout");
+				this.closeUnresponsiveHost(host);
 			}, DIAL_TIMEOUT_MS);
 		});
 		this.sendDial(host, {
@@ -150,7 +152,9 @@ export class HostTunnel extends Server<RelayEnv> {
 		const host = this.hostConn();
 		if (!host) return { ok: false, reason: "timeout" };
 		const ticket = crypto.randomUUID();
-		const result = this.httpExchanges.begin(ticket, request);
+		const result = this.httpExchanges.begin(ticket, request, () =>
+			this.closeUnresponsiveHost(host),
+		);
 		this.sendDial(host, {
 			type: "stream:dial",
 			ticket,
@@ -397,7 +401,7 @@ export class HostTunnel extends Server<RelayEnv> {
 			console.log(
 				`[relay] host stale, closing: ${state?.kind === "host" ? state.hostId : this.name}`,
 			);
-			closeQuietly(host, RELAY_CLOSE.staleHost, "No keepalive from host");
+			await this.evictHost(host, "No keepalive from host");
 			return;
 		}
 
@@ -422,6 +426,25 @@ export class HostTunnel extends Server<RelayEnv> {
 			return;
 		}
 		this.httpExchanges.fail(ticket);
+	}
+
+	// Its control channel is open but it ignored a dial: presence must stop
+	// saying online now rather than at the next stale sweep.
+	private closeUnresponsiveHost(host: Connection): void {
+		if (this.hostConn()?.id !== host.id) return;
+		const state = host.state as ConnState | undefined;
+		console.log(
+			`[relay] host did not answer a dial, closing: ${state?.kind === "host" ? state.hostId : this.name}`,
+		);
+		void this.evictHost(host, "Host did not answer a dial");
+	}
+
+	// An unresponsive peer never completes the close handshake, so its close
+	// event (and the stream teardown in it) can be minutes away. Clients see
+	// presence through their streams, so tear them down now.
+	private async evictHost(host: Connection, reason: string): Promise<void> {
+		closeQuietly(host, RELAY_CLOSE.staleHost, reason);
+		await this.handleGone(host);
 	}
 
 	private hostConn(): Connection | null {
