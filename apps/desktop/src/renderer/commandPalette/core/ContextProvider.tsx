@@ -73,12 +73,16 @@ export function CommandContextProvider({ children }: { children: ReactNode }) {
 				.select(({ sp }) => ({ defaultOpenInApp: sp.defaultOpenInApp })),
 		[collections, projectId],
 	);
-	const { data: globalDefaultEditor } =
+	const projectOpenInApp = preferredAppRows[0]?.defaultOpenInApp as
+		| ExternalApp
+		| null
+		| undefined;
+	const { data: globalDefaultEditor, isPending: isGlobalDefaultPending } =
 		electronTrpc.settings.getDefaultEditor.useQuery();
-	const preferredOpenInApp = resolveV2OpenInApp(
-		preferredAppRows[0]?.defaultOpenInApp as ExternalApp | null | undefined,
-		globalDefaultEditor,
-	);
+	const preferredOpenInApp =
+		projectOpenInApp || !isGlobalDefaultPending
+			? resolveV2OpenInApp(projectOpenInApp, globalDefaultEditor)
+			: undefined;
 
 	const { data: notificationSoundsMuted = false } =
 		electronTrpc.settings.getNotificationSoundsMuted.useQuery();
