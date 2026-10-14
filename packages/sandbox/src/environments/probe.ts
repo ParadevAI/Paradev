@@ -123,16 +123,21 @@ export async function probeBox(args: ProbeArgs): Promise<number> {
 	for (const preset of HOST_AGENT_PRESETS) {
 		if (!isCloudAgentId(preset.presetId)) continue;
 		const out = await run(
-			`cd /tmp && timeout 15 ${[preset.command, ...preset.args].join(" ")} </dev/null 2>&1 | head -5`,
+			`cd /tmp && timeout 15 ${[preset.command, ...preset.args].join(" ")} </dev/null >/tmp/preset.out 2>&1; echo "exit=$?"; head -5 /tmp/preset.out`,
 		);
 		check(
 			`${preset.presetId} accepts its preset's flags`,
-			!/unknown option|unexpected argument|command not found|not found in PATH|No such file or directory/i.test(
-				out,
-			),
-			out.trim().split("\n")[0],
+			!/^exit=12[67]$/m.test(out) &&
+				!/unknown option|unexpected argument|not found in PATH/i.test(out),
+			out.trim().split("\n").slice(0, 2).join(" "),
 		);
 	}
+	const cliVersion = await run("superset --version");
+	check(
+		"superset runs",
+		/^\d+\.\d+\.\d+/m.test(cliVersion),
+		cliVersion.trim(),
+	);
 	if (
 		!(await until(
 			"checkout on the branch",
