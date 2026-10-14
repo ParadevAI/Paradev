@@ -156,7 +156,7 @@ export function createNotificationsRouter(
 			const agent = normalizeAgentIdentity(input.agent);
 			const preview = trimOrUndefined(input.preview);
 
-			const prior = ctx.terminalAgentStore.get(input.terminalId);
+			const prior = ctx.terminalAgentStore.getProvenance(input.terminalId);
 			const verifiedAttribution = verifyAttributionToken(
 				input.terminalId,
 				input.attributionToken,
@@ -164,9 +164,21 @@ export function createNotificationsRouter(
 			if (
 				(prior?.account?.pinned || prior?.accountInvalid) &&
 				!verifiedAttribution &&
-				((agent?.agentId && agent.agentId !== prior.agentId) ||
+				(eventType === "Detached" ||
+					(agent?.agentId && agent.agentId !== prior.agentId) ||
 					(input.launchId && input.launchId !== prior.launchId) ||
 					(agent?.sessionId && agent.sessionId !== prior.agentSessionId))
+			)
+				return { success: true, ignored: true as const };
+			if (
+				prior?.endedAt !== undefined &&
+				(prior.account?.pinned || prior.accountInvalid) &&
+				(!verifiedAttribution ||
+					!agent?.sessionId ||
+					!trimOrUndefined(input.launchId) ||
+					((prior.endReason === "resumed" || prior.endReason === "disposed") &&
+						(prior.launchId === input.launchId ||
+							prior.agentSessionId === agent?.sessionId)))
 			)
 				return { success: true, ignored: true as const };
 			const shouldCaptureAccount =
@@ -190,9 +202,12 @@ export function createNotificationsRouter(
 			let binding = prior;
 			let metadataOnly = false;
 			if (shouldCaptureAccount) {
-				const current = ctx.terminalAgentStore.get(input.terminalId);
+				const current = ctx.terminalAgentStore.getProvenance(input.terminalId);
 				const sameOwner = prior
 					? current &&
+						current.workspaceId === prior.workspaceId &&
+						current.endedAt === prior.endedAt &&
+						current.endReason === prior.endReason &&
 						current.agentId === prior.agentId &&
 						current.launchId === prior.launchId &&
 						current.definitionId === prior.definitionId &&

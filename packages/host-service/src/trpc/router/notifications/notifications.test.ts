@@ -17,7 +17,10 @@ import type { AgentLifecycleEventType } from "../../../events";
 import type { WorkspaceChangedMessage } from "../../../events/types";
 import { TerminalAgentStore } from "../../../terminal-agents";
 import { issueAttributionToken } from "../../../terminal-agents/attribution-token";
-import { SqliteTerminalAgentBindingPersistence } from "../../../terminal-agents/persistence";
+import {
+	markTerminalAgentBindingEnded,
+	SqliteTerminalAgentBindingPersistence,
+} from "../../../terminal-agents/persistence";
 import type { HostServiceContext } from "../../../types";
 import {
 	getLocalWorkspace,
@@ -1079,5 +1082,136 @@ describe("pinned capture race safety", () => {
 		expect((await pending).ignored).toBe(true);
 		expect(terminalAgentStore.get("terminal-1")?.account).toEqual(newer);
 		expect(terminalAgentStore.get("terminal-1")?.launchId).toBe("two");
+	});
+});
+
+it("an unauthenticated end hook cannot end an explicitly pinned account launch", async () => {
+	const { ctx, terminalAgentStore, broadcastAgentBindingsChanged } =
+		createContext("ws-1");
+	terminalAgentStore.recordEvent({
+		terminalId: "terminal-1",
+		workspaceId: "ws-1",
+		agentId: "claude",
+		agentSessionId: "native-1",
+		launchId: "launch-1",
+		eventType: "Attached",
+		occurredAt: 1,
+		account: {
+			agent: "claude",
+			selection: "/fixture/profile",
+			directory: "/fixture/profile",
+			credentialKind: "subscription",
+			identity: "a".repeat(64),
+			pinned: true,
+		},
+	});
+	const result = await notificationsRouter.createCaller(ctx).hook({
+		terminalId: "terminal-1",
+		eventType: "Detached",
+		agent: { agentId: "claude", sessionId: "native-1" },
+		launchId: "launch-1",
+	});
+	expect(result).toMatchObject({ success: true, ignored: true });
+	expect(terminalAgentStore.get("terminal-1")?.agentSessionId).toBe("native-1");
+	expect(broadcastAgentBindingsChanged).not.toHaveBeenCalled();
+});
+
+describe("ended pinned launch ownership through the actual hook router", () => {
+	const account = {
+		agent: "claude" as const,
+		selection: "/fixture/profile",
+		directory: "/fixture/profile",
+		credentialKind: "subscription" as const,
+		identity: "a".repeat(64),
+		pinned: true as const,
+	};
+	function ended(reason: "detached" | "resumed" | "disposed") {
+		const { ctx, db } = createDbContext({
+			terminalId: "terminal-ended",
+			workspaceId: "workspace-ended",
+		});
+		const persistence = new SqliteTerminalAgentBindingPersistence(db);
+		ctx.terminalAgentStore = new TerminalAgentStore(persistence);
+		ctx.terminalAgentStore.recordEvent({
+			terminalId: "terminal-ended",
+			workspaceId: "workspace-ended",
+			agentId: "claude",
+			agentSessionId: "native",
+			launchId: "launch",
+			account,
+			eventType: "Attached",
+			occurredAt: 1,
+		});
+		markTerminalAgentBindingEnded(db, "terminal-ended", reason, 2);
+		ctx.terminalAgentStore = new TerminalAgentStore(persistence);
+		return { ctx, db };
+	}
+	it("an authenticated ended pinned launch survives account capture and restores its exact durable metadata", async () => {
+		const { ctx, db } = ended("detached");
+		const result = await createNotificationsRouter(async () => account)
+			.createCaller(ctx)
+			.hook({
+				terminalId: "terminal-ended",
+				eventType: "Attached",
+				agent: { agentId: "claude", sessionId: "native" },
+				launchId: "launch",
+				accountProfile: "/fixture/profile",
+				attributionToken: issueAttributionToken("terminal-ended"),
+			});
+		expect(result).toMatchObject({ success: true, ignored: false });
+		expect(ctx.terminalAgentStore.get("terminal-ended")?.account).toEqual(
+			account,
+		);
+		expect(
+			db.query.terminalAgentBindings.findFirst().sync()?.endedAt,
+		).toBeNull();
+	});
+	it("an ended pinned row stays intact without a native ID and revives only on a fresh identified hook", async () => {
+		const { ctx, db } = ended("detached");
+		const before = db.query.terminalAgentBindings.findFirst().sync();
+		let captures = 0;
+		const caller = createNotificationsRouter(async () => {
+			captures++;
+			return account;
+		}).createCaller(ctx);
+		const input = {
+			terminalId: "terminal-ended",
+			eventType: "Attached",
+			launchId: "launch",
+			accountProfile: "/fixture/profile",
+			attributionToken: issueAttributionToken("terminal-ended"),
+		};
+		expect(
+			await caller.hook({ ...input, agent: { agentId: "claude" } }),
+		).toMatchObject({ success: true, ignored: true });
+		expect(captures).toBe(0);
+		expect(db.query.terminalAgentBindings.findFirst().sync()).toEqual(before);
+		expect(
+			await caller.hook({
+				...input,
+				agent: { agentId: "claude", sessionId: "native" },
+			}),
+		).toMatchObject({ success: true, ignored: false });
+		expect(captures).toBe(1);
+		expect(ctx.terminalAgentStore.get("terminal-ended")?.agentSessionId).toBe(
+			"native",
+		);
+		expect(ctx.terminalAgentStore.get("terminal-ended")?.account).toEqual(
+			account,
+		);
+	});
+	it("an unsigned or missing-launch hook cannot revive a consumed or disposed pinned row", async () => {
+		for (const reason of ["resumed", "disposed"] as const) {
+			const { ctx, db } = ended(reason);
+			const before = db.query.terminalAgentBindings.findFirst().sync();
+			const result = await notificationsRouter.createCaller(ctx).hook({
+				terminalId: "terminal-ended",
+				eventType: "Attached",
+				agent: { agentId: "claude", sessionId: "native" },
+			});
+			expect(result).toMatchObject({ success: true, ignored: true });
+			expect(ctx.terminalAgentStore.get("terminal-ended")).toBeUndefined();
+			expect(db.query.terminalAgentBindings.findFirst().sync()).toEqual(before);
+		}
 	});
 });

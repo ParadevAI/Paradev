@@ -575,6 +575,10 @@ export class SqliteTerminalAgentBindingPersistence
 		return markTerminalAgentBindingEnded(this.db, terminalId, reason, endedAt);
 	}
 
+	getProvenance(terminalId: string): TerminalAgentBinding | undefined {
+		return getTerminalAgentBinding(this.db, terminalId);
+	}
+
 	getEnded(
 		terminalId: string,
 	): { endedAt: number; agentSessionId?: string } | undefined {
