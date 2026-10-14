@@ -33,7 +33,9 @@ export function SavedConversationsBrowser({
 	const [pending, setPending] = useState(false);
 	const active = useRef(true);
 	const reportBusy = useRef(onBusy);
-	reportBusy.current = onBusy;
+	useEffect(() => {
+		reportBusy.current = onBusy;
+	}, [onBusy]);
 	useEffect(() => {
 		active.current = true;
 		return () => {
