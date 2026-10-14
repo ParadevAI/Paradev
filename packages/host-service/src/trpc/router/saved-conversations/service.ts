@@ -85,7 +85,14 @@ async function context(
 	)
 		unavailable();
 	const cwd = await realpath(workspace.path);
-	const storePath = await realpath(join(account.directory, "projects"));
+	const projectsPath = join(account.directory, "projects");
+	let storePath: string;
+	try {
+		storePath = await realpath(projectsPath);
+	} catch (error) {
+		if ((error as NodeJS.ErrnoException).code !== "ENOENT") unavailable();
+		storePath = projectsPath;
+	}
 	return {
 		workspace,
 		config,

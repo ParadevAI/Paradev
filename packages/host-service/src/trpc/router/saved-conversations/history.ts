@@ -8,7 +8,7 @@ import {
 	realpath,
 	unlink,
 } from "node:fs/promises";
-import { isAbsolute, join } from "node:path";
+import { dirname, isAbsolute, join, resolve } from "node:path";
 import { TRPCError } from "@trpc/server";
 import { claudeProjectDirName } from "../../../terminal-agents/harness-sessions/claude";
 import type { AccountResumeHistory } from "../terminal-agents/account-resume-history";
@@ -17,6 +17,14 @@ export const NATIVE_UUID =
 	/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const MAX_DIRECTORY_ENTRIES = 10_000;
 const PAGE_SIZE = 100;
+
+export function checkpointDirectoryForDatabase(
+	dbPath: string | undefined,
+): string {
+	return dbPath
+		? join(dirname(resolve(dbPath)), "saved-conversation-checkpoints")
+		: "";
+}
 
 export function revision(value: unknown): string {
 	return createHash("sha256").update(JSON.stringify(value)).digest("hex");
@@ -52,7 +60,13 @@ export async function nativeMetadata(
 	const directory = await projectDirectory(storePath, cwd);
 	if (!directory) unavailable();
 	const path = join(directory, `${sessionId}.jsonl`);
-	const info = await lstat(path);
+	let info: Awaited<ReturnType<typeof lstat>>;
+	try {
+		info = await lstat(path);
+	} catch (error) {
+		if ((error as NodeJS.ErrnoException).code === "ENOENT") unavailable();
+		throw error;
+	}
 	if (!info.isFile()) unavailable();
 	return {
 		path,

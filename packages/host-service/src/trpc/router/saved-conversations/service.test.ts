@@ -217,6 +217,35 @@ describe("saved native Claude adoption", () => {
 		await expect(f.adopt()).rejects.toThrow();
 		expect(f.launches).toHaveLength(0);
 	});
+	test("a profile without a projects store lists no saved conversations", async () => {
+		const f = await fixture();
+		await rm(join(f.profile, "projects"), { recursive: true });
+		const page = await listSavedConversations(f.deps, f.input);
+		expect(page.candidates).toEqual([]);
+		expect(page.conversations).toEqual([]);
+		expect(page.nextCursor).toBeNull();
+		expect(f.launches).toHaveLength(0);
+	});
+
+	test("adopting a transcript removed after discovery gives a private precondition refusal", async () => {
+		const f = await fixture();
+		const candidate = (await listSavedConversations(f.deps, f.input))
+			.candidates[0];
+		if (!candidate) throw new Error("missing candidate");
+		await rm(join(f.project, `${firstId}.jsonl`));
+		const error = await rejected(
+			adoptNativeConversation(f.deps, {
+				...f.input,
+				nativeSessionId: firstId,
+				expectedRevision: candidate.revision,
+			}),
+		);
+		expect(error).toMatchObject({ code: "PRECONDITION_FAILED" });
+		expect(String(error)).not.toContain(f.profile);
+		expect(f.launches).toHaveLength(0);
+		expect(f.db.select().from(savedConversations).all()).toEqual([]);
+	});
+
 	test("paginates metadata with an explicit cursor", async () => {
 		const f = await fixture();
 		for (let index = 1; index <= 101; index++)
@@ -292,9 +321,9 @@ describe("saved native Claude adoption", () => {
 		).rejects.toThrow();
 		expect(f.db.select().from(savedConversations).all()).toHaveLength(0);
 	});
-	test("refuses another copy anywhere in the selected history store", async () => {
+	test("refuses another main transcript copy in any Claude project", async () => {
 		const f = await fixture();
-		const duplicate = join(f.profile, "projects", "other", "nested");
+		const duplicate = join(f.profile, "projects", "other");
 		await mkdir(duplicate, { recursive: true });
 		await writeFile(join(duplicate, `${firstId}.jsonl`), f.content(firstId));
 		await expect(f.adopt()).rejects.toThrow("ambiguous");

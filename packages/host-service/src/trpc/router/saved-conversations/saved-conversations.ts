@@ -1,8 +1,8 @@
-import { dirname, isAbsolute, join } from "node:path";
 import { z } from "zod";
 import type { HostServiceContext } from "../../../types";
 import { protectedProcedure, router } from "../../index";
 import { runAgentInWorkspace } from "../agents/agents";
+import { checkpointDirectoryForDatabase } from "./history";
 import {
 	adoptNativeConversation,
 	listSavedConversations,
@@ -25,10 +25,7 @@ function dependencies(ctx: HostServiceContext): SavedConversationDeps {
 	return {
 		db: ctx.db,
 		runAgent: (input) => runAgentInWorkspace(ctx, input),
-		checkpointDirectory:
-			dbPath && isAbsolute(dbPath)
-				? join(dirname(dbPath), "saved-conversation-checkpoints")
-				: "",
+		checkpointDirectory: checkpointDirectoryForDatabase(dbPath),
 	};
 }
 
