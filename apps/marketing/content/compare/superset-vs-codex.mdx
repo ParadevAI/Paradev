@@ -2,7 +2,7 @@
 title: "Superset vs Codex CLI (2026): Agent Orchestrator vs OpenAI's Coding Agent"
 description: "Compare Superset and OpenAI Codex CLI for AI-powered development. See how parallel agent orchestration differs from a single cloud-backed coding agent."
 date: 2026-02-18
-lastUpdated: 2026-09-24
+lastUpdated: 2026-10-13
 type: "1v1"
 competitors:
   - codex
@@ -26,7 +26,7 @@ Codex CLI is OpenAI's terminal-based coding agent, but it now sits inside a broa
 | **Category** | Agent orchestration workspace | AI coding agent (terminal-native) |
 | **What it does** | Runs multiple coding agents in parallel with Git worktrees, chat, diff/file review, and browser tooling | AI assistant that reads, writes, and executes code via OpenAI models |
 | **AI approach** | Agent-agnostic: works with Codex, Claude Code, Aider, OpenCode, Superset Chat, and more | OpenAI's Codex model family and related OpenAI coding workflows |
-| **Parallelism** | Core feature: many agents on separate branches simultaneously | Single session; cloud Codex runs tasks remotely |
+| **Parallelism** | Core feature: many agents, from any vendor, on separate branches simultaneously | Subagents, worktrees (on by default since September 2026), an `/agents` view, and cloud tasks |
 | **Isolation** | Git worktrees for local branch-based workspaces | Sandbox modes (network-disabled, full-auto) per session |
 | **Pricing** | Free tier + Pro $20/seat/mo | ChatGPT-plan access and API usage vary by Codex surface |
 | **License** | Source-available (ELv2) | Open source (Apache 2.0) |
@@ -41,7 +41,7 @@ Superset is a local-first desktop workspace for AI coding agents. It launches Co
 
 ## What Is Codex CLI?
 
-Codex CLI is OpenAI's open-source local terminal client for Codex. It runs on your machine, understands your codebase through file reading and command execution, and can write code, fix bugs, and refactor across files. OpenAI now presents Codex as a broader coding suite that spans the CLI, IDE extensions, a desktop app, and cloud task delegation. The Codex app is especially relevant here because OpenAI now positions it as a way to run multiple Codex agents in parallel across projects with built-in worktree support, skills, automations, and Git functionality.
+Codex CLI is OpenAI's open-source local terminal client for Codex. It runs on your machine, understands your codebase through file reading and command execution, and can write code, fix bugs, and refactor across files. OpenAI now presents Codex as a broader coding suite that spans the CLI, IDE extensions, a desktop app, and cloud task delegation. The CLI itself has grown: worktrees have been on by default since version 0.156 in September 2026, and the refreshed CLI from OpenAI's DevDay on September 29, 2026 adds voice and an `/agents` view for delegating and tracking several tasks at once. `codex exec` covers CI, and GPT-6.1 Sol is the default model. The Codex app is also relevant here because it runs multiple Codex chats in parallel worktrees, and the ChatGPT iOS app can now drive Codex on your computer.
 
 ---
 
@@ -71,7 +71,7 @@ Codex gives you the agent surfaces. Superset adds the operational layer around t
 
 ## Pricing
 
-Superset offers a free tier and Pro at $20/seat/month. Codex pricing now depends on which surface you use: OpenAI exposes Codex through ChatGPT plans, local and cloud permissions, and API-based workflows. The important practical difference is still the same: Codex gives you OpenAI's agent surfaces, while Superset gives you the orchestration layer to run many local tasks in parallel.
+Superset offers a free tier and Pro at $20/seat/month. Codex is included in ChatGPT plans from Free and Go up through Plus, Pro, Business, Edu, and Enterprise, with cloud features from Plus up. With an API key instead, you get the CLI, SDK, and IDE extension at API rates, without cloud features or the desktop app. The important practical difference is still the same: Codex gives you OpenAI's agent surfaces, while Superset gives you the orchestration layer to run many local tasks in parallel.
 
 ---
 

@@ -1,0 +1,96 @@
+---
+title: "Where to Run Coding Agents: Laptops vs a Shared Host vs Cloud Workspaces (2026)"
+description: "The tradeoffs for a small engineering team between running coding agents on personal laptops, a shared host machine, and vendor cloud workspaces: cost, uptime, access to your environment, security, and which tools support each."
+date: 2026-10-14
+type: "tutorial"
+competitors:
+  - codex-app
+  - cursor
+  - devin
+  - factory
+  - amp
+keywords:
+  - where to run coding agents
+  - coding agents shared machine
+  - coding agents cloud vs local
+  - team coding agents host
+  - run claude code on a server
+  - cloud coding agents tradeoffs
+---
+
+A small team that adopts coding agents soon asks where they should run. There are three answers: each developer's laptop, a shared machine the team owns, or a vendor's cloud. Most teams end up using more than one. This guide compares them on what matters day to day: whether agents keep working when you walk away, whether they can reach your real environment, what it costs, and what it exposes.
+
+---
+
+## The Short Version
+
+| | **Personal laptops** | **A shared host** | **Vendor cloud workspaces** |
+|---|---|---|---|
+| **Keeps working when you leave** | No. Agents pause when the laptop sleeps | Yes, while the machine stays awake and online | Yes |
+| **Access to your environment** | Full: local services, databases, VPN, secrets | Whatever you install on the host | Only what you set up in the vendor's environment |
+| **Agent choice** | Any agent | Any agent | Usually the vendor's own agent |
+| **Cost** | Hardware you already have, plus agent subscriptions | One machine, plus agent subscriptions | Vendor plans or usage-based compute |
+| **Parallel capacity** | Limited by one laptop's CPU and memory | Limited by the host; you can add hosts | Scales with the vendor's machines |
+| **Security exposure** | Each developer's own machine | Everything on the host is reachable by people you grant access | Code and credentials live in the vendor's cloud |
+| **Setup** | None | One machine to provision and keep updated | Per-vendor environment setup |
+
+## Personal Laptops
+
+This is where everyone starts. The agent sees exactly what the developer sees: local services, databases, VPN access, and the developer's own subscriptions. Nothing to provision.
+
+The limits show up quickly. Agents stop when the laptop sleeps or leaves the network, so long tasks have to finish while you are at your desk. A laptop also runs only so many agents, dev servers, and builds at once.
+
+**Best for:** short, interactive tasks where you watch the agent work.
+
+## A Shared Host
+
+A dedicated machine the team owns, such as a Mac mini under a desk or a Linux server, runs agents around the clock. Each task gets its own workspace on it, and developers connect from their laptops or phones.
+
+What to plan for:
+
+- **Keep it awake and online.** A host that sleeps or drops off the network shows as offline until it comes back.
+- **Give it only what agents need.** Anyone you grant access to the host can reach what it can reach: files, terminals, and agent runs. Provision it with only the repositories and credentials you intend to share, and keep it separate from anyone's main workstation.
+- **Watch capacity.** Several agents plus their builds and dev servers add up. Add a second host rather than overloading one.
+
+Tools that support this: [Superset](/) adds a macOS or Linux machine as a host through Remote Access, with each task in its own Git worktree and terminal, and developers reach it from the desktop app or the [iPhone and iPad app](/mobile). On a dedicated machine, run the host service from the standalone CLI so it keeps running without the desktop app; see [Keep Agents Running](https://docs.superset.sh/keep-agents-running) and [Remote Access](https://docs.superset.sh/remote-access). Cursor can also run its agents on self-hosted machines and worker pools, Factory's Droid can run on your own machine through its relay, Amp has shared team runners, and [Paseo](/compare/superset-vs-paseo) is a self-hosted daemon.
+
+**Best for:** teams that want agents working overnight on their real environment, on hardware they control.
+
+## Vendor Cloud Workspaces
+
+Most agent vendors now run agents on their own machines: Codex cloud tasks, Cursor's Cloud Agents, Devin's per-session VMs, Factory's managed Droid Computers, Amp's orbs, Claude Code's cloud sessions, and Copilot's cloud agent. You hand off a task, close your laptop, and review the result later.
+
+The tradeoffs:
+
+- **One vendor's agent.** A vendor's cloud runs that vendor's agent. Mixing Claude Code, Codex, and other agents means several clouds.
+- **Your environment has to be rebuilt there.** Private services, internal networks, and local databases are not there unless you set them up in each vendor's environment.
+- **Cost moves to the vendor.** Cloud compute is billed on the vendor's plans or by usage, on top of model costs.
+- **Code and credentials leave your machines.** Check each vendor's data and security terms.
+
+**Best for:** fire-and-forget tasks that need nothing beyond the repository.
+
+## A Setup That Works for Most Small Teams
+
+1. **Laptops for interactive work.** Short tasks, debugging, and anything you want to watch.
+2. **One shared host for long-running and scheduled work.** Overnight tasks, scheduled agents, and work that should continue when everyone logs off, with each task in its own worktree.
+3. **A vendor cloud where it fits.** A specific agent's cloud for tasks that need nothing private.
+
+In Superset, the first two appear in the same desktop app: each workspace lives on the device that holds its files and terminals, and laptop and shared-host workspaces sit side by side, and scheduled automations run on whichever device you choose. See [Run Coding Agents on a Remote Machine](/compare/run-coding-agents-on-remote-machine) and [Scheduled Coding Agents](/compare/scheduled-coding-agents).
+
+## Frequently Asked Questions
+
+### Should a small team run coding agents on laptops or a shared machine?
+
+Use laptops for interactive work and a shared machine for long-running or scheduled work. A shared host keeps agents working after everyone logs off and can reach your real environment; laptops pause when they sleep.
+
+### Is a cloud workspace safer than a shared host?
+
+It is a different risk. A cloud workspace moves your code and credentials to a vendor. A shared host keeps them on hardware you control, but anyone you grant access can reach what the host can reach, so give it only the repositories and credentials you intend to share.
+
+### Can I run different agents on one shared host?
+
+Yes. A workspace like Superset runs Claude Code, Codex, and any other CLI agent on the same host, each in its own Git worktree. Vendor clouds usually run only that vendor's agent.
+
+### Do agents on a shared host keep running when I close my laptop?
+
+Yes. The agents run on the host, not on your laptop. Keep the host awake and online, and in Superset run its host service from the standalone CLI so it does not depend on a desktop app being open.

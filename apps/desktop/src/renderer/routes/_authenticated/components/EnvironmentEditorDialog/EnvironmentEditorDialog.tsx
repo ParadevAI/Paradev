@@ -1,5 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
+import { isCloudUsageRefusal } from "@superset/shared/billing";
 import { ENVIRONMENT_ONBOARDING_PROMPT } from "@superset/shared/cloud-agent-launch";
 import {
 	DEFAULT_SANDBOX_REGION,
@@ -224,7 +225,19 @@ export function EnvironmentEditorDialog({
 				params: { workspaceId: created.id },
 			});
 		} catch (error) {
-			toast.error(errorMessage(error));
+			toast.error(
+				errorMessage(error),
+				isCloudUsageRefusal(error)
+					? {
+							action: {
+								label: t({ message: "Open billing" }),
+								onClick: () => {
+									void navigate({ to: "/settings/billing" });
+								},
+							},
+						}
+					: undefined,
+			);
 		}
 	};
 

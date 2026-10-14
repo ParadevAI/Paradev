@@ -1,11 +1,10 @@
-import { COMPANY } from "@superset/shared/constants";
-import {
-	FAQ_ITEMS,
-	faqSourceText,
-} from "@/app/[lang]/components/FAQSection/constants";
+import type { MessageDescriptor } from "@lingui/core";
+import { getI18nInstance } from "@superset/i18n/server";
+import { CANONICAL_URLS, COMPANY } from "@superset/shared/constants";
 import { API_URL, MCP_SERVER_URL } from "./api-url";
 import { getBlogPosts } from "./blog";
 import { getCategoryPages } from "./category";
+import { getChangelogEntries } from "./changelog";
 import { getComparisonPages } from "./compare";
 import {
 	PRODUCT_DISAMBIGUATION,
@@ -16,6 +15,12 @@ import {
 } from "./product-facts";
 
 export { API_URL, MCP_SERVER_URL };
+
+// Production builds strip `message` from descriptors and keep only the hashed
+// id, so machine-facing feeds resolve the English text through the catalog.
+export function englishText(descriptor: MessageDescriptor): string {
+	return getI18nInstance()._(descriptor);
+}
 
 export function stripMdxSyntax(content: string): string {
 	return (
@@ -61,6 +66,13 @@ export function buildCompanyFactsSection(): string[] {
 	];
 }
 
+// Turns a "## Heading" section into free text under a bold label, for the
+// part of llms.txt that may not contain headings.
+function asPreamble(section: string[]): string[] {
+	const [heading = "", ...body] = section;
+	return [`**${heading.replace(/^#+\s*/, "")}**`, ...body];
+}
+
 export function buildLlmsHeader(): string[] {
 	return [
 		`# ${COMPANY.NAME}`,
@@ -83,7 +95,7 @@ export function buildWhenToUseSection(): string[] {
 		"- Review diffs, manage ports, and monitor many concurrent agent sessions from one dashboard.",
 		"- Check on agents, reply to them, and review their diffs from an iPhone or iPad while they run on your own machine.",
 		"",
-		"Superset is not a coding agent itself; it is the workspace and orchestration layer the agents run in. If you are an AI agent, the fastest way to act on a user's Superset account is the MCP server below (OAuth or API key auth); the fastest way to learn the product is the docs index at https://docs.superset.sh.",
+		`Superset is not a coding agent itself; it is the workspace and orchestration layer the agents run in. If you are an AI agent, the fastest way to act on a user's Superset account is the MCP server below (OAuth or API key auth); the fastest way to learn the product is the docs index at ${CANONICAL_URLS.DOCS}.`,
 	];
 }
 
@@ -107,7 +119,7 @@ export function buildDeveloperResourcesSection(): string[] {
 		`- [OAuth authorization server metadata](${API_URL}/.well-known/oauth-authorization-server): RFC 8414`,
 		`- [Web Bot Auth key directory](${baseUrl}/.well-known/http-message-signatures-directory): Ed25519 keys Superset-operated agents sign requests with (RFC 9421)`,
 		`- [Agent skills](https://github.com/superset-sh/skills): official skills for the CLI and MCP server; install with \`npx skills add superset-sh/skills\``,
-		`- [CLI](${docsUrl}/cli/getting-started): \`brew install superset-sh/tap/superset\` (Homebrew tap: https://github.com/superset-sh/homebrew-tap) or \`curl -fsSL https://superset.sh/cli/install.sh | sh\`; reference at ${docsUrl}/cli/cli-reference`,
+		`- [CLI](${docsUrl}/cli/getting-started): \`brew install superset-sh/tap/superset\` (Homebrew tap: https://github.com/superset-sh/homebrew-tap) or \`curl -fsSL ${CANONICAL_URLS.MARKETING}/cli/install.sh | sh\`; reference at ${docsUrl}/cli/cli-reference`,
 		`- [TypeScript SDK](${docsUrl}/sdk/getting-started): \`npm install @superset_sh/sdk\``,
 		`- [Docs llms.txt](${docsUrl}/llms.txt): scoped context for the documentation`,
 		`- [API llms.txt](${baseUrl}/api/llms.txt): scoped index of the API surface`,
@@ -120,27 +132,37 @@ export function buildLlmsTxt(): string {
 	const posts = getBlogPosts();
 	const comparisons = getComparisonPages();
 	const categories = getCategoryPages();
+	const changelog = getChangelogEntries().slice(0, 8);
 	const baseUrl = COMPANY.MARKETING_URL;
 	const docsUrl = COMPANY.DOCS_URL;
 
+	// The llms.txt format allows only free text between the summary and the
+	// first H2, and only link lists under each H2 (https://llmstxt.org).
 	const lines: string[] = [
 		...buildLlmsHeader(),
 		"",
-		...buildCompanyFactsSection(),
+		...asPreamble(buildCompanyFactsSection()),
 		"",
-		...buildWhenToUseSection(),
+		...asPreamble(buildWhenToUseSection()),
 		"",
 		...buildDeveloperResourcesSection(),
 		"",
 		"## Docs",
 		"",
-		`- [Documentation](${docsUrl})`,
-		`- [Getting Started](${docsUrl}/getting-started)`,
-		`- [GitHub](${COMPANY.GITHUB_URL})`,
+		`- [Documentation](${docsUrl}): Superset documentation`,
+		`- [GitHub](${COMPANY.GITHUB_URL}): source code`,
 		"",
 		"## Blog",
 		"",
 		...posts.map((post) => `- [${post.title}](${baseUrl}/blog/${post.slug})`),
+		"",
+		"## Changelog",
+		"",
+		`- [Changelog](${baseUrl}/changelog): every release, newest first`,
+		`- [Changelog feed](${baseUrl}/changelog.xml): RSS`,
+		...changelog.map(
+			(entry) => `- [${entry.title}](${baseUrl}${entry.url}): ${entry.date}`,
+		),
 		"",
 		"## Guides",
 		"",
@@ -152,14 +174,10 @@ export function buildLlmsTxt(): string {
 			(page) => `- [${page.title}](${baseUrl}/compare/${page.slug})`,
 		),
 		"",
-		"## FAQ",
+		"## Optional",
 		"",
-		...FAQ_ITEMS.flatMap((item) => [
-			`### ${faqSourceText(item.question)}`,
-			"",
-			faqSourceText(item.answer),
-			"",
-		]),
+		`- [Full context](${baseUrl}/llms-full.txt): every blog post, comparison, and the FAQ in one file`,
+		`- [Homepage as markdown](${baseUrl}/index.md): product overview and FAQ`,
 	];
 
 	return lines.join("\n");

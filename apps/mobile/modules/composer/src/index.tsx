@@ -1,4 +1,4 @@
-import { requireNativeView } from "expo";
+import { requireNativeModule, requireNativeView } from "expo";
 import { forwardRef, type Ref, useImperativeHandle, useRef } from "react";
 
 /** The imperative surface the native view exposes through its ref. */
@@ -57,6 +57,24 @@ interface NativeComposerViewProps {
 
 const NativeComposerView =
 	requireNativeView<NativeComposerViewProps>("Composer");
+
+const NativeComposerModule = requireNativeModule<{
+	presentImage: (uri: string) => Promise<void>;
+	fileThumbnail: (uri: string, side: number) => Promise<string | null>;
+}>("Composer");
+
+/** Opens an image full screen in the composer's own viewer. */
+export function presentImage(uri: string): Promise<void> {
+	return NativeComposerModule.presentImage(uri);
+}
+
+/** A PNG preview of a local file, as the composer's file card draws it. */
+export function fileThumbnail(
+	uri: string,
+	side: number,
+): Promise<string | null> {
+	return NativeComposerModule.fileThumbnail(uri, side);
+}
 
 /**
  * How the composer treats the screen behind it while expanded.

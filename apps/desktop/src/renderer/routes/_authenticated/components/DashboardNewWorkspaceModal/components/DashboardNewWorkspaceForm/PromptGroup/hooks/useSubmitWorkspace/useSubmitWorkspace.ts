@@ -1,5 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
 import { acpHarnessForPreset } from "@superset/chat/core";
+import { errorMessage } from "@superset/i18n/errors";
+import { isCloudUsageRefusal } from "@superset/shared/billing";
 import { startableCloudEnvironments } from "@superset/shared/cloud-environments";
 import { CLOUD_HOST_ID } from "@superset/shared/host-routing";
 import { toast } from "@superset/ui/sonner";
@@ -208,11 +210,22 @@ export function useSubmitWorkspace(
 				void utils.cloudWorkspace.list.invalidate();
 			} catch (error) {
 				toast.error(
-					error instanceof Error
-						? error.message
-						: t({
-								message: "Could not create cloud workspace",
-							}),
+					errorMessage(
+						error,
+						t({
+							message: "Could not create cloud workspace",
+						}),
+					),
+					isCloudUsageRefusal(error)
+						? {
+								action: {
+									label: t({ message: "Open billing" }),
+									onClick: () => {
+										void navigate({ to: "/settings/billing" });
+									},
+								},
+							}
+						: undefined,
 				);
 			}
 			return;

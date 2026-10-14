@@ -109,6 +109,10 @@
 			"types": "./src/agent-status.ts",
 			"default": "./src/agent-status.ts"
 		},
+		"./app-identity": {
+			"types": "./src/app-identity.ts",
+			"default": "./src/app-identity.ts"
+		},
 		"./constants": {
 			"types": "./src/constants.ts",
 			"default": "./src/constants.ts"
@@ -436,7 +440,7 @@
 		"@types/culori": "4.0.1",
 		"@types/friendly-words": "1.2.2",
 		"@types/semver": "7.7.1",
-		"@xterm/xterm": "6.1.0-beta.302",
+		"@xterm/xterm": "6.1.0-beta.315",
 		"bun-types": "1.4.2",
 		"typescript": "7.0.2"
 	}

@@ -10,6 +10,8 @@ on:
       - packages/i18n/**
       - packages/db/**
       - packages/auth/**
+      - packages/chat/**
+      - packages/cloud-client/**
       - "!**/*.md"
 
 jobs:

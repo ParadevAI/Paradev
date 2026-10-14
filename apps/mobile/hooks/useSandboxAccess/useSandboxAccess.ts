@@ -1,7 +1,9 @@
+import { isCloudUsageRefusal } from "@superset/shared/billing";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
 import { AppState } from "react-native";
 import type { CloudWorkspaceRow } from "@/hooks/useCloudWorkspaces";
+import { errorCopy } from "@/lib/errors";
 import { addressSandboxAccess, wakeSandboxAccess } from "@/lib/sandbox-access";
 
 /**
@@ -11,6 +13,7 @@ import { addressSandboxAccess, wakeSandboxAccess } from "@/lib/sandbox-access";
  */
 const KEEPALIVE_MS = 10 * 60 * 1000;
 const RETRY_MS = 30_000;
+const WAKE_RETRIES = 3;
 
 const SANDBOX_ADDRESS_QUERY_KEY = ["cloud", "sandbox-address"] as const;
 const SANDBOX_WAKE_QUERY_KEY = ["cloud", "sandbox-wake"] as const;
@@ -24,10 +27,11 @@ export interface SandboxTarget {
 
 export interface SandboxAccessValue {
 	target: SandboxTarget | null;
-	/** True while the last attempt to address it failed; attempts continue. */
+	/** True while the last attempt to address it failed, or billing refused to wake it. */
 	isError: boolean;
 	/** True until the sandbox has been woken since this workspace opened. */
 	isWaking: boolean;
+	refusalMessage: string | null;
 	retry: () => void;
 }
 
@@ -84,11 +88,17 @@ export function useSandboxAccess(
 			queryClient.setQueryData(addressKey, { url: access.url });
 			return { url: access.url };
 		},
+		retry: (failureCount, error) =>
+			!isCloudUsageRefusal(error) && failureCount < WAKE_RETRIES,
 		// No refetchIntervalInBackground: that flag is about browser window
 		// focus, which React Query never sees here — iOS freezes the timers
 		// wholesale, and the AppState listener below is the resume path.
 		refetchInterval: (current) =>
-			current.state.data ? KEEPALIVE_MS : RETRY_MS,
+			current.state.data
+				? KEEPALIVE_MS
+				: isCloudUsageRefusal(current.state.error)
+					? false
+					: RETRY_MS,
 	});
 
 	useEffect(() => {
@@ -102,6 +112,7 @@ export function useSandboxAccess(
 	}, [queryClient]);
 
 	const url = address.data?.url ?? null;
+	const refused = ready !== null && isCloudUsageRefusal(wake.error);
 	return useMemo<SandboxAccessValue>(
 		() => ({
 			target:
@@ -112,13 +123,23 @@ export function useSandboxAccess(
 							url,
 						}
 					: null,
-			isError: address.isError,
-			isWaking: ready !== null && wake.data === undefined,
+			isError: address.isError || refused,
+			isWaking: ready !== null && wake.data === undefined && !refused,
+			refusalMessage: refused ? errorCopy(wake.error) : null,
 			retry: () => {
 				void address.refetch();
 				void wake.refetch();
 			},
 		}),
-		[ready, url, address.isError, address.refetch, wake.data, wake.refetch],
+		[
+			ready,
+			url,
+			address.isError,
+			address.refetch,
+			refused,
+			wake.data,
+			wake.error,
+			wake.refetch,
+		],
 	);
 }

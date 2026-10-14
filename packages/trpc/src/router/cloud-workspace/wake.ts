@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/core";
 import { db } from "@superset/db/client";
 import { cloudWorkspaces } from "@superset/db/schema";
 import { eq } from "drizzle-orm";
@@ -8,6 +9,11 @@ import {
 	stopAndSnapshot,
 	wakeSandbox,
 } from "../../lib/sandbox";
+import {
+	attachBootSession,
+	authorizeBoot,
+	queueSettleWorkspace,
+} from "./meter";
 import { transitionCloudWorkspace } from "./transition";
 
 type CloudWorkspaceRow = typeof cloudWorkspaces.$inferSelect;
@@ -23,10 +29,32 @@ export async function wakeCloudWorkspace(
 	row: CloudWorkspaceRow,
 ): Promise<WokenCloudWorkspace> {
 	const { claim, agentCredentialDigest } = await buildSandboxClaim({ row });
+	let bootId: string | null = null;
 	const { hostTarget, booted } = await wakeSandbox({
 		providerSandboxId: row.providerSandboxId,
 		claim,
+		beforeResume: async (box) => {
+			({ bootId } = await authorizeBoot({
+				organizationId: row.organizationId,
+				cloudWorkspaceId: row.id,
+				...box,
+			}));
+		},
+	}).catch(async (error) => {
+		if (bootId) {
+			await attachBootSession({
+				bootId,
+				providerSandboxId: row.providerSandboxId,
+			}).catch(() => {});
+		}
+		throw error;
 	});
+	if (bootId) {
+		await attachBootSession({
+			bootId,
+			providerSandboxId: row.providerSandboxId,
+		}).catch((error) => Sentry.captureException(error, { extra: { bootId } }));
+	}
 	const set: Partial<CloudWorkspaceRow> = {
 		...(hostTarget !== row.sandboxUrl ? { sandboxUrl: hostTarget } : {}),
 		...(booted ? { bootAgentCredentialDigest: agentCredentialDigest } : {}),
@@ -51,7 +79,10 @@ export async function restartCloudWorkspace(
 	row: CloudWorkspaceRow,
 ): Promise<WokenCloudWorkspace> {
 	const { running } = await describeSandbox(row.providerSandboxId);
-	if (running) await stopAndSnapshot(row.providerSandboxId);
+	if (running) {
+		await stopAndSnapshot(row.providerSandboxId);
+		await queueSettleWorkspace(row.id);
+	}
 	return wakeCloudWorkspace(row);
 }
 

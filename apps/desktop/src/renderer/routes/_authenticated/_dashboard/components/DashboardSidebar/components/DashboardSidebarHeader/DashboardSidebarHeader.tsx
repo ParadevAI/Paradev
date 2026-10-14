@@ -193,6 +193,7 @@ export function DashboardSidebarHeader({
 	const {
 		tab: lastTab,
 		assignee: lastAssignee,
+		label: lastLabel,
 		search: lastSearch,
 		typeTab: lastTypeTab,
 		projectFilters: lastProjectFilters,
@@ -256,6 +257,7 @@ export function DashboardSidebarHeader({
 				search: tasksSearchFromFilters({
 					tab: lastTab,
 					assignee: lastAssignee,
+					label: lastLabel,
 					search: lastSearch,
 					typeTab: lastTypeTab,
 					projectFilters: lastProjectFilters,

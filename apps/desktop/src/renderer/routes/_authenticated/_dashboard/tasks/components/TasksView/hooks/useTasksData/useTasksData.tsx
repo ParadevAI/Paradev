@@ -36,15 +36,21 @@ interface UseTasksDataParams {
 	filterTab: TabValue;
 	searchQuery: string;
 	assigneeFilter: string | null;
+	labelFilter: string | null;
 }
 
-export function useTasksJoinedWithStatuses(): TasksPagination & {
+export function useTasksJoinedWithStatuses(
+	labelFilter: string | null = null,
+): TasksPagination & {
 	tasks: TaskWithStatus[];
 	statuses: SelectTaskStatus[];
 } {
 	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
 		cloudTrpc.task.listPage.useInfiniteQuery(
-			{ limit: TASK_PAGE_SIZE },
+			{
+				limit: TASK_PAGE_SIZE,
+				labels: labelFilter ? [labelFilter] : undefined,
+			},
 			{
 				getNextPageParam: (page) => page.nextCursor,
 				refetchInterval: TASK_LIST_REFETCH_INTERVAL,
@@ -92,6 +98,7 @@ export function useTasksData({
 	filterTab,
 	searchQuery,
 	assigneeFilter,
+	labelFilter,
 }: UseTasksDataParams): TasksPagination & {
 	data: TaskWithStatus[];
 	allStatuses: SelectTaskStatus[];
@@ -103,7 +110,7 @@ export function useTasksData({
 		hasNextTasksPage,
 		isFetchingNextTasksPage,
 		isLoadingTasks,
-	} = useTasksJoinedWithStatuses();
+	} = useTasksJoinedWithStatuses(labelFilter);
 
 	const { search } = useHybridSearch(sortedData);
 

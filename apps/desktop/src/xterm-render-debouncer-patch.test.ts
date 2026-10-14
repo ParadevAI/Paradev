@@ -101,7 +101,11 @@ describe("@xterm/xterm RenderDebouncer dispose patch", () => {
 		test(`${name} carries the patch`, () => {
 			const src = readFileSync(join(libDir, name), "utf8");
 			expect(src).toContain("this._isDisposed=!0,this._refreshCallbacks=[]");
-			expect(src).toContain("if(this._isDisposed)return 0;");
+			expect(src).toContain("this._isDisposed?0:(this._refreshCallbacks.push(");
+			expect(src).toContain("{if(this._isDisposed)return;");
+			// Event.ts: an emitter disposed by one of its own listeners must not
+			// truncate the array fire() is iterating.
+			expect(src).toContain("this._disposed=!0,this._listeners=[]");
 		});
 	}
 

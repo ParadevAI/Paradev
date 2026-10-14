@@ -492,6 +492,7 @@ describe("buildV2TerminalEnv", () => {
 		cwd: "/tmp/workspace",
 		terminalId: "term-1",
 		workspaceId: "ws-1",
+		workspaceName: "fix-login",
 		workspacePath: "/tmp/workspace",
 		rootPath: "/tmp/repo",
 		supersetEnv: "production" as const,
@@ -503,22 +504,33 @@ describe("buildV2TerminalEnv", () => {
 		const env = buildV2TerminalEnv(baseParams);
 		expect(env).toMatchObject({
 			TERM: "xterm-256color",
-			TERM_PROGRAM: "kitty",
-			TERM_PROGRAM_VERSION: "0.42.0",
 			COLORTERM: "truecolor",
 			PWD: "/tmp/workspace",
 			SUPERSET_TERMINAL_ID: "term-1",
 			SUPERSET_ORGANIZATION_ID: "org-1",
 			SUPERSET_WORKSPACE_ID: "ws-1",
+			SUPERSET_WORKSPACE_NAME: "fix-login",
 			SUPERSET_WORKSPACE_PATH: "/tmp/workspace",
 			SUPERSET_ROOT_PATH: "/tmp/repo",
 			SUPERSET_ENV: "production",
 			SUPERSET_AGENT_HOOK_PORT: "51741",
 			SUPERSET_AGENT_HOOK_VERSION: "2",
 		});
-		expect(env.TERM_PROGRAM).toBe("kitty");
 		expect(env.SHELL).toBe("/bin/zsh");
 		expect(env.LANG).toContain("UTF-8");
+	});
+
+	test("claims no terminal identity, even one inherited from the parent", () => {
+		const env = buildV2TerminalEnv({
+			...baseParams,
+			baseEnv: {
+				...baseParams.baseEnv,
+				TERM_PROGRAM: "vscode",
+				TERM_PROGRAM_VERSION: "1.105.0",
+			},
+		});
+		expect(env.TERM_PROGRAM).toBeUndefined();
+		expect(env.TERM_PROGRAM_VERSION).toBeUndefined();
 	});
 
 	test("sets SHELL to the selected launch shell even when base env was stale", () => {
@@ -577,7 +589,7 @@ describe("buildV2TerminalEnv", () => {
 		expect(env.TERM_THEME).toBe("light");
 	});
 
-	test("drops removed v1 metadata while preserving user shell vars", () => {
+	test("drops removed v1 metadata and replaces a stale workspace name", () => {
 		const env = buildV2TerminalEnv({
 			...baseParams,
 			baseEnv: {
@@ -595,7 +607,7 @@ describe("buildV2TerminalEnv", () => {
 		expect(env.SUPERSET_TAB_ID).toBeUndefined();
 		expect(env.SUPERSET_PORT).toBeUndefined();
 		expect(env.SUPERSET_HOOK_VERSION).toBeUndefined();
-		expect(env.SUPERSET_WORKSPACE_NAME).toBeUndefined();
+		expect(env.SUPERSET_WORKSPACE_NAME).toBe("fix-login");
 		expect(env.NVM_DIR).toBe("/Users/test/.nvm");
 		expect(env.SSH_AUTH_SOCK).toBe("/tmp/ssh.sock");
 	});
@@ -626,6 +638,7 @@ describe("v2 env contract boundary", () => {
 			cwd: "/tmp/ws",
 			terminalId: "t-1",
 			workspaceId: "w-1",
+			workspaceName: "",
 			workspacePath: "/tmp/ws",
 			rootPath: "",
 			supersetEnv: "production",

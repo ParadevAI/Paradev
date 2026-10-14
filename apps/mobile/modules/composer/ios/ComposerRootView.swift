@@ -382,7 +382,7 @@ struct ComposerRootView: View {
       if !holds && isExpanded { isFocused = true }
     }
     .fullScreenCover(item: $viewing) { attachment in
-      ComposerImageViewer(attachment: attachment) { viewing = nil }
+      ComposerImageViewer(uri: attachment.uri) { viewing = nil }
     }
     .onChange(of: isExpanded) { publishInteractiveFrame() }
     .onChange(of: model.backdrop) { publishInteractiveFrame() }
@@ -655,7 +655,7 @@ struct ComposerRootView: View {
       Image(systemName: "stop.fill")
         .font(.system(size: 15, weight: .semibold))
     }
-    .buttonStyle(.composerSend)
+    .buttonStyle(.composerStop)
     .accessibilityLabel(composerLocalized("Stop"))
     .transition(.opacity)
   }

@@ -41,6 +41,7 @@ import {
 	visibleTo,
 } from "./access";
 import { recordCloudWorkspaceActivity } from "./activity";
+import { queueSettleWorkspace, settleWorkspaceNow } from "./meter";
 import { nextSandboxNameFor } from "./provision";
 import { queueReap } from "./reap";
 import { cloudWorkspaceRecordRouter } from "./record";
@@ -523,7 +524,10 @@ export const cloudWorkspaceRouter = {
 		.mutation(async ({ ctx, input }) => {
 			const row = await loadReadyWorkspace(ctx, input.id);
 			const { running } = await addressSandbox(row, "address");
-			if (running) await stopAndSnapshot(row.providerSandboxId);
+			if (running) {
+				await stopAndSnapshot(row.providerSandboxId);
+				await queueSettleWorkspace(row.id);
+			}
 			return { stopped: running };
 		}),
 
@@ -644,6 +648,12 @@ export const cloudWorkspaceRouter = {
 						console.error(
 							`[cloud-workspace] could not queue the reap for ${row.id}`,
 							error,
+						);
+						await settleWorkspaceNow(row.id).catch((meterError) =>
+							console.error(
+								`[cloud-workspace] ${row.id} final meter failed`,
+								meterError,
+							),
 						);
 						await deleteSandbox(row.providerSandboxId);
 					});

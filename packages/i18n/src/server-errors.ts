@@ -265,6 +265,20 @@ export const serverErrorMessages: Record<
 				"Cloud sandboxes are not enabled for {account}. Ask the Superset team for access.",
 			values: params,
 		}),
+	"serverError.cloudWorkspace.cloudNeedsPaidPlan": () =>
+		i18n._(
+			msg({
+				message:
+					"Cloud workspaces need a paid plan. Upgrade in Settings, Billing to start one.",
+			}),
+		),
+	"serverError.cloudWorkspace.usageLimitReached": () =>
+		i18n._(
+			msg({
+				message:
+					"Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace.",
+			}),
+		),
 	"serverError.cloudWorkspace.environmentHasNoRepositories": () =>
 		i18n._(
 			msg({
