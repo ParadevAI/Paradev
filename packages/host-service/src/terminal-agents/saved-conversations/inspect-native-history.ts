@@ -69,7 +69,10 @@ async function exactSessionFile(
 				// Only the shared store root may be a link. Nested aliases can
 				// hide another copy from a bounded directory walk.
 				refuse();
-			} else if (entry.isDirectory()) {
+			} else if (
+				entry.isDirectory() &&
+				(provider !== "claude" || directory === root)
+			) {
 				pending.push(path);
 			}
 		}
