@@ -202,10 +202,14 @@ npx mocha out/common/Event.test.js out/common/input/WriteBuffer.test.js out/brow
 
 # 3. From the Superset repo, copy the rebuilt bundles and changed src/ files into the bun patch:
 XTERM=$PWD && cd <superset>
-bun patch @xterm/xterm@<new-version>          # and/or @xterm/addon-webgl@<new-version>
+bun patch @xterm/xterm@<new-version>
 cp "$XTERM"/lib/xterm.js "$XTERM"/lib/xterm.mjs node_modules/@xterm/xterm/lib/
 cp "$XTERM"/<changed src files> node_modules/@xterm/xterm/src/...
 bun patch --commit 'node_modules/@xterm/xterm'
+bun patch @xterm/addon-webgl@<new-version>
+cp "$XTERM"/addons/addon-webgl/lib/addon-webgl.{js,mjs} node_modules/@xterm/addon-webgl/lib/
+cp "$XTERM"/addons/addon-webgl/<changed src files> node_modules/@xterm/addon-webgl/src/...
+bun patch --commit 'node_modules/@xterm/addon-webgl'
 bun test apps/desktop/src/xterm-flushsync-patch.test.ts apps/desktop/src/xterm-render-debouncer-patch.test.ts apps/desktop/src/xterm-ime-patch.test.ts apps/desktop/src/webgl-atlas-patch.test.ts apps/desktop/src/xterm-ligatures-patch.test.ts
 ```
 
