@@ -66,6 +66,9 @@ export const env = createEnv({
 		YC_BOOKFACE_DEAL_ID: z.coerce.number().default(13843),
 		YC_BOOKFACE_COUPON_ID: z.string().min(1).default("yc-bookface-6mo"),
 		SLACK_BILLING_WEBHOOK_URL: z.string().url(),
+		VERCEL_LOG_DRAIN_SECRET: z.string().min(1),
+		PEEC_AGENT_ANALYTICS_API_KEY: z.string().min(1),
+		PEEC_ORGANIZATION_ID: z.string().min(1),
 		SENTRY_AUTH_TOKEN: z.string().optional(),
 		// Public Sentry integration (OAuth app). Optional: unset where the app
 		// is not registered yet, in which case the connect flow 400s.

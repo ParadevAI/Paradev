@@ -188,6 +188,9 @@ jobs:
           SENTRY_DSN_SANDBOX: ${{ secrets.SENTRY_DSN_SANDBOX }}
           SERVER_OPENAI_API_KEY: ${{ secrets.SERVER_OPENAI_API_KEY }}
           GH_APP_SLUG: ${{ secrets.GH_APP_SLUG }}
+          VERCEL_LOG_DRAIN_SECRET: ${{ secrets.VERCEL_LOG_DRAIN_SECRET }}
+          PEEC_AGENT_ANALYTICS_API_KEY: ${{ secrets.PEEC_AGENT_ANALYTICS_API_KEY }}
+          PEEC_ORGANIZATION_ID: ${{ secrets.PEEC_ORGANIZATION_ID }}
         run: |
           vercel pull --yes --environment=production --token=$VERCEL_TOKEN
           vercel build --prod --token=$VERCEL_TOKEN
@@ -275,7 +278,10 @@ jobs:
             --env SANDBOX_GATE_ORIGIN=$SANDBOX_GATE_ORIGIN \
             --env SENTRY_DSN_SANDBOX=$SENTRY_DSN_SANDBOX \
             --env SERVER_OPENAI_API_KEY=$SERVER_OPENAI_API_KEY \
-            --env GH_APP_SLUG=$GH_APP_SLUG
+            --env GH_APP_SLUG=$GH_APP_SLUG \
+            --env VERCEL_LOG_DRAIN_SECRET=$VERCEL_LOG_DRAIN_SECRET \
+            --env PEEC_AGENT_ANALYTICS_API_KEY=$PEEC_AGENT_ANALYTICS_API_KEY \
+            --env PEEC_ORGANIZATION_ID=$PEEC_ORGANIZATION_ID
 
   deploy-web:
     name: Deploy Web to Vercel

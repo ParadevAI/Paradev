@@ -24,4 +24,7 @@ Object.assign(process.env, {
 	QSTASH_TOKEN: "qstash-token",
 	SERVER_ANTHROPIC_API_KEY: "test",
 	SLACK_SIGNING_SECRET: "test-secret",
+	VERCEL_LOG_DRAIN_SECRET: "test-drain-secret",
+	PEEC_AGENT_ANALYTICS_API_KEY: "test-peec-key",
+	PEEC_ORGANIZATION_ID: "test-peec-org",
 });
