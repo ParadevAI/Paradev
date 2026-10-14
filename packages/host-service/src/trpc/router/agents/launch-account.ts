@@ -2,6 +2,7 @@ import { isAbsolute } from "node:path";
 import {
 	ensureClaudeManagedHooksAt,
 	ensureCodexManagedHooksAt,
+	resolveDisabledAgentIds,
 } from "@superset/agent-setup";
 import { buildArgvCommand } from "@superset/shared/agent-prompt-launch";
 import { TRPCError } from "@trpc/server";
@@ -239,6 +240,7 @@ export function prepareLaunchAccountHooks(account: SessionAccount): void {
 			message:
 				"The selected account cannot prepare its hooks. Nothing was launched.",
 		});
+	if (resolveDisabledAgentIds().includes(account.agent)) return;
 	const prepared =
 		account.agent === "claude"
 			? ensureClaudeManagedHooksAt(directory)

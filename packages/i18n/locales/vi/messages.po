@@ -1912,10 +1912,10 @@ msgid "agent settings"
 msgstr "cài đặt agent"
 
 msgid "Agent terminal with account"
-msgstr "Thiết bị đầu cuối của tác nhân với tài khoản"
+msgstr "Terminal của tác nhân với tài khoản"
 
 msgid "Agent terminal with account…"
-msgstr "Thiết bị đầu cuối của tác nhân với tài khoản…"
+msgstr "Terminal của tác nhân với tài khoản…"
 
 msgid "Agent usage rankings"
 msgstr "Xếp hạng mức dùng agent"
@@ -4910,7 +4910,7 @@ msgid "Could not start agent"
 msgstr "Không thể khởi động agent"
 
 msgid "Could not start agent terminal"
-msgstr "Không thể khởi động thiết bị đầu cuối của tác nhân"
+msgstr "Không thể khởi động terminal của tác nhân"
 
 msgid "Could not start checkout. Please try again."
 msgstr "Không thể bắt đầu thanh toán. Vui lòng thử lại."
@@ -10534,7 +10534,7 @@ msgid "No automations match"
 msgstr "Không có tự động hóa nào khớp"
 
 msgid "No available subscription accounts. Add or sign in to an account in Usage, then refresh."
-msgstr "Không có tài khoản đăng ký nào khả dụng. Thêm tài khoản hoặc đăng nhập trong mục Mức sử dụng, rồi làm mới."
+msgstr "Không có tài khoản nào có gói đăng ký khả dụng. Thêm tài khoản hoặc đăng nhập vào một tài khoản trong mục Mức sử dụng, rồi làm mới."
 
 msgid "No branches found"
 msgstr "Không tìm thấy nhánh nào"
@@ -15695,7 +15695,7 @@ msgid "Start a new chat"
 msgstr "Bắt đầu trò chuyện mới"
 
 msgid "Start a new terminal using an existing login. Other chats and your default account stay unchanged."
-msgstr "Khởi động thiết bị đầu cuối mới bằng thông tin đăng nhập hiện có. Các cuộc trò chuyện khác và tài khoản mặc định không thay đổi."
+msgstr "Khởi động terminal mới bằng thông tin đăng nhập hiện có. Các cuộc trò chuyện khác và tài khoản mặc định không thay đổi."
 
 msgid "Start a session"
 msgstr "Bắt đầu một phiên"
@@ -15743,7 +15743,7 @@ msgid "Start or stop the workspace run command"
 msgstr "Bắt đầu hoặc dừng lệnh chạy của workspace"
 
 msgid "Start terminal"
-msgstr "Khởi động thiết bị đầu cuối"
+msgstr "Khởi động terminal"
 
 msgid "Start voice mode"
 msgstr "Bắt đầu chế độ giọng nói"
@@ -18022,7 +18022,7 @@ msgid "update the branch prefix"
 msgstr "cập nhật tiền tố nhánh"
 
 msgid "Update this host to choose an account for a new terminal."
-msgstr "Cập nhật máy chủ này để chọn tài khoản cho thiết bị đầu cuối mới."
+msgstr "Cập nhật máy chủ này để chọn tài khoản cho terminal mới."
 
 msgid "Updated"
 msgstr "Đã cập nhật"
