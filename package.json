@@ -110,8 +110,8 @@
 		"@pierre/trees@1.0.0-beta.5": "patches/@pierre%2Ftrees@1.0.0-beta.5.patch",
 		"expo-observe@57.0.24": "patches/expo-observe@57.0.24.patch",
 		"react-native-enriched-markdown@0.6.0": "patches/react-native-enriched-markdown@0.6.0.patch",
-		"@xterm/xterm@6.1.0-beta.304": "patches/@xterm%2Fxterm@6.1.0-beta.304.patch",
-		"@xterm/addon-webgl@0.20.0-beta.300": "patches/@xterm%2Faddon-webgl@0.20.0-beta.300.patch",
-		"@xterm/addon-ligatures@0.11.0-beta.301": "patches/@xterm%2Faddon-ligatures@0.11.0-beta.301.patch"
+		"@xterm/xterm@6.1.0-beta.315": "patches/@xterm%2Fxterm@6.1.0-beta.315.patch",
+		"@xterm/addon-webgl@0.20.0-beta.309": "patches/@xterm%2Faddon-webgl@0.20.0-beta.309.patch",
+		"@xterm/addon-ligatures@0.11.0-beta.310": "patches/@xterm%2Faddon-ligatures@0.11.0-beta.310.patch"
 	}
 }
