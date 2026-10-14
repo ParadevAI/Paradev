@@ -193,9 +193,10 @@ function getReportCoords(
  * Ghostty) produces.
  *
  * Coupled to terminal identity: TERM_PROGRAM must never be "vscode" (see
- * TERMINAL_IDENTITY_ENV_KEYS in @superset/shared/constants). Under it Claude
- * Code amplifies each report to compensate for xterm's damped stream, so
- * full-fidelity reports would over-scroll ~2x.
+ * TERMINAL_IDENTITY_ENV_KEYS in @superset/shared/constants), and the XTVERSION
+ * reply must not start with "xterm.js" (desktop terminal-version-reply). Either
+ * makes Claude Code treat the stream as stock xterm.js: "vscode" over-scrolls
+ * ~2x, an "xterm.js" reply turns off its native scroll acceleration.
  */
 export function createTerminalWheelEventHandler(
 	xterm: XTerm,

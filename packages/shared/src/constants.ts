@@ -299,7 +299,8 @@ export const SHARED_ENVIRONMENT_NAME = "Default";
 // Terminals set no TERM_PROGRAM, like xterm. Agents take kitty-only paths
 // under "kitty" that xterm.js cannot serve, and under "vscode" Claude Code
 // amplifies the full-fidelity wheel stream ~2x. Without it, agents identify
-// the terminal from its XTVERSION reply ("xterm.js") and the CSI-u probe.
+// the terminal from its XTVERSION reply ("Superset (xterm.js)", see the
+// desktop terminal-version-reply) and the CSI-u probe.
 export const TERMINAL_IDENTITY_ENV_KEYS = [
 	"TERM_PROGRAM",
 	"TERM_PROGRAM_VERSION",
