@@ -404,12 +404,19 @@ function cli(): void {
 	const pkg = JSON.parse(
 		readFileSync(join(REPO_ROOT, "packages", "cli", "package.json"), "utf8"),
 	) as { version: string };
-	const build = Bun.spawnSync(
+	// The compiled catalogs are gitignored, so a clean checkout has none to bundle.
+	const steps = [
+		["bun", "run", "--filter=@superset/i18n", "build"],
 		["bun", "run", "--cwd", "packages/cli", "build:linux-x64"],
-		{ cwd: REPO_ROOT, stdout: "ignore", stderr: "inherit" },
-	);
-	if (build.exitCode !== 0)
-		throw new Error("packages/cli build:linux-x64 failed");
+	];
+	for (const step of steps) {
+		const run = Bun.spawnSync(step, {
+			cwd: REPO_ROOT,
+			stdout: "ignore",
+			stderr: "inherit",
+		});
+		if (run.exitCode !== 0) throw new Error(`${step.join(" ")} failed`);
+	}
 	const binary = readFileSync(
 		join(REPO_ROOT, "packages", "cli", "dist", "superset-linux-x64"),
 	);
