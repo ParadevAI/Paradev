@@ -5,6 +5,7 @@ const DRAFT_DEBOUNCE_MS = 300;
 const unsavedDrafts = new Map<string, string>();
 const recoveredAfterRead = new Map<string, string[]>();
 const pendingSubmissions = new Map<string, { text: string }>();
+const inFlightSubmissions = new Map<string, { text: string }>();
 const clearedDraftListeners = new Map<string, Set<() => void>>();
 
 function persistDraft(draftKey: string, text: string): boolean {
@@ -108,11 +109,15 @@ export function useComposerDraft(draftKey: string) {
 
 	const beginSubmission = useCallback(
 		(text: string, isDraftUnchanged?: () => boolean) => {
+			if (inFlightSubmissions.has(draftKey)) return null;
 			pendingSubmissions.delete(draftKey);
 			const submitted = { text: readDraft(draftKey) ?? "" };
-			if (submitted.text.trim() !== text.trim()) return () => {};
-			pendingSubmissions.set(draftKey, submitted);
+			inFlightSubmissions.set(draftKey, submitted);
+			if (submitted.text.trim() === text.trim())
+				pendingSubmissions.set(draftKey, submitted);
 			return (accepted: boolean) => {
+				if (inFlightSubmissions.get(draftKey) !== submitted) return;
+				inFlightSubmissions.delete(draftKey);
 				if (pendingSubmissions.get(draftKey) !== submitted) return;
 				pendingSubmissions.delete(draftKey);
 				if (

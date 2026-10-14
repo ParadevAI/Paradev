@@ -282,6 +282,7 @@ export const Composer = memo(function Composer({
 				return false;
 			}
 			const finishSubmission = beginSubmission(text, isDraftUnchanged);
+			if (!finishSubmission) return false;
 			try {
 				const result = await submitMessage(
 					{ text, files, mentions, steer },
