@@ -88,7 +88,7 @@ export function ScrollToBottomButton({
 					]}
 				>
 					<SwiftUIImage
-						systemName="arrow.down"
+						systemName="chevron.down"
 						size={18}
 						color="#fafafa"
 						modifiers={
