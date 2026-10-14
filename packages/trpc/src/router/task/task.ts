@@ -480,6 +480,7 @@ async function buildTaskListFilters(
 		assigneeId: input?.assigneeMe ? userId : (input?.assigneeId ?? undefined),
 		creatorId: input?.creatorMe ? userId : undefined,
 		search: input?.search ?? undefined,
+		labels: input?.labels ?? undefined,
 		externalProjectId: input?.externalProjectId ?? undefined,
 		externalProjectName: input?.externalProjectName ?? undefined,
 		externalCycleId: input?.externalCycleId ?? undefined,
@@ -803,11 +804,11 @@ export const taskRouter = {
 					);
 				}
 
-				if ("assigneeId" in data) {
+				if (data.assigneeId !== undefined) {
 					updateData.assigneeId = await getScopedAssigneeId(
 						tx,
 						taskAccess.organizationId,
-						data.assigneeId ?? null,
+						data.assigneeId,
 						"Assignee must belong to the task organization",
 					);
 				}

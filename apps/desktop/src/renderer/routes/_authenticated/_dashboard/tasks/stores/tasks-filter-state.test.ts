@@ -30,6 +30,7 @@ describe("tasksSearchFromFilters", () => {
 			tasksSearchFromFilters({
 				tab: "all",
 				assignee: null,
+				label: null,
 				search: "",
 				typeTab: "tasks",
 				projectFilters: [],
@@ -43,6 +44,7 @@ describe("tasksSearchFromFilters", () => {
 			tasksSearchFromFilters({
 				tab: "active",
 				assignee: "me",
+				label: "acme/web",
 				search: "remote host",
 				typeTab: "issues",
 				projectFilters: ["project-1", "project-2"],
@@ -51,6 +53,7 @@ describe("tasksSearchFromFilters", () => {
 		).toEqual({
 			tab: "active",
 			assignee: "me",
+			label: "acme/web",
 			search: "remote host",
 			type: "issues",
 			projects: "project-1,project-2",
@@ -63,6 +66,7 @@ describe("tasksSearchFromFilters", () => {
 			tasksSearchFromFilters({
 				tab: "all",
 				assignee: null,
+				label: null,
 				search: "",
 				typeTab: "tasks",
 				projectFilters: ["project-1"],

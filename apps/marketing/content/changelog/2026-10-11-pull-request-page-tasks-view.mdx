@@ -1,0 +1,64 @@
+---
+title: Redesigned Pull Requests and a Unified Tasks View
+date: 2026-10-11
+image: /changelog/2026-10-11-pull-request-page.png
+---
+
+## Redesigned Pull Request Page <PRBadge url="https://github.com/superset-sh/superset/pull/8247" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8322" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8323" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8301" />
+
+A pull request now opens as its own page: a header with state, labels, and author, an info rail for merge status, reviews, and checks, and a comment composer that posts as you.
+
+- Switch between **Summary** and **Changes** tabs; checks and reviewers fold into the header when the pane is narrow
+- Reviews and comments collapse into rows, and bot findings show a title and severity line
+- Draft PRs get a **Ready for review** button, and reviewers link straight to their GitHub profile <PRBadge url="https://github.com/superset-sh/superset/pull/8343" />
+
+![A merged pull request's Summary tab with merge status, reviews, and checks in the info rail](/changelog/2026-10-11-pull-request-page.png)
+
+## One Tasks View That Follows Your Tracker <PRBadge url="https://github.com/superset-sh/superset/pull/8100" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8112" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8115" />
+
+The Tasks tab now mirrors whichever tracker your org uses. Pick it once in **Settings → Organization → Track tasks in**, and the separate Linear tab is gone.
+
+- Superset tasks can be filed under a team with `--team`, and admins can rename a team's task key (for example `DESIG` → `ART`) from **Settings → Teams**
+
+![Track tasks in setting under Settings → Organization, with Superset and Linear options](/changelog/2026-10-11-track-tasks-in.png)
+
+Docs: [Tasks](https://docs.superset.sh/docs/tasks).
+
+## Four New Plugins <PRBadge url="https://github.com/superset-sh/superset/pull/8220" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8215" />
+
+Connect Google Calendar, Vercel, Neon, and PostHog from **Plugins**, so an agent can check your schedule, trigger a deploy, query a database, or look up an account.
+
+- Google Calendar reuses your existing Google connection from Gmail
+- Vercel, Neon, and PostHog connect through each vendor's own hosted MCP server
+
+![Plugins page with Google Calendar, Vercel, Neon, and PostHog](/changelog/2026-10-11-plugins.png)
+
+## Improvements
+
+- **Restore deleted and merged workspaces** - right-click an archived workspace on the **Workspaces** tab and choose **Restore** to re-create its worktree on the original branch <PRBadge url="https://github.com/superset-sh/superset/pull/8178" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8255" />
+- **⌘; workspace switcher** - cycles workspaces that need input, just finished, or are running, the same way ⌘-Tab cycles apps <PRBadge url="https://github.com/superset-sh/superset/pull/8283" />
+- **Automations get a PR closed trigger** - react to a pull request closed without merging, separate from Merged <PRBadge url="https://github.com/superset-sh/superset/pull/8302" />
+- **Comment previews on pages** - hover a page's comment count to see the newest reply without opening it <PRBadge url="https://github.com/superset-sh/superset/pull/8393" />
+- **CLI terminal control** - `superset agents wait`, raw keys in `superset terminals send`, `superset terminals attach` over SSH, and `superset panes` let you script terminals and agents directly <PRBadge url="https://github.com/superset-sh/superset/pull/8371" />
+- **`superset hosts add`** turns any machine you can reach over SSH into a host in one command; `superset snapshot` and `superset agents explain` show every workspace, terminal, and agent, or why one is in its current state <PRBadge url="https://github.com/superset-sh/superset/pull/8388" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8381" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8380" />
+- **`superset workspaces archive`** replaces `workspaces delete` (clearer name, same command), and `superset workspaces sleep` puts a cloud workspace to sleep <PRBadge url="https://github.com/superset-sh/superset/pull/8267" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8191" />
+- **Import browser logins** - pull saved logins from more Chromium-based browsers on macOS, not just Chrome <PRBadge url="https://github.com/superset-sh/superset/pull/8190" />
+- **Hermes token usage** - Hermes Agent's usage now shows in **Settings → Usage** with its own cost estimate <PRBadge url="https://github.com/superset-sh/superset/pull/8341" />
+- Experimental: a redesigned chat surface (streaming replies, subagents, background work across every chat) keeps advancing behind the early-access `acp-chat` flag. Its composer gets denser model and mode pickers with ⌘1-9 to jump to a model, and a background chat tab now resumes instead of opening blank <PRBadge url="https://github.com/superset-sh/superset/pull/8339" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8329" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8243" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8342" />
+
+---
+
+**Bug fixes**
+
+- Workspace startup no longer force-deletes a folder with uncommitted changes during cleanup <PRBadge url="https://github.com/superset-sh/superset/pull/8256" />
+- The desktop app always opens v2 now and migrates every v1 setup instead of silently falling back <PRBadge url="https://github.com/superset-sh/superset/pull/8258" />
+- The Linear issue picker lists triage and backlog issues <PRBadge url="https://github.com/superset-sh/superset/pull/8219" />
+- The Slack plugin now acts as the person who connected it, not a shared identity <PRBadge url="https://github.com/superset-sh/superset/pull/8212" />
+- ⌘O opens the editor again, with clearer shortcut names <PRBadge url="https://github.com/superset-sh/superset/pull/8213" />
+- Quit Completely stops every v2 pty-daemon <PRBadge url="https://github.com/superset-sh/superset/pull/8214" />
+- Option-drag selects terminal text over a TUI that captures the mouse <PRBadge url="https://github.com/superset-sh/superset/pull/8361" />
+- Dragging a Files tab row onto a terminal pastes the path instead of failing <PRBadge url="https://github.com/superset-sh/superset/pull/8350" />
+- Renaming or moving a file in the Files tab onto a name that is already taken shows a conflict, not a server error <PRBadge url="https://github.com/superset-sh/superset/pull/8326" />
+- Pull request diffs load even without a matching workspace repository <PRBadge url="https://github.com/superset-sh/superset/pull/8125" />
+- Hardened what app windows are allowed to load and open, contributed by [@PascalOrdano18](https://github.com/PascalOrdano18) <PRBadge url="https://github.com/superset-sh/superset/pull/7436" />
+- Linux: GPU acceleration is no longer disabled, and clipboard image paste works in terminals, contributed by [@pgilmore](https://github.com/pgilmore) and [@dennisklappe](https://github.com/dennisklappe) <PRBadge url="https://github.com/superset-sh/superset/pull/7880" /> <PRBadge url="https://github.com/superset-sh/superset/pull/6013" />

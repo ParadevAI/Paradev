@@ -626,7 +626,9 @@ export const cloudWorkspaceRecordRouter = {
 		.input(z.object({ id: z.string().uuid(), name: z.string() }))
 		.mutation(async ({ ctx, input }) => {
 			const row = await loadVisibleWorkspace(ctx, input.id);
-			const [label] = await ensureLabels(db, row.organizationId, [input.name]);
+			const [label] = await db.transaction((tx) =>
+				ensureLabels(tx, row.organizationId, [input.name]),
+			);
 			if (!label) {
 				throw new TRPCError({ code: "BAD_REQUEST", message: "Invalid label" });
 			}

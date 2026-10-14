@@ -3,7 +3,13 @@ import { Button } from "@superset/ui/button";
 import { toast } from "@superset/ui/sonner";
 import { workspaceTrpc } from "@superset/workspace-client";
 import { useEffect, useState } from "react";
-import { LuArrowUpRight, LuCheck, LuCopy, LuUndo2 } from "react-icons/lu";
+import {
+	LuArrowUpRight,
+	LuCheck,
+	LuCopy,
+	LuLoaderCircle,
+	LuUndo2,
+} from "react-icons/lu";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
 import { PullRequestActivityCard } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestActivityCard";
 import { PullRequestMarkdown } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestMarkdown";
@@ -41,11 +47,19 @@ export function PullRequestCommentCard({
 	const layout = usePullRequestActivityLayout();
 	const requestReply = usePullRequestActivityReply();
 	const [copied, setCopied] = useState(false);
+	const foldable = comment.isResolved || Boolean(comment.isOutdated);
+	const [expanded, setExpanded] = useState(false);
+	const [wasFoldable, setWasFoldable] = useState(foldable);
+	if (foldable !== wasFoldable) {
+		setWasFoldable(foldable);
+		if (foldable) setExpanded(false);
+	}
+	const collapsed = foldable && !expanded;
 	const utils = workspaceTrpc.useUtils();
 	const resolve = workspaceTrpc.git.setReviewThreadResolution.useMutation({
-		onSuccess: () => {
-			void utils.git.getPullRequestThreads.invalidate({ workspaceId });
-		},
+		// Returned so the button stays pending until the refetched thread shows the new state.
+		onSuccess: () =>
+			utils.git.getPullRequestThreads.invalidate({ workspaceId }),
 		onError: () => {
 			toast.error(t({ message: "Couldn't update thread" }));
 		},
@@ -56,9 +70,9 @@ export function PullRequestCommentCard({
 		return () => clearTimeout(timer);
 	}, [copied]);
 	const canOpenCode = Boolean(comment.path && onOpenInDiff);
-	// A folded row is itself a button, so the path cannot be one inside it;
-	// the footer's "Open in diff" still opens the file there.
-	const pathOpensDiff = canOpenCode && layout === "card";
+	// A folded row or a collapsed card is itself a button, so the path cannot
+	// be one inside it; the footer's "Open in diff" still opens the file there.
+	const pathOpensDiff = canOpenCode && layout === "card" && !collapsed;
 	const openCode = () => {
 		if (comment.path)
 			onOpenInDiff?.(
@@ -117,6 +131,8 @@ export function PullRequestCommentCard({
 			}
 			createdAt={comment.createdAt}
 			url={comment.url}
+			collapsed={collapsed}
+			onCollapsedChange={foldable ? (value) => setExpanded(!value) : undefined}
 			actions={
 				<>
 					<Button
@@ -175,7 +191,12 @@ export function PullRequestCommentCard({
 										});
 								}}
 							>
-								{comment.isResolved ? (
+								{resolve.isPending ? (
+									<LuLoaderCircle
+										aria-hidden
+										className="size-3.5 animate-spin"
+									/>
+								) : comment.isResolved ? (
 									<LuUndo2 className="size-3.5" />
 								) : (
 									<LuCheck className="size-3.5" />

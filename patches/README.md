@@ -77,20 +77,8 @@ worst-case pages at 64 MiB instead of 1 GiB.
 patch markers in the installed bundles. If it fails after a version bump,
 regenerate the patch — don't delete the test.
 
-**Regenerating after a version bump** (~10 min):
-
-```bash
-bun patch @xterm/addon-webgl@<new-version>
-# edit node_modules/@xterm/addon-webgl per the three changes above:
-#   - both lib bundles are minified; find `getParameter(<gl>.MAX_TEXTURE_SIZE)`
-#     (2 sites) and wrap each in Math.min(4096, ...)
-#   - find `_onRemoveTextureAtlasCanvas.fire(<p>.canvas)` (merge path) and the
-#     `_evictAllPages` loop; add `<p>.canvas.width=0,<p>.canvas.height=0`
-#   - mirror the edits in src/GlyphRenderer.ts, src/WebglRenderer.ts,
-#     src/TextureAtlas.ts
-bun patch --commit 'node_modules/@xterm/addon-webgl'
-bun test apps/desktop/src/webgl-atlas-patch.test.ts
-```
+**Regenerating after a version bump:** follow the xterm procedure below; the
+addon builds from the same upstream commit.
 
 Before regenerating, check whether the new version made the patch obsolete:
 upstream already absorbed the render-loop page-count clamp and `_evictAllPages`
@@ -103,16 +91,17 @@ for upstreaming. If upstream ships them, delete the patch, the
 **Why:** SUPER-2120 / DESKTOP-12J. `Terminal.resize()` drains the write queue
 through `WriteBuffer.flushSync()`, which ignores the promise an async parser
 handler returns and then re-enters the parser without the continuation token
-it needs. `@xterm/addon-image` decodes inline images asynchronously (cursor-agent
-draws them with the kitty protocol because we identify as kitty), so a re-fit
+it needs. `@xterm/addon-image` decodes inline images asynchronously (any program that
+draws sixel, iTerm or kitty graphics), so a re-fit
 landing mid-decode put the parser in its FAIL state: every later write throws,
 the pane never renders again while the program keeps running, and only
 recreating the pane recovers. `flushSync` also drained from index 0 regardless
 of `_bufferOffset`, re-parsing chunks a sliced `_innerWrite` had already
 applied — duplicated output on a resize during heavy output.
 
-**What it changes** (`lib/xterm.js`, `lib/xterm.mjs`, and
-`src/common/input/WriteBuffer.ts` for readability — bundles are what run):
+**What it changes** (`lib/xterm.js`, `lib/xterm.mjs`, rebuilt from upstream
+source with the `src/` files in this patch; those files are what the bundles
+were built from):
 
 1. `flushSync` returns early while a chunk is paused in an async handler
    (`_asyncPending`), drains from `_bufferOffset` instead of index 0, and when a
@@ -147,6 +136,14 @@ applied — duplicated output on a resize during heavy output.
    helper and Unicode-service injection. Existing buffer/disposal bundle code
    is preserved. No font substitution or dependency upgrade is involved.
 
+5. `Emitter` (also `src/common/Event.ts`): since 6.1.0-beta.304, `fire()`
+   iterates the listener array in place, and `dispose()` truncated that same
+   array with `length = 0`. A listener that disposes its own emitter (a
+   terminal disposed from a render callback) then crashed the loop with
+   "undefined is not an object (evaluating 't[i].fn')". `dispose()` now
+   replaces the array. Still present on upstream master; the render-debouncer
+   guard test reproduces it.
+
 **IME removal condition:** Follow-up: [Superset #7490](https://github.com/superset-sh/superset/issues/7490). Track [upstream fix #6162](https://github.com/xtermjs/xterm.js/pull/6162)
 and [upstream issue #6161](https://github.com/xtermjs/xterm.js/issues/6161).
 An upstream merge alone is not enough: wait for a published xterm version
@@ -176,26 +173,61 @@ scheduled and nothing may throw.
 both installed bundles: CJK cell widths, combining and supplementary characters,
 right-edge constraints, font resizing, clearing preedit, and committing once.
 
-**Regenerating after a version bump** (~10 min), unless upstream has absorbed
-it (check `WriteBuffer.flushSync` for `_asyncPending` or an equivalent guard,
-`RenderDebouncer.dispose` for a disposed flag or callback clearing, and
-`CompositionHelper` for Unicode-aware cell layout; drop
-whichever hunks upstream carries, and delete the patch, the
-`patchedDependencies` entry, and the tests only once all are gone):
+Before regenerating, check whether upstream has absorbed any hunk:
+`WriteBuffer.flushSync` for `_asyncPending` or an equivalent guard,
+`RenderDebouncer.dispose` for a disposed flag or callback clearing,
+`CompositionHelper` for Unicode-aware cell layout, and `Emitter.dispose` for
+replacing rather than truncating its listeners. Drop whichever hunks upstream
+carries, and delete the patch, the `patchedDependencies` entry, and the tests
+only once all are gone.
+
+**Regenerating after a version bump** (~15 min). The bundles are rebuilt from
+upstream source with the readable `src/` changes applied, never hand-edited:
+a minified bundle renames identifiers and module ids on every build.
 
 ```bash
-bun patch @xterm/xterm@<new-version>
-# edit node_modules/@xterm/xterm per the four changes above — in both lib
-# bundles find `flushSync(){` and the `if(<promise>){...}` branch inside
-# `_innerWrite`, and the class holding `_runRefreshCallbacks(){`; mirror the
-# edits in src/common/input/WriteBuffer.ts and src/browser/RenderDebouncer.ts
-# For composition, port the upstream CompositionHelper source and transpile
-# that helper into both bundles, retaining their surrounding code. Add the
-# IUnicodeService constructor injection (index 6) and UnicodeService import;
-# bundled module identifiers vary between versions. Check both bundle tests.
+# 1. The npm package.json carries the source commit ("commit": "<sha>").
+git clone https://github.com/xtermjs/xterm.js && cd xterm.js
+git checkout <sha> && npm ci
+# Stamp the version so the bundle matches npm byte for byte, then confirm it:
+#   src/common/Version.ts -> export const XTERM_VERSION = '<new-version>';
+npm run package          # lib/xterm.js (webpack), lib/xterm.mjs and addon .mjs (esbuild)
+(cd addons/addon-webgl && npx webpack)   # lib/addon-webgl.js
+# Compare lib/*.js and lib/*.mjs with the published package: they must be
+# identical before any change is applied.
+
+# 2. Apply the src/ hunks from the current patch files, rebuild, run upstream tests:
+npm run package && (cd addons/addon-webgl && npx webpack)
+npx mocha out/common/Event.test.js out/common/input/WriteBuffer.test.js out/browser/input/CompositionHelper.test.js
+
+# 3. Copy the rebuilt lib bundles and the changed src/ files into the bun patch:
+bun patch @xterm/xterm@<new-version>          # and/or @xterm/addon-webgl@<new-version>
+cp lib/xterm.js lib/xterm.mjs <superset>/node_modules/@xterm/xterm/lib/
+cp <changed src files> <superset>/node_modules/@xterm/xterm/src/...
 bun patch --commit 'node_modules/@xterm/xterm'
-bun test apps/desktop/src/xterm-flushsync-patch.test.ts apps/desktop/src/xterm-render-debouncer-patch.test.ts apps/desktop/src/xterm-ime-patch.test.ts
+bun test apps/desktop/src/xterm-flushsync-patch.test.ts apps/desktop/src/xterm-render-debouncer-patch.test.ts apps/desktop/src/xterm-ime-patch.test.ts apps/desktop/src/webgl-atlas-patch.test.ts
 ```
+
+`@xterm/*` is in `minimumReleaseAgeExcludes` in `bunfig.toml`, so a beta can be
+taken the day it ships; this rebuild is the review. Every `@xterm/*` version
+moves together (sherif), and `apps/mobile` needs
+`bun run scripts/generate-terminal-html.ts`.
+
+## @xterm/addon-ligatures (`@xterm%2Faddon-ligatures@<version>.patch`)
+
+**Why:** the package's ESM build (`lib/addon-ligatures.mjs`) imports
+`node:diagnostics_channel`. Vite externalizes it for the browser, so the
+renderer throws at module load and never mounts (a white screen). The CommonJS
+build has no such import.
+
+**What it changes:** `package.json` only: `module` points at
+`lib/addon-ligatures.js`, and an `exports` map sends `import` and `default`
+there too.
+
+**Regenerating:** `bun patch @xterm/addon-ligatures@<new-version>`, make the
+same two `package.json` edits, `bun patch --commit`, clear
+`apps/desktop/node_modules/.vite`, and boot the renderer: unit tests never load
+this addon, so only a running app shows the failure.
 
 ## trpc-electron (`trpc-electron@<version>.patch`)
 

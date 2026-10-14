@@ -1,0 +1,98 @@
+---
+title: "Best IDE for Antigravity CLI (agy) in 2026"
+description: "The best places to run Google's Antigravity CLI (agy) in 2026, from the terminal and the Antigravity 2.0 desktop app to the Antigravity IDE, editor extensions, Remote Control, and Superset for parallel worktree sessions."
+date: 2026-10-13
+type: "roundup"
+competitors:
+  - antigravity
+  - gemini-cli
+  - claude-code
+keywords:
+  - best ide for antigravity cli
+  - where to run agy
+  - antigravity cli worktree
+  - agy parallel agents
+  - gemini cli replacement
+  - antigravity cli ide
+---
+
+Antigravity CLI, `agy`, "brings the reasoning, execution, and orchestration capabilities of Antigravity agent harness directly into your terminal." On May 19, 2026 it replaced Gemini CLI for free, Google AI Pro, and Ultra users. Gemini CLI is still released for paid API keys and Code Assist licenses, and Google says there is no 1:1 feature parity between the two. `agy` runs Gemini 3.5 Flash, 3.1 Pro, and 3 Flash, plus Claude Sonnet and Opus 4.6 and gpt-oss-120b. So the best "IDE for agy" depends on where you want to work and whether you want several tasks, or several agents, at once.
+
+Facts were checked against Google's own Antigravity docs on October 13, 2026.
+
+---
+
+## The Short Version
+
+| Where you run `agy` | Best for | Parallel tasks on one repo? | Main tradeoff |
+|---|---|---|---|
+| **Superset** | Many `agy` tasks at once, next to other agents | Git worktrees for local branch-based workspaces | Not a single-file editor experience |
+| **`agy` in the terminal** | One focused task | Async subagents, some in their own worktree | You manage separate tasks yourself |
+| **Antigravity 2.0 desktop app** | Continuing a CLI conversation in Google's app | Each agent in Local mode or its own worktree | Antigravity's agent only |
+| **Antigravity IDE and extensions** | Editing alongside Antigravity | Limited | Editor-centered |
+| **Remote Control** | Driving sessions from a web browser | Sessions on other machines | Web only, no native app |
+
+## The Options
+
+### `agy` in the terminal
+
+`agy` runs on macOS, Linux, and Windows. Subagents run async, and a subagent can use an isolated Git worktree in branch mode. `/tasks` runs background shell jobs, and `/teamwork-preview` adds agent teams on paid plans. Headless `agy -p` outputs JSON or stream-JSON for scripts. It supports MCP (remote servers need `serverUrl`), hooks, plugins, skills, and a Python SDK. It is free for individuals with weekly rate limits; Google AI Pro ($20 per month) and Ultra ($100 or $200 per month) raise them, and a Gemini API key also works. For one task at a time, start here.
+
+### Antigravity 2.0 desktop app
+
+You can export an `agy` conversation to the Antigravity 2.0 desktop app and keep going there. The app runs each new agent in Local mode or in its own Git worktree, with background tasks, custom agents, a browser subagent, and cron-style Automations. Review happens through artifacts and comments on diffs, and the app can stage and commit.
+
+For the direct comparison, see [Superset vs Antigravity](/compare/superset-vs-antigravity).
+
+### Antigravity IDE and extensions
+
+Google still offers the original Antigravity IDE, and extensions cover VS Code, Visual Studio, JetBrains, Zed, and Xcode. These suit editing alongside the agent, with the usual single-working-copy limit when you want several tasks at once.
+
+### Remote Control
+
+Remote Control lets you drive Antigravity sessions on laptops, servers, or cloud machines from any web browser, with push notifications.
+
+### Superset
+
+Superset runs Antigravity CLI (`agy`) as a built-in agent, and Gemini CLI too. Each new local branch-based workspace gets its own Git worktree and terminal, so several `agy` tasks can run on the same repository at once, locally or on your own remote hosts. You can also run Claude Code, Codex, or any other CLI agent in the next workspace and compare the results. Around it you get a Changes pane that commits, pushes, and opens PRs, a Pull Requests view with CI checks, an in-app browser, and an [iPhone and iPad app](/mobile). Superset never proxies model calls. Worktrees separate working files but do not sandbox processes or prevent merge conflicts; see [workspace types](https://docs.superset.sh/workspaces).
+
+## How To Choose
+
+- For one task, use `agy` in the terminal.
+- To keep going in Google's own app, export the conversation to the Antigravity 2.0 desktop app.
+- To edit alongside the agent, use the Antigravity IDE or an editor extension.
+- To drive sessions from a browser, use Remote Control.
+- For many `agy` tasks next to other agents, with PRs and review in one place, use Superset.
+
+## Verdict
+
+Google's own surfaces are the best place for Antigravity alone. The desktop app gives each agent a worktree, Remote Control reaches other machines from a browser, and the free tier is generous for individuals. Once you want `agy` next to Claude Code or Codex on the same repository, with pull requests and CI checks in one place, run it in a workspace like Superset.
+
+For head-to-heads, see [Claude Code vs Antigravity CLI](/compare/claude-code-vs-antigravity-cli) and [Codex vs Antigravity CLI](/compare/codex-vs-antigravity-cli). If you still use Gemini CLI, see [Best IDE for Gemini CLI](/compare/best-ide-for-gemini-cli). For the full field, see [Best AI Coding Agents in 2026](/compare/best-coding-agents).
+
+## How To Run Antigravity CLI in Superset
+
+1. Open your repository in Superset and create a workspace. Each new local branch-based workspace gets its own Git worktree.
+2. Pick Antigravity CLI (`agy`) from the agent presets. It signs in with your own Google account or Gemini API key.
+3. To compare agents, create a second workspace with Claude Code or Codex and give it the same prompt.
+4. Compare the diffs in the Changes pane, then open a PR from the better one.
+
+Superset never proxies model calls. Each agent uses your own subscription or key, and the Usage page shows Antigravity's token use and quota.
+
+## Frequently Asked Questions
+
+### What is the best IDE for Antigravity CLI?
+
+For one task, the terminal. To continue in Google's app, the Antigravity 2.0 desktop app. For several `agy` tasks next to other agents on one repository, a worktree workspace like Superset.
+
+### Did Antigravity CLI replace Gemini CLI?
+
+Yes, for free, Google AI Pro, and Ultra users, on May 19, 2026. Gemini CLI is still released for paid API keys and Code Assist licenses. Google says the two do not have 1:1 feature parity.
+
+### Does `agy` support Git worktrees?
+
+A subagent can use an isolated worktree in branch mode. To run separate tasks on one repository, give each its own worktree; Superset does this for every new local branch-based workspace.
+
+### Is Antigravity CLI free?
+
+It is free for individuals with weekly rate limits. Google AI Pro ($20 per month) and Ultra ($100 or $200 per month) raise them. Non-Gemini models have a separate fixed rate limit.

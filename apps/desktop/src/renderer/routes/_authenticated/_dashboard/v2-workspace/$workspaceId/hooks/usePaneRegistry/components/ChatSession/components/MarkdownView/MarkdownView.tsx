@@ -36,6 +36,7 @@ export function MarkdownView({
 	className,
 	fading = false,
 	final = false,
+	findItemId,
 	pageCards = false,
 	pagesShownEarlier = "",
 	text,
@@ -43,6 +44,8 @@ export function MarkdownView({
 	text: string;
 	className?: string;
 	fading?: boolean;
+	/** The item whose text this is, for the find bar to highlight within. */
+	findItemId?: string;
 	/** A page link also shows as a card, under the first settled block that has it. */
 	pageCards?: boolean;
 	/** The text has stopped growing, so its last block is settled too. */
@@ -112,6 +115,7 @@ export function MarkdownView({
 				fading && "[&>*]:animate-block-fade motion-reduce:[&>*]:animate-none",
 				className,
 			)}
+			data-find-item={findItemId}
 		>
 			{blocks}
 		</div>

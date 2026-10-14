@@ -178,6 +178,15 @@ export function DashboardSidebarHeader({
 	const { myFailedCount } = useFailedAutomations();
 
 	const {
+		tab: lastTab,
+		assignee: lastAssignee,
+		label: lastLabel,
+		search: lastSearch,
+		typeTab: lastTypeTab,
+		projectFilters: lastProjectFilters,
+		includeClosedIssues: lastIncludeClosedIssues,
+	} = useTasksFilterStore();
+	const {
 		search: lastPullRequestsSearch,
 		projectFilters: lastPullRequestsProjectFilters,
 		authorFilter: lastPullRequestsAuthorFilter,
@@ -210,6 +219,31 @@ export function DashboardSidebarHeader({
 	};
 
 	const isPagesEnabled = usePagesEnabled() ?? false;
+
+	const handleFailedAutomationsClick = () => {
+		navigate({
+			to: "/automations/runs",
+			search: { status: "failed", scope: "mine" },
+		});
+	};
+
+	const handleTasksClick = () => {
+		gateFeature(GATED_FEATURES.TASKS, () => {
+			navigate({
+				to: "/tasks",
+				search: tasksSearchFromFilters({
+					tab: lastTab,
+					assignee: lastAssignee,
+					label: lastLabel,
+					search: lastSearch,
+					typeTab: lastTypeTab,
+					projectFilters: lastProjectFilters,
+					includeClosedIssues: lastIncludeClosedIssues,
+				}),
+			});
+		});
+	};
+
 	const { data: isUsageInSidebarEnabled } =
 		electronTrpc.settings.getShowUsageInSidebar.useQuery();
 

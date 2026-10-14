@@ -1790,6 +1790,7 @@ Linear, Superset tasks are not listed or resolved, and the reverse. Pass
 		{ flag: "--assignee-me, -m", description: "Tasks assigned to the current user." },
 		{ flag: "--creator-me", description: "Tasks created by the current user." },
 		{ flag: "--search <query>, -s", description: "Substring search on title or description." },
+		{ flag: "--labels <a,b>", description: "Comma-separated labels. A task must have all of them. A label also matches its sub-labels: `acme` matches `acme/web`. Superset only." },
 		{ flag: "--due-from <date>", description: "Tasks due on or after this date (YYYY-MM-DD)." },
 		{ flag: "--due-to <date>", description: "Tasks due on or before this date (YYYY-MM-DD)." },
 		{ flag: "--sort-by <field>", description: "createdAt | updatedAt | dueDate | priority. Default: createdAt." },

@@ -43,6 +43,7 @@ import {
 	hostServiceUrl,
 } from "@/lib/host-service/client";
 import { posthog } from "@/lib/posthog";
+import { apiClient } from "@/lib/trpc/client";
 import { useVoiceActive } from "@/lib/voice/voiceStore";
 import {
 	getHostTerminalsQueryKey,
@@ -150,6 +151,7 @@ export function WorkspaceScreen() {
 		cloud,
 		sandboxUnreachable,
 		sandboxWaking,
+		sandboxRefusal,
 		retrySandbox,
 		isResolving,
 	} = useWorkspaceHost(id ?? null);
@@ -477,12 +479,9 @@ export function WorkspaceScreen() {
 	const activeRow = rows.find((row) => row.terminalId === activeTerminalId);
 	const activeIsChat = activeRow?.kind === "chat";
 	const acpChat = Boolean(useFeatureFlag(FEATURE_FLAGS.ACP_CHAT));
-	const {
-		running: chatRunning,
-		stop: stopChat,
-		backgroundTasks: chatTasks,
-	} = useActiveChat(activeIsChat ? activeTerminalId : null);
-	const chatTaskCount = chatTasks.length;
+	const { running: chatRunning, stop: stopChat } = useActiveChat(
+		activeIsChat ? activeTerminalId : null,
+	);
 	const slashCommands = useSlashCommands({
 		machineId: host?.machineId ?? null,
 		hostUrl,
@@ -761,6 +760,13 @@ export function WorkspaceScreen() {
 			}
 			if (activeIsChat) {
 				if (!chatRef.current) throw new Error("Chat is not connected");
+				// A cloud box resolves only the files attached to it.
+				if (cloud && attachmentFileIds.length > 0) {
+					await apiClient.cloudWorkspace.attachFiles.mutate({
+						id,
+						fileIds: attachmentFileIds,
+					});
+				}
 				const imported =
 					attachmentFileIds.length > 0
 						? await getHostServiceClientByUrl(
@@ -786,7 +792,7 @@ export function WorkspaceScreen() {
 				text,
 			});
 		},
-		[hostUrl, activeTerminalId, id, activeIsChat],
+		[hostUrl, activeTerminalId, id, activeIsChat, cloud],
 	);
 
 	const handleQuickKey = useCallback(
@@ -977,17 +983,6 @@ export function WorkspaceScreen() {
 			{workspace ? <TitlePress onPress={openActions} /> : null}
 			{workspace ? (
 				<Stack.Toolbar placement="right">
-					{acpChat && activeIsChat && chatTaskCount > 0 ? (
-						<Stack.Toolbar.Button
-							accessibilityLabel={t({ message: "Running in the background" })}
-							icon="cpu"
-							onPress={() =>
-								router.push(
-									`/(authenticated)/workspace/${id}/background-tasks?session=${activeTerminalId}`,
-								)
-							}
-						/>
-					) : null}
 					{acpChat ? (
 						<Stack.Toolbar.Button
 							accessibilityLabel={t({ message: "Manage sessions" })}
@@ -1104,6 +1099,27 @@ export function WorkspaceScreen() {
 						refreshing={refreshing}
 						title={t({
 							message: "This host needs an update",
+						})}
+					/>
+				) : cloud && sandboxRefusal ? (
+					<WorkspacePlaceholder
+						action={
+							<Pressable
+								accessibilityRole="button"
+								className="bg-secondary h-[38px] flex-row items-center justify-center gap-1.5 rounded-md px-5 active:opacity-80"
+								onPress={retrySandbox}
+							>
+								<Text className="font-medium text-[15px]">
+									<Trans>Try again</Trans>
+								</Text>
+							</Pressable>
+						}
+						body={sandboxRefusal}
+						icon={CloudOff}
+						onRefresh={onRefresh}
+						refreshing={refreshing}
+						title={t({
+							message: "This cloud workspace can't start",
 						})}
 					/>
 				) : activeIsChat && activeTerminalId && host && hostUrl && id ? (

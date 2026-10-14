@@ -1,0 +1,112 @@
+---
+title: "Coding Agent Mobile Apps in 2026: Run Claude Code, Codex, and More From Your Phone"
+description: "Every way to run and check on coding agents from your phone in 2026: Superset, Codex in ChatGPT, Cursor, Claude Code Remote Control, GitHub Copilot, Amp, Orca, Paseo, and T3 Code compared."
+date: 2026-10-13
+type: "roundup"
+competitors:
+  - codex-app
+  - cursor
+  - claude-code
+  - github-copilot
+  - amp
+  - orca
+  - paseo
+  - t3-code
+keywords:
+  - coding agent mobile app
+  - claude code on phone
+  - codex mobile
+  - run coding agents from phone
+  - ai coding agent ios app
+  - control coding agents remotely
+---
+
+In October 2026, checking on a coding agent from your phone stopped being a niche feature. OpenAI and Cursor both shipped ways to drive agents running on your computer from their iOS apps, and most agent workspaces now have a mobile app. They differ in one important way: whether your phone talks to **agents on your own machine** or to **agents in the vendor's cloud**, and whether it works with **one vendor's agent** or **any agent**.
+
+Facts were checked against each vendor's own docs and changelog on October 13, 2026.
+
+---
+
+## The Short Version
+
+| App | Agents | Where agents run | Phones |
+|---|---|---|---|
+| **Superset** | Any CLI agent | Your machines (any host you add) | iPhone and iPad |
+| **Codex in ChatGPT** | Codex | Your Mac or Windows computer, or OpenAI's cloud | iOS; Android can control a host |
+| **Cursor** | Cursor's agent | Your computer (remote control) or Cursor's cloud | iPhone and iPad |
+| **Claude Code** | Claude Code | Your computer (Remote Control) or Anthropic's cloud sessions | Claude apps |
+| **GitHub Copilot** | Copilot | Copilot's cloud agent; steer CLI sessions | GitHub Mobile |
+| **Amp** | Amp | Amp's cloud machines (orbs) or your runners | iOS |
+| **Orca, Paseo, T3 Code** | Several agents | Your machines | iOS and Android |
+
+## The Options
+
+### Superset
+
+Superset's [iPhone and iPad app](/mobile) connects to any machine you add as a host through Remote Access, and shows the terminals and diffs of every agent running there: Claude Code, Codex, Cursor's agent, OpenCode, Antigravity CLI, and any other CLI agent. You can answer prompts, send follow-ups, and review diffs. It needs iOS 26 or iPadOS 26 or later, a Pro plan, and a host that stays awake and online. Because agents run on your own machines, they use your own subscriptions and your real environment.
+
+**Best for:** running several different agents on your own machines and checking on all of them from one app.
+
+### Codex in the ChatGPT app
+
+Since OpenAI's DevDay on September 29, 2026, the ChatGPT iOS app can pair with a Mac or Windows computer running the ChatGPT desktop app. From your phone you can start Codex tasks there or in the cloud, steer them, approve actions, and review diffs and test results. Android phones can also control a host. The computer must stay awake.
+
+**Best for:** Codex users who want their phone to drive Codex on their computer.
+
+### Cursor
+
+Since October 6, 2026, Cursor's iOS app can pair with your desktop to see and reply to the agents running on your computer, which must stay on. For Cursor's cloud agents, the app has an inbox and full PR review on iPhone and iPad.
+
+**Best for:** Cursor users, for both local and cloud agents.
+
+### Claude Code
+
+Claude Code has Remote Control for sessions on your computer, and cloud sessions that run in Anthropic's environment. See Anthropic's [Claude Code docs](https://code.claude.com/docs/en/agents).
+
+**Best for:** Claude Code users who want Anthropic's own tools end to end.
+
+### GitHub Copilot
+
+You can steer Copilot CLI sessions from GitHub.com or GitHub Mobile, and hand work to Copilot's cloud agent with `/delegate`.
+
+**Best for:** teams that work in GitHub.
+
+### Amp
+
+Amp's threads follow you across its terminal UI, web, and iOS and macOS apps, and its "orbs" are cloud machines that keep working after you close your laptop.
+
+**Best for:** Amp users who want managed cloud machines.
+
+### Orca, Paseo, and T3 Code
+
+These agent workspaces all have iOS and Android apps that connect to agents on your own machines. Orca is a free, MIT-licensed environment; Paseo is a self-hosted, Apache-2.0 daemon; T3 Code is an MIT-licensed control surface with a web app as well.
+
+See [Superset vs Orca](/compare/superset-vs-orca), [Superset vs Paseo](/compare/superset-vs-paseo), and [Superset vs T3 Code](/compare/superset-vs-t3-code).
+
+## How To Choose
+
+- **One vendor's agent:** use that vendor's app. Codex users have the ChatGPT app, Cursor users have Cursor's, and so on.
+- **Several agents on your own machines:** use a workspace with a mobile app, such as Superset, so one app covers Claude Code, Codex, and the rest.
+- **Android:** Orca, Paseo, and T3 Code have Android apps, and Android phones can control a Codex host. Superset's Android app is on the [waitlist](/mobile#android).
+
+## Keep Your Agents Reachable
+
+Every option that runs agents on your own machine needs that machine to stay awake and online. For an always-on setup, run agents on a dedicated machine, such as a Mac mini or a Linux server. In Superset, run the host service from the standalone CLI so it stays reachable while the desktop app is closed; see [Keep Agents Running](https://docs.superset.sh/keep-agents-running).
+
+## Frequently Asked Questions
+
+### Can I run Claude Code from my phone?
+
+Yes. Claude Code has Remote Control for sessions on your computer. Superset's iPhone and iPad app also shows Claude Code sessions running on any host you add, next to your other agents.
+
+### Can I control Codex on my computer from my phone?
+
+Yes. Since September 29, 2026, the ChatGPT iOS app can pair with a Mac or Windows computer running the ChatGPT desktop app and start, steer, and review Codex tasks there.
+
+### Is there one app for all my coding agents?
+
+Workspaces that run any agent, such as Superset, give you one mobile app for all of them. Vendor apps cover only their own agent.
+
+### Does the agent run on my phone?
+
+No. In every option here, the agent runs on a computer or in the cloud, and your phone is a remote control and review screen.

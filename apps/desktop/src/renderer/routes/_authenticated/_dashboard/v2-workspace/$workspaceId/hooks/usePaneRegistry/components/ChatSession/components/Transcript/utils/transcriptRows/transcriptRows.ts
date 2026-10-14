@@ -150,3 +150,10 @@ export function transcriptRows(
 	}
 	return rows;
 }
+
+/** The id a row registers with the scroller, so a jump can land on it. */
+export function rowMessageId(row: TranscriptRow): string {
+	if (row.kind === "item") return row.item.id;
+	if (row.kind === "tool_run") return row.items[0]?.id ?? row.key;
+	return row.key;
+}

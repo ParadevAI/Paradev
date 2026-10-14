@@ -34,6 +34,9 @@ msgstr "./"
 msgid ".sh"
 msgstr ".sh"
 
+msgid ".superset/config.json is not valid JSON. Fix it, then import again."
+msgstr ".superset/config.json 不是有效的 JSON。请修复后重新导入。"
+
 msgid "· updated {updatedAgo}"
 msgstr "· 更新于{updatedAgo}"
 
@@ -398,6 +401,10 @@ msgstr "{0}已启用"
 #. placeholder {1}: paymentMethod.last4
 msgid "{0} ending in {1}"
 msgstr "{0}，尾号{1}"
+
+#. placeholder {0}: collisions.length
+msgid "{0} files already exist in {where}. Do you want to replace them?"
+msgstr "{where}中已存在{0}个文件。是否要替换它们？"
 
 #. placeholder {0}: displayName(variables.name)
 msgid "{0} installed"
@@ -799,6 +806,9 @@ msgstr "{count} 台主机运行的主机服务比此应用旧"
 msgid "{count}/day"
 msgstr "{count}/天"
 
+msgid "{current} of {total}"
+msgstr "第 {current} 项，共 {total} 项"
+
 msgid "{currentPage} of {totalBranches}"
 msgstr "{currentPage}/{totalBranches}"
 
@@ -1190,6 +1200,9 @@ msgstr "更早的+{hiddenCount}条"
 msgid "+{remainingCount} more"
 msgstr "+{remainingCount}个"
 
+msgid "<0>.superset/config.json</0> is not valid JSON. Fix it before you import, so Superset does not overwrite it."
+msgstr "<0>.superset/config.json</0> 不是有效的 JSON。请在导入前修复，以免 Superset 覆盖它。"
+
 #. placeholder {0}: paths[0]?.split("/").pop()
 msgid "<0>{0}</0> is not a git repository. Would you like to initialize one?"
 msgstr "<0>{0}</0>不是git仓库。要初始化一个吗？"
@@ -1203,6 +1216,9 @@ msgstr "<0>{displayName}</0>请求访问你的Superset账户"
 
 msgid "<0>{primaryFont}</0> is not installed on this system. Falling back to the next available font."
 msgstr "此系统未安装<0>{primaryFont}</0>。将回退到下一个可用字体。"
+
+msgid "<0>{unsafePathList}</0> is a symlink or leads outside this project. Superset does not write through it; replace it with a regular file or folder, then import."
+msgstr "<0>{unsafePathList}</0> 是符号链接或指向此项目之外。Superset 不会通过它写入；请将其替换为普通文件或文件夹，然后再导入。"
 
 #. placeholder {0}: formatNumber(rank)
 #. placeholder {1}: formatNumber(total)
@@ -1420,6 +1436,9 @@ msgstr "从安装到第一次运行智能体的更快路径，并有引导式的
 msgid "A faster, clearer diff experience for reviewing what your agents changed."
 msgstr "更快、更清晰的差异体验，便于审查智能体改了什么。"
 
+msgid "A file named '{firstName}' already exists in {where}. Do you want to replace it?"
+msgstr "{where}中已存在名为「{firstName}」的文件。是否要替换它？"
+
 msgid "A focused burn-down of crashes, hangs, and reconnect failures across the app."
 msgstr "集中清理全应用的崩溃、卡死和重连失败。"
 
@@ -1501,6 +1520,9 @@ msgstr "Aa"
 
 msgid "About"
 msgstr "关于"
+
+msgid "About {displayName}"
+msgstr "关于 {displayName}"
 
 msgid "About Superset"
 msgstr "关于Superset"
@@ -1788,6 +1810,12 @@ msgstr "向此设备添加你自己的终端智能体。"
 msgid "Added"
 msgstr "已添加"
 
+msgid "Added {added} files to {where}"
+msgstr "已向{where}添加{added}个文件"
+
+msgid "Added 1 file to {where}"
+msgstr "已向{where}添加1个文件"
+
 msgid "Added only when launching with a prompt — e.g. <0>--</0>, <1>--prompt</1>, <2>-i</2>."
 msgstr "仅在带提示词启动时添加，例如<0>--</0>、<1>--prompt</1>、<2>-i</2>。"
 
@@ -2035,6 +2063,9 @@ msgstr "全部在当前标签页"
 
 msgid "All in current tab (split panes)"
 msgstr "全部在当前标签页（分屏窗格）"
+
+msgid "All labels"
+msgstr "所有标签"
 
 msgid "All models"
 msgstr "所有模型"
@@ -2463,6 +2494,12 @@ msgstr "已归档 · {0}"
 msgid "Archived {0}"
 msgstr "已归档 {0}"
 
+msgid "Are you sure you want to delete this file? This action cannot be undone."
+msgstr "确定要删除此文件吗？此操作无法撤销。"
+
+msgid "Are you sure you want to delete this folder? This action cannot be undone."
+msgstr "确定要删除此文件夹吗？此操作无法撤销。"
+
 msgid "Are you sure you want to leave this organization? You will lose access immediately.{billingNote}"
 msgstr "确定要退出此组织吗？你将立即失去访问权限。{billingNote}"
 
@@ -2766,9 +2803,6 @@ msgstr "工单到PR的自主流水线"
 msgid "Available"
 msgstr "可用"
 
-msgid "Available when v2 is enabled."
-msgstr "启用v2后可用。"
-
 msgid "Avatar"
 msgstr "头像"
 
@@ -2929,6 +2963,9 @@ msgstr "账单"
 
 msgid "Billing details"
 msgstr "账单信息"
+
+msgid "Billing refused to start a cloud workspace: the organization needs a paid plan, or it reached its cloud usage limit. Upgrade or raise the limit in Settings > Billing, or run the automation on a device."
+msgstr "账单原因导致无法启动云端工作区：组织需要付费方案，或已达到云端用量上限。请在“设置 > 账单”中升级或提高上限，或在设备上运行该自动化。"
 
 msgid "Binary"
 msgstr "二进制"
@@ -3467,9 +3504,6 @@ msgstr "未找到聊天会话"
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "聊天界面：消息、推理、建议"
 
-msgid "Chat v3"
-msgstr "聊天v3"
-
 msgid "Check again"
 msgstr "重新检查"
 
@@ -3761,6 +3795,12 @@ msgstr "如果没有自动跳转，请点击这里"
 msgid "Click the “↑ update” pill to see the pre-update confirm"
 msgstr "点击“↑ update”按钮查看更新前的确认提示"
 
+msgid "Click the chip to open the issue"
+msgstr "点击打开议题"
+
+msgid "Click the chip to open the pull request"
+msgstr "点击打开拉取请求"
+
 msgid "Click to copy the session ID (resume with `claude --resume <id>`)."
 msgstr "点击复制会话ID（使用`claude --resume <id>`恢复）。"
 
@@ -3800,6 +3840,9 @@ msgstr "正在克隆…"
 
 msgid "Close"
 msgstr "关闭"
+
+msgid "Close (Esc)"
+msgstr "关闭（Esc）"
 
 #. placeholder {0}: row.title
 msgid "Close {0}"
@@ -3934,6 +3977,10 @@ msgstr "关闭工作区"
 msgid "Closed"
 msgstr "已关闭"
 
+msgctxt "pull request or issue state"
+msgid "Closed"
+msgstr "已关闭"
+
 msgid "Closing these ports will end the processes using them."
 msgstr "关闭这些端口会结束正在使用它们的进程。"
 
@@ -3965,6 +4012,9 @@ msgstr "云端工作区"
 msgid "Cloud workspaces ignore this variable. Agents sign in under Settings › Agents instead."
 msgstr "云工作区会忽略此变量。智能体改为在「设置 › 智能体」中登录。"
 
+msgid "Cloud workspaces need a paid plan. Upgrade in Settings, Billing to start one."
+msgstr "云端工作区需要付费方案。请在“设置”中的“账单”升级后启动。"
+
 msgid "Cloud workspaces will stop running {agentLabel} with it."
 msgstr "云工作区将不再用它运行{agentLabel}。"
 
@@ -3991,6 +4041,9 @@ msgid "Collapse agents"
 msgstr "折叠智能体"
 
 msgid "Collapse all"
+msgstr "全部折叠"
+
+msgid "Collapse All"
 msgstr "全部折叠"
 
 msgid "Collapse all files"
@@ -4896,6 +4949,9 @@ msgstr "无法读取 Jira 偏好设置。"
 msgid "Could not read selected file"
 msgstr "无法读取所选文件"
 
+msgid "Could not read the dropped files"
+msgstr "无法读取拖入的文件"
+
 msgid "Could not read the Google account. Please try again."
 msgstr "无法读取该Google账户。请重试。"
 
@@ -4976,9 +5032,6 @@ msgstr "无法停止"
 
 msgid "Could not stop the agent"
 msgstr "无法停止智能体"
-
-msgid "Could not stop the task"
-msgstr "无法停止任务"
 
 msgid "Could not stop watching"
 msgstr "无法停止关注"
@@ -5425,6 +5478,12 @@ msgstr "由{creatorLabel}创建于{createdAtLabel}"
 msgid "Created {createdDate}"
 msgstr "创建于{createdDate}"
 
+msgid "Created {createdDirs} folders in {where}"
+msgstr "已在{where}创建{createdDirs}个文件夹"
+
+msgid "Created 1 folder in {where}"
+msgstr "已在{where}创建1个文件夹"
+
 msgid "Created by"
 msgstr "创建者"
 
@@ -5720,6 +5779,9 @@ msgstr "删除“{title}”？"
 msgid "Delete {0}?"
 msgstr "删除{0}？"
 
+msgid "Delete {name}?"
+msgstr "删除{name}？"
+
 msgid "Delete account"
 msgstr "删除账户"
 
@@ -5849,6 +5911,9 @@ msgstr "已删除“{projectName}”。你可以在 30 天内从“设置 → �
 msgid "Deleted {deletedWhen} · {deviceNames}"
 msgstr "{deletedWhen}删除 · {deviceNames}"
 
+msgid "Deleted {name}"
+msgstr "已删除{name}"
+
 msgid "Deleted by {deletedBy} {deletedWhen} · {deviceNames}"
 msgstr "{deletedBy} {deletedWhen}删除 · {deviceNames}"
 
@@ -5863,6 +5928,9 @@ msgstr "已删除的用户"
 
 msgid "Deleted workspaces, but couldn’t finish updating the sidebar"
 msgstr "工作区已删除，但侧边栏没能更新完"
+
+msgid "Deletes <0>{currentScriptFile}</0>, which an earlier import created"
+msgstr "删除之前导入时创建的 <0>{currentScriptFile}</0>"
 
 #. placeholder {0}: account?.sourceLabel
 msgid "Deletes the {0} profile and its saved sign-in on this machine. The account itself is unaffected."
@@ -5883,6 +5951,9 @@ msgstr "删除中"
 #. placeholder {1}: targets.length
 msgid "Deleting {0} of {1}…"
 msgstr "正在删除第{0}个，共{1}个…"
+
+msgid "Deleting {name}..."
+msgstr "正在删除{name}..."
 
 msgid "Deleting automation..."
 msgstr "正在删除自动化..."
@@ -5979,6 +6050,9 @@ msgstr "已分离"
 
 msgid "Details"
 msgstr "详情"
+
+msgid "Details are not available here, but the link still opens."
+msgstr "此处无法显示详情，但链接仍可打开。"
 
 msgid "Dev"
 msgstr "开发"
@@ -6308,6 +6382,10 @@ msgstr "下载"
 msgid "Draft"
 msgstr "草稿"
 
+msgctxt "pull request state"
+msgid "Draft"
+msgstr "草稿"
+
 msgid "Draft · file"
 msgstr "草稿 · 文件"
 
@@ -6347,6 +6425,9 @@ msgstr "从脚本、CI或你自己的工具以编程方式驱动工作区、智�
 
 msgid "Drop files to attach"
 msgstr "拖放文件以添加附件"
+
+msgid "Drop into {label}"
+msgstr "拖放到{label}"
 
 msgid "Drop to attach"
 msgstr "拖放以添加附件"
@@ -6870,6 +6951,9 @@ msgstr "外部编辑器"
 msgid "extra ${used} of ${limit}"
 msgstr "额外用量${used}/${limit}"
 
+msgid "Extra command; add it as a terminal script if you need it"
+msgstr "额外的命令；如有需要，请将其添加为终端脚本"
+
 msgid "Extra high"
 msgstr "极高"
 
@@ -6909,6 +6993,12 @@ msgstr "失败运行 <0>· 7天</0>"
 
 msgid "Failed to accept invitation"
 msgstr "接受邀请失败"
+
+msgid "Failed to add {failed} files"
+msgstr "添加{failed}个文件失败"
+
+msgid "Failed to add 1 file"
+msgstr "添加1个文件失败"
 
 msgid "Failed to add agent"
 msgstr "添加智能体失败"
@@ -6978,8 +7068,17 @@ msgstr "复制到剪贴板失败"
 msgid "Failed to copy workspace ID: {0}"
 msgstr "复制工作区ID失败：{0}"
 
+msgid "Failed to create {failedDirs} folders"
+msgstr "创建{failedDirs}个文件夹失败"
+
+msgid "Failed to create 1 folder"
+msgstr "创建1个文件夹失败"
+
 msgid "Failed to create automation"
 msgstr "创建自动化失败"
+
+msgid "Failed to create item"
+msgstr "创建项失败"
 
 msgid "Failed to create Linear issue"
 msgstr "无法创建Linear议题"
@@ -7015,6 +7114,9 @@ msgstr "从PR创建工作区失败"
 msgid "Failed to delete"
 msgstr "删除失败"
 
+msgid "Failed to delete {name}"
+msgstr "删除{name}失败"
+
 #. placeholder {0}: "message" in e ? e.message : String(e.kind)
 msgid "Failed to delete {workspaceName}: {0}"
 msgstr "删除{workspaceName}失败：{0}"
@@ -7036,6 +7138,9 @@ msgstr "删除任务失败"
 
 msgid "Failed to delete team"
 msgstr "删除团队失败"
+
+msgid "Failed to discard the new item"
+msgstr "放弃新建项失败"
 
 msgid "Failed to enable relay access"
 msgstr "启用中继访问失败"
@@ -7168,6 +7273,9 @@ msgstr "移除PR链接失败：{0}"
 msgid "Failed to remove terminal"
 msgstr "移除终端失败"
 
+msgid "Failed to rename"
+msgstr "重命名失败"
+
 msgid "Failed to rename branch"
 msgstr "重命名分支失败"
 
@@ -7182,6 +7290,12 @@ msgstr "重命名工作区失败"
 
 msgid "Failed to reorder"
 msgstr "重新排序失败"
+
+msgid "Failed to replace {replaceFailed} files"
+msgstr "替换{replaceFailed}个文件失败"
+
+msgid "Failed to replace 1 file"
+msgstr "替换1个文件失败"
 
 msgid "Failed to reset"
 msgstr "重置失败"
@@ -7764,6 +7878,9 @@ msgstr "表单控件与字段组合"
 msgid "Forward"
 msgstr "前进"
 
+msgid "Found {label} setup"
+msgstr "发现 {label} 初始化配置"
+
 msgid "Found 12 tooltip call sites"
 msgstr "找到12处tooltip调用"
 
@@ -8152,6 +8269,9 @@ msgstr "加入后才会显示"
 msgid "Hide"
 msgstr "隐藏"
 
+msgid "Hide {displayName}"
+msgstr "隐藏 {displayName}"
+
 msgid "Hide checks"
 msgstr "隐藏检查"
 
@@ -8522,17 +8642,29 @@ msgstr "导入失败"
 msgid "Import failed: {message}"
 msgstr "导入失败：{message}"
 
+msgid "Import from {label}"
+msgstr "从 {label} 导入"
+
+msgid "Import from another tool"
+msgstr "从其他工具导入"
+
 msgid "Import from file"
 msgstr "从文件导入"
 
 msgid "Import from v1"
 msgstr "从v1导入"
 
+msgid "Import its scripts to automate workspace setup for {projectName}"
+msgstr "导入其脚本，为{projectName}自动化工作区初始化"
+
 msgid "Import puts a worktree on a new branch at its current commit, so it can come over. Your files do not change."
 msgstr "导入会在当前提交上为工作树创建一个新分支，使其可以迁移。你的文件不会改变。"
 
 msgid "Import settings from another browser"
 msgstr "从其他浏览器导入设置"
+
+msgid "Import setup from {label}"
+msgstr "从 {label} 导入初始化配置"
 
 msgid "import the project"
 msgstr "导入项目"
@@ -8552,6 +8684,10 @@ msgstr "导入…"
 msgid "Important"
 msgstr "重要"
 
+msgctxt "heading over the commands an import would write, below the current ones"
+msgid "Imported"
+msgstr "将导入的内容"
+
 #. placeholder {0}: untracked.length
 #. placeholder {1}: errors[0]
 msgid "Imported {imported} of {0} worktrees: {1}"
@@ -8562,6 +8698,9 @@ msgstr "已导入{joinedMessages}"
 
 msgid "Imported from Linear"
 msgstr "从 Linear 导入"
+
+msgid "Imported setup from {label}"
+msgstr "已从 {label} 导入初始化配置"
 
 msgid "Imported to tasks"
 msgstr "已导入到任务"
@@ -8905,6 +9044,13 @@ msgstr "有免费方案吗？"
 msgid "Isolation"
 msgstr "隔离"
 
+msgid "Issue"
+msgstr "议题"
+
+#. placeholder {0}: link.number
+msgid "Issue #{0}"
+msgstr "议题 #{0}"
+
 msgid "Issue archived"
 msgstr "问题已归档"
 
@@ -9091,6 +9237,12 @@ msgstr "继续等待"
 msgid "Keep working"
 msgstr "继续工作"
 
+msgid "Kept the new file — it changed after it was created"
+msgstr "已保留新文件 — 它在创建后发生了更改"
+
+msgid "Kept the new folder — it is no longer empty"
+msgstr "已保留新文件夹 — 它已不再为空"
+
 msgid "Key name"
 msgstr "密钥名称"
 
@@ -9135,6 +9287,10 @@ msgstr "知识"
 
 msgid "Label"
 msgstr "名称"
+
+msgctxt "task label filter"
+msgid "Label"
+msgstr "标签"
 
 msgid "Label change"
 msgstr "标签变更"
@@ -9563,8 +9719,14 @@ msgstr "正在加载对话..."
 msgid "Loading diff…"
 msgstr "正在加载差异…"
 
+msgid "Loading files..."
+msgstr "正在加载文件..."
+
 msgid "Loading fonts..."
 msgstr "正在加载字体..."
+
+msgid "Loading GitHub details"
+msgstr "正在加载 GitHub 详情"
 
 msgid "Loading groups…"
 msgstr "正在加载分组…"
@@ -9982,6 +10144,10 @@ msgstr "合并状态"
 msgid "Merge status unknown"
 msgstr "合并状态未知"
 
+msgid "Merged"
+msgstr "已合并"
+
+msgctxt "pull request state"
 msgid "Merged"
 msgstr "已合并"
 
@@ -10409,6 +10575,18 @@ msgstr "新建云端工作区"
 msgid "New environment"
 msgstr "新建环境"
 
+msgid "New File"
+msgstr "新建文件"
+
+msgid "New File..."
+msgstr "新建文件..."
+
+msgid "New Folder"
+msgstr "新建文件夹"
+
+msgid "New Folder..."
+msgstr "新建文件夹..."
+
 msgid "New group"
 msgstr "新建分组"
 
@@ -10492,6 +10670,9 @@ msgstr "来自 Superset 团队的新闻、更新与洞察，涵盖并行编码�
 
 msgid "Next"
 msgstr "下一页"
+
+msgid "Next (Enter)"
+msgstr "下一个匹配项（Enter）"
 
 msgid "Next branch"
 msgstr "下一个分支"
@@ -10786,6 +10967,9 @@ msgstr "没有已知的创建者"
 
 msgid "No labels"
 msgstr "无标签"
+
+msgid "No labels found."
+msgstr "未找到标签。"
 
 msgid "No lead"
 msgstr "无负责人"
@@ -11148,6 +11332,12 @@ msgstr "不是2026年的主张"
 msgid "Not a member of this organization"
 msgstr "不是此组织的成员"
 
+msgid "Not a plain relative path"
+msgstr "不是简单的相对路径"
+
+msgid "Not a value this file accepts"
+msgstr "不是此文件接受的值"
+
 msgid "Not authenticated. Please sign in."
 msgstr "未通过身份验证。请登录。"
 
@@ -11180,6 +11370,9 @@ msgstr "未找到"
 
 msgid "Not granted"
 msgstr "未授予"
+
+msgid "Not imported"
+msgstr "未导入"
 
 msgid "Not included"
 msgstr "不包含"
@@ -11235,6 +11428,9 @@ msgstr "这里没有内容。"
 
 msgid "Nothing is running. Archive it and create a new one."
 msgstr "没有任何东西在运行。归档它，再建一个。"
+
+msgid "Nothing left to import"
+msgstr "没有可导入的内容"
 
 msgid "Nothing lives at {pathname}."
 msgstr "{pathname}下没有任何内容。"
@@ -11495,6 +11691,10 @@ msgstr "打开"
 msgid "Open"
 msgstr "打开"
 
+msgctxt "pull request or issue state"
+msgid "Open"
+msgstr "开放"
+
 msgctxt "status"
 msgid "Open"
 msgstr "开启"
@@ -11546,6 +11746,9 @@ msgstr "打开 App Store"
 msgid "Open as comment pane"
 msgstr "作为评论面板打开"
 
+msgid "Open billing"
+msgstr "打开账单"
+
 msgid "Open branch on GitHub"
 msgstr "在GitHub上打开分支"
 
@@ -11557,9 +11760,6 @@ msgstr "打开更改"
 
 msgid "Open Changes"
 msgstr "打开更改"
-
-msgid "Open Chat v3"
-msgstr "打开Chat v3"
 
 msgid "Open Command Palette"
 msgstr "打开命令面板"
@@ -11602,6 +11802,9 @@ msgstr "打开文件"
 
 msgid "Open File"
 msgstr "打开文件"
+
+msgid "Open File in New Tab"
+msgstr "在新标签页中打开文件"
 
 msgid "Open from folder"
 msgstr "从文件夹打开"
@@ -11685,6 +11888,9 @@ msgstr "在外部浏览器中打开"
 msgid "Open in File pane"
 msgstr "在“文件”面板中打开"
 
+msgid "Open in file viewer"
+msgstr "在文件查看器中打开"
+
 msgid "Open in Finder"
 msgstr "在Finder中打开"
 
@@ -11699,6 +11905,9 @@ msgstr "在Linear中打开"
 
 msgid "Open in new tab"
 msgstr "在新标签页打开"
+
+msgid "Open in New Tab"
+msgstr "在新标签页中打开"
 
 msgid "Open in Pull Requests"
 msgstr "在拉取请求中打开"
@@ -12096,6 +12305,9 @@ msgstr "概览"
 msgid "Overwrite file"
 msgstr "覆盖文件"
 
+msgid "Overwrites <0>{currentScriptFile}</0>"
+msgstr "将覆盖 <0>{currentScriptFile}</0>"
+
 #. placeholder {0}: ownerName ?? t({ message: "a teammate", })
 msgid "Owned by {0} — only they can edit this automation."
 msgstr "归{0}所有，只有本人能编辑这个自动化。"
@@ -12460,6 +12672,9 @@ msgstr "方案"
 msgid "Plan restored"
 msgstr "方案已恢复"
 
+msgid "Plan updated"
+msgstr "方案已更新"
+
 msgctxt "project state"
 msgid "Planned"
 msgstr "已计划"
@@ -12571,6 +12786,10 @@ msgstr "发表回复"
 
 msgid "PR"
 msgstr "PR"
+
+#. placeholder {0}: link.number
+msgid "PR #{0}"
+msgstr "PR #{0}"
 
 #. placeholder {0}: pullRequest.number
 #. placeholder {1}: i18n._(PR_STATE_LABEL[pullRequest.state])
@@ -12700,6 +12919,9 @@ msgstr "预览：GitHub 星标提醒弹窗"
 
 msgid "Previous"
 msgstr "上一页"
+
+msgid "Previous (Shift+Enter)"
+msgstr "上一个匹配项（Shift+Enter）"
 
 msgid "Previous branch"
 msgstr "上一个分支"
@@ -13062,6 +13284,9 @@ msgstr "为智能体排队安排工作"
 msgid "Queued"
 msgstr "排队中"
 
+msgid "Queued messages"
+msgstr "排队中的消息"
+
 msgid "Queued to Merge"
 msgstr "排队等待合并"
 
@@ -13098,6 +13323,9 @@ msgstr "退出{appName}并停止所有后台服务？"
 
 msgid "Quit {appName} Completely"
 msgstr "完全退出{appName}"
+
+msgid "Quit {displayName}"
+msgstr "退出 {displayName}"
 
 msgid "Quit Completely"
 msgstr "完全退出"
@@ -13164,6 +13392,9 @@ msgstr "读取和发送邮件"
 
 msgid "Read deployment and build logs"
 msgstr "查看部署和构建日志"
+
+msgid "Read from <0>{fileList}</0>"
+msgstr "读取自 <0>{fileList}</0>"
 
 msgid "Read it on your phone"
 msgstr "在手机上阅读"
@@ -13570,6 +13801,9 @@ msgstr "重命名分支"
 msgid "Rename workspace"
 msgstr "重命名工作区"
 
+msgid "Rename..."
+msgstr "重命名..."
+
 msgid "Renamed"
 msgstr "已重命名"
 
@@ -13620,11 +13854,29 @@ msgstr "重新排序智能体"
 msgid "Replace"
 msgstr "替换"
 
+msgid "Replace All"
+msgstr "全部替换"
+
+msgid "Replace and import"
+msgstr "替换并导入"
+
 msgid "Replace custom audio"
 msgstr "替换自定义音频"
 
 msgid "Replace this agent's launch settings with the current bundled configuration."
 msgstr "用当前内置配置替换此智能体的启动设置。"
+
+msgid "Replaced {replaced} files in {where}"
+msgstr "已替换{where}中的{replaced}个文件"
+
+msgid "Replaced 1 file in {where}"
+msgstr "已替换{where}中的1个文件"
+
+msgid "Replaces <0>{currentCwd}</0> with <1>{importedCwd}</1>"
+msgstr "将 <0>{currentCwd}</0> 替换为 <1>{importedCwd}</1>"
+
+msgid "Replaces current commands"
+msgstr "替换当前命令"
 
 msgid "Reply"
 msgstr "回复"
@@ -14264,9 +14516,6 @@ msgstr "使用此配置文件运行中的智能体将失去访问权限。"
 msgid "Running bun test…"
 msgstr "正在运行bun test…"
 
-msgid "Running in the background"
-msgstr "正在后台运行"
-
 msgid "Running now"
 msgstr "正在运行"
 
@@ -14290,6 +14539,9 @@ msgstr "删除前运行；如果此智能体有最近的会话，则使用该会
 
 msgid "Runs inside the Superset app on that device, so updating it means updating the app there."
 msgstr "运行在该设备的 Superset 应用内，因此更新它意味着更新那台设备上的应用。"
+
+msgid "Runs instead of <0>{currentScriptFile}</0>, which runs today"
+msgstr "将代替目前运行的 <0>{currentScriptFile}</0> 运行"
 
 msgid "Runs land in a workspace. Review the diff, merge what's good."
 msgstr "运行结果会落在一个工作区里。审查差异，把合适的合并进去。"
@@ -14563,6 +14815,9 @@ msgstr "在{frameTitle}中搜索…"
 
 msgid "Search issues..."
 msgstr "搜索议题..."
+
+msgid "Search labels..."
+msgstr "搜索标签..."
 
 msgid "Search Linear"
 msgstr "搜索Linear"
@@ -14911,6 +15166,9 @@ msgstr "发送按键、管理窗口并控制其他应用程序。"
 
 msgid "Send message"
 msgstr "发送消息"
+
+msgid "Send now"
+msgstr "立即发送"
 
 msgid "Send reply"
 msgstr "发送回复"
@@ -16046,6 +16304,9 @@ msgstr "已停止"
 msgid "Stopping the agent in {what}"
 msgstr "正在停止 {what} 中的代理"
 
+msgid "Stops the agent and sends this now"
+msgstr "停止智能体并立即发送此消息"
+
 msgid "Strikethrough"
 msgstr "删除线"
 
@@ -16193,6 +16454,12 @@ msgstr "Superset设计系统"
 msgid "Superset desktop app"
 msgstr "Superset 桌面应用"
 
+msgid "Superset does not set this variable"
+msgstr "Superset 不会设置此变量"
+
+msgid "Superset does not write through a symlink or outside this project."
+msgstr "Superset 不会通过符号链接写入，也不会写到此项目之外。"
+
 msgid "Superset Enterprise is Superset for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Superset Enterprise是面向团队的Superset。联系我们，了解它包含什么，以及如何适配你的组织。"
 
@@ -16210,6 +16477,9 @@ msgstr "当你选中某个远程工作区时，Superset 会转发它打开的端
 
 msgid "Superset has a free tier. The source code is available on GitHub under Elastic License 2.0 (ELv2), so you can inspect and self-host it subject to the license terms."
 msgstr "Superset有免费版。源代码在GitHub上以Elastic License 2.0（ELv2）提供，你可以在许可条款范围内查阅并自行部署。"
+
+msgid "Superset has no matching setting"
+msgstr "Superset 没有对应的设置"
 
 msgid "Superset hit an unexpected error. Reload to try again."
 msgstr "Superset遇到意外错误。重新加载以重试。"
@@ -16349,6 +16619,9 @@ msgstr "Superset与同类方案对比"
 
 msgid "Superset works with any CLI-based coding agent, including Claude Code, OpenCode, OpenAI Codex, and more. Choose a different agent for every task without changing your workspace or review flow."
 msgstr "Superset支持任何基于CLI的编码智能体，包括Claude Code、OpenCode、OpenAI Codex等。每个任务都可以换用不同的智能体，工作区和审查流程都不用变。"
+
+msgid "Superset writes these scripts to .superset/config.json in this project. Review them before you import."
+msgstr "Superset 会将这些脚本写入此项目的 .superset/config.json。导入前请先检查。"
 
 msgid "superset.sh"
 msgstr "superset.sh"
@@ -16795,6 +17068,12 @@ msgstr "该链接在应用中没有对应的位置。"
 msgid "That machine is no longer available"
 msgstr "该机器已不可用"
 
+msgid "That name isn't allowed."
+msgstr "该名称不被允许。"
+
+msgid "The {label} setup file is no longer in this project."
+msgstr "{label} 初始化配置文件已不在此项目中。"
+
 msgid "The 2026 bet"
 msgstr "2026年的赌注"
 
@@ -17074,6 +17353,9 @@ msgstr "自动驾驶的软件工厂"
 msgid "The server could not be found"
 msgstr "找不到服务器"
 
+msgid "The setup files from other tools are gone, or this project already uses them."
+msgstr "其他工具的初始化配置文件已不存在，或此项目已在使用它们。"
+
 msgid "The sign-in link was incomplete. Please try again."
 msgstr "登录链接不完整。请重试。"
 
@@ -17179,6 +17461,9 @@ msgstr "该 {plugin} 账户已由 {owner} 连接。请先请其断开连接。"
 msgid "This {plugin} account is already connected by another Superset organization."
 msgstr "该 {plugin} 账户已被另一个 Superset 组织连接。"
 
+msgid "This action is irreversible."
+msgstr "此操作不可逆。"
+
 msgid "This agent can't be opened as a chat."
 msgstr "该智能体无法以聊天方式打开。"
 
@@ -17236,6 +17521,9 @@ msgstr "这会关闭工作区及其终端。文件和分支将保留在磁盘上
 
 msgid "This closes the workspace and its terminals. The project's files, branches and other workspaces stay as they are."
 msgstr "这将关闭该工作区及其终端。项目的文件、分支和其他工作区保持不变。"
+
+msgid "This cloud workspace can't start"
+msgstr "无法启动此云端工作区"
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "正在唤醒此云工作区。如果它已闲置一段时间，可能需要最多 30 秒。"
@@ -17420,11 +17708,20 @@ msgstr "这将从磁盘中删除该 worktree 并关闭工作区。"
 msgid "This replaces its label, command, arguments, prompt and resume settings, environment variables, and icon with the current bundled configuration."
 msgstr "这会用当前内置配置替换它的名称、命令、参数、提示词与恢复设置、环境变量和图标。"
 
+msgid "This replaces part of your current Superset setup."
+msgstr "这会替换你当前 Superset 初始化配置的一部分。"
+
 msgid "This repository does not allow merging from here."
 msgstr "此仓库不允许从这里合并。"
 
 msgid "This screen doesn't exist"
 msgstr "此页面不存在"
+
+msgid "This script has shell blocks that do not split into separate commands, so it is saved to <0>{scriptPath}</0>:"
+msgstr "此脚本包含无法拆分为单独命令的 shell 代码块，因此会保存到 <0>{scriptPath}</0>："
+
+msgid "This setup changed while the dialog was open. Review the update and import again."
+msgstr "此对话框打开期间该初始化配置已更改。请检查更新后重新导入。"
 
 msgid "This Slack workspace is already connected by {owner}. Ask them to disconnect first."
 msgstr "这个Slack工作区已被{owner}连接。请让对方先断开连接。"
@@ -17664,6 +17961,9 @@ msgstr "每次会话的 Token，近 30 天"
 msgid "Tokens stay off your machine"
 msgstr "令牌不会留在你的设备上"
 
+msgid "Too large to import"
+msgstr "太大，无法导入"
+
 msgid "Too many feedback submissions. Try again later."
 msgstr "反馈提交次数过多。请稍后重试。"
 
@@ -17690,6 +17990,9 @@ msgstr "请求过于频繁。请稍后重试。"
 
 msgid "Too many support reports. Try again later."
 msgstr "支持请求次数过多。请稍后重试。"
+
+msgid "Too many untitled items here already."
+msgstr "这里未命名的项已经太多了。"
 
 msgid "Too old for this app to talk to. Update the Superset app on that device to reconnect."
 msgstr "版本太旧，此应用无法与其通信。更新那台设备上的 Superset 应用以重新连接。"
@@ -17825,9 +18128,6 @@ msgstr "试试看"
 
 msgid "Try now"
 msgstr "立即试用"
-
-msgid "Try Superset v2"
-msgstr "试用Superset v2"
 
 msgid "Tufte"
 msgstr "Tufte"
@@ -18201,6 +18501,10 @@ msgstr "更新分支前缀"
 msgid "Updated"
 msgstr "已更新"
 
+#. placeholder {0}: formatRelativeTime(new Date(item.updatedAt))
+msgid "Updated {0}"
+msgstr "更新于{0}"
+
 msgid "Updated {date}"
 msgstr "更新于{date}"
 
@@ -18331,9 +18635,6 @@ msgstr "使用桌面应用开始并行运行编码智能体。"
 
 msgid "Use the email address of the Atlassian account that created the token."
 msgstr "请使用创建令牌的 Atlassian 账号的电子邮件地址。"
-
-msgid "Use the new workspace experience."
-msgstr "使用全新的工作区体验。"
 
 msgid "Use the Superset tray menu > Host Service > Restart, then retry."
 msgstr "请使用Superset托盘菜单 > 主机服务 > 重启，然后重试。"
@@ -18532,6 +18833,9 @@ msgstr "查看发布说明"
 
 msgid "View releases on GitHub"
 msgstr "在GitHub上查看发布"
+
+msgid "View scripts"
+msgstr "查看脚本"
 
 msgid "View Superset repository on GitHub"
 msgstr "在GitHub上查看Superset仓库"
@@ -18925,6 +19229,9 @@ msgctxt "agent status"
 msgid "Working"
 msgstr "运行中"
 
+msgid "Working directory"
+msgstr "工作目录"
+
 #. placeholder {0}: Math.floor(seconds / 60)
 #. placeholder {1}: seconds % 60
 msgid "Working for {0}m {1}s"
@@ -19017,6 +19324,9 @@ msgstr "工作区固定与批量操作"
 msgid "Workspace restored"
 msgstr "工作区已恢复"
 
+msgid "workspace root"
+msgstr "工作区根目录"
+
 msgid "Workspace Run"
 msgstr "工作区运行"
 
@@ -19028,6 +19338,9 @@ msgstr "工作区运行：{workspaceRunState}"
 
 msgid "Workspace settings"
 msgstr "工作区设置"
+
+msgid "Workspace worktree not available"
+msgstr "工作区worktree不可用"
 
 msgid "Workspaces"
 msgstr "工作区"
@@ -19344,6 +19657,12 @@ msgstr "你的姓名"
 
 msgid "Your name <0>(if we use your prompt, we'll credit you in the changelog)</0>"
 msgstr "你的名字 <0>（若我们采用你的提示词，会在更新日志中署名致谢）</0>"
+
+msgid "Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace."
+msgstr "你的组织已达到云端用量上限。请在“设置”中的“账单”提高上限或升级，以启动此工作区。"
+
+msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
+msgstr "你的组织已达到云端用量上限。除非提高上限，此工作区将在几分钟后停止。"
 
 msgid "Your own accounts. Your organization's integrations let Superset reach its tools; connecting yours makes the work Superset does for you show up as you."
 msgstr "你自己的账户。组织的集成让 Superset 访问其工具；连接你自己的账户后，Superset 为你完成的工作会以你的名义显示。"

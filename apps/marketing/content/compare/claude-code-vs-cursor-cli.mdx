@@ -1,0 +1,107 @@
+---
+title: "Claude Code vs Cursor CLI (2026): Anthropic's Agent vs Cursor's Agent in the Terminal"
+description: "Compare Claude Code and Cursor CLI: models, pricing, parallel work, cloud handoff, and how each fits with an editor, and how to run both side by side."
+date: 2026-10-13
+type: "1v1"
+competitors:
+  - claude-code
+  - cursor
+keywords:
+  - claude code vs cursor cli
+  - cursor cli vs claude code
+  - cursor agent cli
+  - claude code vs cursor
+  - cursor cli alternative
+  - best coding agent
+---
+
+Claude Code is Anthropic's terminal coding agent. Cursor CLI, run as `agent`, is Cursor's agent in the terminal. It shares worktrees, rules, and MCP config with the Cursor editor, and it can hand a task to a Cursor Cloud Agent when you prefix it with `&`. The choice comes down to Anthropic's own harness and models versus an agent that is part of the Cursor product, with a choice of models.
+
+Facts were checked against Anthropic's and Cursor's own docs on October 13, 2026.
+
+---
+
+## At a Glance
+
+| | **Claude Code** | **Cursor CLI (`agent`)** |
+|---|---|---|
+| **Vendor** | Anthropic | Cursor |
+| **Models** | Claude models, with a 1M-token context on recent ones | Chosen with `--model`; third-party models billed at API list price |
+| **Price** | Claude Pro from $20/mo, Max from $100/mo, or API key; no free tier | Free; Plus $8/mo; Premium $30/mo; Super $100; Ultra $200; Teams from $30/user |
+| **Subagents** | Yes, plus `/batch` across 5 to 30 worktrees and an agent view | Yes |
+| **Worktrees** | Built in | `--worktree`, shared with the Cursor editor |
+| **Remote and cloud** | Cloud sessions, Remote Control | `&` hands a task to a Cloud Agent; `agent worker start` for your own machines |
+| **Headless** | `claude -p` | `agent -p` with `--force`, GitHub Actions |
+| **Extensions** | MCP, hooks, plugins with marketplaces, skills | MCP (reads `mcp.json`), hooks, rules, skills, ACP, TypeScript and Python SDKs |
+| **Platforms** | macOS, Linux, Windows | macOS, Linux, WSL, Windows PowerShell |
+| **License** | Proprietary | Proprietary |
+
+---
+
+## What Is Claude Code?
+
+Anthropic describes Claude Code as "an agentic coding tool that reads your codebase, edits files, runs commands, and integrates with your development tools." It has a wide set of parallel modes: subagents, `/batch` runs that fan a change out across worktrees, an agent view for background sessions, experimental agent teams, cloud sessions, and Remote Control. Plugins with marketplaces, skills, and hooks make it highly extensible. It is not on Claude's free plan; it comes with Pro, Max, Team, and Enterprise, or an API key.
+
+## What Is Cursor CLI?
+
+Cursor says its CLI lets you "ship code with AI agents right from your terminal." The binary is `agent`. It runs subagents, can work in a worktree with `--worktree`, and sends a task to a Cursor Cloud Agent when you start the prompt with `&`. With `agent worker start`, it can run work on machines you host yourself. It shares worktrees, rules, and MCP config with the Cursor editor, so a team that already uses Cursor gets the same setup in the terminal. ACP (`agent acp`) lets other editors drive Cursor's agent, and TypeScript and Python SDKs let programs drive it. Cursor notes that "some features work differently or are available only in the editor."
+
+## Key Differences
+
+### Editor Fit
+
+Cursor CLI is part of the Cursor product. It reads the same rules, MCP config, and worktrees as the Cursor editor. Claude Code is a standalone agent that pairs with Claude's own apps and IDE extensions.
+
+### Models
+
+Claude Code runs Anthropic's models only. Cursor CLI lets you pick the model with `--model`; Cursor bills third-party models at API list price.
+
+### Price
+
+Cursor CLI is the cheaper start: Cursor has a free plan and a Plus plan at $8 per month. Claude Code needs a paid Claude plan or API spend from the first prompt. Cursor's cloud agents need the Premium plan or above.
+
+### Parallel and Cloud Work
+
+Both run subagents and worktrees. Claude Code has more built-in parallel modes, including `/batch` and an agent view. Cursor CLI's strength is the handoff: prefix a task with `&` and it moves to a Cloud Agent, and the Cursor iOS app can see and reply to local agents.
+
+---
+
+## Run Both Side by Side
+
+You do not have to pick one in the abstract. Give the same task to both on your own repository and keep the better diff.
+
+[Superset](/) runs Claude Code and Cursor's agent as built-in agents, each in its own Git worktree and terminal, on your own Claude plan and Cursor account. Create two workspaces from the same branch, start each agent with the same prompt, then compare the diffs in the Changes pane and open a pull request from the better one. Superset never proxies model calls. See [How to Compare Coding Agents Side by Side](/compare/compare-coding-agents-side-by-side) and [Superset vs Cursor](/compare/superset-vs-cursor).
+
+## Which Should You Choose?
+
+**Choose Claude Code if you:**
+
+- Want the richest set of parallel modes and plugins
+- Already pay for Claude Pro or Max
+- Want Claude in Anthropic's own harness
+
+**Choose Cursor CLI if you:**
+
+- Already use the Cursor editor and want the same rules and MCP setup in the terminal
+- Want to choose the model per task
+- Want to hand tasks to Cursor Cloud Agents with `&`
+
+For the full field, see [Best AI Coding Agents in 2026](/compare/best-coding-agents).
+
+## Frequently Asked Questions
+
+### What is the Cursor CLI command?
+
+The binary is `agent`. Run `agent` for the interactive agent, or `agent -p` with `--force` for headless runs in scripts and CI.
+
+### Is Cursor CLI free?
+
+Cursor has a free plan. Paid plans start at $8 per month for Plus, and cloud agents need Premium at $30 per month or above. Claude Code has no free tier.
+
+### Does Cursor CLI need the Cursor editor?
+
+No. It runs on its own in the terminal. It shares worktrees, rules, and MCP config with the editor if you use both, but Cursor notes that some features work differently or exist only in the editor.
+
+### Can I run Claude Code and Cursor CLI at the same time?
+
+Yes. Give each its own Git worktree so they do not edit the same files. In Superset, each runs in its own workspace on the same repository.

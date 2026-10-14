@@ -62,12 +62,10 @@ test("a service link is a pill, the first other link its page title, the rest pl
 	const title = view.getByText("Content · Agent Client Protocol");
 	expect(title.closest("a")?.title).toBe(DOCS);
 	expect(asked).toEqual([{ url: DOCS }]);
-	expect(view.getByText("superset-sh/superset#8329").closest("a")?.href).toBe(
-		PR,
-	);
+	expect(view.getByText("PR #8329").closest("a")?.href).toBe(PR);
 	expect(view.getByText(LATER).className).toContain("text-link");
 	expect(view.container.textContent).toBe(
-		"Look at superset-sh/superset#8329 and aContent · Agent Client Protocol\nthen https://example.com/later.",
+		"Look at PR #8329 and aContent · Agent Client Protocol\nthen https://example.com/later.",
 	);
 });
 
@@ -116,7 +114,7 @@ test("copying a sent message gives back what was typed, not the labels shown", a
 	window.getSelection()?.selectAllChildren(message);
 	expect(copy(message)).toEqual([["text/plain", text]]);
 
-	const pill = view.getByText("superset-sh/superset#8329");
+	const pill = view.getByText("PR #8329");
 	window.getSelection()?.selectAllChildren(pill);
 	expect(copy(pill)).toEqual([["text/plain", PR]]);
 

@@ -53,6 +53,7 @@ function IssueDetailPage() {
 			tasksSearchFromFilters({
 				tab: search.tab ?? "all",
 				assignee: search.assignee ?? null,
+				label: null,
 				search: search.search ?? "",
 				typeTab: "issues",
 				projectFilters: resolveProjectFilterParams(search.projects, null, []),

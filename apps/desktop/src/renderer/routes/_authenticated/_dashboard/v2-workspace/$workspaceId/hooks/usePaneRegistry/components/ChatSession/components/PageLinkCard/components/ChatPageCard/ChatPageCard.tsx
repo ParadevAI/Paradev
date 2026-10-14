@@ -41,6 +41,7 @@ export function ChatPageCard({
 				"flex h-[68px] w-full max-w-md shrink-0 overflow-hidden rounded-lg border border-border bg-card text-left font-sans transition-colors hover:border-muted-foreground/30",
 				className,
 			)}
+			data-find-skip
 			onClick={onOpen}
 			type="button"
 		>
