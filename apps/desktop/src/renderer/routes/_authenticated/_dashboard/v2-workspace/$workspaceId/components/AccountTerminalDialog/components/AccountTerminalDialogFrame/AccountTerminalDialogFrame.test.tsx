@@ -9,7 +9,7 @@ afterEach(() => {
 	jest.useRealTimers();
 });
 
-function fixture(launching = false) {
+function fixture(launching = false, surface: "terminal" | "chat" = "terminal") {
 	const trigger = document.createElement("button");
 	trigger.textContent = "Add tab";
 	document.body.append(trigger);
@@ -17,6 +17,7 @@ function fixture(launching = false) {
 	const view = render(
 		<AccountTerminalDialogFrame
 			launching={launching}
+			surface={surface}
 			onClose={onClose}
 			returnFocus={trigger}
 		>
@@ -64,5 +65,19 @@ test("keeps a pending launch modal and does not steal focus from its new termina
 	} finally {
 		trigger.remove();
 		terminal.remove();
+	}
+});
+
+test("native chat account picker retains its title and cancel focus", () => {
+	const { trigger, onClose, view } = fixture(false, "chat");
+	try {
+		const dialog = view.getByRole("dialog", { name: "Chat with account" });
+		fireEvent.keyDown(dialog, { key: "Escape" });
+		expect(onClose).toHaveBeenCalledTimes(1);
+		view.unmount();
+		act(() => jest.runAllTimers());
+		expect(document.activeElement).toBe(trigger);
+	} finally {
+		trigger.remove();
 	}
 });
