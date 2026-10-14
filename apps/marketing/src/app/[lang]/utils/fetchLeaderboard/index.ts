@@ -2,6 +2,8 @@ export type {
 	LeaderboardMetric,
 	LeaderboardPeriod,
 	LeaderboardStats,
+	OrgList,
+	OrgStats,
 	ParticipantProfile,
 	RangeQuery,
 	StandingRow,
@@ -9,6 +11,9 @@ export type {
 	StandingsQuery,
 } from "./fetchLeaderboard";
 export {
+	fetchOrgList,
+	fetchOrgStandings,
+	fetchOrgStats,
 	fetchParticipant,
 	fetchPublicHandles,
 	fetchSearch,

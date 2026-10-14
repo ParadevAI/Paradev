@@ -108,10 +108,30 @@ export function useLeaderboardOptIn(period: LeaderboardPeriod = "all") {
 		}
 	}, [refetchMembership]);
 
+	const [savingOrgBoards, setSavingOrgBoards] = useState(false);
+
+	const setShowOnOrgBoards = useCallback(
+		async (enabled: boolean) => {
+			setSavingOrgBoards(true);
+			try {
+				await apiTrpcClient.leaderboard.setShowOnOrgBoards.mutate({ enabled });
+				await refetchMembership();
+			} catch (error) {
+				toast.error(errorMessage(error, "Couldn't update"));
+			} finally {
+				setSavingOrgBoards(false);
+			}
+		},
+		[refetchMembership],
+	);
+
 	return {
 		membership: membership.data ?? null,
 		handle: membership.data?.handle ?? null,
 		optedIn: Boolean(membership.data),
+		showOnOrgBoards: membership.data?.showOnOrgBoards ?? false,
+		setShowOnOrgBoards,
+		savingOrgBoards,
 		isLoading: membership.isLoading,
 		join,
 		leave,

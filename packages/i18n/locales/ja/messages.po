@@ -931,6 +931,9 @@ msgstr "{localHostName}（このデバイス）"
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} other {{1}}}"
 
+msgid "{members} of {minMembers}"
+msgstr "{members} / {minMembers}"
+
 #. placeholder {0}: gaps.length
 msgid "{met} of {0} objectives carrying for {nextLabel} — {laggingLabels} furthest behind."
 msgstr "{nextLabel} に向けて {0} 個中 {met} 個の目標が働いています — {laggingLabels} が最も遅れています。"
@@ -9855,6 +9858,9 @@ msgstr "メンバーを削除しました"
 msgid "Members"
 msgstr "メンバー"
 
+msgid "Members appear here after turning on \"Show me on my organizations' boards\" in Superset under Settings → Account."
+msgstr "「組織のボードに自分を表示」をオンにしたメンバーがここに表示されます（Superset の 設定 → アカウント）。"
+
 msgid "Members cannot modify roles"
 msgstr "メンバーはロールを変更できません"
 
@@ -10770,6 +10776,9 @@ msgstr "オープンなプルリクエストはありません。"
 
 msgid "No open review comments."
 msgstr "未解決のレビューコメントはありません。"
+
+msgid "No organization by that name."
+msgstr "その名前の組織はありません。"
 
 msgid "No organization selected"
 msgstr "組織が選択されていません"
@@ -14442,6 +14451,9 @@ msgstr "Linearを検索…"
 msgid "Search models"
 msgstr "モデルを検索"
 
+msgid "Search organizations"
+msgstr "組織を検索"
+
 msgid "Search pages"
 msgstr "ページを検索"
 
@@ -15112,6 +15124,9 @@ msgstr "上の変更より後の行を表示"
 
 msgid "Show lines before the change below"
 msgstr "下の変更より前の行を表示"
+
+msgid "Show me on my organizations' boards"
+msgstr "組織のボードに自分を表示"
 
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "Linearトリアージのオートメーションの直近10件の実行を見せて"
@@ -16460,6 +16475,9 @@ msgstr "この組織にチームが見つかりません"
 msgid "Team settings"
 msgstr "チーム設定"
 
+msgid "Teammates in your Superset organizations can see where you rank among them. Off by default."
+msgstr "Superset の組織のチームメイトが、メンバー内でのあなたの順位を見られるようになります。デフォルトはオフです。"
+
 msgid "Teammates pin feedback to the exact part of the page they mean."
 msgstr "チームメイトは、指したい箇所に直接フィードバックをピン留めします。"
 
@@ -17036,6 +17054,9 @@ msgstr "このオートメーションにはまだ指示がありません。実
 
 msgid "This automation is in another organization"
 msgstr "このオートメーションは別の組織にあります"
+
+msgid "This board opens once {minMembers} members have usage in this period. {members} so far."
+msgstr "このボードは、この期間に利用のあるメンバーが {minMembers} 人になると公開されます。現在 {members} 人です。"
 
 msgid "This cannot be undone."
 msgstr "この操作は元に戻せません。"

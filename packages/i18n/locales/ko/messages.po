@@ -931,6 +931,9 @@ msgstr "{localHostName} (이 기기)"
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} other {{1}}}"
 
+msgid "{members} of {minMembers}"
+msgstr "{members} / {minMembers}"
+
 #. placeholder {0}: gaps.length
 msgid "{met} of {0} objectives carrying for {nextLabel} — {laggingLabels} furthest behind."
 msgstr "{0}개 목표 중 {met}개가 {nextLabel}을(를) 향해 제 몫을 하고 있습니다 — {laggingLabels}이(가) 가장 뒤처져 있습니다."
@@ -9855,6 +9858,9 @@ msgstr "멤버를 제거했습니다"
 msgid "Members"
 msgstr "멤버"
 
+msgid "Members appear here after turning on \"Show me on my organizations' boards\" in Superset under Settings → Account."
+msgstr "멤버가 Superset의 설정 → 계정에서 \"내 조직 보드에 나를 표시\"을 켜면 여기에 표시됩니다."
+
 msgid "Members cannot modify roles"
 msgstr "멤버는 역할을 변경할 수 없습니다"
 
@@ -10770,6 +10776,9 @@ msgstr "열린 풀 리퀘스트가 없습니다."
 
 msgid "No open review comments."
 msgstr "열린 리뷰 코멘트가 없습니다."
+
+msgid "No organization by that name."
+msgstr "해당 이름의 조직이 없습니다."
 
 msgid "No organization selected"
 msgstr "선택된 조직이 없습니다"
@@ -14442,6 +14451,9 @@ msgstr "Linear 검색…"
 msgid "Search models"
 msgstr "모델 검색"
 
+msgid "Search organizations"
+msgstr "조직 검색"
+
 msgid "Search pages"
 msgstr "페이지 검색"
 
@@ -15112,6 +15124,9 @@ msgstr "위 변경 이후의 줄 보기"
 
 msgid "Show lines before the change below"
 msgstr "변경 앞부분의 줄을 아래에 표시"
+
+msgid "Show me on my organizations' boards"
+msgstr "내 조직 보드에 나를 표시"
 
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "내 Linear 분류 자동화의 최근 실행 10건을 보여 줘"
@@ -16460,6 +16475,9 @@ msgstr "이 조직에서 팀을 찾을 수 없습니다"
 msgid "Team settings"
 msgstr "팀 설정"
 
+msgid "Teammates in your Superset organizations can see where you rank among them. Off by default."
+msgstr "Superset 조직의 팀원들이 그들 사이에서 내 순위를 볼 수 있습니다. 기본값은 꺼짐입니다."
+
 msgid "Teammates pin feedback to the exact part of the page they mean."
 msgstr "팀원이 가리키는 바로 그 부분에 피드백을 고정합니다."
 
@@ -17036,6 +17054,9 @@ msgstr "이 자동화에는 아직 지시문이 없습니다. 실행하기 전�
 
 msgid "This automation is in another organization"
 msgstr "이 자동화는 다른 조직에 있습니다"
+
+msgid "This board opens once {minMembers} members have usage in this period. {members} so far."
+msgstr "이 기간에 사용량이 있는 멤버가 {minMembers}명이 되면 이 보드가 열립니다. 현재 {members}명입니다."
 
 msgid "This cannot be undone."
 msgstr "되돌릴 수 없습니다."

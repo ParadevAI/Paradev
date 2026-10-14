@@ -18,14 +18,24 @@ import { useLeaderboardOptIn } from "renderer/routes/_authenticated/hooks/useLea
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { HighlightText } from "renderer/routes/_authenticated/settings/components/HighlightText";
 import { useSettingsSearchQuery } from "renderer/stores/settings-state";
+import { OrgBoardsToggle } from "./components/OrgBoardsToggle";
 import { ProfileFields } from "./components/ProfileFields";
 
 export function LeaderboardSection() {
 	const { t } = useLingui();
 	const searchQuery = useSettingsSearchQuery();
 	const { activeHostUrl } = useLocalHostService();
-	const { handle, isLoading, optedIn, join, leave, joining } =
-		useLeaderboardOptIn();
+	const {
+		handle,
+		isLoading,
+		optedIn,
+		join,
+		leave,
+		joining,
+		showOnOrgBoards,
+		setShowOnOrgBoards,
+		savingOrgBoards,
+	} = useLeaderboardOptIn();
 
 	const {
 		preview,
@@ -79,6 +89,14 @@ export function LeaderboardSection() {
 					}}
 				/>
 			</div>
+
+			{optedIn && (
+				<OrgBoardsToggle
+					checked={showOnOrgBoards}
+					disabled={savingOrgBoards}
+					onCheckedChange={(enabled) => void setShowOnOrgBoards(enabled)}
+				/>
+			)}
 
 			{optedIn && handle && <ProfileFields handle={handle} />}
 

@@ -128,6 +128,16 @@ export const standingsSchema = windowSchema.extend({
 	offset: z.number().int().min(0).max(1_000).default(0),
 });
 
+export const orgStandingsSchema = standingsSchema.extend({
+	organizationId: z.string().uuid(),
+});
+
+export const orgBoardsSchema = z.object({ enabled: z.boolean() });
+
+export const orgStatsSchema = windowSchema.extend({
+	organizationId: z.string().uuid(),
+});
+
 export const standingForSchema = windowSchema.extend({
 	handle: handleSchema,
 	metric: metricSchema.default("tokens"),

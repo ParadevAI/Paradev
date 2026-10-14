@@ -931,6 +931,9 @@ msgstr "{localHostName} (bu cihaz)"
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} other {{1}}}"
 
+msgid "{members} of {minMembers}"
+msgstr "{members}/{minMembers}"
+
 #. placeholder {0}: gaps.length
 msgid "{met} of {0} objectives carrying for {nextLabel} — {laggingLabels} furthest behind."
 msgstr "{0} hedeften {met} tanesi {nextLabel} için üzerine düşeni yapıyor — en geride {laggingLabels} var."
@@ -9855,6 +9858,9 @@ msgstr "Üye kaldırıldı"
 msgid "Members"
 msgstr "Üyeler"
 
+msgid "Members appear here after turning on \"Show me on my organizations' boards\" in Superset under Settings → Account."
+msgstr "Üyeler, Superset'te Ayarlar → Hesap bölümünde \"Beni kuruluşlarımın tablolarında göster\" seçeneğini açtıktan sonra burada görünür."
+
 msgid "Members cannot modify roles"
 msgstr "Üyeler rolleri değiştiremez"
 
@@ -10770,6 +10776,9 @@ msgstr "Açık pull request yok."
 
 msgid "No open review comments."
 msgstr "Açık inceleme yorumu yok."
+
+msgid "No organization by that name."
+msgstr "Bu adla bir kuruluş yok."
 
 msgid "No organization selected"
 msgstr "Kuruluş seçilmedi"
@@ -14442,6 +14451,9 @@ msgstr "Linear'da ara…"
 msgid "Search models"
 msgstr "Model ara"
 
+msgid "Search organizations"
+msgstr "Kuruluş ara"
+
 msgid "Search pages"
 msgstr "Sayfalarda ara"
 
@@ -15112,6 +15124,9 @@ msgstr "Yukarıdaki değişiklikten sonraki satırları göster"
 
 msgid "Show lines before the change below"
 msgstr "Aşağıdaki değişiklikten önceki satırları göster"
+
+msgid "Show me on my organizations' boards"
+msgstr "Beni kuruluşlarımın tablolarında göster"
 
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "Linear sınıflandırma otomasyonumun son 10 çalıştırmasını göster"
@@ -16460,6 +16475,9 @@ msgstr "Bu kuruluşta takım bulunamadı"
 msgid "Team settings"
 msgstr "Takım ayarları"
 
+msgid "Teammates in your Superset organizations can see where you rank among them. Off by default."
+msgstr "Superset kuruluşlarınızdaki ekip arkadaşlarınız aralarındaki sıranızı görebilir. Varsayılan olarak kapalı."
+
 msgid "Teammates pin feedback to the exact part of the page they mean."
 msgstr "Ekip arkadaşları geri bildirimi sayfada kastettikleri yere iğneler."
 
@@ -17036,6 +17054,9 @@ msgstr "Bu otomasyonun henüz talimatı yok. Çalıştırmadan önce ayarlarınd
 
 msgid "This automation is in another organization"
 msgstr "Bu otomasyon başka bir kuruluşta"
+
+msgid "This board opens once {minMembers} members have usage in this period. {members} so far."
+msgstr "Bu tablo, bu dönemde kullanımı olan {minMembers} üye olduğunda açılır. Şu an {members}."
 
 msgid "This cannot be undone."
 msgstr "Bu geri alınamaz."

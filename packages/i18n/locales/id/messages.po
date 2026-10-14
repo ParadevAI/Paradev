@@ -931,6 +931,9 @@ msgstr "{localHostName} (perangkat ini)"
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} other {{1}}}"
 
+msgid "{members} of {minMembers}"
+msgstr "{members} dari {minMembers}"
+
 #. placeholder {0}: gaps.length
 msgid "{met} of {0} objectives carrying for {nextLabel} — {laggingLabels} furthest behind."
 msgstr "{met} dari {0} sasaran menopang untuk {nextLabel} — {laggingLabels} paling tertinggal."
@@ -9855,6 +9858,9 @@ msgstr "Anggota dihapus"
 msgid "Members"
 msgstr "Anggota"
 
+msgid "Members appear here after turning on \"Show me on my organizations' boards\" in Superset under Settings → Account."
+msgstr "Anggota muncul di sini setelah mengaktifkan \"Tampilkan saya di papan organisasi saya\" di Superset di Pengaturan → Akun."
+
 msgid "Members cannot modify roles"
 msgstr "Anggota tidak bisa mengubah peran"
 
@@ -10770,6 +10776,9 @@ msgstr "Tidak ada pull request terbuka."
 
 msgid "No open review comments."
 msgstr "Tidak ada komentar review yang terbuka."
+
+msgid "No organization by that name."
+msgstr "Tidak ada organisasi dengan nama itu."
 
 msgid "No organization selected"
 msgstr "Tidak ada organisasi yang dipilih"
@@ -14442,6 +14451,9 @@ msgstr "Cari di Linear…"
 msgid "Search models"
 msgstr "Cari model"
 
+msgid "Search organizations"
+msgstr "Cari organisasi"
+
 msgid "Search pages"
 msgstr "Cari halaman"
 
@@ -15112,6 +15124,9 @@ msgstr "Tampilkan baris setelah perubahan di atas"
 
 msgid "Show lines before the change below"
 msgstr "Tampilkan baris sebelum perubahan di bawah"
+
+msgid "Show me on my organizations' boards"
+msgstr "Tampilkan saya di papan organisasi saya"
 
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "Tunjukkan 10 run terakhir otomatisasi triase Linear saya"
@@ -16460,6 +16475,9 @@ msgstr "Tim tidak ditemukan di organisasi ini"
 msgid "Team settings"
 msgstr "Pengaturan tim"
 
+msgid "Teammates in your Superset organizations can see where you rank among them. Off by default."
+msgstr "Rekan di organisasi Superset kamu bisa melihat peringkatmu di antara mereka. Nonaktif secara default."
+
 msgid "Teammates pin feedback to the exact part of the page they mean."
 msgstr "Rekan tim menyematkan masukan tepat di bagian halaman yang mereka maksud."
 
@@ -17036,6 +17054,9 @@ msgstr "Otomatisasi ini belum memiliki instruksi. Tulis prompt di pengaturannya 
 
 msgid "This automation is in another organization"
 msgstr "Otomatisasi ini berada di organisasi lain"
+
+msgid "This board opens once {minMembers} members have usage in this period. {members} so far."
+msgstr "Papan ini terbuka setelah {minMembers} anggota memiliki penggunaan pada periode ini. Sejauh ini {members}."
 
 msgid "This cannot be undone."
 msgstr "Ini tidak bisa dibatalkan."

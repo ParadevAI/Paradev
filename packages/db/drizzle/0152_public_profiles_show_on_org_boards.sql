@@ -1,0 +1,1 @@
+ALTER TABLE "public_profiles" ADD COLUMN "show_on_org_boards" boolean DEFAULT false NOT NULL;

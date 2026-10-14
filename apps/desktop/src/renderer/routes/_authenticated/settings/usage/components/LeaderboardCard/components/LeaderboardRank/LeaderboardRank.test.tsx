@@ -16,6 +16,7 @@ function membership(tokens: number | string) {
 	return {
 		handle: "kiet",
 		visibility: "public" as const,
+		showOnOrgBoards: false,
 		lastPublishedAt: null,
 		period: "30d" as const,
 		range: { from: "2026-08-04", to: "2026-09-02" },

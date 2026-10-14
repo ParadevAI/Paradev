@@ -407,6 +407,8 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 			"stats",
 			"opt in",
 			"opt out",
+			"organization",
+			"team",
 		],
 	},
 	{

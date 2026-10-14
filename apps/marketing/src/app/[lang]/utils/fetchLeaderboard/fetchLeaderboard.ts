@@ -2,7 +2,7 @@ import type { RouterOutputs } from "@superset/trpc";
 import type { LeaderboardPeriod } from "@superset/trpc/leaderboard-periods";
 import type { LeaderboardMetric } from "@superset/trpc/leaderboard-types";
 import { TRPCClientError } from "@trpc/client";
-import { leaderboardClient } from "../leaderboardClient";
+import { leaderboardClient, viewerClient } from "../leaderboardClient";
 
 export type { LeaderboardMetric, LeaderboardPeriod };
 
@@ -12,6 +12,8 @@ export type Standings = PublicLeaderboard["standings"];
 export type StandingRow = Standings["rows"][number];
 export type LeaderboardStats = PublicLeaderboard["stats"];
 export type ParticipantProfile = PublicLeaderboard["participant"];
+export type OrgList = RouterOutputs["leaderboard"]["org"]["list"];
+export type OrgStats = RouterOutputs["leaderboard"]["org"]["stats"];
 
 export interface RangeQuery {
 	period?: LeaderboardPeriod;
@@ -122,4 +124,45 @@ export async function fetchPublicHandles(): Promise<
 	Array<{ handle: string; lastPublishedAt: Date | null }>
 > {
 	return leaderboardClient.leaderboard.public.handles.query();
+}
+
+/** Signed-out callers get a 401, which resolves to null like any other failure. */
+export async function fetchOrgList(
+	signal?: AbortSignal,
+): Promise<OrgList | null> {
+	try {
+		return await viewerClient.leaderboard.org.list.query(undefined, { signal });
+	} catch {
+		return null;
+	}
+}
+
+export async function fetchOrgStandings(
+	organizationId: string,
+	options: StandingsQuery = {},
+	signal?: AbortSignal,
+): Promise<Standings | null> {
+	try {
+		return await viewerClient.leaderboard.org.standings.query(
+			{ organizationId, ...options },
+			{ signal },
+		);
+	} catch {
+		return null;
+	}
+}
+
+export async function fetchOrgStats(
+	organizationId: string,
+	options: RangeQuery = {},
+	signal?: AbortSignal,
+): Promise<OrgStats | null> {
+	try {
+		return await viewerClient.leaderboard.org.stats.query(
+			{ organizationId, ...options },
+			{ signal },
+		);
+	} catch {
+		return null;
+	}
 }

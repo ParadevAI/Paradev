@@ -931,6 +931,9 @@ msgstr "{localHostName} (this device)"
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} other {{1}}}"
 
+msgid "{members} of {minMembers}"
+msgstr "{members} of {minMembers}"
+
 #. placeholder {0}: gaps.length
 msgid "{met} of {0} objectives carrying for {nextLabel} — {laggingLabels} furthest behind."
 msgstr "{met} of {0} objectives carrying for {nextLabel} — {laggingLabels} furthest behind."
@@ -9855,6 +9858,9 @@ msgstr "Member removed"
 msgid "Members"
 msgstr "Members"
 
+msgid "Members appear here after turning on \"Show me on my organizations' boards\" in Superset under Settings → Account."
+msgstr "Members appear here after turning on \"Show me on my organizations' boards\" in Superset under Settings → Account."
+
 msgid "Members cannot modify roles"
 msgstr "Members cannot modify roles"
 
@@ -10770,6 +10776,9 @@ msgstr "No open pull requests."
 
 msgid "No open review comments."
 msgstr "No open review comments."
+
+msgid "No organization by that name."
+msgstr "No organization by that name."
 
 msgid "No organization selected"
 msgstr "No organization selected"
@@ -14442,6 +14451,9 @@ msgstr "Search Linear…"
 msgid "Search models"
 msgstr "Search models"
 
+msgid "Search organizations"
+msgstr "Search organizations"
+
 msgid "Search pages"
 msgstr "Search pages"
 
@@ -15112,6 +15124,9 @@ msgstr "Show lines after the change above"
 
 msgid "Show lines before the change below"
 msgstr "Show lines before the change below"
+
+msgid "Show me on my organizations' boards"
+msgstr "Show me on my organizations' boards"
 
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "Show me the last 10 runs of my Linear triage automation"
@@ -16460,6 +16475,9 @@ msgstr "Team not found in this organization"
 msgid "Team settings"
 msgstr "Team settings"
 
+msgid "Teammates in your Superset organizations can see where you rank among them. Off by default."
+msgstr "Teammates in your Superset organizations can see where you rank among them. Off by default."
+
 msgid "Teammates pin feedback to the exact part of the page they mean."
 msgstr "Teammates pin feedback to the exact part of the page they mean."
 
@@ -17036,6 +17054,9 @@ msgstr "This automation has no instructions yet. Write a prompt in its settings 
 
 msgid "This automation is in another organization"
 msgstr "This automation is in another organization"
+
+msgid "This board opens once {minMembers} members have usage in this period. {members} so far."
+msgstr "This board opens once {minMembers} members have usage in this period. {members} so far."
 
 msgid "This cannot be undone."
 msgstr "This cannot be undone."

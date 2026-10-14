@@ -931,6 +931,9 @@ msgstr "{localHostName} (thiết bị này)"
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} other {{1}}}"
 
+msgid "{members} of {minMembers}"
+msgstr "{members}/{minMembers}"
+
 #. placeholder {0}: gaps.length
 msgid "{met} of {0} objectives carrying for {nextLabel} — {laggingLabels} furthest behind."
 msgstr "{met} trên {0} mục tiêu đang góp sức cho {nextLabel} — {laggingLabels} tụt lại xa nhất."
@@ -9855,6 +9858,9 @@ msgstr "Đã gỡ thành viên"
 msgid "Members"
 msgstr "Thành viên"
 
+msgid "Members appear here after turning on \"Show me on my organizations' boards\" in Superset under Settings → Account."
+msgstr "Thành viên sẽ xuất hiện ở đây sau khi bật \"Hiển thị tôi trên bảng của các tổ chức của tôi\" trong Superset tại Cài đặt → Tài khoản."
+
 msgid "Members cannot modify roles"
 msgstr "Thành viên không thể thay đổi vai trò"
 
@@ -10770,6 +10776,9 @@ msgstr "Không có pull request nào đang mở."
 
 msgid "No open review comments."
 msgstr "Không có bình luận review nào đang mở."
+
+msgid "No organization by that name."
+msgstr "Không có tổ chức nào có tên đó."
 
 msgid "No organization selected"
 msgstr "Chưa chọn tổ chức nào"
@@ -14442,6 +14451,9 @@ msgstr "Tìm trong Linear…"
 msgid "Search models"
 msgstr "Tìm mô hình"
 
+msgid "Search organizations"
+msgstr "Tìm tổ chức"
+
 msgid "Search pages"
 msgstr "Tìm trang"
 
@@ -15112,6 +15124,9 @@ msgstr "Hiện các dòng sau thay đổi ở trên"
 
 msgid "Show lines before the change below"
 msgstr "Hiện các dòng trước thay đổi bên dưới"
+
+msgid "Show me on my organizations' boards"
+msgstr "Hiển thị tôi trên bảng của các tổ chức của tôi"
 
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "Cho tôi xem 10 lần chạy gần nhất của tự động hóa phân loại Linear"
@@ -16460,6 +16475,9 @@ msgstr "Không tìm thấy nhóm trong tổ chức này"
 msgid "Team settings"
 msgstr "Cài đặt nhóm"
 
+msgid "Teammates in your Superset organizations can see where you rank among them. Off by default."
+msgstr "Đồng đội trong các tổ chức Superset của bạn có thể thấy thứ hạng của bạn trong nhóm. Mặc định tắt."
+
 msgid "Teammates pin feedback to the exact part of the page they mean."
 msgstr "Đồng đội ghim phản hồi đúng vào phần trang mà họ muốn nói tới."
 
@@ -17036,6 +17054,9 @@ msgstr "Tự động hóa này chưa có hướng dẫn. Hãy viết một promp
 
 msgid "This automation is in another organization"
 msgstr "Tự động hóa này nằm trong một tổ chức khác"
+
+msgid "This board opens once {minMembers} members have usage in this period. {members} so far."
+msgstr "Bảng này sẽ mở khi có {minMembers} thành viên có mức sử dụng trong khoảng thời gian này. Hiện có {members}."
 
 msgid "This cannot be undone."
 msgstr "Không thể hoàn tác."

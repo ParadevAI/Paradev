@@ -931,6 +931,9 @@ msgstr "{localHostName} (dit apparaat)"
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} other {{1}}}"
 
+msgid "{members} of {minMembers}"
+msgstr "{members} van {minMembers}"
+
 #. placeholder {0}: gaps.length
 msgid "{met} of {0} objectives carrying for {nextLabel} — {laggingLabels} furthest behind."
 msgstr "{met} van {0} doelen dragen bij voor {nextLabel} — {laggingLabels} lopen het verst achter."
@@ -9855,6 +9858,9 @@ msgstr "Lid verwijderd"
 msgid "Members"
 msgstr "Leden"
 
+msgid "Members appear here after turning on \"Show me on my organizations' boards\" in Superset under Settings → Account."
+msgstr "Leden verschijnen hier nadat ze \"Toon mij op de borden van mijn organisaties\" hebben aangezet in Superset onder Instellingen → Account."
+
 msgid "Members cannot modify roles"
 msgstr "Leden kunnen rollen niet wijzigen"
 
@@ -10770,6 +10776,9 @@ msgstr "Geen open pull requests."
 
 msgid "No open review comments."
 msgstr "Geen open reviewopmerkingen."
+
+msgid "No organization by that name."
+msgstr "Geen organisatie met die naam."
 
 msgid "No organization selected"
 msgstr "Geen organisatie geselecteerd"
@@ -14442,6 +14451,9 @@ msgstr "Linear doorzoeken…"
 msgid "Search models"
 msgstr "Modellen zoeken"
 
+msgid "Search organizations"
+msgstr "Organisaties zoeken"
+
 msgid "Search pages"
 msgstr "Pagina's zoeken"
 
@@ -15112,6 +15124,9 @@ msgstr "Regels na de wijziging hierboven tonen"
 
 msgid "Show lines before the change below"
 msgstr "Regels vóór de wijziging hieronder tonen"
+
+msgid "Show me on my organizations' boards"
+msgstr "Toon mij op de borden van mijn organisaties"
 
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "Laat de laatste 10 runs zien van mijn Linear-triage-automatisering"
@@ -16460,6 +16475,9 @@ msgstr "Team niet gevonden in deze organisatie"
 msgid "Team settings"
 msgstr "Teaminstellingen"
 
+msgid "Teammates in your Superset organizations can see where you rank among them. Off by default."
+msgstr "Teamgenoten in je Superset-organisaties zien waar je tussen hen staat. Standaard uit."
+
 msgid "Teammates pin feedback to the exact part of the page they mean."
 msgstr "Teamgenoten pinnen feedback op precies het deel van de pagina dat ze bedoelen."
 
@@ -17036,6 +17054,9 @@ msgstr "Deze automatisering heeft nog geen instructies. Schrijf een prompt in de
 
 msgid "This automation is in another organization"
 msgstr "Deze automatisering staat in een andere organisatie"
+
+msgid "This board opens once {minMembers} members have usage in this period. {members} so far."
+msgstr "Dit bord opent zodra {minMembers} leden gebruik hebben in deze periode. Tot nu toe {members}."
 
 msgid "This cannot be undone."
 msgstr "Dit kan niet ongedaan worden gemaakt."

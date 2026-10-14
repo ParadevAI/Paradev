@@ -931,6 +931,9 @@ msgstr "{localHostName}（此设备）"
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} other {{1}}}"
 
+msgid "{members} of {minMembers}"
+msgstr "{members} / {minMembers}"
+
 #. placeholder {0}: gaps.length
 msgid "{met} of {0} objectives carrying for {nextLabel} — {laggingLabels} furthest behind."
 msgstr "{0} 项目标中有 {met} 项在为 {nextLabel} 出力 —— {laggingLabels} 落后最多。"
@@ -9855,6 +9858,9 @@ msgstr "已移除成员"
 msgid "Members"
 msgstr "成员"
 
+msgid "Members appear here after turning on \"Show me on my organizations' boards\" in Superset under Settings → Account."
+msgstr "成员在 Superset 的 设置 → 账户 中开启“在我的组织榜单中显示我”后会显示在这里。"
+
 msgid "Members cannot modify roles"
 msgstr "成员不能修改角色"
 
@@ -10770,6 +10776,9 @@ msgstr "没有打开的拉取请求。"
 
 msgid "No open review comments."
 msgstr "没有未解决的审查评论。"
+
+msgid "No organization by that name."
+msgstr "没有这个名称的组织。"
 
 msgid "No organization selected"
 msgstr "未选择组织"
@@ -14442,6 +14451,9 @@ msgstr "搜索Linear…"
 msgid "Search models"
 msgstr "搜索模型"
 
+msgid "Search organizations"
+msgstr "搜索组织"
+
 msgid "Search pages"
 msgstr "搜索页面"
 
@@ -15112,6 +15124,9 @@ msgstr "显示上方改动之后的行"
 
 msgid "Show lines before the change below"
 msgstr "显示下方改动之前的行"
+
+msgid "Show me on my organizations' boards"
+msgstr "在我的组织榜单中显示我"
 
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "给我看看Linear分类自动化最近10次运行"
@@ -16460,6 +16475,9 @@ msgstr "在此组织中未找到该团队"
 msgid "Team settings"
 msgstr "团队设置"
 
+msgid "Teammates in your Superset organizations can see where you rank among them. Off by default."
+msgstr "你所在 Superset 组织的队友可以看到你在他们中的排名。默认关闭。"
+
 msgid "Teammates pin feedback to the exact part of the page they mean."
 msgstr "团队成员把反馈钉在页面上他们所指的具体位置。"
 
@@ -17036,6 +17054,9 @@ msgstr "此自动化尚无指令。请先在设置中编写提示词，然后再
 
 msgid "This automation is in another organization"
 msgstr "此自动化位于其他组织"
+
+msgid "This board opens once {minMembers} members have usage in this period. {members} so far."
+msgstr "本期间内有 {minMembers} 名成员产生用量后，此榜单才会开放。目前已有 {members} 名。"
 
 msgid "This cannot be undone."
 msgstr "此操作无法撤销。"

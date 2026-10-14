@@ -6,10 +6,15 @@ import { TierTube } from "@/app/[lang]/components/TierTube";
 import type {
 	LeaderboardMetric,
 	LeaderboardStats,
+	OrgList,
+	OrgStats,
 	StandingRow,
 	Standings,
 } from "@/app/[lang]/utils/fetchLeaderboard";
 import {
+	fetchOrgList,
+	fetchOrgStandings,
+	fetchOrgStats,
 	fetchSearch,
 	fetchStanding,
 	fetchStandings,
@@ -20,7 +25,9 @@ import { formatDayRange } from "@/app/[lang]/utils/formatUsage";
 import { LeaderboardSummary } from "./components/LeaderboardSummary";
 import { LeaderboardTable } from "./components/LeaderboardTable";
 import { MetricTabs } from "./components/MetricTabs";
+import { OrgFloorNotice } from "./components/OrgFloorNotice";
 import { type RangeSelection, RangeTabs } from "./components/RangeTabs";
+import { type Scope, ScopeTabs } from "./components/ScopeTabs";
 import { SearchBox } from "./components/SearchBox";
 import { buildStandingsQuery } from "./utils/buildStandingsQuery";
 
@@ -59,6 +66,22 @@ export function LeaderboardBoard({
 	const [search, setSearch] = useState("");
 	const [viewerHandle, setViewerHandle] = useState<string | null>(null);
 	const [pinned, setPinned] = useState<StandingRow | null>(null);
+	const [scope, setScope] = useState<Scope>("all");
+	const [orgList, setOrgList] = useState<OrgList | null>(null);
+	const [organizationId, setOrganizationId] = useState<string | null>(null);
+	const [orgStats, setOrgStats] = useState<OrgStats | null>(null);
+	const activeOrgId = scope === "org" ? organizationId : null;
+	const inOrg = activeOrgId !== null;
+
+	useEffect(() => {
+		const controller = new AbortController();
+		fetchOrgList(controller.signal).then((next) => {
+			if (controller.signal.aborted) return;
+			setOrgList(next);
+			setOrganizationId(next?.defaultOrganizationId ?? null);
+		});
+		return () => controller.abort();
+	}, []);
 
 	useEffect(() => {
 		const initial = new URLSearchParams(window.location.search).get("q");
@@ -127,7 +150,7 @@ export function LeaderboardBoard({
 		!!viewerHandle && !!loadedRows?.some((row) => row.handle === viewerHandle);
 
 	useEffect(() => {
-		if (!viewerHandle || onScreen) {
+		if (!viewerHandle || onScreen || inOrg) {
 			setPinned(null);
 			return;
 		}
@@ -142,7 +165,7 @@ export function LeaderboardBoard({
 		});
 
 		return () => controller.abort();
-	}, [viewerHandle, onScreen, selection, metric]);
+	}, [viewerHandle, onScreen, inOrg, selection, metric]);
 
 	useEffect(() => {
 		if (!touched) return;
@@ -152,12 +175,25 @@ export function LeaderboardBoard({
 		setError(false);
 		setStandings(null);
 
+		const standingsQuery = {
+			...buildStandingsQuery(selection, metric),
+			limit: PAGE_SIZE,
+		};
+		const statsQuery = buildStandingsQuery(selection);
+		const statsRequest = activeOrgId
+			? fetchOrgStats(activeOrgId, statsQuery, controller.signal).then(
+					(next) => {
+						if (!controller.signal.aborted) setOrgStats(next);
+						return next?.stats ?? null;
+					},
+				)
+			: fetchStats(statsQuery, controller.signal);
+
 		Promise.all([
-			fetchStandings(
-				{ ...buildStandingsQuery(selection, metric), limit: PAGE_SIZE },
-				controller.signal,
-			),
-			fetchStats(buildStandingsQuery(selection), controller.signal),
+			activeOrgId
+				? fetchOrgStandings(activeOrgId, standingsQuery, controller.signal)
+				: fetchStandings(standingsQuery, controller.signal),
+			statsRequest,
 		])
 			.then(([nextStandings, nextStats]) => {
 				if (controller.signal.aborted) return;
@@ -170,7 +206,7 @@ export function LeaderboardBoard({
 			});
 
 		return () => controller.abort();
-	}, [metric, selection, touched]);
+	}, [metric, selection, touched, activeOrgId]);
 
 	const loadMore = async () => {
 		if (!standings || loadingMore || loading) return;
@@ -178,11 +214,14 @@ export function LeaderboardBoard({
 		setLoadingMore(true);
 		setLoadMoreError(false);
 		try {
-			const next = await fetchStandings({
+			const query = {
 				...buildStandingsQuery(selection, metric),
 				limit: PAGE_SIZE,
 				offset: standings.rows.length,
-			});
+			};
+			const next = activeOrgId
+				? await fetchOrgStandings(activeOrgId, query)
+				: await fetchStandings(query);
 			if (generation !== queryGeneration.current) return;
 			if (!next) {
 				setLoadMoreError(true);
@@ -198,16 +237,25 @@ export function LeaderboardBoard({
 	};
 
 	const update = (
-		next: Partial<{ metric: LeaderboardMetric; selection: RangeSelection }>,
+		next: Partial<{
+			metric: LeaderboardMetric;
+			selection: RangeSelection;
+			scope: Scope;
+			organizationId: string;
+		}>,
 	) => {
 		queryGeneration.current += 1;
 		setLoadMoreError(false);
 		setTouched(true);
 		if (next.metric) setMetric(next.metric);
 		if (next.selection) setSelection(next.selection);
+		if (next.scope) setScope(next.scope);
+		if (next.organizationId) setOrganizationId(next.organizationId);
 	};
 
-	const searchingByName = search.trim().length > 0;
+	const searchingByName = !inOrg && search.trim().length > 0;
+	const belowFloor =
+		inOrg && !loading && !error && !!orgStats && !orgStats.stats;
 	const hasError = searchingByName ? searchError : error;
 	const range = standings?.range ?? null;
 	const shown = standings?.rows.length ?? 0;
@@ -217,7 +265,20 @@ export function LeaderboardBoard({
 		<div className="space-y-6">
 			{header}
 
-			{stats && <LeaderboardSummary stats={stats} loading={loading} />}
+			{orgList && orgList.organizations.length > 0 && (
+				<ScopeTabs
+					scope={scope}
+					orgList={orgList}
+					organizationId={organizationId}
+					onChange={(nextScope, nextOrganizationId) =>
+						update({ scope: nextScope, organizationId: nextOrganizationId })
+					}
+				/>
+			)}
+
+			{stats && !belowFloor && (
+				<LeaderboardSummary stats={stats} loading={loading} />
+			)}
 
 			<div className="space-y-3 rounded-[2px] border border-border bg-foreground/[0.02] p-3 sm:p-4">
 				<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -233,7 +294,11 @@ export function LeaderboardBoard({
 					/>
 				</div>
 				<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-					<SearchBox value={search} onChange={setSearch} busy={searching} />
+					{inOrg ? (
+						<span />
+					) : (
+						<SearchBox value={search} onChange={setSearch} busy={searching} />
+					)}
 					<span className="text-xs text-muted-foreground">
 						{loading ? (
 							<Trans>Loading…</Trans>
@@ -268,6 +333,11 @@ export function LeaderboardBoard({
 						<Trans>Try again</Trans>
 					</button>
 				</div>
+			) : belowFloor ? (
+				<OrgFloorNotice
+					members={orgStats.members}
+					minMembers={orgStats.minMembers}
+				/>
 			) : (
 				<LeaderboardTable
 					rows={searchingByName ? (results ?? []) : (standings?.rows ?? [])}
@@ -282,6 +352,7 @@ export function LeaderboardBoard({
 			)}
 
 			{!searchingByName &&
+				!belowFloor &&
 				!hasError &&
 				!loading &&
 				standings &&
@@ -313,7 +384,7 @@ export function LeaderboardBoard({
 						</span>
 					</div>
 				)}
-			{stats && (
+			{stats && !belowFloor && (
 				<details className="group rounded-[2px] border border-border bg-background">
 					<summary className="cursor-pointer px-4 py-3 min-h-11 text-sm text-muted-foreground hover:text-foreground focus-visible:outline-2 focus-visible:outline-brand">
 						<Trans>Tier</Trans>

@@ -36,6 +36,20 @@ export interface StandingsResult {
 	hasMore: boolean;
 }
 
+export interface ViewerOrganization extends Record<string, unknown> {
+	id: string;
+	name: string;
+	/** Members on the board, all time. */
+	members: number;
+}
+
+export interface OrgStatsResult {
+	minMembers: number;
+	members: number;
+	/** Null below the member floor. */
+	stats: LeaderboardStats | null;
+}
+
 export interface TierDistribution {
 	distribution: number[];
 	ranked: number;

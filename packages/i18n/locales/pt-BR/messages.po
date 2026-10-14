@@ -931,6 +931,9 @@ msgstr "{localHostName} (este dispositivo)"
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} other {{1}}}"
 
+msgid "{members} of {minMembers}"
+msgstr "{members} de {minMembers}"
+
 #. placeholder {0}: gaps.length
 msgid "{met} of {0} objectives carrying for {nextLabel} — {laggingLabels} furthest behind."
 msgstr "{met} de {0} objetivos fazendo a sua parte para {nextLabel} — {laggingLabels} estão mais atrás."
@@ -9855,6 +9858,9 @@ msgstr "Membro removido"
 msgid "Members"
 msgstr "Membros"
 
+msgid "Members appear here after turning on \"Show me on my organizations' boards\" in Superset under Settings → Account."
+msgstr "Os membros aparecem aqui depois de ativar \"Mostrar-me nos placares das minhas organizações\" no Superset, em Configurações → Conta."
+
 msgid "Members cannot modify roles"
 msgstr "Membros não podem alterar papéis"
 
@@ -10770,6 +10776,9 @@ msgstr "Nenhum pull request aberto."
 
 msgid "No open review comments."
 msgstr "Nenhum comentário de revisão em aberto."
+
+msgid "No organization by that name."
+msgstr "Nenhuma organização com esse nome."
 
 msgid "No organization selected"
 msgstr "Nenhuma organização selecionada"
@@ -14442,6 +14451,9 @@ msgstr "Buscar no Linear…"
 msgid "Search models"
 msgstr "Buscar modelos"
 
+msgid "Search organizations"
+msgstr "Buscar organizações"
+
 msgid "Search pages"
 msgstr "Buscar páginas"
 
@@ -15112,6 +15124,9 @@ msgstr "Mostrar as linhas depois da alteração acima"
 
 msgid "Show lines before the change below"
 msgstr "Mostrar as linhas antes da alteração abaixo"
+
+msgid "Show me on my organizations' boards"
+msgstr "Mostrar-me nos placares das minhas organizações"
 
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "Me mostre as últimas 10 execuções da minha automação de triagem do Linear"
@@ -16460,6 +16475,9 @@ msgstr "Equipe não encontrada nesta organização"
 msgid "Team settings"
 msgstr "Configurações da equipe"
 
+msgid "Teammates in your Superset organizations can see where you rank among them. Off by default."
+msgstr "Colegas das suas organizações no Superset podem ver sua posição entre eles. Desativado por padrão."
+
 msgid "Teammates pin feedback to the exact part of the page they mean."
 msgstr "Seus colegas fixam o feedback na parte exata da página a que se referem."
 
@@ -17036,6 +17054,9 @@ msgstr "Esta automação ainda não tem instruções. Escreva um prompt nas conf
 
 msgid "This automation is in another organization"
 msgstr "Esta automação está em outra organização"
+
+msgid "This board opens once {minMembers} members have usage in this period. {members} so far."
+msgstr "Este placar abre quando {minMembers} membros tiverem uso neste período. Até agora, {members}."
 
 msgid "This cannot be undone."
 msgstr "Não dá para desfazer."

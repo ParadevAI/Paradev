@@ -12,9 +12,11 @@ import { type Tier, tierProgress } from "./tier";
 import type {
 	LeaderboardMetric,
 	LeaderboardStats,
+	OrgStatsResult,
 	ParticipantProfile,
 	StandingRow,
 	StandingsResult,
+	ViewerOrganization,
 	ViewerProfile,
 } from "./types";
 
@@ -51,15 +53,23 @@ function toAxes(row: AxisColumns): StandingRow["axes"] {
 	};
 }
 
+function onOrgBoard(organizationId: string | undefined) {
+	return organizationId
+		? sql`${publicProfiles.showOnOrgBoards} and exists (select 1 from auth.members m where m.organization_id = ${organizationId} and m.user_id = ${publicProfiles.userId})`
+		: undefined;
+}
+
 export async function getStandings(
 	opts: WindowOpts & {
 		metric: LeaderboardMetric;
 		limit: number;
 		offset: number;
+		organizationId?: string;
 	},
 ): Promise<StandingsResult> {
 	const range = resolveWindow(opts);
 	const byCost = opts.metric === "cost";
+	const inOrg = onOrgBoard(opts.organizationId);
 
 	if (!range) {
 		const rows = await db
@@ -81,7 +91,12 @@ export async function getStandings(
 			.innerJoin(users, eq(users.id, publicProfiles.userId))
 
 			.where(
-				and(onTheBoard, isNull(users.deletedAt), gt(publicProfiles.tokens, 0)),
+				and(
+					onTheBoard,
+					isNull(users.deletedAt),
+					gt(publicProfiles.tokens, 0),
+					inOrg,
+				),
 			)
 			.orderBy(
 				desc(byCost ? publicProfiles.usd : publicProfiles.tokens),
@@ -95,7 +110,12 @@ export async function getStandings(
 			.from(publicProfiles)
 			.innerJoin(users, eq(users.id, publicProfiles.userId))
 			.where(
-				and(onTheBoard, isNull(users.deletedAt), gt(publicProfiles.tokens, 0)),
+				and(
+					onTheBoard,
+					isNull(users.deletedAt),
+					gt(publicProfiles.tokens, 0),
+					inOrg,
+				),
 			);
 		const participantCount = Number(counted?.participants ?? 0);
 
@@ -143,6 +163,7 @@ export async function getStandings(
 				lte(leaderboardDaily.day, range.to),
 				onTheBoard,
 				isNull(users.deletedAt),
+				inOrg,
 			),
 		)
 		.groupBy(
@@ -176,6 +197,7 @@ export async function getStandings(
 				lte(leaderboardDaily.day, range.to),
 				onTheBoard,
 				isNull(users.deletedAt),
+				inOrg,
 			),
 		);
 	const participantCount = Number(counted?.participants ?? 0);
@@ -319,6 +341,78 @@ export async function getStandingFor(
 		usd,
 		sessions: Number(agg?.sessions ?? 0),
 		approximate: Boolean(agg?.approximate),
+	};
+}
+
+export const ORG_MIN_MEMBERS = 3;
+
+/** Orgs past the floor first, busiest first; the rest follow by name. */
+export async function getViewerOrganizations(
+	userId: string,
+): Promise<ViewerOrganization[]> {
+	const result = await db.execute<ViewerOrganization>(sql`
+		select * from (
+			select o.id, o.name, (
+				select count(*)::int
+				from public_profiles p
+				join auth.users u on u.id = p.user_id
+				where p.visibility = 'public'
+					and p.revoked_at is null
+					and p.flagged_at is null
+					and u.deleted_at is null
+					and p.tokens > 0
+					and p.show_on_org_boards
+					and exists (
+						select 1 from auth.members m
+						where m.organization_id = o.id and m.user_id = p.user_id
+					)
+			) as members
+			from auth.organizations o
+			where exists (
+				select 1 from auth.members m
+				where m.organization_id = o.id and m.user_id = ${userId}
+			)
+		) orgs
+		order by (members >= ${ORG_MIN_MEMBERS}) desc, members desc, name
+	`);
+
+	return result.rows.map((row) => ({
+		id: row.id,
+		name: row.name,
+		members: Number(row.members),
+	}));
+}
+
+/** An org board opens once enough members are on it, so it never singles out one person. */
+export async function getOrgStandings(
+	organizationId: string,
+	opts: WindowOpts & {
+		metric: LeaderboardMetric;
+		limit: number;
+		offset: number;
+	},
+): Promise<StandingsResult> {
+	const standings = await getStandings({ ...opts, organizationId });
+	const open = standings.total >= ORG_MIN_MEMBERS;
+
+	return {
+		...standings,
+		rows: open ? standings.rows : [],
+		hasMore: open && standings.hasMore,
+	};
+}
+
+export async function getOrgStats(
+	organizationId: string,
+	opts: WindowOpts,
+): Promise<OrgStatsResult> {
+	const stats = await getStats(opts, organizationId);
+	const members = stats.totals.participants;
+
+	return {
+		minMembers: ORG_MIN_MEMBERS,
+		members,
+		stats: members >= ORG_MIN_MEMBERS ? stats : null,
 	};
 }
 
@@ -485,7 +579,9 @@ export async function searchParticipants(
 
 const TOP_MODELS = 20;
 
-async function getTierDistribution(): Promise<LeaderboardStats["tiers"]> {
+async function getTierDistribution(
+	organizationId?: string,
+): Promise<LeaderboardStats["tiers"]> {
 	const rows = await db
 		.select({
 			tier: publicProfiles.tier,
@@ -493,7 +589,7 @@ async function getTierDistribution(): Promise<LeaderboardStats["tiers"]> {
 		})
 		.from(publicProfiles)
 		.innerJoin(users, eq(users.id, publicProfiles.userId))
-		.where(and(onTheBoard, isNull(users.deletedAt)))
+		.where(and(onTheBoard, isNull(users.deletedAt), onOrgBoard(organizationId)))
 		.groupBy(publicProfiles.tier);
 
 	const distribution = [0, 0, 0, 0, 0];
@@ -525,11 +621,18 @@ async function getTierDistribution(): Promise<LeaderboardStats["tiers"]> {
 	return { distribution, ranked, mode, position };
 }
 
-export async function getStats(opts: WindowOpts): Promise<LeaderboardStats> {
+export async function getStats(
+	opts: WindowOpts,
+	organizationId?: string,
+): Promise<LeaderboardStats> {
 	const range = resolveWindow(opts);
-	const tiers = await getTierDistribution();
+	const tiers = await getTierDistribution(organizationId);
 
-	const active = and(onTheBoard, isNull(users.deletedAt));
+	const active = and(
+		onTheBoard,
+		isNull(users.deletedAt),
+		onOrgBoard(organizationId),
+	);
 	const window = range
 		? and(
 				gte(leaderboardDaily.day, range.from),
