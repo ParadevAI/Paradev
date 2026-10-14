@@ -6,10 +6,12 @@ export async function refreshUsageQuota<T>({
 	queryClient,
 	queryKey,
 	load,
+	selectCurrent,
 }: {
 	queryClient: QueryClient;
 	queryKey: readonly ["host-usage-quota", string | null];
 	load: () => Promise<T>;
+	selectCurrent?: (fresh: T) => T | undefined;
 }): Promise<void> {
 	let pending = requests.get(queryClient);
 	if (!pending) {
@@ -24,7 +26,8 @@ export async function refreshUsageQuota<T>({
 		if (pending.get(host) !== request) return;
 		await queryClient.cancelQueries({ queryKey, exact: true });
 		if (pending.get(host) !== request) return;
-		queryClient.setQueryData(queryKey, fresh);
+		const current = selectCurrent ? selectCurrent(fresh) : fresh;
+		if (current !== undefined) queryClient.setQueryData(queryKey, current);
 	} finally {
 		if (pending.get(host) === request) pending.delete(host);
 	}

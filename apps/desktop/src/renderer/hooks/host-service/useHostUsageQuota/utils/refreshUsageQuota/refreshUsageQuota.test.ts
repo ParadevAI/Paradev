@@ -176,3 +176,53 @@ test("publishing cancels only the exact quota query", async () => {
 	expect(await sibling).toBe("retained");
 	expect(queryClient.getQueryData<string>(siblingKey)).toBe("retained");
 });
+
+test("a newer subscribed observation wins while refresh cancellation is pending", async () => {
+	const queryClient = client();
+	const started = deferred<void>();
+	const release = deferred<void>();
+	const cancel = queryClient.cancelQueries.bind(queryClient);
+	queryClient.cancelQueries = async (...args) => {
+		started.resolve();
+		await release.promise;
+		return cancel(...args);
+	};
+	let current = accountA;
+	const refresh = refreshUsageQuota({
+		queryClient,
+		queryKey,
+		load: async () => accountA,
+		selectCurrent: () => current,
+	});
+	await started.promise;
+	current = accountB;
+	queryClient.setQueryData(queryKey, current);
+	release.resolve();
+	await refresh;
+	expect(queryClient.getQueryData<typeof accountA>(queryKey)).toEqual(accountB);
+});
+
+test("an identity invalidation during cancellation prevents refresh from restoring old data", async () => {
+	const queryClient = client();
+	const started = deferred<void>();
+	const release = deferred<void>();
+	const cancel = queryClient.cancelQueries.bind(queryClient);
+	queryClient.cancelQueries = async (...args) => {
+		started.resolve();
+		await release.promise;
+		return cancel(...args);
+	};
+	let invalidated = false;
+	const refresh = refreshUsageQuota({
+		queryClient,
+		queryKey,
+		load: async () => accountA,
+		selectCurrent: (value) => (invalidated ? undefined : value),
+	});
+	await started.promise;
+	invalidated = true;
+	queryClient.removeQueries({ queryKey, exact: true });
+	release.resolve();
+	await refresh;
+	expect(queryClient.getQueryData(queryKey)).toBeUndefined();
+});
