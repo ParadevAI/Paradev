@@ -1641,6 +1641,9 @@ msgstr "В {where} уже есть файл с именем «{firstName}». З�
 msgid "A focused burn-down of crashes, hangs, and reconnect failures across the app."
 msgstr "Прицельная зачистка падений, зависаний и сбоев переподключения по всему приложению."
 
+msgid "A friend or colleague"
+msgstr "Друг или коллега"
+
 msgid "A gateway is signed in with an API key."
 msgstr "Шлюз авторизован с помощью ключа API."
 
@@ -1670,6 +1673,9 @@ msgstr "Чтобы продолжить, нужна новая версия Para
 
 msgid "A new workspace off this branch, with the conversation handed to a fresh agent"
 msgstr "Новое рабочее пространство от этой ветки, разговор передаётся новому агенту"
+
+msgid "A newsletter or blog"
+msgstr "Рассылка или блог"
 
 msgid "A page can save each reader's answer, so a poll works with no backend."
 msgstr "Страница может сохранять ответ каждого читателя, поэтому опрос работает без бэкенда."
@@ -2223,6 +2229,9 @@ msgstr "AI · диалог"
 msgid "AI · Status"
 msgstr "AI · статус"
 
+msgid "AI assistants"
+msgstr "ИИ-ассистенты"
+
 msgid "Alert"
 msgstr "Оповещение"
 
@@ -2561,6 +2570,9 @@ msgstr "Ежегодно {date} в {time}"
 
 msgid "Anonymous Assembler"
 msgstr "Анонимный сборщик"
+
+msgid "Another AI assistant"
+msgstr "Другой ИИ-ассистент"
 
 msgid "another device"
 msgstr "другое устройство"
@@ -4091,6 +4103,9 @@ msgstr "Выберите, как открывать пути файлов при
 msgid "Choose MCP servers for this message"
 msgstr "Выбрать серверы MCP для этого сообщения"
 
+msgid "Choose one"
+msgstr "Выберите"
+
 msgid "Choose the model"
 msgstr "Выбрать модель"
 
@@ -4139,6 +4154,9 @@ msgstr "Прозрачный"
 
 msgid "Clear all"
 msgstr "Очистить всё"
+
+msgid "Clear answer"
+msgstr "Очистить ответ"
 
 msgid "Clear browsing data"
 msgstr "Очистить данные браузера"
@@ -8936,6 +8954,9 @@ msgstr "Перейти в рабочую область"
 msgid "Google did not grant lasting access. Remove Paradev from your Google account's third-party access and try again."
 msgstr "Google не выдал длительный доступ. Удалите Paradev из стороннего доступа в аккаунте Google и повторите."
 
+msgid "Google or another search engine"
+msgstr "Google или другой поисковик"
+
 msgid "Got it"
 msgstr "Понятно"
 
@@ -9248,6 +9269,9 @@ msgstr "Как создаются ветки и имена рабочих обл
 
 msgid "How can we help?"
 msgstr "Чем можем помочь?"
+
+msgid "How did you hear about Paradev?"
+msgstr "Как вы узнали о Paradev?"
 
 msgid "How do cloud hours work?"
 msgstr "Как работают облачные часы?"
@@ -13292,6 +13316,9 @@ msgstr "Необязательное пояснение, показываемо�
 
 msgid "Optional flags appended after the prompt payload"
 msgstr "Необязательные флаги, добавляемые после промпта"
+
+msgid "Optional. Helps us learn what works."
+msgstr "Необязательно. Помогает понять, что работает."
 
 msgid "Options"
 msgstr "Параметры"
@@ -20654,6 +20681,9 @@ msgstr "Если выключено, ничто извне не может по�
 msgid "Where detected-port badges in the sidebar open when clicked."
 msgstr "Куда ведут значки обнаруженных портов в боковой панели при клике."
 
+msgid "Where did you hear about Paradev?"
+msgstr "Где вы узнали о Paradev?"
+
 msgid "Where do you rank?"
 msgstr "Какое у вас место?"
 
@@ -20674,6 +20704,9 @@ msgstr "Где доступен этот скрипт терминала."
 
 msgid "Where to look next"
 msgstr "Куда посмотреть дальше"
+
+msgid "Where? (optional)"
+msgstr "Где? (необязательно)"
 
 msgid "Which agents are supported?"
 msgstr "Какие агенты поддерживаются?"

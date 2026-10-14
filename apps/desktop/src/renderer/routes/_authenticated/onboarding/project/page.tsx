@@ -31,6 +31,13 @@ import { TemplateGalleryModal } from "renderer/routes/_authenticated/components/
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { GhAuthDialog } from "../components/GhAuthDialog";
 import { OnboardingTile } from "../components/OnboardingTile";
+import { AcquisitionSourceRow } from "./components/AcquisitionSourceRow";
+import {
+	ACQUISITION_SOURCE_EVENT,
+	type AcquisitionSourceAnswer,
+	buildAcquisitionSourceProperties,
+	EMPTY_ACQUISITION_SOURCE_ANSWER,
+} from "./utils/acquisitionSource";
 
 export const Route = createFileRoute("/_authenticated/onboarding/project/")({
 	component: OnboardingProjectPage,
@@ -83,6 +90,8 @@ function OnboardingProjectPage() {
 	const [emptyProjectOpen, setEmptyProjectOpen] = useState(false);
 	const [templateOpen, setTemplateOpen] = useState(false);
 	const [cloneOpen, setCloneOpen] = useState(false);
+	const [acquisitionSource, setAcquisitionSource] =
+		useState<AcquisitionSourceAnswer>(EMPTY_ACQUISITION_SOURCE_ANSWER);
 
 	const folderImport = useFolderFirstImport({
 		onError: (message) => toast.error(message),
@@ -96,6 +105,11 @@ function OnboardingProjectPage() {
 	// Adding a project finishes onboarding: mark onboarded, then hand off to the
 	// new-workspace screen with the project just added selected.
 	const finish = async (projectId: string) => {
+		const acquisitionProperties =
+			buildAcquisitionSourceProperties(acquisitionSource);
+		if (acquisitionProperties) {
+			track(ACQUISITION_SOURCE_EVENT, acquisitionProperties);
+		}
 		track("onboarding_finished", { outcome: "completed" });
 		try {
 			await apiTrpcClient.user.completeOnboarding.mutate();
@@ -280,6 +294,14 @@ function OnboardingProjectPage() {
 					)}
 				</div>
 			)}
+
+			<div className="mt-6">
+				<AcquisitionSourceRow
+					value={acquisitionSource}
+					onChange={setAcquisitionSource}
+					disabled={busy}
+				/>
+			</div>
 
 			<TemplateGalleryModal
 				open={templateOpen}

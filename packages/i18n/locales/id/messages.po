@@ -1641,6 +1641,9 @@ msgstr "File bernama '{firstName}' sudah ada di {where}. Ingin menggantinya?"
 msgid "A focused burn-down of crashes, hangs, and reconnect failures across the app."
 msgstr "Pembersihan terfokus atas crash, hang, dan kegagalan sambung ulang di seluruh aplikasi."
 
+msgid "A friend or colleague"
+msgstr "Teman atau rekan kerja"
+
 msgid "A gateway is signed in with an API key."
 msgstr "Gateway masuk menggunakan kunci API."
 
@@ -1670,6 +1673,9 @@ msgstr "Versi baru Paradev diperlukan untuk melanjutkan. Silakan perbarui ke ver
 
 msgid "A new workspace off this branch, with the conversation handed to a fresh agent"
 msgstr "Ruang kerja baru dari cabang ini, dengan percakapan diserahkan ke agen baru"
+
+msgid "A newsletter or blog"
+msgstr "Newsletter atau blog"
 
 msgid "A page can save each reader's answer, so a poll works with no backend."
 msgstr "Halaman bisa menyimpan jawaban setiap pembaca, jadi polling berjalan tanpa backend."
@@ -2223,6 +2229,9 @@ msgstr "AI · Percakapan"
 msgid "AI · Status"
 msgstr "AI · Status"
 
+msgid "AI assistants"
+msgstr "Asisten AI"
+
 msgid "Alert"
 msgstr "Alert"
 
@@ -2561,6 +2570,9 @@ msgstr "Tahunan pada {date} pukul {time}"
 
 msgid "Anonymous Assembler"
 msgstr "Perakit Anonim"
+
+msgid "Another AI assistant"
+msgstr "Asisten AI lain"
 
 msgid "another device"
 msgstr "perangkat lain"
@@ -4091,6 +4103,9 @@ msgstr "Pilih cara membuka path file saat Cmd+klik di terminal"
 msgid "Choose MCP servers for this message"
 msgstr "Pilih server MCP untuk pesan ini"
 
+msgid "Choose one"
+msgstr "Pilih salah satu"
+
 msgid "Choose the model"
 msgstr "Pilih model"
 
@@ -4139,6 +4154,9 @@ msgstr "Bening"
 
 msgid "Clear all"
 msgstr "Hapus semua"
+
+msgid "Clear answer"
+msgstr "Hapus jawaban"
 
 msgid "Clear browsing data"
 msgstr "Bersihkan data penjelajahan"
@@ -8936,6 +8954,9 @@ msgstr "Ke workspace"
 msgid "Google did not grant lasting access. Remove Paradev from your Google account's third-party access and try again."
 msgstr "Google tidak memberikan akses jangka panjang. Hapus Paradev dari akses pihak ketiga di akun Google Anda lalu coba lagi."
 
+msgid "Google or another search engine"
+msgstr "Google atau mesin pencari lain"
+
 msgid "Got it"
 msgstr "Mengerti"
 
@@ -9248,6 +9269,9 @@ msgstr "Bagaimana branch dan nama workspace dibuat untuk proyek ini."
 
 msgid "How can we help?"
 msgstr "Ada yang bisa kami bantu?"
+
+msgid "How did you hear about Paradev?"
+msgstr "Dari mana Anda tahu tentang Paradev?"
 
 msgid "How do cloud hours work?"
 msgstr "Bagaimana cara kerja jam cloud?"
@@ -13292,6 +13316,9 @@ msgstr "Konteks opsional yang ditampilkan di daftar skrip terminal."
 
 msgid "Optional flags appended after the prompt payload"
 msgstr "Flag opsional yang ditambahkan setelah muatan prompt"
+
+msgid "Optional. Helps us learn what works."
+msgstr "Opsional. Membantu kami mengetahui apa yang berhasil."
 
 msgid "Options"
 msgstr "Opsi"
@@ -20654,6 +20681,9 @@ msgstr "Saat nonaktif, tidak ada yang bisa mengakses file dan alat di perangkat 
 msgid "Where detected-port badges in the sidebar open when clicked."
 msgstr "Ke mana badge port yang terdeteksi di sidebar terbuka saat diklik."
 
+msgid "Where did you hear about Paradev?"
+msgstr "Di mana Anda tahu tentang Paradev?"
+
 msgid "Where do you rank?"
 msgstr "Di peringkat berapa Anda?"
 
@@ -20674,6 +20704,9 @@ msgstr "Di mana skrip terminal ini tersedia."
 
 msgid "Where to look next"
 msgstr "Ke mana mencari berikutnya"
+
+msgid "Where? (optional)"
+msgstr "Di mana? (opsional)"
 
 msgid "Which agents are supported?"
 msgstr "Agen mana saja yang didukung?"

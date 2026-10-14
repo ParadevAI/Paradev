@@ -1641,6 +1641,9 @@ msgstr "{where}中已存在名为「{firstName}」的文件。是否要替换它
 msgid "A focused burn-down of crashes, hangs, and reconnect failures across the app."
 msgstr "集中清理全应用的崩溃、卡死和重连失败。"
 
+msgid "A friend or colleague"
+msgstr "朋友或同事"
+
 msgid "A gateway is signed in with an API key."
 msgstr "网关使用 API 密钥登录。"
 
@@ -1670,6 +1673,9 @@ msgstr "需要新版本的Paradev才能继续。请更新到最新版本。"
 
 msgid "A new workspace off this branch, with the conversation handed to a fresh agent"
 msgstr "基于该分支创建新工作区，并将对话交给新的智能体"
+
+msgid "A newsletter or blog"
+msgstr "新闻通讯或博客"
 
 msgid "A page can save each reader's answer, so a poll works with no backend."
 msgstr "页面可以保存每位读者的答案，所以无需后端就能做投票。"
@@ -2223,6 +2229,9 @@ msgstr "AI · 对话"
 msgid "AI · Status"
 msgstr "AI · 状态"
 
+msgid "AI assistants"
+msgstr "AI 助手"
+
 msgid "Alert"
 msgstr "警告"
 
@@ -2561,6 +2570,9 @@ msgstr "每年{date}{time}"
 
 msgid "Anonymous Assembler"
 msgstr "匿名装配工"
+
+msgid "Another AI assistant"
+msgstr "其他 AI 助手"
 
 msgid "another device"
 msgstr "另一台设备"
@@ -4091,6 +4103,9 @@ msgstr "选择在终端中Cmd+点击文件路径时的打开方式"
 msgid "Choose MCP servers for this message"
 msgstr "为这条消息选择MCP服务器"
 
+msgid "Choose one"
+msgstr "请选择"
+
 msgid "Choose the model"
 msgstr "选择模型"
 
@@ -4139,6 +4154,9 @@ msgstr "透明"
 
 msgid "Clear all"
 msgstr "全部清除"
+
+msgid "Clear answer"
+msgstr "清除答案"
 
 msgid "Clear browsing data"
 msgstr "清除浏览数据"
@@ -8936,6 +8954,9 @@ msgstr "前往工作区"
 msgid "Google did not grant lasting access. Remove Paradev from your Google account's third-party access and try again."
 msgstr "Google没有授予持久访问权限。请在你的Google账户的第三方访问中移除Paradev，然后重试。"
 
+msgid "Google or another search engine"
+msgstr "Google 或其他搜索引擎"
+
 msgid "Got it"
 msgstr "知道了"
 
@@ -9248,6 +9269,9 @@ msgstr "此项目如何创建分支和工作区名称。"
 
 msgid "How can we help?"
 msgstr "我们能帮你什么？"
+
+msgid "How did you hear about Paradev?"
+msgstr "你是如何了解到 Paradev 的？"
 
 msgid "How do cloud hours work?"
 msgstr "云端时长如何计算？"
@@ -13292,6 +13316,9 @@ msgstr "可选说明，显示在终端脚本列表中。"
 
 msgid "Optional flags appended after the prompt payload"
 msgstr "追加在提示词内容之后的可选标志"
+
+msgid "Optional. Helps us learn what works."
+msgstr "可选。帮助我们了解哪些渠道有效。"
 
 msgid "Options"
 msgstr "选项"
@@ -20654,6 +20681,9 @@ msgstr "关闭后，其他设备无法访问本设备上的文件和工具。你
 msgid "Where detected-port badges in the sidebar open when clicked."
 msgstr "点击侧边栏中检测到的端口标记时打开的位置。"
 
+msgid "Where did you hear about Paradev?"
+msgstr "你是在哪里了解到 Paradev 的？"
+
 msgid "Where do you rank?"
 msgstr "你排第几？"
 
@@ -20674,6 +20704,9 @@ msgstr "此终端脚本在哪些地方可用。"
 
 msgid "Where to look next"
 msgstr "接下来可以看这些"
+
+msgid "Where? (optional)"
+msgstr "在哪里？（可选）"
 
 msgid "Which agents are supported?"
 msgstr "支持哪些智能体？"

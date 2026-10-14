@@ -1641,6 +1641,9 @@ msgstr "{where}에 '{firstName}'(이)라는 파일이 이미 있습니다. 바�
 msgid "A focused burn-down of crashes, hangs, and reconnect failures across the app."
 msgstr "앱 전반의 크래시, 멈춤, 재연결 실패를 집중적으로 줄입니다."
 
+msgid "A friend or colleague"
+msgstr "친구 또는 동료"
+
 msgid "A gateway is signed in with an API key."
 msgstr "게이트웨이는 API 키로 로그인합니다."
 
@@ -1670,6 +1673,9 @@ msgstr "계속하려면 새 버전의 Paradev가 필요합니다. 최신 버전�
 
 msgid "A new workspace off this branch, with the conversation handed to a fresh agent"
 msgstr "이 브랜치에서 새 워크스페이스를 만들고 대화를 새 에이전트에 넘깁니다"
+
+msgid "A newsletter or blog"
+msgstr "뉴스레터 또는 블로그"
 
 msgid "A page can save each reader's answer, so a poll works with no backend."
 msgstr "페이지가 독자별 답변을 저장하므로 백엔드 없이 투표를 만들 수 있습니다."
@@ -2223,6 +2229,9 @@ msgstr "AI · 대화"
 msgid "AI · Status"
 msgstr "AI · 상태"
 
+msgid "AI assistants"
+msgstr "AI 어시스턴트"
+
 msgid "Alert"
 msgstr "경고"
 
@@ -2561,6 +2570,9 @@ msgstr "매년 {date} {time}"
 
 msgid "Anonymous Assembler"
 msgstr "익명의 조립공"
+
+msgid "Another AI assistant"
+msgstr "다른 AI 어시스턴트"
 
 msgid "another device"
 msgstr "다른 기기"
@@ -4091,6 +4103,9 @@ msgstr "터미널에서 Cmd+클릭할 때 파일 경로를 여는 방식을 선�
 msgid "Choose MCP servers for this message"
 msgstr "이 메시지에 사용할 MCP 서버 선택"
 
+msgid "Choose one"
+msgstr "선택하세요"
+
 msgid "Choose the model"
 msgstr "모델 선택"
 
@@ -4139,6 +4154,9 @@ msgstr "투명"
 
 msgid "Clear all"
 msgstr "모두 지우기"
+
+msgid "Clear answer"
+msgstr "답변 지우기"
 
 msgid "Clear browsing data"
 msgstr "인터넷 사용 기록 삭제"
@@ -8936,6 +8954,9 @@ msgstr "워크스페이스로 이동"
 msgid "Google did not grant lasting access. Remove Paradev from your Google account's third-party access and try again."
 msgstr "Google이 지속적인 접근 권한을 부여하지 않았습니다. Google 계정의 서드파티 접근에서 Paradev를 제거한 뒤 다시 시도해 주세요."
 
+msgid "Google or another search engine"
+msgstr "Google 또는 다른 검색 엔진"
+
 msgid "Got it"
 msgstr "확인"
 
@@ -9248,6 +9269,9 @@ msgstr "이 프로젝트에서 브랜치와 워크스페이스 이름이 만들�
 
 msgid "How can we help?"
 msgstr "무엇을 도와드릴까요?"
+
+msgid "How did you hear about Paradev?"
+msgstr "Paradev를 어떻게 알게 되셨나요?"
 
 msgid "How do cloud hours work?"
 msgstr "클라우드 시간은 어떻게 작동하나요?"
@@ -13292,6 +13316,9 @@ msgstr "터미널 스크립트 목록에 표시되는 선택 설명입니다."
 
 msgid "Optional flags appended after the prompt payload"
 msgstr "프롬프트 페이로드 뒤에 붙일 선택 플래그"
+
+msgid "Optional. Helps us learn what works."
+msgstr "선택 사항입니다. 무엇이 효과적인지 파악하는 데 도움이 됩니다."
 
 msgid "Options"
 msgstr "옵션"
@@ -20654,6 +20681,9 @@ msgstr "끄면 이 기기의 파일과 도구에 아무것도 접근할 수 없�
 msgid "Where detected-port badges in the sidebar open when clicked."
 msgstr "사이드바의 감지된 포트 배지를 클릭했을 때 열리는 위치입니다."
 
+msgid "Where did you hear about Paradev?"
+msgstr "Paradev를 어디에서 알게 되셨나요?"
+
 msgid "Where do you rank?"
 msgstr "내 순위는 몇 위일까요?"
 
@@ -20674,6 +20704,9 @@ msgstr "이 터미널 스크립트를 사용할 수 있는 범위입니다."
 
 msgid "Where to look next"
 msgstr "다음으로 찾아볼 곳"
+
+msgid "Where? (optional)"
+msgstr "어디에서? (선택 사항)"
 
 msgid "Which agents are supported?"
 msgstr "어떤 에이전트를 지원하나요?"

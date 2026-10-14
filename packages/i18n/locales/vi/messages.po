@@ -1641,6 +1641,9 @@ msgstr "Đã có tệp tên '{firstName}' trong {where}. Bạn có muốn thay t
 msgid "A focused burn-down of crashes, hangs, and reconnect failures across the app."
 msgstr "Đợt tập trung xử lý crash, treo và lỗi kết nối lại trên toàn ứng dụng."
 
+msgid "A friend or colleague"
+msgstr "Bạn bè hoặc đồng nghiệp"
+
 msgid "A gateway is signed in with an API key."
 msgstr "Gateway đăng nhập bằng khóa API."
 
@@ -1670,6 +1673,9 @@ msgstr "Cần phiên bản Paradev mới để tiếp tục. Vui lòng cập nh�
 
 msgid "A new workspace off this branch, with the conversation handed to a fresh agent"
 msgstr "Một workspace mới từ nhánh này, hội thoại được bàn giao cho tác nhân mới"
+
+msgid "A newsletter or blog"
+msgstr "Bản tin hoặc blog"
 
 msgid "A page can save each reader's answer, so a poll works with no backend."
 msgstr "Một trang có thể lưu câu trả lời của từng người đọc, nên cuộc khảo sát chạy được mà không cần backend."
@@ -2223,6 +2229,9 @@ msgstr "AI · Hội thoại"
 msgid "AI · Status"
 msgstr "AI · Trạng thái"
 
+msgid "AI assistants"
+msgstr "Trợ lý AI"
+
 msgid "Alert"
 msgstr "Alert"
 
@@ -2561,6 +2570,9 @@ msgstr "Hằng năm vào {date} lúc {time}"
 
 msgid "Anonymous Assembler"
 msgstr "Thợ lắp ráp ẩn danh"
+
+msgid "Another AI assistant"
+msgstr "Trợ lý AI khác"
 
 msgid "another device"
 msgstr "thiết bị khác"
@@ -4091,6 +4103,9 @@ msgstr "Chọn cách mở đường dẫn tệp khi Cmd+nhấp trong terminal"
 msgid "Choose MCP servers for this message"
 msgstr "Chọn server MCP cho tin nhắn này"
 
+msgid "Choose one"
+msgstr "Chọn một"
+
 msgid "Choose the model"
 msgstr "Chọn mô hình"
 
@@ -4139,6 +4154,9 @@ msgstr "Trong suốt"
 
 msgid "Clear all"
 msgstr "Xóa tất cả"
+
+msgid "Clear answer"
+msgstr "Xóa câu trả lời"
 
 msgid "Clear browsing data"
 msgstr "Xóa dữ liệu duyệt web"
@@ -8936,6 +8954,9 @@ msgstr "Đi tới workspace"
 msgid "Google did not grant lasting access. Remove Paradev from your Google account's third-party access and try again."
 msgstr "Google không cấp quyền truy cập lâu dài. Hãy gỡ Paradev khỏi phần truy cập của bên thứ ba trong tài khoản Google của bạn rồi thử lại."
 
+msgid "Google or another search engine"
+msgstr "Google hoặc công cụ tìm kiếm khác"
+
 msgid "Got it"
 msgstr "Đã hiểu"
 
@@ -9248,6 +9269,9 @@ msgstr "Cách tạo nhánh và tên workspace cho dự án này."
 
 msgid "How can we help?"
 msgstr "Chúng tôi có thể giúp gì?"
+
+msgid "How did you hear about Paradev?"
+msgstr "Bạn biết đến Paradev qua đâu?"
 
 msgid "How do cloud hours work?"
 msgstr "Giờ đám mây hoạt động thế nào?"
@@ -13292,6 +13316,9 @@ msgstr "Ghi chú tùy chọn hiện trong danh sách script terminal."
 
 msgid "Optional flags appended after the prompt payload"
 msgstr "Cờ tùy chọn thêm vào sau phần prompt"
+
+msgid "Optional. Helps us learn what works."
+msgstr "Không bắt buộc. Giúp chúng tôi biết kênh nào hiệu quả."
 
 msgid "Options"
 msgstr "Tùy chọn"
@@ -20654,6 +20681,9 @@ msgstr "Khi tắt, không gì khác có thể truy cập tệp và công cụ tr
 msgid "Where detected-port badges in the sidebar open when clicked."
 msgstr "Nơi mở khi nhấp vào huy hiệu cổng phát hiện được ở thanh bên."
 
+msgid "Where did you hear about Paradev?"
+msgstr "Bạn biết đến Paradev ở đâu?"
+
 msgid "Where do you rank?"
 msgstr "Bạn xếp hạng bao nhiêu?"
 
@@ -20674,6 +20704,9 @@ msgstr "Nơi script terminal này khả dụng."
 
 msgid "Where to look next"
 msgstr "Xem tiếp ở đâu"
+
+msgid "Where? (optional)"
+msgstr "Ở đâu? (không bắt buộc)"
 
 msgid "Which agents are supported?"
 msgstr "Những agent nào được hỗ trợ?"

@@ -1641,6 +1641,9 @@ msgstr "A file named '{firstName}' already exists in {where}. Do you want to rep
 msgid "A focused burn-down of crashes, hangs, and reconnect failures across the app."
 msgstr "A focused burn-down of crashes, hangs, and reconnect failures across the app."
 
+msgid "A friend or colleague"
+msgstr "A friend or colleague"
+
 msgid "A gateway is signed in with an API key."
 msgstr "A gateway is signed in with an API key."
 
@@ -1670,6 +1673,9 @@ msgstr "A new version of Paradev is required to continue. Please update to the l
 
 msgid "A new workspace off this branch, with the conversation handed to a fresh agent"
 msgstr "A new workspace off this branch, with the conversation handed to a fresh agent"
+
+msgid "A newsletter or blog"
+msgstr "A newsletter or blog"
 
 msgid "A page can save each reader's answer, so a poll works with no backend."
 msgstr "A page can save each reader's answer, so a poll works with no backend."
@@ -2223,6 +2229,9 @@ msgstr "AI · Conversation"
 msgid "AI · Status"
 msgstr "AI · Status"
 
+msgid "AI assistants"
+msgstr "AI assistants"
+
 msgid "Alert"
 msgstr "Alert"
 
@@ -2561,6 +2570,9 @@ msgstr "Annually on {date} at {time}"
 
 msgid "Anonymous Assembler"
 msgstr "Anonymous Assembler"
+
+msgid "Another AI assistant"
+msgstr "Another AI assistant"
 
 msgid "another device"
 msgstr "another device"
@@ -4091,6 +4103,9 @@ msgstr "Choose how to open file paths when Cmd+clicking in the terminal"
 msgid "Choose MCP servers for this message"
 msgstr "Choose MCP servers for this message"
 
+msgid "Choose one"
+msgstr "Choose one"
+
 msgid "Choose the model"
 msgstr "Choose the model"
 
@@ -4139,6 +4154,9 @@ msgstr "Clear"
 
 msgid "Clear all"
 msgstr "Clear all"
+
+msgid "Clear answer"
+msgstr "Clear answer"
 
 msgid "Clear browsing data"
 msgstr "Clear browsing data"
@@ -8936,6 +8954,9 @@ msgstr "Go to workspace"
 msgid "Google did not grant lasting access. Remove Paradev from your Google account's third-party access and try again."
 msgstr "Google did not grant lasting access. Remove Paradev from your Google account's third-party access and try again."
 
+msgid "Google or another search engine"
+msgstr "Google or another search engine"
+
 msgid "Got it"
 msgstr "Got it"
 
@@ -9248,6 +9269,9 @@ msgstr "How branches and workspace names are created for this project."
 
 msgid "How can we help?"
 msgstr "How can we help?"
+
+msgid "How did you hear about Paradev?"
+msgstr "How did you hear about Paradev?"
 
 msgid "How do cloud hours work?"
 msgstr "How do cloud hours work?"
@@ -13292,6 +13316,9 @@ msgstr "Optional context shown in the terminal scripts list."
 
 msgid "Optional flags appended after the prompt payload"
 msgstr "Optional flags appended after the prompt payload"
+
+msgid "Optional. Helps us learn what works."
+msgstr "Optional. Helps us learn what works."
 
 msgid "Options"
 msgstr "Options"
@@ -20654,6 +20681,9 @@ msgstr "When off, nothing else can reach the files and tools on this device. You
 msgid "Where detected-port badges in the sidebar open when clicked."
 msgstr "Where detected-port badges in the sidebar open when clicked."
 
+msgid "Where did you hear about Paradev?"
+msgstr "Where did you hear about Paradev?"
+
 msgid "Where do you rank?"
 msgstr "Where do you rank?"
 
@@ -20674,6 +20704,9 @@ msgstr "Where this terminal script is available."
 
 msgid "Where to look next"
 msgstr "Where to look next"
+
+msgid "Where? (optional)"
+msgstr "Where? (optional)"
 
 msgid "Which agents are supported?"
 msgstr "Which agents are supported?"

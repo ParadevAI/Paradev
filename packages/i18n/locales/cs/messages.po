@@ -1641,6 +1641,9 @@ msgstr "V {where} už existuje soubor s názvem „{firstName}“. Chcete ho nah
 msgid "A focused burn-down of crashes, hangs, and reconnect failures across the app."
 msgstr "Soustředěné likvidování pádů, zaseknutí a selhání při opětovném připojení napříč aplikací."
 
+msgid "A friend or colleague"
+msgstr "Přítel nebo kolega"
+
 msgid "A gateway is signed in with an API key."
 msgstr "Brána se přihlašuje pomocí API klíče."
 
@@ -1670,6 +1673,9 @@ msgstr "Pro pokračování je potřeba novější verze Paradev. Aktualizujte pr
 
 msgid "A new workspace off this branch, with the conversation handed to a fresh agent"
 msgstr "Nový pracovní prostor z této větve; konverzace se předá novému agentovi"
+
+msgid "A newsletter or blog"
+msgstr "Newsletter nebo blog"
 
 msgid "A page can save each reader's answer, so a poll works with no backend."
 msgstr "Stránka umí uložit odpověď každého čtenáře, takže anketa funguje bez backendu."
@@ -2223,6 +2229,9 @@ msgstr "AI · Konverzace"
 msgid "AI · Status"
 msgstr "AI · Stav"
 
+msgid "AI assistants"
+msgstr "AI asistenti"
+
 msgid "Alert"
 msgstr "Upozornění"
 
@@ -2561,6 +2570,9 @@ msgstr "Ročně {date} v {time}"
 
 msgid "Anonymous Assembler"
 msgstr "Anonymní montér"
+
+msgid "Another AI assistant"
+msgstr "Jiný AI asistent"
 
 msgid "another device"
 msgstr "jiné zařízení"
@@ -4091,6 +4103,9 @@ msgstr "Zvolte, jak se otevírají cesty k souborům při Cmd+kliknutí v termin
 msgid "Choose MCP servers for this message"
 msgstr "Vyberte MCP servery pro tuto zprávu"
 
+msgid "Choose one"
+msgstr "Vyberte"
+
 msgid "Choose the model"
 msgstr "Vybrat model"
 
@@ -4139,6 +4154,9 @@ msgstr "Čirý"
 
 msgid "Clear all"
 msgstr "Vymazat vše"
+
+msgid "Clear answer"
+msgstr "Vymazat odpověď"
 
 msgid "Clear browsing data"
 msgstr "Vymazat data prohlížení"
@@ -8936,6 +8954,9 @@ msgstr "Přejít do pracovního prostoru"
 msgid "Google did not grant lasting access. Remove Paradev from your Google account's third-party access and try again."
 msgstr "Google neudělil trvalý přístup. Odeberte Paradev z přístupu třetích stran ve svém účtu Google a zkuste to znovu."
 
+msgid "Google or another search engine"
+msgstr "Google nebo jiný vyhledávač"
+
 msgid "Got it"
 msgstr "Rozumím"
 
@@ -9248,6 +9269,9 @@ msgstr "Jak se u tohoto projektu vytvářejí větve a názvy pracovních prosto
 
 msgid "How can we help?"
 msgstr "S čím vám můžeme pomoct?"
+
+msgid "How did you hear about Paradev?"
+msgstr "Jak jste se o Paradev dozvěděli?"
 
 msgid "How do cloud hours work?"
 msgstr "Jak fungují cloudové hodiny?"
@@ -13292,6 +13316,9 @@ msgstr "Volitelný popis zobrazený v seznamu terminálových skriptů."
 
 msgid "Optional flags appended after the prompt payload"
 msgstr "Volitelné přepínače připojené za obsah promptu"
+
+msgid "Optional. Helps us learn what works."
+msgstr "Nepovinné. Pomůže nám zjistit, co funguje."
 
 msgid "Options"
 msgstr "Možnosti"
@@ -20654,6 +20681,9 @@ msgstr "Když je vypnuto, nic jiného se nedostane k souborům a nástrojům na 
 msgid "Where detected-port badges in the sidebar open when clicked."
 msgstr "Kam vedou odznaky rozpoznaných portů v postranním panelu po kliknutí."
 
+msgid "Where did you hear about Paradev?"
+msgstr "Kde jste se o Paradev dozvěděli?"
+
 msgid "Where do you rank?"
 msgstr "Jak si stojíte?"
 
@@ -20674,6 +20704,9 @@ msgstr "Kde je tento terminálový skript dostupný."
 
 msgid "Where to look next"
 msgstr "Kam se podívat dál"
+
+msgid "Where? (optional)"
+msgstr "Kde? (nepovinné)"
 
 msgid "Which agents are supported?"
 msgstr "Kteří agenti jsou podporovaní?"

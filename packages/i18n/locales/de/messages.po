@@ -1641,6 +1641,9 @@ msgstr "Eine Datei namens '{firstName}' existiert bereits in {where}. Willst du 
 msgid "A focused burn-down of crashes, hangs, and reconnect failures across the app."
 msgstr "Ein gezieltes Abarbeiten von Abstürzen, Hängern und Reconnect-Fehlern in der ganzen App."
 
+msgid "A friend or colleague"
+msgstr "Freunde oder Kollegen"
+
 msgid "A gateway is signed in with an API key."
 msgstr "Ein Gateway ist mit einem API-Schlüssel angemeldet."
 
@@ -1670,6 +1673,9 @@ msgstr "Zum Fortfahren ist eine neue Version von Paradev nötig. Bitte aktualisi
 
 msgid "A new workspace off this branch, with the conversation handed to a fresh agent"
 msgstr "Ein neuer Workspace von diesem Branch, die Unterhaltung wird an einen neuen Agenten übergeben"
+
+msgid "A newsletter or blog"
+msgstr "Ein Newsletter oder Blog"
 
 msgid "A page can save each reader's answer, so a poll works with no backend."
 msgstr "Eine Seite kann die Antwort jedes Lesers speichern, also funktioniert eine Umfrage ohne Backend."
@@ -2223,6 +2229,9 @@ msgstr "KI · Unterhaltung"
 msgid "AI · Status"
 msgstr "KI · Status"
 
+msgid "AI assistants"
+msgstr "KI-Assistenten"
+
 msgid "Alert"
 msgstr "Alert"
 
@@ -2561,6 +2570,9 @@ msgstr "Jährlich am {date} um {time}"
 
 msgid "Anonymous Assembler"
 msgstr "Anonymer Monteur"
+
+msgid "Another AI assistant"
+msgstr "Ein anderer KI-Assistent"
 
 msgid "another device"
 msgstr "ein anderes Gerät"
@@ -4091,6 +4103,9 @@ msgstr "Lege fest, wie Dateipfade beim Cmd+Klick im Terminal geöffnet werden"
 msgid "Choose MCP servers for this message"
 msgstr "MCP-Server für diese Nachricht wählen"
 
+msgid "Choose one"
+msgstr "Auswählen"
+
 msgid "Choose the model"
 msgstr "Modell auswählen"
 
@@ -4139,6 +4154,9 @@ msgstr "Klar"
 
 msgid "Clear all"
 msgstr "Alle entfernen"
+
+msgid "Clear answer"
+msgstr "Antwort löschen"
 
 msgid "Clear browsing data"
 msgstr "Browserdaten löschen"
@@ -8936,6 +8954,9 @@ msgstr "Zum Arbeitsbereich"
 msgid "Google did not grant lasting access. Remove Paradev from your Google account's third-party access and try again."
 msgstr "Google hat keinen dauerhaften Zugriff gewährt. Entferne Paradev aus dem Drittanbieter-Zugriff deines Google-Kontos und versuche es erneut."
 
+msgid "Google or another search engine"
+msgstr "Google oder eine andere Suchmaschine"
+
 msgid "Got it"
 msgstr "Verstanden"
 
@@ -9248,6 +9269,9 @@ msgstr "Wie Branches und Namen von Arbeitsbereichen für dieses Projekt entstehe
 
 msgid "How can we help?"
 msgstr "Wie können wir helfen?"
+
+msgid "How did you hear about Paradev?"
+msgstr "Wie hast du von Paradev erfahren?"
 
 msgid "How do cloud hours work?"
 msgstr "Wie funktionieren Cloud-Stunden?"
@@ -13292,6 +13316,9 @@ msgstr "Optionaler Kontext, der in der Liste der Terminal-Skripte angezeigt wird
 
 msgid "Optional flags appended after the prompt payload"
 msgstr "Optionale Flags, die nach dem Prompt angehängt werden"
+
+msgid "Optional. Helps us learn what works."
+msgstr "Optional. Hilft uns zu verstehen, was funktioniert."
 
 msgid "Options"
 msgstr "Optionen"
@@ -20654,6 +20681,9 @@ msgstr "Wenn deaktiviert, kann nichts anderes auf die Dateien und Tools dieses G
 msgid "Where detected-port badges in the sidebar open when clicked."
 msgstr "Wo Port-Badges in der Seitenleiste beim Klick geöffnet werden."
 
+msgid "Where did you hear about Paradev?"
+msgstr "Wo hast du von Paradev erfahren?"
+
 msgid "Where do you rank?"
 msgstr "Auf welchem Platz stehst du?"
 
@@ -20674,6 +20704,9 @@ msgstr "Wo dieses Terminal-Skript verfügbar ist."
 
 msgid "Where to look next"
 msgstr "Wo du als Nächstes suchst"
+
+msgid "Where? (optional)"
+msgstr "Wo? (optional)"
 
 msgid "Which agents are supported?"
 msgstr "Welche Agenten werden unterstützt?"

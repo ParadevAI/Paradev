@@ -1641,6 +1641,9 @@ msgstr "Er bestaat al een bestand met de naam '{firstName}' in {where}. Wil je h
 msgid "A focused burn-down of crashes, hangs, and reconnect failures across the app."
 msgstr "Een gerichte opruiming van crashes, vastlopers en mislukte herverbindingen door de hele app."
 
+msgid "A friend or colleague"
+msgstr "Een vriend of collega"
+
 msgid "A gateway is signed in with an API key."
 msgstr "Een gateway meldt zich aan met een API-sleutel."
 
@@ -1670,6 +1673,9 @@ msgstr "Er is een nieuwe versie van Paradev nodig om verder te gaan. Werk bij na
 
 msgid "A new workspace off this branch, with the conversation handed to a fresh agent"
 msgstr "Een nieuwe workspace vanaf deze branch, met het gesprek overgedragen aan een nieuwe agent"
+
+msgid "A newsletter or blog"
+msgstr "Een nieuwsbrief of blog"
 
 msgid "A page can save each reader's answer, so a poll works with no backend."
 msgstr "Een pagina kan het antwoord van elke lezer opslaan, dus een poll werkt zonder backend."
@@ -2223,6 +2229,9 @@ msgstr "AI · Gesprek"
 msgid "AI · Status"
 msgstr "AI · Status"
 
+msgid "AI assistants"
+msgstr "AI-assistenten"
+
 msgid "Alert"
 msgstr "Alert"
 
@@ -2561,6 +2570,9 @@ msgstr "Jaarlijks op {date} om {time}"
 
 msgid "Anonymous Assembler"
 msgstr "Anonieme Assembleur"
+
+msgid "Another AI assistant"
+msgstr "Een andere AI-assistent"
 
 msgid "another device"
 msgstr "een ander apparaat"
@@ -4091,6 +4103,9 @@ msgstr "Kies hoe bestandspaden openen bij Cmd+klik in de terminal"
 msgid "Choose MCP servers for this message"
 msgstr "Kies MCP-servers voor dit bericht"
 
+msgid "Choose one"
+msgstr "Kies er een"
+
 msgid "Choose the model"
 msgstr "Model kiezen"
 
@@ -4139,6 +4154,9 @@ msgstr "Helder"
 
 msgid "Clear all"
 msgstr "Alles wissen"
+
+msgid "Clear answer"
+msgstr "Antwoord wissen"
 
 msgid "Clear browsing data"
 msgstr "Browsegegevens wissen"
@@ -8936,6 +8954,9 @@ msgstr "Naar werkruimte"
 msgid "Google did not grant lasting access. Remove Paradev from your Google account's third-party access and try again."
 msgstr "Google heeft geen blijvende toegang verleend. Verwijder Paradev uit de externe toegang van je Google-account en probeer het opnieuw."
 
+msgid "Google or another search engine"
+msgstr "Google of een andere zoekmachine"
+
 msgid "Got it"
 msgstr "Begrepen"
 
@@ -9248,6 +9269,9 @@ msgstr "Hoe branches en namen van werkruimtes voor dit project worden gemaakt."
 
 msgid "How can we help?"
 msgstr "Hoe kunnen we helpen?"
+
+msgid "How did you hear about Paradev?"
+msgstr "Hoe heb je over Paradev gehoord?"
 
 msgid "How do cloud hours work?"
 msgstr "Hoe werken clouduren?"
@@ -13292,6 +13316,9 @@ msgstr "Optionele context die in de lijst met terminalscripts wordt getoond."
 
 msgid "Optional flags appended after the prompt payload"
 msgstr "Optionele flags achter de promptpayload"
+
+msgid "Optional. Helps us learn what works."
+msgstr "Optioneel. Helpt ons te zien wat werkt."
 
 msgid "Options"
 msgstr "Opties"
@@ -20654,6 +20681,9 @@ msgstr "Als dit uitstaat, kan niets anders bij de bestanden en tools op dit appa
 msgid "Where detected-port badges in the sidebar open when clicked."
 msgstr "Waar de badges van gedetecteerde poorten in de zijbalk openen bij een klik."
 
+msgid "Where did you hear about Paradev?"
+msgstr "Waar heb je over Paradev gehoord?"
+
 msgid "Where do you rank?"
 msgstr "Waar sta jij?"
 
@@ -20674,6 +20704,9 @@ msgstr "Waar dit terminalscript beschikbaar is."
 
 msgid "Where to look next"
 msgstr "Waar je verder kunt kijken"
+
+msgid "Where? (optional)"
+msgstr "Waar? (optioneel)"
 
 msgid "Which agents are supported?"
 msgstr "Welke agents worden ondersteund?"
