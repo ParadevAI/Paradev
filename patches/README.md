@@ -200,12 +200,13 @@ npm run package          # lib/xterm.js (webpack), lib/xterm.mjs and addon .mjs 
 npm run package && (cd addons/addon-webgl && npx webpack)
 npx mocha out/common/Event.test.js out/common/input/WriteBuffer.test.js out/browser/input/CompositionHelper.test.js
 
-# 3. Copy the rebuilt lib bundles and the changed src/ files into the bun patch:
+# 3. From the Superset repo, copy the rebuilt bundles and changed src/ files into the bun patch:
+XTERM=$PWD && cd <superset>
 bun patch @xterm/xterm@<new-version>          # and/or @xterm/addon-webgl@<new-version>
-cp lib/xterm.js lib/xterm.mjs <superset>/node_modules/@xterm/xterm/lib/
-cp <changed src files> <superset>/node_modules/@xterm/xterm/src/...
+cp "$XTERM"/lib/xterm.js "$XTERM"/lib/xterm.mjs node_modules/@xterm/xterm/lib/
+cp "$XTERM"/<changed src files> node_modules/@xterm/xterm/src/...
 bun patch --commit 'node_modules/@xterm/xterm'
-bun test apps/desktop/src/xterm-flushsync-patch.test.ts apps/desktop/src/xterm-render-debouncer-patch.test.ts apps/desktop/src/xterm-ime-patch.test.ts apps/desktop/src/webgl-atlas-patch.test.ts
+bun test apps/desktop/src/xterm-flushsync-patch.test.ts apps/desktop/src/xterm-render-debouncer-patch.test.ts apps/desktop/src/xterm-ime-patch.test.ts apps/desktop/src/webgl-atlas-patch.test.ts apps/desktop/src/xterm-ligatures-patch.test.ts
 ```
 
 `@xterm/*` is in `minimumReleaseAgeExcludes` in `bunfig.toml`, so a beta can be
@@ -226,8 +227,9 @@ there too.
 
 **Regenerating:** `bun patch @xterm/addon-ligatures@<new-version>`, make the
 same two `package.json` edits, `bun patch --commit`, clear
-`apps/desktop/node_modules/.vite`, and boot the renderer: unit tests never load
-this addon, so only a running app shows the failure.
+`apps/desktop/node_modules/.vite`, and boot the renderer. Unit tests never load
+this addon; `apps/desktop/src/xterm-ligatures-patch.test.ts` checks instead
+that the entry Vite resolves has no `node:diagnostics_channel` import.
 
 ## trpc-electron (`trpc-electron@<version>.patch`)
 
