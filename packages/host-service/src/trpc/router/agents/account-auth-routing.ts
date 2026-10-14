@@ -221,6 +221,7 @@ async function refuseUnparsedPolicy(path: string): Promise<void> {
 		await lstat(path);
 	} catch (error) {
 		if (isMissing(error)) return;
+		refuse("managed authentication policy");
 	}
 	refuse("managed authentication policy");
 }
@@ -295,9 +296,6 @@ export async function validateAccountAuthRouting(
 		const username = options.username ?? userInfo().username;
 		await refuseUnparsedPolicy(join(managed, `${domain}.plist`));
 		await refuseUnparsedPolicy(join(managed, username, `${domain}.plist`));
-		await refuseUnparsedPolicy(
-			join(home, "Library/Preferences", `${domain}.plist`),
-		);
 	}
 	for (const file of files)
 		await validateFile(file, account.agent === "claude" ? "json" : "toml");
