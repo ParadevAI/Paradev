@@ -900,3 +900,34 @@ describe("session account attribution", () => {
 		expect(store.listByWorkspace("ws-account")[0]?.account).toEqual(account);
 	});
 });
+
+it("does not transfer in-memory account provenance when the terminal moves to another workspace", () => {
+	const store = new TerminalAgentStore();
+	const launch = {
+		terminalId: "moved",
+		workspaceId: "one",
+		agentId: "claude" as const,
+		agentSessionId: "native",
+		launchId: "launch",
+		eventType: "Attached",
+		occurredAt: 1,
+	};
+	store.recordEvent({
+		...launch,
+		account: {
+			agent: "claude",
+			selection: "/fixture/profile",
+			credentialKind: "subscription",
+			identity: "a".repeat(64),
+			pinned: true,
+		},
+	});
+	store.recordEvent({
+		...launch,
+		workspaceId: "two",
+		eventType: "Start",
+		occurredAt: 2,
+	});
+	expect(store.get("moved")?.workspaceId).toBe("two");
+	expect(store.get("moved")?.account).toBeUndefined();
+});
