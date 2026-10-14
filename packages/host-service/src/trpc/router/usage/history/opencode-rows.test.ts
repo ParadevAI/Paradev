@@ -87,6 +87,52 @@ describe("opencodeRowsToEntries", () => {
 		});
 	});
 
+	test("maps V2 session_message rows, which keep the role in the row type", () => {
+		const out: UsageLogEntry[] = [];
+		const labels = new Map<string, string>();
+		opencodeRowsToEntries(
+			[
+				row(
+					{
+						time: { created: NOW - 5000, completed: NOW },
+						agent: "build",
+						model: { id: "claude-opus-5-5", providerID: "anthropic" },
+						finish: "stop",
+						cost: 0.0311814,
+						tokens: {
+							input: 2,
+							output: 232,
+							reasoning: 51,
+							cache: { read: 115517, write: 482 },
+						},
+					},
+					{ type: "assistant" },
+				),
+				row({ time: { created: NOW } }, { type: "user" }),
+			],
+			0,
+			out,
+			labels,
+		);
+		expect(out).toEqual([
+			{
+				agent: "opencode",
+				model: "claude-opus-5-5",
+				timestampMs: NOW,
+				cwd: "/Users/me/worktrees/vivid-helenium",
+				sessionId: "ses_f8158c475ffe",
+				uncachedInput: 2,
+				cachedInput: 115517,
+				cacheWrite5m: 482,
+				cacheWrite1h: 0,
+				output: 232,
+				reasoningOutput: 51,
+				costUsd: 0.0311814,
+			},
+		]);
+		expect(labels.get("ses_f8158c475ffe")).toBe("OPENCODE_RESUME_VERIFIED");
+	});
+
 	test("skips user rows, rows before the cutoff, empty usage, and bad JSON", () => {
 		const out: UsageLogEntry[] = [];
 		opencodeRowsToEntries(

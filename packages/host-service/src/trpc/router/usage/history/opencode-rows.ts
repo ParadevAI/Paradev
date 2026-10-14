@@ -2,13 +2,15 @@ import type { UsageLogEntry } from "./parse";
 import { num } from "./parse";
 
 /** One assistant message as OpenCode stores it — the JSON file body in the
- * legacy storage tree, the `data` column in `opencode.db`. */
+ * legacy storage tree, the `data` column in `opencode.db`. V2 drops `role`
+ * (the row's `type` holds it) and nests the model under `model`. */
 export interface OpencodeMessage {
 	sessionID?: string;
 	role?: string;
 	time?: { created?: number; completed?: number };
 	modelID?: string;
 	providerID?: string;
+	model?: { id?: string; providerID?: string };
 	path?: { cwd?: string };
 	cost?: number;
 	tokens?: {
@@ -39,7 +41,7 @@ export function opencodeMessageToEntry(
 	const cost = num(message.cost);
 	return {
 		agent: "opencode",
-		model: message.modelID || "unknown",
+		model: message.modelID || message.model?.id || "unknown",
 		timestampMs,
 		cwd: typeof message.path?.cwd === "string" ? message.path.cwd : null,
 		sessionId,
@@ -55,6 +57,8 @@ export function opencodeMessageToEntry(
 
 export interface OpencodeMessageRow {
 	session_id: string | null;
+	/** V2 `session_message.type`; V1 rows keep the role in `data`. */
+	type?: string | null;
 	data: string | null;
 	directory: string | null;
 	title: string | null;
@@ -74,6 +78,7 @@ export function opencodeRowsToEntries(
 		} catch {
 			continue;
 		}
+		if (row.type && message && !message.role) message.role = row.type;
 		const sessionId = row.session_id ?? "unknown";
 		const entry = opencodeMessageToEntry(message, sessionId, cutoffMs);
 		if (!entry) continue;
