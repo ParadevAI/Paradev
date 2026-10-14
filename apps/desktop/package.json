@@ -2,7 +2,7 @@
 	"name": "@superset/desktop",
 	"productName": "superset++",
 	"description": "Personal development workspace with Jira, pull requests, terminals and local Pages",
-	"version": "1.35.0",
+	"version": "1.36.0",
 	"main": "./dist/main/index.js",
 	"resources": "src/resources",
 	"repository": {
