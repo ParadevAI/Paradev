@@ -20,7 +20,7 @@ keywords:
   - claude code remote control superset
 ---
 
-To check on coding agents from your iPhone, use [Superset for iPhone and iPad](/mobile). It shows every agent you run in Superset (Claude Code, Codex, and other terminal agents) on all your machines in one list. You can answer prompts, send follow-ups, and review diffs, and a Lock Screen card shows which agents need you.
+To check on coding agents from your iPhone, use [Superset for iPhone and iPad](/mobile). It shows every agent you run in Superset (Claude Code, Codex, and other terminal agents) on all your machines in one list. You can answer prompts, send follow-ups, and review diffs, and while the app is open, a Lock Screen Live Activity shows which agents need you. It does not update in the background yet.
 
 Claude Code's own Remote Control also works inside Superset. Superset starts the real `claude` CLI in a real terminal, so `/remote-control` in a Superset workspace connects that session to the Claude app as usual. Use Superset when you run several agents or several machines and want one app for all of them. Use Remote Control when you want the Claude app's push notifications for one Claude Code session. You can use both on the same session.
 
@@ -30,7 +30,7 @@ The other common options are Codex in the ChatGPT app, and Tailscale, SSH, and t
 
 | Option | Agents | Several machines | Push to phone | Send follow-ups | Needs your computer on |
 |---|---|---|---|---|---|
-| Superset for iPhone | Claude Code, Codex, and other agents launched in Superset | Yes, every host you can access | Lock Screen Live Activity today; push notifications coming | Yes | Yes, for host workspaces |
+| Superset for iPhone | Claude Code, Codex, and other agents launched in Superset | Yes, every host you can access | Lock Screen Live Activity | Yes | Yes, for host workspaces |
 | Claude Code Remote Control | Claude Code only, including sessions in Superset | Run it on each machine | Yes, set in `/config` | Yes | Yes |
 | Codex in the ChatGPT app | Codex only | Connected computers or Codex Cloud | Not described in OpenAI's mobile docs | Yes | Yes, for local tasks |
 | Tailscale + SSH + tmux | Any terminal agent | Yes, one SSH session at a time | No, unless you add a hook | Yes, by typing into the terminal | Yes |
@@ -73,7 +73,7 @@ Yes. The vendor apps don't share one: Claude Code lives in the Claude app and Co
 From the iPhone you can:
 
 - See workspaces grouped by project, with a marker when an agent is working, waiting for permission, failed, or has work to review
-- Follow your agents from the Lock Screen and Dynamic Island with a Live Activity that lists which ones need you, are working, or are ready for review
+- Follow your agents from the Lock Screen and Dynamic Island with a Live Activity that lists which ones need you, are working, or are ready for review. It updates while the app is open, not in the background yet.
 - Open a workspace and continue its terminal session. You don't start a new chat or paste context.
 - Send a prompt by typing, dictating, or attaching a photo
 - Review syntax-highlighted diffs file by file, check pull request status, and merge
@@ -97,7 +97,7 @@ For Claude Code, the built-in answer is Remote Control push notifications. Run `
 
 For other agents, the common pattern is a hook that posts to a push service. Most CLI agents can run a command on stop or on a permission request. Point that command at ntfy, Pushover, or a Telegram bot to get a buzz on any phone. OpenAI's Codex mobile page says you can see when your input is needed, but does not describe push notifications.
 
-Superset detects these states through lifecycle hooks it installs in each agent's config. Claude Code reports both finished and waiting. Some agents only report finished. On desktop, Superset [notifies you](https://docs.superset.sh/agent-status) with a sound and a macOS dock badge. On the iPhone, a Live Activity on the Lock Screen lists your agents with **Needs you**, **Working**, or **Review**, while the app is open. It shows up to four agents at once, with attention states first. It does not update in the background yet: after you leave the app it keeps the last status and dims when that status is out of date. Push notifications for Superset on iPhone are coming. Until then, if you need your phone to buzz for every prompt, add Remote Control push or a hook script alongside it.
+Superset detects these states through lifecycle hooks it installs in each agent's config. Claude Code reports both finished and waiting. Some agents only report finished. On desktop, Superset [notifies you](https://docs.superset.sh/agent-status) with a sound and a macOS dock badge. On the iPhone, a Live Activity on the Lock Screen lists your agents with **Needs you**, **Working**, or **Review**, while the app is open. It shows up to four agents at once, with attention states first. It does not update in the background yet: after you leave the app it keeps the last status and dims when that status is out of date. If you need your phone to buzz for every prompt, add Remote Control push or a hook script alongside it.
 
 ## How can I send follow-up instructions to a coding agent from my phone while it works on my computer?
 
