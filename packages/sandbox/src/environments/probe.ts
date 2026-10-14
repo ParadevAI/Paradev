@@ -133,11 +133,7 @@ export async function probeBox(args: ProbeArgs): Promise<number> {
 		);
 	}
 	const cliVersion = await run("superset --version");
-	check(
-		"superset runs",
-		/^\d+\.\d+\.\d+/m.test(cliVersion),
-		cliVersion.trim(),
-	);
+	check("superset runs", /^\d+\.\d+\.\d+/m.test(cliVersion), cliVersion.trim());
 	if (
 		!(await until(
 			"checkout on the branch",
