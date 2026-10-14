@@ -11537,7 +11537,7 @@ msgid "Open existing PR or create a new one on GitHub"
 msgstr "Mở PR hiện có hoặc tạo PR mới trên GitHub"
 
 msgid "Open existing terminal"
-msgstr "Mở cửa sổ dòng lệnh hiện có"
+msgstr "Mở terminal hiện có"
 
 msgid "open file"
 msgstr "mở tệp"

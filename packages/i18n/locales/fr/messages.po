@@ -14308,7 +14308,7 @@ msgid "Saved conversations"
 msgstr "Conversations enregistrées"
 
 msgid "Saved in Superset"
-msgstr "Enregistré dans Superset"
+msgstr "Enregistrée dans Superset"
 
 msgid "Saved to Downloads"
 msgstr "Enregistré dans Téléchargements"

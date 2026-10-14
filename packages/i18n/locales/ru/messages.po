@@ -8379,7 +8379,7 @@ msgid "I can be in a café with my coffee while the work keeps moving forward."
 msgstr "Я могу сидеть в кафе с чашкой кофе, а работа тем временем продолжается."
 
 msgid "I exited this conversation in the original app. No tools or background jobs are still running."
-msgstr "Этот разговор завершён мной в исходном приложении. Инструменты и фоновые задачи больше не выполняются."
+msgstr "Этот разговор закрыт в исходном приложении. Инструменты и фоновые задачи больше не выполняются."
 
 msgid "I start my morning walks with an idea, and end with a pull request."
 msgstr "Я начинаю утреннюю прогулку с идеей, а заканчиваю с пул-реквестом."
