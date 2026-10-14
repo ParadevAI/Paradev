@@ -2,6 +2,7 @@
 title: "Where to Run Coding Agents: Laptops vs a Shared Host vs Cloud Workspaces (2026)"
 description: "The tradeoffs for a small engineering team between running coding agents on personal laptops, a shared host machine, and vendor cloud workspaces: cost, uptime, access to your environment, security, and which tools support each."
 date: 2026-10-14
+lastUpdated: 2026-10-14
 type: "tutorial"
 competitors:
   - codex-app
@@ -18,7 +19,11 @@ keywords:
   - cloud coding agents tradeoffs
 ---
 
-A small team that adopts coding agents soon asks where they should run. There are three answers: each developer's laptop, a shared machine the team owns, or a vendor's cloud. Most teams end up using more than one. This guide compares them on what matters day to day: whether agents keep working when you walk away, whether they can reach your real environment, what it costs, and what it exposes.
+A small team that adopts coding agents soon asks where they should run. There are three answers: each developer's laptop, a shared machine the team owns, or a vendor's cloud. Most teams use more than one.
+
+Superset has the first two built in. Laptops and shared hosts appear in the same app through Remote Access, and each task gets its own worktree on whichever machine you pick. The vendor clouds still work from inside Superset: it runs the real `claude` and `codex` CLIs, so `claude --cloud` starts a Claude Code cloud session and `codex cloud exec` submits a Codex cloud task from a Superset terminal. Use your own machines for work that needs your environment, a vendor cloud for tasks that need only the repository, and Superset to keep the local and host side in one place.
+
+This guide compares the three on what matters day to day: whether agents keep working when you walk away, whether they can reach your real environment, what it costs, and what it exposes.
 
 ---
 
@@ -69,11 +74,13 @@ The tradeoffs:
 
 **Best for:** fire-and-forget tasks that need nothing beyond the repository.
 
+**From a Superset workspace.** You don't have to leave Superset to use a vendor cloud. Per [Anthropic's docs](https://code.claude.com/docs/en/claude-code-on-the-web) (accessed October 14, 2026), `claude --cloud "task"` clones your current directory's GitHub remote at your current branch, not your local checkout, so push first. Codex CLI has `codex cloud exec` to submit a task and `codex cloud apply` to bring its diff back into the workspace, where the Changes pane shows it. In a Superset terminal on October 14, 2026, Claude Code 2.1.300 offered `--cloud` and `codex cloud list` reached Codex cloud. We did not start a cloud task as part of that check.
+
 ## A Setup That Works for Most Small Teams
 
 1. **Laptops for interactive work.** Short tasks, debugging, and anything you want to watch.
 2. **One shared host for long-running and scheduled work.** Overnight tasks, scheduled agents, and work that should continue when everyone logs off, with each task in its own worktree.
-3. **A vendor cloud where it fits.** A specific agent's cloud for tasks that need nothing private.
+3. **A vendor cloud where it fits.** A specific agent's cloud for tasks that need nothing private, started from the same terminal with `claude --cloud` or `codex cloud exec`.
 
 In Superset, the first two appear in the same desktop app: each workspace lives on the device that holds its files and terminals, and laptop and shared-host workspaces sit side by side, and scheduled automations run on whichever device you choose. See [Run Coding Agents on a Remote Machine](/compare/run-coding-agents-on-remote-machine) and [Scheduled Coding Agents](/compare/scheduled-coding-agents).
 
@@ -90,6 +97,10 @@ It is a different risk. A cloud workspace moves your code and credentials to a v
 ### Can I run different agents on one shared host?
 
 Yes. A workspace like Superset runs Claude Code, Codex, and any other CLI agent on the same host, each in its own Git worktree. Vendor clouds usually run only that vendor's agent.
+
+### Can I start Claude Code or Codex cloud tasks from Superset?
+
+Yes. Superset runs the real agent CLIs with your own logins, so `claude --cloud` and `codex cloud exec` work from a Superset terminal. The task then runs in Anthropic's or OpenAI's cloud on a clone of your GitHub repository, not on your machine. With Codex, `codex cloud apply` brings the result back into the workspace for review.
 
 ### Do agents on a shared host keep running when I close my laptop?
 

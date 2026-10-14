@@ -2,7 +2,7 @@
 title: "How to Review Coding Agent Work as a Team: Branches, Diffs, and Owners (2026)"
 description: "Tools for giving each coding agent task its own branch and human reviewer, comparing two agents' diffs, and sending follow-ups before you merge."
 date: 2026-10-07
-lastUpdated: 2026-10-08
+lastUpdated: 2026-10-14
 type: "roundup"
 competitors:
   - codex
@@ -25,9 +25,14 @@ keywords:
   - track coding agent work ownership status review
   - dispatch coding agent tasks cli
   - parallel coding agents team
+  - codex review superset
 ---
 
-Most teams that run coding agents in parallel need three layers: an agent that writes the code (Claude Code, Codex, Cursor, GitHub Copilot, Devin), a workspace that gives each task its own branch and a place to review the diff (Superset, Conductor, the Codex app, Cursor's parallel agents, or plain `git worktree`), and a review gate where a named human approves the merge (GitHub pull requests with branch protection and `CODEOWNERS`). Superset covers the middle layer for any CLI agent: one Git worktree and branch per task, a Changes pane that commits, pushes, and opens the PR, and a pull request view where you select diff lines and send them back to an agent.
+To review coding agent work as a team, give each task its own branch, review its diff in one place, and require a named human to approve the merge. Superset has the first two built in for any CLI agent: each workspace is a Git worktree on its own branch, the **Changes** pane shows the diff and commits, pushes, and opens the PR, and the **Pull requests** view lets you select diff lines and send them back to an agent. The approval gate stays on GitHub, with branch protection and `CODEOWNERS`.
+
+The agents' own review tools still work alongside. Superset runs the real `codex` and `claude` CLIs, so Codex's `/review` (or `codex review`) can check a workspace's changes before you open the PR, and comments from `@codex review` or other review bots on GitHub appear in the PR's **Review** tab in Superset. Use the agent's review for a quick automated pass, and Superset to read the diff, send follow-ups, and track every agent's PR in one list.
+
+Other tools cover parts of this: Conductor, the Codex app, Cursor's parallel agents, and plain `git worktree` for the workspace layer, and GitHub Copilot coding agent and Devin for issue-to-PR work.
 
 The rest of this page answers the specific questions teams ask when they set this up.
 
@@ -87,6 +92,17 @@ done
 ```
 
 Ask each agent to end with a list of files changed and tradeoffs made. Read those first, drop any attempt that misread the task, then prefer the smallest diff that fully does the job. Run the tests in the winner's terminal, create the PR from the Changes pane, and delete the other workspaces.
+
+## Can I use Codex `/review` inside Superset?
+
+Yes. A Superset workspace is a normal Git worktree with the real agent CLI running in a real terminal, so an agent's own review command reviews that worktree's changes. We checked that `codex review` is available in a Superset terminal with Codex CLI 0.162.1 on October 14, 2026. Per [OpenAI's docs](https://learn.chatgpt.com/docs/developer-commands) (accessed the same day), the `/review` command in a Codex session asks Codex to review your working tree. On GitHub, commenting `@codex review` on a PR asks Codex to post a review, and automatic reviews are an opt-in setting per repository ([OpenAI's GitHub docs](https://learn.chatgpt.com/docs/third-party/github)).
+
+How they fit together:
+
+1. Ask the agent that did the work, or a second agent, to review the workspace's diff before you push.
+2. Read the diff yourself in the **Changes** pane and create the PR from there.
+3. Let `@codex review`, CodeRabbit, or another bot comment on the PR. Those comments are GitHub review comments, so they show in the PR's **Review** tab in Superset, where you can reply or send them to an agent.
+4. A named human approves on GitHub.
 
 ## Which coding-agent workspaces let a developer inspect a diff and send focused follow-up instructions before merging?
 
@@ -152,6 +168,10 @@ Agent tools that act through your GitHub connection have your permissions. Branc
 ### Does Superset work with GitHub Copilot or Devin?
 
 Superset runs Copilot's CLI and Devin's CLI as agents inside its workspaces. It does not control the hosted Copilot coding agent or Devin's cloud sessions, but their PRs show in the Pull requests view if the repository belongs to one of your projects.
+
+### Can I run Codex `/review` on a Superset workspace?
+
+Yes. Open the workspace's terminal and run `/review` in Codex, or `codex review` from the shell. It reviews that workspace's worktree, since each Superset workspace is its own Git checkout. The review is a first pass; read the diff in the Changes pane and keep the approving review on GitHub.
 
 ### Is Superset free for a small team?
 

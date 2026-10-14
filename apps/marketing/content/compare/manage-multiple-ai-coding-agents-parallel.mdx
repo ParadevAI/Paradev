@@ -2,6 +2,7 @@
 title: "How to Run and Manage Multiple AI Coding Agents in Parallel"
 description: "Run several AI coding agents at once with Git worktrees and persistent terminals: set up isolated workspaces, orchestrate the sessions, and switch tasks without losing context."
 date: 2026-10-14
+lastUpdated: 2026-10-14
 type: "tutorial"
 competitors:
   - claude-code
@@ -61,7 +62,7 @@ With isolation in place, start one agent per workspace. Scope each task so it ca
 
 **In Superset:**
 
-- **Launch any agent per workspace.** Claude Code, Codex, Cursor's agent, Antigravity CLI, Copilot CLI, Amp, OpenCode, and more are built-in agents; any other CLI agent can be added as a custom command. Each runs on your own subscription or API key, and Superset does not proxy model calls.
+- **Launch any agent per workspace.** Claude Code, Codex, Cursor's agent, Antigravity CLI, Copilot CLI, Amp, OpenCode, and more are built-in agents; any other CLI agent can be added as a custom command. Each runs on your own subscription or API key, and Superset does not proxy model calls. Superset starts the agent's real CLI in a real terminal, so its own commands still work, such as Claude Code's `/remote-control` and `/schedule` or Codex's `/review`.
 - **Mix agents on one repository.** Give one task to Claude Code and another to Codex, or give the same task to both and keep the better result. See [How to Compare Coding Agents Side by Side](/compare/compare-coding-agents-side-by-side).
 - **Start work from outside the app.** The CLI creates a workspace and starts an agent with a prompt in one command (`superset ws create --agent claude --prompt "..."`), and the MCP server lets other agents do the same. Scheduled [automations](https://docs.superset.sh/automations) run an agent on a host you choose.
 - **Run on more than one machine.** Remote Access adds a macOS or Linux machine as a host, so long-running agents keep working when your laptop sleeps. See [Where to Run Coding Agents](/compare/where-to-run-coding-agents).
