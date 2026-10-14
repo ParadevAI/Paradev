@@ -4,7 +4,9 @@
  * check talks to the box the way a client would (its published ports) or
  * the way the boot runner left it (its log and run directory).
  */
+import { isCloudAgentId } from "@superset/shared/cloud-agent-launch";
 import { SANDBOX_CREDENTIAL_PLACEHOLDER } from "@superset/shared/constants";
+import { HOST_AGENT_PRESETS } from "@superset/shared/host-agent-presets";
 import {
 	SANDBOX_PATHS,
 	SANDBOX_PORTS,
@@ -118,6 +120,19 @@ export async function probeBox(args: ProbeArgs): Promise<number> {
 			),
 		),
 	);
+	for (const preset of HOST_AGENT_PRESETS) {
+		if (!isCloudAgentId(preset.presetId)) continue;
+		const out = await run(
+			`cd /tmp && timeout 15 ${[preset.command, ...preset.args].join(" ")} </dev/null 2>&1 | head -5`,
+		);
+		check(
+			`${preset.presetId} accepts its preset's flags`,
+			!/unknown option|unexpected argument|command not found|not found in PATH|No such file or directory/i.test(
+				out,
+			),
+			out.trim().split("\n")[0],
+		);
+	}
 	if (
 		!(await until(
 			"checkout on the branch",
