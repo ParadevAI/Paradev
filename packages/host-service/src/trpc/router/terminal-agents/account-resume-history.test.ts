@@ -221,11 +221,27 @@ describe("exact shared history required for account resume", () => {
 			"unavailable or ambiguous",
 		);
 	});
-	test("does not hide an ambiguous copy in a deeper directory", async () => {
+	test("ignores Claude session sidecars when finding the main transcript", async () => {
 		const f = await fixture();
+		const deep = join(f.shared, "project", id, "subagents");
+		await mkdir(deep, { recursive: true });
+		await writeFile(
+			join(deep, `${id}.jsonl`),
+			JSON.stringify({ ...f.record, isSidechain: true }),
+		);
+		expect((await inspectAccountResumeHistory(f.input)).path).toBe(
+			await realpath(f.file),
+		);
+	});
+
+	test("does not hide an ambiguous Codex copy in a deeper directory", async () => {
+		const f = await fixture("codex");
 		const deep = join(f.shared, "extra/nested/level");
 		await mkdir(deep, { recursive: true });
-		await writeFile(join(deep, `${id}.jsonl`), JSON.stringify(f.record));
+		await writeFile(
+			join(deep, `rollout-duplicate-${id}.jsonl`),
+			JSON.stringify(f.record),
+		);
 		await expect(inspectAccountResumeHistory(f.input)).rejects.toThrow(
 			"unavailable or ambiguous",
 		);

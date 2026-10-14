@@ -187,23 +187,57 @@ export function createNotificationsRouter(
 						input.apiKey ?? false,
 					).catch(() => undefined)
 				: undefined;
-			// Capturing a login reads disk asynchronously. A later hook or launch owns
-			// the binding now; the older capture must not rewind its identity or state.
+			let binding = prior;
+			let metadataOnly = false;
 			if (shouldCaptureAccount) {
 				const current = ctx.terminalAgentStore.get(input.terminalId);
+				const sameOwner = prior
+					? current &&
+						current.agentId === prior.agentId &&
+						current.launchId === prior.launchId &&
+						current.definitionId === prior.definitionId &&
+						current.startedAt === prior.startedAt &&
+						(current.agentSessionId === prior.agentSessionId ||
+							(prior.agentSessionId === undefined &&
+								(!agent?.sessionId ||
+									current.agentSessionId === agent.sessionId)))
+					: !current ||
+						(input.launchId &&
+							current.launchId === input.launchId &&
+							current.agentId === agent?.agentId &&
+							(!agent?.sessionId ||
+								!current.agentSessionId ||
+								current.agentSessionId === agent.sessionId));
+				const unchangedAccount =
+					(!current?.account && !prior?.account) ||
+					sameSessionAccountContext(current?.account, prior?.account) ||
+					(!prior?.account &&
+						sameSessionAccountContext(current?.account, account)) ||
+					(prior?.account?.pinned &&
+						current?.account?.pinned &&
+						sameSessionAccountContext(
+							{ ...current.account, conflict: prior.account.conflict },
+							prior.account,
+						));
 				if (
-					current?.agentId !== prior?.agentId ||
-					current?.agentSessionId !== prior?.agentSessionId ||
-					current?.launchId !== prior?.launchId ||
-					current?.definitionId !== prior?.definitionId ||
-					current?.startedAt !== prior?.startedAt ||
-					current?.lastEventAt !== prior?.lastEventAt ||
-					current?.lastEventType !== prior?.lastEventType ||
-					current?.accountInvalid !== prior?.accountInvalid ||
-					!(
-						(!current?.account && !prior?.account) ||
-						sameSessionAccountContext(current?.account, prior?.account)
-					)
+					!sameOwner ||
+					!unchangedAccount ||
+					current?.accountInvalid !== prior?.accountInvalid
+				)
+					return { success: true, ignored: true as const };
+				binding = current;
+				metadataOnly =
+					current !== undefined &&
+					(current.lastEventAt !== prior?.lastEventAt ||
+						current.lastEventType !== prior?.lastEventType ||
+						current.agentSessionId !== prior?.agentSessionId);
+				if (
+					metadataOnly &&
+					((agent?.agentId && agent.agentId !== current?.agentId) ||
+						(input.launchId && input.launchId !== current?.launchId) ||
+						(agent?.sessionId &&
+							current?.agentSessionId &&
+							agent.sessionId !== current.agentSessionId))
 				)
 					return { success: true, ignored: true as const };
 			}
@@ -212,30 +246,39 @@ export function createNotificationsRouter(
 			// A genuinely new CLI in the shell gets its own unpinned attribution.
 			if (
 				shouldCaptureAccount &&
-				prior?.account?.pinned &&
-				(!prior.launchId || prior.launchId === input.launchId)
+				binding?.account?.pinned &&
+				(!binding.launchId || binding.launchId === input.launchId)
 			) {
 				const matches =
 					account &&
-					prior.account.agent === account.agent &&
-					prior.account.identity === account.identity &&
-					prior.account.directory === account.directory;
+					binding.account.agent === account.agent &&
+					binding.account.identity === account.identity &&
+					binding.account.directory === account.directory;
 				account =
 					!account || matches
-						? prior.account
-						: { ...prior.account, conflict: true };
+						? binding.account
+						: { ...binding.account, conflict: true };
 			}
-			ctx.terminalAgentStore.recordEvent({
-				account,
-				launchId: trimOrUndefined(input.launchId),
-				terminalId: input.terminalId,
-				workspaceId: terminalSession.originWorkspaceId,
-				eventType,
-				...(agent?.agentId ? { agentId: agent.agentId } : {}),
-				...(agent?.sessionId ? { agentSessionId: agent.sessionId } : {}),
-				...(agent?.definitionId ? { definitionId: agent.definitionId } : {}),
-				occurredAt,
-			});
+			if (metadataOnly) {
+				ctx.terminalAgentStore.updateMetadata(input.terminalId, {
+					account,
+					agentSessionId: agent?.sessionId,
+					definitionId: agent?.definitionId,
+				});
+			} else {
+				ctx.terminalAgentStore.recordEvent({
+					account,
+					launchId: trimOrUndefined(input.launchId),
+					terminalId: input.terminalId,
+					workspaceId: terminalSession.originWorkspaceId,
+					eventType,
+					...(agent?.agentId ? { agentId: agent.agentId } : {}),
+					...(agent?.sessionId ? { agentSessionId: agent.sessionId } : {}),
+					...(agent?.definitionId ? { definitionId: agent.definitionId } : {}),
+					occurredAt,
+				});
+			}
+
 			const transcriptPath = trimOrUndefined(input.transcriptPath);
 			if (
 				agent?.sessionId &&
@@ -247,6 +290,14 @@ export function createNotificationsRouter(
 					agentSessionId: agent.sessionId,
 					transcriptPath,
 				});
+			}
+
+			if (metadataOnly) {
+				ctx.eventBus.broadcastAgentBindingsChanged({
+					workspaceId: terminalSession.originWorkspaceId,
+					occurredAt,
+				});
+				return { success: true, ignored: false as const };
 			}
 
 			fanOutAgentLifecycle(ctx, {

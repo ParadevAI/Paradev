@@ -223,6 +223,7 @@ function V2WorkspaceContent() {
 	const launcher = useV2TerminalLauncher();
 	const [accountTerminalOpen, setAccountTerminalOpen] = useState(false);
 	const [savedConversationsOpen, setSavedConversationsOpen] = useState(false);
+	const accountTerminalReturnFocus = useRef<HTMLElement | null>(null);
 	const {
 		createNewAgentSession,
 		createAccountTerminal,
@@ -707,7 +708,10 @@ function V2WorkspaceContent() {
 											onAddAccountTerminal={
 												isSandbox
 													? undefined
-													: () => setAccountTerminalOpen(true)
+													: (returnFocus) => {
+															accountTerminalReturnFocus.current = returnFocus;
+															setAccountTerminalOpen(true);
+														}
 											}
 											onAddBrowser={addBrowserTab}
 											onAddChanges={openChanges}
@@ -830,6 +834,7 @@ function V2WorkspaceContent() {
 					key={workspaceId}
 					onClose={() => setAccountTerminalOpen(false)}
 					onLaunch={createAccountTerminal}
+					returnFocus={accountTerminalReturnFocus.current}
 				/>
 			)}
 		</FileDocumentStoreProvider>
