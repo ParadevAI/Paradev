@@ -188,7 +188,6 @@ interface BuildV2TerminalEnvParams {
 	cwd: string;
 	terminalId: string;
 	workspaceId: string;
-	workspaceName: string;
 	workspacePath: string;
 	rootPath: string;
 	supersetEnv: "development" | "production";
@@ -212,7 +211,6 @@ interface BuildV2TerminalEnvParams {
 export function buildHostLaunchEnv(params: {
 	cwd: string;
 	workspaceId: string;
-	workspaceName: string;
 	workspacePath: string;
 	rootPath: string;
 	terminalId?: string;
@@ -229,7 +227,6 @@ export function buildHostLaunchEnv(params: {
 		cwd: params.cwd,
 		terminalId: params.terminalId ?? "",
 		workspaceId: params.workspaceId,
-		workspaceName: params.workspaceName,
 		workspacePath: params.workspacePath,
 		rootPath: params.rootPath,
 		supersetEnv:
@@ -256,7 +253,6 @@ export function buildV2TerminalEnv(
 		cwd,
 		terminalId,
 		workspaceId,
-		workspaceName,
 		workspacePath,
 		rootPath,
 		supersetEnv,
@@ -303,7 +299,6 @@ export function buildV2TerminalEnv(
 			env.SUPERSET_SANDBOX_WORKSPACE_ID = sandboxWorkspaceId;
 		}
 	}
-	env.SUPERSET_WORKSPACE_NAME = workspaceName;
 	env.SUPERSET_WORKSPACE_PATH = workspacePath;
 	env.SUPERSET_ROOT_PATH = rootPath;
 	env.SUPERSET_ENV = supersetEnv;
