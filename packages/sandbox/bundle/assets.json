@@ -16,11 +16,11 @@
 		"version": "2.1.280"
 	},
 	"cli": {
-		"sha256": "5e49a1f3c2198662209bf97fd9ce991b6b140adece2b176710fca48482ead055",
+		"sha256": "9400518066b02b239c73e565b7d9f0bdb4e82c087cca4424a5e41aa6e15b1f52",
 		"suffix": "",
-		"dest": "/usr/local/share/superset/media/superset-1.35.0",
+		"dest": "/usr/local/share/superset/media/superset-1.38.0",
 		"mode": "0755",
-		"version": "1.35.0"
+		"version": "1.38.0"
 	},
 	"codex": {
 		"sha256": "a676f5722aae0d86cbe3764332f08eab1fdd89dc0a300b3ad4ffbf48611fa3e3",
