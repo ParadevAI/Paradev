@@ -59,6 +59,10 @@ function BoardCardBody({
 	const isArchived = workspace.archivedAt != null;
 	const isDone = isArchived || workspace.pr?.state === "merged";
 	const isLocalWorkspace = workspace.type === "local";
+	// The local device is the one running this app — it can't be offline from
+	// its own point of view, whatever presence says.
+	const isDeviceOffline =
+		!workspace.hostIsOnline && workspace.hostType !== "local-device";
 	// Same rule as the list row: the branch line only earns its slot when it
 	// says something the title doesn't.
 	const showBranch =
@@ -85,6 +89,9 @@ function BoardCardBody({
 				isArchived
 					? "cursor-default opacity-60"
 					: "cursor-pointer hover:border-border hover:bg-accent/30",
+				// An unreachable device's rows are the last-seen snapshot: still
+				// openable, but recede until presence says the host is back.
+				isDeviceOffline && "opacity-60",
 			)}
 		>
 			<div className="mb-1.5 flex items-center gap-1.5 text-[11px] text-muted-foreground">
@@ -120,7 +127,10 @@ function BoardCardBody({
 					</Tooltip>
 				) : null}
 				{workspace.hostType !== "local-device" ? (
-					<span className="flex min-w-0 shrink items-center gap-1">
+					<span
+						className="flex min-w-0 shrink items-center gap-1"
+						title={workspace.hostName}
+					>
 						<LuMonitor className="size-3 shrink-0" />
 						<span className="truncate">{workspace.hostName}</span>
 					</span>
@@ -174,6 +184,11 @@ function BoardCardBody({
 						<span className="text-red-600/80 dark:text-red-400/70">
 							−{formatCount(workspace.diffStats.deletions)}
 						</span>
+					</span>
+				) : null}
+				{isDeviceOffline ? (
+					<span className={PILL_CLASS}>
+						<Trans>Offline</Trans>
 					</span>
 				) : null}
 				{isArchived ? (
