@@ -208,9 +208,10 @@ bun patch --commit 'node_modules/@xterm/xterm'
 bun test apps/desktop/src/xterm-flushsync-patch.test.ts apps/desktop/src/xterm-render-debouncer-patch.test.ts apps/desktop/src/xterm-ime-patch.test.ts apps/desktop/src/webgl-atlas-patch.test.ts
 ```
 
-`bunfig.toml` holds new packages back for three days (`minimumReleaseAge`), so
-pick the newest betas older than that. Every `@xterm/*` version moves together
-(sherif), and `apps/mobile` needs `bun run scripts/generate-terminal-html.ts`.
+`@xterm/*` is in `minimumReleaseAgeExcludes` in `bunfig.toml`, so a beta can be
+taken the day it ships; this rebuild is the review. Every `@xterm/*` version
+moves together (sherif), and `apps/mobile` needs
+`bun run scripts/generate-terminal-html.ts`.
 
 ## @xterm/addon-ligatures (`@xterm%2Faddon-ligatures@<version>.patch`)
 
