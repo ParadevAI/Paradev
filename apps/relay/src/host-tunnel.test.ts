@@ -28,6 +28,7 @@ function socket(id: string, kind: "host" | "client" | "dial") {
 
 function tunnelWith(connections: Connection[]) {
 	const tunnel = new HostTunnel({} as never, {} as never);
+	Object.assign(tunnel, { ctx: { storage: { put: async () => {} } } });
 	tunnel.getConnections = ((tag?: string) =>
 		connections
 			.filter((conn) => !tag || conn.tags.includes(tag))
@@ -90,6 +91,23 @@ describe("a host that ignores a dial", () => {
 		expect(await settledNow(result)).toEqual({ ok: false, reason: "timeout" });
 		expect(host.close).toHaveBeenCalledWith(4408, "Host did not answer a dial");
 		expect(eventStream.close).toHaveBeenCalledWith(4410, "Tunnel disconnected");
+	});
+
+	test("is kept when it still pings, as a host whose dial-back failed does", async () => {
+		const host = socket("live", "host");
+		const eventStream = socket("event-bus", "client");
+		const tunnel = tunnelWith([host, eventStream]);
+		allowAll(tunnel);
+
+		const result = tunnel.proxyHttp({} as never, httpRequest);
+		await Promise.resolve();
+		jest.advanceTimersByTime(20_000);
+		tunnel.onMessage(host, '{"type":"ping"}');
+		jest.advanceTimersByTime(15_000);
+
+		expect(await settledNow(result)).toEqual({ ok: false, reason: "timeout" });
+		expect(host.close).not.toHaveBeenCalled();
+		expect(eventStream.close).not.toHaveBeenCalled();
 	});
 
 	test("does not close a replacement that connected meanwhile", async () => {
