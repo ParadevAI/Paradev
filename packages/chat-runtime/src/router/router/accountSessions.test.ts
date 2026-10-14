@@ -504,6 +504,33 @@ describe("explicit failed account agent stop", () => {
 		]);
 	});
 
+	test("keeps recovery blocked when provider disposal fails without confirming exit", async () => {
+		const f = fixture({
+			initialStatus: "dead",
+			beforeDispose: async () => {
+				throw new Error("provider exit unconfirmed");
+			},
+		});
+		const source = await f.caller().createAccountSession(input());
+		await dead(f, source.sessionId);
+		await expect(
+			f.caller().closeStoppedAccountSession({ sessionId: source.sessionId }),
+		).rejects.toThrow("provider exit unconfirmed");
+		expect(f.state.runtime.live.isClosing(source.sessionId)).toBe(true);
+		await expect(
+			f
+				.caller()
+				.recoverAccountSession({
+					commandId: randomUUID(),
+					sessionId: source.sessionId,
+				}),
+		).rejects.toThrow("still closing");
+		await expect(
+			f.caller().closeStoppedAccountSession({ sessionId: source.sessionId }),
+		).rejects.toThrow("still closing");
+		expect(f.launches).toHaveLength(1);
+	});
+
 	test("prevents enqueue and recovery until confirmed disposal finishes", async () => {
 		let release: (() => void) | undefined;
 		const gate = new Promise<void>((resolve) => {
