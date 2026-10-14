@@ -229,6 +229,7 @@ export function SessionView({
 		),
 	);
 
+	const focusComposer = useCallback(() => composerRef.current?.focus(), []);
 	const timelineRef = useRef(timeline);
 	timelineRef.current = timeline;
 	const snapshotRef = useRef(session.snapshot);
@@ -371,6 +372,8 @@ export function SessionView({
 							canForkToWorktree={canForkToWorktree}
 							groups={timeline}
 							hasOlder={session.hasOlder}
+							isActive={isActive}
+							onCloseFind={focusComposer}
 							onDiscardPrompt={session.discardPrompt}
 							onFork={onFork ? forkWithTranscript : undefined}
 							onLoadOlder={loadOlder}

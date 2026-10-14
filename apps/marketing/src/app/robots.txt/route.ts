@@ -16,6 +16,8 @@ const WELCOME_AI_AGENTS = [
 	"DuckAssistBot",
 	"Meta-ExternalAgent",
 	"ora-agent",
+	"CCBot",
+	"Bytespider",
 ];
 
 export function GET() {
@@ -27,15 +29,8 @@ Allow: /
 Allow: /api/llms.txt
 Disallow: /api/
 
-# AI assistants and AI search crawlers: explicitly welcome
-${WELCOME_AI_AGENTS.map((agent) => `User-Agent: ${agent}\nAllow: /`).join("\n\n")}
-
-# Bulk-scraping crawlers: not welcome
-User-Agent: CCBot
-Disallow: /
-
-User-Agent: Bytespider
-Disallow: /
+# AI assistants, AI search, and AI training crawlers: explicitly welcome
+${WELCOME_AI_AGENTS.map((agent) => `User-Agent: ${agent}\nAllow: /\nAllow: /api/llms.txt\nDisallow: /api/`).join("\n\n")}
 
 # Content Signals (https://contentsignals.org)
 Content-Signal: search=yes, ai-input=yes, ai-train=yes

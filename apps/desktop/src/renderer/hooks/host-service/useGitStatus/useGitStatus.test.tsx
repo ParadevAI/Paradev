@@ -111,6 +111,7 @@ function renderGitStatus(hostUrl: string) {
 								targets: [],
 								isReady: true,
 								agentCredentialsChangedWorkspaceId: null,
+								usageRefusal: null,
 							}}
 						>
 							{children}

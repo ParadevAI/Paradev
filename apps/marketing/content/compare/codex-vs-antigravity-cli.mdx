@@ -1,0 +1,100 @@
+---
+title: "Codex vs Antigravity CLI (2026): OpenAI's Agent vs Google's"
+description: "Compare OpenAI's Codex CLI and Google's Antigravity CLI (agy): models, pricing, open source, parallel work, and cloud features, and how to run both side by side."
+date: 2026-10-13
+type: "1v1"
+competitors:
+  - codex
+  - antigravity
+keywords:
+  - codex vs antigravity
+  - codex vs agy
+  - codex vs gemini cli
+  - antigravity cli vs codex
+  - openai vs google coding agent
+  - best coding agent
+---
+
+Codex CLI is OpenAI's terminal coding agent; Antigravity CLI, run as `agy`, is Google's, and it replaced Gemini CLI for most users in May 2026. Both run subagents, isolate work in Git worktrees, have a headless mode for CI, and support MCP, hooks, plugins, and skills. The main differences: Codex is open source and comes with ChatGPT plans, with a cloud agent on the same subscription, while Antigravity CLI is proprietary and free to start.
+
+Facts were checked against OpenAI's and Google's own docs on October 13, 2026.
+
+---
+
+## At a Glance
+
+| | **Codex CLI** | **Antigravity CLI (`agy`)** |
+|---|---|---|
+| **Vendor** | OpenAI | Google |
+| **Models** | OpenAI GPT models | Gemini models, plus Claude Sonnet and Opus and gpt-oss |
+| **Price** | ChatGPT plans, including limited use on Free; cloud tasks from Plus up; or API key without cloud features | Free with weekly limits; Google AI Pro and Ultra raise them; Gemini API key |
+| **License** | Open source (Apache-2.0) | Proprietary |
+| **Subagents** | Yes | Async subagents; agent teams on paid plans |
+| **Worktrees** | Yes | Per subagent, in branch mode |
+| **Cloud** | `codex cloud` tasks on the same plan | Remote Control; export to the Antigravity desktop app |
+| **Headless and SDK** | `codex exec`, Codex SDK, GitHub Action | `agy -p`, Python SDK |
+| **Platforms** | macOS, Linux, Windows | macOS, Linux, Windows |
+
+---
+
+## What Is Codex CLI?
+
+OpenAI calls Codex CLI a "lightweight coding agent that runs in your terminal." It is open source under Apache-2.0 and comes with ChatGPT plans, which also cover the IDE extension, the coding surface in the ChatGPT desktop app, cloud tasks, and code review. It runs subagents, works in Git worktrees, and has `codex exec` for CI, an SDK, and a GitHub Action. With an API key instead of a plan, you pay per token and lose the cloud features. At DevDay on September 29, 2026, OpenAI added an `/agents` view for tracking several tasks.
+
+## What Is Antigravity CLI?
+
+Google's `agy` brings the Antigravity agent harness to the terminal and shares its settings with the Antigravity 2.0 desktop app. It runs async subagents that can each take an isolated worktree, background shell tasks, and agent teams in preview on paid plans, with headless output in JSON or streaming JSON. Individuals use it free with weekly limits; Google AI Pro and Ultra raise them.
+
+## Key Differences
+
+### Open Source
+
+Codex CLI is Apache-2.0, so you can read, fork, and self-build it. Antigravity CLI is proprietary.
+
+### Price
+
+Both are free to start: Antigravity CLI with weekly limits, and Codex with limited use on ChatGPT Free. Paid ChatGPT plans from Plus up add cloud tasks, and one plan covers the CLI, IDE, desktop app, and cloud tasks.
+
+### Cloud Work
+
+Codex has a cloud agent on the same subscription: `codex cloud` runs tasks in OpenAI-managed environments while you keep working locally. Antigravity CLI's remote story is Remote Control, which drives sessions on your own machines from a browser.
+
+### Models
+
+Codex runs OpenAI's models. Antigravity CLI runs Gemini by default and also offers Claude and gpt-oss, with a separate rate limit for non-Gemini models.
+
+---
+
+## Run Both Side by Side
+
+The quickest way to choose is to give both the same task on your own code. [Superset](/) runs Codex and Antigravity CLI as built-in agents, each in its own Git worktree and terminal, on your own ChatGPT plan and Google account. Create two workspaces from the same branch, run Codex in one and `agy` in the other with the same prompt, compare the diffs in the Changes pane, and open a pull request from the better one. Superset never proxies model calls. See [How to Compare Coding Agents Side by Side](/compare/compare-coding-agents-side-by-side).
+
+## Which Should You Choose?
+
+**Choose Codex if you:**
+
+- Want an open-source agent from a major lab
+- Already pay for ChatGPT, and want cloud tasks on the same plan
+- Use OpenAI's models
+
+**Choose Antigravity CLI if you:**
+
+- Want a free start
+- Want Gemini by default, with Claude available in the same tool
+- Use Google's Antigravity desktop app or Google Cloud
+
+For the full field, see [Best AI Coding Agents in 2026](/compare/best-coding-agents).
+
+## Frequently Asked Questions
+
+### Is Codex or Antigravity CLI better?
+
+It depends on your models and your code. Codex is open source with cloud tasks on ChatGPT plans; Antigravity CLI is free to start with Gemini and Claude. Run both on a real task from your repository and compare the diffs.
+
+### Is Codex CLI free?
+
+The CLI is open source, but using it needs a ChatGPT plan or an OpenAI API key. Antigravity CLI is free with weekly limits.
+
+### Can I use Codex and Antigravity CLI together?
+
+Yes. Give each its own Git worktree. In Superset, each runs in its own workspace on the same repository.

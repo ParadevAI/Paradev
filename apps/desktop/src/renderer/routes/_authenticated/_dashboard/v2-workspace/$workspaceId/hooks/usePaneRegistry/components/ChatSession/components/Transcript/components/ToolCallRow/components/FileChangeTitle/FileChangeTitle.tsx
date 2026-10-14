@@ -1,4 +1,3 @@
-import { useLingui } from "@lingui/react/macro";
 import type { ToolCall, ToolContent } from "@superset/chat/protocol";
 import { ShimmerLabel } from "@superset/ui/ai-elements/shimmer-label";
 import { useMemo } from "react";
@@ -19,14 +18,15 @@ export function FileChangeTitle({
 	item,
 	onToggle,
 	running,
+	verb,
 }: {
 	change: FileChange;
 	item: ToolCall;
 	/** What a click on the file name does; the row around it does the same. */
 	onToggle?: (() => void) | undefined;
 	running: boolean;
+	verb: string;
 }) {
-	const { t } = useLingui();
 	const diff = item.content.find(
 		(content): content is DiffToolContent => content.type === "diff",
 	);
@@ -39,17 +39,6 @@ export function FileChangeTitle({
 				}
 			: null;
 	}, [change.kind, diff]);
-	const verb = running
-		? change.kind === "added"
-			? t({ message: "Creating", context: "file change" })
-			: change.kind === "deleted"
-				? t({ message: "Deleting", context: "file change" })
-				: t({ message: "Editing", context: "file change" })
-		: change.kind === "added"
-			? t({ message: "Created", context: "file change" })
-			: change.kind === "deleted"
-				? t({ message: "Deleted", context: "file change" })
-				: t({ message: "Edited", context: "file change" });
 	return (
 		<>
 			<span className="shrink-0">
@@ -60,7 +49,7 @@ export function FileChangeTitle({
 				) : (
 					verb
 				)}
-			</span>
+			</span>{" "}
 			{diff ? (
 				<FileChangePreview
 					change={change}
@@ -80,7 +69,10 @@ export function FileChangeTitle({
 				</span>
 			)}
 			{stats && !running && (
-				<span className="shrink-0 whitespace-nowrap font-mono text-xs tabular-nums">
+				<span
+					className="shrink-0 whitespace-nowrap font-mono text-xs tabular-nums"
+					data-find-skip
+				>
 					<DiffStatText
 						additions={stats.additions}
 						deletions={stats.deletions}

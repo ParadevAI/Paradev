@@ -9,10 +9,10 @@ import {
 import { cn } from "@superset/ui/utils";
 import { ChevronRight, CircleDashed } from "lucide-react";
 import type { ReactNode } from "react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { PluginIcon } from "renderer/components/PluginIcon";
 import { usePluginMentionOptions } from "renderer/hooks/usePluginMentionOptions";
-import { fileChangeOf } from "../../utils/fileChange";
+import { toolTitle } from "../../utils/toolTitle";
 import { ToolContentList } from "../ToolContentList";
 import { FileChangeTitle } from "./components/FileChangeTitle";
 import { StatusWord } from "./components/StatusWord";
@@ -32,7 +32,6 @@ export function ToolCallRow({ item }: { item: ToolCall }) {
 	const hasBody = item.content.length > 0;
 	const running = item.status === "running";
 	const command = item.toolKind === "execute";
-	const change = useMemo(() => fileChangeOf(item), [item]);
 	const installedPlugins = usePluginMentionOptions();
 	const mcpServer = item.mcpServer;
 	const plugin = mcpServer
@@ -40,6 +39,7 @@ export function ToolCallRow({ item }: { item: ToolCall }) {
 		: undefined;
 	const toggle = hasBody ? () => setOpen((value) => !value) : undefined;
 
+	const { change, label } = toolTitle(item, t, Boolean(plugin));
 	let title: ReactNode;
 	if (change) {
 		title = (
@@ -48,21 +48,10 @@ export function ToolCallRow({ item }: { item: ToolCall }) {
 				item={item}
 				onToggle={toggle}
 				running={running}
+				verb={label}
 			/>
 		);
 	} else {
-		// The translator names a command "Terminal" until the command itself
-		// arrives a beat later; "Running" says more in the meantime.
-		const rawMcpTitle =
-			!item.title ||
-			item.title.startsWith("mcp__") ||
-			item.title === `${mcpServer?.tool} (${mcpServer?.name})`;
-		const label =
-			plugin && mcpServer && rawMcpTitle
-				? mcpServer.tool
-				: running && command && item.title === "Terminal"
-					? t({ message: "Running" })
-					: item.title;
 		const face = command ? "font-mono text-[13px]" : undefined;
 		title = running ? (
 			<span className="min-w-0 truncate">
@@ -106,7 +95,12 @@ export function ToolCallRow({ item }: { item: ToolCall }) {
 							/>
 						)
 					)}
-					<span className="flex min-w-0 items-center gap-1.5">{title}</span>
+					<span
+						className="flex min-w-0 items-center gap-1.5"
+						data-find-item={item.id}
+					>
+						{title}
+					</span>
 					<StatusWord status={item.status} />
 					{hasBody && (
 						<ChevronRight

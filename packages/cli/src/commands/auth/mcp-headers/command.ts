@@ -1,4 +1,6 @@
 import { command } from "../../../lib/command";
+import { resolveOrganizationId } from "../../../lib/config";
+import { pluginMcpHeaders } from "../../../lib/plugins/mcp-client";
 
 export default command({
 	description:
@@ -28,7 +30,10 @@ export default command({
 	 * happens wherever the CLI's own auth does.
 	 */
 	run: async ({ ctx }) => {
-		const headers = { Authorization: `Bearer ${ctx.bearer}` };
+		const headers = pluginMcpHeaders(
+			ctx.bearer,
+			resolveOrganizationId(ctx.config),
+		);
 		return {
 			data: headers,
 			// stdout must be the JSON object and nothing else: the agent parses

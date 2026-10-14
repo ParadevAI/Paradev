@@ -74,6 +74,7 @@ export function AgentMessageRow({
 				className="text-foreground"
 				fading={fading}
 				final={!streaming && !paced.revealing}
+				findItemId={item.id}
 				pageCards
 				pagesShownEarlier={pagesShownEarlier}
 				text={paced.text}

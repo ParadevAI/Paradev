@@ -12,12 +12,6 @@ export interface FAQItem {
 	};
 }
 
-// The source English of a descriptor, for the machine-facing feeds
-// (llms.txt, index.md, JSON-LD) that stay English regardless of locale.
-export function faqSourceText(descriptor: MessageDescriptor): string {
-	return descriptor.message ?? descriptor.id;
-}
-
 export const FAQ_ITEMS: FAQItem[] = [
 	{
 		id: "vsTerminal",

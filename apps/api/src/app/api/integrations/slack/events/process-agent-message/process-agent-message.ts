@@ -1,5 +1,8 @@
+import { billingUsesAutumn } from "@superset/auth/autumn";
+import { organizationPlanFromAutumn } from "@superset/auth/billing";
 import { db } from "@superset/db/client";
 import { subscriptions } from "@superset/db/schema";
+import { CANONICAL_URLS } from "@superset/shared/constants";
 import {
 	accountConnection,
 	connectionBotToken,
@@ -134,13 +137,17 @@ export async function processAgentMessage({
 					teamId,
 				})
 			: undefined,
-		db.query.subscriptions.findFirst({
-			where: and(
-				eq(subscriptions.referenceId, connection.organizationId),
-				eq(subscriptions.status, "active"),
-			),
-			columns: { id: true },
-		}),
+		billingUsesAutumn
+			? organizationPlanFromAutumn(connection.organizationId).then((plan) =>
+					plan === "free" ? undefined : { id: connection.organizationId },
+				)
+			: db.query.subscriptions.findFirst({
+					where: and(
+						eq(subscriptions.referenceId, connection.organizationId),
+						eq(subscriptions.status, "active"),
+					),
+					columns: { id: true },
+				}),
 	]);
 
 	if (!activeSubscription) {
@@ -171,7 +178,7 @@ export async function processAgentMessage({
 						{
 							type: "button",
 							text: { type: "plain_text", text: "Upgrade to Pro", emoji: true },
-							url: "https://app.superset.sh/settings/billing",
+							url: `${CANONICAL_URLS.APP}/settings/billing`,
 							style: "primary",
 						},
 					],

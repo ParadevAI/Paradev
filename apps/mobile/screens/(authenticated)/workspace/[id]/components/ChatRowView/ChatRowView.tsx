@@ -31,6 +31,7 @@ interface ChatRowViewProps {
 	/** The streamed text for a message or thought, else its stored text. */
 	text: string;
 	harness: string | undefined;
+	hostUrl?: string;
 	onRespond: (approvalId: string, decision: Decision) => Promise<void>;
 	onRetryPrompt: (clientId: string) => void;
 	onDiscardPrompt: (clientId: string) => void;
@@ -65,6 +66,7 @@ export const ChatRowView = memo(
 		isLastReply,
 		text,
 		harness,
+		hostUrl,
 		onRespond,
 		onRetryPrompt,
 		onDiscardPrompt,
@@ -85,6 +87,7 @@ export const ChatRowView = memo(
 					<UserMessageBubble
 						content={row.entry.content}
 						harness={harness}
+						hostUrl={hostUrl}
 						pending={{
 							failed: row.entry.state === "failed",
 							onRetry: () => onRetryPrompt(row.entry.clientId),
@@ -122,6 +125,7 @@ export const ChatRowView = memo(
 					<UserMessageBubble
 						content={(item as UserMessage).content}
 						harness={harness}
+						hostUrl={hostUrl}
 					/>
 				);
 			case "agent_message":
@@ -180,6 +184,7 @@ export const ChatRowView = memo(
 		prev.isLastReply === next.isLastReply &&
 		prev.text === next.text &&
 		prev.harness === next.harness &&
+		prev.hostUrl === next.hostUrl &&
 		prev.onRespond === next.onRespond &&
 		prev.onRetryPrompt === next.onRetryPrompt &&
 		prev.onDiscardPrompt === next.onDiscardPrompt &&

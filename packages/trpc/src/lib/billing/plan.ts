@@ -1,3 +1,5 @@
+import { billingUsesAutumn } from "@superset/auth/autumn";
+import { organizationPlanFromAutumn } from "@superset/auth/billing";
 import { db } from "@superset/db/client";
 import { subscriptions } from "@superset/db/schema";
 import {
@@ -15,6 +17,7 @@ import { and, desc, eq, inArray } from "drizzle-orm";
 export async function organizationPlan(
 	organizationId: string,
 ): Promise<PlanTier> {
+	if (billingUsesAutumn) return organizationPlanFromAutumn(organizationId);
 	const [subscription] = await db
 		.select({ plan: subscriptions.plan, status: subscriptions.status })
 		.from(subscriptions)

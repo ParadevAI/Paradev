@@ -15,6 +15,12 @@ import {
 	stopSandbox,
 } from "../../lib/sandbox";
 import { generateCloudWorkspaceName } from "./generate-name";
+import {
+	attachBootSession,
+	authorizeBoot,
+	DEFAULT_BOX,
+	releaseBoot,
+} from "./meter";
 import { transitionCloudWorkspace } from "./transition";
 
 export const FALLBACK_NAME = "Cloud workspace";
@@ -103,11 +109,17 @@ async function provision(
 						nudge(row.organizationId, "cloud_workspaces");
 					},
 				);
+	let bootId: string | null = null;
 	try {
 		const { claim, environment, agentCredentialDigest } =
 			await Sentry.startSpan({ name: "claim", op: "sandbox" }, () =>
 				buildSandboxClaim({ row, launch: input.launch, withRepoHooks: true }),
 			);
+		({ bootId } = await authorizeBoot({
+			organizationId: row.organizationId,
+			cloudWorkspaceId: row.id,
+			...DEFAULT_BOX,
+		}));
 		const sandbox = await Sentry.startSpan(
 			{ name: "create", op: "sandbox" },
 			() => provisionSandbox({ name: providerSandboxId, environment, claim }),
@@ -133,11 +145,17 @@ async function provision(
 			});
 			if (current?.status === "deleted") {
 				await deleteSandbox(providerSandboxId);
+				if (bootId) await releaseBoot(bootId);
 			}
 			await naming.catch(() => {});
 			return "skipped";
 		}
 		nudge(row.organizationId, "cloud_workspaces");
+		if (bootId) {
+			await attachBootSession({ bootId, providerSandboxId }).catch((error) =>
+				Sentry.captureException(error, { extra: { bootId } }),
+			);
+		}
 		// The box is booting; the environment it needs arrives once host-service
 		// answers. The client's own wake pushes it again, so a workspace nobody
 		// opens still gets it (an agent launched at boot waits for this).
@@ -154,6 +172,14 @@ async function provision(
 		return "provisioned";
 	} catch (error) {
 		await naming.catch(() => {});
+		if (bootId) {
+			await releaseBoot(bootId).catch((releaseError) =>
+				console.error(
+					`[cloud-workspace] could not release boot ${bootId}`,
+					releaseError,
+				),
+			);
+		}
 		// A box that booted but whose host-service never answered is kept for
 		// diagnosis, stopped: its boot log, desktop and shell are a resume
 		// away, it costs storage rather than compute meanwhile, and a delete

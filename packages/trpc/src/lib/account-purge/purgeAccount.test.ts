@@ -102,6 +102,12 @@ mock.module("@superset/db/client", () => {
 	};
 });
 
+mock.module("../../router/cloud-workspace/meter", () => ({
+	settleOrganizationNow: async (organizationId: string) => {
+		log.push(`settle ${organizationId}`);
+	},
+}));
+
 mock.module("../page-store", () => ({
 	purgePageStorageForUser: async (userId: string) => {
 		log.push(`page-storage.purge ${userId}`);
@@ -113,7 +119,29 @@ mock.module("../page-store", () => ({
 	notifyPageHub: () => {},
 }));
 
+// Billing moved behind @superset/auth/billing upstream. Mocking the two
+// entrypoints keeps the real module graph — analytics, email, the validated
+// server env — out of this test, the same reason stripe is mocked below.
+mock.module("@superset/auth/autumn", () => ({
+	billingUsesAutumn: false,
+	autumnClient: {
+		billing: {
+			update: async () => {
+				log.push("autumn.billing.update");
+			},
+		},
+	},
+}));
+
+mock.module("@superset/auth/billing", () => ({
+	paidAutumnPlanId: async () => null,
+	seatItem: (subscription: { items: { data: Array<{ id: string }> } }) =>
+		subscription.items.data[0],
+	setAutumnSeats: async () => false,
+}));
+
 mock.module("@superset/auth/stripe", () => ({
+	syncCustomerName: async () => {},
 	stripeClient: {
 		subscriptions: {
 			retrieve: async () => ({ items: { data: [{ id: "si_1" }] } }),
@@ -214,6 +242,7 @@ describe("purgeAccount", () => {
 		expect(log).toEqual([
 			"posthog.delete",
 			`page-storage.purge ${USER_ID}`,
+			"settle org-solo",
 			"subscription.cancel sub_solo",
 			"charges.list cus_solo",
 			"customer.delete cus_solo",
@@ -238,6 +267,7 @@ describe("purgeAccount", () => {
 		expect(log).toEqual([
 			"posthog.delete",
 			`page-storage.purge ${USER_ID}`,
+			"settle org-paid",
 			"charges.list cus_paid",
 			"organization.delete org-paid",
 			"tombstone",
@@ -283,6 +313,7 @@ describe("purgeAccount", () => {
 		expect(log).toEqual([
 			"posthog.delete",
 			`page-storage.purge ${USER_ID}`,
+			"settle org-solo",
 			"charges.list cus_gone",
 			"organization.delete org-solo",
 			"tombstone",
@@ -337,6 +368,7 @@ describe("purgeAccount", () => {
 		expect(log).toEqual([
 			"posthog.delete",
 			`page-storage.purge ${USER_ID}`,
+			"settle org-solo",
 			"charges.list cus_solo",
 		]);
 	});

@@ -1,1 +1,5 @@
-export { type TranscriptRow, transcriptRows } from "./transcriptRows";
+export {
+	rowMessageId,
+	type TranscriptRow,
+	transcriptRows,
+} from "./transcriptRows";

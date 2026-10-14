@@ -12,6 +12,9 @@ minimumReleaseAge = 259200
 # every one of these. Excluding them keeps the repo installable from scratch.
 # Remove once the pins age past the window — they are exact, so this list only
 # ever covers versions we already chose.
+# @xterm/*: upstream publishes betas only, the pins are exact, and our patches are
+# rebuilt from the package's source commit (patches/README.md), so the version is
+# read before it ships.
 # @vercel/sandbox: the sandbox SDK ships fixes we depend on within days, and the
 # pin is exact, so the guard would only ever delay a version we already chose.
 # The ACP adapters track the protocol draft and cut releases daily, so the
@@ -44,4 +47,15 @@ minimumReleaseAgeExcludes = [
   "expo-linking",
   "expo-modules-core",
   "expo-router",
+  "@xterm/addon-clipboard",
+  "@xterm/addon-fit",
+  "@xterm/addon-image",
+  "@xterm/addon-ligatures",
+  "@xterm/addon-progress",
+  "@xterm/addon-search",
+  "@xterm/addon-serialize",
+  "@xterm/addon-unicode11",
+  "@xterm/addon-webgl",
+  "@xterm/headless",
+  "@xterm/xterm",
 ]

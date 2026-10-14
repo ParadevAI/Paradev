@@ -3,6 +3,7 @@ import { db } from "@superset/db/client";
 import { stub } from "../../../test/stub";
 import * as sandbox from "../../lib/sandbox";
 import * as jobs from "./jobs";
+import * as meter from "./meter";
 
 type Row = {
 	status: string;
@@ -16,6 +17,8 @@ let row: Row | undefined;
 let sandboxCalls: string[] = [];
 let queued: Array<{ path: string; body: unknown; delaySeconds?: number }> = [];
 let failingStage: Stage | null = null;
+let meterCalls: string[] = [];
+let meterFailure: Error | null = null;
 
 stub(db.query.cloudWorkspaces, { findFirst: () => Promise.resolve(row) });
 stub(sandbox, {
@@ -42,6 +45,17 @@ stub(jobs, {
 			body: job.body,
 			delaySeconds: job.delaySeconds,
 		});
+		return Promise.resolve();
+	},
+});
+
+stub(meter, {
+	settleWorkspaceNow: () => {
+		meterCalls.push("settle");
+		return meterFailure ? Promise.reject(meterFailure) : Promise.resolve();
+	},
+	queueSettleWorkspace: () => {
+		meterCalls.push("queue");
 		return Promise.resolve();
 	},
 });
@@ -105,17 +119,29 @@ describe("reapArchivedCloudWorkspace", () => {
 		};
 		sandboxCalls = [];
 		queued = [];
+		meterCalls = [];
+		meterFailure = null;
 	});
 
-	test("the stop stage only stops the box", async () => {
+	test("the stop stage stops the box and queues its final settle", async () => {
 		expect(await reapArchivedCloudWorkspace({ ...input, stage: "stop" })).toBe(
 			"stopped",
 		);
 		expect(sandboxCalls).toEqual(["stop:ws-box"]);
+		expect(meterCalls).toEqual(["queue"]);
 		expect(queued).toEqual([]);
 	});
 
-	test("the delete stage deletes the box", async () => {
+	test("the delete stage settles the box's usage before deleting it", async () => {
+		expect(
+			await reapArchivedCloudWorkspace({ ...input, stage: "delete" }),
+		).toBe("reaped");
+		expect(meterCalls).toEqual(["settle"]);
+		expect(sandboxCalls).toEqual(["delete:ws-box"]);
+	});
+
+	test("a delete still deletes when the final settle fails: at most one lock window goes unbilled", async () => {
+		meterFailure = new Error("autumn down");
 		expect(
 			await reapArchivedCloudWorkspace({ ...input, stage: "delete" }),
 		).toBe("reaped");

@@ -7,8 +7,10 @@ import { GridCross } from "@/app/[lang]/blog/components/GridCross";
 import { Soc2Badge } from "@/app/[lang]/components/Soc2Badge";
 import { localizedAlternates } from "@/app/[lang]/metadata";
 import { initServerI18n } from "@/app/i18n-server";
+import { FAQPageJsonLd } from "@/components/JsonLd";
 import { EnterpriseContactForm } from "./components/EnterpriseContactForm";
 import { EnterpriseFAQ } from "./components/EnterpriseFAQ";
+import { ENTERPRISE_FAQ_ITEMS } from "./components/EnterpriseFAQ/constants";
 
 export async function generateMetadata(): Promise<Metadata> {
 	const lang = await initServerI18n();
@@ -31,12 +33,19 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function EnterprisePage() {
-	await initServerI18n();
+	const locale = await initServerI18n();
+	const i18n = getI18nInstance(locale);
 
 	const { t } = useLingui();
 
 	return (
 		<main className="relative min-h-screen">
+			<FAQPageJsonLd
+				items={ENTERPRISE_FAQ_ITEMS.map((item) => ({
+					question: i18n._(item.question),
+					answer: i18n._(item.answer),
+				}))}
+			/>
 			{/* Vertical guide lines */}
 			<div
 				className="absolute inset-0 pointer-events-none"

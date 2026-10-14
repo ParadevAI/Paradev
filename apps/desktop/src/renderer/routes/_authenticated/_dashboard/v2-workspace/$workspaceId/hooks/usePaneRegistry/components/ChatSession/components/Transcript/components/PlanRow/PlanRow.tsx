@@ -28,6 +28,7 @@ export function PlanRow({ item }: { item: Plan }) {
 									? "text-muted-foreground line-through"
 									: undefined
 							}
+							data-find-item={item.id}
 						>
 							{entry.text}
 						</span>
