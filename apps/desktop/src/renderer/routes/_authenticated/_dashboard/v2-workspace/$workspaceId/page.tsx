@@ -691,7 +691,12 @@ function V2WorkspaceContent() {
 										<AddTabMenu
 											onAddTerminal={addTerminalTab}
 											onAddAccountChat={
-												isSandbox ? undefined : (returnFocus) => { accountChatReturnFocus.current=returnFocus; setAccountChatOpen(true); }
+												isSandbox
+													? undefined
+													: (returnFocus) => {
+															accountChatReturnFocus.current = returnFocus;
+															setAccountChatOpen(true);
+														}
 											}
 											onAddAccountTerminal={
 												isSandbox
@@ -812,7 +817,7 @@ function V2WorkspaceContent() {
 					surface="chat"
 					onClose={() => setAccountChatOpen(false)}
 					onLaunch={createAccountChat}
- returnFocus={accountChatReturnFocus.current}
+					returnFocus={accountChatReturnFocus.current}
 				/>
 			)}
 			{accountTerminalOpen && (
@@ -820,7 +825,7 @@ function V2WorkspaceContent() {
 					key={workspaceId}
 					onClose={() => setAccountTerminalOpen(false)}
 					onLaunch={createAccountTerminal}
- returnFocus={accountTerminalReturnFocus.current}
+					returnFocus={accountTerminalReturnFocus.current}
 				/>
 			)}
 		</FileDocumentStoreProvider>
