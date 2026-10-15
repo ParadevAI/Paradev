@@ -566,6 +566,21 @@ describe("agent-wrappers opencode v2", () => {
 		]);
 	});
 
+	it("ignores its idle root once another terminal's TUI resumes it", async () => {
+		const route = { sessionID: "shared" };
+		const plugin = await startCliPlugin({ shared: {}, other: {} }, route);
+		await plugin.emit("session.execution.started", { sessionID: "shared" });
+		await plugin.emit("session.execution.succeeded", { sessionID: "shared" });
+		route.sessionID = "other";
+		await plugin.emit("session.execution.started", { sessionID: "shared" });
+		await plugin.emit("permission.asked", { sessionID: "shared" });
+		await plugin.emit("session.execution.succeeded", { sessionID: "shared" });
+		expect(plugin.notifications()).toEqual([
+			{ hook_event_name: "Start", session_id: "shared" },
+			{ hook_event_name: "Stop", session_id: "shared" },
+		]);
+	});
+
 	it("does nothing outside a Superset terminal", async () => {
 		delete process.env.SUPERSET_TERMINAL_ID;
 		const { default: plugin } = await loadCliPlugin();

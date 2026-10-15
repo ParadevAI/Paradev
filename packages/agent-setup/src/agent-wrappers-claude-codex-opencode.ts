@@ -402,6 +402,7 @@ function ensureOpenCodeCliJson(pluginDir: string): void {
 		);
 		return;
 	}
+	if (content === existing) return;
 	writeFileIfChanged(cliJsonPath, content, 0o600);
 }
 

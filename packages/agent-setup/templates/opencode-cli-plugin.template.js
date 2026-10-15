@@ -93,12 +93,10 @@ export default {
     };
 
     const handleBusy = async (sessionID) => {
-      // A new busy root after an idle turn is a conversation switch.
+      // A new busy root after an idle turn is a conversation switch. The
+      // retained root is checked too: another TUI can resume it.
       if (!rootSessionID || currentState === "idle") {
-        if (
-          sessionID !== rootSessionID &&
-          !(isRoot(sessionID) && isViewed(sessionID))
-        ) {
+        if (!(isRoot(sessionID) && isViewed(sessionID))) {
           log("Ignoring busy from a session this TUI does not show:", sessionID);
           return;
         }
@@ -123,7 +121,8 @@ export default {
 
     const handlePermission = async (sessionID) => {
       if (!sessionID || !isRoot(sessionID)) return;
-      if (sessionID !== rootSessionID && !isViewed(sessionID)) return;
+      const ownsBusyRoot = sessionID === rootSessionID && currentState === "busy";
+      if (!ownsBusyRoot && !isViewed(sessionID)) return;
       await notify("PermissionRequest", sessionID);
     };
 
