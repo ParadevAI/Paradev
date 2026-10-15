@@ -25,9 +25,40 @@ function assertNativeWatchAvailable(dir: string): void {
 // last unsubscribe is in flight joins a backend that is then destroyed, so it
 // resolves but never delivers. Run native calls one at a time.
 let nativeOperationTail: Promise<unknown> = Promise.resolve();
+const SLOW_NATIVE_OPERATION_MS = 10_000;
 
-function runNativeOperation<T>(operation: () => Promise<T>): Promise<T> {
-	const result = nativeOperationTail.then(operation);
+function runNativeOperation<T>(
+	kind: "subscribe" | "unsubscribe",
+	rootPath: string,
+	operation: () => Promise<T>,
+): Promise<T> {
+	const result = nativeOperationTail.then(async () => {
+		const startedAt = Date.now();
+		let slow = false;
+		const slowTimer = setTimeout(() => {
+			slow = true;
+			console.warn(
+				"[workspace-fs/watch] native watcher call is stuck; later watches wait behind it",
+				{ kind, rootPath, elapsedMs: Date.now() - startedAt },
+			);
+		}, SLOW_NATIVE_OPERATION_MS);
+		slowTimer.unref?.();
+		try {
+			return await operation();
+		} finally {
+			clearTimeout(slowTimer);
+			if (slow) {
+				console.warn(
+					"[workspace-fs/watch] stuck native watcher call finished",
+					{
+						kind,
+						rootPath,
+						elapsedMs: Date.now() - startedAt,
+					},
+				);
+			}
+		}
+	});
 	nativeOperationTail = result.catch(() => {});
 	return result;
 }
@@ -49,7 +80,7 @@ export const parcelWatchBackend: NativeWatchBackend = {
 		const { subscribe: subscribeToFilesystem } = await import(
 			"@parcel/watcher"
 		);
-		const subscription = await runNativeOperation(() =>
+		const subscription = await runNativeOperation("subscribe", rootPath, () =>
 			subscribeToFilesystem(
 				rootPath,
 				(error, events) => {
@@ -62,7 +93,10 @@ export const parcelWatchBackend: NativeWatchBackend = {
 			),
 		);
 		return {
-			unsubscribe: () => runNativeOperation(() => subscription.unsubscribe()),
+			unsubscribe: () =>
+				runNativeOperation("unsubscribe", rootPath, () =>
+					subscription.unsubscribe(),
+				),
 		};
 	},
 };
