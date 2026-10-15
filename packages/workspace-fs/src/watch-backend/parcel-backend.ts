@@ -21,6 +21,17 @@ function assertNativeWatchAvailable(dir: string): void {
 	probe.close();
 }
 
+// parcel shares one native backend per process. A subscribe issued while the
+// last unsubscribe is in flight joins a backend that is then destroyed, so it
+// resolves but never delivers. Run native calls one at a time.
+let nativeOperationTail: Promise<unknown> = Promise.resolve();
+
+function runNativeOperation<T>(operation: () => Promise<T>): Promise<T> {
+	const result = nativeOperationTail.then(operation);
+	nativeOperationTail = result.catch(() => {});
+	return result;
+}
+
 export const parcelWatchBackend: NativeWatchBackend = {
 	name: "parcel",
 	async subscribe({ rootPath, ignore, generation, onEvents, onError }) {
@@ -38,16 +49,20 @@ export const parcelWatchBackend: NativeWatchBackend = {
 		const { subscribe: subscribeToFilesystem } = await import(
 			"@parcel/watcher"
 		);
-		const subscription = await subscribeToFilesystem(
-			rootPath,
-			(error, events) => {
-				// Log the error, then process whatever events arrived alongside
-				// it. Mirrors VS Code's parcelWatcher.ts:373-378.
-				if (error) onError(error);
-				if (events.length > 0) onEvents(events);
-			},
-			{ ignore: uniqueIgnore },
+		const subscription = await runNativeOperation(() =>
+			subscribeToFilesystem(
+				rootPath,
+				(error, events) => {
+					// Log the error, then process whatever events arrived alongside
+					// it. Mirrors VS Code's parcelWatcher.ts:373-378.
+					if (error) onError(error);
+					if (events.length > 0) onEvents(events);
+				},
+				{ ignore: uniqueIgnore },
+			),
 		);
-		return { unsubscribe: () => subscription.unsubscribe() };
+		return {
+			unsubscribe: () => runNativeOperation(() => subscription.unsubscribe()),
+		};
 	},
 };
