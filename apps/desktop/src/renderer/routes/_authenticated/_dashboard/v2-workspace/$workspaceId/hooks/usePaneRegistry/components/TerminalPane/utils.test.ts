@@ -36,10 +36,16 @@ describe("resolveLocalFilePaths", () => {
 		).toBe(null);
 	});
 
-	it("returns null for a path with a line break", () => {
-		expect(
-			resolveLocalFilePaths([file("odd")], () => "/tmp/line\nbreak.png"),
-		).toBe(null);
+	it("returns null for a path with a control character", () => {
+		for (const path of [
+			"/tmp/line\nbreak.png",
+			"/tmp/esc\u001b[201~.png",
+			"/tmp/interrupt\u0003.png",
+			"/tmp/delete\u007f.png",
+			"/tmp/c1\u009b.png",
+		]) {
+			expect(resolveLocalFilePaths([file("odd")], () => path)).toBe(null);
+		}
 	});
 });
 

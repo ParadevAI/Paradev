@@ -6,7 +6,7 @@ export function shellEscapePaths(paths: string[]): string {
 
 /**
  * Null when any file has no path on disk (a screenshot or other copied image
- * data) or a path that a paste cannot carry on one line.
+ * data) or a path with a control character, which the PTY could read as input.
  */
 export function resolveLocalFilePaths(
 	files: File[],
@@ -14,7 +14,7 @@ export function resolveLocalFilePaths(
 ): string[] | null {
 	if (files.length === 0) return null;
 	const paths = files.map(getPathForFile);
-	return paths.every((path) => path && !/[\r\n]/.test(path)) ? paths : null;
+	return paths.every((path) => path && !/\p{Cc}/u.test(path)) ? paths : null;
 }
 
 /**
