@@ -1,5 +1,6 @@
 import { PromptInputProvider } from "@superset/ui/ai-elements/prompt-input";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { useCallback } from "react";
 import { NewWorkspaceScreen } from "renderer/routes/_authenticated/components/DashboardNewWorkspaceModal/components/NewWorkspaceScreen";
 import { DashboardNewWorkspaceDraftProvider } from "renderer/routes/_authenticated/components/DashboardNewWorkspaceModal/DashboardNewWorkspaceDraftContext";
 import { newWorkspaceAttachmentsStore } from "renderer/stores/new-workspace-attachments";
@@ -24,6 +25,9 @@ export const Route = createFileRoute(
  */
 function NewWorkspacePage() {
 	const { projectId, session, host } = Route.useSearch();
+	const router = useRouter();
+	const canGoBack = router.history.canGoBack();
+	const goBack = useCallback(() => router.history.back(), [router]);
 	return (
 		<DashboardNewWorkspaceDraftProvider onClose={() => {}}>
 			<PromptInputProvider attachmentsStore={newWorkspaceAttachmentsStore}>
@@ -32,6 +36,7 @@ function NewWorkspacePage() {
 					preSelectedProjectId={projectId ?? null}
 					preSelectedSession={session === true}
 					preSelectedHostId={host ?? null}
+					onClose={canGoBack ? goBack : undefined}
 				/>
 			</PromptInputProvider>
 		</DashboardNewWorkspaceDraftProvider>
