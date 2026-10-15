@@ -10399,6 +10399,9 @@ msgstr "比此應用程式新"
 msgid "Newer than this app. Everything works; update the app to match."
 msgstr "比此應用程式新。一切正常；請更新應用程式以匹配。"
 
+msgid "Newest first"
+msgstr "最新優先"
+
 msgid "News & Updates"
 msgstr "新聞與更新"
 
@@ -11253,6 +11256,9 @@ msgstr "離線/本地優先模式"
 
 msgid "Older"
 msgstr "更早"
+
+msgid "Oldest first"
+msgstr "最早優先"
 
 msgid "on {offScopeHostName} — won't run here"
 msgstr "在{offScopeHostName}上，不會在這裡執行"
@@ -15498,6 +15504,9 @@ msgstr "排序方式"
 
 msgid "Sort by {label}, currently {sortLabel}"
 msgstr "按{label}排序，目前為{sortLabel}"
+
+msgid "Sort direction"
+msgstr "排序方向"
 
 msgid "Sort workspaces"
 msgstr "排序工作區"

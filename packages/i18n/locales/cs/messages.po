@@ -10399,6 +10399,9 @@ msgstr "Novější než tato aplikace"
 msgid "Newer than this app. Everything works; update the app to match."
 msgstr "Novější než tato aplikace. Vše funguje; aktualizujte aplikaci, aby verze odpovídaly."
 
+msgid "Newest first"
+msgstr "Nejnovější první"
+
 msgid "News & Updates"
 msgstr "Novinky a aktualizace"
 
@@ -11253,6 +11256,9 @@ msgstr "Offline / local-first režim"
 
 msgid "Older"
 msgstr "Starší"
+
+msgid "Oldest first"
+msgstr "Nejstarší první"
 
 msgid "on {offScopeHostName} — won't run here"
 msgstr "na {offScopeHostName} — tady nepoběží"
@@ -15498,6 +15504,9 @@ msgstr "Řadit podle"
 
 msgid "Sort by {label}, currently {sortLabel}"
 msgstr "Seřadit podle {label}, aktuálně {sortLabel}"
+
+msgid "Sort direction"
+msgstr "Směr řazení"
 
 msgid "Sort workspaces"
 msgstr "Seřadit pracovní prostory"

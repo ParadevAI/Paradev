@@ -10399,6 +10399,9 @@ msgstr "Новее этого приложения"
 msgid "Newer than this app. Everything works; update the app to match."
 msgstr "Новее этого приложения. Всё работает; обновите приложение, чтобы версии совпали."
 
+msgid "Newest first"
+msgstr "Сначала новые"
+
 msgid "News & Updates"
 msgstr "Новости и обновления"
 
@@ -11253,6 +11256,9 @@ msgstr "Офлайн / local-first режим"
 
 msgid "Older"
 msgstr "Ранее"
+
+msgid "Oldest first"
+msgstr "Сначала старые"
 
 msgid "on {offScopeHostName} — won't run here"
 msgstr "на {offScopeHostName} — здесь не запустится"
@@ -15498,6 +15504,9 @@ msgstr "Сортировать по"
 
 msgid "Sort by {label}, currently {sortLabel}"
 msgstr "Сортировать по {label}, сейчас {sortLabel}"
+
+msgid "Sort direction"
+msgstr "Направление сортировки"
 
 msgid "Sort workspaces"
 msgstr "Сортировать рабочие области"

@@ -5,18 +5,24 @@ import {
 	DropdownMenuLabel,
 	DropdownMenuRadioGroup,
 	DropdownMenuRadioItem,
+	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { HiOutlineBarsArrowDown } from "react-icons/hi2";
-import type { SidebarProjectSortMode } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal/schema";
+import type {
+	SidebarProjectSortDirection,
+	SidebarProjectSortMode,
+} from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal/schema";
 
 const SORT_MODES: SidebarProjectSortMode[] = ["manual", "active", "created"];
 
 interface DashboardSidebarProjectsSortMenuProps {
 	sortMode: SidebarProjectSortMode;
 	onSortModeChange: (mode: SidebarProjectSortMode) => void;
+	sortDirection: SidebarProjectSortDirection;
+	onSortDirectionChange: (direction: SidebarProjectSortDirection) => void;
 }
 
 /**
@@ -28,6 +34,8 @@ interface DashboardSidebarProjectsSortMenuProps {
 export function DashboardSidebarProjectsSortMenu({
 	sortMode,
 	onSortModeChange,
+	sortDirection,
+	onSortDirectionChange,
 }: DashboardSidebarProjectsSortMenuProps) {
 	const { t } = useLingui();
 	const labels: Record<SidebarProjectSortMode, string> = {
@@ -97,11 +105,30 @@ export function DashboardSidebarProjectsSortMenu({
 					))}
 				</DropdownMenuRadioGroup>
 				{sortMode !== "manual" && (
-					<div className="px-2 pb-1 pt-1.5 text-[11px] text-muted-foreground/70">
-						{t({
-							message: "Drag workspaces to reorder in Manual order",
-						})}
-					</div>
+					<>
+						<DropdownMenuSeparator />
+						<DropdownMenuLabel className="text-xs font-normal text-muted-foreground/70">
+							{t({ message: "Sort direction" })}
+						</DropdownMenuLabel>
+						<DropdownMenuRadioGroup
+							value={sortDirection}
+							onValueChange={(value) =>
+								onSortDirectionChange(value as SidebarProjectSortDirection)
+							}
+						>
+							<DropdownMenuRadioItem value="desc">
+								{t({ message: "Newest first" })}
+							</DropdownMenuRadioItem>
+							<DropdownMenuRadioItem value="asc">
+								{t({ message: "Oldest first" })}
+							</DropdownMenuRadioItem>
+						</DropdownMenuRadioGroup>
+						<div className="px-2 pb-1 pt-1.5 text-[11px] text-muted-foreground/70">
+							{t({
+								message: "Drag workspaces to reorder in Manual order",
+							})}
+						</div>
+					</>
 				)}
 			</DropdownMenuContent>
 		</DropdownMenu>

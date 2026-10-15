@@ -17,22 +17,26 @@ column the host persists.
 Persisted per user as `sidebarProjectSortMode` in `v2UserPreferences`
 (`manual` by default; a stale value from #5956 heals to `manual`).
 
+Last active and Date created also take a direction, persisted as
+`sidebarProjectSortDirection` next to the mode: `desc` (Newest first, the
+default) or `asc` (Oldest first). An unknown value heals to `desc`. The sort
+menu shows the direction choice only for those two modes.
+
 | Mode | Project order | Order inside a project |
 | --- | --- | --- |
 | Manual order | drag order (`tabOrder`), untouched | `tabOrder` |
-| Last active | most recently active workspace, newest first | workspaces and folders by activity, newest first |
-| Date created | `project.createdAt`, newest first | workspace / folder `createdAt`, newest first |
+| Last active | drag order (`tabOrder`), untouched | workspaces and folders by activity, in the chosen direction |
+| Date created | drag order (`tabOrder`), untouched | workspace / folder `createdAt`, in the chosen direction |
 
 Rules shared by the non-manual modes (`utils/sortDashboardSidebarProjects`):
 
 - A folder ranks among loose workspaces by its newest member (Last active) or
   its own `createdAt` (Date created); its members are sorted inside it too.
 - The local `main` workspace stays first inside its project.
-- A project with no workspaces ranks by its own `updatedAt`, then `createdAt`.
 - Ties break by name, then id, so the order is stable across renders.
 - Timestamps are coerced NaN-safely. Persisted caches can revive `Date`
   columns as ISO strings; a value that fails to parse sinks to the bottom of
-  its list instead of throwing.
+  its list in both directions instead of throwing.
 - Manual returns the input array by reference, and a project whose children
   are already in order keeps its identity, so memoized rows are not disturbed.
 

@@ -187,8 +187,13 @@ export function DashboardSidebar({
 	const workspacesListCollapsed = useSidebarSectionsCollapseStore(
 		(s) => s.collapsed.workspaces,
 	);
-	const { preferences, setSidebarProjectSortMode } = useV2UserPreferences();
+	const {
+		preferences,
+		setSidebarProjectSortMode,
+		setSidebarProjectSortDirection,
+	} = useV2UserPreferences();
 	const sortMode = preferences.sidebarProjectSortMode;
+	const sortDirection = preferences.sidebarProjectSortDirection;
 	const [projectFilterQuery, setProjectFilterQuery] = useState("");
 	// The icon rail hides the Projects header (and its filter input); a
 	// filter left active there would invisibly hide projects.
@@ -217,8 +222,8 @@ export function DashboardSidebar({
 		() =>
 			sortMode === "manual"
 				? orderedGroups
-				: sortDashboardSidebarProjects(orderedGroups, sortMode),
-		[sortMode, orderedGroups],
+				: sortDashboardSidebarProjects(orderedGroups, sortMode, sortDirection),
+		[sortMode, sortDirection, orderedGroups],
 	);
 	const displayedGroups = useMemo(
 		() => filterDashboardSidebarProjects(sortedGroups, projectFilterQuery),
@@ -481,6 +486,10 @@ export function DashboardSidebar({
 													<DashboardSidebarWorkspacesHeader
 														sortMode={sortMode}
 														onSortModeChange={setSidebarProjectSortMode}
+														sortDirection={sortDirection}
+														onSortDirectionChange={
+															setSidebarProjectSortDirection
+														}
 														filterQuery={projectFilterQuery}
 														onFilterQueryChange={setProjectFilterQuery}
 													/>

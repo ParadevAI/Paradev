@@ -10399,6 +10399,9 @@ msgstr "Mais recente que este app"
 msgid "Newer than this app. Everything works; update the app to match."
 msgstr "Mais recente que este app. Tudo funciona; atualize o app para igualar."
 
+msgid "Newest first"
+msgstr "Mais recentes primeiro"
+
 msgid "News & Updates"
 msgstr "Novidades e atualizações"
 
@@ -11253,6 +11256,9 @@ msgstr "Modo offline / local-first"
 
 msgid "Older"
 msgstr "Mais antigo"
+
+msgid "Oldest first"
+msgstr "Mais antigos primeiro"
 
 msgid "on {offScopeHostName} — won't run here"
 msgstr "em {offScopeHostName} — não vai rodar aqui"
@@ -15498,6 +15504,9 @@ msgstr "Ordenar por"
 
 msgid "Sort by {label}, currently {sortLabel}"
 msgstr "Ordenar por {label}, atualmente {sortLabel}"
+
+msgid "Sort direction"
+msgstr "Direção da ordenação"
 
 msgid "Sort workspaces"
 msgstr "Ordenar áreas de trabalho"

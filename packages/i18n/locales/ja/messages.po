@@ -10399,6 +10399,9 @@ msgstr "このアプリより新しい"
 msgid "Newer than this app. Everything works; update the app to match."
 msgstr "このアプリより新しいバージョンです。動作に問題はありません。アプリを更新して合わせてください。"
 
+msgid "Newest first"
+msgstr "新しい順"
+
 msgid "News & Updates"
 msgstr "ニュースとアップデート"
 
@@ -11253,6 +11256,9 @@ msgstr "オフライン/ローカルファーストモード"
 
 msgid "Older"
 msgstr "それ以前"
+
+msgid "Oldest first"
+msgstr "古い順"
 
 msgid "on {offScopeHostName} — won't run here"
 msgstr "{offScopeHostName}上 — ここでは実行されません"
@@ -15498,6 +15504,9 @@ msgstr "並び替え"
 
 msgid "Sort by {label}, currently {sortLabel}"
 msgstr "{label}で並べ替え、現在{sortLabel}"
+
+msgid "Sort direction"
+msgstr "並び順"
 
 msgid "Sort workspaces"
 msgstr "ワークスペースを並べ替え"

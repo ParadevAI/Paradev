@@ -486,12 +486,20 @@ export type SidebarProjectSortMode = z.infer<
 	typeof sidebarProjectSortModeSchema
 >;
 
+const sidebarProjectSortDirectionSchema = z.enum(["desc", "asc"]);
+
+export type SidebarProjectSortDirection = z.infer<
+	typeof sidebarProjectSortDirectionSchema
+>;
+
 // `.catch`, not `.default`: #5956 persisted a since-retired "updated" value
 // for some users, and an enum failure must degrade to manual rather than
 // drop the whole preferences row. Also applied at heal time (below) because
 // the localStorage collection only runs the schema on writes.
 const persistedSidebarProjectSortModeSchema =
 	sidebarProjectSortModeSchema.catch("manual");
+const persistedSidebarProjectSortDirectionSchema =
+	sidebarProjectSortDirectionSchema.catch("desc");
 
 export const v2UserPreferencesSchema = z.object({
 	id: z.literal("preferences"),
@@ -511,6 +519,7 @@ export const v2UserPreferencesSchema = z.object({
 	changesViewMode: changesViewModeSchema.default("folders"),
 	// Ordering of the dashboard sidebar's Projects list; manual = drag order.
 	sidebarProjectSortMode: persistedSidebarProjectSortModeSchema,
+	sidebarProjectSortDirection: persistedSidebarProjectSortDirectionSchema,
 	// Built-in (synthetic, app-shipped) presets the user hid from the preset
 	// bar. Synthetic presets have no v2TerminalPresets row, so visibility can't
 	// live on the row's pinnedToBar like user presets. Pruned against
@@ -550,6 +559,7 @@ export const DEFAULT_V2_USER_PREFERENCES: V2UserPreferencesRow = {
 	showPresetsBar: true,
 	changesViewMode: "folders",
 	sidebarProjectSortMode: "manual",
+	sidebarProjectSortDirection: "desc",
 	hiddenBuiltinPresetIds: [],
 	favoritePageIds: [],
 	hiddenTagFolders: {},
@@ -650,6 +660,10 @@ export function healV2UserPreferences(raw: unknown): V2UserPreferencesRow {
 		sidebarProjectSortMode: persistedSidebarProjectSortModeSchema.parse(
 			r.sidebarProjectSortMode,
 		),
+		sidebarProjectSortDirection:
+			persistedSidebarProjectSortDirectionSchema.parse(
+				r.sidebarProjectSortDirection,
+			),
 		// Prune retired/stray built-in ids so the array stays bounded.
 		hiddenBuiltinPresetIds: (Array.isArray(r.hiddenBuiltinPresetIds)
 			? r.hiddenBuiltinPresetIds

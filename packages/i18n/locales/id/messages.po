@@ -10399,6 +10399,9 @@ msgstr "Lebih baru dari aplikasi ini"
 msgid "Newer than this app. Everything works; update the app to match."
 msgstr "Lebih baru dari aplikasi ini. Semua berfungsi; perbarui aplikasi agar sesuai."
 
+msgid "Newest first"
+msgstr "Terbaru terlebih dahulu"
+
 msgid "News & Updates"
 msgstr "Berita & Pembaruan"
 
@@ -11253,6 +11256,9 @@ msgstr "Mode offline / local-first"
 
 msgid "Older"
 msgstr "Lebih lama"
+
+msgid "Oldest first"
+msgstr "Terlama terlebih dahulu"
 
 msgid "on {offScopeHostName} — won't run here"
 msgstr "di {offScopeHostName} — tidak akan berjalan di sini"
@@ -15498,6 +15504,9 @@ msgstr "Urutkan menurut"
 
 msgid "Sort by {label}, currently {sortLabel}"
 msgstr "Urutkan menurut {label}, saat ini {sortLabel}"
+
+msgid "Sort direction"
+msgstr "Arah pengurutan"
 
 msgid "Sort workspaces"
 msgstr "Urutkan workspace"

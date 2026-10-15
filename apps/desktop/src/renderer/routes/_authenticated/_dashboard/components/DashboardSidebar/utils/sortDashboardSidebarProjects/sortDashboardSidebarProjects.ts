@@ -2,19 +2,15 @@ import {
 	getWorkspaceActivityTime,
 	toTime,
 } from "@superset/shared/workspace-activity";
-import type { SidebarProjectSortMode } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal/schema";
+import type {
+	SidebarProjectSortDirection,
+	SidebarProjectSortMode,
+} from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal/schema";
 import type {
 	DashboardSidebarProject,
 	DashboardSidebarProjectChild,
 	DashboardSidebarWorkspace,
 } from "../../types";
-
-// An item with no usable timestamp sinks below everything dated. Mapping
-// NaN to -Infinity keeps the comparator a consistent total order instead of
-// interleaving unknowns by name.
-function rankTime(time: number): number {
-	return Number.isNaN(time) ? Number.NEGATIVE_INFINITY : time;
-}
 
 function newest(times: number[]): number {
 	const known = times.filter((time) => !Number.isNaN(time));
@@ -25,9 +21,16 @@ function makeStableComparator<Item>(
 	byTimestamp: (item: Item) => number,
 	byName: (item: Item) => string,
 	byId: (item: Item) => string,
+	direction: SidebarProjectSortDirection,
 ): (left: Item, right: Item) => number {
 	return (left, right) => {
-		const diff = rankTime(byTimestamp(right)) - rankTime(byTimestamp(left));
+		const leftTime = byTimestamp(left);
+		const rightTime = byTimestamp(right);
+		const leftUnknown = Number.isNaN(leftTime);
+		const rightUnknown = Number.isNaN(rightTime);
+		if (leftUnknown !== rightUnknown) return leftUnknown ? 1 : -1;
+		const diff =
+			direction === "asc" ? leftTime - rightTime : rightTime - leftTime;
 		if (!Number.isNaN(diff) && diff !== 0) return diff;
 		const names = byName(left).localeCompare(byName(right));
 		if (names !== 0) return names;
@@ -76,6 +79,7 @@ function haveSameItems<Item>(left: Item[], right: Item[]): boolean {
 export function sortDashboardSidebarProjectChildren(
 	children: DashboardSidebarProjectChild[],
 	mode: SidebarProjectSortMode,
+	direction: SidebarProjectSortDirection = "desc",
 ): DashboardSidebarProjectChild[] {
 	if (mode === "manual") return children;
 
@@ -83,6 +87,7 @@ export function sortDashboardSidebarProjectChildren(
 		(workspace) => getWorkspaceTimestamp(workspace, mode),
 		(workspace) => workspace.name,
 		(workspace) => workspace.id,
+		direction,
 	);
 	const compareChildren = makeStableComparator<DashboardSidebarProjectChild>(
 		(child) => getChildTimestamp(child, mode),
@@ -90,6 +95,7 @@ export function sortDashboardSidebarProjectChildren(
 			child.type === "workspace" ? child.workspace.name : child.section.name,
 		(child) =>
 			child.type === "workspace" ? child.workspace.id : child.section.id,
+		direction,
 	);
 
 	const sortedInside = children.map((child) => {
@@ -115,6 +121,7 @@ export function sortDashboardSidebarProjectChildren(
 export function sortDashboardSidebarProjects(
 	projects: DashboardSidebarProject[],
 	mode: SidebarProjectSortMode,
+	direction: SidebarProjectSortDirection = "desc",
 ): DashboardSidebarProject[] {
 	if (mode === "manual") return projects;
 
@@ -122,6 +129,7 @@ export function sortDashboardSidebarProjects(
 		const children = sortDashboardSidebarProjectChildren(
 			project.children,
 			mode,
+			direction,
 		);
 		return children === project.children ? project : { ...project, children };
 	});
