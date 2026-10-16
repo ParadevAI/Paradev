@@ -21,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
 		description: i18n._(
 			msg({
 				message:
-					"Write a prompt and pick a schedule. Each run opens a workspace you can review and continue.",
+					"Write a prompt and pick a schedule or an event, like a pull request, a Slack message, a Linear issue, a Sentry issue, or a webhook. Each run opens a workspace you can review and continue.",
 			}),
 		),
 		alternates: localizedAlternates(lang, "/automations"),
@@ -42,13 +42,14 @@ export default async function AutomationsPage() {
 						</p>
 						<h1 className="mt-4 font-medium text-balance text-4xl text-foreground tracking-tight sm:text-5xl">
 							<Trans>
-								Your agents do the recurring work on a schedule you set.
+								Your agents do the work on a schedule or when an event comes in.
 							</Trans>
 						</h1>
 						<p className="mt-5 max-w-xl text-lg text-muted-foreground leading-relaxed">
 							<Trans>
-								Write a prompt and pick a schedule. Each run opens a workspace
-								you can review and continue.
+								Write a prompt and pick a schedule or an event, like a pull
+								request, a Slack message, a Linear issue, a Sentry issue, or a
+								webhook. Each run opens a workspace you can review and continue.
 							</Trans>
 						</p>
 						<ProductHeroActions source="automations" docsPath="/automations" />

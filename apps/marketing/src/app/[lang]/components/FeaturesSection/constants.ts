@@ -45,7 +45,7 @@ export const FEATURES: Feature[] = [
 		}),
 		description: msg({
 			message:
-				"Turn chores into scheduled agents: issue triage, changelog drafts, dependency bumps. They run on their own and open PRs for you to review.",
+				"Turn chores into agents that run on a schedule or when an event comes in: issue triage, changelog drafts, dependency bumps. They run on their own and open PRs for you to review.",
 		}),
 	},
 	{
