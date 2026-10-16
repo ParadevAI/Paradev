@@ -8,7 +8,7 @@ import {
 } from "@superset/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@superset/ui/popover";
 import { Tabs, TabsList, TabsTrigger } from "@superset/ui/tabs";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { GoGitBranch, GoGlobe } from "react-icons/go";
 import { HiCheck, HiChevronUpDown } from "react-icons/hi2";
 import { LuFolderOpen } from "react-icons/lu";
@@ -80,16 +80,14 @@ export function CompareBaseBranchPicker({
 	const [open, setOpen] = useState(false);
 	// Mirror cmdk's selected row so Mod+Enter can resolve it without DOM lookup.
 	const [selectedValue, setSelectedValue] = useState("");
-	const sentinelRef = useRef<HTMLDivElement | null>(null);
+	const [sentinel, setSentinel] = useState<HTMLDivElement | null>(null);
 	const handleOpenChange = (nextOpen: boolean) => {
 		setOpen(nextOpen);
 		if (!nextOpen) onBranchSearchChange("");
 	};
 
 	useEffect(() => {
-		if (!open || !hasNextPage || isFetchingNextPage || isBranchesError) return;
-		const el = sentinelRef.current;
-		if (!el) return;
+		if (!open || !hasNextPage || isFetchingNextPage || !sentinel) return;
 		// Guard against cascade: when isFetchingNextPage flips false → effect
 		// re-runs → observer reattaches → if sentinel is still in the root
 		// margin (e.g. tall viewport, small page), the callback fires again
@@ -106,9 +104,9 @@ export function CompareBaseBranchPicker({
 			},
 			{ rootMargin: "64px" },
 		);
-		observer.observe(el);
+		observer.observe(sentinel);
 		return () => observer.disconnect();
-	}, [open, hasNextPage, isFetchingNextPage, isBranchesError, onLoadMore]);
+	}, [open, hasNextPage, isFetchingNextPage, sentinel, onLoadMore]);
 
 	if (isHostOffline) {
 		return (
@@ -294,7 +292,7 @@ export function CompareBaseBranchPicker({
 						) : (
 							hasNextPage && (
 								<div
-									ref={sentinelRef}
+									ref={setSentinel}
 									className="py-2 text-center text-[11px] text-muted-foreground/60"
 								>
 									{isFetchingNextPage ? <Trans>Loading more...</Trans> : ""}

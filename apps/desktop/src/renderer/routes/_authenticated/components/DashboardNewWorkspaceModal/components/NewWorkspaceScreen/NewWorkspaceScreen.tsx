@@ -611,7 +611,7 @@ export function NewWorkspaceScreen({
 		)
 			return null;
 		const remote = otherHosts.find((host) => host.id === selectedHostId);
-		if (!remote) return "unknown";
+		if (!remote || remote.isConnecting) return "unknown";
 		return remote.isOnline ? "online" : "offline";
 	}, [draft.hostId, machineId, otherHosts]);
 

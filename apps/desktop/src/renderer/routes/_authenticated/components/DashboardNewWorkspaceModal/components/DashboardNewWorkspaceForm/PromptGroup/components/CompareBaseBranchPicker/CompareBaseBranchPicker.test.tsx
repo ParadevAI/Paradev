@@ -140,6 +140,46 @@ describe("CompareBaseBranchPicker load failures", () => {
 		expect(page.queryByText("No branches found")).toBeNull();
 	});
 
+	test("loads more branches when the list is scrolled to its end", async () => {
+		const RealObserver = globalThis.IntersectionObserver;
+		globalThis.IntersectionObserver = class {
+			constructor(private callback: IntersectionObserverCallback) {}
+			observe() {
+				this.callback(
+					[{ isIntersecting: true } as IntersectionObserverEntry],
+					this as unknown as IntersectionObserver,
+				);
+			}
+			disconnect() {}
+		} as unknown as typeof IntersectionObserver;
+		try {
+			const onLoadMore = mock(() => {});
+			const page = renderPicker({
+				effectiveCompareBaseBranch: "main",
+				hasNextPage: true,
+				onLoadMore,
+				branches: [
+					{
+						name: "main",
+						lastCommitDate: 0,
+						isLocal: true,
+						isRemote: false,
+						recency: null,
+						worktreePath: null,
+						hasWorkspace: false,
+						isCheckedOut: false,
+					},
+				],
+			});
+			await act(async () => {
+				fireEvent.click(page.getByRole("button", { name: "main" }));
+			});
+			expect(onLoadMore).toHaveBeenCalled();
+		} finally {
+			globalThis.IntersectionObserver = RealObserver;
+		}
+	});
+
 	test("loads more branches again after a failed page recovers", async () => {
 		const RealObserver = globalThis.IntersectionObserver;
 		const observed: Element[] = [];
