@@ -2,7 +2,7 @@
 title: "Superset vs Parallel Code (2026): Two Takes on Worktree-Based Agent Dispatch"
 description: "Compare Superset and Parallel Code (the open-source app) for running coding agents in parallel worktrees. Scope, platforms, licensing, and when each fits."
 date: 2026-08-17
-lastUpdated: 2026-09-24
+lastUpdated: 2026-10-15
 type: "1v1"
 competitors:
   - parallel-code
@@ -28,7 +28,7 @@ Superset and Parallel Code agree on the core idea: give every coding agent its o
 | **License** | Source-available (Elastic License 2.0), code on GitHub | Open source, MIT |
 | **Automations** | Scheduled recurring agent runs built in | Not documented |
 | **Programmatic control** | MCP server, CLI, TypeScript SDK | Not documented |
-| **Extras** | Chat panel, in-app browser, port management, remote/cloud workspaces | Docker sandboxing, AI Arena head-to-head mode, per-file coverage radar, phone monitoring via QR code |
+| **Extras** | Chat panel, in-app browser, port management, iPhone/iPad app, remote/cloud workspaces | Docker sandboxing, AI Arena head-to-head mode, per-file coverage radar, phone monitoring via QR code |
 | **Platform** | macOS, experimental Linux AppImage | macOS and Linux (no Windows) |
 | **Maker** | Superset (funded company) | Johannes Millan, solo open-source maintainer |
 
@@ -36,7 +36,7 @@ Superset and Parallel Code agree on the core idea: give every coding agent its o
 
 ## What Is Superset?
 
-Superset is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Aider, Copilot, Cursor Agent, Gemini CLI, Superset Chat, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, scheduled automations, and an MCP server for driving everything programmatically. You can review inside Superset or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
+Superset is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Copilot, Cursor Agent, Gemini CLI, Superset Chat, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, scheduled automations, and an MCP server for driving everything programmatically. You can review inside Superset or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
 
 ![Reviewing an agent's changes in Superset's diff viewer before merging](/images/readme/diff-viewer.png)
 
@@ -60,7 +60,7 @@ Parallel Code is hands-on by design: you dispatch every task from the app. Super
 
 ### Sandboxing and Review Extras
 
-Parallel Code ships features Superset lacks: optional per-task Docker sandboxing (with the caveat, documented in its README, that Antigravity CLI cannot authenticate inside Docker), the AI Arena race mode, and coverage badges in the changed-files panel. If hard sandboxing of agent execution is a requirement, Parallel Code addresses it locally today.
+Parallel Code ships features Superset lacks: optional per-task Docker sandboxing (with the caveat, documented in its README, that Antigravity CLI cannot authenticate inside Docker) and coverage badges in the changed-files panel. Its AI Arena is a dedicated head-to-head mode; in Superset you race agents as a workflow, with one workspace per agent, and compare the results yourself. If hard sandboxing of agent execution is a requirement, Parallel Code addresses it locally today.
 
 ### Project Shape: Solo OSS vs Company
 
@@ -68,7 +68,7 @@ Parallel Code is MIT, free, and moving fast, and it is overwhelmingly a single-m
 
 ### Merge Flow
 
-Parallel Code merges branch-to-main locally from the sidebar and can watch GitHub PR checks, but does not orchestrate PR creation and review. Superset supports reviewing per task and handing off to your editor and normal PR flow, with the surrounding workspace tracking what is where.
+Parallel Code merges branch-to-main locally from the sidebar and can watch GitHub PR checks, but does not orchestrate PR creation and review. Superset handles the PR flow in the app: the Changes pane commits, pushes, and opens the PR, and the PR view shows checks and review threads, sends line comments to the agent, and can merge.
 
 ---
 

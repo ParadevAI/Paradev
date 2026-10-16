@@ -2,7 +2,7 @@
 title: "Superset vs super.engineering (2026): Agent Workspace vs Native Rust Control Plane"
 description: "Compare Superset and super.engineering (formerly Superconductor) for running parallel AI coding agents in Git worktrees. Native Rust performance vs a full agent workspace with automations, MCP, and remote access."
 date: 2026-08-07
-lastUpdated: 2026-09-24
+lastUpdated: 2026-10-15
 type: "1v1"
 competitors:
   - super-engineering
@@ -25,12 +25,12 @@ Superset and super.engineering (formerly Superconductor) are direct competitors:
 | | **Superset** | **super.engineering** |
 |---|---|---|
 | **What it does** | Runs multiple AI agents in parallel with Git worktree isolation, chat, review, and browser | Runs unlimited parallel CLI agents in worktrees from one keyboard-driven native interface |
-| **Category** | Local-first agent workspace with remote hosts | Native macOS agent control plane (alpha) |
+| **Category** | Local-first agent workspace with remote hosts and cloud workspaces | Native macOS agent control plane (alpha) |
 | **Architecture** | Desktop app | 100% Rust, Metal GPU-rendered terminal, no Electron (WebKit for browser tabs) |
 | **Agent support** | Any CLI agent (Claude Code, Codex, Cursor Agent, OpenCode, Gemini CLI, Copilot, Grok, Kimi Code, Mistral Vibe, Amp, and more) | 15 listed providers (7 stable, incl. Claude Code, Codex, Cursor, OpenCode, Pi, Grok), plus any CLI agent |
 | **Isolation** | Git worktrees for local branch-based workspaces | Worktree per task (workspace → project → worktree → tab) |
 | **Forges** | GitHub, plus Linear integration | GitHub, GitHub Enterprise, GitLab, self-managed GitLab |
-| **Remote / cloud** | Remote access: add any machine as a host and keep workspaces running when your laptop sleeps | Experimental SSH remote workspaces (Linux or macOS hosts); app stays macOS-only |
+| **Remote / cloud** | Remote access: add any machine as a host and keep workspaces running when your laptop sleeps; cloud workspaces | Experimental SSH remote workspaces (Linux or macOS hosts); app stays macOS-only |
 | **Automation** | Automations: scheduled agent sessions, CLI, TypeScript SDK, MCP server, Slack bot | `sc` CLI, experimental 1-8 agent teams, experimental `sc browser` automation; no scheduling |
 | **License / status** | Source-available (ELv2), shipping product | Closed source, alpha, nightly releases only |
 
@@ -86,7 +86,7 @@ Superset offers a free tier and Pro at $20 per user per month, or $15 per user p
 **Choose super.engineering if you:**
 
 - Prioritize native performance: Rust, GPU-rendered terminal, no Electron
-- Are keyboard-driven and want deep layout, theme, and keybinding customization
+- Want saved layouts, per-workspace themes, and picture-in-picture windows
 - Use GitLab (including self-managed) as your forge
 - Are happy riding an alpha on nightly builds
 

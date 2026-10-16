@@ -2,7 +2,7 @@
 title: "Superset vs Orca: worktrees, mobile, and scheduled agents"
 description: "Compare Superset and Orca for parallel coding agents, iPhone and Android access, scheduled tasks, desktop support, and pricing."
 date: 2026-07-13
-lastUpdated: 2026-10-14
+lastUpdated: 2026-10-15
 type: "1v1"
 competitors:
   - orca
@@ -25,9 +25,9 @@ Superset and Orca both support parallel coding work, remote hosts, mobile access
 | Desktop | macOS; experimental Linux; Windows unavailable | macOS, Windows, Linux |
 | Phone | iPhone and iPad app on the App Store, iOS or iPadOS 26+, Pro; Android waitlist | iOS app on the App Store and an Android APK (not on Google Play), both documented as beta |
 | Scheduling | Pro automations on a selected host, with run history and retry for failed runs | Scheduled automations through CLI and desktop |
-| Review | Desktop app with a Changes pane that commits, pushes, and opens PRs, and a PR pane with checks, review threads, and merge | Inline diff comments sent back to the agent, plus GitHub and Linear PRs and issues in the app; source-control review on mobile |
+| Review | Changes pane that commits, pushes, and opens PRs; inline diff comments sent to a running agent or a new session; PR pane with checks, review threads, and merge; Linear and GitHub issues in a Tasks view; diff review with line comments on iPhone and iPad | Inline diff comments sent back to the agent, plus GitHub and Linear PRs and issues in the app; source-control review on mobile |
 | Browser | In-app browser pane with Design Mode: pick an element and send it to an agent | Embedded browser with Design Mode, which sends a clicked element to the agent |
-| Shared hosts | macOS or Linux hosts you add, with access granted per member | SSH worktrees, Remote Orca Servers (beta) with headless `orca serve`, and experimental cloud VMs on your own provider |
+| Shared hosts | macOS or Linux hosts you add, with access granted per member; cloud workspaces | SSH worktrees, Remote Orca Servers (beta) with headless `orca serve`, and experimental cloud VMs on your own provider |
 | Programmatic control | CLI, TypeScript SDK, and MCP server | CLI; multi-agent orchestration is an experimental setting |
 | Pricing | Free; Pro at $20 per user/month, or $15 billed yearly; Enterprise custom | Core app free and open source |
 | License | Source-available, Elastic License 2.0 | MIT |
@@ -40,7 +40,7 @@ Superset runs CLI coding agents in separate workspaces, with terminals and diff 
 
 Inside the app, a Workspaces page groups every workspace by state (Needs attention, Working, Needs review, Idle, Merged), so you can see which agents need you. The Changes pane commits, pushes, and opens a pull request, and the pull request pane shows checks and review threads beside the diff.
 
-To use [Superset on iPhone and iPad](/mobile), you need iOS 26 or iPadOS 26 or later, Pro, and a host that stays online. The iPhone and iPad app is on the App Store; from it you can check on agents, review diffs, and read Pages. Remote access and automations also require a paid plan. See [pricing](/pricing) and [remote access setup](https://docs.superset.sh/remote-access).
+To use [Superset on iPhone and iPad](/mobile), you need iOS 26 or iPadOS 26 or later, Pro, and a host that stays online or a cloud workspace. The iPhone and iPad app is on the App Store; from it you can check on agents, review diffs, and read Pages. Remote access and automations also require a paid plan. See [pricing](/pricing) and [remote access setup](https://docs.superset.sh/remote-access).
 
 ## Try it in your repository
 
@@ -52,7 +52,7 @@ Run one of your usual tasks in each app with the same agent and model. Open the 
 
 Choose Superset if you want to send instructions to your coding agents and review their diffs from an iPhone, then continue in the same workspace on desktop. Follow the [phone walkthrough](/blog/claude-code-codex-iphone) and [scheduled-maintenance guide](/blog/scheduled-agent-maintenance) to test those requirements.
 
-Orca is a strong candidate if Windows, Android, or an MIT license is a requirement. It also tracks Claude Code, Codex, Gemini, OpenCode, Kimi, and MiniMax usage with an account switcher, and lists 27 supported agents. If both products meet your platform needs, try the same task in each and compare the review workflow.
+Orca is a strong candidate if Windows, Android, or an MIT license is a requirement. Both apps track agent usage and switch between accounts. Orca also tracks Gemini, Kimi, and MiniMax usage, which Superset does not, and lists 27 supported agents. If both products meet your platform needs, try the same task in each and compare the review workflow.
 
 Both require an agent provider account or API access. Superset has free and paid plans; Orca describes its core app as free and open source. Check current terms and any optional services before comparing total cost.
 
@@ -64,7 +64,7 @@ Yes. Orca documents scheduled automations. Superset also supports scheduled agen
 
 ### Does Superset have a mobile app?
 
-Yes. Superset's iPhone and iPad app is on the App Store. It requires iOS 26 or iPadOS 26 or later, Pro, and a connected host. Android is on the waitlist.
+Yes. Superset's iPhone and iPad app is on the App Store. It requires iOS 26 or iPadOS 26 or later, Pro, and a connected host or a cloud workspace. Android is on the waitlist.
 
 ### Do worktrees prevent all conflicts?
 

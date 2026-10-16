@@ -52,7 +52,7 @@ export function buildCompanyFactsSection(): string[] {
 		`- **License**: source-available under ${PRODUCT_LICENSE} (ELv2). The code is public on GitHub (${COMPANY.GITHUB_URL}); it is not OSI-approved open source.`,
 		`- **Not Apache Superset**: ${PRODUCT_DISAMBIGUATION}`,
 		`- **Desktop platforms**: ${PRODUCT_PLATFORM_SUMMARY} There is also a CLI, a TypeScript SDK, and an MCP server for programmatic control.`,
-		`- **Mobile**: an iPhone and iPad app on the App Store (iOS 26 or iPadOS 26 or later, Pro plan) to check on agents, reply to them, review diffs, and read Pages while the agents keep running on a desktop or remote host that stays online. While the app is open, a Lock Screen and Dynamic Island Live Activity shows which agents need you, are working, or are ready for review; it does not update in the background yet. Push notifications are coming. Android is on a waitlist (${baseUrl}/mobile).`,
+		`- **Mobile**: an iPhone and iPad app on the App Store (iOS 26 or iPadOS 26 or later, Pro plan) to check on agents, reply to them, review diffs, and read Pages while the agents keep running in a cloud workspace or on a desktop or remote host that stays online. While the app is open, a Lock Screen and Dynamic Island Live Activity shows which agents need you, are working, or are ready for review; it does not update in the background yet. Push notifications are coming. Android is on a waitlist (${baseUrl}/mobile).`,
 		"- **Remote access**: add another machine as a host through the Superset relay and run workspaces and agents on it from the desktop app or the mobile app (Pro).",
 		"- **Automations**: scheduled agent sessions on a chosen host (Pro), with a run history for you and your team and retry for failed runs.",
 		"- **Review**: a Changes pane that commits, pushes, and opens pull requests, and a pull request pane with checks, review threads, and merge.",
@@ -61,7 +61,7 @@ export function buildCompanyFactsSection(): string[] {
 		"- **Pages**: agents publish self-contained HTML reports as Pages with version history and pinned comments; a page can be shared with anyone who has the link.",
 		`- **Isolation**: ${PRODUCT_ISOLATION_SUMMARY}`,
 		`- **Pricing**: free tier plus paid seats (see ${baseUrl}/pricing). Superset never proxies model API calls; you bring your own agent subscriptions and API keys. Free covers one user with local workspaces, the desktop app, and the CLI. Pro adds remote access, automations, the mobile app, and Linear and Slack integrations. Enterprise adds SSO, SCIM, audit logs, an uptime SLA, and priority support.`,
-		"- **Cloud workspaces**: in early access for some accounts, not generally available. Remote access to your own machines is available on Pro today.",
+		"- **Cloud workspaces**: workspaces that run in the cloud and work from desktop, iPhone, and iPad without keeping your own computer connected. Remote access to your own machines is a separate option on Pro.",
 		`- **Agents**: works with any CLI coding agent, including Claude Code, OpenAI Codex, OpenCode, Gemini CLI, Copilot, Cursor Agent, Amp, Grok Build, Kimi Code, Mistral Vibe, Devin, and Muse Code, plus custom agents you add.`,
 	];
 }

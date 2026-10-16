@@ -2,7 +2,7 @@
 title: "How to Monitor Claude Code and Codex From Your iPhone in 2026"
 description: "Check progress, answer prompts, and send follow-ups to Claude Code, Codex, and other agents from an iPhone. Remote Control, SSH and tmux, and Superset compared."
 date: 2026-10-07
-lastUpdated: 2026-10-14
+lastUpdated: 2026-10-15
 type: "roundup"
 competitors:
   - claude-code
@@ -108,7 +108,7 @@ Use a client that writes into the agent's live session, not a new chat.
 - **Any terminal agent over SSH:** attach to its tmux session and type the follow-up into the prompt.
 - **Superset:** open the workspace on your iPhone and reply in its terminal. The agent keeps its context because it is the same session on the host. For a Claude Code session, Remote Control from the Claude app works here too.
 
-Each option needs the computer awake and online. A laptop that sleeps when you close it drops the session. For work that should run overnight, use a machine that stays on. Our guide on [running coding agents on a remote machine](/compare/run-coding-agents-on-remote-machine) covers that setup.
+Each option needs the computer awake and online. A laptop that sleeps when you close it drops the session. For work that should run overnight, use a machine that stays on, or a Superset cloud workspace, which does not need your own computer connected. Our guide on [running coding agents on a remote machine](/compare/run-coding-agents-on-remote-machine) covers that setup.
 
 ## What are the tradeoffs between Claude Code remote access and a separate workspace with a mobile companion?
 
@@ -142,7 +142,7 @@ Yes. Claude Code Remote Control works in the Claude app for iOS and Android and 
 
 ### Does Superset run the agent on my iPhone?
 
-No. The agent runs on your connected computer, or in a cloud workspace if those are enabled for your account. The iPhone sends prompts and shows terminals, status, and diffs.
+No. The agent runs on your connected computer or in a cloud workspace. The iPhone sends prompts and shows terminals, status, and diffs.
 
 ### Is Superset for iPhone free?
 

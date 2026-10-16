@@ -2,6 +2,7 @@
 title: "Superset vs JetBrains Air (2026): Agent Workspace vs JetBrains' Agent Platform"
 description: "Compare Superset and JetBrains Air for running coding agents in parallel. A local-first workspace for any CLI agent vs JetBrains' family of Air app, Air in IDEs, Air Teams, and Air Governance."
 date: 2026-10-13
+lastUpdated: 2026-10-15
 type: "1v1"
 competitors:
   - jetbrains-air
@@ -15,7 +16,7 @@ keywords:
   - parallel coding agents
 ---
 
-Superset and JetBrains Air both run coding agents from several vendors in parallel, each isolated in a Git worktree, with diff review in between. JetBrains relaunched Air on September 22, 2026 as a family of products: the Air desktop app, Air inside JetBrains IDEs, Air Teams for cloud tasks and automations, and Air Governance for policy and cost control. Superset is a local-first desktop workspace that runs any CLI agent, on your own subscriptions, with pull requests, a browser, automations, remote hosts, and a mobile app.
+Superset and JetBrains Air both run coding agents from several vendors in parallel, each isolated in a Git worktree, with diff review in between. JetBrains relaunched Air on September 22, 2026 as a family of products: the Air desktop app, Air inside JetBrains IDEs, Air Teams for cloud tasks and automations, and Air Governance for policy and cost control. Superset is a local-first desktop workspace that runs any CLI agent, on your own subscriptions, with pull requests, a browser, automations, remote hosts, cloud workspaces, and a mobile app.
 
 Facts were checked against JetBrains' own blog, docs, and pricing pages on October 13, 2026.
 
@@ -29,7 +30,7 @@ Facts were checked against JetBrains' own blog, docs, and pricing pages on Octob
 | **Agents** | Any CLI agent (Claude Code, Codex, Copilot CLI, Antigravity CLI, Cursor's agent, Amp, OpenCode, Droid, Muse Code, and more) | Codex, Gemini, GitHub Copilot, Claude Agent, and Junie out of the box, plus any agent from the ACP Registry |
 | **Isolation** | Git worktrees for local branch-based workspaces | Git worktrees or Docker containers locally; containers on JetBrains' cloud VMs for cloud tasks |
 | **Review and PRs** | Changes pane with commit, push, and PR; Pull Requests view with CI checks and line comments | Diffs with line comments for the agent; the agent pushes a task branch and a person opens the PR |
-| **Remote** | Remote Access: add a macOS or Linux machine as a host | Cloud tasks on JetBrains' cloud (needs JetBrains AI credits) |
+| **Remote** | Cloud workspaces, or Remote Access to a macOS or Linux machine you add as a host | Cloud tasks on JetBrains' cloud (needs JetBrains AI credits) |
 | **Automation** | Scheduled automations, CLI, TypeScript SDK, MCP server, Slack bot | Air Teams Automations from GitHub, Jira, webhooks, and schedules |
 | **Mobile** | iPhone and iPad app | "Coming soon" |
 | **Model costs** | Your own subscriptions and keys, never proxied | Your own keys and subscriptions for local tasks; cloud tasks always use JetBrains AI credits |
@@ -63,9 +64,9 @@ Both are multi-vendor. Air runs agents that speak the Agent Client Protocol, wit
 
 Superset never proxies model calls: every agent runs on your own subscription or key. In Air, your own keys and subscriptions work for local tasks, while cloud tasks and automations always use JetBrains AI credits, billed at public API rates.
 
-### Your Machines vs JetBrains' Cloud
+### Remote and Cloud Work
 
-Air's remote story is cloud tasks on JetBrains-hosted VMs. Superset's is Remote Access: add a macOS or Linux machine you own as a host and keep workspaces running when your laptop sleeps. If you want agents off your laptop without paying for vendor compute, Superset fits; if you want managed cloud environments, Air Teams provides them.
+Air's remote story is cloud tasks on JetBrains-hosted VMs, paid for with JetBrains AI credits. Superset has two options: cloud workspaces, which run in the cloud and work from desktop, iPhone, and iPad without keeping your own computer connected, and Remote Access, which adds a macOS or Linux machine you own as a host. In both, agents run on your own subscriptions. If you want shared team cloud environments with automations triggered from GitHub or Jira, Air Teams provides them.
 
 ### Pull Requests
 
@@ -92,18 +93,18 @@ Superset offers a free tier and Pro at $20 per user per month, or $15 per user p
 **Choose Superset if you:**
 
 - Want to run any CLI agent, on your own subscriptions, with no model proxy
-- Want agents on machines you own, with Remote Access and scheduled automations
+- Want agents on machines you own or in cloud workspaces, with scheduled automations
 - Want pull requests, CI checks, and line comments back to the agent in one place
 - Want a mobile app and enterprise controls available today
 
 **Choose JetBrains Air if you:**
 
 - Live in JetBrains IDEs and want agents inside them
-- Want managed cloud environments and automations from GitHub and Jira
+- Want shared team cloud environments and automations triggered from GitHub and Jira
 - Want organization-wide governance and cost tracking from one vendor
 - Are comfortable with preview and early-access products as they mature
 
-**Verdict:** Air is the most serious multi-vendor agent platform from an IDE company, and a natural fit for JetBrains shops. Superset is the better fit when you want any CLI agent on your own machines and subscriptions, with the path to merge and a mobile app available now.
+**Verdict:** Air is the most serious multi-vendor agent platform from an IDE company, and a natural fit for JetBrains shops. Superset is the better fit when you want any CLI agent on your own subscriptions, on your machines or in the cloud, with the path to merge and a mobile app available now.
 
 ---
 

@@ -2,7 +2,7 @@
 title: "Superset vs bb (2026): Agent Workspace vs the IDE That Builds Itself"
 description: "Compare Superset and bb for orchestrating AI coding agents. See how a full agent workspace differs from bb's self-extending, thread-based agentic IDE."
 date: 2026-08-07
-lastUpdated: 2026-10-08
+lastUpdated: 2026-10-15
 type: "1v1"
 competitors:
   - bb
@@ -44,12 +44,12 @@ Git worktrees separate working files; they do not sandbox processes or guarantee
 | | **Superset** | **bb** |
 |---|---|---|
 | **What it does** | Runs AI agents in parallel with Git worktree isolation, chat, review, and browser | Orchestrates coding agents in live threads you can follow, steer, or hand off |
-| **Category** | Local-first agent workspace with remote/cloud hosts | Self-extending agentic IDE ("the IDE that builds itself") |
+| **Category** | Local-first agent workspace with remote hosts and cloud workspaces | Self-extending agentic IDE ("the IDE that builds itself") |
 | **Core unit** | Workspace (worktree + terminals + review) | Thread (agent run in an environment, optionally a worktree) |
 | **Agent support** | Any CLI agent (Claude Code, Codex, OpenCode, Cursor, Copilot, Gemini, Mistral Vibe, and more) | Claude Code, Codex, Cursor, Pi, OpenCode, Grok, omp, Hermes, plus any ACP agent |
 | **Isolation** | Git worktree for new local branch-based workspaces | Optional Git worktree per environment |
-| **Surfaces** | Desktop app, CLI, MCP server | Desktop app, web app, CLI, HTTP API |
-| **Remote / cloud** | Remote and cloud workspaces across your network devices | bb Connect tunnel + multi-machine enrollment |
+| **Surfaces** | Desktop app, iPhone and iPad app, CLI, MCP server, TypeScript SDK | Desktop app, web app, CLI, HTTP API |
+| **Remote / cloud** | Remote Access to machines you own, plus cloud workspaces | bb Connect tunnel + multi-machine enrollment |
 | **Automation** | Scheduled agent sessions, TypeScript SDK, and MCP tools | Automations and extensible workflows |
 | **License** | Source-available (ELv2) | Open source (MIT) |
 
@@ -57,9 +57,9 @@ Git worktrees separate working files; they do not sandbox processes or guarantee
 
 ## What Is Superset?
 
-Superset is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs across your own network devices through remote and cloud workspaces, and it can schedule agent sessions as automations with a TypeScript SDK and a Slack bot. You can review inside Superset or jump into VS Code, Cursor, Windsurf, JetBrains, or Zed. Source-available under Elastic License 2.0 (ELv2).
+Superset is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on machines you own through Remote Access and in the cloud through cloud workspaces, and it can schedule agent sessions as automations with a TypeScript SDK and a Slack bot. You can review inside Superset or jump into VS Code, Cursor, Windsurf, JetBrains, or Zed. Source-available under Elastic License 2.0 (ELv2).
 
-Superset desktop supports macOS and experimental Linux; Windows is not available. Its iPhone and iPad app requires iOS 26 or iPadOS 26 or later, Pro, and a reachable host. See [platform and plan requirements](/pricing) and [remote access setup](https://docs.superset.sh/remote-access).
+Superset desktop supports macOS and experimental Linux; Windows is not available. Its iPhone and iPad app requires iOS 26 or iPadOS 26 or later, Pro, and either a reachable host or a cloud workspace. See [platform and plan requirements](/pricing) and [remote access setup](https://docs.superset.sh/remote-access).
 
 ## What Is bb?
 
@@ -103,7 +103,7 @@ Superset offers a free tier and Pro at $20/seat/month. bb is free and MIT-licens
 **Choose bb if you:**
 
 - Want an MIT-licensed, free, self-extending IDE you can mold with plugins
-- Like the thread model where agents spawn, steer, and hand off other agents
+- Like a thread model where agents spawn, steer, and hand off other agents in one view, rather than Superset's orchestrate skill and session handoff across workspaces
 - Want desktop, web, CLI, and API access
 - Enjoy building your own workflow tooling with the agent's help
 

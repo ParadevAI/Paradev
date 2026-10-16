@@ -2,7 +2,7 @@
 title: "Superset vs Herdr (2026): Agent Workspace vs Agent Runtime"
 description: "Compare Superset and Herdr for persistent CLI-agent workflows. Bring terminals, diff review, and browser previews together in a visual workspace."
 date: 2026-08-07
-lastUpdated: 2026-10-13
+lastUpdated: 2026-10-15
 type: "1v1"
 competitors:
   - herdr
@@ -21,7 +21,7 @@ Superset and Herdr share a useful starting point: keep your coding agents in per
 
 [Download Superset](/download) to try it with an existing repository, or follow the [workspace walkthrough](/blog/parallel-coding-agents-guide).
 
-This comparison is published by Superset and evaluates workflow fit, not measured speed or agent quality. Herdr details were checked against its official documentation on September 23, 2026.
+This comparison is published by Superset and evaluates workflow fit, not measured speed or agent quality. Herdr details were checked against its official documentation on September 23, 2026. Superset CLI details were updated on October 15, 2026.
 
 ---
 
@@ -30,20 +30,20 @@ This comparison is published by Superset and evaluates workflow fit, not measure
 | | **Superset** | **Herdr** |
 |---|---|---|
 | **What it does** | Persistent agent terminals with Git worktrees, chat, review, and browser | Persistent runtime for agents: sessions, workspaces, tabs, and panes that outlive clients |
-| **Category** | Local-first agent workspace with remote/cloud hosts | Terminal-native agent runtime (TUI + CLI + socket API) |
+| **Category** | Local-first agent workspace with remote hosts and cloud workspaces | Terminal-native agent runtime (TUI + CLI + socket API) |
 | **Interface** | Desktop GUI | Terminal UI with keyboard shortcuts, mouse controls, and a sidebar |
 | **Agent support** | Any CLI agent (Claude Code, Codex, OpenCode, Cursor, Copilot, Gemini, Mistral Vibe, and more) | Agent detection and integrations; see the [supported agents](https://herdr.dev/docs/agents/) |
 | **Isolation** | Git worktrees for new local branch-based workspaces | Git worktrees through CLI and sidebar actions |
-| **Persistence** | Persistent terminal sessions | Server-owned terminals; detach anywhere, agents keep running |
+| **Persistence** | Persistent terminal sessions; `superset terminals attach` joins one from a shell, locally or over SSH, and detaches with a key | Server-owned terminals; detach anywhere, agents keep running |
 | **Diff review** | Built-in diff/file editor | Terminal-focused workflow with external review tools |
-| **Automation** | Automations: scheduled agent sessions, TypeScript SDK, Slack bot | JSON socket API, agent-automation CLI, and executable plugins |
+| **Automation** | Automations: scheduled agent sessions, TypeScript SDK, Slack bot; CLI with `agents wait`, raw keys in `terminals send`, and `panes` | JSON socket API, agent-automation CLI, and executable plugins |
 | **License** | Source-available (ELv2) | Open source (Apache-2.0) |
 
 ---
 
 ## What Is Superset?
 
-Superset is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs across your own network devices through remote and cloud workspaces, and it can schedule agent sessions as automations with a TypeScript SDK and a Slack bot. You can review inside Superset or jump into VS Code, Cursor, Windsurf, JetBrains, or Zed. Source-available under Elastic License 2.0 (ELv2).
+Superset is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on machines you own through Remote Access and in the cloud through cloud workspaces, and it can schedule agent sessions as automations with a TypeScript SDK and a Slack bot. You can review inside Superset or jump into VS Code, Cursor, Windsurf, JetBrains, or Zed. Source-available under Elastic License 2.0 (ELv2).
 
 ## What Is Herdr?
 
@@ -70,7 +70,7 @@ For work you need to discuss with teammates, [publish a report or design as a Pa
 
 ### Persistence and Remote
 
-Herdr's [persistence documentation](https://herdr.dev/docs/persistence-remote/) explains server-owned terminals and remote attachment over SSH. Superset's [terminal documentation](https://docs.superset.sh/terminal-integration) covers running processes and scrollback surviving app restarts, while [remote access](https://docs.superset.sh/remote-access) connects you to another host. In both cases, continuing execution requires the machine running the agent to remain available; closing a client and stopping a host are different events. In Superset, agents do not live in the app window: they run in a background terminal daemon, so closing the window, quitting with ⌘Q, or installing an update leaves them running, and they reattach with scrollback when you reopen the app. While the desktop app is quit, the machine is not reachable from your phone or by automations; running the host service from the standalone CLI keeps it reachable. See [Keep Agents Running](https://docs.superset.sh/keep-agents-running).
+Herdr's [persistence documentation](https://herdr.dev/docs/persistence-remote/) explains server-owned terminals and remote attachment over SSH. Superset's [terminal documentation](https://docs.superset.sh/terminal-integration) covers running processes and scrollback surviving app restarts, while [remote access](https://docs.superset.sh/remote-access) connects you to another host. From a shell, `superset terminals attach` joins a running terminal, `Ctrl+]` detaches it, and `--ssh` attaches to a terminal on another machine. In both cases, continuing execution requires the machine running the agent to remain available; closing a client and stopping a host are different events. In Superset, agents do not live in the app window: they run in a background terminal daemon, so closing the window, quitting with ⌘Q, or installing an update leaves them running, and they reattach with scrollback when you reopen the app. While the desktop app is quit, the machine is not reachable from your phone or by automations; running the host service from the standalone CLI keeps it reachable. See [Keep Agents Running](https://docs.superset.sh/keep-agents-running).
 
 ### Worktree Isolation
 
@@ -96,8 +96,8 @@ Superset is source-available under Elastic License 2.0, with plan details on the
 **Choose Herdr if you:**
 
 - Live in the terminal and want a tmux-grade, Electron-free runtime
-- Want to detach from agent terminals and reconnect over SSH
-- Want to script everything over a JSON socket API or extend via plugins
+- Want a terminal UI, not a desktop app, as the place you detach from and reattach to agent sessions
+- Want to extend the runtime with executable plugins and event hooks over a JSON socket API
 - Prefer to compose your terminal environment with external review tools
 
 **Verdict:** Superset is a strong fit for developers who want to keep the direct CLI-agent experience and gain a visual home for their work. Herdr is a good fit when you want terminal session management alongside an existing toolchain. Evaluate the review and return-to-work experience with a real task, even if you only run one agent.

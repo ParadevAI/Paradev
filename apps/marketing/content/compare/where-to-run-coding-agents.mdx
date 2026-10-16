@@ -2,7 +2,7 @@
 title: "Where to Run Coding Agents: Laptops vs a Shared Host vs Cloud Workspaces (2026)"
 description: "The tradeoffs for a small engineering team between running coding agents on personal laptops, a shared host machine, and vendor cloud workspaces: cost, uptime, access to your environment, security, and which tools support each."
 date: 2026-10-14
-lastUpdated: 2026-10-14
+lastUpdated: 2026-10-15
 type: "tutorial"
 competitors:
   - codex-app
@@ -21,7 +21,7 @@ keywords:
 
 A small team that adopts coding agents soon asks where they should run. There are three answers: each developer's laptop, a shared machine the team owns, or a vendor's cloud. Most teams use more than one.
 
-Superset has the first two built in. Laptops and shared hosts appear in the same app through Remote Access, and each task gets its own worktree on whichever machine you pick. The vendor clouds still work from inside Superset: it runs the real `claude` and `codex` CLIs, so `claude --cloud` starts a Claude Code cloud session and `codex cloud exec` submits a Codex cloud task from a Superset terminal. Use your own machines for work that needs your environment, a vendor cloud for tasks that need only the repository, and Superset to keep the local and host side in one place.
+Superset covers all three. Laptops and shared hosts appear in the same app through Remote Access, and each task gets its own worktree on whichever machine you pick. Superset cloud workspaces run in the cloud and work from desktop, iPhone, and iPad without keeping your own computer connected. Other vendors' clouds still work from inside Superset: it runs the real `claude` and `codex` CLIs, so `claude --cloud` starts a Claude Code cloud session and `codex cloud exec` submits a Codex cloud task from a Superset terminal. Use your own machines for work that needs your environment, a cloud workspace for tasks that need only the repository, and Superset to keep all of it in one place.
 
 This guide compares the three on what matters day to day: whether agents keep working when you walk away, whether they can reach your real environment, what it costs, and what it exposes.
 
@@ -63,7 +63,7 @@ Tools that support this: [Superset](/) adds a macOS or Linux machine as a host t
 
 ## Vendor Cloud Workspaces
 
-Most agent vendors now run agents on their own machines: Codex cloud tasks, Cursor's Cloud Agents, Devin's per-session VMs, Factory's managed Droid Computers, Amp's orbs, Claude Code's cloud sessions, and Copilot's cloud agent. You hand off a task, close your laptop, and review the result later.
+Most agent vendors now run agents on their own machines: Codex cloud tasks, Cursor's Cloud Agents, Devin's per-session VMs, Factory's managed Droid Computers, Amp's orbs, Claude Code's cloud sessions, and Copilot's cloud agent. Superset has cloud workspaces too, available from desktop, iPhone, and iPad without keeping your own computer connected. You hand off a task, close your laptop, and review the result later.
 
 The tradeoffs:
 
@@ -80,9 +80,9 @@ The tradeoffs:
 
 1. **Laptops for interactive work.** Short tasks, debugging, and anything you want to watch.
 2. **One shared host for long-running and scheduled work.** Overnight tasks, scheduled agents, and work that should continue when everyone logs off, with each task in its own worktree.
-3. **A vendor cloud where it fits.** A specific agent's cloud for tasks that need nothing private, started from the same terminal with `claude --cloud` or `codex cloud exec`.
+3. **A cloud workspace where it fits.** A Superset cloud workspace, or a specific agent's cloud started from the same terminal with `claude --cloud` or `codex cloud exec`, for tasks that need nothing private.
 
-In Superset, the first two appear in the same desktop app: each workspace lives on the device that holds its files and terminals, and laptop and shared-host workspaces sit side by side, and scheduled automations run on whichever device you choose. See [Run Coding Agents on a Remote Machine](/compare/run-coding-agents-on-remote-machine) and [Scheduled Coding Agents](/compare/scheduled-coding-agents).
+In Superset, all three appear in the same desktop app: each workspace lives on the device or cloud workspace that holds its files and terminals, laptop, shared-host, and cloud workspaces sit side by side, and scheduled automations run on whichever device you choose. See [Run Coding Agents on a Remote Machine](/compare/run-coding-agents-on-remote-machine) and [Scheduled Coding Agents](/compare/scheduled-coding-agents).
 
 ## Frequently Asked Questions
 

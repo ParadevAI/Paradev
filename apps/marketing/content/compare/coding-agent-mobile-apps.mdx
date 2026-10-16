@@ -2,7 +2,7 @@
 title: "Coding Agent Mobile Apps in 2026: Run Claude Code, Codex, and More From Your Phone"
 description: "Every way to run and check on coding agents from your phone in 2026: Superset, Codex in ChatGPT, Cursor, Claude Code Remote Control, GitHub Copilot, Amp, Orca, Paseo, and T3 Code compared."
 date: 2026-10-13
-lastUpdated: 2026-10-14
+lastUpdated: 2026-10-15
 type: "roundup"
 competitors:
   - codex-app
@@ -34,7 +34,7 @@ The apps differ in one important way: whether your phone talks to **agents on yo
 
 | App | Agents | Where agents run | Phones |
 |---|---|---|---|
-| **Superset** | Any CLI agent | Your machines (any host you add) | iPhone and iPad |
+| **Superset** | Any CLI agent | Your machines (any host you add) or Superset's cloud workspaces | iPhone and iPad |
 | **Codex in ChatGPT** | Codex | Your Mac or Windows computer, or OpenAI's cloud | iOS; Android can control a host |
 | **Cursor** | Cursor's agent | Your computer (remote control) or Cursor's cloud | iPhone and iPad |
 | **Claude Code** | Claude Code | Your computer (Remote Control) or Anthropic's cloud sessions | Claude apps |
@@ -46,9 +46,9 @@ The apps differ in one important way: whether your phone talks to **agents on yo
 
 ### Superset
 
-Superset's [iPhone and iPad app](/mobile) connects to any machine you add as a host through Remote Access, and shows the terminals and diffs of every agent running there: Claude Code, Codex, Cursor's agent, OpenCode, Antigravity CLI, and any other CLI agent. You can answer prompts, send follow-ups, and review diffs. It needs iOS 26 or iPadOS 26 or later, a Pro plan, and a host that stays awake and online. Because agents run on your own machines, they use your own subscriptions and your real environment.
+Superset's [iPhone and iPad app](/mobile) connects to cloud workspaces and to any machine you add as a host through Remote Access, and shows the terminals and diffs of every agent running there: Claude Code, Codex, Cursor's agent, OpenCode, Antigravity CLI, and any other CLI agent. You can answer prompts, send follow-ups, and review diffs. It needs iOS 26 or iPadOS 26 or later and a Pro plan. Cloud workspaces work without keeping your own computer connected; a host you add must stay awake and online. Agents use your own subscriptions, and on your own machines they also use your real environment.
 
-**Best for:** running several different agents on your own machines and checking on all of them from one app.
+**Best for:** running several different agents, on your own machines or in cloud workspaces, and checking on all of them from one app.
 
 ### Codex in the ChatGPT app
 
@@ -89,18 +89,18 @@ See [Superset vs Orca](/compare/superset-vs-orca), [Superset vs Paseo](/compare/
 ## How To Choose
 
 - **One vendor's agent:** use that vendor's app. Codex users have the ChatGPT app, Cursor users have Cursor's, and so on. If you run Claude Code in Superset, Remote Control still works for that session.
-- **Several agents on your own machines:** use a workspace with a mobile app, such as Superset, so one app covers Claude Code, Codex, and the rest.
+- **Several different agents:** use a workspace with a mobile app, such as Superset, so one app covers Claude Code, Codex, and the rest.
 - **Android:** Orca, Paseo, and T3 Code have Android apps, and Android phones can control a Codex host. Superset's Android app is on the [waitlist](/mobile#android).
 
 ## Keep Your Agents Reachable
 
-Every option that runs agents on your own machine needs that machine to stay awake and online. For an always-on setup, run agents on a dedicated machine, such as a Mac mini or a Linux server. In Superset, run the host service from the standalone CLI so it stays reachable while the desktop app is closed; see [Keep Agents Running](https://docs.superset.sh/keep-agents-running).
+Every option that runs agents on your own machine needs that machine to stay awake and online. For an always-on setup, run agents on a dedicated machine, such as a Mac mini or a Linux server. In Superset, run the host service from the standalone CLI so it stays reachable while the desktop app is closed; see [Keep Agents Running](https://docs.superset.sh/keep-agents-running). Or use a Superset cloud workspace, which does not need your own computer connected.
 
 ## Frequently Asked Questions
 
 ### Can I run Claude Code from my phone?
 
-Yes. Claude Code has Remote Control for sessions on your computer. Superset's iPhone and iPad app also shows Claude Code sessions running on any host you add, next to your other agents.
+Yes. Claude Code has Remote Control for sessions on your computer. Superset's iPhone and iPad app also shows Claude Code sessions running on any host you add or in a cloud workspace, next to your other agents.
 
 ### Can I use Claude Code Remote Control and Superset's mobile app on the same session?
 

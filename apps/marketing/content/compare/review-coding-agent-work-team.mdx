@@ -2,7 +2,7 @@
 title: "How to Review Coding Agent Work as a Team: Branches, Diffs, and Owners (2026)"
 description: "Tools for giving each coding agent task its own branch and human reviewer, comparing two agents' diffs, and sending follow-ups before you merge."
 date: 2026-10-07
-lastUpdated: 2026-10-14
+lastUpdated: 2026-10-15
 type: "roundup"
 competitors:
   - codex
@@ -56,7 +56,7 @@ A practical shortlist:
 - **Codex app** if the team is standardizing on OpenAI. It runs several agents in parallel on worktrees or in cloud environments.
 - **Cursor** if engineers want to stay in one editor. Cursor 2.0 runs up to eight agents in parallel, each in its own local worktree.
 - **Claude Code** as the agent, with `claude --worktree` for manual isolation, or under a workspace tool when you run more than two or three sessions.
-- **GitHub Copilot coding agent** or **Devin** if you want issue-in, pull-request-out work that runs off your machine.
+- **GitHub Copilot coding agent** or **Devin** if you want issue-in, pull-request-out work from an agent you assign rather than drive.
 - **Superset** if the team uses a mix of CLI agents. Each workspace is a Git worktree with its own branch, terminals, and ports, and it runs Claude Code, Codex, OpenCode, Gemini CLI, Copilot, Cursor Agent, Amp, Devin, and other CLI agents side by side. Desktop runs on macOS, with an experimental Linux AppImage. Windows is not yet available.
 
 Run the same 10 to 20 real backlog tasks through each candidate and measure human minutes per merged PR. Worktrees separate working files. They do not sandbox processes, and they do not prevent merge conflicts between branches that touch the same files. For the setup itself, see [Git worktrees for AI coding agents](/compare/git-worktrees-for-ai-agents) and the [parallel coding agents guide](/blog/parallel-coding-agents-guide).
@@ -151,8 +151,8 @@ The Linear custom-script setup is another dispatch path: **Work on issue → Cus
 ## When to Pick Which
 
 - **Pick Codex, Cursor, or Claude Code alone** if one engineer runs two or three agents and is happy with one vendor's agent.
-- **Pick Copilot coding agent or Devin** if you want the work to run off your machines and arrive as a PR.
-- **Pick Superset** if the team mixes CLI agents and wants branches, diffs, PRs, and tasks in one desktop app, plus CLI and MCP dispatch. It runs on your machine or a connected host, does not proxy model calls, and has a free tier plus paid seats.
+- **Pick Copilot coding agent or Devin** if you want to assign an issue and get the work back as a PR.
+- **Pick Superset** if the team mixes CLI agents and wants branches, diffs, PRs, and tasks in one desktop app, plus CLI and MCP dispatch. It runs on your machine, a connected host, or a cloud workspace, does not proxy model calls, and has a free tier plus paid seats.
 - **Add branch protection and `CODEOWNERS` in every case.** That is where the accountable reviewer actually lives.
 
 ## Frequently Asked Questions

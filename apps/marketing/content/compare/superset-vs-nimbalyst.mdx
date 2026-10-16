@@ -2,6 +2,7 @@
 title: "Superset vs Nimbalyst (2026): Agent Workspace vs Visual Workspace for Claude Code and Codex"
 description: "Compare Superset and Nimbalyst, the successor to Crystal. Any CLI agent in parallel Git worktrees with PR review and remote hosts vs a visual workspace with editors, a task board, and multiplayer for Claude Code and Codex."
 date: 2026-10-14
+lastUpdated: 2026-10-15
 type: "1v1"
 competitors:
   - nimbalyst
@@ -28,11 +29,11 @@ Facts were checked against Nimbalyst's own site, docs, changelog, and repository
 | **What it is** | Desktop workspace for orchestrating any CLI coding agent | Visual workspace and multiplayer for Claude Code and Codex |
 | **Agents** | Any CLI agent; built-in presets for more than 20 | Claude Code and Codex; OpenCode, Copilot, and ACP agents in alpha |
 | **Isolation** | Git worktree per local branch-based workspace | Optional one-click Git worktree per session |
-| **Planning** | Tasks synced with Linear and GitHub Issues; Slack bot | Kanban board of sessions by phase; plans split into tasks agents can update |
+| **Planning** | Tasks from Linear, GitHub Issues, and Superset as a list or kanban board; Workspaces board by status; Slack bot | Kanban board of sessions by phase; plans split into tasks agents can update |
 | **Editors** | Diff and file editor; opens workspaces in VS Code, Cursor, JetBrains, Zed, Xcode | Markdown, sheets, mockups, Excalidraw, Mermaid, data models, mind maps, code, wiki |
 | **Review** | Changes pane commits, pushes, and opens PRs; Pull Requests view with CI checks | Per-file diff review with accept and reject; PR review mode; AI-written commits |
-| **Remote** | macOS or Linux hosts you add through Remote Access | Remote sessions in your own Cloudflare sandbox |
-| **Mobile** | iPhone and iPad app for your own hosts (Pro) | iPhone and iPad app |
+| **Remote** | macOS or Linux hosts you add through Remote Access; cloud workspaces | Remote sessions in your own Cloudflare sandbox |
+| **Mobile** | iPhone and iPad app for your own hosts and cloud workspaces (Pro) | iPhone and iPad app |
 | **Team** | Shared hosts with per-member access; Enterprise SAML SSO, SCIM, audit logs | Real-time multiplayer docs, boards, and shared agent sessions |
 | **Platforms** | macOS; experimental Linux AppImage; Windows not yet available | macOS, Windows, Linux |
 | **License and price** | Source-available (ELv2); Free, Pro $20 per user/month | MIT; Individual free; Teams $20 per user/month (free during beta) |
@@ -41,7 +42,7 @@ Facts were checked against Nimbalyst's own site, docs, changelog, and repository
 
 ## What Is Superset?
 
-Superset is a desktop workspace for orchestrating CLI coding agents. Each task runs in its own workspace with a Git worktree and a persistent terminal, so Claude Code, Codex, and any other agent run side by side on your own subscriptions; Superset never proxies model calls. The Changes pane commits, pushes, and opens pull requests, and the Pull Requests view shows CI checks and sends line comments back to agents. Remote Access adds macOS or Linux machines as shared hosts, scheduled automations run agents on a host you choose, and a CLI, TypeScript SDK, MCP server, and Slack bot let other tools drive it. The [iPhone and iPad app](/mobile) reaches your hosts away from your desk.
+Superset is a desktop workspace for orchestrating CLI coding agents. Each task runs in its own workspace with a Git worktree and a persistent terminal, so Claude Code, Codex, and any other agent run side by side on your own subscriptions; Superset never proxies model calls. The Changes pane commits, pushes, and opens pull requests, and the Pull Requests view shows CI checks and sends line comments back to agents. Remote Access adds macOS or Linux machines as shared hosts, cloud workspaces run in the cloud, scheduled automations run agents on a host you choose, and a CLI, TypeScript SDK, MCP server, and Slack bot let other tools drive it. The [iPhone and iPad app](/mobile) reaches your hosts and cloud workspaces away from your desk.
 
 ## What Is Nimbalyst?
 
@@ -55,11 +56,11 @@ Superset runs any CLI agent in a real terminal, with built-in presets for more t
 
 ### Engineering Loop vs Visual Workspace
 
-Nimbalyst puts documents, diagrams, sheets, and a task board next to the agents, which suits teams that plan and specify work visually. Superset focuses on the engineering loop: worktrees, terminals, diffs, pull requests, CI checks, and an in-app browser, and it works alongside the editor you already use.
+Nimbalyst puts documents, diagrams, sheets, and a session board that agents can update next to the agents, which suits teams that plan and specify work visually. Superset focuses on the engineering loop: worktrees, terminals, diffs, pull requests, CI checks, and an in-app browser, and it works alongside the editor you already use. Both have boards: Superset's Tasks view shows issues as a kanban board and starts a workspace per task, and its Workspaces page has a board view by status.
 
 ### Where Agents Run
 
-Superset runs agents on your machine or on macOS or Linux hosts you add, which keeps them working on your real environment when your laptop sleeps. Nimbalyst runs locally and can run remote sessions in your own Cloudflare sandbox.
+Superset runs agents on your machine or on macOS or Linux hosts you add, which keeps them working on your real environment when your laptop sleeps. It also has cloud workspaces that run in the cloud without your own computer connected. Nimbalyst runs locally and can run remote sessions in your own Cloudflare sandbox.
 
 ### Platforms and License
 
@@ -82,14 +83,14 @@ Superset offers a free tier and Pro at $20 per user per month, or $15 billed yea
 **Choose Superset if you:**
 
 - Run more than Claude Code and Codex, or want to compare agents
-- Want agents on shared hosts you own, reachable from an iPhone or iPad
+- Want agents on shared hosts you own or in cloud workspaces, reachable from an iPhone or iPad
 - Want PRs, CI checks, and line comments back to agents in one place
 - Want a CLI, SDK, MCP server, and Slack bot, and enterprise controls
 
 **Choose Nimbalyst if you:**
 
 - Mainly use Claude Code and Codex
-- Want visual editors and a task board next to your agents
+- Want visual editors for documents, sheets, diagrams, and mockups next to your agents
 - Need Windows, or want an MIT-licensed tool
 - Want real-time multiplayer on documents and sessions
 
