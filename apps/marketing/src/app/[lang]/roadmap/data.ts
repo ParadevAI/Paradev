@@ -192,7 +192,10 @@ export const ROADMAP_ITEMS: RoadmapItem[] = [
 				"A faster, clearer diff experience for reviewing what your agents changed.",
 		}),
 		category: "Desktop",
-		status: "later",
+		status: "shipped",
+		shippedDate: "Sep 2026",
+		href: "/changelog/2026-09-06-changes-pane-ship-flow-image-diffs",
+		image: "/changelog/2026-09-06-media-diff.png",
 	},
 	{
 		id: "project-wide-search",
@@ -264,7 +267,10 @@ export const ROADMAP_ITEMS: RoadmapItem[] = [
 				"Always know which agent needs you, with notifications that deep-link straight to the blocked agent.",
 		}),
 		category: "Desktop",
-		status: "later",
+		status: "shipped",
+		shippedDate: "Aug 2026",
+		href: "/changelog/2026-08-16-workspaces-triage-editable-markdown",
+		image: "/changelog/2026-08-16-workspaces-triage.png",
 	},
 	{
 		id: "sdk-api",
