@@ -7898,9 +7898,6 @@ msgstr "GitHub kurulumu bulunamadı"
 msgid "GitHub integration"
 msgstr "GitHub entegrasyonu"
 
-msgid "GitHub is refusing API calls for this machine's credential until {until}. Existing pull request links stay; new pull requests appear once the limit resets."
-msgstr "GitHub, bu makinenin kimlik bilgileriyle yapılan API çağrılarını reddediyor; sınır saat {until} itibarıyla sıfırlanır. Mevcut pull request bağlantıları korunur; yeni pull request'ler sınır sıfırlandığında görünür."
-
 msgid "GitHub issues"
 msgstr "GitHub issue'ları"
 
@@ -7909,9 +7906,6 @@ msgstr "GitHub istek sınırına ulaşıldı"
 
 msgid "GitHub refused the merge"
 msgstr "GitHub birleştirmeyi reddetti"
-
-msgid "GitHub rejected this machine's credentials, so pull requests cannot be detected. Run \"gh auth login\" or fix GITHUB_TOKEN; the next retry is at {until}."
-msgstr "GitHub bu makinenin kimlik bilgilerini reddetti, bu yüzden pull request'ler algılanamıyor. \"gh auth login\" komutunu çalıştırın veya GITHUB_TOKEN değerini düzeltin; sonraki deneme saat {until} itibarıyla yapılacak."
 
 msgid "GitHub sign-in needed"
 msgstr "GitHub oturumu açmanız gerekiyor"
@@ -13666,6 +13660,9 @@ msgstr "Yakınlaştırmayı sıfırla"
 msgid "Reset Zoom"
 msgstr "Yakınlaştırmayı sıfırla"
 
+msgid "Resets at {until}"
+msgstr "{until} saatinde sıfırlanır"
+
 msgid "Resets in {countdown} · {absolute}"
 msgstr "{countdown} sonra sıfırlanır · {absolute}"
 
@@ -13879,6 +13876,9 @@ msgstr "Birkaç saniye sonra yeniden deneyin; sorun sürerse Superset'i yeniden 
 msgid "Retry in a few seconds."
 msgstr "Birkaç saniye sonra yeniden deneyin."
 
+msgid "Retrying at {until}"
+msgstr "{until} saatinde yeniden denenecek"
+
 msgid "Retrying…"
 msgstr "Yeniden deneniyor…"
 
@@ -14050,6 +14050,9 @@ msgstr "Satırlar değişti"
 
 msgid "Run"
 msgstr "Çalıştır"
+
+msgid "Run \"gh auth login\" or set GITHUB_TOKEN"
+msgstr "\"gh auth login\" çalıştırın veya GITHUB_TOKEN ayarlayın"
 
 #. placeholder {0}: automation.name
 msgid "Run {0} now"
@@ -16008,9 +16011,6 @@ msgstr "Superset Otomasyonlar"
 msgid "superset browser cdp prints an endpoint for that pane only. Point Playwright or browser-use at it."
 msgstr "superset browser cdp yalnızca o bölme için bir uç nokta yazdırır. Playwright'ı veya browser-use'u ona yönlendirin."
 
-msgid "Superset cannot reach api.github.com from this machine. Pull request status retries at {until}."
-msgstr "Superset bu makineden api.github.com adresine ulaşamıyor. Pull request durumu saat {until} itibarıyla yeniden denenecek."
-
 msgid "Superset CLI"
 msgstr "Superset CLI"
 
@@ -17168,6 +17168,9 @@ msgstr "Bu bir ikili dosyaya benziyor. Metin olarak açmak bozuk çıktı göste
 
 msgid "This Mac"
 msgstr "Bu Mac"
+
+msgid "This machine"
+msgstr "Bu bilgisayar"
 
 msgid "This Microsoft tenant is already connected by {detail}. Ask them to disconnect first."
 msgstr "Bu Microsoft kiracısı {detail} tarafından zaten bağlanmış. Önce bağlantıyı kesmesini isteyin."

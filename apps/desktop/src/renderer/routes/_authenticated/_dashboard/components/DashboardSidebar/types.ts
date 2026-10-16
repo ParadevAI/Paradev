@@ -137,4 +137,13 @@ export interface DashboardSidebarGithubStatus {
 	reason: DashboardSidebarGithubHoldReason;
 	since: number;
 	until: number;
+	/** What the failing call reported. Absent from hosts older than the field. */
+	detail?: string;
+}
+
+export interface DashboardSidebarGithubHold
+	extends DashboardSidebarGithubStatus {
+	machineId: string;
+	hostName: string | null;
+	isLocalHost: boolean;
 }

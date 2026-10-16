@@ -7898,9 +7898,6 @@ msgstr "Установка GitHub не найдена"
 msgid "GitHub integration"
 msgstr "Интеграция с GitHub"
 
-msgid "GitHub is refusing API calls for this machine's credential until {until}. Existing pull request links stay; new pull requests appear once the limit resets."
-msgstr "GitHub отклоняет вызовы API с учётными данными этого компьютера до {until}. Существующие ссылки на pull request сохраняются; новые pull request появятся после сброса лимита."
-
 msgid "GitHub issues"
 msgstr "Задачи GitHub"
 
@@ -7909,9 +7906,6 @@ msgstr "Достигнут лимит запросов GitHub"
 
 msgid "GitHub refused the merge"
 msgstr "GitHub отклонил слияние"
-
-msgid "GitHub rejected this machine's credentials, so pull requests cannot be detected. Run \"gh auth login\" or fix GITHUB_TOKEN; the next retry is at {until}."
-msgstr "GitHub отклонил учётные данные этого компьютера, поэтому pull request не могут быть обнаружены. Выполните \"gh auth login\" или исправьте GITHUB_TOKEN; следующая попытка в {until}."
 
 msgid "GitHub sign-in needed"
 msgstr "Требуется вход в GitHub"
@@ -13666,6 +13660,9 @@ msgstr "Сбросить масштаб"
 msgid "Reset Zoom"
 msgstr "Сбросить масштаб"
 
+msgid "Resets at {until}"
+msgstr "Сброс в {until}"
+
 msgid "Resets in {countdown} · {absolute}"
 msgstr "Сброс через {countdown} · {absolute}"
 
@@ -13879,6 +13876,9 @@ msgstr "Повторите через несколько секунд; если 
 msgid "Retry in a few seconds."
 msgstr "Повторите через несколько секунд."
 
+msgid "Retrying at {until}"
+msgstr "Повтор в {until}"
+
 msgid "Retrying…"
 msgstr "Повтор…"
 
@@ -14050,6 +14050,9 @@ msgstr "Строки изменены"
 
 msgid "Run"
 msgstr "Запустить"
+
+msgid "Run \"gh auth login\" or set GITHUB_TOKEN"
+msgstr "Выполните \"gh auth login\" или задайте GITHUB_TOKEN"
 
 #. placeholder {0}: automation.name
 msgid "Run {0} now"
@@ -16008,9 +16011,6 @@ msgstr "Superset Автоматизации"
 msgid "superset browser cdp prints an endpoint for that pane only. Point Playwright or browser-use at it."
 msgstr "superset browser cdp выводит эндпоинт только для этой панели. Направьте на него Playwright или browser-use."
 
-msgid "Superset cannot reach api.github.com from this machine. Pull request status retries at {until}."
-msgstr "Superset не может подключиться к api.github.com с этого компьютера. Состояние pull request будет запрошено повторно в {until}."
-
 msgid "Superset CLI"
 msgstr "Superset CLI"
 
@@ -17168,6 +17168,9 @@ msgstr "Похоже, это бинарный файл. Открытие его 
 
 msgid "This Mac"
 msgstr "Этот Mac"
+
+msgid "This machine"
+msgstr "Этот компьютер"
 
 msgid "This Microsoft tenant is already connected by {detail}. Ask them to disconnect first."
 msgstr "Этот тенант Microsoft уже подключён пользователем {detail}. Попросите отключить его."

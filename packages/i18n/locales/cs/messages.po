@@ -7898,9 +7898,6 @@ msgstr "Instalace GitHubu nenalezena"
 msgid "GitHub integration"
 msgstr "Integrace s GitHubem"
 
-msgid "GitHub is refusing API calls for this machine's credential until {until}. Existing pull request links stay; new pull requests appear once the limit resets."
-msgstr "GitHub odmítá volání API pro přihlašovací údaje tohoto počítače do {until}. Stávající odkazy na pull requesty zůstávají; nové pull requesty se objeví po obnovení limitu."
-
 msgid "GitHub issues"
 msgstr "GitHub issues"
 
@@ -7909,9 +7906,6 @@ msgstr "Dosažen limit požadavků GitHubu"
 
 msgid "GitHub refused the merge"
 msgstr "GitHub sloučení odmítl"
-
-msgid "GitHub rejected this machine's credentials, so pull requests cannot be detected. Run \"gh auth login\" or fix GITHUB_TOKEN; the next retry is at {until}."
-msgstr "GitHub odmítl přihlašovací údaje tohoto počítače, takže pull requesty nelze detekovat. Spusťte \"gh auth login\" nebo opravte GITHUB_TOKEN; další pokus proběhne v {until}."
 
 msgid "GitHub sign-in needed"
 msgstr "Je vyžadováno přihlášení ke GitHubu"
@@ -13666,6 +13660,9 @@ msgstr "Obnovit přiblížení"
 msgid "Reset Zoom"
 msgstr "Obnovit přiblížení"
 
+msgid "Resets at {until}"
+msgstr "Obnoví se v {until}"
+
 msgid "Resets in {countdown} · {absolute}"
 msgstr "Reset za {countdown} · {absolute}"
 
@@ -13879,6 +13876,9 @@ msgstr "Zkuste to znovu za pár sekund; pokud potíže přetrvávají, restartuj
 msgid "Retry in a few seconds."
 msgstr "Zkuste to znovu za pár sekund."
 
+msgid "Retrying at {until}"
+msgstr "Další pokus v {until}"
+
 msgid "Retrying…"
 msgstr "Zkouším znovu…"
 
@@ -14050,6 +14050,9 @@ msgstr "Změněny řádky"
 
 msgid "Run"
 msgstr "Spustit"
+
+msgid "Run \"gh auth login\" or set GITHUB_TOKEN"
+msgstr "Spusťte \"gh auth login\" nebo nastavte GITHUB_TOKEN"
 
 #. placeholder {0}: automation.name
 msgid "Run {0} now"
@@ -16008,9 +16011,6 @@ msgstr "Automatizace Superset"
 msgid "superset browser cdp prints an endpoint for that pane only. Point Playwright or browser-use at it."
 msgstr "superset browser cdp vypíše endpoint jen pro daný panel. Namiřte na něj Playwright nebo browser-use."
 
-msgid "Superset cannot reach api.github.com from this machine. Pull request status retries at {until}."
-msgstr "Superset se z tohoto počítače nemůže připojit k api.github.com. Stav pull requestů se znovu zkusí načíst v {until}."
-
 msgid "Superset CLI"
 msgstr "Superset CLI"
 
@@ -17168,6 +17168,9 @@ msgstr "Vypadá to na binární soubor. Otevření jako text může zobrazit nes
 
 msgid "This Mac"
 msgstr "Tento Mac"
+
+msgid "This machine"
+msgstr "Tento počítač"
 
 msgid "This Microsoft tenant is already connected by {detail}. Ask them to disconnect first."
 msgstr "Tento tenant Microsoftu už má připojený {detail}. Požádejte je, ať se nejdřív odpojí."

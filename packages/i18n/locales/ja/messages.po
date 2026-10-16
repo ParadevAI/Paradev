@@ -7898,9 +7898,6 @@ msgstr "GitHubのインストールが見つかりません"
 msgid "GitHub integration"
 msgstr "GitHub連携"
 
-msgid "GitHub is refusing API calls for this machine's credential until {until}. Existing pull request links stay; new pull requests appear once the limit resets."
-msgstr "GitHub はこのマシンの認証情報による API 呼び出しを {until} まで拒否しています。既存のプルリクエストのリンクは保持され、新しいプルリクエストは制限がリセットされた後に表示されます。"
-
 msgid "GitHub issues"
 msgstr "GitHub issue"
 
@@ -7909,9 +7906,6 @@ msgstr "GitHub のレート制限に達しました"
 
 msgid "GitHub refused the merge"
 msgstr "GitHubがマージを拒否しました"
-
-msgid "GitHub rejected this machine's credentials, so pull requests cannot be detected. Run \"gh auth login\" or fix GITHUB_TOKEN; the next retry is at {until}."
-msgstr "GitHub がこのマシンの認証情報を拒否したため、プルリクエストを検出できません。\"gh auth login\" を実行するか GITHUB_TOKEN を修正してください。次回の再試行は {until} です。"
 
 msgid "GitHub sign-in needed"
 msgstr "GitHub へのサインインが必要です"
@@ -13666,6 +13660,9 @@ msgstr "ズームをリセット"
 msgid "Reset Zoom"
 msgstr "ズームをリセット"
 
+msgid "Resets at {until}"
+msgstr "{until} にリセット"
+
 msgid "Resets in {countdown} · {absolute}"
 msgstr "{countdown}後にリセット · {absolute}"
 
@@ -13879,6 +13876,9 @@ msgstr "数秒後に再試行してください。解消しない場合はSupers
 msgid "Retry in a few seconds."
 msgstr "数秒後に再試行してください。"
 
+msgid "Retrying at {until}"
+msgstr "{until} に再試行"
+
 msgid "Retrying…"
 msgstr "再試行中…"
 
@@ -14050,6 +14050,9 @@ msgstr "行の変更"
 
 msgid "Run"
 msgstr "実行"
+
+msgid "Run \"gh auth login\" or set GITHUB_TOKEN"
+msgstr "\"gh auth login\" を実行するか GITHUB_TOKEN を設定してください"
 
 #. placeholder {0}: automation.name
 msgid "Run {0} now"
@@ -16008,9 +16011,6 @@ msgstr "Superset オートメーション"
 msgid "superset browser cdp prints an endpoint for that pane only. Point Playwright or browser-use at it."
 msgstr "superset browser cdp は、そのペイン専用のエンドポイントを出力します。Playwrightやbrowser-useをそこに向けてください。"
 
-msgid "Superset cannot reach api.github.com from this machine. Pull request status retries at {until}."
-msgstr "このマシンから api.github.com に接続できません。プルリクエストの状態は {until} に再取得します。"
-
 msgid "Superset CLI"
 msgstr "Superset CLI"
 
@@ -17168,6 +17168,9 @@ msgstr "バイナリファイルのようです。テキストとして開くと
 
 msgid "This Mac"
 msgstr "このMac"
+
+msgid "This machine"
+msgstr "このマシン"
 
 msgid "This Microsoft tenant is already connected by {detail}. Ask them to disconnect first."
 msgstr "このMicrosoftテナントは{detail}がすでに接続しています。先に接続を解除してもらってください。"

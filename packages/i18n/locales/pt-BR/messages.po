@@ -7898,9 +7898,6 @@ msgstr "Instalação do GitHub não encontrada"
 msgid "GitHub integration"
 msgstr "Integração com o GitHub"
 
-msgid "GitHub is refusing API calls for this machine's credential until {until}. Existing pull request links stay; new pull requests appear once the limit resets."
-msgstr "O GitHub está recusando chamadas de API com a credencial desta máquina até {until}. Os vínculos de pull requests existentes permanecem; novos pull requests aparecerão quando o limite for redefinido."
-
 msgid "GitHub issues"
 msgstr "Issues do GitHub"
 
@@ -7909,9 +7906,6 @@ msgstr "Limite de requisições do GitHub atingido"
 
 msgid "GitHub refused the merge"
 msgstr "O GitHub recusou o merge"
-
-msgid "GitHub rejected this machine's credentials, so pull requests cannot be detected. Run \"gh auth login\" or fix GITHUB_TOKEN; the next retry is at {until}."
-msgstr "O GitHub rejeitou as credenciais desta máquina, então os pull requests não podem ser detectados. Execute \"gh auth login\" ou corrija GITHUB_TOKEN; a próxima tentativa será às {until}."
 
 msgid "GitHub sign-in needed"
 msgstr "Login no GitHub necessário"
@@ -13666,6 +13660,9 @@ msgstr "Redefinir o zoom"
 msgid "Reset Zoom"
 msgstr "Redefinir o zoom"
 
+msgid "Resets at {until}"
+msgstr "Redefine às {until}"
+
 msgid "Resets in {countdown} · {absolute}"
 msgstr "Zera em {countdown} · {absolute}"
 
@@ -13879,6 +13876,9 @@ msgstr "Tente de novo em alguns segundos; se persistir, reinicie o Superset."
 msgid "Retry in a few seconds."
 msgstr "Tente de novo em alguns segundos."
 
+msgid "Retrying at {until}"
+msgstr "Nova tentativa às {until}"
+
 msgid "Retrying…"
 msgstr "Tentando de novo…"
 
@@ -14050,6 +14050,9 @@ msgstr "Linhas alteradas"
 
 msgid "Run"
 msgstr "Executar"
+
+msgid "Run \"gh auth login\" or set GITHUB_TOKEN"
+msgstr "Execute \"gh auth login\" ou defina GITHUB_TOKEN"
 
 #. placeholder {0}: automation.name
 msgid "Run {0} now"
@@ -16008,9 +16011,6 @@ msgstr "Automações do Superset"
 msgid "superset browser cdp prints an endpoint for that pane only. Point Playwright or browser-use at it."
 msgstr "superset browser cdp imprime um endpoint apenas para esse painel. Aponte o Playwright ou o browser-use para ele."
 
-msgid "Superset cannot reach api.github.com from this machine. Pull request status retries at {until}."
-msgstr "O Superset não consegue acessar api.github.com a partir desta máquina. O status dos pull requests será consultado novamente às {until}."
-
 msgid "Superset CLI"
 msgstr "CLI do Superset"
 
@@ -17168,6 +17168,9 @@ msgstr "Isto parece ser um arquivo binário. Abri-lo como texto pode mostrar car
 
 msgid "This Mac"
 msgstr "Este Mac"
+
+msgid "This machine"
+msgstr "Esta máquina"
 
 msgid "This Microsoft tenant is already connected by {detail}. Ask them to disconnect first."
 msgstr "Este tenant da Microsoft já está conectado por {detail}. Peça para essa pessoa desconectar primeiro."

@@ -7898,9 +7898,6 @@ msgstr "Instalasi GitHub tidak ditemukan"
 msgid "GitHub integration"
 msgstr "Integrasi GitHub"
 
-msgid "GitHub is refusing API calls for this machine's credential until {until}. Existing pull request links stay; new pull requests appear once the limit resets."
-msgstr "GitHub menolak panggilan API untuk kredensial mesin ini hingga {until}. Tautan pull request yang ada tetap dipertahankan; pull request baru akan muncul setelah batasnya diatur ulang."
-
 msgid "GitHub issues"
 msgstr "Issue GitHub"
 
@@ -7909,9 +7906,6 @@ msgstr "Batas laju GitHub tercapai"
 
 msgid "GitHub refused the merge"
 msgstr "GitHub menolak merge-nya"
-
-msgid "GitHub rejected this machine's credentials, so pull requests cannot be detected. Run \"gh auth login\" or fix GITHUB_TOKEN; the next retry is at {until}."
-msgstr "GitHub menolak kredensial mesin ini, sehingga pull request tidak dapat dideteksi. Jalankan \"gh auth login\" atau perbaiki GITHUB_TOKEN; percobaan berikutnya pada {until}."
 
 msgid "GitHub sign-in needed"
 msgstr "Perlu masuk ke GitHub"
@@ -13666,6 +13660,9 @@ msgstr "Reset zoom"
 msgid "Reset Zoom"
 msgstr "Reset zoom"
 
+msgid "Resets at {until}"
+msgstr "Direset pada {until}"
+
 msgid "Resets in {countdown} · {absolute}"
 msgstr "Reset dalam {countdown} · {absolute}"
 
@@ -13879,6 +13876,9 @@ msgstr "Coba lagi dalam beberapa detik; kalau terus terjadi, mulai ulang Superse
 msgid "Retry in a few seconds."
 msgstr "Coba lagi dalam beberapa detik."
 
+msgid "Retrying at {until}"
+msgstr "Dicoba lagi pada {until}"
+
 msgid "Retrying…"
 msgstr "Mencoba lagi…"
 
@@ -14050,6 +14050,9 @@ msgstr "Baris berubah"
 
 msgid "Run"
 msgstr "Jalankan"
+
+msgid "Run \"gh auth login\" or set GITHUB_TOKEN"
+msgstr "Jalankan \"gh auth login\" atau atur GITHUB_TOKEN"
 
 #. placeholder {0}: automation.name
 msgid "Run {0} now"
@@ -16008,9 +16011,6 @@ msgstr "Otomatisasi Superset"
 msgid "superset browser cdp prints an endpoint for that pane only. Point Playwright or browser-use at it."
 msgstr "superset browser cdp mencetak endpoint hanya untuk panel itu. Arahkan Playwright atau browser-use ke sana."
 
-msgid "Superset cannot reach api.github.com from this machine. Pull request status retries at {until}."
-msgstr "Superset tidak dapat menjangkau api.github.com dari mesin ini. Status pull request akan dicoba lagi pada {until}."
-
 msgid "Superset CLI"
 msgstr "Superset CLI"
 
@@ -17168,6 +17168,9 @@ msgstr "Ini tampak seperti file biner. Membukanya sebagai teks bisa menampilkan 
 
 msgid "This Mac"
 msgstr "Mac ini"
+
+msgid "This machine"
+msgstr "Mesin ini"
 
 msgid "This Microsoft tenant is already connected by {detail}. Ask them to disconnect first."
 msgstr "Tenant Microsoft ini sudah terhubung oleh {detail}. Minta mereka memutuskannya dulu."
