@@ -2,7 +2,7 @@
 title: "How to Run Coding Agents on a Remote Machine or Always-On Host (2026)"
 description: "Run Claude Code, Codex, and other coding agents on a remote Linux server, shared host, or Mac mini, and keep them working when your laptop closes."
 date: 2026-10-07
-lastUpdated: 2026-10-14
+lastUpdated: 2026-10-15
 type: "tutorial"
 competitors:
   - vs-code
@@ -132,7 +132,7 @@ Laptops are the cheapest start, a shared host gives the most compute per dollar 
 | Credentials | Spread across laptops | On one box you control | With the provider |
 | Main risk | Agents slow the machine you work on | Resource contention, single point of failure | Idle bills, provider limits |
 
-A common path for a small team: start on laptops, then move long-running agent work to one shared host once people want agents to run overnight or need more cores. Superset covers the first two columns with the same app, since a laptop and a shared host are both just devices in the list. Superset also has cloud workspaces, but they are in early access and not generally available, so plan around laptops and your own hosts today.
+A common path for a small team: start on laptops, then move long-running agent work to one shared host once people want agents to run overnight or need more cores. Superset covers all three columns with the same app. A laptop and a shared host are both just devices in the list, and Superset cloud workspaces run in the cloud and work from desktop, iPhone, and iPad without keeping your own computer connected.
 
 ## How do I review and preview an agent's changes on a remote machine from my laptop?
 
@@ -169,7 +169,7 @@ Yes. Start Claude Code in a workspace on the host and type `/remote-control`. Th
 
 ### Do I need to keep my laptop open for agents to keep working?
 
-Only if the agent runs on the laptop. Run it on an always-on host or a managed cloud agent instead. Claude Code Remote Control still runs on your own machine, so that machine must stay awake.
+Only if the agent runs on the laptop. Run it on an always-on host, a Superset cloud workspace, or a managed cloud agent instead. Claude Code Remote Control still runs on your own machine, so that machine must stay awake.
 
 ### Does Superset need SSH or a VPN to reach a remote host?
 
@@ -177,7 +177,7 @@ No. Superset routes terminals, diffs, and forwarded ports through the Superset r
 
 ### Are Superset cloud workspaces available?
 
-They are in early access for some accounts and not generally available. Remote Access to your own machines is available on Pro today.
+Yes. Cloud workspaces run in the cloud and work from desktop, iPhone, and iPad without keeping your own computer connected. Remote Access to your own machines is a separate option on Pro.
 
 ### Do Git worktrees isolate agents on a shared machine?
 

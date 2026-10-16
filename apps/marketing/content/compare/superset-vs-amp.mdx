@@ -2,6 +2,7 @@
 title: "Superset vs Amp (2026): Any-Agent Workspace vs Amp's Agent and Runners"
 description: "Compare Superset and Amp. A local-first workspace that runs any coding agent in parallel Git worktrees vs Amp's multi-model agent with cloud orbs, runners, and iOS and macOS apps. And how to run Amp inside Superset."
 date: 2026-10-13
+lastUpdated: 2026-10-15
 type: "1v1"
 competitors:
   - amp
@@ -15,7 +16,7 @@ keywords:
   - parallel coding agents
 ---
 
-Amp started as a coding agent and is growing into a development environment. Its agent picks models for you by mode, its "orbs" are cloud machines that keep working after you close your laptop, and since September 2026 its runners create Git worktrees, can be shared across a team, and include the Amp Mac app. Superset is a local-first workspace that runs any CLI agent, Amp included, in parallel Git worktrees, with pull requests, a browser, automations, and remote hosts. The difference: Amp is one vendor's agent with its own infrastructure; Superset is the workspace around every agent you use.
+Amp started as a coding agent and is growing into a development environment. Its agent picks models for you by mode, its "orbs" are cloud machines that keep working after you close your laptop, and since September 2026 its runners create Git worktrees, can be shared across a team, and include the Amp Mac app. Superset is a local-first workspace that runs any CLI agent, Amp included, in parallel Git worktrees, with pull requests, a browser, automations, remote hosts, and cloud workspaces. The difference: Amp is one vendor's agent with its own infrastructure; Superset is the workspace around every agent you use.
 
 Facts were checked against Amp's own manual, pricing, and news pages on October 13, 2026.
 
@@ -29,7 +30,7 @@ Facts were checked against Amp's own manual, pricing, and news pages on October 
 | **Agents** | Any CLI agent (Claude Code, Codex, Amp, Antigravity CLI, Cursor's agent, OpenCode, Copilot, Droid, Muse Code, and more) | Amp's own agent and subagents |
 | **Models** | Whatever each agent uses, on your own subscriptions | Several models chosen by mode, or pinned; your own keys or a linked ChatGPT or Claude plan |
 | **Isolation** | Git worktrees for local branch-based workspaces | Worktrees created by runners; orbs are per-thread cloud machines |
-| **Remote** | Remote Access: add a macOS or Linux machine as a host | Orbs in the cloud, remote and shared team runners |
+| **Remote** | Cloud workspaces, or Remote Access to a macOS or Linux machine you add as a host | Orbs in the cloud, remote and shared team runners |
 | **Clients** | macOS desktop (experimental Linux AppImage; Windows unavailable), iPhone and iPad app, CLI, MCP server | Terminal UI, web, iOS and macOS apps |
 | **Pricing** | Free tier; Pro $20 per user per month | Free with your own compute and keys; Individual $20/mo with orb minutes; Enterprise custom |
 
@@ -53,9 +54,9 @@ Amp's environment runs Amp's agent. Superset runs agents from every vendor in re
 
 Amp chooses the model for each mode, which is simple and keeps you on whatever it considers best. In Superset, each agent uses its own models on your own plan, and you choose the agent for each task.
 
-### Cloud Machines vs Your Machines
+### Cloud and Your Machines
 
-Amp's orbs give you managed cloud machines per thread, and its runners cover your own machines. Superset does not host machines: its Remote Access adds machines you own as hosts and keeps workspaces running when your laptop sleeps.
+Amp's orbs give you a cloud machine per thread, and its runners cover your own machines and can be shared across a team. Superset has cloud workspaces, which run in the cloud and work from desktop, iPhone, and iPad without keeping your own computer connected, and Remote Access, which adds machines you own as hosts and keeps workspaces running when your laptop sleeps.
 
 ### Review and Pull Requests
 
@@ -79,16 +80,16 @@ Superset offers a free tier and Pro at $20 per user per month, or $15 per user p
 
 - Use more than one coding agent, and want them side by side
 - Want pull requests, CI checks, and line comments back to any agent in one place
-- Want agents on machines you own, with scheduled automations and a Slack bot
+- Want agents on machines you own or in cloud workspaces, with scheduled automations and a Slack bot
 - Need enterprise controls: SAML SSO, SCIM, audit logs, SOC 2 Type II
 
 **Choose Amp if you:**
 
 - Want the vendor to pick the best model for each task
-- Want managed cloud machines that keep working after you close your laptop
+- Want one cloud machine per thread and shared team runners from the agent vendor
 - Want the same threads in the terminal, on the web, and on iOS and macOS
 
-**Verdict:** Amp is a strong agent with its own cloud and apps. Superset is the workspace for teams that use several agents, Amp among them, and want review through to the pull request on machines they control.
+**Verdict:** Amp is a strong agent with its own cloud and apps. Superset is the workspace for teams that use several agents, Amp among them, and want review through to the pull request, on their own machines or in cloud workspaces.
 
 ---
 

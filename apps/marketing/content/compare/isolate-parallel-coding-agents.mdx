@@ -2,7 +2,7 @@
 title: "How to Isolate Parallel Coding Agents in One Repository (2026): Worktrees, Ports, and Resuming Work"
 description: "Isolate parallel coding agents with worktrees, clones, containers, or cloud sandboxes, keep ports and previews apart, and resume a task later."
 date: 2026-10-07
-lastUpdated: 2026-10-14
+lastUpdated: 2026-10-15
 type: "tutorial"
 competitors:
   - git-worktrees
@@ -135,7 +135,7 @@ After a full reboot, terminal processes stop. Agents with a resume command come 
 | Resume agent session | Agent's own command | `--resume`, `--continue` | Agent's own command | tmux keeps it running | Auto-resume after unexpected exit |
 | Process isolation | No | No | No | No | No (use a container or remote host) |
 
-None of the worktree tools sandbox processes. If you need that, combine any of them with containers, or run agents on a separate machine. Superset can create workspaces on your own [remote hosts](https://docs.superset.sh/remote-access) and forwards their detected ports back to your machine. Remote access requires a paid plan; see [pricing](/pricing).
+None of the worktree tools sandbox processes. If you need that, combine any of them with containers, or run agents on a separate machine. Superset can create workspaces on your own [remote hosts](https://docs.superset.sh/remote-access) and forwards their detected ports back to your machine. Remote access requires a paid plan; see [pricing](/pricing). Superset also has [cloud workspaces](https://docs.superset.sh/workspaces#cloud-workspaces), which run in the cloud without keeping your own computer connected.
 
 ## Scripting it from the CLI
 

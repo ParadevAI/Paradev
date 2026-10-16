@@ -17,6 +17,7 @@ import type {
 	UserContent,
 } from "@superset/chat/protocol";
 import { AGENT_DEFAULT_MODE } from "@superset/chat/protocol";
+import { z } from "zod";
 import { BackgroundTasks } from "../backgroundTasks";
 import { EventQueue } from "../eventQueue";
 import type {
@@ -167,6 +168,32 @@ const SESSION_STATUS_BY_ACP_STATE: Record<string, SessionState["status"]> = {
 	requires_action: "awaiting_input",
 };
 
+const GATEWAY_MODEL_PREFIX = "vercel-ai-gateway/";
+
+// pdev sends `_meta.piAcp.model` as an id or a { provider, modelId } pair.
+function resolvedModelOf(raw: unknown): string | undefined {
+	const meta = (raw as { _meta?: unknown })._meta;
+	const piAcp =
+		typeof meta === "object" &&
+		meta !== null &&
+		typeof (meta as Record<string, unknown>).piAcp === "object"
+			? ((meta as Record<string, unknown>).piAcp as Record<string, unknown>)
+			: undefined;
+	const reported = piAcp?.model;
+	const id =
+		typeof reported === "string"
+			? reported
+			: typeof reported === "object" &&
+					reported !== null &&
+					typeof (reported as Record<string, unknown>).modelId === "string"
+				? (reported as Record<string, unknown>).modelId
+				: undefined;
+	if (typeof id !== "string" || id === "") return undefined;
+	return id.startsWith(GATEWAY_MODEL_PREFIX)
+		? id.slice(GATEWAY_MODEL_PREFIX.length)
+		: id;
+}
+
 export type AcpAttachment = {
 	path: string;
 	mimeType: string;
@@ -186,6 +213,14 @@ const SELECTION_WAIT_MS = 5000;
 const STARTUP_TIMEOUT_MS = 120_000;
 const REQUEST_TIMEOUT_MS = 30_000;
 const STDERR_TAIL_CHARS = 4000;
+const ASK_MODE_ID = "default";
+const QUESTION_FIELD_ID = "answer";
+const SHELL_POLL_MS = 2000;
+const CLIENT_APPROVAL_MODES = [
+	{ id: ASK_MODE_ID, label: "Ask for approval" },
+	{ id: "auto", label: "Approve for me" },
+	{ id: "bypassPermissions", label: "Full access" },
+];
 
 function sessionMissing(error: unknown): boolean {
 	return (
@@ -201,6 +236,8 @@ export type AcpAdapterOptions = SpawnAcpOptions & {
 	launch?: () => Promise<Pick<SpawnAcpOptions, "command" | "args" | "env">>;
 	/** Selected for a new session that asks for no mode, when the agent offers it. */
 	defaultModeId?: string;
+	clientApprovalModes?: boolean;
+	shellPollMs?: number;
 	/** How long a prompt waits for mode and option changes the agent has not answered. */
 	selectionWaitMs?: number;
 	startupTimeoutMs?: number;
@@ -231,6 +268,7 @@ type OpenText = {
 	attachments: ItemAttachment[];
 	turnId: string;
 	startedAtMs: number;
+	model?: string;
 };
 
 type PendingApproval = {
@@ -238,6 +276,8 @@ type PendingApproval = {
 	turnId: string;
 	item: ApprovalRequest;
 	fieldTypes?: Record<string, string | undefined>;
+	selectsOption?: boolean;
+	otherOptionId?: string;
 };
 
 type AcpSessionModes = NonNullable<
@@ -375,7 +415,12 @@ export class AcpAdapter implements HarnessAdapter {
 	 */
 	private readonly messages = new Map<
 		string,
-		{ text: string; attachments: ItemAttachment[]; startedAtMs: number }
+		{
+			text: string;
+			attachments: ItemAttachment[];
+			startedAtMs: number;
+			model?: string;
+		}
 	>();
 	private readonly subagents = new Map<
 		string,
@@ -414,11 +459,15 @@ export class AcpAdapter implements HarnessAdapter {
 	private readonly selectionsInFlight = new Set<Promise<void>>();
 	private configOptions: SessionConfigOption[] = [];
 	private replaying = false;
+	private agentName: string | null = null;
 	private unkeyedImageSequence = 0;
 	private queuedPrompts: UserContent[][] = [];
 	private disposed = false;
 	private dead = false;
 	private stderrTail = "";
+	private customAnswer: string | null = null;
+	private readonly shellPids = new Map<string, number>();
+	private shellPoll: ReturnType<typeof setInterval> | null = null;
 
 	constructor(private readonly options: AcpAdapterOptions) {
 		this.backgroundTasks = new BackgroundTasks(
@@ -512,6 +561,7 @@ export class AcpAdapter implements HarnessAdapter {
 			pending.requestId,
 			this.approvalOutcome(pending, decision),
 		);
+		if (this.currentTurn?.status !== "running") this.sendCustomAnswer();
 		this.emitItem(
 			{
 				...pending.item,
@@ -525,6 +575,12 @@ export class AcpAdapter implements HarnessAdapter {
 	}
 
 	setMode(modeId: string): void {
+		if (this.options.clientApprovalModes) {
+			if (!isClientApprovalMode(modeId)) return;
+			this.emitSession({ modeId });
+			if (autoApproves(modeId)) this.approvePendingPermissions();
+			return;
+		}
 		const previous = this.modeId;
 		this.emitSession({ modeId });
 		if (!this.client || !this.sessionId) return;
@@ -625,6 +681,8 @@ export class AcpAdapter implements HarnessAdapter {
 	}
 
 	async stopBackgroundTask(taskId: string): Promise<boolean> {
+		const shellPid = this.shellPids.get(taskId);
+		if (shellPid !== undefined) return stopProcessGroup(shellPid);
 		if (!this.client || !this.sessionId) return false;
 		if (!this.backgroundTasks.canStop(taskId)) return false;
 		const response = await this.client.request(
@@ -665,6 +723,7 @@ export class AcpAdapter implements HarnessAdapter {
 		this.disposed = true;
 		this.stalePendingApprovals();
 		this.backgroundTasks.dispose();
+		if (this.shellPoll) clearInterval(this.shellPoll);
 		await this.client?.close();
 		this.queue.close();
 	}
@@ -732,6 +791,7 @@ export class AcpAdapter implements HarnessAdapter {
 			if (negotiated.success) {
 				this.negotiatedVersion =
 					negotiated.data.protocolVersion ?? this.negotiatedVersion;
+				this.agentName = negotiated.data.agentInfo?.name ?? null;
 				this.agentCapabilities =
 					negotiated.data.capabilities ??
 					negotiated.data.agentCapabilities ??
@@ -808,17 +868,29 @@ export class AcpAdapter implements HarnessAdapter {
 			this.emitSession({
 				status: "idle",
 				harnessSessionId: this.sessionId,
-				...(parsed.success && parsed.data.modes?.currentModeId
-					? { modeId: parsed.data.modes.currentModeId }
-					: {}),
-				...(parsed.success && parsed.data.modes?.availableModes
+				...(this.options.clientApprovalModes
 					? {
-							availableModes: parsed.data.modes.availableModes.map((mode) => ({
-								id: mode.id,
-								label: mode.name,
-							})),
+							modeId:
+								[this.modeId, this.startModeId(startOptions, resumed)].find(
+									isClientApprovalMode,
+								) ?? ASK_MODE_ID,
+							availableModes: CLIENT_APPROVAL_MODES,
 						}
-					: {}),
+					: {
+							...(parsed.success && parsed.data.modes?.currentModeId
+								? { modeId: parsed.data.modes.currentModeId }
+								: {}),
+							...(parsed.success && parsed.data.modes?.availableModes
+								? {
+										availableModes: parsed.data.modes.availableModes.map(
+											(mode) => ({
+												id: mode.id,
+												label: mode.name,
+											}),
+										),
+									}
+								: {}),
+						}),
 			});
 			this.handleConfigOptions(response);
 			this.applyStartSelections(
@@ -864,7 +936,9 @@ export class AcpAdapter implements HarnessAdapter {
 				this.emitNotice("info", "The agent declined to continue.");
 			this.cancelPendingApprovals(turnId);
 			this.emitSession({ status: "idle" });
+			this.sendCustomAnswer();
 		} catch (error) {
+			this.customAnswer = null;
 			// The agent's words are the reader's; the method that failed is not.
 			const message =
 				error instanceof AcpRpcError ? error.detail : (error as Error).message;
@@ -998,6 +1072,7 @@ export class AcpAdapter implements HarnessAdapter {
 					this.contentBlock(raw.content),
 					turnId,
 					this.messageIdOf(outer.data.update),
+					resolvedModelOf(outer.data.update),
 				);
 				return;
 			case "agent_thought_chunk":
@@ -1009,7 +1084,12 @@ export class AcpAdapter implements HarnessAdapter {
 				);
 				return;
 			case "agent_message":
-				this.handleMessage("agent_message", outer.data.update, turnId);
+				this.handleMessage(
+					"agent_message",
+					outer.data.update,
+					turnId,
+					resolvedModelOf(outer.data.update),
+				);
 				return;
 			case "agent_thought":
 				this.handleMessage("reasoning", outer.data.update, turnId);
@@ -1034,7 +1114,7 @@ export class AcpAdapter implements HarnessAdapter {
 				this.handleAvailableCommands(outer.data.update);
 				return;
 			case "current_mode_update":
-				if (update.data.currentModeId)
+				if (update.data.currentModeId && !this.options.clientApprovalModes)
 					this.emitSession({ modeId: update.data.currentModeId });
 				return;
 			case "config_option_update":
@@ -1084,6 +1164,7 @@ export class AcpAdapter implements HarnessAdapter {
 		content: AcpContentBlock | undefined,
 		turnId: string,
 		messageId: string | null = null,
+		model: string | undefined = undefined,
 	): void {
 		if (kind === "agent_message" && content && content.type !== "text") {
 			const attachment = this.attachmentOf(
@@ -1092,6 +1173,7 @@ export class AcpAdapter implements HarnessAdapter {
 			);
 			if (!attachment) return;
 			const open = this.openMessage(kind, turnId, messageId);
+			if (model) open.model = model;
 			open.attachments.push(attachment);
 			this.emitItem(this.textItem(open, "open"), turnId);
 			return;
@@ -1099,6 +1181,7 @@ export class AcpAdapter implements HarnessAdapter {
 		const chunk = content?.type === "text" ? (content.text ?? "") : "";
 		if (!chunk) return;
 		const open = this.openMessage(kind, turnId, messageId);
+		if (kind === "agent_message" && model) open.model = model;
 		open.text += chunk;
 		if (kind === "user_message") return;
 		this.emit({
@@ -1139,6 +1222,13 @@ export class AcpAdapter implements HarnessAdapter {
 			attachments: [...(flushed?.attachments ?? [])],
 			turnId,
 			startedAtMs: flushed?.startedAtMs ?? this.nextStartMs(),
+			...(kind === "agent_message"
+				? {
+						model:
+							flushed?.model ??
+							(this.replaying ? undefined : this.currentModelLabel()),
+					}
+				: {}),
 		};
 		this.openText = next;
 		// A user message has no text field to stream into, so it is recorded
@@ -1157,10 +1247,12 @@ export class AcpAdapter implements HarnessAdapter {
 		kind: OpenText["kind"],
 		raw: unknown,
 		turnId: string,
+		model: string | undefined = undefined,
 	): void {
 		const parsed = acpMessageSchema.safeParse(raw);
 		if (!parsed.success) return;
 		const open = this.openMessage(kind, turnId, parsed.data.messageId);
+		if (kind === "agent_message" && model) open.model = model;
 		if (parsed.data.content !== undefined) {
 			open.text = messageText(parsed.data.content ?? []);
 			open.attachments =
@@ -1183,6 +1275,7 @@ export class AcpAdapter implements HarnessAdapter {
 				text: open.text,
 				attachments: open.attachments,
 				startedAtMs: open.startedAtMs,
+				...(open.model ? { model: open.model } : {}),
 			});
 		this.emitItem(this.textItem(open, "flushed"), open.turnId);
 	}
@@ -1194,7 +1287,8 @@ export class AcpAdapter implements HarnessAdapter {
 			...(state === "flushed" ? { completedAtMs: this.now() } : {}),
 		};
 		switch (open.kind) {
-			case "agent_message":
+			case "agent_message": {
+				const { model } = open;
 				return {
 					...base,
 					kind: "agent_message",
@@ -1202,7 +1296,9 @@ export class AcpAdapter implements HarnessAdapter {
 					...(open.attachments.length > 0
 						? { attachments: open.attachments }
 						: {}),
+					...(model ? { model } : {}),
 				};
+			}
 			case "user_message":
 				return {
 					...base,
@@ -1212,6 +1308,22 @@ export class AcpAdapter implements HarnessAdapter {
 			default:
 				return { ...base, kind: "reasoning", text: open.text };
 		}
+	}
+
+	private currentModelLabel(): string | undefined {
+		const option = this.configOptions.find(
+			(entry) => entry.category === "model",
+		);
+		return option?.options.find((entry) => entry.id === option.currentValue)
+			?.label;
+	}
+
+	private optionLabel(name: string): string {
+		return this.isPdevAgent() ? name.replace(/^pdev\//, "") : name;
+	}
+
+	private isPdevAgent(): boolean {
+		return this.agentName === "paradev" || this.agentName === "pdev";
 	}
 
 	private handleToolCall(raw: unknown, turnId: string): void {
@@ -1288,6 +1400,48 @@ export class AcpAdapter implements HarnessAdapter {
 		};
 		this.toolCalls.set(update.toolCallId, item);
 		this.emitItem(item, turnId);
+		if (!this.replaying) {
+			this.trackBackgroundShell(item);
+		}
+	}
+
+	private trackBackgroundShell(item: ToolCall): void {
+		const details = piShellDetailsSchema.safeParse(
+			(item.rawOutput as { details?: unknown } | undefined)?.details,
+		);
+		if (!details.success) return;
+		const { shellId, status, pid } = details.data;
+		if (status !== "running") {
+			this.endBackgroundShell(shellId);
+			return;
+		}
+		if (this.backgroundTasks.has(shellId)) return;
+		const input = piShellInputSchema.safeParse(item.rawInput);
+		this.backgroundTasks.start({
+			id: shellId,
+			kind: "process",
+			name:
+				(input.success && (input.data.description || input.data.command)) ||
+				shellId,
+			canStop: pid !== undefined,
+			startedAtMs: this.now(),
+		});
+		if (pid === undefined) return;
+		this.shellPids.set(shellId, pid);
+		this.shellPoll ??= setInterval(() => {
+			for (const [id, shellPid] of this.shellPids) {
+				if (!processAlive(shellPid)) this.endBackgroundShell(id);
+			}
+		}, this.options.shellPollMs ?? SHELL_POLL_MS);
+	}
+
+	private endBackgroundShell(shellId: string): void {
+		this.shellPids.delete(shellId);
+		this.backgroundTasks.end(shellId);
+		if (this.shellPids.size === 0 && this.shellPoll) {
+			clearInterval(this.shellPoll);
+			this.shellPoll = null;
+		}
 	}
 
 	/**
@@ -1599,18 +1753,20 @@ export class AcpAdapter implements HarnessAdapter {
 			return [
 				{
 					id,
-					label: option.name,
+					label: this.optionLabel(option.name),
 					...(option.category ? { category: option.category } : {}),
 					...(typeof option.currentValue === "string"
 						? { currentValue: option.currentValue }
 						: {}),
-					options: flattenSelectOptions(option.options ?? []),
+					options: flattenSelectOptions(option.options ?? [], (name) =>
+						this.optionLabel(name),
+					),
 				},
 			];
 		});
-		const mode = this.configOptions.find(
-			(option) => option.category === "mode",
-		);
+		const mode = this.options.clientApprovalModes
+			? undefined
+			: this.configOptions.find((option) => option.category === "mode");
 		if (mode) this.modeConfigId = mode.id;
 		this.emitSession({
 			configOptions: this.configOptions,
@@ -1643,7 +1799,7 @@ export class AcpAdapter implements HarnessAdapter {
 		const modeId = this.startModeId(startOptions, resumed);
 		for (const [category, value] of [
 			["model", startOptions.modelId],
-			["mode", modeId],
+			["mode", this.options.clientApprovalModes ? undefined : modeId],
 		] as const) {
 			const option = this.configOptions.find(
 				(entry) => entry.category === category,
@@ -1689,6 +1845,33 @@ export class AcpAdapter implements HarnessAdapter {
 			);
 			return;
 		}
+		const allow = parsed.data.options.find((option) =>
+			/^allow\b/i.test(option.name),
+		);
+		const title = parsed.data.toolCall?.title ?? "Permission required";
+		const asking = [...this.toolCalls.values()].some(
+			(call) => call.status === "running" && call.title === "ask_user_question",
+		);
+		const permission = !asking && Boolean(allow) && /^allow\b/i.test(title);
+		if (
+			this.options.clientApprovalModes &&
+			permission &&
+			allow &&
+			autoApproves(this.modeId)
+		) {
+			this.client?.respond(request.id, {
+				outcome: { outcome: "selected", optionId: allow.optionId },
+			});
+			return;
+		}
+		const question = this.options.clientApprovalModes === true && !permission;
+		const other = parsed.data.options.find((option) =>
+			/^other\b/i.test(option.name),
+		);
+		const choices = parsed.data.options.filter((option) => option !== other);
+		const headed = title.match(/^([^:\n]{1,40}):\s+([\s\S]+)$/);
+		const header = headed?.[1];
+		const questionText = headed?.[2] ?? title;
 		const turnId = this.resolveTurnId();
 		const targetItemId = parsed.data.toolCall?.toolCallId ?? null;
 		const approvalId = `approval:${targetItemId ?? this.mintId()}`;
@@ -1696,22 +1879,72 @@ export class AcpAdapter implements HarnessAdapter {
 			id: approvalId,
 			kind: "approval_request",
 			targetItemId,
-			title: parsed.data.toolCall?.title ?? "Permission required",
+			title,
 			status: "pending",
 			startedAtMs: this.nextStartMs(),
-			options: parsed.data.options.map((option) => ({
-				optionId: option.optionId,
-				label: option.name,
-				...(isApprovalOptionKind(option.kind) ? { kind: option.kind } : {}),
-			})),
+			...(question
+				? {
+						form: {
+							message: questionText,
+							fields: [
+								{
+									id: QUESTION_FIELD_ID,
+									...(header ? { title: header } : {}),
+									input: "single" as const,
+									options: choices.map((option) => ({
+										value: option.optionId,
+										label: option.name,
+									})),
+								},
+								...(other
+									? [
+											{
+												id: `${QUESTION_FIELD_ID}_custom`,
+												title: "Other",
+												description: "Type your own answer (optional).",
+												input: "text" as const,
+											},
+										]
+									: []),
+							],
+						},
+					}
+				: {
+						options: parsed.data.options.map((option) => ({
+							optionId: option.optionId,
+							label: option.name,
+							...(this.options.clientApprovalModes
+								? { kind: optionKindFromLabel(option.name) }
+								: isApprovalOptionKind(option.kind)
+									? { kind: option.kind }
+									: {}),
+						})),
+					}),
 		};
 		this.pendingApprovals.set(approvalId, {
 			requestId: request.id,
 			turnId,
 			item,
+			...(question ? { selectsOption: true } : {}),
+			...(question && other ? { otherOptionId: other.optionId } : {}),
 		});
 		this.emitItem(item, turnId);
 		this.emitSession({ status: "awaiting_input" });
+	}
+
+	private sendCustomAnswer(): void {
+		const text = this.customAnswer;
+		if (!text) return;
+		this.customAnswer = null;
+		void this.runTurn([{ type: "text", text }]);
+	}
+
+	private approvePendingPermissions(): void {
+		for (const [approvalId, pending] of this.pendingApprovals) {
+			if (!pending.item.form) {
+				this.respondToApproval(approvalId, { type: "accept" });
+			}
+		}
 	}
 
 	private handleElicitation(request: AcpServerRequest): void {
@@ -1759,6 +1992,23 @@ export class AcpAdapter implements HarnessAdapter {
 		pending: PendingApproval,
 		decision: Decision,
 	): unknown {
+		if (pending.selectsOption) {
+			const typed =
+				decision.type === "form"
+					? decision.values[`${QUESTION_FIELD_ID}_custom`]
+					: null;
+			if (typeof typed === "string" && typed.trim() && pending.otherOptionId) {
+				this.customAnswer = typed.trim();
+				return {
+					outcome: { outcome: "selected", optionId: pending.otherOptionId },
+				};
+			}
+			const optionId =
+				decision.type === "form" ? decision.values[QUESTION_FIELD_ID] : null;
+			return typeof optionId === "string"
+				? { outcome: { outcome: "selected", optionId } }
+				: { outcome: { outcome: "cancelled" } };
+		}
 		if (pending.item.form) {
 			if (decision.type === "form") {
 				return {
@@ -2047,19 +2297,66 @@ export class AcpAdapter implements HarnessAdapter {
 	}
 }
 
+function isClientApprovalMode(modeId: string | undefined): modeId is string {
+	return CLIENT_APPROVAL_MODES.some((mode) => mode.id === modeId);
+}
+
+function autoApproves(modeId: string | undefined): boolean {
+	return modeId === "auto" || modeId === "bypassPermissions";
+}
+
+function optionKindFromLabel(
+	label: string,
+): "allow_once" | "allow_always" | "reject_once" {
+	if (/^(deny|reject|no)\b/i.test(label)) return "reject_once";
+	if (/always|session/i.test(label)) return "allow_always";
+	return "allow_once";
+}
+
+const piShellDetailsSchema = z.looseObject({
+	shellId: z.string().min(1),
+	status: z.string(),
+	pid: z.number().int().positive().optional(),
+});
+
+const piShellInputSchema = z.looseObject({
+	command: z.string().optional(),
+	description: z.string().optional(),
+});
+
+function processAlive(pid: number): boolean {
+	try {
+		process.kill(pid, 0);
+		return true;
+	} catch (error) {
+		return (error as NodeJS.ErrnoException).code === "EPERM";
+	}
+}
+
+function stopProcessGroup(pid: number): boolean {
+	for (const target of [-pid, pid]) {
+		try {
+			process.kill(target, "SIGTERM");
+			return true;
+		} catch {}
+	}
+	return false;
+}
+
 export function createAcpAdapter(options: AcpAdapterOptions): HarnessAdapter {
 	return new AcpAdapter(options);
 }
 
 function flattenSelectOptions(
 	entries: AcpConfigSelectOption[],
+	labelOf: (name: string) => string,
 ): SessionConfigOption["options"] {
 	return entries.flatMap((entry) => {
 		const leaves =
 			entry.options ?? (entry.value ? [{ ...entry, value: entry.value }] : []);
 		return leaves.map((leaf) => ({
 			id: leaf.value,
-			label: leaf.name,
+			label: labelOf(leaf.name),
 			...(leaf.description ? { description: leaf.description } : {}),
 		}));
 	});

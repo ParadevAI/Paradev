@@ -2,7 +2,7 @@
 title: "Superset vs Symphony (2026): Agent Workspace vs OpenAI's Tracker-Driven Orchestration"
 description: "Compare Superset and OpenAI's Symphony: an interactive workspace for parallel coding agents vs an open-source spec that turns tickets into autonomous Codex runs."
 date: 2026-08-07
-lastUpdated: 2026-09-24
+lastUpdated: 2026-10-15
 type: "1v1"
 competitors:
   - symphony
@@ -37,7 +37,7 @@ Superset and Symphony both scale coding agents past one-at-a-time, from opposite
 
 ## What Is Superset?
 
-Superset is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs across your own network devices through remote and cloud workspaces, and it can schedule agent sessions as automations with a TypeScript SDK and a Slack bot. You can review inside Superset or jump into VS Code, Cursor, Windsurf, JetBrains, or Zed. Source-available under Elastic License 2.0 (ELv2).
+Superset is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also reaches other machines you own through Remote Access, offers cloud workspaces that run in the cloud, and can schedule agent sessions as automations with a TypeScript SDK and a Slack bot. You can review inside Superset or jump into VS Code, Cursor, Windsurf, JetBrains, or Zed. Source-available under Elastic License 2.0 (ELv2).
 
 ## What Is Symphony?
 
@@ -105,4 +105,4 @@ No -- it clones the repo into an isolated workspace per issue, contained within 
 
 ### Can Superset do tracker-driven autonomous runs?
 
-Partially. Superset's tasks integrate GitHub Issues and Linear, its automations run scheduled unattended sessions, and its SDK/MCP surfaces support building tracker-driven pipelines -- but it does not ship Symphony's poll-dispatch-land loop as a turnkey daemon. The inverse gap is larger: Symphony has no interactive workspace at all.
+Partially. Superset's tasks integrate GitHub Issues and Linear, its automations run scheduled unattended sessions, and automation event triggers from Linear and GitHub can start an agent when work comes in -- but Superset does not land PRs on its own, so it does not ship Symphony's full poll-dispatch-land loop. The inverse gap is larger: Symphony has no interactive workspace at all.

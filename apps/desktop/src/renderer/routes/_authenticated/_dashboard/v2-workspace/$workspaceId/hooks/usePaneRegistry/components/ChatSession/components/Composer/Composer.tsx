@@ -1,4 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
+import { appendPastedText } from "@superset/chat/core";
 import type {
 	AvailableCommand,
 	SessionConfigOption,
@@ -289,11 +290,12 @@ export const Composer = memo(function Composer({
 			text: string,
 			files: File[],
 			mentions: ComposerChip[],
+			pastedTexts: string[],
 			steer: boolean,
 		) => {
 			const tags = await uploadAttachments(files);
 			if (!tags) {
-				promptInputRef.current?.appendText(text);
+				promptInputRef.current?.appendText(appendPastedText(text, pastedTexts));
 				return;
 			}
 			const elements = elementsForChips(text.trim(), mentions);
@@ -301,7 +303,10 @@ export const Composer = memo(function Composer({
 				[
 					{
 						type: "text",
-						text: [text.trim(), ...tags].filter(Boolean).join("\n"),
+						text: appendPastedText(
+							[text.trim(), ...tags].filter(Boolean).join("\n"),
+							pastedTexts,
+						),
 						...(elements.length > 0 ? { elements } : {}),
 					},
 				],
@@ -313,8 +318,18 @@ export const Composer = memo(function Composer({
 	);
 
 	const handleSubmit = useCallback(
-		({ text, files, mentions, steer }: PromptInputSubmitPayload) => {
-			if (disabled || (text.trim() === "" && files.length === 0)) return;
+		({
+			text,
+			files,
+			mentions,
+			pastedTexts,
+			steer,
+		}: PromptInputSubmitPayload) => {
+			if (
+				disabled ||
+				(text.trim() === "" && files.length === 0 && pastedTexts.length === 0)
+			)
+				return;
 			const name = LEADING_COMMAND.exec(text.trim())?.[1];
 			if (
 				name &&
@@ -324,7 +339,7 @@ export const Composer = memo(function Composer({
 				toast.error(t({ message: `Unknown command /${name}` }));
 				return false;
 			}
-			return send(text, files, mentions, steer);
+			return send(text, files, mentions, pastedTexts, steer);
 		},
 		[availableCommands, disabled, send, t],
 	);
@@ -381,6 +396,7 @@ export const Composer = memo(function Composer({
 			<AgentComposer
 				className={CHAT_COLUMN_CLASSNAME}
 				clearOnSubmit={!disabled}
+				collapseLargePastes
 				commands={commands}
 				defaultValue={storedDraft}
 				history={history}

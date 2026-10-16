@@ -1,3 +1,4 @@
+import { parsePastedText } from "@superset/chat/core";
 import { WORKSPACE_ATTACHMENTS_DIR } from "@superset/shared/workspace-attachments";
 
 export type AttachmentTag = { path: string; type: string };
@@ -19,10 +20,12 @@ export function formatAttachmentTag({ path, type }: AttachmentTag): string {
 		: `<attachment path="${path}" />`;
 }
 
-export function parseAttachmentTags(text: string): {
+export function parseAttachmentTags(message: string): {
 	text: string;
 	attachments: AttachmentTag[];
+	pastedTexts: string[];
 } {
+	const { text, pastes } = parsePastedText(message);
 	const attachments: AttachmentTag[] = [];
 	const rest = text.replace(
 		TAG,
@@ -32,5 +35,5 @@ export function parseAttachmentTags(text: string): {
 			return "";
 		},
 	);
-	return { text: rest.trim(), attachments };
+	return { text: rest.trim(), attachments, pastedTexts: pastes };
 }

@@ -2,7 +2,7 @@
 title: "Superset vs Firstmate (2026): Agent Workspace vs the DIY Agent Distro"
 description: "Compare Superset and Firstmate for orchestrating parallel coding agents. A purpose-built desktop workspace vs an open-source agent distro that runs on tmux."
 date: 2026-08-07
-lastUpdated: 2026-09-24
+lastUpdated: 2026-10-15
 type: "1v1"
 competitors:
   - firstmate
@@ -29,7 +29,7 @@ Superset and Firstmate both answer "how do I get one conversation to fan out int
 | **Agent support** | Any CLI agent (Claude Code, Codex, OpenCode, Cursor, Copilot, Gemini, Mistral Vibe, and more) | Claude Code, Codex, OpenCode, Pi, Grok, Kimi |
 | **Isolation** | Git worktrees for local branch-based workspaces | Disposable Git worktree per crewmate |
 | **Session backend** | Built-in persistent terminals | tmux (or experimental Herdr/Zellij/cmux/Orca backends) |
-| **Remote** | Remote and cloud workspaces across your network devices | Persistent "secondmates" on local or SSH-reachable hosts |
+| **Remote** | Remote Access to machines you own, plus cloud workspaces | Persistent "secondmates" on local or SSH-reachable hosts |
 | **Review / UI** | Built-in diff/file editor, browser, chat | None -- output is PRs, local merges, or reports; you review in your own tools |
 | **License** | Source-available (ELv2) | Open source (MIT), free |
 
@@ -37,7 +37,7 @@ Superset and Firstmate both answer "how do I get one conversation to fan out int
 
 ## What Is Superset?
 
-Superset is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs across your own network devices through remote and cloud workspaces, and it can schedule agent sessions as automations with a TypeScript SDK and a Slack bot. You can review inside Superset or jump into VS Code, Cursor, Windsurf, JetBrains, or Zed. Source-available under Elastic License 2.0 (ELv2).
+Superset is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on machines you own through Remote Access and in the cloud through cloud workspaces, and it can schedule agent sessions as automations with a TypeScript SDK and a Slack bot. You can review inside Superset or jump into VS Code, Cursor, Windsurf, JetBrains, or Zed. Source-available under Elastic License 2.0 (ELv2).
 
 ## What Is Firstmate?
 
@@ -51,7 +51,7 @@ This is the whole comparison in one line: Superset is software you run; Firstmat
 
 ### Supervision Models
 
-Both fan work out to isolated worktrees. Firstmate's first mate supervises crewmates conversationally -- you talk to one agent, it manages the rest and reports back with PRs or summaries. Superset gives you direct visibility instead: every agent's terminal, diff, and status is a click away, and orchestration can be interactive or programmatic through the CLI, MCP server, and SDK. Delegation-through-conversation versus a control room -- some developers genuinely prefer the former's simplicity.
+Both fan work out to isolated worktrees, and both let you talk to one agent that manages the rest. Firstmate's first mate supervises crewmates in tmux windows and reports back with PRs or summaries. Superset's orchestrate skill turns Claude Code or Codex into a coordinator that starts worker agents in separate workspaces and collects their results, and every worker's terminal, diff, and status stays a click away in the app. Orchestration can also be programmatic through the CLI, MCP server, and SDK. The difference is where the crew lives: in tmux and your own tools, or in a workspace with review built in.
 
 ### Reliability Surface
 
@@ -80,7 +80,7 @@ Superset offers a free tier and Pro at $20/seat/month. Firstmate is free and MIT
 
 **Choose Firstmate if you:**
 
-- Live in the terminal and like "talk to one agent, ship with a crew"
+- Live in the terminal and want "talk to one agent, ship with a crew" with crewmates in tmux
 - Want a free, MIT, fully-inspectable setup with nothing to install
 - Already have tmux (or Herdr/cmux/Orca) and your own review habits
 - Enjoy customizing the orchestration logic itself -- it is all readable text
@@ -101,7 +101,7 @@ Yes. Firstmate gives each crewmate a disposable worktree (or delegates worktree 
 
 ### Can Firstmate and Superset be used together?
 
-Not as an integrated pair -- Firstmate's supported backends are tmux, and experimentally Herdr, Zellij, cmux, and Orca. Conceptually, though, Superset's own orchestration (agents launching agents through its CLI and MCP server) covers the same delegation pattern inside the workspace.
+Not as an integrated pair -- Firstmate's supported backends are tmux, and experimentally Herdr, Zellij, cmux, and Orca. Superset's orchestrate skill covers the same delegation pattern inside the workspace: one Claude Code or Codex agent coordinates workers it starts through the Superset CLI.
 
 ### Is Firstmate free?
 

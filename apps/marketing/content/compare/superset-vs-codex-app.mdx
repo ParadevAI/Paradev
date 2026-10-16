@@ -2,7 +2,7 @@
 title: "Superset vs Codex App (2026): Agent-Agnostic Workspace vs OpenAI's Coding Surface"
 description: "Compare Superset and the OpenAI Codex app for parallel AI coding. See how an agent-agnostic worktree workspace differs from Codex inside the ChatGPT desktop app."
 date: 2026-07-13
-lastUpdated: 2026-10-13
+lastUpdated: 2026-10-15
 type: "1v1"
 competitors:
   - codex-app
@@ -29,7 +29,7 @@ For the terminal-focused comparison, see [Superset vs Codex CLI](/compare/supers
 | **What it does** | Runs multiple agents in parallel with Git worktree isolation, review, and browser | Runs parallel Codex chats in local worktrees plus cloud task environments |
 | **Agent support** | Any CLI agent (Claude Code, Codex, Antigravity CLI, Cursor's agent, Copilot CLI, Amp, OpenCode, and more) | OpenAI Codex (GPT-6.1 Sol and the GPT-6 family) |
 | **Isolation** | Automatic local Git worktrees for local branch-based workspaces | Worktree mode per chat (Codex-managed checkouts) or per-task cloud environments |
-| **Where code runs** | Your local machine, and any macOS or Linux host you add through Remote Access | Your machine, SSH hosts, or OpenAI-managed cloud environments |
+| **Where code runs** | Your local machine, any macOS or Linux host you add through Remote Access, or a cloud workspace | Your machine, SSH hosts, or OpenAI-managed cloud environments |
 | **Platforms** | Desktop (macOS; experimental Linux AppImage; Windows unavailable), iPhone and iPad app, CLI, MCP server | macOS and Windows desktop (Linux in preview), CLI, IDE extensions, web, ChatGPT iOS app |
 | **Scheduling** | Automations: scheduled agent sessions, TypeScript SDK, Slack bot | Scheduled tasks on background worktrees or in cloud |
 | **Pricing** | Free tier + Pro $20/seat/mo | Included with all ChatGPT plans (Free and up); usage scales by tier |
@@ -39,7 +39,7 @@ For the terminal-focused comparison, see [Superset vs Codex CLI](/compare/supers
 
 ## What Is Superset?
 
-Superset is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs across your own network devices through remote and cloud workspaces, and it can schedule agent sessions as automations with a TypeScript SDK and a Slack bot. You can review inside Superset or jump into VS Code, Cursor, Windsurf, JetBrains, or Zed. Source-available under Elastic License 2.0 (ELv2).
+Superset is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on your other machines through Remote Access, and in cloud workspaces, and it can schedule agent sessions as automations with a TypeScript SDK and a Slack bot. You can review inside Superset or jump into VS Code, Cursor, Windsurf, JetBrains, or Zed. Source-available under Elastic License 2.0 (ELv2).
 
 ## What Is the Codex App?
 
@@ -57,11 +57,11 @@ Earlier versions of this comparison could say "local worktrees vs cloud environm
 
 ### Mobile and Remote Machines
 
-Both now reach your own machine from a phone. Codex pairs the ChatGPT iOS app with a Mac or Windows computer running the desktop app, and Handoff moves a chat to a worktree on another host. Superset's iPhone and iPad app connects to any macOS or Linux host you add through Remote Access, with terminals and diff review for any agent running there, not just Codex.
+Both now reach your own machine from a phone. Codex pairs the ChatGPT iOS app with a Mac or Windows computer running the desktop app, and Handoff moves a chat to a worktree on another host. Superset's iPhone and iPad app connects to cloud workspaces and to any macOS or Linux host you add through Remote Access, with terminals and diff review for any agent running there, not just Codex.
 
 ### Review and Environment
 
-With Codex cloud tasks, you configure the environment once and review returned diffs and logs; on desktop, review happens in the app's diff and PR panels. With Superset, each agent runs in your existing checkout as a worktree, so the environment is whatever your machine already has -- private services, local databases, real dependencies -- and you review in the built-in diff editor or jump into your own IDE. Teams with complex local setups or offline constraints tend to prefer keeping the loop local; Codex's cloud tasks remain the better fire-and-forget story when your machine is off.
+With Codex cloud tasks, you configure the environment once and review returned diffs and logs; on desktop, review happens in the app's diff and PR panels. With Superset, each agent runs in your existing checkout as a worktree, so the environment is whatever your machine already has -- private services, local databases, real dependencies -- and you review in the built-in diff editor or jump into your own IDE. Teams with complex local setups or offline constraints tend to prefer keeping the loop local; Codex's cloud tasks remain a strong fire-and-forget option for Codex, and Superset's cloud workspaces also keep running without your own computer connected.
 
 ### Pricing Model
 
@@ -81,11 +81,11 @@ Codex is included with every ChatGPT plan, from Free up through Plus, Pro, Busin
 **Choose the Codex App if you:**
 
 - Are standardized on OpenAI and want a cohesive Codex + ChatGPT experience
-- Like cloud tasks that run while your machine is off
+- Like Codex cloud tasks that run in OpenAI-managed environments
 - Already pay for a ChatGPT plan (or want to start free) with Codex bundled in
 - Want scheduled tasks and code review inside OpenAI's own surfaces
 
-**Verdict:** The Codex app has become a genuinely strong parallel-coding environment -- local worktrees, scheduled tasks, and cloud delegation, bundled with every ChatGPT plan. What it cannot be is neutral: it runs one vendor's agent. Superset is the better fit if you want Codex as one option among many, running in ordinary worktrees on your own machines, with agent-agnostic orchestration, review, and automations around the whole fleet.
+**Verdict:** The Codex app has become a genuinely strong parallel-coding environment -- local worktrees, scheduled tasks, and cloud delegation, bundled with every ChatGPT plan. What it cannot be is neutral: it runs one vendor's agent. Superset is the better fit if you want Codex as one option among many, running on your own machines or in cloud workspaces, with agent-agnostic orchestration, review, and automations around the whole fleet.
 
 ---
 

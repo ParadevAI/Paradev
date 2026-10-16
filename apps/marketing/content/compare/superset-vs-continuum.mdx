@@ -2,7 +2,7 @@
 title: "Superset vs Continuum (2026): Agent Workbench, Mobile, and Pricing"
 description: "Compare Superset and Continuum for running coding agents in parallel: platforms, mobile apps, review, remote hosts, hosted inference, and pricing."
 date: 2026-10-07
-lastUpdated: 2026-10-08
+lastUpdated: 2026-10-15
 type: "1v1"
 competitors:
   - continuum
@@ -16,7 +16,7 @@ keywords:
   - worktree agent workspace
 ---
 
-Superset and Continuum both run coding agents such as Claude Code and Codex in isolated Git worktrees, with diff and PR review. Continuum is a free app that runs on Mac, Windows and Linux (beta), the web, and iPhone, with usage gauges, multi-account switching, and optional paid hosted inference. Superset is a desktop workspace for any CLI agent, with a PR pane, a browser pane with Design Mode, scheduled automations, and shared hosts with per-member access on Pro. Choose Continuum for cost tracking and the widest set of devices. Choose Superset for a review and team workflow built around pull requests.
+Superset and Continuum both run coding agents such as Claude Code and Codex in isolated Git worktrees, with diff and PR review. Continuum is a free app that runs on Mac, Windows and Linux (beta), the web, and iPhone, with usage gauges, multi-account switching, and optional paid hosted inference. Superset is a desktop workspace for any CLI agent, with a PR pane, a browser pane with Design Mode, usage meters with multi-account switching, scheduled automations, and shared hosts with per-member access on Pro. Choose Continuum for the widest set of devices, hosted inference, and team spend caps. Choose Superset for a review and team workflow built around pull requests.
 
 ## At a Glance
 
@@ -30,8 +30,8 @@ Superset and Continuum both run coding agents such as Claude Code and Codex in i
 | Review | Changes pane commits, pushes, and opens PRs; PR pane with checks, review threads, and merge | Plan review, diffs, PRs, and merge |
 | Browser | Browser pane with Design Mode: pick an element and send it to an agent | See their docs |
 | Scheduling | Pro automations with run history and retry | See their docs |
-| Remote hosts | Hosts connected through a relay, with access granted per member (Pro) | Enrolled devices, a VPS, or Continuum-provisioned cloud runners |
-| Usage tracking | See your provider's dashboard | Rate-limit gauges and spend by repo, provider, model, and day |
+| Remote hosts | Hosts connected through a relay, with access granted per member (Pro); cloud workspaces | Enrolled devices, a VPS, or Continuum-provisioned cloud runners |
+| Usage tracking | Quota meters for Claude Code, Codex, Grok, Antigravity, and OpenCode logins; more than one Claude Code or Codex account, with a default you pick; estimated token cost by agent, model, and workspace over 7, 30, or 90 days | Rate-limit gauges and spend by repo, provider, model, and day |
 | Model calls | Never proxied | Your own subscriptions and keys, or optional Continuum-hosted inference |
 | Pricing | Free; Pro $20 per user/month or $15 billed yearly; Enterprise custom | Free app; hosted inference plans from $25/month; teams from $25 per member/month |
 | License | Source-available, Elastic License 2.0 | No public source repository found; see their site |
@@ -52,9 +52,9 @@ Both handle diffs and pull requests. Continuum puts plan approval first: a sessi
 
 ## How do they handle models and cost?
 
-Continuum's main draw here is cost visibility. It shows rate-limit gauges per account, lets you stack two or three Claude or Codex subscriptions and switch between them, and tracks spend by repo, provider, model, and day. It also sells optional hosted inference: Plus at $25 per month, Max at $100 or $200, and Ultra at $500, each with a weekly usage budget. Its pricing page says new Plus sign-ups are paused.
+Both show usage and let you switch accounts. Continuum shows rate-limit gauges per account, lets you stack two or three Claude or Codex subscriptions and switch between them, and tracks spend by repo, provider, model, and day. It also sells optional hosted inference: Plus at $25 per month, Max at $100 or $200, and Ultra at $500, each with a weekly usage budget. Its pricing page says new Plus sign-ups are paused.
 
-Superset does not sell inference and never proxies model calls. Your agent talks to your provider directly, under your own account.
+Superset does not sell inference and never proxies model calls. Your agent talks to your provider directly, under your own account. Its [Usage](https://docs.superset.sh/usage) page shows quota meters for Claude Code, Codex, Grok, Antigravity, and OpenCode logins. You can add more than one Claude Code or Codex account and pick the default. When you switch, Superset offers to restart running agents on the new login, and the conversation resumes. Token cost history covers 13 agents, estimated at API list rates, by agent, model, and workspace. Superset does not switch accounts for you when a quota runs out, and it has no spend caps.
 
 ## What do teams get?
 
@@ -67,7 +67,7 @@ Continuum's app is free on every client when you bring your own keys. Hosted inf
 ## Choose Continuum if
 
 - You need Windows, a web app, or an Apple Watch client.
-- You want gauges and spend analytics across several Claude or Codex accounts.
+- You want spend tracking that includes Gemini or OpenRouter models, or weekly spend caps for a team.
 - You want to compare models by sending one message to several at once.
 - You may want hosted inference instead of your own keys.
 
@@ -81,7 +81,7 @@ Continuum's app is free on every client when you bring your own keys. Hosted inf
 
 ## Verdict
 
-Continuum covers more devices and gives better visibility into usage and spend, and its app is free. Superset is the better fit for Mac teams that review through pull requests and want automations and shared hosts in one desktop app. Run the same task with the same agent in each, then compare the review step. The [parallel-task guide](/blog/parallel-coding-agents-guide) has prompts you can use.
+Continuum covers more devices, adds hosted inference and team spend caps, and its app is free. Both track usage and switch between accounts. Superset is the better fit for Mac teams that review through pull requests and want automations and shared hosts in one desktop app. Run the same task with the same agent in each, then compare the review step. The [parallel-task guide](/blog/parallel-coding-agents-guide) has prompts you can use.
 
 ## Frequently Asked Questions
 

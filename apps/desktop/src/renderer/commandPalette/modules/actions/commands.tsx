@@ -17,15 +17,18 @@ import {
 	PanelLeftIcon,
 	PanelRightIcon,
 	RefreshCwIcon,
+	SparklesIcon,
 	StarIcon,
 	TriangleAlertIcon,
 	XIcon,
 } from "lucide-react";
+import { releaseNotesQuery } from "renderer/components/SidebarCardSlot";
 import { previewStarNagOnboardingToast } from "renderer/components/StarNagToast";
 import { env } from "renderer/env.renderer";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
 import { electronQueryClient } from "renderer/providers/ElectronTRPCProvider";
 import { useDesktopNoticePreviewStore } from "renderer/stores/desktop-notice-preview";
+import { useReleaseNotesCardStore } from "renderer/stores/release-notes-card";
 import { useRightSidebarToggleIntent } from "renderer/stores/right-sidebar-toggle-intent";
 import {
 	STAR_NAG_INITIAL_THRESHOLD,
@@ -352,6 +355,26 @@ export const actionsProvider: CommandProvider = {
 					// imported by useStarNagCard, which DashboardSidebar/WorkspaceSidebar
 					// import unconditionally, so it's already in the eager bundle.
 					run: () => previewStarNagOnboardingToast(),
+				},
+				{
+					id: "dev.previewReleaseNotesCard",
+					title: msg({ message: "Preview: release notes card" }),
+					section: "dev",
+					icon: SparklesIcon,
+					keywords: ["release", "notes", "changelog", "dev", "preview", "test"],
+					run: async () => {
+						const url = env.NEXT_PUBLIC_MARKETING_URL;
+						const data = await electronQueryClient
+							.fetchQuery(releaseNotesQuery)
+							.catch(() => null);
+						if (!data?.releases.length) {
+							toast.error(
+								i18n._(msg({ message: `No release notes at ${url}` })),
+							);
+							return;
+						}
+						useReleaseNotesCardStore.getState().setPreviewing(true);
+					},
 				},
 				{
 					id: "dev.resetStarNagState",

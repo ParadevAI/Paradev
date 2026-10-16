@@ -7,6 +7,7 @@ import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { PlainTextPlugin } from "@lexical/react/LexicalPlainTextPlugin";
 import { LexicalTypeaheadMenuPlugin } from "@lexical/react/LexicalTypeaheadMenuPlugin";
 import { Trans, useLingui } from "@lingui/react/macro";
+import { appendPastedText, parsePastedText } from "@superset/chat/core";
 import { getClipboardFiles } from "@superset/ui/lib/clipboard-files";
 import { cn } from "@superset/ui/utils";
 import {
@@ -54,6 +55,7 @@ import {
 	type MentionSection,
 	useMentionSources,
 } from "../../hooks/useMentionSources";
+import { usePastedTexts } from "../../hooks/usePastedTexts";
 import { MentionChipNode } from "../../nodes/mentionChipNode";
 import type {
 	ComposerActionContext,
@@ -122,6 +124,7 @@ export type ComposerBodyProps = Required<
 		| "defaultValue"
 		| "findChips"
 		| "onChange"
+		| "collapseLargePastes"
 		| "onSubmit"
 		| "onStop"
 		| "onMentionHighlight"
@@ -179,6 +182,7 @@ export function ComposerBody({
 	defaultValue,
 	findChips,
 	onChange,
+	collapseLargePastes,
 	onSubmit,
 	onStop,
 	onMentionHighlight,
@@ -195,6 +199,32 @@ export function ComposerBody({
 }: ComposerBodyProps) {
 	const { t } = useLingui();
 	const [editor] = useLexicalComposerContext();
+	const onChangeRef = useRef(onChange);
+	onChangeRef.current = onChange;
+	const pasted = usePastedTexts(editor, {
+		enabled: Boolean(collapseLargePastes),
+		onCardsChange: (cards, editorText) =>
+			onChangeRef.current?.(
+				appendPastedText(
+					editorText,
+					cards.map((card) => card.text),
+				),
+			),
+	});
+	const { cardsRef } = pasted;
+	const draftText = useCallback(
+		(editorText: string) =>
+			appendPastedText(
+				editorText,
+				cardsRef.current.map((card) => card.text),
+			),
+		[cardsRef],
+	);
+	const splitPastes = useCallback(
+		(text: string) =>
+			collapseLargePastes ? parsePastedText(text) : { text, pastes: [] },
+		[collapseLargePastes],
+	);
 	const focusAtEnd = useCallback(() => {
 		editor.update(() => $getRoot().selectEnd());
 		editor.focus();
@@ -202,7 +232,18 @@ export function ComposerBody({
 	useImperativeHandle(
 		ref,
 		() => ({
-			appendText(text: string) {
+			appendText(message: string) {
+				const { text, pastes } = splitPastes(message);
+				pasted.restore(pastes);
+				if (!text) {
+					onChangeRef.current?.(
+						draftText(
+							editor.getEditorState().read(() => $getRoot().getTextContent()),
+						),
+					);
+					editor.focus();
+					return;
+				}
 				editor.update(() => {
 					const root = $getRoot();
 					const separator = root.getTextContent().trim() === "" ? "" : "\n";
@@ -221,7 +262,7 @@ export function ComposerBody({
 				focusAtEnd();
 			},
 		}),
-		[editor, focusAtEnd],
+		[draftText, editor, focusAtEnd, pasted.restore, splitPastes],
 	);
 	const [attachments, setAttachments] = useState<PromptInputAttachment[]>([]);
 	const [isEmpty, setIsEmpty] = useState(true);
@@ -266,16 +307,18 @@ export function ComposerBody({
 	const seededValue = useRef<string | null>(null);
 	useEffect(() => {
 		if (seededValue.current !== null) return;
-		seededValue.current = defaultValue ?? "";
-		if (!defaultValue) return;
+		const { text, pastes } = splitPastes(defaultValue ?? "");
+		seededValue.current = text;
+		pasted.restore(pastes);
+		if (!text) return;
 		editor.update(() => {
 			const root = $getRoot();
 			if (root.getTextContent() !== "") return;
 			root.selectEnd();
 			const selection = $getSelection();
-			if ($isRangeSelection(selection)) selection.insertText(defaultValue);
+			if ($isRangeSelection(selection)) selection.insertText(text);
 		});
-	}, [defaultValue, editor]);
+	}, [defaultValue, editor, pasted.restore, splitPastes]);
 
 	// Chips come back once the finder can name them, which may be after the
 	// draft was read (a catalog still loading). Only the untouched draft is
@@ -297,15 +340,13 @@ export function ComposerBody({
 		});
 	}, [editor, findChips]);
 
-	const onChangeRef = useRef(onChange);
-	onChangeRef.current = onChange;
 	useEffect(
 		() =>
 			editor.registerUpdateListener(({ editorState }) => {
 				const text = editorState.read(() => $getRoot().getTextContent());
-				onChangeRef.current?.(text);
+				onChangeRef.current?.(draftText(text));
 			}),
-		[editor],
+		[draftText, editor],
 	);
 
 	const addFiles = (files: FileList | File[]) => {
@@ -449,13 +490,28 @@ export function ComposerBody({
 		const files = stateRef.current.attachments.map(
 			(attachment) => attachment.file,
 		);
-		if (!text && files.length === 0 && !stateRef.current.allowEmptySubmit) {
+		const pastedTexts = cardsRef.current.map((card) => card.text);
+		if (
+			!text &&
+			files.length === 0 &&
+			pastedTexts.length === 0 &&
+			!stateRef.current.allowEmptySubmit
+		) {
 			return;
 		}
-		if (stateRef.current.onSubmit?.({ text, files, mentions, steer }) === false)
+		if (
+			stateRef.current.onSubmit?.({
+				text,
+				files,
+				mentions,
+				pastedTexts,
+				steer,
+			}) === false
+		)
 			return;
 		historyNavigationRef.current?.reset();
 		if (!stateRef.current.clearOnSubmit) return;
+		pasted.clear();
 		editor.update(() => $getRoot().clear());
 		setAttachments((previous) => {
 			for (const attachment of previous) releaseAttachment(attachment);
@@ -712,7 +768,11 @@ export function ComposerBody({
 		return () => document.removeEventListener("pointerdown", onPointerDown);
 	}, []);
 
-	const canSend = allowEmptySubmit || !isEmpty || attachments.length > 0;
+	const canSend =
+		allowEmptySubmit ||
+		!isEmpty ||
+		attachments.length > 0 ||
+		pasted.cards.length > 0;
 
 	useEffect(() => {
 		if (autoFocus) focusAtEnd();
@@ -794,6 +854,9 @@ export function ComposerBody({
 			{header}
 			<AttachmentPills
 				attachments={attachments}
+				pastedTexts={pasted.cards}
+				onShowPastedText={pasted.showInTextField}
+				onRemovePastedText={pasted.remove}
 				onAttachmentClick={onAttachmentClick}
 				onPreviewError={(id) =>
 					setAttachments((previous) =>

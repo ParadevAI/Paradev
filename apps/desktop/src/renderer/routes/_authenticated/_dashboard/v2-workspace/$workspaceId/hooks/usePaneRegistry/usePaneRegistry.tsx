@@ -462,52 +462,52 @@ export function usePaneRegistry({
 							launcher={launcher}
 							workspaceId={workspaceId}
 						/>
-						<AgentSurfaceToggle
-							pane={{
-								kind: "terminal",
-								data: ctx.pane.data as TerminalPaneData,
-							}}
-							onChange={(surface, agent) =>
-								void agentSurface.switchSurface(ctx, surface, agent)
-							}
-							workspaceId={workspaceId}
-						/>
 						<V2NotificationStatusIndicator
 							sources={getV2NotificationSourcesForPane(ctx.pane)}
 						/>
 					</div>
 				),
 				renderHeaderExtras: (ctx: RendererContext<PaneViewerData>) => {
-					const { terminalId } = ctx.pane.data as TerminalPaneData;
+					const data = ctx.pane.data as TerminalPaneData;
+					const { terminalId } = data;
 					return (
-						<TerminalPaneHeaderExtras
-							workspaceId={workspaceId}
-							terminalId={terminalId}
-							terminalInstanceId={ctx.pane.id}
-							onNewShell={() =>
-								replaceEndedTerminal({
-									store: ctx.store,
-									paneId: ctx.pane.id,
-									terminalId,
-									create: () => launcher.create(),
-									dispose: (id) =>
-										workspaceTrpcUtils.client.terminal.killSession.mutate({
-											terminalId: id,
-											workspaceId,
-										}),
-									prepare: () =>
-										terminalRuntimeRegistry.prepareReplacement(
-											terminalId,
-											ctx.pane.id,
-											t({ message: "New shell" }),
-										),
-								})
-							}
-							onCreateNewAgentSession={createNewAgentSession}
-							onOpenSubagent={(data) =>
-								openSubagentPaneInStore(ctx.store, data)
-							}
-						/>
+						<div className="flex items-center gap-1">
+							<TerminalPaneHeaderExtras
+								workspaceId={workspaceId}
+								terminalId={terminalId}
+								terminalInstanceId={ctx.pane.id}
+								onNewShell={() =>
+									replaceEndedTerminal({
+										store: ctx.store,
+										paneId: ctx.pane.id,
+										terminalId,
+										create: () => launcher.create(),
+										dispose: (id) =>
+											workspaceTrpcUtils.client.terminal.killSession.mutate({
+												terminalId: id,
+												workspaceId,
+											}),
+										prepare: () =>
+											terminalRuntimeRegistry.prepareReplacement(
+												terminalId,
+												ctx.pane.id,
+												t({ message: "New shell" }),
+											),
+									})
+								}
+								onCreateNewAgentSession={createNewAgentSession}
+								onOpenSubagent={(subagent) =>
+									openSubagentPaneInStore(ctx.store, subagent)
+								}
+							/>
+							<AgentSurfaceToggle
+								pane={{ kind: "terminal", data }}
+								onChange={(surface, agent) =>
+									void agentSurface.switchSurface(ctx, surface, agent)
+								}
+								workspaceId={workspaceId}
+							/>
+						</div>
 					);
 				},
 				renderPane: (ctx: RendererContext<PaneViewerData>) => (

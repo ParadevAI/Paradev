@@ -2,6 +2,7 @@
 title: "Superset vs Factory (2026): Any-Agent Workspace vs Droid Platform"
 description: "Compare Superset and Factory for running coding agents in parallel. An agent-agnostic worktree workspace on your own machines vs Factory's Droid platform with a desktop app, Droid Computers, and automations."
 date: 2026-10-13
+lastUpdated: 2026-10-15
 type: "1v1"
 competitors:
   - factory
@@ -28,8 +29,8 @@ Superset and Factory both run many coding agents at once, in Git worktrees, with
 | **Agents** | Any CLI agent (Claude Code, Codex, Droid, Cursor Agent, OpenCode, Gemini CLI, Copilot, Muse Code, and more) | Droid and custom Droid subagents |
 | **Models** | Whatever each agent uses, on your own subscriptions | Claude, GPT, Gemini, Grok, and Factory's open-weight models through Droid; bring your own key in the CLI and desktop app |
 | **Isolation** | Git worktrees for local branch-based workspaces | Git worktrees on your machine or on a Droid Computer |
-| **Remote** | Remote Access: add a macOS or Linux machine as a host | Droid Computers: managed cloud VMs or your own machine through Factory's relay |
-| **Automation** | Scheduled automations, CLI, TypeScript SDK, MCP server, Slack bot | Automations from schedules, Slack, or GitHub; `droid exec`, SDKs, GitHub Action |
+| **Remote** | Remote Access: add a macOS or Linux machine as a host; cloud workspaces | Droid Computers: managed cloud VMs or your own machine through Factory's relay |
+| **Automation** | Scheduled automations, event triggers (GitHub, Slack, Linear, more), CLI, TypeScript SDK, MCP server, Slack bot | Automations from schedules, Slack, or GitHub; `droid exec`, SDKs, GitHub Action |
 | **Platforms** | macOS; experimental Linux AppImage; Windows unavailable; iPhone and iPad app | macOS and Windows desktop; CLI on macOS, Linux, Windows; web |
 | **Pricing** | Free tier; Pro $20 per user per month | Pro $20, Plus $100, Max $200 per month; Teams and Business; Enterprise with on-prem |
 
@@ -37,7 +38,7 @@ Superset and Factory both run many coding agents at once, in Git worktrees, with
 
 ## What Is Superset?
 
-Superset is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, Factory's Droid, Cursor Agent, OpenCode, Gemini CLI, GitHub Copilot, Grok Build, Muse Code, and any other CLI agent inside isolated Git worktrees with persistent terminal sessions, on your own subscriptions and keys, and never proxies model calls. Around that core it adds a Changes pane that commits, pushes, and opens PRs, a Pull Requests view with CI checks and line comments you can send to agents, a chat panel, an in-app browser with port detection and Design Mode, and an MCP server so agents and tools can create workspaces and launch agents. Remote Access adds a macOS or Linux machine as a host so workspaces keep running when your laptop sleeps, and scheduled automations, a CLI, a TypeScript SDK, and a Slack bot cover unattended work. The [iPhone and iPad app](/mobile) lets you check on sessions and review diffs away from your desk. Source-available under Elastic License 2.0 (ELv2), with an enterprise tier that adds SAML SSO, SCIM, audit logs, and a SOC 2 Type II report.
+Superset is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, Factory's Droid, Cursor Agent, OpenCode, Gemini CLI, GitHub Copilot, Grok Build, Muse Code, and any other CLI agent inside isolated Git worktrees with persistent terminal sessions, on your own subscriptions and keys, and never proxies model calls. Around that core it adds a Changes pane that commits, pushes, and opens PRs, a Pull Requests view with CI checks and line comments you can send to agents, a chat panel, an in-app browser with port detection and Design Mode, and an MCP server so agents and tools can create workspaces and launch agents. Remote Access adds a macOS or Linux machine as a host so workspaces keep running when your laptop sleeps, cloud workspaces run without your own computer connected, and automations on a schedule or event trigger, a CLI, a TypeScript SDK, and a Slack bot cover unattended work. The [iPhone and iPad app](/mobile) lets you check on sessions and review diffs away from your desk. Source-available under Elastic License 2.0 (ELv2), with an enterprise tier that adds SAML SSO, SCIM, audit logs, and a SOC 2 Type II report.
 
 ## What Is Factory?
 
@@ -55,7 +56,7 @@ Superset never proxies model calls: each agent runs on your own subscription or 
 
 ### Remote Machines
 
-Both run agents away from your laptop. Factory's Droid Computers include managed cloud VMs on paid plans, as well as your own machines through its relay. Superset's Remote Access adds machines you own as hosts and keeps workspaces running when your laptop sleeps; Superset does not host machines for you.
+Both run agents away from your laptop. Factory's Droid Computers include managed cloud VMs on paid plans, as well as your own machines through its relay. Superset's Remote Access adds machines you own as hosts and keeps workspaces running when your laptop sleeps, and Superset's cloud workspaces run in the cloud, reachable from desktop, iPhone, and iPad without your own computer connected.
 
 ### Platforms
 
@@ -85,7 +86,7 @@ Superset offers a free tier and Pro at $20 per user per month, or $15 per user p
 **Choose Factory if you:**
 
 - Want to standardize on one agent platform, Droid, across CLI, IDE, Slack, and Linear
-- Want managed cloud machines for your agents
+- Want Droid Computers: persistent cloud VMs that pause when idle, on the same relay as your own machines
 - Need Windows desktop support today
 - Need on-prem or air-gapped deployment
 
@@ -105,7 +106,7 @@ Factory's documentation describes its own agent, Droid, which can use Claude, GP
 
 ### What are Droid Computers?
 
-Persistent machines where Droids run: managed cloud VMs that pause when idle, or your own Linux, macOS, or Windows machine connected through Factory's relay. Superset's Remote Access adds your own machines as hosts.
+Persistent machines where Droids run: managed cloud VMs that pause when idle, or your own Linux, macOS, or Windows machine connected through Factory's relay. Superset's Remote Access adds your own machines as hosts, and its cloud workspaces run in the cloud.
 
 ### How much does Factory cost?
 

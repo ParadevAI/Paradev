@@ -1,5 +1,6 @@
+import { plural } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { userMessageText } from "@superset/chat/core";
+import { countLines, firstLine, userMessageText } from "@superset/chat/core";
 import type { UserMessage } from "@superset/chat/protocol";
 import {
 	QueueItem,
@@ -14,7 +15,13 @@ import {
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
-import { CornerDownRight, Ellipsis, ListEnd, Trash2 } from "lucide-react";
+import {
+	CornerDownRight,
+	Ellipsis,
+	FileTextIcon,
+	ListEnd,
+	Trash2,
+} from "lucide-react";
 import { parseAttachmentTags } from "../../../../../../utils/attachmentTags";
 
 export function QueuedPromptRow({
@@ -31,7 +38,9 @@ export function QueuedPromptRow({
 	onSteer: (id: string) => void;
 }) {
 	const { t } = useLingui();
-	const { text, attachments } = parseAttachmentTags(userMessageText(prompt));
+	const { text, attachments, pastedTexts } = parseAttachmentTags(
+		userMessageText(prompt),
+	);
 	const attachmentNames = [
 		...attachments.map(
 			(attachment) => attachment.path.split("/").pop() ?? attachment.path,
@@ -40,18 +49,36 @@ export function QueuedPromptRow({
 			content.type === "attachment" ? [content.name] : [],
 		),
 	];
+	const label =
+		text ||
+		(pastedTexts[0] ? firstLine(pastedTexts[0]) : attachmentNames.join(", "));
 
 	return (
 		<QueueItem
-			aria-label={text || attachmentNames.join(", ")}
+			aria-label={label}
 			className="flex-row items-center gap-2 pr-2 pl-3 outline-none focus-visible:bg-muted focus-visible:ring-1 focus-visible:ring-ring"
 			data-queue-row
 			tabIndex={actionable ? -1 : undefined}
 		>
 			<ListEnd className="size-4 shrink-0 text-muted-foreground" />
 			<QueueItemContent className="min-w-0 truncate text-foreground">
-				{text || attachmentNames.join(", ")}
+				{label}
 			</QueueItemContent>
+			{pastedTexts.map((pasted, index) => {
+				const lines = countLines(pasted);
+				return (
+					<span
+						className="flex shrink-0 items-center gap-1 text-muted-foreground text-xs"
+						// biome-ignore lint/suspicious/noArrayIndexKey: pastes have no identity beyond their order
+						key={index}
+					>
+						<FileTextIcon className="size-3.5" />
+						{t({
+							message: plural(lines, { one: "# line", other: "# lines" }),
+						})}
+					</span>
+				);
+			})}
 			{actionable && (
 				<QueueItemActions className="shrink-0 items-center">
 					<Tooltip>

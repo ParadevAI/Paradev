@@ -185,6 +185,10 @@
 			"types": "./src/dev-app-profile.ts",
 			"default": "./src/dev-app-profile.ts"
 		},
+		"./release-notes": {
+			"types": "./src/release-notes.ts",
+			"default": "./src/release-notes.ts"
+		},
 		"./desktop-notices": {
 			"types": "./src/desktop-notices.ts",
 			"default": "./src/desktop-notices.ts"

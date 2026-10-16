@@ -55,7 +55,7 @@ export const PRODUCT_SECTIONS: NavSection[] = [
 			{
 				href: "/automations",
 				label: <Trans>Automations</Trans>,
-				description: <Trans>Agents on a schedule</Trans>,
+				description: <Trans>Agents on a schedule or trigger</Trans>,
 			},
 			{
 				href: "/browser",

@@ -2,7 +2,7 @@
 title: "Scheduled Coding Agents in 2026: Nightly, Weekly, and Team Runs You Review"
 description: "How to run coding agents on a schedule and review their work in the morning: GitHub Actions, Claude Code Routines, Codex, Cursor, and Superset Automations."
 date: 2026-10-07
-lastUpdated: 2026-10-14
+lastUpdated: 2026-10-15
 type: "roundup"
 competitors:
   - github-actions
@@ -87,7 +87,7 @@ superset automations create --name "Nightly audit" \
 superset automations run <id>   # fire once now to check the prompt
 ```
 
-One automation can have several triggers, for example weekdays at 9:00 and Fridays at 17:00. Pick **No project** (session mode) for jobs that do not need a repository. Event triggers from Slack, Linear, GitHub, Sentry, and other services are experimental and rolling out per provider.
+One automation can have several triggers, for example weekdays at 9:00 and Fridays at 17:00. Pick **No project** (session mode) for jobs that do not need a repository. Event triggers from Slack, Linear, GitHub, Sentry, and other services start a run when something happens in those tools.
 
 ## How can I schedule a coding agent to investigate flaky tests each week and leave a reviewable proposed fix?
 

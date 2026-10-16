@@ -2,7 +2,7 @@
 title: "Superset vs cmux (2026): Agent Terminal vs Agent Orchestrator"
 description: "Compare Superset and cmux for running AI coding agents. See how a native terminal for agents differs from a Git worktree orchestration workspace."
 date: 2026-07-13
-lastUpdated: 2026-10-08
+lastUpdated: 2026-10-15
 type: "1v1"
 competitors:
   - cmux
@@ -55,7 +55,7 @@ Because cmux is terminal-native, reviewing and merging happens in the agent itse
 
 ### Beyond the Terminal
 
-Superset extends past a single machine with remote and cloud workspaces, scheduled automations with a TypeScript SDK, and CLI and MCP server surfaces. cmux is focused on being an excellent native terminal on macOS, with an embedded browser and scripting API for driving sessions. They can even be complementary: some developers will keep cmux as their daily agent terminal and reach for a worktree orchestrator when multiple agents need to touch the same repo.
+Superset extends past a single machine with Remote Access hosts and cloud workspaces, scheduled automations with a TypeScript SDK, and CLI and MCP server surfaces. Both have an embedded browser you can drive from scripts: Superset's in-app browser takes `superset browser` commands, and its CLI, SDK, and MCP server drive workspaces and terminals. cmux is focused on being an excellent native terminal on macOS, with a socket API for driving sessions. They can even be complementary: some developers will keep cmux as their daily agent terminal and reach for a worktree orchestrator when multiple agents need to touch the same repo.
 
 ### Platform
 
@@ -82,7 +82,7 @@ Superset offers a free tier and Pro at $20/seat/month. cmux is free and open sou
 
 - Want a fast, native macOS terminal purpose-built for agent sessions
 - Mostly run one agent (or manage isolation yourself) and value terminal polish
-- Like an embedded browser and a scriptable API in your terminal
+- Want a GPU-accelerated native terminal that shows subagents as their own panes and marks panes that need attention
 - Prefer a fully open-source GPL tool
 
 **Verdict:** These tools are not really substitutes. cmux is the best fit if your goal is a beautiful native terminal that keeps many agent sessions organized. Superset is the better fit if your goal is running multiple agents on the same repository in separate working directories, with review and orchestration built in. Many developers will end up using a terminal like cmux alongside an orchestrator like Superset.

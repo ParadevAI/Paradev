@@ -6,7 +6,7 @@ import type { TRPCLink } from "@trpc/client";
 const reactActGlobal = globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean };
 const previousActEnvironment = reactActGlobal.IS_REACT_ACT_ENVIRONMENT;
 reactActGlobal.IS_REACT_ACT_ENVIRONMENT = true;
-const { cleanup, fireEvent, render, waitFor } = await import(
+const { cleanup, fireEvent, render, waitFor, within } = await import(
 	"@testing-library/react"
 );
 const { QueryClient } = await import("@tanstack/react-query");
@@ -17,6 +17,10 @@ const { electronTrpc } = await import("renderer/lib/electron-trpc");
 const { ChatPaneActionsProvider } = await import(
 	"../../../../providers/ChatPaneActionsProvider"
 );
+const { ChatImageGalleryProvider } = await import(
+	"../../providers/ChatImageGalleryProvider"
+);
+const { galleryImageId } = await import("../../utils/galleryImages");
 const { AttachmentImage } = await import("./AttachmentImage");
 
 afterEach(cleanup);
@@ -25,6 +29,13 @@ afterAll(() => {
 });
 
 const THUMBNAIL_CAP = 5 * 1024 * 1024;
+const PATH = ".superset/attachments/big.png";
+const image = {
+	id: galleryImageId("m1", PATH),
+	path: PATH,
+	mimeType: "image/png",
+	filename: "big.png",
+};
 
 function read(exceededLimit: boolean) {
 	return {
@@ -36,13 +47,16 @@ function read(exceededLimit: boolean) {
 	};
 }
 
-function renderImage(readFile: (maxBytes: number) => ReturnType<typeof read>) {
+function renderImage(
+	readFile: (maxBytes: number) => ReturnType<typeof read>,
+	getWorkspace: () => unknown = () => ({ worktreePath: "/work" }),
+) {
 	const link: TRPCLink<AppRouter> = () => (call) =>
 		observable((observer) => {
 			try {
 				const data =
 					call.op.path === "workspace.get"
-						? { worktreePath: "/work" }
+						? getWorkspace()
 						: readFile((call.op.input as { maxBytes: number }).maxBytes);
 				observer.next({ result: { data } });
 				observer.complete();
@@ -57,13 +71,14 @@ function renderImage(readFile: (maxBytes: number) => ReturnType<typeof read>) {
 		>
 			<workspaceTrpc.Provider
 				client={workspaceTrpc.createClient({ links: [link] })}
-				queryClient={new QueryClient()}
+				queryClient={
+					new QueryClient({ defaultOptions: { queries: { retry: false } } })
+				}
 			>
 				<ChatPaneActionsProvider workspaceId="ws">
-					<AttachmentImage
-						path=".superset/attachments/big.png"
-						type="image/png"
-					/>
+					<ChatImageGalleryProvider images={[image]}>
+						<AttachmentImage owner="m1" path={PATH} type="image/png" />
+					</ChatImageGalleryProvider>
 				</ChatPaneActionsProvider>
 			</workspaceTrpc.Provider>
 		</electronTrpc.Provider>,
@@ -75,8 +90,8 @@ const tile = { name: "Preview big.png" };
 describe("AttachmentImage", () => {
 	test("a file under the thumbnail cap renders as a data URL thumbnail", async () => {
 		const view = renderImage(() => read(false));
-		const image = await waitFor(() => view.getByAltText("big.png"));
-		expect(image.getAttribute("src")).toBe(
+		const thumbnail = await waitFor(() => view.getByAltText("big.png"));
+		expect(thumbnail.getAttribute("src")).toBe(
 			"data:image/png;base64,iVBORw0KGgo=",
 		);
 	});
@@ -89,21 +104,40 @@ describe("AttachmentImage", () => {
 		expect(button.querySelector("img")).toBeNull();
 
 		fireEvent.click(button);
-		await waitFor(() => view.getByRole("button", { name: "Close preview" }));
-		expect(view.getByAltText("big.png").getAttribute("src")).toBe(
-			"data:image/png;base64,iVBORw0KGgo=",
+		const dialog = await waitFor(() => view.getByRole("dialog"));
+		await waitFor(() =>
+			expect(within(dialog).getByRole("img").getAttribute("src")).toBe(
+				"data:image/png;base64,iVBORw0KGgo=",
+			),
 		);
 	});
 
-	test("a failed read of a file over the cap falls back to the file name", async () => {
+	test("a failed workspace lookup falls back to the file name", async () => {
+		const view = renderImage(
+			() => read(false),
+			() => {
+				throw new Error("no workspace");
+			},
+		);
+		await waitFor(() => view.getByText("big.png"));
+		expect(view.queryByRole("button", tile)).toBeNull();
+	});
+
+	test("a workspace without a worktree path falls back to the file name", async () => {
+		const view = renderImage(
+			() => read(false),
+			() => ({ worktreePath: null }),
+		);
+		await waitFor(() => view.getByText("big.png"));
+	});
+
+	test("a failed read of a file over the cap says so in the overlay", async () => {
 		const view = renderImage((maxBytes) => {
 			if (maxBytes > THUMBNAIL_CAP) throw new Error("read failed");
 			return read(true);
 		});
 		fireEvent.click(await waitFor(() => view.getByRole("button", tile)));
-		await waitFor(() =>
-			expect(view.queryAllByRole("button", tile).length).toBe(0),
-		);
-		expect(view.getByText("big.png")).toBeTruthy();
+		await waitFor(() => view.getByText("Couldn't load big.png"));
+		expect(view.getByRole("button", tile)).toBeTruthy();
 	});
 });

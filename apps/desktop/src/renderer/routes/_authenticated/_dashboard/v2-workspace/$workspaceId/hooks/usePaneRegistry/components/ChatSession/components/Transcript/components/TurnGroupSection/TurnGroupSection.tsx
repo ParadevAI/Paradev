@@ -4,7 +4,6 @@ import type {
 	ApprovalRequest,
 	AvailableCommand,
 	Decision,
-	ImageAttachment,
 	Item,
 	ToolCall,
 	UserMessage,
@@ -15,7 +14,7 @@ import type { ChatForkTarget } from "../../../../types";
 import type { PageLink } from "../../../../utils/pageLinks";
 import { PageLinkCard } from "../../../PageLinkCard";
 import type { TranscriptRow } from "../../utils/transcriptRows";
-import { AttachmentRail } from "../AttachmentRail";
+import { AttachmentRail, type RailImage } from "../AttachmentRail";
 import { ItemRow } from "./components/ItemRow";
 import { ToolRunRow } from "./components/ToolRunRow";
 import { TurnStatusRow } from "./components/TurnStatusRow";
@@ -42,9 +41,11 @@ function pageCards(pages: readonly PageLink[] | undefined): ReactNode {
 	));
 }
 
-function toolImages(tools: readonly ToolCall[]): ImageAttachment[] {
+function toolImages(tools: readonly ToolCall[]): RailImage[] {
 	return tools.flatMap((tool) =>
-		(tool.attachments ?? []).filter(isImageAttachment),
+		(tool.attachments ?? [])
+			.filter(isImageAttachment)
+			.map((image) => ({ owner: tool.id, image })),
 	);
 }
 

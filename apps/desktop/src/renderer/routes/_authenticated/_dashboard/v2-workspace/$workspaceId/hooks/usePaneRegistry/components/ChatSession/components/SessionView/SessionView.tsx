@@ -164,7 +164,7 @@ export function SessionView({
 				)
 				.map((entry) => contentText(entry.content))
 				.filter(Boolean);
-			if (unsent.length > 0) prependToDraft(draftKey, unsent.join("\n\n"));
+			if (unsent.length > 0) prependToDraft(draftKey, unsent);
 		},
 		[draftKey],
 	);

@@ -15,6 +15,7 @@ import {
 	SidebarCardSlot,
 	useHiringCard,
 	usePaymentFailedCard,
+	useReleaseNotesCard,
 	useStarNagCard,
 } from "renderer/components/SidebarCardSlot";
 import { UpdatesPill } from "renderer/components/UpdatesPill";
@@ -31,6 +32,7 @@ import {
 import { isInCloudSidebar } from "renderer/routes/_authenticated/_dashboard/utils/buildCloudSidebar";
 import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
+import { useReleaseNotesCardStore } from "renderer/stores/release-notes-card";
 import { useSidebarSectionsCollapseStore } from "renderer/stores/sidebar-sections-collapse";
 import { useV2NotificationStore } from "renderer/stores/v2-notifications";
 import {
@@ -454,6 +456,10 @@ export function DashboardSidebar({
 		projectName: activeV2Project?.name ?? null,
 	});
 	const gettingStartedCard = useGettingStartedCard();
+	const releaseNotesCard = useReleaseNotesCard();
+	const isPreviewingReleaseNotes = useReleaseNotesCardStore(
+		(s) => s.isPreviewing,
+	);
 	const starNagCard = useStarNagCard({ isCollapsed });
 	const hiringCard = useHiringCard({ surface: "v2" });
 
@@ -585,9 +591,11 @@ export function DashboardSidebar({
 										<SidebarCardSlot
 											isCollapsed={isCollapsed}
 											entries={[
+												isPreviewingReleaseNotes ? releaseNotesCard : null,
 												paymentFailedCard,
 												setupScriptCard,
 												gettingStartedCard,
+												releaseNotesCard,
 												starNagCard,
 												hiringCard,
 											]}

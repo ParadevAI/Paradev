@@ -1,5 +1,9 @@
 import { Trans } from "@lingui/react/macro";
-import { readBookkeeping, userMessageText } from "@superset/chat/core";
+import {
+	parsePastedText,
+	readBookkeeping,
+	userMessageText,
+} from "@superset/chat/core";
 import type { UserContent } from "@superset/chat/protocol";
 import { CircleAlert } from "lucide-react-native";
 import { Pressable, ScrollView, View } from "react-native";
@@ -9,6 +13,7 @@ import { SystemLine } from "../SystemLine";
 import { AttachmentFileCard } from "./components/AttachmentFileCard";
 import { AttachmentThumbnail } from "./components/AttachmentThumbnail";
 import { OutgoingBubble } from "./components/OutgoingBubble";
+import { PastedTextCard } from "./components/PastedTextCard";
 
 /** What the composer's native viewer can decode; UIImage has no SVG. */
 function isViewableImage(mimeType: string): boolean {
@@ -32,13 +37,15 @@ export function UserMessageBubble({
 	hostUrl,
 	pending,
 }: UserMessageBubbleProps) {
-	const text = userMessageText({ content });
-	const note = pending ? null : readBookkeeping(harness, text);
+	const raw = userMessageText({ content });
+	const note = pending ? null : readBookkeeping(harness, raw);
 	if (note) return <SystemLine>{note.label}</SystemLine>;
 
+	const { text, pastes } = parsePastedText(raw);
 	const attachments = content.flatMap((part) =>
 		part.type === "attachment" ? [part] : [],
 	);
+	const wide = attachments.length > 0 || pastes.length > 0;
 	const failed = pending?.failed === true;
 	return (
 		<View className="items-end gap-1">
@@ -53,11 +60,7 @@ export function UserMessageBubble({
 					</Pressable>
 				) : null}
 				<OutgoingBubble
-					className={
-						attachments.length > 0
-							? "w-[82%] gap-2 px-[13px] pt-[11px]"
-							: undefined
-					}
+					className={wide ? "w-[82%] gap-2 px-[13px] pt-[11px]" : undefined}
 					dimmed={pending !== undefined}
 				>
 					{attachments.length > 0 ? (
@@ -87,6 +90,10 @@ export function UserMessageBubble({
 							)}
 						</ScrollView>
 					) : null}
+					{pastes.map((paste, index) => (
+						// biome-ignore lint/suspicious/noArrayIndexKey: pastes have no identity beyond their order
+						<PastedTextCard key={index} text={paste} />
+					))}
 					{text ? (
 						<Text
 							className="text-foreground text-[17px] leading-[24px]"

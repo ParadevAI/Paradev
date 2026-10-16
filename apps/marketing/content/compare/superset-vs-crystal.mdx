@@ -2,7 +2,7 @@
 title: "Superset vs Crystal (2026): Comparing Parallel Claude Code Workspaces"
 description: "Compare Superset and Crystal (now Nimbalyst) for running Claude Code and Codex in parallel Git worktrees. See how agent breadth, remote workflows, and scope differ."
 date: 2026-07-13
-lastUpdated: 2026-10-14
+lastUpdated: 2026-10-15
 type: "1v1"
 competitors:
   - crystal
@@ -29,7 +29,7 @@ Note: Crystal's repository says it was deprecated in February 2026 and replaced 
 | **Agent support** | Any CLI agent (Claude Code, Codex, OpenCode, Cursor, Gemini, Mistral Vibe, and more) | Claude Code and Codex |
 | **Isolation** | Git worktrees for local branch-based workspaces | Git worktree per session |
 | **Review tooling** | Built-in diff/file editor; commit, push, and open PRs; PR pane with checks and review threads | In-app diff review, per-iteration commits, rebase/squash/merge |
-| **Remote / cloud** | Remote and cloud workspaces across your network devices | Local desktop |
+| **Remote / cloud** | Remote hosts through Remote Access, plus cloud workspaces | Local desktop |
 | **Automation** | Automations: scheduled sessions, TypeScript SDK, Slack bot | Focused on interactive sessions |
 | **Platform** | Desktop (macOS; experimental Linux AppImage; Windows unavailable), iPhone and iPad app, CLI, MCP server | Desktop (macOS, Windows, Linux) |
 | **License** | Source-available (ELv2) | Open source (MIT) |
@@ -38,7 +38,7 @@ Note: Crystal's repository says it was deprecated in February 2026 and replaced 
 
 ## What Is Superset?
 
-Superset is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs across your own network devices through remote and cloud workspaces and can schedule agent sessions as automations. You can review inside Superset or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
+Superset is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on your other machines through Remote Access and in cloud workspaces and can schedule agent sessions as automations. You can review inside Superset or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
 
 ## What Is Crystal?
 
@@ -56,7 +56,7 @@ Both apps make a Git worktree per session the unit of work and both include stro
 
 ### Reach and Automation
 
-Superset extends past the local desktop with remote and cloud workspaces on your own network devices, and it can schedule agent sessions as automations with a TypeScript SDK and a Slack bot. Crystal is a local, interactive desktop app. If you want unattended or scheduled runs, or work that moves across machines, Superset covers more of it.
+Superset extends past the local desktop with Remote Access to your other machines and cloud workspaces, and it can schedule agent sessions as automations with a TypeScript SDK and a Slack bot. Crystal is a local, interactive desktop app. If you want unattended or scheduled runs, or work that moves across machines, Superset covers more of it.
 
 ### Project Status
 
