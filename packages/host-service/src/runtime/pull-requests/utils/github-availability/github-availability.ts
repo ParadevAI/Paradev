@@ -127,34 +127,39 @@ function firstLine(text: string): string {
  * request and socket addresses (`Get "https://...": read tcp a->b: read:
  * connection reset by peer`), which hide the part that says what went wrong.
  */
+function cleanFailureLine(line: string): string {
+	const cause = line.replace(/^[A-Za-z]+ "[^"]*": /, "");
+	const socketError = /^(?:read|write|dial) (?:tcp|udp)\b.*: (.+)$/.exec(cause);
+	return (socketError?.[1] ?? cause).slice(0, MAX_DETAIL_LENGTH);
+}
+
 export function describeGitHubFailure(error: unknown): string {
 	let current: unknown = error;
-	let fallback = "";
+	// The innermost message is the specific one ("fetch failed" wraps
+	// "getaddrinfo ENOTFOUND api.github.com").
+	let message = "";
 	for (let depth = 0; depth < MAX_CAUSE_DEPTH && current; depth++) {
 		if (typeof current !== "object") break;
-		const { killed, signal, stderr, message } = current as {
+		const fields = current as {
 			killed?: unknown;
 			signal?: unknown;
 			stderr?: unknown;
 			message?: unknown;
 		};
-		if (killed === true && typeof signal === "string") {
+		if (fields.killed === true && typeof fields.signal === "string") {
 			return "gh did not answer before its timeout";
 		}
-		const line = firstLine(typeof stderr === "string" ? stderr : "");
-		if (line) {
-			const cause = line.replace(/^[A-Za-z]+ "[^"]*": /, "");
-			const socketError = /^(?:read|write|dial) (?:tcp|udp)\b.*: (.+)$/.exec(
-				cause,
-			);
-			return (socketError?.[1] ?? cause).slice(0, MAX_DETAIL_LENGTH);
-		}
-		if (!fallback && typeof message === "string") {
-			fallback = firstLine(message);
-		}
+		const stderrLine = firstLine(
+			typeof fields.stderr === "string" ? fields.stderr : "",
+		);
+		if (stderrLine) return cleanFailureLine(stderrLine);
+		const messageLine = firstLine(
+			typeof fields.message === "string" ? fields.message : "",
+		);
+		if (messageLine) message = messageLine;
 		current = (current as { cause?: unknown }).cause;
 	}
-	return (fallback || String(error)).slice(0, MAX_DETAIL_LENGTH);
+	return cleanFailureLine(message || String(error));
 }
 
 const HOLD_DESCRIPTION: Record<GitHubHoldReason, string> = {

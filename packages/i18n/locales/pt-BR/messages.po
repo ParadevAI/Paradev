@@ -13661,7 +13661,7 @@ msgid "Reset Zoom"
 msgstr "Redefinir o zoom"
 
 msgid "Resets at {until}"
-msgstr "Redefine às {until}"
+msgstr "Zera às {until}"
 
 msgid "Resets in {countdown} · {absolute}"
 msgstr "Zera em {countdown} · {absolute}"

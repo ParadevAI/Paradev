@@ -114,7 +114,7 @@ describe("describeGitHubFailure", () => {
 		).toBe("error connecting to api.github.com");
 	});
 
-	test("names a gh timeout and reads a Node error through its cause", () => {
+	test("names a gh timeout and prefers the innermost cause's message", () => {
 		expect(
 			describeGitHubFailure(
 				Object.assign(new Error("Command failed: gh api"), {
@@ -133,7 +133,20 @@ describe("describeGitHubFailure", () => {
 					),
 				}),
 			),
-		).toBe("fetch failed");
+		).toBe("getaddrinfo ENOTFOUND api.github.com");
+	});
+
+	test("cleans an error message the same way when there is no stderr", () => {
+		expect(
+			describeGitHubFailure(
+				Object.assign(
+					new Error(
+						'Get "https://api.github.com/repos/o/r": dial tcp 140.82.114.6:443: connect: connection refused',
+					),
+					{ code: "ECONNREFUSED" },
+				),
+			),
+		).toBe("connection refused");
 	});
 });
 
