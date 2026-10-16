@@ -2,25 +2,22 @@ import type { MessageDescriptor } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { i18n } from "@superset/i18n";
-import { rawErrorMessage } from "@superset/i18n/errors";
 import { COMPANY } from "@superset/shared/constants";
 import { Badge } from "@superset/ui/badge";
 import { Button } from "@superset/ui/button";
-import { toast } from "@superset/ui/sonner";
 import { Switch } from "@superset/ui/switch";
 import { cn } from "@superset/ui/utils";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { differenceInDays, format } from "date-fns";
 import { Fragment, useState } from "react";
 import { HiArrowLeft, HiArrowUpRight, HiCheck } from "react-icons/hi2";
-import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { env } from "renderer/env.renderer";
 import { useCurrentPlan } from "renderer/hooks/useCurrentPlan";
 import { track } from "renderer/lib/analytics";
-import { authClient } from "renderer/lib/auth-client";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import type { PlanTier } from "../constants";
+import { useBillingActions } from "../hooks/useBillingActions";
 
 export const Route = createFileRoute("/_authenticated/settings/billing/plans/")(
 	{
@@ -333,15 +330,9 @@ function PlansPage() {
 	// no interval to read.
 	const { t } = useLingui();
 	const [manualIsYearly, setManualIsYearly] = useState<boolean | null>(null);
-	const [isUpgrading, setIsUpgrading] = useState(false);
-	const [isCanceling, setIsCanceling] = useState(false);
-	const [isRestoring, setIsRestoring] = useState(false);
+	const { upgrade, cancel, restore, isUpgrading, isCanceling, isRestoring } =
+		useBillingActions();
 	const openUrl = electronTrpc.external.openUrl.useMutation();
-	const utils = cloudTrpc.useUtils();
-
-	// Per-window org: the shared session holds one org for the whole app, so
-	// a second window on another org would render the first window's org here.
-	const activeOrgId = useActiveOrganizationId();
 
 	const { plan: currentPlan, isReady: planResolved, activePlan } = useCurrentPlan();
 	const cancelAt = activePlan?.cancelAt;
@@ -388,101 +379,24 @@ function PlansPage() {
 			return;
 		}
 
-		if (!activeOrgId) return;
-
 		if (action === "downgrade") {
-			setIsCanceling(true);
-			try {
-				await authClient.subscription.cancel(
-					{
-						referenceId: activeOrgId,
-						returnUrl: env.NEXT_PUBLIC_WEB_URL,
-					},
-					{
-						onSuccess: (ctx) => {
-							if (ctx.data?.url) {
-								window.open(ctx.data.url, "_blank");
-							}
-						},
-					},
-				);
-			} finally {
-				setIsCanceling(false);
-				await utils.billing.activePlan.invalidate();
-			}
+			await cancel();
 			return;
 		}
 
 		if (action === "restore") {
-			setIsRestoring(true);
-			try {
-				await authClient.subscription.restore({
-					referenceId: activeOrgId,
-				});
-				toast.success(
-					t({
-						message: "Plan restored",
-					}),
-				);
-			} finally {
-				setIsRestoring(false);
-				await utils.billing.activePlan.invalidate();
-			}
+			await restore();
 			return;
 		}
 
 		if (memberCount === undefined) return;
 
-		// The actual intent-to-pay step — this is what mints the Stripe Checkout
-		// session. `paywall_upgrade_clicked` only navigates to this page.
-		// `previous_plan` separates a new conversion (`free`) from an existing
-		// subscriber changing billing interval (`pro`), which shares this action.
-		const checkoutProperties = {
-			plan: "pro",
+		await upgrade({
 			annual: isYearly,
 			seats: memberCount,
-			previous_plan: currentPlan,
 			source: "billing_plans",
-		};
-		track("checkout_started", checkoutProperties);
-
-		setIsUpgrading(true);
-		try {
-			await authClient.subscription.upgrade(
-				{
-					plan: "pro",
-					referenceId: activeOrgId,
-					annual: isYearly,
-					seats: memberCount,
-					successUrl: `${env.NEXT_PUBLIC_WEB_URL}/settings/billing?success=true`,
-					cancelUrl: env.NEXT_PUBLIC_WEB_URL,
-					returnUrl: env.NEXT_PUBLIC_WEB_URL,
-					disableRedirect: true,
-				},
-				{
-					onSuccess: (ctx) => {
-						if (ctx.data?.url) {
-							// Last thing we can see client-side; everything after this
-							// happens on Stripe and comes back through the webhook.
-							track("checkout_redirected", checkoutProperties);
-							window.open(ctx.data.url, "_blank");
-						}
-					},
-					// Better Auth resolves rather than throws, so without this hook a
-					// failed checkout is invisible: the button just resets.
-					onError: (ctx) => {
-						track("checkout_failed", {
-							...checkoutProperties,
-							status: ctx.response?.status,
-							error: rawErrorMessage(ctx.error),
-						});
-					},
-				},
-			);
-		} finally {
-			setIsUpgrading(false);
-			await utils.billing.activePlan.invalidate();
-		}
+			returnUrl: env.NEXT_PUBLIC_WEB_URL,
+		});
 	};
 
 	const renderComparisonValue = (value: ComparisonValue) => {

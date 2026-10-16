@@ -9,7 +9,10 @@ import { CgLaptop } from "react-icons/cg";
 import { HiCheck, HiChevronUpDown } from "react-icons/hi2";
 import { LuGitFork } from "react-icons/lu";
 import type { WorkspaceCheckout } from "renderer/stores/new-workspace-draft";
-import { FormPickerTrigger } from "../FormPickerTrigger";
+import {
+	FORM_PICKER_MENU_CLASS,
+	FormPickerTrigger,
+} from "../FormPickerTrigger";
 
 interface CheckoutPickerPillProps {
 	checkout: WorkspaceCheckout;
@@ -50,7 +53,10 @@ export function CheckoutPickerPill({
 					<HiChevronUpDown className="size-3 shrink-0" />
 				</FormPickerTrigger>
 			</DropdownMenuTrigger>
-			<DropdownMenuContent align="start" className="w-72">
+			<DropdownMenuContent
+				align="start"
+				className={`w-72 ${FORM_PICKER_MENU_CLASS}`}
+			>
 				<DropdownMenuItem
 					onSelect={() => onSelectCheckout("worktree")}
 					className="items-start gap-2"

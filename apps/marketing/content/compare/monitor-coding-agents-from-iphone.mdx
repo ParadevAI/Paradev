@@ -2,6 +2,7 @@
 title: "How to Monitor Claude Code and Codex From Your iPhone in 2026"
 description: "Check progress, answer prompts, and send follow-ups to Claude Code, Codex, and other agents from an iPhone. Remote Control, SSH and tmux, and Superset compared."
 date: 2026-10-07
+lastUpdated: 2026-10-14
 type: "roundup"
 competitors:
   - claude-code
@@ -16,31 +17,44 @@ keywords:
   - coding agent phone notifications
   - send follow-up instructions to coding agent from phone
   - tailscale ssh tmux iphone
+  - claude code remote control superset
 ---
 
-To check on a coding agent from your iPhone, you have three realistic options. Use the agent's own app (Claude Code Remote Control in the Claude app, or Codex in the ChatGPT app). Use Tailscale, SSH, and tmux with an iOS terminal such as Blink Shell or Termius. Or use a workspace app with an iPhone client, such as Superset, which shows Claude Code, Codex, and other terminal agents on all your machines in one list.
+To check on coding agents from your iPhone, use [Superset for iPhone and iPad](/mobile). It shows every agent you run in Superset (Claude Code, Codex, and other terminal agents) on all your machines in one list. You can answer prompts, send follow-ups, and review diffs, and while the app is open, a Lock Screen Live Activity shows which agents need you. It does not update in the background yet.
 
-The vendor apps are the easiest way to get push notifications for one agent. SSH and tmux give you a full shell. Superset fits when you run more than one agent, or more than one machine, and want one phone app for all of them, with a Lock Screen card that shows which agents need you.
+Claude Code's own Remote Control also works inside Superset. Superset starts the real `claude` CLI in a real terminal, so `/remote-control` in a Superset workspace connects that session to the Claude app as usual. Use Superset when you run several agents or several machines and want one app for all of them. Use Remote Control when you want the Claude app's push notifications for one Claude Code session. You can use both on the same session.
+
+The other common options are Codex in the ChatGPT app, and Tailscale, SSH, and tmux with an iOS terminal such as Blink Shell or Termius.
 
 ## Quick comparison
 
 | Option | Agents | Several machines | Push to phone | Send follow-ups | Needs your computer on |
 |---|---|---|---|---|---|
-| Claude Code Remote Control | Claude Code only | Run it on each machine | Yes, set in `/config` | Yes | Yes |
+| Superset for iPhone | Claude Code, Codex, and other agents launched in Superset | Yes, every host you can access | Lock Screen Live Activity | Yes | Yes, for host workspaces |
+| Claude Code Remote Control | Claude Code only, including sessions in Superset | Run it on each machine | Yes, set in `/config` | Yes | Yes |
 | Codex in the ChatGPT app | Codex only | Connected computers or Codex Cloud | Not described in OpenAI's mobile docs | Yes | Yes, for local tasks |
 | Tailscale + SSH + tmux | Any terminal agent | Yes, one SSH session at a time | No, unless you add a hook | Yes, by typing into the terminal | Yes |
-| Superset for iPhone | Claude Code, Codex, and other agents launched in Superset | Yes, every host you can access | Lock Screen Live Activity today; push notifications coming | Yes | Yes, for host workspaces |
 | GitHub Copilot coding agent | Copilot | Runs on GitHub | GitHub notifications | Steer on github.com | No |
 
 ## I run Claude Code on my computer. How do I check progress from my iPhone?
 
-If you only use Claude Code, start with Claude Code Remote Control. It connects the Claude iPhone app to a session that keeps running on your machine, so your files, MCP servers, and project configuration stay local.
+If you only use Claude Code, Claude Code Remote Control is built in. It connects the Claude iPhone app to a session that keeps running on your machine, so your files, MCP servers, and project configuration stay local.
 
 - In a running session, type `/remote-control` (or `/rc`). Scan the QR code with the Claude app.
 - For several sessions from one process, run `claude remote-control` in server mode. Add `--spawn worktree` to give each new session its own git worktree.
 - It needs a Pro, Max, Team, or Enterprise plan. API keys are not supported, and Team and Enterprise owners must turn it on first.
 
-Outside server mode, Anthropic's [Remote Control docs](https://code.claude.com/docs/en/remote-control) list one remote session per interactive process. Your computer must stay on and online.
+Outside server mode, Anthropic's [Remote Control docs](https://code.claude.com/docs/en/remote-control) list one remote session per interactive process. Your computer must stay on and online, and the `claude` process must keep running.
+
+### Use Remote Control inside Superset
+
+If you already run Claude Code in Superset, you don't have to choose. Superset launches the real `claude` CLI in an interactive terminal, with your own Claude login, and does not route Claude Code's network traffic. Type `/remote-control` in the workspace's terminal and the session shows up in the Claude app. We checked this with Claude Code 2.1.300 on October 14, 2026.
+
+What to know:
+
+- **Your Claude account decides.** Remote Control needs a claude.ai login on a Pro, Max, Team, or Enterprise plan. It does not work with an API key, Amazon Bedrock, Google Cloud, Microsoft Foundry, a non-Anthropic `ANTHROPIC_BASE_URL`, or `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC`. Superset sets none of these in workspaces on your own machines, but your shell profile might. If you picked another Claude account in Superset, the session uses that account.
+- **Keep the terminal open.** Superset terminals run in a background service, so the session keeps going when you quit the desktop app. Closing the terminal's last open pane or deleting the workspace ends the `claude` process, and Remote Control goes offline with it.
+- **Two views, one session.** The Claude app follows that one Claude Code session. Superset for iPhone shows the same terminal next to your other agents and hosts.
 
 If you want the whole machine, not only the Claude conversation, use the classic stack:
 
@@ -59,7 +73,7 @@ Yes. The vendor apps don't share one: Claude Code lives in the Claude app and Co
 From the iPhone you can:
 
 - See workspaces grouped by project, with a marker when an agent is working, waiting for permission, failed, or has work to review
-- Follow your agents from the Lock Screen and Dynamic Island with a Live Activity that lists which ones need you, are working, or are ready for review
+- Follow your agents from the Lock Screen and Dynamic Island with a Live Activity that lists which ones need you, are working, or are ready for review.
 - Open a workspace and continue its terminal session. You don't start a new chat or paste context.
 - Send a prompt by typing, dictating, or attaching a photo
 - Review syntax-highlighted diffs file by file, check pull request status, and merge
@@ -83,16 +97,16 @@ For Claude Code, the built-in answer is Remote Control push notifications. Run `
 
 For other agents, the common pattern is a hook that posts to a push service. Most CLI agents can run a command on stop or on a permission request. Point that command at ntfy, Pushover, or a Telegram bot to get a buzz on any phone. OpenAI's Codex mobile page says you can see when your input is needed, but does not describe push notifications.
 
-Superset detects these states through lifecycle hooks it installs in each agent's config. Claude Code reports both finished and waiting. Some agents only report finished. On desktop, Superset [notifies you](https://docs.superset.sh/agent-status) with a sound and a macOS dock badge. On the iPhone, a Live Activity on the Lock Screen lists your agents with **Needs you**, **Working**, or **Review**, while the app is open. It shows up to four agents at once, with attention states first. It does not update in the background yet: after you leave the app it keeps the last status and dims when that status is out of date. Push notifications for Superset on iPhone are coming. Until then, if you need your phone to buzz for every prompt, add Remote Control push or a hook script alongside it.
+Superset detects these states through lifecycle hooks it installs in each agent's config. Claude Code reports both finished and waiting. Some agents only report finished. On desktop, Superset [notifies you](https://docs.superset.sh/agent-status) with a sound and a macOS dock badge. On the iPhone, a Live Activity on the Lock Screen lists your agents with **Needs you**, **Working**, or **Review**, while the app is open. It shows up to four agents at once, with attention states first. It does not update in the background yet: after you leave the app it keeps the last status and dims when that status is out of date. If you need your phone to buzz for every prompt, add Remote Control push or a hook script alongside it.
 
 ## How can I send follow-up instructions to a coding agent from my phone while it works on my computer?
 
 Use a client that writes into the agent's live session, not a new chat.
 
 - **Claude Code:** open the session in the Claude app through Remote Control and type. Messages from phone, browser, and terminal stay in sync.
-- **Codex:** turn on **Control this Mac or PC** in the Codex desktop app under **Settings → Connections**, scan the QR code, and send instructions from the ChatGPT app.
+- **Codex:** turn on **Control this Mac or PC** in the ChatGPT desktop app under **Settings → Connections**, scan the QR code, and send instructions from the ChatGPT app. This controls Codex in the ChatGPT desktop app, not a `codex` CLI session in a terminal.
 - **Any terminal agent over SSH:** attach to its tmux session and type the follow-up into the prompt.
-- **Superset:** open the workspace on your iPhone and reply in its terminal. The agent keeps its context because it is the same session on the host.
+- **Superset:** open the workspace on your iPhone and reply in its terminal. The agent keeps its context because it is the same session on the host. For a Claude Code session, Remote Control from the Claude app works here too.
 
 Each option needs the computer awake and online. A laptop that sleeps when you close it drops the session. For work that should run overnight, use a machine that stays on. Our guide on [running coding agents on a remote machine](/compare/run-coding-agents-on-remote-machine) covers that setup.
 
@@ -106,7 +120,7 @@ Remote Control changes the screen you use, not where the work runs. A separate w
 
 **Fully hosted cloud agents** (Claude Code on the web, Codex Cloud, Copilot coding agent) remove the "keep your computer on" rule. In exchange, they lose your local services and you must set up secrets and dependencies in the cloud.
 
-Pick Remote Control for one Claude session you are already driving. Pick a workspace app when you run several agents, mix Claude Code and Codex, or spread work across machines.
+Pick Remote Control for one Claude session you are already driving. Pick a workspace app when you run several agents, mix Claude Code and Codex, or spread work across machines. The two also combine: run Claude Code in a Superset workspace for the worktree and the cross-agent view, and turn on Remote Control for the session you want in the Claude app.
 
 ## Set up Superset on your iPhone
 
@@ -117,6 +131,10 @@ Pick Remote Control for one Claude session you are already driving. Pick a works
 If the app shows **One step left**, that computer has never connected. **Offline** with a last-seen time means it connected before and is now asleep or disconnected. The [iPhone walkthrough](/blog/claude-code-codex-iphone) goes through a full task, from prompt to diff review.
 
 ## Frequently Asked Questions
+
+### Can I use Claude Code Remote Control inside Superset?
+
+Yes. Superset runs the real `claude` CLI in an interactive terminal with your own login, so `/remote-control` works in a Superset workspace and the session appears in the Claude app. You need a claude.ai login on a Pro, Max, Team, or Enterprise plan, and the terminal must stay open in at least one pane. Superset for iPhone shows the same session next to your other agents.
 
 ### Can I use Claude Code from my phone without an extra app?
 

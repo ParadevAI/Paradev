@@ -1,0 +1,61 @@
+---
+title: Keep Agents Running
+description: What keeps running when you close or quit Superset, and how to keep agents reachable while you're away
+---
+
+## Overview
+
+Agents in Superset run in terminals that belong to a background terminal daemon, not to the app window. Closing the window, quitting the app, or installing an update does not stop them. When you open Superset again, each terminal reattaches with its scrollback.
+
+What changes when the app is not running is **reachability**: other devices, the mobile app, and automations reach a machine through its host service, and the desktop app starts and stops that service.
+
+## What Happens When You…
+
+| You do this | Agents keep running? | Reachable from other devices and automations? |
+|---|---|---|
+| Close the last window (macOS) | Yes | Yes. The app is still running |
+| Quit with **⌘Q** or **Close Superset** in the menu bar | Yes | No, until you open Superset again |
+| Install an update | Yes | Yes, after the app restarts |
+| **Quit Superset Completely** in the menu bar | No. All terminal sessions end | No |
+| Restart or log out of the computer | No | No |
+
+After a restart, you can often pick up an interrupted agent where it left off. See [Agent Sessions](/agent-sessions).
+
+## Keep a Machine Reachable While You're Away
+
+The desktop app starts its own host service and stops it when you quit. To keep a machine reachable from your phone, and by automations, while the desktop app is closed, run the host service from the standalone CLI instead:
+
+1. Install the standalone CLI. The CLI that comes with the desktop app depends on the app, so it can't keep the host running after you quit.
+
+   ```bash
+   curl -fsSL https://superset.sh/cli/install.sh | sh
+   ```
+
+2. Quit the Superset desktop app. While the app is running, the host belongs to it, and `superset start` only reports that a host is already running.
+3. Sign in and start the host service:
+
+   ```bash
+   superset auth login
+   superset start --daemon
+   ```
+
+4. Run `superset status` and check that the host is running before you leave.
+
+The CLI host picks up terminals that are already running and stays registered with the relay. On a dedicated machine, such as a Mac mini or a Linux server, this is the recommended setup. See [Getting Started](/cli/getting-started), [Host Server](/cli/host-server), and [Remote Access](/remote-access).
+
+Keep the machine awake and online. A machine that sleeps or loses its network connection shows as offline until it comes back.
+
+## Stop Everything
+
+- **Quit Superset Completely** in the menu bar stops the host service and ends every terminal session.
+- On a CLI host, `superset stop` stops the host server but leaves terminals running; `superset stop --terminals` ends them too.
+
+## FAQ
+
+### Do agents stop when I close my laptop?
+
+They pause while the computer sleeps, like any other process, and continue when it wakes. To keep agents working while your laptop is closed, run them on another machine you add as a host. See [Remote Access](/remote-access).
+
+### Why does my Mac show as offline in the mobile app after I quit Superset?
+
+Quitting the desktop app stops its host service, which is what the relay talks to. Your agents are still running. Open Superset again, or start the host service from the standalone CLI as described above, and the machine comes back online.

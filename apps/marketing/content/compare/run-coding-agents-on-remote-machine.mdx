@@ -2,7 +2,7 @@
 title: "How to Run Coding Agents on a Remote Machine or Always-On Host (2026)"
 description: "Run Claude Code, Codex, and other coding agents on a remote Linux server, shared host, or Mac mini, and keep them working when your laptop closes."
 date: 2026-10-07
-lastUpdated: 2026-10-08
+lastUpdated: 2026-10-14
 type: "tutorial"
 competitors:
   - vs-code
@@ -20,9 +20,12 @@ keywords:
   - claude code remote server
   - remote development ssh coding agents
   - local and remote coding agents
+  - claude code remote control remote server
 ---
 
-To run coding agents on a remote machine, put the agents and the repo on an always-on host (a Linux server, a cloud VM, or a Mac mini) and use your laptop only to prompt, review, and preview. The common ways to do that are VS Code Remote-SSH, SSH plus tmux over Tailscale, Claude Code Remote Control, managed cloud agents such as Codex cloud or Cursor Cloud Agents, and Superset, which gives every agent its own worktree on the host and shows local and remote hosts in one app. Pick by where you want the agent to run and how many agents you need to keep track of at once.
+To run coding agents on a remote machine, put the agents and the repo on an always-on host (a Linux server, a cloud VM, or a Mac mini) and use your laptop only to prompt, review, and preview. Superset has this built in: turn on Remote Access on a macOS or Linux machine, and it becomes a host in the same app as your laptop. Each agent gets its own worktree there, and you reach its terminals, diffs, and ports from the desktop app, the CLI, or the iPhone and iPad app, with no SSH setup.
+
+The agents' own remote features still work on a Superset host. Superset runs the real `claude` and `codex` CLIs in real terminals, so Claude Code Remote Control (`/remote-control`) can follow a session on that host from the Claude app, and `codex cloud exec` can hand a task to Codex cloud. Use Superset to run and track several agents across machines, and the agent's own feature when you want its app or its cloud. Other options are VS Code Remote-SSH, SSH plus tmux over Tailscale, and managed cloud agents such as Codex cloud or Cursor Cloud Agents. Pick by where you want the agent to run and how many agents you need to keep track of at once.
 
 This guide answers the questions developers ask most about remote, always-on, and shared setups for parallel coding agents, with the tradeoffs of each option.
 
@@ -76,7 +79,7 @@ The host launches whichever agents are on its `PATH`: the docs list Claude Code,
 The agent process has to live on a machine that stays awake. Closing the lid on the machine that runs the agent stops the work, whatever client you use.
 
 - **Managed cloud agents** (Codex cloud, Cursor Cloud Agents, GitHub Copilot's cloud agent). The vendor runs the task in its own VM and hands back a branch or PR. Least setup. You get only that vendor's agent and environment.
-- **Claude Code Remote Control.** It lets you continue a Claude Code session from claude.ai/code or the Claude mobile app, but the session still runs on your own machine. Think of it as a remote screen for a local session, so it needs that machine awake. Run it on an always-on host if you want it to continue after you close your laptop.
+- **Claude Code Remote Control.** It lets you continue a Claude Code session from claude.ai/code or the Claude mobile app, but the session still runs on your own machine. Think of it as a remote screen for a local session, so it needs that machine awake and the `claude` process running. Run it on an always-on host if you want it to continue after you close your laptop. On a Superset host, start Claude Code in a workspace and type `/remote-control`; Superset's terminal daemon keeps the process running, which is what Anthropic's docs suggest tmux or `screen` for.
 - **Your own always-on box + tmux.** A Mac mini, a home server, or a cloud VM, reached over Tailscale or SSH. Use tmux or a system service so a dropped connection does not kill the agent.
 - **Superset on an always-on host.** Terminals and agents run in a terminal daemon on the host, separate from the host service. They keep running after `superset stop`, and the next `superset start` picks them up. On Linux you can run the host under systemd so it starts at boot:
 
@@ -91,6 +94,15 @@ KillMode=process
 Keep `KillMode=process`; other modes stop every terminal and agent when the service restarts. Add `--auto-update` to a daemon start if you want the host to update itself.
 
 You can then check on agents from your laptop when it wakes, or from [Superset for iPhone and iPad](/blog/superset-mobile) (Pro, iOS 26 or iPadOS 26 or later). Scheduled [Automations](https://docs.superset.sh/automations) also target a device, so a nightly run can fire on the always-on host. If that device is offline at fire time, the run fails and the next one is scheduled normally.
+
+## Can I use Claude Code Remote Control or Codex cloud on a Superset host?
+
+Yes. Superset runs `claude` and `codex` in a login shell in a real terminal on the host, with the host user's own Claude and Codex logins, and it does not route their network traffic. We checked on October 14, 2026, with Claude Code 2.1.300 and Codex CLI 0.162.1 started in a Superset workspace: `/remote-control` connected the session to claude.ai, and `codex cloud list` reached Codex cloud.
+
+- **Claude Code Remote Control** follows one session from the Claude app. Per [Anthropic's docs](https://code.claude.com/docs/en/remote-control) (accessed October 14, 2026), it needs a claude.ai login on a Pro, Max, Team, or Enterprise plan, not an API key or a third-party provider, and it is off when `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC` is set. The terminal must stay open: closing its last pane ends the `claude` process.
+- **Codex cloud** runs the task in OpenAI's environment, so it keeps going while the host sleeps. From the host's terminal, `codex cloud exec` submits a task and `codex cloud apply` brings the diff back into the workspace, where Superset's Changes pane shows it. See [OpenAI's Codex cloud docs](https://learn.chatgpt.com/docs/cloud).
+
+Use Superset to see every agent on every host in one place. Add Remote Control when you want the Claude app on one Claude Code session, and Codex cloud when a task needs nothing from the host.
 
 ## Our team has a shared development machine. How do we give each agent a separate workspace?
 
@@ -139,7 +151,7 @@ Do not make a dev server public just to preview it. A forwarded port carries you
 
 - **One remote box, one agent, editor-first:** VS Code or Cursor with Remote-SSH.
 - **Zero infrastructure, one vendor's agent:** Codex cloud or Cursor Cloud Agents.
-- **Continue a Claude Code session from your phone:** Claude Code Remote Control, on a machine that stays awake.
+- **Continue a Claude Code session from your phone:** Claude Code Remote Control, on a machine that stays awake. It also works for a Claude Code session running in a Superset workspace.
 - **Lowest cost, maximum control:** an always-on Linux box with Tailscale and tmux.
 - **Several CLI agents in parallel across your laptop and an always-on or shared host, with diffs and ports in one place:** Superset. Desktop runs on macOS (Linux AppImage is experimental); the host service runs on macOS and Linux.
 
@@ -150,6 +162,10 @@ For more on running many agents at once, see [running multiple Claude Code agent
 ### Can I run Claude Code on a remote server and control it from my Mac?
 
 Yes. Install Claude Code on the server and connect with SSH and tmux, VS Code Remote-SSH, or Superset. With Superset, run `superset start --daemon` on the server and open its workspaces from the Mac app under the Device filter.
+
+### Can I use Claude Code Remote Control on a Superset host?
+
+Yes. Start Claude Code in a workspace on the host and type `/remote-control`. The session appears in the Claude app and at claude.ai/code, and it also stays visible in Superset's desktop and iPhone apps. You need a claude.ai login on a Pro, Max, Team, or Enterprise plan, and the workspace's terminal must stay open in at least one pane.
 
 ### Do I need to keep my laptop open for agents to keep working?
 

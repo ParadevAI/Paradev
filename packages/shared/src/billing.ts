@@ -134,3 +134,24 @@ export function planAllowsTriggerKind(plan: PlanTier, kind: string): boolean {
 	const required = TRIGGER_KIND_REQUIRED_PLAN[kind];
 	return required === undefined || PLAN_RANK[plan] >= PLAN_RANK[required];
 }
+
+export const CLOUD_USAGE_REFUSAL_KEYS = [
+	"serverError.cloudWorkspace.cloudNeedsPaidPlan",
+	"serverError.cloudWorkspace.usageLimitReached",
+] as const;
+
+export function isCloudUsageRefusal(error: unknown): boolean {
+	const data = (error as { data?: { i18nKey?: unknown } | null } | null)?.data;
+	return (
+		typeof data?.i18nKey === "string" &&
+		(CLOUD_USAGE_REFUSAL_KEYS as readonly string[]).includes(data.i18nKey)
+	);
+}
+
+export function autumnProPlanId({
+	annual,
+}: {
+	annual: boolean;
+}): "pro" | "pro_annual" {
+	return annual ? "pro_annual" : "pro";
+}

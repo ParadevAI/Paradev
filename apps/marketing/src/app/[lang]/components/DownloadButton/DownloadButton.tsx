@@ -7,20 +7,13 @@ import {
 	HiMiniClock,
 	HiMiniEnvelope,
 } from "react-icons/hi2";
-import { track } from "@/lib/analytics";
+import { type DownloadSource, track } from "@/lib/analytics";
 import { isMacPlatform, Platform, usePlatform } from "../../hooks/useOS";
 
 interface DownloadButtonProps {
 	size?: "sm" | "md";
 	className?: string;
-	source?:
-		| "header"
-		| "hero"
-		| "footer"
-		| "pages"
-		| "automations"
-		| "browser"
-		| "plugins";
+	source?: DownloadSource;
 	onJoinWaitlist?: () => void;
 }
 

@@ -95,6 +95,7 @@ const FUTURE = [
 	"signin",
 	"signup",
 	"sitemap",
+	"sitemaps",
 	"status",
 	"support",
 	"trust",

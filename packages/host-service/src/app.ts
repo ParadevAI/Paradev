@@ -57,6 +57,7 @@ import {
 import { matchesAgentBinding } from "./terminal-agents/matches-agent-binding";
 import { appRouter } from "./trpc/router";
 import { gitStatusStore } from "./trpc/router/git/utils/git-status-store";
+import { stopLocalMobileServer } from "./trpc/router/mobile";
 import {
 	resumeCrashedAgentSessions,
 	resumeSessionDepsFor,
@@ -542,6 +543,11 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 			pageWatch.stop();
 		} catch (err) {
 			console.warn("[host-service] pageWatch.stop failed:", err);
+		}
+		try {
+			stopLocalMobileServer();
+		} catch (err) {
+			console.warn("[host-service] stopLocalMobileServer failed:", err);
 		}
 		try {
 			await chatV3.dispose();

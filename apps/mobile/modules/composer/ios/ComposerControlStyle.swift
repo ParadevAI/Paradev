@@ -47,6 +47,12 @@ extension ButtonStyle where Self == ComposerControlStyle {
       foreground: AnyShapeStyle(Color(white: 0.18))
     )
   }
+
+  /// The stop button: the ordinary control fill with a white glyph, so it
+  /// does not read as a second send button.
+  static var composerStop: ComposerControlStyle {
+    ComposerControlStyle(foreground: AnyShapeStyle(.white))
+  }
 }
 
 extension AnyTransition {

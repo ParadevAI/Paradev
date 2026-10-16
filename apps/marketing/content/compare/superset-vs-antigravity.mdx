@@ -1,0 +1,112 @@
+---
+title: "Superset vs Google Antigravity (2026): Any-Agent Workspace vs Google's Agent Platform"
+description: "Compare Superset and Google Antigravity 2.0 for running coding agents in parallel. An agent-agnostic worktree workspace with PRs and remote hosts vs Google's free agent-first desktop app, CLI, and SDK."
+date: 2026-10-13
+type: "1v1"
+competitors:
+  - antigravity
+keywords:
+  - superset vs antigravity
+  - google antigravity alternative
+  - antigravity 2.0
+  - antigravity agent manager
+  - agy cli
+  - parallel coding agents
+  - antigravity worktrees
+---
+
+Superset and Google Antigravity both run several coding agents at once, each in its own Git worktree, with review and scheduled tasks around them. The difference is whose agents. Antigravity 2.0, launched at Google I/O on May 19, 2026, is Google's agent-first desktop app, CLI (`agy`), and SDK, running Antigravity's own agent on Gemini and a few other models. Superset is a local-first workspace that runs any CLI agent, including Antigravity's `agy`, next to Claude Code, Codex, and the rest, with pull requests, Remote Access, and a team and enterprise track.
+
+---
+
+## At a Glance
+
+| | **Superset** | **Google Antigravity** |
+|---|---|---|
+| **What it does** | Runs multiple AI coding agents in parallel with Git worktree isolation, chat, review, and browser | Agent-first desktop app that runs Antigravity's agents across projects, with a CLI and SDK |
+| **Category** | Agent-agnostic workspace and orchestrator | Agent platform from one vendor |
+| **Agents** | Any CLI agent (Claude Code, Codex, Antigravity `agy`, Gemini CLI, Cursor Agent, OpenCode, Copilot, Muse Code, Droid, and more) | Antigravity's own agent and subagents |
+| **Models** | Whatever each agent uses, on your own subscriptions | Gemini models, plus Claude Sonnet and Opus and gpt-oss on separate limits |
+| **Isolation** | Git worktrees for local branch-based workspaces | Local mode or a new worktree per agent; subagents manage their own worktrees |
+| **Review and PRs** | Changes pane with commit, push, and PR; Pull Requests view with CI checks and line comments | Artifacts, diff comments, stage and commit |
+| **Remote and mobile** | Remote Access hosts; iPhone and iPad app | Remote Control from any web browser, with push notifications |
+| **Platforms** | macOS; experimental Linux AppImage; Windows unavailable | macOS, Windows, Linux |
+| **Pricing** | Free tier; Pro $20 per user per month | Free with weekly limits; Google AI Pro $20, Ultra $100 and $200 per month |
+
+---
+
+## What Is Superset?
+
+Superset is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, Antigravity's `agy`, Gemini CLI, Cursor Agent, OpenCode, GitHub Copilot, Grok Build, Muse Code, Droid, and any other CLI agent inside isolated Git worktrees with persistent terminal sessions, on your own subscriptions and keys, and never proxies model calls. Around that core it adds a Changes pane that commits, pushes, and opens PRs, a Pull Requests view with CI checks and line comments you can send to agents, a chat panel, an in-app browser with port detection and Design Mode, and an MCP server so agents and tools can create workspaces and launch agents. Remote Access adds a macOS or Linux machine as a host so workspaces keep running when your laptop sleeps, and scheduled automations, a CLI, a TypeScript SDK, and a Slack bot cover unattended work. The [iPhone and iPad app](/mobile) lets you check on sessions and review diffs away from your desk. Source-available under Elastic License 2.0 (ELv2), with an enterprise tier that adds SAML SSO, SCIM, audit logs, and a SOC 2 Type II report.
+
+## What Is Google Antigravity?
+
+Google calls Antigravity "our agentic development platform, allowing anyone to build in the agent-first era." It first shipped as a free preview IDE in November 2025 with an Agent Manager for running agents across workspaces. Antigravity 2.0, launched on May 19, 2026, is a standalone desktop app with no editor, plus a Go CLI, `agy`, that replaces Gemini CLI, and a Python SDK in preview; the original IDE is still offered separately, and extensions cover VS Code, Visual Studio, JetBrains, Zed, and Xcode. Each new agent runs in Local mode or in its own Git worktree, subagents create and clean up their own worktrees, and the app adds background tasks, hooks, custom agents, a browser subagent, and cron-style Automations. Review happens through artifacts such as plans, walkthroughs, screenshots, and browser recordings, plus comments on diffs, and the app can stage and commit. Remote Control, added in August 2026, lets you drive sessions on laptops, servers, or cloud machines from any web browser. Antigravity runs on macOS, Windows, and Linux and is free with weekly limits; Google AI Pro and Ultra plans raise them, and organizations buy it through Google Cloud. The desktop app is closed source.
+
+## Key Differences
+
+### Any Agent vs Google's Agent
+
+Antigravity runs Antigravity's agent. You can pick Gemini, Claude, or gpt-oss models inside it, but the harness is Google's. Superset runs agents from every vendor in real terminals: Claude Code in one workspace, Codex in the next, and Antigravity's own `agy` CLI in a third. If your team already has a preferred agent, Superset keeps it; if you want Google's agent, you can run it in Superset too.
+
+### Pull Requests and CI
+
+Both show diffs and both commit. Superset goes further along the path to merge: the Changes pane pushes and opens pull requests, the Pull Requests view shows CI checks, and you can send line comments back to the agent. Google's official documentation for Antigravity describes stage and commit, but not opening or reviewing pull requests.
+
+### Remote Hosts and Mobile
+
+Antigravity's Remote Control drives sessions on other machines from a web browser, with push notifications. Superset's Remote Access adds a macOS or Linux machine as a host inside the desktop app, so workspaces keep running when your laptop sleeps, and its native iPhone and iPad app shows terminals and diffs.
+
+### Platforms and Price
+
+Antigravity has the edge here: it runs on macOS, Windows, and Linux and is free to start, with paid limits through Google AI plans. Superset runs on macOS with an experimental Linux build, has no Windows app yet, and charges $20 per user per month for Pro, while you bring your own agent subscriptions.
+
+### Teams
+
+Superset's Pro plan covers unlimited users with Linear and Slack integrations, and its enterprise tier adds SAML SSO, SCIM, audit logs, and a SOC 2 Type II report. Antigravity's organization plan runs through Google Cloud with admin controls and usage-based pricing; Google's docs say the Claude and gpt-oss models are not available on that plan.
+
+---
+
+## Pricing
+
+Superset offers a free tier and Pro at $20 per user per month, or $15 per user per month billed yearly, with an enterprise tier on custom billing. Model costs are on your own agent subscriptions. Antigravity is free with basic weekly limits; Google AI Pro is $20 per month, a new Ultra tier is $100 per month with 5x Pro limits, and the top Ultra tier is $200 per month with 20x Pro limits. Organizations pay through Google Cloud on usage-based pricing. Prices as of October 2026.
+
+---
+
+## Which Should You Choose?
+
+**Choose Superset if you:**
+
+- Use more than one coding agent, or want to keep the one your team already uses
+- Want pull requests, CI checks, and line comments back to the agent in the same app
+- Want native mobile review and remote hosts that keep workspaces running
+- Need enterprise controls: SAML SSO, SCIM, audit logs, SOC 2 Type II
+
+**Choose Google Antigravity if you:**
+
+- Want Google's agent and Gemini models, free to start
+- Need Windows or a supported Linux desktop app today
+- Like artifact-based review, with plans, walkthroughs, and browser recordings
+- Buy through Google Cloud
+
+**Verdict:** Antigravity is Google's strongest bet on the agent-first desktop, and it is free on every major platform. Superset is the better fit when you do not want to standardize on one vendor's agent: it runs Antigravity's CLI next to Claude Code, Codex, and the rest, and carries the work through to pull requests.
+
+---
+
+## Frequently Asked Questions
+
+### Can I run Antigravity in Superset?
+
+Yes. Antigravity's CLI, `agy`, is a built-in agent in Superset. It runs in its own worktree next to Claude Code, Codex, and any other CLI agent.
+
+### Is Antigravity free?
+
+Antigravity is free with basic weekly limits. Google AI Pro ($20 per month) and Ultra ($100 or $200 per month) raise them, and organizations pay through Google Cloud. Superset has a free tier and Pro at $20 per user per month.
+
+### Does Antigravity use Git worktrees?
+
+Yes. Each new agent can run in Local mode or in its own worktree, and subagents create and clean up their own worktrees. Superset gives each new local branch-based workspace its own worktree and terminal.
+
+### Is Antigravity the same as Gemini CLI?
+
+No. Antigravity's CLI, `agy`, launched on May 19, 2026 and replaces Gemini CLI. Superset runs both as built-in agents. See [Best IDE for Gemini CLI](/compare/best-ide-for-gemini-cli).

@@ -173,6 +173,29 @@ describe("attachmentsRouter.upload", () => {
 	});
 });
 
+describe("attachmentsRouter.read", () => {
+	it("returns an uploaded attachment's bytes", async () => {
+		const caller = createCaller();
+		const { attachmentId } = await caller.upload({
+			data: { kind: "base64", data: PNG_BASE64 },
+			mediaType: "image/png",
+		});
+
+		expect(await caller.read({ attachmentId })).toEqual({
+			mediaType: "image/png",
+			data: PNG_BASE64,
+		});
+	});
+
+	it("reports a missing attachment as NOT_FOUND", async () => {
+		await expect(
+			createCaller().read({
+				attachmentId: "00000000-0000-4000-8000-000000000000",
+			}),
+		).rejects.toMatchObject({ code: "NOT_FOUND" });
+	});
+});
+
 describe("attachmentsRouter.delete", () => {
 	it("removes the attachment directory", async () => {
 		const caller = createCaller();

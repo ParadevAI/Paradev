@@ -421,8 +421,14 @@ export function useOptimisticActions() {
 				// sandbox underneath it — the sandbox's own row exists only to give
 				// host-service something to serve. Renaming through the host would
 				// write to a name nothing reads.
-				renameWorkspace: (workspaceId: string, name: string) =>
-					sandboxIds.has(workspaceId)
+				// A cloud caller says so: the row knows it is cloud before its
+				// sandbox answers (provisioning, failed).
+				renameWorkspace: (
+					workspaceId: string,
+					name: string,
+					options?: { cloud?: boolean },
+				) =>
+					options?.cloud || sandboxIds.has(workspaceId)
 						? runWorkspaceMutation(
 								t({ message: "Failed to rename workspace" }),
 								() => {

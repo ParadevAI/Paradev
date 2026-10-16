@@ -63,6 +63,7 @@ const tasks = await client.tasks.list({
   statusId: '<uuid>',
   assigneeId: '<uuid>',      // someone else's tasks
   search: 'auth',            // substring of title
+  labels: ['acme'],          // all must match; 'acme' also matches 'acme/web'
   limit: 50,                 // max 500
   offset: 0,
 });

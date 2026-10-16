@@ -1,3 +1,9 @@
+import { autumnClient, billingUsesAutumn } from "@superset/auth/autumn";
+import {
+	paidAutumnPlanId,
+	seatItem,
+	setAutumnSeats,
+} from "@superset/auth/billing";
 import { stripeClient } from "@superset/auth/stripe";
 import { db, dbWs } from "@superset/db/client";
 import {
@@ -17,6 +23,7 @@ import {
 } from "@superset/db/schema";
 import { and, count, eq, ne } from "drizzle-orm";
 
+import { settleOrganizationNow } from "../../router/cloud-workspace/meter";
 import { purgePageStorageForUser } from "../page-store";
 import { deletePostHogPerson } from "../posthog-persons";
 
@@ -81,11 +88,14 @@ export async function purgeAccount(userId: string): Promise<void> {
 				subscription?.stripeSubscriptionId &&
 				subscription.plan !== "enterprise"
 			) {
+				const seatsSetInAutumn =
+					billingUsesAutumn &&
+					(await setAutumnSeats(membership.organizationId, remainingSeats));
 				const stripeSub = await stripeClient.subscriptions.retrieve(
 					subscription.stripeSubscriptionId,
 				);
-				const itemId = stripeSub.items.data[0]?.id;
-				if (itemId) {
+				const itemId = seatItem(stripeSub)?.id;
+				if (!seatsSetInAutumn && itemId) {
 					await stripeClient.subscriptions.update(
 						subscription.stripeSubscriptionId,
 						{
@@ -102,13 +112,32 @@ export async function purgeAccount(userId: string): Promise<void> {
 			where: eq(organizations.id, membership.organizationId),
 			columns: { id: true, stripeCustomerId: true },
 		});
+		await settleOrganizationNow(membership.organizationId).catch((error) =>
+			console.error(
+				`[account-purge] final box usage of ${membership.organizationId} not settled`,
+				error,
+			),
+		);
+		const autumnPlanId = billingUsesAutumn
+			? await paidAutumnPlanId(membership.organizationId).catch(() => null)
+			: null;
+		if (autumnPlanId) {
+			await autumnClient.billing.update({
+				customerId: membership.organizationId,
+				planId: autumnPlanId,
+				cancelAction: "cancel_immediately",
+			});
+		}
 		if (organization?.stripeCustomerId) {
 			const activeSubscriptions = await stripeClient.subscriptions.list({
 				customer: organization.stripeCustomerId,
 				status: "active",
 			});
 			for (const subscription of activeSubscriptions.data) {
-				await stripeClient.subscriptions.cancel(subscription.id);
+				await stripeClient.subscriptions.cancel(subscription.id, {
+					invoice_now: true,
+					prorate: true,
+				});
 			}
 			await deleteCustomerIfNeverCharged(organization.stripeCustomerId);
 		}

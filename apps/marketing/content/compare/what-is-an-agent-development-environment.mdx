@@ -2,7 +2,7 @@
 title: "What Is an ADE? Agent Development Environments Explained"
 description: "An ADE is an agent development environment: the workspace for running, isolating, monitoring, and reviewing AI coding agents. Learn how ADEs differ from IDEs."
 date: 2026-08-24
-lastUpdated: 2026-08-24
+lastUpdated: 2026-10-14
 type: "tutorial"
 competitors:
   - orca
@@ -127,6 +127,31 @@ Ignore the agent count in screenshots. Check the workflow:
 
 The best choice depends on which of these becomes your bottleneck. See [Best Agent Development Environments in 2026](/compare/best-agent-development-environment) for a tool-by-tool comparison.
 
+## ADEs Worth Evaluating for Claude Code and Codex
+
+If you use Claude Code and Codex every day, these are the agent development environments to compare (as of October 2026):
+
+| ADE | Agents | Where it runs | Review before merge |
+|---|---|---|---|
+| **Superset** | Any CLI agent | macOS app; macOS or Linux hosts you add; iPhone and iPad | Changes pane commits, pushes, and opens PRs; PR view with CI checks and line comments sent back to the agent |
+| **Orca** | 27 listed plus any CLI agent | macOS, Windows, Linux | Inline diff comments sent back to the agent |
+| **Conductor** | Claude Code, Codex, Cursor, OpenCode | Mac app, plus managed cloud workspaces on paid plans | Diff, checks, pull request, merge |
+| **JetBrains Air** | Codex, Gemini, Copilot, Claude Agent, Junie, ACP agents | Air app (preview), inside JetBrains IDEs | Diffs with line comments for the agent |
+| **Cursor** | Cursor's own agent | Editor, Agents Window, cloud agents | In the editor and Bugbot |
+
+Run one real task from your repository in two of them and compare the setup, the review, and how you get back to unfinished work. See [How to Compare Coding Agents Side by Side](/compare/compare-coding-agents-side-by-side).
+
+## Keeping Context Across Many Agent Sessions
+
+The usual pain is losing track: which terminal belongs to which task, which agent is waiting for you, and where a half-finished change lives. An ADE answers that with:
+
+- **One workspace per task**, with its own worktree, branch, terminal, and preview, so switching tasks means switching workspaces, not hunting through terminal tabs
+- **Status at a glance**, so you see which agents are working, waiting for input, or done
+- **Sessions that persist**, so closing the app or restarting does not end the agent's work
+- **Resume**, so an interrupted agent continues its own session instead of starting over
+
+In Superset, the Workspaces page groups every workspace by state (Needs attention, Working, Needs review, Idle, Merged), terminals run in a background daemon so agents keep running when you close or update the app, and supported agents resume their session after a restart. If you are new to worktrees, start with [Claude Code Worktrees](/compare/claude-code-worktrees) and [Git Worktrees for AI Coding Agents](/compare/git-worktrees-for-ai-agents).
+
 ## Do You Need an ADE?
 
 You probably do not need one if you run a single coding agent occasionally and review every edit as it happens. A good terminal or IDE is enough.
@@ -159,6 +184,10 @@ Not necessarily. An AI code editor helps a developer write code with AI. An ADE 
 ### Is Superset an ADE?
 
 Yes. Superset treats each task as an isolated workspace with its own Git worktree, branch, terminals, ports, agent sessions, and review flow. It also exposes the workspace layer through a desktop app, CLI, SDK, and MCP server.
+
+### Which ADEs let me review a diff and send follow-ups before merging?
+
+Superset (the Changes pane and a Pull Requests view with line comments sent back to the agent), Orca (inline diff comments sent back to the agent), and Conductor (diff, checks, and pull request in the app). JetBrains Air also lets you comment on diff lines for the agent.
 
 ### Can I use an ADE with my current IDE?
 

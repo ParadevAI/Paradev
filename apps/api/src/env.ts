@@ -55,6 +55,8 @@ export const env = createEnv({
 		KV_URL: z.string().url(),
 		STRIPE_SECRET_KEY: z.string(),
 		STRIPE_WEBHOOK_SECRET: z.string(),
+		AUTUMN_SECRET_KEY: z.string().min(1),
+		AUTUMN_WEBHOOK_SECRET: z.string().startsWith("whsec_"),
 		STRIPE_PRO_MONTHLY_PRICE_ID: z.string(),
 		STRIPE_PRO_YEARLY_PRICE_ID: z.string(),
 		// YC Bookface deal redemption webhook (deal 13843). The route answers

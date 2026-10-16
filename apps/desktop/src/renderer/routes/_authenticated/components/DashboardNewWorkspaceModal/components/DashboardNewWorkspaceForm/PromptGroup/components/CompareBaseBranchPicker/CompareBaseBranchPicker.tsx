@@ -15,7 +15,10 @@ import { LuFolderOpen } from "react-icons/lu";
 import { PLATFORM } from "renderer/hotkeys";
 import { formatRelativeTime } from "renderer/lib/formatRelativeTime";
 import type { BranchFilter, BranchRow } from "../../../hooks/useBranchContext";
-import { FormPickerTrigger } from "../FormPickerTrigger";
+import {
+	FORM_PICKER_MENU_CLASS,
+	FormPickerTrigger,
+} from "../FormPickerTrigger";
 import {
 	type OpenWorkspaceTarget,
 	toOpenWorkspaceTarget,
@@ -127,7 +130,7 @@ export function CompareBaseBranchPicker({
 				</FormPickerTrigger>
 			</PopoverTrigger>
 			<PopoverContent
-				className="w-[440px] p-0"
+				className={`w-[440px] p-0 ${FORM_PICKER_MENU_CLASS}`}
 				align="start"
 				onWheel={(event) => event.stopPropagation()}
 			>

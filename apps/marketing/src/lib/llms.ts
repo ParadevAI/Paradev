@@ -1,11 +1,10 @@
+import type { MessageDescriptor } from "@lingui/core";
+import { getI18nInstance } from "@superset/i18n/server";
 import { COMPANY } from "@superset/shared/constants";
-import {
-	FAQ_ITEMS,
-	faqSourceText,
-} from "@/app/[lang]/components/FAQSection/constants";
 import { API_URL, MCP_SERVER_URL } from "./api-url";
 import { getBlogPosts } from "./blog";
 import { getCategoryPages } from "./category";
+import { getChangelogEntries } from "./changelog";
 import { getComparisonPages } from "./compare";
 import {
 	PRODUCT_DISAMBIGUATION,
@@ -16,6 +15,12 @@ import {
 } from "./product-facts";
 
 export { API_URL, MCP_SERVER_URL };
+
+// Production builds strip `message` from descriptors and keep only the hashed
+// id, so machine-facing feeds resolve the English text through the catalog.
+export function englishText(descriptor: MessageDescriptor): string {
+	return getI18nInstance()._(descriptor);
+}
 
 export function stripMdxSyntax(content: string): string {
 	return (
@@ -59,6 +64,13 @@ export function buildCompanyFactsSection(): string[] {
 		"- **Cloud workspaces**: in early access for some accounts, not generally available. Remote access to your own machines is available on Pro today.",
 		`- **Agents**: works with any CLI coding agent, including Claude Code, OpenAI Codex, OpenCode, Gemini CLI, Copilot, Cursor Agent, Amp, Grok Build, Kimi Code, Mistral Vibe, Devin, and Muse Code, plus custom agents you add.`,
 	];
+}
+
+// Turns a "## Heading" section into free text under a bold label, for the
+// part of llms.txt that may not contain headings.
+function asPreamble(section: string[]): string[] {
+	const [heading = "", ...body] = section;
+	return [`**${heading.replace(/^#+\s*/, "")}**`, ...body];
 }
 
 export function buildLlmsHeader(): string[] {
@@ -120,27 +132,37 @@ export function buildLlmsTxt(): string {
 	const posts = getBlogPosts();
 	const comparisons = getComparisonPages();
 	const categories = getCategoryPages();
+	const changelog = getChangelogEntries().slice(0, 8);
 	const baseUrl = COMPANY.MARKETING_URL;
 	const docsUrl = COMPANY.DOCS_URL;
 
+	// The llms.txt format allows only free text between the summary and the
+	// first H2, and only link lists under each H2 (https://llmstxt.org).
 	const lines: string[] = [
 		...buildLlmsHeader(),
 		"",
-		...buildCompanyFactsSection(),
+		...asPreamble(buildCompanyFactsSection()),
 		"",
-		...buildWhenToUseSection(),
+		...asPreamble(buildWhenToUseSection()),
 		"",
 		...buildDeveloperResourcesSection(),
 		"",
 		"## Docs",
 		"",
-		`- [Documentation](${docsUrl})`,
-		`- [Getting Started](${docsUrl}/getting-started)`,
-		`- [GitHub](${COMPANY.GITHUB_URL})`,
+		`- [Documentation](${docsUrl}): Superset documentation`,
+		`- [GitHub](${COMPANY.GITHUB_URL}): source code`,
 		"",
 		"## Blog",
 		"",
 		...posts.map((post) => `- [${post.title}](${baseUrl}/blog/${post.slug})`),
+		"",
+		"## Changelog",
+		"",
+		`- [Changelog](${baseUrl}/changelog): every release, newest first`,
+		`- [Changelog feed](${baseUrl}/changelog.xml): RSS`,
+		...changelog.map(
+			(entry) => `- [${entry.title}](${baseUrl}${entry.url}): ${entry.date}`,
+		),
 		"",
 		"## Guides",
 		"",
@@ -152,14 +174,10 @@ export function buildLlmsTxt(): string {
 			(page) => `- [${page.title}](${baseUrl}/compare/${page.slug})`,
 		),
 		"",
-		"## FAQ",
+		"## Optional",
 		"",
-		...FAQ_ITEMS.flatMap((item) => [
-			`### ${faqSourceText(item.question)}`,
-			"",
-			faqSourceText(item.answer),
-			"",
-		]),
+		`- [Full context](${baseUrl}/llms-full.txt): every blog post, comparison, and the FAQ in one file`,
+		`- [Homepage as markdown](${baseUrl}/index.md): product overview and FAQ`,
 	];
 
 	return lines.join("\n");

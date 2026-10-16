@@ -12,6 +12,7 @@ const ACP_HARNESS_BY_PRESET: Record<string, string> = {
 	codex: "codex-acp",
 	opencode: "opencode-acp",
 	pi: "pi-acp",
+	pdev: "pdev-acp",
 };
 
 /** Harness ids from before ACP, still on old sessions. Display only. */

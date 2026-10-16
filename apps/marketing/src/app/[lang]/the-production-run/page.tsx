@@ -2,6 +2,7 @@ import { getI18nInstance } from "@superset/i18n/server";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { GridCross } from "@/app/[lang]/blog/components/GridCross";
+import { DownloadLink } from "@/app/[lang]/components/DownloadLink";
 import { LeaderboardBackLink } from "@/app/[lang]/components/LeaderboardBackLink";
 import { LeaderboardLayout } from "@/app/[lang]/components/LeaderboardLayout";
 import { initServerI18n } from "@/app/i18n-server";
@@ -469,12 +470,12 @@ export default async function ProductionRunPage({
 						without a name attached.
 					</p>
 					<div className="mt-8 flex items-center justify-center gap-4">
-						<Link
-							href="/download"
+						<DownloadLink
+							source="production_run"
 							className="bg-foreground text-background px-6 py-3 text-sm font-normal transition-colors hover:bg-brand hover:text-white"
 						>
 							Download Superset
-						</Link>
+						</DownloadLink>
 						<Link
 							href="/leaderboard"
 							className="group inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"

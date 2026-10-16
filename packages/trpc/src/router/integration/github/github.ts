@@ -41,6 +41,7 @@ export const githubRouter = {
 				where: eq(githubInstallations.organizationId, input.organizationId),
 				columns: {
 					id: true,
+					installationId: true,
 					accountLogin: true,
 					accountType: true,
 					suspended: true,

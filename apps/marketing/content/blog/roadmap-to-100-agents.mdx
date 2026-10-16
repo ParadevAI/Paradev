@@ -4,9 +4,12 @@ description: "An attempt to crystallize our plans for 2026"
 author: satya
 date: 2026-02-02
 category: Product
+lastUpdated: 2026-10-14
 ---
 
 ![Superset: managing coding agents in parallel](/blog/roadmap-to-100-agents/cover.png)
+
+**In short:** managing several coding agents at once is limited by human attention, not by the agents. Each agent needs someone to review its code, give feedback, and pick its next task. To scale from 5–7 agents in parallel to 100, we plan to have agents do more before they ask for help, make review faster, and let agents start work on their own from schedules and events.
 
 Right now at Superset, we're able to reliably manage 5-7 coding agents in parallel - whether that's Claude Code, Codex,
 etc. - at a time. Our goal is to be able to manage 100 coding agents in parallel each by the end of 2026.
@@ -143,4 +146,6 @@ If you're running agents at scale and hitting these limits, we'd like to compare
 
 ---
 
-**Related:** [Best Agentic IDE in 2026](/compare/best-agentic-ide) · [How to Run Multiple OpenCode Agents in Parallel](/compare/multiple-opencode-agents-parallel)
+**Update, October 2026:** several of these are now in Superset. Scheduled [automations](https://docs.superset.sh/automations) start agents on a host you choose, the [iPhone and iPad app](/mobile) lets you answer agents and review diffs away from your desk, agents [keep running](https://docs.superset.sh/keep-agents-running) when you close the app, and the Pull Requests view sends line comments back to the agent.
+
+**Related:** [Best Agentic IDE in 2026](/compare/best-agentic-ide) · [How to Run Multiple OpenCode Agents in Parallel](/compare/multiple-opencode-agents-parallel) · [Claude Code Worktrees](/compare/claude-code-worktrees) · [Where to Run Coding Agents](/compare/where-to-run-coding-agents)

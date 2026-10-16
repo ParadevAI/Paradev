@@ -1063,6 +1063,12 @@ msgstr "{reason}"
 msgid "{received} of {total}"
 msgstr "{received} из {total}"
 
+msgid "{repositoryFullName} isn't on {installedAccountLogin}, where this organization's GitHub App is installed."
+msgstr "{repositoryFullName} не находится в {installedAccountLogin}, где установлено GitHub App этой организации."
+
+msgid "{repositoryFullName} isn't shared with the Superset GitHub App yet."
+msgstr "{repositoryFullName} ещё не открыт для GitHub App Superset."
+
 msgid "{seconds}s ago"
 msgstr "{seconds} с назад"
 
@@ -1257,6 +1263,9 @@ msgstr "Рекомендуются <0>Nerd Fonts</0>."
 
 msgid "<0>vs</0> <1/>"
 msgstr "<0>vs</0> <1/>"
+
+msgid "~{secondsLeft}s"
+msgstr "~{secondsLeft} с"
 
 msgid "~{stars} projected this week"
 msgstr "прогноз на неделю: ~{stars}"
@@ -1768,6 +1777,9 @@ msgstr "Добавить проект из папки..."
 msgid "Add prompt e.g. look for crashes in $sentry"
 msgstr "Добавьте промпт, например: найди падения в $sentry"
 
+msgid "Add repository"
+msgstr "Добавить репозиторий"
+
 msgid "Add script"
 msgstr "Добавить скрипт"
 
@@ -2006,6 +2018,10 @@ msgstr "Работает"
 msgid "All"
 msgstr "Все"
 
+msgctxt "log scope"
+msgid "All"
+msgstr "Все"
+
 #. placeholder {0}: history.projects.length
 msgid "All {0} →"
 msgstr "Все {0} →"
@@ -2064,6 +2080,9 @@ msgstr "Все в текущей вкладке"
 msgid "All in current tab (split panes)"
 msgstr "Все в текущей вкладке (разделённые панели)"
 
+msgid "All labels"
+msgstr "Все метки"
+
 msgid "All models"
 msgstr "Все модели"
 
@@ -2096,6 +2115,9 @@ msgstr "Все посты"
 
 msgid "All projects"
 msgstr "Все проекты"
+
+msgid "All releases"
+msgstr "Все релизы"
 
 msgid "All releases on GitHub"
 msgstr "Все релизы на GitHub"
@@ -2385,6 +2407,10 @@ msgstr "в эквиваленте API"
 msgid "API-equivalent cost"
 msgstr "Стоимость в пересчёте на API"
 
+msgctxt "log scope"
+msgid "App"
+msgstr "Приложение"
+
 msgid "app {appVersion}"
 msgstr "приложение {appVersion}"
 
@@ -2396,6 +2422,9 @@ msgstr "Язык интерфейса приложения. Авто следу�
 
 msgid "App icon"
 msgstr "Значок приложения"
+
+msgid "App path"
+msgstr "Путь к приложению"
 
 msgid "Appearance"
 msgstr "Внешний вид"
@@ -2589,6 +2618,9 @@ msgstr "одновременно"
 
 msgid "Attach files"
 msgstr "Прикрепить файлы"
+
+msgid "Attach image"
+msgstr "Прикрепить изображение"
 
 msgid "Attached"
 msgstr "Подключена"
@@ -2804,6 +2836,10 @@ msgstr "Ожидает ревью от вас или вашей команды"
 msgid "Back"
 msgstr "Назад"
 
+msgctxt "Android back button"
+msgid "Back"
+msgstr "Назад"
+
 msgid "Back to About"
 msgstr "К разделу «О нас»"
 
@@ -2940,6 +2976,9 @@ msgstr "Оплата"
 msgid "Billing details"
 msgstr "Платёжные данные"
 
+msgid "Billing refused to start a cloud workspace: the organization needs a paid plan, or it reached its cloud usage limit. Upgrade or raise the limit in Settings > Billing, or run the automation on a device."
+msgstr "Оплата не позволила запустить облачную рабочую область: организации нужен платный тариф или достигнут лимит использования облака. Перейдите на другой тариф или увеличьте лимит в разделе «Настройки > Оплата» либо запустите автоматизацию на устройстве."
+
 msgid "Binary"
 msgstr "Бинарный"
 
@@ -2973,6 +3012,9 @@ msgstr "Блог"
 msgid "Blue"
 msgstr "Синий"
 
+msgid "Blue/Yellow (Tritanopia)"
+msgstr "Синий/жёлтый (тританопия)"
+
 msgid "Board"
 msgstr "Доска"
 
@@ -2981,6 +3023,13 @@ msgstr "Вид доски"
 
 msgid "Bold"
 msgstr "Жирный"
+
+msgid "Bold Text"
+msgstr "Жирный шрифт"
+
+#. placeholder {0}: selected.name
+msgid "Booting {0}…"
+msgstr "Запуск {0}…"
 
 msgid "Border"
 msgstr "Граница"
@@ -2996,9 +3045,6 @@ msgstr "Нижняя шторка, удобная для свайпов на с�
 
 msgid "Box"
 msgstr "Box"
-
-msgid "Boxes run where the environment was made; a snapshot only exists in its region."
-msgstr "Боксы работают там, где было создано окружение; снимок существует только в своём регионе."
 
 msgid "Branch"
 msgstr "Ветка"
@@ -3573,6 +3619,9 @@ msgstr "Проверки пропущены"
 msgid "Choose a {pluginLabel} account"
 msgstr "Выберите аккаунт {pluginLabel}"
 
+msgid "Choose a device"
+msgstr "Выберите устройство"
+
 msgid "Choose a fighter"
 msgstr "Выберите бойца"
 
@@ -3638,6 +3687,13 @@ msgstr "Разберись со старыми TODO…"
 
 msgid "Cleaner, denser sidebar"
 msgstr "Чище и плотнее боковая панель"
+
+msgid "Clear"
+msgstr "Прозрачный"
+
+msgctxt "Liquid Glass style"
+msgid "Clear"
+msgstr "Прозрачный"
 
 msgid "Clear all"
 msgstr "Очистить всё"
@@ -3747,11 +3803,20 @@ msgstr "Нажмите здесь, если переход не произошё
 msgid "Click the “↑ update” pill to see the pre-update confirm"
 msgstr "Нажмите «↑ update», чтобы увидеть подтверждение перед обновлением"
 
+msgid "Click the chip to open the issue"
+msgstr "Нажмите на чип, чтобы открыть задачу"
+
+msgid "Click the chip to open the pull request"
+msgstr "Нажмите на чип, чтобы открыть пул-реквест"
+
 msgid "Click to copy the session ID (resume with `claude --resume <id>`)."
 msgstr "Нажмите, чтобы скопировать ID сессии (возобновление: `claude --resume <id>`)."
 
 msgid "Click to open on GitHub"
 msgstr "Нажмите, чтобы открыть на GitHub"
+
+msgid "Click to open the pull request"
+msgstr "Нажмите, чтобы открыть пул-реквест"
 
 msgid "Click two commits to define the range."
 msgstr "Кликните по двум коммитам, чтобы задать диапазон."
@@ -3838,6 +3903,9 @@ msgstr "Закрыть файл"
 msgid "Close find bar"
 msgstr "Закрыть панель поиска"
 
+msgid "Close logs"
+msgstr "Закрыть логи"
+
 msgid "Close menu"
 msgstr "Закрыть меню"
 
@@ -3923,6 +3991,10 @@ msgstr "Закрыть рабочую область"
 msgid "Closed"
 msgstr "Закрыт"
 
+msgctxt "pull request or issue state"
+msgid "Closed"
+msgstr "Закрыто"
+
 msgid "Closing these ports will end the processes using them."
 msgstr "Закрытие этих портов завершит использующие их процессы."
 
@@ -3957,8 +4029,20 @@ msgstr "Облачные рабочие области"
 msgid "Cloud workspaces ignore this variable. Agents sign in under Settings › Agents instead."
 msgstr "Облачные рабочие пространства игнорируют эту переменную. Вместо этого агенты входят в систему в разделе «Настройки › Агенты»."
 
+msgid "Cloud workspaces need a paid plan. Upgrade in Settings, Billing to start one."
+msgstr "Для облачных рабочих областей нужен платный тариф. Перейдите на него в разделе «Настройки», «Оплата», чтобы запустить облачную рабочую область."
+
+msgid "Cloud workspaces need a project for now"
+msgstr "Пока облачным рабочим пространствам нужен проект"
+
+msgid "Cloud workspaces under their projects, a local and cloud filter, and the redesigned workspace row."
+msgstr "Облачные рабочие пространства внутри проектов, фильтр «локальные / облачные» и обновлённая строка рабочего пространства."
+
 msgid "Cloud workspaces will stop running {agentLabel} with it."
 msgstr "Облачные рабочие пространства перестанут запускать {agentLabel} с этими данными."
+
+msgid "Cloud workspaces without a project are coming. Pick a project for now."
+msgstr "Облачные рабочие пространства без проекта скоро появятся. Пока выберите проект."
 
 msgid "Co-founder & CTO, TrainLoop (YC W25)"
 msgstr "Сооснователь и технический директор, TrainLoop (YC W25)"
@@ -4011,6 +4095,9 @@ msgstr "Сбор данных…"
 
 msgid "Color"
 msgstr "Цвет"
+
+msgid "Color Filter"
+msgstr "Цветовой фильтр"
 
 msgid "Combine all commits"
 msgstr "Свести все коммиты в один"
@@ -4170,9 +4257,6 @@ msgstr "component-showcase"
 msgid "Composable form layout — pairs with @superset/ui/form for react-hook-form"
 msgstr "Составная раскладка формы — сочетается с @superset/ui/form для react-hook-form"
 
-msgid "Config location"
-msgstr "Расположение конфигурации"
-
 msgid "Configure"
 msgstr "Настроить"
 
@@ -4187,6 +4271,12 @@ msgstr "Общие настройки приложения"
 
 msgid "Configure git branch and worktree behavior"
 msgstr "Настройка поведения веток git и worktree"
+
+msgid "Configure GitHub App"
+msgstr "Настроить GitHub App"
+
+msgid "Configure GitHub App…"
+msgstr "Настроить GitHub App…"
 
 msgid "Configure how tasks sync between Superset and Linear."
 msgstr "Настройте, как задачи синхронизируются между Superset и Linear."
@@ -4251,6 +4341,12 @@ msgstr "Подключайте внешние сервисы для синхро
 
 msgid "Connect external services to sync data."
 msgstr "Подключайте внешние сервисы для синхронизации данных."
+
+msgid "Connect GitHub in Integrations to add {repositoryFullName}."
+msgstr "Подключите GitHub в разделе «Интеграции», чтобы добавить {repositoryFullName}."
+
+msgid "Connect GitHub…"
+msgstr "Подключить GitHub…"
 
 msgid "Connect Google"
 msgstr "Подключить Google"
@@ -4626,6 +4722,9 @@ msgstr "Скопировать localhost:{0}"
 msgid "Copy log"
 msgstr "Скопировать лог"
 
+msgid "Copy logs"
+msgstr "Скопировать логи"
+
 msgid "Copy Markdown"
 msgstr "Скопировать Markdown"
 
@@ -4926,9 +5025,6 @@ msgstr "Не удалось остановить"
 
 msgid "Could not stop the agent"
 msgstr "Не удалось остановить агента"
-
-msgid "Could not stop the task"
-msgstr "Не удалось остановить задачу"
 
 msgid "Could not stop watching"
 msgstr "Не удалось прекратить отслеживание"
@@ -5245,6 +5341,9 @@ msgstr "Создать заново"
 msgid "Create an account"
 msgstr "Создать аккаунт"
 
+msgid "Create environment"
+msgstr "Создать окружение"
+
 msgid "Create failed: {message}"
 msgstr "Не удалось создать: {message}"
 
@@ -5448,6 +5547,9 @@ msgstr "Создание worktree"
 
 msgid "Creating..."
 msgstr "Создание..."
+
+msgid "Creating…"
+msgstr "Создание…"
 
 msgid "Creative Manager, Valid"
 msgstr "Креативный менеджер, Valid"
@@ -5948,6 +6050,9 @@ msgstr "Отключена"
 msgid "Details"
 msgstr "Детали"
 
+msgid "Details are not available here, but the link still opens."
+msgstr "Сведения здесь недоступны, но ссылка всё равно открывается."
+
 msgid "Dev"
 msgstr "Dev"
 
@@ -5993,8 +6098,14 @@ msgstr "Диалоги, шторки, поповеры и поверхности
 msgid "Dictate"
 msgstr "Диктовать"
 
+msgid "Dictation"
+msgstr "Диктовка"
+
 msgid "Dictation is not available on this device"
 msgstr "Диктовка недоступна на этом устройстве"
+
+msgid "Dictation is not available right now"
+msgstr "Диктовка сейчас недоступна"
 
 msgid "Didn't hear back"
 msgstr "Ответа не поступило"
@@ -6150,6 +6261,9 @@ msgstr "отклонил(а) своё ревью"
 msgid "Display"
 msgstr "Отображение"
 
+msgid "Display Size"
+msgstr "Размер экрана"
+
 msgid "Displays the mobile sidebar."
 msgstr "Показывает мобильную боковую панель."
 
@@ -6239,6 +6353,9 @@ msgstr "Скачать для macOS"
 msgid "Download image"
 msgstr "Скачать изображение"
 
+msgid "Download logs"
+msgstr "Скачать логи"
+
 msgid "Download Manually"
 msgstr "Скачать вручную"
 
@@ -6273,6 +6390,10 @@ msgstr "Загрузка..."
 msgid "Downloads"
 msgstr "Загрузки"
 
+msgid "Draft"
+msgstr "Черновик"
+
+msgctxt "pull request state"
 msgid "Draft"
 msgstr "Черновик"
 
@@ -6519,6 +6640,9 @@ msgstr "Пусто"
 msgid "Empty command"
 msgstr "Пустая команда"
 
+msgid "Emulator"
+msgstr "Эмулятор"
+
 msgid "Enable"
 msgstr "Включить"
 
@@ -6622,6 +6746,9 @@ msgstr "esc — закрыть"
 msgid "esc to exit"
 msgstr "esc — выход"
 
+msgid "Event log"
+msgstr "Журнал событий"
+
 msgid "Event triggered"
 msgstr "По событию"
 
@@ -6706,6 +6833,9 @@ msgstr "Всё, что нужно, чтобы написать о Superset: оп
 msgid "Everything you've published is deleted, not hidden. You can rejoin later and it will rebuild from the transcripts still on this machine."
 msgstr "Всё опубликованное удаляется, а не скрывается. Вы можете вернуться позже, и данные соберутся заново из расшифровок, оставшихся на этой машине."
 
+msgid "Executable"
+msgstr "Исполняемый файл"
+
 msgid "Existing repo path"
 msgstr "Путь к существующему репозиторию"
 
@@ -6727,6 +6857,9 @@ msgstr "Выйти из режима дизайна (esc)"
 
 msgid "Exit device toolbar"
 msgstr "Выйти из панели устройств"
+
+msgid "Exit full screen"
+msgstr "Выйти из полноэкранного режима"
 
 msgid "Exited"
 msgstr "Завершена"
@@ -7327,6 +7460,9 @@ msgstr "Быстрый"
 msgid "Fatal"
 msgstr "Критическая"
 
+msgid "Fault"
+msgstr "Сбой"
+
 msgid "Favorites"
 msgstr "Избранное"
 
@@ -7453,6 +7589,9 @@ msgstr "Фильтр хостов"
 msgid "Filter hosts..."
 msgstr "Фильтр хостов..."
 
+msgid "Filter logs"
+msgstr "Фильтровать логи"
+
 msgid "Filter pages"
 msgstr "Фильтровать страницы"
 
@@ -7524,6 +7663,9 @@ msgstr "Завершено"
 
 msgid "finished · worked for 7s"
 msgstr "завершил · работал 7 с"
+
+msgid "First repository by name"
+msgstr "Первый репозиторий по имени"
 
 msgid "Fix all failing checks"
 msgstr "Починить все упавшие проверки"
@@ -7735,9 +7877,6 @@ msgstr "Бесплатно"
 msgid "Free for everyone"
 msgstr "Бесплатно для всех"
 
-msgid "Free to start · No credit card required"
-msgstr "Начните бесплатно · Кредитная карта не требуется"
-
 msgid "Frequently<0/>asked questions"
 msgstr "Частые<0/>вопросы"
 
@@ -7752,6 +7891,9 @@ msgstr "от {price}/польз./мес"
 
 msgid "From a hackathon project to the workspace for parallel coding agents."
 msgstr "От проекта с хакатона до рабочего пространства для параллельных агентов программирования."
+
+msgid "From GitHub"
+msgstr "Из GitHub"
 
 msgid "Front matter hidden — switch to Markdown to edit it"
 msgstr "Front matter скрыт — переключитесь на Markdown, чтобы его изменить"
@@ -7770,6 +7912,9 @@ msgstr "Полный доступ к диску"
 
 msgid "Full name"
 msgstr "Имя и фамилия"
+
+msgid "Full screen"
+msgstr "Полноэкранный режим"
 
 msgid "Full self-driving"
 msgstr "Полная автономность"
@@ -7891,9 +8036,6 @@ msgstr "Установка GitHub не найдена"
 msgid "GitHub integration"
 msgstr "Интеграция с GitHub"
 
-msgid "GitHub is refusing API calls for this machine's credential until {until}. Existing pull request links stay; new pull requests appear once the limit resets."
-msgstr "GitHub отклоняет вызовы API с учётными данными этого компьютера до {until}. Существующие ссылки на pull request сохраняются; новые pull request появятся после сброса лимита."
-
 msgid "GitHub issues"
 msgstr "Задачи GitHub"
 
@@ -7902,9 +8044,6 @@ msgstr "Достигнут лимит запросов GitHub"
 
 msgid "GitHub refused the merge"
 msgstr "GitHub отклонил слияние"
-
-msgid "GitHub rejected this machine's credentials, so pull requests cannot be detected. Run \"gh auth login\" or fix GITHUB_TOKEN; the next retry is at {until}."
-msgstr "GitHub отклонил учётные данные этого компьютера, поэтому pull request не могут быть обнаружены. Выполните \"gh auth login\" или исправьте GITHUB_TOKEN; следующая попытка в {until}."
 
 msgid "GitHub sign-in needed"
 msgstr "Требуется вход в GitHub"
@@ -7984,8 +8123,14 @@ msgstr "Выдайте разрешения ОС, нужные Superset."
 msgid "Granted"
 msgstr "Выдано"
 
+msgid "Grayscale"
+msgstr "Оттенки серого"
+
 msgid "Green"
 msgstr "Зелёный"
+
+msgid "Green/Red (Deuteranopia)"
+msgstr "Зелёный/красный (дейтеранопия)"
 
 msgid "Grepped"
 msgstr "Выполнен grep"
@@ -8046,6 +8191,9 @@ msgstr "идёт сейчас"
 
 msgid "Hard reload"
 msgstr "Жёсткая перезагрузка"
+
+msgid "Hardware Keyboard"
+msgstr "Аппаратная клавиатура"
 
 msgid "Has conflicts"
 msgstr "Есть конфликты"
@@ -8176,6 +8324,10 @@ msgstr "История"
 
 msgid "Home"
 msgstr "Главная"
+
+msgctxt "device home button"
+msgid "Home"
+msgstr "Домашняя"
 
 msgctxt "directory"
 msgid "Home"
@@ -8414,6 +8566,9 @@ msgstr "Изображение скопировано"
 msgid "Image is too large (max 10MB)"
 msgstr "Изображение слишком большое (макс. 10 МБ)"
 
+msgid "Image not found — upload it first"
+msgstr "Изображение не найдено — сначала загрузите его"
+
 #. placeholder {0}: getBaseName(filePath)
 msgid "Image preview of {0}. Zoom with plus and minus, pan with arrow keys, press 0 to reset."
 msgstr "Предпросмотр изображения {0}. Масштаб — плюс и минус, панорама — стрелками, 0 — сброс."
@@ -8594,6 +8749,9 @@ msgstr "Включает специфичный для Superset вариант b
 
 msgid "Incognito Operator"
 msgstr "Оператор инкогнито"
+
+msgid "Increase Contrast"
+msgstr "Увеличить контраст"
 
 msgid "Indigo"
 msgstr "Индиго"
@@ -8819,6 +8977,9 @@ msgstr "Счета и способ оплаты"
 msgid "iOS app"
 msgstr "Приложение для iOS"
 
+msgid "iOS Simulator"
+msgstr "Симулятор iOS"
+
 msgid "IP restrictions"
 msgstr "Ограничения по IP"
 
@@ -8848,6 +9009,13 @@ msgstr "Есть ли бесплатный тариф?"
 
 msgid "Isolation"
 msgstr "Изоляция"
+
+msgid "Issue"
+msgstr "Задача"
+
+#. placeholder {0}: link.number
+msgid "Issue #{0}"
+msgstr "Задача #{0}"
 
 msgid "Issue archived"
 msgstr "Задача архивирована"
@@ -9055,6 +9223,10 @@ msgstr "Знания"
 
 msgid "Label"
 msgstr "Название"
+
+msgctxt "task label filter"
+msgid "Label"
+msgstr "Метка"
 
 msgid "Label change"
 msgstr "Изменение метки"
@@ -9369,6 +9541,9 @@ msgstr "Связать эту задачу"
 msgid "Linked {slug} to workspace"
 msgstr "{slug} привязана к рабочей области"
 
+msgid "Liquid Glass"
+msgstr "Liquid Glass"
+
 msgid "List"
 msgstr "Список"
 
@@ -9471,11 +9646,17 @@ msgstr "Загрузка диалога..."
 msgid "Loading diff…"
 msgstr "Загрузка diff…"
 
+msgid "Loading environments…"
+msgstr "Загрузка окружений…"
+
 msgid "Loading files..."
 msgstr "Загрузка файлов..."
 
 msgid "Loading fonts..."
 msgstr "Загрузка шрифтов..."
+
+msgid "Loading GitHub details"
+msgstr "Загрузка сведений из GitHub"
 
 msgid "Loading groups…"
 msgstr "Загрузка групп…"
@@ -9558,6 +9739,9 @@ msgstr "Расположение"
 msgid "Location & checkout"
 msgstr "Расположение и выгрузка"
 
+msgid "Log levels"
+msgstr "Уровни логов"
+
 msgid "Log out"
 msgstr "Выйти"
 
@@ -9584,6 +9768,9 @@ msgstr "Логотип, светлый"
 
 msgid "Logos"
 msgstr "Логотипы"
+
+msgid "Logs"
+msgstr "Логи"
 
 msgid "Long-horizon reliability crosses a threshold. Work assigned at 6pm is mergeable at 9am often enough that not scheduling the overnight shift feels like leaving a factory idle."
 msgstr "Надёжность на длинной дистанции переходит порог. Работа, выданная в 18:00, достаточно часто готова к объединению в 9:00, чтобы не поставить ночную смену казалось простоем фабрики."
@@ -9905,6 +10092,10 @@ msgstr "Можно объединить, но проверки не пройде
 msgid "Merged"
 msgstr "Объединён"
 
+msgctxt "pull request state"
+msgid "Merged"
+msgstr "Объединено"
+
 #. placeholder {0}: mergedBy.login
 msgid "Merged by {0}"
 msgstr "Объединил {0}"
@@ -9950,6 +10141,12 @@ msgstr "Середина 2026"
 
 msgid "Mid 2027"
 msgstr "Середина 2027"
+
+msgid "Min iOS"
+msgstr "Мин. iOS"
+
+msgid "Min SDK"
+msgstr "Мин. SDK"
 
 msgid "Mine"
 msgstr "Мои"
@@ -10216,9 +10413,6 @@ msgstr "Навигация"
 msgid "Navigation Menu"
 msgstr "Меню навигации"
 
-msgid "Nearest to you."
-msgstr "Ближайший к вам."
-
 msgid "Need app-level wiring (form state, chart data, app shell)"
 msgstr "Нужна обвязка на уровне приложения (состояние формы, данные графика, оболочка приложения)"
 
@@ -10258,6 +10452,9 @@ msgstr "Ждёт вас"
 
 msgid "Nerd Fonts"
 msgstr "Nerd Fonts"
+
+msgid "Network"
+msgstr "Сеть"
 
 msgid "Network Changed"
 msgstr "Сеть изменилась"
@@ -10341,6 +10538,9 @@ msgstr "Новая сессия"
 msgid "New shell"
 msgstr "Новая оболочка"
 
+msgid "New sidebar"
+msgstr "Новая боковая панель"
+
 msgid "New stars"
 msgstr "Новые звёзды"
 
@@ -10415,6 +10615,9 @@ msgstr "Следующий файл"
 
 msgid "Next match"
 msgstr "Следующее совпадение"
+
+msgid "Next release"
+msgstr "Следующий релиз"
 
 #. placeholder {0}: formatDateTimeInTimezone( new Date(automation.nextRunAt), automation.timezone ?? "UTC", )
 msgid "Next run {0}"
@@ -10551,6 +10754,9 @@ msgstr "Chrome, Brave, Arc и другие браузеры на Chromium не �
 msgid "No Claude or Codex usage found on this machine yet. Join now and you'll appear once you've used an agent."
 msgstr "На этой машине пока нет данных об использовании Claude или Codex. Присоединяйтесь — вы появитесь, как только поработаете с агентом."
 
+msgid "No cloud workspaces"
+msgstr "Нет облачных рабочих пространств"
+
 msgid "No cloud workspaces match these filters"
 msgstr "Нет облачных рабочих областей, подходящих под эти фильтры"
 
@@ -10608,6 +10814,9 @@ msgstr "Описание не указано."
 msgid "No desktop session is running in this sandbox."
 msgstr "В этой песочнице нет запущенного сеанса рабочего стола."
 
+msgid "No device is running."
+msgstr "Нет запущенных устройств."
+
 msgid "No devices yet"
 msgstr "Устройств пока нет"
 
@@ -10617,14 +10826,23 @@ msgstr "Загрузок пока нет"
 msgid "No emoji found"
 msgstr "Эмодзи не найдены"
 
+msgid "No environment for {repositoryFullName}"
+msgstr "Нет окружения для {repositoryFullName}"
+
 msgid "No environments available"
 msgstr "Нет доступных окружений"
 
 msgid "No environments found."
 msgstr "Окружения не найдены."
 
+msgid "No environments yet"
+msgstr "Окружений пока нет"
+
 msgid "No environments yet."
 msgstr "Окружений пока нет. Создайте окружение, чтобы запускать из него облачную рабочую область."
+
+msgid "No events yet"
+msgstr "Событий пока нет"
 
 msgid "No extended thinking"
 msgstr "Без расширенного мышления"
@@ -10698,6 +10916,9 @@ msgstr "Нет известных создателей"
 msgid "No labels"
 msgstr "Без меток"
 
+msgid "No labels found."
+msgstr "Метки не найдены."
+
 msgid "No lead"
 msgstr "Без руководителя"
 
@@ -10706,6 +10927,12 @@ msgstr "Нет агентов, получающих комментарии"
 
 msgid "No live sessions"
 msgstr "Нет активных сессий"
+
+msgid "No local workspaces"
+msgstr "Нет локальных рабочих пространств"
+
+msgid "No log lines yet"
+msgstr "Строк лога пока нет"
 
 msgid "no logins"
 msgstr "нет логинов"
@@ -10728,6 +10955,9 @@ msgstr "Нет подходящих участников организации.
 msgid "No matching pages"
 msgstr "Нет подходящих страниц"
 
+msgid "No matching repositories."
+msgstr "Нет подходящих репозиториев."
+
 msgid "No members yet"
 msgstr "Участников пока нет"
 
@@ -10743,8 +10973,8 @@ msgstr "Нет объединённых пул-реквестов."
 msgid "No messages yet"
 msgstr "Сообщений пока нет"
 
-msgid "No mobile simulator available here. This needs either a Limrun-enabled cloud sandbox or a local iOS/Android toolchain."
-msgstr "Здесь нет доступного мобильного симулятора. Нужна облачная песочница с поддержкой Limrun или локальный набор инструментов iOS/Android."
+msgid "No mobile simulator available here. This needs either an EAS simulator on a cloud sandbox or a local iOS/Android toolchain."
+msgstr "Здесь нет доступного мобильного симулятора. Нужен симулятор EAS в облачной песочнице или локальный набор инструментов iOS/Android."
 
 msgid "No name on file"
 msgstr "Имя не указано"
@@ -10864,6 +11094,9 @@ msgstr "Публичных конфигураций агентов пока не
 msgid "No pull requests found."
 msgstr "Пул-реквесты не найдены."
 
+msgid "No release notes at {url}"
+msgstr "Нет заметок о релизе по адресу {url}"
+
 msgid "No repositories found. Make sure your GitHub App has access to repositories."
 msgstr "Репозитории не найдены. Убедитесь, что у вашего GitHub App есть доступ к репозиториям."
 
@@ -10908,6 +11141,9 @@ msgstr "Сессий пока нет"
 
 msgid "No shortcuts found matching \"{searchQuery}\""
 msgstr "Не найдено сочетаний по запросу «{searchQuery}»"
+
+msgid "No simulator is running."
+msgstr "Нет запущенных симуляторов."
 
 msgid "No sites are signed in"
 msgstr "Нет сайтов, где выполнен вход"
@@ -11271,6 +11507,9 @@ msgstr "При смене окна"
 msgid "On your machine. Repos, worktrees, terminal output, and agent sessions stay local by default; cloud sync covers account and organization metadata only. Superset doesn't proxy any API calls."
 msgstr "На вашей машине. Репозитории, worktree, вывод терминала и сессии агентов по умолчанию остаются локальными; облачная синхронизация покрывает только метаданные аккаунта и организации. Superset не проксирует вызовы API."
 
+msgid "On-screen Keyboard"
+msgstr "Экранная клавиатура"
+
 msgid "Onboarding redesign"
 msgstr "Редизайн онбординга"
 
@@ -11330,6 +11569,9 @@ msgstr "Изменять это расположение могут только
 
 msgid "Only host owners or organization owners can delete this host"
 msgstr "Удалить этот хост могут только владельцы хоста или владельцы организации"
+
+msgid "Only images can be attached to a comment"
+msgstr "К комментарию можно прикреплять только изображения"
 
 msgid "Only organization owners can modify these settings."
 msgstr "Изменять эти настройки могут только владельцы организации."
@@ -11397,6 +11639,10 @@ msgstr "открыть"
 msgid "Open"
 msgstr "Открыть"
 
+msgctxt "pull request or issue state"
+msgid "Open"
+msgstr "Открыто"
+
 msgctxt "status"
 msgid "Open"
 msgstr "Открыт"
@@ -11444,6 +11690,9 @@ msgstr "Открыть App Store"
 
 msgid "Open as comment pane"
 msgstr "Открыть как панель комментариев"
+
+msgid "Open billing"
+msgstr "Открыть оплату"
 
 msgid "Open branch on GitHub"
 msgstr "Открыть ветку на GitHub"
@@ -11831,6 +12080,9 @@ msgstr "Открытие worktree..."
 
 msgid "Opens a cloud workspace where an agent installs what the project needs and writes its .superset/config.json"
 msgstr "Открывает облачную рабочую область, где агент устанавливает всё нужное проекту и записывает его .superset/config.json"
+
+msgid "Opens on"
+msgstr "Открывается в"
 
 msgid "Operator"
 msgstr "Оператор"
@@ -12350,6 +12602,9 @@ msgstr "Тариф"
 msgid "Plan restored"
 msgstr "Тариф восстановлен"
 
+msgid "Plan updated"
+msgstr "Тариф обновлён"
+
 msgctxt "project state"
 msgid "Planned"
 msgstr "Запланирован"
@@ -12464,6 +12719,10 @@ msgstr "PR"
 
 msgid "PR {position} of {size} · targets {base}"
 msgstr "PR {position} из {size} · в {base}"
+
+#. placeholder {0}: link.number
+msgid "PR #{0}"
+msgstr "PR #{0}"
 
 #. placeholder {0}: pullRequest.number
 #. placeholder {1}: i18n._(PR_STATE_LABEL[pullRequest.state])
@@ -12582,6 +12841,9 @@ msgstr "Открывайте dev-сервер рядом с терминалам
 msgid "Preview: GitHub star nag toast"
 msgstr "Предпросмотр: напоминание о звезде на GitHub"
 
+msgid "Preview: release notes card"
+msgstr "Предпросмотр: карточка заметок о релизе"
+
 msgid "Previous"
 msgstr "Назад"
 
@@ -12602,6 +12864,9 @@ msgstr "Предыдущее совпадение"
 
 msgid "Previous prompts"
 msgstr "Предыдущие промпты"
+
+msgid "Previous release"
+msgstr "Предыдущий релиз"
 
 msgid "Previous slide"
 msgstr "Предыдущий слайд"
@@ -12768,6 +13033,9 @@ msgstr "Хост проекта недоступен — сейчас переи
 
 msgid "Projects"
 msgstr "Проекты"
+
+msgid "Promoted from a workspace, so its repositories and region are fixed. Promote a workspace again to change them."
+msgstr "Создано из рабочего пространства, поэтому репозитории и регион фиксированы. Повысьте рабочее пространство снова, чтобы изменить их."
 
 msgid "Prompt"
 msgstr "Промпт"
@@ -12949,6 +13217,9 @@ msgstr "Ставьте работу агентам в очередь"
 msgid "Queued"
 msgstr "В очереди"
 
+msgid "Queued messages"
+msgstr "Сообщения в очереди"
+
 msgid "Queued to Merge"
 msgstr "В очереди на слияние"
 
@@ -13030,6 +13301,9 @@ msgstr "Достигнуто"
 
 msgid "React layer of the shared pane/workspace layout engine"
 msgstr "React-слой общего движка раскладки панелей и рабочих областей"
+
+msgid "React Native"
+msgstr "React Native"
 
 msgid "Reaction added"
 msgstr "Добавлена реакция"
@@ -13129,6 +13403,9 @@ msgstr "Перебазировать и объединить"
 msgid "Recent Activity"
 msgstr "Недавняя активность"
 
+msgid "Recent apps"
+msgstr "Недавние приложения"
+
 msgid "Recent invoices"
 msgstr "Недавние счета"
 
@@ -13186,8 +13463,14 @@ msgstr "Переподключение…"
 msgid "Reconnecting… your conversation is kept."
 msgstr "Переподключение… разговор сохранён."
 
+msgid "Recording"
+msgstr "Идёт запись"
+
 msgid "Red"
 msgstr "Красный"
+
+msgid "Red/Green (Protanopia)"
+msgstr "Красный/зелёный (протанопия)"
 
 msgid "Redacted Riveter"
 msgstr "Засекреченный клепальщик"
@@ -13200,6 +13483,12 @@ msgstr "Перенаправление..."
 
 msgid "Redo"
 msgstr "Повторить"
+
+msgid "Reduce Motion"
+msgstr "Уменьшение движения"
+
+msgid "Reduce Transparency"
+msgstr "Понижение прозрачности"
 
 msgid "Referenced, not demoed"
 msgstr "Упомянуто, не показано"
@@ -13328,6 +13617,9 @@ msgstr "Удалить {0}"
 msgid "Remove {label}?"
 msgstr "Удалить {label}?"
 
+msgid "Remove {repositoryName}"
+msgstr "Удалить {repositoryName}"
+
 msgid "Remove attachment"
 msgstr "Удалить вложение"
 
@@ -13345,6 +13637,9 @@ msgstr "Убрать из боковой панели"
 
 msgid "Remove icon"
 msgstr "Удалить иконку"
+
+msgid "Remove image"
+msgstr "Убрать изображение"
 
 msgid "Remove linked issue"
 msgstr "Отвязать задачу"
@@ -13643,6 +13938,9 @@ msgstr "Сбросить масштаб"
 msgid "Reset Zoom"
 msgstr "Сбросить масштаб"
 
+msgid "Resets at {until}"
+msgstr "Сброс в {until}"
+
 msgid "Resets in {countdown} · {absolute}"
 msgstr "Сброс через {countdown} · {absolute}"
 
@@ -13856,6 +14154,9 @@ msgstr "Повторите через несколько секунд; если 
 msgid "Retry in a few seconds."
 msgstr "Повторите через несколько секунд."
 
+msgid "Retrying at {until}"
+msgstr "Повтор в {until}"
+
 msgid "Retrying…"
 msgstr "Повтор…"
 
@@ -14007,6 +14308,9 @@ msgstr "Роль обновлена"
 msgid "Roll back an agent session to any checkpoint, conversation and file changes together."
 msgstr "Откатите сессию агента к любой контрольной точке — вместе с диалогом и изменениями файлов."
 
+msgid "Rotate"
+msgstr "Повернуть"
+
 msgid "Rotate device"
 msgstr "Повернуть устройство"
 
@@ -14027,6 +14331,9 @@ msgstr "Строки изменены"
 
 msgid "Run"
 msgstr "Запустить"
+
+msgid "Run \"gh auth login\" or set GITHUB_TOKEN"
+msgstr "Выполните \"gh auth login\" или задайте GITHUB_TOKEN"
 
 #. placeholder {0}: automation.name
 msgid "Run {0} now"
@@ -14142,9 +14449,6 @@ msgstr "Работающие агенты этого профиля потеря
 
 msgid "Running bun test…"
 msgstr "Выполняется bun test…"
-
-msgid "Running in the background"
-msgstr "Выполняется в фоне"
 
 msgid "Running now"
 msgstr "Запускается"
@@ -14304,6 +14608,9 @@ msgstr "Область"
 msgid "Scoring starts once the board can see {0} days of usage."
 msgstr "Подсчёт очков начнётся, когда наберётся дней с активностью: {0}."
 
+msgid "Screenshot"
+msgstr "Снимок экрана"
+
 msgid "Screenshot copied to clipboard"
 msgstr "Скриншот скопирован в буфер обмена"
 
@@ -14418,6 +14725,9 @@ msgstr "Поиск в {frameTitle}…"
 
 msgid "Search issues..."
 msgstr "Поиск задач..."
+
+msgid "Search labels..."
+msgstr "Поиск меток..."
 
 msgid "Search Linear"
 msgstr "Поиск в Linear"
@@ -14629,6 +14939,9 @@ msgstr "Выберите агента"
 msgid "Select an editor from the dropdown"
 msgstr "Выберите редактор из списка"
 
+msgid "Select an environment"
+msgstr "Выберите окружение"
+
 msgid "Select an organization"
 msgstr "Выберите организацию"
 
@@ -14754,6 +15067,9 @@ msgstr "Отправлять нажатия клавиш, управлять о�
 
 msgid "Send message"
 msgstr "Отправить сообщение"
+
+msgid "Send now"
+msgstr "Отправить сейчас"
 
 msgid "Send reply"
 msgstr "Отправить ответ"
@@ -14889,6 +15205,9 @@ msgstr "Настроить хост по SSH"
 msgid "Set up an automation"
 msgstr "Настройте автоматизацию"
 
+msgid "Set up environment"
+msgstr "Настроить окружение"
+
 msgid "Set up project on {hostName}"
 msgstr "Настроить проект на {hostName}"
 
@@ -14897,6 +15216,9 @@ msgstr "Настроить проект…"
 
 msgid "Set up this project for Superset"
 msgstr "Настроить этот проект под Superset"
+
+msgid "Set up with an agent"
+msgstr "Настроить с помощью агента"
 
 msgid "Set up your organization to get started"
 msgstr "Настройте организацию, чтобы начать"
@@ -14915,6 +15237,9 @@ msgstr "Настройки ({settingsHotkey})"
 
 msgid "Settings → Remote Access → “Allow remote access to this device via relay”."
 msgstr "Настройки → Удалённый доступ → «Разрешить удалённый доступ к этому устройству через реле»."
+
+msgid "Settings are not available for this device"
+msgstr "Настройки недоступны для этого устройства"
 
 msgid "Settings..."
 msgstr "Настройки..."
@@ -15021,6 +15346,9 @@ msgstr "Показать"
 msgid "Show a confirmation dialog when quitting the app"
 msgstr "Показывать подтверждение при выходе из приложения"
 
+msgid "Show a microphone in the chat composer. Speech is transcribed by ChatGPT when Codex is signed in to it, otherwise on your Mac when possible, and otherwise by Superset's servers."
+msgstr "Показывать микрофон в поле ввода чата. Речь расшифровывает ChatGPT, если в Codex выполнен вход в ChatGPT, иначе по возможности ваш Mac, а в остальных случаях серверы Superset."
+
 msgid "Show a Usage button in the home sidebar, under Pull requests"
 msgstr "Показывать кнопку «Использование» в боковой панели главного экрана под пул-реквестами"
 
@@ -15032,6 +15360,9 @@ msgstr "Показать все комментарии"
 
 msgid "Show all lines"
 msgstr "Показать все строки"
+
+msgid "Show Borders"
+msgstr "Показывать границы"
 
 msgid "Show checks"
 msgstr "Показать проверки"
@@ -15165,6 +15496,10 @@ msgstr "Показывается в боковой панели и списке 
 msgid "Shown publicly alongside your name."
 msgstr "Показывается публично рядом с вашим именем."
 
+#. placeholder {0}: selected.name
+msgid "Shut down {0}"
+msgstr "Выключить {0}"
+
 msgid "Side by Side"
 msgstr "Рядом"
 
@@ -15188,6 +15523,9 @@ msgstr "Плашка в боковой панели, появляется, ко�
 
 msgid "Sign in"
 msgstr "Войти"
+
+msgid "Sign in again to use dictation"
+msgstr "Войдите снова, чтобы пользоваться диктовкой"
 
 msgid "Sign in as Local Admin (dev)"
 msgstr "Войти как локальный админ (dev)"
@@ -15291,6 +15629,9 @@ msgstr "Симуляция обновления: ошибка"
 msgid "Simulate update: ready"
 msgstr "Симуляция обновления: готово"
 
+msgid "Simulator"
+msgstr "Симулятор"
+
 msgid "Since 2025"
 msgstr "С 2025 года"
 
@@ -15332,9 +15673,6 @@ msgstr "Навыки поставляются с плагином Superset и а
 
 msgid "Skip"
 msgstr "Пропустить"
-
-msgid "Skip & save"
-msgstr "Пропустить и сохранить"
 
 msgid "Skip All"
 msgstr "Пропустить всё"
@@ -15472,6 +15810,9 @@ msgstr "Сортировать рабочие области"
 
 msgid "Sort workspaces ({currentLabel})"
 msgstr "Сортировать рабочие области ({currentLabel})"
+
+msgid "Sort workspaces ({currentLabel}) · {hostLabel}"
+msgstr "Сортировать рабочие области ({currentLabel}) · {hostLabel}"
 
 msgid "Sounds and ringtone for completed tasks"
 msgstr "Звуки и мелодия для завершённых задач"
@@ -15700,9 +16041,6 @@ msgstr "Запустить сессию"
 msgid "Start a workspace straight from a Linear ticket. The agent picks it up and reports back with a PR."
 msgstr "Запускайте рабочую область прямо из тикета Linear. Агент берёт его в работу и отчитывается пул-реквестом."
 
-msgid "Start agent"
-msgstr "Запустить агента"
-
 msgid "Start agents, follow them live, and review the diff from your iPhone or iPad. Your code stays on your machines."
 msgstr "Запускайте агентов, следите за ними в реальном времени и проверяйте diff с iPhone или iPad. Ваш код остаётся на ваших машинах."
 
@@ -15831,6 +16169,9 @@ msgstr "Хост по-прежнему недоступен."
 msgid "Still trying. If it keeps failing, archive it and create a new one."
 msgstr "Продолжаем попытки. Если не получится, архивируйте её и создайте новую."
 
+msgid "Still waking up…"
+msgstr "Всё ещё пробуждается…"
+
 msgid "Still working — large repos can take a few minutes. You can leave; the workspace will appear on Home when it's ready."
 msgstr "Ещё работаем — большие репозитории могут занять несколько минут. Можно выйти; рабочая область появится на главной, когда будет готова."
 
@@ -15877,6 +16218,9 @@ msgstr "Остановлено"
 
 msgid "Stopping the agent in {what}"
 msgstr "Остановка агента в {what}"
+
+msgid "Stops the agent and sends this now"
+msgstr "Останавливает агента и отправляет это сейчас"
 
 msgid "Strikethrough"
 msgstr "Зачёркнутый"
@@ -15974,8 +16318,11 @@ msgstr "superset"
 msgid "Superset"
 msgstr "Superset"
 
-msgid "Superset (YC S26) is the open-source IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
-msgstr "Superset (YC S26) — это IDE с открытым исходным кодом для эпохи ИИ-агентов, в которой инженеры параллельно запускают сотни агентов для программирования, таких как Claude Code и Codex."
+msgid "Superset (YC S26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
+msgstr "Superset (YC S26) — это IDE с доступным исходным кодом для эпохи ИИ-агентов, в которой инженеры параллельно запускают сотни агентов для программирования, таких как Claude Code и Codex."
+
+msgid "Superset {version}"
+msgstr "Superset {version}"
 
 msgid "Superset Agent"
 msgstr "Superset Agent"
@@ -15991,9 +16338,6 @@ msgstr "Superset Автоматизации"
 
 msgid "superset browser cdp prints an endpoint for that pane only. Point Playwright or browser-use at it."
 msgstr "superset browser cdp выводит эндпоинт только для этой панели. Направьте на него Playwright или browser-use."
-
-msgid "Superset cannot reach api.github.com from this machine. Pull request status retries at {until}."
-msgstr "Superset не может подключиться к api.github.com с этого компьютера. Состояние pull request будет запрошено повторно в {until}."
 
 msgid "Superset CLI"
 msgstr "Superset CLI"
@@ -16582,6 +16926,9 @@ msgstr "Текст"
 msgid "Text input with emoji picker support"
 msgstr "Поле ввода с поддержкой выбора эмодзи"
 
+msgid "Text Size"
+msgstr "Размер текста"
+
 msgid "Text style"
 msgstr "Стиль текста"
 
@@ -16784,6 +17131,9 @@ msgstr "Хост вернулся к предыдущей сборке."
 msgid "The human reads every line before it merges."
 msgstr "Человек читает каждую строку перед слиянием."
 
+msgid "The image upload expired — attach it again"
+msgstr "Срок загрузки изображения истёк — прикрепите его снова"
+
 msgid "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 msgstr "Описание работы меняется. Инженеры перестают быть машинистками со вкусом и становятся диспетчерами со вкусом: декомпозируют работу, раздают её флотам, разрешают конфликты между агентами, которые оба тронули один модуль."
 
@@ -16869,9 +17219,6 @@ msgstr "Период восстановления истёк. Напишите �
 msgid "The remote branch has diverged. Pull before continuing."
 msgstr "Удалённая ветка разошлась. Получите изменения, прежде чем продолжать."
 
-msgid "The repositories a cloud workspace checks out, and which one's .superset/config.json it acts on. The workspace opens on the config location, or on the first repository by name."
-msgstr "Репозитории, которые извлекает облачная рабочая область, и чей .superset/config.json она применяет. Рабочая область открывается в расположении конфигурации или в первом репозитории по имени."
-
 msgid "The request failed."
 msgstr "Запрос завершился ошибкой."
 
@@ -16902,9 +17249,6 @@ msgstr "Не удалось найти сервер"
 
 msgid "The sign-in link was incomplete. Please try again."
 msgstr "Ссылка для входа была неполной. Попробуйте ещё раз."
-
-msgid "The simulator instance was terminated."
-msgstr "Экземпляр симулятора был завершён."
 
 msgid "The site's certificate authority is not trusted"
 msgstr "Удостоверяющий центр сайта не является доверенным"
@@ -16951,8 +17295,8 @@ msgstr "Рабочая область всё же могла быть созда
 msgid "The workspace this automation is pinned to no longer exists on its host. Pin a different one in the automation's settings."
 msgstr "Рабочее пространство, к которому закреплена эта автоматизация, больше не существует на её хосте. Закрепите другое в настройках автоматизации."
 
-msgid "The workspace's repositories, as they are checked out now."
-msgstr "Репозитории рабочего пространства в текущем состоянии."
+msgid "The workspace's repositories, as they are checked out now. Boxes run in its region."
+msgstr "Репозитории рабочего пространства в их текущем состоянии. Боксы работают в его регионе."
 
 msgid "The worktree and any uncommitted changes will be removed. This cannot be undone."
 msgstr "Worktree и все незакоммиченные изменения будут удалены. Отменить нельзя."
@@ -17063,6 +17407,9 @@ msgstr "Выбранные рабочие области и их термина�
 msgid "This closes the workspace and its terminals. The project's files, branches and other workspaces stay as they are."
 msgstr "Рабочая область и её терминалы будут закрыты. Файлы, ветки и другие рабочие области проекта останутся без изменений."
 
+msgid "This cloud workspace can't start"
+msgstr "Не удаётся запустить эту облачную рабочую область"
+
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Облачное рабочее пространство запускается. После простоя это может занять до 30 секунд."
 
@@ -17092,9 +17439,6 @@ msgstr "Этот адрес электронной почты уже зарег�
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "В этом окружении нет репозиториев. Создайте окружение с репозиториями в Настройках и запустите рабочую область из него"
-
-msgid "This environment was promoted from a workspace, so its repositories are fixed. Promote a workspace again to change them."
-msgstr "Это окружение было создано повышением рабочей области, поэтому его репозитории зафиксированы. Чтобы изменить их, снова повысьте рабочую область."
 
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "Репозитории этого окружения зафиксированы; чтобы изменить их, снова повысьте рабочую область"
@@ -17149,6 +17493,9 @@ msgstr "Похоже, это бинарный файл. Открытие его 
 
 msgid "This Mac"
 msgstr "Этот Mac"
+
+msgid "This machine"
+msgstr "Этот компьютер"
 
 msgid "This Microsoft tenant is already connected by {detail}. Ask them to disconnect first."
 msgstr "Этот тенант Microsoft уже подключён пользователем {detail}. Попросите отключить его."
@@ -17227,6 +17574,9 @@ msgstr "Этот пул-реквест больше недоступен."
 
 msgid "This pull request link is invalid."
 msgstr "Эта ссылка на пул-реквест недействительна."
+
+msgid "This recording is too long to transcribe"
+msgstr "Эта запись слишком длинная для расшифровки"
 
 msgid "This removes every selected worktree from disk and deletes its workspace record."
 msgstr "Это удалит каждый выбранный worktree с диска и сотрёт запись о его рабочей области."
@@ -17388,6 +17738,9 @@ msgstr "Время"
 msgid "Times use your time zone."
 msgstr "Время указано в вашем часовом поясе."
 
+msgid "Tinted"
+msgstr "Тонированный"
+
 msgid "Tip"
 msgstr "Совет"
 
@@ -17493,6 +17846,9 @@ msgstr "токенов за сессию, последние 30 дней"
 msgid "Tokens stay off your machine"
 msgstr "Токены не хранятся на вашем компьютере"
 
+msgid "Too many dictations. Try again later."
+msgstr "Слишком много диктовок. Повторите попытку позже."
+
 msgid "Too many feedback submissions. Try again later."
 msgstr "Слишком много отзывов. Попробуйте позже."
 
@@ -17588,6 +17944,12 @@ msgstr "Где вести задачи"
 
 msgid "Tracking"
 msgstr "Отслеживание"
+
+msgid "Transcribing"
+msgstr "Расшифровка"
+
+msgid "Transcribing…"
+msgstr "Расшифровка…"
 
 msgid "Translated"
 msgstr "Переведено"
@@ -17756,6 +18118,9 @@ msgstr "Не удалось запустить диктовку"
 
 msgid "Unable to transcribe audio"
 msgstr "Не удалось расшифровать аудио"
+
+msgid "Unable to transcribe this recording"
+msgstr "Не удалось расшифровать эту запись"
 
 msgid "Unarchive"
 msgstr "Вернуть из архива"
@@ -18014,6 +18379,10 @@ msgstr "обновить префикс ветки"
 
 msgid "Updated"
 msgstr "Обновлено"
+
+#. placeholder {0}: formatRelativeTime(new Date(item.updatedAt))
+msgid "Updated {0}"
+msgstr "Обновлено {0}"
 
 msgid "Updated {date}"
 msgstr "Обновлено {date}"
@@ -18348,6 +18717,9 @@ msgstr "Открыт"
 msgid "Violence or harassment"
 msgstr "Насилие или травля"
 
+msgid "Visible to"
+msgstr "Видно"
+
 msgid "Voice"
 msgstr "Голос"
 
@@ -18356,6 +18728,9 @@ msgstr "В голосовом режиме возникла проблема. П
 
 msgid "Voice settings"
 msgstr "Настройки голоса"
+
+msgid "VoiceOver"
+msgstr "VoiceOver"
 
 msgid "Volume"
 msgstr "Громкость"
@@ -18370,6 +18745,9 @@ msgstr "Ждать настройки рабочей области перед �
 #. placeholder {1}: names.b
 msgid "waiting for {0} and {1}…"
 msgstr "ожидание {0} и {1}…"
+
+msgid "Waiting for activity data"
+msgstr "Ожидание данных об активности"
 
 msgid "Waiting for Checks"
 msgstr "Ожидание проверок"
@@ -18388,6 +18766,9 @@ msgstr "Ожидание первого сообщения субагента…
 
 msgid "Waiting for your input"
 msgstr "Ждёт вашего ответа"
+
+msgid "Waking up workspace"
+msgstr "Пробуждение рабочей области"
 
 msgid "Want something sooner? <0>Tell us in Discord</0>. Much of what's here started as a user request."
 msgstr "Хотите что-то быстрее? <0>Скажите нам в Discord</0>. Многое из этого началось с пожелания пользователя."
@@ -19144,6 +19525,12 @@ msgstr "Ваше имя"
 
 msgid "Your name <0>(if we use your prompt, we'll credit you in the changelog)</0>"
 msgstr "Ваше имя <0>(если возьмём ваш промпт, укажем вас в changelog)</0>"
+
+msgid "Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace."
+msgstr "Ваша организация достигла лимита использования облака. Увеличьте лимит или перейдите на другой тариф в разделе «Настройки», «Оплата», чтобы запустить эту рабочую область."
+
+msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
+msgstr "Ваша организация достигла лимита использования облака. Эта рабочая область остановится через несколько минут, если лимит не увеличить."
 
 msgid "Your own accounts. Your organization's integrations let Superset reach its tools; connecting yours makes the work Superset does for you show up as you."
 msgstr "Ваши собственные учётные записи. Интеграции вашей организации дают Superset доступ к её инструментам; подключив свои, вы увидите работу, которую Superset делает для вас, под своим именем."

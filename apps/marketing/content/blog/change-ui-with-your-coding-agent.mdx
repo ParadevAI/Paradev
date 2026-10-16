@@ -5,6 +5,7 @@ author: kiet
 date: 2026-09-24
 unlisted: true
 category: Product
+lastUpdated: 2026-10-14
 relatedSlugs:
   - send-pr-feedback-to-your-agent
   - review-agent-work-with-pages
@@ -32,5 +33,11 @@ See the [Design Mode demonstration](https://docs.superset.sh/browser#design-mode
 Read the agent's diff, reload the preview, and check the button at the screen sizes your app supports. Try its click behavior too. The screenshot gives the agent context; the preview lets you check what it actually changed.
 
 For browser checks you want to delegate, agents can also [read and interact with the workspace's browser pane](https://docs.superset.sh/browser#drive-it-from-the-cli-and-agents).
+
+## Review, merge, and keep going
+
+- **Review before merging.** Each change runs in its own workspace, on its own branch and worktree, so several UI fixes can run at once without mixing. Read the diff in the Changes pane, send a follow-up if something is off, then commit, push, and open a pull request from the same place. The Pull Requests view shows CI checks and lets you send line comments back to the agent.
+- **Check from your phone.** The [iPhone and iPad app](/mobile) shows the agents running on your hosts, Claude Code and Codex included, so you can answer a question or review a diff away from your desk.
+- **Make it recurring.** A scheduled [automation](https://docs.superset.sh/automations) can run an agent every week, for example to look into flaky tests and leave a reviewable fix in its own workspace.
 
 [Download Superset](/download) and try one UI change in a repository you already work on.

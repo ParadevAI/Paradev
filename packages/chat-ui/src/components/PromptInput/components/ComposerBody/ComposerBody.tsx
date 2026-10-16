@@ -65,6 +65,7 @@ import type {
 } from "../../types";
 import { registerDraftEdit } from "../../utils/draftEdit";
 import { registerHistoryNavigation } from "../../utils/historyNavigation";
+import { $insertTranscript } from "../../utils/insertTranscript";
 import { matchToken } from "../../utils/matchToken";
 import { rankCommands } from "../../utils/rankCommands";
 import { $restoreChips } from "../../utils/restoreChips";
@@ -465,22 +466,23 @@ export function ComposerBody({
 	const submitRef = useRef(submit);
 	submitRef.current = submit;
 
+	const isFocusUnclaimed = () => {
+		const active = document.activeElement;
+		return (
+			active == null ||
+			active === document.body ||
+			Boolean(rootRef.current?.contains(active))
+		);
+	};
+
 	const dictationSession = useDictation({
-		transcribe: (audio) => dictation?.transcribe(audio) ?? "",
+		transcribe: (audio, options) => dictation?.transcribe(audio, options) ?? "",
 		onError: (dictationError) => dictation?.onError?.(dictationError),
+		maxSeconds: dictation?.maxSeconds,
+		audioBitsPerSecond: dictation?.audioBitsPerSecond,
 		onTranscript: (text) => {
-			editor.update(() => {
-				$getRoot().selectEnd();
-				const selection = $getSelection();
-				if (!$isRangeSelection(selection)) return;
-				const anchorNode = selection.anchor.getNode();
-				const offset = selection.anchor.offset;
-				const previousChar = $isTextNode(anchorNode)
-					? anchorNode.getTextContent()[offset - 1]
-					: undefined;
-				const needsSpace = previousChar != null && !/\s/.test(previousChar);
-				selection.insertText(needsSpace ? ` ${text}` : text);
-			});
+			editor.update(() => $insertTranscript(text));
+			if (isFocusUnclaimed()) editor.focus();
 		},
 	});
 
@@ -634,19 +636,25 @@ export function ComposerBody({
 		void entry.select(actionContextRef.current);
 	};
 
-	// Escape aborts dictation without transcribing; it outranks every other
-	// Escape behavior while a recording or failed transcription is active.
+	// While dictating, Escape cancels and Enter stops or retries, never sends;
+	// both win over the composer's own Escape/Enter (stopping the agent, send).
 	useEffect(() => {
-		if (
-			dictationSession.status !== "recording" &&
-			dictationSession.status !== "error"
-		)
-			return;
+		if (dictationSession.status === "idle") return;
 		const onKeyDown = (event: KeyboardEvent) => {
-			if (event.key !== "Escape") return;
+			if (event.isComposing || !isFocusUnclaimed()) return;
+			if (event.key === "Escape") {
+				event.preventDefault();
+				event.stopPropagation();
+				dictationSession.cancel();
+				return;
+			}
+			if (event.key !== "Enter" || event.shiftKey) return;
 			event.preventDefault();
 			event.stopPropagation();
-			dictationSession.cancel();
+			if (dictationSession.status === "recording")
+				void dictationSession.finish();
+			else if (dictationSession.status === "error")
+				void dictationSession.retry();
 		};
 		window.addEventListener("keydown", onKeyDown, { capture: true });
 		return () =>
@@ -892,7 +900,10 @@ export function ComposerBody({
 					}
 				/>
 			</div>
-			<div className="flex min-h-12 items-center gap-2 px-3 pb-2.5">
+			<div
+				className="flex min-h-12 items-center gap-2 px-3 pb-2.5"
+				data-composer-footer
+			>
 				<ContextButton
 					onClick={toggleBrowseMenu}
 					disabled={dictationSession.status !== "idle"}
@@ -948,6 +959,11 @@ export function ComposerBody({
 						<DictationBar
 							canvasRef={dictationSession.canvasRef}
 							seconds={dictationSession.seconds}
+							status={
+								dictationSession.status === "transcribing"
+									? "transcribing"
+									: "recording"
+							}
 						/>
 						<button
 							type="button"
@@ -979,15 +995,16 @@ export function ComposerBody({
 						{toolbar}
 						<div className="flex-1" />
 						{toolbarEnd}
-						{dictation && status !== "streaming" && (
+						{dictation && (
 							<button
 								type="button"
 								aria-label={t({
 									message: "Dictate",
 								})}
-								onClick={() => {
+								onClick={async () => {
 									setBrowseOpen(false);
-									void dictationSession.start();
+									await dictationSession.start();
+									editor.focus();
 								}}
 								className={GHOST_FOOTER_BUTTON_CLASS}
 							>

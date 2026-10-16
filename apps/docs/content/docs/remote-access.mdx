@@ -63,9 +63,15 @@ superset hosts list --org <id|slug|name>
 superset status --org <id|slug|name>
 ```
 
+## Set Up a Host Over SSH
+
+In the desktop app, open **Settings → Hosts** and choose **Set up a host over SSH**. Enter the SSH destination (`user@box` or a Host alias). The dialog runs [`superset hosts add`](/cli/cli-reference) in an embedded terminal, so password, host-key, and install prompts work as in any terminal. When it finishes, the new host appears in the list. If it fails, edit the destination and retry.
+
 ## Connect from an iPhone or iPad
 
-Install [Superset for iPhone and iPad](/install#iphone-and-ipad) and check its requirements before connecting.
+Install [Superset for iPhone and iPad](/install#iphone-and-ipad) and check its requirements before connecting. You can use [cloud workspaces](/workspaces#cloud-workspaces) without connecting your own computer.
+
+To connect to workspaces hosted on your own computer:
 
 1. On your computer, enable **Allow remote access to this device via relay** in **Settings → Remote Access**. You can also use the inline toggle in **Settings → Mobile** when that tab is available. Both toggles control the same setting.
 2. On your iPhone or iPad, sign in with the same Superset account and select the same organization. The QR code in desktop Mobile settings opens the App Store; it does not sign you in.

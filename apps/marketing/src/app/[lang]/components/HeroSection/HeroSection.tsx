@@ -5,10 +5,10 @@ import { COMPANY } from "@superset/shared/constants";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { FaApple, FaGithub } from "react-icons/fa";
+import { track } from "@/lib/analytics";
 import { DownloadButton } from "../DownloadButton";
 import { WaitlistModal } from "../WaitlistModal";
 import { BoidsBackground } from "./components/BoidsBackground";
-import { HeroReassurance } from "./components/HeroReassurance";
 import { ProductDemo } from "./components/ProductDemo";
 import { TypewriterText } from "./components/TypewriterText";
 
@@ -129,6 +129,14 @@ export function HeroSection() {
 											? "/mobile"
 											: `/${i18n.locale}/mobile`
 								}
+								onClick={() =>
+									isIOS
+										? track("mobile_store_clicked", {
+												store: "app_store",
+												source: "hero",
+											})
+										: track("mobile_page_clicked", { source: "hero" })
+								}
 								aria-label={t({ message: "Superset for iPhone and iPad" })}
 								className="flex size-11 shrink-0 items-center justify-center border border-border bg-background text-foreground transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand sm:size-12"
 							>
@@ -137,7 +145,14 @@ export function HeroSection() {
 							<button
 								type="button"
 								className="flex size-11 shrink-0 items-center justify-center border border-border bg-background text-foreground transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand sm:size-12"
-								onClick={() => window.open(COMPANY.GITHUB_URL, "_blank")}
+								onClick={() => {
+									track("github_clicked", { source: "hero" });
+									window.open(
+										COMPANY.GITHUB_URL,
+										"_blank",
+										"noopener,noreferrer",
+									);
+								}}
 								aria-label={t({
 									message: "View on GitHub",
 								})}
@@ -145,7 +160,6 @@ export function HeroSection() {
 								<FaGithub aria-hidden="true" className="size-5" />
 							</button>
 						</div>
-						<HeroReassurance />
 					</div>
 
 					<div className="relative w-full mt-20 sm:mt-32 lg:mt-40">

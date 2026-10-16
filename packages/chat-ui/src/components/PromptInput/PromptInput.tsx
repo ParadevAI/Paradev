@@ -23,6 +23,7 @@ export type {
 	PromptInputAttachment,
 	PromptInputCommand,
 	PromptInputDictation,
+	PromptInputDictationError,
 	PromptInputHandle,
 	PromptInputProps,
 	PromptInputSubmitPayload,

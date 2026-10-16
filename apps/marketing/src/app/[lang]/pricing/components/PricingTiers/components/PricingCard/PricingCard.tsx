@@ -3,7 +3,8 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@superset/ui/button";
 import { cn } from "@superset/ui/utils";
 import { Check } from "lucide-react";
-import Link from "next/link";
+import { DownloadLink } from "@/app/[lang]/components/DownloadLink";
+import { TrackedLink } from "@/app/[lang]/components/TrackedLink";
 import type { PricingTier } from "../../../../constants";
 
 interface PricingCardProps {
@@ -68,8 +69,18 @@ export function PricingCard({ tier, isYearly }: PricingCardProps) {
 						<a href={tier.cta.href} target="_blank" rel="noopener noreferrer">
 							{t(tier.cta.label)}
 						</a>
+					) : tier.cta.event === "download_clicked" ? (
+						<DownloadLink source="pricing" properties={{ tier: tier.id }}>
+							{t(tier.cta.label)}
+						</DownloadLink>
 					) : (
-						<Link href={tier.cta.href}>{t(tier.cta.label)}</Link>
+						<TrackedLink
+							href={tier.cta.href}
+							event={tier.cta.event}
+							properties={{ source: "pricing", tier: tier.id }}
+						>
+							{t(tier.cta.label)}
+						</TrackedLink>
 					)}
 				</Button>
 				<CtaNote note={tier.ctaNote} />

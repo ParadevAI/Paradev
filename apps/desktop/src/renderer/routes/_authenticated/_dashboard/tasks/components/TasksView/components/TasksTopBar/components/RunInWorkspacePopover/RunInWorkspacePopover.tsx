@@ -7,6 +7,7 @@ import {
 	getEnabledAgentConfigs,
 	getFallbackAgentId,
 	indexResolvedAgentConfigs,
+	type ResolvedAgentConfig,
 } from "@superset/shared/agent-settings";
 import { Button } from "@superset/ui/button";
 import {
@@ -21,11 +22,12 @@ import { toast } from "@superset/ui/sonner";
 import { Spinner } from "@superset/ui/spinner";
 import { Switch } from "@superset/ui/switch";
 import { ChevronDownIcon } from "lucide-react";
-import { useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { HiCheck, HiMiniPlay, HiXMark } from "react-icons/hi2";
 import { LuCircle } from "react-icons/lu";
 import { AgentSelect } from "renderer/components/AgentSelect";
 import { useAgentLaunchPreferences } from "renderer/hooks/useAgentLaunchPreferences";
+import { useIsAgentPresetEnabled } from "renderer/hooks/useIsAgentPresetEnabled";
 import { launchAgentSession } from "renderer/lib/agent-session-orchestrator";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { useCreateWorkspace } from "renderer/react-query/workspaces";
@@ -65,7 +67,16 @@ export function RunInWorkspacePopover({
 	const terminalCreateOrAttach =
 		electronTrpc.terminal.createOrAttach.useMutation();
 	const terminalWrite = electronTrpc.terminal.write.useMutation();
-	const agentPresetsQuery = electronTrpc.settings.getAgentPresets.useQuery();
+	const isAgentPresetEnabled = useIsAgentPresetEnabled();
+	const selectEnabledPresets = useCallback(
+		(presets: ResolvedAgentConfig[]) =>
+			presets.filter((preset) => isAgentPresetEnabled(preset.id)),
+		[isAgentPresetEnabled],
+	);
+	const agentPresetsQuery = electronTrpc.settings.getAgentPresets.useQuery(
+		undefined,
+		{ select: selectEnabledPresets },
+	);
 	const agentPresets = agentPresetsQuery.data ?? [];
 	const enabledAgentPresets = useMemo(
 		() => getEnabledAgentConfigs(agentPresets),

@@ -1,3 +1,5 @@
+import { billingUsesAutumn } from "@superset/auth/autumn";
+import { organizationBilling } from "@superset/auth/billing";
 import { stripeClient } from "@superset/auth/stripe";
 import { db } from "@superset/db/client";
 import { members, organizations, subscriptions } from "@superset/db/schema";
@@ -66,6 +68,7 @@ async function requireOwnerWithCustomer(ctx: {
 
 const EMPTY_ACTIVE_PLAN = {
 	plan: "free" as const,
+	/** @deprecated TODO(2027-01-31): Stripe vocabulary; read `paymentState`. */
 	status: null,
 	cancelAt: null,
 	periodStart: null,
@@ -77,6 +80,8 @@ const EMPTY_ACTIVE_PLAN = {
 	 * uses it to decide whether to ask Stripe about an unpaid invoice, and
 	 * doing that for every free organization would put a Stripe round-trip on
 	 * every app load for everyone who ever paid us.
+	 *
+	 * @deprecated TODO(2027-01-31): read `paymentState`.
 	 */
 	lapsed: false,
 };
@@ -126,7 +131,29 @@ async function isBillingOwner(userId: string, organizationId: string) {
 export const billingRouter = {
 	activePlan: protectedProcedure.query(async ({ ctx }) => {
 		const activeOrgId = ctx.activeOrganizationId;
-		if (!activeOrgId) return { ...EMPTY_ACTIVE_PLAN, organizationId: null };
+		const billingProvider = billingUsesAutumn
+			? ("autumn" as const)
+			: ("stripe" as const);
+		if (!activeOrgId) {
+			return { ...EMPTY_ACTIVE_PLAN, organizationId: null, billingProvider };
+		}
+
+		if (billingUsesAutumn) {
+			const billing = await organizationBilling(activeOrgId);
+			const date = (value: string | null) => (value ? new Date(value) : null);
+			return {
+				organizationId: activeOrgId,
+				plan: billing.tier,
+				status: billing.status,
+				cancelAt: date(billing.cancelAt),
+				periodStart: date(billing.periodStart),
+				periodEnd: date(billing.periodEnd),
+				billingInterval: billing.billingInterval,
+				lapsed: billing.lapsed,
+				paymentState: billing.paymentState,
+				billingProvider,
+			};
+		}
 
 		const subscription = await db.query.subscriptions.findFirst({
 			where: and(
@@ -152,6 +179,7 @@ export const billingRouter = {
 				organizationId: activeOrgId,
 				lapsed:
 					previous?.status === "canceled" || previous?.status === "unpaid",
+				billingProvider,
 			};
 		}
 
@@ -164,6 +192,7 @@ export const billingRouter = {
 			periodEnd: subscription.periodEnd,
 			billingInterval: subscription.billingInterval,
 			lapsed: false,
+			billingProvider,
 		};
 	}),
 

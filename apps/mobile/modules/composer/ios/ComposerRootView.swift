@@ -344,6 +344,19 @@ struct ComposerRootView: View {
             action: { model.onHeightChange?($0) }
           .onGeometryChange(for: CGFloat.self) { $0.frame(in: .global).minY }
             action: { clusterTopY = $0 }
+          .background {
+            if model.reportsEdge {
+              ComposerEdgeMarker(
+                model: model,
+                motion: ComposerEdgeMotion(
+                  isExpanded: isExpanded,
+                  dragOffset: dragOffset,
+                  clusterTopY: clusterTopY
+                )
+              )
+              .allowsHitTesting(false)
+            }
+          }
         }
         .offset(y: dragOffset)
         .onGeometryChange(for: CGRect.self) { $0.frame(in: .global) }
@@ -382,7 +395,7 @@ struct ComposerRootView: View {
       if !holds && isExpanded { isFocused = true }
     }
     .fullScreenCover(item: $viewing) { attachment in
-      ComposerImageViewer(attachment: attachment) { viewing = nil }
+      ComposerImageViewer(uri: attachment.uri) { viewing = nil }
     }
     .onChange(of: isExpanded) { publishInteractiveFrame() }
     .onChange(of: model.backdrop) { publishInteractiveFrame() }
@@ -655,7 +668,7 @@ struct ComposerRootView: View {
       Image(systemName: "stop.fill")
         .font(.system(size: 15, weight: .semibold))
     }
-    .buttonStyle(.composerSend)
+    .buttonStyle(.composerStop)
     .accessibilityLabel(composerLocalized("Stop"))
     .transition(.opacity)
   }

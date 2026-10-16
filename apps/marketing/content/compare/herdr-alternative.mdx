@@ -2,7 +2,7 @@
 title: "Best Herdr Alternatives in 2026"
 description: "The best alternatives to Herdr for running AI coding agents, including Superset, Orca, Emdash, cmux, and Claude Squad, from full workspaces to terminal-native tools."
 date: 2026-08-07
-lastUpdated: 2026-09-24
+lastUpdated: 2026-10-13
 type: "roundup"
 competitors:
   - herdr
@@ -108,7 +108,7 @@ Yes. Orca (MIT), Emdash (Apache-2.0), Claude Squad (AGPL), and cmux (GPL) are al
 
 ### Do these alternatives keep agents running like Herdr does?
 
-Superset's terminals are held by a background daemon, so sessions survive app restarts and updates. Emdash persists terminal state and supports tmux. Claude Squad and Herdr both lean on tmux-style detach. Orca persists scrollback across restarts.
+Superset's terminals are held by a background daemon, so agents keep running when you close the window, quit the app with ⌘Q, or install an update, and reattach with scrollback when you reopen it. To keep a machine reachable from your phone while the app is quit, run the host service from the standalone CLI; see [Keep Agents Running](https://docs.superset.sh/keep-agents-running). Emdash persists terminal state and supports tmux. Claude Squad and Herdr both lean on tmux-style detach. Orca persists scrollback across restarts.
 
 ### Can I review code beside my agent in Superset?
 

@@ -2,7 +2,7 @@
 title: "Superset vs Herdr (2026): Agent Workspace vs Agent Runtime"
 description: "Compare Superset and Herdr for persistent CLI-agent workflows. Bring terminals, diff review, and browser previews together in a visual workspace."
 date: 2026-08-07
-lastUpdated: 2026-09-24
+lastUpdated: 2026-10-13
 type: "1v1"
 competitors:
   - herdr
@@ -70,7 +70,7 @@ For work you need to discuss with teammates, [publish a report or design as a Pa
 
 ### Persistence and Remote
 
-Herdr's [persistence documentation](https://herdr.dev/docs/persistence-remote/) explains server-owned terminals and remote attachment over SSH. Superset's [terminal documentation](https://docs.superset.sh/terminal-integration) covers running processes and scrollback surviving app restarts, while [remote access](https://docs.superset.sh/remote-access) connects you to another host. In both cases, continuing execution requires the machine running the agent to remain available; closing a client and stopping a host are different events.
+Herdr's [persistence documentation](https://herdr.dev/docs/persistence-remote/) explains server-owned terminals and remote attachment over SSH. Superset's [terminal documentation](https://docs.superset.sh/terminal-integration) covers running processes and scrollback surviving app restarts, while [remote access](https://docs.superset.sh/remote-access) connects you to another host. In both cases, continuing execution requires the machine running the agent to remain available; closing a client and stopping a host are different events. In Superset, agents do not live in the app window: they run in a background terminal daemon, so closing the window, quitting with ⌘Q, or installing an update leaves them running, and they reattach with scrollback when you reopen the app. While the desktop app is quit, the machine is not reachable from your phone or by automations; running the host service from the standalone CLI keeps it reachable. See [Keep Agents Running](https://docs.superset.sh/keep-agents-running).
 
 ### Worktree Isolation
 

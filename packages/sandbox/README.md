@@ -41,9 +41,9 @@ The rule of thumb: if you can answer "where is it on the box", put it there.
 | `bun run build --publish` | Also uploads the bundle and any asset the bucket lacks. Refuses to publish a bundle that references an asset the bucket does not have. |
 | `bun run image` | Builds the image: OS, apt lists, vendor tools, the `ubuntu` user, then installs the bundle at its sha and runs every pass once, so a fresh box finds every hash sidecar and step marker matching. A push logs Docker into the registry itself with a credential minted from `VERCEL_SANDBOX_TOKEN`, so there is no login to renew. `--local` builds `superset-sandbox:local` for the boot-twice test; `--dry` prints the Dockerfile. |
 | boot (`superset-boot`) | On the box, as root, run by the control plane on every create and wake, after it has written `sandbox.conf`, with the host secret in its env: clears `/run/superset`, installs the pinned bundle if the hash differs, runs the three passes (each a hash compare), starts host-service as `ubuntu` with the secret from the boot env, then the desktop and the checkout. Once host-service answers, the environment has been pushed and the checkout is in, the runner asks host-service to run the repo's `start` hook with that environment. |
-| `bun run release` | Rewrites the host-service asset from this checkout, publishes the bundle, pushes the image (unless `--skip-image`), builds the internal golden with the environment's `setup` hook, probes a fork of it (`src/environments/probe.ts`) including a stop and wake, and writes the environment rows only after the probe passes. |
+| `bun run release` | Rewrites the host-service and CLI assets from this checkout and the claude, codex and Chrome rows to their latest upstream release, publishes the bundle, pushes the image (unless `--skip-image`), builds the internal golden with the environment's `setup` hook, probes a fork of it (`src/environments/probe.ts`) including a stop and wake, and writes the environment rows only after the probe passes. |
 | `bun run src/real-sandbox.ts` | The Sandbox workflow dispatched with `real-sandbox`: one real sandbox from the registry image on this checkout's bundle, the same probe, a stop and a wake. |
-| Sandbox workflow, `production-release` | `bun run release --production` from `main` on a CI runner: the image, the internal golden and production's environment rows. Dispatch it after a merge to `main` that changes the runner, the bundle or host-service. |
+| Sandbox workflow, `production-release` | `bun run release --production` from `main` on a CI runner: the image, the internal golden and production's environment rows. Runs on a merge that touches the bundle and every night; a failed nightly run opens an issue. |
 
 An asset URL is content-addressed, so the CDN caches it for hours — including a 404. An image
 build that runs before the publish that uploads the asset poisons the edge it used for four
@@ -60,7 +60,7 @@ picks it by the manifest's hash rather than by listing the directory.
 - An asset: its sha256, same sidecar rule; it is also the object's name in the bucket.
 - A step: `sha256(script + declared asset shas + declared input hashes + versions of steps it follows + salt)`.
 - The bundle: the sha256 of its tarball; the one pointer the box holds, written into `/etc/superset/sandbox.conf` by the control plane.
-- host-service and Chrome are asset rows that move only when a release or a deliberate `bun run assets` rewrites them; a merge to main changes nothing on any box.
+- host-service, the CLI, claude, codex and Chrome move at release time, so their committed rows are only the floor a pull request's boot test uses. The other rows move only when someone runs `bun run assets`.
 
 ## The runner in the image runs first
 

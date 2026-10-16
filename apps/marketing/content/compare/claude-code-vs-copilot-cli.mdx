@@ -1,0 +1,96 @@
+---
+title: "Claude Code vs GitHub Copilot CLI (2026): Comparing Terminal Coding Agents"
+description: "Compare Claude Code and GitHub Copilot CLI: models, pricing, GitHub integration, parallel work, and cloud handoff, and how to run both side by side."
+date: 2026-10-13
+type: "1v1"
+competitors:
+  - claude-code
+  - github-copilot
+keywords:
+  - claude code vs copilot cli
+  - claude code vs github copilot
+  - copilot cli vs claude code
+  - github copilot cli
+  - best coding agent
+  - terminal coding agent
+---
+
+Claude Code is Anthropic's terminal coding agent. GitHub Copilot CLI brings Copilot's agent to the terminal. Both read your code, run commands, run subagents, and support MCP, hooks, plugins, and skills. The difference is in models and GitHub: Copilot CLI offers models from several vendors on one plan, starting with a free tier, and is built deep into GitHub; Claude Code runs Anthropic's models and has the richest set of parallel modes.
+
+Facts were checked against Anthropic's and GitHub's own docs on October 13, 2026.
+
+---
+
+## At a Glance
+
+| | **Claude Code** | **GitHub Copilot CLI** |
+|---|---|---|
+| **Vendor** | Anthropic | GitHub |
+| **Models** | Claude models | Several vendors: Claude, GPT, Gemini, Grok, Kimi |
+| **Price** | Claude Pro from $20/mo, Max from $100/mo, or API key; no free tier | Free tier; Pro $10, Pro+ $39, Max $100/mo |
+| **Parallel work** | Subagents, `/batch` across worktrees, agent view, cloud sessions | `/fleet`, custom agents, `/delegate` to the cloud agent, `--cloud` sandboxes (preview) |
+| **Worktrees** | Built in | Not documented |
+| **GitHub** | Through MCP and plugins | Built in: issues, PRs, GitHub MCP server by default |
+| **Remote control** | Remote Control | From GitHub.com or GitHub Mobile |
+| **Headless and SDK** | `claude -p` | `copilot -p`, Copilot SDK (MIT) |
+| **Platforms** | macOS, Linux, Windows | macOS, Linux, Windows |
+
+---
+
+## What Is Claude Code?
+
+Anthropic's agent "reads your codebase, edits files, runs commands, and integrates with your development tools." It has subagents, `/batch` runs that fan a change out across worktrees, an agent view for background sessions, experimental agent teams, cloud sessions, and Remote Control, with plugins, skills, and hooks. It needs a paid Claude plan or an API key.
+
+## What Is GitHub Copilot CLI?
+
+GitHub's pitch is "the power of GitHub Copilot, now in your terminal." It runs models from several vendors on Copilot's plans and AI Credits, including a free tier. GitHub's MCP server ships by default, so issues and pull requests are part of the agent's toolset, and `/delegate` hands a task to Copilot's cloud agent. `/fleet` and custom agents split work, `--cloud` runs sessions in sandboxes in preview, and with remote control turned on you can steer sessions from GitHub.com or GitHub Mobile. Organization admins can turn the CLI off.
+
+## Key Differences
+
+### Models and Price
+
+Copilot CLI gives you several vendors' models, Claude included, on one plan starting at free. Claude Code runs only Anthropic's models and starts with a paid plan.
+
+### GitHub Integration
+
+Copilot CLI is built into GitHub: issues, pull requests, and the cloud agent are one command away. Claude Code reaches GitHub through MCP servers and plugins.
+
+### Parallel Work
+
+Claude Code has more built-in ways to run work in parallel and isolates it in worktrees. Copilot CLI leans on the cloud: `/delegate` and `--cloud` sandboxes move work off your machine.
+
+---
+
+## Run Both Side by Side
+
+[Superset](/) runs Claude Code and Copilot CLI as built-in agents, each in its own Git worktree and terminal, on your own Claude and Copilot plans. Create two workspaces from the same branch, start each agent with the same prompt, compare the diffs in the Changes pane, and open a pull request from the better one. Superset never proxies model calls. See [How to Compare Coding Agents Side by Side](/compare/compare-coding-agents-side-by-side).
+
+## Which Should You Choose?
+
+**Choose Claude Code if you:**
+
+- Want the richest set of parallel modes and extensions
+- Already pay for Claude Pro or Max
+- Want worktree isolation built into the agent
+
+**Choose Copilot CLI if you:**
+
+- Live in GitHub and want issues, PRs, and the cloud agent built in
+- Want several vendors' models on one plan
+- Want a free tier, or your organization already pays for Copilot
+
+For the full field, see [Best AI Coding Agents in 2026](/compare/best-coding-agents).
+
+## Frequently Asked Questions
+
+### Can Copilot CLI use Claude models?
+
+Yes. Copilot's plans include Claude models alongside GPT, Gemini, Grok, and Kimi models.
+
+### Is Copilot CLI free?
+
+Copilot's free plan includes the CLI with limited usage. Paid plans start at $10 a month. Claude Code has no free tier.
+
+### Can I run Claude Code and Copilot CLI at the same time?
+
+Yes. Give each its own Git worktree. In Superset, each runs in its own workspace on the same repository.

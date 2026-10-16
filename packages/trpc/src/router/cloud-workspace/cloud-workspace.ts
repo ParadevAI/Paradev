@@ -34,6 +34,8 @@ import {
 } from "../../lib/sandbox";
 import { jwtProcedure, userError } from "../../trpc";
 import { hostServiceMutation } from "../automation/relay-client";
+import { ensureDefaultEnvironment } from "../environment/default-environment";
+import { regionForRequest } from "../environment/region-for-request";
 import {
 	isVisibleTo,
 	loadVisibleWorkspace,
@@ -41,6 +43,7 @@ import {
 	visibleTo,
 } from "./access";
 import { recordCloudWorkspaceActivity } from "./activity";
+import { queueSettleWorkspace, settleWorkspaceNow } from "./meter";
 import { nextSandboxNameFor } from "./provision";
 import { queueReap } from "./reap";
 import { cloudWorkspaceRecordRouter } from "./record";
@@ -327,7 +330,11 @@ export const cloudWorkspaceRouter = {
 				/** Omitted = the repo's default branch, resolved here — a client
 				 * whose branch query hadn't answered must not guess "main". */
 				branch: z.string().min(1).max(300).optional(),
-				environmentId: z.string().uuid(),
+				/** One of the two: an environment, or a repository whose default
+				 * environment is used — made on first use when the organization
+				 * has none that checks the repository out. */
+				environmentId: z.string().uuid().optional(),
+				repositoryId: z.string().uuid().optional(),
 				/**
 				 * A built-in agent to launch on first boot with `prompt`. Absent
 				 * means the workspace comes up idle.
@@ -360,10 +367,29 @@ export const cloudWorkspaceRouter = {
 				});
 			}
 
+			const environmentId =
+				input.environmentId ??
+				(input.repositoryId
+					? (
+							await ensureDefaultEnvironment({
+								organizationId: input.organizationId,
+								repositoryId: input.repositoryId,
+								userId: ctx.userId,
+								region: regionForRequest(ctx.headers),
+							})
+						).id
+					: null);
+			if (!environmentId) {
+				throw new TRPCError({
+					code: "BAD_REQUEST",
+					message: "environmentId or repositoryId is required",
+				});
+			}
+
 			const row = await startCloudWorkspace({
 				organizationId: input.organizationId,
 				userId: ctx.userId,
-				environmentId: input.environmentId,
+				environmentId,
 				name: input.name,
 				prompt: input.prompt,
 				branch: input.branch,
@@ -523,7 +549,10 @@ export const cloudWorkspaceRouter = {
 		.mutation(async ({ ctx, input }) => {
 			const row = await loadReadyWorkspace(ctx, input.id);
 			const { running } = await addressSandbox(row, "address");
-			if (running) await stopAndSnapshot(row.providerSandboxId);
+			if (running) {
+				await stopAndSnapshot(row.providerSandboxId);
+				await queueSettleWorkspace(row.id);
+			}
 			return { stopped: running };
 		}),
 
@@ -644,6 +673,12 @@ export const cloudWorkspaceRouter = {
 						console.error(
 							`[cloud-workspace] could not queue the reap for ${row.id}`,
 							error,
+						);
+						await settleWorkspaceNow(row.id).catch((meterError) =>
+							console.error(
+								`[cloud-workspace] ${row.id} final meter failed`,
+								meterError,
+							),
 						);
 						await deleteSandbox(row.providerSandboxId);
 					});

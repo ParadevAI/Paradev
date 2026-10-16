@@ -1,13 +1,11 @@
 import { COMPANY } from "@superset/shared/constants";
-import {
-	FAQ_ITEMS,
-	faqSourceText,
-} from "@/app/[lang]/components/FAQSection/constants";
+import { FAQ_ITEMS } from "@/app/[lang]/components/FAQSection/constants";
 import {
 	buildCompanyFactsSection,
 	buildDeveloperResourcesSection,
 	buildFrontmatter,
 	buildWhenToUseSection,
+	englishText,
 	MARKDOWN_HEADERS,
 	PRODUCT_SUMMARY,
 } from "@/lib/llms";
@@ -62,9 +60,9 @@ export async function GET() {
 		"## FAQ",
 		"",
 		...FAQ_ITEMS.flatMap((item) => [
-			`### ${faqSourceText(item.question)}`,
+			`### ${englishText(item.question)}`,
 			"",
-			faqSourceText(item.answer),
+			englishText(item.answer),
 			"",
 		]),
 		`## Contact`,

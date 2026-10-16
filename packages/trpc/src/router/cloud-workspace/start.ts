@@ -18,6 +18,7 @@ import {
 import { userError } from "../../trpc";
 import { recordCloudWorkspaceActivity } from "./activity";
 import { publishCloudWorkspaceJob } from "./jobs";
+import { assertMayBoot } from "./meter";
 import {
 	FALLBACK_NAME,
 	type ProvisionCloudWorkspaceInput,
@@ -87,6 +88,7 @@ export async function startCloudWorkspace(args: {
 			? acpChatEnabled(args.userId)
 			: Promise.resolve(false);
 	const environment = await loadUsableEnvironment(args);
+	await assertMayBoot(args.organizationId);
 
 	// A workspace is started from an environment, and the environment's
 	// repositories are its checkouts.

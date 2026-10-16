@@ -4,6 +4,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { COMPANY } from "@superset/shared/constants";
 import { useState } from "react";
 import { FaGithub } from "react-icons/fa";
+import { track } from "@/lib/analytics";
 import { DownloadButton } from "../DownloadButton";
 import { WaitlistModal } from "../WaitlistModal";
 import { InstallCommand } from "./components/InstallCommand";
@@ -31,7 +32,14 @@ export function CTASection({ showInstallCommand = true }: CTASectionProps) {
 						<button
 							type="button"
 							className="px-4 py-2.5 sm:px-6 sm:py-3 text-sm sm:text-base font-normal bg-background border border-border text-foreground hover:bg-muted transition-colors flex items-center gap-2"
-							onClick={() => window.open(COMPANY.GITHUB_URL, "_blank")}
+							onClick={() => {
+								track("github_clicked", { source: "cta_section" });
+								window.open(
+									COMPANY.GITHUB_URL,
+									"_blank",
+									"noopener,noreferrer",
+								);
+							}}
 							aria-label={t({
 								message: "Star on GitHub",
 							})}

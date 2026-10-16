@@ -15,6 +15,7 @@ import type { PaneViewerData, PullRequestPaneData } from "../../types";
 export function openPullRequestPaneInStore(
 	store: StoreApi<WorkspaceStore<PaneViewerData>>,
 	ref: PullRequestRef,
+	placement: "split" | "tab" = "split",
 ): void {
 	const state = store.getState();
 	const data: PullRequestPaneData = {
@@ -34,9 +35,12 @@ export function openPullRequestPaneInStore(
 		}
 	}
 
-	state.openPane({
-		pane: { kind: "pull-request", data: data as PaneViewerData },
-	});
+	const pane = { kind: "pull-request", data: data as PaneViewerData };
+	if (placement === "tab") {
+		state.addTab({ panes: [pane] });
+		return;
+	}
+	state.openPane({ pane });
 }
 
 /** The PR the active tab's pull-request pane shows, if that tab has one. */

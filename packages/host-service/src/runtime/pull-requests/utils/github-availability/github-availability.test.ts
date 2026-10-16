@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import {
 	classifyGitHubHold,
+	describeGitHubFailure,
 	GitHubAvailabilityGate,
 	GitHubUnavailableError,
 	isGitHubUnreachableError,
@@ -77,6 +78,75 @@ describe("isGitHubUnreachableError", () => {
 		).toBe(false);
 		expect(isGitHubUnreachableError("string")).toBe(false);
 		expect(isGitHubUnreachableError(null)).toBe(false);
+	});
+});
+
+describe("describeGitHubFailure", () => {
+	const ghFailure = (stderr: string) =>
+		Object.assign(new Error(`Command failed: gh api\n${stderr}`), {
+			code: 1,
+			killed: false,
+			signal: null,
+			stderr,
+		});
+
+	test("keeps the cause and drops the request gh prefixes it with", () => {
+		expect(
+			describeGitHubFailure(
+				ghFailure(
+					'Get "https://api.github.com/repos/o/r/pulls?state=all": read tcp 10.0.0.2:5316->140.82.114.6:443: read: connection reset by peer\n',
+				),
+			),
+		).toBe("connection reset by peer");
+		expect(
+			describeGitHubFailure(
+				ghFailure(
+					'Get "https://api.github.com/graphql": dial tcp: lookup api.github.com: no such host\n',
+				),
+			),
+		).toBe("no such host");
+		expect(
+			describeGitHubFailure(
+				ghFailure(
+					"error connecting to api.github.com\ncheck your internet connection or https://githubstatus.com\n",
+				),
+			),
+		).toBe("error connecting to api.github.com");
+	});
+
+	test("names a gh timeout and prefers the innermost cause's message", () => {
+		expect(
+			describeGitHubFailure(
+				Object.assign(new Error("Command failed: gh api"), {
+					killed: true,
+					signal: "SIGTERM",
+					stderr: "",
+				}),
+			),
+		).toBe("gh did not answer before its timeout");
+		expect(
+			describeGitHubFailure(
+				new Error("fetch failed", {
+					cause: Object.assign(
+						new Error("getaddrinfo ENOTFOUND api.github.com"),
+						{ code: "ENOTFOUND" },
+					),
+				}),
+			),
+		).toBe("getaddrinfo ENOTFOUND api.github.com");
+	});
+
+	test("cleans an error message the same way when there is no stderr", () => {
+		expect(
+			describeGitHubFailure(
+				Object.assign(
+					new Error(
+						'Get "https://api.github.com/repos/o/r": dial tcp 140.82.114.6:443: connect: connection refused',
+					),
+					{ code: "ECONNREFUSED" },
+				),
+			),
+		).toBe("connection refused");
 	});
 });
 
@@ -173,6 +243,8 @@ describe("GitHubAvailabilityGate", () => {
 			reason: "rate-limited",
 			since: now,
 			until: now + 605_000,
+			detail:
+				"API rate limit exceeded for user ID 1. If you reach out to GitHub Support…",
 		});
 		expect(() => gate.assertReachable()).toThrow(GitHubUnavailableError);
 		try {

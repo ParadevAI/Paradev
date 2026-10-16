@@ -3,6 +3,7 @@
 import { useLingui } from "@lingui/react/macro";
 import { Check, Copy } from "lucide-react";
 import { useState } from "react";
+import { track } from "@/lib/analytics";
 import { DEFAULT_INSTALL_TAB, INSTALL_TABS } from "./constants";
 
 export function InstallCommand() {
@@ -16,11 +17,17 @@ export function InstallCommand() {
 	const handleCopy = async () => {
 		try {
 			await navigator.clipboard.writeText(activeTab.command);
-			setCopied(true);
-			setTimeout(() => setCopied(false), 2000);
 		} catch {
 			// Clipboard unavailable (e.g. insecure context); ignore
+			return;
 		}
+		track("download_command_copied", {
+			source: "cli_install",
+			surface: "cta_section",
+			method: activeTab.id,
+		});
+		setCopied(true);
+		setTimeout(() => setCopied(false), 2000);
 	};
 
 	return (

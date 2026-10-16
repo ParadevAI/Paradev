@@ -10,6 +10,7 @@ export type AcpHarness = {
 	upgrade?: string;
 	/** The agent's own id for its unrestricted mode; chats start in it. */
 	fullAccessModeId?: string;
+	clientApprovalModes?: boolean;
 	note: string;
 } & AcpTranslator;
 
@@ -63,6 +64,15 @@ export const ACP_HARNESSES: Record<string, AcpHarness> = {
 		executableEnv: "PI_ACP_PI_COMMAND",
 		note: "Ungated: no pi install was available to verify a floor against, and gating on a guess would reject working versions. It reached the same state before this catalogue, since the harness resolved pi off PATH either way.",
 	},
+	"pdev-acp": {
+		registryId: "pdev-acp",
+		binary: "pdev",
+		args: ["acp"],
+		minVersion: UNGATED_VERSION,
+		fullAccessModeId: "bypassPermissions",
+		clientApprovalModes: true,
+		note: "Ungated: every release, from 0.1.0 on, ships `pdev acp`, so there is no older build to reject and no upgrade command. `pdev acp` is its own ACP server, so no adapter. The desktop bundles it and needs no env: pdev signs in to the router through the superset CLI on PATH.",
+	},
 };
 
 /**
@@ -85,6 +95,7 @@ const ACP_HARNESS_BY_PRESET: Record<string, string> = {
 	codex: "codex-acp",
 	opencode: "opencode-acp",
 	pi: "pi-acp",
+	pdev: "pdev-acp",
 };
 
 export function acpHarnessForPreset(presetId: string): string | undefined {

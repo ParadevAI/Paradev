@@ -1,0 +1,121 @@
+---
+title: "How to Run and Manage Multiple AI Coding Agents in Parallel"
+description: "Run several AI coding agents at once with Git worktrees and persistent terminals: set up isolated workspaces, orchestrate the sessions, and switch tasks without losing context."
+date: 2026-10-14
+lastUpdated: 2026-10-14
+type: "tutorial"
+competitors:
+  - claude-code
+  - codex
+  - conductor
+  - orca
+  - herdr
+keywords:
+  - manage multiple ai coding agents
+  - run multiple coding agents in parallel
+  - parallel ai coding agents
+  - multiple claude code and codex sessions
+  - coding agent orchestration
+  - git worktrees coding agents
+---
+
+Running one coding agent is easy. Running four at once, on the same repository, is where most setups break down: agents overwrite each other's files, terminals pile up, and it becomes hard to tell which agent is waiting for an answer. This guide covers the workflow that keeps parallel agents manageable, in three parts:
+
+1. Set up an isolated workspace for every task
+2. Orchestrate the agent sessions
+3. Manage context and switch between tasks
+
+It works with any CLI agent: Claude Code, Codex, Cursor's agent, Antigravity CLI, OpenCode, and others. Each step shows the manual way and the way it works in [Superset](/), a desktop workspace for running CLI coding agents in parallel.
+
+---
+
+## 1. Set Up Isolated Workspaces with Git Worktrees
+
+Every task needs its own working directory. Otherwise two agents edit the same files, their diffs mix together, and one agent's failing build confuses the other.
+
+A **Git worktree** gives each task a separate checkout of the same repository, on its own branch, sharing one Git history. It is lighter than a full clone and keeps every task's diff separate.
+
+**Manually:**
+
+```bash
+git worktree add ../app-auth -b feat/auth
+git worktree add ../app-search -b feat/search
+```
+
+New worktrees do not include ignored files such as `node_modules` or `.env`, so each one needs a setup step, for example installing dependencies and copying environment files from the main checkout.
+
+**In Superset:** press **⌘N** to create a workspace. Each new local branch-based workspace gets its own worktree, branch, and persistent terminal. A `setup` command in `.superset/config.json` runs automatically in every new workspace; use `$SUPERSET_ROOT_PATH` to copy files from the main checkout:
+
+```json
+{ "setup": ["bun install", "cp \"$SUPERSET_ROOT_PATH/.env\" .env"] }
+```
+
+Worktrees separate files, but they do not sandbox processes or prevent merge conflicts. Two agents can still compete for the same port or database, and two branches can conflict when merged. Give each task its own port where it runs a dev server, and keep tasks independent.
+
+See [Git Worktrees for AI Coding Agents](/compare/git-worktrees-for-ai-agents) and [How to Isolate Parallel Coding Agents](/compare/isolate-parallel-coding-agents).
+
+## 2. Orchestrate Multiple Agent Sessions
+
+With isolation in place, start one agent per workspace. Scope each task so it can be reviewed on its own: one feature, one bug, or one refactor, with a clear way to check it is done.
+
+**Manually:** open a terminal in each worktree and start the agent there. Use tmux or terminal tabs to keep them running, and check each one in turn.
+
+**In Superset:**
+
+- **Launch any agent per workspace.** Claude Code, Codex, Cursor's agent, Antigravity CLI, Copilot CLI, Amp, OpenCode, and more are built-in agents; any other CLI agent can be added as a custom command. Each runs on your own subscription or API key, and Superset does not proxy model calls. Superset starts the agent's real CLI in a real terminal, so its own commands still work, such as Claude Code's `/remote-control` and `/schedule` or Codex's `/review`.
+- **Mix agents on one repository.** Give one task to Claude Code and another to Codex, or give the same task to both and keep the better result. See [How to Compare Coding Agents Side by Side](/compare/compare-coding-agents-side-by-side).
+- **Start work from outside the app.** The CLI creates a workspace and starts an agent with a prompt in one command (`superset ws create --agent claude --prompt "..."`), and the MCP server lets other agents do the same. Scheduled [automations](https://docs.superset.sh/automations) run an agent on a host you choose.
+- **Run on more than one machine.** Remote Access adds a macOS or Linux machine as a host, so long-running agents keep working when your laptop sleeps. See [Where to Run Coding Agents](/compare/where-to-run-coding-agents).
+
+## 3. Manage Context and Task Switching
+
+The cost of parallel agents is attention: knowing which agent needs you, and picking a task back up without reconstructing what it was doing.
+
+**Manually:** name terminal tabs after their branches, keep notes, and check each terminal for prompts. When a terminal closes, the agent session ends with it.
+
+**In Superset:**
+
+- **See status at a glance.** The sidebar shows which agents are working, need input, or are done, and you get a notification when an agent needs you. The Workspaces page groups every workspace by state: Needs attention, Working, Needs review, Idle, and Merged.
+- **Switch tasks, not tabs.** Each workspace keeps its own terminal, diff, and browser preview, so moving between tasks means moving between workspaces.
+- **Keep sessions running.** Terminals run in a background daemon, so agents keep running when you close or update the app, and reattach with their scrollback. See [Keep Agents Running](https://docs.superset.sh/keep-agents-running).
+- **Resume and hand off.** Supported agents resume their session after a restart, and you can continue a session with a different agent when one gets stuck.
+- **Review each task on its own.** The Changes pane shows the workspace's diff and commits, pushes, and opens a pull request. The Pull Requests view shows CI checks and sends line comments back to the agent.
+- **Check in away from your desk.** The [iPhone and iPad app](/mobile) shows the agents running on your hosts, so you can answer one or review a diff from your phone.
+
+## A Workflow That Holds Up
+
+1. Pick two to four tasks that touch different parts of the code.
+2. Create one workspace per task, with setup running automatically.
+3. Start one agent per workspace with a narrow prompt and an acceptance check.
+4. Work on something else; answer agents as they ask.
+5. Review each diff on its own, then test the combined result before merging.
+6. Delete each workspace after its branch merges.
+
+Add more agents only when review keeps up. The limit is usually the time it takes to review, not the number of agents you can start.
+
+## Other Tools for Parallel Agents
+
+- **Conductor:** a Mac app for Claude Code, Codex, Cursor, and OpenCode, with managed cloud workspaces on paid plans
+- **Orca:** a free, open-source environment for macOS, Windows, and Linux
+- **Herdr:** a terminal runtime where agents keep running when clients disconnect
+- **Do it yourself:** Git worktrees plus tmux, which works anywhere but leaves setup, status, and review to you
+
+See [Superset vs Orca vs Conductor](/compare/superset-vs-orca-vs-conductor) and [Best Agent Development Environments](/compare/best-agent-development-environment).
+
+## Frequently Asked Questions
+
+### How many AI coding agents can I run in parallel?
+
+As many as your machine, your plan's limits, and your review time allow. Each agent uses tokens, so parallel runs multiply usage. Most developers find two to five independent tasks manageable; beyond that, review becomes the limit.
+
+### Do I need Git worktrees to run agents in parallel?
+
+You need some form of isolation. Worktrees are the lightest option on one machine: separate files and branches with one shared history. Clones, containers, or cloud sandboxes also work, at a higher setup cost.
+
+### Can I run Claude Code and Codex at the same time on one repository?
+
+Yes. Give each its own worktree. In Superset, each runs in its own workspace, and you can review and merge their changes separately.
+
+### How do I know which agent needs my input?
+
+Use a workspace that tracks agent status. Superset's sidebar and Workspaces page show which agents are working, waiting for input, or done, and send a notification when one needs you.

@@ -151,7 +151,7 @@ If `superset agents wait` is not available (an older CLI), poll `terminals read`
 
 To see every worker at once (each terminal, its agent and state), read the host in one call with `superset snapshot --host <host-id> --json`. `superset agents explain` says why a worker shows the state it does.
 
-When the user wants to watch workers in the desktop app, lay them out with `superset panes`: `panes new-tab --workspace <id> --terminal <terminal-id>` opens a worker in its own tab, and `panes split --workspace <id> --pane <pane-id> --direction right --terminal <terminal-id>` puts two side by side. Get pane IDs from `panes list --workspace <id> --json`. These commands do not move focus; only `panes focus` does. They work only for workspaces on the machine running the desktop app.
+When the user wants to watch workers in the desktop app, lay them out with `superset panes`: `panes new-tab --workspace <id> --terminal <terminal-id>` opens a worker in its own tab, and `panes split --workspace <id> --pane <pane-id> --direction right --terminal <terminal-id>` puts two side by side. Get pane IDs from `panes list --workspace <id> --json`. These commands do not move focus; only `panes focus` does. They work only for workspaces on the machine running the desktop app. For anything beyond this (resizing, swapping, moving, closing, or building a full layout), use the `superset:panes` skill.
 
 If the user wants to take over a worker from their own shell, give them the command rather than running it: `superset terminals attach --workspace <id> --terminal <terminal-id>` (add `--ssh <user@machine>` for a worker on another machine). It needs an interactive terminal, and `Ctrl+]` detaches without stopping the worker.
 

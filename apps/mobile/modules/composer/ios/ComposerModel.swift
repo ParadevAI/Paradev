@@ -35,6 +35,10 @@ final class ComposerModel {
   /// the outside tap any more.
   var backdrop: ComposerBackdrop = .dim
 
+  /// Whether the caller listens to `onEdgeChange`. Sampling the edge costs a
+  /// display link, so a composer nobody reads (Home, a terminal) runs none.
+  var reportsEdge = false
+
   /// Mirrors React Native's tray. The composer renders it and reports removals
   /// and taps back out; it never owns the list.
   var attachments: [ComposerAttachment] = []
@@ -160,6 +164,9 @@ final class ComposerModel {
   /// already tracks that, and it arrives there with a duration and a curve
   /// worth animating to.
   @ObservationIgnored var onHeightChange: ((CGFloat) -> Void)?
+  /// Where the composer's top edge is on screen, as a distance above the
+  /// bottom of the window, on every frame it moves: keyboard, growth and drag.
+  @ObservationIgnored var onEdgeChange: ((CGFloat) -> Void)?
   @ObservationIgnored var onRemoveAttachment: ((String) -> Void)?
   @ObservationIgnored var onAttachmentPress: ((String) -> Void)?
   /// Lets the caller restore the composer only when it was actually open —
@@ -228,11 +235,11 @@ final class ComposerModel {
     onDraftChange?(text)
   }
 
-  /// Empties the draft. Animated, so the card shrinks back, but reports
-  /// nothing out: React Native calls this while clearing its own copy, so an
-  /// echo would be a bridge round trip to tell the caller what it just did.
+  /// Reported out even though React Native clears its own copy first: a
+  /// change the field sent before this (losing focus on send) can still be in
+  /// flight, and would land after that clear and restore the sent text.
   func clearDraft() {
-    withAnimation(ComposerMetrics.typingGrowth) { draft = "" }
+    setDraft("")
   }
 
   /// The draft React Native saved for this surface, put back once as the view

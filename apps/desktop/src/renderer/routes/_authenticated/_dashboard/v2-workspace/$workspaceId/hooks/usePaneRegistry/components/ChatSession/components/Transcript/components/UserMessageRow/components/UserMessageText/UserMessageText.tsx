@@ -2,9 +2,11 @@ import type { AvailableCommand } from "@superset/chat/protocol";
 import { Chip } from "@superset/chat-ui/Chip";
 import { env } from "renderer/env.renderer";
 import { commandChip } from "../../../../../../utils/commandChip";
+import { parseGithubWorkItemUrl } from "../../../../../../utils/githubWorkItem";
 import { unfurlLink } from "../../../../../../utils/linkUnfurl";
 import type { MessageSegment } from "../../../../../../utils/messageElements";
 import { ChatLink } from "../../../../../ChatLink";
+import { GithubWorkItemChip } from "./components/GithubWorkItemChip";
 import { LinkPreviewChip } from "./components/LinkPreviewChip";
 import { findPreviewLink, splitTextLinks } from "./utils/textLinks";
 
@@ -54,6 +56,7 @@ export function UserMessageText({
 				}
 				return runs[index]?.map((part, partIndex) => {
 					if (part.kind === "text") return part.text;
+					const workItem = parseGithubWorkItemUrl(part.url);
 					return (
 						<span
 							data-source-text={
@@ -65,7 +68,9 @@ export function UserMessageText({
 							// biome-ignore lint/suspicious/noArrayIndexKey: parts have no identity beyond their order
 							key={`${index}:${partIndex}`}
 						>
-							{part === preview ? (
+							{workItem ? (
+								<GithubWorkItemChip link={workItem} url={part.url} />
+							) : part === preview ? (
 								<LinkPreviewChip url={part.url} />
 							) : (
 								<ChatLink href={part.url}>{part.url}</ChatLink>

@@ -40,11 +40,13 @@ const UNRESTRICTED_TINT = "text-highlight";
 
 export function ModePicker({
 	currentModeId,
+	iconOnly,
 	modes,
 	onSelect,
 }: {
 	modes: SessionMode[];
 	currentModeId: string | undefined;
+	iconOnly?: boolean;
 	onSelect: (modeId: string) => void;
 }) {
 	const { t } = useLingui();
@@ -130,8 +132,10 @@ export function ModePicker({
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
 				<button
-					className={cn(PILL_TRIGGER_CLASS, "group max-w-40")}
+					className={cn(PILL_TRIGGER_CLASS, "group")}
+					title={iconOnly ? currentCopy.title : undefined}
 					type="button"
+					data-footer-label
 				>
 					<CurrentIcon
 						{...iconProps(
@@ -139,7 +143,12 @@ export function ModePicker({
 							cn("size-3.5", currentCopy.unrestricted && UNRESTRICTED_TINT),
 						)}
 					/>
-					<span className="truncate">{currentCopy.title}</span>
+					<span
+						className={iconOnly ? "sr-only" : "truncate"}
+						data-footer-label={iconOnly ? undefined : true}
+					>
+						{currentCopy.title}
+					</span>
 					<LuChevronDown className={PILL_CHEVRON_CLASS} />
 				</button>
 			</DropdownMenuTrigger>

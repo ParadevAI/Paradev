@@ -25,6 +25,7 @@ interface CreateCloudWorkspaceArgs {
 	message: PromptInputMessage;
 	/** Already-uploaded cloud ids; the sandbox pulls the bytes once it is up. */
 	attachmentFileIds: string[];
+	onOpened?: () => void;
 }
 
 /**
@@ -75,7 +76,7 @@ export function useCreateCloudWorkspace() {
 		},
 		onSuccess: (
 			row: CloudWorkspaceRow,
-			{ branch, agent, model, effort, message },
+			{ branch, agent, model, effort, message, onOpened },
 		) => {
 			// The API emits `workspace_created`; this is only the client asking.
 			posthog.capture("workspace_create_requested", {
@@ -98,6 +99,7 @@ export function useCreateCloudWorkspace() {
 			);
 			void queryClient.invalidateQueries({ queryKey: key });
 			router.push(`/(authenticated)/workspace/${row.id}`);
+			onOpened?.();
 		},
 		onError: (error, { branch }) => {
 			posthog.capture("workspace_create_failed", {

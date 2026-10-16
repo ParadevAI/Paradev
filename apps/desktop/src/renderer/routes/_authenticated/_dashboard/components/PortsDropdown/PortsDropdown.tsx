@@ -7,6 +7,7 @@ import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
 import { useDashboardSidebarAllPorts } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/providers/DashboardSidebarPortsProvider";
 import { STROKE_WIDTH } from "renderer/screens/main/components/WorkspaceSidebar/constants";
 import { usePortsDisplayMode } from "renderer/stores/inline-workspace-ports";
+import { PortsCountIcon } from "../PortsCountIcon";
 import { PortsFooter } from "./components/PortsFooter";
 import { PortsGroup } from "./components/PortsGroup";
 
@@ -52,10 +53,9 @@ export function PortsDropdown({ align = "end" }: PortsDropdownProps) {
 							aria-label={t({
 								message: `Ports — ${totalPortCount} live`,
 							})}
-							className="flex items-center gap-1.5 rounded-md px-2 py-1 text-muted-foreground text-xs transition-colors hover:bg-fill-hover hover:text-foreground data-[state=open]:bg-fill-hover data-[state=open]:text-foreground"
+							className="no-drag flex size-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-fill-hover hover:text-foreground data-[state=open]:bg-fill-hover data-[state=open]:text-foreground"
 						>
-							<LuRadioTower className="size-3.5" strokeWidth={STROKE_WIDTH} />
-							<span className="font-medium tabular-nums">{totalPortCount}</span>
+							<PortsCountIcon count={totalPortCount} />
 						</button>
 					</PopoverTrigger>
 				</TooltipTrigger>

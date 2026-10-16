@@ -1,3 +1,4 @@
+import { parseGithubWorkItemUrl } from "../githubWorkItem";
 import { stripLocation } from "../pathText";
 import { parseSupersetAppLink } from "../supersetAppLink";
 
@@ -76,15 +77,12 @@ const googleDocs: LinkUnfurler = ({ url }) => {
 	return { icon: { kind: "plugin", name: "google-docs" } };
 };
 
-const githubReference: LinkUnfurler = ({ url }) => {
-	if (url?.hostname !== "github.com") return null;
-	const match = url.pathname.match(
-		/^\/([^/]+)\/([^/]+)\/(?:pull|issues)\/(\d+)\/?$/,
-	);
-	if (!match) return null;
+const githubReference: LinkUnfurler = ({ href }) => {
+	const item = parseGithubWorkItemUrl(href);
+	if (!item) return null;
 	return {
 		icon: { kind: "plugin", name: "github" },
-		label: `${match[1]}/${match[2]}#${match[3]}`,
+		label: `${item.owner}/${item.repo}#${item.number}`,
 	};
 };
 

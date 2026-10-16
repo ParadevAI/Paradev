@@ -178,6 +178,7 @@ export const automationRunErrorCodeValues = [
 	"cloud_not_ready",
 	"cloud_access_denied",
 	"cloud_environment_unusable",
+	"cloud_usage_limit_reached",
 ] as const;
 export const automationRunErrorCodeEnum = z.enum(automationRunErrorCodeValues);
 export type AutomationRunErrorCode = z.infer<typeof automationRunErrorCodeEnum>;

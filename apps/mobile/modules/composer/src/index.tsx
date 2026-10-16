@@ -1,4 +1,4 @@
-import { requireNativeView } from "expo";
+import { requireNativeModule, requireNativeView } from "expo";
 import { forwardRef, type Ref, useImperativeHandle, useRef } from "react";
 
 /** The imperative surface the native view exposes through its ref. */
@@ -48,6 +48,8 @@ interface NativeComposerViewProps {
 	onAllSessionsPress?: () => void;
 	onQuickKeysActionPress?: () => void;
 	onHeightChange?: (event: { nativeEvent: { height: number } }) => void;
+	onEdgeChange?: (event: { nativeEvent: { inset: number } }) => void;
+	reportsEdge?: boolean;
 	onPaste?: (event: { nativeEvent: { items: ComposerPastedItem[] } }) => void;
 	onDraftChange?: (event: { nativeEvent: { text: string } }) => void;
 	onRemoveAttachment?: (event: { nativeEvent: { id: string } }) => void;
@@ -57,6 +59,24 @@ interface NativeComposerViewProps {
 
 const NativeComposerView =
 	requireNativeView<NativeComposerViewProps>("Composer");
+
+const NativeComposerModule = requireNativeModule<{
+	presentImage: (uri: string) => Promise<void>;
+	fileThumbnail: (uri: string, side: number) => Promise<string | null>;
+}>("Composer");
+
+/** Opens an image full screen in the composer's own viewer. */
+export function presentImage(uri: string): Promise<void> {
+	return NativeComposerModule.presentImage(uri);
+}
+
+/** A PNG preview of a local file, as the composer's file card draws it. */
+export function fileThumbnail(
+	uri: string,
+	side: number,
+): Promise<string | null> {
+	return NativeComposerModule.fileThumbnail(uri, side);
+}
 
 /**
  * How the composer treats the screen behind it while expanded.
@@ -408,6 +428,12 @@ interface ComposerBaseProps {
 	 */
 	onHeightChange?: (height: number) => void;
 	/**
+	 * How far the composer's top edge sits above the bottom of the window, on
+	 * every frame it moves — the keyboard, the card growing, the grabber drag.
+	 * Content that should stay level with the composer insets by this.
+	 */
+	onEdgeChange?: (inset: number) => void;
+	/**
 	 * Files and images pasted into the field. A plain text field only ever takes
 	 * strings, so the composer owns its text view to offer Paste for these and
 	 * writes them out; adding them to the tray is the caller's job, because the
@@ -486,6 +512,7 @@ export const Composer = forwardRef<ComposerHandle, ComposerProps>(
 			onAllSessionsPress,
 			onQuickKeysActionPress,
 			onHeightChange,
+			onEdgeChange,
 			onPaste,
 			onDraftChange,
 			onRemoveAttachment,
@@ -553,6 +580,8 @@ export const Composer = forwardRef<ComposerHandle, ComposerProps>(
 				onAllSessionsPress={onAllSessionsPress}
 				onQuickKeysActionPress={onQuickKeysActionPress}
 				onHeightChange={(event) => onHeightChange?.(event.nativeEvent.height)}
+				onEdgeChange={(event) => onEdgeChange?.(event.nativeEvent.inset)}
+				reportsEdge={onEdgeChange !== undefined}
 				onPaste={(event) => onPaste?.(event.nativeEvent.items)}
 				onDraftChange={(event) => onDraftChange?.(event.nativeEvent.text)}
 				onRemoveAttachment={(event) =>

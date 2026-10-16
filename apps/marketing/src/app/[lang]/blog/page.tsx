@@ -50,14 +50,17 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function BlogPage() {
 	await initServerI18n();
 
-	const posts = getListedBlogPosts();
-	const guides = [
+	const guideSlugs = [
 		"change-ui-with-your-coding-agent",
 		"send-pr-feedback-to-your-agent",
 		"review-agent-work-with-pages",
 		"parallel-coding-agents-guide",
 		"scheduled-agent-maintenance",
-	].flatMap((slug) => {
+	];
+	const posts = getListedBlogPosts().filter(
+		(post) => !guideSlugs.includes(post.slug),
+	);
+	const guides = guideSlugs.flatMap((slug) => {
 		const post = getBlogPost(slug);
 		return post ? [post] : [];
 	});

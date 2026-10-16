@@ -96,10 +96,19 @@ export type PromptInputDictationError = {
 };
 
 export type PromptInputDictation = {
-	transcribe(audio: Blob): Promise<string> | string;
+	// Reject with a DictationError to choose the message and whether retry
+	// is offered; any other rejection is retryable. The signal aborts when
+	// the user cancels or the composer unmounts.
+	transcribe(
+		audio: Blob,
+		options: { signal: AbortSignal },
+	): Promise<string> | string;
 	// Surfaced for app-owned toasts; retryable failures also keep the
 	// recording and show retry controls in the composer row.
 	onError?(error: PromptInputDictationError): void;
+	// Recording stops and transcribes on its own at this length.
+	maxSeconds?: number;
+	audioBitsPerSecond?: number;
 };
 
 export type PromptInputHandle = {

@@ -1,0 +1,54 @@
+---
+title: Supported Agents
+description: Which features Superset supports for each built-in agent
+---
+
+## Overview
+
+Every agent runs in its own workspace, with its own Git worktree and terminal, on your own subscription or API key. Superset never proxies model calls. Beyond that, how deeply Superset integrates depends on the agent: some report their status, resume after a restart, and show up in the Usage page; others run as plain terminal programs.
+
+## Feature Support
+
+| Agent | Status | Resumes after restart | Usage history | Quota meter |
+|---|---|---|---|---|
+| Claude | Yes | Yes | Yes | Yes, with multiple accounts |
+| Codex | Yes | Yes | Yes | Yes, with multiple accounts |
+| OpenCode | Yes | Yes | Yes | Yes |
+| Grok | Yes | Yes | Yes | Yes |
+| Cursor Agent | Yes | Yes | Yes | No |
+| Copilot | Yes | Yes | Yes | No |
+| Devin | Yes | Yes | Yes | No |
+| Muse Code | Yes | Yes | Yes | No |
+| Pi | Yes | Yes | Yes | No |
+| Oh My Pi | Yes | No | Yes | No |
+| Droid | Yes | Yes | No | No |
+| Gemini | Yes | Yes | No | No |
+| Amp | Yes | Yes | No | No |
+| Kimi Code | Yes | Yes | No | No |
+| Mastracode | Yes | Yes | No | No |
+| Mistral Vibe | Partial: no "needs input" state | Yes | No | No |
+| UFO | Partial: launch only | No | No | No |
+| Antigravity | No | No | Yes | Yes |
+| fx | No | No | Yes | No |
+| Hermes | No | No | Yes | No |
+| Kiro | No | No | No | No |
+| Polygraph | No | No | No | No |
+
+- **Status** means the agent reports when it is working, needs input, or is done, which drives the sidebar indicators and notifications. See [Agent Status](/agent-status).
+- **Resumes after restart** means Superset can restore the agent's session by its id after the app or machine restarts. See [Agent Sessions](/agent-sessions).
+- **Usage history** means the agent's token use appears on the [Usage](/usage) page.
+- **Quota meter** means the Usage page shows the subscription's quota windows. Only Claude and Codex support switching between several accounts.
+
+## Subagents and Handoff
+
+- Subagents started by **Claude** and **Codex** appear under their parent session, in the terminal header's **Subagents** menu.
+- Moving a conversation to another agent carries a structured transcript for **Claude** and **Codex**; other agents hand over their terminal output.
+- **Fork session** is available for agents with fork arguments: Claude, Codex, OpenCode, Pi, Grok, and Droid.
+
+## Models and Effort
+
+The model picker is available for Claude, Codex, Gemini, OpenCode, Oh My Pi, Copilot, Mistral Vibe, and Cursor Agent. A reasoning-effort picker is available for Claude, Codex, Amp, Mastracode, Oh My Pi, Pi, Copilot, and Cursor Agent. See [AI Agents](/agent-integration#models-and-reasoning-effort).
+
+## Other Agents
+
+Any CLI agent runs in Superset. Add it in **Settings → Agents → Add agent → Custom agent…**. A custom agent gets a workspace, worktree, and terminal like any built-in agent, without the integrations above. If you build an agent and want first-class support, see [Add Superset Support to Your Agent](/add-agent-support).

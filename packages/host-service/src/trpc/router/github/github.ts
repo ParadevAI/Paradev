@@ -1,8 +1,23 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { protectedProcedure, router } from "../../index";
+import { createGithubWorkItemLoader } from "./work-item";
+
+const loadWorkItem = createGithubWorkItemLoader();
 
 export const githubRouter = router({
+	/** A pull request or issue at a glance, for a chip's hover card. */
+	getWorkItem: protectedProcedure
+		.input(
+			z.object({
+				owner: z.string().min(1),
+				repo: z.string().min(1),
+				kind: z.enum(["pr", "issue"]),
+				number: z.number().int().positive(),
+			}),
+		)
+		.query(async ({ ctx, input }) => loadWorkItem(await ctx.github(), input)),
+
 	getPRStatus: protectedProcedure
 		.input(
 			z.object({

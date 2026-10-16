@@ -12,6 +12,7 @@ import { electronTrpc } from "renderer/lib/electron-trpc";
 import { StateScreenShell } from "renderer/routes/_authenticated/_dashboard/components/StateScreenShell";
 import { WorkspaceNotFoundState } from "renderer/routes/_authenticated/_dashboard/components/WorkspaceNotFoundState";
 import { useUnarchiveCloudWorkspace } from "renderer/routes/_authenticated/_dashboard/hooks/useUnarchiveCloudWorkspace";
+import { useCloudSidebarStore } from "renderer/routes/_authenticated/_dashboard/stores/cloudSidebarStore";
 import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
@@ -110,6 +111,7 @@ function V2WorkspaceLayout() {
 	);
 	const failedEntry = failedEntries?.[0] ?? null;
 
+	const setCloudInSidebar = useCloudSidebarStore((state) => state.setInSidebar);
 	const lastEnsuredWorkspaceIdRef = useRef<string | null>(null);
 	useEffect(() => {
 		if (!workspace || lastEnsuredWorkspaceIdRef.current === workspace.id)
@@ -117,6 +119,18 @@ function V2WorkspaceLayout() {
 		lastEnsuredWorkspaceIdRef.current = workspace.id;
 		ensureWorkspaceInSidebar(workspace.id, workspace.projectId);
 	}, [ensureWorkspaceInSidebar, workspace]);
+
+	const lastShownCloudWorkspaceIdRef = useRef<string | null>(null);
+	useEffect(() => {
+		if (
+			!workspace ||
+			!cloudWorkspace ||
+			lastShownCloudWorkspaceIdRef.current === cloudWorkspace.id
+		)
+			return;
+		lastShownCloudWorkspaceIdRef.current = cloudWorkspace.id;
+		setCloudInSidebar(cloudWorkspace.organizationId, cloudWorkspace.id, true);
+	}, [setCloudInSidebar, workspace, cloudWorkspace]);
 
 	// Sandboxes ship with the app's own host-service build, so the remote
 	// version gate has nothing to check and no host row to check it against.

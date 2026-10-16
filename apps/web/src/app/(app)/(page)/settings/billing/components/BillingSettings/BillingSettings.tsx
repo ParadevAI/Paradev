@@ -2,7 +2,6 @@
 
 import { Trans, useLingui } from "@lingui/react/macro";
 import { authClient } from "@superset/auth/client";
-import { rawErrorMessage } from "@superset/i18n/errors";
 import { formatDate } from "@superset/i18n/format";
 import {
 	isPaymentFailingStatus,
@@ -11,11 +10,10 @@ import {
 import { Button } from "@superset/ui/button";
 import { toast } from "@superset/ui/sonner";
 import { Switch } from "@superset/ui/switch";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import posthog from "posthog-js";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { env } from "@/env";
 import { useTRPC } from "@/trpc/react";
+import { useBillingActions } from "./hooks/useBillingActions";
 
 const PRO_MONTHLY_PRICE = 20;
 const PRO_YEARLY_PRICE = 15;
@@ -35,9 +33,6 @@ export function BillingSettings({ organizationId }: BillingSettingsProps) {
 	const queryClient = useQueryClient();
 	const { data: session, isPending: sessionPending } = authClient.useSession();
 	const [isYearly, setIsYearly] = useState(true);
-	const [isUpgrading, setIsUpgrading] = useState(false);
-	const [isCanceling, setIsCanceling] = useState(false);
-	const [isRestoring, setIsRestoring] = useState(false);
 
 	const activeOrganizationId = session?.session?.activeOrganizationId;
 	const switchingOrganization =
@@ -67,7 +62,6 @@ export function BillingSettings({ organizationId }: BillingSettingsProps) {
 		trpc.organization.listMembers.queryOptions({ includeDeactivated: false }),
 	);
 	const { data: activePlan } = useQuery(trpc.billing.activePlan.queryOptions());
-	const portal = useMutation(trpc.billing.portal.mutationOptions());
 
 	const organization = organizations?.find(
 		(candidate) => candidate.id === activeOrganizationId,
@@ -94,104 +88,25 @@ export function BillingSettings({ organizationId }: BillingSettingsProps) {
 			queryKey: trpc.billing.activePlan.queryKey(),
 		});
 
+	const {
+		upgrade,
+		cancel: handleCancel,
+		restore: handleRestore,
+		openPortal,
+		isUpgrading,
+		isCanceling,
+		isRestoring,
+		isOpeningPortal,
+	} = useBillingActions({
+		activeOrganizationId,
+		activePlan,
+		plan,
+		invalidatePlan,
+	});
+
 	const handleUpgrade = async () => {
-		if (!activeOrganizationId || memberCount === undefined) return;
-
-		// Same event names and shape as the desktop's two checkout entry points;
-		// `source` is what separates this one in the funnel.
-		const checkoutProperties = {
-			plan: "pro",
-			annual: isYearly,
-			seats: memberCount,
-			previous_plan: plan,
-			source: "web_billing",
-		};
-		posthog.capture("checkout_started", checkoutProperties);
-
-		setIsUpgrading(true);
-		try {
-			await authClient.subscription.upgrade(
-				{
-					plan: "pro",
-					referenceId: activeOrganizationId,
-					annual: isYearly,
-					seats: memberCount,
-					successUrl: `${env.NEXT_PUBLIC_WEB_URL}/settings/billing?success=true`,
-					cancelUrl: `${env.NEXT_PUBLIC_WEB_URL}/settings/billing`,
-					returnUrl: `${env.NEXT_PUBLIC_WEB_URL}/settings/billing`,
-					disableRedirect: true,
-				},
-				{
-					onSuccess: (ctx) => {
-						if (ctx.data?.url) {
-							posthog.capture("checkout_redirected", checkoutProperties);
-							window.location.assign(ctx.data.url);
-						}
-					},
-					onError: (ctx) => {
-						posthog.capture("checkout_failed", {
-							...checkoutProperties,
-							status: ctx.response?.status,
-							error: rawErrorMessage(ctx.error),
-						});
-						toast.error(
-							t({ message: "Could not start checkout. Please try again." }),
-						);
-					},
-				},
-			);
-		} finally {
-			setIsUpgrading(false);
-			await invalidatePlan();
-		}
-	};
-
-	const handleCancel = async () => {
-		if (!activeOrganizationId) return;
-		setIsCanceling(true);
-		try {
-			await authClient.subscription.cancel(
-				{
-					referenceId: activeOrganizationId,
-					returnUrl: `${env.NEXT_PUBLIC_WEB_URL}/settings/billing`,
-				},
-				{
-					onSuccess: (ctx) => {
-						if (ctx.data?.url) window.location.assign(ctx.data.url);
-					},
-				},
-			);
-		} finally {
-			setIsCanceling(false);
-			await invalidatePlan();
-		}
-	};
-
-	const handleRestore = async () => {
-		if (!activeOrganizationId) return;
-		setIsRestoring(true);
-		try {
-			await authClient.subscription.restore({
-				referenceId: activeOrganizationId,
-			});
-			toast.success(t({ message: "Plan restored" }));
-		} finally {
-			setIsRestoring(false);
-			await invalidatePlan();
-		}
-	};
-
-	const openPortal = (flowType: "general" | "payment_method_update") => {
-		portal.mutate(
-			{ flowType },
-			{
-				onSuccess: ({ url }) => window.location.assign(url),
-				onError: () =>
-					toast.error(
-						t({ message: "Could not open billing. Please try again." }),
-					),
-			},
-		);
+		if (memberCount === undefined) return;
+		await upgrade({ annual: isYearly, seats: memberCount });
 	};
 
 	if (sessionPending || switchingOrganization || activePlan === undefined) {
@@ -244,7 +159,7 @@ export function BillingSettings({ organizationId }: BillingSettingsProps) {
 							size="sm"
 							variant="outline"
 							className="shrink-0"
-							disabled={portal.isPending}
+							disabled={isOpeningPortal}
 							onClick={() => openPortal("payment_method_update")}
 						>
 							<Trans>Update payment method</Trans>
@@ -363,7 +278,7 @@ export function BillingSettings({ organizationId }: BillingSettingsProps) {
 						variant="outline"
 						size="sm"
 						className="shrink-0"
-						disabled={portal.isPending}
+						disabled={isOpeningPortal}
 						onClick={() => openPortal("general")}
 					>
 						<Trans>Manage billing</Trans>

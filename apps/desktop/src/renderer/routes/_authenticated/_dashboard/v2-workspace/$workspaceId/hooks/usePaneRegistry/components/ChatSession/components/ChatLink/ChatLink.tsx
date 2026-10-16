@@ -39,7 +39,7 @@ function openInApp(
 			return;
 		case "workspace":
 			void navigate({
-				to: "/cloud-workspaces/$workspaceId",
+				to: "/v2-workspace/$workspaceId",
 				params: { workspaceId: link.workspaceId },
 			});
 	}

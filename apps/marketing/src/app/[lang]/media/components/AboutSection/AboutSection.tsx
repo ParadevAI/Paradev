@@ -10,7 +10,7 @@ export function AboutSection() {
 			<div className="mt-6 space-y-5 text-foreground text-lg leading-relaxed">
 				<p>
 					<Trans>
-						Superset (YC S26) is the open-source IDE for the AI agents era,
+						Superset (YC S26) is the source-available IDE for the AI agents era,
 						where engineers run hundreds of coding agents like Claude Code and
 						Codex in parallel.
 					</Trans>

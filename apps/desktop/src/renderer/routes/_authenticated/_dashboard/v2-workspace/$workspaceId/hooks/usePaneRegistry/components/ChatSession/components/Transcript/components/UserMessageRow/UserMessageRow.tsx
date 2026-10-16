@@ -1,9 +1,10 @@
-import { Trans } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { readBookkeeping, userMessageText } from "@superset/chat/core";
 import type { AvailableCommand, UserMessage } from "@superset/chat/protocol";
 import { Message, MessageContent } from "@superset/ui/ai-elements/message";
 import { Badge } from "@superset/ui/badge";
 import { Button } from "@superset/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { useRef } from "react";
 import { parseAttachmentTags } from "../../../../utils/attachmentTags";
@@ -12,7 +13,9 @@ import {
 	type MessageSegment,
 	splitByElements,
 } from "../../../../utils/messageElements";
+import { CopyButton } from "../../../CopyButton";
 import { AttachmentImage } from "../AttachmentImage";
+import { MessageTime } from "../MessageTime";
 import { UserMessageText } from "./components/UserMessageText";
 import { useFitsOneLine } from "./hooks/useFitsOneLine";
 
@@ -42,6 +45,7 @@ export function UserMessageRow({
 	harness: string | undefined;
 	pending?: PendingPrompt | undefined;
 }) {
+	const { t } = useLingui();
 	const raw = userMessageText(item);
 	const note = readBookkeeping(harness, raw);
 	const { text, attachments } = parseAttachmentTags(raw);
@@ -77,8 +81,12 @@ export function UserMessageRow({
 				: [],
 		),
 	];
+	const copyable = text.length > 0 && !pending;
 	return (
-		<Message className="pt-1.5 pb-5 pl-10" from="user">
+		<Message
+			className={cn("group/message pt-1.5 pl-10", copyable ? "pb-0" : "pb-5")}
+			from="user"
+		>
 			{images.length > 0 && (
 				<div
 					className={cn(
@@ -122,6 +130,24 @@ export function UserMessageRow({
 						</div>
 					)}
 				</MessageContent>
+			)}
+			{copyable && (
+				<div className="-mt-1.5 flex items-center justify-end gap-2 text-muted-foreground/60 opacity-0 transition-opacity focus-within:opacity-100 group-hover/message:opacity-100">
+					<MessageTime atMs={item.startedAtMs} />
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<span>
+								<CopyButton
+									label={t({ message: "Copy message" })}
+									text={text}
+								/>
+							</span>
+						</TooltipTrigger>
+						<TooltipContent>
+							<Trans>Copy message</Trans>
+						</TooltipContent>
+					</Tooltip>
+				</div>
 			)}
 			{pending?.failed && (
 				<div className="flex items-center gap-2 self-end">

@@ -1,0 +1,99 @@
+---
+title: "Best IDE for Mistral Vibe in 2026"
+description: "The best places to run Mistral Vibe in 2026, from the Vibe CLI and ACP in VS Code, JetBrains, and Zed to remote cloud agents and Superset for parallel worktree sessions next to other agents."
+date: 2026-10-13
+type: "roundup"
+competitors:
+  - mistral-vibe
+  - zed
+  - claude-code
+keywords:
+  - best ide for mistral vibe
+  - where to run mistral vibe
+  - mistral vibe vs code
+  - mistral vibe worktree
+  - mistral vibe acp
+  - mistral vibe parallel agents
+---
+
+Mistral Vibe is Mistral's open-source coding agent for the terminal. It runs in its own CLI, inside VS Code, JetBrains IDEs, and Zed through ACP, and as remote cloud agents. So the best "IDE for Mistral Vibe" depends on where you want to work and whether you want several tasks at once.
+
+Facts were checked against Mistral's own docs on October 13, 2026.
+
+---
+
+## The Short Version
+
+| Where you run Mistral Vibe | Best for | Parallel tasks on one repo? | Main tradeoff |
+|---|---|---|---|
+| **Superset** | Many Vibe tasks at once, next to other agents | Git worktrees for local branch-based workspaces | Not a single-file editor experience |
+| **Vibe CLI** | One focused task, scripts, and CI | `--worktree` and subagents | You manage separate tasks yourself |
+| **ACP in VS Code, JetBrains, or Zed** | Working with Vibe inside your editor | Limited | One working copy |
+| **Remote cloud agents** | Work that runs away from your machine | Through cloud agents | Vibe's agent only |
+
+## The Options
+
+### Vibe CLI
+
+The Vibe CLI is the core of the agent. Version 2.26.1 shipped on October 9, 2026, under the Apache-2.0 license. It uses Mistral models through an API key, and other providers through `config.toml`. Subagents run through its `task` tool, and `--worktree` puts a session in its own Git worktree. The `-p` programmatic mode has a `--max-price` limit and JSON output for scripts and CI. It supports MCP and hooks in `hooks.toml`.
+
+Vibe officially targets UNIX systems. Mistral says it "works on Windows."
+
+There is a Free tier with limited access to Vibe, and Pro is $14.99 a month. One subscription covers the CLI, the IDE integrations, and web remote agents.
+
+### ACP in VS Code, JetBrains, or Zed
+
+Vibe speaks the Agent Client Protocol (ACP), and Mistral documents it for VS Code, JetBrains IDEs, and Zed. This is the choice when you want to edit files yourself next to the agent. Parallel tasks still share one working copy unless you set up worktrees yourself.
+
+For Zed, see [Superset vs Zed](/compare/superset-vs-zed).
+
+### Remote cloud agents
+
+Vibe can run tasks as remote cloud agents, and you can "teleport" a session back to the CLI. This suits work that should keep going away from your machine, when you only need Vibe's own agent. The Pro plan covers it.
+
+### Superset
+
+Superset runs Mistral Vibe as a built-in agent. Each new local branch-based workspace gets its own Git worktree and persistent terminal, so several Vibe tasks can run on the same repository at once, locally or on your own remote hosts. Vibe uses your own Mistral plan or key, and Superset never proxies model calls. You can run Claude Code, Codex, or any other CLI agent in the next workspace and compare the results. Around it you get a Changes pane that commits, pushes, and opens PRs, a Pull Requests view with CI checks, an in-app browser, and an [iPhone and iPad app](/mobile). Worktrees separate working files but do not sandbox processes or prevent merge conflicts; see [workspace types](https://docs.superset.sh/workspaces).
+
+Where Vibe is stronger: its remote cloud agents run on Mistral's side, and Vibe works inside VS Code and JetBrains IDEs. Superset runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Vibe's own CLI also has `--worktree`, so for a single parallel task you may not need anything else.
+
+## How To Choose
+
+- For one task, or for CI with a price limit, use the Vibe CLI.
+- To work with Vibe in your editor, use ACP in VS Code, JetBrains, or Zed.
+- For work that runs away from your machine, use remote cloud agents.
+- For several Vibe tasks at once, or Vibe next to other agents, use Superset.
+
+## Verdict
+
+Mistral Vibe is a low-cost, open-source agent with good reach: a CLI, three editor families through ACP, and cloud agents, all on one subscription. The CLI is the best place for one task. Once you want several Vibe tasks on one repository, or want to compare Vibe with Claude Code or Codex, run it in a workspace like Superset, where each task gets its own worktree and the diffs and PRs are in one place.
+
+For the full field of agents, see [Best AI Coding Agents in 2026](/compare/best-coding-agents).
+
+## How To Run Mistral Vibe in Superset
+
+1. Open your repository in Superset and create a workspace with the Mistral Vibe preset. Superset creates a Git worktree and a terminal for it.
+2. Create a second workspace with another agent, for example Claude Code or Codex, in its own worktree.
+3. Give both agents the same prompt.
+4. Compare the two diffs in the Changes pane.
+5. Commit, push, and open a pull request from the better one.
+
+Each agent uses your own subscription or key. Superset never proxies model calls.
+
+## Frequently Asked Questions
+
+### What is the best IDE for Mistral Vibe?
+
+For one task, the Vibe CLI. To work inside an editor, VS Code, a JetBrains IDE, or Zed through ACP. For several Vibe tasks in parallel, or Vibe next to other agents, a worktree workspace like Superset.
+
+### Does Mistral Vibe work in VS Code?
+
+Yes. Mistral documents ACP support for VS Code, JetBrains IDEs, and Zed.
+
+### How much does Mistral Vibe cost?
+
+There is a Free tier with limited access. Pro is $14.99 a month, and it covers the CLI, IDE, and web remote agents.
+
+### Can I run Mistral Vibe and Claude Code at the same time?
+
+Yes. In Superset, each runs in its own workspace and worktree on the same repository, on your own plans.

@@ -43,6 +43,7 @@ import {
 	takeRecoveredDraftText,
 	useComposerDraft,
 } from "./hooks/useComposerDraft";
+import { useFooterTier } from "./hooks/useFooterTier";
 import { useQueueActions } from "./hooks/useQueueActions";
 import { useUploadAttachments } from "./hooks/useUploadAttachments";
 
@@ -133,6 +134,7 @@ export const Composer = memo(function Composer({
 		[],
 	);
 	const rootRef = useRef<HTMLDivElement>(null);
+	const footerTier = useFooterTier(rootRef);
 	useEffect(() => {
 		const recovered = takeRecoveredDraftText(draftKey);
 		if (recovered) promptInputRef.current?.appendText(recovered);
@@ -368,6 +370,7 @@ export const Composer = memo(function Composer({
 					modes && onSetMode ? (
 						<ModePicker
 							currentModeId={currentModeId}
+							iconOnly={footerTier >= 2}
 							modes={modes}
 							onSelect={onSetMode}
 						/>
@@ -378,6 +381,8 @@ export const Composer = memo(function Composer({
 						<ModelPicker
 							agentSwitcher={agentSwitcher}
 							configOptions={configOptions}
+							hideEffortLabel={footerTier >= 1}
+							hideModelLabel={footerTier >= 3}
 							onSelect={onSetConfigOption}
 						/>
 					) : undefined

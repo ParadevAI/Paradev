@@ -2,7 +2,7 @@
 title: "How to Isolate Parallel Coding Agents in One Repository (2026): Worktrees, Ports, and Resuming Work"
 description: "Isolate parallel coding agents with worktrees, clones, containers, or cloud sandboxes, keep ports and previews apart, and resume a task later."
 date: 2026-10-07
-lastUpdated: 2026-10-07
+lastUpdated: 2026-10-14
 type: "tutorial"
 competitors:
   - git-worktrees
@@ -19,9 +19,14 @@ keywords:
   - dev server port collisions worktrees
   - resume coding agent session
   - parallel coding agents
+  - claude code worktree inside superset
 ---
 
-To stop parallel coding agents from overwriting each other, give each agent its own checkout: a Git worktree for most local work, a full clone when tools fight over the `.git` directory, and a container or cloud sandbox when you also need to fence off processes, databases, or credentials. Worktrees separate files only, so you still need a port plan for dev servers and a way to get back to each task later. Claude Code's `--worktree` flag, Worktrunk, Claude Squad with tmux, and [Superset](https://superset.sh) each automate part of this; Superset ties the worktree, terminals, detected ports, browser preview, and agent session to one workspace you can pin and reopen.
+To stop parallel coding agents from overwriting each other, give each agent its own checkout. [Superset](https://superset.sh) does this by default: each new workspace is a Git worktree on its own branch, with its own terminals, detected ports, browser preview, and agent session, for any CLI agent, in one place you can pin and reopen.
+
+Agents' own worktree features still work inside a Superset workspace, because it is a normal Git checkout and Superset runs the real agent CLI. Claude Code's `--worktree` flag works in a Superset workspace, and Codex has its own worktrees in the ChatGPT desktop app. Use a Superset workspace per task when you want each task tracked, reviewed, and resumed on its own. Use Claude Code's worktrees when one session needs a short-lived side branch.
+
+The general rule: a Git worktree for most local work, a full clone when tools fight over the `.git` directory, and a container or cloud sandbox when you also need to fence off processes, databases, or credentials. Worktrees separate files only, so you still need a port plan for dev servers and a way to get back to each task later. Worktrunk and Claude Squad with tmux also automate parts of this.
 
 This page is about the isolation decision, ports, and resuming. For worktree basics (what `git worktree add` does, the five-step workflow), read [Git Worktrees for AI Coding Agents](/compare/git-worktrees-for-ai-agents) first.
 
@@ -58,6 +63,8 @@ Superset uses worktrees the same way. Its own product summary states that worktr
 You can do everything with plain `git worktree add`, `git worktree list`, and `git worktree remove`. The pain starts at three or more agents: copying `.env` into each worktree, installing dependencies, remembering which folder is which, and deleting finished worktrees without losing uncommitted work. These tools handle that.
 
 **Claude Code `--worktree`.** If Claude Code is your only agent, start here. `claude --worktree feature-auth` (or `-w`) creates a worktree under `.claude/worktrees/` on a new branch and starts the session in it. A `.worktreeinclude` file copies gitignored files such as `.env` into each new worktree. On exit, Claude Code removes a clean, unnamed worktree and asks before it removes one with changes. Custom subagents can set `isolation: worktree`. See the [Claude Code worktree docs](https://code.claude.com/docs/en/worktrees).
+
+**Claude Code `--worktree` inside Superset.** You can use both. A Superset workspace already gives the session its own worktree, so you rarely need `--worktree` in it, but nothing blocks it. We tested `claude --worktree` in a Superset workspace on October 14, 2026, with Claude Code 2.1.300. Claude Code created the new worktree under the main checkout's `.claude/worktrees/` folder, on a branch from the current commit, not inside the Superset workspace. Superset does not list it as a workspace unless you import it with **Import untracked worktrees**.
 
 **Worktrunk (`wt`).** A worktree manager built for running several agents. `wt switch -c -x claude feat` creates a worktree and starts an agent in it, `wt list` shows them, `wt merge main` merges, and `wt remove` cleans up. Hooks run commands on create and merge, and a `hash_port` template filter gives each worktree its own dev-server port. See [worktrunk.dev](https://worktrunk.dev) and [Superset vs Worktrunk](/compare/superset-vs-worktrunk).
 
@@ -160,6 +167,10 @@ Give each worktree its own port in a local `.env`, make the dev command read it,
 ### How do I clean up worktrees safely when an agent is done?
 
 Commit or push first, then run `git worktree remove <path>`. Git refuses to remove a worktree with uncommitted changes unless you pass `--force`. Tools like Claude Code, Worktrunk, and Superset check for changes before removal; Superset's bulk delete flags dirty or unpushed work and runs the project's teardown commands.
+
+### Can I use Claude Code's `--worktree` inside a Superset workspace?
+
+Yes. Superset runs the real `claude` CLI in the workspace's Git worktree, so `claude --worktree` works there. Claude Code puts the new worktree under the main checkout's `.claude/worktrees/` folder, not inside the Superset workspace, and Superset lists it only if you import it. Use a Superset workspace for each task you want to track and review, and Claude Code's worktrees for short side branches inside one task.
 
 ### Can I resume a Claude Code or Codex session in the same worktree later?
 

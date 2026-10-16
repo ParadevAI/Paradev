@@ -45,7 +45,10 @@ import { isUpdateReadyToInstall, setupAutoUpdater } from "./lib/auto-updater";
 import { startBrowserBridge } from "./lib/browser/browser-bridge";
 import { browserManager } from "./lib/browser/browser-manager";
 import { downloadManager } from "./lib/browser/download-manager";
-import { installBundledCliShim } from "./lib/bundled-cli";
+import {
+	installBundledCliShim,
+	installBundledPdevShim,
+} from "./lib/bundled-cli";
 import { installDevRunnerExit } from "./lib/dev-runner-exit";
 import { resolveDevWorkspaceName } from "./lib/dev-workspace-name";
 import { setWorkspaceDockIcon } from "./lib/dock-icon";
@@ -55,6 +58,8 @@ import { resolveAppLocale } from "./lib/language";
 import { localDb } from "./lib/local-db";
 import { requestLocalNetworkAccess } from "./lib/local-network-permission";
 import { menuEmitter } from "./lib/menu-events";
+import { allowRendererToReachDeviceHub } from "./lib/mobile-hub-origin";
+
 import { syncInstalledPluginMcpServers } from "./lib/plugin-installs";
 import { portForwardManager } from "./lib/port-forward";
 import { ensureProjectIconsDir, getProjectIconPath } from "./lib/project-icons";
@@ -547,6 +552,7 @@ if (!gotTheLock) {
 			console.error("[main] Failed to start browser bridge:", error);
 		}
 		downloadManager.start();
+		allowRendererToReachDeviceHub("persist:superset");
 
 		const hostServiceCoordinator = getHostServiceCoordinator();
 		hostServiceCoordinator.setConfigProvider(async () => {
@@ -622,6 +628,11 @@ if (!gotTheLock) {
 			installBundledCliShim();
 		} catch (error) {
 			console.error("[main] Failed to install bundled CLI shim:", error);
+		}
+		try {
+			installBundledPdevShim();
+		} catch (error) {
+			console.error("[main] Failed to install bundled pdev shim:", error);
 		}
 
 		if (IS_DEV) {

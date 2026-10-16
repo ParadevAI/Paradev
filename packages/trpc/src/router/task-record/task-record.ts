@@ -338,7 +338,9 @@ export const taskRecordRouter = {
 		.input(z.object({ taskId: z.string().uuid(), name: z.string() }))
 		.mutation(async ({ ctx, input }) => {
 			const task = await loadTask(ctx, input.taskId);
-			const [label] = await ensureLabels(db, task.organizationId, [input.name]);
+			const [label] = await dbWs.transaction((tx) =>
+				ensureLabels(tx, task.organizationId, [input.name]),
+			);
 			if (!label) {
 				throw userError({
 					code: "BAD_REQUEST",

@@ -132,12 +132,15 @@ export function useOpenNewWorkspaceForHost() {
 	const isV2CloudEnabled = useIsV2CloudEnabled();
 
 	return useCallback(
-		(hostId: string) => {
+		(hostId: string, projectId?: string) => {
 			if (!isV2CloudEnabled) {
 				useNewWorkspaceModalStore.getState().openHostModal(hostId);
 				return;
 			}
-			void navigate({ to: "/new-workspace", search: { host: hostId } });
+			void navigate({
+				to: "/new-workspace",
+				search: projectId ? { host: hostId, projectId } : { host: hostId },
+			});
 		},
 		[isV2CloudEnabled, navigate],
 	);

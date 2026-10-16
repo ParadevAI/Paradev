@@ -1,5 +1,5 @@
-/** Read a File into base64 (handles binary + large files via the reader). */
-export function fileToBase64(file: File): Promise<string> {
+/** Read a File or Blob into base64 (handles binary + large files via the reader). */
+export function fileToBase64(file: Blob): Promise<string> {
 	return new Promise((resolve, reject) => {
 		const reader = new FileReader();
 		reader.onload = () => {

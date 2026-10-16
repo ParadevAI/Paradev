@@ -1,0 +1,237 @@
+---
+title: "Best AI Coding Agents in 2026: Claude Code, Codex, Antigravity, and 15 More Compared"
+description: "The best terminal coding agents in 2026, compared on models, pricing, license, platforms, and parallel work: Claude Code, Codex, Antigravity CLI, Copilot CLI, Cursor, Amp, OpenCode, Droid, Muse Code, Kiro, and more, and how to run them side by side."
+date: 2026-10-13
+lastUpdated: 2026-10-14
+type: "roundup"
+competitors:
+  - claude-code
+  - codex
+  - antigravity
+  - github-copilot
+  - cursor
+  - amp
+  - opencode
+  - factory
+  - muse-code
+  - kiro
+  - devin
+keywords:
+  - best coding agent
+  - best ai coding agent 2026
+  - best cli coding agent
+  - coding agent comparison
+  - claude code vs codex vs antigravity
+  - terminal coding agents
+  - open source coding agent
+---
+
+There are now more good coding agents than any team can try one by one. Every major lab ships its own, the editors ship theirs, and a wave of open-source harnesses lets you bring any model. This guide compares the agents themselves: the tools that read your code, run commands, and make the change. It does not rank editors or orchestrators; for that, see [Best AI Coding Tools and Agents](/compare/best-ai-coding-agents-2026).
+
+The short answer is that there is no single best agent. Each one is strongest on its own vendor's models, and the best one for a task can change from one release to the next. That is why the last section covers how to run several of them side by side on the same repository and keep the best result.
+
+Facts below were checked against each vendor's own docs, pricing, and changelogs on October 13, 2026.
+
+---
+
+## The Short Version
+
+| Agent | Vendor | Models | How you pay | License |
+|---|---|---|---|---|
+| **Claude Code** | Anthropic | Claude | Claude Pro from $20/mo, Max from $100/mo, or API key | Proprietary |
+| **Codex CLI** | OpenAI | OpenAI GPT models | ChatGPT plans, including limited use on Free, or API key | Open source (Apache-2.0) |
+| **Antigravity CLI (`agy`)** | Google | Gemini, plus Claude and gpt-oss | Free with weekly limits; Google AI Pro and Ultra; API key | Proprietary |
+| **GitHub Copilot CLI** | GitHub | Claude, GPT, Gemini, Grok, Kimi | Free tier; Pro $10, Pro+ $39, Max $100/mo | Proprietary |
+| **Cursor CLI** | Cursor | Cursor's model list | Cursor plans, free tier included | Proprietary |
+| **Amp** | Amp | Several, chosen by mode | Free with your own compute and keys; Individual $20/mo | Proprietary |
+| **OpenCode** | Anomaly | Any provider | Free; your own keys, or OpenCode Zen and Go | Open source (MIT) |
+| **Droid** | Factory | Frontier and open-weight models; your own keys in the CLI | Factory Pro $20, Plus $100, Max $200/mo | Proprietary |
+| **Muse Code** | Meta | Muse Spark and Muse Wonder | Muse subscriptions or API per token | Not open source |
+| **Grok Build** | xAI | Grok, or any configured model | Free to try; SuperGrok; xAI API key | Open source (Apache-2.0) |
+| **Kiro CLI** | AWS | Auto router or chosen model | Free 50 credits; Pro $20 to Power $200/mo | Proprietary |
+| **Devin CLI** | Cognition | Frontier models plus SWE-2 | Free tier; Pro $20, Max $200/mo | Proprietary |
+| **Kimi Code** | Moonshot AI | Kimi | Kimi membership | Open source (MIT) |
+| **Mistral Vibe** | Mistral | Mistral, or other providers | Free tier; Pro $14.99/mo | Open source (Apache-2.0) |
+| **Qwen Code** | Alibaba | Qwen, other APIs, or local | Coding Plan Pro $50/mo or pay-as-you-go | Open source (Apache-2.0) |
+| **Pi** | Earendil | Any provider | Free; your own keys | Open source (MIT) |
+| **Hermes Agent** | Nous Research | Any provider | Free; your own keys | Open source (MIT) |
+| **Goose** | AAIF (Linux Foundation) | 15+ providers | Free; your own keys | Open source (Apache-2.0) |
+
+Every agent on this list runs on macOS and Linux. Most run on Windows too, some through WSL.
+
+## How They Compare on Parallel Work
+
+Most agents can now split a task across subagents. Fewer can isolate separate tasks from each other, and that is what matters when you run several at once on one repository.
+
+| Agent | Subagents | Built-in worktrees | Cloud or remote runs | Headless mode |
+|---|---|---|---|---|
+| Claude Code | Yes, plus `/batch` and agent view | Yes | Cloud sessions, Remote Control | `claude -p` |
+| Codex CLI | Yes | Yes | `codex cloud` | `codex exec` |
+| Antigravity CLI | Async subagents, agent teams on paid plans | Per subagent | Remote Control | `agy -p` |
+| Copilot CLI | `/fleet`, custom agents | Not documented | Cloud agent, `--cloud` sandboxes (preview) | `copilot -p` |
+| Cursor CLI | Yes | `--worktree` | Cloud Agents | `agent -p` |
+| Amp | Yes | Through runners | Orbs (cloud machines), remote runners | `amp -x` |
+| OpenCode | Built-in subagents | Not documented | Not documented | Server and SDK |
+| Droid | Missions, custom Droids | Yes, in Factory's app | Droid Computers | `droid exec` |
+| Muse Code | Up to 8 agents per tree by default, counting the root | Per subagent | No | `muse exec` |
+| Grok Build | Yes | Per subagent | No | `-p` |
+| Kiro CLI | Sub-agents, workflows | Not documented | Cloud sessions | Headless with API key |
+| Devin CLI | Yes | Yes | Handoff to Devin cloud | `-p` |
+| Mistral Vibe | Through its task tool | `--worktree` | Remote cloud agents | `-p` |
+| Qwen Code | Subagents, Agent Teams | Yes | No | `qwen -p` |
+| Pi | Only through extensions | No | No | Print and RPC modes |
+| Hermes Agent | Yes | `hermes -w` | Docker, SSH, Modal, and others | One-shot mode |
+
+All of them support MCP.
+
+## The Agents
+
+### Claude Code
+
+Anthropic's agent reads your codebase, edits files, runs commands, and works with your tools. It has the widest range of ways to work in parallel: subagents, `/batch` runs that fan out across worktrees, an agent view for background sessions, cloud sessions, and Remote Control. Plugins, skills, and hooks make it the most extended agent on this list. It needs a paid Claude plan or an API key; there is no free tier. Anthropic warns that parallel runs multiply token use.
+
+**Best for:** deep, multi-step work, and teams that want the richest set of parallel modes.
+
+See [Best IDE for Claude Code](/compare/best-ide-for-claude-code) and [Claude Code vs Codex](/compare/claude-code-vs-codex).
+
+### Codex CLI
+
+OpenAI's agent is open source under Apache-2.0 and comes with ChatGPT plans, so one subscription covers the CLI, the IDE extension, the ChatGPT desktop app, cloud tasks, and code review. It has subagents, worktrees, `codex exec` for CI, an SDK, and a GitHub Action. With an API key instead of a plan, you lose the cloud features.
+
+**Best for:** developers already on ChatGPT, and teams that want an open-source agent from a major lab.
+
+See [Best IDE for Codex](/compare/best-ide-for-codex).
+
+### Antigravity CLI
+
+Google's `agy` replaced Gemini CLI for most users in 2026. It shares its agent harness and settings with the Antigravity desktop app, runs async subagents that can each take a worktree, and has agent teams on paid plans. It is the most generous free option from a major lab: free with weekly limits, with Gemini, Claude, and gpt-oss models. Gemini CLI still exists for paid API and Code Assist users.
+
+**Best for:** a free start with strong models, and teams on Google Cloud.
+
+See [Superset vs Google Antigravity](/compare/superset-vs-antigravity) and [Best IDE for Gemini CLI](/compare/best-ide-for-gemini-cli).
+
+### GitHub Copilot CLI
+
+Copilot's terminal agent offers models from several vendors on one plan, starting with a free tier. Its strength is GitHub itself: issues, pull requests, and the GitHub MCP server are built in, `/delegate` hands work to Copilot's cloud agent, and with remote control turned on you can steer sessions from GitHub.com or GitHub Mobile.
+
+**Best for:** teams that live in GitHub and want several vendors' models on one bill.
+
+### Cursor CLI
+
+Cursor's terminal agent shares worktrees, rules, and MCP config with the Cursor editor and its Cloud Agents; starting a message with `&` hands it to the cloud. Cursor notes that some features work only in the editor.
+
+**Best for:** Cursor users who also want the agent in a terminal or in CI.
+
+See [Superset vs Cursor](/compare/superset-vs-cursor).
+
+### Amp
+
+Amp picks models for you by mode, from fast to "ultra," and runs work on "orbs," cloud machines that keep going after you close your laptop. It is free if you bring your own compute and model keys, and its threads follow you across the terminal, web, and its iOS and macOS apps.
+
+**Best for:** developers who want the vendor to choose the best model for each task.
+
+See [Superset vs Amp](/compare/superset-vs-amp) and [Claude Code vs Amp](/compare/claude-code-vs-amp).
+
+### OpenCode
+
+OpenCode is the most popular open-source agent with free choice of provider. It has a terminal UI, a desktop app, and an IDE extension, built-in subagents, and a server with an SDK. It is MIT-licensed and free; you pay only for the models, through your own keys or OpenCode's Zen and Go services.
+
+**Best for:** developers who want an open-source agent and any model.
+
+See [Multiple OpenCode Agents in Parallel](/compare/multiple-opencode-agents-parallel).
+
+### Droid
+
+Factory's agent runs frontier and open-weight models, and in the CLI you can bring your own keys. Missions coordinate several agents on larger work, and Droid connects to Jira, Linear, Slack, and PagerDuty. It is billed on Factory's plans.
+
+**Best for:** teams that want one agent across the terminal, IDE, Slack, and Linear.
+
+See [Superset vs Factory](/compare/superset-vs-factory).
+
+### Muse Code
+
+Meta's agent is built for the Muse Spark models. It runs up to 8 agents per tree by default, counting the root agent, each with an optional worktree, and workflows that run teams of subagents in parallel or in stages. It can import skills and plugins from Claude and Codex, and continue a local Claude Code or Codex session.
+
+**Best for:** trying Meta's models with strong multi-agent workflows.
+
+See [Superset vs Muse Code](/compare/superset-vs-muse-code) and [Best IDE for Muse Code](/compare/best-ide-for-muse-code).
+
+### Grok Build
+
+xAI's open-source agent, written in Rust, can give each subagent its own worktree, has a plan mode that blocks edits until you approve, and runs any model you configure, including local ones. xAI still labels it early beta.
+
+**Best for:** an open-source agent from a major lab that you can point at local models.
+
+### Kiro CLI
+
+AWS's agent shares one configuration with the Kiro IDE, web app, and mobile app, and adds sub-agents, workflows, and cloud sessions. Kiro began offering version 3 of the CLI in October 2026, and plans a spec mode for CLI 3.0.
+
+**Best for:** AWS teams, and teams that already use the Kiro IDE.
+
+### Devin CLI
+
+Cognition's local agent hands sessions off to cloud Devin when a task gets long, and runs in an OS-level sandbox. It includes Cognition's own SWE-2 model alongside frontier models.
+
+**Best for:** moving long tasks from your terminal to a cloud engineer without starting over.
+
+See [Superset vs Devin](/compare/superset-vs-devin).
+
+### Open-model agents: Kimi Code, Mistral Vibe, Qwen Code
+
+The open-weight labs ship strong agents of their own, all open source. **Kimi Code** (MIT) runs Moonshot's Kimi models with subagents and video input. **Mistral Vibe** (Apache-2.0) has a $14.99-a-month Pro plan, with worktrees and remote cloud agents. **Qwen Code** (Apache-2.0) runs Qwen or any other API, or local models, and has subagents, agent teams, and worktrees.
+
+**Best for:** open models, lower prices, and self-hosting.
+
+### Harnesses: Pi, Hermes Agent, Goose
+
+These bring no model of their own and work with any provider. **Pi** is a minimal harness you shape with extensions; it skips subagents and permissions on purpose. **Hermes Agent** writes and improves its own skills and can run on Docker, SSH, Modal, and other backends. **Goose**, now governed by the Linux Foundation's AAIF, is a general-purpose agent with a desktop app and 70+ MCP extensions.
+
+**Best for:** developers who want full control over the harness.
+
+## Best Picks by Use Case
+
+- **Best overall for deep work:** Claude Code.
+- **Best open-source agent from a major lab:** Codex CLI.
+- **Best free start:** Antigravity CLI, Copilot CLI's free tier, or Codex on ChatGPT Free.
+- **Best for GitHub-centric teams:** Copilot CLI.
+- **Best for any model, open source:** OpenCode.
+- **Best for multi-agent workflows in one session:** Muse Code or Claude Code.
+- **Best low-cost subscriptions:** Copilot Pro at $10 a month, or Mistral Vibe Pro at $14.99.
+- **Best for local or self-hosted models:** Qwen Code, Pi, or Hermes Agent.
+- **Best for handing long tasks to the cloud:** Devin CLI, Amp, or Codex.
+
+## Run Them All Side by Side
+
+Benchmarks and reviews go stale within weeks, and the agent that does best on your code may not be the one that tops a leaderboard. The reliable test is your own repository: give the same task to two or three agents and compare the diffs.
+
+[Superset](/) is built for that. It is a desktop workspace that runs any CLI agent, each in its own Git worktree and terminal, on your own subscriptions and keys; Superset never proxies model calls. Claude Code, Codex, Antigravity CLI, Copilot CLI, Cursor's agent, Amp, OpenCode, Droid, Muse Code, Grok Build, Kiro, Devin CLI, Kimi Code, Mistral Vibe, Pi, Hermes Agent, and more are built-in presets. Any other agent, such as Qwen Code or Goose, runs as a custom command.
+
+A typical comparison takes a few minutes:
+
+1. Create a workspace per agent from the same branch. Each gets its own worktree, so the agents cannot overwrite each other's files.
+2. Give each agent the same prompt.
+3. Review each diff in the Changes pane, run the result in the in-app browser, and open a pull request from the best one.
+
+You can also continue a session with a different agent when one gets stuck, schedule agents as automations, and check on them from the [iPhone and iPad app](/mobile). For the full workflow, see [How to Compare Coding Agents Side by Side](/compare/compare-coding-agents-side-by-side).
+
+## Frequently Asked Questions
+
+### What is the best AI coding agent in 2026?
+
+It depends on your models and budget. Claude Code has the richest parallel features, Codex CLI is the strongest open-source agent from a major lab, Antigravity CLI has the most generous free tier, and OpenCode is the best open-source agent for any model. The most reliable way to choose is to run two or three on your own code and compare the results.
+
+### Which coding agent is free?
+
+Antigravity CLI is free with weekly limits, Copilot CLI has a free tier, Codex includes limited use on ChatGPT Free, and Mistral Vibe and Devin CLI have limited free tiers. OpenCode, Pi, Hermes Agent, and Goose are free open-source agents; you pay only for the model.
+
+### Which coding agents are open source?
+
+Codex CLI, Grok Build, Mistral Vibe, Qwen Code, and Goose are Apache-2.0. OpenCode, Kimi Code, Pi, and Hermes Agent are MIT. Claude Code, Antigravity CLI, Copilot CLI, Cursor CLI, Amp, Droid, Kiro CLI, and Devin CLI are proprietary, and Muse Code has no published source.
+
+### Can I use more than one coding agent at once?
+
+Yes. Give each agent its own Git worktree so they do not edit the same files. Superset does this for you: each workspace gets its own worktree and terminal, and any CLI agent runs in it.
+
+### Does Superset charge for model usage?
+
+No. Superset runs each agent on your own subscription or API key and never proxies model calls. Superset has a free tier and Pro at $20 per user per month.

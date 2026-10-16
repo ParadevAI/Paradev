@@ -13,6 +13,7 @@ import { LoadMoreSentinel } from "renderer/routes/_authenticated/_dashboard/comp
 import { serializeProjectFilters } from "renderer/routes/_authenticated/_dashboard/components/ProjectFilter/project-filter-utils";
 import type { ProjectQueryTarget } from "renderer/routes/_authenticated/_dashboard/hooks/useProjectQueryTargets";
 import { useWorkItemsList } from "renderer/routes/_authenticated/_dashboard/hooks/useWorkItemsList";
+import { GitHubAuthorAvatar } from "renderer/routes/_authenticated/_dashboard/tasks/components/GitHubAuthorAvatar";
 import {
 	type LinkedIssue,
 	useNewWorkspaceDraftStore,
@@ -372,8 +373,14 @@ export function GitHubIssuesContent({
 										{issue.title}
 									</span>
 									{issue.authorLogin && (
-										<span className="hidden shrink-0 text-xs text-muted-foreground @md:inline">
-											{issue.authorLogin}
+										<span
+											className="flex shrink-0 items-center gap-1.5 text-xs text-muted-foreground"
+											title={issue.authorLogin}
+										>
+											<GitHubAuthorAvatar login={issue.authorLogin} />
+											<span className="hidden @md:inline">
+												{issue.authorLogin}
+											</span>
 										</span>
 									)}
 									<div className="flex items-center gap-1">

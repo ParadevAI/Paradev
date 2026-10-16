@@ -14,6 +14,7 @@ import {
 import type { Metadata } from "next";
 import { connection } from "next/server";
 import { GridCross } from "@/app/[lang]/blog/components/GridCross";
+import { TrackedLink } from "@/app/[lang]/components/TrackedLink";
 import { localeUrl, localizedAlternates } from "@/app/[lang]/metadata";
 import { initServerI18n } from "@/app/i18n-server";
 import { getStarHistory } from "./utils/getStarHistory";
@@ -166,13 +167,15 @@ export default async function StarChartPage() {
 					)}
 
 					<Button asChild size="sm" className="mt-6">
-						<a
+						<TrackedLink
 							href={COMPANY.GITHUB_URL}
+							event="github_clicked"
+							properties={{ source: "starchart" }}
 							target="_blank"
 							rel="noopener noreferrer"
 						>
 							<Trans>Star on GitHub</Trans>
-						</a>
+						</TrackedLink>
 					</Button>
 
 					<GridCross className="bottom-0 left-0" />

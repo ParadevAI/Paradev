@@ -1,0 +1,1 @@
+export { useTapHandlers } from "./useTapHandlers";

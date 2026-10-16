@@ -1,0 +1,130 @@
+---
+title: "Superset vs Orca vs Conductor (2026): Agent Workspaces Compared"
+description: "Compare Superset, Orca, and Conductor to choose an AI agent workspace for your team: agents, platforms, remote and cloud work, review, mobile apps, automation, and pricing."
+date: 2026-10-14
+type: "1v1"
+competitors:
+  - orca
+  - conductor
+keywords:
+  - superset vs orca vs conductor
+  - orca vs conductor vs superset
+  - ai agent orchestration comparison
+  - agent workspace comparison
+  - conductor alternative
+  - orca alternative
+  - parallel coding agents
+---
+
+Superset, Orca, and Conductor all run several AI coding agents at once, each in its own Git worktree, with review and pull requests in the same app. They differ in which agents they run, where those agents run, and how a team works together around them. This comparison is for solo developers and engineering teams choosing one.
+
+Facts were checked against each product's own site, docs, changelog, and pricing on October 13, 2026. This page is published by Superset.
+
+---
+
+## At a Glance
+
+| | **Superset** | **Orca** | **Conductor** |
+|---|---|---|---|
+| **What it is** | Desktop workspace for orchestrating any CLI coding agent | Open-source agent development environment | Mac app for parallel coding agents, with managed cloud |
+| **Agents** | Any CLI agent; built-in presets for more than 20, including Claude Code, Codex, Cursor's agent, Antigravity CLI, Copilot, Amp, OpenCode, and Droid | 27 listed plus any CLI agent | Claude Code, Codex, Cursor, OpenCode |
+| **Platforms** | macOS; experimental Linux AppImage; Windows not yet available | macOS, Windows, Linux | macOS; Windows and Linux on a waitlist |
+| **Where agents run** | Your machine, or macOS or Linux hosts you add through Remote Access | Your machine, SSH worktrees, Remote Orca Servers (beta), experimental cloud VMs on your own provider | Your Mac, or managed Linux sandboxes in Conductor Cloud (Pro and above) |
+| **Review** | Changes pane commits, pushes, and opens PRs; Pull Requests view with CI checks and line comments sent back to agents | Inline diff comments sent back to the agent; GitHub and Linear PRs and issues in the app | Diff, checks, pull request, merge, and archive |
+| **Task intake** | Tasks synced with Linear and GitHub Issues; Slack bot | GitHub, Linear, and GitHub Projects in the app | Workspaces from GitHub and Linear issues |
+| **Automation and control** | Scheduled automations on a host you choose; CLI, TypeScript SDK, MCP server | Scheduled automations; CLI; orchestration is experimental | Routines in the cloud (Pro and Teams); API and MCP server |
+| **Mobile** | iPhone and iPad app for your own hosts (Pro) | iOS app and Android APK, both beta | iOS app for cloud workspaces (Pro) |
+| **Team and enterprise** | Pro covers unlimited users; Enterprise adds SAML SSO, SCIM, audit logs, SOC 2 Type II | SOC 2 readiness; self-hostable desktop and server | Multiplayer on Pro (up to 5) and Teams; Enterprise adds SAML SSO, SCIM; SOC 2 Type II |
+| **License** | Source-available (ELv2) | Open source (MIT) | Proprietary |
+| **Pricing** | Free; Pro $20 per user/month ($15 billed yearly); Enterprise custom | Free | Free; Pro $50/month; Teams $60 per user/month; Enterprise custom |
+
+---
+
+## What Each One Is
+
+### Superset
+
+Superset is a desktop workspace for orchestrating CLI coding agents. Each task runs in its own workspace with a Git worktree and a persistent terminal, so you can run Claude Code, Codex, and any other agent side by side, on your own subscriptions; Superset never proxies model calls. Terminals run in a background daemon, so agents keep running when you close or update the app. Remote Access adds macOS or Linux machines as shared hosts for your team, and the [iPhone and iPad app](/mobile) reaches them away from your desk. Tasks sync with Linear and GitHub Issues, and a CLI, a TypeScript SDK, an MCP server, and a Slack bot let other tools and agents create workspaces and launch agents. Superset works alongside your editor: open any workspace in VS Code, Cursor, JetBrains, Zed, or Xcode.
+
+### Orca
+
+Orca is an MIT-licensed agent development environment for macOS, Windows, and Linux. It lists 27 supported agents, has an embedded browser with Design Mode, inline diff comments sent back to the agent, GitHub and Linear issues and PRs in the app, and usage tracking with an account switcher for several agents. It reaches other machines through SSH worktrees, Remote Orca Servers in beta, and a headless `orca serve`, and has iOS and Android companion apps in beta. It is free.
+
+### Conductor
+
+Conductor is a Mac app for running Claude Code, Codex, Cursor, and OpenCode in parallel, each task in its own workspace and branch, through to merge. Its paid plans add Conductor Cloud, managed Linux sandboxes with team collaboration, plus cloud Routines, an API and MCP server, and an iOS app that works with cloud workspaces.
+
+---
+
+## Key Differences
+
+### Which Agents You Can Run
+
+Superset and Orca run any CLI agent; Orca ships configurations for 27 and Superset has built-in presets for more than 20. Conductor supports four. If your team uses agents beyond Claude Code and Codex, or wants to compare several on the same task, Superset or Orca fits.
+
+### Where Agents Run, and Who Pays for It
+
+Superset and Orca run agents on machines you control: your laptop, or a shared host. Conductor's cloud runs them on its own sandboxes, on paid plans. Superset's shared hosts are part of the same desktop workspace, with access granted per member, so a team can keep long-running agents on a Mac mini or Linux server with its real environment.
+
+### Review and Task Management
+
+All three take work to a pull request. Superset adds a Pull Requests view with CI checks and line comments that go back to the agent, and task intake from Linear, GitHub Issues, and Slack. Orca brings GitHub and Linear into the app with inline diff comments. Conductor covers diff, checks, PR, and merge.
+
+### Driving It From Outside
+
+Superset exposes a CLI, a TypeScript SDK, and an MCP server, so scripts and agents can create workspaces and launch other agents; scheduled automations run on a host you choose. Conductor has an API, an MCP server, and cloud Routines. Orca has a CLI and scheduled automations, with orchestration still experimental.
+
+### Platforms and License
+
+Orca is the only one of the three on Windows today, and the only open-source one. Superset is source-available under ELv2 and runs on macOS with an experimental Linux build. Conductor is a proprietary Mac app.
+
+### Mobile
+
+All three now have an iPhone app. Superset's connects to hosts you own and shows any agent running there. Orca's controls your desktop and is in beta, with an Android APK. Conductor's works with its cloud workspaces.
+
+---
+
+## Which Should You Choose?
+
+**Choose Superset if you:**
+
+- Want any CLI agent, on your own machines and subscriptions
+- Want a shared host for your team, with per-member access and an iPhone app
+- Want tasks from Linear, GitHub Issues, and Slack, and PR review with CI checks in one place
+- Want other tools and agents to drive the workspace through a CLI, SDK, and MCP server
+
+**Choose Orca if you:**
+
+- Need Windows, or want an open-source, free tool
+- Want Android
+- Want a wide agent list with usage tracking built in
+
+**Choose Conductor if you:**
+
+- Work on Macs, mainly with Claude Code or Codex
+- Want managed cloud workspaces and collaboration without running your own hosts
+- Are comfortable with Pro or Teams pricing for cloud, Routines, and mobile
+
+---
+
+## Frequently Asked Questions
+
+### What is the difference between Superset, Orca, and Conductor?
+
+All three run AI coding agents in parallel Git worktrees. Superset is a desktop workspace for any CLI agent, with shared hosts, task intake, and a CLI, SDK, and MCP server. Orca is a free, open-source, cross-platform environment with a wide agent list. Conductor is a Mac app for four agents, with managed cloud workspaces on paid plans.
+
+### Which works on Windows?
+
+Orca. Superset runs on macOS with an experimental Linux build, and Conductor is Mac only.
+
+### Which is free?
+
+Orca is free. Superset and Conductor both have free plans; Superset Pro is $20 per user per month, and Conductor Pro is $50 per month.
+
+### Can I use my own Claude or Codex subscription?
+
+Yes, in all three for local workspaces. Superset never proxies model calls, so each agent runs on your own plan or key.
+
+### Which fits a team?
+
+It depends on where you want agents to run. For agents on machines you own, with per-member access and enterprise controls, Superset. For managed cloud workspaces, Conductor. For a free, cross-platform tool, Orca.

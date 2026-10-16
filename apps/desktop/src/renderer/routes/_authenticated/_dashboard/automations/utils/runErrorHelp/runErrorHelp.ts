@@ -28,6 +28,10 @@ const HELP: Record<AutomationRunErrorCode, MessageDescriptor> = {
 		message:
 			"The environment this automation starts cloud workspaces from was archived or has no repositories. Pick another environment in the automation's settings.",
 	}),
+	cloud_usage_limit_reached: msg({
+		message:
+			"Billing refused to start a cloud workspace: the organization needs a paid plan, or it reached its cloud usage limit. Upgrade or raise the limit in Settings > Billing, or run the automation on a device.",
+	}),
 	no_instructions: msg({
 		message:
 			"This automation has no instructions yet. Write a prompt in its settings before running it.",

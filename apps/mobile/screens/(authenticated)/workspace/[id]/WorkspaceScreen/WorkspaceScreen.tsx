@@ -30,6 +30,7 @@ import {
 	Pressable,
 	View,
 } from "react-native";
+import Animated from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
@@ -43,6 +44,7 @@ import {
 	hostServiceUrl,
 } from "@/lib/host-service/client";
 import { posthog } from "@/lib/posthog";
+import { apiClient } from "@/lib/trpc/client";
 import { useVoiceActive } from "@/lib/voice/voiceStore";
 import {
 	getHostTerminalsQueryKey,
@@ -91,6 +93,7 @@ import { PULL_REQUEST_SYMBOL, pullRequestStatus } from "../utils/pullRequest";
 import { WorkspaceCreateFailedState } from "./components/WorkspaceCreateFailedState";
 import { WorkspaceCreatingState } from "./components/WorkspaceCreatingState";
 import { WorkspacePlaceholder } from "./components/WorkspacePlaceholder";
+import { useComposerEdge } from "./hooks/useComposerEdge";
 
 const NOTICE_MS = 1500;
 
@@ -150,6 +153,7 @@ export function WorkspaceScreen() {
 		cloud,
 		sandboxUnreachable,
 		sandboxWaking,
+		sandboxRefusal,
 		retrySandbox,
 		isResolving,
 	} = useWorkspaceHost(id ?? null);
@@ -477,12 +481,9 @@ export function WorkspaceScreen() {
 	const activeRow = rows.find((row) => row.terminalId === activeTerminalId);
 	const activeIsChat = activeRow?.kind === "chat";
 	const acpChat = Boolean(useFeatureFlag(FEATURE_FLAGS.ACP_CHAT));
-	const {
-		running: chatRunning,
-		stop: stopChat,
-		backgroundTasks: chatTasks,
-	} = useActiveChat(activeIsChat ? activeTerminalId : null);
-	const chatTaskCount = chatTasks.length;
+	const { running: chatRunning, stop: stopChat } = useActiveChat(
+		activeIsChat ? activeTerminalId : null,
+	);
 	const slashCommands = useSlashCommands({
 		machineId: host?.machineId ?? null,
 		hostUrl,
@@ -761,6 +762,13 @@ export function WorkspaceScreen() {
 			}
 			if (activeIsChat) {
 				if (!chatRef.current) throw new Error("Chat is not connected");
+				// A cloud box resolves only the files attached to it.
+				if (cloud && attachmentFileIds.length > 0) {
+					await apiClient.cloudWorkspace.attachFiles.mutate({
+						id,
+						fileIds: attachmentFileIds,
+					});
+				}
 				const imported =
 					attachmentFileIds.length > 0
 						? await getHostServiceClientByUrl(
@@ -786,7 +794,7 @@ export function WorkspaceScreen() {
 				text,
 			});
 		},
-		[hostUrl, activeTerminalId, id, activeIsChat],
+		[hostUrl, activeTerminalId, id, activeIsChat, cloud],
 	);
 
 	const handleQuickKey = useCallback(
@@ -839,6 +847,10 @@ export function WorkspaceScreen() {
 		activeTerminalId !== null &&
 		host !== null &&
 		!hostCompatibility.incompatible;
+	// A chat sits level with the composer as it moves; the terminal resizes
+	// once, when the keyboard or the composer settles.
+	const chatFollowsComposer = showComposer && !voiceActive && activeIsChat;
+	const composerEdge = useComposerEdge(chatFollowsComposer);
 
 	// The host resolves its own worktree; a path here is only the signal that
 	// there is one to write into yet.
@@ -977,17 +989,6 @@ export function WorkspaceScreen() {
 			{workspace ? <TitlePress onPress={openActions} /> : null}
 			{workspace ? (
 				<Stack.Toolbar placement="right">
-					{acpChat && activeIsChat && chatTaskCount > 0 ? (
-						<Stack.Toolbar.Button
-							accessibilityLabel={t({ message: "Running in the background" })}
-							icon="cpu"
-							onPress={() =>
-								router.push(
-									`/(authenticated)/workspace/${id}/background-tasks?session=${activeTerminalId}`,
-								)
-							}
-						/>
-					) : null}
 					{acpChat ? (
 						<Stack.Toolbar.Button
 							accessibilityLabel={t({ message: "Manage sessions" })}
@@ -1089,9 +1090,11 @@ export function WorkspaceScreen() {
 				style={{
 					// The terminal has to clear everything stacked at the bottom or its
 					// own prompt hides behind the composer.
-					marginBottom: showComposer
-						? composerHeight + composerBottom
-						: composerBottom,
+					marginBottom: chatFollowsComposer
+						? 0
+						: showComposer
+							? composerHeight + composerBottom
+							: composerBottom,
 				}}
 			>
 				{hostCompatibility.incompatible ? (
@@ -1106,19 +1109,42 @@ export function WorkspaceScreen() {
 							message: "This host needs an update",
 						})}
 					/>
-				) : activeIsChat && activeTerminalId && host && hostUrl && id ? (
-					<ChatSessionView
-						host={host}
-						hostUrl={hostUrl}
-						key={activeTerminalId}
-						onOpenSession={openSession}
-						onOpenPullRequests={openPullRequests}
-						onTap={dismissComposer}
-						pullRequestLabel={chatPullRequestLabel}
-						ref={chatRef}
-						sessionId={activeTerminalId}
-						workspaceId={id}
+				) : cloud && sandboxRefusal ? (
+					<WorkspacePlaceholder
+						action={
+							<Pressable
+								accessibilityRole="button"
+								className="bg-secondary h-[38px] flex-row items-center justify-center gap-1.5 rounded-md px-5 active:opacity-80"
+								onPress={retrySandbox}
+							>
+								<Text className="font-medium text-[15px]">
+									<Trans>Try again</Trans>
+								</Text>
+							</Pressable>
+						}
+						body={sandboxRefusal}
+						icon={CloudOff}
+						onRefresh={onRefresh}
+						refreshing={refreshing}
+						title={t({
+							message: "This cloud workspace can't start",
+						})}
 					/>
+				) : activeIsChat && activeTerminalId && host && hostUrl && id ? (
+					<Animated.View className="flex-1" style={composerEdge.followStyle}>
+						<ChatSessionView
+							host={host}
+							hostUrl={hostUrl}
+							key={activeTerminalId}
+							onOpenSession={openSession}
+							onOpenPullRequests={openPullRequests}
+							onTap={dismissComposer}
+							pullRequestLabel={chatPullRequestLabel}
+							ref={chatRef}
+							sessionId={activeTerminalId}
+							workspaceId={id}
+						/>
+					</Animated.View>
 				) : activeTerminalId && host && id ? (
 					<>
 						<TerminalWebView
@@ -1156,6 +1182,7 @@ export function WorkspaceScreen() {
 						    covers the viewport this would move. Always mounted — it
 						    fades itself, which it cannot do if the parent unmounts it. */}
 						<ScrollToBottomButton
+							systemName="arrow.down"
 							visible={!atBottom && !select.active}
 							onPress={() => {
 								// The tap lands in SwiftUI, where RN autocapture cannot see
@@ -1256,6 +1283,9 @@ export function WorkspaceScreen() {
 					attachmentTarget={attachmentTarget}
 					onActiveChange={setComposerActive}
 					onHeightChange={setComposerHeight}
+					onEdgeChange={
+						chatFollowsComposer ? composerEdge.onEdgeChange : undefined
+					}
 					onCopySelection={() => terminalRef.current?.copySelection()}
 					onQuickKey={handleQuickKey}
 					onSubmit={handleSubmit}

@@ -30,21 +30,25 @@ export function OptionButtons({
 			{rejects.map(({ option }) => (
 				<Button
 					key={option.optionId}
+					className="min-w-0 max-w-full"
 					onClick={() => respond(option)}
 					size="sm"
+					title={option.label}
 					variant="outline"
 				>
-					{option.label}
+					<span className="min-w-0 truncate">{option.label}</span>
 				</Button>
 			))}
 			{allows.map(({ option }) => (
 				<Button
 					key={option.optionId}
+					className="min-w-0 max-w-full"
 					onClick={() => respond(option)}
 					size="sm"
+					title={option.label}
 					variant={option.optionId === primaryId ? "default" : "outline"}
 				>
-					{option.label}
+					<span className="min-w-0 truncate">{option.label}</span>
 				</Button>
 			))}
 		</div>

@@ -6,6 +6,38 @@ public final class ComposerModule: Module {
   public func definition() -> ModuleDefinition {
     Name("Composer")
 
+    /// The composer's image viewer, for images shown outside the composer —
+    /// a sent message's attachments.
+    AsyncFunction("presentImage") { (uri: String) in
+      guard let presenter = self.appContext?.utilities?.currentViewController() else { return }
+      weak var host: UIViewController?
+      let viewer = UIHostingController(
+        rootView: ComposerImageViewer(uri: uri) { host?.dismiss(animated: true) }
+      )
+      host = viewer
+      viewer.modalPresentationStyle = .fullScreen
+      viewer.view.backgroundColor = .black
+      presenter.present(viewer, animated: true)
+    }.runOnQueue(.main)
+
+    /// The composer's file preview, rendered to a PNG beside the file so
+    /// React Native can show it. Nil when QuickLook has nothing to draw.
+    AsyncFunction("fileThumbnail") { (uri: String, side: Double) async -> String? in
+      guard let fileURL = URL(string: uri), fileURL.isFileURL else { return nil }
+      let scale = await MainActor.run { UIScreen.main.scale }
+      guard
+        let image = await ComposerThumbnailCache.shared.thumbnail(
+          for: uri,
+          fitting: CGSize(width: side, height: side),
+          scale: scale
+        ),
+        let png = image.pngData()
+      else { return nil }
+      let target = fileURL.appendingPathExtension("thumbnail.png")
+      guard (try? png.write(to: target, options: .atomic)) != nil else { return nil }
+      return target.absoluteString
+    }
+
     View(ComposerAnchorView.self) {
       Events(
         "onSubmit",
@@ -27,6 +59,7 @@ public final class ComposerModule: Module {
         "onPaste",
         "onDraftChange",
         "onHeightChange",
+        "onEdgeChange",
         "onRemoveAttachment",
         "onAttachmentPress",
         "onExpandedChange"
@@ -44,6 +77,10 @@ public final class ComposerModule: Module {
 
       Prop("backdrop") { (view: ComposerAnchorView, backdrop: String) in
         view.overlay.model.backdrop = ComposerBackdrop(rawValue: backdrop) ?? .dim
+      }
+
+      Prop("reportsEdge") { (view: ComposerAnchorView, reportsEdge: Bool) in
+        view.overlay.model.reportsEdge = reportsEdge
       }
 
       /// Wrapped in a transaction, not left to an `.animation(_:value:)` on
@@ -241,6 +278,7 @@ final class ComposerAnchorView: ExpoView {
   private let onPaste = EventDispatcher()
   private let onDraftChange = EventDispatcher()
   private let onHeightChange = EventDispatcher()
+  private let onEdgeChange = EventDispatcher()
   private let onRemoveAttachment = EventDispatcher()
   private let onAttachmentPress = EventDispatcher()
   private let onExpandedChange = EventDispatcher()
@@ -293,6 +331,9 @@ final class ComposerAnchorView: ExpoView {
     }
     overlay.model.onHeightChange = { [weak self] height in
       self?.onHeightChange(["height": height])
+    }
+    overlay.model.onEdgeChange = { [weak self] inset in
+      self?.onEdgeChange(["inset": inset])
     }
     overlay.model.onChipPress = { [weak self] id in self?.onChipPress(["id": id]) }
     overlay.model.onRemoveAttachment = { [weak self] id in

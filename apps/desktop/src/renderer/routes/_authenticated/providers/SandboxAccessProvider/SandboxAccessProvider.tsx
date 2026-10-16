@@ -1,3 +1,4 @@
+import { isCloudUsageRefusal } from "@superset/shared/billing";
 import { useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMatchRoute } from "@tanstack/react-router";
 import { createContext, type ReactNode, useContext, useMemo } from "react";
@@ -30,6 +31,7 @@ export interface SandboxAccessValue {
 	isReady: boolean;
 	/** The open workspace, when its box booted with agent sign-ins its creator has since changed. */
 	agentCredentialsChangedWorkspaceId: string | null;
+	usageRefusal: { workspaceId: string; error: unknown } | null;
 }
 
 export const SandboxAccessContext = createContext<SandboxAccessValue | null>(
@@ -153,6 +155,10 @@ export function SandboxAccessProvider({ children }: { children: ReactNode }) {
 				openWorkspace && wake.data?.agentCredentialsChanged
 					? openWorkspace.id
 					: null,
+			usageRefusal:
+				openWorkspace && isCloudUsageRefusal(wake.error)
+					? { workspaceId: openWorkspace.id, error: wake.error }
+					: null,
 		};
 	}, [
 		cloudWorkspaces,
@@ -161,6 +167,7 @@ export function SandboxAccessProvider({ children }: { children: ReactNode }) {
 		organizationId,
 		openWorkspace,
 		wake.data,
+		wake.error,
 	]);
 
 	return (
@@ -177,6 +184,7 @@ export function useSandboxAccess(): SandboxAccessValue {
 			targets: [],
 			isReady: true,
 			agentCredentialsChangedWorkspaceId: null,
+			usageRefusal: null,
 		}
 	);
 }

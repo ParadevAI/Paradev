@@ -124,6 +124,8 @@ const CLOUD_ERROR_CODES: Record<string, AutomationRunErrorCode> = {
 		"cloud_environment_unusable",
 	"serverError.cloudWorkspace.environmentHasNoRepositories":
 		"cloud_environment_unusable",
+	"serverError.cloudWorkspace.cloudNeedsPaidPlan": "cloud_usage_limit_reached",
+	"serverError.cloudWorkspace.usageLimitReached": "cloud_usage_limit_reached",
 };
 
 /**

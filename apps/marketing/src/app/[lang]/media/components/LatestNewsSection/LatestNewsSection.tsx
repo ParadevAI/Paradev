@@ -3,6 +3,7 @@ import type { SupportedLocale } from "@superset/i18n";
 import { formatDate } from "@superset/i18n/format";
 import { COMPANY } from "@superset/shared/constants";
 import Link from "next/link";
+import { TrackedLink } from "@/app/[lang]/components/TrackedLink";
 import { SectionHeading } from "../SectionHeading";
 import { MOBILE_LAUNCH_DATE } from "./constants";
 
@@ -57,14 +58,16 @@ export function LatestNewsSection({ lang }: LatestNewsSectionProps) {
 					</Trans>
 				</p>
 				<div className="mt-6 flex flex-wrap gap-3 text-sm">
-					<a
+					<TrackedLink
 						href={COMPANY.APP_STORE_URL}
+						event="mobile_store_clicked"
+						properties={{ store: "app_store", source: "media" }}
 						target="_blank"
 						rel="noopener noreferrer"
 						className="bg-foreground px-4 py-2 font-medium text-background transition-colors hover:bg-brand hover:text-white"
 					>
 						<Trans>View on the App Store</Trans>
-					</a>
+					</TrackedLink>
 					<Link
 						href={mobilePath}
 						className="border border-border px-4 py-2 text-foreground transition-colors hover:border-foreground"

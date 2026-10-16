@@ -204,6 +204,13 @@ export const FEATURE_FLAGS = {
 	 */
 	CLOUD_WORKSPACES: "cloud-workspaces",
 	/**
+	 * Renders cloud workspaces as rows of their GitHub repo's project in the
+	 * desktop sidebar instead of in a separate Cloud section. UI-only and
+	 * renderer-local: off, unloaded, or offline all keep the Cloud section, so
+	 * flips take effect live and nothing on a host changes.
+	 */
+	SIDEBAR_INLINE_CLOUD_WORKSPACES: "sidebar-inline-cloud-workspaces",
+	/**
 	 * Lets the Slack agent answer replies in a thread it has already replied
 	 * in without an @-mention. Evaluated per Slack team; off, unloaded or
 	 * offline all mean mention-only.
@@ -231,6 +238,13 @@ export const FEATURE_FLAGS = {
 	 * release condition on the flag, so widening never needs a release.
 	 */
 	ACP_CHAT: "acp-chat",
+	/**
+	 * Shows the `pdev` agent: in the agent catalog, agent pickers
+	 * and, with ACP_CHAT, as a chat harness (`pdev acp`). Off, unloaded or
+	 * offline all hide it. Hosts never seed it, so a user only gets it by
+	 * adding it while the flag is on.
+	 */
+	PDEV_AGENT: "pdev-agent",
 } as const;
 
 /**
@@ -296,18 +310,12 @@ export const SHARED_ENVIRONMENT_ORGANIZATION_ID =
 
 export const SHARED_ENVIRONMENT_NAME = "Default";
 
-// Terminal identity presented to shell programs via TERM_PROGRAM. kitty:
-// agent TUIs (claude-code especially) tune wheel-scroll compensation per
-// TERM_PROGRAM, and our terminals install the full-fidelity wheel handler
-// (@superset/shared/terminal-wheel-handler) that produces a native
-// kitty/iTerm-grade report stream. Under kitty-class identities TUIs trust
-// that stream as-is; a vscode identity would make claude-code amplify each
-// report (its compensation for xterm.js's damped stock stream) and
-// over-scroll ~3x. The identity and the wheel handler must ship together —
-// reverting one without the other reintroduces slow or runaway scrolling.
-// Kitty *keyboard protocol* support is advertised separately via the CSI-u
-// capability probe.
-export const TERMINAL_TERM_PROGRAM = "kitty";
-// A plausible kitty version: TUIs may version-gate quirk handling against
-// real kitty releases, so keep this roughly current when touching terminal code.
-export const TERMINAL_TERM_PROGRAM_VERSION = "0.42.0";
+// Terminals set no TERM_PROGRAM, like xterm. Agents take kitty-only paths
+// under "kitty" that xterm.js cannot serve, and under "vscode" Claude Code
+// amplifies the full-fidelity wheel stream ~2x. Without it, agents identify
+// the terminal from its XTVERSION reply ("Superset (xterm.js)", see the
+// desktop terminal-version-reply) and the CSI-u probe.
+export const TERMINAL_IDENTITY_ENV_KEYS = [
+	"TERM_PROGRAM",
+	"TERM_PROGRAM_VERSION",
+] as const;

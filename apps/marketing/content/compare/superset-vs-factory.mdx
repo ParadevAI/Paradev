@@ -1,0 +1,112 @@
+---
+title: "Superset vs Factory (2026): Any-Agent Workspace vs Droid Platform"
+description: "Compare Superset and Factory for running coding agents in parallel. An agent-agnostic worktree workspace on your own machines vs Factory's Droid platform with a desktop app, Droid Computers, and automations."
+date: 2026-10-13
+type: "1v1"
+competitors:
+  - factory
+keywords:
+  - superset vs factory
+  - factory ai alternative
+  - factory droid
+  - droid computers
+  - factory desktop app
+  - parallel coding agents
+  - agent-native software development
+---
+
+Superset and Factory both run many coding agents at once, in Git worktrees, with review, automations, and remote machines around them. The difference is the agent. Factory is an "agent-native software development platform" built around its own agent, Droid, with a desktop app, a CLI, Droid Computers in the cloud or on your own machines, and team plans up to on-prem. Superset is a local-first workspace that runs any CLI agent, Droid included, next to Claude Code, Codex, and the rest.
+
+---
+
+## At a Glance
+
+| | **Superset** | **Factory** |
+|---|---|---|
+| **What it does** | Runs multiple AI coding agents in parallel with Git worktree isolation, chat, review, and browser | Runs many Droid sessions in parallel across desktop, CLI, IDE, Slack, and Linear |
+| **Category** | Agent-agnostic workspace and orchestrator | Agent platform built on one agent |
+| **Agents** | Any CLI agent (Claude Code, Codex, Droid, Cursor Agent, OpenCode, Gemini CLI, Copilot, Muse Code, and more) | Droid and custom Droid subagents |
+| **Models** | Whatever each agent uses, on your own subscriptions | Claude, GPT, Gemini, Grok, and Factory's open-weight models through Droid; bring your own key in the CLI and desktop app |
+| **Isolation** | Git worktrees for local branch-based workspaces | Git worktrees on your machine or on a Droid Computer |
+| **Remote** | Remote Access: add a macOS or Linux machine as a host | Droid Computers: managed cloud VMs or your own machine through Factory's relay |
+| **Automation** | Scheduled automations, CLI, TypeScript SDK, MCP server, Slack bot | Automations from schedules, Slack, or GitHub; `droid exec`, SDKs, GitHub Action |
+| **Platforms** | macOS; experimental Linux AppImage; Windows unavailable; iPhone and iPad app | macOS and Windows desktop; CLI on macOS, Linux, Windows; web |
+| **Pricing** | Free tier; Pro $20 per user per month | Pro $20, Plus $100, Max $200 per month; Teams and Business; Enterprise with on-prem |
+
+---
+
+## What Is Superset?
+
+Superset is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, Factory's Droid, Cursor Agent, OpenCode, Gemini CLI, GitHub Copilot, Grok Build, Muse Code, and any other CLI agent inside isolated Git worktrees with persistent terminal sessions, on your own subscriptions and keys, and never proxies model calls. Around that core it adds a Changes pane that commits, pushes, and opens PRs, a Pull Requests view with CI checks and line comments you can send to agents, a chat panel, an in-app browser with port detection and Design Mode, and an MCP server so agents and tools can create workspaces and launch agents. Remote Access adds a macOS or Linux machine as a host so workspaces keep running when your laptop sleeps, and scheduled automations, a CLI, a TypeScript SDK, and a Slack bot cover unattended work. The [iPhone and iPad app](/mobile) lets you check on sessions and review diffs away from your desk. Source-available under Elastic License 2.0 (ELv2), with an enterprise tier that adds SAML SSO, SCIM, audit logs, and a SOC 2 Type II report.
+
+## What Is Factory?
+
+Factory describes itself as "an agent-native software development platform for planning, building, reviewing, testing, and shipping production software… so engineering teams can delegate complete tasks without replacing their existing tools." Its agent, Droid, became generally available in May 2025 and runs in a CLI (`droid`), a headless `droid exec` for CI, Python and TypeScript SDKs, a VS Code extension, Slack, Microsoft Teams, Linear, and Jira. The desktop app, launched on April 8, 2026 for macOS and Windows, is built for running many Droids at once; sessions run in Git worktrees, ephemeral or persistent, on your machine or on a Droid Computer. Droid Computers are persistent machines: managed cloud VMs that pause when idle, or your own Linux, macOS, or Windows machine connected through Factory's relay. Automations start Droids from a schedule, a Slack message, or a GitHub event, with templates for code review, QA, security audits, and triage, and review covers in-app diffs with line comments, a design mode, and automated PR reviews. Droid runs Claude, GPT, Gemini, Grok, and Factory's own open-weight models, with usage multipliers per model, and you can bring your own keys in the CLI and desktop app. Factory is proprietary.
+
+## Key Differences
+
+### Any Agent vs One Agent
+
+Factory's platform is built on Droid: you choose the model, but the agent is Factory's. Superset runs agents from every vendor in real terminals, so Claude Code, Codex, and Droid can work on the same repository in separate worktrees, and you can continue a session with a different agent. If your team wants to standardize on Droid, Factory is the native home for it; if you want to keep options open, Superset runs Droid as one agent among many.
+
+### Model Costs
+
+Superset never proxies model calls: each agent runs on your own subscription or API key. Factory meters Droid usage on its plans, with multipliers per model and three rolling usage windows, and lets you bring your own keys in the CLI and desktop app.
+
+### Remote Machines
+
+Both run agents away from your laptop. Factory's Droid Computers include managed cloud VMs on paid plans, as well as your own machines through its relay. Superset's Remote Access adds machines you own as hosts and keeps workspaces running when your laptop sleeps; Superset does not host machines for you.
+
+### Platforms
+
+Factory's desktop app runs on macOS and Windows, and its CLI runs on Linux too. Superset runs on macOS, with an experimental Linux AppImage, and has no Windows app yet. Superset has a native iPhone and iPad app; Factory's mobile access is through the web.
+
+### Teams and Enterprise
+
+Both have a serious enterprise track. Factory's Business and Enterprise plans add SSO, SAML and SCIM, zero data retention, audit logs, and on-prem or air-gapped deployment, and it lists SOC 2 and ISO 42001. Superset's enterprise tier adds SAML SSO, SCIM, audit logs, a SOC 2 Type II report, and an uptime SLA, and Pro covers unlimited users.
+
+---
+
+## Pricing
+
+Superset offers a free tier and Pro at $20 per user per month, or $15 per user per month billed yearly, with an enterprise tier on custom billing; model costs are on your own agent subscriptions. Factory's Pro plan is $20 per month, Plus is $100 per month with about 5x Pro usage and managed Droid Computers, and Max is $200 per month with about 10x. Teams starts at $60 per month plus $40 per seat for up to 10 seats, Business covers up to 150 seats with SSO and audit logs, and Enterprise adds on-prem deployment. Prices as of October 2026.
+
+---
+
+## Which Should You Choose?
+
+**Choose Superset if you:**
+
+- Use more than one coding agent, or want to keep the one your team already uses
+- Want model costs on your own subscriptions, with no proxy in between
+- Want a native mobile app and remote hosts you own
+- Want pull requests, CI checks, and line comments back to any agent in one place
+
+**Choose Factory if you:**
+
+- Want to standardize on one agent platform, Droid, across CLI, IDE, Slack, and Linear
+- Want managed cloud machines for your agents
+- Need Windows desktop support today
+- Need on-prem or air-gapped deployment
+
+**Verdict:** Factory is a full agent platform for teams that want to delegate work to Droid everywhere they already work. Superset is the workspace for teams that want every agent, Droid included, on machines they own, with review through to the pull request.
+
+---
+
+## Frequently Asked Questions
+
+### Can I run Factory's Droid in Superset?
+
+Yes. Droid is a built-in agent in Superset. It runs in its own worktree next to Claude Code, Codex, and any other CLI agent.
+
+### Does Factory run Claude Code or Codex?
+
+Factory's documentation describes its own agent, Droid, which can use Claude, GPT, and other models. It does not describe running the Claude Code or Codex CLIs. Superset runs those and Droid side by side.
+
+### What are Droid Computers?
+
+Persistent machines where Droids run: managed cloud VMs that pause when idle, or your own Linux, macOS, or Windows machine connected through Factory's relay. Superset's Remote Access adds your own machines as hosts.
+
+### How much does Factory cost?
+
+Factory's Pro plan is $20 per month, Plus $100, and Max $200, with team plans from $60 per month plus $40 per seat. Superset has a free tier and Pro at $20 per user per month.

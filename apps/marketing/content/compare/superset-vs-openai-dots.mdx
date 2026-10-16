@@ -1,0 +1,110 @@
+---
+title: "Superset vs OpenAI dots (2026): Agent Workspace vs Always-On ChatGPT Agents"
+description: "Compare Superset and OpenAI's dots. A local-first workspace for running any coding agent in parallel Git worktrees vs always-on ChatGPT agents that each have their own cloud computer and hand coding to Codex."
+date: 2026-10-13
+type: "1v1"
+competitors:
+  - openai-dots
+keywords:
+  - superset vs dots
+  - openai dots
+  - chatgpt dots
+  - openai dots alternative
+  - dots vs codex
+  - always-on ai agents
+  - parallel coding agents
+---
+
+Superset and OpenAI's dots both promise agents that keep working when you step away, but they are different kinds of product. Superset is a local-first workspace for software engineering: it runs Codex, Claude Code, and any other CLI agent in parallel Git worktrees on machines you own, with diff review, pull requests, a browser, automations, and Remote Access so workspaces keep running when your laptop sleeps. dots, announced by OpenAI on September 29, 2026, are always-on ChatGPT agents powered by GPT-6 Astra. Each dot has its own cloud computer and browser, takes on work across your apps, and hands coding tasks to Codex.
+
+If you want GPT-6 Astra working on your code, you do not need a dot to get it: Superset runs the Codex CLI as a built-in agent, with the GPT-6 models in its picker. The [FAQ](#can-i-use-gpt-6-astra-in-superset) covers how.
+
+---
+
+## At a Glance
+
+| | **Superset** | **OpenAI dots** |
+|---|---|---|
+| **What it does** | Runs multiple AI coding agents in parallel with Git worktree isolation, chat, review, and browser | Always-on ChatGPT agents that take on work across your apps, run scheduled tasks, and start Codex tasks |
+| **Category** | Local-first agent workspace with remote hosts | Cloud personal and work agents inside ChatGPT |
+| **Where agents run** | Your machine, or any macOS or Linux machine you add as a host | Each dot's own OpenAI cloud computer; optionally one connected personal computer (off by default) |
+| **Agent and model choice** | Any CLI agent on your own subscription or keys (Codex, Claude Code, Cursor Agent, OpenCode, Gemini CLI, Copilot, Grok Build, Muse Code, Amp, and more) | GPT-6 Astra; coding work goes to Codex |
+| **Focus** | Software engineering: worktrees, diffs, PRs, CI, dev servers | General work across apps, with coding through Codex |
+| **Isolation** | Git worktrees for local branch-based workspaces on your own repos | A cloud computer and browser per dot |
+| **Where you talk to it** | macOS desktop (experimental Linux AppImage; Windows unavailable), iPhone and iPad app, CLI, MCP server, Slack bot | ChatGPT on desktop, web, and mobile, plus Slack and Microsoft Teams |
+| **Automation** | Scheduled automations, CLI, TypeScript SDK, MCP server, Slack bot | Scheduled and recurring tasks, background research |
+| **Pricing** | Free tier; Pro $20 per user per month; Enterprise custom | First dot included in ChatGPT Pro and Business Premium plans; Enterprise in beta |
+
+---
+
+## What Is Superset?
+
+Superset is a local-first desktop workspace for AI coding agents. It launches Codex, Claude Code, Cursor Agent, OpenCode, Gemini CLI, GitHub Copilot, Grok Build, Muse Code, Amp, and any other CLI agent inside isolated Git worktrees with persistent terminal sessions, on your own subscriptions and keys, and never proxies model calls. Around that core it adds a Changes pane that commits, pushes, and opens PRs, a Pull Requests view with CI checks and line comments you can send to agents, a chat panel, an in-app browser with port detection and Design Mode, and an MCP server so agents and tools can create workspaces and launch agents. Remote Access adds a macOS or Linux machine as a host so workspaces keep running when your laptop sleeps, and scheduled automations, a CLI, a TypeScript SDK, and a Slack bot cover unattended work. The [iPhone and iPad app](/mobile) lets you check on sessions and review diffs away from your desk. Source-available under Elastic License 2.0 (ELv2), with a free tier, Pro, and an enterprise tier with SAML SSO, SCIM, audit logs, and a SOC 2 Type II report.
+
+## What Is OpenAI dots?
+
+OpenAI describes dots as "remarkably capable, always-on agents built to handle everything," powered by GPT-6 Astra. Announced at DevDay on September 29, 2026 and rolling out gradually, each dot gets its own cloud computer and browser, which you can watch and take over. You talk to a dot in ChatGPT on desktop, web, and mobile, or in Slack and Microsoft Teams. Dots run scheduled and recurring tasks, do background research with read-only tools, and can use background agents to work on several things at once. For code, a dot creates Codex tasks, continues local Codex tasks on a computer you connect, or uses a Codex cloud environment you have set up; OpenAI's launch post shows a dot bringing back complete PRs with attached videos for review. Connecting your own computer is off by default and limited to one personal computer at a time. Controls include an Activity view, auto-review of actions, Custom Rules that allow, require approval for, or block actions, and Pause. The first dot is included in ChatGPT Pro and Business Premium plans at no extra cost, with an allowance for deeper work; talking to a dot does not count toward ChatGPT limits, but the Codex tasks it starts do. Enterprise, Edu, and Healthcare workspaces get a beta that an admin turns on.
+
+## Key Differences
+
+### Your Machines vs OpenAI's Cloud
+
+Superset's agents run on your laptop, your desktop, or any macOS or Linux machine you add as a host, against your real repositories, services, and dependencies. A dot works on its own OpenAI-hosted cloud computer, and reaches your machine only if you connect one personal computer. Superset is infrastructure you own; dots are a managed service inside ChatGPT.
+
+### Engineering Loop vs Everything Else
+
+Superset is built around the software loop: local branch-based worktrees, diffs, commit, push, and PR from the Changes pane, CI checks, line comments back to the agent, and dev servers in an in-app browser. A dot is a general agent for work across your apps, and it does coding by handing tasks to Codex. If the work is code and you want to review every change as it happens, Superset gives you that surface. If the work is research, scheduling, and a dozen SaaS tabs, dots are aimed at it.
+
+### Any Agent vs OpenAI's Stack
+
+Superset is agent-agnostic. Codex, Claude Code, Gemini CLI, and any other CLI agent run side by side, and you can continue a session with a different agent. Dots run on GPT-6 Astra and send coding to Codex. You can run the same Codex inside Superset, next to agents from other vendors, without moving your work into ChatGPT.
+
+### Always-On, Two Ways
+
+A dot keeps working because it lives on a cloud computer that never sleeps. Superset does it with Remote Access: add a machine as a host and workspaces keep running when your laptop sleeps, plus scheduled automations that run agent sessions on a device you choose and a Slack bot that dispatches work from a mention. Both give you unattended work; Superset does it on hardware you pick, for every agent you use.
+
+---
+
+## Pricing
+
+Superset offers a free tier and Pro at $20 per user per month, or $15 per user per month billed yearly, with an enterprise tier on custom billing. Superset is bring-your-own-agent for model costs. OpenAI includes the first dot in ChatGPT Pro and Business Premium plans at no extra cost, with an allowance for deeper work; Codex and ChatGPT Work tasks a dot starts count toward your plan's limits. OpenAI says more dots, and faster or larger dots, will be available to buy in the future. Prices as of October 2026.
+
+---
+
+## Which Should You Choose?
+
+**Choose Superset if you:**
+
+- Want agents working on your code, on machines you control, with your own subscriptions
+- Run several different agents in parallel, including Codex, and switch between them
+- Need diff review, pull requests, CI checks, and a browser in the loop
+- Want scheduled automations, an MCP server, and a Slack bot backed by a team and enterprise plan
+
+**Choose OpenAI dots if you:**
+
+- Want an always-on agent for work across your apps, not only code
+- Already pay for ChatGPT Pro or Business Premium
+- Are happy for the agent to run on OpenAI's cloud computer
+- Want to hand coding to Codex from a chat in ChatGPT, Slack, or Teams
+
+**Verdict:** These products overlap less than the "always-on agent" label suggests. A dot is a general ChatGPT agent on OpenAI's cloud that delegates code to Codex; Superset is an engineering workspace that runs Codex and every other coding agent in parallel worktrees on your own hardware. Developers who want GPT-6 Astra on their code, with review in the loop, should run Codex in Superset. Teams that want unattended coding agents on infrastructure they control should look at Superset's Remote Access and automations.
+
+---
+
+## Frequently Asked Questions
+
+### What is OpenAI dots?
+
+dots are always-on ChatGPT agents, announced by OpenAI on September 29, 2026 and powered by GPT-6 Astra. Each dot has its own cloud computer and browser, works across your apps, runs scheduled tasks, and starts Codex tasks for coding. You reach a dot in ChatGPT, Slack, or Microsoft Teams.
+
+### Can I use GPT-6 Astra in Superset?
+
+Yes. Superset runs the Codex CLI as a built-in agent, and its model picker includes GPT-6.1 Sol and GPT-6 Astra, Sol, and Luna, with Ultra effort on GPT-6 Astra. Codex runs on your ChatGPT plan in an isolated worktree, alongside Claude Code and any other CLI agent.
+
+### Does a dot run on my computer?
+
+Not by default. Each dot works on its own OpenAI cloud computer. You can connect one personal computer so a dot can continue local Codex tasks there; that is off by default. Superset runs agents on your own machine, or on any macOS or Linux machine you add as a host through Remote Access.
+
+### How much do dots cost?
+
+The first dot is included in ChatGPT Pro and Business Premium plans at no extra cost, with an allowance for deeper work. Codex tasks a dot starts count toward your plan's limits. Superset has a free tier and Pro at $20 per user per month, and you bring your own agent subscriptions.

@@ -2,7 +2,7 @@
 title: "Scheduled Coding Agents in 2026: Nightly, Weekly, and Team Runs You Review"
 description: "How to run coding agents on a schedule and review their work in the morning: GitHub Actions, Claude Code Routines, Codex, Cursor, and Superset Automations."
 date: 2026-10-07
-lastUpdated: 2026-10-07
+lastUpdated: 2026-10-14
 type: "roundup"
 competitors:
   - github-actions
@@ -22,9 +22,12 @@ keywords:
   - flaky test agent
   - coding agent shared machine
   - agent automations
+  - claude code schedule superset
 ---
 
-To run a coding agent on a schedule, you need three things: a trigger (cron, a scheduler, or a hosted "routine"), an isolated branch or worktree for each run, and a place where a human reviews the result before it merges. GitHub Actions with a headless agent CLI, Claude Code Routines, Codex scheduled tasks, and Cursor Automations all cover this in the cloud. [Superset Automations](https://docs.superset.sh/automations) cover it on a machine you own: each run gets a fresh worktree on a host you pick, and the team reviews it as a normal workspace.
+To run a coding agent on a schedule, you need three things: a trigger, an isolated branch or worktree for each run, and a place where a human reviews the result before it merges. [Superset Automations](https://docs.superset.sh/automations) have all three built in. You set a schedule, a prompt, and an agent (Claude Code, Codex, Amp, or another CLI agent), and each run gets a fresh worktree workspace on a machine you pick, which the team reviews like any other workspace.
+
+The agents' own schedulers still work inside Superset. Superset launches the real `claude` CLI, so `/schedule` (Claude Code Routines) and `/loop` are available in a Superset workspace terminal. Routines run in Anthropic's cloud on a fresh clone; `/loop` repeats inside the open session. Use Superset Automations when a run needs a specific machine or a mix of agents. Use Routines when a fresh clone in Anthropic's cloud is enough and you want runs while every machine is off. GitHub Actions, Codex scheduled tasks, and Cursor Automations are other cloud options.
 
 This guide answers the four questions people ask most about scheduled agents, compares the options, and includes a weekly flaky-test prompt you can copy.
 
@@ -62,9 +65,18 @@ In Superset, the nightly pattern is the [Wake Up to a Finished Audit](https://do
 
 For a full walkthrough with a read-only first prompt and a review checklist, see [Schedule an agent maintenance check you can review](/blog/scheduled-agent-maintenance).
 
+## Does Claude Code's `/schedule` work inside Superset?
+
+Yes. We checked on October 14, 2026, with Claude Code 2.1.300 started by Superset: `/schedule` and `/loop` both appear in the session's command list, and `/schedule` reached the Routines service. Superset uses your own Claude login and does not route Claude Code's traffic, so nothing in a Superset workspace changes how these commands behave. Two of them run in different places, though:
+
+- **`/schedule` creates a Routine.** Per [Anthropic's routines docs](https://code.claude.com/docs/en/routines) (accessed October 14, 2026), routines are a research preview for Pro, Max, Team, and Enterprise plans. They run on Anthropic-managed cloud infrastructure, clone the repository at the start of each run, and push to `claude/` branches. The minimum interval is one hour, and `/schedule` needs a claude.ai login, not an API key or a third-party provider. A routine created from a Superset session does not run in Superset. When someone opens a pull request from its branch in a repository connected to a Superset project, the PR shows up in Superset's Pull requests view.
+- **`/loop` stays in the session.** Per [Anthropic's scheduled tasks docs](https://code.claude.com/docs/en/scheduled-tasks), `/loop` tasks are session-scoped, the shortest interval is one minute, and recurring tasks expire after seven days. In Superset, the session lives in a background terminal service, so a `/loop` keeps firing after you quit the desktop app. Closing the terminal's last open pane or deleting the workspace ends the session and the loop.
+
+**Using them together.** Superset Automations fit runs that need your machine, your local services, or an agent other than Claude Code, and they leave a workspace a teammate can open. Routines fit runs that need only a fresh clone and should keep going while every machine is off. `/loop` fits short polling inside a session you are already watching, such as checking a deploy every five minutes. Codex has its own scheduled tasks in the ChatGPT desktop app; they run there, next to anything you run in Superset.
+
 ## Which tools can run recurring coding-agent tasks without my starting a new terminal session every time?
 
-Claude Code Routines, Claude Code Desktop scheduled tasks, Codex scheduled tasks, Cursor Automations, GitHub Actions, and Superset Automations all start a new agent run for you on each occurrence. Claude Code's `/loop` is different: it repeats inside the current CLI session, so that session has to stay open.
+Superset Automations, Claude Code Routines, Claude Code Desktop scheduled tasks, Codex scheduled tasks, Cursor Automations, and GitHub Actions all start a new agent run for you on each occurrence. Claude Code's `/loop` is different: it repeats inside the current CLI session, so that session has to stay open. A Claude Code session in a Superset workspace stays open until you close its last pane, even when the desktop app is closed.
 
 In Superset, you define the automation once: title, prompt, device, project, schedule, and agent. Each fire creates a new workspace with its own terminal and starts the agent in it. You do not open a terminal. If you would rather script it, the CLI does the same:
 
@@ -135,6 +147,10 @@ Each fire records a run under **Run History** with a status: **created**, **crea
 A **created** status means the workspace was created. It does not mean the agent's work passed. Open the workspace and read the output before you trust a run.
 
 ## FAQ
+
+### Does Claude Code `/schedule` work in Superset?
+
+Yes. Superset runs the real `claude` CLI, so `/schedule` works in a Superset workspace terminal and creates a Claude Code Routine. The routine then runs in Anthropic's cloud on a fresh clone, not in Superset. You need a claude.ai login on a Pro, Max, Team, or Enterprise plan. `/loop` works too and keeps running while the workspace's terminal stays open.
 
 ### Can I schedule Claude Code without keeping a terminal open?
 

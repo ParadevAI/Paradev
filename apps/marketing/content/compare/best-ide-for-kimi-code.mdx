@@ -1,0 +1,97 @@
+---
+title: "Best IDE for Kimi Code in 2026"
+description: "The best places to run Moonshot AI's Kimi Code in 2026, from the Kimi Code CLI, desktop app, and IDE plugins to ACP editors and Superset for parallel worktree sessions next to other agents."
+date: 2026-10-13
+type: "roundup"
+competitors:
+  - kimi-code
+  - claude-code
+  - codex
+keywords:
+  - best ide for kimi code
+  - where to run kimi code
+  - kimi code worktree
+  - kimi code parallel agents
+  - kimi code acp
+  - moonshot kimi coding agent
+---
+
+Kimi Code is Moonshot AI's open-source coding agent. It runs in a terminal, in a desktop app, in IDE plugins, and in editors that speak ACP. So the best "IDE for Kimi Code" depends on how you want to work with it and whether you want several tasks at once on the same repository.
+
+Facts were checked against Moonshot AI's own docs on October 13, 2026.
+
+---
+
+## The Short Version
+
+| Where you run Kimi Code | Best for | Parallel tasks on one repo? | Main tradeoff |
+|---|---|---|---|
+| **Superset** | Many Kimi Code tasks at once, next to other agents | Git worktrees for local branch-based workspaces | Not a single-file editor experience |
+| **Kimi Code CLI** | One focused task, scripts, and CI | Subagents inside a session | You manage separate tasks yourself |
+| **Kimi desktop app and IDE plugins** | Working with Kimi Code outside a terminal | Limited | Kimi's agent only |
+| **ACP editors** | Driving Kimi Code from an editor you already use | Limited | Depends on the editor |
+
+## The Options
+
+### Kimi Code CLI
+
+The `kimi` CLI is the core of the agent. Version 2.1.1 shipped on September 24, 2026, under the MIT license. It runs on macOS, Linux, and Windows; on Windows it needs Git for Windows.
+
+It uses Kimi models, including K3 with up to 1M tokens of context and K2.8 Preview, and it can use other compatible providers. It has three subagents: `coder`, `explore`, and `plan`. Headless `kimi -p` with `--output-format stream-json` fits scripts and CI. It supports MCP, lifecycle hooks, and a plugin marketplace, and it accepts video input.
+
+You pay through a Kimi membership. There is no free coding tier, and the Go plan does not include Kimi Code. Plus and higher plans have a rolling 5-hour limit and no weekly limit.
+
+### Kimi desktop app and IDE plugins
+
+Moonshot AI also ships a desktop app and IDE plugins for Kimi Code. They suit people who want to work with Kimi Code outside a terminal, with the usual single-working-copy limit when you want several tasks at once.
+
+### ACP editors
+
+Kimi Code supports the Agent Client Protocol (ACP). An editor that can host ACP agents can drive Kimi Code from inside the editor. Parallel tasks still share one working copy unless you set up worktrees yourself.
+
+### Superset
+
+Superset runs Kimi Code as a built-in agent. Each new local branch-based workspace gets its own Git worktree and persistent terminal, so several Kimi Code tasks can run on the same repository at once, locally or on your own remote hosts. Kimi Code uses your own Kimi membership or key, and Superset never proxies model calls. You can run Claude Code, Codex, or any other CLI agent in the next workspace and compare the results. Around it you get a Changes pane that commits, pushes, and opens PRs, a Pull Requests view with CI checks, an in-app browser, and an [iPhone and iPad app](/mobile). Worktrees separate working files but do not sandbox processes or prevent merge conflicts; see [workspace types](https://docs.superset.sh/workspaces).
+
+Where Kimi Code is stronger: it has its own desktop app and IDE plugins, and it runs on Windows. Superset runs on macOS, with an experimental Linux AppImage; Windows is not yet available.
+
+## How To Choose
+
+- For one task, or for CI, use the Kimi Code CLI.
+- To work outside a terminal, use the Kimi desktop app or an IDE plugin.
+- To stay in another editor, use an ACP editor.
+- For several Kimi Code tasks at once, or Kimi Code next to other agents, use Superset.
+
+## Verdict
+
+Kimi Code is an open-source agent with long context and its own app and plugins. The CLI is the best place for one task. Once you want several Kimi Code tasks on one repository, or want to compare Kimi Code with Claude Code or Codex, run it in a workspace like Superset, where each task gets its own worktree and the diffs and PRs are in one place.
+
+For the full field of agents, see [Best AI Coding Agents in 2026](/compare/best-coding-agents).
+
+## How To Run Kimi Code in Superset
+
+1. Open your repository in Superset and create a workspace with the Kimi Code preset. Superset creates a Git worktree and a terminal for it.
+2. Create a second workspace with another agent, for example Claude Code or Codex, in its own worktree.
+3. Give both agents the same prompt.
+4. Compare the two diffs in the Changes pane.
+5. Commit, push, and open a pull request from the better one.
+
+Each agent uses your own subscription or key. Superset never proxies model calls.
+
+## Frequently Asked Questions
+
+### What is the best IDE for Kimi Code?
+
+For one task, the Kimi Code CLI. To work outside a terminal, the Kimi desktop app or an IDE plugin. For several Kimi Code tasks in parallel, or Kimi Code next to other agents, a worktree workspace like Superset.
+
+### Is Kimi Code free?
+
+The tool is open source under the MIT license, but there is no free coding tier. You use it through a Kimi membership, and the Go plan does not include Kimi Code.
+
+### Does Kimi Code work in an editor?
+
+Yes. Moonshot AI ships IDE plugins, and Kimi Code supports ACP, so editors that host ACP agents can drive it.
+
+### Can I run Kimi Code and Claude Code at the same time?
+
+Yes. In Superset, each runs in its own workspace and worktree on the same repository, on your own plans.

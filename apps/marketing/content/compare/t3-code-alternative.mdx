@@ -1,0 +1,107 @@
+---
+title: "Best T3 Code Alternatives in 2026"
+description: "The best alternatives to T3 Code for running coding agents in parallel, including Superset, Orca, Conductor, Paseo, and the Codex app, from agent workspaces to self-hosted control planes."
+date: 2026-10-13
+type: "roundup"
+competitors:
+  - t3-code
+  - orca
+  - conductor
+  - paseo
+  - codex-app
+keywords:
+  - t3 code alternative
+  - t3 code alternatives
+  - t3 code vs superset
+  - t3.codes alternative
+  - coding agent control plane
+  - parallel coding agents
+---
+
+T3 Code is an MIT-licensed "agent harness control surface" from T3 Tools Inc. It runs Claude Code, Codex, Cursor CLI, Grok Build, OpenCode, and Antigravity on your own subscriptions, with beta support for more, across a desktop app for macOS, Windows, and Linux, a web app, and iOS and Android apps. It ships nightly builds several times a day. You might want an alternative if you want a more settled release cadence, a deeper review surface, team and enterprise controls, or support for any CLI agent without an adapter. Here are the best T3 Code alternatives in 2026.
+
+Facts were checked against T3 Code's own repository and site on October 13, 2026.
+
+---
+
+## The Short Version
+
+| Alternative | Best for | Agents | License |
+|---|---|---|---|
+| **Superset** | Any CLI agent in parallel worktrees, through to PRs, with a team plan | Any CLI agent | Source-available (ELv2) |
+| **Orca** | Free cross-platform agent environment with a wide prebuilt agent list | Prebuilt list of agents | Open source (MIT) |
+| **Conductor** | A focused Mac app for a few agents | Claude Code, Codex, and more | Proprietary |
+| **Paseo** | A self-hosted daemon you drive from your phone | Claude Code, Codex, OpenCode, Pi, and ACP agents | Open source (Apache-2.0) |
+| **Codex app** | OpenAI's own agent with worktrees and cloud tasks | Codex | Proprietary (Codex CLI is Apache-2.0) |
+
+## Why Look for a T3 Code Alternative?
+
+T3 Code moves fast: its latest stable release is version 0.0.45, and it ships several nightly builds a day. That is good for people who like to live on the edge, and harder for teams that want a stable tool. It supports a fixed set of agents, with others in beta or through the Agent Client Protocol. Its project file, `t3.json`, holds named scripts that run when a worktree is created. And it has no team plan, enterprise controls, or compliance report.
+
+## The Best Alternatives
+
+### 1. Superset
+
+Superset is a local-first desktop workspace that runs any CLI agent in parallel Git worktrees: Claude Code, Codex, Cursor's agent, Grok Build, OpenCode, Antigravity CLI, Copilot CLI, Amp, Droid, Muse Code, and more, each on your own subscription or key, with no model proxy. Setup, teardown, and run scripts in `.superset/config.json` play the same role as `t3.json` scripts. The Changes pane commits, pushes, and opens PRs, the Pull Requests view shows CI checks and sends line comments back to agents, and the in-app browser has port detection. Remote Access adds any machine as a host so workspaces keep running when your laptop sleeps, and the [iPhone and iPad app](/mobile) shows terminals and diffs. Scheduled automations, a CLI, a TypeScript SDK, an MCP server, and a Slack bot cover unattended work, and the enterprise tier adds SAML SSO, SCIM, audit logs, and a SOC 2 Type II report.
+
+**Best for:** developers and teams who want any agent, a full review loop, and a team plan.
+
+For the direct comparison, see [Superset vs T3 Code](/compare/superset-vs-t3-code).
+
+### 2. Orca
+
+Orca is a free, MIT-licensed agent development environment for macOS, Windows, and Linux, with iOS and Android apps. It runs a long prebuilt list of agents in worktrees and has per-agent docs and recipes.
+
+**Best for:** developers who want a free, open-source environment on every platform.
+
+See [Superset vs Orca](/compare/superset-vs-orca).
+
+### 3. Conductor
+
+Conductor is a macOS app that runs Claude Code, Codex, and other agents in parallel, each in an isolated worktree, with a review-and-merge flow.
+
+**Best for:** Mac developers who want a polished, simple multi-agent app.
+
+See [Superset vs Conductor](/compare/superset-vs-conductor).
+
+### 4. Paseo
+
+Paseo is an Apache-2.0 "control plane for coding agents": a self-hosted daemon with native desktop, iOS, Android, and web clients. It runs Claude Code, Codex, OpenCode, and Pi natively and more through the Agent Client Protocol. It is free and needs no account.
+
+**Best for:** solo developers who want a self-hosted, mobile-first setup.
+
+See [Superset vs Paseo](/compare/superset-vs-paseo).
+
+### 5. Codex app
+
+The Codex app, now part of the ChatGPT desktop app, runs parallel Codex chats in local worktrees and cloud tasks, and the ChatGPT iOS app can drive Codex on your computer. It is one of T3 Code's own inspirations.
+
+**Best for:** developers who only use Codex.
+
+See [Superset vs Codex App](/compare/superset-vs-codex-app).
+
+## How To Choose
+
+- For any CLI agent, a full review loop, and a team plan: **Superset**.
+- For a free, open-source app on every platform: **Orca**.
+- For a simple Mac app: **Conductor**.
+- For a self-hosted daemon you drive from your phone: **Paseo**.
+- For Codex only: **the Codex app**.
+
+## Frequently Asked Questions
+
+### What is the best T3 Code alternative?
+
+For running any CLI agent in parallel worktrees, with pull requests, CI checks, remote hosts, and a team plan, Superset.
+
+### Can I bring my T3 Code scripts to Superset?
+
+Yes. T3 Code's `t3.json` scripts map to Superset's setup and run scripts in `.superset/config.json`. Scripts marked to run when a worktree is created become Superset's setup script. See [Project Lifecycle Scripts](https://docs.superset.sh/setup-teardown-scripts).
+
+### Is T3 Code free?
+
+Yes. T3 Code is MIT-licensed and free; you bring your own agent subscriptions. Superset has a free tier and Pro at $20 per user per month.
+
+### Is T3 Code the same as T3 Chat?
+
+No. T3 Chat is an AI chat app. For that comparison, see [Superset vs T3 Chat](/compare/superset-vs-t3-chat).

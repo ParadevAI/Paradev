@@ -11,6 +11,7 @@ describe("acpHarnessForPreset", () => {
 		expect(acpHarnessForPreset("codex")).toBe("codex-acp");
 		expect(acpHarnessForPreset("opencode")).toBe("opencode-acp");
 		expect(acpHarnessForPreset("pi")).toBe("pi-acp");
+		expect(acpHarnessForPreset("pdev")).toBe("pdev-acp");
 	});
 
 	test("anything else is not a chat", () => {
@@ -26,6 +27,7 @@ describe("acpHarnessForPreset", () => {
 describe("presetForAcpHarness", () => {
 	test("reverses the ACP map only", () => {
 		expect(presetForAcpHarness("claude-acp")).toBe("claude");
+		expect(presetForAcpHarness("pdev-acp")).toBe("pdev");
 		expect(presetForAcpHarness("claude-code")).toBeUndefined();
 	});
 });

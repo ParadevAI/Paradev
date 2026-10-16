@@ -1,3 +1,5 @@
+import { billingUsesAutumn } from "@superset/auth/autumn";
+import { organizationPlanFromAutumn } from "@superset/auth/billing";
 import { db } from "@superset/db/client";
 import { subscriptions } from "@superset/db/schema";
 import {
@@ -134,13 +136,17 @@ export async function processAgentMessage({
 					teamId,
 				})
 			: undefined,
-		db.query.subscriptions.findFirst({
-			where: and(
-				eq(subscriptions.referenceId, connection.organizationId),
-				eq(subscriptions.status, "active"),
-			),
-			columns: { id: true },
-		}),
+		billingUsesAutumn
+			? organizationPlanFromAutumn(connection.organizationId).then((plan) =>
+					plan === "free" ? undefined : { id: connection.organizationId },
+				)
+			: db.query.subscriptions.findFirst({
+					where: and(
+						eq(subscriptions.referenceId, connection.organizationId),
+						eq(subscriptions.status, "active"),
+					),
+					columns: { id: true },
+				}),
 	]);
 
 	if (!activeSubscription) {

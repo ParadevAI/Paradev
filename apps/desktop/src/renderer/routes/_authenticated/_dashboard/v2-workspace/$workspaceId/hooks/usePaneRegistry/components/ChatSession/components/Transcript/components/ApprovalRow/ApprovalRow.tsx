@@ -106,8 +106,17 @@ export function ApprovalRow({
 					</Badge>
 				)}
 				{item.status === "answered" && (
-					<Badge className={cn(!afterTarget && "ml-auto")} variant="secondary">
-						{decisionLabel(item.decision, options)}
+					<Badge
+						className={cn(
+							"min-w-0 max-w-[50%] shrink",
+							!afterTarget && "ml-auto",
+						)}
+						title={decisionLabel(item.decision, options)}
+						variant="secondary"
+					>
+						<span className="min-w-0 truncate">
+							{decisionLabel(item.decision, options)}
+						</span>
 					</Badge>
 				)}
 			</div>

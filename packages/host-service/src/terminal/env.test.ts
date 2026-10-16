@@ -503,8 +503,6 @@ describe("buildV2TerminalEnv", () => {
 		const env = buildV2TerminalEnv(baseParams);
 		expect(env).toMatchObject({
 			TERM: "xterm-256color",
-			TERM_PROGRAM: "kitty",
-			TERM_PROGRAM_VERSION: "0.42.0",
 			COLORTERM: "truecolor",
 			PWD: "/tmp/workspace",
 			SUPERSET_TERMINAL_ID: "term-1",
@@ -516,9 +514,21 @@ describe("buildV2TerminalEnv", () => {
 			SUPERSET_AGENT_HOOK_PORT: "51741",
 			SUPERSET_AGENT_HOOK_VERSION: "2",
 		});
-		expect(env.TERM_PROGRAM).toBe("kitty");
 		expect(env.SHELL).toBe("/bin/zsh");
 		expect(env.LANG).toContain("UTF-8");
+	});
+
+	test("claims no terminal identity, even one inherited from the parent", () => {
+		const env = buildV2TerminalEnv({
+			...baseParams,
+			baseEnv: {
+				...baseParams.baseEnv,
+				TERM_PROGRAM: "vscode",
+				TERM_PROGRAM_VERSION: "1.105.0",
+			},
+		});
+		expect(env.TERM_PROGRAM).toBeUndefined();
+		expect(env.TERM_PROGRAM_VERSION).toBeUndefined();
 	});
 
 	test("sets SHELL to the selected launch shell even when base env was stale", () => {

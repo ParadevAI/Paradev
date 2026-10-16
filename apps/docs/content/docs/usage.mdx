@@ -5,13 +5,13 @@ description: Subscription quota meters, token-cost analytics, machine resources,
 
 ## Overview
 
-The **Usage** page (gauge icon in the sidebar) tracks what your agents consume on this machine: signed-in Claude Code and Codex accounts, their session logs, and local processes. Remote hosts aren't aggregated. A pill toggle switches between **Token usage** and **Machine resources**.
+The **Usage** page (gauge icon in the sidebar) tracks what your agents consume on this machine: signed-in agent accounts, their session logs, and local processes. Remote hosts aren't aggregated. A pill toggle switches between **Token usage** and **Machine resources**.
 
 ![The Usage page: quota meters per account and token-cost analytics](/images/usage.png)
 
 ## Quota Meters
 
-The top of **Token usage** shows official subscription quota for every Claude Code and Codex login on this host, refreshed every 5 minutes (use the refresh button to force it). Each account card shows the email, plan, and one meter per quota window, e.g. **Session (5h)** and **Weekly** for Claude, with the fill percentage and time until reset.
+The top of **Token usage** shows official subscription quota for every Claude Code and Codex login on this host, and for Grok, Antigravity, and OpenCode logins, refreshed every 5 minutes (use the refresh button to force it). Each account card shows the email, plan, and one meter per quota window, e.g. **Session (5h)** and **Weekly** for Claude, with the fill percentage and time until reset.
 
 Superset reads quota from the providers' usage endpoints using the agent credentials stored on your host. Some plans (org-managed, education) don't expose limits.
 
@@ -31,10 +31,10 @@ Under the hood, a profile is just a config dir the CLI is pointed at (`CLAUDE_CO
 
 ## Token Costs
 
-Below the meters, the **Token usage** chart estimates spend from the agents' local session logs, priced at API list rates. Subscription usage isn't billed per token (the page shows **Cost to you: $0**); the estimate is what the same work would cost at API rates, plus how much caching saved.
+Below the meters, the **Token usage** chart estimates spend from the agents' local session logs, priced at API list rates. It covers Claude Code, Codex, OpenCode, Grok, Cursor Agent, Copilot, Devin, Muse Code, Pi, Oh My Pi, Antigravity, fx, and Hermes; see [Supported Agents](/supported-agents). Subscription usage isn't billed per token (the page shows **Cost to you: $0**); the estimate is what the same work would cost at API rates, plus how much caching saved.
 
 - Toggle **Cost** / **Tokens** and pick a **7d** / **30d** / **90d** range
-- Per-provider split between Claude Code and Codex; click a provider to show or hide it in the chart; click a day for that day's breakdown
+- Per-agent split; click an agent to show or hide it in the chart; click a day for that day's breakdown
 - **Model** table and **Workspace** bars break spend down; click a row for a per-model or per-workspace drilldown, or **All N →** for every workspace and project
 - Workspace drilldowns list the top sessions by cost; click one to copy its session ID for `claude --resume`
 

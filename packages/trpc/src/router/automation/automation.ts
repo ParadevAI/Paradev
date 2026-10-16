@@ -1,3 +1,5 @@
+import { billingUsesAutumn } from "@superset/auth/autumn";
+import { organizationPlanFromAutumn } from "@superset/auth/billing";
 import { db, dbWs } from "@superset/db/client";
 import {
 	automationEvents,
@@ -102,7 +104,10 @@ async function requireAutomationsPlan(
 ): Promise<string> {
 	const { organizationId, subscription } =
 		await requireActiveOrgMembershipWithSubscription(ctx);
-	if (!planAllowsAutomations(planTierFromSubscription(subscription))) {
+	const plan = billingUsesAutumn
+		? await organizationPlanFromAutumn(organizationId)
+		: planTierFromSubscription(subscription);
+	if (!planAllowsAutomations(plan)) {
 		throw planRequiredError({
 			message: "Automations require the Pro plan.",
 			i18nKey: "serverError.automation.automationsRequireThePro",

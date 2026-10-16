@@ -353,6 +353,17 @@ export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 		],
 	},
 	{
+		presetId: "pdev",
+		modelFlag: "--model",
+		models: [
+			{ id: "pdev/auto", label: "Auto" },
+			{ id: "pdev/claude", label: "Claude" },
+			{ id: "pdev/fun", label: "Fun" },
+			{ id: "pdev/writing", label: "Writing" },
+			{ id: "pdev/free", label: "Free" },
+		],
+	},
+	{
 		presetId: "vibe",
 		modelFlag: null,
 		modelEnv: "VIBE_ACTIVE_MODEL",
@@ -636,6 +647,11 @@ export const AGENT_EFFORT_SUPPORT: readonly AgentEffortSupport[] = [
 		presetId: "omp",
 		effortFlag: "--thinking",
 		efforts: [...PI_THINKING_LEVELS],
+	},
+	{
+		presetId: "pdev",
+		effortFlag: "--thinking",
+		efforts: [...PI_THINKING_LEVELS, { id: "max", label: "Max" }],
 	},
 	{
 		presetId: "copilot",

@@ -34,6 +34,7 @@ export interface PricingTier {
 	cta: {
 		label: MessageDescriptor;
 		href: string;
+		event: "download_clicked" | "contact_sales_clicked";
 		variant: "default" | "outline" | "secondary";
 		external?: boolean;
 	};
@@ -86,6 +87,7 @@ export const PRICING_TIERS: PricingTier[] = [
 				message: "Download app",
 			}),
 			href: "/download",
+			event: "download_clicked",
 			variant: "outline",
 		},
 		ctaNote: {
@@ -170,6 +172,7 @@ export const PRICING_TIERS: PricingTier[] = [
 				message: "Download app",
 			}),
 			href: "/download",
+			event: "download_clicked",
 			variant: "default",
 		},
 		highlight: true,
@@ -234,6 +237,7 @@ export const PRICING_TIERS: PricingTier[] = [
 				message: "Contact sales",
 			}),
 			href: "/enterprise",
+			event: "contact_sales_clicked",
 			variant: "outline",
 		},
 		ctaNote: {

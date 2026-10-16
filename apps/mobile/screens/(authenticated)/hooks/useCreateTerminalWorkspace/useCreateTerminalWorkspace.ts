@@ -30,6 +30,7 @@ import { hostStartsChats } from "@/screens/(authenticated)/utils/hostStartsChats
 type CreateTerminalWorkspaceArgs = PendingWorkspaceCreateInput & {
 	/** Retry from the failed state replaces instead of pushing. */
 	replace?: boolean;
+	onOpened?: () => void;
 };
 
 /**
@@ -94,7 +95,11 @@ export function useCreateTerminalWorkspace() {
 	const queueChatLaunch = usePendingChatLaunchStore((state) => state.queue);
 
 	return useMutation({
-		mutationFn: async ({ replace, ...input }: CreateTerminalWorkspaceArgs) => {
+		mutationFn: async ({
+			replace,
+			onOpened,
+			...input
+		}: CreateTerminalWorkspaceArgs) => {
 			const { target, baseBranch, agentId, model, effort, message } = input;
 			const chatHarness = acpChat ? acpHarnessForPreset(agentId) : undefined;
 			const workspaceId = randomUUID();
@@ -108,6 +113,7 @@ export function useCreateTerminalWorkspace() {
 			const href = `/(authenticated)/workspace/${workspaceId}` as const;
 			if (replace) router.replace(href);
 			else router.push(href);
+			onOpened?.();
 
 			// Attachments upload before the create is sent, so a failure there
 			// proves the workspace was never requested — only a failure at or

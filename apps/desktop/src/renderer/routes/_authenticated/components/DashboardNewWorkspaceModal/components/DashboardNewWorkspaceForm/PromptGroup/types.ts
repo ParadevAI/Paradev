@@ -27,3 +27,14 @@ export interface ProjectOption {
 	// set up. null when we couldn't check (offline / unreachable host).
 	needsSetup: boolean | null;
 }
+
+/** A repository the organization's GitHub App can see that no project checks out yet. */
+export interface GitHubRepositoryOption extends ProjectOption {
+	fullName: string;
+}
+
+/** How the project picker reaches the GitHub connection: the App's settings, or connecting one. */
+export type GitHubConnectionAction =
+	| { kind: "configure"; url: string }
+	| { kind: "connect" }
+	| null;

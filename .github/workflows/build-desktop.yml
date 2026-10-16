@@ -109,6 +109,7 @@ jobs:
           REALTIME_URL: ${{ secrets.REALTIME_URL }}
           SUPERSET_WORKSPACE_NAME: superset
           TARGET_ARCH: ${{ matrix.arch }}
+          PDEV_BUNDLE_REQUIRED: "1"
         run: bun run compile:app
 
       # electron-builder manages its own signing keychain when CSC_LINK is set,
@@ -194,6 +195,12 @@ jobs:
             exit 1
           }
           "$CLI_BIN" --version
+          PDEV_BIN="$APP_DIR/Contents/Resources/resources/bin/pdev/pdev"
+          test -x "$PDEV_BIN" || {
+            echo "::error::Bundled pdev is missing or not executable at $PDEV_BIN"
+            exit 1
+          }
+          "$PDEV_BIN" --version
 
       - name: Verify native bindings packaged
         working-directory: apps/desktop
@@ -313,6 +320,7 @@ jobs:
           REALTIME_URL: ${{ secrets.REALTIME_URL }}
           SUPERSET_WORKSPACE_NAME: superset
           TARGET_ARCH: x64
+          PDEV_BUNDLE_REQUIRED: "1"
         run: bun run compile:app
 
       - name: Build Electron app
@@ -341,6 +349,12 @@ jobs:
             exit 1
           fi
           "$CLI_BIN" --version
+          PDEV_BIN=$(find release -path "*/resources/resources/bin/pdev/pdev" -type f | head -1)
+          if [ -z "$PDEV_BIN" ] || [ ! -x "$PDEV_BIN" ]; then
+            echo "::error::Bundled pdev is missing or not executable under release/"
+            exit 1
+          fi
+          "$PDEV_BIN" --version
 
       - name: Upload AppImage artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2

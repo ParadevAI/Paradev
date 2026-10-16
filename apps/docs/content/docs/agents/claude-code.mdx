@@ -1,0 +1,31 @@
+---
+title: Claude Code in Superset
+description: Run Claude Code in parallel workspaces, with status, resume, subagents, and multiple accounts
+---
+
+## Overview
+
+Claude Code is Superset's most deeply integrated agent. Each session runs in its own workspace, with its own Git worktree and terminal, on your Claude plan or API key. Superset never proxies model calls.
+
+## Launch
+
+Superset starts Claude Code with:
+
+```bash
+claude --dangerously-skip-permissions
+```
+
+This turns off Claude Code's approval prompts, so the agent can edit files and run commands in its worktree without asking. To keep the prompts, open **Settings → Agents → Claude** and remove the flag from **Command** and **Resume args**. Worktrees separate files, but do not sandbox processes; see [Workspaces](/workspaces).
+
+## What Superset Adds
+
+- **Status and notifications** - The sidebar shows when Claude Code is working, needs input, or is done, and you get a notification. See [Agent Status](/agent-status).
+- **Resume and fork** - Superset restores a session after a restart with `--resume`, and can fork a session with `--fork-session`. See [Agent Sessions](/agent-sessions).
+- **Subagents** - Subagents appear under their parent session in the terminal header's **Subagents** menu.
+- **Handoff** - Moving a conversation to another agent carries Claude Code's structured transcript.
+- **Model and effort** - Pick a Claude model and a reasoning effort when you launch. See [AI Agents](/agent-integration#models-and-reasoning-effort).
+- **Usage and accounts** - The [Usage](/usage) page shows quota meters and token costs, and lets you add several Claude accounts and choose the default.
+
+## Run Several Sessions
+
+Press **⌘N** for each task. Each workspace gets its own worktree, so sessions never edit the same files. To give the same task to Claude Code and another agent and keep the best result, see [Race Agents on One Task](/recipes/race-agents).
