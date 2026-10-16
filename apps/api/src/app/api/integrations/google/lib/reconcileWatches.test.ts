@@ -1,11 +1,32 @@
 import { describe, expect, test } from "bun:test";
 import type { SelectConnection } from "@superset/db/schema";
 import { WATCH_RENEW_WINDOW_MS } from "@superset/trpc/integrations/google";
-import { type GmailWatchDeps, reconcileGmailWatch } from "./reconcileWatches";
+import { GaxiosError } from "gaxios";
+import {
+	type GmailWatchDeps,
+	reconcileGmailWatch,
+	watchTopicsFor,
+} from "./reconcileWatches";
 
 const NOW = Date.parse("2026-10-09T06:00:00Z");
 const HOUR = 60 * 60 * 1000;
 const RENEWED_EXPIRATION = NOW + 7 * 24 * HOUR;
+const PRIMARY_TOPIC = "projects/main/topics/gmail";
+const CONNECTOR_TOPIC = "projects/sigma/topics/gmail";
+const CONNECTOR_SCOPES = [
+	"openid",
+	"email",
+	"https://www.googleapis.com/auth/gmail.modify",
+];
+
+function topicInOtherProject(project: string): GaxiosError {
+	const error = new GaxiosError(
+		`Invalid topicName does not match projects/${project}/topics/*`,
+		{ url: new URL("https://gmail.googleapis.com"), headers: new Headers() },
+	);
+	error.status = 400;
+	return error;
+}
 
 function connection(
 	gmail: { historyId?: string; watchExpiresAt?: number } | null,
@@ -21,14 +42,16 @@ function connection(
 function harness() {
 	const calls = {
 		watched: [] as string[],
+		topics: [] as string[],
 		patched: [] as unknown[],
 		synced: [] as string[],
 	};
 	const deps: GmailWatchDeps = {
-		topicName: "projects/p/topics/gmail",
+		topics: { primary: PRIMARY_TOPIC, connector: CONNECTOR_TOPIC },
 		now: NOW,
-		watch: async (connectionId) => {
+		watch: async (connectionId, topic) => {
 			calls.watched.push(connectionId);
+			calls.topics.push(topic);
 			return { historyId: "fresh", expiration: RENEWED_EXPIRATION };
 		},
 		patch: async (_connectionId, patch) => {
@@ -124,5 +147,46 @@ describe("reconcileGmailWatch", () => {
 		);
 		expect(outcome).toEqual({ status: "no_gmail_scope" });
 		expect(calls.watched).toEqual([]);
+	});
+
+	test("watches a connector-flow connection on the connector topic", async () => {
+		const { calls, deps } = harness();
+		await reconcileGmailWatch(connection(null, CONNECTOR_SCOPES), deps);
+		expect(calls.topics).toEqual([CONNECTOR_TOPIC]);
+	});
+
+	test("moves to the other topic when Gmail names another project", async () => {
+		const { calls, deps } = harness();
+		const outcome = await reconcileGmailWatch(connection(null), {
+			...deps,
+			watch: async (_connectionId, topic) => {
+				calls.topics.push(topic);
+				if (topic === PRIMARY_TOPIC) throw topicInOtherProject("sigma");
+				return { historyId: "fresh", expiration: RENEWED_EXPIRATION };
+			},
+		});
+		expect(outcome).toEqual({ status: "watched" });
+		expect(calls.topics).toEqual([PRIMARY_TOPIC, CONNECTOR_TOPIC]);
+	});
+
+	test("does not try the other topic for an unrelated failure", async () => {
+		const { calls, deps } = harness();
+		const attempt = reconcileGmailWatch(connection(null), {
+			...deps,
+			watch: async (_connectionId, topic) => {
+				calls.topics.push(topic);
+				throw new Error("network down");
+			},
+		});
+		await expect(attempt).rejects.toThrow("network down");
+		expect(calls.topics).toEqual([PRIMARY_TOPIC]);
+	});
+});
+
+describe("watchTopicsFor", () => {
+	test("skips a topic that is not configured", () => {
+		expect(
+			watchTopicsFor(CONNECTOR_SCOPES, { primary: PRIMARY_TOPIC }),
+		).toEqual([PRIMARY_TOPIC]);
 	});
 });

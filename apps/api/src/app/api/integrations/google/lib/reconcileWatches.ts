@@ -3,6 +3,8 @@ import {
 	canReadGmail,
 	findGoogleConnectionById,
 	googleConfigOf,
+	issuedByConnectorFlow,
+	isTopicInOtherProject,
 	patchGmailState,
 	WATCH_RENEW_WINDOW_MS,
 	watchMailbox,
@@ -21,8 +23,14 @@ export type ReconcileResult = {
 	errors: string[];
 };
 
+/** One Pub/Sub topic per OAuth client project. */
+export type GmailWatchTopics = {
+	primary?: string;
+	connector?: string;
+};
+
 export type GmailWatchDeps = {
-	topicName: string;
+	topics: GmailWatchTopics;
 	now: number;
 	watch?: typeof watchMailbox;
 	patch?: typeof patchGmailState;
@@ -35,7 +43,7 @@ export type GmailWatchDeps = {
  */
 export async function reconcileWatches(
 	connectionId: string,
-	topicName: string,
+	topics: GmailWatchTopics,
 ): Promise<ReconcileResult> {
 	const connection = await findGoogleConnectionById(connectionId);
 	const result: ReconcileResult = { gmail: null, errors: [] };
@@ -43,7 +51,7 @@ export async function reconcileWatches(
 
 	try {
 		result.gmail = await reconcileGmailWatch(connection, {
-			topicName,
+			topics,
 			now: Date.now(),
 		});
 		if (
@@ -63,7 +71,7 @@ export async function reconcileWatches(
 export async function reconcileGmailWatch(
 	connection: SelectConnection,
 	{
-		topicName,
+		topics,
 		now,
 		watch = watchMailbox,
 		patch = patchGmailState,
@@ -78,7 +86,7 @@ export async function reconcileGmailWatch(
 		return { status: "current" };
 	}
 
-	const watched = await watch(connection.id, topicName);
+	const watched = await watchOnIssuingProjectTopic(connection, topics, watch);
 	await patch(connection.id, {
 		watchExpiresAt: watched.expiration,
 		// Continue from where we were; only a first watch starts from now.
@@ -91,4 +99,32 @@ export async function reconcileGmailWatch(
 		error: error instanceof Error ? error.message : String(error),
 	}));
 	return { status: "rewatched_after_lapse", catchUp };
+}
+
+export function watchTopicsFor(
+	scopes: string[] | null,
+	{ primary, connector }: GmailWatchTopics,
+): string[] {
+	const ordered = issuedByConnectorFlow(scopes)
+		? [connector, primary]
+		: [primary, connector];
+	return [...new Set(ordered.filter((topic) => topic !== undefined))];
+}
+
+async function watchOnIssuingProjectTopic(
+	connection: SelectConnection,
+	topics: GmailWatchTopics,
+	watch: typeof watchMailbox,
+): ReturnType<typeof watchMailbox> {
+	const candidates = watchTopicsFor(connection.scopes, topics);
+	let failure: unknown = new Error("No Pub/Sub topic configured");
+	for (const topic of candidates) {
+		try {
+			return await watch(connection.id, topic);
+		} catch (error) {
+			if (!isTopicInOtherProject(error)) throw error;
+			failure = error;
+		}
+	}
+	throw failure;
 }

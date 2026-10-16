@@ -1,4 +1,5 @@
 import { gmail, type gmail_v1 } from "@googleapis/gmail";
+import { GaxiosError } from "gaxios";
 import { googleAuthFor, googleErrorStatus } from "./auth";
 import { GMAIL_WATCH_TTL_MS, GOOGLE_API_TIMEOUT_MS } from "./constants";
 
@@ -152,6 +153,15 @@ export async function watchMailbox(
 		historyId: data.historyId,
 		expiration: Number(data.expiration ?? Date.now() + GMAIL_WATCH_TTL_MS),
 	};
+}
+
+/** Gmail accepts only a topic in the project of the client that issued the token. */
+export function isTopicInOtherProject(error: unknown): boolean {
+	return (
+		error instanceof GaxiosError &&
+		error.status === 400 &&
+		error.message.includes("Invalid topicName does not match")
+	);
 }
 
 export async function stopMailboxWatch(connectionId: string): Promise<void> {

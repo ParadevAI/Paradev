@@ -47,19 +47,23 @@ const LEGACY_FLOW_SCOPES = new Set<string>([
 ]);
 
 /**
- * A refresh token only works with the client that issued it, and no column
- * records which. Connector-flow rows (GOOGLE_TEMP client) carry wider scopes.
+ * No column records which client issued a connection's tokens.
+ * Connector-flow rows (GOOGLE_TEMP client) carry wider scopes.
  */
+export function issuedByConnectorFlow(scopes: string[] | null): boolean {
+	return (scopes ?? []).some((scope) => !LEGACY_FLOW_SCOPES.has(scope));
+}
+
+/** A refresh token only works with the client that issued it. */
 export function refreshClientsFor(
 	scopes: string[] | null,
 	primary: GoogleOAuthClient,
 	connector: GoogleOAuthClient | null,
 ): GoogleOAuthClient[] {
 	if (!connector || connector.clientId === primary.clientId) return [primary];
-	const fromConnectorFlow = (scopes ?? []).some(
-		(scope) => !LEGACY_FLOW_SCOPES.has(scope),
-	);
-	return fromConnectorFlow ? [connector, primary] : [primary, connector];
+	return issuedByConnectorFlow(scopes)
+		? [connector, primary]
+		: [primary, connector];
 }
 
 function configuredRefreshClients(scopes: string[] | null) {

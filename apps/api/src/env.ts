@@ -16,8 +16,10 @@ export const env = createEnv({
 		GH_CLIENT_SECRET: z.string().min(1),
 		// Gmail push: the Pub/Sub topic `users.watch` publishes to, and the
 		// shared secret the push subscription appends to our URL. Absent means
-		// Gmail triggers are configured but never watched.
+		// Gmail triggers are configured but never watched. Gmail accepts only a
+		// topic in the issuing client's project, so the TEMP client has its own.
 		GOOGLE_PUBSUB_TOPIC: z.string().min(1).optional(),
+		GOOGLE_TEMP_PUBSUB_TOPIC: z.string().min(1).optional(),
 		GOOGLE_PUBSUB_PUSH_TOKEN: z.string().min(1).optional(),
 		// Static bearer token for the read-only support account lookup; the
 		// endpoint answers 404 while unset.

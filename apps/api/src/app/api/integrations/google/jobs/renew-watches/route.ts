@@ -41,10 +41,13 @@ export async function POST(request: Request) {
 		return Response.json({ error: "Invalid payload" }, { status: 400 });
 	}
 
-	const topicName = env.GOOGLE_PUBSUB_TOPIC;
-	if (!topicName) {
+	const topics = {
+		primary: env.GOOGLE_PUBSUB_TOPIC,
+		connector: env.GOOGLE_TEMP_PUBSUB_TOPIC,
+	};
+	if (!topics.primary && !topics.connector) {
 		console.error(
-			"[google/renew-watches] GOOGLE_PUBSUB_TOPIC is not set; no Gmail watch can be created",
+			"[google/renew-watches] GOOGLE_PUBSUB_TOPIC and GOOGLE_TEMP_PUBSUB_TOPIC are not set; no Gmail watch can be created",
 		);
 		return Response.json({ error: "No Pub/Sub topic" }, { status: 503 });
 	}
@@ -73,7 +76,7 @@ export async function POST(request: Request) {
 		}
 		let errors: string[];
 		try {
-			const result = await reconcileWatches(connection.id, topicName);
+			const result = await reconcileWatches(connection.id, topics);
 			errors = result.errors;
 			results.push({ connectionId: connection.id, ...result });
 		} catch (error) {

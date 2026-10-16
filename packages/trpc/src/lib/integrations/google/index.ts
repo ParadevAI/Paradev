@@ -1,4 +1,7 @@
-export { googleTokenResponseSchema } from "../../../router/integration/google/auth";
+export {
+	googleTokenResponseSchema,
+	issuedByConnectorFlow,
+} from "../../../router/integration/google/auth";
 export {
 	GMAIL_WATCH_TTL_MS,
 	GOOGLE_SCOPES,
@@ -9,6 +12,7 @@ export {
 	getMessage,
 	getProfile,
 	headerValue,
+	isTopicInOtherProject,
 	listAddedMessages,
 	listLabels,
 	messageHasAttachment,
