@@ -81,6 +81,7 @@ export const publicProfiles = pgTable(
 
 		handle: text().notNull().unique(),
 		visibility: leaderboardVisibility().notNull().default("public"),
+		showOnOrgBoards: boolean("show_on_org_boards").notNull().default(false),
 
 		bio: text(),
 		githubHandle: text("github_handle"),
