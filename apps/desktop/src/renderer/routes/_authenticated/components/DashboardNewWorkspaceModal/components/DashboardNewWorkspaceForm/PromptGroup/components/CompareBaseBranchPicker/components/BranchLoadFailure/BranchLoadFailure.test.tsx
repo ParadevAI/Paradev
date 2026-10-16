@@ -5,13 +5,13 @@ import { TRPCClientError } from "@trpc/client";
 	globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
-const { cleanup, fireEvent, render, within } = await import(
+const { act, cleanup, fireEvent, render, within } = await import(
 	"@testing-library/react"
 );
 const { BranchLoadFailure } = await import("./BranchLoadFailure");
 afterEach(cleanup);
 
-test("names a missing project folder and offers to change its location instead of retrying", () => {
+test("names a missing project folder and offers to change its location instead of retrying", async () => {
 	const onChangeProjectLocation = mock(() => {});
 	render(
 		<BranchLoadFailure
@@ -34,9 +34,10 @@ test("names a missing project folder and offers to change its location instead o
 		/>,
 	);
 	const page = within(document.body);
-	expect(page.getByText("Folder is missing").getAttribute("title")).toBe(
-		"/code/acme-web",
-	);
+	await act(async () => {
+		fireEvent.focus(page.getByText("Folder is missing"));
+	});
+	expect(page.getByRole("tooltip").textContent).toBe("/code/acme-web");
 	fireEvent.click(page.getByRole("button", { name: "Change location" }));
 	expect(onChangeProjectLocation).toHaveBeenCalledTimes(1);
 	expect(page.queryByRole("button", { name: "Retry" })).toBeNull();

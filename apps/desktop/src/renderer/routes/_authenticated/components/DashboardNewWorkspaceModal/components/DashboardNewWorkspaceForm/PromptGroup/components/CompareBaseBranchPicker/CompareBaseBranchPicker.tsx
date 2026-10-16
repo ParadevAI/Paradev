@@ -87,7 +87,7 @@ export function CompareBaseBranchPicker({
 	};
 
 	useEffect(() => {
-		if (!open || !hasNextPage || isFetchingNextPage) return;
+		if (!open || !hasNextPage || isFetchingNextPage || isBranchesError) return;
 		const el = sentinelRef.current;
 		if (!el) return;
 		// Guard against cascade: when isFetchingNextPage flips false → effect
@@ -108,7 +108,7 @@ export function CompareBaseBranchPicker({
 		);
 		observer.observe(el);
 		return () => observer.disconnect();
-	}, [open, hasNextPage, isFetchingNextPage, onLoadMore]);
+	}, [open, hasNextPage, isFetchingNextPage, isBranchesError, onLoadMore]);
 
 	if (isHostOffline) {
 		return (
