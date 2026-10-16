@@ -1950,6 +1950,9 @@ msgstr "Agent theo lịch"
 msgid "Agents on your phone"
 msgstr "Agent trên điện thoại của bạn"
 
+msgid "Agents remember what they learn about your codebase, so every new session starts warm."
+msgstr "Agent ghi nhớ những gì chúng học được về codebase của bạn, nên mỗi phiên mới đều bắt đầu với sẵn ngữ cảnh."
+
 msgid "Agents running at once"
 msgstr "Số agent chạy cùng lúc"
 
@@ -12446,6 +12449,9 @@ msgstr "mỗi phiên"
 msgid "per user/month"
 msgstr "mỗi người/tháng"
 
+msgid "Per-repo agent memory"
+msgstr "Bộ nhớ agent theo từng repository"
+
 msgid "Percent of total system RAM used by monitored Superset resources only (not all apps). A high share means Superset is a major contributor to system memory pressure; a low share means pressure is likely elsewhere."
 msgstr "Phần trăm tổng RAM hệ thống chỉ do các tài nguyên Superset được theo dõi sử dụng (không tính mọi ứng dụng). Tỷ lệ cao nghĩa là Superset góp phần lớn gây áp lực bộ nhớ; tỷ lệ thấp nghĩa là áp lực có thể đến từ nơi khác."
 
@@ -14868,6 +14874,9 @@ msgstr "Xem những gì đã thay đổi, góp ý, và merge khi đã sẵn sàn
 msgid "See what we're building now, what's coming next, and where Superset is headed."
 msgstr "Xem chúng tôi đang xây dựng gì, sắp tới có gì và Superset đang hướng tới đâu."
 
+msgid "See what your teammates' agents are working on, shipping, and blocked on."
+msgstr "Xem agent của đồng đội đang làm gì, đang phát hành gì và đang bị chặn ở đâu."
+
 msgid "See where your last 30 days land on the public leaderboard. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "Xem 30 ngày qua của bạn đứng ở đâu trên bảng xếp hạng công khai. Chỉ số lượng token và tên mô hình, không có tên repo, đường dẫn tệp hay prompt."
 
@@ -15271,6 +15280,9 @@ msgstr "Component dùng chung của ứng dụng"
 
 msgid "Shared component library."
 msgstr "Thư viện component dùng chung."
+
+msgid "Shared settings and simpler membership for teams that work in Superset together."
+msgstr "Cài đặt dùng chung và quản lý thành viên đơn giản hơn cho các nhóm cùng làm việc trong Superset."
 
 msgid "Shared theme JSON files you can import into Superset."
 msgstr "Các tệp JSON chủ đề được chia sẻ, bạn có thể nhập vào Superset."
@@ -16465,6 +16477,9 @@ msgstr "Superset khởi đầu là một dự án hackathon vào tháng 11 năm 
 msgid "Superset stores each connection encrypted. Tool calls go out from Superset, so the agent never sees a token."
 msgstr "Superset lưu mỗi kết nối dưới dạng mã hóa. Các lệnh gọi công cụ được gửi từ Superset nên agent không bao giờ thấy token."
 
+msgid "Superset Teams"
+msgstr "Nhóm Superset"
+
 msgid "Superset UI"
 msgstr "Superset UI"
 
@@ -16742,6 +16757,9 @@ msgstr "nhóm"
 
 msgid "Team"
 msgstr "Nhóm"
+
+msgid "Team activity feed"
+msgstr "Bảng tin hoạt động nhóm"
 
 msgid "Team collaboration"
 msgstr "Cộng tác nhóm"

@@ -1950,6 +1950,9 @@ msgstr "Agen sesuai jadwal"
 msgid "Agents on your phone"
 msgstr "Agen di ponsel Anda"
 
+msgid "Agents remember what they learn about your codebase, so every new session starts warm."
+msgstr "Agen mengingat apa yang mereka pelajari tentang codebase Anda, sehingga setiap sesi baru dimulai dengan konteks."
+
 msgid "Agents running at once"
 msgstr "Agen yang berjalan sekaligus"
 
@@ -12446,6 +12449,9 @@ msgstr "per sesi"
 msgid "per user/month"
 msgstr "per pengguna/bulan"
 
+msgid "Per-repo agent memory"
+msgstr "Memori agen per repositori"
+
 msgid "Percent of total system RAM used by monitored Superset resources only (not all apps). A high share means Superset is a major contributor to system memory pressure; a low share means pressure is likely elsewhere."
 msgstr "Persentase total RAM sistem yang dipakai hanya oleh sumber daya Superset yang dipantau (bukan semua aplikasi). Porsi tinggi berarti Superset penyumbang utama tekanan memori sistem; porsi rendah berarti tekanannya kemungkinan dari tempat lain."
 
@@ -14868,6 +14874,9 @@ msgstr "Lihat apa yang berubah, beri masukan, dan merge pekerjaannya saat siap."
 msgid "See what we're building now, what's coming next, and where Superset is headed."
 msgstr "Lihat apa yang sedang kami bangun, apa yang akan datang, dan ke mana arah Superset."
 
+msgid "See what your teammates' agents are working on, shipping, and blocked on."
+msgstr "Lihat apa yang sedang dikerjakan, dirilis, dan menghambat agen rekan tim Anda."
+
 msgid "See where your last 30 days land on the public leaderboard. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "Lihat posisi 30 hari terakhir Anda di papan peringkat publik. Hanya jumlah token dan nama model, tanpa nama repo, path file, atau prompt."
 
@@ -15271,6 +15280,9 @@ msgstr "Komponen aplikasi bersama"
 
 msgid "Shared component library."
 msgstr "Pustaka komponen bersama."
+
+msgid "Shared settings and simpler membership for teams that work in Superset together."
+msgstr "Pengaturan bersama dan pengelolaan anggota yang lebih sederhana untuk tim yang bekerja bersama di Superset."
 
 msgid "Shared theme JSON files you can import into Superset."
 msgstr "File JSON tema bersama yang bisa Anda impor ke Superset."
@@ -16465,6 +16477,9 @@ msgstr "Superset bermula sebagai proyek hackathon pada November 2025. Waktu itu 
 msgid "Superset stores each connection encrypted. Tool calls go out from Superset, so the agent never sees a token."
 msgstr "Superset menyimpan setiap koneksi dalam bentuk terenkripsi. Pemanggilan tool dikirim dari Superset, jadi agen tidak pernah melihat token."
 
+msgid "Superset Teams"
+msgstr "Tim Superset"
+
 msgid "Superset UI"
 msgstr "Superset UI"
 
@@ -16742,6 +16757,9 @@ msgstr "tim"
 
 msgid "Team"
 msgstr "Tim"
+
+msgid "Team activity feed"
+msgstr "Feed aktivitas tim"
 
 msgid "Team collaboration"
 msgstr "Kolaborasi tim"

@@ -1950,6 +1950,9 @@ msgstr "按计划运行的智能体"
 msgid "Agents on your phone"
 msgstr "手机上的智能体"
 
+msgid "Agents remember what they learn about your codebase, so every new session starts warm."
+msgstr "智能体会记住它们对你代码库的了解，让每个新会话一开始就有上下文。"
+
 msgid "Agents running at once"
 msgstr "同时运行的智能体数"
 
@@ -12446,6 +12449,9 @@ msgstr "每次会话"
 msgid "per user/month"
 msgstr "每用户/月"
 
+msgid "Per-repo agent memory"
+msgstr "按仓库的智能体记忆"
+
 msgid "Percent of total system RAM used by monitored Superset resources only (not all apps). A high share means Superset is a major contributor to system memory pressure; a low share means pressure is likely elsewhere."
 msgstr "仅受监控的Superset资源占系统总RAM的百分比（不含其他应用）。占比高说明Superset是系统内存压力的主要来源；占比低说明压力可能来自别处。"
 
@@ -14868,6 +14874,9 @@ msgstr "查看改动、给出反馈，就绪后合并成果。"
 msgid "See what we're building now, what's coming next, and where Superset is headed."
 msgstr "了解我们正在构建什么、接下来会做什么，以及 Superset 的发展方向。"
 
+msgid "See what your teammates' agents are working on, shipping, and blocked on."
+msgstr "查看队友的智能体正在做什么、交付了什么，以及卡在哪里。"
+
 msgid "See where your last 30 days land on the public leaderboard. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "看看你最近30天在公开排行榜上的位置。仅包含token数量和模型名称，不含仓库名、文件路径或提示词。"
 
@@ -15271,6 +15280,9 @@ msgstr "共享应用组件"
 
 msgid "Shared component library."
 msgstr "共享组件库。"
+
+msgid "Shared settings and simpler membership for teams that work in Superset together."
+msgstr "为在 Superset 中协作的团队提供共享设置和更简单的成员管理。"
 
 msgid "Shared theme JSON files you can import into Superset."
 msgstr "可导入Superset的共享主题JSON文件。"
@@ -16465,6 +16477,9 @@ msgstr "Superset起初是2025年11月的一个黑客松项目，一个用来管�
 msgid "Superset stores each connection encrypted. Tool calls go out from Superset, so the agent never sees a token."
 msgstr "Superset 会加密存储每个连接。工具调用由 Superset 发出，因此智能体永远看不到令牌。"
 
+msgid "Superset Teams"
+msgstr "Superset 团队"
+
 msgid "Superset UI"
 msgstr "Superset UI"
 
@@ -16742,6 +16757,9 @@ msgstr "团队"
 
 msgid "Team"
 msgstr "团队"
+
+msgid "Team activity feed"
+msgstr "团队动态"
 
 msgid "Team collaboration"
 msgstr "团队协作"

@@ -1950,6 +1950,9 @@ msgstr "Zamanlanmış ajanlar"
 msgid "Agents on your phone"
 msgstr "Telefonunuzda ajanlar"
 
+msgid "Agents remember what they learn about your codebase, so every new session starts warm."
+msgstr "Ajanlar kod tabanınız hakkında öğrendiklerini hatırlar, böylece her yeni oturum bağlamla başlar."
+
 msgid "Agents running at once"
 msgstr "Aynı anda çalışan ajanlar"
 
@@ -12446,6 +12449,9 @@ msgstr "oturum başına"
 msgid "per user/month"
 msgstr "kullanıcı/ay başına"
 
+msgid "Per-repo agent memory"
+msgstr "Depo başına ajan belleği"
+
 msgid "Percent of total system RAM used by monitored Superset resources only (not all apps). A high share means Superset is a major contributor to system memory pressure; a low share means pressure is likely elsewhere."
 msgstr "Yalnızca izlenen Superset kaynaklarının kullandığı toplam sistem RAM'i yüzdesi (tüm uygulamalar değil). Yüksek pay, Superset'in sistem bellek baskısına önemli ölçüde katkıda bulunduğu anlamına gelir; düşük pay ise baskının büyük olasılıkla başka yerden geldiğini gösterir."
 
@@ -14868,6 +14874,9 @@ msgstr "Neyin değiştiğini görün, geri bildirim verin ve hazır olduğunda i
 msgid "See what we're building now, what's coming next, and where Superset is headed."
 msgstr "Şu anda ne geliştirdiğimizi, sırada ne olduğunu ve Superset'in nereye gittiğini görün."
 
+msgid "See what your teammates' agents are working on, shipping, and blocked on."
+msgstr "Takım arkadaşlarınızın ajanlarının ne üzerinde çalıştığını, neyi yayınladığını ve nerede takıldığını görün."
+
 msgid "See where your last 30 days land on the public leaderboard. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "Son 30 gününüzün herkese açık liderlik tablosunda nereye düştüğünü görün. Yalnızca token sayıları ve model adları; repo adları, dosya yolları veya prompt'lar yok."
 
@@ -15271,6 +15280,9 @@ msgstr "Paylaşılan uygulama bileşenleri"
 
 msgid "Shared component library."
 msgstr "Paylaşılan bileşen kitaplığı."
+
+msgid "Shared settings and simpler membership for teams that work in Superset together."
+msgstr "Superset'te birlikte çalışan takımlar için paylaşılan ayarlar ve daha basit üyelik yönetimi."
 
 msgid "Shared theme JSON files you can import into Superset."
 msgstr "Superset'e içe aktarabileceğiniz paylaşılan tema JSON dosyaları."
@@ -16465,6 +16477,9 @@ msgstr "Superset, Kasım 2025'te bir hackathon projesi olarak başladı. Worktre
 msgid "Superset stores each connection encrypted. Tool calls go out from Superset, so the agent never sees a token."
 msgstr "Superset her bağlantıyı şifreli olarak saklar. Araç çağrıları Superset'ten çıkar, bu yüzden ajan bir belirteci asla görmez."
 
+msgid "Superset Teams"
+msgstr "Superset Takımlar"
+
 msgid "Superset UI"
 msgstr "Superset UI"
 
@@ -16742,6 +16757,9 @@ msgstr "takım"
 
 msgid "Team"
 msgstr "Takım"
+
+msgid "Team activity feed"
+msgstr "Takım etkinlik akışı"
 
 msgid "Team collaboration"
 msgstr "Takım iş birliği"

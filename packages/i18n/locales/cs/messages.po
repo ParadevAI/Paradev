@@ -1950,6 +1950,9 @@ msgstr "Agenti podle plánu"
 msgid "Agents on your phone"
 msgstr "Agenti ve vašem telefonu"
 
+msgid "Agents remember what they learn about your codebase, so every new session starts warm."
+msgstr "Agenti si pamatují, co se naučí o vašem kódu, takže každá nová relace začíná s kontextem."
+
 msgid "Agents running at once"
 msgstr "Agentů běžících najednou"
 
@@ -12446,6 +12449,9 @@ msgstr "na relaci"
 msgid "per user/month"
 msgstr "na uživatele/měsíc"
 
+msgid "Per-repo agent memory"
+msgstr "Paměť agentů pro každý repozitář"
+
 msgid "Percent of total system RAM used by monitored Superset resources only (not all apps). A high share means Superset is a major contributor to system memory pressure; a low share means pressure is likely elsewhere."
 msgstr "Procento celkové systémové RAM využité jen sledovanými prostředky Superset (ne všemi aplikacemi). Vysoký podíl znamená, že se Superset zásadně podílí na tlaku na paměť; nízký podíl znamená, že tlak pochází nejspíš odjinud."
 
@@ -14868,6 +14874,9 @@ msgstr "Podívejte se, co se změnilo, dejte zpětnou vazbu a slučte práci, a�
 msgid "See what we're building now, what's coming next, and where Superset is headed."
 msgstr "Podívejte se, co právě stavíme, co přijde dál a kam Superset míří."
 
+msgid "See what your teammates' agents are working on, shipping, and blocked on."
+msgstr "Sledujte, na čem agenti vašich kolegů pracují, co dodávají a kde se zasekli."
+
 msgid "See where your last 30 days land on the public leaderboard. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "Podívejte se, kde se vašich posledních 30 dní umístí ve veřejném žebříčku. Pouze počty tokenů a názvy modelů, žádné názvy repozitářů, cesty k souborům ani prompty."
 
@@ -15271,6 +15280,9 @@ msgstr "Sdílené komponenty aplikace"
 
 msgid "Shared component library."
 msgstr "Sdílená knihovna komponent."
+
+msgid "Shared settings and simpler membership for teams that work in Superset together."
+msgstr "Sdílené nastavení a jednodušší správa členů pro týmy, které v Superset pracují společně."
 
 msgid "Shared theme JSON files you can import into Superset."
 msgstr "Sdílené JSON soubory motivů, které si můžete naimportovat do Superset."
@@ -16465,6 +16477,9 @@ msgstr "Superset vznikl jako projekt na hackathonu v listopadu 2025. Byla to jed
 msgid "Superset stores each connection encrypted. Tool calls go out from Superset, so the agent never sees a token."
 msgstr "Superset ukládá každé připojení šifrovaně. Volání nástrojů odchází ze Supersetu, takže agent token nikdy neuvidí."
 
+msgid "Superset Teams"
+msgstr "Týmy Superset"
+
 msgid "Superset UI"
 msgstr "Superset UI"
 
@@ -16742,6 +16757,9 @@ msgstr "tým"
 
 msgid "Team"
 msgstr "Tým"
+
+msgid "Team activity feed"
+msgstr "Přehled aktivity týmu"
 
 msgid "Team collaboration"
 msgstr "Týmová spolupráce"

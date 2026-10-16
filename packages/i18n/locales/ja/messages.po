@@ -1950,6 +1950,9 @@ msgstr "スケジュール実行のエージェント"
 msgid "Agents on your phone"
 msgstr "スマホで使うエージェント"
 
+msgid "Agents remember what they learn about your codebase, so every new session starts warm."
+msgstr "エージェントがコードベースについて学んだことを記憶するため、新しいセッションは最初から文脈を持って始まります。"
+
 msgid "Agents running at once"
 msgstr "同時に動かしているエージェント数"
 
@@ -12446,6 +12449,9 @@ msgstr "セッションあたり"
 msgid "per user/month"
 msgstr "1ユーザーあたり月額"
 
+msgid "Per-repo agent memory"
+msgstr "リポジトリごとのエージェントメモリ"
+
 msgid "Percent of total system RAM used by monitored Superset resources only (not all apps). A high share means Superset is a major contributor to system memory pressure; a low share means pressure is likely elsewhere."
 msgstr "監視対象のSupersetリソースのみが使用する、システムRAM全体に対する割合です(すべてのアプリではありません)。割合が高い場合はSupersetがシステムのメモリ圧迫の主な要因であり、低い場合は原因は他にあります。"
 
@@ -14868,6 +14874,9 @@ msgstr "変更内容を確認し、フィードバックを送り、準備がで
 msgid "See what we're building now, what's coming next, and where Superset is headed."
 msgstr "現在開発中のもの、次に来るもの、そしてSupersetの向かう先をご覧ください。"
 
+msgid "See what your teammates' agents are working on, shipping, and blocked on."
+msgstr "チームメンバーのエージェントが取り組んでいること、出荷したもの、ブロックされていることを確認できます。"
+
 msgid "See where your last 30 days land on the public leaderboard. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "直近30日の実績が公開リーダーボードでどの位置になるか確認できます。公開されるのはトークン数とモデル名のみで、リポジトリ名・ファイルパス・プロンプトは含まれません。"
 
@@ -15271,6 +15280,9 @@ msgstr "共有アプリコンポーネント"
 
 msgid "Shared component library."
 msgstr "共有コンポーネントライブラリ。"
+
+msgid "Shared settings and simpler membership for teams that work in Superset together."
+msgstr "Superset で一緒に作業するチームのための共有設定と、よりシンプルなメンバー管理。"
 
 msgid "Shared theme JSON files you can import into Superset."
 msgstr "Supersetにインポートできる、共有されたテーマJSONファイル。"
@@ -16465,6 +16477,9 @@ msgstr "Supersetは2025年11月、ハッカソンのプロジェクトとして�
 msgid "Superset stores each connection encrypted. Tool calls go out from Superset, so the agent never sees a token."
 msgstr "Supersetは各接続を暗号化して保存します。ツール呼び出しはSupersetから送られるため、エージェントがトークンを目にすることはありません。"
 
+msgid "Superset Teams"
+msgstr "Superset チーム"
+
 msgid "Superset UI"
 msgstr "Superset UI"
 
@@ -16742,6 +16757,9 @@ msgstr "チーム"
 
 msgid "Team"
 msgstr "チーム"
+
+msgid "Team activity feed"
+msgstr "チームのアクティビティフィード"
 
 msgid "Team collaboration"
 msgstr "チームでのコラボレーション"

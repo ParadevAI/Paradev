@@ -1950,6 +1950,9 @@ msgstr "Agents op schema"
 msgid "Agents on your phone"
 msgstr "Agents op je telefoon"
 
+msgid "Agents remember what they learn about your codebase, so every new session starts warm."
+msgstr "Agents onthouden wat ze over je codebase leren, zodat elke nieuwe sessie met context begint."
+
 msgid "Agents running at once"
 msgstr "Agents die tegelijk draaien"
 
@@ -12446,6 +12449,9 @@ msgstr "per sessie"
 msgid "per user/month"
 msgstr "per gebruiker/maand"
 
+msgid "Per-repo agent memory"
+msgstr "Agentgeheugen per repository"
+
 msgid "Percent of total system RAM used by monitored Superset resources only (not all apps). A high share means Superset is a major contributor to system memory pressure; a low share means pressure is likely elsewhere."
 msgstr "Percentage van het totale systeem-RAM dat alleen door de gemonitorde Superset-resources wordt gebruikt (niet door alle apps). Een hoog aandeel betekent dat Superset flink bijdraagt aan de geheugendruk; een laag aandeel betekent dat de druk waarschijnlijk elders zit."
 
@@ -14868,6 +14874,9 @@ msgstr "Zie wat er veranderd is, geef feedback en merge het werk als het klaar i
 msgid "See what we're building now, what's coming next, and where Superset is headed."
 msgstr "Bekijk wat we nu bouwen, wat er hierna komt en waar Superset naartoe gaat."
 
+msgid "See what your teammates' agents are working on, shipping, and blocked on."
+msgstr "Zie waar de agents van je teamleden aan werken, wat ze opleveren en waar ze vastzitten."
+
 msgid "See where your last 30 days land on the public leaderboard. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "Bekijk waar je laatste 30 dagen staan op de publieke ranglijst. Alleen tokenaantallen en modelnamen, geen repo-namen, bestandspaden of prompts."
 
@@ -15271,6 +15280,9 @@ msgstr "Gedeelde app-componenten"
 
 msgid "Shared component library."
 msgstr "Gedeelde componentbibliotheek."
+
+msgid "Shared settings and simpler membership for teams that work in Superset together."
+msgstr "Gedeelde instellingen en eenvoudiger ledenbeheer voor teams die samen in Superset werken."
 
 msgid "Shared theme JSON files you can import into Superset."
 msgstr "Gedeelde thema-JSON-bestanden die je in Superset kunt importeren."
@@ -16465,6 +16477,9 @@ msgstr "Superset begon in november 2025 als hackathonproject. Het was een simpel
 msgid "Superset stores each connection encrypted. Tool calls go out from Superset, so the agent never sees a token."
 msgstr "Superset slaat elke verbinding versleuteld op. Tool-aanroepen gaan vanuit Superset, dus de agent ziet nooit een token."
 
+msgid "Superset Teams"
+msgstr "Superset Teams"
+
 msgid "Superset UI"
 msgstr "Superset UI"
 
@@ -16742,6 +16757,9 @@ msgstr "team"
 
 msgid "Team"
 msgstr "Team"
+
+msgid "Team activity feed"
+msgstr "Teamactiviteitenfeed"
 
 msgid "Team collaboration"
 msgstr "Teamsamenwerking"

@@ -97,6 +97,42 @@ export const ROADMAP_ITEMS: RoadmapItem[] = [
 		status: "now",
 	},
 	{
+		id: "agent-memory",
+		title: msg({
+			message: "Per-repo agent memory",
+		}),
+		description: msg({
+			message:
+				"Agents remember what they learn about your codebase, so every new session starts warm.",
+		}),
+		category: "Agents",
+		status: "next",
+	},
+	{
+		id: "superset-teams",
+		title: msg({
+			message: "Superset Teams",
+		}),
+		description: msg({
+			message:
+				"Shared settings and simpler membership for teams that work in Superset together.",
+		}),
+		category: "Platform",
+		status: "next",
+	},
+	{
+		id: "team-activity-feed",
+		title: msg({
+			message: "Team activity feed",
+		}),
+		description: msg({
+			message:
+				"See what your teammates' agents are working on, shipping, and blocked on.",
+		}),
+		category: "Platform",
+		status: "next",
+	},
+	{
 		id: "plugin-marketplace",
 		title: msg({
 			message: "Plugin marketplace",
@@ -106,7 +142,7 @@ export const ROADMAP_ITEMS: RoadmapItem[] = [
 				"Browse and install skills, MCP servers, and agent configs shared by the community.",
 		}),
 		category: "Integrations",
-		status: "now",
+		status: "next",
 	},
 	{
 		id: "chat-v3",

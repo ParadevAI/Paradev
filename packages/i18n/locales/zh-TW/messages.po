@@ -1950,6 +1950,9 @@ msgstr "依計劃執行的代理程式"
 msgid "Agents on your phone"
 msgstr "手機上的代理程式"
 
+msgid "Agents remember what they learn about your codebase, so every new session starts warm."
+msgstr "代理程式會記住它們對你程式碼庫的了解，讓每個新會話一開始就有脈絡。"
+
 msgid "Agents running at once"
 msgstr "同時執行的代理程式數"
 
@@ -12446,6 +12449,9 @@ msgstr "每次會話"
 msgid "per user/month"
 msgstr "每使用者/月"
 
+msgid "Per-repo agent memory"
+msgstr "依儲存庫的代理程式記憶"
+
 msgid "Percent of total system RAM used by monitored Superset resources only (not all apps). A high share means Superset is a major contributor to system memory pressure; a low share means pressure is likely elsewhere."
 msgstr "僅受監控的Superset資源佔系統總RAM的百分比（不含其他應用程式）。佔比高說明Superset是系統記憶體壓力的主要來源；佔比低說明壓力可能來自別處。"
 
@@ -14868,6 +14874,9 @@ msgstr "檢視改動、給出回饋，就緒後合併成果。"
 msgid "See what we're building now, what's coming next, and where Superset is headed."
 msgstr "瞭解我們正在打造什麼、接下來會推出什麼，以及 Superset 的發展方向。"
 
+msgid "See what your teammates' agents are working on, shipping, and blocked on."
+msgstr "查看隊友的代理程式正在做什麼、交付了什麼，以及卡在哪裡。"
+
 msgid "See where your last 30 days land on the public leaderboard. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "看看你最近 30 天的表現在公開排行榜上的位置。僅包含 token 數量與模型名稱，不含儲存庫名稱、檔案路徑或提示詞。"
 
@@ -15271,6 +15280,9 @@ msgstr "共享應用元件"
 
 msgid "Shared component library."
 msgstr "共享元件庫。"
+
+msgid "Shared settings and simpler membership for teams that work in Superset together."
+msgstr "為在 Superset 中協作的團隊提供共用設定與更簡單的成員管理。"
 
 msgid "Shared theme JSON files you can import into Superset."
 msgstr "可匯入Superset的共享主題JSON檔案。"
@@ -16465,6 +16477,9 @@ msgstr "Superset起初是2025年11月的一個駭客松專案，一個用來管�
 msgid "Superset stores each connection encrypted. Tool calls go out from Superset, so the agent never sees a token."
 msgstr "Superset 會加密儲存每個連線。工具呼叫由 Superset 發出，因此代理程式永遠看不到權杖。"
 
+msgid "Superset Teams"
+msgstr "Superset 團隊"
+
 msgid "Superset UI"
 msgstr "Superset UI"
 
@@ -16742,6 +16757,9 @@ msgstr "團隊"
 
 msgid "Team"
 msgstr "團隊"
+
+msgid "Team activity feed"
+msgstr "團隊動態"
 
 msgid "Team collaboration"
 msgstr "團隊協作"
