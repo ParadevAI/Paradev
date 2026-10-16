@@ -1453,9 +1453,6 @@ msgstr "{where}には「{firstName}」という名前のファイルがすでに
 msgid "A focused burn-down of crashes, hangs, and reconnect failures across the app."
 msgstr "アプリ全体のクラッシュ、ハング、再接続の失敗を集中的につぶします。"
 
-msgid "A full restyle: denser rows, port and agent chips under each workspace, one-click stop for everything."
-msgstr "全面的なデザイン刷新。行はより高密度に、各ワークスペースの下にポートとエージェントのチップを表示し、すべてをワンクリックで停止できます。"
-
 msgid "A gateway is signed in with an API key."
 msgstr "ゲートウェイは API キーでサインインします。"
 
@@ -1935,17 +1932,14 @@ msgstr "エージェントが操作するプレビュー"
 msgid "Agents"
 msgstr "エージェント"
 
-msgid "Agents can watch CI checks, tail dev servers, and keep long-running processes alive while they work."
-msgstr "エージェントがCIのチェックを監視し、開発サーバーのログを追い、作業中も長時間動くプロセスを維持できます。"
-
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "エージェントが定型チケットを途中の介入なしに完了する。"
 
 msgid "Agents load their own preview, drive the UI, and attach screenshot proof before marking work ready for review."
 msgstr "エージェントが自らプレビューを開き、UIを操作し、レビュー待ちにする前にスクリーンショットの証拠を添付します。"
 
-msgid "Agents on a schedule"
-msgstr "スケジュール実行のエージェント"
+msgid "Agents on a schedule or trigger"
+msgstr "スケジュールやトリガーで動くエージェント"
 
 msgid "Agents on your phone"
 msgstr "スマホで使うエージェント"
@@ -2872,9 +2866,6 @@ msgstr "背景"
 msgid "Background processes"
 msgstr "バックグラウンドプロセス"
 
-msgid "Background processes in chat"
-msgstr "チャット内のバックグラウンドプロセス"
-
 msgid "Background task"
 msgstr "バックグラウンドタスク"
 
@@ -3671,9 +3662,6 @@ msgstr "ワークスペースcomponent-showcaseでClaudeが実行中です。"
 
 msgid "Clean up stale TODOs…"
 msgstr "古いTODOを整理…"
-
-msgid "Cleaner, denser sidebar"
-msgstr "すっきり高密度なサイドバー"
 
 msgid "Clear"
 msgstr "クリア"
@@ -5603,9 +5591,6 @@ msgstr "個別見積もり"
 
 msgid "Custom provider"
 msgstr "カスタムプロバイダー"
-
-msgid "Custom terminal agents"
-msgstr "カスタムターミナルエージェント"
 
 msgid "Custom themes"
 msgstr "カスタムテーマ"
@@ -8122,12 +8107,6 @@ msgstr "緑/赤（2型2色覚）"
 msgid "Grepped"
 msgstr "検索"
 
-msgid "Grok & Kimi Code agents"
-msgstr "GrokとKimi Codeのエージェント"
-
-msgid "Grok and Kimi Code join the lineup alongside Claude Code, Codex, and friends."
-msgstr "Claude CodeやCodexなどに加えて、GrokとKimi Codeが仲間に加わります。"
-
 msgid "Group actions"
 msgstr "グループの操作"
 
@@ -8970,6 +8949,9 @@ msgstr "iOSアプリ"
 msgid "iOS Simulator"
 msgstr "iOSシミュレータ"
 
+msgid "iOS simulator pane"
+msgstr "iOSシミュレーターのペイン"
+
 msgid "IP restrictions"
 msgstr "IP制限"
 
@@ -9447,9 +9429,6 @@ msgstr "ライト"
 msgid "Light theme"
 msgstr "ライトテーマ"
 
-msgid "Lighter memory, smoother under load"
-msgstr "メモリは軽く、負荷時も滑らかに"
-
 msgid "Like building with Superset?"
 msgstr "Supersetでの開発は気に入りましたか?"
 
@@ -9798,9 +9777,6 @@ msgstr "低"
 
 msgid "Low severity"
 msgstr "重要度: 低"
-
-msgid "Lower memory with many terminals open, smoother git in big repos, and less background CPU."
-msgstr "ターミナルを多数開いてもメモリ消費を抑え、大きなリポジトリでのgitを滑らかにし、バックグラウンドのCPU使用を減らします。"
 
 msgid "Machine resources"
 msgstr "マシンリソース"
@@ -10218,8 +10194,8 @@ msgstr "スマートフォンからエージェントを確認できます。"
 msgid "Monitor workspaces and manage tasks on the go. Continue conversations from anywhere."
 msgstr "外出先でもワークスペースを確認し、タスクを管理できます。どこからでも会話を続けられます。"
 
-msgid "Monitor, steer, and unblock your agents from your phone."
-msgstr "スマートフォンからエージェントを監視し、方向を示し、詰まりを解消できます。"
+msgid "Monitor, steer, and unblock your agents from your iPhone or iPad."
+msgstr "iPhoneやiPadから、エージェントを監視し、指示を出し、詰まりを解消できます。"
 
 msgid "Monitoring"
 msgstr "モニタリング"
@@ -12558,9 +12534,6 @@ msgstr "ピン留め"
 msgid "Pin feedback to a page and let the agent make the change."
 msgstr "ページにフィードバックを残し、変更はエージェントに任せましょう。"
 
-msgid "Pin workspaces above your projects, then ⌘-click a batch to move, group, or delete them all at once."
-msgstr "ワークスペースをプロジェクトの上にピン留めし、⌘クリックでまとめて選んで移動、グループ化、削除ができます。"
-
 msgid "Pink"
 msgstr "ピンク"
 
@@ -12779,9 +12752,6 @@ msgstr "<0>Esc</0>で閉じる"
 
 msgid "Press ⌘⇧B or open a port Superset detected. Your dev server loads in a pane beside your terminals."
 msgstr "⌘⇧Bを押すか、Supersetが検出したポートを開きます。開発サーバーがターミナルの隣のペインに読み込まれます。"
-
-msgid "Press ⌘I over any terminal and compose in a real editor, with multiline prompts and @file mentions."
-msgstr "任意のターミナルで⌘Iを押すと、本格的なエディタで入力できます。複数行のプロンプトや@fileのメンションにも対応。"
 
 msgid "Press a key…"
 msgstr "キーを押してください…"
@@ -13499,9 +13469,6 @@ msgstr "再生成"
 
 msgid "Region"
 msgstr "リージョン"
-
-msgid "Register any CLI agent alongside the built-ins, each with its own name, icon, and launch command."
-msgstr "組み込みのエージェントと並べて、任意のCLIエージェントを登録できます。名前、アイコン、起動コマンドはそれぞれ設定できます。"
 
 msgid "Registers lifecycle hooks in this agent's global config so Superset can show status and send notifications. Turning this off removes Superset's entries everywhere — status and notifications stop for this agent, including inside Superset."
 msgstr "このエージェントのグローバル設定にライフサイクルフックを登録し、Supersetがステータス表示と通知を行えるようにします。オフにするとSupersetのエントリがすべて削除され、Superset内も含めてこのエージェントのステータスと通知が停止します。"
@@ -14255,9 +14222,6 @@ msgstr "リッチ入力"
 msgid "Rich input ({hotkeyText})"
 msgstr "リッチ入力 ({hotkeyText})"
 
-msgid "Rich input for the terminal"
-msgstr "ターミナルのリッチ入力"
-
 msgid "right pane"
 msgstr "右ペイン"
 
@@ -14333,6 +14297,9 @@ msgstr "再実行"
 
 msgid "Run agents side by side"
 msgstr "エージェントを並べて実行"
+
+msgid "Run an iOS simulator in a workspace pane so you and your agents can test mobile apps."
+msgstr "ワークスペースのペインでiOSシミュレーターを動かし、あなたとエージェントがモバイルアプリをテストできます。"
 
 msgid "Run any agent you set up in Superset, such as Claude or Codex."
 msgstr "Superset で設定したエージェントなら何でも実行できます。たとえば Claude や Codex です。"
@@ -15624,6 +15591,9 @@ msgstr "シミュレータ"
 msgid "Since 2025"
 msgstr "2025年から"
 
+msgid "Single sign-on for organizations, self-serve configurable."
+msgstr "組織向けのシングルサインオン。セルフサービスで設定できます。"
+
 msgid "Single tab + panes"
 msgstr "単一タブ + ペイン"
 
@@ -15917,6 +15887,9 @@ msgstr "SS"
 msgid "SSH destination"
 msgstr "SSH の接続先"
 
+msgid "SSO (SAML / OIDC)"
+msgstr "SSO（SAML / OIDC）"
+
 msgid "SSO/SAML"
 msgstr "SSO/SAML"
 
@@ -16005,9 +15978,6 @@ msgstr "新しいチャットを開始"
 msgid "Start a session"
 msgstr "セッションを開始"
 
-msgid "Start a workspace straight from a Linear ticket. The agent picks it up and reports back with a PR."
-msgstr "Linearのチケットからそのままワークスペースを作れます。エージェントが引き受け、PRとして返してきます。"
-
 msgid "Start agents, follow them live, and review the diff from your iPhone or iPad. Your code stays on your machines."
 msgstr "iPhone や iPad からエージェントを起動し、ライブで見守り、差分をレビュー。コードはあなたのマシンに残ります。"
 
@@ -16052,6 +16022,9 @@ msgstr "仕事から始める。"
 
 msgid "Start work from anywhere"
 msgstr "どこからでも作業を開始"
+
+msgid "Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one."
+msgstr "タスクビューでLinearやGitHubのIssueから直接ワークスペースを開始でき、それぞれでエージェントがすでに作業を始めています。"
 
 msgid "Started"
 msgstr "開始"
@@ -17990,8 +17963,8 @@ msgstr "Tufte"
 msgid "Tunnel established"
 msgstr "トンネル確立"
 
-msgid "Turn chores into scheduled agents: issue triage, changelog drafts, dependency bumps. They run on their own and open PRs for you to review."
-msgstr "面倒な作業をスケジュール実行のエージェントにしましょう。issueのトリアージ、changelogの下書き、依存関係の更新。自動で走り、レビュー用のPRを開いてくれます。"
+msgid "Turn chores into agents that run on a schedule or when an event comes in: issue triage, changelog drafts, dependency bumps. They run on their own and open PRs for you to review."
+msgstr "定型作業を、スケジュールやイベントの発生で動くエージェントに任せましょう。Issueのトリアージ、Changelogの下書き、依存関係の更新など。エージェントは自律的に動き、レビュー用のPRを作成します。"
 
 msgid "Turn failed"
 msgstr "ターンが失敗しました"
@@ -19149,9 +19122,6 @@ msgstr "ワークスペースのパスを利用できません"
 msgid "Workspace path is not available yet"
 msgstr "ワークスペースのパスはまだ利用できません"
 
-msgid "Workspace pinning & bulk actions"
-msgstr "ワークスペースのピン留めと一括操作"
-
 msgid "Workspace restored"
 msgstr "ワークスペースを復元しました"
 
@@ -19233,8 +19203,8 @@ msgstr "コメントを入力…"
 msgid "Write a note and pick an agent. Your note arrives with the element's code and a cropped screenshot."
 msgstr "メモを書いて、エージェントを選びます。メモは、要素のコードと切り抜いたスクリーンショットと一緒に届きます。"
 
-msgid "Write a prompt and pick a schedule. Each run opens a workspace you can review and continue."
-msgstr "プロンプトを書いて、スケジュールを選びます。実行のたびにワークスペースが開き、確認や続行ができます。"
+msgid "Write a prompt and pick a schedule or an event, like a pull request, a Slack message, a Linear issue, a Sentry issue, or a webhook. Each run opens a workspace you can review and continue."
+msgstr "プロンプトを書き、スケジュールまたはイベントを選びます。イベントには、プルリクエスト、Slackのメッセージ、LinearのIssue、SentryのIssue、Webhookなどがあります。実行ごとにワークスペースが開き、レビューして作業を続けられます。"
 
 msgid "Write a reply"
 msgstr "返信を書く"
@@ -19438,8 +19408,8 @@ msgstr "エージェントがデザインやレポートを公開し、チーム
 msgid "Your agent publishes designs and reports. Your team comments, and it gets to work."
 msgstr "エージェントがデザインやレポートを公開します。チームがコメントすると、エージェントが作業を始めます。"
 
-msgid "Your agents do the recurring work on a schedule you set."
-msgstr "エージェントが、設定したスケジュールで定期的な作業をこなします。"
+msgid "Your agents do the work on a schedule or when an event comes in."
+msgstr "エージェントがスケジュールやイベントの発生に応じて作業します。"
 
 msgid "Your Agents, Your Accounts"
 msgstr "エージェントもアカウントも、あなたのもの"

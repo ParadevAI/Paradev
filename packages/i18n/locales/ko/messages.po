@@ -1453,9 +1453,6 @@ msgstr "{where}에 '{firstName}'(이)라는 파일이 이미 있습니다. 바�
 msgid "A focused burn-down of crashes, hangs, and reconnect failures across the app."
 msgstr "앱 전반의 크래시, 멈춤, 재연결 실패를 집중적으로 줄입니다."
 
-msgid "A full restyle: denser rows, port and agent chips under each workspace, one-click stop for everything."
-msgstr "전면 재단장입니다. 더 촘촘한 행, 워크스페이스마다 표시되는 포트와 에이전트 칩, 클릭 한 번으로 전부 중지."
-
 msgid "A gateway is signed in with an API key."
 msgstr "게이트웨이는 API 키로 로그인합니다."
 
@@ -1935,17 +1932,14 @@ msgstr "에이전트가 조작하는 미리보기"
 msgid "Agents"
 msgstr "에이전트"
 
-msgid "Agents can watch CI checks, tail dev servers, and keep long-running processes alive while they work."
-msgstr "에이전트가 작업하는 동안 CI 검사를 지켜보고, 개발 서버 로그를 따라가고, 장시간 프로세스를 살려 둘 수 있습니다."
-
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "에이전트가 작업 중간 개입 없이 일상적인 티켓을 완료합니다."
 
 msgid "Agents load their own preview, drive the UI, and attach screenshot proof before marking work ready for review."
 msgstr "에이전트가 직접 미리 보기를 띄우고, UI를 조작하고, 리뷰 준비 표시를 하기 전에 스크린샷 증거를 첨부합니다."
 
-msgid "Agents on a schedule"
-msgstr "일정에 따라 도는 에이전트"
+msgid "Agents on a schedule or trigger"
+msgstr "일정이나 트리거로 실행되는 에이전트"
 
 msgid "Agents on your phone"
 msgstr "휴대폰에서 쓰는 에이전트"
@@ -2872,9 +2866,6 @@ msgstr "배경"
 msgid "Background processes"
 msgstr "백그라운드 프로세스"
 
-msgid "Background processes in chat"
-msgstr "채팅 안의 백그라운드 프로세스"
-
 msgid "Background task"
 msgstr "백그라운드 작업"
 
@@ -3671,9 +3662,6 @@ msgstr "이제 워크스페이스 component-showcase에서 Claude가 실행 중�
 
 msgid "Clean up stale TODOs…"
 msgstr "오래된 TODO 정리…"
-
-msgid "Cleaner, denser sidebar"
-msgstr "더 깔끔하고 촘촘한 사이드바"
 
 msgid "Clear"
 msgstr "투명"
@@ -5603,9 +5591,6 @@ msgstr "맞춤 가격"
 
 msgid "Custom provider"
 msgstr "사용자 지정 제공사"
-
-msgid "Custom terminal agents"
-msgstr "커스텀 터미널 에이전트"
 
 msgid "Custom themes"
 msgstr "사용자 지정 테마"
@@ -8122,12 +8107,6 @@ msgstr "녹색/적색(제2색맹)"
 msgid "Grepped"
 msgstr "Grep 실행함"
 
-msgid "Grok & Kimi Code agents"
-msgstr "Grok 및 Kimi Code 에이전트"
-
-msgid "Grok and Kimi Code join the lineup alongside Claude Code, Codex, and friends."
-msgstr "Claude Code, Codex 등과 함께 Grok과 Kimi Code가 합류합니다."
-
 msgid "Group actions"
 msgstr "그룹 작업"
 
@@ -8970,6 +8949,9 @@ msgstr "iOS 앱"
 msgid "iOS Simulator"
 msgstr "iOS 시뮬레이터"
 
+msgid "iOS simulator pane"
+msgstr "iOS 시뮬레이터 패널"
+
 msgid "IP restrictions"
 msgstr "IP 제한"
 
@@ -9447,9 +9429,6 @@ msgstr "라이트"
 msgid "Light theme"
 msgstr "라이트 테마"
 
-msgid "Lighter memory, smoother under load"
-msgstr "더 가벼운 메모리, 부하에도 매끄럽게"
-
 msgid "Like building with Superset?"
 msgstr "Superset으로 만드는 게 즐거우신가요?"
 
@@ -9798,9 +9777,6 @@ msgstr "낮음"
 
 msgid "Low severity"
 msgstr "심각도 낮음"
-
-msgid "Lower memory with many terminals open, smoother git in big repos, and less background CPU."
-msgstr "터미널을 많이 열어도 메모리를 덜 쓰고, 큰 리포지토리에서 git이 더 매끄럽고, 백그라운드 CPU 사용이 줄어듭니다."
 
 msgid "Machine resources"
 msgstr "머신 리소스"
@@ -10218,8 +10194,8 @@ msgstr "휴대폰에서 에이전트를 모니터링합니다."
 msgid "Monitor workspaces and manage tasks on the go. Continue conversations from anywhere."
 msgstr "이동 중에도 워크스페이스를 확인하고 작업을 관리하세요. 어디서든 대화를 이어갈 수 있습니다."
 
-msgid "Monitor, steer, and unblock your agents from your phone."
-msgstr "휴대폰에서 에이전트를 지켜보고, 방향을 잡고, 막힌 곳을 풀어 주세요."
+msgid "Monitor, steer, and unblock your agents from your iPhone or iPad."
+msgstr "iPhone이나 iPad에서 에이전트를 모니터링하고, 방향을 잡아 주고, 막힌 부분을 풀어 주세요."
 
 msgid "Monitoring"
 msgstr "모니터링"
@@ -12558,9 +12534,6 @@ msgstr "고정"
 msgid "Pin feedback to a page and let the agent make the change."
 msgstr "페이지에 피드백을 남기면 에이전트가 변경합니다."
 
-msgid "Pin workspaces above your projects, then ⌘-click a batch to move, group, or delete them all at once."
-msgstr "워크스페이스를 프로젝트 위에 고정하고, ⌘ 클릭으로 여러 개를 골라 한 번에 옮기거나, 묶거나, 삭제하세요."
-
 msgid "Pink"
 msgstr "분홍"
 
@@ -12779,9 +12752,6 @@ msgstr "닫으려면 <0>Esc</0>를 누르세요"
 
 msgid "Press ⌘⇧B or open a port Superset detected. Your dev server loads in a pane beside your terminals."
 msgstr "⌘⇧B를 누르거나 Superset이 감지한 포트를 여세요. 개발 서버가 터미널 옆 패널에 로드됩니다."
-
-msgid "Press ⌘I over any terminal and compose in a real editor, with multiline prompts and @file mentions."
-msgstr "아무 터미널에서나 ⌘I를 눌러 실제 에디터에서 작성하세요. 여러 줄 프롬프트와 @파일 언급을 지원합니다."
 
 msgid "Press a key…"
 msgstr "키를 누르세요…"
@@ -13499,9 +13469,6 @@ msgstr "다시 생성"
 
 msgid "Region"
 msgstr "리전"
-
-msgid "Register any CLI agent alongside the built-ins, each with its own name, icon, and launch command."
-msgstr "기본 제공 에이전트 옆에 어떤 CLI 에이전트든 이름, 아이콘, 실행 명령과 함께 등록하세요."
 
 msgid "Registers lifecycle hooks in this agent's global config so Superset can show status and send notifications. Turning this off removes Superset's entries everywhere — status and notifications stop for this agent, including inside Superset."
 msgstr "이 에이전트의 전역 구성에 라이프사이클 훅을 등록해 Superset이 상태를 표시하고 알림을 보낼 수 있게 합니다. 이 기능을 끄면 모든 곳에서 Superset의 항목이 제거되며, Superset 안에서도 이 에이전트의 상태와 알림이 중단됩니다."
@@ -14255,9 +14222,6 @@ msgstr "리치 입력"
 msgid "Rich input ({hotkeyText})"
 msgstr "리치 입력 ({hotkeyText})"
 
-msgid "Rich input for the terminal"
-msgstr "터미널용 리치 입력"
-
 msgid "right pane"
 msgstr "오른쪽 패널"
 
@@ -14333,6 +14297,9 @@ msgstr "다시 실행"
 
 msgid "Run agents side by side"
 msgstr "에이전트를 나란히 실행"
+
+msgid "Run an iOS simulator in a workspace pane so you and your agents can test mobile apps."
+msgstr "워크스페이스 패널에서 iOS 시뮬레이터를 실행해 나와 에이전트가 모바일 앱을 테스트할 수 있습니다."
 
 msgid "Run any agent you set up in Superset, such as Claude or Codex."
 msgstr "Superset에 설정한 어떤 에이전트든 실행하세요. 예를 들어 Claude나 Codex입니다."
@@ -15624,6 +15591,9 @@ msgstr "시뮬레이터"
 msgid "Since 2025"
 msgstr "2025년부터"
 
+msgid "Single sign-on for organizations, self-serve configurable."
+msgstr "조직을 위한 싱글 사인온, 직접 설정할 수 있습니다."
+
 msgid "Single tab + panes"
 msgstr "단일 탭 + 패널"
 
@@ -15917,6 +15887,9 @@ msgstr "SS"
 msgid "SSH destination"
 msgstr "SSH 대상"
 
+msgid "SSO (SAML / OIDC)"
+msgstr "SSO (SAML / OIDC)"
+
 msgid "SSO/SAML"
 msgstr "SSO/SAML"
 
@@ -16005,9 +15978,6 @@ msgstr "새 채팅 시작"
 msgid "Start a session"
 msgstr "세션 시작"
 
-msgid "Start a workspace straight from a Linear ticket. The agent picks it up and reports back with a PR."
-msgstr "Linear 티켓에서 바로 워크스페이스를 시작하세요. 에이전트가 이어받아 PR로 결과를 알려 줍니다."
-
 msgid "Start agents, follow them live, and review the diff from your iPhone or iPad. Your code stays on your machines."
 msgstr "iPhone이나 iPad에서 에이전트를 시작하고, 실시간으로 따라가고, diff를 리뷰하세요. 코드는 내 머신에 그대로 남습니다."
 
@@ -16052,6 +16022,9 @@ msgstr "할 일에서 시작하세요."
 
 msgid "Start work from anywhere"
 msgstr "어디서든 작업 시작"
+
+msgid "Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one."
+msgstr "작업 보기에서 Linear 또는 GitHub 이슈로 바로 워크스페이스를 시작하면, 각 워크스페이스에서 에이전트가 이미 작업하고 있습니다."
 
 msgid "Started"
 msgstr "시작"
@@ -17990,8 +17963,8 @@ msgstr "Tufte"
 msgid "Tunnel established"
 msgstr "터널 연결됨"
 
-msgid "Turn chores into scheduled agents: issue triage, changelog drafts, dependency bumps. They run on their own and open PRs for you to review."
-msgstr "반복 업무를 예약된 에이전트로 바꾸세요. 이슈 분류, 변경 로그 초안, 의존성 업데이트를 알아서 실행하고 리뷰할 PR을 열어 줍니다."
+msgid "Turn chores into agents that run on a schedule or when an event comes in: issue triage, changelog drafts, dependency bumps. They run on their own and open PRs for you to review."
+msgstr "반복 작업을 일정에 따라 또는 이벤트가 발생할 때 실행되는 에이전트로 바꾸세요. 이슈 분류, 변경 로그 초안, 의존성 업데이트 등. 에이전트가 알아서 실행하고 검토할 PR을 엽니다."
 
 msgid "Turn failed"
 msgstr "턴 실패"
@@ -19149,9 +19122,6 @@ msgstr "워크스페이스 경로를 사용할 수 없습니다"
 msgid "Workspace path is not available yet"
 msgstr "작업 공간 경로를 아직 사용할 수 없습니다"
 
-msgid "Workspace pinning & bulk actions"
-msgstr "워크스페이스 고정 및 일괄 작업"
-
 msgid "Workspace restored"
 msgstr "워크스페이스를 복원했습니다"
 
@@ -19233,8 +19203,8 @@ msgstr "댓글을 작성하세요…"
 msgid "Write a note and pick an agent. Your note arrives with the element's code and a cropped screenshot."
 msgstr "메모를 쓰고 에이전트를 고르세요. 메모는 요소의 코드와 잘라낸 스크린샷과 함께 전달됩니다."
 
-msgid "Write a prompt and pick a schedule. Each run opens a workspace you can review and continue."
-msgstr "프롬프트를 쓰고 일정을 고르세요. 실행할 때마다 워크스페이스가 열리며, 검토하고 이어서 작업할 수 있습니다."
+msgid "Write a prompt and pick a schedule or an event, like a pull request, a Slack message, a Linear issue, a Sentry issue, or a webhook. Each run opens a workspace you can review and continue."
+msgstr "프롬프트를 작성하고 일정이나 이벤트를 고르세요. 이벤트로는 풀 리퀘스트, Slack 메시지, Linear 이슈, Sentry 이슈, 웹훅 등이 있습니다. 실행할 때마다 검토하고 이어서 작업할 수 있는 워크스페이스가 열립니다."
 
 msgid "Write a reply"
 msgstr "답글 작성"
@@ -19438,8 +19408,8 @@ msgstr "에이전트가 디자인과 보고서를 게시하면 팀이 검토합�
 msgid "Your agent publishes designs and reports. Your team comments, and it gets to work."
 msgstr "에이전트가 디자인과 보고서를 게시합니다. 팀이 댓글을 달면 에이전트가 작업을 시작합니다."
 
-msgid "Your agents do the recurring work on a schedule you set."
-msgstr "에이전트가 설정한 일정에 따라 반복 작업을 처리합니다."
+msgid "Your agents do the work on a schedule or when an event comes in."
+msgstr "에이전트가 일정에 따라 또는 이벤트가 발생할 때 작업합니다."
 
 msgid "Your Agents, Your Accounts"
 msgstr "당신의 에이전트, 당신의 계정"

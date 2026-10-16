@@ -1453,9 +1453,6 @@ msgstr "Já existe um arquivo chamado '{firstName}' em {where}. Quer substituí-
 msgid "A focused burn-down of crashes, hangs, and reconnect failures across the app."
 msgstr "Um mutirão focado em travamentos, congelamentos e falhas de reconexão em todo o app."
 
-msgid "A full restyle: denser rows, port and agent chips under each workspace, one-click stop for everything."
-msgstr "Um restyle completo: linhas mais densas, chips de porta e de agente sob cada área de trabalho e parada de tudo com um clique."
-
 msgid "A gateway is signed in with an API key."
 msgstr "Um gateway entra com uma chave de API."
 
@@ -1935,17 +1932,14 @@ msgstr "Prévias controladas pelo agente"
 msgid "Agents"
 msgstr "Agentes"
 
-msgid "Agents can watch CI checks, tail dev servers, and keep long-running processes alive while they work."
-msgstr "Os agentes podem acompanhar verificações de CI, seguir servidores de desenvolvimento e manter processos longos vivos enquanto trabalham."
-
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Os agentes concluem tickets rotineiros sem intervenção no meio da tarefa."
 
 msgid "Agents load their own preview, drive the UI, and attach screenshot proof before marking work ready for review."
 msgstr "Os agentes carregam a própria prévia, usam a interface e anexam capturas de tela como prova antes de marcar o trabalho como pronto para revisão."
 
-msgid "Agents on a schedule"
-msgstr "Agentes agendados"
+msgid "Agents on a schedule or trigger"
+msgstr "Agentes por agenda ou gatilho"
 
 msgid "Agents on your phone"
 msgstr "Agentes no seu celular"
@@ -2872,9 +2866,6 @@ msgstr "Fundo"
 msgid "Background processes"
 msgstr "Processos em segundo plano"
 
-msgid "Background processes in chat"
-msgstr "Processos em segundo plano no chat"
-
 msgid "Background task"
 msgstr "Tarefa em segundo plano"
 
@@ -3671,9 +3662,6 @@ msgstr "O Claude está rodando agora na área de trabalho component-showcase."
 
 msgid "Clean up stale TODOs…"
 msgstr "Limpe os TODOs antigos…"
-
-msgid "Cleaner, denser sidebar"
-msgstr "Barra lateral mais limpa e densa"
 
 msgid "Clear"
 msgstr "Transparente"
@@ -5603,9 +5591,6 @@ msgstr "Preço sob consulta"
 
 msgid "Custom provider"
 msgstr "Provedor personalizado"
-
-msgid "Custom terminal agents"
-msgstr "Agentes de terminal personalizados"
 
 msgid "Custom themes"
 msgstr "Temas personalizados"
@@ -8122,12 +8107,6 @@ msgstr "Verde/vermelho (deuteranopia)"
 msgid "Grepped"
 msgstr "Grep feito"
 
-msgid "Grok & Kimi Code agents"
-msgstr "Agentes Grok e Kimi Code"
-
-msgid "Grok and Kimi Code join the lineup alongside Claude Code, Codex, and friends."
-msgstr "Grok e Kimi Code entram no time ao lado de Claude Code, Codex e companhia."
-
 msgid "Group actions"
 msgstr "Ações do grupo"
 
@@ -8970,6 +8949,9 @@ msgstr "App para iOS"
 msgid "iOS Simulator"
 msgstr "Simulador do iOS"
 
+msgid "iOS simulator pane"
+msgstr "Painel do simulador de iOS"
+
 msgid "IP restrictions"
 msgstr "Restrições de IP"
 
@@ -9447,9 +9429,6 @@ msgstr "Claro"
 msgid "Light theme"
 msgstr "Tema claro"
 
-msgid "Lighter memory, smoother under load"
-msgstr "Menos memória, mais leve sob carga"
-
 msgid "Like building with Superset?"
 msgstr "Gosta de construir com o Superset?"
 
@@ -9798,9 +9777,6 @@ msgstr "Baixa"
 
 msgid "Low severity"
 msgstr "Gravidade baixa"
-
-msgid "Lower memory with many terminals open, smoother git in big repos, and less background CPU."
-msgstr "Menos memória com muitos terminais abertos, git mais fluido em repositórios grandes e menos CPU em segundo plano."
 
 msgid "Machine resources"
 msgstr "Recursos da máquina"
@@ -10218,8 +10194,8 @@ msgstr "Acompanhe os agentes pelo celular."
 msgid "Monitor workspaces and manage tasks on the go. Continue conversations from anywhere."
 msgstr "Acompanhe áreas de trabalho e gerencie tarefas em qualquer lugar. Continue as conversas de onde estiver."
 
-msgid "Monitor, steer, and unblock your agents from your phone."
-msgstr "Acompanhe, conduza e destrave seus agentes pelo celular."
+msgid "Monitor, steer, and unblock your agents from your iPhone or iPad."
+msgstr "Acompanhe, oriente e desbloqueie seus agentes pelo iPhone ou iPad."
 
 msgid "Monitoring"
 msgstr "Monitoramento"
@@ -12558,9 +12534,6 @@ msgstr "Fixar"
 msgid "Pin feedback to a page and let the agent make the change."
 msgstr "Fixe feedback em uma página e deixe o agente fazer a mudança."
 
-msgid "Pin workspaces above your projects, then ⌘-click a batch to move, group, or delete them all at once."
-msgstr "Fixe áreas de trabalho acima dos seus projetos e depois ⌘-clique em um lote para mover, agrupar ou excluir tudo de uma vez."
-
 msgid "Pink"
 msgstr "Rosa"
 
@@ -12779,9 +12752,6 @@ msgstr "Pressione <0>Esc</0> para fechar"
 
 msgid "Press ⌘⇧B or open a port Superset detected. Your dev server loads in a pane beside your terminals."
 msgstr "Pressione ⌘⇧B ou abra uma porta detectada pelo Superset. Seu servidor de desenvolvimento carrega em um painel ao lado dos seus terminais."
-
-msgid "Press ⌘I over any terminal and compose in a real editor, with multiline prompts and @file mentions."
-msgstr "Aperte ⌘I sobre qualquer terminal e escreva em um editor de verdade, com prompts multilinha e menções @arquivo."
 
 msgid "Press a key…"
 msgstr "Pressione uma tecla…"
@@ -13499,9 +13469,6 @@ msgstr "Gerar novamente"
 
 msgid "Region"
 msgstr "Região"
-
-msgid "Register any CLI agent alongside the built-ins, each with its own name, icon, and launch command."
-msgstr "Registre qualquer agente de CLI ao lado dos nativos, cada um com nome, ícone e comando de execução próprios."
 
 msgid "Registers lifecycle hooks in this agent's global config so Superset can show status and send notifications. Turning this off removes Superset's entries everywhere — status and notifications stop for this agent, including inside Superset."
 msgstr "Registra hooks de ciclo de vida na configuração global deste agente para o Superset mostrar o status e enviar notificações. Desligar isso remove as entradas do Superset em todo lugar — status e notificações param para este agente, inclusive dentro do Superset."
@@ -14255,9 +14222,6 @@ msgstr "Entrada avançada"
 msgid "Rich input ({hotkeyText})"
 msgstr "Entrada avançada ({hotkeyText})"
 
-msgid "Rich input for the terminal"
-msgstr "Entrada avançada para o terminal"
-
 msgid "right pane"
 msgstr "painel direito"
 
@@ -14333,6 +14297,9 @@ msgstr "Executar novamente"
 
 msgid "Run agents side by side"
 msgstr "Execute agentes lado a lado"
+
+msgid "Run an iOS simulator in a workspace pane so you and your agents can test mobile apps."
+msgstr "Rode um simulador de iOS em um painel da área de trabalho para que você e seus agentes possam testar apps móveis."
 
 msgid "Run any agent you set up in Superset, such as Claude or Codex."
 msgstr "Rode qualquer agente que você configurou no Superset, como Claude ou Codex."
@@ -15624,6 +15591,9 @@ msgstr "Simulador"
 msgid "Since 2025"
 msgstr "Desde 2025"
 
+msgid "Single sign-on for organizations, self-serve configurable."
+msgstr "Login único para organizações, configurável por conta própria."
+
 msgid "Single tab + panes"
 msgstr "Aba única + painéis"
 
@@ -15917,6 +15887,9 @@ msgstr "SS"
 msgid "SSH destination"
 msgstr "Destino SSH"
 
+msgid "SSO (SAML / OIDC)"
+msgstr "SSO (SAML / OIDC)"
+
 msgid "SSO/SAML"
 msgstr "SSO/SAML"
 
@@ -16005,9 +15978,6 @@ msgstr "Iniciar um novo chat"
 msgid "Start a session"
 msgstr "Iniciar uma sessão"
 
-msgid "Start a workspace straight from a Linear ticket. The agent picks it up and reports back with a PR."
-msgstr "Crie uma área de trabalho direto de um ticket do Linear. O agente assume e volta com um PR."
-
 msgid "Start agents, follow them live, and review the diff from your iPhone or iPad. Your code stays on your machines."
 msgstr "Inicie agentes, acompanhe-os ao vivo e revise o diff no seu iPhone ou iPad. Seu código fica nas suas máquinas."
 
@@ -16052,6 +16022,9 @@ msgstr "Comece pelo trabalho."
 
 msgid "Start work from anywhere"
 msgstr "Comece a trabalhar de qualquer lugar"
+
+msgid "Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one."
+msgstr "Inicie áreas de trabalho direto de issues do Linear ou do GitHub na visualização Tarefas, com um agente já trabalhando em cada uma."
 
 msgid "Started"
 msgstr "Iniciada"
@@ -17990,8 +17963,8 @@ msgstr "Tufte"
 msgid "Tunnel established"
 msgstr "Túnel estabelecido"
 
-msgid "Turn chores into scheduled agents: issue triage, changelog drafts, dependency bumps. They run on their own and open PRs for you to review."
-msgstr "Transforme tarefas repetitivas em agentes agendados: triagem de issues, rascunhos de changelog, atualização de dependências. Eles rodam sozinhos e abrem PRs para você revisar."
+msgid "Turn chores into agents that run on a schedule or when an event comes in: issue triage, changelog drafts, dependency bumps. They run on their own and open PRs for you to review."
+msgstr "Transforme tarefas rotineiras em agentes que rodam por agenda ou quando chega um evento: triagem de issues, rascunhos de changelog, atualizações de dependências. Eles trabalham sozinhos e abrem PRs para você revisar."
 
 msgid "Turn failed"
 msgstr "O turno falhou"
@@ -19149,9 +19122,6 @@ msgstr "O caminho da área de trabalho não está disponível"
 msgid "Workspace path is not available yet"
 msgstr "O caminho do espaço de trabalho ainda não está disponível"
 
-msgid "Workspace pinning & bulk actions"
-msgstr "Fixação de áreas de trabalho e ações em lote"
-
 msgid "Workspace restored"
 msgstr "Área de trabalho restaurada"
 
@@ -19233,8 +19203,8 @@ msgstr "Escreva um comentário…"
 msgid "Write a note and pick an agent. Your note arrives with the element's code and a cropped screenshot."
 msgstr "Escreva uma nota e escolha um agente. Sua nota chega com o código do elemento e uma captura de tela recortada."
 
-msgid "Write a prompt and pick a schedule. Each run opens a workspace you can review and continue."
-msgstr "Escreva um prompt e escolha uma agenda. Cada execução abre uma área de trabalho que você pode revisar e continuar."
+msgid "Write a prompt and pick a schedule or an event, like a pull request, a Slack message, a Linear issue, a Sentry issue, or a webhook. Each run opens a workspace you can review and continue."
+msgstr "Escreva um prompt e escolha uma agenda ou um evento, como um pull request, uma mensagem no Slack, uma issue do Linear, uma issue do Sentry ou um webhook. Cada execução abre uma área de trabalho que você pode revisar e continuar."
 
 msgid "Write a reply"
 msgstr "Escreva uma resposta"
@@ -19438,8 +19408,8 @@ msgstr "Seu agente publica designs e relatórios para sua equipe revisar. Quando
 msgid "Your agent publishes designs and reports. Your team comments, and it gets to work."
 msgstr "Seu agente publica designs e relatórios. Sua equipe comenta e o agente começa a trabalhar."
 
-msgid "Your agents do the recurring work on a schedule you set."
-msgstr "Seus agentes fazem o trabalho recorrente na agenda que você definir."
+msgid "Your agents do the work on a schedule or when an event comes in."
+msgstr "Seus agentes fazem o trabalho por agenda ou quando chega um evento."
 
 msgid "Your Agents, Your Accounts"
 msgstr "Seus agentes, suas contas"

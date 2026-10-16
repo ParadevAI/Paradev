@@ -1453,9 +1453,6 @@ msgstr "{where}中已存在名为「{firstName}」的文件。是否要替换它
 msgid "A focused burn-down of crashes, hangs, and reconnect failures across the app."
 msgstr "集中清理全应用的崩溃、卡死和重连失败。"
 
-msgid "A full restyle: denser rows, port and agent chips under each workspace, one-click stop for everything."
-msgstr "整体重做样式：更紧凑的行、每个工作区下方的端口和智能体标签、一键全部停止。"
-
 msgid "A gateway is signed in with an API key."
 msgstr "网关使用 API 密钥登录。"
 
@@ -1935,17 +1932,14 @@ msgstr "由智能体驱动的预览"
 msgid "Agents"
 msgstr "智能体"
 
-msgid "Agents can watch CI checks, tail dev servers, and keep long-running processes alive while they work."
-msgstr "智能体可以在工作的同时盯着CI检查、跟踪开发服务器日志，并让长时间运行的进程保持存活。"
-
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "智能体无需中途干预即可完成常规工单。"
 
 msgid "Agents load their own preview, drive the UI, and attach screenshot proof before marking work ready for review."
 msgstr "智能体自己加载预览、操作界面，并在标记为待审查之前附上截图证据。"
 
-msgid "Agents on a schedule"
-msgstr "按计划运行的智能体"
+msgid "Agents on a schedule or trigger"
+msgstr "按计划或触发器运行的智能体"
 
 msgid "Agents on your phone"
 msgstr "手机上的智能体"
@@ -2872,9 +2866,6 @@ msgstr "背景"
 msgid "Background processes"
 msgstr "后台进程"
 
-msgid "Background processes in chat"
-msgstr "聊天中的后台进程"
-
 msgid "Background task"
 msgstr "后台任务"
 
@@ -3671,9 +3662,6 @@ msgstr "Claude已在工作区component-showcase中运行。"
 
 msgid "Clean up stale TODOs…"
 msgstr "清理过期的TODO…"
-
-msgid "Cleaner, denser sidebar"
-msgstr "更清爽紧凑的侧边栏"
 
 msgid "Clear"
 msgstr "透明"
@@ -5603,9 +5591,6 @@ msgstr "定制价格"
 
 msgid "Custom provider"
 msgstr "自定义提供商"
-
-msgid "Custom terminal agents"
-msgstr "自定义终端智能体"
 
 msgid "Custom themes"
 msgstr "自定义主题"
@@ -8122,12 +8107,6 @@ msgstr "绿/红（绿色盲）"
 msgid "Grepped"
 msgstr "已搜索"
 
-msgid "Grok & Kimi Code agents"
-msgstr "Grok与Kimi Code智能体"
-
-msgid "Grok and Kimi Code join the lineup alongside Claude Code, Codex, and friends."
-msgstr "Grok和Kimi Code加入阵容，与Claude Code、Codex等并列。"
-
 msgid "Group actions"
 msgstr "分组操作"
 
@@ -8970,6 +8949,9 @@ msgstr "iOS应用"
 msgid "iOS Simulator"
 msgstr "iOS 模拟器"
 
+msgid "iOS simulator pane"
+msgstr "iOS 模拟器窗格"
+
 msgid "IP restrictions"
 msgstr "IP限制"
 
@@ -9447,9 +9429,6 @@ msgstr "浅色"
 msgid "Light theme"
 msgstr "浅色主题"
 
-msgid "Lighter memory, smoother under load"
-msgstr "更省内存，高负载更顺"
-
 msgid "Like building with Superset?"
 msgstr "喜欢用Superset开发吗？"
 
@@ -9798,9 +9777,6 @@ msgstr "低"
 
 msgid "Low severity"
 msgstr "低严重性"
-
-msgid "Lower memory with many terminals open, smoother git in big repos, and less background CPU."
-msgstr "开很多终端时占用更低的内存，大仓库里的git更顺，后台CPU更少。"
 
 msgid "Machine resources"
 msgstr "机器资源"
@@ -10218,8 +10194,8 @@ msgstr "在手机上监控智能体。"
 msgid "Monitor workspaces and manage tasks on the go. Continue conversations from anywhere."
 msgstr "随时随地监控工作区、管理任务，在任何地方继续对话。"
 
-msgid "Monitor, steer, and unblock your agents from your phone."
-msgstr "在手机上监控、引导并为智能体解阻。"
+msgid "Monitor, steer, and unblock your agents from your iPhone or iPad."
+msgstr "在 iPhone 或 iPad 上监控、引导智能体，并为它们解除阻塞。"
 
 msgid "Monitoring"
 msgstr "监控"
@@ -12558,9 +12534,6 @@ msgstr "置顶"
 msgid "Pin feedback to a page and let the agent make the change."
 msgstr "在页面上留下反馈，让智能体完成修改。"
 
-msgid "Pin workspaces above your projects, then ⌘-click a batch to move, group, or delete them all at once."
-msgstr "把工作区固定在项目上方，再⌘点击批量选中，一次性移动、分组或删除。"
-
 msgid "Pink"
 msgstr "粉色"
 
@@ -12779,9 +12752,6 @@ msgstr "按<0>Esc</0>关闭"
 
 msgid "Press ⌘⇧B or open a port Superset detected. Your dev server loads in a pane beside your terminals."
 msgstr "按 ⌘⇧B，或打开 Superset 检测到的端口。开发服务器会在终端旁的窗格中加载。"
-
-msgid "Press ⌘I over any terminal and compose in a real editor, with multiline prompts and @file mentions."
-msgstr "在任意终端上按⌘I，在真正的编辑器里撰写，支持多行提示词和@文件引用。"
 
 msgid "Press a key…"
 msgstr "请按一个键…"
@@ -13499,9 +13469,6 @@ msgstr "重新生成"
 
 msgid "Region"
 msgstr "区域"
-
-msgid "Register any CLI agent alongside the built-ins, each with its own name, icon, and launch command."
-msgstr "在内置智能体之外注册任意CLI智能体，各自拥有名称、图标和启动命令。"
 
 msgid "Registers lifecycle hooks in this agent's global config so Superset can show status and send notifications. Turning this off removes Superset's entries everywhere — status and notifications stop for this agent, including inside Superset."
 msgstr "在该智能体的全局配置中注册生命周期钩子，以便Superset显示状态并发送通知。关闭后会在所有位置移除Superset的条目，该智能体的状态和通知都会停止，包括在Superset内部。"
@@ -14255,9 +14222,6 @@ msgstr "富输入"
 msgid "Rich input ({hotkeyText})"
 msgstr "富输入（{hotkeyText}）"
 
-msgid "Rich input for the terminal"
-msgstr "终端富文本输入"
-
 msgid "right pane"
 msgstr "右侧面板"
 
@@ -14333,6 +14297,9 @@ msgstr "重新运行"
 
 msgid "Run agents side by side"
 msgstr "并排运行智能体"
+
+msgid "Run an iOS simulator in a workspace pane so you and your agents can test mobile apps."
+msgstr "在工作区窗格中运行 iOS 模拟器，让你和你的智能体测试移动应用。"
 
 msgid "Run any agent you set up in Superset, such as Claude or Codex."
 msgstr "运行你在 Superset 中设置的任何智能体，比如 Claude 或 Codex。"
@@ -15624,6 +15591,9 @@ msgstr "模拟器"
 msgid "Since 2025"
 msgstr "自2025年起"
 
+msgid "Single sign-on for organizations, self-serve configurable."
+msgstr "面向组织的单点登录，可自助配置。"
+
 msgid "Single tab + panes"
 msgstr "单标签页+窗格"
 
@@ -15917,6 +15887,9 @@ msgstr "SS"
 msgid "SSH destination"
 msgstr "SSH 目标"
 
+msgid "SSO (SAML / OIDC)"
+msgstr "SSO（SAML / OIDC）"
+
 msgid "SSO/SAML"
 msgstr "SSO/SAML"
 
@@ -16005,9 +15978,6 @@ msgstr "开始新的聊天"
 msgid "Start a session"
 msgstr "开始一个会话"
 
-msgid "Start a workspace straight from a Linear ticket. The agent picks it up and reports back with a PR."
-msgstr "直接从Linear工单启动工作区。智能体接手，并以一个PR回报结果。"
-
 msgid "Start agents, follow them live, and review the diff from your iPhone or iPad. Your code stays on your machines."
 msgstr "在 iPhone 或 iPad 上启动智能体、实时跟进并审查差异。你的代码始终留在你的机器上。"
 
@@ -16052,6 +16022,9 @@ msgstr "从工作本身开始。"
 
 msgid "Start work from anywhere"
 msgstr "随时随地开始工作"
+
+msgid "Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one."
+msgstr "在任务视图中直接从 Linear 或 GitHub 议题启动工作区，每个工作区都已有智能体在处理。"
 
 msgid "Started"
 msgstr "开始时间"
@@ -17990,8 +17963,8 @@ msgstr "Tufte"
 msgid "Tunnel established"
 msgstr "隧道已建立"
 
-msgid "Turn chores into scheduled agents: issue triage, changelog drafts, dependency bumps. They run on their own and open PRs for you to review."
-msgstr "把杂活变成定时智能体：议题分类、更新日志草稿、依赖升级。它们自己运行，并开好PR等你审查。"
+msgid "Turn chores into agents that run on a schedule or when an event comes in: issue triage, changelog drafts, dependency bumps. They run on their own and open PRs for you to review."
+msgstr "把日常杂务交给按计划或在事件到来时运行的智能体：议题分类、更新日志草稿、依赖升级。它们会自行运行，并创建 PR 供你审查。"
 
 msgid "Turn failed"
 msgstr "本轮失败"
@@ -19149,9 +19122,6 @@ msgstr "工作区路径不可用"
 msgid "Workspace path is not available yet"
 msgstr "工作区路径尚不可用"
 
-msgid "Workspace pinning & bulk actions"
-msgstr "工作区固定与批量操作"
-
 msgid "Workspace restored"
 msgstr "工作区已恢复"
 
@@ -19233,8 +19203,8 @@ msgstr "写下评论…"
 msgid "Write a note and pick an agent. Your note arrives with the element's code and a cropped screenshot."
 msgstr "写一条备注并选择智能体。备注会连同该元素的代码和裁剪后的截图一起送达。"
 
-msgid "Write a prompt and pick a schedule. Each run opens a workspace you can review and continue."
-msgstr "写好提示词并选择计划。每次运行都会打开一个工作区，你可以审阅并继续。"
+msgid "Write a prompt and pick a schedule or an event, like a pull request, a Slack message, a Linear issue, a Sentry issue, or a webhook. Each run opens a workspace you can review and continue."
+msgstr "编写提示词，然后选择一个计划或事件，例如拉取请求、Slack 消息、Linear 议题、Sentry 议题或 Webhook。每次运行都会打开一个工作区，你可以审查并继续工作。"
 
 msgid "Write a reply"
 msgstr "写回复"
@@ -19438,8 +19408,8 @@ msgstr "你的智能体发布设计和报告，供团队审阅。有人评论后
 msgid "Your agent publishes designs and reports. Your team comments, and it gets to work."
 msgstr "你的智能体发布设计和报告。团队发表评论，智能体随即开始工作。"
 
-msgid "Your agents do the recurring work on a schedule you set."
-msgstr "智能体按你设定的计划完成重复性工作。"
+msgid "Your agents do the work on a schedule or when an event comes in."
+msgstr "你的智能体会按计划或在事件到来时完成工作。"
 
 msgid "Your Agents, Your Accounts"
 msgstr "你的智能体，你的账号"

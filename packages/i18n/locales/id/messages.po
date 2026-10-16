@@ -1453,9 +1453,6 @@ msgstr "File bernama '{firstName}' sudah ada di {where}. Ingin menggantinya?"
 msgid "A focused burn-down of crashes, hangs, and reconnect failures across the app."
 msgstr "Pembersihan terfokus atas crash, hang, dan kegagalan sambung ulang di seluruh aplikasi."
 
-msgid "A full restyle: denser rows, port and agent chips under each workspace, one-click stop for everything."
-msgstr "Perombakan gaya menyeluruh: baris lebih padat, chip port dan agen di bawah tiap workspace, hentikan semuanya dengan satu klik."
-
 msgid "A gateway is signed in with an API key."
 msgstr "Gateway masuk menggunakan kunci API."
 
@@ -1935,17 +1932,14 @@ msgstr "Pratinjau yang digerakkan agen"
 msgid "Agents"
 msgstr "Agen"
 
-msgid "Agents can watch CI checks, tail dev servers, and keep long-running processes alive while they work."
-msgstr "Agen bisa memantau check CI, mengikuti log dev server, dan menjaga proses jangka panjang tetap hidup sambil bekerja."
-
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Agen menyelesaikan tiket rutin tanpa intervensi di tengah tugas."
 
 msgid "Agents load their own preview, drive the UI, and attach screenshot proof before marking work ready for review."
 msgstr "Agen memuat pratinjaunya sendiri, mengendalikan UI, dan melampirkan bukti tangkapan layar sebelum menandai pekerjaan siap direview."
 
-msgid "Agents on a schedule"
-msgstr "Agen sesuai jadwal"
+msgid "Agents on a schedule or trigger"
+msgstr "Agen terjadwal atau dengan pemicu"
 
 msgid "Agents on your phone"
 msgstr "Agen di ponsel Anda"
@@ -2872,9 +2866,6 @@ msgstr "Latar belakang"
 msgid "Background processes"
 msgstr "Proses latar belakang"
 
-msgid "Background processes in chat"
-msgstr "Proses latar belakang di chat"
-
 msgid "Background task"
 msgstr "Tugas latar belakang"
 
@@ -3671,9 +3662,6 @@ msgstr "Claude kini berjalan di workspace component-showcase."
 
 msgid "Clean up stale TODOs…"
 msgstr "Bereskan TODO yang basi…"
-
-msgid "Cleaner, denser sidebar"
-msgstr "Sidebar lebih bersih dan padat"
 
 msgid "Clear"
 msgstr "Bening"
@@ -5603,9 +5591,6 @@ msgstr "Harga khusus"
 
 msgid "Custom provider"
 msgstr "Penyedia kustom"
-
-msgid "Custom terminal agents"
-msgstr "Agen terminal kustom"
 
 msgid "Custom themes"
 msgstr "Tema kustom"
@@ -8122,12 +8107,6 @@ msgstr "Hijau/Merah (Deuteranopia)"
 msgid "Grepped"
 msgstr "Di-grep"
 
-msgid "Grok & Kimi Code agents"
-msgstr "Agen Grok & Kimi Code"
-
-msgid "Grok and Kimi Code join the lineup alongside Claude Code, Codex, and friends."
-msgstr "Grok dan Kimi Code bergabung bersama Claude Code, Codex, dan kawan-kawan."
-
 msgid "Group actions"
 msgstr "Aksi grup"
 
@@ -8970,6 +8949,9 @@ msgstr "Aplikasi iOS"
 msgid "iOS Simulator"
 msgstr "Simulator iOS"
 
+msgid "iOS simulator pane"
+msgstr "Panel simulator iOS"
+
 msgid "IP restrictions"
 msgstr "Pembatasan IP"
 
@@ -9447,9 +9429,6 @@ msgstr "Terang"
 msgid "Light theme"
 msgstr "Tema terang"
 
-msgid "Lighter memory, smoother under load"
-msgstr "Memori lebih ringan, lebih mulus saat beban tinggi"
-
 msgid "Like building with Superset?"
 msgstr "Suka membangun dengan Superset?"
 
@@ -9798,9 +9777,6 @@ msgstr "Rendah"
 
 msgid "Low severity"
 msgstr "Tingkat keparahan rendah"
-
-msgid "Lower memory with many terminals open, smoother git in big repos, and less background CPU."
-msgstr "Memori lebih rendah saat banyak terminal terbuka, git lebih mulus di repo besar, dan CPU latar belakang lebih hemat."
 
 msgid "Machine resources"
 msgstr "Sumber daya mesin"
@@ -10218,8 +10194,8 @@ msgstr "Pantau agen dari ponsel Anda."
 msgid "Monitor workspaces and manage tasks on the go. Continue conversations from anywhere."
 msgstr "Pantau workspace dan kelola tugas saat bepergian. Lanjutkan percakapan dari mana saja."
 
-msgid "Monitor, steer, and unblock your agents from your phone."
-msgstr "Pantau, arahkan, dan bebaskan agen Anda dari hambatan lewat ponsel."
+msgid "Monitor, steer, and unblock your agents from your iPhone or iPad."
+msgstr "Pantau, arahkan, dan bantu agen Anda yang tertahan dari iPhone atau iPad."
 
 msgid "Monitoring"
 msgstr "Pemantauan"
@@ -12558,9 +12534,6 @@ msgstr "Sematkan"
 msgid "Pin feedback to a page and let the agent make the change."
 msgstr "Sematkan masukan di halaman dan biarkan agen membuat perubahannya."
 
-msgid "Pin workspaces above your projects, then ⌘-click a batch to move, group, or delete them all at once."
-msgstr "Sematkan workspace di atas proyek Anda, lalu ⌘-klik sekumpulan untuk memindahkan, mengelompokkan, atau menghapus semuanya sekaligus."
-
 msgid "Pink"
 msgstr "Merah muda"
 
@@ -12779,9 +12752,6 @@ msgstr "Tekan <0>Esc</0> untuk menutup"
 
 msgid "Press ⌘⇧B or open a port Superset detected. Your dev server loads in a pane beside your terminals."
 msgstr "Tekan ⌘⇧B atau buka port yang terdeteksi Superset. Dev server Anda dimuat di panel di samping terminal."
-
-msgid "Press ⌘I over any terminal and compose in a real editor, with multiline prompts and @file mentions."
-msgstr "Tekan ⌘I di terminal mana pun dan tulis di editor sungguhan, dengan prompt multibaris dan mention @file."
 
 msgid "Press a key…"
 msgstr "Tekan sebuah tombol…"
@@ -13499,9 +13469,6 @@ msgstr "Buat ulang"
 
 msgid "Region"
 msgstr "Region"
-
-msgid "Register any CLI agent alongside the built-ins, each with its own name, icon, and launch command."
-msgstr "Daftarkan agen CLI apa pun bersama agen bawaan, masing-masing dengan nama, ikon, dan perintah peluncurannya sendiri."
 
 msgid "Registers lifecycle hooks in this agent's global config so Superset can show status and send notifications. Turning this off removes Superset's entries everywhere — status and notifications stop for this agent, including inside Superset."
 msgstr "Mendaftarkan hook lifecycle di konfigurasi global agen ini agar Superset bisa menampilkan status dan mengirim notifikasi. Mematikannya menghapus entri Superset di mana-mana — status dan notifikasi berhenti untuk agen ini, termasuk di dalam Superset."
@@ -14255,9 +14222,6 @@ msgstr "Input kaya"
 msgid "Rich input ({hotkeyText})"
 msgstr "Input kaya ({hotkeyText})"
 
-msgid "Rich input for the terminal"
-msgstr "Input kaya untuk terminal"
-
 msgid "right pane"
 msgstr "panel kanan"
 
@@ -14333,6 +14297,9 @@ msgstr "Jalankan lagi"
 
 msgid "Run agents side by side"
 msgstr "Jalankan agen berdampingan"
+
+msgid "Run an iOS simulator in a workspace pane so you and your agents can test mobile apps."
+msgstr "Jalankan simulator iOS di panel workspace agar Anda dan agen Anda bisa menguji aplikasi mobile."
 
 msgid "Run any agent you set up in Superset, such as Claude or Codex."
 msgstr "Jalankan agen apa pun yang Anda atur di Superset, misalnya Claude atau Codex."
@@ -15624,6 +15591,9 @@ msgstr "Simulator"
 msgid "Since 2025"
 msgstr "Sejak 2025"
 
+msgid "Single sign-on for organizations, self-serve configurable."
+msgstr "Single sign-on untuk organisasi, bisa dikonfigurasi sendiri."
+
 msgid "Single tab + panes"
 msgstr "Satu tab + panel"
 
@@ -15917,6 +15887,9 @@ msgstr "SS"
 msgid "SSH destination"
 msgstr "Tujuan SSH"
 
+msgid "SSO (SAML / OIDC)"
+msgstr "SSO (SAML / OIDC)"
+
 msgid "SSO/SAML"
 msgstr "SSO/SAML"
 
@@ -16005,9 +15978,6 @@ msgstr "Mulai chat baru"
 msgid "Start a session"
 msgstr "Mulai sesi"
 
-msgid "Start a workspace straight from a Linear ticket. The agent picks it up and reports back with a PR."
-msgstr "Mulai workspace langsung dari tiket Linear. Agen mengambilnya dan melapor kembali dengan sebuah PR."
-
 msgid "Start agents, follow them live, and review the diff from your iPhone or iPad. Your code stays on your machines."
 msgstr "Mulai agen, ikuti secara langsung, dan tinjau diff dari iPhone atau iPad Anda. Kode Anda tetap di mesin Anda."
 
@@ -16052,6 +16022,9 @@ msgstr "Mulai dari pekerjaannya."
 
 msgid "Start work from anywhere"
 msgstr "Mulai bekerja dari mana saja"
+
+msgid "Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one."
+msgstr "Mulai workspace langsung dari issue Linear atau GitHub di tampilan Tugas, dengan agen yang sudah mengerjakan masing-masing."
 
 msgid "Started"
 msgstr "Dimulai"
@@ -17990,8 +17963,8 @@ msgstr "Tufte"
 msgid "Tunnel established"
 msgstr "Tunnel tersambung"
 
-msgid "Turn chores into scheduled agents: issue triage, changelog drafts, dependency bumps. They run on their own and open PRs for you to review."
-msgstr "Ubah pekerjaan rutin jadi agen terjadwal: triase issue, draf changelog, pembaruan dependensi. Semuanya berjalan sendiri dan membuka PR untuk Anda review."
+msgid "Turn chores into agents that run on a schedule or when an event comes in: issue triage, changelog drafts, dependency bumps. They run on their own and open PRs for you to review."
+msgstr "Ubah pekerjaan rutin menjadi agen yang berjalan sesuai jadwal atau saat ada event: triase issue, draf changelog, pembaruan dependensi. Agen bekerja sendiri dan membuka PR untuk Anda tinjau."
 
 msgid "Turn failed"
 msgstr "Giliran gagal"
@@ -19149,9 +19122,6 @@ msgstr "Path workspace tidak tersedia"
 msgid "Workspace path is not available yet"
 msgstr "Jalur ruang kerja belum tersedia"
 
-msgid "Workspace pinning & bulk actions"
-msgstr "Penyematan workspace & aksi massal"
-
 msgid "Workspace restored"
 msgstr "Workspace dipulihkan"
 
@@ -19233,8 +19203,8 @@ msgstr "Tulis komentar…"
 msgid "Write a note and pick an agent. Your note arrives with the element's code and a cropped screenshot."
 msgstr "Tulis catatan dan pilih agen. Catatan Anda dikirim bersama kode elemen dan screenshot yang dipotong."
 
-msgid "Write a prompt and pick a schedule. Each run opens a workspace you can review and continue."
-msgstr "Tulis prompt dan pilih jadwal. Setiap run membuka workspace yang bisa Anda tinjau dan lanjutkan."
+msgid "Write a prompt and pick a schedule or an event, like a pull request, a Slack message, a Linear issue, a Sentry issue, or a webhook. Each run opens a workspace you can review and continue."
+msgstr "Tulis prompt dan pilih jadwal atau event, seperti pull request, pesan Slack, issue Linear, issue Sentry, atau webhook. Setiap run membuka workspace yang bisa Anda tinjau dan lanjutkan."
 
 msgid "Write a reply"
 msgstr "Tulis balasan"
@@ -19438,8 +19408,8 @@ msgstr "Agen Anda menerbitkan desain dan laporan untuk ditinjau tim Anda. Saat s
 msgid "Your agent publishes designs and reports. Your team comments, and it gets to work."
 msgstr "Agen Anda menerbitkan desain dan laporan. Tim Anda berkomentar, lalu agen mulai bekerja."
 
-msgid "Your agents do the recurring work on a schedule you set."
-msgstr "Agen Anda mengerjakan tugas berulang sesuai jadwal yang Anda atur."
+msgid "Your agents do the work on a schedule or when an event comes in."
+msgstr "Agen Anda bekerja sesuai jadwal atau saat ada event."
 
 msgid "Your Agents, Your Accounts"
 msgstr "Agen Anda, Akun Anda"

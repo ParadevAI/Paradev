@@ -1453,9 +1453,6 @@ msgstr "Đã có tệp tên '{firstName}' trong {where}. Bạn có muốn thay t
 msgid "A focused burn-down of crashes, hangs, and reconnect failures across the app."
 msgstr "Đợt tập trung xử lý crash, treo và lỗi kết nối lại trên toàn ứng dụng."
 
-msgid "A full restyle: denser rows, port and agent chips under each workspace, one-click stop for everything."
-msgstr "Thiết kế lại toàn bộ: hàng dày hơn, chip cổng và agent dưới mỗi workspace, dừng mọi thứ chỉ với một cú nhấp."
-
 msgid "A gateway is signed in with an API key."
 msgstr "Gateway đăng nhập bằng khóa API."
 
@@ -1935,17 +1932,14 @@ msgstr "Bản xem trước do agent điều khiển"
 msgid "Agents"
 msgstr "Agent"
 
-msgid "Agents can watch CI checks, tail dev servers, and keep long-running processes alive while they work."
-msgstr "Agent có thể theo dõi các check CI, tail server dev và giữ các tiến trình chạy dài trong lúc làm việc."
-
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Agent hoàn thành các ticket thường ngày mà không cần can thiệp giữa chừng."
 
 msgid "Agents load their own preview, drive the UI, and attach screenshot proof before marking work ready for review."
 msgstr "Agent tự mở bản xem trước, thao tác giao diện và đính kèm ảnh chụp làm bằng chứng trước khi đánh dấu sẵn sàng review."
 
-msgid "Agents on a schedule"
-msgstr "Agent theo lịch"
+msgid "Agents on a schedule or trigger"
+msgstr "Agent chạy theo lịch hoặc trigger"
 
 msgid "Agents on your phone"
 msgstr "Agent trên điện thoại của bạn"
@@ -2872,9 +2866,6 @@ msgstr "Nền"
 msgid "Background processes"
 msgstr "Tiến trình nền"
 
-msgid "Background processes in chat"
-msgstr "Tiến trình nền trong chat"
-
 msgid "Background task"
 msgstr "Tác vụ nền"
 
@@ -3671,9 +3662,6 @@ msgstr "Claude hiện đang chạy trong workspace component-showcase."
 
 msgid "Clean up stale TODOs…"
 msgstr "Dọn các TODO cũ…"
-
-msgid "Cleaner, denser sidebar"
-msgstr "Thanh bên gọn và dày hơn"
 
 msgid "Clear"
 msgstr "Trong suốt"
@@ -5603,9 +5591,6 @@ msgstr "Giá tùy chỉnh"
 
 msgid "Custom provider"
 msgstr "Nhà cung cấp tùy chỉnh"
-
-msgid "Custom terminal agents"
-msgstr "Agent terminal tùy chỉnh"
 
 msgid "Custom themes"
 msgstr "Theme tùy chỉnh"
@@ -8122,12 +8107,6 @@ msgstr "Xanh lục/Đỏ (Deuteranopia)"
 msgid "Grepped"
 msgstr "Đã grep"
 
-msgid "Grok & Kimi Code agents"
-msgstr "Agent Grok & Kimi Code"
-
-msgid "Grok and Kimi Code join the lineup alongside Claude Code, Codex, and friends."
-msgstr "Grok và Kimi Code gia nhập danh sách cùng Claude Code, Codex và các agent khác."
-
 msgid "Group actions"
 msgstr "Hành động nhóm"
 
@@ -8970,6 +8949,9 @@ msgstr "Ứng dụng iOS"
 msgid "iOS Simulator"
 msgstr "Trình mô phỏng iOS"
 
+msgid "iOS simulator pane"
+msgstr "Ngăn trình mô phỏng iOS"
+
 msgid "IP restrictions"
 msgstr "Giới hạn IP"
 
@@ -9447,9 +9429,6 @@ msgstr "Sáng"
 msgid "Light theme"
 msgstr "Theme sáng"
 
-msgid "Lighter memory, smoother under load"
-msgstr "Nhẹ bộ nhớ, mượt khi tải nặng"
-
 msgid "Like building with Superset?"
 msgstr "Thích xây dựng cùng Superset?"
 
@@ -9798,9 +9777,6 @@ msgstr "Thấp"
 
 msgid "Low severity"
 msgstr "Mức độ nghiêm trọng thấp"
-
-msgid "Lower memory with many terminals open, smoother git in big repos, and less background CPU."
-msgstr "Ít bộ nhớ hơn khi mở nhiều terminal, git mượt hơn trong repo lớn và CPU nền thấp hơn."
 
 msgid "Machine resources"
 msgstr "Tài nguyên máy"
@@ -10218,8 +10194,8 @@ msgstr "Theo dõi agent ngay trên điện thoại."
 msgid "Monitor workspaces and manage tasks on the go. Continue conversations from anywhere."
 msgstr "Theo dõi workspace và quản lý tác vụ khi đang di chuyển. Tiếp tục cuộc trò chuyện từ bất cứ đâu."
 
-msgid "Monitor, steer, and unblock your agents from your phone."
-msgstr "Theo dõi, điều hướng và gỡ vướng cho agent ngay trên điện thoại."
+msgid "Monitor, steer, and unblock your agents from your iPhone or iPad."
+msgstr "Theo dõi, điều hướng và gỡ vướng cho agent từ iPhone hoặc iPad của bạn."
 
 msgid "Monitoring"
 msgstr "Giám sát"
@@ -12558,9 +12534,6 @@ msgstr "Ghim"
 msgid "Pin feedback to a page and let the agent make the change."
 msgstr "Ghim phản hồi lên trang và để agent thực hiện thay đổi."
 
-msgid "Pin workspaces above your projects, then ⌘-click a batch to move, group, or delete them all at once."
-msgstr "Ghim workspace lên trên các dự án, rồi ⌘-nhấp một loạt để chuyển, gom nhóm hoặc xóa tất cả cùng lúc."
-
 msgid "Pink"
 msgstr "Hồng"
 
@@ -12779,9 +12752,6 @@ msgstr "Nhấn <0>Esc</0> để đóng"
 
 msgid "Press ⌘⇧B or open a port Superset detected. Your dev server loads in a pane beside your terminals."
 msgstr "Nhấn ⌘⇧B hoặc mở một cổng mà Superset đã phát hiện. Dev server của bạn sẽ tải trong một ngăn cạnh các terminal."
-
-msgid "Press ⌘I over any terminal and compose in a real editor, with multiline prompts and @file mentions."
-msgstr "Nhấn ⌘I trên bất kỳ terminal nào để soạn trong một editor thật, với prompt nhiều dòng và nhắc @tệp."
 
 msgid "Press a key…"
 msgstr "Nhấn một phím…"
@@ -13499,9 +13469,6 @@ msgstr "Tạo lại"
 
 msgid "Region"
 msgstr "Region"
-
-msgid "Register any CLI agent alongside the built-ins, each with its own name, icon, and launch command."
-msgstr "Đăng ký bất kỳ agent CLI nào bên cạnh các agent có sẵn, mỗi agent có tên, biểu tượng và lệnh khởi chạy riêng."
 
 msgid "Registers lifecycle hooks in this agent's global config so Superset can show status and send notifications. Turning this off removes Superset's entries everywhere — status and notifications stop for this agent, including inside Superset."
 msgstr "Đăng ký các hook vòng đời vào cấu hình toàn cục của agent này để Superset hiển thị trạng thái và gửi thông báo. Tắt tùy chọn này sẽ gỡ các mục của Superset ở mọi nơi — trạng thái và thông báo cho agent này sẽ dừng, kể cả bên trong Superset."
@@ -14255,9 +14222,6 @@ msgstr "Nhập nâng cao"
 msgid "Rich input ({hotkeyText})"
 msgstr "Nhập nâng cao ({hotkeyText})"
 
-msgid "Rich input for the terminal"
-msgstr "Ô nhập nâng cao cho terminal"
-
 msgid "right pane"
 msgstr "ngăn bên phải"
 
@@ -14333,6 +14297,9 @@ msgstr "Chạy lại"
 
 msgid "Run agents side by side"
 msgstr "Chạy các agent cạnh nhau"
+
+msgid "Run an iOS simulator in a workspace pane so you and your agents can test mobile apps."
+msgstr "Chạy trình mô phỏng iOS trong một ngăn của workspace để bạn và các agent có thể kiểm thử ứng dụng di động."
 
 msgid "Run any agent you set up in Superset, such as Claude or Codex."
 msgstr "Chạy bất kỳ agent nào bạn đã thiết lập trong Superset, như Claude hoặc Codex."
@@ -15624,6 +15591,9 @@ msgstr "Trình mô phỏng"
 msgid "Since 2025"
 msgstr "Từ 2025"
 
+msgid "Single sign-on for organizations, self-serve configurable."
+msgstr "Đăng nhập một lần cho tổ chức, tự cấu hình được."
+
 msgid "Single tab + panes"
 msgstr "Một tab + khung"
 
@@ -15917,6 +15887,9 @@ msgstr "SS"
 msgid "SSH destination"
 msgstr "Đích SSH"
 
+msgid "SSO (SAML / OIDC)"
+msgstr "SSO (SAML / OIDC)"
+
 msgid "SSO/SAML"
 msgstr "SSO/SAML"
 
@@ -16005,9 +15978,6 @@ msgstr "Bắt đầu trò chuyện mới"
 msgid "Start a session"
 msgstr "Bắt đầu một phiên"
 
-msgid "Start a workspace straight from a Linear ticket. The agent picks it up and reports back with a PR."
-msgstr "Tạo workspace ngay từ một ticket Linear. Agent nhận việc và báo lại bằng một PR."
-
 msgid "Start agents, follow them live, and review the diff from your iPhone or iPad. Your code stays on your machines."
 msgstr "Khởi chạy agent, theo dõi trực tiếp và xem xét diff từ iPhone hoặc iPad. Mã của bạn vẫn nằm trên máy của bạn."
 
@@ -16052,6 +16022,9 @@ msgstr "Bắt đầu từ công việc."
 
 msgid "Start work from anywhere"
 msgstr "Bắt đầu công việc từ bất cứ đâu"
+
+msgid "Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one."
+msgstr "Bắt đầu workspace ngay từ issue Linear hoặc GitHub trong chế độ xem Tác vụ, mỗi workspace đều có sẵn một agent đang làm việc."
 
 msgid "Started"
 msgstr "Bắt đầu"
@@ -17990,8 +17963,8 @@ msgstr "Tufte"
 msgid "Tunnel established"
 msgstr "Đã thiết lập tunnel"
 
-msgid "Turn chores into scheduled agents: issue triage, changelog drafts, dependency bumps. They run on their own and open PRs for you to review."
-msgstr "Biến việc lặt vặt thành agent chạy theo lịch: phân loại issue, soạn changelog, nâng dependency. Chúng tự chạy và mở PR để bạn review."
+msgid "Turn chores into agents that run on a schedule or when an event comes in: issue triage, changelog drafts, dependency bumps. They run on their own and open PRs for you to review."
+msgstr "Biến việc lặt vặt thành agent chạy theo lịch hoặc khi có sự kiện: phân loại issue, soạn nháp changelog, cập nhật dependency. Chúng tự chạy và mở PR để bạn review."
 
 msgid "Turn failed"
 msgstr "Lượt xử lý thất bại"
@@ -19149,9 +19122,6 @@ msgstr "Không có đường dẫn workspace"
 msgid "Workspace path is not available yet"
 msgstr "Đường dẫn không gian làm việc chưa sẵn sàng"
 
-msgid "Workspace pinning & bulk actions"
-msgstr "Ghim workspace & hành động hàng loạt"
-
 msgid "Workspace restored"
 msgstr "Đã khôi phục workspace"
 
@@ -19233,8 +19203,8 @@ msgstr "Viết bình luận…"
 msgid "Write a note and pick an agent. Your note arrives with the element's code and a cropped screenshot."
 msgstr "Viết ghi chú và chọn một agent. Ghi chú của bạn được gửi kèm mã của phần tử và ảnh chụp màn hình đã cắt."
 
-msgid "Write a prompt and pick a schedule. Each run opens a workspace you can review and continue."
-msgstr "Viết một prompt và chọn lịch. Mỗi lượt chạy mở một workspace để bạn xem lại và tiếp tục."
+msgid "Write a prompt and pick a schedule or an event, like a pull request, a Slack message, a Linear issue, a Sentry issue, or a webhook. Each run opens a workspace you can review and continue."
+msgstr "Viết prompt và chọn lịch hoặc sự kiện, như pull request, tin nhắn Slack, issue Linear, issue Sentry hoặc webhook. Mỗi lần chạy sẽ mở một workspace để bạn review và tiếp tục."
 
 msgid "Write a reply"
 msgstr "Viết câu trả lời"
@@ -19438,8 +19408,8 @@ msgstr "Agent của bạn xuất bản thiết kế và báo cáo để nhóm xe
 msgid "Your agent publishes designs and reports. Your team comments, and it gets to work."
 msgstr "Agent của bạn xuất bản thiết kế và báo cáo. Nhóm bạn bình luận, và agent bắt tay vào việc."
 
-msgid "Your agents do the recurring work on a schedule you set."
-msgstr "Các agent của bạn làm công việc lặp lại theo lịch bạn đặt."
+msgid "Your agents do the work on a schedule or when an event comes in."
+msgstr "Agent của bạn làm việc theo lịch hoặc khi có sự kiện."
 
 msgid "Your Agents, Your Accounts"
 msgstr "Agent của bạn, tài khoản của bạn"

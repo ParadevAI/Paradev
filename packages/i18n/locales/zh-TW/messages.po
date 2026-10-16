@@ -1453,9 +1453,6 @@ msgstr "{where}中已存在名為「{firstName}」的檔案。是否要替換它
 msgid "A focused burn-down of crashes, hangs, and reconnect failures across the app."
 msgstr "集中清理全應用的崩潰、卡死和重連失敗。"
 
-msgid "A full restyle: denser rows, port and agent chips under each workspace, one-click stop for everything."
-msgstr "整體重做樣式：更緊湊的行、每個工作區下方的埠和代理程式標籤、一鍵全部停止。"
-
 msgid "A gateway is signed in with an API key."
 msgstr "閘道使用 API 金鑰登入。"
 
@@ -1935,17 +1932,14 @@ msgstr "由代理程式驅動的預覽"
 msgid "Agents"
 msgstr "代理程式"
 
-msgid "Agents can watch CI checks, tail dev servers, and keep long-running processes alive while they work."
-msgstr "代理程式可以在工作的同時盯著CI檢查、追蹤開發伺服器日誌，並讓長時間執行的處理程序保持存活。"
-
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "代理程式無需中途干預即可完成常規工單。"
 
 msgid "Agents load their own preview, drive the UI, and attach screenshot proof before marking work ready for review."
 msgstr "代理程式自己載入預覽、操作介面，並在標記為待審查之前附上截圖證據。"
 
-msgid "Agents on a schedule"
-msgstr "依計劃執行的代理程式"
+msgid "Agents on a schedule or trigger"
+msgstr "依排程或觸發器執行的代理程式"
 
 msgid "Agents on your phone"
 msgstr "手機上的代理程式"
@@ -2872,9 +2866,6 @@ msgstr "背景"
 msgid "Background processes"
 msgstr "背景處理程序"
 
-msgid "Background processes in chat"
-msgstr "聊天中的背景處理程序"
-
 msgid "Background task"
 msgstr "背景工作"
 
@@ -3671,9 +3662,6 @@ msgstr "Claude已在工作區component-showcase中執行。"
 
 msgid "Clean up stale TODOs…"
 msgstr "清理過期的TODO…"
-
-msgid "Cleaner, denser sidebar"
-msgstr "更清爽緊湊的側邊欄"
 
 msgid "Clear"
 msgstr "透明"
@@ -5603,9 +5591,6 @@ msgstr "定製價格"
 
 msgid "Custom provider"
 msgstr "自訂提供商"
-
-msgid "Custom terminal agents"
-msgstr "自訂終端代理程式"
 
 msgid "Custom themes"
 msgstr "自訂主題"
@@ -8122,12 +8107,6 @@ msgstr "綠/紅（綠色盲）"
 msgid "Grepped"
 msgstr "已搜尋"
 
-msgid "Grok & Kimi Code agents"
-msgstr "Grok與Kimi Code代理程式"
-
-msgid "Grok and Kimi Code join the lineup alongside Claude Code, Codex, and friends."
-msgstr "Grok和Kimi Code加入陣容，與Claude Code、Codex等並列。"
-
 msgid "Group actions"
 msgstr "群組操作"
 
@@ -8970,6 +8949,9 @@ msgstr "iOS應用"
 msgid "iOS Simulator"
 msgstr "iOS 模擬器"
 
+msgid "iOS simulator pane"
+msgstr "iOS 模擬器窗格"
+
 msgid "IP restrictions"
 msgstr "IP限制"
 
@@ -9447,9 +9429,6 @@ msgstr "淺色"
 msgid "Light theme"
 msgstr "淺色主題"
 
-msgid "Lighter memory, smoother under load"
-msgstr "更省記憶體，高負載更順"
-
 msgid "Like building with Superset?"
 msgstr "喜歡用Superset開發嗎？"
 
@@ -9798,9 +9777,6 @@ msgstr "低"
 
 msgid "Low severity"
 msgstr "低嚴重性"
-
-msgid "Lower memory with many terminals open, smoother git in big repos, and less background CPU."
-msgstr "開很多終端時佔用更低的記憶體，大儲存庫裡的git更順，背景CPU更少。"
 
 msgid "Machine resources"
 msgstr "機器資源"
@@ -10218,8 +10194,8 @@ msgstr "在手機上監控代理程式。"
 msgid "Monitor workspaces and manage tasks on the go. Continue conversations from anywhere."
 msgstr "隨時隨地監控工作區、管理任務，在任何地方繼續對話。"
 
-msgid "Monitor, steer, and unblock your agents from your phone."
-msgstr "在手機上監控、引導併為代理程式解阻。"
+msgid "Monitor, steer, and unblock your agents from your iPhone or iPad."
+msgstr "從 iPhone 或 iPad 監控、引導代理程式，並為它們排除阻礙。"
 
 msgid "Monitoring"
 msgstr "監控"
@@ -12558,9 +12534,6 @@ msgstr "固定"
 msgid "Pin feedback to a page and let the agent make the change."
 msgstr "在頁面上留下回饋，讓代理程式完成修改。"
 
-msgid "Pin workspaces above your projects, then ⌘-click a batch to move, group, or delete them all at once."
-msgstr "把工作區固定在專案上方，再⌘點選批次選中，一次性移動、分組或刪除。"
-
 msgid "Pink"
 msgstr "粉色"
 
@@ -12779,9 +12752,6 @@ msgstr "按<0>Esc</0>關閉"
 
 msgid "Press ⌘⇧B or open a port Superset detected. Your dev server loads in a pane beside your terminals."
 msgstr "按 ⌘⇧B，或開啟 Superset 偵測到的連接埠。開發伺服器會在終端旁的窗格中載入。"
-
-msgid "Press ⌘I over any terminal and compose in a real editor, with multiline prompts and @file mentions."
-msgstr "在任意終端上按⌘I，在真正的編輯器裡撰寫，支援多行提示詞和@檔案引用。"
 
 msgid "Press a key…"
 msgstr "請按一個鍵…"
@@ -13499,9 +13469,6 @@ msgstr "重新產生"
 
 msgid "Region"
 msgstr "區域"
-
-msgid "Register any CLI agent alongside the built-ins, each with its own name, icon, and launch command."
-msgstr "在內建代理程式之外註冊任意CLI代理程式，各自擁有名稱、圖示和啟動命令。"
 
 msgid "Registers lifecycle hooks in this agent's global config so Superset can show status and send notifications. Turning this off removes Superset's entries everywhere — status and notifications stop for this agent, including inside Superset."
 msgstr "在該代理程式的全域性配置中註冊生命週期鉤子，以便Superset顯示狀態併發送通知。關閉後會在所有位置移除Superset的條目，該代理程式的狀態和通知都會停止，包括在Superset內部。"
@@ -14255,9 +14222,6 @@ msgstr "富輸入"
 msgid "Rich input ({hotkeyText})"
 msgstr "富輸入（{hotkeyText}）"
 
-msgid "Rich input for the terminal"
-msgstr "終端富文字輸入"
-
 msgid "right pane"
 msgstr "右側面板"
 
@@ -14333,6 +14297,9 @@ msgstr "重新執行"
 
 msgid "Run agents side by side"
 msgstr "並排執行代理程式"
+
+msgid "Run an iOS simulator in a workspace pane so you and your agents can test mobile apps."
+msgstr "在工作區窗格中執行 iOS 模擬器，讓你和你的代理程式測試行動應用程式。"
 
 msgid "Run any agent you set up in Superset, such as Claude or Codex."
 msgstr "執行你在 Superset 中設定的任何代理程式，例如 Claude 或 Codex。"
@@ -15624,6 +15591,9 @@ msgstr "模擬器"
 msgid "Since 2025"
 msgstr "自2025年起"
 
+msgid "Single sign-on for organizations, self-serve configurable."
+msgstr "適用於組織的單一登入，可自助設定。"
+
 msgid "Single tab + panes"
 msgstr "單分頁+窗格"
 
@@ -15917,6 +15887,9 @@ msgstr "SS"
 msgid "SSH destination"
 msgstr "SSH 目的地"
 
+msgid "SSO (SAML / OIDC)"
+msgstr "SSO（SAML / OIDC）"
+
 msgid "SSO/SAML"
 msgstr "SSO/SAML"
 
@@ -16005,9 +15978,6 @@ msgstr "開始新的聊天"
 msgid "Start a session"
 msgstr "開始一個會話"
 
-msgid "Start a workspace straight from a Linear ticket. The agent picks it up and reports back with a PR."
-msgstr "直接從Linear工單啟動工作區。代理程式接手，並以一個PR回報結果。"
-
 msgid "Start agents, follow them live, and review the diff from your iPhone or iPad. Your code stays on your machines."
 msgstr "在 iPhone 或 iPad 上啟動 agent、即時追蹤並審查差異。你的程式碼始終留在你的機器上。"
 
@@ -16052,6 +16022,9 @@ msgstr "從工作本身開始。"
 
 msgid "Start work from anywhere"
 msgstr "隨時隨地開始工作"
+
+msgid "Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one."
+msgstr "在任務檢視中直接從 Linear 或 GitHub 議題啟動工作區，每個工作區都已有代理程式在處理。"
 
 msgid "Started"
 msgstr "開始時間"
@@ -17990,8 +17963,8 @@ msgstr "Tufte"
 msgid "Tunnel established"
 msgstr "通道已建立"
 
-msgid "Turn chores into scheduled agents: issue triage, changelog drafts, dependency bumps. They run on their own and open PRs for you to review."
-msgstr "把雜活變成定時代理程式：議題分類、更新日誌草稿、相依性升級。它們自己執行，並開好PR等你審查。"
+msgid "Turn chores into agents that run on a schedule or when an event comes in: issue triage, changelog drafts, dependency bumps. They run on their own and open PRs for you to review."
+msgstr "把例行雜務交給依排程或在事件發生時執行的代理程式：議題分類、更新日誌草稿、相依套件更新。它們會自行執行，並建立 PR 供你審查。"
 
 msgid "Turn failed"
 msgstr "本輪失敗"
@@ -19149,9 +19122,6 @@ msgstr "工作區路徑不可用"
 msgid "Workspace path is not available yet"
 msgstr "工作區路徑尚不可用"
 
-msgid "Workspace pinning & bulk actions"
-msgstr "工作區固定與批次操作"
-
 msgid "Workspace restored"
 msgstr "工作區已還原"
 
@@ -19233,8 +19203,8 @@ msgstr "寫下評論…"
 msgid "Write a note and pick an agent. Your note arrives with the element's code and a cropped screenshot."
 msgstr "寫一則備註並選擇代理程式。備註會連同該元素的程式碼和裁剪後的截圖一起送達。"
 
-msgid "Write a prompt and pick a schedule. Each run opens a workspace you can review and continue."
-msgstr "寫好提示詞並選擇計劃。每次執行都會開啟一個工作區，你可以審閱並繼續。"
+msgid "Write a prompt and pick a schedule or an event, like a pull request, a Slack message, a Linear issue, a Sentry issue, or a webhook. Each run opens a workspace you can review and continue."
+msgstr "撰寫提示詞，然後選擇排程或事件，例如拉取請求、Slack 訊息、Linear 議題、Sentry 議題或 Webhook。每次執行都會開啟一個工作區，你可以審查並繼續工作。"
 
 msgid "Write a reply"
 msgstr "撰寫回覆"
@@ -19438,8 +19408,8 @@ msgstr "你的代理程式發布設計和報告，供團隊審閱。有人留言
 msgid "Your agent publishes designs and reports. Your team comments, and it gets to work."
 msgstr "你的代理程式發布設計和報告。團隊留言，代理程式隨即開始工作。"
 
-msgid "Your agents do the recurring work on a schedule you set."
-msgstr "代理程式依你設定的計劃完成重複性工作。"
+msgid "Your agents do the work on a schedule or when an event comes in."
+msgstr "你的代理程式會依排程或在事件發生時完成工作。"
 
 msgid "Your Agents, Your Accounts"
 msgstr "你的代理程式，你的帳號"

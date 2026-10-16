@@ -1453,9 +1453,6 @@ msgstr "{where} konumunda '{firstName}' adlı bir dosya zaten var. Değiştirmek
 msgid "A focused burn-down of crashes, hangs, and reconnect failures across the app."
 msgstr "Uygulama genelinde çökmelerin, donmaların ve yeniden bağlanma hatalarının odaklı biçimde azaltılması."
 
-msgid "A full restyle: denser rows, port and agent chips under each workspace, one-click stop for everything."
-msgstr "Baştan sona yeni bir stil: daha yoğun satırlar, her çalışma alanının altında port ve ajan çipleri, her şey için tek tıkla durdurma."
-
 msgid "A gateway is signed in with an API key."
 msgstr "Ağ geçidi API anahtarıyla oturum açmış durumda."
 
@@ -1935,17 +1932,14 @@ msgstr "Ajanın yönettiği önizlemeler"
 msgid "Agents"
 msgstr "Ajanlar"
 
-msgid "Agents can watch CI checks, tail dev servers, and keep long-running processes alive while they work."
-msgstr "Ajanlar CI kontrollerini izleyebilir, geliştirme sunucularını takip edebilir ve çalışırken uzun süreli süreçleri ayakta tutabilir."
-
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Ajanlar rutin biletleri görev ortasında müdahale olmadan tamamlar."
 
 msgid "Agents load their own preview, drive the UI, and attach screenshot proof before marking work ready for review."
 msgstr "Ajanlar kendi önizlemelerini yükler, arayüzü kullanır ve işi incelemeye hazır işaretlemeden önce ekran görüntüsü kanıtı ekler."
 
-msgid "Agents on a schedule"
-msgstr "Zamanlanmış ajanlar"
+msgid "Agents on a schedule or trigger"
+msgstr "Zamanlamayla veya tetikleyiciyle çalışan ajanlar"
 
 msgid "Agents on your phone"
 msgstr "Telefonunuzda ajanlar"
@@ -2872,9 +2866,6 @@ msgstr "Arka plan"
 msgid "Background processes"
 msgstr "Arka plan işlemleri"
 
-msgid "Background processes in chat"
-msgstr "Sohbette arka plan süreçleri"
-
 msgid "Background task"
 msgstr "Arka plan görevi"
 
@@ -3671,9 +3662,6 @@ msgstr "Claude artık component-showcase çalışma alanında çalışıyor."
 
 msgid "Clean up stale TODOs…"
 msgstr "Eskimiş TODO'ları temizle…"
-
-msgid "Cleaner, denser sidebar"
-msgstr "Daha temiz, daha yoğun kenar çubuğu"
 
 msgid "Clear"
 msgstr "Şeffaf"
@@ -5603,9 +5591,6 @@ msgstr "Özel fiyatlandırma"
 
 msgid "Custom provider"
 msgstr "Özel sağlayıcı"
-
-msgid "Custom terminal agents"
-msgstr "Özel terminal ajanları"
 
 msgid "Custom themes"
 msgstr "Özel temalar"
@@ -8122,12 +8107,6 @@ msgstr "Yeşil/Kırmızı (Döteranopi)"
 msgid "Grepped"
 msgstr "Grep'lendi"
 
-msgid "Grok & Kimi Code agents"
-msgstr "Grok ve Kimi Code ajanları"
-
-msgid "Grok and Kimi Code join the lineup alongside Claude Code, Codex, and friends."
-msgstr "Grok ve Kimi Code, Claude Code, Codex ve diğerlerinin yanına katılıyor."
-
 msgid "Group actions"
 msgstr "Grup eylemleri"
 
@@ -8970,6 +8949,9 @@ msgstr "iOS uygulaması"
 msgid "iOS Simulator"
 msgstr "iOS Simülatörü"
 
+msgid "iOS simulator pane"
+msgstr "iOS simülatörü bölmesi"
+
 msgid "IP restrictions"
 msgstr "IP kısıtlamaları"
 
@@ -9447,9 +9429,6 @@ msgstr "Açık"
 msgid "Light theme"
 msgstr "Açık tema"
 
-msgid "Lighter memory, smoother under load"
-msgstr "Daha hafif bellek, yük altında daha akıcı"
-
 msgid "Like building with Superset?"
 msgstr "Superset ile geliştirmeyi seviyor musunuz?"
 
@@ -9798,9 +9777,6 @@ msgstr "Düşük"
 
 msgid "Low severity"
 msgstr "Düşük önem"
-
-msgid "Lower memory with many terminals open, smoother git in big repos, and less background CPU."
-msgstr "Çok sayıda terminal açıkken daha az bellek, büyük depolarda daha akıcı git ve daha az arka plan CPU kullanımı."
 
 msgid "Machine resources"
 msgstr "Makine kaynakları"
@@ -10218,8 +10194,8 @@ msgstr "Ajanları telefonunuzdan izleyin."
 msgid "Monitor workspaces and manage tasks on the go. Continue conversations from anywhere."
 msgstr "Yolda çalışma alanlarını izleyin ve görevleri yönetin. Konuşmalara her yerden devam edin."
 
-msgid "Monitor, steer, and unblock your agents from your phone."
-msgstr "Ajanlarınızı telefonunuzdan izleyin, yönlendirin ve engellerini kaldırın."
+msgid "Monitor, steer, and unblock your agents from your iPhone or iPad."
+msgstr "Ajanlarınızı iPhone veya iPad'inizden izleyin, yönlendirin ve önlerini açın."
 
 msgid "Monitoring"
 msgstr "İzleme"
@@ -12558,9 +12534,6 @@ msgstr "Sabitle"
 msgid "Pin feedback to a page and let the agent make the change."
 msgstr "Bir sayfaya geri bildirim iğneleyin, değişikliği ajan yapsın."
 
-msgid "Pin workspaces above your projects, then ⌘-click a batch to move, group, or delete them all at once."
-msgstr "Çalışma alanlarını projelerinizin üstüne sabitleyin, sonra ⌘ ile bir grup seçip hepsini birden taşıyın, gruplayın veya silin."
-
 msgid "Pink"
 msgstr "Pembe"
 
@@ -12779,9 +12752,6 @@ msgstr "Kapatmak için <0>Esc</0> tuşuna basın"
 
 msgid "Press ⌘⇧B or open a port Superset detected. Your dev server loads in a pane beside your terminals."
 msgstr "⌘⇧B tuşlarına basın veya Superset'in algıladığı bir portu açın. Geliştirme sunucunuz terminallerinizin yanındaki bir bölmede yüklenir."
-
-msgid "Press ⌘I over any terminal and compose in a real editor, with multiline prompts and @file mentions."
-msgstr "Herhangi bir terminalin üzerinde ⌘I tuşlarına basın ve çok satırlı istemler ve @dosya bahisleriyle gerçek bir düzenleyicide yazın."
 
 msgid "Press a key…"
 msgstr "Bir tuşa basın…"
@@ -13499,9 +13469,6 @@ msgstr "Yeniden oluştur"
 
 msgid "Region"
 msgstr "Bölge"
-
-msgid "Register any CLI agent alongside the built-ins, each with its own name, icon, and launch command."
-msgstr "Herhangi bir CLI ajanını, kendi adı, simgesi ve başlatma komutuyla yerleşiklerin yanına kaydedin."
 
 msgid "Registers lifecycle hooks in this agent's global config so Superset can show status and send notifications. Turning this off removes Superset's entries everywhere — status and notifications stop for this agent, including inside Superset."
 msgstr "Superset'in durum gösterebilmesi ve bildirim gönderebilmesi için bu ajanın genel yapılandırmasına yaşam döngüsü hook'ları kaydeder. Bunu kapatmak Superset'in kayıtlarını her yerden kaldırır — Superset içinde dahil olmak üzere bu ajan için durum ve bildirimler durur."
@@ -14255,9 +14222,6 @@ msgstr "Zengin giriş"
 msgid "Rich input ({hotkeyText})"
 msgstr "Zengin giriş ({hotkeyText})"
 
-msgid "Rich input for the terminal"
-msgstr "Terminal için zengin giriş"
-
 msgid "right pane"
 msgstr "sağ panel"
 
@@ -14333,6 +14297,9 @@ msgstr "Yeniden çalıştır"
 
 msgid "Run agents side by side"
 msgstr "Ajanları yan yana çalıştırın"
+
+msgid "Run an iOS simulator in a workspace pane so you and your agents can test mobile apps."
+msgstr "Siz ve ajanlarınız mobil uygulamaları test edebilsin diye bir çalışma alanı bölmesinde iOS simülatörü çalıştırın."
 
 msgid "Run any agent you set up in Superset, such as Claude or Codex."
 msgstr "Superset'te kurduğunuz herhangi bir ajanı çalıştırın, örneğin Claude veya Codex."
@@ -15624,6 +15591,9 @@ msgstr "Simülatör"
 msgid "Since 2025"
 msgstr "2025'ten beri"
 
+msgid "Single sign-on for organizations, self-serve configurable."
+msgstr "Kuruluşlar için çoklu oturum açma, kendi kendinize yapılandırabilirsiniz."
+
 msgid "Single tab + panes"
 msgstr "Tek sekme + bölmeler"
 
@@ -15917,6 +15887,9 @@ msgstr "SS"
 msgid "SSH destination"
 msgstr "SSH hedefi"
 
+msgid "SSO (SAML / OIDC)"
+msgstr "SSO (SAML / OIDC)"
+
 msgid "SSO/SAML"
 msgstr "SSO/SAML"
 
@@ -16005,9 +15978,6 @@ msgstr "Yeni sohbet başlat"
 msgid "Start a session"
 msgstr "Bir oturum başlat"
 
-msgid "Start a workspace straight from a Linear ticket. The agent picks it up and reports back with a PR."
-msgstr "Doğrudan bir Linear biletinden çalışma alanı başlatın. Ajan işi devralır ve bir PR ile geri döner."
-
 msgid "Start agents, follow them live, and review the diff from your iPhone or iPad. Your code stays on your machines."
 msgstr "iPhone veya iPad'inizden ajanları başlatın, canlı takip edin ve diff'i inceleyin. Kodunuz makinelerinizde kalır."
 
@@ -16052,6 +16022,9 @@ msgstr "İşle başlayın."
 
 msgid "Start work from anywhere"
 msgstr "Her yerden işe başlayın"
+
+msgid "Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one."
+msgstr "Görevler görünümünde Linear veya GitHub issue'larından doğrudan çalışma alanları başlatın; her birinde zaten çalışan bir ajan olur."
 
 msgid "Started"
 msgstr "Başladı"
@@ -17990,8 +17963,8 @@ msgstr "Tufte"
 msgid "Tunnel established"
 msgstr "Tünel kuruldu"
 
-msgid "Turn chores into scheduled agents: issue triage, changelog drafts, dependency bumps. They run on their own and open PRs for you to review."
-msgstr "Rutin işleri zamanlanmış ajanlara dönüştürün: issue sınıflandırma, değişiklik günlüğü taslakları, bağımlılık yükseltmeleri. Kendi başlarına çalışır ve incelemeniz için PR açarlar."
+msgid "Turn chores into agents that run on a schedule or when an event comes in: issue triage, changelog drafts, dependency bumps. They run on their own and open PRs for you to review."
+msgstr "Rutin işleri zamanlamayla veya bir olay geldiğinde çalışan ajanlara dönüştürün: issue önceliklendirme, değişiklik günlüğü taslakları, bağımlılık güncellemeleri. Kendi başlarına çalışır ve incelemeniz için PR açarlar."
 
 msgid "Turn failed"
 msgstr "Tur başarısız"
@@ -19149,9 +19122,6 @@ msgstr "Çalışma alanı yolu kullanılamıyor"
 msgid "Workspace path is not available yet"
 msgstr "Çalışma alanı yolu henüz kullanılamıyor"
 
-msgid "Workspace pinning & bulk actions"
-msgstr "Çalışma alanı sabitleme ve toplu eylemler"
-
 msgid "Workspace restored"
 msgstr "Çalışma alanı geri yüklendi"
 
@@ -19233,8 +19203,8 @@ msgstr "Bir yorum yazın…"
 msgid "Write a note and pick an agent. Your note arrives with the element's code and a cropped screenshot."
 msgstr "Bir not yazın ve bir ajan seçin. Notunuz, öğenin koduyla ve kırpılmış bir ekran görüntüsüyle birlikte ulaşır."
 
-msgid "Write a prompt and pick a schedule. Each run opens a workspace you can review and continue."
-msgstr "Bir istem yazın ve bir zamanlama seçin. Her çalıştırma, inceleyip devam edebileceğiniz bir çalışma alanı açar."
+msgid "Write a prompt and pick a schedule or an event, like a pull request, a Slack message, a Linear issue, a Sentry issue, or a webhook. Each run opens a workspace you can review and continue."
+msgstr "Bir istem yazın ve bir zamanlama ya da olay seçin: pull request, Slack mesajı, Linear issue'su, Sentry issue'su veya webhook gibi. Her çalıştırma, inceleyip devam edebileceğiniz bir çalışma alanı açar."
 
 msgid "Write a reply"
 msgstr "Bir yanıt yazın"
@@ -19438,8 +19408,8 @@ msgstr "Ajanınız ekibinizin incelemesi için tasarımlar ve raporlar yayınlar
 msgid "Your agent publishes designs and reports. Your team comments, and it gets to work."
 msgstr "Ajanınız tasarımlar ve raporlar yayınlar. Ekibiniz yorum yapar, ajan işe koyulur."
 
-msgid "Your agents do the recurring work on a schedule you set."
-msgstr "Ajanlarınız tekrarlayan işi belirlediğiniz zamanlamayla yapar."
+msgid "Your agents do the work on a schedule or when an event comes in."
+msgstr "Ajanlarınız işi zamanlamayla veya bir olay geldiğinde yapar."
 
 msgid "Your Agents, Your Accounts"
 msgstr "Sizin ajanlarınız, sizin hesaplarınız"
