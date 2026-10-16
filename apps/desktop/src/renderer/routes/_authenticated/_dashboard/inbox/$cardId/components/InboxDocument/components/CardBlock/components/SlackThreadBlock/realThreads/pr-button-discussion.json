@@ -1,0 +1,945 @@
+{
+	"kind": "slack.thread",
+	"channel": {
+		"id": "C0GENERAL01",
+		"name": "#general"
+	},
+	"permalink": null,
+	"messages": [
+		{
+			"ts": "1790873623.593809",
+			"user": {
+				"id": "U0SATYA2P7D",
+				"name": "Satya Patel",
+				"realName": null,
+				"avatar": null,
+				"isBot": false,
+				"title": null,
+				"timezone": "America/Los_Angeles",
+				"presence": null,
+				"inChannel": false,
+				"isReader": true,
+				"team": null
+			},
+			"deleted": false,
+			"text": "Sadge, ye I won't block",
+			"edited": false,
+			"broadcast": false,
+			"reactions": [],
+			"files": [],
+			"attachments": [],
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"kind": "section",
+							"inline": [
+								{
+									"kind": "text",
+									"text": "Sadge, ye I won't block"
+								}
+							]
+						}
+					]
+				}
+			],
+			"permalink": "https://superset.slack.com/archives/C0GENERAL01/p1790873623593809"
+		},
+		{
+			"ts": "1790873674.242219",
+			"user": {
+				"id": "U0SATYA2P7D",
+				"name": "Satya Patel",
+				"realName": null,
+				"avatar": null,
+				"isBot": false,
+				"title": null,
+				"timezone": "America/Los_Angeles",
+				"presence": null,
+				"inChannel": false,
+				"isReader": true,
+				"team": null
+			},
+			"deleted": false,
+			"text": "I still suspect they're not that important to see personally :thinking_face:, I may have clicked the open in external editor exactly once in the last 5 months for example ",
+			"edited": false,
+			"broadcast": false,
+			"reactions": [],
+			"files": [],
+			"attachments": [],
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"kind": "section",
+							"inline": [
+								{
+									"kind": "text",
+									"text": "I still suspect they're not that important to see personally "
+								},
+								{
+									"kind": "emoji",
+									"name": "thinking_face",
+									"unicode": "🤔"
+								},
+								{
+									"kind": "text",
+									"text": ", I may have clicked the open in external editor exactly once in the last 5 months for example "
+								}
+							]
+						}
+					]
+				}
+			],
+			"permalink": "https://superset.slack.com/archives/C0GENERAL01/p1790873674242219"
+		},
+		{
+			"ts": "1790873693.382859",
+			"user": {
+				"id": "U0SATYA2P7D",
+				"name": "Satya Patel",
+				"realName": null,
+				"avatar": null,
+				"isBot": false,
+				"title": null,
+				"timezone": "America/Los_Angeles",
+				"presence": null,
+				"inChannel": false,
+				"isReader": true,
+				"team": null
+			},
+			"deleted": false,
+			"text": "But ye I'll revert ",
+			"edited": false,
+			"broadcast": false,
+			"reactions": [],
+			"files": [],
+			"attachments": [],
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"kind": "section",
+							"inline": [
+								{
+									"kind": "text",
+									"text": "But ye I'll revert "
+								}
+							]
+						}
+					]
+				}
+			],
+			"permalink": "https://superset.slack.com/archives/C0GENERAL01/p1790873693382859"
+		},
+		{
+			"ts": "1790873722.414929",
+			"user": {
+				"id": "U0BLAKE8R3V",
+				"name": "Blake",
+				"realName": "Blake Rivera",
+				"avatar": null,
+				"isBot": false,
+				"title": null,
+				"timezone": "America/Los_Angeles",
+				"presence": null,
+				"inChannel": false,
+				"isReader": false,
+				"team": null
+			},
+			"deleted": false,
+			"text": "i personally don't either. i do know that people do until our editor become better or they evolve.",
+			"edited": false,
+			"broadcast": false,
+			"reactions": [],
+			"files": [],
+			"attachments": [],
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"kind": "section",
+							"inline": [
+								{
+									"kind": "text",
+									"text": "i personally don't either. i do know that people do until our editor become better or they evolve."
+								}
+							]
+						}
+					]
+				}
+			],
+			"permalink": "https://superset.slack.com/archives/C0GENERAL01/p1790873722414929"
+		},
+		{
+			"ts": "1790873733.068279",
+			"user": {
+				"id": "U0BLAKE8R3V",
+				"name": "Blake",
+				"realName": "Blake Rivera",
+				"avatar": null,
+				"isBot": false,
+				"title": null,
+				"timezone": "America/Los_Angeles",
+				"presence": null,
+				"inChannel": false,
+				"isReader": false,
+				"team": null
+			},
+			"deleted": false,
+			"text": "the other one defi shouldnt be on the sidebar tho",
+			"edited": false,
+			"broadcast": false,
+			"reactions": [],
+			"files": [],
+			"attachments": [],
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"kind": "section",
+							"inline": [
+								{
+									"kind": "text",
+									"text": "the other one defi shouldnt be on the sidebar tho"
+								}
+							]
+						}
+					]
+				}
+			],
+			"permalink": "https://superset.slack.com/archives/C0GENERAL01/p1790873733068279"
+		},
+		{
+			"ts": "1790873813.100169",
+			"user": {
+				"id": "U0SATYA2P7D",
+				"name": "Satya Patel",
+				"realName": null,
+				"avatar": null,
+				"isBot": false,
+				"title": null,
+				"timezone": "America/Los_Angeles",
+				"presence": null,
+				"inChannel": false,
+				"isReader": true,
+				"team": null
+			},
+			"deleted": false,
+			"text": "The PR button? I personally think it's debatable too bc you press it once per pr, the rest of the time it's kinda in the way no? But ye this is def minor lol won't die on the hill ",
+			"edited": false,
+			"broadcast": false,
+			"reactions": [],
+			"files": [],
+			"attachments": [],
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"kind": "section",
+							"inline": [
+								{
+									"kind": "text",
+									"text": "The PR button? I personally think it's debatable too bc you press it once per pr, the rest of the time it's kinda in the way no? But ye this is def minor lol won't die on the hill "
+								}
+							]
+						}
+					]
+				}
+			],
+			"permalink": "https://superset.slack.com/archives/C0GENERAL01/p1790873813100169"
+		},
+		{
+			"ts": "1790873859.426969",
+			"user": {
+				"id": "U0SATYA2P7D",
+				"name": "Satya Patel",
+				"realName": null,
+				"avatar": null,
+				"isBot": false,
+				"title": null,
+				"timezone": "America/Los_Angeles",
+				"presence": null,
+				"inChannel": false,
+				"isReader": true,
+				"team": null
+			},
+			"deleted": false,
+			"text": "For the external editor I wonder if they're annoyed that the /hotkey/ isn't mounted actually, since I swap editors once every few quarters but I press command + o frequently",
+			"edited": false,
+			"broadcast": false,
+			"reactions": [],
+			"files": [],
+			"attachments": [],
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"kind": "section",
+							"inline": [
+								{
+									"kind": "text",
+									"text": "For the external editor I wonder if they're annoyed that the /hotkey/ isn't mounted actually, since I swap editors once every few quarters but I press command + o frequently"
+								}
+							]
+						}
+					]
+				}
+			],
+			"permalink": "https://superset.slack.com/archives/C0GENERAL01/p1790873859426969"
+		},
+		{
+			"ts": "1790873873.237539",
+			"user": {
+				"id": "U0SATYA2P7D",
+				"name": "Satya Patel",
+				"realName": null,
+				"avatar": null,
+				"isBot": false,
+				"title": null,
+				"timezone": "America/Los_Angeles",
+				"presence": null,
+				"inChannel": false,
+				"isReader": true,
+				"team": null
+			},
+			"deleted": false,
+			"text": "Or ye maybe I'm underestimating folks pressing buttons ",
+			"edited": false,
+			"broadcast": false,
+			"reactions": [],
+			"files": [],
+			"attachments": [],
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"kind": "section",
+							"inline": [
+								{
+									"kind": "text",
+									"text": "Or ye maybe I'm underestimating folks pressing buttons "
+								}
+							]
+						}
+					]
+				}
+			],
+			"permalink": "https://superset.slack.com/archives/C0GENERAL01/p1790873873237539"
+		},
+		{
+			"ts": "1790873900.240969",
+			"user": {
+				"id": "U0BLAKE8R3V",
+				"name": "Blake",
+				"realName": "Blake Rivera",
+				"avatar": null,
+				"isBot": false,
+				"title": null,
+				"timezone": "America/Los_Angeles",
+				"presence": null,
+				"inChannel": false,
+				"isReader": false,
+				"team": null
+			},
+			"deleted": false,
+			"text": "not sure, don't we have data for this?",
+			"edited": false,
+			"broadcast": false,
+			"reactions": [],
+			"files": [],
+			"attachments": [],
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"kind": "section",
+							"inline": [
+								{
+									"kind": "text",
+									"text": "not sure, don't we have data for this?"
+								}
+							]
+						}
+					]
+				}
+			],
+			"permalink": "https://superset.slack.com/archives/C0GENERAL01/p1790873900240969"
+		},
+		{
+			"ts": "1790873904.670179",
+			"user": {
+				"id": "U0SATYA2P7D",
+				"name": "Satya Patel",
+				"realName": null,
+				"avatar": null,
+				"isBot": false,
+				"title": null,
+				"timezone": "America/Los_Angeles",
+				"presence": null,
+				"inChannel": false,
+				"isReader": true,
+				"team": null
+			},
+			"deleted": false,
+			"text": "Probably a waste of time discussion mb lol",
+			"edited": false,
+			"broadcast": false,
+			"reactions": [],
+			"files": [],
+			"attachments": [],
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"kind": "section",
+							"inline": [
+								{
+									"kind": "text",
+									"text": "Probably a waste of time discussion mb lol"
+								}
+							]
+						}
+					]
+				}
+			],
+			"permalink": "https://superset.slack.com/archives/C0GENERAL01/p1790873904670179"
+		},
+		{
+			"ts": "1790873907.513389",
+			"user": {
+				"id": "U0BLAKE8R3V",
+				"name": "Blake",
+				"realName": "Blake Rivera",
+				"avatar": null,
+				"isBot": false,
+				"title": null,
+				"timezone": "America/Los_Angeles",
+				"presence": null,
+				"inChannel": false,
+				"isReader": false,
+				"team": null
+			},
+			"deleted": false,
+			"text": "but should swap the PR back for now?",
+			"edited": false,
+			"broadcast": false,
+			"reactions": [],
+			"files": [],
+			"attachments": [],
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"kind": "section",
+							"inline": [
+								{
+									"kind": "text",
+									"text": "but should swap the PR back for now?"
+								}
+							]
+						}
+					]
+				}
+			],
+			"permalink": "https://superset.slack.com/archives/C0GENERAL01/p1790873907513389"
+		},
+		{
+			"ts": "1790873910.118519",
+			"user": {
+				"id": "U0BLAKE8R3V",
+				"name": "Blake",
+				"realName": "Blake Rivera",
+				"avatar": null,
+				"isBot": false,
+				"title": null,
+				"timezone": "America/Los_Angeles",
+				"presence": null,
+				"inChannel": false,
+				"isReader": false,
+				"team": null
+			},
+			"deleted": false,
+			"text": "yeah agreed",
+			"edited": false,
+			"broadcast": false,
+			"reactions": [
+				{
+					"name": "joy",
+					"count": 1,
+					"mine": true,
+					"users": ["U0SATYA2P7D"]
+				}
+			],
+			"files": [],
+			"attachments": [],
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"kind": "section",
+							"inline": [
+								{
+									"kind": "text",
+									"text": "yeah agreed"
+								}
+							]
+						}
+					]
+				}
+			],
+			"permalink": "https://superset.slack.com/archives/C0GENERAL01/p1790873910118519"
+		},
+		{
+			"ts": "1790873916.234459",
+			"user": {
+				"id": "U0SATYA2P7D",
+				"name": "Satya Patel",
+				"realName": null,
+				"avatar": null,
+				"isBot": false,
+				"title": null,
+				"timezone": "America/Los_Angeles",
+				"presence": null,
+				"inChannel": false,
+				"isReader": true,
+				"team": null
+			},
+			"deleted": false,
+			"text": "Oop",
+			"edited": false,
+			"broadcast": false,
+			"reactions": [],
+			"files": [],
+			"attachments": [],
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"kind": "section",
+							"inline": [
+								{
+									"kind": "text",
+									"text": "Oop"
+								}
+							]
+						}
+					]
+				}
+			],
+			"permalink": "https://superset.slack.com/archives/C0GENERAL01/p1790873916234459"
+		},
+		{
+			"ts": "1790873930.538099",
+			"user": {
+				"id": "U0SATYA2P7D",
+				"name": "Satya Patel",
+				"realName": null,
+				"avatar": null,
+				"isBot": false,
+				"title": null,
+				"timezone": "America/Los_Angeles",
+				"presence": null,
+				"inChannel": false,
+				"isReader": true,
+				"team": null
+			},
+			"deleted": false,
+			"text": "I think it's NBD it makes cloud look uglier is p much it ",
+			"edited": false,
+			"broadcast": false,
+			"reactions": [],
+			"files": [],
+			"attachments": [],
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"kind": "section",
+							"inline": [
+								{
+									"kind": "text",
+									"text": "I think it's NBD it makes cloud look uglier is p much it "
+								}
+							]
+						}
+					]
+				}
+			],
+			"permalink": "https://superset.slack.com/archives/C0GENERAL01/p1790873930538099"
+		},
+		{
+			"ts": "1790873930.591499",
+			"user": {
+				"id": "U0BLAKE8R3V",
+				"name": "Blake",
+				"realName": "Blake Rivera",
+				"avatar": null,
+				"isBot": false,
+				"title": null,
+				"timezone": "America/Los_Angeles",
+				"presence": null,
+				"inChannel": false,
+				"isReader": false,
+				"team": null
+			},
+			"deleted": false,
+			"text": "more like we will solve this later kinda thing",
+			"edited": false,
+			"broadcast": false,
+			"reactions": [
+				{
+					"name": "ok_hand",
+					"count": 1,
+					"mine": true,
+					"users": ["U0SATYA2P7D"]
+				}
+			],
+			"files": [],
+			"attachments": [],
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"kind": "section",
+							"inline": [
+								{
+									"kind": "text",
+									"text": "more like we will solve this later kinda thing"
+								}
+							]
+						}
+					]
+				}
+			],
+			"permalink": "https://superset.slack.com/archives/C0GENERAL01/p1790873930591499"
+		},
+		{
+			"ts": "1790873937.927729",
+			"user": {
+				"id": "U0SATYA2P7D",
+				"name": "Satya Patel",
+				"realName": null,
+				"avatar": null,
+				"isBot": false,
+				"title": null,
+				"timezone": "America/Los_Angeles",
+				"presence": null,
+				"inChannel": false,
+				"isReader": true,
+				"team": null
+			},
+			"deleted": false,
+			"text": "Ye agreed ",
+			"edited": false,
+			"broadcast": false,
+			"reactions": [],
+			"files": [],
+			"attachments": [],
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"kind": "section",
+							"inline": [
+								{
+									"kind": "text",
+									"text": "Ye agreed "
+								}
+							]
+						}
+					]
+				}
+			],
+			"permalink": "https://superset.slack.com/archives/C0GENERAL01/p1790873937927729"
+		},
+		{
+			"ts": "1790873954.720709",
+			"user": {
+				"id": "U0BLAKE8R3V",
+				"name": "Blake",
+				"realName": "Blake Rivera",
+				"avatar": null,
+				"isBot": false,
+				"title": null,
+				"timezone": "America/Los_Angeles",
+				"presence": null,
+				"inChannel": false,
+				"isReader": false,
+				"team": null
+			},
+			"deleted": false,
+			"text": "i think it's actually ok because you replace the open in external with the cloud stuff anyway no?",
+			"edited": false,
+			"broadcast": false,
+			"reactions": [],
+			"files": [],
+			"attachments": [],
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"kind": "section",
+							"inline": [
+								{
+									"kind": "text",
+									"text": "i think it's actually ok because you replace the open in external with the cloud stuff anyway no?"
+								}
+							]
+						}
+					]
+				}
+			],
+			"permalink": "https://superset.slack.com/archives/C0GENERAL01/p1790873954720709"
+		},
+		{
+			"ts": "1790873996.492189",
+			"user": {
+				"id": "U0SATYA2P7D",
+				"name": "Satya Patel",
+				"realName": null,
+				"avatar": null,
+				"isBot": false,
+				"title": null,
+				"timezone": "America/Los_Angeles",
+				"presence": null,
+				"inChannel": false,
+				"isReader": true,
+				"team": null
+			},
+			"deleted": false,
+			"text": "TRUUU",
+			"edited": false,
+			"broadcast": false,
+			"reactions": [],
+			"files": [],
+			"attachments": [],
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"kind": "section",
+							"inline": [
+								{
+									"kind": "text",
+									"text": "TRUUU"
+								}
+							]
+						}
+					]
+				}
+			],
+			"permalink": "https://superset.slack.com/archives/C0GENERAL01/p1790873996492189"
+		},
+		{
+			"ts": "1790874005.121359",
+			"user": {
+				"id": "U0SATYA2P7D",
+				"name": "Satya Patel",
+				"realName": null,
+				"avatar": null,
+				"isBot": false,
+				"title": null,
+				"timezone": "America/Los_Angeles",
+				"presence": null,
+				"inChannel": false,
+				"isReader": true,
+				"team": null
+			},
+			"deleted": false,
+			"text": "pr is still there but ye not a huge deal ",
+			"edited": false,
+			"broadcast": false,
+			"reactions": [],
+			"files": [],
+			"attachments": [],
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"kind": "section",
+							"inline": [
+								{
+									"kind": "text",
+									"text": "pr is still there but ye not a huge deal "
+								}
+							]
+						}
+					]
+				}
+			],
+			"permalink": "https://superset.slack.com/archives/C0GENERAL01/p1790874005121359"
+		},
+		{
+			"ts": "1790874813.760449",
+			"user": {
+				"id": "U0BLAKE8R3V",
+				"name": "Blake",
+				"realName": "Blake Rivera",
+				"avatar": null,
+				"isBot": false,
+				"title": null,
+				"timezone": "America/Los_Angeles",
+				"presence": null,
+				"inChannel": false,
+				"isReader": false,
+				"team": null
+			},
+			"deleted": false,
+			"text": "btw the review bot is skippin comments on any PR created in cloud",
+			"edited": false,
+			"broadcast": false,
+			"reactions": [
+				{
+					"name": "eyes",
+					"count": 1,
+					"mine": true,
+					"users": ["U0SATYA2P7D"]
+				}
+			],
+			"files": [
+				{
+					"id": "F0SHOT00001",
+					"name": "Screenshot 2026-10-01 at 10.13.30 AM.png",
+					"permalink": "https://superset.slack.com/files/U0SATYA2P7D/F0SHOT00001/screenshot_2026-10-01_at_10.13.30___am.png",
+					"type": "png",
+					"size": 199970,
+					"image": {
+						"url": "/fixtures/slack/F0SHOT00001.png",
+						"width": 1696,
+						"height": 1022
+					}
+				}
+			],
+			"attachments": [],
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"kind": "section",
+							"inline": [
+								{
+									"kind": "text",
+									"text": "btw the review bot is skippin comments on any PR created in cloud"
+								}
+							]
+						}
+					]
+				}
+			],
+			"permalink": "https://superset.slack.com/archives/C0GENERAL01/p1790874813760449"
+		},
+		{
+			"ts": "1790874821.502219",
+			"user": {
+				"id": "U0BLAKE8R3V",
+				"name": "Blake",
+				"realName": "Blake Rivera",
+				"avatar": null,
+				"isBot": false,
+				"title": null,
+				"timezone": "America/Los_Angeles",
+				"presence": null,
+				"inChannel": false,
+				"isReader": false,
+				"team": null
+			},
+			"deleted": false,
+			"text": "not sure if you're aware <@U0SATYA2P7D>",
+			"edited": false,
+			"broadcast": false,
+			"reactions": [],
+			"files": [],
+			"attachments": [],
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"kind": "section",
+							"inline": [
+								{
+									"kind": "text",
+									"text": "not sure if you're aware "
+								},
+								{
+									"kind": "user",
+									"id": "U0SATYA2P7D"
+								}
+							]
+						}
+					]
+				}
+			],
+			"permalink": "https://superset.slack.com/archives/C0GENERAL01/p1790874821502219"
+		}
+	],
+	"members": [
+		{
+			"id": "U0SATYA2P7D",
+			"name": "Satya Patel",
+			"realName": null,
+			"avatar": null,
+			"isBot": false,
+			"title": null,
+			"timezone": "America/Los_Angeles",
+			"presence": null,
+			"inChannel": true,
+			"isReader": true,
+			"team": null
+		},
+		{
+			"id": "U0BLAKE8R3V",
+			"name": "Blake",
+			"realName": "Blake Rivera",
+			"avatar": null,
+			"isBot": false,
+			"title": null,
+			"timezone": "America/Los_Angeles",
+			"presence": null,
+			"inChannel": true,
+			"isReader": false,
+			"team": null
+		}
+	],
+	"names": {
+		"U0BLAKE8R3V": "Blake",
+		"U0SATYA2P7D": "Satya Patel",
+		"U0AVERY4C1N": "Avery Chen",
+		"U0CLAUDE1A1": "Claude",
+		"U0GITHUB1A1": "GitHub",
+		"U0CURSOR1A1": "Cursor",
+		"U0SYFTEN1A1": "Syften",
+		"U0APPBOT1A1": "Superset"
+	},
+	"channels": {
+		"C0TESTAGNT1": "test-agents",
+		"C0BUGS00001": "bugs",
+		"C0GENERAL01": "general",
+		"C0AGENTS001": "agents"
+	},
+	"groups": {},
+	"emoji": {},
+	"readerConnected": true,
+	"draft": null
+}

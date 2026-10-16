@@ -430,6 +430,94 @@ export const serverErrorMessages: Record<
 				message: "Only the host owner can set its wake command",
 			}),
 		),
+	"serverError.inbox.cardNotFound": () =>
+		i18n._(
+			msg({
+				message: "Card not found",
+			}),
+		),
+	"serverError.inbox.blockAlreadySettled": () =>
+		i18n._(
+			msg({
+				message: "This part of the card was already answered",
+			}),
+		),
+	"serverError.inbox.readerSessionRequired": () =>
+		i18n._(
+			msg({
+				message:
+					"A card is answered by the person it was sent to, in the Superset app. An agent or the CLI cannot answer it.",
+			}),
+		),
+	"serverError.inbox.cursorCouldNotBeRead": () =>
+		i18n._(
+			msg({
+				message:
+					"That cursor could not be read. Drop it to start from the first page.",
+			}),
+		),
+	"serverError.inbox.recipientNotInOrganization": () =>
+		i18n._(
+			msg({
+				message: "No one in this organization matches that recipient",
+			}),
+		),
+	"serverError.inbox.documentVersionConflict": (params) =>
+		i18n._({
+			id: "serverError.inbox.documentVersionConflict",
+			message: "The document is at version {current}. Pull it and write again.",
+			values: params,
+		}),
+	"serverError.inbox.cardChanged": () =>
+		i18n._(
+			msg({
+				message: "The agent changed this card. Read it again before you act.",
+			}),
+		),
+	"serverError.inbox.alreadyResolved": () =>
+		i18n._(
+			msg({
+				message: "This card was already resolved",
+			}),
+		),
+	"serverError.inbox.blockNotACard": () =>
+		i18n._(
+			msg({
+				message: "That block is not an integration card",
+			}),
+		),
+	"serverError.inbox.actionUnavailable": (params) =>
+		i18n._({
+			id: "serverError.inbox.actionUnavailable",
+			message: "{reason}",
+			values: params,
+		}),
+	"serverError.inbox.answerDoesNotFitQuestion": (params) =>
+		i18n._({
+			id: "serverError.inbox.answerDoesNotFitQuestion",
+			message: "“{prompt}” needs an answer of the kind it asked for",
+			values: params,
+		}),
+	"serverError.inbox.keyOwnedByAnotherSession": () =>
+		i18n._(
+			msg({
+				message: "Another person's session already uses this key",
+			}),
+		),
+	"serverError.inbox.pagePrivateToSender": () =>
+		i18n._(
+			msg({
+				message:
+					"That page is visible only to you. Publish it to the organization before sending it to someone else",
+			}),
+		),
+	"serverError.inbox.tooManyOpenCards": (params) =>
+		i18n._({
+			id: "serverError.inbox.tooManyOpenCards",
+			message:
+				"This session already has {max} unanswered cards. Resolve one, or fold this into an existing card with --key.",
+			values: params,
+		}),
 	"serverError.integration.adminAccessRequired": () =>
 		i18n._(
 			msg({

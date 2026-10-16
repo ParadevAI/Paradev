@@ -5,7 +5,10 @@ import Suggestion, {
 	type SuggestionKeyDownProps,
 	type SuggestionProps,
 } from "@tiptap/suggestion";
+import type { ComponentType, RefAttributes } from "react";
 import tippy, { type Instance as TippyInstance } from "tippy.js";
+import { matchSuggestion } from "../../utils/matchSuggestion";
+import { suggestionKeyDown } from "../../utils/suggestionKeyDown";
 import {
 	RecordMentionList,
 	type RecordMentionListRef,
@@ -29,8 +32,14 @@ function toAttrs(item: RecordMentionItem) {
 	}
 }
 
+export type RecordMentionListComponent = ComponentType<
+	SuggestionProps<RecordMentionItem> & RefAttributes<RecordMentionListRef>
+>;
+
 export interface RecordMentionSuggestionOptions {
 	searchMentions: RecordMentionSearchFn | null;
+	/** Draws the suggestions; the app's own list unless a surface brings one. */
+	list: RecordMentionListComponent | null;
 }
 
 export const RecordMentionSuggestion =
@@ -38,7 +47,7 @@ export const RecordMentionSuggestion =
 		name: "recordMentionSuggestion",
 
 		addOptions() {
-			return { searchMentions: null };
+			return { searchMentions: null, list: null };
 		},
 
 		addProseMirrorPlugins() {
@@ -47,6 +56,7 @@ export const RecordMentionSuggestion =
 					pluginKey: recordMentionSuggestionKey,
 					editor: this.editor,
 					char: "@",
+					findSuggestionMatch: matchSuggestion,
 					allowSpaces: false,
 					allow: ({ state, range }) => {
 						const $pos = state.doc.resolve(range.from);
@@ -93,6 +103,7 @@ export const RecordMentionSuggestion =
 					},
 
 					render: () => {
+						const list = this.options.list;
 						let component: ReactRenderer<
 							RecordMentionListRef,
 							SuggestionProps<RecordMentionItem>
@@ -101,7 +112,7 @@ export const RecordMentionSuggestion =
 
 						return {
 							onStart: (props: SuggestionProps<RecordMentionItem>) => {
-								component = new ReactRenderer(RecordMentionList, {
+								component = new ReactRenderer(list ?? RecordMentionList, {
 									props,
 									editor: props.editor,
 								});
@@ -128,15 +139,8 @@ export const RecordMentionSuggestion =
 										getClientRect() ?? new DOMRect(),
 								});
 							},
-							onKeyDown: (props: SuggestionKeyDownProps) => {
-								if (props.event.key === "Escape") {
-									props.event.preventDefault();
-									props.event.stopPropagation();
-									popup?.[0]?.hide();
-									return true;
-								}
-								return component?.ref?.onKeyDown(props) ?? false;
-							},
+							onKeyDown: (props: SuggestionKeyDownProps) =>
+								suggestionKeyDown(popup?.[0], component?.ref, props),
 							onExit: () => {
 								popup?.[0]?.destroy();
 								component?.destroy();

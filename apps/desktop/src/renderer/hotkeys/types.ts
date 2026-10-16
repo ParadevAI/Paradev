@@ -15,7 +15,11 @@ export type HotkeyCategory =
 	| "Terminal"
 	| "Chat"
 	| "Window"
+	| "Inbox"
 	| "Help";
+
+/** A surface whose hotkeys act only while it holds keyboard focus. */
+export type HotkeyScope = "inbox";
 
 export interface HotkeyDisplay {
 	/** Individual symbols for <Kbd> components: ["⌘", "⇧", "N"] */
@@ -29,6 +33,7 @@ export interface HotkeyDefinition {
 	label: MessageDescriptor;
 	category: HotkeyCategory;
 	description?: MessageDescriptor;
+	scope?: HotkeyScope;
 }
 
 /**

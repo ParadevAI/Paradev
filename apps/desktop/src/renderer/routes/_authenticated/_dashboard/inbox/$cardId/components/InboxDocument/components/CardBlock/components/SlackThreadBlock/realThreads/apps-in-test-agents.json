@@ -1,0 +1,921 @@
+{
+	"kind": "slack.thread",
+	"channel": {
+		"id": "C0TESTAGNT1",
+		"name": "#test-agents"
+	},
+	"permalink": null,
+	"messages": [
+		{
+			"ts": "1772680465.928699",
+			"user": {
+				"id": "U0SYFTEN1A1",
+				"name": "Syften",
+				"realName": null,
+				"avatar": "/fixtures/slack/U0SYFTEN1A1.png",
+				"isBot": true,
+				"title": null,
+				"timezone": "America/Los_Angeles",
+				"presence": null,
+				"inChannel": false,
+				"isReader": false,
+				"team": null
+			},
+			"deleted": false,
+			"text": "",
+			"edited": false,
+			"broadcast": false,
+			"reactions": [],
+			"files": [],
+			"attachments": [
+				{
+					"color": "#000000",
+					"pretext": null,
+					"author": {
+						"name": "Daily Simple Questions Thread",
+						"icon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fwww.redditstatic.com%2Fshreddit%2Fassets%2Ffavicon%2F192x192.png",
+						"link": "https://www.reddit.com/r/Fitness/comments/example/daily_simple_questions_thread/"
+					},
+					"title": null,
+					"titleLink": null,
+					"text": "*Filter:* superset\nCan someone rate my leg day for jumping higher?\n\n1. Sprinter drills, dynamic warm-up, ankle and hip mobility. - 15 minutes. \n\n2. 3 X plyo superset. \n\n-Jump squats, 10 reps for height. \n-Skater jumps 10 reps each leg\nPogos\nPlenty of rest between\n\n3. Heavy lifts\n\n2X10-12 split squats\n2X15 leg extensions and leg curls\n1X20 calf raises to failure. \n\n4. Cardio, usually the stair machine or the rower.",
+					"fields": [],
+					"image": null,
+					"footer": "comment by lifts_with_lena",
+					"footerIcon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fwww.redditstatic.com%2Fshreddit%2Fassets%2Ffavicon%2F192x192.png",
+					"ts": null,
+					"blocks": [],
+					"unfurl": null,
+					"link": null,
+					"buttons": []
+				}
+			],
+			"blocks": [],
+			"permalink": "https://superset.slack.com/archives/C0TESTAGNT1/p1772680465928699"
+		},
+		{
+			"ts": "1772680587.044619",
+			"user": {
+				"id": "U0SYFTEN1A1",
+				"name": "Syften",
+				"realName": null,
+				"avatar": "/fixtures/slack/U0SYFTEN1A1.png",
+				"isBot": true,
+				"title": null,
+				"timezone": "America/Los_Angeles",
+				"presence": null,
+				"inChannel": false,
+				"isReader": false,
+				"team": null
+			},
+			"deleted": false,
+			"text": "",
+			"edited": false,
+			"broadcast": false,
+			"reactions": [],
+			"files": [],
+			"attachments": [
+				{
+					"color": "#000000",
+					"pretext": null,
+					"author": {
+						"name": "A Tweet by lifts_with_lena",
+						"icon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+						"link": "https://x.com/lifts_with_lena/status/2029300000000000000"
+					},
+					"title": null,
+					"titleLink": null,
+					"text": "*Filter:* superset\nShoulders and arms today :headphones:\n\npress - 8 reps - 4 sets\ncurls - 12 reps - 4 sets\npush down - 12 reps - 3 sets\nSuperset with\nraises - 12 reps - 3 sets\n\nSave &amp;amp; try it next time you're ... <https://x.com/lifts_with_lena/status/2029300000000000000/photo/1>",
+					"fields": [],
+					"image": null,
+					"footer": "post by Lena Fischer (412 followers)",
+					"footerIcon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+					"ts": null,
+					"blocks": [],
+					"unfurl": null,
+					"link": null,
+					"buttons": []
+				},
+				{
+					"color": "#000000",
+					"pretext": null,
+					"author": {
+						"name": "A Tweet by marcus_builds",
+						"icon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+						"link": "https://x.com/marcus_builds/status/2029300000000000001"
+					},
+					"title": null,
+					"titleLink": null,
+					"text": "*Filter:* superset\n@sam_ortega_writes Give @superset_sh a shot, the chat renders markdown and code well and it runs several agents side by side.",
+					"fields": [],
+					"image": null,
+					"footer": "post by Marcus Oyelaran (1830 followers)",
+					"footerIcon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+					"ts": null,
+					"blocks": [],
+					"unfurl": null,
+					"link": null,
+					"buttons": []
+				},
+				{
+					"color": "#000000",
+					"pretext": null,
+					"author": {
+						"name": "A Tweet by riya_codes",
+						"icon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+						"link": "https://x.com/riya_codes/status/2029300000000000002"
+					},
+					"title": null,
+					"titleLink": null,
+					"text": "*Filter:* superset\n@riya_codes TypeScript, a superset of JavaScript.",
+					"fields": [],
+					"image": null,
+					"footer": "post by Riya Kapoor (96 followers)",
+					"footerIcon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+					"ts": null,
+					"blocks": [],
+					"unfurl": null,
+					"link": null,
+					"buttons": []
+				},
+				{
+					"color": "#000000",
+					"pretext": null,
+					"author": {
+						"name": "A Tweet by sam_ortega_writes",
+						"icon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+						"link": "https://x.com/sam_ortega_writes/status/2029300000000000003"
+					},
+					"title": null,
+					"titleLink": null,
+					"text": "*Filter:* superset\nLeg day was a million reps. 360x20, 540x15, 630x10 on leg press.\n\nAnd I superset each one of those with calf raises at the same weight.\n\nMy legs are almost non-functional.",
+					"fields": [],
+					"image": null,
+					"footer": "post by Sam Ortega (2204 followers)",
+					"footerIcon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+					"ts": null,
+					"blocks": [],
+					"unfurl": null,
+					"link": null,
+					"buttons": []
+				},
+				{
+					"color": "#000000",
+					"pretext": null,
+					"author": {
+						"name": "A Tweet by devon_trains",
+						"icon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+						"link": "https://x.com/devon_trains/status/2029300000000000004"
+					},
+					"title": null,
+					"titleLink": null,
+					"text": "*Filter:* superset\nRT @blake_rivera: Where we want @superset_sh to go: agents you can leave alone\n\n0 - Write code by hand\n1 - Autocomplete…",
+					"fields": [],
+					"image": null,
+					"footer": "post by Devon Park (57 followers)",
+					"footerIcon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+					"ts": null,
+					"blocks": [],
+					"unfurl": null,
+					"link": null,
+					"buttons": []
+				},
+				{
+					"color": "#000000",
+					"pretext": null,
+					"author": {
+						"name": "A Tweet by noor_ships",
+						"icon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+						"link": "https://x.com/noor_ships/status/2029300000000000005"
+					},
+					"title": null,
+					"titleLink": null,
+					"text": "*Filter:* superset\n@devon_trains perf on superset is great. The only slow thing is find across files, it stalls sometimes. Still have to try the separate process option.",
+					"fields": [],
+					"image": null,
+					"footer": "post by Noor Haddad (731 followers)",
+					"footerIcon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+					"ts": null,
+					"blocks": [],
+					"unfurl": null,
+					"link": null,
+					"buttons": []
+				},
+				{
+					"color": "#000000",
+					"pretext": null,
+					"author": {
+						"name": "A Tweet by theo_runs_agents",
+						"icon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+						"link": "https://x.com/theo_runs_agents/status/2029300000000000006"
+					},
+					"title": null,
+					"titleLink": null,
+					"text": "*Filter:* superset\n@blake_rivera @superset_sh the harness matters more than the model for this, imo",
+					"fields": [],
+					"image": null,
+					"footer": "post by Theo Lindqvist (318 followers)",
+					"footerIcon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+					"ts": null,
+					"blocks": [],
+					"unfurl": null,
+					"link": null,
+					"buttons": []
+				},
+				{
+					"color": "#000000",
+					"pretext": null,
+					"author": {
+						"name": "A Tweet by mika_lifts",
+						"icon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+						"link": "https://x.com/mika_lifts/status/2029300000000000007"
+					},
+					"title": null,
+					"titleLink": null,
+					"text": "*Filter:* superset\n@noor_ships Biased but superset is worth a try imo",
+					"fields": [],
+					"image": null,
+					"footer": "post by Mika Tanaka (64 followers)",
+					"footerIcon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+					"ts": null,
+					"blocks": [],
+					"unfurl": null,
+					"link": null,
+					"buttons": []
+				},
+				{
+					"color": "#000000",
+					"pretext": null,
+					"author": {
+						"name": "A Tweet by blake_rivera",
+						"icon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+						"link": "https://x.com/blake_rivera/status/2029300000000000008"
+					},
+					"title": null,
+					"titleLink": null,
+					"text": "*Filter:* superset\n@riya_codes TypeScript, a superset of JavaScript.",
+					"fields": [],
+					"image": null,
+					"footer": "post by Blake (1855 followers)",
+					"footerIcon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+					"ts": null,
+					"blocks": [],
+					"unfurl": null,
+					"link": null,
+					"buttons": []
+				},
+				{
+					"color": "#000000",
+					"pretext": null,
+					"author": {
+						"name": "A Tweet by superset_sh",
+						"icon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+						"link": "https://x.com/superset_sh/status/2029300000000000009"
+					},
+					"title": null,
+					"titleLink": null,
+					"text": "*Filter:* superset\n@sam_ortega_writes Give @superset_sh a shot, the chat renders markdown and code well and it runs several agents side by side.",
+					"fields": [],
+					"image": null,
+					"footer": "post by Superset (1897 followers)",
+					"footerIcon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+					"ts": null,
+					"blocks": [],
+					"unfurl": null,
+					"link": null,
+					"buttons": []
+				},
+				{
+					"color": "#000000",
+					"pretext": null,
+					"author": {
+						"name": "A Tweet by lifts_with_lena",
+						"icon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+						"link": "https://x.com/lifts_with_lena/status/2029300000000000010"
+					},
+					"title": null,
+					"titleLink": null,
+					"text": "*Filter:* superset\n@theo_runs_agents As in superset right ?",
+					"fields": [],
+					"image": null,
+					"footer": "post by Lena Fischer (412 followers)",
+					"footerIcon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+					"ts": null,
+					"blocks": [],
+					"unfurl": null,
+					"link": null,
+					"buttons": []
+				},
+				{
+					"color": "#000000",
+					"pretext": null,
+					"author": {
+						"name": "A Tweet by marcus_builds",
+						"icon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+						"link": "https://x.com/marcus_builds/status/2029300000000000011"
+					},
+					"title": null,
+					"titleLink": null,
+					"text": "*Filter:* superset\nLeg day was a million reps. 360x20, 540x15, 630x10 on leg press.\n\nAnd I superset each one of those with calf raises at the same weight.\n\nMy legs are almost non-functional.",
+					"fields": [],
+					"image": null,
+					"footer": "post by Marcus Oyelaran (1830 followers)",
+					"footerIcon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+					"ts": null,
+					"blocks": [],
+					"unfurl": null,
+					"link": null,
+					"buttons": []
+				},
+				{
+					"color": "#000000",
+					"pretext": null,
+					"author": {
+						"name": "A Tweet by riya_codes",
+						"icon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+						"link": "https://x.com/riya_codes/status/2029300000000000012"
+					},
+					"title": null,
+					"titleLink": null,
+					"text": "*Filter:* superset\nRT @blake_rivera: Where we want @superset_sh to go: agents you can leave alone\n\n0 - Write code by hand\n1 - Autocomplete…",
+					"fields": [],
+					"image": null,
+					"footer": "post by Riya Kapoor (96 followers)",
+					"footerIcon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+					"ts": null,
+					"blocks": [],
+					"unfurl": null,
+					"link": null,
+					"buttons": []
+				},
+				{
+					"color": "#000000",
+					"pretext": null,
+					"author": {
+						"name": "A Tweet by sam_ortega_writes",
+						"icon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+						"link": "https://x.com/sam_ortega_writes/status/2029300000000000013"
+					},
+					"title": null,
+					"titleLink": null,
+					"text": "*Filter:* superset\n@noor_ships Biased but superset is worth a try imo",
+					"fields": [],
+					"image": null,
+					"footer": "post by Sam Ortega (2204 followers)",
+					"footerIcon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+					"ts": null,
+					"blocks": [],
+					"unfurl": null,
+					"link": null,
+					"buttons": []
+				},
+				{
+					"color": "#000000",
+					"pretext": null,
+					"author": {
+						"name": "A Tweet by devon_trains",
+						"icon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+						"link": "https://x.com/devon_trains/status/2029300000000000014"
+					},
+					"title": null,
+					"titleLink": null,
+					"text": "*Filter:* superset\n3/4/26\n\nStrength:\n8 Barbell Bench Press \n95 / 135 / 155 / 185#\nSuperset with\n10 DB Bent Over Row 60#\nWeighted plank\n\nConditioning: 4 Rounds: (16min. Total)\n40sec. Hang Power Cleans\n20sec. Rest\n40sec. Push-Ups\nRest",
+					"fields": [],
+					"image": null,
+					"footer": "post by Devon Park (57 followers)",
+					"footerIcon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+					"ts": null,
+					"blocks": [],
+					"unfurl": null,
+					"link": null,
+					"buttons": []
+				},
+				{
+					"color": "#000000",
+					"pretext": null,
+					"author": {
+						"name": "A Tweet by noor_ships",
+						"icon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+						"link": "https://x.com/noor_ships/status/2029300000000000015"
+					},
+					"title": null,
+					"titleLink": null,
+					"text": "*Filter:* superset\nThe best superset :saluting_face: <https://x.com/noor_ships/status/2029300000000000015/video/1>",
+					"fields": [],
+					"image": null,
+					"footer": "post by Noor Haddad (731 followers)",
+					"footerIcon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+					"ts": null,
+					"blocks": [],
+					"unfurl": null,
+					"link": null,
+					"buttons": []
+				},
+				{
+					"color": "#000000",
+					"pretext": null,
+					"author": {
+						"name": "A Tweet by theo_runs_agents",
+						"icon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+						"link": "https://x.com/theo_runs_agents/status/2029300000000000016"
+					},
+					"title": null,
+					"titleLink": null,
+					"text": "*Filter:* superset\nShoulders and arms today :headphones:\n\npress - 8 reps - 4 sets\ncurls - 12 reps - 4 sets\npush down - 12 reps - 3 sets\nSuperset with\nraises - 12 reps - 3 sets\n\nSave &amp;amp; try it next time you're ... <https://x.com/theo_runs_agents/status/2029300000000000016/photo/1>",
+					"fields": [],
+					"image": null,
+					"footer": "post by Theo Lindqvist (318 followers)",
+					"footerIcon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+					"ts": null,
+					"blocks": [],
+					"unfurl": null,
+					"link": null,
+					"buttons": []
+				},
+				{
+					"color": "#000000",
+					"pretext": null,
+					"author": {
+						"name": "A Tweet by mika_lifts",
+						"icon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+						"link": "https://x.com/mika_lifts/status/2029300000000000017"
+					},
+					"title": null,
+					"titleLink": null,
+					"text": "*Filter:* superset\n@marcus_builds @superset_sh Likely a bit of both, but more work on the harness and the environment for us",
+					"fields": [],
+					"image": null,
+					"footer": "post by Mika Tanaka (64 followers)",
+					"footerIcon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+					"ts": null,
+					"blocks": [],
+					"unfurl": null,
+					"link": null,
+					"buttons": []
+				},
+				{
+					"color": "#000000",
+					"pretext": null,
+					"author": {
+						"name": "A Tweet by blake_rivera",
+						"icon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+						"link": "https://x.com/blake_rivera/status/2029300000000000018"
+					},
+					"title": null,
+					"titleLink": null,
+					"text": "*Filter:* superset\n@blake_rivera @superset_sh the harness matters more than the model for this, imo",
+					"fields": [],
+					"image": null,
+					"footer": "post by Blake (1855 followers)",
+					"footerIcon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+					"ts": null,
+					"blocks": [],
+					"unfurl": null,
+					"link": null,
+					"buttons": []
+				},
+				{
+					"color": "#000000",
+					"pretext": null,
+					"author": {
+						"name": "A Tweet by superset_sh",
+						"icon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+						"link": "https://x.com/superset_sh/status/2029300000000000019"
+					},
+					"title": null,
+					"titleLink": null,
+					"text": "*Filter:* superset\n@noor_ships Biased but superset is worth a try imo",
+					"fields": [],
+					"image": null,
+					"footer": "post by Superset (1897 followers)",
+					"footerIcon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+					"ts": null,
+					"blocks": [],
+					"unfurl": null,
+					"link": null,
+					"buttons": []
+				},
+				{
+					"color": "#000000",
+					"pretext": null,
+					"author": {
+						"name": "A Tweet by lifts_with_lena",
+						"icon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+						"link": "https://x.com/lifts_with_lena/status/2029300000000000020"
+					},
+					"title": null,
+					"titleLink": null,
+					"text": "*Filter:* superset\nRT @blake_rivera: Where we want @superset_sh to go: agents you can leave alone\n\n0 - Write code by hand\n1 - Autocomplete…",
+					"fields": [],
+					"image": null,
+					"footer": "post by Lena Fischer (412 followers)",
+					"footerIcon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+					"ts": null,
+					"blocks": [],
+					"unfurl": null,
+					"link": null,
+					"buttons": []
+				},
+				{
+					"color": "#000000",
+					"pretext": null,
+					"author": {
+						"name": "A Tweet by marcus_builds",
+						"icon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+						"link": "https://x.com/marcus_builds/status/2029300000000000021"
+					},
+					"title": null,
+					"titleLink": null,
+					"text": "*Filter:* superset\nThe best superset :saluting_face: <https://x.com/marcus_builds/status/2029300000000000021/video/1>",
+					"fields": [],
+					"image": null,
+					"footer": "post by Marcus Oyelaran (1830 followers)",
+					"footerIcon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+					"ts": null,
+					"blocks": [],
+					"unfurl": null,
+					"link": null,
+					"buttons": []
+				},
+				{
+					"color": "#000000",
+					"pretext": null,
+					"author": {
+						"name": "A Tweet by riya_codes",
+						"icon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+						"link": "https://x.com/riya_codes/status/2029300000000000022"
+					},
+					"title": null,
+					"titleLink": null,
+					"text": "*Filter:* superset\n@theo_runs_agents As in superset right ?",
+					"fields": [],
+					"image": null,
+					"footer": "post by Riya Kapoor (96 followers)",
+					"footerIcon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+					"ts": null,
+					"blocks": [],
+					"unfurl": null,
+					"link": null,
+					"buttons": []
+				},
+				{
+					"color": "#000000",
+					"pretext": null,
+					"author": {
+						"name": "A Tweet by sam_ortega_writes",
+						"icon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+						"link": "https://x.com/sam_ortega_writes/status/2029300000000000023"
+					},
+					"title": null,
+					"titleLink": null,
+					"text": "*Filter:* superset\n@marcus_builds @superset_sh Likely a bit of both, but more work on the harness and the environment for us",
+					"fields": [],
+					"image": null,
+					"footer": "post by Sam Ortega (2204 followers)",
+					"footerIcon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+					"ts": null,
+					"blocks": [],
+					"unfurl": null,
+					"link": null,
+					"buttons": []
+				},
+				{
+					"color": "#000000",
+					"pretext": null,
+					"author": {
+						"name": "A Tweet by devon_trains",
+						"icon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+						"link": "https://x.com/devon_trains/status/2029300000000000024"
+					},
+					"title": null,
+					"titleLink": null,
+					"text": "*Filter:* superset\nShoulders and arms today :headphones:\n\npress - 8 reps - 4 sets\ncurls - 12 reps - 4 sets\npush down - 12 reps - 3 sets\nSuperset with\nraises - 12 reps - 3 sets\n\nSave &amp;amp; try it next time you're ... <https://x.com/devon_trains/status/2029300000000000024/photo/1>",
+					"fields": [],
+					"image": null,
+					"footer": "post by Devon Park (57 followers)",
+					"footerIcon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+					"ts": null,
+					"blocks": [],
+					"unfurl": null,
+					"link": null,
+					"buttons": []
+				},
+				{
+					"color": "#000000",
+					"pretext": null,
+					"author": {
+						"name": "A Tweet by noor_ships",
+						"icon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+						"link": "https://x.com/noor_ships/status/2029300000000000025"
+					},
+					"title": null,
+					"titleLink": null,
+					"text": "*Filter:* superset\n@sam_ortega_writes Give @superset_sh a shot, the chat renders markdown and code well and it runs several agents side by side.",
+					"fields": [],
+					"image": null,
+					"footer": "post by Noor Haddad (731 followers)",
+					"footerIcon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+					"ts": null,
+					"blocks": [],
+					"unfurl": null,
+					"link": null,
+					"buttons": []
+				},
+				{
+					"color": "#000000",
+					"pretext": null,
+					"author": {
+						"name": "A Tweet by theo_runs_agents",
+						"icon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+						"link": "https://x.com/theo_runs_agents/status/2029300000000000026"
+					},
+					"title": null,
+					"titleLink": null,
+					"text": "*Filter:* superset\n@riya_codes TypeScript, a superset of JavaScript.",
+					"fields": [],
+					"image": null,
+					"footer": "post by Theo Lindqvist (318 followers)",
+					"footerIcon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+					"ts": null,
+					"blocks": [],
+					"unfurl": null,
+					"link": null,
+					"buttons": []
+				},
+				{
+					"color": "#000000",
+					"pretext": null,
+					"author": {
+						"name": "A Tweet by mika_lifts",
+						"icon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+						"link": "https://x.com/mika_lifts/status/2029300000000000027"
+					},
+					"title": null,
+					"titleLink": null,
+					"text": "*Filter:* superset\nLeg day was a million reps. 360x20, 540x15, 630x10 on leg press.\n\nAnd I superset each one of those with calf raises at the same weight.\n\nMy legs are almost non-functional.",
+					"fields": [],
+					"image": null,
+					"footer": "post by Mika Tanaka (64 followers)",
+					"footerIcon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+					"ts": null,
+					"blocks": [],
+					"unfurl": null,
+					"link": null,
+					"buttons": []
+				},
+				{
+					"color": "#000000",
+					"pretext": null,
+					"author": {
+						"name": "A Tweet by blake_rivera",
+						"icon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+						"link": "https://x.com/blake_rivera/status/2029300000000000028"
+					},
+					"title": null,
+					"titleLink": null,
+					"text": "*Filter:* superset\n@theo_runs_agents As in superset right ?",
+					"fields": [],
+					"image": null,
+					"footer": "post by Blake (1855 followers)",
+					"footerIcon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+					"ts": null,
+					"blocks": [],
+					"unfurl": null,
+					"link": null,
+					"buttons": []
+				},
+				{
+					"color": "#000000",
+					"pretext": null,
+					"author": {
+						"name": "A Tweet by superset_sh",
+						"icon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+						"link": "https://x.com/superset_sh/status/2029300000000000029"
+					},
+					"title": null,
+					"titleLink": null,
+					"text": "*Filter:* superset\n@marcus_builds @superset_sh Likely a bit of both, but more work on the harness and the environment for us",
+					"fields": [],
+					"image": null,
+					"footer": "post by Superset (1897 followers)",
+					"footerIcon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+					"ts": null,
+					"blocks": [],
+					"unfurl": null,
+					"link": null,
+					"buttons": []
+				},
+				{
+					"color": "#000000",
+					"pretext": null,
+					"author": {
+						"name": "A Tweet by lifts_with_lena",
+						"icon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+						"link": "https://x.com/lifts_with_lena/status/2029300000000000030"
+					},
+					"title": null,
+					"titleLink": null,
+					"text": "*Filter:* superset\n3/4/26\n\nStrength:\n8 Barbell Bench Press \n95 / 135 / 155 / 185#\nSuperset with\n10 DB Bent Over Row 60#\nWeighted plank\n\nConditioning: 4 Rounds: (16min. Total)\n40sec. Hang Power Cleans\n20sec. Rest\n40sec. Push-Ups\nRest",
+					"fields": [],
+					"image": null,
+					"footer": "post by Lena Fischer (412 followers)",
+					"footerIcon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+					"ts": null,
+					"blocks": [],
+					"unfurl": null,
+					"link": null,
+					"buttons": []
+				},
+				{
+					"color": "#000000",
+					"pretext": null,
+					"author": {
+						"name": "A Tweet by marcus_builds",
+						"icon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+						"link": "https://x.com/marcus_builds/status/2029300000000000031"
+					},
+					"title": null,
+					"titleLink": null,
+					"text": "*Filter:* superset\n@mika_lifts Muy recomendable @superset_sh para muchos agentes. Lo estuve probando y mejoró bastante mi experiencia con varias instancias",
+					"fields": [],
+					"image": null,
+					"footer": "post by Marcus Oyelaran (1830 followers)",
+					"footerIcon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsyften.com%2Fstatic%2Fimgs%2Ftwitter.ico",
+					"ts": null,
+					"blocks": [],
+					"unfurl": null,
+					"link": null,
+					"buttons": []
+				}
+			],
+			"blocks": [],
+			"permalink": "https://superset.slack.com/archives/C0TESTAGNT1/p1772680587044619"
+		},
+		{
+			"ts": "1772680892.586409",
+			"user": {
+				"id": "U0SYFTEN1A1",
+				"name": "Syften",
+				"realName": null,
+				"avatar": "/fixtures/slack/U0SYFTEN1A1.png",
+				"isBot": true,
+				"title": null,
+				"timezone": "America/Los_Angeles",
+				"presence": null,
+				"inChannel": false,
+				"isReader": false,
+				"team": null
+			},
+			"deleted": false,
+			"text": "",
+			"edited": false,
+			"broadcast": false,
+			"reactions": [],
+			"files": [],
+			"attachments": [
+				{
+					"color": "#00BB00",
+					"pretext": null,
+					"author": null,
+					"title": null,
+					"titleLink": null,
+					"text": ":tada: Syften has been successfully configured!",
+					"fields": [],
+					"image": null,
+					"footer": null,
+					"footerIcon": null,
+					"ts": null,
+					"blocks": [],
+					"unfurl": null,
+					"link": null,
+					"buttons": []
+				}
+			],
+			"blocks": [],
+			"permalink": "https://superset.slack.com/archives/C0TESTAGNT1/p1772680892586409"
+		},
+		{
+			"ts": "1772680924.834409",
+			"user": {
+				"id": "U0SYFTEN1A1",
+				"name": "Syften",
+				"realName": null,
+				"avatar": "/fixtures/slack/U0SYFTEN1A1.png",
+				"isBot": true,
+				"title": null,
+				"timezone": "America/Los_Angeles",
+				"presence": null,
+				"inChannel": false,
+				"isReader": false,
+				"team": null
+			},
+			"deleted": false,
+			"text": "",
+			"edited": false,
+			"broadcast": false,
+			"reactions": [],
+			"files": [],
+			"attachments": [
+				{
+					"color": "#00BB00",
+					"pretext": null,
+					"author": null,
+					"title": null,
+					"titleLink": null,
+					"text": ":tada: Syften has been successfully configured!",
+					"fields": [],
+					"image": null,
+					"footer": null,
+					"footerIcon": null,
+					"ts": null,
+					"blocks": [],
+					"unfurl": null,
+					"link": null,
+					"buttons": []
+				}
+			],
+			"blocks": [],
+			"permalink": "https://superset.slack.com/archives/C0TESTAGNT1/p1772680924834409"
+		},
+		{
+			"ts": "1787255162.186459",
+			"user": {
+				"id": "U0CURSOR1A1",
+				"name": "Cursor",
+				"realName": null,
+				"avatar": "/fixtures/slack/U0CURSOR1A1.png",
+				"isBot": true,
+				"title": null,
+				"timezone": "America/Los_Angeles",
+				"presence": null,
+				"inChannel": false,
+				"isReader": false,
+				"team": null
+			},
+			"deleted": false,
+			"text": "The \"Untitled\" automation is enabled in this channel and may automatically trigger on messages that match conditions. View automation: <https://cursor.com/automations/00000000-0000-4000-8000-000000000001>",
+			"edited": false,
+			"broadcast": false,
+			"reactions": [],
+			"files": [],
+			"attachments": [],
+			"blocks": [
+				{
+					"type": "section",
+					"text": "The *<https://cursor.com/automations/00000000-0000-4000-8000-000000000001|Untitled>* automation is enabled in this channel and may automatically trigger on messages that match conditions.",
+					"fields": [],
+					"accessory": null
+				}
+			],
+			"permalink": "https://superset.slack.com/archives/C0TESTAGNT1/p1787255162186459"
+		}
+	],
+	"members": [
+		{
+			"id": "U0SYFTEN1A1",
+			"name": "Syften",
+			"realName": null,
+			"avatar": "/fixtures/slack/U0SYFTEN1A1.png",
+			"isBot": true,
+			"title": null,
+			"timezone": "America/Los_Angeles",
+			"presence": null,
+			"inChannel": true,
+			"isReader": false,
+			"team": null
+		},
+		{
+			"id": "U0CURSOR1A1",
+			"name": "Cursor",
+			"realName": null,
+			"avatar": "/fixtures/slack/U0CURSOR1A1.png",
+			"isBot": true,
+			"title": null,
+			"timezone": "America/Los_Angeles",
+			"presence": null,
+			"inChannel": true,
+			"isReader": false,
+			"team": null
+		}
+	],
+	"names": {
+		"U0BLAKE8R3V": "Blake",
+		"U0SATYA2P7D": "Satya Patel",
+		"U0AVERY4C1N": "Avery Chen",
+		"U0CLAUDE1A1": "Claude",
+		"U0GITHUB1A1": "GitHub",
+		"U0CURSOR1A1": "Cursor",
+		"U0SYFTEN1A1": "Syften",
+		"U0APPBOT1A1": "Superset"
+	},
+	"channels": {
+		"C0TESTAGNT1": "test-agents",
+		"C0BUGS00001": "bugs",
+		"C0GENERAL01": "general",
+		"C0AGENTS001": "agents"
+	},
+	"groups": {},
+	"emoji": {},
+	"readerConnected": true,
+	"draft": null
+}

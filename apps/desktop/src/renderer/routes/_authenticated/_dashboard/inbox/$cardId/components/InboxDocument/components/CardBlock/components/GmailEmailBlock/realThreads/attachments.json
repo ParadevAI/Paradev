@@ -1,0 +1,116 @@
+{
+	"kind": "gmail.email",
+	"mode": "reply",
+	"account": {
+		"email": "satya@superset.sh",
+		"photo": null
+	},
+	"sendAs": [
+		{
+			"email": "satya@superset.sh",
+			"name": "Satya Patel",
+			"isDefault": true,
+			"signature": ""
+		}
+	],
+	"canSend": true,
+	"draftGone": false,
+	"scheduledAt": null,
+	"thread": {
+		"id": "1a0fb9ddcfe52482",
+		"subject": "Offsite budget and venue photos",
+		"labels": [
+			{
+				"id": "INBOX",
+				"name": "Inbox",
+				"color": null
+			}
+		],
+		"messages": [
+			{
+				"id": "1a0fb9ddcfe52482",
+				"from": {
+					"name": "Marcus Bell",
+					"email": "marcus.bell@fieldstone.dev"
+				},
+				"to": [
+					{
+						"name": "Satya Patel",
+						"email": "satya@superset.sh"
+					}
+				],
+				"cc": [
+					{
+						"name": "Priya Raman",
+						"email": "priya.raman@northwind.co"
+					}
+				],
+				"bcc": [],
+				"date": "2026-10-02T07:57:01.000Z",
+				"snippet": "Hi Satya, Budget attached, and here is the lodge: We come in about $400 under the cap. Spreadsheet version coming Monday. Marcus",
+				"unread": false,
+				"starred": false,
+				"html": "<div>Hi Satya,</div><div><br></div><div>Budget attached, and here is the lodge:</div><div><br></div><div><img src=\"/fixtures/gmail/file-3.png\" alt=\"Lodge\" width=\"200\" height=\"200\"></div><div><br></div><div>We come in about $400 under the cap. Spreadsheet version coming Monday.</div><div><br></div><div>Marcus</div>",
+				"text": null,
+				"attachments": [
+					{
+						"partId": "1",
+						"filename": "offsite-budget.pdf",
+						"mimeType": "application/pdf",
+						"size": 391,
+						"url": "/fixtures/gmail/file-1.pdf",
+						"blocked": false
+					},
+					{
+						"partId": "2",
+						"filename": "seating-chart.png",
+						"mimeType": "image/png",
+						"size": 6002,
+						"url": "/fixtures/gmail/file-2.png",
+						"blocked": false
+					}
+				],
+				"clipped": false
+			}
+		],
+		"reply": {
+			"to": [
+				{
+					"name": "Marcus Bell",
+					"email": "marcus.bell@fieldstone.dev"
+				}
+			],
+			"cc": []
+		},
+		"replyAll": {
+			"to": [
+				{
+					"name": "Marcus Bell",
+					"email": "marcus.bell@fieldstone.dev"
+				}
+			],
+			"cc": [
+				{
+					"name": "Priya Raman",
+					"email": "priya.raman@northwind.co"
+				}
+			]
+		}
+	},
+	"draft": {
+		"to": [
+			{
+				"name": "Marcus Bell",
+				"email": "marcus.bell@fieldstone.dev"
+			}
+		],
+		"cc": [],
+		"bcc": [],
+		"subject": "Re: Offsite budget and venue photos",
+		"body": "",
+		"html": null,
+		"replyAll": false,
+		"from": "satya@superset.sh",
+		"attachments": []
+	}
+}

@@ -13,6 +13,7 @@ export {
 export { HOTKEYS, type HotkeyId, PLATFORM } from "./registry";
 export {
 	useHotkeyOverridesStore,
+	useHotkeyScopeStore,
 	useKeyboardPreferencesStore,
 } from "./stores";
 export type {
@@ -20,6 +21,7 @@ export type {
 	HotkeyCategory,
 	HotkeyDefinition,
 	HotkeyDisplay,
+	HotkeyScope,
 	ParsedBinding,
 	Platform,
 	ShortcutBinding,

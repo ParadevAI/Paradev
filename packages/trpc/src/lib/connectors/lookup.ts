@@ -72,6 +72,24 @@ export async function orgConnection(
 	return single(rows, connector);
 }
 
+/** Every live connection the organization has to a connector, newest first. */
+export async function orgConnections(
+	organizationId: string,
+	connector: string,
+	options: ConnectionLookupOptions = {},
+): Promise<SelectConnection[]> {
+	return db
+		.select()
+		.from(connections)
+		.where(
+			live(options, [
+				eq(connections.organizationId, organizationId),
+				eq(connections.connector, connector),
+			]),
+		)
+		.orderBy(...NEWEST_FIRST);
+}
+
 export async function userConnection(
 	organizationId: string,
 	connector: string,

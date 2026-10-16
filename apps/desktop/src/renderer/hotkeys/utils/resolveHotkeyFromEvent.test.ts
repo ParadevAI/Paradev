@@ -263,6 +263,26 @@ function chordKeyToCode(key: string): string {
 }
 
 describe("resolveHotkeyFromEvent", () => {
+	it("a chord a scoped hotkey shares still resolves to the global hotkey, so a terminal hands it to the app as before", () => {
+		const pairs = [
+			["INBOX_ARCHIVE", "SPLIT_AUTO"],
+			["INBOX_OPEN_SOURCE", "OPEN_PROJECT"],
+		] as const;
+		for (const [scoped, global] of pairs) {
+			const chord = parseBinding(HOTKEYS[scoped].key ?? "").chord;
+			expect(chord).toBe(parseBinding(HOTKEYS[global].key ?? "").chord);
+			expect(resolveHotkeyFromEvent(buildEventFromChord(chord))).toBe(global);
+		}
+	});
+
+	it("the card keys share no chord with a global hotkey: Focus Chat Input and Clear Terminal act everywhere", () => {
+		for (const global of ["FOCUS_CHAT_INPUT", "CLEAR_TERMINAL"] as const) {
+			const chord = parseBinding(HOTKEYS[global].key ?? "").chord;
+			for (const scoped of ["INBOX_NEXT", "INBOX_PREVIOUS"] as const)
+				expect(parseBinding(HOTKEYS[scoped].key ?? "").chord).not.toBe(chord);
+		}
+	});
+
 	it("returns null for non-keydown events", () => {
 		expect(
 			resolveHotkeyFromEvent(

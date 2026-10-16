@@ -1,0 +1,1 @@
+export { nameList } from "./nameList";

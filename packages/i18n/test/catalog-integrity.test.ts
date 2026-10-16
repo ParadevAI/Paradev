@@ -37,13 +37,11 @@ function parsePo(text: string): Entry[] {
 	return entries;
 }
 
-const stripIcu = (t: string) =>
-	t.replace(
-		/\{\s*\w+\s*,\s*(plural|select|selectordinal)\b[\s\S]*?\}\s*\}/g,
-		"",
-	);
+// A braced word right after a plural key is that branch's text, not a placeholder.
+const PLACEHOLDER =
+	/(?<!(?:=\d+|\b(?:zero|one|two|few|many|other))\s*)\{([A-Za-z0-9_]+)\}/g;
 const placeholders = (t: string) =>
-	new Set([...stripIcu(t).matchAll(/\{([A-Za-z0-9_]+)\}/g)].map((m) => m[1]));
+	new Set([...t.matchAll(PLACEHOLDER)].map((m) => m[1]));
 const tags = (t: string) =>
 	[...t.matchAll(/<\/?(\d+)\/?>/g)]
 		.map((m) => m[0])

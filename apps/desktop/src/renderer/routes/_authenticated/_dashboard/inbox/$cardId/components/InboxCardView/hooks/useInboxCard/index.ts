@@ -1,0 +1,1 @@
+export { useInboxCard } from "./useInboxCard";

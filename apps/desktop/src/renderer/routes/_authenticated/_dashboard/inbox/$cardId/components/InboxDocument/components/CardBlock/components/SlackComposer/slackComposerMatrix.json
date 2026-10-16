@@ -1,0 +1,2541 @@
+{
+	"btn-bold|empty": {
+		"steps": ["btn:Bold", "type:Q"],
+		"slack": "p \"*Q|*\""
+	},
+	"btn-bold|mid": {
+		"steps": ["type:hello world", "key:ArrowLeft*5", "btn:Bold", "type:Q"],
+		"slack": "p \"hello *Q|*world\""
+	},
+	"btn-bold|emptyline": {
+		"steps": ["type:hello\\n", "btn:Bold", "type:Q"],
+		"slack": "p \"hello\"\np \"*Q|*\""
+	},
+	"btn-bold|sel1": {
+		"steps": ["type:hello world", "key:ArrowLeft+shift*5", "btn:Bold"],
+		"slack": "p \"hello [*world]*\""
+	},
+	"btn-bold|selmulti": {
+		"steps": ["type:one\\ntwo", "key:ArrowUp+shift", "btn:Bold"],
+		"slack": "p \"one[\"\np \"*two]*\""
+	},
+	"btn-bold|list": {
+		"steps": ["type:- item", "btn:Bold", "type:Q"],
+		"slack": "ul \"item*Q|*\""
+	},
+	"btn-bold|emptyitem": {
+		"steps": ["type:- item\\n", "btn:Bold", "type:Q"],
+		"slack": "ul \"item\"\nul \"*Q|*\""
+	},
+	"btn-bold|code": {
+		"steps": ["type:```", "type:code", "btn:Bold", "type:Q"],
+		"slack": "pre \"codeQ|\""
+	},
+	"btn-bold|quote": {
+		"steps": ["type:>", "type:quote", "btn:Bold", "type:Q"],
+		"slack": "quote \"quote*Q|*\""
+	},
+	"btn-bold|inlinecode": {
+		"steps": ["type:say `x`", "btn:Bold", "type:Q"],
+		"slack": "p \"say `x`*Q|*\""
+	},
+	"btn-bold|emoji": {
+		"steps": ["type:hi :+1:", "btn:Bold", "type:Q"],
+		"slack": "p \"hi ⟨:+1:⟩*Q|*\""
+	},
+	"btn-bold|mention": {
+		"steps": ["type:hi @satya", "wait:900", "pick", "btn:Bold", "type:Q"],
+		"slack": "p \"hi ⟨@Satya Patel⟩ *Q|*\""
+	},
+	"btn-italic|empty": {
+		"steps": ["btn:Italic", "type:Q"],
+		"slack": "p \"_Q|_\""
+	},
+	"btn-italic|mid": {
+		"steps": ["type:hello world", "key:ArrowLeft*5", "btn:Italic", "type:Q"],
+		"slack": "p \"hello _Q|_world\""
+	},
+	"btn-italic|emptyline": {
+		"steps": ["type:hello\\n", "btn:Italic", "type:Q"],
+		"slack": "p \"hello\"\np \"_Q|_\""
+	},
+	"btn-italic|sel1": {
+		"steps": ["type:hello world", "key:ArrowLeft+shift*5", "btn:Italic"],
+		"slack": "p \"hello [_world]_\""
+	},
+	"btn-italic|selmulti": {
+		"steps": ["type:one\\ntwo", "key:ArrowUp+shift", "btn:Italic"],
+		"slack": "p \"one[\"\np \"_two]_\""
+	},
+	"btn-italic|list": {
+		"steps": ["type:- item", "btn:Italic", "type:Q"],
+		"slack": "ul \"item_Q|_\""
+	},
+	"btn-italic|emptyitem": {
+		"steps": ["type:- item\\n", "btn:Italic", "type:Q"],
+		"slack": "ul \"item\"\nul \"_Q|_\""
+	},
+	"btn-italic|code": {
+		"steps": ["type:```", "type:code", "btn:Italic", "type:Q"],
+		"slack": "pre \"codeQ|\""
+	},
+	"btn-italic|quote": {
+		"steps": ["type:>", "type:quote", "btn:Italic", "type:Q"],
+		"slack": "quote \"quote_Q|_\""
+	},
+	"btn-italic|inlinecode": {
+		"steps": ["type:say `x`", "btn:Italic", "type:Q"],
+		"slack": "p \"say `x`_Q|_\""
+	},
+	"btn-italic|emoji": {
+		"steps": ["type:hi :+1:", "btn:Italic", "type:Q"],
+		"slack": "p \"hi ⟨:+1:⟩_Q|_\""
+	},
+	"btn-italic|mention": {
+		"steps": ["type:hi @satya", "wait:900", "pick", "btn:Italic", "type:Q"],
+		"slack": "p \"hi ⟨@Satya Patel⟩ _Q|_\""
+	},
+	"btn-underline|empty": {
+		"steps": ["btn:Underline", "type:Q"],
+		"slack": "p \"+Q|+\""
+	},
+	"btn-underline|mid": {
+		"steps": ["type:hello world", "key:ArrowLeft*5", "btn:Underline", "type:Q"],
+		"slack": "p \"hello +Q|+world\""
+	},
+	"btn-underline|emptyline": {
+		"steps": ["type:hello\\n", "btn:Underline", "type:Q"],
+		"slack": "p \"hello\"\np \"+Q|+\""
+	},
+	"btn-underline|sel1": {
+		"steps": ["type:hello world", "key:ArrowLeft+shift*5", "btn:Underline"],
+		"slack": "p \"hello [+world]+\""
+	},
+	"btn-underline|selmulti": {
+		"steps": ["type:one\\ntwo", "key:ArrowUp+shift", "btn:Underline"],
+		"slack": "p \"one[\"\np \"+two]+\""
+	},
+	"btn-underline|list": {
+		"steps": ["type:- item", "btn:Underline", "type:Q"],
+		"slack": "ul \"item+Q|+\""
+	},
+	"btn-underline|emptyitem": {
+		"steps": ["type:- item\\n", "btn:Underline", "type:Q"],
+		"slack": "ul \"item\"\nul \"+Q|+\""
+	},
+	"btn-underline|code": {
+		"steps": ["type:```", "type:code", "btn:Underline", "type:Q"],
+		"slack": "pre \"codeQ|\""
+	},
+	"btn-underline|quote": {
+		"steps": ["type:>", "type:quote", "btn:Underline", "type:Q"],
+		"slack": "quote \"quote+Q|+\""
+	},
+	"btn-underline|inlinecode": {
+		"steps": ["type:say `x`", "btn:Underline", "type:Q"],
+		"slack": "p \"say `x`+Q|+\""
+	},
+	"btn-underline|emoji": {
+		"steps": ["type:hi :+1:", "btn:Underline", "type:Q"],
+		"slack": "p \"hi ⟨:+1:⟩+Q|+\""
+	},
+	"btn-underline|mention": {
+		"steps": ["type:hi @satya", "wait:900", "pick", "btn:Underline", "type:Q"],
+		"slack": "p \"hi ⟨@Satya Patel⟩ +Q|+\""
+	},
+	"btn-strike|empty": {
+		"steps": ["btn:Strikethrough", "type:Q"],
+		"slack": "p \"~Q|~\""
+	},
+	"btn-strike|mid": {
+		"steps": [
+			"type:hello world",
+			"key:ArrowLeft*5",
+			"btn:Strikethrough",
+			"type:Q"
+		],
+		"slack": "p \"hello ~Q|~world\""
+	},
+	"btn-strike|emptyline": {
+		"steps": ["type:hello\\n", "btn:Strikethrough", "type:Q"],
+		"slack": "p \"hello\"\np \"~Q|~\""
+	},
+	"btn-strike|sel1": {
+		"steps": ["type:hello world", "key:ArrowLeft+shift*5", "btn:Strikethrough"],
+		"slack": "p \"hello [~world]~\""
+	},
+	"btn-strike|selmulti": {
+		"steps": ["type:one\\ntwo", "key:ArrowUp+shift", "btn:Strikethrough"],
+		"slack": "p \"one[\"\np \"~two]~\""
+	},
+	"btn-strike|list": {
+		"steps": ["type:- item", "btn:Strikethrough", "type:Q"],
+		"slack": "ul \"item~Q|~\""
+	},
+	"btn-strike|emptyitem": {
+		"steps": ["type:- item\\n", "btn:Strikethrough", "type:Q"],
+		"slack": "ul \"item\"\nul \"~Q|~\""
+	},
+	"btn-strike|code": {
+		"steps": ["type:```", "type:code", "btn:Strikethrough", "type:Q"],
+		"slack": "pre \"codeQ|\""
+	},
+	"btn-strike|quote": {
+		"steps": ["type:>", "type:quote", "btn:Strikethrough", "type:Q"],
+		"slack": "quote \"quote~Q|~\""
+	},
+	"btn-strike|inlinecode": {
+		"steps": ["type:say `x`", "btn:Strikethrough", "type:Q"],
+		"slack": "p \"say `x`~Q|~\""
+	},
+	"btn-strike|emoji": {
+		"steps": ["type:hi :+1:", "btn:Strikethrough", "type:Q"],
+		"slack": "p \"hi ⟨:+1:⟩~Q|~\""
+	},
+	"btn-strike|mention": {
+		"steps": [
+			"type:hi @satya",
+			"wait:900",
+			"pick",
+			"btn:Strikethrough",
+			"type:Q"
+		],
+		"slack": "p \"hi ⟨@Satya Patel⟩ ~Q|~\""
+	},
+	"btn-link|empty": {
+		"steps": ["btn:Link", "wait:400"],
+		"slack": "p \"\""
+	},
+	"btn-link|mid": {
+		"steps": ["type:hello world", "key:ArrowLeft*5", "btn:Link", "wait:400"],
+		"slack": "p \"hello world\""
+	},
+	"btn-link|emptyline": {
+		"steps": ["type:hello\\n", "btn:Link", "wait:400"],
+		"slack": "p \"hello\"\np \"\""
+	},
+	"btn-link|sel1": {
+		"steps": [
+			"type:hello world",
+			"key:ArrowLeft+shift*5",
+			"btn:Link",
+			"wait:400"
+		],
+		"slack": "p \"hello world\""
+	},
+	"btn-link|selmulti": {
+		"steps": ["type:one\\ntwo", "key:ArrowUp+shift", "btn:Link", "wait:400"],
+		"slack": "p \"one\"\np \"two\""
+	},
+	"btn-link|list": {
+		"steps": ["type:- item", "btn:Link", "wait:400"],
+		"slack": "ul \"item\""
+	},
+	"btn-link|emptyitem": {
+		"steps": ["type:- item\\n", "btn:Link", "wait:400"],
+		"slack": "ul \"item\"\nul \"\""
+	},
+	"btn-link|code": {
+		"steps": ["type:```", "type:code", "btn:Link", "wait:400"],
+		"slack": "pre \"code|\""
+	},
+	"btn-link|quote": {
+		"steps": ["type:>", "type:quote", "btn:Link", "wait:400"],
+		"slack": "quote \"quote\""
+	},
+	"btn-link|inlinecode": {
+		"steps": ["type:say `x`", "btn:Link", "wait:400"],
+		"slack": "p \"say `x`\""
+	},
+	"btn-link|emoji": {
+		"steps": ["type:hi :+1:", "btn:Link", "wait:400"],
+		"slack": "p \"hi ⟨:+1:⟩\""
+	},
+	"btn-link|mention": {
+		"steps": ["type:hi @satya", "wait:900", "pick", "btn:Link", "wait:400"],
+		"slack": "p \"hi ⟨@Satya Patel⟩ \""
+	},
+	"btn-ol|empty": {
+		"steps": ["btn:Numbered list"],
+		"slack": "ol \"\""
+	},
+	"btn-ol|mid": {
+		"steps": ["type:hello world", "key:ArrowLeft*5", "btn:Numbered list"],
+		"slack": "ol \"hello |world\""
+	},
+	"btn-ol|emptyline": {
+		"steps": ["type:hello\\n", "btn:Numbered list"],
+		"slack": "p \"hello\"\nol \"\""
+	},
+	"btn-ol|sel1": {
+		"steps": ["type:hello world", "key:ArrowLeft+shift*5", "btn:Numbered list"],
+		"slack": "ol \"hello [world]\""
+	},
+	"btn-ol|selmulti": {
+		"steps": ["type:one\\ntwo", "key:ArrowUp+shift", "btn:Numbered list"],
+		"slack": "ol \"one[\"\nol \"two]\""
+	},
+	"btn-ol|list": {
+		"steps": ["type:- item", "btn:Numbered list"],
+		"slack": "ol \"item|\""
+	},
+	"btn-ol|emptyitem": {
+		"steps": ["type:- item\\n", "btn:Numbered list"],
+		"slack": "ul \"item\"\nol \"\""
+	},
+	"btn-ol|code": {
+		"steps": ["type:```", "type:code", "btn:Numbered list"],
+		"slack": "ol \"code|\""
+	},
+	"btn-ol|quote": {
+		"steps": ["type:>", "type:quote", "btn:Numbered list"],
+		"slack": "ol \"quote|\""
+	},
+	"btn-ol|inlinecode": {
+		"steps": ["type:say `x`", "btn:Numbered list"],
+		"slack": "ol \"say `x|`\""
+	},
+	"btn-ol|emoji": {
+		"steps": ["type:hi :+1:", "btn:Numbered list"],
+		"slack": "ol \"hi ⟨:+1:⟩\""
+	},
+	"btn-ol|mention": {
+		"steps": ["type:hi @satya", "wait:900", "pick", "btn:Numbered list"],
+		"slack": "ol \"hi ⟨@Satya Patel⟩ |\""
+	},
+	"btn-ul|empty": {
+		"steps": ["btn:Bulleted list"],
+		"slack": "ul \"\""
+	},
+	"btn-ul|mid": {
+		"steps": ["type:hello world", "key:ArrowLeft*5", "btn:Bulleted list"],
+		"slack": "ul \"hello |world\""
+	},
+	"btn-ul|emptyline": {
+		"steps": ["type:hello\\n", "btn:Bulleted list"],
+		"slack": "p \"hello\"\nul \"\""
+	},
+	"btn-ul|sel1": {
+		"steps": ["type:hello world", "key:ArrowLeft+shift*5", "btn:Bulleted list"],
+		"slack": "ul \"hello [world]\""
+	},
+	"btn-ul|selmulti": {
+		"steps": ["type:one\\ntwo", "key:ArrowUp+shift", "btn:Bulleted list"],
+		"slack": "ul \"one[\"\nul \"two]\""
+	},
+	"btn-ul|list": {
+		"steps": ["type:- item", "btn:Bulleted list"],
+		"slack": "p \"item|\""
+	},
+	"btn-ul|emptyitem": {
+		"steps": ["type:- item\\n", "btn:Bulleted list"],
+		"slack": "ul \"item\"\np \"|\""
+	},
+	"btn-ul|code": {
+		"steps": ["type:```", "type:code", "btn:Bulleted list"],
+		"slack": "ul \"code|\""
+	},
+	"btn-ul|quote": {
+		"steps": ["type:>", "type:quote", "btn:Bulleted list"],
+		"slack": "ul \"quote|\""
+	},
+	"btn-ul|inlinecode": {
+		"steps": ["type:say `x`", "btn:Bulleted list"],
+		"slack": "ul \"say `x|`\""
+	},
+	"btn-ul|emoji": {
+		"steps": ["type:hi :+1:", "btn:Bulleted list"],
+		"slack": "ul \"hi ⟨:+1:⟩\""
+	},
+	"btn-ul|mention": {
+		"steps": ["type:hi @satya", "wait:900", "pick", "btn:Bulleted list"],
+		"slack": "ul \"hi ⟨@Satya Patel⟩ |\""
+	},
+	"btn-quote|empty": {
+		"steps": ["btn:Blockquote"],
+		"slack": "quote \"|\""
+	},
+	"btn-quote|mid": {
+		"steps": ["type:hello world", "key:ArrowLeft*5", "btn:Blockquote"],
+		"slack": "quote \"hello |world\""
+	},
+	"btn-quote|emptyline": {
+		"steps": ["type:hello\\n", "btn:Blockquote"],
+		"slack": "p \"hello\"\nquote \"|\""
+	},
+	"btn-quote|sel1": {
+		"steps": ["type:hello world", "key:ArrowLeft+shift*5", "btn:Blockquote"],
+		"slack": "quote \"hello [world]\""
+	},
+	"btn-quote|selmulti": {
+		"steps": ["type:one\\ntwo", "key:ArrowUp+shift", "btn:Blockquote"],
+		"slack": "quote \"one[\"\nquote \"two]\""
+	},
+	"btn-quote|list": {
+		"steps": ["type:- item", "btn:Blockquote"],
+		"slack": "ul \"item|\""
+	},
+	"btn-quote|emptyitem": {
+		"steps": ["type:- item\\n", "btn:Blockquote"],
+		"slack": "ul \"item\"\nul \"\""
+	},
+	"btn-quote|code": {
+		"steps": ["type:```", "type:code", "btn:Blockquote"],
+		"slack": "pre \"code|\""
+	},
+	"btn-quote|quote": {
+		"steps": ["type:>", "type:quote", "btn:Blockquote"],
+		"slack": "p \"quote|\""
+	},
+	"btn-quote|inlinecode": {
+		"steps": ["type:say `x`", "btn:Blockquote"],
+		"slack": "quote \"say `x|`\""
+	},
+	"btn-quote|emoji": {
+		"steps": ["type:hi :+1:", "btn:Blockquote"],
+		"slack": "quote \"hi ⟨:+1:⟩|\""
+	},
+	"btn-quote|mention": {
+		"steps": ["type:hi @satya", "wait:900", "pick", "btn:Blockquote"],
+		"slack": "quote \"hi ⟨@Satya Patel⟩ |\""
+	},
+	"btn-code|empty": {
+		"steps": ["btn:Code", "type:Q"],
+		"slack": "p \"`Q|`\""
+	},
+	"btn-code|mid": {
+		"steps": ["type:hello world", "key:ArrowLeft*5", "btn:Code", "type:Q"],
+		"slack": "p \"hello `Q|`world\""
+	},
+	"btn-code|emptyline": {
+		"steps": ["type:hello\\n", "btn:Code", "type:Q"],
+		"slack": "p \"hello\"\np \"`Q|`\""
+	},
+	"btn-code|sel1": {
+		"steps": ["type:hello world", "key:ArrowLeft+shift*5", "btn:Code"],
+		"slack": "p \"hello [`world]`\""
+	},
+	"btn-code|selmulti": {
+		"steps": ["type:one\\ntwo", "key:ArrowUp+shift", "btn:Code"],
+		"slack": "p \"one[\"\np \"`two]`\""
+	},
+	"btn-code|list": {
+		"steps": ["type:- item", "btn:Code", "type:Q"],
+		"slack": "ul \"item`Q|`\""
+	},
+	"btn-code|emptyitem": {
+		"steps": ["type:- item\\n", "btn:Code", "type:Q"],
+		"slack": "ul \"item\"\nul \"`Q|`\""
+	},
+	"btn-code|code": {
+		"steps": ["type:```", "type:code", "btn:Code", "type:Q"],
+		"slack": "pre \"codeQ|\""
+	},
+	"btn-code|quote": {
+		"steps": ["type:>", "type:quote", "btn:Code", "type:Q"],
+		"slack": "quote \"quote`Q|`\""
+	},
+	"btn-code|inlinecode": {
+		"steps": ["type:say `x`", "btn:Code", "type:Q"],
+		"slack": "p \"say `xQ|`\""
+	},
+	"btn-code|emoji": {
+		"steps": ["type:hi :+1:", "btn:Code", "type:Q"],
+		"slack": "p \"hi ⟨:+1:⟩`Q|`\""
+	},
+	"btn-code|mention": {
+		"steps": ["type:hi @satya", "wait:900", "pick", "btn:Code", "type:Q"],
+		"slack": "p \"hi ⟨@Satya Patel⟩ `Q|`\""
+	},
+	"btn-pre|empty": {
+		"steps": ["btn:Code block"],
+		"slack": "pre \"|\""
+	},
+	"btn-pre|mid": {
+		"steps": ["type:hello world", "key:ArrowLeft*5", "btn:Code block"],
+		"slack": "pre \"hello |world\""
+	},
+	"btn-pre|emptyline": {
+		"steps": ["type:hello\\n", "btn:Code block"],
+		"slack": "p \"hello\"\npre \"|\""
+	},
+	"btn-pre|sel1": {
+		"steps": ["type:hello world", "key:ArrowLeft+shift*5", "btn:Code block"],
+		"slack": "pre \"hello [world]\""
+	},
+	"btn-pre|selmulti": {
+		"steps": ["type:one\\ntwo", "key:ArrowUp+shift", "btn:Code block"],
+		"slack": "pre \"one[\"\npre \"two]\""
+	},
+	"btn-pre|list": {
+		"steps": ["type:- item", "btn:Code block"],
+		"slack": "pre \"item|\""
+	},
+	"btn-pre|emptyitem": {
+		"steps": ["type:- item\\n", "btn:Code block"],
+		"slack": "ul \"item\"\npre \"|\""
+	},
+	"btn-pre|code": {
+		"steps": ["type:```", "type:code", "btn:Code block"],
+		"slack": "p \"code|\""
+	},
+	"btn-pre|quote": {
+		"steps": ["type:>", "type:quote", "btn:Code block"],
+		"slack": "pre \"quote|\""
+	},
+	"btn-pre|inlinecode": {
+		"steps": ["type:say `x`", "btn:Code block"],
+		"slack": "pre \"say x|\""
+	},
+	"btn-pre|emoji": {
+		"steps": ["type:hi :+1:", "btn:Code block"],
+		"slack": "pre \"hi :+1:|\""
+	},
+	"btn-pre|mention": {
+		"steps": ["type:hi @satya", "wait:900", "pick", "btn:Code block"],
+		"slack": "pre \"hi @Satya Patel |\""
+	},
+	"key-bold|empty": {
+		"steps": ["key:b+meta", "type:Q"],
+		"slack": "p \"*Q|*\""
+	},
+	"key-bold|mid": {
+		"steps": ["type:hello world", "key:ArrowLeft*5", "key:b+meta", "type:Q"],
+		"slack": "p \"hello *Q|*world\""
+	},
+	"key-bold|emptyline": {
+		"steps": ["type:hello\\n", "key:b+meta", "type:Q"],
+		"slack": "p \"hello\"\np \"*Q|*\""
+	},
+	"key-bold|sel1": {
+		"steps": ["type:hello world", "key:ArrowLeft+shift*5", "key:b+meta"],
+		"slack": "p \"hello [*world]*\""
+	},
+	"key-bold|selmulti": {
+		"steps": ["type:one\\ntwo", "key:ArrowUp+shift", "key:b+meta"],
+		"slack": "p \"one[\"\np \"*two]*\""
+	},
+	"key-bold|list": {
+		"steps": ["type:- item", "key:b+meta", "type:Q"],
+		"slack": "ul \"item*Q|*\""
+	},
+	"key-bold|emptyitem": {
+		"steps": ["type:- item\\n", "key:b+meta", "type:Q"],
+		"slack": "ul \"item\"\nul \"*Q|*\""
+	},
+	"key-bold|code": {
+		"steps": ["type:```", "type:code", "key:b+meta", "type:Q"],
+		"slack": "pre \"codeQ|\""
+	},
+	"key-bold|quote": {
+		"steps": ["type:>", "type:quote", "key:b+meta", "type:Q"],
+		"slack": "quote \"quote*Q|*\""
+	},
+	"key-bold|inlinecode": {
+		"steps": ["type:say `x`", "key:b+meta", "type:Q"],
+		"slack": "p \"say `x`*Q|*\""
+	},
+	"key-bold|emoji": {
+		"steps": ["type:hi :+1:", "key:b+meta", "type:Q"],
+		"slack": "p \"hi ⟨:+1:⟩*Q|*\""
+	},
+	"key-bold|mention": {
+		"steps": ["type:hi @satya", "wait:900", "pick", "key:b+meta", "type:Q"],
+		"slack": "p \"hi ⟨@Satya Patel⟩ *Q|*\""
+	},
+	"key-italic|empty": {
+		"steps": ["key:i+meta", "type:Q"],
+		"slack": "p \"_Q|_\""
+	},
+	"key-italic|mid": {
+		"steps": ["type:hello world", "key:ArrowLeft*5", "key:i+meta", "type:Q"],
+		"slack": "p \"hello _Q|_world\""
+	},
+	"key-italic|emptyline": {
+		"steps": ["type:hello\\n", "key:i+meta", "type:Q"],
+		"slack": "p \"hello\"\np \"_Q|_\""
+	},
+	"key-italic|sel1": {
+		"steps": ["type:hello world", "key:ArrowLeft+shift*5", "key:i+meta"],
+		"slack": "p \"hello [_world]_\""
+	},
+	"key-italic|selmulti": {
+		"steps": ["type:one\\ntwo", "key:ArrowUp+shift", "key:i+meta"],
+		"slack": "p \"one[\"\np \"_two]_\""
+	},
+	"key-italic|list": {
+		"steps": ["type:- item", "key:i+meta", "type:Q"],
+		"slack": "ul \"item_Q|_\""
+	},
+	"key-italic|emptyitem": {
+		"steps": ["type:- item\\n", "key:i+meta", "type:Q"],
+		"slack": "ul \"item\"\nul \"_Q|_\""
+	},
+	"key-italic|code": {
+		"steps": ["type:```", "type:code", "key:i+meta", "type:Q"],
+		"slack": "pre \"codeQ|\""
+	},
+	"key-italic|quote": {
+		"steps": ["type:>", "type:quote", "key:i+meta", "type:Q"],
+		"slack": "quote \"quote_Q|_\""
+	},
+	"key-italic|inlinecode": {
+		"steps": ["type:say `x`", "key:i+meta", "type:Q"],
+		"slack": "p \"say `x`_Q|_\""
+	},
+	"key-italic|emoji": {
+		"steps": ["type:hi :+1:", "key:i+meta", "type:Q"],
+		"slack": "p \"hi ⟨:+1:⟩_Q|_\""
+	},
+	"key-italic|mention": {
+		"steps": ["type:hi @satya", "wait:900", "pick", "key:i+meta", "type:Q"],
+		"slack": "p \"hi ⟨@Satya Patel⟩ _Q|_\""
+	},
+	"key-underline|empty": {
+		"steps": ["key:u+meta", "type:Q"],
+		"slack": "p \"+Q|+\""
+	},
+	"key-underline|mid": {
+		"steps": ["type:hello world", "key:ArrowLeft*5", "key:u+meta", "type:Q"],
+		"slack": "p \"hello +Q|+world\""
+	},
+	"key-underline|emptyline": {
+		"steps": ["type:hello\\n", "key:u+meta", "type:Q"],
+		"slack": "p \"hello\"\np \"+Q|+\""
+	},
+	"key-underline|sel1": {
+		"steps": ["type:hello world", "key:ArrowLeft+shift*5", "key:u+meta"],
+		"slack": "p \"hello [+world]+\""
+	},
+	"key-underline|selmulti": {
+		"steps": ["type:one\\ntwo", "key:ArrowUp+shift", "key:u+meta"],
+		"slack": "p \"one[\"\np \"+two]+\""
+	},
+	"key-underline|list": {
+		"steps": ["type:- item", "key:u+meta", "type:Q"],
+		"slack": "ul \"item+Q|+\""
+	},
+	"key-underline|emptyitem": {
+		"steps": ["type:- item\\n", "key:u+meta", "type:Q"],
+		"slack": "ul \"item\"\nul \"+Q|+\""
+	},
+	"key-underline|code": {
+		"steps": ["type:```", "type:code", "key:u+meta", "type:Q"],
+		"slack": "pre \"codeQ|\""
+	},
+	"key-underline|quote": {
+		"steps": ["type:>", "type:quote", "key:u+meta", "type:Q"],
+		"slack": "quote \"quote+Q|+\""
+	},
+	"key-underline|inlinecode": {
+		"steps": ["type:say `x`", "key:u+meta", "type:Q"],
+		"slack": "p \"say `x`+Q|+\""
+	},
+	"key-underline|emoji": {
+		"steps": ["type:hi :+1:", "key:u+meta", "type:Q"],
+		"slack": "p \"hi ⟨:+1:⟩+Q|+\""
+	},
+	"key-underline|mention": {
+		"steps": ["type:hi @satya", "wait:900", "pick", "key:u+meta", "type:Q"],
+		"slack": "p \"hi ⟨@Satya Patel⟩ +Q|+\""
+	},
+	"key-strike|empty": {
+		"steps": ["key:X+meta+shift", "type:Q"],
+		"slack": "p \"~Q|~\""
+	},
+	"key-strike|mid": {
+		"steps": [
+			"type:hello world",
+			"key:ArrowLeft*5",
+			"key:X+meta+shift",
+			"type:Q"
+		],
+		"slack": "p \"hello ~Q|~world\""
+	},
+	"key-strike|emptyline": {
+		"steps": ["type:hello\\n", "key:X+meta+shift", "type:Q"],
+		"slack": "p \"hello\"\np \"~Q|~\""
+	},
+	"key-strike|sel1": {
+		"steps": ["type:hello world", "key:ArrowLeft+shift*5", "key:X+meta+shift"],
+		"slack": "p \"hello [~world]~\""
+	},
+	"key-strike|selmulti": {
+		"steps": ["type:one\\ntwo", "key:ArrowUp+shift", "key:X+meta+shift"],
+		"slack": "p \"one[\"\np \"~two]~\""
+	},
+	"key-strike|list": {
+		"steps": ["type:- item", "key:X+meta+shift", "type:Q"],
+		"slack": "ul \"item~Q|~\""
+	},
+	"key-strike|emptyitem": {
+		"steps": ["type:- item\\n", "key:X+meta+shift", "type:Q"],
+		"slack": "ul \"item\"\nul \"~Q|~\""
+	},
+	"key-strike|code": {
+		"steps": ["type:```", "type:code", "key:X+meta+shift", "type:Q"],
+		"slack": "pre \"codeQ|\""
+	},
+	"key-strike|quote": {
+		"steps": ["type:>", "type:quote", "key:X+meta+shift", "type:Q"],
+		"slack": "quote \"quote~Q|~\""
+	},
+	"key-strike|inlinecode": {
+		"steps": ["type:say `x`", "key:X+meta+shift", "type:Q"],
+		"slack": "p \"say `x`~Q|~\""
+	},
+	"key-strike|emoji": {
+		"steps": ["type:hi :+1:", "key:X+meta+shift", "type:Q"],
+		"slack": "p \"hi ⟨:+1:⟩~Q|~\""
+	},
+	"key-strike|mention": {
+		"steps": [
+			"type:hi @satya",
+			"wait:900",
+			"pick",
+			"key:X+meta+shift",
+			"type:Q"
+		],
+		"slack": "p \"hi ⟨@Satya Patel⟩ ~Q|~\""
+	},
+	"key-ol|empty": {
+		"steps": ["key:&+meta+shift"],
+		"slack": "ol \"\""
+	},
+	"key-ol|mid": {
+		"steps": ["type:hello world", "key:ArrowLeft*5", "key:&+meta+shift"],
+		"slack": "ol \"hello |world\""
+	},
+	"key-ol|emptyline": {
+		"steps": ["type:hello\\n", "key:&+meta+shift"],
+		"slack": "p \"hello\"\nol \"\""
+	},
+	"key-ol|sel1": {
+		"steps": ["type:hello world", "key:ArrowLeft+shift*5", "key:&+meta+shift"],
+		"slack": "ol \"hello [world]\""
+	},
+	"key-ol|selmulti": {
+		"steps": ["type:one\\ntwo", "key:ArrowUp+shift", "key:&+meta+shift"],
+		"slack": "ol \"one[\"\nol \"two]\""
+	},
+	"key-ol|list": {
+		"steps": ["type:- item", "key:&+meta+shift"],
+		"slack": "ol \"item|\""
+	},
+	"key-ol|emptyitem": {
+		"steps": ["type:- item\\n", "key:&+meta+shift"],
+		"slack": "ul \"item\"\nol \"\""
+	},
+	"key-ol|code": {
+		"steps": ["type:```", "type:code", "key:&+meta+shift"],
+		"slack": "ol \"code|\""
+	},
+	"key-ol|quote": {
+		"steps": ["type:>", "type:quote", "key:&+meta+shift"],
+		"slack": "ol \"quote|\""
+	},
+	"key-ol|inlinecode": {
+		"steps": ["type:say `x`", "key:&+meta+shift"],
+		"slack": "ol \"say `x|`\""
+	},
+	"key-ol|emoji": {
+		"steps": ["type:hi :+1:", "key:&+meta+shift"],
+		"slack": "ol \"hi ⟨:+1:⟩\""
+	},
+	"key-ol|mention": {
+		"steps": ["type:hi @satya", "wait:900", "pick", "key:&+meta+shift"],
+		"slack": "ol \"hi ⟨@Satya Patel⟩ |\""
+	},
+	"key-ul|empty": {
+		"steps": ["key:*+meta+shift"],
+		"slack": "p \"|\""
+	},
+	"key-ul|mid": {
+		"steps": ["type:hello world", "key:ArrowLeft*5", "key:*+meta+shift"],
+		"slack": "p \"hello |world\""
+	},
+	"key-ul|emptyline": {
+		"steps": ["type:hello\\n", "key:*+meta+shift"],
+		"slack": "p \"hello\"\np \"|\""
+	},
+	"key-ul|sel1": {
+		"steps": ["type:hello world", "key:ArrowLeft+shift*5", "key:*+meta+shift"],
+		"slack": "p \"hello [world]\""
+	},
+	"key-ul|selmulti": {
+		"steps": ["type:one\\ntwo", "key:ArrowUp+shift", "key:*+meta+shift"],
+		"slack": "p \"one[\"\np \"two]\""
+	},
+	"key-ul|list": {
+		"steps": ["type:- item", "key:*+meta+shift"],
+		"slack": "ul \"item|\""
+	},
+	"key-ul|emptyitem": {
+		"steps": ["type:- item\\n", "key:*+meta+shift"],
+		"slack": "ul \"item\"\nul \"\""
+	},
+	"key-ul|code": {
+		"steps": ["type:```", "type:code", "key:*+meta+shift"],
+		"slack": "pre \"code|\""
+	},
+	"key-ul|quote": {
+		"steps": ["type:>", "type:quote", "key:*+meta+shift"],
+		"slack": "quote \"quote|\""
+	},
+	"key-ul|inlinecode": {
+		"steps": ["type:say `x`", "key:*+meta+shift"],
+		"slack": "p \"say `x`|\""
+	},
+	"key-ul|emoji": {
+		"steps": ["type:hi :+1:", "key:*+meta+shift"],
+		"slack": "p \"hi ⟨:+1:⟩|\""
+	},
+	"key-ul|mention": {
+		"steps": ["type:hi @satya", "wait:900", "pick", "key:*+meta+shift"],
+		"slack": "p \"hi ⟨@Satya Patel⟩ |\""
+	},
+	"key-quote|empty": {
+		"steps": ["key:(+meta+shift"],
+		"slack": "quote \"|\""
+	},
+	"key-quote|mid": {
+		"steps": ["type:hello world", "key:ArrowLeft*5", "key:(+meta+shift"],
+		"slack": "quote \"hello |world\""
+	},
+	"key-quote|emptyline": {
+		"steps": ["type:hello\\n", "key:(+meta+shift"],
+		"slack": "p \"hello\"\nquote \"|\""
+	},
+	"key-quote|sel1": {
+		"steps": ["type:hello world", "key:ArrowLeft+shift*5", "key:(+meta+shift"],
+		"slack": "quote \"hello [world]\""
+	},
+	"key-quote|selmulti": {
+		"steps": ["type:one\\ntwo", "key:ArrowUp+shift", "key:(+meta+shift"],
+		"slack": "quote \"one[\"\nquote \"two]\""
+	},
+	"key-quote|list": {
+		"steps": ["type:- item", "key:(+meta+shift"],
+		"slack": "ul \"item|\""
+	},
+	"key-quote|emptyitem": {
+		"steps": ["type:- item\\n", "key:(+meta+shift"],
+		"slack": "ul \"item\"\nul \"\""
+	},
+	"key-quote|code": {
+		"steps": ["type:```", "type:code", "key:(+meta+shift"],
+		"slack": "pre \"code|\""
+	},
+	"key-quote|quote": {
+		"steps": ["type:>", "type:quote", "key:(+meta+shift"],
+		"slack": "p \"quote|\""
+	},
+	"key-quote|inlinecode": {
+		"steps": ["type:say `x`", "key:(+meta+shift"],
+		"slack": "quote \"say `x|`\""
+	},
+	"key-quote|emoji": {
+		"steps": ["type:hi :+1:", "key:(+meta+shift"],
+		"slack": "quote \"hi ⟨:+1:⟩|\""
+	},
+	"key-quote|mention": {
+		"steps": ["type:hi @satya", "wait:900", "pick", "key:(+meta+shift"],
+		"slack": "quote \"hi ⟨@Satya Patel⟩ |\""
+	},
+	"key-code|empty": {
+		"steps": ["key:C+meta+shift", "type:Q"],
+		"slack": "p \"`Q|`\""
+	},
+	"key-code|mid": {
+		"steps": [
+			"type:hello world",
+			"key:ArrowLeft*5",
+			"key:C+meta+shift",
+			"type:Q"
+		],
+		"slack": "p \"hello `Q|`world\""
+	},
+	"key-code|emptyline": {
+		"steps": ["type:hello\\n", "key:C+meta+shift", "type:Q"],
+		"slack": "p \"hello\"\np \"`Q|`\""
+	},
+	"key-code|sel1": {
+		"steps": ["type:hello world", "key:ArrowLeft+shift*5", "key:C+meta+shift"],
+		"slack": "p \"hello [`world]`\""
+	},
+	"key-code|selmulti": {
+		"steps": ["type:one\\ntwo", "key:ArrowUp+shift", "key:C+meta+shift"],
+		"slack": "p \"one[\"\np \"`two]`\""
+	},
+	"key-code|list": {
+		"steps": ["type:- item", "key:C+meta+shift", "type:Q"],
+		"slack": "ul \"item`Q|`\""
+	},
+	"key-code|emptyitem": {
+		"steps": ["type:- item\\n", "key:C+meta+shift", "type:Q"],
+		"slack": "ul \"item\"\nul \"`Q|`\""
+	},
+	"key-code|code": {
+		"steps": ["type:```", "type:code", "key:C+meta+shift", "type:Q"],
+		"slack": "pre \"codeQ|\""
+	},
+	"key-code|quote": {
+		"steps": ["type:>", "type:quote", "key:C+meta+shift", "type:Q"],
+		"slack": "quote \"quote`Q|`\""
+	},
+	"key-code|inlinecode": {
+		"steps": ["type:say `x`", "key:C+meta+shift", "type:Q"],
+		"slack": "p \"say `xQ|`\""
+	},
+	"key-code|emoji": {
+		"steps": ["type:hi :+1:", "key:C+meta+shift", "type:Q"],
+		"slack": "p \"hi ⟨:+1:⟩`Q|`\""
+	},
+	"key-code|mention": {
+		"steps": [
+			"type:hi @satya",
+			"wait:900",
+			"pick",
+			"key:C+meta+shift",
+			"type:Q"
+		],
+		"slack": "p \"hi ⟨@Satya Patel⟩ `Q|`\""
+	},
+	"key-pre|empty": {
+		"steps": ["key:Ç+meta+alt+shift"],
+		"slack": "pre \"|\""
+	},
+	"key-pre|mid": {
+		"steps": ["type:hello world", "key:ArrowLeft*5", "key:Ç+meta+alt+shift"],
+		"slack": "pre \"hello |world\""
+	},
+	"key-pre|emptyline": {
+		"steps": ["type:hello\\n", "key:Ç+meta+alt+shift"],
+		"slack": "p \"hello\"\npre \"|\""
+	},
+	"key-pre|sel1": {
+		"steps": [
+			"type:hello world",
+			"key:ArrowLeft+shift*5",
+			"key:Ç+meta+alt+shift"
+		],
+		"slack": "pre \"hello [world]\""
+	},
+	"key-pre|selmulti": {
+		"steps": ["type:one\\ntwo", "key:ArrowUp+shift", "key:Ç+meta+alt+shift"],
+		"slack": "pre \"one[\"\npre \"two]\""
+	},
+	"key-pre|list": {
+		"steps": ["type:- item", "key:Ç+meta+alt+shift"],
+		"slack": "pre \"item|\""
+	},
+	"key-pre|emptyitem": {
+		"steps": ["type:- item\\n", "key:Ç+meta+alt+shift"],
+		"slack": "ul \"item\"\npre \"|\""
+	},
+	"key-pre|code": {
+		"steps": ["type:```", "type:code", "key:Ç+meta+alt+shift"],
+		"slack": "p \"code|\""
+	},
+	"key-pre|quote": {
+		"steps": ["type:>", "type:quote", "key:Ç+meta+alt+shift"],
+		"slack": "pre \"quote|\""
+	},
+	"key-pre|inlinecode": {
+		"steps": ["type:say `x`", "key:Ç+meta+alt+shift"],
+		"slack": "pre \"say x|\""
+	},
+	"key-pre|emoji": {
+		"steps": ["type:hi :+1:", "key:Ç+meta+alt+shift"],
+		"slack": "pre \"hi :+1:|\""
+	},
+	"key-pre|mention": {
+		"steps": ["type:hi @satya", "wait:900", "pick", "key:Ç+meta+alt+shift"],
+		"slack": "pre \"hi @Satya Patel |\""
+	},
+	"key-link|empty": {
+		"steps": ["key:U+meta+shift", "wait:400"],
+		"slack": "p \"\""
+	},
+	"key-link|mid": {
+		"steps": [
+			"type:hello world",
+			"key:ArrowLeft*5",
+			"key:U+meta+shift",
+			"wait:400"
+		],
+		"slack": "p \"hello world\""
+	},
+	"key-link|emptyline": {
+		"steps": ["type:hello\\n", "key:U+meta+shift", "wait:400"],
+		"slack": "p \"hello\"\np \"\""
+	},
+	"key-link|sel1": {
+		"steps": [
+			"type:hello world",
+			"key:ArrowLeft+shift*5",
+			"key:U+meta+shift",
+			"wait:400"
+		],
+		"slack": "p \"hello world\""
+	},
+	"key-link|selmulti": {
+		"steps": [
+			"type:one\\ntwo",
+			"key:ArrowUp+shift",
+			"key:U+meta+shift",
+			"wait:400"
+		],
+		"slack": "p \"one\"\np \"two\""
+	},
+	"key-link|list": {
+		"steps": ["type:- item", "key:U+meta+shift", "wait:400"],
+		"slack": "ul \"item\""
+	},
+	"key-link|emptyitem": {
+		"steps": ["type:- item\\n", "key:U+meta+shift", "wait:400"],
+		"slack": "ul \"item\"\nul \"\""
+	},
+	"key-link|quote": {
+		"steps": ["type:>", "type:quote", "key:U+meta+shift", "wait:400"],
+		"slack": "quote \"quote\""
+	},
+	"key-link|inlinecode": {
+		"steps": ["type:say `x`", "key:U+meta+shift", "wait:400"],
+		"slack": "p \"say `x`\""
+	},
+	"key-link|emoji": {
+		"steps": ["type:hi :+1:", "key:U+meta+shift", "wait:400"],
+		"slack": "p \"hi ⟨:+1:⟩\""
+	},
+	"key-link|mention": {
+		"steps": [
+			"type:hi @satya",
+			"wait:900",
+			"pick",
+			"key:U+meta+shift",
+			"wait:400"
+		],
+		"slack": "p \"hi ⟨@Satya Patel⟩ \""
+	},
+	"key-undo|empty": {
+		"steps": ["wait:1500", "type:z", "wait:1500", "key:z+meta"],
+		"slack": "p \"|\""
+	},
+	"key-undo|mid": {
+		"steps": [
+			"type:hello world",
+			"key:ArrowLeft*5",
+			"wait:1500",
+			"type:z",
+			"wait:1500",
+			"key:z+meta"
+		],
+		"slack": "p \"hello |world\""
+	},
+	"key-undo|emptyline": {
+		"steps": [
+			"type:hello\\n",
+			"wait:1500",
+			"type:z",
+			"wait:1500",
+			"key:z+meta"
+		],
+		"slack": "p \"hello\"\np \"|\""
+	},
+	"key-undo|sel1": {
+		"steps": [
+			"type:hello world",
+			"key:ArrowLeft+shift*5",
+			"wait:1500",
+			"type:z",
+			"wait:1500",
+			"key:z+meta"
+		],
+		"slack": "p \"hello world|\""
+	},
+	"key-undo|selmulti": {
+		"steps": [
+			"type:one\\ntwo",
+			"key:ArrowUp+shift",
+			"wait:1500",
+			"type:z",
+			"wait:1500",
+			"key:z+meta"
+		],
+		"slack": "p \"one\"\np \"two|\""
+	},
+	"key-undo|list": {
+		"steps": ["type:- item", "wait:1500", "type:z", "wait:1500", "key:z+meta"],
+		"slack": "ul \"item|\""
+	},
+	"key-undo|emptyitem": {
+		"steps": [
+			"type:- item\\n",
+			"wait:1500",
+			"type:z",
+			"wait:1500",
+			"key:z+meta"
+		],
+		"slack": "ul \"item\"\nul \"\""
+	},
+	"key-undo|code": {
+		"steps": [
+			"type:```",
+			"type:code",
+			"wait:1500",
+			"type:z",
+			"wait:1500",
+			"key:z+meta"
+		],
+		"slack": "pre \"code|\""
+	},
+	"key-undo|quote": {
+		"steps": [
+			"type:>",
+			"type:quote",
+			"wait:1500",
+			"type:z",
+			"wait:1500",
+			"key:z+meta"
+		],
+		"slack": "quote \"quote|\""
+	},
+	"key-undo|inlinecode": {
+		"steps": ["type:say `x`", "wait:1500", "type:z", "wait:1500", "key:z+meta"],
+		"slack": "p \"say `x|`\""
+	},
+	"key-undo|emoji": {
+		"steps": ["type:hi :+1:", "wait:1500", "type:z", "wait:1500", "key:z+meta"],
+		"slack": "p \"hi ⟨:+1:⟩|\""
+	},
+	"key-undo|mention": {
+		"steps": [
+			"type:hi @satya",
+			"wait:900",
+			"pick",
+			"wait:1500",
+			"type:z",
+			"wait:1500",
+			"key:z+meta"
+		],
+		"slack": "p \"hi ⟨@Satya Patel⟩ |\""
+	},
+	"type-star|empty": {
+		"steps": ["type:* "],
+		"slack": "ul \"\""
+	},
+	"type-star|mid": {
+		"steps": ["type:hello world", "key:ArrowLeft*5", "type:* "],
+		"slack": "p \"hello * |world\""
+	},
+	"type-star|emptyline": {
+		"steps": ["type:hello\\n", "type:* "],
+		"slack": "p \"hello\"\nul \"\""
+	},
+	"type-star|sel1": {
+		"steps": ["type:hello world", "key:ArrowLeft+shift*5", "type:* "],
+		"slack": "p \"hello * |\""
+	},
+	"type-star|selmulti": {
+		"steps": ["type:one\\ntwo", "key:ArrowUp+shift", "type:* "],
+		"slack": "p \"one* |\""
+	},
+	"type-star|list": {
+		"steps": ["type:- item", "type:* "],
+		"slack": "ul \"item* |\""
+	},
+	"type-star|emptyitem": {
+		"steps": ["type:- item\\n", "type:* "],
+		"slack": "ul \"item\"\nul \"* |\""
+	},
+	"type-star|code": {
+		"steps": ["type:```", "type:code", "type:* "],
+		"slack": "pre \"code* |\""
+	},
+	"type-star|quote": {
+		"steps": ["type:>", "type:quote", "type:* "],
+		"slack": "quote \"quote* |\""
+	},
+	"type-star|inlinecode": {
+		"steps": ["type:say `x`", "type:* "],
+		"slack": "p \"say `x`* |\""
+	},
+	"type-star|emoji": {
+		"steps": ["type:hi :+1:", "type:* "],
+		"slack": "p \"hi ⟨:+1:⟩* |\""
+	},
+	"type-star|mention": {
+		"steps": ["type:hi @satya", "wait:900", "pick", "type:* "],
+		"slack": "p \"hi ⟨@Satya Patel⟩ * |\""
+	},
+	"type-dash|empty": {
+		"steps": ["type:- "],
+		"slack": "ul \"\""
+	},
+	"type-dash|mid": {
+		"steps": ["type:hello world", "key:ArrowLeft*5", "type:- "],
+		"slack": "p \"hello - |world\""
+	},
+	"type-dash|emptyline": {
+		"steps": ["type:hello\\n", "type:- "],
+		"slack": "p \"hello\"\nul \"\""
+	},
+	"type-dash|sel1": {
+		"steps": ["type:hello world", "key:ArrowLeft+shift*5", "type:- "],
+		"slack": "p \"hello - |\""
+	},
+	"type-dash|selmulti": {
+		"steps": ["type:one\\ntwo", "key:ArrowUp+shift", "type:- "],
+		"slack": "p \"one- |\""
+	},
+	"type-dash|list": {
+		"steps": ["type:- item", "type:- "],
+		"slack": "ul \"item- |\""
+	},
+	"type-dash|emptyitem": {
+		"steps": ["type:- item\\n", "type:- "],
+		"slack": "ul \"item\"\nul \"- |\""
+	},
+	"type-dash|code": {
+		"steps": ["type:```", "type:code", "type:- "],
+		"slack": "pre \"code- |\""
+	},
+	"type-dash|quote": {
+		"steps": ["type:>", "type:quote", "type:- "],
+		"slack": "quote \"quote- |\""
+	},
+	"type-dash|inlinecode": {
+		"steps": ["type:say `x`", "type:- "],
+		"slack": "p \"say `x`- |\""
+	},
+	"type-dash|emoji": {
+		"steps": ["type:hi :+1:", "type:- "],
+		"slack": "p \"hi ⟨:+1:⟩- |\""
+	},
+	"type-dash|mention": {
+		"steps": ["type:hi @satya", "wait:900", "pick", "type:- "],
+		"slack": "p \"hi ⟨@Satya Patel⟩ - |\""
+	},
+	"type-num|empty": {
+		"steps": ["type:1. "],
+		"slack": "ol \"\""
+	},
+	"type-num|mid": {
+		"steps": ["type:hello world", "key:ArrowLeft*5", "type:1. "],
+		"slack": "p \"hello 1. |world\""
+	},
+	"type-num|emptyline": {
+		"steps": ["type:hello\\n", "type:1. "],
+		"slack": "p \"hello\"\nol \"\""
+	},
+	"type-num|sel1": {
+		"steps": ["type:hello world", "key:ArrowLeft+shift*5", "type:1. "],
+		"slack": "p \"hello 1. |\""
+	},
+	"type-num|selmulti": {
+		"steps": ["type:one\\ntwo", "key:ArrowUp+shift", "type:1. "],
+		"slack": "p \"one1. |\""
+	},
+	"type-num|list": {
+		"steps": ["type:- item", "type:1. "],
+		"slack": "ul \"item1. |\""
+	},
+	"type-num|emptyitem": {
+		"steps": ["type:- item\\n", "type:1. "],
+		"slack": "ul \"item\"\nul \"1. |\""
+	},
+	"type-num|code": {
+		"steps": ["type:```", "type:code", "type:1. "],
+		"slack": "pre \"code1. |\""
+	},
+	"type-num|quote": {
+		"steps": ["type:>", "type:quote", "type:1. "],
+		"slack": "quote \"quote1. |\""
+	},
+	"type-num|inlinecode": {
+		"steps": ["type:say `x`", "type:1. "],
+		"slack": "p \"say `x`1. |\""
+	},
+	"type-num|emoji": {
+		"steps": ["type:hi :+1:", "type:1. "],
+		"slack": "p \"hi ⟨:+1:⟩1. |\""
+	},
+	"type-num|mention": {
+		"steps": ["type:hi @satya", "wait:900", "pick", "type:1. "],
+		"slack": "p \"hi ⟨@Satya Patel⟩ 1. |\""
+	},
+	"type-gt|empty": {
+		"steps": ["type:> "],
+		"slack": "quote \" |\""
+	},
+	"type-gt|mid": {
+		"steps": ["type:hello world", "key:ArrowLeft*5", "type:> "],
+		"slack": "p \"hello > |world\""
+	},
+	"type-gt|emptyline": {
+		"steps": ["type:hello\\n", "type:> "],
+		"slack": "p \"hello\"\nquote \" |\""
+	},
+	"type-gt|sel1": {
+		"steps": ["type:hello world", "key:ArrowLeft+shift*5", "type:> "],
+		"slack": "p \"hello > |\""
+	},
+	"type-gt|selmulti": {
+		"steps": ["type:one\\ntwo", "key:ArrowUp+shift", "type:> "],
+		"slack": "p \"one> |\""
+	},
+	"type-gt|list": {
+		"steps": ["type:- item", "type:> "],
+		"slack": "ul \"item> |\""
+	},
+	"type-gt|emptyitem": {
+		"steps": ["type:- item\\n", "type:> "],
+		"slack": "ul \"item\"\nul \"> |\""
+	},
+	"type-gt|code": {
+		"steps": ["type:```", "type:code", "type:> "],
+		"slack": "pre \"code> |\""
+	},
+	"type-gt|quote": {
+		"steps": ["type:>", "type:quote", "type:> "],
+		"slack": "quote \"quote> |\""
+	},
+	"type-gt|inlinecode": {
+		"steps": ["type:say `x`", "type:> "],
+		"slack": "p \"say `x`> |\""
+	},
+	"type-gt|emoji": {
+		"steps": ["type:hi :+1:", "type:> "],
+		"slack": "p \"hi ⟨:+1:⟩> |\""
+	},
+	"type-tick|empty": {
+		"steps": ["type:`x`"],
+		"slack": "p \"`x`|\""
+	},
+	"type-tick|mid": {
+		"steps": ["type:hello world", "key:ArrowLeft*5", "type:`x`"],
+		"slack": "p \"hello `x`|world\""
+	},
+	"type-tick|emptyline": {
+		"steps": ["type:hello\\n", "type:`x`"],
+		"slack": "p \"hello\"\np \"`x`|\""
+	},
+	"type-tick|sel1": {
+		"steps": ["type:hello world", "key:ArrowLeft+shift*5", "type:`x`"],
+		"slack": "p \"hello `x`|\""
+	},
+	"type-tick|selmulti": {
+		"steps": ["type:one\\ntwo", "key:ArrowUp+shift", "type:`x`"],
+		"slack": "p \"one`x`|\""
+	},
+	"type-tick|list": {
+		"steps": ["type:- item", "type:`x`"],
+		"slack": "ul \"item`x`|\""
+	},
+	"type-tick|emptyitem": {
+		"steps": ["type:- item\\n", "type:`x`"],
+		"slack": "ul \"item\"\nul \"`x`|\""
+	},
+	"type-tick|code": {
+		"steps": ["type:```", "type:code", "type:`x`"],
+		"slack": "pre \"code`x`|\""
+	},
+	"type-tick|quote": {
+		"steps": ["type:>", "type:quote", "type:`x`"],
+		"slack": "quote \"quote`x`|\""
+	},
+	"type-tick|inlinecode": {
+		"steps": ["type:say `x`", "type:`x`"],
+		"slack": "p \"say `xx`|\""
+	},
+	"type-tick|emoji": {
+		"steps": ["type:hi :+1:", "type:`x`"],
+		"slack": "p \"hi ⟨:+1:⟩`x`|\""
+	},
+	"type-tick|mention": {
+		"steps": ["type:hi @satya", "wait:900", "pick", "type:`x`"],
+		"slack": "p \"hi ⟨@Satya Patel⟩ `x`|\""
+	},
+	"type-fence|empty": {
+		"steps": ["type:```"],
+		"slack": "pre \"|\""
+	},
+	"type-fence|mid": {
+		"steps": ["type:hello world", "key:ArrowLeft*5", "type:```"],
+		"slack": "p \"hello \"\npre \"|world\""
+	},
+	"type-fence|emptyline": {
+		"steps": ["type:hello\\n", "type:```"],
+		"slack": "p \"hello\"\npre \"|\""
+	},
+	"type-fence|sel1": {
+		"steps": ["type:hello world", "key:ArrowLeft+shift*5", "type:```"],
+		"slack": "p \"hello \"\npre \"|\""
+	},
+	"type-fence|selmulti": {
+		"steps": ["type:one\\ntwo", "key:ArrowUp+shift", "type:```"],
+		"slack": "p \"one\"\npre \"|\""
+	},
+	"type-fence|list": {
+		"steps": ["type:- item", "type:```"],
+		"slack": "ul \"item\"\npre \"|\""
+	},
+	"type-fence|emptyitem": {
+		"steps": ["type:- item\\n", "type:```"],
+		"slack": "ul \"item\"\npre \"|\""
+	},
+	"type-fence|code": {
+		"steps": ["type:```", "type:code", "type:```"],
+		"slack": "pre \"code\"\np \"|\""
+	},
+	"type-fence|quote": {
+		"steps": ["type:>", "type:quote", "type:```"],
+		"slack": "quote \"quote\"\npre \"|\""
+	},
+	"type-fence|inlinecode": {
+		"steps": ["type:say `x`", "type:```"],
+		"slack": "p \"say `x`\"\npre \"|\""
+	},
+	"type-fence|emoji": {
+		"steps": ["type:hi :+1:", "type:```"],
+		"slack": "p \"hi ⟨:+1:⟩\"\npre \"|\""
+	},
+	"type-fence|mention": {
+		"steps": ["type:hi @satya", "wait:900", "pick", "type:```"],
+		"slack": "p \"hi ⟨@Satya Patel⟩ \"\npre \"|\""
+	},
+	"type-bold|empty": {
+		"steps": ["type:*x*"],
+		"slack": "p \"*x*|\""
+	},
+	"type-bold|mid": {
+		"steps": ["type:hello world", "key:ArrowLeft*5", "type:*x*"],
+		"slack": "p \"hello *x*|world\""
+	},
+	"type-bold|emptyline": {
+		"steps": ["type:hello\\n", "type:*x*"],
+		"slack": "p \"hello\"\np \"*x*|\""
+	},
+	"type-bold|sel1": {
+		"steps": ["type:hello world", "key:ArrowLeft+shift*5", "type:*x*"],
+		"slack": "p \"hello *x*|\""
+	},
+	"type-bold|selmulti": {
+		"steps": ["type:one\\ntwo", "key:ArrowUp+shift", "type:*x*"],
+		"slack": "p \"one*x*|\""
+	},
+	"type-bold|list": {
+		"steps": ["type:- item", "type:*x*"],
+		"slack": "ul \"item*x*|\""
+	},
+	"type-bold|emptyitem": {
+		"steps": ["type:- item\\n", "type:*x*"],
+		"slack": "ul \"item\"\nul \"*x*|\""
+	},
+	"type-bold|code": {
+		"steps": ["type:```", "type:code", "type:*x*"],
+		"slack": "pre \"code*x*|\""
+	},
+	"type-bold|quote": {
+		"steps": ["type:>", "type:quote", "type:*x*"],
+		"slack": "quote \"quote*x*|\""
+	},
+	"type-bold|inlinecode": {
+		"steps": ["type:say `x`", "type:*x*"],
+		"slack": "p \"say `x`*x*|\""
+	},
+	"type-bold|emoji": {
+		"steps": ["type:hi :+1:", "type:*x*"],
+		"slack": "p \"hi ⟨:+1:⟩*x*|\""
+	},
+	"type-bold|mention": {
+		"steps": ["type:hi @satya", "wait:900", "pick", "type:*x*"],
+		"slack": "p \"hi ⟨@Satya Patel⟩ *x*|\""
+	},
+	"type-ital|empty": {
+		"steps": ["type:_x_"],
+		"slack": "p \"_x_|\""
+	},
+	"type-ital|mid": {
+		"steps": ["type:hello world", "key:ArrowLeft*5", "type:_x_"],
+		"slack": "p \"hello _x_|world\""
+	},
+	"type-ital|emptyline": {
+		"steps": ["type:hello\\n", "type:_x_"],
+		"slack": "p \"hello\"\np \"_x_|\""
+	},
+	"type-ital|sel1": {
+		"steps": ["type:hello world", "key:ArrowLeft+shift*5", "type:_x_"],
+		"slack": "p \"hello _x_|\""
+	},
+	"type-ital|selmulti": {
+		"steps": ["type:one\\ntwo", "key:ArrowUp+shift", "type:_x_"],
+		"slack": "p \"one_x_|\""
+	},
+	"type-ital|list": {
+		"steps": ["type:- item", "type:_x_"],
+		"slack": "ul \"item_x_|\""
+	},
+	"type-ital|emptyitem": {
+		"steps": ["type:- item\\n", "type:_x_"],
+		"slack": "ul \"item\"\nul \"_x_|\""
+	},
+	"type-ital|code": {
+		"steps": ["type:```", "type:code", "type:_x_"],
+		"slack": "pre \"code_x_|\""
+	},
+	"type-ital|quote": {
+		"steps": ["type:>", "type:quote", "type:_x_"],
+		"slack": "quote \"quote_x_|\""
+	},
+	"type-ital|inlinecode": {
+		"steps": ["type:say `x`", "type:_x_"],
+		"slack": "p \"say `x`_x_|\""
+	},
+	"type-ital|emoji": {
+		"steps": ["type:hi :+1:", "type:_x_"],
+		"slack": "p \"hi ⟨:+1:⟩_x_|\""
+	},
+	"type-ital|mention": {
+		"steps": ["type:hi @satya", "wait:900", "pick", "type:_x_"],
+		"slack": "p \"hi ⟨@Satya Patel⟩ _x_|\""
+	},
+	"type-strike|empty": {
+		"steps": ["type:~x~"],
+		"slack": "p \"~x~|\""
+	},
+	"type-strike|mid": {
+		"steps": ["type:hello world", "key:ArrowLeft*5", "type:~x~"],
+		"slack": "p \"hello ~x~|world\""
+	},
+	"type-strike|emptyline": {
+		"steps": ["type:hello\\n", "type:~x~"],
+		"slack": "p \"hello\"\np \"~x~|\""
+	},
+	"type-strike|sel1": {
+		"steps": ["type:hello world", "key:ArrowLeft+shift*5", "type:~x~"],
+		"slack": "p \"hello ~x~|\""
+	},
+	"type-strike|selmulti": {
+		"steps": ["type:one\\ntwo", "key:ArrowUp+shift", "type:~x~"],
+		"slack": "p \"one~x~|\""
+	},
+	"type-strike|list": {
+		"steps": ["type:- item", "type:~x~"],
+		"slack": "ul \"item~x~|\""
+	},
+	"type-strike|emptyitem": {
+		"steps": ["type:- item\\n", "type:~x~"],
+		"slack": "ul \"item\"\nul \"~x~|\""
+	},
+	"type-strike|code": {
+		"steps": ["type:```", "type:code", "type:~x~"],
+		"slack": "pre \"code~x~|\""
+	},
+	"type-strike|quote": {
+		"steps": ["type:>", "type:quote", "type:~x~"],
+		"slack": "quote \"quote~x~|\""
+	},
+	"type-strike|inlinecode": {
+		"steps": ["type:say `x`", "type:~x~"],
+		"slack": "p \"say `x`~x~|\""
+	},
+	"type-strike|emoji": {
+		"steps": ["type:hi :+1:", "type:~x~"],
+		"slack": "p \"hi ⟨:+1:⟩~x~|\""
+	},
+	"type-strike|mention": {
+		"steps": ["type:hi @satya", "wait:900", "pick", "type:~x~"],
+		"slack": "p \"hi ⟨@Satya Patel⟩ ~x~|\""
+	},
+	"type-emoji|empty": {
+		"steps": ["type::smi", "wait:700"],
+		"slack": "p \":smi|\""
+	},
+	"type-emoji|mid": {
+		"steps": ["type:hello world", "key:ArrowLeft*5", "type::smi", "wait:700"],
+		"slack": "p \"hello :smi|world\""
+	},
+	"type-emoji|emptyline": {
+		"steps": ["type:hello\\n", "type::smi", "wait:700"],
+		"slack": "p \"hello\"\np \":smi|\""
+	},
+	"type-emoji|sel1": {
+		"steps": [
+			"type:hello world",
+			"key:ArrowLeft+shift*5",
+			"type::smi",
+			"wait:700"
+		],
+		"slack": "p \"hello :smi|\""
+	},
+	"type-emoji|selmulti": {
+		"steps": ["type:one\\ntwo", "key:ArrowUp+shift", "type::smi", "wait:700"],
+		"slack": "p \"one:smi|\""
+	},
+	"type-emoji|list": {
+		"steps": ["type:- item", "type::smi", "wait:700"],
+		"slack": "ul \"item:smi|\""
+	},
+	"type-emoji|emptyitem": {
+		"steps": ["type:- item\\n", "type::smi", "wait:700"],
+		"slack": "ul \"item\"\nul \":smi|\""
+	},
+	"type-emoji|code": {
+		"steps": ["type:```", "type:code", "type::smi", "wait:700"],
+		"slack": "pre \"code:smi|\""
+	},
+	"type-emoji|quote": {
+		"steps": ["type:>", "type:quote", "type::smi", "wait:700"],
+		"slack": "quote \"quote:smi|\""
+	},
+	"type-emoji|inlinecode": {
+		"steps": ["type:say `x`", "type::smi", "wait:700"],
+		"slack": "p \"say `x`:smi|\""
+	},
+	"type-emoji|emoji": {
+		"steps": ["type:hi :+1:", "type::smi", "wait:700"],
+		"slack": "p \"hi ⟨:+1:⟩:smi|\""
+	},
+	"type-emoji|mention": {
+		"steps": ["type:hi @satya", "wait:900", "pick", "type::smi", "wait:700"],
+		"slack": "p \"hi ⟨@Satya Patel⟩ :smi|\""
+	},
+	"type-at|empty": {
+		"steps": ["type:@sat", "wait:900"],
+		"slack": "p \"@sat|\""
+	},
+	"type-at|mid": {
+		"steps": ["type:hello world", "key:ArrowLeft*5", "type:@sat", "wait:900"],
+		"slack": "p \"hello @sat|world\""
+	},
+	"type-at|emptyline": {
+		"steps": ["type:hello\\n", "type:@sat", "wait:900"],
+		"slack": "p \"hello\"\np \"@sat|\""
+	},
+	"type-at|sel1": {
+		"steps": [
+			"type:hello world",
+			"key:ArrowLeft+shift*5",
+			"type:@sat",
+			"wait:900"
+		],
+		"slack": "p \"hello @sat|\""
+	},
+	"type-at|selmulti": {
+		"steps": ["type:one\\ntwo", "key:ArrowUp+shift", "type:@sat", "wait:900"],
+		"slack": "p \"one@sat|\""
+	},
+	"type-at|list": {
+		"steps": ["type:- item", "type:@sat", "wait:900"],
+		"slack": "ul \"item@sat|\""
+	},
+	"type-at|emptyitem": {
+		"steps": ["type:- item\\n", "type:@sat", "wait:900"],
+		"slack": "ul \"item\"\nul \"@sat|\""
+	},
+	"type-at|code": {
+		"steps": ["type:```", "type:code", "type:@sat", "wait:900"],
+		"slack": "pre \"code@sat|\""
+	},
+	"type-at|quote": {
+		"steps": ["type:>", "type:quote", "type:@sat", "wait:900"],
+		"slack": "quote \"quote@sat|\""
+	},
+	"type-at|inlinecode": {
+		"steps": ["type:say `x`", "type:@sat", "wait:900"],
+		"slack": "p \"say `x`@sat|\""
+	},
+	"type-at|emoji": {
+		"steps": ["type:hi :+1:", "type:@sat", "wait:900"],
+		"slack": "p \"hi ⟨:+1:⟩@sat|\""
+	},
+	"type-at|mention": {
+		"steps": ["type:hi @satya", "wait:900", "pick", "type:@sat", "wait:900"],
+		"slack": "p \"hi ⟨@Satya Patel⟩ @sat|\""
+	},
+	"type-hash|empty": {
+		"steps": ["type:#gen", "wait:900"],
+		"slack": "p \"#gen|\""
+	},
+	"type-hash|mid": {
+		"steps": ["type:hello world", "key:ArrowLeft*5", "type:#gen", "wait:900"],
+		"slack": "p \"hello #gen|world\""
+	},
+	"type-hash|emptyline": {
+		"steps": ["type:hello\\n", "type:#gen", "wait:900"],
+		"slack": "p \"hello\"\np \"#gen|\""
+	},
+	"type-hash|sel1": {
+		"steps": [
+			"type:hello world",
+			"key:ArrowLeft+shift*5",
+			"type:#gen",
+			"wait:900"
+		],
+		"slack": "p \"hello #gen|\""
+	},
+	"type-hash|selmulti": {
+		"steps": ["type:one\\ntwo", "key:ArrowUp+shift", "type:#gen", "wait:900"],
+		"slack": "p \"one#gen|\""
+	},
+	"type-hash|list": {
+		"steps": ["type:- item", "type:#gen", "wait:900"],
+		"slack": "ul \"item#gen|\""
+	},
+	"type-hash|emptyitem": {
+		"steps": ["type:- item\\n", "type:#gen", "wait:900"],
+		"slack": "ul \"item\"\nul \"#gen|\""
+	},
+	"type-hash|code": {
+		"steps": ["type:```", "type:code", "type:#gen", "wait:900"],
+		"slack": "pre \"code#gen|\""
+	},
+	"type-hash|quote": {
+		"steps": ["type:>", "type:quote", "type:#gen", "wait:900"],
+		"slack": "quote \"quote#gen|\""
+	},
+	"type-hash|inlinecode": {
+		"steps": ["type:say `x`", "type:#gen", "wait:900"],
+		"slack": "p \"say `x`#gen|\""
+	},
+	"type-hash|emoji": {
+		"steps": ["type:hi :+1:", "type:#gen", "wait:900"],
+		"slack": "p \"hi ⟨:+1:⟩#gen|\""
+	},
+	"type-hash|mention": {
+		"steps": ["type:hi @satya", "wait:900", "pick", "type:#gen", "wait:900"],
+		"slack": "p \"hi ⟨@Satya Patel⟩ #gen|\""
+	},
+	"type-slash|empty": {
+		"steps": ["type:/", "wait:700"],
+		"slack": "p \"/|\""
+	},
+	"type-slash|mid": {
+		"steps": ["type:hello world", "key:ArrowLeft*5", "type:/", "wait:700"],
+		"slack": "p \"hello /|world\""
+	},
+	"type-slash|emptyline": {
+		"steps": ["type:hello\\n", "type:/", "wait:700"],
+		"slack": "p \"hello\"\np \"/|\""
+	},
+	"type-slash|sel1": {
+		"steps": [
+			"type:hello world",
+			"key:ArrowLeft+shift*5",
+			"type:/",
+			"wait:700"
+		],
+		"slack": "p \"hello /|\""
+	},
+	"type-slash|selmulti": {
+		"steps": ["type:one\\ntwo", "key:ArrowUp+shift", "type:/", "wait:700"],
+		"slack": "p \"one/|\""
+	},
+	"type-slash|list": {
+		"steps": ["type:- item", "type:/", "wait:700"],
+		"slack": "ul \"item/|\""
+	},
+	"type-slash|emptyitem": {
+		"steps": ["type:- item\\n", "type:/", "wait:700"],
+		"slack": "ul \"item\"\nul \"/|\""
+	},
+	"type-slash|code": {
+		"steps": ["type:```", "type:code", "type:/", "wait:700"],
+		"slack": "pre \"code/|\""
+	},
+	"type-slash|quote": {
+		"steps": ["type:>", "type:quote", "type:/", "wait:700"],
+		"slack": "quote \"quote/|\""
+	},
+	"type-slash|inlinecode": {
+		"steps": ["type:say `x`", "type:/", "wait:700"],
+		"slack": "p \"say `x`/|\""
+	},
+	"type-slash|emoji": {
+		"steps": ["type:hi :+1:", "type:/", "wait:700"],
+		"slack": "p \"hi ⟨:+1:⟩/|\""
+	},
+	"type-slash|mention": {
+		"steps": ["type:hi @satya", "wait:900", "pick", "type:/", "wait:700"],
+		"slack": "p \"hi ⟨@Satya Patel⟩ /|\""
+	},
+	"shift-enter|empty": {
+		"steps": ["key:Enter+shift"],
+		"slack": "p \"\"\np \"|\""
+	},
+	"shift-enter|mid": {
+		"steps": ["type:hello world", "key:ArrowLeft*5", "key:Enter+shift"],
+		"slack": "p \"hello \"\np \"|world\""
+	},
+	"shift-enter|emptyline": {
+		"steps": ["type:hello\\n", "key:Enter+shift"],
+		"slack": "p \"hello\"\np \"\"\np \"|\""
+	},
+	"shift-enter|sel1": {
+		"steps": ["type:hello world", "key:ArrowLeft+shift*5", "key:Enter+shift"],
+		"slack": "p \"hello \"\np \"|\""
+	},
+	"shift-enter|selmulti": {
+		"steps": ["type:one\\ntwo", "key:ArrowUp+shift", "key:Enter+shift"],
+		"slack": "p \"one\"\np \"|\""
+	},
+	"shift-enter|list": {
+		"steps": ["type:- item", "key:Enter+shift"],
+		"slack": "ul \"item\"\nul \"\""
+	},
+	"shift-enter|emptyitem": {
+		"steps": ["type:- item\\n", "key:Enter+shift"],
+		"slack": "ul \"item\"\np \"|\""
+	},
+	"shift-enter|code": {
+		"steps": ["type:```", "type:code", "key:Enter+shift"],
+		"slack": "pre \"code\"\npre \"|\""
+	},
+	"shift-enter|quote": {
+		"steps": ["type:>", "type:quote", "key:Enter+shift"],
+		"slack": "quote \"quote\"\nquote \"|\""
+	},
+	"shift-enter|inlinecode": {
+		"steps": ["type:say `x`", "key:Enter+shift"],
+		"slack": "p \"say `x`\"\np \"|\""
+	},
+	"shift-enter|emoji": {
+		"steps": ["type:hi :+1:", "key:Enter+shift"],
+		"slack": "p \"hi ⟨:+1:⟩\"\np \"|\""
+	},
+	"shift-enter|mention": {
+		"steps": ["type:hi @satya", "wait:900", "pick", "key:Enter+shift"],
+		"slack": "p \"hi ⟨@Satya Patel⟩ \"\np \"|\""
+	},
+	"backspace|empty": {
+		"steps": ["key:Backspace"],
+		"slack": "p \"|\""
+	},
+	"backspace|mid": {
+		"steps": ["type:hello world", "key:ArrowLeft*5", "key:Backspace"],
+		"slack": "p \"hello|world\""
+	},
+	"backspace|emptyline": {
+		"steps": ["type:hello\\n", "key:Backspace"],
+		"slack": "p \"hello|\""
+	},
+	"backspace|sel1": {
+		"steps": ["type:hello world", "key:ArrowLeft+shift*5", "key:Backspace"],
+		"slack": "p \"hello |\""
+	},
+	"backspace|selmulti": {
+		"steps": ["type:one\\ntwo", "key:ArrowUp+shift", "key:Backspace"],
+		"slack": "p \"one|\""
+	},
+	"backspace|list": {
+		"steps": ["type:- item", "key:Backspace"],
+		"slack": "ul \"ite|\""
+	},
+	"backspace|emptyitem": {
+		"steps": ["type:- item\\n", "key:Backspace"],
+		"slack": "ul \"item\"\np \"|\""
+	},
+	"backspace|code": {
+		"steps": ["type:```", "type:code", "key:Backspace"],
+		"slack": "pre \"cod|\""
+	},
+	"backspace|quote": {
+		"steps": ["type:>", "type:quote", "key:Backspace"],
+		"slack": "quote \"quot|\""
+	},
+	"backspace|inlinecode": {
+		"steps": ["type:say `x`", "key:Backspace"],
+		"slack": "p \"say |\""
+	},
+	"backspace|emoji": {
+		"steps": ["type:hi :+1:", "key:Backspace"],
+		"slack": "p \"hi |\""
+	},
+	"backspace|mention": {
+		"steps": ["type:hi @satya", "wait:900", "pick", "key:Backspace"],
+		"slack": "p \"hi ⟨@Satya Patel⟩\""
+	},
+	"tab|empty": {
+		"steps": ["key:Tab"],
+		"slack": "p \"|\""
+	},
+	"tab|mid": {
+		"steps": ["type:hello world", "key:ArrowLeft*5", "key:Tab"],
+		"slack": "p \"hello |world\""
+	},
+	"tab|emptyline": {
+		"steps": ["type:hello\\n", "key:Tab"],
+		"slack": "p \"hello\"\np \"|\""
+	},
+	"tab|sel1": {
+		"steps": ["type:hello world", "key:ArrowLeft+shift*5", "key:Tab"],
+		"slack": "p \"hello [world]\""
+	},
+	"tab|selmulti": {
+		"steps": ["type:one\\ntwo", "key:ArrowUp+shift", "key:Tab"],
+		"slack": "p \"one[\"\np \"two]\""
+	},
+	"tab|list": {
+		"steps": ["type:- item", "key:Tab"],
+		"slack": "ul \"item|\""
+	},
+	"tab|emptyitem": {
+		"steps": ["type:- item\\n", "key:Tab"],
+		"slack": "ul \"item\"\n  ul \"\""
+	},
+	"tab|code": {
+		"steps": ["type:```", "type:code", "key:Tab"],
+		"slack": "pre \"code|\""
+	},
+	"tab|quote": {
+		"steps": ["type:>", "type:quote", "key:Tab"],
+		"slack": "quote \"quote|\""
+	},
+	"tab|inlinecode": {
+		"steps": ["type:say `x`", "key:Tab"],
+		"slack": "p \"say `x`|\""
+	},
+	"tab|emoji": {
+		"steps": ["type:hi :+1:", "key:Tab"],
+		"slack": "p \"hi ⟨:+1:⟩|\""
+	},
+	"tab|mention": {
+		"steps": ["type:hi @satya", "wait:900", "pick", "key:Tab"],
+		"slack": "p \"hi ⟨@Satya Patel⟩ |\""
+	},
+	"shift-tab|empty": {
+		"steps": ["key:Tab+shift"],
+		"slack": "p \"|\""
+	},
+	"shift-tab|mid": {
+		"steps": ["type:hello world", "key:ArrowLeft*5", "key:Tab+shift"],
+		"slack": "p \"hello |world\""
+	},
+	"shift-tab|emptyline": {
+		"steps": ["type:hello\\n", "key:Tab+shift"],
+		"slack": "p \"hello\"\np \"|\""
+	},
+	"shift-tab|sel1": {
+		"steps": ["type:hello world", "key:ArrowLeft+shift*5", "key:Tab+shift"],
+		"slack": "p \"hello [world]\""
+	},
+	"shift-tab|selmulti": {
+		"steps": ["type:one\\ntwo", "key:ArrowUp+shift", "key:Tab+shift"],
+		"slack": "p \"one[\"\np \"two]\""
+	},
+	"shift-tab|list": {
+		"steps": ["type:- item", "key:Tab+shift"],
+		"slack": "ul \"item|\""
+	},
+	"shift-tab|emptyitem": {
+		"steps": ["type:- item\\n", "key:Tab+shift"],
+		"slack": "ul \"item\"\nul \"\""
+	},
+	"shift-tab|code": {
+		"steps": ["type:```", "type:code", "key:Tab+shift"],
+		"slack": "pre \"code|\""
+	},
+	"shift-tab|quote": {
+		"steps": ["type:>", "type:quote", "key:Tab+shift"],
+		"slack": "quote \"quote|\""
+	},
+	"shift-tab|inlinecode": {
+		"steps": ["type:say `x`", "key:Tab+shift"],
+		"slack": "p \"say `x`|\""
+	},
+	"shift-tab|emoji": {
+		"steps": ["type:hi :+1:", "key:Tab+shift"],
+		"slack": "p \"hi ⟨:+1:⟩|\""
+	},
+	"shift-tab|mention": {
+		"steps": ["type:hi @satya", "wait:900", "pick", "key:Tab+shift"],
+		"slack": "p \"hi ⟨@Satya Patel⟩ |\""
+	},
+	"paste-text|empty": {
+		"steps": ["clip:a\\nb", "key:v+meta"],
+		"slack": "p \"a\"\np \"b|\""
+	},
+	"paste-text|mid": {
+		"steps": [
+			"type:hello world",
+			"key:ArrowLeft*5",
+			"clip:a\\nb",
+			"key:v+meta"
+		],
+		"slack": "p \"hello a\"\np \"b|world\""
+	},
+	"paste-text|emptyline": {
+		"steps": ["type:hello\\n", "clip:a\\nb", "key:v+meta"],
+		"slack": "p \"hello\"\np \"a\"\np \"b|\""
+	},
+	"paste-text|sel1": {
+		"steps": [
+			"type:hello world",
+			"key:ArrowLeft+shift*5",
+			"clip:a\\nb",
+			"key:v+meta"
+		],
+		"slack": "p \"hello a\"\np \"b|\""
+	},
+	"paste-text|selmulti": {
+		"steps": [
+			"type:one\\ntwo",
+			"key:ArrowUp+shift",
+			"clip:a\\nb",
+			"key:v+meta"
+		],
+		"slack": "p \"onea\"\np \"b|\""
+	},
+	"paste-text|list": {
+		"steps": ["type:- item", "clip:a\\nb", "key:v+meta"],
+		"slack": "ul \"itema\"\nul \"b|\""
+	},
+	"paste-text|emptyitem": {
+		"steps": ["type:- item\\n", "clip:a\\nb", "key:v+meta"],
+		"slack": "ul \"item\"\nul \"a\"\nul \"b|\""
+	},
+	"paste-text|code": {
+		"steps": ["type:```", "type:code", "clip:a\\nb", "key:v+meta"],
+		"slack": "pre \"codea\"\npre \"b|\""
+	},
+	"paste-text|quote": {
+		"steps": ["type:>", "type:quote", "clip:a\\nb", "key:v+meta"],
+		"slack": "quote \"quotea\"\nquote \"b|\""
+	},
+	"paste-text|inlinecode": {
+		"steps": ["type:say `x`", "clip:a\\nb", "key:v+meta"],
+		"slack": "p \"say `x`a\"\np \"b|\""
+	},
+	"paste-text|emoji": {
+		"steps": ["type:hi :+1:", "clip:a\\nb", "key:v+meta"],
+		"slack": "p \"hi ⟨:+1:⟩a\"\np \"b|\""
+	},
+	"paste-text|mention": {
+		"steps": ["type:hi @satya", "wait:900", "pick", "clip:a\\nb", "key:v+meta"],
+		"slack": "p \"hi ⟨@Satya Patel⟩ a\"\np \"b|\""
+	},
+	"paste-list|empty": {
+		"steps": ["clip:- a\\n- b", "key:v+meta"],
+		"slack": "p \"- a\"\np \"- b|\""
+	},
+	"paste-list|mid": {
+		"steps": [
+			"type:hello world",
+			"key:ArrowLeft*5",
+			"clip:- a\\n- b",
+			"key:v+meta"
+		],
+		"slack": "p \"hello - a\"\np \"- b|world\""
+	},
+	"paste-list|emptyline": {
+		"steps": ["type:hello\\n", "clip:- a\\n- b", "key:v+meta"],
+		"slack": "p \"hello\"\np \"- a\"\np \"- b|\""
+	},
+	"paste-list|sel1": {
+		"steps": [
+			"type:hello world",
+			"key:ArrowLeft+shift*5",
+			"clip:- a\\n- b",
+			"key:v+meta"
+		],
+		"slack": "p \"hello - a\"\np \"- b|\""
+	},
+	"paste-list|selmulti": {
+		"steps": [
+			"type:one\\ntwo",
+			"key:ArrowUp+shift",
+			"clip:- a\\n- b",
+			"key:v+meta"
+		],
+		"slack": "p \"one- a\"\np \"- b|\""
+	},
+	"paste-list|list": {
+		"steps": ["type:- item", "clip:- a\\n- b", "key:v+meta"],
+		"slack": "ul \"item- a\"\nul \"- b|\""
+	},
+	"paste-list|emptyitem": {
+		"steps": ["type:- item\\n", "clip:- a\\n- b", "key:v+meta"],
+		"slack": "ul \"item\"\nul \"- a\"\nul \"- b|\""
+	},
+	"paste-list|code": {
+		"steps": ["type:```", "type:code", "clip:- a\\n- b", "key:v+meta"],
+		"slack": "pre \"code- a\"\npre \"- b|\""
+	},
+	"paste-list|quote": {
+		"steps": ["type:>", "type:quote", "clip:- a\\n- b", "key:v+meta"],
+		"slack": "quote \"quote- a\"\nquote \"- b|\""
+	},
+	"paste-list|inlinecode": {
+		"steps": ["type:say `x`", "clip:- a\\n- b", "key:v+meta"],
+		"slack": "p \"say `x`- a\"\np \"- b|\""
+	},
+	"paste-list|emoji": {
+		"steps": ["type:hi :+1:", "clip:- a\\n- b", "key:v+meta"],
+		"slack": "p \"hi ⟨:+1:⟩- a\"\np \"- b|\""
+	},
+	"paste-list|mention": {
+		"steps": [
+			"type:hi @satya",
+			"wait:900",
+			"pick",
+			"clip:- a\\n- b",
+			"key:v+meta"
+		],
+		"slack": "p \"hi ⟨@Satya Patel⟩ - a\"\np \"- b|\""
+	},
+	"paste-html-list|empty": {
+		"steps": [
+			"cliphtml:<ul><li>a</li><li>b</li></ul>|||a\\nb",
+			"key:v+meta",
+			"wait:1500"
+		],
+		"slack": "ul \"a\"\nul \"b\"\np \"|\""
+	},
+	"paste-html-list|mid": {
+		"steps": [
+			"type:hello world",
+			"key:ArrowLeft*5",
+			"cliphtml:<ul><li>a</li><li>b</li></ul>|||a\\nb",
+			"key:v+meta",
+			"wait:1500"
+		],
+		"slack": "ul \"hello a\"\nul \"b\"\np \"|world\""
+	},
+	"paste-html-list|emptyline": {
+		"steps": [
+			"type:hello\\n",
+			"cliphtml:<ul><li>a</li><li>b</li></ul>|||a\\nb",
+			"key:v+meta",
+			"wait:1500"
+		],
+		"slack": "p \"hello\"\nul \"a\"\nul \"b\"\np \"|\""
+	},
+	"paste-html-list|sel1": {
+		"steps": [
+			"type:hello world",
+			"key:ArrowLeft+shift*5",
+			"cliphtml:<ul><li>a</li><li>b</li></ul>|||a\\nb",
+			"key:v+meta",
+			"wait:1500"
+		],
+		"slack": "ul \"hello a\"\nul \"b\"\np \"|\""
+	},
+	"paste-html-list|selmulti": {
+		"steps": [
+			"type:one\\ntwo",
+			"key:ArrowUp+shift",
+			"cliphtml:<ul><li>a</li><li>b</li></ul>|||a\\nb",
+			"key:v+meta",
+			"wait:1500"
+		],
+		"slack": "ul \"onea\"\nul \"b\"\np \"|\""
+	},
+	"paste-html-list|list": {
+		"steps": [
+			"type:- item",
+			"cliphtml:<ul><li>a</li><li>b</li></ul>|||a\\nb",
+			"key:v+meta",
+			"wait:1500"
+		],
+		"slack": "ul \"itema\"\nul \"b|\""
+	},
+	"paste-html-list|emptyitem": {
+		"steps": [
+			"type:- item\\n",
+			"cliphtml:<ul><li>a</li><li>b</li></ul>|||a\\nb",
+			"key:v+meta",
+			"wait:1500"
+		],
+		"slack": "ul \"item\"\nul \"a\"\nul \"b|\""
+	},
+	"paste-html-list|code": {
+		"steps": [
+			"type:```",
+			"type:code",
+			"cliphtml:<ul><li>a</li><li>b</li></ul>|||a\\nb",
+			"key:v+meta",
+			"wait:1500"
+		],
+		"slack": "pre \"codea\\\\nb|\""
+	},
+	"paste-html-list|quote": {
+		"steps": [
+			"type:>",
+			"type:quote",
+			"cliphtml:<ul><li>a</li><li>b</li></ul>|||a\\nb",
+			"key:v+meta",
+			"wait:1500"
+		],
+		"slack": "ul \"quotea\"\nul \"b\"\nquote \"|\""
+	},
+	"paste-html-list|inlinecode": {
+		"steps": [
+			"type:say `x`",
+			"cliphtml:<ul><li>a</li><li>b</li></ul>|||a\\nb",
+			"key:v+meta",
+			"wait:1500"
+		],
+		"slack": "ul \"say `x`a\"\nul \"b\"\np \"|\""
+	},
+	"paste-html-list|emoji": {
+		"steps": [
+			"type:hi :+1:",
+			"cliphtml:<ul><li>a</li><li>b</li></ul>|||a\\nb",
+			"key:v+meta",
+			"wait:1500"
+		],
+		"slack": "ul \"hi ⟨:+1:⟩a\"\nul \"b\"\np \"|\""
+	},
+	"paste-html-list|mention": {
+		"steps": [
+			"type:hi @satya",
+			"wait:900",
+			"pick",
+			"cliphtml:<ul><li>a</li><li>b</li></ul>|||a\\nb",
+			"key:v+meta",
+			"wait:1500"
+		],
+		"slack": "ul \"hi ⟨@Satya Patel⟩ a\"\nul \"b\"\np \"|\""
+	},
+	"paste-url|empty": {
+		"steps": ["clip:https://superset.sh", "key:v+meta", "wait:1000"],
+		"slack": "p \"[superset.sh|](link)\""
+	},
+	"paste-url|mid": {
+		"steps": [
+			"type:hello world",
+			"key:ArrowLeft*5",
+			"clip:https://superset.sh",
+			"key:v+meta",
+			"wait:1000"
+		],
+		"slack": "p \"hello [superset.sh|](link)world\""
+	},
+	"paste-url|emptyline": {
+		"steps": [
+			"type:hello\\n",
+			"clip:https://superset.sh",
+			"key:v+meta",
+			"wait:1000"
+		],
+		"slack": "p \"hello\"\np \"[superset.sh|](link)\""
+	},
+	"paste-url|sel1": {
+		"steps": [
+			"type:hello world",
+			"key:ArrowLeft+shift*5",
+			"clip:https://superset.sh",
+			"key:v+meta",
+			"wait:1000"
+		],
+		"slack": "p \"hello [[world]](link)\""
+	},
+	"paste-url|selmulti": {
+		"steps": [
+			"type:one\\ntwo",
+			"key:ArrowUp+shift",
+			"clip:https://superset.sh",
+			"key:v+meta",
+			"wait:1000"
+		],
+		"slack": "p \"one[\"\np \"[two]](link)\""
+	},
+	"paste-url|list": {
+		"steps": [
+			"type:- item",
+			"clip:https://superset.sh",
+			"key:v+meta",
+			"wait:1000"
+		],
+		"slack": "ul \"item[superset.sh|](link)\""
+	},
+	"paste-url|emptyitem": {
+		"steps": [
+			"type:- item\\n",
+			"clip:https://superset.sh",
+			"key:v+meta",
+			"wait:1000"
+		],
+		"slack": "ul \"item\"\nul \"[superset.sh|](link)\""
+	},
+	"paste-url|code": {
+		"steps": [
+			"type:```",
+			"type:code",
+			"clip:https://superset.sh",
+			"key:v+meta",
+			"wait:1000"
+		],
+		"slack": "pre \"codehttps://superset.sh|\""
+	},
+	"paste-url|quote": {
+		"steps": [
+			"type:>",
+			"type:quote",
+			"clip:https://superset.sh",
+			"key:v+meta",
+			"wait:1000"
+		],
+		"slack": "quote \"quote[superset.sh|](link)\""
+	},
+	"paste-url|inlinecode": {
+		"steps": [
+			"type:say `x`",
+			"clip:https://superset.sh",
+			"key:v+meta",
+			"wait:1000"
+		],
+		"slack": "p \"say `x`[superset.sh|](link)\""
+	},
+	"paste-url|emoji": {
+		"steps": [
+			"type:hi :+1:",
+			"clip:https://superset.sh",
+			"key:v+meta",
+			"wait:1000"
+		],
+		"slack": "p \"hi ⟨:+1:⟩[superset.sh|](link)\""
+	},
+	"paste-url|mention": {
+		"steps": [
+			"type:hi @satya",
+			"wait:900",
+			"pick",
+			"clip:https://superset.sh",
+			"key:v+meta",
+			"wait:1000"
+		],
+		"slack": "p \"hi ⟨@Satya Patel⟩ [superset.sh|](link)\""
+	},
+	"type-url|empty": {
+		"steps": ["type:https://superset.sh "],
+		"slack": "p \"[https://superset.sh](link) |\""
+	},
+	"type-url|emptyline": {
+		"steps": ["type:hello\\n", "type:https://superset.sh "],
+		"slack": "p \"hello\"\np \"[https://superset.sh](link) |\""
+	},
+	"type-url|sel1": {
+		"steps": [
+			"type:hello world",
+			"key:ArrowLeft+shift*5",
+			"type:https://superset.sh "
+		],
+		"slack": "p \"hello [https://superset.sh](link) |\""
+	},
+	"type-url|selmulti": {
+		"steps": [
+			"type:one\\ntwo",
+			"key:ArrowUp+shift",
+			"type:https://superset.sh "
+		],
+		"slack": "p \"one[https://superset.sh](link) |\""
+	},
+	"type-url|list": {
+		"steps": ["type:- item", "type:https://superset.sh "],
+		"slack": "ul \"item[https://superset.sh](link) |\""
+	},
+	"type-url|emptyitem": {
+		"steps": ["type:- item\\n", "type:https://superset.sh "],
+		"slack": "ul \"item\"\nul \"[https://superset.sh](link) |\""
+	},
+	"type-url|code": {
+		"steps": ["type:```", "type:code", "type:https://superset.sh "],
+		"slack": "pre \"codehttps://superset.sh |\""
+	},
+	"type-url|quote": {
+		"steps": ["type:>", "type:quote", "type:https://superset.sh "],
+		"slack": "quote \"quote[https://superset.sh](link) |\""
+	},
+	"type-url|inlinecode": {
+		"steps": ["type:say `x`", "type:https://superset.sh "],
+		"slack": "p \"say `x`[https://superset.sh](link) |\""
+	},
+	"type-url|emoji": {
+		"steps": ["type:hi :+1:", "type:https://superset.sh "],
+		"slack": "p \"hi ⟨:+1:⟩[https://superset.sh](link) |\""
+	},
+	"type-url|mention": {
+		"steps": [
+			"type:hi @satya",
+			"wait:900",
+			"pick",
+			"type:https://superset.sh "
+		],
+		"slack": "p \"hi ⟨@Satya Patel⟩ [https://superset.sh](link) |\""
+	},
+	"esc-menu|empty": {
+		"steps": ["type::smi", "wait:700", "key:Escape", "wait:300"],
+		"slack": "p \":smi|\""
+	},
+	"esc-menu|mid": {
+		"steps": [
+			"type:hello world",
+			"key:ArrowLeft*5",
+			"type::smi",
+			"wait:700",
+			"key:Escape",
+			"wait:300"
+		],
+		"slack": "p \"hello :smi|world\""
+	},
+	"esc-menu|emptyline": {
+		"steps": [
+			"type:hello\\n",
+			"type::smi",
+			"wait:700",
+			"key:Escape",
+			"wait:300"
+		],
+		"slack": "p \"hello\"\np \":smi|\""
+	},
+	"esc-menu|sel1": {
+		"steps": [
+			"type:hello world",
+			"key:ArrowLeft+shift*5",
+			"type::smi",
+			"wait:700",
+			"key:Escape",
+			"wait:300"
+		],
+		"slack": "p \"hello :smi|\""
+	},
+	"esc-menu|selmulti": {
+		"steps": [
+			"type:one\\ntwo",
+			"key:ArrowUp+shift",
+			"type::smi",
+			"wait:700",
+			"key:Escape",
+			"wait:300"
+		],
+		"slack": "p \"one:smi|\""
+	},
+	"esc-menu|list": {
+		"steps": ["type:- item", "type::smi", "wait:700", "key:Escape", "wait:300"],
+		"slack": "ul \"item:smi|\""
+	},
+	"esc-menu|emptyitem": {
+		"steps": [
+			"type:- item\\n",
+			"type::smi",
+			"wait:700",
+			"key:Escape",
+			"wait:300"
+		],
+		"slack": "ul \"item\"\nul \":smi|\""
+	},
+	"esc-menu|code": {
+		"steps": [
+			"type:```",
+			"type:code",
+			"type::smi",
+			"wait:700",
+			"key:Escape",
+			"wait:300"
+		],
+		"slack": "pre \"code:smi|\""
+	},
+	"esc-menu|quote": {
+		"steps": [
+			"type:>",
+			"type:quote",
+			"type::smi",
+			"wait:700",
+			"key:Escape",
+			"wait:300"
+		],
+		"slack": "quote \"quote:smi|\""
+	},
+	"esc-menu|inlinecode": {
+		"steps": [
+			"type:say `x`",
+			"type::smi",
+			"wait:700",
+			"key:Escape",
+			"wait:300"
+		],
+		"slack": "p \"say `x`:smi|\""
+	},
+	"esc-menu|emoji": {
+		"steps": [
+			"type:hi :+1:",
+			"type::smi",
+			"wait:700",
+			"key:Escape",
+			"wait:300"
+		],
+		"slack": "p \"hi ⟨:+1:⟩:smi|\""
+	},
+	"esc-menu|mention": {
+		"steps": [
+			"type:hi @satya",
+			"wait:900",
+			"pick",
+			"type::smi",
+			"wait:700",
+			"key:Escape",
+			"wait:300"
+		],
+		"slack": "p \"hi ⟨@Satya Patel⟩ :smi|\""
+	},
+	"key-fmt|empty": {
+		"steps": ["type:*hi* _soft_ ~old~", "key:F+meta+shift"],
+		"slack": "p \"*hi* _soft_ ~old~|\""
+	},
+	"up-empty|empty": {
+		"steps": ["key:ArrowUp", "wait:600"],
+		"slack": "p \"|\""
+	},
+	"pick-emoji-enter|empty": {
+		"steps": ["type::thumbs", "wait:1200", "key:Enter", "wait:600"],
+		"slack": "p \"⟨:👍:⟩ |\""
+	},
+	"pick-emoji-tab|empty": {
+		"steps": ["type::thumbs", "wait:1200", "key:Tab", "wait:600"],
+		"slack": "p \"⟨:👍:⟩ |\""
+	},
+	"pick-emoji-down|empty": {
+		"steps": [
+			"type::thumbs",
+			"wait:1200",
+			"key:ArrowDown",
+			"key:Enter",
+			"wait:600"
+		],
+		"slack": "p \"⟨:👍:⟩ |\""
+	},
+	"pick-emoji-wrap|empty": {
+		"steps": [
+			"type::thumbs",
+			"wait:1200",
+			"key:ArrowDown*4",
+			"key:Enter",
+			"wait:600"
+		],
+		"slack": "p \"⟨:👍:⟩ |\""
+	},
+	"pick-emoji-esc|empty": {
+		"steps": [
+			"type::thumbs",
+			"wait:1200",
+			"key:Escape",
+			"wait:300",
+			"wait:600"
+		],
+		"slack": "p \":thumbs|\""
+	},
+	"pick-emoji-narrow|empty": {
+		"steps": [
+			"type::thumbs",
+			"wait:1200",
+			"type:d",
+			"wait:1200",
+			"key:Enter",
+			"wait:600"
+		],
+		"slack": "p \"⟨:👎:⟩ |\""
+	}
+}

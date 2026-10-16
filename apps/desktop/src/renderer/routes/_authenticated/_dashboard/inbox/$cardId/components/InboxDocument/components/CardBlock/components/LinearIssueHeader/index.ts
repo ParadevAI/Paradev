@@ -1,0 +1,1 @@
+export { LinearIssueHeader } from "./LinearIssueHeader";

@@ -1,0 +1,1 @@
+export { toSidebarWorkspace } from "./toSidebarWorkspace";

@@ -1,0 +1,1 @@
+export { SlackCanvasBlock } from "./SlackCanvasBlock";

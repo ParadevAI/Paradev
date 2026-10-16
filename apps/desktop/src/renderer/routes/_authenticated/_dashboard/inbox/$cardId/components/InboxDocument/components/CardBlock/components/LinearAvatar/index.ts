@@ -1,0 +1,1 @@
+export { LinearAvatar } from "./LinearAvatar";

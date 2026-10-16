@@ -121,6 +121,8 @@ export const connectorsRouter = {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
 
 			const connector = requireConnector(input.slug);
+			if (connector.scope === "org")
+				await verifyOrgAdmin(ctx.session.user.id, input.organizationId);
 			const method = connectorMethod(connector, "api_key");
 			if (method.type !== "api_key")
 				throw new TRPCError({

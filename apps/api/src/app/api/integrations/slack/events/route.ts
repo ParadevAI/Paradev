@@ -12,6 +12,7 @@ import {
 import { ownBotUserIds } from "./process-automation-event/normalizeSlackDelivery";
 import { processEntityDetails } from "./process-entity-details";
 import { processLinkShared } from "./process-link-shared";
+import { nudgeInboxThreadCards } from "./utils/inbox-threads";
 import { threadFollowUpTarget } from "./utils/thread-sessions";
 
 const qstash = new Client({ token: env.QSTASH_TOKEN });
@@ -35,6 +36,9 @@ type SlackMessageEvent = {
 	text?: string;
 	channel?: string;
 	thread_ts?: string;
+	/** Edits and deletions carry the affected message here instead of at the top. */
+	message?: { thread_ts?: string };
+	previous_message?: { thread_ts?: string };
 };
 
 type EntityDetailsRequestedEvent = Extract<
@@ -139,6 +143,21 @@ export async function POST(request: Request) {
 
 		if (event.type === "message") {
 			const messageEvent = event as SlackMessageEvent;
+			const threadTs =
+				messageEvent.thread_ts ??
+				messageEvent.message?.thread_ts ??
+				messageEvent.previous_message?.thread_ts;
+			if (messageEvent.channel && threadTs) {
+				after(
+					nudgeInboxThreadCards({
+						teamId: team_id,
+						channelId: messageEvent.channel,
+						threadTs,
+					}).catch((error) => {
+						console.error("[slack/events] inbox thread nudge failed:", error);
+					}),
+				);
+			}
 			// Bot posts, edits, deletes and joins never launch the agent. A file
 			// share and a reply also sent to the channel are still messages.
 			const humanPost =

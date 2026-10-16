@@ -1,16 +1,10 @@
-import { Trans } from "@lingui/react/macro";
 import type { EmojiItem } from "@tiptap/extension-emoji";
 import type {
 	SuggestionKeyDownProps,
 	SuggestionProps,
 } from "@tiptap/suggestion";
-import {
-	forwardRef,
-	useEffect,
-	useImperativeHandle,
-	useRef,
-	useState,
-} from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
+import { useListCursor } from "renderer/hooks/useListCursor";
 
 export interface EmojiSuggestionListRef {
 	onKeyDown: (props: SuggestionKeyDownProps) => boolean;
@@ -19,35 +13,22 @@ export interface EmojiSuggestionListRef {
 export const EmojiSuggestionList = forwardRef<
 	EmojiSuggestionListRef,
 	SuggestionProps<EmojiItem>
->(({ items, command }, ref) => {
-	const [selectedIndex, setSelectedIndex] = useState(0);
+>(({ items, command, query }, ref) => {
+	const { highlighted, move, hover } = useListCursor(items.length, items);
 	const containerRef = useRef<HTMLDivElement>(null);
-
-	// biome-ignore lint/correctness/useExhaustiveDependencies: reset selection when items change
-	useEffect(() => {
-		setSelectedIndex(0);
-	}, [items]);
 
 	useEffect(() => {
 		containerRef.current
-			?.querySelector(`[data-index="${selectedIndex}"]`)
+			?.querySelector(`[data-index="${highlighted}"]`)
 			?.scrollIntoView({ block: "nearest" });
-	}, [selectedIndex]);
+	}, [highlighted]);
 
 	useImperativeHandle(ref, () => ({
 		onKeyDown: ({ event }: SuggestionKeyDownProps) => {
+			if (move(event.key)) return true;
 			if (items.length === 0) return false;
-
-			if (event.key === "ArrowUp") {
-				setSelectedIndex((prev) => (prev - 1 + items.length) % items.length);
-				return true;
-			}
-			if (event.key === "ArrowDown") {
-				setSelectedIndex((prev) => (prev + 1) % items.length);
-				return true;
-			}
-			if (event.key === "Enter") {
-				const item = items[selectedIndex];
+			if (event.key === "Enter" || event.key === "Tab") {
+				const item = items[highlighted];
 				if (item) command(item);
 				return true;
 			}
@@ -55,38 +36,56 @@ export const EmojiSuggestionList = forwardRef<
 		},
 	}));
 
-	if (items.length === 0) {
-		return (
-			<div className="bg-popover text-popover-foreground rounded-md border p-1 shadow-md">
-				<div className="px-2 py-1.5 text-sm text-muted-foreground">
-					<Trans>No emoji found</Trans>
-				</div>
-			</div>
-		);
-	}
+	if (items.length === 0) return null;
 
 	return (
 		<div
 			ref={containerRef}
+			role="listbox"
 			className="bg-popover text-popover-foreground rounded-md border p-1 shadow-md overflow-hidden max-h-72 overflow-y-auto w-64"
 		>
 			{items.map((item, index) => {
-				const shortcode = item.shortcodes[0] ?? item.name;
+				const q = query.toLowerCase();
+				const shortcode =
+					item.shortcodes.find((s) => s.toLowerCase().includes(q)) ??
+					item.shortcodes[0] ??
+					item.name;
+				const at = shortcode.toLowerCase().indexOf(q);
 				return (
 					<button
 						type="button"
+						role="option"
+						aria-selected={index === highlighted}
 						key={item.name}
 						data-index={index}
 						onClick={() => command(item)}
+						onMouseEnter={() => hover(index)}
 						className={`relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none w-full ${
-							index === selectedIndex ? "bg-accent text-accent-foreground" : ""
+							index === highlighted ? "bg-accent text-accent-foreground" : ""
 						}`}
 					>
-						<span className="w-5 shrink-0 text-base leading-none">
-							{item.emoji ?? "·"}
+						<span className="flex w-5 shrink-0 items-center text-base leading-none">
+							{item.emoji ??
+								(item.fallbackImage ? (
+									<img src={item.fallbackImage} alt="" className="size-4" />
+								) : (
+									"·"
+								))}
 						</span>
 						<span className="flex-1 truncate text-left text-xs text-muted-foreground">
-							:{shortcode}:
+							:
+							{at < 0 ? (
+								shortcode
+							) : (
+								<>
+									{shortcode.slice(0, at)}
+									<span className="font-semibold text-foreground">
+										{shortcode.slice(at, at + q.length)}
+									</span>
+									{shortcode.slice(at + q.length)}
+								</>
+							)}
+							:
 						</span>
 					</button>
 				);

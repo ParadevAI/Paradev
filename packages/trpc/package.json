@@ -52,6 +52,26 @@
 			"types": "./src/router/page/preview.ts",
 			"default": "./src/router/page/preview.ts"
 		},
+		"./inbox-slack-files": {
+			"types": "./src/router/inbox/cards/definitions/slackFiles.ts",
+			"default": "./src/router/inbox/cards/definitions/slackFiles.ts"
+		},
+		"./inbox-gmail-files": {
+			"types": "./src/router/inbox/cards/definitions/gmailFiles.ts",
+			"default": "./src/router/inbox/cards/definitions/gmailFiles.ts"
+		},
+		"./inbox-gmail-schedule": {
+			"types": "./src/router/inbox/cards/definitions/gmailSchedule.ts",
+			"default": "./src/router/inbox/cards/definitions/gmailSchedule.ts"
+		},
+		"./inbox-notify-review": {
+			"types": "./src/router/inbox/notifyReview.ts",
+			"default": "./src/router/inbox/notifyReview.ts"
+		},
+		"./inbox-email-images": {
+			"types": "./src/router/inbox/cards/definitions/emailImages.ts",
+			"default": "./src/router/inbox/cards/definitions/emailImages.ts"
+		},
 		"./file-sweep": {
 			"types": "./src/lib/files/sweep.ts",
 			"default": "./src/lib/files/sweep.ts"

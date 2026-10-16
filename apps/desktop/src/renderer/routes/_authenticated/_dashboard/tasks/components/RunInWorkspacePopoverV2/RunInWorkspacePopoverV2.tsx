@@ -34,20 +34,18 @@ import { useLocalHostService } from "renderer/routes/_authenticated/providers/Lo
 import { deriveBranchName } from "renderer/routes/_authenticated/utils/deriveBranchName";
 import { useV2WorkspaceCreateDefaultsStore } from "renderer/stores/v2-workspace-create-defaults";
 import { useWorkspaceCreates } from "renderer/stores/workspace-creates";
-import type { TaskWithStatus } from "../TasksView/hooks/useTasksTable";
+import type { RunnableTask } from "./types";
+import { cloudTaskLink, localTaskLink } from "./utils/taskLinks";
 
 const AGENT_STORAGE_KEY = "lastSelectedV2TaskBatchAgent";
 const NONE = "none" as const;
 type SelectedAgent = string | typeof NONE;
 
-type RunnableTask = Pick<
-	TaskWithStatus,
-	"id" | "slug" | "title" | "description" | "branch"
->;
-
 interface RunInWorkspacePopoverV2Props {
 	tasks: RunnableTask[];
 	onComplete: () => void;
+	/** Told the workspaces that were made, once they exist. */
+	onCreated?: (workspaceIds: string[]) => void;
 	/** Replaces the default "Run in Workspace" button. */
 	trigger?: ReactNode;
 	align?: "start" | "end";
@@ -68,6 +66,7 @@ function readStoredAgent(): SelectedAgent {
 export function RunInWorkspacePopoverV2({
 	tasks,
 	onComplete,
+	onCreated,
 	trigger,
 	align = "start",
 }: RunInWorkspacePopoverV2Props) {
@@ -255,7 +254,7 @@ export function RunInWorkspacePopoverV2({
 					organizationId,
 					environmentId: environment.id,
 					name: task.title,
-					taskIds: [task.id],
+					...cloudTaskLink(task),
 					...(selectedAgent === NONE
 						? {}
 						: {
@@ -272,6 +271,7 @@ export function RunInWorkspacePopoverV2({
 				rows ? [...created, ...rows] : created,
 			);
 			void utils.cloudWorkspace.list.invalidate(listInput);
+			if (created.length > 0) onCreated?.(created.map((row) => row.id));
 			const failure = results.find((result) => result.status === "rejected");
 			if (failure) {
 				throw new Error(
@@ -321,11 +321,12 @@ export function RunInWorkspacePopoverV2({
 			return;
 		}
 
-		const handles = tasks.map((task) =>
+		const workspaceIds = tasks.map(() => crypto.randomUUID());
+		const handles = tasks.map((task, index) =>
 			submit({
 				hostId,
 				snapshot: {
-					id: crypto.randomUUID(),
+					id: workspaceIds[index] as string,
 					projectId: selectedProjectId,
 					name: task.title,
 					branch: deriveBranchName({
@@ -334,7 +335,7 @@ export function RunInWorkspacePopoverV2({
 						branch: task.branch,
 					}),
 					skipBranchPrefix: task.branch?.trim() ? true : undefined,
-					taskId: task.id,
+					...localTaskLink(task),
 					agents:
 						selectedAgent === NONE
 							? undefined
@@ -350,6 +351,8 @@ export function RunInWorkspacePopoverV2({
 
 		const promise = Promise.all(handles.map((handle) => handle.completed)).then(
 			(outcomes) => {
+				const created = workspaceIds.filter((_, index) => outcomes[index]?.ok);
+				if (created.length > 0) onCreated?.(created);
 				const failed = outcomes.filter((outcome) => !outcome.ok).length;
 				if (failed > 0) {
 					const firstFailure = outcomes.find((outcome) => !outcome.ok);

@@ -311,10 +311,18 @@
 						"users:read.email",
 						"users:write",
 						"search:read",
-						"team:read"
+						"team:read",
+						"usergroups:read",
+						"emoji:read",
+						"files:read",
+						"reminders:write",
+						"users.profile:write",
+						"dnd:read",
+						"dnd:write",
+						"canvases:write"
 					],
 					"authorization_params": {
-						"scope": "app_mentions:read,chat:write,reactions:read,reactions:write,channels:history,channels:read,groups:history,groups:read,im:history,im:read,im:write,mpim:history,users:read,files:read,assistant:write,links:read,links:write"
+						"scope": "app_mentions:read,chat:write,emoji:read,reactions:read,reactions:write,team:read,channels:history,channels:read,groups:history,groups:read,im:history,im:read,im:write,mpim:history,users:read,usergroups:read,files:read,assistant:write,links:read,links:write,conversations.connect:write"
 					},
 					"token": "$.authed_user.access_token",
 					"store": {
@@ -631,6 +639,45 @@
 						"user": {
 							"id": "$.accounts[0].stripe_context",
 							"label": "$.accounts[0].name"
+						}
+					},
+					"bind": {
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						}
+					}
+				}
+			]
+		},
+		"stripe_api": {
+			"displayName": "Stripe (restricted key)",
+			"icon": "stripe",
+			"category": "Data & APIs",
+			"scope": "org",
+			"methods": [
+				{
+					"type": "api_key",
+					"label": "Restricted API key",
+					"credential_input": "api_key",
+					"inputs": [
+						{
+							"name": "api_key",
+							"label": "Stripe API key",
+							"placeholder": "rk_live_\u2026 or rk_test_\u2026",
+							"description": "Stripe Dashboard > Developers > API keys > Create restricted key",
+							"required": true,
+							"secret": true
+						}
+					],
+					"identity": {
+						"url": "https://api.stripe.com/v1/account",
+						"method": "GET",
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						},
+						"account": {
+							"id": "$.id",
+							"label": "$.settings.dashboard.display_name"
 						}
 					},
 					"bind": {

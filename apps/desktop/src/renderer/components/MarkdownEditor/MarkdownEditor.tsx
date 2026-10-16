@@ -4,13 +4,14 @@ import "./markdown-editor.css";
 import { useLingui } from "@lingui/react/macro";
 import { getClipboardFiles } from "@superset/ui/lib/clipboard-files";
 import { cn } from "@superset/ui/utils";
-import { Extension } from "@tiptap/core";
+import { type AnyExtension, Extension } from "@tiptap/core";
 import { Blockquote } from "@tiptap/extension-blockquote";
 import { Bold } from "@tiptap/extension-bold";
 import { BulletList } from "@tiptap/extension-bullet-list";
 import { Code } from "@tiptap/extension-code";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import { Document } from "@tiptap/extension-document";
+import type { EmojiItem } from "@tiptap/extension-emoji";
 import FileHandler from "@tiptap/extension-file-handler";
 import { HardBreak } from "@tiptap/extension-hard-break";
 import { Heading } from "@tiptap/extension-heading";
@@ -30,6 +31,7 @@ import { Text } from "@tiptap/extension-text";
 import { Underline } from "@tiptap/extension-underline";
 import { Dropcursor, TrailingNode } from "@tiptap/extensions";
 import type { Node as ProseMirrorNode } from "@tiptap/pm/model";
+import type { EditorView } from "@tiptap/pm/view";
 import {
 	type Editor,
 	EditorContent,
@@ -53,7 +55,7 @@ import {
 import { electronTrpcClient } from "renderer/lib/trpc-client";
 import { Markdown } from "tiptap-markdown";
 import { CodeBlockView } from "./components/CodeBlockView";
-import { EmojiSuggestion } from "./components/EmojiSuggestion";
+import { createEmojiSuggestion } from "./components/EmojiSuggestion";
 import {
 	FileMentionNode,
 	type FileMentionSearchFn,
@@ -69,6 +71,7 @@ import {
 	PluginMentionSuggestion,
 } from "./components/PluginMentionSuggestion";
 import {
+	type RecordMentionListComponent,
 	RecordMentionNode,
 	type RecordMentionSearchFn,
 	RecordMentionSuggestion,
@@ -148,8 +151,11 @@ const StyledHeading = Heading.extend({
 	},
 });
 
-const KeyboardHandler = Extension.create({
+const KeyboardHandler = Extension.create<{ blurOnEscape: boolean }>({
 	name: "keyboardHandler",
+	addOptions() {
+		return { blurOnEscape: true };
+	},
 	addKeyboardShortcuts() {
 		return {
 			Tab: ({ editor }) => {
@@ -165,12 +171,25 @@ const KeyboardHandler = Extension.create({
 				return true;
 			},
 			Escape: ({ editor }) => {
+				if (!this.options.blurOnEscape) return false;
 				editor.commands.blur();
 				return true;
 			},
 		};
 	},
 });
+
+/** Editor props run before plugin props, so an open emoji, mention or command list takes the key here first. */
+function suggestionTakesKey(view: EditorView, event: KeyboardEvent): boolean {
+	return view.state.plugins.some(
+		(plugin) =>
+			(plugin.getState(view.state) as { active?: unknown } | undefined)
+				?.active === true &&
+			plugin.props.handleKeyDown?.call(plugin, view, event) === true,
+	);
+}
+
+const ENTER_NEW_LINE_IN = ["listItem", "taskItem", "codeBlock"];
 
 interface MarkdownEditorProps {
 	content: string;
@@ -187,6 +206,8 @@ interface MarkdownEditorProps {
 	 * (Shift+Enter still breaks the line). Composer-style editors only.
 	 */
 	onEnterSubmit?: () => void;
+	/** Blocks where Enter adds a line instead of firing `onEnterSubmit`. */
+	enterNewLineIn?: readonly string[];
 	/** If provided, enables @-mention file search for the editor. */
 	searchFiles?: FileMentionSearchFn;
 	/** If provided (and searchFiles isn't), @ mentions people, tasks, and pull requests. */
@@ -208,9 +229,31 @@ interface MarkdownEditorProps {
 		emoji?: boolean;
 		fileMention?: boolean;
 		bubbleMenu?: boolean;
+		/** An empty paragraph kept after the last block, so the caret can always leave a list or code block. */
+		trailingNode?: boolean;
+		/** The language picker on code blocks. */
+		codeBlockLanguages?: boolean;
+		/** Pasted plain text read as markdown, so `- a` becomes a list. */
+		markdownPaste?: boolean;
+		/** Escape leaves the editor. */
+		blurOnEscape?: boolean;
+		/** A space after an emoji picked from the menu, as Slack adds. The one feature off by default. */
+		emojiSpace?: boolean;
+		/** Markdown typed at a line start (`- `, `1. `, `> `) turns into a list or quote. */
+		inputRules?: boolean;
+		/** A web address becomes a link as it is typed. */
+		autolink?: boolean;
 	};
 	/** false renders the content read-only. */
 	editable?: boolean;
+	/** Emoji beyond the standard set, e.g. a Slack workspace's own, completed by `:name:`. */
+	customEmojis?: EmojiItem[];
+	/** Sees every key first; returning true stops the editor handling it. */
+	onKeyDown?: (event: KeyboardEvent) => boolean;
+	/** Draws the @-mention suggestions in place of the app's own list. Read once. */
+	mentionList?: RecordMentionListComponent;
+	/** More extensions, ahead of the defaults, for a surface with its own typing rules. Read once. */
+	extensions?: AnyExtension[];
 }
 
 function getMarkdown(editor: Editor | null): string {
@@ -251,6 +294,7 @@ export function MarkdownEditor({
 	editorClassName,
 	onModEnter,
 	onEnterSubmit,
+	enterNewLineIn = ENTER_NEW_LINE_IN,
 	searchFiles,
 	searchMentions,
 	pluginMentions,
@@ -259,6 +303,10 @@ export function MarkdownEditor({
 	editorHandle,
 	features,
 	editable = true,
+	customEmojis,
+	onKeyDown,
+	mentionList,
+	extensions: extraExtensions,
 }: MarkdownEditorProps) {
 	const { t } = useLingui();
 	const resolvedPlaceholder =
@@ -270,6 +318,13 @@ export function MarkdownEditor({
 	const showEmoji = features?.emoji ?? true;
 	const showFileMention = features?.fileMention ?? true;
 	const showBubbleMenu = features?.bubbleMenu ?? true;
+	const keepTrailingNode = features?.trailingNode ?? true;
+	const codeBlockLanguages = features?.codeBlockLanguages ?? true;
+	const markdownPaste = features?.markdownPaste ?? true;
+	const blurOnEscape = features?.blurOnEscape ?? true;
+	const emojiSpace = features?.emojiSpace ?? false;
+	const inputRules = features?.inputRules ?? true;
+	const autolink = features?.autolink ?? true;
 	// useEditor captures extensions on first render, so searchFiles gets frozen
 	// at its initial (likely stale, since projectId resolves in an effect) value.
 	// Thread through a ref so the extension reads the live callback each fire.
@@ -287,6 +342,10 @@ export function MarkdownEditor({
 	onModEnterRef.current = onModEnter;
 	const onEnterSubmitRef = useRef(onEnterSubmit);
 	onEnterSubmitRef.current = onEnterSubmit;
+	const enterNewLineInRef = useRef(enterNewLineIn);
+	enterNewLineInRef.current = enterNewLineIn;
+	const onKeyDownRef = useRef(onKeyDown);
+	onKeyDownRef.current = onKeyDown;
 	const editorRef = useRef<Editor | null>(null);
 
 	const getUrlAction = useUrlLinkAction("2-tier");
@@ -294,7 +353,9 @@ export function MarkdownEditor({
 	const editor = useEditor({
 		editable,
 		autofocus: autoFocus === true ? "end" : autoFocus || false,
+		enableInputRules: inputRules,
 		extensions: [
+			...(extraExtensions ?? []),
 			Document,
 			Text,
 			Paragraph.configure({
@@ -318,11 +379,14 @@ export function MarkdownEditor({
 					class: "font-mono text-sm px-1 py-0.5 rounded bg-muted",
 				},
 			}),
-			CodeBlockLowlight.extend({
-				addNodeView() {
-					return ReactNodeViewRenderer(CodeBlockView);
-				},
-			}).configure({
+			(codeBlockLanguages
+				? CodeBlockLowlight.extend({
+						addNodeView() {
+							return ReactNodeViewRenderer(CodeBlockView);
+						},
+					})
+				: CodeBlockLowlight
+			).configure({
 				lowlight,
 				HTMLAttributes: {
 					class:
@@ -359,13 +423,14 @@ export function MarkdownEditor({
 			History,
 			SafeLink.configure({
 				openOnClick: false,
+				autolink,
 				HTMLAttributes: { class: "text-primary underline" },
 			}),
 			LinearImage.configure({
 				HTMLAttributes: { class: "max-w-full h-auto rounded-md my-3" },
 			}),
 			Dropcursor.configure({ color: "var(--primary)", width: 2 }),
-			TrailingNode,
+			...(keepTrailingNode ? [TrailingNode] : []),
 			...(onDropFilesRef.current
 				? [
 						FileHandler.configure({
@@ -408,11 +473,13 @@ export function MarkdownEditor({
 			}),
 			Markdown.configure({
 				html: true,
-				transformPastedText: true,
+				transformPastedText: markdownPaste,
 				transformCopiedText: true,
 			}),
 			...(showSlashCommand ? [SlashCommand] : []),
-			...(showEmoji ? [EmojiSuggestion] : []),
+			...(showEmoji
+				? [createEmojiSuggestion(customEmojis, { emojiSpace })]
+				: []),
 			RecordMentionNode,
 			PluginMentionNode.configure({
 				resolvePlugin: (name) =>
@@ -431,6 +498,7 @@ export function MarkdownEditor({
 						RecordMentionSuggestion.configure({
 							searchMentions: (query) =>
 								searchMentionsRef.current?.(query) ?? Promise.resolve([]),
+							list: mentionList ?? null,
 						}),
 					]
 				: []),
@@ -443,14 +511,16 @@ export function MarkdownEditor({
 						}),
 					]
 				: []),
-			KeyboardHandler,
+			KeyboardHandler.configure({ blurOnEscape }),
 		],
 		content,
 		editorProps: {
 			attributes: {
 				class: cn("focus:outline-none min-h-0", editorClassName),
 			},
-			handleKeyDown: (_, event) => {
+			handleKeyDown: (view, event) => {
+				if (onKeyDownRef.current?.(event)) return true;
+				if (suggestionTakesKey(view, event)) return true;
 				if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
 					onModEnterRef.current?.();
 					return true;
@@ -460,7 +530,10 @@ export function MarkdownEditor({
 					event.key === "Enter" &&
 					!event.shiftKey &&
 					!event.altKey &&
-					!isPluginMentionMenuOpen(editorRef.current)
+					!isPluginMentionMenuOpen(editorRef.current) &&
+					!enterNewLineInRef.current.some((type) =>
+						editorRef.current?.isActive(type),
+					)
 				) {
 					onEnterSubmitRef.current();
 					return true;

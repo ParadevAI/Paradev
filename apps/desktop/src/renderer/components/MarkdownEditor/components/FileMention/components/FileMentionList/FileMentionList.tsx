@@ -3,13 +3,8 @@ import type {
 	SuggestionKeyDownProps,
 	SuggestionProps,
 } from "@tiptap/suggestion";
-import {
-	forwardRef,
-	useEffect,
-	useImperativeHandle,
-	useRef,
-	useState,
-} from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
+import { useListCursor } from "renderer/hooks/useListCursor";
 import { FileIcon } from "renderer/lib/fileIcons";
 import type { FileMentionResult } from "../../types";
 
@@ -26,13 +21,12 @@ export const FileMentionList = forwardRef<
 	FileMentionListRef,
 	SuggestionProps<FileMentionResult>
 >(({ items, command }, ref) => {
-	const [selectedIndex, setSelectedIndex] = useState(0);
+	const {
+		highlighted: selectedIndex,
+		move,
+		hover: setSelectedIndex,
+	} = useListCursor(items.length, items);
 	const containerRef = useRef<HTMLDivElement>(null);
-
-	// biome-ignore lint/correctness/useExhaustiveDependencies: reset on new items
-	useEffect(() => {
-		setSelectedIndex(0);
-	}, [items]);
 
 	useEffect(() => {
 		containerRef.current
@@ -42,15 +36,8 @@ export const FileMentionList = forwardRef<
 
 	useImperativeHandle(ref, () => ({
 		onKeyDown: ({ event }: SuggestionKeyDownProps) => {
+			if (move(event.key)) return true;
 			if (items.length === 0) return false;
-			if (event.key === "ArrowUp") {
-				setSelectedIndex((prev) => (prev - 1 + items.length) % items.length);
-				return true;
-			}
-			if (event.key === "ArrowDown") {
-				setSelectedIndex((prev) => (prev + 1) % items.length);
-				return true;
-			}
 			if (event.key === "Enter" || event.key === "Tab") {
 				const item = items[selectedIndex];
 				if (item) command(item);
@@ -82,6 +69,7 @@ export const FileMentionList = forwardRef<
 						type="button"
 						key={item.id}
 						data-index={index}
+						onMouseEnter={() => setSelectedIndex(index)}
 						onClick={() => command(item)}
 						className={`relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-xs outline-hidden select-none w-full ${
 							index === selectedIndex ? "bg-accent text-accent-foreground" : ""

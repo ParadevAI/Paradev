@@ -1,0 +1,1 @@
+export { SlackPostTarget } from "./SlackPostTarget";

@@ -1,0 +1,1 @@
+export { LinearEmoji } from "./linearEmoji";

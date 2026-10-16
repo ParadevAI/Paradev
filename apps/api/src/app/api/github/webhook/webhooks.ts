@@ -6,6 +6,7 @@ import {
 	githubPullRequests,
 	githubRepositories,
 } from "@superset/db/schema";
+import { notifyPullRequestReview } from "@superset/trpc/inbox-notify-review";
 import { and, eq } from "drizzle-orm";
 
 import { env } from "@/env";
@@ -272,6 +273,23 @@ webhooks.on(
 		if (!repo) {
 			console.warn("[github/webhook] Repository not found:", repository.id);
 			return;
+		}
+
+		// A reply on a thread arrives as a "commented" review with no body.
+		const isNews =
+			review.state === "changes_requested" ||
+			(review.state === "commented" && Boolean(review.body?.trim()));
+		const byAuthor = review.user?.login === pr.user?.login;
+		const fromFork = pr.head.repo?.full_name !== repository.full_name;
+		if (isNews && !byAuthor && !fromFork) {
+			await notifyPullRequestReview({
+				repositoryId: repo.id,
+				prNumber: pr.number,
+				headBranch: pr.head.ref,
+				title: pr.title,
+				reviewer: review.user?.login ?? "A reviewer",
+				state: review.state,
+			});
 		}
 
 		const reviewDecision =

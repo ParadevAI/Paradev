@@ -6,6 +6,8 @@ import Suggestion, {
 	type SuggestionProps,
 } from "@tiptap/suggestion";
 import tippy, { type Instance as TippyInstance } from "tippy.js";
+import { matchSuggestion } from "../../utils/matchSuggestion";
+import { suggestionKeyDown } from "../../utils/suggestionKeyDown";
 import {
 	FileMentionList,
 	type FileMentionListRef,
@@ -34,6 +36,7 @@ export const FileMentionSuggestion =
 					pluginKey: fileMentionSuggestionKey,
 					editor: this.editor,
 					char: "@",
+					findSuggestionMatch: matchSuggestion,
 					allowSpaces: false,
 					// Only trigger at start of block or after whitespace/atom
 					allow: ({ state, range }) => {
@@ -123,15 +126,8 @@ export const FileMentionSuggestion =
 								if (props.query) popup?.[0]?.show();
 								else popup?.[0]?.hide();
 							},
-							onKeyDown: (props: SuggestionKeyDownProps) => {
-								if (props.event.key === "Escape") {
-									props.event.preventDefault();
-									props.event.stopPropagation();
-									popup?.[0]?.hide();
-									return true;
-								}
-								return component?.ref?.onKeyDown(props) ?? false;
-							},
+							onKeyDown: (props: SuggestionKeyDownProps) =>
+								suggestionKeyDown(popup?.[0], component?.ref, props),
 							onExit: () => {
 								popup?.[0]?.destroy();
 								component?.destroy();

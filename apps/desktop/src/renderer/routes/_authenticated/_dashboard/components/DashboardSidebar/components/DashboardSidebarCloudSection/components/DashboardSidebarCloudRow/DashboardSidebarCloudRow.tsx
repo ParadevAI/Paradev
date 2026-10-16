@@ -39,7 +39,7 @@ interface DashboardSidebarCloudRowProps
 	isActive?: boolean;
 	onOpen: () => void;
 	onOpenPullRequest: () => void;
-	onArchive: () => void;
+	onArchive?: () => void;
 }
 
 export const DashboardSidebarCloudRow = forwardRef<
@@ -134,17 +134,19 @@ export const DashboardSidebarCloudRow = forwardRef<
 								now={now}
 							/>
 						</span>
-						<button
-							type="button"
-							onClick={(event) => {
-								event.stopPropagation();
-								onArchive();
-							}}
-							aria-label={t({ message: "Archive workspace" })}
-							className="-mr-[3px] hidden size-5 items-center justify-center rounded text-muted-foreground group-hover:flex group-has-[:focus-visible]:flex hover:bg-foreground/10 hover:text-foreground"
-						>
-							<LuArchive className="size-3.5" />
-						</button>
+						{onArchive && (
+							<button
+								type="button"
+								onClick={(event) => {
+									event.stopPropagation();
+									onArchive();
+								}}
+								aria-label={t({ message: "Archive workspace" })}
+								className="-mr-[3px] hidden size-5 items-center justify-center rounded text-muted-foreground group-hover:flex group-has-[:focus-visible]:flex hover:bg-foreground/10 hover:text-foreground"
+							>
+								<LuArchive className="size-3.5" />
+							</button>
+						)}
 					</span>
 				</span>
 			</div>

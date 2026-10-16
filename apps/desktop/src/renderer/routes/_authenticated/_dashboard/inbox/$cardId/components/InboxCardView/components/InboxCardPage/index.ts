@@ -1,0 +1,1 @@
+export { InboxCardPage } from "./InboxCardPage";

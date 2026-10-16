@@ -2419,3 +2419,97 @@ export const githubUserConnections = pgTable("github_user_connections", {
 
 export type SelectGithubUserConnection =
 	typeof githubUserConnections.$inferSelect;
+
+export const inboxCards = pgTable(
+	"inbox_cards",
+	{
+		id: uuid().primaryKey().defaultRandom(),
+		organizationId: uuid("organization_id")
+			.notNull()
+			.references(() => organizations.id, { onDelete: "cascade" }),
+		/** Who the card is for. Only this user can read or act on it. */
+		userId: uuid("user_id")
+			.notNull()
+			.references(() => users.id, { onDelete: "cascade" }),
+		/** Whose agent pushed it, so an interruption is attributable to a person. */
+		sentByUserId: uuid("sent_by_user_id").references(() => users.id, {
+			onDelete: "set null",
+		}),
+		/** The sending session, and the card's identity. A terminal today, a chat session later. */
+		agentSessionId: text("agent_session_id").notNull(),
+		/**
+		 * Routing hints only, both expected to disappear once a session is
+		 * addressable on its own. Deliberately unreferenced for that reason.
+		 */
+		workspaceId: uuid("workspace_id"),
+		hostId: text("host_id"),
+		/** Idempotency, scoped to the sending session. */
+		key: text(),
+		title: text().notNull(),
+		why: text().notNull(),
+		body: text(),
+		pageId: uuid("page_id").references(() => pages.id, {
+			onDelete: "set null",
+		}),
+		/**
+		 * The block document behind the card, written whole by the agent and
+		 * versioned so two writers collide loudly. Integration blocks in it hold
+		 * identifiers only; the API renders them per reader.
+		 */
+		document: jsonb().$type<Record<string, unknown>>(),
+		documentVersion: integer("document_version").notNull().default(0),
+		/** Before this, the card sits in Scheduled and never counts on the badge. */
+		showAt: timestamp("show_at", { withTimezone: true }),
+		readAt: timestamp("read_at", { withTimezone: true }),
+		resolvedAt: timestamp("resolved_at", { withTimezone: true }),
+		outcome: jsonb().$type<Record<string, unknown>>(),
+		createdAt: timestamp("created_at", { withTimezone: true })
+			.notNull()
+			.defaultNow(),
+		updatedAt: timestamp("updated_at", { withTimezone: true })
+			.notNull()
+			.defaultNow()
+			.$onUpdate(() => new Date()),
+	},
+	(table) => [
+		uniqueIndex("inbox_cards_session_key_unique")
+			.on(table.agentSessionId, table.key)
+			.where(sql`${table.key} is not null`),
+		index("inbox_cards_user_open_idx")
+			.on(table.userId, desc(table.createdAt))
+			.where(sql`${table.resolvedAt} is null`),
+		index("inbox_cards_user_id_created_at_idx").on(
+			table.userId,
+			desc(table.createdAt),
+		),
+	],
+);
+
+export type InsertInboxCard = typeof inboxCards.$inferInsert;
+export type SelectInboxCard = typeof inboxCards.$inferSelect;
+
+/**
+ * One row per live `inbox wait`. Its existence is what makes a card's channel
+ * worth delivering to; nothing about the card itself changes when it appears.
+ */
+export const inboxWaits = pgTable(
+	"inbox_waits",
+	{
+		id: uuid().primaryKey().defaultRandom(),
+		cardId: uuid("card_id")
+			.notNull()
+			.references(() => inboxCards.id, { onDelete: "cascade" }),
+		agentSessionId: text("agent_session_id").notNull(),
+		startedAt: timestamp("started_at", { withTimezone: true })
+			.notNull()
+			.defaultNow(),
+		expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+	},
+	(table) => [
+		index("inbox_waits_card_id_idx").on(table.cardId),
+		index("inbox_waits_expires_at_idx").on(table.expiresAt),
+	],
+);
+
+export type InsertInboxWait = typeof inboxWaits.$inferInsert;
+export type SelectInboxWait = typeof inboxWaits.$inferSelect;

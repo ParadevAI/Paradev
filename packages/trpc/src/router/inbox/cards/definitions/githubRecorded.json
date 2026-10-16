@@ -1,0 +1,452 @@
+{
+	"pull": {
+		"node_id": "PR_kwDOQGUlEs8AAAABGY81Tg",
+		"number": 8100,
+		"title": "feat(desktop): one Tasks view that follows the organization's task tracker",
+		"state": "open",
+		"draft": false,
+		"merged": false,
+		"mergeable": true,
+		"mergeable_state": "unstable",
+		"maintainer_can_modify": false,
+		"html_url": "https://github.com/lumen-labs/app/pull/8100",
+		"user": {
+			"login": "avery-chen",
+			"avatar_url": "https://avatars.example/u/1"
+		},
+		"head": {
+			"ref": "avery/tasks-single-view",
+			"sha": "0b0da8b6d281d89300e01d7282516df77d26ecd0",
+			"label": "lumen-labs:avery/tasks-single-view",
+			"repo": {
+				"full_name": "lumen-labs/app"
+			}
+		},
+		"base": {
+			"ref": "avery/org-task-tracker",
+			"sha": "7728361d8740aedb9c4fadb6cc0beec1e89b856f",
+			"repo": {
+				"full_name": "lumen-labs/app"
+			}
+		}
+	},
+	"checkRuns": {
+		"total_count": 3,
+		"check_runs": [
+			{
+				"id": 111132273482,
+				"name": "Test",
+				"status": "completed",
+				"conclusion": "failure",
+				"html_url": "https://github.com/lumen-labs/app/actions/runs/37098177509/job/111132273482",
+				"details_url": "https://github.com/lumen-labs/app/actions/runs/37098177509/job/111132273482",
+				"app": {
+					"slug": "github-actions"
+				}
+			},
+			{
+				"id": 111133707874,
+				"name": "Post Deployment Comment",
+				"status": "completed",
+				"conclusion": "success",
+				"html_url": "https://github.com/lumen-labs/app/actions/runs/37098177234/job/111133707874",
+				"details_url": "https://github.com/lumen-labs/app/actions/runs/37098177234/job/111133707874",
+				"app": {
+					"slug": "github-actions"
+				}
+			},
+			{
+				"id": 111132481302,
+				"name": "Deploy Marketing",
+				"status": "completed",
+				"conclusion": "success",
+				"html_url": "https://github.com/lumen-labs/app/actions/runs/37098177234/job/111132481302",
+				"details_url": "https://github.com/lumen-labs/app/actions/runs/37098177234/job/111132481302",
+				"app": {
+					"slug": "github-actions"
+				}
+			}
+		]
+	},
+	"run": {
+		"id": 37098177509,
+		"name": "CI",
+		"display_title": "feat(desktop): one Tasks view that follows the organization's task tracker",
+		"run_attempt": 1,
+		"status": "completed",
+		"html_url": "https://github.com/lumen-labs/app/actions/runs/37098177509",
+		"head_branch": "avery/tasks-single-view",
+		"head_sha": "0b0da8b6d281d89300e01d7282516df77d26ecd0",
+		"event": "pull_request",
+		"actor": {
+			"login": "avery-chen",
+			"avatar_url": "https://avatars.example/u/1"
+		},
+		"run_number": 482
+	},
+	"job": {
+		"id": 111132273482,
+		"run_id": 37098177509,
+		"name": "Test",
+		"status": "completed",
+		"conclusion": "failure",
+		"html_url": "https://github.com/lumen-labs/app/actions/runs/37098177509/job/111132273482",
+		"steps": [
+			{
+				"number": 1,
+				"name": "Set up job",
+				"status": "completed",
+				"conclusion": "success"
+			},
+			{
+				"number": 2,
+				"name": "Check out code",
+				"status": "completed",
+				"conclusion": "success"
+			},
+			{
+				"number": 3,
+				"name": "Setup Bun",
+				"status": "completed",
+				"conclusion": "success"
+			},
+			{
+				"number": 4,
+				"name": "Cache dependencies",
+				"status": "completed",
+				"conclusion": "success"
+			},
+			{
+				"number": 5,
+				"name": "Install dependencies",
+				"status": "completed",
+				"conclusion": "success"
+			},
+			{
+				"number": 6,
+				"name": "Test",
+				"status": "completed",
+				"conclusion": "failure"
+			},
+			{
+				"number": 7,
+				"name": "Setup Node.js (terminal node-tests)",
+				"status": "completed",
+				"conclusion": "skipped"
+			},
+			{
+				"number": 8,
+				"name": "Prepare better-sqlite3 for Node",
+				"status": "completed",
+				"conclusion": "skipped"
+			},
+			{
+				"number": 9,
+				"name": "Terminal node-tests",
+				"status": "completed",
+				"conclusion": "skipped"
+			},
+			{
+				"number": 16,
+				"name": "Post Cache dependencies",
+				"status": "completed",
+				"conclusion": "skipped"
+			},
+			{
+				"number": 17,
+				"name": "Post Setup Bun",
+				"status": "completed",
+				"conclusion": "skipped"
+			},
+			{
+				"number": 18,
+				"name": "Post Check out code",
+				"status": "completed",
+				"conclusion": "success"
+			},
+			{
+				"number": 19,
+				"name": "Complete job",
+				"status": "completed",
+				"conclusion": "success"
+			}
+		]
+	},
+	"annotations": [
+		{
+			"path": ".github",
+			"start_line": 2,
+			"end_line": 2,
+			"annotation_level": "warning",
+			"title": "",
+			"message": "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830, actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/"
+		},
+		{
+			"path": ".github",
+			"start_line": 3134,
+			"end_line": 3134,
+			"annotation_level": "failure",
+			"title": "",
+			"message": "Process completed with exit code 1."
+		},
+		{
+			"path": ".github",
+			"start_line": 3006,
+			"end_line": 3006,
+			"annotation_level": "failure",
+			"title": "",
+			"message": "command (/home/runner/work/app/app/packages/workspace-fs) /home/runner/.bun/bin/bun run test exited (1)"
+		},
+		{
+			"path": "packages/workspace-fs/src/watch-overflow-backoff.test.ts",
+			"start_line": 222,
+			"end_line": 222,
+			"annotation_level": "failure",
+			"title": "error: expect(received).toBeGreaterThanOrEqual(expected)",
+			"message": "Expected: >= 290\nReceived: -88\n\n      at <anonymous> (/home/runner/work/app/app/packages/workspace-fs/src/watch-overflow-backoff.test.ts:222:44)"
+		},
+		{
+			"path": ".github",
+			"start_line": 1,
+			"end_line": 1,
+			"annotation_level": "notice",
+			"title": "",
+			"message": "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+		}
+	],
+	"log": "﻿2026-10-03T04:56:11.6421202Z Current runner version: '2.337.0'\n2026-10-03T04:56:11.6446741Z ##[group]Runner Image Provisioner\n2026-10-03T04:56:11.6447720Z Hosted Compute Agent\n2026-10-03T04:56:11.6448619Z Version: 20260901.588\n2026-10-03T04:56:11.6449328Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b\n2026-10-03T04:56:11.6450279Z Build Date: 2026-09-01T19:56:44Z\n2026-10-03T04:57:20.2809292Z [workspace-fs/watch] FSEvents overflow rescan: {\n2026-10-03T04:57:20.2809665Z   absolutePath: \"/tmp/watch-overflow-pW9eEJ\",\n2026-10-03T04:57:20.2809982Z   coalescedOverflows: 1,\n2026-10-03T04:57:20.2810223Z }\n2026-10-03T04:57:20.2810791Z (pass) FSEvents overflow rescan backoff > backs off exponentially to the cap while overflows keep arriving, and resets after quiet [759.09ms]\n2026-10-03T04:57:20.2811572Z [workspace-fs/watch] FSEvents overflow — rescan scheduled: {\n2026-10-03T04:57:20.2811967Z   absolutePath: \"/tmp/watch-overflow-7M5qPn\",\n2026-10-03T04:57:20.2812264Z   delayMs: 150,\n2026-10-03T04:57:20.2812491Z }\n2026-10-03T04:57:20.2812725Z [workspace-fs/watch] FSEvents overflow rescan: {\n2026-10-03T04:57:20.2813072Z   absolutePath: \"/tmp/watch-overflow-7M5qPn\",\n2026-10-03T04:57:20.2813388Z   coalescedOverflows: 2,\n2026-10-03T04:57:20.2813636Z }\n2026-10-03T04:57:20.2814095Z (pass) FSEvents overflow rescan backoff > a change during the suppressed window is reflected after settle [157.47ms]\n2026-10-03T04:57:20.2814775Z [workspace-fs/watch] FSEvents overflow — rescan scheduled: {\n2026-10-03T04:57:20.2815162Z   absolutePath: \"/tmp/watch-overflow-FuTSHM\",\n2026-10-03T04:57:20.2815457Z   delayMs: 300,\n2026-10-03T04:57:20.2815671Z }\n2026-10-03T04:57:20.2815902Z [workspace-fs/watch] FSEvents overflow rescan: {\n2026-10-03T04:57:20.2816256Z   absolutePath: \"/tmp/watch-overflow-FuTSHM\",\n2026-10-03T04:57:20.2816562Z   coalescedOverflows: 1,\n2026-10-03T04:57:20.2816809Z }\n2026-10-03T04:57:20.2817129Z [workspace-fs/watch] FSEvents overflow — rescan scheduled: {\n2026-10-03T04:57:20.2817526Z   absolutePath: \"/tmp/watch-overflow-FuTSHM\",\n2026-10-03T04:57:20.2817999Z   delayMs: 600,\n2026-10-03T04:57:20.2818383Z }\n2026-10-03T04:57:20.2818661Z 217 | \n2026-10-03T04:57:20.2819170Z 218 | \t\tawait waitUntil(() => rescanTimes.length > 0, \"trailing rescan\");\n2026-10-03T04:57:20.2819990Z 219 | \t\t// Must trail the SECOND overflow by a full window, not fire on the\n2026-10-03T04:57:20.2820762Z 220 | \t\t// first overflow's timer (~100ms after the second).\n2026-10-03T04:57:20.2821440Z 221 | \t\tconst firstRescanAt = rescanTimes[0] ?? 0;\n2026-10-03T04:57:20.2822216Z 222 | \t\texpect(firstRescanAt - secondOverflowAt).toBeGreaterThanOrEqual(290);\n2026-10-03T04:57:20.2822953Z                                                  ^\n2026-10-03T04:57:20.2823782Z error: expect(received).toBeGreaterThanOrEqual(expected)\n2026-10-03T04:57:20.2824217Z \n2026-10-03T04:57:20.2824388Z Expected: >= 290\n2026-10-03T04:57:20.2824757Z Received: -88\n2026-10-03T04:57:20.2824958Z \n2026-10-03T04:57:20.2825626Z       at <anonymous> (/home/runner/work/app/app/packages/workspace-fs/src/watch-overflow-backoff.test.ts:222:44)\n2026-10-03T04:57:20.2826537Z \n2026-10-03T04:57:20.2851326Z ##[error]Expected: >= 290\n2026-10-03T04:57:20.4094324Z ##[error]command (/home/runner/work/app/app/packages/workspace-fs) /home/runner/.bun/bin/bun run test exited (1)\n2026-10-03T04:57:20.4574800Z ##[error]Process completed with exit code 1.",
+	"compare": {
+		"html_url": "https://github.com/lumen-labs/app/compare/desktop-v1.35.0...main",
+		"status": "diverged",
+		"ahead_by": 26,
+		"behind_by": 1,
+		"total_commits": 26,
+		"commits": [
+			{
+				"sha": "905453605e417036deb596317bf0a6f007e3305e",
+				"commit": {
+					"message": "fix(themes): use green-500 for success in Dark and Light themes (#8099)",
+					"author": {
+						"name": "Someone"
+					}
+				},
+				"author": {
+					"login": "avery-chen",
+					"avatar_url": "https://avatars.example/u/1"
+				}
+			},
+			{
+				"sha": "f1e2c39f1709dff80174448712631e1b5dac576d",
+				"commit": {
+					"message": "chore(desktop): drop the task-keys and linear-live-tab flags (#8094)",
+					"author": {
+						"name": "Someone"
+					}
+				},
+				"author": {
+					"login": "avery-chen",
+					"avatar_url": "https://avatars.example/u/1"
+				}
+			},
+			{
+				"sha": "30fd3e3d5f29233d60449fc29a1cf763a56bfcdc",
+				"commit": {
+					"message": "feat(db): organizations choose where their tasks live (#8095)",
+					"author": {
+						"name": "Someone"
+					}
+				},
+				"author": {
+					"login": "avery-chen",
+					"avatar_url": "https://avatars.example/u/1"
+				}
+			},
+			{
+				"sha": "ef5ecd085badece7c8dbabb8641c692eab2b02f2",
+				"commit": {
+					"message": "feat(plugins): add a Superhuman plugin on a dynamic-OAuth superhuman_mcp connector (#8093)",
+					"author": {
+						"name": "Someone"
+					}
+				},
+				"author": {
+					"login": "blake-rivera",
+					"avatar_url": "https://avatars.example/u/2"
+				}
+			},
+			{
+				"sha": "af674c7ef95c2b808f980d1cf325eff8239b6a2d",
+				"commit": {
+					"message": "feat(db): every task has a team and a number (#8091)",
+					"author": {
+						"name": "Someone"
+					}
+				},
+				"author": {
+					"login": "avery-chen",
+					"avatar_url": "https://avatars.example/u/2"
+				}
+			},
+			{
+				"sha": "b8c5ad799e1f2f626cc0daab3d970de87bb9b950",
+				"commit": {
+					"message": "fix(desktop): realtime socket after sign-in; steady cloud list row; limrun-dev tunnels (#8092)",
+					"author": {
+						"name": "Someone"
+					}
+				},
+				"author": {
+					"login": "avery-chen",
+					"avatar_url": "https://avatars.example/u/2"
+				}
+			}
+		]
+	},
+	"release": {
+		"tag_name": "desktop-v1.35.0",
+		"html_url": "https://github.com/lumen-labs/app/releases/tag/desktop-v1.35.0",
+		"name": "Lumen Desktop desktop-v1.35.0",
+		"draft": false,
+		"prerelease": false
+	},
+	"issue": {
+		"id": 5678148474,
+		"number": 8061,
+		"title": "[bug] ⌘O opens Finder instead of the selected app when the sidebar is closed",
+		"html_url": "https://github.com/lumen-labs/app/issues/8061",
+		"state": "open",
+		"created_at": "2026-10-02T13:32:54Z",
+		"comments": 3,
+		"state_reason": null,
+		"body": "**Where:** Desktop app (macOS) · **Version:** 1.33.0 · macOS 26.6\n\n### What happened?\n\nI picked VS Code once for a project via the \"Open in\" dropdown. With the right sidebar open, ⌘O opens the workspace in VS Code as expected. When the right sidebar is closed, ⌘O opens the workspace in Finder instead. I expected ⌘O to use the project's selected app regardless of sidebar state.\n\n### Steps to reproduce\n\n1. In a v2 workspace, choose VS Code from the \"Open in\" dropdown. ⌘O now opens VS Code.\n2. Close the right sidebar.\n3. Press ⌘O. The workspace opens in Finder.\n\n### Suspected cause (from reading ",
+		"user": {
+			"login": "casey-lin",
+			"avatar_url": "https://avatars.example/u/3"
+		},
+		"labels": [],
+		"assignees": []
+	},
+	"labels": [
+		{
+			"name": "needs-triage",
+			"color": "deb53f",
+			"description": "Not looked at yet"
+		},
+		{
+			"name": "bug",
+			"color": "d73a4a",
+			"description": "Something isn't working"
+		},
+		{
+			"name": "capy",
+			"color": "0085DA",
+			"description": "Generated by capy.ai"
+		},
+		{
+			"name": "Chore",
+			"color": "95A2B3",
+			"description": null
+		},
+		{
+			"name": "dependencies",
+			"color": "0366d6",
+			"description": "Pull requests that update a dependency file"
+		},
+		{
+			"name": "documentation",
+			"color": "0075ca",
+			"description": "Improvements or additions to documentation"
+		},
+		{
+			"name": "duplicate",
+			"color": "cfd3d7",
+			"description": "This issue or pull request already exists"
+		},
+		{
+			"name": "e2e-mobile",
+			"color": "1D76DB",
+			"description": "Run the Maestro iOS E2E suite on this PR (remove and re-add to re-run)"
+		}
+	],
+	"assignees": [
+		{
+			"login": "blake-rivera",
+			"avatar_url": "https://avatars.example/u/3"
+		},
+		{
+			"login": "dana-okafor",
+			"avatar_url": "https://avatars.example/u/4"
+		},
+		{
+			"login": "eli-santos",
+			"avatar_url": "https://avatars.example/u/5"
+		},
+		{
+			"login": "avery-chen",
+			"avatar_url": "https://avatars.example/u/5"
+		}
+	],
+	"repo": {
+		"default_branch": "main",
+		"html_url": "https://github.com/lumen-labs/app",
+		"permissions": {
+			"admin": true,
+			"maintain": true,
+			"push": true,
+			"triage": true,
+			"pull": true
+		}
+	},
+	"pending": [
+		{
+			"environment": {
+				"id": 161088068,
+				"node_id": "MDExOkVudmlyb25tZW50MTYxMDg4MDY4",
+				"name": "Production",
+				"url": "https://api.github.com/repos/lumen-labs/app/environments/Production",
+				"html_url": "https://github.com/lumen-labs/app/deployments/activity_log?environments_filter=Production"
+			},
+			"wait_timer": 30,
+			"wait_timer_started_at": "2026-10-03T04:57:20Z",
+			"current_user_can_approve": true,
+			"reviewers": [
+				{
+					"type": "User",
+					"reviewer": {
+						"login": "farah-idris",
+						"avatar_url": "https://avatars.example/u/6"
+					}
+				},
+				{
+					"type": "Team",
+					"reviewer": {
+						"id": 1,
+						"name": "Platform",
+						"slug": "platform"
+					}
+				}
+			]
+		},
+		{
+			"environment": {
+				"id": 161088069,
+				"node_id": "x",
+				"name": "Production – web",
+				"url": "https://api.github.com/x",
+				"html_url": "https://github.com/lumen-labs/app/deployments/activity_log?environments_filter=web"
+			},
+			"wait_timer": 0,
+			"wait_timer_started_at": null,
+			"current_user_can_approve": false,
+			"reviewers": [
+				{
+					"type": "User",
+					"reviewer": {
+						"login": "gus-lind",
+						"avatar_url": "https://avatars.example/u/7"
+					}
+				}
+			]
+		}
+	]
+}

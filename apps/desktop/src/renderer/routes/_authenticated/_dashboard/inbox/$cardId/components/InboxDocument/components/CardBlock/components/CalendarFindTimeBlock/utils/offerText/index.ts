@@ -1,0 +1,1 @@
+export { offerText } from "./offerText";

@@ -11,9 +11,9 @@ import {
 	useEffect,
 	useImperativeHandle,
 	useRef,
-	useState,
 } from "react";
 import { LuGitPullRequest } from "react-icons/lu";
+import { useListCursor } from "renderer/hooks/useListCursor";
 import {
 	StatusIcon,
 	type StatusType,
@@ -75,13 +75,12 @@ export const RecordMentionList = forwardRef<
 	RecordMentionListRef,
 	SuggestionProps<RecordMentionItem>
 >(({ items, command }, ref) => {
-	const [selectedIndex, setSelectedIndex] = useState(0);
+	const {
+		highlighted: selectedIndex,
+		move,
+		hover: setSelectedIndex,
+	} = useListCursor(items.length, items);
 	const containerRef = useRef<HTMLDivElement>(null);
-
-	// biome-ignore lint/correctness/useExhaustiveDependencies: reset on new items
-	useEffect(() => {
-		setSelectedIndex(0);
-	}, [items]);
 
 	useEffect(() => {
 		containerRef.current
@@ -91,15 +90,8 @@ export const RecordMentionList = forwardRef<
 
 	useImperativeHandle(ref, () => ({
 		onKeyDown: ({ event }: SuggestionKeyDownProps) => {
+			if (move(event.key)) return true;
 			if (items.length === 0) return false;
-			if (event.key === "ArrowUp") {
-				setSelectedIndex((prev) => (prev - 1 + items.length) % items.length);
-				return true;
-			}
-			if (event.key === "ArrowDown") {
-				setSelectedIndex((prev) => (prev + 1) % items.length);
-				return true;
-			}
 			if (event.key === "Enter" || event.key === "Tab") {
 				const item = items[selectedIndex];
 				if (item) command(item);

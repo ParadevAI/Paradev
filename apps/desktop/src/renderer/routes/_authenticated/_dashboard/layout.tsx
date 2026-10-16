@@ -16,7 +16,9 @@ import { electronTrpc } from "renderer/lib/electron-trpc";
 import { DashboardSidebar } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar";
 import { DashboardSidebarPortsProvider } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/providers/DashboardSidebarPortsProvider";
 import { PortForwardsProvider } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/providers/PortForwardsProvider";
+import { InboxPanel } from "renderer/routes/_authenticated/_dashboard/components/InboxPanel";
 import { useHistoryNavigationShortcuts } from "renderer/routes/_authenticated/_dashboard/hooks/useHistoryNavigationShortcuts";
+import { useInboxEnabled } from "renderer/routes/_authenticated/_dashboard/hooks/useInboxEnabled";
 import { useCloudSidebarStore } from "renderer/routes/_authenticated/_dashboard/stores/cloudSidebarStore";
 import { useDevSeedV2Sidebar } from "renderer/routes/_authenticated/hooks/useDevSeedV2Sidebar";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
@@ -26,6 +28,7 @@ import { WorkspaceSidebar } from "renderer/screens/main/components/WorkspaceSide
 import { DeleteWorkspaceDialog } from "renderer/screens/main/components/WorkspaceSidebar/WorkspaceListItem/components";
 import { useAutomationFailuresStore } from "renderer/stores/automation-failures";
 import { useDeleteWorkspaceIntent } from "renderer/stores/delete-workspace-intent";
+import { useInboxPanelStore } from "renderer/stores/inbox-panel-state";
 import { usePortsDisplayMode } from "renderer/stores/inline-workspace-ports";
 import { useSidebarSectionsCollapseStore } from "renderer/stores/sidebar-sections-collapse";
 import { syncPersistedStoreAcrossWindows } from "renderer/stores/syncPersistedStoreAcrossWindows";
@@ -61,6 +64,8 @@ function DashboardLayout() {
 
 	const openNewWorkspace = useOpenNewWorkspace();
 	const isV2CloudEnabled = useIsV2CloudEnabled();
+	const isInboxEnabled = useInboxEnabled();
+	const toggleInboxPanel = useInboxPanelStore((s) => s.toggleOpen);
 	const portsDisplayMode = usePortsDisplayMode();
 	const { workspaces: hostWorkspaces } = useHostWorkspaces();
 	const quickCreateWorkspace = useQuickCreateWorkspace();
@@ -152,6 +157,7 @@ function DashboardLayout() {
 		ignoreEventWhen: (e) => e.defaultPrevented,
 	});
 	useHotkey("TOGGLE_WORKSPACE_SIDEBAR", toggleWorkspaceSidebarCollapsed);
+	useHotkey("TOGGLE_INBOX", toggleInboxPanel, { enabled: isInboxEnabled });
 	useHotkey("NEW_WORKSPACE", () =>
 		openNewWorkspace(
 			currentWorkspace?.projectId ?? currentV2Workspace?.projectId ?? undefined,
@@ -252,10 +258,12 @@ function DashboardLayout() {
 				<div className="flex h-full w-full overflow-hidden">
 					<CommandPaletteHost />
 					{sidebarOutsideColumn && sidebarPanel}
+					{sidebarOutsideColumn && <InboxPanel />}
 					<div className="flex flex-1 flex-col min-w-0 min-h-0">
 						{showsAppTopBar && <TopBar />}
 						<div className="flex flex-1 min-h-0 min-w-0 overflow-hidden">
 							{!sidebarOutsideColumn && sidebarPanel}
+							{!sidebarOutsideColumn && <InboxPanel />}
 							<div className="relative flex flex-1 min-h-0 min-w-0">
 								{versionMismatch ? (
 									// A v2 user on a stale v1 workspace route has nothing to go

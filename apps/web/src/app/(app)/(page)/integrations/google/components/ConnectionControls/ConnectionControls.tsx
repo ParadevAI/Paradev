@@ -23,12 +23,14 @@ interface ConnectionControlsProps {
 	organizationId: string;
 	isConnected: boolean;
 	needsReconnect: boolean;
+	missingCalendar: boolean;
 }
 
 export function ConnectionControls({
 	organizationId,
 	isConnected,
 	needsReconnect,
+	missingCalendar,
 }: ConnectionControlsProps) {
 	const trpc = useTRPC();
 	const router = useRouter();
@@ -72,41 +74,48 @@ export function ConnectionControls({
 
 	if (isConnected) {
 		return (
-			<AlertDialog>
-				<AlertDialogTrigger asChild>
-					<Button variant="outline" disabled={disconnectMutation.isPending}>
-						<Unplug className="mr-2 size-4" />
-						{disconnectMutation.isPending ? (
-							<Trans>Disconnecting...</Trans>
-						) : (
-							<Trans>Disconnect</Trans>
-						)}
+			<div className="flex gap-2">
+				{missingCalendar && (
+					<Button onClick={handleConnect}>
+						<Trans>Add Google Calendar access</Trans>
 					</Button>
-				</AlertDialogTrigger>
-				<AlertDialogContent>
-					<AlertDialogHeader>
-						<AlertDialogTitle>
-							<Trans>Disconnect Google?</Trans>
-						</AlertDialogTitle>
-						<AlertDialogDescription>
-							<Trans>
-								Calendar and Gmail triggers in this organization will stop
-								firing until an account is connected again.
-							</Trans>
-						</AlertDialogDescription>
-					</AlertDialogHeader>
-					<AlertDialogFooter>
-						<AlertDialogCancel>
-							<Trans>Cancel</Trans>
-						</AlertDialogCancel>
-						<AlertDialogAction
-							onClick={() => disconnectMutation.mutate({ organizationId })}
-						>
-							<Trans>Disconnect</Trans>
-						</AlertDialogAction>
-					</AlertDialogFooter>
-				</AlertDialogContent>
-			</AlertDialog>
+				)}
+				<AlertDialog>
+					<AlertDialogTrigger asChild>
+						<Button variant="outline" disabled={disconnectMutation.isPending}>
+							<Unplug className="mr-2 size-4" />
+							{disconnectMutation.isPending ? (
+								<Trans>Disconnecting...</Trans>
+							) : (
+								<Trans>Disconnect</Trans>
+							)}
+						</Button>
+					</AlertDialogTrigger>
+					<AlertDialogContent>
+						<AlertDialogHeader>
+							<AlertDialogTitle>
+								<Trans>Disconnect Google?</Trans>
+							</AlertDialogTitle>
+							<AlertDialogDescription>
+								<Trans>
+									Calendar and Gmail triggers in this organization will stop
+									firing until an account is connected again.
+								</Trans>
+							</AlertDialogDescription>
+						</AlertDialogHeader>
+						<AlertDialogFooter>
+							<AlertDialogCancel>
+								<Trans>Cancel</Trans>
+							</AlertDialogCancel>
+							<AlertDialogAction
+								onClick={() => disconnectMutation.mutate({ organizationId })}
+							>
+								<Trans>Disconnect</Trans>
+							</AlertDialogAction>
+						</AlertDialogFooter>
+					</AlertDialogContent>
+				</AlertDialog>
+			</div>
 		);
 	}
 

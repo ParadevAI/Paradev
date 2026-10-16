@@ -1,0 +1,1 @@
+export { FactRow } from "./FactRow";

@@ -3,6 +3,7 @@ import { msg } from "@lingui/core/macro";
 import type {
 	HotkeyCategory,
 	HotkeyDefinition,
+	HotkeyScope,
 	Platform,
 	PlatformKey,
 	ShortcutBinding,
@@ -13,6 +14,8 @@ interface HotkeyRegistryDefinition {
 	label: MessageDescriptor;
 	category: HotkeyCategory;
 	description?: MessageDescriptor;
+	/** Acts only while this surface holds focus, and takes its chord from any unscoped hotkey meanwhile. */
+	scope?: HotkeyScope;
 }
 
 function detectPlatform(): Platform {
@@ -46,6 +49,171 @@ const L = (chord: string): ShortcutBinding => ({
 
 export const HOTKEYS_REGISTRY = {
 	// Navigation
+	TOGGLE_INBOX: {
+		key: {
+			mac: L("meta+shift+i"),
+			windows: L("ctrl+shift+i"),
+			linux: L("ctrl+shift+i"),
+		},
+		label: msg({ message: "Toggle Inbox" }),
+		category: "Navigation",
+		description: msg({
+			message: "Show or hide the inbox of cards agents have sent you",
+		}),
+	},
+	INBOX_NEXT: {
+		key: {
+			mac: "meta+arrowdown",
+			windows: "ctrl+arrowdown",
+			linux: "ctrl+arrowdown",
+		},
+		label: msg({ message: "Next Card" }),
+		category: "Inbox",
+		scope: "inbox",
+		description: msg({
+			message: "Select the next card and show it. The down arrow does the same",
+		}),
+	},
+	INBOX_PREVIOUS: {
+		key: {
+			mac: "meta+arrowup",
+			windows: "ctrl+arrowup",
+			linux: "ctrl+arrowup",
+		},
+		label: msg({ message: "Previous Card" }),
+		category: "Inbox",
+		scope: "inbox",
+		description: msg({
+			message:
+				"Select the previous card and show it. The up arrow does the same",
+		}),
+	},
+	INBOX_ARCHIVE: {
+		key: {
+			mac: L("meta+e"),
+			windows: L("ctrl+shift+e"),
+			linux: L("ctrl+shift+e"),
+		},
+		label: msg({ message: "Archive Card" }),
+		category: "Inbox",
+		scope: "inbox",
+		description: msg({
+			message:
+				"Archive the selected card without deciding, and select the next",
+		}),
+	},
+	INBOX_OPEN_SOURCE: {
+		key: {
+			mac: L("meta+shift+o"),
+			windows: L("ctrl+shift+alt+o"),
+			linux: L("ctrl+shift+alt+o"),
+		},
+		label: msg({ message: "Open Card in Its App" }),
+		category: "Inbox",
+		scope: "inbox",
+		description: msg({
+			message:
+				"Open what the selected card is about in Slack, Gmail, Linear, GitHub, Stripe or its own app",
+		}),
+	},
+	INBOX_BLOCK_PRIMARY: {
+		key: { mac: "meta+enter", windows: "ctrl+enter", linux: "ctrl+enter" },
+		label: msg({ message: "Card Primary Action" }),
+		category: "Inbox",
+		scope: "inbox",
+		description: msg({
+			message:
+				"Take the focused block's main action: send, approve, accept, or send the answer to a question",
+		}),
+	},
+	INBOX_BLOCK_DISMISS: {
+		key: {
+			mac: "meta+backspace",
+			windows: "ctrl+backspace",
+			linux: "ctrl+backspace",
+		},
+		label: msg({ message: "Card Decline Action" }),
+		category: "Inbox",
+		scope: "inbox",
+		description: msg({
+			message:
+				'Take the focused block\'s "no": do not send, keep as is, decline, or skip an optional question',
+		}),
+	},
+	INBOX_BLOCK_NEXT: {
+		key: { mac: "tab", windows: "tab", linux: "tab" },
+		label: msg({ message: "Next Block" }),
+		category: "Inbox",
+		scope: "inbox",
+		description: msg({
+			message:
+				"Move through the focused block's fields, then to the next block of the card that is still open",
+		}),
+	},
+	INBOX_BLOCK_PREVIOUS: {
+		key: { mac: "shift+tab", windows: "shift+tab", linux: "shift+tab" },
+		label: msg({ message: "Previous Block" }),
+		category: "Inbox",
+		scope: "inbox",
+		description: msg({
+			message:
+				"Move back through the focused block's fields, then to the previous block of the card that is still open",
+		}),
+	},
+	INBOX_BLOCK_ACTION_1: {
+		key: { mac: L("meta+1"), windows: L("ctrl+1"), linux: L("ctrl+1") },
+		label: msg({ message: "Card Action 1" }),
+		category: "Inbox",
+		scope: "inbox",
+	},
+	INBOX_BLOCK_ACTION_2: {
+		key: { mac: L("meta+2"), windows: L("ctrl+2"), linux: L("ctrl+2") },
+		label: msg({ message: "Card Action 2" }),
+		category: "Inbox",
+		scope: "inbox",
+	},
+	INBOX_BLOCK_ACTION_3: {
+		key: { mac: L("meta+3"), windows: L("ctrl+3"), linux: L("ctrl+3") },
+		label: msg({ message: "Card Action 3" }),
+		category: "Inbox",
+		scope: "inbox",
+	},
+	INBOX_BLOCK_ACTION_4: {
+		key: { mac: L("meta+4"), windows: L("ctrl+4"), linux: L("ctrl+4") },
+		label: msg({ message: "Card Action 4" }),
+		category: "Inbox",
+		scope: "inbox",
+	},
+	INBOX_BLOCK_ACTION_5: {
+		key: { mac: L("meta+5"), windows: L("ctrl+5"), linux: L("ctrl+5") },
+		label: msg({ message: "Card Action 5" }),
+		category: "Inbox",
+		scope: "inbox",
+	},
+	INBOX_BLOCK_ACTION_6: {
+		key: { mac: L("meta+6"), windows: L("ctrl+6"), linux: L("ctrl+6") },
+		label: msg({ message: "Card Action 6" }),
+		category: "Inbox",
+		scope: "inbox",
+	},
+	INBOX_BLOCK_ACTION_7: {
+		key: { mac: L("meta+7"), windows: L("ctrl+7"), linux: L("ctrl+7") },
+		label: msg({ message: "Card Action 7" }),
+		category: "Inbox",
+		scope: "inbox",
+	},
+	INBOX_BLOCK_ACTION_8: {
+		key: { mac: L("meta+8"), windows: L("ctrl+8"), linux: L("ctrl+8") },
+		label: msg({ message: "Card Action 8" }),
+		category: "Inbox",
+		scope: "inbox",
+	},
+	INBOX_BLOCK_ACTION_9: {
+		key: { mac: L("meta+9"), windows: L("ctrl+9"), linux: L("ctrl+9") },
+		label: msg({ message: "Card Action 9" }),
+		category: "Inbox",
+		scope: "inbox",
+	},
 	NAVIGATE_BACK: {
 		key: {
 			mac: L("meta+bracketleft"),

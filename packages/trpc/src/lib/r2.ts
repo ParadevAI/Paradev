@@ -190,10 +190,16 @@ export async function presignedGetUrl(
 	key: string,
 	expiresInSeconds = 60 * 60,
 	signingDate?: Date,
+	response: { contentType?: string; contentDisposition?: string } = {},
 ): Promise<string> {
 	return getSignedUrl(
 		s3(),
-		new GetObjectCommand({ Bucket: bucketName("private"), Key: key }),
+		new GetObjectCommand({
+			Bucket: bucketName("private"),
+			Key: key,
+			ResponseContentType: response.contentType,
+			ResponseContentDisposition: response.contentDisposition,
+		}),
 		{ expiresIn: expiresInSeconds, signingDate },
 	);
 }

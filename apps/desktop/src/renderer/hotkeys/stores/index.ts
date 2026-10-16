@@ -1,4 +1,5 @@
 export { useHotkeyOverridesStore } from "./hotkeyOverridesStore";
+export { useHotkeyScopeStore } from "./hotkeyScopeStore";
 export {
 	getEffectiveLayoutMap,
 	useEffectiveLayoutMap,

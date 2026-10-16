@@ -1,0 +1,1 @@
+export { handleSlackPaste } from "./slackPaste";

@@ -5,8 +5,10 @@ import { requireOrgMember } from "@/lib/integrations/requireOrgMember";
 const SLACK_SCOPES = [
 	"app_mentions:read",
 	"chat:write",
+	"emoji:read",
 	"reactions:read",
 	"reactions:write",
+	"team:read",
 	"channels:history",
 	"channels:read",
 	"groups:history",
@@ -16,6 +18,7 @@ const SLACK_SCOPES = [
 	"im:write",
 	"mpim:history",
 	"users:read",
+	"usergroups:read",
 	"files:read",
 	"assistant:write",
 	"links:read",

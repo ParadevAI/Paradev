@@ -12,13 +12,7 @@ import Suggestion, {
 
 const slashCommandSuggestionKey = new PluginKey("markdownEditorSlashCommand");
 
-import {
-	forwardRef,
-	useEffect,
-	useImperativeHandle,
-	useRef,
-	useState,
-} from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import {
 	HiOutlineCheckCircle,
 	HiOutlineCodeBracket,
@@ -26,7 +20,10 @@ import {
 	HiOutlineNumberedList,
 } from "react-icons/hi2";
 import { RiDoubleQuotesL } from "react-icons/ri";
+import { useListCursor } from "renderer/hooks/useListCursor";
 import tippy, { type Instance as TippyInstance } from "tippy.js";
+import { matchSuggestion } from "../../utils/matchSuggestion";
+import { suggestionKeyDown } from "../../utils/suggestionKeyDown";
 
 interface CommandItem {
 	title: MessageDescriptor;
@@ -119,13 +116,12 @@ interface SlashCommandListProps {
 
 const SlashCommandList = forwardRef<SlashCommandListRef, SlashCommandListProps>(
 	({ items, command }, ref) => {
-		const [selectedIndex, setSelectedIndex] = useState(0);
+		const {
+			highlighted: selectedIndex,
+			move,
+			hover: setSelectedIndex,
+		} = useListCursor(items.length, items);
 		const containerRef = useRef<HTMLDivElement>(null);
-
-		// biome-ignore lint/correctness/useExhaustiveDependencies: Reset selection when items change
-		useEffect(() => {
-			setSelectedIndex(0);
-		}, [items]);
 
 		useEffect(() => {
 			const selectedElement = containerRef.current?.querySelector(
@@ -136,15 +132,7 @@ const SlashCommandList = forwardRef<SlashCommandListRef, SlashCommandListProps>(
 
 		useImperativeHandle(ref, () => ({
 			onKeyDown: ({ event }: SuggestionKeyDownProps) => {
-				if (event.key === "ArrowUp") {
-					setSelectedIndex((prev) => (prev - 1 + items.length) % items.length);
-					return true;
-				}
-
-				if (event.key === "ArrowDown") {
-					setSelectedIndex((prev) => (prev + 1) % items.length);
-					return true;
-				}
+				if (move(event.key)) return true;
 
 				if (event.key === "Enter") {
 					const item = items[selectedIndex];
@@ -203,6 +191,7 @@ const SlashCommandList = forwardRef<SlashCommandListRef, SlashCommandListProps>(
 									type="button"
 									key={item.title.id}
 									data-index={index}
+									onMouseEnter={() => setSelectedIndex(index)}
 									onClick={() => command(item)}
 									className={`relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none w-full ${
 										index === selectedIndex
@@ -233,6 +222,7 @@ export const SlashCommand = Extension.create({
 		return {
 			suggestion: {
 				char: "/",
+				findSuggestionMatch: matchSuggestion,
 				decorationClass: "bg-accent/50 rounded px-0.5",
 				command: ({
 					editor,
@@ -304,16 +294,8 @@ export const SlashCommand = Extension.create({
 								getReferenceClientRect: () => getClientRect() ?? new DOMRect(),
 							});
 						},
-						onKeyDown: (props: SuggestionKeyDownProps) => {
-							if (props.event.key === "Escape") {
-								props.event.preventDefault();
-								props.event.stopPropagation();
-								popup?.[0]?.hide();
-								return true;
-							}
-
-							return component?.ref?.onKeyDown(props) ?? false;
-						},
+						onKeyDown: (props: SuggestionKeyDownProps) =>
+							suggestionKeyDown(popup?.[0], component?.ref, props),
 						onExit: () => {
 							popup?.[0]?.destroy();
 							component?.destroy();

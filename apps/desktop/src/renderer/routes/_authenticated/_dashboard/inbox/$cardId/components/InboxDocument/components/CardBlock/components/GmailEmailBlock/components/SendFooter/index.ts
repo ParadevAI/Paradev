@@ -1,0 +1,1 @@
+export { SendFooter } from "./SendFooter";

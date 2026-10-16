@@ -1,0 +1,1 @@
+export { StripeTag } from "./StripeTag";

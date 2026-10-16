@@ -1,0 +1,328 @@
+{
+	"kind": "slack.thread",
+	"channel": {
+		"id": "C0TESTAGNT1",
+		"name": "#test-agents"
+	},
+	"permalink": null,
+	"messages": [
+		{
+			"ts": "1769582287.600199",
+			"user": {
+				"id": "U0SATYA2P7D",
+				"name": "Satya Patel",
+				"realName": null,
+				"avatar": null,
+				"isBot": false,
+				"title": null,
+				"timezone": "America/Los_Angeles",
+				"presence": null,
+				"inChannel": false,
+				"isReader": true,
+				"team": null
+			},
+			"deleted": false,
+			"text": "<@U0APPBOT1A1> create a ticket for testing with extensive markdown (code blocks, bold text, headers, etc)",
+			"edited": false,
+			"broadcast": false,
+			"reactions": [],
+			"files": [],
+			"attachments": [],
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"kind": "section",
+							"inline": [
+								{
+									"kind": "user",
+									"id": "U0APPBOT1A1"
+								},
+								{
+									"kind": "text",
+									"text": " create a ticket for testing with extensive markdown (code blocks, bold text, headers, etc)"
+								}
+							]
+						}
+					]
+				}
+			],
+			"permalink": "https://superset.slack.com/archives/C0TESTAGNT1/p1769582287600199"
+		},
+		{
+			"ts": "1769582310.824439",
+			"user": {
+				"id": "U0APPBOT1A1",
+				"name": "Superset",
+				"realName": null,
+				"avatar": "/fixtures/slack/U0APPBOT1A1.png",
+				"isBot": true,
+				"title": null,
+				"timezone": "America/Los_Angeles",
+				"presence": null,
+				"inChannel": false,
+				"isReader": false,
+				"team": null
+			},
+			"deleted": false,
+			"text": "Created task <https://app.superset.sh/task/testing-with-extensive-markdown|testing-with-extensive-markdown>",
+			"edited": false,
+			"broadcast": false,
+			"reactions": [],
+			"files": [],
+			"attachments": [
+				{
+					"color": null,
+					"pretext": null,
+					"author": null,
+					"title": "Testing with Extensive Markdown",
+					"titleLink": "https://app.superset.sh/task/testing-with-extensive-markdown",
+					"text": "Task testing-with-extensive-markdown in Superset",
+					"fields": [
+						{
+							"title": "Status",
+							"value": "Backlog",
+							"short": true
+						}
+					],
+					"image": null,
+					"footer": null,
+					"footerIcon": null,
+					"ts": null,
+					"blocks": [],
+					"unfurl": {
+						"app": "Superset",
+						"icon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fsuperset.sh%2Ffavicon-192.png",
+						"title": "Testing with Extensive Markdown",
+						"subtitle": "Task testing-with-extensive-markdown in Superset",
+						"url": "https://app.superset.sh/task/testing-with-extensive-markdown",
+						"fields": [
+							{
+								"label": "Status",
+								"value": [
+									{
+										"kind": "section",
+										"inline": [
+											{
+												"kind": "text",
+												"text": "Backlog          "
+											}
+										]
+									}
+								]
+							}
+						]
+					},
+					"link": null,
+					"buttons": []
+				}
+			],
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"kind": "section",
+							"inline": [
+								{
+									"kind": "text",
+									"text": "Created task "
+								},
+								{
+									"kind": "link",
+									"url": "https://app.superset.sh/task/testing-with-extensive-markdown",
+									"text": "testing-with-extensive-markdown"
+								}
+							]
+						}
+					]
+				}
+			],
+			"permalink": "https://superset.slack.com/archives/C0TESTAGNT1/p1769582310824439"
+		},
+		{
+			"ts": "1769582598.547269",
+			"user": {
+				"id": "U0SATYA2P7D",
+				"name": "Satya Patel",
+				"realName": null,
+				"avatar": null,
+				"isBot": false,
+				"title": null,
+				"timezone": "America/Los_Angeles",
+				"presence": null,
+				"inChannel": false,
+				"isReader": true,
+				"team": null
+			},
+			"deleted": false,
+			"text": "<@U0APPBOT1A1> create again",
+			"edited": false,
+			"broadcast": false,
+			"reactions": [],
+			"files": [],
+			"attachments": [],
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"kind": "section",
+							"inline": [
+								{
+									"kind": "user",
+									"id": "U0APPBOT1A1"
+								},
+								{
+									"kind": "text",
+									"text": " create again"
+								}
+							]
+						}
+					]
+				}
+			],
+			"permalink": "https://superset.slack.com/archives/C0TESTAGNT1/p1769582598547269"
+		},
+		{
+			"ts": "1769582619.245989",
+			"user": {
+				"id": "U0APPBOT1A1",
+				"name": "Superset",
+				"realName": null,
+				"avatar": "/fixtures/slack/U0APPBOT1A1.png",
+				"isBot": true,
+				"title": null,
+				"timezone": "America/Los_Angeles",
+				"presence": null,
+				"inChannel": false,
+				"isReader": false,
+				"team": null
+			},
+			"deleted": false,
+			"text": "Created task <https://app.superset.sh/task/testing-with-extensive-markdown-1|testing-with-extensive-markdown-1>",
+			"edited": false,
+			"broadcast": false,
+			"reactions": [],
+			"files": [],
+			"attachments": [
+				{
+					"color": null,
+					"pretext": null,
+					"author": null,
+					"title": "Testing with extensive markdown",
+					"titleLink": "https://app.superset.sh/task/testing-with-extensive-markdown-1",
+					"text": "Task testing-with-extensive-markdown-1 in Superset",
+					"fields": [
+						{
+							"title": "Status",
+							"value": "Backlog",
+							"short": true
+						}
+					],
+					"image": null,
+					"footer": null,
+					"footerIcon": null,
+					"ts": null,
+					"blocks": [],
+					"unfurl": {
+						"app": "Superset",
+						"icon": "/fixtures/slack/U0APPBOT1A1.png",
+						"title": "Testing with extensive markdown",
+						"subtitle": "Task testing-with-extensive-markdown-1 in Superset",
+						"url": "https://app.superset.sh/task/testing-with-extensive-markdown-1",
+						"fields": [
+							{
+								"label": "Status",
+								"value": [
+									{
+										"kind": "section",
+										"inline": [
+											{
+												"kind": "text",
+												"text": "Backlog          "
+											}
+										]
+									}
+								]
+							}
+						]
+					},
+					"link": null,
+					"buttons": []
+				}
+			],
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"kind": "section",
+							"inline": [
+								{
+									"kind": "text",
+									"text": "Created task "
+								},
+								{
+									"kind": "link",
+									"url": "https://app.superset.sh/task/testing-with-extensive-markdown-1",
+									"text": "testing-with-extensive-markdown-1"
+								}
+							]
+						}
+					]
+				}
+			],
+			"permalink": "https://superset.slack.com/archives/C0TESTAGNT1/p1769582619245989"
+		}
+	],
+	"members": [
+		{
+			"id": "U0SATYA2P7D",
+			"name": "Satya Patel",
+			"realName": null,
+			"avatar": null,
+			"isBot": false,
+			"title": null,
+			"timezone": "America/Los_Angeles",
+			"presence": null,
+			"inChannel": true,
+			"isReader": true,
+			"team": null
+		},
+		{
+			"id": "U0APPBOT1A1",
+			"name": "Superset",
+			"realName": null,
+			"avatar": "/fixtures/slack/U0APPBOT1A1.png",
+			"isBot": true,
+			"title": null,
+			"timezone": "America/Los_Angeles",
+			"presence": null,
+			"inChannel": true,
+			"isReader": false,
+			"team": null
+		}
+	],
+	"names": {
+		"U0BLAKE8R3V": "Blake",
+		"U0SATYA2P7D": "Satya Patel",
+		"U0AVERY4C1N": "Avery Chen",
+		"U0CLAUDE1A1": "Claude",
+		"U0GITHUB1A1": "GitHub",
+		"U0CURSOR1A1": "Cursor",
+		"U0SYFTEN1A1": "Syften",
+		"U0APPBOT1A1": "Superset"
+	},
+	"channels": {
+		"C0TESTAGNT1": "test-agents",
+		"C0BUGS00001": "bugs",
+		"C0GENERAL01": "general",
+		"C0AGENTS001": "agents"
+	},
+	"groups": {},
+	"emoji": {},
+	"readerConnected": true,
+	"draft": null
+}

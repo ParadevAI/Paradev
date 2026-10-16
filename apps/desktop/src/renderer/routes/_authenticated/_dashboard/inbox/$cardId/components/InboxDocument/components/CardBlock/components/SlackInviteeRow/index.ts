@@ -1,0 +1,1 @@
+export { SlackInviteeRow } from "./SlackInviteeRow";

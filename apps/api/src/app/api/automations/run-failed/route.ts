@@ -1,6 +1,7 @@
 import * as Sentry from "@sentry/nextjs";
 import { db } from "@superset/db/client";
 import { automationRuns, automations } from "@superset/db/schema";
+import { notifyAutomationRunFailed } from "@superset/trpc/automation-dispatch";
 import { nudge } from "@superset/trpc/realtime";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
@@ -59,7 +60,9 @@ export async function POST(request: Request): Promise<Response> {
 
 	const [automation] = await db
 		.select({
+			id: automations.id,
 			organizationId: automations.organizationId,
+			ownerUserId: automations.ownerUserId,
 			name: automations.name,
 		})
 		.from(automations)
@@ -73,8 +76,9 @@ export async function POST(request: Request): Promise<Response> {
 	const errorText = `delivery failed after retries (status ${parsed.data.status}): ${parsed.data.error ?? "unknown"}`;
 	const failed = { status: "dispatch_failed", error: errorText } as const;
 
+	let runId: string | undefined;
 	if ("scheduledFor" in source.data) {
-		await db
+		const [inserted] = await db
 			.insert(automationRuns)
 			.values({
 				automationId,
@@ -88,9 +92,11 @@ export async function POST(request: Request): Promise<Response> {
 				target: [automationRuns.automationId, automationRuns.scheduledFor],
 				targetWhere: sql`${automationRuns.scheduledFor} IS NOT NULL`,
 				set: failed,
-			});
+			})
+			.returning({ id: automationRuns.id });
+		runId = inserted?.id;
 	} else {
-		await db
+		const [inserted] = await db
 			.insert(automationRuns)
 			.values({
 				automationId,
@@ -104,10 +110,14 @@ export async function POST(request: Request): Promise<Response> {
 				target: [automationRuns.triggerId, automationRuns.eventId],
 				targetWhere: sql`${automationRuns.eventId} IS NOT NULL`,
 				set: failed,
-			});
+			})
+			.returning({ id: automationRuns.id });
+		runId = inserted?.id;
 	}
 
 	nudge(automation.organizationId, "automation_runs");
+	if (runId)
+		await notifyAutomationRunFailed({ automation, runId, error: errorText });
 
 	Sentry.captureException(
 		new Error(`automation dispatch failed: ${automationId}`),

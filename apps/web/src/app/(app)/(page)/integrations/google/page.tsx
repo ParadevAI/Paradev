@@ -172,6 +172,7 @@ export default async function GoogleIntegrationPage() {
 						organizationId={organization.id}
 						isConnected={isConnected}
 						needsReconnect={needsReconnect}
+						missingCalendar={!!connection?.missingCalendar}
 					/>
 					{connection?.email && (
 						<div className="mt-4 text-sm text-muted-foreground">

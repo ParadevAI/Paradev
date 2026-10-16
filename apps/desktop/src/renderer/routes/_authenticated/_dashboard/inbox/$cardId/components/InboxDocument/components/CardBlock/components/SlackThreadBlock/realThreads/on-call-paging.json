@@ -1,0 +1,190 @@
+{
+	"kind": "slack.thread",
+	"channel": {
+		"id": "C0GENERAL01",
+		"name": "#general"
+	},
+	"permalink": null,
+	"messages": [
+		{
+			"ts": "1790892091.016449",
+			"user": {
+				"id": "U0BLAKE8R3V",
+				"name": "Blake",
+				"realName": "Blake Rivera",
+				"avatar": null,
+				"isBot": false,
+				"title": null,
+				"timezone": "America/Los_Angeles",
+				"presence": null,
+				"inChannel": false,
+				"isReader": false,
+				"team": null
+			},
+			"deleted": false,
+			"text": "On-call paging is now live on *<http://incident.io|incident.io>* (we're not using PagerDuty). Sentry uptime and error-spike alerts page whoever is on call in the weekly rotation (Avery, Satya, Casey), and every alert also posts in #incidents.\n\n*If you're on the rotation:* add your phone number or install the <http://incident.io|incident.io> app, or a page reaches you only by email or Slack.\n\nRunbook: <https://github.com/superset-sh/superset/blob/main/docs/runbooks/incidents.md|github.com/superset-sh/superset/blob/…/incidents.md> *Sent using* <@U0CLAUDE1A1>",
+			"edited": true,
+			"broadcast": false,
+			"reactions": [],
+			"files": [],
+			"attachments": [],
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"kind": "section",
+							"inline": [
+								{
+									"kind": "text",
+									"text": "On-call paging is now live on "
+								},
+								{
+									"kind": "link",
+									"url": "http://incident.io",
+									"text": "incident.io",
+									"bold": true
+								},
+								{
+									"kind": "text",
+									"text": " (we're not using PagerDuty). Sentry uptime and error-spike alerts page whoever is on call in the weekly rotation (Avery, Satya, Casey), and every alert also posts in #incidents.\n\n"
+								},
+								{
+									"kind": "text",
+									"text": "If you're on the rotation:",
+									"bold": true
+								},
+								{
+									"kind": "text",
+									"text": " add your phone number or install the "
+								},
+								{
+									"kind": "link",
+									"url": "http://incident.io",
+									"text": "incident.io"
+								},
+								{
+									"kind": "text",
+									"text": " app, or a page reaches you only by email or Slack.\n\nRunbook: "
+								},
+								{
+									"kind": "link",
+									"url": "https://github.com/superset-sh/superset/blob/main/docs/runbooks/incidents.md",
+									"text": "github.com/superset-sh/superset/blob/…/incidents.md"
+								}
+							]
+						}
+					]
+				},
+				{
+					"type": "context",
+					"elements": [
+						{
+							"kind": "text",
+							"text": "*Sent using* <@U0CLAUDE1A1>"
+						}
+					]
+				}
+			],
+			"permalink": "https://superset.slack.com/archives/C0GENERAL01/p1790892091016449"
+		},
+		{
+			"ts": "1790892315.212979",
+			"user": {
+				"id": "U0BLAKE8R3V",
+				"name": "Blake",
+				"realName": "Blake Rivera",
+				"avatar": null,
+				"isBot": false,
+				"title": null,
+				"timezone": "America/Los_Angeles",
+				"presence": null,
+				"inChannel": false,
+				"isReader": false,
+				"team": null
+			},
+			"deleted": false,
+			"text": "Update: the rotation is now all 4 of us (Avery, Satya, Casey, Blake). Get the <http://incident.io|incident.io> app: <https://apps.apple.com/us/app/incident-io/id6471268530|iOS> · <https://docs.incident.io/on-call/responder-guide|Android + setup guide> *Sent using* <@U0CLAUDE1A1>",
+			"edited": false,
+			"broadcast": true,
+			"reactions": [],
+			"files": [],
+			"attachments": [],
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"kind": "section",
+							"inline": [
+								{
+									"kind": "text",
+									"text": "Update: the rotation is now all 4 of us (Avery, Satya, Casey, Blake). Get the incident.io app: "
+								},
+								{
+									"kind": "link",
+									"url": "https://apps.apple.com/us/app/incident-io/id6471268530",
+									"text": "iOS"
+								},
+								{
+									"kind": "text",
+									"text": " · "
+								},
+								{
+									"kind": "link",
+									"url": "https://docs.incident.io/on-call/responder-guide",
+									"text": "Android + setup guide"
+								}
+							]
+						}
+					]
+				},
+				{
+					"type": "context",
+					"elements": [
+						{
+							"kind": "text",
+							"text": "*Sent using* <@U0CLAUDE1A1>"
+						}
+					]
+				}
+			],
+			"permalink": "https://superset.slack.com/archives/C0GENERAL01/p1790892315212979"
+		}
+	],
+	"members": [
+		{
+			"id": "U0BLAKE8R3V",
+			"name": "Blake",
+			"realName": "Blake Rivera",
+			"avatar": null,
+			"isBot": false,
+			"title": null,
+			"timezone": "America/Los_Angeles",
+			"presence": null,
+			"inChannel": true,
+			"isReader": false,
+			"team": null
+		}
+	],
+	"names": {
+		"U0BLAKE8R3V": "Blake",
+		"U0SATYA2P7D": "Satya Patel",
+		"U0AVERY4C1N": "Avery Chen",
+		"U0CLAUDE1A1": "Claude",
+		"U0GITHUB1A1": "GitHub",
+		"U0CURSOR1A1": "Cursor",
+		"U0SYFTEN1A1": "Syften",
+		"U0APPBOT1A1": "Superset"
+	},
+	"channels": {
+		"C0TESTAGNT1": "test-agents",
+		"C0BUGS00001": "bugs",
+		"C0GENERAL01": "general",
+		"C0AGENTS001": "agents"
+	},
+	"groups": {},
+	"emoji": {},
+	"readerConnected": true,
+	"draft": null
+}

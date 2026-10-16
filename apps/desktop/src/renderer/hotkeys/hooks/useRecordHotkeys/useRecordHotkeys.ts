@@ -156,7 +156,7 @@ function checkReserved(
 	return null;
 }
 
-function getHotkeyConflict(
+export function getHotkeyConflict(
 	candidate: ShortcutBinding,
 	excludeId: HotkeyId,
 ): HotkeyId | null {
@@ -167,6 +167,9 @@ function getHotkeyConflict(
 	const target = canonicalizeChord(candidateDispatch);
 	for (const id of Object.keys(HOTKEYS) as HotkeyId[]) {
 		if (id === excludeId) continue;
+		// A scoped hotkey and a global one may share a chord: the scope decides
+		// which acts. Only two hotkeys of the same reach collide.
+		if (HOTKEYS[id].scope !== HOTKEYS[excludeId].scope) continue;
 		const effective = id in overrides ? overrides[id] : HOTKEYS[id].key;
 		if (!effective) continue;
 		const otherDispatch = bindingToDispatchChord(effective, layoutMap);

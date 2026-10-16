@@ -45,6 +45,7 @@ import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { useFolderFirstImport } from "renderer/routes/_authenticated/_dashboard/components/AddRepositoryModals/hooks/useFolderFirstImport";
 import { AppMenuButton } from "renderer/routes/_authenticated/_dashboard/components/AppMenuButton";
+import { InboxToggle } from "renderer/routes/_authenticated/_dashboard/components/InboxToggle";
 import { NavigationControls } from "renderer/routes/_authenticated/_dashboard/components/NavigationControls";
 import { OfflineBadge } from "renderer/routes/_authenticated/_dashboard/components/OfflineBadge";
 import { PortsDropdown } from "renderer/routes/_authenticated/_dashboard/components/PortsDropdown";
@@ -694,6 +695,9 @@ export function DashboardSidebarHeader({
 					<OfflineBadge />
 				</ZoomStable>
 				<div className="drag h-full min-w-0 flex-1" />
+				<ZoomStable enabled={isMac} className="flex items-center pr-1">
+					<InboxToggle />
+				</ZoomStable>
 			</div>
 
 			<button

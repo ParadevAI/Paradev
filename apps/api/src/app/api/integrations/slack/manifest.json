@@ -43,6 +43,7 @@
 				"channels:history",
 				"channels:read",
 				"chat:write",
+				"emoji:read",
 				"files:read",
 				"groups:history",
 				"groups:read",
@@ -55,7 +56,10 @@
 				"mpim:history",
 				"reactions:read",
 				"reactions:write",
-				"users:read"
+				"team:read",
+				"usergroups:read",
+				"users:read",
+				"conversations.connect:write"
 			]
 		},
 		"pkce_enabled": false

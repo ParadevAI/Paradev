@@ -1,0 +1,1 @@
+export { SlackAttachment } from "./SlackAttachment";

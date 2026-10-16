@@ -225,6 +225,11 @@ export const FEATURE_FLAGS = {
 	 */
 	PLUGINS: "plugins",
 	/**
+	 * The agent inbox: a second sidebar of cards agents push when they cannot
+	 * finish without a person. Internal-only while the card set is first-party.
+	 */
+	INBOX: "inbox",
+	/**
 	 * Lock Screen / Dynamic Island agent card on iOS. Off by default while the
 	 * card is still being worked on; the flag's release conditions decide who
 	 * sees it, so a new build ships with it dark and no release widens it.

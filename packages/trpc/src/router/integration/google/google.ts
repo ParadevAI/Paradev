@@ -10,6 +10,7 @@ import {
 } from "../../../lib/connectors";
 import { protectedProcedure } from "../../../trpc";
 import { verifyOrgMembership } from "../utils";
+import { calendarAccess, gmailAccess } from "./constants";
 import { stopMailboxWatch } from "./gmail";
 import { findGoogleConnection, googleConfigOf } from "./state";
 
@@ -36,7 +37,12 @@ export const googleRouter = {
 				email: connection.externalAccountId,
 				connectedByUserId: connection.connectedByUserId,
 				connectedAt: connection.createdAt,
-				needsReconnect: connection.disconnectedAt !== null,
+				needsReconnect:
+					connection.disconnectedAt !== null ||
+					!gmailAccess(connection.scopes ?? []).canArchive,
+				// Released clients read `needsReconnect` as "not connected", so a working
+				// connection that only lacks the calendar scopes says so here instead.
+				missingCalendar: !calendarAccess(connection.scopes ?? []).canUseEvents,
 			};
 		}),
 

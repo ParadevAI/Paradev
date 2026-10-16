@@ -1,0 +1,1 @@
+export { RsvpFooter } from "./RsvpFooter";

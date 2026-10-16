@@ -1,0 +1,1 @@
+export { pdfFirstPage } from "./pdfFirstPage";

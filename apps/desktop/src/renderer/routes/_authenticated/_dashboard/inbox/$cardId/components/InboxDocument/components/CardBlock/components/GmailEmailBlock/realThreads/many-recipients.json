@@ -1,0 +1,388 @@
+{
+	"kind": "gmail.email",
+	"mode": "reply",
+	"account": {
+		"email": "satya@superset.sh",
+		"photo": null
+	},
+	"sendAs": [
+		{
+			"email": "satya@superset.sh",
+			"name": "Satya Patel",
+			"isDefault": true,
+			"signature": ""
+		}
+	],
+	"canSend": true,
+	"draftGone": false,
+	"scheduledAt": null,
+	"thread": {
+		"id": "1a0fb9de05c14553",
+		"subject": "Carpool sign-up for the offsite",
+		"labels": [
+			{
+				"id": "INBOX",
+				"name": "Inbox",
+				"color": null
+			}
+		],
+		"messages": [
+			{
+				"id": "1a0fb9de05c14553",
+				"from": {
+					"name": "Satya Patel",
+					"email": "satya@superset.sh"
+				},
+				"to": [
+					{
+						"name": "Leah Kim",
+						"email": "leah.kim@harborview.io"
+					},
+					{
+						"name": "Daniel Ortiz",
+						"email": "dortiz@brightline.co"
+					},
+					{
+						"name": "Mei Tanaka",
+						"email": "mei@tanaka-design.example.com"
+					},
+					{
+						"name": "Omar Haddad",
+						"email": "omar.haddad@northwind.co"
+					},
+					{
+						"name": "Grace Liu",
+						"email": "grace@lumenlabs.io"
+					},
+					{
+						"name": "Ben Carter",
+						"email": "ben.carter@fieldstone.dev"
+					},
+					{
+						"name": "Sofia Rossi",
+						"email": "sofia.rossi@example.org"
+					},
+					{
+						"name": "Ethan Brooks",
+						"email": "ethan@brooks.example.com"
+					},
+					{
+						"name": "Nina Petrova",
+						"email": "nina.p@harborview.io"
+					},
+					{
+						"name": "Lucas Moreau",
+						"email": "lucas@moreau.example.net"
+					},
+					{
+						"name": "Hana Sato",
+						"email": "hana.sato@brightline.co"
+					},
+					{
+						"name": "Ravi Kapoor",
+						"email": "ravi@kapoor.example.com"
+					}
+				],
+				"cc": [
+					{
+						"name": "Chloe Martin",
+						"email": "chloe.martin@northwind.co"
+					},
+					{
+						"name": "Isaac Green",
+						"email": "isaac@lumenlabs.io"
+					},
+					{
+						"name": "Tara Walsh",
+						"email": "tara.walsh@fieldstone.dev"
+					},
+					{
+						"name": "Kenji Mori",
+						"email": "kenji@example.org"
+					},
+					{
+						"name": "Ana Silva",
+						"email": "ana.silva@brightline.co"
+					},
+					{
+						"name": "Felix Wagner",
+						"email": "felix@wagner.example.com"
+					}
+				],
+				"bcc": [],
+				"date": "2026-10-01T16:03:00.000Z",
+				"snippet": "Hi everyone, Reply with your seat preference by Friday. Car one leaves the office at 8, car two at 9. Satya",
+				"unread": false,
+				"starred": false,
+				"html": "<div>Hi everyone,</div><div><br></div><div>Reply with your seat preference by Friday. Car one leaves the office at 8, car two at 9.</div><div><br></div><div>Satya</div><div><br></div>",
+				"text": "Hi everyone,\n\nReply with your seat preference by Friday. Car one leaves the office at 8, car two at 9.\n\nSatya",
+				"attachments": [],
+				"clipped": false
+			},
+			{
+				"id": "1a0fbbf26d55eb95",
+				"from": {
+					"name": "Leah Kim",
+					"email": "leah.kim@harborview.io"
+				},
+				"to": [
+					{
+						"name": "Satya Patel",
+						"email": "satya@superset.sh"
+					},
+					{
+						"name": "Daniel Ortiz",
+						"email": "dortiz@brightline.co"
+					},
+					{
+						"name": "Mei Tanaka",
+						"email": "mei@tanaka-design.example.com"
+					},
+					{
+						"name": "Omar Haddad",
+						"email": "omar.haddad@northwind.co"
+					},
+					{
+						"name": "Grace Liu",
+						"email": "grace@lumenlabs.io"
+					},
+					{
+						"name": "Ben Carter",
+						"email": "ben.carter@fieldstone.dev"
+					},
+					{
+						"name": "Sofia Rossi",
+						"email": "sofia.rossi@example.org"
+					},
+					{
+						"name": "Ethan Brooks",
+						"email": "ethan@brooks.example.com"
+					},
+					{
+						"name": "Nina Petrova",
+						"email": "nina.p@harborview.io"
+					},
+					{
+						"name": "Lucas Moreau",
+						"email": "lucas@moreau.example.net"
+					},
+					{
+						"name": "Hana Sato",
+						"email": "hana.sato@brightline.co"
+					},
+					{
+						"name": "Ravi Kapoor",
+						"email": "ravi@kapoor.example.com"
+					}
+				],
+				"cc": [
+					{
+						"name": "Chloe Martin",
+						"email": "chloe.martin@northwind.co"
+					},
+					{
+						"name": "Isaac Green",
+						"email": "isaac@lumenlabs.io"
+					},
+					{
+						"name": "Tara Walsh",
+						"email": "tara.walsh@fieldstone.dev"
+					},
+					{
+						"name": "Kenji Mori",
+						"email": "kenji@example.org"
+					},
+					{
+						"name": "Ana Silva",
+						"email": "ana.silva@brightline.co"
+					},
+					{
+						"name": "Felix Wagner",
+						"email": "felix@wagner.example.com"
+					}
+				],
+				"bcc": [],
+				"date": "2026-10-02T15:33:00.000Z",
+				"snippet": "Put me in car one, front seat if it's free. I get carsick in the back.",
+				"unread": true,
+				"starred": false,
+				"html": "<div>Put me in car one, front seat if it&#x27;s free. I get carsick in the back.</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Thu, Oct 1, 2026 at 9:03 AM Satya Patel &lt;satya@superset.sh&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>Hi everyone,</div><div><br></div><div>Reply with your seat preference by Friday. Car one leaves the office at 8, car two at 9.</div><div><br></div><div>Satya</div><div><br></div></blockquote></div>",
+				"text": "Put me in car one, front seat if it's free. I get carsick in the back.\n\nOn Thu, Oct 1, 2026 at 9:03 AM Satya Patel <satya@superset.sh> wrote:\n> Hi everyone,\n>\n> Reply with your seat preference by Friday. Car one leaves the office at 8, car two at 9.\n>\n> Satya",
+				"attachments": [],
+				"clipped": false
+			}
+		],
+		"reply": {
+			"to": [
+				{
+					"name": "Leah Kim",
+					"email": "leah.kim@harborview.io"
+				}
+			],
+			"cc": []
+		},
+		"replyAll": {
+			"to": [
+				{
+					"name": "Leah Kim",
+					"email": "leah.kim@harborview.io"
+				},
+				{
+					"name": "Daniel Ortiz",
+					"email": "dortiz@brightline.co"
+				},
+				{
+					"name": "Mei Tanaka",
+					"email": "mei@tanaka-design.example.com"
+				},
+				{
+					"name": "Omar Haddad",
+					"email": "omar.haddad@northwind.co"
+				},
+				{
+					"name": "Grace Liu",
+					"email": "grace@lumenlabs.io"
+				},
+				{
+					"name": "Ben Carter",
+					"email": "ben.carter@fieldstone.dev"
+				},
+				{
+					"name": "Sofia Rossi",
+					"email": "sofia.rossi@example.org"
+				},
+				{
+					"name": "Ethan Brooks",
+					"email": "ethan@brooks.example.com"
+				},
+				{
+					"name": "Nina Petrova",
+					"email": "nina.p@harborview.io"
+				},
+				{
+					"name": "Lucas Moreau",
+					"email": "lucas@moreau.example.net"
+				},
+				{
+					"name": "Hana Sato",
+					"email": "hana.sato@brightline.co"
+				},
+				{
+					"name": "Ravi Kapoor",
+					"email": "ravi@kapoor.example.com"
+				}
+			],
+			"cc": [
+				{
+					"name": "Chloe Martin",
+					"email": "chloe.martin@northwind.co"
+				},
+				{
+					"name": "Isaac Green",
+					"email": "isaac@lumenlabs.io"
+				},
+				{
+					"name": "Tara Walsh",
+					"email": "tara.walsh@fieldstone.dev"
+				},
+				{
+					"name": "Kenji Mori",
+					"email": "kenji@example.org"
+				},
+				{
+					"name": "Ana Silva",
+					"email": "ana.silva@brightline.co"
+				},
+				{
+					"name": "Felix Wagner",
+					"email": "felix@wagner.example.com"
+				}
+			]
+		}
+	},
+	"draft": {
+		"to": [
+			{
+				"name": "Leah Kim",
+				"email": "leah.kim@harborview.io"
+			},
+			{
+				"name": "Daniel Ortiz",
+				"email": "dortiz@brightline.co"
+			},
+			{
+				"name": "Mei Tanaka",
+				"email": "mei@tanaka-design.example.com"
+			},
+			{
+				"name": "Omar Haddad",
+				"email": "omar.haddad@northwind.co"
+			},
+			{
+				"name": "Grace Liu",
+				"email": "grace@lumenlabs.io"
+			},
+			{
+				"name": "Ben Carter",
+				"email": "ben.carter@fieldstone.dev"
+			},
+			{
+				"name": "Sofia Rossi",
+				"email": "sofia.rossi@example.org"
+			},
+			{
+				"name": "Ethan Brooks",
+				"email": "ethan@brooks.example.com"
+			},
+			{
+				"name": "Nina Petrova",
+				"email": "nina.p@harborview.io"
+			},
+			{
+				"name": "Lucas Moreau",
+				"email": "lucas@moreau.example.net"
+			},
+			{
+				"name": "Hana Sato",
+				"email": "hana.sato@brightline.co"
+			},
+			{
+				"name": "Ravi Kapoor",
+				"email": "ravi@kapoor.example.com"
+			}
+		],
+		"cc": [
+			{
+				"name": "Chloe Martin",
+				"email": "chloe.martin@northwind.co"
+			},
+			{
+				"name": "Isaac Green",
+				"email": "isaac@lumenlabs.io"
+			},
+			{
+				"name": "Tara Walsh",
+				"email": "tara.walsh@fieldstone.dev"
+			},
+			{
+				"name": "Kenji Mori",
+				"email": "kenji@example.org"
+			},
+			{
+				"name": "Ana Silva",
+				"email": "ana.silva@brightline.co"
+			},
+			{
+				"name": "Felix Wagner",
+				"email": "felix@wagner.example.com"
+			}
+		],
+		"bcc": [],
+		"subject": "Re: Carpool sign-up for the offsite",
+		"body": "",
+		"html": null,
+		"replyAll": true,
+		"from": "satya@superset.sh",
+		"attachments": []
+	}
+}

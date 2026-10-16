@@ -1,0 +1,1 @@
+export { SlackChannelLabel } from "./SlackChannelLabel";

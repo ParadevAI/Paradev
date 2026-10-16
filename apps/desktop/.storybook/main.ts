@@ -39,6 +39,43 @@ const config: StorybookConfig = {
 			...viteConfig.define,
 			"process.env.NODE_ENV": JSON.stringify("development"),
 		};
+		// Stories render without Electron, so the IPC client is a stub that only
+		// throws when a procedure is called.
+		const alias = viteConfig.resolve?.alias ?? [];
+		viteConfig.resolve = {
+			...viteConfig.resolve,
+			alias: [
+				...(Array.isArray(alias)
+					? alias
+					: Object.entries(alias).map(([find, replacement]) => ({
+							find,
+							replacement,
+						}))),
+				{
+					find: /^(.*\/)?trpc-client$/,
+					replacement: resolve(import.meta.dirname, "./mocks/trpc-client.ts"),
+				},
+				{
+					find: /^(.*\/)?lib\/clickPolicy$/,
+					replacement: resolve(import.meta.dirname, "./mocks/clickPolicy.ts"),
+				},
+				{
+					find: /^(.*\/stores\/ringtone|\.\/ringtone)$/,
+					replacement: resolve(
+						import.meta.dirname,
+						"./mocks/ringtone-store.ts",
+					),
+				},
+				{
+					find: /^(.*\/)?lib\/trpc-storage$/,
+					replacement: resolve(import.meta.dirname, "./mocks/trpc-storage.ts"),
+				},
+				{
+					find: /^(.*\/)?electron-trpc$/,
+					replacement: resolve(import.meta.dirname, "./mocks/electron-trpc.ts"),
+				},
+			],
+		};
 		return viteConfig;
 	},
 };

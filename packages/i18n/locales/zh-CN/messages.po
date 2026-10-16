@@ -19,6 +19,9 @@ msgstr "和"
 msgid "- className=\"rounded-sm border border-border bg-background …\""
 msgstr "- className=\"rounded-sm border border-border bg-background …\""
 
+msgid "---------- Forwarded message ---------"
+msgstr "---------- 转发的邮件 ---------"
+
 msgid ", selected"
 msgstr "，已选中"
 
@@ -71,6 +74,10 @@ msgstr "“{name}”已暂停"
 msgid "\"{name}\" resumed"
 msgstr "“{name}”已恢复"
 
+#. js-lingui-explicit-id
+msgid "serverError.inbox.answerDoesNotFitQuestion"
+msgstr "“{prompt}”需要所要求类型的回答"
+
 msgid "\"{title}\" has finished its task"
 msgstr "“{title}”已完成任务"
 
@@ -88,6 +95,22 @@ msgstr "（已编辑）"
 
 msgid "(no output)"
 msgstr "（无输出）"
+
+msgid "(no subject)"
+msgstr "（无主题）"
+
+msgid "(you)"
+msgstr "（你）"
+
+msgid "[#channel] [what] [when]"
+msgstr "[#频道] [内容] [时间]"
+
+msgid "[Message clipped]"
+msgstr "[邮件已截断]"
+
+#. placeholder {0}: view.total
+msgid "{0, plural, one {{failing} of # check failing} other {{failing} of # checks failing}}"
+msgstr "{0, plural, one {#个检查中有{failing}个失败} other {#个检查中有{failing}个失败}}"
 
 #. placeholder {0}: connections.length
 msgid "{0, plural, one {# account connected} other {# accounts connected}}"
@@ -122,12 +145,25 @@ msgid "{0, plural, one {# comment attached} other {# comments attached}}"
 msgstr "{0, plural, one {已附上#条评论} other {已附上#条评论}}"
 
 #. placeholder {0}: comments.length
+#. placeholder {0}: issue.comments
 msgid "{0, plural, one {# comment} other {# comments}}"
 msgstr "{0, plural, one {#条评论} other {#条评论}}"
+
+#. placeholder {0}: view.behindBy
+msgid "{0, plural, one {# commit behind {base}} other {# commits behind {base}}}"
+msgstr "{0, plural, one {落后{base} #个提交} other {落后{base} #个提交}}"
+
+#. placeholder {0}: view.total
+msgid "{0, plural, one {# commit since {previousTag}} other {# commits since {previousTag}}}"
+msgstr "{0, plural, one {自{previousTag}以来有#个提交} other {自{previousTag}以来有#个提交}}"
 
 #. placeholder {0}: commits.length
 msgid "{0, plural, one {# Commit} other {# Commits}}"
 msgstr "{0, plural, one {#个提交} other {#个提交}}"
+
+#. placeholder {0}: conflicts.length
+msgid "{0, plural, one {# conflict on your calendar} other {# conflicts on your calendar}}"
+msgstr "{0, plural, other {日历中有 # 个冲突}}"
 
 #. placeholder {0}: summary.updated
 msgid "{0, plural, one {# existing theme updated} other {# existing themes updated}}"
@@ -174,6 +210,10 @@ msgstr "{0, plural, other {# 个标签}}"
 msgid "{0, plural, one {# login} other {# logins}}"
 msgstr "{0, plural, one {#项登录信息} other {#项登录信息}}"
 
+#. placeholder {0}: channel.members
+msgid "{0, plural, one {# member} other {# members}}"
+msgstr "{0, plural, one {# 位成员} other {# 位成员}}"
+
 #. placeholder {0}: summary.passed
 msgid "{0, plural, one {# passed} other {# passed}}"
 msgstr "{0, plural, one {#项通过} other {#项通过}}"
@@ -195,6 +235,10 @@ msgstr "{0, plural, one {已选择#个项目。} other {已选择#个项目。}}
 #. placeholder {0}: projectFilters.length
 msgid "{0, plural, one {# project} other {# projects}}"
 msgstr "{0, plural, one {# 个项目} other {# 个项目}}"
+
+#. placeholder {0}: replies.length
+msgid "{0, plural, one {# reply} other {# replies}}"
+msgstr "{0, plural, other {# 条回复}}"
 
 #. placeholder {0}: repositories.length
 #. placeholder {0}: selectedProjects.length
@@ -256,6 +300,10 @@ msgstr "{0, plural, one {#个工作区} other {#个工作区}}"
 msgid "{0, plural, one {A running agent still uses the previous account — the switch only reaches new launches.} other {# running agents still use the previous account — the switch only reaches new launches.}}"
 msgstr "{0, plural, one {#个运行中的智能体仍在使用之前的账户。切换只对新启动生效。} other {#个运行中的智能体仍在使用之前的账户。切换只对新启动生效。}}"
 
+#. placeholder {0}: view.omitted
+msgid "{0, plural, one {and # more failed job} other {and # more failed jobs}}"
+msgstr "{0, plural, one {另有#个失败的任务} other {另有#个失败的任务}}"
+
 #. placeholder {0}: pages.length
 msgid "{0, plural, one {Asked # question} other {Asked # questions}}"
 msgstr "{0, plural, other {提出了 # 个问题}}"
@@ -298,6 +346,12 @@ msgstr "{0, plural, one {差异已截断 — 主机上还有#行} other {差异�
 msgid "{0, plural, one {Failed to close # port} other {Failed to close # ports}}"
 msgstr "{0, plural, one {关闭#个端口失败} other {关闭#个端口失败}}"
 
+#. placeholder {0}: names.length
+#. placeholder {1}: formatList(names)
+#. placeholder {2}: formatList(names)
+msgid "{0, plural, one {Gmail blocks {1} for security reasons, so it can't be sent.} other {Gmail blocks {2} for security reasons, so they can't be sent.}}"
+msgstr "{0, plural, one {Gmail 出于安全原因阻止了 {1}，因此无法发送。} other {Gmail 出于安全原因阻止了 {2}，因此无法发送。}}"
+
 #. placeholder {0}: result.imported
 msgid "{0, plural, one {Imported # workspace} other {Imported # workspaces}}"
 msgstr "{0, plural, one {已导入#个工作区} other {已导入#个工作区}}"
@@ -310,6 +364,10 @@ msgstr "{0, plural, one {Linear议题} other {Linear议题}}"
 msgid "{0, plural, one {Move # selected workspace to a group} other {Move # selected workspaces to a group}}"
 msgstr "{0, plural, one {把选中的#个工作区移动到分组} other {把选中的#个工作区移动到分组}}"
 
+#. placeholder {0}: attachments.length
+msgid "{0, plural, one {One attachment} other {# attachments}}"
+msgstr "{0, plural, other {# 个附件}}"
+
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Paused # automation.} other {Paused # automations.}}"
 msgstr "{0, plural, other {已暂停 # 个自动化。}}"
@@ -317,6 +375,10 @@ msgstr "{0, plural, other {已暂停 # 个自动化。}}"
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Pauses # automation} other {Pauses # automations}}"
 msgstr "{0, plural, other {暂停 # 个自动化}}"
+
+#. placeholder {0}: steps.length
+msgid "{0, plural, one {Route # item} other {Route # items}}"
+msgstr "{0, plural, other {分派 # 项}}"
 
 #. placeholder {0}: issues.length
 #. placeholder {0}: tasks.length
@@ -335,6 +397,10 @@ msgstr "{0, plural, one {这会把#个已有worktree作为工作区导入Superse
 #. placeholder {0}: resolved.length
 msgid "{0, plural, one {View # resolved comment} other {View # resolved comments}}"
 msgstr "{0, plural, other {查看 # 条已解决的评论}}"
+
+#. placeholder {0}: environment.waitTimer
+msgid "{0, plural, one {Wait timer: # minute} other {Wait timer: # minutes}}"
+msgstr "{0, plural, one {等待计时器：#分钟} other {等待计时器：#分钟}}"
 
 #. placeholder {0}: mine.length
 msgid "{0, plural, one {Watching # page for comments} other {Watching # pages for comments}}"
@@ -355,6 +421,7 @@ msgstr "{0} · 落后"
 
 #. placeholder {0}: creator.name
 #. placeholder {0}: option.name
+#. placeholder {0}: person.name
 msgid "{0} (you)"
 msgstr "{0}（你）"
 
@@ -693,6 +760,9 @@ msgstr "目前{actual} · 预计约{projected}"
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "打开对应工作区时，{agents} 会话会恢复。"
 
+msgid "{awaiting} awaiting"
+msgstr "{awaiting} 人未回复"
+
 msgid "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 msgstr "{behindCount, plural, one {落后main #个提交，需要变基} other {落后main #个提交，需要变基}}"
 
@@ -741,6 +811,9 @@ msgstr "{count, plural, one {#条评论} other {#条评论}}"
 
 msgid "{count, plural, one {# file} other {# files}}"
 msgstr "{count, plural, one {#个文件} other {#个文件}}"
+
+msgid "{count, plural, one {# person} other {# people}}"
+msgstr "{count, plural, one {# 人} other {# 人}}"
 
 msgid "{count, plural, one {# search} other {# searches}}"
 msgstr "{count, plural, one {#次搜索} other {#次搜索}}"
@@ -796,6 +869,9 @@ msgstr "{count, plural, one {运行了 # 个命令} other {运行了 # 个命令
 msgid "{count, plural, one {read # file} other {read # files}}"
 msgstr "{count, plural, one {读取了 # 个文件} other {读取了 # 个文件}}"
 
+msgid "{count, plural, one {Show # older message} other {Show # older messages}}"
+msgstr "{count, plural, other {显示 # 封较早的邮件}}"
+
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {使用了#个来源} other {使用了#个来源}}"
 
@@ -808,6 +884,12 @@ msgstr "{count}个GitHub星标"
 msgid "{count} hosts run an older host service than this app"
 msgstr "{count} 台主机运行的主机服务比此应用旧"
 
+msgid "{count} labels"
+msgstr "{count} 个标签"
+
+msgid "{count} more"
+msgstr "另外 {count} 人"
+
 msgid "{count}/day"
 msgstr "{count}/天"
 
@@ -816,6 +898,12 @@ msgstr "第 {current} 项，共 {total} 项"
 
 msgid "{currentPage} of {totalBranches}"
 msgstr "{currentPage}/{totalBranches}"
+
+msgid "{day} at {time}"
+msgstr "{day} {time}"
+
+msgid "{days, plural, one {# day left} other {# days left}}"
+msgstr "{days, plural, one {还剩 # 天} other {还剩 # 天}}"
 
 msgid "{days} at {time}"
 msgstr "{days}{time}"
@@ -860,6 +948,9 @@ msgstr "{total}项检查中有{failing}项失败"
 msgid "{focusShortcutText} to focus"
 msgstr "{focusShortcutText}聚焦"
 
+msgid "{folded, plural, one {Show # more reply} other {Show # more replies}}"
+msgstr "{folded, plural, other {显示另外 # 条回复}}"
+
 msgid "{formatted} {count, plural, one {dev} other {devs}}"
 msgstr "{formatted}{count, plural, one {位开发者} other {位开发者}}"
 
@@ -871,6 +962,9 @@ msgstr "{gate} · {statusLabel}"
 
 msgid "{gate}: {statusLabel}"
 msgstr "{gate}：{statusLabel}"
+
+msgid "{groupNotifies, plural, one {It notifies # person in {groupNames}.} other {It notifies # people in {groupNames}.}}"
+msgstr "{groupNotifies, plural, one {这会通知 {groupNames} 中的 # 人。} other {这会通知 {groupNames} 中的 # 人。}}"
 
 msgid "{hidden, plural, one {# hidden line} other {# hidden lines}}"
 msgstr "{hidden, plural, one {#行已隐藏} other {#行已隐藏}}"
@@ -923,6 +1017,18 @@ msgstr "{level} · {gate} · {statusLabel}"
 msgid "{level} {gate}: {statusLabel}"
 msgstr "{level} {gate}：{statusLabel}"
 
+msgid "{line}, selected"
+msgstr "{line}，已选择"
+
+msgid "{line}, selected, a guest is busy"
+msgstr "{line}，已选择，有参加者忙碌"
+
+msgid "{line}, selected, conflicts with {titles}"
+msgstr "{line}，已选择，与 {titles} 冲突"
+
+msgid "{line}, suggested time"
+msgstr "{line}，建议时间"
+
 msgid "{localHostName} (this device)"
 msgstr "{localHostName}（此设备）"
 
@@ -930,6 +1036,9 @@ msgstr "{localHostName}（此设备）"
 #. placeholder {1}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} results for &ldquo;{query}&rdquo; </>
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} other {{1}}}"
+
+msgid "{maybe} maybe"
+msgstr "{maybe} 人待定"
 
 #. placeholder {0}: gaps.length
 msgid "{met} of {0} objectives carrying for {nextLabel} — {laggingLabels} furthest behind."
@@ -950,6 +1059,9 @@ msgstr "{modKey}↵创建"
 msgid "{months}mo ago"
 msgstr "{months}个月前"
 
+msgid "{more, plural, one {and # more} other {and # more}}"
+msgstr "{more, plural, one {还有#个} other {还有#个}}"
+
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "你有{myFailedCount}个自动化上次运行失败"
 
@@ -968,14 +1080,36 @@ msgstr "{name} 是内置的，无法替换"
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name} 尚未添加"
 
+msgid "{no} no"
+msgstr "{no} 人不参加"
+
+msgid "{notifies, plural, one {It notifies # person there.} other {It notifies # people there.}}"
+msgstr "{notifies, plural, one {这会通知那里的 # 人。} other {这会通知那里的 # 人。}}"
+
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {请至少指定一个人员，或选择{choice}。} sender {请至少指定一个发件人，或选择{choice}。} other {请至少指定一个条目，或选择{choice}。}}"
 
 msgid "{noun, select, repository {Specify at least one repository.} channel {Specify at least one channel.} reaction {Specify at least one reaction.} dataSource {Specify at least one data source.} team {Specify at least one team.} project {Specify at least one project.} calendar {Specify at least one calendar.} other {Specify at least one entry.}}"
 msgstr "{noun, select, repository {请至少指定一个仓库。} channel {请至少指定一个频道。} reaction {请至少指定一个回应。} dataSource {请至少指定一个数据源。} team {请至少指定一个团队。} project {请至少指定一个项目。} calendar {请至少指定一个日历。} other {请至少指定一个条目。}}"
 
+msgid "{off} off for {months} months"
+msgstr "{months} 个月内减免 {off}"
+
+msgid "{off} off for 1 month"
+msgstr "1 个月内减免 {off}"
+
+msgid "{off} off forever"
+msgstr "永久减免 {off}"
+
+msgid "{off} off once"
+msgstr "一次性减免 {off}"
+
 msgid "{openCount} open"
 msgstr "{openCount}项已开启"
+
+msgctxt "reaction tooltip"
+msgid "{others} others"
+msgstr "另外 {others} 人"
 
 msgid "{pageTitle} can read and change data in your {pluginLabel} account as you, including in future versions of this page. It can send what it reads to other websites. Only allow pages you trust."
 msgstr "{pageTitle} 可以以你的身份读取和更改你的 {pluginLabel} 账户中的数据，包括此页面的未来版本。它可以把读取的内容发送到其他网站。只允许你信任的页面。"
@@ -1030,6 +1164,36 @@ msgstr "{presetLabel}已重置为默认值"
 msgid "{previewSize}px · {0} line height"
 msgstr "{previewSize}px · 行高{0}"
 
+msgid "{price} + usage"
+msgstr "{price} + 用量"
+
+msgid "{price} every {count} days"
+msgstr "每 {count} 天 {price}"
+
+msgid "{price} every {count} months"
+msgstr "每 {count} 个月 {price}"
+
+msgid "{price} every {count} weeks"
+msgstr "每 {count} 周 {price}"
+
+msgid "{price} every {count} years"
+msgstr "每 {count} 年 {price}"
+
+msgid "{price} per day"
+msgstr "{price}/天"
+
+msgid "{price} per month"
+msgstr "{price}/月"
+
+msgid "{price} per week"
+msgstr "{price}/周"
+
+msgid "{price} per year"
+msgstr "{price}/年"
+
+msgid "{product} +{more} more"
+msgstr "{product} 等另外 {more} 项"
+
 msgid "{provider} logo"
 msgstr "{provider}标志"
 
@@ -1041,6 +1205,10 @@ msgstr "{queued, plural, one {队列中有 # 条消息等待} other {队列中�
 
 msgid "{readPercent}% read"
 msgstr "已读{readPercent}%"
+
+#. js-lingui-explicit-id
+msgid "serverError.inbox.actionUnavailable"
+msgstr "{reason}"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.ambiguousPlugin"
@@ -1058,6 +1226,9 @@ msgstr "{repositoryFullName} 不在 {installedAccountLogin} 上，而本组织�
 
 msgid "{repositoryFullName} isn't shared with the Superset GitHub App yet."
 msgstr "{repositoryFullName} 尚未与 Superset GitHub App 共享。"
+
+msgid "{running} still running"
+msgstr "{running}个仍在运行"
 
 msgid "{seconds}s ago"
 msgstr "{seconds}秒前"
@@ -1106,8 +1277,14 @@ msgstr "{teardownFailureCount, plural, one {仍然删除} other {仍然删除#�
 msgid "{threshold, plural, one {# agent PR merged} other {# agent PRs merged}}"
 msgstr "{threshold, plural, other {已合并 # 个智能体 PR}}"
 
+msgid "{time} local time"
+msgstr "当地时间 {time}"
+
 msgid "{toolName} interrupted"
 msgstr "{toolName}已中断"
+
+msgid "{total, plural, one {# guest} other {# guests}}"
+msgstr "{total, plural, other {# 位参加者}}"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {#项检查全部通过} other {#项检查全部通过}}"
@@ -1133,6 +1310,9 @@ msgstr "{totalWorkspaceCount, plural, one {#个工作区} other {#个工作区}}
 msgid "{uncommittedCount, plural, one {# file changed} other {# files changed}}"
 msgstr "{uncommittedCount, plural, one {#个文件已更改} other {#个文件已更改}}"
 
+msgid "{unread, plural, =0 {Inbox} one {Inbox, # unread} other {Inbox, # unread}}"
+msgstr "{unread, plural, other {Inbox，# 条未读}}"
+
 msgid "{updatedLabel} restored to defaults"
 msgstr "{updatedLabel}已恢复为默认值"
 
@@ -1145,6 +1325,9 @@ msgstr "已使用 {used}"
 msgid "{waiting} Waiting"
 msgstr "{waiting}人等待"
 
+msgid "{weekday} at {mondayClock}"
+msgstr "{weekday} {mondayClock}"
+
 msgid "{workspaceName}: host is unavailable"
 msgstr "{workspaceName}：主机不可用"
 
@@ -1154,12 +1337,18 @@ msgstr "{workspaceName}：清理失败"
 msgid "{years}y ago"
 msgstr "{years}年前"
 
+msgid "{yes} yes"
+msgstr "{yes} 人参加"
+
 #. placeholder {0}: connection.login
 msgid "@{0} · cloud workspaces commit, push and open pull requests as you"
 msgstr "@{0} · 云端工作区以你的身份提交、推送并创建拉取请求"
 
 msgid "@superset"
 msgstr "@superset"
+
+msgid "@user"
+msgstr "@用户"
 
 msgid "* if billed at full API rate"
 msgstr "* 如按API全价计费"
@@ -1224,6 +1413,9 @@ msgstr "<0>{displayName}</0>请求访问你的Superset账户"
 
 msgid "<0>{primaryFont}</0> is not installed on this system. Falling back to the next available font."
 msgstr "此系统未安装<0>{primaryFont}</0>。将回退到下一个可用字体。"
+
+msgid "<0>{who}</0> reacted with {shortcode}"
+msgstr "<0>{who}</0> 回应了 {shortcode}"
 
 #. placeholder {0}: formatNumber(rank)
 #. placeholder {1}: formatNumber(total)
@@ -1299,8 +1491,15 @@ msgstr "1"
 msgid "1 cookie — forget this site"
 msgstr "1个cookie——忘记此站点"
 
+msgid "1 hour"
+msgstr "1 小时"
+
 msgid "1 hr"
 msgstr "1 小时"
+
+msgctxt "reaction tooltip"
+msgid "1 other"
+msgstr "另外 1 人"
 
 msgid "1 user"
 msgstr "1个用户"
@@ -1365,11 +1564,17 @@ msgstr "3周前"
 msgid "3+ concurrent workstreams per engineer"
 msgstr "每位工程师3条以上并行工作流"
 
+msgid "30 minutes"
+msgstr "30 分钟"
+
 msgid "30D"
 msgstr "30天"
 
 msgid "3d ago"
 msgstr "3天前"
+
+msgid "4 hours"
+msgstr "4 小时"
 
 msgid "4 min ago"
 msgstr "4 分钟前"
@@ -1410,6 +1615,9 @@ msgstr "更好用的应用内浏览器：预览改动，点击任意元素即可
 msgid "A better Superset is ready"
 msgstr "更好的 Superset 已准备就绪"
 
+msgid "A card is answered by the person it was sent to, in the Superset app. An agent or the CLI cannot answer it."
+msgstr "卡片由收到它的人在 Superset 应用中回答。智能体或 CLI 无法回答。"
+
 msgid "A CDP endpoint per pane"
 msgstr "每个窗格一个 CDP 端点"
 
@@ -1434,6 +1642,9 @@ msgstr "云端工作区无法调用 {path}。请在你已登录的客户端中�
 
 msgid "A delete is already in progress for {workspaceName}."
 msgstr "{workspaceName}已经在删除中。"
+
+msgid "A device"
+msgstr "一台设备"
 
 msgid "A falsifiable rubric for the self-driving software factory: six levels of autonomy, the measurable gates between them, and a forecast for how far 2026 gets us."
 msgstr "一套可证伪的自动化软件工厂评估标准：六个自治级别、级别之间的可量化门槛，以及对2026年进展的预测。"
@@ -1471,6 +1682,9 @@ msgstr "看看有什么正在进行、接下来做什么，以及{company}要走
 msgid "A majority of production changes merge without any human reading the diff."
 msgstr "多数生产变更在无人阅读差异的情况下合并。"
 
+msgid "A month from now"
+msgstr "一个月后"
+
 msgid "A new version of Superset is required to continue. Please update to the latest version."
 msgstr "需要新版本的Superset才能继续。请更新到最新版本。"
 
@@ -1497,6 +1711,9 @@ msgstr "拉取请求总是使用自己的 worktree"
 
 msgid "A rebuilt chat surface for driving agents: richer tool output, smoother steering, faster everything."
 msgstr "重建的智能体驱动聊天界面：更丰富的工具输出、更顺手的引导，一切都更快。"
+
+msgid "A reply is sent to {recipients}."
+msgstr "将向 {recipients} 发送回复。"
 
 msgid "A repository is not connected to this organization, or the repositories come from different GitHub installations"
 msgstr "某个仓库未连接到此组织，或这些仓库来自不同的 GitHub 安装"
@@ -1549,6 +1766,9 @@ msgstr "接受邀请"
 
 msgid "Accept terms"
 msgstr "接受条款"
+
+msgid "Access activity log"
+msgstr "访问活动日志"
 
 msgid "Access denied"
 msgstr "访问被拒绝"
@@ -1632,12 +1852,23 @@ msgstr "创建API密钥需要有活动组织"
 msgid "Active sessions"
 msgstr "活动会话"
 
+msgid "Activities"
+msgstr "活动"
+
 msgid "Activity"
 msgstr "动态"
 
 msgid "Adaptive layout mapping"
 msgstr "自适应布局映射"
 
+msgid "Add"
+msgstr "添加"
+
+msgctxt "add an email address to an invitation"
+msgid "Add"
+msgstr "添加"
+
+msgctxt "add people to a Slack channel"
 msgid "Add"
 msgstr "添加"
 
@@ -1649,6 +1880,18 @@ msgstr "添加{0}账户"
 msgid "Add {0} to workspace"
 msgstr "将{0}添加到工作区"
 
+msgid "Add {crediting} credit to {who}'s balance?"
+msgstr "要向 {who} 的余额添加 {crediting} 抵用金吗？"
+
+msgid "Add {person} to #{channel} and reply in the thread?"
+msgstr "要将 {person} 添加到 #{channel} 并在消息列中回复吗？"
+
+msgid "Add {person} to #{channel}?"
+msgstr "要将 {person} 添加到 #{channel} 吗？"
+
+msgid "Add {who} to #{name}?"
+msgstr "要将 {who} 添加到 #{name} 吗？"
+
 msgid "Add a comment…"
 msgstr "添加评论…"
 
@@ -1658,11 +1901,17 @@ msgstr "添加描述…"
 msgid "Add a lifecycle run script in Project Settings or mark a terminal script as the workspace run."
 msgstr "在项目设置中添加生命周期运行脚本，或将某个终端脚本标记为工作区运行命令。"
 
+msgid "Add a note"
+msgstr "添加备注"
+
 msgid "Add a project to see GitHub issues."
 msgstr "添加项目以查看GitHub议题。"
 
 msgid "Add a project to see pull requests."
 msgstr "添加一个项目来查看拉取请求。"
+
+msgid "Add a reason for declining…"
+msgstr "添加拒绝原因…"
 
 msgid "Add a short summary…"
 msgstr "添加简短摘要…"
@@ -1672,6 +1921,9 @@ msgstr "添加账户"
 
 msgid "Add address or domain…"
 msgstr "添加地址或域名…"
+
+msgid "Add after"
+msgstr "在其后添加"
 
 msgid "Add agent"
 msgstr "添加智能体"
@@ -1688,11 +1940,20 @@ msgstr "添加智能体"
 msgid "Add an environment in Settings before creating a cloud workspace"
 msgstr "创建云端工作区前，请先在设置中添加一个环境"
 
+msgid "Add an optional message for all guests"
+msgstr "为所有参加者添加留言（可选）"
+
+msgid "Add an optional message for cancellations"
+msgstr "添加取消说明（可选）"
+
 msgid "Add another account, or disconnect one you no longer use."
 msgstr "连接其他账号，或断开不再使用的账号。"
 
 msgid "Add any machine as a host. Workspaces keep running when your laptop sleeps, and you can check in from wherever you are."
 msgstr "把任意机器添加为主机。笔记本休眠时工作区照常运行，你在哪儿都能查看进展。"
+
+msgid "Add at the end"
+msgstr "添加到末尾"
 
 msgid "Add attachment"
 msgstr "添加附件"
@@ -1715,6 +1976,9 @@ msgstr "添加自定义音频"
 msgid "Add description..."
 msgstr "添加描述..."
 
+msgid "Add Emoji"
+msgstr "添加表情"
+
 msgid "Add file comment"
 msgstr "添加文件评论"
 
@@ -1724,12 +1988,24 @@ msgstr "添加文件、应用等"
 msgid "Add files, apps, and more (@)"
 msgstr "添加文件、应用等（@）"
 
+msgid "Add Google Calendar access"
+msgstr "添加 Google 日历访问权限"
+
+msgid "Add internal note"
+msgstr "添加内部备注"
+
 #. placeholder {0}: issue.issueNumber
 msgid "Add issue #{0} to workspace"
 msgstr "将议题#{0}添加到工作区"
 
 msgid "Add label"
 msgstr "添加标签"
+
+msgid "Add labels…"
+msgstr "添加标签…"
+
+msgid "Add link"
+msgstr "添加链接"
 
 msgid "Add listening agent"
 msgstr "添加监听智能体"
@@ -1740,8 +2016,20 @@ msgstr "添加成员"
 msgid "Add more agents in Settings."
 msgstr "可在设置中添加更多智能体。"
 
+msgid "Add note"
+msgstr "添加备注"
+
 msgid "Add one from the menu in the sidebar to get started."
 msgstr "从侧边栏菜单中添加一个即可开始。"
+
+msgid "Add optional message"
+msgstr "添加留言（可选）"
+
+msgid "Add people"
+msgstr "添加人员"
+
+msgid "Add people to <0/>"
+msgstr "将人员添加到 <0/>"
 
 msgid "Add photos or files"
 msgstr "添加照片或文件"
@@ -1757,6 +2045,12 @@ msgstr "从文件夹添加项目..."
 
 msgid "Add prompt e.g. look for crashes in $sentry"
 msgstr "添加提示词，例如：在$sentry中查找崩溃"
+
+msgid "Add reaction"
+msgstr "添加表情回应"
+
+msgid "Add reaction…"
+msgstr "添加回应…"
 
 msgid "Add repository"
 msgstr "添加仓库"
@@ -1788,8 +2082,14 @@ msgstr "给风险最高又没测试的代码补上测试…"
 msgid "Add tests where they're missing"
 msgstr "给缺测试的地方补测试"
 
+msgid "Add the note"
+msgstr "添加备注"
+
 msgid "Add this label"
 msgstr "添加此标签"
+
+msgid "Add to cycle…"
+msgstr "添加到周期…"
 
 msgid "Add to Dictionary"
 msgstr "添加到词典"
@@ -1799,6 +2099,9 @@ msgstr "添加到收藏"
 
 msgid "Add to project"
 msgstr "添加到项目"
+
+msgid "Add to project…"
+msgstr "添加到项目…"
 
 msgid "Add to sidebar"
 msgstr "添加到侧边栏"
@@ -1818,6 +2121,9 @@ msgstr "已向{where}添加1个文件"
 msgid "Added only when launching with a prompt — e.g. <0>--</0>, <1>--prompt</1>, <2>-i</2>."
 msgstr "仅在带提示词启动时添加，例如<0>--</0>、<1>--prompt</1>、<2>-i</2>。"
 
+msgid "Additional information"
+msgstr "补充信息"
+
 msgid "Address Comments with Agent"
 msgstr "用智能体处理评论"
 
@@ -1826,6 +2132,9 @@ msgstr "地址无法访问"
 
 msgid "Adds skills to your agents"
 msgstr "为你的智能体添加技能"
+
+msgid "Adjustment type"
+msgstr "调整类型"
 
 msgid "Admin"
 msgstr "管理员"
@@ -2043,6 +2352,9 @@ msgstr "所有提交"
 msgid "All data will be permanently deleted for all {0} members — this cannot be undone."
 msgstr "全部{0}名成员的所有数据都将被永久删除——此操作无法撤销。"
 
+msgid "All day"
+msgstr "全天"
+
 msgid "All devices"
 msgstr "全部设备"
 
@@ -2190,8 +2502,17 @@ msgstr "已有账户？<0>登录</0>"
 msgid "Already in tasks"
 msgstr "已在任务中"
 
+msgid "Already in this channel"
+msgstr "已在此频道中"
+
+msgid "Already refunded"
+msgstr "已退款"
+
 msgid "Also available as CommandDialog for ⌘K palettes"
 msgstr "也可用作CommandDialog，用于⌘K命令面板"
+
+msgid "Also cancel {name}"
+msgstr "同时取消 {name}"
 
 msgid "Also delete local branch"
 msgstr "同时删除本地分支"
@@ -2201,6 +2522,12 @@ msgstr "同时删除本地分支"
 
 msgid "Also delete the local git branch when deleting a worktree workspace"
 msgstr "删除worktree工作区时一并删除本地git分支"
+
+msgid "Also send to <0>{channelName}</0>"
+msgstr "同时发送到 <0>{channelName}</0>"
+
+msgid "Also sent to the channel"
+msgstr "同时发送到频道"
 
 msgid "Also viewing this page"
 msgstr "也在查看此页面的人"
@@ -2223,6 +2550,25 @@ msgstr "另有：@superset/ui/spinner"
 msgid "Always know which agent needs you, with notifications that deep-link straight to the blocked agent."
 msgstr "随时知道哪个智能体需要你，通知可直接跳转到被阻塞的智能体。"
 
+msgctxt "money to adjust a balance by"
+msgid "Amount"
+msgstr "金额"
+
+msgid "Amount cannot be {zero}."
+msgstr "金额不能为 {zero}。"
+
+msgid "Amount cannot be more than {most}."
+msgstr "金额不能超过 {most}。"
+
+msgid "Amount due"
+msgstr "应付金额"
+
+msgid "Amount paid"
+msgstr "已付金额"
+
+msgid "An agent"
+msgstr "智能体"
+
 msgid "An agent completes multi-file changes end to end."
 msgstr "智能体能端到端完成跨文件改动。"
 
@@ -2235,6 +2581,9 @@ msgstr "自动化只能使用你创建的云端工作区"
 msgid "An error occurred"
 msgstr "发生错误"
 
+msgid "An hour from now"
+msgstr "一小时后"
+
 msgid "An isolated git worktree where an agent runs without touching your main checkout."
 msgstr "一个隔离的git worktree，智能体在其中运行，不会动到你的主检出。"
 
@@ -2244,8 +2593,14 @@ msgstr "发生未知错误"
 msgid "An update is ready to install."
 msgstr "更新已准备好安装。"
 
+msgid "Anchor Text"
+msgstr "链接文字"
+
 msgid "Android is on the way. Be first to know when it ships."
 msgstr "Android 版即将到来。发布时第一时间通知你。"
+
+msgid "Animals & Nature"
+msgstr "动物与自然"
 
 msgid "Animate the active terminal cursor."
 msgstr "让当前终端光标闪烁。"
@@ -2276,6 +2631,12 @@ msgstr "匿名装配工"
 
 msgid "another device"
 msgstr "另一台设备"
+
+msgid "Another person's session already uses this key"
+msgstr "另一个人的会话已在使用此键"
+
+msgid "Answer"
+msgstr "答复"
 
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "请在下方终端中回答提问，例如输入密码。"
@@ -2346,6 +2707,9 @@ msgstr "任意讨论事件"
 msgid "Anyone"
 msgstr "任何人"
 
+msgid "Anyone in {workspace}"
+msgstr "{workspace} 中的任何人"
+
 msgid "Anyone in your organization"
 msgstr "你组织中的任何人"
 
@@ -2388,6 +2752,9 @@ msgstr "按API价折算"
 msgid "API-equivalent cost"
 msgstr "API 等价费用"
 
+msgid "App"
+msgstr "应用"
+
 msgctxt "log scope"
 msgid "App"
 msgstr "应用"
@@ -2409,6 +2776,9 @@ msgstr "应用路径"
 
 msgid "Appearance"
 msgstr "外观"
+
+msgid "Appends ¯\\_(ツ)_/¯ to your message"
+msgstr "在消息末尾加上 ¯\\_(ツ)_/¯"
 
 msgid "Apple logo"
 msgstr "Apple 标志"
@@ -2441,6 +2811,18 @@ msgctxt "job application"
 msgid "Apply"
 msgstr "申请"
 
+msgid "Apply {terms} to {who}'s {product} subscription?"
+msgstr "要将 {terms} 应用到 {who} 的 {product} 订阅吗？"
+
+msgid "Apply changes"
+msgstr "应用更改"
+
+msgid "Apply coupon"
+msgstr "应用优惠券"
+
+msgid "Apply to canvas"
+msgstr "应用到画板"
+
 msgid "Approve"
 msgstr "批准"
 
@@ -2471,14 +2853,26 @@ msgstr "apps/web/src/app/design/components/LayoutSection/LayoutSection.tsx"
 msgid "Archive"
 msgstr "归档"
 
+msgid "Archive Card"
+msgstr "归档卡片"
+
 msgid "Archive environment"
 msgstr "归档环境"
 
 msgid "Archive failed"
 msgstr "归档失败"
 
+msgid "Archive the current channel"
+msgstr "归档当前频道"
+
+msgid "Archive the selected card without deciding, and select the next"
+msgstr "不作决定直接归档所选卡片，并选中下一张"
+
 msgid "Archive workspace"
 msgstr "归档工作区"
+
+msgid "Archive. The agent is told."
+msgstr "归档。代理会收到通知。"
 
 msgid "Archived"
 msgstr "已归档"
@@ -2521,6 +2915,15 @@ msgstr "Artifact"
 
 msgid "As last reported. The host must be online to update."
 msgstr "上次报告的版本。主机必须在线才能更新。"
+
+msgid "As of {day}"
+msgstr "截至 {day}"
+
+msgid "As of today at {time}"
+msgstr "截至今天 {time}"
+
+msgid "As of yesterday at {time}"
+msgstr "截至昨天 {time}"
 
 msgid "ascending"
 msgstr "升序"
@@ -2582,6 +2985,9 @@ msgstr "分配给你"
 msgid "Assignee"
 msgstr "负责人"
 
+msgid "Assignees"
+msgstr "负责人"
+
 msgid "Assisted"
 msgstr "辅助"
 
@@ -2608,6 +3014,9 @@ msgstr "已附加"
 
 msgid "Attaching to the running session…"
 msgstr "正在连接运行中的会话…"
+
+msgid "Attaching…"
+msgstr "正在附加…"
 
 msgid "attachment"
 msgstr "附件"
@@ -2641,6 +3050,9 @@ msgstr "附件尚未上传 — 请先发送数据"
 
 msgid "Attachments need an online host"
 msgstr "附件需要主机在线"
+
+msgid "Attempt {attempt}"
+msgstr "第{attempt}次尝试"
 
 msgid "Attempt before checks pass"
 msgstr "在检查通过前就尝试"
@@ -2814,6 +3226,9 @@ msgstr "等待你的审查"
 msgid "Awaiting review from you or your team"
 msgstr "等待你或你团队的审查"
 
+msgid "Away"
+msgstr "离开"
+
 msgid "Back"
 msgstr "返回"
 
@@ -2890,6 +3305,9 @@ msgstr "徽章、头像、卡片、表格和列表"
 msgid "Baking the chip style into tooltip.tsx"
 msgstr "把chip样式内置到tooltip.tsx"
 
+msgid "Bank cannot process"
+msgstr "银行无法处理"
+
 msgid "Bar"
 msgstr "竖线"
 
@@ -2924,6 +3342,12 @@ msgstr "基于PR #{0}"
 msgid "Based on {0} tokens in the last 30 days, counting {1}."
 msgstr "基于最近30天的{0}个token，统计{1}。"
 
+msgid "Bcc"
+msgstr "密送"
+
+msgid "bcc:"
+msgstr "密送："
+
 msgid "Become a design partner"
 msgstr "成为共创伙伴"
 
@@ -2954,6 +3378,9 @@ msgstr "按年计费"
 msgid "Billing"
 msgstr "账单"
 
+msgid "Billing address"
+msgstr "账单地址"
+
 msgid "Billing details"
 msgstr "账单信息"
 
@@ -2983,6 +3410,12 @@ msgstr "已阻止"
 
 msgid "Blocked by Branch Rules"
 msgstr "被分支规则阻止"
+
+msgid "Blocked file"
+msgstr "已屏蔽的文件"
+
+msgid "Blocked for security reasons"
+msgstr "因安全原因被阻止"
 
 msgid "Blockquote"
 msgstr "引用块"
@@ -3313,17 +3746,39 @@ msgstr "无法在Finder中打开远程工作区路径"
 msgid "Cancel"
 msgstr "取消"
 
+msgctxt "when a subscription is canceled"
+msgid "Cancel"
+msgstr "取消时间"
+
+msgid "Cancel {product} for {who} now and refund {back} to {card}?"
+msgstr "要立即取消 {who} 的 {product} 并将 {back} 退回 {card} 吗？"
+
+msgid "Cancel {product} for {who} now? No refund."
+msgstr "要立即取消 {who} 的 {product} 吗？不退款。"
+
+msgid "Cancel {product} for {who} on {periodEnd}? No refund."
+msgstr "要在 {periodEnd} 取消 {who} 的 {product} 吗？不退款。"
+
 msgid "Cancel download"
 msgstr "取消下载"
 
 msgid "Cancel edits"
 msgstr "取消编辑"
 
+msgid "Cancel event"
+msgstr "取消活动"
+
 msgid "Cancel plan"
 msgstr "取消方案"
 
 msgid "Cancel reply"
 msgstr "取消回复"
+
+msgid "Cancel subscription"
+msgstr "取消订阅"
+
+msgid "Cancel subscription instead"
+msgstr "改为取消订阅"
 
 msgid "Canceled"
 msgstr "已取消"
@@ -3342,6 +3797,9 @@ msgstr "已取消"
 #. placeholder {0}: formatDate(cancelAt)
 msgid "Cancels {0} — downgrades to Free at the end of the billing period."
 msgstr "将于{0}取消，在计费周期结束时降级为免费版。"
+
+msgid "Cancels {cancels}"
+msgstr "将于 {cancels} 取消"
 
 msgid "Cannot {action}: no active organization is selected. Select an organization or sign in again."
 msgstr "无法{action}：未选择活动组织。请选择一个组织或重新登录。"
@@ -3370,6 +3828,46 @@ msgstr "能力"
 msgid "Card"
 msgstr "卡片"
 
+msgctxt "payment card"
+msgid "Card"
+msgstr "银行卡"
+
+msgid "Card Action 1"
+msgstr "卡片操作 1"
+
+msgid "Card Action 2"
+msgstr "卡片操作 2"
+
+msgid "Card Action 3"
+msgstr "卡片操作 3"
+
+msgid "Card Action 4"
+msgstr "卡片操作 4"
+
+msgid "Card Action 5"
+msgstr "卡片操作 5"
+
+msgid "Card Action 6"
+msgstr "卡片操作 6"
+
+msgid "Card Action 7"
+msgstr "卡片操作 7"
+
+msgid "Card Action 8"
+msgstr "卡片操作 8"
+
+msgid "Card Action 9"
+msgstr "卡片操作 9"
+
+msgid "Card Decline Action"
+msgstr "卡片拒绝操作"
+
+msgid "Card not found"
+msgstr "未找到卡片"
+
+msgid "Card Primary Action"
+msgstr "卡片主要操作"
+
 msgid "Careers"
 msgstr "招聘"
 
@@ -3382,6 +3880,12 @@ msgstr "分类"
 msgid "Caution"
 msgstr "当心"
 
+msgid "Cc"
+msgstr "抄送"
+
+msgid "cc:"
+msgstr "抄送："
+
 msgid "Certificate Authority Invalid"
 msgstr "证书颁发机构无效"
 
@@ -3393,6 +3897,19 @@ msgstr "证书错误"
 
 msgid "Chain of Thought"
 msgstr "思维链"
+
+msgctxt "change where a Slack message goes"
+msgid "Change"
+msgstr "更改"
+
+msgid "Change \"{title}\" in Slack?"
+msgstr "要在 Slack 中更改“{title}”吗？"
+
+msgid "Change {count} issues"
+msgstr "更改 {count} 个事项"
+
+msgid "Change 1 issue"
+msgstr "更改 1 个事项"
 
 msgid "Change assignee"
 msgstr "更改负责人"
@@ -3440,6 +3957,9 @@ msgstr "更改状态"
 msgid "Change status from {0}"
 msgstr "更改状态（当前：{0}）"
 
+msgid "Change status…"
+msgstr "更改状态…"
+
 #. placeholder {0}: organizationRoleName(role)
 msgid "Change to {0}"
 msgstr "更改为{0}"
@@ -3480,8 +4000,21 @@ msgstr "更改已保存"
 msgid "Changing..."
 msgstr "正在更改..."
 
+msgid "channel"
+msgstr "频道"
+
 msgid "Channel created"
 msgstr "频道已创建"
+
+msgid "Channel names can’t contain spaces or punctuation. Use dashes to separate words."
+msgstr "频道名称不能包含空格或标点符号。请使用连字符分隔单词。"
+
+msgctxt "a payment"
+msgid "Charge"
+msgstr "付款"
+
+msgid "Charge customer"
+msgstr "向客户收费"
 
 msgid "Chat"
 msgstr "聊天"
@@ -3528,6 +4061,9 @@ msgstr "检查资源"
 msgid "Check Resources"
 msgstr "查看资源"
 
+msgid "Check returned"
+msgstr "支票被退回"
+
 msgid "Check the rendered prompt and launch output before saving"
 msgstr "保存前检查渲染后的提示词和启动输出"
 
@@ -3551,6 +4087,9 @@ msgstr "正在检查智能体…"
 
 msgid "Checking environments…"
 msgstr "正在检查环境…"
+
+msgid "Checking for the ability to merge"
+msgstr "正在检查能否合并"
 
 msgid "Checking host…"
 msgstr "正在检查主机…"
@@ -3630,6 +4169,9 @@ msgstr "选择已有的仓库文件夹"
 msgid "Choose app"
 msgstr "选择应用"
 
+msgid "Choose date and time"
+msgstr "选择日期和时间"
+
 msgid "Choose how files open when no preview pane exists"
 msgstr "选择在没有预览窗格时文件的打开方式"
 
@@ -3639,6 +4181,9 @@ msgstr "选择从顶栏打开更改视图的方式"
 msgid "Choose how to open file paths when Cmd+clicking in the terminal"
 msgstr "选择在终端中Cmd+点击文件路径时的打开方式"
 
+msgid "Choose how to update the branch"
+msgstr "选择更新分支的方式"
+
 msgid "Choose what to clear from the in-app browser."
 msgstr "选择要从应用内浏览器清除的内容。"
 
@@ -3647,6 +4192,9 @@ msgstr "选择Superset在什么时候通知你。"
 
 msgid "Choose where agents started from comments, design mode, and Pages open."
 msgstr "选择从评论、设计模式和 Pages 启动的智能体的打开位置。"
+
+msgid "Choose your default skin tone"
+msgstr "选择默认肤色"
 
 msgid "CI failed"
 msgstr "CI失败"
@@ -3718,6 +4266,9 @@ msgstr "清除选择"
 msgid "Clear selection (Esc)"
 msgstr "清除选择（Esc）"
 
+msgid "Clear status"
+msgstr "清除状态"
+
 msgid "Clear Status"
 msgstr "清除状态"
 
@@ -3732,6 +4283,9 @@ msgstr "清除终端历史？"
 
 msgid "Clear the filter to rearrange the sidebar"
 msgstr "清除筛选即可重新排列侧边栏"
+
+msgid "Clear time"
+msgstr "清除状态的时间"
 
 msgid "Clear workspace selection"
 msgstr "清除工作区选择"
@@ -3840,9 +4394,15 @@ msgstr "关闭（Esc）"
 msgid "Close {0}"
 msgstr "关闭{0}"
 
+msgid "Close {count} issues"
+msgstr "关闭 {count} 个事项"
+
 #. placeholder {0}: data.number
 msgid "Close #{0}?"
 msgstr "关闭#{0}？"
+
+msgid "Close 1 issue"
+msgstr "关闭 1 个事项"
 
 msgid "Close all"
 msgstr "全部关闭"
@@ -3883,6 +4443,9 @@ msgstr "关闭文件"
 
 msgid "Close find bar"
 msgstr "关闭查找栏"
+
+msgid "Close inbox"
+msgstr "关闭收件箱"
 
 msgid "Close logs"
 msgstr "关闭日志"
@@ -4052,6 +4615,9 @@ msgstr "全部折叠"
 
 msgid "Collapse all files"
 msgstr "折叠所有文件"
+
+msgid "Collapse all files in the current channel or thread"
+msgstr "折叠当前频道或话题中的所有文件"
 
 msgid "Collapse file"
 msgstr "折叠文件"
@@ -4328,6 +4894,9 @@ msgstr "在集成中连接 GitHub 以添加 {repositoryFullName}。"
 
 msgid "Connect GitHub…"
 msgstr "连接 GitHub…"
+
+msgid "Connect Gmail to send a reply"
+msgstr "连接 Gmail 以发送回复"
 
 msgid "Connect Google"
 msgstr "连接Google"
@@ -4689,6 +5258,9 @@ msgstr "复制链接"
 
 msgid "Copy Link"
 msgstr "复制链接"
+
+msgid "Copy link address"
+msgstr "复制链接地址"
 
 msgid "Copy Link Address"
 msgstr "复制链接地址"
@@ -5265,12 +5837,19 @@ msgstr "无法上传 {name}"
 msgid "Couldn’t verify"
 msgstr "无法确认"
 
+msgid "Coupon"
+msgstr "优惠券"
+
 msgid "CPU"
 msgstr "CPU"
 
 msgid "CPU cores"
 msgstr "CPU核心"
 
+msgid "Create"
+msgstr "创建"
+
+msgctxt "create a Slack channel"
 msgid "Create"
 msgstr "创建"
 
@@ -5322,6 +5901,9 @@ msgstr "创建账户"
 msgid "Create environment"
 msgstr "创建环境"
 
+msgid "Create event"
+msgstr "创建活动"
+
 msgid "Create failed: {message}"
 msgstr "创建失败：{message}"
 
@@ -5365,6 +5947,12 @@ msgstr "创建PR"
 msgid "Create PR failed: {0}"
 msgstr "创建PR失败：{0}"
 
+msgid "Create private channel #{name} and add {people}?"
+msgstr "要创建私有频道 #{name} 并添加 {people} 吗？"
+
+msgid "Create private channel #{name}?"
+msgstr "要创建私有频道 #{name} 吗？"
+
 msgid "Create project"
 msgstr "创建项目"
 
@@ -5373,6 +5961,12 @@ msgstr "创建项目“{newName}”"
 
 msgid "Create project…"
 msgstr "创建项目…"
+
+msgid "Create public channel #{name} and add {people}?"
+msgstr "要创建公开频道 #{name} 并添加 {people} 吗？"
+
+msgid "Create public channel #{name}?"
+msgstr "要创建公开频道 #{name} 吗？"
 
 msgid "Create pull request"
 msgstr "创建拉取请求"
@@ -5436,6 +6030,9 @@ msgstr "已创建{0}"
 #. placeholder {1}: formatDate(key.lastRequest)
 msgid "Created {0} · Last used {1}"
 msgstr "创建于{0} · 最后使用{1}"
+
+msgid "Created {age}"
+msgstr "创建于 {age}"
 
 msgid "Created {ago}"
 msgstr "创建于{ago}"
@@ -5535,6 +6132,16 @@ msgstr "创意经理，Valid"
 msgid "Credentials stay on the server"
 msgstr "凭据保留在服务器上"
 
+msgctxt "balance adjustment type"
+msgid "Credit"
+msgstr "贷记"
+
+msgid "Credit balance"
+msgstr "抵用金余额"
+
+msgid "Credit not processed"
+msgstr "退款未处理"
+
 msgid "Cross-feature components living outside packages/ui — check here before building a new one"
 msgstr "位于packages/ui之外的跨功能组件——新建组件之前先来这里看看"
 
@@ -5547,6 +6154,13 @@ msgstr "Ctrl+Shift+点击"
 msgid "Current"
 msgstr "当前"
 
+msgctxt "cycle"
+msgid "Current"
+msgstr "当前"
+
+msgid "Current event time:"
+msgstr "当前活动时间："
+
 msgid "Current level"
 msgstr "当前等级"
 
@@ -5556,8 +6170,17 @@ msgstr "当前速度"
 msgid "Current plan"
 msgstr "当前方案"
 
+msgid "Current status"
+msgstr "当前状态"
+
 msgid "Current tab"
 msgstr "当前标签页"
+
+msgid "Current trial end"
+msgstr "当前试用结束日期"
+
+msgid "Currently viewing"
+msgstr "当前查看"
 
 msgid "Cursor"
 msgstr "光标"
@@ -5568,6 +6191,10 @@ msgstr "光标闪烁"
 msgid "Cursor style"
 msgstr "光标样式"
 
+msgid "Custom"
+msgstr "自定义"
+
+msgctxt "a pause time"
 msgid "Custom"
 msgstr "自定义"
 
@@ -5601,6 +6228,21 @@ msgstr "自定义终端智能体"
 msgid "Custom themes"
 msgstr "自定义主题"
 
+msgid "Custom time"
+msgstr "自定义时间"
+
+msgid "Custom…"
+msgstr "自定义…"
+
+msgid "Customer email"
+msgstr "客户邮箱"
+
+msgid "Customer initiated"
+msgstr "客户发起"
+
+msgid "Customer name"
+msgstr "客户名称"
+
 msgid "Customize commands"
 msgstr "自定义命令"
 
@@ -5613,6 +6255,13 @@ msgstr "为你的工作流自定义键盘快捷键。随时按<0>{0}</0>打开�
 
 msgid "Cyan"
 msgstr "青色"
+
+msgid "Cycle"
+msgstr "周期"
+
+#. placeholder {0}: cycle.number
+msgid "Cycle {0}"
+msgstr "周期 {0}"
 
 msgid "Cycle ended"
 msgstr "周期结束"
@@ -5666,11 +6315,17 @@ msgstr "数据与 API"
 msgid "Data display"
 msgstr "数据展示"
 
+msgid "Date"
+msgstr "日期"
+
 msgid "Date created"
 msgstr "创建日期"
 
 msgid "Date range"
 msgstr "日期范围"
+
+msgid "date:"
+msgstr "日期："
 
 msgid "Day"
 msgstr "按天"
@@ -5690,11 +6345,37 @@ msgstr "已停用"
 msgid "Dead"
 msgstr "已终止"
 
+msgid "Deadline"
+msgstr "截止日期"
+
+msgid "Deadline passed"
+msgstr "已过截止日期"
+
+msgctxt "balance adjustment type"
+msgid "Debit"
+msgstr "借记"
+
+msgid "Debit {crediting} from {who}'s credit balance?"
+msgstr "要从 {who} 的抵用金余额中扣除 {crediting} 吗？"
+
+msgid "Debit not authorized"
+msgstr "未授权扣款"
+
+msgid "Debug"
+msgstr "调试"
+
+msgctxt "Sentry level"
 msgid "Debug"
 msgstr "调试"
 
 msgid "Debug with production stack traces"
 msgstr "用生产环境堆栈跟踪调试"
+
+msgid "Decline"
+msgstr "拒绝"
+
+msgid "Decline reason"
+msgstr "拒付原因"
 
 msgid "default"
 msgstr "默认"
@@ -5710,6 +6391,9 @@ msgstr "默认（{defaultWorktreePath}）"
 
 msgid "Default base for new workspaces. Override per-workspace at creation."
 msgstr "新工作区的默认基础分支。可在创建时为各工作区单独覆盖。"
+
+msgid "Default color"
+msgstr "默认颜色"
 
 msgid "Default effort"
 msgstr "默认推理强度"
@@ -5944,6 +6628,9 @@ msgstr "正在删除..."
 msgid "Deleting…"
 msgstr "正在删除…"
 
+msgid "Delinquent"
+msgstr "拖欠"
+
 msgid "Demote yourself?"
 msgstr "降低自己的角色？"
 
@@ -6158,6 +6845,9 @@ msgstr "放弃对“{discardBasename}”的更改？"
 msgid "Discard changes?"
 msgstr "放弃更改？"
 
+msgid "Discard draft"
+msgstr "舍弃草稿"
+
 msgid "Discard recording"
 msgstr "放弃录音"
 
@@ -6230,6 +6920,9 @@ msgstr "忽略建议"
 msgid "Dismiss suggestions"
 msgstr "忽略建议"
 
+msgid "Dismiss. It comes back when the agent finishes again."
+msgstr "忽略。智能体再次完成时会重新出现。"
+
 msgid "Dismissed"
 msgstr "已忽略"
 
@@ -6242,14 +6935,32 @@ msgstr "显示"
 msgid "Display Size"
 msgstr "显示大小"
 
+msgid "Displays action text"
+msgstr "显示动作文本"
+
 msgid "Displays the mobile sidebar."
 msgstr "显示移动端侧边栏。"
+
+msgid "Disputed"
+msgstr "有争议"
+
+msgid "Disputed amount"
+msgstr "争议金额"
 
 msgid "Do anything"
 msgstr "做任何事"
 
 msgid "Do I need my own coding agent subscriptions?"
 msgstr "我需要自备编码智能体的订阅吗？"
+
+msgid "Do not file"
+msgstr "不创建"
+
+msgid "Do not refund"
+msgstr "不退款"
+
+msgid "Do not send"
+msgstr "不发送"
 
 msgid "Do nothing"
 msgstr "不执行任何操作"
@@ -6286,12 +6997,30 @@ msgstr "不再询问"
 msgid "Don't ask me again"
 msgstr "不再询问"
 
+msgid "Don't cancel"
+msgstr "不取消"
+
+msgid "Don't clear"
+msgstr "不清除"
+
 msgid "Don't have an account? <0>Sign up</0>"
 msgstr "还没有账户？<0>注册</0>"
 
 msgid "Don't Save"
 msgstr "不保存"
 
+msgid "Done"
+msgstr "完成"
+
+msgctxt "finish a card that is partly done"
+msgid "Done"
+msgstr "完成"
+
+msgctxt "finish editing a canvas change"
+msgid "Done"
+msgstr "完成"
+
+msgctxt "finish editing the description"
 msgid "Done"
 msgstr "完成"
 
@@ -6371,6 +7100,10 @@ msgstr "下载"
 msgid "Draft"
 msgstr "草稿"
 
+msgctxt "invoice status"
+msgid "Draft"
+msgstr "草稿"
+
 msgctxt "pull request state"
 msgid "Draft"
 msgstr "草稿"
@@ -6384,6 +7117,9 @@ msgstr "草稿 · 第{0}行"
 
 msgid "Draft opened"
 msgstr "创建了草稿"
+
+msgid "Drafted"
+msgstr "已起草"
 
 msgid "drafted 3 support replies"
 msgstr "起草了3条支持回复"
@@ -6402,6 +7138,9 @@ msgstr "在终端里驱动它"
 
 msgid "Drive workspaces, agents, and sessions programmatically from scripts, CI, or your own tools."
 msgstr "从脚本、CI或你自己的工具以编程方式驱动工作区、智能体和会话。"
+
+msgid "Drop files here"
+msgstr "将文件拖放到此处"
 
 msgid "Drop files to attach"
 msgstr "拖放文件以添加附件"
@@ -6430,6 +7169,15 @@ msgstr "下拉菜单"
 msgid "Dropdown, context, and application menus"
 msgstr "下拉菜单、右键菜单和应用菜单"
 
+msgid "Due date"
+msgstr "到期日"
+
+msgid "Duplicate"
+msgstr "重复"
+
+msgid "Duplicate of"
+msgstr "重复于"
+
 msgid "Duration"
 msgstr "耗时"
 
@@ -6456,6 +7204,9 @@ msgstr "例如：engineering"
 
 msgid "e.g. Engineering"
 msgstr "例如：工程"
+
+msgid "e.g. plan-budget"
+msgstr "例如：plan-budget"
 
 msgid "Each agent runs in its own isolated Git worktree. No overwriting each other's files. Review and merge work when you're ready."
 msgstr "每个智能体都跑在自己隔离的Git worktree里。互不覆盖彼此的文件。等你准备好了再审查和合并。"
@@ -6516,6 +7267,9 @@ msgstr "编辑环境"
 msgid "Edit files without asking; ask before commands"
 msgstr "无需询问即可编辑文件；运行命令前询问"
 
+msgid "Edit link"
+msgstr "编辑链接"
+
 msgid "Edit name"
 msgstr "编辑名称"
 
@@ -6530,6 +7284,9 @@ msgstr "编辑运行脚本"
 
 msgid "Edit script"
 msgstr "编辑脚本"
+
+msgid "Edit this channel’s topic"
+msgstr "编辑此频道的主题"
 
 msgid "Edit your comment…"
 msgstr "编辑你的评论…"
@@ -6594,6 +7351,9 @@ msgstr "邮箱"
 msgid "Email address"
 msgstr "邮箱地址"
 
+msgid "Email body"
+msgstr "邮件正文"
+
 msgid "Email hidden"
 msgstr "邮箱已隐藏"
 
@@ -6609,8 +7369,14 @@ msgstr "在Gmail中收到邮件"
 msgid "Email Support"
 msgstr "邮件支持"
 
+msgid "Email the payment link for {due} to {recipients}?"
+msgstr "要通过邮件将 {due} 的付款链接发送给 {recipients} 吗？"
+
 msgid "Embedded browser improvements"
 msgstr "内嵌浏览器改进"
+
+msgid "Emoji"
+msgstr "表情"
 
 msgid "Empty"
 msgstr "空状态"
@@ -6643,6 +7409,15 @@ msgstr "启用远程访问，并保持这台电脑唤醒且 Superset 持续运�
 msgid "Enable skill"
 msgstr "启用技能"
 
+msgid "End date"
+msgstr "结束日期"
+
+msgid "End of the current period"
+msgstr "当前周期结束时"
+
+msgid "End time"
+msgstr "结束时间"
+
 msgid "End voice session"
 msgstr "结束语音会话"
 
@@ -6651,6 +7426,12 @@ msgstr "已结束"
 
 msgid "Ending the call"
 msgstr "正在结束通话"
+
+msgid "Ends"
+msgstr "结束"
+
+msgid "Ends {trialDate}"
+msgstr "将于 {trialDate} 结束"
 
 msgid "Enjoying Superset?"
 msgstr "用得还顺手吗？"
@@ -6681,6 +7462,9 @@ msgstr "请输入一个值。"
 
 msgid "Enter a whole number"
 msgstr "输入整数"
+
+msgid "Enter one email address"
+msgstr "请输入一个电子邮件地址"
 
 msgid "Enter URL or search..."
 msgstr "输入URL或搜索..."
@@ -6715,6 +7499,10 @@ msgstr "均分窗格"
 msgid "Error"
 msgstr "错误"
 
+msgctxt "Sentry level"
+msgid "Error"
+msgstr "错误"
+
 msgid "Error {statusCode}"
 msgstr "错误{statusCode}"
 
@@ -6724,11 +7512,17 @@ msgstr "按esc关闭"
 msgid "esc to exit"
 msgstr "esc退出"
 
+msgid "Estimate"
+msgstr "估算"
+
 msgid "Event log"
 msgstr "事件日志"
 
 msgid "Event triggered"
 msgstr "事件触发"
+
+msgid "Events"
+msgstr "事件"
 
 msgid "Every {day}"
 msgstr "每{day}"
@@ -6820,6 +7614,9 @@ msgstr "已有仓库路径"
 msgid "Existing repo path on {hostName}"
 msgstr "{hostName}上的已有仓库路径"
 
+msgid "Existing tag at <0>{short}</0>"
+msgstr "已有标签，位于<0>{short}</0>"
+
 msgid "Existing worktrees under the old path will be orphaned. You can re-import them from the worktrees flow."
 msgstr "旧路径下已有的worktree将被孤立。你可以通过worktree流程重新导入它们。"
 
@@ -6854,6 +7651,9 @@ msgstr "全部展开"
 
 msgid "Expand all files"
 msgstr "展开所有文件"
+
+msgid "Expand all files in the current channel or thread"
+msgstr "展开当前频道或话题中的所有文件"
 
 msgid "Expand file"
 msgstr "展开文件"
@@ -6898,10 +7698,19 @@ msgctxt "roadmap"
 msgid "Exploring"
 msgstr "探索中"
 
+msgid "Extend {who}'s trial of {product} to {trialDate}?"
+msgstr "要将 {who} 的 {product} 试用期延长至 {trialDate} 吗？"
+
+msgid "Extend trial"
+msgstr "延长试用"
+
 msgid "Extended thinking: {activeLabel}"
 msgstr "扩展思考：{activeLabel}"
 
 msgid "external"
+msgstr "外部"
+
+msgid "External"
 msgstr "外部"
 
 msgid "External Application"
@@ -7438,6 +8247,10 @@ msgstr "快速"
 msgid "Fatal"
 msgstr "致命"
 
+msgctxt "Sentry level"
+msgid "Fatal"
+msgstr "致命"
+
 msgid "Fault"
 msgstr "故障"
 
@@ -7458,6 +8271,9 @@ msgstr "未配置反馈速率限制"
 
 msgid "Fetching latest changes"
 msgstr "正在获取最新更改"
+
+msgid "Fewer options"
+msgstr "收起选项"
 
 msgid "Field"
 msgstr "字段"
@@ -7489,8 +8305,14 @@ msgstr "创建和更新 issue"
 msgid "File changed on disk"
 msgstr "磁盘上的文件已更改"
 
+msgid "File in Linear"
+msgstr "在Linear中创建"
+
 msgid "File is too large to preview"
 msgstr "文件过大，无法预览"
+
+msgid "File issue"
+msgstr "创建议题"
 
 msgid "File links"
 msgstr "文件链接"
@@ -7567,6 +8389,9 @@ msgstr "筛选主机"
 msgid "Filter hosts..."
 msgstr "筛选主机..."
 
+msgid "Filter labels"
+msgstr "筛选标签"
+
 msgid "Filter logs"
 msgstr "筛选日志"
 
@@ -7597,6 +8422,9 @@ msgstr "筛选，{activeFilterCount}项生效"
 msgid "Find"
 msgstr "查找"
 
+msgid "Find a channel or person"
+msgstr "查找频道或人员"
+
 msgid "Find a person…"
 msgstr "查找成员…"
 
@@ -7608,6 +8436,9 @@ msgstr "查找团队…"
 
 msgid "Find and fix a small bug"
 msgstr "找一个小bug并修好"
+
+msgid "Find another reaction"
+msgstr "查找其他回应"
 
 msgid "Find in Changes"
 msgstr "在更改中查找"
@@ -7623,6 +8454,9 @@ msgstr "在页面中查找"
 
 msgid "Find in Terminal"
 msgstr "在终端中查找"
+
+msgid "Find people"
+msgstr "查找人员"
 
 msgid "Find recently changed code with weak coverage and test it properly."
 msgstr "找出最近改动过、覆盖率薄弱的代码，好好补上测试。"
@@ -7644,6 +8478,9 @@ msgstr "已完成 · 用时7秒"
 
 msgid "First repository by name"
 msgstr "按名称排序的第一个仓库"
+
+msgid "First seen"
+msgstr "首次出现"
 
 msgid "Fix all failing checks"
 msgstr "修复所有失败的检查"
@@ -7668,6 +8505,9 @@ msgstr "FK"
 
 msgid "Flag"
 msgstr "标志"
+
+msgid "Flags"
+msgstr "旗帜"
 
 msgid "Flame"
 msgstr "火焰"
@@ -7714,6 +8554,9 @@ msgstr "聚焦当前工作区中的上一个标签页"
 msgid "Focus the search input in the tasks view"
 msgstr "聚焦任务视图中的搜索框"
 
+msgid "Fold"
+msgstr "折叠"
+
 msgid "Folder"
 msgstr "文件夹"
 
@@ -7749,6 +8592,18 @@ msgstr "字号"
 
 msgid "Font weight"
 msgstr "字重"
+
+msgid "Food & Drink"
+msgstr "食物与饮料"
+
+msgid "For 1 hour"
+msgstr "1 小时"
+
+msgid "For 2 hours"
+msgstr "2 小时"
+
+msgid "For 30 minutes"
+msgstr "30 分钟"
 
 msgid "For a project, open the importer to link it."
 msgstr "对于项目，请打开导入器进行关联。"
@@ -7837,6 +8692,9 @@ msgstr "分叉到新聊天"
 msgid "Form controls and field composition"
 msgstr "表单控件与字段组合"
 
+msgid "Formatting options"
+msgstr "格式选项"
+
 msgid "Forward"
 msgstr "前进"
 
@@ -7849,11 +8707,20 @@ msgstr "创始人兼 CEO，WowMakers"
 msgid "Founding Engineer"
 msgstr "创始工程师"
 
+msgid "Fraudulent"
+msgstr "欺诈"
+
 msgid "Free"
 msgstr "免费版"
 
 msgid "Free for everyone"
 msgstr "对所有人免费"
+
+msgid "Free trial days"
+msgstr "免费试用天数"
+
+msgid "Frequently Used"
+msgstr "常用"
 
 msgid "Frequently<0/>asked questions"
 msgstr "常见<0/>问题"
@@ -7872,6 +8739,13 @@ msgstr "从一个黑客松项目，到并行编程智能体的工作空间。"
 
 msgid "From GitHub"
 msgstr "来自 GitHub"
+
+msgid "from:"
+msgstr "发件人："
+
+#. placeholder {0}: formatRecipient(target.from)
+msgid "From: {0}"
+msgstr "发件人：{0}"
 
 msgid "Front matter hidden — switch to Markdown to edit it"
 msgstr "已隐藏front matter，切换到Markdown可编辑"
@@ -7975,6 +8849,9 @@ msgstr "充分利用 Pro"
 msgid "Get the iPhone and iPad app"
 msgstr "获取 iPhone 和 iPad 应用"
 
+msgid "Getting Work Done"
+msgstr "办公常用"
+
 msgid "Ghost"
 msgstr "幽灵"
 
@@ -8053,6 +8930,15 @@ msgstr "地球"
 msgid "Gmail access is required. Please allow it when asked."
 msgstr "需要 Gmail 访问权限。请在系统询问时允许。"
 
+msgid "Gmail draft"
+msgstr "Gmail草稿"
+
+msgid "Gmail draft to {to}"
+msgstr "发给{to}的Gmail草稿"
+
+msgid "Gmail won't send blocked files"
+msgstr "Gmail 不会发送被阻止的文件"
+
 msgid "Go back"
 msgstr "返回"
 
@@ -8088,6 +8974,9 @@ msgstr "前往Superset"
 
 msgid "Go to workspace"
 msgstr "前往工作区"
+
+msgid "Going?"
+msgstr "参加吗？"
 
 msgid "Google did not grant lasting access. Remove Superset from your Google account's third-party access and try again."
 msgstr "Google没有授予持久访问权限。请在你的Google账户的第三方访问中移除Superset，然后重试。"
@@ -8136,6 +9025,9 @@ msgstr "访客"
 
 msgid "Guest {number}"
 msgstr "访客 {number}"
+
+msgid "Guest customer"
+msgstr "访客客户"
 
 msgid "Guide"
 msgstr "指南"
@@ -8203,6 +9095,9 @@ msgstr "心形"
 msgid "Help"
 msgstr "帮助"
 
+msgid "help [or subscribe, list, remove…]"
+msgstr "help [或 subscribe、list、remove…]"
+
 msgid "Help & Docs"
 msgstr "帮助与文档"
 
@@ -8237,11 +9132,17 @@ msgstr "隐藏详情"
 msgid "Hide emails"
 msgstr "隐藏邮箱"
 
+msgid "Hide expanded content"
+msgstr "隐藏展开的内容"
+
 msgid "Hide file tree"
 msgstr "隐藏文件树"
 
 msgid "Hide folder"
 msgstr "隐藏文件夹"
+
+msgid "Hide formatting"
+msgstr "隐藏格式"
 
 msgid "Hide from bar"
 msgstr "从工具栏隐藏"
@@ -8278,6 +9179,9 @@ msgstr "隐藏已解决的评论"
 
 msgid "Hide review comments"
 msgstr "隐藏审查评论"
+
+msgid "Hide session"
+msgstr "隐藏会话"
 
 msgid "Hide sessions"
 msgstr "隐藏会话"
@@ -8462,6 +9366,9 @@ msgstr "https://"
 msgid "https://github.com/owner/repo.git or /path/to/repo"
 msgstr "https://github.com/owner/repo.git 或 /path/to/repo"
 
+msgid "Huge"
+msgstr "特大"
+
 msgid "Human"
 msgstr "人类"
 
@@ -8553,6 +9460,9 @@ msgstr "{0}的图片预览。用加号和减号缩放，用方向键平移，按
 
 msgid "Images"
 msgstr "图片"
+
+msgid "Immediately"
+msgstr "立即"
 
 msgid "Impersonates someone"
 msgstr "冒充他人"
@@ -8692,6 +9602,9 @@ msgstr "进行中"
 msgid "In Progress"
 msgstr "进行中"
 
+msgid "In sandbox mode, emails can only be sent to addresses with access to this sandbox."
+msgstr "在沙箱模式下，邮件只能发送到有权访问此沙箱的地址。"
+
 msgid "In the Superset desktop app, open <0>Settings → Appearance → Theme</0>."
 msgstr "在Superset桌面应用中打开<0>设置 → 外观 → 主题</0>。"
 
@@ -8709,6 +9622,13 @@ msgstr "应用内浏览器"
 
 msgid "In-app PR merge"
 msgstr "应用内合并PR"
+
+msgid "Inbox"
+msgstr "收件箱"
+
+msgctxt "Gmail label"
+msgid "Inbox"
+msgstr "收件箱"
 
 msgid "Inbox triage"
 msgstr "收件箱分拣"
@@ -8728,8 +9648,23 @@ msgstr "包含Superset特有的box变体"
 msgid "Incognito Operator"
 msgstr "隐身操作员"
 
+msgid "Incomplete"
+msgstr "未完成"
+
+msgid "Incorrect account details"
+msgstr "账户信息有误"
+
 msgid "Increase Contrast"
 msgstr "增强对比度"
+
+msgid "Indefinite"
+msgstr "无限期"
+
+msgid "Indent less"
+msgstr "减少缩进"
+
+msgid "Indent more"
+msgstr "增加缩进"
 
 msgid "Indigo"
 msgstr "靛蓝"
@@ -8737,6 +9672,10 @@ msgstr "靛蓝"
 msgid "Industry median, our estimate. Dashed is forecast. The first F4 teams cross the gate earlier."
 msgstr "行业中位数，为我们的估计。虚线为预测。第一批F4团队会更早越过这道关卡。"
 
+msgid "Info"
+msgstr "信息"
+
+msgctxt "Sentry level"
 msgid "Info"
 msgstr "信息"
 
@@ -8781,6 +9720,18 @@ msgstr "输入、缓存和输出token"
 
 msgid "Inputs"
 msgstr "输入"
+
+msgid "Inquiry"
+msgstr "查询"
+
+msgid "Inquiry closed"
+msgstr "查询已关闭"
+
+msgid "Inquiry under review"
+msgstr "查询审核中"
+
+msgid "Insert link"
+msgstr "插入链接"
 
 msgid "Insights from the Superset team about parallel coding agents and developer productivity."
 msgstr "来自Superset团队的洞见，关于并行编码智能体与开发者效率。"
@@ -8859,6 +9810,9 @@ msgstr "在可通过 ssh 访问的机器上安装 Superset，将 Superset 登录
 msgid "Instructions"
 msgstr "说明"
 
+msgid "Insufficient funds"
+msgstr "余额不足"
+
 msgid "Integrations"
 msgstr "集成"
 
@@ -8931,6 +9885,9 @@ msgstr "未找到邀请"
 msgid "Invitation sent to {email}"
 msgstr "邀请已发送至{email}"
 
+msgid "Invite {who} to #{name} through Slack Connect? They are outside {workspace}."
+msgstr "要通过 Slack Connect 邀请 {who} 加入 #{name} 吗？他们不属于 {workspace}。"
+
 msgid "Invite and manage members, assign roles, and control permissions"
 msgstr "邀请和管理成员、分配角色并控制权限"
 
@@ -8939,6 +9896,12 @@ msgstr "邀请成员"
 
 msgid "Invite Member"
 msgstr "邀请成员"
+
+msgid "Invite people to <0/>"
+msgstr "邀请人员加入 <0/>"
+
+msgid "Invite someone to this channel"
+msgstr "邀请某人加入此频道"
 
 msgid "Invite teammate"
 msgstr "邀请团队成员"
@@ -8949,8 +9912,20 @@ msgstr "邀请团队加入共享工作区。查看实时更新、同步配置，
 msgid "Invited By"
 msgstr "邀请人"
 
+msgid "Invoice behavior"
+msgstr "账单处理方式"
+
 msgid "Invoices and payment method"
 msgstr "发票和支付方式"
+
+msgid "Invoices will be created as drafts. You can finalize and collect payment later."
+msgstr "账单将创建为草稿。你可以稍后确定账单并收款。"
+
+msgid "Invoices will be marked uncollectible. No payment will be collected for these periods."
+msgstr "账单将标记为无法收款。这些周期不会收取任何款项。"
+
+msgid "Invoices will be voided. No record of charges will be created for these periods."
+msgstr "账单将被作废。这些周期不会生成任何收费记录。"
 
 msgid "iOS app"
 msgstr "iOS应用"
@@ -9036,6 +10011,9 @@ msgstr "设备可能处于睡眠状态"
 
 msgid "It may have been deleted, or it belongs to another organization."
 msgstr "它可能已被删除，或属于另一个组织。"
+
+msgid "It notifies everyone there."
+msgstr "这会通知那里的所有人。"
 
 msgid "It will open once the connection is back."
 msgstr "网络恢复后会自动打开。"
@@ -9139,11 +10117,20 @@ msgstr "刚刚"
 msgid "Kbd"
 msgstr "Kbd"
 
+msgid "Keep as is"
+msgstr "保持不变"
+
 msgid "Keep docs fresh"
 msgstr "让文档保持最新"
 
 msgid "Keep editing"
 msgstr "继续编辑"
+
+msgid "Keep event"
+msgstr "保留活动"
+
+msgid "Keep invoices as drafts"
+msgstr "将账单保留为草稿"
 
 msgid "Keep waiting"
 msgstr "继续等待"
@@ -9264,6 +10251,9 @@ msgstr "每月最后一天"
 msgid "Last day of each month at {time}"
 msgstr "每月最后一天{time}"
 
+msgid "Last payment {lastPayment}"
+msgstr "上次付款 {lastPayment}"
+
 msgid "Last run"
 msgstr "上次运行"
 
@@ -9363,6 +10353,9 @@ msgstr "退出并删除"
 msgid "Leave comment mode"
 msgstr "退出评论模式"
 
+msgid "Leave it"
+msgstr "保持不变"
+
 msgid "Leave it empty to go back to the name the terminal reports."
 msgstr "留空即可恢复终端报告的名称。"
 
@@ -9377,6 +10370,9 @@ msgstr "退出组织..."
 
 msgid "Leave team"
 msgstr "退出团队"
+
+msgid "Leave the canvas"
+msgstr "保持画板不变"
 
 msgid "Leave the leaderboard?"
 msgstr "退出排行榜？"
@@ -9476,6 +10472,9 @@ msgstr "Linear集成"
 msgid "Linear is limiting requests. Try again in a few minutes."
 msgstr "Linear正在限制请求，请几分钟后重试。"
 
+msgid "Linear issue in {team}"
+msgstr "{team}中的Linear议题"
+
 #. placeholder {0}: m.startLine
 #. placeholder {0}: metadata.startLine
 #. placeholder {1}: m.endLine
@@ -9539,6 +10538,9 @@ msgstr "列出你有权用来运行工作区的机器。"
 
 msgid "List the projects (checked-out repos) available on a host."
 msgstr "列出主机上可用的项目（已检出的仓库）。"
+
+msgid "List users in the current channel"
+msgstr "列出当前频道中的用户"
 
 msgid "List, create, update, and delete workspaces on a host."
 msgstr "列出、创建、更新和删除主机上的工作区。"
@@ -9638,6 +10640,9 @@ msgstr "正在加载 GitHub 详情"
 
 msgid "Loading groups…"
 msgstr "正在加载分组…"
+
+msgid "Loading integration card"
+msgstr "正在加载集成卡片"
 
 msgid "Loading issue…"
 msgstr "正在加载议题…"
@@ -9781,6 +10786,9 @@ msgctxt "quick reply button"
 msgid "Looks good"
 msgstr "看起来不错"
 
+msgid "Lost"
+msgstr "败诉"
+
 msgid "Low"
 msgstr "低"
 
@@ -9860,6 +10868,9 @@ msgstr "管理方案"
 msgid "Manage plan on the web"
 msgstr "在网页端管理方案"
 
+msgid "Manage RSS subscriptions"
+msgstr "管理 RSS 订阅"
+
 msgid "Manage sessions"
 msgstr "管理会话"
 
@@ -9887,11 +10898,23 @@ msgstr "手动"
 msgid "Manual order"
 msgstr "手动排序"
 
+msgid "Mark as duplicate"
+msgstr "标记为重复"
+
 msgid "Mark as not viewed"
 msgstr "标记为未查看"
 
+msgid "Mark as paid"
+msgstr "标记为已支付"
+
+msgid "Mark as read"
+msgstr "标为已读"
+
 msgid "Mark as Read"
 msgstr "标为已读"
+
+msgid "Mark as unread"
+msgstr "标为未读"
 
 msgid "Mark as Unread"
 msgstr "标为未读"
@@ -9899,8 +10922,14 @@ msgstr "标为未读"
 msgid "Mark as viewed"
 msgstr "标记为已查看"
 
+msgid "Mark invoices uncollectible"
+msgstr "将账单标记为无法收款"
+
 msgid "Mark Ready"
 msgstr "标记为待审查"
+
+msgid "Mark uncollectible"
+msgstr "标记为无法收款"
 
 msgid "Markdown"
 msgstr "Markdown"
@@ -9929,6 +10958,9 @@ msgstr "正在标记为可评审…"
 msgid "Marking ready…"
 msgstr "正在标记为就绪…"
 
+msgid "Marking this payment as fraudulent adds the associated payment method and email to your block lists. Stripe uses this data to block similar payments and improve our fraud detection."
+msgstr "将此付款标记为欺诈会把关联的支付方式和邮箱添加到你的阻止列表。Stripe 会使用这些数据来阻止类似付款并改进我们的欺诈检测。"
+
 msgid "Match existing patterns"
 msgstr "沿用现有模式"
 
@@ -9947,6 +10979,9 @@ msgstr "最大的推理投入"
 msgid "Maximum size is 256 KB."
 msgstr "最大为256 KB。"
 
+msgid "Maybe"
+msgstr "待定"
+
 msgid "MCP"
 msgstr "MCP"
 
@@ -9958,6 +10993,10 @@ msgstr "MCP服务器"
 
 msgid "MCP Server Commands"
 msgstr "MCP服务器命令"
+
+msgctxt "email recipient"
+msgid "me"
+msgstr "我"
 
 msgid "Measured over the trailing 30 days"
 msgstr "按最近 30 天计算"
@@ -9990,6 +11029,9 @@ msgstr "认识团队"
 msgid "Meet the team behind Superset, building parallel coding agents for developers."
 msgstr "认识 Superset 背后的团队，我们为开发者打造并行编码智能体。"
 
+msgid "Meeting follow-ups"
+msgstr "会议后续事项"
+
 msgid "Member"
 msgstr "成员"
 
@@ -10013,6 +11055,9 @@ msgstr "内存"
 
 msgid "Memory share"
 msgstr "内存占比"
+
+msgid "Mention someone"
+msgstr "提及某人"
 
 msgid "Mention."
 msgstr "提及。"
@@ -10080,6 +11125,12 @@ msgstr "正在合并…"
 
 msgid "Mesh Gradient"
 msgstr "网格渐变"
+
+msgid "Message"
+msgstr "消息"
+
+msgid "Message {where}"
+msgstr "发消息给 {where}"
 
 msgid "Message in channel"
 msgstr "频道中的消息"
@@ -10200,6 +11251,9 @@ msgstr "使用的模型"
 msgid "Moderate reasoning effort"
 msgstr "适中的推理投入"
 
+msgid "Monday morning"
+msgstr "周一上午"
+
 msgid "Monitor agents from your phone."
 msgstr "在手机上监控智能体。"
 
@@ -10271,6 +11325,9 @@ msgstr "更多选项"
 msgid "More pages"
 msgstr "更多页面"
 
+msgid "More send options"
+msgstr "更多发送选项"
+
 msgid "More than half of merged changes are written by agents with zero human edits."
 msgstr "超过一半的合并变更由智能体撰写，且无任何人工修改。"
 
@@ -10289,6 +11346,12 @@ msgstr "软件史的大部分时间"
 
 msgid "Move {count} to Group"
 msgstr "将{count}个移动到分组"
+
+msgid "Move back through the focused block's fields, then to the previous block of the card that is still open"
+msgstr "反向依次移动到当前区块的各个字段，然后移到卡片中上一个仍未处理的区块"
+
+msgid "Move through the focused block's fields, then to the next block of the card that is still open"
+msgstr "依次移动到当前区块的各个字段，然后移到卡片中下一个仍未处理的区块"
 
 msgid "Move to Center"
 msgstr "移到中间"
@@ -10346,6 +11409,9 @@ msgstr "域名无法解析"
 msgid "Name updated!"
 msgstr "姓名已更新！"
 
+msgid "name@example.com"
+msgstr "name@example.com"
+
 msgid "Nameless Foreman"
 msgstr "无名工头"
 
@@ -10385,6 +11451,9 @@ msgstr "需要实时的聊天或工具调用状态（ToolUIPart、流），或�
 msgid "Needs a retry"
 msgstr "需要重试"
 
+msgid "Needs a Slack permission Superset doesn't ask for"
+msgstr "需要 Superset 未申请的 Slack 权限"
+
 msgid "Needs Action"
 msgstr "需要处理"
 
@@ -10396,6 +11465,9 @@ msgstr "需要输入"
 
 msgid "Needs permission"
 msgstr "需要授权"
+
+msgid "Needs response"
+msgstr "需要回应"
 
 msgid "Needs review"
 msgstr "待审查"
@@ -10453,6 +11525,9 @@ msgstr "新智能体会话"
 msgid "New automation"
 msgstr "新建自动化"
 
+msgid "New balance"
+msgstr "新余额"
+
 msgid "New Browser"
 msgstr "新建浏览器"
 
@@ -10464,6 +11539,9 @@ msgstr "新建云端工作区"
 
 msgid "New environment"
 msgstr "新建环境"
+
+msgid "New event time:"
+msgstr "新的活动时间："
 
 msgid "New File"
 msgstr "新建文件"
@@ -10485,6 +11563,9 @@ msgstr "以此工作区新建分组"
 
 msgid "New issue"
 msgstr "新建议题"
+
+msgid "New Message"
+msgstr "新邮件"
 
 msgid "New page"
 msgstr "新建页面"
@@ -10519,6 +11600,9 @@ msgstr "新建标签页"
 msgid "New tab + panes"
 msgstr "新标签页+窗格"
 
+msgid "New tag on <0>{target}</0> at <1>{short}</1>"
+msgstr "新标签，位于<0>{target}</0>的<1>{short}</1>"
+
 msgid "New task"
 msgstr "新建任务"
 
@@ -10527,6 +11611,9 @@ msgstr "新建终端"
 
 msgid "New Terminal"
 msgstr "新建终端"
+
+msgid "New text"
+msgstr "新文本"
 
 msgid "New window"
 msgstr "新建窗口"
@@ -10567,11 +11654,23 @@ msgstr "下一页"
 msgid "Next (Enter)"
 msgstr "下一个匹配项（Enter）"
 
+msgid "Next attempt"
+msgstr "下次尝试"
+
+msgid "Next Block"
+msgstr "下一个区块"
+
 msgid "Next branch"
 msgstr "下一个分支"
 
+msgid "Next Card"
+msgstr "下一张卡片"
+
 msgid "Next comment"
 msgstr "下一条评论"
+
+msgid "Next cycle"
+msgstr "下个周期"
 
 msgid "Next file"
 msgstr "下一个文件"
@@ -10598,6 +11697,9 @@ msgstr "下一个标签页"
 msgid "Next Tab (Second Shortcut)"
 msgstr "下一个标签页（第二快捷键）"
 
+msgid "Next week"
+msgstr "下周"
+
 msgid "Next Workspace"
 msgstr "下一个工作区"
 
@@ -10615,6 +11717,9 @@ msgstr "思路不错"
 
 msgid "Nice, open a PR when ready."
 msgstr "不错，准备好就开个PR。"
+
+msgid "Nicely done"
+msgstr "干得漂亮"
 
 msgid "No"
 msgstr "否"
@@ -10689,6 +11794,9 @@ msgstr "没有匹配的自动化"
 
 msgid "No branches found"
 msgstr "未找到分支"
+
+msgid "No card on file"
+msgstr "未保存银行卡"
 
 msgid "No changed files."
 msgstr "没有更改的文件。"
@@ -10768,6 +11876,9 @@ msgstr "未找到贡献者。"
 msgid "No credit card required."
 msgstr "无需信用卡。"
 
+msgid "No cycle"
+msgstr "无周期"
+
 msgid "No description"
 msgstr "无描述"
 
@@ -10786,9 +11897,6 @@ msgstr "还没有设备"
 msgid "No downloads yet"
 msgstr "暂无下载"
 
-msgid "No emoji found"
-msgstr "未找到表情"
-
 msgid "No environment for {repositoryFullName}"
 msgstr "{repositoryFullName} 没有环境"
 
@@ -10803,6 +11911,9 @@ msgstr "还没有环境"
 
 msgid "No environments yet."
 msgstr "还没有环境。创建一个，以便基于它启动云端工作区。"
+
+msgid "No estimate"
+msgstr "无估算"
 
 msgid "No events yet"
 msgstr "暂无事件"
@@ -10827,6 +11938,9 @@ msgstr "没有与搜索匹配的文件"
 
 msgid "No fonts found."
 msgstr "未找到字体。"
+
+msgid "No funds have been withdrawn from your account yet, but the cardholder's bank is requesting more information to decide whether to return these funds to the cardholder."
+msgstr "尚未从你的账户中扣除任何资金，但持卡人的银行正在要求提供更多信息，以决定是否将这些资金退还给持卡人。"
 
 msgid "No git remote detected"
 msgstr "未检测到git远程仓库"
@@ -10906,6 +12020,9 @@ msgstr "无匹配项"
 msgid "No matches"
 msgstr "没有匹配项"
 
+msgid "No matching commands"
+msgstr "没有匹配的命令"
+
 msgid "No matching files"
 msgstr "没有匹配的文件"
 
@@ -10941,6 +12058,12 @@ msgstr "此处没有可用的移动模拟器。需要云沙箱上的 EAS 模拟�
 
 msgid "No name on file"
 msgstr "未登记姓名"
+
+msgid "No one assigned"
+msgstr "未指派任何人"
+
+msgid "No one in this organization matches that recipient"
+msgstr "此组织中没有匹配该收件人的成员"
 
 msgid "No open issues found."
 msgstr "未找到打开的议题。"
@@ -11057,8 +12180,14 @@ msgstr "暂无公开的智能体配置。此页面已为将来的智能体配置
 msgid "No pull requests found."
 msgstr "未找到拉取请求。"
 
+msgid "No refund"
+msgstr "不退款"
+
 msgid "No release notes at {url}"
 msgstr "{url} 上没有版本说明"
+
+msgid "No reminder"
+msgstr "不提醒"
 
 msgid "No repositories found. Make sure your GitHub App has access to repositories."
 msgstr "未找到仓库。请确认你的GitHub App有权访问仓库。"
@@ -11165,6 +12294,9 @@ msgstr "未找到主题。"
 msgid "No themes were imported"
 msgstr "没有导入任何主题"
 
+msgid "No trial"
+msgstr "无试用"
+
 msgid "No triggers"
 msgstr "没有触发器"
 
@@ -11237,6 +12369,9 @@ msgstr "团队里还没有人共享自动化。"
 msgid "Nobody reviews differently because of it."
 msgstr "没有人因此改变审查方式。"
 
+msgid "Noncompliant"
+msgstr "不合规"
+
 msgid "None"
 msgstr "无"
 
@@ -11246,11 +12381,17 @@ msgstr "无（会话）"
 msgid "None. This is the floor."
 msgstr "没有。这是起点。"
 
+msgid "Normal"
+msgstr "正常"
+
 msgid "Not a 2026 claim"
 msgstr "不是2026年的主张"
 
 msgid "Not a member of this organization"
 msgstr "不是此组织的成员"
+
+msgid "Not answered"
+msgstr "未回答"
 
 msgid "Not authenticated. Please sign in."
 msgstr "未通过身份验证。请登录。"
@@ -11282,8 +12423,17 @@ msgstr "此处未做演示"
 msgid "Not found"
 msgstr "未找到"
 
+msgid "Not from {customerEmail}"
+msgstr "并非来自 {customerEmail}"
+
+msgid "Not from the customer"
+msgstr "并非来自客户"
+
 msgid "Not granted"
 msgstr "未授予"
+
+msgid "Not in channel"
+msgstr "不在频道中"
 
 msgid "Not included"
 msgstr "不包含"
@@ -11296,6 +12446,9 @@ msgstr "暂不"
 
 msgid "Not on the leaderboard. Opt in first."
 msgstr "不在排行榜中。请先加入。"
+
+msgid "Not on this thread"
+msgstr "不在此会话中"
 
 msgid "Not on this version"
 msgstr "不在此版本中"
@@ -11321,6 +12474,9 @@ msgstr "尚未在此主机上配置"
 msgid "not sorted"
 msgstr "未排序"
 
+msgid "Not starred"
+msgstr "未加星标"
+
 msgctxt "agent status"
 msgid "Not updating"
 msgstr "未更新"
@@ -11331,6 +12487,13 @@ msgstr "注意"
 msgid "Notes"
 msgstr "笔记"
 
+msgctxt "where meeting notes came from"
+msgid "Notes"
+msgstr "笔记"
+
+msgid "Nothing archived yet."
+msgstr "尚无归档内容。"
+
 msgid "Nothing here yet."
 msgstr "这里还没有内容。"
 
@@ -11340,17 +12503,26 @@ msgstr "这里没有内容。"
 msgid "Nothing is running. Archive it and create a new one."
 msgstr "没有任何东西在运行。归档它，再建一个。"
 
+msgid "Nothing is waiting for a later date."
+msgstr "没有等待稍后处理的事项。"
+
 msgid "Nothing lives at {pathname}."
 msgstr "{pathname}下没有任何内容。"
 
 msgid "Nothing needs a retry"
 msgstr "没有需要重试的运行"
 
+msgid "Nothing needs you right now."
+msgstr "目前没有需要你处理的事项。"
+
 msgid "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
 msgstr "最近30天还没有已公开的数据。待本机用量同步后，你的排名就会显示，将以<0>{handle}</0>身份公开。"
 
 msgid "Nothing running"
 msgstr "没有正在运行的内容"
+
+msgid "Nothing unread."
+msgstr "没有未读内容。"
 
 msgid "Nothing was missed"
 msgstr "没有错过的运行"
@@ -11366,6 +12538,9 @@ msgstr "通知声音"
 
 msgid "Notifications"
 msgstr "通知"
+
+msgid "Notifications are paused until {pausedUntil}"
+msgstr "通知已暂停至 {pausedUntil}"
 
 msgid "Notion is not configured for this environment."
 msgstr "当前环境未配置Notion。"
@@ -11392,6 +12567,9 @@ msgstr "当前运行{0}（之前是{1}）。所有会话已关闭。"
 msgid "Now, we've raised from the best investors in Silicon Valley to build the platform for software factories."
 msgstr "如今，我们已从硅谷最好的投资人那里完成融资，用来打造软件工厂的平台。"
 
+msgid "Nowhere yet"
+msgstr "尚未选择发送位置"
+
 msgid "Numbered list"
 msgstr "编号列表"
 
@@ -11401,9 +12579,15 @@ msgstr "OAuth 2.0"
 msgid "OAuth by default, API keys for CI"
 msgstr "默认用OAuth，CI用API密钥"
 
+msgid "Objects"
+msgstr "物品"
+
 #. placeholder {0}: formatNumber(participants)
 msgid "of {0}"
 msgstr "共{0}人"
+
+msgid "of {refundable} refundable"
+msgstr "可退款 {refundable}"
 
 msgid "of {total}"
 msgstr "共{total}名"
@@ -11442,6 +12626,9 @@ msgstr "更早"
 
 msgid "on {offScopeHostName} — won't run here"
 msgstr "在{offScopeHostName}上，不会在这里运行"
+
+msgid "On {when} {sender} wrote:"
+msgstr "{sender} 于 {when}写道："
 
 msgid "On every machine you sign into"
 msgstr "在你登录的每台设备上"
@@ -11557,6 +12744,9 @@ msgstr "只有所有者才能更新组织设置"
 msgid "Only people who opted in appear here."
 msgstr "只有选择加入的人才会出现在这里。"
 
+msgid "Only specific people"
+msgstr "仅限特定人员"
+
 msgid "Only the author can change a comment"
 msgstr "只有作者可以修改评论"
 
@@ -11590,6 +12780,9 @@ msgstr "只有讨论串的作者或页面所有者才能删除它"
 msgid "Only want it out of your sidebar? Hide it instead. Nobody else is affected."
 msgstr "只是想把它从侧边栏移走？请改为隐藏。不会影响其他人。"
 
+msgid "Only works in the Slack app"
+msgstr "仅在 Slack 应用中可用"
+
 msgid "Only you"
 msgstr "仅你自己"
 
@@ -11601,6 +12794,10 @@ msgstr "打开"
 
 msgid "Open"
 msgstr "打开"
+
+msgctxt "invoice status"
+msgid "Open"
+msgstr "待付款"
 
 msgctxt "pull request or issue state"
 msgid "Open"
@@ -11626,6 +12823,9 @@ msgstr "打开 {parentLabel}"
 
 msgid "Open {path} in file pane"
 msgstr "在文件面板中打开{path}"
+
+msgid "Open a channel"
+msgstr "打开频道"
 
 msgid "Open a multiline prompt composer for the active terminal"
 msgstr "为当前终端打开多行提示词编辑器"
@@ -11662,6 +12862,9 @@ msgstr "在GitHub上打开分支"
 
 msgid "Open Browser"
 msgstr "打开浏览器"
+
+msgid "Open Card in Its App"
+msgstr "在对应应用中打开卡片"
 
 msgid "Open changes"
 msgstr "打开更改"
@@ -11799,6 +13002,12 @@ msgstr "在Finder中打开"
 msgid "Open in GitHub"
 msgstr "在GitHub中打开"
 
+msgid "Open in Gmail"
+msgstr "在 Gmail 中打开"
+
+msgid "Open in Google Calendar"
+msgstr "在 Google 日历中打开"
+
 msgid "Open in Linear"
 msgstr "在Linear中打开"
 
@@ -11817,8 +13026,17 @@ msgstr "在右侧面板中打开"
 msgid "Open in Scira AI"
 msgstr "在Scira AI中打开"
 
+msgid "Open in Sentry"
+msgstr "在Sentry中打开"
+
+msgid "Open in Slack"
+msgstr "在 Slack 中打开"
+
 msgid "Open in split pane"
 msgstr "在分屏窗格中打开"
+
+msgid "Open in Stripe"
+msgstr "在 Stripe 中打开"
 
 msgid "Open in Superset"
 msgstr "在 Superset 中打开"
@@ -11828,6 +13046,9 @@ msgstr "在T3 Chat中打开"
 
 msgid "Open in tab"
 msgstr "在标签页中打开"
+
+msgid "Open in workspace"
+msgstr "在工作区中打开"
 
 msgid "Open in…"
 msgstr "打开方式…"
@@ -11847,6 +13068,9 @@ msgstr "打开的议题"
 
 msgid "Open leaderboard"
 msgstr "打开排行榜"
+
+msgid "Open link"
+msgstr "打开链接"
 
 msgid "Open Link as New Split"
 msgstr "在新拆分中打开链接"
@@ -11869,6 +13093,9 @@ msgstr "打开菜单"
 
 msgid "Open navigation"
 msgstr "打开导航"
+
+msgid "Open notes"
+msgstr "打开笔记"
 
 msgid "Open on GitHub"
 msgstr "在GitHub上打开"
@@ -11927,6 +13154,9 @@ msgstr "打开最近使用"
 msgid "Open roles"
 msgstr "空缺职位"
 
+msgid "Open run"
+msgstr "打开运行"
+
 msgid "Open session in"
 msgstr "会话打开位置"
 
@@ -11950,6 +13180,9 @@ msgstr "在那台电脑上打开Superset"
 
 msgid "Open System Settings"
 msgstr "打开系统设置"
+
+msgid "Open task"
+msgstr "打开任务"
 
 msgid "Open task {title}"
 msgstr "打开任务{title}"
@@ -12002,6 +13235,9 @@ msgstr "在“运行历史”中打开该运行，查看智能体做了什么。
 msgid "Open the run's workspace"
 msgstr "打开这次运行的工作区"
 
+msgid "Open the session this card came from"
+msgstr "打开此卡片来源的会话"
+
 msgid "open the task in a workspace"
 msgstr "在工作区中打开任务"
 
@@ -12010,6 +13246,9 @@ msgstr "在“打开方式”菜单中选定的应用（VS Code、Cursor等）�
 
 msgid "Open this run's workspace"
 msgstr "打开此次运行的工作区"
+
+msgid "Open what the selected card is about in Slack, Gmail, Linear, GitHub, Stripe or its own app"
+msgstr "在 Slack、Gmail、Linear、GitHub、Stripe 或其自有应用中打开所选卡片涉及的内容"
 
 msgid "Open workspace"
 msgstr "打开工作区"
@@ -12022,6 +13261,9 @@ msgstr "OpenAI拒绝了此API密钥。"
 
 msgid "Opened"
 msgstr "已创建"
+
+msgid "Opened on {opened}"
+msgstr "创建于{opened}"
 
 msgid "opened PR #841 for review"
 msgstr "开了PR #841待审查"
@@ -12058,6 +13300,9 @@ msgstr "拒绝"
 
 msgid "Option shortcuts may prevent typing special characters"
 msgstr "Option快捷键可能会影响特殊字符的输入"
+
+msgid "optional"
+msgstr "可选"
 
 msgid "Optional"
 msgstr "可选"
@@ -12138,11 +13383,21 @@ msgstr "组织：<0>{0}</0>"
 msgid "Organize your work into teams. Tasks and integrations can sync per-team."
 msgstr "把工作组织到团队中。任务和集成可以按团队同步。"
 
+msgid "Organizer"
+msgstr "组织者"
+
 msgid "Originals"
 msgstr "原创组件"
 
 msgid "Other"
 msgstr "其他"
+
+msgctxt "refund reason"
+msgid "Other"
+msgstr "其他"
+
+msgid "Other agents"
+msgstr "其他代理"
 
 msgid "Other apps"
 msgstr "其他应用"
@@ -12155,6 +13410,9 @@ msgstr "其他主机"
 
 msgid "Other people are using this project. Type <0>{projectName}</0> to confirm."
 msgstr "其他人正在使用此项目。输入 <0>{projectName}</0> 以确认。"
+
+msgid "Other projects"
+msgstr "其他项目"
 
 msgid "Other Team Members"
 msgstr "其他团队成员"
@@ -12191,6 +13449,9 @@ msgstr "输出结构"
 
 msgid "Output truncated"
 msgstr "输出已截断"
+
+msgid "Over Gmail's 25 MB limit"
+msgstr "超出 Gmail 的 25 MB 上限"
 
 msgid "Overflow Fade"
 msgstr "溢出渐隐"
@@ -12283,6 +13544,13 @@ msgstr "分页"
 msgid "Pagination"
 msgstr "分页"
 
+msgid "Paid"
+msgstr "已付费"
+
+msgctxt "what a customer has paid in total"
+msgid "Paid"
+msgstr "累计付款"
+
 msgid "Paid work trial"
 msgstr "带薪工作试用"
 
@@ -12352,6 +13620,9 @@ msgstr "密码"
 msgid "Password for {email}"
 msgstr "{email}的密码"
 
+msgid "Past due"
+msgstr "逾期"
+
 msgid "Past month"
 msgstr "过去一个月"
 
@@ -12360,6 +13631,9 @@ msgstr "过去一周"
 
 msgid "Paste"
 msgstr "粘贴"
+
+msgid "Paste or type a link"
+msgstr "粘贴或输入链接"
 
 msgid "Paste this into Superset CLI:"
 msgstr "把它粘贴到Superset CLI："
@@ -12382,11 +13656,41 @@ msgstr "暂停"
 msgid "Pause automation"
 msgstr "暂停自动化"
 
+msgid "Pause notifications"
+msgstr "暂停通知"
+
+msgid "Pause notifications until {when}"
+msgstr "暂停通知至 {when}"
+
+msgid "Pause notifications until status is cleared"
+msgstr "暂停通知，直到状态被清除"
+
+msgid "Pause payment collection"
+msgstr "暂停收款"
+
+msgid "Pause payment collection instead"
+msgstr "改为暂停收款"
+
+msgid "Pause payment collection on {product} for {who} until {resumeDate}?"
+msgstr "要暂停 {who} 的 {product} 收款至 {resumeDate} 吗？"
+
+msgid "Pause payment collection on {product} for {who} with no end date?"
+msgstr "要暂停 {who} 的 {product} 收款且不设结束日期吗？"
+
 msgid "Pause the animation"
 msgstr "暂停动画"
 
 msgid "Pause the nightly cleanup automation"
 msgstr "暂停每晚的清理自动化"
+
+msgid "Pause until date"
+msgstr "暂停截止日期"
+
+msgid "Pause until time"
+msgstr "暂停截止时间"
+
+msgid "Pause your Slack notifications until {when}?"
+msgstr "要将你的 Slack 通知暂停至 {when} 吗？"
 
 msgid "Paused"
 msgstr "已暂停"
@@ -12395,8 +13699,17 @@ msgctxt "project state"
 msgid "Paused"
 msgstr "已暂停"
 
+msgid "Paused indefinitely"
+msgstr "已无限期暂停"
+
+msgid "Paused until {date}"
+msgstr "已暂停至 {date}"
+
 msgid "Pay now"
 msgstr "立即支付"
+
+msgid "Payment attempts"
+msgstr "付款尝试次数"
 
 msgid "Payment failed."
 msgstr "支付失败。"
@@ -12407,17 +13720,26 @@ msgstr "支付方式"
 msgid "Payment Successful"
 msgstr "支付成功"
 
+msgid "Payments"
+msgstr "付款"
+
 msgid "PDF"
 msgstr "PDF"
 
 msgid "Peak pace"
 msgstr "峰值速度"
 
+msgid "Pending"
+msgstr "待处理"
+
 msgid "Pending Invitations"
 msgstr "待处理邀请"
 
 msgid "People"
 msgstr "人员"
+
+msgid "People outside {workspace}"
+msgstr "{workspace} 之外的人员"
 
 msgid "People with access"
 msgstr "有访问权限的人"
@@ -12504,6 +13826,12 @@ msgstr "选择一个声音或添加自己的。自定义音频支持.mp3、.wav�
 msgid "Pick a theme or follow your system appearance. Browse the <0>marketplace<1/></0> or <2>docs<3/></2>."
 msgstr "选择一个主题，或跟随系统外观。浏览<0>市场<1/></0>或<2>文档<3/></2>。"
 
+msgid "Pick a time in the future"
+msgstr "请选择将来的时间"
+
+msgid "Pick a time on {date}"
+msgstr "选择 {date} 的时间"
+
 msgid "Pick a workspace"
 msgstr "选择一个工作区"
 
@@ -12512,6 +13840,9 @@ msgstr "选择一个工作区：其智能体正在等待你的输入、自你上
 
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "选择图标和颜色，或上传自定义图片。默认使用关联的GitHub所有者头像。"
+
+msgid "Pick date & time"
+msgstr "选择日期和时间"
 
 msgid "Pick how {label} signs in inside a sandbox. The credential is handed to the agent process when it launches and is not stored in the sandbox."
 msgstr "选择{label}在沙箱中的登录方式。凭据在启动时交给智能体进程，不会存放在沙箱里。"
@@ -12810,8 +14141,14 @@ msgstr "上一页"
 msgid "Previous (Shift+Enter)"
 msgstr "上一个匹配项（Shift+Enter）"
 
+msgid "Previous Block"
+msgstr "上一个区块"
+
 msgid "Previous branch"
 msgstr "上一个分支"
+
+msgid "Previous Card"
+msgstr "上一张卡片"
 
 msgid "Previous comment"
 msgstr "上一条评论"
@@ -12858,6 +14195,9 @@ msgstr "基础组件"
 msgid "Print"
 msgstr "打印"
 
+msgid "Print all"
+msgstr "全部打印"
+
 msgid "Priority"
 msgstr "优先级"
 
@@ -12903,8 +14243,17 @@ msgstr "处理中..."
 msgid "Product"
 msgstr "产品"
 
+msgid "Product description"
+msgstr "产品说明"
+
 msgid "Product images"
 msgstr "产品图片"
+
+msgid "Product not received"
+msgstr "未收到商品"
+
+msgid "Product unacceptable"
+msgstr "商品不符"
 
 msgid "Production run"
 msgstr "生产运行"
@@ -12994,6 +14343,9 @@ msgstr "项目所在主机不可达，暂时无法重命名"
 msgid "Projects"
 msgstr "项目"
 
+msgid "Projects in {teamName} team"
+msgstr "{teamName} 团队的项目"
+
 msgid "Promoted from a workspace, so its repositories and region are fixed. Promote a workspace again to change them."
 msgstr "由工作区提升而来，因此仓库和区域固定。再次提升一个工作区即可更改。"
 
@@ -13047,6 +14399,15 @@ msgstr "你提交过的提示词会显示在这里。"
 
 msgid "Properties"
 msgstr "属性"
+
+msgid "Propose a new time"
+msgstr "提议新时间"
+
+msgid "Prorated amount {prorated}"
+msgstr "按比例计算的金额 {prorated}"
+
+msgid "Prorated amount {prorated} of {lastPayment}"
+msgstr "按比例计算的金额 {prorated}（共 {lastPayment}）"
 
 msgid "Provide either id or slug"
 msgstr "请提供id或slug"
@@ -13196,6 +14557,9 @@ msgstr "快速反馈"
 msgid "Quick Open File"
 msgstr "快速打开文件"
 
+msgid "Quick suggestions"
+msgstr "快速建议"
+
 msgid "Quickly create a workspace in the current project"
 msgstr "在当前项目中快速创建工作区"
 
@@ -13219,6 +14583,9 @@ msgstr "完全退出Superset"
 
 msgid "Quit the source browser first so its logins are saved to disk. You'll be asked to allow Keychain access."
 msgstr "请先退出源浏览器，让它把登录信息写入磁盘。系统会请求你允许访问钥匙串。"
+
+msgid "Quote"
+msgstr "引用"
 
 msgid "Radix Primitives"
 msgstr "Radix Primitives"
@@ -13261,6 +14628,9 @@ msgstr "共享面板/工作区布局引擎的React层"
 
 msgid "React Native"
 msgstr "React Native"
+
+msgid "React with {name}"
+msgstr "用 {name} 回应"
 
 msgid "Reaction added"
 msgstr "添加了回应"
@@ -13341,6 +14711,9 @@ msgstr "准备好试试Superset了吗？"
 msgid "Reapply all commits"
 msgstr "重新应用所有提交"
 
+msgid "Reason"
+msgstr "原因"
+
 msgid "Reasoning"
 msgstr "推理"
 
@@ -13389,6 +14762,9 @@ msgstr "最近查看"
 msgid "Recents"
 msgstr "最近"
 
+msgid "Recipients"
+msgstr "收件人"
+
 msgid "Recommended size 256×256."
 msgstr "推荐尺寸256×256。"
 
@@ -13400,6 +14776,12 @@ msgstr "重新连接 {name}"
 
 msgid "Reconnect Google"
 msgstr "重新连接Google"
+
+msgid "Reconnect Google to email a note"
+msgstr "重新连接 Google 才能通过邮件发送备注"
+
+msgid "Reconnect Google to reply and archive as you"
+msgstr "重新连接 Google 后即可以你的身份回复和归档"
 
 msgid "Reconnect Linear"
 msgstr "重新连接Linear"
@@ -13473,6 +14855,31 @@ msgstr "下次运行 Claude Code 时刷新。"
 msgid "Refreshes when OpenCode next runs."
 msgstr "下次运行 OpenCode 时刷新。"
 
+msgid "Refund"
+msgstr "退款"
+
+msgctxt "what is refunded with a cancellation"
+msgid "Refund"
+msgstr "退款"
+
+msgid "Refund {refunding} of the {charged} charge to {who}'s {card}?"
+msgstr "要将 {charged} 付款中的 {refunding} 退回 {who} 的 {card} 吗？"
+
+msgid "Refund amount"
+msgstr "退款金额"
+
+msgid "Refund and block"
+msgstr "退款并阻止"
+
+msgid "Refund full amount"
+msgstr "全额退款"
+
+msgid "Refunded"
+msgstr "已退款"
+
+msgid "Refunded {refunded}"
+msgstr "已退款 {refunded}"
+
 msgid "Regenerate"
 msgstr "重新生成"
 
@@ -13499,6 +14906,9 @@ msgstr "已启用中继访问，正在连接中继…"
 
 msgid "Release control"
 msgstr "释放控制"
+
+msgid "Release notes"
+msgstr "版本说明"
 
 msgid "Release notes draft"
 msgstr "发布说明草稿"
@@ -13536,6 +14946,15 @@ msgstr "正在迁移…"
 msgid "rematch"
 msgstr "再来一局"
 
+msgid "Remind"
+msgstr "提醒对象"
+
+msgid "Reminder date"
+msgstr "提醒日期"
+
+msgid "Reminder time"
+msgstr "提醒时间"
+
 msgid "remote"
 msgstr "远程"
 
@@ -13563,18 +14982,39 @@ msgstr "远程工作区，设备离线"
 msgid "Remove"
 msgstr "移除"
 
+msgctxt "a change to a canvas"
+msgid "Remove"
+msgstr "移除"
+
+#. placeholder {0}: displayName(address)
+#. placeholder {0}: file.name
 #. placeholder {0}: member.name
 msgid "Remove {0}"
 msgstr "移除{0}"
 
+msgid "Remove {email}"
+msgstr "移除 {email}"
+
 msgid "Remove {label}?"
 msgstr "移除{label}？"
+
+msgid "Remove {name}"
+msgstr "移除 {name}"
 
 msgid "Remove {repositoryName}"
 msgstr "移除 {repositoryName}"
 
+msgid "Remove a person from the current channel"
+msgstr "将某人移出当前频道"
+
 msgid "Remove attachment"
 msgstr "移除附件"
+
+msgid "Remove blocked files and send"
+msgstr "移除被阻止的文件并发送"
+
+msgid "Remove formatting"
+msgstr "清除格式"
 
 msgid "Remove from favorites"
 msgstr "从收藏中移除"
@@ -13593,6 +15033,12 @@ msgstr "移除图标"
 
 msgid "Remove image"
 msgstr "移除图片"
+
+msgid "Remove label {name}"
+msgstr "移除标签 {name}"
+
+msgid "Remove link"
+msgstr "移除链接"
 
 msgid "Remove linked issue"
 msgstr "移除关联的议题"
@@ -13726,6 +15172,9 @@ msgstr "在下拉菜单／菜单栏项中渲染已注册的快捷键"
 msgid "Renews {0}."
 msgstr "将于{0}续订。"
 
+msgid "Renews {renews}"
+msgstr "将于 {renews} 续订"
+
 msgid "Reopen"
 msgstr "重新打开"
 
@@ -13747,6 +15196,10 @@ msgstr "重新排序智能体"
 msgid "Replace"
 msgstr "替换"
 
+msgctxt "a change to a canvas"
+msgid "Replace"
+msgstr "替换"
+
 msgid "Replace All"
 msgstr "全部替换"
 
@@ -13765,8 +15218,27 @@ msgstr "已替换{where}中的1个文件"
 msgid "Reply"
 msgstr "回复"
 
+msgctxt "the text of a reply email"
+msgid "Reply"
+msgstr "回复"
+
+msgid "Reply \"{quote}\" in the thread?"
+msgstr "要在消息列中回复“{quote}”吗？"
+
+msgid "Reply all"
+msgstr "全部回复"
+
+msgid "Reply in thread"
+msgstr "在讨论串中回复"
+
 msgid "Reply to thread…"
 msgstr "回复讨论串…"
+
+msgid "Reply with the link"
+msgstr "回复该链接"
+
+msgid "Reply…"
+msgstr "回复…"
 
 msgid "Replying to {replyingTo}"
 msgstr "回复 {replyingTo}"
@@ -13825,6 +15297,9 @@ msgstr "申请试用"
 msgid "Request Body"
 msgstr "请求体"
 
+msgid "Requested by customer"
+msgstr "客户要求"
+
 msgid "requested changes"
 msgstr "请求了更改"
 
@@ -13842,6 +15317,9 @@ msgstr "所需版本：{minimumVersion}+"
 
 msgid "Requires iOS 26 or iPadOS 26 or later. Included with Superset Pro."
 msgstr "需要 iOS 26 或 iPadOS 26 或更高版本。包含在 Superset Pro 中。"
+
+msgid "Reschedule"
+msgstr "重新安排时间"
 
 msgid "Reserved by OS"
 msgstr "已被系统占用"
@@ -13943,6 +15421,9 @@ msgstr "解决讨论串"
 msgid "Resolved"
 msgstr "已解决"
 
+msgid "Resolved by the agent"
+msgstr "由代理解决"
+
 msgid "Resource consumption"
 msgstr "资源占用"
 
@@ -13951,6 +15432,9 @@ msgstr "资源监视器"
 
 msgid "Resources"
 msgstr "资源"
+
+msgid "Respond by {date}"
+msgstr "请在 {date} 前回应"
 
 msgid "Response"
 msgstr "响应"
@@ -14081,6 +15565,18 @@ msgstr "恢复参数"
 
 msgid "Resume automation"
 msgstr "恢复自动化"
+
+msgid "Resume date"
+msgstr "恢复日期"
+
+msgid "Resume notifications"
+msgstr "恢复通知"
+
+msgid "Resume payment collection"
+msgstr "恢复收款"
+
+msgid "Resume payment collection on {product} for {who}?"
+msgstr "要恢复 {who} 的 {product} 收款吗？"
 
 #. placeholder {0}: candidate.agentLabel
 msgid "Resuming {0}…"
@@ -14273,6 +15769,9 @@ msgstr "综合评测"
 msgid "Route {label} through a provider you run, with the credentials you hold. Saved values are handed to the agent at launch."
 msgstr "让{label}走你自己运行的提供商，用你手中的凭据。保存的值会在启动时交给智能体。"
 
+msgid "Route nothing"
+msgstr "全部不分派"
+
 msgid "Routine tickets with no mid-task intervention"
 msgstr "常规工单无需中途干预"
 
@@ -14281,6 +15780,15 @@ msgstr "行操作"
 
 msgid "Rows changed"
 msgstr "行有变更"
+
+msgid "RSVP: Maybe"
+msgstr "回复：待定"
+
+msgid "RSVP: No"
+msgstr "回复：不参加"
+
+msgid "RSVP: Yes"
+msgstr "回复：参加"
 
 msgid "Run"
 msgstr "运行"
@@ -14512,6 +16020,9 @@ msgstr "正在保存..."
 msgid "Saving…"
 msgstr "正在保存…"
 
+msgid "Say what instead"
+msgstr "说明改为做什么"
+
 msgid "Scale to 100+ agents"
 msgstr "扩展至 100 多个智能体"
 
@@ -14530,14 +16041,32 @@ msgstr "计划"
 msgid "Schedule a daily automation that triages new Linear issues at 9am"
 msgstr "安排一个每天上午9点分类新Linear议题的自动化"
 
+msgid "Schedule for {when}"
+msgstr "定时在 {when} 发送"
+
+msgid "Schedule for later"
+msgstr "定时稍后发送"
+
 msgid "Schedule meetings"
 msgstr "安排会议"
+
+msgid "Schedule message"
+msgstr "定时发送消息"
 
 msgid "Schedule recurring runs, run on demand, pause, resume, and read logs."
 msgstr "安排定时运行、按需运行、暂停、恢复并读取日志。"
 
+msgid "Schedule send"
+msgstr "定时发送"
+
+msgid "Schedule this for {where} on {when}?"
+msgstr "要定时在 {when} 将此内容发送到 {where} 吗？"
+
 msgid "Schedule."
 msgstr "计划。"
+
+msgid "Scheduled"
+msgstr "已排期"
 
 msgid "Scheduled and event-triggered agents (cron, GitHub events, webhooks) with ready-made templates."
 msgstr "定时和事件触发的智能体（cron、GitHub事件、webhook），并提供现成模板。"
@@ -14612,6 +16141,9 @@ msgstr "搜索开发者"
 
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "一次搜索所有文件内容和所有工作区。"
+
+msgid "Search all emoji"
+msgstr "搜索所有表情"
 
 msgid "Search and open files in the current workspace"
 msgstr "在当前工作区中搜索并打开文件"
@@ -14726,6 +16258,9 @@ msgstr "搜索拉取请求…"
 
 msgid "Search repositories..."
 msgstr "搜索仓库..."
+
+msgid "Search results"
+msgstr "搜索结果"
 
 msgid "Search settings..."
 msgstr "搜索设置..."
@@ -14871,6 +16406,9 @@ msgstr "选择一个项目来查看拉取请求。"
 msgid "Select a pull request to preview it here."
 msgstr "选择一个拉取请求，在这里预览。"
 
+msgid "Select a reason"
+msgstr "选择原因"
+
 msgid "Select a team"
 msgstr "选择团队"
 
@@ -14985,6 +16523,12 @@ msgstr "选择团队"
 msgid "Select terminal script directory"
 msgstr "选择终端脚本目录"
 
+msgid "Select the next card and show it. The down arrow does the same"
+msgstr "选中并显示下一张卡片。向下箭头键效果相同"
+
+msgid "Select the previous card and show it. The up arrow does the same"
+msgstr "选中并显示上一张卡片。向上箭头键效果相同"
+
 msgid "Select worktree location"
 msgstr "选择worktree位置"
 
@@ -15006,11 +16550,29 @@ msgstr "在终端中选中文本后立即复制到剪贴板，并去除行尾空
 msgid "Send"
 msgstr "发送"
 
+msgid "Send again"
+msgstr "重新发送"
+
 msgid "Send an invitation to join {organizationName}. Expires in 48 hours."
 msgstr "发送加入{organizationName}的邀请。48小时后过期。"
 
+msgid "Send answer"
+msgstr "发送回答"
+
+msgid "Send back"
+msgstr "退回"
+
+msgid "Send date"
+msgstr "发送日期"
+
+msgid "Send invitation"
+msgstr "发送邀请"
+
 msgid "Send Invitation"
 msgstr "发送邀请"
+
+msgid "Send invoice"
+msgstr "发送账单"
 
 msgid "Send invoices in a minute"
 msgstr "一分钟发出发票"
@@ -15024,6 +16586,12 @@ msgstr "发送消息"
 msgid "Send now"
 msgstr "立即发送"
 
+msgid "Send on"
+msgstr "发送于"
+
+msgid "Send proposal"
+msgstr "发送提议"
+
 msgid "Send reply"
 msgstr "发送回复"
 
@@ -15033,8 +16601,17 @@ msgstr "提交举报"
 msgid "Send review"
 msgstr "发送审查"
 
+msgid "Send scheduled for {when}"
+msgstr "已安排在 {when} 发送"
+
 msgid "Send the link. Your team opens it in a browser or in Superset."
 msgstr "发送链接。团队可以在浏览器或 Superset 里打开。"
+
+msgid "Send this to {where}?"
+msgstr "要将此内容发送到 {where} 吗？"
+
+msgid "Send time"
+msgstr "发送时间"
 
 msgid "Send to"
 msgstr "发送给"
@@ -15047,6 +16624,9 @@ msgstr "发送到聊天"
 
 msgid "Send to chat ({draftCount})"
 msgstr "发送到聊天（{draftCount}）"
+
+msgid "Send update-card link"
+msgstr "发送更新银行卡的链接"
 
 msgid "Sending"
 msgstr "正在发送"
@@ -15072,6 +16652,9 @@ msgstr "发送时间"
 msgid "Sent to agent"
 msgstr "已发送给智能体"
 
+msgid "Sent to the agent"
+msgstr "已发送给智能体"
+
 msgid "Sent to the pull request's workspace"
 msgstr "已发送到拉取请求的工作区"
 
@@ -15086,6 +16669,9 @@ msgstr "分隔线"
 
 msgid "Service availability is published at <0>status.superset.sh</0>, and security and compliance documentation at <1>trust.superset.sh</1>."
 msgstr "服务可用性发布在<0>status.superset.sh</0>，安全与合规文档在<1>trust.superset.sh</1>。"
+
+msgid "Service date"
+msgstr "服务日期"
 
 msgid "Session"
 msgstr "会话"
@@ -15122,12 +16708,27 @@ msgstr "会话"
 msgid "Sessions · top {0} by cost"
 msgstr "会话 · 按费用排名前{0}"
 
+msgid "Set a priority to accept this issue"
+msgstr "设置优先级后才能接受此事项"
+
+msgid "Set a reminder"
+msgstr "设置提醒"
+
+msgid "Set as a pre-release"
+msgstr "设为预发布版本"
+
+msgid "Set as the latest release"
+msgstr "设为最新版本"
+
 #. placeholder {0}: color.name
 msgid "Set color to {0}"
 msgstr "将颜色设为{0}"
 
 msgid "Set date"
 msgstr "设置日期"
+
+msgid "Set estimate to…"
+msgstr "将估算设为…"
 
 msgid "Set group color"
 msgstr "设置分组颜色"
@@ -15136,11 +16737,20 @@ msgstr "设置分组颜色"
 msgid "Set icon to {0}"
 msgstr "将图标设为{0}"
 
+msgid "Set priority to…"
+msgstr "将优先级设为…"
+
 msgid "Set project…"
 msgstr "设置项目…"
 
+msgid "Set reminder"
+msgstr "设置提醒"
+
 msgid "Set Run"
 msgstr "设置运行命令"
+
+msgid "Set status"
+msgstr "设置状态"
 
 msgid "Set this project"
 msgstr "设为此项目"
@@ -15175,6 +16785,18 @@ msgstr "用智能体设置"
 
 msgid "Set up your organization to get started"
 msgstr "设置你的组织即可开始"
+
+msgid "Set your Slack status to {status} until {when} and pause notifications?"
+msgstr "要将你的 Slack 状态设为 {status} 直到 {when}，并暂停通知吗？"
+
+msgid "Set your Slack status to {status} until {when}?"
+msgstr "要将你的 Slack 状态设为 {status} 直到 {when} 吗？"
+
+msgid "Set your Slack status to {status}?"
+msgstr "要将你的 Slack 状态设为 {status} 吗？"
+
+msgid "Set yourself as away"
+msgstr "将自己设为离开"
 
 msgid "Setting saved"
 msgstr "设置已保存"
@@ -15305,6 +16927,9 @@ msgstr "在聊天输入框中显示麦克风。如果 Codex 已登录 ChatGPT，
 msgid "Show a Usage button in the home sidebar, under Pull requests"
 msgstr "在主页侧边栏的“拉取请求”下方显示“用量”按钮"
 
+msgid "Show all"
+msgstr "显示全部"
+
 msgid "Show all {count}"
 msgstr "显示全部{count}条"
 
@@ -15353,6 +16978,9 @@ msgstr "收起"
 msgid "Show file tree"
 msgstr "显示文件树"
 
+msgid "Show formatting"
+msgstr "显示格式"
+
 msgid "Show in bar"
 msgstr "在工具栏显示"
 
@@ -15392,6 +17020,9 @@ msgstr "在侧边栏中显示"
 msgid "Show open items"
 msgstr "只显示打开的条目"
 
+msgid "Show or hide the inbox of cards agents have sent you"
+msgstr "显示或隐藏代理发来的卡片收件箱"
+
 msgid "Show original"
 msgstr "显示原文"
 
@@ -15419,6 +17050,9 @@ msgstr "在侧边栏每个工作区下显示正在运行的智能体及其实时
 msgid "Show Scripts Bar"
 msgstr "显示脚本栏"
 
+msgid "Show session"
+msgstr "显示会话"
+
 msgid "Show sessions"
 msgstr "显示会话"
 
@@ -15428,8 +17062,14 @@ msgstr "为此智能体显示状态并发送通知。"
 msgid "Show the triggering payload"
 msgstr "显示触发负载"
 
+msgid "Show the whole canvas"
+msgstr "显示整个画板"
+
 msgid "Show translation"
 msgstr "显示译文"
+
+msgid "Show trimmed content"
+msgstr "显示被剪辑的内容"
 
 msgid "Show usage tab on sidebar"
 msgstr "在侧边栏显示用量选项卡"
@@ -15588,6 +17228,9 @@ msgstr "模拟器"
 msgid "Since 2025"
 msgstr "自2025年起"
 
+msgid "Since then"
+msgstr "此后"
+
 msgid "Single tab + panes"
 msgstr "单标签页+窗格"
 
@@ -15624,6 +17267,9 @@ msgstr "技能"
 msgid "Skills ship with the Superset plugin and are kept up to date automatically in every agent you use. Click one to preview it."
 msgstr "技能随Superset插件一起提供，并会在你使用的每个智能体中自动保持最新。点击一个即可预览。"
 
+msgid "Skin Tone"
+msgstr "肤色"
+
 msgid "Skip"
 msgstr "跳过"
 
@@ -15636,17 +17282,32 @@ msgstr "暂时跳过"
 msgid "Skipped"
 msgstr "已跳过"
 
+msgid "Slack"
+msgstr "Slack"
+
 msgid "Slack Account Linked"
 msgstr "Slack账户已关联"
 
 msgid "Slack API error occurred. Please try again."
 msgstr "发生了Slack API错误。请重试。"
 
+msgid "Slack can't post this in a thread from here"
+msgstr "Slack 无法从这里将其发到话题中"
+
 msgid "Slack integration"
 msgstr "Slack集成"
 
 msgid "Slack Integration"
 msgstr "Slack集成"
+
+msgid "Slack isn't connected. Connect it to reply as you."
+msgstr "Slack 未连接。连接后即可以你本人身份回复。"
+
+msgid "Slack message to {where}"
+msgstr "发给{where}的Slack消息"
+
+msgid "Slack schedules messages up to 120 days ahead"
+msgstr "Slack 最多可提前 120 天定时发送消息"
 
 msgid "Slate"
 msgstr "石板灰"
@@ -15663,6 +17324,9 @@ msgstr "Slug"
 msgid "Small"
 msgstr "小"
 
+msgid "Smileys & People"
+msgstr "笑脸与人物"
+
 msgid "Smoother onboarding"
 msgstr "更顺畅的上手流程"
 
@@ -15671,6 +17335,15 @@ msgstr "为此工作区的当前状态（包括其中安装的所有内容）创
 
 msgid "Snooze"
 msgstr "稍后提醒"
+
+msgid "Snooze date"
+msgstr "延后日期"
+
+msgid "Snooze time"
+msgstr "延后时间"
+
+msgid "Snoozed until {snoozedUntil}"
+msgstr "已延后至 {snoozedUntil}"
 
 msgid "so a border on two edges of the rotated square always faces outward."
 msgstr "因此旋转后方块两条边上的边框始终朝外。"
@@ -15781,6 +17454,10 @@ msgstr "源码路径（不是导入路径）"
 
 msgid "Sources"
 msgstr "来源"
+
+msgctxt "Gmail label"
+msgid "Spam"
+msgstr "垃圾邮件"
 
 msgid "Spam or a scam"
 msgstr "垃圾信息或诈骗"
@@ -15978,6 +17655,9 @@ msgstr "在 iPhone 或 iPad 上启动智能体、实时跟进并审查差异。�
 msgid "Start an agent or a terminal to begin working in this workspace."
 msgstr "启动一个智能体或终端，开始在此工作区中工作。"
 
+msgid "Start an agent to fix it"
+msgstr "启动智能体来修复"
+
 msgid "Start browsing"
 msgstr "开始浏览"
 
@@ -16008,8 +17688,14 @@ msgstr "用标签栏中的+新建一个。"
 msgid "Start or stop the workspace run command"
 msgstr "启动或停止工作区运行命令"
 
+msgid "Start time"
+msgstr "开始时间"
+
 msgid "Start voice mode"
 msgstr "开始语音模式"
+
+msgid "Start with an agent"
+msgstr "使用智能体开始"
 
 msgid "Start with the work."
 msgstr "从工作本身开始。"
@@ -16035,6 +17721,9 @@ msgstr "正在为此拉取请求启动工作区"
 msgid "Starting an agent in {what}"
 msgstr "正在 {what} 中启动代理"
 
+msgid "Starting balance"
+msgstr "期初余额"
+
 msgid "Starting cloud workspace"
 msgstr "正在启动云端工作区"
 
@@ -16052,6 +17741,9 @@ msgstr "正在启动工作区"
 
 msgid "Starting…"
 msgstr "正在启动…"
+
+msgid "Starts"
+msgstr "开始"
 
 #. placeholder {0}: cancelAt ? format(new Date(cancelAt), "MMMM d, yyyy") : ""
 msgid "Starts {0}"
@@ -16078,6 +17770,9 @@ msgstr "状态"
 msgid "Status changed"
 msgstr "状态变更"
 
+msgid "Status emoji"
+msgstr "状态表情"
+
 msgid "Stay connected (refresh tokens)"
 msgstr "保持连接（刷新令牌）"
 
@@ -16087,6 +17782,9 @@ msgstr "引导"
 #. placeholder {0}: step === "workspace" ? 1 : 2
 msgid "Step {0} of 2"
 msgstr "第{0}步，共2步"
+
+msgid "Step {number}: {name}"
+msgstr "步骤{number}：{name}"
 
 msgid "Steps 3 and 4 repeat at every scheduled time."
 msgstr "第 3 步和第 4 步会在每个计划时间重复。"
@@ -16171,8 +17869,14 @@ msgstr "子智能体"
 msgid "Subagents"
 msgstr "子智能体"
 
+msgid "Subject"
+msgstr "主题"
+
 msgid "Subject contains..."
 msgstr "主题包含..."
+
+msgid "subject:"
+msgstr "主题："
 
 msgid "Submit"
 msgstr "提交"
@@ -16203,6 +17907,15 @@ msgstr "订阅"
 
 msgid "Subscription"
 msgstr "订阅"
+
+msgid "Subscription canceled"
+msgstr "订阅已取消"
+
+msgid "Subscriptions"
+msgstr "订阅"
+
+msgid "Succeeded"
+msgstr "成功"
 
 msgid "Success"
 msgstr "成功"
@@ -16562,6 +18275,9 @@ msgstr "切换到工作区9"
 msgid "Symbol, light"
 msgstr "图形标志，浅色"
 
+msgid "Symbols"
+msgstr "符号"
+
 msgid "Sync"
 msgstr "同步"
 
@@ -16631,11 +18347,20 @@ msgstr "接管控制"
 msgid "Take me home"
 msgstr "回到首页"
 
+msgid "Take the focused block's \"no\": do not send, keep as is, decline, or skip an optional question"
+msgstr "执行当前区块的“否”：不发送、保持原样、拒绝或跳过可选问题"
+
+msgid "Take the focused block's main action: send, approve, accept, or send the answer to a question"
+msgstr "执行当前区块的主要操作：发送、批准、接受或发送问题的回答"
+
 msgid "Taken"
 msgstr "已被占用"
 
 msgid "Takes effect in new agent sessions."
 msgstr "会在新的智能体会话中生效。"
+
+msgid "Taking a look…"
+msgstr "正在查看…"
 
 msgid "Taking longer than usual. It keeps going if you leave."
 msgstr "比平时久一些。你离开后它也会继续。"
@@ -16848,11 +18573,17 @@ msgstr "条款"
 msgid "Terms of Service"
 msgstr "服务条款"
 
+msgid "Test mode"
+msgstr "测试模式"
+
 msgid "test the signup flow on my dev server"
 msgstr "在我的开发服务器上测试注册流程"
 
 msgid "Text"
 msgstr "正文"
+
+msgid "Text color"
+msgstr "文字颜色"
 
 msgid "Text input with emoji picker support"
 msgstr "支持emoji选择器的文本输入框"
@@ -16881,6 +18612,15 @@ msgstr "该账号已断开连接，请选择其他账号。"
 msgid "That agent session has no conversation to open yet — it was started but never prompted."
 msgstr "该智能体会话还没有可打开的对话——它已启动但从未收到指令。"
 
+msgid "That block is not an integration card"
+msgstr "此区块不是集成卡片"
+
+msgid "That command needs more after it"
+msgstr "该命令后面还需要内容"
+
+msgid "That cursor could not be read. Drop it to start from the first page."
+msgstr "无法读取该游标。去掉它即可从第一页开始。"
+
 msgid "That endpoint could not be resolved."
 msgstr "无法解析该端点。"
 
@@ -16889,6 +18629,9 @@ msgstr "该端点不被允许。"
 
 msgid "That handle is taken."
 msgstr "该用户名已被占用。"
+
+msgid "That isn't a command you can use here"
+msgstr "此处无法使用该命令"
 
 msgid "That Linear issue doesn't exist or you can't see it."
 msgstr "该 Linear 问题不存在，或你无权查看。"
@@ -16902,6 +18645,12 @@ msgstr "该机器已不可用"
 msgid "That name isn't allowed."
 msgstr "该名称不被允许。"
 
+msgid "That page is visible only to you. Publish it to the organization before sending it to someone else"
+msgstr "该页面仅对你可见。发送给他人之前，请先将其发布到组织"
+
+msgid "The {product} subscription is canceled now."
+msgstr "{product} 订阅将立即取消。"
+
 msgid "The 2026 bet"
 msgstr "2026年的赌注"
 
@@ -16910,6 +18659,9 @@ msgstr "当前组织"
 
 msgid "The address is unreachable"
 msgstr "无法访问该地址"
+
+msgid "The agent changed this card. Read it again before you act."
+msgstr "智能体更改了此卡片。请重新阅读后再操作。"
 
 msgid "The agent clicks and types in the same pane to test the change. You watch it happen."
 msgstr "智能体在同一个窗格中点击和输入来测试修改。你可以看着它完成。"
@@ -16965,6 +18717,9 @@ msgstr "连接已被关闭"
 msgid "The current prompt will be replaced with the selected version. A new \"Restored\" entry will be added to history so you can undo this."
 msgstr "当前提示词会被所选版本替换。历史中会新增一条“已恢复”记录，方便你撤销。"
 
+msgid "The customer disputed this payment"
+msgstr "客户对此付款提出了争议"
+
 msgid "The daemon couldn't hand off your live sessions to the new binary. Reason:"
 msgstr "守护进程无法将你的活动会话移交给新的二进制文件。原因："
 
@@ -16985,6 +18740,10 @@ msgstr "差异仍是最新的，只是评论没能加载。"
 
 msgid "The dispatcher appears"
 msgstr "调度员出现"
+
+#. js-lingui-explicit-id
+msgid "serverError.inbox.documentVersionConflict"
+msgstr "文档当前为版本 {current}。请重新拉取后再写入。"
 
 msgid "The endpoint must use https."
 msgstr "端点必须使用 https。"
@@ -17098,6 +18857,9 @@ msgstr "本地主机服务未运行，因此此设备上没有任何服务能提
 msgid "The local host service just came up. Reconnecting to it now."
 msgstr "本地主机服务刚刚启动。正在重新连接。"
 
+msgid "The machine this session runs on is not reachable right now."
+msgstr "运行此会话的机器当前无法访问。"
+
 msgid "The majority of merged agent PRs need review only, with zero human edits."
 msgstr "多数已合并的智能体PR只需审查，无需任何人工修改。"
 
@@ -17134,8 +18896,17 @@ msgstr "你要找的页面不存在。"
 msgid "The pane uses your real logins. Agents ask you before they take a consequential action."
 msgstr "窗格使用你真实的登录状态。智能体在执行重要操作前会先征求你的同意。"
 
+msgid "The payment method and email are added to your block lists."
+msgstr "支付方式和邮箱会被添加到你的阻止列表。"
+
+msgid "the payment method on file"
+msgstr "已保存的支付方式"
+
 msgid "The project's checkout as it is: files and branch are shared"
 msgstr "按原样使用项目的检出: 文件和分支是共享的"
+
+msgid "The proposed time has passed"
+msgstr "建议的时间已过"
 
 #. placeholder {0}: params?.status
 msgid "The provider answered {0}."
@@ -17211,6 +18982,9 @@ msgstr "团队"
 msgid "The team invitation has either expired or doesn't exist. Request a new link from the team owner or check the URL to make sure it is entered correctly."
 msgstr "该团队邀请已过期或不存在。请向团队所有者索取新链接，或检查URL是否输入正确。"
 
+msgid "The terminal this card came from, beside the card"
+msgstr "此卡片来源的终端，显示在卡片旁"
+
 msgid "The title shows everywhere this page is listed and in its link preview."
 msgstr "标题会显示在此页面列出的所有位置以及链接预览中。"
 
@@ -17252,6 +19026,9 @@ msgstr "主题"
 
 msgid "Themes and agents"
 msgstr "主题与智能体"
+
+msgid "There was an inquiry on this payment"
+msgstr "此付款收到了查询"
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "创建工作区时会自动运行这些命令。<0>阅读文档<1/></0>"
@@ -17314,8 +19091,32 @@ msgstr "此自动化尚无指令。请先在设置中编写提示词，然后再
 msgid "This automation is in another organization"
 msgstr "此自动化位于其他组织"
 
+msgid "This block needs a newer version of the app."
+msgstr "此区块需要更新版本的应用。"
+
+msgid "This branch has conflicts that must be resolved"
+msgstr "此分支存在必须解决的冲突"
+
+msgid "This branch is out-of-date with the base branch"
+msgstr "此分支落后于基准分支"
+
+msgid "This branch is up to date"
+msgstr "此分支已是最新"
+
 msgid "This cannot be undone."
 msgstr "此操作无法撤销。"
+
+msgid "This card could not be loaded."
+msgstr "无法加载此卡片。"
+
+msgid "This card has nothing to open in another app"
+msgstr "此卡片没有可在其他应用中打开的内容"
+
+msgid "This card is gone."
+msgstr "此卡片已不存在。"
+
+msgid "This card was already resolved"
+msgstr "此卡片已处理"
 
 msgid "This chat has ended."
 msgstr "此聊天已结束。"
@@ -17343,6 +19144,9 @@ msgstr "无法启动此云端工作区"
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "正在唤醒此云工作区。如果它已闲置一段时间，可能需要最多 30 秒。"
+
+msgid "this customer"
+msgstr "该客户"
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "这将删除用于重启/崩溃恢复的已保存回滚缓冲。"
@@ -17401,6 +19205,9 @@ msgstr "这个邀请已被接受。"
 msgid "This invitation link is invalid or has expired."
 msgstr "这个邀请链接无效或已过期。"
 
+msgid "This is nothing"
+msgstr "这不重要"
+
 msgid "This is taking longer than usual. The sandbox may still be pulling its image — it keeps going whether this window is open or not."
 msgstr "这比平时耗时更久。沙箱可能仍在拉取镜像 — 无论此窗口是否打开，它都会继续。"
 
@@ -17427,6 +19234,9 @@ msgstr "这台Mac"
 
 msgid "This machine"
 msgstr "本机"
+
+msgid "This message was deleted."
+msgstr "此消息已删除。"
 
 msgid "This Microsoft tenant is already connected by {detail}. Ask them to disconnect first."
 msgstr "这个Microsoft租户已被{detail}连接。请让对方先断开连接。"
@@ -17475,6 +19285,9 @@ msgstr "无法显示此窗格"
 
 msgid "This pane hit an error"
 msgstr "此窗格出错了"
+
+msgid "This part of the card was already answered"
+msgstr "卡片的这一部分已经回答过了"
 
 msgid "This path exists, but it is not a directory."
 msgstr "此路径存在，但不是目录。"
@@ -17529,6 +19342,10 @@ msgstr "此仓库不允许从这里合并。"
 
 msgid "This screen doesn't exist"
 msgstr "此页面不存在"
+
+#. js-lingui-explicit-id
+msgid "serverError.inbox.tooManyOpenCards"
+msgstr "此会话已有 {max} 张未回复的卡片。请先处理一张，或用 --key 将其合并到现有卡片。"
 
 msgid "This Slack workspace is already connected by {owner}. Ask them to disconnect first."
 msgstr "这个Slack工作区已被{owner}连接。请让对方先断开连接。"
@@ -17621,6 +19438,9 @@ msgstr "这将取消暂存并还原所有已暂存的更改。已暂存的新文
 msgid "This workspace"
 msgstr "此工作区"
 
+msgid "This workspace has no agent session to show."
+msgstr "此工作区没有可显示的智能体会话。"
+
 msgid "This workspace has no project to branch from"
 msgstr "此工作区没有可供分叉的项目"
 
@@ -17672,11 +19492,24 @@ msgstr "标题"
 msgid "To"
 msgstr "到"
 
+#. placeholder {0}: formatList(everyone.map(short))
+msgid "to {0}"
+msgstr "发送至 {0}"
+
+msgid "To {recipients}"
+msgstr "收件人：{recipients}"
+
 msgid "To resume an agent conversation, run this in its folder:"
 msgstr "要恢复与智能体的对话，请在其文件夹中运行："
 
 msgid "To resume another agent conversation, run this in its folder:"
 msgstr "要恢复其他与智能体的对话，请在其文件夹中运行："
+
+msgid "to:"
+msgstr "收件人："
+
+msgid "To:"
+msgstr "收件人："
 
 msgid "Toast (Sonner)"
 msgstr "Toast（Sonner）"
@@ -17689,6 +19522,9 @@ msgstr "今天"
 
 msgid "TODAY"
 msgstr "今天"
+
+msgid "Today at {time}"
+msgstr "今天 {time}"
 
 msgid "Todo"
 msgstr "待办"
@@ -17704,6 +19540,9 @@ msgstr "展开/收起描述"
 
 msgid "Toggle Group"
 msgstr "切换控件组"
+
+msgid "Toggle Inbox"
+msgstr "切换收件箱"
 
 msgid "Toggle italic"
 msgstr "切换斜体"
@@ -17767,6 +19606,18 @@ msgstr "每次会话的 Token，近 30 天"
 
 msgid "Tokens stay off your machine"
 msgstr "令牌不会留在你的设备上"
+
+msgid "Tomorrow"
+msgstr "明天"
+
+msgid "Tomorrow afternoon"
+msgstr "明天下午"
+
+msgid "Tomorrow at {tomorrowClock}"
+msgstr "明天 {tomorrowClock}"
+
+msgid "Tomorrow morning"
+msgstr "明天上午"
 
 msgid "Too many dictations. Try again later."
 msgstr "语音输入次数过多，请稍后再试。"
@@ -17876,6 +19727,13 @@ msgstr "正在转写…"
 msgid "Translated"
 msgstr "已翻译"
 
+msgctxt "Gmail label"
+msgid "Trash"
+msgstr "已删除邮件"
+
+msgid "Travel & Places"
+msgstr "旅行与地点"
+
 msgid "Tree view"
 msgstr "树状视图"
 
@@ -17890,6 +19748,12 @@ msgstr "分类新议题"
 
 msgid "triaging 12 new issues…"
 msgstr "正在分类12个新议题…"
+
+msgid "Trial ends {trialEnds}"
+msgstr "试用将于 {trialEnds} 结束"
+
+msgid "Trialing"
+msgstr "试用中"
 
 msgid "Trigger"
 msgstr "触发器"
@@ -17993,6 +19857,12 @@ msgstr "给Claude写个任务…"
 msgid "Type here to send to the terminal"
 msgstr "在此输入以发送到终端"
 
+msgid "Type or choose a user"
+msgstr "输入或选择用户"
+
+msgid "Type or paste a link"
+msgstr "输入或粘贴链接"
+
 msgid "Type the organization name to confirm."
 msgstr "输入组织名称以确认。"
 
@@ -18079,6 +19949,9 @@ msgstr "未提交 · 未推送"
 
 msgid "Uncommitted changes"
 msgstr "未提交的更改"
+
+msgid "Under review"
+msgstr "审核中"
 
 msgid "Underline"
 msgstr "下划线"
@@ -18204,6 +20077,15 @@ msgstr "未上榜"
 msgid "Unranked until {0} days carry usage."
 msgstr "在累计 {0} 天使用记录之前不参与排名。"
 
+msgid "Unread"
+msgstr "未读"
+
+msgid "Unread & read"
+msgstr "未读和已读"
+
+msgid "Unrecognized"
+msgstr "无法识别"
+
 msgid "Unresolve"
 msgstr "取消解决"
 
@@ -18226,6 +20108,15 @@ msgstr "未暂存"
 msgid "Unsupported item \"{0}\""
 msgstr "不支持的项目“{0}”"
 
+msgid "until {when}"
+msgstr "至 {when}"
+
+msgid "Until a custom date"
+msgstr "直到自定义日期"
+
+msgid "Until tomorrow"
+msgstr "到明天"
+
 msgid "Untitled"
 msgstr "未命名"
 
@@ -18246,6 +20137,10 @@ msgstr "即将开始"
 
 msgid "Up to date"
 msgstr "已是最新"
+
+msgctxt "cycle"
+msgid "Upcoming"
+msgstr "即将开始"
 
 msgid "Update"
 msgstr "更新"
@@ -18298,6 +20193,12 @@ msgstr "请在这台机器上更新Superset以附加文件"
 
 msgid "update the branch prefix"
 msgstr "更新分支前缀"
+
+msgid "Update with merge commit"
+msgstr "使用合并提交更新"
+
+msgid "Update with rebase"
+msgstr "使用变基更新"
 
 msgid "Updated"
 msgstr "已更新"
@@ -18384,6 +20285,9 @@ msgstr "用量分区"
 
 msgid "Usage unavailable."
 msgstr "无法获取用量。"
+
+msgid "Usage-based"
+msgstr "按用量计费"
 
 #. placeholder {0}: search.trim()
 msgid "Use “{0}”"
@@ -18485,6 +20389,9 @@ msgstr "user@example.com"
 msgid "user@host, ssh://user@host:2222, or an ssh config alias"
 msgstr "user@host、ssh://user@host:2222 或 ssh 配置中的别名"
 
+msgid "Users"
+msgstr "用户"
+
 msgid "Using random branch name (AI generation timed out)"
 msgstr "使用随机分支名（AI生成超时）"
 
@@ -18578,6 +20485,9 @@ msgstr "查看全部（另有 {moreCount} 项）"
 msgid "View comment by {0}"
 msgstr "查看{0}的评论"
 
+msgid "View entire message"
+msgstr "查看完整邮件"
+
 msgid "View file"
 msgstr "查看文件"
 
@@ -18629,6 +20539,9 @@ msgstr "查看用量"
 msgid "Violence or harassment"
 msgstr "暴力或骚扰"
 
+msgid "Visibility"
+msgstr "可见性"
+
 msgid "Visible to"
 msgstr "可见范围"
 
@@ -18644,11 +20557,23 @@ msgstr "语音设置"
 msgid "VoiceOver"
 msgstr "VoiceOver"
 
+msgid "Void"
+msgstr "已作废"
+
+msgid "Void invoice"
+msgstr "作废账单"
+
+msgid "Void invoices"
+msgstr "作废账单"
+
 msgid "Volume"
 msgstr "音量"
 
 msgid "VS Code"
 msgstr "VS Code"
+
+msgid "Wait for the files to finish attaching"
+msgstr "请等待文件附加完成"
 
 msgid "Wait for workspace setup before starting agents"
 msgstr "启动智能体前等待工作区设置完成"
@@ -18685,6 +20610,10 @@ msgstr "正在唤醒工作区"
 msgid "Want something sooner? <0>Tell us in Discord</0>. Much of what's here started as a user request."
 msgstr "想让某件事早点做？<0>在Discord上告诉我们</0>。这里的很多条目最初都来自用户的请求。"
 
+msgid "Warning"
+msgstr "警告"
+
+msgctxt "Sentry level"
 msgid "Warning"
 msgstr "警告"
 
@@ -18736,6 +20665,9 @@ msgstr "我们只收集分析类cookie，用于改进你的使用体验。"
 msgid "We sent the download link to {submittedEmail}."
 msgstr "下载链接已发送至{submittedEmail}。"
 
+msgid "We'll automatically resume payment collection on the date you choose."
+msgstr "我们会在你选择的日期自动恢复收款。"
+
 msgid "We'll be in touch shortly."
 msgstr "我们会尽快与你联系。"
 
@@ -18747,6 +20679,9 @@ msgstr "Superset Android 版准备就绪时，我们会发邮件通知你。"
 
 msgid "We'll get back to you shortly."
 msgstr "我们会尽快回复你。"
+
+msgid "We'll keep payment collection paused until you resume it."
+msgstr "在你恢复之前，收款将保持暂停。"
 
 msgid "We'll notify you when Windows & Linux support is ready."
 msgstr "Windows和Linux支持就绪时我们会通知你。"
@@ -18880,6 +20815,9 @@ msgstr "接下来做点什么？"
 msgid "What Superset is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents."
 msgstr "Superset 是什么、由谁打造、为谁而建。一支由三位前 YC CTO 带领的旧金山团队，正在打造并行编码智能体的工作区。"
 
+msgid "What the agent should do next"
+msgstr "智能体接下来应该做什么"
+
 msgid "What these were written against is no longer on the page, so they have no pin."
 msgstr "这些评论所针对的内容已不在页面上，因此没有标记。"
 
@@ -18913,6 +20851,12 @@ msgstr "最新动态"
 msgid "What's next"
 msgstr "接下来"
 
+msgid "What's your status?"
+msgstr "你的状态是什么？"
+
+msgid "When"
+msgstr "时间"
+
 msgid "When off, nothing else can reach the files and tools on this device. You can still connect out to remote sandboxes from here. <0>Learn more<1/></0>"
 msgstr "关闭后，其他设备无法访问本设备上的文件和工具。你仍可以从这里连接到远程沙箱。<0>了解更多<1/></0>"
 
@@ -18945,6 +20889,9 @@ msgstr "支持哪些智能体？"
 
 msgid "Which AI coding agents are supported?"
 msgstr "支持哪些AI编码智能体？"
+
+msgid "While the inbox has focus"
+msgstr "收件箱获得焦点时"
 
 msgid "Who can open this page from its link"
 msgstr "谁可以通过链接打开这个页面"
@@ -18984,6 +20931,9 @@ msgstr "有无附件均可"
 
 msgid "With the Superset mobile app, I can address production issues from anywhere."
 msgstr "有了 Superset 手机应用，我可以随时随地处理生产环境问题。"
+
+msgid "Won"
+msgstr "胜诉"
 
 msgid "Wordmark, black"
 msgstr "文字标志，黑色"
@@ -19062,6 +21012,9 @@ msgstr "工作区操作"
 msgid "Workspace activity"
 msgstr "工作区活动"
 
+msgid "Workspace Admin"
+msgstr "工作区管理员"
+
 msgid "Workspace agents"
 msgstr "工作区智能体"
 
@@ -19101,6 +21054,9 @@ msgstr "工作区已打开，但初始化命令失败。"
 msgid "Workspace opened, but terminal failed to start."
 msgstr "工作区已打开，但终端启动失败。"
 
+msgid "Workspace Owner"
+msgstr "工作区所有者"
+
 msgid "Workspace path is not available"
 msgstr "工作区路径不可用"
 
@@ -19109,6 +21065,9 @@ msgstr "工作区路径尚不可用"
 
 msgid "Workspace pinning & bulk actions"
 msgstr "工作区固定与批量操作"
+
+msgid "Workspace Primary Owner"
+msgstr "工作区主要所有者"
 
 msgid "Workspace restored"
 msgstr "工作区已恢复"
@@ -19188,6 +21147,9 @@ msgstr "写评论"
 msgid "Write a comment…"
 msgstr "写下评论…"
 
+msgid "Write a message"
+msgstr "撰写消息"
+
 msgid "Write a note and pick an agent. Your note arrives with the element's code and a cropped screenshot."
 msgstr "写一条备注并选择智能体。备注会连同该元素的代码和裁剪后的截图一起送达。"
 
@@ -19211,6 +21173,9 @@ msgstr "写好提示词并选择智能体。可选择一个项目来工作，也
 
 msgid "Write the prompt once. Every run gets its own workspace."
 msgstr "提示词只需写一次，每次运行都有独立的工作区。"
+
+msgid "Write your reply"
+msgstr "撰写回复"
 
 msgid "Write."
 msgstr "编写。"
@@ -19263,14 +21228,29 @@ msgstr "提供。申请时不需要美国工作许可，但你需要愿意搬到
 msgid "Yesterday"
 msgstr "昨天"
 
+msgid "Yesterday at {time}"
+msgstr "昨天 {time}"
+
 msgid "you"
 msgstr "你"
 
 msgid "You"
 msgstr "你"
 
+msgctxt "reaction tooltip"
+msgid "You"
+msgstr "你"
+
+msgctxt "the reminder goes to the reader"
+msgid "You"
+msgstr "你"
+
 msgid "YOU"
 msgstr "你"
+
+msgctxt "reaction tooltip"
+msgid "You (click to remove)"
+msgstr "你（点击取消）"
 
 msgid "You appear to be offline"
 msgstr "你似乎处于离线状态"
@@ -19312,6 +21292,9 @@ msgstr "在与我们交流之前，你就能看到我们是如何工作的。"
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."
 msgstr "无法在应用内更改此订阅。你所在组织的方案由所有者在{0}管理。"
+
+msgid "You can't issue a refund here when canceling at the end of the period. However, you can still issue a refund manually."
+msgstr "在周期结束时取消的情况下，无法在此处退款。不过，你仍然可以手动退款。"
 
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "此操作无法撤销。终端窗格会显示“进程已退出”，之后可以重新启动。"
@@ -19432,6 +21415,9 @@ msgstr "你的 GitHub 链接来自登录所用的账号，因此显示为已验�
 msgid "Your last payment failed. Update your payment method to keep Pro."
 msgstr "上次付款失败。请更新支付方式以继续使用 Pro。"
 
+msgid "your message"
+msgstr "你的消息"
+
 msgid "Your name"
 msgstr "你的姓名"
 
@@ -19446,6 +21432,9 @@ msgstr "你的组织已达到云端用量上限。除非提高上限，此工作
 
 msgid "Your own accounts. Your organization's integrations let Superset reach its tools; connecting yours makes the work Superset does for you show up as you."
 msgstr "你自己的账户。组织的集成让 Superset 访问其工具；连接你自己的账户后，Superset 为你完成的工作会以你的名义显示。"
+
+msgid "Your proposal:"
+msgstr "你的提议："
 
 msgid "Your rank"
 msgstr "你的排名"
@@ -19483,6 +21472,9 @@ msgstr "你的终端会话不会被中断。"
 
 msgid "Your terminals restarted"
 msgstr "你的终端已重新启动"
+
+msgid "your text"
+msgstr "你的文本"
 
 #. placeholder {0}: String(gaps.length)
 msgid "Your tier is a weighted score across the {0} axes measured for you, so a strong axis offsets a weak one. The axes below are the ones lagging."

@@ -1,0 +1,453 @@
+{
+	"kind": "gmail.email",
+	"mode": "reply",
+	"account": {
+		"email": "satya@superset.sh",
+		"photo": null
+	},
+	"sendAs": [
+		{
+			"email": "satya@superset.sh",
+			"name": "Satya Patel",
+			"isDefault": true,
+			"signature": ""
+		}
+	],
+	"canSend": true,
+	"draftGone": false,
+	"scheduledAt": null,
+	"thread": {
+		"id": "1a0fb9dc85867470",
+		"subject": "Team offsite in Tahoe",
+		"labels": [
+			{
+				"id": "INBOX",
+				"name": "Inbox",
+				"color": null
+			},
+			{
+				"id": "IMPORTANT",
+				"name": "IMPORTANT",
+				"color": null
+			},
+			{
+				"id": "Label_12",
+				"name": "Offsite",
+				"color": {
+					"background": "#b9e4d0",
+					"text": "#0b4f30"
+				}
+			}
+		],
+		"messages": [
+			{
+				"id": "1a0fb9dc85867470",
+				"from": {
+					"name": "Satya Patel",
+					"email": "satya@superset.sh"
+				},
+				"to": [
+					{
+						"name": "Avery Chen",
+						"email": "avery@lumenlabs.io"
+					},
+					{
+						"name": "Priya Raman",
+						"email": "priya.raman@northwind.co"
+					},
+					{
+						"name": "Marcus Bell",
+						"email": "marcus.bell@fieldstone.dev"
+					},
+					{
+						"name": "Jordan Okafor",
+						"email": "jordan@okafor.example.com"
+					}
+				],
+				"cc": [],
+				"bcc": [],
+				"date": "2026-09-28T16:14:00.000Z",
+				"snippet": "Hi all, Proposing Tahoe for the week of Nov 9. The lodge fits twelve, and we can do two cars each way. Thoughts on dates before I book? Satya",
+				"unread": false,
+				"starred": false,
+				"html": "<div>Hi all,</div><div><br></div><div>Proposing Tahoe for the week of Nov 9. The lodge fits twelve, and we can do two cars each way.</div><div><br></div><div>Thoughts on dates before I book?</div><div><br></div><div>Satya</div><div><br></div>",
+				"text": "Hi all,\n\nProposing Tahoe for the week of Nov 9. The lodge fits twelve, and we can do two cars each way.\n\nThoughts on dates before I book?\n\nSatya",
+				"attachments": [],
+				"clipped": false
+			},
+			{
+				"id": "1a0fb9dcb93cf0bf",
+				"from": {
+					"name": "Avery Chen",
+					"email": "avery@lumenlabs.io"
+				},
+				"to": [
+					{
+						"name": "Satya Patel",
+						"email": "satya@superset.sh"
+					},
+					{
+						"name": "Priya Raman",
+						"email": "priya.raman@northwind.co"
+					},
+					{
+						"name": "Marcus Bell",
+						"email": "marcus.bell@fieldstone.dev"
+					},
+					{
+						"name": "Jordan Okafor",
+						"email": "jordan@okafor.example.com"
+					}
+				],
+				"cc": [],
+				"bcc": [],
+				"date": "2026-09-28T17:02:00.000Z",
+				"snippet": "Nov 9 works for me. Can we push the start to Tuesday so Monday stays free for the release?",
+				"unread": false,
+				"starred": false,
+				"html": "<div>Nov 9 works for me. Can we push the start to Tuesday so Monday stays free for the release?</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Mon, Sep 28, 2026 at 9:14 AM Satya Patel &lt;satya@superset.sh&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>Hi all,</div><div><br></div><div>Proposing Tahoe for the week of Nov 9. The lodge fits twelve, and we can do two cars each way.</div><div><br></div><div>Thoughts on dates before I book?</div><div><br></div><div>Satya</div><div><br></div></blockquote></div>",
+				"text": "Nov 9 works for me. Can we push the start to Tuesday so Monday stays free for the release?\n\nOn Mon, Sep 28, 2026 at 9:14 AM Satya Patel <satya@superset.sh> wrote:\n> Hi all,\n>\n> Proposing Tahoe for the week of Nov 9. The lodge fits twelve, and we can do two cars each way.\n>\n> Thoughts on dates before I book?\n>\n> Satya",
+				"attachments": [],
+				"clipped": false
+			},
+			{
+				"id": "1a0fb9dcaba74365",
+				"from": {
+					"name": "Satya Patel",
+					"email": "satya@superset.sh"
+				},
+				"to": [
+					{
+						"name": "Avery Chen",
+						"email": "avery@lumenlabs.io"
+					},
+					{
+						"name": "Priya Raman",
+						"email": "priya.raman@northwind.co"
+					},
+					{
+						"name": "Marcus Bell",
+						"email": "marcus.bell@fieldstone.dev"
+					},
+					{
+						"name": "Jordan Okafor",
+						"email": "jordan@okafor.example.com"
+					}
+				],
+				"cc": [],
+				"bcc": [],
+				"date": "2026-09-28T18:40:00.000Z",
+				"snippet": "Tuesday start is fine. Booking the lodge for Tue to Fri.",
+				"unread": false,
+				"starred": false,
+				"html": "<div>Tuesday start is fine. Booking the lodge for Tue to Fri.</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Mon, Sep 28, 2026 at 10:02 AM Avery Chen &lt;avery@lumenlabs.io&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>Nov 9 works for me. Can we push the start to Tuesday so Monday stays free for the release?</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Mon, Sep 28, 2026 at 9:14 AM Satya Patel &lt;satya@superset.sh&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>Hi all,</div><div><br></div><div>Proposing Tahoe for the week of Nov 9. The lodge fits twelve, and we can do two cars each way.</div><div><br></div><div>Thoughts on dates before I book?</div><div><br></div><div>Satya</div><div><br></div></blockquote></div></blockquote></div>",
+				"text": "Tuesday start is fine. Booking the lodge for Tue to Fri.\n\nOn Mon, Sep 28, 2026 at 10:02 AM Avery Chen <avery@lumenlabs.io> wrote:\n> Nov 9 works for me. Can we push the start to Tuesday so Monday stays free for the release?\n>\n> On Mon, Sep 28, 2026 at 9:14 AM Satya Patel <satya@superset.sh> wrote:\n> > Hi all,\n> >\n> > Proposing Tahoe for the week of Nov 9. The lodge fits twelve, and we can do two cars each way.\n> >\n> > Thoughts on dates before I book?\n> >\n> > Satya",
+				"attachments": [],
+				"clipped": false
+			},
+			{
+				"id": "1a0fb9dcc5aea034",
+				"from": {
+					"name": "Priya Raman",
+					"email": "priya.raman@northwind.co"
+				},
+				"to": [
+					{
+						"name": "Satya Patel",
+						"email": "satya@superset.sh"
+					},
+					{
+						"name": "Avery Chen",
+						"email": "avery@lumenlabs.io"
+					},
+					{
+						"name": "Marcus Bell",
+						"email": "marcus.bell@fieldstone.dev"
+					},
+					{
+						"name": "Jordan Okafor",
+						"email": "jordan@okafor.example.com"
+					}
+				],
+				"cc": [],
+				"bcc": [],
+				"date": "2026-09-29T15:55:00.000Z",
+				"snippet": "Agenda draft: day one roadmap, day two hack day, day three customer calls in the morning and the drive home after lunch. Edits welcome, I will lock it Thursday.",
+				"unread": false,
+				"starred": false,
+				"html": "<div>Agenda draft: day one roadmap, day two hack day, day three customer calls in the morning and the drive home after lunch.</div><div><br></div><div>Edits welcome, I will lock it Thursday.</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Mon, Sep 28, 2026 at 11:40 AM Satya Patel &lt;satya@superset.sh&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>Tuesday start is fine. Booking the lodge for Tue to Fri.</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Mon, Sep 28, 2026 at 10:02 AM Avery Chen &lt;avery@lumenlabs.io&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>Nov 9 works for me. Can we push the start to Tuesday so Monday stays free for the release?</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Mon, Sep 28, 2026 at 9:14 AM Satya Patel &lt;satya@superset.sh&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>Hi all,</div><div><br></div><div>Proposing Tahoe for the week of Nov 9. The lodge fits twelve, and we can do two cars each way.</div><div><br></div><div>Thoughts on dates before I book?</div><div><br></div><div>Satya</div><div><br></div></blockquote></div></blockquote></div></blockquote></div>",
+				"text": "Agenda draft: day one roadmap, day two hack day, day three customer calls in the morning and the drive home after lunch.\n\nEdits welcome, I will lock it Thursday.\n\nOn Mon, Sep 28, 2026 at 11:40 AM Satya Patel <satya@superset.sh> wrote:\n> Tuesday start is fine. Booking the lodge for Tue to Fri.\n>\n> On Mon, Sep 28, 2026 at 10:02 AM Avery Chen <avery@lumenlabs.io> wrote:\n> > Nov 9 works for me. Can we push the start to Tuesday so Monday stays free for the release?\n> >\n> > On Mon, Sep 28, 2026 at 9:14 AM Satya Patel <satya@superset.sh> wrote:\n> > > Hi all,\n> > >\n> > > Proposing Tahoe for the week of Nov 9. The lodge fits twelve, and we can do two cars each way.\n> > >\n> > > Thoughts on dates before I book?\n> > >\n> > > Satya",
+				"attachments": [],
+				"clipped": false
+			},
+			{
+				"id": "1a0fb9dcf42d1f37",
+				"from": {
+					"name": "Marcus Bell",
+					"email": "marcus.bell@fieldstone.dev"
+				},
+				"to": [
+					{
+						"name": "Satya Patel",
+						"email": "satya@superset.sh"
+					},
+					{
+						"name": "Avery Chen",
+						"email": "avery@lumenlabs.io"
+					},
+					{
+						"name": "Priya Raman",
+						"email": "priya.raman@northwind.co"
+					},
+					{
+						"name": "Jordan Okafor",
+						"email": "jordan@okafor.example.com"
+					}
+				],
+				"cc": [],
+				"bcc": [],
+				"date": "2026-09-29T20:21:00.000Z",
+				"snippet": "Love the hack day. Can we add a one hour retro on the cloud rollout? Lots to unpack from last month.",
+				"unread": false,
+				"starred": false,
+				"html": "<div>Love the hack day. Can we add a one hour retro on the cloud rollout? Lots to unpack from last month.</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Tue, Sep 29, 2026 at 8:55 AM Priya Raman &lt;priya.raman@northwind.co&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>Agenda draft: day one roadmap, day two hack day, day three customer calls in the morning and the drive home after lunch.</div><div><br></div><div>Edits welcome, I will lock it Thursday.</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Mon, Sep 28, 2026 at 11:40 AM Satya Patel &lt;satya@superset.sh&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>Tuesday start is fine. Booking the lodge for Tue to Fri.</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Mon, Sep 28, 2026 at 10:02 AM Avery Chen &lt;avery@lumenlabs.io&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>Nov 9 works for me. Can we push the start to Tuesday so Monday stays free for the release?</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Mon, Sep 28, 2026 at 9:14 AM Satya Patel &lt;satya@superset.sh&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>Hi all,</div><div><br></div><div>Proposing Tahoe for the week of Nov 9. The lodge fits twelve, and we can do two cars each way.</div><div><br></div><div>Thoughts on dates before I book?</div><div><br></div><div>Satya</div><div><br></div></blockquote></div></blockquote></div></blockquote></div></blockquote></div>",
+				"text": "Love the hack day. Can we add a one hour retro on the cloud rollout? Lots to unpack from last month.\n\nOn Tue, Sep 29, 2026 at 8:55 AM Priya Raman <priya.raman@northwind.co> wrote:\n> Agenda draft: day one roadmap, day two hack day, day three customer calls in the morning and the drive home after lunch.\n>\n> Edits welcome, I will lock it Thursday.\n>\n> On Mon, Sep 28, 2026 at 11:40 AM Satya Patel <satya@superset.sh> wrote:\n> > Tuesday start is fine. Booking the lodge for Tue to Fri.\n> >\n> > On Mon, Sep 28, 2026 at 10:02 AM Avery Chen <avery@lumenlabs.io> wrote:\n> > > Nov 9 works for me. Can we push the start to Tuesday so Monday stays free for the release?\n> > >\n> > > On Mon, Sep 28, 2026 at 9:14 AM Satya Patel <satya@superset.sh> wrote:\n> > > > Hi all,\n> > > >\n> > > > Proposing Tahoe for the week of Nov 9. The lodge fits twelve, and we can do two cars each way.\n> > > >\n> > > > Thoughts on dates before I book?\n> > > >\n> > > > Satya",
+				"attachments": [],
+				"clipped": false
+			},
+			{
+				"id": "1a0fb9dd12935484",
+				"from": {
+					"name": "Priya Raman",
+					"email": "priya.raman@northwind.co"
+				},
+				"to": [
+					{
+						"name": "Satya Patel",
+						"email": "satya@superset.sh"
+					},
+					{
+						"name": "Avery Chen",
+						"email": "avery@lumenlabs.io"
+					},
+					{
+						"name": "Marcus Bell",
+						"email": "marcus.bell@fieldstone.dev"
+					},
+					{
+						"name": "Jordan Okafor",
+						"email": "jordan@okafor.example.com"
+					}
+				],
+				"cc": [],
+				"bcc": [],
+				"date": "2026-09-29T22:07:00.000Z",
+				"snippet": "Good call. Added the retro to day one, right after lunch.",
+				"unread": false,
+				"starred": false,
+				"html": "<div>Good call. Added the retro to day one, right after lunch.</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Tue, Sep 29, 2026 at 1:21 PM Marcus Bell &lt;marcus.bell@fieldstone.dev&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>Love the hack day. Can we add a one hour retro on the cloud rollout? Lots to unpack from last month.</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Tue, Sep 29, 2026 at 8:55 AM Priya Raman &lt;priya.raman@northwind.co&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>Agenda draft: day one roadmap, day two hack day, day three customer calls in the morning and the drive home after lunch.</div><div><br></div><div>Edits welcome, I will lock it Thursday.</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Mon, Sep 28, 2026 at 11:40 AM Satya Patel &lt;satya@superset.sh&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>Tuesday start is fine. Booking the lodge for Tue to Fri.</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Mon, Sep 28, 2026 at 10:02 AM Avery Chen &lt;avery@lumenlabs.io&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>Nov 9 works for me. Can we push the start to Tuesday so Monday stays free for the release?</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Mon, Sep 28, 2026 at 9:14 AM Satya Patel &lt;satya@superset.sh&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>Hi all,</div><div><br></div><div>Proposing Tahoe for the week of Nov 9. The lodge fits twelve, and we can do two cars each way.</div><div><br></div><div>Thoughts on dates before I book?</div><div><br></div><div>Satya</div><div><br></div></blockquote></div></blockquote></div></blockquote></div></blockquote></div></blockquote></div>",
+				"text": "Good call. Added the retro to day one, right after lunch.\n\nOn Tue, Sep 29, 2026 at 1:21 PM Marcus Bell <marcus.bell@fieldstone.dev> wrote:\n> Love the hack day. Can we add a one hour retro on the cloud rollout? Lots to unpack from last month.\n>\n> On Tue, Sep 29, 2026 at 8:55 AM Priya Raman <priya.raman@northwind.co> wrote:\n> > Agenda draft: day one roadmap, day two hack day, day three customer calls in the morning and the drive home after lunch.\n> >\n> > Edits welcome, I will lock it Thursday.\n> >\n> > On Mon, Sep 28, 2026 at 11:40 AM Satya Patel <satya@superset.sh> wrote:\n> > > Tuesday start is fine. Booking the lodge for Tue to Fri.\n> > >\n> > > On Mon, Sep 28, 2026 at 10:02 AM Avery Chen <avery@lumenlabs.io> wrote:\n> > > > Nov 9 works for me. Can we push the start to Tuesday so Monday stays free for the release?\n> > > >\n> > > > On Mon, Sep 28, 2026 at 9:14 AM Satya Patel <satya@superset.sh> wrote:\n> > > > > Hi all,\n> > > > >\n> > > > > Proposing Tahoe for the week of Nov 9. The lodge fits twelve, and we can do two cars each way.\n> > > > >\n> > > > > Thoughts on dates before I book?\n> > > > >\n> > > > > Satya",
+				"attachments": [],
+				"clipped": false
+			},
+			{
+				"id": "1a0fb9dd30b89aa9",
+				"from": {
+					"name": "Jordan Okafor",
+					"email": "jordan@okafor.example.com"
+				},
+				"to": [
+					{
+						"name": "Satya Patel",
+						"email": "satya@superset.sh"
+					},
+					{
+						"name": "Avery Chen",
+						"email": "avery@lumenlabs.io"
+					},
+					{
+						"name": "Priya Raman",
+						"email": "priya.raman@northwind.co"
+					},
+					{
+						"name": "Marcus Bell",
+						"email": "marcus.bell@fieldstone.dev"
+					}
+				],
+				"cc": [],
+				"bcc": [],
+				"date": "2026-10-01T01:45:00.000Z",
+				"snippet": "I can cook dinner Wednesday. Anyone vegetarian, or allergic to anything?",
+				"unread": false,
+				"starred": false,
+				"html": "<div>I can cook dinner Wednesday. Anyone vegetarian, or allergic to anything?</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Tue, Sep 29, 2026 at 3:07 PM Priya Raman &lt;priya.raman@northwind.co&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>Good call. Added the retro to day one, right after lunch.</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Tue, Sep 29, 2026 at 1:21 PM Marcus Bell &lt;marcus.bell@fieldstone.dev&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>Love the hack day. Can we add a one hour retro on the cloud rollout? Lots to unpack from last month.</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Tue, Sep 29, 2026 at 8:55 AM Priya Raman &lt;priya.raman@northwind.co&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>Agenda draft: day one roadmap, day two hack day, day three customer calls in the morning and the drive home after lunch.</div><div><br></div><div>Edits welcome, I will lock it Thursday.</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Mon, Sep 28, 2026 at 11:40 AM Satya Patel &lt;satya@superset.sh&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>Tuesday start is fine. Booking the lodge for Tue to Fri.</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Mon, Sep 28, 2026 at 10:02 AM Avery Chen &lt;avery@lumenlabs.io&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>Nov 9 works for me. Can we push the start to Tuesday so Monday stays free for the release?</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Mon, Sep 28, 2026 at 9:14 AM Satya Patel &lt;satya@superset.sh&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>Hi all,</div><div><br></div><div>Proposing Tahoe for the week of Nov 9. The lodge fits twelve, and we can do two cars each way.</div><div><br></div><div>Thoughts on dates before I book?</div><div><br></div><div>Satya</div><div><br></div></blockquote></div></blockquote></div></blockquote></div></blockquote></div></blockquote></div></blockquote></div>",
+				"text": "I can cook dinner Wednesday. Anyone vegetarian, or allergic to anything?\n\nOn Tue, Sep 29, 2026 at 3:07 PM Priya Raman <priya.raman@northwind.co> wrote:\n> Good call. Added the retro to day one, right after lunch.\n>\n> On Tue, Sep 29, 2026 at 1:21 PM Marcus Bell <marcus.bell@fieldstone.dev> wrote:\n> > Love the hack day. Can we add a one hour retro on the cloud rollout? Lots to unpack from last month.\n> >\n> > On Tue, Sep 29, 2026 at 8:55 AM Priya Raman <priya.raman@northwind.co> wrote:\n> > > Agenda draft: day one roadmap, day two hack day, day three customer calls in the morning and the drive home after lunch.\n> > >\n> > > Edits welcome, I will lock it Thursday.\n> > >\n> > > On Mon, Sep 28, 2026 at 11:40 AM Satya Patel <satya@superset.sh> wrote:\n> > > > Tuesday start is fine. Booking the lodge for Tue to Fri.\n> > > >\n> > > > On Mon, Sep 28, 2026 at 10:02 AM Avery Chen <avery@lumenlabs.io> wrote:\n> > > > > Nov 9 works for me. Can we push the start to Tuesday so Monday stays free for the release?\n> > > > >\n> > > > > On Mon, Sep 28, 2026 at 9:14 AM Satya Patel <satya@superset.sh> wrote:\n> > > > > > Hi all,\n> > > > > >\n> > > > > > Proposing Tahoe for the week of Nov 9. The lodge fits twelve, and we can do two cars each way.\n> > > > > >\n> > > > > > Thoughts on dates before I book?\n> > > > > >\n> > > > > > Satya",
+				"attachments": [],
+				"clipped": false
+			},
+			{
+				"id": "1a0fb9dd5a7a45e4",
+				"from": {
+					"name": "Avery Chen",
+					"email": "avery@lumenlabs.io"
+				},
+				"to": [
+					{
+						"name": "Satya Patel",
+						"email": "satya@superset.sh"
+					},
+					{
+						"name": "Priya Raman",
+						"email": "priya.raman@northwind.co"
+					},
+					{
+						"name": "Marcus Bell",
+						"email": "marcus.bell@fieldstone.dev"
+					},
+					{
+						"name": "Jordan Okafor",
+						"email": "jordan@okafor.example.com"
+					}
+				],
+				"cc": [],
+				"bcc": [],
+				"date": "2026-10-01T16:12:00.000Z",
+				"snippet": "Two vegetarians and one no dairy so far. I will send the grocery list Friday.",
+				"unread": false,
+				"starred": false,
+				"html": "<div>Two vegetarians and one no dairy so far. I will send the grocery list Friday.</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Wed, Sep 30, 2026 at 6:45 PM Jordan Okafor &lt;jordan@okafor.example.com&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>I can cook dinner Wednesday. Anyone vegetarian, or allergic to anything?</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Tue, Sep 29, 2026 at 3:07 PM Priya Raman &lt;priya.raman@northwind.co&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>Good call. Added the retro to day one, right after lunch.</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Tue, Sep 29, 2026 at 1:21 PM Marcus Bell &lt;marcus.bell@fieldstone.dev&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>Love the hack day. Can we add a one hour retro on the cloud rollout? Lots to unpack from last month.</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Tue, Sep 29, 2026 at 8:55 AM Priya Raman &lt;priya.raman@northwind.co&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>Agenda draft: day one roadmap, day two hack day, day three customer calls in the morning and the drive home after lunch.</div><div><br></div><div>Edits welcome, I will lock it Thursday.</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Mon, Sep 28, 2026 at 11:40 AM Satya Patel &lt;satya@superset.sh&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>Tuesday start is fine. Booking the lodge for Tue to Fri.</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Mon, Sep 28, 2026 at 10:02 AM Avery Chen &lt;avery@lumenlabs.io&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>Nov 9 works for me. Can we push the start to Tuesday so Monday stays free for the release?</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Mon, Sep 28, 2026 at 9:14 AM Satya Patel &lt;satya@superset.sh&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>Hi all,</div><div><br></div><div>Proposing Tahoe for the week of Nov 9. The lodge fits twelve, and we can do two cars each way.</div><div><br></div><div>Thoughts on dates before I book?</div><div><br></div><div>Satya</div><div><br></div></blockquote></div></blockquote></div></blockquote></div></blockquote></div></blockquote></div></blockquote></div></blockquote></div>",
+				"text": "Two vegetarians and one no dairy so far. I will send the grocery list Friday.\n\nOn Wed, Sep 30, 2026 at 6:45 PM Jordan Okafor <jordan@okafor.example.com> wrote:\n> I can cook dinner Wednesday. Anyone vegetarian, or allergic to anything?\n>\n> On Tue, Sep 29, 2026 at 3:07 PM Priya Raman <priya.raman@northwind.co> wrote:\n> > Good call. Added the retro to day one, right after lunch.\n> >\n> > On Tue, Sep 29, 2026 at 1:21 PM Marcus Bell <marcus.bell@fieldstone.dev> wrote:\n> > > Love the hack day. Can we add a one hour retro on the cloud rollout? Lots to unpack from last month.\n> > >\n> > > On Tue, Sep 29, 2026 at 8:55 AM Priya Raman <priya.raman@northwind.co> wrote:\n> > > > Agenda draft: day one roadmap, day two hack day, day three customer calls in the morning and the drive home after lunch.\n> > > >\n> > > > Edits welcome, I will lock it Thursday.\n> > > >\n> > > > On Mon, Sep 28, 2026 at 11:40 AM Satya Patel <satya@superset.sh> wrote:\n> > > > > Tuesday start is fine. Booking the lodge for Tue to Fri.\n> > > > >\n> > > > > On Mon, Sep 28, 2026 at 10:02 AM Avery Chen <avery@lumenlabs.io> wrote:\n> > > > > > Nov 9 works for me. Can we push the start to Tuesday so Monday stays free for the release?\n> > > > > >\n> > > > > > On Mon, Sep 28, 2026 at 9:14 AM Satya Patel <satya@superset.sh> wrote:\n> > > > > > > Hi all,\n> > > > > > >\n> > > > > > > Proposing Tahoe for the week of Nov 9. The lodge fits twelve, and we can do two cars each way.\n> > > > > > >\n> > > > > > > Thoughts on dates before I book?\n> > > > > > >\n> > > > > > > Satya",
+				"attachments": [],
+				"clipped": false
+			},
+			{
+				"id": "1a0fb9dd6ef2d7da",
+				"from": {
+					"name": "Satya Patel",
+					"email": "satya@superset.sh"
+				},
+				"to": [
+					{
+						"name": "Avery Chen",
+						"email": "avery@lumenlabs.io"
+					},
+					{
+						"name": "Priya Raman",
+						"email": "priya.raman@northwind.co"
+					},
+					{
+						"name": "Marcus Bell",
+						"email": "marcus.bell@fieldstone.dev"
+					},
+					{
+						"name": "Jordan Okafor",
+						"email": "jordan@okafor.example.com"
+					}
+				],
+				"cc": [],
+				"bcc": [],
+				"date": "2026-10-01T23:30:00.000Z",
+				"snippet": "Lodge is booked and cars are sorted. Last question: who is bringing the projector?",
+				"unread": false,
+				"starred": false,
+				"html": "<div>Lodge is booked and cars are sorted. Last question: who is bringing the projector?</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Thu, Oct 1, 2026 at 9:12 AM Avery Chen &lt;avery@lumenlabs.io&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>Two vegetarians and one no dairy so far. I will send the grocery list Friday.</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Wed, Sep 30, 2026 at 6:45 PM Jordan Okafor &lt;jordan@okafor.example.com&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>I can cook dinner Wednesday. Anyone vegetarian, or allergic to anything?</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Tue, Sep 29, 2026 at 3:07 PM Priya Raman &lt;priya.raman@northwind.co&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>Good call. Added the retro to day one, right after lunch.</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Tue, Sep 29, 2026 at 1:21 PM Marcus Bell &lt;marcus.bell@fieldstone.dev&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>Love the hack day. Can we add a one hour retro on the cloud rollout? Lots to unpack from last month.</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Tue, Sep 29, 2026 at 8:55 AM Priya Raman &lt;priya.raman@northwind.co&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>Agenda draft: day one roadmap, day two hack day, day three customer calls in the morning and the drive home after lunch.</div><div><br></div><div>Edits welcome, I will lock it Thursday.</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Mon, Sep 28, 2026 at 11:40 AM Satya Patel &lt;satya@superset.sh&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>Tuesday start is fine. Booking the lodge for Tue to Fri.</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Mon, Sep 28, 2026 at 10:02 AM Avery Chen &lt;avery@lumenlabs.io&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>Nov 9 works for me. Can we push the start to Tuesday so Monday stays free for the release?</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Mon, Sep 28, 2026 at 9:14 AM Satya Patel &lt;satya@superset.sh&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>Hi all,</div><div><br></div><div>Proposing Tahoe for the week of Nov 9. The lodge fits twelve, and we can do two cars each way.</div><div><br></div><div>Thoughts on dates before I book?</div><div><br></div><div>Satya</div><div><br></div></blockquote></div></blockquote></div></blockquote></div></blockquote></div></blockquote></div></blockquote></div></blockquote></div></blockquote></div>",
+				"text": "Lodge is booked and cars are sorted. Last question: who is bringing the projector?\n\nOn Thu, Oct 1, 2026 at 9:12 AM Avery Chen <avery@lumenlabs.io> wrote:\n> Two vegetarians and one no dairy so far. I will send the grocery list Friday.\n>\n> On Wed, Sep 30, 2026 at 6:45 PM Jordan Okafor <jordan@okafor.example.com> wrote:\n> > I can cook dinner Wednesday. Anyone vegetarian, or allergic to anything?\n> >\n> > On Tue, Sep 29, 2026 at 3:07 PM Priya Raman <priya.raman@northwind.co> wrote:\n> > > Good call. Added the retro to day one, right after lunch.\n> > >\n> > > On Tue, Sep 29, 2026 at 1:21 PM Marcus Bell <marcus.bell@fieldstone.dev> wrote:\n> > > > Love the hack day. Can we add a one hour retro on the cloud rollout? Lots to unpack from last month.\n> > > >\n> > > > On Tue, Sep 29, 2026 at 8:55 AM Priya Raman <priya.raman@northwind.co> wrote:\n> > > > > Agenda draft: day one roadmap, day two hack day, day three customer calls in the morning and the drive home after lunch.\n> > > > >\n> > > > > Edits welcome, I will lock it Thursday.\n> > > > >\n> > > > > On Mon, Sep 28, 2026 at 11:40 AM Satya Patel <satya@superset.sh> wrote:\n> > > > > > Tuesday start is fine. Booking the lodge for Tue to Fri.\n> > > > > >\n> > > > > > On Mon, Sep 28, 2026 at 10:02 AM Avery Chen <avery@lumenlabs.io> wrote:\n> > > > > > > Nov 9 works for me. Can we push the start to Tuesday so Monday stays free for the release?\n> > > > > > >\n> > > > > > > On Mon, Sep 28, 2026 at 9:14 AM Satya Patel <satya@superset.sh> wrote:\n> > > > > > > > Hi all,\n> > > > > > > >\n> > > > > > > > Proposing Tahoe for the week of Nov 9. The lodge fits twelve, and we can do two cars each way.\n> > > > > > > >\n> > > > > > > > Thoughts on dates before I book?\n> > > > > > > >\n> > > > > > > > Satya",
+				"attachments": [],
+				"clipped": false
+			},
+			{
+				"id": "1a0fbb0e3b43d165",
+				"from": {
+					"name": "Priya Raman",
+					"email": "priya.raman@northwind.co"
+				},
+				"to": [
+					{
+						"name": "Satya Patel",
+						"email": "satya@superset.sh"
+					},
+					{
+						"name": "Avery Chen",
+						"email": "avery@lumenlabs.io"
+					},
+					{
+						"name": "Marcus Bell",
+						"email": "marcus.bell@fieldstone.dev"
+					},
+					{
+						"name": "Jordan Okafor",
+						"email": "jordan@okafor.example.com"
+					}
+				],
+				"cc": [],
+				"bcc": [],
+				"date": "2026-10-02T15:17:00.000Z",
+				"snippet": "I'll bring the projector and a spare HDMI cable. See everyone Tuesday! Priya",
+				"unread": true,
+				"starred": false,
+				"html": "<div>I&#x27;ll bring the projector and a spare HDMI cable.</div><div><br></div><div>See everyone Tuesday!</div><div><br></div><div>Priya</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Thu, Oct 1, 2026 at 4:30 PM Satya Patel &lt;satya@superset.sh&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>Lodge is booked and cars are sorted. Last question: who is bringing the projector?</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Thu, Oct 1, 2026 at 9:12 AM Avery Chen &lt;avery@lumenlabs.io&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>Two vegetarians and one no dairy so far. I will send the grocery list Friday.</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Wed, Sep 30, 2026 at 6:45 PM Jordan Okafor &lt;jordan@okafor.example.com&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>I can cook dinner Wednesday. Anyone vegetarian, or allergic to anything?</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Tue, Sep 29, 2026 at 3:07 PM Priya Raman &lt;priya.raman@northwind.co&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>Good call. Added the retro to day one, right after lunch.</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Tue, Sep 29, 2026 at 1:21 PM Marcus Bell &lt;marcus.bell@fieldstone.dev&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>Love the hack day. Can we add a one hour retro on the cloud rollout? Lots to unpack from last month.</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Tue, Sep 29, 2026 at 8:55 AM Priya Raman &lt;priya.raman@northwind.co&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>Agenda draft: day one roadmap, day two hack day, day three customer calls in the morning and the drive home after lunch.</div><div><br></div><div>Edits welcome, I will lock it Thursday.</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Mon, Sep 28, 2026 at 11:40 AM Satya Patel &lt;satya@superset.sh&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>Tuesday start is fine. Booking the lodge for Tue to Fri.</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Mon, Sep 28, 2026 at 10:02 AM Avery Chen &lt;avery@lumenlabs.io&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>Nov 9 works for me. Can we push the start to Tuesday so Monday stays free for the release?</div><div><br></div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Mon, Sep 28, 2026 at 9:14 AM Satya Patel &lt;satya@superset.sh&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div>Hi all,</div><div><br></div><div>Proposing Tahoe for the week of Nov 9. The lodge fits twelve, and we can do two cars each way.</div><div><br></div><div>Thoughts on dates before I book?</div><div><br></div><div>Satya</div><div><br></div></blockquote></div></blockquote></div></blockquote></div></blockquote></div></blockquote></div></blockquote></div></blockquote></div></blockquote></div></blockquote></div>",
+				"text": "I'll bring the projector and a spare HDMI cable.\n\nSee everyone Tuesday!\n\nPriya\n\nOn Thu, Oct 1, 2026 at 4:30 PM Satya Patel <satya@superset.sh> wrote:\n> Lodge is booked and cars are sorted. Last question: who is bringing the projector?\n>\n> On Thu, Oct 1, 2026 at 9:12 AM Avery Chen <avery@lumenlabs.io> wrote:\n> > Two vegetarians and one no dairy so far. I will send the grocery list Friday.\n> >\n> > On Wed, Sep 30, 2026 at 6:45 PM Jordan Okafor <jordan@okafor.example.com> wrote:\n> > > I can cook dinner Wednesday. Anyone vegetarian, or allergic to anything?\n> > >\n> > > On Tue, Sep 29, 2026 at 3:07 PM Priya Raman <priya.raman@northwind.co> wrote:\n> > > > Good call. Added the retro to day one, right after lunch.\n> > > >\n> > > > On Tue, Sep 29, 2026 at 1:21 PM Marcus Bell <marcus.bell@fieldstone.dev> wrote:\n> > > > > Love the hack day. Can we add a one hour retro on the cloud rollout? Lots to unpack from last month.\n> > > > >\n> > > > > On Tue, Sep 29, 2026 at 8:55 AM Priya Raman <priya.raman@northwind.co> wrote:\n> > > > > > Agenda draft: day one roadmap, day two hack day, day three customer calls in the morning and the drive home after lunch.\n> > > > > >\n> > > > > > Edits welcome, I will lock it Thursday.\n> > > > > >\n> > > > > > On Mon, Sep 28, 2026 at 11:40 AM Satya Patel <satya@superset.sh> wrote:\n> > > > > > > Tuesday start is fine. Booking the lodge for Tue to Fri.\n> > > > > > >\n> > > > > > > On Mon, Sep 28, 2026 at 10:02 AM Avery Chen <avery@lumenlabs.io> wrote:\n> > > > > > > > Nov 9 works for me. Can we push the start to Tuesday so Monday stays free for the release?\n> > > > > > > >\n> > > > > > > > On Mon, Sep 28, 2026 at 9:14 AM Satya Patel <satya@superset.sh> wrote:\n> > > > > > > > > Hi all,\n> > > > > > > > >\n> > > > > > > > > Proposing Tahoe for the week of Nov 9. The lodge fits twelve, and we can do two cars each way.\n> > > > > > > > >\n> > > > > > > > > Thoughts on dates before I book?\n> > > > > > > > >\n> > > > > > > > > Satya",
+				"attachments": [],
+				"clipped": false
+			}
+		],
+		"reply": {
+			"to": [
+				{
+					"name": "Priya Raman",
+					"email": "priya.raman@northwind.co"
+				}
+			],
+			"cc": []
+		},
+		"replyAll": {
+			"to": [
+				{
+					"name": "Priya Raman",
+					"email": "priya.raman@northwind.co"
+				},
+				{
+					"name": "Avery Chen",
+					"email": "avery@lumenlabs.io"
+				},
+				{
+					"name": "Marcus Bell",
+					"email": "marcus.bell@fieldstone.dev"
+				},
+				{
+					"name": "Jordan Okafor",
+					"email": "jordan@okafor.example.com"
+				}
+			],
+			"cc": []
+		}
+	},
+	"draft": {
+		"to": [
+			{
+				"name": "Priya Raman",
+				"email": "priya.raman@northwind.co"
+			},
+			{
+				"name": "Avery Chen",
+				"email": "avery@lumenlabs.io"
+			},
+			{
+				"name": "Marcus Bell",
+				"email": "marcus.bell@fieldstone.dev"
+			},
+			{
+				"name": "Jordan Okafor",
+				"email": "jordan@okafor.example.com"
+			}
+		],
+		"cc": [],
+		"bcc": [],
+		"subject": "Re: Team offsite in Tahoe",
+		"body": "",
+		"html": null,
+		"replyAll": true,
+		"from": "satya@superset.sh",
+		"attachments": []
+	}
+}

@@ -1,0 +1,1 @@
+export { fileSize } from "./fileSize";

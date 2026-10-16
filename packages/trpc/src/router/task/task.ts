@@ -44,6 +44,7 @@ import {
 	labelActivity,
 	recordTaskActivity,
 } from "./activity";
+import { notifyAssignee } from "./notifyAssignee";
 import {
 	createTaskSchema,
 	type TaskListFilterInput,
@@ -328,7 +329,14 @@ async function createTask(
 	});
 
 	if (result.task) {
-		const { id, organizationId, description } = result.task;
+		const { id, organizationId, description, assigneeId } = result.task;
+		if (assigneeId) {
+			await notifyAssignee({
+				taskId: id,
+				assigneeId,
+				actorId: ctx.session.user.id,
+			});
+		}
 		if (description) {
 			await anchorAttachments({
 				parentKind: "issue",
@@ -773,6 +781,7 @@ export const taskRouter = {
 		.input(updateTaskSchema)
 		.mutation(async ({ ctx, input }) => {
 			const { id, labels, ...data } = input;
+			let reassignedTo: string | null = null;
 
 			const result = await dbWs.transaction(async (tx) => {
 				const taskAccess = await getTaskAccess(tx, ctx.session.user.id, id);
@@ -835,6 +844,8 @@ export const taskRouter = {
 						: null;
 
 				if (before && updated) {
+					if (before.assigneeId !== updated.assigneeId)
+						reassignedTo = updated.assigneeId;
 					await recordTaskActivity(
 						tx,
 						id,
@@ -857,6 +868,13 @@ export const taskRouter = {
 
 			if (result.task) {
 				const { id, organizationId, description } = result.task;
+				if (reassignedTo) {
+					await notifyAssignee({
+						taskId: id,
+						assigneeId: reassignedTo,
+						actorId: ctx.session.user.id,
+					});
+				}
 				if (description) {
 					await anchorAttachments({
 						parentKind: "issue",

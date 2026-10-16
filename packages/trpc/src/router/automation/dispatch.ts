@@ -25,6 +25,7 @@ import { and, eq, sql } from "drizzle-orm";
 import { acpChatEnabled } from "../../lib/acp-chat";
 import { nudge } from "../../lib/realtime";
 import { fetchRelayPresence } from "../../lib/relay-presence";
+import { pushSystemCardQuietly } from "../inbox/systemCards";
 import { runInCloud } from "./cloudDispatch";
 import { RelayDispatchError, relayMutation } from "./relay-client";
 import {
@@ -114,6 +115,49 @@ type HostCandidate = Pick<
 	typeof v2Hosts.$inferSelect,
 	keyof typeof hostCandidateColumns
 >;
+
+/** A scheduled or event run; a failure lands in the owner's inbox. */
+export async function dispatchAutomationAndNotify(
+	opts: DispatchOptions,
+): Promise<DispatchOutcome> {
+	const outcome = await dispatchAutomation(opts);
+	if (
+		(outcome.status === "dispatch_failed" ||
+			outcome.status === "skipped_offline") &&
+		outcome.runId
+	) {
+		await notifyAutomationRunFailed({
+			automation: opts.automation,
+			runId: outcome.runId,
+			error: outcome.error,
+		});
+	}
+	return outcome;
+}
+
+/**
+ * Tells the owner a run failed or never started, in their inbox. One card per
+ * automation that follows its latest failure, so a schedule that keeps failing
+ * every minute is one card, not hundreds.
+ */
+export function notifyAutomationRunFailed(args: {
+	automation: Pick<
+		DispatchableAutomation,
+		"id" | "name" | "organizationId" | "ownerUserId"
+	>;
+	runId: string;
+	error: string;
+}): Promise<void> {
+	return pushSystemCardQuietly({
+		organizationId: args.automation.organizationId,
+		userId: args.automation.ownerUserId,
+		source: "automation",
+		key: `automation-failed:${args.automation.id}`,
+		title: `${args.automation.name} failed`,
+		why: `The run failed: ${args.error}`,
+		card: { type: "superset.automation_failed", refs: { run: args.runId } },
+	});
+}
 
 /**
  * Run one automation: resolve host, (maybe) create a workspace, start the

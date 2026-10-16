@@ -1,0 +1,1 @@
+export { LabelChip } from "./LabelChip";

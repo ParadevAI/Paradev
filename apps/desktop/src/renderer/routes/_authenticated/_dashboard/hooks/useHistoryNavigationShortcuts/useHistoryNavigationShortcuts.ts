@@ -6,8 +6,12 @@ import { useHotkey } from "renderer/hotkeys";
 export function useHistoryNavigationShortcuts() {
 	const router = useRouter();
 
-	useHotkey("NAVIGATE_BACK", () => router.history.back());
-	useHotkey("NAVIGATE_FORWARD", () => router.history.forward());
+	// ⌘[ and ⌘] also indent text in editors; a key the editor already used is not navigation.
+	const editorUsedKey = {
+		ignoreEventWhen: (e: KeyboardEvent) => e.defaultPrevented,
+	};
+	useHotkey("NAVIGATE_BACK", () => router.history.back(), editorUsedKey);
+	useHotkey("NAVIGATE_FORWARD", () => router.history.forward(), editorUsedKey);
 
 	useEffect(() => {
 		const handleMouseUp = (event: MouseEvent) => {

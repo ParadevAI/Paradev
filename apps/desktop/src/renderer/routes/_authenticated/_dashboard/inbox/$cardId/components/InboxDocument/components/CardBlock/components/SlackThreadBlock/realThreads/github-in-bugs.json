@@ -1,0 +1,399 @@
+{
+	"kind": "slack.thread",
+	"channel": {
+		"id": "C0BUGS00001",
+		"name": "#bugs"
+	},
+	"permalink": null,
+	"messages": [
+		{
+			"ts": "1790840504.927289",
+			"user": {
+				"id": "U0GITHUB1A1",
+				"name": "GitHub",
+				"realName": null,
+				"avatar": "/fixtures/slack/U0GITHUB1A1.png",
+				"isBot": true,
+				"title": null,
+				"timezone": "America/Los_Angeles",
+				"presence": null,
+				"inChannel": false,
+				"isReader": false,
+				"team": null
+			},
+			"deleted": false,
+			"text": "",
+			"edited": false,
+			"broadcast": false,
+			"reactions": [],
+			"files": [],
+			"attachments": [
+				{
+					"color": "#36a64f",
+					"pretext": "Issue created by <https://github.com/sam-ortega-dev|sam-ortega-dev>",
+					"author": null,
+					"title": "<https://github.com/superset-sh/superset/issues/8031|#8031 Repo PR panel costs ~3 API calls per open PR per refresh — add conditional requests and lazy per-PR data>",
+					"titleLink": null,
+					"text": "*Observed (Superset 1.32.0 desktop, macOS)*\n\nDuring a rate-limit incident (2026-10-01) the GitHub REST budget of the account was driven to 0 for ~3 hours. Sampling `ps` showed `host-service.js` as the dominant spawner, one `gh api` per request:\n• `GET /repos/{org}/{repo}/pulls?state=open&amp;per_page=100` — one per repo\n• per open PR: `GET /repos/.../pulls/{n}/reviews`, `GET /repos/.../commits/{sha}/check-runs`, `GET /repos/.../commits/{sha}/statuses`\nWith 32 open PRs across 3 active repos a single sweep is *~100 requests*; refresh bursts were visible as the top consumer while the shared account token was recovering (window reset → 2,527 calls used within 16 minutes, panel sweeps among the spawners).\n\n*Proposal*\n\n1. *Conditional requests.* Send `If-None-Match` with the stored ETag for the list and each per-PR read; 304 responses don't count against the core rate limit. This alone collapses idle cost to near zero.\n2. *Lazy per-PR data.* Reviews/check-runs/statuses for a PR row are only needed when the row is expanded (or the PR's `updated_at`/`pushed_at` changed since the last sweep). Skip unchanged PRs entirely.\n3. *One check call instead of two.* The pulls list already returns `head.sha`; a single checks-API read for the head ref can replace separate `check-runs` + `statuses` fetches.\n4. *Rate-aware throttling.* Read `x-ratelimit-remaining` on responses; when it drops below a threshold, pause panel refreshes until reset instead of erroring per request.\nContext: on multi-agent hosts the panel often shares one account token with automation (daemons, CI scripts), so panel efficiency directly determines whether the rest of the machine starves.\n_Filed with measured process-level evidence from the incident above._",
+					"fields": [],
+					"image": null,
+					"footer": "<https://github.com/superset-sh/superset|superset-sh/superset>",
+					"footerIcon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fslack.github.com%2Fstatic%2Fimg%2Ffavicon-neutral.png",
+					"ts": "1790840502",
+					"blocks": [],
+					"unfurl": null,
+					"link": null,
+					"buttons": [
+						{
+							"text": "Comment",
+							"url": null,
+							"style": null
+						},
+						{
+							"text": "Edit",
+							"url": null,
+							"style": null
+						},
+						{
+							"text": "Close",
+							"url": null,
+							"style": "danger"
+						}
+					]
+				}
+			],
+			"blocks": [],
+			"permalink": "https://superset.slack.com/archives/C0BUGS00001/p1790840504927289"
+		},
+		{
+			"ts": "1790857998.975669",
+			"user": {
+				"id": "U0GITHUB1A1",
+				"name": "GitHub",
+				"realName": null,
+				"avatar": "/fixtures/slack/U0GITHUB1A1.png",
+				"isBot": true,
+				"title": null,
+				"timezone": "America/Los_Angeles",
+				"presence": null,
+				"inChannel": false,
+				"isReader": false,
+				"team": null
+			},
+			"deleted": false,
+			"text": "",
+			"edited": false,
+			"broadcast": false,
+			"reactions": [],
+			"files": [],
+			"attachments": [
+				{
+					"color": "#36a64f",
+					"pretext": "Issue created by <https://github.com/devon-park-dev|devon-park-dev>",
+					"author": null,
+					"title": "<https://github.com/superset-sh/superset/issues/8035|#8035 Workspaces: \"Has unpushed commits\" on delete after multi-commit squash>",
+					"titleLink": null,
+					"text": "Summary\n• Deleting a workspace whose PR was squash-merged shows \"Has unpushed commits\" when the branch had more than one commit\n• Happens on every multi-commit squash merge once the head branch is deleted, so the warning shows on most cleanups\n• Same symptom as <https://github.com/superset-sh/superset/issues/2545|#2545>; the fix in <https://github.com/superset-sh/superset/pull/2546|#2546> only covers single-commit branches\nSteps to reproduce\n1. Make 3 commits on a branch, push, open a PR\n2. Squash and merge it, let GitHub delete the head branch, fetch with prune\n3. Delete the workspace\nExpected  \nNo warning, since everything on the branch is in main.\nActual  \n\"Has unpushed commits\" and a \"Delete anyway\" button.\nInvestigation  \nIn hasUnpushedCommits, `git log --cherry-pick --right-only --no-merges origin/main...HEAD` still lists all 3 commits: each commit's patch-id differs from the single squash commit. The code then falls back to `rev-list --count HEAD --not --remotes`, which returns 3. A whole-branch check gets this right: the tree from `git merge-tree --write-tree origin/main HEAD` equals `origin/main^{tree}`.\nEnvironment  \nSuperset 1.32.0, macOS arm64 (1.33.0 and current main have the same hasUnpushedCommits code)",
+					"fields": [],
+					"image": null,
+					"footer": "<https://github.com/superset-sh/superset|superset-sh/superset>",
+					"footerIcon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fslack.github.com%2Fstatic%2Fimg%2Ffavicon-neutral.png",
+					"ts": "1790857996",
+					"blocks": [],
+					"unfurl": null,
+					"link": null,
+					"buttons": [
+						{
+							"text": "Comment",
+							"url": null,
+							"style": null
+						},
+						{
+							"text": "Edit",
+							"url": null,
+							"style": null
+						},
+						{
+							"text": "Close",
+							"url": null,
+							"style": "danger"
+						}
+					]
+				}
+			],
+			"blocks": [],
+			"permalink": "https://superset.slack.com/archives/C0BUGS00001/p1790857998975669"
+		},
+		{
+			"ts": "1790869509.559789",
+			"user": {
+				"id": "U0GITHUB1A1",
+				"name": "GitHub",
+				"realName": null,
+				"avatar": "/fixtures/slack/U0GITHUB1A1.png",
+				"isBot": true,
+				"title": null,
+				"timezone": "America/Los_Angeles",
+				"presence": null,
+				"inChannel": false,
+				"isReader": false,
+				"team": null
+			},
+			"deleted": false,
+			"text": "",
+			"edited": false,
+			"broadcast": false,
+			"reactions": [],
+			"files": [],
+			"attachments": [
+				{
+					"color": "#36a64f",
+					"pretext": "Issue created by <https://github.com/marcus-oyelaran-dev|marcus-oyelaran-dev>",
+					"author": null,
+					"title": "<https://github.com/superset-sh/superset/issues/8036|#8036 Terminal: Hebrew/Arabic (RTL) text renders letter-reversed>",
+					"titleLink": null,
+					"text": "*Problem.* The terminal (xterm.js) has no bidi support, so any RTL text — agent replies in Hebrew or Arabic, file names, git messages — is drawn left-to-right and comes out letter-reversed and unreadable. For teams that work with agents in Hebrew this makes the terminal pane unusable for reading replies.\n*Proposal.* Display-time implicit bidi in the WebGL renderer, the way Konsole and Apple Terminal do it: per row, compute the visual order of the cells (reduced Unicode Bidi Algorithm) and draw cells in that order. The buffer, cursor addressing, input and copy stay in logical order, so TUIs are unaffected and copied text pastes correctly. Rows without RTL characters take the existing path untouched.\nPlus an opt-in header toggle that lays out rows whose first strong character is RTL as RTL paragraphs (right-aligned), and `textDirection: \"auto\"` on the rich-input composer so Hebrew typing flows right-to-left.\nI have a working implementation with tests and screenshots; PR incoming.",
+					"fields": [],
+					"image": null,
+					"footer": "<https://github.com/superset-sh/superset|superset-sh/superset>",
+					"footerIcon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fslack.github.com%2Fstatic%2Fimg%2Ffavicon-neutral.png",
+					"ts": "1790869506",
+					"blocks": [],
+					"unfurl": null,
+					"link": null,
+					"buttons": [
+						{
+							"text": "Comment",
+							"url": null,
+							"style": null
+						},
+						{
+							"text": "Edit",
+							"url": null,
+							"style": null
+						},
+						{
+							"text": "Close",
+							"url": null,
+							"style": "danger"
+						}
+					]
+				}
+			],
+			"blocks": [],
+			"permalink": "https://superset.slack.com/archives/C0BUGS00001/p1790869509559789"
+		},
+		{
+			"ts": "1790870438.391109",
+			"user": {
+				"id": "U0GITHUB1A1",
+				"name": "GitHub",
+				"realName": null,
+				"avatar": "/fixtures/slack/U0GITHUB1A1.png",
+				"isBot": true,
+				"title": null,
+				"timezone": "America/Los_Angeles",
+				"presence": null,
+				"inChannel": false,
+				"isReader": false,
+				"team": null
+			},
+			"deleted": false,
+			"text": "",
+			"edited": true,
+			"broadcast": false,
+			"reactions": [],
+			"files": [],
+			"attachments": [
+				{
+					"color": "#36a64f",
+					"pretext": "Issue created by <https://github.com/lena-fischer-dev|lena-fischer-dev>",
+					"author": null,
+					"title": "<https://github.com/superset-sh/superset/issues/8038|#8038 Workspaces: close the Workspace Setup tab when setup succeeds>",
+					"titleLink": null,
+					"text": "*What problem are you trying to solve?*\n\nThe Workspace Setup tab stays open after setup finishes, whether it succeeded or failed. I open many workspaces a day and close a green setup tab by hand each time. Because I close them by reflex, I rarely read them, so a failed setup looks the same as a good one until something breaks later.\n\n*Proposed solution*\n\nAn opt-in option, either a config key (e.g. `\"closeSetupOnSuccess\": true`) or a desktop setting, that closes the setup pane when the joined setup command exits 0. A non-zero exit leaves it open, ideally marked as failed in the sidebar so the failure stands out.\n\n*Workarounds you've tried*\n\n• Ending setup with `superset terminals close --local --workspace \"$SUPERSET_WORKSPACE_ID\" --terminal \"$SUPERSET_TERMINAL_ID\"`. It ends the session, but the pane stays open showing \"Session ended\", so I still have to close it.\n• Looked for an existing option: the config takes only `setup`, `teardown`, `run`, `start` and `cwd`, and no desktop setting covers it (checked on 1.33.0, macOS arm64).",
+					"fields": [],
+					"image": null,
+					"footer": "<https://github.com/superset-sh/superset|superset-sh/superset>",
+					"footerIcon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fslack.github.com%2Fstatic%2Fimg%2Ffavicon-neutral.png",
+					"ts": "1790870435",
+					"blocks": [],
+					"unfurl": null,
+					"link": null,
+					"buttons": [
+						{
+							"text": "Comment",
+							"url": null,
+							"style": null
+						},
+						{
+							"text": "Edit",
+							"url": null,
+							"style": null
+						},
+						{
+							"text": "Close",
+							"url": null,
+							"style": "danger"
+						}
+					]
+				}
+			],
+			"blocks": [],
+			"permalink": "https://superset.slack.com/archives/C0BUGS00001/p1790870438391109"
+		},
+		{
+			"ts": "1790873109.436619",
+			"user": {
+				"id": "U0GITHUB1A1",
+				"name": "GitHub",
+				"realName": null,
+				"avatar": "/fixtures/slack/U0GITHUB1A1.png",
+				"isBot": true,
+				"title": null,
+				"timezone": "America/Los_Angeles",
+				"presence": null,
+				"inChannel": false,
+				"isReader": false,
+				"team": null
+			},
+			"deleted": false,
+			"text": "",
+			"edited": false,
+			"broadcast": false,
+			"reactions": [],
+			"files": [],
+			"attachments": [
+				{
+					"color": "#36a64f",
+					"pretext": "Issue created by <https://github.com/lena-fischer-dev|lena-fischer-dev>",
+					"author": null,
+					"title": "<https://github.com/superset-sh/superset/issues/8039|#8039 Browser pane: tab shows a globe instead of the favicon once the page loads an iframe>",
+					"titleLink": null,
+					"text": "*Where did this happen?*\n\nDesktop app (macOS)\n\n*Version*\n\n1.33.0 (the code involved is unchanged on `main` as of 2026-10-01)\n\n*What happened?*\n\n• A browser pane's tab loses the page's favicon and shows the generic globe when the page adds an iframe after it has loaded.\n• It happens every time. The same page without the late iframe keeps its favicon.\n• It affects any page that loads embeds after first paint, such as a landing page whose live-demo iframes mount as you scroll.\nExpected: the tab keeps the page's favicon.\n\n*Steps to reproduce*\n\n1. Serve these files from one folder (e.g. `python3 -m http.server 7493`), with any SVG saved as `icon.svg`:  \n   • `plain.html`:  \n   `<!doctype html>&lt;title&gt;Plain&lt;/title&gt;&lt;link rel=\"icon\" href=\"/icon.svg\" type=\"image/svg+xml\"&gt;&lt;p&gt;No frame.&lt;/p&gt;`  \n   • `late-frame.html`:  \n   `<!doctype html>&lt;title&gt;Late frame&lt;/title&gt;&lt;link rel=\"icon\" href=\"/icon.svg\" type=\"image/svg+xml\"&gt;&lt;p&gt;A frame arrives after load.&lt;/p&gt;&lt;script&gt;setTimeout(()=&gt;{const f=document.createElement(\"iframe\");f.src=\"/plain.html\";document.body.append(f)},1500)&lt;/script&gt;`\n2. Open each page in its own browser pane tab.\n3. \"Plain\" shows the icon. \"Late frame\" shows the globe once its iframe loads.\n\n*Logs, screenshots, or recordings*\n\n• `browser_history` in `~/.superset/local.db` keeps `favicon_url = <http://localhost:7493/icon.svg>` for `plain.html`, and no favicon for `late-frame.html`.\n• `browserRuntimeRegistry.ts`: `handleDidStartLoading` sets `faviconUrl: null`. Only `handlePageFaviconUpdated` sets it again.\n• Hypothesis: Electron's `did-start-loading` also fires when a subframe starts loading, so the late iframe clears the favicon. The page's own icon hasn't changed, so `page-favicon-updated` doesn't fire again and nothing restores it. Clearing the favicon on `did-navigate` (main-frame navigations only) instead of on `did-start-loading` might fix it.",
+					"fields": [],
+					"image": null,
+					"footer": "<https://github.com/superset-sh/superset|superset-sh/superset>",
+					"footerIcon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fslack.github.com%2Fstatic%2Fimg%2Ffavicon-neutral.png",
+					"ts": "1790873105",
+					"blocks": [],
+					"unfurl": null,
+					"link": null,
+					"buttons": [
+						{
+							"text": "Comment",
+							"url": null,
+							"style": null
+						},
+						{
+							"text": "Edit",
+							"url": null,
+							"style": null
+						},
+						{
+							"text": "Close",
+							"url": null,
+							"style": "danger"
+						}
+					]
+				}
+			],
+			"blocks": [],
+			"permalink": "https://superset.slack.com/archives/C0BUGS00001/p1790873109436619"
+		},
+		{
+			"ts": "1790886535.142589",
+			"user": {
+				"id": "U0GITHUB1A1",
+				"name": "GitHub",
+				"realName": null,
+				"avatar": "/fixtures/slack/U0GITHUB1A1.png",
+				"isBot": true,
+				"title": null,
+				"timezone": "America/Los_Angeles",
+				"presence": null,
+				"inChannel": false,
+				"isReader": false,
+				"team": null
+			},
+			"deleted": false,
+			"text": "",
+			"edited": false,
+			"broadcast": false,
+			"reactions": [],
+			"files": [],
+			"attachments": [
+				{
+					"color": "#36a64f",
+					"pretext": "Issue created by <https://github.com/riya-kapoor-dev|riya-kapoor-dev>",
+					"author": null,
+					"title": "<https://github.com/superset-sh/superset/issues/8046|#8046 Projects: repository URL stays stale after GitHub repo transfer>",
+					"titleLink": null,
+					"text": "Summary\n• After transferring a GitHub repo to another org, the project's Repository field in Settings keeps the old URL\n• The local git remote already points to the new URL; Superset doesn't pick it up\n• No way to update it: the field is read-only and the CLI has no command for it\n• Happens on every open of the project; GitHub's redirect hides it for now\nSteps to reproduce\n1. Create a project linked to <http://github.com/old-org/my-repo|github.com/old-org/my-repo>\n2. Transfer the repo on GitHub to new-org and update the local remote (git remote set-url)\n3. Open the project's settings, or run `superset projects list`\nExpected  \nRepository shows <https://github.com/new-org/my-repo|https://github.com/new-org/my-repo>, or there is a way to re-link it.\nActual  \nRepository still shows <https://github.com/old-org/my-repo|https://github.com/old-org/my-repo>.\nInvestigation\n• `superset projects setup &lt;id&gt; --local --import &lt;path&gt; --repo-url &lt;new url&gt;` exits 0 but the repo stays unchanged\n• `superset projects create --local --import &lt;path&gt;` returns the existing project (created: false), repo unchanged\n• Hypothesis: the URL comes from the linked GitHub repository record, and the GitHub App installed on the old org never sees the transfer\nHost status  \n{\"running\":true,\"healthy\":true,\"hostServiceVersion\":\"1.33.0\",\"cloudRegistered\":true}\nEnvironment  \nSuperset 1.33.0, macOS arm64",
+					"fields": [],
+					"image": null,
+					"footer": "<https://github.com/superset-sh/superset|superset-sh/superset>",
+					"footerIcon": "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fslack.github.com%2Fstatic%2Fimg%2Ffavicon-neutral.png",
+					"ts": "1790886532",
+					"blocks": [],
+					"unfurl": null,
+					"link": null,
+					"buttons": [
+						{
+							"text": "Comment",
+							"url": null,
+							"style": null
+						},
+						{
+							"text": "Edit",
+							"url": null,
+							"style": null
+						},
+						{
+							"text": "Close",
+							"url": null,
+							"style": "danger"
+						}
+					]
+				}
+			],
+			"blocks": [],
+			"permalink": "https://superset.slack.com/archives/C0BUGS00001/p1790886535142589"
+		}
+	],
+	"members": [
+		{
+			"id": "U0GITHUB1A1",
+			"name": "GitHub",
+			"realName": null,
+			"avatar": "/fixtures/slack/U0GITHUB1A1.png",
+			"isBot": true,
+			"title": null,
+			"timezone": "America/Los_Angeles",
+			"presence": null,
+			"inChannel": true,
+			"isReader": false,
+			"team": null
+		}
+	],
+	"names": {
+		"U0BLAKE8R3V": "Blake",
+		"U0SATYA2P7D": "Satya Patel",
+		"U0AVERY4C1N": "Avery Chen",
+		"U0CLAUDE1A1": "Claude",
+		"U0GITHUB1A1": "GitHub",
+		"U0CURSOR1A1": "Cursor",
+		"U0SYFTEN1A1": "Syften",
+		"U0APPBOT1A1": "Superset"
+	},
+	"channels": {
+		"C0TESTAGNT1": "test-agents",
+		"C0BUGS00001": "bugs",
+		"C0GENERAL01": "general",
+		"C0AGENTS001": "agents"
+	},
+	"groups": {},
+	"emoji": {},
+	"readerConnected": true,
+	"draft": null
+}

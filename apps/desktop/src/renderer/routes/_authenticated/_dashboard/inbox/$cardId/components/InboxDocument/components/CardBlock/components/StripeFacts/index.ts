@@ -1,0 +1,1 @@
+export { StripeFacts } from "./StripeFacts";

@@ -1,9 +1,9 @@
-import type { ReactNode } from "react";
+import type { MouseEvent, ReactNode } from "react";
 
 interface RecordInlineLinkProps {
 	icon: ReactNode;
 	children: ReactNode;
-	onClick: () => void;
+	onClick: (event: MouseEvent<HTMLButtonElement>) => void;
 }
 
 export function RecordInlineLink({

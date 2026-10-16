@@ -1,0 +1,1 @@
+export { SlackChannelMention } from "./slackChannelMention";

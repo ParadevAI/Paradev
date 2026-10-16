@@ -34,6 +34,7 @@ import { useSettingsSearchQuery } from "renderer/stores/settings-state";
 
 const CATEGORY_ORDER: HotkeyCategory[] = [
 	"Navigation",
+	"Inbox",
 	"Workspace",
 	"Layout",
 	"Terminal",
@@ -68,7 +69,14 @@ function HotkeyRow({
 			)}
 		>
 			<div className="flex flex-col">
-				<span className="text-sm text-foreground">{i18n._(label)}</span>
+				<span className="flex items-center gap-2 text-sm text-foreground">
+					{i18n._(label)}
+					{HOTKEYS[id].scope === "inbox" && (
+						<span className="rounded border border-border px-1.5 py-px text-[10px] text-muted-foreground">
+							<Trans>While the inbox has focus</Trans>
+						</span>
+					)}
+				</span>
 				{description && (
 					<span className="text-xs text-muted-foreground">
 						{i18n._(description)}
@@ -127,6 +135,7 @@ function getHotkeysByCategory(): Record<
 		}>
 	> = {
 		Navigation: [],
+		Inbox: [],
 		Workspace: [],
 		Layout: [],
 		Terminal: [],
@@ -197,6 +206,7 @@ function KeyboardShortcutsPage() {
 			Navigation: t({
 				message: "Navigation",
 			}),
+			Inbox: t({ message: "Inbox" }),
 			Workspace: t({
 				message: "Workspace",
 			}),

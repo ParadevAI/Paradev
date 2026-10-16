@@ -1,0 +1,1 @@
+export { uploadAttachment } from "./uploadAttachment";

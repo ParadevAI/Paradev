@@ -51,6 +51,12 @@ export function RealtimeNudges() {
 						void utils.automation.listOrgRuns.invalidate(undefined, options);
 						void utils.automation.orgRunStats.invalidate(undefined, options);
 						break;
+					case "inbox":
+						void utils.inbox.list.invalidate(undefined, options);
+						void utils.inbox.count.invalidate(undefined, options);
+						void utils.inbox.get.invalidate(undefined, options);
+						void utils.inbox.document.invalidate(undefined, options);
+						break;
 				}
 			}
 		};

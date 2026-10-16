@@ -1,0 +1,1 @@
+export { LetterAvatar } from "./LetterAvatar";

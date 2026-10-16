@@ -92,6 +92,7 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 		"src/renderer/stores/workspace-sidebar-state.ts",
 		["workspace-sidebar-store"],
 	],
+	["src/renderer/stores/inbox-panel-state.ts", ["inbox-panel-store"]],
 	[
 		"src/renderer/routes/_authenticated/_dashboard/stores/cloudSidebarStore/cloudSidebarStore.ts",
 		["cloud-sidebar"],
@@ -221,6 +222,14 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 	[
 		"src/renderer/routes/_authenticated/_dashboard/automations/runs/components/RunRow/RunRow.tsx",
 		["lastViewedWorkspaceId"],
+	],
+	[
+		"src/renderer/routes/_authenticated/_dashboard/inbox/$cardId/components/InboxDocument/components/CardBlock/components/AutomationFailedBlock/hooks/useOpenRun/useOpenRun.ts",
+		["lastViewedWorkspaceId"],
+	],
+	[
+		"src/renderer/routes/_authenticated/_dashboard/inbox/$cardId/components/InboxDocument/components/CardBlock/components/EmojiPicker/hooks/useSkinTone/useSkinTone.ts",
+		["slack.emojiSkinTone"],
 	],
 	[
 		"src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/TerminalPane/richInputOpenStore.ts",

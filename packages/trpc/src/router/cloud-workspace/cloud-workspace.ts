@@ -20,7 +20,6 @@ import { z } from "zod";
 import { assertCloudAccess, assertMember } from "../../lib/cloud-guards";
 import { nudge } from "../../lib/realtime";
 import {
-	deleteSandbox,
 	describeSandbox,
 	HOST_SERVICE_PORT,
 	listRemoteBranches,
@@ -43,9 +42,9 @@ import {
 	visibleTo,
 } from "./access";
 import { recordCloudWorkspaceActivity } from "./activity";
-import { queueSettleWorkspace, settleWorkspaceNow } from "./meter";
+import { archiveCloudWorkspace } from "./archive";
+import { queueSettleWorkspace } from "./meter";
 import { nextSandboxNameFor } from "./provision";
-import { queueReap } from "./reap";
 import { cloudWorkspaceRecordRouter } from "./record";
 import { queueProvision, startCloudWorkspace } from "./start";
 import { transitionCloudWorkspace } from "./transition";
@@ -139,7 +138,10 @@ async function addressSandbox(
  * Current members who have opened the workspaces, most recently seen first.
  * The creator counts as present from the moment they created it.
  */
-async function loadPresence(organizationId: string, workspaceIds: string[]) {
+export async function loadPresence(
+	organizationId: string,
+	workspaceIds: string[],
+) {
 	if (workspaceIds.length === 0) return [];
 	const isMember = (userId: typeof users.id) =>
 		and(eq(members.userId, userId), eq(members.organizationId, organizationId));
@@ -653,49 +655,7 @@ export const cloudWorkspaceRouter = {
 			assertMember(ctx.organizationIds, row.organizationId);
 			if (!isVisibleTo(row, ctx.userId)) return { deleted: false };
 
-			const archivedAt = new Date();
-			// From any state, provisioning included: the job checks the row
-			// before it marks it ready and tears its box down when this won.
-			// The box keeps running until the reap stops it, so an undo is instant.
-			const archived = await transitionCloudWorkspace({
-				id: row.id,
-				from: ["provisioning", "ready", "failed"],
-				to: "deleted",
-				set: { sandboxUrl: null, deletedAt: archivedAt },
-			});
-			if (archived) {
-				// A row from a retired provider has no sandbox left to keep.
-				if (row.provider === "vercel") {
-					await queueReap(
-						{ cloudWorkspaceId: row.id, archivedAt: archivedAt.toISOString() },
-						row.providerSandboxId,
-					).catch(async (error) => {
-						console.error(
-							`[cloud-workspace] could not queue the reap for ${row.id}`,
-							error,
-						);
-						await settleWorkspaceNow(row.id).catch((meterError) =>
-							console.error(
-								`[cloud-workspace] ${row.id} final meter failed`,
-								meterError,
-							),
-						);
-						await deleteSandbox(row.providerSandboxId);
-					});
-				}
-				await recordCloudWorkspaceActivity(
-					db,
-					row.id,
-					{ kind: "user", userId: ctx.userId },
-					{ event: "archived" },
-				).catch((error) => {
-					console.error(
-						`[cloud-workspace] ${row.id} archive activity write failed`,
-						error,
-					);
-				});
-			}
-			nudge(row.organizationId, "cloud_workspaces");
+			await archiveCloudWorkspace(row, ctx.userId);
 			return { deleted: true };
 		}),
 

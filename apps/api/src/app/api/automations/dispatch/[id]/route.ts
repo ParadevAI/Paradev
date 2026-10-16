@@ -1,6 +1,6 @@
 import { db } from "@superset/db/client";
 import { automations } from "@superset/db/schema";
-import { dispatchAutomation } from "@superset/trpc/automation-dispatch";
+import { dispatchAutomationAndNotify } from "@superset/trpc/automation-dispatch";
 import { eq } from "drizzle-orm";
 import { env } from "@/env";
 import { verifyQstashRequest } from "@/lib/verifyQstash";
@@ -42,7 +42,7 @@ export async function POST(
 	}
 
 	const relayUrl = env.RELAY_URL;
-	const outcome = await dispatchAutomation(
+	const outcome = await dispatchAutomationAndNotify(
 		"scheduledFor" in parsed.data
 			? {
 					automation,

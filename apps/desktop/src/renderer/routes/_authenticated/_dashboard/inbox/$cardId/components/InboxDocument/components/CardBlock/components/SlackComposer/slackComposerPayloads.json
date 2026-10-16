@@ -1,0 +1,712 @@
+[
+	{
+		"id": "plain",
+		"label": "Plain text",
+		"steps": ["type:hello world"],
+		"slack": {
+			"text": "hello world",
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"type": "rich_text_section",
+							"elements": [
+								{
+									"type": "text",
+									"text": "hello world"
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	},
+	{
+		"id": "lines",
+		"label": "Line breaks",
+		"steps": ["type:line one\\nline two\\n\\nafter a blank"],
+		"slack": {
+			"text": "line one\nline two\n\nafter a blank",
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"type": "rich_text_section",
+							"elements": [
+								{
+									"type": "text",
+									"text": "line one\nline two\n\nafter a blank"
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	},
+	{
+		"id": "bold",
+		"label": "Bold",
+		"steps": ["type:a *bold* word"],
+		"slack": {
+			"text": "a *bold* word",
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"type": "rich_text_section",
+							"elements": [
+								{
+									"type": "text",
+									"text": "a "
+								},
+								{
+									"type": "text",
+									"text": "bold",
+									"style": {
+										"bold": true
+									}
+								},
+								{
+									"type": "text",
+									"text": " word"
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	},
+	{
+		"id": "italic",
+		"label": "Italic",
+		"steps": ["type:an _italic_ word"],
+		"slack": {
+			"text": "an _italic_ word",
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"type": "rich_text_section",
+							"elements": [
+								{
+									"type": "text",
+									"text": "an "
+								},
+								{
+									"type": "text",
+									"text": "italic",
+									"style": {
+										"italic": true
+									}
+								},
+								{
+									"type": "text",
+									"text": " word"
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	},
+	{
+		"id": "strike",
+		"label": "Strikethrough",
+		"steps": ["type:a ~gone~ word"],
+		"slack": {
+			"text": "a ~gone~ word",
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"type": "rich_text_section",
+							"elements": [
+								{
+									"type": "text",
+									"text": "a "
+								},
+								{
+									"type": "text",
+									"text": "gone",
+									"style": {
+										"strike": true
+									}
+								},
+								{
+									"type": "text",
+									"text": " word"
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	},
+	{
+		"id": "code",
+		"label": "Inline code",
+		"steps": ["type:run `bun test` now"],
+		"slack": {
+			"text": "run `bun test` now",
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"type": "rich_text_section",
+							"elements": [
+								{
+									"type": "text",
+									"text": "run "
+								},
+								{
+									"type": "text",
+									"text": "bun test",
+									"style": {
+										"code": true
+									}
+								},
+								{
+									"type": "text",
+									"text": " now"
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	},
+	{
+		"id": "underline",
+		"label": "Underline",
+		"steps": [
+			"type:under",
+			"key:ArrowLeft+shift*5",
+			"btn:Underline",
+			"key:ArrowRight",
+			"type: line"
+		],
+		"slack": {
+			"text": "under line",
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"type": "rich_text_section",
+							"elements": [
+								{
+									"type": "text",
+									"text": "under line",
+									"style": {
+										"underline": true
+									}
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	},
+	{
+		"id": "bold-italic",
+		"label": "Bold and italic together",
+		"steps": [
+			"type:both",
+			"key:ArrowLeft+shift*4",
+			"btn:Bold",
+			"btn:Italic",
+			"key:ArrowRight",
+			"type: styles"
+		],
+		"slack": {
+			"text": "_*both styles*_",
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"type": "rich_text_section",
+							"elements": [
+								{
+									"type": "text",
+									"text": "both styles",
+									"style": {
+										"bold": true,
+										"italic": true
+									}
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	},
+	{
+		"id": "url",
+		"label": "A typed URL",
+		"steps": ["type:see https://superset.sh today"],
+		"slack": {
+			"text": "see <https://superset.sh> today",
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"type": "rich_text_section",
+							"elements": [
+								{
+									"type": "text",
+									"text": "see "
+								},
+								{
+									"type": "link",
+									"url": "https://superset.sh"
+								},
+								{
+									"type": "text",
+									"text": " today"
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	},
+	{
+		"id": "link-paste",
+		"label": "A URL pasted over selected text",
+		"steps": [
+			"type:the docs",
+			"key:ArrowLeft+shift*4",
+			"paste:https://superset.sh/docs",
+			"key:ArrowRight",
+			"type: here"
+		],
+		"slack": {
+			"text": "the <https://superset.sh/docs|docs> here",
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"type": "rich_text_section",
+							"elements": [
+								{
+									"type": "text",
+									"text": "the "
+								},
+								{
+									"type": "link",
+									"url": "https://superset.sh/docs",
+									"text": "docs"
+								},
+								{
+									"type": "text",
+									"text": " here"
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	},
+	{
+		"id": "user",
+		"label": "User mention",
+		"steps": ["type:hi @satya", "wait:900", "pick", "type:there"],
+		"slack": {
+			"text": "hi <@U0SATYA2P7D> there",
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"type": "rich_text_section",
+							"elements": [
+								{
+									"type": "text",
+									"text": "hi "
+								},
+								{
+									"type": "user",
+									"user_id": "U0SATYA2P7D"
+								},
+								{
+									"type": "text",
+									"text": " there"
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	},
+	{
+		"id": "channel",
+		"label": "Channel mention",
+		"steps": ["type:see #test-ag", "wait:900", "pick", "type:please"],
+		"slack": {
+			"text": "see <#C0TESTAGNT1> please",
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"type": "rich_text_section",
+							"elements": [
+								{
+									"type": "text",
+									"text": "see "
+								},
+								{
+									"type": "channel",
+									"channel_id": "C0TESTAGNT1"
+								},
+								{
+									"type": "text",
+									"text": " please"
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	},
+	{
+		"id": "emoji-standard",
+		"label": "Standard emoji whose names differ between libraries",
+		"steps": ["type:mad :rage: and :thumbsup: "],
+		"slack": {
+			"text": "mad :rage: and :+1:",
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"type": "rich_text_section",
+							"elements": [
+								{
+									"type": "text",
+									"text": "mad "
+								},
+								{
+									"type": "emoji",
+									"name": "rage",
+									"unicode": "1f621"
+								},
+								{
+									"type": "text",
+									"text": " and "
+								},
+								{
+									"type": "emoji",
+									"name": "thumbsup",
+									"unicode": "1f44d"
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	},
+	{
+		"id": "emoji-custom",
+		"label": "Workspace emoji",
+		"steps": ["type:hello :glitch_crab: "],
+		"slack": {
+			"text": "hello :glitch_crab:",
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"type": "rich_text_section",
+							"elements": [
+								{
+									"type": "text",
+									"text": "hello "
+								},
+								{
+									"type": "emoji",
+									"name": "glitch_crab"
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	},
+	{
+		"id": "bullets",
+		"label": "Bulleted list",
+		"steps": ["type:- one\\ntwo"],
+		"slack": {
+			"text": "• one\n• two",
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"type": "rich_text_list",
+							"elements": [
+								{
+									"type": "rich_text_section",
+									"elements": [
+										{
+											"type": "text",
+											"text": "one"
+										}
+									]
+								},
+								{
+									"type": "rich_text_section",
+									"elements": [
+										{
+											"type": "text",
+											"text": "two"
+										}
+									]
+								}
+							],
+							"style": "bullet",
+							"indent": 0,
+							"border": 0
+						}
+					]
+				}
+			]
+		}
+	},
+	{
+		"id": "nested",
+		"label": "Nested list",
+		"steps": [
+			"type:- one\\n",
+			"key:Tab",
+			"type:sub\\n",
+			"key:Tab+shift",
+			"type:two"
+		],
+		"slack": {
+			"text": "• one\n    ◦ sub\n• two",
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"type": "rich_text_list",
+							"elements": [
+								{
+									"type": "rich_text_section",
+									"elements": [
+										{
+											"type": "text",
+											"text": "one"
+										}
+									]
+								}
+							],
+							"style": "bullet",
+							"indent": 0,
+							"border": 0
+						},
+						{
+							"type": "rich_text_list",
+							"elements": [
+								{
+									"type": "rich_text_section",
+									"elements": [
+										{
+											"type": "text",
+											"text": "sub"
+										}
+									]
+								}
+							],
+							"style": "bullet",
+							"indent": 1,
+							"border": 0
+						},
+						{
+							"type": "rich_text_list",
+							"elements": [
+								{
+									"type": "rich_text_section",
+									"elements": [
+										{
+											"type": "text",
+											"text": "two"
+										}
+									]
+								}
+							],
+							"style": "bullet",
+							"indent": 0,
+							"border": 0
+						}
+					]
+				}
+			]
+		}
+	},
+	{
+		"id": "ordered",
+		"label": "Numbered list",
+		"steps": ["type:1. first\\nsecond"],
+		"slack": {
+			"text": "1. first\n2. second",
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"type": "rich_text_list",
+							"elements": [
+								{
+									"type": "rich_text_section",
+									"elements": [
+										{
+											"type": "text",
+											"text": "first"
+										}
+									]
+								},
+								{
+									"type": "rich_text_section",
+									"elements": [
+										{
+											"type": "text",
+											"text": "second"
+										}
+									]
+								}
+							],
+							"style": "ordered",
+							"indent": 0,
+							"border": 0
+						}
+					]
+				}
+			]
+		}
+	},
+	{
+		"id": "quote",
+		"label": "Quote",
+		"steps": ["type:>quoted\\nmore"],
+		"slack": {
+			"text": "&gt; quoted\n&gt; more",
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"type": "rich_text_quote",
+							"elements": [
+								{
+									"type": "text",
+									"text": "quoted\nmore"
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	},
+	{
+		"id": "codeblock",
+		"label": "Code block",
+		"steps": ["type:```", "type:let x = 1\\nlet y = 2"],
+		"slack": {
+			"text": "```let x = 1\nlet y = 2```",
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"type": "rich_text_preformatted",
+							"elements": [
+								{
+									"type": "text",
+									"text": "let x = 1\nlet y = 2"
+								}
+							],
+							"border": 0
+						}
+					]
+				}
+			]
+		}
+	},
+	{
+		"id": "mixed",
+		"label": "Line, list and quote together",
+		"steps": ["type:intro\\n- point\\n\\n>said"],
+		"slack": {
+			"text": "intro\n• point\n&gt; said",
+			"blocks": [
+				{
+					"type": "rich_text",
+					"elements": [
+						{
+							"type": "rich_text_section",
+							"elements": [
+								{
+									"type": "text",
+									"text": "intro\n"
+								}
+							]
+						},
+						{
+							"type": "rich_text_list",
+							"elements": [
+								{
+									"type": "rich_text_section",
+									"elements": [
+										{
+											"type": "text",
+											"text": "point"
+										}
+									]
+								}
+							],
+							"style": "bullet",
+							"indent": 0,
+							"border": 0
+						},
+						{
+							"type": "rich_text_quote",
+							"elements": [
+								{
+									"type": "text",
+									"text": "said"
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	}
+]

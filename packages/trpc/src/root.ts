@@ -13,6 +13,7 @@ import { connectorsRouter } from "./router/connectors";
 import { environmentRouter } from "./router/environment";
 import { githubUserRouter } from "./router/github-user";
 import { hostManagementRouter, hostRouter } from "./router/host";
+import { inboxRouter } from "./router/inbox";
 import { integrationRouter } from "./router/integration";
 import { leaderboardRouter } from "./router/leaderboard";
 import { mentionRouter } from "./router/mention";
@@ -45,6 +46,7 @@ export const appRouter = createTRPCRouter({
 	environment: environmentRouter,
 	host: { ...hostRouter, ...hostManagementRouter },
 	connectors: connectorsRouter,
+	inbox: inboxRouter,
 	integration: integrationRouter,
 	leaderboard: leaderboardRouter,
 	organization: organizationRouter,

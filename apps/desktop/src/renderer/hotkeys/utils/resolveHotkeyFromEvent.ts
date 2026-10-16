@@ -58,6 +58,9 @@ function buildRegisteredAppChords(
 		// Explicit unassignment (null override) must drop from the index — else
 		// the terminal's isAppHotkey check would swallow the freed chord.
 		if (hasOverride && override === null) continue;
+		// A scoped hotkey is not an app-wide chord: a terminal must still
+		// receive the key, and the unscoped hotkey on the same chord keeps it.
+		if (HOTKEYS[id].scope) continue;
 		const binding = override ?? HOTKEYS[id].key;
 		if (!binding) continue;
 		const dispatchChord = bindingToDispatchChord(binding, layoutMap);

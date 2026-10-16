@@ -2,11 +2,13 @@ import { useRef } from "react";
 import { type Options, useHotkeys } from "react-hotkeys-hook";
 import { formatHotkeyDisplay } from "../../display";
 import type { HotkeyId } from "../../registry";
-import { PLATFORM } from "../../registry";
+import { HOTKEYS, PLATFORM } from "../../registry";
+import { useHotkeyScopeStore } from "../../stores/hotkeyScopeStore";
 import { useEffectiveLayoutMap } from "../../stores/keyboardPreferencesStore";
 import type { HotkeyDisplay } from "../../types";
 import { bindingToDispatchChord } from "../../utils/binding";
-import { useBinding } from "../useBinding";
+import { isSilencedByScope } from "../../utils/scope";
+import { getDispatchChord, useBinding } from "../useBinding";
 
 // react-hotkeys-hook doesn't check AltGraph or IME composition. Use its
 // `ignoreEventWhen` option (runs after match, before preventDefault) to
@@ -29,6 +31,18 @@ export function useHotkey(
 	const callbackRef = useRef(callback);
 	callbackRef.current = callback;
 	const callerIgnore = options?.ignoreEventWhen;
+	const scope = HOTKEYS[id]?.scope;
+	const silenced = () =>
+		isSilencedByScope({
+			hotkey: { scope, chord },
+			active: useHotkeyScopeStore.getState().active,
+			all: (Object.keys(HOTKEYS) as HotkeyId[])
+				.filter((other) => HOTKEYS[other].scope)
+				.map((other) => ({
+					scope: HOTKEYS[other].scope,
+					chord: getDispatchChord(other),
+				})),
+		});
 	useHotkeys(
 		chord ?? "",
 		(e, _h) => {
@@ -41,9 +55,8 @@ export function useHotkey(
 			enableOnFormTags: true,
 			enableOnContentEditable: true,
 			...options,
-			ignoreEventWhen: callerIgnore
-				? (e) => shouldIgnoreEvent(e) || callerIgnore(e)
-				: shouldIgnoreEvent,
+			ignoreEventWhen: (e) =>
+				shouldIgnoreEvent(e) || silenced() || (callerIgnore?.(e) ?? false),
 		},
 		[chord],
 	);

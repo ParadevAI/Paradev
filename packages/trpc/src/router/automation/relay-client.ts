@@ -50,7 +50,7 @@ function parseTrpcErrorMessage(rawBody: string): string | null {
  * `{ result: { data: { json: <output> } } }`.
  */
 export function relayMutation<TInput, TOutput>(
-	options: RelayClientOptions,
+	options: RelayClientOptions & { query?: boolean },
 	procedure: string,
 	input: TInput,
 ): Promise<TOutput> {
@@ -59,6 +59,7 @@ export function relayMutation<TInput, TOutput>(
 			baseUrl: `${options.relayUrl}/hosts/${options.hostId}`,
 			headers: { authorization: `Bearer ${options.jwt}` },
 			timeoutMs: options.timeoutMs,
+			query: options.query,
 		},
 		procedure,
 		input,
@@ -71,12 +72,16 @@ export async function hostServiceMutation<TInput, TOutput>(
 		baseUrl: string;
 		headers: Record<string, string>;
 		timeoutMs?: number;
+		/** A tRPC query rather than a mutation: GET, with the input in the URL. */
+		query?: boolean;
 	},
 	procedure: string,
 	input: TInput,
 ): Promise<TOutput> {
-	const url = `${options.baseUrl}/trpc/${procedure}`;
 	const encoded = SuperJSON.serialize(input);
+	const url = options.query
+		? `${options.baseUrl}/trpc/${procedure}?input=${encodeURIComponent(JSON.stringify(encoded))}`
+		: `${options.baseUrl}/trpc/${procedure}`;
 
 	const controller = new AbortController();
 	const timer = setTimeout(
@@ -86,12 +91,17 @@ export async function hostServiceMutation<TInput, TOutput>(
 
 	let response: Response;
 	try {
-		response = await fetch(url, {
-			method: "POST",
-			headers: { "content-type": "application/json", ...options.headers },
-			body: JSON.stringify(encoded),
-			signal: controller.signal,
-		});
+		response = await fetch(
+			url,
+			options.query
+				? { headers: options.headers, signal: controller.signal }
+				: {
+						method: "POST",
+						headers: { "content-type": "application/json", ...options.headers },
+						body: JSON.stringify(encoded),
+						signal: controller.signal,
+					},
+		);
 	} finally {
 		clearTimeout(timer);
 	}
