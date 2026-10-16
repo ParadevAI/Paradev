@@ -14,8 +14,8 @@ export const env = createEnv({
 		GOOGLE_CLIENT_SECRET: z.string().min(1),
 		// Google connections (Gmail triggers and the Gmail plugin) sign in with
 		// this client; GOOGLE_CLIENT_ID is for Sign in with Google only.
-		GOOGLE_TEMP_CLIENT_ID: z.string().min(1),
-		GOOGLE_TEMP_CLIENT_SECRET: z.string().min(1),
+		GOOGLE_CONNECTIONS_CLIENT_ID: z.string().min(1),
+		GOOGLE_CONNECTIONS_CLIENT_SECRET: z.string().min(1),
 		GH_CLIENT_ID: z.string().min(1),
 		GH_CLIENT_SECRET: z.string().min(1),
 		// Gmail push: the Pub/Sub topic `users.watch` publishes to, and the

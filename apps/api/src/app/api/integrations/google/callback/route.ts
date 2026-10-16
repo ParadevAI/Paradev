@@ -42,8 +42,8 @@ export async function GET(request: Request) {
 		signal: AbortSignal.timeout(GOOGLE_CALL_TIMEOUT_MS),
 		body: new URLSearchParams({
 			grant_type: "authorization_code",
-			client_id: env.GOOGLE_TEMP_CLIENT_ID,
-			client_secret: env.GOOGLE_TEMP_CLIENT_SECRET,
+			client_id: env.GOOGLE_CONNECTIONS_CLIENT_ID,
+			client_secret: env.GOOGLE_CONNECTIONS_CLIENT_SECRET,
 			redirect_uri: `${env.NEXT_PUBLIC_API_URL}/api/integrations/google/callback`,
 			code: params.code,
 		}),

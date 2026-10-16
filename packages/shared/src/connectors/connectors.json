@@ -28,8 +28,8 @@
 					"token_request_auth_method": "client_secret_post",
 					"token_expiration_buffer": 300,
 					"requires_env": [
-						"GOOGLE_TEMP_CLIENT_ID",
-						"GOOGLE_TEMP_CLIENT_SECRET"
+						"GOOGLE_CONNECTIONS_CLIENT_ID",
+						"GOOGLE_CONNECTIONS_CLIENT_SECRET"
 					],
 					"authorization_params": {
 						"access_type": "offline",
