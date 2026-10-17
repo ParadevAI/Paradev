@@ -7,6 +7,7 @@ interface Settings {
 	diffStyle: "split" | "unified";
 	showDiffComments: boolean;
 	expandUnchanged: boolean;
+	terminalReadingWidth: boolean;
 	/** How the top-bar Changes button (and ⌘⇧L) opens the Changes surface:
 	 * split the current tab, or focus/create a dedicated tab. */
 	changesOpenTarget: ChangesOpenTarget;
@@ -23,6 +24,7 @@ export const useSettings = create<SettingsStore>()(
 			diffStyle: "split",
 			showDiffComments: true,
 			expandUnchanged: false,
+			terminalReadingWidth: false,
 			changesOpenTarget: "pane",
 			dictationEnabled: true,
 			update: (key, value) => set({ [key]: value }),
