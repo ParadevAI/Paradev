@@ -5,6 +5,7 @@ import {
 	planAllowsAutomations,
 	planAllowsTriggerKind,
 	planTierFromSubscription,
+	proSeatPricePerMonth,
 	requiredPlanForTriggerKind,
 	resolveCurrentPlan,
 } from "./billing";
@@ -158,5 +159,12 @@ describe("autumnProPlanId", () => {
 	test("annual picks the annual Pro plan", () => {
 		expect(autumnProPlanId({ annual: true })).toBe("pro_annual");
 		expect(autumnProPlanId({ annual: false })).toBe("pro");
+	});
+});
+
+describe("proSeatPricePerMonth", () => {
+	test("yearly is the annual price spread over twelve months", () => {
+		expect(proSeatPricePerMonth({ annual: false })).toBe(20);
+		expect(proSeatPricePerMonth({ annual: true })).toBe(15);
 	});
 });

@@ -960,6 +960,9 @@ msgstr "{minutes}分鐘前"
 msgid "{modKey}↵ to create"
 msgstr "{modKey}↵建立"
 
+msgid "{monthlyPrice} per user/mo billed monthly, or {yearlyPrice} billed yearly. Cloud workspaces, mobile, priority support."
+msgstr "按月計費每使用者每月 {monthlyPrice}，按年計費為 {yearlyPrice}。包含雲端工作區、行動版和優先支援。"
+
 msgid "{months}mo ago"
 msgstr "{months}個月前"
 
@@ -1291,20 +1294,11 @@ msgstr "✓ 3天前"
 msgid "${balance} credits"
 msgstr "${balance}額度"
 
-msgid "${monthly} per user/mo. Cloud workspaces, mobile, priority support."
-msgstr "${monthly}每使用者/月。包含雲端工作區、行動版和優先支援。"
-
 msgid "$0"
 msgstr "$0"
 
-msgid "$15"
-msgstr "$15"
-
 msgid "$180 per user, billed yearly"
 msgstr "每使用者$180，按年計費"
-
-msgid "$20"
-msgstr "$20"
 
 msgid "1"
 msgstr "1"

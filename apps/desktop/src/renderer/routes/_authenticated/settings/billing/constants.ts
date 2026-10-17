@@ -16,10 +16,6 @@ export interface Plan {
 	id: PlanTier;
 	name: MessageDescriptor;
 	description: MessageDescriptor;
-	price: {
-		monthly: number;
-		yearly?: number;
-	} | null;
 	limits: {
 		maxUsers: number | null;
 		maxWorkspaces: number | null;
@@ -41,7 +37,6 @@ export const PLANS: Record<PlanTier, Plan> = {
 		description: msg({
 			message: "For individuals getting started",
 		}),
-		price: null,
 		limits: {
 			maxUsers: 1,
 			maxWorkspaces: 5,
@@ -63,7 +58,6 @@ export const PLANS: Record<PlanTier, Plan> = {
 		description: msg({
 			message: "For teams that need more power",
 		}),
-		price: { monthly: 2000, yearly: 18000 },
 		limits: {
 			maxUsers: null,
 			maxWorkspaces: null,
@@ -71,12 +65,7 @@ export const PLANS: Record<PlanTier, Plan> = {
 			mobileApp: true,
 		},
 		features: [
-			{
-				id: "users",
-				name: "Unlimited users",
-				included: true,
-				limit: "$20/seat",
-			},
+			{ id: "users", name: "Unlimited users", included: true },
 			{ id: "tasks", name: "Task management", included: true },
 			{ id: "cloud", name: "Cloud workspaces", included: true },
 			{ id: "mobile", name: "Mobile app access", included: true },
@@ -93,7 +82,6 @@ export const PLANS: Record<PlanTier, Plan> = {
 		description: msg({
 			message: "For organizations with advanced needs",
 		}),
-		price: null,
 		limits: {
 			maxUsers: null,
 			maxWorkspaces: null,

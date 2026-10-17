@@ -960,6 +960,9 @@ msgstr "{minutes} мин. назад"
 msgid "{modKey}↵ to create"
 msgstr "{modKey}↵ — создать"
 
+msgid "{monthlyPrice} per user/mo billed monthly, or {yearlyPrice} billed yearly. Cloud workspaces, mobile, priority support."
+msgstr "{monthlyPrice} за пользователя в месяц при помесячной оплате или {yearlyPrice} при оплате за год. Облачные рабочие области, мобильное приложение, приоритетная поддержка."
+
 msgid "{months}mo ago"
 msgstr "{months} мес. назад"
 
@@ -1291,20 +1294,11 @@ msgstr "✓ 3 д. назад"
 msgid "${balance} credits"
 msgstr "${balance} кредитов"
 
-msgid "${monthly} per user/mo. Cloud workspaces, mobile, priority support."
-msgstr "${monthly} за пользователя в месяц. Облачные рабочие области, мобильное приложение, приоритетная поддержка."
-
 msgid "$0"
 msgstr "$0"
 
-msgid "$15"
-msgstr "$15"
-
 msgid "$180 per user, billed yearly"
 msgstr "$180 за пользователя при годовой оплате"
-
-msgid "$20"
-msgstr "$20"
 
 msgid "1"
 msgstr "1"

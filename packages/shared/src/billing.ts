@@ -155,3 +155,18 @@ export function autumnProPlanId({
 }): "pro" | "pro_annual" {
 	return annual ? "pro_annual" : "pro";
 }
+
+// Display copy of the Autumn `pro` and `pro_annual` seat prices; checkout bills
+// from Autumn, so change both together.
+export const PRO_SEAT_PRICE = {
+	currency: "USD",
+	monthlyCents: 2000,
+	yearlyCents: 18000,
+} as const;
+
+export function proSeatPricePerMonth({ annual }: { annual: boolean }): number {
+	const cents = annual
+		? PRO_SEAT_PRICE.yearlyCents / 12
+		: PRO_SEAT_PRICE.monthlyCents;
+	return cents / 100;
+}

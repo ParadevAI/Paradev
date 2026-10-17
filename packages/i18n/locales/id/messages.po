@@ -960,6 +960,9 @@ msgstr "{minutes}m lalu"
 msgid "{modKey}↵ to create"
 msgstr "{modKey}↵ untuk membuat"
 
+msgid "{monthlyPrice} per user/mo billed monthly, or {yearlyPrice} billed yearly. Cloud workspaces, mobile, priority support."
+msgstr "{monthlyPrice} per pengguna/bln jika ditagih bulanan, atau {yearlyPrice} jika ditagih tahunan. Workspace cloud, mobile, dukungan prioritas."
+
 msgid "{months}mo ago"
 msgstr "{months}bln lalu"
 
@@ -1291,20 +1294,11 @@ msgstr "✓ 3h lalu"
 msgid "${balance} credits"
 msgstr "kredit ${balance}"
 
-msgid "${monthly} per user/mo. Cloud workspaces, mobile, priority support."
-msgstr "${monthly} per pengguna/bln. Workspace cloud, mobile, dukungan prioritas."
-
 msgid "$0"
 msgstr "$0"
 
-msgid "$15"
-msgstr "$15"
-
 msgid "$180 per user, billed yearly"
 msgstr "$180 per pengguna, ditagih tahunan"
-
-msgid "$20"
-msgstr "$20"
 
 msgid "1"
 msgstr "1"

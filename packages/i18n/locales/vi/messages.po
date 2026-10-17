@@ -960,6 +960,9 @@ msgstr "{minutes} phút trước"
 msgid "{modKey}↵ to create"
 msgstr "{modKey}↵ để tạo"
 
+msgid "{monthlyPrice} per user/mo billed monthly, or {yearlyPrice} billed yearly. Cloud workspaces, mobile, priority support."
+msgstr "{monthlyPrice} mỗi người/tháng khi thanh toán theo tháng, hoặc {yearlyPrice} khi thanh toán theo năm. Workspace trên cloud, ứng dụng di động, hỗ trợ ưu tiên."
+
 msgid "{months}mo ago"
 msgstr "{months} tháng trước"
 
@@ -1291,20 +1294,11 @@ msgstr "✓ 3 ngày trước"
 msgid "${balance} credits"
 msgstr "${balance} credit"
 
-msgid "${monthly} per user/mo. Cloud workspaces, mobile, priority support."
-msgstr "${monthly} mỗi người/tháng. Workspace trên cloud, ứng dụng di động, hỗ trợ ưu tiên."
-
 msgid "$0"
 msgstr "$0"
 
-msgid "$15"
-msgstr "$15"
-
 msgid "$180 per user, billed yearly"
 msgstr "180 USD mỗi người, thanh toán theo năm"
-
-msgid "$20"
-msgstr "$20"
 
 msgid "1"
 msgstr "1"

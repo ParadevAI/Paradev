@@ -2,6 +2,8 @@ import type { MessageDescriptor } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { i18n } from "@superset/i18n";
+import { useFormat } from "@superset/i18n/react";
+import { PRO_SEAT_PRICE, proSeatPricePerMonth } from "@superset/shared/billing";
 import { COMPANY } from "@superset/shared/constants";
 import { Badge } from "@superset/ui/badge";
 import { Button } from "@superset/ui/button";
@@ -47,7 +49,7 @@ type PlanCardActionButton = {
 type PlanCardData = {
 	id: "free" | "pro" | "enterprise";
 	name: MessageDescriptor;
-	price: PlanCardText;
+	price: PlanCardText | "proSeat";
 	priceNote?: PlanCardText;
 	billingText: PlanCardText;
 	showBillingToggle?: boolean;
@@ -92,14 +94,7 @@ const PLAN_CARDS: PlanCardData[] = [
 	{
 		id: "pro",
 		name: msg({ message: "Pro" }),
-		price: {
-			monthly: msg({
-				message: "$20",
-			}),
-			yearly: msg({
-				message: "$15",
-			}),
-		},
+		price: "proSeat",
 		priceNote: msg({
 			message: "per user/month",
 		}),
@@ -329,6 +324,7 @@ function PlansPage() {
 	// then on, and Annual stays the default for free and enterprise, which have
 	// no interval to read.
 	const { t } = useLingui();
+	const { formatCurrency } = useFormat();
 	const [manualIsYearly, setManualIsYearly] = useState<boolean | null>(null);
 	const { upgrade, cancel, restore, isUpgrading, isCanceling, isRestoring } =
 		useBillingActions();
@@ -367,6 +363,15 @@ function PlansPage() {
 		}
 		return value as T;
 	};
+
+	const getPriceLabel = (price: PlanCardData["price"]): string =>
+		price === "proSeat"
+			? formatCurrency(
+					proSeatPricePerMonth({ annual: isYearly }),
+					PRO_SEAT_PRICE.currency,
+					{ minimumFractionDigits: 0 },
+				)
+			: i18n._(getValue(price));
 
 	const handlePlanAction = async (action: PlanCardAction) => {
 		if (action === "current") {
@@ -614,7 +619,7 @@ function PlansPage() {
 																: "text-base font-medium text-muted-foreground",
 														)}
 													>
-														{i18n._(getValue(plan.price))}
+														{getPriceLabel(plan.price)}
 													</div>
 													{plan.priceNote && (
 														<div className="text-xs text-muted-foreground">

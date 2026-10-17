@@ -1,5 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { i18n } from "@superset/i18n";
+import { useFormat } from "@superset/i18n/react";
+import { PRO_SEAT_PRICE, proSeatPricePerMonth } from "@superset/shared/billing";
 import { Button } from "@superset/ui/button";
 import { PLANS } from "../../../../constants";
 
@@ -10,7 +12,13 @@ interface UpgradeCardProps {
 
 export function UpgradeCard({ onUpgrade, isUpgrading }: UpgradeCardProps) {
 	const plan = PLANS.pro;
-	const monthly = plan.price?.monthly ? plan.price.monthly / 100 : 0;
+	const { formatCurrency } = useFormat();
+	const formatSeatPrice = (annual: boolean) =>
+		formatCurrency(proSeatPricePerMonth({ annual }), PRO_SEAT_PRICE.currency, {
+			minimumFractionDigits: 0,
+		});
+	const monthlyPrice = formatSeatPrice(false);
+	const yearlyPrice = formatSeatPrice(true);
 
 	return (
 		<div className="flex items-center justify-between gap-8 py-3">
@@ -25,7 +33,8 @@ export function UpgradeCard({ onUpgrade, isUpgrading }: UpgradeCardProps) {
 				</div>
 				<div className="text-xs text-muted-foreground mt-0.5">
 					<Trans>
-						${monthly} per user/mo. Cloud workspaces, mobile, priority support.
+						{monthlyPrice} per user/mo billed monthly, or {yearlyPrice} billed
+						yearly. Cloud workspaces, mobile, priority support.
 					</Trans>
 				</div>
 			</div>

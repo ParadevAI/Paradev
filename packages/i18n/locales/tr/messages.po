@@ -960,6 +960,9 @@ msgstr "{minutes}dk önce"
 msgid "{modKey}↵ to create"
 msgstr "Oluşturmak için {modKey}↵"
 
+msgid "{monthlyPrice} per user/mo billed monthly, or {yearlyPrice} billed yearly. Cloud workspaces, mobile, priority support."
+msgstr "Aylık faturalandırmada kullanıcı başına ayda {monthlyPrice}, yıllık faturalandırmada {yearlyPrice}. Bulut çalışma alanları, mobil, öncelikli destek."
+
 msgid "{months}mo ago"
 msgstr "{months}ay önce"
 
@@ -1291,20 +1294,11 @@ msgstr "✓ 3g önce"
 msgid "${balance} credits"
 msgstr "${balance} kredi"
 
-msgid "${monthly} per user/mo. Cloud workspaces, mobile, priority support."
-msgstr "Kullanıcı başına ayda ${monthly}. Bulut çalışma alanları, mobil, öncelikli destek."
-
 msgid "$0"
 msgstr "$0"
 
-msgid "$15"
-msgstr "$15"
-
 msgid "$180 per user, billed yearly"
 msgstr "Kullanıcı başına 180 $, yıllık faturalandırılır"
-
-msgid "$20"
-msgstr "$20"
 
 msgid "1"
 msgstr "1"

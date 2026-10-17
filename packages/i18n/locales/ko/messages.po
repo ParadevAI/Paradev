@@ -960,6 +960,9 @@ msgstr "{minutes}분 전"
 msgid "{modKey}↵ to create"
 msgstr "{modKey}↵로 만들기"
 
+msgid "{monthlyPrice} per user/mo billed monthly, or {yearlyPrice} billed yearly. Cloud workspaces, mobile, priority support."
+msgstr "월간 결제 시 사용자당 월 {monthlyPrice}, 연간 결제 시 {yearlyPrice}. 클라우드 워크스페이스, 모바일, 우선 지원이 포함됩니다."
+
 msgid "{months}mo ago"
 msgstr "{months}개월 전"
 
@@ -1291,20 +1294,11 @@ msgstr "✓ 3일 전"
 msgid "${balance} credits"
 msgstr "크레딧 ${balance}"
 
-msgid "${monthly} per user/mo. Cloud workspaces, mobile, priority support."
-msgstr "사용자당 월 ${monthly}. 클라우드 워크스페이스, 모바일, 우선 지원이 포함됩니다."
-
 msgid "$0"
 msgstr "$0"
 
-msgid "$15"
-msgstr "$15"
-
 msgid "$180 per user, billed yearly"
 msgstr "사용자당 $180, 연간 결제"
-
-msgid "$20"
-msgstr "$20"
 
 msgid "1"
 msgstr "1"

@@ -960,6 +960,9 @@ msgstr "il y a {minutes} min"
 msgid "{modKey}↵ to create"
 msgstr "{modKey}↵ pour créer"
 
+msgid "{monthlyPrice} per user/mo billed monthly, or {yearlyPrice} billed yearly. Cloud workspaces, mobile, priority support."
+msgstr "{monthlyPrice} par utilisateur/mois en facturation mensuelle, ou {yearlyPrice} en facturation annuelle. Espaces de travail cloud, mobile, support prioritaire."
+
 msgid "{months}mo ago"
 msgstr "il y a {months} mois"
 
@@ -1291,20 +1294,11 @@ msgstr "✓ il y a 3 j"
 msgid "${balance} credits"
 msgstr "{balance} $ de crédits"
 
-msgid "${monthly} per user/mo. Cloud workspaces, mobile, priority support."
-msgstr "${monthly} par utilisateur/mois. Espaces de travail cloud, mobile, support prioritaire."
-
 msgid "$0"
 msgstr "$0"
 
-msgid "$15"
-msgstr "$15"
-
 msgid "$180 per user, billed yearly"
 msgstr "180 $ par utilisateur, facturation annuelle"
-
-msgid "$20"
-msgstr "$20"
 
 msgid "1"
 msgstr "1"

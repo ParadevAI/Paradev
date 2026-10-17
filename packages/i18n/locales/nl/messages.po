@@ -960,6 +960,9 @@ msgstr "{minutes}m geleden"
 msgid "{modKey}↵ to create"
 msgstr "{modKey}↵ om aan te maken"
 
+msgid "{monthlyPrice} per user/mo billed monthly, or {yearlyPrice} billed yearly. Cloud workspaces, mobile, priority support."
+msgstr "{monthlyPrice} per gebruiker/mnd bij maandelijkse facturering, of {yearlyPrice} bij jaarlijkse facturering. Cloudwerkruimtes, mobiel, prioritaire support."
+
 msgid "{months}mo ago"
 msgstr "{months}mnd geleden"
 
@@ -1291,20 +1294,11 @@ msgstr "✓ 3d geleden"
 msgid "${balance} credits"
 msgstr "${balance} tegoed"
 
-msgid "${monthly} per user/mo. Cloud workspaces, mobile, priority support."
-msgstr "${monthly} per gebruiker/mnd. Cloudwerkruimtes, mobiel, prioritaire support."
-
 msgid "$0"
 msgstr "$0"
 
-msgid "$15"
-msgstr "$15"
-
 msgid "$180 per user, billed yearly"
 msgstr "$180 per gebruiker, jaarlijks gefactureerd"
-
-msgid "$20"
-msgstr "$20"
 
 msgid "1"
 msgstr "1"

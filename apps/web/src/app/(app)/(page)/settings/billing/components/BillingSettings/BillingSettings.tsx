@@ -2,9 +2,11 @@
 
 import { Trans, useLingui } from "@lingui/react/macro";
 import { authClient } from "@superset/auth/client";
-import { formatDate } from "@superset/i18n/format";
+import { formatCurrency, formatDate } from "@superset/i18n/format";
 import {
 	isPaymentFailingStatus,
+	PRO_SEAT_PRICE,
+	proSeatPricePerMonth,
 	resolveCurrentPlan,
 } from "@superset/shared/billing";
 import { Button } from "@superset/ui/button";
@@ -14,9 +16,6 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useTRPC } from "@/trpc/react";
 import { useBillingActions } from "./hooks/useBillingActions";
-
-const PRO_MONTHLY_PRICE = 20;
-const PRO_YEARLY_PRICE = 15;
 
 interface BillingSettingsProps {
 	/**
@@ -226,7 +225,11 @@ export function BillingSettings({ organizationId }: BillingSettingsProps) {
 					</div>
 					<div className="flex items-baseline gap-2">
 						<span className="text-2xl font-semibold">
-							${isYearly ? PRO_YEARLY_PRICE : PRO_MONTHLY_PRICE}
+							{formatCurrency(
+								proSeatPricePerMonth({ annual: isYearly }),
+								PRO_SEAT_PRICE.currency,
+								{ minimumFractionDigits: 0 },
+							)}
 						</span>
 						<span className="text-sm text-muted-foreground">
 							<Trans>per user/month</Trans>

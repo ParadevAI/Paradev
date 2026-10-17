@@ -960,6 +960,9 @@ msgstr "před {minutes} m"
 msgid "{modKey}↵ to create"
 msgstr "{modKey}↵ pro vytvoření"
 
+msgid "{monthlyPrice} per user/mo billed monthly, or {yearlyPrice} billed yearly. Cloud workspaces, mobile, priority support."
+msgstr "{monthlyPrice} na uživatele a měsíc při měsíční fakturaci, nebo {yearlyPrice} při roční fakturaci. Cloudové pracovní prostory, mobil, prioritní podpora."
+
 msgid "{months}mo ago"
 msgstr "před {months} měs."
 
@@ -1291,20 +1294,11 @@ msgstr "✓ před 3 d"
 msgid "${balance} credits"
 msgstr "{balance} $ kreditů"
 
-msgid "${monthly} per user/mo. Cloud workspaces, mobile, priority support."
-msgstr "{monthly} $ na uživatele a měsíc. Cloudové pracovní prostory, mobil, prioritní podpora."
-
 msgid "$0"
 msgstr "0 $"
 
-msgid "$15"
-msgstr "15 $"
-
 msgid "$180 per user, billed yearly"
 msgstr "180 $ na uživatele, účtováno ročně"
-
-msgid "$20"
-msgstr "20 $"
 
 msgid "1"
 msgstr "1"
