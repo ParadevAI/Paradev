@@ -621,21 +621,17 @@ function bindingRunsConfig(
 	binding: Pick<TerminalAgentBinding, "definitionId" | "agentId">,
 	config: ResolvedHostAgentConfig,
 ): boolean {
-	const bound = resolveHostAgentConfig(
-		db,
-		binding.definitionId ?? binding.agentId,
-	);
-	if (!bound) return false;
 	if (binding.definitionId) {
 		// The binding knows which instance it runs.
-		return bound.id === config.id;
+		return resolveHostAgentConfig(db, binding.definitionId)?.id === config.id;
 	}
 	// The binding knows only the binary. A caller that names an instance of it
 	// - an automation pinned to a second agent of one preset, or to a custom
 	// agent that runs the same binary - is still the agent this terminal
 	// holds; the candidate is that automation's own last session, so the
-	// instance it names is the instance that is running.
-	return bound.presetId === launchIdentity(config);
+	// instance it names is the instance that is running. Compared as is: a
+	// host may have no preset row left for the binary to resolve to.
+	return binding.agentId === launchIdentity(config);
 }
 
 export function chatLaunchTarget(

@@ -934,9 +934,8 @@ describe("continuationTarget", () => {
 			.run();
 	}
 
-	// Seeded too, so a codex binding resolves to a REAL config that differs
-	// from claude. Without it `bound` is null and the identity comparison is
-	// never the thing doing the rejecting.
+	// Seeded too, so a codex binding names a REAL config that differs from
+	// claude rather than an agent the host does not have.
 	function seedCodex(db: HostDb) {
 		db.insert(schema.hostAgentConfigs)
 			.values({
@@ -1150,5 +1149,13 @@ describe("continuationTarget", () => {
 		expect(
 			continuationTarget(db, boundStore(), { ...run, agent: "custom:omp" }),
 		).toBeNull();
+	});
+
+	it("accepts a custom agent that runs the binary when no preset row of it is left", () => {
+		const db = createTestDb();
+		seedCustomAgent(db, "custom:team", "claude");
+		expect(
+			continuationTarget(db, boundStore(), { ...run, agent: "custom:team" }),
+		).toEqual({ terminalId, label: "Team Claude" });
 	});
 });
