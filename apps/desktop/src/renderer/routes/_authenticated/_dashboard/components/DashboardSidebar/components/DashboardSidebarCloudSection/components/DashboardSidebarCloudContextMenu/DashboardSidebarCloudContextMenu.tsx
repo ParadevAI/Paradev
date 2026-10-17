@@ -10,6 +10,7 @@ import {
 	ContextMenuSubTrigger,
 	ContextMenuTrigger,
 } from "@superset/ui/context-menu";
+import { useRunAfterMenuClose } from "@superset/ui/hooks/use-run-after-menu-close";
 import type { KeyboardEvent, ReactNode } from "react";
 import { HiOutlineClipboardDocumentList } from "react-icons/hi2";
 import {
@@ -33,7 +34,6 @@ import { LabelCommand } from "renderer/routes/_authenticated/_dashboard/componen
 import { ProjectCommand } from "renderer/routes/_authenticated/_dashboard/components/ProjectCommand";
 import { ProjectGlyph } from "renderer/routes/_authenticated/_dashboard/components/TaskProjectIcon";
 import type { CloudSidebarGroup } from "renderer/routes/_authenticated/_dashboard/stores/cloudSidebarStore";
-import { useRunAfterMenuClose } from "../../../../hooks/useRunAfterMenuClose";
 import { LinkTaskCommand } from "./components/LinkTaskCommand";
 
 interface LabelOption {
