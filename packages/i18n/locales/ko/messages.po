@@ -3853,9 +3853,6 @@ msgstr "칩을 클릭하면 풀 리퀘스트가 열립니다"
 msgid "Click to copy the session ID (resume with `claude --resume <id>`)."
 msgstr "클릭하면 세션 ID를 복사합니다(`claude --resume <id>`로 이어서 진행)."
 
-msgid "Click to open on GitHub"
-msgstr "클릭하여 GitHub에서 열기"
-
 msgid "Click to open the pull request"
 msgstr "클릭하여 풀 리퀘스트 열기"
 

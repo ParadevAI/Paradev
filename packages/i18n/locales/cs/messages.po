@@ -3853,9 +3853,6 @@ msgstr "Kliknutím na štítek otevřete pull request"
 msgid "Click to copy the session ID (resume with `claude --resume <id>`)."
 msgstr "Kliknutím zkopírujete ID relace (pokračování přes `claude --resume <id>`)."
 
-msgid "Click to open on GitHub"
-msgstr "Kliknutím otevřete na GitHubu"
-
 msgid "Click to open the pull request"
 msgstr "Kliknutím otevřete pull request"
 

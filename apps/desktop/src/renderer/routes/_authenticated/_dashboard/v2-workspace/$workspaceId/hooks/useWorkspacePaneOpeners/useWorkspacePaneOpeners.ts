@@ -1,7 +1,7 @@
 import type { WorkspaceStore } from "@superset/panes";
 import { useCallback } from "react";
 import type { V2UserPreferencesApi } from "renderer/hooks/useV2UserPreferences";
-import type { PullRequestRef } from "renderer/lib/github/pullRequestRef";
+import type { OpenPullRequestPane } from "renderer/lib/github/openPullRequestLink";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import type { V2TerminalPresetRow } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
@@ -60,7 +60,7 @@ export function useWorkspacePaneOpeners({
 	openCommentPane: (comment: CommentPaneData) => void;
 	openPagePane: (page: PagePaneData, placement: "split" | "tab") => void;
 	/** Focus or open the pane showing the workspace's linked PR summary. */
-	openPullRequestPane: (ref: PullRequestRef) => void;
+	openPullRequestPane: OpenPullRequestPane;
 } {
 	const openDiffPane = useCallback(
 		(
@@ -231,9 +231,9 @@ export function useWorkspacePaneOpeners({
 		[store],
 	);
 
-	const openPullRequestPane = useCallback(
-		(ref: PullRequestRef) => {
-			openPullRequestPaneInStore(store, ref);
+	const openPullRequestPane = useCallback<OpenPullRequestPane>(
+		(ref, placement) => {
+			openPullRequestPaneInStore(store, ref, placement);
 		},
 		[store],
 	);

@@ -3853,9 +3853,6 @@ msgstr "Nhấp vào thẻ để mở pull request"
 msgid "Click to copy the session ID (resume with `claude --resume <id>`)."
 msgstr "Nhấp để sao chép ID phiên (resume bằng `claude --resume <id>`)."
 
-msgid "Click to open on GitHub"
-msgstr "Nhấp để mở trên GitHub"
-
 msgid "Click to open the pull request"
 msgstr "Nhấp để mở pull request"
 

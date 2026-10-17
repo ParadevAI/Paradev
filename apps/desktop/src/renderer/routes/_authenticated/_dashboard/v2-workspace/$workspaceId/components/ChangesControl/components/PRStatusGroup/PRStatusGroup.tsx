@@ -26,10 +26,11 @@ import {
 	VscLoading,
 	VscRepoPush,
 } from "react-icons/vsc";
+import { usePullRequestLinkPolicy } from "renderer/lib/clickPolicy";
 import {
-	type PullRequestRef,
-	pullRequestRefFromUrl,
-} from "renderer/lib/github/pullRequestRef";
+	type OpenPullRequestPane,
+	openPullRequestLink,
+} from "renderer/lib/github/openPullRequestLink";
 import { computeChecksRollup } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/computeChecksStatus";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import { PRIcon, type PRState } from "renderer/screens/main/components/PRIcon";
@@ -53,7 +54,7 @@ interface PRStatusGroupProps {
 	 */
 	onToggleChanges?: () => void;
 	/** Opens the PR's summary pane in the workspace (the menu's "Open pull request"). */
-	onOpenPullRequest: (ref: PullRequestRef) => void;
+	onOpenPullRequest: OpenPullRequestPane;
 	paneAreaStyle?: boolean;
 }
 
@@ -82,6 +83,7 @@ export function PRStatusGroup({
 }: PRStatusGroupProps) {
 	const { t } = useLingui();
 	const { workspace } = useWorkspace();
+	const linkPolicy = usePullRequestLinkPolicy();
 	const isSession = workspace.type === "session";
 	const pr =
 		state.kind === "pr-exists"
@@ -428,11 +430,13 @@ export function PRStatusGroup({
 							{!isSession && (
 								<DropdownMenuItem
 									className={menuItemClass}
-									onClick={() => {
-										const ref = pullRequestRefFromUrl(pr.url);
-										if (ref) onOpenPullRequest(ref);
-										else window.open(pr.url, "_blank");
-									}}
+									onClick={(event) =>
+										openPullRequestLink(
+											pr.url,
+											linkPolicy.getAction(event),
+											onOpenPullRequest,
+										)
+									}
 								>
 									<VscGitPullRequest className={menuIconClass} />
 									<Trans>Open pull request</Trans>

@@ -3853,9 +3853,6 @@ msgstr "Klik op de chip om de pull request te openen"
 msgid "Click to copy the session ID (resume with `claude --resume <id>`)."
 msgstr "Klik om de sessie-ID te kopiëren (hervatten met `claude --resume <id>`)."
 
-msgid "Click to open on GitHub"
-msgstr "Klik om te openen op GitHub"
-
 msgid "Click to open the pull request"
 msgstr "Klik om de pull request te openen"
 

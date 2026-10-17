@@ -3853,9 +3853,6 @@ msgstr "チップをクリックするとプルリクエストを開きます"
 msgid "Click to copy the session ID (resume with `claude --resume <id>`)."
 msgstr "クリックでセッションIDをコピーします(`claude --resume <id>`で再開)。"
 
-msgid "Click to open on GitHub"
-msgstr "クリックしてGitHubで開く"
-
 msgid "Click to open the pull request"
 msgstr "クリックしてプルリクエストを開く"
 

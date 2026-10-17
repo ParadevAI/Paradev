@@ -3853,9 +3853,6 @@ msgstr "点击打开拉取请求"
 msgid "Click to copy the session ID (resume with `claude --resume <id>`)."
 msgstr "点击复制会话ID（使用`claude --resume <id>`恢复）。"
 
-msgid "Click to open on GitHub"
-msgstr "点击在GitHub上打开"
-
 msgid "Click to open the pull request"
 msgstr "点击打开拉取请求"
 
