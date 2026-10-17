@@ -5,7 +5,7 @@
  *
  *   1. the host-service runtime asset (this checkout's host-service and
  *      pty-daemon, natives installed for the box), this checkout's CLI, the
- *      latest claude, codex and Chrome (a fetch that fails keeps the
+ *      latest claude, codex, pdev and Chrome (a fetch that fails keeps the
  *      committed pin) and the bundle, published
  *   2. the image in Vercel Container Registry, unless --skip-image
  *   3. the internal golden: a box provisioned from the image exactly the way
@@ -55,7 +55,7 @@ process.env.SKIP_ENV_VALIDATION ??= "1";
 const SKIP_IMAGE = process.argv.includes("--skip-image");
 const KEEP_OLD = process.argv.includes("--keep-old");
 const PRODUCTION = process.argv.includes("--production");
-const FOLLOWED_UPSTREAM = ["claude", "codex", "chrome"];
+const FOLLOWED_UPSTREAM = ["claude", "codex", "pdev", "chrome"];
 /** The environment the release rebuilds; without it, the release creates one named INTERNAL_NAME. */
 const ENVIRONMENT_ID = process.env.SUPERSET_INTERNAL_ENVIRONMENT_ID;
 const INTERNAL_NAME =

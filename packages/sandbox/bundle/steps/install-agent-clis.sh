@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
-# Puts the pinned `claude` and `codex` on PATH. Both are rows in assets.json,
-# so a version bump is a row change and every box picks it up on its next
-# boot. Codex unpacks into /opt/codex/<sha>/: its binary finds the bundled
-# rg, bwrap and code-mode host through the codex-package.json beside it.
+# Puts the pinned `claude`, `codex` and `pdev` on PATH. All are rows in
+# assets.json, so a version bump is a row change and every box picks it up on
+# its next boot. Codex unpacks into /opt/codex/<sha>/: its binary finds the
+# bundled rg, bwrap and code-mode host through the codex-package.json beside
+# it. pdev unpacks into /opt/pdev/<sha>/ for the same reason: its runtime and
+# natives sit next to the binary.
 set -euo pipefail
 . /etc/superset/contract.sh
 
@@ -45,5 +47,22 @@ for dir in /opt/codex/*/; do
 	[ "$dir" = "$target" ] || rm -rf "$dir"
 done
 
+archive="$(staged 'pdev-*.tar.gz')"
+sha="$(tr -d '\n\r' < "${archive}.hash")"
+target="/opt/pdev/${sha}"
+if [ ! -x "${target}/pdev" ]; then
+	rm -rf "$target" "${target}.partial"
+	mkdir -p "${target}.partial"
+	# Built on macOS: drop its owner and the xattr headers GNU tar warns about.
+	tar --no-same-owner --warning=no-unknown-keyword -xzf "$archive" -C "${target}.partial" --strip-components=1
+	mv -T "${target}.partial" "$target"
+fi
+link /usr/local/bin/pdev "${target}/pdev"
+for dir in /opt/pdev/*/; do
+	dir="${dir%/}"
+	[ "$dir" = "$target" ] || rm -rf "$dir"
+done
+
 claude --version
 codex --version
+pdev --version

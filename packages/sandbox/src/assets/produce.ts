@@ -8,6 +8,7 @@
  *   bun run assets host-service      the runtime tarball from this checkout
  *   bun run assets claude [version]  Claude Code's native binary (default: stable)
  *   bun run assets codex [version]   Codex's standalone package (default: latest)
+ *   bun run assets pdev [version]    pdev's linux-x64 package (default: latest)
  *   bun run assets all
  *
  * Each producer writes its files to .cache/assets/<sha256><suffix>, then
@@ -499,6 +500,40 @@ async function codex(version?: string): Promise<void> {
 	});
 }
 
+/** pdev's linux-x64 package (binary, runtime, natives); defaults to the latest release. */
+async function pdev(version?: string): Promise<void> {
+	const tag = version ? `tags/v${version}` : "latest";
+	const release = JSON.parse(
+		await fetchText(
+			`https://api.github.com/repos/superset-sh/pdev/releases/${tag}`,
+		),
+	) as {
+		tag_name: string;
+		assets: { name: string; digest: string; browser_download_url: string }[];
+	};
+	const pinned = release.tag_name.replace(/^v/, "");
+	const asset = release.assets.find(
+		(a) => a.name === `pdev-${pinned}-linux-x64.tar.gz`,
+	);
+	if (!asset) throw new Error(`pdev ${pinned}: no linux-x64 package`);
+	const { sha256: hash } = cache(
+		await fetchBytes(asset.browser_download_url),
+		".tar.gz",
+	);
+	if (`sha256:${hash}` !== asset.digest)
+		throw new Error(`pdev ${pinned}: sha256 ${hash}, release ${asset.digest}`);
+	rewriteRows({
+		pdev: {
+			sha256: hash,
+			suffix: ".tar.gz",
+			dest: `${SANDBOX_PATHS.media}/pdev-${pinned}.tar.gz`,
+			mode: "0644",
+			source: asset.browser_download_url,
+			version: pinned,
+		},
+	});
+}
+
 export const producers: Record<
 	string,
 	(version?: string) => Promise<void> | void
@@ -512,6 +547,7 @@ export const producers: Record<
 	cli,
 	claude,
 	codex,
+	pdev,
 };
 
 if (import.meta.main) {
