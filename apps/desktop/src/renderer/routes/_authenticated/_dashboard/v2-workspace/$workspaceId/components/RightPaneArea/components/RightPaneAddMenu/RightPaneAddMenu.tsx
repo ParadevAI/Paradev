@@ -16,9 +16,13 @@ import type { RightPaneKind } from "../../types";
 
 interface RightPaneAddMenuProps {
 	onAdd: (kind: RightPaneKind) => void;
+	runAfterClose: (action: () => void) => void;
 }
 
-export function RightPaneAddMenu({ onAdd }: RightPaneAddMenuProps) {
+export function RightPaneAddMenu({
+	onAdd,
+	runAfterClose,
+}: RightPaneAddMenuProps) {
 	return (
 		<>
 			<DropdownMenuItem className="gap-2" onClick={() => onAdd("files")}>
@@ -58,7 +62,10 @@ export function RightPaneAddMenu({ onAdd }: RightPaneAddMenuProps) {
 					<Trans>Browser</Trans>
 				</span>
 			</DropdownMenuItem>
-			<DropdownMenuItem className="gap-2" onClick={() => onAdd("terminal")}>
+			<DropdownMenuItem
+				className="gap-2"
+				onClick={() => runAfterClose(() => onAdd("terminal"))}
+			>
 				<BsTerminalPlus className="size-4" />
 				<span>
 					<Trans>Terminal</Trans>

@@ -677,9 +677,10 @@ function V2WorkspaceContent() {
 											/>
 										) : null
 									}
-									renderAddTabMenu={() => (
+									renderAddTabMenu={({ runAfterClose }) => (
 										<AddTabMenu
 											onAddTerminal={addTerminalTab}
+											runAfterClose={runAfterClose}
 											onAddBrowser={addBrowserTab}
 											onAddChanges={openChanges}
 											onAddDesktop={isSandbox ? addDesktopTab : undefined}
