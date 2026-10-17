@@ -1211,6 +1211,16 @@ export function NewWorkspaceScreen({
 									{draft.checkout === "worktree" && (
 										<CompareBaseBranchPicker {...pickerProps} />
 									)}
+									{draft.checkout === "local" && (
+										<span className="flex items-center gap-1 text-xs text-muted-foreground">
+											<Trans>
+												On branch{" "}
+												{pickerProps.isBranchesLoading
+													? "..."
+													: (pickerProps.checkedOutBranch ?? "unknown")}
+											</Trans>
+										</span>
+									)}
 								</>
 							)}
 						</div>

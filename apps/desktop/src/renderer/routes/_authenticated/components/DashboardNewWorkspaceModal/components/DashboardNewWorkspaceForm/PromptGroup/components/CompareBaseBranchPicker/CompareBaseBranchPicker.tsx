@@ -29,6 +29,7 @@ const MOD_KEY = PLATFORM === "mac" ? "⌘" : "Ctrl";
 interface CompareBaseBranchPickerProps {
 	effectiveCompareBaseBranch: string | null;
 	defaultBranch: string | null | undefined;
+	checkedOutBranch: string | null | undefined;
 	isBranchesLoading: boolean;
 	isBranchesError: boolean;
 	branches: BranchRow[];
@@ -52,6 +53,7 @@ interface CompareBaseBranchPickerProps {
 export function CompareBaseBranchPicker({
 	effectiveCompareBaseBranch,
 	defaultBranch,
+	checkedOutBranch,
 	isBranchesLoading,
 	isBranchesError,
 	branches,
