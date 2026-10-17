@@ -48,6 +48,9 @@ const destroysInFlight = new Set<string>();
 /** @internal — exposed for tests to introspect / clear the guard. */
 export const __testDestroysInFlight = destroysInFlight;
 
+/** Patched in place by tests, like `cleanupGitOps`. */
+export const cleanupTeardownOps = { runTeardown };
+
 const restoresInFlight = new Set<string>();
 
 /**
@@ -356,7 +359,7 @@ async function runDestroy(
 			local &&
 			project
 		) {
-			const teardown: TeardownResult = await runTeardown({
+			const teardown: TeardownResult = await cleanupTeardownOps.runTeardown({
 				db: ctx.db,
 				workspaceId: input.workspaceId,
 				worktreePath: local.worktreePath,
@@ -687,6 +690,9 @@ async function runDestroyPhases(
 		// Workspaces have no cloud row to delete any more. Released CLI/SDK
 		// binaries still read this field, so it stays in the response.
 		cloudDeleted: false,
+		// An unknown id still succeeds, as released callers expect; this is
+		// the only signal that nothing on this host had that id.
+		found: local !== undefined,
 		worktreeRemoved,
 		branchDeleted,
 		warnings,

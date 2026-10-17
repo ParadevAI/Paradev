@@ -13,10 +13,12 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { workspaceRouter } from "../src/trpc/router/workspace";
 import { cleanupGitOps } from "../src/trpc/router/workspace-cleanup/git-ops";
 import { isLocalCheckoutWorkspace } from "../src/trpc/router/workspace-cleanup/is-local-checkout-workspace";
 import {
 	__testDestroysInFlight,
+	cleanupTeardownOps,
 	workspaceCleanupRouter,
 } from "../src/trpc/router/workspace-cleanup/workspace-cleanup";
 import type { HostServiceContext } from "../src/types";
@@ -66,7 +68,11 @@ interface ContextSpec {
 let gitOpsSpec: ContextSpec = {};
 
 const realGitOps = { ...cleanupGitOps };
-afterAll(() => Object.assign(cleanupGitOps, realGitOps));
+const realTeardownOps = { ...cleanupTeardownOps };
+afterAll(() => {
+	Object.assign(cleanupGitOps, realGitOps);
+	Object.assign(cleanupTeardownOps, realTeardownOps);
+});
 
 Object.assign(cleanupGitOps, {
 	resolveGitEnv: async () => {
@@ -1121,5 +1127,67 @@ describe("workspaceCleanup.destroy cleanup ordering", () => {
 				force: true,
 			}),
 		).rejects.toThrow(/sqlite update boom/);
+	});
+});
+
+describe("workspace.delete (CLI/SDK/MCP surface)", () => {
+	beforeEach(() => __testDestroysInFlight.clear());
+
+	test("an id this host does not have succeeds but reports found: false", async () => {
+		const caller = workspaceRouter.createCaller(makeCtx({}));
+
+		const result = await caller.delete({ id: "5a17058b" });
+
+		expect(result).toMatchObject({ success: true, found: false });
+	});
+
+	test("teardown runs while the worktree exists, and its failure is reported", async () => {
+		const repo = mkdtempSync(join(tmpdir(), "workspace-delete-teardown-"));
+		const worktreePath = join(repo, "worktree");
+		mkdirSync(worktreePath);
+		const steps: string[] = [];
+		cleanupTeardownOps.runTeardown = async (options) => {
+			steps.push(
+				existsSync(options.worktreePath)
+					? "teardown with worktree"
+					: "teardown without worktree",
+			);
+			return {
+				status: "failed",
+				exitCode: 3,
+				signal: null,
+				timedOut: false,
+				outputTail: "neon branch delete failed",
+			};
+		};
+		try {
+			const ctx = makeCtx({
+				workspace: {
+					id: "ws-1",
+					projectId: "p-1",
+					worktreePath,
+					branch: "feature",
+				},
+				project: { id: "p-1", repoPath: repo },
+				removeWorktree: async () => {
+					steps.push("remove worktree");
+					rmSync(worktreePath, { recursive: true, force: true });
+					return { stillRegistered: false };
+				},
+			});
+
+			const result = await workspaceRouter
+				.createCaller(ctx)
+				.delete({ id: "ws-1" });
+
+			expect(steps).toEqual(["teardown with worktree", "remove worktree"]);
+			expect(result.found).toBe(true);
+			expect(result.warnings).toContain(
+				"Teardown script failed (exit code 3): neon branch delete failed",
+			);
+		} finally {
+			Object.assign(cleanupTeardownOps, realTeardownOps);
+			rmSync(repo, { recursive: true, force: true });
+		}
 	});
 });
