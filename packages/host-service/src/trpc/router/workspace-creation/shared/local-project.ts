@@ -1,4 +1,5 @@
 import { statSync } from "node:fs";
+import { stat } from "node:fs/promises";
 import { TRPCError } from "@trpc/server";
 import { and, eq, isNull, ne } from "drizzle-orm";
 import { projects } from "../../../../db/schema";
@@ -51,6 +52,13 @@ export function getProjectWorktreesFolder(
 // error can't escape a workspace-creation procedure as a reportable 500.
 export function isProjectDirPresent(repoPath: string): boolean {
 	return statSync(repoPath, { throwIfNoEntry: false })?.isDirectory() ?? false;
+}
+
+export async function projectDirExists(repoPath: string): Promise<boolean> {
+	return stat(repoPath).then(
+		(stats) => stats.isDirectory(),
+		() => false,
+	);
 }
 
 export function requireProjectRepoPath(localProject: LocalProject): string {
