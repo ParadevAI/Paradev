@@ -171,7 +171,7 @@ describe("introspectCli", () => {
 });
 
 describe("CLIError with data", () => {
-	async function runFailing(json: boolean) {
+	async function runFailing(json: boolean, { stdoutClosed = false } = {}) {
 		const stdout: string[] = [];
 		const stderr: string[] = [];
 		const capture =
@@ -181,10 +181,19 @@ describe("CLIError with data", () => {
 				cb?.();
 				return true;
 			};
+		const brokenPipe = (
+			_chunk: string | Uint8Array,
+			cb?: (error?: Error) => void,
+		) => {
+			cb?.(Object.assign(new Error("write EPIPE"), { code: "EPIPE" }));
+			return false;
+		};
 		const write = { out: process.stdout.write, err: process.stderr.write };
 		const exit = process.exit;
 		let exitCode: number | undefined;
-		process.stdout.write = capture(stdout) as never;
+		process.stdout.write = (
+			stdoutClosed ? brokenPipe : capture(stdout)
+		) as never;
 		process.stderr.write = capture(stderr) as never;
 		process.exit = ((code?: number) => {
 			exitCode = code;
@@ -228,6 +237,12 @@ describe("CLIError with data", () => {
 			deleted: ["a"],
 			notFound: ["b"],
 		});
+		expect(result.stderr).toBe("Error: Not found: b\nHint: Pass full ids\n");
+		expect(result.exitCode).toBe(1);
+	});
+
+	it("still exits 1 when stdout is closed", async () => {
+		const result = await runFailing(true, { stdoutClosed: true });
 		expect(result.stderr).toBe("Error: Not found: b\nHint: Pass full ids\n");
 		expect(result.exitCode).toBe(1);
 	});

@@ -54,6 +54,23 @@ describe("archiveOnHost", () => {
 	}
 });
 
+test("an older host whose follow-up check fails reports the id as failed", async () => {
+	const host = {
+		workspace: {
+			delete: { mutate: async () => ({ success: true, warnings: [] }) },
+			get: {
+				query: async () => {
+					throw new Error("socket hang up");
+				},
+			},
+		},
+	} as never;
+
+	expect(await archiveOnHost(host, ["5a17058b"])).toEqual([
+		{ id: "5a17058b", status: "failed", reason: "socket hang up" },
+	]);
+});
+
 describe("reportHostOutcomes", () => {
 	test("a mixed batch fails with every id in its data", () => {
 		let error: unknown;

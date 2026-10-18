@@ -43,27 +43,24 @@ async function archiveOne(
 	} catch (error) {
 		return { id, status: "failed", reason: rawErrorMessage(error) };
 	}
-	const found =
-		"found" in result && typeof result.found === "boolean"
-			? result.found
-			: await existsOnOlderHost(client, id);
-	if (!found) return { id, status: "not_found" };
-	return { id, status: "deleted", warnings: result.warnings ?? [] };
-}
-
-// Hosts before `found` answer success for any id. A delete only archives
-// the row, so a row that is still missing afterwards never existed.
-async function existsOnOlderHost(
-	client: WorkspaceClient,
-	id: string,
-): Promise<boolean> {
+	const deleted: HostArchiveOutcome = {
+		id,
+		status: "deleted",
+		warnings: result.warnings ?? [],
+	};
+	if ("found" in result && typeof result.found === "boolean") {
+		return result.found ? deleted : { id, status: "not_found" };
+	}
+	// Hosts before `found` answer success for any id. A delete only archives
+	// the row, so a row that is still missing afterwards never existed.
 	try {
 		await client.workspace.get.query({ id });
-		return true;
+		return deleted;
 	} catch (error) {
-		return !(
-			error instanceof TRPCClientError && error.data?.code === "NOT_FOUND"
-		);
+		if (error instanceof TRPCClientError && error.data?.code === "NOT_FOUND") {
+			return { id, status: "not_found" };
+		}
+		return { id, status: "failed", reason: rawErrorMessage(error) };
 	}
 }
 

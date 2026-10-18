@@ -1,4 +1,5 @@
 import { boolean, CLIError, positional, string } from "@superset/cli-framework";
+import { rawErrorMessage } from "@superset/i18n/errors";
 import { resolveWorkspaceHost } from "../../../lib/cloud-workspaces";
 import { command } from "../../../lib/command";
 import { resolveHostTarget } from "../../../lib/host-target";
@@ -32,22 +33,35 @@ export default command({
 		if (!hostId) {
 			const archived: string[] = [];
 			const missing: string[] = [];
+			const failed: DeleteReport["failed"] = [];
 			for (const id of ids) {
-				const result = await ctx.api.cloudWorkspace.delete.mutate({ id });
-				(result.deleted ? archived : missing).push(id);
+				try {
+					const result = await ctx.api.cloudWorkspace.delete.mutate({ id });
+					(result.deleted ? archived : missing).push(id);
+				} catch (error) {
+					failed.push({ id, reason: rawErrorMessage(error) });
+				}
 			}
-			const data = {
+			const data: DeleteReport = {
 				deleted: archived,
 				notFound: missing,
-				failed: [],
+				failed,
 				warnings: [],
-			} satisfies DeleteReport;
-			if (missing.length > 0) {
+			};
+			if (missing.length > 0 || failed.length > 0) {
+				const lines = [
+					...(missing.length > 0
+						? [`No cloud workspace in this organization: ${missing.join(", ")}`]
+						: []),
+					...failed.map(({ id, reason }) => `Failed: ${id}: ${reason}`),
+				];
 				const alsoArchived =
 					archived.length > 0 ? ` (archived: ${archived.join(", ")})` : "";
 				throw new CLIError(
-					`No cloud workspace in this organization: ${missing.join(", ")}${alsoArchived}`,
-					"Pass --local or --host <id> if it lives on a machine",
+					`${lines.join("\n")}${alsoArchived}`,
+					missing.length > 0
+						? "Pass --local or --host <id> if it lives on a machine"
+						: undefined,
 					data,
 				);
 			}

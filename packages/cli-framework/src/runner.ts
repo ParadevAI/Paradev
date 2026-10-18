@@ -492,7 +492,7 @@ async function execute(
 				process.stdout,
 				`${JSON.stringify(error.data, null, 2)}\n`,
 				signal,
-			);
+			).catch(() => {});
 		}
 		throw error;
 	}
