@@ -42,9 +42,7 @@ export const searchBranches = protectedProcedure
 		const git = await ctx.git(requireProjectRepoPath(localProject));
 
 		// Honor `refresh` only if TTL elapsed — prevents thrashing `git fetch`
-		// on every keystroke when the client tags first-page requests. Not
-		// awaited: a fetch on a large repo takes seconds, so this page answers
-		// from cached refs and the next search sees the fetched ones.
+		// on every keystroke when the client tags first-page requests.
 		if (input.refresh && shouldRefetchRemote(input.projectId)) {
 			markRefetchRemote(input.projectId);
 			void git.fetch(["--prune", "--quiet", "--no-tags"]).catch(() => {

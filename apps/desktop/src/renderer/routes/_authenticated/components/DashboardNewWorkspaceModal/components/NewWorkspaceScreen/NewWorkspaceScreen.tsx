@@ -74,8 +74,10 @@ import { resolveRemoteHostPresence } from "../../utils/resolveRemoteHostPresence
 import { DevicePicker } from "../DashboardNewWorkspaceForm/components/DevicePicker";
 import { useWorkspaceHostOptions } from "../DashboardNewWorkspaceForm/components/DevicePicker/hooks/useWorkspaceHostOptions";
 import { CheckoutPickerPill } from "../DashboardNewWorkspaceForm/PromptGroup/components/CheckoutPickerPill";
-import type { OpenWorkspaceTarget } from "../DashboardNewWorkspaceForm/PromptGroup/components/CompareBaseBranchPicker";
-import { CompareBaseBranchPicker } from "../DashboardNewWorkspaceForm/PromptGroup/components/CompareBaseBranchPicker";
+import {
+	CompareBaseBranchPicker,
+	type OpenWorkspaceTarget,
+} from "../DashboardNewWorkspaceForm/PromptGroup/components/CompareBaseBranchPicker";
 import { ProjectPickerPill } from "../DashboardNewWorkspaceForm/PromptGroup/components/ProjectPickerPill";
 import { PromptHistoryCommand } from "../DashboardNewWorkspaceForm/PromptGroup/components/PromptHistoryCommand";
 import { useBranchPickerController } from "../DashboardNewWorkspaceForm/PromptGroup/hooks/useBranchPickerController";
