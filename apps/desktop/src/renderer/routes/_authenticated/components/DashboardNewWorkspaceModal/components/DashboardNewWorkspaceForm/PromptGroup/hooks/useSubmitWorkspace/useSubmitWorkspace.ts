@@ -22,6 +22,7 @@ import { usePromptHistoryStore } from "renderer/stores/prompt-history";
 import { useWorkspaceCreates } from "renderer/stores/workspace-creates";
 import { seedPendingCloudChat } from "renderer/stores/workspace-creates/pendingCloudChat";
 import { useDashboardNewWorkspaceDraft } from "../../../../../DashboardNewWorkspaceDraftContext";
+import type { OpenWorkspaceTarget } from "../../components/CompareBaseBranchPicker";
 import type { WorkspaceCreateAgent } from "../../types";
 import type { UseUploadAttachmentsApi } from "../useUploadAttachments";
 import { resolveNames } from "./resolveNames";
@@ -31,6 +32,9 @@ import { resolveNames } from "./resolveNames";
  * procedure. Attachment uploads run optimistically through `useUploadAttachments`
  * — submit only blocks on whatever uploads are still in flight, then dispatches
  * the create with the resulting `attachmentIds` on the agent launch sugar.
+ *
+ * Passing an `openTarget` opens that existing branch/worktree (or creates the
+ * typed branch) instead of a fresh one — the prompt and agent still launch.
  */
 export function useSubmitWorkspace(
 	projectId: string | null,
@@ -72,371 +76,401 @@ export function useSubmitWorkspace(
 	const inFlightRef = useRef(false);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
-	const submitWorkspaceInner = useCallback(async () => {
-		const hostId = draft.hostId ?? machineId;
-		const isCloud = hostId === CLOUD_HOST_ID;
-		// A cloud workspace clones the one cloud repo, so it has no use for a
-		// project — and the create surface hides the project picker when cloud
-		// is the target, which would make this an unanswerable error.
-		if (!projectId && !isSession && !isCloud) {
-			toast.error(
-				t({
-					message: "Select a project first",
-				}),
-			);
-			return;
-		}
-		if (isSession && linkedPR !== null) {
-			toast.error(
-				t({
-					message: "Checking out a PR requires a project",
-				}),
-			);
-			return;
-		}
-		if (!activeOrganizationId) {
-			toast.error(
-				t({
-					message: "No active organization",
-				}),
-			);
-			return;
-		}
-
-		if (!hostId) {
-			toast.error(
-				t({
-					message: "No active host",
-				}),
-			);
-			return;
-		}
-
-		const { readyIds: attachmentIds, errors } =
-			await uploadAttachments.awaitUploads();
-		if (errors.length > 0) {
-			const first = errors[0];
-			toast.error(
-				first.filename
-					? t({
-							message: `Attachment upload failed (${first.filename}): ${first.message}`,
-						})
-					: t({
-							message: `Attachment upload failed: ${first.message}`,
-						}),
-			);
-			return;
-		}
-
-		const { branchName, workspaceName } = resolveNames(draft);
-
-		// Cloud workspaces are provisioned by the API, not the local host, so
-		// they bypass the host `workspaces.create` path entirely.
-		if (isCloud) {
-			try {
-				// Checked against the live list so a stale draft can't start a
-				// vanished environment.
-				const environmentId = cloudEnvironmentId
-					? startableCloudEnvironments(
-							await cloudTrpcClient.environment.list.query({
-								organizationId: activeOrganizationId,
-							}),
-						).find((row) => row.id === cloudEnvironmentId)?.id
-					: undefined;
-				if (!environmentId) {
-					toast.error(
-						t({
-							message:
-								"Add an environment in Settings before creating a cloud workspace",
-						}),
-					);
-					return;
-				}
-				// A typed name wins; otherwise the API names it from the prompt,
-				// since nothing about a cloud workspace runs on this device.
-				// Returns as soon as the row exists — the sandbox is still being
-				// provisioned behind it, which the workspace screen renders.
-				// Same rule as a local create: an agent launches only when there
-				// is something to say to it. Attachments were uploaded to cloud
-				// storage rather than a host, so the ids here are `files.id`s the
-				// sandbox resolves and pulls once it is up.
-				const wantCloudAgent =
-					selectedAgent !== "none" &&
-					(!!prompt.trim() || linkedPR !== null || linkedIssues.length > 0);
-				const cloudPrompt = wantCloudAgent
-					? await promptContext.build({
-							userPrompt: prompt,
-							linkedPR: linkedPR,
-							linkedIssues: linkedIssues,
-							timeoutMs: 2000,
-						})
-					: null;
-				const createdResult = await createCloudWorkspace.mutateAsync({
-					organizationId: activeOrganizationId,
-					environmentId,
-					name: workspaceName ?? undefined,
-					// Linked PR and issue bodies can push this past the create input's
-					// 20,000-character cap.
-					prompt: (cloudPrompt ?? prompt).trim().slice(0, 20_000) || undefined,
-					typedPrompt: prompt.trim().slice(0, 20_000) || undefined,
-					taskIds: linkedIssues
-						.flatMap((issue) =>
-							issue.source === "internal" && issue.taskId ? [issue.taskId] : [],
-						)
-						.slice(0, 10),
-					branch: draft.baseBranch ?? branchName ?? undefined,
-					machineSize: cloudMachineSize ?? undefined,
-					...(attachmentIds.length > 0
-						? { attachmentFileIds: attachmentIds }
-						: {}),
-					...(wantCloudAgent
-						? {
-								agent: selectedAgent,
-								model: selectedModel ?? undefined,
-								effort: selectedEffort ?? undefined,
-								mode: selectedMode ?? undefined,
-							}
-						: {}),
-				});
-				const { initialLaunch, ...created } = createdResult;
-				if (initialLaunch?.surface === "chat") {
-					seedPendingCloudChat({
-						collections,
-						workspaceId: created.id,
-						launch: initialLaunch,
-						prompt: prompt.trim(),
-						chatEnabled: await awaitAcpChatEnabled(),
-						modelId: selectedModel,
-						modeId: selectedMode,
-					});
-				}
-				closeAndResetDraft();
-				// The cloud list is what both the sidebar and the workspace route
-				// read, and nothing used to tell it a workspace had been created —
-				// the row appeared whenever the poll next came round, which is why
-				// creating one felt like nothing had happened. Seeded rather than
-				// only invalidated because the route we're about to open decides
-				// between "provisioning" and "doesn't exist" off this list, and
-				// even one refetch round trip is long enough to flash the wrong
-				// one. Cancelled first so an in-flight fetch from before the
-				// create can't land on top of the patch.
-				const listInput = { organizationId: activeOrganizationId };
-				await utils.cloudWorkspace.list.cancel(listInput);
-				utils.cloudWorkspace.list.setData(listInput, (rows) =>
-					rows ? [created, ...rows] : [created],
-				);
-				void navigate({
-					to: "/v2-workspace/$workspaceId",
-					params: { workspaceId: created.id },
-				}).catch((error) => {
-					console.error(
-						"[useSubmitWorkspace] failed to open cloud workspace",
-						error,
-					);
-				});
-				// Server truth on top of the patch — the generated name lands here.
-				void utils.cloudWorkspace.list.invalidate();
-			} catch (error) {
+	const submitWorkspaceInner = useCallback(
+		async (openTarget?: OpenWorkspaceTarget) => {
+			const hostId = draft.hostId ?? machineId;
+			const isCloud = hostId === CLOUD_HOST_ID;
+			// A cloud workspace clones the one cloud repo, so it has no use for a
+			// project — and the create surface hides the project picker when cloud
+			// is the target, which would make this an unanswerable error.
+			if (!projectId && !isSession && !isCloud) {
 				toast.error(
-					errorMessage(
-						error,
-						t({
-							message: "Could not create cloud workspace",
-						}),
-					),
-					isCloudUsageRefusal(error)
-						? {
-								action: {
-									label: t({ message: "Open billing" }),
-									onClick: () => {
-										void navigate({ to: "/settings/billing" });
-									},
-								},
-							}
-						: undefined,
+					t({
+						message: "Select a project first",
+					}),
 				);
+				return;
 			}
-			return;
-		}
+			if (isSession && linkedPR !== null) {
+				toast.error(
+					t({
+						message: "Checking out a PR requires a project",
+					}),
+				);
+				return;
+			}
+			if (!activeOrganizationId) {
+				toast.error(
+					t({
+						message: "No active organization",
+					}),
+				);
+				return;
+			}
 
-		const isPrCheckout = linkedPR !== null;
-		// A PR always needs its own worktree; otherwise the picker decides.
-		const isLocalCheckout = !isPrCheckout && draft.checkout === "local";
+			if (!hostId) {
+				toast.error(
+					t({
+						message: "No active host",
+					}),
+				);
+				return;
+			}
 
-		const linkedTaskId = linkedIssues.find(
-			(issue) => issue.source === "internal" && issue.taskId,
-		)?.taskId;
+			const { readyIds: attachmentIds, errors } =
+				await uploadAttachments.awaitUploads();
+			if (errors.length > 0) {
+				const first = errors[0];
+				toast.error(
+					first.filename
+						? t({
+								message: `Attachment upload failed (${first.filename}): ${first.message}`,
+							})
+						: t({
+								message: `Attachment upload failed: ${first.message}`,
+							}),
+				);
+				return;
+			}
 
-		const hasAnyContext =
-			!!prompt.trim() ||
-			linkedPR !== null ||
-			linkedIssues.length > 0 ||
-			attachmentIds.length > 0;
-		const wantAgent = selectedAgent !== "none" && hasAnyContext;
+			const { branchName, workspaceName } = resolveNames(draft);
 
-		const finalPrompt = wantAgent
-			? await promptContext.build({
-					userPrompt: prompt,
-					linkedPR: linkedPR,
-					linkedIssues: linkedIssues,
-					timeoutMs: 2000,
-				})
-			: null;
-
-		const openAsChat =
-			wantAgent &&
-			Boolean(acpHarnessForPreset(selectedPresetId)) &&
-			(await awaitAcpChatEnabled());
-		const agents = wantAgent
-			? [
-					{
-						agent: selectedAgent,
-						prompt: finalPrompt ?? "",
-						attachmentIds: attachmentIds.length > 0 ? attachmentIds : undefined,
-						model: selectedModel ?? undefined,
-						effort: openAsChat ? undefined : (selectedEffort ?? undefined),
-						mode: selectedMode ?? undefined,
-						...(openAsChat ? { surface: "chat" as const } : {}),
-					},
-				]
-			: undefined;
-
-		// PR path supplies a name (PR title) so the in-flight UI has
-		// something to show immediately. Branch path leaves both `name`
-		// and `branch` undefined when the user didn't type — a typed name
-		// seeds the branch slug; otherwise the server creates with a
-		// friendly random and AI-renames once names arrive.
-		const prName = isPrCheckout
-			? linkedPR?.title || `PR #${linkedPR?.prNumber}`
-			: undefined;
-
-		const trimmedPrompt = prompt.trim();
-		const namingPrompt = openAsChat
-			? (finalPrompt ?? trimmedPrompt).trim().slice(0, 20_000) || undefined
-			: !wantAgent && trimmedPrompt
-				? trimmedPrompt
-				: undefined;
-		const namingAgent = openAsChat ? selectedAgent : undefined;
-		const workspaceId = crypto.randomUUID();
-		const snapshot = isSession
-			? {
-					id: workspaceId,
-					projectId: null,
-					name: workspaceName ?? undefined,
-					agents,
-					namingPrompt,
-					namingAgent,
+			// Cloud workspaces are provisioned by the API, not the local host, so
+			// they bypass the host `workspaces.create` path entirely.
+			if (isCloud) {
+				try {
+					// Checked against the live list so a stale draft can't start a
+					// vanished environment.
+					const environmentId = cloudEnvironmentId
+						? startableCloudEnvironments(
+								await cloudTrpcClient.environment.list.query({
+									organizationId: activeOrganizationId,
+								}),
+							).find((row) => row.id === cloudEnvironmentId)?.id
+						: undefined;
+					if (!environmentId) {
+						toast.error(
+							t({
+								message:
+									"Add an environment in Settings before creating a cloud workspace",
+							}),
+						);
+						return;
+					}
+					// A typed name wins; otherwise the API names it from the prompt,
+					// since nothing about a cloud workspace runs on this device.
+					// Returns as soon as the row exists — the sandbox is still being
+					// provisioned behind it, which the workspace screen renders.
+					// Same rule as a local create: an agent launches only when there
+					// is something to say to it. Attachments were uploaded to cloud
+					// storage rather than a host, so the ids here are `files.id`s the
+					// sandbox resolves and pulls once it is up.
+					const wantCloudAgent =
+						selectedAgent !== "none" &&
+						(!!prompt.trim() || linkedPR !== null || linkedIssues.length > 0);
+					const cloudPrompt = wantCloudAgent
+						? await promptContext.build({
+								userPrompt: prompt,
+								linkedPR: linkedPR,
+								linkedIssues: linkedIssues,
+								timeoutMs: 2000,
+							})
+						: null;
+					const createdResult = await createCloudWorkspace.mutateAsync({
+						organizationId: activeOrganizationId,
+						environmentId,
+						name: workspaceName ?? undefined,
+						// Linked PR and issue bodies can push this past the create input's
+						// 20,000-character cap.
+						prompt:
+							(cloudPrompt ?? prompt).trim().slice(0, 20_000) || undefined,
+						typedPrompt: prompt.trim().slice(0, 20_000) || undefined,
+						taskIds: linkedIssues
+							.flatMap((issue) =>
+								issue.source === "internal" && issue.taskId
+									? [issue.taskId]
+									: [],
+							)
+							.slice(0, 10),
+						branch:
+							openTarget?.branchName ??
+							draft.baseBranch ??
+							branchName ??
+							undefined,
+						machineSize: cloudMachineSize ?? undefined,
+						...(attachmentIds.length > 0
+							? { attachmentFileIds: attachmentIds }
+							: {}),
+						...(wantCloudAgent
+							? {
+									agent: selectedAgent,
+									model: selectedModel ?? undefined,
+									effort: selectedEffort ?? undefined,
+									mode: selectedMode ?? undefined,
+								}
+							: {}),
+					});
+					const { initialLaunch, ...created } = createdResult;
+					if (initialLaunch?.surface === "chat") {
+						seedPendingCloudChat({
+							collections,
+							workspaceId: created.id,
+							launch: initialLaunch,
+							prompt: prompt.trim(),
+							chatEnabled: await awaitAcpChatEnabled(),
+							modelId: selectedModel,
+							modeId: selectedMode,
+						});
+					}
+					closeAndResetDraft();
+					// The cloud list is what both the sidebar and the workspace route
+					// read, and nothing used to tell it a workspace had been created —
+					// the row appeared whenever the poll next came round, which is why
+					// creating one felt like nothing had happened. Seeded rather than
+					// only invalidated because the route we're about to open decides
+					// between "provisioning" and "doesn't exist" off this list, and
+					// even one refetch round trip is long enough to flash the wrong
+					// one. Cancelled first so an in-flight fetch from before the
+					// create can't land on top of the patch.
+					const listInput = { organizationId: activeOrganizationId };
+					await utils.cloudWorkspace.list.cancel(listInput);
+					utils.cloudWorkspace.list.setData(listInput, (rows) =>
+						rows ? [created, ...rows] : [created],
+					);
+					void navigate({
+						to: "/v2-workspace/$workspaceId",
+						params: { workspaceId: created.id },
+					}).catch((error) => {
+						console.error(
+							"[useSubmitWorkspace] failed to open cloud workspace",
+							error,
+						);
+					});
+					// Server truth on top of the patch — the generated name lands here.
+					void utils.cloudWorkspace.list.invalidate();
+				} catch (error) {
+					toast.error(
+						errorMessage(
+							error,
+							t({
+								message: "Could not create cloud workspace",
+							}),
+						),
+						isCloudUsageRefusal(error)
+							? {
+									action: {
+										label: t({ message: "Open billing" }),
+										onClick: () => {
+											void navigate({ to: "/settings/billing" });
+										},
+									},
+								}
+							: undefined,
+					);
 				}
-			: isLocalCheckout
+				return;
+			}
+
+			// An explicit branch to open wins over a linked PR and the checkout pill.
+			const isPrCheckout = !openTarget && linkedPR !== null;
+			// A PR always needs its own worktree; otherwise the picker decides.
+			const isLocalCheckout =
+				!openTarget && !isPrCheckout && draft.checkout === "local";
+
+			const linkedTaskId = linkedIssues.find(
+				(issue) => issue.source === "internal" && issue.taskId,
+			)?.taskId;
+
+			const hasAnyContext =
+				!!prompt.trim() ||
+				linkedPR !== null ||
+				linkedIssues.length > 0 ||
+				attachmentIds.length > 0;
+			const wantAgent = selectedAgent !== "none" && hasAnyContext;
+
+			const finalPrompt = wantAgent
+				? await promptContext.build({
+						userPrompt: prompt,
+						linkedPR: linkedPR,
+						linkedIssues: linkedIssues,
+						timeoutMs: 2000,
+					})
+				: null;
+
+			const openAsChat =
+				wantAgent &&
+				Boolean(acpHarnessForPreset(selectedPresetId)) &&
+				(await awaitAcpChatEnabled());
+			const agents = wantAgent
+				? [
+						{
+							agent: selectedAgent,
+							prompt: finalPrompt ?? "",
+							attachmentIds:
+								attachmentIds.length > 0 ? attachmentIds : undefined,
+							model: selectedModel ?? undefined,
+							effort: openAsChat ? undefined : (selectedEffort ?? undefined),
+							mode: selectedMode ?? undefined,
+							...(openAsChat ? { surface: "chat" as const } : {}),
+						},
+					]
+				: undefined;
+
+			// PR path supplies a name (PR title) so the in-flight UI has
+			// something to show immediately. Branch path leaves both `name`
+			// and `branch` undefined when the user didn't type — a typed name
+			// seeds the branch slug; otherwise the server creates with a
+			// friendly random and AI-renames once names arrive.
+			const prName = isPrCheckout
+				? linkedPR?.title || `PR #${linkedPR?.prNumber}`
+				: undefined;
+
+			const trimmedPrompt = prompt.trim();
+			const namingPrompt = openAsChat
+				? (finalPrompt ?? trimmedPrompt).trim().slice(0, 20_000) || undefined
+				: !wantAgent && trimmedPrompt
+					? trimmedPrompt
+					: undefined;
+			const namingAgent = openAsChat ? selectedAgent : undefined;
+			const workspaceId = crypto.randomUUID();
+			const snapshot = isSession
 				? {
 						id: workspaceId,
-						projectId: projectId as string,
-						checkout: "local" as const,
+						projectId: null,
 						name: workspaceName ?? undefined,
-						taskId: linkedTaskId,
 						agents,
 						namingPrompt,
 						namingAgent,
 					}
-				: {
-						id: workspaceId,
-						projectId: projectId as string,
-						name: isPrCheckout ? prName : (workspaceName ?? undefined),
-						branch: isPrCheckout ? undefined : (branchName ?? undefined),
-						skipBranchPrefix:
-							!isPrCheckout &&
-							branchName !== null &&
-							draft.branchNameFromProvider
-								? true
-								: undefined,
-						pr: isPrCheckout ? linkedPR?.prNumber : undefined,
-						baseBranch: draft.baseBranch ?? undefined,
-						taskId: linkedTaskId,
-						agents,
-						namingPrompt: isPrCheckout ? undefined : namingPrompt,
-						namingAgent: isPrCheckout ? undefined : namingAgent,
-					};
+				: openTarget
+					? {
+							id: workspaceId,
+							projectId: projectId as string,
+							name: workspaceName ?? openTarget.branchName,
+							branch: openTarget.branchName,
+							// Only used when the branch doesn't exist yet and gets created.
+							baseBranch: draft.baseBranch ?? undefined,
+							...(openTarget.worktreePath
+								? { worktreePath: openTarget.worktreePath }
+								: {}),
+							taskId: linkedTaskId,
+							agents,
+						}
+					: isLocalCheckout
+						? {
+								id: workspaceId,
+								projectId: projectId as string,
+								checkout: "local" as const,
+								name: workspaceName ?? undefined,
+								taskId: linkedTaskId,
+								agents,
+								namingPrompt,
+								namingAgent,
+							}
+						: {
+								id: workspaceId,
+								projectId: projectId as string,
+								name: isPrCheckout ? prName : (workspaceName ?? undefined),
+								branch: isPrCheckout ? undefined : (branchName ?? undefined),
+								skipBranchPrefix:
+									!isPrCheckout &&
+									branchName !== null &&
+									draft.branchNameFromProvider
+										? true
+										: undefined,
+								pr: isPrCheckout ? linkedPR?.prNumber : undefined,
+								baseBranch: draft.baseBranch ?? undefined,
+								taskId: linkedTaskId,
+								agents,
+								namingPrompt: isPrCheckout ? undefined : namingPrompt,
+								namingAgent: isPrCheckout ? undefined : namingAgent,
+							};
 
-		if (trimmedPrompt) {
-			usePromptHistoryStore.getState().recordPrompt(trimmedPrompt);
-		}
+			if (trimmedPrompt) {
+				usePromptHistoryStore.getState().recordPrompt(trimmedPrompt);
+			}
 
-		closeAndResetDraft();
-		const { completed } = submit({ hostId, snapshot });
-		void navigate({
-			to: "/v2-workspace/$workspaceId",
-			params: { workspaceId },
-		}).catch((error) => {
-			console.error("[useSubmitWorkspace] failed to open workspace", error);
-		});
-
-		const isViewingOptimisticWorkspace = () => {
-			const workspaceMatch = matchRoute({
-				to: "/v2-workspace/$workspaceId",
-			});
-			return (
-				workspaceMatch !== false && workspaceMatch.workspaceId === workspaceId
-			);
-		};
-
-		void completed.then((outcome) => {
-			if (!outcome.ok) return;
-
-			// The server can resolve the optimistic workspace to a different
-			// canonical id; follow it only if we're still on the optimistic route.
-			if (outcome.workspaceId === workspaceId) return;
-			if (!isViewingOptimisticWorkspace()) return;
+			closeAndResetDraft();
+			const { completed } = submit({ hostId, snapshot });
 			void navigate({
 				to: "/v2-workspace/$workspaceId",
-				params: { workspaceId: outcome.workspaceId },
-				replace: true,
+				params: { workspaceId },
 			}).catch((error) => {
-				console.error(
-					"[useSubmitWorkspace] failed to redirect workspace",
-					error,
-				);
+				console.error("[useSubmitWorkspace] failed to open workspace", error);
 			});
-		});
-	}, [
-		activeOrganizationId,
-		awaitAcpChatEnabled,
-		selectedPresetId,
-		closeAndResetDraft,
-		collections,
-		createCloudWorkspace,
-		draft,
-		prompt,
-		linkedIssues,
-		linkedPR,
-		isSession,
-		matchRoute,
-		machineId,
-		navigate,
-		projectId,
-		promptContext,
-		selectedAgent,
-		selectedModel,
-		selectedEffort,
-		selectedMode,
-		submit,
-		t,
-		uploadAttachments,
-		utils,
-		cloudEnvironmentId,
-		cloudMachineSize,
-	]);
 
-	const submitWorkspace = useCallback(async () => {
-		if (inFlightRef.current) return;
-		inFlightRef.current = true;
-		setIsSubmitting(true);
-		try {
-			await submitWorkspaceInner();
-		} finally {
-			inFlightRef.current = false;
-			setIsSubmitting(false);
-		}
-	}, [submitWorkspaceInner]);
+			const isViewingOptimisticWorkspace = () => {
+				const workspaceMatch = matchRoute({
+					to: "/v2-workspace/$workspaceId",
+				});
+				return (
+					workspaceMatch !== false && workspaceMatch.workspaceId === workspaceId
+				);
+			};
+
+			void completed.then((outcome) => {
+				if (!outcome.ok) return;
+
+				// The server can resolve the optimistic workspace to a different
+				// canonical id; follow it only if we're still on the optimistic route.
+				if (outcome.workspaceId === workspaceId) return;
+				if (!isViewingOptimisticWorkspace()) return;
+				void navigate({
+					to: "/v2-workspace/$workspaceId",
+					params: { workspaceId: outcome.workspaceId },
+					replace: true,
+				}).catch((error) => {
+					console.error(
+						"[useSubmitWorkspace] failed to redirect workspace",
+						error,
+					);
+				});
+			});
+		},
+		[
+			activeOrganizationId,
+			awaitAcpChatEnabled,
+			selectedPresetId,
+			closeAndResetDraft,
+			collections,
+			createCloudWorkspace,
+			draft,
+			prompt,
+			linkedIssues,
+			linkedPR,
+			isSession,
+			matchRoute,
+			machineId,
+			navigate,
+			projectId,
+			promptContext,
+			selectedAgent,
+			selectedModel,
+			selectedEffort,
+			selectedMode,
+			submit,
+			t,
+			uploadAttachments,
+			utils,
+			cloudEnvironmentId,
+			cloudMachineSize,
+		],
+	);
+
+	const submitWorkspace = useCallback(
+		async (openTarget?: OpenWorkspaceTarget) => {
+			if (inFlightRef.current) return;
+			inFlightRef.current = true;
+			setIsSubmitting(true);
+			try {
+				await submitWorkspaceInner(openTarget);
+			} finally {
+				inFlightRef.current = false;
+				setIsSubmitting(false);
+			}
+		},
+		[submitWorkspaceInner],
+	);
 
 	// Spans the whole submit — pending uploads, the cloud environment lookup,
 	// and the create itself — so the submit control reads busy for exactly the
