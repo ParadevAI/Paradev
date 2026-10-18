@@ -10,6 +10,7 @@ function hasControlCharacter(name: string): boolean {
 
 export function isValidBranchName(name: string): boolean {
 	if (
+		name === "" ||
 		name === "@" ||
 		name.startsWith("-") ||
 		FORBIDDEN.test(name) ||

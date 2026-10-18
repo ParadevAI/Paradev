@@ -13460,7 +13460,7 @@ msgid "Open workspace"
 msgstr "Otevřít pracovní prostor"
 
 msgid "Open workspace on <0>{typedBranch}</0>"
-msgstr "Otevřít pracovní prostor na <0>{typedBranch}</0>"
+msgstr "Otevřít pracovní prostor na větvi <0>{typedBranch}</0>"
 
 msgid "Open your app."
 msgstr "Otevřete aplikaci."

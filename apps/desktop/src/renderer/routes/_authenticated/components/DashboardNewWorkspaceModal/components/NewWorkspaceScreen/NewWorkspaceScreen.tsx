@@ -1042,7 +1042,10 @@ export function NewWorkspaceScreen({
 									</span>
 								</>
 							) : draft.hostId === CLOUD_HOST_ID ? (
-								<CompareBaseBranchPicker {...pickerProps} />
+								<CompareBaseBranchPicker
+									{...pickerProps}
+									canOpenTypedBranch={false}
+								/>
 							) : draft.isSession ? null : (
 								<>
 									<CheckoutPickerPill

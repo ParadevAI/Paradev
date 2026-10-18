@@ -56,6 +56,7 @@ interface CompareBaseBranchPickerProps {
 	// worktree, and fresh-create. Worktree rows must carry their path so stale
 	// branch labels do not make the server create a new managed worktree.
 	onOpenWorkspace: (target: OpenWorkspaceTarget) => void;
+	canOpenTypedBranch?: boolean;
 }
 
 export function CompareBaseBranchPicker({
@@ -78,6 +79,7 @@ export function CompareBaseBranchPicker({
 	onLoadMore,
 	onSelectCompareBaseBranch,
 	onOpenWorkspace,
+	canOpenTypedBranch = true,
 }: CompareBaseBranchPickerProps) {
 	const { t } = useLingui();
 	const [open, setOpen] = useState(false);
@@ -134,6 +136,7 @@ export function CompareBaseBranchPicker({
 
 	const typedBranch = branchSearch.trim();
 	const showTypedBranchRow =
+		canOpenTypedBranch &&
 		isValidBranchName(typedBranch) &&
 		!branches.some((branch) => branch.name === typedBranch);
 	const openTypedBranch = () => {

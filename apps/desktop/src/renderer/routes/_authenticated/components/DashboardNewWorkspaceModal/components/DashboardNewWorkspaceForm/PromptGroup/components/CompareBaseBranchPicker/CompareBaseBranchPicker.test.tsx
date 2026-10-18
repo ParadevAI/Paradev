@@ -315,6 +315,18 @@ describe("CompareBaseBranchPicker typed branch", () => {
 		expect(onOpenWorkspace).toHaveBeenCalledWith({ branchName: "feat/pasted" });
 	});
 
+	test("offers no typed row where typed branches can't be opened", async () => {
+		const page = renderPicker({
+			effectiveCompareBaseBranch: "main",
+			branchSearch: "feat/pasted",
+			canOpenTypedBranch: false,
+		});
+		await act(async () => {
+			fireEvent.click(page.getByRole("button", { name: "main" }));
+		});
+		expect(page.queryByText(/Open workspace on/)).toBeNull();
+	});
+
 	test("offers no typed row for a name git would reject", async () => {
 		const page = renderPicker({
 			effectiveCompareBaseBranch: "main",
