@@ -1173,7 +1173,7 @@ export function NewWorkspaceScreen({
 					</span>
 				</>
 			) : isCloudHost ? (
-				<CompareBaseBranchPicker {...pickerProps} />
+				<CompareBaseBranchPicker {...pickerProps} canOpenTypedBranch={false} />
 			) : isSession ? null : (
 				<>
 					<CheckoutPickerPill

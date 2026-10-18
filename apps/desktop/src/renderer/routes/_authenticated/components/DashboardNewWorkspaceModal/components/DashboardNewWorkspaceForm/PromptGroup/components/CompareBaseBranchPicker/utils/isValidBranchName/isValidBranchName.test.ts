@@ -9,6 +9,7 @@ test("accepts the branch names git accepts", () => {
 
 test("rejects the branch names git rejects", () => {
 	for (const name of [
+		"",
 		"has space",
 		"a..b",
 		"a~1",
