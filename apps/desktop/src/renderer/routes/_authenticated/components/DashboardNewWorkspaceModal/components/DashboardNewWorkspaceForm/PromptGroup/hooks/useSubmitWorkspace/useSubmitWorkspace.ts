@@ -18,6 +18,7 @@ import { usePromptHistoryStore } from "renderer/stores/prompt-history";
 import { useWorkspaceCreates } from "renderer/stores/workspace-creates";
 import { seedPendingCloudChat } from "renderer/stores/workspace-creates/pendingCloudChat";
 import { useDashboardNewWorkspaceDraft } from "../../../../../DashboardNewWorkspaceDraftContext";
+import type { OpenWorkspaceTarget } from "../../components/CompareBaseBranchPicker";
 import type { WorkspaceCreateAgent } from "../../types";
 import type { UseUploadAttachmentsApi } from "../useUploadAttachments";
 import { resolveNames } from "./resolveNames";
@@ -27,6 +28,7 @@ interface Overrides {
 	cloudPrompt?: (typed: string) => string;
 	ignoreDraft?: boolean;
 	cloudAgent?: WorkspaceCreateAgent;
+	openTarget?: OpenWorkspaceTarget;
 }
 
 /**
@@ -34,6 +36,9 @@ interface Overrides {
  * procedure. Attachment uploads run optimistically through `useUploadAttachments`
  * — submit only blocks on whatever uploads are still in flight, then dispatches
  * the create with the resulting `attachmentIds` on the agent launch sugar.
+ *
+ * Passing an `openTarget` opens that existing branch/worktree (or creates the
+ * typed branch) instead of a fresh one — the prompt and agent still launch.
  */
 export function useSubmitWorkspace(
 	projectId: string | null,
@@ -115,6 +120,7 @@ export function useSubmitWorkspace(
 			}
 
 			const ignoreDraft = overrides?.ignoreDraft === true;
+			const openTarget = overrides?.openTarget;
 			const { readyIds: attachmentIds, errors } = ignoreDraft
 				? { readyIds: [], errors: [] }
 				: await uploadAttachments.awaitUploads();
@@ -202,7 +208,11 @@ export function useSubmitWorkspace(
 									: [],
 							)
 							.slice(0, 10),
-						branch: draft.baseBranch ?? branchName ?? undefined,
+						branch:
+							openTarget?.branchName ??
+							draft.baseBranch ??
+							branchName ??
+							undefined,
 						...(attachmentIds.length > 0
 							? { attachmentFileIds: attachmentIds }
 							: {}),
@@ -282,9 +292,11 @@ export function useSubmitWorkspace(
 				return false;
 			}
 
-			const isPrCheckout = linkedPR !== null;
+			// An explicit branch to open wins over a linked PR and the checkout pill.
+			const isPrCheckout = !openTarget && linkedPR !== null;
 			// A PR always needs its own worktree; otherwise the picker decides.
-			const isLocalCheckout = !isPrCheckout && draft.checkout === "local";
+			const isLocalCheckout =
+				!openTarget && !isPrCheckout && draft.checkout === "local";
 
 			const linkedTaskId = linkedIssues.find(
 				(issue) => issue.source === "internal" && issue.taskId,
@@ -351,35 +363,49 @@ export function useSubmitWorkspace(
 						namingPrompt,
 						namingAgent,
 					}
-				: isLocalCheckout
+				: openTarget
 					? {
 							id: workspaceId,
 							projectId: projectId as string,
-							checkout: "local" as const,
-							name: workspaceName ?? undefined,
-							taskId: linkedTaskId,
-							agents,
-							namingPrompt,
-							namingAgent,
-						}
-					: {
-							id: workspaceId,
-							projectId: projectId as string,
-							name: isPrCheckout ? prName : (workspaceName ?? undefined),
-							branch: isPrCheckout ? undefined : (branchName ?? undefined),
-							skipBranchPrefix:
-								!isPrCheckout &&
-								branchName !== null &&
-								draft.branchNameFromProvider
-									? true
-									: undefined,
-							pr: isPrCheckout ? linkedPR?.prNumber : undefined,
+							name: workspaceName ?? openTarget.branchName,
+							branch: openTarget.branchName,
+							// Only used when the branch doesn't exist yet and gets created.
 							baseBranch: draft.baseBranch ?? undefined,
+							...(openTarget.worktreePath
+								? { worktreePath: openTarget.worktreePath }
+								: {}),
 							taskId: linkedTaskId,
 							agents,
-							namingPrompt: isPrCheckout ? undefined : namingPrompt,
-							namingAgent: isPrCheckout ? undefined : namingAgent,
-						};
+						}
+					: isLocalCheckout
+						? {
+								id: workspaceId,
+								projectId: projectId as string,
+								checkout: "local" as const,
+								name: workspaceName ?? undefined,
+								taskId: linkedTaskId,
+								agents,
+								namingPrompt,
+								namingAgent,
+							}
+						: {
+								id: workspaceId,
+								projectId: projectId as string,
+								name: isPrCheckout ? prName : (workspaceName ?? undefined),
+								branch: isPrCheckout ? undefined : (branchName ?? undefined),
+								skipBranchPrefix:
+									!isPrCheckout &&
+									branchName !== null &&
+									draft.branchNameFromProvider
+										? true
+										: undefined,
+								pr: isPrCheckout ? linkedPR?.prNumber : undefined,
+								baseBranch: draft.baseBranch ?? undefined,
+								taskId: linkedTaskId,
+								agents,
+								namingPrompt: isPrCheckout ? undefined : namingPrompt,
+								namingAgent: isPrCheckout ? undefined : namingAgent,
+							};
 
 			if (trimmedPrompt) {
 				usePromptHistoryStore.getState().recordPrompt(trimmedPrompt);
