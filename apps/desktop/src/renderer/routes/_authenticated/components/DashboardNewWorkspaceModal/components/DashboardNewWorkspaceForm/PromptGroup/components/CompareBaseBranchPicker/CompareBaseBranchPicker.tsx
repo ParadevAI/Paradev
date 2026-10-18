@@ -24,6 +24,7 @@ import {
 	type OpenWorkspaceTarget,
 	toOpenWorkspaceTarget,
 } from "./openWorkspaceTarget";
+import { isValidBranchName } from "./utils/isValidBranchName";
 
 const MOD_KEY = PLATFORM === "mac" ? "⌘" : "Ctrl";
 // cmdk row value for the typed-name row; can't collide with a git ref name.
@@ -131,11 +132,9 @@ export function CompareBaseBranchPicker({
 		return branchesFailure;
 	}
 
-	// Lets a known (e.g. pasted) branch name open without waiting for, or
-	// matching, the loaded list; the server checks it out or creates it.
 	const typedBranch = branchSearch.trim();
 	const showTypedBranchRow =
-		typedBranch.length > 0 &&
+		isValidBranchName(typedBranch) &&
 		!branches.some((branch) => branch.name === typedBranch);
 	const openTypedBranch = () => {
 		onOpenWorkspace({ branchName: typedBranch });
@@ -173,13 +172,17 @@ export function CompareBaseBranchPicker({
 					onKeyDown={(e) => {
 						// cmdk leaves focus on the input, so the per-row button is
 						// pointer-only — Mod+Enter is the keyboard path to it.
+						if (
+							e.key === "Enter" &&
+							showTypedBranchRow &&
+							selectedValue === TYPED_BRANCH_VALUE
+						) {
+							e.preventDefault();
+							e.stopPropagation();
+							if (e.metaKey || e.ctrlKey) openTypedBranch();
+							return;
+						}
 						if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
-							if (showTypedBranchRow && selectedValue === TYPED_BRANCH_VALUE) {
-								e.preventDefault();
-								e.stopPropagation();
-								openTypedBranch();
-								return;
-							}
 							const selectedBranch = branches.find(
 								(branch) => branch.name === selectedValue,
 							);
@@ -323,7 +326,7 @@ export function CompareBaseBranchPicker({
 									</Trans>
 								</span>
 								<span className="ml-2 shrink-0 text-[10px] text-muted-foreground opacity-70">
-									↵
+									{MOD_KEY}↵
 								</span>
 							</CommandItem>
 						)}

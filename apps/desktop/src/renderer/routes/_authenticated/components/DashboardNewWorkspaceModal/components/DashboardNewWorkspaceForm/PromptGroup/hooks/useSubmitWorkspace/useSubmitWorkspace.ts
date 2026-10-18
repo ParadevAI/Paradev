@@ -32,9 +32,6 @@ import { resolveNames } from "./resolveNames";
  * procedure. Attachment uploads run optimistically through `useUploadAttachments`
  * — submit only blocks on whatever uploads are still in flight, then dispatches
  * the create with the resulting `attachmentIds` on the agent launch sugar.
- *
- * Passing an `openTarget` opens that existing branch/worktree (or creates the
- * typed branch) instead of a fresh one — the prompt and agent still launch.
  */
 export function useSubmitWorkspace(
 	projectId: string | null,
@@ -271,7 +268,6 @@ export function useSubmitWorkspace(
 				return;
 			}
 
-			// An explicit branch to open wins over a linked PR and the checkout pill.
 			const isPrCheckout = !openTarget && linkedPR !== null;
 			// A PR always needs its own worktree; otherwise the picker decides.
 			const isLocalCheckout =
@@ -348,7 +344,6 @@ export function useSubmitWorkspace(
 							projectId: projectId as string,
 							name: workspaceName ?? openTarget.branchName,
 							branch: openTarget.branchName,
-							// Only used when the branch doesn't exist yet and gets created.
 							baseBranch: draft.baseBranch ?? undefined,
 							...(openTarget.worktreePath
 								? { worktreePath: openTarget.worktreePath }
