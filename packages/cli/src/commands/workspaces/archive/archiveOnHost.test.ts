@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
+import { CLIError } from "@superset/cli-framework";
 import { TRPCClientError } from "@trpc/client";
-import { archiveOnHost } from "./archiveOnHost";
+import { archiveOnHost, reportHostOutcomes } from "./archiveOnHost";
 
 const notFound = () =>
 	new TRPCClientError("Workspace not found", {
@@ -51,4 +52,52 @@ describe("archiveOnHost", () => {
 			]);
 		});
 	}
+});
+
+describe("reportHostOutcomes", () => {
+	test("a mixed batch fails with every id in its data", () => {
+		let error: unknown;
+		try {
+			reportHostOutcomes(
+				[
+					{ id: "ws-1", status: "deleted", warnings: ["teardown exited 1"] },
+					{ id: "5a17058b", status: "not_found" },
+					{ id: "broken", status: "failed", reason: "disk on fire" },
+				],
+				"host-1",
+			);
+		} catch (caught) {
+			error = caught;
+		}
+
+		expect(error).toBeInstanceOf(CLIError);
+		const cliError = error as CLIError;
+		expect(cliError.data).toEqual({
+			deleted: ["ws-1"],
+			notFound: ["5a17058b"],
+			failed: [{ id: "broken", reason: "disk on fire" }],
+			warnings: ["ws-1: teardown exited 1"],
+		});
+		expect(cliError.message).toBe(
+			[
+				"Archived workspace ws-1",
+				"Warning: ws-1: teardown exited 1",
+				"Not found: no workspace 5a17058b on host host-1",
+				"Failed: broken: disk on fire",
+			].join("\n"),
+		);
+		expect(cliError.suggestion).toContain("Pass full workspace IDs");
+	});
+
+	test("an all-deleted batch returns the same shape", () => {
+		expect(
+			reportHostOutcomes(
+				[{ id: "ws-1", status: "deleted", warnings: [] }],
+				"h",
+			),
+		).toEqual({
+			data: { deleted: ["ws-1"], notFound: [], failed: [], warnings: [] },
+			message: "Archived workspace ws-1",
+		});
+	});
 });

@@ -2,7 +2,11 @@ import { boolean, CLIError, positional, string } from "@superset/cli-framework";
 import { resolveWorkspaceHost } from "../../../lib/cloud-workspaces";
 import { command } from "../../../lib/command";
 import { resolveHostTarget } from "../../../lib/host-target";
-import { archiveOnHost } from "./archiveOnHost";
+import {
+	archiveOnHost,
+	type DeleteReport,
+	reportHostOutcomes,
+} from "./archiveOnHost";
 
 export default command({
 	description:
@@ -32,16 +36,23 @@ export default command({
 				const result = await ctx.api.cloudWorkspace.delete.mutate({ id });
 				(result.deleted ? archived : missing).push(id);
 			}
+			const data = {
+				deleted: archived,
+				notFound: missing,
+				failed: [],
+				warnings: [],
+			} satisfies DeleteReport;
 			if (missing.length > 0) {
 				const alsoArchived =
 					archived.length > 0 ? ` (archived: ${archived.join(", ")})` : "";
 				throw new CLIError(
 					`No cloud workspace in this organization: ${missing.join(", ")}${alsoArchived}`,
 					"Pass --local or --host <id> if it lives on a machine",
+					data,
 				);
 			}
 			return {
-				data: { deleted: archived },
+				data,
 				message:
 					archived.length === 1
 						? `Archived cloud workspace ${archived[0]}`
@@ -56,46 +67,9 @@ export default command({
 			api: ctx.api,
 		});
 
-		const outcomes = await archiveOnHost(target.client, ids);
-		const archived: string[] = [];
-		const warnings: string[] = [];
-		const notFound: string[] = [];
-		const failed: { id: string; reason: string }[] = [];
-		for (const outcome of outcomes) {
-			if (outcome.status === "deleted") {
-				archived.push(outcome.id);
-				for (const warning of outcome.warnings) {
-					warnings.push(`${outcome.id}: ${warning}`);
-				}
-			} else if (outcome.status === "not_found") {
-				notFound.push(outcome.id);
-			} else {
-				failed.push({ id: outcome.id, reason: outcome.reason });
-			}
-		}
-
-		const lines = [
-			...archived.map((id) => `Archived workspace ${id}`),
-			...warnings.map((warning) => `Warning: ${warning}`),
-			...notFound.map(
-				(id) => `Not found: no workspace ${id} on host ${target.hostId}`,
-			),
-			...failed.map(({ id, reason }) => `Failed: ${id}: ${reason}`),
-		];
-		if (notFound.length > 0 || failed.length > 0) {
-			throw new CLIError(
-				lines.join("\n"),
-				notFound.length > 0
-					? "Pass full workspace IDs (superset workspaces list), and --host <id> for a workspace on another machine"
-					: undefined,
-			);
-		}
-		return {
-			data: { deleted: archived, warnings },
-			message:
-				archived.length === 1 && warnings.length === 0
-					? `Archived workspace ${archived[0]}`
-					: lines.join("\n"),
-		};
+		return reportHostOutcomes(
+			await archiveOnHost(target.client, ids),
+			target.hostId,
+		);
 	},
 });
