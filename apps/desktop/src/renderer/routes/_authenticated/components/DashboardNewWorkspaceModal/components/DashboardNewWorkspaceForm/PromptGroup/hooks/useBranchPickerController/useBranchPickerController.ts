@@ -5,6 +5,7 @@ import { useCallback, useState } from "react";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { useWorkspaceCreates } from "renderer/stores/workspace-creates";
 import type { BaseBranchSource } from "../../../../../DashboardNewWorkspaceDraftContext";
+import type { RemoteHostPresence } from "../../../../../utils/resolveRemoteHostPresence";
 import {
 	type BranchFilter,
 	type CloudRepository,
@@ -20,7 +21,7 @@ type PickerProps = React.ComponentProps<typeof CompareBaseBranchPicker>;
 export interface UseBranchPickerControllerArgs {
 	projectId: string | null;
 	hostId: string | null;
-	isHostOffline: boolean;
+	remoteHostPresence: RemoteHostPresence | null;
 	/** Cloud only: the primary repository whose branches are offered. */
 	cloudRepository?: CloudRepository | null;
 	baseBranch: string | null;
@@ -38,7 +39,7 @@ export function useBranchPickerController(args: UseBranchPickerControllerArgs) {
 	const {
 		projectId,
 		hostId,
-		isHostOffline,
+		remoteHostPresence,
 		cloudRepository = null,
 		baseBranch,
 		typedWorkspaceName,
@@ -75,7 +76,7 @@ export function useBranchPickerController(args: UseBranchPickerControllerArgs) {
 		branchSearch,
 		branchFilter,
 		cloudRepository,
-		!isHostOffline,
+		remoteHostPresence !== "offline" && remoteHostPresence !== "connecting",
 	);
 
 	const effectiveCompareBaseBranch = baseBranch || defaultBranch || null;
@@ -165,12 +166,12 @@ export function useBranchPickerController(args: UseBranchPickerControllerArgs) {
 	const pickerProps: PickerProps = {
 		effectiveCompareBaseBranch,
 		defaultBranch,
-		isBranchesLoading,
+		isBranchesLoading: isBranchesLoading || remoteHostPresence === "connecting",
 		isBranchesError,
 		branchesError,
 		isBranchesRefetching,
 		onRetryBranches,
-		isHostOffline,
+		isHostOffline: remoteHostPresence === "offline",
 		branches,
 		branchSearch,
 		onBranchSearchChange: setBranchSearch,

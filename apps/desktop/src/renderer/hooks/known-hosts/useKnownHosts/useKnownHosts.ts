@@ -6,12 +6,12 @@ import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId"
 import { useRelayUrl } from "renderer/hooks/useRelayUrl";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { getHostEventBus } from "renderer/lib/host-event-bus";
+import { hostPresence } from "./utils/hostPresence";
 
 type HostRow = RouterOutputs["host"]["roster"][number];
 
 export type KnownHostRow = HostRow & {
 	isOnline: boolean;
-	/** The first connection attempt has not resolved, so online is unknown. */
 	isConnecting: boolean;
 };
 
@@ -57,14 +57,10 @@ export function useKnownHosts(): {
 	const presence = useRelayPresence(relayUrl, rows);
 	const hosts = useMemo(
 		() =>
-			rows.map((row) => {
-				const state = presence.get(row.machineId) ?? "connecting";
-				return {
-					...row,
-					isOnline: state === "open",
-					isConnecting: state === "connecting",
-				};
-			}),
+			rows.map((row) => ({
+				...row,
+				...hostPresence(presence.get(row.machineId)),
+			})),
 		[rows, presence],
 	);
 	return { hosts, organizationId, settled: hostsQuery.data !== undefined };
@@ -73,7 +69,7 @@ export function useKnownHosts(): {
 function useRelayPresence(
 	relayUrl: string,
 	rows: HostRow[],
-): Map<string, HostConnectionStatus["state"]> {
+): Map<string, HostConnectionStatus> {
 	const hostUrls = useMemo(
 		() =>
 			rows.map(
@@ -85,15 +81,15 @@ function useRelayPresence(
 			),
 		[rows, relayUrl],
 	);
-	const [presence, setPresence] = useState<
-		Map<string, HostConnectionStatus["state"]>
-	>(() => new Map());
+	const [presence, setPresence] = useState<Map<string, HostConnectionStatus>>(
+		() => new Map(),
+	);
 	useEffect(() => {
 		const read = () =>
 			new Map(
 				hostUrls.map(([machineId, hostUrl]) => [
 					machineId,
-					getHostEventBus(hostUrl).getConnectionStatus().state,
+					getHostEventBus(hostUrl).getConnectionStatus(),
 				]),
 			);
 		setPresence(read());

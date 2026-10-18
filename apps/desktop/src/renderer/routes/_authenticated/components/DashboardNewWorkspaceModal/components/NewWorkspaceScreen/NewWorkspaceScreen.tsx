@@ -82,6 +82,7 @@ import {
 	type PromptCardsVariant,
 	useNewWorkspacePromptCardsVariant,
 } from "../../hooks/useNewWorkspacePromptCardsVariant";
+import { resolveRemoteHostPresence } from "../../utils/resolveRemoteHostPresence";
 import { DevicePicker } from "../DashboardNewWorkspaceForm/components/DevicePicker";
 import { useWorkspaceHostOptions } from "../DashboardNewWorkspaceForm/components/DevicePicker/hooks/useWorkspaceHostOptions";
 import { CheckoutPickerPill } from "../DashboardNewWorkspaceForm/PromptGroup/components/CheckoutPickerPill";
@@ -599,27 +600,23 @@ export function NewWorkspaceScreen({
 		modeSupport ? selectedPresetId : null,
 	);
 
-	const { otherHosts } = useWorkspaceHostOptions();
-	const selectedRemoteHostPresence = useMemo<
-		"online" | "offline" | "unknown" | null
-	>(() => {
-		const selectedHostId = draft.hostId ?? machineId;
-		if (
-			!selectedHostId ||
-			selectedHostId === machineId ||
-			selectedHostId === CLOUD_HOST_ID
-		)
-			return null;
-		const remote = otherHosts.find((host) => host.id === selectedHostId);
-		if (!remote || remote.isConnecting) return "unknown";
-		return remote.isOnline ? "online" : "offline";
-	}, [draft.hostId, machineId, otherHosts]);
+	const { otherHosts, hostsSettled } = useWorkspaceHostOptions();
+	const selectedRemoteHostPresence = useMemo(
+		() =>
+			resolveRemoteHostPresence({
+				selectedHostId: draft.hostId ?? machineId,
+				localHostId: machineId,
+				hosts: otherHosts,
+				hostsSettled,
+			}),
+		[draft.hostId, machineId, otherHosts, hostsSettled],
+	);
 
 	// ── Base branch ──────────────────────────────────────────────────
 	const { pickerProps } = useBranchPickerController({
 		projectId,
 		hostId: draft.hostId,
-		isHostOffline: selectedRemoteHostPresence === "offline",
+		remoteHostPresence: selectedRemoteHostPresence,
 		cloudRepository,
 		baseBranch: draft.baseBranch,
 		typedWorkspaceName: draft.workspaceName,

@@ -32,7 +32,10 @@ interface UseWorkspaceHostOptionsResult {
 	localHostIsOnline: boolean | null;
 	activeHostUrl: string | null;
 	otherHosts: WorkspaceHostOption[];
+	hostsSettled: boolean;
 }
+
+const NO_MEMBERS: never[] = [];
 
 export function useWorkspaceHostOptions(): UseWorkspaceHostOptionsResult {
 	const { t } = useLingui();
@@ -43,10 +46,11 @@ export function useWorkspaceHostOptions(): UseWorkspaceHostOptionsResult {
 	const activeOrganizationId = useActiveOrganizationId();
 	const currentUserId = session?.user?.id ?? null;
 
-	const { hosts: hostRows } = useKnownHosts();
+	const { hosts: hostRows, settled: rosterSettled } = useKnownHosts();
 
-	const { data: hostMemberRows = [] } =
-		cloudTrpc.host.listMembers.useQuery(undefined);
+	const { data: memberRows } = cloudTrpc.host.listMembers.useQuery(undefined);
+	const hostMemberRows = memberRows ?? NO_MEMBERS;
+	const hostsSettled = rosterSettled && memberRows !== undefined;
 
 	const accessibleHosts = useMemo(() => {
 		const accessibleHostIds = new Set(
@@ -104,5 +108,6 @@ export function useWorkspaceHostOptions(): UseWorkspaceHostOptionsResult {
 		localHostIsOnline: localHost ? localHost.isOnline : null,
 		activeHostUrl,
 		otherHosts,
+		hostsSettled,
 	};
 }

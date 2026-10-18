@@ -35,7 +35,7 @@ export function useBranchContext(
 	query: string,
 	filter: BranchFilter = "all",
 	cloudRepository: CloudRepository | null = null,
-	isHostOnline = true,
+	canReachHost = true,
 ) {
 	// A cloud workspace has no host to search — the sandbox doesn't exist until
 	// create — so its branches come from the GitHub remote instead.
@@ -72,7 +72,7 @@ export function useBranchContext(
 			query,
 			filter,
 		],
-		enabled: !isCloud && isHostOnline && !!projectId && !!hostUrl,
+		enabled: !isCloud && canReachHost && !!projectId && !!hostUrl,
 		initialPageParam: undefined as string | undefined,
 		getNextPageParam: (last: BranchPage) => last.nextCursor ?? undefined,
 		queryFn: async ({ pageParam }): Promise<BranchPage> => {
