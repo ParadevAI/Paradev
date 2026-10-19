@@ -92,10 +92,6 @@ msgstr "(출력 없음)"
 msgid "(you)"
 msgstr "(나)"
 
-#. placeholder {0}: connections.length
-msgid "{0, plural, one {# account connected} other {# accounts connected}}"
-msgstr "{0, plural, other {계정 #개 연결됨}}"
-
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
 msgstr "{0, plural, one {활성 포트 #개 — 세부 정보 숨기기} other {활성 포트 #개 — 세부 정보 숨기기}}"
@@ -391,7 +387,6 @@ msgstr "{0}은(는) 아직 이 방식으로 로그인할 수 없습니다."
 msgid "{0} developers are ranked by agent usage. Your last 30 days are already counted, just hidden. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "{0}명의 개발자가 에이전트 사용량으로 순위에 올라 있습니다. 최근 30일 사용량은 이미 집계되어 있고 숨겨져 있을 뿐입니다. 토큰 수와 모델 이름만 공개되며 저장소 이름, 파일 경로, 프롬프트는 포함되지 않습니다."
 
-#. placeholder {0}: displayName(variables.name)
 #. placeholder {0}: variables.name
 msgid "{0} disabled"
 msgstr "{0} 비활성화됨"
@@ -400,7 +395,6 @@ msgstr "{0} 비활성화됨"
 msgid "{0} Documentation"
 msgstr "{0} 문서"
 
-#. placeholder {0}: displayName(variables.name)
 #. placeholder {0}: skill.name
 #. placeholder {0}: variables.name
 msgid "{0} enabled"
@@ -6191,9 +6185,6 @@ msgstr "다이렉트 모드"
 msgid "Directory"
 msgstr "디렉터리"
 
-msgid "Disable"
-msgstr "비활성화"
-
 msgid "Disable skill"
 msgstr "스킬 비활성화"
 
@@ -6699,9 +6690,6 @@ msgstr "빈 명령"
 
 msgid "Emulator"
 msgstr "에뮬레이터"
-
-msgid "Enable"
-msgstr "활성화"
 
 #. placeholder {0}: preset.label
 msgid "Enable {0}"
@@ -8916,9 +8904,6 @@ msgstr "클라이언트에 Superset MCP 설치하기"
 msgid "Install the desktop app"
 msgstr "데스크톱 앱 설치"
 
-msgid "Install the plugin to connect"
-msgstr "연결하려면 플러그인을 설치하세요"
-
 msgid "Install the Superset GitHub App to connect your repositories."
 msgstr "리포지토리를 연결하려면 Superset GitHub App을 설치하세요."
 
@@ -9160,6 +9145,9 @@ msgstr "반복."
 
 msgid "Its comments and history go with it."
 msgstr "댓글과 기록도 함께 삭제됩니다."
+
+msgid "Its connected accounts were disconnected."
+msgstr "연결된 계정의 연결이 해제되었습니다."
 
 msgid "Its own branch and copy of the files"
 msgstr "독립된 브랜치와 파일 사본"
@@ -9955,9 +9943,6 @@ msgstr "관리"
 
 msgid "Manage {title}"
 msgstr "{title} 관리"
-
-msgid "Manage accounts"
-msgstr "계정 관리"
 
 msgid "Manage accounts…"
 msgstr "계정 관리…"

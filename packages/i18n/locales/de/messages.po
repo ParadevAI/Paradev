@@ -92,10 +92,6 @@ msgstr "(keine Ausgabe)"
 msgid "(you)"
 msgstr "(du)"
 
-#. placeholder {0}: connections.length
-msgid "{0, plural, one {# account connected} other {# accounts connected}}"
-msgstr "{0, plural, one {# Konto verbunden} other {# Konten verbunden}}"
-
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
 msgstr "{0, plural, one {# aktiver Port — Details ausblenden} other {# aktive Ports — Details ausblenden}}"
@@ -391,7 +387,6 @@ msgstr "{0} kann so noch nicht angemeldet werden."
 msgid "{0} developers are ranked by agent usage. Your last 30 days are already counted, just hidden. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "{0} Entwickler sind nach Agent-Nutzung platziert. Deine letzten 30 Tage werden bereits gezählt, nur verborgen. Nur Token-Zahlen und Modellnamen, keine Repo-Namen, Dateipfade oder Prompts."
 
-#. placeholder {0}: displayName(variables.name)
 #. placeholder {0}: variables.name
 msgid "{0} disabled"
 msgstr "{0} deaktiviert"
@@ -400,7 +395,6 @@ msgstr "{0} deaktiviert"
 msgid "{0} Documentation"
 msgstr "Dokumentation zu {0}"
 
-#. placeholder {0}: displayName(variables.name)
 #. placeholder {0}: skill.name
 #. placeholder {0}: variables.name
 msgid "{0} enabled"
@@ -6191,9 +6185,6 @@ msgstr "Direktmodus"
 msgid "Directory"
 msgstr "Verzeichnis"
 
-msgid "Disable"
-msgstr "Deaktivieren"
-
 msgid "Disable skill"
 msgstr "Skill deaktivieren"
 
@@ -6699,9 +6690,6 @@ msgstr "Leerer Befehl"
 
 msgid "Emulator"
 msgstr "Emulator"
-
-msgid "Enable"
-msgstr "Aktivieren"
 
 #. placeholder {0}: preset.label
 msgid "Enable {0}"
@@ -8916,9 +8904,6 @@ msgstr "Superset MCP in deinem Client installieren"
 msgid "Install the desktop app"
 msgstr "Desktop-App installieren"
 
-msgid "Install the plugin to connect"
-msgstr "Installieren Sie das Plugin, um zu verbinden"
-
 msgid "Install the Superset GitHub App to connect your repositories."
 msgstr "Installiere die Superset-GitHub-App, um deine Repositories zu verbinden."
 
@@ -9160,6 +9145,9 @@ msgstr "Iterieren."
 
 msgid "Its comments and history go with it."
 msgstr "Kommentare und Verlauf werden mitgelöscht."
+
+msgid "Its connected accounts were disconnected."
+msgstr "Die verbundenen Konten wurden getrennt."
 
 msgid "Its own branch and copy of the files"
 msgstr "Eigener Branch und eigene Kopie der Dateien"
@@ -9955,9 +9943,6 @@ msgstr "Verwalten"
 
 msgid "Manage {title}"
 msgstr "{title} verwalten"
-
-msgid "Manage accounts"
-msgstr "Konten verwalten"
 
 msgid "Manage accounts…"
 msgstr "Konten verwalten…"

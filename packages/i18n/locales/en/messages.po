@@ -92,10 +92,6 @@ msgstr "(no output)"
 msgid "(you)"
 msgstr "(you)"
 
-#. placeholder {0}: connections.length
-msgid "{0, plural, one {# account connected} other {# accounts connected}}"
-msgstr "{0, plural, one {# account connected} other {# accounts connected}}"
-
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
 msgstr "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
@@ -391,7 +387,6 @@ msgstr "{0} cannot be signed in this way yet."
 msgid "{0} developers are ranked by agent usage. Your last 30 days are already counted, just hidden. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "{0} developers are ranked by agent usage. Your last 30 days are already counted, just hidden. Token counts and model names only, no repo names, file paths or prompts."
 
-#. placeholder {0}: displayName(variables.name)
 #. placeholder {0}: variables.name
 msgid "{0} disabled"
 msgstr "{0} disabled"
@@ -400,7 +395,6 @@ msgstr "{0} disabled"
 msgid "{0} Documentation"
 msgstr "{0} Documentation"
 
-#. placeholder {0}: displayName(variables.name)
 #. placeholder {0}: skill.name
 #. placeholder {0}: variables.name
 msgid "{0} enabled"
@@ -6191,9 +6185,6 @@ msgstr "Direct mode"
 msgid "Directory"
 msgstr "Directory"
 
-msgid "Disable"
-msgstr "Disable"
-
 msgid "Disable skill"
 msgstr "Disable skill"
 
@@ -6699,9 +6690,6 @@ msgstr "Empty command"
 
 msgid "Emulator"
 msgstr "Emulator"
-
-msgid "Enable"
-msgstr "Enable"
 
 #. placeholder {0}: preset.label
 msgid "Enable {0}"
@@ -8916,9 +8904,6 @@ msgstr "Install Superset MCP in your client"
 msgid "Install the desktop app"
 msgstr "Install the desktop app"
 
-msgid "Install the plugin to connect"
-msgstr "Install the plugin to connect"
-
 msgid "Install the Superset GitHub App to connect your repositories."
 msgstr "Install the Superset GitHub App to connect your repositories."
 
@@ -9160,6 +9145,9 @@ msgstr "Iterate."
 
 msgid "Its comments and history go with it."
 msgstr "Its comments and history go with it."
+
+msgid "Its connected accounts were disconnected."
+msgstr "Its connected accounts were disconnected."
 
 msgid "Its own branch and copy of the files"
 msgstr "Its own branch and copy of the files"
@@ -9955,9 +9943,6 @@ msgstr "Manage"
 
 msgid "Manage {title}"
 msgstr "Manage {title}"
-
-msgid "Manage accounts"
-msgstr "Manage accounts"
 
 msgid "Manage accounts…"
 msgstr "Manage accounts…"

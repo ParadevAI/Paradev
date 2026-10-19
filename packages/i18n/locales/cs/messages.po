@@ -92,10 +92,6 @@ msgstr "(žádný výstup)"
 msgid "(you)"
 msgstr "(vy)"
 
-#. placeholder {0}: connections.length
-msgid "{0, plural, one {# account connected} other {# accounts connected}}"
-msgstr "{0, plural, one {# připojený účet} few {# připojené účty} many {# připojených účtů} other {# připojených účtů}}"
-
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
 msgstr "{0, plural, one {# aktivní port — skrýt podrobnosti} few {# aktivní porty — skrýt podrobnosti} many {# aktivního portu — skrýt podrobnosti} other {# aktivních portů — skrýt podrobnosti}}"
@@ -391,7 +387,6 @@ msgstr "{0} se zatím nedá přihlásit tímto způsobem."
 msgid "{0} developers are ranked by agent usage. Your last 30 days are already counted, just hidden. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "Počet vývojářů v žebříčku podle využití agentů: {0}. Vašich posledních 30 dní se už počítá, jen je skryto. Pouze počty tokenů a názvy modelů, žádné názvy repozitářů, cesty k souborům ani prompty."
 
-#. placeholder {0}: displayName(variables.name)
 #. placeholder {0}: variables.name
 msgid "{0} disabled"
 msgstr "{0} vypnuto"
@@ -400,7 +395,6 @@ msgstr "{0} vypnuto"
 msgid "{0} Documentation"
 msgstr "Dokumentace {0}"
 
-#. placeholder {0}: displayName(variables.name)
 #. placeholder {0}: skill.name
 #. placeholder {0}: variables.name
 msgid "{0} enabled"
@@ -6191,9 +6185,6 @@ msgstr "Přímý režim"
 msgid "Directory"
 msgstr "Adresář"
 
-msgid "Disable"
-msgstr "Vypnout"
-
 msgid "Disable skill"
 msgstr "Vypnout skill"
 
@@ -6699,9 +6690,6 @@ msgstr "Prázdný příkaz"
 
 msgid "Emulator"
 msgstr "Emulátor"
-
-msgid "Enable"
-msgstr "Zapnout"
 
 #. placeholder {0}: preset.label
 msgid "Enable {0}"
@@ -8916,9 +8904,6 @@ msgstr "Nainstalujte Superset MCP do svého klienta"
 msgid "Install the desktop app"
 msgstr "Nainstalujte desktopovou aplikaci"
 
-msgid "Install the plugin to connect"
-msgstr "Pro připojení nainstalujte plugin"
-
 msgid "Install the Superset GitHub App to connect your repositories."
 msgstr "Nainstalujte Superset GitHub App a připojte své repozitáře."
 
@@ -9160,6 +9145,9 @@ msgstr "Vylepšujte."
 
 msgid "Its comments and history go with it."
 msgstr "Smažou se i jeho komentáře a historie."
+
+msgid "Its connected accounts were disconnected."
+msgstr "Připojené účty byly odpojeny."
 
 msgid "Its own branch and copy of the files"
 msgstr "Vlastní větev a vlastní kopie souborů"
@@ -9955,9 +9943,6 @@ msgstr "Spravovat"
 
 msgid "Manage {title}"
 msgstr "Spravovat {title}"
-
-msgid "Manage accounts"
-msgstr "Správa účtů"
 
 msgid "Manage accounts…"
 msgstr "Správa účtů…"

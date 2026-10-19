@@ -92,10 +92,6 @@ msgstr "(sem saída)"
 msgid "(you)"
 msgstr "(você)"
 
-#. placeholder {0}: connections.length
-msgid "{0, plural, one {# account connected} other {# accounts connected}}"
-msgstr "{0, plural, one {# conta conectada} other {# contas conectadas}}"
-
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
 msgstr "{0, plural, one {# porta ativa — ocultar detalhes} other {# portas ativas — ocultar detalhes}}"
@@ -391,7 +387,6 @@ msgstr "{0} ainda não pode entrar dessa forma."
 msgid "{0} developers are ranked by agent usage. Your last 30 days are already counted, just hidden. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "{0} desenvolvedores estão classificados por uso de agentes. Seus últimos 30 dias já estão contabilizados, apenas ocultos. Apenas contagens de tokens e nomes de modelos, sem nomes de repositórios, caminhos de arquivos ou prompts."
 
-#. placeholder {0}: displayName(variables.name)
 #. placeholder {0}: variables.name
 msgid "{0} disabled"
 msgstr "{0} desativado"
@@ -400,7 +395,6 @@ msgstr "{0} desativado"
 msgid "{0} Documentation"
 msgstr "Documentação do {0}"
 
-#. placeholder {0}: displayName(variables.name)
 #. placeholder {0}: skill.name
 #. placeholder {0}: variables.name
 msgid "{0} enabled"
@@ -6191,9 +6185,6 @@ msgstr "Modo direto"
 msgid "Directory"
 msgstr "Diretório"
 
-msgid "Disable"
-msgstr "Desativar"
-
 msgid "Disable skill"
 msgstr "Desativar skill"
 
@@ -6699,9 +6690,6 @@ msgstr "Comando vazio"
 
 msgid "Emulator"
 msgstr "Emulador"
-
-msgid "Enable"
-msgstr "Ativar"
 
 #. placeholder {0}: preset.label
 msgid "Enable {0}"
@@ -8916,9 +8904,6 @@ msgstr "Instale o MCP do Superset no seu cliente"
 msgid "Install the desktop app"
 msgstr "Instale o app de desktop"
 
-msgid "Install the plugin to connect"
-msgstr "Instale o plugin para conectar"
-
 msgid "Install the Superset GitHub App to connect your repositories."
 msgstr "Instale o GitHub App do Superset para conectar seus repositórios."
 
@@ -9160,6 +9145,9 @@ msgstr "Itere."
 
 msgid "Its comments and history go with it."
 msgstr "Os comentários e o histórico também serão excluídos."
+
+msgid "Its connected accounts were disconnected."
+msgstr "As contas conectadas foram desconectadas."
 
 msgid "Its own branch and copy of the files"
 msgstr "Sua própria branch e sua própria cópia dos arquivos"
@@ -9955,9 +9943,6 @@ msgstr "Gerenciar"
 
 msgid "Manage {title}"
 msgstr "Gerenciar {title}"
-
-msgid "Manage accounts"
-msgstr "Gerenciar contas"
 
 msgid "Manage accounts…"
 msgstr "Gerenciar contas…"

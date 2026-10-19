@@ -92,10 +92,6 @@ msgstr "（無輸出）"
 msgid "(you)"
 msgstr "（你）"
 
-#. placeholder {0}: connections.length
-msgid "{0, plural, one {# account connected} other {# accounts connected}}"
-msgstr "{0, plural, other {已連接 # 個帳號}}"
-
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
 msgstr "{0, plural, one {#個活動埠 — 隱藏詳情} other {#個活動埠 — 隱藏詳情}}"
@@ -391,7 +387,6 @@ msgstr "{0}還不能用這種方式登入。"
 msgid "{0} developers are ranked by agent usage. Your last 30 days are already counted, just hidden. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "已有 {0} 位開發者依 agent 用量排名。你最近 30 天的資料已計入，只是尚未公開。僅包含 token 數量與模型名稱，不含儲存庫名稱、檔案路徑或提示詞。"
 
-#. placeholder {0}: displayName(variables.name)
 #. placeholder {0}: variables.name
 msgid "{0} disabled"
 msgstr "{0}已停用"
@@ -400,7 +395,6 @@ msgstr "{0}已停用"
 msgid "{0} Documentation"
 msgstr "{0} 文件"
 
-#. placeholder {0}: displayName(variables.name)
 #. placeholder {0}: skill.name
 #. placeholder {0}: variables.name
 msgid "{0} enabled"
@@ -6191,9 +6185,6 @@ msgstr "直接模式"
 msgid "Directory"
 msgstr "目錄"
 
-msgid "Disable"
-msgstr "停用"
-
 msgid "Disable skill"
 msgstr "停用技能"
 
@@ -6699,9 +6690,6 @@ msgstr "空命令"
 
 msgid "Emulator"
 msgstr "模擬器"
-
-msgid "Enable"
-msgstr "啟用"
 
 #. placeholder {0}: preset.label
 msgid "Enable {0}"
@@ -8916,9 +8904,6 @@ msgstr "在你的客戶端裡安裝Superset MCP"
 msgid "Install the desktop app"
 msgstr "安裝桌面應用程式"
 
-msgid "Install the plugin to connect"
-msgstr "安裝外掛後即可連線"
-
 msgid "Install the Superset GitHub App to connect your repositories."
 msgstr "安裝Superset GitHub App以連線你的儲存庫。"
 
@@ -9160,6 +9145,9 @@ msgstr "迭代。"
 
 msgid "Its comments and history go with it."
 msgstr "其留言和歷史記錄也會一併刪除。"
+
+msgid "Its connected accounts were disconnected."
+msgstr "其已連接的帳號已中斷連線。"
 
 msgid "Its own branch and copy of the files"
 msgstr "獨立的分支和檔案副本"
@@ -9955,9 +9943,6 @@ msgstr "管理"
 
 msgid "Manage {title}"
 msgstr "管理 {title}"
-
-msgid "Manage accounts"
-msgstr "管理帳號"
 
 msgid "Manage accounts…"
 msgstr "管理帳號…"

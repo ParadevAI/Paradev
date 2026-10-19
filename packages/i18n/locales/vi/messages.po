@@ -92,10 +92,6 @@ msgstr "(không có đầu ra)"
 msgid "(you)"
 msgstr "(bạn)"
 
-#. placeholder {0}: connections.length
-msgid "{0, plural, one {# account connected} other {# accounts connected}}"
-msgstr "{0, plural, other {# tài khoản đã kết nối}}"
-
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
 msgstr "{0, plural, one {# cổng đang hoạt động — ẩn chi tiết} other {# cổng đang hoạt động — ẩn chi tiết}}"
@@ -391,7 +387,6 @@ msgstr "{0} chưa thể đăng nhập theo cách này."
 msgid "{0} developers are ranked by agent usage. Your last 30 days are already counted, just hidden. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "{0} nhà phát triển được xếp hạng theo mức dùng agent. 30 ngày qua của bạn đã được tính, chỉ là đang ẩn. Chỉ số lượng token và tên mô hình, không có tên repo, đường dẫn tệp hay prompt."
 
-#. placeholder {0}: displayName(variables.name)
 #. placeholder {0}: variables.name
 msgid "{0} disabled"
 msgstr "Đã tắt {0}"
@@ -400,7 +395,6 @@ msgstr "Đã tắt {0}"
 msgid "{0} Documentation"
 msgstr "Tài liệu {0}"
 
-#. placeholder {0}: displayName(variables.name)
 #. placeholder {0}: skill.name
 #. placeholder {0}: variables.name
 msgid "{0} enabled"
@@ -6191,9 +6185,6 @@ msgstr "Chế độ trực tiếp"
 msgid "Directory"
 msgstr "Thư mục"
 
-msgid "Disable"
-msgstr "Tắt"
-
 msgid "Disable skill"
 msgstr "Tắt skill"
 
@@ -6699,9 +6690,6 @@ msgstr "Lệnh trống"
 
 msgid "Emulator"
 msgstr "Trình giả lập"
-
-msgid "Enable"
-msgstr "Bật"
 
 #. placeholder {0}: preset.label
 msgid "Enable {0}"
@@ -8916,9 +8904,6 @@ msgstr "Cài Superset MCP vào client của bạn"
 msgid "Install the desktop app"
 msgstr "Cài ứng dụng máy tính"
 
-msgid "Install the plugin to connect"
-msgstr "Cài đặt plugin để kết nối"
-
 msgid "Install the Superset GitHub App to connect your repositories."
 msgstr "Hãy cài Superset GitHub App để kết nối các repository của bạn."
 
@@ -9160,6 +9145,9 @@ msgstr "Cải tiến."
 
 msgid "Its comments and history go with it."
 msgstr "Bình luận và lịch sử cũng bị xóa theo."
+
+msgid "Its connected accounts were disconnected."
+msgstr "Các tài khoản đã kết nối đã bị ngắt kết nối."
 
 msgid "Its own branch and copy of the files"
 msgstr "Nhánh riêng và bản sao tệp riêng"
@@ -9955,9 +9943,6 @@ msgstr "Quản lý"
 
 msgid "Manage {title}"
 msgstr "Quản lý {title}"
-
-msgid "Manage accounts"
-msgstr "Quản lý tài khoản"
 
 msgid "Manage accounts…"
 msgstr "Quản lý tài khoản…"

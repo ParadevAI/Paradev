@@ -92,10 +92,6 @@ msgstr "(brak wyniku)"
 msgid "(you)"
 msgstr "(Ty)"
 
-#. placeholder {0}: connections.length
-msgid "{0, plural, one {# account connected} other {# accounts connected}}"
-msgstr "{0, plural, one {# połączone konto} few {# połączone konta} many {# połączonych kont} other {# połączonego konta}}"
-
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
 msgstr "{0, plural, one {# aktywny port — ukryj szczegóły} few {# aktywne porty — ukryj szczegóły} many {# aktywnych portów — ukryj szczegóły} other {# aktywnego portu — ukryj szczegóły}}"
@@ -391,7 +387,6 @@ msgstr "{0} nie może się jeszcze zalogować w ten sposób."
 msgid "{0} developers are ranked by agent usage. Your last 30 days are already counted, just hidden. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "{0} deweloperów jest w rankingu według użycia agentów. Twoje ostatnie 30 dni już się liczy — tylko jest ukryte. Tylko liczby tokenów i nazwy modeli, żadnych nazw repozytoriów, ścieżek plików ani promptów."
 
-#. placeholder {0}: displayName(variables.name)
 #. placeholder {0}: variables.name
 msgid "{0} disabled"
 msgstr "{0} wyłączona"
@@ -400,7 +395,6 @@ msgstr "{0} wyłączona"
 msgid "{0} Documentation"
 msgstr "Dokumentacja {0}"
 
-#. placeholder {0}: displayName(variables.name)
 #. placeholder {0}: skill.name
 #. placeholder {0}: variables.name
 msgid "{0} enabled"
@@ -6191,9 +6185,6 @@ msgstr "Tryb bezpośredni"
 msgid "Directory"
 msgstr "Katalog"
 
-msgid "Disable"
-msgstr "Wyłącz"
-
 msgid "Disable skill"
 msgstr "Wyłącz umiejętność"
 
@@ -6699,9 +6690,6 @@ msgstr "Puste polecenie"
 
 msgid "Emulator"
 msgstr "Emulator"
-
-msgid "Enable"
-msgstr "Włącz"
 
 #. placeholder {0}: preset.label
 msgid "Enable {0}"
@@ -8916,9 +8904,6 @@ msgstr "Zainstaluj Superset MCP w swoim kliencie"
 msgid "Install the desktop app"
 msgstr "Zainstaluj aplikację desktopową"
 
-msgid "Install the plugin to connect"
-msgstr "Zainstaluj wtyczkę, aby połączyć"
-
 msgid "Install the Superset GitHub App to connect your repositories."
 msgstr "Zainstaluj aplikację GitHub Superset, aby podłączyć swoje repozytoria."
 
@@ -9160,6 +9145,9 @@ msgstr "Ulepszaj."
 
 msgid "Its comments and history go with it."
 msgstr "Komentarze i historia też zostaną usunięte."
+
+msgid "Its connected accounts were disconnected."
+msgstr "Połączone konta zostały odłączone."
 
 msgid "Its own branch and copy of the files"
 msgstr "Własna gałąź i własna kopia plików"
@@ -9955,9 +9943,6 @@ msgstr "Zarządzaj"
 
 msgid "Manage {title}"
 msgstr "Zarządzaj {title}"
-
-msgid "Manage accounts"
-msgstr "Zarządzaj kontami"
 
 msgid "Manage accounts…"
 msgstr "Zarządzaj kontami…"

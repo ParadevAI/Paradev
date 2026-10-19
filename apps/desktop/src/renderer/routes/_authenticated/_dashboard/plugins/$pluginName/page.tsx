@@ -10,6 +10,7 @@ import { usePluginCatalog } from "renderer/hooks/usePluginCatalog";
 import { PluginDetail } from "./components/PluginDetail";
 
 export type PluginDetailSearch = {
+	connect?: boolean;
 	connected?: string;
 	error?: string;
 };
@@ -19,6 +20,7 @@ export const Route = createFileRoute(
 )({
 	component: PluginDetailPage,
 	validateSearch: (search: Record<string, unknown>): PluginDetailSearch => ({
+		connect: search.connect === true ? true : undefined,
 		connected:
 			typeof search.connected === "string" ? search.connected : undefined,
 		error: typeof search.error === "string" ? search.error : undefined,
@@ -67,8 +69,14 @@ function PluginDetailPage() {
 	const isEnabled = useFeatureFlagEnabled(FEATURE_FLAGS.PLUGINS);
 	const { plugins, isLoading } = usePluginCatalog();
 	const plugin = plugins.find((entry) => entry.name === pluginName);
+	const { connect } = Route.useSearch();
+	const navigate = Route.useNavigate();
 
 	useConnectOutcome(pluginName);
+
+	useEffect(() => {
+		if (connect) void navigate({ search: {}, replace: true });
+	}, [connect, navigate]);
 
 	if (env.NODE_ENV !== "development") {
 		if (isEnabled === undefined) return null;
@@ -77,5 +85,5 @@ function PluginDetailPage() {
 	if (isLoading) return null;
 	if (!plugin) return <Redirect to="/plugins" />;
 
-	return <PluginDetail plugin={plugin} />;
+	return <PluginDetail plugin={plugin} openConnect={connect} />;
 }

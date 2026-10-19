@@ -26,12 +26,14 @@ import { useConnector } from "./hooks/useConnector";
 interface ConnectorSectionProps {
 	slug: string;
 	organizationId?: string | null;
+	connectOnly?: boolean;
 	onConnected?: () => void;
 }
 
 export function ConnectorSection({
 	slug,
 	organizationId,
+	connectOnly = false,
 	onConnected,
 }: ConnectorSectionProps) {
 	const { t } = useLingui();
@@ -64,7 +66,7 @@ export function ConnectorSection({
 		(entry) => entry.type !== "api_key",
 	);
 
-	const connected = connections.length > 0 && (
+	const connected = !connectOnly && connections.length > 0 && (
 		<div className="w-full min-w-0 divide-y divide-border/40 rounded-lg border border-border/60">
 			{connections.map((connection) => {
 				const { title, subtitle } = accountLabels(
@@ -142,7 +144,7 @@ export function ConnectorSection({
 		</div>
 	);
 
-	if (connections.length > 0 && !addingAccount) {
+	if (!connectOnly && connections.length > 0 && !addingAccount) {
 		return (
 			<div className="w-full min-w-0 space-y-3">
 				{connected}

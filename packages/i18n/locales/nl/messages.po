@@ -92,10 +92,6 @@ msgstr "(geen uitvoer)"
 msgid "(you)"
 msgstr "(jij)"
 
-#. placeholder {0}: connections.length
-msgid "{0, plural, one {# account connected} other {# accounts connected}}"
-msgstr "{0, plural, one {# account verbonden} other {# accounts verbonden}}"
-
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
 msgstr "{0, plural, one {# actieve poort — details verbergen} other {# actieve poorten — details verbergen}}"
@@ -391,7 +387,6 @@ msgstr "{0} kan nog niet op deze manier worden ingelogd."
 msgid "{0} developers are ranked by agent usage. Your last 30 days are already counted, just hidden. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "{0} developers zijn gerangschikt op agentgebruik. Je laatste 30 dagen zijn al meegeteld, alleen verborgen. Alleen tokenaantallen en modelnamen, geen repo-namen, bestandspaden of prompts."
 
-#. placeholder {0}: displayName(variables.name)
 #. placeholder {0}: variables.name
 msgid "{0} disabled"
 msgstr "{0} uitgeschakeld"
@@ -400,7 +395,6 @@ msgstr "{0} uitgeschakeld"
 msgid "{0} Documentation"
 msgstr "Documentatie van {0}"
 
-#. placeholder {0}: displayName(variables.name)
 #. placeholder {0}: skill.name
 #. placeholder {0}: variables.name
 msgid "{0} enabled"
@@ -6191,9 +6185,6 @@ msgstr "Directe modus"
 msgid "Directory"
 msgstr "Map"
 
-msgid "Disable"
-msgstr "Uitschakelen"
-
 msgid "Disable skill"
 msgstr "Skill uitschakelen"
 
@@ -6699,9 +6690,6 @@ msgstr "Leeg commando"
 
 msgid "Emulator"
 msgstr "Emulator"
-
-msgid "Enable"
-msgstr "Inschakelen"
 
 #. placeholder {0}: preset.label
 msgid "Enable {0}"
@@ -8916,9 +8904,6 @@ msgstr "Superset MCP installeren in je client"
 msgid "Install the desktop app"
 msgstr "Installeer de desktop-app"
 
-msgid "Install the plugin to connect"
-msgstr "Installeer de plugin om te verbinden"
-
 msgid "Install the Superset GitHub App to connect your repositories."
 msgstr "Installeer de Superset GitHub App om je repository's te koppelen."
 
@@ -9160,6 +9145,9 @@ msgstr "Verbeter."
 
 msgid "Its comments and history go with it."
 msgstr "De reacties en geschiedenis worden ook verwijderd."
+
+msgid "Its connected accounts were disconnected."
+msgstr "De gekoppelde accounts zijn ontkoppeld."
 
 msgid "Its own branch and copy of the files"
 msgstr "Een eigen branch en een eigen kopie van de bestanden"
@@ -9955,9 +9943,6 @@ msgstr "Beheren"
 
 msgid "Manage {title}"
 msgstr "{title} beheren"
-
-msgid "Manage accounts"
-msgstr "Accounts beheren"
 
 msgid "Manage accounts…"
 msgstr "Accounts beheren…"

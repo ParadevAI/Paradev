@@ -92,10 +92,6 @@ msgstr "（出力なし）"
 msgid "(you)"
 msgstr "（自分）"
 
-#. placeholder {0}: connections.length
-msgid "{0, plural, one {# account connected} other {# accounts connected}}"
-msgstr "{0, plural, other {# 個のアカウントが接続されています}}"
-
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
 msgstr "{0, plural, one {#個のアクティブなポート — 詳細を隠す} other {#個のアクティブなポート — 詳細を隠す}}"
@@ -391,7 +387,6 @@ msgstr "{0}はまだこの方法ではサインインできません。"
 msgid "{0} developers are ranked by agent usage. Your last 30 days are already counted, just hidden. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "{0}人の開発者がエージェント利用量でランク付けされています。あなたの直近30日はすでに集計済みで、非表示になっているだけです。公開されるのはトークン数とモデル名のみで、リポジトリ名・ファイルパス・プロンプトは含まれません。"
 
-#. placeholder {0}: displayName(variables.name)
 #. placeholder {0}: variables.name
 msgid "{0} disabled"
 msgstr "{0}を無効にしました"
@@ -400,7 +395,6 @@ msgstr "{0}を無効にしました"
 msgid "{0} Documentation"
 msgstr "{0}ドキュメント"
 
-#. placeholder {0}: displayName(variables.name)
 #. placeholder {0}: skill.name
 #. placeholder {0}: variables.name
 msgid "{0} enabled"
@@ -6191,9 +6185,6 @@ msgstr "ダイレクトモード"
 msgid "Directory"
 msgstr "ディレクトリ"
 
-msgid "Disable"
-msgstr "無効にする"
-
 msgid "Disable skill"
 msgstr "スキルを無効にする"
 
@@ -6699,9 +6690,6 @@ msgstr "空のコマンド"
 
 msgid "Emulator"
 msgstr "エミュレータ"
-
-msgid "Enable"
-msgstr "有効にする"
 
 #. placeholder {0}: preset.label
 msgid "Enable {0}"
@@ -8916,9 +8904,6 @@ msgstr "クライアントにSuperset MCPをインストール"
 msgid "Install the desktop app"
 msgstr "デスクトップアプリをインストール"
 
-msgid "Install the plugin to connect"
-msgstr "接続するにはプラグインをインストールしてください"
-
 msgid "Install the Superset GitHub App to connect your repositories."
 msgstr "Superset GitHub Appをインストールしてリポジトリを接続します。"
 
@@ -9160,6 +9145,9 @@ msgstr "改善。"
 
 msgid "Its comments and history go with it."
 msgstr "コメントと履歴も削除されます。"
+
+msgid "Its connected accounts were disconnected."
+msgstr "接続済みのアカウントは切断されました。"
 
 msgid "Its own branch and copy of the files"
 msgstr "独自のブランチとファイルのコピー"
@@ -9955,9 +9943,6 @@ msgstr "管理"
 
 msgid "Manage {title}"
 msgstr "{title} を管理"
-
-msgid "Manage accounts"
-msgstr "アカウントを管理"
 
 msgid "Manage accounts…"
 msgstr "アカウントを管理…"

@@ -92,10 +92,6 @@ msgstr "(çıktı yok)"
 msgid "(you)"
 msgstr "(siz)"
 
-#. placeholder {0}: connections.length
-msgid "{0, plural, one {# account connected} other {# accounts connected}}"
-msgstr "{0, plural, one {# hesap bağlı} other {# hesap bağlı}}"
-
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
 msgstr "{0, plural, one {# etkin port — ayrıntıları gizle} other {# etkin port — ayrıntıları gizle}}"
@@ -391,7 +387,6 @@ msgstr "{0} henüz bu şekilde oturum açamıyor."
 msgid "{0} developers are ranked by agent usage. Your last 30 days are already counted, just hidden. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "{0} geliştirici ajan kullanımına göre sıralanıyor. Son 30 gününüz zaten sayılıyor, yalnızca gizli. Yalnızca token sayıları ve model adları; repo adları, dosya yolları veya prompt'lar yok."
 
-#. placeholder {0}: displayName(variables.name)
 #. placeholder {0}: variables.name
 msgid "{0} disabled"
 msgstr "{0} devre dışı bırakıldı"
@@ -400,7 +395,6 @@ msgstr "{0} devre dışı bırakıldı"
 msgid "{0} Documentation"
 msgstr "{0} Belgeleri"
 
-#. placeholder {0}: displayName(variables.name)
 #. placeholder {0}: skill.name
 #. placeholder {0}: variables.name
 msgid "{0} enabled"
@@ -6191,9 +6185,6 @@ msgstr "Doğrudan mod"
 msgid "Directory"
 msgstr "Dizin"
 
-msgid "Disable"
-msgstr "Devre dışı bırak"
-
 msgid "Disable skill"
 msgstr "Beceriyi devre dışı bırak"
 
@@ -6699,9 +6690,6 @@ msgstr "Boş komut"
 
 msgid "Emulator"
 msgstr "Emülatör"
-
-msgid "Enable"
-msgstr "Etkinleştir"
 
 #. placeholder {0}: preset.label
 msgid "Enable {0}"
@@ -8916,9 +8904,6 @@ msgstr "Superset MCP'yi istemcinize kurun"
 msgid "Install the desktop app"
 msgstr "Masaüstü uygulamasını kurun"
 
-msgid "Install the plugin to connect"
-msgstr "Bağlanmak için eklentiyi kurun"
-
 msgid "Install the Superset GitHub App to connect your repositories."
 msgstr "Depolarınızı bağlamak için Superset GitHub App'i kurun."
 
@@ -9160,6 +9145,9 @@ msgstr "Yineleyin."
 
 msgid "Its comments and history go with it."
 msgstr "Yorumları ve geçmişi de silinir."
+
+msgid "Its connected accounts were disconnected."
+msgstr "Bağlı hesapların bağlantısı kesildi."
 
 msgid "Its own branch and copy of the files"
 msgstr "Kendi dalı ve dosyaların kendi kopyası"
@@ -9955,9 +9943,6 @@ msgstr "Yönet"
 
 msgid "Manage {title}"
 msgstr "{title} yönet"
-
-msgid "Manage accounts"
-msgstr "Hesapları yönet"
 
 msgid "Manage accounts…"
 msgstr "Hesapları yönet…"

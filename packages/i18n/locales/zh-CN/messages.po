@@ -92,10 +92,6 @@ msgstr "（无输出）"
 msgid "(you)"
 msgstr "（你）"
 
-#. placeholder {0}: connections.length
-msgid "{0, plural, one {# account connected} other {# accounts connected}}"
-msgstr "{0, plural, other {已连接 # 个账号}}"
-
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
 msgstr "{0, plural, one {#个活动端口 — 隐藏详情} other {#个活动端口 — 隐藏详情}}"
@@ -391,7 +387,6 @@ msgstr "{0}还不能用这种方式登录。"
 msgid "{0} developers are ranked by agent usage. Your last 30 days are already counted, just hidden. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "已有{0}位开发者按agent用量排名。你最近30天的数据已计入，只是尚未公开。仅包含token数量和模型名称，不含仓库名、文件路径或提示词。"
 
-#. placeholder {0}: displayName(variables.name)
 #. placeholder {0}: variables.name
 msgid "{0} disabled"
 msgstr "{0}已停用"
@@ -400,7 +395,6 @@ msgstr "{0}已停用"
 msgid "{0} Documentation"
 msgstr "{0} 文档"
 
-#. placeholder {0}: displayName(variables.name)
 #. placeholder {0}: skill.name
 #. placeholder {0}: variables.name
 msgid "{0} enabled"
@@ -6191,9 +6185,6 @@ msgstr "直接模式"
 msgid "Directory"
 msgstr "目录"
 
-msgid "Disable"
-msgstr "停用"
-
 msgid "Disable skill"
 msgstr "停用技能"
 
@@ -6699,9 +6690,6 @@ msgstr "空命令"
 
 msgid "Emulator"
 msgstr "模拟器"
-
-msgid "Enable"
-msgstr "启用"
 
 #. placeholder {0}: preset.label
 msgid "Enable {0}"
@@ -8916,9 +8904,6 @@ msgstr "在你的客户端里安装Superset MCP"
 msgid "Install the desktop app"
 msgstr "安装桌面应用"
 
-msgid "Install the plugin to connect"
-msgstr "安装插件后即可连接"
-
 msgid "Install the Superset GitHub App to connect your repositories."
 msgstr "安装Superset GitHub App以连接你的仓库。"
 
@@ -9160,6 +9145,9 @@ msgstr "迭代。"
 
 msgid "Its comments and history go with it."
 msgstr "其评论和历史记录也会一并删除。"
+
+msgid "Its connected accounts were disconnected."
+msgstr "其已连接的账户已断开。"
 
 msgid "Its own branch and copy of the files"
 msgstr "独立的分支和文件副本"
@@ -9955,9 +9943,6 @@ msgstr "管理"
 
 msgid "Manage {title}"
 msgstr "管理 {title}"
-
-msgid "Manage accounts"
-msgstr "管理账号"
 
 msgid "Manage accounts…"
 msgstr "管理账号…"

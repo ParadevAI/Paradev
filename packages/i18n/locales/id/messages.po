@@ -92,10 +92,6 @@ msgstr "(tidak ada keluaran)"
 msgid "(you)"
 msgstr "(Anda)"
 
-#. placeholder {0}: connections.length
-msgid "{0, plural, one {# account connected} other {# accounts connected}}"
-msgstr "{0, plural, other {# akun terhubung}}"
-
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
 msgstr "{0, plural, one {# port aktif — sembunyikan detail} other {# port aktif — sembunyikan detail}}"
@@ -391,7 +387,6 @@ msgstr "{0} belum bisa masuk dengan cara ini."
 msgid "{0} developers are ranked by agent usage. Your last 30 days are already counted, just hidden. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "{0} developer diperingkat berdasarkan penggunaan agen. 30 hari terakhir Anda sudah dihitung, hanya disembunyikan. Hanya jumlah token dan nama model, tanpa nama repo, path file, atau prompt."
 
-#. placeholder {0}: displayName(variables.name)
 #. placeholder {0}: variables.name
 msgid "{0} disabled"
 msgstr "{0} dinonaktifkan"
@@ -400,7 +395,6 @@ msgstr "{0} dinonaktifkan"
 msgid "{0} Documentation"
 msgstr "Dokumentasi {0}"
 
-#. placeholder {0}: displayName(variables.name)
 #. placeholder {0}: skill.name
 #. placeholder {0}: variables.name
 msgid "{0} enabled"
@@ -6191,9 +6185,6 @@ msgstr "Mode langsung"
 msgid "Directory"
 msgstr "Direktori"
 
-msgid "Disable"
-msgstr "Nonaktifkan"
-
 msgid "Disable skill"
 msgstr "Nonaktifkan skill"
 
@@ -6699,9 +6690,6 @@ msgstr "Perintah kosong"
 
 msgid "Emulator"
 msgstr "Emulator"
-
-msgid "Enable"
-msgstr "Aktifkan"
 
 #. placeholder {0}: preset.label
 msgid "Enable {0}"
@@ -8916,9 +8904,6 @@ msgstr "Pasang Superset MCP di klien Anda"
 msgid "Install the desktop app"
 msgstr "Pasang aplikasi desktop"
 
-msgid "Install the plugin to connect"
-msgstr "Instal plugin untuk menghubungkan"
-
 msgid "Install the Superset GitHub App to connect your repositories."
 msgstr "Pasang GitHub App Superset untuk menghubungkan repositori Anda."
 
@@ -9160,6 +9145,9 @@ msgstr "Iterasi."
 
 msgid "Its comments and history go with it."
 msgstr "Komentar dan riwayatnya ikut terhapus."
+
+msgid "Its connected accounts were disconnected."
+msgstr "Akun yang terhubung telah diputuskan."
 
 msgid "Its own branch and copy of the files"
 msgstr "Branch dan salinan file tersendiri"
@@ -9955,9 +9943,6 @@ msgstr "Kelola"
 
 msgid "Manage {title}"
 msgstr "Kelola {title}"
-
-msgid "Manage accounts"
-msgstr "Kelola akun"
 
 msgid "Manage accounts…"
 msgstr "Kelola akun…"
