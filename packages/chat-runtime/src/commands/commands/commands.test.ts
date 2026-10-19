@@ -504,4 +504,28 @@ describe("chat commands", () => {
 		).toEqual({ conversation: "text", files: false });
 		await runtime.dispose();
 	});
+
+	test("getSession says why a dead session died", async () => {
+		const runtime = createTestRuntime({
+			harnesses: new Map([
+				[
+					FAKE_HARNESS,
+					() => {
+						const adapter = new FakeHarness({ turns: [] });
+						adapter.start = async function* () {
+							yield* [];
+							throw new Error("Authentication required");
+						};
+						return adapter;
+					},
+				],
+			]),
+		});
+		const { sessionId } = createSession(runtime);
+		await waitFor(() => runtime.sessions.get(sessionId)?.status === "dead");
+		expect(runtime.commands.getSession({ sessionId }).lastError).toBe(
+			"Authentication required",
+		);
+		await runtime.dispose();
+	});
 });

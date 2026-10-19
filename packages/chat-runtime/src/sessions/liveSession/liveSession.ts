@@ -68,6 +68,9 @@ export class LiveSession {
 	private currentTurn: Turn | null = null;
 	private pump: Promise<void> | null = null;
 	private stopped = false;
+	/** Turns a user prompt started, and those of them that have shown anything yet. */
+	private readonly promptedTurns = new Set<string>();
+	private readonly turnsWithOutput = new Set<string>();
 
 	constructor(private readonly options: LiveSessionOptions) {
 		this.sessionState = { status: "starting", harness: options.harness };
@@ -304,6 +307,9 @@ export class LiveSession {
 	private handle(event: AdapterEvent): void {
 		switch (event.kind) {
 			case "item":
+				if (event.item.kind !== "user_message") {
+					this.turnsWithOutput.add(event.turnId);
+				}
 				this.appendDurable({
 					type: "item",
 					item: event.item,
@@ -321,6 +327,7 @@ export class LiveSession {
 						this.options.adapter.cancelTurn();
 					}
 				} else {
+					this.noteSilentTurn(event.turn);
 					this.deliverNextQueued();
 				}
 				return;
@@ -341,9 +348,30 @@ export class LiveSession {
 		}
 	}
 
+	/** A turn that ends as if it worked but shows nothing would otherwise read as success. */
+	private noteSilentTurn(turn: Turn): void {
+		const prompted = this.promptedTurns.delete(turn.id);
+		const showed = this.turnsWithOutput.delete(turn.id);
+		if (!prompted || showed || turn.status !== "completed") return;
+		const at = this.now();
+		this.appendDurable({
+			type: "item",
+			item: {
+				id: this.mintId(),
+				kind: "notice",
+				noticeKind: "error",
+				text: "The agent finished without replying. It may have failed to reach its model.",
+				startedAtMs: at,
+				completedAtMs: at,
+			},
+			turnId: turn.id,
+		});
+	}
+
 	private attributeAwaitingPrompt(turnId: string): void {
 		const awaiting = this.awaitingTurn;
 		if (!awaiting) return;
+		this.promptedTurns.add(turnId);
 		this.awaitingTurn = null;
 		this.appendDurable({
 			type: "item",

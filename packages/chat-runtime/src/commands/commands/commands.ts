@@ -153,6 +153,8 @@ export type GetSessionResult = {
 	 * caller that wants to prompt has to ask this, not the status.
 	 */
 	live: boolean;
+	/** For a dead session, why it died, when the journal says. */
+	lastError?: string;
 };
 
 export type GetQueueResult = QueueState & { live: boolean };
@@ -261,6 +263,21 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 		}
 		if (cachedEvents > MAX_CACHED_REPLAY_EVENTS) replays.delete(sessionId);
 		return { ok: true, snapshot };
+	};
+
+	const lastErrorNotice = (sessionId: string): string | null => {
+		const replay = replaySession(sessionId);
+		if (!replay.ok) return null;
+		let latest: { at: number; text: string } | null = null;
+		for (const { item } of replay.snapshot.items.values()) {
+			if (item.kind !== "notice") continue;
+			const notice = item as { noticeKind?: string; text?: string };
+			if (notice.noticeKind !== "error" || !notice.text) continue;
+			if (!latest || item.startedAtMs >= latest.at) {
+				latest = { at: item.startedAtMs, text: notice.text };
+			}
+		}
+		return latest?.text ?? null;
 	};
 
 	const listSessions = (
@@ -533,10 +550,13 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 				: null;
 			// Reading the cursor can backfill the row, so read the row after it.
 			const session = options.sessions.get(parsed.sessionId);
+			const lastError =
+				session?.status === "dead" ? lastErrorNotice(parsed.sessionId) : null;
 			return {
 				live: options.live.get(parsed.sessionId) !== null,
 				session,
 				cursor: session && seq !== null ? { epoch: session.epoch, seq } : null,
+				...(lastError ? { lastError } : {}),
 			};
 		},
 

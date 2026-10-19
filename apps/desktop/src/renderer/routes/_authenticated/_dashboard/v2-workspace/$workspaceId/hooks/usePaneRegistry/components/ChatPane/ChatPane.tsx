@@ -7,7 +7,6 @@ import type {
 	OpenFile,
 	PaneViewerData,
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
-import { saveLastChatAgent } from "../../../../utils/lastChatAgent";
 import { useLinkClickHint } from "../../hooks/useLinkClickHint";
 import { AcpChatPane } from "./components/AcpChatPane";
 import { useOpenChatLink } from "./hooks/useOpenChatLink";
@@ -141,10 +140,9 @@ export function ChatPane({
 					if (data.agent) saveChatMode(data.agent.id, chatModeId);
 					ctx.actions.updateData({ ...data, chatModeId });
 				}}
-				onSessionCreated={(sessionId) => {
-					if (latest.current.agent) saveLastChatAgent(latest.current.agent.id);
-					ctx.actions.updateData({ ...latest.current, sessionId });
-				}}
+				onSessionCreated={(sessionId) =>
+					ctx.actions.updateData({ ...latest.current, sessionId })
+				}
 				onOpenFile={onOpenFile}
 				onOpenPage={openPage}
 				onOpenLink={openLink}

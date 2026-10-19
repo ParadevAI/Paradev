@@ -120,6 +120,46 @@ describe("LiveSession", () => {
 		await runtime.dispose();
 	});
 
+	test("says so when a prompted turn ends without showing anything", async () => {
+		const { runtime, sessionId } = startSession({
+			start: [
+				{ kind: "turn", turn: turn("t0") },
+				{
+					kind: "turn",
+					turn: turn("t0", { status: "completed", completedAtMs: 1 }),
+				},
+			],
+			turns: [
+				[
+					{ kind: "turn", turn: turn("t1") },
+					{
+						kind: "turn",
+						turn: turn("t1", { status: "completed", completedAtMs: 2 }),
+					},
+					{ kind: "session", session: { status: "idle" } },
+				],
+			],
+		});
+		await waitFor(
+			() => runtime.live.require(sessionId).turn?.status === "completed",
+		);
+		sendPrompt(runtime, sessionId, "hello");
+		await waitFor(() => runtime.live.require(sessionId).turn?.id === "t1");
+		await waitFor(() => runtime.sessions.get(sessionId)?.status === "idle");
+
+		const notices = journalEnvelopes(runtime, sessionId).flatMap((envelope) =>
+			envelope.event.type === "item" && envelope.event.item.kind === "notice"
+				? [{ turnId: envelope.event.turnId, item: envelope.event.item }]
+				: [],
+		);
+		expect(notices).toHaveLength(1);
+		expect(notices[0]).toMatchObject({
+			turnId: "t1",
+			item: { noticeKind: "error" },
+		});
+		await runtime.dispose();
+	});
+
 	test("holds a prompt until its checkpoint is taken", async () => {
 		const { harnesses } = fakeHarnessRegistry(SINGLE_TURN);
 		const captured: string[] = [];
