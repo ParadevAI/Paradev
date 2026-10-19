@@ -4,6 +4,10 @@ import type { CreatePaneInput, RendererContext } from "@superset/panes";
 import { toast } from "@superset/ui/sonner";
 import { workspaceTrpc } from "@superset/workspace-client";
 import { useCallback, useMemo } from "react";
+import {
+	type TerminalAgentBinding,
+	useTerminalAgentBindings,
+} from "renderer/hooks/host-service/useTerminalAgentBindings";
 import { useTerminalAppearance } from "renderer/hooks/useTerminalAppearance";
 import { terminalQueryColors } from "renderer/lib/terminal/terminal-query-colors";
 import { terminalRuntimeRegistry } from "renderer/lib/terminal/terminal-runtime-registry";
@@ -34,9 +38,31 @@ export type AgentSurfaceSwitch = {
 	stopChat(sessionId: string): Promise<boolean>;
 };
 
+/**
+ * The chat pane that replaces a terminal pane. A terminal id that already runs
+ * a chat (an automation run, a host-started chat) keeps that session: a pane
+ * with no session id starts a second agent on the same conversation.
+ */
+export function chatPaneDataForTerminal({
+	terminalId,
+	agent,
+	binding,
+}: {
+	terminalId: string;
+	agent: AgentIdentity;
+	binding: Pick<TerminalAgentBinding, "chatSessionId"> | undefined;
+}): ChatPaneData {
+	return {
+		terminalId,
+		sessionId: binding?.chatSessionId ?? null,
+		agent,
+	};
+}
+
 export function useAgentSurfaceSwitch(workspaceId: string): AgentSurfaceSwitch {
 	const { t } = useLingui();
 	const wiring = useChatWiring();
+	const bindings = useTerminalAgentBindings(workspaceId);
 	const killTerminal = workspaceTrpc.terminal.killSession.useMutation();
 	const runAgent = workspaceTrpc.agents.run.useMutation();
 	const appearance = useTerminalAppearance();
@@ -75,24 +101,23 @@ export function useAgentSurfaceSwitch(workspaceId: string): AgentSurfaceSwitch {
 			if (surface === "acp") {
 				if (ctx.pane.kind !== "terminal" || !agent) return;
 				const { terminalId } = ctx.pane.data as TerminalPaneData;
+				const binding = bindings.get(terminalId);
 				terminalRuntimeRegistry.dispose(terminalId);
-				try {
-					await killTerminal.mutateAsync({ terminalId, workspaceId });
-				} catch (error) {
-					console.warn("[acp-chat] could not stop the terminal", error);
-					toast.error(t({ message: "Couldn't stop the agent's terminal" }));
-					return;
+				if (!binding?.chatSessionId) {
+					try {
+						await killTerminal.mutateAsync({ terminalId, workspaceId });
+					} catch (error) {
+						console.warn("[acp-chat] could not stop the terminal", error);
+						toast.error(t({ message: "Couldn't stop the agent's terminal" }));
+						return;
+					}
 				}
 				replaceWith({
 					kind: "chat-v3",
 					...(ctx.pane.titleOverride
 						? { titleOverride: ctx.pane.titleOverride }
 						: {}),
-					data: {
-						terminalId,
-						sessionId: null,
-						agent,
-					} satisfies ChatPaneData,
+					data: chatPaneDataForTerminal({ terminalId, agent, binding }),
 				});
 				return;
 			}
@@ -134,7 +159,15 @@ export function useAgentSurfaceSwitch(workspaceId: string): AgentSurfaceSwitch {
 				});
 			}
 		},
-		[killTerminal, runAgent, stopChat, workspaceId, t, appearance.theme],
+		[
+			bindings,
+			killTerminal,
+			runAgent,
+			stopChat,
+			workspaceId,
+			t,
+			appearance.theme,
+		],
 	);
 
 	return useMemo(

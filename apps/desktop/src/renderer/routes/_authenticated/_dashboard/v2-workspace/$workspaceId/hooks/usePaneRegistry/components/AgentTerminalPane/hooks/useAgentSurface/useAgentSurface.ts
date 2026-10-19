@@ -31,8 +31,16 @@ export function useAgentSurface(
 
 	const harness = acpHarnessForPreset(binding?.agentId);
 	const agent =
-		harness && binding?.agentId && binding.agentSessionId && !binding.endedAt
-			? { id: binding.agentId, sessionId: binding.agentSessionId }
+		harness &&
+		binding?.agentId &&
+		(binding.agentSessionId || binding.chatSessionId) &&
+		!binding.endedAt
+			? {
+					id: binding.agentId,
+					...(binding.agentSessionId
+						? { sessionId: binding.agentSessionId }
+						: {}),
+				}
 			: undefined;
 	return {
 		surface: "cli",

@@ -3,4 +3,7 @@ export type {
 	AgentSurface,
 	AgentSurfaceSwitch,
 } from "./useAgentSurfaceSwitch";
-export { useAgentSurfaceSwitch } from "./useAgentSurfaceSwitch";
+export {
+	chatPaneDataForTerminal,
+	useAgentSurfaceSwitch,
+} from "./useAgentSurfaceSwitch";
