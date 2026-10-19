@@ -14,17 +14,17 @@ import { tmpdir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
 import { config } from "dotenv";
 
-export const PDEV_VERSION = "0.1.1";
+export const PDEV_VERSION = "0.1.3";
 const PDEV_DOWNLOAD_URL = `https://github.com/superset-sh/pdev/releases/download/v${PDEV_VERSION}`;
 export const PDEV_SHA256: Record<string, string> = {
-	"pdev-0.1.1-darwin-arm64.tar.gz":
-		"b0bce974fc86d56d89ee2302e51f92a8c5a4020f65329de0996c196a5972b045",
-	"pdev-0.1.1-darwin-x64.tar.gz":
-		"1feb258b6729a71a8c62b8f67fa2c6f80ce274e66d27b565d6932fd25226fdc7",
-	"pdev-0.1.1-linux-arm64.tar.gz":
-		"6b36cc67c48efb446157944db1c7025e956877806e8af040dad5c47e1243281a",
-	"pdev-0.1.1-linux-x64.tar.gz":
-		"e3bc68aed6d1f522ac4d5cbe65c58ec6624bef79d44230db7e37f55a09fe89b8",
+	"pdev-0.1.3-darwin-arm64.tar.gz":
+		"883e47983ee976765e3a70524bedc9f9eeb890a95230b28c30668542480c56d0",
+	"pdev-0.1.3-darwin-x64.tar.gz":
+		"7c348b12703d2c67b03477211bc3bf152c113870dd5bbb0309afb0b2940d91e7",
+	"pdev-0.1.3-linux-arm64.tar.gz":
+		"07d69098472f57c131c30a9a89a7443fe5138e32b22bdaaac526d56bd53c2d32",
+	"pdev-0.1.3-linux-x64.tar.gz":
+		"dc325ec03da0545976b75b608109258be1923436e59c3e7f64705b82ab7391c2",
 };
 const BUNDLED_FROM_FILE = ".bundled-from";
 
