@@ -8,9 +8,9 @@ import Speech
 /// `SpeechTranscriber` first. `DictationTranscriber` covers the devices it does
 /// not run on (iPhone 11, SE 2) and every language `SFSpeechRecognizer` has an
 /// on-device model for.
-final class ComposerAnalyzerTranscriber: ComposerTranscriber {
+final class ComposerAnalyzerTranscriber {
   /// A model still downloading after this is left to finish in the background
-  /// for next time, and this session uses the next engine.
+  /// for next time, and this attempt fails.
   private static let installTimeout = Duration.seconds(10)
 
   private typealias ResultStream = (ComposerTranscriptHandler) async throws -> Void
@@ -22,8 +22,7 @@ final class ComposerAnalyzerTranscriber: ComposerTranscriber {
   /// Touched only from the audio tap thread.
   private var converter: AVAudioConverter?
 
-  /// Nil when neither module can run here; the caller then falls back to
-  /// `ComposerRecognizerTranscriber`.
+  /// Nil when neither module can run here.
   static func make(
     locale: Locale,
     onEvent: @escaping ComposerTranscriptHandler
@@ -123,7 +122,9 @@ final class ComposerAnalyzerTranscriber: ComposerTranscriber {
   }
 
   private static func install(_ module: any SpeechModule) async throws {
-    guard let request = try await AssetInventory.assetInstallationRequest(supporting: [module])
+    // Asking for a request costs about two seconds even when nothing is missing.
+    guard await AssetInventory.status(forModules: [module]) != .installed,
+      let request = try await AssetInventory.assetInstallationRequest(supporting: [module])
     else { return }
     let download = Task { try await request.downloadAndInstall() }
     try await withThrowingTaskGroup(of: Void.self) { group in
@@ -147,11 +148,13 @@ final class ComposerAnalyzerTranscriber: ComposerTranscriber {
     self.input = input
   }
 
+  /// Called on the audio tap thread for every buffer.
   func append(_ buffer: AVAudioPCMBuffer) {
     guard let converted = convert(buffer) else { return }
     input.yield(AnalyzerInput(buffer: converted))
   }
 
+  /// No more audio. Events continue until `.ended` or `.failed`.
   @MainActor
   func finish() {
     input.finish()
@@ -159,6 +162,14 @@ final class ComposerAnalyzerTranscriber: ComposerTranscriber {
     Task { try? await analyzer.finalizeAndFinishThroughEndOfInput() }
   }
 
+  /// Settles everything heard so far and keeps listening.
+  @MainActor
+  func settleHeard() {
+    let analyzer = analyzer
+    Task { try? await analyzer.finalize(through: nil) }
+  }
+
+  /// Stop now. No further events are delivered.
   @MainActor
   func cancel() {
     results?.cancel()

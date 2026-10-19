@@ -66,9 +66,9 @@ export function NewChatWidget({
 	const addPasted = usePasteAttachments(HOME_DRAFT_KEY);
 	const uploads = useAttachmentUploads(HOME_DRAFT_KEY);
 
-	// What was typed here last time, pinned once loaded: a starting value handed to
+	// What was typed here last time, pinned at mount: a starting value handed to
 	// the composer as it is set up, never a binding.
-	const initialDraft = draft.initialText;
+	const [initialDraft] = useState(() => draft.readText());
 
 	const agentId = useNewSessionPreferencesStore((state) => state.agentId);
 	const targetKey = useNewSessionPreferencesStore((state) => state.targetKey);

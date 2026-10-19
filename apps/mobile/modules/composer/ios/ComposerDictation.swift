@@ -2,7 +2,6 @@ import Accelerate
 import AVFoundation
 import SwiftUI
 import Observation
-import Speech
 
 /// Dictation, run entirely on this side of the bridge.
 ///
@@ -17,8 +16,8 @@ import Speech
 ///   recognised are `volatileText`, drawn after the draft and never written
 ///   into it, so the draft is never rewritten mid-sentence. A failure at minute
 ///   fourteen loses seconds, not the recording.
-/// - **No time cap.** `ComposerAnalyzerTranscriber` runs on device; the
-///   server fallback rotates requests under their one-minute limit.
+/// - **No time cap.** `ComposerAnalyzerTranscriber` runs on device, with no
+///   per-request limit.
 /// - **A failure keeps what was heard and says so.** The volatile tail is
 ///   committed as the best guess, and `onError` reports why it stopped.
 /// - **A finalize backstop.** Stopping asks the engine to flush; if it never
@@ -61,13 +60,18 @@ final class ComposerDictation {
   @ObservationIgnored var onError: ((String) -> Void)?
 
   @ObservationIgnored private let engine = AVAudioEngine()
-  @ObservationIgnored private var transcriber: ComposerTranscriber?
+  @ObservationIgnored private var transcriber: ComposerAnalyzerTranscriber?
   @ObservationIgnored private var backstop: Task<Void, Never>?
+  @ObservationIgnored private var pauseTimer: Task<Void, Never>?
   /// Interruptions, route changes and media-services resets.
   @ObservationIgnored private var audioObservers: [NSObjectProtocol] = []
   /// Touched only from the audio tap thread, between publishes.
   @ObservationIgnored private var pendingFrames = 0.0
   @ObservationIgnored private var pendingPeak = 0.0
+
+  /// The engine settles text only when told to, so a pause this long is
+  /// taken as the end of a phrase.
+  private static let pauseToSettle = Duration.milliseconds(900)
 
   /// Only the unsettled tail is left to flush by then, so this is generous.
   private static let finalizeTimeout = Duration.seconds(15)
@@ -102,9 +106,6 @@ final class ComposerDictation {
       }
       do {
         try await beginRecording()
-      } catch DictationError.speechNotAuthorized {
-        settle()
-        onError?(composerLocalized("Microphone access is not allowed"))
       } catch {
         settle()
         onError?(composerLocalized("Could not start dictation"))
@@ -125,18 +126,7 @@ final class ComposerDictation {
   // MARK: - Internals
 
   private enum DictationError: Error {
-    case speechNotAuthorized
     case unavailable
-  }
-
-  /// Only `SFSpeechRecognizer` needs speech recognition permission;
-  /// `SpeechAnalyzer` needs the microphone alone.
-  @MainActor
-  private func requestSpeechAuthorization() async -> Bool {
-    let status = await withCheckedContinuation { continuation in
-      SFSpeechRecognizer.requestAuthorization { continuation.resume(returning: $0) }
-    }
-    return status == .authorized
   }
 
   /// The language the user speaks is closer to their first preferred language
@@ -191,7 +181,7 @@ final class ComposerDictation {
   }
 
   @MainActor
-  private func installTap(feeding transcriber: ComposerTranscriber) throws {
+  private func installTap(feeding transcriber: ComposerAnalyzerTranscriber) throws {
     let input = engine.inputNode
     try ComposerExceptionGuard.run {
       input.installTap(onBus: 0, bufferSize: 1024, format: nil) { [weak self] buffer, _ in
@@ -250,17 +240,15 @@ final class ComposerDictation {
   }
 
   @MainActor
-  private func makeTranscriber() async throws -> ComposerTranscriber {
+  private func makeTranscriber() async throws -> ComposerAnalyzerTranscriber {
     let onEvent: ComposerTranscriptHandler = { [weak self] event in self?.receive(event) }
-    let locale = Self.dictationLocale
-    if let analyzer = await ComposerAnalyzerTranscriber.make(locale: locale, onEvent: onEvent) {
-      return analyzer
-    }
-    guard await requestSpeechAuthorization() else { throw DictationError.speechNotAuthorized }
-    guard let recognizer = ComposerRecognizerTranscriber(locale: locale, onEvent: onEvent) else {
-      throw DictationError.unavailable
-    }
-    return recognizer
+    guard
+      let transcriber = await ComposerAnalyzerTranscriber.make(
+        locale: Self.dictationLocale,
+        onEvent: onEvent
+      )
+    else { throw DictationError.unavailable }
+    return transcriber
   }
 
   @MainActor
@@ -269,6 +257,7 @@ final class ComposerDictation {
     switch event {
     case .volatile(let text):
       withAnimation(ComposerMetrics.typingGrowth) { volatileText = text }
+      settleAfterPause()
     case .finalized(let text):
       withAnimation(ComposerMetrics.typingGrowth) { volatileText = "" }
       commit(text)
@@ -279,6 +268,17 @@ final class ComposerDictation {
     case .ended:
       commitVolatile()
       settle()
+    }
+  }
+
+  @MainActor
+  private func settleAfterPause() {
+    pauseTimer?.cancel()
+    guard case .recording = state, !volatileText.isEmpty else { return }
+    pauseTimer = Task { @MainActor [weak self] in
+      try? await Task.sleep(for: Self.pauseToSettle)
+      guard !Task.isCancelled, let self, case .recording = self.state else { return }
+      self.transcriber?.settleHeard()
     }
   }
 
@@ -364,6 +364,8 @@ final class ComposerDictation {
     guard state != .idle else { return }
     backstop?.cancel()
     backstop = nil
+    pauseTimer?.cancel()
+    pauseTimer = nil
     transcriber?.cancel()
     transcriber = nil
     for observer in audioObservers { NotificationCenter.default.removeObserver(observer) }

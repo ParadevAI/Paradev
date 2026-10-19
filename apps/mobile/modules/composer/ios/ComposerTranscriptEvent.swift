@@ -1,4 +1,4 @@
-import AVFoundation
+import Foundation
 
 /// What a speech engine reports while dictation runs.
 ///
@@ -11,20 +11,6 @@ enum ComposerTranscriptEvent {
   case failed(Error)
   /// The engine has flushed everything it heard. Nothing follows this.
   case ended
-}
-
-/// One speech engine behind `ComposerDictation`.
-///
-/// Two exist because `SpeechTranscriber` covers fewer languages than
-/// `SFSpeechRecognizer`. See `ComposerAnalyzerTranscriber` and
-/// `ComposerRecognizerTranscriber`.
-protocol ComposerTranscriber: AnyObject {
-  /// Called on the audio tap thread for every buffer.
-  func append(_ buffer: AVAudioPCMBuffer)
-  /// No more audio. Events continue until `.ended` or `.failed`.
-  @MainActor func finish()
-  /// Stop now. No further events are delivered.
-  @MainActor func cancel()
 }
 
 typealias ComposerTranscriptHandler = @MainActor (ComposerTranscriptEvent) -> Void

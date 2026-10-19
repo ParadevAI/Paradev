@@ -186,10 +186,9 @@ final class ComposerModel {
 
   func settle() { isAppearing = false }
 
-  /// First non-empty delivery of `initialDraft` wins, and never after the
-  /// user has typed, dictated or cleared.
+  /// First delivery of `initialDraft` wins; React Native pins the value at
+  /// mount, so later deliveries are the same text and must not clobber typing.
   @ObservationIgnored private var hasAppliedInitialDraft = false
-  @ObservationIgnored private var hasEdited = false
 
   /// Internal plumbing, not a React Native event — see `ComposerPassthroughView`.
   @ObservationIgnored var onInteractiveFrameChange: ((CGRect) -> Void)?
@@ -225,7 +224,6 @@ final class ComposerModel {
   /// opened — and the same change reveals or hides send, so if the two are not
   /// in one transaction the mic travels along an arc.
   func setDraft(_ text: String) {
-    hasEdited = true
     withAnimation(ComposerMetrics.typingGrowth) { draft = text }
     onDraftChange?(text)
   }
@@ -245,13 +243,10 @@ final class ComposerModel {
   /// where a prop is delivered as part of setting the view up. Unanimated,
   /// because the composer is appearing rather than growing, and unreported,
   /// because React Native is where this text just came from.
-  ///
-  /// An empty delivery does not count: the saved draft is read from disk, and
-  /// on a cold launch it can land after the composer has already been set up.
   func applyInitialDraft(_ text: String) {
-    guard !hasAppliedInitialDraft, !text.isEmpty else { return }
+    guard !hasAppliedInitialDraft else { return }
     hasAppliedInitialDraft = true
-    guard !hasEdited else { return }
+    guard !text.isEmpty else { return }
     draft = text
   }
 
