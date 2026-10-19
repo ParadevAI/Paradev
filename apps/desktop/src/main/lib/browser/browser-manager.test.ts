@@ -618,6 +618,42 @@ describe("pane focus forwarding", () => {
 		session.detach();
 	});
 
+	test("a release from before the pane re-registered is ignored", async () => {
+		const first = register("pane-reregister");
+		const session = browserManager.attachCdp(
+			"pane-reregister",
+			"ws-1",
+			() => {},
+			() => {},
+		);
+		let settleOld = () => {};
+		first.debugger.sendCommand = mock(
+			() => new Promise<void>((resolve) => (settleOld = resolve)),
+		);
+		sendPress(session);
+
+		browserManager.unregister("pane-reregister");
+		const second = register("pane-reregister");
+		const { onFocus, stop } = watchFocus("pane-reregister");
+		const newSession = browserManager.attachCdp(
+			"pane-reregister",
+			"ws-1",
+			() => {},
+			() => {},
+		);
+		second.debugger.sendCommand = mock(() => new Promise<void>(() => {}));
+		sendPress(newSession);
+
+		settleOld();
+		await flush();
+		await passBarriers(first);
+		await pressMouse(second);
+		expect(onFocus).not.toHaveBeenCalled();
+
+		newSession.detach();
+		stop();
+	});
+
 	test("other CDP commands do not hide a user click", async () => {
 		const wc = register("pane-agent-eval");
 		const { onFocus, stop } = watchFocus("pane-agent-eval");

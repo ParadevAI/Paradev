@@ -276,7 +276,9 @@ class BrowserManager extends EventEmitter {
 	// releases to the registration generation they were acquired under.
 	private agentWakes = new Map<string, { count: number }>();
 	// CDP `Input.*` commands in flight per pane. Their input is trusted, so the
-	// guest cannot tell it from a user click — see setupFocusForward.
+	// guest cannot tell it from a user click — see setupFocusForward. The entry
+	// object's identity ties releases to the registration they were taken
+	// under.
 	private agentInputs = new Map<string, { inFlight: number }>();
 	// Canonical chords to suppress in the focused guest and forward for the
 	// renderer to replay. Kept override/layout-aware by the renderer.
@@ -408,7 +410,11 @@ class BrowserManager extends EventEmitter {
 		}
 		const held = entry;
 		held.inFlight += 1;
+		let released = false;
 		return () => {
+			if (released) return;
+			released = true;
+			if (this.agentInputs.get(paneId) !== held) return;
 			held.inFlight -= 1;
 			if (held.inFlight === 0) this.endAgentInput(paneId);
 		};
