@@ -512,18 +512,26 @@ struct ComposerRootView: View {
   }
 
   private var editor: some View {
-    TextField(model.placeholder, text: Binding(
-      get: { model.draft },
-      set: { text in
-        model.setDraft(text)
+    Group {
+      // Swapped for the whole session rather than per guess: the field takes
+      // focus on appear, and toggling it would raise the keyboard mid-dictation.
+      if model.isDictating {
+        dictationPreview
+      } else {
+        TextField(model.placeholder, text: Binding(
+          get: { model.draft },
+          set: { text in
+            model.setDraft(text)
+          }
+        ), axis: .vertical)
+          .lineLimit(1...ComposerMetrics.maxLines)
+          .textInputAutocapitalization(model.autocapitalization)
+          .focused($isFocused)
+          // The editor exists only while expanded, so this is the first moment
+          // it can take first responder.
+          .onAppear { isFocused = true }
       }
-    ), axis: .vertical)
-      .lineLimit(1...ComposerMetrics.maxLines)
-      .textInputAutocapitalization(model.autocapitalization)
-      .focused($isFocused)
-      // The editor exists only while expanded, so this is the first moment it
-      // can take first responder.
-      .onAppear { isFocused = true }
+    }
       .frame(
         minHeight: model.compactEditor
           ? ComposerMetrics.editorMinHeightCompact
@@ -532,6 +540,27 @@ struct ComposerRootView: View {
       )
       .padding(.horizontal, ComposerMetrics.textInset + ComposerMetrics.rowPadding)
       .padding(.bottom, ComposerMetrics.textInset)
+  }
+
+  /// The draft, then the words still being recognised in dimmed italics on
+  /// the same line. The head truncates so the words being spoken stay in view.
+  private var dictationPreview: some View {
+    let volatile = model.dictation.volatileText
+    let shown: AttributedString
+    if !model.hasDraft && volatile.isEmpty {
+      var placeholder = AttributedString(model.placeholder)
+      placeholder.foregroundColor = .secondary
+      shown = placeholder
+    } else {
+      var tail = AttributedString(model.hasDraft && !volatile.isEmpty ? " " + volatile : volatile)
+      tail.font = .body.italic()
+      tail.foregroundColor = .secondary
+      shown = AttributedString(model.draft) + tail
+    }
+    return Text(shown)
+      .lineLimit(ComposerMetrics.maxLines)
+      .truncationMode(.head)
+      .frame(maxWidth: .infinity, alignment: .leading)
   }
 
   // MARK: - Control row

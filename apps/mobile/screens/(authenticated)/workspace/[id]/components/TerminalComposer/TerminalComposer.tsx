@@ -162,9 +162,9 @@ export const TerminalComposer = forwardRef<
 	const addPasted = usePasteAttachments(draftKey);
 	const uploads = useAttachmentUploads(draftKey);
 
-	// What was typed here last time, pinned at mount: a starting value handed to
+	// What was typed here last time, pinned once loaded: a starting value handed to
 	// the composer as it is set up, never a binding.
-	const [initialDraft] = useState(() => draft.readText());
+	const initialDraft = draft.initialText;
 	const wasExpanded = useRef(false);
 	const writeAttachments = useWriteTerminalAttachments();
 	const [isSubmitting, setIsSubmitting] = useState(false);

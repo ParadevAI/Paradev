@@ -9,19 +9,20 @@ import Speech
 /// This began as a prop mirror of React Native's `useVoiceDictation`. The level
 /// meter is what settled it: the recogniser's volume had to cross the bridge
 /// about ten times a second, for the whole recording, purely to animate five
-/// dots — precisely the chatty seam this rewrite exists to remove. And
-/// `expo-speech-recognition` is itself a wrapper over `SFSpeechRecognizer`, so
-/// owning it here is less indirection rather than more.
+/// dots — precisely the chatty seam this rewrite exists to remove.
 ///
-/// The behaviours below are carried over deliberately from that hook; they were
-/// each learned the hard way and none of them are obvious:
+/// The behaviours below were each learned the hard way:
 ///
-/// - **Continuous, final results only.** Interim results arrive constantly and
-///   would rewrite the draft mid-sentence.
-/// - **A finalize backstop.** Stopping asks the recogniser to flush; if it never
+/// - **Settled text goes into the draft as it arrives.** Words still being
+///   recognised are `volatileText`, drawn after the draft and never written
+///   into it, so the draft is never rewritten mid-sentence. A failure at minute
+///   fourteen loses seconds, not the recording.
+/// - **No time cap.** `ComposerAnalyzerTranscriber` runs on device; the
+///   fallback rotates server requests under their one-minute limit.
+/// - **A failure keeps what was heard and says so.** The volatile tail is
+///   committed as the best guess, and `onError` reports why it stopped.
+/// - **A finalize backstop.** Stopping asks the engine to flush; if it never
 ///   answers, the composer would sit in `finalizing` forever.
-/// - **The recogniser's own task end is authoritative.** No result can follow
-///   it, in any state.
 /// - **Append, never replace**, so dictating after typing adds to what is there.
 /// - **Permission refusal settles to idle** with the prior text intact.
 @Observable
@@ -51,22 +52,23 @@ final class ComposerDictation {
 
   static let meterSamples = 5
 
-  /// Receives the final transcript. The composer appends it to its own draft.
+  /// Heard but not settled yet. Replaced on every guess.
+  private(set) var volatileText = ""
+
+  /// Receives each settled stretch of speech. The composer appends it to its
+  /// own draft.
   @ObservationIgnored var onTranscript: ((String) -> Void)?
   @ObservationIgnored var onError: ((String) -> Void)?
 
   @ObservationIgnored private let engine = AVAudioEngine()
-  @ObservationIgnored private let recognizer = SFSpeechRecognizer()
-  @ObservationIgnored private var request: SFSpeechAudioBufferRecognitionRequest?
-  @ObservationIgnored private var task: SFSpeechRecognitionTask?
-  @ObservationIgnored private var transcript = ""
+  @ObservationIgnored private var transcriber: ComposerTranscriber?
   @ObservationIgnored private var backstop: Task<Void, Never>?
+  @ObservationIgnored private var interruptions: NSObjectProtocol?
   /// Touched only from the audio tap thread, between publishes.
   @ObservationIgnored private var pendingFrames = 0.0
   @ObservationIgnored private var pendingPeak = 0.0
 
-  /// Matches the hook's 15s: long enough for a slow flush, short enough that a
-  /// recogniser that never answers does not wedge the composer.
+  /// Only the unsettled tail is left to flush by then, so this is generous.
   private static let finalizeTimeout = Duration.seconds(15)
 
   /// One bar every 100ms, so the five of them span half a second of speech.
@@ -93,14 +95,14 @@ final class ComposerDictation {
     setState(.preparing)
     Task { @MainActor in
       guard await requestAuthorization() else {
-        settle(with: nil)
+        settle()
         onError?(composerLocalized("Microphone access is not allowed"))
         return
       }
       do {
-        try beginRecording()
+        try await beginRecording()
       } catch {
-        settle(with: nil)
+        settle()
         onError?(composerLocalized("Could not start dictation"))
       }
     }
@@ -110,10 +112,9 @@ final class ComposerDictation {
   func stop() {
     guard case .recording = state else { return }
     setState(.finalizing)
-    // Let the recogniser flush what it has; `task` reports the final result.
-    engine.inputNode.removeTap(onBus: 0)
-    engine.stop()
-    request?.endAudio()
+    // The engine flushes its tail and then reports `.ended`.
+    stopEngine()
+    transcriber?.finish()
     armBackstop()
   }
 
@@ -131,10 +132,13 @@ final class ComposerDictation {
   }
 
   @MainActor
-  private func beginRecording() throws {
-    guard let recognizer, recognizer.isAvailable else {
-      throw NSError(domain: "ComposerDictation", code: 1)
+  private func beginRecording() async throws {
+    let transcriber = try await makeTranscriber()
+    guard case .preparing = state else {
+      transcriber.cancel()
+      return
     }
+    self.transcriber = transcriber
 
     let session = AVAudioSession.sharedInstance()
     try session.setCategory(
@@ -143,12 +147,6 @@ final class ComposerDictation {
       options: [.defaultToSpeaker, .allowBluetooth]
     )
     try session.setActive(true, options: .notifyOthersOnDeactivation)
-
-    let request = SFSpeechAudioBufferRecognitionRequest()
-    // Interim results would rewrite the draft mid-sentence.
-    request.shouldReportPartialResults = false
-    self.request = request
-    transcript = ""
 
     let input = engine.inputNode
     let format = input.outputFormat(forBus: 0)
@@ -171,7 +169,7 @@ final class ComposerDictation {
     // failure path instead of taking the app down.
     try ComposerExceptionGuard.run {
       input.installTap(onBus: 0, bufferSize: 1024, format: nil) { [weak self] buffer, _ in
-        request.append(buffer)
+        transcriber.append(buffer)
         self?.accumulate(buffer, sampleRate: buffer.format.sampleRate)
       }
     }
@@ -179,18 +177,76 @@ final class ComposerDictation {
     engine.prepare()
     try engine.start()
 
-    task = recognizer.recognitionTask(with: request) { [weak self] result, error in
-      guard let self else { return }
-      if let result, result.isFinal {
-        self.transcript = result.bestTranscription.formattedString
-      }
-      // The task ending is authoritative: nothing can follow it.
-      if error != nil || result?.isFinal == true {
-        Task { @MainActor in self.settle(with: self.transcript) }
-      }
+    // A phone call or Siri takes the microphone; stop and keep what was heard
+    // rather than recording silence until the user notices.
+    interruptions = NotificationCenter.default.addObserver(
+      forName: AVAudioSession.interruptionNotification,
+      object: session,
+      queue: .main
+    ) { [weak self] note in
+      let raw = note.userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt
+      guard raw == AVAudioSession.InterruptionType.began.rawValue else { return }
+      MainActor.assumeIsolated { self?.stop() }
     }
 
     setState(.recording(startedAt: Date()))
+  }
+
+  @MainActor
+  private func makeTranscriber() async throws -> ComposerTranscriber {
+    let onEvent: ComposerTranscriptHandler = { [weak self] event in self?.receive(event) }
+    // A model that cannot be fetched (first use, offline) is not a reason to
+    // refuse dictation while the older engine can still take it.
+    if let analyzer = try? await ComposerAnalyzerTranscriber.make(
+      locale: Locale.current,
+      onEvent: onEvent
+    ) {
+      return analyzer
+    }
+    guard let recognizer = ComposerRecognizerTranscriber(onEvent: onEvent) else {
+      throw NSError(domain: "ComposerDictation", code: 1)
+    }
+    return recognizer
+  }
+
+  @MainActor
+  private func receive(_ event: ComposerTranscriptEvent) {
+    guard state != .idle else { return }
+    switch event {
+    case .volatile(let text):
+      withAnimation(ComposerMetrics.typingGrowth) { volatileText = text }
+    case .finalized(let text):
+      withAnimation(ComposerMetrics.typingGrowth) { volatileText = "" }
+      commit(text)
+    case .failed:
+      commitVolatile()
+      settle()
+      onError?(composerLocalized("Dictation stopped. What was heard so far is in your message."))
+    case .ended:
+      commitVolatile()
+      settle()
+    }
+  }
+
+  @MainActor
+  private func commit(_ text: String) {
+    let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard !trimmed.isEmpty else { return }
+    onTranscript?(trimmed)
+  }
+
+  /// The engine's last guess is closer to what was said than nothing.
+  @MainActor
+  private func commitVolatile() {
+    let tail = volatileText
+    volatileText = ""
+    commit(tail)
+  }
+
+  @MainActor
+  private func stopEngine() {
+    engine.inputNode.removeTap(onBus: 0)
+    if engine.isRunning { engine.stop() }
   }
 
   /// Called on the audio thread for every buffer. It folds each one into a
@@ -240,33 +296,35 @@ final class ComposerDictation {
     backstop = Task { [weak self] in
       try? await Task.sleep(for: Self.finalizeTimeout)
       guard !Task.isCancelled else { return }
-      await MainActor.run { self?.settle(with: self?.transcript) }
+      await MainActor.run {
+        guard let self, self.state == .finalizing else { return }
+        self.commitVolatile()
+        self.settle()
+        self.onError?(composerLocalized("Transcription took too long. The last few words may be missing."))
+      }
     }
   }
 
   @MainActor
-  private func settle(with text: String?) {
+  private func settle() {
     guard state != .idle else { return }
     backstop?.cancel()
     backstop = nil
-    task?.cancel()
-    task = nil
-    request = nil
-    if engine.isRunning {
-      engine.inputNode.removeTap(onBus: 0)
-      engine.stop()
+    transcriber?.cancel()
+    transcriber = nil
+    if let interruptions {
+      NotificationCenter.default.removeObserver(interruptions)
+      self.interruptions = nil
     }
+    stopEngine()
     try? AVAudioSession.sharedInstance().setActive(
       false,
       options: .notifyOthersOnDeactivation
     )
     setState(.idle)
+    volatileText = ""
     levels = [Double](repeating: 0, count: Self.meterSamples)
     pendingFrames = 0
     pendingPeak = 0
-
-    let trimmed = text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-    guard !trimmed.isEmpty else { return }
-    onTranscript?(trimmed)
   }
 }

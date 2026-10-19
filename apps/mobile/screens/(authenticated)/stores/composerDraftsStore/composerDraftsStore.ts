@@ -15,9 +15,9 @@ export interface AttachmentUpload {
 	error?: string;
 }
 
-/** What a surface had typed and attached when you last left it. */
+/** What a surface had attached when you last left it. The text is kept in
+ *  `composerDraftTextStore`, which persists. */
 export interface ComposerDraft {
-	text: string;
 	attachments: PromptInputAttachmentItem[];
 	/**
 	 * Keyed by attachment id. Kept beside the attachments rather than on them
@@ -38,7 +38,6 @@ export interface ComposerDraft {
  */
 interface ComposerDraftsStore {
 	draftsByKey: Record<string, ComposerDraft>;
-	setText: (key: string, text: string) => void;
 	addAttachments: (key: string, items: PromptInputAttachmentItem[]) => void;
 	removeAttachment: (key: string, id: string) => void;
 	clearDraft: (key: string) => void;
@@ -52,7 +51,6 @@ interface ComposerDraftsStore {
  *  unrelated key's change. */
 export const EMPTY_DRAFT: ComposerDraft = {
 	attachments: [],
-	text: "",
 	uploads: {},
 };
 
@@ -69,8 +67,6 @@ const update = (
 
 export const useComposerDraftsStore = create<ComposerDraftsStore>()((set) => ({
 	draftsByKey: {},
-	setText: (key, text) =>
-		set((state) => update(state, key, (draft) => ({ ...draft, text }))),
 	addAttachments: (key, items) =>
 		set((state) =>
 			update(state, key, (draft) => ({

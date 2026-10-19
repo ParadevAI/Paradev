@@ -7,7 +7,7 @@ import {
 import * as DocumentPicker from "expo-document-picker";
 import { File } from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { Alert } from "react-native";
 import {
 	createAttachmentId,
@@ -25,6 +25,7 @@ import {
 	HOME_DRAFT_KEY,
 	useComposerDraftsStore,
 } from "@/screens/(authenticated)/stores/composerDraftsStore";
+import { useComposerDraftTextStore } from "@/screens/(authenticated)/stores/composerDraftTextStore";
 
 export type AttachmentSource = "camera" | "photos" | "files" | "paste";
 
@@ -58,14 +59,17 @@ function sizeOf(item: PromptInputAttachmentInput): number {
  * hand it back at mount, and the composer owns it from then on. Subscribing
  * would re-render the whole surface on every keystroke — a cost the composer
  * does not pay today, since its text never crosses into React Native at all.
- * `readText` is the one-shot read instead.
+ * `initialText` is the one-shot read instead.
  */
 export function useComposerDraft(key: string) {
 	const { t } = useLingui();
 	const attachments = useComposerDraftsStore(
 		(state) => (state.draftsByKey[key] ?? EMPTY_DRAFT).attachments,
 	);
-	const setTextForKey = useComposerDraftsStore((state) => state.setText);
+	const setTextForKey = useComposerDraftTextStore((state) => state.setText);
+	const hasHydratedText = useComposerDraftTextStore(
+		(state) => state.hasHydrated,
+	);
 	const addForKey = useComposerDraftsStore((state) => state.addAttachments);
 	const removeForKey = useComposerDraftsStore(
 		(state) => state.removeAttachment,
@@ -77,11 +81,13 @@ export function useComposerDraft(key: string) {
 		[key, setTextForKey],
 	);
 
-	/** The saved text, read once — see the note above about not subscribing. */
-	const readText = useCallback(
-		() => useComposerDraftsStore.getState().draftsByKey[key]?.text ?? "",
-		[key],
-	);
+	// Pinned the first render the saved text is readable, never a binding —
+	// see the note above about not subscribing.
+	const initialText = useRef<string | null>(null);
+	if (initialText.current === null && hasHydratedText) {
+		initialText.current =
+			useComposerDraftTextStore.getState().textByKey[key] ?? "";
+	}
 
 	// Enforced here rather than at send: this is the one funnel every source
 	// goes through (both pickers, the camera, the native sheet, paste), and a
@@ -160,7 +166,8 @@ export function useComposerDraft(key: string) {
 			cancelAttachmentUpload(item.id);
 		}
 		clearForKey(key);
-	}, [key, clearForKey]);
+		setTextForKey(key, "");
+	}, [key, clearForKey, setTextForKey]);
 
 	const openImagePicker = useCallback(async () => {
 		try {
@@ -215,9 +222,9 @@ export function useComposerDraft(key: string) {
 		add,
 		attachments,
 		clear,
+		initialText: initialText.current ?? "",
 		openFilePicker,
 		openImagePicker,
-		readText,
 		remove,
 		setText,
 	};
