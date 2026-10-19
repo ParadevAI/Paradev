@@ -1,0 +1,1 @@
+export { usePullRequestDiffstat } from "./usePullRequestDiffstat";

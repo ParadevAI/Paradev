@@ -1,4 +1,5 @@
 import type { LucideIcon } from "lucide-react-native";
+import type { ReactNode } from "react";
 import { Pressable } from "react-native";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
@@ -8,10 +9,19 @@ interface DockChipProps {
 	label: string;
 	count?: number;
 	icon?: LucideIcon;
+	iconClassName?: string;
+	trailing?: ReactNode;
 	onPress: () => void;
 }
 
-export function DockChip({ label, count, icon, onPress }: DockChipProps) {
+export function DockChip({
+	label,
+	count,
+	icon,
+	iconClassName = "text-muted-foreground",
+	trailing,
+	onPress,
+}: DockChipProps) {
 	return (
 		<Pressable
 			accessibilityRole="button"
@@ -20,12 +30,13 @@ export function DockChip({ label, count, icon, onPress }: DockChipProps) {
 			style={{ height: DOCK_CHIP_HEIGHT }}
 		>
 			{icon ? (
-				<Icon as={icon} className="text-muted-foreground size-[18px]" />
+				<Icon as={icon} className={`size-[18px] ${iconClassName}`} />
 			) : null}
 			<Text className="text-foreground text-base">{label}</Text>
 			{count !== undefined ? (
 				<Text className="text-muted-foreground text-base">{count}</Text>
 			) : null}
+			{trailing}
 		</Pressable>
 	);
 }

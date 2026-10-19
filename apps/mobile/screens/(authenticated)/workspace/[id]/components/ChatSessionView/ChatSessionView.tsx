@@ -14,7 +14,7 @@ import {
 import { randomUUID } from "expo-crypto";
 import { useRouter } from "expo-router";
 import { useHeaderHeight } from "expo-router/react-navigation";
-import { GitPullRequest, ListEnd } from "lucide-react-native";
+import { ListEnd } from "lucide-react-native";
 import {
 	forwardRef,
 	useCallback,
@@ -43,6 +43,10 @@ import {
 	groupPositions,
 	lastReplyKeys,
 } from "../../utils/chatRows";
+import {
+	PULL_REQUEST_STATUS,
+	type PullRequestStatus,
+} from "../../utils/pullRequest";
 import { ChatRowView } from "../ChatRowView";
 import { DockChip } from "./components/DockChip";
 import { ScrollToBottom } from "./components/ScrollToBottom";
@@ -76,6 +80,12 @@ export interface ChatSessionViewHandle {
 	send: (text: string, attachments?: ChatAttachment[]) => Promise<void>;
 }
 
+export interface PullRequestChip {
+	label: string;
+	status: PullRequestStatus;
+	diffstat: { additions: number; deletions: number } | null;
+}
+
 interface ChatSessionViewProps {
 	sessionId: string;
 	workspaceId: string;
@@ -83,7 +93,7 @@ interface ChatSessionViewProps {
 	hostUrl: string;
 	onOpenSession: (sessionId: string) => void;
 	onTap?: () => void;
-	pullRequestLabel?: string;
+	pullRequestChip?: PullRequestChip;
 	onOpenPullRequests?: () => void;
 }
 
@@ -103,7 +113,7 @@ export const ChatSessionView = forwardRef<
 		hostUrl,
 		onOpenSession,
 		onTap,
-		pullRequestLabel,
+		pullRequestChip,
 		onOpenPullRequests,
 	},
 	ref,
@@ -445,13 +455,26 @@ export const ChatSessionView = forwardRef<
 				onLayout={(event) => setDockHeight(event.nativeEvent.layout.height)}
 				pointerEvents="box-none"
 			>
-				{pullRequestLabel || queued.length > 0 ? (
+				{pullRequestChip || queued.length > 0 ? (
 					<View className="flex-row gap-2" pointerEvents="box-none">
-						{pullRequestLabel && onOpenPullRequests ? (
+						{pullRequestChip && onOpenPullRequests ? (
 							<DockChip
-								icon={GitPullRequest}
-								label={pullRequestLabel}
+								icon={PULL_REQUEST_STATUS[pullRequestChip.status].icon}
+								iconClassName={PULL_REQUEST_STATUS[pullRequestChip.status].ink}
+								label={pullRequestChip.label}
 								onPress={onOpenPullRequests}
+								trailing={
+									pullRequestChip.diffstat ? (
+										<Text className="text-base">
+											<Text className="text-green-500 text-base">
+												+{pullRequestChip.diffstat.additions}
+											</Text>{" "}
+											<Text className="text-red-500 text-base">
+												−{pullRequestChip.diffstat.deletions}
+											</Text>
+										</Text>
+									) : null
+								}
 							/>
 						) : null}
 						{queued.length > 0 ? (

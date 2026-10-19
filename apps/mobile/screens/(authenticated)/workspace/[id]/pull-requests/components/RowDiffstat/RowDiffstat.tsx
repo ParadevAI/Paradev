@@ -1,13 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
 import { View } from "react-native";
 import { Text } from "@/components/ui/text";
-import { getHostServiceClientByUrl } from "@/lib/host-service/client";
+import { usePullRequestDiffstat } from "../../../hooks/usePullRequestDiffstat";
 import type { WorkspacePullRequest } from "../../../hooks/useWorkspacePullRequest";
 
 /**
- * The history rows come from the host's sweep, which lists PRs without
- * per-PR detail; the diffstat is fetched per row on open. Renders nothing
- * until the numbers exist — a placeholder would be a third thing on the row.
+ * Renders nothing until the numbers exist — a placeholder would be a third
+ * thing on the row.
  */
 export function RowDiffstat({
 	hostUrl,
@@ -20,21 +18,7 @@ export function RowDiffstat({
 	 * out one GitHub call per row the moment the sheet opens. */
 	enabled: boolean;
 }) {
-	const { data } = useQuery({
-		queryKey: ["pull-request-diffstat", hostUrl, pullRequest.key],
-		enabled: enabled && hostUrl !== null,
-		staleTime: 5 * 60_000,
-		networkMode: "always" as const,
-		queryFn: async () => {
-			if (!hostUrl) return null;
-			const pr = await getHostServiceClientByUrl(hostUrl).github.getPR.query({
-				owner: pullRequest.repoOwner,
-				repo: pullRequest.repoName,
-				pullNumber: pullRequest.prNumber,
-			});
-			return { additions: pr.additions, deletions: pr.deletions };
-		},
-	});
+	const data = usePullRequestDiffstat({ hostUrl, pullRequest, enabled });
 
 	if (!data) return null;
 	return (

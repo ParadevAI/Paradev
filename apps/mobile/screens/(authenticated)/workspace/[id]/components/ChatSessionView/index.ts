@@ -1,1 +1,5 @@
-export { ChatSessionView, type ChatSessionViewHandle } from "./ChatSessionView";
+export {
+	ChatSessionView,
+	type ChatSessionViewHandle,
+	type PullRequestChip,
+} from "./ChatSessionView";

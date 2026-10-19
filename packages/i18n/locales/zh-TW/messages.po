@@ -18866,6 +18866,9 @@ msgstr "檢視空缺職位"
 msgid "View open roles on Y Combinator"
 msgstr "在Y Combinator上檢視空缺職位"
 
+msgid "View PR"
+msgstr "檢視 PR"
+
 msgid "View pull request"
 msgstr "檢視拉取請求"
 

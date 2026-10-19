@@ -18866,6 +18866,9 @@ msgstr "募集中の職種を見る"
 msgid "View open roles on Y Combinator"
 msgstr "Y Combinatorで募集中のポジションを見る"
 
+msgid "View PR"
+msgstr "PRを表示"
+
 msgid "View pull request"
 msgstr "プルリクエストを表示"
 

@@ -18866,6 +18866,9 @@ msgstr "Offene Stellen ansehen"
 msgid "View open roles on Y Combinator"
 msgstr "Offene Stellen auf Y Combinator ansehen"
 
+msgid "View PR"
+msgstr "PR ansehen"
+
 msgid "View pull request"
 msgstr "Pull Request ansehen"
 

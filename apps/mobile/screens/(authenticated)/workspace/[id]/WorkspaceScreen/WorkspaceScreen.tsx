@@ -67,6 +67,7 @@ import { useUnreadWorkspacesStore } from "@/screens/(authenticated)/stores/unrea
 import {
 	ChatSessionView,
 	type ChatSessionViewHandle,
+	type PullRequestChip,
 } from "../components/ChatSessionView";
 import { CloudWorkspaceProvisioningState } from "../components/CloudWorkspaceProvisioningState";
 import { ScrollToBottomButton } from "../components/ScrollToBottomButton";
@@ -82,6 +83,7 @@ import {
 	type TerminalWebViewHandle,
 } from "../components/TerminalWebView";
 import { useHostCompatibility } from "../hooks/useHostCompatibility";
+import { usePullRequestDiffstat } from "../hooks/usePullRequestDiffstat";
 import { usePullRequestIconUri } from "../hooks/usePullRequestIconUri";
 import { useWorkspaceHeaderActions } from "../hooks/useWorkspaceHeaderActions";
 import { useWorkspacePullRequests } from "../hooks/useWorkspacePullRequest";
@@ -891,12 +893,25 @@ export function WorkspaceScreen() {
 	}, [pullRequests, pullRequestIconUri, t]);
 
 	const pullRequestCount = pullRequests.length;
-	const chatPullRequestLabel =
-		pullRequestCount > 0
-			? t({
-					message: plural(pullRequestCount, { one: "# PR", other: "# PRs" }),
-				})
-			: undefined;
+	const singlePullRequest = pullRequestCount === 1 ? pullRequests[0] : null;
+	const singlePullRequestDiffstat = usePullRequestDiffstat({
+		hostUrl,
+		pullRequest: singlePullRequest ?? null,
+	});
+	const chatPullRequestChip: PullRequestChip | undefined = pullRequestStatusNow
+		? {
+				label: singlePullRequest
+					? t({ message: "View PR" })
+					: t({
+							message: plural(pullRequestCount, {
+								one: "# PR",
+								other: "# PRs",
+							}),
+						}),
+				status: pullRequestStatusNow,
+				diffstat: singlePullRequest ? singlePullRequestDiffstat : null,
+			}
+		: undefined;
 
 	// One PR goes straight to it; a history goes to the list. Captured by hand
 	// because the tap lands in SwiftUI, where RN autocapture cannot see it.
@@ -1130,7 +1145,7 @@ export function WorkspaceScreen() {
 						onOpenSession={openSession}
 						onOpenPullRequests={openPullRequests}
 						onTap={dismissComposer}
-						pullRequestLabel={chatPullRequestLabel}
+						pullRequestChip={chatPullRequestChip}
 						ref={chatRef}
 						sessionId={activeTerminalId}
 						workspaceId={id}

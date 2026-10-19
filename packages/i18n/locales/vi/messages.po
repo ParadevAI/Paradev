@@ -18866,6 +18866,9 @@ msgstr "Xem vị trí đang tuyển"
 msgid "View open roles on Y Combinator"
 msgstr "Xem các vị trí đang tuyển trên Y Combinator"
 
+msgid "View PR"
+msgstr "Xem PR"
+
 msgid "View pull request"
 msgstr "Xem pull request"
 

@@ -18866,6 +18866,9 @@ msgstr "채용 중인 직무 보기"
 msgid "View open roles on Y Combinator"
 msgstr "Y Combinator에서 채용 공고 보기"
 
+msgid "View PR"
+msgstr "PR 보기"
+
 msgid "View pull request"
 msgstr "풀 리퀘스트 보기"
 
