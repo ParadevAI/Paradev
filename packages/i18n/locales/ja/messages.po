@@ -3505,6 +3505,9 @@ msgstr "チャット"
 msgid "Chat closed"
 msgstr "チャットを閉じました"
 
+msgid "Chat history"
+msgstr "チャット履歴"
+
 msgid "Chat is being reworked"
 msgstr "チャットは再構築中です"
 
@@ -10779,6 +10782,9 @@ msgstr "このブランチにはまだ変更がありません。"
 msgid "No changes to display."
 msgstr "表示する変更がありません。"
 
+msgid "No chats found"
+msgstr "チャットが見つかりません"
+
 msgid "No checks"
 msgstr "チェックなし"
 
@@ -14745,6 +14751,9 @@ msgstr "キー名で検索..."
 msgid "Search changed files"
 msgstr "変更されたファイルを検索"
 
+msgid "Search chats..."
+msgstr "チャットを検索..."
+
 msgid "Search developers"
 msgstr "開発者を検索"
 
@@ -15803,6 +15812,9 @@ msgstr "SOC 2 Type II準拠。レポートをご請求ください。"
 
 msgid "SOC 2 Type II report"
 msgstr "SOC 2 Type IIレポート"
+
+msgid "Some chat history could not be loaded."
+msgstr "一部のチャット履歴を読み込めませんでした。"
 
 msgid "Some files are not an accepted type and were not added."
 msgstr "一部のファイルは対応していない形式のため追加されませんでした。"
@@ -17421,6 +17433,9 @@ msgstr "このエージェントはクラウドワークスペースで実行で
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "選択したデバイスにこのエージェントは存在しません(エージェントがリセットされた可能性があります)。新しいエージェントを選ぶまで実行は失敗します。"
 
+msgid "This agent only shows chats saved in Superset."
+msgstr "このエージェントは Superset に保存されたチャットのみ表示します。"
+
 msgid "This also:"
 msgstr "さらに次の処理も行われます:"
 
@@ -18354,6 +18369,9 @@ msgstr "未対応のアイテム「{0}」"
 
 msgid "Untitled"
 msgstr "無題"
+
+msgid "Untitled chat"
+msgstr "無題のチャット"
 
 msgid "Untitled Page"
 msgstr "無題のページ"

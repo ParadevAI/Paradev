@@ -20,6 +20,7 @@ type Query =
 	| "getSession"
 	| "getQueue"
 	| "listSessions"
+	| "discoverSessions"
 	| "getItems"
 	| "getOutline"
 	| "getItemBodies"
@@ -53,6 +54,7 @@ export function chatTransportFromTrpc(client: ChatTrpcClient): ChatTransport {
 		getSession: (input) => client.getSession.query(input),
 		getQueue: (input) => client.getQueue.query(input),
 		listSessions: (input) => client.listSessions.query(input),
+		discoverSessions: (input) => client.discoverSessions.query(input),
 		getItems: (input) => client.getItems.query(input),
 		getOutline: (input) => client.getOutline.query(input),
 		getItemBodies: (input) => client.getItemBodies.query(input),

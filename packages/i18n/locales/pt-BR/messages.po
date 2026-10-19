@@ -3505,6 +3505,9 @@ msgstr "Chat"
 msgid "Chat closed"
 msgstr "Chat fechado"
 
+msgid "Chat history"
+msgstr "Histórico de chats"
+
 msgid "Chat is being reworked"
 msgstr "O chat está sendo refeito"
 
@@ -10779,6 +10782,9 @@ msgstr "Nenhuma alteração nesta branch ainda."
 msgid "No changes to display."
 msgstr "Nenhuma alteração para exibir."
 
+msgid "No chats found"
+msgstr "Nenhum chat encontrado"
+
 msgid "No checks"
 msgstr "Sem verificações"
 
@@ -14745,6 +14751,9 @@ msgstr "Buscar por nome de chave..."
 msgid "Search changed files"
 msgstr "Buscar arquivos alterados"
 
+msgid "Search chats..."
+msgstr "Buscar chats..."
+
 msgid "Search developers"
 msgstr "Buscar desenvolvedores"
 
@@ -15803,6 +15812,9 @@ msgstr "Em conformidade com SOC 2 Tipo II. Solicite nosso relatório."
 
 msgid "SOC 2 Type II report"
 msgstr "Relatório SOC 2 Tipo II"
+
+msgid "Some chat history could not be loaded."
+msgstr "Não foi possível carregar parte do histórico de chats."
 
 msgid "Some files are not an accepted type and were not added."
 msgstr "Alguns arquivos não são de um tipo aceito e não foram adicionados."
@@ -17421,6 +17433,9 @@ msgstr "Este agente não pode ser executado em uma área de trabalho na nuvem"
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Este agente não existe mais no dispositivo selecionado (os agentes podem ter sido redefinidos). As execuções vão falhar até você escolher outro."
 
+msgid "This agent only shows chats saved in Superset."
+msgstr "Este agente mostra apenas chats salvos no Superset."
+
 msgid "This also:"
 msgstr "Isso também:"
 
@@ -18354,6 +18369,9 @@ msgstr "Item não suportado \"{0}\""
 
 msgid "Untitled"
 msgstr "Sem título"
+
+msgid "Untitled chat"
+msgstr "Chat sem título"
 
 msgid "Untitled Page"
 msgstr "Página sem título"

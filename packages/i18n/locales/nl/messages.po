@@ -3505,6 +3505,9 @@ msgstr "Chat"
 msgid "Chat closed"
 msgstr "Chat gesloten"
 
+msgid "Chat history"
+msgstr "Chatgeschiedenis"
+
 msgid "Chat is being reworked"
 msgstr "Chat wordt herbouwd"
 
@@ -10779,6 +10782,9 @@ msgstr "Nog geen wijzigingen op deze branch."
 msgid "No changes to display."
 msgstr "Geen wijzigingen om te tonen."
 
+msgid "No chats found"
+msgstr "Geen chats gevonden"
+
 msgid "No checks"
 msgstr "Geen checks"
 
@@ -14745,6 +14751,9 @@ msgstr "Zoeken op sleutelnaam..."
 msgid "Search changed files"
 msgstr "Gewijzigde bestanden zoeken"
 
+msgid "Search chats..."
+msgstr "Chats zoeken..."
+
 msgid "Search developers"
 msgstr "Ontwikkelaars zoeken"
 
@@ -15803,6 +15812,9 @@ msgstr "SOC 2 Type II-compliant. Vraag ons rapport aan."
 
 msgid "SOC 2 Type II report"
 msgstr "SOC 2 Type II-rapport"
+
+msgid "Some chat history could not be loaded."
+msgstr "Een deel van de chatgeschiedenis kon niet worden geladen."
 
 msgid "Some files are not an accepted type and were not added."
 msgstr "Sommige bestanden hebben geen toegestaan type en zijn niet toegevoegd."
@@ -17421,6 +17433,9 @@ msgstr "Deze agent kan niet in een cloudwerkruimte draaien"
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Deze agent bestaat niet meer op het gekozen apparaat (de agents zijn mogelijk gereset). Runs mislukken totdat je een nieuwe kiest."
 
+msgid "This agent only shows chats saved in Superset."
+msgstr "Deze agent toont alleen chats die in Superset zijn opgeslagen."
+
 msgid "This also:"
 msgstr "Dit doet ook het volgende:"
 
@@ -18354,6 +18369,9 @@ msgstr "Niet-ondersteund item \"{0}\""
 
 msgid "Untitled"
 msgstr "Naamloos"
+
+msgid "Untitled chat"
+msgstr "Naamloze chat"
 
 msgid "Untitled Page"
 msgstr "Naamloze pagina"

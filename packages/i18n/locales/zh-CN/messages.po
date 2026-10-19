@@ -3505,6 +3505,9 @@ msgstr "聊天"
 msgid "Chat closed"
 msgstr "聊天已关闭"
 
+msgid "Chat history"
+msgstr "聊天历史"
+
 msgid "Chat is being reworked"
 msgstr "聊天功能正在重做"
 
@@ -10779,6 +10782,9 @@ msgstr "此分支上还没有改动。"
 msgid "No changes to display."
 msgstr "没有可显示的改动。"
 
+msgid "No chats found"
+msgstr "未找到聊天"
+
 msgid "No checks"
 msgstr "无检查"
 
@@ -14745,6 +14751,9 @@ msgstr "按键名搜索..."
 msgid "Search changed files"
 msgstr "搜索更改的文件"
 
+msgid "Search chats..."
+msgstr "搜索聊天..."
+
 msgid "Search developers"
 msgstr "搜索开发者"
 
@@ -15803,6 +15812,9 @@ msgstr "已通过SOC 2 Type II合规。可索取报告。"
 
 msgid "SOC 2 Type II report"
 msgstr "SOC 2 Type II报告"
+
+msgid "Some chat history could not be loaded."
+msgstr "部分聊天历史无法加载。"
 
 msgid "Some files are not an accepted type and were not added."
 msgstr "部分文件的类型不被允许，未添加。"
@@ -17421,6 +17433,9 @@ msgstr "此智能体无法在云端工作区中运行"
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "所选设备上已不存在这个智能体（它的智能体可能被重置过）。在你选择新的智能体之前，运行都会失败。"
 
+msgid "This agent only shows chats saved in Superset."
+msgstr "此智能体仅显示保存在 Superset 中的聊天。"
+
 msgid "This also:"
 msgstr "同时还会："
 
@@ -18354,6 +18369,9 @@ msgstr "不支持的项目“{0}”"
 
 msgid "Untitled"
 msgstr "未命名"
+
+msgid "Untitled chat"
+msgstr "未命名聊天"
 
 msgid "Untitled Page"
 msgstr "未命名页面"

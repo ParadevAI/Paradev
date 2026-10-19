@@ -3505,6 +3505,9 @@ msgstr "Czat"
 msgid "Chat closed"
 msgstr "Czat zamknięty"
 
+msgid "Chat history"
+msgstr "Historia czatów"
+
 msgid "Chat is being reworked"
 msgstr "Czat jest przebudowywany"
 
@@ -10779,6 +10782,9 @@ msgstr "Brak zmian na tej gałęzi."
 msgid "No changes to display."
 msgstr "Brak zmian do wyświetlenia."
 
+msgid "No chats found"
+msgstr "Nie znaleziono czatów"
+
 msgid "No checks"
 msgstr "Brak kontroli"
 
@@ -14745,6 +14751,9 @@ msgstr "Szukaj według nazwy klucza..."
 msgid "Search changed files"
 msgstr "Szukaj zmienionych plików"
 
+msgid "Search chats..."
+msgstr "Szukaj czatów..."
+
 msgid "Search developers"
 msgstr "Szukaj programistów"
 
@@ -15803,6 +15812,9 @@ msgstr "Zgodność z SOC 2 Type II. Poproś o raport."
 
 msgid "SOC 2 Type II report"
 msgstr "Raport SOC 2 Type II"
+
+msgid "Some chat history could not be loaded."
+msgstr "Nie udało się wczytać części historii czatów."
 
 msgid "Some files are not an accepted type and were not added."
 msgstr "Część plików ma niedozwolony typ i nie została dodana."
@@ -17421,6 +17433,9 @@ msgstr "Ten agent nie może działać w obszarze roboczym w chmurze"
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Ten agent już nie istnieje na wybranym urządzeniu (jego agenci mogli zostać zresetowani). Uruchomienia będą kończyć się błędem, dopóki nie wybierzesz nowego."
 
+msgid "This agent only shows chats saved in Superset."
+msgstr "Ten agent pokazuje tylko czaty zapisane w Superset."
+
 msgid "This also:"
 msgstr "Dodatkowo:"
 
@@ -18354,6 +18369,9 @@ msgstr "Nieobsługiwany element „{0}”"
 
 msgid "Untitled"
 msgstr "Bez tytułu"
+
+msgid "Untitled chat"
+msgstr "Czat bez tytułu"
 
 msgid "Untitled Page"
 msgstr "Strona bez tytułu"

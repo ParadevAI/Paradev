@@ -2,6 +2,7 @@ import {
 	cancelTurnInputSchema,
 	closeSessionInputSchema,
 	createSessionInputSchema,
+	discoverSessionsInputSchema,
 	forkSessionInputSchema,
 	getItemBodiesInputSchema,
 	getItemsInputSchema,
@@ -212,6 +213,22 @@ export function createChatRouter(
 						: { scopeId: input.workspaceId }),
 				}),
 			),
+
+		discoverSessions: t.procedure
+			.input(discoverSessionsInputSchema)
+			.query(async ({ input }) => {
+				const cwd = await options.resolveCwd(input.workspaceId);
+				try {
+					return await runtime.commands.discoverSessions({
+						harness: input.harness,
+						scopeId: input.workspaceId,
+						cwd,
+						...(input.cursor ? { cursor: input.cursor } : {}),
+					});
+				} catch (error) {
+					throw mapCommandError(runtime, error);
+				}
+			}),
 
 		getItems: t.procedure
 			.input(getItemsInputSchema)

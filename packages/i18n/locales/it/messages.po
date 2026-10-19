@@ -3505,6 +3505,9 @@ msgstr "Chat"
 msgid "Chat closed"
 msgstr "Chat chiusa"
 
+msgid "Chat history"
+msgstr "Cronologia chat"
+
 msgid "Chat is being reworked"
 msgstr "La chat è in fase di rifacimento"
 
@@ -10779,6 +10782,9 @@ msgstr "Ancora nessuna modifica su questo branch."
 msgid "No changes to display."
 msgstr "Nessuna modifica da mostrare."
 
+msgid "No chats found"
+msgstr "Nessuna chat trovata"
+
 msgid "No checks"
 msgstr "Nessun controllo"
 
@@ -14745,6 +14751,9 @@ msgstr "Cerca per nome della chiave..."
 msgid "Search changed files"
 msgstr "Cerca file modificati"
 
+msgid "Search chats..."
+msgstr "Cerca chat..."
+
 msgid "Search developers"
 msgstr "Cerca sviluppatori"
 
@@ -15803,6 +15812,9 @@ msgstr "Conforme a SOC 2 Type II. Richiedi il nostro report."
 
 msgid "SOC 2 Type II report"
 msgstr "Report SOC 2 Type II"
+
+msgid "Some chat history could not be loaded."
+msgstr "Impossibile caricare parte della cronologia chat."
 
 msgid "Some files are not an accepted type and were not added."
 msgstr "Alcuni file non sono di un tipo consentito e non sono stati aggiunti."
@@ -17421,6 +17433,9 @@ msgstr "Questo agente non può essere eseguito in un workspace cloud"
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Questo agente non esiste più sul dispositivo selezionato (i suoi agenti potrebbero essere stati reimpostati). Le esecuzioni falliranno finché non ne scegli uno nuovo."
 
+msgid "This agent only shows chats saved in Superset."
+msgstr "Questo agente mostra solo le chat salvate in Superset."
+
 msgid "This also:"
 msgstr "Inoltre:"
 
@@ -18354,6 +18369,9 @@ msgstr "Elemento non supportato \"{0}\""
 
 msgid "Untitled"
 msgstr "Senza titolo"
+
+msgid "Untitled chat"
+msgstr "Chat senza titolo"
 
 msgid "Untitled Page"
 msgstr "Pagina senza titolo"

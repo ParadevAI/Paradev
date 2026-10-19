@@ -14,6 +14,7 @@ import type {
 	CancelTurnInput,
 	CloseSessionInput,
 	Cursor,
+	DiscoverSessionsResult,
 	DurableEvent,
 	GetItemsInput,
 	GetSessionInput,
@@ -29,6 +30,7 @@ import {
 	cancelTurnInputSchema,
 	closeSessionInputSchema,
 	createSessionInputSchema,
+	discoverSessionsInputSchema,
 	forkSessionInputSchema,
 	getItemBodiesInputSchema,
 	getItemsInputSchema,
@@ -140,6 +142,16 @@ export type ListSessionsCommandInput = z.input<
 	typeof listSessionsCommandSchema
 >;
 
+export const discoverSessionsCommandSchema = discoverSessionsInputSchema
+	.omit({ workspaceId: true })
+	.extend({
+		scopeId: z.string().min(1),
+		cwd: z.string().min(1),
+	});
+export type DiscoverSessionsCommandInput = z.input<
+	typeof discoverSessionsCommandSchema
+>;
+
 export type CreateSessionResult = {
 	sessionId: string;
 	epoch: string;
@@ -192,6 +204,9 @@ export type ChatCommands = {
 	getSession(input: GetSessionInput): GetSessionResult;
 	getQueue(input: GetSessionInput): GetQueueResult;
 	listSessions(input: ListSessionsCommandInput): ChatSessionListEntry[];
+	discoverSessions(
+		input: DiscoverSessionsCommandInput,
+	): Promise<DiscoverSessionsResult>;
 	getItems(input: z.input<typeof getItemsInputSchema>): PageResult;
 	getOutline(input: z.input<typeof getOutlineInputSchema>): OutlineResult;
 	getItemBodies(
@@ -576,6 +591,16 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 		},
 
 		listSessions,
+
+		discoverSessions(input) {
+			const parsed = discoverSessionsCommandSchema.parse(input);
+			return options.live.discoverSessions({
+				harness: parsed.harness,
+				scopeId: parsed.scopeId,
+				cwd: parsed.cwd,
+				...(parsed.cursor ? { cursor: parsed.cursor } : {}),
+			});
+		},
 
 		getItems(input) {
 			const parsed: GetItemsInput = getItemsInputSchema.parse(input);

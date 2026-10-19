@@ -3505,6 +3505,9 @@ msgstr "Chat"
 msgid "Chat closed"
 msgstr "Chat ditutup"
 
+msgid "Chat history"
+msgstr "Riwayat obrolan"
+
 msgid "Chat is being reworked"
 msgstr "Chat sedang dirombak"
 
@@ -10779,6 +10782,9 @@ msgstr "Belum ada perubahan di branch ini."
 msgid "No changes to display."
 msgstr "Tidak ada perubahan untuk ditampilkan."
 
+msgid "No chats found"
+msgstr "Tidak ada obrolan ditemukan"
+
 msgid "No checks"
 msgstr "Tidak ada check"
 
@@ -14745,6 +14751,9 @@ msgstr "Cari berdasarkan nama kunci..."
 msgid "Search changed files"
 msgstr "Cari file yang berubah"
 
+msgid "Search chats..."
+msgstr "Cari obrolan..."
+
 msgid "Search developers"
 msgstr "Cari pengembang"
 
@@ -15803,6 +15812,9 @@ msgstr "Patuh SOC 2 Type II. Minta laporan kami."
 
 msgid "SOC 2 Type II report"
 msgstr "Laporan SOC 2 Type II"
+
+msgid "Some chat history could not be loaded."
+msgstr "Sebagian riwayat obrolan tidak dapat dimuat."
 
 msgid "Some files are not an accepted type and were not added."
 msgstr "Sebagian file bukan tipe yang diterima dan tidak ditambahkan."
@@ -17421,6 +17433,9 @@ msgstr "Agen ini tidak bisa berjalan di workspace cloud"
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Agen ini sudah tidak ada di perangkat yang dipilih (agennya mungkin telah direset). Run akan gagal sampai Anda memilih yang baru."
 
+msgid "This agent only shows chats saved in Superset."
+msgstr "Agen ini hanya menampilkan obrolan yang disimpan di Superset."
+
 msgid "This also:"
 msgstr "Ini juga akan:"
 
@@ -18354,6 +18369,9 @@ msgstr "Item tidak didukung \"{0}\""
 
 msgid "Untitled"
 msgstr "Tanpa judul"
+
+msgid "Untitled chat"
+msgstr "Obrolan tanpa judul"
 
 msgid "Untitled Page"
 msgstr "Halaman Tanpa Judul"

@@ -3505,6 +3505,9 @@ msgstr "Чат"
 msgid "Chat closed"
 msgstr "Чат закрыт"
 
+msgid "Chat history"
+msgstr "История чатов"
+
 msgid "Chat is being reworked"
 msgstr "Чат перерабатывается"
 
@@ -10779,6 +10782,9 @@ msgstr "В этой ветке пока нет изменений."
 msgid "No changes to display."
 msgstr "Нет изменений для показа."
 
+msgid "No chats found"
+msgstr "Чаты не найдены"
+
 msgid "No checks"
 msgstr "Без проверок"
 
@@ -14745,6 +14751,9 @@ msgstr "Поиск по имени ключа..."
 msgid "Search changed files"
 msgstr "Поиск изменённых файлов"
 
+msgid "Search chats..."
+msgstr "Поиск чатов..."
+
 msgid "Search developers"
 msgstr "Поиск разработчиков"
 
@@ -15803,6 +15812,9 @@ msgstr "Соответствие SOC 2 Type II. Запросите отчёт."
 
 msgid "SOC 2 Type II report"
 msgstr "Отчёт SOC 2 Type II"
+
+msgid "Some chat history could not be loaded."
+msgstr "Не удалось загрузить часть истории чатов."
 
 msgid "Some files are not an accepted type and were not added."
 msgstr "Некоторые файлы не подходят по типу и не были добавлены."
@@ -17421,6 +17433,9 @@ msgstr "Этот агент не может работать в облачной
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Этого агента больше нет на выбранном устройстве (возможно, его агенты были сброшены). Запуски будут падать, пока не выберете нового."
 
+msgid "This agent only shows chats saved in Superset."
+msgstr "Этот агент показывает только чаты, сохранённые в Superset."
+
 msgid "This also:"
 msgstr "Также:"
 
@@ -18354,6 +18369,9 @@ msgstr "Неподдерживаемый элемент «{0}»"
 
 msgid "Untitled"
 msgstr "Без названия"
+
+msgid "Untitled chat"
+msgstr "Чат без названия"
 
 msgid "Untitled Page"
 msgstr "Страница без названия"

@@ -3,6 +3,7 @@ import type {
 	ApprovalRequest,
 	AvailableCommand,
 	Decision,
+	DiscoverSessionsResult,
 	FormField,
 	Item,
 	ItemAttachment,
@@ -60,6 +61,7 @@ import {
 	acpContentBlockSchema,
 	acpCreateElicitationParamsSchema,
 	acpInitializeResponseSchema,
+	acpListSessionsResponseSchema,
 	acpMessageSchema,
 	acpNewSessionResponseSchema,
 	acpPlanSchema,
@@ -401,6 +403,8 @@ export class AcpAdapter implements HarnessAdapter {
 	/** Start of each named v2 plan, so a revision keeps its place in the order. */
 	private readonly planItems = new Map<string, number>();
 	private client: AcpRpcClient | null = null;
+	/** Shared by `start` and native discovery so a list never spawns a second agent. */
+	private connection: Promise<void> | null = null;
 	private sessionId: string | null = null;
 	private loadingSessionId: string | null = null;
 	private cwd = process.cwd();
@@ -687,6 +691,48 @@ export class AcpAdapter implements HarnessAdapter {
 		);
 	}
 
+	/**
+	 * v1 advertises `sessionCapabilities.list` (null means absent). v2 makes
+	 * `session/list` a baseline method of any `capabilities.session` object.
+	 */
+	private supportsSessionList(): boolean {
+		const caps = this.agentCapabilities.sessionCapabilities;
+		if (caps && typeof caps === "object" && "list" in caps) {
+			const list = (caps as { list?: unknown }).list;
+			if (list !== undefined && list !== null) return true;
+		}
+		if (this.negotiatedVersion < 2) return false;
+		const session = this.agentCapabilities.session;
+		return session !== null && typeof session === "object";
+	}
+
+	/**
+	 * Lists the agent's own sessions. Initializes when this adapter has not
+	 * started, and never sends `session/new`.
+	 */
+	async discoverSessions(input: {
+		cwd: string;
+		cursor?: string;
+	}): Promise<DiscoverSessionsResult> {
+		if (this.disposed) throw new Error("acp adapter is disposed");
+		await this.ensureConnected(input.cwd);
+		if (this.disposed || !this.client) {
+			throw new Error("acp adapter is disposed");
+		}
+		if (!this.supportsSessionList()) {
+			return { supported: false, sessions: [] };
+		}
+		const response = await this.client.request(
+			"session/list",
+			{
+				cwd: input.cwd,
+				...(input.cursor ? { cursor: input.cursor } : {}),
+			},
+			this.requestTimeoutMs(),
+		);
+		return listedSessions(response);
+	}
+
 	async dispose(): Promise<void> {
 		if (this.disposed) return;
 		this.disposed = true;
@@ -697,76 +743,90 @@ export class AcpAdapter implements HarnessAdapter {
 		this.queue.close();
 	}
 
+	private ensureConnected(cwd: string): Promise<void> {
+		if (!this.connection) {
+			this.connection = this.initializeAgent(cwd);
+		}
+		return this.connection;
+	}
+
+	/** Spawns the agent and runs `initialize` only. Does not open a session. */
+	private async initializeAgent(cwd: string): Promise<void> {
+		const launch = await this.options.launch?.();
+		if (this.disposed) return;
+		const client = new AcpRpcClient({
+			createTransport: (handlers) => {
+				const transport = (this.options.createTransport ?? spawnAcpTransport)(
+					{
+						command: launch?.command ?? this.options.command,
+						args: launch?.args ?? this.options.args,
+						cwd,
+						env: launch?.env ?? this.options.env,
+					},
+					handlers,
+				);
+				if (transport.pid !== undefined) this.options.onSpawn?.(transport.pid);
+				return transport;
+			},
+			onNotification: (notification) => this.handleNotification(notification),
+			onServerRequest: (request) => this.handleServerRequest(request),
+			onStderr: (chunk) => {
+				this.stderrTail = (this.stderrTail + chunk).slice(-STDERR_TAIL_CHARS);
+			},
+			onDispatchError: (error, method) =>
+				this.emitNotice(
+					"error",
+					`acp ${method} could not be read: ${error instanceof Error ? error.message : String(error)}`,
+				),
+			onExit: (code) => this.handleExit(code),
+		});
+		this.client = client;
+		if (this.disposed) {
+			await client.close();
+			return;
+		}
+
+		const initialized = await client.request(
+			"initialize",
+			{
+				protocolVersion: LATEST_PROTOCOL_VERSION,
+				// v2 requires `info` and renamed `clientCapabilities` to
+				// `capabilities`, so both names go out and one request serves either
+				// side of the bump.
+				info: CLIENT_INFO,
+				// v2 moved fs and terminal out of client capabilities entirely.
+				// Without form elicitation, claude-agent-acp drops AskUserQuestion.
+				capabilities: { elicitation: { form: {} }, _meta: AIR_CLIENT_META },
+				// Do not advertise fs/terminal: the agent falls back to its own
+				// Read/Edit/Bash tools, which run headless in the workspace.
+				clientCapabilities: {
+					fs: { readTextFile: false, writeTextFile: false },
+					terminal: false,
+					elicitation: { form: {} },
+					_meta: AIR_CLIENT_META,
+				},
+			},
+			this.options.startupTimeoutMs ?? STARTUP_TIMEOUT_MS,
+		);
+		if (this.disposed) return;
+
+		const negotiated = acpInitializeResponseSchema.safeParse(initialized);
+		if (!negotiated.success) return;
+		this.negotiatedVersion =
+			negotiated.data.protocolVersion ?? this.negotiatedVersion;
+		this.agentCapabilities =
+			negotiated.data.capabilities ?? negotiated.data.agentCapabilities ?? {};
+		this.supportsSteering = negotiated.data._meta?.steering?.supported === true;
+	}
+
 	private async bootstrap(startOptions: HarnessStartOptions): Promise<void> {
 		this.emitSession({ status: "starting" });
 		try {
-			const launch = await this.options.launch?.();
-			if (this.disposed) return;
-			const client = new AcpRpcClient({
-				createTransport: (handlers) => {
-					const transport = (this.options.createTransport ?? spawnAcpTransport)(
-						{
-							command: launch?.command ?? this.options.command,
-							args: launch?.args ?? this.options.args,
-							cwd: startOptions.cwd,
-							env: launch?.env ?? this.options.env,
-						},
-						handlers,
-					);
-					if (transport.pid !== undefined)
-						this.options.onSpawn?.(transport.pid);
-					return transport;
-				},
-				onNotification: (notification) => this.handleNotification(notification),
-				onServerRequest: (request) => this.handleServerRequest(request),
-				onStderr: (chunk) => {
-					this.stderrTail = (this.stderrTail + chunk).slice(-STDERR_TAIL_CHARS);
-				},
-				onDispatchError: (error, method) =>
-					this.emitNotice(
-						"error",
-						`acp ${method} could not be read: ${error instanceof Error ? error.message : String(error)}`,
-					),
-				onExit: (code) => this.handleExit(code),
-			});
-			this.client = client;
-
+			await this.ensureConnected(startOptions.cwd);
+			if (this.disposed || !this.client) return;
+			const client = this.client;
 			const startupTimeoutMs =
 				this.options.startupTimeoutMs ?? STARTUP_TIMEOUT_MS;
-			const initialized = await client.request(
-				"initialize",
-				{
-					protocolVersion: LATEST_PROTOCOL_VERSION,
-					// v2 requires `info` and renamed `clientCapabilities` to
-					// `capabilities`, so both names go out and one request serves either
-					// side of the bump.
-					info: CLIENT_INFO,
-					// v2 moved fs and terminal out of client capabilities entirely.
-					// Without form elicitation, claude-agent-acp drops AskUserQuestion.
-					capabilities: { elicitation: { form: {} }, _meta: AIR_CLIENT_META },
-					// Do not advertise fs/terminal: the agent falls back to its own
-					// Read/Edit/Bash tools, which run headless in the workspace.
-					clientCapabilities: {
-						fs: { readTextFile: false, writeTextFile: false },
-						terminal: false,
-						elicitation: { form: {} },
-						_meta: AIR_CLIENT_META,
-					},
-				},
-				startupTimeoutMs,
-			);
-
-			const negotiated = acpInitializeResponseSchema.safeParse(initialized);
-			if (negotiated.success) {
-				this.negotiatedVersion =
-					negotiated.data.protocolVersion ?? this.negotiatedVersion;
-				this.agentCapabilities =
-					negotiated.data.capabilities ??
-					negotiated.data.agentCapabilities ??
-					{};
-				this.supportsSteering =
-					negotiated.data._meta?.steering?.supported === true;
-			}
 
 			let response: unknown;
 			let resumed = false;
@@ -2264,6 +2324,24 @@ function stopProcessGroup(pid: number): boolean {
 
 export function createAcpAdapter(options: AcpAdapterOptions): HarnessAdapter {
 	return new AcpAdapter(options);
+}
+
+function listedSessions(response: unknown): DiscoverSessionsResult {
+	const parsed = acpListSessionsResponseSchema.safeParse(response);
+	if (!parsed.success) {
+		throw new Error("acp session/list returned an unreadable page");
+	}
+	const nextCursor = parsed.data.nextCursor || undefined;
+	return {
+		supported: true,
+		sessions: parsed.data.sessions.map((session) => ({
+			sessionId: session.sessionId,
+			cwd: session.cwd,
+			...(session.title ? { title: session.title } : {}),
+			...(session.updatedAt ? { updatedAt: session.updatedAt } : {}),
+		})),
+		...(nextCursor ? { nextCursor } : {}),
+	};
 }
 
 function flattenSelectOptions(

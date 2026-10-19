@@ -1,6 +1,10 @@
-import type { Envelope } from "@superset/chat/protocol";
+import { randomUUID } from "node:crypto";
+import type { DiscoverSessionsResult, Envelope } from "@superset/chat/protocol";
 import type { ChatCheckpoints } from "../../checkpoints";
-import type { HarnessAdapter } from "../../harness";
+import type {
+	DiscoverNativeSessionsInput,
+	HarnessAdapter,
+} from "../../harness";
 import type { ChatJournal } from "../../journal";
 import { LiveSession } from "../liveSession";
 
@@ -42,6 +46,54 @@ export class LiveSessionRegistry {
 
 	supports(harness: string): boolean {
 		return this.options.harnesses.has(harness);
+	}
+
+	/**
+	 * Lists native harness history. Reuses a live adapter for the same harness
+	 * and workspace when one is up; otherwise builds a temporary adapter from
+	 * the registry factory and disposes it. Does not open a journal session.
+	 */
+	async discoverSessions(input: {
+		harness: string;
+		scopeId: string;
+		cwd: string;
+		cursor?: string;
+	}): Promise<DiscoverSessionsResult> {
+		const query: DiscoverNativeSessionsInput = {
+			cwd: input.cwd,
+			...(input.cursor ? { cursor: input.cursor } : {}),
+		};
+		const reusable = [...this.live.values()].find(
+			(session) =>
+				session.harness === input.harness &&
+				session.scopeId === input.scopeId &&
+				session.state.status !== "dead" &&
+				session.supportsNativeDiscovery(),
+		);
+		if (reusable) return reusable.discoverSessions(query);
+
+		const factory = this.options.harnesses.get(input.harness);
+		if (!factory) throw new Error(`unknown harness ${input.harness}`);
+		const adapter = factory({
+			sessionId: `discover-${randomUUID()}`,
+			scopeId: input.scopeId,
+			harness: input.harness,
+			cwd: input.cwd,
+		});
+		let failure: unknown;
+		try {
+			if (!adapter.discoverSessions) {
+				return { supported: false, sessions: [] };
+			}
+			return await adapter.discoverSessions(query);
+		} catch (error) {
+			failure = error;
+			throw error;
+		} finally {
+			await adapter.dispose().catch((disposeError: unknown) => {
+				if (!failure) throw disposeError;
+			});
+		}
 	}
 
 	create(options: HarnessFactoryOptions): LiveSession {

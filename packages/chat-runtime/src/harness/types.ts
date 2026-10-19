@@ -1,6 +1,7 @@
 import type {
 	Decision,
 	Delta,
+	DiscoverSessionsResult,
 	Item,
 	SessionState,
 	Turn,
@@ -21,6 +22,12 @@ export type HarnessStartOptions = {
 	resume?: { harnessSessionId: string; quiet?: boolean };
 };
 
+/** Asks a harness for its own history. Must not open a session. */
+export type DiscoverNativeSessionsInput = {
+	cwd: string;
+	cursor?: string;
+};
+
 export interface HarnessAdapter {
 	start(options: HarnessStartOptions): AsyncIterable<AdapterEvent>;
 	prompt(content: UserContent[]): void;
@@ -38,5 +45,12 @@ export interface HarnessAdapter {
 	/** With `upToMessageId`, keeps the conversation only through that message, or returns null when it cannot. */
 	fork?(cut?: { upToMessageId: string }): Promise<string | null>;
 	stopBackgroundTask?(taskId: string): Promise<boolean>;
+	/**
+	 * Lists the harness's own sessions. Absent when this harness has no native
+	 * history. `supported: false` means the process answered but cannot list.
+	 */
+	discoverSessions?(
+		input: DiscoverNativeSessionsInput,
+	): Promise<DiscoverSessionsResult>;
 	dispose(): Promise<void>;
 }

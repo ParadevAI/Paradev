@@ -146,6 +146,37 @@ export const listSessionsInputSchema = z.object({
 });
 export type ListSessionsInput = z.infer<typeof listSessionsInputSchema>;
 
+/**
+ * Native harness history for the resume picker. Additive: this does not change
+ * `listSessions`, which stays the journal of sessions this app has opened.
+ */
+export const discoverSessionsInputSchema = z.object({
+	workspaceId: z.string().min(1),
+	harness: z.string().min(1),
+	/** Opaque page token from a previous `nextCursor`. Not a journal cursor. */
+	cursor: z.string().min(1).optional(),
+});
+export type DiscoverSessionsInput = z.infer<typeof discoverSessionsInputSchema>;
+
+export const discoveredSessionSchema = z.object({
+	sessionId: z.string().min(1),
+	cwd: z.string().min(1),
+	title: z.string().optional(),
+	/** RFC 3339 timestamp from the harness, when it sent one. */
+	updatedAt: z.string().optional(),
+});
+export type DiscoveredSession = z.infer<typeof discoveredSessionSchema>;
+
+export const discoverSessionsResultSchema = z.object({
+	/** False when this harness cannot list its own history. Not an error. */
+	supported: z.boolean(),
+	sessions: z.array(discoveredSessionSchema),
+	nextCursor: z.string().min(1).optional(),
+});
+export type DiscoverSessionsResult = z.infer<
+	typeof discoverSessionsResultSchema
+>;
+
 export const getItemsInputSchema = z.object({
 	sessionId: z.string().min(1),
 	before: cursorSchema.optional(),

@@ -3505,6 +3505,9 @@ msgstr "Chat"
 msgid "Chat closed"
 msgstr "Đã đóng cuộc trò chuyện"
 
+msgid "Chat history"
+msgstr "Lịch sử trò chuyện"
+
 msgid "Chat is being reworked"
 msgstr "Chat đang được làm lại"
 
@@ -10779,6 +10782,9 @@ msgstr "Chưa có thay đổi nào trên nhánh này."
 msgid "No changes to display."
 msgstr "Không có thay đổi nào để hiển thị."
 
+msgid "No chats found"
+msgstr "Không tìm thấy cuộc trò chuyện"
+
 msgid "No checks"
 msgstr "Không có check"
 
@@ -14745,6 +14751,9 @@ msgstr "Tìm theo tên khóa..."
 msgid "Search changed files"
 msgstr "Tìm tệp đã thay đổi"
 
+msgid "Search chats..."
+msgstr "Tìm cuộc trò chuyện..."
+
 msgid "Search developers"
 msgstr "Tìm nhà phát triển"
 
@@ -15803,6 +15812,9 @@ msgstr "Tuân thủ SOC 2 Type II. Yêu cầu báo cáo của chúng tôi."
 
 msgid "SOC 2 Type II report"
 msgstr "Báo cáo SOC 2 Type II"
+
+msgid "Some chat history could not be loaded."
+msgstr "Không thể tải một phần lịch sử trò chuyện."
 
 msgid "Some files are not an accepted type and were not added."
 msgstr "Một số tệp không thuộc loại được chấp nhận nên không được thêm."
@@ -17421,6 +17433,9 @@ msgstr "Agent này không thể chạy trong workspace cloud"
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Agent này không còn tồn tại trên thiết bị đã chọn (agent trên đó có thể đã bị đặt lại). Các lần chạy sẽ thất bại cho đến khi bạn chọn agent khác."
 
+msgid "This agent only shows chats saved in Superset."
+msgstr "Tác tử này chỉ hiển thị các cuộc trò chuyện được lưu trong Superset."
+
 msgid "This also:"
 msgstr "Thao tác này cũng sẽ:"
 
@@ -18354,6 +18369,9 @@ msgstr "Mục không được hỗ trợ \"{0}\""
 
 msgid "Untitled"
 msgstr "Không tiêu đề"
+
+msgid "Untitled chat"
+msgstr "Cuộc trò chuyện chưa có tiêu đề"
 
 msgid "Untitled Page"
 msgstr "Trang chưa đặt tên"

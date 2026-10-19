@@ -3505,6 +3505,9 @@ msgstr "Sohbet"
 msgid "Chat closed"
 msgstr "Sohbet kapatıldı"
 
+msgid "Chat history"
+msgstr "Sohbet geçmişi"
+
 msgid "Chat is being reworked"
 msgstr "Sohbet yeniden düzenleniyor"
 
@@ -10779,6 +10782,9 @@ msgstr "Bu dalda henüz değişiklik yok."
 msgid "No changes to display."
 msgstr "Gösterilecek değişiklik yok."
 
+msgid "No chats found"
+msgstr "Sohbet bulunamadı"
+
 msgid "No checks"
 msgstr "Kontrol yok"
 
@@ -14745,6 +14751,9 @@ msgstr "Anahtar adına göre ara..."
 msgid "Search changed files"
 msgstr "Değişen dosyaları ara"
 
+msgid "Search chats..."
+msgstr "Sohbetlerde ara..."
+
 msgid "Search developers"
 msgstr "Geliştirici ara"
 
@@ -15803,6 +15812,9 @@ msgstr "SOC 2 Type II uyumlu. Raporumuzu talep edin."
 
 msgid "SOC 2 Type II report"
 msgstr "SOC 2 Type II raporu"
+
+msgid "Some chat history could not be loaded."
+msgstr "Sohbet geçmişinin bir kısmı yüklenemedi."
 
 msgid "Some files are not an accepted type and were not added."
 msgstr "Bazı dosyalar kabul edilen türde değil ve eklenmedi."
@@ -17421,6 +17433,9 @@ msgstr "Bu ajan bir bulut çalışma alanında çalışamaz"
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Bu ajan seçili cihazda artık yok (ajanları sıfırlanmış olabilir). Yeni bir tane seçene kadar çalıştırmalar başarısız olacak."
 
+msgid "This agent only shows chats saved in Superset."
+msgstr "Bu ajan yalnızca Superset'te kaydedilen sohbetleri gösterir."
+
 msgid "This also:"
 msgstr "Ayrıca:"
 
@@ -18354,6 +18369,9 @@ msgstr "Desteklenmeyen öğe \"{0}\""
 
 msgid "Untitled"
 msgstr "Adsız"
+
+msgid "Untitled chat"
+msgstr "Başlıksız sohbet"
 
 msgid "Untitled Page"
 msgstr "Adsız sayfa"

@@ -3505,6 +3505,9 @@ msgstr "聊天"
 msgid "Chat closed"
 msgstr "聊天已關閉"
 
+msgid "Chat history"
+msgstr "聊天記錄"
+
 msgid "Chat is being reworked"
 msgstr "聊天功能正在重做"
 
@@ -10779,6 +10782,9 @@ msgstr "此分支上還沒有改動。"
 msgid "No changes to display."
 msgstr "沒有可顯示的改動。"
 
+msgid "No chats found"
+msgstr "找不到聊天"
+
 msgid "No checks"
 msgstr "無檢查"
 
@@ -14745,6 +14751,9 @@ msgstr "依鍵名搜尋..."
 msgid "Search changed files"
 msgstr "搜尋更改的檔案"
 
+msgid "Search chats..."
+msgstr "搜尋聊天..."
+
 msgid "Search developers"
 msgstr "搜尋開發者"
 
@@ -15803,6 +15812,9 @@ msgstr "已通過SOC 2 Type II合規。可索取報告。"
 
 msgid "SOC 2 Type II report"
 msgstr "SOC 2 Type II報告"
+
+msgid "Some chat history could not be loaded."
+msgstr "無法載入部分聊天記錄。"
 
 msgid "Some files are not an accepted type and were not added."
 msgstr "部分檔案的型別不被允許，未新增。"
@@ -17421,6 +17433,9 @@ msgstr "此代理程式無法在雲端工作區中執行"
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "所選裝置上已不存在這個代理程式（它的代理程式可能被重置過）。在你選擇新的代理程式之前，執行都會失敗。"
 
+msgid "This agent only shows chats saved in Superset."
+msgstr "此代理僅顯示儲存在 Superset 中的聊天。"
+
 msgid "This also:"
 msgstr "同時還會："
 
@@ -18354,6 +18369,9 @@ msgstr "不支援的專案「{0}」"
 
 msgid "Untitled"
 msgstr "未命名"
+
+msgid "Untitled chat"
+msgstr "未命名聊天"
 
 msgid "Untitled Page"
 msgstr "未命名頁面"

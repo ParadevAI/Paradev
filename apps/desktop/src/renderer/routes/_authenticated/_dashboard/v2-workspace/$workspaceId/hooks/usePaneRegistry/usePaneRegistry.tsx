@@ -82,6 +82,7 @@ import { AgentTerminalPane } from "./components/AgentTerminalPane";
 import { BrowserPane, BrowserPaneToolbar } from "./components/BrowserPane";
 import { ChangesListPane } from "./components/ChangesListPane";
 import { ChatPane } from "./components/ChatPane";
+import { ChatHistoryPicker } from "./components/ChatPane/components/ChatHistoryPicker";
 import { CommentPane } from "./components/CommentPane";
 import { CommentPaneHeaderExtras } from "./components/CommentPane/components/CommentPaneHeaderExtras";
 import { CommentPaneTitle } from "./components/CommentPane/components/CommentPaneTitle";
@@ -798,6 +799,11 @@ export function usePaneRegistry({
 					const data = ctx.pane.data as ChatPaneData;
 					return (
 						<div className="flex items-center gap-1">
+							<ChatHistoryPicker
+								context={ctx}
+								workspaceId={workspaceId}
+								linkedStores={linkedStores}
+							/>
 							<AccountUsage
 								key={`${workspaceId}:${data.terminalId}`}
 								workspaceId={workspaceId}

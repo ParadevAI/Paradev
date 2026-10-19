@@ -3505,6 +3505,9 @@ msgstr "Chat"
 msgid "Chat closed"
 msgstr "Chat closed"
 
+msgid "Chat history"
+msgstr "Chat history"
+
 msgid "Chat is being reworked"
 msgstr "Chat is being reworked"
 
@@ -10779,6 +10782,9 @@ msgstr "No changes on this branch yet."
 msgid "No changes to display."
 msgstr "No changes to display."
 
+msgid "No chats found"
+msgstr "No chats found"
+
 msgid "No checks"
 msgstr "No checks"
 
@@ -14745,6 +14751,9 @@ msgstr "Search by key name..."
 msgid "Search changed files"
 msgstr "Search changed files"
 
+msgid "Search chats..."
+msgstr "Search chats..."
+
 msgid "Search developers"
 msgstr "Search developers"
 
@@ -15803,6 +15812,9 @@ msgstr "SOC 2 Type II compliant. Request our report."
 
 msgid "SOC 2 Type II report"
 msgstr "SOC 2 Type II report"
+
+msgid "Some chat history could not be loaded."
+msgstr "Some chat history could not be loaded."
 
 msgid "Some files are not an accepted type and were not added."
 msgstr "Some files are not an accepted type and were not added."
@@ -17421,6 +17433,9 @@ msgstr "This agent can't run in a cloud workspace"
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 
+msgid "This agent only shows chats saved in Superset."
+msgstr "This agent only shows chats saved in Superset."
+
 msgid "This also:"
 msgstr "This also:"
 
@@ -18354,6 +18369,9 @@ msgstr "Unsupported item \"{0}\""
 
 msgid "Untitled"
 msgstr "Untitled"
+
+msgid "Untitled chat"
+msgstr "Untitled chat"
 
 msgid "Untitled Page"
 msgstr "Untitled Page"

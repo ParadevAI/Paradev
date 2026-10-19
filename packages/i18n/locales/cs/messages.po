@@ -3505,6 +3505,9 @@ msgstr "Chat"
 msgid "Chat closed"
 msgstr "Chat zavřen"
 
+msgid "Chat history"
+msgstr "Historie chatů"
+
 msgid "Chat is being reworked"
 msgstr "Chat se předělává"
 
@@ -10779,6 +10782,9 @@ msgstr "V této větvi zatím nejsou žádné změny."
 msgid "No changes to display."
 msgstr "Žádné změny k zobrazení."
 
+msgid "No chats found"
+msgstr "Nebyly nalezeny žádné chaty"
+
 msgid "No checks"
 msgstr "Žádné kontroly"
 
@@ -14745,6 +14751,9 @@ msgstr "Hledat podle názvu klíče..."
 msgid "Search changed files"
 msgstr "Hledat změněné soubory"
 
+msgid "Search chats..."
+msgstr "Hledat chaty..."
+
 msgid "Search developers"
 msgstr "Hledat vývojáře"
 
@@ -15803,6 +15812,9 @@ msgstr "V souladu se SOC 2 Type II. Vyžádejte si naši zprávu."
 
 msgid "SOC 2 Type II report"
 msgstr "Zpráva SOC 2 Type II"
+
+msgid "Some chat history could not be loaded."
+msgstr "Část historie chatů se nepodařilo načíst."
 
 msgid "Some files are not an accepted type and were not added."
 msgstr "Některé soubory nemají povolený typ a nebyly přidány."
@@ -17421,6 +17433,9 @@ msgstr "Tento agent nemůže běžet v cloudovém pracovním prostoru"
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Tento agent už na vybraném zařízení neexistuje (jeho agenti mohli být resetováni). Běhy budou selhávat, dokud nevyberete jiného."
 
+msgid "This agent only shows chats saved in Superset."
+msgstr "Tento agent zobrazuje pouze chaty uložené v Superset."
+
 msgid "This also:"
 msgstr "Zároveň:"
 
@@ -18354,6 +18369,9 @@ msgstr "Nepodporovaná položka „{0}“"
 
 msgid "Untitled"
 msgstr "Bez názvu"
+
+msgid "Untitled chat"
+msgstr "Chat bez názvu"
 
 msgid "Untitled Page"
 msgstr "Stránka bez názvu"

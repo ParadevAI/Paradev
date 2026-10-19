@@ -1,15 +1,17 @@
 import { randomUUID } from "node:crypto";
-import type {
-	DurableEvent,
-	Envelope,
-	SessionState,
-	Turn,
-	UserContent,
-	UserMessage,
+import {
+	type DiscoverSessionsResult,
+	type DurableEvent,
+	type Envelope,
+	type SessionState,
+	sessionStateSchema,
+	type Turn,
+	type UserContent,
+	type UserMessage,
 } from "@superset/chat/protocol";
-import { sessionStateSchema } from "@superset/chat/protocol";
 import type {
 	AdapterEvent,
+	DiscoverNativeSessionsInput,
 	HarnessAdapter,
 	HarnessStartOptions,
 } from "../../harness";
@@ -86,6 +88,22 @@ export class LiveSession {
 
 	get terminalId(): string | undefined {
 		return this.options.terminalId;
+	}
+
+	get harness(): string {
+		return this.options.harness;
+	}
+
+	supportsNativeDiscovery(): boolean {
+		return typeof this.options.adapter.discoverSessions === "function";
+	}
+
+	discoverSessions(
+		input: DiscoverNativeSessionsInput,
+	): Promise<DiscoverSessionsResult> {
+		const discover = this.options.adapter.discoverSessions;
+		if (!discover) return Promise.resolve({ supported: false, sessions: [] });
+		return discover.call(this.options.adapter, input);
 	}
 
 	get state(): SessionState {

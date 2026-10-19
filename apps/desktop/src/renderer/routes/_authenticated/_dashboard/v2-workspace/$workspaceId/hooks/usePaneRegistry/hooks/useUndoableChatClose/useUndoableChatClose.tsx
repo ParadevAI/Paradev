@@ -64,7 +64,8 @@ export function useUndoableChatClose({
 	);
 
 	const [batches] = useState(() => {
-		const stopSession = (sessionId: string) =>
+		const stopSession = (sessionId: string) => {
+			if (!isChatSessionClosed(sessionId)) return;
 			void latest.current
 				.stopChat(sessionId)
 				.then((stopped) => {
@@ -75,6 +76,7 @@ export function useUndoableChatClose({
 					}
 				})
 				.finally(() => removePendingChatStop(sessionId));
+		};
 		const { push, remove } = useUndoStack.getState();
 		const closed = createClosedChatBatches<ClosedChat>({
 			show: ({ id, chats }) => {
@@ -106,6 +108,7 @@ export function useUndoableChatClose({
 				toast.dismiss(id);
 			},
 			restore: (chat) => {
+				if (!isChatSessionClosed(chat.sessionId)) return;
 				removePendingChatStop(chat.sessionId);
 				chat.reopen();
 				const state = latest.current.store.getState();
