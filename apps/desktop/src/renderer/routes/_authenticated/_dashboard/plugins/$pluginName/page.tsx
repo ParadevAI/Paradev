@@ -3,11 +3,12 @@ import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { toast } from "@superset/ui/sonner";
 import { createFileRoute } from "@tanstack/react-router";
 import { useFeatureFlagEnabled } from "posthog-js/react";
-import { useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { Redirect } from "renderer/components/Redirect";
 import { env } from "renderer/env.renderer";
 import { usePluginCatalog } from "renderer/hooks/usePluginCatalog";
 import { PluginDetail } from "./components/PluginDetail";
+import { useInstallAfterConnect } from "./hooks/useInstallAfterConnect";
 
 export type PluginDetailSearch = {
 	connect?: boolean;
@@ -27,17 +28,20 @@ export const Route = createFileRoute(
 	}),
 });
 
-function useConnectOutcome(plugin: string) {
+function useConnectOutcome(plugin: string, onConnected: () => void) {
 	const { t } = useLingui();
 	const navigate = Route.useNavigate();
 	const { connected, error } = Route.useSearch();
+	const onConnectedRef = useRef(onConnected);
+	onConnectedRef.current = onConnected;
 
 	useEffect(() => {
 		if (connected === undefined && !error) return;
 
 		if (connected !== undefined) {
-			const label = connected || plugin;
+			const label = plugin;
 			toast.success(t({ message: `Connected ${label}` }));
+			onConnectedRef.current();
 		} else if (error === "oauth_denied") {
 			toast.error(
 				t({ message: `You declined the ${plugin} authorization request.` }),
@@ -72,7 +76,13 @@ function PluginDetailPage() {
 	const { connect } = Route.useSearch();
 	const navigate = Route.useNavigate();
 
-	useConnectOutcome(pluginName);
+	const installAfterConnect = useInstallAfterConnect(pluginName);
+	const onConnected = useCallback(
+		() => void installAfterConnect(),
+		[installAfterConnect],
+	);
+
+	useConnectOutcome(plugin?.interface.displayName ?? pluginName, onConnected);
 
 	useEffect(() => {
 		if (connect) void navigate({ search: {}, replace: true });
@@ -85,5 +95,11 @@ function PluginDetailPage() {
 	if (isLoading) return null;
 	if (!plugin) return <Redirect to="/plugins" />;
 
-	return <PluginDetail plugin={plugin} openConnect={connect} />;
+	return (
+		<PluginDetail
+			plugin={plugin}
+			openConnect={connect}
+			onConnected={onConnected}
+		/>
+	);
 }

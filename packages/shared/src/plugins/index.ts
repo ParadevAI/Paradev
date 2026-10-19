@@ -525,10 +525,7 @@ export function pluginProxyMcpServers(
 	marketplace: string = DEFAULT_MARKETPLACE,
 	options: { headersHelper?: string } = {},
 ): Record<string, PluginMcpServerConfig> | undefined {
-	const extension = firstPartyManifest(name)?.extensions?.superset as
-		| { connector?: { slug: string } }
-		| undefined;
-	if (!extension?.connector) return undefined;
+	if (!pluginConnectorSlug(name)) return undefined;
 
 	return {
 		[name]: {
@@ -574,6 +571,13 @@ export function desiredPluginMcpServers(
 		Object.assign(desired, proxied ?? entry.mcpServers);
 	}
 	return desired;
+}
+
+export function pluginConnectorSlug(name: string): string | undefined {
+	const extension = firstPartyManifest(name)?.extensions?.superset as
+		| { connector?: { slug: string } }
+		| undefined;
+	return extension?.connector?.slug;
 }
 
 export function getPluginByName(name: string): PluginCatalogEntry | undefined {

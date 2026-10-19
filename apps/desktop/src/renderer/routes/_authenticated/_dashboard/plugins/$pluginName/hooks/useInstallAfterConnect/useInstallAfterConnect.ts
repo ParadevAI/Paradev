@@ -1,0 +1,24 @@
+import { useCallback, useRef } from "react";
+import { cloudTrpc } from "renderer/lib/cloud-trpc";
+import { usePluginMutations } from "renderer/routes/_authenticated/_dashboard/hooks/usePluginMutations";
+
+/** Installs the plugin once its connector has an account, read fresh from the API. */
+export function useInstallAfterConnect(pluginName: string) {
+	const utils = cloudTrpc.useUtils();
+	const { install } = usePluginMutations();
+	const inFlight = useRef(false);
+
+	return useCallback(async () => {
+		if (inFlight.current) return;
+		inFlight.current = true;
+		try {
+			const rows = await utils.plugins.list.fetch(undefined, { staleTime: 0 });
+			const row = rows.find((entry) => entry.name === pluginName);
+			const connected = Boolean(row?.connector && row.connections.length > 0);
+			const installed = Boolean(row?.installed && row.enabled);
+			if (connected && !installed) await install(pluginName);
+		} finally {
+			inFlight.current = false;
+		}
+	}, [install, pluginName, utils]);
+}

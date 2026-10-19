@@ -17,6 +17,8 @@ interface ConnectConnectorDialogProps {
 	author?: string | null;
 	organizationId?: string | null;
 	connectOnly?: boolean;
+	plugin?: string;
+	onConnected?: () => void;
 	onOpenChange: (open: boolean) => void;
 }
 
@@ -26,6 +28,8 @@ export function ConnectConnectorDialog({
 	author,
 	organizationId,
 	connectOnly = false,
+	plugin,
+	onConnected,
 	onOpenChange,
 }: ConnectConnectorDialogProps) {
 	return (
@@ -42,7 +46,11 @@ export function ConnectConnectorDialog({
 						author={author}
 						organizationId={organizationId}
 						connectOnly={connectOnly}
-						onConnected={() => onOpenChange(false)}
+						plugin={plugin}
+						onConnected={() => {
+							onConnected?.();
+							onOpenChange(false);
+						}}
 					/>
 				)}
 			</DialogContent>
@@ -56,6 +64,7 @@ function DialogBody({
 	author,
 	organizationId,
 	connectOnly,
+	plugin,
 	onConnected,
 }: {
 	slug: string;
@@ -63,6 +72,7 @@ function DialogBody({
 	author?: string | null;
 	organizationId?: string | null;
 	connectOnly: boolean;
+	plugin?: string;
 	onConnected: () => void;
 }) {
 	const { t } = useLingui();
@@ -144,6 +154,7 @@ function DialogBody({
 				slug={slug}
 				organizationId={organizationId}
 				connectOnly={connectOnly}
+				plugin={plugin}
 				onConnected={onConnected}
 			/>
 		</>

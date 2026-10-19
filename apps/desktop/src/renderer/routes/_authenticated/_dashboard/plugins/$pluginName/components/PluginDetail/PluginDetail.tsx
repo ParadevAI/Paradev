@@ -27,7 +27,6 @@ import { useOpenNewWorkspace } from "renderer/hooks/useOpenNewWorkspace";
 import type { CatalogPlugin } from "renderer/hooks/usePluginCatalog";
 import { usePluginMutations } from "renderer/routes/_authenticated/_dashboard/hooks/usePluginMutations";
 import { SkillIcon } from "renderer/routes/_authenticated/_dashboard/plugins/components/SkillIcon";
-import { usePendingPluginInstallsStore } from "renderer/routes/_authenticated/_dashboard/stores/pendingPluginInstallsStore";
 import { useNewWorkspaceDraftStore } from "renderer/stores/new-workspace-draft";
 import { ConnectedAccounts } from "./components/ConnectedAccounts";
 import { InfoRow } from "./components/InfoRow";
@@ -36,9 +35,11 @@ import { SectionHeader } from "./components/SectionHeader";
 export function PluginDetail({
 	plugin,
 	openConnect = false,
+	onConnected,
 }: {
 	plugin: CatalogPlugin;
 	openConnect?: boolean;
+	onConnected: () => void;
 }) {
 	const { t } = useLingui();
 	const navigate = useNavigate();
@@ -57,13 +58,8 @@ export function PluginDetail({
 		openNewWorkspace();
 	}, [openNewWorkspace, plugin.name]);
 
-	const addPendingInstall = usePendingPluginInstallsStore(
-		(state) => state.addPending,
-	);
-
 	const installOrConnect = () => {
 		if (plugin.connector && plugin.connections.length === 0) {
-			addPendingInstall(plugin.name, plugin.connector);
 			setIsConnectOpen(true);
 		} else {
 			void install(plugin.name);
@@ -250,6 +246,8 @@ export function PluginDetail({
 			<ConnectConnectorDialog
 				slug={isConnectOpen ? plugin.connector : null}
 				connectOnly
+				plugin={plugin.name}
+				onConnected={onConnected}
 				icon={<PluginIcon pluginName={plugin.name} className="size-12" />}
 				author={plugin.author}
 				onOpenChange={(open) => !open && setIsConnectOpen(false)}

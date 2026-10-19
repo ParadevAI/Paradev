@@ -11,7 +11,6 @@ import {
 	usePluginCatalog,
 } from "renderer/hooks/usePluginCatalog";
 import { usePluginMutations } from "renderer/routes/_authenticated/_dashboard/hooks/usePluginMutations";
-import { usePendingPluginInstallsStore } from "renderer/routes/_authenticated/_dashboard/stores/pendingPluginInstallsStore";
 import { PluginCard } from "./components/PluginCard";
 import { SkillsList } from "./components/SkillsList";
 
@@ -30,9 +29,6 @@ export function PluginsView() {
 		plugin.installed && (!plugin.connector || plugin.connections.length > 0);
 
 	const { add, uninstall, update, isBusy } = usePluginMutations();
-	const addPendingInstall = usePendingPluginInstallsStore(
-		(state) => state.addPending,
-	);
 
 	const handleOpen = (plugin: CatalogPlugin) => {
 		navigate({
@@ -96,7 +92,6 @@ export function PluginsView() {
 			onOpen={handleOpen}
 			onInstall={(target) => {
 				if (target.connector && target.connections.length === 0) {
-					addPendingInstall(target.name, target.connector);
 					navigate({
 						to: "/plugins/$pluginName",
 						params: { pluginName: target.name },

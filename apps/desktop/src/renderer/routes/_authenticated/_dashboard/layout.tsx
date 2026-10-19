@@ -39,7 +39,6 @@ import {
 import { ContentBoundary } from "../components/ContentBoundary";
 import { AddRepositoryModals } from "./components/AddRepositoryModals";
 import { CrossVersionMismatchState } from "./components/CrossVersionMismatchState";
-import { PendingPluginInstalls } from "./components/PendingPluginInstalls";
 import { RemotePortForwarder } from "./components/RemotePortForwarder";
 import { SaveAsEnvironmentMount } from "./components/SaveAsEnvironmentMount";
 import { TopBar } from "./components/TopBar";
@@ -250,7 +249,6 @@ function DashboardLayout() {
 		>
 			<PortForwardsProvider>
 				<RemotePortForwarder />
-				<PendingPluginInstalls />
 				<div className="flex h-full w-full overflow-hidden">
 					<CommandPaletteHost />
 					{sidebarOutsideColumn && sidebarPanel}

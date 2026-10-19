@@ -27,6 +27,7 @@ interface ConnectorSectionProps {
 	slug: string;
 	organizationId?: string | null;
 	connectOnly?: boolean;
+	plugin?: string;
 	onConnected?: () => void;
 }
 
@@ -34,6 +35,7 @@ export function ConnectorSection({
 	slug,
 	organizationId,
 	connectOnly = false,
+	plugin,
 	onConnected,
 }: ConnectorSectionProps) {
 	const { t } = useLingui();
@@ -99,7 +101,7 @@ export function ConnectorSection({
 								variant="ghost"
 								size="sm"
 								className="shrink-0"
-								onClick={() => openOAuth(oauthMethod.type)}
+								onClick={() => openOAuth(oauthMethod.type, plugin)}
 							>
 								<Trans>Reconnect</Trans>
 							</Button>
@@ -240,7 +242,10 @@ export function ConnectorSection({
 					</Button>
 				</form>
 			) : (
-				<Button className="w-full" onClick={() => openOAuth(method.type)}>
+				<Button
+					className="w-full"
+					onClick={() => openOAuth(method.type, plugin)}
+				>
 					{t({ message: `Continue to ${connector.displayName}` })}
 					<LuExternalLink className="ml-1.5 size-3.5" />
 				</Button>

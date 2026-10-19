@@ -1,4 +1,5 @@
 import type { ConnectorMethod } from "@superset/shared/connectors";
+import { pluginConnectorSlug } from "@superset/shared/plugins";
 import {
 	authorizeUrl,
 	connectorMethod,
@@ -29,7 +30,11 @@ export async function GET(
 	// Same reason as the callback: the generic connect page covers every
 	// connector, `/integrations/<slug>` only the seven older ones.
 	const connectUrl = `${env.NEXT_PUBLIC_WEB_URL}/connect/${slug}`;
-	const requested = new URL(request.url).searchParams.get("method");
+	const search = new URL(request.url).searchParams;
+	const requested = search.get("method");
+	const plugin = search.get("plugin");
+	const returnsToPlugin =
+		plugin !== null && pluginConnectorSlug(plugin) === slug;
 
 	let method: ConnectorMethod;
 	try {
@@ -65,6 +70,7 @@ export async function GET(
 				...(codeVerifier
 					? { codeVerifier: await encryptSecret(codeVerifier) }
 					: {}),
+				...(returnsToPlugin ? { plugin } : {}),
 			},
 			authorizeUrl: async (state) =>
 				(
