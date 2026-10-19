@@ -11,6 +11,10 @@ export function toAppDisplayName(appName: string, displayName: string): string {
 	return displayName + appName.slice(PRODUCT_NAME.length);
 }
 
+export function getProductDisplayName(): string {
+	return toAppDisplayName(PRODUCT_NAME, env.DESKTOP_DISPLAY_NAME);
+}
+
 export function getAppDisplayName(): string {
 	return toAppDisplayName(app.name, env.DESKTOP_DISPLAY_NAME);
 }

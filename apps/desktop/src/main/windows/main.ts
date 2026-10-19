@@ -11,6 +11,7 @@ import log from "electron-log/main";
 import { createWindow } from "lib/electron-app/factories/windows/create";
 import { createTrpcContext } from "lib/trpc/context";
 import { createAppRouter } from "lib/trpc/routers";
+import { getProductDisplayName } from "main/lib/app-display-name";
 import { resolveDevWorkspaceName } from "main/lib/dev-workspace-name";
 import { getIconPath } from "main/lib/dock-icon";
 import { localDb } from "main/lib/local-db";
@@ -19,7 +20,6 @@ import { NOTIFICATION_EVENTS, PLATFORM } from "shared/constants";
 import { env } from "shared/env.shared";
 import type { AgentLifecycleEvent } from "shared/notification-types";
 import { createIPCHandler } from "trpc-electron/main";
-import { productName } from "~/package.json";
 import {
 	appState,
 	isAppStateInitialized,
@@ -392,9 +392,10 @@ export async function createPlatformWindow({
 
 	const isDev = env.NODE_ENV === "development";
 	const workspaceName = isDev ? resolveDevWorkspaceName() : undefined;
+	const displayName = getProductDisplayName();
 	const windowTitle = workspaceName
-		? `${productName} — ${workspaceName}`
-		: productName;
+		? `${displayName} — ${workspaceName}`
+		: displayName;
 
 	const window = createWindow({
 		id: "main",
