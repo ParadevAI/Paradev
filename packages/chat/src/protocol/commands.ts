@@ -115,6 +115,13 @@ export const rewindSessionInputSchema = z.object({
 });
 export type RewindSessionInput = z.infer<typeof rewindSessionInputSchema>;
 
+/** Lists what a files rewind to `itemId` would undo, without undoing it. */
+export const getRewindChangesInputSchema = z.object({
+	sessionId: z.string().min(1),
+	itemId: z.string().min(1),
+});
+export type GetRewindChangesInput = z.infer<typeof getRewindChangesInputSchema>;
+
 export const getRewindSupportInputSchema = z.object({
 	sessionId: z.string().min(1),
 });

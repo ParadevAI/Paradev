@@ -145,6 +145,10 @@ msgstr "{0, plural, one {# en échec} other {# en échec}}"
 msgid "{0, plural, one {# failing} other {# failing}}"
 msgstr "{0, plural, one {# en échec} other {# en échec}}"
 
+#. placeholder {0}: changes.changes.length
+msgid "{0, plural, one {# file changed since this message} other {# files changed since this message}}"
+msgstr "{0, plural, one {# fichier modifié depuis ce message} other {# fichiers modifiés depuis ce message}}"
+
 #. placeholder {0}: detail.pullRequest.changedFiles
 msgid "{0, plural, one {# file changed} other {# files changed}}"
 msgstr "{0, plural, one {# fichier modifié} other {# fichiers modifiés}}"
@@ -958,9 +962,6 @@ msgstr "Vos automatisations en échec lors de leur dernière exécution : {myFai
 
 msgid "{name} accounts"
 msgstr "Comptes {name}"
-
-msgid "{name} can't rewind its own history, so it is told the earlier conversation as text, without the details of its tool calls."
-msgstr "{name} ne peut pas rembobiner son propre historique : la conversation précédente lui est donc transmise sous forme de texte, sans le détail de ses appels d’outils."
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
@@ -2255,6 +2256,9 @@ msgstr "Une erreur inconnue est survenue"
 
 msgid "An update is ready to install."
 msgstr "Une mise à jour est prête à être installée."
+
+msgid "and {hidden} more"
+msgstr "et {hidden} de plus"
 
 msgid "Android is on the way. Be first to know when it ships."
 msgstr "Android arrive. Soyez le premier informé de sa sortie."
@@ -5065,6 +5069,9 @@ msgstr "Impossible de dupliquer dans un nouveau worktree"
 msgid "Couldn't branch the conversation"
 msgstr "Impossible de dupliquer la conversation"
 
+msgid "Couldn't check the files"
+msgstr "Impossible de vérifier les fichiers"
+
 msgid "Couldn't check what removing this member affects"
 msgstr "Impossible de vérifier ce que le retrait de ce membre affecte"
 
@@ -5100,6 +5107,9 @@ msgstr "Impossible d'abandonner les modifications indexées"
 
 msgid "Couldn't discard unstaged changes"
 msgstr "Impossible d'abandonner les modifications non indexées"
+
+msgid "Couldn't edit the message"
+msgstr "Impossible de modifier le message"
 
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Impossible de terminer la suppression des espaces de travail"
@@ -5210,9 +5220,6 @@ msgstr "Impossible de restaurer « {workspaceName} »"
 
 msgid "Couldn't restore the files"
 msgstr "Impossible de restaurer les fichiers"
-
-msgid "Couldn't rewind the chat"
-msgstr "Impossible de rembobiner le chat"
 
 msgid "Couldn't save"
 msgstr "Échec de l'enregistrement"
@@ -5896,6 +5903,9 @@ msgstr "Supprimer l'espace de travail"
 msgid "Delete workspace \"{workspaceName}\"?"
 msgstr "Supprimer l'espace de travail \"{workspaceName}\" ?"
 
+msgid "deleted"
+msgstr "supprimé"
+
 msgid "Deleted"
 msgstr "Supprimés"
 
@@ -6543,6 +6553,9 @@ msgstr "{name} ×{tier} obtenu"
 msgid "Edit"
 msgstr "Modifier"
 
+msgid "Edit and restore files"
+msgstr "Modifier et restaurer les fichiers"
+
 msgid "Edit comment"
 msgstr "Modifier le commentaire"
 
@@ -6551,6 +6564,9 @@ msgstr "Modifier l'environnement"
 
 msgid "Edit files without asking; ask before commands"
 msgstr "Modifier les fichiers sans demander ; demander avant les commandes"
+
+msgid "Edit message"
+msgstr "Modifier le message"
 
 msgid "Edit name"
 msgstr "Modifier le nom"
@@ -6569,6 +6585,9 @@ msgstr "Modifier le script"
 
 msgid "Edit your comment…"
 msgstr "Modifiez votre commentaire…"
+
+msgid "Edit, keep files"
+msgstr "Modifier, garder les fichiers"
 
 msgid "Edited"
 msgstr "Modifié"
@@ -7555,11 +7574,11 @@ msgstr "Fichiers"
 msgid "Files & Editor"
 msgstr "Fichiers et éditeur"
 
-msgid "Files can't be rewound here because this folder is not a git repository. Only the chat goes back."
-msgstr "Impossible de rembobiner les fichiers ici, car ce dossier n’est pas un dépôt git. Seul le chat revient en arrière."
-
 msgid "Files changed"
 msgstr "Fichiers modifiés"
+
+msgid "Files restored to before that message"
+msgstr "Fichiers restaurés à leur état avant ce message"
 
 msgid "files to exclude (glob)"
 msgstr "fichiers à exclure (glob)"
@@ -8097,9 +8116,6 @@ msgstr "Revenir en arrière"
 
 msgid "Go back home"
 msgstr "Retourner à l'accueil"
-
-msgid "Go back to an earlier message and restore the files"
-msgstr "Revenir à un message précédent et restaurer les fichiers"
 
 msgid "Go back to the previous page in history"
 msgstr "Revenir à la page précédente de l'historique"
@@ -9345,6 +9361,9 @@ msgstr "Latence"
 msgid "Later"
 msgstr "Plus tard"
 
+msgid "Later messages and their file changes are removed."
+msgstr "Les messages suivants et leurs modifications de fichiers seront supprimés."
+
 msgid "Latest"
 msgstr "Dernière"
 
@@ -10482,6 +10501,9 @@ msgstr "Jamais"
 
 msgid "Never asks before acting"
 msgstr "Ne demande jamais avant d'agir"
+
+msgid "new"
+msgstr "nouveau"
 
 msgid "New"
 msgstr "Nouveau"
@@ -12556,9 +12578,6 @@ msgstr "Choisir un dossier…"
 msgid "Pick a low-risk papercut, fix it, and explain how it was verified."
 msgstr "Choisir un désagrément à faible risque, le corriger et expliquer comment il a été vérifié."
 
-msgid "Pick a message. The chat goes back to just before it, and the message returns to the composer."
-msgstr "Choisissez un message. Le chat revient juste avant ce message, et le message retourne dans la zone de saisie."
-
 msgid "Pick a model"
 msgstr "Choisir un modèle"
 
@@ -14147,6 +14166,9 @@ msgstr "« {workspaceName} » restauré"
 msgid "Restoring \"{workspaceName}\"…"
 msgstr "Restauration de « {workspaceName} »…"
 
+msgid "Restoring puts them back as they were before this message, including changes you made yourself. A snapshot of the current files is kept first."
+msgstr "La restauration les remet dans l'état d'avant ce message, y compris les modifications que vous avez faites vous-même. Un instantané des fichiers actuels est conservé d'abord."
+
 msgid "Restoring your session"
 msgstr "Restauration de votre session"
 
@@ -14313,21 +14335,6 @@ msgstr "Révoquer la clé API"
 
 msgid "Revoke key"
 msgstr "Révoquer la clé"
-
-msgid "Rewind"
-msgstr "Rembobiner"
-
-msgid "Rewind chat"
-msgstr "Rembobiner le chat"
-
-msgid "Rewind chat and files"
-msgstr "Rembobiner le chat et les fichiers"
-
-msgid "Rewind chat only"
-msgstr "Rembobiner le chat uniquement"
-
-msgid "Rewind to this message?"
-msgstr "Rembobiner jusqu’à ce message ?"
 
 msgid "Rewrote it and published version 2."
 msgstr "Réécrit et publié en version 2."
@@ -16254,8 +16261,8 @@ msgstr "Arrêtez Superset ici pour le supprimer depuis un autre appareil."
 msgid "Stop the agent and send this now"
 msgstr "Arrêter l'agent et envoyer maintenant"
 
-msgid "Stop the agent before you rewind"
-msgstr "Arrêtez l’agent avant de rembobiner"
+msgid "Stop the agent before you edit a message"
+msgstr "Arrêtez l'agent avant de modifier un message"
 
 msgid "Stop watching"
 msgstr "Arrêter la surveillance"
@@ -17318,9 +17325,6 @@ msgstr "Le point de départ à partir duquel démarre un espace de travail cloud
 msgid "The Superset desktop app is available for macOS and Linux."
 msgstr "L'application de bureau Superset est disponible pour macOS et Linux."
 
-msgid "The Superset host on this machine is out of date, so only the chat goes back and the agent is told the earlier conversation as text."
-msgstr "L’hôte Superset de cette machine n’est pas à jour : seul le chat revient en arrière, et la conversation précédente est transmise à l’agent sous forme de texte."
-
 msgid "The Superset host service for {organization} stopped unexpectedly ({cause}) and could not be restarted automatically."
 msgstr "Le service hôte Superset pour {organization} s'est arrêté de façon inattendue ({cause}) et n'a pas pu être redémarré automatiquement."
 
@@ -17378,11 +17382,8 @@ msgstr "Thèmes"
 msgid "Themes and agents"
 msgstr "Thèmes et agents"
 
-msgid "There are no messages to rewind to yet."
-msgstr "Il n’y a encore aucun message vers lequel rembobiner."
-
-msgid "There is no file snapshot for that message, so nothing was rewound. Choose Rewind chat only to rewind just the conversation."
-msgstr "Il n’existe aucun instantané des fichiers pour ce message, donc rien n’a été rembobiné. Choisissez « Rembobiner le chat uniquement » pour ne rembobiner que la conversation."
+msgid "There was no file snapshot for that message, so the files were left as they are."
+msgstr "Aucun instantané des fichiers n'existait pour ce message, les fichiers ont donc été laissés tels quels."
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "Ces commandes s'exécutent automatiquement lorsqu'un espace de travail est créé. <0>Lire notre documentation<1/></0>"
@@ -17413,9 +17414,6 @@ msgstr "Ce compte {plugin} est déjà connecté par une autre organisation Super
 
 msgid "This action is irreversible."
 msgstr "Cette action est irréversible."
-
-msgid "This agent"
-msgstr "Cet agent"
 
 msgid "This agent can't be opened as a chat."
 msgstr "Cet agent ne peut pas être ouvert en tant que chat."
@@ -17520,9 +17518,6 @@ msgstr "Cette installation GitHub est déjà connectée à une autre organisatio
 msgid "This host"
 msgstr "Cet hôte"
 
-msgid "This host can't restore files, so nothing was rewound. Choose Rewind chat only to rewind just the conversation."
-msgstr "Cet hôte ne peut pas restaurer les fichiers, donc rien n’a été rembobiné. Choisissez « Rembobiner le chat uniquement » pour ne rembobiner que la conversation."
-
 msgid "This host has not reported a version yet."
 msgstr "Cet hôte n'a pas encore signalé de version."
 
@@ -17564,12 +17559,6 @@ msgstr "Ce Mac"
 
 msgid "This machine"
 msgstr "Cette machine"
-
-msgid "This message and everything after it leave the chat, and the message goes back to the composer. Files stay as they are."
-msgstr "Ce message et tout ce qui suit quittent le chat, et le message retourne dans la zone de saisie. Les fichiers restent tels quels."
-
-msgid "This message and everything after it leave the chat, and the message goes back to the composer. Rewinding the files also undoes changes made since then. A snapshot of the current files is kept first."
-msgstr "Ce message et tout ce qui suit quittent le chat, et le message retourne dans la zone de saisie. Rembobiner aussi les fichiers annule les modifications faites depuis. Un instantané des fichiers actuels est d’abord conservé."
 
 msgid "This Microsoft tenant is already connected by {detail}. Ask them to disconnect first."
 msgstr "Ce tenant Microsoft est déjà connecté par {detail}. Demandez-lui de le déconnecter d'abord."

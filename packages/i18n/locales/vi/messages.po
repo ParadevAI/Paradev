@@ -145,6 +145,10 @@ msgstr "{0, plural, one {# thất bại} other {# thất bại}}"
 msgid "{0, plural, one {# failing} other {# failing}}"
 msgstr "{0, plural, one {# thất bại} other {# thất bại}}"
 
+#. placeholder {0}: changes.changes.length
+msgid "{0, plural, one {# file changed since this message} other {# files changed since this message}}"
+msgstr "{0, plural, other {# tệp đã thay đổi kể từ tin nhắn này}}"
+
 #. placeholder {0}: detail.pullRequest.changedFiles
 msgid "{0, plural, one {# file changed} other {# files changed}}"
 msgstr "{0, plural, one {# tệp thay đổi} other {# tệp thay đổi}}"
@@ -958,9 +962,6 @@ msgstr "{myFailedCount} tự động hóa của bạn thất bại ở lần ch�
 
 msgid "{name} accounts"
 msgstr "Tài khoản {name}"
-
-msgid "{name} can't rewind its own history, so it is told the earlier conversation as text, without the details of its tool calls."
-msgstr "{name} không thể tua lại lịch sử của chính nó, nên cuộc trò chuyện trước đó được gửi cho nó dưới dạng văn bản, không kèm chi tiết các lệnh gọi công cụ."
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
@@ -2255,6 +2256,9 @@ msgstr "Đã xảy ra lỗi không xác định"
 
 msgid "An update is ready to install."
 msgstr "Đã có bản cập nhật sẵn sàng để cài đặt."
+
+msgid "and {hidden} more"
+msgstr "và {hidden} tệp khác"
 
 msgid "Android is on the way. Be first to know when it ships."
 msgstr "Bản Android đang đến. Hãy là người đầu tiên biết khi nó ra mắt."
@@ -5065,6 +5069,9 @@ msgstr "Không thể tạo nhánh sang worktree mới"
 msgid "Couldn't branch the conversation"
 msgstr "Không thể tạo nhánh hội thoại"
 
+msgid "Couldn't check the files"
+msgstr "Không thể kiểm tra các tệp"
+
 msgid "Couldn't check what removing this member affects"
 msgstr "Không kiểm tra được việc gỡ thành viên này ảnh hưởng đến những gì"
 
@@ -5100,6 +5107,9 @@ msgstr "Không thể bỏ các thay đổi đã stage"
 
 msgid "Couldn't discard unstaged changes"
 msgstr "Không thể bỏ các thay đổi chưa stage"
+
+msgid "Couldn't edit the message"
+msgstr "Không thể chỉnh sửa tin nhắn"
 
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Không xóa xong các workspace"
@@ -5210,9 +5220,6 @@ msgstr "Không thể khôi phục \"{workspaceName}\""
 
 msgid "Couldn't restore the files"
 msgstr "Không thể khôi phục tệp"
-
-msgid "Couldn't rewind the chat"
-msgstr "Không thể tua lại chat"
 
 msgid "Couldn't save"
 msgstr "Không lưu được"
@@ -5896,6 +5903,9 @@ msgstr "Xóa workspace"
 msgid "Delete workspace \"{workspaceName}\"?"
 msgstr "Xóa workspace \"{workspaceName}\"?"
 
+msgid "deleted"
+msgstr "đã xóa"
+
 msgid "Deleted"
 msgstr "Đã xóa"
 
@@ -6543,6 +6553,9 @@ msgstr "Đã đạt {name} ×{tier}"
 msgid "Edit"
 msgstr "Sửa"
 
+msgid "Edit and restore files"
+msgstr "Chỉnh sửa và khôi phục tệp"
+
 msgid "Edit comment"
 msgstr "Sửa bình luận"
 
@@ -6551,6 +6564,9 @@ msgstr "Chỉnh sửa environment"
 
 msgid "Edit files without asking; ask before commands"
 msgstr "Sửa tệp không cần hỏi; hỏi trước khi chạy lệnh"
+
+msgid "Edit message"
+msgstr "Chỉnh sửa tin nhắn"
 
 msgid "Edit name"
 msgstr "Sửa tên"
@@ -6569,6 +6585,9 @@ msgstr "Sửa script"
 
 msgid "Edit your comment…"
 msgstr "Sửa bình luận của bạn…"
+
+msgid "Edit, keep files"
+msgstr "Chỉnh sửa, giữ tệp"
 
 msgid "Edited"
 msgstr "Đã sửa"
@@ -7555,11 +7574,11 @@ msgstr "Tệp"
 msgid "Files & Editor"
 msgstr "Tệp và trình soạn thảo"
 
-msgid "Files can't be rewound here because this folder is not a git repository. Only the chat goes back."
-msgstr "Không thể tua lại tệp ở đây vì thư mục này không phải là kho git. Chỉ chat được quay lại."
-
 msgid "Files changed"
 msgstr "Tệp đã thay đổi"
+
+msgid "Files restored to before that message"
+msgstr "Đã khôi phục tệp về trước tin nhắn đó"
 
 msgid "files to exclude (glob)"
 msgstr "tệp cần loại trừ (glob)"
@@ -8097,9 +8116,6 @@ msgstr "Quay lại"
 
 msgid "Go back home"
 msgstr "Quay về trang chủ"
-
-msgid "Go back to an earlier message and restore the files"
-msgstr "Quay lại một tin nhắn trước đó và khôi phục tệp"
 
 msgid "Go back to the previous page in history"
 msgstr "Quay lại trang trước trong lịch sử"
@@ -9345,6 +9361,9 @@ msgstr "Độ trễ"
 msgid "Later"
 msgstr "Để sau"
 
+msgid "Later messages and their file changes are removed."
+msgstr "Các tin nhắn sau và thay đổi tệp của chúng sẽ bị xóa."
+
 msgid "Latest"
 msgstr "Mới nhất"
 
@@ -10482,6 +10501,9 @@ msgstr "Chưa bao giờ"
 
 msgid "Never asks before acting"
 msgstr "Không bao giờ hỏi trước"
+
+msgid "new"
+msgstr "mới"
 
 msgid "New"
 msgstr "Mới"
@@ -12556,9 +12578,6 @@ msgstr "Chọn một thư mục…"
 msgid "Pick a low-risk papercut, fix it, and explain how it was verified."
 msgstr "Chọn một lỗi vặt ít rủi ro, sửa nó và giải thích cách đã kiểm chứng."
 
-msgid "Pick a message. The chat goes back to just before it, and the message returns to the composer."
-msgstr "Chọn một tin nhắn. Chat quay lại ngay trước tin nhắn đó, và tin nhắn trở về ô soạn thảo."
-
 msgid "Pick a model"
 msgstr "Chọn một mô hình"
 
@@ -14147,6 +14166,9 @@ msgstr "Đã khôi phục \"{workspaceName}\""
 msgid "Restoring \"{workspaceName}\"…"
 msgstr "Đang khôi phục \"{workspaceName}\"…"
 
+msgid "Restoring puts them back as they were before this message, including changes you made yourself. A snapshot of the current files is kept first."
+msgstr "Khôi phục sẽ đưa chúng về như trước tin nhắn này, kể cả thay đổi do bạn tự thực hiện. Ảnh chụp các tệp hiện tại được lưu trước."
+
 msgid "Restoring your session"
 msgstr "Đang khôi phục phiên của bạn"
 
@@ -14313,21 +14335,6 @@ msgstr "Thu hồi khóa API"
 
 msgid "Revoke key"
 msgstr "Thu hồi khóa"
-
-msgid "Rewind"
-msgstr "Tua lại"
-
-msgid "Rewind chat"
-msgstr "Tua lại chat"
-
-msgid "Rewind chat and files"
-msgstr "Tua lại chat và tệp"
-
-msgid "Rewind chat only"
-msgstr "Chỉ tua lại chat"
-
-msgid "Rewind to this message?"
-msgstr "Tua lại đến tin nhắn này?"
 
 msgid "Rewrote it and published version 2."
 msgstr "Đã viết lại và xuất bản phiên bản 2."
@@ -16254,8 +16261,8 @@ msgstr "Hãy dừng Superset ở đây để xóa từ thiết bị khác."
 msgid "Stop the agent and send this now"
 msgstr "Dừng tác tử và gửi ngay"
 
-msgid "Stop the agent before you rewind"
-msgstr "Hãy dừng tác tử trước khi tua lại"
+msgid "Stop the agent before you edit a message"
+msgstr "Hãy dừng tác tử trước khi chỉnh sửa tin nhắn"
 
 msgid "Stop watching"
 msgstr "Ngừng theo dõi"
@@ -17318,9 +17325,6 @@ msgstr "Điểm khởi đầu mà một workspace cloud boot lên — một base
 msgid "The Superset desktop app is available for macOS and Linux."
 msgstr "Ứng dụng desktop Superset có sẵn cho macOS và Linux."
 
-msgid "The Superset host on this machine is out of date, so only the chat goes back and the agent is told the earlier conversation as text."
-msgstr "Máy chủ Superset trên máy này đã cũ, nên chỉ chat được quay lại và cuộc trò chuyện trước đó được gửi cho tác tử dưới dạng văn bản."
-
 msgid "The Superset host service for {organization} stopped unexpectedly ({cause}) and could not be restarted automatically."
 msgstr "Dịch vụ host Superset cho {organization} đã dừng bất ngờ ({cause}) và không tự khởi động lại được."
 
@@ -17378,11 +17382,8 @@ msgstr "Chủ đề"
 msgid "Themes and agents"
 msgstr "Giao diện và agent"
 
-msgid "There are no messages to rewind to yet."
-msgstr "Chưa có tin nhắn nào để tua lại."
-
-msgid "There is no file snapshot for that message, so nothing was rewound. Choose Rewind chat only to rewind just the conversation."
-msgstr "Không có ảnh chụp nhanh tệp cho tin nhắn đó, nên chưa có gì được tua lại. Chọn \"Chỉ tua lại chat\" để chỉ tua lại cuộc trò chuyện."
+msgid "There was no file snapshot for that message, so the files were left as they are."
+msgstr "Không có ảnh chụp tệp cho tin nhắn đó, nên các tệp được giữ nguyên."
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "Các lệnh này chạy tự động khi một workspace được tạo. <0>Đọc tài liệu<1/></0>"
@@ -17413,9 +17414,6 @@ msgstr "Tài khoản {plugin} này đã được một tổ chức Superset khá
 
 msgid "This action is irreversible."
 msgstr "Không thể hoàn tác thao tác này."
-
-msgid "This agent"
-msgstr "Tác tử này"
 
 msgid "This agent can't be opened as a chat."
 msgstr "Không thể mở tác nhân này dưới dạng trò chuyện."
@@ -17520,9 +17518,6 @@ msgstr "Bản cài đặt GitHub này đã kết nối với một tổ chức S
 msgid "This host"
 msgstr "Host này"
 
-msgid "This host can't restore files, so nothing was rewound. Choose Rewind chat only to rewind just the conversation."
-msgstr "Máy chủ này không thể khôi phục tệp, nên chưa có gì được tua lại. Chọn \"Chỉ tua lại chat\" để chỉ tua lại cuộc trò chuyện."
-
 msgid "This host has not reported a version yet."
 msgstr "Máy chủ này chưa báo cáo phiên bản."
 
@@ -17564,12 +17559,6 @@ msgstr "Mac này"
 
 msgid "This machine"
 msgstr "Máy này"
-
-msgid "This message and everything after it leave the chat, and the message goes back to the composer. Files stay as they are."
-msgstr "Tin nhắn này và mọi thứ sau nó sẽ rời khỏi chat, và tin nhắn trở về ô soạn thảo. Các tệp vẫn giữ nguyên."
-
-msgid "This message and everything after it leave the chat, and the message goes back to the composer. Rewinding the files also undoes changes made since then. A snapshot of the current files is kept first."
-msgstr "Tin nhắn này và mọi thứ sau nó sẽ rời khỏi chat, và tin nhắn trở về ô soạn thảo. Tua lại cả tệp cũng hoàn tác các thay đổi từ lúc đó. Ảnh chụp nhanh của các tệp hiện tại được lưu trước."
 
 msgid "This Microsoft tenant is already connected by {detail}. Ask them to disconnect first."
 msgstr "Tenant Microsoft này đã được {detail} kết nối. Hãy nhờ họ ngắt kết nối trước."

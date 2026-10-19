@@ -145,6 +145,10 @@ msgstr "{0, plural, one {# başarısız} other {# başarısız}}"
 msgid "{0, plural, one {# failing} other {# failing}}"
 msgstr "{0, plural, one {# başarısız} other {# başarısız}}"
 
+#. placeholder {0}: changes.changes.length
+msgid "{0, plural, one {# file changed since this message} other {# files changed since this message}}"
+msgstr "{0, plural, one {Bu mesajdan beri # dosya değişti} other {Bu mesajdan beri # dosya değişti}}"
+
 #. placeholder {0}: detail.pullRequest.changedFiles
 msgid "{0, plural, one {# file changed} other {# files changed}}"
 msgstr "{0, plural, one {# dosya değişti} other {# dosya değişti}}"
@@ -958,9 +962,6 @@ msgstr "Otomasyonlarınızdan {myFailedCount} tanesi son çalıştırmasında ba
 
 msgid "{name} accounts"
 msgstr "{name} hesapları"
-
-msgid "{name} can't rewind its own history, so it is told the earlier conversation as text, without the details of its tool calls."
-msgstr "{name} kendi geçmişini geri saramadığı için önceki konuşma ona metin olarak iletilir; araç çağrılarının ayrıntıları dahil edilmez."
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
@@ -2255,6 +2256,9 @@ msgstr "Bilinmeyen bir hata oluştu"
 
 msgid "An update is ready to install."
 msgstr "Yüklenmeye hazır bir güncelleme var."
+
+msgid "and {hidden} more"
+msgstr "ve {hidden} tane daha"
 
 msgid "Android is on the way. Be first to know when it ships."
 msgstr "Android yolda. Çıktığında ilk siz haberdar olun."
@@ -5065,6 +5069,9 @@ msgstr "Yeni bir worktree'ye çatallanamadı"
 msgid "Couldn't branch the conversation"
 msgstr "Konuşma çatallanamadı"
 
+msgid "Couldn't check the files"
+msgstr "Dosyalar kontrol edilemedi"
+
 msgid "Couldn't check what removing this member affects"
 msgstr "Bu üyeyi kaldırmanın nelere etki edeceği kontrol edilemedi"
 
@@ -5100,6 +5107,9 @@ msgstr "Hazırlanmış değişiklikler atılamadı"
 
 msgid "Couldn't discard unstaged changes"
 msgstr "Hazırlanmamış değişiklikler atılamadı"
+
+msgid "Couldn't edit the message"
+msgstr "Mesaj düzenlenemedi"
 
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Çalışma alanlarını silme işlemi tamamlanamadı"
@@ -5210,9 +5220,6 @@ msgstr "\"{workspaceName}\" geri yüklenemedi"
 
 msgid "Couldn't restore the files"
 msgstr "Dosyalar geri yüklenemedi"
-
-msgid "Couldn't rewind the chat"
-msgstr "Sohbet geri sarılamadı"
 
 msgid "Couldn't save"
 msgstr "Kaydedilemedi"
@@ -5896,6 +5903,9 @@ msgstr "Çalışma alanını sil"
 msgid "Delete workspace \"{workspaceName}\"?"
 msgstr "\"{workspaceName}\" çalışma alanı silinsin mi?"
 
+msgid "deleted"
+msgstr "silindi"
+
 msgid "Deleted"
 msgstr "Silindi"
 
@@ -6543,6 +6553,9 @@ msgstr "{name} ×{tier} kazanıldı"
 msgid "Edit"
 msgstr "Düzenle"
 
+msgid "Edit and restore files"
+msgstr "Düzenle ve dosyaları geri yükle"
+
 msgid "Edit comment"
 msgstr "Yorumu düzenle"
 
@@ -6551,6 +6564,9 @@ msgstr "Ortamı düzenle"
 
 msgid "Edit files without asking; ask before commands"
 msgstr "Dosyaları sormadan düzenle; komutlardan önce sor"
+
+msgid "Edit message"
+msgstr "Mesajı düzenle"
 
 msgid "Edit name"
 msgstr "Adı düzenle"
@@ -6569,6 +6585,9 @@ msgstr "Betiği düzenle"
 
 msgid "Edit your comment…"
 msgstr "Yorumunu düzenle…"
+
+msgid "Edit, keep files"
+msgstr "Düzenle, dosyaları koru"
 
 msgid "Edited"
 msgstr "Düzenlendi"
@@ -7555,11 +7574,11 @@ msgstr "Dosyalar"
 msgid "Files & Editor"
 msgstr "Dosyalar ve Düzenleyici"
 
-msgid "Files can't be rewound here because this folder is not a git repository. Only the chat goes back."
-msgstr "Bu klasör bir git deposu olmadığı için dosyalar burada geri sarılamaz. Yalnızca sohbet geri gider."
-
 msgid "Files changed"
 msgstr "Değişen dosyalar"
+
+msgid "Files restored to before that message"
+msgstr "Dosyalar o mesajdan önceki haline geri yüklendi"
 
 msgid "files to exclude (glob)"
 msgstr "hariç tutulacak dosyalar (glob)"
@@ -8097,9 +8116,6 @@ msgstr "Geri git"
 
 msgid "Go back home"
 msgstr "Ana sayfaya dön"
-
-msgid "Go back to an earlier message and restore the files"
-msgstr "Önceki bir mesaja dönün ve dosyaları geri yükleyin"
 
 msgid "Go back to the previous page in history"
 msgstr "Geçmişte önceki sayfaya dön"
@@ -9345,6 +9361,9 @@ msgstr "Gecikme"
 msgid "Later"
 msgstr "Daha sonra"
 
+msgid "Later messages and their file changes are removed."
+msgstr "Sonraki mesajlar ve bunların dosya değişiklikleri kaldırılacak."
+
 msgid "Latest"
 msgstr "En son"
 
@@ -10482,6 +10501,9 @@ msgstr "Hiç"
 
 msgid "Never asks before acting"
 msgstr "Hiç sormadan çalışır"
+
+msgid "new"
+msgstr "yeni"
 
 msgid "New"
 msgstr "Yeni"
@@ -12556,9 +12578,6 @@ msgstr "Bir klasör seçin…"
 msgid "Pick a low-risk papercut, fix it, and explain how it was verified."
 msgstr "Düşük riskli küçük bir sorun seç, düzelt ve nasıl doğrulandığını anlat."
 
-msgid "Pick a message. The chat goes back to just before it, and the message returns to the composer."
-msgstr "Bir mesaj seçin. Sohbet o mesajın hemen öncesine döner ve mesaj yazma alanına geri gelir."
-
 msgid "Pick a model"
 msgstr "Bir model seçin"
 
@@ -14147,6 +14166,9 @@ msgstr "\"{workspaceName}\" geri yüklendi"
 msgid "Restoring \"{workspaceName}\"…"
 msgstr "\"{workspaceName}\" geri yükleniyor…"
 
+msgid "Restoring puts them back as they were before this message, including changes you made yourself. A snapshot of the current files is kept first."
+msgstr "Geri yükleme, kendi yaptığınız değişiklikler dahil, onları bu mesajdan önceki haline döndürür. Önce mevcut dosyaların anlık görüntüsü saklanır."
+
 msgid "Restoring your session"
 msgstr "Oturumunuz geri yükleniyor"
 
@@ -14313,21 +14335,6 @@ msgstr "API anahtarını iptal et"
 
 msgid "Revoke key"
 msgstr "Anahtarı iptal et"
-
-msgid "Rewind"
-msgstr "Geri sar"
-
-msgid "Rewind chat"
-msgstr "Sohbeti geri sar"
-
-msgid "Rewind chat and files"
-msgstr "Sohbeti ve dosyaları geri sar"
-
-msgid "Rewind chat only"
-msgstr "Yalnızca sohbeti geri sar"
-
-msgid "Rewind to this message?"
-msgstr "Bu mesaja geri sarılsın mı?"
 
 msgid "Rewrote it and published version 2."
 msgstr "Yeniden yazdım ve sürüm 2'yi yayınladım."
@@ -16254,8 +16261,8 @@ msgstr "Başka bir cihazdan silmek için Superset'i burada durdurun."
 msgid "Stop the agent and send this now"
 msgstr "Ajanı durdur ve şimdi gönder"
 
-msgid "Stop the agent before you rewind"
-msgstr "Geri sarmadan önce ajanı durdurun"
+msgid "Stop the agent before you edit a message"
+msgstr "Bir mesajı düzenlemeden önce ajanı durdurun"
 
 msgid "Stop watching"
 msgstr "İzlemeyi durdur"
@@ -17318,9 +17325,6 @@ msgstr "Bir bulut çalışma alanının açıldığı başlangıç noktası — 
 msgid "The Superset desktop app is available for macOS and Linux."
 msgstr "Superset masaüstü uygulaması macOS ve Linux için kullanılabilir."
 
-msgid "The Superset host on this machine is out of date, so only the chat goes back and the agent is told the earlier conversation as text."
-msgstr "Bu makinedeki Superset ana makine hizmeti güncel değil; bu yüzden yalnızca sohbet geri gider ve önceki konuşma ajana metin olarak iletilir."
-
 msgid "The Superset host service for {organization} stopped unexpectedly ({cause}) and could not be restarted automatically."
 msgstr "{organization} için Superset host hizmeti beklenmedik şekilde durdu ({cause}) ve otomatik olarak yeniden başlatılamadı."
 
@@ -17378,11 +17382,8 @@ msgstr "Temalar"
 msgid "Themes and agents"
 msgstr "Temalar ve ajanlar"
 
-msgid "There are no messages to rewind to yet."
-msgstr "Henüz geri sarılacak mesaj yok."
-
-msgid "There is no file snapshot for that message, so nothing was rewound. Choose Rewind chat only to rewind just the conversation."
-msgstr "Bu mesaj için dosya anlık görüntüsü yok, bu yüzden hiçbir şey geri sarılmadı. Yalnızca konuşmayı geri sarmak için \"Yalnızca sohbeti geri sar\" seçeneğini seçin."
+msgid "There was no file snapshot for that message, so the files were left as they are."
+msgstr "O mesaj için dosya anlık görüntüsü yoktu, bu yüzden dosyalar olduğu gibi bırakıldı."
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "Bu komutlar bir çalışma alanı oluşturulduğunda otomatik olarak çalışır. <0>Belgelerimizi okuyun<1/></0>"
@@ -17413,9 +17414,6 @@ msgstr "Bu {plugin} hesabı zaten başka bir Superset kuruluşuna bağlı."
 
 msgid "This action is irreversible."
 msgstr "Bu işlem geri alınamaz."
-
-msgid "This agent"
-msgstr "Bu ajan"
 
 msgid "This agent can't be opened as a chat."
 msgstr "Bu aracı sohbet olarak açamazsınız."
@@ -17520,9 +17518,6 @@ msgstr "Bu GitHub kurulumu zaten başka bir Superset kuruluşuna bağlı. Oradak
 msgid "This host"
 msgstr "Bu host"
 
-msgid "This host can't restore files, so nothing was rewound. Choose Rewind chat only to rewind just the conversation."
-msgstr "Bu ana makine dosyaları geri yükleyemiyor, bu yüzden hiçbir şey geri sarılmadı. Yalnızca konuşmayı geri sarmak için \"Yalnızca sohbeti geri sar\" seçeneğini seçin."
-
 msgid "This host has not reported a version yet."
 msgstr "Bu ana makine henüz bir sürüm bildirmedi."
 
@@ -17564,12 +17559,6 @@ msgstr "Bu Mac"
 
 msgid "This machine"
 msgstr "Bu bilgisayar"
-
-msgid "This message and everything after it leave the chat, and the message goes back to the composer. Files stay as they are."
-msgstr "Bu mesaj ve sonrasındaki her şey sohbetten çıkar, mesaj yazma alanına geri gelir. Dosyalar olduğu gibi kalır."
-
-msgid "This message and everything after it leave the chat, and the message goes back to the composer. Rewinding the files also undoes changes made since then. A snapshot of the current files is kept first."
-msgstr "Bu mesaj ve sonrasındaki her şey sohbetten çıkar, mesaj yazma alanına geri gelir. Dosyaları da geri sarmak, o zamandan beri yapılan değişiklikleri geri alır. Önce mevcut dosyaların anlık görüntüsü kaydedilir."
 
 msgid "This Microsoft tenant is already connected by {detail}. Ask them to disconnect first."
 msgstr "Bu Microsoft kiracısı {detail} tarafından zaten bağlanmış. Önce bağlantıyı kesmesini isteyin."

@@ -145,6 +145,10 @@ msgstr "{0, plural, one {# falhou} other {# falharam}}"
 msgid "{0, plural, one {# failing} other {# failing}}"
 msgstr "{0, plural, one {# falhando} other {# falhando}}"
 
+#. placeholder {0}: changes.changes.length
+msgid "{0, plural, one {# file changed since this message} other {# files changed since this message}}"
+msgstr "{0, plural, one {# arquivo alterado desde esta mensagem} other {# arquivos alterados desde esta mensagem}}"
+
 #. placeholder {0}: detail.pullRequest.changedFiles
 msgid "{0, plural, one {# file changed} other {# files changed}}"
 msgstr "{0, plural, one {# arquivo alterado} other {# arquivos alterados}}"
@@ -958,9 +962,6 @@ msgstr "Suas automações com falha na última execução: {myFailedCount}"
 
 msgid "{name} accounts"
 msgstr "Contas do {name}"
-
-msgid "{name} can't rewind its own history, so it is told the earlier conversation as text, without the details of its tool calls."
-msgstr "{name} não consegue retroceder o próprio histórico, então a conversa anterior é passada a ele como texto, sem os detalhes das chamadas de ferramentas."
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
@@ -2255,6 +2256,9 @@ msgstr "Ocorreu um erro desconhecido"
 
 msgid "An update is ready to install."
 msgstr "Há uma atualização pronta para instalar."
+
+msgid "and {hidden} more"
+msgstr "e mais {hidden}"
 
 msgid "Android is on the way. Be first to know when it ships."
 msgstr "O Android está a caminho. Seja o primeiro a saber quando for lançado."
@@ -5065,6 +5069,9 @@ msgstr "Não foi possível ramificar para um novo worktree"
 msgid "Couldn't branch the conversation"
 msgstr "Não foi possível ramificar a conversa"
 
+msgid "Couldn't check the files"
+msgstr "Não foi possível verificar os arquivos"
+
 msgid "Couldn't check what removing this member affects"
 msgstr "Não foi possível verificar o que a remoção deste membro afeta"
 
@@ -5100,6 +5107,9 @@ msgstr "Não foi possível descartar as alterações no stage"
 
 msgid "Couldn't discard unstaged changes"
 msgstr "Não foi possível descartar as alterações fora do stage"
+
+msgid "Couldn't edit the message"
+msgstr "Não foi possível editar a mensagem"
 
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Não foi possível terminar a exclusão das áreas de trabalho"
@@ -5210,9 +5220,6 @@ msgstr "Não foi possível restaurar \"{workspaceName}\""
 
 msgid "Couldn't restore the files"
 msgstr "Não foi possível restaurar os arquivos"
-
-msgid "Couldn't rewind the chat"
-msgstr "Não foi possível retroceder o chat"
 
 msgid "Couldn't save"
 msgstr "Não foi possível salvar"
@@ -5896,6 +5903,9 @@ msgstr "Excluir área de trabalho"
 msgid "Delete workspace \"{workspaceName}\"?"
 msgstr "Excluir a área de trabalho \"{workspaceName}\"?"
 
+msgid "deleted"
+msgstr "excluído"
+
 msgid "Deleted"
 msgstr "Excluídas"
 
@@ -6543,6 +6553,9 @@ msgstr "{name} ×{tier} conquistado"
 msgid "Edit"
 msgstr "Editar"
 
+msgid "Edit and restore files"
+msgstr "Editar e restaurar arquivos"
+
 msgid "Edit comment"
 msgstr "Editar comentário"
 
@@ -6551,6 +6564,9 @@ msgstr "Editar ambiente"
 
 msgid "Edit files without asking; ask before commands"
 msgstr "Editar arquivos sem perguntar; perguntar antes de comandos"
+
+msgid "Edit message"
+msgstr "Editar mensagem"
 
 msgid "Edit name"
 msgstr "Editar nome"
@@ -6569,6 +6585,9 @@ msgstr "Editar script"
 
 msgid "Edit your comment…"
 msgstr "Edite seu comentário…"
+
+msgid "Edit, keep files"
+msgstr "Editar e manter arquivos"
 
 msgid "Edited"
 msgstr "Editado"
@@ -7555,11 +7574,11 @@ msgstr "Arquivos"
 msgid "Files & Editor"
 msgstr "Arquivos e editor"
 
-msgid "Files can't be rewound here because this folder is not a git repository. Only the chat goes back."
-msgstr "Não é possível retroceder os arquivos aqui porque esta pasta não é um repositório git. Só o chat volta."
-
 msgid "Files changed"
 msgstr "Arquivos alterados"
+
+msgid "Files restored to before that message"
+msgstr "Arquivos restaurados para antes dessa mensagem"
 
 msgid "files to exclude (glob)"
 msgstr "arquivos a excluir (glob)"
@@ -8097,9 +8116,6 @@ msgstr "Voltar"
 
 msgid "Go back home"
 msgstr "Voltar ao início"
-
-msgid "Go back to an earlier message and restore the files"
-msgstr "Voltar a uma mensagem anterior e restaurar os arquivos"
 
 msgid "Go back to the previous page in history"
 msgstr "Voltar para a página anterior do histórico"
@@ -9345,6 +9361,9 @@ msgstr "Latência"
 msgid "Later"
 msgstr "Mais tarde"
 
+msgid "Later messages and their file changes are removed."
+msgstr "As mensagens posteriores e suas alterações de arquivos serão removidas."
+
 msgid "Latest"
 msgstr "Mais recente"
 
@@ -10482,6 +10501,9 @@ msgstr "Nunca"
 
 msgid "Never asks before acting"
 msgstr "Nunca pergunta antes de agir"
+
+msgid "new"
+msgstr "novo"
 
 msgid "New"
 msgstr "Novo"
@@ -12556,9 +12578,6 @@ msgstr "Escolha uma pasta…"
 msgid "Pick a low-risk papercut, fix it, and explain how it was verified."
 msgstr "Escolha um incômodo de baixo risco, corrija e explique como verificou."
 
-msgid "Pick a message. The chat goes back to just before it, and the message returns to the composer."
-msgstr "Escolha uma mensagem. O chat volta para logo antes dela, e a mensagem volta para a caixa de texto."
-
 msgid "Pick a model"
 msgstr "Escolha um modelo"
 
@@ -14147,6 +14166,9 @@ msgstr "\"{workspaceName}\" restaurado"
 msgid "Restoring \"{workspaceName}\"…"
 msgstr "Restaurando \"{workspaceName}\"…"
 
+msgid "Restoring puts them back as they were before this message, including changes you made yourself. A snapshot of the current files is kept first."
+msgstr "Restaurar os deixa como estavam antes desta mensagem, incluindo alterações feitas por você. Um snapshot dos arquivos atuais é salvo antes."
+
 msgid "Restoring your session"
 msgstr "Restaurando sua sessão"
 
@@ -14313,21 +14335,6 @@ msgstr "Revogar chave de API"
 
 msgid "Revoke key"
 msgstr "Revogar chave"
-
-msgid "Rewind"
-msgstr "Retroceder"
-
-msgid "Rewind chat"
-msgstr "Retroceder chat"
-
-msgid "Rewind chat and files"
-msgstr "Retroceder chat e arquivos"
-
-msgid "Rewind chat only"
-msgstr "Retroceder só o chat"
-
-msgid "Rewind to this message?"
-msgstr "Retroceder até esta mensagem?"
 
 msgid "Rewrote it and published version 2."
 msgstr "Reescrevi e publiquei a versão 2."
@@ -16254,8 +16261,8 @@ msgstr "Feche o Superset aqui para excluir a partir de outro dispositivo."
 msgid "Stop the agent and send this now"
 msgstr "Parar o agente e enviar agora"
 
-msgid "Stop the agent before you rewind"
-msgstr "Pare o agente antes de retroceder"
+msgid "Stop the agent before you edit a message"
+msgstr "Pare o agente antes de editar uma mensagem"
 
 msgid "Stop watching"
 msgstr "Parar de observar"
@@ -17318,9 +17325,6 @@ msgstr "O ponto de partida a partir do qual uma área de trabalho na nuvem inici
 msgid "The Superset desktop app is available for macOS and Linux."
 msgstr "O app desktop do Superset está disponível para macOS e Linux."
 
-msgid "The Superset host on this machine is out of date, so only the chat goes back and the agent is told the earlier conversation as text."
-msgstr "O host do Superset nesta máquina está desatualizado, então só o chat volta e a conversa anterior é passada ao agente como texto."
-
 msgid "The Superset host service for {organization} stopped unexpectedly ({cause}) and could not be restarted automatically."
 msgstr "O serviço do host do Superset de {organization} parou inesperadamente ({cause}) e não pôde ser reiniciado automaticamente."
 
@@ -17378,11 +17382,8 @@ msgstr "Temas"
 msgid "Themes and agents"
 msgstr "Temas e agentes"
 
-msgid "There are no messages to rewind to yet."
-msgstr "Ainda não há mensagens para retroceder."
-
-msgid "There is no file snapshot for that message, so nothing was rewound. Choose Rewind chat only to rewind just the conversation."
-msgstr "Não há snapshot dos arquivos para essa mensagem, então nada foi retrocedido. Escolha \"Retroceder só o chat\" para retroceder apenas a conversa."
+msgid "There was no file snapshot for that message, so the files were left as they are."
+msgstr "Não havia um snapshot de arquivos para essa mensagem, então os arquivos foram mantidos como estavam."
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "Esses comandos rodam automaticamente quando uma área de trabalho é criada. <0>Leia a documentação<1/></0>"
@@ -17413,9 +17414,6 @@ msgstr "Esta conta do {plugin} já está conectada por outra organização do Su
 
 msgid "This action is irreversible."
 msgstr "Não dá para desfazer."
-
-msgid "This agent"
-msgstr "Este agente"
 
 msgid "This agent can't be opened as a chat."
 msgstr "Este agente não pode ser aberto como chat."
@@ -17520,9 +17518,6 @@ msgstr "Esta instalação do GitHub já está conectada a outra organização do
 msgid "This host"
 msgstr "Este host"
 
-msgid "This host can't restore files, so nothing was rewound. Choose Rewind chat only to rewind just the conversation."
-msgstr "Este host não consegue restaurar arquivos, então nada foi retrocedido. Escolha \"Retroceder só o chat\" para retroceder apenas a conversa."
-
 msgid "This host has not reported a version yet."
 msgstr "Este host ainda não informou uma versão."
 
@@ -17564,12 +17559,6 @@ msgstr "Este Mac"
 
 msgid "This machine"
 msgstr "Esta máquina"
-
-msgid "This message and everything after it leave the chat, and the message goes back to the composer. Files stay as they are."
-msgstr "Esta mensagem e tudo o que vem depois saem do chat, e a mensagem volta para a caixa de texto. Os arquivos ficam como estão."
-
-msgid "This message and everything after it leave the chat, and the message goes back to the composer. Rewinding the files also undoes changes made since then. A snapshot of the current files is kept first."
-msgstr "Esta mensagem e tudo o que vem depois saem do chat, e a mensagem volta para a caixa de texto. Retroceder os arquivos também desfaz as alterações feitas desde então. Antes, um snapshot dos arquivos atuais é salvo."
 
 msgid "This Microsoft tenant is already connected by {detail}. Ask them to disconnect first."
 msgstr "Este tenant da Microsoft já está conectado por {detail}. Peça para essa pessoa desconectar primeiro."

@@ -30,7 +30,7 @@ import {
 	type OpenLink,
 	type OpenPage,
 } from "../../providers/ChatPaneActionsProvider";
-import type { ChatForkTarget, ChatRewindRequest } from "../../types";
+import type { ChatEditRequest, ChatForkTarget } from "../../types";
 import { buildChatHandoffTranscript } from "../../utils/chatHandoffTranscript";
 import { heldPromptQueue } from "../../utils/heldPromptQueue";
 import { promptHistory } from "../../utils/promptHistory";
@@ -74,9 +74,8 @@ export function SessionView({
 	preferredModelLabel,
 	onPendingPromptsSent,
 	onFork,
-	onRewind,
+	onEditMessage,
 	onUserPrompt,
-	rewindNotes,
 	onSessionState,
 	openFile,
 	openPage,
@@ -108,11 +107,9 @@ export function SessionView({
 	 */
 	onFork?: ((target: ChatForkTarget, transcript: string) => void) | undefined;
 	canForkToWorktree?: boolean;
-	onRewind?: (request: ChatRewindRequest) => void;
+	onEditMessage?: (request: ChatEditRequest) => void;
 	/** Called when the user sends a message, as opposed to anything sent for them. */
 	onUserPrompt?: () => void;
-	/** Shown in the rewind picker when this agent or host cannot rewind fully. */
-	rewindNotes?: string[];
 	/** Names the speaker in a handed-over transcript. */
 	agentLabel?: string;
 	/** The transcript goes with the switch: the next agent cannot load this session. */
@@ -305,29 +302,34 @@ export function SessionView({
 		(previous, next) =>
 			previous.itemId === next.itemId && previous.text === next.text,
 	);
-	const rewind = useMemo(
+	const editableMessageIds = useMemo(
+		() => new Set(points.map((point) => point.itemId)),
+		[points],
+	);
+	const editable = onEditMessage !== undefined && held === undefined;
+	const editMessage = useMemo(
 		() =>
-			onRewind && {
-				points,
-				notes: rewindNotes ?? [],
-				onPick: (point: { itemId: string; text: string }) => {
-					if (runningTurnId) {
-						toast.error(t({ message: "Stop the agent before you rewind" }));
-						return;
+			editable && onEditMessage
+				? (itemId: string, text: string) => {
+						if (runningTurnId) {
+							toast.error(
+								t({ message: "Stop the agent before you edit a message" }),
+							);
+							return;
+						}
+						onEditMessage({
+							itemId,
+							messageText: text,
+							transcript: rewindTranscript(
+								timelineRef.current,
+								itemId,
+								snapshotRef.current,
+								agentLabel ?? "Agent",
+							),
+						});
 					}
-					onRewind({
-						itemId: point.itemId,
-						messageText: point.text,
-						transcript: rewindTranscript(
-							timelineRef.current,
-							point.itemId,
-							snapshotRef.current,
-							agentLabel ?? "Agent",
-						),
-					});
-				},
-			},
-		[onRewind, rewindNotes, points, runningTurnId, agentLabel, t],
+				: undefined,
+		[editable, onEditMessage, runningTurnId, agentLabel, t],
 	);
 	const holdPrompt = held?.onQueue;
 	const onSend = useCallback(
@@ -392,6 +394,8 @@ export function SessionView({
 	// sizes to its content and leaves the right of the pane empty.
 	return (
 		<ChatPaneActionsProvider
+			editMessage={editMessage}
+			editableMessageIds={editableMessageIds}
 			openFile={openFile}
 			openPage={openPage}
 			openLink={openLink}
@@ -468,7 +472,6 @@ export function SessionView({
 					onCancelTurn={onCancelTurn}
 					onSend={onSend}
 					promptQueue={heldQueue ?? (held ? undefined : promptQueue)}
-					rewind={held ? undefined : rewind}
 					workspaceId={workspaceId}
 				/>
 			</ComposerDropZone>

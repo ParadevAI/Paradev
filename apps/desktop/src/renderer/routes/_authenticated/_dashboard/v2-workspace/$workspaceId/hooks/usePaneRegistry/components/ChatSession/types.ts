@@ -5,8 +5,8 @@
  */
 export type ChatForkTarget = "workspace" | "worktree";
 
-/** A rewind picked in the chat: the message to go back before, and the conversation up to it. */
-export type ChatRewindRequest = {
+/** An edited message: the message it replaces, its new text, and the conversation before it. */
+export type ChatEditRequest = {
 	itemId: string;
 	messageText: string;
 	transcript: string;

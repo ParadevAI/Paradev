@@ -74,4 +74,35 @@ describe("createGitCheckpoints", () => {
 			"edited before prompt\n",
 		);
 	});
+
+	test("lists what a restore would undo without changing the tree or the chain", async () => {
+		const checkpoints = createGitCheckpoints();
+		const target = { cwd: repo, sessionId: "session-1", itemId: "item-1" };
+		await writeFile(join(repo, "doomed.txt"), "before prompt\n");
+		await checkpoints.capture(target);
+		expect(await checkpoints.changes?.(target)).toEqual([]);
+
+		await writeFile(join(repo, "tracked.txt"), "agent edit\n");
+		await writeFile(join(repo, "created.txt"), "agent created\n");
+		await writeFile(join(repo, "ignored.txt"), "agent ignored\n");
+		rmSync(join(repo, "doomed.txt"));
+		const chain = await git.raw(["rev-parse", checkpointRef("session-1")]);
+
+		const changes = await checkpoints.changes?.(target);
+		expect(changes?.sort((a, b) => a.path.localeCompare(b.path))).toEqual([
+			{ path: "created.txt", change: "added" },
+			{ path: "doomed.txt", change: "deleted" },
+			{ path: "tracked.txt", change: "modified" },
+		]);
+		expect(await readFile(join(repo, "tracked.txt"), "utf8")).toBe(
+			"agent edit\n",
+		);
+		expect(await git.raw(["rev-parse", checkpointRef("session-1")])).toBe(
+			chain,
+		);
+		expect((await git.status()).staged).toEqual([]);
+		expect(
+			await checkpoints.changes?.({ ...target, itemId: "unknown" }),
+		).toBeNull();
+	});
 });

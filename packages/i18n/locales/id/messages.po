@@ -145,6 +145,10 @@ msgstr "{0, plural, one {# gagal} other {# gagal}}"
 msgid "{0, plural, one {# failing} other {# failing}}"
 msgstr "{0, plural, one {# gagal} other {# gagal}}"
 
+#. placeholder {0}: changes.changes.length
+msgid "{0, plural, one {# file changed since this message} other {# files changed since this message}}"
+msgstr "{0, plural, other {# file berubah sejak pesan ini}}"
+
 #. placeholder {0}: detail.pullRequest.changedFiles
 msgid "{0, plural, one {# file changed} other {# files changed}}"
 msgstr "{0, plural, one {# file berubah} other {# file berubah}}"
@@ -958,9 +962,6 @@ msgstr "{myFailedCount} otomatisasi Anda gagal pada run terakhirnya"
 
 msgid "{name} accounts"
 msgstr "Akun {name}"
-
-msgid "{name} can't rewind its own history, so it is told the earlier conversation as text, without the details of its tool calls."
-msgstr "{name} tidak dapat memutar balik riwayatnya sendiri, jadi percakapan sebelumnya disampaikan sebagai teks, tanpa detail panggilan alatnya."
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
@@ -2255,6 +2256,9 @@ msgstr "Terjadi kesalahan yang tidak diketahui"
 
 msgid "An update is ready to install."
 msgstr "Pembaruan siap dipasang."
+
+msgid "and {hidden} more"
+msgstr "dan {hidden} lainnya"
 
 msgid "Android is on the way. Be first to know when it ships."
 msgstr "Android sedang dalam perjalanan. Jadilah yang pertama tahu saat dirilis."
@@ -5065,6 +5069,9 @@ msgstr "Tidak dapat mencabangkan ke worktree baru"
 msgid "Couldn't branch the conversation"
 msgstr "Tidak dapat mencabangkan percakapan"
 
+msgid "Couldn't check the files"
+msgstr "Tidak dapat memeriksa file"
+
 msgid "Couldn't check what removing this member affects"
 msgstr "Tidak dapat memeriksa apa yang terdampak jika anggota ini dihapus"
 
@@ -5100,6 +5107,9 @@ msgstr "Tidak bisa membuang perubahan yang di-stage"
 
 msgid "Couldn't discard unstaged changes"
 msgstr "Tidak bisa membuang perubahan yang belum di-stage"
+
+msgid "Couldn't edit the message"
+msgstr "Tidak dapat mengedit pesan"
 
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Tidak bisa menyelesaikan penghapusan workspace"
@@ -5210,9 +5220,6 @@ msgstr "Tidak dapat memulihkan \"{workspaceName}\""
 
 msgid "Couldn't restore the files"
 msgstr "Tidak dapat memulihkan file"
-
-msgid "Couldn't rewind the chat"
-msgstr "Tidak dapat memutar balik chat"
 
 msgid "Couldn't save"
 msgstr "Tidak bisa menyimpan"
@@ -5896,6 +5903,9 @@ msgstr "Hapus workspace"
 msgid "Delete workspace \"{workspaceName}\"?"
 msgstr "Hapus workspace \"{workspaceName}\"?"
 
+msgid "deleted"
+msgstr "dihapus"
+
 msgid "Deleted"
 msgstr "Dihapus"
 
@@ -6543,6 +6553,9 @@ msgstr "{name} ×{tier} diraih"
 msgid "Edit"
 msgstr "Edit"
 
+msgid "Edit and restore files"
+msgstr "Edit dan pulihkan file"
+
 msgid "Edit comment"
 msgstr "Edit komentar"
 
@@ -6551,6 +6564,9 @@ msgstr "Edit environment"
 
 msgid "Edit files without asking; ask before commands"
 msgstr "Edit file tanpa bertanya; tanya sebelum perintah"
+
+msgid "Edit message"
+msgstr "Edit pesan"
 
 msgid "Edit name"
 msgstr "Edit nama"
@@ -6569,6 +6585,9 @@ msgstr "Edit skrip"
 
 msgid "Edit your comment…"
 msgstr "Edit komentar Anda…"
+
+msgid "Edit, keep files"
+msgstr "Edit, simpan file"
 
 msgid "Edited"
 msgstr "Diedit"
@@ -7555,11 +7574,11 @@ msgstr "File"
 msgid "Files & Editor"
 msgstr "File & Editor"
 
-msgid "Files can't be rewound here because this folder is not a git repository. Only the chat goes back."
-msgstr "File tidak dapat diputar balik di sini karena folder ini bukan repositori git. Hanya chat yang kembali."
-
 msgid "Files changed"
 msgstr "File yang berubah"
+
+msgid "Files restored to before that message"
+msgstr "File dipulihkan ke sebelum pesan itu"
 
 msgid "files to exclude (glob)"
 msgstr "file yang dikecualikan (glob)"
@@ -8097,9 +8116,6 @@ msgstr "Kembali"
 
 msgid "Go back home"
 msgstr "Kembali ke beranda"
-
-msgid "Go back to an earlier message and restore the files"
-msgstr "Kembali ke pesan sebelumnya dan pulihkan file"
 
 msgid "Go back to the previous page in history"
 msgstr "Kembali ke halaman sebelumnya di riwayat"
@@ -9345,6 +9361,9 @@ msgstr "Latensi"
 msgid "Later"
 msgstr "Nanti"
 
+msgid "Later messages and their file changes are removed."
+msgstr "Pesan berikutnya dan perubahan filenya akan dihapus."
+
 msgid "Latest"
 msgstr "Terbaru"
 
@@ -10482,6 +10501,9 @@ msgstr "Tidak pernah"
 
 msgid "Never asks before acting"
 msgstr "Tidak pernah bertanya dulu"
+
+msgid "new"
+msgstr "baru"
 
 msgid "New"
 msgstr "Baru"
@@ -12556,9 +12578,6 @@ msgstr "Pilih folder…"
 msgid "Pick a low-risk papercut, fix it, and explain how it was verified."
 msgstr "Pilih satu gangguan kecil berisiko rendah, perbaiki, dan jelaskan cara verifikasinya."
 
-msgid "Pick a message. The chat goes back to just before it, and the message returns to the composer."
-msgstr "Pilih pesan. Chat kembali ke tepat sebelum pesan itu, dan pesan kembali ke kolom tulis."
-
 msgid "Pick a model"
 msgstr "Pilih sebuah model"
 
@@ -14147,6 +14166,9 @@ msgstr "\"{workspaceName}\" dipulihkan"
 msgid "Restoring \"{workspaceName}\"…"
 msgstr "Memulihkan \"{workspaceName}\"…"
 
+msgid "Restoring puts them back as they were before this message, including changes you made yourself. A snapshot of the current files is kept first."
+msgstr "Memulihkan akan mengembalikannya seperti sebelum pesan ini, termasuk perubahan yang Anda buat sendiri. Snapshot file saat ini disimpan terlebih dahulu."
+
 msgid "Restoring your session"
 msgstr "Memulihkan sesi Anda"
 
@@ -14313,21 +14335,6 @@ msgstr "Cabut kunci API"
 
 msgid "Revoke key"
 msgstr "Cabut kunci"
-
-msgid "Rewind"
-msgstr "Putar balik"
-
-msgid "Rewind chat"
-msgstr "Putar balik chat"
-
-msgid "Rewind chat and files"
-msgstr "Putar balik chat dan file"
-
-msgid "Rewind chat only"
-msgstr "Putar balik chat saja"
-
-msgid "Rewind to this message?"
-msgstr "Putar balik ke pesan ini?"
 
 msgid "Rewrote it and published version 2."
 msgstr "Sudah ditulis ulang dan versi 2 diterbitkan."
@@ -16254,8 +16261,8 @@ msgstr "Hentikan Superset di sini untuk menghapus dari perangkat lain."
 msgid "Stop the agent and send this now"
 msgstr "Hentikan agen dan kirim sekarang"
 
-msgid "Stop the agent before you rewind"
-msgstr "Hentikan agen sebelum memutar balik"
+msgid "Stop the agent before you edit a message"
+msgstr "Hentikan agen sebelum mengedit pesan"
 
 msgid "Stop watching"
 msgstr "Berhenti memantau"
@@ -17318,9 +17325,6 @@ msgstr "Titik awal booting sebuah workspace cloud — sebuah image dasar, atau s
 msgid "The Superset desktop app is available for macOS and Linux."
 msgstr "Aplikasi desktop Superset tersedia untuk macOS dan Linux."
 
-msgid "The Superset host on this machine is out of date, so only the chat goes back and the agent is told the earlier conversation as text."
-msgstr "Host Superset di mesin ini sudah usang, jadi hanya chat yang kembali dan percakapan sebelumnya disampaikan ke agen sebagai teks."
-
 msgid "The Superset host service for {organization} stopped unexpectedly ({cause}) and could not be restarted automatically."
 msgstr "Layanan host Superset untuk {organization} berhenti tak terduga ({cause}) dan tidak bisa dimulai ulang otomatis."
 
@@ -17378,11 +17382,8 @@ msgstr "Tema"
 msgid "Themes and agents"
 msgstr "Tema dan agen"
 
-msgid "There are no messages to rewind to yet."
-msgstr "Belum ada pesan untuk diputar balik."
-
-msgid "There is no file snapshot for that message, so nothing was rewound. Choose Rewind chat only to rewind just the conversation."
-msgstr "Tidak ada snapshot file untuk pesan itu, jadi tidak ada yang diputar balik. Pilih \"Putar balik chat saja\" untuk memutar balik percakapannya saja."
+msgid "There was no file snapshot for that message, so the files were left as they are."
+msgstr "Tidak ada snapshot file untuk pesan itu, jadi file dibiarkan apa adanya."
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "Perintah ini berjalan otomatis saat workspace dibuat. <0>Baca dokumentasi kami<1/></0>"
@@ -17413,9 +17414,6 @@ msgstr "Akun {plugin} ini sudah dihubungkan oleh organisasi Superset lain."
 
 msgid "This action is irreversible."
 msgstr "Tindakan ini tidak bisa dibatalkan."
-
-msgid "This agent"
-msgstr "Agen ini"
 
 msgid "This agent can't be opened as a chat."
 msgstr "Agen ini tidak dapat dibuka sebagai chat."
@@ -17520,9 +17518,6 @@ msgstr "Instalasi GitHub ini sudah terhubung ke organisasi Superset lain. Putusk
 msgid "This host"
 msgstr "Host ini"
 
-msgid "This host can't restore files, so nothing was rewound. Choose Rewind chat only to rewind just the conversation."
-msgstr "Host ini tidak dapat memulihkan file, jadi tidak ada yang diputar balik. Pilih \"Putar balik chat saja\" untuk memutar balik percakapannya saja."
-
 msgid "This host has not reported a version yet."
 msgstr "Host ini belum melaporkan versi."
 
@@ -17564,12 +17559,6 @@ msgstr "Mac ini"
 
 msgid "This machine"
 msgstr "Mesin ini"
-
-msgid "This message and everything after it leave the chat, and the message goes back to the composer. Files stay as they are."
-msgstr "Pesan ini dan semua setelahnya keluar dari chat, dan pesan kembali ke kolom tulis. File tetap seperti apa adanya."
-
-msgid "This message and everything after it leave the chat, and the message goes back to the composer. Rewinding the files also undoes changes made since then. A snapshot of the current files is kept first."
-msgstr "Pesan ini dan semua setelahnya keluar dari chat, dan pesan kembali ke kolom tulis. Memutar balik file juga membatalkan perubahan sejak saat itu. Snapshot file saat ini disimpan lebih dulu."
 
 msgid "This Microsoft tenant is already connected by {detail}. Ask them to disconnect first."
 msgstr "Tenant Microsoft ini sudah terhubung oleh {detail}. Minta mereka memutuskannya dulu."

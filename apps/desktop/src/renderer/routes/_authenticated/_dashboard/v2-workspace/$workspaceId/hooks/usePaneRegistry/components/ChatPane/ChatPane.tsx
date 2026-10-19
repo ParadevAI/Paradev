@@ -123,7 +123,7 @@ export function ChatPane({
 						],
 					})
 				}
-				onRewound={(handoffPrompt) => {
+				onRewound={(handoffPrompt, editedPrompt) => {
 					const { agent, chatModelId, chatModelLabel, chatModeId } =
 						latest.current;
 					ctx.actions.updateData({
@@ -133,15 +133,24 @@ export function ChatPane({
 						...(chatModelId ? { chatModelId } : {}),
 						...(chatModelLabel ? { chatModelLabel } : {}),
 						...(chatModeId ? { chatModeId } : {}),
-						...(handoffPrompt ? { pendingPrompt: handoffPrompt } : {}),
+						...(handoffPrompt
+							? {
+									pendingPrompt: handoffPrompt,
+									queuedPrompts: [[{ type: "text", text: editedPrompt }]],
+								}
+							: { pendingPrompt: editedPrompt }),
 					});
 				}}
 				onModeChange={(chatModeId) => {
 					if (data.agent) saveChatMode(data.agent.id, chatModeId);
 					ctx.actions.updateData({ ...data, chatModeId });
 				}}
-				onSessionCreated={(sessionId) =>
-					ctx.actions.updateData({ ...latest.current, sessionId })
+				onSessionCreated={(sessionId, pendingPrompt) =>
+					ctx.actions.updateData({
+						...latest.current,
+						sessionId,
+						...(pendingPrompt ? { pendingPrompt } : {}),
+					})
 				}
 				onOpenFile={onOpenFile}
 				onOpenPage={openPage}

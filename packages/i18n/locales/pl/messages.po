@@ -145,6 +145,10 @@ msgstr "{0, plural, one {# nieudany} few {# nieudane} many {# nieudanych} other 
 msgid "{0, plural, one {# failing} other {# failing}}"
 msgstr "{0, plural, one {# nieudana} few {# nieudane} many {# nieudanych} other {# nieudanego}}"
 
+#. placeholder {0}: changes.changes.length
+msgid "{0, plural, one {# file changed since this message} other {# files changed since this message}}"
+msgstr "{0, plural, one {# plik zmieniony od tej wiadomości} few {# pliki zmienione od tej wiadomości} many {# plików zmienionych od tej wiadomości} other {# pliku zmienionego od tej wiadomości}}"
+
 #. placeholder {0}: detail.pullRequest.changedFiles
 msgid "{0, plural, one {# file changed} other {# files changed}}"
 msgstr "{0, plural, one {# zmieniony plik} few {# zmienione pliki} many {# zmienionych plików} other {# zmienionego pliku}}"
@@ -958,9 +962,6 @@ msgstr "Twoje automatyzacje z nieudanym ostatnim uruchomieniem: {myFailedCount}"
 
 msgid "{name} accounts"
 msgstr "Konta {name}"
-
-msgid "{name} can't rewind its own history, so it is told the earlier conversation as text, without the details of its tool calls."
-msgstr "{name} nie może cofnąć własnej historii, więc wcześniejsza rozmowa jest mu przekazywana jako tekst, bez szczegółów wywołań narzędzi."
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
@@ -2255,6 +2256,9 @@ msgstr "Wystąpił nieznany błąd"
 
 msgid "An update is ready to install."
 msgstr "Aktualizacja jest gotowa do zainstalowania."
+
+msgid "and {hidden} more"
+msgstr "i {hidden} więcej"
 
 msgid "Android is on the way. Be first to know when it ships."
 msgstr "Android jest w drodze. Dowiedz się jako pierwszy, gdy się pojawi."
@@ -5065,6 +5069,9 @@ msgstr "Nie udało się rozgałęzić do nowego worktree"
 msgid "Couldn't branch the conversation"
 msgstr "Nie udało się rozgałęzić rozmowy"
 
+msgid "Couldn't check the files"
+msgstr "Nie udało się sprawdzić plików"
+
 msgid "Couldn't check what removing this member affects"
 msgstr "Nie udało się sprawdzić, na co wpłynie usunięcie tego członka"
 
@@ -5100,6 +5107,9 @@ msgstr "Nie udało się odrzucić zaindeksowanych zmian"
 
 msgid "Couldn't discard unstaged changes"
 msgstr "Nie udało się odrzucić niezaindeksowanych zmian"
+
+msgid "Couldn't edit the message"
+msgstr "Nie udało się edytować wiadomości"
 
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Nie udało się dokończyć usuwania obszarów roboczych"
@@ -5210,9 +5220,6 @@ msgstr "Nie udało się przywrócić „{workspaceName}”"
 
 msgid "Couldn't restore the files"
 msgstr "Nie udało się przywrócić plików"
-
-msgid "Couldn't rewind the chat"
-msgstr "Nie udało się cofnąć czatu"
 
 msgid "Couldn't save"
 msgstr "Nie udało się zapisać"
@@ -5896,6 +5903,9 @@ msgstr "Usuń obszar roboczy"
 msgid "Delete workspace \"{workspaceName}\"?"
 msgstr "Usunąć obszar roboczy „{workspaceName}”?"
 
+msgid "deleted"
+msgstr "usunięty"
+
 msgid "Deleted"
 msgstr "Usunięte"
 
@@ -6543,6 +6553,9 @@ msgstr "Zdobyto: {name} ×{tier}"
 msgid "Edit"
 msgstr "Edytuj"
 
+msgid "Edit and restore files"
+msgstr "Edytuj i przywróć pliki"
+
 msgid "Edit comment"
 msgstr "Edytuj komentarz"
 
@@ -6551,6 +6564,9 @@ msgstr "Edytuj środowisko"
 
 msgid "Edit files without asking; ask before commands"
 msgstr "Edytuj pliki bez pytania; pytaj przed poleceniami"
+
+msgid "Edit message"
+msgstr "Edytuj wiadomość"
 
 msgid "Edit name"
 msgstr "Edytuj nazwę"
@@ -6569,6 +6585,9 @@ msgstr "Edytuj skrypt"
 
 msgid "Edit your comment…"
 msgstr "Edytuj komentarz…"
+
+msgid "Edit, keep files"
+msgstr "Edytuj, zachowaj pliki"
 
 msgid "Edited"
 msgstr "Edytowano"
@@ -7555,11 +7574,11 @@ msgstr "Pliki"
 msgid "Files & Editor"
 msgstr "Pliki i edytor"
 
-msgid "Files can't be rewound here because this folder is not a git repository. Only the chat goes back."
-msgstr "Nie można tu cofnąć plików, ponieważ ten folder nie jest repozytorium git. Cofnięty zostanie tylko czat."
-
 msgid "Files changed"
 msgstr "Zmienione pliki"
+
+msgid "Files restored to before that message"
+msgstr "Przywrócono pliki do stanu sprzed tej wiadomości"
 
 msgid "files to exclude (glob)"
 msgstr "pliki do wykluczenia (glob)"
@@ -8097,9 +8116,6 @@ msgstr "Wstecz"
 
 msgid "Go back home"
 msgstr "Wróć na stronę główną"
-
-msgid "Go back to an earlier message and restore the files"
-msgstr "Wróć do wcześniejszej wiadomości i przywróć pliki"
 
 msgid "Go back to the previous page in history"
 msgstr "Wróć do poprzedniej strony w historii"
@@ -9345,6 +9361,9 @@ msgstr "Opóźnienie"
 msgid "Later"
 msgstr "Później"
 
+msgid "Later messages and their file changes are removed."
+msgstr "Późniejsze wiadomości i ich zmiany w plikach zostaną usunięte."
+
 msgid "Latest"
 msgstr "Najnowsza"
 
@@ -10482,6 +10501,9 @@ msgstr "Nigdy"
 
 msgid "Never asks before acting"
 msgstr "Nigdy nie pyta przed działaniem"
+
+msgid "new"
+msgstr "nowy"
 
 msgid "New"
 msgstr "Nowość"
@@ -12556,9 +12578,6 @@ msgstr "Wybierz folder…"
 msgid "Pick a low-risk papercut, fix it, and explain how it was verified."
 msgstr "Wybierz drobną, bezpieczną usterkę, napraw ją i wyjaśnij, jak to zweryfikowano."
 
-msgid "Pick a message. The chat goes back to just before it, and the message returns to the composer."
-msgstr "Wybierz wiadomość. Czat wróci do chwili tuż przed nią, a wiadomość wróci do pola tekstowego."
-
 msgid "Pick a model"
 msgstr "Wybierz model"
 
@@ -14147,6 +14166,9 @@ msgstr "Przywrócono „{workspaceName}”"
 msgid "Restoring \"{workspaceName}\"…"
 msgstr "Przywracanie „{workspaceName}”…"
 
+msgid "Restoring puts them back as they were before this message, including changes you made yourself. A snapshot of the current files is kept first."
+msgstr "Przywrócenie ustawi je tak jak przed tą wiadomością, łącznie ze zmianami wprowadzonymi przez Ciebie. Najpierw zapisywana jest migawka bieżących plików."
+
 msgid "Restoring your session"
 msgstr "Przywracanie sesji"
 
@@ -14313,21 +14335,6 @@ msgstr "Unieważnij klucz API"
 
 msgid "Revoke key"
 msgstr "Unieważnij klucz"
-
-msgid "Rewind"
-msgstr "Cofnij"
-
-msgid "Rewind chat"
-msgstr "Cofnij czat"
-
-msgid "Rewind chat and files"
-msgstr "Cofnij czat i pliki"
-
-msgid "Rewind chat only"
-msgstr "Cofnij tylko czat"
-
-msgid "Rewind to this message?"
-msgstr "Cofnąć do tej wiadomości?"
 
 msgid "Rewrote it and published version 2."
 msgstr "Przepisałem i opublikowałem wersję 2."
@@ -16254,8 +16261,8 @@ msgstr "Zatrzymaj tutaj Superset, aby usunąć hosta z innego urządzenia."
 msgid "Stop the agent and send this now"
 msgstr "Zatrzymaj agenta i wyślij teraz"
 
-msgid "Stop the agent before you rewind"
-msgstr "Zatrzymaj agenta przed cofnięciem"
+msgid "Stop the agent before you edit a message"
+msgstr "Zatrzymaj agenta przed edycją wiadomości"
 
 msgid "Stop watching"
 msgstr "Przestań obserwować"
@@ -17318,9 +17325,6 @@ msgstr "Punkt startowy, z którego uruchamia się obszar roboczy w chmurze — o
 msgid "The Superset desktop app is available for macOS and Linux."
 msgstr "Aplikacja desktopowa Superset jest dostępna dla macOS i Linux."
 
-msgid "The Superset host on this machine is out of date, so only the chat goes back and the agent is told the earlier conversation as text."
-msgstr "Host Superset na tym komputerze jest nieaktualny, więc cofnięty zostanie tylko czat, a wcześniejsza rozmowa zostanie przekazana agentowi jako tekst."
-
 msgid "The Superset host service for {organization} stopped unexpectedly ({cause}) and could not be restarted automatically."
 msgstr "Usługa hosta Superset dla {organization} zatrzymała się nieoczekiwanie ({cause}) i nie udało się jej automatycznie uruchomić ponownie."
 
@@ -17378,11 +17382,8 @@ msgstr "Motywy"
 msgid "Themes and agents"
 msgstr "Motywy i agenci"
 
-msgid "There are no messages to rewind to yet."
-msgstr "Nie ma jeszcze wiadomości, do których można wrócić."
-
-msgid "There is no file snapshot for that message, so nothing was rewound. Choose Rewind chat only to rewind just the conversation."
-msgstr "Dla tej wiadomości nie ma migawki plików, więc nic nie zostało cofnięte. Wybierz „Cofnij tylko czat”, aby cofnąć tylko rozmowę."
+msgid "There was no file snapshot for that message, so the files were left as they are."
+msgstr "Dla tej wiadomości nie było migawki plików, więc pliki pozostały bez zmian."
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "Te polecenia uruchamiają się automatycznie przy tworzeniu obszaru roboczego. <0>Przeczytaj dokumentację<1/></0>"
@@ -17413,9 +17414,6 @@ msgstr "To konto {plugin} jest już połączone z inną organizacją Superset."
 
 msgid "This action is irreversible."
 msgstr "Tej operacji nie można cofnąć."
-
-msgid "This agent"
-msgstr "Ten agent"
 
 msgid "This agent can't be opened as a chat."
 msgstr "Tego agenta nie można otworzyć jako czatu."
@@ -17520,9 +17518,6 @@ msgstr "Ta instalacja GitHub jest już połączona z inną organizacją Superset
 msgid "This host"
 msgstr "Ten host"
 
-msgid "This host can't restore files, so nothing was rewound. Choose Rewind chat only to rewind just the conversation."
-msgstr "Ten host nie może przywracać plików, więc nic nie zostało cofnięte. Wybierz „Cofnij tylko czat”, aby cofnąć tylko rozmowę."
-
 msgid "This host has not reported a version yet."
 msgstr "Ten host nie zgłosił jeszcze wersji."
 
@@ -17564,12 +17559,6 @@ msgstr "Ten Mac"
 
 msgid "This machine"
 msgstr "Ten komputer"
-
-msgid "This message and everything after it leave the chat, and the message goes back to the composer. Files stay as they are."
-msgstr "Ta wiadomość i wszystko po niej znikną z czatu, a wiadomość wróci do pola tekstowego. Pliki pozostaną bez zmian."
-
-msgid "This message and everything after it leave the chat, and the message goes back to the composer. Rewinding the files also undoes changes made since then. A snapshot of the current files is kept first."
-msgstr "Ta wiadomość i wszystko po niej znikną z czatu, a wiadomość wróci do pola tekstowego. Cofnięcie plików cofa też zmiany wprowadzone od tamtej pory. Najpierw zapisywana jest migawka bieżących plików."
 
 msgid "This Microsoft tenant is already connected by {detail}. Ask them to disconnect first."
 msgstr "Ten tenant Microsoft jest już połączony przez {detail}. Poproś o rozłączenie."

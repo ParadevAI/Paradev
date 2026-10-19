@@ -1,7 +1,11 @@
 import { copyFile, mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import type { ChatCheckpoints, CheckpointTarget } from "@superset/chat-runtime";
+import type {
+	ChatCheckpoints,
+	CheckpointTarget,
+	RewindChange,
+} from "@superset/chat-runtime";
 import type { SimpleGit } from "simple-git";
 import { createUserSimpleGit } from "../runtime/git/simple-git";
 
@@ -77,6 +81,11 @@ async function readRef(git: SimpleGit, ref: string): Promise<string | null> {
 	return sha || null;
 }
 
+async function writeWorkTree(git: SimpleGit): Promise<string> {
+	await git.raw(["add", "-A"]);
+	return (await git.raw(["write-tree"])).trim();
+}
+
 async function snapshot(
 	cwd: string,
 	sessionId: string,
@@ -86,8 +95,7 @@ async function snapshot(
 	return withScratchIndex(
 		cwd,
 		async (git) => {
-			await git.raw(["add", "-A"]);
-			const tree = (await git.raw(["write-tree"])).trim();
+			const tree = await writeWorkTree(git);
 			const ref = checkpointRef(sessionId);
 			const parent = await readRef(git, ref);
 			const commit = (
@@ -119,6 +127,32 @@ async function findCheckpoint(
 		.split("\n")
 		.find((entry) => entry.slice(entry.indexOf(" ") + 1) === subject);
 	return line ? line.slice(0, line.indexOf(" ")) : null;
+}
+
+async function diffSince(cwd: string, target: string, tree: string) {
+	return parseNameStatus(
+		await gitAt(cwd).raw([
+			"diff-tree",
+			"-r",
+			"-z",
+			"--no-renames",
+			"--name-status",
+			`${target}^{tree}`,
+			tree,
+		]),
+	);
+}
+
+function toRewindChange(entry: { status: string; path: string }): RewindChange {
+	return {
+		path: entry.path,
+		change:
+			entry.status === "A"
+				? "added"
+				: entry.status === "D"
+					? "deleted"
+					: "modified",
+	};
 }
 
 function parseNameStatus(output: string): { status: string; path: string }[] {
@@ -156,6 +190,15 @@ export function createGitCheckpoints(): ChatCheckpoints {
 			if (head) await git.raw(["update-ref", checkpointRef(toSessionId), head]);
 		},
 
+		async changes({ cwd: dir, sessionId, itemId }: CheckpointTarget) {
+			const cwd = await workTreeRoot(dir);
+			if (!cwd) return null;
+			const target = await findCheckpoint(cwd, sessionId, itemId);
+			if (!target) return null;
+			const current = await withScratchIndex(cwd, writeWorkTree);
+			return (await diffSince(cwd, target, current)).map(toRewindChange);
+		},
+
 		async restore({ cwd: dir, sessionId, itemId }: CheckpointTarget) {
 			const cwd = await workTreeRoot(dir);
 			if (!cwd) return "missing";
@@ -167,17 +210,7 @@ export function createGitCheckpoints(): ChatCheckpoints {
 				sessionId,
 				`before rewind to ${itemId}`,
 			);
-			const changed = parseNameStatus(
-				await gitAt(cwd).raw([
-					"diff-tree",
-					"-r",
-					"-z",
-					"--no-renames",
-					"--name-status",
-					`${target}^{tree}`,
-					current,
-				]),
-			);
+			const changed = await diffSince(cwd, target, current);
 			await withScratchIndex(cwd, async (git) => {
 				await git.raw(["read-tree", `${target}^{tree}`]);
 				const restored = changed

@@ -23,6 +23,7 @@ type Query =
 	| "getItems"
 	| "getOutline"
 	| "getItemBodies"
+	| "getRewindChanges"
 	| "getRewindSupport";
 
 /** A tRPC client for the chat router, by shape rather than by router type. */
@@ -55,6 +56,7 @@ export function chatTransportFromTrpc(client: ChatTrpcClient): ChatTransport {
 		getItems: (input) => client.getItems.query(input),
 		getOutline: (input) => client.getOutline.query(input),
 		getItemBodies: (input) => client.getItemBodies.query(input),
+		getRewindChanges: (input) => client.getRewindChanges.query(input),
 		getRewindSupport: (input) => client.getRewindSupport.query(input),
 	};
 }

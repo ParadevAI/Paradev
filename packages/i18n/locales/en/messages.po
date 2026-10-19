@@ -145,6 +145,10 @@ msgstr "{0, plural, one {# failed} other {# failed}}"
 msgid "{0, plural, one {# failing} other {# failing}}"
 msgstr "{0, plural, one {# failing} other {# failing}}"
 
+#. placeholder {0}: changes.changes.length
+msgid "{0, plural, one {# file changed since this message} other {# files changed since this message}}"
+msgstr "{0, plural, one {# file changed since this message} other {# files changed since this message}}"
+
 #. placeholder {0}: detail.pullRequest.changedFiles
 msgid "{0, plural, one {# file changed} other {# files changed}}"
 msgstr "{0, plural, one {# file changed} other {# files changed}}"
@@ -958,9 +962,6 @@ msgstr "{myFailedCount} of your automations failed their last run"
 
 msgid "{name} accounts"
 msgstr "{name} accounts"
-
-msgid "{name} can't rewind its own history, so it is told the earlier conversation as text, without the details of its tool calls."
-msgstr "{name} can't rewind its own history, so it is told the earlier conversation as text, without the details of its tool calls."
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
@@ -2255,6 +2256,9 @@ msgstr "An unknown error occurred"
 
 msgid "An update is ready to install."
 msgstr "An update is ready to install."
+
+msgid "and {hidden} more"
+msgstr "and {hidden} more"
 
 msgid "Android is on the way. Be first to know when it ships."
 msgstr "Android is on the way. Be first to know when it ships."
@@ -5065,6 +5069,9 @@ msgstr "Couldn't branch into a new worktree"
 msgid "Couldn't branch the conversation"
 msgstr "Couldn't branch the conversation"
 
+msgid "Couldn't check the files"
+msgstr "Couldn't check the files"
+
 msgid "Couldn't check what removing this member affects"
 msgstr "Couldn't check what removing this member affects"
 
@@ -5100,6 +5107,9 @@ msgstr "Couldn't discard staged changes"
 
 msgid "Couldn't discard unstaged changes"
 msgstr "Couldn't discard unstaged changes"
+
+msgid "Couldn't edit the message"
+msgstr "Couldn't edit the message"
 
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Couldn’t finish deleting workspaces"
@@ -5210,9 +5220,6 @@ msgstr "Couldn't restore \"{workspaceName}\""
 
 msgid "Couldn't restore the files"
 msgstr "Couldn't restore the files"
-
-msgid "Couldn't rewind the chat"
-msgstr "Couldn't rewind the chat"
 
 msgid "Couldn't save"
 msgstr "Couldn't save"
@@ -5896,6 +5903,9 @@ msgstr "Delete workspace"
 msgid "Delete workspace \"{workspaceName}\"?"
 msgstr "Delete workspace \"{workspaceName}\"?"
 
+msgid "deleted"
+msgstr "deleted"
+
 msgid "Deleted"
 msgstr "Deleted"
 
@@ -6543,6 +6553,9 @@ msgstr "Earned {name} ×{tier}"
 msgid "Edit"
 msgstr "Edit"
 
+msgid "Edit and restore files"
+msgstr "Edit and restore files"
+
 msgid "Edit comment"
 msgstr "Edit comment"
 
@@ -6551,6 +6564,9 @@ msgstr "Edit environment"
 
 msgid "Edit files without asking; ask before commands"
 msgstr "Edit files without asking; ask before commands"
+
+msgid "Edit message"
+msgstr "Edit message"
 
 msgid "Edit name"
 msgstr "Edit name"
@@ -6569,6 +6585,9 @@ msgstr "Edit script"
 
 msgid "Edit your comment…"
 msgstr "Edit your comment…"
+
+msgid "Edit, keep files"
+msgstr "Edit, keep files"
 
 msgid "Edited"
 msgstr "Edited"
@@ -7555,11 +7574,11 @@ msgstr "Files"
 msgid "Files & Editor"
 msgstr "Files & Editor"
 
-msgid "Files can't be rewound here because this folder is not a git repository. Only the chat goes back."
-msgstr "Files can't be rewound here because this folder is not a git repository. Only the chat goes back."
-
 msgid "Files changed"
 msgstr "Files changed"
+
+msgid "Files restored to before that message"
+msgstr "Files restored to before that message"
 
 msgid "files to exclude (glob)"
 msgstr "files to exclude (glob)"
@@ -8097,9 +8116,6 @@ msgstr "Go back"
 
 msgid "Go back home"
 msgstr "Go back home"
-
-msgid "Go back to an earlier message and restore the files"
-msgstr "Go back to an earlier message and restore the files"
 
 msgid "Go back to the previous page in history"
 msgstr "Go back to the previous page in history"
@@ -9345,6 +9361,9 @@ msgstr "Latency"
 msgid "Later"
 msgstr "Later"
 
+msgid "Later messages and their file changes are removed."
+msgstr "Later messages and their file changes are removed."
+
 msgid "Latest"
 msgstr "Latest"
 
@@ -10482,6 +10501,9 @@ msgstr "Never"
 
 msgid "Never asks before acting"
 msgstr "Never asks before acting"
+
+msgid "new"
+msgstr "new"
 
 msgid "New"
 msgstr "New"
@@ -12556,9 +12578,6 @@ msgstr "Pick a folder…"
 msgid "Pick a low-risk papercut, fix it, and explain how it was verified."
 msgstr "Pick a low-risk papercut, fix it, and explain how it was verified."
 
-msgid "Pick a message. The chat goes back to just before it, and the message returns to the composer."
-msgstr "Pick a message. The chat goes back to just before it, and the message returns to the composer."
-
 msgid "Pick a model"
 msgstr "Pick a model"
 
@@ -14147,6 +14166,9 @@ msgstr "Restored \"{workspaceName}\""
 msgid "Restoring \"{workspaceName}\"…"
 msgstr "Restoring \"{workspaceName}\"…"
 
+msgid "Restoring puts them back as they were before this message, including changes you made yourself. A snapshot of the current files is kept first."
+msgstr "Restoring puts them back as they were before this message, including changes you made yourself. A snapshot of the current files is kept first."
+
 msgid "Restoring your session"
 msgstr "Restoring your session"
 
@@ -14313,21 +14335,6 @@ msgstr "Revoke API key"
 
 msgid "Revoke key"
 msgstr "Revoke key"
-
-msgid "Rewind"
-msgstr "Rewind"
-
-msgid "Rewind chat"
-msgstr "Rewind chat"
-
-msgid "Rewind chat and files"
-msgstr "Rewind chat and files"
-
-msgid "Rewind chat only"
-msgstr "Rewind chat only"
-
-msgid "Rewind to this message?"
-msgstr "Rewind to this message?"
 
 msgid "Rewrote it and published version 2."
 msgstr "Rewrote it and published version 2."
@@ -16254,8 +16261,8 @@ msgstr "Stop Superset here to delete from another device."
 msgid "Stop the agent and send this now"
 msgstr "Stop the agent and send this now"
 
-msgid "Stop the agent before you rewind"
-msgstr "Stop the agent before you rewind"
+msgid "Stop the agent before you edit a message"
+msgstr "Stop the agent before you edit a message"
 
 msgid "Stop watching"
 msgstr "Stop watching"
@@ -17318,9 +17325,6 @@ msgstr "The starting point a cloud workspace boots from. Variables set here reac
 msgid "The Superset desktop app is available for macOS and Linux."
 msgstr "The Superset desktop app is available for macOS and Linux."
 
-msgid "The Superset host on this machine is out of date, so only the chat goes back and the agent is told the earlier conversation as text."
-msgstr "The Superset host on this machine is out of date, so only the chat goes back and the agent is told the earlier conversation as text."
-
 msgid "The Superset host service for {organization} stopped unexpectedly ({cause}) and could not be restarted automatically."
 msgstr "The Superset host service for {organization} stopped unexpectedly ({cause}) and could not be restarted automatically."
 
@@ -17378,11 +17382,8 @@ msgstr "Themes"
 msgid "Themes and agents"
 msgstr "Themes and agents"
 
-msgid "There are no messages to rewind to yet."
-msgstr "There are no messages to rewind to yet."
-
-msgid "There is no file snapshot for that message, so nothing was rewound. Choose Rewind chat only to rewind just the conversation."
-msgstr "There is no file snapshot for that message, so nothing was rewound. Choose Rewind chat only to rewind just the conversation."
+msgid "There was no file snapshot for that message, so the files were left as they are."
+msgstr "There was no file snapshot for that message, so the files were left as they are."
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
@@ -17413,9 +17414,6 @@ msgstr "This {plugin} account is already connected by another Superset organizat
 
 msgid "This action is irreversible."
 msgstr "This action is irreversible."
-
-msgid "This agent"
-msgstr "This agent"
 
 msgid "This agent can't be opened as a chat."
 msgstr "This agent can't be opened as a chat."
@@ -17520,9 +17518,6 @@ msgstr "This GitHub installation is already connected to another Superset organi
 msgid "This host"
 msgstr "This host"
 
-msgid "This host can't restore files, so nothing was rewound. Choose Rewind chat only to rewind just the conversation."
-msgstr "This host can't restore files, so nothing was rewound. Choose Rewind chat only to rewind just the conversation."
-
 msgid "This host has not reported a version yet."
 msgstr "This host has not reported a version yet."
 
@@ -17564,12 +17559,6 @@ msgstr "This Mac"
 
 msgid "This machine"
 msgstr "This machine"
-
-msgid "This message and everything after it leave the chat, and the message goes back to the composer. Files stay as they are."
-msgstr "This message and everything after it leave the chat, and the message goes back to the composer. Files stay as they are."
-
-msgid "This message and everything after it leave the chat, and the message goes back to the composer. Rewinding the files also undoes changes made since then. A snapshot of the current files is kept first."
-msgstr "This message and everything after it leave the chat, and the message goes back to the composer. Rewinding the files also undoes changes made since then. A snapshot of the current files is kept first."
 
 msgid "This Microsoft tenant is already connected by {detail}. Ask them to disconnect first."
 msgstr "This Microsoft tenant is already connected by {detail}. Ask them to disconnect first."

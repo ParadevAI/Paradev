@@ -1,3 +1,4 @@
+import { plural } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { acpHarnessForPreset } from "@superset/chat/core";
 import { AGENT_DEFAULT_MODE, type UserContent } from "@superset/chat/protocol";
@@ -19,7 +20,6 @@ import { useWorkspaceEvent } from "renderer/hooks/host-service/useWorkspaceEvent
 import { useV2AgentConfigs } from "renderer/hooks/useV2AgentConfigs";
 import type { OpenFile } from "../../../../../../types";
 import { saveLastChatAgent } from "../../../../../../utils/lastChatAgent";
-import { prependToDraft } from "../../../ChatSession/components/Composer";
 import { SessionView } from "../../../ChatSession/components/SessionView";
 import { useSessionClient } from "../../../ChatSession/hooks/useSessionClient";
 import type {
@@ -27,14 +27,15 @@ import type {
 	OpenPage,
 } from "../../../ChatSession/providers/ChatPaneActionsProvider";
 import type {
+	ChatEditRequest,
 	ChatForkTarget,
-	ChatRewindRequest,
 } from "../../../ChatSession/types";
 import { isUnrestrictedMode } from "../../../ChatSession/utils/isUnrestrictedMode";
 import { useForkChat } from "../../hooks/useForkChat";
 import { readSavedChatMode } from "../../utils/savedChatMode";
 import { AcpRecovery } from "./components/AcpRecovery";
 import { DraftChat } from "./components/DraftChat";
+import { RewindChangesList } from "./components/RewindChangesList";
 import { createWhenReachable } from "./utils/createWhenReachable";
 import {
 	isChatCreateWatched,
@@ -88,7 +89,7 @@ export function AcpChatPane({
 	pendingPrompts: UserContent[][];
 	onPendingPromptsSent: () => void;
 	onQueuePrompt: (content: UserContent[]) => void;
-	onSessionCreated: (sessionId: string) => void;
+	onSessionCreated: (sessionId: string, pendingPrompt?: string) => void;
 	onModeChange?: (modeId: string) => void;
 	onSessionInfo: (info: { harnessSessionId?: string; title?: string }) => void;
 	onOpenFile?: OpenFile;
@@ -96,8 +97,8 @@ export function AcpChatPane({
 	onOpenLink?: OpenLink;
 	onSwitchAgent?: (target: AgentSwitchTarget) => void;
 	onOpenAgentChat?: (target: AgentSwitchTarget) => void;
-	/** The chat restarts in a fresh agent session, told the conversation before the rewind point. */
-	onRewound?: (handoffPrompt: string | null) => void;
+	/** The chat restarts in a fresh agent session, told the conversation before the edited message. */
+	onRewound?: (handoffPrompt: string | null, editedPrompt: string) => void;
 	modelId?: string;
 	modelLabel?: string;
 	modeId?: string;
@@ -472,8 +473,31 @@ export function AcpChatPane({
 
 	const draftKey = `chat-v3-draft:${terminalId}`;
 
-	const runRewind = useCallback(
-		async (request: ChatRewindRequest, restoreFiles: boolean) => {
+	// A host from before rewind support answers with an unknown procedure; it
+	// can still rewind the chat as text, but not the files.
+	const { data: rewindSupport } = useQuery({
+		enabled: sessionId !== null && onRewound !== undefined,
+		queryKey: ["acp-chat-rewind-support", sessionId, workspaceId],
+		queryFn: () =>
+			sessionId
+				? wiring.transport
+						.getRewindSupport({ sessionId, workspaceId })
+						.catch((error: unknown) => {
+							if (
+								error instanceof TRPCClientError &&
+								/No procedure/.test(error.message)
+							) {
+								return { conversation: "text" as const, files: false };
+							}
+							throw error;
+						})
+				: Promise.resolve(null),
+		staleTime: 30_000,
+	});
+	const canRewindFiles = rewindSupport?.files !== false;
+
+	const editMessage = useCallback(
+		async (request: ChatEditRequest, restoreFiles: boolean) => {
 			if (!sessionId || !onRewound) return;
 			let files: "restored" | "missing" | "unsupported" | "skipped" = "skipped";
 			if (restoreFiles) {
@@ -489,24 +513,6 @@ export function AcpChatPane({
 					toast.error(t({ message: "Couldn't restore the files" }), {
 						description: errorMessage(error, t({ message: "Unknown error" })),
 					});
-					return;
-				}
-				if (files === "missing") {
-					toast.error(
-						t({
-							message:
-								"There is no file snapshot for that message, so nothing was rewound. Choose Rewind chat only to rewind just the conversation.",
-						}),
-					);
-					return;
-				}
-				if (files === "unsupported") {
-					toast.error(
-						t({
-							message:
-								"This host can't restore files, so nothing was rewound. Choose Rewind chat only to rewind just the conversation.",
-						}),
-					);
 					return;
 				}
 			}
@@ -538,8 +544,8 @@ export function AcpChatPane({
 						/No procedure/.test(error.message)
 					)
 				) {
-					console.error("[acp-chat] rewind failed", error);
-					toast.error(t({ message: "Couldn't rewind the chat" }), {
+					console.error("[acp-chat] edit failed", error);
+					toast.error(t({ message: "Couldn't edit the message" }), {
 						description: errorMessage(error, t({ message: "Unknown error" })),
 					});
 					return;
@@ -547,17 +553,26 @@ export function AcpChatPane({
 				rewound = null;
 			}
 			if (!mounted.current) return;
-			prependToDraft(draftKey, [request.messageText]);
 			if (rewound) {
-				onSessionCreated(rewound.sessionId);
+				onSessionCreated(rewound.sessionId, request.messageText);
 			} else {
 				attaching.current = false;
-				onRewound(handoffPrompt);
+				onRewound(handoffPrompt, request.messageText);
+			}
+			if (files === "restored") {
+				toast.success(t({ message: "Files restored to before that message" }));
+			} else if (files === "missing") {
+				toast.info(
+					t({
+						message:
+							"There was no file snapshot for that message, so the files were left as they are.",
+					}),
+				);
 			}
 			void wiring.transport
 				.closeSession({ sessionId })
 				.catch((error: unknown) =>
-					console.warn("[acp-chat] could not close the rewound chat", error),
+					console.warn("[acp-chat] could not close the edited chat", error),
 				);
 		},
 		[
@@ -567,105 +582,73 @@ export function AcpChatPane({
 			wiring.transport,
 			workspaceId,
 			t,
-			draftKey,
 			agentLabel,
 			modelId,
 			modeId,
 		],
 	);
-	// A host from before rewind support answers with an unknown procedure; it
-	// can still rewind the chat as text, but not the files.
-	const { data: rewindSupport } = useQuery({
-		enabled: sessionId !== null && onRewound !== undefined,
-		queryKey: ["acp-chat-rewind-support", sessionId, workspaceId],
-		queryFn: () =>
-			sessionId
-				? wiring.transport
-						.getRewindSupport({ sessionId, workspaceId })
-						.then((support) => ({ ...support, outdatedHost: false }))
-						.catch((error: unknown) => {
-							if (
-								error instanceof TRPCClientError &&
-								/No procedure/.test(error.message)
-							) {
-								return {
-									conversation: "text" as const,
-									files: false,
-									outdatedHost: true,
-								};
-							}
-							throw error;
-						})
-				: Promise.resolve(null),
-		staleTime: 30_000,
-	});
-	const rewindNotes = useMemo(() => {
-		if (!rewindSupport) return [];
-		if (rewindSupport.outdatedHost) {
-			return [
-				t({
-					message:
-						"The Superset host on this machine is out of date, so only the chat goes back and the agent is told the earlier conversation as text.",
-				}),
-			];
-		}
-		const name = agentLabel ?? t({ message: "This agent" });
-		return [
-			...(rewindSupport.conversation === "text"
-				? [
-						t({
-							message: `${name} can't rewind its own history, so it is told the earlier conversation as text, without the details of its tool calls.`,
-						}),
-					]
-				: []),
-			...(rewindSupport.files
-				? []
-				: [
-						t({
-							message:
-								"Files can't be rewound here because this folder is not a git repository. Only the chat goes back.",
-						}),
-					]),
-		];
-	}, [rewindSupport, agentLabel, t]);
-	const canRewindFiles = rewindSupport?.files !== false;
-
-	const rewind = useCallback(
-		(request: ChatRewindRequest) =>
+	const confirmEdit = useCallback(
+		async (request: ChatEditRequest) => {
+			if (!sessionId) return;
+			if (!canRewindFiles) return editMessage(request, false);
+			let changes: Awaited<
+				ReturnType<typeof wiring.transport.getRewindChanges>
+			>;
+			try {
+				changes = await wiring.transport.getRewindChanges({
+					sessionId,
+					itemId: request.itemId,
+					workspaceId,
+				});
+			} catch (error) {
+				if (
+					error instanceof TRPCClientError &&
+					/No procedure/.test(error.message)
+				) {
+					return editMessage(request, true);
+				}
+				console.error("[acp-chat] could not list file changes", error);
+				toast.error(t({ message: "Couldn't check the files" }), {
+					description: errorMessage(error, t({ message: "Unknown error" })),
+				});
+				return;
+			}
+			if (!mounted.current) return;
+			if (changes.files !== "listed" || changes.changes.length === 0) {
+				return editMessage(request, changes.files === "missing");
+			}
 			alert({
-				title: t({ message: "Rewind to this message?" }),
-				description: canRewindFiles
-					? t({
-							message:
-								"This message and everything after it leave the chat, and the message goes back to the composer. Rewinding the files also undoes changes made since then. A snapshot of the current files is kept first.",
-						})
-					: t({
-							message:
-								"This message and everything after it leave the chat, and the message goes back to the composer. Files stay as they are.",
-						}),
+				title: t({
+					message: plural(changes.changes.length, {
+						one: "# file changed since this message",
+						other: "# files changed since this message",
+					}),
+				}),
+				description: t({
+					message:
+						"Restoring puts them back as they were before this message, including changes you made yourself. A snapshot of the current files is kept first.",
+				}),
+				details: <RewindChangesList changes={changes.changes} />,
 				actions: [
-					...(canRewindFiles
-						? [
-								{
-									label: t({ message: "Rewind chat and files" }),
-									variant: "default" as const,
-									onClick: () => void runRewind(request, true),
-								},
-							]
-						: []),
 					{
-						label: canRewindFiles
-							? t({ message: "Rewind chat only" })
-							: t({ message: "Rewind chat" }),
-						variant: canRewindFiles
-							? ("outline" as const)
-							: ("default" as const),
-						onClick: () => void runRewind(request, false),
+						label: t({ message: "Edit and restore files" }),
+						variant: "default",
+						onClick: () => void editMessage(request, true),
 					},
-					{ label: t({ message: "Cancel" }), variant: "ghost" as const },
+					{
+						label: t({ message: "Edit, keep files" }),
+						variant: "outline",
+						onClick: () => void editMessage(request, false),
+					},
+					{ label: t({ message: "Cancel" }), variant: "ghost" },
 				],
-			}),
-		[runRewind, t, canRewindFiles],
+			});
+		},
+		[sessionId, canRewindFiles, editMessage, wiring.transport, workspaceId, t],
+	);
+	const onEditMessage = useCallback(
+		(request: ChatEditRequest) => void confirmEdit(request),
+		[confirmEdit],
 	);
 
 	const draft = (notice: ReactNode) => (
@@ -744,9 +727,8 @@ export function AcpChatPane({
 			canForkToWorktree={canForkToWorktree}
 			isActive={isActive}
 			onFork={fork}
-			onRewind={onRewound ? rewind : undefined}
+			onEditMessage={onRewound ? onEditMessage : undefined}
 			onUserPrompt={agent ? () => saveLastChatAgent(agent.id) : undefined}
-			rewindNotes={rewindNotes}
 			openFile={onOpenFile}
 			openPage={onOpenPage}
 			openLink={onOpenLink}

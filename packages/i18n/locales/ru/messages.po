@@ -145,6 +145,10 @@ msgstr "{0, plural, one {# не пройдено} few {# не пройдено} 
 msgid "{0, plural, one {# failing} other {# failing}}"
 msgstr "{0, plural, one {# с ошибкой} few {# с ошибкой} many {# с ошибкой} other {# с ошибкой}}"
 
+#. placeholder {0}: changes.changes.length
+msgid "{0, plural, one {# file changed since this message} other {# files changed since this message}}"
+msgstr "{0, plural, one {С этого сообщения изменён # файл} few {С этого сообщения изменено # файла} many {С этого сообщения изменено # файлов} other {С этого сообщения изменено # файла}}"
+
 #. placeholder {0}: detail.pullRequest.changedFiles
 msgid "{0, plural, one {# file changed} other {# files changed}}"
 msgstr "{0, plural, one {# файл изменён} few {# файла изменено} many {# файлов изменено} other {# файла изменено}}"
@@ -958,9 +962,6 @@ msgstr "Ваши автоматизации с ошибкой при после�
 
 msgid "{name} accounts"
 msgstr "Аккаунты {name}"
-
-msgid "{name} can't rewind its own history, so it is told the earlier conversation as text, without the details of its tool calls."
-msgstr "{name} не может откатить собственную историю, поэтому предыдущий разговор передаётся ему текстом, без подробностей вызовов инструментов."
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
@@ -2255,6 +2256,9 @@ msgstr "Произошла неизвестная ошибка"
 
 msgid "An update is ready to install."
 msgstr "Обновление готово к установке."
+
+msgid "and {hidden} more"
+msgstr "и ещё {hidden}"
 
 msgid "Android is on the way. Be first to know when it ships."
 msgstr "Версия для Android уже в работе. Узнайте о выходе первыми."
@@ -5065,6 +5069,9 @@ msgstr "Не удалось ответвить в новый worktree"
 msgid "Couldn't branch the conversation"
 msgstr "Не удалось ответвить разговор"
 
+msgid "Couldn't check the files"
+msgstr "Не удалось проверить файлы"
+
 msgid "Couldn't check what removing this member affects"
 msgstr "Не удалось проверить, на что повлияет удаление этого участника"
 
@@ -5100,6 +5107,9 @@ msgstr "Не удалось отменить проиндексированны�
 
 msgid "Couldn't discard unstaged changes"
 msgstr "Не удалось отменить непроиндексированные изменения"
+
+msgid "Couldn't edit the message"
+msgstr "Не удалось изменить сообщение"
 
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Не удалось завершить удаление рабочих областей"
@@ -5210,9 +5220,6 @@ msgstr "Не удалось восстановить «{workspaceName}»"
 
 msgid "Couldn't restore the files"
 msgstr "Не удалось восстановить файлы"
-
-msgid "Couldn't rewind the chat"
-msgstr "Не удалось откатить чат"
 
 msgid "Couldn't save"
 msgstr "Не удалось сохранить"
@@ -5896,6 +5903,9 @@ msgstr "Удалить рабочую область"
 msgid "Delete workspace \"{workspaceName}\"?"
 msgstr "Удалить рабочую область «{workspaceName}»?"
 
+msgid "deleted"
+msgstr "удалён"
+
 msgid "Deleted"
 msgstr "Удалено"
 
@@ -6543,6 +6553,9 @@ msgstr "Получено: {name} ×{tier}"
 msgid "Edit"
 msgstr "Изменить"
 
+msgid "Edit and restore files"
+msgstr "Изменить и восстановить файлы"
+
 msgid "Edit comment"
 msgstr "Изменить комментарий"
 
@@ -6551,6 +6564,9 @@ msgstr "Изменить окружение"
 
 msgid "Edit files without asking; ask before commands"
 msgstr "Править файлы без вопросов; спрашивать перед командами"
+
+msgid "Edit message"
+msgstr "Изменить сообщение"
 
 msgid "Edit name"
 msgstr "Изменить имя"
@@ -6569,6 +6585,9 @@ msgstr "Изменить скрипт"
 
 msgid "Edit your comment…"
 msgstr "Измените комментарий…"
+
+msgid "Edit, keep files"
+msgstr "Изменить, оставить файлы"
 
 msgid "Edited"
 msgstr "Изменено"
@@ -7555,11 +7574,11 @@ msgstr "Файлы"
 msgid "Files & Editor"
 msgstr "Файлы и редактор"
 
-msgid "Files can't be rewound here because this folder is not a git repository. Only the chat goes back."
-msgstr "Здесь нельзя откатить файлы, потому что эта папка не является git-репозиторием. Откатится только чат."
-
 msgid "Files changed"
 msgstr "Изменённые файлы"
+
+msgid "Files restored to before that message"
+msgstr "Файлы восстановлены до состояния перед этим сообщением"
 
 msgid "files to exclude (glob)"
 msgstr "исключаемые файлы (glob)"
@@ -8097,9 +8116,6 @@ msgstr "Назад"
 
 msgid "Go back home"
 msgstr "Вернуться на главную"
-
-msgid "Go back to an earlier message and restore the files"
-msgstr "Вернуться к более раннему сообщению и восстановить файлы"
 
 msgid "Go back to the previous page in history"
 msgstr "Вернуться на предыдущую страницу в истории"
@@ -9345,6 +9361,9 @@ msgstr "Задержка"
 msgid "Later"
 msgstr "Позже"
 
+msgid "Later messages and their file changes are removed."
+msgstr "Последующие сообщения и их изменения файлов будут удалены."
+
 msgid "Latest"
 msgstr "Последняя"
 
@@ -10482,6 +10501,9 @@ msgstr "Никогда"
 
 msgid "Never asks before acting"
 msgstr "Никогда не спрашивает"
+
+msgid "new"
+msgstr "новый"
 
 msgid "New"
 msgstr "Новое"
@@ -12556,9 +12578,6 @@ msgstr "Выберите папку…"
 msgid "Pick a low-risk papercut, fix it, and explain how it was verified."
 msgstr "Выбрать мелкую безопасную недоработку, исправить её и объяснить, как это проверено."
 
-msgid "Pick a message. The chat goes back to just before it, and the message returns to the composer."
-msgstr "Выберите сообщение. Чат вернётся к моменту прямо перед ним, а сообщение вернётся в поле ввода."
-
 msgid "Pick a model"
 msgstr "Выберите модель"
 
@@ -14147,6 +14166,9 @@ msgstr "Восстановлено: «{workspaceName}»"
 msgid "Restoring \"{workspaceName}\"…"
 msgstr "Восстановление «{workspaceName}»…"
 
+msgid "Restoring puts them back as they were before this message, including changes you made yourself. A snapshot of the current files is kept first."
+msgstr "Восстановление вернёт их к состоянию до этого сообщения, включая изменения, сделанные вами. Сначала сохраняется снимок текущих файлов."
+
 msgid "Restoring your session"
 msgstr "Восстановление сессии"
 
@@ -14313,21 +14335,6 @@ msgstr "Отозвать ключ API"
 
 msgid "Revoke key"
 msgstr "Отозвать ключ"
-
-msgid "Rewind"
-msgstr "Откатить"
-
-msgid "Rewind chat"
-msgstr "Откатить чат"
-
-msgid "Rewind chat and files"
-msgstr "Откатить чат и файлы"
-
-msgid "Rewind chat only"
-msgstr "Откатить только чат"
-
-msgid "Rewind to this message?"
-msgstr "Откатить к этому сообщению?"
 
 msgid "Rewrote it and published version 2."
 msgstr "Переписал и опубликовал версию 2."
@@ -16254,8 +16261,8 @@ msgstr "Остановите Superset здесь, чтобы удалить с �
 msgid "Stop the agent and send this now"
 msgstr "Остановить агента и отправить сейчас"
 
-msgid "Stop the agent before you rewind"
-msgstr "Остановите агента перед откатом"
+msgid "Stop the agent before you edit a message"
+msgstr "Остановите агента, прежде чем изменять сообщение"
 
 msgid "Stop watching"
 msgstr "Прекратить отслеживание"
@@ -17318,9 +17325,6 @@ msgstr "Отправная точка, с которой загружается 
 msgid "The Superset desktop app is available for macOS and Linux."
 msgstr "Десктопное приложение Superset доступно для macOS и Linux."
 
-msgid "The Superset host on this machine is out of date, so only the chat goes back and the agent is told the earlier conversation as text."
-msgstr "Хост Superset на этом компьютере устарел, поэтому откатится только чат, а предыдущий разговор будет передан агенту текстом."
-
 msgid "The Superset host service for {organization} stopped unexpectedly ({cause}) and could not be restarted automatically."
 msgstr "Служба хоста Superset для {organization} неожиданно остановилась ({cause}), и её не удалось перезапустить автоматически."
 
@@ -17378,11 +17382,8 @@ msgstr "Темы"
 msgid "Themes and agents"
 msgstr "Темы и агенты"
 
-msgid "There are no messages to rewind to yet."
-msgstr "Пока нет сообщений, к которым можно откатиться."
-
-msgid "There is no file snapshot for that message, so nothing was rewound. Choose Rewind chat only to rewind just the conversation."
-msgstr "Для этого сообщения нет снимка файлов, поэтому ничего не откачено. Чтобы откатить только разговор, выберите «Откатить только чат»."
+msgid "There was no file snapshot for that message, so the files were left as they are."
+msgstr "Для этого сообщения нет снимка файлов, поэтому файлы оставлены без изменений."
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "Эти команды выполняются автоматически при создании рабочей области. <0>Читать документацию<1/></0>"
@@ -17413,9 +17414,6 @@ msgstr "Этот аккаунт {plugin} уже подключён другой 
 
 msgid "This action is irreversible."
 msgstr "Это действие необратимо."
-
-msgid "This agent"
-msgstr "Этот агент"
 
 msgid "This agent can't be opened as a chat."
 msgstr "Этого агента нельзя открыть как чат."
@@ -17520,9 +17518,6 @@ msgstr "Эта установка GitHub уже подключена к друг
 msgid "This host"
 msgstr "Этот хост"
 
-msgid "This host can't restore files, so nothing was rewound. Choose Rewind chat only to rewind just the conversation."
-msgstr "Этот хост не может восстанавливать файлы, поэтому ничего не откачено. Чтобы откатить только разговор, выберите «Откатить только чат»."
-
 msgid "This host has not reported a version yet."
 msgstr "Этот хост ещё не сообщил версию."
 
@@ -17564,12 +17559,6 @@ msgstr "Этот Mac"
 
 msgid "This machine"
 msgstr "Этот компьютер"
-
-msgid "This message and everything after it leave the chat, and the message goes back to the composer. Files stay as they are."
-msgstr "Это сообщение и всё, что после него, будут удалены из чата, а сообщение вернётся в поле ввода. Файлы останутся как есть."
-
-msgid "This message and everything after it leave the chat, and the message goes back to the composer. Rewinding the files also undoes changes made since then. A snapshot of the current files is kept first."
-msgstr "Это сообщение и всё, что после него, будут удалены из чата, а сообщение вернётся в поле ввода. Откат файлов также отменит изменения, сделанные с тех пор. Сначала сохраняется снимок текущих файлов."
 
 msgid "This Microsoft tenant is already connected by {detail}. Ask them to disconnect first."
 msgstr "Этот тенант Microsoft уже подключён пользователем {detail}. Попросите отключить его."

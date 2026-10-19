@@ -48,6 +48,7 @@ import {
 import { z } from "zod";
 import type {
 	ChatCheckpoints,
+	RewindChangesResult,
 	RewindFilesResult,
 	RewindSupport,
 } from "../../checkpoints";
@@ -181,6 +182,11 @@ export type ChatCommands = {
 		input: ForkSessionCommandInput,
 	): Promise<CreateSessionResult | null>;
 	rewindFiles(input: RewindFilesCommandInput): Promise<RewindFilesResult>;
+	getRewindChanges(input: {
+		sessionId: string;
+		itemId: string;
+		cwd: string;
+	}): Promise<RewindChangesResult>;
 	rewindSession(input: RewindSessionCommandInput): Promise<CreateSessionResult>;
 	getRewindSupport(input: {
 		sessionId: string;
@@ -440,6 +446,16 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 				itemId: parsed.itemId,
 			});
 			return { files };
+		},
+
+		async getRewindChanges({ sessionId, itemId, cwd }) {
+			if (!options.checkpoints?.changes) return { files: "unsupported" };
+			const changes = await options.checkpoints.changes({
+				cwd,
+				sessionId,
+				itemId,
+			});
+			return changes ? { files: "listed", changes } : { files: "missing" };
 		},
 
 		/**

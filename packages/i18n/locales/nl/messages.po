@@ -145,6 +145,10 @@ msgstr "{0, plural, one {# mislukt} other {# mislukt}}"
 msgid "{0, plural, one {# failing} other {# failing}}"
 msgstr "{0, plural, one {# mislukt} other {# mislukt}}"
 
+#. placeholder {0}: changes.changes.length
+msgid "{0, plural, one {# file changed since this message} other {# files changed since this message}}"
+msgstr "{0, plural, one {# bestand gewijzigd sinds dit bericht} other {# bestanden gewijzigd sinds dit bericht}}"
+
 #. placeholder {0}: detail.pullRequest.changedFiles
 msgid "{0, plural, one {# file changed} other {# files changed}}"
 msgstr "{0, plural, one {# bestand gewijzigd} other {# bestanden gewijzigd}}"
@@ -958,9 +962,6 @@ msgstr "Bij {myFailedCount} van je automatiseringen is de laatste run mislukt"
 
 msgid "{name} accounts"
 msgstr "{name}-accounts"
-
-msgid "{name} can't rewind its own history, so it is told the earlier conversation as text, without the details of its tool calls."
-msgstr "{name} kan zijn eigen geschiedenis niet terugspoelen, dus het eerdere gesprek wordt als tekst doorgegeven, zonder de details van zijn tool-aanroepen."
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
@@ -2255,6 +2256,9 @@ msgstr "Er is een onbekende fout opgetreden"
 
 msgid "An update is ready to install."
 msgstr "Er staat een update klaar om te installeren."
+
+msgid "and {hidden} more"
+msgstr "en nog {hidden}"
 
 msgid "Android is on the way. Be first to know when it ships."
 msgstr "Android komt eraan. Hoor het als eerste wanneer het uitkomt."
@@ -5065,6 +5069,9 @@ msgstr "Kon niet afsplitsen naar een nieuwe worktree"
 msgid "Couldn't branch the conversation"
 msgstr "Kon het gesprek niet afsplitsen"
 
+msgid "Couldn't check the files"
+msgstr "Kan de bestanden niet controleren"
+
 msgid "Couldn't check what removing this member affects"
 msgstr "Kon niet controleren wat het verwijderen van dit lid beïnvloedt"
 
@@ -5100,6 +5107,9 @@ msgstr "Kan gestagede wijzigingen niet verwerpen"
 
 msgid "Couldn't discard unstaged changes"
 msgstr "Kan niet-gestagede wijzigingen niet verwerpen"
+
+msgid "Couldn't edit the message"
+msgstr "Kan het bericht niet bewerken"
 
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Kon het verwijderen van werkruimtes niet afronden"
@@ -5210,9 +5220,6 @@ msgstr "Kan \"{workspaceName}\" niet herstellen"
 
 msgid "Couldn't restore the files"
 msgstr "Kan de bestanden niet herstellen"
-
-msgid "Couldn't rewind the chat"
-msgstr "Kan de chat niet terugspoelen"
 
 msgid "Couldn't save"
 msgstr "Kan niet opslaan"
@@ -5896,6 +5903,9 @@ msgstr "Werkruimte verwijderen"
 msgid "Delete workspace \"{workspaceName}\"?"
 msgstr "Werkruimte \"{workspaceName}\" verwijderen?"
 
+msgid "deleted"
+msgstr "verwijderd"
+
 msgid "Deleted"
 msgstr "Verwijderd"
 
@@ -6543,6 +6553,9 @@ msgstr "{name} ×{tier} behaald"
 msgid "Edit"
 msgstr "Bewerken"
 
+msgid "Edit and restore files"
+msgstr "Bewerken en bestanden herstellen"
+
 msgid "Edit comment"
 msgstr "Opmerking bewerken"
 
@@ -6551,6 +6564,9 @@ msgstr "Omgeving bewerken"
 
 msgid "Edit files without asking; ask before commands"
 msgstr "Bestanden bewerken zonder te vragen; vragen vóór commando's"
+
+msgid "Edit message"
+msgstr "Bericht bewerken"
 
 msgid "Edit name"
 msgstr "Naam bewerken"
@@ -6569,6 +6585,9 @@ msgstr "Script bewerken"
 
 msgid "Edit your comment…"
 msgstr "Bewerk je reactie…"
+
+msgid "Edit, keep files"
+msgstr "Bewerken, bestanden behouden"
 
 msgid "Edited"
 msgstr "Bewerkt"
@@ -7555,11 +7574,11 @@ msgstr "Bestanden"
 msgid "Files & Editor"
 msgstr "Bestanden en editor"
 
-msgid "Files can't be rewound here because this folder is not a git repository. Only the chat goes back."
-msgstr "Bestanden kunnen hier niet worden teruggespoeld, omdat deze map geen git-repository is. Alleen de chat gaat terug."
-
 msgid "Files changed"
 msgstr "Gewijzigde bestanden"
+
+msgid "Files restored to before that message"
+msgstr "Bestanden hersteld naar vóór dat bericht"
 
 msgid "files to exclude (glob)"
 msgstr "uit te sluiten bestanden (glob)"
@@ -8097,9 +8116,6 @@ msgstr "Terug"
 
 msgid "Go back home"
 msgstr "Terug naar home"
-
-msgid "Go back to an earlier message and restore the files"
-msgstr "Ga terug naar een eerder bericht en herstel de bestanden"
 
 msgid "Go back to the previous page in history"
 msgstr "Terug naar de vorige pagina in de geschiedenis"
@@ -9345,6 +9361,9 @@ msgstr "Latentie"
 msgid "Later"
 msgstr "Later"
 
+msgid "Later messages and their file changes are removed."
+msgstr "Latere berichten en hun bestandswijzigingen worden verwijderd."
+
 msgid "Latest"
 msgstr "Nieuwste"
 
@@ -10482,6 +10501,9 @@ msgstr "Nooit"
 
 msgid "Never asks before acting"
 msgstr "Vraagt nooit vooraf"
+
+msgid "new"
+msgstr "nieuw"
 
 msgid "New"
 msgstr "Nieuw"
@@ -12556,9 +12578,6 @@ msgstr "Kies een map…"
 msgid "Pick a low-risk papercut, fix it, and explain how it was verified."
 msgstr "Kies een risicoloze ergernis, fix die en leg uit hoe het is geverifieerd."
 
-msgid "Pick a message. The chat goes back to just before it, and the message returns to the composer."
-msgstr "Kies een bericht. De chat gaat terug tot vlak voor dat bericht, en het bericht komt terug in het invoerveld."
-
 msgid "Pick a model"
 msgstr "Kies een model"
 
@@ -14147,6 +14166,9 @@ msgstr "\"{workspaceName}\" hersteld"
 msgid "Restoring \"{workspaceName}\"…"
 msgstr "\"{workspaceName}\" wordt hersteld…"
 
+msgid "Restoring puts them back as they were before this message, including changes you made yourself. A snapshot of the current files is kept first."
+msgstr "Herstellen zet ze terug zoals ze vóór dit bericht waren, inclusief wijzigingen die je zelf hebt gemaakt. Eerst wordt een snapshot van de huidige bestanden bewaard."
+
 msgid "Restoring your session"
 msgstr "Je sessie wordt hersteld"
 
@@ -14313,21 +14335,6 @@ msgstr "API-sleutel intrekken"
 
 msgid "Revoke key"
 msgstr "Sleutel intrekken"
-
-msgid "Rewind"
-msgstr "Terugspoelen"
-
-msgid "Rewind chat"
-msgstr "Chat terugspoelen"
-
-msgid "Rewind chat and files"
-msgstr "Chat en bestanden terugspoelen"
-
-msgid "Rewind chat only"
-msgstr "Alleen de chat terugspoelen"
-
-msgid "Rewind to this message?"
-msgstr "Terugspoelen naar dit bericht?"
 
 msgid "Rewrote it and published version 2."
 msgstr "Herschreven en versie 2 gepubliceerd."
@@ -16254,8 +16261,8 @@ msgstr "Stop Superset hier om vanaf een ander apparaat te verwijderen."
 msgid "Stop the agent and send this now"
 msgstr "Agent stoppen en nu verzenden"
 
-msgid "Stop the agent before you rewind"
-msgstr "Stop de agent voordat je terugspoelt"
+msgid "Stop the agent before you edit a message"
+msgstr "Stop de agent voordat je een bericht bewerkt"
 
 msgid "Stop watching"
 msgstr "Stoppen met volgen"
@@ -17318,9 +17325,6 @@ msgstr "Het startpunt waarvandaan een cloudwerkruimte opstart — een base image
 msgid "The Superset desktop app is available for macOS and Linux."
 msgstr "De Superset-desktopapp is beschikbaar voor macOS en Linux."
 
-msgid "The Superset host on this machine is out of date, so only the chat goes back and the agent is told the earlier conversation as text."
-msgstr "De Superset-host op deze machine is verouderd, dus alleen de chat gaat terug en het eerdere gesprek wordt als tekst aan de agent doorgegeven."
-
 msgid "The Superset host service for {organization} stopped unexpectedly ({cause}) and could not be restarted automatically."
 msgstr "De Superset-hostservice voor {organization} is onverwacht gestopt ({cause}) en kon niet automatisch opnieuw worden gestart."
 
@@ -17378,11 +17382,8 @@ msgstr "Thema's"
 msgid "Themes and agents"
 msgstr "Thema's en agents"
 
-msgid "There are no messages to rewind to yet."
-msgstr "Er zijn nog geen berichten om naar terug te spoelen."
-
-msgid "There is no file snapshot for that message, so nothing was rewound. Choose Rewind chat only to rewind just the conversation."
-msgstr "Er is geen snapshot van de bestanden voor dat bericht, dus er is niets teruggespoeld. Kies 'Alleen de chat terugspoelen' om alleen het gesprek terug te spoelen."
+msgid "There was no file snapshot for that message, so the files were left as they are."
+msgstr "Er was geen bestandssnapshot voor dat bericht, dus de bestanden zijn ongewijzigd gelaten."
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "Deze commando's draaien automatisch wanneer een werkruimte wordt aangemaakt. <0>Lees onze docs<1/></0>"
@@ -17413,9 +17414,6 @@ msgstr "Dit {plugin}-account is al verbonden door een andere Superset-organisati
 
 msgid "This action is irreversible."
 msgstr "Deze actie kan niet worden teruggedraaid."
-
-msgid "This agent"
-msgstr "Deze agent"
 
 msgid "This agent can't be opened as a chat."
 msgstr "Deze agent kan niet als chat worden geopend."
@@ -17520,9 +17518,6 @@ msgstr "Deze GitHub-installatie is al gekoppeld aan een andere Superset-organisa
 msgid "This host"
 msgstr "Deze host"
 
-msgid "This host can't restore files, so nothing was rewound. Choose Rewind chat only to rewind just the conversation."
-msgstr "Deze host kan geen bestanden herstellen, dus er is niets teruggespoeld. Kies 'Alleen de chat terugspoelen' om alleen het gesprek terug te spoelen."
-
 msgid "This host has not reported a version yet."
 msgstr "Deze host heeft nog geen versie gemeld."
 
@@ -17564,12 +17559,6 @@ msgstr "Deze Mac"
 
 msgid "This machine"
 msgstr "Deze computer"
-
-msgid "This message and everything after it leave the chat, and the message goes back to the composer. Files stay as they are."
-msgstr "Dit bericht en alles daarna verdwijnen uit de chat, en het bericht komt terug in het invoerveld. De bestanden blijven zoals ze zijn."
-
-msgid "This message and everything after it leave the chat, and the message goes back to the composer. Rewinding the files also undoes changes made since then. A snapshot of the current files is kept first."
-msgstr "Dit bericht en alles daarna verdwijnen uit de chat, en het bericht komt terug in het invoerveld. Als je ook de bestanden terugspoelt, worden wijzigingen sindsdien ongedaan gemaakt. Eerst wordt een snapshot van de huidige bestanden bewaard."
 
 msgid "This Microsoft tenant is already connected by {detail}. Ask them to disconnect first."
 msgstr "Deze Microsoft-tenant is al gekoppeld door {detail}. Vraag hen om eerst los te koppelen."

@@ -145,6 +145,10 @@ msgstr "{0, plural, one {# fallito} other {# falliti}}"
 msgid "{0, plural, one {# failing} other {# failing}}"
 msgstr "{0, plural, one {# fallito} other {# falliti}}"
 
+#. placeholder {0}: changes.changes.length
+msgid "{0, plural, one {# file changed since this message} other {# files changed since this message}}"
+msgstr "{0, plural, one {# file modificato da questo messaggio} other {# file modificati da questo messaggio}}"
+
 #. placeholder {0}: detail.pullRequest.changedFiles
 msgid "{0, plural, one {# file changed} other {# files changed}}"
 msgstr "{0, plural, one {# file modificato} other {# file modificati}}"
@@ -958,9 +962,6 @@ msgstr "Tue automazioni con l'ultima esecuzione non riuscita: {myFailedCount}"
 
 msgid "{name} accounts"
 msgstr "Account {name}"
-
-msgid "{name} can't rewind its own history, so it is told the earlier conversation as text, without the details of its tool calls."
-msgstr "{name} non può riavvolgere la propria cronologia, quindi la conversazione precedente gli viene comunicata come testo, senza i dettagli delle sue chiamate agli strumenti."
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
@@ -2255,6 +2256,9 @@ msgstr "Si è verificato un errore sconosciuto"
 
 msgid "An update is ready to install."
 msgstr "Un aggiornamento è pronto per l'installazione."
+
+msgid "and {hidden} more"
+msgstr "e altri {hidden}"
 
 msgid "Android is on the way. Be first to know when it ships."
 msgstr "Android è in arrivo. Scoprilo per primo quando sarà disponibile."
@@ -5065,6 +5069,9 @@ msgstr "Non è stato possibile diramare in un nuovo worktree"
 msgid "Couldn't branch the conversation"
 msgstr "Non è stato possibile diramare la conversazione"
 
+msgid "Couldn't check the files"
+msgstr "Impossibile controllare i file"
+
 msgid "Couldn't check what removing this member affects"
 msgstr "Impossibile verificare cosa comporta la rimozione di questo membro"
 
@@ -5100,6 +5107,9 @@ msgstr "Impossibile scartare le modifiche in stage"
 
 msgid "Couldn't discard unstaged changes"
 msgstr "Impossibile scartare le modifiche non in stage"
+
+msgid "Couldn't edit the message"
+msgstr "Impossibile modificare il messaggio"
 
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Impossibile completare l'eliminazione dei workspace"
@@ -5210,9 +5220,6 @@ msgstr "Impossibile ripristinare \"{workspaceName}\""
 
 msgid "Couldn't restore the files"
 msgstr "Impossibile ripristinare i file"
-
-msgid "Couldn't rewind the chat"
-msgstr "Impossibile riavvolgere la chat"
 
 msgid "Couldn't save"
 msgstr "Impossibile salvare"
@@ -5896,6 +5903,9 @@ msgstr "Elimina il workspace"
 msgid "Delete workspace \"{workspaceName}\"?"
 msgstr "Eliminare il workspace \"{workspaceName}\"?"
 
+msgid "deleted"
+msgstr "eliminato"
+
 msgid "Deleted"
 msgstr "Eliminato"
 
@@ -6543,6 +6553,9 @@ msgstr "Hai ottenuto {name} ×{tier}"
 msgid "Edit"
 msgstr "Modifica"
 
+msgid "Edit and restore files"
+msgstr "Modifica e ripristina i file"
+
 msgid "Edit comment"
 msgstr "Modifica il commento"
 
@@ -6551,6 +6564,9 @@ msgstr "Modifica ambiente"
 
 msgid "Edit files without asking; ask before commands"
 msgstr "Modifica i file senza chiedere; chiedi prima dei comandi"
+
+msgid "Edit message"
+msgstr "Modifica messaggio"
 
 msgid "Edit name"
 msgstr "Modifica il nome"
@@ -6569,6 +6585,9 @@ msgstr "Modifica lo script"
 
 msgid "Edit your comment…"
 msgstr "Modifica il tuo commento…"
+
+msgid "Edit, keep files"
+msgstr "Modifica, mantieni i file"
 
 msgid "Edited"
 msgstr "Modificato"
@@ -7555,11 +7574,11 @@ msgstr "File"
 msgid "Files & Editor"
 msgstr "File ed editor"
 
-msgid "Files can't be rewound here because this folder is not a git repository. Only the chat goes back."
-msgstr "Qui non è possibile riavvolgere i file perché questa cartella non è un repository git. Torna indietro solo la chat."
-
 msgid "Files changed"
 msgstr "File modificati"
+
+msgid "Files restored to before that message"
+msgstr "File ripristinati a prima di quel messaggio"
 
 msgid "files to exclude (glob)"
 msgstr "file da escludere (glob)"
@@ -8097,9 +8116,6 @@ msgstr "Indietro"
 
 msgid "Go back home"
 msgstr "Torna alla home"
-
-msgid "Go back to an earlier message and restore the files"
-msgstr "Torna a un messaggio precedente e ripristina i file"
 
 msgid "Go back to the previous page in history"
 msgstr "Torna alla pagina precedente nella cronologia"
@@ -9345,6 +9361,9 @@ msgstr "Latenza"
 msgid "Later"
 msgstr "Più tardi"
 
+msgid "Later messages and their file changes are removed."
+msgstr "I messaggi successivi e le relative modifiche ai file verranno rimossi."
+
 msgid "Latest"
 msgstr "Ultima"
 
@@ -10482,6 +10501,9 @@ msgstr "Mai"
 
 msgid "Never asks before acting"
 msgstr "Non chiede mai prima di agire"
+
+msgid "new"
+msgstr "nuovo"
 
 msgid "New"
 msgstr "Novità"
@@ -12556,9 +12578,6 @@ msgstr "Scegli una cartella…"
 msgid "Pick a low-risk papercut, fix it, and explain how it was verified."
 msgstr "Scegli una piccola seccatura a basso rischio, correggila e spiega come l'hai verificata."
 
-msgid "Pick a message. The chat goes back to just before it, and the message returns to the composer."
-msgstr "Scegli un messaggio. La chat torna a subito prima di esso e il messaggio ritorna nel campo di testo."
-
 msgid "Pick a model"
 msgstr "Scegli un modello"
 
@@ -14147,6 +14166,9 @@ msgstr "\"{workspaceName}\" ripristinato"
 msgid "Restoring \"{workspaceName}\"…"
 msgstr "Ripristino di \"{workspaceName}\"…"
 
+msgid "Restoring puts them back as they were before this message, including changes you made yourself. A snapshot of the current files is kept first."
+msgstr "Il ripristino li riporta a com'erano prima di questo messaggio, incluse le modifiche fatte da te. Prima viene salvato uno snapshot dei file attuali."
+
 msgid "Restoring your session"
 msgstr "Ripristino della sessione"
 
@@ -14313,21 +14335,6 @@ msgstr "Revoca la chiave API"
 
 msgid "Revoke key"
 msgstr "Revoca la chiave"
-
-msgid "Rewind"
-msgstr "Riavvolgi"
-
-msgid "Rewind chat"
-msgstr "Riavvolgi la chat"
-
-msgid "Rewind chat and files"
-msgstr "Riavvolgi chat e file"
-
-msgid "Rewind chat only"
-msgstr "Riavvolgi solo la chat"
-
-msgid "Rewind to this message?"
-msgstr "Riavvolgere fino a questo messaggio?"
 
 msgid "Rewrote it and published version 2."
 msgstr "Riscritto e pubblicata la versione 2."
@@ -16254,8 +16261,8 @@ msgstr "Chiudi Superset qui per eliminarlo da un altro dispositivo."
 msgid "Stop the agent and send this now"
 msgstr "Ferma l'agente e invia ora"
 
-msgid "Stop the agent before you rewind"
-msgstr "Ferma l'agente prima di riavvolgere"
+msgid "Stop the agent before you edit a message"
+msgstr "Arresta l'agente prima di modificare un messaggio"
 
 msgid "Stop watching"
 msgstr "Smetti di osservare"
@@ -17318,9 +17325,6 @@ msgstr "Il punto di partenza da cui si avvia un workspace cloud — un'immagine 
 msgid "The Superset desktop app is available for macOS and Linux."
 msgstr "L'app desktop Superset è disponibile per macOS e Linux."
 
-msgid "The Superset host on this machine is out of date, so only the chat goes back and the agent is told the earlier conversation as text."
-msgstr "L'host Superset su questa macchina non è aggiornato, quindi torna indietro solo la chat e all'agente viene comunicata la conversazione precedente come testo."
-
 msgid "The Superset host service for {organization} stopped unexpectedly ({cause}) and could not be restarted automatically."
 msgstr "Il servizio host di Superset per {organization} si è arrestato in modo imprevisto ({cause}) e non è stato possibile riavviarlo automaticamente."
 
@@ -17378,11 +17382,8 @@ msgstr "Temi"
 msgid "Themes and agents"
 msgstr "Temi e agenti"
 
-msgid "There are no messages to rewind to yet."
-msgstr "Non ci sono ancora messaggi a cui tornare."
-
-msgid "There is no file snapshot for that message, so nothing was rewound. Choose Rewind chat only to rewind just the conversation."
-msgstr "Non c'è uno snapshot dei file per quel messaggio, quindi non è stato riavvolto nulla. Scegli \"Riavvolgi solo la chat\" per riavvolgere solo la conversazione."
+msgid "There was no file snapshot for that message, so the files were left as they are."
+msgstr "Non c'era uno snapshot dei file per quel messaggio, quindi i file sono rimasti invariati."
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "Questi comandi vengono eseguiti automaticamente quando viene creato un workspace. <0>Leggi la documentazione<1/></0>"
@@ -17413,9 +17414,6 @@ msgstr "Questo account {plugin} è già collegato da un'altra organizzazione Sup
 
 msgid "This action is irreversible."
 msgstr "L'operazione è irreversibile."
-
-msgid "This agent"
-msgstr "Questo agente"
 
 msgid "This agent can't be opened as a chat."
 msgstr "Questo agente non può essere aperto come chat."
@@ -17520,9 +17518,6 @@ msgstr "Questa installazione GitHub è già collegata a un'altra organizzazione 
 msgid "This host"
 msgstr "Questo host"
 
-msgid "This host can't restore files, so nothing was rewound. Choose Rewind chat only to rewind just the conversation."
-msgstr "Questo host non può ripristinare i file, quindi non è stato riavvolto nulla. Scegli \"Riavvolgi solo la chat\" per riavvolgere solo la conversazione."
-
 msgid "This host has not reported a version yet."
 msgstr "Questo host non ha ancora riportato una versione."
 
@@ -17564,12 +17559,6 @@ msgstr "Questo Mac"
 
 msgid "This machine"
 msgstr "Questo computer"
-
-msgid "This message and everything after it leave the chat, and the message goes back to the composer. Files stay as they are."
-msgstr "Questo messaggio e tutto ciò che segue escono dalla chat, e il messaggio torna nel campo di testo. I file restano come sono."
-
-msgid "This message and everything after it leave the chat, and the message goes back to the composer. Rewinding the files also undoes changes made since then. A snapshot of the current files is kept first."
-msgstr "Questo messaggio e tutto ciò che segue escono dalla chat, e il messaggio torna nel campo di testo. Riavvolgere anche i file annulla le modifiche fatte da allora. Prima viene salvato uno snapshot dei file attuali."
 
 msgid "This Microsoft tenant is already connected by {detail}. Ask them to disconnect first."
 msgstr "Questo tenant Microsoft è già collegato da {detail}. Chiedi di scollegarlo prima."

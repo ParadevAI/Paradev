@@ -145,6 +145,10 @@ msgstr "{0, plural, one {#项失败} other {#项失败}}"
 msgid "{0, plural, one {# failing} other {# failing}}"
 msgstr "{0, plural, one {#项失败} other {#项失败}}"
 
+#. placeholder {0}: changes.changes.length
+msgid "{0, plural, one {# file changed since this message} other {# files changed since this message}}"
+msgstr "{0, plural, other {自此消息以来有 # 个文件已更改}}"
+
 #. placeholder {0}: detail.pullRequest.changedFiles
 msgid "{0, plural, one {# file changed} other {# files changed}}"
 msgstr "{0, plural, one {#个文件已更改} other {#个文件已更改}}"
@@ -958,9 +962,6 @@ msgstr "你有{myFailedCount}个自动化上次运行失败"
 
 msgid "{name} accounts"
 msgstr "{name} 账号"
-
-msgid "{name} can't rewind its own history, so it is told the earlier conversation as text, without the details of its tool calls."
-msgstr "{name} 无法回退自身的历史，因此会以文本形式告知它之前的对话，不包含其工具调用的细节。"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
@@ -2255,6 +2256,9 @@ msgstr "发生未知错误"
 
 msgid "An update is ready to install."
 msgstr "更新已准备好安装。"
+
+msgid "and {hidden} more"
+msgstr "以及另外 {hidden} 个"
 
 msgid "Android is on the way. Be first to know when it ships."
 msgstr "Android 版即将到来。发布时第一时间通知你。"
@@ -5065,6 +5069,9 @@ msgstr "无法分叉到新的 worktree"
 msgid "Couldn't branch the conversation"
 msgstr "无法分叉对话"
 
+msgid "Couldn't check the files"
+msgstr "无法检查文件"
+
 msgid "Couldn't check what removing this member affects"
 msgstr "无法检查移除此成员会影响哪些内容"
 
@@ -5100,6 +5107,9 @@ msgstr "无法放弃已暂存的更改"
 
 msgid "Couldn't discard unstaged changes"
 msgstr "无法放弃未暂存的更改"
+
+msgid "Couldn't edit the message"
+msgstr "无法编辑该消息"
 
 msgid "Couldn’t finish deleting workspaces"
 msgstr "没能完成工作区的删除"
@@ -5210,9 +5220,6 @@ msgstr "无法恢复“{workspaceName}”"
 
 msgid "Couldn't restore the files"
 msgstr "无法恢复文件"
-
-msgid "Couldn't rewind the chat"
-msgstr "无法回退聊天"
 
 msgid "Couldn't save"
 msgstr "保存失败"
@@ -5896,6 +5903,9 @@ msgstr "删除工作区"
 msgid "Delete workspace \"{workspaceName}\"?"
 msgstr "删除工作区“{workspaceName}”？"
 
+msgid "deleted"
+msgstr "已删除"
+
 msgid "Deleted"
 msgstr "已删除"
 
@@ -6543,6 +6553,9 @@ msgstr "已获得「{name}」×{tier}"
 msgid "Edit"
 msgstr "编辑"
 
+msgid "Edit and restore files"
+msgstr "编辑并恢复文件"
+
 msgid "Edit comment"
 msgstr "编辑评论"
 
@@ -6551,6 +6564,9 @@ msgstr "编辑环境"
 
 msgid "Edit files without asking; ask before commands"
 msgstr "无需询问即可编辑文件；运行命令前询问"
+
+msgid "Edit message"
+msgstr "编辑消息"
 
 msgid "Edit name"
 msgstr "编辑名称"
@@ -6569,6 +6585,9 @@ msgstr "编辑脚本"
 
 msgid "Edit your comment…"
 msgstr "编辑你的评论…"
+
+msgid "Edit, keep files"
+msgstr "编辑并保留文件"
 
 msgid "Edited"
 msgstr "已编辑"
@@ -7555,11 +7574,11 @@ msgstr "文件"
 msgid "Files & Editor"
 msgstr "文件与编辑器"
 
-msgid "Files can't be rewound here because this folder is not a git repository. Only the chat goes back."
-msgstr "此文件夹不是 git 仓库，因此无法回退文件。只会回退聊天。"
-
 msgid "Files changed"
 msgstr "更改的文件"
+
+msgid "Files restored to before that message"
+msgstr "文件已恢复到该消息之前的状态"
 
 msgid "files to exclude (glob)"
 msgstr "排除的文件（glob）"
@@ -8097,9 +8116,6 @@ msgstr "返回"
 
 msgid "Go back home"
 msgstr "返回首页"
-
-msgid "Go back to an earlier message and restore the files"
-msgstr "回到之前的消息并恢复文件"
 
 msgid "Go back to the previous page in history"
 msgstr "返回历史记录中的上一页"
@@ -9345,6 +9361,9 @@ msgstr "延迟"
 msgid "Later"
 msgstr "稍后"
 
+msgid "Later messages and their file changes are removed."
+msgstr "之后的消息及其文件更改将被移除。"
+
 msgid "Latest"
 msgstr "最新"
 
@@ -10482,6 +10501,9 @@ msgstr "从未"
 
 msgid "Never asks before acting"
 msgstr "执行前从不询问"
+
+msgid "new"
+msgstr "新建"
 
 msgid "New"
 msgstr "新功能"
@@ -12556,9 +12578,6 @@ msgstr "选择文件夹…"
 msgid "Pick a low-risk papercut, fix it, and explain how it was verified."
 msgstr "挑一个低风险的小毛病，修好它，并说明是怎么验证的。"
 
-msgid "Pick a message. The chat goes back to just before it, and the message returns to the composer."
-msgstr "选择一条消息。聊天会回到这条消息之前，该消息会回到输入框。"
-
 msgid "Pick a model"
 msgstr "选择模型"
 
@@ -14147,6 +14166,9 @@ msgstr "已恢复“{workspaceName}”"
 msgid "Restoring \"{workspaceName}\"…"
 msgstr "正在恢复“{workspaceName}”…"
 
+msgid "Restoring puts them back as they were before this message, including changes you made yourself. A snapshot of the current files is kept first."
+msgstr "恢复会将它们还原到此消息之前的状态，包括你自己做的更改。会先保存当前文件的快照。"
+
 msgid "Restoring your session"
 msgstr "正在恢复你的会话"
 
@@ -14313,21 +14335,6 @@ msgstr "吊销API密钥"
 
 msgid "Revoke key"
 msgstr "吊销密钥"
-
-msgid "Rewind"
-msgstr "回退"
-
-msgid "Rewind chat"
-msgstr "回退聊天"
-
-msgid "Rewind chat and files"
-msgstr "回退聊天和文件"
-
-msgid "Rewind chat only"
-msgstr "仅回退聊天"
-
-msgid "Rewind to this message?"
-msgstr "回退到这条消息？"
 
 msgid "Rewrote it and published version 2."
 msgstr "已重写并发布版本 2。"
@@ -16254,8 +16261,8 @@ msgstr "在此停止Superset，然后从其他设备删除。"
 msgid "Stop the agent and send this now"
 msgstr "停止智能体并立即发送"
 
-msgid "Stop the agent before you rewind"
-msgstr "回退前请先停止智能体"
+msgid "Stop the agent before you edit a message"
+msgstr "编辑消息前请先停止智能体"
 
 msgid "Stop watching"
 msgstr "停止关注"
@@ -17318,9 +17325,6 @@ msgstr "云端工作区启动的起点 — 一个基础镜像，或你已配置�
 msgid "The Superset desktop app is available for macOS and Linux."
 msgstr "Superset 桌面应用支持 macOS 和 Linux。"
 
-msgid "The Superset host on this machine is out of date, so only the chat goes back and the agent is told the earlier conversation as text."
-msgstr "此机器上的 Superset 主机版本过旧，因此只会回退聊天，并以文本形式告知智能体之前的对话。"
-
 msgid "The Superset host service for {organization} stopped unexpectedly ({cause}) and could not be restarted automatically."
 msgstr "{organization}的Superset主机服务意外停止（{cause}），且无法自动重启。"
 
@@ -17378,11 +17382,8 @@ msgstr "主题"
 msgid "Themes and agents"
 msgstr "主题与智能体"
 
-msgid "There are no messages to rewind to yet."
-msgstr "还没有可以回退到的消息。"
-
-msgid "There is no file snapshot for that message, so nothing was rewound. Choose Rewind chat only to rewind just the conversation."
-msgstr "这条消息没有文件快照，因此没有回退任何内容。若只想回退对话，请选择“仅回退聊天”。"
+msgid "There was no file snapshot for that message, so the files were left as they are."
+msgstr "该消息没有文件快照，因此文件保持不变。"
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "创建工作区时会自动运行这些命令。<0>阅读文档<1/></0>"
@@ -17413,9 +17414,6 @@ msgstr "该 {plugin} 账户已被另一个 Superset 组织连接。"
 
 msgid "This action is irreversible."
 msgstr "此操作不可逆。"
-
-msgid "This agent"
-msgstr "此智能体"
 
 msgid "This agent can't be opened as a chat."
 msgstr "该智能体无法以聊天方式打开。"
@@ -17520,9 +17518,6 @@ msgstr "这个GitHub安装已连接到另一个Superset组织。请先在那里�
 msgid "This host"
 msgstr "此主机"
 
-msgid "This host can't restore files, so nothing was rewound. Choose Rewind chat only to rewind just the conversation."
-msgstr "此主机无法恢复文件，因此没有回退任何内容。若只想回退对话，请选择“仅回退聊天”。"
-
 msgid "This host has not reported a version yet."
 msgstr "此主机尚未报告版本。"
 
@@ -17564,12 +17559,6 @@ msgstr "这台Mac"
 
 msgid "This machine"
 msgstr "本机"
-
-msgid "This message and everything after it leave the chat, and the message goes back to the composer. Files stay as they are."
-msgstr "这条消息及之后的内容会从聊天中移除，该消息会回到输入框。文件保持不变。"
-
-msgid "This message and everything after it leave the chat, and the message goes back to the composer. Rewinding the files also undoes changes made since then. A snapshot of the current files is kept first."
-msgstr "这条消息及之后的内容会从聊天中移除，该消息会回到输入框。同时回退文件会撤销此后的更改。系统会先保存当前文件的快照。"
 
 msgid "This Microsoft tenant is already connected by {detail}. Ask them to disconnect first."
 msgstr "这个Microsoft租户已被{detail}连接。请让对方先断开连接。"

@@ -145,6 +145,10 @@ msgstr "{0, plural, one {#件失敗} other {#件失敗}}"
 msgid "{0, plural, one {# failing} other {# failing}}"
 msgstr "{0, plural, one {#件失敗} other {#件失敗}}"
 
+#. placeholder {0}: changes.changes.length
+msgid "{0, plural, one {# file changed since this message} other {# files changed since this message}}"
+msgstr "{0, plural, other {このメッセージ以降に # 個のファイルが変更されました}}"
+
 #. placeholder {0}: detail.pullRequest.changedFiles
 msgid "{0, plural, one {# file changed} other {# files changed}}"
 msgstr "{0, plural, one {#件のファイルを変更} other {#件のファイルを変更}}"
@@ -958,9 +962,6 @@ msgstr "自分のオートメーションのうち{myFailedCount}件が前回の
 
 msgid "{name} accounts"
 msgstr "{name} のアカウント"
-
-msgid "{name} can't rewind its own history, so it is told the earlier conversation as text, without the details of its tool calls."
-msgstr "{name} は自身の履歴を巻き戻せないため、以前の会話はテキストとして伝えられます。ツール呼び出しの詳細は含まれません。"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
@@ -2255,6 +2256,9 @@ msgstr "不明なエラーが発生しました"
 
 msgid "An update is ready to install."
 msgstr "アップデートをインストールする準備ができました。"
+
+msgid "and {hidden} more"
+msgstr "ほか {hidden} 件"
 
 msgid "Android is on the way. Be first to know when it ships."
 msgstr "Android 版を準備中です。リリース時にいち早くお知らせします。"
@@ -5065,6 +5069,9 @@ msgstr "新しい worktree へ分岐できませんでした"
 msgid "Couldn't branch the conversation"
 msgstr "会話を分岐できませんでした"
 
+msgid "Couldn't check the files"
+msgstr "ファイルを確認できませんでした"
+
 msgid "Couldn't check what removing this member affects"
 msgstr "このメンバーの削除による影響を確認できませんでした"
 
@@ -5100,6 +5107,9 @@ msgstr "ステージ済みの変更を破棄できませんでした"
 
 msgid "Couldn't discard unstaged changes"
 msgstr "未ステージの変更を破棄できませんでした"
+
+msgid "Couldn't edit the message"
+msgstr "メッセージを編集できませんでした"
 
 msgid "Couldn’t finish deleting workspaces"
 msgstr "ワークスペースの削除を完了できませんでした"
@@ -5210,9 +5220,6 @@ msgstr "「{workspaceName}」を復元できませんでした"
 
 msgid "Couldn't restore the files"
 msgstr "ファイルを復元できませんでした"
-
-msgid "Couldn't rewind the chat"
-msgstr "チャットを巻き戻せませんでした"
 
 msgid "Couldn't save"
 msgstr "保存できませんでした"
@@ -5896,6 +5903,9 @@ msgstr "ワークスペースを削除"
 msgid "Delete workspace \"{workspaceName}\"?"
 msgstr "ワークスペース「{workspaceName}」を削除しますか?"
 
+msgid "deleted"
+msgstr "削除"
+
 msgid "Deleted"
 msgstr "削除済み"
 
@@ -6543,6 +6553,9 @@ msgstr "「{name}」×{tier} を獲得"
 msgid "Edit"
 msgstr "編集"
 
+msgid "Edit and restore files"
+msgstr "編集してファイルを復元"
+
 msgid "Edit comment"
 msgstr "コメントを編集"
 
@@ -6551,6 +6564,9 @@ msgstr "環境を編集"
 
 msgid "Edit files without asking; ask before commands"
 msgstr "ファイルは確認なしで編集し、コマンドは事前に確認"
+
+msgid "Edit message"
+msgstr "メッセージを編集"
 
 msgid "Edit name"
 msgstr "名前を編集"
@@ -6569,6 +6585,9 @@ msgstr "スクリプトを編集"
 
 msgid "Edit your comment…"
 msgstr "コメントを編集…"
+
+msgid "Edit, keep files"
+msgstr "編集してファイルを保持"
 
 msgid "Edited"
 msgstr "編集"
@@ -7555,11 +7574,11 @@ msgstr "ファイル"
 msgid "Files & Editor"
 msgstr "ファイルとエディター"
 
-msgid "Files can't be rewound here because this folder is not a git repository. Only the chat goes back."
-msgstr "このフォルダーは git リポジトリではないため、ファイルは巻き戻せません。チャットのみが戻ります。"
-
 msgid "Files changed"
 msgstr "変更されたファイル"
+
+msgid "Files restored to before that message"
+msgstr "ファイルをそのメッセージの前の状態に復元しました"
 
 msgid "files to exclude (glob)"
 msgstr "除外するファイル（glob）"
@@ -8097,9 +8116,6 @@ msgstr "戻る"
 
 msgid "Go back home"
 msgstr "ホームに戻る"
-
-msgid "Go back to an earlier message and restore the files"
-msgstr "以前のメッセージに戻り、ファイルを復元します"
 
 msgid "Go back to the previous page in history"
 msgstr "履歴の前のページに戻る"
@@ -9345,6 +9361,9 @@ msgstr "レイテンシ"
 msgid "Later"
 msgstr "後で"
 
+msgid "Later messages and their file changes are removed."
+msgstr "以降のメッセージとそのファイル変更は削除されます。"
+
 msgid "Latest"
 msgstr "最新"
 
@@ -10482,6 +10501,9 @@ msgstr "未使用"
 
 msgid "Never asks before acting"
 msgstr "確認なしで実行"
+
+msgid "new"
+msgstr "新規"
 
 msgid "New"
 msgstr "新着"
@@ -12556,9 +12578,6 @@ msgstr "フォルダを選択…"
 msgid "Pick a low-risk papercut, fix it, and explain how it was verified."
 msgstr "リスクの低い小さな不具合を選んで修正し、検証方法を説明します。"
 
-msgid "Pick a message. The chat goes back to just before it, and the message returns to the composer."
-msgstr "メッセージを選択してください。チャットはその直前に戻り、メッセージは入力欄に戻ります。"
-
 msgid "Pick a model"
 msgstr "モデルを選択"
 
@@ -14147,6 +14166,9 @@ msgstr "「{workspaceName}」を復元しました"
 msgid "Restoring \"{workspaceName}\"…"
 msgstr "「{workspaceName}」を復元中…"
 
+msgid "Restoring puts them back as they were before this message, including changes you made yourself. A snapshot of the current files is kept first."
+msgstr "復元すると、ご自身で行った変更も含めて、このメッセージより前の状態に戻ります。先に現在のファイルのスナップショットが保存されます。"
+
 msgid "Restoring your session"
 msgstr "セッションを復元中"
 
@@ -14313,21 +14335,6 @@ msgstr "APIキーを取り消す"
 
 msgid "Revoke key"
 msgstr "キーを取り消す"
-
-msgid "Rewind"
-msgstr "巻き戻し"
-
-msgid "Rewind chat"
-msgstr "チャットを巻き戻す"
-
-msgid "Rewind chat and files"
-msgstr "チャットとファイルを巻き戻す"
-
-msgid "Rewind chat only"
-msgstr "チャットのみ巻き戻す"
-
-msgid "Rewind to this message?"
-msgstr "このメッセージまで巻き戻しますか？"
 
 msgid "Rewrote it and published version 2."
 msgstr "書き直してバージョン2を公開しました。"
@@ -16254,8 +16261,8 @@ msgstr "別のデバイスから削除するには、ここでSupersetを停止�
 msgid "Stop the agent and send this now"
 msgstr "エージェントを停止して今すぐ送信"
 
-msgid "Stop the agent before you rewind"
-msgstr "巻き戻す前にエージェントを停止してください"
+msgid "Stop the agent before you edit a message"
+msgstr "メッセージを編集する前にエージェントを停止してください"
 
 msgid "Stop watching"
 msgstr "監視を停止"
@@ -17318,9 +17325,6 @@ msgstr "クラウドワークスペースの起動元となる出発点 — ベ�
 msgid "The Superset desktop app is available for macOS and Linux."
 msgstr "Supersetデスクトップアプリは macOS と Linux で利用できます。"
 
-msgid "The Superset host on this machine is out of date, so only the chat goes back and the agent is told the earlier conversation as text."
-msgstr "このマシンの Superset ホストが古いため、チャットのみが戻り、エージェントには以前の会話がテキストとして伝えられます。"
-
 msgid "The Superset host service for {organization} stopped unexpectedly ({cause}) and could not be restarted automatically."
 msgstr "{organization}のSupersetホストサービスが予期せず停止し ({cause})、自動的に再起動できませんでした。"
 
@@ -17378,11 +17382,8 @@ msgstr "テーマ"
 msgid "Themes and agents"
 msgstr "テーマとエージェント"
 
-msgid "There are no messages to rewind to yet."
-msgstr "巻き戻せるメッセージはまだありません。"
-
-msgid "There is no file snapshot for that message, so nothing was rewound. Choose Rewind chat only to rewind just the conversation."
-msgstr "このメッセージのファイルのスナップショットがないため、何も巻き戻していません。会話だけを巻き戻すには「チャットのみ巻き戻す」を選んでください。"
+msgid "There was no file snapshot for that message, so the files were left as they are."
+msgstr "そのメッセージのファイルスナップショットがないため、ファイルはそのままです。"
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "これらのコマンドはワークスペース作成時に自動的に実行されます。<0>ドキュメントを読む<1/></0>"
@@ -17413,9 +17414,6 @@ msgstr "この {plugin} アカウントはすでに別の Superset 組織が接�
 
 msgid "This action is irreversible."
 msgstr "この操作は元に戻せません。"
-
-msgid "This agent"
-msgstr "このエージェント"
 
 msgid "This agent can't be opened as a chat."
 msgstr "このエージェントはチャットとして開けません。"
@@ -17520,9 +17518,6 @@ msgstr "このGitHubインストールは別のSuperset組織にすでに接続�
 msgid "This host"
 msgstr "このホスト"
 
-msgid "This host can't restore files, so nothing was rewound. Choose Rewind chat only to rewind just the conversation."
-msgstr "このホストではファイルを復元できないため、何も巻き戻していません。会話だけを巻き戻すには「チャットのみ巻き戻す」を選んでください。"
-
 msgid "This host has not reported a version yet."
 msgstr "このホストはまだバージョンを報告していません。"
 
@@ -17564,12 +17559,6 @@ msgstr "このMac"
 
 msgid "This machine"
 msgstr "このマシン"
-
-msgid "This message and everything after it leave the chat, and the message goes back to the composer. Files stay as they are."
-msgstr "このメッセージとそれ以降の内容はチャットから削除され、メッセージは入力欄に戻ります。ファイルはそのままです。"
-
-msgid "This message and everything after it leave the chat, and the message goes back to the composer. Rewinding the files also undoes changes made since then. A snapshot of the current files is kept first."
-msgstr "このメッセージとそれ以降の内容はチャットから削除され、メッセージは入力欄に戻ります。ファイルも巻き戻すと、それ以降の変更も元に戻ります。先に現在のファイルのスナップショットが保存されます。"
 
 msgid "This Microsoft tenant is already connected by {detail}. Ask them to disconnect first."
 msgstr "このMicrosoftテナントは{detail}がすでに接続しています。先に接続を解除してもらってください。"
