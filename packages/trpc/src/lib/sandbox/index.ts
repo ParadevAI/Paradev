@@ -40,6 +40,7 @@ export {
 	type BoxSession,
 	deleteSandbox,
 	describeSandbox,
+	extendSandbox,
 	findSandboxSession,
 	HOST_SERVICE_PORT,
 	IMAGE_SANDBOX_VCPUS,

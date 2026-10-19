@@ -30,7 +30,7 @@ export async function wakeCloudWorkspace(
 ): Promise<WokenCloudWorkspace> {
 	const { claim, agentCredentialDigest } = await buildSandboxClaim({ row });
 	let bootId: string | null = null;
-	const { hostTarget, booted } = await wakeSandbox({
+	const { hostTarget, booted, sessionEndsAt } = await wakeSandbox({
 		providerSandboxId: row.providerSandboxId,
 		claim,
 		beforeResume: async (box) => {
@@ -58,6 +58,9 @@ export async function wakeCloudWorkspace(
 	const set: Partial<CloudWorkspaceRow> = {
 		...(hostTarget !== row.sandboxUrl ? { sandboxUrl: hostTarget } : {}),
 		...(booted ? { bootAgentCredentialDigest: agentCredentialDigest } : {}),
+		...(sessionEndsAt?.getTime() !== row.sessionEndsAt?.getTime()
+			? { sessionEndsAt }
+			: {}),
 	};
 	if (Object.keys(set).length > 0) {
 		await db
@@ -72,6 +75,19 @@ export async function wakeCloudWorkspace(
 			row.bootAgentCredentialDigest !== null &&
 			row.bootAgentCredentialDigest !== agentCredentialDigest,
 	};
+}
+
+/** For a box stopped before its session ran out, so the list stops showing its cut-off turn. */
+export async function recordSessionEnded(
+	row: CloudWorkspaceRow,
+	now = new Date(),
+): Promise<void> {
+	if (row.sessionEndsAt && row.sessionEndsAt <= now) return;
+	await db
+		.update(cloudWorkspaces)
+		.set({ sessionEndsAt: now })
+		.where(eq(cloudWorkspaces.id, row.id));
+	nudge(row.organizationId, "cloud_workspaces");
 }
 
 /** Ends every process on the box and boots it again from a fresh claim. */

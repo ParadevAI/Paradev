@@ -1072,6 +1072,13 @@
       "when": 1792197917616,
       "tag": "0152_sharing_people_and_teams",
       "breakpoints": true
+    },
+    {
+      "idx": 153,
+      "version": "7",
+      "when": 1792289292895,
+      "tag": "0153_cloud_workspace_session_ends_at",
+      "breakpoints": true
     }
   ]
 }

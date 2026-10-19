@@ -132,6 +132,7 @@ async function provision(
 				providerSandboxId: sandbox.providerSandboxId,
 				sandboxUrl: sandbox.sandboxUrl,
 				bootAgentCredentialDigest: agentCredentialDigest,
+				sessionEndsAt: sandbox.sessionEndsAt,
 			},
 		});
 		if (!ready) {

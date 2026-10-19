@@ -28,13 +28,13 @@ import { env } from "../../env";
 export const HOST_SERVICE_PORT = SANDBOX_PORTS.hostService;
 /**
  * A session ends after this long; the workspace's files survive and the next
- * open resumes it. A workspace someone has open is extended before it gets
- * there (`wakeSandbox`), so this is really the idle stop, and how long an
- * unattended agent run can last.
+ * open resumes it. A workspace someone has open (`wakeSandbox`) or whose agent
+ * reports `working` (`extendSandbox`) is extended before it gets there, so
+ * this is really the idle stop.
  */
-const SESSION_TIMEOUT_MS = 4 * 60 * 60 * 1000;
-/** Extend an open workspace's session when it has less than this left. */
-const EXTEND_BELOW_MS = 60 * 60 * 1000;
+const SESSION_TIMEOUT_MS = 60 * 60 * 1000;
+/** Above the 10-minute client keepalive and the box's 15-minute working heartbeat. */
+const EXTEND_BELOW_MS = 30 * 60 * 1000;
 const WORKSPACE_SNAPSHOT_EXPIRATION_MS = 30 * 24 * 60 * 60 * 1000;
 /** 2 GB of memory per vCPU; disk is 64 GB regardless. */
 export const IMAGE_SANDBOX_VCPUS = 8;
@@ -178,6 +178,7 @@ export async function provisionSandbox(args: {
 	providerSandboxId: string;
 	sandboxUrl: string;
 	hostTarget: string;
+	sessionEndsAt: Date | null;
 }> {
 	const kind = args.kind ?? "workspace";
 	const config = {
@@ -214,6 +215,7 @@ export async function provisionSandbox(args: {
 		providerSandboxId: args.name,
 		sandboxUrl: sandbox.domain(HOST_SERVICE_PORT),
 		hostTarget: sandbox.domain(HOST_SERVICE_PORT),
+		sessionEndsAt: sandbox.expiresAt ?? null,
 	};
 }
 
@@ -330,6 +332,35 @@ export async function describeSandbox(providerSandboxId: string): Promise<{
 	}
 }
 
+/**
+ * Extends a running session that has less than `EXTEND_BELOW_MS` left and
+ * returns when it now ends. Goes through the session, not
+ * `Sandbox.extendTimeout`: that one resumes a session that stopped meanwhile.
+ * Past the plan's 24h per-session cap the extension is refused; the session
+ * then ends and the next open resumes it.
+ */
+async function extendRunningSession(sandbox: Sandbox): Promise<Date | null> {
+	const remaining = (sandbox.expiresAt?.getTime() ?? 0) - Date.now();
+	if (remaining < EXTEND_BELOW_MS) {
+		await sandbox
+			.currentSession()
+			.extendTimeout(SESSION_TIMEOUT_MS)
+			.catch((error: unknown) =>
+				console.warn(`[sandbox] extend failed for ${sandbox.name}`, error),
+			);
+	}
+	return sandbox.expiresAt ?? null;
+}
+
+/** Keeps a running session alive, waking nothing. Null when no session is running. */
+export async function extendSandbox(
+	providerSandboxId: string,
+): Promise<Date | null> {
+	const sandbox = await getSandbox(providerSandboxId);
+	if (!sandbox || sandbox.status !== "running") return null;
+	return extendRunningSession(sandbox);
+}
+
 /** Whether host-service is already serving, so a wake can skip the boot. */
 async function hostServiceAnswers(hostTarget: string): Promise<boolean> {
 	try {
@@ -360,6 +391,7 @@ export async function wakeSandbox(args: {
 	hostTarget: string;
 	/** The session was stopped, so every process on the box started from this claim. */
 	booted: boolean;
+	sessionEndsAt: Date | null;
 }> {
 	try {
 		const sandbox = await Sandbox.get({
@@ -375,14 +407,7 @@ export async function wakeSandbox(args: {
 				vcpus: sandbox.vcpus ?? IMAGE_SANDBOX_VCPUS,
 			});
 		}
-		if (wasRunning) {
-			const remaining = (sandbox.expiresAt?.getTime() ?? 0) - Date.now();
-			if (remaining < EXTEND_BELOW_MS) {
-				// Past the plan's per-session cap the extension is refused; the
-				// session then ends and the next open resumes it.
-				await sandbox.extendTimeout(SESSION_TIMEOUT_MS).catch(() => {});
-			}
-		}
+		if (wasRunning) await extendRunningSession(sandbox);
 		// A box that is already serving needs neither a fresh identity file nor
 		// another boot. The policy still goes out: a credential may have aged.
 		const serving = wasRunning && (await hostServiceAnswers(hostTarget));
@@ -403,7 +428,11 @@ export async function wakeSandbox(args: {
 			hostTarget,
 			claim: args.claim,
 		});
-		return { hostTarget, booted: !wasRunning };
+		return {
+			hostTarget,
+			booted: !wasRunning,
+			sessionEndsAt: sandbox.expiresAt ?? null,
+		};
 	} catch (error) {
 		if (isUnavailable(error))
 			throw new SandboxUnavailableError(args.providerSandboxId, error);

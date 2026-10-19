@@ -921,6 +921,8 @@ export const cloudWorkspaces = pgTable(
 		bootAgentCredentialDigest: text("boot_agent_credential_digest"),
 		agentStatus: text("agent_status").$type<ActiveAgentStatus>(),
 		agentStatusAt: timestamp("agent_status_at", { withTimezone: true }),
+		/** When the box's session stops unless extended; null if no session started since this was added. */
+		sessionEndsAt: timestamp("session_ends_at", { withTimezone: true }),
 		/** What the creator typed, as markdown; null when the box started idle. */
 		prompt: text(),
 		/** Markdown anyone can edit; the box's agent can write it on request. */

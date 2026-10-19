@@ -70,8 +70,10 @@ day. Instead the box reports its own status — the most urgent of its
 terminals, from the same lifecycle events — to
 `POST /api/cloud-workspaces/:id/agent-status` with its host secret, coalesced
 and capped at one report per five seconds (`sandbox-agent-status` in
-host-service). The row keeps the last value (`agent_status`,
-`agent_status_at`) so a cold client sees it at once, and the realtime nudge
+host-service). `working` is also repeated every fifteen minutes as the box's
+keepalive (see Lifecycle); a repeat with an unchanged status writes and
+nudges nothing. The row keeps the last value (`agent_status`,
+`agent_status_at`, when that status began) so a cold client sees it at once, and the realtime nudge
 carries it so open clients patch their cache rather than refetch the list.
 A closed box's dot is therefore at most a few seconds behind; the open box's
 own subscribers stay live as before. Reaches a box only through a
@@ -405,14 +407,27 @@ the same: at 4 vCPU / 8 GB an agent that brought up the dev stack and an
 Electron instance took the VM down (2026-09-11).
 
 **A session ends; the sandbox does not.** A session stops at its timeout
-(`SESSION_TIMEOUT_MS`, four hours, extended while a workspace is open) or on
-`stop()`, and the platform snapshots the filesystem. The next wake boots a
-new session from that snapshot with *no processes*: uncommitted files survive,
-a running agent does not. Blaxel froze the VM instead, processes intact. So
-an unattended agent run has to finish within a session, and the idle stop
-must not fire on a workspace someone is using — which is what the open
-workspace's `wake` on every token refresh is for. Sessions cap at 24 hours on
-the plan; past that the extension is refused and the next open resumes.
+(`SESSION_TIMEOUT_MS`, one hour, extended while in use) or on `stop()`, and
+the platform snapshots the filesystem. The next wake boots a new session from
+that snapshot with *no processes*: uncommitted files survive, a running agent
+does not. Blaxel froze the VM instead, processes intact. So the idle stop must
+not fire on a workspace someone is using — which is what the open workspace's
+`wake` on every token refresh is for — nor under an agent mid-turn: while the
+box's status is `working` it repeats the report every fifteen minutes and the
+API extends the session (`extendSandbox`). An agent waiting on a permission
+prompt counts as idle, and so does anything still running after the turn
+ends. A turn `working` for over four hours (`WORKING_KEEPALIVE_CAP_MS`) is
+taken as hung and no longer extends. Extensions go through the session, never
+`Sandbox.extendTimeout`, which resumes a session that stopped meanwhile.
+Sessions cap at 24 hours on the plan; past that the extension is refused and
+the next open resumes.
+
+A session that stops mid-turn — the idle stop, or an automation that runs
+`superset workspaces sleep` as its last step — never reports the turn's end,
+so the row would say `working` forever. The row records when its session ends
+(`session_ends_at`, written by provision, wake, extension and `sleep`), and
+the list shows a `working` or `permission` status whose session has ended as
+none; `review` and `failed` stay.
 
 **A fork starts from the source's snapshot, not its live filesystem.** A
 golden is therefore a *stopped* sandbox: `promoteSandboxToEnvironment` takes

@@ -22,12 +22,14 @@ provisions running indefinitely, and nothing in the product would ever have
 shown them.
 
 **An idle sandbox stops after its session timeout. Done, with a caveat.** A
-session ends four hours after its last extension; only the workspace someone
-has open extends it (every token refresh with `wake`), so a closed workspace
-stops within four hours and costs snapshot storage only. Still owed: a per-org
-quota and cost visibility in the product — and a decision on unattended agent
-runs, which die with the session (Blaxel froze processes; Vercel snapshots the
-filesystem and boots fresh).
+session ends one hour after its last extension. Two things extend it: the
+workspace someone has open (every token refresh with `wake`), and a box whose
+agent reports `working`, for at most four hours of one unbroken turn. A
+closed workspace with no agent mid-turn stops within the hour and costs
+snapshot storage only. Still owed: a per-org quota and cost visibility in the
+product. Work left running after a turn ends (a background shell, a dev
+server) still dies with the session (Blaxel froze processes; Vercel snapshots
+the filesystem and boots fresh).
 
 **Box time is metered and capped.** Creating a workspace checks the
 organization may run boxes; every box start or wake takes a short Autumn

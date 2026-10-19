@@ -1,0 +1,1 @@
+ALTER TABLE "cloud_workspaces" ADD COLUMN "session_ends_at" timestamp with time zone;

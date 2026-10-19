@@ -47,11 +47,13 @@ import { queueSettleWorkspace, settleWorkspaceNow } from "./meter";
 import { nextSandboxNameFor } from "./provision";
 import { queueReap } from "./reap";
 import { cloudWorkspaceRecordRouter } from "./record";
+import { listedWorkspace } from "./session";
 import { cloudWorkspaceSharingRouter } from "./sharing";
 import { queueProvision, startCloudWorkspace } from "./start";
 import { transitionCloudWorkspace } from "./transition";
 import {
 	markSandboxUnavailable,
+	recordSessionEnded,
 	restartCloudWorkspace,
 	wakeCloudWorkspace,
 } from "./wake";
@@ -241,7 +243,7 @@ export const cloudWorkspaceRouter = {
 				rows.map((r) => r.workspace.id),
 			);
 			return rows.map(({ workspace, createdBy }) => ({
-				...workspace,
+				...listedWorkspace(workspace),
 				createdBy,
 				presence: presence
 					.filter((p) => p.cloudWorkspaceId === workspace.id)
@@ -417,7 +419,7 @@ export const cloudWorkspaceRouter = {
 				columns: { id: true, name: true, image: true },
 			});
 			return {
-				...row,
+				...listedWorkspace(row),
 				createdBy: creator
 					? { userId: creator.id, name: creator.name, image: creator.image }
 					: null,
@@ -450,7 +452,7 @@ export const cloudWorkspaceRouter = {
 				);
 			}
 			nudge(row.organizationId, "cloud_workspaces");
-			return renamed ?? row;
+			return listedWorkspace(renamed ?? row);
 		}),
 
 	/**
@@ -555,6 +557,7 @@ export const cloudWorkspaceRouter = {
 				await stopAndSnapshot(row.providerSandboxId);
 				await queueSettleWorkspace(row.id);
 			}
+			await recordSessionEnded(row);
 			return { stopped: running };
 		}),
 
