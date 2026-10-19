@@ -111,7 +111,8 @@ export function linguiMacroPlugin(): Plugin {
 function connectSrcOrigins(): string {
 	const origins = [
 		process.env.NEXT_PUBLIC_API_URL || "https://api.superset.sh",
-		process.env.NEXT_PUBLIC_MARKETING_URL || "https://superset.sh",
+		process.env.NEXT_PUBLIC_MARKETING_URL ||
+			`https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN || "superset.sh"}`,
 		process.env.RELAY_URL || "https://relay.superset.sh",
 		process.env.REALTIME_URL || "https://realtime.superset.sh",
 		process.env.SANDBOX_GATE_ORIGIN ||
