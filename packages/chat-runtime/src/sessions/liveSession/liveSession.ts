@@ -282,10 +282,6 @@ export class LiveSession {
 		);
 	}
 
-	canForkAtMessage(): boolean {
-		return this.options.adapter.canForkAtMessage?.() ?? false;
-	}
-
 	fork(cut?: { upToMessageId: string }): Promise<string | null> {
 		return this.options.adapter.fork?.(cut) ?? Promise.resolve(null);
 	}

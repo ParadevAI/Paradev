@@ -5199,9 +5199,6 @@ msgstr "Nepodařilo se z tohoto hosta načíst historii využití."
 msgid "Couldn't remove the local sign-in"
 msgstr "Nepodařilo se odebrat místní přihlášení"
 
-msgid "Couldn't reopen the agent in a terminal"
-msgstr "Agenta se nepodařilo znovu otevřít v terminálu"
-
 msgid "Couldn't restart terminals"
 msgstr "Nepodařilo se restartovat terminály"
 
@@ -5274,9 +5271,6 @@ msgstr "Hlasový režim se nepodařilo spustit"
 
 msgid "Couldn't start workspace"
 msgstr "Pracovní prostor se nepodařilo spustit"
-
-msgid "Couldn't stop the agent's terminal"
-msgstr "Terminál agenta se nepodařilo zastavit"
 
 msgid "Couldn't stop the background task"
 msgstr "Úlohu na pozadí se nepodařilo zastavit"

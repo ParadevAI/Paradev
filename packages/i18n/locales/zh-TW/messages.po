@@ -5199,9 +5199,6 @@ msgstr "無法從此主機讀取用量歷史。"
 msgid "Couldn't remove the local sign-in"
 msgstr "無法移除本地登入"
 
-msgid "Couldn't reopen the agent in a terminal"
-msgstr "無法在終端機中重新開啟此代理"
-
 msgid "Couldn't restart terminals"
 msgstr "無法重啟終端"
 
@@ -5274,9 +5271,6 @@ msgstr "無法啟動語音模式"
 
 msgid "Couldn't start workspace"
 msgstr "無法啟動工作區"
-
-msgid "Couldn't stop the agent's terminal"
-msgstr "無法停止該代理的終端機"
 
 msgid "Couldn't stop the background task"
 msgstr "無法停止背景工作"

@@ -10,10 +10,9 @@ import { parseChatRewindPrompt } from "@superset/shared/terminal-session-handoff
 import { parseAttachmentTags } from "../attachmentTags";
 import { buildChatHandoffTranscript } from "../chatHandoffTranscript";
 
-export type RewindPoint = {
+type RewindPoint = {
 	itemId: string;
 	text: string;
-	startedAtMs: number;
 };
 
 /** The user's own messages, newest first: each one is a point the chat can go back to. */
@@ -33,7 +32,6 @@ export function rewindPoints(
 			points.push({
 				itemId: entry.item.id,
 				text,
-				startedAtMs: entry.item.startedAtMs,
 			});
 		}
 	}

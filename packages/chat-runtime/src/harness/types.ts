@@ -37,8 +37,6 @@ export interface HarnessAdapter {
 	 */
 	/** With `upToMessageId`, keeps the conversation only through that message, or returns null when it cannot. */
 	fork?(cut?: { upToMessageId: string }): Promise<string | null>;
-	/** Whether `fork` would honour a cut point right now. */
-	canForkAtMessage?(): boolean;
 	stopBackgroundTask?(taskId: string): Promise<boolean>;
 	dispose(): Promise<void>;
 }

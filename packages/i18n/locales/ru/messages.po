@@ -5199,9 +5199,6 @@ msgstr "Не удалось прочитать историю использов
 msgid "Couldn't remove the local sign-in"
 msgstr "Не удалось удалить локальный вход"
 
-msgid "Couldn't reopen the agent in a terminal"
-msgstr "Не удалось снова открыть агента в терминале"
-
 msgid "Couldn't restart terminals"
 msgstr "Не удалось перезапустить терминалы"
 
@@ -5274,9 +5271,6 @@ msgstr "Не удалось запустить голосовой режим"
 
 msgid "Couldn't start workspace"
 msgstr "Не удалось запустить рабочую область"
-
-msgid "Couldn't stop the agent's terminal"
-msgstr "Не удалось остановить терминал агента"
 
 msgid "Couldn't stop the background task"
 msgstr "Не удалось остановить фоновую задачу"

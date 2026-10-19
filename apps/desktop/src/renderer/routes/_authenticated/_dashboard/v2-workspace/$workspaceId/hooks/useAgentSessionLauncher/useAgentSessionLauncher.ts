@@ -36,7 +36,7 @@ export type CreateNewAgentSession = (
 	input: CreateNewAgentSessionInput,
 ) => Promise<{ terminalId: string } | null>;
 
-export type OpenNewChat = () => Promise<{ terminalId: string } | null>;
+type OpenNewChat = () => Promise<{ terminalId: string } | null>;
 
 export type OpenAgentChat = (
 	input: Omit<CreateNewAgentSessionInput, "forkSessionId" | "prompt"> & {

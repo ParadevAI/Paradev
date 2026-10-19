@@ -24,7 +24,7 @@ export interface McpConfigPaths {
 	installedPluginsPath: string;
 }
 
-export interface DiscoverMcpServersOptions {
+interface DiscoverMcpServersOptions {
 	worktreePath: string;
 	agent: string;
 	paths: McpConfigPaths;
@@ -193,7 +193,7 @@ function tomlString(line: string, key: string): string | undefined {
 	return match ? (match[1] ?? match[2]) : undefined;
 }
 
-export function parseCodexMcpServers(
+function parseCodexMcpServers(
 	content: string,
 	scope: McpServerScope,
 	configPath: string,
@@ -244,7 +244,7 @@ export function parseCodexMcpServers(
 	return [...servers.values()];
 }
 
-export function parseCodexTrustedProjects(content: string): Set<string> {
+function parseCodexTrustedProjects(content: string): Set<string> {
 	const trusted = new Set<string>();
 	let project: string | null = null;
 	for (const line of content.split(/\r?\n/)) {

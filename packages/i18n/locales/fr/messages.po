@@ -5199,9 +5199,6 @@ msgstr "Impossible de lire l'historique d'utilisation depuis cet hôte."
 msgid "Couldn't remove the local sign-in"
 msgstr "Impossible de supprimer la connexion locale"
 
-msgid "Couldn't reopen the agent in a terminal"
-msgstr "Impossible de réouvrir l'agent dans un terminal"
-
 msgid "Couldn't restart terminals"
 msgstr "Impossible de redémarrer les terminaux"
 
@@ -5274,9 +5271,6 @@ msgstr "Impossible de démarrer le mode vocal"
 
 msgid "Couldn't start workspace"
 msgstr "Impossible de démarrer l'espace de travail"
-
-msgid "Couldn't stop the agent's terminal"
-msgstr "Impossible d'arrêter le terminal de l'agent"
 
 msgid "Couldn't stop the background task"
 msgstr "Impossible d'arrêter la tâche en arrière-plan"

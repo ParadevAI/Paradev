@@ -22,7 +22,7 @@ import {
 } from "../../utils/mcpServerChips";
 import { mcpServerIconUrl } from "../../utils/mcpServerIconUrl";
 
-export type McpServerPickerControls = {
+type McpServerPickerControls = {
 	command: PromptInputCommand | null;
 	findChips: (text: string) => ComposerChipMatch[];
 	dialog: ReactNode;

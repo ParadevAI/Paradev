@@ -5199,9 +5199,6 @@ msgstr "Tidak bisa membaca riwayat penggunaan dari host ini."
 msgid "Couldn't remove the local sign-in"
 msgstr "Tidak bisa menghapus sesi masuk lokal"
 
-msgid "Couldn't reopen the agent in a terminal"
-msgstr "Tidak dapat membuka kembali agen di terminal"
-
 msgid "Couldn't restart terminals"
 msgstr "Tidak bisa memulai ulang terminal"
 
@@ -5274,9 +5271,6 @@ msgstr "Tidak dapat memulai mode suara"
 
 msgid "Couldn't start workspace"
 msgstr "Tidak bisa memulai workspace"
-
-msgid "Couldn't stop the agent's terminal"
-msgstr "Tidak dapat menghentikan terminal agen"
 
 msgid "Couldn't stop the background task"
 msgstr "Tidak dapat menghentikan tugas latar belakang"

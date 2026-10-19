@@ -1,6 +1,5 @@
 export {
 	findMcpServerTokens,
-	type McpTokenMatch,
 	mcpContextLine,
 	mcpServerChip,
 	mcpServerOfChip,

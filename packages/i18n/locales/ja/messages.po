@@ -5199,9 +5199,6 @@ msgstr "このホストから使用履歴を読み取れませんでした。"
 msgid "Couldn't remove the local sign-in"
 msgstr "ローカルのサインインを削除できませんでした"
 
-msgid "Couldn't reopen the agent in a terminal"
-msgstr "エージェントをターミナルで再度開けませんでした"
-
 msgid "Couldn't restart terminals"
 msgstr "ターミナルを再起動できませんでした"
 
@@ -5274,9 +5271,6 @@ msgstr "音声モードを開始できませんでした"
 
 msgid "Couldn't start workspace"
 msgstr "ワークスペースを開始できませんでした"
-
-msgid "Couldn't stop the agent's terminal"
-msgstr "エージェントのターミナルを停止できませんでした"
 
 msgid "Couldn't stop the background task"
 msgstr "バックグラウンドタスクを停止できませんでした"

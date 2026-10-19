@@ -5199,9 +5199,6 @@ msgstr "이 호스트에서 사용량 기록을 읽지 못했습니다."
 msgid "Couldn't remove the local sign-in"
 msgstr "로컬 로그인 정보를 제거하지 못했습니다"
 
-msgid "Couldn't reopen the agent in a terminal"
-msgstr "터미널에서 에이전트를 다시 열 수 없습니다"
-
 msgid "Couldn't restart terminals"
 msgstr "터미널을 다시 시작하지 못했습니다"
 
@@ -5274,9 +5271,6 @@ msgstr "음성 모드를 시작할 수 없습니다"
 
 msgid "Couldn't start workspace"
 msgstr "워크스페이스를 시작하지 못했습니다"
-
-msgid "Couldn't stop the agent's terminal"
-msgstr "에이전트의 터미널을 중지할 수 없습니다"
 
 msgid "Couldn't stop the background task"
 msgstr "백그라운드 작업을 중지할 수 없습니다"

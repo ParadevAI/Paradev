@@ -78,11 +78,7 @@ import { useAgentSessionLauncher } from "../useAgentSessionLauncher";
 import type { OpenReviewDiff } from "../useReviewCommentNavigation";
 import type { TerminalLauncher } from "../useV2TerminalLauncher";
 import { AccountUsage } from "./components/AccountUsage";
-import {
-	AgentSurfaceToggle,
-	AgentTerminalPane,
-	useAgentSurfaceSwitch,
-} from "./components/AgentTerminalPane";
+import { AgentTerminalPane } from "./components/AgentTerminalPane";
 import { BrowserPane, BrowserPaneToolbar } from "./components/BrowserPane";
 import { ChangesListPane } from "./components/ChangesListPane";
 import { ChatPane } from "./components/ChatPane";
@@ -180,12 +176,7 @@ export function usePaneRegistry({
 	const { t } = useLingui();
 	const { workspace } = useWorkspace();
 	const workspaceId = workspace.id;
-	const agentSurface = useAgentSurfaceSwitch(workspaceId);
-	const closeChatWithUndo = useUndoableChatClose({
-		workspaceId,
-		store,
-		stopChat: agentSurface.stopChat,
-	});
+	const closeChatWithUndo = useUndoableChatClose({ workspaceId, store });
 	const host = useWorkspaceHostTarget(workspaceId);
 	const desktopUrl =
 		host.status === "ready" && host.kind === "sandbox" ? host.desktopUrl : null;
@@ -500,13 +491,6 @@ export function usePaneRegistry({
 								onCreateNewAgentSession={createNewAgentSession}
 								onOpenSubagent={onOpenSubagent}
 							/>
-							<AgentSurfaceToggle
-								pane={{ kind: "terminal", data }}
-								onChange={(surface, agent) =>
-									void agentSurface.switchSurface(ctx, surface, agent)
-								}
-								workspaceId={workspaceId}
-							/>
 						</div>
 					);
 				},
@@ -819,13 +803,6 @@ export function usePaneRegistry({
 								workspaceId={workspaceId}
 								terminalId={data.terminalId}
 							/>
-							<AgentSurfaceToggle
-								pane={{ kind: "chat", data }}
-								onChange={(surface, agent) =>
-									void agentSurface.switchSurface(ctx, surface, agent)
-								}
-								workspaceId={workspaceId}
-							/>
 						</div>
 					);
 				},
@@ -1001,7 +978,6 @@ export function usePaneRegistry({
 			store,
 			linkedStores,
 			workspaceId,
-			agentSurface,
 			closeChatWithUndo,
 			clearWorkspaceRunTerminal,
 			clearShortcut,

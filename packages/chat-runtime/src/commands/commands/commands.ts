@@ -107,7 +107,7 @@ function lastAgentMessageId(events: DurableEvent[]): string | null {
 }
 
 /** The finished turns and items shown before `itemId`, or null when it is not there. */
-export function transcriptBefore(
+function transcriptBefore(
 	snapshot: SessionSnapshot,
 	itemId: string,
 ): DurableEvent[] | null {
@@ -188,10 +188,7 @@ export type ChatCommands = {
 		cwd: string;
 	}): Promise<RewindChangesResult>;
 	rewindSession(input: RewindSessionCommandInput): Promise<CreateSessionResult>;
-	getRewindSupport(input: {
-		sessionId: string;
-		cwd: string;
-	}): Promise<RewindSupport>;
+	getRewindSupport(input: { cwd: string }): Promise<RewindSupport>;
 	getSession(input: GetSessionInput): GetSessionResult;
 	getQueue(input: GetSessionInput): GetQueueResult;
 	listSessions(input: ListSessionsCommandInput): ChatSessionListEntry[];
@@ -528,16 +525,11 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 			return created;
 		},
 
-		async getRewindSupport({ sessionId, cwd }) {
+		async getRewindSupport({ cwd }) {
 			const files = options.checkpoints
 				? await (options.checkpoints.available?.(cwd) ?? Promise.resolve(true))
 				: false;
-			return {
-				conversation: options.live.get(sessionId)?.canForkAtMessage()
-					? "native"
-					: "text",
-				files,
-			};
+			return { files };
 		},
 
 		async closeSession(input) {

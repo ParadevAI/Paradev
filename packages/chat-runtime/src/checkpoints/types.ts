@@ -19,8 +19,6 @@ export type RewindChangesResult =
 	| { files: "missing" | "unsupported" };
 
 export type RewindSupport = {
-	/** `native`: the agent cuts its own history. `text`: it is told the earlier conversation. */
-	conversation: "native" | "text";
 	files: boolean;
 };
 

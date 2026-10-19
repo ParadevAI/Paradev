@@ -11,7 +11,7 @@ export type McpServerScope = "user" | "project" | "local";
  * - `not-configured`: a Superset plugin server that is not in the asking
  *   agent's config yet (plugin not installed, or not written there yet).
  */
-export type McpServerState =
+type McpServerState =
 	| "available"
 	| "disabled"
 	| "other-agent"

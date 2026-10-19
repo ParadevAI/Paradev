@@ -187,10 +187,7 @@ export function createChatRouter(
 			)
 			.query(async ({ input }) => {
 				const cwd = await options.resolveCwd(input.workspaceId);
-				return runtime.commands.getRewindSupport({
-					sessionId: input.sessionId,
-					cwd,
-				});
+				return runtime.commands.getRewindSupport({ cwd });
 			}),
 
 		closeSession: t.procedure

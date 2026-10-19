@@ -5199,9 +5199,6 @@ msgstr "Kan de gebruiksgeschiedenis van deze host niet lezen."
 msgid "Couldn't remove the local sign-in"
 msgstr "Kan de lokale login niet verwijderen"
 
-msgid "Couldn't reopen the agent in a terminal"
-msgstr "Kon de agent niet opnieuw in een terminal openen"
-
 msgid "Couldn't restart terminals"
 msgstr "Kan terminals niet herstarten"
 
@@ -5274,9 +5271,6 @@ msgstr "Spraakmodus kon niet worden gestart"
 
 msgid "Couldn't start workspace"
 msgstr "Kan werkruimte niet starten"
-
-msgid "Couldn't stop the agent's terminal"
-msgstr "Kon de terminal van de agent niet stoppen"
 
 msgid "Couldn't stop the background task"
 msgstr "Kan de achtergrondtaak niet stoppen"

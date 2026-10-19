@@ -14,6 +14,7 @@ import {
 	readPendingChatStops,
 	removePendingChatStop,
 } from "../../../../utils/pendingChatStops";
+import { useChatWiring } from "../../components/ChatSession/hooks/useSessionClient";
 import { ChatClosedToast } from "./components/ChatClosedToast";
 import { createClosedChatBatches } from "./utils/closedChatBatches";
 
@@ -30,13 +31,26 @@ interface ClosedChat {
 export function useUndoableChatClose({
 	workspaceId,
 	store,
-	stopChat,
 }: {
 	workspaceId: string;
 	store: StoreApi<WorkspaceStore<PaneViewerData>>;
-	stopChat: (sessionId: string) => Promise<boolean>;
 }): (pane: Pane<PaneViewerData>) => void {
 	const { t } = useLingui();
+	const wiring = useChatWiring();
+	const stopChat = useCallback(
+		async (sessionId: string) => {
+			const reopen = markChatSessionClosed(sessionId);
+			try {
+				await wiring.transport.closeSession({ sessionId });
+				return true;
+			} catch (error) {
+				console.warn("[acp-chat] could not stop the chat session", error);
+				reopen();
+				return false;
+			}
+		},
+		[wiring.transport],
+	);
 	const latest = useRef({ store, stopChat, t });
 	latest.current = { store, stopChat, t };
 	const previousTabs = useRef(store.getState().tabs);

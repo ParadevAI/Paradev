@@ -487,7 +487,7 @@ export function AcpChatPane({
 								error instanceof TRPCClientError &&
 								/No procedure/.test(error.message)
 							) {
-								return { conversation: "text" as const, files: false };
+								return { files: false };
 							}
 							throw error;
 						})

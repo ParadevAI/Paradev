@@ -5199,9 +5199,6 @@ msgstr "无法从此主机读取用量历史。"
 msgid "Couldn't remove the local sign-in"
 msgstr "无法移除本地登录"
 
-msgid "Couldn't reopen the agent in a terminal"
-msgstr "无法在终端中重新打开该智能体"
-
 msgid "Couldn't restart terminals"
 msgstr "无法重启终端"
 
@@ -5274,9 +5271,6 @@ msgstr "无法启动语音模式"
 
 msgid "Couldn't start workspace"
 msgstr "无法启动工作区"
-
-msgid "Couldn't stop the agent's terminal"
-msgstr "无法停止该智能体的终端"
 
 msgid "Couldn't stop the background task"
 msgstr "无法停止后台任务"

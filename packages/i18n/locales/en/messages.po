@@ -5199,9 +5199,6 @@ msgstr "Couldn't read usage history from this host."
 msgid "Couldn't remove the local sign-in"
 msgstr "Couldn't remove the local sign-in"
 
-msgid "Couldn't reopen the agent in a terminal"
-msgstr "Couldn't reopen the agent in a terminal"
-
 msgid "Couldn't restart terminals"
 msgstr "Couldn't restart terminals"
 
@@ -5274,9 +5271,6 @@ msgstr "Couldn't start voice mode"
 
 msgid "Couldn't start workspace"
 msgstr "Couldn't start workspace"
-
-msgid "Couldn't stop the agent's terminal"
-msgstr "Couldn't stop the agent's terminal"
 
 msgid "Couldn't stop the background task"
 msgstr "Couldn't stop the background task"

@@ -1,1 +1,1 @@
-export { McpServerPicker, type McpServerPickerProps } from "./McpServerPicker";
+export { McpServerPicker } from "./McpServerPicker";

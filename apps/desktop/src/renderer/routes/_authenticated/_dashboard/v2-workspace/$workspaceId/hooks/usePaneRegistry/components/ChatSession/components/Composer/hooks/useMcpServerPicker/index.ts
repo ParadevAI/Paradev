@@ -1,4 +1,1 @@
-export {
-	type McpServerPickerControls,
-	useMcpServerPicker,
-} from "./useMcpServerPicker";
+export { useMcpServerPicker } from "./useMcpServerPicker";

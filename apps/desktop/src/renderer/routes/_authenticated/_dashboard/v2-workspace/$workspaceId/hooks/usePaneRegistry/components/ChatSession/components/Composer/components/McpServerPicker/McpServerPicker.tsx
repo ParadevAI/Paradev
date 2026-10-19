@@ -37,7 +37,7 @@ const AGENT_LABELS: Record<McpServerAgent, string> = {
 	codex: "Codex",
 };
 
-export type McpServerPickerProps = {
+type McpServerPickerProps = {
 	workspaceId: string;
 	agentId: string;
 	/** Plugins installed from this picker before this machine's config caught up. */

@@ -5199,9 +5199,6 @@ msgstr "Bu host'tan kullanım geçmişi okunamadı."
 msgid "Couldn't remove the local sign-in"
 msgstr "Yerel oturum kaydı kaldırılamadı"
 
-msgid "Couldn't reopen the agent in a terminal"
-msgstr "Aracı bir terminalde yeniden açamadık"
-
 msgid "Couldn't restart terminals"
 msgstr "Terminaller yeniden başlatılamadı"
 
@@ -5274,9 +5271,6 @@ msgstr "Sesli mod başlatılamadı"
 
 msgid "Couldn't start workspace"
 msgstr "Çalışma alanı başlatılamadı"
-
-msgid "Couldn't stop the agent's terminal"
-msgstr "Aracının terminali durdurulamadı"
 
 msgid "Couldn't stop the background task"
 msgstr "Arka plan görevi durdurulamadı"

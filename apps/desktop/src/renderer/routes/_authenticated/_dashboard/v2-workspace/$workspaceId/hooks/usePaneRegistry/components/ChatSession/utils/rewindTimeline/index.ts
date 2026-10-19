@@ -1,5 +1,4 @@
 export {
-	type RewindPoint,
 	rewindPoints,
 	rewindTranscript,
 	timelineBefore,

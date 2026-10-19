@@ -493,15 +493,11 @@ describe("chat commands", () => {
 		await runtime.dispose();
 	});
 
-	test("getRewindSupport reports what a rewind can do for this agent and folder", async () => {
+	test("getRewindSupport reports whether files can be rewound in this folder", async () => {
 		const { runtime } = newRuntime();
-		const { sessionId } = createSession(runtime);
 		expect(
-			await runtime.commands.getRewindSupport({
-				sessionId,
-				cwd: "/tmp/workspace",
-			}),
-		).toEqual({ conversation: "text", files: false });
+			await runtime.commands.getRewindSupport({ cwd: "/tmp/workspace" }),
+		).toEqual({ files: false });
 		await runtime.dispose();
 	});
 

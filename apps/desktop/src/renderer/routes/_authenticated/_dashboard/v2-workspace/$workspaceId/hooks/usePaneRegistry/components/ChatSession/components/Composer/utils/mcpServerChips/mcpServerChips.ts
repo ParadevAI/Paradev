@@ -45,7 +45,7 @@ export function mcpServerOfChip(chip: ComposerChip): string | null {
 	return typeof server === "string" ? server : null;
 }
 
-export interface McpTokenMatch {
+interface McpTokenMatch {
 	start: number;
 	end: number;
 	token: string;

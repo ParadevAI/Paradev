@@ -5199,9 +5199,6 @@ msgstr "Không đọc được lịch sử sử dụng từ host này."
 msgid "Couldn't remove the local sign-in"
 msgstr "Không thể xóa phiên đăng nhập cục bộ"
 
-msgid "Couldn't reopen the agent in a terminal"
-msgstr "Không thể mở lại tác nhân trong terminal"
-
 msgid "Couldn't restart terminals"
 msgstr "Không thể khởi động lại terminal"
 
@@ -5274,9 +5271,6 @@ msgstr "Không thể bắt đầu chế độ giọng nói"
 
 msgid "Couldn't start workspace"
 msgstr "Không khởi động được workspace"
-
-msgid "Couldn't stop the agent's terminal"
-msgstr "Không thể dừng terminal của tác nhân"
 
 msgid "Couldn't stop the background task"
 msgstr "Không thể dừng tác vụ nền"
