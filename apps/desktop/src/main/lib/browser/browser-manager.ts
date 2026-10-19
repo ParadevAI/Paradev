@@ -573,6 +573,7 @@ class BrowserManager extends EventEmitter {
 				wc.debugger.off("detach", handleDetach);
 			}
 			this.cdpDetachers.delete(paneId);
+			this.endAgentInput(paneId);
 			releaseWake();
 		};
 		wc.debugger.on("message", handleMessage);

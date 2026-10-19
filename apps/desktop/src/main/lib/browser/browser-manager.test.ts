@@ -654,6 +654,25 @@ describe("pane focus forwarding", () => {
 		stop();
 	});
 
+	test("agent input ends when the CDP session detaches", async () => {
+		const wc = register("pane-agent-detach");
+		const { onFocus, stop } = watchFocus("pane-agent-detach");
+		const session = browserManager.attachCdp(
+			"pane-agent-detach",
+			"ws-1",
+			() => {},
+			() => {},
+		);
+		wc.debugger.sendCommand = mock(() => new Promise<void>(() => {}));
+		sendPress(session);
+
+		session.detach();
+		await pressMouse(wc);
+
+		expect(onFocus).toHaveBeenCalledTimes(1);
+		stop();
+	});
+
 	test("other CDP commands do not hide a user click", async () => {
 		const wc = register("pane-agent-eval");
 		const { onFocus, stop } = watchFocus("pane-agent-eval");
