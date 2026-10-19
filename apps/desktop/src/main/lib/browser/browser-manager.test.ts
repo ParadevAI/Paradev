@@ -5,7 +5,6 @@ import {
 	describe,
 	expect,
 	mock,
-	setSystemTime,
 	test,
 } from "bun:test";
 import { webContents } from "electron";
@@ -57,8 +56,11 @@ interface FakeWebContents {
 	getTitle: () => string;
 	isLoading: () => boolean;
 	capturePage: ReturnType<typeof mock>;
-	executeJavaScript: () => Promise<void>;
+	executeJavaScript: (code: string) => Promise<void>;
 	pendingMousedowns: Array<() => void>;
+	pendingPageFocus: Array<() => void>;
+	mainFrame: { executeJavaScript: () => Promise<void> };
+	pendingBarriers: Array<() => void>;
 	debugger: {
 		attach: () => void;
 		detach: () => void;
@@ -97,9 +99,20 @@ function makeWc(): { wc: FakeWebContents; id: number } {
 		getTitle: () => "Example",
 		isLoading: () => false,
 		capturePage: mock(async () => PNG_IMAGE),
-		executeJavaScript: () =>
-			new Promise<void>((resolve) => wc.pendingMousedowns.push(resolve)),
+		executeJavaScript: (code: string) =>
+			new Promise<void>((resolve) =>
+				(code.includes("__supersetPageFocusHook")
+					? wc.pendingPageFocus
+					: wc.pendingMousedowns
+				).push(resolve),
+			),
 		pendingMousedowns: [],
+		pendingPageFocus: [],
+		mainFrame: {
+			executeJavaScript: () =>
+				new Promise<void>((resolve) => wc.pendingBarriers.push(resolve)),
+		},
+		pendingBarriers: [],
 		debugger: {
 			attach: () => {},
 			detach: () => {},
@@ -515,9 +528,25 @@ describe("pane focus forwarding", () => {
 		};
 	}
 
-	afterEach(() => {
-		setSystemTime();
-	});
+	async function gainPageFocus(wc: FakeWebContents): Promise<void> {
+		for (const resolve of wc.pendingPageFocus.splice(0)) resolve();
+		await flush();
+	}
+
+	async function passBarriers(wc: FakeWebContents): Promise<void> {
+		for (const resolve of wc.pendingBarriers.splice(0)) resolve();
+		await flush();
+	}
+
+	function sendPress(session: { send: (raw: string) => void }, id = 1) {
+		session.send(
+			JSON.stringify({
+				id,
+				method: "Input.dispatchMouseEvent",
+				params: { type: "mousePressed", x: 10, y: 10, button: "left" },
+			}),
+		);
+	}
 
 	test("a user click in the guest activates the pane", async () => {
 		const wc = register("pane-click");
@@ -543,13 +572,7 @@ describe("pane focus forwarding", () => {
 			() => new Promise<void>((resolve) => (settle = resolve)),
 		);
 
-		session.send(
-			JSON.stringify({
-				id: 1,
-				method: "Input.dispatchMouseEvent",
-				params: { type: "mousePressed", x: 10, y: 10, button: "left" },
-			}),
-		);
+		sendPress(session);
 		await pressMouse(wc);
 		// The guest's mousedown can arrive just after the CDP reply.
 		settle();
@@ -557,7 +580,7 @@ describe("pane focus forwarding", () => {
 		await pressMouse(wc);
 		expect(onFocus).not.toHaveBeenCalled();
 
-		setSystemTime(new Date(Date.now() + 1_000));
+		await passBarriers(wc);
 		await pressMouse(wc);
 		expect(onFocus).toHaveBeenCalledTimes(1);
 
@@ -565,46 +588,33 @@ describe("pane focus forwarding", () => {
 		stop();
 	});
 
-	test("announces agent input when it starts and once all of it settles", async () => {
-		const wc = register("pane-agent-input");
-		const states: unknown[] = [];
-		const onAgentInput = (state: unknown) => states.push(state);
-		browserManager.on("agent-input", onAgentInput);
+	test("reports the guest gaining focus during agent input, and only then", async () => {
+		const wc = register("pane-agent-focus");
+		const reports: unknown[] = [];
+		const onAgentFocus = (event: unknown) => reports.push(event);
+		browserManager.on("agent-focus", onAgentFocus);
 		const session = browserManager.attachCdp(
-			"pane-agent-input",
+			"pane-agent-focus",
 			"ws-1",
 			() => {},
 			() => {},
 		);
-		const settles: Array<() => void> = [];
+		let settle = () => {};
 		wc.debugger.sendCommand = mock(
-			() => new Promise<void>((resolve) => settles.push(resolve)),
+			() => new Promise<void>((resolve) => (settle = resolve)),
 		);
-		const press = (id: number, type: string) =>
-			session.send(
-				JSON.stringify({
-					id,
-					method: "Input.dispatchMouseEvent",
-					params: { type, x: 10, y: 10, button: "left" },
-				}),
-			);
 
-		press(1, "mousePressed");
-		press(2, "mouseReleased");
-		expect(states).toEqual([{ paneId: "pane-agent-input", active: true }]);
-
-		settles[0]?.();
+		sendPress(session);
+		await gainPageFocus(wc);
+		settle();
 		await flush();
-		expect(states).toHaveLength(1);
+		await passBarriers(wc);
+		expect(reports).toEqual([{ paneId: "pane-agent-focus" }]);
 
-		settles[1]?.();
-		await flush();
-		expect(states).toEqual([
-			{ paneId: "pane-agent-input", active: true },
-			{ paneId: "pane-agent-input", active: false },
-		]);
+		await gainPageFocus(wc);
+		expect(reports).toHaveLength(1);
 
-		browserManager.off("agent-input", onAgentInput);
+		browserManager.off("agent-focus", onAgentFocus);
 		session.detach();
 	});
 

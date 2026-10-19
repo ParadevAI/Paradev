@@ -2,10 +2,6 @@ import { attachBrowserViewportZoom } from "renderer/lib/browser-viewport-zoom";
 import { pointerPassthrough } from "renderer/lib/pointer-passthrough";
 import { selectRuntimesToEvict } from "renderer/lib/terminal/terminal-runtime-eviction";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
-import {
-	AGENT_INPUT_GRACE_MS,
-	type AgentInputState,
-} from "shared/browser-agent-input";
 import type { BrowserLoadError } from "shared/tabs-types";
 import { sanitizeUrl } from "./sanitizeUrl";
 
@@ -104,11 +100,11 @@ export class BrowserRuntimeRegistryImpl {
 	// screenshots hang and input hit-testing goes stale — and exempt from
 	// hidden-webview eviction so the guest isn't destroyed mid-session.
 	private agentActivePaneIds = new Set<string>();
-	// When each pane's agent CDP input last settled (mirrored from main), or
-	// null while some is in flight.
-	private agentInputSettledAt = new Map<string, number | null>();
-	// Where focus goes back to when agent input pulls it into a guest.
+	// The two most recent focus targets. Focus goes back to one of them when
+	// agent input pulls it into a guest: the guest's own focus event may
+	// already have made it the latest.
 	private lastFocused: Element | null = null;
+	private previousFocused: Element | null = null;
 
 	private getListeners(paneId: string): Set<() => void> {
 		let set = this.listenersByPaneId.get(paneId);
@@ -169,14 +165,17 @@ export class BrowserRuntimeRegistryImpl {
 		document.addEventListener(
 			"focusin",
 			(event) => {
-				if (event.target instanceof Element) this.lastFocused = event.target;
+				if (event.target instanceof Element) this.recordFocus(event.target);
 			},
 			true,
 		);
 
-		this.ipc.browser.onAgentInput.subscribe(undefined, {
-			onData: ({ paneId, active }: AgentInputState) => {
-				this.agentInputSettledAt.set(paneId, active ? null : Date.now());
+		this.ipc.browser.onAgentFocus.subscribe(undefined, {
+			onData: ({ paneId }: { paneId: string }) => {
+				const entry = this.entries.get(paneId);
+				if (entry && document.activeElement === entry.webview) {
+					this.handBackFocus(entry);
+				}
 			},
 		});
 
@@ -213,25 +212,33 @@ export class BrowserRuntimeRegistryImpl {
 		entry.overlay.style.visibility = "hidden";
 	}
 
-	private isAgentInputActive(paneId: string): boolean {
-		const settledAt = this.agentInputSettledAt.get(paneId);
-		if (settledAt === undefined) return false;
-		return settledAt === null || Date.now() - settledAt < AGENT_INPUT_GRACE_MS;
-	}
-
 	/**
 	 * Chromium moves keyboard focus into a guest on every mousedown routed to
 	 * it, before dispatch and whatever its source, so an agent's CDP click
 	 * pulls the user's typing out of the terminal they are in and into the
 	 * page — even a page parked in a background tab. A guest that takes focus
-	 * while parked, or while an agent is sending it input, hands it back.
+	 * while parked hands it back here; main reports one an agent's input
+	 * focused while visible (`onAgentFocus`).
 	 */
-	private handleWebviewFocus(paneId: string, entry: RegistryEntry): void {
-		if (entry.visible && !this.isAgentInputActive(paneId)) {
-			this.lastFocused = entry.webview;
+	private handleWebviewFocus(entry: RegistryEntry): void {
+		if (entry.visible) {
+			this.recordFocus(entry.webview);
 			return;
 		}
-		const previous = this.lastFocused;
+		this.handBackFocus(entry);
+	}
+
+	private recordFocus(element: Element): void {
+		if (element === this.lastFocused) return;
+		this.previousFocused = this.lastFocused;
+		this.lastFocused = element;
+	}
+
+	private handBackFocus(entry: RegistryEntry): void {
+		const previous =
+			this.lastFocused === entry.webview
+				? this.previousFocused
+				: this.lastFocused;
 		const previousPaneId = previous ? this.getPaneIdForWebview(previous) : null;
 		const canRestore =
 			previous instanceof HTMLElement &&
@@ -492,7 +499,7 @@ export class BrowserRuntimeRegistryImpl {
 		};
 
 		// Electron's own event: keyboard focus moved into the guest.
-		const handleFocus = () => this.handleWebviewFocus(paneId, entry);
+		const handleFocus = () => this.handleWebviewFocus(entry);
 
 		webview.addEventListener("dom-ready", handleDomReady);
 		webview.addEventListener("focus", handleFocus);
@@ -688,7 +695,6 @@ export class BrowserRuntimeRegistryImpl {
 		entry.webview.remove();
 		entry.overlay.remove();
 		this.entries.delete(paneId);
-		this.agentInputSettledAt.delete(paneId);
 		this.listenersByPaneId.delete(paneId);
 		this.foundInPageListenersByPaneId.delete(paneId);
 		this.ipc.browser.unregister.mutate({ paneId }).catch((err) => {

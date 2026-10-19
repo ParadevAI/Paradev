@@ -5,7 +5,6 @@ import {
 	browserManager,
 } from "main/lib/browser/browser-manager";
 import { screenshotManager } from "main/lib/browser/screenshot-manager";
-import type { AgentInputState } from "shared/browser-agent-input";
 import type { ForwardedKey } from "shared/hotkey-chord";
 import { z } from "zod";
 import { publicProcedure, router } from "../..";
@@ -320,17 +319,16 @@ export const createBrowserRouter = () => {
 			});
 		}),
 
-		// An agent's CDP input in flight on a pane, on its start and settle. Its
-		// mousedown takes keyboard focus into the guest; the renderer registry
-		// hands that focus back to whatever the user had focused.
-		onAgentInput: publicProcedure.subscription(() => {
-			return observable<AgentInputState>((emit) => {
-				const handler = (state: AgentInputState) => {
-					emit.next(state);
+		// An agent's CDP input moved keyboard focus into a pane's guest; the
+		// renderer registry hands it back to whatever the user had focused.
+		onAgentFocus: publicProcedure.subscription(() => {
+			return observable<{ paneId: string }>((emit) => {
+				const handler = (event: { paneId: string }) => {
+					emit.next(event);
 				};
-				browserManager.on("agent-input", handler);
+				browserManager.on("agent-focus", handler);
 				return () => {
-					browserManager.off("agent-input", handler);
+					browserManager.off("agent-focus", handler);
 				};
 			});
 		}),

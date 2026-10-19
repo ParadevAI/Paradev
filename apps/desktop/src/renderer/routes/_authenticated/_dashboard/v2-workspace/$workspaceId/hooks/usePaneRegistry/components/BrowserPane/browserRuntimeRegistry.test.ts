@@ -1,12 +1,4 @@
-import {
-	afterEach,
-	describe,
-	expect,
-	mock,
-	setSystemTime,
-	spyOn,
-	test,
-} from "bun:test";
+import { afterEach, describe, expect, mock, spyOn, test } from "bun:test";
 import { pointerPassthrough } from "renderer/lib/pointer-passthrough";
 import { BrowserRuntimeRegistryImpl } from "./browserRuntimeRegistry";
 
@@ -18,7 +10,7 @@ const browserRuntimeRegistry = new BrowserRuntimeRegistryImpl({
 		register: { mutate: register },
 		unregister: { mutate: unregister },
 		onAgentActivePanes: { subscribe: () => ({ unsubscribe: () => {} }) },
-		onAgentInput: { subscribe: () => ({ unsubscribe: () => {} }) },
+		onAgentFocus: { subscribe: () => ({ unsubscribe: () => {} }) },
 	},
 	browserHistory: {
 		upsert: { mutate: async () => ({ success: true }) },
@@ -434,19 +426,18 @@ describe("browserRuntimeRegistry background open", () => {
 });
 
 describe("browserRuntimeRegistry agent input focus", () => {
-	let sendAgentInput: (state: { paneId: string; active: boolean }) => void =
-		() => {};
+	let sendAgentFocus: (event: { paneId: string }) => void = () => {};
 	const registry = new BrowserRuntimeRegistryImpl({
 		browser: {
 			register: { mutate: register },
 			unregister: { mutate: unregister },
 			onAgentActivePanes: { subscribe: () => ({ unsubscribe: () => {} }) },
-			onAgentInput: {
+			onAgentFocus: {
 				subscribe: (
 					_input: undefined,
-					handlers: { onData: typeof sendAgentInput },
+					handlers: { onData: typeof sendAgentFocus },
 				) => {
-					sendAgentInput = handlers.onData;
+					sendAgentFocus = handlers.onData;
 					return { unsubscribe: () => {} };
 				},
 			},
@@ -503,41 +494,27 @@ describe("browserRuntimeRegistry agent input focus", () => {
 	};
 
 	afterEach(() => {
-		setSystemTime();
 		internals.entries.clear();
 		document.body.replaceChildren();
 	});
 
-	test("hands focus back when an agent's click focuses a visible guest", () => {
+	test("hands focus back when main reports an agent's input focused a visible guest", () => {
 		const entry = createEntry("focus-agent-visible", true);
 		const terminal = typeInTerminal();
+		const guest = document.createElement("button");
+		document.body.appendChild(guest);
+		entry.webview = guest as unknown as FocusEntry["webview"];
 
-		sendAgentInput({ paneId: "focus-agent-visible", active: true });
-		terminal.blur();
-		entry.webview.dispatchEvent(new Event("focus"));
-
-		expect(document.activeElement).toBe(terminal);
-	});
-
-	test("still hands focus back just after the agent's input settles", () => {
-		const entry = createEntry("focus-agent-settled", true);
-		const terminal = typeInTerminal();
-
-		sendAgentInput({ paneId: "focus-agent-settled", active: true });
-		sendAgentInput({ paneId: "focus-agent-settled", active: false });
-		terminal.blur();
-		entry.webview.dispatchEvent(new Event("focus"));
+		guest.focus();
+		sendAgentFocus({ paneId: "focus-agent-visible" });
 
 		expect(document.activeElement).toBe(terminal);
 	});
 
-	test("keeps focus in a visible guest the user clicks once agent input is over", () => {
+	test("keeps focus in a visible guest the user clicks", () => {
 		const entry = createEntry("focus-user-click", true);
 		const terminal = typeInTerminal();
-		sendAgentInput({ paneId: "focus-user-click", active: true });
-		sendAgentInput({ paneId: "focus-user-click", active: false });
 
-		setSystemTime(new Date(Date.now() + 1_000));
 		terminal.blur();
 		entry.webview.dispatchEvent(new Event("focus"));
 
@@ -560,7 +537,7 @@ describe("browserRuntimeRegistry agent input focus", () => {
 		const fresh = new BrowserRuntimeRegistryImpl({
 			browser: {
 				onAgentActivePanes: { subscribe: () => ({ unsubscribe: () => {} }) },
-				onAgentInput: { subscribe: () => ({ unsubscribe: () => {} }) },
+				onAgentFocus: { subscribe: () => ({ unsubscribe: () => {} }) },
 			},
 		} as unknown as ConstructorParameters<
 			typeof BrowserRuntimeRegistryImpl
@@ -573,12 +550,12 @@ describe("browserRuntimeRegistry agent input focus", () => {
 		terminal.blur();
 		(
 			fresh as unknown as {
-				handleWebviewFocus: (
-					paneId: string,
-					entry: { webview: typeof webview; visible: boolean },
-				) => void;
+				handleWebviewFocus: (entry: {
+					webview: typeof webview;
+					visible: boolean;
+				}) => void;
 			}
-		).handleWebviewFocus("focus-fresh", { webview, visible: false });
+		).handleWebviewFocus({ webview, visible: false });
 
 		expect(document.activeElement).toBe(terminal);
 	});
