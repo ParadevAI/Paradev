@@ -552,10 +552,12 @@ struct ComposerRootView: View {
       placeholder.foregroundColor = .secondary
       shown = placeholder
     } else {
-      var tail = AttributedString(model.hasDraft && !volatile.isEmpty ? " " + volatile : volatile)
+      let base = model.draft.trimmingCharacters(in: .whitespaces)
+      let joined = ComposerDictatedText.join(base, volatile)
+      var tail = AttributedString(String(joined.dropFirst(base.count)))
       tail.font = .body.italic()
       tail.foregroundColor = .secondary
-      shown = AttributedString(model.draft) + tail
+      shown = AttributedString(base) + tail
     }
     return Text(shown)
       .lineLimit(ComposerMetrics.maxLines)

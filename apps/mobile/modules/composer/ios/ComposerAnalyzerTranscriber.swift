@@ -4,7 +4,17 @@ import Speech
 /// Dictation on `SpeechAnalyzer`: on device, for long-form audio, with no
 /// per-request time cap. `SFSpeechRecognizer` on the server stops after about
 /// one minute, which is how a 15-minute recording used to vanish.
+///
+/// `SpeechTranscriber` first. `DictationTranscriber` covers the devices it does
+/// not run on (iPhone 11, SE 2) and every language `SFSpeechRecognizer` has an
+/// on-device model for.
 final class ComposerAnalyzerTranscriber: ComposerTranscriber {
+  /// A model still downloading after this is left to finish in the background
+  /// for next time, and this session uses the next engine.
+  private static let installTimeout = Duration.seconds(10)
+
+  private typealias ResultStream = (ComposerTranscriptHandler) async throws -> Void
+
   private let analyzer: SpeechAnalyzer
   private let format: AVAudioFormat
   private let input: AsyncStream<AnalyzerInput>.Continuation
@@ -12,39 +22,83 @@ final class ComposerAnalyzerTranscriber: ComposerTranscriber {
   /// Touched only from the audio tap thread.
   private var converter: AVAudioConverter?
 
-  /// Nil when this device or language has no `SpeechTranscriber` model; the
-  /// caller then falls back to `ComposerRecognizerTranscriber`.
+  /// Nil when neither module can run here; the caller then falls back to
+  /// `ComposerRecognizerTranscriber`.
   static func make(
     locale: Locale,
     onEvent: @escaping ComposerTranscriptHandler
-  ) async throws -> ComposerAnalyzerTranscriber? {
-    guard SpeechTranscriber.isAvailable,
+  ) async -> ComposerAnalyzerTranscriber? {
+    if SpeechTranscriber.isAvailable,
       let supported = await SpeechTranscriber.supportedLocale(equivalentTo: locale)
-    else { return nil }
-
-    let module = SpeechTranscriber(
-      locale: supported,
-      transcriptionOptions: [],
-      reportingOptions: [.volatileResults],
-      attributeOptions: []
-    )
-    // First use of a language downloads its model. Dictation stays in
-    // `preparing` until it is ready.
-    if let install = try await AssetInventory.assetInstallationRequest(supporting: [module]) {
-      try await install.downloadAndInstall()
+    {
+      let module = SpeechTranscriber(
+        locale: supported,
+        transcriptionOptions: [],
+        reportingOptions: [.volatileResults],
+        attributeOptions: []
+      )
+      if let transcriber = try? await start(
+        module: module,
+        locale: supported,
+        results: { onEvent in
+          for try await result in module.results {
+            await onEvent(Self.event(text: result.text, isFinal: result.isFinal))
+          }
+        },
+        onEvent: onEvent
+      ) {
+        return transcriber
+      }
     }
+
+    if let supported = await DictationTranscriber.supportedLocale(equivalentTo: locale) {
+      let module = DictationTranscriber(locale: supported, preset: .progressiveLongDictation)
+      return try? await start(
+        module: module,
+        locale: supported,
+        results: { onEvent in
+          for try await result in module.results {
+            await onEvent(Self.event(text: result.text, isFinal: result.isFinal))
+          }
+        },
+        onEvent: onEvent
+      )
+    }
+    return nil
+  }
+
+  private static func event(text: AttributedString, isFinal: Bool) -> ComposerTranscriptEvent {
+    let plain = String(text.characters)
+    return isFinal ? .finalized(plain) : .volatile(plain)
+  }
+
+  private static func start(
+    module: any SpeechModule,
+    locale: Locale,
+    results: @escaping ResultStream,
+    onEvent: @escaping ComposerTranscriptHandler
+  ) async throws -> ComposerAnalyzerTranscriber? {
+    try await reserve(locale)
+    try await install(module)
     guard let format = await SpeechAnalyzer.bestAvailableAudioFormat(compatibleWith: [module])
     else { return nil }
 
     let analyzer = SpeechAnalyzer(modules: [module])
+    try await analyzer.prepareToAnalyze(in: format)
     let (stream, input) = AsyncStream.makeStream(of: AnalyzerInput.self)
+    // Results are read only once the analyzer has started, so a failed start
+    // falls through to the next engine rather than reporting a failure.
+    do {
+      try await analyzer.start(inputSequence: stream)
+    } catch {
+      input.finish()
+      throw error
+    }
+
     let transcriber = ComposerAnalyzerTranscriber(analyzer: analyzer, format: format, input: input)
     transcriber.results = Task {
       do {
-        for try await result in module.results {
-          let text = String(result.text.characters)
-          await onEvent(result.isFinal ? .finalized(text) : .volatile(text))
-        }
+        try await results(onEvent)
         guard !Task.isCancelled else { return }
         await onEvent(.ended)
       } catch {
@@ -52,8 +106,35 @@ final class ComposerAnalyzerTranscriber: ComposerTranscriber {
         await onEvent(.failed(error))
       }
     }
-    try await analyzer.start(inputSequence: stream)
     return transcriber
+  }
+
+  /// Installing reserves a locale only when it downloads something, and Apple
+  /// warns that using an unreserved one will become an error. The cap can be
+  /// as low as one, and these are this app's reservations alone.
+  private static func reserve(_ locale: Locale) async throws {
+    let reserved = await AssetInventory.reservedLocales
+    let wanted = locale.identifier(.bcp47)
+    guard !reserved.contains(where: { $0.identifier(.bcp47) == wanted }) else { return }
+    if reserved.count >= AssetInventory.maximumReservedLocales {
+      for stale in reserved { await AssetInventory.release(reservedLocale: stale) }
+    }
+    try await AssetInventory.reserve(locale: locale)
+  }
+
+  private static func install(_ module: any SpeechModule) async throws {
+    guard let request = try await AssetInventory.assetInstallationRequest(supporting: [module])
+    else { return }
+    let download = Task { try await request.downloadAndInstall() }
+    try await withThrowingTaskGroup(of: Void.self) { group in
+      group.addTask { try await download.value }
+      group.addTask {
+        try await Task.sleep(for: installTimeout)
+        throw CancellationError()
+      }
+      try await group.next()
+      group.cancelAll()
+    }
   }
 
   private init(
@@ -86,10 +167,11 @@ final class ComposerAnalyzerTranscriber: ComposerTranscriber {
     Task { await analyzer.cancelAndFinishNow() }
   }
 
-  /// The microphone's format is whatever the route gives (48 kHz on most
-  /// phones, other rates on Bluetooth); the analyzer wants its own.
+  /// Always into a fresh buffer: the tap's own is only valid during its
+  /// callback, and the analyzer reads it later. The microphone's format is
+  /// whatever the route gives (48 kHz on most phones, other rates on
+  /// Bluetooth); the analyzer wants its own.
   private func convert(_ buffer: AVAudioPCMBuffer) -> AVAudioPCMBuffer? {
-    if buffer.format == format { return buffer }
     if converter?.inputFormat != buffer.format {
       converter = AVAudioConverter(from: buffer.format, to: format)
       converter?.primeMethod = .none
