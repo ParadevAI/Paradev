@@ -19,6 +19,8 @@ interface ComposerDraftTextStore {
 	/** False until AsyncStorage answers — an empty draft would win the race. */
 	hasHydrated: boolean;
 	setText: (key: string, text: string) => void;
+	/** Drafts belong to the account that wrote them. */
+	forget: () => void;
 }
 
 export const useComposerDraftTextStore = create<ComposerDraftTextStore>()(
@@ -41,11 +43,20 @@ export const useComposerDraftTextStore = create<ComposerDraftTextStore>()(
 					return { textByKey };
 				});
 			},
+			forget: () => set({ textByKey: {} }),
 		}),
 		{
 			name: "composer-draft-text-v1",
 			storage: createJSONStorage(() => AsyncStorage),
 			partialize: ({ textByKey }) => ({ textByKey }),
+			// Typed before the saved map arrived: the keystroke is newer.
+			merge: (saved, current) => ({
+				...current,
+				textByKey: {
+					...(saved as Partial<ComposerDraftTextStore> | undefined)?.textByKey,
+					...current.textByKey,
+				},
+			}),
 			// Flips on storage errors too, so a failed read still lets the
 			// composer start empty instead of waiting forever.
 			onRehydrateStorage: () => () =>

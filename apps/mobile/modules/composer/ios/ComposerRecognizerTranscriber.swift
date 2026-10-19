@@ -138,17 +138,17 @@ final class ComposerRecognizerTranscriber: ComposerTranscriber {
     if !text.isEmpty { onEvent(.finalized(text)) }
     publishVolatile()
 
-    guard id == liveSegment, !isFinishing else {
-      endIfDrained()
-      return
-    }
     if let error, !Self.isBenign(error) {
       failuresInARow += 1
-      guard failuresInARow < Self.maxFailuresInARow else {
+      if isFinishing || failuresInARow >= Self.maxFailuresInARow {
         cancel()
         onEvent(.failed(error))
         return
       }
+    }
+    guard id == liveSegment, !isFinishing else {
+      endIfDrained()
+      return
     }
     beginSegment()
   }

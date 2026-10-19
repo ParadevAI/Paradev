@@ -57,6 +57,41 @@ describe("composerDraftTextStore", () => {
 		expect(useComposerDraftTextStore.getState().textByKey).toEqual({});
 	});
 
+	test("a draft typed while the saved map is still loading wins", async () => {
+		useComposerDraftTextStore.getState().setText("home", "old");
+		useComposerDraftTextStore.setState({ textByKey: {}, hasHydrated: false });
+		useComposerDraftTextStore.getState().setText("home", "new");
+		useComposerDraftTextStore.getState().setText("workspace:1", "typed");
+		disk.set(
+			"composer-draft-text-v1",
+			JSON.stringify({ state: { textByKey: { home: "old" } }, version: 0 }),
+		);
+
+		await useComposerDraftTextStore.persist.rehydrate();
+
+		expect(useComposerDraftTextStore.getState().textByKey).toEqual({
+			home: "new",
+			"workspace:1": "typed",
+		});
+	});
+
+	test("hydrating with nothing saved reports no error", async () => {
+		let seen: unknown = "unset";
+		const { onRehydrateStorage } =
+			useComposerDraftTextStore.persist.getOptions();
+		useComposerDraftTextStore.persist.setOptions({
+			onRehydrateStorage: () => (_state, error) => {
+				seen = error;
+			},
+		});
+		disk.clear();
+
+		await useComposerDraftTextStore.persist.rehydrate();
+		useComposerDraftTextStore.persist.setOptions({ onRehydrateStorage });
+
+		expect(seen).toBeUndefined();
+	});
+
 	test("keeps the 50 most recently written drafts", () => {
 		const { setText } = useComposerDraftTextStore.getState();
 		for (let index = 0; index < 50; index++) setText(`workspace:${index}`, "x");

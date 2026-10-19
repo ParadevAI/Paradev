@@ -562,6 +562,8 @@ struct ComposerRootView: View {
     return Text(shown)
       .lineLimit(ComposerMetrics.maxLines)
       .truncationMode(.head)
+      // The default crossfade ghosts the words while they are still changing.
+      .contentTransition(.identity)
       .frame(maxWidth: .infinity, alignment: .leading)
   }
 

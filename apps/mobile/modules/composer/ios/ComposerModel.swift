@@ -186,8 +186,10 @@ final class ComposerModel {
 
   func settle() { isAppearing = false }
 
-  /// First non-empty delivery of `initialDraft` wins, and never over typing.
+  /// First non-empty delivery of `initialDraft` wins, and never after the
+  /// user has typed, dictated or cleared.
   @ObservationIgnored private var hasAppliedInitialDraft = false
+  @ObservationIgnored private var hasEdited = false
 
   /// Internal plumbing, not a React Native event — see `ComposerPassthroughView`.
   @ObservationIgnored var onInteractiveFrameChange: ((CGRect) -> Void)?
@@ -223,6 +225,7 @@ final class ComposerModel {
   /// opened — and the same change reveals or hides send, so if the two are not
   /// in one transaction the mic travels along an arc.
   func setDraft(_ text: String) {
+    hasEdited = true
     withAnimation(ComposerMetrics.typingGrowth) { draft = text }
     onDraftChange?(text)
   }
@@ -248,7 +251,7 @@ final class ComposerModel {
   func applyInitialDraft(_ text: String) {
     guard !hasAppliedInitialDraft, !text.isEmpty else { return }
     hasAppliedInitialDraft = true
-    guard draft.isEmpty else { return }
+    guard !hasEdited else { return }
     draft = text
   }
 

@@ -3,6 +3,7 @@ import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { signOut } from "@/lib/auth/client";
 import { clearWarmTerminals } from "@/lib/terminal/warmTerminalCache";
+import { useComposerDraftTextStore } from "@/screens/(authenticated)/stores/composerDraftTextStore";
 
 export function useSignOut() {
 	const router = useRouter();
@@ -16,6 +17,7 @@ export function useSignOut() {
 			queryClient.clear();
 			// Cached scrollback belongs to the account that just left.
 			clearWarmTerminals();
+			useComposerDraftTextStore.getState().forget();
 			router.replace("/(auth)/sign-in");
 		} catch (error) {
 			console.error("[auth/signOut] Failed to sign out:", error);
