@@ -1527,6 +1527,9 @@ msgstr "Aa"
 msgid "About"
 msgstr "關於"
 
+msgid "About {displayName}"
+msgstr "關於 {displayName}"
+
 msgid "About Superset"
 msgstr "關於Superset"
 
@@ -2105,8 +2108,8 @@ msgstr "你的所有資料將在{ACCOUNT_DELETION_GRACE_DAYS}天後被永久刪�
 msgid "All of your data will be permanently deleted after {ACCOUNT_DELETION_GRACE_DAYS} days. Sign back in before then to restore your account."
 msgstr "你的所有資料將在{ACCOUNT_DELETION_GRACE_DAYS}天後被永久刪除。在此之前重新登入即可恢復帳戶。"
 
-msgid "All open terminal sessions will be killed and any running host-services will be stopped. Use “Close Superset” instead if you want services to keep running for the next launch."
-msgstr "所有開啟的終端會話都會被結束，正在執行的主機服務也會停止。如果希望服務繼續執行以便下次啟動，請改用「關閉Superset」。"
+msgid "All open terminal sessions will be killed and any running host-services will be stopped. Use “Close {displayName}” instead if you want services to keep running for the next launch."
+msgstr "所有開啟的終端會話都會被結束，正在執行的主機服務也會停止。如果希望服務繼續執行以便下次啟動，請改用「關閉{displayName}」。"
 
 msgid "All pages"
 msgstr "所有頁面"
@@ -3903,6 +3906,9 @@ msgstr "關閉（Esc）"
 msgid "Close {0}"
 msgstr "關閉{0}"
 
+msgid "Close {displayName}"
+msgstr "關閉{displayName}"
+
 #. placeholder {0}: data.number
 msgid "Close #{0}?"
 msgstr "關閉#{0}？"
@@ -4001,9 +4007,6 @@ msgstr "關閉審查篩選"
 
 msgid "Close session"
 msgstr "關閉會話"
-
-msgid "Close Superset"
-msgstr "關閉Superset"
 
 msgid "Close tab"
 msgstr "關閉分頁"
@@ -8301,6 +8304,9 @@ msgstr "加入後才會顯示"
 msgid "Hide"
 msgstr "隱藏"
 
+msgid "Hide {displayName}"
+msgstr "隱藏 {displayName}"
+
 msgid "Hide checks"
 msgstr "隱藏檢查"
 
@@ -11766,6 +11772,9 @@ msgstr "開啟{0}"
 msgid "Open {0} website"
 msgstr "開啟 {0} 官網"
 
+msgid "Open {displayName}"
+msgstr "開啟{displayName}"
+
 msgid "Open {filePath}"
 msgstr "開啟{filePath}"
 
@@ -12086,9 +12095,6 @@ msgstr "開啟側邊面板"
 
 msgid "Open ship options"
 msgstr "開啟發布選項"
-
-msgid "Open Superset"
-msgstr "開啟Superset"
 
 msgid "Open Superset on that computer"
 msgstr "在那台電腦上開啟Superset"
@@ -13369,17 +13375,17 @@ msgstr "輕"
 msgid "Quit"
 msgstr "退出"
 
+msgid "Quit {displayName}"
+msgstr "結束 {displayName}"
+
+msgid "Quit {displayName} and stop all background services?"
+msgstr "退出{displayName}並停止所有背景服務？"
+
+msgid "Quit {displayName} Completely"
+msgstr "完全退出{displayName}"
+
 msgid "Quit Completely"
 msgstr "完全退出"
-
-msgid "Quit Superset"
-msgstr "退出Superset"
-
-msgid "Quit Superset and stop all background services?"
-msgstr "退出Superset並停止所有背景服務？"
-
-msgid "Quit Superset Completely"
-msgstr "完全退出Superset"
 
 msgid "Quit the source browser first so its logins are saved to disk. You'll be asked to allow Keychain access."
 msgstr "請先退出源瀏覽器，讓它把登入資訊寫入磁碟。系統會請求你允許存取鑰匙圈。"

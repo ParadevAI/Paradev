@@ -1527,6 +1527,9 @@ msgstr "Aa"
 msgid "About"
 msgstr "Giới thiệu"
 
+msgid "About {displayName}"
+msgstr "Giới thiệu về {displayName}"
+
 msgid "About Superset"
 msgstr "Về Superset"
 
@@ -2105,8 +2108,8 @@ msgstr "Toàn bộ dữ liệu của bạn sẽ bị xóa vĩnh viễn sau {ACCO
 msgid "All of your data will be permanently deleted after {ACCOUNT_DELETION_GRACE_DAYS} days. Sign back in before then to restore your account."
 msgstr "Toàn bộ dữ liệu của bạn sẽ bị xóa vĩnh viễn sau {ACCOUNT_DELETION_GRACE_DAYS} ngày. Hãy đăng nhập lại trước thời điểm đó để khôi phục tài khoản."
 
-msgid "All open terminal sessions will be killed and any running host-services will be stopped. Use “Close Superset” instead if you want services to keep running for the next launch."
-msgstr "Mọi phiên terminal đang mở sẽ bị kết thúc và các host-service đang chạy sẽ bị dừng. Hãy dùng “Đóng Superset” nếu bạn muốn các dịch vụ tiếp tục chạy cho lần khởi động sau."
+msgid "All open terminal sessions will be killed and any running host-services will be stopped. Use “Close {displayName}” instead if you want services to keep running for the next launch."
+msgstr "Mọi phiên terminal đang mở sẽ bị kết thúc và các host-service đang chạy sẽ bị dừng. Hãy dùng “Đóng {displayName}” nếu bạn muốn các dịch vụ tiếp tục chạy cho lần khởi động sau."
 
 msgid "All pages"
 msgstr "Tất cả các trang"
@@ -3903,6 +3906,9 @@ msgstr "Đóng (Esc)"
 msgid "Close {0}"
 msgstr "Đóng {0}"
 
+msgid "Close {displayName}"
+msgstr "Đóng {displayName}"
+
 #. placeholder {0}: data.number
 msgid "Close #{0}?"
 msgstr "Đóng #{0}?"
@@ -4001,9 +4007,6 @@ msgstr "Đóng bộ lọc review"
 
 msgid "Close session"
 msgstr "Đóng phiên"
-
-msgid "Close Superset"
-msgstr "Đóng Superset"
 
 msgid "Close tab"
 msgstr "Đóng tab"
@@ -8301,6 +8304,9 @@ msgstr "Ẩn cho đến khi bạn tham gia"
 msgid "Hide"
 msgstr "Ẩn"
 
+msgid "Hide {displayName}"
+msgstr "Ẩn {displayName}"
+
 msgid "Hide checks"
 msgstr "Ẩn check"
 
@@ -11766,6 +11772,9 @@ msgstr "Mở {0}"
 msgid "Open {0} website"
 msgstr "Mở website {0}"
 
+msgid "Open {displayName}"
+msgstr "Mở {displayName}"
+
 msgid "Open {filePath}"
 msgstr "Mở {filePath}"
 
@@ -12086,9 +12095,6 @@ msgstr "Mở sheet"
 
 msgid "Open ship options"
 msgstr "Mở tùy chọn gửi"
-
-msgid "Open Superset"
-msgstr "Mở Superset"
 
 msgid "Open Superset on that computer"
 msgstr "Mở Superset trên máy tính đó"
@@ -13369,17 +13375,17 @@ msgstr "Nhỏ"
 msgid "Quit"
 msgstr "Thoát"
 
+msgid "Quit {displayName}"
+msgstr "Thoát {displayName}"
+
+msgid "Quit {displayName} and stop all background services?"
+msgstr "Thoát {displayName} và dừng mọi dịch vụ nền?"
+
+msgid "Quit {displayName} Completely"
+msgstr "Thoát hẳn {displayName}"
+
 msgid "Quit Completely"
 msgstr "Thoát hẳn"
-
-msgid "Quit Superset"
-msgstr "Thoát Superset"
-
-msgid "Quit Superset and stop all background services?"
-msgstr "Thoát Superset và dừng mọi dịch vụ nền?"
-
-msgid "Quit Superset Completely"
-msgstr "Thoát hẳn Superset"
 
 msgid "Quit the source browser first so its logins are saved to disk. You'll be asked to allow Keychain access."
 msgstr "Thoát trình duyệt nguồn trước để thông tin đăng nhập được lưu xuống đĩa. Bạn sẽ được hỏi cho phép truy cập Keychain."

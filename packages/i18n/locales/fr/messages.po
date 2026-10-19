@@ -1527,6 +1527,9 @@ msgstr "Aa"
 msgid "About"
 msgstr "À propos"
 
+msgid "About {displayName}"
+msgstr "À propos de {displayName}"
+
 msgid "About Superset"
 msgstr "À propos de Superset"
 
@@ -2105,8 +2108,8 @@ msgstr "Toutes vos données seront définitivement supprimées après {ACCOUNT_D
 msgid "All of your data will be permanently deleted after {ACCOUNT_DELETION_GRACE_DAYS} days. Sign back in before then to restore your account."
 msgstr "Toutes vos données seront définitivement supprimées après {ACCOUNT_DELETION_GRACE_DAYS} jours. Reconnectez-vous avant cette échéance pour restaurer votre compte."
 
-msgid "All open terminal sessions will be killed and any running host-services will be stopped. Use “Close Superset” instead if you want services to keep running for the next launch."
-msgstr "Toutes les sessions de terminal ouvertes seront interrompues et les services hôtes en cours seront arrêtés. Utilisez plutôt « Fermer Superset » si vous voulez que les services continuent de tourner pour le prochain lancement."
+msgid "All open terminal sessions will be killed and any running host-services will be stopped. Use “Close {displayName}” instead if you want services to keep running for the next launch."
+msgstr "Toutes les sessions de terminal ouvertes seront interrompues et les services hôtes en cours seront arrêtés. Utilisez plutôt « Fermer {displayName} » si vous voulez que les services continuent de tourner pour le prochain lancement."
 
 msgid "All pages"
 msgstr "Toutes les pages"
@@ -3903,6 +3906,9 @@ msgstr "Fermer (Esc)"
 msgid "Close {0}"
 msgstr "Fermer {0}"
 
+msgid "Close {displayName}"
+msgstr "Fermer {displayName}"
+
 #. placeholder {0}: data.number
 msgid "Close #{0}?"
 msgstr "Fermer #{0} ?"
@@ -4001,9 +4007,6 @@ msgstr "Fermer le filtre de revues"
 
 msgid "Close session"
 msgstr "Fermer la session"
-
-msgid "Close Superset"
-msgstr "Fermer Superset"
 
 msgid "Close tab"
 msgstr "Fermer l'onglet"
@@ -8301,6 +8304,9 @@ msgstr "Masqué tant que vous n'avez pas rejoint"
 msgid "Hide"
 msgstr "Masquer"
 
+msgid "Hide {displayName}"
+msgstr "Masquer {displayName}"
+
 msgid "Hide checks"
 msgstr "Masquer les vérifications"
 
@@ -11766,6 +11772,9 @@ msgstr "Ouvrir {0}"
 msgid "Open {0} website"
 msgstr "Ouvrir le site de {0}"
 
+msgid "Open {displayName}"
+msgstr "Ouvrir {displayName}"
+
 msgid "Open {filePath}"
 msgstr "Ouvrir {filePath}"
 
@@ -12086,9 +12095,6 @@ msgstr "Ouvrir le panneau"
 
 msgid "Open ship options"
 msgstr "Ouvrir les options d'envoi"
-
-msgid "Open Superset"
-msgstr "Ouvrir Superset"
 
 msgid "Open Superset on that computer"
 msgstr "Ouvrez Superset sur cet ordinateur"
@@ -13369,17 +13375,17 @@ msgstr "Faible"
 msgid "Quit"
 msgstr "Quitter"
 
+msgid "Quit {displayName}"
+msgstr "Quitter {displayName}"
+
+msgid "Quit {displayName} and stop all background services?"
+msgstr "Quitter {displayName} et arrêter tous les services en arrière-plan ?"
+
+msgid "Quit {displayName} Completely"
+msgstr "Quitter complètement {displayName}"
+
 msgid "Quit Completely"
 msgstr "Quitter complètement"
-
-msgid "Quit Superset"
-msgstr "Quitter Superset"
-
-msgid "Quit Superset and stop all background services?"
-msgstr "Quitter Superset et arrêter tous les services en arrière-plan ?"
-
-msgid "Quit Superset Completely"
-msgstr "Quitter complètement Superset"
 
 msgid "Quit the source browser first so its logins are saved to disk. You'll be asked to allow Keychain access."
 msgstr "Quittez d'abord le navigateur source pour que ses identifiants soient enregistrés sur le disque. Vous devrez autoriser l'accès au trousseau."
