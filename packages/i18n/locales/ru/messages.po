@@ -15277,8 +15277,8 @@ msgstr "Триггеры Sentry перестанут срабатывать, п�
 msgid "Separator"
 msgstr "Разделитель"
 
-msgid "Service availability is published at <0>status.superset.sh</0>, and security and compliance documentation at <1>trust.superset.sh</1>."
-msgstr "Доступность сервиса публикуется на <0>status.superset.sh</0>, а документация по безопасности и соответствию — на <1>trust.superset.sh</1>."
+msgid "Service availability is published at <0>{statusHost}</0>, and security and compliance documentation at <1>{trustHost}</1>."
+msgstr "Доступность сервиса публикуется на <0>{statusHost}</0>, а документация по безопасности и соответствию — на <1>{trustHost}</1>."
 
 msgid "Session"
 msgstr "Сессия"

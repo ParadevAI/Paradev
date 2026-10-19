@@ -15277,8 +15277,8 @@ msgstr "Pemicu Sentry berhenti berjalan sampai Anda menghubungkan lagi. Integras
 msgid "Separator"
 msgstr "Separator"
 
-msgid "Service availability is published at <0>status.superset.sh</0>, and security and compliance documentation at <1>trust.superset.sh</1>."
-msgstr "Ketersediaan layanan dipublikasikan di <0>status.superset.sh</0>, dan dokumentasi keamanan serta kepatuhan di <1>trust.superset.sh</1>."
+msgid "Service availability is published at <0>{statusHost}</0>, and security and compliance documentation at <1>{trustHost}</1>."
+msgstr "Ketersediaan layanan dipublikasikan di <0>{statusHost}</0>, dan dokumentasi keamanan serta kepatuhan di <1>{trustHost}</1>."
 
 msgid "Session"
 msgstr "Sesi"

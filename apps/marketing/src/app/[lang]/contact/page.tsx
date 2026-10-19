@@ -8,6 +8,9 @@ import { localizedAlternates } from "@/app/[lang]/metadata";
 import { initServerI18n } from "@/app/i18n-server";
 import { ContactForm } from "../components/ContactForm";
 
+const statusHost = new URL(COMPANY.STATUS_URL).host;
+const trustHost = new URL(COMPANY.TRUST_URL).host;
+
 export async function generateMetadata(): Promise<Metadata> {
 	const lang = await initServerI18n();
 	const i18n = getI18nInstance(lang);
@@ -132,11 +135,11 @@ export default async function ContactPage() {
 								className="text-foreground underline"
 								href={COMPANY.STATUS_URL}
 							>
-								status.superset.sh
+								{statusHost}
 							</a>
 							, and security and compliance documentation at{" "}
 							<a className="text-foreground underline" href={COMPANY.TRUST_URL}>
-								trust.superset.sh
+								{trustHost}
 							</a>
 							.
 						</Trans>
