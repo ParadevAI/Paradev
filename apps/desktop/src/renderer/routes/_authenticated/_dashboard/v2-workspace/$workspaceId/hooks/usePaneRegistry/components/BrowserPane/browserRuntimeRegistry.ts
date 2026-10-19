@@ -246,8 +246,11 @@ export class BrowserRuntimeRegistryImpl {
 			previous.isConnected &&
 			(previousPaneId === null ||
 				this.entries.get(previousPaneId)?.visible === true);
+		// Chromium only moves keyboard focus into another webview's guest while
+		// the host page has it (WebContentsImpl::SetFocusedFrame), so leave
+		// this guest first.
+		entry.webview.blur();
 		if (canRestore) previous.focus({ preventScroll: true });
-		else entry.webview.blur();
 	}
 
 	private applyPointerPassthrough(passthrough: boolean) {

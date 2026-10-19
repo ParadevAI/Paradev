@@ -511,6 +511,23 @@ describe("browserRuntimeRegistry agent input focus", () => {
 		expect(document.activeElement).toBe(terminal);
 	});
 
+	test("leaves the guest before handing focus to the page the user was in", () => {
+		const pageA = createEntry("focus-page-a", true);
+		const pageB = createEntry("focus-page-b", false);
+		const calls: string[] = [];
+		const pageAStub = pageA.webview;
+		const pageAElement = document.createElement("button");
+		document.body.appendChild(pageAElement);
+		pageAElement.focus = () => calls.push("focus A");
+		pageA.webview = pageAElement as unknown as FocusEntry["webview"];
+		pageB.webview.blur.mockImplementation(() => calls.push("blur B"));
+		pageAStub.dispatchEvent(new Event("focus"));
+
+		pageB.webview.dispatchEvent(new Event("focus"));
+
+		expect(calls).toEqual(["blur B", "focus A"]);
+	});
+
 	test("keeps focus in a visible guest the user clicks", () => {
 		const entry = createEntry("focus-user-click", true);
 		const terminal = typeInTerminal();
