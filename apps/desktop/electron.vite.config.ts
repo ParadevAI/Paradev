@@ -121,6 +121,10 @@ export default defineConfig({
 			"process.env.SUPERSET_WORKSPACE_NAME": defineEnv(
 				process.env.SUPERSET_WORKSPACE_NAME,
 			),
+			"process.env.DESKTOP_DISPLAY_NAME": defineEnv(
+				process.env.DESKTOP_DISPLAY_NAME,
+				"",
+			),
 		},
 
 		build: {

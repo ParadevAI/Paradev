@@ -1527,6 +1527,9 @@ msgstr "Aa"
 msgid "About"
 msgstr "회사 소개"
 
+msgid "About {displayName}"
+msgstr "{displayName}에 관하여"
+
 msgid "About Superset"
 msgstr "Superset 소개"
 
@@ -2105,8 +2108,8 @@ msgstr "모든 데이터가 {ACCOUNT_DELETION_GRACE_DAYS}일 후에 영구적으
 msgid "All of your data will be permanently deleted after {ACCOUNT_DELETION_GRACE_DAYS} days. Sign back in before then to restore your account."
 msgstr "모든 데이터가 {ACCOUNT_DELETION_GRACE_DAYS}일 후에 영구적으로 삭제됩니다. 그 전에 다시 로그인하면 계정이 복원됩니다."
 
-msgid "All open terminal sessions will be killed and any running host-services will be stopped. Use “Close Superset” instead if you want services to keep running for the next launch."
-msgstr "열려 있는 모든 터미널 세션이 종료되고 실행 중인 호스트 서비스가 모두 중지됩니다. 다음 실행까지 서비스를 계속 실행하려면 “Superset 닫기”를 사용하세요."
+msgid "All open terminal sessions will be killed and any running host-services will be stopped. Use “Close {displayName}” instead if you want services to keep running for the next launch."
+msgstr "열려 있는 모든 터미널 세션이 종료되고 실행 중인 호스트 서비스가 모두 중지됩니다. 다음 실행까지 서비스를 계속 실행하려면 “{displayName} 닫기”를 사용하세요."
 
 msgid "All pages"
 msgstr "모든 페이지"
@@ -3900,6 +3903,9 @@ msgstr "닫기 (Esc)"
 msgid "Close {0}"
 msgstr "{0} 닫기"
 
+msgid "Close {displayName}"
+msgstr "{displayName} 닫기"
+
 #. placeholder {0}: data.number
 msgid "Close #{0}?"
 msgstr "#{0}을(를) 닫을까요?"
@@ -3998,9 +4004,6 @@ msgstr "리뷰 필터 닫기"
 
 msgid "Close session"
 msgstr "세션 닫기"
-
-msgid "Close Superset"
-msgstr "Superset 닫기"
 
 msgid "Close tab"
 msgstr "탭 닫기"
@@ -8298,6 +8301,9 @@ msgstr "참여 전까지 숨김"
 msgid "Hide"
 msgstr "숨기기"
 
+msgid "Hide {displayName}"
+msgstr "{displayName} 가리기"
+
 msgid "Hide checks"
 msgstr "검사 숨기기"
 
@@ -11763,6 +11769,9 @@ msgstr "{0} 열기"
 msgid "Open {0} website"
 msgstr "{0} 웹사이트 열기"
 
+msgid "Open {displayName}"
+msgstr "{displayName} 열기"
+
 msgid "Open {filePath}"
 msgstr "{filePath} 열기"
 
@@ -12083,9 +12092,6 @@ msgstr "시트 열기"
 
 msgid "Open ship options"
 msgstr "배포 옵션 열기"
-
-msgid "Open Superset"
-msgstr "Superset 열기"
 
 msgid "Open Superset on that computer"
 msgstr "해당 컴퓨터에서 Superset 열기"
@@ -13366,17 +13372,17 @@ msgstr "조용함"
 msgid "Quit"
 msgstr "종료"
 
+msgid "Quit {displayName}"
+msgstr "{displayName} 종료"
+
+msgid "Quit {displayName} and stop all background services?"
+msgstr "{displayName}을 종료하고 모든 백그라운드 서비스를 중지할까요?"
+
+msgid "Quit {displayName} Completely"
+msgstr "{displayName} 완전히 종료"
+
 msgid "Quit Completely"
 msgstr "완전히 종료"
-
-msgid "Quit Superset"
-msgstr "Superset 종료"
-
-msgid "Quit Superset and stop all background services?"
-msgstr "Superset을 종료하고 모든 백그라운드 서비스를 중지할까요?"
-
-msgid "Quit Superset Completely"
-msgstr "Superset 완전히 종료"
 
 msgid "Quit the source browser first so its logins are saved to disk. You'll be asked to allow Keychain access."
 msgstr "로그인 정보가 디스크에 저장되도록 원본 브라우저를 먼저 종료하세요. 키체인 접근 허용을 요청받게 됩니다."

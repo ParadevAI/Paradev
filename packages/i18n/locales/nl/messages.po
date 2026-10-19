@@ -1527,6 +1527,9 @@ msgstr "Aa"
 msgid "About"
 msgstr "Over ons"
 
+msgid "About {displayName}"
+msgstr "Over {displayName}"
+
 msgid "About Superset"
 msgstr "Over Superset"
 
@@ -2105,8 +2108,8 @@ msgstr "Al je gegevens worden na {ACCOUNT_DELETION_GRACE_DAYS} dagen definitief 
 msgid "All of your data will be permanently deleted after {ACCOUNT_DELETION_GRACE_DAYS} days. Sign back in before then to restore your account."
 msgstr "Al je gegevens worden na {ACCOUNT_DELETION_GRACE_DAYS} dagen definitief verwijderd. Log daarvoor weer in om je account te herstellen."
 
-msgid "All open terminal sessions will be killed and any running host-services will be stopped. Use “Close Superset” instead if you want services to keep running for the next launch."
-msgstr "Alle open terminalsessies worden beëindigd en draaiende hostservices worden gestopt. Gebruik “Superset sluiten” als je wilt dat de services blijven draaien voor de volgende keer."
+msgid "All open terminal sessions will be killed and any running host-services will be stopped. Use “Close {displayName}” instead if you want services to keep running for the next launch."
+msgstr "Alle open terminalsessies worden beëindigd en draaiende hostservices worden gestopt. Gebruik “{displayName} sluiten” als je wilt dat de services blijven draaien voor de volgende keer."
 
 msgid "All pages"
 msgstr "Alle pagina's"
@@ -3900,6 +3903,9 @@ msgstr "Sluiten (Esc)"
 msgid "Close {0}"
 msgstr "{0} sluiten"
 
+msgid "Close {displayName}"
+msgstr "{displayName} sluiten"
+
 #. placeholder {0}: data.number
 msgid "Close #{0}?"
 msgstr "#{0} sluiten?"
@@ -3998,9 +4004,6 @@ msgstr "Reviewfilter sluiten"
 
 msgid "Close session"
 msgstr "Sessie sluiten"
-
-msgid "Close Superset"
-msgstr "Superset sluiten"
 
 msgid "Close tab"
 msgstr "Tabblad sluiten"
@@ -8298,6 +8301,9 @@ msgstr "Verborgen tot je meedoet"
 msgid "Hide"
 msgstr "Verbergen"
 
+msgid "Hide {displayName}"
+msgstr "Verberg {displayName}"
+
 msgid "Hide checks"
 msgstr "Checks verbergen"
 
@@ -11763,6 +11769,9 @@ msgstr "{0} openen"
 msgid "Open {0} website"
 msgstr "Website van {0} openen"
 
+msgid "Open {displayName}"
+msgstr "{displayName} openen"
+
 msgid "Open {filePath}"
 msgstr "{filePath} openen"
 
@@ -12083,9 +12092,6 @@ msgstr "Sheet openen"
 
 msgid "Open ship options"
 msgstr "Verzendopties openen"
-
-msgid "Open Superset"
-msgstr "Superset openen"
 
 msgid "Open Superset on that computer"
 msgstr "Open Superset op die computer"
@@ -13366,17 +13372,17 @@ msgstr "Zacht"
 msgid "Quit"
 msgstr "Afsluiten"
 
+msgid "Quit {displayName}"
+msgstr "Stop {displayName}"
+
+msgid "Quit {displayName} and stop all background services?"
+msgstr "{displayName} afsluiten en alle achtergrondservices stoppen?"
+
+msgid "Quit {displayName} Completely"
+msgstr "{displayName} volledig afsluiten"
+
 msgid "Quit Completely"
 msgstr "Volledig afsluiten"
-
-msgid "Quit Superset"
-msgstr "Superset afsluiten"
-
-msgid "Quit Superset and stop all background services?"
-msgstr "Superset afsluiten en alle achtergrondservices stoppen?"
-
-msgid "Quit Superset Completely"
-msgstr "Superset volledig afsluiten"
 
 msgid "Quit the source browser first so its logins are saved to disk. You'll be asked to allow Keychain access."
 msgstr "Sluit eerst de bronbrowser af zodat de logins naar schijf worden weggeschreven. Er wordt om toegang tot de Sleutelhanger gevraagd."

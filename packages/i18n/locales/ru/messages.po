@@ -1527,6 +1527,9 @@ msgstr "Aa"
 msgid "About"
 msgstr "О нас"
 
+msgid "About {displayName}"
+msgstr "О программе {displayName}"
+
 msgid "About Superset"
 msgstr "О Superset"
 
@@ -2105,8 +2108,8 @@ msgstr "Все ваши данные будут безвозвратно уда�
 msgid "All of your data will be permanently deleted after {ACCOUNT_DELETION_GRACE_DAYS} days. Sign back in before then to restore your account."
 msgstr "Все ваши данные будут безвозвратно удалены через {ACCOUNT_DELETION_GRACE_DAYS} дней. Войдите снова до этого срока, чтобы восстановить аккаунт."
 
-msgid "All open terminal sessions will be killed and any running host-services will be stopped. Use “Close Superset” instead if you want services to keep running for the next launch."
-msgstr "Все открытые сессии терминала будут завершены, а работающие службы хоста остановлены. Если нужно, чтобы службы продолжили работу до следующего запуска, используйте «Закрыть Superset»."
+msgid "All open terminal sessions will be killed and any running host-services will be stopped. Use “Close {displayName}” instead if you want services to keep running for the next launch."
+msgstr "Все открытые сессии терминала будут завершены, а работающие службы хоста остановлены. Если нужно, чтобы службы продолжили работу до следующего запуска, используйте «Закрыть {displayName}»."
 
 msgid "All pages"
 msgstr "Все страницы"
@@ -3900,6 +3903,9 @@ msgstr "Закрыть (Esc)"
 msgid "Close {0}"
 msgstr "Закрыть {0}"
 
+msgid "Close {displayName}"
+msgstr "Закрыть {displayName}"
+
 #. placeholder {0}: data.number
 msgid "Close #{0}?"
 msgstr "Закрыть #{0}?"
@@ -3998,9 +4004,6 @@ msgstr "Закрыть фильтр по ревью"
 
 msgid "Close session"
 msgstr "Закрыть сессию"
-
-msgid "Close Superset"
-msgstr "Закрыть Superset"
 
 msgid "Close tab"
 msgstr "Закрыть вкладку"
@@ -8298,6 +8301,9 @@ msgstr "Скрыто, пока вы не присоединитесь"
 msgid "Hide"
 msgstr "Скрыть"
 
+msgid "Hide {displayName}"
+msgstr "Скрыть {displayName}"
+
 msgid "Hide checks"
 msgstr "Скрыть проверки"
 
@@ -11763,6 +11769,9 @@ msgstr "Открыть {0}"
 msgid "Open {0} website"
 msgstr "Открыть сайт {0}"
 
+msgid "Open {displayName}"
+msgstr "Открыть {displayName}"
+
 msgid "Open {filePath}"
 msgstr "Открыть {filePath}"
 
@@ -12083,9 +12092,6 @@ msgstr "Открыть панель"
 
 msgid "Open ship options"
 msgstr "Открыть параметры отправки"
-
-msgid "Open Superset"
-msgstr "Открыть Superset"
 
 msgid "Open Superset on that computer"
 msgstr "Откройте Superset на этом компьютере"
@@ -13366,17 +13372,17 @@ msgstr "Тихо"
 msgid "Quit"
 msgstr "Выйти"
 
+msgid "Quit {displayName}"
+msgstr "Завершить {displayName}"
+
+msgid "Quit {displayName} and stop all background services?"
+msgstr "Выйти из {displayName} и остановить все фоновые службы?"
+
+msgid "Quit {displayName} Completely"
+msgstr "Полностью выйти из {displayName}"
+
 msgid "Quit Completely"
 msgstr "Выйти полностью"
-
-msgid "Quit Superset"
-msgstr "Выйти из Superset"
-
-msgid "Quit Superset and stop all background services?"
-msgstr "Выйти из Superset и остановить все фоновые службы?"
-
-msgid "Quit Superset Completely"
-msgstr "Полностью выйти из Superset"
 
 msgid "Quit the source browser first so its logins are saved to disk. You'll be asked to allow Keychain access."
 msgstr "Сначала закройте исходный браузер, чтобы его логины сохранились на диск. Потребуется разрешить доступ к Keychain."

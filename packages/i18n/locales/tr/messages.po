@@ -1527,6 +1527,9 @@ msgstr "Aa"
 msgid "About"
 msgstr "Hakkımızda"
 
+msgid "About {displayName}"
+msgstr "{displayName} Hakkında"
+
 msgid "About Superset"
 msgstr "Superset hakkında"
 
@@ -2105,8 +2108,8 @@ msgstr "Tüm verileriniz {ACCOUNT_DELETION_GRACE_DAYS} gün sonra kalıcı olara
 msgid "All of your data will be permanently deleted after {ACCOUNT_DELETION_GRACE_DAYS} days. Sign back in before then to restore your account."
 msgstr "Tüm verileriniz {ACCOUNT_DELETION_GRACE_DAYS} gün sonra kalıcı olarak silinecek. Hesabınızı geri yüklemek için o tarihten önce yeniden oturum açın."
 
-msgid "All open terminal sessions will be killed and any running host-services will be stopped. Use “Close Superset” instead if you want services to keep running for the next launch."
-msgstr "Açık tüm terminal oturumları sonlandırılacak ve çalışan host hizmetleri durdurulacak. Hizmetlerin sonraki açılış için çalışmaya devam etmesini istiyorsanız “Superset'i kapat” seçeneğini kullanın."
+msgid "All open terminal sessions will be killed and any running host-services will be stopped. Use “Close {displayName}” instead if you want services to keep running for the next launch."
+msgstr "Açık tüm terminal oturumları sonlandırılacak ve çalışan host hizmetleri durdurulacak. Hizmetlerin sonraki açılış için çalışmaya devam etmesini istiyorsanız “{displayName}'i kapat” seçeneğini kullanın."
 
 msgid "All pages"
 msgstr "Tüm sayfalar"
@@ -3900,6 +3903,9 @@ msgstr "Kapat (Esc)"
 msgid "Close {0}"
 msgstr "{0} oturumunu kapat"
 
+msgid "Close {displayName}"
+msgstr "{displayName}'i kapat"
+
 #. placeholder {0}: data.number
 msgid "Close #{0}?"
 msgstr "#{0} kapatılsın mı?"
@@ -3998,9 +4004,6 @@ msgstr "İnceleme filtresini kapat"
 
 msgid "Close session"
 msgstr "Oturumu kapat"
-
-msgid "Close Superset"
-msgstr "Superset'i kapat"
 
 msgid "Close tab"
 msgstr "Sekmeyi kapat"
@@ -8298,6 +8301,9 @@ msgstr "Katılana kadar gizli"
 msgid "Hide"
 msgstr "Gizle"
 
+msgid "Hide {displayName}"
+msgstr "{displayName} Uygulamasını Gizle"
+
 msgid "Hide checks"
 msgstr "Kontrolleri gizle"
 
@@ -11763,6 +11769,9 @@ msgstr "Aç: {0}"
 msgid "Open {0} website"
 msgstr "{0} web sitesini aç"
 
+msgid "Open {displayName}"
+msgstr "{displayName}'i aç"
+
 msgid "Open {filePath}"
 msgstr "Aç: {filePath}"
 
@@ -12083,9 +12092,6 @@ msgstr "Sayfayı aç"
 
 msgid "Open ship options"
 msgstr "Gönderim seçeneklerini aç"
-
-msgid "Open Superset"
-msgstr "Superset'i aç"
 
 msgid "Open Superset on that computer"
 msgstr "O bilgisayarda Superset'i açın"
@@ -13366,17 +13372,17 @@ msgstr "Sessiz"
 msgid "Quit"
 msgstr "Çık"
 
+msgid "Quit {displayName}"
+msgstr "{displayName} Uygulamasından Çık"
+
+msgid "Quit {displayName} and stop all background services?"
+msgstr "{displayName}'ten çıkılsın ve tüm arka plan hizmetleri durdurulsun mu?"
+
+msgid "Quit {displayName} Completely"
+msgstr "{displayName}'ten tamamen çık"
+
 msgid "Quit Completely"
 msgstr "Tamamen çık"
-
-msgid "Quit Superset"
-msgstr "Superset'ten çık"
-
-msgid "Quit Superset and stop all background services?"
-msgstr "Superset'ten çıkılsın ve tüm arka plan hizmetleri durdurulsun mu?"
-
-msgid "Quit Superset Completely"
-msgstr "Superset'ten tamamen çık"
 
 msgid "Quit the source browser first so its logins are saved to disk. You'll be asked to allow Keychain access."
 msgstr "Oturum bilgilerinin diske kaydedilmesi için önce kaynak tarayıcıdan çıkın. Anahtar Zinciri erişimine izin vermeniz istenecek."

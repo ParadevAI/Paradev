@@ -1527,6 +1527,9 @@ msgstr "Aa"
 msgid "About"
 msgstr "Tentang"
 
+msgid "About {displayName}"
+msgstr "Tentang {displayName}"
+
 msgid "About Superset"
 msgstr "Tentang Superset"
 
@@ -2105,8 +2108,8 @@ msgstr "Semua data Anda akan dihapus permanen setelah {ACCOUNT_DELETION_GRACE_DA
 msgid "All of your data will be permanently deleted after {ACCOUNT_DELETION_GRACE_DAYS} days. Sign back in before then to restore your account."
 msgstr "Semua data Anda akan dihapus permanen setelah {ACCOUNT_DELETION_GRACE_DAYS} hari. Masuk lagi sebelum itu untuk memulihkan akun Anda."
 
-msgid "All open terminal sessions will be killed and any running host-services will be stopped. Use “Close Superset” instead if you want services to keep running for the next launch."
-msgstr "Semua sesi terminal yang terbuka akan dimatikan dan host-service yang berjalan akan dihentikan. Pakai “Close Superset” kalau Anda ingin layanannya tetap berjalan untuk peluncuran berikutnya."
+msgid "All open terminal sessions will be killed and any running host-services will be stopped. Use “Close {displayName}” instead if you want services to keep running for the next launch."
+msgstr "Semua sesi terminal yang terbuka akan dimatikan dan host-service yang berjalan akan dihentikan. Pakai “Close {displayName}” kalau Anda ingin layanannya tetap berjalan untuk peluncuran berikutnya."
 
 msgid "All pages"
 msgstr "Semua halaman"
@@ -3900,6 +3903,9 @@ msgstr "Tutup (Esc)"
 msgid "Close {0}"
 msgstr "Tutup {0}"
 
+msgid "Close {displayName}"
+msgstr "Tutup {displayName}"
+
 #. placeholder {0}: data.number
 msgid "Close #{0}?"
 msgstr "Tutup #{0}?"
@@ -3998,9 +4004,6 @@ msgstr "Tutup filter review"
 
 msgid "Close session"
 msgstr "Tutup sesi"
-
-msgid "Close Superset"
-msgstr "Tutup Superset"
 
 msgid "Close tab"
 msgstr "Tutup tab"
@@ -8298,6 +8301,9 @@ msgstr "Tersembunyi sampai Anda bergabung"
 msgid "Hide"
 msgstr "Sembunyikan"
 
+msgid "Hide {displayName}"
+msgstr "Sembunyikan {displayName}"
+
 msgid "Hide checks"
 msgstr "Sembunyikan check"
 
@@ -11763,6 +11769,9 @@ msgstr "Buka {0}"
 msgid "Open {0} website"
 msgstr "Buka situs web {0}"
 
+msgid "Open {displayName}"
+msgstr "Buka {displayName}"
+
 msgid "Open {filePath}"
 msgstr "Buka {filePath}"
 
@@ -12083,9 +12092,6 @@ msgstr "Buka sheet"
 
 msgid "Open ship options"
 msgstr "Buka opsi pengiriman"
-
-msgid "Open Superset"
-msgstr "Buka Superset"
 
 msgid "Open Superset on that computer"
 msgstr "Buka Superset di komputer itu"
@@ -13366,17 +13372,17 @@ msgstr "Pelan"
 msgid "Quit"
 msgstr "Keluar"
 
+msgid "Quit {displayName}"
+msgstr "Keluar dari {displayName}"
+
+msgid "Quit {displayName} and stop all background services?"
+msgstr "Keluar dari {displayName} dan hentikan semua layanan latar belakang?"
+
+msgid "Quit {displayName} Completely"
+msgstr "Keluar dari {displayName} Sepenuhnya"
+
 msgid "Quit Completely"
 msgstr "Keluar Sepenuhnya"
-
-msgid "Quit Superset"
-msgstr "Keluar dari Superset"
-
-msgid "Quit Superset and stop all background services?"
-msgstr "Keluar dari Superset dan hentikan semua layanan latar belakang?"
-
-msgid "Quit Superset Completely"
-msgstr "Keluar dari Superset Sepenuhnya"
 
 msgid "Quit the source browser first so its logins are saved to disk. You'll be asked to allow Keychain access."
 msgstr "Tutup dulu browser sumbernya agar login-nya tersimpan ke disk. Anda akan diminta mengizinkan akses Keychain."
