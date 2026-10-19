@@ -121,6 +121,10 @@
 			"types": "./src/constants.ts",
 			"default": "./src/constants.ts"
 		},
+		"./legacy-host-redirects": {
+			"types": "./src/legacy-host-redirects.ts",
+			"default": "./src/legacy-host-redirects.ts"
+		},
 		"./format-scaled": {
 			"types": "./src/format-scaled.ts",
 			"default": "./src/format-scaled.ts"

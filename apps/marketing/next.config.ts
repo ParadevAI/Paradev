@@ -1,7 +1,9 @@
 import { join } from "node:path";
 import { withSentryConfig } from "@sentry/nextjs";
 import { SUPPORTED_LOCALES } from "@superset/i18n/locales";
+import { readRootDomain } from "@superset/shared/app-identity";
 import { CANONICAL_URLS } from "@superset/shared/constants";
+import { withLegacyHostRedirects } from "@superset/shared/legacy-host-redirects";
 import { config as dotenvConfig } from "dotenv";
 import type { NextConfig } from "next";
 import { buildLegacyRedirects } from "./src/lib/legacy-redirects";
@@ -151,7 +153,7 @@ const config: NextConfig = {
 
 	async redirects() {
 		const docsUrl = process.env.NEXT_PUBLIC_DOCS_URL || CANONICAL_URLS.DOCS;
-		return [
+		const redirects = [
 			// These URLs were advertised before discovery files were excluded
 			// from locale expansion. Keep existing inbound links working.
 			{
@@ -196,6 +198,10 @@ const config: NextConfig = {
 			},
 			...buildLegacyRedirects({ locales: SUPPORTED_LOCALES, docsUrl }),
 		];
+		return withLegacyHostRedirects(redirects, {
+			rootDomain: readRootDomain(),
+			site: "marketing",
+		});
 	},
 
 	async headers() {
