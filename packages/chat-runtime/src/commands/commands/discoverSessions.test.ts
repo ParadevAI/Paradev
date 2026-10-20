@@ -46,9 +46,10 @@ function listingAdapter(
 	};
 }
 
-function runtimeOf(
-	factory: HarnessFactory,
-): { runtime: ChatRuntime; probe: Probe } {
+function runtimeOf(factory: HarnessFactory): {
+	runtime: ChatRuntime;
+	probe: Probe;
+} {
 	const probe: Probe = {
 		started: 0,
 		disposed: 0,
@@ -146,9 +147,7 @@ describe("discoverSessions", () => {
 			],
 			nextCursor: "page-2",
 		});
-		expect(probe.queries).toEqual([
-			{ cwd: "/work/repo", cursor: "page-1" },
-		]);
+		expect(probe.queries).toEqual([{ cwd: "/work/repo", cursor: "page-1" }]);
 		expect(probe.started).toBe(0);
 		expect(probe.disposed).toBe(1);
 		expect(runtime.sessions.list()).toEqual([]);

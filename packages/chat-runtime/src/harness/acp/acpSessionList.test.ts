@@ -14,10 +14,7 @@ class ListingAgent {
 	closed = 0;
 	private handlers!: AcpTransportHandlers;
 
-	transport(
-		_options: unknown,
-		handlers: AcpTransportHandlers,
-	): AcpTransport {
+	transport(_options: unknown, handlers: AcpTransportHandlers): AcpTransport {
 		this.handlers = handlers;
 		return {
 			send: (line) => this.onSend(line),
@@ -164,12 +161,12 @@ describe("ACP native session list", () => {
 			adapter.discoverSessions({ cwd: "/work/repo", cursor: "page-2" }),
 		).resolves.toEqual({
 			supported: true,
-			sessions: [
-				{ sessionId: "native-3", cwd: "/work/repo", title: "Older" },
-			],
+			sessions: [{ sessionId: "native-3", cwd: "/work/repo", title: "Older" }],
 		});
 
-		const listed = agent.sent.filter((frame) => frame.method === "session/list");
+		const listed = agent.sent.filter(
+			(frame) => frame.method === "session/list",
+		);
 		expect(listed.map((frame) => frame.params)).toEqual([
 			{ cwd: "/work/repo" },
 			{ cwd: "/work/repo", cursor: "page-2" },
