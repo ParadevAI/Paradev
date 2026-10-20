@@ -1,6 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
 import type {
 	ComposerActionContext,
+	ComposerChip,
 	ComposerChipMatch,
 	PromptInputCommand,
 } from "@superset/chat-ui/PromptInput";
@@ -19,12 +20,14 @@ import {
 	findMcpServerTokens,
 	mcpServerChip,
 	mcpServerToken,
+	resolveMcpServerName,
 } from "../../utils/mcpServerChips";
 import { mcpServerIconUrl } from "../../utils/mcpServerIconUrl";
 
 type McpServerPickerControls = {
 	command: PromptInputCommand | null;
 	findChips: (text: string) => ComposerChipMatch[];
+	serverNameOf: (chip: ComposerChip) => string | null;
 	dialog: ReactNode;
 };
 
@@ -44,7 +47,7 @@ export function useMcpServerPicker({
 	const { install } = usePluginMutations({ announceInstall: false });
 	const input = { workspaceId, agent: agentId ?? "" };
 	const cached = workspaceTrpc.agentTooling.listMcpServers.useQuery(input, {
-		enabled: false,
+		enabled: pickerAgent !== undefined,
 	}).data?.servers;
 	const [connecting, setConnecting] = useState<{
 		plugin: string;
@@ -174,5 +177,10 @@ export function useMcpServerPicker({
 		/>
 	);
 
-	return { command, findChips, dialog };
+	const serverNameOf = useCallback(
+		(chip: ComposerChip) => resolveMcpServerName(chip, cached ?? [], agentId),
+		[cached, agentId],
+	);
+
+	return { command, findChips, serverNameOf, dialog };
 }

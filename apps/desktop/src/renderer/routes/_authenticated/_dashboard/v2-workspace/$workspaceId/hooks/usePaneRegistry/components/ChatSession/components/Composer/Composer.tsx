@@ -48,7 +48,7 @@ import { useFooterTier } from "./hooks/useFooterTier";
 import { useMcpServerPicker } from "./hooks/useMcpServerPicker";
 import { useQueueActions } from "./hooks/useQueueActions";
 import { useUploadAttachments } from "./hooks/useUploadAttachments";
-import { mcpServerOfChip, withMcpContext } from "./utils/mcpServerChips";
+import { withMcpContext } from "./utils/mcpServerChips";
 
 export type ComposerProps = {
 	workspaceId: string;
@@ -297,7 +297,7 @@ export const Composer = memo(function Composer({
 			}
 			const message = withMcpContext(
 				text.trim(),
-				mentions.flatMap((chip) => mcpServerOfChip(chip) ?? []),
+				mentions.flatMap((chip) => mcpPicker.serverNameOf(chip) ?? []),
 			);
 			const elements = elementsForChips(message, mentions);
 			onSend(
@@ -315,7 +315,7 @@ export const Composer = memo(function Composer({
 			);
 			clearDraft();
 		},
-		[onSend, uploadAttachments, clearDraft],
+		[onSend, uploadAttachments, clearDraft, mcpPicker.serverNameOf],
 	);
 
 	const handleSubmit = useCallback(

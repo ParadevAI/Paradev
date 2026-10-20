@@ -2,7 +2,7 @@ export {
 	findMcpServerTokens,
 	mcpContextLine,
 	mcpServerChip,
-	mcpServerOfChip,
 	mcpServerToken,
+	resolveMcpServerName,
 	withMcpContext,
 } from "./mcpServerChips";

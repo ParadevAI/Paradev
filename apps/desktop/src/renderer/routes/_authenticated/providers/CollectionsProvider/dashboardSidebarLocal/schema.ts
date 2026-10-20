@@ -210,6 +210,15 @@ export const workspaceLocalStateSchema = z.object({
 	paneLayout: paneWorkspaceStateSchema,
 	rightPaneLayout: paneWorkspaceStateSchema.optional(),
 	rightSidebarOpen: z.boolean().optional(),
+	// Left by builds that expanded the right area by moving the center's tabs
+	// into it; read once on load to move them back, then deleted.
+	rightPaneAreaExpansion: z
+		.object({
+			movedTabIds: z.array(z.string()),
+			centerActiveTabId: z.string().nullable(),
+			rightActiveTabId: z.string().nullable(),
+		})
+		.optional(),
 	viewedFiles: z.array(z.string()).default([]),
 	recentlyViewedFiles: z
 		.array(

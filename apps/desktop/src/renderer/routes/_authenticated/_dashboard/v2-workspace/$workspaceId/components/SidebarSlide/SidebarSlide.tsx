@@ -40,18 +40,21 @@ export function SidebarSlide({
 		if (mode !== "closed") setHasOpened(true);
 		setMove({ from, to: mode });
 		setArmed(false);
+		let timer: ReturnType<typeof setTimeout> | undefined;
 		let frame = requestAnimationFrame(() => {
-			frame = requestAnimationFrame(() => setArmed(true));
+			frame = requestAnimationFrame(() => {
+				setArmed(true);
+				timer = setTimeout(() => {
+					cancelAnimationFrame(layoutFrame);
+					setSettled(mode);
+					setMove(null);
+				}, durationMs);
+			});
 		});
 		let layoutFrame = requestAnimationFrame(function follow() {
 			onLayoutFrameRef.current?.();
 			layoutFrame = requestAnimationFrame(follow);
 		});
-		const timer = setTimeout(() => {
-			cancelAnimationFrame(layoutFrame);
-			setSettled(mode);
-			setMove(null);
-		}, durationMs);
 		return () => {
 			cancelAnimationFrame(frame);
 			cancelAnimationFrame(layoutFrame);
@@ -100,6 +103,7 @@ export function SidebarSlide({
 			style={{ width: inFlow ? undefined : spaceWidth, ...transition }}
 		>
 			<div
+				data-browser-layer={inFlow ? undefined : "raised"}
 				className={cn(
 					"overflow-hidden ease-[ease] motion-reduce:transition-none",
 					inFlow ? "flex h-full" : "absolute inset-y-0 right-0 z-30",

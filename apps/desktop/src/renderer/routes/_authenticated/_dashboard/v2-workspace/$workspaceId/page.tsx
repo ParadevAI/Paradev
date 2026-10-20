@@ -60,6 +60,7 @@ import { usePaneRegistry } from "./hooks/usePaneRegistry";
 import { renderBrowserTabIcon } from "./hooks/usePaneRegistry/components/BrowserPane";
 import { browserRuntimeRegistry } from "./hooks/usePaneRegistry/components/BrowserPane/browserRuntimeRegistry";
 import { usePullRequestPaneIntentOpener } from "./hooks/usePullRequestPaneIntentOpener";
+import { useRestoreExpandedPaneArea } from "./hooks/useRestoreExpandedPaneArea";
 import { useRightPaneAreaFullScreen } from "./hooks/useRightPaneAreaFullScreen";
 import { useRightPaneAreaLifecycle } from "./hooks/useRightPaneAreaLifecycle";
 import { useRunPendingChatHandoff } from "./hooks/useRunPendingChatHandoff";
@@ -217,6 +218,12 @@ function V2WorkspaceContent() {
 	const { store: rightStore, isLayoutReady: isRightLayoutReady } =
 		useV2WorkspacePaneLayout({ slot: "rightPaneLayout" });
 	useClearActivePaneAttention({ store: rightStore });
+	useRestoreExpandedPaneArea({
+		workspaceId,
+		centerStore: store,
+		rightStore,
+		isReady: isLayoutReady && isRightLayoutReady,
+	});
 	useRightPaneAreaLifecycle({
 		workspaceId,
 		flag: rightPaneAreaFlag,
@@ -413,6 +420,7 @@ function V2WorkspaceContent() {
 	const defaultContextMenuActions = useDefaultContextMenuActions({
 		paneRegistry,
 		launcher,
+		viewer: viewerTarget,
 	});
 	const diffPaneTarget = useDiffPaneTarget(store);
 	const isChangesPaneOpen = useStore(

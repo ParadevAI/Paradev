@@ -63,9 +63,11 @@ export function ResizablePanel({
 	// the panel does not flash back to its old width for a frame.
 	if (width !== committedWidth) {
 		setCommittedWidth(width);
-		setDraftWidth(null);
-		draftWidthRef.current = null;
+		if (!isResizing) setDraftWidth(null);
 	}
+	useEffect(() => {
+		if (draftWidth === null) draftWidthRef.current = null;
+	}, [draftWidth]);
 	const shownWidth = draftWidth ?? width;
 	const startXRef = useRef(0);
 	const startWidthRef = useRef(0);

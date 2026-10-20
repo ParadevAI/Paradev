@@ -40,9 +40,28 @@ export function mcpServerChip(
 	};
 }
 
-export function mcpServerOfChip(chip: ComposerChip): string | null {
+function mcpServerOfChip(chip: ComposerChip): string | null {
 	const server = (chip.data as Partial<McpChipData> | undefined)?.mcpServer;
 	return typeof server === "string" ? server : null;
+}
+
+/**
+ * The server a chip names, read from the catalog by its token: a chip
+ * restored before the catalog loaded holds only a guess from the token.
+ */
+export function resolveMcpServerName(
+	chip: ComposerChip,
+	servers: readonly Pick<McpServerEntry, "name" | "agent" | "scope">[],
+	agent: string | undefined,
+): string | null {
+	const fallback = mcpServerOfChip(chip);
+	if (fallback === null) return null;
+	const server = servers.find(
+		(candidate) =>
+			candidate.agent === agent &&
+			mcpServerToken(candidate, servers) === chip.serialized,
+	);
+	return server?.name ?? fallback;
 }
 
 interface McpTokenMatch {

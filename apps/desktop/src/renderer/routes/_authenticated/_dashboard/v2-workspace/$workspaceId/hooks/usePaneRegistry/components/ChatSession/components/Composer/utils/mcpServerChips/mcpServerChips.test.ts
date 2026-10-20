@@ -2,7 +2,9 @@ import { describe, expect, it } from "bun:test";
 import {
 	findMcpServerTokens,
 	mcpContextLine,
+	mcpServerChip,
 	mcpServerToken,
+	resolveMcpServerName,
 	withMcpContext,
 } from "./mcpServerChips";
 
@@ -43,5 +45,22 @@ describe("withMcpContext", () => {
 		const sent = withMcpContext("@mcp/github list PRs", ["github"]);
 		expect(withMcpContext(sent, ["github"])).toBe(sent);
 		expect(withMcpContext(sent, [])).toBe("@mcp/github list PRs");
+	});
+});
+
+describe("resolveMcpServerName", () => {
+	it("names the server a restored chip points at, not the guess from its token", () => {
+		const docs = { name: "My Docs", agent: "claude", scope: "user" } as const;
+		const guessed = mcpServerChip("My-Docs", "@mcp/My-Docs");
+
+		expect(resolveMcpServerName(guessed, [docs], "claude")).toBe("My Docs");
+		expect(resolveMcpServerName(guessed, [], "claude")).toBe("My-Docs");
+		expect(
+			resolveMcpServerName(
+				{ label: "file", serialized: "@a.ts", data: {} },
+				[docs],
+				"claude",
+			),
+		).toBeNull();
 	});
 });

@@ -9,6 +9,11 @@ import {
 	visibleClipPath,
 } from "./utils/visibleClipPath";
 
+/** Matches a panel drawn over the page; its browsers sit above it, below dialogs. */
+const RAISED_LAYER_SELECTOR = "[data-browser-layer=raised]";
+const RAISED_WEBVIEW_Z = "31";
+const RAISED_OVERLAY_Z = "32";
+
 export interface BrowserRuntimeState {
 	currentUrl: string;
 	pageTitle: string;
@@ -127,15 +132,13 @@ export class BrowserRuntimeRegistryImpl {
 			this.installGlobalListeners();
 			return existing;
 		}
+		// Not positioned, so it forms no stacking context and each webview can
+		// be raised on its own over a panel that slides above the page.
 		const root = document.createElement("div");
 		root.id = ROOT_CONTAINER_ID;
-		root.style.position = "fixed";
-		root.style.top = "0";
-		root.style.left = "0";
 		root.style.width = "0";
 		root.style.height = "0";
 		root.style.pointerEvents = "none";
-		root.style.zIndex = "0";
 		document.body.appendChild(root);
 		this.rootContainer = root;
 		this.installGlobalListeners();
@@ -203,6 +206,9 @@ export class BrowserRuntimeRegistryImpl {
 	private applyShownStyle(entry: RegistryEntry): void {
 		entry.webview.style.visibility = "visible";
 		entry.webview.style.opacity = "";
+		entry.webview.style.pointerEvents = pointerPassthrough.active
+			? "none"
+			: "auto";
 		entry.overlay.style.visibility = "visible";
 	}
 
@@ -213,6 +219,11 @@ export class BrowserRuntimeRegistryImpl {
 			entry.placeholder instanceof Element
 				? visibleClipPath(rect, clippingAncestorRects(entry.placeholder))
 				: "";
+		const raised =
+			entry.placeholder instanceof Element &&
+			entry.placeholder.closest(RAISED_LAYER_SELECTOR) !== null;
+		entry.webview.style.zIndex = raised ? RAISED_WEBVIEW_Z : "";
+		entry.overlay.style.zIndex = raised ? RAISED_OVERLAY_Z : "1";
 		for (const style of [entry.webview.style, entry.overlay.style]) {
 			style.top = `${rect.top}px`;
 			style.left = `${rect.left}px`;
