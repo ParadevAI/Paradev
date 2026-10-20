@@ -1,3 +1,4 @@
+import type { PresenceVisitor } from "@superset/shared/page-presence";
 import type { CloudWorkspaceRow } from "renderer/hooks/useCloudWorkspaces";
 import type { CloudTask } from "renderer/routes/_authenticated/_dashboard/components/CloudTaskRow";
 import type { RecordLabel } from "renderer/routes/_authenticated/_dashboard/components/RecordLabels";
@@ -25,10 +26,10 @@ export type CloudWorkspaceRecord = Pick<
 	| "agentStatusAt"
 	| "createdAt"
 	| "createdBy"
-	| "presence"
 	| "deletedAt"
 	| "visibility"
 > & {
+	presence: PresenceVisitor[];
 	environmentName: string;
 	repositories: { fullName: string; branch: string }[];
 	prompt: string | null;

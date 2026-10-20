@@ -1,74 +1,133 @@
 ---
 title: "Best Conductor Alternatives in 2026"
-description: "Compare alternatives to Conductor by platform, mobile access, hosting, licensing, and the work you need to review. Compare desktop support, phone access, and cloud options."
+description: "The best alternatives to Conductor for running AI coding agents in parallel, including Superset, Orca, Emdash, Nimbalyst, Claude Squad, and cmux, compared by agents, platforms, mobile, and license."
 date: 2026-07-13
-lastUpdated: 2026-10-15
+lastUpdated: 2026-10-20
 type: "roundup"
 competitors:
+  - conductor
   - orca
-  - crystal
-  - cmux
+  - emdash
+  - nimbalyst
   - claude-squad
-  - vibe-kanban
+  - cmux
 keywords:
   - conductor alternative
   - conductor alternatives
   - conductor competitors
   - conductor vs superset
+  - conductor build alternative
   - parallel ai coding agents
   - agentic ide
 ---
 
-Conductor now supports OpenCode as well as Claude Code, Codex, and Cursor, and offers cloud workspaces, multiplayer, and an API. A comparison that treats it as only a local three-agent app is out of date.
+Conductor runs Claude Code, Codex, Cursor, and OpenCode in parallel workspaces on your Mac, with cloud workspaces, multiplayer, an API, and an iOS app on its $50/month Pro plan. If you want to run any CLI agent, keep work on your own machines, or reach those machines from your phone, Superset gives you parallel worktrees, diff review, an in-app browser, and scheduled automations in one desktop workspace.
+
+**Our recommendation: choose Superset if you want Conductor's parallel-workspace model with any CLI agent and your own hosts.** The alternatives below cover other needs, including Windows support and fully open-source licenses.
+
+[Download Superset](/download) to try a small task, or read [Superset vs Conductor](/compare/superset-vs-conductor) for the direct comparison. This guide is published by Superset; recommendations describe workflow fit rather than benchmark results.
+
+---
 
 ## The Short Version
 
-Start with the feature you need: iPhone access, managed cloud workspaces, or support for your desktop platform.
+| Alternative | Best for | Platform | License |
+|---|---|---|---|
+| **Superset** | Any CLI agent, your own hosts and cloud workspaces, review, automations | macOS; experimental Linux AppImage; Windows unavailable; iPhone and iPad | Source-available (ELv2) |
+| **Orca** | Free cross-platform desktop ADE with mobile apps | macOS, Windows, Linux + iOS/Android | Open source (MIT) |
+| **Emdash** | Open-source ADE with issue-tracker intake | macOS, Windows, Linux | Open source (Apache-2.0) |
+| **Nimbalyst** | Visual workspace for Claude Code, Codex, and OpenCode | macOS, Windows, Linux + iOS/Android | Open source (MIT) |
+| **Claude Squad** | Terminal-native parallel agents over tmux | macOS, Linux | Open source (AGPL) |
+| **cmux** | Native macOS terminal for agent sessions | macOS | Open source |
+
+## Why Look for a Conductor Alternative?
+
+Conductor's [documentation](https://www.conductor.build/docs) lists four agents: Claude Code, Codex, Cursor, and OpenCode. Its desktop app runs on Mac. Cloud workspaces, the API, multiplayer, and the mobile app are on Pro at $50/month or Teams at $60 per user/month, according to its [pricing page](https://www.conductor.build/pricing). Common reasons to look elsewhere:
+
+- **Other agents.** You use Copilot CLI, Gemini CLI, Amp, Droid, or a custom CLI agent.
+- **Your own machines.** You want agents to keep running on a desktop or server you own, and to reach them from your phone.
+- **Platform.** You need Windows or Linux.
+- **License.** You need open source, or you want to read the code.
+- **Cost.** You want mobile and remote access at a lower per-seat price.
 
 ## The Best Alternatives
 
 ### Superset
 
-Superset is worth trying if you want your coding workspaces, terminal sessions, and diff review on desktop, iPhone, and iPad. The iPhone and iPad app is on the App Store and requires iOS 26 or iPadOS 26 or later and Pro. It works with cloud workspaces without keeping your own computer connected; workspaces on your own machine need a reachable host. Pro also adds scheduled automations, with a run history and retry for failed runs, and remote access to agents on other machines. Desktop targets macOS, with experimental Linux support; Windows is not available. The source uses Elastic License 2.0.
+Superset runs any CLI agent, such as Claude Code, Codex, OpenCode, Cursor's agent, Copilot CLI, Gemini CLI, and Amp, each in its own Git worktree with persistent terminal sessions. Around the terminals, it adds a Changes pane that commits, pushes, and opens PRs, a pull request view with checks and review threads, an in-app browser with Design Mode, and port management. Workspaces run on your machine, on any macOS or Linux host you add through Remote Access, or in a cloud workspace. The [iPhone and iPad app](/mobile) lets you answer an agent and review its diff on any of them. Pro is $20 per user/month and adds scheduled automations, remote access, and mobile. A CLI, TypeScript SDK, and MCP server let agents and scripts create workspaces and launch agents.
 
-Read the [detailed comparison](/compare/superset-vs-conductor).
+For the direct comparison, see [Superset vs Conductor](/compare/superset-vs-conductor).
 
 ### Orca
 
-Orca is a candidate when an MIT license, Windows support, or an Android companion is important. Its current documentation covers worktrees, remote hosts, mobile access, and scheduled automations.
+Orca is a free, MIT-licensed desktop agent development environment. It runs agents in parallel worktrees with split terminals, per-task browser tabs, and Design Mode, and it supports SSH worktrees, scheduled automations, and iOS and Android companions. It is the most direct open-source, cross-platform analog to Conductor.
 
-Read the [detailed comparison](/compare/superset-vs-orca).
+See [Superset vs Orca](/compare/superset-vs-orca).
 
 ### Emdash
 
-Emdash is a candidate for its Apache-2.0 desktop app, macOS/Windows/Linux support, issue intake, and scheduled tasks. Cloud and enterprise plans are available separately.
+Emdash is an Apache-2.0 desktop app for macOS, Windows, and Linux. Its [documentation](https://emdash.com/docs) lists 34 supported CLI agents, task intake from Linear, Jira, GitHub, Notion, and Asana, SSH machines, and scheduled runs with history. A team cloud product is on a waitlist.
 
-Read the [detailed comparison](/compare/superset-vs-emdash).
+See [Superset vs Emdash](/compare/superset-vs-emdash).
 
-## Run a useful trial
+### Nimbalyst
 
-Use the same repository commit, agent, model, and three small tasks in each candidate. Follow the [parallel-task walkthrough](/blog/parallel-coding-agents-guide), including a paused agent, separate previews, and a combined test run. Record setup time, review time, rework, and any missing capability.
+Nimbalyst is the successor to Crystal: an MIT-licensed visual workspace for Claude Code, Codex, and OpenCode on macOS, Windows, and Linux, with iOS and Android companions. It adds visual editing of markdown, mockups, and diagrams beside the agents. Choose it if you want an open-source, Conductor-style app with a document focus.
 
-For mobile, verify you can reconnect, reply to the agent, and inspect the intended diff. A host that is asleep cannot continue local work. Try the [Superset iPhone workflow](/blog/claude-code-codex-iphone) for a concrete example.
+See [Superset vs Nimbalyst](/compare/superset-vs-nimbalyst).
 
-For recurring work, inspect the workspace and output after dispatch. Check that the agent finished its task and that its checks passed. The [maintenance guide](/blog/scheduled-agent-maintenance) shows what to check.
+### Claude Squad
 
-## Product documentation
+Claude Squad manages multiple agents in separate worktrees inside tmux. It has no desktop window, no cloud, and no mobile app. If you only need parallel terminal agents in worktrees, it does that with very little machinery.
 
-See [Orca's docs](https://www.onorca.dev/docs), [Orca automations](https://www.onorca.dev/docs/cli/automations), [Conductor's docs](https://www.conductor.build/docs), [Conductor Cloud](https://www.conductor.build/docs/cloud), [Emdash's docs](https://emdash.com/docs), and [Emdash enterprise](https://emdash.com/enterprise). Superset requirements are on [pricing](/pricing) and [mobile](/mobile).
+See [Superset vs Claude Squad](/compare/superset-vs-claude-squad).
 
-For more options, see the [agentic IDE roundup](/compare/best-agentic-ide).
+### cmux
+
+cmux is a Ghostty-based macOS terminal with vertical tabs and notifications for agent sessions. It organizes many agents well, but it does not make worktrees the center of the workflow and has no built-in diff review.
+
+See [Superset vs cmux](/compare/superset-vs-cmux).
+
+## How To Choose
+
+- For any CLI agent, your own hosts, cloud workspaces, review, and automations, choose **Superset**.
+- For a free, open-source, cross-platform desktop ADE with mobile apps, choose **Orca**.
+- For open source with issue-tracker intake and many agent CLIs, choose **Emdash**.
+- For an open-source visual workspace around Claude Code, Codex, and OpenCode, choose **Nimbalyst**.
+- To stay in the terminal with minimal tooling, choose **Claude Squad**.
+- For a native Mac terminal built for agent sessions, choose **cmux**.
+
+## Verdict
+
+Conductor is a polished Mac app, and it is a good fit if its four agents and its cloud are what your team wants. Choose Superset when you want the same parallel-workspace model with any CLI agent, on your own machines or in the cloud, with review, a browser, and automations in one place. Run the same small task in both, then compare the review step. For the wider landscape, see [Best Agentic IDE in 2026](/compare/best-agentic-ide).
+
+## What To Try First
+
+- **Keep your agent:** launch the CLI you already use in a Superset workspace.
+- **Run two tasks:** start a second workspace on its own branch and let both agents work.
+- **Review in place:** inspect each diff, run your checks, and open a PR from the Changes pane.
+- **Leave your desk:** continue the task from the [iPhone app](/blog/claude-code-codex-iphone).
+
+[Download Superset](/download), then follow the [parallel-task walkthrough](/blog/parallel-coding-agents-guide).
 
 ## Frequently Asked Questions
 
-### Which alternative is best?
+### What is the best Conductor alternative?
 
-Choose the one that meets your platform and hosting requirements and lets you review an actual task with the least friction. Try a task in your own repository before switching.
+For developers who want to run any CLI agent in parallel worktrees on their own machines or in the cloud, Superset is our recommendation. It combines worktrees, diff review, an in-app browser, scheduled automations, and an iPhone and iPad app. Orca and Emdash are strong open-source alternatives.
 
-### Is Superset free and open source?
+### Is there an open-source Conductor alternative?
 
-Superset has a free tier and paid plans, and its source uses Elastic License 2.0. Mobile, remote access, and automations require an eligible paid plan. It is not MIT- or Apache-licensed.
+Yes. Orca (MIT), Nimbalyst (MIT), Emdash (Apache-2.0), and Claude Squad (AGPL) are open source, and cmux publishes its source. Superset is source-available under Elastic License 2.0.
+
+### Is there a Conductor alternative for Windows or Linux?
+
+Orca, Emdash, and Nimbalyst run on macOS, Windows, and Linux. Superset runs on macOS with experimental Linux support; Windows is not yet available. Conductor runs on Mac.
+
+### Which Conductor alternatives run agents other than Claude Code and Codex?
+
+Superset runs any CLI agent, including custom commands. Orca and Emdash also support many agent CLIs. Nimbalyst focuses on Claude Code, Codex, and OpenCode.
 
 ### Do these tools replace my coding-agent subscription?
 
-No. Account for the agent provider's subscription or API usage separately, along with any compute or hosting charges.
+No. You still pay your agent provider for Claude Code, Codex, or other agent usage. Superset uses your own subscriptions and keys.

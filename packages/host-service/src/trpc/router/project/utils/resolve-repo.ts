@@ -236,6 +236,15 @@ function findUnreadableRepoAbove(path: string): string | undefined {
 	}
 }
 
+// simple-git's revparse() trims, which drops trailing spaces of a folder name.
+export async function readGitToplevel(path: string): Promise<string> {
+	const stdout = await createUserSimpleGit(path).raw([
+		"rev-parse",
+		"--show-toplevel",
+	]);
+	return stdout.replace(/\n$/, "");
+}
+
 /**
  * Returns the canonical git root for `path`, or `null` when `path` is not
  * inside a git work tree. Callers that want to branch on "is this a git
@@ -246,9 +255,7 @@ function findUnreadableRepoAbove(path: string): string | undefined {
 export async function tryRevParseGitRoot(path: string): Promise<string | null> {
 	let error: unknown;
 	try {
-		return (
-			await createUserSimpleGit(path).revparse(["--show-toplevel"])
-		).trim();
+		return await readGitToplevel(path);
 	} catch (err) {
 		error = err;
 	}

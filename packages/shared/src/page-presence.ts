@@ -8,7 +8,17 @@ export interface PagePresenceViewer {
 	color: number;
 }
 
+/** A signed-in person who has opened the page or workspace; `lastSeenAt` is epoch ms. */
+export interface PresenceVisitor {
+	userId: string;
+	name: string;
+	image: string | null;
+	lastSeenAt: number;
+	active: boolean;
+}
+
 export const MAX_PAGE_GUESTS = 20;
+export const MAX_PRESENCE_VISITORS = 50;
 
 const PRESENCE_COLORS = [
 	"#2563eb",
@@ -50,6 +60,29 @@ export function presenceViewersFrom(raw: unknown): PagePresenceViewer[] {
 							typeof viewer.image === "string" &&
 							viewer.image.startsWith("https:")
 								? viewer.image
+								: null,
+					},
+				]
+			: [],
+	);
+}
+
+export function presenceVisitorsFrom(raw: unknown): PresenceVisitor[] {
+	if (!Array.isArray(raw)) return [];
+	return raw.flatMap((visitor) =>
+		typeof visitor?.userId === "string" &&
+		typeof visitor.name === "string" &&
+		typeof visitor.lastSeenAt === "number"
+			? [
+					{
+						userId: visitor.userId,
+						name: visitor.name,
+						lastSeenAt: visitor.lastSeenAt,
+						active: visitor.active === true,
+						image:
+							typeof visitor.image === "string" &&
+							visitor.image.startsWith("https:")
+								? visitor.image
 								: null,
 					},
 				]

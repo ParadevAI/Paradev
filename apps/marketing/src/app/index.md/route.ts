@@ -1,3 +1,4 @@
+import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import { FAQ_ITEMS } from "@/app/[lang]/components/FAQSection/constants";
 import {
@@ -24,11 +25,11 @@ export async function GET() {
 
 	const lines: string[] = [
 		...buildFrontmatter({
-			title: `${COMPANY.NAME}: Run 100+ parallel coding agents on your machine`,
+			title: `${BRAND.INTRO_NAME}: Run 100+ parallel coding agents on your machine`,
 			description: PRODUCT_SUMMARY,
 			canonical: `${baseUrl}/`,
 		}),
-		`# ${COMPANY.NAME}: Run 100+ parallel coding agents on your machine`,
+		`# ${BRAND.INTRO_NAME}: Run 100+ parallel coding agents on your machine`,
 		"",
 		PRODUCT_SUMMARY,
 		"",

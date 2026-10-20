@@ -1,6 +1,7 @@
 import type { MessageDescriptor } from "@lingui/core";
 import { getI18nInstance } from "@superset/i18n/server";
-import { COMPANY } from "@superset/shared/constants";
+import { BRAND } from "@superset/shared/brand";
+import { CANONICAL_URLS, COMPANY } from "@superset/shared/constants";
 import { API_URL, MCP_SERVER_URL } from "./api-url";
 import { getBlogPosts } from "./blog";
 import { getCategoryPages } from "./category";
@@ -48,7 +49,7 @@ export function buildCompanyFactsSection(): string[] {
 		"",
 		`- **What it is**: a local-first desktop workspace for orchestrating any CLI-based coding agent. Each task runs in its own Git worktree, and Superset provides the stable workflow around the agents.`,
 		"- **Interface**: a desktop app with a full GUI, not a terminal wrapper. Next to the agent terminals it has a Changes pane, a pull request pane, a file editor, and an in-app browser.",
-		`- **Company**: built by ${COMPANY.NAME} in San Francisco, founded by three former YC CTOs (see ${baseUrl}/team).`,
+		`- **Company**: built by ${BRAND.NAME} in San Francisco, founded by three former YC CTOs (see ${baseUrl}/team).`,
 		`- **License**: source-available under ${PRODUCT_LICENSE} (ELv2). The code is public on GitHub (${COMPANY.GITHUB_URL}); it is not OSI-approved open source.`,
 		`- **Not Apache Superset**: ${PRODUCT_DISAMBIGUATION}`,
 		`- **Desktop platforms**: ${PRODUCT_PLATFORM_SUMMARY} There is also a CLI, a TypeScript SDK, and an MCP server for programmatic control.`,
@@ -75,7 +76,7 @@ function asPreamble(section: string[]): string[] {
 
 export function buildLlmsHeader(): string[] {
 	return [
-		`# ${COMPANY.NAME}`,
+		`# ${BRAND.INTRO_NAME}`,
 		"",
 		"> Bring any coding agent. Orchestrate them all.",
 		"",
@@ -95,7 +96,7 @@ export function buildWhenToUseSection(): string[] {
 		"- Review diffs, manage ports, and monitor many concurrent agent sessions from one dashboard.",
 		"- Check on agents, reply to them, and review their diffs from an iPhone or iPad while they run on your own machine.",
 		"",
-		"Superset is not a coding agent itself; it is the workspace and orchestration layer the agents run in. If you are an AI agent, the fastest way to act on a user's Superset account is the MCP server below (OAuth or API key auth); the fastest way to learn the product is the docs index at https://docs.superset.sh.",
+		`Superset is not a coding agent itself; it is the workspace and orchestration layer the agents run in. If you are an AI agent, the fastest way to act on a user's Superset account is the MCP server below (OAuth or API key auth); the fastest way to learn the product is the docs index at ${CANONICAL_URLS.DOCS}.`,
 	];
 }
 
@@ -119,7 +120,7 @@ export function buildDeveloperResourcesSection(): string[] {
 		`- [OAuth authorization server metadata](${API_URL}/.well-known/oauth-authorization-server): RFC 8414`,
 		`- [Web Bot Auth key directory](${baseUrl}/.well-known/http-message-signatures-directory): Ed25519 keys Superset-operated agents sign requests with (RFC 9421)`,
 		`- [Agent skills](https://github.com/superset-sh/skills): official skills for the CLI and MCP server; install with \`npx skills add superset-sh/skills\``,
-		`- [CLI](${docsUrl}/cli/getting-started): \`brew install superset-sh/tap/superset\` (Homebrew tap: https://github.com/superset-sh/homebrew-tap) or \`curl -fsSL https://superset.sh/cli/install.sh | sh\`; reference at ${docsUrl}/cli/cli-reference`,
+		`- [CLI](${docsUrl}/cli/getting-started): \`brew install superset-sh/tap/superset\` (Homebrew tap: https://github.com/superset-sh/homebrew-tap) or \`curl -fsSL ${CANONICAL_URLS.MARKETING}/cli/install.sh | sh\`; reference at ${docsUrl}/cli/cli-reference`,
 		`- [TypeScript SDK](${docsUrl}/sdk/getting-started): \`npm install @superset_sh/sdk\``,
 		`- [Docs llms.txt](${docsUrl}/llms.txt): scoped context for the documentation`,
 		`- [API llms.txt](${baseUrl}/api/llms.txt): scoped index of the API surface`,

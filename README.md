@@ -128,11 +128,11 @@ Control Claude Code, Codex, and other terminal agents in cloud workspaces or on 
 
 ### Automations
 
-Run agent sessions on a schedule: triage issues overnight, draft the weekly changelog, keep dependencies fresh.
+Run agent sessions on a schedule or when something happens: review a PR when you're asked, triage a new Sentry issue, pick up a bug report from Slack, draft the weekly changelog.
 
 [Docs →](https://docs.superset.sh/automations)
 
-<a href="https://docs.superset.sh/automations"><img src="apps/marketing/public/images/readme/automations.png" alt="Scheduled agent automations" width="100%" /></a>
+<a href="https://docs.superset.sh/automations"><img src="apps/marketing/public/images/readme/automations.png" alt="Agent automations on a schedule or an event" width="100%" /></a>
 
 ### Remote Access
 
@@ -251,7 +251,7 @@ No Neon account or third-party credentials are needed. `setup.local.sh` brings
 up a local Postgres + neon-proxy + Redis stack via Docker and seeds a dev account.
 Sign in with the **"Sign in as dev"** button (or `admin@local.test` / `supersetdev`).
 
-Prereqs for building from source (to use Superset, [install the app](#install) instead): [Bun](https://bun.sh/) v1.4.2+ (pinned in `.bun-version`), `docker`, `jq`, and [`gh`](https://cli.github.com/) (`brew install jq gh`).
+Prereqs for building from source (to use Superset, [install the app](#install) instead): [Bun](https://bun.sh/) v1.4.3+ (pinned in `.bun-version`), `docker`, `jq`, and [`gh`](https://cli.github.com/) (`brew install jq gh`).
 
 See [**DEVELOPMENT.md**](./DEVELOPMENT.md) for the full guide: what the setup script does, manual setup against real services, common commands, troubleshooting, and how to build the desktop app. Contribution process lives in [**CONTRIBUTING.md**](./CONTRIBUTING.md).
 

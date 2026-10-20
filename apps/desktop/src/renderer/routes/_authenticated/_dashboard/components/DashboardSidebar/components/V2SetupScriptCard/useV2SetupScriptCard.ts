@@ -1,11 +1,17 @@
 import { useLingui } from "@lingui/react/macro";
+import { CANONICAL_URLS } from "@superset/shared/constants";
 import { useQuery } from "@tanstack/react-query";
 import type { SidebarCardEntry } from "renderer/components/SidebarCardSlot";
 import { useOpenNewWorkspace } from "renderer/hooks/useOpenNewWorkspace";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { useNewWorkspaceDraftStore } from "renderer/stores/new-workspace-draft";
 import { useV2SetupCardDismissalsStore } from "renderer/stores/v2-setup-card-dismissals";
-import setupScriptPrompt from "./setup-script-prompt.md?raw";
+import setupScriptPromptTemplate from "./setup-script-prompt.md?raw";
+
+const setupScriptPrompt = setupScriptPromptTemplate.replaceAll(
+	"{{DOCS_URL}}",
+	CANONICAL_URLS.DOCS,
+);
 
 export function useV2SetupScriptCard({
 	hostUrl,

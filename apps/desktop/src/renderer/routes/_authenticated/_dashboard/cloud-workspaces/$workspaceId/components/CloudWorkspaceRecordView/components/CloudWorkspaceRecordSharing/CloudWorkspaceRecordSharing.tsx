@@ -1,14 +1,12 @@
+import { useLingui } from "@lingui/react/macro";
+import type { PresenceVisitor } from "@superset/shared/page-presence";
 import type { CloudWorkspaceRow } from "renderer/hooks/useCloudWorkspaces";
-import {
-	ACTIVE_WITHIN_MS,
-	CloudWorkspacePresenceStack,
-} from "renderer/routes/_authenticated/_dashboard/components/CloudWorkspacePresenceStack";
 import { CloudWorkspaceShareButton } from "renderer/routes/_authenticated/_dashboard/components/CloudWorkspaceShareButton";
+import { PresenceStack } from "renderer/routes/_authenticated/_dashboard/components/PresenceStack";
 
 interface CloudWorkspaceRecordSharingProps {
 	workspaceId: string;
-	archivedAt: Date | null;
-	people: CloudWorkspaceRow["presence"];
+	people: PresenceVisitor[];
 	owner: CloudWorkspaceRow["createdBy"];
 	visibility: CloudWorkspaceRow["visibility"];
 	canEditSharing: boolean;
@@ -22,7 +20,6 @@ interface CloudWorkspaceRecordSharingProps {
 
 export function CloudWorkspaceRecordSharing({
 	workspaceId,
-	archivedAt,
 	people,
 	owner,
 	visibility,
@@ -32,6 +29,7 @@ export function CloudWorkspaceRecordSharing({
 	onOpenPerson,
 	onSetVisibility,
 }: CloudWorkspaceRecordSharingProps) {
+	const { t } = useLingui();
 	return (
 		<div className="flex shrink-0 items-center gap-3">
 			<CloudWorkspaceShareButton
@@ -41,11 +39,13 @@ export function CloudWorkspaceRecordSharing({
 				canEdit={canEditSharing}
 				onSetVisibility={onSetVisibility}
 			/>
-			<CloudWorkspacePresenceStack
+			<PresenceStack
 				people={people}
 				viewerId={viewerId}
 				now={now}
-				activeWithinMs={archivedAt ? 0 : ACTIVE_WITHIN_MS}
+				overflowLabel={t({
+					message: "Show everyone who opened this workspace",
+				})}
 				onOpenPerson={onOpenPerson}
 			/>
 		</div>

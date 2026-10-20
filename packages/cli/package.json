@@ -1,6 +1,6 @@
 {
 	"name": "@superset/cli",
-	"version": "1.38.0",
+	"version": "1.39.0",
 	"private": true,
 	"type": "module",
 	"scripts": {
@@ -37,7 +37,7 @@
 		"@superset/typescript": "workspace:*",
 		"@types/mime-types": "3.0.1",
 		"@types/react": "19.2.14",
-		"bun-types": "1.4.2",
+		"bun-types": "1.4.3",
 		"typescript": "7.0.2"
 	}
 }

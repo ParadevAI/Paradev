@@ -364,6 +364,15 @@ describe("initLocalRepoInPlace", () => {
 		expect(await commitCount(dir)).toBe(1);
 	});
 
+	test("keeps trailing whitespace in the folder name", async () => {
+		const dir = join(workRoot, "plain ");
+		mkdirSync(dir);
+
+		const resolved = await initLocalRepoInPlace(dir);
+
+		expect(eqRealpath(resolved.repoPath, dir)).toBe(true);
+	});
+
 	test("adopts a non-empty folder without erroring and preserves its files", async () => {
 		const dir = join(workRoot, "with-files");
 		mkdirSync(dir);

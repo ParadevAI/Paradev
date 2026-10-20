@@ -5,7 +5,7 @@
 	},
 	"build": {
 		"development": {
-			"bun": "1.4.2",
+			"bun": "1.4.3",
 			"developmentClient": true,
 			"distribution": "internal",
 			"environment": "development",
@@ -21,7 +21,7 @@
 			}
 		},
 		"preview": {
-			"bun": "1.4.2",
+			"bun": "1.4.3",
 			"distribution": "internal",
 			"environment": "preview",
 			"channel": "preview",
@@ -30,7 +30,7 @@
 			}
 		},
 		"e2e-test": {
-			"bun": "1.4.2",
+			"bun": "1.4.3",
 			"withoutCredentials": true,
 			"ios": {
 				"simulator": true
@@ -41,7 +41,7 @@
 			}
 		},
 		"production": {
-			"bun": "1.4.2",
+			"bun": "1.4.3",
 			"autoIncrement": true,
 			"environment": "production",
 			"channel": "production",

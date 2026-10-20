@@ -2,8 +2,10 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import type { WorkspaceStore } from "@superset/panes";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { workspaceTrpc } from "@superset/workspace-client";
-import { LuArrowRight } from "react-icons/lu";
-import { pullRequestRefFromUrl } from "renderer/lib/github/pullRequestRef";
+import { LuArrowRight, LuArrowUpRight } from "react-icons/lu";
+import { usePullRequestLinkPolicy } from "renderer/lib/clickPolicy";
+import { openPullRequestInBrowser } from "renderer/lib/github/openPullRequestInBrowser";
+import { openPullRequestLink } from "renderer/lib/github/openPullRequestLink";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import { PRIcon, type PRState } from "renderer/screens/main/components/PRIcon";
 import type { StoreApi } from "zustand/vanilla";
@@ -25,6 +27,7 @@ interface DiffPanePRLinkProps {
 export function DiffPanePRLink({ workspaceId, store }: DiffPanePRLinkProps) {
 	const { t } = useLingui();
 	const { workspace } = useWorkspace();
+	const linkPolicy = usePullRequestLinkPolicy();
 	// Same query key useDiffAnnotations polls at 10s from inside the pane, so
 	// tanstack-query dedupes this into the existing subscription.
 	const prQuery = workspaceTrpc.git.getPullRequest.useQuery(
@@ -51,14 +54,14 @@ export function DiffPanePRLink({ workspaceId, store }: DiffPanePRLinkProps) {
 				<TooltipTrigger asChild>
 					<button
 						type="button"
-						onClick={() => {
-							const ref = pullRequestRefFromUrl(pr.url);
-							if (!ref) {
-								window.open(pr.url, "_blank");
-								return;
-							}
-							openPullRequestPaneInStore(store, ref);
-						}}
+						onClick={(event) =>
+							openPullRequestLink(
+								pr.url,
+								linkPolicy.getAction(event),
+								(ref, placement) =>
+									openPullRequestPaneInStore(store, ref, placement),
+							)
+						}
 						aria-label={t({
 							message: `Open pull request #${pr.number}`,
 						})}
@@ -76,7 +79,25 @@ export function DiffPanePRLink({ workspaceId, store }: DiffPanePRLinkProps) {
 					</button>
 				</TooltipTrigger>
 				<TooltipContent side="bottom">
-					<Trans>Open pull request</Trans>
+					<p>
+						<Trans>Open pull request</Trans>
+					</p>
+					<p className="font-normal">{linkPolicy.hint}</p>
+				</TooltipContent>
+			</Tooltip>
+			<Tooltip>
+				<TooltipTrigger asChild>
+					<button
+						type="button"
+						onClick={() => openPullRequestInBrowser(pr.url)}
+						aria-label={t({ message: "View on GitHub" })}
+						className="ml-0.5 flex size-5 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent/60 hover:text-foreground"
+					>
+						<LuArrowUpRight className="size-3.5" />
+					</button>
+				</TooltipTrigger>
+				<TooltipContent side="bottom">
+					<Trans>View on GitHub</Trans>
 				</TooltipContent>
 			</Tooltip>
 			{/* Rendered here, not by the parent, so no stray divider shows when

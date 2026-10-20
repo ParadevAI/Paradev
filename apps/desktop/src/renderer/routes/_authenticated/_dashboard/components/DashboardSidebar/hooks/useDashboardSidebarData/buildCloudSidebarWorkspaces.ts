@@ -158,7 +158,9 @@ export function buildCloudSidebarWorkspaces({
 			behindCount: null,
 			createdAt: workspace.createdAt,
 			updatedAt: workspace.updatedAt,
-			lastActivityAt: workspace.agentStatusAt?.getTime() ?? null,
+			lastActivityAt: (
+				workspace.agentStatusAt ?? workspace.createdAt
+			).getTime(),
 			taskId: null,
 			isPinned: false,
 			pendingTransaction: null,

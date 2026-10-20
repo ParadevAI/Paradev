@@ -304,7 +304,7 @@ export const ROADMAP_ITEMS: RoadmapItem[] = [
 		}),
 		description: msg({
 			message:
-				"Scheduled and event-triggered agents (cron, GitHub events, webhooks) with ready-made templates.",
+				"Scheduled and event-triggered agents (cron, GitHub, Slack, Linear, Sentry, Notion, Microsoft Teams, webhooks) with ready-made templates.",
 		}),
 		category: "Agents",
 		status: "shipped",

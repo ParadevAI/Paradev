@@ -1072,6 +1072,55 @@
       "when": 1792197917616,
       "tag": "0152_sharing_people_and_teams",
       "breakpoints": true
+    },
+    {
+      "idx": 153,
+      "version": "7",
+      "when": 1792277453335,
+      "tag": "0153_oauth_refresh_token_unique",
+      "breakpoints": true
+    },
+    {
+      "idx": 154,
+      "version": "7",
+      "when": 1792461474743,
+      "tag": "0154_sandbox_bundles",
+      "breakpoints": true
+    },
+    {
+      "idx": 155,
+      "version": "7",
+      "when": 1792461856907,
+      "tag": "0155_seed_sandbox_bundles",
+      "breakpoints": true
+    },
+    {
+      "idx": 156,
+      "version": "7",
+      "when": 1792463931612,
+      "tag": "0156_backfill_environments_bundle_sha",
+      "breakpoints": true
+    },
+    {
+      "idx": 157,
+      "version": "7",
+      "when": 1792463950392,
+      "tag": "0157_environments_bundle_sha_not_null",
+      "breakpoints": true
+    },
+    {
+      "idx": 158,
+      "version": "7",
+      "when": 1792465715977,
+      "tag": "0158_retire_shared_environment_organization",
+      "breakpoints": true
+    },
+    {
+      "idx": 159,
+      "version": "7",
+      "when": 1792472299402,
+      "tag": "0159_drop_cloud_workspace_presence",
+      "breakpoints": true
     }
   ]
 }

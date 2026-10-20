@@ -1,8 +1,5 @@
-import {
-	CommentModeButton,
-	PageShareButton,
-	PageViewers,
-} from "@superset/ui/page-comments";
+import { CommentModeButton, PageShareButton } from "@superset/ui/page-comments";
+import { PagePresenceStack } from "renderer/routes/_authenticated/_dashboard/components/PagePresenceStack";
 import { usePageHeaderData } from "renderer/routes/_authenticated/_dashboard/hooks/usePageHeaderData";
 import type { PagePaneData } from "../../../../types";
 import type { CreateNewAgentSession } from "../../../useAgentSessionLauncher";
@@ -40,7 +37,7 @@ export function PagePaneHeaderExtras({
 
 	return (
 		<>
-			<PageViewers pageId={page?.id} className="mr-1" />
+			<PagePresenceStack pageId={page?.id} />
 			<PageWatcherMenu
 				workspaceId={workspaceId}
 				pageId={page?.id}

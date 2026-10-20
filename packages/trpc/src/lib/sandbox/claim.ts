@@ -111,9 +111,7 @@ export async function buildSandboxClaim(args: {
 		SUPERSET_SANDBOX_PLUGINS: JSON.stringify(plugins),
 		SUPERSET_SANDBOX_IMAGE_TAG: environment.sourceRef,
 		SUPERSET_SANDBOX_PROVIDER: args.row.provider,
-		...(environment.bundleSha
-			? { SUPERSET_BUNDLE_SHA: environment.bundleSha }
-			: {}),
+		SUPERSET_BUNDLE_SHA: environment.bundleSha,
 		...(env.SENTRY_DSN_SANDBOX
 			? {
 					HOST_SERVICE_SENTRY_DSN: env.SENTRY_DSN_SANDBOX,

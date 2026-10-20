@@ -14,7 +14,7 @@ const DEFAULT_TIMEZONE =
 	Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
 
 export default command({
-	description: "Create a scheduled automation",
+	description: "Create an automation that runs on a schedule or on events",
 	options: {
 		name: string().required().desc("Human-readable automation name"),
 		prompt: string().desc("Prompt to send to the agent"),

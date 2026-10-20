@@ -174,6 +174,20 @@ describe("buildCloudSidebarWorkspaces", () => {
 		);
 	});
 
+	it("ranks a row with no agent message by creation, not by updatedAt", () => {
+		const layout = build({
+			cloudWorkspaces: [
+				makeCloudWorkspace({
+					id: "restarted",
+					updatedAt: new Date("2026-01-05T00:00:00.000Z"),
+				}),
+			],
+		});
+
+		const rows = layout.repoProjects[0]?.cloudWorkspaces ?? [];
+		expect(rows[0]?.lastActivityAt).toBe(DATE.getTime());
+	});
+
 	it("looks the pull request up by repo and the live branch", () => {
 		const pullRequest = makePullRequest({ isDraft: true });
 		const layout = build({

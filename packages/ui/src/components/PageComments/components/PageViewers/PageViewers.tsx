@@ -4,8 +4,8 @@ import { useLingui } from "@lingui/react/macro";
 import { presenceColor } from "@superset/shared/page-presence";
 import { AvatarStack } from "../../../../atoms/AvatarStack";
 import { cn } from "../../../../lib/utils";
+import { usePresenceViewers } from "../../../Presence";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../../ui/tooltip";
-import { usePageViewers } from "../../stores/pagePresenceStore";
 
 export function PageViewers({
 	pageId,
@@ -15,7 +15,7 @@ export function PageViewers({
 	className?: string;
 }) {
 	const { t } = useLingui();
-	const viewers = usePageViewers(pageId);
+	const viewers = usePresenceViewers(pageId);
 
 	const seen = new Set<string>();
 	const people = viewers.flatMap((viewer) => {

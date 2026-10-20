@@ -15,6 +15,7 @@ import {
 	recordWorkspaceRepositories,
 	workspaceBranchName,
 } from "../../lib/sandbox";
+import { pushWorkspaceAccess } from "../../lib/workspace-access";
 import { userError } from "../../trpc";
 import { recordCloudWorkspaceActivity } from "./activity";
 import { publishCloudWorkspaceJob } from "./jobs";
@@ -199,6 +200,7 @@ export async function startCloudWorkspace(args: {
 			: {}),
 	};
 
+	pushWorkspaceAccess(row.organizationId, row.id);
 	nudge(row.organizationId, "cloud_workspaces");
 	await queueProvision(job);
 	return row;

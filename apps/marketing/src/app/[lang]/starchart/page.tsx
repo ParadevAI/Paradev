@@ -1,6 +1,7 @@
 import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { getI18nInstance } from "@superset/i18n/server";
+import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import { formatStarCount, githubRepoSlug } from "@superset/shared/github-stars";
 import { Button } from "@superset/ui/button";
@@ -31,21 +32,21 @@ export async function generateMetadata(): Promise<Metadata> {
 		...msg({
 			message: "See how {companyName}'s GitHub stars have grown over time.",
 		}),
-		values: { companyName: COMPANY.NAME },
+		values: { companyName: BRAND.NAME },
 	});
 	return {
 		title,
 		description,
 		alternates: localizedAlternates(lang, "/starchart"),
 		openGraph: {
-			title: `${title} | ${COMPANY.NAME}`,
+			title: `${title} | ${BRAND.NAME}`,
 			description,
 			url: localeUrl(lang, "/starchart"),
 			images: ["/og-image.png"],
 		},
 		twitter: {
 			card: "summary_large_image",
-			title: `${title} | ${COMPANY.NAME}`,
+			title: `${title} | ${BRAND.NAME}`,
 			description,
 			images: ["/og-image.png"],
 		},

@@ -66,6 +66,7 @@ export const SETTING_ITEM_ID = {
 	TERMINAL_LINK_BEHAVIOR: "terminal-link-behavior",
 	TERMINAL_BACKGROUND_LIMIT: "terminal-background-limit",
 	TERMINAL_COPY_ON_SELECT: "terminal-copy-on-select",
+	TERMINAL_CLOSE_CONFIRM: "terminal-close-confirm",
 
 	LINKS_FILE: "links-file",
 	LINKS_FOLDER: "links-folder",
@@ -225,6 +226,7 @@ export const SETTING_ITEM_VARIANT: Record<SettingItemId, SettingVariant> = {
 	[SETTING_ITEM_ID.TERMINAL_LINK_BEHAVIOR]: "v1",
 	[SETTING_ITEM_ID.TERMINAL_BACKGROUND_LIMIT]: "v2",
 	[SETTING_ITEM_ID.TERMINAL_COPY_ON_SELECT]: "v2",
+	[SETTING_ITEM_ID.TERMINAL_CLOSE_CONFIRM]: "v2",
 
 	[SETTING_ITEM_ID.LINKS_FILE]: "v2",
 	[SETTING_ITEM_ID.LINKS_FOLDER]: "v2",
@@ -1245,6 +1247,27 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 			"clipboard",
 			"ghostty",
 			"iterm",
+		],
+	},
+	{
+		id: SETTING_ITEM_ID.TERMINAL_CLOSE_CONFIRM,
+		section: "terminal",
+		title: "Warn before closing a running terminal",
+		description: "Ask before closing a terminal or port with a running process",
+		keywords: [
+			"terminal",
+			"close",
+			"delete",
+			"tab",
+			"pane",
+			"port",
+			"warn",
+			"warning",
+			"confirm",
+			"prompt",
+			"running",
+			"process",
+			"ask",
 		],
 	},
 	{

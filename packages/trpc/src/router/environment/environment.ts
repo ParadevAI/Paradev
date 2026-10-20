@@ -6,10 +6,7 @@ import {
 	environments,
 	githubRepositories,
 } from "@superset/db/schema";
-import {
-	SANDBOX_IMAGE_NAME,
-	SHARED_ENVIRONMENT_ORGANIZATION_ID,
-} from "@superset/shared/constants";
+import { SANDBOX_IMAGE_NAME } from "@superset/shared/constants";
 import { SANDBOX_REGION_IDS } from "@superset/shared/sandbox-regions";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { and, asc, eq, inArray, isNull, or } from "drizzle-orm";
@@ -27,6 +24,7 @@ import {
 } from "../../lib/sandbox";
 import { jwtProcedure, userError } from "../../trpc";
 import { loadVisibleWorkspace } from "../cloud-workspace/access";
+import { currentBundleSha } from "./current-bundle";
 import { regionForRequest } from "./region-for-request";
 import { secretsRouter } from "./secrets";
 import { decryptSecret, encryptSecret } from "./secrets/utils/crypto";
@@ -51,35 +49,6 @@ export async function loadEnvironment(
 		});
 	}
 	return row;
-}
-
-export function isSharedEnvironment(row: { organizationId: string }): boolean {
-	return row.organizationId === SHARED_ENVIRONMENT_ORGANIZATION_ID;
-}
-
-export function secretOwnerOrganizationId(
-	row: { organizationId: string },
-	activeOrganizationId: string | null,
-): string {
-	if (!isSharedEnvironment(row)) return row.organizationId;
-	if (!activeOrganizationId) {
-		throw userError({
-			code: "BAD_REQUEST",
-			message: "No active organization",
-			i18nKey: "serverError.environment.noActiveOrganization",
-		});
-	}
-	return activeOrganizationId;
-}
-
-function assertOwned(row: { organizationId: string }): void {
-	if (isSharedEnvironment(row)) {
-		throw userError({
-			code: "FORBIDDEN",
-			message: "This environment is managed by Superset and cannot be changed",
-			i18nKey: "serverError.environment.sharedEnvironmentIsReadOnly",
-		});
-	}
 }
 
 /**
@@ -299,6 +268,7 @@ export const environmentRouter = {
 					sourceKind: "image",
 					sourceRef: SANDBOX_IMAGE_NAME,
 					region: input.region ?? regionForRequest(ctx.headers),
+					bundleSha: await currentBundleSha(),
 					scope: input.scope,
 					createdByUserId: ctx.userId,
 				})
@@ -366,7 +336,6 @@ export const environmentRouter = {
 				? await loadEnvironment(input.environmentId, ctx)
 				: null;
 			if (target) {
-				assertOwned(target);
 				if (target.organizationId !== workspace.organizationId) {
 					throw userError({
 						code: "BAD_REQUEST",
@@ -413,7 +382,7 @@ export const environmentRouter = {
 				sourceKind: "fork" as const,
 				sourceRef: goldenName,
 				region: golden.region,
-				bundleSha: source?.bundleSha ?? null,
+				bundleSha: await currentBundleSha(),
 				hooksRepositoryId,
 			};
 			const row = await dbWs
@@ -525,7 +494,6 @@ export const environmentRouter = {
 		.mutation(async ({ ctx, input }) => {
 			await assertCloudAccess(ctx);
 			const current = await loadEnvironment(input.id, ctx);
-			assertOwned(current);
 
 			// A golden was built for its repositories: cloned, set up, snapshotted.
 			// A different set means a different golden, so it is promoted again.
@@ -592,7 +560,6 @@ export const environmentRouter = {
 		.mutation(async ({ ctx, input }) => {
 			await assertCloudAccess(ctx);
 			const environment = await loadEnvironment(input.id, ctx);
-			assertOwned(environment);
 			const [archived] = await db
 				.update(environments)
 				.set({ archivedAt: new Date() })

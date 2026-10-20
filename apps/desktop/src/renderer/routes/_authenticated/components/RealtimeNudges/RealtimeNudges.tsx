@@ -1,5 +1,4 @@
 import {
-	mergePresenceByUser,
 	parseRealtimeNudgeMessage,
 	REALTIME_NUDGE_KINDS,
 	type RealtimeNudgeKind,
@@ -63,20 +62,8 @@ export function RealtimeNudges() {
 					if (!update) return row;
 					return {
 						...row,
-						...(update.agentStatusAt !== undefined && {
-							agentStatus: update.agentStatus ?? null,
-							agentStatusAt: new Date(update.agentStatusAt),
-						}),
-						...(update.presence && {
-							presence: mergePresenceByUser(
-								row.presence,
-								update.presence.map((person) => ({
-									...person,
-									lastSeenAt: new Date(person.lastSeenAt),
-								})),
-								(person) => person.lastSeenAt.getTime(),
-							),
-						}),
+						agentStatus: update.agentStatus,
+						agentStatusAt: new Date(update.agentStatusAt),
 					};
 				}),
 			);

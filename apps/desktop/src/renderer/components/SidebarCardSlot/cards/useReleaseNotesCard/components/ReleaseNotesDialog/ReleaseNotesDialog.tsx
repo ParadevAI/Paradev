@@ -37,6 +37,7 @@ export function ReleaseNotesDialog({
 
 	return (
 		<Dialog
+			modal
 			open={open}
 			onOpenChange={(next) => {
 				if (!next) onClose();

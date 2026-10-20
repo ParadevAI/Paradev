@@ -1,6 +1,6 @@
 import { msg } from "@lingui/core/macro";
 import { getI18nInstance } from "@superset/i18n/server";
-import { COMPANY } from "@superset/shared/constants";
+import { BRAND } from "@superset/shared/brand";
 import type { Metadata } from "next";
 import { localizedAlternates } from "@/app/[lang]/metadata";
 import { initServerI18n } from "@/app/i18n-server";
@@ -28,7 +28,7 @@ export async function generateMetadata(): Promise<Metadata> {
 					"Simple pricing for every team. Free for individuals, {yearlyPrice}/user/month for teams, custom for enterprise. Run 100+ parallel coding agents with {companyName}.",
 			}),
 			values: {
-				companyName: COMPANY.NAME,
+				companyName: BRAND.NAME,
 				yearlyPrice: proSeatPriceValues(lang).yearlyPrice,
 			},
 		}),

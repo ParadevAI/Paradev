@@ -802,8 +802,8 @@ export const environments = pgTable(
 		sourceRef: text("source_ref").notNull(),
 		/** Where its golden lives and every box forked from it runs; a snapshot only exists in its region. */
 		region: text().notNull().default("sfo1"),
-		/** The sandbox bundle every workspace of this environment boots on; null keeps the image's own. */
-		bundleSha: text("bundle_sha"),
+		/** The sandbox bundle every workspace of this environment boots on: the newest `sandbox_bundles` row at create, moved by every release. */
+		bundleSha: text("bundle_sha").notNull(),
 		/**
 		 * Which of the environment's repositories carries the `.superset/config.json`
 		 * the box acts on; null means none does and only `hooks` applies.
@@ -831,9 +831,21 @@ export const environments = pgTable(
 );
 
 /**
+ * Every sandbox bundle a release published, so "the current bundle" is a row
+ * and not whichever environment the release last touched. The newest is what
+ * a new environment pins to; rolling back is inserting the previous sha.
+ */
+export const sandboxBundles = pgTable("sandbox_bundles", {
+	sha: text().primaryKey(),
+	imageRef: text("image_ref").notNull(),
+	releasedAt: timestamp("released_at", { withTimezone: true })
+		.notNull()
+		.defaultNow(),
+});
+
+/**
  * The repositories an environment checks out, in order; the first is the
- * primary. An environment with none (the shared image environment) takes
- * its repositories at workspace create.
+ * primary.
  */
 export const environmentRepositories = pgTable(
 	"environment_repositories",
@@ -1033,29 +1045,6 @@ export const cloudWorkspaceRepositories = pgTable(
 		index("cloud_workspace_repositories_cloud_workspace_id_idx").on(
 			table.cloudWorkspaceId,
 		),
-	],
-);
-
-/** Who has opened a cloud workspace, and when they were last in it. */
-export const cloudWorkspacePresence = pgTable(
-	"cloud_workspace_presence",
-	{
-		cloudWorkspaceId: uuid("cloud_workspace_id")
-			.notNull()
-			.references(() => cloudWorkspaces.id, { onDelete: "cascade" }),
-		userId: uuid("user_id")
-			.notNull()
-			.references(() => users.id, { onDelete: "cascade" }),
-		firstSeenAt: timestamp("first_seen_at", { withTimezone: true })
-			.notNull()
-			.defaultNow(),
-		lastSeenAt: timestamp("last_seen_at", { withTimezone: true })
-			.notNull()
-			.defaultNow(),
-	},
-	(table) => [
-		primaryKey({ columns: [table.cloudWorkspaceId, table.userId] }),
-		index("cloud_workspace_presence_user_id_idx").on(table.userId),
 	],
 );
 

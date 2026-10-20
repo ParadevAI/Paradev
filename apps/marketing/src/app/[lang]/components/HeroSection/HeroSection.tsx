@@ -2,18 +2,17 @@
 
 import { Trans, useLingui } from "@lingui/react/macro";
 import { COMPANY } from "@superset/shared/constants";
-import { useInView } from "framer-motion";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { FaApple, FaGithub } from "react-icons/fa";
 import { track } from "@/lib/analytics";
+import { HEADLINE_VARIANTS, type HeadlineVariant } from "@/lib/hero-headline";
 import { DownloadButton } from "../DownloadButton";
 import { WaitlistModal } from "../WaitlistModal";
 import { BoidsBackground } from "./components/BoidsBackground";
 import { ProductDemo } from "./components/ProductDemo";
 import { RiseHeadline } from "./components/RiseHeadline";
-import { useHeadlineVariant } from "./hooks/useHeadlineVariant";
-import type { HeadlineVariant } from "./utils/subscribeToHeadlineVariant";
+import { useHeadlineExposure } from "./hooks/useHeadlineExposure";
 
 export function HeroSection() {
 	const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
@@ -28,20 +27,8 @@ export function HeroSection() {
 	}, []);
 	const { t, i18n } = useLingui();
 
-	const assignment = useHeadlineVariant();
 	const headlineRef = useRef<HTMLHeadingElement>(null);
-	const isHeadlineInView = useInView(headlineRef, { amount: 0.5 });
-
-	useEffect(() => {
-		if (!assignment || !isHeadlineInView) return;
-		const recordWhenVisible = () => {
-			if (document.visibilityState === "visible") assignment.recordExposure();
-		};
-		recordWhenVisible();
-		document.addEventListener("visibilitychange", recordWhenVisible);
-		return () =>
-			document.removeEventListener("visibilitychange", recordWhenVisible);
-	}, [assignment, isHeadlineInView]);
+	useHeadlineExposure(headlineRef);
 
 	const headlines: Record<HeadlineVariant, [lead: string, emphasis: string]> = {
 		control: [
@@ -71,7 +58,6 @@ export function HeroSection() {
 			}),
 		],
 	};
-	const [lead, emphasis] = headlines[assignment?.variant ?? "control"];
 
 	return (
 		<div>
@@ -106,17 +92,14 @@ export function HeroSection() {
 								ref={headlineRef}
 								className="text-[min(2.25rem,8.6vw)] sm:text-5xl md:text-6xl lg:text-7xl font-medium tracking-tight leading-[1.1] [word-spacing:0.15em] whitespace-pre-line text-foreground relative max-w-6xl mx-auto"
 							>
-								{assignment ? (
-									<RiseHeadline
-										key={assignment.variant}
-										lead={lead}
-										emphasis={emphasis}
-									/>
-								) : (
-									<span className="invisible" aria-hidden="true">
-										<RiseHeadline lead={lead} emphasis={emphasis} />
+								{HEADLINE_VARIANTS.map((variant) => (
+									<span key={variant} data-headline-variant={variant}>
+										<RiseHeadline
+											lead={headlines[variant][0]}
+											emphasis={headlines[variant][1]}
+										/>
 									</span>
-								)}
+								))}
 							</h1>
 							<p
 								id="hero-subheadline"

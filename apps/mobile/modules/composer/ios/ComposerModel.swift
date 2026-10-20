@@ -254,7 +254,7 @@ final class ComposerModel {
     let addition = text.trimmingCharacters(in: .whitespacesAndNewlines)
     guard !addition.isEmpty else { return }
     let base = draft.trimmingCharacters(in: .whitespaces)
-    setDraft(base.isEmpty ? addition : base + " " + addition)
+    setDraft(ComposerDictatedText.join(base, addition))
   }
 
   func submit() {

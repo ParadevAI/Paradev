@@ -28,6 +28,10 @@
 			"types": "./src/lib/sandbox/index.ts",
 			"default": "./src/lib/sandbox/index.ts"
 		},
+		"./lib/workspace-access": {
+			"types": "./src/lib/workspace-access/index.ts",
+			"default": "./src/lib/workspace-access/index.ts"
+		},
 		"./lib/document-files": {
 			"types": "./src/lib/document-files/index.ts",
 			"default": "./src/lib/document-files/index.ts"

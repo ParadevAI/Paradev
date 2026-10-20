@@ -6,9 +6,9 @@ import { Button } from "@superset/ui/button";
 import {
 	PageFrame,
 	PageViewers,
-	useJoinPagePresence,
 	usePageToolsUnavailable,
 } from "@superset/ui/page-comments";
+import { useJoinPresence } from "@superset/ui/presence";
 import { Globe } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useRef } from "react";
@@ -36,8 +36,8 @@ export function PublicPageView({
 	const frameRef = useRef<HTMLIFrameElement>(null);
 	const frameOrigin = useMemo(() => new URL(viewUrl).origin, [viewUrl]);
 	usePageToolsUnavailable({ frameRef, frameOrigin, signedIn });
-	useJoinPagePresence({
-		pageId,
+	useJoinPresence({
+		roomId: pageId,
 		url: async () =>
 			pagePresenceUrl({
 				realtimeUrl: env.NEXT_PUBLIC_REALTIME_URL,

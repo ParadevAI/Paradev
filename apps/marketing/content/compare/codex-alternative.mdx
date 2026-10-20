@@ -1,0 +1,136 @@
+---
+title: "Best Codex Alternatives in 2026"
+description: "The best alternatives to OpenAI Codex CLI, including Claude Code, Antigravity CLI, OpenCode, GitHub Copilot CLI, Amp, and Droid, compared by models, pricing, and license, plus how to run several side by side."
+date: 2026-10-20
+lastUpdated: 2026-10-20
+type: "roundup"
+competitors:
+  - codex
+  - claude-code
+  - antigravity-cli
+  - opencode
+  - copilot-cli
+  - amp
+  - droid
+keywords:
+  - codex alternative
+  - codex alternatives
+  - codex cli alternative
+  - openai codex alternative
+  - codex competitors
+  - codex vs claude code
+---
+
+Codex CLI is OpenAI's coding agent. It is open source under Apache-2.0 and comes with ChatGPT plans, with subagents, worktrees, `codex exec` for CI, and cloud tasks. It runs OpenAI's models. Other strong agents now exist, and the best one for a task can change from one release to the next. Superset lets you keep Codex and run any of these alternatives beside it, each in its own Git worktree, so you can compare the diffs on your own code.
+
+**Our recommendation: keep Codex, and use Superset to try the alternatives side by side on the same task.** The list below covers the agents worth trying, from other labs' agents to open-source options for any model.
+
+[Download Superset](/download) to run two agents on one task, or read [Superset vs Codex](/compare/superset-vs-codex) for how the two fit together. This guide is published by Superset; recommendations describe workflow fit rather than benchmark results.
+
+---
+
+## The Short Version
+
+| Alternative | Best for | Models | How you pay | License |
+|---|---|---|---|---|
+| **Claude Code** | Deep, multi-step work and the richest parallel modes | Claude | Claude Pro from $20/mo, Max from $100/mo, or API key | Proprietary |
+| **Antigravity CLI** | Free start with strong models | Gemini, plus Claude and gpt-oss | Free with weekly limits; Google AI Pro and Ultra; API key | Proprietary |
+| **OpenCode** | Open-source agent for any model | Any provider | Free; your own keys, or OpenCode Zen and Go | Open source (MIT) |
+| **GitHub Copilot CLI** | GitHub-centric teams, several vendors' models | Claude, GPT, Gemini, Grok, Kimi | Free tier; Pro $10, Pro+ $39, Max $100/mo | Proprietary |
+| **Amp** | Letting the vendor pick the model | Several, chosen by mode | Free with your own compute and keys; Individual $20/mo | Proprietary |
+| **Droid** | One agent across terminal, IDE, Slack, and Linear | Frontier and open-weight models | Factory Pro $20, Plus $100, Max $200/mo | Proprietary |
+| **Superset** | Running Codex and these agents side by side | Whatever each agent uses | Free tier; Pro $20 per user/month | Source-available (ELv2) |
+
+## Why Look for a Codex Alternative?
+
+Codex is a strong, open-source agent with a generous plan bundle. Common reasons to look further:
+
+- **Models.** You want Claude, Gemini, open-weight, or local models.
+- **A second opinion.** A different agent often solves the task Codex is stuck on.
+- **Usage limits.** Your ChatGPT plan's limits run out on heavy days.
+- **Vendor risk.** You do not want your whole workflow to depend on one lab.
+
+## The Best Alternatives
+
+### Claude Code
+
+Anthropic's agent has the widest range of parallel modes: subagents, `/batch` runs that fan out across worktrees, an agent view for background sessions, cloud sessions, and Remote Control. Plugins, skills, and hooks make it the most extended agent available. It needs a paid Claude plan or an API key. It is the closest like-for-like alternative to Codex.
+
+See [Claude Code vs Codex](/compare/claude-code-vs-codex) and [Superset vs Claude Code](/compare/superset-vs-claude-code).
+
+### Antigravity CLI
+
+Google's `agy` shares its agent harness with the Antigravity desktop app, runs async subagents that can each take a worktree, and is free with weekly limits, with Gemini, Claude, and gpt-oss models.
+
+See [Codex vs Antigravity CLI](/compare/codex-vs-antigravity-cli) and [Superset vs Google Antigravity](/compare/superset-vs-antigravity).
+
+### OpenCode
+
+OpenCode is the most popular open-source agent with free choice of provider. It has a terminal UI, a desktop app, an IDE extension, built-in subagents, and a server with an SDK. It is MIT-licensed and free; you pay only for the models, and it can use OpenAI models too.
+
+See [Codex vs OpenCode](/compare/codex-vs-opencode) and [Superset vs OpenCode](/compare/superset-vs-opencode).
+
+### GitHub Copilot CLI
+
+Copilot's terminal agent offers models from several vendors, including GPT and Claude, on one plan, starting with a free tier. Issues, pull requests, and the GitHub MCP server are built in, and `/delegate` hands work to Copilot's cloud agent.
+
+See [Codex vs Copilot CLI](/compare/codex-vs-copilot-cli) and [Superset vs GitHub Copilot](/compare/superset-vs-github-copilot).
+
+### Amp
+
+Amp picks models for you by mode, runs work on "orbs," cloud machines that keep going after you close your laptop, and runners that create Git worktrees. It is free with your own compute and keys, and it can use a linked ChatGPT or Claude plan.
+
+See [Superset vs Amp](/compare/superset-vs-amp).
+
+### Droid
+
+Factory's agent runs frontier and open-weight models, and in the CLI you can bring your own keys. Missions coordinate several agents on larger work, and Droid connects to Jira, Linear, Slack, and PagerDuty.
+
+See [Superset vs Factory](/compare/superset-vs-factory).
+
+### Superset (to run them all)
+
+Superset is not an agent. It is a desktop workspace that runs Codex and every agent above, each in its own Git worktree and terminal, on your own subscriptions and keys; Superset never proxies model calls. Give the same prompt to Codex and Claude Code in two workspaces, review both diffs in the Changes pane, preview the result in the in-app browser, and open a PR from the better one. You can also continue a stuck session with a different agent, schedule agents as automations, and check on them from the [iPhone and iPad app](/mobile).
+
+See [Superset vs Codex](/compare/superset-vs-codex).
+
+## How To Choose
+
+- For the closest like-for-like agent from another lab, choose **Claude Code**.
+- For a free start with Gemini and Claude models, choose **Antigravity CLI**.
+- For open source with any model, choose **OpenCode**.
+- For GitHub-centric teams on one low-cost plan, choose **Copilot CLI**.
+- To let the vendor pick the model, choose **Amp**.
+- For one agent across Slack, Linear, and the terminal, choose **Droid**.
+- To compare any of them with Codex on your own repository, use **Superset**.
+
+## Verdict
+
+There is no single best agent; each one is strongest on its own vendor's models. You do not have to give up Codex to try another. Run Codex and one alternative on the same task in Superset, compare the diffs, and keep whichever works best for each kind of task. For the full agent comparison, see [Best Coding Agents](/compare/best-coding-agents).
+
+## What To Try First
+
+- **Keep Codex:** launch it in a Superset workspace with your ChatGPT account.
+- **Add an alternative:** start a second workspace from the same branch with Claude Code or OpenCode.
+- **Give both the same prompt:** each agent works in its own worktree.
+- **Compare:** review both diffs, run your checks, and open a PR from the better one.
+
+[Download Superset](/download), then follow [How to Compare Coding Agents Side by Side](/compare/compare-coding-agents-side-by-side).
+
+## Frequently Asked Questions
+
+### What is the best Codex alternative?
+
+Claude Code is the closest like-for-like alternative, with the richest set of parallel modes. OpenCode is the best open-source option for any model, and Antigravity CLI is the best free start.
+
+### Is there a free Codex alternative?
+
+Yes. Antigravity CLI is free with weekly limits, Copilot CLI has a free tier, and OpenCode and Amp are free with your own model keys.
+
+### Is there an open-source Codex alternative?
+
+Yes. OpenCode (MIT) is open source and works with any provider. Codex CLI itself is also open source under Apache-2.0.
+
+### Is this about the Codex CLI or the Codex app?
+
+This page covers the Codex agent, mostly the CLI. For alternatives to the Codex coding surface in the ChatGPT desktop app, see [Best Codex App Alternatives](/compare/codex-app-alternative).

@@ -1,6 +1,7 @@
 import { createHash, randomBytes } from "node:crypto";
 import { createServer, type Server } from "node:http";
 import { CLIError } from "@superset/cli-framework";
+import { readOAuthErrorCode } from "@superset/shared/oauth-refresh";
 import { env } from "./env";
 import { canReachDesktop, openUrl } from "./open-url";
 
@@ -230,12 +231,28 @@ async function exchangeCodeForToken({
 	};
 }
 
+/**
+ * Upper bound on one refresh round trip. The refresh lock in oauth-refresh.ts
+ * stays alive by heartbeat for as long as this runs.
+ */
+const REFRESH_TIMEOUT_MS = 60_000;
+
+export class TokenRefreshHttpError extends CLIError {
+	constructor(
+		readonly status: number,
+		readonly oauthError: string | undefined,
+	) {
+		super(`Token refresh failed: ${status}`, LOGIN_AGAIN_SUGGESTION);
+	}
+}
+
 export async function refreshAccessToken(
 	refreshToken: string,
 ): Promise<LoginResult> {
 	const apiUrl = env.SUPERSET_API_URL;
 	const response = await fetch(`${apiUrl}/api/auth/oauth2/token`, {
 		method: "POST",
+		signal: AbortSignal.timeout(REFRESH_TIMEOUT_MS),
 		headers: { "Content-Type": "application/x-www-form-urlencoded" },
 		body: new URLSearchParams({
 			grant_type: "refresh_token",
@@ -246,9 +263,9 @@ export async function refreshAccessToken(
 	});
 
 	if (!response.ok) {
-		throw new CLIError(
-			`Token refresh failed: ${response.status}`,
-			LOGIN_AGAIN_SUGGESTION,
+		throw new TokenRefreshHttpError(
+			response.status,
+			await readOAuthErrorCode(response),
 		);
 	}
 

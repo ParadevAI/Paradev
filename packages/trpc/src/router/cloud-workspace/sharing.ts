@@ -14,6 +14,7 @@ import {
 	sharingResourceSchema,
 	validateGrantees,
 } from "../../lib/sharing";
+import { pushWorkspaceAccess } from "../../lib/workspace-access";
 import { jwtProcedure, userError } from "../../trpc";
 import { loadVisibleWorkspace } from "./access";
 import { recordCloudWorkspaceActivity } from "./activity";
@@ -87,6 +88,7 @@ export const cloudWorkspaceSharingRouter = {
 		});
 		if (added.length) {
 			await recordShareActivity(row.id, ctx.userId, "shared", added);
+			pushWorkspaceAccess(row.organizationId, row.id);
 			nudge(row.organizationId, "cloud_workspaces");
 		}
 		return { added };
@@ -104,6 +106,7 @@ export const cloudWorkspaceSharingRouter = {
 				await recordShareActivity(row.id, ctx.userId, "unshared", [
 					input.grantee,
 				]);
+				pushWorkspaceAccess(row.organizationId, row.id);
 				nudge(row.organizationId, "cloud_workspaces");
 			}
 			return { removed };

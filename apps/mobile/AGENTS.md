@@ -91,8 +91,20 @@ export default function AuthenticatedLayout() {
     has the dev values in its shell.
   - **The simulator reaches this machine only through local egress,** and the egress client can only
     start once the session exists. The app's first load therefore always fails; the script loads it
-    again when the tunnel is up. A port the app calls must be passed as `--egress-allow`; the script
+    again through the dev-client URL when the tunnel is up, and retries until the Metro log shows a
+    new `iOS Bundled` line. A port the app calls must be passed as `--egress-allow`; the script
     reads `$API_PORT` from `.env` rather than assuming a fixed port.
+  - **An egress client serves only the session it started with.** It reads `.env.eas-simulator` once,
+    so after a new session a running client still tunnels to the old one and the app shows "Could
+    not connect to the server". `--new` replaces the client; never start a session by hand.
+  - **Reload with `eas-dev.sh --reload`, not `agent-device open Superset`.** A plain launch has no
+    Metro URL and fails; only
+    `superset://expo-development-client/?url=...&disableAutoLaunch=1&disableFab=1` loads the app
+    without the dev menu and its gear button.
+  - **The "slide to type" keyboard intro** covers the screen the first time a keyboard opens.
+    `simctl` is out of reach, so the script opens the keyboard once in Settings and presses Continue.
+  - **SwiftUI menu items (`@expo/ui` `Menu`) are not in `agent-device snapshot`.** Tap them by
+    coordinate from a screenshot. This is a limit of the tool.
   - **Native Sentry starts only when `EXPO_PUBLIC_SENTRY_DSN_MOBILE` is set.** Native init without a
     DSN crashes the app at launch with a bare SIGSEGV before any JS runs, and the EAS `development`
     environment has no DSN.

@@ -1,4 +1,8 @@
+import { ROOT_DOMAIN } from "./app-identity";
 import type { TriggerConfigInput } from "./automation-triggers";
+import { BRAND } from "./brand";
+
+export { CANONICAL_URLS, IOS_APP } from "./app-identity";
 
 // Auth
 export const AUTH_PROVIDERS = ["github", "google"] as const;
@@ -12,27 +16,19 @@ export const PROTOCOL_SCHEMES = {
 	PROD: "superset",
 } as const;
 
-const IOS_TEAM_ID = "NV9657CS5A";
-const IOS_BUNDLE_ID = "sh.superset.mobile";
-
-export const IOS_APP = {
-	TEAM_ID: IOS_TEAM_ID,
-	BUNDLE_ID: IOS_BUNDLE_ID,
-	APP_ID: `${IOS_TEAM_ID}.${IOS_BUNDLE_ID}`,
-} as const;
-
 // Company
 // Root domain flips the whole brand at cutover. Default keeps superset.sh so
-// nothing changes until NEXT_PUBLIC_ROOT_DOMAIN is set (e.g. boid.so). All
+// nothing changes until NEXT_PUBLIC_ROOT_DOMAIN is set. All
 // domain-derived URLs below build off this; social handles / GitHub / Discord
 // are external identities and are updated by hand on rebrand.
-const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN || "superset.sh";
+const SUPPORT_EMAIL = `support@${ROOT_DOMAIN}`;
 const MARKETING_URL =
 	process.env.NEXT_PUBLIC_MARKETING_URL || `https://${ROOT_DOMAIN}`;
 const APP_STORE_ID = "6788926383";
 
 export const COMPANY = {
-	NAME: "Superset",
+	NAME: BRAND.NAME,
+	LEGAL_NAME: "Superset Inc.",
 	DOMAIN: ROOT_DOMAIN,
 	EMAIL_DOMAIN: `@${ROOT_DOMAIN}`,
 	GITHUB_URL: "https://github.com/superset-sh/superset",
@@ -44,7 +40,8 @@ export const COMPANY = {
 	X_URL: "https://x.com/superset_sh",
 	LINKEDIN_URL: "https://www.linkedin.com/company/superset-sh",
 	YOUTUBE_URL: "https://www.youtube.com/@superset-sh",
-	MAIL_TO: `mailto:support@${ROOT_DOMAIN}`,
+	SUPPORT_EMAIL,
+	MAIL_TO: `mailto:${SUPPORT_EMAIL}`,
 	TEAM_EMAIL: `team@${ROOT_DOMAIN}`,
 	TEAM_MAIL_TO: `mailto:team@${ROOT_DOMAIN}`,
 	REPORT_ISSUE_URL: "https://github.com/superset-sh/superset/issues/new",
@@ -57,6 +54,15 @@ export const COMPANY = {
 	/** The formal YC listing; product surfaces link here. `JOIN_US_URL` is our own marketing page. */
 	CAREERS_URL: "https://www.ycombinator.com/companies/superset/jobs",
 } as const;
+
+// Staff keep their @superset.sh accounts after the root domain changes.
+export const STAFF_EMAIL_DOMAINS = [
+	...new Set([COMPANY.EMAIL_DOMAIN, "@superset.sh"]),
+];
+
+export function isStaffEmail(email: string): boolean {
+	return STAFF_EMAIL_DOMAINS.some((domain) => email.endsWith(domain));
+}
 
 export const OPEN_ROLES = [
 	{
@@ -304,11 +310,6 @@ export const SANDBOX_IMAGE_NAME = "superset-hostsvc";
 /** The one transaction the API traces: the cloud workspace provision job. */
 export const CLOUD_WORKSPACE_PROVISION_TRANSACTION =
 	"cloud-workspace.provision";
-
-export const SHARED_ENVIRONMENT_ORGANIZATION_ID =
-	"00000000-0000-0000-0000-000000000000";
-
-export const SHARED_ENVIRONMENT_NAME = "Default";
 
 // Terminals set no TERM_PROGRAM, like xterm. Agents take kitty-only paths
 // under "kitty" that xterm.js cannot serve, and under "vscode" Claude Code

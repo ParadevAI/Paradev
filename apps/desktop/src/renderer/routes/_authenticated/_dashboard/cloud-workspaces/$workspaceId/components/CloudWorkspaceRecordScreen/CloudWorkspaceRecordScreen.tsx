@@ -19,6 +19,7 @@ import {
 	cloudPullRequestRefKey,
 	useCloudPullRequests,
 } from "renderer/routes/_authenticated/_dashboard/hooks/useCloudPullRequests";
+import { useCloudWorkspacePresence } from "renderer/routes/_authenticated/_dashboard/hooks/useCloudWorkspacePresence";
 import { useCopyShareLink } from "renderer/routes/_authenticated/_dashboard/hooks/useCopyShareLink";
 import { useOpenPullRequestInApp } from "renderer/routes/_authenticated/_dashboard/hooks/useOpenPullRequestInApp";
 import { useOrganizationPeople } from "renderer/routes/_authenticated/_dashboard/hooks/useOrganizationPeople";
@@ -67,6 +68,10 @@ export function CloudWorkspaceRecordScreen({
 	const hasOrg = organizationId !== null;
 
 	const record = cloudTrpc.cloudWorkspace.get.useQuery({ id: workspaceId });
+	const presence = useCloudWorkspacePresence(workspaceId, {
+		organizationId: record.data?.organizationId,
+		observe: true,
+	});
 	const activity = cloudTrpc.cloudWorkspace.activity.useQuery({
 		id: workspaceId,
 	});
@@ -150,7 +155,7 @@ export function CloudWorkspaceRecordScreen({
 		agentStatusAt: listed?.agentStatusAt ?? data.agentStatusAt,
 		createdAt: data.createdAt,
 		createdBy: data.createdBy,
-		presence: listed?.presence ?? [],
+		presence,
 		deletedAt: data.deletedAt,
 		visibility: listed?.visibility ?? data.visibility,
 		environmentName: data.environment?.name ?? "",

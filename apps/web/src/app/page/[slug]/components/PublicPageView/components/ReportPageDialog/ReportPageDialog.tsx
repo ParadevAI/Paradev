@@ -65,6 +65,7 @@ export function ReportPageDialog({ slug, signedIn }: ReportPageDialogProps) {
 
 	return (
 		<Dialog
+			modal
 			open={open}
 			onOpenChange={(next) => {
 				setOpen(next);

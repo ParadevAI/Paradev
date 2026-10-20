@@ -207,8 +207,8 @@ jobs:
           CDN_URL: ${{ secrets.CDN_URL }}
         run: bun run release --production
 
-      - name: Report a failed nightly release
-        if: failure() && github.event_name == 'schedule'
+      - name: Report a failed release
+        if: failure() && github.event_name != 'workflow_dispatch'
         env:
           GH_TOKEN: ${{ github.token }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
@@ -218,5 +218,5 @@ jobs:
           if [ -n "$issue" ]; then
             gh issue comment "$issue" --body "Failed again: $RUN_URL"
           else
-            gh issue create --title "$title" --body "Boxes keep the previous release until a release passes. Run: $RUN_URL"
+            gh issue create --title "$title" --body "Boxes keep the previous release until a release passes. Event: ${{ github.event_name }}. Run: $RUN_URL"
           fi

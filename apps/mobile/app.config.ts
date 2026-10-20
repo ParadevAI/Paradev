@@ -1,6 +1,6 @@
 import path from "node:path";
 import { SUPPORTED_LOCALES } from "@superset/i18n/locales";
-import { IOS_APP } from "@superset/shared/constants";
+import { IOS_APP } from "@superset/shared/app-identity";
 import { config } from "dotenv";
 import type { ConfigContext } from "expo/config";
 import { withIosAccentColor } from "./config-plugins/withIosAccentColor";

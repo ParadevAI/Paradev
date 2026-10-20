@@ -1,0 +1,137 @@
+---
+title: "Best Amp Alternatives in 2026"
+description: "The best alternatives to Amp, the multi-model coding agent, including Claude Code, Codex CLI, OpenCode, Droid, Copilot CLI, and Devin CLI, compared by models, pricing, and license, plus how to run several side by side."
+date: 2026-10-20
+lastUpdated: 2026-10-20
+type: "roundup"
+competitors:
+  - amp
+  - claude-code
+  - codex
+  - opencode
+  - droid
+  - copilot-cli
+  - devin-cli
+keywords:
+  - amp alternative
+  - amp alternatives
+  - ampcode alternative
+  - amp coding agent alternative
+  - amp competitors
+  - amp vs claude code
+---
+
+Amp is a coding agent that picks the model for you by mode, from fast to "ultra." It runs work on "orbs," cloud machines that keep going after you close your laptop, and on runners that create Git worktrees, with threads that follow you across the terminal, the web, and its iOS and macOS apps. It is free with your own compute and keys, or $20 a month for the Individual plan. Amp is proprietary and says it keeps "no backward compatibility, no legacy features." Superset lets you keep Amp and run any of these alternatives beside it, each in its own Git worktree, so you can compare the diffs on your own code.
+
+**Our recommendation: keep Amp, and use Superset to try the alternatives side by side on the same task.** The list below covers the major labs' agents and open-source options.
+
+[Download Superset](/download) to run two agents on one task, or read [Superset vs Amp](/compare/superset-vs-amp) for how the two fit together. This guide is published by Superset; recommendations describe workflow fit rather than benchmark results.
+
+---
+
+## The Short Version
+
+| Alternative | Best for | Models | How you pay | License |
+|---|---|---|---|---|
+| **Claude Code** | Deep, multi-step work and the richest parallel modes | Claude | Claude Pro from $20/mo, Max from $100/mo, or API key | Proprietary |
+| **Codex CLI** | Open-source agent from a major lab | OpenAI GPT models | ChatGPT plans, including limited use on Free, or API key | Open source (Apache-2.0) |
+| **OpenCode** | Open-source agent for any model | Any provider | Free; your own keys, or OpenCode Zen and Go | Open source (MIT) |
+| **Droid** | One agent across terminal, IDE, Slack, and Linear | Frontier and open-weight models | Factory Pro $20, Plus $100, Max $200/mo | Proprietary |
+| **GitHub Copilot CLI** | Several vendors' models on one low-cost plan | Claude, GPT, Gemini, Grok, Kimi | Free tier; Pro $10, Pro+ $39, Max $100/mo | Proprietary |
+| **Devin CLI** | Handing long tasks to a cloud engineer | Frontier models plus SWE-2 | Free tier; Pro $20, Max $200/mo | Proprietary |
+| **Superset** | Running Amp and these agents side by side | Whatever each agent uses | Free tier; Pro $20 per user/month | Source-available (ELv2) |
+
+## Why Look for an Amp Alternative?
+
+Amp is a strong choice if you want the vendor to pick the model. Common reasons to look further:
+
+- **Model control.** You want to choose the model yourself on every task.
+- **Stability.** Amp removes features without keeping backward compatibility.
+- **Open source.** You want an agent you can read and change.
+- **Windows.** Amp runs on Windows only through WSL.
+- **A second opinion.** A different agent often solves the task Amp is stuck on.
+
+## The Best Alternatives
+
+### Claude Code
+
+Anthropic's agent has the widest range of parallel modes: subagents, `/batch` runs across worktrees, an agent view for background sessions, cloud sessions, and Remote Control, plus plugins, skills, and hooks. It needs a paid Claude plan or an API key.
+
+See [Claude Code vs Amp](/compare/claude-code-vs-amp) and [Superset vs Claude Code](/compare/superset-vs-claude-code).
+
+### Codex CLI
+
+OpenAI's agent is open source under Apache-2.0 and comes with ChatGPT plans. It has subagents, worktrees, `codex exec` for CI, an SDK, a GitHub Action, and cloud tasks.
+
+See [Superset vs Codex](/compare/superset-vs-codex).
+
+### OpenCode
+
+OpenCode is the most popular open-source agent with free choice of provider. It has a terminal UI, a desktop app, an IDE extension, built-in subagents, and a server with an SDK. It is MIT-licensed and free; you pay only for the models.
+
+See [Superset vs OpenCode](/compare/superset-vs-opencode).
+
+### Droid
+
+Factory's agent runs frontier and open-weight models, and in the CLI you can bring your own keys. Missions coordinate several agents on larger work, and Droid connects to Jira, Linear, Slack, and PagerDuty.
+
+See [Superset vs Factory](/compare/superset-vs-factory).
+
+### GitHub Copilot CLI
+
+Copilot's terminal agent offers models from several vendors on one plan, starting with a free tier. Issues, pull requests, and the GitHub MCP server are built in, and `/delegate` hands work to Copilot's cloud agent.
+
+See [Superset vs GitHub Copilot](/compare/superset-vs-github-copilot).
+
+### Devin CLI
+
+Cognition's local agent hands sessions off to cloud Devin when a task gets long, and runs in an OS-level sandbox. Choose it if Amp's orbs are the feature you use most.
+
+See [Superset vs Devin](/compare/superset-vs-devin).
+
+### Superset (to run them all)
+
+Superset is not an agent. It is a desktop workspace that runs Amp and every agent above, each in its own Git worktree and terminal, on your own subscriptions and keys; Superset never proxies model calls. Give the same prompt to Amp and Claude Code in two workspaces, review both diffs in the Changes pane, preview the result in the in-app browser, and open a PR from the better one. Workspaces run on your machine, on hosts you add, or in cloud workspaces, and the [iPhone and iPad app](/mobile) reaches all of them.
+
+See [Superset vs Amp](/compare/superset-vs-amp).
+
+## How To Choose
+
+- For the richest parallel modes, choose **Claude Code**.
+- For an open-source agent from a major lab, choose **Codex CLI**.
+- For open source with any model, choose **OpenCode**.
+- For one agent across Slack, Linear, and the terminal, choose **Droid**.
+- For several vendors' models on one low-cost plan, choose **Copilot CLI**.
+- For handing long tasks to the cloud, choose **Devin CLI**.
+- To compare any of them with Amp on your own repository, use **Superset**.
+
+## Verdict
+
+There is no single best agent, and Amp's choice of model per mode will suit some tasks better than others. Run Amp and one alternative on the same task in Superset, compare the diffs, and keep whichever works best for each kind of task. For the full agent comparison, see [Best Coding Agents](/compare/best-coding-agents).
+
+## What To Try First
+
+- **Keep Amp:** launch it in a Superset workspace.
+- **Add an alternative:** start a second workspace from the same branch with Claude Code or Codex.
+- **Give both the same prompt:** each agent works in its own worktree.
+- **Compare:** review both diffs, run your checks, and open a PR from the better one.
+
+[Download Superset](/download), then see [Best IDE for Amp](/compare/best-ide-for-amp).
+
+## Frequently Asked Questions
+
+### What is the best Amp alternative?
+
+Claude Code is the strongest alternative for deep work, Codex CLI is the best open-source agent from a major lab, and OpenCode is the best open-source option for any model.
+
+### Is there an open-source Amp alternative?
+
+Yes. Codex CLI (Apache-2.0) and OpenCode (MIT) are open source. Amp is proprietary.
+
+### Is there a free Amp alternative?
+
+Yes. Copilot CLI and Devin CLI have free tiers, Codex includes limited use on ChatGPT Free, and OpenCode is free with your own model keys. Amp itself is free with your own compute and keys.
+
+### Can I use Amp and Claude Code together?
+
+Yes. Superset runs both side by side, each in its own worktree. You pay each provider for its own usage.

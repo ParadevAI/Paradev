@@ -53,10 +53,11 @@ rm -rf "$SUPERSET_RUN_DIR"
 install -d -m 0755 -o "$SUPERSET_USER" -g "$SUPERSET_USER" "$SUPERSET_RUN_DIR"
 stamp "run.cleared"
 
-# --- the bundle the environment pins; unpinned keeps what the image baked
+# --- the bundle the environment pins. A box with no pin would silently keep
+# whatever its image or golden baked, for as long as it lives.
+[ -n "${SUPERSET_BUNDLE_SHA:-}" ] || refuse "SUPERSET_BUNDLE_SHA missing from ${SUPERSET_CONF}; the control plane pins every box"
 ensure_bundle() {
-	local want="${SUPERSET_BUNDLE_SHA:-}" have
-	if [ -z "$want" ]; then stamp "bundle.unpinned keeping $(cat "${SUPERSET_BUNDLE_ROOT}/current.bundle-hash" 2>/dev/null | cut -c1-12)"; return 0; fi
+	local want="$SUPERSET_BUNDLE_SHA" have
 	have="$(cat "${SUPERSET_BUNDLE_ROOT}/current.bundle-hash" 2>/dev/null || true)"
 	if [ "$have" = "$want" ] && [ -x "${SUPERSET_BUNDLE_ROOT}/current/setup" ]; then
 		stamp "bundle.current ${want:0:12} matches pin"

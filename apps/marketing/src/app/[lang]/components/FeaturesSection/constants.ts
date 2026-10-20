@@ -41,7 +41,7 @@ export const FEATURES: Feature[] = [
 			message: "Automations",
 		}),
 		title: msg({
-			message: "Put recurring work on a schedule",
+			message: "Start agents on events or a schedule",
 		}),
 		description: msg({
 			message:

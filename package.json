@@ -6,7 +6,7 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.4.2",
-		"@types/bun": "1.4.2",
+		"@types/bun": "1.4.3",
 		"@types/semver": "7.7.1",
 		"@vercel/sandbox": "3.2.2",
 		"babel-plugin-macros": "3.1.0",
@@ -19,7 +19,7 @@
 	"description": "Superset Monorepo",
 	"homepage": "https://superset.sh",
 	"license": "Elastic-2.0",
-	"packageManager": "bun@1.4.2",
+	"packageManager": "bun@1.4.3",
 	"private": true,
 	"scripts": {
 		"predev": "bun scripts/check-dev-ports.ts",
@@ -101,6 +101,7 @@
 		"workerd"
 	],
 	"patchedDependencies": {
+		"@better-auth/oauth-provider@1.6.22": "patches/@better-auth%2Foauth-provider@1.6.22.patch",
 		"metro@0.84.5": "patches/metro@0.84.5.patch",
 		"metro@0.84.6": "patches/metro@0.84.6.patch",
 		"metro@0.87.1": "patches/metro@0.87.1.patch",

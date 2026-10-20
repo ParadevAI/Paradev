@@ -9,42 +9,15 @@ export const REALTIME_NUDGE_KINDS = [
 
 export type RealtimeNudgeKind = (typeof REALTIME_NUDGE_KINDS)[number];
 
-/** Someone who has opened the workspace; `lastSeenAt` is epoch ms. */
-export interface RealtimeCloudWorkspacePresence {
-	userId: string;
-	name: string;
-	image: string | null;
-	lastSeenAt: number;
-}
-
-/** A patch to one listed row: each field present replaces the row's. */
+/** A patch to one listed row's agent status. */
 export interface RealtimeCloudWorkspaceUpdate {
 	kind: "cloud_workspaces";
 	workspaceId: string;
-	agentStatus?: ActiveAgentStatus | null;
-	agentStatusAt?: number;
-	presence?: RealtimeCloudWorkspacePresence[];
+	agentStatus: ActiveAgentStatus | null;
+	agentStatusAt: number;
 }
 
 export type RealtimeUpdate = RealtimeCloudWorkspaceUpdate;
-
-/** The newest sighting of each person wins, so updates can land in any order. */
-export function mergePresenceByUser<Person extends { userId: string }>(
-	current: readonly Person[],
-	incoming: readonly Person[],
-	seenAt: (person: Person) => number,
-): Person[] {
-	const byUser = new Map(current.map((person) => [person.userId, person]));
-	for (const person of incoming) {
-		const existing = byUser.get(person.userId);
-		if (!existing || seenAt(person) >= seenAt(existing)) {
-			byUser.set(person.userId, person);
-		}
-	}
-	return [...byUser.values()].sort(
-		(left, right) => seenAt(right) - seenAt(left),
-	);
-}
 
 export interface RealtimeNudgeMessage {
 	type: "nudge";
@@ -61,19 +34,6 @@ export function isRealtimeNudgeKind(
 	);
 }
 
-function isRealtimePresence(
-	value: unknown,
-): value is RealtimeCloudWorkspacePresence {
-	if (typeof value !== "object" || value === null) return false;
-	const person = value as Record<string, unknown>;
-	return (
-		typeof person.userId === "string" &&
-		typeof person.name === "string" &&
-		(person.image === null || typeof person.image === "string") &&
-		typeof person.lastSeenAt === "number"
-	);
-}
-
 export function isRealtimeUpdate(value: unknown): value is RealtimeUpdate {
 	if (typeof value !== "object" || value === null) return false;
 	const update = value as Record<string, unknown>;
@@ -84,20 +44,10 @@ export function isRealtimeUpdate(value: unknown): value is RealtimeUpdate {
 	) {
 		return false;
 	}
-	const agentStatusValid =
-		update.agentStatus === undefined
-			? update.agentStatusAt === undefined
-			: (update.agentStatus === null ||
-					isActiveAgentStatus(update.agentStatus)) &&
-				typeof update.agentStatusAt === "number";
-	const presenceValid =
-		update.presence === undefined ||
-		(Array.isArray(update.presence) &&
-			update.presence.every(isRealtimePresence));
 	return (
-		agentStatusValid &&
-		presenceValid &&
-		(update.agentStatus !== undefined || update.presence !== undefined)
+		update.agentStatus !== undefined &&
+		(update.agentStatus === null || isActiveAgentStatus(update.agentStatus)) &&
+		typeof update.agentStatusAt === "number"
 	);
 }
 
@@ -130,4 +80,12 @@ export function parseRealtimeNudgeMessage(
 /** Subscribe path for an organization's nudges, relative to the realtime origin. */
 export function realtimeNudgesPath(organizationId: string): string {
 	return `/v2/org/${encodeURIComponent(organizationId)}/nudges`;
+}
+
+/** A cloud workspace's presence socket, relative to the realtime origin. */
+export function realtimeWorkspacePresencePath(
+	organizationId: string,
+	workspaceId: string,
+): string {
+	return `/organization/${encodeURIComponent(organizationId)}/workspace/${encodeURIComponent(workspaceId)}`;
 }

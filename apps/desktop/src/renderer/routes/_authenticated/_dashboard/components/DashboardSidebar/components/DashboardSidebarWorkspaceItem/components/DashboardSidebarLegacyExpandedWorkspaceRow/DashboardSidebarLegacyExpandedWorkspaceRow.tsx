@@ -18,7 +18,8 @@ import { WorkspaceNameMarquee } from "renderer/components/WorkspaceNameMarquee";
 import type { DiffStats } from "renderer/hooks/host-service/useDiffStats";
 import { useFocusVisible } from "renderer/hooks/useFocusVisible";
 import { HotkeyLabel } from "renderer/hotkeys";
-import { pullRequestRefFromUrl } from "renderer/lib/github/pullRequestRef";
+import { usePullRequestLinkPolicy } from "renderer/lib/clickPolicy";
+import { openPullRequestLink } from "renderer/lib/github/openPullRequestLink";
 import { useDashboardSidebarWorkspacePorts } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/providers/DashboardSidebarPortsProvider";
 import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { ProjectThumbnail } from "renderer/routes/_authenticated/components/ProjectThumbnail";
@@ -134,6 +135,7 @@ export const DashboardSidebarLegacyExpandedWorkspaceRow = forwardRef<
 		const isPending = pendingTransaction?.type === "insert";
 		const localRef = useRef<HTMLDivElement>(null);
 		const navigate = useNavigate();
+		const linkPolicy = usePullRequestLinkPolicy();
 		// Drives the name's hover-reveal for keyboard users: the row, not the
 		// name span, is what's actually tabbable.
 		const {
@@ -222,16 +224,18 @@ export const DashboardSidebarLegacyExpandedWorkspaceRow = forwardRef<
 											event.stopPropagation();
 											// Lands in the workspace with its PR pane open, rather
 											// than on GitHub; the pane keeps the GitHub link.
-											const ref = pullRequestRefFromUrl(pullRequest.url);
-											if (!ref) {
-												window.open(pullRequest.url, "_blank");
-												return;
-											}
-											usePullRequestPaneIntent.getState().request({
-												workspaceId: workspace.id,
-												...ref,
-											});
-											void navigateToV2Workspace(workspace.id, navigate);
+											openPullRequestLink(
+												pullRequest.url,
+												linkPolicy.getAction(event),
+												(ref, placement) => {
+													usePullRequestPaneIntent.getState().request({
+														workspaceId: workspace.id,
+														...ref,
+														placement,
+													});
+													void navigateToV2Workspace(workspace.id, navigate);
+												},
+											);
 										}}
 										onKeyDown={(event) => {
 											if (event.key === "Enter" || event.key === " ") {
@@ -279,7 +283,10 @@ export const DashboardSidebarLegacyExpandedWorkspaceRow = forwardRef<
 											</Trans>
 										</p>
 										<p className="text-xs text-muted-foreground">
-											<Trans>Click to open on GitHub</Trans>
+											<Trans>Click to open the pull request</Trans>
+										</p>
+										<p className="text-xs text-muted-foreground">
+											{linkPolicy.hint}
 										</p>
 									</>
 								) : (

@@ -211,6 +211,7 @@ export function TerminalSessionHandoffMenu({
 			</DropdownMenu>
 
 			<Dialog
+				modal
 				open={action !== null}
 				onOpenChange={(open) => {
 					if (!open && !isStarting) setAction(null);
