@@ -30,12 +30,7 @@ final class ComposerAnalyzerTranscriber {
     if SpeechTranscriber.isAvailable,
       let supported = await SpeechTranscriber.supportedLocale(equivalentTo: locale)
     {
-      let module = SpeechTranscriber(
-        locale: supported,
-        transcriptionOptions: [],
-        reportingOptions: [.volatileResults],
-        attributeOptions: []
-      )
+      let module = SpeechTranscriber(locale: supported, preset: .progressiveTranscription)
       if let transcriber = try? await start(
         module: module,
         locale: supported,
@@ -160,13 +155,6 @@ final class ComposerAnalyzerTranscriber {
     input.finish()
     let analyzer = analyzer
     Task { try? await analyzer.finalizeAndFinishThroughEndOfInput() }
-  }
-
-  /// Settles everything heard so far and keeps listening.
-  @MainActor
-  func settleHeard() {
-    let analyzer = analyzer
-    Task { try? await analyzer.finalize(through: nil) }
   }
 
   /// Stop now. No further events are delivered.

@@ -41,6 +41,8 @@ enum ComposerMetrics {
   /// field expand to fill that height instead of hugging its content, which
   /// leaves an empty card the size of the cap.
   static let maxLines = 8
+  /// Trailing words of what is being heard drawn as still unsure.
+  static let unsureWords = 5
   static let grabberSize = CGSize(width: 36, height: 5)
   /// The chips and the model picker, measured off frames 4 and 10: the
   /// reference's chrome is ~14pt, not the 17pt body every `Text` inherits by
@@ -542,8 +544,10 @@ struct ComposerRootView: View {
       .padding(.bottom, ComposerMetrics.textInset)
   }
 
-  /// The draft, then the words still being recognised in dimmed italics on
-  /// the same line. The head truncates so the words being spoken stay in view.
+  /// The draft, then what is being heard. Only the last few words of it are
+  /// dimmed italics: the engine settles a phrase only when it ends, and asking
+  /// it to settle sooner drops words, but words this far back rarely change.
+  /// The head truncates so the words being spoken stay in view.
   private var dictationPreview: some View {
     let volatile = model.dictation.volatileText
     let shown: AttributedString
@@ -553,11 +557,12 @@ struct ComposerRootView: View {
       shown = placeholder
     } else {
       let base = model.draft.trimmingCharacters(in: .whitespaces)
-      let joined = ComposerDictatedText.join(base, volatile)
-      var tail = AttributedString(String(joined.dropFirst(base.count)))
+      let heard = String(ComposerDictatedText.join(base, volatile).dropFirst(base.count))
+      let unsure = Self.trailingWords(heard, count: ComposerMetrics.unsureWords)
+      var tail = AttributedString(String(heard.suffix(unsure)))
       tail.font = .body.italic()
       tail.foregroundColor = .secondary
-      shown = AttributedString(base) + tail
+      shown = AttributedString(base + heard.dropLast(unsure)) + tail
     }
     return Text(shown)
       .lineLimit(ComposerMetrics.maxLines)
@@ -565,6 +570,23 @@ struct ComposerRootView: View {
       // The default crossfade ghosts the words while they are still changing.
       .contentTransition(.identity)
       .frame(maxWidth: .infinity, alignment: .leading)
+  }
+
+  /// Characters taken by the last `count` words, with the space before them.
+  /// Unspaced scripts (Chinese, Japanese) have no words to count, so all of
+  /// it stays unsure.
+  private static func trailingWords(_ text: String, count: Int) -> Int {
+    var words = 0
+    var index = text.endIndex
+    while index > text.startIndex {
+      let previous = text.index(before: index)
+      if text[previous].isWhitespace, index < text.endIndex, !text[index].isWhitespace {
+        words += 1
+        if words == count { return text.distance(from: previous, to: text.endIndex) }
+      }
+      index = previous
+    }
+    return text.count
   }
 
   // MARK: - Control row

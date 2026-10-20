@@ -62,16 +62,11 @@ final class ComposerDictation {
   @ObservationIgnored private let engine = AVAudioEngine()
   @ObservationIgnored private var transcriber: ComposerAnalyzerTranscriber?
   @ObservationIgnored private var backstop: Task<Void, Never>?
-  @ObservationIgnored private var pauseTimer: Task<Void, Never>?
   /// Interruptions, route changes and media-services resets.
   @ObservationIgnored private var audioObservers: [NSObjectProtocol] = []
   /// Touched only from the audio tap thread, between publishes.
   @ObservationIgnored private var pendingFrames = 0.0
   @ObservationIgnored private var pendingPeak = 0.0
-
-  /// The engine settles text only when told to, so a pause this long is
-  /// taken as the end of a phrase.
-  private static let pauseToSettle = Duration.milliseconds(900)
 
   /// Only the unsettled tail is left to flush by then, so this is generous.
   private static let finalizeTimeout = Duration.seconds(15)
@@ -257,7 +252,6 @@ final class ComposerDictation {
     switch event {
     case .volatile(let text):
       withAnimation(ComposerMetrics.typingGrowth) { volatileText = text }
-      settleAfterPause()
     case .finalized(let text):
       withAnimation(ComposerMetrics.typingGrowth) { volatileText = "" }
       commit(text)
@@ -268,17 +262,6 @@ final class ComposerDictation {
     case .ended:
       commitVolatile()
       settle()
-    }
-  }
-
-  @MainActor
-  private func settleAfterPause() {
-    pauseTimer?.cancel()
-    guard case .recording = state, !volatileText.isEmpty else { return }
-    pauseTimer = Task { @MainActor [weak self] in
-      try? await Task.sleep(for: Self.pauseToSettle)
-      guard !Task.isCancelled, let self, case .recording = self.state else { return }
-      self.transcriber?.settleHeard()
     }
   }
 
@@ -364,8 +347,6 @@ final class ComposerDictation {
     guard state != .idle else { return }
     backstop?.cancel()
     backstop = nil
-    pauseTimer?.cancel()
-    pauseTimer = nil
     transcriber?.cancel()
     transcriber = nil
     for observer in audioObservers { NotificationCenter.default.removeObserver(observer) }
