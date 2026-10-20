@@ -831,6 +831,19 @@ export const environments = pgTable(
 );
 
 /**
+ * Every sandbox bundle a release published, so "the current bundle" is a row
+ * and not whichever environment the release last touched. The newest is what
+ * a new environment pins to; rolling back is inserting the previous sha.
+ */
+export const sandboxBundles = pgTable("sandbox_bundles", {
+	sha: text().primaryKey(),
+	imageRef: text("image_ref").notNull(),
+	releasedAt: timestamp("released_at", { withTimezone: true })
+		.notNull()
+		.defaultNow(),
+});
+
+/**
  * The repositories an environment checks out, in order; the first is the
  * primary. An environment with none (the shared image environment) takes
  * its repositories at workspace create.
