@@ -195,6 +195,43 @@ describe("LiveSession", () => {
 		await runtime.dispose();
 	});
 
+	test("a prompt cancelled while its checkpoint is taken never reaches the agent", async () => {
+		const { harnesses } = fakeHarnessRegistry(SINGLE_TURN);
+		let captures = 0;
+		let release = () => {};
+		const gate = new Promise<void>((resolve) => {
+			release = resolve;
+		});
+		const runtime = createTestRuntime({
+			harnesses,
+			checkpoints: {
+				capture: async () => {
+					captures += 1;
+					await gate;
+				},
+				restore: async () => "missing",
+			},
+		});
+		const { sessionId } = runtime.commands.createSession({
+			commandId: randomUUID(),
+			scopeId: "workspace-1",
+			harness: FAKE_HARNESS,
+			cwd: "/tmp/workspace",
+		});
+		const result = sendPrompt(runtime, sessionId, "hello");
+		await waitFor(() => captures === 1);
+
+		runtime.live.require(sessionId).cancelTurn();
+		release();
+		await new Promise((resolve) => setTimeout(resolve, 20));
+
+		expect(runtime.live.require(sessionId).turn).toBeNull();
+		expect(
+			snapshotOf(runtime, sessionId).items.get(result.itemId)?.item,
+		).toMatchObject({ discarded: true });
+		await runtime.dispose();
+	});
+
 	test("a queued prompt is counted by the time it is published", async () => {
 		const countsAtPublish: number[] = [];
 		const { harnesses } = fakeHarnessRegistry({
@@ -419,6 +456,37 @@ describe("LiveSession", () => {
 		expect(snapshot.items.get(second.itemId)?.item).not.toHaveProperty(
 			"queued",
 		);
+		await runtime.dispose();
+	});
+
+	test("a prompt that joins a running turn gets a checkpoint first", async () => {
+		const { harnesses } = fakeHarnessRegistry({
+			...HELD_THEN_QUICK,
+			steer: true,
+		});
+		const captured: string[] = [];
+		const runtime = createTestRuntime({
+			harnesses,
+			checkpoints: {
+				capture: async ({ itemId }) => {
+					captured.push(itemId);
+				},
+				restore: async () => "missing",
+			},
+		});
+		const { sessionId } = runtime.commands.createSession({
+			commandId: randomUUID(),
+			scopeId: "workspace-1",
+			harness: FAKE_HARNESS,
+			cwd: "/tmp/workspace",
+		});
+		const first = sendPrompt(runtime, sessionId, "first");
+		await waitForApproval(runtime, sessionId);
+		const second = sendPrompt(runtime, sessionId, "second");
+
+		expect(second.queued).toBe(false);
+		await waitFor(() => captured.length === 2);
+		expect(captured).toEqual([first.itemId, second.itemId]);
 		await runtime.dispose();
 	});
 

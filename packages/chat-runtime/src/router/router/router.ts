@@ -37,6 +37,7 @@ export type ChatRouterOptions = {
 const UNKNOWN_HARNESS = /^unknown harness /;
 const NOT_RUNNING = /^chat session (.+) is not running$/;
 const NOT_QUEUED = /^prompt .+ is not queued$/;
+const STILL_WORKING = /^chat session .+ is still working$/;
 
 function mapCommandError(runtime: ChatRuntime, error: unknown): unknown {
 	if (error instanceof TRPCError) return error;
@@ -44,6 +45,13 @@ function mapCommandError(runtime: ChatRuntime, error: unknown): unknown {
 	if (UNKNOWN_HARNESS.test(error.message)) {
 		return new TRPCError({
 			code: "BAD_REQUEST",
+			message: error.message,
+			cause: error,
+		});
+	}
+	if (STILL_WORKING.test(error.message)) {
+		return new TRPCError({
+			code: "CONFLICT",
 			message: error.message,
 			cause: error,
 		});
@@ -72,7 +80,13 @@ export function createChatRouter(
 ) {
 	function guarded<T>(execute: () => T): T {
 		try {
-			return execute();
+			const result = execute();
+			if (result instanceof Promise) {
+				return result.catch((error: unknown) => {
+					throw mapCommandError(runtime, error);
+				}) as T;
+			}
+			return result;
 		} catch (error) {
 			throw mapCommandError(runtime, error);
 		}

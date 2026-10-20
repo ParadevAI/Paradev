@@ -2262,7 +2262,10 @@ export class AcpAdapter implements HarnessAdapter {
 	}
 
 	private emit(event: AdapterEvent): void {
-		if (this.quietReplay && (event.kind === "item" || event.kind === "turn"))
+		if (
+			this.quietReplay &&
+			(event.kind === "item" || event.kind === "turn" || event.kind === "delta")
+		)
 			return;
 		this.queue.push(event);
 	}

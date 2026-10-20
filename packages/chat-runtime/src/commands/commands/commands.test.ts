@@ -5,7 +5,7 @@ import type { UserMessage } from "@superset/chat/protocol";
 import type { FakeHarnessScript } from "../../harness/fake";
 import { FakeHarness } from "../../harness/fake";
 import type { ChatRuntime } from "../../index";
-import { agentMessage, turn } from "../../testing/fixtures";
+import { agentMessage, turn, userMessage } from "../../testing/fixtures";
 import { createTestRuntime } from "../../testing/testRuntime";
 import {
 	FAKE_HARNESS,
@@ -463,14 +463,17 @@ describe("chat commands", () => {
 				runtime.live.require(sessionId).turn?.status === "completed",
 		);
 
-		const rewound = await runtime.commands.rewindSession({
+		const request = {
 			commandId: randomUUID(),
 			sessionId,
 			itemId: second.itemId,
 			handoffPrompt: "earlier conversation",
 			cwd: "/tmp/workspace",
-		});
+		};
+		const rewound = await runtime.commands.rewindSession(request);
+		const retried = await runtime.commands.rewindSession(request);
 
+		expect(retried.sessionId).toBe(rewound.sessionId);
 		expect(cuts).toEqual(["msg_1"]);
 		expect(resumes.at(-1)).toEqual({
 			harnessSessionId: "agent-forked",
@@ -490,6 +493,162 @@ describe("chat commands", () => {
 				(group) => group.turnId,
 			),
 		).toContain("t1");
+		await runtime.dispose();
+	});
+
+	test("rewindSession hands over a message sent into a running turn instead of forking", async () => {
+		const cuts: (string | undefined)[] = [];
+		class CuttingHarness extends FakeHarness {
+			async fork(cut?: { upToMessageId: string }) {
+				cuts.push(cut?.upToMessageId);
+				return "agent-forked";
+			}
+		}
+		const runtime = createTestRuntime({
+			harnesses: new Map([
+				[
+					FAKE_HARNESS,
+					() =>
+						new CuttingHarness({
+							turns: [
+								[
+									{ kind: "turn", turn: turn("t9") },
+									{
+										kind: "turn",
+										turn: turn("t9", { status: "completed" }),
+									},
+									{ kind: "session", session: { status: "idle" } },
+								],
+							],
+						}),
+				],
+			]),
+		});
+		const { sessionId } = createSession(runtime);
+		const done = turn("t1", { status: "completed", completedAtMs: 2 });
+		runtime.live.require(sessionId).seed([
+			{ type: "turn", turn: turn("t1") },
+			{ type: "item", item: userMessage("u1", "first"), turnId: "t1" },
+			{
+				type: "item",
+				item: { ...agentMessage("a1", "working"), agentMessageId: "msg_1" },
+				turnId: "t1",
+			},
+			{ type: "item", item: userMessage("u2", "steer"), turnId: "t1" },
+			{ type: "turn", turn: done },
+		]);
+
+		await runtime.commands.rewindSession({
+			commandId: randomUUID(),
+			sessionId,
+			itemId: "u2",
+			handoffPrompt: "earlier conversation",
+			cwd: "/tmp/workspace",
+		});
+
+		expect(cuts).toEqual([]);
+		await runtime.dispose();
+	});
+
+	test("rewindSession closes the session it opened when setting it up fails", async () => {
+		const runtime = createTestRuntime({
+			harnesses: new Map([
+				[
+					FAKE_HARNESS,
+					() =>
+						new FakeHarness({
+							turns: [
+								[
+									{ kind: "turn" as const, turn: turn("t1") },
+									{
+										kind: "item" as const,
+										item: agentMessage("t1-reply", "hi"),
+										turnId: "t1",
+									},
+									{
+										kind: "turn" as const,
+										turn: turn("t1", { status: "completed" }),
+									},
+									{
+										kind: "session" as const,
+										session: { status: "idle" as const },
+									},
+								],
+							],
+						}),
+				],
+			]),
+			checkpoints: {
+				capture: async () => undefined,
+				restore: async () => "missing",
+				fork: () => {
+					throw new Error("checkpoint store unavailable");
+				},
+			},
+		});
+		const { sessionId } = createSession(runtime);
+		const sent = runtime.commands.prompt({
+			commandId: randomUUID(),
+			sessionId,
+			clientId: "client-1",
+			content: [{ type: "text", text: "hello" }],
+		});
+		await waitFor(() => runtime.sessions.get(sessionId)?.status === "idle");
+
+		await expect(
+			runtime.commands.rewindSession({
+				commandId: randomUUID(),
+				sessionId,
+				itemId: sent.itemId,
+				cwd: "/tmp/workspace",
+			}),
+		).rejects.toThrow("checkpoint store unavailable");
+		const opened = runtime.commands
+			.listSessions({})
+			.filter((session) => session.sessionId !== sessionId);
+		expect(opened).toHaveLength(1);
+		expect(runtime.live.get(opened[0]?.sessionId ?? "")).toBeNull();
+		await runtime.dispose();
+	});
+
+	test("rewindFiles refuses while the agent is still working", async () => {
+		const restored: string[] = [];
+		const runtime = createTestRuntime({
+			harnesses: new Map([
+				[
+					FAKE_HARNESS,
+					() =>
+						new FakeHarness({
+							turns: [[{ kind: "turn" as const, turn: turn("t1") }]],
+						}),
+				],
+			]),
+			checkpoints: {
+				capture: async () => undefined,
+				restore: async ({ itemId }) => {
+					restored.push(itemId);
+					return "restored";
+				},
+			},
+		});
+		const { sessionId } = createSession(runtime);
+		const sent = runtime.commands.prompt({
+			commandId: randomUUID(),
+			sessionId,
+			clientId: "client-1",
+			content: [{ type: "text", text: "hello" }],
+		});
+		await waitFor(() => runtime.live.require(sessionId).turn?.id === "t1");
+
+		await expect(
+			runtime.commands.rewindFiles({
+				commandId: randomUUID(),
+				sessionId,
+				itemId: sent.itemId,
+				cwd: "/tmp/workspace",
+			}),
+		).rejects.toThrow("is still working");
+		expect(restored).toEqual([]);
 		await runtime.dispose();
 	});
 

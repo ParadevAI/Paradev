@@ -108,11 +108,14 @@ function lastAgentMessageId(events: DurableEvent[]): string | null {
 	return null;
 }
 
-/** The finished turns and items shown before `itemId`, or null when it is not there. */
+/**
+ * The finished turns and items shown before `itemId`, or null when it is not
+ * there. `midTurn` is set when `itemId` was sent into a turn already running.
+ */
 function transcriptBefore(
 	snapshot: SessionSnapshot,
 	itemId: string,
-): DurableEvent[] | null {
+): { events: DurableEvent[]; midTurn: boolean } | null {
 	const events: DurableEvent[] = [];
 	for (const group of deriveTimeline(snapshot)) {
 		const items = group.entries.flatMap((entry) =>
@@ -130,7 +133,7 @@ function transcriptBefore(
 				events.push({ type: "item", item, turnId: group.turnId });
 			}
 		}
-		if (index !== -1) return events;
+		if (index !== -1) return { events, midTurn: index > 0 };
 	}
 	return null;
 }
@@ -452,6 +455,9 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 		async rewindFiles(input) {
 			const parsed = rewindFilesCommandSchema.parse(input);
 			if (!options.checkpoints) return { files: "unsupported" };
+			if (options.live.get(parsed.sessionId)?.busy) {
+				throw new Error(`chat session ${parsed.sessionId} is still working`);
+			}
 			const files = await options.checkpoints.restore({
 				cwd: parsed.cwd,
 				sessionId: parsed.sessionId,
@@ -478,66 +484,81 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 		 */
 		async rewindSession(input) {
 			const parsed = rewindSessionCommandSchema.parse(input);
-			const source = options.sessions.get(parsed.sessionId);
-			const replay = replaySession(parsed.sessionId);
-			if (!source || !replay.ok) {
-				throw new Error(`chat session ${parsed.sessionId} is not running`);
-			}
-			const seed = transcriptBefore(replay.snapshot, parsed.itemId);
-			if (!seed) {
-				throw new Error(
-					`message ${parsed.itemId} is not in chat session ${parsed.sessionId}`,
-				);
-			}
-			const sourceLive = options.live.get(parsed.sessionId);
-			const cutAt = lastAgentMessageId(seed);
-			const forked =
-				cutAt && sourceLive
-					? await sourceLive
-							.fork({ upToMessageId: cutAt })
-							.catch((error: unknown) => {
-								console.warn(
-									"[chat-runtime] could not fork the agent at the rewind point",
-									error,
-								);
-								return null;
+			return options.dedupe.run(
+				`rewindSession:${parsed.commandId}`,
+				async () => {
+					const source = options.sessions.get(parsed.sessionId);
+					const replay = replaySession(parsed.sessionId);
+					if (!source || !replay.ok) {
+						throw new Error(`chat session ${parsed.sessionId} is not running`);
+					}
+					const before = transcriptBefore(replay.snapshot, parsed.itemId);
+					if (!before) {
+						throw new Error(
+							`message ${parsed.itemId} is not in chat session ${parsed.sessionId}`,
+						);
+					}
+					const sourceLive = options.live.get(parsed.sessionId);
+					// Some agents fork a whole turn, so a cut inside one would keep what came after it.
+					const cutAt = before.midTurn
+						? null
+						: lastAgentMessageId(before.events);
+					const forked =
+						cutAt && sourceLive
+							? await sourceLive
+									.fork({ upToMessageId: cutAt })
+									.catch((error: unknown) => {
+										console.warn(
+											"[chat-runtime] could not fork the agent at the rewind point",
+											error,
+										);
+										return null;
+									})
+							: null;
+					const created = this.createSession({
+						commandId: parsed.commandId,
+						scopeId: source.scopeId,
+						cwd: parsed.cwd,
+						harness: source.harness,
+						modeId: sourceLive?.state.modeId ?? parsed.modeId,
+						modelId: parsed.modelId,
+						terminalId: sourceLive?.terminalId,
+						...(forked
+							? { resume: { harnessSessionId: forked, quiet: true } }
+							: {}),
+					});
+					try {
+						const live = options.live.require(created.sessionId);
+						live.seed(before.events);
+						await options.checkpoints
+							?.fork?.({
+								cwd: parsed.cwd,
+								fromSessionId: parsed.sessionId,
+								toSessionId: created.sessionId,
 							})
-					: null;
-			const created = this.createSession({
-				commandId: parsed.commandId,
-				scopeId: source.scopeId,
-				cwd: parsed.cwd,
-				harness: source.harness,
-				modeId: sourceLive?.state.modeId ?? parsed.modeId,
-				modelId: parsed.modelId,
-				terminalId: sourceLive?.terminalId,
-				...(forked
-					? { resume: { harnessSessionId: forked, quiet: true } }
-					: {}),
-			});
-			const live = options.live.require(created.sessionId);
-			live.seed(seed);
-			await options.checkpoints
-				?.fork?.({
-					cwd: parsed.cwd,
-					fromSessionId: parsed.sessionId,
-					toSessionId: created.sessionId,
-				})
-				.catch((error: unknown) =>
-					console.warn(
-						"[chat-runtime] could not carry checkpoints over",
-						error,
-					),
-				);
-			if (parsed.handoffPrompt && !forked) {
-				live.prompt(
-					[{ type: "text", text: parsed.handoffPrompt }],
-					`rewind-${parsed.commandId}`,
-					undefined,
-					true,
-				);
-			}
-			return created;
+							.catch((error: unknown) =>
+								console.warn(
+									"[chat-runtime] could not carry checkpoints over",
+									error,
+								),
+							);
+						if (parsed.handoffPrompt && !forked) {
+							live.prompt(
+								[{ type: "text", text: parsed.handoffPrompt }],
+								`rewind-${parsed.commandId}`,
+								undefined,
+								true,
+							);
+						}
+					} catch (error) {
+						await this.closeSession({ sessionId: created.sessionId }).catch(
+							() => undefined,
+						);
+						throw error;
+					}
+					return created;
+				},
+			);
 		},
 
 		async getRewindSupport({ cwd }) {

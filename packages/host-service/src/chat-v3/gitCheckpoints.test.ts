@@ -28,7 +28,9 @@ describe("createGitCheckpoints", () => {
 	});
 
 	test("restores the tree from before a prompt without touching index or HEAD", async () => {
-		const checkpoints = createGitCheckpoints();
+		const checkpoints = createGitCheckpoints((task, input) =>
+			task.handler(input),
+		);
 		const target = { cwd: repo, sessionId: "session-1", itemId: "item-1" };
 		await writeFile(join(repo, "tracked.txt"), "edited before prompt\n");
 		await writeFile(join(repo, "untracked.txt"), "kept\n");
@@ -76,7 +78,9 @@ describe("createGitCheckpoints", () => {
 	});
 
 	test("lists what a restore would undo without changing the tree or the chain", async () => {
-		const checkpoints = createGitCheckpoints();
+		const checkpoints = createGitCheckpoints((task, input) =>
+			task.handler(input),
+		);
 		const target = { cwd: repo, sessionId: "session-1", itemId: "item-1" };
 		await writeFile(join(repo, "doomed.txt"), "before prompt\n");
 		await checkpoints.capture(target);

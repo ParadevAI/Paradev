@@ -156,6 +156,15 @@ describe("createChatRouter", () => {
 			}),
 		).rejects.toMatchObject({ code: "NOT_FOUND" });
 
+		await expect(
+			caller.rewindSession({
+				commandId: randomUUID(),
+				sessionId: "missing",
+				itemId: "item-1",
+				workspaceId: "workspace-1",
+			}),
+		).rejects.toMatchObject({ code: "NOT_FOUND" });
+
 		const created = await caller.createSession(createSessionInput());
 		await runtime.live.dispose(created.sessionId);
 		await expect(
