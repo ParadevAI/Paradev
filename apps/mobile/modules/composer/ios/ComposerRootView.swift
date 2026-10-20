@@ -547,24 +547,26 @@ struct ComposerRootView: View {
   /// The draft, then what is being heard. Only the last few words of it are
   /// dimmed italics: the engine settles a phrase only when it ends, and asking
   /// it to settle sooner drops words, but words this far back rarely change.
-  /// The head truncates so the words being spoken stay in view.
-  private var dictationPreview: some View {
+  /// Shown head-truncated, collapsed or expanded, so the words being spoken
+  /// stay in view.
+  private var dictatedText: AttributedString {
     let volatile = model.dictation.volatileText
-    let shown: AttributedString
-    if !model.hasDraft && volatile.isEmpty {
+    guard model.hasDraft || !volatile.isEmpty else {
       var placeholder = AttributedString(model.placeholder)
       placeholder.foregroundColor = .secondary
-      shown = placeholder
-    } else {
-      let base = model.draft.trimmingCharacters(in: .whitespaces)
-      let heard = String(ComposerDictatedText.join(base, volatile).dropFirst(base.count))
-      let unsure = Self.trailingWords(heard, count: ComposerMetrics.unsureWords)
-      var tail = AttributedString(String(heard.suffix(unsure)))
-      tail.font = .body.italic()
-      tail.foregroundColor = .secondary
-      shown = AttributedString(base + heard.dropLast(unsure)) + tail
+      return placeholder
     }
-    return Text(shown)
+    let base = model.draft.trimmingCharacters(in: .whitespaces)
+    let heard = String(ComposerDictatedText.join(base, volatile).dropFirst(base.count))
+    let unsure = Self.trailingWords(heard, count: ComposerMetrics.unsureWords)
+    var tail = AttributedString(String(heard.suffix(unsure)))
+    tail.font = .body.italic()
+    tail.foregroundColor = .secondary
+    return AttributedString(base + heard.dropLast(unsure)) + tail
+  }
+
+  private var dictationPreview: some View {
+    Text(dictatedText)
       .lineLimit(ComposerMetrics.maxLines)
       .truncationMode(.head)
       // The default crossfade ghosts the words while they are still changing.
@@ -739,17 +741,26 @@ struct ComposerRootView: View {
 
   /// Frame 5: collapsing shows the head of the draft on one line,
   /// tail-truncated. It is a summary, not a viewport — no caret, no scroll
-  /// offset, and not editable. Tapping it expands the composer.
+  /// offset, and not editable. Tapping it expands the composer. While
+  /// dictating it follows the words being spoken instead.
   private var draftPreview: some View {
-    Text(model.hasDraft ? model.draft : model.placeholder)
-      .foregroundStyle(model.hasDraft ? .primary : .secondary)
-      .lineLimit(1)
-      .truncationMode(.tail)
-      .frame(maxWidth: .infinity, alignment: .leading)
-      .padding(.leading, ComposerMetrics.previewGap - ComposerMetrics.rowSpacing)
-      .padding(.trailing, ComposerMetrics.textInset)
-      .contentShape(.rect)
-      .onTapGesture { expand() }
+    Group {
+      if model.isDictating {
+        Text(dictatedText)
+          .truncationMode(.head)
+          .contentTransition(.identity)
+      } else {
+        Text(model.hasDraft ? model.draft : model.placeholder)
+          .foregroundStyle(model.hasDraft ? .primary : .secondary)
+          .truncationMode(.tail)
+      }
+    }
+    .lineLimit(1)
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .padding(.leading, ComposerMetrics.previewGap - ComposerMetrics.rowSpacing)
+    .padding(.trailing, ComposerMetrics.textInset)
+    .contentShape(.rect)
+    .onTapGesture { expand() }
   }
 
   /// The agent, then its launch settings: `✱ Claude ⌄ · Opus ⌄ · High ⌄`.
