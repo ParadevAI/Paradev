@@ -469,7 +469,7 @@ const { db, dbWs } = await import("@superset/db/client");
 const { environments, environmentRepositories, githubRepositories } =
 	await import("@superset/db/schema");
 const { and, eq, isNull } = await import("drizzle-orm");
-const { recordReleasedBundle } = await import("./seed");
+const { recordReleasedBundle } = await import("./record-bundle");
 
 // The golden baked the monorepo at its path; a fork asks for the same, and
 // the box acts on the monorepo's own .superset/config.json.

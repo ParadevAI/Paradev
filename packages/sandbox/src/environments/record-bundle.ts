@@ -17,7 +17,7 @@ if (import.meta.main) {
 	const bundleSha = process.argv[2];
 	if (!/^[0-9a-f]{64}$/.test(bundleSha ?? "")) {
 		console.error(
-			"usage: bun run seed <bundle sha256> [image ref]; a database with no released bundle cannot create environments",
+			"usage: bun run record-bundle <bundle sha256> [image ref]; a database with no released bundle cannot create environments",
 		);
 		process.exit(1);
 	}
