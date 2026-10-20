@@ -13378,6 +13378,10 @@ msgstr "Thoát"
 msgid "Quit {displayName}"
 msgstr "Thoát {displayName}"
 
+msgctxt "quit confirmation dialog title"
+msgid "Quit {displayName}"
+msgstr "Thoát {displayName}"
+
 msgid "Quit {displayName} and stop all background services?"
 msgstr "Thoát {displayName} và dừng mọi dịch vụ nền?"
 

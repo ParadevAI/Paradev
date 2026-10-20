@@ -323,7 +323,12 @@ app.on("before-quit", async (event) => {
 				],
 				defaultId: 0,
 				cancelId: 1,
-				title: i18n._(msg({ message: `Quit ${displayName}` })),
+				title: i18n._(
+					msg({
+						message: `Quit ${displayName}`,
+						context: "quit confirmation dialog title",
+					}),
+				),
 				message: i18n._(
 					msg({
 						message: "Are you sure you want to quit?",

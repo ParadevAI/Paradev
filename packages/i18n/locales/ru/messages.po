@@ -13378,6 +13378,10 @@ msgstr "Выйти"
 msgid "Quit {displayName}"
 msgstr "Завершить {displayName}"
 
+msgctxt "quit confirmation dialog title"
+msgid "Quit {displayName}"
+msgstr "Выйти из {displayName}"
+
 msgid "Quit {displayName} and stop all background services?"
 msgstr "Выйти из {displayName} и остановить все фоновые службы?"
 

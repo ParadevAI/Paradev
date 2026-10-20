@@ -13378,6 +13378,10 @@ msgstr "Çık"
 msgid "Quit {displayName}"
 msgstr "{displayName} Uygulamasından Çık"
 
+msgctxt "quit confirmation dialog title"
+msgid "Quit {displayName}"
+msgstr "{displayName}'ten çık"
+
 msgid "Quit {displayName} and stop all background services?"
 msgstr "{displayName}'ten çıkılsın ve tüm arka plan hizmetleri durdurulsun mu?"
 

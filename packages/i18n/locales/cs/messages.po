@@ -13378,6 +13378,10 @@ msgstr "Ukončit"
 msgid "Quit {displayName}"
 msgstr "Ukončit {displayName}"
 
+msgctxt "quit confirmation dialog title"
+msgid "Quit {displayName}"
+msgstr "Ukončit {displayName}"
+
 msgid "Quit {displayName} and stop all background services?"
 msgstr "Ukončit {displayName} a zastavit všechny služby na pozadí?"
 

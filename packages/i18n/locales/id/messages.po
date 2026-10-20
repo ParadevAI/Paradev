@@ -13378,6 +13378,10 @@ msgstr "Keluar"
 msgid "Quit {displayName}"
 msgstr "Keluar dari {displayName}"
 
+msgctxt "quit confirmation dialog title"
+msgid "Quit {displayName}"
+msgstr "Keluar dari {displayName}"
+
 msgid "Quit {displayName} and stop all background services?"
 msgstr "Keluar dari {displayName} dan hentikan semua layanan latar belakang?"
 

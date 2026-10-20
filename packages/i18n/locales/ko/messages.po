@@ -13378,6 +13378,10 @@ msgstr "종료"
 msgid "Quit {displayName}"
 msgstr "{displayName} 종료"
 
+msgctxt "quit confirmation dialog title"
+msgid "Quit {displayName}"
+msgstr "{displayName} 종료"
+
 msgid "Quit {displayName} and stop all background services?"
 msgstr "{displayName}을 종료하고 모든 백그라운드 서비스를 중지할까요?"
 

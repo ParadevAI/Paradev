@@ -13378,6 +13378,10 @@ msgstr "Esci"
 msgid "Quit {displayName}"
 msgstr "Esci da {displayName}"
 
+msgctxt "quit confirmation dialog title"
+msgid "Quit {displayName}"
+msgstr "Esci da {displayName}"
+
 msgid "Quit {displayName} and stop all background services?"
 msgstr "Uscire da {displayName} e arrestare tutti i servizi in background?"
 
