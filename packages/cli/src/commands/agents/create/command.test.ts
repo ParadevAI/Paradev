@@ -204,6 +204,18 @@ describe("agents create", () => {
 		expect(runInput).toBeUndefined();
 	});
 
+	test("asks for a chat session and says when the host ran a terminal", async () => {
+		const result = await invoke(undefined, {
+			prompt: "Review this diff",
+			surface: "chat",
+		});
+
+		expect(runInput).toMatchObject({ surface: "chat" });
+		expect(result).toMatchObject({
+			message: expect.stringContaining("cannot run this agent as a chat"),
+		});
+	});
+
 	test("rejects combining a handoff with a fork", async () => {
 		await expect(
 			invoke(undefined, {

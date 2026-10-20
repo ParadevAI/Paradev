@@ -1,9 +1,20 @@
 import { terminalColorsSchema } from "@superset/shared/terminal-colors";
-import { TERMINAL_HANDOFF_MAX_CHARS } from "@superset/shared/terminal-session-handoff";
+import {
+	boundTranscriptText,
+	TERMINAL_HANDOFF_MAX_CHARS,
+} from "@superset/shared/terminal-session-handoff";
 import { normalizeTerminalTitle } from "@superset/shared/terminal-title-scanner";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
+import {
+	type ChatTerminal,
+	chatTranscriptText,
+	findChatTerminal,
+	interruptChat,
+	isChatInterruptInput,
+	sendToChat,
+} from "../../../chat-v3/chatTerminal";
 import { getSupervisor, waitForDaemonReady } from "../../../daemon";
 import { terminalSessions, workspaces } from "../../../db/schema";
 import {
@@ -25,6 +36,29 @@ import {
 import type { HostServiceContext } from "../../../types";
 import { protectedProcedure, router } from "../../index";
 import { toTerminalSessionError } from "./errors";
+
+function runOnChat<T>(execute: () => T): T {
+	try {
+		return execute();
+	} catch (error) {
+		throw new TRPCError({
+			code: "CONFLICT",
+			message: error instanceof Error ? error.message : String(error),
+			cause: error,
+		});
+	}
+}
+
+function readChatTranscript(chat: ChatTerminal): string {
+	const text = chatTranscriptText(chat);
+	if (text === null) {
+		throw new TRPCError({
+			code: "NOT_FOUND",
+			message: "The chat session has no history on this host",
+		});
+	}
+	return text;
+}
 
 export const createSessionInputSchema = z.object({
 	workspaceId: z.string(),
@@ -167,7 +201,19 @@ export const terminalRouter = router({
 				data: z.string(),
 			}),
 		)
-		.mutation(({ input }) => {
+		.mutation(({ ctx, input }) => {
+			const chat = findChatTerminal(ctx, input);
+			if (chat) {
+				if (!isChatInterruptInput(input.data)) {
+					throw new TRPCError({
+						code: "BAD_REQUEST",
+						message:
+							"A chat session takes only an interrupt key (esc or ctrl+c); send text as a message",
+					});
+				}
+				runOnChat(() => interruptChat(chat));
+				return { success: true as const };
+			}
 			const result = writeInputToSession(input);
 			if ("error" in result) {
 				throw toTerminalSessionError(result);
@@ -192,6 +238,17 @@ export const terminalRouter = router({
 				}),
 		)
 		.mutation(async ({ ctx, input }) => {
+			const chat = findChatTerminal(ctx, input);
+			if (chat) {
+				if (!input.submit) {
+					throw new TRPCError({
+						code: "BAD_REQUEST",
+						message: "A chat session cannot stage text without sending it",
+					});
+				}
+				runOnChat(() => sendToChat(chat, input.text));
+				return { terminalId: input.terminalId, submitted: true };
+			}
 			const message = { ...input, db: ctx.db, eventBus: ctx.eventBus };
 			const binding = ctx.terminalAgentStore.get(input.terminalId);
 			const result =
@@ -218,6 +275,21 @@ export const terminalRouter = router({
 			}),
 		)
 		.query(async ({ ctx, input }) => {
+			const chat = findChatTerminal(ctx, input);
+			if (chat) {
+				const text = boundTranscriptText(
+					readChatTranscript(chat),
+					TERMINAL_HANDOFF_MAX_CHARS,
+				);
+				return {
+					terminalId: input.terminalId,
+					cols: 0,
+					rows: 0,
+					text: input.maxLines
+						? text.split("\n").slice(-input.maxLines).join("\n")
+						: text,
+				};
+			}
 			const result = await snapshotSession({
 				...input,
 				db: ctx.db,
@@ -249,6 +321,19 @@ export const terminalRouter = router({
 			}),
 		)
 		.query(async ({ ctx, input }) => {
+			const chat = findChatTerminal(ctx, input);
+			if (chat) {
+				const text = readChatTranscript(chat);
+				return {
+					terminalId: input.terminalId,
+					text: boundTranscriptText(
+						text,
+						input.maxChars ?? TERMINAL_HANDOFF_MAX_CHARS,
+					),
+					source: "harness" as const,
+					streamBytes: text.length,
+				};
+			}
 			const result = await transcriptSession({
 				...input,
 				db: ctx.db,

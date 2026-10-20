@@ -5,6 +5,10 @@ import {
 import { boundTranscriptText } from "@superset/shared/terminal-session-handoff";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+import {
+	chatTranscriptText,
+	findChatTerminal,
+} from "../../../chat-v3/chatTerminal";
 import type { HostDb } from "../../../db";
 import type { EventBus } from "../../../events";
 import { reconcileMissingTerminalSessions } from "../../../terminal/reaper/reaper";
@@ -471,6 +475,16 @@ export const terminalAgentsRouter = router({
 	transcript: protectedProcedure
 		.input(z.object({ workspaceId: z.string(), terminalId: z.string() }))
 		.query(async ({ ctx, input }) => {
+			const chat = findChatTerminal(ctx, input);
+			if (chat) {
+				const text = chatTranscriptText(chat);
+				return text === null
+					? null
+					: {
+							text: boundTranscriptText(text, MAX_AGENT_TRANSCRIPT_CHARS),
+							harness: "chat",
+						};
+			}
 			const binding = getTerminalAgentBinding(ctx.db, input.terminalId);
 			if (!binding || binding.workspaceId !== input.workspaceId) return null;
 			const bound = terminalHarnessSession(ctx.db, input.terminalId);

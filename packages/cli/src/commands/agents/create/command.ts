@@ -43,6 +43,11 @@ export default command({
 		effort: string().desc(
 			"Reasoning effort for this launch (agent-specific; omit to use the agent default)",
 		),
+		surface: string()
+			.enum("terminal", "chat")
+			.desc(
+				"Run the agent in a terminal (default) or in a chat session; both are addressed by the returned sessionId",
+			),
 		attachmentId: string()
 			.variadic()
 			.desc("Pre-uploaded attachment UUID; pass --attachment-id repeatedly"),
@@ -122,13 +127,20 @@ export default command({
 			model: options.model,
 			effort: options.effort,
 			attachmentIds: attachmentIds.length > 0 ? attachmentIds : undefined,
+			surface: options.surface ?? undefined,
 		});
+
+		const session = `${result.chatSessionId ? "chat" : "terminal"} ${result.sessionId}`;
+		const chatRefused =
+			options.surface === "chat" && !result.chatSessionId
+				? "; the host cannot run this agent as a chat session"
+				: "";
 
 		return {
 			data: result,
 			message: options.fromTerminal
-				? `Handed ${options.fromTerminal} off to ${result.label} with ${prompt.length} characters of context (terminal ${result.sessionId})`
-				: `Launched ${result.label} (terminal ${result.sessionId}) in workspace ${options.workspace}`,
+				? `Handed ${options.fromTerminal} off to ${result.label} with ${prompt.length} characters of context (${session})`
+				: `Launched ${result.label} (${session}) in workspace ${options.workspace}${chatRefused}`,
 		};
 	},
 });

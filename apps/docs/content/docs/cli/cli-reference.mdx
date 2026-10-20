@@ -1072,11 +1072,13 @@ superset agents list --host host_…
 		{ flag: "--effort <level>", description: "Reasoning effort for this launch. Omit to use the agent default." },
 		{ flag: "--attachment-id <uuid>", description: "Pre-uploaded attachment UUID; pass repeatedly for multiple attachments." },
 		{ flag: "--attachment <path>", description: "Local file path to upload as an attachment. Repeatable." },
+		{ flag: "--surface <terminal|chat>", description: "Run the agent in a terminal (default) or in a chat session. A host that cannot run the agent as a chat starts it in a terminal and says so." },
 	]}
 	output={`{
   kind: "terminal" | "chat";
   sessionId: string;
   label: string;
+  chatSessionId?: string; // set when the agent runs in a chat session
 }`}
 >
 Create an agent session in an existing workspace on its host (default: this
@@ -1093,6 +1095,16 @@ superset agents create --workspace ws_… --agent claude --fork-session 0b7c…
 # Hand a terminal's recent output to a different agent
 superset agents create --workspace ws_… --agent codex --from-terminal term_…
 superset agents create --workspace ws_… --agent codex --from-terminal term_… --context-chars 12000
+```
+
+A chat session is addressed by its `sessionId` like a terminal:
+`terminals send`, `terminals read`, `terminals wait`, `agents read`, and
+`agents wait` all accept it. `terminals read` returns the conversation as text,
+and `terminals send --keys` takes only `esc` or `ctrl+c`, which cancel the
+running turn.
+
+```bash
+superset agents create --workspace ws_… --agent claude --surface chat --prompt "Audit the login flow"
 ```
 
 Pass at most one of `--resume-session`, `--fork-session`, and
