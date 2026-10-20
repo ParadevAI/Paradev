@@ -10,7 +10,7 @@ export interface ResolvedEnvironment {
 	sourceKind: "image" | "fork";
 	sourceRef: string;
 	region: string;
-	bundleSha: string | null;
+	bundleSha: string;
 	hooksRepositoryId: string | null;
 	envs: Record<string, string>;
 }
@@ -23,6 +23,11 @@ export async function resolveEnvironment(
 		where: eq(environments.id, environmentId),
 	});
 	if (!row) return null;
+	if (!row.bundleSha) {
+		throw new Error(
+			`Environment ${row.id} has no bundle pin; its boxes would boot on whatever the image baked`,
+		);
+	}
 
 	const rows = await db
 		.select({

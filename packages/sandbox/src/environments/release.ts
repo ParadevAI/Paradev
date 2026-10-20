@@ -39,7 +39,6 @@ import { join } from "node:path";
 import {
 	SANDBOX_IMAGE_NAME,
 	SHARED_ENVIRONMENT_NAME,
-	SHARED_ENVIRONMENT_ORGANIZATION_ID,
 } from "@superset/shared/constants";
 import {
 	SANDBOX_CONTRACT_VERSION,
@@ -472,7 +471,7 @@ if (!SKIP_IMAGE) {
 const { db, dbWs } = await import("@superset/db/client");
 const { environments, environmentRepositories, githubRepositories } =
 	await import("@superset/db/schema");
-const { and, eq, isNotNull, isNull, or } = await import("drizzle-orm");
+const { and, eq, isNull } = await import("drizzle-orm");
 const { seedSharedEnvironments } = await import("./seed");
 
 // The golden baked the monorepo at its path; a fork asks for the same, and
@@ -502,7 +501,10 @@ if (ENVIRONMENT_ID && !previous)
 		`rows: environment ${ENVIRONMENT_ID} is not in organization ${ORGANIZATION_ID}; ${golden} left for inspection`,
 	);
 
-await seedSharedEnvironments(SANDBOX_IMAGE_NAME);
+await seedSharedEnvironments({
+	imageRef: SANDBOX_IMAGE_NAME,
+	bundleSha: bundle.sha256,
+});
 const fromGolden = {
 	provider: "vercel" as const,
 	sourceKind: "fork" as const,
@@ -516,15 +518,7 @@ const { internal, bundled } = await dbWs.transaction(async (tx) => {
 	const bundled = await tx
 		.update(environments)
 		.set({ bundleSha: bundle.sha256 })
-		.where(
-			and(
-				isNull(environments.archivedAt),
-				or(
-					isNotNull(environments.bundleSha),
-					eq(environments.organizationId, SHARED_ENVIRONMENT_ORGANIZATION_ID),
-				),
-			),
-		)
+		.where(isNull(environments.archivedAt))
 		.returning({ id: environments.id });
 	const [internal] = previous
 		? await tx

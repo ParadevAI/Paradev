@@ -77,11 +77,8 @@ export const SANDBOX_ASSET_BASE_URL = "https://cdn.superset.sh/sandbox";
  */
 export const sandboxIdentitySchema = z.object({
 	SUPERSET_SANDBOX_CONTRACT: z.literal(String(SANDBOX_CONTRACT_VERSION)),
-	/** The bundle the environment pins; absent means the image's own stays. */
-	SUPERSET_BUNDLE_SHA: z
-		.string()
-		.regex(/^[0-9a-f]{64}$/)
-		.optional(),
+	/** The bundle the environment pins; the box installs it before anything else runs. */
+	SUPERSET_BUNDLE_SHA: z.string().regex(/^[0-9a-f]{64}$/),
 	SUPERSET_API_URL: z.string().url(),
 	SUPERSET_SANDBOX_WORKSPACE_ID: z.string().uuid(),
 	SUPERSET_SANDBOX_ORGANIZATION_ID: z.string().uuid(),

@@ -27,6 +27,7 @@ import {
 } from "../../lib/sandbox";
 import { jwtProcedure, userError } from "../../trpc";
 import { loadVisibleWorkspace } from "../cloud-workspace/access";
+import { currentBundleSha } from "./current-bundle";
 import { regionForRequest } from "./region-for-request";
 import { secretsRouter } from "./secrets";
 import { decryptSecret, encryptSecret } from "./secrets/utils/crypto";
@@ -299,6 +300,7 @@ export const environmentRouter = {
 					sourceKind: "image",
 					sourceRef: SANDBOX_IMAGE_NAME,
 					region: input.region ?? regionForRequest(ctx.headers),
+					bundleSha: await currentBundleSha(),
 					scope: input.scope,
 					createdByUserId: ctx.userId,
 				})
@@ -413,7 +415,7 @@ export const environmentRouter = {
 				sourceKind: "fork" as const,
 				sourceRef: goldenName,
 				region: golden.region,
-				bundleSha: source?.bundleSha ?? null,
+				bundleSha: await currentBundleSha(),
 				hooksRepositoryId,
 			};
 			const row = await dbWs
