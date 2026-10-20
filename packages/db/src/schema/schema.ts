@@ -845,8 +845,7 @@ export const sandboxBundles = pgTable("sandbox_bundles", {
 
 /**
  * The repositories an environment checks out, in order; the first is the
- * primary. An environment with none (the shared image environment) takes
- * its repositories at workspace create.
+ * primary.
  */
 export const environmentRepositories = pgTable(
 	"environment_repositories",

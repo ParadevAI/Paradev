@@ -36,10 +36,7 @@
 import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import {
-	SANDBOX_IMAGE_NAME,
-	SHARED_ENVIRONMENT_NAME,
-} from "@superset/shared/constants";
+import { SANDBOX_IMAGE_NAME } from "@superset/shared/constants";
 import {
 	SANDBOX_CONTRACT_VERSION,
 	SANDBOX_PATHS,
@@ -472,7 +469,7 @@ const { db, dbWs } = await import("@superset/db/client");
 const { environments, environmentRepositories, githubRepositories } =
 	await import("@superset/db/schema");
 const { and, eq, isNull } = await import("drizzle-orm");
-const { seedSharedEnvironments } = await import("./seed");
+const { recordReleasedBundle } = await import("./seed");
 
 // The golden baked the monorepo at its path; a fork asks for the same, and
 // the box acts on the monorepo's own .superset/config.json.
@@ -501,7 +498,7 @@ if (ENVIRONMENT_ID && !previous)
 		`rows: environment ${ENVIRONMENT_ID} is not in organization ${ORGANIZATION_ID}; ${golden} left for inspection`,
 	);
 
-await seedSharedEnvironments({
+await recordReleasedBundle({
 	imageRef: SANDBOX_IMAGE_NAME,
 	bundleSha: bundle.sha256,
 });
@@ -546,7 +543,7 @@ const { internal, bundled } = await dbWs.transaction(async (tx) => {
 	return { internal, bundled };
 });
 log(
-	`rows: ${SHARED_ENVIRONMENT_NAME} -> image ${SANDBOX_IMAGE_NAME}; ${bundled.length} environments -> bundle ${bundle.sha256.slice(0, 12)}`,
+	`rows: bundle ${bundle.sha256.slice(0, 12)} recorded; ${bundled.length} environments -> it`,
 );
 log(
 	`rows: ${internal.name} (${internal.id}) -> fork of ${golden}, bundle ${bundle.sha256.slice(0, 12)}`,

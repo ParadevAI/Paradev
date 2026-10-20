@@ -311,11 +311,6 @@ export const SANDBOX_IMAGE_NAME = "superset-hostsvc";
 export const CLOUD_WORKSPACE_PROVISION_TRANSACTION =
 	"cloud-workspace.provision";
 
-export const SHARED_ENVIRONMENT_ORGANIZATION_ID =
-	"00000000-0000-0000-0000-000000000000";
-
-export const SHARED_ENVIRONMENT_NAME = "Default";
-
 // Terminals set no TERM_PROGRAM, like xterm. Agents take kitty-only paths
 // under "kitty" that xterm.js cannot serve, and under "vscode" Claude Code
 // amplifies the full-fidelity wheel stream ~2x. Without it, agents identify

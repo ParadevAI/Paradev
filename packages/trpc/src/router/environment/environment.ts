@@ -6,10 +6,7 @@ import {
 	environments,
 	githubRepositories,
 } from "@superset/db/schema";
-import {
-	SANDBOX_IMAGE_NAME,
-	SHARED_ENVIRONMENT_ORGANIZATION_ID,
-} from "@superset/shared/constants";
+import { SANDBOX_IMAGE_NAME } from "@superset/shared/constants";
 import { SANDBOX_REGION_IDS } from "@superset/shared/sandbox-regions";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { and, asc, eq, inArray, isNull, or } from "drizzle-orm";
@@ -52,35 +49,6 @@ export async function loadEnvironment(
 		});
 	}
 	return row;
-}
-
-export function isSharedEnvironment(row: { organizationId: string }): boolean {
-	return row.organizationId === SHARED_ENVIRONMENT_ORGANIZATION_ID;
-}
-
-export function secretOwnerOrganizationId(
-	row: { organizationId: string },
-	activeOrganizationId: string | null,
-): string {
-	if (!isSharedEnvironment(row)) return row.organizationId;
-	if (!activeOrganizationId) {
-		throw userError({
-			code: "BAD_REQUEST",
-			message: "No active organization",
-			i18nKey: "serverError.environment.noActiveOrganization",
-		});
-	}
-	return activeOrganizationId;
-}
-
-function assertOwned(row: { organizationId: string }): void {
-	if (isSharedEnvironment(row)) {
-		throw userError({
-			code: "FORBIDDEN",
-			message: "This environment is managed by Superset and cannot be changed",
-			i18nKey: "serverError.environment.sharedEnvironmentIsReadOnly",
-		});
-	}
 }
 
 /**
@@ -368,7 +336,6 @@ export const environmentRouter = {
 				? await loadEnvironment(input.environmentId, ctx)
 				: null;
 			if (target) {
-				assertOwned(target);
 				if (target.organizationId !== workspace.organizationId) {
 					throw userError({
 						code: "BAD_REQUEST",
@@ -527,7 +494,6 @@ export const environmentRouter = {
 		.mutation(async ({ ctx, input }) => {
 			await assertCloudAccess(ctx);
 			const current = await loadEnvironment(input.id, ctx);
-			assertOwned(current);
 
 			// A golden was built for its repositories: cloned, set up, snapshotted.
 			// A different set means a different golden, so it is promoted again.
@@ -594,7 +560,6 @@ export const environmentRouter = {
 		.mutation(async ({ ctx, input }) => {
 			await assertCloudAccess(ctx);
 			const environment = await loadEnvironment(input.id, ctx);
-			assertOwned(environment);
 			const [archived] = await db
 				.update(environments)
 				.set({ archivedAt: new Date() })
