@@ -11,10 +11,11 @@ export function openPullRequestLink(
 	url: string,
 	action: LinkAction | null,
 	openPane: OpenPullRequestPane,
+	openInBrowser: (url: string) => void = openPullRequestInBrowser,
 ): void {
 	const ref = pullRequestRefFromUrl(url);
 	if (!ref || action === "external") {
-		openPullRequestInBrowser(url);
+		openInBrowser(url);
 		return;
 	}
 	openPane(ref, action === "newTab" ? "tab" : "split");
