@@ -16,7 +16,8 @@ import { msg } from "@lingui/core/macro";
 export type {
 	ComposerActionContext,
 	ComposerChip,
-	ComposerChipMatch,
+	ComposerDraft,
+	ComposerDraftSegment,
 	ComposerMentionEntry,
 	ComposerMentionProvider,
 	ComposerMentionSource,
@@ -42,26 +43,18 @@ export function PromptInput({
 	commands,
 	dictation,
 	status = "ready",
-	submitWhileStreaming = false,
-	placement = "top",
 	toolbar,
 	toolbarEnd,
-	defaultValue,
-	findChips,
-	onChange,
-	collapseLargePastes = false,
+	draft,
+	onDraftChange,
 	onSubmit,
 	onStop,
 	stopOnEscape = true,
-	header,
-	onAddFiles,
 	allowEmptySubmit = false,
-	clearOnSubmit = true,
-	hideSubmit = false,
+	disabled = false,
+	pending = false,
 	autoFocus = false,
-	onMentionHighlight,
 	onAttachmentClick,
-	onChipClick,
 	chipForPaste,
 	renderChip,
 	history,
@@ -86,26 +79,18 @@ export function PromptInput({
 						commands={commands}
 						dictation={dictation}
 						status={status}
-						submitWhileStreaming={submitWhileStreaming}
-						placement={placement}
 						toolbar={toolbar}
 						toolbarEnd={toolbarEnd}
-						defaultValue={defaultValue}
-						findChips={findChips}
-						onChange={onChange}
-						collapseLargePastes={collapseLargePastes}
+						draft={draft}
+						onDraftChange={onDraftChange}
 						onSubmit={onSubmit}
 						onStop={onStop}
 						stopOnEscape={stopOnEscape}
-						header={header}
-						onAddFiles={onAddFiles}
 						allowEmptySubmit={allowEmptySubmit}
-						clearOnSubmit={clearOnSubmit}
-						hideSubmit={hideSubmit}
+						disabled={disabled}
+						pending={pending}
 						autoFocus={autoFocus}
-						onMentionHighlight={onMentionHighlight}
 						onAttachmentClick={onAttachmentClick}
-						onChipClick={onChipClick}
 						chipForPaste={chipForPaste}
 						history={history}
 					/>

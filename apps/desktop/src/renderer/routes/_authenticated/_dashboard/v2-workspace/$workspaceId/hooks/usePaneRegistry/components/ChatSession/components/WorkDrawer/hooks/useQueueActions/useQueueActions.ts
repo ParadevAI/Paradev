@@ -4,14 +4,15 @@ import type { UserMessage } from "@superset/chat/protocol";
 import { errorMessage, rawErrorMessage } from "@superset/i18n/errors";
 import { toast } from "@superset/ui/sonner";
 import { useCallback } from "react";
+import {
+	formatAttachmentTag,
+	parseAttachmentTags,
+} from "../../../../utils/attachmentTags";
 import type { DrawerQueue } from "../../types";
 
 const ALREADY_GONE = /is not queued$/;
 
-export function useQueueActions(
-	promptQueue: DrawerQueue | undefined,
-	appendToComposer: (text: string) => void,
-) {
+export function useQueueActions(promptQueue: DrawerQueue | undefined) {
 	const { t } = useLingui();
 
 	const runQueueAction = useCallback(
@@ -29,13 +30,26 @@ export function useQueueActions(
 		[t],
 	);
 
-	const editQueued = useCallback(
-		async (prompt: UserMessage) => {
+	// The edited text keeps the prompt's attachments; mention ranges are dropped
+	// because the text they pointed into has changed.
+	const updateQueued = useCallback(
+		async (prompt: UserMessage, text: string) => {
 			if (!promptQueue) return;
-			if (!(await runQueueAction(() => promptQueue.remove(prompt.id)))) return;
-			appendToComposer(userMessageText(prompt));
+			const { attachments } = parseAttachmentTags(userMessageText(prompt));
+			const content = [
+				text.trim(),
+				...attachments.map((attachment) => formatAttachmentTag(attachment)),
+			]
+				.filter(Boolean)
+				.join("\n");
+			await runQueueAction(() =>
+				promptQueue.update(prompt.id, [
+					{ type: "text", text: content },
+					...prompt.content.filter((part) => part.type !== "text"),
+				]),
+			);
 		},
-		[promptQueue, runQueueAction, appendToComposer],
+		[promptQueue, runQueueAction],
 	);
 
 	const clearQueued = useCallback(async () => {
@@ -55,7 +69,8 @@ export function useQueueActions(
 
 	return {
 		onClear: () => void clearQueued(),
-		onEdit: (prompt: UserMessage) => void editQueued(prompt),
+		onUpdate: (prompt: UserMessage, text: string) =>
+			void updateQueued(prompt, text),
 		onRemove: (id: string) => {
 			if (promptQueue) void runQueueAction(() => promptQueue.remove(id));
 		},

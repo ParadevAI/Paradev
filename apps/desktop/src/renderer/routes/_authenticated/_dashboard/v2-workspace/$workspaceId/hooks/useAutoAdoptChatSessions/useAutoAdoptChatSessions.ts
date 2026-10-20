@@ -26,7 +26,7 @@ import {
 	reopenCloudChatLaunch,
 } from "../../utils/closedChatSessions";
 import { markChatSessionLive } from "../usePaneRegistry/components/ChatPane/components/AcpChatPane/hooks/useChatSessionLiveness";
-import { readComposerDraft } from "../usePaneRegistry/components/ChatSession/components/Composer/hooks/useComposerDraft";
+import { hasComposerDraft } from "../usePaneRegistry/components/ChatSession/components/Composer/hooks/useComposerDraft";
 import { useChatWiring } from "../usePaneRegistry/components/ChatSession/hooks/useSessionClient";
 import { PENDING_CLOUD_CHAT_TIMEOUT_MS } from "./constants";
 import { initialCloudChatPromptHash } from "./utils/initialCloudChatPrompt";
@@ -195,7 +195,7 @@ export function useAutoAdoptChatSessions({
 				waitingSince.current.delete(pending.paneId);
 				const typed =
 					pending.data.queuedPrompts?.length ||
-					readComposerDraft(`chat-v3-draft:${pending.data.draftId}`);
+					hasComposerDraft(`chat-v3-draft:${pending.data.draftId}`);
 				if (typed) {
 					pending.store
 						.getState()

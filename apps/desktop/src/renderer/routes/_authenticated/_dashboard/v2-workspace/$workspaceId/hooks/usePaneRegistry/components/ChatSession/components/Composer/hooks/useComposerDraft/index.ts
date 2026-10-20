@@ -1,6 +1,6 @@
 export {
 	prependToDraft,
-	readDraft as readComposerDraft,
-	takeRecoveredDraftText,
+	hasDraft as hasComposerDraft,
+	takeRecoveredDraft,
 	useComposerDraft,
 } from "./useComposerDraft";

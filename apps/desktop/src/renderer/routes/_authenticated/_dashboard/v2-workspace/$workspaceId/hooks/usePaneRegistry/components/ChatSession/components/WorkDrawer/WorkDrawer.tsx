@@ -1,5 +1,4 @@
 import { useLingui } from "@lingui/react/macro";
-import { userMessageText } from "@superset/chat/core";
 import type { UserMessage } from "@superset/chat/protocol";
 import { cn } from "@superset/ui/utils";
 import {
@@ -13,7 +12,6 @@ import {
 	useState,
 } from "react";
 import { CHAT_COLUMN_CLASSNAME, CHAT_GUTTER_CLASSNAME } from "../../constants";
-import { parseAttachmentTags } from "../../utils/attachmentTags";
 import { DrawerSection } from "./components/DrawerSection";
 import { QueuedPromptRow } from "./components/QueuedPromptRow";
 import { QueuePausedBar } from "./components/QueuePausedBar";
@@ -25,10 +23,6 @@ const MAX_HEIGHT = "13.5rem";
 const STOP_SELECTOR = "[data-drawer-stop]";
 
 type Entry = { kind: "queued"; prompt: UserMessage } | { kind: "header" };
-
-const hasAttachments = (prompt: UserMessage) =>
-	prompt.content.some((content) => content.type === "attachment") ||
-	parseAttachmentTags(userMessageText(prompt)).attachments.length > 0;
 
 const stopsIn = (root: HTMLElement | null) => [
 	...(root?.querySelectorAll<HTMLElement>(STOP_SELECTOR) ?? []),
@@ -45,13 +39,11 @@ export function WorkDrawer({
 	ref,
 	queue,
 	paneRef,
-	onAppendToComposer,
 	onExit,
 }: {
 	ref?: Ref<WorkDrawerHandle>;
 	queue?: DrawerQueue;
 	paneRef?: RefObject<HTMLElement | null>;
-	onAppendToComposer: (text: string) => void;
 	onExit: (exit: DrawerExit) => void;
 }) {
 	const { t } = useLingui();
@@ -60,7 +52,8 @@ export function WorkDrawer({
 	const [activeKey, setActiveKey] = useState<string | null>(null);
 	const lastFocusRef = useRef<string | null>(null);
 	const previousKeysRef = useRef<string[]>([]);
-	const queueActions = useQueueActions(queue, onAppendToComposer);
+	const queueActions = useQueueActions(queue);
+	const [editingId, setEditingId] = useState<string | null>(null);
 	const prompts = queue?.prompts ?? [];
 	const actionableQueue = queue?.actionable === true;
 	const paneThird = usePaneThird(paneRef);
@@ -199,12 +192,8 @@ export function WorkDrawer({
 				handled = entry ? remove(entry) : false;
 				break;
 			case "e":
-				handled =
-					entry?.kind === "queued" &&
-					actionableQueue &&
-					!hasAttachments(entry.prompt);
-				if (handled && entry?.kind === "queued")
-					queueActions.onEdit(entry.prompt);
+				handled = entry?.kind === "queued" && actionableQueue;
+				if (handled && entry?.kind === "queued") setEditingId(entry.prompt.id);
 				break;
 			default:
 				handled = false;
@@ -273,7 +262,12 @@ export function WorkDrawer({
 								<QueuedPromptRow
 									actionable={actionableQueue}
 									key={prompt.id}
-									onEdit={queueActions.onEdit}
+									editing={editingId === prompt.id}
+									onEdit={() => setEditingId(prompt.id)}
+									onEditEnd={(text) => {
+										setEditingId(null);
+										if (text !== null) queueActions.onUpdate(prompt, text);
+									}}
 									onRemove={queueActions.onRemove}
 									onSteer={queueActions.onSteer}
 									prompt={prompt}

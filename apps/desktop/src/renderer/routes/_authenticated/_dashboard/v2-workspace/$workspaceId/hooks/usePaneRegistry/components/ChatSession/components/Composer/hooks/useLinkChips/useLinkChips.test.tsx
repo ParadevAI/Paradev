@@ -79,7 +79,10 @@ async function setup() {
 	const text = () => view.container.textContent ?? "";
 	const type = async (value: string) => {
 		await act(async () => {
-			handle.current?.appendText(value);
+			handle.current?.restoreDraft({
+				segments: [{ type: "text", text: value }],
+				attachments: [],
+			});
 		});
 	};
 	const chipHasPopup = () => {
