@@ -391,7 +391,7 @@ msgstr "{0} desenvolvedores estão classificados por uso de agentes. Seus últim
 msgid "{0} disabled"
 msgstr "{0} desativado"
 
-#. placeholder {0}: COMPANY.NAME
+#. placeholder {0}: BRAND.INTRO_NAME
 msgid "{0} Documentation"
 msgstr "Documentação do {0}"
 
@@ -1190,7 +1190,7 @@ msgstr "#{0} {1}\n"
 msgid "#engineering"
 msgstr "#engineering"
 
-#. placeholder {0}: COMPANY.NAME
+#. placeholder {0}: BRAND.NAME
 msgid "%s | {0} Docs"
 msgstr "%s | Documentação do {0}"
 
@@ -11553,11 +11553,11 @@ msgstr "de todos os tokens"
 msgid "Off"
 msgstr "Desligado"
 
-#. placeholder {0}: COMPANY.NAME
+#. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
 msgstr "Documentação oficial do {0}, o aplicativo para executar mais de 100 agentes de programação em paralelo."
 
-#. placeholder {0}: COMPANY.NAME
+#. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}. Learn how to run 100+ coding agents in parallel on your machine."
 msgstr "Documentação oficial do {0}. Aprenda a executar mais de 100 agentes de programação em paralelo na sua máquina."
 

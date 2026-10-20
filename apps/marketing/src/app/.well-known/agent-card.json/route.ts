@@ -1,3 +1,4 @@
+import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import { API_URL, MCP_SERVER_URL } from "@/lib/llms";
 
@@ -12,7 +13,7 @@ export function GET() {
 		url: MCP_SERVER_URL,
 		preferredTransport: "JSONRPC",
 		provider: {
-			organization: COMPANY.NAME,
+			organization: BRAND.INTRO_NAME,
 			url: baseUrl,
 		},
 		version: "1.0.0",

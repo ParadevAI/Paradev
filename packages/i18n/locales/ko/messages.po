@@ -391,7 +391,7 @@ msgstr "{0}명의 개발자가 에이전트 사용량으로 순위에 올라 있
 msgid "{0} disabled"
 msgstr "{0} 비활성화됨"
 
-#. placeholder {0}: COMPANY.NAME
+#. placeholder {0}: BRAND.INTRO_NAME
 msgid "{0} Documentation"
 msgstr "{0} 문서"
 
@@ -1190,7 +1190,7 @@ msgstr "#{0} {1}\n"
 msgid "#engineering"
 msgstr "#engineering"
 
-#. placeholder {0}: COMPANY.NAME
+#. placeholder {0}: BRAND.NAME
 msgid "%s | {0} Docs"
 msgstr "%s | {0} 문서"
 
@@ -11553,11 +11553,11 @@ msgstr "전체 토큰 대비"
 msgid "Off"
 msgstr "끔"
 
-#. placeholder {0}: COMPANY.NAME
+#. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
 msgstr "100개 이상의 코딩 에이전트를 병렬로 실행하는 앱, {0}의 공식 문서입니다."
 
-#. placeholder {0}: COMPANY.NAME
+#. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}. Learn how to run 100+ coding agents in parallel on your machine."
 msgstr "{0} 공식 문서입니다. 기기에서 100개 이상의 코딩 에이전트를 병렬로 실행하는 방법을 알아보세요."
 

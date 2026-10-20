@@ -391,7 +391,7 @@ msgstr "{0} nhà phát triển được xếp hạng theo mức dùng agent. 30 
 msgid "{0} disabled"
 msgstr "Đã tắt {0}"
 
-#. placeholder {0}: COMPANY.NAME
+#. placeholder {0}: BRAND.INTRO_NAME
 msgid "{0} Documentation"
 msgstr "Tài liệu {0}"
 
@@ -1190,7 +1190,7 @@ msgstr "#{0} {1}\n"
 msgid "#engineering"
 msgstr "#engineering"
 
-#. placeholder {0}: COMPANY.NAME
+#. placeholder {0}: BRAND.NAME
 msgid "%s | {0} Docs"
 msgstr "%s | Tài liệu {0}"
 
@@ -11553,11 +11553,11 @@ msgstr "trên tổng số token"
 msgid "Off"
 msgstr "Tắt"
 
-#. placeholder {0}: COMPANY.NAME
+#. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
 msgstr "Tài liệu chính thức của {0}, ứng dụng chạy song song hơn 100 tác tử lập trình."
 
-#. placeholder {0}: COMPANY.NAME
+#. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}. Learn how to run 100+ coding agents in parallel on your machine."
 msgstr "Tài liệu chính thức của {0}. Tìm hiểu cách chạy song song hơn 100 tác tử lập trình trên máy của bạn."
 

@@ -391,7 +391,7 @@ msgstr "{0}人の開発者がエージェント利用量でランク付けされ
 msgid "{0} disabled"
 msgstr "{0}を無効にしました"
 
-#. placeholder {0}: COMPANY.NAME
+#. placeholder {0}: BRAND.INTRO_NAME
 msgid "{0} Documentation"
 msgstr "{0}ドキュメント"
 
@@ -1190,7 +1190,7 @@ msgstr "#{0} {1}\n"
 msgid "#engineering"
 msgstr "#engineering"
 
-#. placeholder {0}: COMPANY.NAME
+#. placeholder {0}: BRAND.NAME
 msgid "%s | {0} Docs"
 msgstr "%s | {0}ドキュメント"
 
@@ -11553,11 +11553,11 @@ msgstr "全トークン中"
 msgid "Off"
 msgstr "オフ"
 
-#. placeholder {0}: COMPANY.NAME
+#. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
 msgstr "100以上のコーディングエージェントを並列実行できるアプリ、{0}の公式ドキュメント。"
 
-#. placeholder {0}: COMPANY.NAME
+#. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}. Learn how to run 100+ coding agents in parallel on your machine."
 msgstr "{0}の公式ドキュメント。端末上で100以上のコーディングエージェントを並列実行する方法をご紹介します。"
 

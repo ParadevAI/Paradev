@@ -1,7 +1,7 @@
 import { msg } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { getI18nInstance } from "@superset/i18n/server";
-import { COMPANY } from "@superset/shared/constants";
+import { BRAND } from "@superset/shared/brand";
 import type { Metadata } from "next";
 import { cacheLife } from "next/cache";
 import { LeaderboardBackLink } from "@/app/[lang]/components/LeaderboardBackLink";
@@ -76,14 +76,14 @@ export async function generateMetadata({
 		description,
 		alternates: localizedAlternates(lang, "/fight"),
 		openGraph: {
-			title: `${title} | ${COMPANY.NAME}`,
+			title: `${title} | ${BRAND.NAME}`,
 			description,
 			url: localeUrl(lang, "/fight"),
-			siteName: COMPANY.NAME,
+			siteName: BRAND.NAME,
 		},
 		twitter: {
 			card: "summary_large_image",
-			title: `${title} | ${COMPANY.NAME}`,
+			title: `${title} | ${BRAND.NAME}`,
 			description,
 		},
 	};

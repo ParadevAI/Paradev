@@ -117,6 +117,10 @@
 			"types": "./src/app-identity.ts",
 			"default": "./src/app-identity.ts"
 		},
+		"./brand": {
+			"types": "./src/brand.ts",
+			"default": "./src/brand.ts"
+		},
 		"./constants": {
 			"types": "./src/constants.ts",
 			"default": "./src/constants.ts"

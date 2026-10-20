@@ -1,3 +1,4 @@
+import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import { getComparisonPages } from "@/lib/compare";
 
@@ -6,9 +7,9 @@ export function GET() {
 	const pages = getComparisonPages();
 
 	const lines = [
-		`# ${COMPANY.NAME} Comparisons`,
+		`# ${BRAND.INTRO_NAME} Comparisons`,
 		"",
-		`> Comparisons of ${COMPANY.NAME} with other AI coding tools, and guides to the parallel-agent workflow.`,
+		`> Comparisons of ${BRAND.NAME} with other AI coding tools, and guides to the parallel-agent workflow.`,
 		"",
 		"Append `.md` to any page URL for a markdown version.",
 		"",

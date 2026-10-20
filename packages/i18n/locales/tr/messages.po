@@ -391,7 +391,7 @@ msgstr "{0} geliştirici ajan kullanımına göre sıralanıyor. Son 30 günün�
 msgid "{0} disabled"
 msgstr "{0} devre dışı bırakıldı"
 
-#. placeholder {0}: COMPANY.NAME
+#. placeholder {0}: BRAND.INTRO_NAME
 msgid "{0} Documentation"
 msgstr "{0} Belgeleri"
 
@@ -1190,7 +1190,7 @@ msgstr "#{0} {1}\n"
 msgid "#engineering"
 msgstr "#engineering"
 
-#. placeholder {0}: COMPANY.NAME
+#. placeholder {0}: BRAND.NAME
 msgid "%s | {0} Docs"
 msgstr "%s | {0} Belgeleri"
 
@@ -11553,11 +11553,11 @@ msgstr "tüm token'ların"
 msgid "Off"
 msgstr "Kapalı"
 
-#. placeholder {0}: COMPANY.NAME
+#. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
 msgstr "100'den fazla kodlama ajanını paralel çalıştıran {0} uygulamasının resmi belgeleri."
 
-#. placeholder {0}: COMPANY.NAME
+#. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}. Learn how to run 100+ coding agents in parallel on your machine."
 msgstr "{0} resmi belgeleri. Bilgisayarınızda 100'den fazla kodlama ajanını paralel çalıştırmayı öğrenin."
 

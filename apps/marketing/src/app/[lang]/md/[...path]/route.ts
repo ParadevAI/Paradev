@@ -1,6 +1,7 @@
 import type { I18n, MessageDescriptor } from "@lingui/core";
 import { isSupportedLocale } from "@superset/i18n";
 import { getI18nInstance, preloadServerLocale } from "@superset/i18n/server";
+import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import { MCP_CAPABILITIES } from "@/app/[lang]/mcp-install/components/McpCapabilities/constants";
 import {
@@ -85,7 +86,7 @@ function pricingPage(i18n: I18n): MarkdownPage {
 		"",
 	]);
 	return {
-		title: `${COMPANY.NAME} pricing`,
+		title: `${BRAND.NAME} pricing`,
 		url: `${baseUrl}/pricing`,
 		description: `Free for individuals. Pro is ${prices.monthlyPrice} per user/month (or ${prices.yearlyPrice} billed yearly). Enterprise adds SSO, SCIM, audit logs, and an SLA.`,
 		content: [
@@ -106,9 +107,9 @@ function mcpInstallPage(i18n: I18n): MarkdownPage {
 	const baseUrl = COMPANY.MARKETING_URL;
 	const docsUrl = COMPANY.DOCS_URL;
 	return {
-		title: `Install the ${COMPANY.NAME} MCP server in your client`,
+		title: `Install the ${BRAND.NAME} MCP server in your client`,
 		url: `${baseUrl}/mcp-install`,
-		description: `Connect Claude, Codex, Cursor, or any MCP client to ${COMPANY.NAME}. Create tasks, spin up workspaces, launch agents, and run automations straight from your AI agent.`,
+		description: `Connect Claude, Codex, Cursor, or any MCP client to ${BRAND.NAME}. Create tasks, spin up workspaces, launch agents, and run automations straight from your AI agent.`,
 		content: [
 			`Server URL: ${MCP_SERVER_URL} (Streamable HTTP). Authentication: OAuth 2.1 + PKCE with dynamic client registration, or a Superset API key as a Bearer token. Walkthrough: ${baseUrl}/auth.md`,
 			"",
@@ -148,7 +149,7 @@ function teamPage(): MarkdownPage {
 	const baseUrl = COMPANY.MARKETING_URL;
 	const people = getAllPeople();
 	return {
-		title: `About ${COMPANY.NAME}`,
+		title: `About ${BRAND.NAME}`,
 		url: `${baseUrl}/team`,
 		description:
 			"What Superset is, who builds it, and who it's for. A San Francisco team of three ex-YC CTOs building the workspace for parallel coding agents.",
@@ -177,9 +178,9 @@ function enterprisePage(i18n: I18n): MarkdownPage {
 	const baseUrl = COMPANY.MARKETING_URL;
 	const enterprise = PRICING_TIERS.find((tier) => tier.id === "enterprise");
 	return {
-		title: `${COMPANY.NAME} for enterprise`,
+		title: `${BRAND.NAME} for enterprise`,
 		url: `${baseUrl}/enterprise`,
-		description: `Bring ${COMPANY.NAME} to your team. Enterprise plans add SSO, SCIM, audit logs, an uptime SLA, and custom contracts.`,
+		description: `Bring ${BRAND.NAME} to your team. Enterprise plans add SSO, SCIM, audit logs, an uptime SLA, and custom contracts.`,
 		content: [
 			"## What Enterprise includes",
 			"",
@@ -260,7 +261,7 @@ async function loadPage(
 		return {
 			title: `${profile.name ?? profile.handle} (@${profile.handle})`,
 			url: `${baseUrl}/${profile.handle}`,
-			description: `Rank #${profile.rank} of ${profile.total} on the ${COMPANY.NAME} leaderboard, tier ${tier}.`,
+			description: `Rank #${profile.rank} of ${profile.total} on the ${BRAND.NAME} leaderboard, tier ${tier}.`,
 			content: renderProfileMarkdown(profile),
 		};
 	}

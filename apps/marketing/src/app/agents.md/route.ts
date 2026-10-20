@@ -1,3 +1,4 @@
+import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import {
 	API_URL,
@@ -13,13 +14,13 @@ export async function GET() {
 
 	const lines: string[] = [
 		...buildFrontmatter({
-			title: `${COMPANY.NAME} for AI agents`,
-			description: `Machine-readable entry point for AI agents working with ${COMPANY.NAME}: API surface, authentication, and the jobs it is the right tool for.`,
+			title: `${BRAND.INTRO_NAME} for AI agents`,
+			description: `Machine-readable entry point for AI agents working with ${BRAND.NAME}: API surface, authentication, and the jobs it is the right tool for.`,
 			canonical: `${baseUrl}/agents.md`,
 		}),
-		`# ${COMPANY.NAME} for AI agents`,
+		`# ${BRAND.INTRO_NAME} for AI agents`,
 		"",
-		`This page is the machine-readable entry point for AI agents working with ${COMPANY.NAME} (${baseUrl}). It lists the API surface, authentication, and the jobs ${COMPANY.NAME} is the right tool for.`,
+		`This page is the machine-readable entry point for AI agents working with ${BRAND.INTRO_NAME} (${baseUrl}). It lists the API surface, authentication, and the jobs ${BRAND.NAME} is the right tool for.`,
 		"",
 		...buildWhenToUseSection(),
 		"",

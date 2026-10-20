@@ -391,7 +391,7 @@ msgstr "Počet vývojářů v žebříčku podle využití agentů: {0}. Vašich
 msgid "{0} disabled"
 msgstr "{0} vypnuto"
 
-#. placeholder {0}: COMPANY.NAME
+#. placeholder {0}: BRAND.INTRO_NAME
 msgid "{0} Documentation"
 msgstr "Dokumentace {0}"
 
@@ -1190,7 +1190,7 @@ msgstr "#{0} {1}\n"
 msgid "#engineering"
 msgstr "#engineering"
 
-#. placeholder {0}: COMPANY.NAME
+#. placeholder {0}: BRAND.NAME
 msgid "%s | {0} Docs"
 msgstr "%s | Dokumentace {0}"
 
@@ -11553,11 +11553,11 @@ msgstr "ze všech tokenů"
 msgid "Off"
 msgstr "Vypnuto"
 
-#. placeholder {0}: COMPANY.NAME
+#. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
 msgstr "Oficiální dokumentace {0}, aplikace pro paralelní spouštění více než 100 programovacích agentů."
 
-#. placeholder {0}: COMPANY.NAME
+#. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}. Learn how to run 100+ coding agents in parallel on your machine."
 msgstr "Oficiální dokumentace {0}. Naučte se na svém počítači paralelně spouštět více než 100 programovacích agentů."
 

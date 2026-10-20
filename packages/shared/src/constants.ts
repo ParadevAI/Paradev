@@ -1,5 +1,6 @@
 import { ROOT_DOMAIN } from "./app-identity";
 import type { TriggerConfigInput } from "./automation-triggers";
+import { BRAND } from "./brand";
 
 export { CANONICAL_URLS, IOS_APP } from "./app-identity";
 
@@ -26,7 +27,8 @@ const MARKETING_URL =
 const APP_STORE_ID = "6788926383";
 
 export const COMPANY = {
-	NAME: "Superset",
+	NAME: BRAND.NAME,
+	LEGAL_NAME: "Superset Inc.",
 	DOMAIN: ROOT_DOMAIN,
 	EMAIL_DOMAIN: `@${ROOT_DOMAIN}`,
 	GITHUB_URL: "https://github.com/superset-sh/superset",

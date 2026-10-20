@@ -1,6 +1,7 @@
 import { msg } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { getI18nInstance } from "@superset/i18n/server";
+import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import type { Metadata } from "next";
 import { GridCross } from "@/app/[lang]/blog/components/GridCross";
@@ -24,7 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
 			...msg({
 				message: "Get in touch with the {companyName} team.",
 			}),
-			values: { companyName: COMPANY.NAME },
+			values: { companyName: BRAND.NAME },
 		}),
 		alternates: localizedAlternates(lang, "/contact"),
 	};

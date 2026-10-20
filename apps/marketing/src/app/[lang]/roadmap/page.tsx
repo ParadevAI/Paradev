@@ -1,6 +1,7 @@
 import { msg } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { getI18nInstance } from "@superset/i18n/server";
+import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import type { Metadata } from "next";
 import { GridCross } from "@/app/[lang]/blog/components/GridCross";
@@ -47,7 +48,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function RoadmapPage() {
 	await initServerI18n();
 
-	const company = COMPANY.NAME;
+	const company = BRAND.NAME;
 
 	return (
 		<main className="relative min-h-screen">

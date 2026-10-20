@@ -1,6 +1,7 @@
 import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { getI18nInstance } from "@superset/i18n/server";
+import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import type { Metadata } from "next";
 import { CTASection } from "@/app/[lang]/components/CTASection";
@@ -39,7 +40,7 @@ export async function generateMetadata(): Promise<Metadata> {
 			description,
 			type: "website",
 			url: `${COMPANY.MARKETING_URL}/plugins`,
-			siteName: COMPANY.NAME,
+			siteName: BRAND.NAME,
 			images: [image],
 		},
 		twitter: {

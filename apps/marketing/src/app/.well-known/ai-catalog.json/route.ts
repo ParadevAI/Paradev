@@ -1,3 +1,4 @@
+import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import { AGENT_DID } from "@/lib/agent-identity";
 import { API_URL, MCP_SERVER_URL } from "@/lib/llms";
@@ -95,7 +96,7 @@ export function GET() {
 	const catalog = {
 		specVersion: "1.0",
 		host: {
-			displayName: COMPANY.NAME,
+			displayName: BRAND.INTRO_NAME,
 			identifier: AGENT_DID,
 			url: baseUrl,
 			documentationUrl: `${docsUrl}/mcp-server`,

@@ -391,7 +391,7 @@ msgstr "{0} developers are ranked by agent usage. Your last 30 days are already 
 msgid "{0} disabled"
 msgstr "{0} disabled"
 
-#. placeholder {0}: COMPANY.NAME
+#. placeholder {0}: BRAND.INTRO_NAME
 msgid "{0} Documentation"
 msgstr "{0} Documentation"
 
@@ -1190,7 +1190,7 @@ msgstr "#{0} {1}\n"
 msgid "#engineering"
 msgstr "#engineering"
 
-#. placeholder {0}: COMPANY.NAME
+#. placeholder {0}: BRAND.NAME
 msgid "%s | {0} Docs"
 msgstr "%s | {0} Docs"
 
@@ -11553,11 +11553,11 @@ msgstr "of all tokens"
 msgid "Off"
 msgstr "Off"
 
-#. placeholder {0}: COMPANY.NAME
+#. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
 msgstr "Official documentation for {0}, the app for running 100+ coding agents in parallel."
 
-#. placeholder {0}: COMPANY.NAME
+#. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}. Learn how to run 100+ coding agents in parallel on your machine."
 msgstr "Official documentation for {0}. Learn how to run 100+ coding agents in parallel on your machine."
 

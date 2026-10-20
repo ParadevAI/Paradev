@@ -1,4 +1,4 @@
-import { COMPANY } from "@superset/shared/constants";
+import { BRAND } from "@superset/shared/brand";
 import { env } from "./env";
 
-export const NOREPLY_FROM = `${COMPANY.NAME} <noreply@${env.EMAIL_SENDING_DOMAIN}>`;
+export const NOREPLY_FROM = `${BRAND.INTRO_NAME} <noreply@${env.EMAIL_SENDING_DOMAIN}>`;

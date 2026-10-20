@@ -391,7 +391,7 @@ msgstr "已有{0}位开发者按agent用量排名。你最近30天的数据已�
 msgid "{0} disabled"
 msgstr "{0}已停用"
 
-#. placeholder {0}: COMPANY.NAME
+#. placeholder {0}: BRAND.INTRO_NAME
 msgid "{0} Documentation"
 msgstr "{0} 文档"
 
@@ -1190,7 +1190,7 @@ msgstr "#{0} {1}\n"
 msgid "#engineering"
 msgstr "#engineering"
 
-#. placeholder {0}: COMPANY.NAME
+#. placeholder {0}: BRAND.NAME
 msgid "%s | {0} Docs"
 msgstr "%s | {0} 文档"
 
@@ -11553,11 +11553,11 @@ msgstr "占全部token"
 msgid "Off"
 msgstr "关闭"
 
-#. placeholder {0}: COMPANY.NAME
+#. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
 msgstr "{0} 官方文档。这款应用可并行运行 100 多个编程代理。"
 
-#. placeholder {0}: COMPANY.NAME
+#. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}. Learn how to run 100+ coding agents in parallel on your machine."
 msgstr "{0} 官方文档。了解如何在您的设备上并行运行 100 多个编程代理。"
 

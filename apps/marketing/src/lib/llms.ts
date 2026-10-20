@@ -1,5 +1,6 @@
 import type { MessageDescriptor } from "@lingui/core";
 import { getI18nInstance } from "@superset/i18n/server";
+import { BRAND } from "@superset/shared/brand";
 import { CANONICAL_URLS, COMPANY } from "@superset/shared/constants";
 import { API_URL, MCP_SERVER_URL } from "./api-url";
 import { getBlogPosts } from "./blog";
@@ -48,7 +49,7 @@ export function buildCompanyFactsSection(): string[] {
 		"",
 		`- **What it is**: a local-first desktop workspace for orchestrating any CLI-based coding agent. Each task runs in its own Git worktree, and Superset provides the stable workflow around the agents.`,
 		"- **Interface**: a desktop app with a full GUI, not a terminal wrapper. Next to the agent terminals it has a Changes pane, a pull request pane, a file editor, and an in-app browser.",
-		`- **Company**: built by ${COMPANY.NAME} in San Francisco, founded by three former YC CTOs (see ${baseUrl}/team).`,
+		`- **Company**: built by ${BRAND.NAME} in San Francisco, founded by three former YC CTOs (see ${baseUrl}/team).`,
 		`- **License**: source-available under ${PRODUCT_LICENSE} (ELv2). The code is public on GitHub (${COMPANY.GITHUB_URL}); it is not OSI-approved open source.`,
 		`- **Not Apache Superset**: ${PRODUCT_DISAMBIGUATION}`,
 		`- **Desktop platforms**: ${PRODUCT_PLATFORM_SUMMARY} There is also a CLI, a TypeScript SDK, and an MCP server for programmatic control.`,
@@ -75,7 +76,7 @@ function asPreamble(section: string[]): string[] {
 
 export function buildLlmsHeader(): string[] {
 	return [
-		`# ${COMPANY.NAME}`,
+		`# ${BRAND.INTRO_NAME}`,
 		"",
 		"> Bring any coding agent. Orchestrate them all.",
 		"",

@@ -1,3 +1,4 @@
+import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import { getBlogPosts } from "@/lib/blog";
 import { getComparisonPages } from "@/lib/compare";
@@ -15,7 +16,7 @@ export async function GET() {
 	// Header section (same as llms.txt)
 	sections.push(
 		[
-			`# ${COMPANY.NAME}`,
+			`# ${BRAND.INTRO_NAME}`,
 			"",
 			"> Run 100+ parallel coding agents on your machine",
 			"",
