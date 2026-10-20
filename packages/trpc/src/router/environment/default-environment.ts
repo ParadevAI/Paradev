@@ -8,6 +8,7 @@ import { SANDBOX_IMAGE_NAME } from "@superset/shared/constants";
 import type { SandboxRegionId } from "@superset/shared/sandbox-regions";
 import { and, asc, eq, isNull, or, sql } from "drizzle-orm";
 import { userError } from "../../trpc";
+import { currentBundleSha } from "./current-bundle";
 
 interface CarryingEnvironment {
 	id: string;
@@ -106,6 +107,7 @@ export async function ensureDefaultEnvironment(args: {
 				sourceKind: "image",
 				sourceRef: SANDBOX_IMAGE_NAME,
 				region: args.region,
+				bundleSha: await currentBundleSha(),
 				scope: "organization",
 				hooksRepositoryId: repository.id,
 				createdByUserId: args.userId,
