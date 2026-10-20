@@ -63,7 +63,24 @@ final class ForwardSwipeView: ExpoView, UIGestureRecognizerDelegate {
       return super.gestureRecognizerShouldBegin(gestureRecognizer)
     }
     let velocity = recognizer.velocity(in: nil)
-    return velocity.x < 0 && abs(velocity.x) > abs(velocity.y)
+    guard velocity.x < 0 && abs(velocity.x) > abs(velocity.y) else { return false }
+    cancelReactNativeTouches()
+    return true
+  }
+
+  /// React Native's touch handler cannot be prevented by this recognizer, so the row under the
+  /// finger would press on release. Same reset react-native-screens does for the back swipe.
+  private func cancelReactNativeTouches() {
+    guard let touchHandlerClass = NSClassFromString("RCTSurfaceTouchHandler") else { return }
+    var view = superview
+    while let current = view {
+      for handler in current.gestureRecognizers ?? [] where handler.isKind(of: touchHandlerClass) {
+        handler.isEnabled = false
+        handler.isEnabled = true
+        handler.reset()
+      }
+      view = current.superview
+    }
   }
 
   /// Scroll views wait for the edge pan to fail, as they do for UIKit's back swipe.

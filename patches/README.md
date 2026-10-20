@@ -417,9 +417,10 @@ Progress and the release that arrive before UIKit starts the transition are
 kept and applied from the new `onStart` hook. The simple-push animator starts
 paused and linear when interactive, like its pop branch. A cancelled push
 leaves UIKit's stack, and `RNSScreen` sends `onDismissed`, so JS drops the
-route. An arm with no push in 1 s expires. `arm` must not call
-`cancelTouchesInParent`: the forward-swipe recognizer already cancels React
-Native's touches, and resetting `RCTSurfaceTouchHandler` as well makes it throw
+route. An arm with no push in 1 s expires. `arm` does not call
+`cancelTouchesInParent`: the forward-swipe module resets
+`RCTSurfaceTouchHandler` itself when its pan begins, so the row under the
+finger does not press on release. A second reset from `arm` throws
 "Inconsistency between local and UIKit touch registries".
 
 **Guard test:** `apps/mobile/react-native-screens-interactive-push-patch.test.ts`.
