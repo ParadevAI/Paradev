@@ -236,6 +236,51 @@ describe("sessions router", () => {
 		).toHaveLength(1);
 	});
 
+	test("pages read with the before cursor without duplicate or lost events", async () => {
+		const created = await caller.create({
+			workspaceId: WORKSPACE,
+			agent: "claude",
+		});
+		const input = { workspaceId: WORKSPACE, sessionId: created.sessionId };
+		await waitFor(
+			() => runtime.live.get(created.sessionId)?.state.status === "idle",
+		);
+		for (const prompt of ["First", "Second", "Third", "Fourth"]) {
+			await caller.send({ ...input, prompt });
+		}
+		const newest = await caller.read({ ...input, limit: 2 });
+		if (!newest.ok || !newest.nextBefore) throw new Error("expected a page");
+		const older = await caller.read({
+			...input,
+			limit: 2,
+			before: newest.nextBefore,
+		});
+		if (!older.ok) throw new Error(older.reset);
+		const full = await caller.read(input);
+		if (!full.ok) throw new Error(full.reset);
+		const seqs = (page: { envelopes: { cursor: { seq: number } }[] }) =>
+			page.envelopes.map((entry) => entry.cursor.seq);
+		const newestSeq = seqs(newest).at(-1) ?? -1;
+
+		expect(older.nextBefore).toEqual(older.envelopes[0]?.cursor ?? null);
+		expect([...seqs(older), ...seqs(newest)]).toEqual(
+			seqs(full)
+				.filter((seq) => seq <= newestSeq)
+				.slice(-4),
+		);
+
+		await expect(
+			caller.read({
+				...input,
+				workspaceId: OTHER_WORKSPACE,
+				before: newest.nextBefore,
+			}),
+		).rejects.toMatchObject({ code: "NOT_FOUND" });
+		await expect(
+			caller.read({ ...input, before: { epoch: "", seq: -1 } }),
+		).rejects.toMatchObject({ code: "BAD_REQUEST" });
+	});
+
 	test("scopes read, send and close to the requested workspace", async () => {
 		const created = await caller.create({
 			workspaceId: WORKSPACE,

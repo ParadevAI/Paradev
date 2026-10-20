@@ -37,6 +37,7 @@ import { AcpRecovery } from "./components/AcpRecovery";
 import { DraftChat } from "./components/DraftChat";
 import { RewindChangesList } from "./components/RewindChangesList";
 import { createWhenReachable } from "./utils/createWhenReachable";
+import { messageEditPlan } from "./utils/messageEditPlan";
 import {
 	isChatCreateWatched,
 	sharedChatCreate,
@@ -590,23 +591,18 @@ export function AcpChatPane({
 	const confirmEdit = useCallback(
 		async (request: ChatEditRequest) => {
 			if (!sessionId) return;
-			if (!canRewindFiles) return editMessage(request, false);
-			let changes: Awaited<
-				ReturnType<typeof wiring.transport.getRewindChanges>
-			>;
+			let plan: Awaited<ReturnType<typeof messageEditPlan>>;
 			try {
-				changes = await wiring.transport.getRewindChanges({
-					sessionId,
-					itemId: request.itemId,
-					workspaceId,
+				plan = await messageEditPlan({
+					canRewindFiles,
+					loadChanges: () =>
+						wiring.transport.getRewindChanges({
+							sessionId,
+							itemId: request.itemId,
+							workspaceId,
+						}),
 				});
 			} catch (error) {
-				if (
-					error instanceof TRPCClientError &&
-					/No procedure/.test(error.message)
-				) {
-					return editMessage(request, true);
-				}
 				console.error("[acp-chat] could not list file changes", error);
 				toast.error(t({ message: "Couldn't check the files" }), {
 					description: errorMessage(error, t({ message: "Unknown error" })),
@@ -614,12 +610,10 @@ export function AcpChatPane({
 				return;
 			}
 			if (!mounted.current) return;
-			if (changes.files !== "listed" || changes.changes.length === 0) {
-				return editMessage(request, changes.files === "missing");
-			}
+			if (plan.kind === "keep-files") return editMessage(request, false);
 			alert({
 				title: t({
-					message: plural(changes.changes.length, {
+					message: plural(plan.changes.length, {
 						one: "# file changed since this message",
 						other: "# files changed since this message",
 					}),
@@ -628,7 +622,7 @@ export function AcpChatPane({
 					message:
 						"Restoring puts them back as they were before this message, including changes you made yourself. A snapshot of the current files is kept first.",
 				}),
-				details: <RewindChangesList changes={changes.changes} />,
+				details: <RewindChangesList changes={plan.changes} />,
 				actions: [
 					{
 						label: t({ message: "Edit and restore files" }),

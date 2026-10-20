@@ -145,7 +145,7 @@ msgstr "{0, plural, one {# selhalo} few {# selhalo} many {# selhalo} other {# se
 msgid "{0, plural, one {# failing} other {# failing}}"
 msgstr "{0, plural, one {# selhává} few {# selhávají} many {# selhává} other {# selhává}}"
 
-#. placeholder {0}: changes.changes.length
+#. placeholder {0}: plan.changes.length
 msgid "{0, plural, one {# file changed since this message} other {# files changed since this message}}"
 msgstr "{0, plural, one {Od této zprávy se změnil # soubor} few {Od této zprávy se změnily # soubory} many {Od této zprávy se změnilo # souboru} other {Od této zprávy se změnilo # souborů}}"
 

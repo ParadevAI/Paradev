@@ -145,7 +145,7 @@ msgstr "{0, plural, one {#项失败} other {#项失败}}"
 msgid "{0, plural, one {# failing} other {# failing}}"
 msgstr "{0, plural, one {#项失败} other {#项失败}}"
 
-#. placeholder {0}: changes.changes.length
+#. placeholder {0}: plan.changes.length
 msgid "{0, plural, one {# file changed since this message} other {# files changed since this message}}"
 msgstr "{0, plural, other {自此消息以来有 # 个文件已更改}}"
 

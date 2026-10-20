@@ -145,7 +145,7 @@ msgstr "{0, plural, one {# fehlgeschlagen} other {# fehlgeschlagen}}"
 msgid "{0, plural, one {# failing} other {# failing}}"
 msgstr "{0, plural, one {# fehlgeschlagen} other {# fehlgeschlagen}}"
 
-#. placeholder {0}: changes.changes.length
+#. placeholder {0}: plan.changes.length
 msgid "{0, plural, one {# file changed since this message} other {# files changed since this message}}"
 msgstr "{0, plural, one {# Datei seit dieser Nachricht geändert} other {# Dateien seit dieser Nachricht geändert}}"
 

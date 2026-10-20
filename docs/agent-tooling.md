@@ -126,6 +126,7 @@ and `superset terminals` for PTYs. Existing commands keep their behavior.
 superset sessions create --local --workspace WORKSPACE_ID --agent claude --prompt "Review the diff"
 superset sessions list --local --workspace WORKSPACE_ID
 superset sessions read --local --workspace WORKSPACE_ID --session CHAT_SESSION_ID
+superset sessions read --local --workspace WORKSPACE_ID --session CHAT_SESSION_ID --limit 50 --before '{"epoch":"EPOCH","seq":42}'
 superset sessions send --local --workspace WORKSPACE_ID --session CHAT_SESSION_ID --prompt "Continue"
 superset sessions open --local --workspace WORKSPACE_ID --session CHAT_SESSION_ID
 superset sessions close --local --workspace WORKSPACE_ID --session CHAT_SESSION_ID
@@ -137,6 +138,10 @@ agent to an installed ACP harness. If the flag cannot be checked, sessions fail 
 agents and hosts without the new router return an error; these commands never start a terminal.
 Deploy the API flag endpoint before rolling out the new host-service. Old hosts produce an update
 instruction instead of falling back to `agents.run`.
+
+`sessions read --json` returns the newest page of events, in journal order, with a `nextBefore`
+cursor. To read older events, pass that cursor as JSON to `--before`. `nextBefore` is `null` on the
+oldest page.
 
 A chat session ID identifies the host's journal. A provider session ID identifies the conversation
 inside Claude, Codex, or another ACP agent. `sessions resume --session` accepts the former and

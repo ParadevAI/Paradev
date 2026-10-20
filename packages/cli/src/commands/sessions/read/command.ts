@@ -1,4 +1,5 @@
-import { number, string } from "@superset/cli-framework";
+import { CLIError, number, string } from "@superset/cli-framework";
+import { z } from "zod";
 import { command } from "../../../lib/command";
 import {
 	resolveSessionWorkspace,
@@ -6,6 +7,30 @@ import {
 	type SessionPageResult,
 	sessionWorkspaceOptions,
 } from "../../../lib/sessions";
+
+const beforeCursorSchema = z.object({
+	epoch: z.string().min(1),
+	seq: z.number().int().nonnegative(),
+});
+
+function parseBeforeCursor(
+	value: string | undefined,
+): z.infer<typeof beforeCursorSchema> | undefined {
+	if (value === undefined) return undefined;
+	let json: unknown;
+	try {
+		json = JSON.parse(value);
+	} catch {
+		json = undefined;
+	}
+	const parsed = beforeCursorSchema.safeParse(json);
+	if (!parsed.success)
+		throw new CLIError(
+			"Invalid --before cursor",
+			'Pass the nextBefore value from a previous read as JSON, e.g. --before \'{"epoch":"EPOCH","seq":42}\'',
+		);
+	return parsed.data;
+}
 
 function formatEnvelope(envelope: SessionDurableEnvelope): string | null {
 	const event = envelope.event;
@@ -82,14 +107,19 @@ export default command({
 			.min(1)
 			.max(500)
 			.desc("Maximum number of journal events to return (1-500)"),
+		before: string().desc(
+			"Return events older than this cursor: the JSON nextBefore value from a previous read",
+		),
 	},
 	run: async ({ ctx, options }) => {
+		const before = parseBeforeCursor(options.before ?? undefined);
 		const { sessions } = await resolveSessionWorkspace(ctx, options);
 
 		const result = await sessions.read.query({
 			workspaceId: options.workspace,
 			sessionId: options.session,
 			limit: options.limit,
+			...(before ? { before } : {}),
 		});
 
 		return {

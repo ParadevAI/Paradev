@@ -185,6 +185,29 @@ describe("sessions commands", () => {
 		expect(terminalCall).not.toHaveBeenCalled();
 	});
 
+	test("read forwards a JSON --before cursor to sessions.read", async () => {
+		await runCommand(readSessionCommand, {
+			session: SESSION_ID,
+			limit: 2,
+			before: '{"epoch":"epoch-1","seq":3}',
+		});
+
+		expect(readInput).toEqual({
+			workspaceId: WORKSPACE_ID,
+			sessionId: SESSION_ID,
+			limit: 2,
+			before: { epoch: "epoch-1", seq: 3 },
+		});
+	});
+
+	test("read rejects a malformed --before cursor before calling the host", async () => {
+		for (const before of ["epoch-1:3", '{"epoch":"","seq":3}', '{"seq":-1}'])
+			await expect(
+				runCommand(readSessionCommand, { session: SESSION_ID, before }),
+			).rejects.toThrow(/Invalid --before cursor/);
+		expect(readInput).toBeUndefined();
+	});
+
 	test("send mutates sessions.send and rejects empty prompts", async () => {
 		await expect(
 			runCommand(sendSessionCommand, { session: SESSION_ID, prompt: "   " }),

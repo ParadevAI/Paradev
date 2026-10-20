@@ -1,4 +1,5 @@
 import { presetForAcpHarness } from "@superset/chat/core";
+import { cursorSchema } from "@superset/chat/protocol";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import type { HostServiceContext } from "../../../types";
@@ -94,6 +95,7 @@ export const sessionsRouter = router({
 		.input(
 			sessionInput.extend({
 				limit: z.number().int().positive().max(500).default(200),
+				before: cursorSchema.optional(),
 			}),
 		)
 		.query(({ ctx, input }) => {
@@ -105,6 +107,7 @@ export const sessionsRouter = router({
 			return chat.commands.getItems({
 				sessionId: input.sessionId,
 				limit: input.limit,
+				before: input.before,
 			});
 		}),
 	send: sessionProcedure

@@ -145,7 +145,7 @@ msgstr "{0, plural, one {# не пройдено} few {# не пройдено} 
 msgid "{0, plural, one {# failing} other {# failing}}"
 msgstr "{0, plural, one {# с ошибкой} few {# с ошибкой} many {# с ошибкой} other {# с ошибкой}}"
 
-#. placeholder {0}: changes.changes.length
+#. placeholder {0}: plan.changes.length
 msgid "{0, plural, one {# file changed since this message} other {# files changed since this message}}"
 msgstr "{0, plural, one {С этого сообщения изменён # файл} few {С этого сообщения изменено # файла} many {С этого сообщения изменено # файлов} other {С этого сообщения изменено # файла}}"
 
