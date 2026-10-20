@@ -597,20 +597,22 @@ function continuationConfig(
 	return resolveHostAgentConfig(db, input.agent);
 }
 
-// Resolve both sides before comparing: the caller may name a preset while
-// the binding carries the instance that preset resolved to, or the reverse.
-// This is what stops a prompt landing in whatever agent holds the terminal
-// now rather than the one the caller means.
+function launchIdentity(config: ResolvedHostAgentConfig): string {
+	if (isBuiltinAgentId(config.presetId)) return config.presetId;
+	const [command = ""] = config.command.trim().split(/\s+/);
+	const executable = command.split(/[\\/]/).pop() ?? "";
+	return executable.toLowerCase() || config.presetId;
+}
+
 function bindingRunsConfig(
 	db: HostDb,
 	binding: Pick<TerminalAgentBinding, "definitionId" | "agentId">,
 	config: ResolvedHostAgentConfig,
 ): boolean {
-	const bound = resolveHostAgentConfig(
-		db,
-		binding.definitionId ?? binding.agentId,
-	);
-	return bound?.id === config.id;
+	if (binding.definitionId) {
+		return resolveHostAgentConfig(db, binding.definitionId)?.id === config.id;
+	}
+	return binding.agentId === launchIdentity(config);
 }
 
 export function chatLaunchTarget(

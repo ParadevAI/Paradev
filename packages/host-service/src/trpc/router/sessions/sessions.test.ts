@@ -121,6 +121,34 @@ afterEach(async () => {
 });
 
 describe("sessions router", () => {
+	test("continues the same conversation for a second config of the provider", async () => {
+		db.insert(schema.hostAgentConfigs)
+			.values({
+				id: "second-claude-config",
+				presetId: "claude",
+				command: "claude",
+				promptTransport: "argv",
+				label: "Claude work",
+				displayOrder: 1,
+			})
+			.run();
+		const created = await caller.create({
+			workspaceId: WORKSPACE,
+			agent: "second-claude-config",
+		});
+		await waitFor(
+			() => runtime.live.get(created.sessionId)?.state.status === "idle",
+		);
+		const continued = await caller.create({
+			workspaceId: WORKSPACE,
+			agent: "second-claude-config",
+			continueSessionId: created.sessionId,
+			prompt: "Continue the same work",
+		});
+		expect(continued.sessionId).toBe(created.sessionId);
+		expect(launches).toHaveLength(1);
+	});
+
 	test("reports unavailable flag verification without launching or downgrading", async () => {
 		flagFailure = true;
 		await expect(
