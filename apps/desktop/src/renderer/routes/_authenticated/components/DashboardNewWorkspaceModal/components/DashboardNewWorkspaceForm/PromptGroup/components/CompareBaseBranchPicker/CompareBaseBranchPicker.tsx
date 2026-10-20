@@ -173,6 +173,7 @@ export function CompareBaseBranchPicker({
 					value={selectedValue}
 					onValueChange={setSelectedValue}
 					onKeyDown={(e) => {
+						if (e.nativeEvent.isComposing) return;
 						// cmdk leaves focus on the input, so the per-row button is
 						// pointer-only — Mod+Enter is the keyboard path to it.
 						if (
