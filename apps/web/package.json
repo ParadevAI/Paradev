@@ -55,7 +55,7 @@
 		"@lingui/swc-plugin": "6.6.0",
 		"@superset/typescript": "workspace:*",
 		"@tailwindcss/postcss": "4.2.2",
-		"@types/bun": "1.4.2",
+		"@types/bun": "1.4.3",
 		"@types/node": "24.12.0",
 		"@types/react": "19.2.14",
 		"@types/react-dom": "19.2.3",

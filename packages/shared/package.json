@@ -461,7 +461,7 @@
 		"@types/friendly-words": "1.2.2",
 		"@types/semver": "7.7.1",
 		"@xterm/xterm": "6.1.0-beta.315",
-		"bun-types": "1.4.2",
+		"bun-types": "1.4.3",
 		"typescript": "7.0.2"
 	}
 }

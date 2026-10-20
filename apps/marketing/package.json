@@ -70,7 +70,7 @@
 		"@types/react-dom": "19.2.3",
 		"@types/three": "0.181.0",
 		"babel-plugin-react-compiler": "1.0.0",
-		"bun-types": "1.4.2",
+		"bun-types": "1.4.3",
 		"dotenv": "17.3.1",
 		"tailwindcss": "4.2.2",
 		"typescript": "7.0.2"

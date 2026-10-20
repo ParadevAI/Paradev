@@ -270,7 +270,7 @@
 		"@testing-library/react": "16.3.0",
 		"@types/babel__core": "7.20.5",
 		"@types/better-sqlite3": "7.6.13",
-		"@types/bun": "1.4.2",
+		"@types/bun": "1.4.3",
 		"@types/culori": "4.0.1",
 		"@types/http-proxy": "1.17.17",
 		"@types/lodash": "4.17.24",
