@@ -401,6 +401,34 @@ Verify in the simulator: open a workspace with two PRs, tap the PR chip, tap a
 row, go back, reopen the sheet, tap the other row. The second PR must show its
 description and the Files row without scrolling.
 
+### Interactive push (same patch)
+
+**Why:** Home's right-edge swipe returns to the last workspace, and the pushed
+screen follows the finger like the back swipe does. react-native-screens can
+only drive a *pop* interactively; UIKit asks for an interaction controller only
+when the stack returns a custom animator, and the stack returns none for a
+default push.
+
+**What it changes:** `RNSScreenStackView` gets `armInteractivePush`,
+`updateInteractivePush:` and `endInteractivePush:`, called by
+`apps/mobile/modules/forward-swipe`. The next push after `arm` (JS performs it)
+gets `RNSScreenStackAnimator` and an `RNSPercentDrivenInteractiveTransition`.
+Progress and the release that arrive before UIKit starts the transition are
+kept and applied from the new `onStart` hook. The simple-push animator starts
+paused and linear when interactive, like its pop branch. A cancelled push
+leaves UIKit's stack, and `RNSScreen` sends `onDismissed`, so JS drops the
+route. An arm with no push in 1 s expires. `arm` must not call
+`cancelTouchesInParent`: the forward-swipe recognizer already cancels React
+Native's touches, and resetting `RCTSurfaceTouchHandler` as well makes it throw
+"Inconsistency between local and UIKit touch registries".
+
+**Guard test:** `apps/mobile/react-native-screens-interactive-push-patch.test.ts`.
+
+**Regenerating:** re-apply the hunks in `ios/RNSScreenStack.h`,
+`ios/RNSScreenStack.mm`, `ios/RNSPercentDrivenInteractiveTransition.{h,mm}` and
+`ios/RNSScreenStackAnimator.mm`. Verify in the simulator: open a workspace, go
+back, swipe in from Home's right edge, let go past half way and short of it.
+
 ## @pierre/trees (`@pierre%2Ftrees@<version>.patch`)
 
 **Why:** DESKTOP-19G, DESKTOP-KR, DESKTOP-P5, DESKTOP-P4 (and DESKTOP-11E's
