@@ -30,6 +30,16 @@ Anything that needs a production secret must run as an Actions workflow with
 `environment: production`. `.github/workflows/backfill-connections.yml` is the pattern: manual
 dispatch, dry run by default, writes only when the `apply` input is checked.
 
+## Fork pull requests do not receive deployment secrets
+
+Preview database/deployment jobs, their write-token comment job, and preview cleanup run only for
+same-repository, non-Dependabot PRs. Forks still run CI and the sandbox manifest, bundle-build, image-build, boot,
+and runner checks. Only the sandbox bucket-comparison dry run is skipped because it requires R2
+credentials. Same-repository runs still fail if their configured credentials are missing.
+
+Do not use `pull_request_target` to run PR code with deployment credentials. The fork policy is
+covered by `.github/workflows/fork-safety.test.ts`, which CI runs before the package suites.
+
 ## One run shows about ten deployment rows
 
 Every job that declares `environment: production` creates its own row on the GitHub Deployments

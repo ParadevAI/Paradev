@@ -20,6 +20,7 @@ env:
 jobs:
   create-database:
     name: Create Database (Neon)
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment: preview
@@ -689,7 +690,7 @@ jobs:
     name: Post Deployment Comment
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    if: always()
+    if: always() && github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]'
     needs: [create-database, deploy-database, deploy-api, deploy-web, deploy-marketing, deploy-docs]
     permissions:
       contents: read

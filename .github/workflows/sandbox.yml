@@ -59,6 +59,7 @@ jobs:
         run: bun run build
 
       - name: Step versions that would re-run on the next wake
+        if: github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]'
         working-directory: packages/sandbox
         env:
           CDN_R2_ACCESS_KEY_ID: ${{ secrets.CDN_R2_ACCESS_KEY_ID }}
