@@ -1093,6 +1093,20 @@
       "when": 1792461856907,
       "tag": "0155_seed_sandbox_bundles",
       "breakpoints": true
+    },
+    {
+      "idx": 156,
+      "version": "7",
+      "when": 1792463931612,
+      "tag": "0156_backfill_environments_bundle_sha",
+      "breakpoints": true
+    },
+    {
+      "idx": 157,
+      "version": "7",
+      "when": 1792463950392,
+      "tag": "0157_environments_bundle_sha_not_null",
+      "breakpoints": true
     }
   ]
 }
