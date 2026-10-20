@@ -13,8 +13,7 @@ import type {
 	ChatPaneData,
 	PaneViewerData,
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
-import { reopenChatSession } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/closedChatSessions";
-import { removePendingChatStop } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/pendingChatStops";
+import { focusChatSession } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/focusChatSession";
 import type { StoreApi } from "zustand/vanilla";
 import { useChatWiring } from "../../../ChatSession/hooks/useSessionClient";
 import { type HistoryEntry, historyEntries } from "./utils/historyEntries";
@@ -75,47 +74,7 @@ export function ChatHistoryPicker({
 
 	const openChat = (entry: HistoryEntry) => {
 		setOpen(false);
-		for (const store of [context.store, ...linkedStores]) {
-			for (const tab of store.getState().tabs) {
-				const pane = Object.values(tab.panes).find((pane) => {
-					if (pane.kind !== "chat-v3") return false;
-					const data = pane.data as ChatPaneData;
-					return (
-						(entry.sessionId !== null && data.sessionId === entry.sessionId) ||
-						(data.agent?.id === entry.presetId &&
-							entry.harnessSessionId !== undefined &&
-							data.agent?.sessionId === entry.harnessSessionId)
-					);
-				});
-				if (pane) {
-					store.getState().setActiveTab(tab.id);
-					store.getState().setActivePane({ tabId: tab.id, paneId: pane.id });
-					return;
-				}
-			}
-		}
-		if (entry.sessionId) {
-			reopenChatSession(entry.sessionId);
-			removePendingChatStop(entry.sessionId);
-		}
-		context.store.getState().addTab({
-			panes: [
-				{
-					kind: "chat-v3",
-					data: {
-						terminalId: entry.terminalId ?? crypto.randomUUID(),
-						sessionId: entry.sessionId,
-						agent: {
-							id: entry.presetId,
-							...(entry.harnessSessionId
-								? { sessionId: entry.harnessSessionId }
-								: {}),
-						},
-						...(entry.title ? { chatTitle: entry.title } : {}),
-					} satisfies ChatPaneData,
-				},
-			],
-		});
+		focusChatSession({ store: context.store, linkedStores, session: entry });
 	};
 
 	return (

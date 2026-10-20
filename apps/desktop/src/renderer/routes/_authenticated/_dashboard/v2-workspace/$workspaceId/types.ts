@@ -137,6 +137,7 @@ export interface SubagentPaneData {
 }
 
 export type WorkspaceSearchKey =
+	| "sessionId"
 	| "terminalId"
 	| "focusRequestId"
 	| "subagentTerminalId"

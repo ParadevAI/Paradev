@@ -18,8 +18,12 @@ import {
 import { eq } from "drizzle-orm";
 import type { HostDb } from "../../db";
 import { projects, workspaces } from "../../db/schema";
-import { runAgentInWorkspace } from "../../trpc/router/agents/agents";
+import {
+	chatLaunchTarget,
+	runAgentInWorkspace,
+} from "../../trpc/router/agents/agents";
 import { importCloudAttachments } from "../../trpc/router/attachments/attachments";
+import { createChatSessionInWorkspace } from "../../trpc/router/sessions/session-service";
 import { seedDefaultsIfEmpty } from "../../trpc/router/settings/agent-configs";
 import type { HostServiceContext } from "../../types";
 import {
@@ -27,6 +31,12 @@ import {
 	waitForManagedEnv,
 } from "../sandbox-managed-env/sandbox-managed-env.ts";
 import { resolveScript, shellSingleQuote } from "../setup/config";
+import {
+	type PendingCloudLaunchReport,
+	readPendingLaunchReport,
+	withoutPendingLaunchReport,
+	withPendingLaunchReport,
+} from "./launchMarker";
 import { buildStartHookEnv } from "./utils/buildStartHookEnv";
 
 /**
@@ -292,8 +302,11 @@ export async function launchSandboxAgentOnce(
 	ctx: HostServiceContext,
 	identity: SandboxIdentity,
 ): Promise<void> {
+	if (existsSync(identity.launchMarkerPath)) {
+		await flushPendingLaunchReport(ctx, identity);
+		return;
+	}
 	if (!identity.launch) return;
-	if (existsSync(identity.launchMarkerPath)) return;
 	const { agent, prompt, model, effort, mode, attachmentFileIds, surface } =
 		identity.launch;
 	// The agent needs the environment the control plane pushes after boot and
@@ -330,26 +343,117 @@ export async function launchSandboxAgentOnce(
 				console.error("[sandbox] could not import prompt attachments", error);
 			}
 		}
-		await runAgentInWorkspace(ctx, {
-			workspaceId: identity.workspaceId,
-			agent,
-			prompt,
-			model,
-			// A launch that carries an effort opens a terminal.
-			effort: surface === "chat" ? undefined : effort,
-			mode,
-			...(attachmentIds?.length ? { attachmentIds } : {}),
-			...(surface ? { surface } : {}),
-		});
+		const chatTarget =
+			surface === "chat"
+				? chatLaunchTarget(ctx.db, {
+						workspaceId: identity.workspaceId,
+						agent,
+						prompt,
+						model,
+						attachmentIds,
+						surface: "chat",
+					})
+				: null;
+		const useChat =
+			chatTarget && ctx.runtime.chat?.()?.live.supports(chatTarget.harness);
+		const report = useChat
+			? await createChatSessionInWorkspace(ctx, {
+					workspaceId: identity.workspaceId,
+					agent,
+					prompt,
+					model,
+					mode,
+					...(attachmentIds?.length ? { attachmentIds } : {}),
+				}).then((session) => ({
+					kind: "chat" as const,
+					sessionId: session.sessionId,
+					terminalId: session.terminalId,
+				}))
+			: await runAgentInWorkspace(ctx, {
+					workspaceId: identity.workspaceId,
+					agent,
+					prompt,
+					model,
+					effort,
+					mode,
+					...(attachmentIds?.length ? { attachmentIds } : {}),
+				}).then((run) => ({
+					kind: "terminal" as const,
+					terminalId: run.sessionId,
+				}));
 		console.log(
 			`[sandbox] launched ${agent} for workspace ${identity.workspaceId}`,
 		);
+		await rememberLaunchReport(ctx, identity, report);
 	} catch (error) {
 		await rm(identity.launchMarkerPath, { force: true });
 		console.error(
 			`[sandbox] could not launch ${agent} for workspace ${identity.workspaceId}`,
 			error,
 		);
+	}
+}
+
+async function rememberLaunchReport(
+	ctx: HostServiceContext,
+	identity: SandboxIdentity,
+	report:
+		| { kind: "chat"; sessionId: string; terminalId: string }
+		| { kind: "terminal"; terminalId: string },
+): Promise<void> {
+	const automationRunId = identity.launch?.automationRunId;
+	if (!automationRunId) return;
+	const pending: PendingCloudLaunchReport =
+		report.kind === "chat"
+			? { ...report, automationRunId }
+			: { kind: "terminal", terminalId: report.terminalId, automationRunId };
+	try {
+		writeFileSync(
+			identity.launchMarkerPath,
+			withPendingLaunchReport(readMarker(identity.launchMarkerPath), pending),
+		);
+		await flushPendingLaunchReport(ctx, identity);
+	} catch (error) {
+		console.warn(
+			`[sandbox] could not keep the launch report for workspace ${identity.workspaceId}`,
+			error,
+		);
+	}
+}
+
+async function flushPendingLaunchReport(
+	ctx: HostServiceContext,
+	identity: SandboxIdentity,
+): Promise<void> {
+	const marker = readMarker(identity.launchMarkerPath);
+	const pending = readPendingLaunchReport(marker);
+	if (!pending) return;
+	if (!(await reportLaunch(ctx, identity.workspaceId, pending))) return;
+	writeFileSync(identity.launchMarkerPath, withoutPendingLaunchReport(marker));
+}
+
+function readMarker(path: string): string {
+	try {
+		return readFileSync(path, "utf8");
+	} catch {
+		return "";
+	}
+}
+
+async function reportLaunch(
+	ctx: HostServiceContext,
+	workspaceId: string,
+	report: PendingCloudLaunchReport,
+): Promise<boolean> {
+	try {
+		await ctx.api.automation.reportCloudLaunch.mutate(report);
+		return true;
+	} catch (error) {
+		console.warn(
+			`[sandbox] could not report the launch for workspace ${workspaceId}`,
+			error,
+		);
+		return false;
 	}
 }
 

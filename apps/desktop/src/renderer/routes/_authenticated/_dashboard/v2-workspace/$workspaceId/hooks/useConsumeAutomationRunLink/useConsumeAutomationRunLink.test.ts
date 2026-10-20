@@ -15,6 +15,16 @@ describe("getAutomationRunLinkConsumeKey", () => {
 		).toBe("terminal:terminal-1");
 	});
 
+	it("keeps chat runtime ids separate from compatibility terminal ids", () => {
+		expect(
+			getAutomationRunLinkConsumeKey({
+				type: "chat",
+				id: "session-1",
+				focusRequestId: undefined,
+			}),
+		).toBe("chat:session-1");
+	});
+
 	it("treats each notification focus request as a fresh command", () => {
 		expect(
 			getAutomationRunLinkConsumeKey({

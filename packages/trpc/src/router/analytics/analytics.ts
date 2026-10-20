@@ -1,10 +1,32 @@
-import type { TRPCRouterRecord } from "@trpc/server";
+import { db } from "@superset/db/client";
+import { members } from "@superset/db/schema";
+import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
+import { and, eq } from "drizzle-orm";
 import { z } from "zod";
-
+import { acpChatEnabled } from "../../lib/acp-chat";
 import { posthog } from "../../lib/analytics";
 import { protectedProcedure } from "../../trpc";
 
 export const analyticsRouter = {
+	acpChatEnabled: protectedProcedure
+		.input(z.object({ userId: z.string().optional() }))
+		.query(async ({ ctx, input }) => {
+			const userId = input.userId ?? ctx.session.user.id;
+			if (userId !== ctx.session.user.id) {
+				if (!ctx.activeOrganizationId) {
+					throw new TRPCError({ code: "FORBIDDEN" });
+				}
+				const membership = await db.query.members.findFirst({
+					where: and(
+						eq(members.organizationId, ctx.activeOrganizationId),
+						eq(members.userId, userId),
+					),
+					columns: { id: true },
+				});
+				if (!membership) throw new TRPCError({ code: "FORBIDDEN" });
+			}
+			return { enabled: await acpChatEnabled(userId) };
+		}),
 	captureEvent: protectedProcedure
 		.input(
 			z.object({

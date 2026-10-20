@@ -15,6 +15,15 @@ context.
 
 ## Identity and ownership
 
+**An automation dispatch finishes before its cloud chat exists.** A machine-owned host returns the
+chat session ID during dispatch. A fresh sandbox creates that session only on first boot, after the
+API has queued provisioning. The run now binds its cloud workspace before provisioning and carries
+its run ID in the launch environment. Host-service reports the actual chat/terminal identity through
+a sandbox-scoped procedure; the API checks the run, workspace, organization, and creator before
+linking it. Failed reports stay in the launch marker for retry on restart, without relaunching the
+agent. **Open:** a process crash between session creation and writing the report can still lose the
+session link. Changes in this path require a published host-service/sandbox bundle.
+
 **The workspace's name belongs to the cloud row, not the sandbox.** For a local
 or remote host, `host.db` owns the workspace because the user created it there.
 A cloud workspace is created, named (by the API's namer) and listed by the

@@ -45,6 +45,7 @@ import { hasHarnessSession } from "../../../terminal-agents/harness-sessions";
 import type { HostServiceContext } from "../../../types";
 import { protectedProcedure, router } from "../../index";
 import { resolveAttachmentPath } from "../attachments/storage";
+import { createChatSession } from "../sessions/create-chat-session";
 import { toTerminalSessionError } from "../terminal/errors";
 import { seedAgentFolderTrust } from "../workspace-creation/shared/seed-agent-trust";
 
@@ -685,6 +686,7 @@ function continueChatAgent(
 		kind: "terminal",
 		sessionId: target.terminalId,
 		label: target.label,
+		chatSessionId: target.chatSessionId,
 	};
 }
 
@@ -698,39 +700,12 @@ function launchChatAgent(
 	const chat = ctx.runtime.chat?.();
 	if (!chat?.live.supports(target.harness)) return null;
 
-	const terminalId = crypto.randomUUID();
-	const { sessionId } = chat.commands.createSession({
-		commandId: crypto.randomUUID(),
-		scopeId: input.workspaceId,
-		harness: target.harness,
-		cwd,
-		terminalId,
-		...(input.model ? { modelId: input.model } : {}),
-		...(input.mode ? { modeId: input.mode } : {}),
-	});
-	const content = [
-		...(input.prompt.trim() !== ""
-			? [{ type: "text" as const, text: input.prompt }]
-			: []),
-		...target.attachments.map((attachment) => ({
-			type: "attachment" as const,
-			...attachment,
-		})),
-	];
-	if (content.length > 0) {
-		chat.commands.prompt({
-			commandId: crypto.randomUUID(),
-			sessionId,
-			clientId: crypto.randomUUID(),
-			content,
-		});
-	}
-
+	const created = createChatSession(chat, target, input, cwd);
 	return {
 		kind: "terminal",
-		sessionId: terminalId,
-		label: target.label,
-		chatSessionId: sessionId,
+		sessionId: created.terminalId,
+		label: created.label,
+		chatSessionId: created.sessionId,
 	};
 }
 
