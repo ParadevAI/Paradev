@@ -98,6 +98,16 @@
 			"version": "1.0.0"
 		},
 		{
+			"name": "autumn",
+			"description": "Work with billing in Autumn: customers, plans, balances, and subscriptions.",
+			"author": {
+				"name": "Superset"
+			},
+			"category": "development",
+			"source": "./plugins/autumn",
+			"version": "1.0.0"
+		},
+		{
 			"name": "stripe",
 			"description": "Work with payments in Stripe: trace charges and subscriptions, read billing data, and search Stripe's docs.",
 			"author": {

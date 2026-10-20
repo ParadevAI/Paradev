@@ -48,7 +48,7 @@ const LEGACY_FLOW_SCOPES = new Set<string>([
 
 /**
  * A refresh token only works with the client that issued it, and no column
- * records which. Connector-flow rows (GOOGLE_TEMP client) carry wider scopes.
+ * records which. Connector-flow rows (GOOGLE_CONNECTIONS client) carry wider scopes.
  */
 export function refreshClientsFor(
 	scopes: string[] | null,
@@ -66,10 +66,10 @@ function configuredRefreshClients(scopes: string[] | null) {
 	return refreshClientsFor(
 		scopes,
 		{ clientId: env.GOOGLE_CLIENT_ID, clientSecret: env.GOOGLE_CLIENT_SECRET },
-		env.GOOGLE_TEMP_CLIENT_ID && env.GOOGLE_TEMP_CLIENT_SECRET
+		env.GOOGLE_CONNECTIONS_CLIENT_ID && env.GOOGLE_CONNECTIONS_CLIENT_SECRET
 			? {
-					clientId: env.GOOGLE_TEMP_CLIENT_ID,
-					clientSecret: env.GOOGLE_TEMP_CLIENT_SECRET,
+					clientId: env.GOOGLE_CONNECTIONS_CLIENT_ID,
+					clientSecret: env.GOOGLE_CONNECTIONS_CLIENT_SECRET,
 				}
 			: null,
 	);

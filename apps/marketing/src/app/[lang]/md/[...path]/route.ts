@@ -9,6 +9,7 @@ import {
 	PRICING_FAQ_ITEMS,
 	PRICING_TIERS,
 } from "@/app/[lang]/pricing/constants";
+import { proSeatPriceValues } from "@/app/[lang]/pricing/utils/proSeatPriceValues";
 import { fetchParticipant } from "@/app/[lang]/utils/fetchLeaderboard";
 import { getBlogPost } from "@/lib/blog";
 import { getCategoryPage } from "@/lib/category";
@@ -48,10 +49,11 @@ function cell(i18n: I18n, value: ComparisonValue | null): string {
 
 function pricingPage(i18n: I18n): MarkdownPage {
 	const baseUrl = COMPANY.MARKETING_URL;
+	const prices = proSeatPriceValues(i18n.locale);
 	const tiers = PRICING_TIERS.map((tier) => {
 		const price =
-			tier.price.kind === "variable"
-				? `${tier.price.monthly.display} ${text(i18n, tier.price.monthly.note)} (${text(i18n, tier.price.monthly.cadence)}) or ${tier.price.yearly.display} ${text(i18n, tier.price.yearly.note)} (${text(i18n, tier.price.yearly.cadence)})`
+			tier.price.kind === "proSeat"
+				? `${prices.monthlyPrice} ${text(i18n, tier.price.monthly.note)} (${text(i18n, tier.price.monthly.cadence)}) or ${prices.yearlyPrice} ${text(i18n, tier.price.yearly.note)} (${i18n._({ ...tier.price.yearly.cadence, values: prices })})`
 				: `${text(i18n, tier.price.display)} (${text(i18n, tier.price.note)})`;
 		return [
 			`### ${text(i18n, tier.name)}`,
@@ -79,14 +81,13 @@ function pricingPage(i18n: I18n): MarkdownPage {
 	const faq = PRICING_FAQ_ITEMS.flatMap((item) => [
 		`### ${text(i18n, item.question)}`,
 		"",
-		text(i18n, item.answer),
+		i18n._({ ...item.answer, values: prices }),
 		"",
 	]);
 	return {
 		title: `${COMPANY.NAME} pricing`,
 		url: `${baseUrl}/pricing`,
-		description:
-			"Free for individuals. Pro is $20 per user/month (or $15 billed yearly). Enterprise adds SSO, SCIM, audit logs, and an SLA.",
+		description: `Free for individuals. Pro is ${prices.monthlyPrice} per user/month (or ${prices.yearlyPrice} billed yearly). Enterprise adds SSO, SCIM, audit logs, and an SLA.`,
 		content: [
 			"## Plans",
 			"",

@@ -48,7 +48,7 @@
 	"devDependencies": {
 		"@superset/typescript": "workspace:*",
 		"@types/node": "24.12.0",
-		"@xterm/headless": "6.1.0-beta.302",
+		"@xterm/headless": "6.1.0-beta.313",
 		"bun-types": "1.4.2",
 		"typescript": "7.0.2"
 	}

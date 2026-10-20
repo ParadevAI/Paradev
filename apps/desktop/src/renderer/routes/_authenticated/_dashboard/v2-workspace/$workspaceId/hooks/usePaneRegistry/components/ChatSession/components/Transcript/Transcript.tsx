@@ -43,7 +43,9 @@ import { useNearRows } from "./hooks/useNearRows";
 import { useScrollAnchorKey } from "./hooks/useScrollAnchorKey";
 import { useScrollbarGutter } from "./hooks/useScrollbarGutter";
 import { useTranscriptFind } from "./hooks/useTranscriptFind";
+import { ChatImageGalleryProvider } from "./providers/ChatImageGalleryProvider";
 import { copySourceText } from "./utils/copySourceText";
+import { galleryImages } from "./utils/galleryImages";
 import { lastReplyKeys } from "./utils/lastReplyKeys";
 import {
 	rowMessageId,
@@ -222,6 +224,7 @@ export function Transcript({
 	}, [rows, entryOverrides]);
 
 	const lastReplies = useMemo(() => lastReplyKeys(rows), [rows]);
+	const gallery = useMemo(() => galleryImages(rows), [rows]);
 	const availableCommands = snapshot.session?.availableCommands;
 	const commands = useMemo(
 		() => new Map(availableCommands?.map((command) => [command.name, command])),
@@ -303,65 +306,67 @@ export function Transcript({
 
 	return (
 		<MessageScroller.Root className="relative flex min-h-0 min-w-0 flex-1 flex-col">
-			<TranscriptFindBar
-				currentIndex={find.currentIndex}
-				inputRef={find.inputRef}
-				isOpen={find.isOpen}
-				loading={
-					find.loading || (find.isOpen && hasOlder && !olderPages.failed)
-				}
-				matchCount={find.matchCount}
-				onClose={find.close}
-				onNext={find.next}
-				onPrevious={find.previous}
-				onQueryChange={find.setQuery}
-				query={find.query}
-			/>
-			<MessageScroller.Viewport
-				aria-label={t({ message: "Messages" })}
-				className={cn(
-					"min-h-0 flex-1 overflow-y-auto [scrollbar-gutter:stable_both-edges]",
-					CHAT_SCROLLER_GUTTER_CLASSNAME,
-				)}
-				onCopy={copySourceText}
-				onKeyDown={onViewportKeyDown}
-				onPointerDown={onViewportPointerDown}
-				onTouchMove={markReaderScroll}
-				onWheel={markReaderScroll}
-				ref={viewportRef}
-				style={
-					{ "--scrollbar-gutter": `${scrollbarGutter}px` } as CSSProperties
-				}
-			>
-				{hasOlder && (
-					<div
+			<ChatImageGalleryProvider images={gallery}>
+				<TranscriptFindBar
+					currentIndex={find.currentIndex}
+					inputRef={find.inputRef}
+					isOpen={find.isOpen}
+					loading={
+						find.loading || (find.isOpen && hasOlder && !olderPages.failed)
+					}
+					matchCount={find.matchCount}
+					onClose={find.close}
+					onNext={find.next}
+					onPrevious={find.previous}
+					onQueryChange={find.setQuery}
+					query={find.query}
+				/>
+				<MessageScroller.Viewport
+					aria-label={t({ message: "Messages" })}
+					className={cn(
+						"min-h-0 flex-1 overflow-y-auto [scrollbar-gutter:stable_both-edges]",
+						CHAT_SCROLLER_GUTTER_CLASSNAME,
+					)}
+					onCopy={copySourceText}
+					onKeyDown={onViewportKeyDown}
+					onPointerDown={onViewportPointerDown}
+					onTouchMove={markReaderScroll}
+					onWheel={markReaderScroll}
+					ref={viewportRef}
+					style={
+						{ "--scrollbar-gutter": `${scrollbarGutter}px` } as CSSProperties
+					}
+				>
+					{hasOlder && (
+						<div
+							className={cn(
+								CHAT_COLUMN_CLASSNAME,
+								"flex h-10 items-center justify-center",
+							)}
+							ref={olderPages.sentinelRef}
+						>
+							{olderPages.failed ? (
+								<Button onClick={olderPages.retry} size="sm" variant="ghost">
+									<Trans>Couldn't load earlier messages. Retry</Trans>
+								</Button>
+							) : (
+								olderPages.loading && <Spinner className="size-4" />
+							)}
+						</div>
+					)}
+					<MessageScroller.Content
 						className={cn(
 							CHAT_COLUMN_CLASSNAME,
-							"flex h-10 items-center justify-center",
+							"flex select-text flex-col pt-4 pb-8",
 						)}
-						ref={olderPages.sentinelRef}
 					>
-						{olderPages.failed ? (
-							<Button onClick={olderPages.retry} size="sm" variant="ghost">
-								<Trans>Couldn't load earlier messages. Retry</Trans>
-							</Button>
-						) : (
-							olderPages.loading && <Spinner className="size-4" />
-						)}
-					</div>
-				)}
-				<MessageScroller.Content
-					className={cn(
-						CHAT_COLUMN_CLASSNAME,
-						"flex select-text flex-col pt-4 pb-8",
-					)}
-				>
-					{contentChildren}
-				</MessageScroller.Content>
-			</MessageScroller.Viewport>
-			<div className="pointer-events-none absolute inset-x-0 bottom-3 flex justify-center">
-				<ScrollToBottomButton />
-			</div>
+						{contentChildren}
+					</MessageScroller.Content>
+				</MessageScroller.Viewport>
+				<div className="pointer-events-none absolute inset-x-0 bottom-3 flex justify-center">
+					<ScrollToBottomButton />
+				</div>
+			</ChatImageGalleryProvider>
 		</MessageScroller.Root>
 	);
 }

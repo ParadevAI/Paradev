@@ -1,0 +1,127 @@
+---
+title: "Superset vs JetBrains Air (2026): Agent Workspace vs JetBrains' Agent Platform"
+description: "Compare Superset and JetBrains Air for running coding agents in parallel. A local-first workspace for any CLI agent vs JetBrains' family of Air app, Air in IDEs, Air Teams, and Air Governance."
+date: 2026-10-13
+lastUpdated: 2026-10-15
+type: "1v1"
+competitors:
+  - jetbrains-air
+keywords:
+  - superset vs jetbrains air
+  - jetbrains air alternative
+  - jetbrains air
+  - air in ides
+  - air teams
+  - jetbrains central
+  - parallel coding agents
+---
+
+Superset and JetBrains Air both run coding agents from several vendors in parallel, each isolated in a Git worktree, with diff review in between. JetBrains relaunched Air on September 22, 2026 as a family of products: the Air desktop app, Air inside JetBrains IDEs, Air Teams for cloud tasks and automations, and Air Governance for policy and cost control. Superset is a local-first desktop workspace that runs any CLI agent, on your own subscriptions, with pull requests, a browser, automations, remote hosts, cloud workspaces, and a mobile app.
+
+Facts were checked against JetBrains' own blog, docs, and pricing pages on October 13, 2026.
+
+---
+
+## At a Glance
+
+| | **Superset** | **JetBrains Air** |
+|---|---|---|
+| **What it is** | Local-first workspace for running any CLI coding agent in parallel | A family: Air app (preview), Air in IDEs (early access), Air Teams, Air Governance |
+| **Agents** | Any CLI agent (Claude Code, Codex, Copilot CLI, Antigravity CLI, Cursor's agent, Amp, OpenCode, Droid, Muse Code, and more) | Codex, Gemini, GitHub Copilot, Claude Agent, and Junie out of the box, plus any agent from the ACP Registry |
+| **Isolation** | Git worktrees for local branch-based workspaces | Git worktrees or Docker containers locally; containers on JetBrains' cloud VMs for cloud tasks |
+| **Review and PRs** | Changes pane with commit, push, and PR; Pull Requests view with CI checks and line comments | Diffs with line comments for the agent; the agent pushes a task branch and a person opens the PR |
+| **Remote** | Cloud workspaces, or Remote Access to a macOS or Linux machine you add as a host | Cloud tasks on JetBrains' cloud (needs JetBrains AI credits) |
+| **Automation** | Scheduled automations, CLI, TypeScript SDK, MCP server, Slack bot | Air Teams Automations from GitHub, Jira, webhooks, and schedules |
+| **Mobile** | iPhone and iPad app | "Coming soon" |
+| **Model costs** | Your own subscriptions and keys, never proxied | Your own keys and subscriptions for local tasks; cloud tasks always use JetBrains AI credits |
+| **Platforms** | macOS; experimental Linux AppImage; Windows unavailable | Air app on macOS, Windows, Linux; Air in IDEs inside JetBrains IDEs; Air Teams in the browser |
+| **Pricing** | Free tier; Pro $20 per user per month | Basic free; Business $20 per seat per month; Enterprise on request; AI credits billed separately |
+
+---
+
+## What Is Superset?
+
+Superset is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, Copilot CLI, Antigravity CLI, Cursor's agent, Amp, OpenCode, Droid, Muse Code, and any other CLI agent inside isolated Git worktrees with persistent terminal sessions, on your own subscriptions and keys, and never proxies model calls. Around that core it adds a Changes pane that commits, pushes, and opens PRs, a Pull Requests view with CI checks and line comments you can send to agents, a chat panel, an in-app browser with port detection and Design Mode, and an MCP server so agents and tools can create workspaces and launch agents. Remote Access adds a macOS or Linux machine as a host so workspaces keep running when your laptop sleeps, and scheduled automations, a CLI, a TypeScript SDK, and a Slack bot cover unattended work. The [iPhone and iPad app](/mobile) lets you check on sessions and review diffs away from your desk. Source-available under Elastic License 2.0 (ELv2), with an enterprise tier that adds SAML SSO, SCIM, audit logs, and a SOC 2 Type II report.
+
+## What Is JetBrains Air?
+
+JetBrains describes Air as "an open, coherent system of products for developers, teams, and organizations, inside and beyond JetBrains IDEs," with multi-vendor support as "a foundational design principle." Air first launched in March 2026 as a free, standalone "agentic development environment" in public preview; the Air app now runs on macOS, Windows, and Linux and is still labeled preview. On September 22, 2026, JetBrains expanded it into a family:
+
+- **Air app:** runs agent tasks locally, in Git worktrees or Docker containers, and runs cloud tasks.
+- **Air in IDEs:** an early-access plugin, opened on October 1, 2026, that brings Air into JetBrains IDEs. Each session runs in a temporary worktree, and you cherry-pick results back.
+- **Air Teams:** a browser app with cloud tasks, shared cloud environments, Automations triggered by GitHub, Jira, webhooks, or schedules, and Projects. It is available to JetBrains business customers now, with individuals later.
+- **Air Governance:** policy, visibility, auditability, and cost management for organizations. It was announced in March as JetBrains Central and renamed in September.
+
+Air ships with Codex, Gemini, GitHub Copilot, Claude Agent, and Junie, and adds other agents through the Agent Client Protocol (ACP) Registry. Cloud tasks run in a Docker container on a JetBrains cloud VM; the agent pushes to its own task branch, and a person opens and merges the pull request. You can bring your own keys and subscriptions for local tasks, but cloud tasks and automations always spend JetBrains AI credits. A mobile app is "coming soon."
+
+## Key Differences
+
+### Any CLI Agent vs ACP Agents
+
+Both are multi-vendor. Air runs agents that speak the Agent Client Protocol, with five built in and more from the ACP Registry. Superset runs any CLI agent in a real terminal, with no protocol adapter: if it runs in a shell, it runs in Superset. JetBrains also notes that a Claude Free, Pro, or Max plan works in Air's terminal or IDE tab, but not for ACP agents you add yourself; in Superset, Claude Code runs on your Claude plan like any other agent.
+
+### Who Pays for the Models
+
+Superset never proxies model calls: every agent runs on your own subscription or key. In Air, your own keys and subscriptions work for local tasks, while cloud tasks and automations always use JetBrains AI credits, billed at public API rates.
+
+### Remote and Cloud Work
+
+Air's remote story is cloud tasks on JetBrains-hosted VMs, paid for with JetBrains AI credits. Superset has two options: cloud workspaces, which run in the cloud and work from desktop, iPhone, and iPad without keeping your own computer connected, and Remote Access, which adds a macOS or Linux machine you own as a host. In both, agents run on your own subscriptions. If you want shared team cloud environments with automations triggered from GitHub or Jira, Air Teams provides them.
+
+### Pull Requests
+
+Superset takes the change all the way: commit, push, and open the pull request from the Changes pane, then watch CI checks and send line comments back to the agent. In Air, the agent pushes a task branch and a person opens and merges the pull request.
+
+### Mobile and Maturity
+
+Superset has an iPhone and iPad app today. Air's mobile app is "coming soon," the Air app is in preview, Air in IDEs is in early access, and several Enterprise governance features, including AI audit logs and identity provisioning, are marked "coming soon."
+
+### IDE Integration
+
+If your team lives in IntelliJ IDEA, PyCharm, or another JetBrains IDE, Air in IDEs puts agents inside the editor you already use. Superset works alongside any editor and can open a workspace in JetBrains IDEs, VS Code, Cursor, Zed, or Xcode.
+
+---
+
+## Pricing
+
+Superset offers a free tier and Pro at $20 per user per month, or $15 per user per month billed yearly, with an enterprise tier on custom billing; model costs are on your own agent subscriptions. JetBrains' Console plans are Basic (free), Business at $20 per seat per month, and Enterprise on request, with JetBrains AI credits billed separately for cloud tasks and automations. Policies, organization-level keys, model management, and ACP agents and MCP servers need Business or higher. Prices as of October 2026.
+
+---
+
+## Which Should You Choose?
+
+**Choose Superset if you:**
+
+- Want to run any CLI agent, on your own subscriptions, with no model proxy
+- Want agents on machines you own or in cloud workspaces, with scheduled automations
+- Want pull requests, CI checks, and line comments back to the agent in one place
+- Want a mobile app and enterprise controls available today
+
+**Choose JetBrains Air if you:**
+
+- Live in JetBrains IDEs and want agents inside them
+- Want shared team cloud environments and automations triggered from GitHub and Jira
+- Want organization-wide governance and cost tracking from one vendor
+- Are comfortable with preview and early-access products as they mature
+
+**Verdict:** Air is the most serious multi-vendor agent platform from an IDE company, and a natural fit for JetBrains shops. Superset is the better fit when you want any CLI agent on your own subscriptions, on your machines or in the cloud, with the path to merge and a mobile app available now.
+
+---
+
+## Frequently Asked Questions
+
+### What is JetBrains Air?
+
+A family of JetBrains products for running coding agents: the Air desktop app (preview), Air in IDEs (early access), Air Teams for cloud tasks and automations, and Air Governance for policy and cost control. It was relaunched in this form on September 22, 2026.
+
+### What happened to JetBrains Central?
+
+JetBrains announced Central in March 2026 as a control plane for agent-driven development. In September 2026 it was renamed Air Governance.
+
+### Which agents does JetBrains Air support?
+
+Codex, Gemini, GitHub Copilot, Claude Agent, and Junie out of the box, plus agents from the ACP Registry. Superset runs any CLI agent, including Claude Code, Codex, and Copilot CLI.
+
+### Can I use my own API keys in JetBrains Air?
+
+For local tasks, yes. Cloud tasks and automations always use JetBrains AI credits. Superset runs every agent on your own subscriptions and keys.

@@ -296,6 +296,20 @@ export function useDashboardSidebarState() {
 		},
 		[v2Workspaces],
 	);
+	// Folder membership is a host tag; a cloud workspace keeps only its local
+	// pointer, even while its sandbox answers as a host.
+	const writeHostWorkspaceTags = useCallback(
+		(workspaceId: string, tags: string[]) => {
+			const served = hostWorkspaces.some(
+				(workspace) =>
+					workspace.id === workspaceId &&
+					!hostWorkspacesCache.isSandboxHost(workspace.hostId),
+			);
+			if (!served) return;
+			void writeWorkspaceTags(workspaceId, tags);
+		},
+		[hostWorkspaces, hostWorkspacesCache, writeWorkspaceTags],
+	);
 
 	// Folder presentation (label, color) is host-owned beside its workspaces.
 	// Projects can have a row on multiple serving hosts, so project writes fan
@@ -518,7 +532,7 @@ export function useDashboardSidebarState() {
 						null,
 					);
 					if (strippedTags.join("\n") !== currentTags.join("\n")) {
-						writeWorkspaceTags(item.id, strippedTags);
+						writeHostWorkspaceTags(item.id, strippedTags);
 					}
 					collections.v2WorkspaceLocalState.update(item.id, (draft) => {
 						draft.sidebarState.tabOrder = tabOrder;
@@ -541,7 +555,7 @@ export function useDashboardSidebarState() {
 			ensureSectionRow,
 			hostWorkspaces,
 			tagFolderContext,
-			writeWorkspaceTags,
+			writeHostWorkspaceTags,
 		],
 	);
 
@@ -576,7 +590,7 @@ export function useDashboardSidebarState() {
 						targetTag,
 					);
 					if (nextTags.join("\n") !== currentTags.join("\n")) {
-						writeWorkspaceTags(workspaceId, nextTags);
+						writeHostWorkspaceTags(workspaceId, nextTags);
 					}
 				}
 				collections.v2WorkspaceLocalState.update(workspaceId, (draft) => {
@@ -587,7 +601,7 @@ export function useDashboardSidebarState() {
 				});
 			});
 		},
-		[collections, hostWorkspaces, tagFolderContext, writeWorkspaceTags],
+		[collections, hostWorkspaces, tagFolderContext, writeHostWorkspaceTags],
 	);
 
 	const createSection = useCallback(
@@ -765,7 +779,7 @@ export function useDashboardSidebarState() {
 					null,
 				);
 				if (strippedTags.join("\n") !== currentTags.join("\n")) {
-					writeWorkspaceTags(workspaceId, strippedTags);
+					writeHostWorkspaceTags(workspaceId, strippedTags);
 				}
 				const topLevelItems = getProjectTopLevelItems(
 					collections,
@@ -819,7 +833,7 @@ export function useDashboardSidebarState() {
 				.map((item) => ({ tabOrder: item.sidebarState.tabOrder }));
 
 			if (targetTag !== null) {
-				writeWorkspaceTags(
+				writeHostWorkspaceTags(
 					workspaceId,
 					applyFolderTagChange(currentTags, folderIndex.keys(), targetTag),
 				);
@@ -834,7 +848,7 @@ export function useDashboardSidebarState() {
 				draft.sidebarState.isHidden = false;
 			});
 		},
-		[collections, hostWorkspaces, tagFolderContext, writeWorkspaceTags],
+		[collections, hostWorkspaces, tagFolderContext, writeHostWorkspaceTags],
 	);
 
 	const deleteSection = useCallback(

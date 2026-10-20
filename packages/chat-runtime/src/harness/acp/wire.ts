@@ -30,6 +30,7 @@ export type AcpContentBlock = z.infer<typeof acpContentBlockSchema>;
  */
 export const acpInitializeResponseSchema = z.looseObject({
 	protocolVersion: z.number().optional(),
+	agentInfo: z.looseObject({ name: z.string().optional() }).optional(),
 	agentCapabilities: z.looseObject({}).optional(),
 	capabilities: z.looseObject({}).optional(),
 	authMethods: z.array(z.unknown()).optional(),

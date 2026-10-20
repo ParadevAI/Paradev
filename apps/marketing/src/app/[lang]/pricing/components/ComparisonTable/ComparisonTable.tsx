@@ -10,6 +10,7 @@ import {
 	PRICING_TIERS,
 	type PricingTier,
 } from "../../constants";
+import { proSeatPriceValues } from "../../utils/proSeatPriceValues";
 
 export function ComparisonTable() {
 	return (
@@ -68,11 +69,12 @@ function DesktopTable() {
 }
 
 function TierPriceLabel({ tier }: { tier: PricingTier }) {
+	const { i18n } = useLingui();
 	if (tier.price.kind === "fixed") {
 		return <>{tier.price.display}</>;
 	}
-	if (tier.price.kind === "variable") {
-		const price = tier.price.yearly.display;
+	if (tier.price.kind === "proSeat") {
+		const price = proSeatPriceValues(i18n.locale).yearlyPrice;
 		return <Trans>from {price}/user/mo</Trans>;
 	}
 	return <Trans>Custom</Trans>;

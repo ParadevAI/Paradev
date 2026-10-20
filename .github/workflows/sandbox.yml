@@ -13,6 +13,8 @@ on:
     paths:
       - "packages/sandbox/**"
       - "packages/shared/src/sandbox-contract.ts"
+  schedule:
+    - cron: "0 9 * * *"
   workflow_dispatch:
     inputs:
       run:
@@ -147,15 +149,13 @@ jobs:
 
   production-release:
     name: Production release
-    # A merge that touches the image or the bundle releases it. Without this the
-    # bundle moved on every merge while the image and the goldens only moved when
-    # someone remembered, so every new box booted an image older than the bundle
-    # it then fetched. host-service is deliberately not here: a box picks one up
-    # by hash from `bundle/assets.json`, so what reaches a box is the version
-    # bump in that file, which is already a `packages/sandbox/**` change.
+    # A merge that touches the image or the bundle releases it, and the nightly
+    # run carries everything else: host-service and the CLI from main, the
+    # latest claude, codex and Chrome, and the image's apt packages.
     if: |
       github.ref == 'refs/heads/main' && (
         github.event_name == 'push' ||
+        github.event_name == 'schedule' ||
         (github.event_name == 'workflow_dispatch' && inputs.run == 'production-release')
       )
     runs-on: ubuntu-latest
@@ -164,9 +164,14 @@ jobs:
     concurrency:
       group: sandbox-production-release
       cancel-in-progress: false
+    permissions:
+      contents: read
+      issues: write
     steps:
       - name: Check out code
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
 
       - name: Setup Bun
         id: setup-bun
@@ -201,3 +206,17 @@ jobs:
           CDN_R2_BUCKET: ${{ secrets.CDN_R2_BUCKET }}
           CDN_URL: ${{ secrets.CDN_URL }}
         run: bun run release --production
+
+      - name: Report a failed nightly release
+        if: failure() && github.event_name == 'schedule'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          title="Nightly sandbox release failed"
+          issue=$(gh issue list --state open --search "\"$title\" in:title" --json number --jq '.[0].number')
+          if [ -n "$issue" ]; then
+            gh issue comment "$issue" --body "Failed again: $RUN_URL"
+          else
+            gh issue create --title "$title" --body "Boxes keep the previous release until a release passes. Run: $RUN_URL"
+          fi

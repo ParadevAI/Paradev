@@ -34,7 +34,7 @@ const OVERLAY_POSITION = {
 	expanded: "-top-0.5 -right-0.5",
 } as const;
 
-const PR_ICON_BY_STATE = {
+export const PR_ICON_BY_STATE = {
 	open: LuGitPullRequest,
 	merged: LuGitMerge,
 	closed: LuGitPullRequestClosed,
@@ -42,7 +42,7 @@ const PR_ICON_BY_STATE = {
 	queued: LuListChecks,
 } as const;
 
-const PR_COLOR_BY_STATE = {
+export const PR_COLOR_BY_STATE = {
 	open: "text-emerald-500",
 	merged: "text-purple-500",
 	closed: "text-destructive",

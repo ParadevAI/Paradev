@@ -107,6 +107,10 @@ export interface WorkspaceInteractionState {
 	resizeActive: boolean;
 }
 
+export interface AddTabMenuActions {
+	runAfterClose: (action: () => void) => void;
+}
+
 export interface WorkspaceProps<TData> {
 	store: StoreApi<WorkspaceStore<TData>>;
 	registry: PaneRegistry<TData>;
@@ -114,7 +118,7 @@ export interface WorkspaceProps<TData> {
 	renderTabAccessory?: (tab: Tab<TData>) => ReactNode;
 	renderTabIcon?: (tab: Tab<TData>) => ReactNode;
 	renderEmptyState?: () => ReactNode;
-	renderAddTabMenu?: () => ReactNode;
+	renderAddTabMenu?: (actions: AddTabMenuActions) => ReactNode;
 	/** Rendered at the leading (left) edge of the tab bar row, before the tabs. */
 	renderTabBarLeading?: () => ReactNode;
 	/** Rendered at the trailing (right) edge of the tab bar row. */

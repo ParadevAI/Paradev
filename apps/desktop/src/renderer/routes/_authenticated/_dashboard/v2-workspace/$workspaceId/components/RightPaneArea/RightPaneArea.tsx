@@ -76,7 +76,9 @@ export function RightPaneArea({
 						sources={getV2NotificationSourcesForTab(tab)}
 					/>
 				)}
-				renderAddTabMenu={() => <RightPaneAddMenu onAdd={onAdd} />}
+				renderAddTabMenu={({ runAfterClose }) => (
+					<RightPaneAddMenu onAdd={onAdd} runAfterClose={runAfterClose} />
+				)}
 				renderTabBarTrailing={() => (
 					<div className="flex items-center gap-1 pr-1">
 						<RightPaneHeaderButton

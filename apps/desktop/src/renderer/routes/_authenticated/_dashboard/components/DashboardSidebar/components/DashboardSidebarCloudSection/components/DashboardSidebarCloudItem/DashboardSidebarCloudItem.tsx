@@ -125,7 +125,7 @@ export function DashboardSidebarCloudItem({
 		setIsRenaming(false);
 		const name = renameValue.trim();
 		if (name && name !== workspace.name) {
-			workspaceActions.renameWorkspace(workspace.id, name);
+			workspaceActions.renameWorkspace(workspace.id, name, { cloud: true });
 		}
 	};
 

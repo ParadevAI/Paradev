@@ -6,9 +6,8 @@ import {
 	HoverCardTrigger,
 } from "@superset/ui/hover-card";
 import { type ReactNode, useState } from "react";
-import { LuRadioTower } from "react-icons/lu";
-
-const MAX_BADGE_COUNT = 9;
+import { useHoverCardSafeTriangle } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/hooks/useHoverCardSafeTriangle";
+import { PortsCountIcon } from "renderer/routes/_authenticated/_dashboard/components/PortsCountIcon";
 
 interface DashboardSidebarCloudPortsButtonProps {
 	count: number;
@@ -27,10 +26,11 @@ export function DashboardSidebarCloudPortsButton({
 		setIsOpen(open);
 		onOpenChange?.(open);
 	};
+	const safeTriangle = useHoverCardSafeTriangle(isOpen, setOpen);
 	return (
 		<HoverCard
 			open={isOpen}
-			onOpenChange={setOpen}
+			onOpenChange={safeTriangle.onOpenChange}
 			openDelay={150}
 			closeDelay={120}
 		>
@@ -38,6 +38,7 @@ export function DashboardSidebarCloudPortsButton({
 				<button
 					type="button"
 					onClick={() => setOpen(!isOpen)}
+					onPointerLeave={safeTriangle.onTriggerPointerLeave}
 					aria-expanded={isOpen}
 					aria-label={t({
 						message: plural(count, {
@@ -45,18 +46,14 @@ export function DashboardSidebarCloudPortsButton({
 							other: "# active ports — show details",
 						}),
 					})}
-					className="relative mr-1 flex size-5 items-center justify-center rounded text-muted-foreground hover:bg-foreground/10 hover:text-foreground"
+					className="mr-1 flex size-5 items-center justify-center rounded text-muted-foreground hover:bg-foreground/10 hover:text-foreground"
 				>
-					<LuRadioTower className="size-3.5" strokeWidth={1.75} />
-					<span
-						className="absolute -top-0.5 -right-[3px] size-[11px] rounded-full text-center leading-[11px] bg-muted-foreground font-bold tracking-[-0.02em] text-background tabular-nums ring-[1.5px] ring-sidebar dark:ring-[color-mix(in_oklab,var(--muted)_35%,var(--background))]"
-						style={{ fontSize: count > MAX_BADGE_COUNT ? 6 : 7.5 }}
-					>
-						{count > MAX_BADGE_COUNT ? `${MAX_BADGE_COUNT}+` : count}
-					</span>
+					<PortsCountIcon count={count} />
 				</button>
 			</HoverCardTrigger>
 			<HoverCardContent
+				ref={safeTriangle.setCardElement}
+				onPointerEnter={safeTriangle.onCardPointerEnter}
 				side="right"
 				align="start"
 				sideOffset={8}

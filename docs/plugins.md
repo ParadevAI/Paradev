@@ -107,8 +107,9 @@ writes the desired set and reaps whatever is absent, so a caller that hands in i
 instead of letting agent-setup read the file has just told it every other caller's plugins are gone.
 The desktop's next boot would undo a `plugins sync`, and vice versa.
 
-Skills land in `~/.agents/skills` (what Codex, Vibe, and Kimi read natively) and are mirrored into
-`~/.claude/skills` as a plugin directory, because Claude does not read the shared convention.
+Skills land in `~/.agents/skills` (what Codex, Cursor, OpenCode, Gemini CLI, Vibe, and Kimi read
+natively) and are mirrored into `~/.claude/skills` as a plugin directory, because Claude does not
+read the shared convention.
 
 ## Command surface
 

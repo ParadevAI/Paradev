@@ -1,4 +1,5 @@
 import { describe, expect, it } from "bun:test";
+import { spawn } from "node:child_process";
 import type { Item } from "@superset/chat/protocol";
 import { AGENT_DEFAULT_MODE } from "@superset/chat/protocol";
 import type { AdapterEvent } from "../types";
@@ -28,6 +29,10 @@ class FakeAcpAgent {
 	silent = false;
 	/** What the agent answers `initialize` with; older agents answer 1. */
 	protocolVersion = 2;
+	/** agentInfo.name reported at initialize, as pdev reports "paradev". */
+	agentName: string | null = null;
+	/** _meta attached to the first scripted agent message chunk. */
+	chunkMeta: Record<string, unknown> | null = null;
 	/** Session capabilities advertised at initialize; both shipped agents fork. */
 	sessionCapabilities: Record<string, unknown> | null = { fork: {} };
 	/** Replay history with v2's whole-message variants instead of chunks. */
@@ -101,6 +106,59 @@ class FakeAcpAgent {
 		return id;
 	}
 
+	requestPermissionWith(params: Record<string, unknown>, id: number): void {
+		this.deliver({
+			jsonrpc: "2.0",
+			id,
+			method: "session/request_permission",
+			params: { sessionId: "sess-1", ...params },
+		});
+	}
+
+	requestPdevPermission(toolCallId: string, id: number): void {
+		this.deliver({
+			jsonrpc: "2.0",
+			id,
+			method: "session/request_permission",
+			params: {
+				sessionId: "sess-1",
+				toolCall: { toolCallId, title: "Allow Write hello.txt?" },
+				options: [
+					{ optionId: "choice-0", name: "Allow once", kind: "allow_once" },
+					{
+						optionId: "choice-1",
+						name: "Allow all edits this session",
+						kind: "allow_once",
+					},
+					{ optionId: "choice-2", name: "Deny", kind: "allow_once" },
+				],
+			},
+		});
+	}
+
+	askQuestion(sessionId: string, toolCallId: string): number {
+		const id = 9003;
+		this.deliver({
+			jsonrpc: "2.0",
+			id,
+			method: "session/request_permission",
+			params: {
+				sessionId,
+				toolCall: { toolCallId, title: "Color: Which color?" },
+				options: [
+					{ optionId: "choice-0", name: "Red", kind: "allow_once" },
+					{ optionId: "choice-1", name: "Blue", kind: "allow_once" },
+					{
+						optionId: "choice-2",
+						name: "Other (type an answer)",
+						kind: "allow_once",
+					},
+				],
+			},
+		});
+		return id;
+	}
+
 	requestElicitation(params: Record<string, unknown>, id = 9002): number {
 		this.deliver({
 			jsonrpc: "2.0",
@@ -150,6 +208,7 @@ class FakeAcpAgent {
 		queueMicrotask(() => {
 			if (frame.method === "initialize") {
 				this.respond(frame.id as number, {
+					...(this.agentName ? { agentInfo: { name: this.agentName } } : {}),
 					...(this.steeringOutcome
 						? { _meta: { steering: { supported: true } } }
 						: {}),
@@ -251,6 +310,7 @@ class FakeAcpAgent {
 				this.notify("sess-1", {
 					sessionUpdate: "agent_message_chunk",
 					content: { type: "text", text: "Hello" },
+					...(this.chunkMeta ? { _meta: this.chunkMeta } : {}),
 				});
 				this.notify("sess-1", {
 					sessionUpdate: "agent_message_chunk",
@@ -288,7 +348,9 @@ function startAdapter(
 	adapterOptions: Pick<
 		AcpAdapterOptions,
 		| "defaultModeId"
-		| "selectionWaitMs"
+		| "requestTimeoutMs"
+		| "clientApprovalModes"
+		| "shellPollMs"
 		| "backgroundDetailIntervalMs"
 		| "startupTimeoutMs"
 	> = {},
@@ -1376,6 +1438,455 @@ describe("AcpAdapter on protocol v2", () => {
 		await adapter.dispose();
 	});
 
+	it("offers its own approval modes, answers permissions silently by them, and asks questions as forms", async () => {
+		const agent = new FakeAcpAgent();
+		agent.protocolVersion = 1;
+		agent.newSessionModes = {
+			currentModeId: "medium",
+			availableModes: [
+				{ id: "low", name: "Thinking: low" },
+				{ id: "medium", name: "Thinking: medium" },
+			],
+		};
+		const { adapter, events } = startAdapter(
+			agent,
+			undefined,
+			{},
+			{ defaultModeId: "bypassPermissions", clientApprovalModes: true },
+		);
+		await flush();
+		adapter.setMode("medium");
+		expect(sessionsOf(events).at(-1)?.modeId).toBe("bypassPermissions");
+		expect(sessionsOf(events).find((s) => s.availableModes)).toMatchObject({
+			modeId: "bypassPermissions",
+			availableModes: [
+				{ id: "default" },
+				{ id: "auto" },
+				{ id: "bypassPermissions" },
+			],
+		});
+		adapter.prompt([{ type: "text", text: "run" }]);
+		await flush();
+
+		agent.requestPdevPermission("tc-1", 9101);
+		await flush();
+		expect(agent.sent.find((f) => f.id === 9101)?.result).toEqual({
+			outcome: { outcome: "selected", optionId: "choice-0" },
+		});
+		expect(itemsOf(events).some((item) => item.id === "approval:tc-1")).toBe(
+			false,
+		);
+
+		agent.askQuestion("sess-1", "q-1");
+		await flush();
+		expect(
+			itemsOf(events).find((item) => item.id === "approval:q-1"),
+		).toMatchObject({
+			status: "pending",
+			form: {
+				message: "Which color?",
+				fields: [
+					{
+						title: "Color",
+						input: "single",
+						options: [
+							{ value: "choice-0", label: "Red" },
+							{ value: "choice-1", label: "Blue" },
+						],
+					},
+					{ id: "answer_custom", title: "Other", input: "text" },
+				],
+			},
+		});
+		adapter.respondToApproval("approval:q-1", {
+			type: "form",
+			values: { answer: "choice-1" },
+		});
+		await flush();
+		expect(agent.sent.find((f) => f.id === 9003)?.result).toEqual({
+			outcome: { outcome: "selected", optionId: "choice-1" },
+		});
+
+		adapter.setMode("default");
+		agent.requestPdevPermission("tc-2", 9102);
+		await flush();
+		expect(
+			itemsOf(events)
+				.filter((item) => item.id === "approval:tc-2")
+				.at(-1),
+		).toMatchObject({
+			status: "pending",
+			options: [
+				{ optionId: "choice-0", kind: "allow_once" },
+				{ optionId: "choice-1", kind: "allow_always" },
+				{ optionId: "choice-2", kind: "reject_once" },
+			],
+		});
+
+		adapter.setMode("auto");
+		await flush();
+		expect(
+			itemsOf(events)
+				.filter((item) => item.id === "approval:tc-2")
+				.at(-1),
+		).toMatchObject({ status: "answered" });
+		expect(agent.sent.find((f) => f.id === 9102)?.result).toEqual({
+			outcome: { outcome: "selected", optionId: "choice-0" },
+		});
+		expect(agent.sent.some((f) => f.method === "session/set_mode")).toBe(false);
+
+		await adapter.dispose();
+	});
+
+	it("keeps its own approval modes over an agent's mode config option", async () => {
+		const agent = new FakeAcpAgent();
+		agent.newSessionConfigOptions = [
+			{
+				configId: "mode",
+				name: "Mode",
+				type: "select",
+				category: "mode",
+				currentValue: "medium",
+				options: [
+					{ value: "low", name: "Thinking: low" },
+					{ value: "medium", name: "Thinking: medium" },
+				],
+			},
+		];
+		const { adapter, events } = startAdapter(
+			agent,
+			undefined,
+			{},
+			{ defaultModeId: "bypassPermissions", clientApprovalModes: true },
+		);
+		await flush();
+
+		const withModes = sessionsOf(events).filter((s) => s.availableModes);
+		expect(withModes.at(-1)?.availableModes?.map((mode) => mode.id)).toEqual([
+			"default",
+			"auto",
+			"bypassPermissions",
+		]);
+		expect(
+			sessionsOf(events)
+				.filter((s) => s.modeId)
+				.at(-1)?.modeId,
+		).toBe("bypassPermissions");
+		expect(
+			agent.sent.some((f) => f.method === "session/set_config_option"),
+		).toBe(false);
+
+		await adapter.dispose();
+	});
+
+	it("asks a question with Allow and Deny choices while ask_user_question runs", async () => {
+		const agent = new FakeAcpAgent();
+		const { adapter, events } = startAdapter(
+			agent,
+			undefined,
+			{},
+			{ defaultModeId: "bypassPermissions", clientApprovalModes: true },
+		);
+		await flush();
+		adapter.prompt([{ type: "text", text: "run" }]);
+		await flush();
+		agent.notify("sess-1", {
+			sessionUpdate: "tool_call",
+			toolCallId: "ask",
+			title: "ask_user_question",
+			status: "pending",
+		});
+		agent.requestPermissionWith(
+			{
+				toolCall: { toolCallId: "q-1", title: "Allow network access?" },
+				options: [
+					{ optionId: "choice-0", name: "Allow", kind: "allow_once" },
+					{ optionId: "choice-1", name: "Deny", kind: "allow_once" },
+				],
+			},
+			9201,
+		);
+		await flush();
+
+		expect(
+			itemsOf(events).find((item) => item.id === "approval:q-1"),
+		).toMatchObject({
+			status: "pending",
+			form: { fields: [{ input: "single" }] },
+		});
+		expect(agent.sent.some((f) => f.id === 9201)).toBe(false);
+
+		await adapter.dispose();
+	});
+
+	it("answers a typed question with pi's Other choice and sends the text once the turn ends", async () => {
+		const agent = new FakeAcpAgent();
+		agent.holdPrompts = true;
+		const { adapter } = startAdapter(
+			agent,
+			undefined,
+			{},
+			{ defaultModeId: "bypassPermissions", clientApprovalModes: true },
+		);
+		await flush();
+		adapter.prompt([{ type: "text", text: "run" }]);
+		await flush();
+		agent.askQuestion("sess-1", "q-1");
+		await flush();
+
+		adapter.respondToApproval("approval:q-1", {
+			type: "form",
+			values: { answer_custom: "purple" },
+		});
+		await flush();
+		expect(agent.sent.find((f) => f.id === 9003)?.result).toEqual({
+			outcome: { outcome: "selected", optionId: "choice-2" },
+		});
+		const prompts = () =>
+			agent.sent.filter((f) => f.method === "session/prompt");
+		expect(prompts()).toHaveLength(1);
+
+		agent.releasePrompts("end_turn");
+		await flush();
+		expect(prompts().at(-1)?.params).toMatchObject({
+			prompt: [{ type: "text", text: "purple" }],
+		});
+
+		await adapter.dispose();
+	});
+
+	it("resumes a session with its own approval modes in Ask, not the harness default", async () => {
+		const agent = new FakeAcpAgent();
+		const { adapter, events } = startAdapter(
+			agent,
+			"sess-1",
+			{},
+			{ defaultModeId: "bypassPermissions", clientApprovalModes: true },
+		);
+		await flush(40);
+
+		expect(
+			sessionsOf(events)
+				.filter((s) => s.availableModes)
+				.at(-1)?.modeId,
+		).toBe("default");
+
+		await adapter.dispose();
+	});
+
+	it("names the selected model on a live agent message", async () => {
+		const agent = new FakeAcpAgent();
+		agent.newSessionConfigOptions = [
+			{
+				configId: "model",
+				name: "Model",
+				type: "select",
+				category: "model",
+				currentValue: "pdev/auto",
+				options: [{ value: "pdev/auto", name: "pdev/Auto" }],
+			},
+		];
+		const { adapter, events } = startAdapter(agent);
+		await flush();
+		adapter.prompt([{ type: "text", text: "hi" }]);
+		await flush();
+
+		expect(
+			itemsOf(events)
+				.filter((item) => item.kind === "agent_message")
+				.at(-1),
+		).toMatchObject({ model: "pdev/Auto" });
+
+		await adapter.dispose();
+	});
+
+	it("shows the model pdev resolved, not the alias, on a live message", async () => {
+		const agent = new FakeAcpAgent();
+		agent.agentName = "paradev";
+		agent.chunkMeta = {
+			piAcp: {
+				model: { provider: "vercel-ai-gateway", modelId: "zai/glm-5.3-flash" },
+			},
+		};
+		agent.newSessionConfigOptions = [
+			{
+				configId: "model",
+				name: "Model",
+				type: "select",
+				category: "model",
+				currentValue: "pdev/auto",
+				options: [{ value: "pdev/auto", name: "pdev/Auto" }],
+			},
+		];
+		const { adapter, events } = startAdapter(agent);
+		await flush();
+		adapter.prompt([{ type: "text", text: "hi" }]);
+		await flush();
+
+		expect(
+			itemsOf(events)
+				.filter((item) => item.kind === "agent_message")
+				.at(-1),
+		).toMatchObject({ model: "zai/glm-5.3-flash" });
+
+		await adapter.dispose();
+	});
+
+	it("strips the gateway prefix from the model id pdev reports", async () => {
+		const agent = new FakeAcpAgent();
+		agent.chunkMeta = {
+			piAcp: { model: "vercel-ai-gateway/zai/glm-5.3-flash" },
+		};
+		const { adapter, events } = startAdapter(agent);
+		await flush();
+		adapter.prompt([{ type: "text", text: "hi" }]);
+		await flush();
+
+		expect(
+			itemsOf(events)
+				.filter((item) => item.kind === "agent_message")
+				.at(-1),
+		).toMatchObject({ model: "zai/glm-5.3-flash" });
+
+		await adapter.dispose();
+	});
+
+	it("drops the pdev/ prefix from pdev's own model option labels", async () => {
+		const agent = new FakeAcpAgent();
+		agent.agentName = "paradev";
+		agent.newSessionConfigOptions = [
+			{
+				configId: "model",
+				name: "Model",
+				type: "select",
+				category: "model",
+				currentValue: "pdev/auto",
+				options: [{ value: "pdev/auto", name: "pdev/Auto" }],
+			},
+		];
+		const { adapter, events } = startAdapter(agent);
+		await flush();
+
+		const session = sessionsOf(events)
+			.filter((s) => s.configOptions)
+			.at(-1);
+		const model = session?.configOptions?.find(
+			(option) => option.category === "model",
+		);
+		expect(model?.options[0]).toMatchObject({ label: "Auto" });
+
+		// A message the agent did not name a model for falls back to that label.
+		adapter.prompt([{ type: "text", text: "hi" }]);
+		await flush();
+		expect(
+			itemsOf(events)
+				.filter((item) => item.kind === "agent_message")
+				.at(-1),
+		).toMatchObject({ model: "Auto" });
+
+		await adapter.dispose();
+	});
+
+	it("keeps the model a replayed v2 message reports", async () => {
+		const agent = new FakeAcpAgent();
+		agent.replayUpdates = [
+			{
+				sessionUpdate: "agent_message",
+				messageId: "a1",
+				content: [{ type: "text", text: "On it." }],
+				_meta: { piAcp: { model: "zai/glm-5.3-flash" } },
+			},
+		];
+		const { adapter, events } = startAdapter(agent, "sess-1");
+		await flush();
+
+		expect(
+			itemsOf(events)
+				.filter((item) => item.kind === "agent_message")
+				.at(-1),
+		).toMatchObject({ model: "zai/glm-5.3-flash" });
+
+		await adapter.dispose();
+	});
+
+	it("lists a pi background shell from its tool result until pi reports it stopped", async () => {
+		const agent = new FakeAcpAgent();
+		const { adapter, events } = startAdapter(agent);
+		await flush();
+		adapter.prompt([{ type: "text", text: "run" }]);
+		await flush();
+		const shellTasks = () =>
+			sessionsOf(events)
+				.filter((session) => session.backgroundTasks)
+				.at(-1)
+				?.backgroundTasks?.map((task) => [task.id, task.name]);
+
+		agent.notify("sess-1", {
+			sessionUpdate: "tool_call",
+			toolCallId: "bg",
+			title: "bash_background",
+			rawInput: { command: "sleep 25", description: "Wait a while" },
+		});
+		agent.notify("sess-1", {
+			sessionUpdate: "tool_call_update",
+			toolCallId: "bg",
+			status: "completed",
+			rawOutput: {
+				details: { shellId: "bash_1", status: "running", pid: process.pid },
+			},
+		});
+		await flush();
+		expect(shellTasks()).toEqual([["bash_1", "Wait a while"]]);
+
+		agent.notify("sess-1", {
+			sessionUpdate: "tool_call_update",
+			toolCallId: "kill",
+			title: "kill_shell",
+			status: "completed",
+			rawOutput: { details: { shellId: "bash_1", status: "killed" } },
+		});
+		await flush();
+		expect(shellTasks()).toEqual([]);
+
+		await adapter.dispose();
+	});
+
+	it("stops a pi background shell's process and drops it once the process is gone", async () => {
+		const shell = spawn("sleep", ["30"], { detached: true, stdio: "ignore" });
+		const pid = shell.pid;
+		if (pid === undefined) throw new Error("no pid");
+		const exited = new Promise((resolve) => shell.once("exit", resolve));
+		const agent = new FakeAcpAgent();
+		const { adapter, events } = startAdapter(
+			agent,
+			undefined,
+			{},
+			{ shellPollMs: 5 },
+		);
+		await flush();
+		adapter.prompt([{ type: "text", text: "run" }]);
+		await flush();
+		agent.notify("sess-1", {
+			sessionUpdate: "tool_call_update",
+			toolCallId: "bg",
+			title: "bash_background",
+			status: "completed",
+			rawOutput: { details: { shellId: "bash_1", status: "running", pid } },
+		});
+		await flush();
+
+		expect(await adapter.stopBackgroundTask("bash_1")).toBe(true);
+		await exited;
+		await new Promise((resolve) => setTimeout(resolve, 20));
+		expect(
+			sessionsOf(events)
+				.filter((session) => session.backgroundTasks)
+				.at(-1)?.backgroundTasks,
+		).toEqual([]);
+
+		await adapter.dispose();
+	});
+
 	it("keeps a resumed session's own mode instead of the harness default", async () => {
 		const agent = new FakeAcpAgent();
 		agent.loadConfigOptions = [
@@ -1543,7 +2054,7 @@ describe("AcpAdapter on protocol v2", () => {
 		await adapter.dispose();
 	});
 
-	it("says so when a prompt goes out before a change is confirmed", async () => {
+	it("keeps an unanswered change selected after it times out, and sends the prompt", async () => {
 		const agent = new FakeAcpAgent();
 		agent.holdSelections = true;
 		agent.newSessionConfigOptions = [
@@ -1563,21 +2074,65 @@ describe("AcpAdapter on protocol v2", () => {
 			agent,
 			undefined,
 			{},
-			{ defaultModeId: "bypassPermissions", selectionWaitMs: 5 },
+			{ defaultModeId: "bypassPermissions", requestTimeoutMs: 5 },
 		);
 		adapter.prompt([{ type: "text", text: "go" }]);
-		await Bun.sleep(20);
-		await flush();
+		await flush(16);
+		expect(agent.sent.map((f) => f.method)).not.toContain("session/prompt");
 
+		await Bun.sleep(20);
+		await flush(16);
 		expect(agent.sent.map((f) => f.method)).toContain("session/prompt");
 		expect(
+			sessionsOf(events)
+				.filter((session) => session.modeId !== undefined)
+				.pop()?.modeId,
+		).toBe("bypassPermissions");
+		expect(
 			itemsOf(events).some(
-				(item) =>
-					item.kind === "notice" &&
-					typeof item.text === "string" &&
-					item.text.includes("did not confirm a mode or model change"),
+				(item) => item.kind === "notice" && item.noticeKind === "error",
 			),
 		).toBe(true);
+
+		await adapter.dispose();
+	});
+
+	it("drops a prompt held for an unanswered change when the turn is cancelled", async () => {
+		const agent = new FakeAcpAgent();
+		agent.holdSelections = true;
+		agent.newSessionConfigOptions = [
+			{
+				configId: "mode",
+				name: "Mode",
+				type: "select",
+				category: "mode",
+				currentValue: "default",
+				options: [
+					{ value: "default", name: "Ask for approval" },
+					{ value: "bypassPermissions", name: "Full access" },
+				],
+			},
+		];
+		const { adapter, events } = startAdapter(
+			agent,
+			undefined,
+			{},
+			{ defaultModeId: "bypassPermissions" },
+		);
+		adapter.prompt([{ type: "text", text: "go" }]);
+		await flush(16);
+		const turns = () =>
+			events.flatMap((event) => (event.kind === "turn" ? [event.turn] : []));
+		expect(turns().pop()?.status).toBe("running");
+
+		adapter.cancelTurn();
+		agent.releaseSelections();
+		await flush(16);
+
+		const methods = agent.sent.map((f) => f.method);
+		expect(methods).not.toContain("session/prompt");
+		expect(methods).not.toContain("session/cancel");
+		expect(turns().pop()?.status).toBe("interrupted");
 
 		await adapter.dispose();
 	});

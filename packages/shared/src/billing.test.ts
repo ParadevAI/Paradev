@@ -1,8 +1,11 @@
 import { describe, expect, test } from "bun:test";
 import {
+	autumnProPlanId,
+	isCloudUsageRefusal,
 	planAllowsAutomations,
 	planAllowsTriggerKind,
 	planTierFromSubscription,
+	proSeatPricePerMonth,
 	requiredPlanForTriggerKind,
 	resolveCurrentPlan,
 } from "./billing";
@@ -129,5 +132,39 @@ describe("resolveCurrentPlan", () => {
 				subscriptionsLoaded: true,
 			}),
 		).toBe("enterprise");
+	});
+});
+
+describe("isCloudUsageRefusal", () => {
+	test("matches only the two refusal keys a box start can answer with", () => {
+		for (const i18nKey of [
+			"serverError.cloudWorkspace.cloudNeedsPaidPlan",
+			"serverError.cloudWorkspace.usageLimitReached",
+		]) {
+			expect(isCloudUsageRefusal({ data: { i18nKey } })).toBe(true);
+		}
+		expect(
+			isCloudUsageRefusal({
+				data: {
+					i18nKey: "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly",
+				},
+			}),
+		).toBe(false);
+		expect(isCloudUsageRefusal(new Error("network"))).toBe(false);
+		expect(isCloudUsageRefusal(null)).toBe(false);
+	});
+});
+
+describe("autumnProPlanId", () => {
+	test("annual picks the annual Pro plan", () => {
+		expect(autumnProPlanId({ annual: true })).toBe("pro_annual");
+		expect(autumnProPlanId({ annual: false })).toBe("pro");
+	});
+});
+
+describe("proSeatPricePerMonth", () => {
+	test("yearly is the annual price spread over twelve months", () => {
+		expect(proSeatPricePerMonth({ annual: false })).toBe(20);
+		expect(proSeatPricePerMonth({ annual: true })).toBe(15);
 	});
 });

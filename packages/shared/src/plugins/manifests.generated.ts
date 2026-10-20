@@ -388,6 +388,43 @@ export const FIRST_PARTY_MANIFESTS = {
 		},
 		"skills": []
 	} as const,
+	"autumn": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "autumn",
+		"version": "1.0.0",
+		"description": "Work with billing in Autumn: customers, plans, balances, and subscriptions.",
+		"author": {
+			"name": "Superset",
+			"url": "https://superset.sh"
+		},
+		"homepage": "https://docs.superset.sh",
+		"repository": "https://github.com/superset-sh/superset",
+		"license": "MIT",
+		"keywords": [
+			"autumn",
+			"billing",
+			"pricing",
+			"subscriptions",
+			"usage"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Autumn",
+					"category": "Data & APIs",
+					"icon": "autumn"
+				},
+				"connector": {
+					"slug": "autumn_mcp"
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://mcp.useautumn.com/mcp"
+				}
+			}
+		},
+		"skills": []
+	} as const,
 	"stripe": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "stripe",

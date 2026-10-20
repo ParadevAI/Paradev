@@ -1,16 +1,10 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { rawErrorMessage } from "@superset/i18n/errors";
 import { useFormat } from "@superset/i18n/react";
 import { isPaymentFailingStatus } from "@superset/shared/billing";
 import { Button } from "@superset/ui/button";
-import { toast } from "@superset/ui/sonner";
 import { Link } from "@tanstack/react-router";
-import { useState } from "react";
 import { HiArrowRight } from "react-icons/hi2";
-import { env } from "renderer/env.renderer";
-import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useCurrentPlan } from "renderer/hooks/useCurrentPlan";
-import { track } from "renderer/lib/analytics";
 import { authClient } from "renderer/lib/auth-client";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { electronTrpc } from "renderer/lib/electron-trpc";
@@ -21,6 +15,7 @@ import {
 	SETTING_ITEM_ID,
 	type SettingItemId,
 } from "../../../utils/settings-search";
+import { useBillingActions } from "../../hooks/useBillingActions";
 import { BillingDetails } from "./components/BillingDetails";
 import { CurrentPlanCard } from "./components/CurrentPlanCard";
 import { PaymentFailedBanner } from "./components/PaymentFailedBanner";
@@ -36,15 +31,15 @@ export function BillingOverview({ visibleItems }: BillingOverviewProps) {
 
 	const { t } = useLingui();
 	const { data: session } = authClient.useSession();
-	const utils = cloudTrpc.useUtils();
 	const searchQuery = useSettingsSearchQuery();
-	const [isUpgrading, setIsUpgrading] = useState(false);
-	const [isCanceling, setIsCanceling] = useState(false);
-	const [isRestoring, setIsRestoring] = useState(false);
-
-	// Per-window org: the shared session holds one org for the whole app, so
-	// a second window on another org would render the first window's org here.
-	const activeOrgId = useActiveOrganizationId();
+	const {
+		upgrade,
+		cancel: handleCancel,
+		restore: handleRestore,
+		isUpgrading,
+		isCanceling,
+		isRestoring,
+	} = useBillingActions();
 
 	// Ownership must be judged against the org being billed. The session's
 	// active organization is shared by every window, so reading membership from
@@ -83,98 +78,8 @@ export function BillingOverview({ visibleItems }: BillingOverviewProps) {
 	);
 
 	const handleUpgrade = async (annual = false) => {
-		if (!activeOrgId || memberCount === undefined) return;
-
-		// Second route into Stripe Checkout, alongside the plans page. `source`
-		// is what lets the funnel tell them apart.
-		const checkoutProperties = {
-			plan: "pro",
-			annual,
-			seats: memberCount,
-			// `plan` here is the tier they are on now — same shape as the plans
-			// page, so both sources group together.
-			previous_plan: plan,
-			source: "billing_overview",
-		};
-		track("checkout_started", checkoutProperties);
-
-		setIsUpgrading(true);
-		try {
-			await authClient.subscription.upgrade(
-				{
-					plan: "pro",
-					referenceId: activeOrgId,
-					annual,
-					seats: memberCount,
-					successUrl: `${env.NEXT_PUBLIC_WEB_URL}/settings/billing?success=true`,
-					cancelUrl: env.NEXT_PUBLIC_WEB_URL,
-					disableRedirect: true,
-				},
-				{
-					onSuccess: (ctx) => {
-						if (ctx.data?.url) {
-							track("checkout_redirected", checkoutProperties);
-							window.open(ctx.data.url, "_blank");
-						}
-					},
-					// Better Auth resolves rather than throws, so without this hook a
-					// failed checkout is invisible: the button just resets.
-					onError: (ctx) => {
-						track("checkout_failed", {
-							...checkoutProperties,
-							status: ctx.response?.status,
-							error: rawErrorMessage(ctx.error),
-						});
-					},
-				},
-			);
-		} finally {
-			setIsUpgrading(false);
-			await utils.billing.activePlan.invalidate();
-		}
-	};
-
-	const handleCancel = async () => {
-		if (!activeOrgId) return;
-
-		setIsCanceling(true);
-		try {
-			await authClient.subscription.cancel(
-				{
-					referenceId: activeOrgId,
-					returnUrl: env.NEXT_PUBLIC_WEB_URL,
-				},
-				{
-					onSuccess: (ctx) => {
-						if (ctx.data?.url) {
-							window.open(ctx.data.url, "_blank");
-						}
-					},
-				},
-			);
-		} finally {
-			setIsCanceling(false);
-			await utils.billing.activePlan.invalidate();
-		}
-	};
-
-	const handleRestore = async () => {
-		if (!activeOrgId) return;
-
-		setIsRestoring(true);
-		try {
-			await authClient.subscription.restore({
-				referenceId: activeOrgId,
-			});
-			toast.success(
-				t({
-					message: "Plan restored",
-				}),
-			);
-		} finally {
-			setIsRestoring(false);
-			await utils.billing.activePlan.invalidate();
-		}
+		if (memberCount === undefined) return;
+		await upgrade({ annual, seats: memberCount, source: "billing_overview" });
 	};
 
 	return (

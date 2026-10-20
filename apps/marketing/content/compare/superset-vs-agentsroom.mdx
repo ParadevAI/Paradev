@@ -2,7 +2,7 @@
 title: "Superset vs AgentsRoom (2026): Worktree Workspaces vs Multi-Project Cockpit"
 description: "Compare Superset and AgentsRoom for parallel coding agents: isolation, review, phone control, scheduling, platforms, and pricing."
 date: 2026-10-07
-lastUpdated: 2026-10-08
+lastUpdated: 2026-10-15
 type: "1v1"
 competitors:
   - agentsroom
@@ -30,8 +30,8 @@ This comparison is published by Superset. AgentsRoom details were checked agains
 | Review | Changes pane that commits, pushes, and opens PRs; PR pane with checks, review threads, and merge | Side-by-side diff, diff filtered by agent, commit and push |
 | Browser | In-app browser with Design Mode: pick an element and send it to an agent | Built-in browser pointer that sends an element to an agent |
 | Phone | iPhone and iPad app (iOS or iPadOS 26+, Pro) with Lock Screen Live Activity; Android waitlist | iOS and Android apps over an end-to-end encrypted relay |
-| Scheduling | Pro automations on a chosen host, with run history and retry | Scheduled tasks and webhook triggers |
-| Other machines | Remote hosts through the relay, with per-member access (Pro) | Remote fleet of your own machines; cloud agents on Pro |
+| Scheduling | Pro automations on a chosen host, with run history and retry; event triggers from GitHub, Slack, Linear, Sentry, and webhooks | Scheduled tasks and webhook triggers |
+| Other machines | Remote hosts through the relay, with per-member access (Pro); cloud workspaces | Remote fleet of your own machines; cloud agents on Pro |
 | Pricing | Free; Pro $20/user/month or $15 billed yearly; Enterprise custom | Free; Pro €7.99/month; Team €15.99/seat/month from 3 seats |
 | License | Source-available, Elastic License 2.0 | Desktop app source not published |
 
@@ -57,11 +57,11 @@ AgentsRoom shows a side-by-side diff, lets you scope it to one agent, writes com
 
 Both do, with different reach. AgentsRoom has native iOS and Android apps. Its [remote control page](https://agentsroom.dev/features/remote-agent-control) says the phone can start agents, drive terminals, run saved prompts, move backlog cards, open a tunnel to a local dev server, and commit and push. Traffic goes through its own end-to-end encrypted relay. AgentsRoom also shows agents in an iPhone Live Activity.
 
-Superset's [iPhone and iPad app](/mobile) is on the App Store for iOS 26 or iPadOS 26 or later on Pro. You can check on agents, reply to them, review diffs, and read Pages while the agents run on a host that stays online. A Lock Screen and Dynamic Island Live Activity shows which agents need you. Android is on a waitlist. If you need Android today, AgentsRoom wins this row.
+Superset's [iPhone and iPad app](/mobile) is on the App Store for iOS 26 or iPadOS 26 or later on Pro. You can check on agents, reply to them, review diffs, and read Pages while the agents run on a host that stays online or in a cloud workspace. A Lock Screen and Dynamic Island Live Activity shows which agents need you. Android is on a waitlist. If you need Android today, AgentsRoom wins this row.
 
 ## Can agents run when your laptop is closed?
 
-Superset runs workspaces on remote hosts you add through its relay, and an organization can grant host access per member (Pro). Automations run on a chosen host on a schedule and keep a run history with retry. Cloud workspaces are in early access only.
+Superset runs workspaces on remote hosts you add through its relay, and an organization can grant host access per member (Pro). Automations run on a chosen host on a schedule and keep a run history with retry. Event triggers from GitHub, Slack, Linear, Sentry, and webhooks start runs too. Cloud workspaces run in the cloud and are available from desktop, iPhone, and iPad without keeping your own computer connected.
 
 AgentsRoom links your own computers into one view, and its Pro plan includes cloud agents: 1,200 minutes a month on a temporary cloud machine that commits and pushes a branch. It also starts agents from GitHub, Slack, or CI webhooks.
 
@@ -81,19 +81,20 @@ Superset Pro adds remote hosts, automations, the iPhone and iPad app, and the Gi
 
 - You work on Windows, or you need an Android app.
 - You juggle many small projects and want agents with named roles in one window.
-- You want voice input, a prompt library, and a backlog that starts agents.
-- You want cloud runs or webhook triggers on a low-priced individual plan.
+- You want voice input and a prompt library.
+- You want a fixed number of cloud minutes included in a low-priced individual plan.
 
 ## Choose Superset if
 
 - Every task should get its own branch and worktree without a setting to remember.
 - You want to commit, open a pull request, read checks and review threads, and merge in the same app.
+- You want a Tasks board over Linear, GitHub Issues, and Superset tasks that starts a workspace with an agent.
 - You want to read the source code: Superset is source-available under Elastic License 2.0.
 - Your team needs shared remote hosts with per-member access, SOC 2 Type II, or Enterprise SSO and SCIM.
 
 ## Verdict
 
-AgentsRoom is the broader cockpit. It covers more platforms, both phone systems, and many features around prompting and quotas. Superset is narrower and stricter: one task, one worktree, and a review path that ends in a merged pull request. Run the same task in both with the same agent, then compare how long it takes to review and merge the result.
+AgentsRoom is the broader cockpit. It covers more platforms, both phone systems, a prompt library, and automatic account switching when a quota runs out. Superset also shows quota meters and lets you switch accounts, but you switch by hand. Superset is narrower and stricter: one task, one worktree, and a review path that ends in a merged pull request. Run the same task in both with the same agent, then compare how long it takes to review and merge the result.
 
 ## Frequently Asked Questions
 

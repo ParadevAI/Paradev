@@ -2,7 +2,7 @@
 title: "Superset vs T3 Code (2026): Comparing Coding Agent Control Planes"
 description: "Compare Superset and T3 Code for orchestrating AI coding agents in Git worktrees. See how a mature agent workspace differs from an early open-source control plane."
 date: 2026-07-13
-lastUpdated: 2026-10-08
+lastUpdated: 2026-10-15
 type: "1v1"
 competitors:
   - t3-code
@@ -30,7 +30,7 @@ Note that T3 Code is a distinct product from T3 Chat, the AI chat app. For that 
 | **Agent support** | Any CLI agent (Claude Code, Codex, OpenCode, Cursor, Gemini, Mistral Vibe, and more) | Claude Code, Codex, OpenCode, Cursor (more planned) |
 | **Maturity** | Established, with SOC 2 and remote/cloud workspaces | Very early alpha (expect rapid change) |
 | **Review tooling** | Built-in diff/file editor; commit, push, and open PRs; PR pane with checks and review threads | Inline diff review, one-button commit/push/PR |
-| **Remote / cloud** | Remote and cloud workspaces across your network devices | Local desktop and CLI launcher |
+| **Remote / cloud** | Remote hosts through Remote Access, plus cloud workspaces | Local desktop and CLI launcher |
 | **Platform** | Desktop (macOS; experimental Linux AppImage; Windows unavailable), iPhone and iPad app, CLI, MCP server | Desktop (macOS, Windows, Linux) plus `npx` launcher |
 | **License** | Source-available (ELv2) | Open source (MIT) |
 
@@ -38,7 +38,7 @@ Note that T3 Code is a distinct product from T3 Chat, the AI chat app. For that 
 
 ## What Is Superset?
 
-Superset is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs across your own network devices through remote and cloud workspaces and can schedule agent sessions as automations. You can review inside Superset or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
+Superset is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on your other machines through Remote Access and in cloud workspaces and can schedule agent sessions as automations. You can review inside Superset or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
 
 ## What Is T3 Code?
 
@@ -60,7 +60,7 @@ T3 Code currently wraps Claude Code, Codex, OpenCode, and Cursor, with more plan
 
 ### Reach Beyond One Machine
 
-Superset extends past the local desktop with remote and cloud workspaces that run on your own network devices, plus CLI and MCP surfaces. T3 Code is a local desktop GUI with an `npx` launcher. If moving work across machines or scripting the orchestration matters, Superset has more of that built in.
+Superset extends past the local desktop with Remote Access to your other machines and cloud workspaces, plus CLI and MCP surfaces. T3 Code is a local desktop GUI with an `npx` launcher. If moving work across machines or scripting the orchestration matters, Superset has more of that built in.
 
 ---
 

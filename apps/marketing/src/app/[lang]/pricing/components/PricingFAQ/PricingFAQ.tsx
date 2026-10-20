@@ -3,9 +3,11 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { FAQDisclosure } from "../../../components/FAQDisclosure";
 import { PRICING_FAQ_ITEMS } from "../../constants";
+import { proSeatPriceValues } from "../../utils/proSeatPriceValues";
 
 export function PricingFAQ() {
-	const { t } = useLingui();
+	const { t, i18n } = useLingui();
+	const prices = proSeatPriceValues(i18n.locale);
 
 	return (
 		<div>
@@ -23,7 +25,7 @@ export function PricingFAQ() {
 						compact
 						question={t(item.question)}
 					>
-						<p>{t(item.answer)}</p>
+						<p>{i18n._({ ...item.answer, values: prices })}</p>
 					</FAQDisclosure>
 				))}
 			</div>

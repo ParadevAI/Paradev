@@ -2,7 +2,7 @@
 title: "Superset vs Vibe Kanban (2026): A Vibe Kanban Alternative for Parallel Agents"
 description: "Compare Superset and Vibe Kanban for orchestrating AI coding agents in Git worktrees. See why Superset is a natural home as Vibe Kanban sunsets."
 date: 2026-07-13
-lastUpdated: 2026-10-08
+lastUpdated: 2026-10-15
 type: "1v1"
 competitors:
   - vibe-kanban
@@ -24,11 +24,11 @@ Vibe Kanban put a Kanban board over AI coding agents: plan work as cards, then s
 | | **Superset** | **Vibe Kanban** |
 |---|---|---|
 | **What it does** | Runs multiple agents in parallel with Git worktree isolation, review, and browser | Kanban board that runs coding agents in parallel workspaces |
-| **Interface** | Agent workspace with panes, diff review, and browser | Kanban board of tasks mapped to agent runs |
+| **Interface** | Agent workspace with panes, diff review, and browser, plus Tasks and Workspaces board views | Kanban board of tasks mapped to agent runs |
 | **Isolation** | Git worktrees for local branch-based workspaces | Git worktree per workspace/task |
 | **Agent support** | Any CLI agent (Claude Code, Codex, OpenCode, Cursor, Gemini, and more) | Agent-agnostic (10+, including Claude Code, Codex, Gemini, Copilot, Amp, Cursor, OpenCode) |
 | **Project status** | Actively developed | Sunsetting; continues as community open source |
-| **Remote / cloud** | Remote and cloud workspaces across your network devices | Local |
+| **Remote / cloud** | Remote Access to machines you own, plus cloud workspaces | Local |
 | **Platform** | Desktop (macOS; experimental Linux AppImage; Windows unavailable), iPhone and iPad app, CLI, MCP server | Cross-platform (Node + Rust) |
 | **License** | Source-available (ELv2) | Open source (Apache-2.0) |
 
@@ -36,7 +36,7 @@ Vibe Kanban put a Kanban board over AI coding agents: plan work as cards, then s
 
 ## What Is Superset?
 
-Superset is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs across your own network devices through remote and cloud workspaces and can schedule agent sessions as automations. You can review inside Superset or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
+Superset is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on machines you own through Remote Access and in the cloud through cloud workspaces, and can schedule agent sessions as automations. You can review inside Superset or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
 
 ## What Is Vibe Kanban?
 
@@ -48,17 +48,17 @@ Vibe Kanban is an open-source app from Bloop that puts a Kanban board over AI co
 
 The most practical difference today is direction. Vibe Kanban is sunsetting as a maintained product, even though the open-source code remains. Superset is actively developed, with ongoing work on remote and cloud workspaces, automations, and its review and browser surfaces. If you are choosing where to invest your workflow now, ongoing maintenance matters.
 
-### Board Metaphor vs Agent Workspace
+### Board-First vs Workspace-First
 
-Vibe Kanban organizes work as a Kanban board, mapping cards to agent runs. Superset organizes work as a workspace of live agent sessions, each in its own pane and worktree, with review and an in-app browser alongside. Both run agents in parallel Git worktrees underneath. If you like planning work as a board, Vibe Kanban's metaphor is appealing; if you prefer a live workspace you drive directly, Superset fits better.
+Vibe Kanban is built around a Kanban board: the board is the main surface, and each card maps to an agent run. Superset is built around live agent sessions, each in its own pane and worktree, with review and an in-app browser alongside. Superset also has boards: the Tasks view shows Linear, GitHub Issues, and Superset tasks as a list or a kanban board, and **Run in workspace** starts a workspace with the agent already working. The Workspaces page has a board view with Working, Needs attention, Needs review, and Merged columns. Both run agents in parallel Git worktrees underneath. If you want the board to be the center of the app, Vibe Kanban is more focused on it; if you want boards next to a live workspace you drive directly, Superset fits better.
 
 ### Reach and Surfaces
 
-Superset extends past the local desktop with remote and cloud workspaces on your own network devices, plus CLI and MCP server surfaces and scheduled automations. Vibe Kanban runs locally as a cross-platform app. If you want the orchestration to move across machines or be scripted, Superset offers more of that.
+Superset extends past the local desktop with Remote Access to machines you own and cloud workspaces, plus CLI and MCP server surfaces and scheduled automations. Vibe Kanban runs locally as a cross-platform app. If you want the orchestration to move across machines or be scripted, Superset offers more of that.
 
 ### Shared Foundation
 
-Both are agent-agnostic and both support worktree-backed tasks; Superset uses worktrees for new local branch-based workspaces, so migrating mental models is easy: your agents, your branches, your review flow. The move from Vibe Kanban to Superset is mostly about trading a board view for a live workspace, and gaining active development plus remote and automation surfaces.
+Both are agent-agnostic and both support worktree-backed tasks; Superset uses worktrees for new local branch-based workspaces, so migrating mental models is easy: your agents, your branches, your review flow. The move from Vibe Kanban to Superset keeps a board view for tasks and workspaces, and adds a live workspace, active development, and remote and automation surfaces.
 
 ---
 
@@ -79,7 +79,7 @@ Superset offers a free tier and Pro at $20/seat/month. Vibe Kanban is free and o
 
 **Choose Vibe Kanban if you:**
 
-- Specifically want a Kanban-board metaphor over your agents
+- Want a board-first app where the Kanban board is the main surface over your agents
 - Are comfortable running a sunsetting project as community open source
 - Want a fully permissive Apache-2.0 tool and will self-maintain
 

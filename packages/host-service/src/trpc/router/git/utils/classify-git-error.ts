@@ -6,7 +6,11 @@ import { TRPCError } from "@trpc/server";
 const CWD_GONE_PATTERN =
 	/unable to read current working directory: no such file or directory/i;
 const CWD_UNREADABLE_PATTERN = /unable to read current working directory/i;
-const NOT_GIT_REPO_PATTERN = /not a git repository/i;
+// Git 2.56 reworded "not a git repository: <dir>" for a `.git` file whose
+// target is not a repository, such as a worktree whose main repo was moved or
+// deleted, or whose admin data was pruned.
+const NOT_GIT_REPO_PATTERN =
+	/not a git repository|^fatal: gitfile does not point to a valid repository: /im;
 // Git's text (do_read_index, read-cache.c) when mmap(2) of the index fails,
 // with the errno macOS returns when the file's storage cannot deliver it: a
 // cloud-synced folder whose sync client evicted the index and cannot fetch it

@@ -228,11 +228,11 @@ final class ComposerModel {
     onDraftChange?(text)
   }
 
-  /// Empties the draft. Animated, so the card shrinks back, but reports
-  /// nothing out: React Native calls this while clearing its own copy, so an
-  /// echo would be a bridge round trip to tell the caller what it just did.
+  /// Reported out even though React Native clears its own copy first: a
+  /// change the field sent before this (losing focus on send) can still be in
+  /// flight, and would land after that clear and restore the sent text.
   func clearDraft() {
-    withAnimation(ComposerMetrics.typingGrowth) { draft = "" }
+    setDraft("")
   }
 
   /// The draft React Native saved for this surface, put back once as the view

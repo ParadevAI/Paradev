@@ -1,5 +1,5 @@
 import { auth } from "@superset/auth/server";
-import { stripeClient } from "@superset/auth/stripe";
+import { syncCustomerName } from "@superset/auth/stripe";
 import { db } from "@superset/db/client";
 import { taskTrackerEnum } from "@superset/db/enums";
 import {
@@ -465,16 +465,14 @@ export const organizationRouter = {
 				.returning();
 
 			if (organization?.stripeCustomerId && data.name) {
-				stripeClient.customers
-					.update(organization.stripeCustomerId, {
-						name: data.name,
-					})
-					.catch((error) => {
+				syncCustomerName(organization.stripeCustomerId, data.name).catch(
+					(error) => {
 						console.error(
 							"[org/update] Failed to sync Stripe customer info:",
 							error,
 						);
-					});
+					},
+				);
 			}
 
 			return organization;

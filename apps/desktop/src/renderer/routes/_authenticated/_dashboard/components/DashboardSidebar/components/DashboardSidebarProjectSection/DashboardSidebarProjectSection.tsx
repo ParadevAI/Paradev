@@ -74,6 +74,7 @@ export function DashboardSidebarProjectSection({
 		project,
 	});
 
+	const isCloudRepo = project.kind === "cloud-repo";
 	const totalWorkspaceCount = flattenedCollapsedWorkspaces.length;
 
 	const { preferences } = useV2UserPreferences();
@@ -116,6 +117,7 @@ export function DashboardSidebarProjectSection({
 				projectId={project.id}
 				projectColor={project.color}
 				onSetColor={setProjectColor}
+				kind={project.kind}
 				onCreateSection={handleNewSection}
 				onImportWorktrees={handleImportWorktrees}
 				onOpenInFinder={handleOpenInFinder}
@@ -161,6 +163,7 @@ export function DashboardSidebarProjectSection({
 				projectId={project.id}
 				projectColor={project.color}
 				onSetColor={setProjectColor}
+				kind={project.kind}
 				onCreateSection={handleNewSection}
 				onImportWorktrees={handleImportWorktrees}
 				onOpenInFinder={handleOpenInFinder}
@@ -179,7 +182,7 @@ export function DashboardSidebarProjectSection({
 					onRenameValueChange={setRenameValue}
 					onSubmitRename={submitRename}
 					onCancelRename={cancelRename}
-					onStartRename={startRename}
+					onStartRename={isCloudRepo ? undefined : startRename}
 					onToggleCollapse={() => onToggleCollapse(project.id)}
 					onNewWorkspace={handleNewWorkspace}
 					{...(dragHandleAttributes ?? {})}

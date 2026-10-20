@@ -1,0 +1,96 @@
+---
+title: "How to Compare Coding Agents Side by Side on Your Own Code"
+description: "Give the same task to Claude Code, Codex, Antigravity CLI, and other coding agents, each in its own Git worktree, and keep the best diff. A practical workflow for choosing a coding agent on your own repository."
+date: 2026-10-13
+type: "tutorial"
+competitors:
+  - claude-code
+  - codex
+  - antigravity
+keywords:
+  - compare coding agents
+  - claude code vs codex on my repo
+  - run same prompt multiple agents
+  - coding agent benchmark own code
+  - best of n coding agents
+  - multiple coding agents same task
+---
+
+Leaderboards tell you how a coding agent does on someone else's tasks. They do not tell you how it does on your codebase, with your conventions, tests, and dependencies, and the ranking changes with every model release. The reliable way to choose is to give the same task to several agents and compare what they produce.
+
+This guide shows how to do that without the agents getting in each other's way.
+
+---
+
+## Why Run Agents Side by Side
+
+- **Your code is the benchmark that matters.** An agent that tops a public benchmark can still miss your project's patterns.
+- **Models change monthly.** Claude, GPT, Gemini, and the open-weight labs all shipped new models in the last quarter. A comparison you ran in the spring may no longer hold.
+- **Different agents fail differently.** When two agents agree on a fix, you can trust it more. When they disagree, the difference shows you where the task is ambiguous.
+- **You keep the best result.** Running three agents costs more tokens, but on a hard task, picking the best of three diffs is often cheaper than fixing one bad one.
+
+## The One Rule: One Worktree per Agent
+
+Agents that share a working directory overwrite each other's files, and their diffs mix together. Give each agent its own Git worktree: a separate checkout of the same repository, on its own branch. The agents then work in parallel without touching each other's changes, and each one's diff stands alone.
+
+You can do this by hand:
+
+```bash
+git worktree add ../task-claude -b try/claude
+git worktree add ../task-codex  -b try/codex
+git worktree add ../task-agy    -b try/agy
+```
+
+Then start one agent in each directory, give each the same prompt, and compare the branches. Worktrees separate working files, but they do not sandbox processes: two agents can still fight over the same dev-server port or database.
+
+## The Workflow in Superset
+
+[Superset](/) is a desktop workspace that does the worktree setup for you and runs any CLI agent in it. Claude Code, Codex, Antigravity CLI, Copilot CLI, Cursor's agent, Amp, OpenCode, Droid, Muse Code, Grok Build, Kiro, Devin CLI, Kimi Code, Mistral Vibe, Pi, and Hermes Agent are built-in presets; any other CLI agent runs as a custom command. Each agent uses your own subscription or key, and Superset never proxies model calls.
+
+1. **Create one workspace per agent from the same base branch.** Each workspace gets its own worktree, branch, and terminal.
+2. **Start a different agent in each, with the same prompt.** Keep the prompt identical, including any files or links you attach, so the comparison is fair.
+3. **Let them run in parallel.** The sidebar shows which agents are working and which need input. You can check on them from the [iPhone and iPad app](/mobile).
+4. **Review each diff.** Open the Changes pane in each workspace to read the diff, and run the app in the in-app browser to try the result.
+5. **Keep the winner.** Commit, push, and open a pull request from the best workspace, then delete the others.
+
+If one agent gets stuck, you can continue its session with a different agent in the same workspace instead of starting over.
+
+## What to Compare
+
+| Check | What to look for |
+|---|---|
+| **Correctness** | Do the tests pass? Does the change do what you asked, and only that? |
+| **Diff size** | Smaller is usually better. A large diff for a small task often means the agent rewrote things it did not need to. |
+| **Fit** | Does it follow your project's patterns, names, and libraries? |
+| **Time and cost** | How long did it take, and how many tokens? Superset's Usage page shows token use and estimated cost for supported agents. |
+| **Interventions** | How often did you have to answer questions or correct it? |
+
+Run the comparison on a few real tasks of different kinds, such as a bug fix, a small feature, and a refactor, before you draw a conclusion. One task is not enough; agent output varies from run to run.
+
+## Which Agents to Start With
+
+If you are not sure where to begin, compare one agent from each of the big labs:
+
+- **Claude Code** for Anthropic's models
+- **Codex CLI** for OpenAI's models
+- **Antigravity CLI** for Google's models, free to start
+
+Then add an open-source agent with your own keys, such as **OpenCode** or **Qwen Code**, to see how an open model does on your code. For the full field, see [Best AI Coding Agents in 2026](/compare/best-coding-agents).
+
+## Frequently Asked Questions
+
+### How do I run the same prompt on several coding agents?
+
+Create a separate Git worktree for each agent from the same branch, start one agent in each, and give each the same prompt. Superset automates this: create one workspace per agent, and each gets its own worktree and terminal.
+
+### Is it expensive to run several agents on one task?
+
+It multiplies token use by the number of agents. Use it for tasks where a wrong result is costly, and run a single agent for routine work. Superset does not add model costs; each agent runs on your own subscription or key.
+
+### Can agents in different worktrees still conflict?
+
+Their files cannot conflict, because each worktree has its own checkout. They can still conflict on shared resources such as ports, databases, or caches, and their branches can conflict when you merge. Review and merge one result at a time.
+
+### Which agents does Superset support?
+
+Any CLI agent. Claude Code, Codex, Antigravity CLI, Copilot CLI, Cursor's agent, Amp, OpenCode, Droid, Muse Code, Grok Build, Kiro, Devin CLI, Kimi Code, Mistral Vibe, Pi, Hermes Agent, and more are built-in presets, and you can add any other agent as a custom command.

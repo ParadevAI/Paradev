@@ -11,6 +11,7 @@ import { PricingHero } from "./components/PricingHero";
 import { PricingTiers } from "./components/PricingTiers";
 import { TrustStrip } from "./components/TrustStrip";
 import { PRICING_FAQ_ITEMS } from "./constants";
+import { proSeatPriceValues } from "./utils/proSeatPriceValues";
 
 export async function generateMetadata(): Promise<Metadata> {
 	const lang = await initServerI18n();
@@ -24,9 +25,12 @@ export async function generateMetadata(): Promise<Metadata> {
 		description: i18n._({
 			...msg({
 				message:
-					"Simple pricing for every team. Free for individuals, $15/user/month for teams, custom for enterprise. Run 100+ parallel coding agents with {companyName}.",
+					"Simple pricing for every team. Free for individuals, {yearlyPrice}/user/month for teams, custom for enterprise. Run 100+ parallel coding agents with {companyName}.",
 			}),
-			values: { companyName: COMPANY.NAME },
+			values: {
+				companyName: COMPANY.NAME,
+				yearlyPrice: proSeatPriceValues(lang).yearlyPrice,
+			},
 		}),
 		alternates: localizedAlternates(lang, "/pricing"),
 	};
@@ -38,9 +42,10 @@ export default async function PricingPage() {
 
 	// JSON-LD is machine-facing, so it gets rendered strings rather than the
 	// message descriptors the UI components resolve through Lingui.
+	const prices = proSeatPriceValues(locale);
 	const faqJsonLdItems = PRICING_FAQ_ITEMS.map((item) => ({
 		question: i18n._(item.question),
-		answer: i18n._(item.answer),
+		answer: i18n._({ ...item.answer, values: prices }),
 	}));
 
 	return (

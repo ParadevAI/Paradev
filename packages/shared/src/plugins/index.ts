@@ -328,6 +328,16 @@ export const PLUGIN_CATALOG: readonly PluginCatalogEntry[] = [
 		},
 	},
 	{
+		name: "autumn",
+		version: "1.0.0",
+		description: "Manage customers, plans, and billing in Autumn",
+		interface: { displayName: "Autumn", category: "Data & APIs" },
+		auth: [{ type: "oauth2" }],
+		mcpServers: {
+			autumn: { type: "http", url: "https://mcp.useautumn.com/mcp" },
+		},
+	},
+	{
 		name: "stripe",
 		version: "1.0.0",
 		description: "Query payments data and Stripe docs",

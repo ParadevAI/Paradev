@@ -2,7 +2,7 @@
 title: "Superset vs Devin (2026): Local Agent Orchestration vs Cloud AI Engineer"
 description: "Compare Superset and Devin for AI-powered development. See how local parallel agent orchestration differs from a fully remote AI software engineer."
 date: 2026-02-18
-lastUpdated: 2026-09-24
+lastUpdated: 2026-10-15
 type: "1v1"
 competitors:
   - devin
@@ -23,7 +23,7 @@ Devin is a cloud-based AI software engineer that works autonomously in a remote 
 | | **Superset** | **Devin** |
 |---|---|---|
 | **Category** | Agent orchestration workspace | Autonomous AI software engineer |
-| **Architecture** | Local-first today: worktrees, review, browser, and chat run on your machine | Fully remote: runs in cloud VMs |
+| **Architecture** | Local-first: worktrees run on your machine or remote hosts you own; cloud workspaces run in the cloud | Fully remote: runs in cloud VMs |
 | **AI approach** | Agent-agnostic: orchestrates external agents plus Superset Chat and MCP tools | Proprietary AI with browser, editor, and terminal in cloud |
 | **Parallelism** | Multiple agents across isolated local worktrees | Parallel cloud sessions (10 concurrent on Pro, unlimited on Max) |
 | **Code privacy** | Local-first; outbound model traffic depends on your chosen agents/providers | Code runs on Cognition's cloud infrastructure |
@@ -48,7 +48,7 @@ Devin is Cognition's AI software engineer: a cloud-based autonomous agent that r
 
 ### Local vs Cloud
 
-Superset's shipped workflow is local-first today. Your repo, worktrees, review flow, chat, and browser preview stay on your machine, and outbound traffic depends on the specific agents or providers you choose. Devin runs entirely in Cognition's cloud: your code is cloned into remote VMs where Devin operates. This is the fundamental architectural difference and drives most of the trade-offs below.
+Superset is local-first. By default your repo, worktrees, review flow, chat, and browser preview stay on your machine or on remote hosts you own, and outbound traffic depends on the specific agents or providers you choose. Cloud workspaces are there when you want a task to run in the cloud instead. Devin runs entirely in Cognition's cloud: your code is cloned into remote VMs where Devin operates. This is the fundamental architectural difference and drives most of the trade-offs below.
 
 ### Control vs Autonomy
 
@@ -72,8 +72,7 @@ Superset offers a free tier and Pro at $20/seat/month plus your agents' API cost
 
 **Choose Devin if you:**
 - Want a fully autonomous AI that works in the background with minimal oversight
-- Need event-driven workflows (auto-respond to Linear tickets, Slack messages)
-- Prefer cloud-based execution where you don't manage local compute
+- Want every task to run in Cognition-managed cloud VMs by default
 - Want autonomous parallel cloud sessions and the ROI justifies the cloud usage
 
 **Choose Superset if you:**

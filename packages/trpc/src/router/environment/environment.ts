@@ -10,12 +10,7 @@ import {
 	SANDBOX_IMAGE_NAME,
 	SHARED_ENVIRONMENT_ORGANIZATION_ID,
 } from "@superset/shared/constants";
-import {
-	DEFAULT_SANDBOX_REGION,
-	nearestSandboxRegion,
-	SANDBOX_REGION_IDS,
-	type SandboxRegionId,
-} from "@superset/shared/sandbox-regions";
+import { SANDBOX_REGION_IDS } from "@superset/shared/sandbox-regions";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { and, asc, eq, inArray, isNull, or } from "drizzle-orm";
 import { z } from "zod";
@@ -32,6 +27,7 @@ import {
 } from "../../lib/sandbox";
 import { jwtProcedure, userError } from "../../trpc";
 import { loadVisibleWorkspace } from "../cloud-workspace/access";
+import { regionForRequest } from "./region-for-request";
 import { secretsRouter } from "./secrets";
 import { decryptSecret, encryptSecret } from "./secrets/utils/crypto";
 
@@ -197,18 +193,6 @@ async function setEnvironmentRepositories(args: {
 		.update(environments)
 		.set({ hooksRepositoryId: args.hooksRepositoryId ?? null })
 		.where(eq(environments.id, args.environmentId));
-}
-
-/**
- * The region nearest the caller, from the coordinates Vercel stamps on the
- * request; the default when they are missing (local dev, a proxy).
- */
-function regionForRequest(headers: Headers): SandboxRegionId {
-	const lat = Number(headers.get("x-vercel-ip-latitude"));
-	const lng = Number(headers.get("x-vercel-ip-longitude"));
-	return Number.isFinite(lat) && Number.isFinite(lng) && (lat || lng)
-		? nearestSandboxRegion(lat, lng)
-		: DEFAULT_SANDBOX_REGION;
 }
 
 async function loadPromotable(

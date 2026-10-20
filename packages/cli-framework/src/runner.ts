@@ -1,4 +1,4 @@
-import type { Audience, CommandConfig } from "./command";
+import type { Audience, CommandConfig, CommandResult } from "./command";
 import { CLIError } from "./errors";
 import {
 	type CliDescription,
@@ -478,12 +478,24 @@ async function execute(
 	// Agent-mode auto-JSON only when --quiet wasn't passed; --quiet beats it.
 	const isJson = jsonFlag ?? (!isQuiet && isAgentMode());
 
-	const result = await cmd.run({
-		options: parsed.options as never,
-		args: argsResult as never,
-		ctx: ctx as never,
-		signal,
-	});
+	let result: CommandResult;
+	try {
+		result = await cmd.run({
+			options: parsed.options as never,
+			args: argsResult as never,
+			ctx: ctx as never,
+			signal,
+		});
+	} catch (error) {
+		if (isJson && error instanceof CLIError && error.data !== undefined) {
+			await writeStream(
+				process.stdout,
+				`${JSON.stringify(error.data, null, 2)}\n`,
+				signal,
+			).catch(() => {});
+		}
+		throw error;
+	}
 
 	if (result !== undefined) {
 		const output = formatOutput(result, cmd.display, {

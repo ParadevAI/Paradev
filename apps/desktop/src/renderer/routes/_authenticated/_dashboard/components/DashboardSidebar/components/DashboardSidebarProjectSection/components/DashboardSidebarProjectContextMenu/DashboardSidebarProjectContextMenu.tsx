@@ -27,11 +27,14 @@ import {
 } from "renderer/components/ColorSelector";
 import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
 import { PROJECT_COLOR_DEFAULT } from "shared/constants/project-colors";
+import type { DashboardSidebarProject } from "../../../../types";
 
 interface DashboardSidebarProjectContextMenuProps {
 	projectId: string;
 	projectColor: string | null;
 	onSetColor: (color: string | null) => void;
+	/** A `cloud-repo` stand-in has no checkout, settings or name of its own. */
+	kind?: DashboardSidebarProject["kind"];
 	onCreateSection: () => void;
 	onImportWorktrees: () => void;
 	onOpenInFinder: () => void;
@@ -47,6 +50,7 @@ export function DashboardSidebarProjectContextMenu({
 	projectId,
 	projectColor,
 	onSetColor,
+	kind,
 	onCreateSection,
 	onImportWorktrees,
 	onOpenInFinder,
@@ -59,6 +63,7 @@ export function DashboardSidebarProjectContextMenu({
 	const { preferences, setTagFolderHidden } = useV2UserPreferences();
 	const hiddenTags = preferences.hiddenTagFolders[projectId] ?? [];
 	const customColorInputRef = useRef<HTMLInputElement>(null);
+	const hasCheckout = kind !== "cloud-repo";
 	return (
 		<>
 			<ContextMenu>
@@ -66,63 +71,69 @@ export function DashboardSidebarProjectContextMenu({
 				<ContextMenuContent
 					onCloseAutoFocus={(event) => event.preventDefault()}
 				>
-					<ContextMenuItem onSelect={onRename}>
-						<LuPencil className="size-4 mr-2" />
-						<Trans>Rename</Trans>
-					</ContextMenuItem>
-					<ContextMenuSeparator />
-					<ContextMenuItem onSelect={onOpenInFinder}>
-						<LuFolderOpen className="size-4 mr-2" />
-						<Trans>Open in Finder</Trans>
-					</ContextMenuItem>
-					<ContextMenuItem onSelect={onOpenSettings}>
-						<LuSettings className="size-4 mr-2" />
-						<Trans>Project Settings</Trans>
-					</ContextMenuItem>
-					<ContextMenuSub>
-						<ContextMenuSubTrigger>
-							<LuPalette className="size-4 mr-2" />
-							<Trans>Color</Trans>
-						</ContextMenuSubTrigger>
-						<ContextMenuSubContent className="w-48">
-							<ColorSelector
-								variant="menu"
-								includeDefault
-								selectedColor={projectColor}
-								onSelectColor={(color) =>
-									onSetColor(color === PROJECT_COLOR_DEFAULT ? null : color)
-								}
-								onPickCustom={() => customColorInputRef.current?.click()}
-							/>
-						</ContextMenuSubContent>
-					</ContextMenuSub>
-					<ContextMenuItem onSelect={onCreateSection}>
-						<LuFolderPlus className="size-4 mr-2" />
-						<Trans>New group</Trans>
-					</ContextMenuItem>
-					{hiddenTags.length > 0 ? (
-						<ContextMenuSub>
-							<ContextMenuSubTrigger>
-								<LuEye className="size-4 mr-2" />
-								<Trans>Hidden folders</Trans>
-							</ContextMenuSubTrigger>
-							<ContextMenuSubContent className="w-48 max-h-80 overflow-y-auto">
-								{hiddenTags.map((tag) => (
-									<ContextMenuItem
-										key={tag}
-										onSelect={() => setTagFolderHidden(projectId, tag, false)}
-									>
-										{tag}
-									</ContextMenuItem>
-								))}
-							</ContextMenuSubContent>
-						</ContextMenuSub>
-					) : null}
-					<ContextMenuItem onSelect={onImportWorktrees}>
-						<LuFolderInput className="size-4 mr-2" />
-						<Trans>Import untracked worktrees</Trans>
-					</ContextMenuItem>
-					<ContextMenuSeparator />
+					{hasCheckout && (
+						<>
+							<ContextMenuItem onSelect={onRename}>
+								<LuPencil className="size-4 mr-2" />
+								<Trans>Rename</Trans>
+							</ContextMenuItem>
+							<ContextMenuSeparator />
+							<ContextMenuItem onSelect={onOpenInFinder}>
+								<LuFolderOpen className="size-4 mr-2" />
+								<Trans>Open in Finder</Trans>
+							</ContextMenuItem>
+							<ContextMenuItem onSelect={onOpenSettings}>
+								<LuSettings className="size-4 mr-2" />
+								<Trans>Project Settings</Trans>
+							</ContextMenuItem>
+							<ContextMenuSub>
+								<ContextMenuSubTrigger>
+									<LuPalette className="size-4 mr-2" />
+									<Trans>Color</Trans>
+								</ContextMenuSubTrigger>
+								<ContextMenuSubContent className="w-48">
+									<ColorSelector
+										variant="menu"
+										includeDefault
+										selectedColor={projectColor}
+										onSelectColor={(color) =>
+											onSetColor(color === PROJECT_COLOR_DEFAULT ? null : color)
+										}
+										onPickCustom={() => customColorInputRef.current?.click()}
+									/>
+								</ContextMenuSubContent>
+							</ContextMenuSub>
+							<ContextMenuItem onSelect={onCreateSection}>
+								<LuFolderPlus className="size-4 mr-2" />
+								<Trans>New group</Trans>
+							</ContextMenuItem>
+							{hiddenTags.length > 0 ? (
+								<ContextMenuSub>
+									<ContextMenuSubTrigger>
+										<LuEye className="size-4 mr-2" />
+										<Trans>Hidden folders</Trans>
+									</ContextMenuSubTrigger>
+									<ContextMenuSubContent className="w-48 max-h-80 overflow-y-auto">
+										{hiddenTags.map((tag) => (
+											<ContextMenuItem
+												key={tag}
+												onSelect={() =>
+													setTagFolderHidden(projectId, tag, false)
+												}
+											>
+												{tag}
+											</ContextMenuItem>
+										))}
+									</ContextMenuSubContent>
+								</ContextMenuSub>
+							) : null}
+							<ContextMenuItem onSelect={onImportWorktrees}>
+								<LuFolderInput className="size-4 mr-2" />
+								<Trans>Import untracked worktrees</Trans>
+							</ContextMenuItem>
+							<ContextMenuSeparator />
+						</>
+					)}
 					<ContextMenuItem onSelect={onHide}>
 						<LuEyeOff className="size-4 mr-2" />
 						<Trans>Hide from Sidebar</Trans>

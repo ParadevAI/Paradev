@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
+import { appendPastedText, parsePastedText } from "@superset/chat/core";
 
 const { act, cleanup, renderHook } = await import("@testing-library/react");
 const { prependToDraft, takeRecoveredDraftText, useComposerDraft } =
@@ -23,7 +24,7 @@ test("recovered text survives the composer's own save on unmount", () => {
 		useComposerDraft("chat-v3-draft:recover-a"),
 	);
 	act(() => recoveredFirst.result.current.onChange("newer draft"));
-	prependToDraft("chat-v3-draft:recover-a", "unsent message");
+	prependToDraft("chat-v3-draft:recover-a", ["unsent message"]);
 	recoveredFirst.unmount();
 	expect(window.localStorage.getItem("chat-v3-draft:recover-a")).toBe(
 		"unsent message\n\nnewer draft",
@@ -34,10 +35,29 @@ test("recovered text survives the composer's own save on unmount", () => {
 	);
 	act(() => flushedFirst.result.current.onChange("newer draft"));
 	flushedFirst.unmount();
-	prependToDraft("chat-v3-draft:recover-b", "unsent message");
+	prependToDraft("chat-v3-draft:recover-b", ["unsent message"]);
 	expect(window.localStorage.getItem("chat-v3-draft:recover-b")).toBe(
 		"unsent message\n\nnewer draft",
 	);
+});
+
+test("unsent prompts with pasted cards join a draft with its own card", () => {
+	const draft = renderHook(() => useComposerDraft("chat-v3-draft:pastes"));
+	act(() =>
+		draft.result.current.onChange(appendPastedText("draft", ["draft log"])),
+	);
+	draft.unmount();
+	prependToDraft("chat-v3-draft:pastes", [
+		appendPastedText("first", ["first log"]),
+		appendPastedText("second", ["second log"]),
+	]);
+
+	expect(
+		parsePastedText(window.localStorage.getItem("chat-v3-draft:pastes") ?? ""),
+	).toEqual({
+		text: "first\n\nsecond\n\ndraft",
+		pastes: ["first log", "second log", "draft log"],
+	});
 });
 
 test("a draft that fails to save is still read from memory", () => {
@@ -62,11 +82,11 @@ test("a draft that fails to save is still read from memory", () => {
 
 test("text recovered after a composer read its draft is handed to it once", () => {
 	renderHook(() => useComposerDraft("chat-v3-draft:late"));
-	prependToDraft("chat-v3-draft:late", "unsent message");
+	prependToDraft("chat-v3-draft:late", ["unsent message"]);
 	expect(takeRecoveredDraftText("chat-v3-draft:late")).toBe("unsent message");
 	expect(takeRecoveredDraftText("chat-v3-draft:late")).toBeNull();
 
-	prependToDraft("chat-v3-draft:early", "unsent message");
+	prependToDraft("chat-v3-draft:early", ["unsent message"]);
 	const reader = renderHook(() => useComposerDraft("chat-v3-draft:early"));
 	expect(reader.result.current.storedDraft).toBe("unsent message");
 	expect(takeRecoveredDraftText("chat-v3-draft:early")).toBeNull();

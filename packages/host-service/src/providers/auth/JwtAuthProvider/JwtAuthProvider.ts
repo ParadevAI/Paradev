@@ -2,6 +2,7 @@ import type { ApiAuthProvider } from "../types";
 
 const JWT_REFRESH_BUFFER_MS = 5 * 60 * 1000;
 const JWT_CACHE_DURATION_MS = 55 * 60 * 1000;
+export const SESSION_REJECTED_ERROR_NAME = "SessionRejectedError";
 
 function looksLikeJwt(token: string): boolean {
 	const parts = token.split(".");
@@ -72,7 +73,9 @@ export class JwtApiAuthProvider implements ApiAuthProvider {
 				: { Authorization: `Bearer ${sessionToken}` },
 		});
 		if (!response.ok) {
-			throw new Error(`Failed to mint JWT: ${response.status}`);
+			const error = new Error(`Failed to mint JWT: ${response.status}`);
+			if (response.status === 401) error.name = SESSION_REJECTED_ERROR_NAME;
+			throw error;
 		}
 		const data = (await response.json()) as { token: string };
 		this.cachedJwt = data.token;

@@ -9,7 +9,10 @@ export {
 	PromptInput,
 	type PromptInputAttachment,
 	type PromptInputCommand,
+	type PromptInputDictation,
+	type PromptInputDictationError,
 	type PromptInputHandle,
 	type PromptInputProps,
 	type PromptInputSubmitPayload,
 } from "./PromptInput";
+export { DictationError } from "./utils/dictationError";

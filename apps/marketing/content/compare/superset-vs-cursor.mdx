@@ -1,19 +1,24 @@
 ---
-title: "Superset vs Cursor (2026): Parallel Agents vs AI Editor"
-description: "Compare Superset and Cursor for AI-assisted development. See how parallel agent orchestration differs from an AI-powered editor."
+title: "Superset vs Cursor (2026): Any-Agent Workspace vs Cursor's Agent Platform"
+description: "Compare Superset and Cursor for parallel AI coding. A local-first workspace that runs any CLI agent in Git worktrees vs Cursor's editor, Agents Window, cloud agents, Projects, and iOS remote control."
 date: 2026-02-02
-lastUpdated: 2026-09-24
+lastUpdated: 2026-10-15
 type: "1v1"
 competitors:
   - cursor
 keywords:
   - superset vs cursor
   - cursor alternative
-  - ai coding editor comparison
+  - cursor agents window
+  - cursor remote control
+  - cursor projects
   - parallel coding agents
+  - ai coding editor comparison
 ---
 
-Cursor started as an AI-native editor, but it now spans its own IDE, cloud agents, web/mobile agents, JetBrains support via ACP, and automation workflows. Superset solves a different problem: it is a local-first agent workspace that can run many coding agents in parallel while staying editor-independent.
+Cursor started as an AI editor and is now a full agent platform: an Agents Window that runs agents locally, in the cloud, or over SSH, cloud agents on their own VMs, self-hosted machines, a coordinator agent in Projects, code hosting with Origin, and an iOS app that, since October 2026, can see and reply to the agents running on your computer. Superset solves a narrower problem in a different way: it is a local-first workspace that runs any CLI agent, including Cursor's own, in parallel Git worktrees on your machines and subscriptions, independent of any editor.
+
+Facts were checked against Cursor's changelog, docs, and pricing page on October 13, 2026.
 
 ---
 
@@ -21,70 +26,73 @@ Cursor started as an AI-native editor, but it now spans its own IDE, cloud agent
 
 | | **Superset** | **Cursor** |
 |---|---|---|
-| **Category** | Agent orchestration workspace | AI coding suite (editor + cloud agents) |
-| **AI approach** | Agent-agnostic: works with Claude Code, Codex, Aider, Superset Chat, or any CLI agent | Managed platform with Cursor-hosted agents and access to frontier models |
-| **Parallelism** | Core feature: multiple agents across isolated worktrees | Up to 8 agents in local Git worktrees (Cursor 2.0), plus cloud agents |
-| **Editor surface** | Works alongside any editor (VS Code, Cursor, JetBrains, Xcode) | Cursor IDE first, plus JetBrains via ACP and web/mobile agent surfaces |
-| **Pricing** | Free tier + Pro $20/seat/mo | Hobby free, Pro $20/mo, Pro+ $60/mo, Ultra $200/mo, Teams $40/user/mo |
-| **Privacy** | Local Git worktrees; you control agent and provider choices | Requests route through Cursor's services for managed models and cloud agents |
+| **Category** | Agent workspace and orchestrator | AI editor and agent platform |
+| **Agents** | Any CLI agent: Claude Code, Codex, Cursor's agent, Antigravity CLI, Copilot CLI, Amp, OpenCode, Droid, Muse Code, and more | Cursor's own agent, with models from several vendors |
+| **Parallel work** | Many agents, from different vendors, each in its own worktree; orchestrate skill turns Claude Code or Codex into a coordinator | Agents Window with worktrees; `/best-of-n` and `/multitask`; cloud agents; Projects coordinator (beta) |
+| **Where agents run** | Your machine, any macOS or Linux machine you add as a host, or a cloud workspace | Your machine, Cursor's cloud VMs, SSH hosts, or self-hosted workers |
+| **Mobile** | iPhone and iPad app: terminals and diff review on your hosts and cloud workspaces | iOS app: cloud agent inbox and PR review; see and reply to local agents (since Oct 6, 2026) |
+| **Editor** | Works alongside any editor | Cursor's own editor at the center |
+| **Model costs** | Your own subscriptions and keys, never proxied | Cursor plans; third-party models billed at API list price |
+| **Platforms** | macOS; experimental Linux AppImage; Windows unavailable | macOS, Windows, Linux, web, iOS |
+| **Pricing** | Free tier; Pro $20 per user per month | Free; Plus $8, Premium $30, Super $100, Ultra $200 per month; Teams from $30 per user |
 
 ---
 
 ## What Is Superset?
 
-Superset is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Aider, Copilot, Cursor Agent, Gemini CLI, Superset Chat, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. You can review inside Superset or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
-
----
+Superset is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, Cursor's agent, Antigravity CLI, GitHub Copilot, Amp, OpenCode, Droid, Muse Code, and any other CLI agent inside isolated Git worktrees with persistent terminal sessions, on your own subscriptions and keys, and never proxies model calls. Around that core it adds a Changes pane that commits, pushes, and opens PRs, a Pull Requests view with CI checks and line comments you can send to agents, a chat panel, an in-app browser with port detection and Design Mode, and an MCP server so agents and tools can create workspaces and launch agents. Remote Access adds a macOS or Linux machine as a host so workspaces keep running when your laptop sleeps, cloud workspaces run in the cloud without your own computer connected, and scheduled automations, a CLI, a TypeScript SDK, and a Slack bot cover unattended work. The [iPhone and iPad app](/mobile) lets you check on sessions and review diffs away from your desk. You can open any workspace in VS Code, Cursor, JetBrains, Zed, or Xcode. Source-available under Elastic License 2.0 (ELv2).
 
 ## What Is Cursor?
 
-Cursor is no longer just a VS Code fork with autocomplete. It is a broader AI coding suite: the desktop IDE still anchors the experience, but Cursor now also offers cloud agents, automations, web/mobile agent access, and JetBrains support through ACP. Cursor 2.0 added a multi-agent interface that runs up to eight agents in parallel, each in its own local Git worktree, so you can compare results and pick the best. The common thread is that Cursor manages the model access and agent runtime for you, rather than asking you to bring your own CLI tools.
-
----
+Cursor is an AI editor that has grown into an agent platform. The Agents Window manages agents across many repositories, running locally, in the cloud, or over SSH, and gives local agents their own worktrees; in the editor, `/worktree`, `/best-of-n`, and `/multitask` cover parallel work. Cloud agents each get their own VM, start from prepared snapshots, and can subscribe to PRs, Slack, and schedules. Since September 2026, self-hosted machines let agents run on your own laptop, a VM, or worker pools on several cloud providers, and Projects, in beta, has a coordinator agent that plans work and hands it to many agents in parallel. Cursor also hosts code with Origin, reviews PRs with Bugbot, and since October 13 has an app marketplace. On October 6, 2026, Cursor added remote control for local agents: pair the iOS app with your desktop to see and reply to agents running on your computer, which must stay on. The CLI, `agent`, runs Cursor's agent in a terminal and lets other editors drive it over ACP. Cursor runs its own agent; its docs do not describe running Claude Code or Codex.
 
 ## Key Differences
 
-### Managed Agent Platform vs Agent Orchestrator
+### Any Agent vs Cursor's Agent
 
-Cursor has expanded well beyond a single chat panel. You can now launch remote agents, work with them from the web, and automate recurring workflows. But all of that still lives inside the Cursor stack. Superset is different: it is the workspace around whichever agents you choose, keeping each one isolated in its own worktree while adding chat, browser preview, and review tooling around the repo itself.
+Cursor's parallelism runs Cursor's agent, with your choice of model. Superset runs agents from every vendor in real terminals, so Claude Code, Codex, and Cursor's own agent can work on the same repository side by side, and you can continue a session with a different agent. If you like Cursor's agent, you can run it in Superset too.
 
-### Cursor-Centered Workflow vs Editor Freedom
+### Who Pays for the Models
 
-Cursor is less editor-locked than it used to be. It now reaches JetBrains through ACP and lets you monitor or launch agents from the web and mobile. But the product is still fundamentally Cursor-centered: you are buying into its hosted runtime, its plans, and its workflow model. Superset stays editor-independent. It now has its own chat, file review, and browser surfaces, but it still treats your editor as a choice rather than the center of the product.
+Superset never proxies model calls: each agent runs on your own subscription or key. Cursor bundles usage into its plans, bills third-party models at API list price, and refreshes usage weekly.
 
-### Hosted Runtime vs Bring-Your-Own Agents
+### Remote Agents and Mobile
 
-Cursor gives you convenience: hosted agents, managed model access, and a unified account. Superset gives you freedom: Claude Code, Codex, OpenCode, Aider, Superset Chat, or anything else that runs in a shell. That matters if you want to switch models often, compare agents head-to-head, or avoid tying your entire workflow to one vendor's runtime.
+Both now let you check on agents running on your own machine from a phone. Cursor's iOS app pairs with one desktop and shows its local agents, alongside its cloud agents. Superset's iPhone and iPad app connects to any macOS or Linux host you add through Remote Access and to cloud workspaces, with terminals and diff review for any agent running there.
 
-### Privacy
+### Cloud Infrastructure
 
-Superset runs agents locally in Git worktrees and has a source-available codebase. Cursor's hosted features route through Cursor infrastructure and external model providers. That is the tradeoff: managed convenience versus direct local control.
+Cursor offers managed cloud agents on their own VMs, started from prepared snapshots, and worker pools on several clouds. Superset has cloud workspaces that run in the cloud and open from desktop, iPhone, and iPad, and it also runs agents on machines you own through Remote Access.
+
+### Editor-Centered vs Editor-Independent
+
+Cursor's editor is the center of its product, and some CLI features work only in the editor. Superset works alongside whichever editor you use, and many Superset users run it next to Cursor.
 
 ---
 
 ## Pricing
 
-Superset offers a free tier and a Pro plan at $20/seat/month. You also pay for your agents' API keys (for example Anthropic for Claude Code or OpenAI for Codex): transparent provider costs, no platform credit system.
-
-Cursor's current public pricing is Hobby (free), Pro ($20/month), Pro+ ($60/month), Ultra ($200/month), Teams ($40/user/month), and Enterprise (custom). That structure makes Cursor easier to adopt out of the box, but it also means your agent usage, hosted runtime, and model access stay bundled inside Cursor's platform economics.
+Superset offers a free tier and Pro at $20 per user per month, or $15 per user per month billed yearly, with an enterprise tier on custom billing. Model costs are on your own agent subscriptions. Cursor's pricing page lists Free, Plus at $8 a month, Premium at $30, Super at $100, Ultra at $200, Teams from $30 per user, and Enterprise on custom terms. Cloud agents, automations, Origin, and Bugbot start at Premium, and third-party models are billed at API list price on every tier. Prices as of October 2026.
 
 ---
 
 ## Which Should You Choose?
 
-**Choose Cursor if you:**
-- Want one managed product for editor AI, cloud agents, and web/mobile agent access
-- Prefer convenience over control: no separate CLI agent setup or API key juggling
-- Like Cursor's hosted model access and plan-based workflow
-- Want AI tightly integrated into either Cursor IDE or its remote agent surfaces
-
 **Choose Superset if you:**
-- Run CLI-based coding agents and want to parallelize independent tasks
-- Use JetBrains, Xcode, Neovim, Cursor, or any other editor and do not want orchestration tied to one product
-- Need local worktrees and direct control over providers
-- Want agent and model flexibility with no vendor lock-in
 
-Both tools work together. Use Cursor for inline AI editing, Superset alongside it to dispatch parallel agents for test generation, refactors, and migrations. Cursor is where you write code interactively; Superset is where you orchestrate autonomous work at scale.
+- Run CLI agents from several vendors and want them side by side
+- Want model costs on your own subscriptions, with no proxy
+- Want agents on machines you own, reachable from an iPhone or iPad app
+- Use JetBrains, Xcode, Neovim, Zed, or Cursor itself, and want orchestration that is not tied to one editor
+
+**Choose Cursor if you:**
+
+- Want one product for AI editing, local and cloud agents, and code review
+- Want cloud agents on prepared VM snapshots and worker pools across several clouds
+- Want a coordinator built into a Projects view that plans work for Cursor's own agents
+- Prefer Cursor's agent and editor as the center of your workflow
+
+The two also work together: use Cursor as your editor, and Superset to run Claude Code, Codex, and Cursor's agent in parallel worktrees around it.
 
 ---
 
@@ -92,12 +100,16 @@ Both tools work together. Use Cursor for inline AI editing, Superset alongside i
 
 ### Is Superset a Cursor replacement?
 
-Not as an IDE. Superset does not provide Cursor-style inline completions or replace a full code editor, but it does provide in-app chat, diff/file editing, browser previews, and worktree orchestration. It works alongside Cursor rather than trying to become Cursor.
+Not as an editor. Superset does not offer Cursor-style inline completions. It is the workspace for running and reviewing many agents, and it opens any workspace in Cursor when you want to edit.
 
 ### Does Cursor support parallel agents?
 
-Yes. Cursor 2.0 runs up to eight agents in parallel, each in its own local Git worktree, plus cloud agents and automations. The difference is agent choice: Cursor's parallelism runs its own agents inside the Cursor stack, while Superset runs any CLI agent (Claude Code, Codex, OpenCode, and more) in worktrees on your machine, independent of any one editor.
+Yes. The Agents Window runs agents locally, in the cloud, or over SSH, with worktrees for local agents, and Projects has a coordinator agent in beta. Cursor's parallelism runs its own agent; Superset runs any CLI agent in worktrees on your machines.
 
-### Is Superset really free?
+### Can I control local Cursor agents from my phone?
 
-Superset has a free tier and a Pro plan at $20/seat/month. You also need API keys for your chosen agents (e.g., Anthropic for Claude Code). No credit system, no markup on API costs.
+Yes, since October 6, 2026: pair Cursor's iOS app with your desktop to see and reply to its local agents. Superset's iPhone and iPad app does the same for any agent running on any macOS or Linux host you add.
+
+### Can I run Cursor's agent in Superset?
+
+Yes. Cursor's agent is a built-in agent in Superset, and runs in its own worktree next to Claude Code, Codex, and any other CLI agent.

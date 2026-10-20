@@ -181,8 +181,9 @@ describe("eventBus", () => {
 		cleanups.push(() => revived.server.stop(true));
 
 		reconnectEventBusIfDown(host.hostUrl);
-		await waitFor(() => revived.clientCount() === 1, 2_000);
-		expect(bus.getConnectionStatus().state).toBe("open");
+		// About 1.1s of the 1.3s backoff is still left here.
+		await waitFor(() => bus.getConnectionStatus().state === "open", 500);
+		expect(revived.clientCount()).toBe(1);
 	});
 
 	it("reconnectEventBusIfDown leaves an open connection alone", async () => {

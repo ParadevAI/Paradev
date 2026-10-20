@@ -2,7 +2,7 @@
 title: "Superset vs Aider (2026): Agent Workspace vs Terminal Pair Programmer"
 description: "Compare Superset and Aider for AI coding. See how a local-first workspace that runs many agents in parallel differs from a single terminal pair-programming CLI."
 date: 2026-07-13
-lastUpdated: 2026-09-24
+lastUpdated: 2026-10-15
 type: "1v1"
 competitors:
   - aider
@@ -14,7 +14,7 @@ keywords:
   - parallel coding agents
 ---
 
-Aider is one of the most popular open-source AI pair programmers: a single, focused CLI that edits your code and commits to Git from the terminal. Superset solves a broader problem: it is a local-first workspace that runs Aider (and other agents) across many isolated worktrees at once. In fact, Aider is one of the agents Superset can launch, so the real question is single-session pair programming versus multi-agent orchestration.
+Aider is one of the most popular open-source AI pair programmers: a single, focused CLI that edits your code and commits to Git from the terminal. Superset solves a broader problem: it is a local-first workspace that runs Aider (and other agents) across many isolated worktrees at once. Aider is not a built-in preset, but it runs in Superset as a custom agent command, so the real question is single-session pair programming versus multi-agent orchestration.
 
 ---
 
@@ -23,7 +23,7 @@ Aider is one of the most popular open-source AI pair programmers: a single, focu
 | | **Superset** | **Aider** |
 |---|---|---|
 | **Category** | Agent orchestration workspace | Terminal AI pair programmer |
-| **AI approach** | Agent-agnostic: runs Claude Code, Codex, Aider, Superset Chat, or any CLI agent | Model-agnostic: Claude, GPT, Gemini, DeepSeek, or local models |
+| **AI approach** | Agent-agnostic: runs Claude Code, Codex, Superset Chat, or any CLI agent (Aider as a custom agent) | Model-agnostic: Claude, GPT, Gemini, DeepSeek, or local models |
 | **Parallelism** | Core feature: multiple agents across isolated Git worktrees | One interactive session per terminal |
 | **Interface** | Desktop app: terminals, diff/file editor, chat, in-app browser | Command-line REPL in your terminal |
 | **Git model** | Isolated worktree per task | Auto-commits to your current branch |
@@ -33,7 +33,7 @@ Aider is one of the most popular open-source AI pair programmers: a single, focu
 
 ## What Is Superset?
 
-Superset is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Aider, Copilot, Cursor Agent, Gemini CLI, Superset Chat, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. You can review inside Superset or jump into VS Code, Cursor, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
+Superset is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Copilot, Cursor Agent, Gemini CLI, Superset Chat, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. You can review inside Superset or jump into VS Code, Cursor, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
 
 ---
 
@@ -55,7 +55,7 @@ Aider is intentionally minimal: a terminal REPL that edits and commits. Superset
 
 ### Complementary, Not Mutually Exclusive
 
-Aider is one of the CLI agents Superset can run. You can use Aider standalone for quick, focused edits, and launch it inside Superset when you want to run it in an isolated worktree alongside other agents. Superset does not replace Aider; it orchestrates it.
+Aider runs in Superset as a custom agent command. You can use Aider standalone for quick, focused edits, and launch it inside Superset when you want to run it in an isolated worktree alongside other agents. Superset does not replace Aider; it orchestrates it.
 
 ### Privacy
 
@@ -93,7 +93,7 @@ Both tools work together. Use Aider for quick terminal edits, and run it inside 
 
 ### Can Superset run Aider?
 
-Yes. Aider is one of the CLI agents Superset can launch inside an isolated Git worktree, alongside Claude Code, Codex, OpenCode, and others. Superset acts as the workspace and orchestration layer around Aider.
+Yes. Aider is not a built-in preset, but you can add it as a custom agent in **Settings → Agents → Add agent → Custom agent…**. It then launches inside an isolated Git worktree, alongside Claude Code, Codex, OpenCode, and others, without the integrations built-in agents get. Superset acts as the workspace and orchestration layer around Aider.
 
 ### Is Aider free?
 

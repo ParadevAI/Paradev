@@ -152,7 +152,7 @@ export function SessionView({
 				)
 				.map((entry) => contentText(entry.content))
 				.filter(Boolean);
-			if (unsent.length > 0) prependToDraft(draftKey, unsent.join("\n\n"));
+			if (unsent.length > 0) prependToDraft(draftKey, unsent);
 		},
 		[draftKey],
 	);
@@ -335,9 +335,6 @@ export function SessionView({
 		() => (heldQueued ? heldPromptQueue(heldQueued) : undefined),
 		[heldQueued],
 	);
-	const connecting =
-		session.unreachable ||
-		(session.status === "ready" && session.connection === "closed");
 	const booting = sessionState?.status === "starting";
 
 	// w-full because the pane lays its children out in a row: without it this
@@ -394,13 +391,9 @@ export function SessionView({
 				{held ? (
 					<ConnectionNotice>{held.notice}</ConnectionNotice>
 				) : (
-					(connecting || booting) && (
+					booting && (
 						<ConnectionNotice>
-							{connecting ? (
-								<Trans>Connecting to the host service…</Trans>
-							) : (
-								<Trans>Starting the agent…</Trans>
-							)}
+							<Trans>Starting the agent…</Trans>
 						</ConnectionNotice>
 					)
 				)}

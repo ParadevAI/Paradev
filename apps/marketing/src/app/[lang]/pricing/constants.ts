@@ -16,17 +16,9 @@ export interface PricingTier {
 	price:
 		| { kind: "fixed"; display: string; note: MessageDescriptor }
 		| {
-				kind: "variable";
-				monthly: {
-					display: string;
-					note: MessageDescriptor;
-					cadence: MessageDescriptor;
-				};
-				yearly: {
-					display: string;
-					note: MessageDescriptor;
-					cadence: MessageDescriptor;
-				};
+				kind: "proSeat";
+				monthly: { note: MessageDescriptor; cadence: MessageDescriptor };
+				yearly: { note: MessageDescriptor; cadence: MessageDescriptor };
 		  }
 		| { kind: "custom"; display: MessageDescriptor; note: MessageDescriptor };
 	features: PricingFeature[];
@@ -34,6 +26,7 @@ export interface PricingTier {
 	cta: {
 		label: MessageDescriptor;
 		href: string;
+		event: "download_clicked" | "contact_sales_clicked";
 		variant: "default" | "outline" | "secondary";
 		external?: boolean;
 	};
@@ -86,6 +79,7 @@ export const PRICING_TIERS: PricingTier[] = [
 				message: "Download app",
 			}),
 			href: "/download",
+			event: "download_clicked",
 			variant: "outline",
 		},
 		ctaNote: {
@@ -101,9 +95,8 @@ export const PRICING_TIERS: PricingTier[] = [
 			message: "For teams that need more power",
 		}),
 		price: {
-			kind: "variable",
+			kind: "proSeat",
 			monthly: {
-				display: "$20",
 				note: msg({
 					message: "per user/month",
 				}),
@@ -112,12 +105,11 @@ export const PRICING_TIERS: PricingTier[] = [
 				}),
 			},
 			yearly: {
-				display: "$15",
 				note: msg({
 					message: "per user/month",
 				}),
 				cadence: msg({
-					message: "$180 per user, billed yearly",
+					message: "{yearlyTotal} per user, billed yearly",
 				}),
 			},
 		},
@@ -170,6 +162,7 @@ export const PRICING_TIERS: PricingTier[] = [
 				message: "Download app",
 			}),
 			href: "/download",
+			event: "download_clicked",
 			variant: "default",
 		},
 		highlight: true,
@@ -234,6 +227,7 @@ export const PRICING_TIERS: PricingTier[] = [
 				message: "Contact sales",
 			}),
 			href: "/enterprise",
+			event: "contact_sales_clicked",
 			variant: "outline",
 		},
 		ctaNote: {
@@ -464,7 +458,7 @@ export const PRICING_FAQ_ITEMS: PricingFAQItem[] = [
 		}),
 		answer: msg({
 			message:
-				"Pro is $20 per user/month billed monthly, or $15 per user/month billed yearly (a 25% discount). You're billed per active seat on your team.",
+				"Pro is {monthlyPrice} per user/month billed monthly, or {yearlyPrice} per user/month billed yearly (a 25% discount). You're billed per active seat on your team.",
 		}),
 	},
 	{

@@ -8,7 +8,7 @@ import {
 } from "@superset/local-db";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
-import { app, clipboard, shell } from "electron";
+import { app, clipboard, nativeImage, shell } from "electron";
 import { localDb } from "main/lib/local-db";
 import { externalUrlLogLabel, isSafeExternalUrl } from "main/lib/safe-url";
 import { z } from "zod";
@@ -242,6 +242,21 @@ export const createExternalRouter = () => {
 						err,
 					);
 				}
+			}),
+
+		copyImage: publicProcedure
+			.input(z.object({ pngBase64: z.string().min(1).max(70_000_000) }))
+			.mutation(({ input }) => {
+				const image = nativeImage.createFromBuffer(
+					Buffer.from(input.pngBase64, "base64"),
+				);
+				if (image.isEmpty()) {
+					throw new TRPCError({
+						code: "BAD_REQUEST",
+						message: "Not a decodable image",
+					});
+				}
+				clipboard.writeImage(image);
 			}),
 
 		copyPath: publicProcedure.input(z.string()).mutation(async ({ input }) => {

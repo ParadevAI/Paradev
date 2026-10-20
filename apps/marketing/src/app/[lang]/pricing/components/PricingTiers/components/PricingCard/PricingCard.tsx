@@ -3,8 +3,13 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@superset/ui/button";
 import { cn } from "@superset/ui/utils";
 import { Check } from "lucide-react";
-import Link from "next/link";
+import { DownloadLink } from "@/app/[lang]/components/DownloadLink";
+import { TrackedLink } from "@/app/[lang]/components/TrackedLink";
 import type { PricingTier } from "../../../../constants";
+import {
+	type ProSeatPriceValues,
+	proSeatPriceValues,
+} from "../../../../utils/proSeatPriceValues";
 
 interface PricingCardProps {
 	tier: PricingTier;
@@ -12,10 +17,11 @@ interface PricingCardProps {
 }
 
 export function PricingCard({ tier, isYearly }: PricingCardProps) {
-	const { t } = useLingui();
+	const { t, i18n } = useLingui();
 	const { display, strikethrough, note, cadence } = resolvePrice(
 		tier,
 		isYearly,
+		proSeatPriceValues(i18n.locale),
 	);
 
 	return (
@@ -58,7 +64,7 @@ export function PricingCard({ tier, isYearly }: PricingCardProps) {
 					)}
 				</div>
 				{cadence && (
-					<p className="text-xs text-muted-foreground">{t(cadence)}</p>
+					<p className="text-xs text-muted-foreground">{i18n._(cadence)}</p>
 				)}
 			</div>
 
@@ -68,8 +74,18 @@ export function PricingCard({ tier, isYearly }: PricingCardProps) {
 						<a href={tier.cta.href} target="_blank" rel="noopener noreferrer">
 							{t(tier.cta.label)}
 						</a>
+					) : tier.cta.event === "download_clicked" ? (
+						<DownloadLink source="pricing" properties={{ tier: tier.id }}>
+							{t(tier.cta.label)}
+						</DownloadLink>
 					) : (
-						<Link href={tier.cta.href}>{t(tier.cta.label)}</Link>
+						<TrackedLink
+							href={tier.cta.href}
+							event={tier.cta.event}
+							properties={{ source: "pricing", tier: tier.id }}
+						>
+							{t(tier.cta.label)}
+						</TrackedLink>
 					)}
 				</Button>
 				<CtaNote note={tier.ctaNote} />
@@ -115,6 +131,7 @@ function CtaNote({ note }: { note: PricingTier["ctaNote"] }) {
 function resolvePrice(
 	tier: PricingTier,
 	isYearly: boolean,
+	prices: ProSeatPriceValues,
 ): {
 	display: string | MessageDescriptor;
 	strikethrough: string | null;
@@ -131,9 +148,9 @@ function resolvePrice(
 	}
 	const entry = isYearly ? tier.price.yearly : tier.price.monthly;
 	return {
-		display: entry.display,
-		strikethrough: isYearly ? tier.price.monthly.display : null,
+		display: isYearly ? prices.yearlyPrice : prices.monthlyPrice,
+		strikethrough: isYearly ? prices.monthlyPrice : null,
 		note: entry.note,
-		cadence: entry.cadence,
+		cadence: { ...entry.cadence, values: prices },
 	};
 }

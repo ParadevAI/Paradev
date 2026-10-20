@@ -54,6 +54,31 @@ describe("rethrowEnvironmentalGitError", () => {
 		expect(thrown?.message).toBe(message);
 	});
 
+	test("git 2.56+ gitfile pointing at no repository → BAD_REQUEST / NOT_GIT_REPO", () => {
+		const message =
+			"fatal: gitfile does not point to a valid repository: /worktrees/repo/feature/.git\n";
+		const thrown = capture(new Error(message));
+		expect(thrown?.code).toBe("BAD_REQUEST");
+		expect(causeKind(thrown)).toBe("NOT_GIT_REPO");
+		expect(thrown?.message).toBe(message);
+	});
+
+	test("leaves malformed gitfiles and the sentence mid-line unclassified", () => {
+		expect(
+			capture(new Error("fatal: invalid gitfile format: /repo/.git\n")),
+		).toBeNull();
+		expect(
+			capture(new Error("fatal: no path in gitfile: /repo/.git\n")),
+		).toBeNull();
+		expect(
+			capture(
+				new Error(
+					"hook output: gitfile does not point to a valid repository: x\n",
+				),
+			),
+		).toBeNull();
+	});
+
 	test("simple-git construct error → NOT_FOUND / WORKTREE_MISSING", () => {
 		const message = "Cannot use simple-git on a directory that does not exist";
 		const thrown = capture(new Error(message));

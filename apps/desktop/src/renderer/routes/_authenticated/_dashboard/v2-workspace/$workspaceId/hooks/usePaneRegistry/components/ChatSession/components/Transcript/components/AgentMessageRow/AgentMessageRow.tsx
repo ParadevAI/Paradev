@@ -1,7 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import type { AgentMessage } from "@superset/chat/protocol";
 import { isImageAttachment } from "@superset/chat/protocol";
-import { useFormat } from "@superset/i18n/react";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -16,21 +15,11 @@ import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
 import type { ChatForkTarget } from "../../../../types";
 import { MarkdownView } from "../../../MarkdownView";
 import { AttachmentRail } from "../AttachmentRail";
+import { MessageTime } from "../MessageTime";
 import { useBlockFading } from "./hooks/useBlockFading";
 import { usePacedText } from "./hooks/usePacedText";
 
 const COPIED_MS = 1500;
-
-function clockLabelOptions(at: Date, now: Date): Intl.DateTimeFormatOptions {
-	const time = { hour: "numeric", minute: "2-digit" } as const;
-	if (at.toDateString() === now.toDateString()) return time;
-	return {
-		...time,
-		month: "short",
-		day: "numeric",
-		...(at.getFullYear() === now.getFullYear() ? {} : { year: "numeric" }),
-	};
-}
 
 export function AgentMessageRow({
 	canForkToWorktree = true,
@@ -51,7 +40,6 @@ export function AgentMessageRow({
 	pagesShownEarlier?: string | undefined;
 }) {
 	const { t } = useLingui();
-	const { formatDateTime } = useFormat();
 	const { copied, copyToClipboard } = useCopyToClipboard(COPIED_MS);
 	const streaming = item.completedAtMs === undefined;
 	const paced = usePacedText(text, streaming);
@@ -63,8 +51,9 @@ export function AgentMessageRow({
 		});
 	}, [copyToClipboard, text]);
 
-	const at = new Date(item.completedAtMs ?? item.startedAtMs);
-	const images = (item.attachments ?? []).filter(isImageAttachment);
+	const images = (item.attachments ?? [])
+		.filter(isImageAttachment)
+		.map((image) => ({ owner: item.id, image }));
 
 	return (
 		// Actions stay out of the way until the message is pointed at, and stay
@@ -152,13 +141,12 @@ export function AgentMessageRow({
 							</DropdownMenuContent>
 						</DropdownMenu>
 					)}
-					<time
-						className="text-[11px] tabular-nums"
-						dateTime={at.toISOString()}
-						title={formatDateTime(at)}
-					>
-						{formatDateTime(at, clockLabelOptions(at, new Date()))}
-					</time>
+					{item.model && (
+						<span className="max-w-48 truncate text-[11px]" title={item.model}>
+							{item.model}
+						</span>
+					)}
+					<MessageTime atMs={item.completedAtMs ?? item.startedAtMs} />
 				</div>
 			)}
 		</div>

@@ -1,0 +1,112 @@
+---
+title: "Superset vs Amp (2026): Any-Agent Workspace vs Amp's Agent and Runners"
+description: "Compare Superset and Amp. A local-first workspace that runs any coding agent in parallel Git worktrees vs Amp's multi-model agent with cloud orbs, runners, and iOS and macOS apps. And how to run Amp inside Superset."
+date: 2026-10-13
+lastUpdated: 2026-10-15
+type: "1v1"
+competitors:
+  - amp
+keywords:
+  - superset vs amp
+  - amp alternative
+  - ampcode alternative
+  - amp coding agent
+  - amp runners worktrees
+  - amp orbs
+  - parallel coding agents
+---
+
+Amp started as a coding agent and is growing into a development environment. Its agent picks models for you by mode, its "orbs" are cloud machines that keep working after you close your laptop, and since September 2026 its runners create Git worktrees, can be shared across a team, and include the Amp Mac app. Superset is a local-first workspace that runs any CLI agent, Amp included, in parallel Git worktrees, with pull requests, a browser, automations, remote hosts, and cloud workspaces. The difference: Amp is one vendor's agent with its own infrastructure; Superset is the workspace around every agent you use.
+
+Facts were checked against Amp's own manual, pricing, and news pages on October 13, 2026.
+
+---
+
+## At a Glance
+
+| | **Superset** | **Amp** |
+|---|---|---|
+| **What it does** | Runs multiple AI coding agents in parallel with Git worktree isolation, chat, review, and browser | A multi-model coding agent with cloud orbs, runners, and apps across terminal, web, iOS, and macOS |
+| **Agents** | Any CLI agent (Claude Code, Codex, Amp, Antigravity CLI, Cursor's agent, OpenCode, Copilot, Droid, Muse Code, and more) | Amp's own agent and subagents |
+| **Models** | Whatever each agent uses, on your own subscriptions | Several models chosen by mode, or pinned; your own keys or a linked ChatGPT or Claude plan |
+| **Isolation** | Git worktrees for local branch-based workspaces | Worktrees created by runners; orbs are per-thread cloud machines |
+| **Remote** | Cloud workspaces, or Remote Access to a macOS or Linux machine you add as a host | Orbs in the cloud, remote and shared team runners |
+| **Clients** | macOS desktop (experimental Linux AppImage; Windows unavailable), iPhone and iPad app, CLI, MCP server | Terminal UI, web, iOS and macOS apps |
+| **Pricing** | Free tier; Pro $20 per user per month | Free with your own compute and keys; Individual $20/mo with orb minutes; Enterprise custom |
+
+---
+
+## What Is Superset?
+
+Superset is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, Amp, Antigravity CLI, Cursor's agent, OpenCode, GitHub Copilot, Droid, Muse Code, and any other CLI agent inside isolated Git worktrees with persistent terminal sessions, on your own subscriptions and keys, and never proxies model calls. Around that core it adds a Changes pane that commits, pushes, and opens PRs, a Pull Requests view with CI checks and line comments you can send to agents, a chat panel, an in-app browser with port detection and Design Mode, and an MCP server so agents and tools can create workspaces and launch agents. Remote Access adds a macOS or Linux machine as a host so workspaces keep running when your laptop sleeps, and scheduled automations, a CLI, a TypeScript SDK, and a Slack bot cover unattended work. The [iPhone and iPad app](/mobile) lets you check on sessions and review diffs away from your desk. Source-available under Elastic License 2.0 (ELv2), with an enterprise tier that adds SAML SSO, SCIM, audit logs, and a SOC 2 Type II report.
+
+## What Is Amp?
+
+Amp calls itself "a coding agent and development environment built for the frontier." Instead of a model picker, you choose a mode, from fast to "ultra," and Amp picks the model, though you can pin one. It runs subagents automatically, supports custom subagents through plugins, and lets agents start other agents. Orbs are cloud machines, one per thread, that keep working after you close your laptop. Runners execute threads on machines you choose: since September 22, 2026 a runner creates Git worktrees for its threads, and since September 24 runners can be shared across a team and the Amp Mac app can act as one. Threads follow you across the terminal UI, the web, and Amp's iOS and macOS apps. Amp is free if you bring your own compute and model keys ("Free Agent," September 13); the Individual plan is $20 a month with orb minutes included, and since October 10 you can use a Claude Pro or Max plan in Amp. It runs on macOS and Linux, and on Windows through WSL. Amp is proprietary and says it keeps "no backward compatibility, no legacy features."
+
+## Key Differences
+
+### Any Agent vs Amp's Agent
+
+Amp's environment runs Amp's agent. Superset runs agents from every vendor in real terminals, so Amp, Claude Code, and Codex can work on the same repository in separate worktrees, and you can continue a session with a different agent. If you like Amp's agent, you can run it in Superset next to the others.
+
+### Who Picks the Model
+
+Amp chooses the model for each mode, which is simple and keeps you on whatever it considers best. In Superset, each agent uses its own models on your own plan, and you choose the agent for each task.
+
+### Cloud and Your Machines
+
+Amp's orbs give you a cloud machine per thread, and its runners cover your own machines and can be shared across a team. Superset has cloud workspaces, which run in the cloud and work from desktop, iPhone, and iPad without keeping your own computer connected, and Remote Access, which adds machines you own as hosts and keeps workspaces running when your laptop sleeps.
+
+### Review and Pull Requests
+
+Superset's Changes pane commits, pushes, and opens pull requests, and its Pull Requests view shows CI checks and sends line comments back to the agent. Amp's surface centers on threads you follow across devices.
+
+### Platforms
+
+Amp has iOS and macOS apps and a web client, and runs on Linux. Superset has a macOS desktop app, an experimental Linux build, and an iPhone and iPad app; Windows is not yet available for either as a native desktop app.
+
+---
+
+## Pricing
+
+Superset offers a free tier and Pro at $20 per user per month, or $15 per user per month billed yearly, with an enterprise tier on custom billing; model costs are on your own agent subscriptions. Amp is free when you bring your own compute and model keys, Individual is $20 per month with 45,000 orb minutes, Teams adds no extra charge, and Enterprise is custom. Prices as of October 2026.
+
+---
+
+## Which Should You Choose?
+
+**Choose Superset if you:**
+
+- Use more than one coding agent, and want them side by side
+- Want pull requests, CI checks, and line comments back to any agent in one place
+- Want agents on machines you own or in cloud workspaces, with scheduled automations and a Slack bot
+- Need enterprise controls: SAML SSO, SCIM, audit logs, SOC 2 Type II
+
+**Choose Amp if you:**
+
+- Want the vendor to pick the best model for each task
+- Want one cloud machine per thread and shared team runners from the agent vendor
+- Want the same threads in the terminal, on the web, and on iOS and macOS
+
+**Verdict:** Amp is a strong agent with its own cloud and apps. Superset is the workspace for teams that use several agents, Amp among them, and want review through to the pull request, on their own machines or in cloud workspaces.
+
+---
+
+## Frequently Asked Questions
+
+### Can I run Amp in Superset?
+
+Yes. Amp is a built-in agent in Superset. It runs in its own worktree next to Claude Code, Codex, and any other CLI agent.
+
+### Is Amp free?
+
+Amp is free if you bring your own compute and model keys. The Individual plan is $20 per month with orb minutes. Superset has a free tier and Pro at $20 per user per month.
+
+### Does Amp use Git worktrees?
+
+Yes. Since September 2026, Amp's runners create Git worktrees for their threads. Superset gives each new local branch-based workspace its own worktree and terminal.
+
+### Does Amp run on Windows?
+
+Amp runs on Windows through WSL. Superset's desktop app runs on macOS, with an experimental Linux build.

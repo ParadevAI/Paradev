@@ -15,6 +15,16 @@ export interface CatalogPlugin {
 	installed?: boolean;
 }
 
+export const AGENT_TARGETS: { name: string; icon: string }[] = [
+	{ name: "Claude Code", icon: "/app-icons/claude.svg" },
+	{ name: "Codex", icon: "/app-icons/codex.svg" },
+	{ name: "Cursor Agent", icon: "/app-icons/cursor-agent.svg" },
+	{ name: "OpenCode", icon: "/app-icons/opencode.svg" },
+	{ name: "Gemini CLI", icon: "/app-icons/gemini.svg" },
+	{ name: "Mistral Vibe", icon: "/app-icons/vibe.svg" },
+	{ name: "Kimi Code", icon: "/app-icons/kimi.svg" },
+];
+
 export const CATALOG: {
 	category: MessageDescriptor;
 	plugins: CatalogPlugin[];
@@ -116,6 +126,16 @@ export const CATALOG: {
 				displayName: "Stripe",
 				description: msg({ message: "Trace charges and subscriptions" }),
 			},
+			{
+				name: "autumn",
+				displayName: "Autumn",
+				description: msg({ message: "Check plans and balances" }),
+			},
+			{
+				name: "exa",
+				displayName: "Exa",
+				description: msg({ message: "Search the web" }),
+			},
 		],
 	},
 ];
@@ -156,10 +176,10 @@ export const STEPS: (PluginsItem & { id: StepId })[] = [
 
 export const FEATURES: PluginsItem[] = [
 	{
-		title: msg({ message: "On every machine you sign into" }),
+		title: msg({ message: "Works in every agent" }),
 		description: msg({
 			message:
-				"Install a plugin once. Superset adds its skills on each machine where you use your account.",
+				"Claude Code, Codex, Cursor, OpenCode, and more use the same plugin. There is no setup per agent.",
 		}),
 	},
 	{
@@ -170,17 +190,17 @@ export const FEATURES: PluginsItem[] = [
 		}),
 	},
 	{
-		title: msg({ message: "Works with Claude Code and Codex" }),
+		title: msg({ message: "On your machines and in the cloud" }),
 		description: msg({
 			message:
-				"Superset puts plugin skills and tools where these agents look for them.",
+				"Install a plugin once. It is ready on each machine you sign into and in every cloud workspace you start.",
 		}),
 	},
 	{
-		title: msg({ message: "Install from the terminal" }),
+		title: msg({ message: "Publish from your own repo" }),
 		description: msg({
 			message:
-				"Run superset plugins install linear from any shell. The plugin shows up in the app too.",
+				"Share plugins with your team from a GitHub repo. Each release is a git tag you can pin.",
 		}),
 	},
 ];

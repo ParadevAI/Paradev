@@ -6,6 +6,7 @@ export * from "./markdown/fenceState";
 export * from "./markdown/splitBlocks";
 export * from "./outbox/outbox";
 export * from "./outline";
+export * from "./pastedText/pastedText";
 export * from "./reducer/reducer";
 export * from "./timeline/deriveTimeline";
 export * from "./transcript/transcript";

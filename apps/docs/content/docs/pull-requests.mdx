@@ -28,8 +28,11 @@ Selecting a PR opens it in the right pane, with **Summary** and **Code** tabs. T
 The Summary tab shows the PR description alongside:
 
 - **Checks**: every CI check with its status and a link to the run on GitHub. The header summarizes the state at a glance ("All 12 passed"). Cancelled checks count as failures, not successes.
-- Review status and reviewers for the PR
-- The comment thread, with a composer for replying
+- Review status and reviewers for the PR. Each reviewer links to their GitHub profile
+- **Activity**: comments, reviews, review threads, and commits in one stream, oldest first, with a composer for replying
+- **Pages**: in a workspace's PR pane, up to three pages the workspace's agents published, with a link to view all
+
+Review threads show one card per thread, with its replies inside. Resolved and outdated threads fold to their header; click the header to unfold one. Each card keeps copy, resolve or unresolve, reply, and open-in-diff actions.
 
 ![PR checks alongside the summary, with Start Workspace and Merge actions in the header](/images/pr-checks.png)
 

@@ -10,6 +10,7 @@ interface Settings {
 	/** How the top-bar Changes button (and ⌘⇧L) opens the Changes surface:
 	 * split the current tab, or focus/create a dedicated tab. */
 	changesOpenTarget: ChangesOpenTarget;
+	dictationEnabled: boolean;
 }
 
 interface SettingsStore extends Settings {
@@ -23,6 +24,7 @@ export const useSettings = create<SettingsStore>()(
 			showDiffComments: true,
 			expandUnchanged: false,
 			changesOpenTarget: "pane",
+			dictationEnabled: true,
 			update: (key, value) => set({ [key]: value }),
 		}),
 		{ name: "settings" },

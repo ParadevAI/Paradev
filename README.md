@@ -111,16 +111,16 @@ Jump to any workspace, action, or setting from one search box.
 
 Connect another machine to reach its workspaces remotely, or schedule an agent to work on a recurring task. The CLI, SDK, and MCP server also let agents and scripts manage workspaces.
 
-Mobile requires **Superset Pro**, **iOS 26 or later**, and a computer with **Remote Access enabled**.
+Mobile supports **iPhone and iPad** and requires **Superset Pro** and **iOS 26 or iPadOS 26 or later**. Use cloud workspaces without keeping your own computer connected. To reach workspaces on your own computer, enable **Remote Access** and keep that host awake and online.
 
-[Remote access](https://docs.superset.sh/remote-access) · [Automations](https://docs.superset.sh/automations) · [iPhone](https://superset.sh/mobile) · [CLI](https://docs.superset.sh/cli/getting-started)
+[Remote access](https://docs.superset.sh/remote-access) · [Automations](https://docs.superset.sh/automations) · [iPhone and iPad](https://superset.sh/mobile) · [CLI](https://docs.superset.sh/cli/getting-started)
 
 <details>
 <summary>See mobile, automations, remote access, and the CLI</summary>
 
-### Superset for iPhone
+### Superset for iPhone and iPad
 
-Remotely control Claude Code, Codex, and other terminal agents running on your connected computer. Pick up the same workspaces and terminal sessions, send follow-up prompts, review diffs, and merge PRs from your iPhone.
+Control Claude Code, Codex, and other terminal agents in cloud workspaces or on your connected computer. Pick up the same workspaces and terminal sessions, send follow-up prompts, review diffs, and merge PRs from your iPhone or iPad.
 
 [**Download on the App Store**](https://apps.apple.com/us/app/id6788926383) &nbsp;&bull;&nbsp; [Learn more →](https://superset.sh/mobile)
 

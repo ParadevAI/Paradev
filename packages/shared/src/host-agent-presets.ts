@@ -1,5 +1,6 @@
 import type { PromptTransport } from "./agent-prompt-launch";
 import { BUILTIN_TERMINAL_AGENTS } from "./builtin-terminal-agents";
+import { FEATURE_FLAGS } from "./constants";
 
 export interface HostAgentPreset {
 	presetId: string;
@@ -74,8 +75,26 @@ function clonePreset(preset: HostAgentPreset): HostAgentPreset {
 	};
 }
 
+/**
+ * Presets shown only to users with the flag on. Hosts cannot read flags, so
+ * these are never seeded, and clients hide their rows while the flag is off.
+ */
+export const AGENT_PRESET_FEATURE_FLAGS: ReadonlyMap<string, string> = new Map([
+	["pdev", FEATURE_FLAGS.PDEV_AGENT],
+]);
+
+export function isAgentPresetEnabled(
+	presetId: string,
+	activeFeatureFlags: readonly string[],
+): boolean {
+	const flag = AGENT_PRESET_FEATURE_FLAGS.get(presetId);
+	return flag === undefined || activeFeatureFlags.includes(flag);
+}
+
 export function getDefaultSeedPresets(): HostAgentPreset[] {
-	return HOST_AGENT_PRESETS.map(clonePreset);
+	return HOST_AGENT_PRESETS.filter(
+		(preset) => !AGENT_PRESET_FEATURE_FLAGS.has(preset.presetId),
+	).map(clonePreset);
 }
 
 export function getPresetById(presetId: string): HostAgentPreset | undefined {

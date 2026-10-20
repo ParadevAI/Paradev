@@ -7,6 +7,7 @@ import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { PlainTextPlugin } from "@lexical/react/LexicalPlainTextPlugin";
 import { LexicalTypeaheadMenuPlugin } from "@lexical/react/LexicalTypeaheadMenuPlugin";
 import { Trans, useLingui } from "@lingui/react/macro";
+import { appendPastedText, parsePastedText } from "@superset/chat/core";
 import { getClipboardFiles } from "@superset/ui/lib/clipboard-files";
 import { cn } from "@superset/ui/utils";
 import {
@@ -54,6 +55,7 @@ import {
 	type MentionSection,
 	useMentionSources,
 } from "../../hooks/useMentionSources";
+import { usePastedTexts } from "../../hooks/usePastedTexts";
 import { MentionChipNode } from "../../nodes/mentionChipNode";
 import type {
 	ComposerActionContext,
@@ -65,6 +67,7 @@ import type {
 } from "../../types";
 import { registerDraftEdit } from "../../utils/draftEdit";
 import { registerHistoryNavigation } from "../../utils/historyNavigation";
+import { $insertTranscript } from "../../utils/insertTranscript";
 import { matchToken } from "../../utils/matchToken";
 import { rankCommands } from "../../utils/rankCommands";
 import { $restoreChips } from "../../utils/restoreChips";
@@ -121,6 +124,7 @@ export type ComposerBodyProps = Required<
 		| "defaultValue"
 		| "findChips"
 		| "onChange"
+		| "collapseLargePastes"
 		| "onSubmit"
 		| "onStop"
 		| "onMentionHighlight"
@@ -178,6 +182,7 @@ export function ComposerBody({
 	defaultValue,
 	findChips,
 	onChange,
+	collapseLargePastes,
 	onSubmit,
 	onStop,
 	onMentionHighlight,
@@ -194,6 +199,32 @@ export function ComposerBody({
 }: ComposerBodyProps) {
 	const { t } = useLingui();
 	const [editor] = useLexicalComposerContext();
+	const onChangeRef = useRef(onChange);
+	onChangeRef.current = onChange;
+	const pasted = usePastedTexts(editor, {
+		enabled: Boolean(collapseLargePastes),
+		onCardsChange: (cards, editorText) =>
+			onChangeRef.current?.(
+				appendPastedText(
+					editorText,
+					cards.map((card) => card.text),
+				),
+			),
+	});
+	const { cardsRef } = pasted;
+	const draftText = useCallback(
+		(editorText: string) =>
+			appendPastedText(
+				editorText,
+				cardsRef.current.map((card) => card.text),
+			),
+		[cardsRef],
+	);
+	const splitPastes = useCallback(
+		(text: string) =>
+			collapseLargePastes ? parsePastedText(text) : { text, pastes: [] },
+		[collapseLargePastes],
+	);
 	const focusAtEnd = useCallback(() => {
 		editor.update(() => $getRoot().selectEnd());
 		editor.focus();
@@ -201,7 +232,18 @@ export function ComposerBody({
 	useImperativeHandle(
 		ref,
 		() => ({
-			appendText(text: string) {
+			appendText(message: string) {
+				const { text, pastes } = splitPastes(message);
+				pasted.restore(pastes);
+				if (!text) {
+					onChangeRef.current?.(
+						draftText(
+							editor.getEditorState().read(() => $getRoot().getTextContent()),
+						),
+					);
+					editor.focus();
+					return;
+				}
 				editor.update(() => {
 					const root = $getRoot();
 					const separator = root.getTextContent().trim() === "" ? "" : "\n";
@@ -220,7 +262,7 @@ export function ComposerBody({
 				focusAtEnd();
 			},
 		}),
-		[editor, focusAtEnd],
+		[draftText, editor, focusAtEnd, pasted.restore, splitPastes],
 	);
 	const [attachments, setAttachments] = useState<PromptInputAttachment[]>([]);
 	const [isEmpty, setIsEmpty] = useState(true);
@@ -265,16 +307,18 @@ export function ComposerBody({
 	const seededValue = useRef<string | null>(null);
 	useEffect(() => {
 		if (seededValue.current !== null) return;
-		seededValue.current = defaultValue ?? "";
-		if (!defaultValue) return;
+		const { text, pastes } = splitPastes(defaultValue ?? "");
+		seededValue.current = text;
+		pasted.restore(pastes);
+		if (!text) return;
 		editor.update(() => {
 			const root = $getRoot();
 			if (root.getTextContent() !== "") return;
 			root.selectEnd();
 			const selection = $getSelection();
-			if ($isRangeSelection(selection)) selection.insertText(defaultValue);
+			if ($isRangeSelection(selection)) selection.insertText(text);
 		});
-	}, [defaultValue, editor]);
+	}, [defaultValue, editor, pasted.restore, splitPastes]);
 
 	// Chips come back once the finder can name them, which may be after the
 	// draft was read (a catalog still loading). Only the untouched draft is
@@ -296,15 +340,13 @@ export function ComposerBody({
 		});
 	}, [editor, findChips]);
 
-	const onChangeRef = useRef(onChange);
-	onChangeRef.current = onChange;
 	useEffect(
 		() =>
 			editor.registerUpdateListener(({ editorState }) => {
 				const text = editorState.read(() => $getRoot().getTextContent());
-				onChangeRef.current?.(text);
+				onChangeRef.current?.(draftText(text));
 			}),
-		[editor],
+		[draftText, editor],
 	);
 
 	const addFiles = (files: FileList | File[]) => {
@@ -448,13 +490,28 @@ export function ComposerBody({
 		const files = stateRef.current.attachments.map(
 			(attachment) => attachment.file,
 		);
-		if (!text && files.length === 0 && !stateRef.current.allowEmptySubmit) {
+		const pastedTexts = cardsRef.current.map((card) => card.text);
+		if (
+			!text &&
+			files.length === 0 &&
+			pastedTexts.length === 0 &&
+			!stateRef.current.allowEmptySubmit
+		) {
 			return;
 		}
-		if (stateRef.current.onSubmit?.({ text, files, mentions, steer }) === false)
+		if (
+			stateRef.current.onSubmit?.({
+				text,
+				files,
+				mentions,
+				pastedTexts,
+				steer,
+			}) === false
+		)
 			return;
 		historyNavigationRef.current?.reset();
 		if (!stateRef.current.clearOnSubmit) return;
+		pasted.clear();
 		editor.update(() => $getRoot().clear());
 		setAttachments((previous) => {
 			for (const attachment of previous) releaseAttachment(attachment);
@@ -465,22 +522,23 @@ export function ComposerBody({
 	const submitRef = useRef(submit);
 	submitRef.current = submit;
 
+	const isFocusUnclaimed = () => {
+		const active = document.activeElement;
+		return (
+			active == null ||
+			active === document.body ||
+			Boolean(rootRef.current?.contains(active))
+		);
+	};
+
 	const dictationSession = useDictation({
-		transcribe: (audio) => dictation?.transcribe(audio) ?? "",
+		transcribe: (audio, options) => dictation?.transcribe(audio, options) ?? "",
 		onError: (dictationError) => dictation?.onError?.(dictationError),
+		maxSeconds: dictation?.maxSeconds,
+		audioBitsPerSecond: dictation?.audioBitsPerSecond,
 		onTranscript: (text) => {
-			editor.update(() => {
-				$getRoot().selectEnd();
-				const selection = $getSelection();
-				if (!$isRangeSelection(selection)) return;
-				const anchorNode = selection.anchor.getNode();
-				const offset = selection.anchor.offset;
-				const previousChar = $isTextNode(anchorNode)
-					? anchorNode.getTextContent()[offset - 1]
-					: undefined;
-				const needsSpace = previousChar != null && !/\s/.test(previousChar);
-				selection.insertText(needsSpace ? ` ${text}` : text);
-			});
+			editor.update(() => $insertTranscript(text));
+			if (isFocusUnclaimed()) editor.focus();
 		},
 	});
 
@@ -634,19 +692,25 @@ export function ComposerBody({
 		void entry.select(actionContextRef.current);
 	};
 
-	// Escape aborts dictation without transcribing; it outranks every other
-	// Escape behavior while a recording or failed transcription is active.
+	// While dictating, Escape cancels and Enter stops or retries, never sends;
+	// both win over the composer's own Escape/Enter (stopping the agent, send).
 	useEffect(() => {
-		if (
-			dictationSession.status !== "recording" &&
-			dictationSession.status !== "error"
-		)
-			return;
+		if (dictationSession.status === "idle") return;
 		const onKeyDown = (event: KeyboardEvent) => {
-			if (event.key !== "Escape") return;
+			if (event.isComposing || !isFocusUnclaimed()) return;
+			if (event.key === "Escape") {
+				event.preventDefault();
+				event.stopPropagation();
+				dictationSession.cancel();
+				return;
+			}
+			if (event.key !== "Enter" || event.shiftKey) return;
 			event.preventDefault();
 			event.stopPropagation();
-			dictationSession.cancel();
+			if (dictationSession.status === "recording")
+				void dictationSession.finish();
+			else if (dictationSession.status === "error")
+				void dictationSession.retry();
 		};
 		window.addEventListener("keydown", onKeyDown, { capture: true });
 		return () =>
@@ -704,7 +768,11 @@ export function ComposerBody({
 		return () => document.removeEventListener("pointerdown", onPointerDown);
 	}, []);
 
-	const canSend = allowEmptySubmit || !isEmpty || attachments.length > 0;
+	const canSend =
+		allowEmptySubmit ||
+		!isEmpty ||
+		attachments.length > 0 ||
+		pasted.cards.length > 0;
 
 	useEffect(() => {
 		if (autoFocus) focusAtEnd();
@@ -786,6 +854,9 @@ export function ComposerBody({
 			{header}
 			<AttachmentPills
 				attachments={attachments}
+				pastedTexts={pasted.cards}
+				onShowPastedText={pasted.showInTextField}
+				onRemovePastedText={pasted.remove}
 				onAttachmentClick={onAttachmentClick}
 				onPreviewError={(id) =>
 					setAttachments((previous) =>
@@ -892,7 +963,10 @@ export function ComposerBody({
 					}
 				/>
 			</div>
-			<div className="flex min-h-12 items-center gap-2 px-3 pb-2.5">
+			<div
+				className="flex min-h-12 items-center gap-2 px-3 pb-2.5"
+				data-composer-footer
+			>
 				<ContextButton
 					onClick={toggleBrowseMenu}
 					disabled={dictationSession.status !== "idle"}
@@ -948,6 +1022,11 @@ export function ComposerBody({
 						<DictationBar
 							canvasRef={dictationSession.canvasRef}
 							seconds={dictationSession.seconds}
+							status={
+								dictationSession.status === "transcribing"
+									? "transcribing"
+									: "recording"
+							}
 						/>
 						<button
 							type="button"
@@ -979,15 +1058,16 @@ export function ComposerBody({
 						{toolbar}
 						<div className="flex-1" />
 						{toolbarEnd}
-						{dictation && status !== "streaming" && (
+						{dictation && (
 							<button
 								type="button"
 								aria-label={t({
 									message: "Dictate",
 								})}
-								onClick={() => {
+								onClick={async () => {
 									setBrowseOpen(false);
-									void dictationSession.start();
+									await dictationSession.start();
+									editor.focus();
 								}}
 								className={GHOST_FOOTER_BUTTON_CLASS}
 							>

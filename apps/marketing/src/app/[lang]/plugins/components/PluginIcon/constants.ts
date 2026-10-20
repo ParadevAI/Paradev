@@ -8,10 +8,12 @@ import {
 	SiSentry,
 	SiVercel,
 } from "react-icons/si";
+import { AutumnIcon } from "./components/AutumnIcon";
 import { SuperhumanIcon } from "./components/SuperhumanIcon";
 
 export const IMAGE_ICONS: Record<string, string> = {
 	circleback: "/plugins/circleback-icon.png",
+	exa: "/plugins/exa-icon.svg",
 	gmail: "/plugins/gmail-icon.svg",
 	granola: "/plugins/granola-icon.svg",
 	neon: "/plugins/neon-icon.png",
@@ -21,6 +23,7 @@ export const IMAGE_ICONS: Record<string, string> = {
 };
 
 export const GLYPH_ICONS: Record<string, { icon: IconType; color?: string }> = {
+	autumn: { icon: AutumnIcon },
 	github: { icon: FaGithub },
 	linear: { icon: SiLinear },
 	notion: { icon: SiNotion },

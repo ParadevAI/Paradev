@@ -85,18 +85,6 @@ export const STATUS_DESCRIPTIONS: Record<RoadmapStatus, MessageDescriptor> = {
 export const ROADMAP_ITEMS: RoadmapItem[] = [
 	// ── Now ──────────────────────────────────────────
 	{
-		id: "in-app-pr-merge",
-		title: msg({
-			message: "In-app PR merge",
-		}),
-		description: msg({
-			message:
-				"Merge pull requests without leaving Superset, plus a round of chat fixes and polish.",
-		}),
-		category: "Desktop",
-		status: "now",
-	},
-	{
 		id: "mcp-manager",
 		title: msg({
 			message: "MCP manager",
@@ -109,77 +97,39 @@ export const ROADMAP_ITEMS: RoadmapItem[] = [
 		status: "now",
 	},
 	{
-		id: "embedded-browser",
+		id: "agent-memory",
 		title: msg({
-			message: "Embedded browser improvements",
+			message: "Per-repo agent memory",
 		}),
 		description: msg({
 			message:
-				"A better in-app browser: preview your changes and click any element to send it to the agent as context.",
-		}),
-		category: "Desktop",
-		status: "now",
-	},
-	{
-		id: "onboarding",
-		title: msg({
-			message: "Smoother onboarding",
-		}),
-		description: msg({
-			message:
-				"A faster path from install to your first agent run, with a guided first workspace.",
-		}),
-		category: "Desktop",
-		status: "now",
-	},
-
-	// ── Next ─────────────────────────────────────────
-	{
-		id: "chat-v3",
-		title: msg({
-			message: "Next-generation chat",
-		}),
-		description: msg({
-			message:
-				"A rebuilt chat surface for driving agents: richer tool output, smoother steering, faster everything.",
+				"Agents remember what they learn about your codebase, so every new session starts warm.",
 		}),
 		category: "Agents",
 		status: "next",
 	},
 	{
-		id: "native-pr-reviews",
+		id: "superset-teams",
 		title: msg({
-			message: "Native PR reviews",
+			message: "Superset Teams",
 		}),
 		description: msg({
 			message:
-				"Review pull requests inside Superset: diff pane, agent-assisted review, act on comments directly.",
+				"Shared settings and simpler membership for teams that work in Superset together.",
 		}),
-		category: "Desktop",
+		category: "Platform",
 		status: "next",
 	},
 	{
-		id: "improved-diff-viewer",
+		id: "team-activity-feed",
 		title: msg({
-			message: "Improved diff viewer",
+			message: "Team activity feed",
 		}),
 		description: msg({
 			message:
-				"A faster, clearer diff experience for reviewing what your agents changed.",
+				"See what your teammates' agents are working on, shipping, and blocked on.",
 		}),
-		category: "Desktop",
-		status: "next",
-	},
-	{
-		id: "chat-background-processes",
-		title: msg({
-			message: "Background processes in chat",
-		}),
-		description: msg({
-			message:
-				"Agents can watch CI checks, tail dev servers, and keep long-running processes alive while they work.",
-		}),
-		category: "Agents",
+		category: "Platform",
 		status: "next",
 	},
 	{
@@ -194,7 +144,59 @@ export const ROADMAP_ITEMS: RoadmapItem[] = [
 		category: "Integrations",
 		status: "next",
 	},
+	{
+		id: "chat-v3",
+		title: msg({
+			message: "Next-generation chat",
+		}),
+		description: msg({
+			message:
+				"A rebuilt chat surface for driving agents: richer tool output, smoother steering, faster everything.",
+		}),
+		category: "Agents",
+		status: "now",
+	},
+	{
+		id: "cloud-sandboxes",
+		title: msg({
+			message: "Cloud sandboxes",
+		}),
+		description: msg({
+			message:
+				"Machine-unbound cloud workspaces that spin up in seconds and can be shared with teammates.",
+		}),
+		category: "Platform",
+		status: "now",
+	},
+	{
+		id: "ios-simulator-pane",
+		title: msg({
+			message: "iOS simulator pane",
+		}),
+		description: msg({
+			message:
+				"Run an iOS simulator in a workspace pane so you and your agents can test mobile apps.",
+		}),
+		category: "Desktop",
+		status: "now",
+	},
+
 	// ── Later ────────────────────────────────────────
+	{
+		id: "improved-diff-viewer",
+		title: msg({
+			message: "Improved diff viewer",
+		}),
+		description: msg({
+			message:
+				"A faster, clearer diff experience for reviewing what your agents changed.",
+		}),
+		category: "Desktop",
+		status: "shipped",
+		shippedDate: "Sep 2026",
+		href: "/changelog/2026-09-06-changes-pane-ship-flow-image-diffs",
+		image: "/changelog/2026-09-06-media-diff.png",
+	},
 	{
 		id: "project-wide-search",
 		title: msg({
@@ -208,18 +210,6 @@ export const ROADMAP_ITEMS: RoadmapItem[] = [
 		status: "later",
 	},
 	{
-		id: "work-from-tickets",
-		title: msg({
-			message: "Work from tickets",
-		}),
-		description: msg({
-			message:
-				"Start a workspace straight from a Linear ticket. The agent picks it up and reports back with a PR.",
-		}),
-		category: "Integrations",
-		status: "later",
-	},
-	{
 		id: "autonomous-ticket-to-pr",
 		title: msg({
 			message: "Autonomous ticket-to-PR pipeline",
@@ -227,18 +217,6 @@ export const ROADMAP_ITEMS: RoadmapItem[] = [
 		description: msg({
 			message:
 				"File a ticket, get back a verified, merge-ready PR, with screenshots or a screencast as proof the change works.",
-		}),
-		category: "Agents",
-		status: "later",
-	},
-	{
-		id: "automations",
-		title: msg({
-			message: "Automations & event triggers",
-		}),
-		description: msg({
-			message:
-				"Scheduled and event-triggered agents (cron, GitHub events, webhooks) with ready-made templates.",
 		}),
 		category: "Agents",
 		status: "later",
@@ -289,19 +267,10 @@ export const ROADMAP_ITEMS: RoadmapItem[] = [
 				"Always know which agent needs you, with notifications that deep-link straight to the blocked agent.",
 		}),
 		category: "Desktop",
-		status: "later",
-	},
-	{
-		id: "cloud-sandboxes",
-		title: msg({
-			message: "Cloud sandboxes",
-		}),
-		description: msg({
-			message:
-				"Machine-unbound cloud workspaces that spin up in seconds and can be shared with teammates.",
-		}),
-		category: "Platform",
-		status: "later",
+		status: "shipped",
+		shippedDate: "Aug 2026",
+		href: "/changelog/2026-08-16-workspaces-triage-editable-markdown",
+		image: "/changelog/2026-08-16-workspaces-triage.png",
 	},
 	{
 		id: "sdk-api",
@@ -316,18 +285,120 @@ export const ROADMAP_ITEMS: RoadmapItem[] = [
 		status: "later",
 	},
 	{
+		id: "sso",
+		title: msg({
+			message: "SSO (SAML / OIDC)",
+		}),
+		description: msg({
+			message: "Single sign-on for organizations, self-serve configurable.",
+		}),
+		category: "Platform",
+		status: "later",
+	},
+
+	// ── Shipped ──────────────────────────────────────
+	{
+		id: "automations",
+		title: msg({
+			message: "Automations & event triggers",
+		}),
+		description: msg({
+			message:
+				"Scheduled and event-triggered agents (cron, GitHub events, webhooks) with ready-made templates.",
+		}),
+		category: "Agents",
+		status: "shipped",
+		shippedDate: "Oct 2026",
+		image: "/changelog/2026-10-04-automation-history.png",
+		href: "/changelog/2026-10-04-automation-history-linear-tasks",
+	},
+	{
+		id: "work-from-tickets",
+		title: msg({
+			message: "Work from tickets",
+		}),
+		description: msg({
+			message:
+				"Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one.",
+		}),
+		category: "Integrations",
+		status: "shipped",
+		shippedDate: "Oct 2026",
+		image: "/changelog/2026-10-04-linear-board.png",
+		href: "/changelog/2026-10-04-automation-history-linear-tasks",
+	},
+	{
 		id: "ios-app",
 		title: msg({
 			message: "iOS app",
 		}),
 		description: msg({
-			message: "Monitor, steer, and unblock your agents from your phone.",
+			message:
+				"Monitor, steer, and unblock your agents from your iPhone or iPad.",
 		}),
 		category: "Mobile",
-		status: "later",
+		status: "shipped",
+		shippedDate: "Oct 2026",
+		image: "/images/blog/superset-mobile/hero.png",
+		href: "/changelog/2026-09-28-file-editing-instant-workspaces",
 	},
-
-	// ── Shipped ──────────────────────────────────────
+	{
+		id: "in-app-pr-merge",
+		title: msg({
+			message: "In-app PR merge",
+		}),
+		description: msg({
+			message:
+				"Merge pull requests without leaving Superset, plus a round of chat fixes and polish.",
+		}),
+		category: "Desktop",
+		status: "shipped",
+		shippedDate: "Aug 2026",
+		image: "/changelog/2026-08-23-pull-requests-split.png",
+		href: "/changelog/2026-08-23-pull-requests-multi-window-design-mode",
+	},
+	{
+		id: "native-pr-reviews",
+		title: msg({
+			message: "Native PR reviews",
+		}),
+		description: msg({
+			message:
+				"Review pull requests inside Superset: diff pane, agent-assisted review, act on comments directly.",
+		}),
+		category: "Desktop",
+		status: "shipped",
+		shippedDate: "Aug 2026",
+		image: "/changelog/2026-09-13-pr-comments.png",
+		href: "/changelog/2026-09-13-pull-request-pane-subagents-new-agents",
+	},
+	{
+		id: "embedded-browser",
+		title: msg({
+			message: "Embedded browser improvements",
+		}),
+		description: msg({
+			message:
+				"A better in-app browser: preview your changes and click any element to send it to the agent as context.",
+		}),
+		category: "Desktop",
+		status: "shipped",
+		shippedDate: "Aug 2026",
+		href: "/changelog/2026-08-23-pull-requests-multi-window-design-mode",
+	},
+	{
+		id: "onboarding",
+		title: msg({
+			message: "Smoother onboarding",
+		}),
+		description: msg({
+			message:
+				"A faster path from install to your first agent run, with a guided first workspace.",
+		}),
+		category: "Desktop",
+		status: "shipped",
+		shippedDate: "Aug 2026",
+	},
 	{
 		id: "offline-local-first",
 		title: msg({
@@ -343,51 +414,6 @@ export const ROADMAP_ITEMS: RoadmapItem[] = [
 		pr: "https://github.com/superset-sh/superset/pull/5731",
 	},
 	{
-		id: "workspace-pinning-bulk-actions",
-		title: msg({
-			message: "Workspace pinning & bulk actions",
-		}),
-		description: msg({
-			message:
-				"Pin workspaces above your projects, then ⌘-click a batch to move, group, or delete them all at once.",
-		}),
-		category: "Desktop",
-		status: "shipped",
-		shippedDate: "Aug 2026",
-		image: "/changelog/2026-08-02-workspace-bulk-select.png",
-		href: "/changelog/2026-08-02-workspace-pinning-bulk-actions",
-	},
-	{
-		id: "sidebar-redesign",
-		title: msg({
-			message: "Cleaner, denser sidebar",
-		}),
-		description: msg({
-			message:
-				"A full restyle: denser rows, port and agent chips under each workspace, one-click stop for everything.",
-		}),
-		category: "Desktop",
-		status: "shipped",
-		shippedDate: "Aug 2026",
-		image: "/changelog/2026-08-02-sidebar-redesign.png",
-		href: "/changelog/2026-08-02-workspace-pinning-bulk-actions",
-	},
-	{
-		id: "grok-kimi-agents",
-		title: msg({
-			message: "Grok & Kimi Code agents",
-		}),
-		description: msg({
-			message:
-				"Grok and Kimi Code join the lineup alongside Claude Code, Codex, and friends.",
-		}),
-		category: "Agents",
-		status: "shipped",
-		shippedDate: "Aug 2026",
-		image: "/changelog/2026-08-02-add-agent-picker.png",
-		href: "/changelog/2026-08-02-workspace-pinning-bulk-actions",
-	},
-	{
 		id: "stability-pass",
 		title: msg({
 			message: "Stability improvements",
@@ -399,49 +425,5 @@ export const ROADMAP_ITEMS: RoadmapItem[] = [
 		category: "Desktop",
 		status: "shipped",
 		shippedDate: "Aug 2026",
-	},
-	{
-		id: "performance-pass",
-		title: msg({
-			message: "Lighter memory, smoother under load",
-		}),
-		description: msg({
-			message:
-				"Lower memory with many terminals open, smoother git in big repos, and less background CPU.",
-		}),
-		category: "Desktop",
-		status: "shipped",
-		shippedDate: "Jul 2026",
-		image: "/changelog/2026-07-19-performance-summary.png",
-		href: "/changelog/2026-07-19-performance-memory-and-load",
-	},
-	{
-		id: "terminal-rich-input",
-		title: msg({
-			message: "Rich input for the terminal",
-		}),
-		description: msg({
-			message:
-				"Press ⌘I over any terminal and compose in a real editor, with multiline prompts and @file mentions.",
-		}),
-		category: "Desktop",
-		status: "shipped",
-		shippedDate: "Jul 2026",
-		image: "/changelog/2026-07-12-rich-input-hero.png",
-		href: "/changelog/2026-07-12-terminal-rich-input-mistral-vibe",
-	},
-	{
-		id: "custom-terminal-agents",
-		title: msg({
-			message: "Custom terminal agents",
-		}),
-		description: msg({
-			message:
-				"Register any CLI agent alongside the built-ins, each with its own name, icon, and launch command.",
-		}),
-		category: "Agents",
-		status: "shipped",
-		shippedDate: "Jul 2026",
-		href: "/changelog/2026-07-06-custom-agents-workspace-activity-fable",
 	},
 ];

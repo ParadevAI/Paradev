@@ -5,6 +5,7 @@ import type {
 } from "@superset/chat-ui/PromptInput";
 import { PromptInput } from "@superset/chat-ui/PromptInput";
 import { useMemo } from "react";
+import { useComposerDictation } from "./hooks/useComposerDictation";
 import { usePluginMentionProvider } from "./hooks/usePluginMentionProvider";
 
 const NO_COMMANDS: PromptInputCommand[] = [];
@@ -21,9 +22,11 @@ export type AgentComposerProps = Omit<
 export function AgentComposer({
 	commands = NO_COMMANDS,
 	mentionProviders = NO_PROVIDERS,
+	dictation,
 	...props
 }: AgentComposerProps) {
 	const { provider: pluginProvider, findChips } = usePluginMentionProvider();
+	const composerDictation = useComposerDictation();
 	const providers = useMemo(
 		() => [pluginProvider, ...mentionProviders],
 		[pluginProvider, mentionProviders],
@@ -32,6 +35,7 @@ export function AgentComposer({
 		<PromptInput
 			{...props}
 			commands={commands}
+			dictation={dictation ?? composerDictation}
 			findChips={findChips}
 			mentionProviders={providers}
 		/>

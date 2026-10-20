@@ -37,7 +37,8 @@ const SESSION_TIMEOUT_MS = 4 * 60 * 60 * 1000;
 const EXTEND_BELOW_MS = 60 * 60 * 1000;
 const WORKSPACE_SNAPSHOT_EXPIRATION_MS = 30 * 24 * 60 * 60 * 1000;
 /** 2 GB of memory per vCPU; disk is 64 GB regardless. */
-const IMAGE_SANDBOX_VCPUS = 8;
+export const IMAGE_SANDBOX_VCPUS = 8;
+export const MEMORY_MB_PER_VCPU = 2048;
 const GOLDEN_SESSION_TIMEOUT_MS = 30 * 60 * 1000;
 const BOOT_COMMAND = "/usr/local/bin/superset-boot";
 const HOST_PROBE_TIMEOUT_MS = 1_500;
@@ -353,6 +354,8 @@ async function hostServiceAnswers(hostTarget: string): Promise<boolean> {
 export async function wakeSandbox(args: {
 	providerSandboxId: string;
 	claim: SandboxClaim;
+	/** Runs once the box is known to be stopped, before anything resumes it. */
+	beforeResume?: (box: { memoryMb: number; vcpus: number }) => Promise<void>;
 }): Promise<{
 	hostTarget: string;
 	/** The session was stopped, so every process on the box started from this claim. */
@@ -366,6 +369,12 @@ export async function wakeSandbox(args: {
 		});
 		const hostTarget = sandbox.domain(HOST_SERVICE_PORT);
 		const wasRunning = sandbox.status === "running";
+		if (!wasRunning && args.beforeResume) {
+			await args.beforeResume({
+				memoryMb: sandbox.memory ?? IMAGE_SANDBOX_VCPUS * MEMORY_MB_PER_VCPU,
+				vcpus: sandbox.vcpus ?? IMAGE_SANDBOX_VCPUS,
+			});
+		}
 		if (wasRunning) {
 			const remaining = (sandbox.expiresAt?.getTime() ?? 0) - Date.now();
 			if (remaining < EXTEND_BELOW_MS) {
@@ -523,6 +532,109 @@ export async function stopSandbox(providerSandboxId: string): Promise<void> {
 	const sandbox = await getSandbox(providerSandboxId);
 	if (!sandbox || sandbox.status !== "running") return;
 	await sandbox.stop();
+}
+
+export interface BoxSession {
+	id: string;
+	memoryMb: number;
+	vcpus: number;
+	startedAt: number;
+	endedAt: number | null;
+	activeCpuMs: number | null;
+}
+
+const LIVE_STATUSES = new Set(["pending", "running"]);
+const SESSION_SEARCH_LIMIT = 20;
+
+export function sessionEndedAt(session: {
+	status: string;
+	stoppedAt?: number;
+	abortedAt?: number;
+	requestedStopAt?: number;
+	updatedAt: number;
+}): number | null {
+	if (LIVE_STATUSES.has(session.status)) return null;
+	return (
+		session.stoppedAt ??
+		session.abortedAt ??
+		session.requestedStopAt ??
+		session.updatedAt
+	);
+}
+
+interface RawSession {
+	id: string;
+	memory: number;
+	vcpus: number;
+	status: string;
+	startedAt?: number;
+	stoppedAt?: number;
+	abortedAt?: number;
+	requestedStopAt?: number;
+	updatedAt: number;
+	activeCpuDurationMs?: number;
+}
+
+function toBoxSession(session: RawSession): BoxSession | null {
+	if (session.startedAt === undefined) return null;
+	return {
+		id: session.id,
+		memoryMb: session.memory,
+		vcpus: session.vcpus,
+		startedAt: session.startedAt,
+		endedAt: sessionEndedAt(session),
+		activeCpuMs: session.activeCpuDurationMs ?? null,
+	};
+}
+
+/** Null when the sandbox no longer exists. */
+export async function findSandboxSession(
+	providerSandboxId: string,
+	sessionId: string | null,
+): Promise<{ session: BoxSession | null } | null> {
+	const sandbox = await getSandbox(providerSandboxId);
+	if (!sandbox) return null;
+	let seen = 0;
+	for await (const raw of await sandbox.listSessions({
+		sortOrder: "desc",
+		limit: SESSION_SEARCH_LIMIT,
+	})) {
+		const session = toBoxSession(raw);
+		if (session && (sessionId === null || session.id === sessionId)) {
+			return { session };
+		}
+		seen += 1;
+		if (seen >= SESSION_SEARCH_LIMIT) break;
+	}
+	return { session: null };
+}
+
+const SESSION_MAX_MS = 24 * 60 * 60 * 1000;
+const UNSETTLED_SANDBOX_STATUSES = new Set([
+	"pending",
+	"running",
+	"stopping",
+	"snapshotting",
+]);
+
+export async function listActiveWorkspaceSandboxes(
+	since: number,
+): Promise<string[]> {
+	const names: string[] = [];
+	const oldestRunning = Date.now() - SESSION_MAX_MS;
+	for await (const sandbox of await Sandbox.list({
+		...credentials(),
+		tags: { kind: "workspace" },
+		sortBy: "statusUpdatedAt",
+		sortOrder: "desc",
+	})) {
+		const updatedAt = sandbox.statusUpdatedAt ?? sandbox.updatedAt;
+		if (updatedAt < oldestRunning) break;
+		if (UNSETTLED_SANDBOX_STATUSES.has(sandbox.status) || updatedAt >= since) {
+			names.push(sandbox.name);
+		}
+	}
+	return names;
 }
 
 /** Best-effort: a sandbox already gone is the state we wanted. */

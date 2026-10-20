@@ -1,9 +1,14 @@
-import { Trans } from "@lingui/react/macro";
-import { readBookkeeping, userMessageText } from "@superset/chat/core";
+import { Trans, useLingui } from "@lingui/react/macro";
+import {
+	readBookkeeping,
+	transcriptItemKey,
+	userMessageText,
+} from "@superset/chat/core";
 import type { AvailableCommand, UserMessage } from "@superset/chat/protocol";
 import { Message, MessageContent } from "@superset/ui/ai-elements/message";
 import { Badge } from "@superset/ui/badge";
 import { Button } from "@superset/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { useRef } from "react";
 import { parseAttachmentTags } from "../../../../utils/attachmentTags";
@@ -12,7 +17,10 @@ import {
 	type MessageSegment,
 	splitByElements,
 } from "../../../../utils/messageElements";
+import { CopyButton } from "../../../CopyButton";
 import { AttachmentImage } from "../AttachmentImage";
+import { MessageTime } from "../MessageTime";
+import { PastedTextBlock } from "./components/PastedTextBlock";
 import { UserMessageText } from "./components/UserMessageText";
 import { useFitsOneLine } from "./hooks/useFitsOneLine";
 
@@ -42,9 +50,10 @@ export function UserMessageRow({
 	harness: string | undefined;
 	pending?: PendingPrompt | undefined;
 }) {
+	const { t } = useLingui();
 	const raw = userMessageText(item);
 	const note = readBookkeeping(harness, raw);
-	const { text, attachments } = parseAttachmentTags(raw);
+	const { text, attachments, pastedTexts } = parseAttachmentTags(raw);
 	const elements = item.content.find((part) => part.type === "text")?.elements;
 	const leading = LEADING_COMMAND.exec(text)?.[1];
 	const segments: MessageSegment[] = elements?.length
@@ -77,8 +86,13 @@ export function UserMessageRow({
 				: [],
 		),
 	];
+	const copyable = (text.length > 0 || pastedTexts.length > 0) && !pending;
+	const copyText = [text, ...pastedTexts].filter(Boolean).join("\n\n");
 	return (
-		<Message className="pt-1.5 pb-5 pl-10" from="user">
+		<Message
+			className={cn("group/message pt-1.5 pl-10", copyable ? "pb-0" : "pb-5")}
+			from="user"
+		>
 			{images.length > 0 && (
 				<div
 					className={cn(
@@ -89,9 +103,23 @@ export function UserMessageRow({
 					{images.map((image) => (
 						<AttachmentImage
 							key={image.path}
+							owner={transcriptItemKey(item)}
 							path={image.path}
 							type={image.type}
 						/>
+					))}
+				</div>
+			)}
+			{pastedTexts.length > 0 && (
+				<div
+					className={cn(
+						"ml-auto flex w-full flex-col items-end gap-1.5 transition-opacity",
+						pending && !pending.failed && "opacity-60",
+					)}
+				>
+					{pastedTexts.map((pasted, index) => (
+						// biome-ignore lint/suspicious/noArrayIndexKey: pastes have no identity beyond their order
+						<PastedTextBlock key={index} text={pasted} />
 					))}
 				</div>
 			)}
@@ -122,6 +150,24 @@ export function UserMessageRow({
 						</div>
 					)}
 				</MessageContent>
+			)}
+			{copyable && (
+				<div className="-mt-1.5 flex items-center justify-end gap-2 text-muted-foreground/60 opacity-0 transition-opacity focus-within:opacity-100 group-hover/message:opacity-100">
+					<MessageTime atMs={item.startedAtMs} />
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<span>
+								<CopyButton
+									label={t({ message: "Copy message" })}
+									text={copyText}
+								/>
+							</span>
+						</TooltipTrigger>
+						<TooltipContent>
+							<Trans>Copy message</Trans>
+						</TooltipContent>
+					</Tooltip>
+				</div>
 			)}
 			{pending?.failed && (
 				<div className="flex items-center gap-2 self-end">

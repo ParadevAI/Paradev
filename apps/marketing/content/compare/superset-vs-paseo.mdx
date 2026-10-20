@@ -2,7 +2,7 @@
 title: "Superset vs Paseo (2026): Agent Workspace vs Self-Hosted Agent Control Plane"
 description: "Compare Superset and Paseo for running Claude Code, Codex, and other coding agents in parallel. Desktop-first workspace with Remote Access vs an Apache-2.0 daemon with native mobile clients."
 date: 2026-09-11
-lastUpdated: 2026-10-08
+lastUpdated: 2026-10-15
 type: "1v1"
 competitors:
   - paseo
@@ -28,10 +28,10 @@ Superset and Paseo both run many coding agents at once on hardware you own, each
 | **Category** | Local-first agent workspace with remote hosts | Self-hosted control plane: daemon plus native clients |
 | **Agent support** | Any CLI agent (Claude Code, Codex, Cursor Agent, OpenCode, Gemini CLI, Copilot, Grok, Kimi Code, Mistral Vibe, Amp, and more), plus built-in chat | Native harnesses for Claude Code, Codex, OpenCode, and Pi; 30+ more via the Agent Client Protocol; custom providers by config |
 | **Isolation** | Git worktrees for local branch-based workspaces | Worktree per workspace, with `paseo.json` setup, teardown, and per-worktree service URLs |
-| **Platforms** | macOS; experimental Linux AppImage; Windows unavailable; iPhone and iPad (iOS or iPadOS 26+, Pro, online host) | macOS, Windows, Linux desktop; iOS and Android apps; web app; Docker and Nix |
+| **Platforms** | macOS; experimental Linux AppImage; Windows unavailable; iPhone and iPad (iOS or iPadOS 26+, Pro) | macOS, Windows, Linux desktop; iOS and Android apps; web app; Docker and Nix |
 | **Mobile** | [iPhone and iPad app](https://apps.apple.com/app/id6788926383); Android [waitlist](/mobile#android) | Native iOS and Android apps with feature parity |
-| **Remote** | Remote Access: add any machine as a host through the Superset Relay (Pro) | SSH tunnel, opt-in end-to-end encrypted relay, or direct/Tailscale |
-| **Automation** | Automations on a cron-style schedule, CLI, TypeScript SDK, MCP server, Slack bot | Cron schedules and heartbeats, CLI, TypeScript client SDK, MCP server, Hub triggers from GitHub, Slack, and Discord |
+| **Remote** | Remote Access: add any machine as a host through the Superset Relay (Pro); cloud workspaces | SSH tunnel, opt-in end-to-end encrypted relay, or direct/Tailscale |
+| **Automation** | Automations on a cron-style schedule, event triggers (GitHub, Slack, Linear, more), CLI, TypeScript SDK, MCP server, Slack bot | Cron schedules and heartbeats, CLI, TypeScript client SDK, MCP server, Hub triggers from GitHub, Slack, and Discord |
 | **Team** | Pro: unlimited users, Linear and Slack integrations. Enterprise: SAML SSO, SCIM, audit logs, SOC 2 Type II | Hub (beta): self-hosted free, hosted at €15 per seat per month; team provisioning and shared settings not built yet |
 | **License / pricing** | Source-available (ELv2); free tier, Pro $20 per user per month | Open source (Apache-2.0); free, no account, no seat limits |
 
@@ -39,7 +39,7 @@ Superset and Paseo both run many coding agents at once on hardware you own, each
 
 ## What Is Superset?
 
-Superset is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, Cursor Agent, OpenCode, Gemini CLI, GitHub Copilot, Grok, Kimi Code, Mistral Vibe, Amp, and any other CLI agent inside isolated Git worktrees with persistent terminal sessions, and lets you continue a session with a different agent or fork it. Around that core it adds a diff/file editor that commits, pushes, and opens PRs from the Changes pane, a Pull Requests view with CI checks and line comments you can send to agents, a chat panel with a model picker, an in-app browser with port detection and Design Mode, and an MCP server so agents and tools can create workspaces and launch agents. Remote Access adds any machine as a host so workspaces keep running when your laptop sleeps. Scheduled automations, a CLI, a TypeScript SDK, and a Slack bot cover unattended work, and tasks sync with Linear and GitHub Issues. Source-available under Elastic License 2.0 (ELv2).
+Superset is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, Cursor Agent, OpenCode, Gemini CLI, GitHub Copilot, Grok, Kimi Code, Mistral Vibe, Amp, and any other CLI agent inside isolated Git worktrees with persistent terminal sessions, and lets you continue a session with a different agent or fork it. Around that core it adds a diff/file editor that commits, pushes, and opens PRs from the Changes pane, a Pull Requests view with CI checks and line comments you can send to agents, a chat panel with a model picker, an in-app browser with port detection and Design Mode, and an MCP server so agents and tools can create workspaces and launch agents. Remote Access adds any machine as a host so workspaces keep running when your laptop sleeps, and cloud workspaces run without your own computer connected. Automations on a schedule or event trigger, a CLI, a TypeScript SDK, and a Slack bot cover unattended work, and tasks sync with Linear and GitHub Issues. Source-available under Elastic License 2.0 (ELv2).
 
 ## What Is Paseo?
 
@@ -49,7 +49,7 @@ Paseo calls itself "the control plane for coding agents." It is a self-hostable 
 
 ### Workspace vs Control Plane
 
-Superset is the place you work: one desktop app where agents, diffs, PRs, browser, and chat live together, with your other machines reachable from it. Paseo inverts that: the daemon is the product, and every client, including the phone in your pocket, is a window onto it with the same features. Superset has an [iPhone and iPad app](/mobile) for workspace terminals and diff review. It requires iOS 26 or iPadOS 26 or later, Pro, and a host that stays awake and online. Android is on the [waitlist](/mobile#android). If you mostly work at a desk and want the deepest desktop surface, Superset's Changes pane, Pull Requests view, Design Mode, and Tasks give you more to work with in one window.
+Superset is the place you work: one desktop app where agents, diffs, PRs, browser, and chat live together, with your other machines reachable from it. Paseo inverts that: the daemon is the product, and every client, including the phone in your pocket, is a window onto it with the same features. Superset has an [iPhone and iPad app](/mobile) for workspace terminals and diff review. It requires iOS 26 or iPadOS 26 or later and Pro; workspaces on your own computer need that host awake and online, and cloud workspaces do not. Android is on the [waitlist](/mobile#android). If you mostly work at a desk and want the deepest desktop surface, Superset's Changes pane, Pull Requests view, Design Mode, and Tasks give you more to work with in one window.
 
 ### Any CLI Agent vs Harnesses and ACP
 
@@ -57,7 +57,7 @@ Superset runs any CLI agent in a real terminal with no adapter: if it runs in a 
 
 ### Automation and Team Dispatch
 
-Both schedule agents and both expose an MCP server. Superset's automations run on a cron-style schedule on a device you choose, produce a reviewable workspace, and can be composed from the CLI or TypeScript SDK; a Slack bot creates tasks, spins up workspaces, and launches agents from a mention. Paseo has cron schedules, heartbeats that re-prompt a running agent, a client SDK, and agents that spawn and message subagents across hosts; team-level triggers from GitHub, Slack, and Discord come from Hub, a separate service in beta with a hosted plan.
+Both schedule agents and both expose an MCP server. Superset's automations run on a cron-style schedule on a device you choose, with event triggers from GitHub, Slack, Linear, and more, produce a reviewable workspace, and can be composed from the CLI or TypeScript SDK; a Slack bot creates tasks, spins up workspaces, and launches agents from a mention. Paseo has cron schedules, heartbeats that re-prompt a running agent, a client SDK, and agents that spawn and message subagents across hosts; team-level triggers from GitHub, Slack, and Discord come from Hub, a separate service in beta with a hosted plan.
 
 ### Team and Enterprise
 
@@ -81,7 +81,7 @@ Superset offers a free tier for individuals and Pro at $20 per user per month, o
 
 - Want the deepest desktop surface: Changes pane with commit, push, and PRs, a Pull Requests view, Design Mode, and Tasks
 - Run any CLI agent in a real terminal and switch agents mid-session
-- Need scheduled automations, an MCP server, and a Slack bot backed by a team plan
+- Need automations on a schedule or event trigger, an MCP server, and a Slack bot backed by a team plan
 - Need enterprise controls: SAML SSO, SCIM, audit logs, SOC 2 Type II
 
 **Choose Paseo if you:**
@@ -99,7 +99,7 @@ Superset offers a free tier for individuals and Pro at $20 per user per month, o
 
 ### Is Paseo a Superset alternative?
 
-Yes. Paseo publishes its own comparison with Superset and covers the same core: parallel agents in Git worktrees with terminals, diff review, a browser, schedules, and remote hosts. Both offer mobile access. Superset’s iPhone and iPad app connects to an awake, online host and requires iOS 26 or iPadOS 26 or later and Pro; compare the supported devices and review workflow you need.
+Yes. Paseo publishes its own comparison with Superset and covers the same core: parallel agents in Git worktrees with terminals, diff review, a browser, schedules, and remote hosts. Both offer mobile access. Superset’s iPhone and iPad app reaches cloud workspaces or an awake, online host of your own, and requires iOS 26 or iPadOS 26 or later and Pro; compare the supported devices and review workflow you need.
 
 ### Does Paseo run on Windows and Linux?
 

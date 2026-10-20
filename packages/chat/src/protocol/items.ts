@@ -119,6 +119,7 @@ export const agentMessageSchema = z.looseObject({
 	kind: z.literal("agent_message"),
 	text: z.string(),
 	attachments: z.array(itemAttachmentSchema).optional(),
+	model: z.string().optional(),
 });
 export type AgentMessage = z.infer<typeof agentMessageSchema>;
 
