@@ -121,16 +121,15 @@ final class ComposerAnalyzerTranscriber {
     guard await AssetInventory.status(forModules: [module]) != .installed,
       let request = try await AssetInventory.assetInstallationRequest(supporting: [module])
     else { return }
-    let download = Task { try await request.downloadAndInstall() }
-    try await withThrowingTaskGroup(of: Void.self) { group in
-      group.addTask { try await download.value }
-      group.addTask {
-        try await Task.sleep(for: installTimeout)
-        throw CancellationError()
-      }
-      try await group.next()
-      group.cancelAll()
+    Task { try await request.downloadAndInstall() }
+    // Polled: awaiting the download ignores cancellation, so a race against a
+    // sleep would still wait for the whole download.
+    let deadline = ContinuousClock.now + installTimeout
+    while ContinuousClock.now < deadline {
+      try await Task.sleep(for: .milliseconds(250))
+      if await AssetInventory.status(forModules: [module]) == .installed { return }
     }
+    throw CancellationError()
   }
 
   private init(
