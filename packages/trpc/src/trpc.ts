@@ -1,12 +1,12 @@
 import type { auth, Session } from "@superset/auth/server";
 import { db } from "@superset/db/client";
-import { members } from "@superset/db/schema";
+import { cloudWorkspaces, members } from "@superset/db/schema";
 import {
 	ORGANIZATION_HEADER,
 	STAFF_EMAIL_DOMAINS,
 } from "@superset/shared/constants";
 import { initTRPC, TRPCError } from "@trpc/server";
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import superjson from "superjson";
 import { formatError, userError } from "./i18n-error";
 import { hasAdminAccess } from "./lib/admin-access";
@@ -68,18 +68,29 @@ export type TRPCContext = {
 	 * procedures it may reach are an allowlist, not everything they can do.
 	 */
 	sandboxCaller: SandboxCaller | null;
+	/**
+	 * The cloud workspace whose box sent this request, from the same
+	 * credential. The box itself, not a person: set even when the workspace has
+	 * no creator, and what `sandboxProcedure` requires.
+	 */
+	sandboxWorkspaceId: string | null;
 };
 
 export const createTRPCContext = (
-	opts: Omit<TRPCContext, "client" | "agentCaller" | "sandboxCaller"> & {
+	opts: Omit<
+		TRPCContext,
+		"client" | "agentCaller" | "sandboxCaller" | "sandboxWorkspaceId"
+	> & {
 		agentCaller?: AgentCaller | null;
 		sandboxCaller?: SandboxCaller | null;
+		sandboxWorkspaceId?: string | null;
 	},
 ): TRPCContext => ({
 	...opts,
 	client: parseClientHeader(opts.headers),
 	agentCaller: opts.agentCaller ?? null,
 	sandboxCaller: opts.sandboxCaller ?? null,
+	sandboxWorkspaceId: opts.sandboxWorkspaceId ?? null,
 });
 
 const t = initTRPC.context<TRPCContext>().create({
@@ -148,6 +159,35 @@ const PENDING_DELETION_ALLOWED_PROCEDURES = new Set([
 	"user.deleteAccount",
 	"user.reactivateAccount",
 ]);
+
+/**
+ * A box calling about its own workspace, which must still exist: an archived
+ * box keeps running until the reap stops it. Anything running in the box can
+ * call these, so each must be safe for an agent to call on its own workspace.
+ */
+export const sandboxProcedure = t.procedure.use(async ({ ctx, next }) => {
+	const workspace = ctx.sandboxWorkspaceId
+		? await db.query.cloudWorkspaces.findFirst({
+				where: and(
+					eq(cloudWorkspaces.id, ctx.sandboxWorkspaceId),
+					isNull(cloudWorkspaces.deletedAt),
+				),
+				columns: {
+					id: true,
+					organizationId: true,
+					providerSandboxId: true,
+					status: true,
+				},
+			})
+		: undefined;
+	if (!workspace) {
+		throw new TRPCError({
+			code: "UNAUTHORIZED",
+			message: "Only a live cloud workspace's box can call this.",
+		});
+	}
+	return next({ ctx: { ...ctx, sandboxWorkspace: workspace } });
+});
 
 export const protectedProcedure = t.procedure
 	.use(sandboxScope)

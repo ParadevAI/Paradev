@@ -153,6 +153,26 @@ describe("createChatAgentBridge", () => {
 		expect(terminalAgentStore.listByWorkspace(WORKSPACE)).toEqual([]);
 	});
 
+	it("counts each item of a turn as activity, and a background task's output as none", () => {
+		const { bridge, terminalAgentStore, start, status, reply, publishDelta } =
+			setup();
+		const activity = mock(() => {});
+		terminalAgentStore.on("activity", activity);
+		start("chat-1");
+		status("chat-1", "running");
+		const afterStart = activity.mock.calls.length;
+		publishDelta("chat-1", {
+			type: "background",
+			itemId: "a",
+			append: "dev server output",
+		});
+		expect(activity.mock.calls.length).toBe(afterStart);
+		reply("chat-1", "working on it");
+		reply("chat-1", "still working");
+		expect(activity.mock.calls.length).toBe(afterStart + 2);
+		bridge.stopped("chat-1");
+	});
+
 	it("records a background task's step without announcing it at once", () => {
 		const {
 			bridge,

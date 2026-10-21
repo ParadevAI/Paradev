@@ -57,6 +57,7 @@ export {
 	stopAndSnapshot,
 	stopSandbox,
 	stripWorkspaceIdentity,
+	topUpSandboxSession,
 	waitForStopSnapshot,
 	wakeSandbox,
 } from "./vercel";

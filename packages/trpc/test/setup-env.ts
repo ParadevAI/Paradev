@@ -11,3 +11,4 @@ process.env.NEXT_PUBLIC_MARKETING_URL ??= "https://superset.test";
 process.env.NEXT_PUBLIC_POSTHOG_KEY ??= "phc_placeholder";
 process.env.DATABASE_URL ??= "postgresql://test:test@localhost:5432/test";
 process.env.DATABASE_URL_UNPOOLED ??= process.env.DATABASE_URL;
+process.env.SANDBOX_GATE_SECRET ??= "test-sandbox-gate-secret-placeholder-0000";

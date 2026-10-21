@@ -1,7 +1,19 @@
-import { describe, expect, test } from "bun:test";
+import {
+	afterAll,
+	beforeAll,
+	describe,
+	expect,
+	setSystemTime,
+	test,
+} from "bun:test";
 import { Sandbox } from "@vercel/sandbox";
 import { stub } from "../../../test/stub";
-import { findSandboxSession, listActiveWorkspaceSandboxes } from "./vercel";
+import {
+	findSandboxSession,
+	listActiveWorkspaceSandboxes,
+	SESSION_TIMEOUT_MS,
+	topUpSandboxSession,
+} from "./vercel";
 
 type ListOptions = NonNullable<Parameters<typeof Sandbox.list>[0]>;
 
@@ -110,5 +122,35 @@ describe("listActiveWorkspaceSandboxes", () => {
 			sortOrder: "desc",
 		});
 		expect(listOptions).not.toHaveProperty("tags");
+	});
+});
+
+describe("topUpSandboxSession", () => {
+	let expiresAt: Date;
+	const extended: number[] = [];
+	stub(Sandbox, {
+		get: async () => ({
+			status: "running",
+			get expiresAt() {
+				return expiresAt;
+			},
+			currentSession: () => ({
+				extendTimeout: async (ms: number) => {
+					extended.push(ms);
+				},
+			}),
+		}),
+	});
+	beforeAll(() => setSystemTime(new Date(NOW)));
+	afterAll(() => setSystemTime());
+
+	test("extends a session to end a full timeout from now, unless it nearly does", async () => {
+		expiresAt = new Date(NOW + SESSION_TIMEOUT_MS / 2);
+		await topUpSandboxSession("sbx");
+		expect(extended).toEqual([SESSION_TIMEOUT_MS / 2]);
+
+		expiresAt = new Date(NOW + SESSION_TIMEOUT_MS - 30_000);
+		await topUpSandboxSession("sbx");
+		expect(extended).toEqual([SESSION_TIMEOUT_MS / 2]);
 	});
 });

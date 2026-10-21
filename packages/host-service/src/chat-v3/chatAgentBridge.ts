@@ -240,6 +240,7 @@ export function createChatAgentBridge(
 			if (!isDurableEnvelope(envelope)) return;
 			const event = envelope.event;
 			if (event.type === "item") {
+				ctx.terminalAgentStore.noteActivity(chat.workspaceId);
 				const { kind, text } = event.item;
 				if (kind === "agent_message" && typeof text === "string") {
 					chat.lastReply = text.slice(0, MAX_PREVIEW_LENGTH);

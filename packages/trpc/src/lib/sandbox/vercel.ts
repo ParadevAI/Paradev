@@ -28,13 +28,14 @@ import { env } from "../../env";
 export const HOST_SERVICE_PORT = SANDBOX_PORTS.hostService;
 /**
  * A session ends after this long; the workspace's files survive and the next
- * open resumes it. A workspace someone has open is extended before it gets
- * there (`wakeSandbox`), so this is really the idle stop, and how long an
- * unattended agent run can last.
+ * open resumes it. A workspace someone has open (`wakeSandbox`) or whose agent
+ * is active (`topUpSandboxSession`) is extended before it gets there, so this
+ * is really the idle stop.
  */
-const SESSION_TIMEOUT_MS = 4 * 60 * 60 * 1000;
+export const SESSION_TIMEOUT_MS = 4 * 60 * 60 * 1000;
 /** Extend an open workspace's session when it has less than this left. */
 const EXTEND_BELOW_MS = 60 * 60 * 1000;
+const MIN_TOP_UP_MS = 60 * 1000;
 const WORKSPACE_SNAPSHOT_EXPIRATION_MS = 30 * 24 * 60 * 60 * 1000;
 /** 2 GB of memory per vCPU; disk is 64 GB regardless. */
 export const MEMORY_MB_PER_VCPU = 2048;
@@ -328,6 +329,24 @@ export async function describeSandbox(providerSandboxId: string): Promise<{
 		if (isUnavailable(error))
 			throw new SandboxUnavailableError(providerSandboxId, error);
 		throw error;
+	}
+}
+
+/**
+ * Extends a running session so it ends `SESSION_TIMEOUT_MS` from now; never
+ * wakes a stopped one. The provider only extends by a duration, and refuses
+ * past the plan's 24h session cap. Goes through the session:
+ * `Sandbox.extendTimeout` resumes a session that stopped meanwhile.
+ */
+export async function topUpSandboxSession(
+	providerSandboxId: string,
+): Promise<void> {
+	const sandbox = await getSandbox(providerSandboxId);
+	if (sandbox?.status !== "running" || !sandbox.expiresAt) return;
+	const extension =
+		Date.now() + SESSION_TIMEOUT_MS - sandbox.expiresAt.getTime();
+	if (extension > MIN_TOP_UP_MS) {
+		await sandbox.currentSession().extendTimeout(extension);
 	}
 }
 
