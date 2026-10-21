@@ -78,6 +78,7 @@ export function parseMergedAt(mergedAt: string | null): number | null {
 		: null;
 }
 
+// If you change this, also look at its GitLab twin `normalizeGitLabMergeRequest`.
 function normalizePullRequest(raw: unknown): GitHubPullRequestNode | null {
 	if (!isRecord(raw) || !isRecord(raw.head)) return null;
 	const headRepo = isRecord(raw.head.repo) ? raw.head.repo : null;
@@ -163,6 +164,8 @@ function normalizePullRequestCandidates(
 	);
 }
 
+// If you change this, also look at its GitLab twin: `reviewDecision` in
+// `fetchPullRequestDetailsFromGlab`.
 function mapReviewDecision(
 	rawReviews: unknown,
 	prState: PullRequestState,
@@ -198,6 +201,7 @@ function mapReviewDecision(
 	return prState === "OPEN" ? "REVIEW_REQUIRED" : null;
 }
 
+// If you change this, also look at its GitLab twin `toGitLabJobCheck`.
 function toCheckRunNode(raw: RestCheckRun): GitHubCheckContextNode | null {
 	if (!raw.name) return null;
 
@@ -517,6 +521,7 @@ interface GitLabRepository {
 
 // An MR names its source project by id only, so a fork MR gets no head repo and
 // is never linked: forks are not supported.
+// If you change this, also look at its GitHub twin `normalizePullRequest`.
 function normalizeGitLabMergeRequest(
 	raw: unknown,
 	repository: GitLabRepository,
@@ -571,6 +576,7 @@ const GITLAB_JOB_CONCLUSIONS: Record<string, string> = {
 	manual: "SKIPPED",
 };
 
+// If you change this, also look at its GitHub twin `toCheckRunNode`.
 function toGitLabJobCheck(job: unknown): GitHubCheckContextNode {
 	if (!isRecord(job)) return null;
 	// A manual job blocks the pipeline unless it may fail; only then is it skipped.
@@ -614,6 +620,7 @@ export async function fetchPullRequestDetailsFromGlab(
 	]);
 	return {
 		// With no approval rule GitLab says `approved`, so also require an approver.
+		// If you change this, also look at its GitHub twin `mapReviewDecision`.
 		reviewDecision:
 			isRecord(approvals) &&
 			approvals.approved === true &&
