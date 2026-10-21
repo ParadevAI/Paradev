@@ -2511,7 +2511,11 @@ describe("GitLab through glab", () => {
 			readWorkspaceRefs: async () => ({
 				branch: "feat",
 				headSha: "sha-1",
-				upstream: { owner: "group/sub", name: "app", branch: "feat" },
+				upstream: {
+					owner: "gitlab.example.com/group/sub",
+					name: "app",
+					branch: "feat",
+				},
 			}),
 			execGlab: async (args) => {
 				glabCalls.push(args);
@@ -2544,6 +2548,7 @@ describe("GitLab through glab", () => {
 		const pr = getPrById(db, getWorkspace(db, "ws")?.pullRequestId ?? "");
 		expect(pr).toMatchObject({
 			repoProvider: "gitlab",
+			repoOwner: "gitlab.example.com/group/sub",
 			url: webUrl,
 			state: "open",
 			reviewDecision: "pending",

@@ -1,6 +1,5 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import type { HostServiceContext } from "../../../types";
 import { protectedProcedure, router } from "../../index";
 import { execGlab } from "../workspace-creation/utils/exec-gh";
 import { createGithubWorkItemLoader } from "./work-item";
@@ -354,7 +353,7 @@ export const githubRouter = router({
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			const gitlab = gitlabProjectUrl(ctx, input);
+			const gitlab = gitlabProjectUrl(input);
 			if (gitlab) {
 				const method =
 					input.mergeMethod === "merge" ? [] : [`--${input.mergeMethod}`];
@@ -393,7 +392,7 @@ export const githubRouter = router({
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			const gitlab = gitlabProjectUrl(ctx, input);
+			const gitlab = gitlabProjectUrl(input);
 			if (gitlab) {
 				await execGlab([
 					"mr",
@@ -862,24 +861,9 @@ export function actionRejectionError(
 	}
 }
 
-// Callers send owner/repo/number only. A linked GitLab MR with that identity
-// is the one meant, unless a linked GitHub PR has the same identity.
-function gitlabProjectUrl(
-	ctx: HostServiceContext,
-	input: { owner: string; repo: string; pullNumber: number },
-): string | null {
-	const rows = ctx.runtime.pullRequests.findLinkedPullRequests(
-		input.owner,
-		input.repo,
-		input.pullNumber,
-	);
-	const gitlab = rows.find((row) => row.provider === "gitlab");
-	if (!gitlab) return null;
-	if (rows.some((row) => row.provider !== "gitlab")) {
-		throw new TRPCError({
-			code: "CONFLICT",
-			message: `${input.owner}/${input.repo}#${input.pullNumber} is both a GitHub PR and a GitLab MR on this host. Open it in the browser.`,
-		});
-	}
-	return gitlab.url.split("/-/")[0] ?? null;
+// GitLab owners carry their host (`host/group`); GitHub owners have no slash.
+function gitlabProjectUrl(input: { owner: string; repo: string }) {
+	return input.owner.includes("/")
+		? `https://${input.owner}/${input.repo}`
+		: null;
 }

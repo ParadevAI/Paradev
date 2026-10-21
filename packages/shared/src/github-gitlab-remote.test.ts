@@ -1,21 +1,23 @@
 import { describe, expect, test } from "bun:test";
-import { parseGitLabRemote } from "./github-remote";
+import { parseGitLabRemote } from "./github-gitlab-remote";
 
 describe("parseGitLabRemote", () => {
 	test.each([
-		["git@gitlab.com:group/sub/app.git", "gitlab.com", "group/sub"],
+		["git@gitlab.com:group/sub/app.git", "gitlab.com/group/sub"],
 		[
 			"ssh://git@gitlab-ssh.example.com:2222/team/app.git",
-			"gitlab-ssh.example.com",
-			"team",
+			"gitlab-ssh.example.com/team",
 		],
-		["https://gitlab.example.com/team/app/", "gitlab.example.com", "team"],
-	])("parses %s", (remote, host, owner) => {
+		[
+			"https://gitlab.example.com:8443/team/app/",
+			"gitlab.example.com:8443/team",
+		],
+	])("parses %s", (remote, owner) => {
 		expect(parseGitLabRemote(remote)).toEqual({
 			provider: "gitlab",
 			owner,
 			name: "app",
-			url: `https://${host}/${owner}/app`,
+			url: `https://${owner}/app`,
 		});
 	});
 

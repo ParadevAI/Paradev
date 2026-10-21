@@ -7,7 +7,7 @@ import { getHostWorkerPool } from "../../../../workers/host-worker-pool";
 import { gitPrHeadBaseTask } from "../../../../workers/tasks/git";
 import { protectedProcedure } from "../../../index";
 import { resolveWorktreePath } from "../../git/utils/resolve-worktree";
-import { actionRejectionError } from "../../github/github";
+import { actionRejectionError } from "../../github/github-gitlab";
 import { resolveGithubRepo } from "../../workspace-creation/shared/project-helpers";
 import { execGlab } from "../../workspace-creation/utils/exec-gh";
 
@@ -100,7 +100,12 @@ export const createForWorkspace = protectedProcedure
 			}
 			await ctx.runtime.pullRequests
 				.refreshPullRequestsByWorkspaces([input.workspaceId])
-				.catch(() => {});
+				.catch((error) =>
+					console.warn(
+						"[pull-requests:create-for-workspace] created MR but failed to refresh workspace link",
+						{ workspaceId: input.workspaceId, error },
+					),
+				);
 			return { number: Number(created[1]), url: created[0] };
 		}
 		const repo = await resolveGithubRepo(ctx, workspace.projectId);

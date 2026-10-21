@@ -519,17 +519,17 @@ function normalizeMergeRequest(
 	raw: unknown,
 	repository: GitLabRepository,
 ): GitHubPullRequestNode | null {
-	if (!isRecord(raw) || typeof raw.iid !== "number") return null;
+	if (!isRecord(raw) || typeof raw.sha !== "string") return null;
 	const sameProject = raw.source_project_id === raw.target_project_id;
 	const mergedAt = typeof raw.merged_at === "string" ? raw.merged_at : null;
 	return {
-		number: raw.iid,
+		number: Number(raw.iid),
 		title: String(raw.title),
 		url: String(raw.web_url),
 		state: normalizePullRequestState(String(raw.state), mergedAt),
 		isDraft: raw.draft === true,
 		headRefName: String(raw.source_branch),
-		headRefOid: String(raw.sha),
+		headRefOid: raw.sha,
 		isCrossRepository: !sameProject,
 		headRepositoryOwner: sameProject ? { login: repository.owner } : null,
 		headRepository: sameProject ? { name: repository.name } : null,
@@ -591,7 +591,7 @@ export async function fetchPullRequestDetailsFromGlab(
 		__typename: "CheckRun",
 		name: "pipeline",
 		conclusion,
-		detailsUrl: String(pipeline?.web_url),
+		detailsUrl: pipeline?.web_url ? String(pipeline.web_url) : null,
 		status: conclusion ? "COMPLETED" : "IN_PROGRESS",
 		startedAt: null,
 		completedAt: null,

@@ -35,20 +35,25 @@ export interface ParsedGitLabRemote
 	provider: "gitlab";
 }
 
-/** Only hosts named like GitLab: other hosts would spawn `glab` for nothing. */
+/**
+ * Only hosts named like GitLab: other hosts would spawn `glab` for nothing.
+ * The owner carries the host (`host/group`): MRs of two instances never share
+ * an identity, and no GitHub owner (no slash allowed) can match one.
+ */
 export function parseGitLabRemote(
 	remoteUrl: string,
 ): ParsedGitLabRemote | null {
 	const match =
-		/^(?:git@|ssh:\/\/git@|https:\/\/)(?<host>[^/:]*gitlab[^/:]*)(?::\d+\/|[:/])(?<owner>.+)\/(?<name>[^/]+?)(?:\.git)?\/?$/i.exec(
+		/^(?<scheme>git@|ssh:\/\/git@|https:\/\/)(?<host>[^/:]*gitlab[^/:]*)(?<port>:\d+)?[:/](?<owner>.+)\/(?<name>[^/]+?)(?:\.git)?\/?$/i.exec(
 			remoteUrl.trim(),
 		);
-	const { host, owner, name } = match?.groups ?? {};
+	const { scheme, host, port, owner, name } = match?.groups ?? {};
 	if (!host || !owner || !name) return null;
+	const origin = scheme === "https://" ? `${host}${port ?? ""}` : host;
 	return {
 		provider: "gitlab",
-		owner,
+		owner: `${origin}/${owner}`,
 		name,
-		url: `https://${host}/${owner}/${name}`,
+		url: `https://${origin}/${owner}/${name}`,
 	};
 }
