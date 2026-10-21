@@ -6,7 +6,7 @@ export interface ParsedGitLabRemote
 }
 
 /**
- * Only hosts named like GitLab: other hosts would spawn `glab` for nothing.
+ * Any host: the caller asks glab whether it knows it.
  * The owner carries the host (`host/group`): MRs of two instances never share
  * an identity, and no GitHub owner (no slash allowed) can match one.
  */
@@ -14,7 +14,7 @@ export function parseGitLabRemote(
 	remoteUrl: string,
 ): ParsedGitLabRemote | null {
 	const match =
-		/^(?<scheme>git@|ssh:\/\/git@|https:\/\/)(?<host>[^/:]*gitlab[^/:]*)(?<port>:\d+)?[:/](?<owner>.+)\/(?<name>[^/]+?)(?:\.git)?\/?$/i.exec(
+		/^(?<scheme>git@|ssh:\/\/git@|https:\/\/)(?<host>[^/:]+)(?<port>:\d+)?[:/](?<owner>.+)\/(?<name>[^/]+?)(?:\.git)?\/?$/i.exec(
 			remoteUrl.trim(),
 		);
 	const { scheme, host, port, owner, name } = match?.groups ?? {};

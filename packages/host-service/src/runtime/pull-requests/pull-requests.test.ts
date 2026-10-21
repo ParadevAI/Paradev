@@ -2519,6 +2519,7 @@ describe("GitLab through glab", () => {
 			}),
 			execGlab: async (args) => {
 				glabCalls.push(args);
+				if (args[0] === "config") return "gitlab.example.com";
 				if (args[1] === "list") {
 					return [
 						{
@@ -2564,7 +2565,43 @@ describe("GitLab through glab", () => {
 			reviewDecision: "pending",
 			checksStatus: "failure",
 		});
-		expect(glabCalls[0]).toContain("https://gitlab.example.com/group/sub/app");
+		expect(glabCalls[1]).toContain("https://gitlab.example.com/group/sub/app");
 		expect(db.select().from(schema.projects).get()?.repoProvider).toBeNull();
+	});
+
+	test("asks glab once about an unknown host and looks up no MR", async () => {
+		const db = createRealDb();
+		db.insert(schema.projects)
+			.values({ id: PROJECT_ID, repoPath: "/repo", createdAt: Date.now() })
+			.run();
+		seedWorkspace(db, { id: "ws", branch: "feat" });
+		const glabCalls: string[][] = [];
+		const manager = createManager(db, {
+			git: async () => ({
+				remote: async () => "git@git.example.com:team/app.git\n",
+				raw: async () => "origin/main\n",
+			}),
+			readWorkspaceRefs: async () => ({
+				branch: "feat",
+				headSha: "sha-1",
+				upstream: {
+					owner: "git.example.com/team",
+					name: "app",
+					branch: "feat",
+				},
+			}),
+			execGlab: async (args) => {
+				glabCalls.push(args);
+				return {};
+			},
+		});
+
+		await manager.refreshPullRequestsByWorkspaces(["ws"]);
+		await manager.refreshPullRequestsByWorkspaces(["ws"]);
+
+		expect(glabCalls).toEqual([
+			["config", "get", "api_host", "--host", "git.example.com"],
+		]);
+		expect(getWorkspace(db, "ws")?.pullRequestId).toBeNull();
 	});
 });

@@ -4,6 +4,7 @@ import { parseGitLabRemote } from "./gitlab-remote";
 describe("parseGitLabRemote", () => {
 	test.each([
 		["git@gitlab.com:group/sub/app.git", "gitlab.com/group/sub"],
+		["git@git.example.com:team/app.git", "git.example.com/team"],
 		[
 			"ssh://git@gitlab-ssh.example.com:2222/team/app.git",
 			"gitlab-ssh.example.com/team",
@@ -21,8 +22,8 @@ describe("parseGitLabRemote", () => {
 		});
 	});
 
-	test("ignores hosts not named like GitLab", () => {
-		expect(parseGitLabRemote("git@github.com:team/app.git")).toBeNull();
-		expect(parseGitLabRemote("git@git.example.com:team/app.git")).toBeNull();
+	test("ignores what is not a hosted repository", () => {
+		expect(parseGitLabRemote("/srv/repos/app.git")).toBeNull();
+		expect(parseGitLabRemote("git@git.example.com:app.git")).toBeNull();
 	});
 });
