@@ -149,6 +149,7 @@ function createManager(
 	db: HostDb,
 	overrides: {
 		execGh?: (args: string[]) => Promise<unknown>;
+		execGlab?: (args: string[]) => Promise<unknown>;
 		github?: () => Promise<never>;
 		git?: unknown;
 		readWorkspaceRefs?: (
@@ -174,6 +175,7 @@ function createManager(
 			((async () => {
 				throw new Error("octokit should not be used");
 			}) as never),
+		execGlab: overrides.execGlab as never,
 		gitWatcher: { onChanged: () => () => {} } as never,
 		readWorkspaceRefs: overrides.readWorkspaceRefs,
 		// Seeded worktree paths are fabricated; default the disk gate open so
@@ -2488,5 +2490,66 @@ describe("PullRequestRuntimeManager GitHub traffic", () => {
 		);
 		expect(manager.getGithubStatus()?.reason).toBe("auth");
 		expect(getWorkspace(db, "ws")?.pullRequestId).toBeNull();
+	});
+});
+
+describe("GitLab through glab", () => {
+	test("links a workspace to its MR with the head pipeline as its check", async () => {
+		const db = createRealDb();
+		db.insert(schema.projects)
+			.values({ id: PROJECT_ID, repoPath: "/repo", createdAt: Date.now() })
+			.run();
+		seedWorkspace(db, { id: "ws", branch: "feat" });
+		const webUrl =
+			"https://gitlab.example.com/group/sub/app/-/merge_requests/7";
+		const glabCalls: string[][] = [];
+		const manager = createManager(db, {
+			git: async () => ({
+				remote: async () => "git@gitlab.example.com:group/sub/app.git\n",
+				raw: async () => "origin/main\n",
+			}),
+			readWorkspaceRefs: async () => ({
+				branch: "feat",
+				headSha: "sha-1",
+				upstream: { owner: "group/sub", name: "app", branch: "feat" },
+			}),
+			execGlab: async (args) => {
+				glabCalls.push(args);
+				if (args[1] === "list") {
+					return [
+						{
+							iid: 7,
+							title: "Feat",
+							web_url: webUrl,
+							state: "opened",
+							source_branch: "feat",
+							sha: "sha-1",
+							source_project_id: 1,
+							target_project_id: 1,
+						},
+					];
+				}
+				return {
+					detailed_merge_status: "not_approved",
+					head_pipeline: {
+						status: "failed",
+						web_url: "https://gitlab.example.com/p/9",
+					},
+				};
+			},
+		});
+
+		await manager.refreshPullRequestsByWorkspaces(["ws"]);
+
+		const pr = getPrById(db, getWorkspace(db, "ws")?.pullRequestId ?? "");
+		expect(pr).toMatchObject({
+			repoProvider: "gitlab",
+			url: webUrl,
+			state: "open",
+			reviewDecision: "pending",
+			checksStatus: "failure",
+		});
+		expect(glabCalls[0]).toContain("https://gitlab.example.com/group/sub/app");
+		expect(db.select().from(schema.projects).get()?.repoProvider).toBeNull();
 	});
 });

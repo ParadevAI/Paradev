@@ -1,7 +1,10 @@
 import { randomUUID } from "node:crypto";
 import { existsSync } from "node:fs";
 import type { Octokit } from "@octokit/rest";
-import { parseGitHubRemote } from "@superset/shared/github-remote";
+import {
+	parseGitHubRemote,
+	parseGitLabRemote,
+} from "@superset/shared/github-remote";
 import { and, eq, inArray, isNull } from "drizzle-orm";
 import type { HostDb } from "../../db";
 import {
@@ -12,7 +15,10 @@ import {
 } from "../../db/schema";
 import type { EventBus } from "../../events/event-bus";
 import type { GitWatcher } from "../../events/git-watcher";
-import type { ExecGh } from "../../trpc/router/workspace-creation/utils/exec-gh";
+import {
+	type ExecGh,
+	execGlab,
+} from "../../trpc/router/workspace-creation/utils/exec-gh";
 import { type GitFactory, resolveDefaultBranchName } from "../git";
 import { ConditionalGh } from "./utils/conditional-gh";
 import {
@@ -26,8 +32,10 @@ import {
 	fetchOpenPullRequestsFromGh,
 	fetchPullRequestByHead,
 	fetchPullRequestByHeadFromGh,
+	fetchPullRequestByHeadFromGlab,
 	fetchPullRequestChecks,
 	fetchPullRequestChecksFromGh,
+	fetchPullRequestDetailsFromGlab,
 	fetchPullRequestMergeQueueState,
 	fetchPullRequestMergeQueueStateFromGh,
 	fetchPullRequestReviewDecision,
@@ -92,7 +100,7 @@ function upstreamKey(
 	return `${owner.toLowerCase()}/${repo.toLowerCase()}#${branch}`;
 }
 
-type RepoProvider = "github";
+type RepoProvider = "github" | "gitlab";
 
 export interface PullRequestStateSnapshot {
 	url: string;
@@ -144,6 +152,7 @@ export interface PullRequestRuntimeManagerOptions {
 	execGh: ExecGh;
 	git: GitFactory;
 	github: () => Promise<Octokit>;
+	execGlab?: ExecGh;
 	gitWatcher: GitWatcher;
 	/** Override to run the per-workspace branch/HEAD/upstream read off the
 	 * event loop (app wiring passes a worker-pool-backed reader). Defaults
@@ -223,6 +232,7 @@ export class PullRequestRuntimeManager {
 	private readonly conditionalGh: ConditionalGh;
 	private readonly git: GitFactory;
 	private readonly github: () => Promise<Octokit>;
+	private readonly execGlab: ExecGh;
 	private readonly gitWatcher: GitWatcher;
 	private safetyNetTimer: ReturnType<typeof setInterval> | null = null;
 	private projectRefreshTimer: ReturnType<typeof setInterval> | null = null;
@@ -288,6 +298,7 @@ export class PullRequestRuntimeManager {
 		this.execGh = this.conditionalGh.exec;
 		this.git = options.git;
 		this.github = options.github;
+		this.execGlab = options.execGlab ?? execGlab;
 		this.gitWatcher = options.gitWatcher;
 		this.readWorkspaceRefs =
 			options.readWorkspaceRefs ??
@@ -1049,7 +1060,7 @@ export class PullRequestRuntimeManager {
 		}
 	}
 
-	private async getProjectRepository(
+	async getProjectRepository(
 		projectId: string,
 	): Promise<NormalizedRepoIdentity | null> {
 		const project = this.db.query.projects
@@ -1090,7 +1101,13 @@ export class PullRequestRuntimeManager {
 			}
 
 			const parsedRemote = parseGitHubRemote(remoteUrl);
-			if (!parsedRemote) return null;
+			if (!parsedRemote) {
+				// Not persisted: the rest of the app reads projects.repo* as GitHub.
+				const gitlab = parseGitLabRemote(remoteUrl);
+				if (!gitlab) return null;
+				const defaultBranch = await this.resolveDefaultBranch(project.repoPath);
+				return { ...gitlab, remoteName, defaultBranch };
+			}
 
 			this.db
 				.update(projects)
@@ -1410,6 +1427,14 @@ export class PullRequestRuntimeManager {
 			head.repo.toLowerCase(),
 			head.branch,
 		].join("/");
+		if (repo.provider === "gitlab") {
+			return this.cachedGitHubFetch(
+				this.pullRequestHeadCache,
+				`gitlab:${cacheKey}`,
+				options,
+				() => fetchPullRequestByHeadFromGlab(this.execGlab, repo, head),
+			);
+		}
 		return this.cachedGitHubFetch(
 			this.pullRequestHeadCache,
 			cacheKey,
@@ -1449,6 +1474,14 @@ export class PullRequestRuntimeManager {
 			name: repo.name,
 			prNumber: node.number,
 		};
+		if (repo.provider === "gitlab") {
+			return this.cachedGitHubFetch(
+				this.pullRequestDetailsCache,
+				`gitlab:${cacheKey}`,
+				{ ...options, fingerprint: node.headRefOid },
+				() => fetchPullRequestDetailsFromGlab(this.execGlab, repo, node.number),
+			);
+		}
 		return this.cachedGitHubFetch(
 			this.pullRequestDetailsCache,
 			cacheKey,
@@ -1524,6 +1557,7 @@ export class PullRequestRuntimeManager {
 		repo: NormalizedRepoIdentity,
 		options: { bypassCache?: boolean } = {},
 	): Promise<GitHubPullRequestNode[]> {
+		if (repo.provider === "gitlab") return [];
 		const cacheKey = `${repo.owner.toLowerCase()}/${repo.name.toLowerCase()}`;
 		return this.cachedGitHubFetch(
 			this.openPullRequestsCache,

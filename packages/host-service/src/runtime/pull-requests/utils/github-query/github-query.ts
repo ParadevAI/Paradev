@@ -507,3 +507,102 @@ export async function fetchPullRequestChecks(
 		(node): node is NonNullable<GitHubCheckContextNode> => node !== null,
 	);
 }
+
+interface GitLabRepository {
+	owner: string;
+	name: string;
+	url: string;
+}
+
+// A fork MR gets no head repo, so it never matches a workspace key.
+function normalizeMergeRequest(
+	raw: unknown,
+	repository: GitLabRepository,
+): GitHubPullRequestNode | null {
+	if (!isRecord(raw) || typeof raw.iid !== "number") return null;
+	const sameProject = raw.source_project_id === raw.target_project_id;
+	const mergedAt = typeof raw.merged_at === "string" ? raw.merged_at : null;
+	return {
+		number: raw.iid,
+		title: String(raw.title),
+		url: String(raw.web_url),
+		state: normalizePullRequestState(String(raw.state), mergedAt),
+		isDraft: raw.draft === true,
+		headRefName: String(raw.source_branch),
+		headRefOid: String(raw.sha),
+		isCrossRepository: !sameProject,
+		headRepositoryOwner: sameProject ? { login: repository.owner } : null,
+		headRepository: sameProject ? { name: repository.name } : null,
+		updatedAt: String(raw.updated_at),
+		mergedAt: parseMergedAt(mergedAt),
+	};
+}
+
+export async function fetchPullRequestByHeadFromGlab(
+	execGlab: ExecGh,
+	repository: GitLabRepository,
+	head: GitHubPullRequestHeadRef,
+): Promise<GitHubPullRequestNode | null> {
+	const raw = await execGlab([
+		"mr",
+		"list",
+		"--all",
+		"-R",
+		repository.url,
+		"-s",
+		head.branch,
+		"-F",
+		"json",
+	]);
+	return (
+		asArray(raw)
+			.map((item) => normalizeMergeRequest(item, repository))
+			.find((node) => node && !node.isCrossRepository) ?? null
+	);
+}
+
+const GITLAB_PIPELINE_CONCLUSIONS: Record<string, string> = {
+	success: "SUCCESS",
+	failed: "FAILURE",
+	canceled: "CANCELLED",
+	skipped: "SKIPPED",
+};
+
+// The MR's head pipeline stands in for GitHub's checks.
+export async function fetchPullRequestDetailsFromGlab(
+	execGlab: ExecGh,
+	repository: GitLabRepository,
+	number: number,
+) {
+	const raw = await execGlab([
+		"mr",
+		"view",
+		String(number),
+		"-R",
+		repository.url,
+		"-F",
+		"json",
+	]);
+	const mr = isRecord(raw) ? raw : {};
+	const pipeline = isRecord(mr.head_pipeline) ? mr.head_pipeline : null;
+	const conclusion =
+		GITLAB_PIPELINE_CONCLUSIONS[String(pipeline?.status)] ?? null;
+	const check: GitHubCheckContextNode = {
+		__typename: "CheckRun",
+		name: "pipeline",
+		conclusion,
+		detailsUrl: String(pipeline?.web_url),
+		status: conclusion ? "COMPLETED" : "IN_PROGRESS",
+		startedAt: null,
+		completedAt: null,
+		checkSuite: null,
+	};
+	return {
+		reviewDecision:
+			mr.detailed_merge_status === "not_approved"
+				? ("REVIEW_REQUIRED" as const)
+				: null,
+		checks: pipeline ? [check] : [],
+		isInMergeQueue: null,
+	};
+}

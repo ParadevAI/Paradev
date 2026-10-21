@@ -29,3 +29,26 @@ export function parseGitHubRemote(
 
 	return null;
 }
+
+export interface ParsedGitLabRemote
+	extends Omit<ParsedGitHubRemote, "provider"> {
+	provider: "gitlab";
+}
+
+/** Only hosts named like GitLab: other hosts would spawn `glab` for nothing. */
+export function parseGitLabRemote(
+	remoteUrl: string,
+): ParsedGitLabRemote | null {
+	const match =
+		/^(?:git@|ssh:\/\/git@|https:\/\/)(?<host>[^/:]*gitlab[^/:]*)(?::\d+\/|[:/])(?<owner>.+)\/(?<name>[^/]+?)(?:\.git)?\/?$/i.exec(
+			remoteUrl.trim(),
+		);
+	const { host, owner, name } = match?.groups ?? {};
+	if (!host || !owner || !name) return null;
+	return {
+		provider: "gitlab",
+		owner,
+		name,
+		url: `https://${host}/${owner}/${name}`,
+	};
+}

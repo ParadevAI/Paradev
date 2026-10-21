@@ -9,6 +9,7 @@ import { protectedProcedure } from "../../../index";
 import { resolveWorktreePath } from "../../git/utils/resolve-worktree";
 import { actionRejectionError } from "../../github/github";
 import { resolveGithubRepo } from "../../workspace-creation/shared/project-helpers";
+import { execGlab } from "../../workspace-creation/utils/exec-gh";
 
 const createInputSchema = z.object({
 	workspaceId: z.string(),
@@ -68,6 +69,40 @@ export const createForWorkspace = protectedProcedure
 			});
 		}
 
+		const project = await ctx.runtime.pullRequests.getProjectRepository(
+			workspace.projectId,
+		);
+		if (project?.provider === "gitlab") {
+			const output = String(
+				await execGlab(
+					[
+						"mr",
+						"create",
+						"-R",
+						project.url,
+						"-s",
+						head,
+						"-b",
+						base,
+						"-t",
+						input.title,
+						"-d",
+						input.body ?? "",
+						...(input.draft ? ["--draft"] : []),
+						"--yes",
+					],
+					{ cwd: worktreePath },
+				),
+			);
+			const created = /\S+\/-\/merge_requests\/(\d+)/.exec(output);
+			if (!created) {
+				throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: output });
+			}
+			await ctx.runtime.pullRequests
+				.refreshPullRequestsByWorkspaces([input.workspaceId])
+				.catch(() => {});
+			return { number: Number(created[1]), url: created[0] };
+		}
 		const repo = await resolveGithubRepo(ctx, workspace.projectId);
 		const octokit = await ctx.github();
 		let created: { number: number; html_url: string };
