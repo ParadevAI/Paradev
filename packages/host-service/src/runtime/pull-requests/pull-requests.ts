@@ -13,10 +13,11 @@ import {
 } from "../../db/schema";
 import type { EventBus } from "../../events/event-bus";
 import type { GitWatcher } from "../../events/git-watcher";
+import type { ExecGh } from "../../trpc/router/workspace-creation/utils/exec-gh";
 import {
-	type ExecGh,
+	type ExecGlab,
 	execGlab,
-} from "../../trpc/router/workspace-creation/utils/exec-gh";
+} from "../../trpc/router/workspace-creation/utils/exec-glab";
 import { type GitFactory, resolveDefaultBranchName } from "../git";
 import { ConditionalGh } from "./utils/conditional-gh";
 import {
@@ -152,7 +153,7 @@ export interface PullRequestRuntimeManagerOptions {
 	execGh: ExecGh;
 	git: GitFactory;
 	github: () => Promise<Octokit>;
-	execGlab?: ExecGh;
+	execGlab?: ExecGlab;
 	gitWatcher: GitWatcher;
 	/** Override to run the per-workspace branch/HEAD/upstream read off the
 	 * event loop (app wiring passes a worker-pool-backed reader). Defaults
@@ -232,7 +233,7 @@ export class PullRequestRuntimeManager {
 	private readonly conditionalGh: ConditionalGh;
 	private readonly git: GitFactory;
 	private readonly github: () => Promise<Octokit>;
-	private readonly execGlab: ExecGh;
+	private readonly execGlab: ExecGlab;
 	private readonly glabHosts = new Map<
 		string,
 		{ known: Promise<boolean>; checkedAt: number }

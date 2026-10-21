@@ -1,7 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { protectedProcedure, router } from "../../index";
-import { execGlab } from "../workspace-creation/utils/exec-gh";
+import { execGlab } from "../workspace-creation/utils/exec-glab";
 import { createGithubWorkItemLoader } from "./work-item";
 
 const loadWorkItem = createGithubWorkItemLoader();

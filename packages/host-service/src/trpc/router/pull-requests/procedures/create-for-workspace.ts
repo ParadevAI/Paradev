@@ -9,7 +9,7 @@ import { protectedProcedure } from "../../../index";
 import { resolveWorktreePath } from "../../git/utils/resolve-worktree";
 import { actionRejectionError } from "../../github/github-gitlab";
 import { resolveGithubRepo } from "../../workspace-creation/shared/project-helpers";
-import { execGlab } from "../../workspace-creation/utils/exec-gh";
+import { execGlab } from "../../workspace-creation/utils/exec-glab";
 
 const createInputSchema = z.object({
 	workspaceId: z.string(),

@@ -1,5 +1,6 @@
 import type { Octokit } from "@octokit/rest";
 import type { ExecGh } from "../../../../trpc/router/workspace-creation/utils/exec-gh";
+import type { ExecGlab } from "../../../../trpc/router/workspace-creation/utils/exec-glab";
 import type {
 	GitHubCheckContextNode,
 	GitHubPullRequestHeadRef,
@@ -514,9 +515,9 @@ interface GitLabRepository {
 	url: string;
 }
 
-// GitLab's normalizePullRequest. An MR names its source project by id only, so
-// a fork MR gets no head repo and is never linked: forks are not supported.
-function normalizeMergeRequest(
+// An MR names its source project by id only, so a fork MR gets no head repo and
+// is never linked: forks are not supported.
+function normalizeGitLabMergeRequest(
 	raw: unknown,
 	repository: GitLabRepository,
 ): GitHubPullRequestNode | null {
@@ -540,7 +541,7 @@ function normalizeMergeRequest(
 }
 
 export async function fetchPullRequestByHeadFromGlab(
-	execGlab: ExecGh,
+	execGlab: ExecGlab,
 	repository: GitLabRepository,
 	head: GitHubPullRequestHeadRef,
 ): Promise<GitHubPullRequestNode | null> {
@@ -557,7 +558,7 @@ export async function fetchPullRequestByHeadFromGlab(
 	]);
 	return (
 		asArray(raw)
-			.map((item) => normalizeMergeRequest(item, repository))
+			.map((item) => normalizeGitLabMergeRequest(item, repository))
 			.find((node) => node && !node.isCrossRepository) ?? null
 	);
 }
@@ -570,7 +571,7 @@ const GITLAB_JOB_CONCLUSIONS: Record<string, string> = {
 	manual: "SKIPPED",
 };
 
-function toJobCheck(job: unknown): GitHubCheckContextNode {
+function toGitLabJobCheck(job: unknown): GitHubCheckContextNode {
 	if (!isRecord(job)) return null;
 	// A manual job blocks the pipeline unless it may fail; only then is it skipped.
 	const conclusion =
@@ -593,7 +594,7 @@ function toJobCheck(job: unknown): GitHubCheckContextNode {
 
 // The jobs of the MR's head pipeline stand in for GitHub's checks.
 export async function fetchPullRequestDetailsFromGlab(
-	execGlab: ExecGh,
+	execGlab: ExecGlab,
 	repository: GitLabRepository,
 	number: number,
 ) {
@@ -621,7 +622,7 @@ export async function fetchPullRequestDetailsFromGlab(
 				: mr.detailed_merge_status === "not_approved"
 					? ("REVIEW_REQUIRED" as const)
 					: null,
-		checks: isRecord(ci) ? asArray(ci.jobs).map(toJobCheck) : [],
+		checks: isRecord(ci) ? asArray(ci.jobs).map(toGitLabJobCheck) : [],
 		isInMergeQueue: null,
 	};
 }
