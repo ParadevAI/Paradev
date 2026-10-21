@@ -514,7 +514,8 @@ interface GitLabRepository {
 	url: string;
 }
 
-// A fork MR gets no head repo, so it never matches a workspace key.
+// GitLab's normalizePullRequest. An MR names its source project by id only, so
+// a fork MR gets no head repo and is never linked: forks are not supported.
 function normalizeMergeRequest(
 	raw: unknown,
 	repository: GitLabRepository,
@@ -611,6 +612,7 @@ export async function fetchPullRequestDetailsFromGlab(
 		]).catch(() => null),
 	]);
 	return {
+		// With no approval rule GitLab says `approved`, so also require an approver.
 		reviewDecision:
 			isRecord(approvals) &&
 			approvals.approved === true &&

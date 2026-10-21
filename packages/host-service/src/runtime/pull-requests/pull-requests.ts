@@ -1453,36 +1453,30 @@ export class PullRequestRuntimeManager {
 			head.repo.toLowerCase(),
 			head.branch,
 		].join("/");
-		if (repo.provider === "gitlab") {
-			return this.cachedGitHubFetch(
-				this.pullRequestHeadCache,
-				cacheKey,
-				options,
-				() => fetchPullRequestByHeadFromGlab(this.execGlab, repo, head),
-			);
-		}
 		return this.cachedGitHubFetch(
 			this.pullRequestHeadCache,
 			cacheKey,
 			options,
 			() =>
-				this.fetchFromGitHub(
-					"PR head lookup",
-					{ owner: repo.owner, name: repo.name, head },
-					() =>
-						fetchPullRequestByHeadFromGh(
-							this.execGh,
-							{ owner: repo.owner, name: repo.name },
-							head,
+				repo.provider === "gitlab"
+					? fetchPullRequestByHeadFromGlab(this.execGlab, repo, head)
+					: this.fetchFromGitHub(
+							"PR head lookup",
+							{ owner: repo.owner, name: repo.name, head },
+							() =>
+								fetchPullRequestByHeadFromGh(
+									this.execGh,
+									{ owner: repo.owner, name: repo.name },
+									head,
+								),
+							async () =>
+								fetchPullRequestByHead(
+									await this.github(),
+									{ owner: repo.owner, name: repo.name },
+									head,
+								),
+							{ probe: options.bypassCache === true },
 						),
-					async () =>
-						fetchPullRequestByHead(
-							await this.github(),
-							{ owner: repo.owner, name: repo.name },
-							head,
-						),
-					{ probe: options.bypassCache === true },
-				),
 		);
 	}
 
@@ -1500,19 +1494,18 @@ export class PullRequestRuntimeManager {
 			name: repo.name,
 			prNumber: node.number,
 		};
-		if (repo.provider === "gitlab") {
-			return this.cachedGitHubFetch(
-				this.pullRequestDetailsCache,
-				cacheKey,
-				{ ...options, fingerprint: node.headRefOid },
-				() => fetchPullRequestDetailsFromGlab(this.execGlab, repo, node.number),
-			);
-		}
 		return this.cachedGitHubFetch(
 			this.pullRequestDetailsCache,
 			cacheKey,
 			{ ...options, fingerprint: node.headRefOid },
 			async () => {
+				if (repo.provider === "gitlab") {
+					return fetchPullRequestDetailsFromGlab(
+						this.execGlab,
+						repo,
+						node.number,
+					);
+				}
 				const [reviewDecision, checks] = await this.fetchFromGitHub(
 					"PR review/check lookup",
 					context,
@@ -1583,6 +1576,8 @@ export class PullRequestRuntimeManager {
 		repo: NormalizedRepoIdentity,
 		options: { bypassCache?: boolean } = {},
 	): Promise<GitHubPullRequestNode[]> {
+		// No GitLab sweep yet. GitLab's branch filter is also case-sensitive, so a
+		// branch whose case drifted from its MR stays unlinked.
 		if (repo.provider === "gitlab") return [];
 		const cacheKey = `${repo.owner.toLowerCase()}/${repo.name.toLowerCase()}`;
 		return this.cachedGitHubFetch(
