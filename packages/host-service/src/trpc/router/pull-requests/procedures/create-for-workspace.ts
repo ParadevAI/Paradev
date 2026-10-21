@@ -69,17 +69,17 @@ export const createForWorkspace = protectedProcedure
 			});
 		}
 
-		const project = await ctx.runtime.pullRequests.getProjectRepository(
+		const gitlab = await ctx.runtime.pullRequests.getGitLabRepository(
 			workspace.projectId,
 		);
-		if (project?.provider === "gitlab") {
+		if (gitlab) {
 			const output = String(
 				await execGlab(
 					[
 						"mr",
 						"create",
 						"-R",
-						project.url,
+						gitlab.url,
 						"-s",
 						head,
 						"-b",

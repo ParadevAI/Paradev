@@ -1060,7 +1060,14 @@ export class PullRequestRuntimeManager {
 		}
 	}
 
-	async getProjectRepository(
+	async getGitLabRepository(
+		projectId: string,
+	): Promise<NormalizedRepoIdentity | null> {
+		const repo = await this.getProjectRepository(projectId);
+		return repo?.provider === "gitlab" ? repo : null;
+	}
+
+	private async getProjectRepository(
 		projectId: string,
 	): Promise<NormalizedRepoIdentity | null> {
 		const project = this.db.query.projects
