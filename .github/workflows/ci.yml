@@ -179,6 +179,14 @@ jobs:
         run: |
           (
             set +e
+            echo "cgroup memory.max=$(cat /sys/fs/cgroup/memory.max 2>/dev/null || echo unknown)"
+            while true; do
+              echo "$(date -u +%T) $(free -m | awk '/Mem:/{print "used=" $3 "MB avail=" $7 "MB"}') load=$(cut -d' ' -f1 /proc/loadavg)"
+              sleep 2
+            done
+          ) > "$RUNNER_TEMP/test-memory.txt" 2>&1 &
+          (
+            set +e
             sleep 345
             {
               date -u
@@ -194,9 +202,13 @@ jobs:
           ) > /dev/null 2>&1 &
           timeout --kill-after=15 360 bun x turbo test test:integration:terminal --concurrency=4 --log-order=stream
 
-      - name: Show what a hung test run was blocked on
+      - name: Show what a hung or killed test run was blocked on
         if: failure() || cancelled()
         run: |
+          echo "== memory every 2s, last 40 samples"
+          if [ -f "$RUNNER_TEMP/test-memory.txt" ]; then tail -40 "$RUNNER_TEMP/test-memory.txt"; fi
+          echo "== kernel OOM kills"
+          sudo dmesg -T 2>/dev/null | grep -iE 'out of memory|oom-kill|killed process' || echo none
           if [ -f "$RUNNER_TEMP/test-hang.txt" ]; then cat "$RUNNER_TEMP/test-hang.txt"; fi
 
   page-storage:
