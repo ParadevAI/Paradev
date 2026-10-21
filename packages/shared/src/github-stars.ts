@@ -5,7 +5,7 @@
 // depending on the server package.
 
 import { COMPANY } from "./constants";
-import { parseGitHubRemote } from "./github-gitlab-remote";
+import { parseGitHubRemote } from "./github-remote";
 
 export interface StarHistoryPoint {
 	/** ISO date (yyyy-mm-dd), anchored at UTC midnight. */

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { parseGitLabRemote } from "./github-gitlab-remote";
+import { parseGitLabRemote } from "./gitlab-remote";
 
 describe("parseGitLabRemote", () => {
 	test.each([
