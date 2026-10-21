@@ -1663,9 +1663,9 @@ function deliverOutput(session: TerminalSession, bytes: Uint8Array) {
  * proven recipe; never synthesize screen content the tracker may not have
  * — #6290).
  *
- * The restore shrinks the width. cursor-agent's Ink renderer forces a
- * write only on a width decrease, so a row-only nudge leaves the pane
- * frozen on the frame it had when the tab was opened (#8733).
+ * The interim size is smaller than the live terminal. cursor-agent's Ink
+ * renderer forces a write on a width decrease, and a wider interim frame
+ * would wrap in the terminal that is still the old size (#8733).
  */
 function nudgeRepaint(session: TerminalSession) {
 	if (!isCurrentLiveSession(session)) return;

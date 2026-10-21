@@ -2,17 +2,17 @@ import { describe, expect, test } from "bun:test";
 import { repaintNudgeIntermediateSize } from "./repaint-nudge";
 
 describe("repaintNudgeIntermediateSize", () => {
-	test("grows both axes so the restore shrinks the width", () => {
+	test("shrinks both axes so the interim frame cannot wrap", () => {
 		expect(repaintNudgeIntermediateSize(80, 24)).toEqual({
-			cols: 81,
-			rows: 25,
+			cols: 79,
+			rows: 23,
 		});
 	});
 
-	test("still grows at the minimum terminal size", () => {
-		expect(repaintNudgeIntermediateSize(20, 5)).toEqual({
-			cols: 21,
-			rows: 6,
+	test("grows an axis that cannot shrink", () => {
+		expect(repaintNudgeIntermediateSize(1, 1)).toEqual({
+			cols: 2,
+			rows: 2,
 		});
 	});
 });
