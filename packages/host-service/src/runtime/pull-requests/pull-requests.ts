@@ -76,8 +76,6 @@ const SAFETY_NET_INTERVAL_MS = 5 * 60_000;
 // branch/HEAD/upstream changes. The 60s repo-PR cache deduplicates across
 // concurrent triggers.
 const PROJECT_REFRESH_INTERVAL_MS = 5 * 60_000;
-// A host glab learns later (`glab auth login`) is picked up within this.
-const GLAB_HOST_CHECK_TTL_MS = 5 * 60_000;
 // Sweeps outlive this cache on purpose: they revalidate through ConditionalGh,
 // and a 304 costs no rate limit. Raising it past the sweep only makes PRs staler.
 const REPO_PULL_REQUEST_CACHE_TTL_MS = 60_000;
@@ -234,10 +232,7 @@ export class PullRequestRuntimeManager {
 	private readonly git: GitFactory;
 	private readonly github: () => Promise<Octokit>;
 	private readonly execGlab: ExecGlab;
-	private readonly glabHosts = new Map<
-		string,
-		{ known: Promise<boolean>; checkedAt: number }
-	>();
+	private readonly glabHosts = new Set<string>();
 	private readonly gitWatcher: GitWatcher;
 	private safetyNetTimer: ReturnType<typeof setInterval> | null = null;
 	private projectRefreshTimer: ReturnType<typeof setInterval> | null = null;
@@ -1133,26 +1128,21 @@ export class PullRequestRuntimeManager {
 		return { ...identity, defaultBranch };
 	}
 
-	// glab knows a host when its config has an API host for it: a local read,
-	// cached so a refresh spawns nothing for a host seen recently.
-	private isGlabHost({ owner }: { owner: string }): Promise<boolean> {
+	// glab knows a host when its config has an API host for it (a local read).
+	// Only known hosts are kept, so a host added later shows at the next refresh.
+	private async isGlabHost({ owner }: { owner: string }): Promise<boolean> {
 		const host = owner.slice(0, owner.indexOf("/"));
-		const cached = this.glabHosts.get(host);
-		if (cached && Date.now() - cached.checkedAt < GLAB_HOST_CHECK_TTL_MS) {
-			return cached.known;
-		}
-		const known = this.execGlab([
+		if (this.glabHosts.has(host)) return true;
+		const apiHost = await this.execGlab([
 			"config",
 			"get",
 			"api_host",
 			"--host",
 			host,
-		]).then(
-			(apiHost) => typeof apiHost === "string" && apiHost !== "",
-			() => false,
-		);
-		this.glabHosts.set(host, { known, checkedAt: Date.now() });
-		return known;
+		]).catch(() => "");
+		if (typeof apiHost !== "string" || apiHost === "") return false;
+		this.glabHosts.add(host);
+		return true;
 	}
 
 	// Shared origin/HEAD resolver; a repo-open failure disables the guard

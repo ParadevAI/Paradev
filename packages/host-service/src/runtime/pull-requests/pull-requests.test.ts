@@ -2569,7 +2569,7 @@ describe("GitLab through glab", () => {
 		expect(db.select().from(schema.projects).get()?.repoProvider).toBeNull();
 	});
 
-	test("asks glab once about an unknown host and looks up no MR", async () => {
+	test("asks glab again about an unknown host and looks up no MR", async () => {
 		const db = createRealDb();
 		db.insert(schema.projects)
 			.values({ id: PROJECT_ID, repoPath: "/repo", createdAt: Date.now() })
@@ -2600,6 +2600,7 @@ describe("GitLab through glab", () => {
 		await manager.refreshPullRequestsByWorkspaces(["ws"]);
 
 		expect(glabCalls).toEqual([
+			["config", "get", "api_host", "--host", "git.example.com"],
 			["config", "get", "api_host", "--host", "git.example.com"],
 		]);
 		expect(getWorkspace(db, "ws")?.pullRequestId).toBeNull();
