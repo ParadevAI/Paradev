@@ -15,11 +15,11 @@ import { FcGoogle } from "react-icons/fc";
 import { Redirect } from "renderer/components/Redirect";
 import { env } from "renderer/env.renderer";
 import { useDelayElapsed } from "renderer/hooks/useDelayElapsed";
+import { useSessionRecovery } from "renderer/hooks/useSessionRecovery";
 import { track } from "renderer/lib/analytics";
 import { setAuthToken } from "renderer/lib/auth-client";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { SupersetLogo } from "./components/SupersetLogo";
-import { useSessionRecovery } from "./hooks/useSessionRecovery";
 
 export const Route = createFileRoute("/sign-in/")({
 	component: SignInPage,
