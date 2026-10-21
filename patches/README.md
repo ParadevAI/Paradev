@@ -144,6 +144,13 @@ were built from):
    replaces the array. Still present on upstream master; the render-debouncer
    guard test reproduces it.
 
+6. `IModes.mouseEncoding` (also `src/browser/public/Terminal.ts` and
+   `typings/xterm.d.ts`): `terminal.modes` reports the active mouse encoding
+   (`'default' | 'sgr' | 'sgr-pixels'`), so `@xterm/addon-serialize` can
+   restore it. Backported from
+   [xterm.js #6174](https://github.com/xtermjs/xterm.js/pull/6174), commit
+   `793883591` (open, not yet released). See the addon-serialize section below.
+
 **IME removal condition:** Follow-up: [Superset #7490](https://github.com/superset-sh/superset/issues/7490). Track [upstream fix #6162](https://github.com/xtermjs/xterm.js/pull/6162)
 and [upstream issue #6161](https://github.com/xtermjs/xterm.js/issues/6161).
 An upstream merge alone is not enough: wait for a published xterm version
@@ -210,13 +217,48 @@ bun patch @xterm/addon-webgl@<new-version>
 cp "$XTERM"/addons/addon-webgl/lib/addon-webgl.{js,mjs} node_modules/@xterm/addon-webgl/lib/
 cp "$XTERM"/addons/addon-webgl/<changed src files> node_modules/@xterm/addon-webgl/src/...
 bun patch --commit 'node_modules/@xterm/addon-webgl'
-bun test apps/desktop/src/xterm-flushsync-patch.test.ts apps/desktop/src/xterm-render-debouncer-patch.test.ts apps/desktop/src/xterm-ime-patch.test.ts apps/desktop/src/webgl-atlas-patch.test.ts apps/desktop/src/xterm-ligatures-patch.test.ts
+bun patch @xterm/addon-serialize@<new-version>
+(cd "$XTERM"/addons/addon-serialize && npx webpack)   # lib/addon-serialize.js
+cp "$XTERM"/addons/addon-serialize/lib/addon-serialize.{js,mjs} node_modules/@xterm/addon-serialize/lib/
+cp "$XTERM"/addons/addon-serialize/src/SerializeAddon.ts node_modules/@xterm/addon-serialize/src/
+bun patch --commit 'node_modules/@xterm/addon-serialize'
+# bun patch --commit can record a .bun-tag-* file; drop that hunk from the patch.
+bun test apps/desktop/src/xterm-flushsync-patch.test.ts apps/desktop/src/xterm-render-debouncer-patch.test.ts apps/desktop/src/xterm-ime-patch.test.ts apps/desktop/src/webgl-atlas-patch.test.ts apps/desktop/src/xterm-ligatures-patch.test.ts apps/desktop/src/xterm-serialize-mouse-encoding-patch.test.ts
 ```
+
+Use a real `node_modules` from `npm ci`. A symlinked one changes webpack's
+module ids, and `lib/xterm.js` no longer matches npm.
 
 `@xterm/*` is in `minimumReleaseAgeExcludes` in `bunfig.toml`, so a beta can be
 taken the day it ships; this rebuild is the review. Every `@xterm/*` version
 moves together (sherif), and `apps/mobile` needs
 `bun run scripts/generate-terminal-html.ts`.
+
+## @xterm/addon-serialize (`@xterm%2Faddon-serialize@<version>.patch`)
+
+**Why:** `serialize()` restores mouse tracking (`?1000h`/`?1002h`/`?1003h`)
+but not the mouse encoding (`?1006h` SGR, `?1016h` SGR-pixels). The mobile
+terminal repaints a pooled session from `serialize()` when you switch tabs,
+so the display came back with the default encoding. xterm emits those
+reports through `onBinary`, and Codex, which arms SGR once at startup, stopped
+scrolling after a tab switch until the session was reopened. Claude Code
+re-arms SGR on redraw, so it hid the bug.
+
+**What it changes** (`lib/addon-serialize.js`, `lib/addon-serialize.mjs`,
+`src/SerializeAddon.ts`): the mode preamble writes `?1006h` or `?1016h` from
+`terminal.modes.mouseEncoding` (xterm hunk 6). With an unpatched xterm the
+field is undefined and nothing is written. Backported from
+[xterm.js #6174](https://github.com/xtermjs/xterm.js/pull/6174).
+
+**Guard test:** `apps/desktop/src/xterm-serialize-mouse-encoding-patch.test.ts`
+round-trips each encoding through `serialize()` into a fresh terminal.
+
+**Regenerating:** part of the xterm procedure above; both packages build from
+the same upstream commit.
+
+**Removing:** once a published xterm and addon-serialize carry #6174, drop
+this patch, xterm hunk 6, and the `patchedDependencies` entry. Keep the guard
+test.
 
 ## @xterm/addon-ligatures (`@xterm%2Faddon-ligatures@<version>.patch`)
 
