@@ -485,6 +485,69 @@ describe("AcpAdapter", () => {
 		await adapter.dispose();
 	});
 
+	it("holds a steer until a running compaction settles", async () => {
+		const agent = new FakeAcpAgent();
+		agent.steeringOutcome = "injected";
+		agent.holdPrompts = true;
+		const { adapter } = startAdapter(agent);
+		await flush();
+		adapter.prompt([{ type: "text", text: "first" }]);
+		await flush();
+		const compaction = {
+			toolCallId: "compact-1",
+			_meta: { jetbrains: { air: { contextCompaction: { version: 1 } } } },
+		};
+		agent.notify("sess-1", {
+			sessionUpdate: "tool_call",
+			title: "Compact conversation",
+			kind: "think",
+			status: "in_progress",
+			...compaction,
+		});
+		await flush();
+
+		let steered: boolean | undefined;
+		void adapter.steer([{ type: "text", text: "and this" }]).then((taken) => {
+			steered = taken;
+		});
+		await flush();
+		expect(agent.sent.map((f) => f.method)).not.toContain("_session/steering");
+
+		agent.notify("sess-1", {
+			sessionUpdate: "tool_call_update",
+			status: "completed",
+			...compaction,
+		});
+		await flush();
+		expect(steered).toBe(true);
+		expect(agent.sent.at(-1)).toMatchObject({ method: "_session/steering" });
+		await adapter.dispose();
+	});
+
+	it("does not steer into a turn that ended during its compaction", async () => {
+		const agent = new FakeAcpAgent();
+		agent.steeringOutcome = "injected";
+		agent.holdPrompts = true;
+		const { adapter } = startAdapter(agent);
+		await flush();
+		adapter.prompt([{ type: "text", text: "first" }]);
+		await flush();
+		agent.notify("sess-1", {
+			sessionUpdate: "tool_call",
+			toolCallId: "compact-1",
+			title: "Compact conversation",
+			status: "in_progress",
+			_meta: { claudeCode: { toolName: "compact" } },
+		});
+		await flush();
+
+		const steered = adapter.steer([{ type: "text", text: "and this" }]);
+		agent.releasePrompts("end_turn");
+		expect(await steered).toBe(false);
+		expect(agent.sent.map((f) => f.method)).not.toContain("_session/steering");
+		await adapter.dispose();
+	});
+
 	it("does not steer an agent that does not advertise it", async () => {
 		const agent = new FakeAcpAgent();
 		agent.holdPrompts = true;
