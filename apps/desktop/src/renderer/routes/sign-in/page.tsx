@@ -46,7 +46,7 @@ function SignInPage() {
 	const [devError, setDevError] = useState<string | null>(null);
 	const [lastUsedMethod, setLastUsedMethod] = useState(readLastUsedMethod);
 	const recovery = useSessionRecovery();
-	const { hasLocalToken, session } = recovery;
+	const { session } = recovery;
 	const signOut = useSignOut();
 
 	return (
@@ -167,11 +167,7 @@ function SignInPage() {
 										<Trans>Welcome to Superset</Trans>
 									</h1>
 									<p className="text-sm text-muted-foreground">
-										{hasLocalToken ? (
-											<Trans>Restoring your session</Trans>
-										) : (
-											<Trans>Sign in to get started</Trans>
-										)}
+										<Trans>Sign in to get started</Trans>
 									</p>
 								</div>
 
