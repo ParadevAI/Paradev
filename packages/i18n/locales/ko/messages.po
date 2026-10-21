@@ -16375,6 +16375,9 @@ msgstr "페이지가 완성될 때까지 3단계와 4단계를 반복합니다."
 msgid "Still can't reach the host."
 msgstr "아직 호스트에 연결할 수 없습니다."
 
+msgid "Still restoring your session"
+msgstr "아직 세션을 복원하는 중입니다"
+
 msgid "Still trying. If it keeps failing, archive it and create a new one."
 msgstr "계속 시도하는 중입니다. 계속 실패하면 보관하고 새로 만드세요."
 
@@ -16547,6 +16550,9 @@ msgstr "Superset 자동화"
 
 msgid "superset browser cdp prints an endpoint for that pane only. Point Playwright or browser-use at it."
 msgstr "superset browser cdp는 해당 패널 전용 엔드포인트만 출력합니다. Playwright나 browser-use를 여기에 연결하세요."
+
+msgid "Superset can't confirm your sign-in with the server."
+msgstr "Superset이 서버에서 로그인 상태를 확인할 수 없습니다."
 
 msgid "Superset CLI"
 msgstr "Superset CLI"

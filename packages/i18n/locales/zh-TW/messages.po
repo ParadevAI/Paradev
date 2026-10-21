@@ -16375,6 +16375,9 @@ msgstr "步驟 3 和 4 會重複，直到頁面滿意為止。"
 msgid "Still can't reach the host."
 msgstr "仍然無法連線到主機。"
 
+msgid "Still restoring your session"
+msgstr "仍在還原您的工作階段"
+
 msgid "Still trying. If it keeps failing, archive it and create a new one."
 msgstr "仍在重試。如果一直失敗，封存它，再建一個。"
 
@@ -16547,6 +16550,9 @@ msgstr "Superset 自動化"
 
 msgid "superset browser cdp prints an endpoint for that pane only. Point Playwright or browser-use at it."
 msgstr "superset browser cdp 只會輸出該窗格專屬的端點。讓 Playwright 或 browser-use 連接它即可。"
+
+msgid "Superset can't confirm your sign-in with the server."
+msgstr "Superset 無法向伺服器確認您的登入狀態。"
 
 msgid "Superset CLI"
 msgstr "Superset CLI"

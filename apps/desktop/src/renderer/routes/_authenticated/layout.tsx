@@ -1,6 +1,5 @@
 import { WorkerPoolContextProvider } from "@pierre/diffs/react";
 import { Button } from "@superset/ui/button";
-import { Spinner } from "@superset/ui/spinner";
 import {
 	createFileRoute,
 	Outlet,
@@ -8,16 +7,14 @@ import {
 	useNavigate,
 	useRouterState,
 } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { DndProvider } from "react-dnd";
 import { HiOutlineWifi } from "react-icons/hi2";
 import { NewWorkspaceModal } from "renderer/components/NewWorkspaceModal";
 import { Paywall } from "renderer/components/Paywall";
 import { Redirect } from "renderer/components/Redirect";
 import { env } from "renderer/env.renderer";
-import { useDelayElapsed } from "renderer/hooks/useDelayElapsed";
 import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
-import { useOnlineStatus } from "renderer/hooks/useOnlineStatus";
 import { useSessionRecovery } from "renderer/hooks/useSessionRecovery";
 import { useSettingsExternalChangeListener } from "renderer/hooks/useSettingsExternalChangeListener";
 import { useSignOut } from "renderer/hooks/useSignOut";
@@ -45,6 +42,7 @@ import {
 import { V1ImportModal } from "renderer/routes/_authenticated/components/V1ImportModal";
 import { useForwardedHotkeys } from "renderer/routes/_authenticated/hooks/useForwardedHotkeys";
 import { useZoomHotkeys } from "renderer/routes/_authenticated/hooks/useZoomHotkeys";
+import { SessionRecoveryBoundary } from "renderer/routes/components/SessionRecoveryBoundary";
 import { WorkspaceInitEffects } from "renderer/screens/main/components/WorkspaceInitEffects";
 import { useSettingsStore } from "renderer/stores/settings-state";
 import { useTabsStore } from "renderer/stores/tabs/store";
@@ -79,18 +77,9 @@ const createOrganizationRedirect = (
 );
 const onboardingRedirect = <Redirect to="/onboarding" replace />;
 
-const SESSION_PENDING_TIMEOUT_MS = 15_000;
-
 function AuthenticatedLayout() {
-	const {
-		session,
-		hasLocalToken,
-		isPending,
-		isRefetching,
-		isRecovering,
-		refetch,
-	} = useSessionRecovery();
-	const isOnline = useOnlineStatus();
+	const recovery = useSessionRecovery();
+	const { session, hasLocalToken, isOnline, refetch } = recovery;
 	const navigate = useNavigate();
 	const location = useLocation();
 	// The onboarding gate below must key off the route being RENDERED, not
@@ -112,17 +101,7 @@ function AuthenticatedLayout() {
 		? MOCK_ORG_ID
 		: session?.session?.activeOrganizationId;
 
-	const isAuthPending =
-		(isPending ||
-			isRecovering ||
-			(isRefetching && !session?.user && hasLocalToken)) &&
-		!env.SKIP_ENV_VALIDATION;
-	const authPendingTimedOut = useDelayElapsed(
-		isAuthPending,
-		SESSION_PENDING_TIMEOUT_MS,
-	);
 	const signOut = useSignOut();
-	const [isSigningOut, setIsSigningOut] = useState(false);
 
 	useAgentHookListener();
 	useSettingsExternalChangeListener();
@@ -219,145 +198,128 @@ function AuthenticatedLayout() {
 		},
 	});
 
-	// Never redirect while the session is unresolved — a redirect held open
-	// across re-renders loops the router until the renderer OOMs (#5729).
-	if (isAuthPending) {
-		return (
-			<div className="relative flex h-screen w-screen flex-col items-center justify-center gap-4 bg-background">
-				<div className="drag absolute inset-x-0 top-0 h-12" />
-				<Spinner className="size-8" />
-				{authPendingTimedOut && (
-					<>
-						<div className="text-center select-text cursor-text">
-							<h2 className="text-lg font-medium">
-								Still restoring your session
-							</h2>
-							<p className="text-sm text-muted-foreground">
-								Superset can't confirm your sign-in with the server.
-							</p>
-						</div>
-						<div className="flex gap-2">
+	return (
+		<SessionRecoveryBoundary
+			recovery={recovery}
+			mode="authenticated"
+			bypassAuth={env.SKIP_ENV_VALIDATION}
+			onSignOut={async () => {
+				try {
+					await signOut();
+				} finally {
+					void navigate({ to: "/sign-in", replace: true });
+				}
+			}}
+		>
+			{() => {
+				if (!isSignedIn && hasLocalToken && !isOnline) {
+					return (
+						<div className="relative flex h-screen w-screen flex-col items-center justify-center gap-4 bg-background">
+							<div className="drag absolute inset-x-0 top-0 h-12" />
+							<HiOutlineWifi className="size-12 text-muted-foreground" />
+							<div className="text-center">
+								<h2 className="text-lg font-medium">You're offline</h2>
+								<p className="text-sm text-muted-foreground">
+									Connect to the internet to continue
+								</p>
+							</div>
 							<Button variant="outline" size="sm" onClick={() => refetch()}>
 								Retry
 							</Button>
-							<Button
-								variant="outline"
-								size="sm"
-								disabled={isSigningOut}
-								onClick={async () => {
-									setIsSigningOut(true);
-									try {
-										await signOut();
-									} finally {
-										void navigate({ to: "/sign-in", replace: true });
-									}
-								}}
-							>
-								Sign out
-							</Button>
 						</div>
-					</>
-				)}
-			</div>
-		);
-	}
+					);
+				}
 
-	if (!isSignedIn && hasLocalToken && !isOnline) {
-		return (
-			<div className="relative flex h-screen w-screen flex-col items-center justify-center gap-4 bg-background">
-				<div className="drag absolute inset-x-0 top-0 h-12" />
-				<HiOutlineWifi className="size-12 text-muted-foreground" />
-				<div className="text-center">
-					<h2 className="text-lg font-medium">You're offline</h2>
-					<p className="text-sm text-muted-foreground">
-						Connect to the internet to continue
-					</p>
-				</div>
-				<Button variant="outline" size="sm" onClick={() => refetch()}>
-					Retry
-				</Button>
-			</div>
-		);
-	}
+				if (!isSignedIn) {
+					return signInRedirect;
+				}
 
-	if (!isSignedIn) {
-		return signInRedirect;
-	}
+				if (session?.user?.deletionRequestedAt) {
+					return (
+						<PendingDeletionScreen
+							deletionRequestedAt={session.user.deletionRequestedAt}
+							onReactivated={() => void refetch()}
+						/>
+					);
+				}
 
-	if (session?.user?.deletionRequestedAt) {
-		return (
-			<PendingDeletionScreen
-				deletionRequestedAt={session.user.deletionRequestedAt}
-				onReactivated={() => void refetch()}
-			/>
-		);
-	}
+				if (!activeOrganizationId) {
+					return createOrganizationRedirect;
+				}
 
-	if (!activeOrganizationId) {
-		return createOrganizationRedirect;
-	}
+				if (
+					session?.user &&
+					!session.user.onboardedAt &&
+					!renderedPathname.startsWith("/onboarding")
+				) {
+					return onboardingRedirect;
+				}
 
-	if (
-		session?.user &&
-		!session.user.onboardedAt &&
-		!renderedPathname.startsWith("/onboarding")
-	) {
-		return onboardingRedirect;
-	}
-
-	return (
-		<DndProvider manager={dragDropManager}>
-			<CollectionsProvider>
-				<WindowTitle />
-				<GlobalBrowserLifecycle />
-				<GlobalPaneLayoutRequests />
-				<FileAutoSave />
-				<LocalHostServiceProvider>
-					{/* Above the workspace fan-out: it needs sandbox addresses to
+				return (
+					<DndProvider manager={dragDropManager}>
+						<CollectionsProvider>
+							<WindowTitle />
+							<GlobalBrowserLifecycle />
+							<GlobalPaneLayoutRequests />
+							<FileAutoSave />
+							<LocalHostServiceProvider>
+								{/* Above the workspace fan-out: it needs sandbox addresses to
 					    include them as hosts. */}
-					<SandboxAccessProvider>
-						<HostWorkspacesProvider>
-							<WorkerPoolContextProvider
-								poolOptions={{ workerFactory: createPierreWorker, poolSize: 8 }}
-								highlighterOptions={{ preferredHighlighter: "shiki-wasm" }}
-							>
-								<DiffThemeSync />
-								<AgentHooks />
-								<FileMenuListener />
-								<V2NotificationController />
-								<DockBadgeController />
-								<StarNagObserver />
-								<LeaderboardAutoPublish />
-								<RealtimeNudges />
-								<DaemonAutoUpdateFailureDialog />
-								<Outlet />
-								<V1ImportModal />
-								{isV2CloudEnabled ? (
-									<>
-										<V1MigrationContinuity />
-										<V2FlipWelcome organizationId={activeOrganizationId} />
-										<V1MigrationStatusCard
-											organizationId={activeOrganizationId}
-										/>
-										<V1TerminalsNotice organizationId={activeOrganizationId} />
-									</>
-								) : (
-									<V1FlipNotice />
-								)}
-								<V1AutoMigration />
-								<WorkspaceInitEffects />
-								{/* v2 creates from the /new-workspace route; only v1 has a modal. */}
-								{!isV2CloudEnabled && <NewWorkspaceModal />}
-								<InitGitDialog />
-								<GitInitConfirmDialog />
-								<TeardownLogsDialog />
-								<Paywall />
-								<InviteMemberDialog />
-							</WorkerPoolContextProvider>
-						</HostWorkspacesProvider>
-					</SandboxAccessProvider>
-				</LocalHostServiceProvider>
-			</CollectionsProvider>
-		</DndProvider>
+								<SandboxAccessProvider>
+									<HostWorkspacesProvider>
+										<WorkerPoolContextProvider
+											poolOptions={{
+												workerFactory: createPierreWorker,
+												poolSize: 8,
+											}}
+											highlighterOptions={{
+												preferredHighlighter: "shiki-wasm",
+											}}
+										>
+											<DiffThemeSync />
+											<AgentHooks />
+											<FileMenuListener />
+											<V2NotificationController />
+											<DockBadgeController />
+											<StarNagObserver />
+											<LeaderboardAutoPublish />
+											<RealtimeNudges />
+											<DaemonAutoUpdateFailureDialog />
+											<Outlet />
+											<V1ImportModal />
+											{isV2CloudEnabled ? (
+												<>
+													<V1MigrationContinuity />
+													<V2FlipWelcome
+														organizationId={activeOrganizationId}
+													/>
+													<V1MigrationStatusCard
+														organizationId={activeOrganizationId}
+													/>
+													<V1TerminalsNotice
+														organizationId={activeOrganizationId}
+													/>
+												</>
+											) : (
+												<V1FlipNotice />
+											)}
+											<V1AutoMigration />
+											<WorkspaceInitEffects />
+											{/* v2 creates from the /new-workspace route; only v1 has a modal. */}
+											{!isV2CloudEnabled && <NewWorkspaceModal />}
+											<InitGitDialog />
+											<GitInitConfirmDialog />
+											<TeardownLogsDialog />
+											<Paywall />
+											<InviteMemberDialog />
+										</WorkerPoolContextProvider>
+									</HostWorkspacesProvider>
+								</SandboxAccessProvider>
+							</LocalHostServiceProvider>
+						</CollectionsProvider>
+					</DndProvider>
+				);
+			}}
+		</SessionRecoveryBoundary>
 	);
 }

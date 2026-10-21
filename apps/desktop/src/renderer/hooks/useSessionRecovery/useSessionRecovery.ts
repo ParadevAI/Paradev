@@ -156,6 +156,7 @@ export function useSessionRecoveryState(
 
 	return {
 		hasLocalToken,
+		isOnline,
 		isPending,
 		isRefetching,
 		isRecovering,

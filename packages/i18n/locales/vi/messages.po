@@ -16375,6 +16375,9 @@ msgstr "Bước 3 và 4 lặp lại cho đến khi trang ổn."
 msgid "Still can't reach the host."
 msgstr "Vẫn không thể kết nối tới host."
 
+msgid "Still restoring your session"
+msgstr "Vẫn đang khôi phục phiên của bạn"
+
 msgid "Still trying. If it keeps failing, archive it and create a new one."
 msgstr "Vẫn đang thử. Nếu tiếp tục lỗi, hãy lưu trữ nó và tạo cái mới."
 
@@ -16547,6 +16550,9 @@ msgstr "Tự động hóa Superset"
 
 msgid "superset browser cdp prints an endpoint for that pane only. Point Playwright or browser-use at it."
 msgstr "superset browser cdp in ra endpoint chỉ cho ngăn đó. Trỏ Playwright hoặc browser-use vào đó."
+
+msgid "Superset can't confirm your sign-in with the server."
+msgstr "Superset không thể xác nhận trạng thái đăng nhập của bạn với máy chủ."
 
 msgid "Superset CLI"
 msgstr "Superset CLI"
