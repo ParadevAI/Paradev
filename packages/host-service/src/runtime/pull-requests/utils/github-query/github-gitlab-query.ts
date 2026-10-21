@@ -571,10 +571,13 @@ const GITLAB_JOB_CONCLUSIONS: Record<string, string> = {
 
 function toJobCheck(job: unknown): GitHubCheckContextNode {
 	if (!isRecord(job)) return null;
+	// A manual job blocks the pipeline unless it may fail; only then is it skipped.
 	const conclusion =
-		job.status === "failed" && job.allow_failure === true
-			? "NEUTRAL"
-			: (GITLAB_JOB_CONCLUSIONS[String(job.status)] ?? null);
+		job.allow_failure !== true && job.status === "manual"
+			? null
+			: job.allow_failure === true && job.status === "failed"
+				? "NEUTRAL"
+				: (GITLAB_JOB_CONCLUSIONS[String(job.status)] ?? null);
 	return {
 		__typename: "CheckRun",
 		name: String(job.name),
@@ -609,7 +612,9 @@ export async function fetchPullRequestDetailsFromGlab(
 	]);
 	return {
 		reviewDecision:
-			isRecord(approvals) && asArray(approvals.approved_by).length > 0
+			isRecord(approvals) &&
+			approvals.approved === true &&
+			asArray(approvals.approved_by).length > 0
 				? ("APPROVED" as const)
 				: mr.detailed_merge_status === "not_approved"
 					? ("REVIEW_REQUIRED" as const)
