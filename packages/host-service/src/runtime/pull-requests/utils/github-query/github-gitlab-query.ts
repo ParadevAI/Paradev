@@ -561,48 +561,60 @@ export async function fetchPullRequestByHeadFromGlab(
 	);
 }
 
-const GITLAB_PIPELINE_CONCLUSIONS: Record<string, string> = {
+const GITLAB_JOB_CONCLUSIONS: Record<string, string> = {
 	success: "SUCCESS",
 	failed: "FAILURE",
 	canceled: "CANCELLED",
 	skipped: "SKIPPED",
+	manual: "SKIPPED",
 };
 
-// The MR's head pipeline stands in for GitHub's checks.
-export async function fetchPullRequestDetailsFromGlab(
-	execGlab: ExecGh,
-	repository: GitLabRepository,
-	number: number,
-) {
-	const raw = await execGlab([
-		"mr",
-		"view",
-		String(number),
-		"-R",
-		repository.url,
-		"-F",
-		"json",
-	]);
-	const mr = isRecord(raw) ? raw : {};
-	const pipeline = isRecord(mr.head_pipeline) ? mr.head_pipeline : null;
+function toJobCheck(job: unknown): GitHubCheckContextNode {
+	if (!isRecord(job)) return null;
 	const conclusion =
-		GITLAB_PIPELINE_CONCLUSIONS[String(pipeline?.status)] ?? null;
-	const check: GitHubCheckContextNode = {
+		job.status === "failed" && job.allow_failure === true
+			? "NEUTRAL"
+			: (GITLAB_JOB_CONCLUSIONS[String(job.status)] ?? null);
+	return {
 		__typename: "CheckRun",
-		name: "pipeline",
+		name: String(job.name),
 		conclusion,
-		detailsUrl: pipeline?.web_url ? String(pipeline.web_url) : null,
+		detailsUrl: job.web_url ? String(job.web_url) : null,
 		status: conclusion ? "COMPLETED" : "IN_PROGRESS",
 		startedAt: null,
 		completedAt: null,
 		checkSuite: null,
 	};
+}
+
+// The jobs of the MR's head pipeline stand in for GitHub's checks.
+export async function fetchPullRequestDetailsFromGlab(
+	execGlab: ExecGh,
+	repository: GitLabRepository,
+	number: number,
+) {
+	const glabJson = (...args: string[]) =>
+		execGlab([...args, "-R", repository.url, "-F", "json"]);
+	const raw = await glabJson("mr", "view", String(number));
+	const mr = isRecord(raw) ? raw : {};
+	const pipeline = isRecord(mr.head_pipeline) ? mr.head_pipeline : null;
+	const [ci, approvals] = await Promise.all([
+		pipeline ? glabJson("ci", "get", "-p", String(pipeline.id)) : null,
+		execGlab([
+			"api",
+			"--hostname",
+			new URL(String(mr.web_url)).host,
+			`projects/${mr.target_project_id}/merge_requests/${number}/approvals`,
+		]).catch(() => null),
+	]);
 	return {
 		reviewDecision:
-			mr.detailed_merge_status === "not_approved"
-				? ("REVIEW_REQUIRED" as const)
-				: null,
-		checks: pipeline ? [check] : [],
+			isRecord(approvals) && asArray(approvals.approved_by).length > 0
+				? ("APPROVED" as const)
+				: mr.detailed_merge_status === "not_approved"
+					? ("REVIEW_REQUIRED" as const)
+					: null,
+		checks: isRecord(ci) ? asArray(ci.jobs).map(toJobCheck) : [],
 		isInMergeQueue: null,
 	};
 }

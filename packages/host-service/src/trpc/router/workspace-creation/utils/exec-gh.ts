@@ -50,4 +50,13 @@ async function execCli(
 }
 
 export const execGh: ExecGh = (...args) => execCli("gh", ...args);
-export const execGlab: ExecGh = (...args) => execCli("glab", ...args);
+// glab prints its reason to stderr; execFile's message repeats the whole command.
+export const execGlab: ExecGh = (...args) =>
+	execCli("glab", ...args).catch((error) => {
+		const reason = String(error?.stderr ?? "")
+			.replace(/\s+/g, " ")
+			.trim();
+		throw reason
+			? new Error(reason.replace(/^ERROR /, ""), { cause: error })
+			: error;
+	});

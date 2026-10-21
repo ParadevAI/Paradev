@@ -2533,13 +2533,23 @@ describe("GitLab through glab", () => {
 						},
 					];
 				}
-				return {
-					detailed_merge_status: "not_approved",
-					head_pipeline: {
-						status: "failed",
-						web_url: "https://gitlab.example.com/p/9",
-					},
-				};
+				if (args[1] === "view") {
+					return {
+						web_url: webUrl,
+						target_project_id: 1,
+						detailed_merge_status: "not_approved",
+						head_pipeline: { id: 9 },
+					};
+				}
+				if (args[1] === "get") {
+					return {
+						jobs: [
+							{ name: "test", status: "failed" },
+							{ name: "lint", status: "failed", allow_failure: true },
+						],
+					};
+				}
+				return { approved_by: [] };
 			},
 		});
 
