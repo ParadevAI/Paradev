@@ -963,9 +963,6 @@ msgstr "{monthlyPrice} за пользователя в месяц при пом
 msgid "{months}mo ago"
 msgstr "{months} мес. назад"
 
-msgid "{multiple}× the cost of Medium"
-msgstr "{multiple}× стоимости среднего"
-
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "Ваши автоматизации с ошибкой при последнем запуске: {myFailedCount}"
 

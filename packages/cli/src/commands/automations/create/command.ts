@@ -46,7 +46,7 @@ export default command({
 		machineSize: string()
 			.enum(...MACHINE_SIZES)
 			.desc(
-				"Machine size of each run's new cloud workspace: `small`, `medium` (the default) or `large`; `xlarge` and `2xlarge` where your plan includes them. Each size costs twice the size below it. Implies --cloud",
+				"Machine size of each run's new cloud workspace: `small`, `medium` (the default) or `large`; `xlarge` and `2xlarge` where your plan includes them. Implies --cloud",
 			),
 		continueSession: boolean().desc(
 			"Deliver each run's prompt into the agent session the previous run left, instead of starting another. Requires --workspace",

@@ -963,9 +963,6 @@ msgstr "1ユーザーあたり月額{monthlyPrice}（月払い）、または{ye
 msgid "{months}mo ago"
 msgstr "{months}か月前"
 
-msgid "{multiple}× the cost of Medium"
-msgstr "中の {multiple} 倍のコスト"
-
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "自分のオートメーションのうち{myFailedCount}件が前回の実行に失敗しました"
 

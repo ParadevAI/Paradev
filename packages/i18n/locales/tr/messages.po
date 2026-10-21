@@ -963,9 +963,6 @@ msgstr "Aylık faturalandırmada kullanıcı başına ayda {monthlyPrice}, yıll
 msgid "{months}mo ago"
 msgstr "{months}ay önce"
 
-msgid "{multiple}× the cost of Medium"
-msgstr "Ortanın {multiple}× maliyeti"
-
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "Otomasyonlarınızdan {myFailedCount} tanesi son çalıştırmasında başarısız oldu"
 

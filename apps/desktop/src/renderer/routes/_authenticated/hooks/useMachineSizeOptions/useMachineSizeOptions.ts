@@ -13,7 +13,6 @@ export interface MachineSizeOption {
 	size: MachineSize;
 	name: string;
 	spec: string;
-	cost: string;
 }
 
 const FALLBACK_SIZES = offeredMachineSizes([]);
@@ -41,17 +40,13 @@ export function useMachineSizeOptions(): {
 	return {
 		defaultSize: data?.defaultSize ?? defaultMachineSize(sizes),
 		options: sizes.map((size) => {
-			const { vcpus, memoryGb, costVsDefault } = machineSpec(size);
+			const { vcpus, memoryGb } = machineSpec(size);
 			const vcpuCount = formatNumber(vcpus);
 			const memory = formatNumber(memoryGb);
-			const multiple = formatNumber(costVsDefault, {
-				maximumFractionDigits: 1,
-			});
 			return {
 				size,
 				name: names[size],
 				spec: t({ message: `${vcpuCount} vCPU · ${memory} GB` }),
-				cost: t({ message: `${multiple}× the cost of Medium` }),
 			};
 		}),
 	};

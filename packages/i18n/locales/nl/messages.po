@@ -963,9 +963,6 @@ msgstr "{monthlyPrice} per gebruiker/mnd bij maandelijkse facturering, of {yearl
 msgid "{months}mo ago"
 msgstr "{months}mnd geleden"
 
-msgid "{multiple}× the cost of Medium"
-msgstr "{multiple}× de kosten van Middel"
-
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "Bij {myFailedCount} van je automatiseringen is de laatste run mislukt"
 

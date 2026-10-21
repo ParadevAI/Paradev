@@ -53,15 +53,10 @@ export function MachineSizePickerPill({
 						className="items-start gap-2"
 					>
 						<LuCpu className="mt-0.5 size-4 shrink-0" />
-						<span className="flex min-w-0 flex-1 flex-col">
-							<span className="flex items-baseline gap-1.5">
-								<span>{option.name}</span>
-								<span className="text-xs text-muted-foreground">
-									{option.spec}
-								</span>
-							</span>
+						<span className="flex min-w-0 flex-1 items-baseline gap-1.5">
+							<span>{option.name}</span>
 							<span className="text-xs text-muted-foreground">
-								{option.cost}
+								{option.spec}
 							</span>
 						</span>
 						{option.size === selected?.size && (

@@ -963,9 +963,6 @@ msgstr "{monthlyPrice} per pengguna/bln jika ditagih bulanan, atau {yearlyPrice}
 msgid "{months}mo ago"
 msgstr "{months}bln lalu"
 
-msgid "{multiple}× the cost of Medium"
-msgstr "{multiple}× biaya Sedang"
-
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "{myFailedCount} otomatisasi Anda gagal pada run terakhirnya"
 

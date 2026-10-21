@@ -963,9 +963,6 @@ msgstr "{monthlyPrice} per utente/mese con fatturazione mensile, o {yearlyPrice}
 msgid "{months}mo ago"
 msgstr "{months}me fa"
 
-msgid "{multiple}× the cost of Medium"
-msgstr "{multiple}× il costo di Media"
-
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "Tue automazioni con l'ultima esecuzione non riuscita: {myFailedCount}"
 

@@ -218,12 +218,7 @@ export function defaultMachineSize(
 export function machineSpec(size: MachineSize): {
 	vcpus: number;
 	memoryGb: number;
-	costVsDefault: number;
 } {
 	const vcpus = MACHINE_SIZE_VCPUS[size];
-	return {
-		vcpus,
-		memoryGb: vcpus * MEMORY_GB_PER_VCPU,
-		costVsDefault: vcpus / MACHINE_SIZE_VCPUS[DEFAULT_MACHINE_SIZE],
-	};
+	return { vcpus, memoryGb: vcpus * MEMORY_GB_PER_VCPU };
 }

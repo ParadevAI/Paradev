@@ -963,9 +963,6 @@ msgstr "{monthlyPrice} mỗi người/tháng khi thanh toán theo tháng, hoặc
 msgid "{months}mo ago"
 msgstr "{months} tháng trước"
 
-msgid "{multiple}× the cost of Medium"
-msgstr "{multiple}× chi phí của Vừa"
-
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "{myFailedCount} tự động hóa của bạn thất bại ở lần chạy gần nhất"
 

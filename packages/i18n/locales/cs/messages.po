@@ -963,9 +963,6 @@ msgstr "{monthlyPrice} na uživatele a měsíc při měsíční fakturaci, nebo 
 msgid "{months}mo ago"
 msgstr "před {months} měs."
 
-msgid "{multiple}× the cost of Medium"
-msgstr "{multiple}× cena střední"
-
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "Vaše automatizace s neúspěšným posledním během: {myFailedCount}"
 

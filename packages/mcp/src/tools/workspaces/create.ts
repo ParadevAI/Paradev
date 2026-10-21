@@ -80,7 +80,7 @@ export function register(server: McpServer): void {
 				.enum(MACHINE_SIZES)
 				.optional()
 				.describe(
-					"Cloud only: size of the machine. `small` (2 vCPU, 4 GB) for light work such as triage, review or answering questions; `medium` (4 vCPU, 8 GB) for most coding work and the default; `large` (8 vCPU, 16 GB) for big builds, large test suites or heavy compiles. `xlarge` and `2xlarge` only where the organization's plan includes them. Each size costs twice the size below it.",
+					"Cloud only: size of the machine. `small` (2 vCPU, 4 GB) for light work such as triage, review or answering questions; `medium` (4 vCPU, 8 GB) for most coding work and the default; `large` (8 vCPU, 16 GB) for big builds, large test suites or heavy compiles. `xlarge` and `2xlarge` only where the organization's plan includes them.",
 				),
 			branch: z
 				.string()

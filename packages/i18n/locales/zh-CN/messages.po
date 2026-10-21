@@ -963,9 +963,6 @@ msgstr "按月计费每用户每月 {monthlyPrice}，按年计费为 {yearlyPric
 msgid "{months}mo ago"
 msgstr "{months}个月前"
 
-msgid "{multiple}× the cost of Medium"
-msgstr "中型的 {multiple} 倍费用"
-
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "你有{myFailedCount}个自动化上次运行失败"
 

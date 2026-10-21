@@ -42,7 +42,7 @@ export default command({
 		machineSize: string()
 			.enum(...MACHINE_SIZES)
 			.desc(
-				"Machine size of each run's new cloud workspace: `small`, `medium` (the default) or `large`; `xlarge` and `2xlarge` where your plan includes them. Each size costs twice the size below it. Only for a cloud automation",
+				"Machine size of each run's new cloud workspace: `small`, `medium` (the default) or `large`; `xlarge` and `2xlarge` where your plan includes them. Only for a cloud automation",
 			),
 		continueSession: boolean().desc(
 			"Continue the agent session the previous run left (--continue-session) or start a new one each run (--no-continue-session). Requires a pinned workspace",

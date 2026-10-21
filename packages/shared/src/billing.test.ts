@@ -188,12 +188,8 @@ describe("machine sizes", () => {
 		expect(defaultMachineSize(["large", "xlarge"])).toBe("large");
 	});
 
-	test("each size costs twice the size below it, measured against medium", () => {
-		expect(machineSpec("small")).toEqual({
-			vcpus: 2,
-			memoryGb: 4,
-			costVsDefault: 0.5,
-		});
-		expect(machineSpec("2xlarge").costVsDefault).toBe(8);
+	test("memory scales with vCPUs", () => {
+		expect(machineSpec("small")).toEqual({ vcpus: 2, memoryGb: 4 });
+		expect(machineSpec("2xlarge")).toEqual({ vcpus: 32, memoryGb: 64 });
 	});
 });
