@@ -22,9 +22,9 @@ provisions running indefinitely, and nothing in the product would ever have
 shown them.
 
 **An idle sandbox stops after its session timeout. Done, with a caveat.** A
-session ends four hours after its last extension. The workspace someone has
+session ends one hour after its last extension. The workspace someone has
 open extends it (every token refresh with `wake`), and so does the box while
-its agent is active, so a closed workspace stops within four hours of its
+its agent is active, so a closed workspace stops within an hour of its
 agent's last activity and costs snapshot storage only. Still owed: a per-org
 quota and cost visibility in the product. Work left running after a turn (a
 background shell, a dev server) dies with the session (Blaxel froze

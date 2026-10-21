@@ -448,7 +448,7 @@ the same: at 4 vCPU / 8 GB an agent that brought up the dev stack and an
 Electron instance took the VM down (2026-09-11).
 
 **A session ends; the sandbox does not.** A session stops at its timeout
-(`SESSION_TIMEOUT_MS`, four hours, extended while a workspace is open) or on
+(`SESSION_TIMEOUT_MS`, one hour, extended while in use) or on
 `stop()`, and the platform snapshots the filesystem. The next wake boots a
 new session from that snapshot with *no processes*: uncommitted files survive,
 a running agent does not. Blaxel froze the VM instead, processes intact. So
