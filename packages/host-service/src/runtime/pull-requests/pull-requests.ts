@@ -1179,6 +1179,24 @@ export class PullRequestRuntimeManager {
 			.sync();
 	}
 
+	findLinkedPullRequests(
+		owner: string,
+		name: string,
+		prNumber: number,
+	): { provider: string; url: string }[] {
+		return this.db
+			.select({ provider: pullRequests.repoProvider, url: pullRequests.url })
+			.from(pullRequests)
+			.where(
+				and(
+					eq(pullRequests.repoOwner, owner),
+					eq(pullRequests.repoName, name),
+					eq(pullRequests.prNumber, prNumber),
+				),
+			)
+			.all();
+	}
+
 	private findPullRequestRowById(id: string): PullRequestRow | undefined {
 		return this.db.query.pullRequests
 			.findFirst({ where: eq(pullRequests.id, id) })

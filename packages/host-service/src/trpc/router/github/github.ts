@@ -1,6 +1,8 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+import type { HostServiceContext } from "../../../types";
 import { protectedProcedure, router } from "../../index";
+import { execGlab } from "../workspace-creation/utils/exec-gh";
 import { createGithubWorkItemLoader } from "./work-item";
 
 const loadWorkItem = createGithubWorkItemLoader();
@@ -352,6 +354,22 @@ export const githubRouter = router({
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
+			const gitlab = gitlabProjectUrl(ctx, input);
+			if (gitlab) {
+				const method =
+					input.mergeMethod === "merge" ? [] : [`--${input.mergeMethod}`];
+				await execGlab([
+					"mr",
+					"merge",
+					String(input.pullNumber),
+					"-R",
+					gitlab,
+					"--auto-merge=false",
+					"--yes",
+					...method,
+				]);
+				return null;
+			}
 			const octokit = await ctx.github();
 			try {
 				const { data } = await octokit.pulls.merge({
@@ -375,6 +393,18 @@ export const githubRouter = router({
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
+			const gitlab = gitlabProjectUrl(ctx, input);
+			if (gitlab) {
+				await execGlab([
+					"mr",
+					"update",
+					String(input.pullNumber),
+					"-R",
+					gitlab,
+					"--ready",
+				]);
+				return;
+			}
 			const octokit = await ctx.github();
 			try {
 				const id = await pullRequestNodeId(octokit, input);
@@ -830,4 +860,26 @@ export function actionRejectionError(
 				cause: error,
 			});
 	}
+}
+
+// Callers send owner/repo/number only. A linked GitLab MR with that identity
+// is the one meant, unless a linked GitHub PR has the same identity.
+function gitlabProjectUrl(
+	ctx: HostServiceContext,
+	input: { owner: string; repo: string; pullNumber: number },
+): string | null {
+	const rows = ctx.runtime.pullRequests.findLinkedPullRequests(
+		input.owner,
+		input.repo,
+		input.pullNumber,
+	);
+	const gitlab = rows.find((row) => row.provider === "gitlab");
+	if (!gitlab) return null;
+	if (rows.some((row) => row.provider !== "gitlab")) {
+		throw new TRPCError({
+			code: "CONFLICT",
+			message: `${input.owner}/${input.repo}#${input.pullNumber} is both a GitHub PR and a GitLab MR on this host. Open it in the browser.`,
+		});
+	}
+	return gitlab.url.split("/-/")[0] ?? null;
 }

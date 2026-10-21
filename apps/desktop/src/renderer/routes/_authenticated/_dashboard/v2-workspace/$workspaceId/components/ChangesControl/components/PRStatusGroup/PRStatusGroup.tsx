@@ -31,7 +31,6 @@ import {
 	type OpenPullRequestPane,
 	openPullRequestLink,
 } from "renderer/lib/github/openPullRequestLink";
-import { pullRequestRefFromUrl } from "renderer/lib/github/pullRequestRef";
 import { computeChecksRollup } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/computeChecksStatus";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import { PRIcon, type PRState } from "renderer/screens/main/components/PRIcon";
@@ -205,16 +204,10 @@ export function PRStatusGroup({
 				: pr.state === "queued"
 					? "queued"
 					: "open";
-	// Merge and ready call GitHub by owner/repo, which a GitLab MR shares with
-	// any GitHub repo of the same name.
-	const isGitHubPr = pullRequestRefFromUrl(pr.url) !== null;
-	const canMerge = isGitHubPr && pr.state === "open" && !pr.isDraft;
+	const canMerge = pr.state === "open" && !pr.isDraft;
 	// A closed/merged draft can't transition to ready — GitHub rejects it.
 	const canMarkReady =
-		isGitHubPr &&
-		linkState === "draft" &&
-		pr.state !== "closed" &&
-		pr.state !== "merged";
+		linkState === "draft" && pr.state !== "closed" && pr.state !== "merged";
 	// Queued PRs are still actively running checks, so keep CI/review indicators.
 	const showIndicators = pr.state === "open" || pr.state === "queued";
 
