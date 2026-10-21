@@ -8,10 +8,8 @@ interface ResizablePanelProps {
 	width: number;
 	/** Callback when width changes */
 	onWidthChange: (width: number) => void;
-	/** Whether the panel is currently being resized */
-	isResizing: boolean;
-	/** Callback when resizing state changes */
-	onResizingChange: (isResizing: boolean) => void;
+	/** Called when a drag starts and ends. */
+	onResizingChange?: (isResizing: boolean) => void;
 	/** Minimum allowed width (used for clamping and aria) */
 	minWidth: number;
 	/** Maximum allowed width (used for clamping and aria) */
@@ -47,7 +45,6 @@ export function ResizablePanel({
 	children,
 	width,
 	onWidthChange,
-	isResizing,
 	onResizingChange,
 	minWidth,
 	maxWidth,
@@ -59,6 +56,15 @@ export function ResizablePanel({
 	disabled = false,
 	commitOnRelease = false,
 }: ResizablePanelProps) {
+	// Owned here rather than by the consumer: a drag start or end that set
+	// state in a large parent re-rendered the whole page on every click.
+	const [isResizing, setIsResizing] = useState(false);
+	const onResizingChangeRef = useRef(onResizingChange);
+	onResizingChangeRef.current = onResizingChange;
+	const setResizing = useCallback((next: boolean) => {
+		setIsResizing(next);
+		onResizingChangeRef.current?.(next);
+	}, []);
 	const [draftWidth, setDraftWidth] = useState<number | null>(null);
 	const [committedWidth, setCommittedWidth] = useState(width);
 	const draftWidthRef = useRef<number | null>(null);
@@ -103,9 +109,9 @@ export function ResizablePanel({
 			e.preventDefault();
 			startXRef.current = e.clientX;
 			startWidthRef.current = shownWidth;
-			onResizingChange(true);
+			setResizing(true);
 		},
-		[shownWidth, onResizingChange],
+		[shownWidth, setResizing],
 	);
 
 	const handleMouseMove = useCallback(
@@ -142,10 +148,10 @@ export function ResizablePanel({
 		if (commitOnRelease && draftWidthRef.current !== null) {
 			onWidthChange(draftWidthRef.current);
 		}
-		onResizingChange(false);
+		setResizing(false);
 	}, [
 		isResizing,
-		onResizingChange,
+		setResizing,
 		flushPendingWidth,
 		commitOnRelease,
 		onWidthChange,

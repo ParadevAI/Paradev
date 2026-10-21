@@ -15,10 +15,8 @@ interface WorkspaceSidebarState {
 	lastExpandedWidth: number;
 	// Use string[] instead of Set<string> for JSON serialization with Zustand persist
 	collapsedProjectIds: string[];
-	isResizing: boolean;
 
 	setWidth: (width: number) => void;
-	setIsResizing: (isResizing: boolean) => void;
 	toggleProjectCollapsed: (projectId: string) => void;
 	isProjectCollapsed: (projectId: string) => boolean;
 	toggleCollapsed: () => void;
@@ -32,7 +30,6 @@ export const useWorkspaceSidebarStore = create<WorkspaceSidebarState>()(
 				width: DEFAULT_WORKSPACE_SIDEBAR_WIDTH,
 				lastExpandedWidth: DEFAULT_WORKSPACE_SIDEBAR_WIDTH,
 				collapsedProjectIds: [],
-				isResizing: false,
 
 				setWidth: (width) => {
 					if (width < COLLAPSE_THRESHOLD) {
@@ -50,10 +47,6 @@ export const useWorkspaceSidebarStore = create<WorkspaceSidebarState>()(
 						width: clampedWidth,
 						lastExpandedWidth: clampedWidth,
 					});
-				},
-
-				setIsResizing: (isResizing) => {
-					set({ isResizing });
 				},
 
 				toggleProjectCollapsed: (projectId) => {
@@ -104,7 +97,6 @@ export const useWorkspaceSidebarStore = create<WorkspaceSidebarState>()(
 					width: state.width,
 					lastExpandedWidth: state.lastExpandedWidth,
 					collapsedProjectIds: state.collapsedProjectIds,
-					// isResizing intentionally excluded - ephemeral UI state
 				}),
 			},
 		),

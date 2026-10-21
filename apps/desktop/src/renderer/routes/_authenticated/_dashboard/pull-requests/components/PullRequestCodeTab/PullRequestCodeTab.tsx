@@ -218,7 +218,6 @@ export function PullRequestCodeTab({
 		(containerWidth != null &&
 			containerWidth < NARROW_PANE_WIDTH_HIDE_TREE_THRESHOLD);
 	const [treeWidth, setTreeWidth] = useState(DEFAULT_TREE_WIDTH);
-	const [isResizingTree, setIsResizingTree] = useState(false);
 	const [composer, setComposer] = useState<ComposerState | null>(null);
 	// Pierre's controlled `items` prop skips reprocessing an item whose
 	// `version` is unchanged from what it last saw (see the version comment
@@ -896,8 +895,6 @@ export function PullRequestCodeTab({
 					<ResizablePanel
 						width={treeWidth}
 						onWidthChange={setTreeWidth}
-						isResizing={isResizingTree}
-						onResizingChange={setIsResizingTree}
 						minWidth={MIN_TREE_WIDTH}
 						maxWidth={MAX_TREE_WIDTH}
 						handleSide="right"

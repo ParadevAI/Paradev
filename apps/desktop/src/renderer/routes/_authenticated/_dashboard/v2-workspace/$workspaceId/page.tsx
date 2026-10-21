@@ -5,7 +5,14 @@ import { cn } from "@superset/ui/utils";
 import { useWorkspaceClient, workspaceTrpc } from "@superset/workspace-client";
 import { createFileRoute } from "@tanstack/react-router";
 import { useFeatureFlagEnabled } from "posthog-js/react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+	useCallback,
+	useEffect,
+	useLayoutEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import { createPortal } from "react-dom";
 import { useQuickOpenStore } from "renderer/commandPalette/ui/QuickOpen/quickOpenStore";
 import { useWorkspaceHostTarget } from "renderer/hooks/host-service/useWorkspaceHostUrl";
@@ -562,16 +569,21 @@ function V2WorkspaceContent() {
 
 	const windowWidth = useWindowWidth();
 	const centerAreaRef = useRef<HTMLDivElement>(null);
+	// Tracked only while the right pane fills the window, the one state that
+	// reads it: observing it always re-rendered the page on every frame of a
+	// sidebar drag or ease.
 	const [centerAreaWidth, setCenterAreaWidth] = useState(0);
-	useEffect(() => {
+	useLayoutEffect(() => {
+		if (!showFullScreenRightPaneArea) return;
 		const element = centerAreaRef.current;
 		if (!element) return;
+		setCenterAreaWidth(element.getBoundingClientRect().width);
 		const observer = new ResizeObserver(([entry]) => {
 			if (entry) setCenterAreaWidth(entry.contentRect.width);
 		});
 		observer.observe(element);
 		return () => observer.disconnect();
-	}, []);
+	}, [showFullScreenRightPaneArea]);
 	const defaultRightPaneAreaWidth = Math.round(windowWidth * 0.4);
 	const maxRightPaneAreaWidth = Math.round(windowWidth * 0.75);
 	// Fallback for rows persisted before the rightSidebarWidth field existed —
@@ -589,16 +601,8 @@ function V2WorkspaceContent() {
 	const setSidebarWidth = isRightPaneAreaEnabled
 		? setRightPaneAreaWidth
 		: setRightSidebarWidth;
-	const [isSidebarResizing, setIsSidebarResizing] = useState(false);
 	const { onSidebarResizeDragging, onWorkspaceInteractionStateChange } =
 		useShellInteractionPassthrough({ sidebarOpen });
-	const handleSidebarResizingChange = useCallback(
-		(resizing: boolean) => {
-			setIsSidebarResizing(resizing);
-			onSidebarResizeDragging(resizing);
-		},
-		[onSidebarResizeDragging],
-	);
 
 	// The sidebar slot lives at the dashboard layout level (next to TopBar) so
 	// the sidebar runs full-height.
@@ -833,8 +837,7 @@ function V2WorkspaceContent() {
 										commitOnRelease
 										width={sidebarWidth}
 										onWidthChange={setSidebarWidth}
-										isResizing={isSidebarResizing}
-										onResizingChange={handleSidebarResizingChange}
+										onResizingChange={onSidebarResizeDragging}
 										minWidth={240}
 										maxWidth={
 											isRightPaneAreaEnabled ? maxRightPaneAreaWidth : 640

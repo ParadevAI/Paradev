@@ -15,14 +15,10 @@ export function WorkspaceSidebarPanel({
 }) {
 	const width = useWorkspaceSidebarStore((s) => s.width);
 	const setWidth = useWorkspaceSidebarStore((s) => s.setWidth);
-	const isResizing = useWorkspaceSidebarStore((s) => s.isResizing);
-	const setIsResizing = useWorkspaceSidebarStore((s) => s.setIsResizing);
 	return (
 		<ResizablePanel
 			width={width}
 			onWidthChange={setWidth}
-			isResizing={isResizing}
-			onResizingChange={setIsResizing}
 			minWidth={COLLAPSED_WORKSPACE_SIDEBAR_WIDTH}
 			maxWidth={MAX_WORKSPACE_SIDEBAR_WIDTH}
 			handleSide="right"
