@@ -25,6 +25,7 @@ import { cancelAndWaitWorkspaceTitleCommit } from "../../../workspaces/workspace
 import { protectedProcedure, queryProcedure, router } from "../../index";
 import { rethrowWorkerTaskAbort } from "../../worker-abort";
 import { resolveGithubRepo } from "../workspace-creation/shared/project-helpers";
+import { execGlab } from "../workspace-creation/utils/exec-glab";
 import type {
 	ChangedFile,
 	CheckConclusionState,
@@ -49,6 +50,11 @@ import {
 } from "./utils/git-helpers";
 import { gitStatusRefreshLimiter } from "./utils/git-status-refresh-limiter";
 import { gitStatusStore } from "./utils/git-status-store";
+import {
+	fetchGitLabThreads,
+	replyToGitLabThread,
+	setGitLabThreadResolution,
+} from "./utils/gitlab-discussions";
 import {
 	type GraphQLThreadsResult,
 	parseGraphQLThreads,
@@ -1061,6 +1067,23 @@ export const gitRouter = router({
 				});
 			}
 
+			const project =
+				pr.repoProvider === "gitlab" ? pr.url.split("/-/")[0] : undefined;
+			const gitlabJobId =
+				project && input.detailsUrl.startsWith(`${project}/-/jobs/`)
+					? input.detailsUrl.match(/\/-\/jobs\/(\d+)/)?.[1]
+					: undefined;
+			if (project && gitlabJobId) {
+				const logs = await execGlab(
+					["ci", "trace", gitlabJobId, "-R", project],
+					{
+						timeout: 30_000,
+						maxBuffer: 50 * 1024 * 1024,
+					},
+				);
+				return { logs: String(logs) };
+			}
+
 			// GitHub Actions check details URLs look like
 			// https://github.com/<owner>/<repo>/actions/runs/<run_id>/job/<job_id>
 			const isGithubUrl =
@@ -1114,6 +1137,7 @@ export const gitRouter = router({
 				});
 			}
 
+			if (pr.repoProvider === "gitlab") return fetchGitLabThreads(pr.url);
 			// Session workspaces (null projectId) have no GitHub remote.
 			if (workspace.projectId === null) {
 				return { reviewThreads: [], conversationComments: [] };
@@ -1209,6 +1233,16 @@ export const gitRouter = router({
 				});
 			}
 
+			const pr = workspace.pullRequestId
+				? ctx.db.query.pullRequests
+						.findFirst({ where: eq(pullRequests.id, workspace.pullRequestId) })
+						.sync()
+				: undefined;
+			if (pr?.repoProvider === "gitlab") {
+				await setGitLabThreadResolution(pr.url, input.threadId, input.resolved);
+				return { threadId: input.threadId, isResolved: input.resolved };
+			}
+
 			const octokit = await ctx.github();
 			const mutation = input.resolved
 				? `mutation($threadId: ID!) {
@@ -1267,6 +1301,9 @@ export const gitRouter = router({
 				});
 			}
 
+			if (pr.repoProvider === "gitlab") {
+				return replyToGitLabThread(pr.url, input.commentId, input.body);
+			}
 			// The PR row already names the repo the PR lives in, so there's no
 			// remote to parse (resolveGithubRepo). A comment id from some other
 			// PR 404s rather than landing somewhere unexpected.
