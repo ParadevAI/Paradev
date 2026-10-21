@@ -2494,67 +2494,62 @@ describe("PullRequestRuntimeManager GitHub traffic", () => {
 });
 
 describe("GitLab through glab", () => {
-	test("links a workspace to its MR with the head pipeline as its check", async () => {
+	function gitlabProject(owner: string, answer: (args: string[]) => unknown) {
 		const db = createRealDb();
 		db.insert(schema.projects)
 			.values({ id: PROJECT_ID, repoPath: "/repo", createdAt: Date.now() })
 			.run();
-		seedWorkspace(db, { id: "ws", branch: "feat" });
-		const webUrl =
-			"https://gitlab.example.com/group/sub/app/-/merge_requests/7";
-		const glabCalls: string[][] = [];
+		seedWorkspace(db, {
+			id: "ws",
+			branch: "feat",
+			upstreamOwner: owner,
+			upstreamRepo: "app",
+			upstreamBranch: "feat",
+		});
+		const calls: string[][] = [];
 		const manager = createManager(db, {
 			git: async () => ({
-				remote: async () => "git@gitlab.example.com:group/sub/app.git\n",
+				remote: async () => `git@${owner.replace("/", ":")}/app.git`,
 				raw: async () => "origin/main\n",
 			}),
-			readWorkspaceRefs: async () => ({
-				branch: "feat",
-				headSha: "sha-1",
-				upstream: {
-					owner: "gitlab.example.com/group/sub",
-					name: "app",
-					branch: "feat",
-				},
-			}),
 			execGlab: async (args) => {
-				glabCalls.push(args);
-				if (args[0] === "config") return "gitlab.example.com";
-				if (args[1] === "list") {
-					return [
-						{
-							iid: 7,
-							title: "Feat",
-							web_url: webUrl,
-							state: "opened",
-							source_branch: "feat",
-							sha: "sha-1",
-							source_project_id: 1,
-							target_project_id: 1,
-						},
-					];
-				}
-				if (args[1] === "view") {
-					return {
-						web_url: webUrl,
-						target_project_id: 1,
-						detailed_merge_status: "not_approved",
-						head_pipeline: { id: 9 },
-					};
-				}
-				if (args[1] === "get") {
-					return {
-						jobs: [
-							{ name: "test", status: "failed" },
-							{ name: "lint", status: "failed", allow_failure: true },
-						],
-					};
-				}
-				return { approved_by: [] };
+				calls.push(args);
+				return answer(args);
 			},
 		});
+		return { db, calls, refresh: () => projectRefresher(manager)(PROJECT_ID) };
+	}
 
-		await manager.refreshPullRequestsByWorkspaces(["ws"]);
+	test("links a workspace to its MR with the head pipeline as its check", async () => {
+		const webUrl =
+			"https://gitlab.example.com/group/sub/app/-/merge_requests/7";
+		const glab: Record<string, unknown> = {
+			"config get": "gitlab.example.com",
+			"mr list": [
+				{
+					iid: 7,
+					web_url: webUrl,
+					state: "opened",
+					source_branch: "feat",
+					sha: "sha-1",
+					source_project_id: 1,
+					target_project_id: 1,
+				},
+			],
+			"mr view": {
+				web_url: webUrl,
+				target_project_id: 1,
+				detailed_merge_status: "not_approved",
+				head_pipeline: { id: 9 },
+			},
+			"ci get": { jobs: [{ name: "test", status: "failed" }] },
+		};
+		const { db, calls, refresh } = gitlabProject(
+			"gitlab.example.com/group/sub",
+			(args) => glab[`${args[0]} ${args[1]}`] ?? {},
+		);
+
+		await refresh();
 
 		const pr = getPrById(db, getWorkspace(db, "ws")?.pullRequestId ?? "");
 		expect(pr).toMatchObject({
@@ -2565,44 +2560,21 @@ describe("GitLab through glab", () => {
 			reviewDecision: "pending",
 			checksStatus: "failure",
 		});
-		expect(glabCalls[1]).toContain("https://gitlab.example.com/group/sub/app");
+		expect(calls[1]).toContain("https://gitlab.example.com/group/sub/app");
 		expect(db.select().from(schema.projects).get()?.repoProvider).toBeNull();
 	});
 
 	test("asks glab again about an unknown host and looks up no MR", async () => {
-		const db = createRealDb();
-		db.insert(schema.projects)
-			.values({ id: PROJECT_ID, repoPath: "/repo", createdAt: Date.now() })
-			.run();
-		seedWorkspace(db, { id: "ws", branch: "feat" });
-		const glabCalls: string[][] = [];
-		const manager = createManager(db, {
-			git: async () => ({
-				remote: async () => "git@git.example.com:team/app.git\n",
-				raw: async () => "origin/main\n",
-			}),
-			readWorkspaceRefs: async () => ({
-				branch: "feat",
-				headSha: "sha-1",
-				upstream: {
-					owner: "git.example.com/team",
-					name: "app",
-					branch: "feat",
-				},
-			}),
-			execGlab: async (args) => {
-				glabCalls.push(args);
-				return {};
-			},
-		});
+		const { db, calls, refresh } = gitlabProject(
+			"git.example.com/team",
+			() => ({}),
+		);
 
-		await manager.refreshPullRequestsByWorkspaces(["ws"]);
-		await manager.refreshPullRequestsByWorkspaces(["ws"]);
+		await refresh();
+		await refresh();
 
-		expect(glabCalls).toEqual([
-			["config", "get", "api_host", "--host", "git.example.com"],
-			["config", "get", "api_host", "--host", "git.example.com"],
-		]);
+		const ask = ["config", "get", "api_host", "--host", "git.example.com"];
+		expect(calls).toEqual([ask, ask]);
 		expect(getWorkspace(db, "ws")?.pullRequestId).toBeNull();
 	});
 });
