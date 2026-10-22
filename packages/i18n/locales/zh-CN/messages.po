@@ -5256,6 +5256,9 @@ msgstr "无法合并拉取请求"
 msgid "Couldn't move the subagent to the background"
 msgstr "无法将子智能体移到后台"
 
+msgid "Couldn't move this chat to the cloud"
+msgstr "无法将此聊天移至云端"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "无法自动命名“{name}”"
 
@@ -10488,8 +10491,14 @@ msgstr "将{count}个移动到分组"
 msgid "Move {name} to background"
 msgstr "将 {name} 移到后台"
 
+msgid "Move this chat to the cloud?"
+msgstr "将此聊天移至云端？"
+
 msgid "Move to background"
 msgstr "移到后台"
+
+msgid "Move to cloud"
+msgstr "移至云端"
 
 msgid "Move to group"
 msgstr "移动到分组"
@@ -10499,6 +10508,9 @@ msgstr "移到右侧"
 
 msgid "Move to Tab"
 msgstr "移动到标签页"
+
+msgid "Moving..."
+msgstr "正在移动..."
 
 msgid "Multi-select"
 msgstr "多选"
@@ -17563,6 +17575,9 @@ msgstr "云端工作区启动的起点 — 一个基础镜像，或你已配置�
 msgid "The Superset desktop app is available for macOS and Linux."
 msgstr "Superset 桌面应用支持 macOS 和 Linux。"
 
+msgid "The Superset GitHub App cannot see {repositoryName}"
+msgstr "Superset GitHub App 无法访问 {repositoryName}"
+
 msgid "The Superset host service for {organization} stopped unexpectedly ({cause}) and could not be restarted automatically."
 msgstr "{organization}的Superset主机服务意外停止（{cause}），且无法自动重启。"
 
@@ -18683,6 +18698,9 @@ msgstr "请在这台机器上更新Superset以附加文件"
 
 msgid "update the branch prefix"
 msgstr "更新分支前缀"
+
+msgid "Update the host service on this device and try again."
+msgstr "请更新此设备上的主机服务，然后重试。"
 
 msgid "Update this host to message subagents"
 msgstr "请更新此主机以向子智能体发送消息"
@@ -19831,6 +19849,9 @@ msgstr "如果不保存，你的更改将会丢失。"
 
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "你的代码默认留在本地，连接哪些服务由你明确决定。"
+
+msgid "Your current work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch and continues this conversation. This chat stays here unchanged."
+msgstr "当前的工作（包括未提交的更改）将推送到远程仓库的一个新分支。云端工作区将从该分支启动并继续此对话。此聊天会原样保留在这里。"
 
 msgid "Your download starts automatically. If it didn't, grab it here."
 msgstr "下载将自动开始。如果没有，请点此获取。"

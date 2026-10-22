@@ -83,6 +83,7 @@ import { BrowserPane, BrowserPaneToolbar } from "./components/BrowserPane";
 import { ChangesListPane } from "./components/ChangesListPane";
 import { ChatPane } from "./components/ChatPane";
 import { ChatHistoryPicker } from "./components/ChatPane/components/ChatHistoryPicker";
+import { MoveToCloudButton } from "./components/ChatPane/components/MoveToCloudButton";
 import { ChatPaneTitle } from "./components/ChatPaneTitle";
 import { CommentPane } from "./components/CommentPane";
 import { CommentPaneHeaderExtras } from "./components/CommentPane/components/CommentPaneHeaderExtras";
@@ -813,6 +814,7 @@ export function usePaneRegistry({
 					const data = ctx.pane.data as ChatPaneData;
 					return (
 						<div className="flex items-center gap-1">
+							<MoveToCloudButton data={data} workspaceId={workspaceId} />
 							<ChatHistoryPicker
 								context={ctx}
 								workspaceId={workspaceId}

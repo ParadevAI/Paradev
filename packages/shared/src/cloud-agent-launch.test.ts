@@ -51,6 +51,21 @@ describe("cloud agent launch", () => {
 		).toBeUndefined();
 	});
 
+	it("reaches the box with a session to resume, and drops a half one", () => {
+		const resume = {
+			harnessSessionId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+			transcriptFileId: fileId,
+		};
+		const env = cloudAgentLaunchToEnv({ agent: "claude", prompt: "", resume });
+		expect(readCloudAgentLaunch(env)?.resume).toEqual(resume);
+		expect(
+			readCloudAgentLaunch({
+				...env,
+				SUPERSET_SANDBOX_AGENT_RESUME_TRANSCRIPT_FILE_ID: undefined,
+			})?.resume,
+		).toBeUndefined();
+	});
+
 	it("refuses an agent the sandbox does not install", () => {
 		expect(
 			cloudAgentLaunchSchema.safeParse({ agent: "nope", prompt: "" }).success,

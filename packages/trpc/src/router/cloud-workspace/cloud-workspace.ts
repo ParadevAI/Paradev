@@ -11,6 +11,7 @@ import {
 import { MACHINE_SIZES, machineSpec } from "@superset/shared/billing";
 import {
 	CLOUD_AGENT_PROMPT_MAX_LENGTH,
+	cloudAgentResumeSchema,
 	isCloudAgentId,
 } from "@superset/shared/cloud-agent-launch";
 import {
@@ -374,11 +375,23 @@ export const cloudWorkspaceRouter = {
 				taskIds: z.array(z.string().uuid()).max(10).optional(),
 				/** A size the organization offers (see `machineSizes`); omitted = its default. */
 				machineSize: z.enum(MACHINE_SIZES).optional(),
+				/**
+				 * A Claude session moved from another host, resumed in place of a
+				 * new one. `transcriptFileId` is the session file, uploaded like an
+				 * attachment.
+				 */
+				resume: cloudAgentResumeSchema.optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
 			await assertCloudAccess(ctx);
 			assertMember(ctx.organizationIds, input.organizationId);
+			if (input.resume && input.agent !== "claude") {
+				throw new TRPCError({
+					code: "BAD_REQUEST",
+					message: "Only a Claude session can be resumed in the cloud",
+				});
+			}
 			if (input.agent && !isCloudAgentId(input.agent)) {
 				// Only the built-in presets exist inside a sandbox; the clients offer
 				// nothing else, so this is a developer error, not a user one.
@@ -427,6 +440,7 @@ export const cloudWorkspaceRouter = {
 								effort: input.effort,
 								mode: input.mode,
 								attachmentFileIds: input.attachmentFileIds,
+								...(input.resume ? { resume: input.resume } : {}),
 							},
 						}
 					: {}),

@@ -5256,6 +5256,9 @@ msgstr "Pull request birleştirilemedi"
 msgid "Couldn't move the subagent to the background"
 msgstr "Alt ajan arka plana taşınamadı"
 
+msgid "Couldn't move this chat to the cloud"
+msgstr "Bu sohbet buluta taşınamadı"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "\"{name}\" otomatik olarak adlandırılamadı"
 
@@ -10488,8 +10491,14 @@ msgstr "{count} öğeyi gruba taşı"
 msgid "Move {name} to background"
 msgstr "{name} öğesini arka plana taşı"
 
+msgid "Move this chat to the cloud?"
+msgstr "Bu sohbet buluta taşınsın mı?"
+
 msgid "Move to background"
 msgstr "Arka plana taşı"
+
+msgid "Move to cloud"
+msgstr "Buluta taşı"
 
 msgid "Move to group"
 msgstr "Gruba taşı"
@@ -10499,6 +10508,9 @@ msgstr "Sağ tarafa taşı"
 
 msgid "Move to Tab"
 msgstr "Sekmeye taşı"
+
+msgid "Moving..."
+msgstr "Taşınıyor..."
 
 msgid "Multi-select"
 msgstr "Çoklu seçim"
@@ -17563,6 +17575,9 @@ msgstr "Bir bulut çalışma alanının açıldığı başlangıç noktası — 
 msgid "The Superset desktop app is available for macOS and Linux."
 msgstr "Superset masaüstü uygulaması macOS ve Linux için kullanılabilir."
 
+msgid "The Superset GitHub App cannot see {repositoryName}"
+msgstr "Superset GitHub App, {repositoryName} deposuna erişemiyor"
+
 msgid "The Superset host service for {organization} stopped unexpectedly ({cause}) and could not be restarted automatically."
 msgstr "{organization} için Superset host hizmeti beklenmedik şekilde durdu ({cause}) ve otomatik olarak yeniden başlatılamadı."
 
@@ -18683,6 +18698,9 @@ msgstr "Dosya eklemek için bu makinede Superset'i güncelleyin"
 
 msgid "update the branch prefix"
 msgstr "dal ön ekini güncelleme"
+
+msgid "Update the host service on this device and try again."
+msgstr "Bu cihazdaki host hizmetini güncelleyip yeniden deneyin."
 
 msgid "Update this host to message subagents"
 msgstr "Alt ajanlara mesaj göndermek için bu ana makineyi güncelleyin"
@@ -19831,6 +19849,9 @@ msgstr "Kaydetmezseniz değişiklikleriniz kaybolur."
 
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "Kodunuz varsayılan olarak yerelde kalır; bağlı hizmetler üzerinde açık denetiminiz olur."
+
+msgid "Your current work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch and continues this conversation. This chat stays here unchanged."
+msgstr "Commit edilmemiş değişiklikler dahil mevcut çalışmanız uzak depodaki yeni bir dala gönderilir. Bir bulut çalışma alanı bu daldan başlar ve bu konuşmaya devam eder. Bu sohbet burada değişmeden kalır."
 
 msgid "Your download starts automatically. If it didn't, grab it here."
 msgstr "İndirme otomatik olarak başlıyor. Başlamadıysa buradan indirin."

@@ -55,6 +55,18 @@ function sessionFileName(sessionId: string): string {
 	return `${sessionId}.jsonl`;
 }
 
+/** Where Claude, launched under `env` in `worktreePath`, reads a session from. */
+export function claudeSessionPath(
+	env: HarnessEnv,
+	worktreePath: string,
+	sessionId: string,
+): string {
+	return join(
+		projectDir(configDir(env), worktreePath),
+		sessionFileName(sessionId),
+	);
+}
+
 function layoutPath(root: string, query: HarnessSessionQuery): string | null {
 	if (!query.worktreePath) return null;
 	const path = join(

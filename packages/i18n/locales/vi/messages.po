@@ -5256,6 +5256,9 @@ msgstr "Không thể merge pull request"
 msgid "Couldn't move the subagent to the background"
 msgstr "Không thể chuyển agent con sang chạy nền"
 
+msgid "Couldn't move this chat to the cloud"
+msgstr "Không thể chuyển cuộc trò chuyện này lên cloud"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Không thể tự động đặt tên cho \"{name}\""
 
@@ -10488,8 +10491,14 @@ msgstr "Chuyển {count} vào nhóm"
 msgid "Move {name} to background"
 msgstr "Chuyển {name} sang chạy nền"
 
+msgid "Move this chat to the cloud?"
+msgstr "Chuyển cuộc trò chuyện này lên cloud?"
+
 msgid "Move to background"
 msgstr "Chuyển sang chạy nền"
+
+msgid "Move to cloud"
+msgstr "Chuyển lên cloud"
 
 msgid "Move to group"
 msgstr "Chuyển vào nhóm"
@@ -10499,6 +10508,9 @@ msgstr "Chuyển sang bên phải"
 
 msgid "Move to Tab"
 msgstr "Chuyển sang tab"
+
+msgid "Moving..."
+msgstr "Đang chuyển..."
 
 msgid "Multi-select"
 msgstr "Chọn nhiều"
@@ -17563,6 +17575,9 @@ msgstr "Điểm khởi đầu mà một workspace cloud boot lên — một base
 msgid "The Superset desktop app is available for macOS and Linux."
 msgstr "Ứng dụng desktop Superset có sẵn cho macOS và Linux."
 
+msgid "The Superset GitHub App cannot see {repositoryName}"
+msgstr "Superset GitHub App không thể truy cập {repositoryName}"
+
 msgid "The Superset host service for {organization} stopped unexpectedly ({cause}) and could not be restarted automatically."
 msgstr "Dịch vụ host Superset cho {organization} đã dừng bất ngờ ({cause}) và không tự khởi động lại được."
 
@@ -18683,6 +18698,9 @@ msgstr "Hãy cập nhật Superset trên máy này để đính kèm tệp"
 
 msgid "update the branch prefix"
 msgstr "cập nhật tiền tố nhánh"
+
+msgid "Update the host service on this device and try again."
+msgstr "Hãy cập nhật dịch vụ host trên thiết bị này rồi thử lại."
 
 msgid "Update this host to message subagents"
 msgstr "Cập nhật máy chủ này để nhắn tin cho agent con"
@@ -19831,6 +19849,9 @@ msgstr "Thay đổi của bạn sẽ mất nếu không lưu."
 
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "Code của bạn mặc định ở lại cục bộ, với quyền kiểm soát rõ ràng đối với các dịch vụ đã kết nối."
+
+msgid "Your current work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch and continues this conversation. This chat stays here unchanged."
+msgstr "Công việc hiện tại của bạn, bao gồm các thay đổi chưa commit, được đẩy lên một nhánh mới trên remote. Một workspace cloud sẽ bắt đầu từ nhánh đó và tiếp tục cuộc trò chuyện này. Cuộc trò chuyện này vẫn giữ nguyên ở đây."
 
 msgid "Your download starts automatically. If it didn't, grab it here."
 msgstr "Quá trình tải xuống sẽ tự động bắt đầu. Nếu không, hãy tải tại đây."

@@ -5256,6 +5256,9 @@ msgstr "Kan pull request niet mergen"
 msgid "Couldn't move the subagent to the background"
 msgstr "Kan de subagent niet naar de achtergrond verplaatsen"
 
+msgid "Couldn't move this chat to the cloud"
+msgstr "Kon deze chat niet naar de cloud verplaatsen"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Kon \"{name}\" niet automatisch een naam geven"
 
@@ -10488,8 +10491,14 @@ msgstr "{count} naar groep verplaatsen"
 msgid "Move {name} to background"
 msgstr "{name} naar de achtergrond verplaatsen"
 
+msgid "Move this chat to the cloud?"
+msgstr "Deze chat naar de cloud verplaatsen?"
+
 msgid "Move to background"
 msgstr "Naar de achtergrond"
+
+msgid "Move to cloud"
+msgstr "Naar cloud verplaatsen"
 
 msgid "Move to group"
 msgstr "Naar groep verplaatsen"
@@ -10499,6 +10508,9 @@ msgstr "Naar rechts verplaatsen"
 
 msgid "Move to Tab"
 msgstr "Verplaatsen naar tabblad"
+
+msgid "Moving..."
+msgstr "Verplaatsen..."
 
 msgid "Multi-select"
 msgstr "Meerdere keuzes"
@@ -17563,6 +17575,9 @@ msgstr "Het startpunt waarvandaan een cloudwerkruimte opstart — een base image
 msgid "The Superset desktop app is available for macOS and Linux."
 msgstr "De Superset-desktopapp is beschikbaar voor macOS en Linux."
 
+msgid "The Superset GitHub App cannot see {repositoryName}"
+msgstr "De Superset GitHub App heeft geen toegang tot {repositoryName}"
+
 msgid "The Superset host service for {organization} stopped unexpectedly ({cause}) and could not be restarted automatically."
 msgstr "De Superset-hostservice voor {organization} is onverwacht gestopt ({cause}) en kon niet automatisch opnieuw worden gestart."
 
@@ -18683,6 +18698,9 @@ msgstr "Werk Superset op deze machine bij om bestanden toe te voegen"
 
 msgid "update the branch prefix"
 msgstr "de branchprefix bijwerken"
+
+msgid "Update the host service on this device and try again."
+msgstr "Werk de hostservice op dit apparaat bij en probeer het opnieuw."
 
 msgid "Update this host to message subagents"
 msgstr "Werk deze host bij om subagents berichten te sturen"
@@ -19831,6 +19849,9 @@ msgstr "Je wijzigingen gaan verloren als je ze niet opslaat."
 
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "Je code blijft standaard lokaal, met expliciete controle over gekoppelde diensten."
+
+msgid "Your current work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch and continues this conversation. This chat stays here unchanged."
+msgstr "Je huidige werk, inclusief niet-gecommitte wijzigingen, wordt naar een nieuwe branch op de remote gepusht. Een cloudwerkruimte start vanaf die branch en zet dit gesprek voort. Deze chat blijft hier ongewijzigd."
 
 msgid "Your download starts automatically. If it didn't, grab it here."
 msgstr "Je download start automatisch. Gebeurt dat niet, download dan hier."

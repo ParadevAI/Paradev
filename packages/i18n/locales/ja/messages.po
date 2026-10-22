@@ -5256,6 +5256,9 @@ msgstr "プルリクエストをマージできませんでした"
 msgid "Couldn't move the subagent to the background"
 msgstr "サブエージェントをバックグラウンドに移動できませんでした"
 
+msgid "Couldn't move this chat to the cloud"
+msgstr "このチャットをクラウドに移動できませんでした"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "「{name}」に自動で名前を付けられませんでした"
 
@@ -10488,8 +10491,14 @@ msgstr "{count}件をグループへ移動"
 msgid "Move {name} to background"
 msgstr "{name} をバックグラウンドに移動"
 
+msgid "Move this chat to the cloud?"
+msgstr "このチャットをクラウドに移動しますか？"
+
 msgid "Move to background"
 msgstr "バックグラウンドに移動"
+
+msgid "Move to cloud"
+msgstr "クラウドに移動"
 
 msgid "Move to group"
 msgstr "グループへ移動"
@@ -10499,6 +10508,9 @@ msgstr "右側に移動"
 
 msgid "Move to Tab"
 msgstr "タブに移動"
+
+msgid "Moving..."
+msgstr "移動中..."
 
 msgid "Multi-select"
 msgstr "複数選択"
@@ -17563,6 +17575,9 @@ msgstr "クラウドワークスペースの起動元となる出発点 — ベ�
 msgid "The Superset desktop app is available for macOS and Linux."
 msgstr "Supersetデスクトップアプリは macOS と Linux で利用できます。"
 
+msgid "The Superset GitHub App cannot see {repositoryName}"
+msgstr "Superset GitHub App から {repositoryName} にアクセスできません"
+
 msgid "The Superset host service for {organization} stopped unexpectedly ({cause}) and could not be restarted automatically."
 msgstr "{organization}のSupersetホストサービスが予期せず停止し ({cause})、自動的に再起動できませんでした。"
 
@@ -18683,6 +18698,9 @@ msgstr "ファイルを添付するには、このマシンでSupersetを更新�
 
 msgid "update the branch prefix"
 msgstr "ブランチのプレフィックスを更新する"
+
+msgid "Update the host service on this device and try again."
+msgstr "このデバイスのホストサービスを更新してから、もう一度お試しください。"
 
 msgid "Update this host to message subagents"
 msgstr "サブエージェントにメッセージを送るには、このホストを更新してください"
@@ -19831,6 +19849,9 @@ msgstr "保存しないと変更は失われます。"
 
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "コードは既定でローカルに留まり、連携するサービスは明示的に制御できます。"
+
+msgid "Your current work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch and continues this conversation. This chat stays here unchanged."
+msgstr "未コミットの変更を含む現在の作業が、リモートの新しいブランチにプッシュされます。クラウドワークスペースはそのブランチから開始し、この会話を続けます。このチャットはここにそのまま残ります。"
 
 msgid "Your download starts automatically. If it didn't, grab it here."
 msgstr "ダウンロードは自動的に開始されます。開始されない場合はこちらから取得してください。"

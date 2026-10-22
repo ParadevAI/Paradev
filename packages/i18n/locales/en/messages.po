@@ -5256,6 +5256,9 @@ msgstr "Couldn't merge pull request"
 msgid "Couldn't move the subagent to the background"
 msgstr "Couldn't move the subagent to the background"
 
+msgid "Couldn't move this chat to the cloud"
+msgstr "Couldn't move this chat to the cloud"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Couldn't name \"{name}\" automatically"
 
@@ -10488,8 +10491,14 @@ msgstr "Move {count} to Group"
 msgid "Move {name} to background"
 msgstr "Move {name} to background"
 
+msgid "Move this chat to the cloud?"
+msgstr "Move this chat to the cloud?"
+
 msgid "Move to background"
 msgstr "Move to background"
+
+msgid "Move to cloud"
+msgstr "Move to cloud"
 
 msgid "Move to group"
 msgstr "Move to group"
@@ -10499,6 +10508,9 @@ msgstr "Move to Right Side"
 
 msgid "Move to Tab"
 msgstr "Move to Tab"
+
+msgid "Moving..."
+msgstr "Moving..."
 
 msgid "Multi-select"
 msgstr "Multi-select"
@@ -17563,6 +17575,9 @@ msgstr "The starting point a cloud workspace boots from. Variables set here reac
 msgid "The Superset desktop app is available for macOS and Linux."
 msgstr "The Superset desktop app is available for macOS and Linux."
 
+msgid "The Superset GitHub App cannot see {repositoryName}"
+msgstr "The Superset GitHub App cannot see {repositoryName}"
+
 msgid "The Superset host service for {organization} stopped unexpectedly ({cause}) and could not be restarted automatically."
 msgstr "The Superset host service for {organization} stopped unexpectedly ({cause}) and could not be restarted automatically."
 
@@ -18683,6 +18698,9 @@ msgstr "Update Superset on this machine to attach files"
 
 msgid "update the branch prefix"
 msgstr "update the branch prefix"
+
+msgid "Update the host service on this device and try again."
+msgstr "Update the host service on this device and try again."
 
 msgid "Update this host to message subagents"
 msgstr "Update this host to message subagents"
@@ -19831,6 +19849,9 @@ msgstr "Your changes will be lost if you don't save them."
 
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "Your code stays local by default, with explicit control over connected services."
+
+msgid "Your current work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch and continues this conversation. This chat stays here unchanged."
+msgstr "Your current work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch and continues this conversation. This chat stays here unchanged."
 
 msgid "Your download starts automatically. If it didn't, grab it here."
 msgstr "Your download starts automatically. If it didn't, grab it here."

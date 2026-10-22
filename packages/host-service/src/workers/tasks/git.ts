@@ -4,7 +4,9 @@
 // the credential provider) and crosses as plain data.
 
 import { mkdirSync } from "node:fs";
-import { dirname } from "node:path";
+import { mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { dirname, join } from "node:path";
 import {
 	getGitAuthorName,
 	type ResolvedGitInfo,
@@ -724,6 +726,57 @@ export const gitRestoreWorktreeTask = defineWorkerTask<
 	},
 });
 
+const SNAPSHOT_COMMIT_MESSAGE = "Work in progress, moved to a cloud workspace";
+
+/**
+ * Pushes the worktree as it is now, with uncommitted and untracked files, to
+ * `branch` on its remote. The snapshot is staged in a separate index, so the
+ * user's index, working tree and branch do not change.
+ */
+export const gitPushSnapshotTask = defineWorkerTask<
+	{ worktreePath: string; branch: string; gitEnv: GitTaskEnv },
+	{ remoteUrl: string; commit: string }
+>({
+	type: "git/pushSnapshot",
+	handler: async ({ worktreePath, branch, gitEnv }) => {
+		const scratch = await mkdtemp(join(tmpdir(), "superset-snapshot-"));
+		try {
+			const git = createUserSimpleGit(worktreePath, {
+				env: { ...gitEnv, GIT_INDEX_FILE: join(scratch, "index") },
+			});
+			const head = (await git.revparse(["HEAD"])).trim();
+			await git.raw(["read-tree", head]);
+			await git.raw(["add", "-A"]);
+			const tree = (await git.raw(["write-tree"])).trim();
+			const headTree = (await git.revparse([`${head}^{tree}`])).trim();
+			const commit =
+				tree === headTree
+					? head
+					: (
+							await git.raw([
+								"commit-tree",
+								tree,
+								"-p",
+								head,
+								"-m",
+								SNAPSHOT_COMMIT_MESSAGE,
+							])
+						).trim();
+			const remotes = await git.getRemotes(false);
+			const remote =
+				remotes.find((entry) => entry.name === "origin")?.name ??
+				remotes[0]?.name;
+			if (!remote)
+				throw new Error("This worktree has no git remote to push to");
+			const remoteUrl = (await git.raw(["remote", "get-url", remote])).trim();
+			await git.raw(["push", remote, `${commit}:refs/heads/${branch}`]);
+			return { remoteUrl, commit };
+		} finally {
+			await rm(scratch, { recursive: true, force: true });
+		}
+	},
+});
+
 export const gitTasks = [
 	gitStatusSnapshotTask,
 	gitStatusPartialTask,
@@ -743,6 +796,7 @@ export const gitTasks = [
 	gitStagePathsTask,
 	gitCommitTask,
 	gitPushTask,
+	gitPushSnapshotTask,
 	gitPrHeadBaseTask,
 	gitRestoreWorktreeTask,
 ];

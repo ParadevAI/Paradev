@@ -5256,6 +5256,9 @@ msgstr "Не удалось объединить пул-реквест"
 msgid "Couldn't move the subagent to the background"
 msgstr "Не удалось перевести субагента в фон"
 
+msgid "Couldn't move this chat to the cloud"
+msgstr "Не удалось перенести этот чат в облако"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Не удалось автоматически назвать «{name}»"
 
@@ -10488,8 +10491,14 @@ msgstr "Переместить {count} в группу"
 msgid "Move {name} to background"
 msgstr "Перевести {name} в фон"
 
+msgid "Move this chat to the cloud?"
+msgstr "Перенести этот чат в облако?"
+
 msgid "Move to background"
 msgstr "Перевести в фон"
+
+msgid "Move to cloud"
+msgstr "Перенести в облако"
 
 msgid "Move to group"
 msgstr "Переместить в группу"
@@ -10499,6 +10508,9 @@ msgstr "Переместить вправо"
 
 msgid "Move to Tab"
 msgstr "Переместить во вкладку"
+
+msgid "Moving..."
+msgstr "Перенос..."
 
 msgid "Multi-select"
 msgstr "Множественный выбор"
@@ -17563,6 +17575,9 @@ msgstr "Отправная точка, с которой загружается 
 msgid "The Superset desktop app is available for macOS and Linux."
 msgstr "Десктопное приложение Superset доступно для macOS и Linux."
 
+msgid "The Superset GitHub App cannot see {repositoryName}"
+msgstr "Superset GitHub App не имеет доступа к {repositoryName}"
+
 msgid "The Superset host service for {organization} stopped unexpectedly ({cause}) and could not be restarted automatically."
 msgstr "Служба хоста Superset для {organization} неожиданно остановилась ({cause}), и её не удалось перезапустить автоматически."
 
@@ -18683,6 +18698,9 @@ msgstr "Обновите Superset на этой машине, чтобы при�
 
 msgid "update the branch prefix"
 msgstr "обновить префикс ветки"
+
+msgid "Update the host service on this device and try again."
+msgstr "Обновите службу хоста на этом устройстве и повторите попытку."
 
 msgid "Update this host to message subagents"
 msgstr "Обновите этот хост, чтобы писать субагентам"
@@ -19831,6 +19849,9 @@ msgstr "Изменения будут потеряны, если их не со�
 
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "Ваш код по умолчанию остаётся локальным, с явным контролем над подключёнными сервисами."
+
+msgid "Your current work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch and continues this conversation. This chat stays here unchanged."
+msgstr "Текущая работа, включая незафиксированные изменения, отправляется в новую ветку на удалённом репозитории. Облачная рабочая область запускается с этой ветки и продолжает этот разговор. Этот чат остаётся здесь без изменений."
 
 msgid "Your download starts automatically. If it didn't, grab it here."
 msgstr "Загрузка начнётся автоматически. Если этого не произошло, скачайте здесь."

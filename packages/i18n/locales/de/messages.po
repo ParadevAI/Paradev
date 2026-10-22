@@ -5256,6 +5256,9 @@ msgstr "Pull Request konnte nicht zusammengeführt werden"
 msgid "Couldn't move the subagent to the background"
 msgstr "Der Subagent konnte nicht in den Hintergrund verschoben werden"
 
+msgid "Couldn't move this chat to the cloud"
+msgstr "Dieser Chat konnte nicht in die Cloud verschoben werden"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "„{name}“ konnte nicht automatisch benannt werden"
 
@@ -10488,8 +10491,14 @@ msgstr "{count} in Gruppe verschieben"
 msgid "Move {name} to background"
 msgstr "{name} in den Hintergrund verschieben"
 
+msgid "Move this chat to the cloud?"
+msgstr "Diesen Chat in die Cloud verschieben?"
+
 msgid "Move to background"
 msgstr "In den Hintergrund"
+
+msgid "Move to cloud"
+msgstr "In die Cloud verschieben"
 
 msgid "Move to group"
 msgstr "In Gruppe verschieben"
@@ -10499,6 +10508,9 @@ msgstr "Nach rechts verschieben"
 
 msgid "Move to Tab"
 msgstr "In Tab verschieben"
+
+msgid "Moving..."
+msgstr "Wird verschoben..."
 
 msgid "Multi-select"
 msgstr "Mehrfachauswahl"
@@ -17563,6 +17575,9 @@ msgstr "Der Ausgangspunkt, von dem ein Cloud-Arbeitsbereich startet — ein Basi
 msgid "The Superset desktop app is available for macOS and Linux."
 msgstr "Die Superset-Desktop-App ist für macOS und Linux verfügbar."
 
+msgid "The Superset GitHub App cannot see {repositoryName}"
+msgstr "Die Superset GitHub App kann nicht auf {repositoryName} zugreifen"
+
 msgid "The Superset host service for {organization} stopped unexpectedly ({cause}) and could not be restarted automatically."
 msgstr "Der Superset-Host-Dienst für {organization} wurde unerwartet beendet ({cause}) und konnte nicht automatisch neu gestartet werden."
 
@@ -18683,6 +18698,9 @@ msgstr "Aktualisiere Superset auf diesem Rechner, um Dateien anzuhängen"
 
 msgid "update the branch prefix"
 msgstr "das Branch-Präfix aktualisieren"
+
+msgid "Update the host service on this device and try again."
+msgstr "Aktualisiere den Host-Dienst auf diesem Gerät und versuche es erneut."
 
 msgid "Update this host to message subagents"
 msgstr "Aktualisiere diesen Host, um Subagents Nachrichten zu senden"
@@ -19831,6 +19849,9 @@ msgstr "Deine Änderungen gehen verloren, wenn du sie nicht speicherst."
 
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "Dein Code bleibt standardmäßig lokal, mit ausdrücklicher Kontrolle über verbundene Dienste."
+
+msgid "Your current work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch and continues this conversation. This chat stays here unchanged."
+msgstr "Deine aktuelle Arbeit, einschließlich nicht committeter Änderungen, wird auf einen neuen Branch im Remote gepusht. Ein Cloud-Arbeitsbereich startet von diesem Branch und setzt diese Unterhaltung fort. Dieser Chat bleibt hier unverändert."
 
 msgid "Your download starts automatically. If it didn't, grab it here."
 msgstr "Der Download startet automatisch. Falls nicht, hier herunterladen."

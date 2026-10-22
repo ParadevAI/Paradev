@@ -6,6 +6,7 @@ import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import {
 	type CloudAgentLaunch,
+	type CloudAgentResume,
 	readCloudAgentLaunch,
 } from "@superset/shared/cloud-agent-launch";
 import { parseGitHubRemote } from "@superset/shared/github-remote";
@@ -18,6 +19,7 @@ import {
 import { eq } from "drizzle-orm";
 import type { HostDb } from "../../db";
 import { projects, workspaces } from "../../db/schema";
+import { placeClaudeSession } from "../../teleport/place-claude-session";
 import {
 	chatLaunchTarget,
 	runAgentInWorkspace,
@@ -307,8 +309,16 @@ export async function launchSandboxAgentOnce(
 		return;
 	}
 	if (!identity.launch) return;
-	const { agent, prompt, model, effort, mode, attachmentFileIds, surface } =
-		identity.launch;
+	const {
+		agent,
+		prompt,
+		model,
+		effort,
+		mode,
+		attachmentFileIds,
+		surface,
+		resume,
+	} = identity.launch;
 	// The agent needs the environment the control plane pushes after boot and
 	// the branch the boot runner is checking out beside us; both are seconds.
 	const [pushed, checkedOut] = await Promise.all([
@@ -343,6 +353,9 @@ export async function launchSandboxAgentOnce(
 				console.error("[sandbox] could not import prompt attachments", error);
 			}
 		}
+		const resumeSessionId = resume
+			? await placeResumedSession(ctx, identity.workspaceId, resume)
+			: undefined;
 		const chatTarget =
 			surface === "chat"
 				? chatLaunchTarget(ctx.db, {
@@ -364,6 +377,7 @@ export async function launchSandboxAgentOnce(
 					model,
 					mode,
 					...(attachmentIds?.length ? { attachmentIds } : {}),
+					...(resumeSessionId ? { resumeSessionId } : {}),
 				}).then((session) => ({
 					kind: "chat" as const,
 					sessionId: session.sessionId,
@@ -377,6 +391,7 @@ export async function launchSandboxAgentOnce(
 					effort,
 					mode,
 					...(attachmentIds?.length ? { attachmentIds } : {}),
+					...(resumeSessionId ? { resumeSessionId } : {}),
 				}).then((run) => ({
 					kind: "terminal" as const,
 					terminalId: run.sessionId,
@@ -391,6 +406,28 @@ export async function launchSandboxAgentOnce(
 			`[sandbox] could not launch ${agent} for workspace ${identity.workspaceId}`,
 			error,
 		);
+	}
+}
+
+/**
+ * The id to resume, once its session file is in place. A file that cannot be
+ * placed starts a new session: losing the history must not cost the launch.
+ */
+async function placeResumedSession(
+	ctx: HostServiceContext,
+	workspaceId: string,
+	resume: CloudAgentResume,
+): Promise<string | undefined> {
+	const workspace = ctx.db.query.workspaces
+		.findFirst({ where: eq(workspaces.id, workspaceId) })
+		.sync();
+	if (!workspace?.worktreePath) return undefined;
+	try {
+		await placeClaudeSession(ctx, workspace.worktreePath, resume);
+		return resume.harnessSessionId;
+	} catch (error) {
+		console.error("[sandbox] could not place the moved Claude session", error);
+		return undefined;
 	}
 }
 

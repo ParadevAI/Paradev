@@ -5256,6 +5256,9 @@ msgstr "풀 리퀘스트를 머지하지 못했습니다"
 msgid "Couldn't move the subagent to the background"
 msgstr "서브 에이전트를 백그라운드로 옮기지 못했습니다"
 
+msgid "Couldn't move this chat to the cloud"
+msgstr "이 채팅을 클라우드로 옮길 수 없습니다"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "\"{name}\"의 이름을 자동으로 지정하지 못했습니다"
 
@@ -10488,8 +10491,14 @@ msgstr "{count}개를 그룹으로 이동"
 msgid "Move {name} to background"
 msgstr "{name}을(를) 백그라운드로 이동"
 
+msgid "Move this chat to the cloud?"
+msgstr "이 채팅을 클라우드로 옮길까요?"
+
 msgid "Move to background"
 msgstr "백그라운드로 이동"
+
+msgid "Move to cloud"
+msgstr "클라우드로 옮기기"
 
 msgid "Move to group"
 msgstr "그룹으로 이동"
@@ -10499,6 +10508,9 @@ msgstr "오른쪽으로 이동"
 
 msgid "Move to Tab"
 msgstr "탭으로 이동"
+
+msgid "Moving..."
+msgstr "옮기는 중..."
 
 msgid "Multi-select"
 msgstr "다중 선택"
@@ -17563,6 +17575,9 @@ msgstr "클라우드 워크스페이스가 부팅되는 시작점입니다 — �
 msgid "The Superset desktop app is available for macOS and Linux."
 msgstr "Superset 데스크톱 앱은 macOS와 Linux에서 사용할 수 있습니다."
 
+msgid "The Superset GitHub App cannot see {repositoryName}"
+msgstr "Superset GitHub App에서 {repositoryName}에 접근할 수 없습니다"
+
 msgid "The Superset host service for {organization} stopped unexpectedly ({cause}) and could not be restarted automatically."
 msgstr "{organization}의 Superset 호스트 서비스가 예기치 않게 중지되었으며({cause}) 자동으로 다시 시작하지 못했습니다."
 
@@ -18683,6 +18698,9 @@ msgstr "파일을 첨부하려면 이 컴퓨터에서 Superset을 업데이트�
 
 msgid "update the branch prefix"
 msgstr "브랜치 접두사를 업데이트할"
+
+msgid "Update the host service on this device and try again."
+msgstr "이 기기의 호스트 서비스를 업데이트한 후 다시 시도하세요."
 
 msgid "Update this host to message subagents"
 msgstr "서브 에이전트에게 메시지를 보내려면 이 호스트를 업데이트하세요"
@@ -19831,6 +19849,9 @@ msgstr "저장하지 않으면 변경 사항이 사라집니다."
 
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "코드는 기본적으로 로컬에 머물고, 연결된 서비스는 명시적으로 통제합니다."
+
+msgid "Your current work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch and continues this conversation. This chat stays here unchanged."
+msgstr "커밋되지 않은 변경 사항을 포함한 현재 작업이 원격의 새 브랜치로 푸시됩니다. 클라우드 워크스페이스가 그 브랜치에서 시작해 이 대화를 이어갑니다. 이 채팅은 여기에 그대로 남습니다."
 
 msgid "Your download starts automatically. If it didn't, grab it here."
 msgstr "다운로드가 자동으로 시작됩니다. 시작되지 않으면 여기서 받으세요."

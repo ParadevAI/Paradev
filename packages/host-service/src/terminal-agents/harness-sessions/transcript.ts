@@ -54,6 +54,19 @@ function reportedSessionFile(
 		: null;
 }
 
+export function locateHarnessSessionFile(
+	ref: HarnessSessionRef,
+): string | null {
+	const resolved = toSessionQuery(ref);
+	const files =
+		resolved && HARNESS_SESSION_FILES[resolved.agentId as AgentIdentityId];
+	if (!resolved || !files) return null;
+	return (
+		reportedSessionFile(ref.reportedPath, resolved.query.sessionId) ??
+		files.locate(resolved.query)
+	);
+}
+
 export interface HarnessTranscript {
 	text: string;
 	/** Which harness store answered, for the caller to report. */

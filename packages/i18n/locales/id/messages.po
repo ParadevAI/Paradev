@@ -5256,6 +5256,9 @@ msgstr "Tidak bisa merge pull request"
 msgid "Couldn't move the subagent to the background"
 msgstr "Tidak dapat memindahkan subagen ke latar belakang"
 
+msgid "Couldn't move this chat to the cloud"
+msgstr "Tidak dapat memindahkan chat ini ke cloud"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Tidak dapat menamai \"{name}\" secara otomatis"
 
@@ -10488,8 +10491,14 @@ msgstr "Pindahkan {count} ke Grup"
 msgid "Move {name} to background"
 msgstr "Pindahkan {name} ke latar belakang"
 
+msgid "Move this chat to the cloud?"
+msgstr "Pindahkan chat ini ke cloud?"
+
 msgid "Move to background"
 msgstr "Pindahkan ke latar belakang"
+
+msgid "Move to cloud"
+msgstr "Pindahkan ke cloud"
 
 msgid "Move to group"
 msgstr "Pindahkan ke grup"
@@ -10499,6 +10508,9 @@ msgstr "Pindahkan ke kanan"
 
 msgid "Move to Tab"
 msgstr "Pindahkan ke Tab"
+
+msgid "Moving..."
+msgstr "Memindahkan..."
 
 msgid "Multi-select"
 msgstr "Pilih banyak"
@@ -17563,6 +17575,9 @@ msgstr "Titik awal booting sebuah workspace cloud — sebuah image dasar, atau s
 msgid "The Superset desktop app is available for macOS and Linux."
 msgstr "Aplikasi desktop Superset tersedia untuk macOS dan Linux."
 
+msgid "The Superset GitHub App cannot see {repositoryName}"
+msgstr "Superset GitHub App tidak dapat mengakses {repositoryName}"
+
 msgid "The Superset host service for {organization} stopped unexpectedly ({cause}) and could not be restarted automatically."
 msgstr "Layanan host Superset untuk {organization} berhenti tak terduga ({cause}) dan tidak bisa dimulai ulang otomatis."
 
@@ -18683,6 +18698,9 @@ msgstr "Perbarui Superset di mesin ini untuk melampirkan file"
 
 msgid "update the branch prefix"
 msgstr "memperbarui prefix branch"
+
+msgid "Update the host service on this device and try again."
+msgstr "Perbarui layanan host di perangkat ini, lalu coba lagi."
 
 msgid "Update this host to message subagents"
 msgstr "Perbarui host ini untuk mengirim pesan ke subagen"
@@ -19831,6 +19849,9 @@ msgstr "Perubahan Anda akan hilang kalau tidak disimpan."
 
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "Kode Anda tetap lokal secara bawaan, dengan kendali eksplisit atas layanan yang terhubung."
+
+msgid "Your current work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch and continues this conversation. This chat stays here unchanged."
+msgstr "Pekerjaan Anda saat ini, termasuk perubahan yang belum di-commit, di-push ke branch baru di remote. Workspace cloud dimulai dari branch tersebut dan melanjutkan percakapan ini. Chat ini tetap di sini tanpa perubahan."
 
 msgid "Your download starts automatically. If it didn't, grab it here."
 msgstr "Unduhan Anda dimulai otomatis. Jika tidak, ambil di sini."

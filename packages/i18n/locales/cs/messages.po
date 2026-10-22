@@ -5256,6 +5256,9 @@ msgstr "Pull request se nepodařilo sloučit"
 msgid "Couldn't move the subagent to the background"
 msgstr "Subagenta se nepodařilo přesunout na pozadí"
 
+msgid "Couldn't move this chat to the cloud"
+msgstr "Tento chat se nepodařilo přesunout do cloudu"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Nepodařilo se automaticky pojmenovat „{name}“"
 
@@ -10488,8 +10491,14 @@ msgstr "Přesunout {count} do skupiny"
 msgid "Move {name} to background"
 msgstr "Přesunout {name} na pozadí"
 
+msgid "Move this chat to the cloud?"
+msgstr "Přesunout tento chat do cloudu?"
+
 msgid "Move to background"
 msgstr "Přesunout na pozadí"
+
+msgid "Move to cloud"
+msgstr "Přesunout do cloudu"
 
 msgid "Move to group"
 msgstr "Přesunout do skupiny"
@@ -10499,6 +10508,9 @@ msgstr "Přesunout doprava"
 
 msgid "Move to Tab"
 msgstr "Přesunout na kartu"
+
+msgid "Moving..."
+msgstr "Přesouvání..."
 
 msgid "Multi-select"
 msgstr "Výběr více možností"
@@ -17563,6 +17575,9 @@ msgstr "Výchozí bod, ze kterého se spouští cloudový pracovní prostor — 
 msgid "The Superset desktop app is available for macOS and Linux."
 msgstr "Desktopová aplikace Superset je dostupná pro macOS a Linux."
 
+msgid "The Superset GitHub App cannot see {repositoryName}"
+msgstr "Superset GitHub App nemá přístup k {repositoryName}"
+
 msgid "The Superset host service for {organization} stopped unexpectedly ({cause}) and could not be restarted automatically."
 msgstr "Host service Superset pro {organization} se nečekaně zastavila ({cause}) a nešlo ji automaticky restartovat."
 
@@ -18683,6 +18698,9 @@ msgstr "Aktualizujte na tomto počítači Superset, abyste mohli přikládat sou
 
 msgid "update the branch prefix"
 msgstr "aktualizovat prefix větve"
+
+msgid "Update the host service on this device and try again."
+msgstr "Aktualizujte službu hostitele na tomto zařízení a zkuste to znovu."
 
 msgid "Update this host to message subagents"
 msgstr "Aktualizujte tohoto hostitele, abyste mohli psát subagentům"
@@ -19831,6 +19849,9 @@ msgstr "Pokud změny neuložíte, budou ztraceny."
 
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "Váš kód zůstává ve výchozím stavu lokálně a připojené služby máte výslovně pod kontrolou."
+
+msgid "Your current work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch and continues this conversation. This chat stays here unchanged."
+msgstr "Vaše aktuální práce včetně necommitnutých změn se odešle do nové větve ve vzdáleném repozitáři. Cloudový pracovní prostor se spustí z této větve a bude v této konverzaci pokračovat. Tento chat zde zůstane beze změny."
 
 msgid "Your download starts automatically. If it didn't, grab it here."
 msgstr "Stahování se spustí automaticky. Pokud ne, stáhněte si to zde."
