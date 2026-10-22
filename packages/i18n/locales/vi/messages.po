@@ -928,9 +928,6 @@ msgstr "{kind} · bởi {author}"
 msgid "{kindLabel} theme"
 msgstr "Chủ đề {kindLabel}"
 
-msgid "{label} in cloud workspaces"
-msgstr "{label} trong workspace cloud"
-
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -3272,6 +3269,9 @@ msgstr "Đi kèm với ứng dụng Superset trên thiết bị này."
 
 msgid "Bundled with the Superset app on this device. Updates with the app."
 msgstr "Đi kèm với ứng dụng Superset trên thiết bị này. Cập nhật cùng với ứng dụng."
+
+msgid "Business plan"
+msgstr "Gói Business"
 
 msgid "Button — sizes"
 msgstr "Nút — kích thước"
@@ -6814,6 +6814,9 @@ msgstr "Hãy nhập một giá trị."
 msgid "Enter a whole number"
 msgstr "Nhập một số nguyên"
 
+msgid "Enter this code when OpenAI asks for it:"
+msgstr "Nhập mã này khi OpenAI yêu cầu:"
+
 msgid "Enter URL or search..."
 msgstr "Nhập URL hoặc tìm kiếm..."
 
@@ -8549,6 +8552,9 @@ msgstr "Hằng giờ"
 msgid "Hover Card"
 msgstr "Hover Card"
 
+msgid "How {label} signs in when Superset runs it for you."
+msgstr "Cách {label} đăng nhập khi Superset chạy nó cho bạn."
+
 msgid "How 2026 plays out"
 msgstr "Năm 2026 diễn ra thế nào"
 
@@ -10068,6 +10074,9 @@ msgstr "Quản lý tác vụ từ hội thoại Slack."
 
 msgid "Manage Terminal Scripts"
 msgstr "Quản lý script terminal"
+
+msgid "Manage usage"
+msgstr "Quản lý mức sử dụng"
 
 msgid "Manage your account settings"
 msgstr "Quản lý cài đặt tài khoản của bạn"
@@ -11936,6 +11945,12 @@ msgstr "Mở thay đổi"
 msgid "Open Changes"
 msgstr "Mở thay đổi"
 
+msgid "Open ChatGPT admin settings"
+msgstr "Mở cài đặt quản trị ChatGPT"
+
+msgid "Open ChatGPT settings"
+msgstr "Mở cài đặt ChatGPT"
+
 msgid "Open Command Palette"
 msgstr "Mở bảng lệnh"
 
@@ -11944,6 +11959,9 @@ msgstr "Mở bình luận trên GitHub"
 
 msgid "Open details"
 msgstr "Mở chi tiết"
+
+msgid "Open device sign-in"
+msgstr "Mở đăng nhập thiết bị"
 
 msgid "Open DevTools"
 msgstr "Mở DevTools"
@@ -12140,6 +12158,9 @@ msgstr "Mở điều hướng"
 msgid "Open on GitHub"
 msgstr "Mở trên GitHub"
 
+msgid "Open OpenAI's device sign-in page."
+msgstr "Mở trang đăng nhập thiết bị của OpenAI."
+
 msgid "Open Page in Default Browser"
 msgstr "Mở trang trong trình duyệt mặc định"
 
@@ -12277,6 +12298,9 @@ msgstr "Mở workspace"
 
 msgid "Open your app."
 msgstr "Mở ứng dụng của bạn."
+
+msgid "OpenAI did not complete the sign-in. Start again."
+msgstr "OpenAI chưa hoàn tất đăng nhập. Hãy bắt đầu lại."
 
 msgid "OpenAI rejected this API key."
 msgstr "OpenAI đã từ chối khóa API này."
@@ -12730,6 +12754,9 @@ msgstr "Người"
 msgid "Personal"
 msgstr "Cá nhân"
 
+msgid "Personal plan"
+msgstr "Gói cá nhân"
+
 msgid "Phantom Forklift"
 msgstr "Xe nâng bóng ma"
 
@@ -12783,9 +12810,6 @@ msgstr "Chọn workspace có agent đang chờ bạn nhập, đã hoàn tất k�
 
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Chọn biểu tượng và màu, hoặc tải ảnh riêng lên. Mặc định dùng ảnh đại diện của chủ sở hữu GitHub đã liên kết."
-
-msgid "Pick how {label} signs in inside a sandbox. The credential is handed to the agent process when it launches and is not stored in the sandbox."
-msgstr "Chọn cách {label} đăng nhập bên trong sandbox. Thông tin xác thực được chuyển cho tiến trình agent khi khởi chạy và không được lưu trong sandbox."
 
 msgid "Pick one in the Superset app. It's saved to your account."
 msgstr "Chọn một plugin trong ứng dụng Superset. Plugin được lưu vào tài khoản của bạn."
@@ -15890,6 +15914,12 @@ msgstr "Đăng nhập thất bại ({reason}). Vui lòng thử lại."
 msgid "Signed in as <0>{userName}</0>"
 msgstr "Đang đăng nhập với <0>{userName}</0>"
 
+msgid "Signed in to ChatGPT"
+msgstr "Đã đăng nhập ChatGPT"
+
+msgid "Signed in to ChatGPT as {connectedAs}"
+msgstr "Đã đăng nhập ChatGPT với tên {connectedAs}"
+
 msgid "Signed out"
 msgstr "Đã đăng xuất"
 
@@ -17328,6 +17358,9 @@ msgstr "Nút giờ đã nổi bật. Tôi đã kiểm tra trong ngăn của bạ
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "Workspace cloud lẽ ra đã khởi động nhưng không phản hồi kịp. Lần chạy tiếp theo sẽ thử lại."
 
+msgid "The code expired. Start again."
+msgstr "Mã đã hết hạn. Hãy bắt đầu lại."
+
 msgid "The config repository must be one of the environment's repositories"
 msgstr "Repository cấu hình phải là một trong các repository của environment"
 
@@ -18354,6 +18387,9 @@ msgstr "Bật “Cho phép truy cập từ xa vào thiết bị này qua relay�
 msgid "Turn on Design and click the part of the page you want to change."
 msgstr "Bật Thiết kế và nhấp vào phần của trang mà bạn muốn thay đổi."
 
+msgid "Turn on device code sign-in for Codex."
+msgstr "Bật đăng nhập bằng mã thiết bị cho Codex."
+
 msgid "Turn Slack conversations into tasks, run agents from your workspace, and keep teammates in the loop where work starts."
 msgstr "Biến hội thoại Slack thành tác vụ, chạy agent từ workspace của bạn và giữ đồng đội nắm thông tin ngay nơi công việc bắt đầu."
 
@@ -19074,6 +19110,9 @@ msgstr "đang chờ {0} và {1}…"
 
 msgid "Waiting for activity data"
 msgstr "Đang chờ dữ liệu hoạt động"
+
+msgid "Waiting for approval. Keep this dialog open."
+msgstr "Đang chờ phê duyệt. Hãy giữ hộp thoại này mở."
 
 msgid "Waiting for Checks"
 msgstr "Đang chờ check"
@@ -19930,6 +19969,9 @@ msgstr "Các dự án và workspace v1 của bạn đang được chuyển sang 
 
 msgid "Your version: {currentVersion}"
 msgstr "Phiên bản của bạn: {currentVersion}"
+
+msgid "Your workspace admin turns on device code sign-in for Codex."
+msgstr "Quản trị viên không gian làm việc của bạn bật đăng nhập bằng mã thiết bị cho Codex."
 
 msgid "Zap"
 msgstr "Tia chớp"

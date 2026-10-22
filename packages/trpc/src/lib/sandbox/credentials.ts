@@ -18,12 +18,14 @@ import {
 	CLOUD_WORKSPACE_IGNORED_ENV_NAMES,
 } from "@superset/shared/agent-credentials";
 import { SANDBOX_CREDENTIAL_PLACEHOLDER } from "@superset/shared/constants";
+import { SANDBOX_PATHS } from "@superset/shared/sandbox-contract";
 import {
 	SANDBOX_API_CREDENTIAL_HEADER,
 	sandboxApiCredential,
 } from "@superset/shared/sandbox-gate";
 import type { NetworkPolicy, NetworkPolicyRule } from "@vercel/sandbox";
 import { env } from "../../env";
+import type { CodexChatgptSignIn } from "../../router/agent-credential";
 
 export interface SandboxCredentialInputs {
 	/** Which workspace the box is, for the credential it presents to the API. */
@@ -32,6 +34,8 @@ export interface SandboxCredentialInputs {
 	environmentEnv: Record<string, string>;
 	/** The workspace creator's own agent sign-ins, already decrypted. */
 	userAgentEnv: Record<string, string>;
+	/** The creator's ChatGPT sign-in for Codex, which is a file rather than a variable. */
+	codexChatgpt?: CodexChatgptSignIn | null;
 	/**
 	 * The GitHub token the box's git and gh requests carry: the workspace
 	 * creator's own user token when they have connected GitHub, else the App
@@ -77,9 +81,71 @@ export function gitAuthorFor(args: {
 	return { name: args.user.name, email: args.user.email };
 }
 
+export interface SandboxFile {
+	path: string;
+	content: string;
+}
+
 export interface SandboxCredentials {
 	networkPolicy: NetworkPolicy;
 	managedEnv: Record<string, string>;
+	/** Written into the box before every boot. */
+	files: SandboxFile[];
+}
+
+export const CODEX_AUTH_PATH = `${SANDBOX_PATHS.home}/.codex/auth.json`;
+/** Codex's system config layer: below the person's own `~/.codex/config.toml`. */
+export const CODEX_SYSTEM_CONFIG_PATH = "/etc/codex/config.toml";
+
+/**
+ * Codex's built-in provider speaks WebSockets to chatgpt.com, and the
+ * firewall refuses an upgrade on a host whose headers it rewrites; Codex then
+ * spends ~10 s on retries before falling back to HTTPS. The built-in provider
+ * cannot be reconfigured, so this is the same endpoint without WebSockets.
+ */
+const CODEX_CHATGPT_PROVIDER_CONFIG = `model_provider = "chatgpt"
+
+[model_providers.chatgpt]
+name = "OpenAI"
+base_url = "https://chatgpt.com/backend-api/codex"
+wire_api = "responses"
+requires_openai_auth = true
+supports_websockets = false
+supports_standalone_web_search = true
+`;
+
+function unsignedJwt(claims: Record<string, unknown>): string {
+	const part = (value: unknown) =>
+		Buffer.from(JSON.stringify(value)).toString("base64url");
+	return `${part({ alg: "none", typ: "JWT" })}.${part(claims)}.unsigned`;
+}
+
+/**
+ * Codex's own login file with nothing real in it. The tokens are the
+ * placeholder, which the firewall swaps on the way out; the id token is
+ * rebuilt unsigned from the claims Codex reads. A last refresh far ahead
+ * keeps Codex from ever trying to renew with the placeholder: the API renews
+ * the real session and the firewall carries the new token.
+ */
+function codexChatgptAuthFile(signIn: CodexChatgptSignIn): string {
+	return JSON.stringify({
+		auth_mode: "chatgpt",
+		OPENAI_API_KEY: null,
+		tokens: {
+			id_token: unsignedJwt({
+				email: signIn.identity.email,
+				"https://api.openai.com/auth": {
+					chatgpt_plan_type: signIn.identity.planType,
+					chatgpt_user_id: signIn.identity.userId,
+					chatgpt_account_id: signIn.accountId,
+				},
+			}),
+			access_token: SANDBOX_CREDENTIAL_PLACEHOLDER,
+			refresh_token: SANDBOX_CREDENTIAL_PLACEHOLDER,
+			account_id: signIn.accountId,
+		},
+		last_refresh: "2099-01-01T00:00:00Z",
+	});
 }
 
 function rule(headers: Record<string, string>): NetworkPolicyRule[] {
@@ -178,6 +244,35 @@ export async function deriveSandboxCredentials(
 		managedEnv.OPENAI_BASE_URL = signIn.OPENAI_BASE_URL;
 	}
 
+	// Codex on a ChatGPT plan: the sign-in is the login file, and the bearer
+	// is swapped on the way out. Codex reads the login file before
+	// OPENAI_API_KEY, so an API key rewrites it too, or a box that was signed
+	// in with ChatGPT would stay so.
+	const files: SandboxFile[] = [];
+	if (inputs.codexChatgpt) {
+		allow["chatgpt.com"] = swap(
+			"authorization",
+			`Bearer ${SANDBOX_CREDENTIAL_PLACEHOLDER}`,
+			`Bearer ${inputs.codexChatgpt.accessToken}`,
+		);
+		files.push({
+			path: CODEX_AUTH_PATH,
+			content: codexChatgptAuthFile(inputs.codexChatgpt),
+		});
+	} else if (signIn.OPENAI_API_KEY) {
+		files.push({
+			path: CODEX_AUTH_PATH,
+			content: JSON.stringify({
+				auth_mode: "apikey",
+				OPENAI_API_KEY: SANDBOX_CREDENTIAL_PLACEHOLDER,
+			}),
+		});
+	}
+	files.push({
+		path: CODEX_SYSTEM_CONFIG_PATH,
+		content: inputs.codexChatgpt ? CODEX_CHATGPT_PROVIDER_CONFIG : "",
+	});
+
 	// GitHub: git speaks Basic with the token as the password, gh and the
 	// REST API speak bearer. Both are the installation token, scoped to the
 	// workspace's repository and re-minted before it expires.
@@ -215,7 +310,7 @@ export async function deriveSandboxCredentials(
 		Object.keys(allow).length === 0
 			? "allow-all"
 			: { allow: { ...allow, "*": [] } };
-	return { networkPolicy, managedEnv };
+	return { networkPolicy, managedEnv, files };
 }
 
 /** Re-exported so callers build the user's env the one way the sign-in code does. */

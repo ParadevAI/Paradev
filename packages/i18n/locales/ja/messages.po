@@ -928,9 +928,6 @@ msgstr "{kind} · 作者: {author}"
 msgid "{kindLabel} theme"
 msgstr "{kindLabel}テーマ"
 
-msgid "{label} in cloud workspaces"
-msgstr "クラウドワークスペースでの{label}"
-
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -3272,6 +3269,9 @@ msgstr "このデバイスのSupersetアプリに同梱されています。"
 
 msgid "Bundled with the Superset app on this device. Updates with the app."
 msgstr "このデバイスのSupersetアプリに同梱されています。アプリと一緒に更新されます。"
+
+msgid "Business plan"
+msgstr "Business プラン"
 
 msgid "Button — sizes"
 msgstr "Button — サイズ"
@@ -6814,6 +6814,9 @@ msgstr "値を入力してください。"
 msgid "Enter a whole number"
 msgstr "整数を入力"
 
+msgid "Enter this code when OpenAI asks for it:"
+msgstr "OpenAI に求められたら、このコードを入力してください:"
+
 msgid "Enter URL or search..."
 msgstr "URLを入力または検索..."
 
@@ -8549,6 +8552,9 @@ msgstr "毎時"
 msgid "Hover Card"
 msgstr "Hover Card"
 
+msgid "How {label} signs in when Superset runs it for you."
+msgstr "Superset が {label} を実行するときのサインイン方法。"
+
 msgid "How 2026 plays out"
 msgstr "2026年はこう進む"
 
@@ -10068,6 +10074,9 @@ msgstr "Slackの会話からタスクを管理します。"
 
 msgid "Manage Terminal Scripts"
 msgstr "ターミナルスクリプトを管理"
+
+msgid "Manage usage"
+msgstr "使用量を管理"
 
 msgid "Manage your account settings"
 msgstr "アカウント設定を管理"
@@ -11936,6 +11945,12 @@ msgstr "変更を開く"
 msgid "Open Changes"
 msgstr "変更を開く"
 
+msgid "Open ChatGPT admin settings"
+msgstr "ChatGPT の管理者設定を開く"
+
+msgid "Open ChatGPT settings"
+msgstr "ChatGPT の設定を開く"
+
 msgid "Open Command Palette"
 msgstr "コマンドパレットを開く"
 
@@ -11944,6 +11959,9 @@ msgstr "GitHubでコメントを開く"
 
 msgid "Open details"
 msgstr "詳細を開く"
+
+msgid "Open device sign-in"
+msgstr "デバイスのサインインを開く"
 
 msgid "Open DevTools"
 msgstr "DevToolsを開く"
@@ -12140,6 +12158,9 @@ msgstr "ナビゲーションを開く"
 msgid "Open on GitHub"
 msgstr "GitHubで開く"
 
+msgid "Open OpenAI's device sign-in page."
+msgstr "OpenAI のデバイスサインインページを開きます。"
+
 msgid "Open Page in Default Browser"
 msgstr "ページを既定のブラウザで開く"
 
@@ -12277,6 +12298,9 @@ msgstr "ワークスペースを開く"
 
 msgid "Open your app."
 msgstr "アプリを開きます。"
+
+msgid "OpenAI did not complete the sign-in. Start again."
+msgstr "OpenAI がサインインを完了しませんでした。やり直してください。"
 
 msgid "OpenAI rejected this API key."
 msgstr "OpenAIがこのAPIキーを拒否しました。"
@@ -12730,6 +12754,9 @@ msgstr "人"
 msgid "Personal"
 msgstr "個人"
 
+msgid "Personal plan"
+msgstr "個人プラン"
+
 msgid "Phantom Forklift"
 msgstr "幻のフォークリフト"
 
@@ -12783,9 +12810,6 @@ msgstr "エージェントがあなたの入力を待っている、前回確認
 
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "アイコンと色を選ぶか、独自の画像をアップロードします。既定ではリンクされたGitHubオーナーのアバターになります。"
-
-msgid "Pick how {label} signs in inside a sandbox. The credential is handed to the agent process when it launches and is not stored in the sandbox."
-msgstr "サンドボックス内で{label}がどうサインインするかを選びます。認証情報は起動時にエージェントのプロセスへ渡され、サンドボックスには保存されません。"
 
 msgid "Pick one in the Superset app. It's saved to your account."
 msgstr "Supersetアプリで選ぶだけ。アカウントに保存されます。"
@@ -15890,6 +15914,12 @@ msgstr "サインインに失敗しました（{reason}）。もう一度お試�
 msgid "Signed in as <0>{userName}</0>"
 msgstr "<0>{userName}</0>としてサインイン中"
 
+msgid "Signed in to ChatGPT"
+msgstr "ChatGPT にサインインしました"
+
+msgid "Signed in to ChatGPT as {connectedAs}"
+msgstr "{connectedAs} として ChatGPT にサインインしました"
+
 msgid "Signed out"
 msgstr "サインアウトしました"
 
@@ -17328,6 +17358,9 @@ msgstr "ボタンが目立つようになりました。ペインで確認済み
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "クラウドワークスペースは起動しているはずですが、時間内に応答がありませんでした。次回の実行で再試行します。"
 
+msgid "The code expired. Start again."
+msgstr "コードの有効期限が切れました。やり直してください。"
+
 msgid "The config repository must be one of the environment's repositories"
 msgstr "設定リポジトリは環境のリポジトリのいずれかである必要があります"
 
@@ -18354,6 +18387,9 @@ msgstr "「リレー経由でこのデバイスへのリモートアクセスを
 msgid "Turn on Design and click the part of the page you want to change."
 msgstr "デザインをオンにして、変更したいページの部分をクリックします。"
 
+msgid "Turn on device code sign-in for Codex."
+msgstr "Codex のデバイスコードによるサインインを有効にします。"
+
 msgid "Turn Slack conversations into tasks, run agents from your workspace, and keep teammates in the loop where work starts."
 msgstr "Slackの会話をタスクに変え、ワークスペースからエージェントを実行し、仕事が始まる場所でチームと共有できます。"
 
@@ -19074,6 +19110,9 @@ msgstr "{0}と{1}を待っています…"
 
 msgid "Waiting for activity data"
 msgstr "アクティビティデータを待機中"
+
+msgid "Waiting for approval. Keep this dialog open."
+msgstr "承認を待っています。このダイアログは開いたままにしてください。"
 
 msgid "Waiting for Checks"
 msgstr "チェックを待機中"
@@ -19930,6 +19969,9 @@ msgstr "v1 のプロジェクトとワークスペースを新しい Superset �
 
 msgid "Your version: {currentVersion}"
 msgstr "現在のバージョン: {currentVersion}"
+
+msgid "Your workspace admin turns on device code sign-in for Codex."
+msgstr "Codex のデバイスコードによるサインインは、ワークスペースの管理者が有効にします。"
 
 msgid "Zap"
 msgstr "稲妻"

@@ -76,7 +76,8 @@ environment's. Fixed (2026-09-25).** A sandbox's Anthropic or OpenAI credential
 comes from the creator's sign-in (Settings › Agents, per user,
 `agent_credentials`), brokered at the firewall by a rule that fires only on the
 placeholder the agent presents. An environment variable by one of those names
-(`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `CLAUDE_CODE_OAUTH_TOKEN`) is ignored:
+(`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `CLAUDE_CODE_OAUTH_TOKEN`,
+`CODEX_ACCESS_TOKEN`, `CODEX_API_KEY`) is ignored:
 it never reaches the box, so nothing that runs there, a launched agent, a
 hand-typed `claude`, a headless `claude -p`, `codex`, the app itself, can bill
 it; the environment sheet and `secrets set` say so. Measured on Claude Code

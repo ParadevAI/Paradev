@@ -177,6 +177,26 @@ rewrite. An environment variable by a credential's name is ignored and never
 reaches the box; a cloud workspace has no way to carry an app's own provider
 key.
 
+**A ChatGPT sign-in is a file and a session, not a key.** Codex on a ChatGPT
+plan reads `~/.codex/auth.json`, and its refresh token works once: two holders
+of one session sign each other out ("refresh token was already used"). The API
+runs Codex's device-code sign-in itself, so the session is Superset's own and
+never the one on the person's laptop, and renews it under a row lock before
+the access token lapses. The box gets an `auth.json` of placeholders (an
+unsigned id token rebuilt from the claims, a last refresh far ahead so Codex
+never tries to renew) written with the identity on every create and wake; the
+firewall swaps the bearer on `chatgpt.com`. Verified 2026-10-21 on a real box,
+including a forced rotation while it ran.
+
+**The firewall refuses a WebSocket upgrade on a host whose headers it
+rewrites.** Codex's built-in provider opens `wss://chatgpt.com/...` first; with
+the bearer swap in place the upgrade fails ("Attack attempt detected") and
+Codex spends ~10 s on retries before it falls back to HTTPS, once per session.
+The built-in provider cannot be reconfigured, so the claim writes
+`/etc/codex/config.toml` (Codex's system layer, below the person's own config)
+with the same endpoint and `supports_websockets = false`. Measured: 13.3 s →
+3.6 s for one `codex exec`.
+
 **The firewall terminates TLS for the domains it rewrites, and the terminal
 must trust its CA.** The CA is in the image's system bundle, which curl, git,
 gh, python and bun read. Node does not read it, and the platform sets no CA

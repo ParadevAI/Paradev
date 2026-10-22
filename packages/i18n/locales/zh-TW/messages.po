@@ -928,9 +928,6 @@ msgstr "{kind} · 作者{author}"
 msgid "{kindLabel} theme"
 msgstr "{kindLabel}主題"
 
-msgid "{label} in cloud workspaces"
-msgstr "雲端工作區中的{label}"
-
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -3272,6 +3269,9 @@ msgstr "隨此裝置上的 Superset 應用程式一起提供。"
 
 msgid "Bundled with the Superset app on this device. Updates with the app."
 msgstr "隨此裝置上的 Superset 應用程式一起提供，並隨應用程式一起更新。"
+
+msgid "Business plan"
+msgstr "Business 方案"
 
 msgid "Button — sizes"
 msgstr "Button — 尺寸"
@@ -6814,6 +6814,9 @@ msgstr "請輸入一個值。"
 msgid "Enter a whole number"
 msgstr "輸入整數"
 
+msgid "Enter this code when OpenAI asks for it:"
+msgstr "OpenAI 要求時輸入此代碼："
+
 msgid "Enter URL or search..."
 msgstr "輸入URL或搜尋..."
 
@@ -8549,6 +8552,9 @@ msgstr "每小時"
 msgid "Hover Card"
 msgstr "懸浮卡片"
 
+msgid "How {label} signs in when Superset runs it for you."
+msgstr "Superset 為你執行 {label} 時它如何登入。"
+
 msgid "How 2026 plays out"
 msgstr "2026年會怎麼走"
 
@@ -10068,6 +10074,9 @@ msgstr "在Slack對話中管理任務。"
 
 msgid "Manage Terminal Scripts"
 msgstr "管理終端指令碼"
+
+msgid "Manage usage"
+msgstr "管理用量"
 
 msgid "Manage your account settings"
 msgstr "管理你的帳戶設定"
@@ -11936,6 +11945,12 @@ msgstr "開啟更改"
 msgid "Open Changes"
 msgstr "開啟更改"
 
+msgid "Open ChatGPT admin settings"
+msgstr "開啟 ChatGPT 管理員設定"
+
+msgid "Open ChatGPT settings"
+msgstr "開啟 ChatGPT 設定"
+
 msgid "Open Command Palette"
 msgstr "開啟命令面板"
 
@@ -11944,6 +11959,9 @@ msgstr "在GitHub上開啟評論"
 
 msgid "Open details"
 msgstr "開啟詳細資料"
+
+msgid "Open device sign-in"
+msgstr "開啟裝置登入"
 
 msgid "Open DevTools"
 msgstr "開啟DevTools"
@@ -12140,6 +12158,9 @@ msgstr "開啟導覽"
 msgid "Open on GitHub"
 msgstr "在GitHub上開啟"
 
+msgid "Open OpenAI's device sign-in page."
+msgstr "開啟 OpenAI 的裝置登入頁面。"
+
 msgid "Open Page in Default Browser"
 msgstr "在預設瀏覽器中開啟頁面"
 
@@ -12277,6 +12298,9 @@ msgstr "開啟工作區"
 
 msgid "Open your app."
 msgstr "開啟你的應用程式。"
+
+msgid "OpenAI did not complete the sign-in. Start again."
+msgstr "OpenAI 未完成登入。請重新開始。"
 
 msgid "OpenAI rejected this API key."
 msgstr "OpenAI拒絕了此API金鑰。"
@@ -12730,6 +12754,9 @@ msgstr "人員"
 msgid "Personal"
 msgstr "個人"
 
+msgid "Personal plan"
+msgstr "個人方案"
+
 msgid "Phantom Forklift"
 msgstr "幽靈堆高機"
 
@@ -12783,9 +12810,6 @@ msgstr "選擇一個工作區：其代理正在等待你的輸入、自你上次
 
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "選擇圖示和顏色，或上傳自訂圖片。預設使用關聯的GitHub擁有者頭像。"
-
-msgid "Pick how {label} signs in inside a sandbox. The credential is handed to the agent process when it launches and is not stored in the sandbox."
-msgstr "選擇{label}在沙箱中的登入方式。憑證在啟動時交給代理程式的行程，不會存放在沙箱裡。"
 
 msgid "Pick one in the Superset app. It's saved to your account."
 msgstr "在 Superset 應用程式中選一個，它會儲存到你的帳號。"
@@ -15890,6 +15914,12 @@ msgstr "登入失敗（{reason}）。請再試一次。"
 msgid "Signed in as <0>{userName}</0>"
 msgstr "已登入為<0>{userName}</0>"
 
+msgid "Signed in to ChatGPT"
+msgstr "已登入 ChatGPT"
+
+msgid "Signed in to ChatGPT as {connectedAs}"
+msgstr "已以 {connectedAs} 身分登入 ChatGPT"
+
 msgid "Signed out"
 msgstr "已登出"
 
@@ -17328,6 +17358,9 @@ msgstr "按鈕現在更醒目了。我已在你的窗格中確認過。"
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "雲端工作區應該已經啟動，但沒有及時回應。下次執行時會重試。"
 
+msgid "The code expired. Start again."
+msgstr "代碼已過期。請重新開始。"
+
 msgid "The config repository must be one of the environment's repositories"
 msgstr "設定儲存庫必須是該環境的儲存庫之一"
 
@@ -18354,6 +18387,9 @@ msgstr "開啟「允許透過中繼遠端存取此裝置」"
 msgid "Turn on Design and click the part of the page you want to change."
 msgstr "開啟「設計」，然後點擊頁面上想修改的部分。"
 
+msgid "Turn on device code sign-in for Codex."
+msgstr "為 Codex 開啟裝置代碼登入。"
+
 msgid "Turn Slack conversations into tasks, run agents from your workspace, and keep teammates in the loop where work starts."
 msgstr "把Slack對話變成任務，從工作區執行代理程式，讓隊友在工作開始的地方保持同步。"
 
@@ -19074,6 +19110,9 @@ msgstr "正在等待 {0} 和 {1}…"
 
 msgid "Waiting for activity data"
 msgstr "正在等待活動資料"
+
+msgid "Waiting for approval. Keep this dialog open."
+msgstr "正在等待核准。請保持此對話方塊開啟。"
 
 msgid "Waiting for Checks"
 msgstr "等待檢查"
@@ -19930,6 +19969,9 @@ msgstr "你的 v1 專案和工作區正在移轉到新版 Superset。每一項�
 
 msgid "Your version: {currentVersion}"
 msgstr "你的版本：{currentVersion}"
+
+msgid "Your workspace admin turns on device code sign-in for Codex."
+msgstr "Codex 的裝置碼登入由你的工作區管理員開啟。"
 
 msgid "Zap"
 msgstr "閃電"

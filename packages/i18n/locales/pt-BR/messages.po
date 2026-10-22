@@ -928,9 +928,6 @@ msgstr "{kind} · por {author}"
 msgid "{kindLabel} theme"
 msgstr "Tema {kindLabel}"
 
-msgid "{label} in cloud workspaces"
-msgstr "{label} em áreas de trabalho na nuvem"
-
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -3272,6 +3269,9 @@ msgstr "Incluído no app Superset neste dispositivo."
 
 msgid "Bundled with the Superset app on this device. Updates with the app."
 msgstr "Incluído no app Superset neste dispositivo. Atualiza junto com o app."
+
+msgid "Business plan"
+msgstr "Plano Business"
 
 msgid "Button — sizes"
 msgstr "Botão — tamanhos"
@@ -6814,6 +6814,9 @@ msgstr "Digite um valor."
 msgid "Enter a whole number"
 msgstr "Digite um número inteiro"
 
+msgid "Enter this code when OpenAI asks for it:"
+msgstr "Digite este código quando o OpenAI pedir:"
+
 msgid "Enter URL or search..."
 msgstr "Digite uma URL ou busque..."
 
@@ -8549,6 +8552,9 @@ msgstr "A cada hora"
 msgid "Hover Card"
 msgstr "Hover Card"
 
+msgid "How {label} signs in when Superset runs it for you."
+msgstr "Como o {label} faz login quando o Superset o executa para você."
+
 msgid "How 2026 plays out"
 msgstr "Como 2026 se desenrola"
 
@@ -10068,6 +10074,9 @@ msgstr "Gerencie tarefas a partir de conversas do Slack."
 
 msgid "Manage Terminal Scripts"
 msgstr "Gerenciar scripts de terminal"
+
+msgid "Manage usage"
+msgstr "Gerenciar uso"
 
 msgid "Manage your account settings"
 msgstr "Gerencie as configurações da sua conta"
@@ -11936,6 +11945,12 @@ msgstr "Abrir alterações"
 msgid "Open Changes"
 msgstr "Abrir alterações"
 
+msgid "Open ChatGPT admin settings"
+msgstr "Abrir configurações de administrador do ChatGPT"
+
+msgid "Open ChatGPT settings"
+msgstr "Abrir configurações do ChatGPT"
+
 msgid "Open Command Palette"
 msgstr "Abrir a paleta de comandos"
 
@@ -11944,6 +11959,9 @@ msgstr "Abrir o comentário no GitHub"
 
 msgid "Open details"
 msgstr "Abrir detalhes"
+
+msgid "Open device sign-in"
+msgstr "Abrir login do dispositivo"
 
 msgid "Open DevTools"
 msgstr "Abrir o DevTools"
@@ -12140,6 +12158,9 @@ msgstr "Abrir navegação"
 msgid "Open on GitHub"
 msgstr "Abrir no GitHub"
 
+msgid "Open OpenAI's device sign-in page."
+msgstr "Abra a página de login de dispositivos do OpenAI."
+
 msgid "Open Page in Default Browser"
 msgstr "Abrir a página no navegador padrão"
 
@@ -12277,6 +12298,9 @@ msgstr "Abrir área de trabalho"
 
 msgid "Open your app."
 msgstr "Abra seu app."
+
+msgid "OpenAI did not complete the sign-in. Start again."
+msgstr "O OpenAI não concluiu o login. Comece de novo."
 
 msgid "OpenAI rejected this API key."
 msgstr "A OpenAI recusou esta chave de API."
@@ -12730,6 +12754,9 @@ msgstr "Pessoa"
 msgid "Personal"
 msgstr "Pessoal"
 
+msgid "Personal plan"
+msgstr "Plano pessoal"
+
 msgid "Phantom Forklift"
 msgstr "Empilhadeira Fantasma"
 
@@ -12783,9 +12810,6 @@ msgstr "Escolha uma área de trabalho cujo agente está esperando sua resposta, 
 
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Escolha um ícone e uma cor, ou envie uma imagem. Por padrão, usa o avatar do dono do repositório no GitHub."
-
-msgid "Pick how {label} signs in inside a sandbox. The credential is handed to the agent process when it launches and is not stored in the sandbox."
-msgstr "Escolha como o {label} entra dentro de um sandbox. A credencial é entregue ao processo do agente quando ele inicia e não fica guardada no sandbox."
 
 msgid "Pick one in the Superset app. It's saved to your account."
 msgstr "Escolha um no app do Superset. Ele fica salvo na sua conta."
@@ -15890,6 +15914,12 @@ msgstr "Falha ao entrar ({reason}). Tente novamente."
 msgid "Signed in as <0>{userName}</0>"
 msgstr "Conectado como <0>{userName}</0>"
 
+msgid "Signed in to ChatGPT"
+msgstr "Conectado ao ChatGPT"
+
+msgid "Signed in to ChatGPT as {connectedAs}"
+msgstr "Conectado ao ChatGPT como {connectedAs}"
+
 msgid "Signed out"
 msgstr "Sessão encerrada"
 
@@ -17328,6 +17358,9 @@ msgstr "O botão agora se destaca. Conferi no seu painel."
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "A área de trabalho na nuvem deveria ter iniciado, mas não respondeu a tempo. A próxima execução tentará novamente."
 
+msgid "The code expired. Start again."
+msgstr "O código expirou. Comece de novo."
+
 msgid "The config repository must be one of the environment's repositories"
 msgstr "O repositório de configuração deve ser um dos repositórios do ambiente"
 
@@ -18354,6 +18387,9 @@ msgstr "Ative “Permitir acesso remoto a este dispositivo via relay”"
 msgid "Turn on Design and click the part of the page you want to change."
 msgstr "Ative o Design e clique na parte da página que você quer mudar."
 
+msgid "Turn on device code sign-in for Codex."
+msgstr "Ative o login por código de dispositivo para o Codex."
+
 msgid "Turn Slack conversations into tasks, run agents from your workspace, and keep teammates in the loop where work starts."
 msgstr "Transforme conversas do Slack em tarefas, execute agentes a partir da sua área de trabalho e mantenha o time informado onde o trabalho começa."
 
@@ -19074,6 +19110,9 @@ msgstr "aguardando {0} e {1}…"
 
 msgid "Waiting for activity data"
 msgstr "Aguardando dados de atividade"
+
+msgid "Waiting for approval. Keep this dialog open."
+msgstr "Aguardando aprovação. Mantenha esta caixa de diálogo aberta."
 
 msgid "Waiting for Checks"
 msgstr "Aguardando as verificações"
@@ -19930,6 +19969,9 @@ msgstr "Seus projetos e workspaces da v1 estão sendo levados para o novo Supers
 
 msgid "Your version: {currentVersion}"
 msgstr "Sua versão: {currentVersion}"
+
+msgid "Your workspace admin turns on device code sign-in for Codex."
+msgstr "O administrador do seu workspace ativa o login com código de dispositivo para o Codex."
 
 msgid "Zap"
 msgstr "Raio"

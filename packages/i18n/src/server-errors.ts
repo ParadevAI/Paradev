@@ -26,6 +26,12 @@ export const serverErrorMessages: Record<
 				message: "Anthropic rejected this token.",
 			}),
 		),
+	"serverError.agentCredential.chatgptSignInFailed": () =>
+		i18n._(
+			msg({
+				message: "OpenAI did not complete the sign-in. Start again.",
+			}),
+		),
 	"serverError.agentCredential.empty": () =>
 		i18n._(
 			msg({

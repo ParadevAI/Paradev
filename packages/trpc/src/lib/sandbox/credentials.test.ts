@@ -1,7 +1,12 @@
 import { describe, expect, test } from "bun:test";
 import { SANDBOX_CREDENTIAL_PLACEHOLDER } from "@superset/shared/constants";
 import { setTestEnv } from "../../../test/env";
-import { deriveSandboxCredentials, gitAuthorFor } from "./credentials";
+import {
+	CODEX_AUTH_PATH,
+	CODEX_SYSTEM_CONFIG_PATH,
+	deriveSandboxCredentials,
+	gitAuthorFor,
+} from "./credentials";
 
 setTestEnv({ NEXT_PUBLIC_API_URL: undefined });
 
@@ -186,5 +191,75 @@ describe("gitAuthorFor", () => {
 				user: { name: "Ada", email: "ada@example.com" },
 			}),
 		).toEqual({ name: "Ada", email: "ada@example.com" });
+	});
+});
+
+describe("deriveSandboxCredentials for Codex", () => {
+	const chatgpt = {
+		accessToken: "chatgpt-access",
+		accountId: "acct-1",
+		identity: {
+			email: "ada@example.com",
+			planType: "plus",
+			userId: "user-1",
+			accountId: "acct-1",
+		},
+	};
+	const derive = (
+		inputs: Partial<Parameters<typeof deriveSandboxCredentials>[0]>,
+	) =>
+		deriveSandboxCredentials({
+			workspaceId: WORKSPACE_ID,
+			environmentEnv: {},
+			userAgentEnv: {},
+			githubToken: null,
+			gitAuthor: author,
+			...inputs,
+		});
+	const file = (
+		result: Awaited<ReturnType<typeof deriveSandboxCredentials>>,
+		path: string,
+	) => result.files.find((entry) => entry.path === path)?.content;
+
+	test("a ChatGPT sign-in is a bearer swap on chatgpt.com and a login file of placeholders", async () => {
+		const result = await derive({ codexChatgpt: chatgpt });
+		expect(
+			rules(result.networkPolicy)["chatgpt.com"]?.[0]?.transform[0]?.headers,
+		).toEqual({ authorization: "Bearer chatgpt-access" });
+		const auth = JSON.parse(file(result, CODEX_AUTH_PATH) ?? "{}");
+		expect(auth.auth_mode).toBe("chatgpt");
+		expect(auth.tokens.access_token).toBe(SANDBOX_CREDENTIAL_PLACEHOLDER);
+		expect(auth.tokens.refresh_token).toBe(SANDBOX_CREDENTIAL_PLACEHOLDER);
+		expect(auth.tokens.account_id).toBe("acct-1");
+		const claims = JSON.parse(
+			Buffer.from(auth.tokens.id_token.split(".")[1], "base64url").toString(),
+		);
+		expect(claims["https://api.openai.com/auth"].chatgpt_plan_type).toBe(
+			"plus",
+		);
+		expect(JSON.stringify(result.files)).not.toContain("chatgpt-access");
+		expect(file(result, CODEX_SYSTEM_CONFIG_PATH)).toContain(
+			"supports_websockets = false",
+		);
+	});
+
+	test("an OpenAI key rewrites the login file, so a box once signed in with ChatGPT follows the switch", async () => {
+		const result = await derive({
+			userAgentEnv: { OPENAI_API_KEY: "sk-mine" },
+		});
+		expect(JSON.parse(file(result, CODEX_AUTH_PATH) ?? "{}")).toEqual({
+			auth_mode: "apikey",
+			OPENAI_API_KEY: SANDBOX_CREDENTIAL_PLACEHOLDER,
+		});
+		expect(file(result, CODEX_SYSTEM_CONFIG_PATH)).toBe("");
+	});
+
+	test("an environment's Codex token is ignored like any provider credential", async () => {
+		const result = await derive({
+			environmentEnv: { CODEX_ACCESS_TOKEN: "at-app", CODEX_API_KEY: "k" },
+		});
+		expect(result.managedEnv.CODEX_ACCESS_TOKEN).toBeUndefined();
+		expect(result.managedEnv.CODEX_API_KEY).toBeUndefined();
+		expect(file(result, CODEX_AUTH_PATH)).toBeUndefined();
 	});
 });

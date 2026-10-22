@@ -928,9 +928,6 @@ msgstr "{kind} · {author} tarafından"
 msgid "{kindLabel} theme"
 msgstr "{kindLabel} tema"
 
-msgid "{label} in cloud workspaces"
-msgstr "Bulut çalışma alanlarında {label}"
-
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -3272,6 +3269,9 @@ msgstr "Bu cihazdaki Superset uygulamasıyla birlikte gelir."
 
 msgid "Bundled with the Superset app on this device. Updates with the app."
 msgstr "Bu cihazdaki Superset uygulamasıyla birlikte gelir. Uygulamayla birlikte güncellenir."
+
+msgid "Business plan"
+msgstr "Business planı"
 
 msgid "Button — sizes"
 msgstr "Düğme — boyutlar"
@@ -6814,6 +6814,9 @@ msgstr "Bir değer girin."
 msgid "Enter a whole number"
 msgstr "Bir tam sayı girin"
 
+msgid "Enter this code when OpenAI asks for it:"
+msgstr "OpenAI istediğinde bu kodu girin:"
+
 msgid "Enter URL or search..."
 msgstr "URL girin veya arayın..."
 
@@ -8549,6 +8552,9 @@ msgstr "Saatlik"
 msgid "Hover Card"
 msgstr "Üzerine gelme kartı"
 
+msgid "How {label} signs in when Superset runs it for you."
+msgstr "Superset sizin için çalıştırdığında {label} nasıl giriş yapar."
+
 msgid "How 2026 plays out"
 msgstr "2026 nasıl geçecek"
 
@@ -10068,6 +10074,9 @@ msgstr "Görevleri Slack konuşmalarından yönetin."
 
 msgid "Manage Terminal Scripts"
 msgstr "Terminal betiklerini yönet"
+
+msgid "Manage usage"
+msgstr "Kullanımı yönet"
 
 msgid "Manage your account settings"
 msgstr "Hesap ayarlarınızı yönetin"
@@ -11936,6 +11945,12 @@ msgstr "Değişiklikleri aç"
 msgid "Open Changes"
 msgstr "Değişiklikleri aç"
 
+msgid "Open ChatGPT admin settings"
+msgstr "ChatGPT yönetici ayarlarını aç"
+
+msgid "Open ChatGPT settings"
+msgstr "ChatGPT ayarlarını aç"
+
 msgid "Open Command Palette"
 msgstr "Komut paletini aç"
 
@@ -11944,6 +11959,9 @@ msgstr "Yorumu GitHub'da aç"
 
 msgid "Open details"
 msgstr "Ayrıntıları aç"
+
+msgid "Open device sign-in"
+msgstr "Cihaz girişini aç"
 
 msgid "Open DevTools"
 msgstr "DevTools'u aç"
@@ -12140,6 +12158,9 @@ msgstr "Gezinmeyi aç"
 msgid "Open on GitHub"
 msgstr "GitHub'da aç"
 
+msgid "Open OpenAI's device sign-in page."
+msgstr "OpenAI'ın cihaz giriş sayfasını açın."
+
 msgid "Open Page in Default Browser"
 msgstr "Sayfayı varsayılan tarayıcıda aç"
 
@@ -12277,6 +12298,9 @@ msgstr "Çalışma alanını aç"
 
 msgid "Open your app."
 msgstr "Uygulamanızı açın."
+
+msgid "OpenAI did not complete the sign-in. Start again."
+msgstr "OpenAI girişi tamamlamadı. Yeniden başlayın."
 
 msgid "OpenAI rejected this API key."
 msgstr "OpenAI bu API anahtarını reddetti."
@@ -12730,6 +12754,9 @@ msgstr "Kişi"
 msgid "Personal"
 msgstr "Kişisel"
 
+msgid "Personal plan"
+msgstr "Kişisel plan"
+
 msgid "Phantom Forklift"
 msgstr "Hayalet Forklift"
 
@@ -12783,9 +12810,6 @@ msgstr "Ajanı sizden yanıt bekleyen, son bakışınızdan beri işini bitiren 
 
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Bir simge ve renk seçin ya da özel bir görsel yükleyin. Varsayılan olarak bağlı GitHub sahibinin avatarı kullanılır."
-
-msgid "Pick how {label} signs in inside a sandbox. The credential is handed to the agent process when it launches and is not stored in the sandbox."
-msgstr "{label} ajanının bir sandbox içinde nasıl oturum açacağını seçin. Kimlik bilgisi, başlatıldığında ajan sürecine verilir ve sandbox'ta saklanmaz."
 
 msgid "Pick one in the Superset app. It's saved to your account."
 msgstr "Superset uygulamasında birini seçin. Hesabınıza kaydedilir."
@@ -15890,6 +15914,12 @@ msgstr "Oturum açılamadı ({reason}). Lütfen tekrar deneyin."
 msgid "Signed in as <0>{userName}</0>"
 msgstr "<0>{userName}</0> olarak oturum açıldı"
 
+msgid "Signed in to ChatGPT"
+msgstr "ChatGPT'ye giriş yapıldı"
+
+msgid "Signed in to ChatGPT as {connectedAs}"
+msgstr "ChatGPT'ye {connectedAs} olarak giriş yapıldı"
+
 msgid "Signed out"
 msgstr "Oturum kapatıldı"
 
@@ -17328,6 +17358,9 @@ msgstr "Düğme artık öne çıkıyor. Bölmenizde kontrol ettim."
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "Bulut çalışma alanının başlamış olması gerekiyordu ancak zamanında yanıt vermedi. Bir sonraki çalıştırma yeniden deneyecek."
 
+msgid "The code expired. Start again."
+msgstr "Kodun süresi doldu. Yeniden başlayın."
+
 msgid "The config repository must be one of the environment's repositories"
 msgstr "Yapılandırma deposu, ortamın depolarından biri olmalıdır"
 
@@ -18354,6 +18387,9 @@ msgstr "“Bu cihaza röle üzerinden uzaktan erişime izin ver” seçeneğini 
 msgid "Turn on Design and click the part of the page you want to change."
 msgstr "Tasarım'ı açın ve sayfada değiştirmek istediğiniz bölüme tıklayın."
 
+msgid "Turn on device code sign-in for Codex."
+msgstr "Codex için cihaz koduyla girişi açın."
+
 msgid "Turn Slack conversations into tasks, run agents from your workspace, and keep teammates in the loop where work starts."
 msgstr "Slack konuşmalarını göreve dönüştürün, çalışma alanınızdan ajan çalıştırın ve takım arkadaşlarınızı işin başladığı yerde haberdar edin."
 
@@ -19074,6 +19110,9 @@ msgstr "{0} ve {1} bekleniyor…"
 
 msgid "Waiting for activity data"
 msgstr "Etkinlik verileri bekleniyor"
+
+msgid "Waiting for approval. Keep this dialog open."
+msgstr "Onay bekleniyor. Bu pencereyi açık tutun."
 
 msgid "Waiting for Checks"
 msgstr "Kontroller bekleniyor"
@@ -19930,6 +19969,9 @@ msgstr "v1 projeleriniz ve çalışma alanlarınız yeni Superset'e aktarılıyo
 
 msgid "Your version: {currentVersion}"
 msgstr "Sürümünüz: {currentVersion}"
+
+msgid "Your workspace admin turns on device code sign-in for Codex."
+msgstr "Codex için cihaz koduyla girişi çalışma alanı yöneticiniz açar."
 
 msgid "Zap"
 msgstr "Şimşek"

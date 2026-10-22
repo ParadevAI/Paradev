@@ -19,7 +19,10 @@ import {
 } from "@superset/shared/sandbox-contract";
 import { eq } from "drizzle-orm";
 import { env } from "../../env";
-import { resolveAgentCredentialEnv } from "../../router/agent-credential";
+import {
+	type AgentSignIns,
+	resolveAgentSignIns,
+} from "../../router/agent-credential";
 import { resolveEnvironment } from "../../router/environment/resolve-environment";
 import { resolveMachineSize } from "../billing/plan";
 import { githubUserConnectionFor, githubUserTokenFor } from "../github-user";
@@ -36,10 +39,21 @@ import type { SandboxClaim, SandboxEnvironment } from "./vercel";
 
 type CloudWorkspaceRow = typeof cloudWorkspaces.$inferSelect;
 
-function agentCredentialDigest(userAgentEnv: Record<string, string>): string {
-	const sorted = Object.keys(userAgentEnv)
+/**
+ * A ChatGPT sign-in counts by its account, not its access token: the API
+ * renews that token every few days and the firewall carries the new one, so a
+ * renewal is not a change a running agent has to restart for.
+ */
+function agentCredentialDigest(signIns: AgentSignIns): string {
+	const values: Record<string, string> = {
+		...signIns.env,
+		...(signIns.codexChatgpt
+			? { CODEX_CHATGPT_ACCOUNT: signIns.codexChatgpt.accountId }
+			: {}),
+	};
+	const sorted = Object.keys(values)
 		.sort()
-		.map((key) => [key, userAgentEnv[key]]);
+		.map((key) => [key, values[key]]);
 	return createHmac("sha256", env.SANDBOX_GATE_SECRET)
 		.update(`agent-credentials:${JSON.stringify(sorted)}`)
 		.digest("hex");
@@ -72,11 +86,11 @@ export async function buildSandboxClaim(args: {
 	repositories: SandboxRepository[];
 	agentCredentialDigest: string;
 }> {
-	const [environment, userAgentEnv] = await Promise.all([
+	const [environment, signIns] = await Promise.all([
 		resolveEnvironment(args.row.environmentId, args.row.organizationId),
 		args.row.createdByUserId
-			? resolveAgentCredentialEnv({ userId: args.row.createdByUserId })
-			: Promise.resolve({}),
+			? resolveAgentSignIns({ userId: args.row.createdByUserId })
+			: Promise.resolve({ env: {}, codexChatgpt: null }),
 	]);
 	if (!environment) throw new Error("Environment not found");
 	const checkouts = await workspaceRepositories({
@@ -133,10 +147,11 @@ export async function buildSandboxClaim(args: {
 			: {}),
 		...(cloudAgentLaunchToEnv(args.launch) as Partial<SandboxIdentity>),
 	};
-	const { networkPolicy, managedEnv } = await deriveSandboxCredentials({
+	const { networkPolicy, managedEnv, files } = await deriveSandboxCredentials({
 		workspaceId: args.row.id,
 		environmentEnv: environment.envs,
-		userAgentEnv,
+		userAgentEnv: signIns.env,
+		codexChatgpt: signIns.codexChatgpt,
 		githubToken: token,
 		gitAuthor: gitAuthorFor({
 			github: githubAccount
@@ -155,6 +170,7 @@ export async function buildSandboxClaim(args: {
 			hostSecret: await sandboxHostSecretFor(args.row.id),
 			managedEnv,
 			networkPolicy,
+			files,
 			ports: repoHooks?.ports,
 			vcpus: await boxVcpus(args.row),
 		},
@@ -164,6 +180,6 @@ export async function buildSandboxClaim(args: {
 			region: environment.region,
 		},
 		repositories,
-		agentCredentialDigest: agentCredentialDigest(userAgentEnv),
+		agentCredentialDigest: agentCredentialDigest(signIns),
 	};
 }

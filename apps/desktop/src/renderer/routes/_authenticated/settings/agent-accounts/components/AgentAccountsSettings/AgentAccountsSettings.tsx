@@ -85,6 +85,7 @@ function AgentAccountRow({
 				</Button>
 			)}
 			<CloudAuthDialog
+				accountLabel={credential.accountLabel}
 				chooseMethod={credential.chooseMethod}
 				disconnect={credential.disconnect}
 				label={label}
@@ -92,6 +93,7 @@ function AgentAccountRow({
 				open={open}
 				presetId={presetId}
 				save={credential.save}
+				signedIn={credential.signedIn}
 				state={state}
 			/>
 		</div>
