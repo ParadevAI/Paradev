@@ -1,5 +1,6 @@
 import { billingUsesAutumn } from "@superset/auth/autumn";
 import {
+	organizationEnvironmentLimitFromAutumn,
 	organizationGatedMachineSizesFromAutumn,
 	organizationPlanFromAutumn,
 } from "@superset/auth/billing";
@@ -7,6 +8,7 @@ import { db } from "@superset/db/client";
 import { subscriptions } from "@superset/db/schema";
 import {
 	ACTIVE_SUBSCRIPTION_STATUSES,
+	DEFAULT_ENVIRONMENT_LIMIT,
 	defaultMachineSize,
 	isMachineSize,
 	MACHINE_SIZE_VCPUS,
@@ -64,4 +66,19 @@ export async function resolveMachineSize(
 	const name = requested ?? defaultSize;
 	if (!isMachineSize(name) || !sizes.includes(name)) return null;
 	return { name, vcpus: MACHINE_SIZE_VCPUS[name] };
+}
+
+/**
+ * Environments the org may hold: the plan's `environments` feature in Autumn,
+ * `Infinity` when that is unlimited, and DEFAULT_ENVIRONMENT_LIMIT while the
+ * plan carries no such feature or billing is not on Autumn.
+ */
+export async function organizationEnvironmentLimit(
+	organizationId: string,
+): Promise<number> {
+	const limit = billingUsesAutumn
+		? await organizationEnvironmentLimitFromAutumn(organizationId)
+		: null;
+	if (limit === "unlimited") return Number.POSITIVE_INFINITY;
+	return limit ?? DEFAULT_ENVIRONMENT_LIMIT;
 }

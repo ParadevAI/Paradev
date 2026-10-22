@@ -25,6 +25,7 @@ import {
 import { jwtProcedure, userError } from "../../trpc";
 import { loadVisibleWorkspace } from "../cloud-workspace/access";
 import { currentBundleSha } from "./current-bundle";
+import { assertEnvironmentCapacity } from "./limit";
 import { regionForRequest } from "./region-for-request";
 import { secretsRouter } from "./secrets";
 import { decryptSecret, encryptSecret } from "./secrets/utils/crypto";
@@ -248,6 +249,7 @@ export const environmentRouter = {
 		.mutation(async ({ ctx, input }) => {
 			await assertCloudAccess(ctx);
 			assertMember(ctx.organizationIds, input.organizationId);
+			await assertEnvironmentCapacity(input.organizationId);
 			if (
 				input.hooksRepositoryId &&
 				!input.repositoryIds.includes(input.hooksRepositoryId)
@@ -369,6 +371,7 @@ export const environmentRouter = {
 								),
 							);
 
+			if (!target) await assertEnvironmentCapacity(workspace.organizationId);
 			const { claim } = await buildSandboxClaim({ row: workspace });
 			const golden = await promoteSandboxToEnvironment({
 				sourceSandbox: workspace.providerSandboxId,

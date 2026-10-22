@@ -80,6 +80,7 @@ describe("activePlan read from Autumn keeps the shape released clients read", ()
 			paymentState: { kind: "ok" },
 			cloudUsage: null,
 			gatedMachineSizes: [],
+			environmentLimit: null,
 		});
 	});
 

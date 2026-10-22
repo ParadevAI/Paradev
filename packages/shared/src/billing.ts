@@ -74,6 +74,14 @@ export const PLAN_RANK: Record<PlanTier, number> = {
 	enterprise: 2,
 };
 
+/**
+ * Environments an organization may hold when its plan carries no
+ * `environments` feature in Autumn.
+ * TODO(harshith): remove once every plan in Autumn sets `environments`; the
+ * fallback exists only so the cap ships before the dashboard is configured.
+ */
+export const DEFAULT_ENVIRONMENT_LIMIT = 10;
+
 /** The tier an org needs to create, run, or resume an automation. */
 export const AUTOMATIONS_REQUIRED_PLAN: Exclude<PlanTier, "free"> = "pro";
 

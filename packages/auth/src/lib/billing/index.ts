@@ -9,11 +9,13 @@ export {
 export {
 	ACTIVE_CPU_MINUTES_FEATURE_ID,
 	BOX_GB_MINUTES_FEATURE_ID,
+	ENVIRONMENTS_FEATURE_ID,
 	SEATS_FEATURE_ID,
 } from "./autumn/features";
 export {
 	invalidateOrganizationBilling,
 	organizationBilling,
+	organizationEnvironmentLimitFromAutumn,
 	organizationGatedMachineSizesFromAutumn,
 	organizationPlanFromAutumn,
 } from "./autumn/plan-state";

@@ -307,6 +307,12 @@ export const serverErrorMessages: Record<
 					"The config repository must be one of the environment's repositories",
 			}),
 		),
+	"serverError.environment.limitReached": (params) =>
+		i18n._(
+			msg({
+				message: `Your organization has reached its limit of ${params?.limit} environments. Archive one, or upgrade in Settings, Billing to add more.`,
+			}),
+		),
 	"serverError.githubUser.notConfigured": () =>
 		i18n._(
 			msg({

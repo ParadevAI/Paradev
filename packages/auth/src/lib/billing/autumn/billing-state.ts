@@ -6,6 +6,10 @@ import {
 	paidPlanIdFromFlags,
 	tierFromFlags,
 } from "./entitlements";
+import {
+	type EnvironmentLimit,
+	environmentLimitFromBalances,
+} from "./environment-limit";
 import { SEATS_FEATURE_ID } from "./features";
 
 export type PaymentState =
@@ -29,6 +33,7 @@ export interface OrganizationBilling {
 	paymentState: PaymentState;
 	cloudUsage: CloudUsage | null;
 	gatedMachineSizes: MachineSize[];
+	environmentLimit: EnvironmentLimit;
 }
 
 type AutumnCustomer = Awaited<ReturnType<typeof getAutumnCustomer>>;
@@ -96,5 +101,6 @@ export function billingFromCustomer(
 		paymentState,
 		cloudUsage: cloudUsageFromBalances(customer.balances),
 		gatedMachineSizes: gatedMachineSizesFromFlags(customer.flags),
+		environmentLimit: environmentLimitFromBalances(customer.balances),
 	};
 }
