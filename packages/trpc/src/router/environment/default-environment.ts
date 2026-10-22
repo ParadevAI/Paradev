@@ -38,6 +38,8 @@ export function pickDefaultEnvironment<T extends CarryingEnvironment>(
  * caller names none. An existing one the caller can use wins; otherwise a new
  * one named after the repository, shared with the organization, opening on
  * that repository, in `region`.
+ * @deprecated Only `cloudWorkspace.create`'s `repositoryId`, which desktop
+ * 1.39.x sends, reaches this. Remove both once MINIMUM_DESKTOP_VERSION passes 1.39.x.
  */
 export async function ensureDefaultEnvironment(args: {
 	organizationId: string;

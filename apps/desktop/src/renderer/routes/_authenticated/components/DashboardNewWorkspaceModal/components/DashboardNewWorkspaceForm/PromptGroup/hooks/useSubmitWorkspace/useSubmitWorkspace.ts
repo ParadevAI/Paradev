@@ -34,17 +34,12 @@ export function useSubmitWorkspace(
 	selectedMode: string | null,
 	uploadAttachments: UseUploadAttachmentsApi,
 	promptContext: NewWorkspacePromptContextApi,
-	/**
-	 * Where a cloud workspace starts: the environment the create surface
-	 * resolved, else the project's GitHub repository, whose default
-	 * environment the API makes on first use.
-	 */
+	/** Where a cloud workspace starts: the environment the create surface resolved. */
 	cloudTarget: {
 		environmentId: string | null;
-		repositoryId: string | null;
-		/** The project's repository; a named environment must still open on it. */
+		/** The project's repository; the environment must still open on it. */
 		repositoryFullName: string | null;
-	} = { environmentId: null, repositoryId: null, repositoryFullName: null },
+	} = { environmentId: null, repositoryFullName: null },
 ) {
 	const { t } = useLingui();
 	const navigate = useNavigate();
@@ -139,15 +134,14 @@ export function useSubmitWorkspace(
 							}),
 						).find((row) => row.id === cloudTarget.environmentId)
 					: undefined;
-				// An environment edited since the form loaded may open on another
-				// repository now; Default (the repository target) is the safe fallback.
+				// An environment edited since the form loaded may open on another repository now.
 				const opensOnProject =
 					!cloudTarget.repositoryFullName ||
 					liveEnvironment?.repositories?.[0]?.fullName.toLowerCase() ===
 						cloudTarget.repositoryFullName.toLowerCase();
 				const environmentId =
 					liveEnvironment && opensOnProject ? liveEnvironment.id : null;
-				if (!environmentId && !cloudTarget.repositoryId) {
+				if (!environmentId) {
 					toast.error(
 						t({
 							message:
@@ -179,9 +173,7 @@ export function useSubmitWorkspace(
 					: null;
 				const created = await createCloudWorkspace.mutateAsync({
 					organizationId: activeOrganizationId,
-					...(environmentId
-						? { environmentId }
-						: { repositoryId: cloudTarget.repositoryId ?? undefined }),
+					environmentId,
 					name: workspaceName ?? undefined,
 					// Linked PR and issue bodies can push this past the create input's
 					// 20,000-character cap.
@@ -233,8 +225,6 @@ export function useSubmitWorkspace(
 				});
 				// Server truth on top of the patch — the generated name lands here.
 				void utils.cloudWorkspace.list.invalidate();
-				// A default environment made for the repository now exists to pick.
-				if (!environmentId) void utils.environment.list.invalidate();
 			} catch (error) {
 				toast.error(
 					errorMessage(
@@ -418,7 +408,6 @@ export function useSubmitWorkspace(
 		uploadAttachments,
 		utils,
 		cloudTarget.environmentId,
-		cloudTarget.repositoryId,
 		cloudTarget.repositoryFullName,
 	]);
 

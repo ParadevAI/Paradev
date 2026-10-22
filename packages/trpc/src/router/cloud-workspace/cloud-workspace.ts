@@ -309,10 +309,14 @@ export const cloudWorkspaceRouter = {
 				/** Omitted = the repo's default branch, resolved here — a client
 				 * whose branch query hadn't answered must not guess "main". */
 				branch: z.string().min(1).max(300).optional(),
-				/** One of the two: an environment, or a repository whose default
-				 * environment is used — made on first use when the organization
-				 * has none that checks the repository out. */
+				/** Required in practice; optional only while `repositoryId` is accepted. */
 				environmentId: z.string().uuid().optional(),
+				/**
+				 * @deprecated desktop 1.39.x sends this when no environment covers the
+				 * repository; the API then makes one. Newer clients send `environmentId`.
+				 * Remove with `ensureDefaultEnvironment` once MINIMUM_DESKTOP_VERSION
+				 * passes 1.39.x.
+				 */
 				repositoryId: z.string().uuid().optional(),
 				/**
 				 * A built-in agent to launch on first boot with `prompt`. Absent
