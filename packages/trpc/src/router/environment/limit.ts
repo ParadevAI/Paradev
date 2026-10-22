@@ -20,7 +20,7 @@ async function countEnvironments(organizationId: string): Promise<number> {
 export function environmentLimitError(limit: number) {
 	return userError({
 		code: "FORBIDDEN",
-		message: `Your organization has reached its limit of ${limit} environments. Archive one, or upgrade in Settings, Billing to add more.`,
+		message: `Your organization has reached its environment limit (${limit}). Archive an environment, or upgrade in Settings, Billing to add more.`,
 		i18nKey: "serverError.environment.limitReached",
 		params: { limit },
 	});

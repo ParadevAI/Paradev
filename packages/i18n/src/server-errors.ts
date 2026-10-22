@@ -310,7 +310,7 @@ export const serverErrorMessages: Record<
 	"serverError.environment.limitReached": (params) =>
 		i18n._(
 			msg({
-				message: `Your organization has reached its limit of ${params?.limit} environments. Archive one, or upgrade in Settings, Billing to add more.`,
+				message: `Your organization has reached its environment limit (${params?.limit}). Archive an environment, or upgrade in Settings, Billing to add more.`,
 			}),
 		),
 	"serverError.githubUser.notConfigured": () =>

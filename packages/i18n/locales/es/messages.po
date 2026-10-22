@@ -19872,8 +19872,8 @@ msgid "Your organization has reached its cloud usage limit. Raise the limit or u
 msgstr "Tu organización alcanzó su límite de uso en la nube. Aumenta el límite o mejora el plan en Configuración, Facturación para iniciar este espacio de trabajo."
 
 #. placeholder {0}: params?.limit
-msgid "Your organization has reached its limit of {0} environments. Archive one, or upgrade in Settings, Billing to add more."
-msgstr "Tu organización alcanzó su límite de {0} entornos. Archiva uno o mejora el plan en Configuración, Facturación para añadir más."
+msgid "Your organization has reached its environment limit ({0}). Archive an environment, or upgrade in Settings, Billing to add more."
+msgstr "Tu organización alcanzó su límite de entornos ({0}). Archiva un entorno o mejora el plan en Configuración, Facturación para añadir más."
 
 msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
 msgstr "Tu organización alcanzó su límite de uso en la nube. Este espacio de trabajo se detendrá en unos minutos si no se aumenta el límite."

@@ -8,7 +8,7 @@ describe("assertBelowEnvironmentLimit", () => {
 
 	test("refuses at the limit, naming it", () => {
 		expect(() => assertBelowEnvironmentLimit(3, 3)).toThrow(
-			/limit of 3 environments/,
+			/environment limit \(3\)/,
 		);
 	});
 

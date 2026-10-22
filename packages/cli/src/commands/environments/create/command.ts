@@ -4,6 +4,7 @@ import {
 	type SandboxRegionId,
 } from "@superset/shared/sandbox-regions";
 import { command } from "../../../lib/command";
+import { environmentLimitHint } from "../../../lib/environments";
 
 export default command({
 	sandbox: false,
@@ -54,16 +55,18 @@ export default command({
 			return match.id;
 		};
 		const repositoryIds = (options.repo as string[]).map(repositoryId);
-		const created = await ctx.api.environment.create.mutate({
-			organizationId,
-			name: options.name,
-			repositoryIds,
-			hooksRepositoryId: options.hooksRepo
-				? repositoryId(options.hooksRepo)
-				: repositoryIds[0],
-			scope: options.scope,
-			region,
-		});
+		const created = await ctx.api.environment.create
+			.mutate({
+				organizationId,
+				name: options.name,
+				repositoryIds,
+				hooksRepositoryId: options.hooksRepo
+					? repositoryId(options.hooksRepo)
+					: repositoryIds[0],
+				scope: options.scope,
+				region,
+			})
+			.catch(environmentLimitHint);
 		const environment = await ctx.api.environment.get.query({
 			id: created.id,
 		});
