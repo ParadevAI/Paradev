@@ -38,9 +38,12 @@ async function signInWithChatgpt(api: ApiClient) {
 		await new Promise((resolve) =>
 			setTimeout(resolve, code.intervalSeconds * 1000),
 		);
-		const result = await api.agentCredential.pollChatgptSignIn.mutate({
-			handle: code.handle,
-		});
+		const result = await api.agentCredential.pollChatgptSignIn
+			.mutate({ handle: code.handle })
+			.catch((error) => {
+				spinner.stop("Sign-in failed");
+				throw error;
+			});
 		if (result.status === "connected") {
 			spinner.stop(`Signed in as ${result.accountLabel ?? "ChatGPT"}`);
 			return { agent: "codex", kind: "subscription" as const };

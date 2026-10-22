@@ -3,7 +3,7 @@ import { Button } from "@superset/ui/button";
 import { Spinner } from "@superset/ui/spinner";
 import { cn } from "@superset/ui/utils";
 import { ArrowUpRight, RotateCcw } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { FOCUS_RING } from "../../constants";
@@ -41,6 +41,8 @@ export function ChatgptSignIn({
 	const poll = cloudTrpc.agentCredential.pollChatgptSignIn.useMutation();
 	const startMutate = start.mutateAsync;
 	const pollMutate = poll.mutateAsync;
+	const onConnectedRef = useRef(onConnected);
+	onConnectedRef.current = onConnected;
 
 	const restart = useCallback(async () => {
 		setFailure(null);
@@ -70,7 +72,7 @@ export function ChatgptSignIn({
 				const result = await pollMutate({ handle: code.handle });
 				if (cancelled) return;
 				if (result.status === "connected") {
-					onConnected(result.accountLabel);
+					onConnectedRef.current(result.accountLabel);
 					return;
 				}
 				timer = setTimeout(check, code.intervalSeconds * 1000);
@@ -85,7 +87,7 @@ export function ChatgptSignIn({
 			cancelled = true;
 			clearTimeout(timer);
 		};
-	}, [code, pollMutate, onConnected, t]);
+	}, [code, pollMutate, t]);
 
 	const stepClass = "flex gap-2";
 	const stepNumberClass = "w-4 shrink-0 text-muted-foreground tabular-nums";

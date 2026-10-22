@@ -315,13 +315,22 @@ function isFresh(tokens: ChatgptTokens): boolean {
 /**
  * The stored ChatGPT session, renewed first when its access token is close to
  * expiring. The row is locked for the renewal: a refresh token works once, so
- * two boxes renewing together would sign the person out.
+ * two boxes renewing together would sign the person out. Null once OpenAI
+ * refuses the session: the row is removed so Settings asks for a new sign-in.
  */
 async function currentChatgptTokens(
 	row: AgentCredentialRow,
-): Promise<ChatgptTokens> {
+): Promise<ChatgptTokens | null> {
 	const stored = chatgptTokensSchema.parse(JSON.parse(decryptRow(row)));
 	if (isFresh(stored)) return stored;
+	const save = (tokens: ChatgptTokens) => ({
+		encryptedValue: encryptAgentCredential(JSON.stringify(tokens), {
+			userId: row.userId,
+			agent: row.agent,
+		}),
+		lastValidatedAt: new Date(),
+	});
+	let renewed: ChatgptTokens | null = null;
 	try {
 		return await dbWs.transaction(async (tx) => {
 			const [locked] = await tx
@@ -332,20 +341,36 @@ async function currentChatgptTokens(
 			if (!locked) return stored;
 			const current = chatgptTokensSchema.parse(JSON.parse(decryptRow(locked)));
 			if (isFresh(current)) return current;
-			const renewed = await refreshChatgptTokens(current);
+			renewed = await refreshChatgptTokens(current);
 			await tx
 				.update(agentCredentials)
-				.set({
-					encryptedValue: encryptAgentCredential(JSON.stringify(renewed), {
-						userId: locked.userId,
-						agent: locked.agent,
-					}),
-					lastValidatedAt: new Date(),
-				})
+				.set(save(renewed))
 				.where(eq(agentCredentials.id, locked.id));
 			return renewed;
 		});
 	} catch (error) {
+		if (renewed) {
+			await dbWs
+				.update(agentCredentials)
+				.set(save(renewed))
+				.where(eq(agentCredentials.id, row.id))
+				.catch((saveError) =>
+					console.error(
+						"[agent-credential] renewed ChatGPT sign-in was not saved",
+						saveError,
+					),
+				);
+			return renewed;
+		}
+		if (error instanceof ChatgptSignInError && error.reason === "rejected") {
+			console.warn(
+				"[agent-credential] OpenAI refused the ChatGPT sign-in; removing it",
+			);
+			await dbWs
+				.delete(agentCredentials)
+				.where(eq(agentCredentials.id, row.id));
+			return null;
+		}
 		console.warn("[agent-credential] ChatGPT sign-in was not renewed", error);
 		return stored;
 	}
@@ -369,6 +394,7 @@ export async function resolveAgentSignIns(args: {
 	for (const row of rows) {
 		if (row.agent === "codex" && row.provider === CHATGPT_PROVIDER) {
 			const tokens = await currentChatgptTokens(row);
+			if (!tokens) continue;
 			codexChatgpt = {
 				accessToken: tokens.accessToken,
 				accountId: tokens.accountId,
