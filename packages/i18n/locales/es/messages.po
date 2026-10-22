@@ -428,6 +428,10 @@ msgid "{0} is already used for tasks in this organization."
 msgstr "{0} ya se usa para tareas en esta organización."
 
 #. placeholder {0}: params?.repoFullName
+msgid "{0} is no longer connected to GitHub; reinstall the Superset GitHub App on its account"
+msgstr "{0} ya no está conectado a GitHub; vuelve a instalar la GitHub App de Superset en su cuenta"
+
+#. placeholder {0}: params?.repoFullName
 msgid "{0} is not a repository the GitHub App is installed on"
 msgstr "{0} no es un repositorio en el que esté instalada la GitHub App"
 
@@ -1719,6 +1723,9 @@ msgstr "Añade un entorno en Ajustes antes de crear un espacio de trabajo en la 
 
 msgid "Add another account, or disconnect one you no longer use."
 msgstr "Conecta otra cuenta o desconecta una que ya no uses."
+
+msgid "Add another GitHub account"
+msgstr "Añadir otra cuenta de GitHub"
 
 msgid "Add any machine as a host. Workspaces keep running when your laptop sleeps, and you can check in from wherever you are."
 msgstr "Añade cualquier máquina como host. Los espacios de trabajo siguen ejecutándose cuando tu portátil se suspende, y puedes consultarlos desde donde estés."
@@ -4457,6 +4464,12 @@ msgstr "Conectar este ordenador"
 msgid "Connect your {pluginLabel} account, then reload this page."
 msgstr "Conecta tu cuenta de {pluginLabel} y vuelve a cargar esta página."
 
+msgid "Connect your GitHub account in Settings › Connections to work on a private repository"
+msgstr "Conecta tu cuenta de GitHub en Configuración › Conexiones para trabajar en un repositorio privado"
+
+msgid "Connect your GitHub account…"
+msgstr "Conectar tu cuenta de GitHub…"
+
 msgid "Connect your GitHub repositories and sync pull requests. Track CI status and reviews across your team."
 msgstr "Conecta tus repositorios de GitHub y sincroniza las pull requests. Sigue el estado de CI y las revisiones de todo tu equipo."
 
@@ -6271,14 +6284,15 @@ msgstr "Descartado: no se volverá a preguntar"
 msgid "Disconnect"
 msgstr "Desconectar"
 
+#. placeholder {0}: installation.accountLogin
+msgid "Disconnect {0}?"
+msgstr "¿Desconectar {0}?"
+
 msgid "Disconnect {credential}?"
 msgstr "¿Desconectar {credential}?"
 
 msgid "Disconnect {title}"
 msgstr "Desconectar {title}"
-
-msgid "Disconnect GitHub?"
-msgstr "¿Desconectar GitHub?"
 
 msgid "Disconnect Google?"
 msgstr "¿Desconectar Google?"
@@ -8941,8 +8955,8 @@ msgstr "Instala Superset MCP en tu cliente"
 msgid "Install the desktop app"
 msgstr "Instala la app de escritorio"
 
-msgid "Install the Superset GitHub App to connect your repositories."
-msgstr "Instala la GitHub App de Superset para conectar tus repositorios."
+msgid "Install the Superset GitHub App on each GitHub organization or account whose repositories you want to connect."
+msgstr "Instala la GitHub App de Superset en cada organización o cuenta de GitHub cuyos repositorios quieras conectar."
 
 msgid "Install, authorize, and scope MCP servers across all your workspaces from one place, with centralized OAuth."
 msgstr "Instala, autoriza y limita servidores MCP en todos tus espacios de trabajo desde un solo sitio, con OAuth centralizado."
@@ -9191,6 +9205,9 @@ msgstr "Su propia rama y su propia copia de los archivos"
 
 msgid "Its replies go with it."
 msgstr "Sus respuestas también se eliminan."
+
+msgid "Its repositories stop syncing, and environments and cloud workspaces built on them cannot start until it is connected again. The GitHub App stays installed on GitHub."
+msgstr "Sus repositorios dejan de sincronizarse y los entornos y espacios de trabajo en la nube basados en ellos no pueden iniciarse hasta que se vuelva a conectar. La GitHub App sigue instalada en GitHub."
 
 msgid "Its workspaces and terminals are unavailable until it restarts — use the Superset tray menu > Host Service > Restart."
 msgstr "Sus espacios de trabajo y terminales no estarán disponibles hasta que se reinicie: usa el menú de la bandeja de Superset > Host Service > Reiniciar."
@@ -13118,6 +13135,9 @@ msgstr "Privado"
 
 msgid "Private by default.<0/>You're in control."
 msgstr "Privado por defecto.<0/>Tú tienes el control."
+
+msgid "Private repositories appear once you connect your GitHub account."
+msgstr "Los repositorios privados aparecen cuando conectas tu cuenta de GitHub."
 
 msgid "Pro"
 msgstr "Pro"
@@ -17929,9 +17949,6 @@ msgstr "Esto cambiará la URL pública de tu organización. Asegúrate de actual
 #. placeholder {0}: team?.name
 msgid "This will delete <0>{0}</0> and remove all of its members. This can't be undone."
 msgstr "Esto eliminará <0>{0}</0> y quitará a todos sus miembros. No se puede deshacer."
-
-msgid "This will disconnect GitHub from your organization. The GitHub App will remain installed but will no longer sync data. You can reconnect at any time."
-msgstr "Esto desconectará GitHub de tu organización. La GitHub App seguirá instalada, pero dejará de sincronizar datos. Puedes volver a conectarla cuando quieras."
 
 msgid "This will kill all running sessions and restart the terminal daemon. The app will restart terminals with a fresh daemon."
 msgstr "Esto terminará todas las sesiones en marcha y reiniciará el daemon de terminal. La app reiniciará las terminales con un daemon nuevo."

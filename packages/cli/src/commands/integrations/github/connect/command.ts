@@ -12,6 +12,9 @@ export default command({
 	description:
 		"Install the Superset GitHub App for the organization in the browser, so its repositories can back cloud environments",
 	options: {
+		add: boolean().desc(
+			"Install on another GitHub organization or account beside the ones already connected",
+		),
 		noWait: boolean().desc("Print the install URL and exit without waiting"),
 	},
 	run: async ({ ctx, options }) => {
@@ -19,13 +22,14 @@ export default command({
 		if (!organizationId) {
 			throw new CLIError("No active organization", "Run: superset auth login");
 		}
-		const existing = await ctx.api.integration.github.getInstallation.query({
+		const existing = await ctx.api.integration.github.listInstallations.query({
 			organizationId,
 		});
-		if (existing) {
+		if (existing.length > 0 && !options.add) {
+			const accounts = existing.map((row) => row.accountLogin).join(", ");
 			return {
-				data: { installation: existing },
-				message: `Already installed on ${existing.accountLogin}. Choose which repositories it can see in that account's GitHub settings.`,
+				data: { installations: existing },
+				message: `Already installed on ${accounts}. Choose which repositories it can see in that account's GitHub settings, or install on another account with --add.`,
 			};
 		}
 
@@ -49,17 +53,19 @@ export default command({
 		}
 		process.stderr.write(`${instructions}\nWaiting for the installation…\n`);
 
+		const known = new Set(existing.map((row) => row.id));
 		const deadline = Date.now() + POLL_TIMEOUT_MS;
 		while (Date.now() < deadline) {
 			await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
-			const installation =
-				await ctx.api.integration.github.getInstallation.query({
+			const installations =
+				await ctx.api.integration.github.listInstallations.query({
 					organizationId,
 				});
-			if (installation) {
+			const added = installations.find((row) => !known.has(row.id));
+			if (added) {
 				return {
-					data: { installation },
-					message: `Installed on ${installation.accountLogin}. Its repositories appear within a minute: superset environments repos`,
+					data: { installation: added, installations },
+					message: `Installed on ${added.accountLogin}. Its repositories appear within a minute: superset environments repos`,
 				};
 			}
 		}

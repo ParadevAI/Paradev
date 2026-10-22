@@ -35,23 +35,24 @@ export interface SubscriptionEventRow {
  * missing until this job replays it.
  */
 async function resumeGatedSyncs(organizationId: string): Promise<void> {
-	const installation = await db.query.githubInstallations.findFirst({
+	const installations = await db.query.githubInstallations.findMany({
 		where: eq(githubInstallations.organizationId, organizationId),
 		columns: { id: true },
 	});
-	if (!installation) return;
 
-	try {
-		await qstash.publishJSON({
-			url: `${env.NEXT_PUBLIC_API_URL}/api/github/jobs/initial-sync`,
-			body: { installationDbId: installation.id, organizationId },
-			retries: 3,
-		});
-	} catch (error) {
-		console.error(
-			"[stripe/subscription-complete] Failed to queue integration backfill:",
-			error,
-		);
+	for (const installation of installations) {
+		try {
+			await qstash.publishJSON({
+				url: `${env.NEXT_PUBLIC_API_URL}/api/github/jobs/initial-sync`,
+				body: { installationDbId: installation.id, organizationId },
+				retries: 3,
+			});
+		} catch (error) {
+			console.error(
+				"[stripe/subscription-complete] Failed to queue integration backfill:",
+				error,
+			);
+		}
 	}
 }
 

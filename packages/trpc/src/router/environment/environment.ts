@@ -12,6 +12,7 @@ import type { TRPCRouterRecord } from "@trpc/server";
 import { and, asc, eq, inArray, isNull, or } from "drizzle-orm";
 import { z } from "zod";
 import { assertCloudAccess, assertMember } from "../../lib/cloud-guards";
+import { assertGithubReach } from "../../lib/github-user";
 import {
 	buildSandboxClaim,
 	deleteSandbox,
@@ -119,6 +120,7 @@ async function repositoriesByEnvironment(
 async function setEnvironmentRepositories(args: {
 	environmentId: string;
 	organizationId: string;
+	userId: string;
 	repositoryIds: readonly string[];
 	hooksRepositoryId: string | null | undefined;
 }): Promise<void> {
@@ -136,6 +138,11 @@ async function setEnvironmentRepositories(args: {
 			i18nKey: "serverError.environment.repositoryNotConnected",
 		});
 	}
+	await assertGithubReach({
+		userId: args.userId,
+		repositories,
+		requireConnection: true,
+	});
 	if (
 		args.hooksRepositoryId &&
 		!repositories.some((repo) => repo.id === args.hooksRepositoryId)
@@ -283,6 +290,7 @@ export const environmentRouter = {
 			await setEnvironmentRepositories({
 				environmentId: row.id,
 				organizationId: input.organizationId,
+				userId: ctx.userId,
 				repositoryIds: input.repositoryIds,
 				hooksRepositoryId: input.hooksRepositoryId,
 			});
@@ -509,6 +517,7 @@ export const environmentRouter = {
 				await setEnvironmentRepositories({
 					environmentId: input.id,
 					organizationId: current.organizationId,
+					userId: ctx.userId,
 					repositoryIds: input.repositoryIds,
 					hooksRepositoryId:
 						input.hooksRepositoryId === undefined

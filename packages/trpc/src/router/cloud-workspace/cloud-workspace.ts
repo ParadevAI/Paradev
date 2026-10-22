@@ -18,6 +18,7 @@ import { and, asc, desc, eq, isNotNull, ne } from "drizzle-orm";
 import { z } from "zod";
 import { organizationMachineSizes } from "../../lib/billing/plan";
 import { assertCloudAccess, assertMember } from "../../lib/cloud-guards";
+import { assertGithubReach } from "../../lib/github-user";
 import { nudge } from "../../lib/realtime";
 import {
 	deleteSandbox,
@@ -31,6 +32,7 @@ import {
 	SandboxUnavailableError,
 	sandboxExists,
 	stopAndSnapshot,
+	workspaceRepositoryRows,
 } from "../../lib/sandbox";
 import { pushWorkspaceAccess } from "../../lib/workspace-access";
 import { jwtProcedure, userError } from "../../trpc";
@@ -449,6 +451,15 @@ export const cloudWorkspaceRouter = {
 		)
 		.mutation(async ({ ctx, input }) => {
 			const row = await loadReadyWorkspace(ctx, input.id);
+			// Opening someone else's box takes the visitor's own GitHub reach to
+			// its repositories; the box itself still acts as its creator.
+			if (input.wake && row.createdByUserId !== ctx.userId) {
+				await assertGithubReach({
+					userId: ctx.userId,
+					repositories: await workspaceRepositoryRows(row.id),
+					requireConnection: true,
+				});
+			}
 			const address = await addressSandbox(
 				row,
 				input.wake ? "wake" : "address",

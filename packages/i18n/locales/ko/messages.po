@@ -428,6 +428,10 @@ msgid "{0} is already used for tasks in this organization."
 msgstr "{0}은(는) 이 조직의 작업에 이미 사용 중입니다."
 
 #. placeholder {0}: params?.repoFullName
+msgid "{0} is no longer connected to GitHub; reinstall the Superset GitHub App on its account"
+msgstr "{0}은(는) 더 이상 GitHub에 연결되어 있지 않습니다. 해당 계정에 Superset GitHub App을 다시 설치하세요"
+
+#. placeholder {0}: params?.repoFullName
 msgid "{0} is not a repository the GitHub App is installed on"
 msgstr "{0}은(는) GitHub App이 설치된 리포지토리가 아닙니다"
 
@@ -1719,6 +1723,9 @@ msgstr "클라우드 워크스페이스를 만들기 전에 설정에서 환경�
 
 msgid "Add another account, or disconnect one you no longer use."
 msgstr "다른 계정을 연결하거나 더 이상 쓰지 않는 계정을 해제하세요."
+
+msgid "Add another GitHub account"
+msgstr "다른 GitHub 계정 추가"
 
 msgid "Add any machine as a host. Workspaces keep running when your laptop sleeps, and you can check in from wherever you are."
 msgstr "어떤 머신이든 호스트로 추가하세요. 노트북이 잠자기에 들어가도 워크스페이스는 계속 돌고, 어디서든 확인할 수 있습니다."
@@ -4457,6 +4464,12 @@ msgstr "이 컴퓨터에 연결"
 msgid "Connect your {pluginLabel} account, then reload this page."
 msgstr "{pluginLabel} 계정을 연결한 다음 이 페이지를 새로 고치세요."
 
+msgid "Connect your GitHub account in Settings › Connections to work on a private repository"
+msgstr "비공개 리포지토리에서 작업하려면 설정 › 연결에서 GitHub 계정을 연결하세요"
+
+msgid "Connect your GitHub account…"
+msgstr "GitHub 계정 연결…"
+
 msgid "Connect your GitHub repositories and sync pull requests. Track CI status and reviews across your team."
 msgstr "GitHub 리포지토리를 연결하고 풀 리퀘스트를 동기화하세요. 팀 전체의 CI 상태와 리뷰를 추적할 수 있습니다."
 
@@ -6271,14 +6284,15 @@ msgstr "버렸습니다 — 다시 묻지 않습니다"
 msgid "Disconnect"
 msgstr "연결 해제"
 
+#. placeholder {0}: installation.accountLogin
+msgid "Disconnect {0}?"
+msgstr "{0} 연결을 해제할까요?"
+
 msgid "Disconnect {credential}?"
 msgstr "{credential} 연결을 해제할까요?"
 
 msgid "Disconnect {title}"
 msgstr "{title} 연결 해제"
-
-msgid "Disconnect GitHub?"
-msgstr "GitHub 연결을 해제할까요?"
 
 msgid "Disconnect Google?"
 msgstr "Google 연결을 해제할까요?"
@@ -8941,8 +8955,8 @@ msgstr "클라이언트에 Superset MCP 설치하기"
 msgid "Install the desktop app"
 msgstr "데스크톱 앱 설치"
 
-msgid "Install the Superset GitHub App to connect your repositories."
-msgstr "리포지토리를 연결하려면 Superset GitHub App을 설치하세요."
+msgid "Install the Superset GitHub App on each GitHub organization or account whose repositories you want to connect."
+msgstr "리포지토리를 연결할 각 GitHub 조직 또는 계정에 Superset GitHub App을 설치하세요."
 
 msgid "Install, authorize, and scope MCP servers across all your workspaces from one place, with centralized OAuth."
 msgstr "모든 워크스페이스의 MCP 서버를 한곳에서 설치하고, 인증하고, 범위를 지정하세요. OAuth도 중앙에서 관리합니다."
@@ -9191,6 +9205,9 @@ msgstr "독립된 브랜치와 파일 사본"
 
 msgid "Its replies go with it."
 msgstr "답글도 함께 삭제됩니다."
+
+msgid "Its repositories stop syncing, and environments and cloud workspaces built on them cannot start until it is connected again. The GitHub App stays installed on GitHub."
+msgstr "해당 리포지토리의 동기화가 중단되고, 이를 기반으로 한 환경과 클라우드 워크스페이스는 다시 연결할 때까지 시작할 수 없습니다. GitHub App은 GitHub에 설치된 상태로 유지됩니다."
 
 msgid "Its workspaces and terminals are unavailable until it restarts — use the Superset tray menu > Host Service > Restart."
 msgstr "다시 시작할 때까지 해당 워크스페이스와 터미널을 사용할 수 없습니다. Superset 트레이 메뉴 > 호스트 서비스 > 다시 시작을 사용하세요."
@@ -13118,6 +13135,9 @@ msgstr "비공개"
 
 msgid "Private by default.<0/>You're in control."
 msgstr "기본이 비공개입니다.<0/>통제권은 여러분에게 있습니다."
+
+msgid "Private repositories appear once you connect your GitHub account."
+msgstr "GitHub 계정을 연결하면 비공개 리포지토리가 표시됩니다."
 
 msgid "Pro"
 msgstr "Pro"
@@ -17929,9 +17949,6 @@ msgstr "조직의 공개 URL이 바뀝니다. 북마크나 공유한 링크도 �
 #. placeholder {0}: team?.name
 msgid "This will delete <0>{0}</0> and remove all of its members. This can't be undone."
 msgstr "<0>{0}</0>을(를) 삭제하고 모든 멤버를 제거합니다. 되돌릴 수 없습니다."
-
-msgid "This will disconnect GitHub from your organization. The GitHub App will remain installed but will no longer sync data. You can reconnect at any time."
-msgstr "조직에서 GitHub 연결을 해제합니다. GitHub App은 설치된 상태로 남지만 더 이상 데이터를 동기화하지 않습니다. 언제든지 다시 연결할 수 있습니다."
 
 msgid "This will kill all running sessions and restart the terminal daemon. The app will restart terminals with a fresh daemon."
 msgstr "실행 중인 모든 세션을 종료하고 터미널 데몬을 다시 시작합니다. 앱은 새 데몬으로 터미널을 다시 시작합니다."

@@ -7,6 +7,14 @@ export async function GET(request: Request) {
 	const member = await requireOrgMember(request);
 	if (member instanceof Response) return member;
 
+	// Installing binds a GitHub account to the whole organization, as
+	// disconnecting already requires an admin to undo.
+	if (member.role !== "admin" && member.role !== "owner") {
+		return Response.redirect(
+			`${env.NEXT_PUBLIC_WEB_URL}/integrations/github?error=unauthorized`,
+		);
+	}
+
 	if (!(await organizationSyncsNow(member.organizationId))) {
 		return Response.redirect(
 			`${env.NEXT_PUBLIC_WEB_URL}/integrations?pro=github`,

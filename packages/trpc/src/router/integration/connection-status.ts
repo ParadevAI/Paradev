@@ -13,8 +13,8 @@ import { verifyOrgMembership } from "./utils";
  * One procedure rather than the seven per-provider queries the settings pane
  * makes, because the trigger editor asks on every render of every row and
  * polls while the page is open. Two queries answer all of them: the
- * organization's live connections, and the GitHub installation, which lives in
- * its own table.
+ * organization's live connections, and its GitHub installations, which live in
+ * their own table.
  *
  * "Connected" means the same thing here as everywhere else — a row marked
  * disconnected is not connected — so this stays in step with the per-provider
@@ -44,7 +44,7 @@ export const connectionStatusProcedure = protectedProcedure
 		async ({ ctx, input }): Promise<Record<string, ProviderConnection>> => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
 
-			const [connectorRows, installation] = await Promise.all([
+			const [connectorRows, installations] = await Promise.all([
 				db.query.connections.findMany({
 					// Oldest first, and stable: the editor pins a new trigger to the
 					// first account, and an unordered read returns heap order, which
@@ -67,7 +67,7 @@ export const connectionStatusProcedure = protectedProcedure
 						nickname: true,
 					},
 				}),
-				db.query.githubInstallations.findFirst({
+				db.query.githubInstallations.findMany({
 					where: eq(githubInstallations.organizationId, input.organizationId),
 					columns: { suspended: true },
 				}),
@@ -103,7 +103,7 @@ export const connectionStatusProcedure = protectedProcedure
 
 			// A suspended installation still has a row, and delivers nothing.
 			connected.github = {
-				connected: installation !== undefined && !installation.suspended,
+				connected: installations.some((row) => !row.suspended),
 				needsReauth: false,
 				accounts: [],
 			};

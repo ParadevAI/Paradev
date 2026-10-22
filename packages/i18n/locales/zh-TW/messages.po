@@ -428,6 +428,10 @@ msgid "{0} is already used for tasks in this organization."
 msgstr "{0} 已在此組織的任務中使用。"
 
 #. placeholder {0}: params?.repoFullName
+msgid "{0} is no longer connected to GitHub; reinstall the Superset GitHub App on its account"
+msgstr "{0} 已不再連結到 GitHub；請在其帳戶上重新安裝 Superset GitHub App"
+
+#. placeholder {0}: params?.repoFullName
 msgid "{0} is not a repository the GitHub App is installed on"
 msgstr "{0} 不是已安裝 GitHub App 的存放庫"
 
@@ -1719,6 +1723,9 @@ msgstr "建立雲端工作區前，請先在設定中新增環境"
 
 msgid "Add another account, or disconnect one you no longer use."
 msgstr "連接其他帳號，或中斷不再使用的帳號。"
+
+msgid "Add another GitHub account"
+msgstr "新增另一個 GitHub 帳戶"
 
 msgid "Add any machine as a host. Workspaces keep running when your laptop sleeps, and you can check in from wherever you are."
 msgstr "把任意機器新增為主機。筆記本休眠時工作區照常執行，你在哪兒都能檢視進展。"
@@ -4457,6 +4464,12 @@ msgstr "連線至這台電腦"
 msgid "Connect your {pluginLabel} account, then reload this page."
 msgstr "連線你的 {pluginLabel} 帳戶，然後重新載入此頁面。"
 
+msgid "Connect your GitHub account in Settings › Connections to work on a private repository"
+msgstr "要處理私有儲存庫，請在 設定 › 連線 中連結你的 GitHub 帳戶"
+
+msgid "Connect your GitHub account…"
+msgstr "連結你的 GitHub 帳戶…"
+
 msgid "Connect your GitHub repositories and sync pull requests. Track CI status and reviews across your team."
 msgstr "連線你的GitHub儲存庫並同步拉取請求。追蹤整個團隊的CI狀態和程式碼審查。"
 
@@ -6271,14 +6284,15 @@ msgstr "已放棄——不再詢問"
 msgid "Disconnect"
 msgstr "斷開連線"
 
+#. placeholder {0}: installation.accountLogin
+msgid "Disconnect {0}?"
+msgstr "斷開 {0} 的連線？"
+
 msgid "Disconnect {credential}?"
 msgstr "中斷{credential}連線？"
 
 msgid "Disconnect {title}"
 msgstr "中斷 {title}"
-
-msgid "Disconnect GitHub?"
-msgstr "斷開GitHub連線？"
 
 msgid "Disconnect Google?"
 msgstr "斷開Google連線？"
@@ -8941,8 +8955,8 @@ msgstr "在你的客戶端裡安裝Superset MCP"
 msgid "Install the desktop app"
 msgstr "安裝桌面應用程式"
 
-msgid "Install the Superset GitHub App to connect your repositories."
-msgstr "安裝Superset GitHub App以連線你的儲存庫。"
+msgid "Install the Superset GitHub App on each GitHub organization or account whose repositories you want to connect."
+msgstr "在每個要連結其儲存庫的 GitHub 組織或帳戶上安裝 Superset GitHub App。"
 
 msgid "Install, authorize, and scope MCP servers across all your workspaces from one place, with centralized OAuth."
 msgstr "在一處為所有工作區安裝、授權並劃定MCP伺服器的權限範圍，OAuth集中管理。"
@@ -9191,6 +9205,9 @@ msgstr "獨立的分支和檔案副本"
 
 msgid "Its replies go with it."
 msgstr "其回覆也會一併刪除。"
+
+msgid "Its repositories stop syncing, and environments and cloud workspaces built on them cannot start until it is connected again. The GitHub App stays installed on GitHub."
+msgstr "其儲存庫將停止同步，基於這些儲存庫的環境和雲端工作區在重新連結前無法啟動。GitHub App 仍保持安裝在 GitHub 上。"
 
 msgid "Its workspaces and terminals are unavailable until it restarts — use the Superset tray menu > Host Service > Restart."
 msgstr "在它重啟之前，其工作區和終端都不可用，請使用Superset托盤選單 > 主機服務 > 重啟。"
@@ -13118,6 +13135,9 @@ msgstr "私有"
 
 msgid "Private by default.<0/>You're in control."
 msgstr "預設私密。<0/>掌控權在你。"
+
+msgid "Private repositories appear once you connect your GitHub account."
+msgstr "連結你的 GitHub 帳戶後，私有儲存庫才會顯示。"
 
 msgid "Pro"
 msgstr "專業版"
@@ -17929,9 +17949,6 @@ msgstr "這會更改組織的公開URL。請記得更新書籤和已分享的連
 #. placeholder {0}: team?.name
 msgid "This will delete <0>{0}</0> and remove all of its members. This can't be undone."
 msgstr "這將刪除<0>{0}</0>並移除其所有成員。此操作無法復原。"
-
-msgid "This will disconnect GitHub from your organization. The GitHub App will remain installed but will no longer sync data. You can reconnect at any time."
-msgstr "這會斷開GitHub與你組織的連線。GitHub App仍會保持安裝，但不再同步資料。你可以隨時重新連線。"
 
 msgid "This will kill all running sessions and restart the terminal daemon. The app will restart terminals with a fresh daemon."
 msgstr "這將終止所有執行中的會話並重啟終端守護程式。應用會用全新的守護程式重啟終端。"

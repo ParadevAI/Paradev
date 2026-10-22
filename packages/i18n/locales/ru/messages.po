@@ -428,6 +428,10 @@ msgid "{0} is already used for tasks in this organization."
 msgstr "{0} уже используется для задач в этой организации."
 
 #. placeholder {0}: params?.repoFullName
+msgid "{0} is no longer connected to GitHub; reinstall the Superset GitHub App on its account"
+msgstr "{0} больше не подключён к GitHub; переустановите Superset GitHub App на его учётной записи"
+
+#. placeholder {0}: params?.repoFullName
 msgid "{0} is not a repository the GitHub App is installed on"
 msgstr "{0} — не репозиторий, в котором установлено GitHub App"
 
@@ -1719,6 +1723,9 @@ msgstr "Добавьте окружение в Настройках, прежд�
 
 msgid "Add another account, or disconnect one you no longer use."
 msgstr "Подключите ещё аккаунт или отключите тот, которым больше не пользуетесь."
+
+msgid "Add another GitHub account"
+msgstr "Добавить ещё одну учётную запись GitHub"
 
 msgid "Add any machine as a host. Workspaces keep running when your laptop sleeps, and you can check in from wherever you are."
 msgstr "Добавьте любую машину как хост. Рабочие области продолжают работать, когда ноутбук спит, а вы можете заглянуть откуда угодно."
@@ -4457,6 +4464,12 @@ msgstr "Подключите этот компьютер"
 msgid "Connect your {pluginLabel} account, then reload this page."
 msgstr "Подключите аккаунт {pluginLabel}, затем перезагрузите эту страницу."
 
+msgid "Connect your GitHub account in Settings › Connections to work on a private repository"
+msgstr "Подключите свою учётную запись GitHub в Настройки › Подключения, чтобы работать с приватным репозиторием"
+
+msgid "Connect your GitHub account…"
+msgstr "Подключить свою учётную запись GitHub…"
+
 msgid "Connect your GitHub repositories and sync pull requests. Track CI status and reviews across your team."
 msgstr "Подключите репозитории GitHub и синхронизируйте пул-реквесты. Отслеживайте статус CI и ревью по всей команде."
 
@@ -6271,14 +6284,15 @@ msgstr "Изменения отменены — больше не спросим
 msgid "Disconnect"
 msgstr "Отключить"
 
+#. placeholder {0}: installation.accountLogin
+msgid "Disconnect {0}?"
+msgstr "Отключить {0}?"
+
 msgid "Disconnect {credential}?"
 msgstr "Отключить {credential}?"
 
 msgid "Disconnect {title}"
 msgstr "Отключить {title}"
-
-msgid "Disconnect GitHub?"
-msgstr "Отключить GitHub?"
 
 msgid "Disconnect Google?"
 msgstr "Отключить Google?"
@@ -8941,8 +8955,8 @@ msgstr "Установите Superset MCP в своём клиенте"
 msgid "Install the desktop app"
 msgstr "Установите десктопное приложение"
 
-msgid "Install the Superset GitHub App to connect your repositories."
-msgstr "Установите GitHub App Superset, чтобы подключить свои репозитории."
+msgid "Install the Superset GitHub App on each GitHub organization or account whose repositories you want to connect."
+msgstr "Установите Superset GitHub App в каждой организации или учётной записи GitHub, репозитории которых вы хотите подключить."
 
 msgid "Install, authorize, and scope MCP servers across all your workspaces from one place, with centralized OAuth."
 msgstr "Устанавливайте, авторизуйте и ограничивайте серверы MCP во всех рабочих областях из одного места, с централизованным OAuth."
@@ -9191,6 +9205,9 @@ msgstr "Собственная ветка и собственная копия �
 
 msgid "Its replies go with it."
 msgstr "Ответы тоже будут удалены."
+
+msgid "Its repositories stop syncing, and environments and cloud workspaces built on them cannot start until it is connected again. The GitHub App stays installed on GitHub."
+msgstr "Его репозитории перестанут синхронизироваться, а окружения и облачные рабочие области на их основе не запустятся, пока оно не будет подключено снова. GitHub App остаётся установленным на GitHub."
 
 msgid "Its workspaces and terminals are unavailable until it restarts — use the Superset tray menu > Host Service > Restart."
 msgstr "Её рабочие области и терминалы недоступны до перезапуска — откройте меню Superset в трее > Host Service > Restart."
@@ -13118,6 +13135,9 @@ msgstr "Приватный"
 
 msgid "Private by default.<0/>You're in control."
 msgstr "Приватно по умолчанию.<0/>Контроль у вас."
+
+msgid "Private repositories appear once you connect your GitHub account."
+msgstr "Приватные репозитории появятся после подключения вашей учётной записи GitHub."
 
 msgid "Pro"
 msgstr "Pro"
@@ -17929,9 +17949,6 @@ msgstr "Это изменит публичный URL вашей организа
 #. placeholder {0}: team?.name
 msgid "This will delete <0>{0}</0> and remove all of its members. This can't be undone."
 msgstr "Это удалит <0>{0}</0> и всех её участников. Отменить нельзя."
-
-msgid "This will disconnect GitHub from your organization. The GitHub App will remain installed but will no longer sync data. You can reconnect at any time."
-msgstr "Это отключит GitHub от вашей организации. GitHub App останется установленным, но перестанет синхронизировать данные. Переподключиться можно в любой момент."
 
 msgid "This will kill all running sessions and restart the terminal daemon. The app will restart terminals with a fresh daemon."
 msgstr "Это завершит все работающие сессии и перезапустит демон терминала. Приложение перезапустит терминалы с новым демоном."

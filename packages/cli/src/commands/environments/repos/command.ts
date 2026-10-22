@@ -4,7 +4,7 @@ import { command } from "../../../lib/command";
 export default command({
 	sandbox: false,
 	description:
-		"List the repositories the organization's GitHub App can see; these are what --repo accepts",
+		"List the repositories you can build an environment on: public ones the organization's GitHub App can see, and private ones your own GitHub account also reaches; these are what --repo accepts",
 	display: (data) =>
 		table(
 			(data ?? []) as Record<string, unknown>[],
@@ -17,14 +17,16 @@ export default command({
 		if (!organizationId) {
 			throw new CLIError("No active organization", "Run: superset auth login");
 		}
-		const repositories =
-			await ctx.api.integration.github.listRepositories.query({
+		const { repositories, connected, connectable } =
+			await ctx.api.integration.github.listAccessibleRepositories.query({
 				organizationId,
 			});
 		if (repositories.length === 0) {
 			throw new CLIError(
-				"No repositories connected to this organization",
-				"Run: superset integrations github connect",
+				"No repositories you can use in this organization",
+				connectable && !connected
+					? "Private repositories appear once you connect your GitHub account: superset connections github connect. To install the App: superset integrations github connect"
+					: "Run: superset integrations github connect",
 			);
 		}
 		return repositories

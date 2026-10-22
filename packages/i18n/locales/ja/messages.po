@@ -428,6 +428,10 @@ msgid "{0} is already used for tasks in this organization."
 msgstr "{0} はこの組織のタスクですでに使われています。"
 
 #. placeholder {0}: params?.repoFullName
+msgid "{0} is no longer connected to GitHub; reinstall the Superset GitHub App on its account"
+msgstr "{0} は GitHub に接続されていません。そのアカウントに Superset GitHub App を再インストールしてください"
+
+#. placeholder {0}: params?.repoFullName
 msgid "{0} is not a repository the GitHub App is installed on"
 msgstr "{0} は GitHub App がインストールされているリポジトリではありません"
 
@@ -1719,6 +1723,9 @@ msgstr "クラウドワークスペースを作成する前に、設定で環境
 
 msgid "Add another account, or disconnect one you no longer use."
 msgstr "別のアカウントを接続するか、使わなくなったものを解除します。"
+
+msgid "Add another GitHub account"
+msgstr "別の GitHub アカウントを追加"
 
 msgid "Add any machine as a host. Workspaces keep running when your laptop sleeps, and you can check in from wherever you are."
 msgstr "どんなマシンでもホストとして追加できます。ノートPCがスリープしてもワークスペースは動き続け、どこからでも様子を確認できます。"
@@ -4457,6 +4464,12 @@ msgstr "このコンピューターに接続"
 msgid "Connect your {pluginLabel} account, then reload this page."
 msgstr "{pluginLabel} アカウントを接続してから、このページを再読み込みしてください。"
 
+msgid "Connect your GitHub account in Settings › Connections to work on a private repository"
+msgstr "プライベートリポジトリで作業するには、設定 › 接続 で GitHub アカウントを接続してください"
+
+msgid "Connect your GitHub account…"
+msgstr "GitHub アカウントを接続…"
+
 msgid "Connect your GitHub repositories and sync pull requests. Track CI status and reviews across your team."
 msgstr "GitHubリポジトリを接続してプルリクエストを同期します。チーム全体のCIステータスとレビューを追跡できます。"
 
@@ -6271,14 +6284,15 @@ msgstr "破棄しました — 今後は確認しません"
 msgid "Disconnect"
 msgstr "切断"
 
+#. placeholder {0}: installation.accountLogin
+msgid "Disconnect {0}?"
+msgstr "{0} を切断しますか？"
+
 msgid "Disconnect {credential}?"
 msgstr "{credential}の接続を解除しますか？"
 
 msgid "Disconnect {title}"
 msgstr "{title} を切断"
-
-msgid "Disconnect GitHub?"
-msgstr "GitHubの接続を解除しますか?"
 
 msgid "Disconnect Google?"
 msgstr "Googleの接続を解除しますか?"
@@ -8941,8 +8955,8 @@ msgstr "クライアントにSuperset MCPをインストール"
 msgid "Install the desktop app"
 msgstr "デスクトップアプリをインストール"
 
-msgid "Install the Superset GitHub App to connect your repositories."
-msgstr "Superset GitHub Appをインストールしてリポジトリを接続します。"
+msgid "Install the Superset GitHub App on each GitHub organization or account whose repositories you want to connect."
+msgstr "リポジトリを接続したい GitHub 組織またはアカウントごとに Superset GitHub App をインストールしてください。"
 
 msgid "Install, authorize, and scope MCP servers across all your workspaces from one place, with centralized OAuth."
 msgstr "すべてのワークスペースにまたがるMCPサーバーのインストール、認可、スコープ設定を1か所で。OAuthも一元管理します。"
@@ -9191,6 +9205,9 @@ msgstr "独自のブランチとファイルのコピー"
 
 msgid "Its replies go with it."
 msgstr "返信も一緒に削除されます。"
+
+msgid "Its repositories stop syncing, and environments and cloud workspaces built on them cannot start until it is connected again. The GitHub App stays installed on GitHub."
+msgstr "そのリポジトリの同期が止まり、それらに基づく環境とクラウドワークスペースは再接続するまで起動できません。GitHub App は GitHub 上にインストールされたままです。"
 
 msgid "Its workspaces and terminals are unavailable until it restarts — use the Superset tray menu > Host Service > Restart."
 msgstr "再起動するまで、そのワークスペースとターミナルは利用できません — Supersetのトレイメニューから「ホストサービス」>「再起動」を実行してください。"
@@ -13118,6 +13135,9 @@ msgstr "プライベート"
 
 msgid "Private by default.<0/>You're in control."
 msgstr "既定でプライベート。<0/>主導権はあなたに。"
+
+msgid "Private repositories appear once you connect your GitHub account."
+msgstr "GitHub アカウントを接続すると、プライベートリポジトリが表示されます。"
 
 msgid "Pro"
 msgstr "Pro"
@@ -17929,9 +17949,6 @@ msgstr "組織の公開URLが変わります。ブックマークや共有リン
 #. placeholder {0}: team?.name
 msgid "This will delete <0>{0}</0> and remove all of its members. This can't be undone."
 msgstr "<0>{0}</0>を削除し、すべてのメンバーを外します。この操作は元に戻せません。"
-
-msgid "This will disconnect GitHub from your organization. The GitHub App will remain installed but will no longer sync data. You can reconnect at any time."
-msgstr "組織からGitHubの接続を解除します。GitHub Appはインストールされたまま残りますが、データの同期は行われなくなります。いつでも再接続できます。"
 
 msgid "This will kill all running sessions and restart the terminal daemon. The app will restart terminals with a fresh daemon."
 msgstr "実行中のすべてのセッションを終了し、ターミナルデーモンを再起動します。アプリは新しいデーモンでターミナルを再起動します。"

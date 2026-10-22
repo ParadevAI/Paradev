@@ -428,6 +428,10 @@ msgid "{0} is already used for tasks in this organization."
 msgstr "{0} đã được dùng cho nhiệm vụ trong tổ chức này."
 
 #. placeholder {0}: params?.repoFullName
+msgid "{0} is no longer connected to GitHub; reinstall the Superset GitHub App on its account"
+msgstr "{0} không còn kết nối với GitHub; hãy cài lại Superset GitHub App trên tài khoản đó"
+
+#. placeholder {0}: params?.repoFullName
 msgid "{0} is not a repository the GitHub App is installed on"
 msgstr "{0} không phải là kho lưu trữ đã cài đặt GitHub App"
 
@@ -1719,6 +1723,9 @@ msgstr "Thêm một environment trong Settings trước khi tạo workspace clou
 
 msgid "Add another account, or disconnect one you no longer use."
 msgstr "Kết nối tài khoản khác, hoặc ngắt tài khoản bạn không còn dùng."
+
+msgid "Add another GitHub account"
+msgstr "Thêm tài khoản GitHub khác"
 
 msgid "Add any machine as a host. Workspaces keep running when your laptop sleeps, and you can check in from wherever you are."
 msgstr "Thêm bất kỳ máy nào làm host. Workspace vẫn chạy khi laptop của bạn ngủ, và bạn có thể kiểm tra từ bất cứ đâu."
@@ -4457,6 +4464,12 @@ msgstr "Kết nối máy tính này"
 msgid "Connect your {pluginLabel} account, then reload this page."
 msgstr "Kết nối tài khoản {pluginLabel} của bạn, sau đó tải lại trang này."
 
+msgid "Connect your GitHub account in Settings › Connections to work on a private repository"
+msgstr "Kết nối tài khoản GitHub của bạn trong Cài đặt › Kết nối để làm việc trên repository riêng tư"
+
+msgid "Connect your GitHub account…"
+msgstr "Kết nối tài khoản GitHub của bạn…"
+
 msgid "Connect your GitHub repositories and sync pull requests. Track CI status and reviews across your team."
 msgstr "Kết nối các repository GitHub của bạn và đồng bộ pull request. Theo dõi trạng thái CI và review trong cả nhóm."
 
@@ -6271,14 +6284,15 @@ msgstr "Đã bỏ — sẽ không hỏi lại"
 msgid "Disconnect"
 msgstr "Ngắt kết nối"
 
+#. placeholder {0}: installation.accountLogin
+msgid "Disconnect {0}?"
+msgstr "Ngắt kết nối {0}?"
+
 msgid "Disconnect {credential}?"
 msgstr "Ngắt kết nối {credential}?"
 
 msgid "Disconnect {title}"
 msgstr "Ngắt kết nối {title}"
-
-msgid "Disconnect GitHub?"
-msgstr "Ngắt kết nối GitHub?"
 
 msgid "Disconnect Google?"
 msgstr "Ngắt kết nối Google?"
@@ -8941,8 +8955,8 @@ msgstr "Cài Superset MCP vào client của bạn"
 msgid "Install the desktop app"
 msgstr "Cài ứng dụng máy tính"
 
-msgid "Install the Superset GitHub App to connect your repositories."
-msgstr "Hãy cài Superset GitHub App để kết nối các repository của bạn."
+msgid "Install the Superset GitHub App on each GitHub organization or account whose repositories you want to connect."
+msgstr "Cài Superset GitHub App trên từng tổ chức hoặc tài khoản GitHub có repository bạn muốn kết nối."
 
 msgid "Install, authorize, and scope MCP servers across all your workspaces from one place, with centralized OAuth."
 msgstr "Cài đặt, ủy quyền và giới hạn phạm vi server MCP trên mọi workspace từ một chỗ, với OAuth tập trung."
@@ -9191,6 +9205,9 @@ msgstr "Nhánh riêng và bản sao tệp riêng"
 
 msgid "Its replies go with it."
 msgstr "Các câu trả lời cũng bị xóa theo."
+
+msgid "Its repositories stop syncing, and environments and cloud workspaces built on them cannot start until it is connected again. The GitHub App stays installed on GitHub."
+msgstr "Các repository của nó ngừng đồng bộ, và các environment cùng workspace cloud dựa trên chúng không thể khởi động cho đến khi được kết nối lại. GitHub App vẫn được cài trên GitHub."
 
 msgid "Its workspaces and terminals are unavailable until it restarts — use the Superset tray menu > Host Service > Restart."
 msgstr "Các workspace và terminal của nó không khả dụng cho đến khi khởi động lại — dùng menu khay Superset > Host Service > Restart."
@@ -13118,6 +13135,9 @@ msgstr "Riêng tư"
 
 msgid "Private by default.<0/>You're in control."
 msgstr "Riêng tư theo mặc định.<0/>Bạn nắm quyền kiểm soát."
+
+msgid "Private repositories appear once you connect your GitHub account."
+msgstr "Các repository riêng tư sẽ hiện ra sau khi bạn kết nối tài khoản GitHub."
 
 msgid "Pro"
 msgstr "Pro"
@@ -17929,9 +17949,6 @@ msgstr "Thao tác này sẽ đổi URL công khai của tổ chức. Hãy nhớ 
 #. placeholder {0}: team?.name
 msgid "This will delete <0>{0}</0> and remove all of its members. This can't be undone."
 msgstr "Thao tác này sẽ xóa <0>{0}</0> và gỡ toàn bộ thành viên. Không thể hoàn tác."
-
-msgid "This will disconnect GitHub from your organization. The GitHub App will remain installed but will no longer sync data. You can reconnect at any time."
-msgstr "Thao tác này sẽ ngắt kết nối GitHub khỏi tổ chức của bạn. GitHub App vẫn được cài nhưng sẽ không đồng bộ dữ liệu nữa. Bạn có thể kết nối lại bất cứ lúc nào."
 
 msgid "This will kill all running sessions and restart the terminal daemon. The app will restart terminals with a fresh daemon."
 msgstr "Thao tác này sẽ kết thúc mọi phiên đang chạy và khởi động lại daemon terminal. Ứng dụng sẽ khởi động lại các terminal với một daemon mới."

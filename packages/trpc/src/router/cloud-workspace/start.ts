@@ -5,10 +5,7 @@ import { and, eq, inArray, isNull } from "drizzle-orm";
 import { acpChatEnabled } from "../../lib/acp-chat";
 import { anchorAttachments } from "../../lib/attachments";
 import { resolveMachineSize } from "../../lib/billing/plan";
-import {
-	githubRepositoriesOutOfReach,
-	githubUserTokenFor,
-} from "../../lib/github-user";
+import { assertGithubReach } from "../../lib/github-user";
 import { nudge } from "../../lib/realtime";
 import {
 	environmentRepositoryRows,
@@ -131,22 +128,13 @@ export async function startCloudWorkspace(args: {
 		environment.hooksRepositoryId,
 	) as (typeof repositories)[number];
 	const branch = args.branch ?? primary.defaultBranch;
-	// A connected person's workspace acts as them on GitHub, so a
-	// repository they cannot see would fail to clone later; say so now.
-	const githubToken = await githubUserTokenFor(args.userId);
-	if (githubToken) {
-		const outOfReach = await githubRepositoriesOutOfReach({
-			token: githubToken,
-			repositories,
-		});
-		if (outOfReach.length > 0) {
-			throw userError({
-				code: "FORBIDDEN",
-				message: `Your GitHub account cannot reach ${outOfReach.join(", ")}`,
-				i18nKey: "serverError.cloudWorkspace.githubRepositoryOutOfReach",
-			});
-		}
-	}
+	// A private repository takes the person's own GitHub reach, not only the
+	// App's; refused here rather than at clone. An automation runs on the App's.
+	await assertGithubReach({
+		userId: args.userId,
+		repositories,
+		requireConnection: !args.launch?.automationRunId,
+	});
 
 	// The id is generated here rather than by the database so the sandbox
 	// name can be derived before the insert. A placeholder would briefly

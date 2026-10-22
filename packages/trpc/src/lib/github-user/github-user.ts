@@ -14,6 +14,9 @@ import { env } from "../../env";
 import { open, seal } from "../secret-box";
 
 const STATE_TTL_MS = 10 * 60_000;
+const REPO_PAGE = 100;
+/** 2,000 repositories per installation; past that the picker is the wrong tool. */
+const MAX_REPO_PAGES = 20;
 /** Refresh a token this close to expiring, so a box never holds a dying one. */
 const REFRESH_MARGIN_MS = 15 * 60_000;
 const STATE_AAD = "github-user-connect";
@@ -295,6 +298,43 @@ export async function disconnectGithubUser(userId: string): Promise<void> {
 	}).catch((error) => {
 		console.warn("[github-user] could not revoke the grant", error);
 	});
+}
+
+const installationRepositoriesSchema = z.object({
+	repositories: z.array(z.object({ id: z.number() })),
+});
+
+/**
+ * GitHub's ids of the repositories both the person and one App installation
+ * reach: the set a connected person is offered, computed by GitHub itself.
+ */
+export async function githubUserInstallationRepoIds(args: {
+	token: string;
+	installationId: string;
+}): Promise<Set<string>> {
+	const ids = new Set<string>();
+	for (let page = 1; page <= MAX_REPO_PAGES; page++) {
+		const response = await fetch(
+			`https://api.github.com/user/installations/${args.installationId}/repositories?per_page=${REPO_PAGE}&page=${page}`,
+			{
+				headers: {
+					accept: "application/vnd.github+json",
+					authorization: `Bearer ${args.token}`,
+					"x-github-api-version": "2022-11-28",
+				},
+				signal: AbortSignal.timeout(10_000),
+			},
+		);
+		if (!response.ok) {
+			throw new GithubUserConnectionError(
+				`GitHub refused the repository list: HTTP ${response.status}`,
+			);
+		}
+		const body = installationRepositoriesSchema.parse(await response.json());
+		for (const repository of body.repositories) ids.add(String(repository.id));
+		if (body.repositories.length < REPO_PAGE) break;
+	}
+	return ids;
 }
 
 /** The repositories the person cannot see on GitHub, by full name. */

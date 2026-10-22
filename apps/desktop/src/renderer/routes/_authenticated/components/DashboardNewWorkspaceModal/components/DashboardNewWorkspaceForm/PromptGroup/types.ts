@@ -33,8 +33,13 @@ export interface GitHubRepositoryOption extends ProjectOption {
 	fullName: string;
 }
 
-/** How the project picker reaches the GitHub connection: the App's settings, or connecting one. */
+/**
+ * How the project picker reaches the GitHub connection: the App's settings,
+ * installing the App, or connecting the person's own account so private
+ * repositories appear.
+ */
 export type GitHubConnectionAction =
 	| { kind: "configure"; url: string }
 	| { kind: "connect" }
+	| { kind: "connect-account" }
 	| null;

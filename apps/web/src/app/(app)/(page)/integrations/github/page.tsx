@@ -104,10 +104,10 @@ export default async function GitHubIntegrationPage() {
 		redirect("/integrations?pro=github");
 	}
 
-	const installation = await trpc.integration.github.getInstallation.query({
+	const installations = await trpc.integration.github.listInstallations.query({
 		organizationId: organization.id,
 	});
-	const isConnected = !!installation;
+	const isConnected = installations.length > 0;
 
 	return (
 		<div className="space-y-8">
@@ -180,7 +180,7 @@ export default async function GitHubIntegrationPage() {
 						{i18n._(
 							msg({
 								message:
-									"Install the Superset GitHub App to connect your repositories.",
+									"Install the Superset GitHub App on each GitHub organization or account whose repositories you want to connect.",
 							}),
 						)}
 					</CardDescription>
@@ -188,32 +188,12 @@ export default async function GitHubIntegrationPage() {
 				<CardContent>
 					<ConnectionControls
 						organizationId={organization.id}
-						isConnected={isConnected}
+						installations={installations}
 					/>
-					{installation && (
-						<div className="mt-4 text-sm text-muted-foreground">
-							{i18n._(
-								msg({
-									message: "Connected to",
-								}),
-							)}{" "}
-							<strong>{installation.accountLogin}</strong> (
-							{installation.accountType})
-							{installation.suspended && (
-								<Badge variant="destructive" className="ml-2">
-									{i18n._(
-										msg({
-											message: "Suspended",
-										}),
-									)}
-								</Badge>
-							)}
-						</div>
-					)}
 				</CardContent>
 			</Card>
 
-			{installation && (
+			{isConnected && (
 				<Card>
 					<CardHeader>
 						<CardTitle>

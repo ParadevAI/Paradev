@@ -27,6 +27,8 @@ interface EnvironmentRepositoryPickerProps {
 	isLoading: boolean;
 	disabled: boolean;
 	onConfigureGitHubApp: (() => void) | null;
+	/** Set while the list is public repositories only, for want of the person's own GitHub account. */
+	onConnectAccount: (() => void) | null;
 	onRefresh: (() => void) | null;
 	isRefreshing: boolean;
 }
@@ -42,6 +44,7 @@ export function EnvironmentRepositoryPicker({
 	isLoading,
 	disabled,
 	onConfigureGitHubApp,
+	onConnectAccount,
 	onRefresh,
 	isRefreshing,
 }: EnvironmentRepositoryPickerProps) {
@@ -110,6 +113,11 @@ export function EnvironmentRepositoryPicker({
 								<CommandEmpty className="px-3 py-3 text-center text-xs text-muted-foreground">
 									{isLoading ? (
 										<Trans>Loading repositories...</Trans>
+									) : onConnectAccount ? (
+										<Trans>
+											Private repositories appear once you connect your GitHub
+											account.
+										</Trans>
 									) : onConfigureGitHubApp ? (
 										<Trans>No matching repositories.</Trans>
 									) : (
@@ -139,10 +147,20 @@ export function EnvironmentRepositoryPicker({
 										))}
 									</CommandGroup>
 								)}
-								{(onRefresh || onConfigureGitHubApp) && (
+								{(onRefresh || onConfigureGitHubApp || onConnectAccount) && (
 									<>
 										<CommandSeparator alwaysRender />
 										<CommandGroup forceMount>
+											{onConnectAccount && (
+												<CommandItem
+													className="rounded-md text-xs"
+													forceMount
+													onSelect={onConnectAccount}
+												>
+													<FaGithub className="size-3.5" />
+													<Trans>Connect your GitHub account…</Trans>
+												</CommandItem>
+											)}
 											{onRefresh && (
 												<CommandItem
 													className="rounded-md text-xs"

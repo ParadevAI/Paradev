@@ -18,9 +18,10 @@ interface GitHubRepositoryRow {
 }
 
 /**
- * The repositories the organization's GitHub App can see, as projects the
- * cloud picker can offer: the ones no project checks out yet become
- * stand-ins.
+ * The repositories this person may start a cloud workspace on — public ones
+ * the organization's GitHub App delivers, private ones their own account also
+ * reaches — as projects the cloud picker can offer: the ones no project checks
+ * out yet become stand-ins.
  */
 export function useGitHubRepositoryProjects({
 	organizationId,
@@ -33,12 +34,12 @@ export function useGitHubRepositoryProjects({
 }) {
 	const isEnabled = enabled && organizationId !== null;
 	const repositoriesQuery =
-		cloudTrpc.integration.github.listRepositories.useQuery(
+		cloudTrpc.integration.github.listAccessibleRepositories.useQuery(
 			{ organizationId: organizationId ?? "" },
 			{ enabled: isEnabled },
 		);
-	const installationQuery =
-		cloudTrpc.integration.github.getInstallation.useQuery(
+	const installationsQuery =
+		cloudTrpc.integration.github.listInstallations.useQuery(
 			{ organizationId: organizationId ?? "" },
 			{ enabled: isEnabled },
 		);
@@ -46,7 +47,7 @@ export function useGitHubRepositoryProjects({
 	const repositoriesByFullName = useMemo(
 		() =>
 			new Map<string, GitHubRepositoryRow>(
-				(repositoriesQuery.data ?? []).map((repository) => [
+				(repositoriesQuery.data?.repositories ?? []).map((repository) => [
 					repository.fullName.toLowerCase(),
 					repository,
 				]),
@@ -78,12 +79,18 @@ export function useGitHubRepositoryProjects({
 			}));
 	}, [repositoriesByFullName, projects]);
 
-	const installation = installationQuery.data;
-	const connection: GitHubConnectionAction = !installationQuery.isSuccess
+	// The first installation's settings stand for the App; a person's own
+	// account comes before configuring it, since without one the list is
+	// public repositories only.
+	const installation = installationsQuery.data?.[0];
+	const access = repositoriesQuery.data;
+	const connection: GitHubConnectionAction = !installationsQuery.isSuccess
 		? null
-		: installation?.installationId
-			? { kind: "configure", url: githubAppSettingsUrl(installation) }
-			: { kind: "connect" };
+		: !installation
+			? { kind: "connect" }
+			: access?.connectable && !access.connected
+				? { kind: "connect-account" }
+				: { kind: "configure", url: githubAppSettingsUrl(installation) };
 
 	return {
 		repositories,

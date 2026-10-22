@@ -428,6 +428,10 @@ msgid "{0} is already used for tasks in this organization."
 msgstr "{0} se v této organizaci pro úkoly už používá."
 
 #. placeholder {0}: params?.repoFullName
+msgid "{0} is no longer connected to GitHub; reinstall the Superset GitHub App on its account"
+msgstr "{0} už není připojen ke GitHubu; znovu nainstalujte Superset GitHub App na jeho účet"
+
+#. placeholder {0}: params?.repoFullName
 msgid "{0} is not a repository the GitHub App is installed on"
 msgstr "{0} není repozitář, ve kterém je nainstalována aplikace GitHub App"
 
@@ -1719,6 +1723,9 @@ msgstr "Před vytvořením cloudového pracovního prostoru přidejte prostřed�
 
 msgid "Add another account, or disconnect one you no longer use."
 msgstr "Připoj další účet nebo odpoj ten, který už nepoužíváš."
+
+msgid "Add another GitHub account"
+msgstr "Přidat další účet GitHub"
 
 msgid "Add any machine as a host. Workspaces keep running when your laptop sleeps, and you can check in from wherever you are."
 msgstr "Přidejte jako hosta libovolný počítač. Pracovní prostory běží dál, i když váš laptop usne, a vy se můžete kdykoli podívat, jak si vedou."
@@ -4457,6 +4464,12 @@ msgstr "Připojte tento počítač"
 msgid "Connect your {pluginLabel} account, then reload this page."
 msgstr "Připojte svůj účet {pluginLabel} a pak tuto stránku znovu načtěte."
 
+msgid "Connect your GitHub account in Settings › Connections to work on a private repository"
+msgstr "Připojte svůj účet GitHub v Nastavení › Připojení, abyste mohli pracovat na privátním repozitáři"
+
+msgid "Connect your GitHub account…"
+msgstr "Připojit svůj účet GitHub…"
+
 msgid "Connect your GitHub repositories and sync pull requests. Track CI status and reviews across your team."
 msgstr "Připojte své GitHub repozitáře a synchronizujte pull requesty. Sledujte stav CI a revize napříč týmem."
 
@@ -6271,14 +6284,15 @@ msgstr "Zahozeno — příště se nezeptáme"
 msgid "Disconnect"
 msgstr "Odpojit"
 
+#. placeholder {0}: installation.accountLogin
+msgid "Disconnect {0}?"
+msgstr "Odpojit {0}?"
+
 msgid "Disconnect {credential}?"
 msgstr "Odpojit {credential}?"
 
 msgid "Disconnect {title}"
 msgstr "Odpojit {title}"
-
-msgid "Disconnect GitHub?"
-msgstr "Odpojit GitHub?"
 
 msgid "Disconnect Google?"
 msgstr "Odpojit Google?"
@@ -8941,8 +8955,8 @@ msgstr "Nainstalujte Superset MCP do svého klienta"
 msgid "Install the desktop app"
 msgstr "Nainstalujte desktopovou aplikaci"
 
-msgid "Install the Superset GitHub App to connect your repositories."
-msgstr "Nainstalujte Superset GitHub App a připojte své repozitáře."
+msgid "Install the Superset GitHub App on each GitHub organization or account whose repositories you want to connect."
+msgstr "Nainstalujte Superset GitHub App do každé organizace nebo účtu GitHub, jejichž repozitáře chcete připojit."
 
 msgid "Install, authorize, and scope MCP servers across all your workspaces from one place, with centralized OAuth."
 msgstr "Instalujte, autorizujte a omezujte MCP servery napříč všemi pracovními prostory z jednoho místa, s centrálním OAuth."
@@ -9191,6 +9205,9 @@ msgstr "Vlastní větev a vlastní kopie souborů"
 
 msgid "Its replies go with it."
 msgstr "Smažou se i odpovědi."
+
+msgid "Its repositories stop syncing, and environments and cloud workspaces built on them cannot start until it is connected again. The GitHub App stays installed on GitHub."
+msgstr "Jeho repozitáře se přestanou synchronizovat a prostředí a cloudové pracovní prostory na nich postavené nepůjde spustit, dokud ho znovu nepřipojíte. GitHub App zůstane na GitHubu nainstalovaná."
 
 msgid "Its workspaces and terminals are unavailable until it restarts — use the Superset tray menu > Host Service > Restart."
 msgstr "Její pracovní prostory a terminály nebudou dostupné, dokud se nerestartuje — použijte nabídku Superset na liště > Host Service > Restart."
@@ -13118,6 +13135,9 @@ msgstr "Soukromý"
 
 msgid "Private by default.<0/>You're in control."
 msgstr "Soukromé ve výchozím stavu.<0/>Máte to pod kontrolou."
+
+msgid "Private repositories appear once you connect your GitHub account."
+msgstr "Privátní repozitáře se zobrazí, jakmile připojíte svůj účet GitHub."
 
 msgid "Pro"
 msgstr "Pro"
@@ -17929,9 +17949,6 @@ msgstr "Tímto se změní veřejná URL vaší organizace. Nezapomeňte aktualiz
 #. placeholder {0}: team?.name
 msgid "This will delete <0>{0}</0> and remove all of its members. This can't be undone."
 msgstr "Tímto se smaže <0>{0}</0> a odeberou se všichni jeho členové. Nelze vrátit zpět."
-
-msgid "This will disconnect GitHub from your organization. The GitHub App will remain installed but will no longer sync data. You can reconnect at any time."
-msgstr "Tímto odpojíte GitHub od své organizace. GitHub App zůstane nainstalovaná, ale přestane synchronizovat data. Kdykoli se můžete připojit znovu."
 
 msgid "This will kill all running sessions and restart the terminal daemon. The app will restart terminals with a fresh daemon."
 msgstr "Tímto se ukončí všechny běžící relace a restartuje terminálový démon. Aplikace terminály spustí znovu s čerstvým démonem."

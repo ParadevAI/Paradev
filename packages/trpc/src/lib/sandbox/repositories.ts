@@ -148,6 +148,21 @@ export async function recordWorkspaceRepositories(args: {
 	);
 }
 
+/** The rows a workspace checked out, as fixed at create. */
+export async function workspaceRepositoryRows(
+	cloudWorkspaceId: string,
+): Promise<RepositoryRow[]> {
+	const rows = await db
+		.select({ repository: githubRepositories })
+		.from(cloudWorkspaceRepositories)
+		.innerJoin(
+			githubRepositories,
+			eq(cloudWorkspaceRepositories.repositoryId, githubRepositories.id),
+		)
+		.where(eq(cloudWorkspaceRepositories.cloudWorkspaceId, cloudWorkspaceId));
+	return sortRepositories(rows.map((row) => row.repository));
+}
+
 /** What a workspace checked out, the primary first, with the hooks repository marked. */
 export async function workspaceRepositories(args: {
 	cloudWorkspaceId: string;

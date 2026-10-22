@@ -428,6 +428,10 @@ msgid "{0} is already used for tasks in this organization."
 msgstr "{0} bu kuruluştaki görevler için zaten kullanılıyor."
 
 #. placeholder {0}: params?.repoFullName
+msgid "{0} is no longer connected to GitHub; reinstall the Superset GitHub App on its account"
+msgstr "{0} artık GitHub'a bağlı değil; Superset GitHub App'i o hesaba yeniden kur"
+
+#. placeholder {0}: params?.repoFullName
 msgid "{0} is not a repository the GitHub App is installed on"
 msgstr "{0}, GitHub App’in yüklü olduğu bir depo değil"
 
@@ -1719,6 +1723,9 @@ msgstr "Bulut çalışma alanı oluşturmadan önce Ayarlar'da bir ortam ekleyin
 
 msgid "Add another account, or disconnect one you no longer use."
 msgstr "Başka bir hesap bağla ya da artık kullanmadığın birini kaldır."
+
+msgid "Add another GitHub account"
+msgstr "Başka bir GitHub hesabı ekle"
 
 msgid "Add any machine as a host. Workspaces keep running when your laptop sleeps, and you can check in from wherever you are."
 msgstr "Herhangi bir makineyi host olarak ekleyin. Dizüstünüz uykuya geçtiğinde çalışma alanları çalışmaya devam eder ve nerede olursanız olun durumu kontrol edebilirsiniz."
@@ -4457,6 +4464,12 @@ msgstr "Bu bilgisayarı bağlayın"
 msgid "Connect your {pluginLabel} account, then reload this page."
 msgstr "{pluginLabel} hesabınızı bağlayın, ardından bu sayfayı yeniden yükleyin."
 
+msgid "Connect your GitHub account in Settings › Connections to work on a private repository"
+msgstr "Özel bir depoda çalışmak için Ayarlar › Bağlantılar'dan GitHub hesabını bağla"
+
+msgid "Connect your GitHub account…"
+msgstr "GitHub hesabını bağla…"
+
 msgid "Connect your GitHub repositories and sync pull requests. Track CI status and reviews across your team."
 msgstr "GitHub depolarınızı bağlayın ve pull request'leri eşitleyin. CI durumunu ve incelemeleri takımınız genelinde izleyin."
 
@@ -6271,14 +6284,15 @@ msgstr "Atıldı — bir daha sorulmayacak"
 msgid "Disconnect"
 msgstr "Bağlantıyı kes"
 
+#. placeholder {0}: installation.accountLogin
+msgid "Disconnect {0}?"
+msgstr "{0} bağlantısı kesilsin mi?"
+
 msgid "Disconnect {credential}?"
 msgstr "{credential} bağlantısı kesilsin mi?"
 
 msgid "Disconnect {title}"
 msgstr "{title} bağlantısını kes"
-
-msgid "Disconnect GitHub?"
-msgstr "GitHub bağlantısı kesilsin mi?"
 
 msgid "Disconnect Google?"
 msgstr "Google bağlantısı kesilsin mi?"
@@ -8941,8 +8955,8 @@ msgstr "Superset MCP'yi istemcinize kurun"
 msgid "Install the desktop app"
 msgstr "Masaüstü uygulamasını kurun"
 
-msgid "Install the Superset GitHub App to connect your repositories."
-msgstr "Depolarınızı bağlamak için Superset GitHub App'i kurun."
+msgid "Install the Superset GitHub App on each GitHub organization or account whose repositories you want to connect."
+msgstr "Superset GitHub App'i, depolarını bağlamak istediğin her GitHub organizasyonuna veya hesabına kur."
 
 msgid "Install, authorize, and scope MCP servers across all your workspaces from one place, with centralized OAuth."
 msgstr "MCP sunucularını tek bir yerden, merkezi OAuth ile tüm çalışma alanlarınıza kurun, yetkilendirin ve kapsamlandırın."
@@ -9191,6 +9205,9 @@ msgstr "Kendi dalı ve dosyaların kendi kopyası"
 
 msgid "Its replies go with it."
 msgstr "Yanıtları da silinir."
+
+msgid "Its repositories stop syncing, and environments and cloud workspaces built on them cannot start until it is connected again. The GitHub App stays installed on GitHub."
+msgstr "Depoları eşitlenmeyi durdurur ve bunlar üzerine kurulu ortamlar ile bulut çalışma alanları yeniden bağlanana kadar başlatılamaz. GitHub App GitHub'da kurulu kalır."
 
 msgid "Its workspaces and terminals are unavailable until it restarts — use the Superset tray menu > Host Service > Restart."
 msgstr "Yeniden başlayana kadar çalışma alanları ve terminalleri kullanılamaz — Superset tepsi menüsünde Host hizmeti > Yeniden başlat yolunu kullanın."
@@ -13118,6 +13135,9 @@ msgstr "Özel"
 
 msgid "Private by default.<0/>You're in control."
 msgstr "Varsayılan olarak özel.<0/>Kontrol sizde."
+
+msgid "Private repositories appear once you connect your GitHub account."
+msgstr "GitHub hesabını bağladığında özel depolar görünür."
 
 msgid "Pro"
 msgstr "Pro"
@@ -17929,9 +17949,6 @@ msgstr "Bu, kuruluşunuzun herkese açık URL'sini değiştirir. Yer imlerinizi 
 #. placeholder {0}: team?.name
 msgid "This will delete <0>{0}</0> and remove all of its members. This can't be undone."
 msgstr "Bu işlem <0>{0}</0> takımını siler ve tüm üyelerini kaldırır. Bu geri alınamaz."
-
-msgid "This will disconnect GitHub from your organization. The GitHub App will remain installed but will no longer sync data. You can reconnect at any time."
-msgstr "Bu işlem GitHub bağlantısını kuruluşunuzdan kaldırır. GitHub App kurulu kalır ancak artık veri eşitlemez. İstediğiniz zaman yeniden bağlanabilirsiniz."
 
 msgid "This will kill all running sessions and restart the terminal daemon. The app will restart terminals with a fresh daemon."
 msgstr "Bu işlem çalışan tüm oturumları sonlandırır ve terminal daemon'unu yeniden başlatır. Uygulama, terminalleri yeni bir daemon ile yeniden başlatır."

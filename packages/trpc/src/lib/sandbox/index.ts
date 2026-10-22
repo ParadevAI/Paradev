@@ -35,6 +35,7 @@ export {
 	type WorkspaceRepository,
 	workspaceBranchName,
 	workspaceRepositories,
+	workspaceRepositoryRows,
 } from "./repositories";
 export {
 	type BoxSession,

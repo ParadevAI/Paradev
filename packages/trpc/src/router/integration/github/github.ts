@@ -6,7 +6,7 @@ import {
 } from "@superset/db/schema";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { Client } from "@upstash/qstash";
-import { and, desc, eq, inArray, sql } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 import { env } from "../../../env";
 import { removeInstallation } from "../../../lib/github-installation";
@@ -18,6 +18,7 @@ import {
 	userError,
 } from "../../../trpc";
 import { verifyOrgAdmin, verifyOrgMembership } from "../utils";
+import { accessibleRepositories } from "./accessible-repositories";
 import { findInstalledRepository } from "./find-installed-repository";
 import { getPullRequestDiff } from "./get-pull-request-diff";
 import {
@@ -31,36 +32,61 @@ import { listGithubRepositories } from "./trigger-options";
 
 const qstash = new Client({ token: env.QSTASH_TOKEN });
 
+const installationColumns = {
+	id: true,
+	installationId: true,
+	accountLogin: true,
+	accountType: true,
+	suspended: true,
+	lastSyncedAt: true,
+	createdAt: true,
+} as const;
+
+/** The organization's installations, the first connected first. */
+function listInstallations(organizationId: string) {
+	return db.query.githubInstallations.findMany({
+		where: eq(githubInstallations.organizationId, organizationId),
+		orderBy: [asc(githubInstallations.createdAt)],
+		columns: installationColumns,
+	});
+}
+
 export const githubRouter = {
 	getPullRequestDiff,
+	/** @deprecated Reads one installation where an organization may hold several; use `listInstallations`. */
 	getInstallation: protectedProcedure
 		.input(z.object({ organizationId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
-
-			const installation = await db.query.githubInstallations.findFirst({
-				where: eq(githubInstallations.organizationId, input.organizationId),
-				columns: {
-					id: true,
-					installationId: true,
-					accountLogin: true,
-					accountType: true,
-					suspended: true,
-					lastSyncedAt: true,
-					createdAt: true,
-				},
-			});
-
+			const [installation] = await listInstallations(input.organizationId);
 			return installation ?? null;
 		}),
 
-	disconnect: protectedProcedure
+	listInstallations: protectedProcedure
 		.input(z.object({ organizationId: z.string().uuid() }))
+		.query(async ({ ctx, input }) => {
+			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
+			return listInstallations(input.organizationId);
+		}),
+
+	disconnect: protectedProcedure
+		.input(
+			z.object({
+				organizationId: z.string().uuid(),
+				/** One installation; every one of the organization's when omitted. */
+				installationId: z.string().uuid().optional(),
+			}),
+		)
 		.mutation(async ({ ctx, input }) => {
 			await verifyOrgAdmin(ctx.session.user.id, input.organizationId);
 
 			const rows = await db.query.githubInstallations.findMany({
-				where: eq(githubInstallations.organizationId, input.organizationId),
+				where: and(
+					eq(githubInstallations.organizationId, input.organizationId),
+					input.installationId
+						? eq(githubInstallations.id, input.installationId)
+						: undefined,
+				),
 				columns: { id: true },
 			});
 			if (rows.length === 0) {
@@ -72,16 +98,27 @@ export const githubRouter = {
 		}),
 
 	triggerSync: protectedProcedure
-		.input(z.object({ organizationId: z.string().uuid() }))
+		.input(
+			z.object({
+				organizationId: z.string().uuid(),
+				/** One installation; every one of the organization's when omitted. */
+				installationId: z.string().uuid().optional(),
+			}),
+		)
 		.mutation(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
 
-			const installation = await db.query.githubInstallations.findFirst({
-				where: eq(githubInstallations.organizationId, input.organizationId),
+			const installations = await db.query.githubInstallations.findMany({
+				where: and(
+					eq(githubInstallations.organizationId, input.organizationId),
+					input.installationId
+						? eq(githubInstallations.id, input.installationId)
+						: undefined,
+				),
 				columns: { id: true },
 			});
 
-			if (!installation) {
+			if (installations.length === 0) {
 				throw userError({
 					code: "NOT_FOUND",
 					message: "GitHub installation not found",
@@ -100,36 +137,49 @@ export const githubRouter = {
 			}
 
 			const syncUrl = `${env.NEXT_PUBLIC_API_URL}/api/github/jobs/initial-sync`;
-			const syncBody = {
-				installationDbId: installation.id,
-				organizationId: input.organizationId,
-			};
-
-			// In development, call the sync endpoint directly (QStash can't reach localhost)
-			if (env.NODE_ENV === "development") {
-				fetch(syncUrl, {
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify(syncBody),
-				}).catch((error) => {
-					console.error("[github/triggerSync] Dev sync failed:", error);
-				});
-			} else {
-				await qstash.publishJSON({
-					url: syncUrl,
-					body: syncBody,
-					retries: 3,
-				});
+			for (const installation of installations) {
+				const syncBody = {
+					installationDbId: installation.id,
+					organizationId: input.organizationId,
+				};
+				// In development, call the sync endpoint directly (QStash can't reach localhost)
+				if (env.NODE_ENV === "development") {
+					fetch(syncUrl, {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify(syncBody),
+					}).catch((error) => {
+						console.error("[github/triggerSync] Dev sync failed:", error);
+					});
+				} else {
+					await qstash.publishJSON({
+						url: syncUrl,
+						body: syncBody,
+						retries: 3,
+					});
+				}
 			}
 
 			return { success: true };
 		}),
 
+	/** Every repository the organization's installations deliver, for the organization's own view. */
 	listRepositories: protectedProcedure
 		.input(z.object({ organizationId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
 			return listGithubRepositories(input.organizationId);
+		}),
+
+	/** What the caller may build an environment on: see `accessibleRepositories`. */
+	listAccessibleRepositories: protectedProcedure
+		.input(z.object({ organizationId: z.string().uuid() }))
+		.query(async ({ ctx, input }) => {
+			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
+			return accessibleRepositories({
+				userId: ctx.session.user.id,
+				repositories: await listGithubRepositories(input.organizationId),
+			});
 		}),
 
 	listPullRequests: protectedProcedure
@@ -143,23 +193,14 @@ export const githubRouter = {
 		.query(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
 
-			const installation = await db.query.githubInstallations.findFirst({
-				where: eq(githubInstallations.organizationId, input.organizationId),
-				columns: { id: true },
-			});
-
-			if (!installation) {
-				return [];
-			}
-
-			// Get repository IDs for this installation
 			const repos = await db.query.githubRepositories.findMany({
-				where: input.repositoryId
-					? and(
-							eq(githubRepositories.installationId, installation.id),
-							eq(githubRepositories.id, input.repositoryId),
-						)
-					: eq(githubRepositories.installationId, installation.id),
+				where: and(
+					eq(githubRepositories.organizationId, input.organizationId),
+					isNull(githubRepositories.disconnectedAt),
+					input.repositoryId
+						? eq(githubRepositories.id, input.repositoryId)
+						: undefined,
+				),
 				columns: { id: true },
 			});
 
@@ -243,7 +284,10 @@ export const githubRouter = {
 			}
 
 			const repos = await db.query.githubRepositories.findMany({
-				where: eq(githubRepositories.installationId, installation.id),
+				where: and(
+					eq(githubRepositories.organizationId, input.organizationId),
+					isNull(githubRepositories.disconnectedAt),
+				),
 				columns: { id: true, fullName: true, defaultBranch: true },
 			});
 			const repoByFullName = new Map(
@@ -397,22 +441,11 @@ export const githubRouter = {
 		.query(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
 
-			const installation = await db.query.githubInstallations.findFirst({
-				where: eq(githubInstallations.organizationId, input.organizationId),
-				columns: { id: true },
-			});
-
-			if (!installation) {
-				return {
-					repositoryCount: 0,
-					openPullRequestCount: 0,
-					pendingChecksCount: 0,
-					failedChecksCount: 0,
-				};
-			}
-
 			const repos = await db.query.githubRepositories.findMany({
-				where: eq(githubRepositories.installationId, installation.id),
+				where: and(
+					eq(githubRepositories.organizationId, input.organizationId),
+					isNull(githubRepositories.disconnectedAt),
+				),
 				columns: { id: true },
 			});
 

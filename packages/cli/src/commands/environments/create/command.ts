@@ -38,17 +38,20 @@ export default command({
 				`Regions: ${SANDBOX_REGION_IDS.join(", ")}`,
 			);
 		}
-		const connected = await ctx.api.integration.github.listRepositories.query({
-			organizationId,
-		});
+		const access =
+			await ctx.api.integration.github.listAccessibleRepositories.query({
+				organizationId,
+			});
 		const repositoryId = (fullName: string) => {
-			const match = connected.find(
+			const match = access.repositories.find(
 				(repo) => repo.fullName.toLowerCase() === fullName.toLowerCase(),
 			);
 			if (!match) {
 				throw new CLIError(
-					`${fullName} is not connected to this organization`,
-					"See what is connected with: superset environments repos",
+					`${fullName} is not a repository you can use in this organization`,
+					access.connectable && !access.connected
+						? "A private repository needs your own GitHub account connected: superset connections github connect. See what you can use with: superset environments repos"
+						: "See what you can use with: superset environments repos",
 				);
 			}
 			return match.id;

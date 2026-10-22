@@ -320,6 +320,19 @@ export const serverErrorMessages: Record<
 					"Your GitHub account cannot reach a repository in this environment",
 			}),
 		),
+	"serverError.cloudWorkspace.githubConnectionRequired": () =>
+		i18n._(
+			msg({
+				message:
+					"Connect your GitHub account in Settings › Connections to work on a private repository",
+			}),
+		),
+	"serverError.cloudWorkspace.repositoryDisconnected": (params) =>
+		i18n._(
+			msg({
+				message: `${params?.repoFullName} is no longer connected to GitHub; reinstall the Superset GitHub App on its account`,
+			}),
+		),
 	"serverError.environment.repositoriesFrozen": () =>
 		i18n._(
 			msg({

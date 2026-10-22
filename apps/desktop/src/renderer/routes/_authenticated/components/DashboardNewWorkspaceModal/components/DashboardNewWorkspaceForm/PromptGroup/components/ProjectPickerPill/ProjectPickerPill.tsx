@@ -73,6 +73,8 @@ export function ProjectPickerPill({
 		if (!githubConnection) return;
 		if (githubConnection.kind === "configure")
 			openUrl.mutate(githubConnection.url);
+		else if (githubConnection.kind === "connect-account")
+			void navigate({ to: "/settings/connections" });
 		else void navigate({ to: "/settings/integrations" });
 	};
 	const folderImport = useFolderFirstImport({
@@ -262,6 +264,8 @@ export function ProjectPickerPill({
 								<FaGithub className="size-4" />
 								{githubConnection.kind === "configure" ? (
 									<Trans>Configure GitHub App…</Trans>
+								) : githubConnection.kind === "connect-account" ? (
+									<Trans>Connect your GitHub account…</Trans>
 								) : (
 									<Trans>Connect GitHub…</Trans>
 								)}

@@ -103,15 +103,23 @@ clone URL carries nothing, and the box holds only a `GH_TOKEN` placeholder so
 `gh` is willing to call. The rule is re-minted on every wake and every
 `access` keepalive, so a rule's token is never older than one keepalive.
 
-**A visitor acts on GitHub as the workspace's creator. Accepted (multiplayer).**
-Any member of the organization can open any cloud workspace; that is the
-default on purpose. The GitHub rule carries the creator's own connection
-(Settings › Connections) when they have one, so a member who opens someone
-else's workspace commits, pushes and opens pull requests as that person, and
-reaches every repository the creator can reach through the App, including ones
-the visitor cannot. Before cloud workspaces leave the team this needs an
-answer: per-member identity inside a shared box, or a workspace falling back
-to the installation token while someone other than its creator holds a ticket.
+**A visitor acts on GitHub as the workspace's creator. Reach checked
+(2026-10-22), identity open.** Any member of the organization can open any
+cloud workspace; that is the default on purpose. The GitHub rule carries the
+creator's own connection (Settings › Connections), so a member who opens
+someone else's workspace commits, pushes and opens pull requests as that
+person. What is closed: a private repository takes the person's own GitHub
+reach everywhere a box is built or opened — the repository picker and
+`environment.create` offer only what the person's connection ∩ the App
+reaches (`listAccessibleRepositories`), `cloudWorkspace.create` refuses a
+private repository without a connection that reaches it (an automation runs on
+the App's token), and `access` with `wake` by someone other than the creator
+runs the same check on the visitor (`assertGithubReach`). The App installation
+is a capability, never an authorization: before it, membership of the Superset
+organization alone reached every private repository the App was installed on.
+Still open: the identity inside a shared box is the creator's; the answer is
+per-member identity, or the installation token (repository-scoped) for pushes
+with the person's token for `api.github.com` only.
 
 **A box reaches its creator's private workspaces. Open.** `superset` in a
 box calls the API as the creator, held to the box's organization. Inside it,

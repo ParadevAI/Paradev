@@ -120,11 +120,11 @@ export function EnvironmentEditorDialog({
 		(environment?.repositoriesFrozen ?? false) || fromWorkspaceId !== undefined;
 
 	const repositoriesQuery =
-		cloudTrpc.integration.github.listRepositories.useQuery(
+		cloudTrpc.integration.github.listAccessibleRepositories.useQuery(
 			{ organizationId },
 			{ enabled: open && !fromWorkspaceId },
 		);
-	const repositories = repositoriesQuery.data ?? [];
+	const repositories = repositoriesQuery.data?.repositories ?? [];
 	const seededRepositoryId = initialRepositoryFullName
 		? repositories.find(
 				(repo) =>
@@ -145,15 +145,22 @@ export function EnvironmentEditorDialog({
 		selectedRepositories[0]?.fullName.split("/").pop() ??
 		"";
 
-	const installationQuery =
-		cloudTrpc.integration.github.getInstallation.useQuery(
+	const installationsQuery =
+		cloudTrpc.integration.github.listInstallations.useQuery(
 			{ organizationId },
 			{ enabled: open && !fromWorkspaceId },
 		);
-	const installation = installationQuery.data;
-	const appSettingsUrl = installation?.installationId
+	const installation = installationsQuery.data?.[0];
+	const appSettingsUrl = installation
 		? githubAppSettingsUrl(installation)
 		: null;
+	const connectAccount =
+		repositoriesQuery.data?.connectable && !repositoriesQuery.data.connected
+			? () => {
+					onOpenChange(false);
+					void navigate({ to: "/settings/connections" });
+				}
+			: null;
 	const missingRepositoryFullName =
 		initialRepositoryFullName &&
 		repositoriesQuery.isSuccess &&
@@ -174,7 +181,7 @@ export function EnvironmentEditorDialog({
 	useEffect(() => {
 		if (!isAwaitingGitHub || !open) return;
 		const refetch = () => {
-			void utils.integration.github.listRepositories.invalidate({
+			void utils.integration.github.listAccessibleRepositories.invalidate({
 				organizationId,
 			});
 		};
@@ -199,7 +206,7 @@ export function EnvironmentEditorDialog({
 
 	const resync = cloudTrpc.integration.github.triggerSync.useMutation({
 		onSuccess: async () => {
-			await utils.integration.github.listRepositories.invalidate();
+			await utils.integration.github.listAccessibleRepositories.invalidate();
 			toast.success(t({ message: "Repositories refreshed" }));
 		},
 		onError: (error) => toast.error(errorMessage(error)),
@@ -365,6 +372,7 @@ export function EnvironmentEditorDialog({
 								isLoading={repositoriesQuery.isLoading}
 								isRefreshing={resync.isPending}
 								onConfigureGitHubApp={configureGitHubApp}
+								onConnectAccount={connectAccount}
 								onRefresh={
 									fromWorkspaceId
 										? null

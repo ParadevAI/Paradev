@@ -120,8 +120,9 @@ export function IntegrationsSettings({
 			{ enabled: !!activeOrganizationId },
 		);
 
-	const [githubInstallation, setGithubInstallation] =
-		useState<GithubInstallation | null>(null);
+	const [githubInstallations, setGithubInstallations] = useState<
+		GithubInstallation[]
+	>([]);
 	const [isLoadingGithub, setIsLoadingGithub] = useState(true);
 
 	const fetchGithubInstallation = useCallback(async () => {
@@ -132,10 +133,10 @@ export function IntegrationsSettings({
 
 		try {
 			const result =
-				await apiTrpcClient.integration.github.getInstallation.query({
+				await apiTrpcClient.integration.github.listInstallations.query({
 					organizationId: activeOrganizationId,
 				});
-			setGithubInstallation(result);
+			setGithubInstallations(result);
 		} catch (err) {
 			console.error("[integrations] Failed to fetch GitHub installation:", err);
 		} finally {
@@ -156,8 +157,10 @@ export function IntegrationsSettings({
 			isLoading: isLinearPending,
 		},
 		github: {
-			isConnected: !!githubInstallation && !githubInstallation.suspended,
-			connectedOrgName: githubInstallation?.accountLogin,
+			isConnected: githubInstallations.some((row) => !row.suspended),
+			connectedOrgName: githubInstallations
+				.map((row) => row.accountLogin)
+				.join(", "),
 			isLoading: isLoadingGithub,
 		},
 		slack: {
