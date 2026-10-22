@@ -60,11 +60,10 @@ export async function GET(request: Request) {
 		const accountType =
 			account && "type" in account ? account.type : "Organization";
 
-		// If another organization already owns this installation_id, refuse to
-		// silently take it over — we'd otherwise either crash on the
-		// installation_id UNIQUE constraint or sever the other org's integration
-		// without notice. Ask the user to disconnect on the existing org (or
-		// uninstall in GitHub, which fires our uninstall webhook) first.
+		// Another organization owning this installation is refused rather than
+		// taken over, which would sever its integration without notice. Ask the
+		// user to disconnect there (or uninstall in GitHub, which fires our
+		// uninstall webhook) first.
 		const existingForInstallation =
 			await db.query.githubInstallations.findFirst({
 				where: and(
@@ -90,10 +89,9 @@ export async function GET(request: Request) {
 				permissions: installation.permissions as Record<string, string>,
 			})
 			.onConflictDoUpdate({
-				target: [githubInstallations.organizationId],
+				target: [githubInstallations.installationId],
 				set: {
 					connectedByUserId: userId,
-					installationId: String(installation.id),
 					accountLogin,
 					accountType,
 					permissions: installation.permissions as Record<string, string>,

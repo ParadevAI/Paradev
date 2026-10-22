@@ -23,7 +23,7 @@ import {
 	type SandboxRepository,
 	sandboxRepositoryPath,
 } from "@superset/shared/sandbox-contract";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, isNull } from "drizzle-orm";
 import { env } from "../../env";
 import { installationOctokit } from "./clone-token";
 
@@ -70,6 +70,7 @@ export async function loadRepositories(args: {
 			and(
 				inArray(githubRepositories.id, [...args.repositoryIds]),
 				eq(githubRepositories.organizationId, args.organizationId),
+				isNull(githubRepositories.disconnectedAt),
 			),
 		);
 	if (rows.length !== new Set(args.repositoryIds).size) {
@@ -224,7 +225,8 @@ export async function installationTokenFor(
 	repositories: readonly RepositoryRow[],
 ): Promise<string | null> {
 	const first = repositories[0];
-	if (!first || !env.GH_APP_ID || !env.GH_APP_PRIVATE_KEY) return null;
+	if (!first?.installationId || !env.GH_APP_ID || !env.GH_APP_PRIVATE_KEY)
+		return null;
 	const installation = await db.query.githubInstallations.findFirst({
 		where: eq(githubInstallations.id, first.installationId),
 	});

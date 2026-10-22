@@ -6,6 +6,10 @@ import {
 	githubPullRequests,
 	githubRepositories,
 } from "@superset/db/schema";
+import {
+	detachRepositoriesByRepoId,
+	removeInstallation,
+} from "@superset/trpc/lib/github-installation";
 import { and, eq } from "drizzle-orm";
 
 import { env } from "@/env";
@@ -19,11 +23,14 @@ webhooks.on(
 			"[github/webhook] Installation deleted:",
 			payload.installation.id,
 		);
-		await db
-			.delete(githubInstallations)
-			.where(
-				eq(githubInstallations.installationId, String(payload.installation.id)),
-			);
+		const installation = await db.query.githubInstallations.findFirst({
+			where: eq(
+				githubInstallations.installationId,
+				String(payload.installation.id),
+			),
+			columns: { id: true },
+		});
+		if (installation) await removeInstallation(installation.id);
 	},
 );
 
@@ -101,6 +108,7 @@ webhooks.on(
 					set: {
 						installationId: installation.id,
 						organizationId: installation.organizationId,
+						disconnectedAt: null,
 						owner: owner ?? "",
 						name: name ?? repo.name,
 						fullName: repo.full_name,
@@ -119,10 +127,10 @@ webhooks.on(
 	}: EmitterWebhookEvent<"installation_repositories.removed">) => {
 		for (const repo of payload.repositories_removed) {
 			console.log("[github/webhook] Repository removed:", repo.full_name);
-			await db
-				.delete(githubRepositories)
-				.where(eq(githubRepositories.repoId, String(repo.id)));
 		}
+		await detachRepositoriesByRepoId(
+			payload.repositories_removed.map((repo) => String(repo.id)),
+		);
 	},
 );
 

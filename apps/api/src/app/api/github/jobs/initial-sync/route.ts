@@ -4,6 +4,7 @@ import {
 	githubPullRequests,
 	githubRepositories,
 } from "@superset/db/schema";
+import { pruneInstallationRepositories } from "@superset/trpc/lib/github-installation";
 import { subDays } from "date-fns";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
@@ -82,7 +83,9 @@ export async function POST(request: Request) {
 				.onConflictDoUpdate({
 					target: [githubRepositories.repoId],
 					set: {
+						installationId: installationDbId,
 						organizationId,
+						disconnectedAt: null,
 						owner: repo.owner.login,
 						name: repo.name,
 						fullName: repo.full_name,
@@ -92,6 +95,10 @@ export async function POST(request: Request) {
 					},
 				});
 		}
+		await pruneInstallationRepositories(
+			installationDbId,
+			repos.map((repo) => String(repo.id)),
+		);
 
 		const thirtyDaysAgo = subDays(new Date(), 30);
 

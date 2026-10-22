@@ -1,5 +1,6 @@
 import { db } from "@superset/db/client";
 import { githubInstallations } from "@superset/db/schema";
+import { removeInstallation } from "@superset/trpc/lib/github-installation";
 import { eq } from "drizzle-orm";
 import { githubApp } from "@/app/api/github/octokit";
 
@@ -23,9 +24,7 @@ export async function suspendInstallation(installation: {
 		const status = (error as { status?: number }).status;
 		if (status === 404) {
 			// Uninstalled at GitHub without the webhook reaching us.
-			await db
-				.delete(githubInstallations)
-				.where(eq(githubInstallations.id, installation.id));
+			await removeInstallation(installation.id);
 			return "gone";
 		}
 		if (status === 429 || isRateLimitExhausted(error)) return "rate_limited";

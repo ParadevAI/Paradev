@@ -28,9 +28,11 @@ export async function listRemoteBranches(
 	repo: RepositoryRow,
 	query?: string,
 ): Promise<RemoteBranchPage> {
-	const installation = await db.query.githubInstallations.findFirst({
-		where: eq(githubInstallations.id, repo.installationId),
-	});
+	const installation = repo.installationId
+		? await db.query.githubInstallations.findFirst({
+				where: eq(githubInstallations.id, repo.installationId),
+			})
+		: undefined;
 	// No installation to authenticate with — the default branch alone still
 	// lets a picker offer something create will accept.
 	if (!installation) {

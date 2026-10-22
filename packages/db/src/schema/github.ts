@@ -13,8 +13,9 @@ import {
 import { organizations, users } from "./auth";
 
 /**
- * GitHub App installations linked to Superset organizations.
- * One organization can have one GitHub installation.
+ * GitHub App installations linked to Superset organizations. An installation
+ * is bound to one GitHub account, so an organization whose repositories span
+ * accounts holds several.
  */
 export const githubInstallations = pgTable(
 	"github_installations",
@@ -52,7 +53,7 @@ export const githubInstallations = pgTable(
 			.$onUpdate(() => new Date()),
 	},
 	(table) => [
-		unique("github_installations_org_unique").on(table.organizationId),
+		index("github_installations_org_id_idx").on(table.organizationId),
 		index("github_installations_installation_id_idx").on(table.installationId),
 	],
 );
@@ -61,17 +62,21 @@ export type InsertGithubInstallation = typeof githubInstallations.$inferInsert;
 export type SelectGithubInstallation = typeof githubInstallations.$inferSelect;
 
 /**
- * GitHub repositories accessible via an installation.
+ * GitHub repositories accessible via an installation. A row outlives its
+ * installation: environments and cloud workspaces reference it, so losing
+ * access detaches it (`installationId` null, `disconnectedAt` set) and a
+ * reinstall or re-grant attaches it again.
  */
 export const githubRepositories = pgTable(
 	"github_repositories",
 	{
 		id: uuid().primaryKey().defaultRandom(),
 
-		// Link to installation
-		installationId: uuid("installation_id")
-			.notNull()
-			.references(() => githubInstallations.id, { onDelete: "cascade" }),
+		installationId: uuid("installation_id").references(
+			() => githubInstallations.id,
+			{ onDelete: "set null" },
+		),
+		disconnectedAt: timestamp("disconnected_at", { withTimezone: true }),
 
 		// Link to organization (denormalized from installation for Electric SQL filtering)
 		organizationId: uuid("organization_id")

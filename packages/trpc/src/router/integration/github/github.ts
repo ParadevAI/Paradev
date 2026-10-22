@@ -9,6 +9,7 @@ import { Client } from "@upstash/qstash";
 import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 import { env } from "../../../env";
+import { removeInstallation } from "../../../lib/github-installation";
 import { installationOctokit } from "../../../lib/sandbox/clone-token";
 import { organizationSyncsNow } from "../../../lib/sync-policy/syncPolicy";
 import {
@@ -58,14 +59,14 @@ export const githubRouter = {
 		.mutation(async ({ ctx, input }) => {
 			await verifyOrgAdmin(ctx.session.user.id, input.organizationId);
 
-			const result = await db
-				.delete(githubInstallations)
-				.where(eq(githubInstallations.organizationId, input.organizationId))
-				.returning({ id: githubInstallations.id });
-
-			if (result.length === 0) {
+			const rows = await db.query.githubInstallations.findMany({
+				where: eq(githubInstallations.organizationId, input.organizationId),
+				columns: { id: true },
+			});
+			if (rows.length === 0) {
 				return { success: false, error: "No installation found" };
 			}
+			for (const row of rows) await removeInstallation(row.id);
 
 			return { success: true };
 		}),

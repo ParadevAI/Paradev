@@ -44,6 +44,10 @@
 			"types": "./src/lib/github-user/index.ts",
 			"default": "./src/lib/github-user/index.ts"
 		},
+		"./lib/github-installation": {
+			"types": "./src/lib/github-installation/index.ts",
+			"default": "./src/lib/github-installation/index.ts"
+		},
 		"./linear-lookup": {
 			"types": "./src/router/integration/linear/lookup.ts",
 			"default": "./src/router/integration/linear/lookup.ts"
