@@ -1,22 +1,35 @@
+"use client";
+
 import { useLingui } from "@lingui/react/macro";
-import { usePresenceViewers, usePresenceVisitors } from "@superset/ui/presence";
+import { presencePeople } from "@superset/shared/page-presence";
 import { useMemo } from "react";
-import { useNow } from "renderer/hooks/useNow";
-import { authClient } from "renderer/lib/auth-client";
-import { PresenceStack } from "renderer/routes/_authenticated/_dashboard/components/PresenceStack";
-import { withGuests } from "./utils/withGuests";
+import { useNow } from "../../hooks/useNow";
+import {
+	usePresenceViewers,
+	usePresenceVisitors,
+} from "../../stores/presenceStore";
+import { PresenceStack } from "../PresenceStack";
 
 const NOW_TICK_MS = 30_000;
 
-export function PagePresenceStack({ pageId }: { pageId: string | undefined }) {
+interface PagePresenceStackProps {
+	pageId: string | undefined;
+	viewerId: string | undefined;
+	onOpenPerson?: (userId: string) => void;
+}
+
+export function PagePresenceStack({
+	pageId,
+	viewerId,
+	onOpenPerson,
+}: PagePresenceStackProps) {
 	const { t } = useLingui();
 	const now = useNow(NOW_TICK_MS);
-	const { data: session } = authClient.useSession();
 	const visitors = usePresenceVisitors(pageId);
 	const viewers = usePresenceViewers(pageId);
 	const people = useMemo(
 		() =>
-			withGuests(
+			presencePeople(
 				visitors,
 				viewers,
 				(number) =>
@@ -28,9 +41,10 @@ export function PagePresenceStack({ pageId }: { pageId: string | undefined }) {
 	return (
 		<PresenceStack
 			people={people}
-			viewerId={session?.user?.id}
+			viewerId={viewerId}
 			now={now}
 			overflowLabel={t({ message: "Show everyone who opened this page" })}
+			onOpenPerson={onOpenPerson}
 		/>
 	);
 }

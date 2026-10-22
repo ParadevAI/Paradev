@@ -3,12 +3,8 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { pagePresenceUrl } from "@superset/shared/page-presence";
 import { Button } from "@superset/ui/button";
-import {
-	PageFrame,
-	PageViewers,
-	usePageToolsUnavailable,
-} from "@superset/ui/page-comments";
-import { useJoinPresence } from "@superset/ui/presence";
+import { PageFrame, usePageToolsUnavailable } from "@superset/ui/page-comments";
+import { PagePresenceStack, useJoinPresence } from "@superset/ui/presence";
 import { Globe } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useRef } from "react";
@@ -55,7 +51,7 @@ export function PublicPageView({
 				/>
 				<span className="min-w-0 truncate font-medium text-sm">{title}</span>
 				<div className="ml-auto flex shrink-0 items-center gap-1">
-					<PageViewers pageId={pageId} className="mr-1" />
+					<PagePresenceStack pageId={pageId} viewerId={undefined} />
 					<ReportPageDialog slug={slug} signedIn={signedIn} />
 					{signedIn ? (
 						<OpenInSupersetButton slug={slug} />

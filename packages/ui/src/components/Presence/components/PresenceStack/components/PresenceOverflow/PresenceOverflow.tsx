@@ -1,3 +1,5 @@
+"use client";
+
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useFormat } from "@superset/i18n/react";
 import type { PresenceVisitor } from "@superset/shared/page-presence";

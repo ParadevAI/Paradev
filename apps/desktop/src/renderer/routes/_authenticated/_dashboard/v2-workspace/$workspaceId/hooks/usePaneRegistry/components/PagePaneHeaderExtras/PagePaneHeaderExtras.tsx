@@ -1,5 +1,5 @@
 import { CommentModeButton, PageShareButton } from "@superset/ui/page-comments";
-import { PagePresenceStack } from "renderer/routes/_authenticated/_dashboard/components/PagePresenceStack";
+import { PagePresenceStack } from "@superset/ui/presence";
 import { usePageHeaderData } from "renderer/routes/_authenticated/_dashboard/hooks/usePageHeaderData";
 import type { PagePaneData } from "../../../../types";
 import type { CreateNewAgentSession } from "../../../useAgentSessionLauncher";
@@ -37,7 +37,7 @@ export function PagePaneHeaderExtras({
 
 	return (
 		<>
-			<PagePresenceStack pageId={page?.id} />
+			<PagePresenceStack pageId={page?.id} viewerId={currentUserId} />
 			<PageWatcherMenu
 				workspaceId={workspaceId}
 				pageId={page?.id}

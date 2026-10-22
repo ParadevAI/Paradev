@@ -103,6 +103,8 @@
 		"zod": "4.6.5"
 	},
 	"devDependencies": {
+		"@lingui/babel-plugin-lingui-macro": "6.8.0",
+		"@vitejs/plugin-react": "5.2.0",
 		"@storybook/react-vite": "10.4.2",
 		"@superset/typescript": "workspace:*",
 		"@tailwindcss/postcss": "4.2.2",
