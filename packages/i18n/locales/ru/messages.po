@@ -9433,6 +9433,12 @@ msgstr "В последний день каждого месяца в {time}"
 msgid "Last run"
 msgstr "Последний запуск"
 
+msgid "Last run (result)"
+msgstr "Последний запуск (результат)"
+
+msgid "Last run (time)"
+msgstr "Последний запуск (время)"
+
 msgid "Last seen"
 msgstr "Последний раз в сети"
 

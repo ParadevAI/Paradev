@@ -9433,6 +9433,12 @@ msgstr "Ngày cuối mỗi tháng lúc {time}"
 msgid "Last run"
 msgstr "Chạy lần cuối"
 
+msgid "Last run (result)"
+msgstr "Chạy lần cuối (kết quả)"
+
+msgid "Last run (time)"
+msgstr "Chạy lần cuối (thời gian)"
+
 msgid "Last seen"
 msgstr "Lần cuối trực tuyến"
 

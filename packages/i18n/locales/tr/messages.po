@@ -9433,6 +9433,12 @@ msgstr "Her ayın son günü saat {time}"
 msgid "Last run"
 msgstr "Son çalıştırma"
 
+msgid "Last run (result)"
+msgstr "Son çalıştırma (sonuç)"
+
+msgid "Last run (time)"
+msgstr "Son çalıştırma (zaman)"
+
 msgid "Last seen"
 msgstr "Son görülme"
 

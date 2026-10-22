@@ -9433,6 +9433,12 @@ msgstr "Poslední den v měsíci v {time}"
 msgid "Last run"
 msgstr "Poslední běh"
 
+msgid "Last run (result)"
+msgstr "Poslední běh (výsledek)"
+
+msgid "Last run (time)"
+msgstr "Poslední běh (čas)"
+
 msgid "Last seen"
 msgstr "Naposledy viděn"
 

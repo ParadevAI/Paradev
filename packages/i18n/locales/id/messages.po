@@ -9433,6 +9433,12 @@ msgstr "Hari terakhir tiap bulan pukul {time}"
 msgid "Last run"
 msgstr "Run terakhir"
 
+msgid "Last run (result)"
+msgstr "Run terakhir (hasil)"
+
+msgid "Last run (time)"
+msgstr "Run terakhir (waktu)"
+
 msgid "Last seen"
 msgstr "Terakhir terlihat"
 

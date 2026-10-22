@@ -9433,6 +9433,12 @@ msgstr "每月最后一天{time}"
 msgid "Last run"
 msgstr "上次运行"
 
+msgid "Last run (result)"
+msgstr "上次运行（结果）"
+
+msgid "Last run (time)"
+msgstr "上次运行（时间）"
+
 msgid "Last seen"
 msgstr "最后在线"
 

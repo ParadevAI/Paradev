@@ -9433,6 +9433,12 @@ msgstr "Último dia de cada mês às {time}"
 msgid "Last run"
 msgstr "Última execução"
 
+msgid "Last run (result)"
+msgstr "Última execução (resultado)"
+
+msgid "Last run (time)"
+msgstr "Última execução (horário)"
+
 msgid "Last seen"
 msgstr "Visto por último"
 

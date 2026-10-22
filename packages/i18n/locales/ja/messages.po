@@ -9433,6 +9433,12 @@ msgstr "毎月末日 {time}"
 msgid "Last run"
 msgstr "最終実行"
 
+msgid "Last run (result)"
+msgstr "最終実行（結果）"
+
+msgid "Last run (time)"
+msgstr "最終実行（時刻）"
+
 msgid "Last seen"
 msgstr "最終確認"
 
