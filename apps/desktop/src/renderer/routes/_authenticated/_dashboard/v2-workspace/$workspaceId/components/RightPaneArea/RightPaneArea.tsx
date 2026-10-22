@@ -106,7 +106,9 @@ export function RightPaneArea({
 						{showWindowControls && <WindowControlsInset />}
 					</div>
 				)}
-				renderEmptyState={() => <RightPaneEmptyState onAdd={onAdd} />}
+				renderEmptyState={() => (
+					<RightPaneEmptyState onAdd={onAdd} canAddDesktop={canAddDesktop} />
+				)}
 				onBeforeCloseTab={onBeforeCloseTab}
 				onInteractionStateChange={onInteractionStateChange}
 				store={store}

@@ -6,4 +6,5 @@ export type RightPaneKind =
 	| "pages-list"
 	| "browser"
 	| "desktop"
+	| "mobile"
 	| "terminal";

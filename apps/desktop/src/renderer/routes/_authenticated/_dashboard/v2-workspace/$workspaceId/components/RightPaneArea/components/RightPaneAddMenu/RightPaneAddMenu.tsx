@@ -1,17 +1,10 @@
-import { Trans } from "@lingui/react/macro";
+import { useLingui } from "@lingui/react/macro";
 import {
 	DropdownMenuItem,
 	DropdownMenuSeparator,
 } from "@superset/ui/dropdown-menu";
-import { BsTerminalPlus } from "react-icons/bs";
-import {
-	LuFileDiff,
-	LuFiles,
-	LuFileText,
-	LuFolderTree,
-	LuGitPullRequestArrow,
-} from "react-icons/lu";
-import { TbDeviceDesktop, TbWorld } from "react-icons/tb";
+import { Fragment } from "react";
+import { getRightPaneOptions } from "../../paneOptions";
 import type { RightPaneKind } from "../../types";
 
 interface RightPaneAddMenuProps {
@@ -25,62 +18,29 @@ export function RightPaneAddMenu({
 	runAfterClose,
 	canAddDesktop,
 }: RightPaneAddMenuProps) {
+	const { i18n } = useLingui();
+	const options = getRightPaneOptions(canAddDesktop);
+
 	return (
 		<>
-			<DropdownMenuItem className="gap-2" onClick={() => onAdd("files")}>
-				<LuFolderTree className="size-4" />
-				<span>
-					<Trans>Files</Trans>
-				</span>
-			</DropdownMenuItem>
-			<DropdownMenuItem className="gap-2" onClick={() => onAdd("diff")}>
-				<LuFileDiff className="size-4" />
-				<span>
-					<Trans>Changes</Trans>
-				</span>
-			</DropdownMenuItem>
-			<DropdownMenuItem className="gap-2" onClick={() => onAdd("changes-list")}>
-				<LuFiles className="size-4" />
-				<span>
-					<Trans>Files changed</Trans>
-				</span>
-			</DropdownMenuItem>
-			<DropdownMenuItem className="gap-2" onClick={() => onAdd("review")}>
-				<LuGitPullRequestArrow className="size-4" />
-				<span>
-					<Trans>Review</Trans>
-				</span>
-			</DropdownMenuItem>
-			<DropdownMenuItem className="gap-2" onClick={() => onAdd("pages-list")}>
-				<LuFileText className="size-4" />
-				<span>
-					<Trans>Pages</Trans>
-				</span>
-			</DropdownMenuItem>
-			<DropdownMenuSeparator />
-			<DropdownMenuItem className="gap-2" onClick={() => onAdd("browser")}>
-				<TbWorld className="size-4" />
-				<span>
-					<Trans>Browser</Trans>
-				</span>
-			</DropdownMenuItem>
-			{canAddDesktop && (
-				<DropdownMenuItem className="gap-2" onClick={() => onAdd("desktop")}>
-					<TbDeviceDesktop className="size-4" />
-					<span>
-						<Trans>Desktop</Trans>
-					</span>
-				</DropdownMenuItem>
-			)}
-			<DropdownMenuItem
-				className="gap-2"
-				onClick={() => runAfterClose(() => onAdd("terminal"))}
-			>
-				<BsTerminalPlus className="size-4" />
-				<span>
-					<Trans>Terminal</Trans>
-				</span>
-			</DropdownMenuItem>
+			{options.map((option, index) => {
+				const previous = options[index - 1];
+				const open = () =>
+					option.kind === "terminal"
+						? runAfterClose(() => onAdd(option.kind))
+						: onAdd(option.kind);
+				return (
+					<Fragment key={option.kind}>
+						{previous && previous.group !== option.group && (
+							<DropdownMenuSeparator />
+						)}
+						<DropdownMenuItem className="gap-2" onClick={open}>
+							<option.Icon className="size-4" />
+							<span>{i18n._(option.label)}</span>
+						</DropdownMenuItem>
+					</Fragment>
+				);
+			})}
 		</>
 	);
 }

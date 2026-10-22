@@ -538,6 +538,7 @@ function V2WorkspaceContent() {
 				case "review":
 				case "pages-list":
 				case "desktop":
+				case "mobile":
 					rightStore.getState().addTab({ panes: [{ kind, data: { kind } }] });
 					return;
 				case "diff":
