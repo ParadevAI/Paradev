@@ -1,9 +1,3 @@
-import {
-	SortableContext,
-	useSortable,
-	verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
 import { useLingui } from "@lingui/react/macro";
 import { OverflowFadeContainer } from "@superset/ui/overflow-fade-container";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
@@ -47,16 +41,13 @@ import { DashboardSidebarHeader } from "./components/DashboardSidebarHeader";
 import { DashboardSidebarHiddenProjects } from "./components/DashboardSidebarHiddenProjects";
 import { DashboardSidebarHoverCardOverlay } from "./components/DashboardSidebarHoverCardOverlay";
 import { DashboardSidebarPinnedSection } from "./components/DashboardSidebarPinnedSection";
-import { DashboardSidebarProjectSection } from "./components/DashboardSidebarProjectSection";
+import { DashboardSidebarProjectLane } from "./components/DashboardSidebarProjectLane";
 import { DashboardSidebarSectionRenameProvider } from "./components/DashboardSidebarSectionRenameContext";
 import { DashboardSidebarSessionsSection } from "./components/DashboardSidebarSessionsSection";
 import { DashboardSidebarWorkspacesHeader } from "./components/DashboardSidebarWorkspacesHeader";
 import { useGettingStartedCard } from "./components/GettingStartedCard";
 import { useV2SetupScriptCard } from "./components/V2SetupScriptCard";
-import {
-	getBlockedDragProps,
-	useBlockedDragNotice,
-} from "./hooks/useBlockedDragNotice";
+import { useBlockedDragNotice } from "./hooks/useBlockedDragNotice";
 import { useDashboardSidebarData } from "./hooks/useDashboardSidebarData";
 import { useDashboardSidebarShortcuts } from "./hooks/useDashboardSidebarShortcuts";
 import { useMigrateLegacySidebarFolders } from "./hooks/useMigrateLegacySidebarFolders";
@@ -64,7 +55,7 @@ import {
 	NewDashboardSidebarContext,
 	useNewDashboardSidebarEnabled,
 } from "./hooks/useNewDashboardSidebarEnabled";
-import { useDashboardSidebarDnd } from "./hooks/useSidebarDnd";
+import { useProjectSidebarSections } from "./hooks/useProjectSidebarSections";
 import { DashboardSidebarDndProvider } from "./providers/DashboardSidebarDndProvider";
 import { DashboardSidebarHoverProvider } from "./providers/DashboardSidebarHoverProvider";
 import { DashboardSidebarSelectionProvider } from "./providers/DashboardSidebarSelectionProvider";
@@ -72,92 +63,20 @@ import {
 	DashboardSidebarWorkspaceStatusProvider,
 	type SidebarStatusWorkspaceRef,
 } from "./providers/DashboardSidebarWorkspaceStatusProvider";
-import type {
-	DashboardSidebarProject,
-	DashboardSidebarWorkspace,
-} from "./types";
+import { ProjectSidebarSectionsProvider } from "./providers/ProjectSidebarSectionsProvider";
+import type { DashboardSidebarWorkspace } from "./types";
 import { filterDashboardSidebarProjects } from "./utils/filterDashboardSidebarProjects";
 import {
 	filterDashboardSidebarProjectsByHost,
 	matchesHostFilter,
 } from "./utils/filterDashboardSidebarProjectsByHost";
 import { getProjectChildrenWorkspaces } from "./utils/projectChildren";
+import { buildProjectSidebarLane } from "./utils/projectSidebarLane";
 import { sortDashboardSidebarProjects } from "./utils/sortDashboardSidebarProjects";
 
 interface DashboardSidebarProps {
 	isCollapsed?: boolean;
 }
-
-interface SortableProjectWrapperProps {
-	project: DashboardSidebarProject;
-	isCollapsed: boolean;
-	isDragDisabled: boolean;
-	workspaceShortcutLabels: Map<string, string>;
-	onWorkspaceHover: (workspaceId: string) => void | Promise<void>;
-	onToggleCollapse: (projectId: string) => void;
-}
-
-const SortableProjectWrapper = memo(function SortableProjectWrapper({
-	project,
-	isCollapsed,
-	isDragDisabled,
-	workspaceShortcutLabels,
-	onWorkspaceHover,
-	onToggleCollapse,
-}: SortableProjectWrapperProps) {
-	const { activeType } = useDashboardSidebarDnd();
-	const {
-		attributes,
-		listeners,
-		setNodeRef,
-		transform,
-		transition,
-		isDragging,
-	} = useSortable({ id: project.id, disabled: isDragDisabled });
-	const isDraggingProject = activeType === "project";
-
-	// useSortable re-renders this wrapper on every pointer move of any drag in
-	// the sidebar's DndContext; the project section subtree is expensive, so
-	// keep it referentially stable while only the wrapper transform changes.
-	const section = useMemo(
-		() => (
-			<DashboardSidebarProjectSection
-				project={project}
-				isSidebarCollapsed={isCollapsed}
-				isDraggingProject={isDraggingProject}
-				workspaceShortcutLabels={workspaceShortcutLabels}
-				onWorkspaceHover={onWorkspaceHover}
-				onToggleCollapse={onToggleCollapse}
-				dragHandleListeners={listeners}
-				dragHandleAttributes={attributes}
-			/>
-		),
-		[
-			project,
-			isCollapsed,
-			isDraggingProject,
-			workspaceShortcutLabels,
-			onWorkspaceHover,
-			onToggleCollapse,
-			listeners,
-			attributes,
-		],
-	);
-
-	return (
-		<div
-			ref={setNodeRef}
-			style={{
-				transform: CSS.Translate.toString(transform),
-				transition,
-				opacity: isDragging ? 0.5 : undefined,
-			}}
-			{...getBlockedDragProps(isDragDisabled)}
-		>
-			{section}
-		</div>
-	);
-});
 
 export const DashboardSidebar = memo(function DashboardSidebar({
 	isCollapsed = false,
@@ -166,6 +85,8 @@ export const DashboardSidebar = memo(function DashboardSidebar({
 	const inlineCloudWorkspaces = useNewDashboardSidebarEnabled();
 	const {
 		groups,
+		projectSections,
+		projectPlacements,
 		hiddenProjects,
 		pinnedWorkspaces,
 		sessionWorkspaces,
@@ -176,11 +97,11 @@ export const DashboardSidebar = memo(function DashboardSidebar({
 	} = useDashboardSidebarData({ inlineCloudWorkspaces });
 	const {
 		deleteSection,
-		reorderProjects,
 		renameSection,
 		setProjectHidden,
 		toggleSectionCollapsed,
 	} = useDashboardSidebarState();
+	const { commitProjectLane, revealProject } = useProjectSidebarSections();
 	const showHiddenProject = useCallback(
 		(projectId: string) => setProjectHidden(projectId, false),
 		[setProjectHidden],
@@ -218,29 +139,14 @@ export const DashboardSidebar = memo(function DashboardSidebar({
 		if (isCollapsed) setProjectFilterQuery("");
 	}, [isCollapsed]);
 
-	// Local project order — syncs from groups, updated on drag end
-	const [projectOrder, setProjectOrder] = useState(() =>
-		groups.map((p) => p.id),
-	);
-	useEffect(() => {
-		setProjectOrder(groups.map((p) => p.id));
-	}, [groups]);
-
-	const orderedGroups = useMemo(() => {
-		const byId = new Map(groups.map((g) => [g.id, g]));
-		return projectOrder
-			.map((id) => byId.get(id))
-			.filter((g): g is DashboardSidebarProject => g != null);
-	}, [groups, projectOrder]);
-
-	// Sort, then filter, as derived views: `orderedGroups` and the persisted
-	// tabOrder stay untouched, so Manual restores the drag order exactly.
+	// Sort, then filter, as derived views: `groups` and the persisted tabOrder
+	// stay untouched, so Manual restores the drag order exactly.
 	const sortedGroups = useMemo(
 		() =>
 			sortMode === "manual"
-				? orderedGroups
-				: sortDashboardSidebarProjects(orderedGroups, sortMode),
-		[sortMode, orderedGroups],
+				? groups
+				: sortDashboardSidebarProjects(groups, sortMode),
+		[sortMode, groups],
 	);
 	const hostFilteredGroups = useMemo(
 		() => filterDashboardSidebarProjectsByHost(sortedGroups, hostFilter),
@@ -269,12 +175,38 @@ export const DashboardSidebar = memo(function DashboardSidebar({
 			filterDashboardSidebarProjects(hostFilteredGroups, projectFilterQuery),
 		[hostFilteredGroups, projectFilterQuery],
 	);
-	const displayedProjectIds = useMemo(
-		() => displayedGroups.map((project) => project.id),
-		[displayedGroups],
-	);
 	const trimmedFilterQuery = projectFilterQuery.trim();
-	const isFilterActive = trimmedFilterQuery !== "" || hostFilter !== "all";
+	const isSearchActive = trimmedFilterQuery !== "";
+	const isFilterActive = isSearchActive || hostFilter !== "all";
+	// Projects in the order the list shows them, sections included.
+	const sortedLane = useMemo(
+		() =>
+			buildProjectSidebarLane({
+				projects: sortedGroups,
+				sections: projectSections,
+				placements: projectPlacements,
+			}),
+		[sortedGroups, projectSections, projectPlacements],
+	);
+	// Only a search hides and opens sections. The host filter keeps their
+	// collapse state, as it does for projects.
+	const displayedLane = useMemo(
+		() =>
+			buildProjectSidebarLane({
+				projects: displayedGroups,
+				sections: projectSections,
+				placements: projectPlacements,
+				hideEmptySections: isSearchActive,
+			}),
+		[displayedGroups, projectSections, projectPlacements, isSearchActive],
+	);
+	const laneSortedGroups = useMemo(
+		() =>
+			sortedLane.flatMap((item) =>
+				item.type === "project" ? [item.project] : [],
+			),
+		[sortedLane],
+	);
 	// The sort modes only reorder rows inside a project, so the project list
 	// is still the manual order and stays draggable; only a filter, which
 	// hides projects outright, makes a project drop unsafe to commit.
@@ -293,10 +225,10 @@ export const DashboardSidebar = memo(function DashboardSidebar({
 	// The filtered view expands matches through derived objects, so a jump
 	// must not toggle the persisted collapse state while it is active.
 	const workspaceShortcutLabels = useDashboardSidebarShortcuts(
-		sortedGroups,
+		laneSortedGroups,
 		sessionWorkspaces,
 		sessionChildren,
-		{ revealCollapsed: !isFilterActive, pinnedWorkspaces },
+		{ revealCollapsed: !isFilterActive, pinnedWorkspaces, revealProject },
 	);
 	// Scoped to what the filter actually shows — select-all and range-select
 	// must not reach rows the filter is hiding.
@@ -355,7 +287,7 @@ export const DashboardSidebar = memo(function DashboardSidebar({
 		for (const workspace of sessionWorkspaces) {
 			byId.set(workspace.id, { id: workspace.id, hostId: workspace.hostId });
 		}
-		for (const project of orderedGroups) {
+		for (const project of groups) {
 			for (const workspace of getProjectChildrenWorkspaces(project.children)) {
 				byId.set(workspace.id, { id: workspace.id, hostId: workspace.hostId });
 			}
@@ -369,7 +301,7 @@ export const DashboardSidebar = memo(function DashboardSidebar({
 			});
 		}
 		return [...byId.values()];
-	}, [pinnedWorkspaces, sessionWorkspaces, orderedGroups, cloudWorkspaces]);
+	}, [pinnedWorkspaces, sessionWorkspaces, groups, cloudWorkspaces]);
 
 	const { data: session } = authClient.useSession();
 	const userId = session?.user?.id ?? null;
@@ -395,7 +327,7 @@ export const DashboardSidebar = memo(function DashboardSidebar({
 				detail: null,
 			});
 		}
-		for (const project of sortedGroups) {
+		for (const project of laneSortedGroups) {
 			for (const workspace of getProjectChildrenWorkspaces(project.children)) {
 				byId.set(workspace.id, {
 					id: workspace.id,
@@ -413,7 +345,7 @@ export const DashboardSidebar = memo(function DashboardSidebar({
 	}, [
 		pinnedWorkspaces,
 		sessionWorkspaces,
-		sortedGroups,
+		laneSortedGroups,
 		cloudWorkspaces,
 		userId,
 		cloudSidebarEntries,
@@ -463,14 +395,6 @@ export const DashboardSidebar = memo(function DashboardSidebar({
 	const starNagCard = useStarNagCard({ isCollapsed });
 	const hiringCard = useHiringCard({ surface: "v2" });
 
-	const handleReorderProjects = useCallback(
-		(reordered: string[]) => {
-			setProjectOrder(reordered);
-			reorderProjects(reordered);
-		},
-		[reorderProjects],
-	);
-
 	return (
 		<DashboardSidebarSelectionProvider
 			availableWorkspaceIds={selectableWorkspaceIds}
@@ -478,181 +402,178 @@ export const DashboardSidebar = memo(function DashboardSidebar({
 		>
 			<DashboardSidebarBulkDeleteMount />
 			<DashboardSidebarSectionRenameProvider>
-				<DashboardSidebarHoverProvider>
-					<DashboardSidebarWorkspaceStatusProvider
-						workspaces={statusWorkspaces}
-						activeWorkspaceId={activeV2WorkspaceId}
-					>
-						<DashboardSidebarActiveWorkspaceSwitcher
-							workspaces={switcherWorkspaces}
+				<ProjectSidebarSectionsProvider sections={projectSections}>
+					<DashboardSidebarHoverProvider>
+						<DashboardSidebarWorkspaceStatusProvider
+							workspaces={statusWorkspaces}
 							activeWorkspaceId={activeV2WorkspaceId}
-						/>
-						{/* Port data comes from the single DashboardSidebarPortsProvider in the
+						>
+							<DashboardSidebarActiveWorkspaceSwitcher
+								workspaces={switcherWorkspaces}
+								activeWorkspaceId={activeV2WorkspaceId}
+							/>
+							{/* Port data comes from the single DashboardSidebarPortsProvider in the
 						    dashboard layout, which wraps this sidebar. */}
-						<NewDashboardSidebarContext.Provider value={inlineCloudWorkspaces}>
-							<DashboardSidebarHoverCardOverlay>
-								<DashboardSidebarDndProvider
-									projects={displayedGroups}
-									pinnedWorkspaces={pinnedWorkspaces}
-									sessionChildren={sessionChildren}
-									isSidebarCollapsed={isCollapsed}
-									workspaceShortcutLabels={workspaceShortcutLabels}
-									onReorderProjects={handleReorderProjects}
-									isProjectDragDisabled={isProjectDragDisabled}
-									isChildDragDisabled={isChildDragDisabled}
-								>
-									<div className="flex h-full flex-col border-r border-border bg-sidebar dark:bg-muted/35">
-										<DashboardSidebarHeader isCollapsed={isCollapsed} />
+							<NewDashboardSidebarContext.Provider
+								value={inlineCloudWorkspaces}
+							>
+								<DashboardSidebarHoverCardOverlay>
+									<DashboardSidebarDndProvider
+										projects={displayedGroups}
+										pinnedWorkspaces={pinnedWorkspaces}
+										sessionChildren={sessionChildren}
+										isSidebarCollapsed={isCollapsed}
+										workspaceShortcutLabels={workspaceShortcutLabels}
+										projectLane={displayedLane}
+										onCommitProjectLane={commitProjectLane}
+										isProjectDragDisabled={isProjectDragDisabled}
+										isChildDragDisabled={isChildDragDisabled}
+									>
+										<div className="flex h-full flex-col border-r border-border bg-sidebar dark:bg-muted/35">
+											<DashboardSidebarHeader isCollapsed={isCollapsed} />
 
-										<OverflowFadeContainer
-											fadeEdges={["top", "bottom"]}
-											className="flex-1 overflow-y-auto hide-scrollbar"
-										>
-											<DashboardSidebarGithubNotice
-												status={githubStatus}
-												isCollapsed={isCollapsed}
-											/>
-											{(isCollapsed || !workspacesListCollapsed) && (
-												<DashboardSidebarPinnedSection
-													pinnedWorkspaces={displayedPinnedWorkspaces}
+											<OverflowFadeContainer
+												fadeEdges={["top", "bottom"]}
+												className="flex-1 overflow-y-auto hide-scrollbar"
+											>
+												<DashboardSidebarGithubNotice
+													status={githubStatus}
 													isCollapsed={isCollapsed}
-													onWorkspaceHover={refreshWorkspacePullRequest}
 												/>
-											)}
-											{!inlineCloudWorkspaces && (
-												<DashboardSidebarCloudSection
+												{(isCollapsed || !workspacesListCollapsed) && (
+													<DashboardSidebarPinnedSection
+														pinnedWorkspaces={displayedPinnedWorkspaces}
+														isCollapsed={isCollapsed}
+														onWorkspaceHover={refreshWorkspacePullRequest}
+													/>
+												)}
+												{!inlineCloudWorkspaces && (
+													<DashboardSidebarCloudSection
+														isCollapsed={isCollapsed}
+														onWorkspaceHover={refreshWorkspacePullRequest}
+													/>
+												)}
+												<DashboardSidebarSessionsSection
+													sessionWorkspaces={displayedSessionWorkspaces}
 													isCollapsed={isCollapsed}
+													workspaceShortcutLabels={workspaceShortcutLabels}
 													onWorkspaceHover={refreshWorkspacePullRequest}
+													onDeleteSection={deleteSection}
+													onRenameSection={renameSection}
+													onToggleSectionCollapse={toggleSectionCollapsed}
 												/>
-											)}
-											<DashboardSidebarSessionsSection
-												sessionWorkspaces={displayedSessionWorkspaces}
-												isCollapsed={isCollapsed}
-												workspaceShortcutLabels={workspaceShortcutLabels}
-												onWorkspaceHover={refreshWorkspacePullRequest}
-												onDeleteSection={deleteSection}
-												onRenameSection={renameSection}
-												onToggleSectionCollapse={toggleSectionCollapsed}
-											/>
-											{!isCollapsed && (
-												<div className="mt-3 first:mt-0">
-													<DashboardSidebarBulkActions projects={orderedGroups}>
-														<DashboardSidebarWorkspacesHeader
-															sortMode={sortMode}
-															onSortModeChange={setSidebarProjectSortMode}
-															hostFilter={
-																inlineCloudWorkspaces ? hostFilter : null
-															}
-															onHostFilterChange={setSidebarProjectHostFilter}
-															filterQuery={projectFilterQuery}
-															onFilterQueryChange={setProjectFilterQuery}
-														/>
-													</DashboardSidebarBulkActions>
-												</div>
-											)}
-											{(isCollapsed || !workspacesListCollapsed) && (
-												<SortableContext
-													items={displayedProjectIds}
-													strategy={verticalListSortingStrategy}
-												>
-													{displayedGroups.map((project) => (
-														<SortableProjectWrapper
-															key={project.id}
-															project={project}
-															isCollapsed={isCollapsed}
-															isDragDisabled={isProjectDragDisabled}
-															workspaceShortcutLabels={workspaceShortcutLabels}
-															onWorkspaceHover={refreshWorkspacePullRequest}
-															onToggleCollapse={toggleProjectCollapsed}
-														/>
-													))}
-												</SortableContext>
-											)}
-											{!isCollapsed && !workspacesListCollapsed && (
-												<DashboardSidebarHiddenProjects
-													projects={hiddenProjects}
-													onShow={showHiddenProject}
-												/>
-											)}
-											{!isCollapsed &&
-												isFilterActive &&
-												displayedGroups.length === 0 && (
-													<div className="select-text cursor-text px-4 py-2 text-xs text-muted-foreground">
-														{trimmedFilterQuery !== ""
-															? t({
-																	message: `No projects match "${trimmedFilterQuery}"`,
-																})
-															: hostFilter === "cloud"
-																? t({ message: "No cloud workspaces" })
-																: t({ message: "No local workspaces" })}
+												{!isCollapsed && (
+													<div className="mt-3 first:mt-0">
+														<DashboardSidebarBulkActions projects={groups}>
+															<DashboardSidebarWorkspacesHeader
+																sortMode={sortMode}
+																onSortModeChange={setSidebarProjectSortMode}
+																hostFilter={
+																	inlineCloudWorkspaces ? hostFilter : null
+																}
+																onHostFilterChange={setSidebarProjectHostFilter}
+																filterQuery={projectFilterQuery}
+																onFilterQueryChange={setProjectFilterQuery}
+															/>
+														</DashboardSidebarBulkActions>
 													</div>
 												)}
-										</OverflowFadeContainer>
-										<SidebarCardSlot
-											isCollapsed={isCollapsed}
-											entries={[
-												isPreviewingReleaseNotes ? releaseNotesCard : null,
-												paymentFailedCard,
-												setupScriptCard,
-												gettingStartedCard,
-												releaseNotesCard,
-												starNagCard,
-												hiringCard,
-											]}
-										/>
-										<div
-											className={cn(
-												isCollapsed
-													? "flex flex-col items-center gap-2 py-2"
-													: "flex items-center gap-1 p-2",
-											)}
-										>
-											{isCollapsed ? (
-												<OrganizationDropdown variant="collapsed" />
-											) : (
-												<div className="min-w-0 flex-1">
-													<OrganizationDropdown variant="expanded" />
-												</div>
-											)}
+												{(isCollapsed || !workspacesListCollapsed) && (
+													<DashboardSidebarProjectLane
+														lane={displayedLane}
+														isSidebarCollapsed={isCollapsed}
+														isDragDisabled={isProjectDragDisabled}
+														workspaceShortcutLabels={workspaceShortcutLabels}
+														onWorkspaceHover={refreshWorkspacePullRequest}
+														onToggleProjectCollapse={toggleProjectCollapsed}
+													/>
+												)}
+												{!isCollapsed && !workspacesListCollapsed && (
+													<DashboardSidebarHiddenProjects
+														projects={hiddenProjects}
+														onShow={showHiddenProject}
+													/>
+												)}
+												{!isCollapsed &&
+													isFilterActive &&
+													displayedGroups.length === 0 && (
+														<div className="select-text cursor-text px-4 py-2 text-xs text-muted-foreground">
+															{trimmedFilterQuery !== ""
+																? t({
+																		message: `No projects match "${trimmedFilterQuery}"`,
+																	})
+																: hostFilter === "cloud"
+																	? t({ message: "No cloud workspaces" })
+																	: t({ message: "No local workspaces" })}
+														</div>
+													)}
+											</OverflowFadeContainer>
+											<SidebarCardSlot
+												isCollapsed={isCollapsed}
+												entries={[
+													isPreviewingReleaseNotes ? releaseNotesCard : null,
+													paymentFailedCard,
+													setupScriptCard,
+													gettingStartedCard,
+													releaseNotesCard,
+													starNagCard,
+													hiringCard,
+												]}
+											/>
+											<div
+												className={cn(
+													isCollapsed
+														? "flex flex-col items-center gap-2 py-2"
+														: "flex items-center gap-1 p-2",
+												)}
+											>
+												{isCollapsed ? (
+													<OrganizationDropdown variant="collapsed" />
+												) : (
+													<div className="min-w-0 flex-1">
+														<OrganizationDropdown variant="expanded" />
+													</div>
+												)}
 
-											<UpdatesPill isCollapsed={isCollapsed} />
-											<Tooltip delayDuration={300}>
-												<TooltipTrigger asChild>
-													<button
-														type="button"
-														aria-label={t({
-															message: "Settings",
-														})}
-														onClick={() =>
-															navigate({ to: "/settings/account" })
-														}
-														className={cn(
-															"flex size-8 shrink-0 items-center justify-center rounded-md transition-colors",
-															isSettingsOpen
-																? "bg-fill-selected text-muted-foreground"
-																: "text-muted-foreground hover:bg-fill-hover",
-														)}
-													>
-														<HiOutlineCog6Tooth className="size-3.5" />
-													</button>
-												</TooltipTrigger>
-												<TooltipContent side={isCollapsed ? "right" : "top"}>
-													{settingsHotkey !== "Unassigned"
-														? t({
-																message: `Settings (${settingsHotkey})`,
-															})
-														: t({
+												<UpdatesPill isCollapsed={isCollapsed} />
+												<Tooltip delayDuration={300}>
+													<TooltipTrigger asChild>
+														<button
+															type="button"
+															aria-label={t({
 																message: "Settings",
 															})}
-												</TooltipContent>
-											</Tooltip>
+															onClick={() =>
+																navigate({ to: "/settings/account" })
+															}
+															className={cn(
+																"flex size-8 shrink-0 items-center justify-center rounded-md transition-colors",
+																isSettingsOpen
+																	? "bg-fill-selected text-muted-foreground"
+																	: "text-muted-foreground hover:bg-fill-hover",
+															)}
+														>
+															<HiOutlineCog6Tooth className="size-3.5" />
+														</button>
+													</TooltipTrigger>
+													<TooltipContent side={isCollapsed ? "right" : "top"}>
+														{settingsHotkey !== "Unassigned"
+															? t({
+																	message: `Settings (${settingsHotkey})`,
+																})
+															: t({
+																	message: "Settings",
+																})}
+													</TooltipContent>
+												</Tooltip>
+											</div>
 										</div>
-									</div>
-								</DashboardSidebarDndProvider>
-							</DashboardSidebarHoverCardOverlay>
-						</NewDashboardSidebarContext.Provider>
-					</DashboardSidebarWorkspaceStatusProvider>
-				</DashboardSidebarHoverProvider>
+									</DashboardSidebarDndProvider>
+								</DashboardSidebarHoverCardOverlay>
+							</NewDashboardSidebarContext.Provider>
+						</DashboardSidebarWorkspaceStatusProvider>
+					</DashboardSidebarHoverProvider>
+				</ProjectSidebarSectionsProvider>
 			</DashboardSidebarSectionRenameProvider>
 		</DashboardSidebarSelectionProvider>
 	);

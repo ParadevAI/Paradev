@@ -16,6 +16,8 @@ import { useDashboardSidebarProjectSectionActions } from "./hooks/useDashboardSi
 
 interface DashboardSidebarProjectSectionProps {
 	project: DashboardSidebarProject;
+	/** The Projects-list section it is filed under, or null at the top level. */
+	projectSectionId?: string | null;
 	isSidebarCollapsed?: boolean;
 	isDraggingProject?: boolean;
 	workspaceShortcutLabels: Map<string, string>;
@@ -27,6 +29,7 @@ interface DashboardSidebarProjectSectionProps {
 
 export function DashboardSidebarProjectSection({
 	project,
+	projectSectionId = null,
 	isSidebarCollapsed = false,
 	isDraggingProject = false,
 	workspaceShortcutLabels,
@@ -103,6 +106,8 @@ export function DashboardSidebarProjectSection({
 			<DashboardSidebarProjectContextMenu
 				projectId={project.id}
 				kind={project.kind}
+				projectSectionId={projectSectionId}
+				isSidebarCollapsed={isSidebarCollapsed}
 				onCreateSection={handleNewSection}
 				onImportWorktrees={handleImportWorktrees}
 				onOpenInFinder={handleOpenInFinder}
@@ -135,6 +140,8 @@ export function DashboardSidebarProjectSection({
 			<DashboardSidebarProjectContextMenu
 				projectId={project.id}
 				kind={project.kind}
+				projectSectionId={projectSectionId}
+				isSidebarCollapsed={isSidebarCollapsed}
 				onCreateSection={handleNewSection}
 				onImportWorktrees={handleImportWorktrees}
 				onOpenInFinder={handleOpenInFinder}

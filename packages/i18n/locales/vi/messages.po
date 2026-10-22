@@ -5952,6 +5952,9 @@ msgstr "Xóa dự án…"
 msgid "Delete script"
 msgstr "Xóa script"
 
+msgid "Delete section"
+msgstr "Xóa mục"
+
 msgid "Delete selected workspaces"
 msgstr "Xóa các workspace đã chọn"
 
@@ -10494,6 +10497,9 @@ msgstr "Chuyển vào nhóm"
 msgid "Move to Right Side"
 msgstr "Chuyển sang bên phải"
 
+msgid "Move to section"
+msgstr "Chuyển vào mục"
+
 msgid "Move to Tab"
 msgstr "Chuyển sang tab"
 
@@ -10704,6 +10710,9 @@ msgstr "Dự án mới"
 
 msgid "New push to branch"
 msgstr "Push mới lên nhánh"
+
+msgid "New section"
+msgstr "Mục mới"
 
 msgid "New session"
 msgstr "Phiên mới"
@@ -13870,6 +13879,9 @@ msgstr "Xóa khỏi mục yêu thích"
 msgid "Remove from Queue"
 msgstr "Bỏ khỏi hàng đợi"
 
+msgid "Remove from section"
+msgstr "Xóa khỏi mục"
+
 msgid "Remove from sidebar"
 msgstr "Gỡ khỏi thanh bên"
 
@@ -13981,6 +13993,9 @@ msgstr "Đổi tên host"
 
 msgid "Rename page"
 msgstr "Đổi tên trang"
+
+msgid "Rename section"
+msgstr "Đổi tên mục"
 
 msgid "Rename session"
 msgstr "Đổi tên phiên"
@@ -15088,6 +15103,9 @@ msgstr "Secondary"
 msgid "Secret Shift Lead"
 msgstr "Trưởng ca bí mật"
 
+msgid "Section actions"
+msgstr "Hành động mục"
+
 msgid "Sections"
 msgstr "Các mục"
 
@@ -15446,6 +15464,9 @@ msgstr "Đặt dự án…"
 
 msgid "Set Run"
 msgstr "Đặt lệnh chạy"
+
+msgid "Set section color"
+msgstr "Đặt màu mục"
 
 msgid "Set this project"
 msgstr "Đặt dự án này"

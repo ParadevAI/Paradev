@@ -5952,6 +5952,9 @@ msgstr "Project verwijderen…"
 msgid "Delete script"
 msgstr "Script verwijderen"
 
+msgid "Delete section"
+msgstr "Sectie verwijderen"
+
 msgid "Delete selected workspaces"
 msgstr "Geselecteerde werkruimtes verwijderen"
 
@@ -10494,6 +10497,9 @@ msgstr "Naar groep verplaatsen"
 msgid "Move to Right Side"
 msgstr "Naar rechts verplaatsen"
 
+msgid "Move to section"
+msgstr "Naar sectie verplaatsen"
+
 msgid "Move to Tab"
 msgstr "Verplaatsen naar tabblad"
 
@@ -10704,6 +10710,9 @@ msgstr "Nieuw project"
 
 msgid "New push to branch"
 msgstr "Nieuwe push naar branch"
+
+msgid "New section"
+msgstr "Nieuwe sectie"
 
 msgid "New session"
 msgstr "Nieuwe sessie"
@@ -13870,6 +13879,9 @@ msgstr "Verwijderen uit favorieten"
 msgid "Remove from Queue"
 msgstr "Uit wachtrij halen"
 
+msgid "Remove from section"
+msgstr "Uit sectie verwijderen"
+
 msgid "Remove from sidebar"
 msgstr "Uit zijbalk verwijderen"
 
@@ -13981,6 +13993,9 @@ msgstr "Host hernoemen"
 
 msgid "Rename page"
 msgstr "Pagina hernoemen"
+
+msgid "Rename section"
+msgstr "Sectienaam wijzigen"
 
 msgid "Rename session"
 msgstr "Sessienaam wijzigen"
@@ -15088,6 +15103,9 @@ msgstr "Secundair"
 msgid "Secret Shift Lead"
 msgstr "Geheime Ploegleider"
 
+msgid "Section actions"
+msgstr "Sectieacties"
+
 msgid "Sections"
 msgstr "Secties"
 
@@ -15446,6 +15464,9 @@ msgstr "Project instellen…"
 
 msgid "Set Run"
 msgstr "Run instellen"
+
+msgid "Set section color"
+msgstr "Sectiekleur instellen"
 
 msgid "Set this project"
 msgstr "Dit project instellen"

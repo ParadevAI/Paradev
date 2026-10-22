@@ -34,6 +34,7 @@ import type {
 	DashboardSidebarProject,
 	DashboardSidebarWorkspace,
 } from "../../types";
+import type { ProjectPlacementInput } from "../../utils/projectSidebarLane";
 import {
 	applyCloudSidebarPinnedRows,
 	applyCloudSidebarRows,
@@ -220,9 +221,32 @@ export function useDashboardSidebarData({
 						isCollapsed: sidebarProjects.isCollapsed,
 						isHidden: sidebarProjects.isHidden,
 						tabOrder: sidebarProjects.tabOrder,
+						sectionId: sidebarProjects.sectionId,
 					})),
 			[collections],
 		);
+	const projectPlacements = useMemo<ProjectPlacementInput[]>(
+		() =>
+			sidebarProjectRows.map((row) => ({
+				projectId: row.projectId,
+				tabOrder: row.tabOrder,
+				sectionId: row.sectionId,
+			})),
+		[sidebarProjectRows],
+	);
+	const { data: projectSections = [] } = useLiveQuery(
+		(q) =>
+			q
+				.from({ sections: collections.v2SidebarProjectSections })
+				.select(({ sections }) => ({
+					sectionId: sections.sectionId,
+					name: sections.name,
+					color: sections.color,
+					isCollapsed: sections.isCollapsed,
+					tabOrder: sections.tabOrder,
+				})),
+		[collections],
+	);
 	// Sorted in JS, not via the query's orderBy: the incremental orderBy
 	// does not reliably re-sort on row inserts/renumbers (a newly added
 	// project stayed appended at the bottom until reload), and tabOrders
@@ -912,6 +936,8 @@ export function useDashboardSidebarData({
 
 	return {
 		groups,
+		projectSections,
+		projectPlacements,
 		hiddenProjects: allHiddenProjects,
 		pinnedWorkspaces,
 		sessionWorkspaces,
