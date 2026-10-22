@@ -9,21 +9,30 @@ import {
 	ContextMenuSubTrigger,
 	ContextMenuTrigger,
 } from "@superset/ui/context-menu";
+import { useRef } from "react";
 import {
 	LuEye,
 	LuEyeOff,
 	LuFolderInput,
 	LuFolderOpen,
 	LuFolderPlus,
+	LuPalette,
 	LuPencil,
 	LuSettings,
 	LuTrash2,
 } from "react-icons/lu";
+import {
+	ColorSelector,
+	CustomColorInput,
+} from "renderer/components/ColorSelector";
 import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
+import { PROJECT_COLOR_DEFAULT } from "shared/constants/project-colors";
 import type { DashboardSidebarProject } from "../../../../types";
 
 interface DashboardSidebarProjectContextMenuProps {
 	projectId: string;
+	projectColor: string | null;
+	onSetColor: (color: string | null) => void;
 	/** A `cloud-repo` stand-in has no checkout, settings or name of its own. */
 	kind?: DashboardSidebarProject["kind"];
 	onCreateSection: () => void;
@@ -39,6 +48,8 @@ interface DashboardSidebarProjectContextMenuProps {
 
 export function DashboardSidebarProjectContextMenu({
 	projectId,
+	projectColor,
+	onSetColor,
 	kind,
 	onCreateSection,
 	onImportWorktrees,
@@ -51,66 +62,98 @@ export function DashboardSidebarProjectContextMenu({
 }: DashboardSidebarProjectContextMenuProps) {
 	const { preferences, setTagFolderHidden } = useV2UserPreferences();
 	const hiddenTags = preferences.hiddenTagFolders[projectId] ?? [];
+	const customColorInputRef = useRef<HTMLInputElement>(null);
 	const hasCheckout = kind !== "cloud-repo";
 	return (
-		<ContextMenu>
-			<ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
-			<ContextMenuContent onCloseAutoFocus={(event) => event.preventDefault()}>
-				{hasCheckout && (
-					<>
-						<ContextMenuItem onSelect={onRename}>
-							<LuPencil className="size-4 mr-2" />
-							<Trans>Rename</Trans>
-						</ContextMenuItem>
-						<ContextMenuSeparator />
-						<ContextMenuItem onSelect={onOpenInFinder}>
-							<LuFolderOpen className="size-4 mr-2" />
-							<Trans>Open in Finder</Trans>
-						</ContextMenuItem>
-						<ContextMenuItem onSelect={onOpenSettings}>
-							<LuSettings className="size-4 mr-2" />
-							<Trans>Project Settings</Trans>
-						</ContextMenuItem>
-						<ContextMenuItem onSelect={onCreateSection}>
-							<LuFolderPlus className="size-4 mr-2" />
-							<Trans>New group</Trans>
-						</ContextMenuItem>
-						{hiddenTags.length > 0 ? (
+		<>
+			<ContextMenu>
+				<ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
+				<ContextMenuContent
+					onCloseAutoFocus={(event) => event.preventDefault()}
+				>
+					{hasCheckout && (
+						<>
+							<ContextMenuItem onSelect={onRename}>
+								<LuPencil className="size-4 mr-2" />
+								<Trans>Rename</Trans>
+							</ContextMenuItem>
+							<ContextMenuSeparator />
+							<ContextMenuItem onSelect={onOpenInFinder}>
+								<LuFolderOpen className="size-4 mr-2" />
+								<Trans>Open in Finder</Trans>
+							</ContextMenuItem>
+							<ContextMenuItem onSelect={onOpenSettings}>
+								<LuSettings className="size-4 mr-2" />
+								<Trans>Project Settings</Trans>
+							</ContextMenuItem>
 							<ContextMenuSub>
 								<ContextMenuSubTrigger>
-									<LuEye className="size-4 mr-2" />
-									<Trans>Hidden folders</Trans>
+									<LuPalette className="size-4 mr-2" />
+									<Trans>Color</Trans>
 								</ContextMenuSubTrigger>
-								<ContextMenuSubContent className="w-48 max-h-80 overflow-y-auto">
-									{hiddenTags.map((tag) => (
-										<ContextMenuItem
-											key={tag}
-											onSelect={() => setTagFolderHidden(projectId, tag, false)}
-										>
-											{tag}
-										</ContextMenuItem>
-									))}
+								<ContextMenuSubContent className="w-48">
+									<ColorSelector
+										variant="menu"
+										includeDefault
+										selectedColor={projectColor}
+										onSelectColor={(color) =>
+											onSetColor(color === PROJECT_COLOR_DEFAULT ? null : color)
+										}
+										onPickCustom={() => customColorInputRef.current?.click()}
+									/>
 								</ContextMenuSubContent>
 							</ContextMenuSub>
-						) : null}
-						<ContextMenuItem onSelect={onImportWorktrees}>
-							<LuFolderInput className="size-4 mr-2" />
-							<Trans>Import untracked worktrees</Trans>
-						</ContextMenuItem>
-						<ContextMenuSeparator />
-					</>
-				)}
-				<ContextMenuItem onSelect={onHide}>
-					<LuEyeOff className="size-4 mr-2" />
-					<Trans>Hide from Sidebar</Trans>
-				</ContextMenuItem>
-				{onDelete ? (
-					<ContextMenuItem variant="destructive" onSelect={onDelete}>
-						<LuTrash2 className="size-4 mr-2" />
-						<Trans>Delete Project…</Trans>
+							<ContextMenuItem onSelect={onCreateSection}>
+								<LuFolderPlus className="size-4 mr-2" />
+								<Trans>New group</Trans>
+							</ContextMenuItem>
+							{hiddenTags.length > 0 ? (
+								<ContextMenuSub>
+									<ContextMenuSubTrigger>
+										<LuEye className="size-4 mr-2" />
+										<Trans>Hidden folders</Trans>
+									</ContextMenuSubTrigger>
+									<ContextMenuSubContent className="w-48 max-h-80 overflow-y-auto">
+										{hiddenTags.map((tag) => (
+											<ContextMenuItem
+												key={tag}
+												onSelect={() =>
+													setTagFolderHidden(projectId, tag, false)
+												}
+											>
+												{tag}
+											</ContextMenuItem>
+										))}
+									</ContextMenuSubContent>
+								</ContextMenuSub>
+							) : null}
+							<ContextMenuItem onSelect={onImportWorktrees}>
+								<LuFolderInput className="size-4 mr-2" />
+								<Trans>Import untracked worktrees</Trans>
+							</ContextMenuItem>
+							<ContextMenuSeparator />
+						</>
+					)}
+					<ContextMenuItem onSelect={onHide}>
+						<LuEyeOff className="size-4 mr-2" />
+						<Trans>Hide from Sidebar</Trans>
 					</ContextMenuItem>
-				) : null}
-			</ContextMenuContent>
-		</ContextMenu>
+					{onDelete ? (
+						<ContextMenuItem variant="destructive" onSelect={onDelete}>
+							<LuTrash2 className="size-4 mr-2" />
+							<Trans>Delete Project…</Trans>
+						</ContextMenuItem>
+					) : null}
+				</ContextMenuContent>
+			</ContextMenu>
+			<CustomColorInput
+				ref={customColorInputRef}
+				value={projectColor ?? "#64748b"}
+				onCommit={onSetColor}
+				tabIndex={-1}
+				aria-hidden
+				className="sr-only"
+			/>
+		</>
 	);
 }

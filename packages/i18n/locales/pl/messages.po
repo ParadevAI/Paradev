@@ -3034,6 +3034,9 @@ msgstr "Plik binarny ukryty"
 msgid "Bio"
 msgstr "O sobie"
 
+msgid "Blend the color into the workspace and terminal background"
+msgstr "Wmieszaj kolor w tło obszaru roboczego i terminala"
+
 msgid "Block"
 msgstr "Blok"
 
@@ -5703,6 +5706,9 @@ msgstr "Własny"
 msgid "Custom agent…"
 msgstr "Własny agent…"
 
+msgid "Custom color"
+msgstr "Własny kolor"
+
 msgid "Custom components beyond the shadcn set"
 msgstr "Własne komponenty poza zestawem shadcn"
 
@@ -5726,6 +5732,9 @@ msgstr "Własny dostawca"
 
 msgid "Custom themes"
 msgstr "Własne motywy"
+
+msgid "Custom…"
+msgstr "Własny…"
 
 msgid "Customize commands"
 msgstr "Dostosuj polecenia"
@@ -8579,6 +8588,9 @@ msgstr "Ile pracy agentów faktycznie wykonują inżynierowie — tokeny, koszt,
 msgid "How should the agent's actions be approved?"
 msgstr "Jak zatwierdzać działania agenta?"
 
+msgid "How strongly the color tints each surface"
+msgstr "Jak mocno kolor zabarwia każdą powierzchnię"
+
 msgid "How the command opens."
 msgstr "Jak otwiera się polecenie."
 
@@ -8990,6 +9002,9 @@ msgstr "Instrukcje"
 
 msgid "Integrations"
 msgstr "Integracje"
+
+msgid "Intensity"
+msgstr "Intensywność"
 
 msgid "Interactive agent terminal."
 msgstr "Interaktywny terminal agenta."
@@ -12538,6 +12553,9 @@ msgstr "Płatna praca próbna"
 msgid "Palette"
 msgstr "Paleta"
 
+msgid "Pane headers"
+msgstr "Nagłówki paneli"
+
 msgid "Pane in current tab"
 msgstr "Panel w bieżącej karcie"
 
@@ -13196,6 +13214,9 @@ msgstr "projekt"
 msgid "Project"
 msgstr "Projekt"
 
+msgid "Project colors in workspaces"
+msgstr "Kolory projektów w obszarach roboczych"
+
 msgid "Project created."
 msgstr "Projekt utworzony."
 
@@ -13256,6 +13277,9 @@ msgstr "Wyszukiwanie w całym projekcie"
 #. placeholder {0}: workspace.projectName ?? t({ message: "none (session)", })
 msgid "Project: {0}"
 msgstr "Projekt: {0}"
+
+msgid "Project's host is unreachable — cannot change color right now"
+msgstr "Host projektu jest nieosiągalny — nie można teraz zmienić koloru"
 
 msgid "Project's host is unreachable — cannot import worktrees right now"
 msgstr "Host projektu jest nieosiągalny — nie można teraz zaimportować worktree"
@@ -16952,6 +16976,9 @@ msgstr "Pamięć RAM systemu: Superset {0}, inne aplikacje {1}, wolne {2}"
 msgid "Tab"
 msgstr "Karta"
 
+msgid "Tab bar"
+msgstr "Pasek kart"
+
 msgid "Tab per command"
 msgstr "Karta na polecenie"
 
@@ -18030,8 +18057,23 @@ msgstr "Poziom"
 msgid "Time"
 msgstr "Czas"
 
+msgid "Tint each project and its workspaces in the sidebar"
+msgstr "Zabarw każdy projekt i jego obszary robocze na pasku bocznym"
+
+msgid "Tint each workspace with its project's color. Pick a color by right-clicking a project in the sidebar."
+msgstr "Zabarwia każdy obszar roboczy kolorem jego projektu. Wybierz kolor, klikając prawym przyciskiem projekt na pasku bocznym."
+
+msgid "Tint the header above each pane"
+msgstr "Zabarw nagłówek nad każdym panelem"
+
+msgid "Tint the tab strip and mark the active tab"
+msgstr "Zabarw pasek kart i oznacz aktywną kartę"
+
 msgid "Tinted"
 msgstr "Zabarwiony"
+
+msgid "Tints the project in the sidebar and in its workspaces."
+msgstr "Zabarwia projekt na pasku bocznym i w jego obszarach roboczych."
 
 msgid "Tip"
 msgstr "Wskazówka"
