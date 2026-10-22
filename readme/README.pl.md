@@ -218,6 +218,7 @@ Superset działa z każdym agentem kodującym opartym na CLI, w tym:
 | <picture><source media="(prefers-color-scheme: dark)" srcset="../packages/ui/src/assets/icons/preset-icons/opencode-white.svg" /><img height="16" align="top" alt="OpenCode" src="../packages/ui/src/assets/icons/preset-icons/opencode.svg" /></picture> &nbsp;[OpenCode](https://github.com/opencode-ai/opencode) | Pełne wsparcie |
 | <picture><source media="(prefers-color-scheme: dark)" srcset="../packages/ui/src/assets/icons/preset-icons/pi-white.svg" /><img height="16" align="top" alt="Pi" src="../packages/ui/src/assets/icons/preset-icons/pi.svg" /></picture> &nbsp;[Pi](https://github.com/badlogic/pi-mono/tree/main/packages/coding-agent) | Pełne wsparcie |
 | <picture><source media="(prefers-color-scheme: dark)" srcset="../packages/ui/src/assets/icons/preset-icons/polygraph-white.svg" /><img height="16" align="top" alt="Polygraph" src="../packages/ui/src/assets/icons/preset-icons/polygraph.svg" /></picture> &nbsp;[Polygraph](https://trypolygraph.com/) | Pełne wsparcie |
+| <picture><source media="(prefers-color-scheme: dark)" srcset="../packages/ui/src/assets/icons/preset-icons/prime-agent-white.svg" /><img height="16" align="top" alt="Prime Agent" src="../packages/ui/src/assets/icons/preset-icons/prime-agent.svg" /></picture> &nbsp;Prime Agent | Pełne wsparcie |
 | Dowolny inny agent CLI | Działa bez konfiguracji |
 
 Jeśli działa w terminalu, działa w Superset
