@@ -343,9 +343,9 @@ function AutomationsPage() {
 						? aRun.at - bRun.at
 						: bRun.at - aRun.at;
 				}
-				const cmp = i18n
-					._(RUN_STATUS_META[aRun.status].label)
-					.localeCompare(i18n._(RUN_STATUS_META[bRun.status].label));
+				const cmp =
+					RUN_STATUS_META[aRun.status].sortRank -
+					RUN_STATUS_META[bRun.status].sortRank;
 				if (cmp !== 0) return sortDirection === "asc" ? cmp : -cmp;
 				return bRun.at - aRun.at;
 			});
