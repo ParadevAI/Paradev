@@ -25,6 +25,7 @@ export class JwtApiAuthProvider implements ApiAuthProvider {
 	private readonly onInvalidateCache?: () => void;
 	private readonly apiUrl: string;
 	private cachedJwt: string | null = null;
+	private cachedJwtSourceToken: string | null = null;
 	private cachedJwtExpiresAt = 0;
 
 	constructor(options: JwtApiAuthProviderOptions) {
@@ -40,18 +41,12 @@ export class JwtApiAuthProvider implements ApiAuthProvider {
 
 	invalidateCache(): void {
 		this.cachedJwt = null;
+		this.cachedJwtSourceToken = null;
 		this.cachedJwtExpiresAt = 0;
 		this.onInvalidateCache?.();
 	}
 
 	async getJwt(): Promise<string> {
-		if (
-			this.cachedJwt &&
-			Date.now() < this.cachedJwtExpiresAt - JWT_REFRESH_BUFFER_MS
-		) {
-			return this.cachedJwt;
-		}
-
 		const sessionToken = await this.getSessionToken();
 
 		// CLI OAuth code+PKCE login stores the OAuth access token directly,
@@ -62,6 +57,14 @@ export class JwtApiAuthProvider implements ApiAuthProvider {
 		// anyway, only sessions and api keys).
 		if (looksLikeJwt(sessionToken)) {
 			return sessionToken;
+		}
+
+		if (
+			this.cachedJwt &&
+			this.cachedJwtSourceToken === sessionToken &&
+			Date.now() < this.cachedJwtExpiresAt - JWT_REFRESH_BUFFER_MS
+		) {
+			return this.cachedJwt;
 		}
 
 		// better-auth's apiKey plugin reads `sk_live_…` from x-api-key, not
@@ -79,6 +82,7 @@ export class JwtApiAuthProvider implements ApiAuthProvider {
 		}
 		const data = (await response.json()) as { token: string };
 		this.cachedJwt = data.token;
+		this.cachedJwtSourceToken = sessionToken;
 		this.cachedJwtExpiresAt = Date.now() + JWT_CACHE_DURATION_MS;
 		return data.token;
 	}
