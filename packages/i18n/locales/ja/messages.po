@@ -16442,6 +16442,9 @@ msgstr "ページが仕上がるまでステップ3と4を繰り返します。"
 msgid "Still can't reach the host."
 msgstr "ホストにまだ接続できません。"
 
+msgid "Still restoring your session"
+msgstr "セッションの復元を続けています"
+
 msgid "Still trying. If it keeps failing, archive it and create a new one."
 msgstr "再試行しています。失敗が続く場合は、アーカイブして新しく作成してください。"
 
@@ -16614,6 +16617,9 @@ msgstr "Superset オートメーション"
 
 msgid "superset browser cdp prints an endpoint for that pane only. Point Playwright or browser-use at it."
 msgstr "superset browser cdp は、そのペイン専用のエンドポイントを出力します。Playwrightやbrowser-useをそこに向けてください。"
+
+msgid "Superset can't confirm your sign-in with the server."
+msgstr "Superset はサーバーでサインインを確認できません。"
 
 msgid "Superset CLI"
 msgstr "Superset CLI"

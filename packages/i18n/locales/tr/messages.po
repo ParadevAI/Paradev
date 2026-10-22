@@ -16442,6 +16442,9 @@ msgstr "Sayfa doğru olana kadar 3. ve 4. adımlar tekrarlanır."
 msgid "Still can't reach the host."
 msgstr "Host'a hâlâ ulaşılamıyor."
 
+msgid "Still restoring your session"
+msgstr "Oturumunuz hâlâ geri yükleniyor"
+
 msgid "Still trying. If it keeps failing, archive it and create a new one."
 msgstr "Hâlâ deneniyor. Başarısız olmaya devam ederse bunu arşivleyip yeni bir tane oluşturun."
 
@@ -16614,6 +16617,9 @@ msgstr "Superset Otomasyonlar"
 
 msgid "superset browser cdp prints an endpoint for that pane only. Point Playwright or browser-use at it."
 msgstr "superset browser cdp yalnızca o bölme için bir uç nokta yazdırır. Playwright'ı veya browser-use'u ona yönlendirin."
+
+msgid "Superset can't confirm your sign-in with the server."
+msgstr "Superset, sunucuda oturum açtığınızı doğrulayamıyor."
 
 msgid "Superset CLI"
 msgstr "Superset CLI"

@@ -16442,6 +16442,9 @@ msgstr "第 3 步和第 4 步会重复，直到页面满意为止。"
 msgid "Still can't reach the host."
 msgstr "仍然无法连接到主机。"
 
+msgid "Still restoring your session"
+msgstr "仍在恢复您的会话"
+
 msgid "Still trying. If it keeps failing, archive it and create a new one."
 msgstr "仍在重试。如果一直失败，归档它，再建一个。"
 
@@ -16614,6 +16617,9 @@ msgstr "Superset 自动化"
 
 msgid "superset browser cdp prints an endpoint for that pane only. Point Playwright or browser-use at it."
 msgstr "superset browser cdp 只会输出该窗格专属的端点。让 Playwright 或 browser-use 连接它即可。"
+
+msgid "Superset can't confirm your sign-in with the server."
+msgstr "Superset 无法向服务器确认您的登录状态。"
 
 msgid "Superset CLI"
 msgstr "Superset CLI"

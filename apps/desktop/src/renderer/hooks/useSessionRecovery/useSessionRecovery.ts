@@ -36,9 +36,30 @@ export function nextRecoveryDelayMs(
 }
 
 export function useSessionRecovery() {
-	const { data: session, isPending, refetch } = authClient.useSession();
+	const sessionState = authClient.useSession();
 	const isOnline = useOnlineStatus();
 	const hasLocalToken = !!getAuthToken();
+	return useSessionRecoveryState(sessionState, hasLocalToken, isOnline);
+}
+
+export function useSessionRecoveryState(
+	{
+		data: session,
+		error,
+		isPending,
+		isRefetching,
+		refetch,
+	}: ReturnType<typeof authClient.useSession>,
+	hasLocalToken: boolean,
+	isOnline: boolean,
+) {
+	const isRecovering =
+		hasLocalToken &&
+		!session?.user &&
+		isOnline &&
+		!!error &&
+		error.status !== 401 &&
+		error.status !== 403;
 
 	const recoveryInFlightRef = useRef(false);
 	const attemptRef = useRef(0);
@@ -135,7 +156,11 @@ export function useSessionRecovery() {
 
 	return {
 		hasLocalToken,
+		isOnline,
 		isPending,
+		isRefetching,
+		isRecovering,
+		refetch,
 		session,
 	};
 }

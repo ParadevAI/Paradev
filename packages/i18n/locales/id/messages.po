@@ -16442,6 +16442,9 @@ msgstr "Langkah 3 dan 4 diulang sampai halamannya pas."
 msgid "Still can't reach the host."
 msgstr "Host masih tidak dapat dijangkau."
 
+msgid "Still restoring your session"
+msgstr "Masih memulihkan sesi Anda"
+
 msgid "Still trying. If it keeps failing, archive it and create a new one."
 msgstr "Masih mencoba. Jika terus gagal, arsipkan dan buat yang baru."
 
@@ -16614,6 +16617,9 @@ msgstr "Otomatisasi Superset"
 
 msgid "superset browser cdp prints an endpoint for that pane only. Point Playwright or browser-use at it."
 msgstr "superset browser cdp mencetak endpoint hanya untuk panel itu. Arahkan Playwright atau browser-use ke sana."
+
+msgid "Superset can't confirm your sign-in with the server."
+msgstr "Superset tidak dapat mengonfirmasi proses masuk Anda ke server."
 
 msgid "Superset CLI"
 msgstr "Superset CLI"

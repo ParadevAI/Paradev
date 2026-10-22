@@ -16442,6 +16442,9 @@ msgstr "I passaggi 3 e 4 si ripetono finché la pagina non è giusta."
 msgid "Still can't reach the host."
 msgstr "L'host resta irraggiungibile."
 
+msgid "Still restoring your session"
+msgstr "Ripristino della sessione ancora in corso"
+
 msgid "Still trying. If it keeps failing, archive it and create a new one."
 msgstr "Nuovo tentativo in corso. Se il problema persiste, archivialo e creane uno nuovo."
 
@@ -16614,6 +16617,9 @@ msgstr "Superset Automazioni"
 
 msgid "superset browser cdp prints an endpoint for that pane only. Point Playwright or browser-use at it."
 msgstr "superset browser cdp stampa un endpoint solo per quel riquadro. Punta Playwright o browser-use su di esso."
+
+msgid "Superset can't confirm your sign-in with the server."
+msgstr "Superset non riesce a confermare l'accesso con il server."
 
 msgid "Superset CLI"
 msgstr "CLI di Superset"
