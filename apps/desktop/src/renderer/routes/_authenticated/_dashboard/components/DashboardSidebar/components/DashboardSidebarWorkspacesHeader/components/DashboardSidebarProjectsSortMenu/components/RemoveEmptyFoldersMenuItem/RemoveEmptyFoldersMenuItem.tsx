@@ -2,6 +2,7 @@ import { plural } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { DropdownMenuItem } from "@superset/ui/dropdown-menu";
 import { toast } from "@superset/ui/sonner";
+import { useState } from "react";
 import { LuFolderX } from "react-icons/lu";
 import {
 	type RemoveEmptySidebarFoldersResult,
@@ -11,13 +12,16 @@ import {
 
 /**
  * Removes stored folders whose tag no workspace carries. Mounted only while
- * the menu is open, so the sidebar does not track the count otherwise.
+ * the menu is open, so the sidebar does not track the count otherwise. The
+ * menu stays open while a purge runs: the purge refetches stale sources and
+ * reads their data from this component's later renders.
  */
 export function RemoveEmptyFoldersMenuItem() {
 	const { t } = useLingui();
 	const { emptyFolders, unverifiedFolders, removeEmptyFolders } =
 		useEmptySidebarFolders();
 	const emptyCount = emptyFolders.length;
+	const [isRemoving, setIsRemoving] = useState(false);
 
 	const describeSkipped = (skippedFolders: readonly SkippedSidebarFolder[]) => {
 		const skipped = skippedFolders.length;
@@ -78,11 +82,17 @@ export function RemoveEmptyFoldersMenuItem() {
 
 	return (
 		<DropdownMenuItem
-			disabled={emptyCount === 0 && unverifiedFolders.length === 0}
-			onSelect={() => {
-				void removeEmptyFolders().then(report, (error: unknown) => {
-					console.error("[sidebar] remove empty folders failed:", error);
-				});
+			disabled={
+				isRemoving || (emptyCount === 0 && unverifiedFolders.length === 0)
+			}
+			onSelect={(event) => {
+				event.preventDefault();
+				setIsRemoving(true);
+				void removeEmptyFolders()
+					.then(report, (error: unknown) => {
+						console.error("[sidebar] remove empty folders failed:", error);
+					})
+					.finally(() => setIsRemoving(false));
 			}}
 		>
 			<LuFolderX className="size-4" />

@@ -5,9 +5,11 @@ import {
 	SESSIONS_TAG_SCOPE,
 } from "@superset/shared/workspace-tags";
 import { useLiveQuery } from "@tanstack/react-db";
+import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo, useRef } from "react";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
+import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
@@ -21,6 +23,11 @@ import {
 	type UnverifiedTagFolderReason,
 	useTagFolderContext,
 } from "renderer/routes/_authenticated/utils/workspaceTagFolders";
+import { refreshPruneSources } from "./utils/refreshPruneSources";
+
+const SOURCE_REFETCH_TIMEOUT_MS = 5_000;
+const SOURCE_SETTLE_MS = 1_500;
+const SOURCE_POLL_MS = 50;
 
 export interface EmptySidebarFolder {
 	scope: string;
@@ -183,8 +190,6 @@ export function useEmptySidebarFolders() {
 		sections,
 		tagFolderContext.hiddenTagsByProject,
 	]);
-	const latestFindInputRef = useRef(findInput);
-	latestFindInputRef.current = findInput;
 
 	const groupFolders = useCallback(
 		(folders: readonly OrphanedTagFolder[]): FolderGroup[] => {
@@ -259,12 +264,51 @@ export function useEmptySidebarFolders() {
 		[activeHostUrl, cache, hostProjects],
 	);
 
+	const cloudUtils = cloudTrpc.useUtils();
+	const queryClient = useQueryClient();
+	// A prune refetches stale sources and decides from the render that
+	// carries their data, so it reads everything through this ref.
+	const latestRef = useRef({
+		findInput,
+		cache,
+		groupFolders,
+		resolveSettingHostUrls,
+		toSkipped,
+	});
+	latestRef.current = {
+		findInput,
+		cache,
+		groupFolders,
+		resolveSettingHostUrls,
+		toSkipped,
+	};
+
 	const removeEmptyFolders = useCallback(
 		async ({
 			projectId,
 			dryRun = false,
 		}: RemoveEmptySidebarFoldersOptions = {}): Promise<RemoveEmptySidebarFoldersResult> => {
-			const found = findOrphanedTagFolders({ ...findInput, scope: projectId });
+			const input = await refreshPruneSources({
+				current: latestRef.current.findInput,
+				readLatest: () => latestRef.current.findInput,
+				refetch: {
+					roster: () => cloudUtils.host.roster.refetch(),
+					cloud: () => cloudUtils.cloudWorkspace.list.refetch(),
+					hosts: () =>
+						Promise.all([
+							latestRef.current.cache.refetchAll(),
+							queryClient.refetchQueries({
+								queryKey: ["host-service", "projects", "list"],
+							}),
+						]),
+				},
+				timeoutMs: SOURCE_REFETCH_TIMEOUT_MS,
+				settleMs: SOURCE_SETTLE_MS,
+				pollMs: SOURCE_POLL_MS,
+			});
+			const { groupFolders, resolveSettingHostUrls, toSkipped } =
+				latestRef.current;
+			const found = findOrphanedTagFolders({ ...input, scope: projectId });
 			const skipped = toSkipped(found.unverified);
 			const candidates: (FolderGroup & { urls: string[] })[] = [];
 			for (const group of groupFolders(found.orphaned)) {
@@ -296,7 +340,7 @@ export function useEmptySidebarFolders() {
 					continue;
 				}
 				const latest = findOrphanedTagFolders({
-					...latestFindInputRef.current,
+					...latestRef.current.findInput,
 					scope: folder.scope,
 				});
 				const nowUnverified = latest.unverified.find(
@@ -318,7 +362,7 @@ export function useEmptySidebarFolders() {
 			}
 			return { removed, skipped, failed };
 		},
-		[collections, findInput, groupFolders, resolveSettingHostUrls, toSkipped],
+		[cloudUtils, collections, queryClient],
 	);
 
 	return { emptyFolders, unverifiedFolders, removeEmptyFolders };
