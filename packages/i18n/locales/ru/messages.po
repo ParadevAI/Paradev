@@ -2220,6 +2220,9 @@ msgstr "Все сессии сохранены при обновлении."
 msgid "All sessions were closed and a fresh daemon is running."
 msgstr "Все сессии закрыты, работает новый демон."
 
+msgid "All tabs"
+msgstr "Все вкладки"
+
 msgid "All tasks"
 msgstr "Все задачи"
 
