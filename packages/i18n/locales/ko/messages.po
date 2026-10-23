@@ -16259,6 +16259,9 @@ msgstr "정렬 기준"
 msgid "Sort by {label}, currently {sortLabel}"
 msgstr "{label} 기준 정렬, 현재 {sortLabel}"
 
+msgid "Sort projects and workspaces"
+msgstr "프로젝트 및 워크스페이스 정렬"
+
 msgid "Sort workspaces"
 msgstr "워크스페이스 정렬"
 

@@ -16259,6 +16259,9 @@ msgstr "Sıralama ölçütü"
 msgid "Sort by {label}, currently {sortLabel}"
 msgstr "{label} ölçütüne göre sırala, şu anda {sortLabel}"
 
+msgid "Sort projects and workspaces"
+msgstr "Projeleri ve çalışma alanlarını sırala"
+
 msgid "Sort workspaces"
 msgstr "Çalışma alanlarını sırala"
 

@@ -16259,6 +16259,9 @@ msgstr "Sắp xếp theo"
 msgid "Sort by {label}, currently {sortLabel}"
 msgstr "Sắp xếp theo {label}, hiện tại {sortLabel}"
 
+msgid "Sort projects and workspaces"
+msgstr "Sắp xếp dự án và workspace"
+
 msgid "Sort workspaces"
 msgstr "Sắp xếp workspace"
 

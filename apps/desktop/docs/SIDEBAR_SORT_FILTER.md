@@ -21,15 +21,14 @@ Persisted per user as `sidebarProjectSortMode` in `v2UserPreferences`
 | Mode | Project order | Order inside a project |
 | --- | --- | --- |
 | Manual order | drag order (`tabOrder`), untouched | `tabOrder` |
-| Last active | most recently active workspace, newest first | workspaces and folders by activity, newest first |
-| Date created | `project.createdAt`, newest first | workspace / folder `createdAt`, newest first |
+| Last active | unchanged (see Project order) | workspaces and folders by activity, newest first |
+| Date created | unchanged (see Project order) | workspace / folder `createdAt`, newest first |
 
 Rules shared by the non-manual modes (`utils/sortDashboardSidebarProjects`):
 
 - A folder ranks among loose workspaces by its newest member (Last active) or
   its own `createdAt` (Date created); its members are sorted inside it too.
 - The local `main` workspace stays first inside its project.
-- A project with no workspaces ranks by its own `updatedAt`, then `createdAt`.
 - Ties break by name, then id, so the order is stable across renders.
 - Timestamps are coerced NaN-safely. Persisted caches can revive `Date`
   columns as ISO strings; a value that fails to parse sinks to the bottom of

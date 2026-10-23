@@ -16259,6 +16259,9 @@ msgstr "Ordina per"
 msgid "Sort by {label}, currently {sortLabel}"
 msgstr "Ordina per {label}, attualmente {sortLabel}"
 
+msgid "Sort projects and workspaces"
+msgstr "Ordina progetti e workspace"
+
 msgid "Sort workspaces"
 msgstr "Ordina i workspace"
 

@@ -92,7 +92,7 @@ export function DashboardSidebarProjectsSortMenu({
 						<button
 							type="button"
 							aria-label={t({
-								message: "Sort workspaces",
+								message: "Sort projects and workspaces",
 							})}
 							onClick={(event) => event.stopPropagation()}
 							onKeyDown={(event) => event.stopPropagation()}

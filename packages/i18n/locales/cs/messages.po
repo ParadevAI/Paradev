@@ -16259,6 +16259,9 @@ msgstr "Řadit podle"
 msgid "Sort by {label}, currently {sortLabel}"
 msgstr "Seřadit podle {label}, aktuálně {sortLabel}"
 
+msgid "Sort projects and workspaces"
+msgstr "Seřadit projekty a pracovní prostory"
+
 msgid "Sort workspaces"
 msgstr "Seřadit pracovní prostory"
 

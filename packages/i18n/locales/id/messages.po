@@ -16259,6 +16259,9 @@ msgstr "Urutkan menurut"
 msgid "Sort by {label}, currently {sortLabel}"
 msgstr "Urutkan menurut {label}, saat ini {sortLabel}"
 
+msgid "Sort projects and workspaces"
+msgstr "Urutkan proyek dan workspace"
+
 msgid "Sort workspaces"
 msgstr "Urutkan workspace"
 

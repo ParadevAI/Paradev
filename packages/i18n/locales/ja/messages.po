@@ -16259,6 +16259,9 @@ msgstr "並び替え"
 msgid "Sort by {label}, currently {sortLabel}"
 msgstr "{label}で並べ替え、現在{sortLabel}"
 
+msgid "Sort projects and workspaces"
+msgstr "プロジェクトとワークスペースを並べ替え"
+
 msgid "Sort workspaces"
 msgstr "ワークスペースを並べ替え"
 

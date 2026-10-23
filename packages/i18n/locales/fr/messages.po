@@ -16259,6 +16259,9 @@ msgstr "Trier par"
 msgid "Sort by {label}, currently {sortLabel}"
 msgstr "Trier par {label}, actuellement {sortLabel}"
 
+msgid "Sort projects and workspaces"
+msgstr "Trier les projets et les espaces de travail"
+
 msgid "Sort workspaces"
 msgstr "Trier les espaces de travail"
 

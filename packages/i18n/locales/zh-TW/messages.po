@@ -16259,6 +16259,9 @@ msgstr "排序方式"
 msgid "Sort by {label}, currently {sortLabel}"
 msgstr "按{label}排序，目前為{sortLabel}"
 
+msgid "Sort projects and workspaces"
+msgstr "排序專案和工作區"
+
 msgid "Sort workspaces"
 msgstr "排序工作區"
 
