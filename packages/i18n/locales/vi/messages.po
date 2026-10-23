@@ -17501,6 +17501,9 @@ msgstr "Ứng dụng máy tính chạy trên macOS, kèm bản AppImage Linux th
 msgid "The device that hosts this project is unavailable."
 msgstr "Thiết bị chứa dự án này không khả dụng."
 
+msgid "The device was offline when this run started. It may have been asleep or shut down."
+msgstr "Thiết bị đang ngoại tuyến khi lần chạy này bắt đầu. Thiết bị có thể đang ngủ hoặc đã tắt."
+
 msgid "The diff is still up to date — only comments failed to load."
 msgstr "Diff vẫn là mới nhất — chỉ có bình luận không tải được."
 
@@ -17567,9 +17570,6 @@ msgstr "Host không phản hồi."
 
 msgid "The host is online. Pick it when you create a workspace."
 msgstr "Host đã trực tuyến. Hãy chọn nó khi tạo workspace."
-
-msgid "The host isn't connected to the Superset relay. If it's this device, turn on \"Allow remote access to this device via relay\" in Settings > Remote Access, then try again."
-msgstr "Host chưa kết nối tới relay của Superset. Nếu đó là thiết bị này, hãy bật \"Cho phép truy cập từ xa vào thiết bị này qua relay\" trong Cài đặt > Truy cập từ xa, rồi thử lại."
 
 msgid "The host reported a failed update."
 msgstr "Máy chủ báo cáo cập nhật thất bại."

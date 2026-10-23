@@ -17501,6 +17501,9 @@ msgstr "Desktopová aplikace běží na macOS, k tomu je experimentální AppIma
 msgid "The device that hosts this project is unavailable."
 msgstr "Zařízení, které hostuje tento projekt, není dostupné."
 
+msgid "The device was offline when this run started. It may have been asleep or shut down."
+msgstr "Zařízení bylo při spuštění tohoto běhu offline. Mohlo být v režimu spánku nebo vypnuté."
+
 msgid "The diff is still up to date — only comments failed to load."
 msgstr "Rozdíly jsou stále aktuální — nenačetly se jen komentáře."
 
@@ -17567,9 +17570,6 @@ msgstr "Host neodpověděl."
 
 msgid "The host is online. Pick it when you create a workspace."
 msgstr "Host je online. Vyberte ho při vytváření pracovního prostoru."
-
-msgid "The host isn't connected to the Superset relay. If it's this device, turn on \"Allow remote access to this device via relay\" in Settings > Remote Access, then try again."
-msgstr "Host není připojený k Superset relay. Pokud jde o toto zařízení, zapněte „Povolit vzdálený přístup k tomuto zařízení přes relay“ v Nastavení > Vzdálený přístup a zkuste to znovu."
 
 msgid "The host reported a failed update."
 msgstr "Hostitel nahlásil neúspěšnou aktualizaci."

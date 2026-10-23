@@ -17501,6 +17501,9 @@ msgstr "O app de desktop roda no macOS, com um AppImage experimental para Linux;
 msgid "The device that hosts this project is unavailable."
 msgstr "O dispositivo que hospeda este projeto está indisponível."
 
+msgid "The device was offline when this run started. It may have been asleep or shut down."
+msgstr "O dispositivo estava offline quando esta execução começou. Ele pode ter estado em repouso ou desligado."
+
 msgid "The diff is still up to date — only comments failed to load."
 msgstr "O diff continua atualizado — só os comentários não carregaram."
 
@@ -17567,9 +17570,6 @@ msgstr "O host não respondeu."
 
 msgid "The host is online. Pick it when you create a workspace."
 msgstr "O host está online. Escolha-o ao criar uma área de trabalho."
-
-msgid "The host isn't connected to the Superset relay. If it's this device, turn on \"Allow remote access to this device via relay\" in Settings > Remote Access, then try again."
-msgstr "O host não está conectado ao relay do Superset. Se for este dispositivo, ative \"Permitir acesso remoto a este dispositivo via relay\" em Configurações > Acesso remoto e tente novamente."
 
 msgid "The host reported a failed update."
 msgstr "O host relatou uma falha na atualização."

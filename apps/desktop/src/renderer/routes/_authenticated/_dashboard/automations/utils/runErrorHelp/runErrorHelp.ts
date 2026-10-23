@@ -6,7 +6,7 @@ import { i18n } from "@superset/i18n";
 const HELP: Record<AutomationRunErrorCode, MessageDescriptor> = {
 	host_offline: msg({
 		message:
-			"The host isn't connected to the Superset relay. If it's this device, turn on \"Allow remote access to this device via relay\" in Settings > Remote Access, then try again.",
+			"The device was offline when this run started. It may have been asleep or shut down.",
 	}),
 	agent_not_found: msg({
 		message:

@@ -17501,6 +17501,9 @@ msgstr "Десктопное приложение работает на macOS, �
 msgid "The device that hosts this project is unavailable."
 msgstr "Устройство, где размещён этот проект, недоступно."
 
+msgid "The device was offline when this run started. It may have been asleep or shut down."
+msgstr "Устройство было не в сети, когда начался этот запуск. Возможно, оно было в спящем режиме или выключено."
+
 msgid "The diff is still up to date — only comments failed to load."
 msgstr "Diff актуален — не загрузились только комментарии."
 
@@ -17567,9 +17570,6 @@ msgstr "Хост не ответил."
 
 msgid "The host is online. Pick it when you create a workspace."
 msgstr "Хост в сети. Выберите его при создании рабочей области."
-
-msgid "The host isn't connected to the Superset relay. If it's this device, turn on \"Allow remote access to this device via relay\" in Settings > Remote Access, then try again."
-msgstr "Хост не подключён к реле Superset. Если это текущее устройство, включите «Разрешить удалённый доступ к этому устройству через реле» в Настройки > Удалённый доступ и повторите."
 
 msgid "The host reported a failed update."
 msgstr "Хост сообщил о неудачном обновлении."

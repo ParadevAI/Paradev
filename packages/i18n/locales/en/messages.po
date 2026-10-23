@@ -17501,6 +17501,9 @@ msgstr "The desktop app runs on macOS, with an experimental Linux AppImage; Wind
 msgid "The device that hosts this project is unavailable."
 msgstr "The device that hosts this project is unavailable."
 
+msgid "The device was offline when this run started. It may have been asleep or shut down."
+msgstr "The device was offline when this run started. It may have been asleep or shut down."
+
 msgid "The diff is still up to date — only comments failed to load."
 msgstr "The diff is still up to date — only comments failed to load."
 
@@ -17567,9 +17570,6 @@ msgstr "The host hasn't answered."
 
 msgid "The host is online. Pick it when you create a workspace."
 msgstr "The host is online. Pick it when you create a workspace."
-
-msgid "The host isn't connected to the Superset relay. If it's this device, turn on \"Allow remote access to this device via relay\" in Settings > Remote Access, then try again."
-msgstr "The host isn't connected to the Superset relay. If it's this device, turn on \"Allow remote access to this device via relay\" in Settings > Remote Access, then try again."
 
 msgid "The host reported a failed update."
 msgstr "The host reported a failed update."

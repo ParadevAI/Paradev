@@ -17501,6 +17501,9 @@ msgstr "桌面應用程式支援macOS，另有實驗性的Linux AppImage；Windo
 msgid "The device that hosts this project is unavailable."
 msgstr "承載這個專案的裝置不可用。"
 
+msgid "The device was offline when this run started. It may have been asleep or shut down."
+msgstr "此次執行開始時裝置處於離線狀態。裝置可能處於睡眠或關機狀態。"
+
 msgid "The diff is still up to date — only comments failed to load."
 msgstr "差異仍是最新的，只是評論沒能載入。"
 
@@ -17567,9 +17570,6 @@ msgstr "主機未回應。"
 
 msgid "The host is online. Pick it when you create a workspace."
 msgstr "主機已上線。建立工作區時選擇它。"
-
-msgid "The host isn't connected to the Superset relay. If it's this device, turn on \"Allow remote access to this device via relay\" in Settings > Remote Access, then try again."
-msgstr "該主機沒有連線到Superset中繼。如果就是此裝置，請在「設定>遠端存取」中開啟「允許遠端存取通過中繼存取此裝置」，然後重試。"
 
 msgid "The host reported a failed update."
 msgstr "主機回報更新失敗。"

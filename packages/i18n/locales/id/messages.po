@@ -17501,6 +17501,9 @@ msgstr "Aplikasi desktopnya berjalan di macOS, dengan AppImage Linux eksperiment
 msgid "The device that hosts this project is unavailable."
 msgstr "Perangkat yang menjadi host proyek ini tidak tersedia."
 
+msgid "The device was offline when this run started. It may have been asleep or shut down."
+msgstr "Perangkat sedang offline saat run ini dimulai. Perangkat mungkin sedang tidur atau mati."
+
 msgid "The diff is still up to date — only comments failed to load."
 msgstr "Diff-nya tetap terbaru — hanya komentarnya yang gagal dimuat."
 
@@ -17567,9 +17570,6 @@ msgstr "Host tidak merespons."
 
 msgid "The host is online. Pick it when you create a workspace."
 msgstr "Host sudah online. Pilih host ini saat membuat workspace."
-
-msgid "The host isn't connected to the Superset relay. If it's this device, turn on \"Allow remote access to this device via relay\" in Settings > Remote Access, then try again."
-msgstr "Host tidak terhubung ke relay Superset. Kalau ini perangkatnya, aktifkan \"Izinkan akses jarak jauh ke perangkat ini melalui relay\" di Pengaturan > Akses Jarak Jauh, lalu coba lagi."
 
 msgid "The host reported a failed update."
 msgstr "Host melaporkan pembaruan yang gagal."
