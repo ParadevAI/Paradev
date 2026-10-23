@@ -5,11 +5,8 @@ type ZoomableContents = Pick<
 	"on" | "getZoomLevel" | "setZoomLevel" | "isDestroyed"
 >;
 
-/**
- * Chromium keys file:// zoom by the full URL, hash route included, and
- * re-reads it on resize. Carry the zoom onto each new route, and keep the
- * browser panes' own zoom, which Electron overwrites when the window's changes.
- */
+// Chromium keys file:// zoom by the full URL, hash included, and re-reads it on resize.
+// Writing it per route makes Electron push it onto <webview> guests, so restore theirs.
 export function keepZoomAcrossRoutes(
 	contents: ZoomableContents,
 	{
