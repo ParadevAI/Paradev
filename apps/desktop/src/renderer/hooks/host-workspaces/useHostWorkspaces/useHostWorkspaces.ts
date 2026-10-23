@@ -15,7 +15,9 @@ import {
 	type HostWorkspaceItem,
 	type HostWorkspaceRow,
 	isEventBusReopen,
+	isHostWorkspacesListLive,
 	loadHostWorkspacesSnapshot,
+	markHostWorkspacesListRead,
 	mergeHostWorkspaces,
 	normalizeServedWorkspaceRow,
 	saveHostWorkspacesSnapshot,
@@ -219,6 +221,7 @@ export function useHostWorkspacesSource(
 					target.machineId,
 					rows,
 				);
+				markHostWorkspacesListRead(queryClient, target);
 				return rows;
 			},
 		})),
@@ -428,11 +431,12 @@ export function useHostWorkspacesSource(
 								machineId: target.machineId,
 								isLocal: target.isLocal,
 								live:
-									target.hostUrl !== null && queries[index]?.isSuccess === true,
+									queries[index]?.isSuccess === true &&
+									isHostWorkspacesListLive(queryClient, target),
 							},
 						],
 			),
-		[targets, queries],
+		[targets, queries, queryClient],
 	);
 
 	const cache = useMemo<HostWorkspacesCacheOps>(() => {
