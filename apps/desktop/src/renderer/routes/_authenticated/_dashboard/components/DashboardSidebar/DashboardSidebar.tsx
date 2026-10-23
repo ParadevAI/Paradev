@@ -54,10 +54,7 @@ import { DashboardSidebarSessionsSection } from "./components/DashboardSidebarSe
 import { DashboardSidebarWorkspacesHeader } from "./components/DashboardSidebarWorkspacesHeader";
 import { useGettingStartedCard } from "./components/GettingStartedCard";
 import { useV2SetupScriptCard } from "./components/V2SetupScriptCard";
-import {
-	getBlockedDragProps,
-	useBlockedDragNotice,
-} from "./hooks/useBlockedDragNotice";
+import { useBlockedDragNotice } from "./hooks/useBlockedDragNotice";
 import { useDashboardSidebarData } from "./hooks/useDashboardSidebarData";
 import { useDashboardSidebarShortcuts } from "./hooks/useDashboardSidebarShortcuts";
 import { useMigrateLegacySidebarFolders } from "./hooks/useMigrateLegacySidebarFolders";
@@ -126,6 +123,7 @@ const SortableProjectWrapper = memo(function SortableProjectWrapper({
 				project={project}
 				isSidebarCollapsed={isCollapsed}
 				isDraggingProject={isDraggingProject}
+				isDragBlocked={isDragDisabled}
 				workspaceShortcutLabels={workspaceShortcutLabels}
 				onWorkspaceHover={onWorkspaceHover}
 				onToggleCollapse={onToggleCollapse}
@@ -137,6 +135,7 @@ const SortableProjectWrapper = memo(function SortableProjectWrapper({
 			project,
 			isCollapsed,
 			isDraggingProject,
+			isDragDisabled,
 			workspaceShortcutLabels,
 			onWorkspaceHover,
 			onToggleCollapse,
@@ -153,7 +152,6 @@ const SortableProjectWrapper = memo(function SortableProjectWrapper({
 				transition,
 				opacity: isDragging ? 0.5 : undefined,
 			}}
-			{...getBlockedDragProps(isDragDisabled)}
 		>
 			{section}
 		</div>
