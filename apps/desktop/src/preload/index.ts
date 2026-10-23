@@ -1,9 +1,13 @@
 import "@sentry/electron/preload";
 
-import { contextBridge, ipcRenderer, webUtils } from "electron";
+import { contextBridge, ipcRenderer, webFrame, webUtils } from "electron";
 import { exposeElectronTRPC } from "trpc-electron/main";
 
 declare const __APP_VERSION__: string;
+
+// Chromium keys file:// zoom by the full URL, hash route included, and re-reads
+// it on resize. A per-frame zoom survives route changes; main's setZoomLevel follows it.
+webFrame.setZoomLevel(webFrame.getZoomLevel());
 
 declare global {
 	interface Window {
