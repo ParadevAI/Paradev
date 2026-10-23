@@ -44,7 +44,15 @@ const VALID_TARGETS: Target[] = [
 	"linux-x64",
 	"linux-arm64",
 ];
-const NODE_VERSION = "22.13.0";
+/**
+ * Node.js runtime shipped as lib/node. Read from the repo-root `.node-version`
+ * so this, build-dist-linux-docker.sh, and build-cli.yml can't drift apart.
+ * Stay on 22.x unless NODE_ABI is bumped too.
+ */
+const NODE_VERSION = readFileSync(
+	resolve(import.meta.dir, "../../../.node-version"),
+	"utf8",
+).trim();
 
 /**
  * Runtime packages that must be shipped alongside the bundled host-service

@@ -21,7 +21,12 @@ echo "[smoke] dist=$DIST target=$TARGET"
 
 "$DIST/bin/superset" --version
 "$DIST/bin/superset" --help | head -5
-"$DIST/lib/node" --version
+# The bundled runtime must be the pinned release, so a stale runtime cached in
+# ~/.superset-build-cache can't ship unnoticed.
+EXPECTED_NODE="v$(cat "$(dirname "$0")/../../../.node-version")"
+ACTUAL_NODE="$("$DIST/lib/node" --version)"
+echo "[smoke] lib/node $ACTUAL_NODE"
+[[ "$ACTUAL_NODE" == "$EXPECTED_NODE" ]] || { echo "[smoke] lib/node is $ACTUAL_NODE, expected $EXPECTED_NODE" >&2; exit 1; }
 test -f "$DIST/lib/host-service.js" || { echo "[smoke] missing host-service.js" >&2; exit 1; }
 test -f "$DIST/lib/pty-daemon.js" || { echo "[smoke] missing pty-daemon.js" >&2; exit 1; }
 
