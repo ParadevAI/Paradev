@@ -5182,6 +5182,9 @@ msgstr "Não foi possível salvar o ambiente"
 msgid "Could not remove access"
 msgstr "Não foi possível remover o acesso"
 
+msgid "Could not remove empty folders"
+msgstr "Não foi possível remover as pastas vazias"
+
 msgid "Could not rename the session"
 msgstr "Não foi possível renomear a sessão"
 

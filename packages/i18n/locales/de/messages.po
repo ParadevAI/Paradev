@@ -5182,6 +5182,9 @@ msgstr "Umgebung konnte nicht gespeichert werden"
 msgid "Could not remove access"
 msgstr "Zugriff konnte nicht entfernt werden"
 
+msgid "Could not remove empty folders"
+msgstr "Leere Ordner konnten nicht entfernt werden"
+
 msgid "Could not rename the session"
 msgstr "Sitzung konnte nicht umbenannt werden"
 

@@ -5182,6 +5182,9 @@ msgstr "Impossible d'enregistrer l'environnement"
 msgid "Could not remove access"
 msgstr "Impossible de retirer l’accès"
 
+msgid "Could not remove empty folders"
+msgstr "Impossible de supprimer les dossiers vides"
+
 msgid "Could not rename the session"
 msgstr "Impossible de renommer la session"
 

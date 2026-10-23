@@ -5182,6 +5182,9 @@ msgstr "환경을 저장할 수 없습니다"
 msgid "Could not remove access"
 msgstr "접근 권한을 제거할 수 없습니다"
 
+msgid "Could not remove empty folders"
+msgstr "빈 폴더를 제거하지 못했습니다"
+
 msgid "Could not rename the session"
 msgstr "세션 이름을 변경할 수 없습니다"
 

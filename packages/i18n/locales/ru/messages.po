@@ -5182,6 +5182,9 @@ msgstr "Не удалось сохранить окружение"
 msgid "Could not remove access"
 msgstr "Не удалось закрыть доступ"
 
+msgid "Could not remove empty folders"
+msgstr "Не удалось удалить пустые папки"
+
 msgid "Could not rename the session"
 msgstr "Не удалось переименовать сессию"
 

@@ -5182,6 +5182,9 @@ msgstr "Tidak dapat menyimpan environment"
 msgid "Could not remove access"
 msgstr "Tidak bisa menghapus akses"
 
+msgid "Could not remove empty folders"
+msgstr "Tidak dapat menghapus folder kosong"
+
 msgid "Could not rename the session"
 msgstr "Tidak dapat mengganti nama sesi"
 

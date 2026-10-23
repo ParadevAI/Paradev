@@ -5182,6 +5182,9 @@ msgstr "Không thể lưu environment"
 msgid "Could not remove access"
 msgstr "Không thể gỡ quyền truy cập"
 
+msgid "Could not remove empty folders"
+msgstr "Không thể xóa các thư mục trống"
+
 msgid "Could not rename the session"
 msgstr "Không thể đổi tên phiên"
 

@@ -5182,6 +5182,9 @@ msgstr "Prostředí se nepodařilo uložit"
 msgid "Could not remove access"
 msgstr "Přístup se nepodařilo odebrat"
 
+msgid "Could not remove empty folders"
+msgstr "Prázdné složky se nepodařilo odebrat"
+
 msgid "Could not rename the session"
 msgstr "Relaci se nepodařilo přejmenovat"
 

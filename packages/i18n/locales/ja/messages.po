@@ -5182,6 +5182,9 @@ msgstr "環境を保存できませんでした"
 msgid "Could not remove access"
 msgstr "アクセスを削除できませんでした"
 
+msgid "Could not remove empty folders"
+msgstr "空のフォルダを削除できませんでした"
+
 msgid "Could not rename the session"
 msgstr "セッションの名前を変更できませんでした"
 

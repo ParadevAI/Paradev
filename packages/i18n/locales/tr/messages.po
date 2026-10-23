@@ -1191,7 +1191,7 @@ msgid "{skipped, plural, one {Skipped # folder: it changed while it was being re
 msgstr "{skipped, plural, one {# klasör atlandı: kaldırılırken değişti.} other {# klasör atlandı: kaldırılırken değişti.}}"
 
 msgid "{skipped, plural, one {Skipped # folder: not every host that keeps its settings is known yet.} other {Skipped # folders: not every host that keeps their settings is known yet.}}"
-msgstr "{skipped, plural, one {# klasör atlandı: ayarlarını tutan tüm hostlar henüz bilinmiyor.} other {# klasör atlandı: ayarlarını tutan tüm hostlar henüz bilinmiyor.}}"
+msgstr "{skipped, plural, one {# klasör atlandı: ayarlarını tutan tüm host'lar henüz bilinmiyor.} other {# klasör atlandı: ayarlarını tutan tüm host'lar henüz bilinmiyor.}}"
 
 msgid "{skipped, plural, one {Skipped # folder: this window switched organization.} other {Skipped # folders: this window switched organization.}}"
 msgstr "{skipped, plural, one {# klasör atlandı: bu pencere kuruluş değiştirdi.} other {# klasör atlandı: bu pencere kuruluş değiştirdi.}}"
@@ -5181,6 +5181,9 @@ msgstr "Ortam kaydedilemedi"
 
 msgid "Could not remove access"
 msgstr "Erişim kaldırılamadı"
+
+msgid "Could not remove empty folders"
+msgstr "Boş klasörler kaldırılamadı"
 
 msgid "Could not rename the session"
 msgstr "Oturum yeniden adlandırılamadı"

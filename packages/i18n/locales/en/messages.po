@@ -5182,6 +5182,9 @@ msgstr "Could not record environment"
 msgid "Could not remove access"
 msgstr "Could not remove access"
 
+msgid "Could not remove empty folders"
+msgstr "Could not remove empty folders"
+
 msgid "Could not rename the session"
 msgstr "Could not rename the session"
 

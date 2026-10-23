@@ -1,5 +1,6 @@
 import { plural } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
+import { errorMessage } from "@superset/i18n/errors";
 import { DropdownMenuItem } from "@superset/ui/dropdown-menu";
 import { toast } from "@superset/ui/sonner";
 import { useState } from "react";
@@ -110,6 +111,9 @@ export function RemoveEmptyFoldersMenuItem() {
 				void removeEmptyFolders()
 					.then(report, (error: unknown) => {
 						console.error("[sidebar] remove empty folders failed:", error);
+						toast.error(t({ message: "Could not remove empty folders" }), {
+							description: errorMessage(error),
+						});
 					})
 					.finally(() => setIsRemoving(false));
 			}}
