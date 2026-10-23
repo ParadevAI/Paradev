@@ -3487,9 +3487,6 @@ msgstr "Einladung zurückziehen"
 msgid "Cancel plan"
 msgstr "Tarif kündigen"
 
-msgid "Cancel reply"
-msgstr "Antwort abbrechen"
-
 msgid "Canceled"
 msgstr "Abgebrochen"
 
@@ -14223,9 +14220,6 @@ msgstr "Antworten"
 
 msgid "Reply to thread…"
 msgstr "Auf den Thread antworten…"
-
-msgid "Replying to {replyingTo}"
-msgstr "Antwort an {replyingTo}"
 
 msgid "repo"
 msgstr "Repo"

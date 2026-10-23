@@ -3487,9 +3487,6 @@ msgstr "Отменить приглашение"
 msgid "Cancel plan"
 msgstr "Отменить тариф"
 
-msgid "Cancel reply"
-msgstr "Отменить ответ"
-
 msgid "Canceled"
 msgstr "Отменена"
 
@@ -14223,9 +14220,6 @@ msgstr "Ответить"
 
 msgid "Reply to thread…"
 msgstr "Ответить в ветке…"
-
-msgid "Replying to {replyingTo}"
-msgstr "Ответ для {replyingTo}"
 
 msgid "repo"
 msgstr "репозиторий"

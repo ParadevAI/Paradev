@@ -3487,9 +3487,6 @@ msgstr "Batalkan undangan"
 msgid "Cancel plan"
 msgstr "Batalkan paket"
 
-msgid "Cancel reply"
-msgstr "Batalkan balasan"
-
 msgid "Canceled"
 msgstr "Dibatalkan"
 
@@ -14223,9 +14220,6 @@ msgstr "Balas"
 
 msgid "Reply to thread…"
 msgstr "Balas thread…"
-
-msgid "Replying to {replyingTo}"
-msgstr "Membalas {replyingTo}"
 
 msgid "repo"
 msgstr "repo"
