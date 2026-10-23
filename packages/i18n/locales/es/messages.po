@@ -1190,6 +1190,9 @@ msgstr "{skipped, plural, one {Se omitió # carpeta: un host o la nube aún no h
 msgid "{skipped, plural, one {Skipped # folder: not every host that keeps its settings is known yet.} other {Skipped # folders: not every host that keeps their settings is known yet.}}"
 msgstr "{skipped, plural, one {Se omitió # carpeta: aún no se conocen todos los hosts que guardan su configuración.} other {Se omitieron # carpetas: aún no se conocen todos los hosts que guardan su configuración.}}"
 
+msgid "{skipped, plural, one {Skipped # folder: this window switched organization.} other {Skipped # folders: this window switched organization.}}"
+msgstr "{skipped, plural, one {Se omitió # carpeta: esta ventana cambió de organización.} other {Se omitieron # carpetas: esta ventana cambió de organización.}}"
+
 msgid "{starCount} stars and counting"
 msgstr "{starCount} estrellas y subiendo"
 

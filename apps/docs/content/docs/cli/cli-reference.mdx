@@ -1038,7 +1038,9 @@ Linux/Windows substitute your platform's URL opener (`xdg-open`, `start`) for
 	output={`{
   dryRun: boolean;
   removed: Folder[];   // or, with --dry-run, the folders that would go
-  skipped: (Folder & { reason: "unanswered" | "settingHostsUnknown" })[];
+  skipped: (Folder & {
+    reason: "unanswered" | "settingHostsUnknown" | "organizationChanged";
+  })[];
   failed: (Folder & { error: string })[];
 }
 // Folder: { projectId: string | null; projectName: string | null; tag: string; name: string }`}
@@ -1049,7 +1051,8 @@ carries it; what can stay behind is its saved name, color and order. This
 removes those, and changes no workspace. A folder is skipped while a host that
 serves its project, or the cloud workspace list, has not answered the desktop
 app (`unanswered`), or while the desktop app does not yet know every host that
-keeps the folder's settings (`settingHostsUnknown`). Run it on the machine that runs the desktop app, with a window open on
+keeps the folder's settings (`settingHostsUnknown`). If the window switches
+organization during the run, the rest is skipped (`organizationChanged`). Run it on the machine that runs the desktop app, with a window open on
 the same organization.
 
 ```bash

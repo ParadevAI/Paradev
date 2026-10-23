@@ -1190,6 +1190,9 @@ msgstr "{skipped, plural, one {Пропущена # папка: хост или 
 msgid "{skipped, plural, one {Skipped # folder: not every host that keeps its settings is known yet.} other {Skipped # folders: not every host that keeps their settings is known yet.}}"
 msgstr "{skipped, plural, one {Пропущена # папка: известны ещё не все хосты, где хранятся её настройки.} few {Пропущены # папки: известны ещё не все хосты, где хранятся их настройки.} many {Пропущено # папок: известны ещё не все хосты, где хранятся их настройки.} other {Пропущено # папки: известны ещё не все хосты, где хранятся их настройки.}}"
 
+msgid "{skipped, plural, one {Skipped # folder: this window switched organization.} other {Skipped # folders: this window switched organization.}}"
+msgstr "{skipped, plural, one {Пропущена # папка: в этом окне сменилась организация.} few {Пропущены # папки: в этом окне сменилась организация.} many {Пропущено # папок: в этом окне сменилась организация.} other {Пропущено # папки: в этом окне сменилась организация.}}"
+
 msgid "{starCount} stars and counting"
 msgstr "{starCount} звёзд и продолжаем"
 

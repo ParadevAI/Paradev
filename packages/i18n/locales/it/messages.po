@@ -1190,6 +1190,9 @@ msgstr "{skipped, plural, one {# cartella saltata: un host o il cloud non ha anc
 msgid "{skipped, plural, one {Skipped # folder: not every host that keeps its settings is known yet.} other {Skipped # folders: not every host that keeps their settings is known yet.}}"
 msgstr "{skipped, plural, one {# cartella saltata: non tutti gli host che ne conservano le impostazioni sono ancora noti.} other {# cartelle saltate: non tutti gli host che ne conservano le impostazioni sono ancora noti.}}"
 
+msgid "{skipped, plural, one {Skipped # folder: this window switched organization.} other {Skipped # folders: this window switched organization.}}"
+msgstr "{skipped, plural, one {# cartella saltata: questa finestra ha cambiato organizzazione.} other {# cartelle saltate: questa finestra ha cambiato organizzazione.}}"
+
 msgid "{starCount} stars and counting"
 msgstr "{starCount} star e continuano a crescere"
 

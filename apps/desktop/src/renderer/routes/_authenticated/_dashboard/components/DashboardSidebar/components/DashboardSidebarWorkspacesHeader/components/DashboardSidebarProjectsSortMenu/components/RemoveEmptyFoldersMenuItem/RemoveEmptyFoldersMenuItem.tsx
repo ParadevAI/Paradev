@@ -27,6 +27,16 @@ export function RemoveEmptyFoldersMenuItem() {
 		const skipped = skippedFolders.length;
 		if (skipped === 0) return undefined;
 		if (
+			skippedFolders.every(({ reason }) => reason === "organizationChanged")
+		) {
+			return t({
+				message: plural(skipped, {
+					one: "Skipped # folder: this window switched organization.",
+					other: "Skipped # folders: this window switched organization.",
+				}),
+			});
+		}
+		if (
 			skippedFolders.every(({ reason }) => reason === "settingHostsUnknown")
 		) {
 			return t({

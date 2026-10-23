@@ -1190,6 +1190,9 @@ msgstr "{skipped, plural, one {Přeskočena # složka: host nebo cloud zatím ne
 msgid "{skipped, plural, one {Skipped # folder: not every host that keeps its settings is known yet.} other {Skipped # folders: not every host that keeps their settings is known yet.}}"
 msgstr "{skipped, plural, one {Přeskočena # složka: zatím nejsou známy všechny hosty, které uchovávají její nastavení.} few {Přeskočeny # složky: zatím nejsou známy všechny hosty, které uchovávají jejich nastavení.} many {Přeskočeno # složky: zatím nejsou známy všechny hosty, které uchovávají jejich nastavení.} other {Přeskočeno # složek: zatím nejsou známy všechny hosty, které uchovávají jejich nastavení.}}"
 
+msgid "{skipped, plural, one {Skipped # folder: this window switched organization.} other {Skipped # folders: this window switched organization.}}"
+msgstr "{skipped, plural, one {Přeskočena # složka: toto okno přepnulo organizaci.} few {Přeskočeny # složky: toto okno přepnulo organizaci.} many {Přeskočeno # složky: toto okno přepnulo organizaci.} other {Přeskočeno # složek: toto okno přepnulo organizaci.}}"
+
 msgid "{starCount} stars and counting"
 msgstr "{starCount} hvězd a přibývá"
 

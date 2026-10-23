@@ -1,4 +1,3 @@
-import { errorMessage } from "@superset/i18n/errors";
 import { isMissingProcedureError } from "@superset/shared/missing-procedure-error";
 import {
 	normalizeWorkspaceTag,
@@ -8,6 +7,7 @@ import { useLiveQuery } from "@tanstack/react-db";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo, useRef } from "react";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
+import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
@@ -20,49 +20,32 @@ import {
 	laneProjectIdForScope,
 	type OrphanedTagFolder,
 	type UnverifiedTagFolder,
-	type UnverifiedTagFolderReason,
 	useTagFolderContext,
 } from "renderer/routes/_authenticated/utils/workspaceTagFolders";
+import type {
+	FolderGroup,
+	RemoveEmptySidebarFoldersOptions,
+	RemoveEmptySidebarFoldersResult,
+	SkippedSidebarFolder,
+} from "./types";
 import { refreshPruneSources } from "./utils/refreshPruneSources";
+import {
+	type FolderPruneSnapshot,
+	runFolderPrune,
+} from "./utils/runFolderPrune";
+
+export type {
+	EmptySidebarFolder,
+	FailedSidebarFolder,
+	RemoveEmptySidebarFoldersOptions,
+	RemoveEmptySidebarFoldersResult,
+	SidebarFolderSkipReason,
+	SkippedSidebarFolder,
+} from "./types";
 
 const SOURCE_REFETCH_TIMEOUT_MS = 5_000;
 const SOURCE_SETTLE_MS = 1_500;
 const SOURCE_POLL_MS = 50;
-
-export interface EmptySidebarFolder {
-	scope: string;
-	/** Null for the Sessions lane. */
-	projectId: string | null;
-	projectName: string | null;
-	tag: string;
-	name: string;
-}
-
-export interface FailedSidebarFolder extends EmptySidebarFolder {
-	error: string;
-}
-
-export interface SkippedSidebarFolder extends EmptySidebarFolder {
-	reason: UnverifiedTagFolderReason;
-}
-
-export interface RemoveEmptySidebarFoldersResult {
-	/** Removed, or on a dry run the folders that would be. */
-	removed: EmptySidebarFolder[];
-	/** Looked empty, but could not be removed safely yet; `reason` says why. */
-	skipped: SkippedSidebarFolder[];
-	failed: FailedSidebarFolder[];
-}
-
-export interface RemoveEmptySidebarFoldersOptions {
-	projectId?: string;
-	dryRun?: boolean;
-}
-
-interface FolderGroup {
-	folder: EmptySidebarFolder;
-	sectionIds: string[];
-}
 
 function hasErrorCode(error: unknown, code: string): boolean {
 	return (error as { data?: { code?: unknown } } | null)?.data?.code === code;
@@ -264,104 +247,61 @@ export function useEmptySidebarFolders() {
 		[activeHostUrl, cache, hostProjects],
 	);
 
+	const organizationId = useActiveOrganizationId();
 	const cloudUtils = cloudTrpc.useUtils();
 	const queryClient = useQueryClient();
 	// A prune refetches stale sources and decides from the render that
 	// carries their data, so it reads everything through this ref.
-	const latestRef = useRef({
-		findInput,
-		cache,
-		groupFolders,
-		resolveSettingHostUrls,
-		toSkipped,
-	});
-	latestRef.current = {
+	const latest: FolderPruneSnapshot & { cache: typeof cache } = {
+		organizationId,
 		findInput,
 		cache,
 		groupFolders,
 		resolveSettingHostUrls,
 		toSkipped,
 	};
+	const latestRef = useRef(latest);
+	latestRef.current = latest;
 
 	const removeEmptyFolders = useCallback(
-		async ({
+		({
 			projectId,
 			dryRun = false,
-		}: RemoveEmptySidebarFoldersOptions = {}): Promise<RemoveEmptySidebarFoldersResult> => {
-			const input = await refreshPruneSources({
-				current: latestRef.current.findInput,
-				readLatest: () => latestRef.current.findInput,
-				refetch: {
-					roster: () => cloudUtils.host.roster.refetch(),
-					cloud: () => cloudUtils.cloudWorkspace.list.refetch(),
-					hosts: () =>
-						Promise.all([
-							latestRef.current.cache.refetchAll(),
-							queryClient.refetchQueries({
-								queryKey: ["host-service", "projects", "list"],
-							}),
-						]),
-				},
-				timeoutMs: SOURCE_REFETCH_TIMEOUT_MS,
-				settleMs: SOURCE_SETTLE_MS,
-				pollMs: SOURCE_POLL_MS,
-			});
-			const { groupFolders, resolveSettingHostUrls, toSkipped } =
-				latestRef.current;
-			const found = findOrphanedTagFolders({ ...input, scope: projectId });
-			const skipped = toSkipped(found.unverified);
-			const candidates: (FolderGroup & { urls: string[] })[] = [];
-			for (const group of groupFolders(found.orphaned)) {
-				const urls = resolveSettingHostUrls(group.folder.scope);
-				if (urls) {
-					candidates.push({ ...group, urls });
-				} else {
-					skipped.push({ ...group.folder, reason: "settingHostsUnknown" });
-				}
-			}
-			if (dryRun) {
-				return {
-					removed: candidates.map(({ folder }) => folder),
-					skipped,
-					failed: [],
-				};
-			}
-			const removed: EmptySidebarFolder[] = [];
-			const failed: FailedSidebarFolder[] = [];
-			for (const { folder, sectionIds, urls } of candidates) {
-				try {
-					await Promise.all(
-						urls.map((url) =>
-							deleteHostTagSetting(url, folder.scope, folder.tag),
-						),
-					);
-				} catch (error) {
-					failed.push({ ...folder, error: errorMessage(error) });
-					continue;
-				}
-				const latest = findOrphanedTagFolders({
-					...latestRef.current.findInput,
-					scope: folder.scope,
-				});
-				const nowUnverified = latest.unverified.find(
-					(current) => current.tag === folder.tag,
-				);
-				if (nowUnverified) {
-					skipped.push({ ...folder, reason: nowUnverified.reason });
-					continue;
-				}
-				if (!latest.orphaned.some((current) => current.tag === folder.tag)) {
-					continue;
-				}
-				for (const sectionId of sectionIds) {
-					if (collections.v2SidebarSections.get(sectionId)) {
-						collections.v2SidebarSections.delete(sectionId);
+		}: RemoveEmptySidebarFoldersOptions = {}): Promise<RemoveEmptySidebarFoldersResult> =>
+			runFolderPrune({
+				projectId,
+				dryRun,
+				readLatest: () => latestRef.current,
+				refresh: () =>
+					refreshPruneSources({
+						current: latestRef.current.findInput,
+						readLatest: () => latestRef.current.findInput,
+						refetch: {
+							roster: () => cloudUtils.host.roster.refetch(),
+							cloud: () => cloudUtils.cloudWorkspace.list.refetch(),
+							hosts: () =>
+								Promise.all([
+									latestRef.current.cache.refetchAll(),
+									queryClient.refetchQueries({
+										queryKey: ["host-service", "projects", "list"],
+									}),
+								]),
+						},
+						timeoutMs: SOURCE_REFETCH_TIMEOUT_MS,
+						settleMs: SOURCE_SETTLE_MS,
+						pollMs: SOURCE_POLL_MS,
+					}),
+				deleteHostSetting: deleteHostTagSetting,
+				// These collections belong to the organization this callback was
+				// made for, even after the window switches.
+				deleteRows: (sectionIds) => {
+					for (const sectionId of sectionIds) {
+						if (collections.v2SidebarSections.get(sectionId)) {
+							collections.v2SidebarSections.delete(sectionId);
+						}
 					}
-				}
-				removed.push(folder);
-			}
-			return { removed, skipped, failed };
-		},
+				},
+			}),
 		[cloudUtils, collections, queryClient],
 	);
 
