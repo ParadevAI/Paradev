@@ -15,7 +15,9 @@ import {
 	type HostWorkspaceItem,
 	type HostWorkspaceRow,
 	isEventBusReopen,
+	isHostWorkspacesListLive,
 	loadHostWorkspacesSnapshot,
+	markHostWorkspacesListRead,
 	mergeHostWorkspaces,
 	normalizeServedWorkspaceRow,
 	saveHostWorkspacesSnapshot,
@@ -211,6 +213,7 @@ export function useHostWorkspacesSource(
 					target.machineId,
 					rows,
 				);
+				markHostWorkspacesListRead(queryClient, target);
 				return rows;
 			},
 		})),
@@ -414,9 +417,14 @@ export function useHostWorkspacesSource(
 		knownHostsSettled &&
 		sandboxesReady &&
 		targets.length > 0 &&
-		queries.every(
-			(query, index) => targets[index]?.hostUrl != null && query.isSuccess,
-		);
+		queries.every((query, index) => {
+			const target = targets[index];
+			return (
+				target !== undefined &&
+				query.isSuccess &&
+				isHostWorkspacesListLive(queryClient, target)
+			);
+		});
 
 	const cache = useMemo<HostWorkspacesCacheOps>(() => {
 		const targetFor = (hostId: string) =>
