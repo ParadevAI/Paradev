@@ -4,8 +4,10 @@ import { useFeatureFlagEnabled } from "posthog-js/react";
 import { useMemo } from "react";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useArchivingCloudWorkspaceIds } from "renderer/hooks/useArchivingCloudWorkspaceIds";
+import { usePostHogFlagsSettled } from "renderer/hooks/usePostHogFlagsSettled";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { isFromThisWindow } from "renderer/lib/query-freshness";
+import { isCloudWorkspaceListLive } from "./useCloudWorkspaces.utils";
 
 export type CloudWorkspaceRow = RouterOutputs["cloudWorkspace"]["list"][number];
 
@@ -26,7 +28,8 @@ export interface CloudWorkspacesValue {
 	isLoading: boolean;
 	/**
 	 * True when the list is known to be complete: the server answered in this
-	 * window, or the organization has no cloud workspaces to list.
+	 * window, or cloud workspaces do not apply (flag off, or flags that will
+	 * never load). False while flags are still loading.
 	 */
 	isLive: boolean;
 }
@@ -44,6 +47,7 @@ export interface CloudWorkspacesValue {
  */
 export function useCloudWorkspaces(): CloudWorkspacesValue {
 	const flagEnabled = useFeatureFlagEnabled(FEATURE_FLAGS.CLOUD_WORKSPACES);
+	const flagsSettled = usePostHogFlagsSettled();
 	const organizationId = useActiveOrganizationId();
 	const enabled = Boolean(flagEnabled && organizationId);
 
@@ -77,8 +81,11 @@ export function useCloudWorkspaces(): CloudWorkspacesValue {
 		organizationId,
 		isFresh: query.isSuccess && !query.isStale,
 		isLoading: query.isLoading,
-		isLive:
-			flagEnabled === false ||
-			(enabled && query.isSuccess && isFromThisWindow(query.dataUpdatedAt)),
+		isLive: isCloudWorkspaceListLive({
+			flagEnabled,
+			flagsSettled,
+			queryAnsweredInThisWindow:
+				enabled && query.isSuccess && isFromThisWindow(query.dataUpdatedAt),
+		}),
 	};
 }
