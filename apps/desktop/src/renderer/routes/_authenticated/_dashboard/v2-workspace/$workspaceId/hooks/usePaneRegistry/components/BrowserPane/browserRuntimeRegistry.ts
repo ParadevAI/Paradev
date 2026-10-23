@@ -695,6 +695,10 @@ export class BrowserRuntimeRegistryImpl {
 		if (entry?.webview.canGoForward()) entry.webview.goForward();
 	}
 
+	focus(paneId: string): void {
+		this.entries.get(paneId)?.webview.focus();
+	}
+
 	reload(paneId: string): void {
 		const entry = this.entries.get(paneId);
 		entry?.webview.reload();

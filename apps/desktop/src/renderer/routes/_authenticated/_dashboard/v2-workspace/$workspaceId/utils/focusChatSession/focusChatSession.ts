@@ -39,8 +39,7 @@ export function focusChatSession({
 				);
 			});
 			if (pane) {
-				paneStore.getState().setActiveTab(tab.id);
-				paneStore.getState().setActivePane({ tabId: tab.id, paneId: pane.id });
+				paneStore.getState().focusPane(pane.id);
 				return "focused";
 			}
 		}

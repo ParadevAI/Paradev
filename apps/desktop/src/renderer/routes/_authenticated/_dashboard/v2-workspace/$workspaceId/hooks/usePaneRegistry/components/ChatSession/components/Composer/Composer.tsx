@@ -13,6 +13,7 @@ import type {
 	PromptInputHandle,
 	PromptInputSubmitPayload,
 } from "@superset/chat-ui/PromptInput";
+import { usePaneFocus } from "@superset/panes";
 import { toast } from "@superset/ui/sonner";
 import { cn } from "@superset/ui/utils";
 import { workspaceTrpc } from "@superset/workspace-client";
@@ -204,6 +205,7 @@ export const Composer = memo(function Composer({
 			}
 		};
 	}, [draftKey]);
+	usePaneFocus(focusInput);
 	useHotkey("FOCUS_CHAT_INPUT", () => promptInputRef.current?.focus(), {
 		enabled: Boolean(isActive),
 	});

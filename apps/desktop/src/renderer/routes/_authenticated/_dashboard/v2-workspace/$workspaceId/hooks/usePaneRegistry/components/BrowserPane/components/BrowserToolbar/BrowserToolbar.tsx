@@ -1,4 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import { usePaneFocus } from "@superset/panes";
 import {
 	useCallback,
 	useEffect,
@@ -82,6 +83,14 @@ export function BrowserToolbar({
 		autocomplete.open();
 		autocomplete.updateQuery(url);
 	}, [url, autocomplete]);
+
+	usePaneFocus(() => {
+		if (displayUrl(browserRuntimeRegistry.getState(paneId).currentUrl)) {
+			browserRuntimeRegistry.focus(paneId);
+		} else {
+			enterEditMode();
+		}
+	});
 
 	const exitEditMode = useCallback(() => {
 		setIsEditing(false);
