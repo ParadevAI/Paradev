@@ -6,13 +6,30 @@ import { paneLayoutUnavailableReason } from "../../panes/shared";
 
 interface PaneRemoval {
 	removedPaneIds: string[];
+	skippedPanes: Array<{ paneId: string; reason: string }>;
 	failedPanes: Array<{ paneId: string; error: string }>;
+	closedOtherTerminalPanes: Array<{
+		paneId: string;
+		terminalId: string | null;
+	}>;
 	paneRemovalSkippedReason: string | null;
+}
+
+function errorMessage(error: unknown): string {
+	return error instanceof Error ? error.message : String(error);
+}
+
+function isConflict(error: unknown): boolean {
+	return (
+		error instanceof Error &&
+		(error as { data?: { code?: string } }).data?.code === "CONFLICT"
+	);
 }
 
 /**
  * Closes every desktop pane showing the terminal. Each close keeps the
  * terminal running; the caller ends it once afterwards, even if a close fails.
+ * A pane switched to another terminal since the list is left open.
  */
 async function removeTerminalPanes(
 	client: HostServiceClient,
@@ -21,7 +38,9 @@ async function removeTerminalPanes(
 ): Promise<PaneRemoval> {
 	const removal: PaneRemoval = {
 		removedPaneIds: [],
+		skippedPanes: [],
 		failedPanes: [],
+		closedOtherTerminalPanes: [],
 		paneRemovalSkippedReason: null,
 	};
 	let paneIds: string[];
@@ -38,17 +57,27 @@ async function removeTerminalPanes(
 	}
 	for (const paneId of paneIds) {
 		try {
-			await client.panes.close.mutate({
+			const closed = await client.panes.close.mutate({
 				workspaceId,
 				paneId,
 				keepTerminal: true,
+				expectedTerminalId: terminalId,
 			});
+			// Hosts without `expectedTerminalId` ignore it and close anyway.
+			if (closed.terminalId !== undefined && closed.terminalId !== terminalId) {
+				removal.closedOtherTerminalPanes.push({
+					paneId,
+					terminalId: closed.terminalId,
+				});
+				continue;
+			}
 			removal.removedPaneIds.push(paneId);
 		} catch (error) {
-			removal.failedPanes.push({
-				paneId,
-				error: error instanceof Error ? error.message : String(error),
-			});
+			if (isConflict(error)) {
+				removal.skippedPanes.push({ paneId, reason: errorMessage(error) });
+				continue;
+			}
+			removal.failedPanes.push({ paneId, error: errorMessage(error) });
 		}
 	}
 	return removal;
@@ -61,11 +90,26 @@ function describeRemoval(terminalId: string, removal: PaneRemoval): string {
 	} else if (removal.removedPaneIds.length > 0) {
 		const noun = removal.removedPaneIds.length === 1 ? "pane" : "panes";
 		lines[0] += ` and removed ${noun} ${removal.removedPaneIds.join(", ")}`;
-	} else if (removal.failedPanes.length === 0) {
+	} else if (
+		removal.failedPanes.length === 0 &&
+		removal.skippedPanes.length === 0 &&
+		removal.closedOtherTerminalPanes.length === 0
+	) {
 		lines[0] += "; no pane showed it";
+	}
+	for (const { paneId, reason } of removal.skippedPanes) {
+		lines.push(`Left pane ${paneId} open: ${reason}`);
 	}
 	for (const { paneId, error } of removal.failedPanes) {
 		lines.push(`Warning: could not close pane ${paneId}: ${error}`);
+	}
+	for (const pane of removal.closedOtherTerminalPanes) {
+		const closed = `Warning: closed pane ${pane.paneId}`;
+		lines.push(
+			pane.terminalId
+				? `${closed} while it showed terminal ${pane.terminalId}, not ${terminalId} (the host is too old to check first); ${pane.terminalId} keeps running in the background`
+				: `${closed} after it stopped showing ${terminalId} (the host is too old to check first)`,
+		);
 	}
 	return lines.join("\n");
 }
