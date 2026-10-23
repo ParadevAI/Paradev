@@ -173,6 +173,42 @@ Override one key while extending the other:
 
 The local config merges on top of whichever base config wins the [priority order](#priority-order). If a `config.local.json` exists in both the worktree and main repo, the worktree's local config takes priority.
 
+## Optional local code tools
+
+For agents working in Git worktrees, [Sem](https://github.com/Ataraxy-Labs/sem)
+provides code lookup over MCP and [Weave](https://github.com/Ataraxy-Labs/weave)
+provides an optional Git merge driver. Install the tools on the machine that
+hosts the workspace before using them. Neither is a Superset dependency.
+
+To enable the merge driver without changing your team's setup commands, add
+this to `.superset/config.local.json`:
+
+```json
+{
+  "setup": {
+    "after": ["weave setup --local"]
+  }
+}
+```
+
+Weave and `weave-driver` must be on the setup shell's PATH. `--local` writes
+Git's local merge attributes rather than `.gitattributes`. Git configuration
+and local attributes are shared across linked worktrees, so this is a
+repository-wide opt-in, not a workspace sandbox. Keep normal diff review and
+tests: resolving a conflict does not prove the merged program is correct.
+
+For Sem, configure the agent's own stdio MCP client to run `sem mcp` and set
+`SEM_REPO` to the absolute path of **that workspace's checkout**. Do not point
+every agent at the root checkout: each workspace has different source state.
+Follow your agent client's MCP setup instructions; Superset's lifecycle JSON
+does not itself register MCP tools. Sem may write its index, and its full MCP
+server includes validation tools that execute commands. Use trusted checkouts
+and the agent's tool approval controls.
+
+If an agent needs setup to finish first, enable **Wait for workspace setup
+before starting agents** as described above. These commands do not commit,
+merge, publish, or delete a workspace.
+
 ## Force Delete
 
 If teardown scripts fail during workspace deletion, you can force-delete to skip the failed teardown and continue cleanup.
