@@ -43,7 +43,7 @@ const empty = makeProject({ id: "p-empty", name: "Empty" });
 const projects = [withEmptyFolder, withRow, empty, withFolderMember];
 const ready = {
 	pinnedWorkspaces: [],
-	pendingProjectIds: [],
+	unsettledProjectIds: [],
 	isReady: true,
 };
 
@@ -76,10 +76,10 @@ describe("filterEmptyDashboardSidebarProjects", () => {
 		]);
 	});
 
-	it("keeps a project that a workspace is about to be placed in", () => {
+	it("keeps a project that may hold a workspace not shown yet", () => {
 		const result = filterEmptyDashboardSidebarProjects(projects, {
 			...ready,
-			pendingProjectIds: ["p-empty-folder"],
+			unsettledProjectIds: ["p-empty-folder"],
 		});
 		expect(result.projects.map((project) => project.id)).toEqual([
 			"p-empty-folder",

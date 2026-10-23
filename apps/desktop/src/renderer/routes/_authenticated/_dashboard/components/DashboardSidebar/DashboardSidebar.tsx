@@ -178,7 +178,7 @@ export const DashboardSidebar = memo(function DashboardSidebar({
 		hiddenProjects,
 		pinnedWorkspaces,
 		isPlacementReady,
-		pendingPlacementProjectIds,
+		unsettledProjectIds,
 		sessionWorkspaces,
 		sessionChildren,
 		githubStatus,
@@ -263,7 +263,7 @@ export const DashboardSidebar = memo(function DashboardSidebar({
 				hideEmptyProjects
 					? filterEmptyDashboardSidebarProjects(sortedGroups, {
 							pinnedWorkspaces,
-							pendingProjectIds: pendingPlacementProjectIds,
+							unsettledProjectIds: unsettledProjectIds,
 							isReady: isPlacementReady,
 						})
 					: { projects: sortedGroups, hiddenCount: 0 },
@@ -271,7 +271,7 @@ export const DashboardSidebar = memo(function DashboardSidebar({
 				hideEmptyProjects,
 				sortedGroups,
 				pinnedWorkspaces,
-				pendingPlacementProjectIds,
+				unsettledProjectIds,
 				isPlacementReady,
 			],
 		);
