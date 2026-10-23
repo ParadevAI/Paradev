@@ -14,7 +14,10 @@ export interface RefreshPruneSourcesOptions {
 	readLatest: () => FindOrphanedTagFoldersInput;
 	refetch: PruneSourceRefetchers;
 	timeoutMs: number;
-	/** How long to wait, after the refetches, for a render that carries their data. */
+	/**
+	 * How long to wait, after the refetches, for a render that carries their
+	 * data. A host that stays offline uses all of it.
+	 */
 	settleMs: number;
 	pollMs: number;
 }
@@ -71,7 +74,10 @@ export async function refreshPruneSources({
 	for (;;) {
 		const latest = readLatest();
 		const caughtUp =
-			(!needsRoster || latest.rosterLive) && (!needsCloud || latest.cloudLive);
+			(!needsRoster || latest.rosterLive) &&
+			(!needsCloud || latest.cloudLive) &&
+			(!needsHosts ||
+				latest.hostReads.every((read) => read.live && read.projectsLive));
 		if (caughtUp || Date.now() >= deadline) return latest;
 		await sleep(pollMs);
 	}

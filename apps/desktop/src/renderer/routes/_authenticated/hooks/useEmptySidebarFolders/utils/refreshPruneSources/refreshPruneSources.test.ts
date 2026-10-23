@@ -90,6 +90,41 @@ describe("refreshPruneSources", () => {
 		expect(refetch.roster).not.toHaveBeenCalled();
 	});
 
+	it("waits for refetched host reads to reach a render before deciding", async () => {
+		const staleHost: FindOrphanedTagFoldersInput = {
+			...restored,
+			rosterLive: true,
+			hostReads: [
+				{
+					isLocal: true,
+					live: false,
+					projectIds: [PROJECT],
+					projectsLive: true,
+				},
+			],
+		};
+		let latest = staleHost;
+		const refetch = {
+			roster: mock(async () => {}),
+			cloud: mock(async () => {}),
+			hosts: mock(async () => {
+				// The fetch resolves first; React renders its data a little later.
+				setTimeout(() => {
+					latest = { ...staleHost, hostReads: restored.hostReads };
+				}, 5);
+			}),
+		};
+		const input = await refreshPruneSources({
+			current: staleHost,
+			readLatest: () => latest,
+			refetch,
+			...TIMING,
+		});
+		expect(
+			findOrphanedTagFolders(input).orphaned.map(({ tag }) => tag),
+		).toEqual(["perf"]);
+	});
+
 	it("refetches hosts whose workspace or project read is not live", async () => {
 		const { refetch, readLatest } = setup(async () => {});
 		await refreshPruneSources({
