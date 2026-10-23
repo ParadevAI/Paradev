@@ -124,6 +124,7 @@ export function DashboardSidebarProjectSection({
 						workspaceShortcutLabels={workspaceShortcutLabels}
 						onWorkspaceHover={onWorkspaceHover}
 						onToggleCollapse={() => onToggleCollapse(project.id)}
+						isDragBlocked={isDragBlocked}
 					/>
 					{importWorktreesDialog}
 					{deleteProjectDialog}
