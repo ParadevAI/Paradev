@@ -26,4 +26,16 @@ describe("placeInTabs", () => {
 		store.getState().openPane({ pane: pane("p3") });
 		expect(paneIdsByTab()).toEqual([["p2"], ["list"], ["p3"]]);
 	});
+
+	it("leaves focus alone when openPane is told not to focus", () => {
+		const store = createWorkspaceStore<TestData>({ placePane: placeInTabs });
+		store
+			.getState()
+			.addTab({ id: "t1", panes: [pane("list", "list")], focus: false });
+
+		store.getState().openPane({ pane: pane("p1"), focus: false });
+
+		expect(store.getState().tabs).toHaveLength(2);
+		expect(store.getState().focusRequest).toBeNull();
+	});
 });
