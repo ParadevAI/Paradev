@@ -147,7 +147,7 @@ export function useEmptySidebarFolders() {
 		const projectsLiveByHost = new Map(
 			projectHostResults.map((result) => [
 				result.target.machineId,
-				result.reachable,
+				result.listLive,
 			]),
 		);
 		return {
