@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import type { PromptTransport } from "@superset/shared/agent-prompt-launch";
 import {
+	AGENT_PRESET_FEATURE_FLAGS,
 	getDefaultSeedPresets,
 	getPresetById,
 	type HostAgentPreset,
@@ -145,6 +146,23 @@ export function seedDefaultsIfEmpty(db: HostDb): HostAgentConfigRow[] {
 	if (seeds.length === 0) return existing;
 	db.insert(hostAgentConfigs).values(seeds).run();
 	return listOrdered(db);
+}
+
+/**
+ * A cloud box has no settings screen to add a flagged agent to, so it gets
+ * every flagged preset; clients hide each one while its flag is off.
+ */
+export function seedSandboxAgents(db: HostDb): void {
+	const rows = seedDefaultsIfEmpty(db);
+	const missing = [...AGENT_PRESET_FEATURE_FLAGS.keys()].filter(
+		(presetId) => !rows.some((row) => row.presetId === presetId),
+	);
+	let order = Math.max(-1, ...rows.map((row) => row.displayOrder)) + 1;
+	for (const presetId of missing) {
+		const preset = getPresetById(presetId);
+		if (!preset) continue;
+		db.insert(hostAgentConfigs).values(rowFromPreset(preset, order++)).run();
+	}
 }
 
 /**

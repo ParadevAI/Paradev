@@ -24,7 +24,10 @@ import {
 } from "../../trpc/router/agents/agents";
 import { importCloudAttachments } from "../../trpc/router/attachments/attachments";
 import { createChatSessionInWorkspace } from "../../trpc/router/sessions/session-service";
-import { seedDefaultsIfEmpty } from "../../trpc/router/settings/agent-configs";
+import {
+	seedDefaultsIfEmpty,
+	seedSandboxAgents,
+} from "../../trpc/router/settings/agent-configs";
 import type { HostServiceContext } from "../../types";
 import {
 	getManagedEnv,
@@ -543,4 +546,5 @@ export function runSandboxSelfSeed(
 			})
 			.run();
 	});
+	seedSandboxAgents(db);
 }

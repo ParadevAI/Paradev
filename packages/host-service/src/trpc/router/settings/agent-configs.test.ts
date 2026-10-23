@@ -8,9 +8,10 @@ import {
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
+import type { HostDb } from "../../../db";
 import * as schema from "../../../db/schema";
 import type { HostServiceContext } from "../../../types";
-import { agentConfigsRouter } from "./agent-configs";
+import { agentConfigsRouter, seedSandboxAgents } from "./agent-configs";
 
 function presetBody(presetId: string) {
 	const preset = getPresetById(presetId);
@@ -72,6 +73,29 @@ describe("agentConfigsRouter", () => {
 			const caller = createCaller();
 			const result = await caller.list();
 			expect(result.find((row) => row.presetId === "pdev")).toBeUndefined();
+		});
+
+		it("a cloud box gets the defaults and pdev, once", async () => {
+			const { caller, db } = createCallerWithDb();
+			seedSandboxAgents(db as unknown as HostDb);
+			seedSandboxAgents(db as unknown as HostDb);
+			const result = await caller.list();
+			expect(result.map((row) => row.presetId)).toEqual([
+				...DEFAULT_PRESET_IDS,
+				"pdev",
+			]);
+			expect(result.at(-1)?.order).toBe(DEFAULT_PRESET_IDS.length);
+		});
+
+		it("a box seeded before pdev gains it after its own agents", async () => {
+			const { caller, db } = createCallerWithDb();
+			await caller.list();
+			seedSandboxAgents(db as unknown as HostDb);
+			const result = await caller.list();
+			expect(result.map((row) => row.presetId)).toEqual([
+				...DEFAULT_PRESET_IDS,
+				"pdev",
+			]);
 		});
 
 		it("seeds Claude with its most permissive flag", async () => {
