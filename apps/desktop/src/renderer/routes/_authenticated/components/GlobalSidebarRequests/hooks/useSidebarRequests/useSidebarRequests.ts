@@ -57,7 +57,10 @@ export function useSidebarRequests() {
 			const result: SidebarFolderPruneResult = {
 				dryRun,
 				removed: removed.map(toSidebarFolder),
-				skipped: skipped.map(toSidebarFolder),
+				skipped: skipped.map((folder) => ({
+					...toSidebarFolder(folder),
+					reason: folder.reason,
+				})),
 				failed: failed.map((folder) => ({
 					...toSidebarFolder(folder),
 					error: folder.error,

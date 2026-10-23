@@ -17,6 +17,8 @@ import {
 	findOrphanedTagFolders,
 	laneProjectIdForScope,
 	type OrphanedTagFolder,
+	type UnverifiedTagFolder,
+	type UnverifiedTagFolderReason,
 	useTagFolderContext,
 } from "renderer/routes/_authenticated/utils/workspaceTagFolders";
 
@@ -33,11 +35,15 @@ export interface FailedSidebarFolder extends EmptySidebarFolder {
 	error: string;
 }
 
+export interface SkippedSidebarFolder extends EmptySidebarFolder {
+	reason: UnverifiedTagFolderReason;
+}
+
 export interface RemoveEmptySidebarFoldersResult {
 	/** Removed, or on a dry run the folders that would be. */
 	removed: EmptySidebarFolder[];
-	/** Looked empty, but a host or the cloud list could not confirm it. */
-	skipped: EmptySidebarFolder[];
+	/** Looked empty, but could not be removed safely yet; `reason` says why. */
+	skipped: SkippedSidebarFolder[];
 	failed: FailedSidebarFolder[];
 }
 
@@ -131,6 +137,12 @@ export function useEmptySidebarFolders() {
 				result.rows?.map((project) => project.id) ?? null,
 			]),
 		);
+		const projectsLiveByHost = new Map(
+			projectHostResults.map((result) => [
+				result.target.machineId,
+				result.reachable,
+			]),
+		);
 		return {
 			sections,
 			workspaces: [
@@ -151,12 +163,15 @@ export function useEmptySidebarFolders() {
 				isLocal: read.isLocal,
 				live: read.live,
 				projectIds: projectIdsByHost.get(read.machineId) ?? null,
+				projectsLive: projectsLiveByHost.get(read.machineId) ?? false,
 			})),
 			rosterLive,
 			cloudLive,
 			hiddenTagsByProject: tagFolderContext.hiddenTagsByProject,
+			sessionsSettingHostKnown: activeHostUrl !== null,
 		};
 	}, [
+		activeHostUrl,
 		cache,
 		cloudLive,
 		cloudWorkspaces,
@@ -205,24 +220,41 @@ export function useEmptySidebarFolders() {
 		[hostProjects, tagFolderContext.tagSettings],
 	);
 
-	const { emptyGroups, unverifiedGroups } = useMemo(() => {
+	const toSkipped = useCallback(
+		(folders: readonly UnverifiedTagFolder[]): SkippedSidebarFolder[] =>
+			groupFolders(folders).map(({ folder }) => ({
+				...folder,
+				reason:
+					folders.find(
+						(item) => item.scope === folder.scope && item.tag === folder.tag,
+					)?.reason ?? "unanswered",
+			})),
+		[groupFolders],
+	);
+
+	const { emptyFolders, unverifiedFolders } = useMemo(() => {
 		const found = findOrphanedTagFolders(findInput);
 		return {
-			emptyGroups: groupFolders(found.orphaned),
-			unverifiedGroups: groupFolders(found.unverified),
+			emptyFolders: groupFolders(found.orphaned).map(({ folder }) => folder),
+			unverifiedFolders: toSkipped(found.unverified),
 		};
-	}, [findInput, groupFolders]);
+	}, [findInput, groupFolders, toSkipped]);
 
-	/** A project's folders live on every host serving it; Sessions folders on the active host. */
+	/**
+	 * A project's folders live on every host serving it; Sessions folders on
+	 * the active host. Null when one of those hosts cannot be reached, so the
+	 * caller never reads "no hosts" as "nothing to delete".
+	 */
 	const resolveSettingHostUrls = useCallback(
-		(scope: string): string[] => {
+		(scope: string): string[] | null => {
 			if (scope === SESSIONS_TAG_SCOPE) {
-				return activeHostUrl ? [activeHostUrl] : [];
+				return activeHostUrl ? [activeHostUrl] : null;
 			}
 			const project = hostProjects.find((item) => item.projectKey === scope);
-			return (project?.hostIds ?? [])
-				.map((hostId) => cache.resolveHostUrl(hostId))
-				.filter((url): url is string => url != null);
+			const urls = (project?.hostIds ?? []).map((hostId) =>
+				cache.resolveHostUrl(hostId),
+			);
+			return urls.every((url): url is string => url != null) ? urls : null;
 		},
 		[activeHostUrl, cache, hostProjects],
 	);
@@ -233,10 +265,16 @@ export function useEmptySidebarFolders() {
 			dryRun = false,
 		}: RemoveEmptySidebarFoldersOptions = {}): Promise<RemoveEmptySidebarFoldersResult> => {
 			const found = findOrphanedTagFolders({ ...findInput, scope: projectId });
-			const candidates = groupFolders(found.orphaned);
-			const skipped = groupFolders(found.unverified).map(
-				({ folder }) => folder,
-			);
+			const skipped = toSkipped(found.unverified);
+			const candidates: (FolderGroup & { urls: string[] })[] = [];
+			for (const group of groupFolders(found.orphaned)) {
+				const urls = resolveSettingHostUrls(group.folder.scope);
+				if (urls) {
+					candidates.push({ ...group, urls });
+				} else {
+					skipped.push({ ...group.folder, reason: "settingHostsUnknown" });
+				}
+			}
 			if (dryRun) {
 				return {
 					removed: candidates.map(({ folder }) => folder),
@@ -246,10 +284,10 @@ export function useEmptySidebarFolders() {
 			}
 			const removed: EmptySidebarFolder[] = [];
 			const failed: FailedSidebarFolder[] = [];
-			for (const { folder, sectionIds } of candidates) {
+			for (const { folder, sectionIds, urls } of candidates) {
 				try {
 					await Promise.all(
-						resolveSettingHostUrls(folder.scope).map((url) =>
+						urls.map((url) =>
 							deleteHostTagSetting(url, folder.scope, folder.tag),
 						),
 					);
@@ -257,12 +295,18 @@ export function useEmptySidebarFolders() {
 					failed.push({ ...folder, error: errorMessage(error) });
 					continue;
 				}
-				const stillEmpty = findOrphanedTagFolders({
+				const latest = findOrphanedTagFolders({
 					...latestFindInputRef.current,
 					scope: folder.scope,
-				}).orphaned.some((current) => current.tag === folder.tag);
-				if (!stillEmpty) {
-					skipped.push(folder);
+				});
+				const nowUnverified = latest.unverified.find(
+					(current) => current.tag === folder.tag,
+				);
+				if (nowUnverified) {
+					skipped.push({ ...folder, reason: nowUnverified.reason });
+					continue;
+				}
+				if (!latest.orphaned.some((current) => current.tag === folder.tag)) {
 					continue;
 				}
 				for (const sectionId of sectionIds) {
@@ -274,12 +318,8 @@ export function useEmptySidebarFolders() {
 			}
 			return { removed, skipped, failed };
 		},
-		[collections, findInput, groupFolders, resolveSettingHostUrls],
+		[collections, findInput, groupFolders, resolveSettingHostUrls, toSkipped],
 	);
 
-	return {
-		emptyFolders: emptyGroups.map(({ folder }) => folder),
-		unverifiedFolders: unverifiedGroups.map(({ folder }) => folder),
-		removeEmptyFolders,
-	};
+	return { emptyFolders, unverifiedFolders, removeEmptyFolders };
 }

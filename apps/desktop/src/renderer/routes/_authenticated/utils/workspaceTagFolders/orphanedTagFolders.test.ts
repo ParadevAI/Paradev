@@ -24,11 +24,17 @@ function find(overrides: Partial<FindOrphanedTagFoldersInput>) {
 		sections: [],
 		workspaces: [],
 		hostReads: [
-			{ isLocal: true, live: true, projectIds: [PROJECT_A, PROJECT_B] },
+			{
+				isLocal: true,
+				live: true,
+				projectIds: [PROJECT_A, PROJECT_B],
+				projectsLive: true,
+			},
 		],
 		rosterLive: true,
 		cloudLive: true,
 		hiddenTagsByProject: new Map(),
+		sessionsSettingHostKnown: true,
 		...overrides,
 	});
 }
@@ -65,8 +71,18 @@ describe("findOrphanedTagFolders", () => {
 			sections: [row(PROJECT_A, "perf")],
 			workspaces: [{ id: "remote", projectId: PROJECT_A, tags: ["Perf"] }],
 			hostReads: [
-				{ isLocal: true, live: true, projectIds: [PROJECT_A] },
-				{ isLocal: false, live: true, projectIds: [PROJECT_A] },
+				{
+					isLocal: true,
+					live: true,
+					projectIds: [PROJECT_A],
+					projectsLive: true,
+				},
+				{
+					isLocal: false,
+					live: true,
+					projectIds: [PROJECT_A],
+					projectsLive: true,
+				},
 			],
 		});
 		expect(result.orphaned).toEqual([]);
@@ -140,8 +156,18 @@ describe("findOrphanedTagFolders", () => {
 				row(SESSIONS_TAG_SCOPE, "perf"),
 			],
 			hostReads: [
-				{ isLocal: true, live: true, projectIds: [PROJECT_A] },
-				{ isLocal: false, live: false, projectIds: [PROJECT_B] },
+				{
+					isLocal: true,
+					live: true,
+					projectIds: [PROJECT_A],
+					projectsLive: true,
+				},
+				{
+					isLocal: false,
+					live: false,
+					projectIds: [PROJECT_B],
+					projectsLive: true,
+				},
 			],
 		});
 		expect(result.orphaned.map(({ scope }) => scope)).toEqual([PROJECT_A]);
@@ -156,14 +182,23 @@ describe("findOrphanedTagFolders", () => {
 			"a host whose projects are unknown is not live",
 			{
 				hostReads: [
-					{ isLocal: true, live: true, projectIds: [PROJECT_A] },
-					{ isLocal: false, live: false, projectIds: null },
+					{
+						isLocal: true,
+						live: true,
+						projectIds: [PROJECT_A],
+						projectsLive: true,
+					},
+					{ isLocal: false, live: false, projectIds: null, projectsLive: true },
 				],
 			},
 		],
 		[
 			"the local host has not answered",
-			{ hostReads: [{ isLocal: true, live: false, projectIds: [] }] },
+			{
+				hostReads: [
+					{ isLocal: true, live: false, projectIds: [], projectsLive: true },
+				],
+			},
 		],
 		["the host roster is a cached copy", { rosterLive: false }],
 		["the cloud list has not answered", { cloudLive: false }],
@@ -174,6 +209,58 @@ describe("findOrphanedTagFolders", () => {
 		});
 		expect(result.orphaned).toEqual([]);
 		expect(tagsOf(result.unverified)).toEqual(["perf"]);
+	});
+
+	it.each([
+		["pending", null],
+		["failed after an earlier read", [PROJECT_A]],
+	])("holds back project folders while a live host's project discovery is %s", (_name, projectIds) => {
+		const result = find({
+			sections: [
+				row(PROJECT_A, "perf"),
+				row(PROJECT_B, "perf"),
+				row(SESSIONS_TAG_SCOPE, "perf"),
+			],
+			hostReads: [
+				{ isLocal: true, live: true, projectIds, projectsLive: false },
+			],
+		});
+		expect(result.orphaned.map(({ scope }) => scope)).toEqual([
+			SESSIONS_TAG_SCOPE,
+		]);
+		expect(
+			result.unverified.map(({ scope, reason }) => [scope, reason]),
+		).toEqual([
+			[PROJECT_A, "settingHostsUnknown"],
+			[PROJECT_B, "settingHostsUnknown"],
+		]);
+	});
+
+	it("holds back Sessions folders while the active host is unknown", () => {
+		const result = find({
+			sections: [row(PROJECT_A, "perf"), row(SESSIONS_TAG_SCOPE, "perf")],
+			sessionsSettingHostKnown: false,
+		});
+		expect(result.orphaned.map(({ scope }) => scope)).toEqual([PROJECT_A]);
+		expect(result.unverified).toEqual([
+			expect.objectContaining({
+				scope: SESSIONS_TAG_SCOPE,
+				reason: "settingHostsUnknown",
+			}),
+		]);
+	});
+
+	it("reports an unanswered scope as unanswered, not as unknown hosts", () => {
+		const result = find({
+			sections: [row(PROJECT_A, "perf")],
+			hostReads: [
+				{ isLocal: true, live: true, projectIds: null, projectsLive: false },
+			],
+			cloudLive: false,
+		});
+		expect(result.unverified.map(({ reason }) => reason)).toEqual([
+			"unanswered",
+		]);
 	});
 
 	it("limits the result to one scope", () => {

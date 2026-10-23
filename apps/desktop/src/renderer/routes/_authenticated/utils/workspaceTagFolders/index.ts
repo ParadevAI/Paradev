@@ -5,6 +5,8 @@ export {
 	type OrphanedTagFolder,
 	type OrphanedTagFolders,
 	type TagFolderHostRead,
+	type UnverifiedTagFolder,
+	type UnverifiedTagFolderReason,
 } from "./orphanedTagFolders";
 export {
 	type CloudTagFolderWorkspace,

@@ -2,23 +2,32 @@ import { boolean, CLIError, string, table } from "@superset/cli-framework";
 import type {
 	SidebarFolder,
 	SidebarFolderPruneResult,
+	SidebarFolderSkipReason,
 } from "@superset/shared/sidebar-folders";
 import { command } from "../../../../lib/command";
 import { resolveHostClient } from "../../../../lib/resolve-host-client";
 
+const SKIP_NOTES: Record<SidebarFolderSkipReason, string> = {
+	unanswered: "a host or the cloud has not answered yet",
+	settingHostsUnknown: "not every host that keeps its settings is known yet",
+};
+
 function rowsOf(result: SidebarFolderPruneResult) {
-	const row = (status: string, folder: SidebarFolder) => ({
+	const row = (status: string, folder: SidebarFolder, note?: string) => ({
 		status,
 		name: folder.name,
 		project: folder.projectName ?? folder.projectId ?? "sessions",
 		tag: folder.tag,
+		note: note ?? "",
 	});
 	return [
 		...result.removed.map((folder) =>
 			row(result.dryRun ? "would remove" : "removed", folder),
 		),
-		...result.skipped.map((folder) => row("skipped", folder)),
-		...result.failed.map((folder) => row("failed", folder)),
+		...result.skipped.map((folder) =>
+			row("skipped", folder, SKIP_NOTES[folder.reason]),
+		),
+		...result.failed.map((folder) => row("failed", folder, folder.error)),
 	];
 }
 
@@ -32,11 +41,7 @@ function summarize(result: SidebarFolderPruneResult): string {
 			? `Would remove ${plural(result.removed.length, "empty folder")}`
 			: `Removed ${plural(result.removed.length, "empty folder")}`,
 	];
-	if (result.skipped.length > 0) {
-		parts.push(
-			`skipped ${result.skipped.length} (a host or the cloud has not answered yet)`,
-		);
-	}
+	if (result.skipped.length > 0) parts.push(`skipped ${result.skipped.length}`);
 	if (result.failed.length > 0) parts.push(`${result.failed.length} failed`);
 	return `${parts.join("; ")}.`;
 }
@@ -69,9 +74,6 @@ export default command({
 			throw error;
 		}
 		const rows = rowsOf(result);
-		const failures = result.failed.map(
-			(folder) => `${folder.name}: ${folder.error}`,
-		);
 		return {
 			data: result,
 			message: [
@@ -80,13 +82,12 @@ export default command({
 					? [
 							table(
 								rows,
-								["status", "name", "project", "tag"],
-								["STATUS", "NAME", "PROJECT", "TAG"],
-								[14, 30, 24, 30],
+								["status", "name", "project", "tag", "note"],
+								["STATUS", "NAME", "PROJECT", "TAG", "NOTE"],
+								[14, 30, 24, 30, 60],
 							),
 						]
 					: []),
-				...failures,
 			].join("\n"),
 		};
 	},

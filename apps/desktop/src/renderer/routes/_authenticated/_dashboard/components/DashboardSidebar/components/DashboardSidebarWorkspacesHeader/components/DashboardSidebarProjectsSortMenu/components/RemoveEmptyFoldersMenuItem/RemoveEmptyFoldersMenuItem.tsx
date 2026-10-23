@@ -5,6 +5,7 @@ import { toast } from "@superset/ui/sonner";
 import { LuFolderX } from "react-icons/lu";
 import {
 	type RemoveEmptySidebarFoldersResult,
+	type SkippedSidebarFolder,
 	useEmptySidebarFolders,
 } from "renderer/routes/_authenticated/hooks/useEmptySidebarFolders";
 
@@ -18,16 +19,27 @@ export function RemoveEmptyFoldersMenuItem() {
 		useEmptySidebarFolders();
 	const emptyCount = emptyFolders.length;
 
-	const describeSkipped = (skipped: number) =>
-		skipped > 0
-			? t({
-					message: plural(skipped, {
-						one: "Skipped # folder: a host or the cloud has not answered yet.",
-						other:
-							"Skipped # folders: a host or the cloud has not answered yet.",
-					}),
-				})
-			: undefined;
+	const describeSkipped = (skippedFolders: readonly SkippedSidebarFolder[]) => {
+		const skipped = skippedFolders.length;
+		if (skipped === 0) return undefined;
+		if (
+			skippedFolders.every(({ reason }) => reason === "settingHostsUnknown")
+		) {
+			return t({
+				message: plural(skipped, {
+					one: "Skipped # folder: not every host that keeps its settings is known yet.",
+					other:
+						"Skipped # folders: not every host that keeps their settings is known yet.",
+				}),
+			});
+		}
+		return t({
+			message: plural(skipped, {
+				one: "Skipped # folder: a host or the cloud has not answered yet.",
+				other: "Skipped # folders: a host or the cloud has not answered yet.",
+			}),
+		});
+	};
 
 	const report = ({
 		removed,
@@ -53,13 +65,13 @@ export function RemoveEmptyFoldersMenuItem() {
 						other: "Removed # empty folders",
 					}),
 				}),
-				{ description: describeSkipped(skipped.length) },
+				{ description: describeSkipped(skipped) },
 			);
 			return;
 		}
 		if (failed.length === 0) {
 			toast(t({ message: "No folders removed" }), {
-				description: describeSkipped(skipped.length),
+				description: describeSkipped(skipped),
 			});
 		}
 	};

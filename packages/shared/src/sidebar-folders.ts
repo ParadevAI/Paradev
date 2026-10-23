@@ -19,12 +19,19 @@ export interface SidebarFolder {
 	name: string;
 }
 
+/**
+ * `unanswered`: a host or the cloud list has not answered, so the tag may
+ * still be in use. `settingHostsUnknown`: not every host that keeps the
+ * folder's settings is known yet.
+ */
+export type SidebarFolderSkipReason = "unanswered" | "settingHostsUnknown";
+
 export interface SidebarFolderPruneResult {
 	dryRun: boolean;
 	/** Removed, or on a dry run the folders that would be. */
 	removed: SidebarFolder[];
-	/** Looked empty, but a host or the cloud list could not confirm it. */
-	skipped: SidebarFolder[];
+	/** Looked empty, but could not be removed safely yet. */
+	skipped: (SidebarFolder & { reason: SidebarFolderSkipReason })[];
 	failed: (SidebarFolder & { error: string })[];
 }
 

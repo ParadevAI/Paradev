@@ -23,6 +23,8 @@ export interface TagFolderHostRead {
 	live: boolean;
 	/** Projects the host serves, live or last seen; null when nothing is known. */
 	projectIds: readonly string[] | null;
+	/** The host answered `project.list` in this session, so the hosts that keep a project's folder settings are known. */
+	projectsLive: boolean;
 }
 
 export interface FindOrphanedTagFoldersInput {
@@ -38,6 +40,8 @@ export interface FindOrphanedTagFoldersInput {
 	/** The cloud list answered in this session, or cloud workspaces do not apply. */
 	cloudLive: boolean;
 	hiddenTagsByProject: ReadonlyMap<string, ReadonlySet<string>>;
+	/** The host that keeps the Sessions lane's folder settings (the active host) is known. */
+	sessionsSettingHostKnown: boolean;
 	/** Only consider this scope (a project id, or the Sessions scope). */
 	scope?: string;
 }
@@ -49,11 +53,23 @@ export interface OrphanedTagFolder {
 	name: string;
 }
 
+/**
+ * `unanswered`: a host or the cloud list has not answered for the scope, so
+ * the tag may still be in use. `settingHostsUnknown`: the folder is empty,
+ * but the hosts that keep its settings are not all known yet, so its host
+ * settings could not all be removed.
+ */
+export type UnverifiedTagFolderReason = "unanswered" | "settingHostsUnknown";
+
+export interface UnverifiedTagFolder extends OrphanedTagFolder {
+	reason: UnverifiedTagFolderReason;
+}
+
 export interface OrphanedTagFolders {
 	/** Stored rows whose tag no workspace in the scope carries, where every source answered. */
 	orphaned: OrphanedTagFolder[];
-	/** Rows that look the same, but in a scope some source has not answered for. */
-	unverified: OrphanedTagFolder[];
+	/** Rows that look the same, but that cannot be removed safely yet. */
+	unverified: UnverifiedTagFolder[];
 }
 
 /**
@@ -98,6 +114,22 @@ export function findOrphanedTagFolders(
 		}
 	}
 
+	// A host that answers for its workspaces but not for its projects may keep
+	// settings for any project: every project scope waits for it.
+	const projectSettingHostsUnknown = input.hostReads.some(
+		(read) => read.live && !read.projectsLive,
+	);
+	const reasonFor = (scope: string): UnverifiedTagFolderReason | null => {
+		if (everyScopeUnverified || unverifiedScopes.has(scope)) {
+			return "unanswered";
+		}
+		const settingHostsKnown =
+			scope === SESSIONS_TAG_SCOPE
+				? input.sessionsSettingHostKnown
+				: !projectSettingHostsUnknown;
+		return settingHostsKnown ? null : "settingHostsUnknown";
+	};
+
 	const result: OrphanedTagFolders = { orphaned: [], unverified: [] };
 	for (const section of input.sections) {
 		const scope = section.projectId;
@@ -113,8 +145,9 @@ export function findOrphanedTagFolders(
 			tag,
 			name: section.name,
 		};
-		if (everyScopeUnverified || unverifiedScopes.has(scope)) {
-			result.unverified.push(folder);
+		const reason = reasonFor(scope);
+		if (reason) {
+			result.unverified.push({ ...folder, reason });
 		} else {
 			result.orphaned.push(folder);
 		}

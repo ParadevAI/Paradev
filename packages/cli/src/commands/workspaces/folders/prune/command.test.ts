@@ -42,15 +42,22 @@ describe("workspaces folders prune", () => {
 				{ projectId: "p-1", projectName: "web", tag: "old", name: "Old work" },
 			],
 			skipped: [
-				{ projectId: null, projectName: null, tag: "scratch", name: "scratch" },
+				{
+					projectId: null,
+					projectName: null,
+					tag: "scratch",
+					name: "scratch",
+					reason: "settingHostsUnknown",
+				},
 			],
 			failed: [],
 		};
 		const result = await invoke({ project: "p-1" });
 		expect(prune).toHaveBeenLastCalledWith({ projectId: "p-1", dryRun: false });
 		expect(result.data).toEqual(pruneResult);
-		expect(result.message).toStartWith(
-			"Removed 1 empty folder; skipped 1 (a host or the cloud has not answered yet).",
+		expect(result.message).toStartWith("Removed 1 empty folder; skipped 1.");
+		expect(result.message).toContain(
+			"not every host that keeps its settings is known yet",
 		);
 		expect(result.message).toContain("removed");
 		expect(result.message).toContain("Old work");
@@ -90,7 +97,8 @@ describe("workspaces folders prune", () => {
 		};
 		const result = await invoke();
 		expect(result.message).toStartWith("Removed 0 empty folders; 1 failed.");
-		expect(result.message).toEndWith("Old work: Host unreachable");
+		expect(result.message).toContain("failed");
+		expect(result.message).toContain("Host unreachable");
 	});
 
 	test("names an old host instead of a missing procedure", async () => {
