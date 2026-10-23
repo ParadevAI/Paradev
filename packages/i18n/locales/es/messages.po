@@ -897,12 +897,6 @@ msgstr "{gate} · {statusLabel}"
 msgid "{gate}: {statusLabel}"
 msgstr "{gate}: {statusLabel}"
 
-msgid "{gbHours} cloud GB-hours per seat each month"
-msgstr "{gbHours} GB-horas en la nube por puesto al mes"
-
-msgid "{gbHours} on {name}"
-msgstr "{gbHours} en {name}"
-
 msgid "{hidden, plural, one {# hidden line} other {# hidden lines}}"
 msgstr "{hidden, plural, one {# línea oculta} other {# líneas ocultas}}"
 
@@ -923,6 +917,9 @@ msgstr "{hostName} está sin conexión"
 
 msgid "{hotkeyText} to hide"
 msgstr "{hotkeyText} para ocultar"
+
+msgid "{hours} hours per seat each month"
+msgstr "{hours} horas por puesto al mes"
 
 msgid "{hours}h"
 msgstr "{hours} h"
@@ -990,9 +987,6 @@ msgstr "{monthlyPrice} por usuario/mes. Móvil, automatizaciones y soporte prior
 msgid "{months}mo ago"
 msgstr "hace {months} m"
 
-msgid "{multiple}x the cloud GB-hours of {basePlan}"
-msgstr "{multiple} veces las GB-horas en la nube de {basePlan}"
-
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "Tus automatizaciones con error en su última ejecución: {myFailedCount}"
 
@@ -1031,6 +1025,9 @@ msgstr "{name} empezó a trabajar"
 
 msgid "{name} stopped"
 msgstr "{name} se detuvo"
+
+msgid "{name}: {hours} hours ({gbHours} GB-hours) per seat"
+msgstr "{name}: {hours} horas ({gbHours} GB-horas) por puesto"
 
 msgid "{name}: {monthly} per user/month"
 msgstr "{name}: {monthly} por usuario/mes"
@@ -4196,9 +4193,6 @@ msgstr "Espacio de trabajo en la nube"
 msgid "Cloud workspaces"
 msgstr "Espacios de trabajo en la nube"
 
-msgid "Cloud workspaces are metered in GB-hours: the memory of the box times the hours it runs. An 8 GB box uses 8 GB-hours per hour. Each seat adds its plan's GB-hours to one pool your team shares: {allowances}. The pool resets every month, and usage past it is billed per GB-hour at the rate shown on each plan."
-msgstr "Los espacios de trabajo en la nube se miden en GB-horas: la memoria de la máquina por las horas que funciona. Una máquina de 8 GB usa 8 GB-horas por hora. Cada puesto suma las GB-horas de su plan a un único fondo que comparte tu equipo: {allowances}. El fondo se reinicia cada mes, y el uso que lo supere se factura por GB-hora a la tarifa indicada en cada plan."
-
 #. js-lingui-explicit-id
 msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
 msgstr "Los espacios de trabajo en la nube no están habilitados para {account}. Vienen con los planes Team y Ultra: mejora tu plan en Configuración, Facturación."
@@ -6703,6 +6697,9 @@ msgstr "Cada uno en su propia pestaña"
 msgid "Each morning at 8am, look at yesterday's failed CI runs, diagnose the most common failure, and open a fix PR."
 msgstr "Cada mañana a las 8:00, revisa las ejecuciones de CI fallidas de ayer, diagnostica el fallo más habitual y abre un PR con la corrección."
 
+msgid "Each seat adds its plan's hours to one pool your team shares:"
+msgstr "Cada puesto suma las horas de su plan a un único fondo que comparte todo tu equipo:"
+
 msgid "Each session resumes where it left off."
 msgstr "Cada sesión retoma donde la dejó."
 
@@ -8668,6 +8665,12 @@ msgstr "HotkeyTooltip.tsx"
 msgid "Hourly"
 msgstr "Cada hora"
 
+msgid "Hours are shared across your team. They assume a standard {vcpus} vCPU / {memoryGb} GB workspace, and bigger machines use them faster."
+msgstr "Las horas se comparten con todo tu equipo. Se calculan con un espacio de trabajo estándar de {vcpus} vCPU / {memoryGb} GB, y las máquinas más grandes las consumen más rápido."
+
+msgid "Hours assume a standard {vcpus} vCPU / {memoryGb} GB workspace. We meter GB-hours, the memory of the machine times the hours it runs, so a machine with twice the memory uses hours twice as fast."
+msgstr "Las horas se calculan con un espacio de trabajo estándar de {vcpus} vCPU / {memoryGb} GB. Medimos GB-horas, la memoria de la máquina por las horas que funciona, así que una máquina con el doble de memoria consume las horas el doble de rápido."
+
 msgid "Hover Card"
 msgstr "Tarjeta al pasar el cursor"
 
@@ -8682,6 +8685,9 @@ msgstr "Cómo se crean las ramas y los nombres de los espacios de trabajo de est
 
 msgid "How can we help?"
 msgstr "¿Cómo podemos ayudarte?"
+
+msgid "How do cloud hours work?"
+msgstr "¿Cómo funcionan las horas en la nube?"
 
 msgid "How do I get started?"
 msgstr "¿Cómo empiezo?"
@@ -9656,6 +9662,9 @@ msgstr "Aprender"
 
 msgid "Learn how to use scripts"
 msgstr "Aprender a usar los scripts"
+
+msgid "Learn more"
+msgstr "Más información"
 
 msgid "Learn the workflow that fits this repo — parallel workspaces and agent setup."
 msgstr "Aprende el flujo de trabajo que encaja con este repositorio: espacios de trabajo en paralelo y configuración de agentes."
@@ -11873,9 +11882,6 @@ msgstr "Un plugin, todos los agentes de programación: Claude Code, Codex, Curso
 
 msgid "One plugin. Every coding agent."
 msgstr "Un plugin. Todos los agentes de programación."
-
-msgid "One shared GB-hour pool for the team"
-msgstr "Un único fondo de GB-horas compartido por el equipo"
 
 msgid "One step left"
 msgstr "Falta un paso"
@@ -17659,6 +17665,9 @@ msgstr "La página solicitada no existe."
 msgid "The pane uses your real logins. Agents ask you before they take a consequential action."
 msgstr "El panel usa tus inicios de sesión reales. Los agentes te preguntan antes de realizar una acción importante."
 
+msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
+msgstr "El fondo se renueva cada mes. El uso que lo supere se cobra por GB-hora a la tarifa indicada en cada plan."
+
 msgid "The primary repository must be one of the environment's repositories"
 msgstr "El repositorio principal debe ser uno de los repositorios del entorno"
 
@@ -19405,9 +19414,6 @@ msgstr "Te damos la bienvenida a Superset"
 
 msgid "Welcome to the new Superset"
 msgstr "Te damos la bienvenida al nuevo Superset"
-
-msgid "What are cloud GB-hours?"
-msgstr "¿Qué son las GB-horas en la nube?"
 
 msgid "What are the benefits?"
 msgstr "¿Cuáles son los beneficios?"

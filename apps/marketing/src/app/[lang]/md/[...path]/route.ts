@@ -13,6 +13,7 @@ import {
 	pricingTiers,
 } from "@/app/[lang]/pricing/constants";
 import { checkoutHref } from "@/app/[lang]/pricing/utils/checkoutHref";
+import { faqAnswer } from "@/app/[lang]/pricing/utils/faqAnswer";
 import { fetchPlanCatalog } from "@/app/[lang]/pricing/utils/fetchPlanCatalog";
 import {
 	comparisonValue,
@@ -20,7 +21,6 @@ import {
 } from "@/app/[lang]/pricing/utils/planDisplay";
 import {
 	faqShown,
-	faqValues,
 	featureShown,
 	featureValues,
 	planPriceValues,
@@ -92,10 +92,15 @@ function pricingPage(i18n: I18n, catalog: PlanFamily[]): MarkdownPage {
 			`- **Price**: ${price}`,
 			...tier.features
 				.filter((feature) => featureShown(feature, set))
-				.map(
-					(feature) =>
-						`- ${i18n._({ ...feature.label, values: featureValues(set) })}`,
-				),
+				.flatMap((feature) => [
+					`- ${i18n._({ ...feature.label, values: featureValues(set) })}`,
+					...[feature.detail, feature.info?.body]
+						.filter((line) => line !== undefined)
+						.map(
+							(line) =>
+								`  - ${i18n._({ ...line, values: featureValues(set) })}`,
+						),
+				]),
 			`- [${i18n._({ ...tier.cta.label, values: { plan: tierName(tier) } })}](${tier.price.kind === "seat" ? checkoutHref(CANONICAL_URLS.APP, tier.id, Boolean(set?.hasYearlyDiscount)) : tier.cta.href.startsWith("/") ? baseUrl + tier.cta.href : tier.cta.href})`,
 			"",
 		];
@@ -114,12 +119,19 @@ function pricingPage(i18n: I18n, catalog: PlanFamily[]): MarkdownPage {
 	]);
 	const faq = PRICING_FAQ_ITEMS.filter((item) =>
 		faqShown(item, prices),
-	).flatMap((item) => [
-		`### ${text(i18n, item.question)}`,
-		"",
-		i18n._({ ...item.answer, values: faqValues(prices) }),
-		"",
-	]);
+	).flatMap((item) => {
+		const answer = faqAnswer(item, prices, i18n);
+		return [
+			`### ${text(i18n, item.question)}`,
+			"",
+			answer.lead,
+			"",
+			...(answer.list.length
+				? [...answer.list.map((line) => `- ${line}`), ""]
+				: []),
+			...answer.more.flatMap((paragraph) => [paragraph, ""]),
+		];
+	});
 	return {
 		title: `${BRAND.NAME} pricing`,
 		url: `${baseUrl}/pricing`,

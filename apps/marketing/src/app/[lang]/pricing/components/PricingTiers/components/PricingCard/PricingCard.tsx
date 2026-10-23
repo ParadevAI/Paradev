@@ -15,6 +15,7 @@ import {
 	featureValues,
 	type PlanPriceValues,
 } from "../../../../utils/planPriceValues";
+import { FeatureInfo } from "./components/FeatureInfo";
 
 interface PricingCardProps {
 	tier: PricingTier;
@@ -43,7 +44,7 @@ export function PricingCard({
 	return (
 		<div
 			className={cn(
-				"flex flex-col gap-6 rounded-lg border p-6 md:p-8 xl:p-6",
+				"row-span-4 grid grid-rows-subgrid gap-6 rounded-lg border p-6 md:p-8 xl:p-6",
 				wide && "md:col-span-2 lg:col-span-4 xl:col-span-1",
 				tier.highlight
 					? "border-foreground/30 bg-accent/20"
@@ -144,14 +145,34 @@ export function PricingCard({
 							className="flex items-start gap-2.5 text-sm text-foreground"
 						>
 							<Check className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
-							<span>
-								{i18n._({ ...feature.label, values: featureValues(set) })}
-								{feature.beta && (
-									<span className="ml-2 rounded-sm bg-accent/40 px-1.5 py-0.5 align-middle text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
-										{t(BETA)}
-									</span>
+							<div className="flex flex-col gap-1">
+								<span>
+									{i18n._({ ...feature.label, values: featureValues(set) })}
+									{feature.beta && (
+										<span className="ml-2 rounded-sm bg-accent/40 px-1.5 py-0.5 align-middle text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+											{t(BETA)}
+										</span>
+									)}
+								</span>
+								{feature.detail && (
+									<p className="text-xs text-muted-foreground">
+										{feature.info ? (
+											<FeatureInfo
+												body={feature.info.body}
+												faqId={feature.info.faqId}
+												values={featureValues(set)}
+											>
+												{i18n._({
+													...feature.detail,
+													values: featureValues(set),
+												})}
+											</FeatureInfo>
+										) : (
+											i18n._({ ...feature.detail, values: featureValues(set) })
+										)}
+									</p>
 								)}
-							</span>
+							</div>
 						</li>
 					))}
 			</ul>

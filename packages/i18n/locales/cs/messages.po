@@ -897,12 +897,6 @@ msgstr "{gate} · {statusLabel}"
 msgid "{gate}: {statusLabel}"
 msgstr "{gate}: {statusLabel}"
 
-msgid "{gbHours} cloud GB-hours per seat each month"
-msgstr "{gbHours} cloudových GB-hodin na místo měsíčně"
-
-msgid "{gbHours} on {name}"
-msgstr "{gbHours} v plánu {name}"
-
 msgid "{hidden, plural, one {# hidden line} other {# hidden lines}}"
 msgstr "{hidden, plural, one {# skrytý řádek} few {# skryté řádky} many {# skrytého řádku} other {# skrytých řádků}}"
 
@@ -923,6 +917,9 @@ msgstr "{hostName} je offline"
 
 msgid "{hotkeyText} to hide"
 msgstr "{hotkeyText} skryje"
+
+msgid "{hours} hours per seat each month"
+msgstr "{hours} hodin na místo měsíčně"
 
 msgid "{hours}h"
 msgstr "{hours} h"
@@ -990,9 +987,6 @@ msgstr "{monthlyPrice} za uživatele/měs. Mobilní aplikace, automatizace, prio
 msgid "{months}mo ago"
 msgstr "před {months} měs."
 
-msgid "{multiple}x the cloud GB-hours of {basePlan}"
-msgstr "{multiple}× více cloudových GB-hodin než {basePlan}"
-
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "Vaše automatizace s neúspěšným posledním během: {myFailedCount}"
 
@@ -1031,6 +1025,9 @@ msgstr "{name} začal pracovat"
 
 msgid "{name} stopped"
 msgstr "{name} byl zastaven"
+
+msgid "{name}: {hours} hours ({gbHours} GB-hours) per seat"
+msgstr "{name}: {hours} hodin ({gbHours} GB-hodin) na místo"
 
 msgid "{name}: {monthly} per user/month"
 msgstr "{name}: {monthly} za uživatele/měsíc"
@@ -4196,9 +4193,6 @@ msgstr "Cloudový pracovní prostor"
 msgid "Cloud workspaces"
 msgstr "Cloudové pracovní prostory"
 
-msgid "Cloud workspaces are metered in GB-hours: the memory of the box times the hours it runs. An 8 GB box uses 8 GB-hours per hour. Each seat adds its plan's GB-hours to one pool your team shares: {allowances}. The pool resets every month, and usage past it is billed per GB-hour at the rate shown on each plan."
-msgstr "Cloudové pracovní prostory se měří v GB-hodinách: paměť stroje krát počet hodin, kdy běží. Stroj s 8 GB spotřebuje 8 GB-hodin za hodinu. Každé místo přidá GB-hodiny svého plánu do jednoho fondu, který tým sdílí: {allowances}. Fond se každý měsíc obnoví a využití nad jeho rámec se účtuje za GB-hodinu podle sazby uvedené u každého plánu."
-
 #. js-lingui-explicit-id
 msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
 msgstr "Cloudové pracovní prostory nejsou pro {account} zapnuté. Jsou součástí plánů Team a Ultra: přejděte na vyšší plán v Nastavení, Fakturace."
@@ -6703,6 +6697,9 @@ msgstr "Každý ve vlastní nové kartě"
 msgid "Each morning at 8am, look at yesterday's failed CI runs, diagnose the most common failure, and open a fix PR."
 msgstr "Každé ráno v 8:00 se podívej na včerejší neúspěšné běhy CI, urči nejčastější příčinu selhání a otevři PR s opravou."
 
+msgid "Each seat adds its plan's hours to one pool your team shares:"
+msgstr "Každé místo přidá hodiny svého plánu do jednoho fondu, který sdílí celý tým:"
+
 msgid "Each session resumes where it left off."
 msgstr "Každá relace naváže tam, kde skončila."
 
@@ -8668,6 +8665,12 @@ msgstr "HotkeyTooltip.tsx"
 msgid "Hourly"
 msgstr "Každou hodinu"
 
+msgid "Hours are shared across your team. They assume a standard {vcpus} vCPU / {memoryGb} GB workspace, and bigger machines use them faster."
+msgstr "Hodiny sdílí celý tým. Počítají se standardním pracovním prostorem {vcpus} vCPU / {memoryGb} GB a větší stroje je spotřebují rychleji."
+
+msgid "Hours assume a standard {vcpus} vCPU / {memoryGb} GB workspace. We meter GB-hours, the memory of the machine times the hours it runs, so a machine with twice the memory uses hours twice as fast."
+msgstr "Hodiny počítají se standardním pracovním prostorem {vcpus} vCPU / {memoryGb} GB. Měříme GB-hodiny, tedy paměť stroje krát hodiny jeho běhu, takže stroj s dvojnásobnou pamětí spotřebuje hodiny dvakrát rychleji."
+
 msgid "Hover Card"
 msgstr "Hover Card"
 
@@ -8682,6 +8685,9 @@ msgstr "Jak se u tohoto projektu vytvářejí větve a názvy pracovních prosto
 
 msgid "How can we help?"
 msgstr "S čím vám můžeme pomoct?"
+
+msgid "How do cloud hours work?"
+msgstr "Jak fungují cloudové hodiny?"
 
 msgid "How do I get started?"
 msgstr "Jak začít?"
@@ -9656,6 +9662,9 @@ msgstr "Učte se"
 
 msgid "Learn how to use scripts"
 msgstr "Jak používat skripty"
+
+msgid "Learn more"
+msgstr "Další informace"
 
 msgid "Learn the workflow that fits this repo — parallel workspaces and agent setup."
 msgstr "Poznejte postup, který k tomuto repozitáři sedí — paralelní pracovní prostory a nastavení agentů."
@@ -11873,9 +11882,6 @@ msgstr "Jeden plugin, každý programovací agent: Claude Code, Codex, Cursor, O
 
 msgid "One plugin. Every coding agent."
 msgstr "Jeden plugin. Každý programovací agent."
-
-msgid "One shared GB-hour pool for the team"
-msgstr "Jeden sdílený fond GB-hodin pro celý tým"
 
 msgid "One step left"
 msgstr "Zbývá jeden krok"
@@ -17659,6 +17665,9 @@ msgstr "Stránka, kterou hledáte, neexistuje."
 msgid "The pane uses your real logins. Agents ask you before they take a consequential action."
 msgstr "Panel používá vaše skutečná přihlášení. Agenti se před důležitou akcí zeptají."
 
+msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
+msgstr "Fond se každý měsíc obnovuje. Využití nad jeho rámec se účtuje za GB-hodinu podle sazby uvedené u každého plánu."
+
 msgid "The primary repository must be one of the environment's repositories"
 msgstr "Primární repozitář musí být jedním z repozitářů prostředí"
 
@@ -19405,9 +19414,6 @@ msgstr "Vítejte v Superset"
 
 msgid "Welcome to the new Superset"
 msgstr "Vítejte v novém Superset"
-
-msgid "What are cloud GB-hours?"
-msgstr "Co jsou cloudové GB-hodiny?"
 
 msgid "What are the benefits?"
 msgstr "Jaké jsou benefity?"

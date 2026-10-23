@@ -897,12 +897,6 @@ msgstr "{gate} · {statusLabel}"
 msgid "{gate}: {statusLabel}"
 msgstr "{gate}: {statusLabel}"
 
-msgid "{gbHours} cloud GB-hours per seat each month"
-msgstr "{gbHours} GB-jam cloud per kursi setiap bulan"
-
-msgid "{gbHours} on {name}"
-msgstr "{gbHours} di {name}"
-
 msgid "{hidden, plural, one {# hidden line} other {# hidden lines}}"
 msgstr "{hidden, plural, one {# baris tersembunyi} other {# baris tersembunyi}}"
 
@@ -923,6 +917,9 @@ msgstr "{hostName} sedang offline"
 
 msgid "{hotkeyText} to hide"
 msgstr "{hotkeyText} untuk menyembunyikan"
+
+msgid "{hours} hours per seat each month"
+msgstr "{hours} jam per kursi setiap bulan"
 
 msgid "{hours}h"
 msgstr "{hours}j"
@@ -990,9 +987,6 @@ msgstr "{monthlyPrice} per pengguna/bulan. Seluler, otomatisasi, dukungan priori
 msgid "{months}mo ago"
 msgstr "{months}bln lalu"
 
-msgid "{multiple}x the cloud GB-hours of {basePlan}"
-msgstr "{multiple}x GB-jam cloud dari {basePlan}"
-
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "{myFailedCount} otomatisasi Anda gagal pada run terakhirnya"
 
@@ -1031,6 +1025,9 @@ msgstr "{name} mulai bekerja"
 
 msgid "{name} stopped"
 msgstr "{name} dihentikan"
+
+msgid "{name}: {hours} hours ({gbHours} GB-hours) per seat"
+msgstr "{name}: {hours} jam ({gbHours} GB-jam) per kursi"
 
 msgid "{name}: {monthly} per user/month"
 msgstr "{name}: {monthly} per pengguna/bulan"
@@ -4196,9 +4193,6 @@ msgstr "Workspace cloud"
 msgid "Cloud workspaces"
 msgstr "Workspace cloud"
 
-msgid "Cloud workspaces are metered in GB-hours: the memory of the box times the hours it runs. An 8 GB box uses 8 GB-hours per hour. Each seat adds its plan's GB-hours to one pool your team shares: {allowances}. The pool resets every month, and usage past it is billed per GB-hour at the rate shown on each plan."
-msgstr "Ruang kerja cloud diukur dalam GB-jam: memori mesin dikali jam berjalannya. Mesin 8 GB memakai 8 GB-jam per jam. Setiap kursi menambahkan GB-jam paketnya ke satu kumpulan bersama tim Anda: {allowances}. Kumpulan direset setiap bulan, dan pemakaian di atasnya ditagih per GB-jam sesuai tarif di setiap paket."
-
 #. js-lingui-explicit-id
 msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
 msgstr "Workspace cloud tidak diaktifkan untuk {account}. Workspace cloud tersedia di paket Team dan Ultra: upgrade di Pengaturan, Penagihan."
@@ -6703,6 +6697,9 @@ msgstr "Masing-masing di tab barunya sendiri"
 msgid "Each morning at 8am, look at yesterday's failed CI runs, diagnose the most common failure, and open a fix PR."
 msgstr "Tiap pagi jam 8, lihat run CI yang gagal kemarin, diagnosis kegagalan paling umum, dan buka PR perbaikan."
 
+msgid "Each seat adds its plan's hours to one pool your team shares:"
+msgstr "Setiap kursi menambahkan jam paketnya ke satu kumpulan yang dibagi seluruh tim Anda:"
+
 msgid "Each session resumes where it left off."
 msgstr "Setiap sesi melanjutkan dari titik terakhir."
 
@@ -8668,6 +8665,12 @@ msgstr "HotkeyTooltip.tsx"
 msgid "Hourly"
 msgstr "Tiap jam"
 
+msgid "Hours are shared across your team. They assume a standard {vcpus} vCPU / {memoryGb} GB workspace, and bigger machines use them faster."
+msgstr "Jam dibagi ke seluruh tim Anda. Jam dihitung dengan workspace standar {vcpus} vCPU / {memoryGb} GB, dan mesin yang lebih besar menghabiskannya lebih cepat."
+
+msgid "Hours assume a standard {vcpus} vCPU / {memoryGb} GB workspace. We meter GB-hours, the memory of the machine times the hours it runs, so a machine with twice the memory uses hours twice as fast."
+msgstr "Jam dihitung dengan workspace standar {vcpus} vCPU / {memoryGb} GB. Kami mengukur GB-jam, yaitu memori mesin dikali jam berjalannya, sehingga mesin dengan memori dua kali lipat menghabiskan jam dua kali lebih cepat."
+
 msgid "Hover Card"
 msgstr "Hover Card"
 
@@ -8682,6 +8685,9 @@ msgstr "Bagaimana branch dan nama workspace dibuat untuk proyek ini."
 
 msgid "How can we help?"
 msgstr "Ada yang bisa kami bantu?"
+
+msgid "How do cloud hours work?"
+msgstr "Bagaimana cara kerja jam cloud?"
 
 msgid "How do I get started?"
 msgstr "Bagaimana cara memulai?"
@@ -9656,6 +9662,9 @@ msgstr "Belajar"
 
 msgid "Learn how to use scripts"
 msgstr "Pelajari cara memakai skrip"
+
+msgid "Learn more"
+msgstr "Pelajari lebih lanjut"
 
 msgid "Learn the workflow that fits this repo — parallel workspaces and agent setup."
 msgstr "Pelajari alur kerja yang cocok untuk repo ini — workspace paralel dan penyiapan agen."
@@ -11873,9 +11882,6 @@ msgstr "Satu plugin, setiap agen coding: Claude Code, Codex, Cursor, OpenCode, d
 
 msgid "One plugin. Every coding agent."
 msgstr "Satu plugin. Setiap agen coding."
-
-msgid "One shared GB-hour pool for the team"
-msgstr "Satu kumpulan GB-jam bersama untuk tim"
 
 msgid "One step left"
 msgstr "Tinggal satu langkah"
@@ -17659,6 +17665,9 @@ msgstr "Halaman yang Anda cari tidak ada."
 msgid "The pane uses your real logins. Agents ask you before they take a consequential action."
 msgstr "Panel memakai login asli Anda. Agen bertanya dulu sebelum melakukan tindakan yang berdampak."
 
+msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
+msgstr "Kumpulan direset setiap bulan. Penggunaan di atasnya ditagih per GB-jam sesuai tarif di setiap paket."
+
 msgid "The primary repository must be one of the environment's repositories"
 msgstr "Repositori utama harus salah satu repositori lingkungan"
 
@@ -19405,9 +19414,6 @@ msgstr "Selamat datang di Superset"
 
 msgid "Welcome to the new Superset"
 msgstr "Selamat datang di Superset baru"
-
-msgid "What are cloud GB-hours?"
-msgstr "Apa itu GB-jam cloud?"
 
 msgid "What are the benefits?"
 msgstr "Apa saja tunjangannya?"

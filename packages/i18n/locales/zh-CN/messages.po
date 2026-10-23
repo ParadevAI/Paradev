@@ -897,12 +897,6 @@ msgstr "{gate} · {statusLabel}"
 msgid "{gate}: {statusLabel}"
 msgstr "{gate}：{statusLabel}"
 
-msgid "{gbHours} cloud GB-hours per seat each month"
-msgstr "每席位每月 {gbHours} 云端 GB 小时"
-
-msgid "{gbHours} on {name}"
-msgstr "{name} 含 {gbHours}"
-
 msgid "{hidden, plural, one {# hidden line} other {# hidden lines}}"
 msgstr "{hidden, plural, one {#行已隐藏} other {#行已隐藏}}"
 
@@ -923,6 +917,9 @@ msgstr "{hostName}已离线"
 
 msgid "{hotkeyText} to hide"
 msgstr "按{hotkeyText}隐藏"
+
+msgid "{hours} hours per seat each month"
+msgstr "每席位每月 {hours} 小时"
 
 msgid "{hours}h"
 msgstr "{hours}小时"
@@ -990,9 +987,6 @@ msgstr "每用户每月 {monthlyPrice}。移动端、自动化、优先支持。
 msgid "{months}mo ago"
 msgstr "{months}个月前"
 
-msgid "{multiple}x the cloud GB-hours of {basePlan}"
-msgstr "{basePlan} 的 {multiple} 倍云端 GB 小时"
-
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "你有{myFailedCount}个自动化上次运行失败"
 
@@ -1031,6 +1025,9 @@ msgstr "{name} 开始工作"
 
 msgid "{name} stopped"
 msgstr "{name} 已停止"
+
+msgid "{name}: {hours} hours ({gbHours} GB-hours) per seat"
+msgstr "{name}：每席位 {hours} 小时（{gbHours} GB 小时）"
 
 msgid "{name}: {monthly} per user/month"
 msgstr "{name}：每用户每月 {monthly}"
@@ -4196,9 +4193,6 @@ msgstr "云端工作区"
 msgid "Cloud workspaces"
 msgstr "云工作区"
 
-msgid "Cloud workspaces are metered in GB-hours: the memory of the box times the hours it runs. An 8 GB box uses 8 GB-hours per hour. Each seat adds its plan's GB-hours to one pool your team shares: {allowances}. The pool resets every month, and usage past it is billed per GB-hour at the rate shown on each plan."
-msgstr "云端工作区按 GB 小时计量：机器内存乘以运行小时数。8 GB 的机器每小时使用 8 GB 小时。每个席位都会把其套餐的 GB 小时加入团队共享的同一个额度池：{allowances}。额度池每月重置，超出部分按各套餐标示的价格以每 GB 小时计费。"
-
 #. js-lingui-explicit-id
 msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
 msgstr "{account} 未开通云工作区。云工作区包含在 Team 和 Ultra 方案中：请在设置的账单中升级。"
@@ -6703,6 +6697,9 @@ msgstr "每条各占一个新标签页"
 msgid "Each morning at 8am, look at yesterday's failed CI runs, diagnose the most common failure, and open a fix PR."
 msgstr "每天早上8点，查看昨天失败的CI运行，诊断最常见的失败原因，并提一个修复PR。"
 
+msgid "Each seat adds its plan's hours to one pool your team shares:"
+msgstr "每个席位会把其套餐的时长加入整个团队共享的一个时长池："
+
 msgid "Each session resumes where it left off."
 msgstr "每个会话都会从中断处继续。"
 
@@ -8668,6 +8665,12 @@ msgstr "HotkeyTooltip.tsx"
 msgid "Hourly"
 msgstr "每小时"
 
+msgid "Hours are shared across your team. They assume a standard {vcpus} vCPU / {memoryGb} GB workspace, and bigger machines use them faster."
+msgstr "时长由整个团队共享。以标准 {vcpus} vCPU / {memoryGb} GB 工作区计算，更大的机器消耗更快。"
+
+msgid "Hours assume a standard {vcpus} vCPU / {memoryGb} GB workspace. We meter GB-hours, the memory of the machine times the hours it runs, so a machine with twice the memory uses hours twice as fast."
+msgstr "时长以标准 {vcpus} vCPU / {memoryGb} GB 工作区计算。我们按 GB 小时计量，即机器内存乘以运行小时数，因此内存翻倍的机器消耗时长也快一倍。"
+
 msgid "Hover Card"
 msgstr "悬浮卡片"
 
@@ -8682,6 +8685,9 @@ msgstr "此项目如何创建分支和工作区名称。"
 
 msgid "How can we help?"
 msgstr "我们能帮你什么？"
+
+msgid "How do cloud hours work?"
+msgstr "云端时长如何计算？"
 
 msgid "How do I get started?"
 msgstr "如何开始？"
@@ -9656,6 +9662,9 @@ msgstr "学习"
 
 msgid "Learn how to use scripts"
 msgstr "了解如何使用脚本"
+
+msgid "Learn more"
+msgstr "了解更多"
 
 msgid "Learn the workflow that fits this repo — parallel workspaces and agent setup."
 msgstr "了解适合这个仓库的工作流：并行工作区和智能体配置。"
@@ -11873,9 +11882,6 @@ msgstr "一个插件，所有编码智能体：Claude Code、Codex、Cursor、Op
 
 msgid "One plugin. Every coding agent."
 msgstr "一个插件，所有编码智能体。"
-
-msgid "One shared GB-hour pool for the team"
-msgstr "团队共享一个 GB 小时额度池"
 
 msgid "One step left"
 msgstr "还差一步"
@@ -17659,6 +17665,9 @@ msgstr "你要找的页面不存在。"
 msgid "The pane uses your real logins. Agents ask you before they take a consequential action."
 msgstr "窗格使用你真实的登录状态。智能体在执行重要操作前会先征求你的同意。"
 
+msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
+msgstr "时长池每月重置。超出部分按各套餐标注的每 GB 小时价格计费。"
+
 msgid "The primary repository must be one of the environment's repositories"
 msgstr "主仓库必须是该环境的仓库之一"
 
@@ -19405,9 +19414,6 @@ msgstr "欢迎使用Superset"
 
 msgid "Welcome to the new Superset"
 msgstr "欢迎使用全新的 Superset"
-
-msgid "What are cloud GB-hours?"
-msgstr "什么是云端 GB 小时?"
 
 msgid "What are the benefits?"
 msgstr "有哪些福利？"

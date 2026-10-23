@@ -46,7 +46,7 @@ const team = { self_serve: true, family: "team", display_order: 2 };
 const ultra = { self_serve: true, family: "ultra", display_order: 3 };
 
 describe("planPriceValues", () => {
-	test("formats each family's prices, GB-hours and multiple of the base plan", () => {
+	test("formats each family's prices, GB-hours and hours on the standard box", () => {
 		const catalog = planCatalogFromAutumn([
 			...plan("pro", 20, "month", pro, 19200),
 			...plan("pro_annual", 192, "year", pro, 19200),
@@ -61,12 +61,11 @@ describe("planPriceValues", () => {
 			yearly: "$54",
 			yearlyTotal: "$648",
 			gbHours: "1,200",
-			multiple: "3.8",
+			hours: "150",
 			overage: "$0.06",
 			overageRate: "$0.06 per GB-hour",
 			environments: "5",
 			previousName: "Pro",
-			baseName: "Pro",
 		});
 		expect(values.byFamily.ultra).toMatchObject({
 			yearly: "$200",
@@ -111,16 +110,13 @@ describe("planPriceValues", () => {
 			pack: null,
 		});
 		expect(values.byFamily.team).toMatchObject({
-			multiple: null,
+			hours: "150",
 			pack: "$0.06 per GB-hour",
 		});
-		expect(values.byFamily.ultra).toMatchObject({
-			multiple: "3.3",
-			baseName: "Team",
-		});
+		expect(values.byFamily.ultra).toMatchObject({ hours: "500" });
 		expect(values.packPrice).toBe("$0.06");
 		expect(featureShown({ needs: "gbHours" }, values.byFamily.pro)).toBe(false);
-		expect(featureShown({ needs: "multiple" }, values.byFamily.ultra)).toBe(
+		expect(featureShown({ needs: "gbHours" }, values.byFamily.ultra)).toBe(
 			true,
 		);
 	});

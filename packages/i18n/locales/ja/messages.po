@@ -897,12 +897,6 @@ msgstr "{gate} · {statusLabel}"
 msgid "{gate}: {statusLabel}"
 msgstr "{gate}: {statusLabel}"
 
-msgid "{gbHours} cloud GB-hours per seat each month"
-msgstr "1席あたり毎月 {gbHours} クラウド GB 時間"
-
-msgid "{gbHours} on {name}"
-msgstr "{name} で {gbHours}"
-
 msgid "{hidden, plural, one {# hidden line} other {# hidden lines}}"
 msgstr "{hidden, plural, one {非表示の#行} other {非表示の#行}}"
 
@@ -923,6 +917,9 @@ msgstr "{hostName}はオフラインです"
 
 msgid "{hotkeyText} to hide"
 msgstr "{hotkeyText}で隠す"
+
+msgid "{hours} hours per seat each month"
+msgstr "1席あたり毎月 {hours} 時間"
 
 msgid "{hours}h"
 msgstr "{hours}時間"
@@ -990,9 +987,6 @@ msgstr "1ユーザーあたり月額 {monthlyPrice}。モバイル、オート�
 msgid "{months}mo ago"
 msgstr "{months}か月前"
 
-msgid "{multiple}x the cloud GB-hours of {basePlan}"
-msgstr "{basePlan} の {multiple} 倍のクラウド GB 時間"
-
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "自分のオートメーションのうち{myFailedCount}件が前回の実行に失敗しました"
 
@@ -1031,6 +1025,9 @@ msgstr "{name} が作業を開始しました"
 
 msgid "{name} stopped"
 msgstr "{name} が停止しました"
+
+msgid "{name}: {hours} hours ({gbHours} GB-hours) per seat"
+msgstr "{name}: 1席あたり {hours} 時間（{gbHours} GB 時間）"
 
 msgid "{name}: {monthly} per user/month"
 msgstr "{name}: 1ユーザーあたり月額 {monthly}"
@@ -4196,9 +4193,6 @@ msgstr "クラウドワークスペース"
 msgid "Cloud workspaces"
 msgstr "クラウドワークスペース"
 
-msgid "Cloud workspaces are metered in GB-hours: the memory of the box times the hours it runs. An 8 GB box uses 8 GB-hours per hour. Each seat adds its plan's GB-hours to one pool your team shares: {allowances}. The pool resets every month, and usage past it is billed per GB-hour at the rate shown on each plan."
-msgstr "クラウドワークスペースは GB 時間で計測されます。マシンのメモリに稼働時間を掛けた値です。8 GB のマシンは1時間あたり 8 GB 時間を使います。各席はプランの GB 時間をチームで共有する1つのプールに追加します: {allowances}。プールは毎月リセットされ、超過分は各プランに記載の単価で GB 時間ごとに請求されます。"
-
 #. js-lingui-explicit-id
 msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
 msgstr "{account} ではクラウドワークスペースが有効になっていません。Team と Ultra プランで利用できます。設定の請求からアップグレードしてください。"
@@ -6703,6 +6697,9 @@ msgstr "それぞれ新しいタブで"
 msgid "Each morning at 8am, look at yesterday's failed CI runs, diagnose the most common failure, and open a fix PR."
 msgstr "毎朝午前8時に、前日の失敗したCI実行を確認し、最も多い失敗原因を診断して修正PRを作成する。"
 
+msgid "Each seat adds its plan's hours to one pool your team shares:"
+msgstr "各席はプランの時間をチーム全体で共有する 1 つのプールに追加します:"
+
 msgid "Each session resumes where it left off."
 msgstr "各セッションは中断したところから再開します。"
 
@@ -8668,6 +8665,12 @@ msgstr "HotkeyTooltip.tsx"
 msgid "Hourly"
 msgstr "毎時"
 
+msgid "Hours are shared across your team. They assume a standard {vcpus} vCPU / {memoryGb} GB workspace, and bigger machines use them faster."
+msgstr "時間はチーム全体で共有されます。標準の {vcpus} vCPU / {memoryGb} GB ワークスペースを基準にしており、大きいマシンほど早く消費します。"
+
+msgid "Hours assume a standard {vcpus} vCPU / {memoryGb} GB workspace. We meter GB-hours, the memory of the machine times the hours it runs, so a machine with twice the memory uses hours twice as fast."
+msgstr "時間は標準の {vcpus} vCPU / {memoryGb} GB ワークスペースを基準にしています。計測単位は GB 時間（マシンのメモリ × 稼働時間）なので、メモリが 2 倍のマシンは時間を 2 倍の速さで消費します。"
+
 msgid "Hover Card"
 msgstr "Hover Card"
 
@@ -8682,6 +8685,9 @@ msgstr "このプロジェクトのブランチ名とワークスペース名の
 
 msgid "How can we help?"
 msgstr "どのようなご用件ですか?"
+
+msgid "How do cloud hours work?"
+msgstr "クラウド時間の仕組みは?"
 
 msgid "How do I get started?"
 msgstr "どう始めればいいですか?"
@@ -9656,6 +9662,9 @@ msgstr "学ぶ"
 
 msgid "Learn how to use scripts"
 msgstr "スクリプトの使い方を見る"
+
+msgid "Learn more"
+msgstr "詳しく見る"
 
 msgid "Learn the workflow that fits this repo — parallel workspaces and agent setup."
 msgstr "このリポジトリに合うワークフロー — 並列ワークスペースとエージェント設定を学びます。"
@@ -11873,9 +11882,6 @@ msgstr "ひとつのプラグインを、すべてのコーディングエージ
 
 msgid "One plugin. Every coding agent."
 msgstr "ひとつのプラグインを、すべてのコーディングエージェントで。"
-
-msgid "One shared GB-hour pool for the team"
-msgstr "チームで共有する1つの GB 時間プール"
 
 msgid "One step left"
 msgstr "あと1ステップ"
@@ -17659,6 +17665,9 @@ msgstr "お探しのページは存在しません。"
 msgid "The pane uses your real logins. Agents ask you before they take a consequential action."
 msgstr "ペインでは、あなたの実際のログイン状態が使われます。重要な操作の前には、エージェントが確認を求めます。"
 
+msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
+msgstr "プールは毎月リセットされます。超過分は各プランに表示された GB 時間あたりの料金で請求されます。"
+
 msgid "The primary repository must be one of the environment's repositories"
 msgstr "プライマリリポジトリは環境のリポジトリのいずれかである必要があります"
 
@@ -19405,9 +19414,6 @@ msgstr "Supersetへようこそ"
 
 msgid "Welcome to the new Superset"
 msgstr "新しいSupersetへようこそ"
-
-msgid "What are cloud GB-hours?"
-msgstr "クラウド GB 時間とは?"
 
 msgid "What are the benefits?"
 msgstr "福利厚生は?"
