@@ -46,6 +46,7 @@ import {
 	buildDashboardSidebarSessions,
 	partitionSidebarWorkspacesByPinned,
 } from "./buildDashboardSidebarProjects";
+import { collectPendingPlacementProjectIds } from "./collectPendingPlacementProjectIds";
 import {
 	derivePullRequestQueryTargets,
 	getDashboardSidebarPullRequestQueryKey,
@@ -317,8 +318,11 @@ export function useDashboardSidebarData() {
 		[collections],
 	);
 
-	const { workspaces: allHostWorkspaces, cache: hostWorkspacesCache } =
-		useHostWorkspaces();
+	const {
+		workspaces: allHostWorkspaces,
+		cache: hostWorkspacesCache,
+		isReady: hostWorkspacesReady,
+	} = useHostWorkspaces();
 	// A cloud workspace's rows come from the cloud list, never from its
 	// sandbox's host rows, whatever placement their local-state row carries.
 	const hostWorkspaces = useMemo(
@@ -881,10 +885,57 @@ export function useDashboardSidebarData() {
 	);
 	const pinnedWorkspaces = useJsonStable(decoratedPinnedWorkspaces);
 
+	const isPlacementReady =
+		sidebarProjectRowsReady &&
+		sidebarLocalStateReady &&
+		hostProjectsReady &&
+		hostWorkspacesReady &&
+		machineId !== null &&
+		userId !== null &&
+		cloudRows !== undefined &&
+		(shownCloudRows.length === 0 || cloudRepositoriesReady);
+	const computedPendingPlacementProjectIds = useMemo(
+		() =>
+			collectPendingPlacementProjectIds({
+				hostWorkspaces: allHostWorkspaces.map((workspace) => ({
+					id: workspace.id,
+					projectId: workspace.projectId,
+					type: workspace.type,
+					hostId: workspace.hostId,
+					hostReachable: workspace.hostReachable,
+					createdByUserId: workspace.createdByUserId ?? null,
+				})),
+				cloudRows: cloudRowById.values(),
+				placedProjectIdByWorkspaceId: new Map(
+					sidebarLocalStateRows.map((row) => [row.workspaceId, row.projectId]),
+				),
+				placementContext: {
+					machineId,
+					onlineHostIds: new Set(
+						hosts.filter((host) => host.isOnline).map((host) => host.machineId),
+					),
+					currentUserId: userId,
+				},
+			}),
+		[
+			allHostWorkspaces,
+			cloudRowById,
+			sidebarLocalStateRows,
+			machineId,
+			hosts,
+			userId,
+		],
+	);
+	const pendingPlacementProjectIds = useJsonStable(
+		[...computedPendingPlacementProjectIds].sort(),
+	);
+
 	return {
 		groups,
 		hiddenProjects: allHiddenProjects,
 		pinnedWorkspaces,
+		isPlacementReady,
+		pendingPlacementProjectIds,
 		sessionWorkspaces,
 		sessionChildren: sessions.children,
 		githubStatus,
