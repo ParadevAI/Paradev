@@ -264,6 +264,10 @@ msgstr "{0, plural, one {Zadano # pytanie} few {Zadano # pytania} many {Zadano #
 msgid "{0, plural, one {Comments go to this agent} other {Comments go to these agents}}"
 msgstr "{0, plural, one {Komentarze trafiają do tego agenta} few {Komentarze trafiają do tych agentów} many {Komentarze trafiają do tych agentów} other {Komentarze trafiają do tych agentów}}"
 
+#. placeholder {0}: failed.length
+msgid "{0, plural, one {Could not remove # folder} other {Could not remove # folders}}"
+msgstr "{0, plural, one {Nie udało się usunąć # folderu} few {Nie udało się usunąć # folderów} many {Nie udało się usunąć # folderów} other {Nie udało się usunąć # folderu}}"
+
 #. placeholder {0}: failures.length
 #. placeholder {0}: nextFailures.length
 msgid "{0, plural, one {Couldn’t delete # workspace} other {Couldn’t delete # workspaces}}"
@@ -317,6 +321,10 @@ msgstr "{0, plural, one {Wstrzymano # automatyzację.} few {Wstrzymano # automat
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Pauses # automation} other {Pauses # automations}}"
 msgstr "{0, plural, one {Wstrzymuje # automatyzację} few {Wstrzymuje # automatyzacje} many {Wstrzymuje # automatyzacji} other {Wstrzymuje # automatyzacji}}"
+
+#. placeholder {0}: removed.length
+msgid "{0, plural, one {Removed # empty folder} other {Removed # empty folders}}"
+msgstr "{0, plural, one {Usunięto # pusty folder} few {Usunięto # puste foldery} many {Usunięto # pustych folderów} other {Usunięto # pustego folderu}}"
 
 #. placeholder {0}: issues.length
 #. placeholder {0}: tasks.length
@@ -869,6 +877,9 @@ msgstr "{distance} temu"
 msgid "{duration, plural, one {Thought for # second} other {Thought for # seconds}}"
 msgstr "{duration, plural, one {Myślał # sekundę} few {Myślał # sekundy} many {Myślał # sekund} other {Myślał # sekundy}}"
 
+msgid "{emptyCount, plural, one {Remove # empty folder} other {Remove # empty folders}}"
+msgstr "{emptyCount, plural, one {Usuń # pusty folder} few {Usuń # puste foldery} many {Usuń # pustych folderów} other {Usuń # pustego folderu}}"
+
 #. js-lingui-explicit-id
 msgid "serverError.page.entryPathHeldByAnotherOrganization"
 msgstr "{entryPath} w tym workspace jest już opublikowany jako strona w innej organizacji. Przenieś plik albo opublikuj z identyfikatorem tamtej strony."
@@ -1172,6 +1183,9 @@ msgstr "pokazano: {shownCount} · {0} · {1} tokenów"
 
 msgid "{skipped, plural, one {# skipped} other {# skipped}}"
 msgstr "{skipped, plural, one {# pominięty} few {# pominięte} many {# pominiętych} other {# pominiętego}}"
+
+msgid "{skipped, plural, one {Skipped # folder: a host or the cloud has not answered yet.} other {Skipped # folders: a host or the cloud has not answered yet.}}"
+msgstr "{skipped, plural, one {Pominięto # folder: host lub chmura jeszcze nie odpowiedziały.} few {Pominięto # foldery: host lub chmura jeszcze nie odpowiedziały.} many {Pominięto # folderów: host lub chmura jeszcze nie odpowiedziały.} other {Pominięto # folderu: host lub chmura jeszcze nie odpowiedziały.}}"
 
 msgid "{starCount} stars and counting"
 msgstr "{starCount} gwiazdek i rośnie"
@@ -11148,6 +11162,9 @@ msgstr "Brak pobranych plików"
 msgid "No emoji found"
 msgstr "Nie znaleziono emoji"
 
+msgid "No empty folders"
+msgstr "Brak pustych folderów"
+
 msgid "No environment for {repositoryFullName}"
 msgstr "Brak środowiska dla {repositoryFullName}"
 
@@ -11183,6 +11200,9 @@ msgstr "Żaden plik nie pasuje do dozwolonych typów."
 
 msgid "No files match your search"
 msgstr "Żaden plik nie pasuje do wyszukiwania"
+
+msgid "No folders removed"
+msgstr "Nie usunięto żadnego folderu"
 
 msgid "No fonts found."
 msgstr "Nie znaleziono czcionek."
@@ -14007,6 +14027,9 @@ msgstr "Usuń {repositoryName}"
 
 msgid "Remove attachment"
 msgstr "Usuń załącznik"
+
+msgid "Remove empty folders"
+msgstr "Usuń puste foldery"
 
 msgid "Remove from favorites"
 msgstr "Usuń z ulubionych"

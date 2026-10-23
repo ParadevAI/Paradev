@@ -1,4 +1,12 @@
 export {
+	type FindOrphanedTagFoldersInput,
+	findOrphanedTagFolders,
+	type OrphanCheckWorkspace,
+	type OrphanedTagFolder,
+	type OrphanedTagFolders,
+	type TagFolderHostRead,
+} from "./orphanedTagFolders";
+export {
 	type CloudTagFolderWorkspace,
 	type HostTagFolderWorkspace,
 	mergeTagFolderWorkspaces,

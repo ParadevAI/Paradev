@@ -264,6 +264,10 @@ msgstr "{0, plural, other {提出了 # 個問題}}"
 msgid "{0, plural, one {Comments go to this agent} other {Comments go to these agents}}"
 msgstr "{0, plural, one {評論將傳送給此代理程式} other {評論將傳送給這些代理程式}}"
 
+#. placeholder {0}: failed.length
+msgid "{0, plural, one {Could not remove # folder} other {Could not remove # folders}}"
+msgstr "{0, plural, one {無法移除 # 個資料夾} other {無法移除 # 個資料夾}}"
+
 #. placeholder {0}: failures.length
 #. placeholder {0}: nextFailures.length
 msgid "{0, plural, one {Couldn’t delete # workspace} other {Couldn’t delete # workspaces}}"
@@ -317,6 +321,10 @@ msgstr "{0, plural, other {已暫停 # 個自動化。}}"
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Pauses # automation} other {Pauses # automations}}"
 msgstr "{0, plural, other {暫停 # 個自動化}}"
+
+#. placeholder {0}: removed.length
+msgid "{0, plural, one {Removed # empty folder} other {Removed # empty folders}}"
+msgstr "{0, plural, one {已移除 # 個空資料夾} other {已移除 # 個空資料夾}}"
 
 #. placeholder {0}: issues.length
 #. placeholder {0}: tasks.length
@@ -869,6 +877,9 @@ msgstr "{distance}前"
 msgid "{duration, plural, one {Thought for # second} other {Thought for # seconds}}"
 msgstr "{duration, plural, one {思考了#秒} other {思考了#秒}}"
 
+msgid "{emptyCount, plural, one {Remove # empty folder} other {Remove # empty folders}}"
+msgstr "{emptyCount, plural, one {移除 # 個空資料夾} other {移除 # 個空資料夾}}"
+
 #. js-lingui-explicit-id
 msgid "serverError.page.entryPathHeldByAnotherOrganization"
 msgstr "此工作區中的 {entryPath} 已在其他組織中發佈為頁面。請移動該檔案，或使用那個頁面的 id 發佈。"
@@ -1172,6 +1183,9 @@ msgstr "顯示{shownCount}個 · {0} · {1}個token"
 
 msgid "{skipped, plural, one {# skipped} other {# skipped}}"
 msgstr "{skipped, plural, one {#項已跳過} other {#項已跳過}}"
+
+msgid "{skipped, plural, one {Skipped # folder: a host or the cloud has not answered yet.} other {Skipped # folders: a host or the cloud has not answered yet.}}"
+msgstr "{skipped, plural, one {已略過 # 個資料夾：某台主機或雲端尚未回應。} other {已略過 # 個資料夾：某台主機或雲端尚未回應。}}"
 
 msgid "{starCount} stars and counting"
 msgstr "{starCount}個星標，還在成長"
@@ -11148,6 +11162,9 @@ msgstr "暫無下載"
 msgid "No emoji found"
 msgstr "未找到表情"
 
+msgid "No empty folders"
+msgstr "沒有空資料夾"
+
 msgid "No environment for {repositoryFullName}"
 msgstr "{repositoryFullName} 沒有環境"
 
@@ -11183,6 +11200,9 @@ msgstr "沒有檔案符合允許的型別。"
 
 msgid "No files match your search"
 msgstr "沒有符合搜尋的檔案"
+
+msgid "No folders removed"
+msgstr "未移除任何資料夾"
 
 msgid "No fonts found."
 msgstr "未找到字型。"
@@ -14007,6 +14027,9 @@ msgstr "移除 {repositoryName}"
 
 msgid "Remove attachment"
 msgstr "移除附件"
+
+msgid "Remove empty folders"
+msgstr "移除空資料夾"
 
 msgid "Remove from favorites"
 msgstr "從最愛移除"

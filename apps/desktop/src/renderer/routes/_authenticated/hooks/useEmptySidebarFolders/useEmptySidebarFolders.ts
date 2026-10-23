@@ -1,0 +1,285 @@
+import { errorMessage } from "@superset/i18n/errors";
+import { isMissingProcedureError } from "@superset/shared/missing-procedure-error";
+import {
+	normalizeWorkspaceTag,
+	SESSIONS_TAG_SCOPE,
+} from "@superset/shared/workspace-tags";
+import { useLiveQuery } from "@tanstack/react-db";
+import { useCallback, useMemo, useRef } from "react";
+import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
+import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
+import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
+import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
+import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
+import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
+import {
+	type FindOrphanedTagFoldersInput,
+	findOrphanedTagFolders,
+	laneProjectIdForScope,
+	type OrphanedTagFolder,
+	useTagFolderContext,
+} from "renderer/routes/_authenticated/utils/workspaceTagFolders";
+
+export interface EmptySidebarFolder {
+	scope: string;
+	/** Null for the Sessions lane. */
+	projectId: string | null;
+	projectName: string | null;
+	tag: string;
+	name: string;
+}
+
+export interface FailedSidebarFolder extends EmptySidebarFolder {
+	error: string;
+}
+
+export interface RemoveEmptySidebarFoldersResult {
+	/** Removed, or on a dry run the folders that would be. */
+	removed: EmptySidebarFolder[];
+	/** Looked empty, but a host or the cloud list could not confirm it. */
+	skipped: EmptySidebarFolder[];
+	failed: FailedSidebarFolder[];
+}
+
+export interface RemoveEmptySidebarFoldersOptions {
+	projectId?: string;
+	dryRun?: boolean;
+}
+
+interface FolderGroup {
+	folder: EmptySidebarFolder;
+	sectionIds: string[];
+}
+
+function hasErrorCode(error: unknown, code: string): boolean {
+	return (error as { data?: { code?: unknown } } | null)?.data?.code === code;
+}
+
+/** Drops one folder's presentation on one host. A host without the scope has none to drop. */
+async function deleteHostTagSetting(
+	url: string,
+	scope: string,
+	tag: string,
+): Promise<void> {
+	const client = getHostServiceClientByUrl(url);
+	try {
+		await client.tagFolders.delete.mutate({ scope, tag });
+	} catch (error) {
+		if (hasErrorCode(error, "NOT_FOUND")) return;
+		if (scope === SESSIONS_TAG_SCOPE || !isMissingProcedureError(error)) {
+			throw error;
+		}
+		try {
+			await client.project.deleteTagSetting.mutate({ projectId: scope, tag });
+		} catch (legacyError) {
+			if (!hasErrorCode(legacyError, "NOT_FOUND")) throw legacyError;
+		}
+	}
+}
+
+/**
+ * Stored folders that no workspace carries the tag of, and the purge that
+ * removes their presentation: the local row and the host
+ * `tag_folder_settings` row. It never changes a workspace's tags, so a
+ * folder that comes back later is a new, plain one.
+ */
+export function useEmptySidebarFolders() {
+	const collections = useCollections();
+	const {
+		workspaces: hostWorkspaces,
+		hostReads,
+		rosterLive,
+		cache,
+	} = useHostWorkspaces();
+	const { workspaces: cloudWorkspaces, isLive: cloudLive } =
+		useCloudWorkspaces();
+	const { projects: hostProjects, hostResults: projectHostResults } =
+		useHostProjects();
+	const { activeHostUrl } = useLocalHostService();
+	const tagFolderContext = useTagFolderContext();
+
+	const { data: sections = [] } = useLiveQuery(
+		(q) =>
+			q
+				.from({ sidebarSections: collections.v2SidebarSections })
+				.select(({ sidebarSections }) => ({
+					sectionId: sidebarSections.sectionId,
+					projectId: sidebarSections.projectId,
+					name: sidebarSections.name,
+					tag: sidebarSections.tag,
+				})),
+		[collections],
+	);
+	const { data: placements = [] } = useLiveQuery(
+		(q) =>
+			q
+				.from({ rows: collections.v2WorkspaceLocalState })
+				.select(({ rows }) => ({
+					workspaceId: rows.workspaceId,
+					projectId: rows.sidebarState.projectId,
+				})),
+		[collections],
+	);
+
+	const findInput = useMemo<FindOrphanedTagFoldersInput>(() => {
+		const placedProjectIdById = new Map(
+			placements.map((row) => [row.workspaceId, row.projectId]),
+		);
+		const projectIdsByHost = new Map(
+			projectHostResults.map((result) => [
+				result.target.machineId,
+				result.rows?.map((project) => project.id) ?? null,
+			]),
+		);
+		return {
+			sections,
+			workspaces: [
+				...hostWorkspaces
+					.filter((workspace) => !cache.isSandboxHost(workspace.hostId))
+					.map((workspace) => ({
+						id: workspace.id,
+						projectId: workspace.projectId,
+						tags: workspace.tags,
+					})),
+				...(cloudWorkspaces ?? []).map((workspace) => ({
+					id: workspace.id,
+					projectId: placedProjectIdById.get(workspace.id),
+					tags: workspace.tags,
+				})),
+			],
+			hostReads: hostReads.map((read) => ({
+				isLocal: read.isLocal,
+				live: read.live,
+				projectIds: projectIdsByHost.get(read.machineId) ?? null,
+			})),
+			rosterLive,
+			cloudLive,
+			hiddenTagsByProject: tagFolderContext.hiddenTagsByProject,
+		};
+	}, [
+		cache,
+		cloudLive,
+		cloudWorkspaces,
+		hostReads,
+		hostWorkspaces,
+		placements,
+		projectHostResults,
+		rosterLive,
+		sections,
+		tagFolderContext.hiddenTagsByProject,
+	]);
+	const latestFindInputRef = useRef(findInput);
+	latestFindInputRef.current = findInput;
+
+	const groupFolders = useCallback(
+		(folders: readonly OrphanedTagFolder[]): FolderGroup[] => {
+			const groups = new Map<string, FolderGroup>();
+			for (const folder of folders) {
+				const key = `${folder.scope}\u0000${folder.tag}`;
+				const existing = groups.get(key);
+				if (existing) {
+					existing.sectionIds.push(folder.sectionId);
+					continue;
+				}
+				const setting = tagFolderContext.tagSettings.find(
+					(item) =>
+						item.projectId === folder.scope &&
+						normalizeWorkspaceTag(item.tag) === folder.tag,
+				);
+				groups.set(key, {
+					sectionIds: [folder.sectionId],
+					folder: {
+						scope: folder.scope,
+						projectId: laneProjectIdForScope(folder.scope),
+						projectName:
+							hostProjects.find(
+								(project) => project.projectKey === folder.scope,
+							)?.name ?? null,
+						tag: folder.tag,
+						name: setting?.displayName ?? folder.name,
+					},
+				});
+			}
+			return [...groups.values()];
+		},
+		[hostProjects, tagFolderContext.tagSettings],
+	);
+
+	const { emptyGroups, unverifiedGroups } = useMemo(() => {
+		const found = findOrphanedTagFolders(findInput);
+		return {
+			emptyGroups: groupFolders(found.orphaned),
+			unverifiedGroups: groupFolders(found.unverified),
+		};
+	}, [findInput, groupFolders]);
+
+	/** A project's folders live on every host serving it; Sessions folders on the active host. */
+	const resolveSettingHostUrls = useCallback(
+		(scope: string): string[] => {
+			if (scope === SESSIONS_TAG_SCOPE) {
+				return activeHostUrl ? [activeHostUrl] : [];
+			}
+			const project = hostProjects.find((item) => item.projectKey === scope);
+			return (project?.hostIds ?? [])
+				.map((hostId) => cache.resolveHostUrl(hostId))
+				.filter((url): url is string => url != null);
+		},
+		[activeHostUrl, cache, hostProjects],
+	);
+
+	const removeEmptyFolders = useCallback(
+		async ({
+			projectId,
+			dryRun = false,
+		}: RemoveEmptySidebarFoldersOptions = {}): Promise<RemoveEmptySidebarFoldersResult> => {
+			const found = findOrphanedTagFolders({ ...findInput, scope: projectId });
+			const candidates = groupFolders(found.orphaned);
+			const skipped = groupFolders(found.unverified).map(
+				({ folder }) => folder,
+			);
+			if (dryRun) {
+				return {
+					removed: candidates.map(({ folder }) => folder),
+					skipped,
+					failed: [],
+				};
+			}
+			const removed: EmptySidebarFolder[] = [];
+			const failed: FailedSidebarFolder[] = [];
+			for (const { folder, sectionIds } of candidates) {
+				try {
+					await Promise.all(
+						resolveSettingHostUrls(folder.scope).map((url) =>
+							deleteHostTagSetting(url, folder.scope, folder.tag),
+						),
+					);
+				} catch (error) {
+					failed.push({ ...folder, error: errorMessage(error) });
+					continue;
+				}
+				const stillEmpty = findOrphanedTagFolders({
+					...latestFindInputRef.current,
+					scope: folder.scope,
+				}).orphaned.some((current) => current.tag === folder.tag);
+				if (!stillEmpty) {
+					skipped.push(folder);
+					continue;
+				}
+				for (const sectionId of sectionIds) {
+					if (collections.v2SidebarSections.get(sectionId)) {
+						collections.v2SidebarSections.delete(sectionId);
+					}
+				}
+				removed.push(folder);
+			}
+			return { removed, skipped, failed };
+		},
+		[collections, findInput, groupFolders, resolveSettingHostUrls],
+	);
+
+	return {
+		emptyFolders: emptyGroups.map(({ folder }) => folder),
+		unverifiedFolders: unverifiedGroups.map(({ folder }) => folder),
+		removeEmptyFolders,
+	};
+}
