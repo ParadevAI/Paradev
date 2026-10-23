@@ -1187,6 +1187,9 @@ msgstr "{skipped, plural, one {#项已跳过} other {#项已跳过}}"
 msgid "{skipped, plural, one {Skipped # folder: a host or the cloud has not answered yet.} other {Skipped # folders: a host or the cloud has not answered yet.}}"
 msgstr "{skipped, plural, one {已跳过 # 个文件夹：某台主机或云端尚未响应。} other {已跳过 # 个文件夹：某台主机或云端尚未响应。}}"
 
+msgid "{skipped, plural, one {Skipped # folder: it changed while it was being removed.} other {Skipped # folders: they changed while they were being removed.}}"
+msgstr "{skipped, plural, one {已跳过 # 个文件夹：删除过程中文件夹发生了变化。} other {已跳过 # 个文件夹：删除过程中文件夹发生了变化。}}"
+
 msgid "{skipped, plural, one {Skipped # folder: not every host that keeps its settings is known yet.} other {Skipped # folders: not every host that keeps their settings is known yet.}}"
 msgstr "{skipped, plural, one {已跳过 # 个文件夹：尚未确定保存其设置的所有主机。} other {已跳过 # 个文件夹：尚未确定保存其设置的所有主机。}}"
 

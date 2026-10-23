@@ -26,6 +26,15 @@ export function RemoveEmptyFoldersMenuItem() {
 	const describeSkipped = (skippedFolders: readonly SkippedSidebarFolder[]) => {
 		const skipped = skippedFolders.length;
 		if (skipped === 0) return undefined;
+		if (skippedFolders.every(({ reason }) => reason === "noLongerEmpty")) {
+			return t({
+				message: plural(skipped, {
+					one: "Skipped # folder: it changed while it was being removed.",
+					other:
+						"Skipped # folders: they changed while they were being removed.",
+				}),
+			});
+		}
 		if (
 			skippedFolders.every(({ reason }) => reason === "organizationChanged")
 		) {

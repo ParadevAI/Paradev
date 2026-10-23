@@ -13,10 +13,15 @@ export interface FailedSidebarFolder extends EmptySidebarFolder {
 	error: string;
 }
 
-/** `organizationChanged`: the window switched organization while the prune ran. */
+/**
+ * `organizationChanged`: the window switched organization while the prune
+ * ran. `noLongerEmpty`: while the prune ran, a workspace took the folder's
+ * tag or the folder was hidden.
+ */
 export type SidebarFolderSkipReason =
 	| UnverifiedTagFolderReason
-	| "organizationChanged";
+	| "organizationChanged"
+	| "noLongerEmpty";
 
 export interface SkippedSidebarFolder extends EmptySidebarFolder {
 	reason: SidebarFolderSkipReason;

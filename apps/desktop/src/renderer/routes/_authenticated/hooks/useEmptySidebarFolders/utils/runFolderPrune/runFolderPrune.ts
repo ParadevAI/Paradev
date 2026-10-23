@@ -94,6 +94,24 @@ export async function runFolderPrune({
 		};
 	}
 
+	// Earlier folders' deletes take time; a later folder can gain a workspace,
+	// be hidden, or lose a source meanwhile. Check against the latest render.
+	const whyNotEmptyNow = (
+		folder: EmptySidebarFolder,
+	): SkippedSidebarFolder["reason"] | null => {
+		const latest = findOrphanedTagFolders({
+			...readLatest().findInput,
+			scope: folder.scope,
+		});
+		if (latest.orphaned.some((current) => current.tag === folder.tag)) {
+			return null;
+		}
+		return (
+			latest.unverified.find((current) => current.tag === folder.tag)?.reason ??
+			"noLongerEmpty"
+		);
+	};
+
 	const removed: EmptySidebarFolder[] = [];
 	const failed: FailedSidebarFolder[] = [];
 	for (const [index, { folder, sectionIds, urls }] of candidates.entries()) {
@@ -104,6 +122,11 @@ export async function runFolderPrune({
 					.map((candidate) => asSwitched(candidate.folder)),
 			);
 			break;
+		}
+		const beforeHostDelete = whyNotEmptyNow(folder);
+		if (beforeHostDelete) {
+			skipped.push({ ...folder, reason: beforeHostDelete });
+			continue;
 		}
 		try {
 			await Promise.all(
@@ -121,18 +144,9 @@ export async function runFolderPrune({
 			);
 			break;
 		}
-		const latest = findOrphanedTagFolders({
-			...readLatest().findInput,
-			scope: folder.scope,
-		});
-		const nowUnverified = latest.unverified.find(
-			(current) => current.tag === folder.tag,
-		);
-		if (nowUnverified) {
-			skipped.push({ ...folder, reason: nowUnverified.reason });
-			continue;
-		}
-		if (!latest.orphaned.some((current) => current.tag === folder.tag)) {
+		const beforeRowDelete = whyNotEmptyNow(folder);
+		if (beforeRowDelete) {
+			skipped.push({ ...folder, reason: beforeRowDelete });
 			continue;
 		}
 		deleteRows(sectionIds);

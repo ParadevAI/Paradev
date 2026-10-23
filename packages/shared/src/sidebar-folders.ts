@@ -23,12 +23,14 @@ export interface SidebarFolder {
  * `unanswered`: a host or the cloud list has not answered, so the tag may
  * still be in use. `settingHostsUnknown`: not every host that keeps the
  * folder's settings is known yet. `organizationChanged`: the desktop window
- * switched organization while the prune ran.
+ * switched organization while the prune ran. `noLongerEmpty`: while the
+ * prune ran, a workspace took the folder's tag or the folder was hidden.
  */
 export type SidebarFolderSkipReason =
 	| "unanswered"
 	| "settingHostsUnknown"
-	| "organizationChanged";
+	| "organizationChanged"
+	| "noLongerEmpty";
 
 export interface SidebarFolderPruneResult {
 	dryRun: boolean;

@@ -11,6 +11,7 @@ const SKIP_NOTES: Record<SidebarFolderSkipReason, string> = {
 	unanswered: "a host or the cloud has not answered yet",
 	settingHostsUnknown: "not every host that keeps its settings is known yet",
 	organizationChanged: "the desktop window switched organization",
+	noLongerEmpty: "it changed while the prune ran",
 };
 
 function rowsOf(result: SidebarFolderPruneResult) {

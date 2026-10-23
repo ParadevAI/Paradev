@@ -90,6 +90,13 @@ function setup() {
 		switchToB: () => {
 			latest = orgB;
 		},
+		changeA: (
+			change: (
+				input: FindOrphanedTagFoldersInput,
+			) => FindOrphanedTagFoldersInput,
+		) => {
+			latest = { ...latest, findInput: change(latest.findInput) };
+		},
 		deleteHostSetting,
 		deleteRows,
 		run: (refresh: () => Promise<FindOrphanedTagFoldersInput>) =>
@@ -150,6 +157,37 @@ describe("runFolderPrune", () => {
 		expect(deleteHostSetting.mock.calls.some(([url]) => url === "host-b")).toBe(
 			false,
 		);
+	});
+
+	it.each([
+		[
+			"a workspace takes its tag",
+			(input: FindOrphanedTagFoldersInput) => ({
+				...input,
+				workspaces: [{ id: "w1", projectId: PROJECT_A, tags: ["docs"] }],
+			}),
+		],
+		[
+			"it is hidden",
+			(input: FindOrphanedTagFoldersInput) => ({
+				...input,
+				hiddenTagsByProject: new Map([[PROJECT_A, new Set(["docs"])]]),
+			}),
+		],
+	])("sends no deletes for a later folder when %s while an earlier delete is pending", async (_name, change) => {
+		const { run, changeA, deleteHostSetting, deleteRows } = setup();
+		deleteHostSetting.mockImplementationOnce(async () => {
+			changeA(change);
+		});
+		const result = await run(async () => orgA.findInput);
+		expect(deleteHostSetting.mock.calls).toEqual([
+			["host-a", PROJECT_A, "perf"],
+		]);
+		expect(deleteRows.mock.calls).toEqual([[[`${PROJECT_A}:perf`]]]);
+		expect(result.removed.map(({ tag }) => tag)).toEqual(["perf"]);
+		expect(result.skipped.map(({ tag, reason }) => [tag, reason])).toEqual([
+			["docs", "noLongerEmpty"],
+		]);
 	});
 
 	it("lists without deleting on a dry run", async () => {

@@ -1187,6 +1187,9 @@ msgstr "{skipped, plural, one {# пропущено} few {# пропущено} 
 msgid "{skipped, plural, one {Skipped # folder: a host or the cloud has not answered yet.} other {Skipped # folders: a host or the cloud has not answered yet.}}"
 msgstr "{skipped, plural, one {Пропущена # папка: хост или облако ещё не ответили.} few {Пропущены # папки: хост или облако ещё не ответили.} many {Пропущено # папок: хост или облако ещё не ответили.} other {Пропущено # папки: хост или облако ещё не ответили.}}"
 
+msgid "{skipped, plural, one {Skipped # folder: it changed while it was being removed.} other {Skipped # folders: they changed while they were being removed.}}"
+msgstr "{skipped, plural, one {Пропущена # папка: она изменилась во время удаления.} few {Пропущены # папки: они изменились во время удаления.} many {Пропущено # папок: они изменились во время удаления.} other {Пропущено # папки: они изменились во время удаления.}}"
+
 msgid "{skipped, plural, one {Skipped # folder: not every host that keeps its settings is known yet.} other {Skipped # folders: not every host that keeps their settings is known yet.}}"
 msgstr "{skipped, plural, one {Пропущена # папка: известны ещё не все хосты, где хранятся её настройки.} few {Пропущены # папки: известны ещё не все хосты, где хранятся их настройки.} many {Пропущено # папок: известны ещё не все хосты, где хранятся их настройки.} other {Пропущено # папки: известны ещё не все хосты, где хранятся их настройки.}}"
 

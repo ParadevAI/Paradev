@@ -1187,6 +1187,9 @@ msgstr "{skipped, plural, one {# ignorado} other {# ignorados}}"
 msgid "{skipped, plural, one {Skipped # folder: a host or the cloud has not answered yet.} other {Skipped # folders: a host or the cloud has not answered yet.}}"
 msgstr "{skipped, plural, one {# pasta ignorada: um host ou a nuvem ainda não respondeu.} other {# pastas ignoradas: um host ou a nuvem ainda não respondeu.}}"
 
+msgid "{skipped, plural, one {Skipped # folder: it changed while it was being removed.} other {Skipped # folders: they changed while they were being removed.}}"
+msgstr "{skipped, plural, one {# pasta ignorada: ela mudou durante a remoção.} other {# pastas ignoradas: elas mudaram durante a remoção.}}"
+
 msgid "{skipped, plural, one {Skipped # folder: not every host that keeps its settings is known yet.} other {Skipped # folders: not every host that keeps their settings is known yet.}}"
 msgstr "{skipped, plural, one {# pasta ignorada: ainda não se conhecem todos os hosts que guardam suas configurações.} other {# pastas ignoradas: ainda não se conhecem todos os hosts que guardam suas configurações.}}"
 

@@ -1187,6 +1187,9 @@ msgstr "{skipped, plural, one {#件スキップ} other {#件スキップ}}"
 msgid "{skipped, plural, one {Skipped # folder: a host or the cloud has not answered yet.} other {Skipped # folders: a host or the cloud has not answered yet.}}"
 msgstr "{skipped, plural, one {#個のフォルダをスキップしました: ホストまたはクラウドがまだ応答していません。} other {#個のフォルダをスキップしました: ホストまたはクラウドがまだ応答していません。}}"
 
+msgid "{skipped, plural, one {Skipped # folder: it changed while it was being removed.} other {Skipped # folders: they changed while they were being removed.}}"
+msgstr "{skipped, plural, one {#個のフォルダをスキップしました: 削除中に変更されました。} other {#個のフォルダをスキップしました: 削除中に変更されました。}}"
+
 msgid "{skipped, plural, one {Skipped # folder: not every host that keeps its settings is known yet.} other {Skipped # folders: not every host that keeps their settings is known yet.}}"
 msgstr "{skipped, plural, one {#個のフォルダをスキップしました: 設定を保持しているホストがまだすべて判明していません。} other {#個のフォルダをスキップしました: 設定を保持しているホストがまだすべて判明していません。}}"
 
