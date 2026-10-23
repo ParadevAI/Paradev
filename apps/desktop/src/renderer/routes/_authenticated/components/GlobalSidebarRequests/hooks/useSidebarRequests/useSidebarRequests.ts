@@ -4,7 +4,7 @@ import type {
 	SidebarFolderPruneRequest,
 	SidebarFolderPruneResult,
 } from "@superset/shared/sidebar-folders";
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
 import {
@@ -30,7 +30,9 @@ export function useSidebarRequests() {
 	const organizationId = useActiveOrganizationId();
 	const { removeEmptyFolders } = useEmptySidebarFolders();
 	const latestRef = useRef({ organizationId, removeEmptyFolders });
-	latestRef.current = { organizationId, removeEmptyFolders };
+	useLayoutEffect(() => {
+		latestRef.current = { organizationId, removeEmptyFolders };
+	});
 
 	useEffect(() => {
 		const serve = async (

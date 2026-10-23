@@ -5,7 +5,7 @@ import {
 } from "@superset/shared/workspace-tags";
 import { useLiveQuery } from "@tanstack/react-db";
 import { useQueryClient } from "@tanstack/react-query";
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useLayoutEffect, useMemo, useRef } from "react";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
@@ -261,7 +261,10 @@ export function useEmptySidebarFolders() {
 		toSkipped,
 	};
 	const latestRef = useRef(latest);
-	latestRef.current = latest;
+	// After commit, so an in-flight prune only ever reads committed data.
+	useLayoutEffect(() => {
+		latestRef.current = latest;
+	});
 
 	const removeEmptyFolders = useCallback(
 		({
