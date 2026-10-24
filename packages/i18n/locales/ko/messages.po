@@ -65,6 +65,9 @@ msgstr "\"{0}\"이(가) 더 이상 실행되지 않으며 실행 기록도 삭�
 msgid "\"{name}\" deleted"
 msgstr "\"{name}\"을(를) 삭제했습니다"
 
+msgid "\"{name}\" is over {limit}, the most a workspace outside the cloud can take"
+msgstr "\"{name}\"이(가) {limit}를 넘습니다. 클라우드 밖의 워크스페이스는 최대 {limit}까지 받을 수 있습니다"
+
 msgid "\"{name}\" paused"
 msgstr "\"{name}\"을(를) 일시 중지했습니다"
 
@@ -19713,9 +19716,6 @@ msgstr "워크스페이스를 열었지만 터미널을 시작하지 못했습�
 
 msgid "Workspace path is not available"
 msgstr "워크스페이스 경로를 사용할 수 없습니다"
-
-msgid "Workspace path is not available yet"
-msgstr "작업 공간 경로를 아직 사용할 수 없습니다"
 
 msgid "Workspace restored"
 msgstr "워크스페이스를 복원했습니다"

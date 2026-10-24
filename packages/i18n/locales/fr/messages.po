@@ -65,6 +65,9 @@ msgstr "« {0} » ne se déclenchera plus et son historique d'exécutions sera s
 msgid "\"{name}\" deleted"
 msgstr "« {name} » supprimée"
 
+msgid "\"{name}\" is over {limit}, the most a workspace outside the cloud can take"
+msgstr "« {name} » dépasse {limit}, le maximum qu’accepte un espace de travail hors du cloud"
+
 msgid "\"{name}\" paused"
 msgstr "« {name} » mise en pause"
 
@@ -19713,9 +19716,6 @@ msgstr "Espace de travail ouvert, mais le terminal n'a pas démarré."
 
 msgid "Workspace path is not available"
 msgstr "Le chemin de l'espace de travail n'est pas disponible"
-
-msgid "Workspace path is not available yet"
-msgstr "Le chemin de l’espace de travail n’est pas encore disponible"
 
 msgid "Workspace restored"
 msgstr "Espace de travail restauré"

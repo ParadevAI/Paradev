@@ -65,6 +65,9 @@ msgstr "“{0}”将不再触发，其运行历史也会被移除。此操作无
 msgid "\"{name}\" deleted"
 msgstr "“{name}”已删除"
 
+msgid "\"{name}\" is over {limit}, the most a workspace outside the cloud can take"
+msgstr "“{name}”超过 {limit}，这是云端以外的工作区可接收的上限"
+
 msgid "\"{name}\" paused"
 msgstr "“{name}”已暂停"
 
@@ -19713,9 +19716,6 @@ msgstr "工作区已打开，但终端启动失败。"
 
 msgid "Workspace path is not available"
 msgstr "工作区路径不可用"
-
-msgid "Workspace path is not available yet"
-msgstr "工作区路径尚不可用"
 
 msgid "Workspace restored"
 msgstr "工作区已恢复"

@@ -65,6 +65,9 @@ msgstr "\"{0}\" artık tetiklenmeyecek ve çalıştırma geçmişi kaldırılaca
 msgid "\"{name}\" deleted"
 msgstr "\"{name}\" silindi"
 
+msgid "\"{name}\" is over {limit}, the most a workspace outside the cloud can take"
+msgstr "\"{name}\" {limit} sınırını aşıyor; bulut dışındaki bir çalışma alanı en fazla bu kadarını alabilir"
+
 msgid "\"{name}\" paused"
 msgstr "\"{name}\" duraklatıldı"
 
@@ -19713,9 +19716,6 @@ msgstr "Çalışma alanı açıldı, ancak terminal başlatılamadı."
 
 msgid "Workspace path is not available"
 msgstr "Çalışma alanı yolu kullanılamıyor"
-
-msgid "Workspace path is not available yet"
-msgstr "Çalışma alanı yolu henüz kullanılamıyor"
 
 msgid "Workspace restored"
 msgstr "Çalışma alanı geri yüklendi"

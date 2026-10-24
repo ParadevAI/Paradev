@@ -6,9 +6,11 @@ import type {
 	SessionState,
 	ToolCall,
 	Turn,
+	UserContent,
 } from "@superset/chat/protocol";
 import { itemSchema, turnSchema } from "@superset/chat/protocol";
-import type { AdapterEvent } from "../../types";
+import { attachedFilesBlock } from "../../attachedFiles";
+import type { AdapterEvent, ResolveAttachment } from "../../types";
 import { FixturePlayer } from "../fixturePlayer";
 import type { CodexFixtureName } from "../fixtures";
 import { fixtureCwd, loadCodexFixture } from "../fixtures";
@@ -18,6 +20,8 @@ const FIXED_NOW = 1_785_000_000_000;
 
 type ReplayOptions = {
 	onEvent?(event: AdapterEvent, adapter: CodexAdapter): void;
+	prompt?: UserContent[];
+	resolveAttachment?: ResolveAttachment;
 };
 
 type ReplayResult = {
@@ -40,6 +44,7 @@ async function replay(
 	let minted = 0;
 	const adapter = new CodexAdapter({
 		createTransport: (_spawnOptions, handlers) => player.transport(handlers),
+		resolveAttachment: options.resolveAttachment,
 		now: () => FIXED_NOW,
 		mintId: () => {
 			minted += 1;
@@ -55,7 +60,7 @@ async function replay(
 		}
 	})();
 
-	adapter.prompt([{ type: "text", text: "fixture prompt" }]);
+	adapter.prompt(options.prompt ?? [{ type: "text", text: "fixture prompt" }]);
 
 	const deadline = Date.now() + 5000;
 	while (!player.exhausted) {
@@ -305,5 +310,68 @@ describe("codexAdapter fixtures", () => {
 		expect(settled.completedAtMs).toBe(FIXED_NOW);
 		expect(settled.text.startsWith("1\n2\n3\n")).toBe(true);
 		expect(settled.text.endsWith("36")).toBe(true);
+	});
+});
+
+describe("codexAdapter attachments", () => {
+	const part = (name: string, mimeType: string) => ({
+		type: "attachment" as const,
+		attachmentId: name,
+		name,
+		mimeType,
+	});
+
+	async function turnInput(
+		prompt: UserContent[],
+		resolveAttachment: ResolveAttachment,
+	): Promise<unknown> {
+		const { player } = await replay("text", { prompt, resolveAttachment });
+		return (player.paramsSent("turn/start")[0] as { input: unknown }).input;
+	}
+
+	test("an image goes to app-server as a localImage", async () => {
+		expect(
+			await turnInput(
+				[{ type: "text", text: "look" }, part("shot.png", "image/png")],
+				async () => ({
+					path: "/store/a/a.png",
+					mimeType: "image/png",
+					data: "",
+				}),
+			),
+		).toEqual([
+			{ type: "text", text: "look", text_elements: [] },
+			{ type: "localImage", path: "/store/a/a.png" },
+		]);
+	});
+
+	test("a non-image goes as its name and path", async () => {
+		expect(
+			await turnInput([part("spec.pdf", "application/pdf")], async () => ({
+				path: "/store/b/b.pdf",
+				mimeType: "application/pdf",
+				data: "",
+			})),
+		).toEqual([
+			{
+				type: "text",
+				text: attachedFilesBlock([
+					{ name: "spec.pdf", path: "/store/b/b.pdf" },
+				]),
+				text_elements: [],
+			},
+		]);
+	});
+
+	test("an unreadable attachment is named, not dropped", async () => {
+		expect(
+			await turnInput([part("gone.png", "image/png")], async () => null),
+		).toEqual([
+			{
+				type: "text",
+				text: "[gone.png: could not be read]",
+				text_elements: [],
+			},
+		]);
 	});
 });

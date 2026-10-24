@@ -65,6 +65,9 @@ msgstr "\"{0}\" wird nicht mehr ausgelöst und der Ausführungsverlauf wird entf
 msgid "\"{name}\" deleted"
 msgstr "\"{name}\" gelöscht"
 
+msgid "\"{name}\" is over {limit}, the most a workspace outside the cloud can take"
+msgstr "„{name}“ ist größer als {limit} – mehr nimmt ein Arbeitsbereich außerhalb der Cloud nicht an"
+
 msgid "\"{name}\" paused"
 msgstr "\"{name}\" pausiert"
 
@@ -19713,9 +19716,6 @@ msgstr "Arbeitsbereich geöffnet, aber das Terminal konnte nicht starten."
 
 msgid "Workspace path is not available"
 msgstr "Pfad des Arbeitsbereichs ist nicht verfügbar"
-
-msgid "Workspace path is not available yet"
-msgstr "Der Workspace-Pfad ist noch nicht verfügbar"
 
 msgid "Workspace restored"
 msgstr "Arbeitsbereich wiederhergestellt"

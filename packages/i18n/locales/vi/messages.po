@@ -65,6 +65,9 @@ msgstr "\"{0}\" sẽ ngừng kích hoạt và lịch sử chạy sẽ bị xóa.
 msgid "\"{name}\" deleted"
 msgstr "Đã xóa \"{name}\""
 
+msgid "\"{name}\" is over {limit}, the most a workspace outside the cloud can take"
+msgstr "\"{name}\" vượt quá {limit}, mức tối đa mà một workspace ngoài cloud có thể nhận"
+
 msgid "\"{name}\" paused"
 msgstr "Đã tạm dừng \"{name}\""
 
@@ -19713,9 +19716,6 @@ msgstr "Đã mở workspace, nhưng terminal không khởi động được."
 
 msgid "Workspace path is not available"
 msgstr "Không có đường dẫn workspace"
-
-msgid "Workspace path is not available yet"
-msgstr "Đường dẫn không gian làm việc chưa sẵn sàng"
 
 msgid "Workspace restored"
 msgstr "Đã khôi phục workspace"

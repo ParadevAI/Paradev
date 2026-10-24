@@ -14,6 +14,20 @@ export type AdapterEvent =
 	| { kind: "turn"; turn: Turn }
 	| { kind: "session"; session: Partial<SessionState> };
 
+export type AttachmentPart = Extract<UserContent, { type: "attachment" }>;
+
+/** `data` is an image's bytes, base64; empty for any other file, which goes by `path`. */
+export type ResolvedAttachment = {
+	path: string;
+	mimeType: string;
+	data: string;
+};
+
+/** Null when the bytes cannot be had: the adapter tells the agent so. */
+export type ResolveAttachment = (
+	part: AttachmentPart,
+) => Promise<ResolvedAttachment | null>;
+
 export type HarnessStartOptions = {
 	cwd: string;
 	modeId?: string;

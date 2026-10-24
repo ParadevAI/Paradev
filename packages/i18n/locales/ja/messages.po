@@ -65,6 +65,9 @@ msgstr "「{0}」は発火しなくなり、実行履歴も削除されます。
 msgid "\"{name}\" deleted"
 msgstr "「{name}」を削除しました"
 
+msgid "\"{name}\" is over {limit}, the most a workspace outside the cloud can take"
+msgstr "「{name}」は {limit} を超えています。クラウド外のワークスペースが受け取れるのは {limit} までです"
+
 msgid "\"{name}\" paused"
 msgstr "「{name}」を一時停止しました"
 
@@ -19713,9 +19716,6 @@ msgstr "ワークスペースを開きましたが、ターミナルを起動で
 
 msgid "Workspace path is not available"
 msgstr "ワークスペースのパスを利用できません"
-
-msgid "Workspace path is not available yet"
-msgstr "ワークスペースのパスはまだ利用できません"
 
 msgid "Workspace restored"
 msgstr "ワークスペースを復元しました"

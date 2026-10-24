@@ -65,6 +65,9 @@ msgstr "„{0}” przestanie się uruchamiać, a jej historia uruchomień zostan
 msgid "\"{name}\" deleted"
 msgstr "„{name}” usunięta"
 
+msgid "\"{name}\" is over {limit}, the most a workspace outside the cloud can take"
+msgstr "„{name}” przekracza {limit} — tyle maksymalnie przyjmuje obszar roboczy poza chmurą"
+
 msgid "\"{name}\" paused"
 msgstr "„{name}” wstrzymana"
 
@@ -19713,9 +19716,6 @@ msgstr "Obszar roboczy otwarty, ale terminal się nie uruchomił."
 
 msgid "Workspace path is not available"
 msgstr "Ścieżka obszaru roboczego jest niedostępna"
-
-msgid "Workspace path is not available yet"
-msgstr "Ścieżka obszaru roboczego nie jest jeszcze dostępna"
 
 msgid "Workspace restored"
 msgstr "Przywrócono obszar roboczy"

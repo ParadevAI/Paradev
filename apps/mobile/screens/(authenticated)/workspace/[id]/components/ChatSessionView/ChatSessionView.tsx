@@ -28,6 +28,7 @@ import {
 import { ActionSheetIOS, Alert, Pressable, View } from "react-native";
 import { Conversation } from "@/components/ai-elements/conversation";
 import { Text } from "@/components/ui/text";
+import type { ChatAttachmentPart } from "@/lib/attachments/chatParts";
 import {
 	type ChatHost,
 	createChatSessionClient,
@@ -73,11 +74,7 @@ function activityTexts(
 	);
 }
 
-export interface ChatAttachment {
-	attachmentId: string;
-	name: string;
-	mimeType: string;
-}
+export type ChatAttachment = Omit<ChatAttachmentPart, "type">;
 
 export interface ChatSessionViewHandle {
 	send: (text: string, attachments?: ChatAttachment[]) => Promise<void>;
@@ -331,8 +328,8 @@ export const ChatSessionView = forwardRef<
 				chat.sendPrompt([
 					...(text.trim() ? [{ type: "text" as const, text }] : []),
 					...attachments.map((attachment) => ({
-						type: "attachment" as const,
 						...attachment,
+						type: "attachment" as const,
 					})),
 				]);
 			},

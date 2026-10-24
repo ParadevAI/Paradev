@@ -65,6 +65,9 @@ msgstr "«{0}» перестанет срабатывать, а история �
 msgid "\"{name}\" deleted"
 msgstr "«{name}» удалена"
 
+msgid "\"{name}\" is over {limit}, the most a workspace outside the cloud can take"
+msgstr "«{name}» больше {limit} — это максимум для рабочей области вне облака"
+
 msgid "\"{name}\" paused"
 msgstr "«{name}» приостановлена"
 
@@ -19713,9 +19716,6 @@ msgstr "Рабочая область открыта, но терминал не
 
 msgid "Workspace path is not available"
 msgstr "Путь к рабочей области недоступен"
-
-msgid "Workspace path is not available yet"
-msgstr "Путь рабочего пространства пока недоступен"
 
 msgid "Workspace restored"
 msgstr "Рабочая область восстановлена"

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { appendPastedText } from "@superset/chat/core";
+import { appendPastedText } from "../pastedText/pastedText";
 import { formatAttachmentTag, parseAttachmentTags } from "./attachmentTags";
 
 describe("attachmentTags", () => {

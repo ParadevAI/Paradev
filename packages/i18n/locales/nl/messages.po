@@ -65,6 +65,9 @@ msgstr "\"{0}\" wordt niet meer geactiveerd en de geschiedenis van runs wordt ve
 msgid "\"{name}\" deleted"
 msgstr "\"{name}\" verwijderd"
 
+msgid "\"{name}\" is over {limit}, the most a workspace outside the cloud can take"
+msgstr "\"{name}\" is groter dan {limit}, het maximum dat een werkruimte buiten de cloud aankan"
+
 msgid "\"{name}\" paused"
 msgstr "\"{name}\" gepauzeerd"
 
@@ -19713,9 +19716,6 @@ msgstr "Werkruimte geopend, maar de terminal kon niet starten."
 
 msgid "Workspace path is not available"
 msgstr "Pad van werkruimte is niet beschikbaar"
-
-msgid "Workspace path is not available yet"
-msgstr "Het werkruimtepad is nog niet beschikbaar"
 
 msgid "Workspace restored"
 msgstr "Werkruimte hersteld"

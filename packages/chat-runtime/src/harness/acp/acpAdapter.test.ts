@@ -2,7 +2,7 @@ import { describe, expect, it, jest } from "bun:test";
 import { spawn } from "node:child_process";
 import type { Item } from "@superset/chat/protocol";
 import { AGENT_DEFAULT_MODE, wrapHiddenText } from "@superset/chat/protocol";
-import type { AdapterEvent } from "../types";
+import type { AdapterEvent, ResolveAttachment } from "../types";
 import {
 	AcpAdapter,
 	type AcpAdapterOptions,
@@ -5180,11 +5180,7 @@ describe("AcpAdapter config options", () => {
 describe("AcpAdapter attachments", () => {
 	const startWith = (
 		agent: FakeAcpAgent,
-		resolveAttachment: (id: string) => Promise<{
-			path: string;
-			mimeType: string;
-			data: string;
-		} | null>,
+		resolveAttachment: ResolveAttachment,
 	) => {
 		const adapter = new AcpAdapter({
 			command: "fake",
@@ -5277,6 +5273,25 @@ describe("AcpAdapter attachments", () => {
 				/missing\.png/.test(String(e.item.text)),
 		);
 		expect(told).toBe(true);
+	});
+
+	it("hands the resolver the whole part, so a cloud part resolves by its fileId", async () => {
+		const agent = new FakeAcpAgent();
+		const asked: unknown[] = [];
+		const { adapter } = startWith(agent, async (part) => {
+			asked.push(part);
+			return null;
+		});
+		await flush();
+		const part = {
+			type: "attachment" as const,
+			fileId: "8c1f6f8e-3a2b-4c5d-9e0f-112233445566",
+			name: "shot.png",
+			mimeType: "image/png",
+		};
+		adapter.prompt([part]);
+		await flush();
+		expect(asked).toEqual([part]);
 	});
 });
 

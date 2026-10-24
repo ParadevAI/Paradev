@@ -65,6 +65,9 @@ msgstr "\"{0}\" akan berhenti berjalan dan riwayat run-nya akan dihapus. Ini tid
 msgid "\"{name}\" deleted"
 msgstr "\"{name}\" dihapus"
 
+msgid "\"{name}\" is over {limit}, the most a workspace outside the cloud can take"
+msgstr "\"{name}\" melebihi {limit}, batas maksimum untuk workspace di luar cloud"
+
 msgid "\"{name}\" paused"
 msgstr "\"{name}\" dijeda"
 
@@ -19713,9 +19716,6 @@ msgstr "Workspace terbuka, tapi terminal gagal dijalankan."
 
 msgid "Workspace path is not available"
 msgstr "Path workspace tidak tersedia"
-
-msgid "Workspace path is not available yet"
-msgstr "Jalur ruang kerja belum tersedia"
 
 msgid "Workspace restored"
 msgstr "Workspace dipulihkan"
