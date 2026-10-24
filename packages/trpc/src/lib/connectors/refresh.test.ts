@@ -10,6 +10,7 @@ import * as crypto from "../../router/plugins/crypto";
 
 let rows: Array<Record<string, unknown>> = [];
 let stored: Record<string, unknown> | null = null;
+let reads: Array<Record<string, unknown> | null> = [];
 let updates: Array<Record<string, unknown>> = [];
 let response: { status: number; ok: boolean; body: unknown } | null = null;
 let fetchError: Error | null = null;
@@ -24,6 +25,10 @@ const selectChain = {
 	limit: (n: number) => {
 		limits.push(n);
 		if (rows.length) return Promise.resolve(rows.slice(0, n));
+		if (reads.length) {
+			const next = reads.shift();
+			return Promise.resolve(next ? [next] : []);
+		}
 		return Promise.resolve(stored ? [stored] : []);
 	},
 };
@@ -99,6 +104,7 @@ beforeEach(() => {
 	updates = [];
 	limits = [];
 	rows = [];
+	reads = [];
 	response = null;
 	fetchError = null;
 	stored = connection();
@@ -134,6 +140,21 @@ describe("a connection that cannot be refreshed", () => {
 			UnrefreshableConnectionError,
 		);
 		expect(updates[0]).toMatchObject({ disconnectReason: NEEDS_REAUTH });
+	});
+});
+
+describe("two processes refreshing a rotating refresh token at once", () => {
+	test("the loser adopts the winner's tokens instead of disconnecting", async () => {
+		const winner = connection({
+			accessToken: "new-access",
+			refreshToken: "rotated",
+			tokenExpiresAt: new Date(Date.now() + 3600_000),
+		});
+		reads = [connection(), winner];
+		response = { ok: false, status: 400, body: { error: "invalid_grant" } };
+
+		await expect(ensureFreshConnection(connection())).resolves.toBe(winner);
+		expect(updates).toHaveLength(0);
 	});
 });
 

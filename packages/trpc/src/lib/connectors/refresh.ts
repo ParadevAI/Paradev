@@ -173,13 +173,18 @@ async function refresh(
 	}
 	const payload = (await response.json()) as Record<string, unknown>;
 	if (!response.ok || typeof payload.access_token !== "string") {
+		// Rotating refresh tokens are single-use: when another process redeemed
+		// ours first, the rejection means we lost the race, not that the grant died.
+		const latest = await readConnection(current.id);
+		if (latest && latest.accessToken !== current.accessToken) return latest;
+
 		if (endpoints.issuer && payload.error === "invalid_client")
 			await forgetClient(
 				endpoints.issuer,
 				redirectUriFor(current.connector),
 				clientId,
 			);
-		await markNeedsReauth(current.id);
+		await markNeedsReauth(current.id, current.accessToken);
 		throw new UnrefreshableConnectionError(current.connector);
 	}
 
