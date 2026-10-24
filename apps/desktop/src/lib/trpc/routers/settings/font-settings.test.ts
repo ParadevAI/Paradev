@@ -5,6 +5,21 @@ import {
 } from "./font-settings.utils";
 
 describe("font settings validation", () => {
+	it("preserves enabling, disabling, and resetting Option as Meta", () => {
+		for (const terminalMacOptionIsMeta of [true, false, null]) {
+			const input = { terminalMacOptionIsMeta };
+			expect(transformFontSettings(setFontSettingsSchema.parse(input))).toEqual(
+				input,
+			);
+		}
+		expect(
+			transformFontSettings(setFontSettingsSchema.parse({})),
+		).not.toHaveProperty("terminalMacOptionIsMeta");
+		expect(
+			setFontSettingsSchema.safeParse({ terminalMacOptionIsMeta: "true" })
+				.success,
+		).toBe(false);
+	});
 	describe("font size validation (range 10-24)", () => {
 		it("accepts font size at minimum (10)", () => {
 			const result = setFontSettingsSchema.safeParse({

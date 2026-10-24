@@ -17,6 +17,20 @@ Open several terminal tabs per workspace. Each runs independently.
 - **⌘W** - Close pane; **⌘⇧W** - Close tab
 - **⌘⌥1-9** - Switch tabs (⌘1-9 switches workspaces)
 
+## Option as Meta on macOS
+
+Enable **Use Option as Meta key** in **Settings → Appearance → Terminal typography** to use shortcuts such as **Option+B** (Emacs `M-b`) and **Option+F** (`M-f`). Changes apply to open terminals immediately.
+
+![Option as Meta in terminal settings](/images/option-as-meta.png)
+
+You can also enable it from the CLI:
+
+```bash
+superset settings set terminalMacOptionIsMeta true
+```
+
+The setting defaults to off so Option can type special characters. Disable it, or run `superset settings reset terminalMacOptionIsMeta`, to restore that behavior. **Esc**, then **b** also sends `M-b` without changing the setting.
+
 ## Session Persistence
 
 Sessions survive app restarts:

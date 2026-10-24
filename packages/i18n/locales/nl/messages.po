@@ -15475,6 +15475,9 @@ msgstr "Toetsaanslagen versturen, vensters beheren en andere applicaties bediene
 msgid "Send message"
 msgstr "Bericht versturen"
 
+msgid "Send Meta shortcuts such as Option+B instead of special characters."
+msgstr "Meta-sneltoetsen zoals Option+B verzenden in plaats van speciale tekens."
+
 msgid "Send now"
 msgstr "Nu verzenden"
 
@@ -18990,6 +18993,9 @@ msgstr "Gebruiken voor nieuwe agents"
 
 msgid "Use global default"
 msgstr "Globale standaard gebruiken"
+
+msgid "Use Option as Meta key"
+msgstr "Option als Meta-toets gebruiken"
 
 msgid "Use Superset on mobile"
 msgstr "Gebruik Superset op je mobiel"

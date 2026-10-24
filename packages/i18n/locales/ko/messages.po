@@ -15475,6 +15475,9 @@ msgstr "키 입력을 보내고, 창을 관리하고, 다른 애플리케이션�
 msgid "Send message"
 msgstr "메시지 보내기"
 
+msgid "Send Meta shortcuts such as Option+B instead of special characters."
+msgstr "특수 문자 대신 Option+B와 같은 Meta 단축키를 전송합니다."
+
 msgid "Send now"
 msgstr "지금 보내기"
 
@@ -18990,6 +18993,9 @@ msgstr "새 에이전트에 사용"
 
 msgid "Use global default"
 msgstr "전역 기본값 사용"
+
+msgid "Use Option as Meta key"
+msgstr "Option을 Meta 키로 사용"
 
 msgid "Use Superset on mobile"
 msgstr "모바일에서 Superset 사용하기"

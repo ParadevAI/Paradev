@@ -123,6 +123,7 @@ describe("terminalRuntimeRegistry eviction cleanup", () => {
 			minimumContrastRatio: 1,
 			cursorStyle: "block" as const,
 			cursorBlink: true,
+			macOptionIsMeta: false,
 		};
 		const runtime = {
 			terminal: {
@@ -151,7 +152,7 @@ describe("terminalRuntimeRegistry eviction cleanup", () => {
 		}
 	});
 
-	test("updates active and parked runtime appearance overrides", () => {
+	test("updates active and parked runtime appearance overrides", async () => {
 		const entries = (
 			terminalRuntimeRegistry as unknown as {
 				entries: Map<string, unknown>;
@@ -182,6 +183,7 @@ describe("terminalRuntimeRegistry eviction cleanup", () => {
 							lineHeight: 1,
 							letterSpacing: 0,
 							fontWeight: "normal",
+							macOptionIsMeta: false,
 						},
 						rows: 24,
 						refresh: mock(() => {}),
@@ -206,6 +208,7 @@ describe("terminalRuntimeRegistry eviction cleanup", () => {
 				minimumContrastRatio: 4.5,
 				cursorStyle: "bar",
 				cursorBlink: false,
+				macOptionIsMeta: true,
 			});
 
 			for (const key of addedKeys) {
@@ -223,10 +226,21 @@ describe("terminalRuntimeRegistry eviction cleanup", () => {
 					minimumContrastRatio: 4.5,
 					cursorStyle: "bar",
 					cursorBlink: false,
+					macOptionIsMeta: true,
 				});
 				expect(entry.runtime.ligaturesEnabled).toBe(false);
 			}
 			expect(setLigatures).toHaveBeenCalledTimes(2);
+			const { getDefaultTerminalAppearance } = await import("./appearance");
+			terminalRuntimeRegistry.updateAllAppearances(
+				getDefaultTerminalAppearance(),
+			);
+			for (const key of addedKeys) {
+				const entry = entries.get(key) as {
+					runtime: { terminal: { options: { macOptionIsMeta: boolean } } };
+				};
+				expect(entry.runtime.terminal.options.macOptionIsMeta).toBe(false);
+			}
 		} finally {
 			for (const key of addedKeys) entries.delete(key);
 		}

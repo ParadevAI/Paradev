@@ -311,6 +311,13 @@ export const SETTINGS: SettingDefinition[] = [
 		description: "Blink the terminal cursor",
 		defaultValue: true,
 	},
+	{
+		key: "terminalMacOptionIsMeta",
+		type: "boolean",
+		section: "terminal appearance",
+		description: "Use Option as Meta in macOS terminals",
+		defaultValue: false,
+	},
 	// Editor appearance
 	{
 		key: "editorFontFamily",

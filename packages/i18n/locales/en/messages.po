@@ -15475,6 +15475,9 @@ msgstr "Send keystrokes, manage windows, and control other applications."
 msgid "Send message"
 msgstr "Send message"
 
+msgid "Send Meta shortcuts such as Option+B instead of special characters."
+msgstr "Send Meta shortcuts such as Option+B instead of special characters."
+
 msgid "Send now"
 msgstr "Send now"
 
@@ -18990,6 +18993,9 @@ msgstr "Use for new agents"
 
 msgid "Use global default"
 msgstr "Use global default"
+
+msgid "Use Option as Meta key"
+msgstr "Use Option as Meta key"
 
 msgid "Use Superset on mobile"
 msgstr "Use Superset on mobile"

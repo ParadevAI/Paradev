@@ -15475,6 +15475,9 @@ msgstr "发送按键、管理窗口并控制其他应用程序。"
 msgid "Send message"
 msgstr "发送消息"
 
+msgid "Send Meta shortcuts such as Option+B instead of special characters."
+msgstr "发送 Option+B 等 Meta 快捷键，而不是特殊字符。"
+
 msgid "Send now"
 msgstr "立即发送"
 
@@ -18990,6 +18993,9 @@ msgstr "用于新智能体"
 
 msgid "Use global default"
 msgstr "使用全局默认值"
+
+msgid "Use Option as Meta key"
+msgstr "将 Option 用作 Meta 键"
 
 msgid "Use Superset on mobile"
 msgstr "在手机上使用 Superset"

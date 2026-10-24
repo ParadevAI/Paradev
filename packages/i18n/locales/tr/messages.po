@@ -15475,6 +15475,9 @@ msgstr "Tuş vuruşları gönderin, pencereleri yönetin ve diğer uygulamaları
 msgid "Send message"
 msgstr "Mesaj gönder"
 
+msgid "Send Meta shortcuts such as Option+B instead of special characters."
+msgstr "Özel karakterler yerine Option+B gibi Meta kısayollarını gönder."
+
 msgid "Send now"
 msgstr "Şimdi gönder"
 
@@ -18990,6 +18993,9 @@ msgstr "Yeni ajanlar için kullan"
 
 msgid "Use global default"
 msgstr "Genel varsayılanı kullan"
+
+msgid "Use Option as Meta key"
+msgstr "Option tuşunu Meta tuşu olarak kullan"
 
 msgid "Use Superset on mobile"
 msgstr "Superset’i mobilde kullanın"

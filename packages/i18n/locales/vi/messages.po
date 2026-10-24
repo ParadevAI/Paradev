@@ -15475,6 +15475,9 @@ msgstr "Gửi thao tác phím, quản lý cửa sổ và điều khiển ứng d
 msgid "Send message"
 msgstr "Gửi tin nhắn"
 
+msgid "Send Meta shortcuts such as Option+B instead of special characters."
+msgstr "Gửi phím tắt Meta như Option+B thay vì ký tự đặc biệt."
+
 msgid "Send now"
 msgstr "Gửi ngay"
 
@@ -18990,6 +18993,9 @@ msgstr "Dùng cho agent mới"
 
 msgid "Use global default"
 msgstr "Dùng mặc định toàn cục"
+
+msgid "Use Option as Meta key"
+msgstr "Dùng Option làm phím Meta"
 
 msgid "Use Superset on mobile"
 msgstr "Dùng Superset trên điện thoại"

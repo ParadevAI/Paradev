@@ -15475,6 +15475,9 @@ msgstr "傳送按鍵、管理視窗並控制其他應用程式程式。"
 msgid "Send message"
 msgstr "傳送訊息"
 
+msgid "Send Meta shortcuts such as Option+B instead of special characters."
+msgstr "傳送 Option+B 等 Meta 快速鍵，而非特殊字元。"
+
 msgid "Send now"
 msgstr "立即傳送"
 
@@ -18990,6 +18993,9 @@ msgstr "用於新代理程式"
 
 msgid "Use global default"
 msgstr "使用全域性預設值"
+
+msgid "Use Option as Meta key"
+msgstr "將 Option 用作 Meta 鍵"
 
 msgid "Use Superset on mobile"
 msgstr "在手機上使用 Superset"

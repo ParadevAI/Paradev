@@ -1,5 +1,6 @@
 import type { ITerminalOptions } from "@xterm/xterm";
 import {
+	DEFAULT_TERMINAL_MAC_OPTION_IS_META,
 	DEFAULT_TERMINAL_FONT_FAMILY as SHARED_DEFAULT_TERMINAL_FONT_FAMILY,
 	DEFAULT_TERMINAL_FONT_SIZE as SHARED_DEFAULT_TERMINAL_FONT_SIZE,
 } from "renderer/lib/terminal/appearance";
@@ -30,7 +31,7 @@ export const TERMINAL_OPTIONS: ITerminalOptions = {
 	allowProposedApi: true,
 	scrollback: DEFAULT_TERMINAL_SCROLLBACK,
 	// Allow Option+key to type special characters on international keyboards (e.g., Option+2 = @)
-	macOptionIsMeta: false,
+	macOptionIsMeta: DEFAULT_TERMINAL_MAC_OPTION_IS_META,
 	cursorStyle: "block",
 	cursorInactiveStyle: "outline",
 	vtExtensions: { kittyKeyboard: true },

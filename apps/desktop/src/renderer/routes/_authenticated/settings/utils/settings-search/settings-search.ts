@@ -672,6 +672,10 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 		title: "Terminal Typography",
 		description: "Typography and cursor behavior used in V2 terminal panels",
 		keywords: [
+			"option",
+			"meta",
+			"alt",
+			"emacs",
 			"appearance",
 			"font",
 			"family",

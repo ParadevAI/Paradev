@@ -15475,6 +15475,9 @@ msgstr "Posílat stisky kláves, spravovat okna a ovládat další aplikace."
 msgid "Send message"
 msgstr "Odeslat zprávu"
 
+msgid "Send Meta shortcuts such as Option+B instead of special characters."
+msgstr "Odesílat zkratky Meta, například Option+B, místo speciálních znaků."
+
 msgid "Send now"
 msgstr "Odeslat hned"
 
@@ -18990,6 +18993,9 @@ msgstr "Použít pro nové agenty"
 
 msgid "Use global default"
 msgstr "Použít globální výchozí"
+
+msgid "Use Option as Meta key"
+msgstr "Používat Option jako klávesu Meta"
 
 msgid "Use Superset on mobile"
 msgstr "Používejte Superset na mobilu"

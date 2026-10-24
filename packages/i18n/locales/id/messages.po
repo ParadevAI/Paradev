@@ -15475,6 +15475,9 @@ msgstr "Mengirim ketukan tombol, mengelola jendela, dan mengendalikan aplikasi l
 msgid "Send message"
 msgstr "Kirim pesan"
 
+msgid "Send Meta shortcuts such as Option+B instead of special characters."
+msgstr "Kirim pintasan Meta seperti Option+B, bukan karakter khusus."
+
 msgid "Send now"
 msgstr "Kirim sekarang"
 
@@ -18990,6 +18993,9 @@ msgstr "Pakai untuk agen baru"
 
 msgid "Use global default"
 msgstr "Pakai bawaan global"
+
+msgid "Use Option as Meta key"
+msgstr "Gunakan Option sebagai tombol Meta"
 
 msgid "Use Superset on mobile"
 msgstr "Gunakan Superset di ponsel"

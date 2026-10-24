@@ -15475,6 +15475,9 @@ msgstr "Envoyer des frappes clavier, gérer les fenêtres et contrôler d'autres
 msgid "Send message"
 msgstr "Envoyer le message"
 
+msgid "Send Meta shortcuts such as Option+B instead of special characters."
+msgstr "Envoyer des raccourcis Meta comme Option+B au lieu de caractères spéciaux."
+
 msgid "Send now"
 msgstr "Envoyer maintenant"
 
@@ -18990,6 +18993,9 @@ msgstr "Utiliser pour les nouveaux agents"
 
 msgid "Use global default"
 msgstr "Utiliser la valeur globale par défaut"
+
+msgid "Use Option as Meta key"
+msgstr "Utiliser Option comme touche Meta"
 
 msgid "Use Superset on mobile"
 msgstr "Utiliser Superset sur mobile"

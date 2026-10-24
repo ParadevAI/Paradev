@@ -17,6 +17,7 @@ import type { AppRouter } from "lib/trpc/routers";
 import { Code2, RotateCcw, SquareTerminal } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { resolveEditorLineHeight } from "renderer/lib/editor-typography";
+import { electronTrpc } from "renderer/lib/electron-trpc";
 import type { FontSettings } from "renderer/lib/font-settings";
 import {
 	DEFAULT_TERMINAL_CURSOR_BLINK,
@@ -25,6 +26,7 @@ import {
 	DEFAULT_TERMINAL_FONT_SIZE,
 	DEFAULT_TERMINAL_LIGATURES,
 	DEFAULT_TERMINAL_LINE_HEIGHT,
+	DEFAULT_TERMINAL_MAC_OPTION_IS_META,
 } from "renderer/lib/terminal/appearance";
 import { HighlightText } from "renderer/routes/_authenticated/settings/components/HighlightText";
 import {
@@ -95,6 +97,7 @@ const VARIANT_CONFIG = {
 			"terminalMinimumContrast",
 			"terminalCursorStyle",
 			"terminalCursorBlink",
+			"terminalMacOptionIsMeta",
 		] satisfies FontSettingKey[],
 	},
 } as const;
@@ -117,6 +120,7 @@ export function TypographySurfaceCard({
 	fontsLoading,
 }: TypographySurfaceCardProps) {
 	const { t } = useLingui();
+	const { data: platform } = electronTrpc.window.getPlatform.useQuery();
 	const config = VARIANT_CONFIG[variant];
 	const configTitle = i18n._(config.title);
 	const searchQuery = useSettingsSearchQuery();
@@ -464,6 +468,32 @@ export function TypographySurfaceCard({
 								}
 							/>
 						</div>
+						{platform === "darwin" && (
+							<div className="flex items-center justify-between gap-3 min-h-14 sm:col-span-2">
+								<div>
+									<Label htmlFor="terminal-option-as-meta" className="text-xs">
+										<Trans>Use Option as Meta key</Trans>
+									</Label>
+									<p className="text-[11px] text-muted-foreground">
+										<Trans>
+											Send Meta shortcuts such as Option+B instead of special
+											characters.
+										</Trans>
+									</p>
+								</div>
+								<Switch
+									id="terminal-option-as-meta"
+									checked={
+										settings.terminalMacOptionIsMeta ??
+										DEFAULT_TERMINAL_MAC_OPTION_IS_META
+									}
+									onCheckedChange={(checked) =>
+										mutateSetting("terminalMacOptionIsMeta", checked)
+									}
+									disabled={isLoading}
+								/>
+							</div>
+						)}
 					</>
 				)}
 			</div>

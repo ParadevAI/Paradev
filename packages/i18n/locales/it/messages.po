@@ -15475,6 +15475,9 @@ msgstr "Inviare sequenze di tasti, gestire le finestre e controllare altre appli
 msgid "Send message"
 msgstr "Invia messaggio"
 
+msgid "Send Meta shortcuts such as Option+B instead of special characters."
+msgstr "Invia scorciatoie Meta come Option+B anziché caratteri speciali."
+
 msgid "Send now"
 msgstr "Invia ora"
 
@@ -18990,6 +18993,9 @@ msgstr "Usa per i nuovi agenti"
 
 msgid "Use global default"
 msgstr "Usa il valore predefinito globale"
+
+msgid "Use Option as Meta key"
+msgstr "Usa Option come tasto Meta"
 
 msgid "Use Superset on mobile"
 msgstr "Usa Superset sul cellulare"

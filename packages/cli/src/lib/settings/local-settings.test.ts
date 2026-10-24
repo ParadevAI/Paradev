@@ -41,6 +41,16 @@ describe("local settings store", () => {
 		expect(row?.notificationVolume).toBe(40);
 	});
 
+	test("Option as Meta persists and resets without changing other settings", () => {
+		createLocalDb();
+		writeSetting("terminalFontSize", 16);
+		for (const value of [true, false, null]) {
+			writeSetting("terminalMacOptionIsMeta", value);
+			expect(readSettingsRow()?.terminalMacOptionIsMeta).toBe(value);
+			expect(readSettingsRow()?.terminalFontSize).toBe(16);
+		}
+	});
+
 	test("writing null resets a setting to the app default", () => {
 		createLocalDb();
 		writeSetting("terminalFontSize", 18);

@@ -15475,6 +15475,9 @@ msgstr "キー入力の送信、ウィンドウの管理、他のアプリケー
 msgid "Send message"
 msgstr "メッセージを送信"
 
+msgid "Send Meta shortcuts such as Option+B instead of special characters."
+msgstr "特殊文字の代わりに、Option+BなどのMetaショートカットを送信します。"
+
 msgid "Send now"
 msgstr "今すぐ送信"
 
@@ -18990,6 +18993,9 @@ msgstr "新規エージェントに使用"
 
 msgid "Use global default"
 msgstr "グローバルのデフォルトを使用"
+
+msgid "Use Option as Meta key"
+msgstr "OptionキーをMetaキーとして使用"
 
 msgid "Use Superset on mobile"
 msgstr "モバイルでSupersetを使う"
