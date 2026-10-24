@@ -1,7 +1,9 @@
 import { describe, expect, test } from "bun:test";
+import { ATTACHMENT_PARTS_MIN_HOST_VERSION } from "./attachment-limits";
 import {
 	deriveHostVersionState,
 	hostNeedsUpdate,
+	hostReadsAttachmentParts,
 	isHostUpdateTarget,
 	parseHostInstallSource,
 } from "./host-version";
@@ -80,4 +82,15 @@ test("only released app versions can target a standalone update", () => {
 	expect(isHostUpdateTarget("1.27.0")).toBe(true);
 	for (const version of ["1.27.0-canary.1", "0.0.0-dev", "v1.27.0", "01.27.0"])
 		expect(isHostUpdateTarget(version)).toBe(false);
+});
+
+describe("hostReadsAttachmentParts", () => {
+	test("a host at or above the floor reads parts; an older or unknown one gets path tags", () => {
+		expect(hostReadsAttachmentParts(ATTACHMENT_PARTS_MIN_HOST_VERSION)).toBe(
+			true,
+		);
+		expect(hostReadsAttachmentParts("9.0.0")).toBe(true);
+		expect(hostReadsAttachmentParts("1.40.0")).toBe(false);
+		expect(hostReadsAttachmentParts(undefined)).toBe(false);
+	});
 });

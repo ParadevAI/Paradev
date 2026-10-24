@@ -350,6 +350,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 	};
 	const chatV3 = createChatV3Mount({
 		db,
+		api,
 		dbPath: config.dbPath,
 		agents: createChatAgentBridge(chatAgentContext),
 		onSessionChanged: ({ scopeId, occurredAt }) =>

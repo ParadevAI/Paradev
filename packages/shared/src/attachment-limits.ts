@@ -30,3 +30,9 @@ export const MAX_THUMBNAIL_BYTES = 5 * 1024 * 1024;
 
 /** A host's attachment store removes an entry nobody has used for this long. */
 export const ATTACHMENT_RETENTION_DAYS = 30;
+
+/**
+ * The first host whose adapters read an attachment part, by `attachmentId` or
+ * `fileId`. Below it a client sends path tags in the text instead.
+ */
+export const ATTACHMENT_PARTS_MIN_HOST_VERSION = "1.41.0";

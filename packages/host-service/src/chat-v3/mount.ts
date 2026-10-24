@@ -10,6 +10,7 @@ import type {
 	ChatSessionChange,
 	HarnessFactory,
 	HarnessRegistry,
+	ResolveAttachment,
 	WsSinkSocket,
 } from "@superset/chat-runtime";
 import {
@@ -23,11 +24,15 @@ import {
 import { HOST_CHAT_RESUME_MARKER_FILE } from "@superset/shared/host-version";
 import type { Hono, MiddlewareHandler } from "hono";
 import type { HostDb } from "../db";
+import { reportAttachmentResolveFailure } from "../sentry";
+import { importCloudAttachments } from "../trpc/router/attachments/attachments";
+import type { ApiClient } from "../types";
 import { cliFloor } from "./acpCatalogue";
 import { acpHarnessEntries } from "./acpHarnesses";
 import { resolveAgentCli } from "./agentCli";
 import { buildChatAgentEnv } from "./agentEnv";
 import type { ChatAgentBridge } from "./chatAgentBridge";
+import { createAttachmentResolver } from "./resolveAttachment";
 import { createResolveCwd } from "./resolveCwd";
 import {
 	recordUnfinishedChats,
@@ -55,12 +60,14 @@ function migrationsFolder(): string {
 function harnessRegistry(
 	db: HostDb,
 	agents: ChatAgentBridge | undefined,
+	resolveAttachment: ResolveAttachment,
 ): HarnessRegistry {
 	const entries: [string, HarnessFactory][] = [
 		[
 			"claude-code",
 			(options) =>
 				createClaudeAdapter({
+					resolveAttachment,
 					launch: async () => {
 						const cli = await resolveAgentCli({
 							binary: "claude",
@@ -85,6 +92,7 @@ function harnessRegistry(
 			"codex",
 			(options) =>
 				new CodexAdapter({
+					resolveAttachment,
 					launch: async () => {
 						const cli = await resolveAgentCli({
 							binary: "codex",
@@ -101,7 +109,7 @@ function harnessRegistry(
 					},
 				}),
 		],
-		...acpHarnessEntries(db, agents),
+		...acpHarnessEntries(db, resolveAttachment, agents),
 	];
 	return new Map(entries);
 }
@@ -120,6 +128,7 @@ export type ChatV3Mount = {
  */
 export function createChatV3Mount(options: {
 	db: HostDb;
+	api: ApiClient;
 	dbPath: string;
 	agents?: ChatAgentBridge;
 	onSessionChanged?: (change: ChatSessionChange) => void;
@@ -135,7 +144,14 @@ export function createChatV3Mount(options: {
 		built = createChatRuntime({
 			dataDir: dirname(options.dbPath),
 			migrationsFolder: migrationsFolder(),
-			harnesses: harnessRegistry(options.db, options.agents),
+			harnesses: harnessRegistry(
+				options.db,
+				options.agents,
+				createAttachmentResolver({
+					importCloud: (fileIds) => importCloudAttachments(options, fileIds),
+					report: reportAttachmentResolveFailure,
+				}),
+			),
 			observer: options.agents,
 			onSessionChanged: options.onSessionChanged,
 		});

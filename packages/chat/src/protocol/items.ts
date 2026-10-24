@@ -25,15 +25,20 @@ export const userContentSchema = z.discriminatedUnion("type", [
 		/** Reaches the agent, but is not kept on the transcript's user message. */
 		hidden: z.boolean().optional(),
 	}),
-	z.looseObject({
-		type: z.literal("attachment"),
-		attachmentId: z.string().min(1),
-		/** The storage object behind a cloud workspace's attachment; set, it is the identity. */
-		fileId: z.string().uuid().optional(),
-		name: z.string(),
-		mimeType: z.string(),
-		sizeBytes: z.number().int().nonnegative().optional(),
-	}),
+	z
+		.looseObject({
+			type: z.literal("attachment"),
+			/** In the host's attachment store: a workspace on a machine someone owns. */
+			attachmentId: z.string().min(1).optional(),
+			/** In our storage: a cloud workspace. Readers prefer it when both are set. */
+			fileId: z.string().uuid().optional(),
+			name: z.string(),
+			mimeType: z.string(),
+			sizeBytes: z.number().int().nonnegative().optional(),
+		})
+		.refine((part) => part.attachmentId || part.fileId, {
+			message: "An attachment needs an attachmentId or a fileId",
+		}),
 ]);
 export type UserContent = z.infer<typeof userContentSchema>;
 
