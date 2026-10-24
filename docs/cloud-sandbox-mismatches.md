@@ -393,8 +393,9 @@ uplink loses it about half the time, a 1 MB body on a datacenter link wins
 it. This is why shipping file bytes through `filesystem.writeFile` broke
 (SUPER-2658) and why attachments go through storage instead. host-service now
 buffers every `/trpc/*` body before handing it to tRPC, so no response starts
-before the request is complete; a sandbox provisioned before that bundle still
-has the race for any request with a sizeable body. Reproducing with curl: pass
+before the request is complete. A box runs that host-service from its next
+boot (see "A box's host-service is as new as its last boot"); one that never
+sleeps keeps the race until it restarts. Reproducing with curl: pass
 `-H "Expect:"` — curl's automatic `Expect: 100-continue` on bodies ≥1 MB
 masks the bug, and browsers never send it.
 
@@ -443,6 +444,19 @@ installs each adapter at host-service's pinned version and fails if one is
 missing. The CLI bundle has the same gap.
 
 ## Lifecycle
+
+**A box's host-service is as new as its last boot.** A sandbox bundle release
+repins every live environment (`environments.bundleSha`, set by
+`packages/sandbox/src/environments/release.ts`), and every wake builds the
+box's claim from its environment (`wakeCloudWorkspace` → `buildSandboxClaim`).
+When the box boots, `superset-boot` installs the pinned bundle if its hash
+differs from the one installed. So a cold wake, a restart or a new box runs
+the current host-service. A warm resume does not boot, and a box that never
+sleeps keeps the host-service it last booted with. Do not assume a box is
+frozen at the bundle it was provisioned with, and do not assume it is current
+either: gate a new host feature on the version the box reports
+(`health.check`), the same way as a remote host. The chat attachment parts
+floor (`ATTACHMENT_PARTS_MIN_HOST_VERSION`) works like this.
 
 **A tag-filtered sandbox list is not sorted by status time. Fixed.** The usage
 reconciler scans by `statusUpdatedAt` and stops at entries older than the maximum
