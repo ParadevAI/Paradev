@@ -136,9 +136,9 @@ describe("a connection that cannot be refreshed", () => {
 	test("a rejected refresh token is recorded the same way", async () => {
 		response = { ok: false, status: 400, body: { error: "invalid_grant" } };
 
-		await expect(ensureFreshConnection(connection())).rejects.toBeInstanceOf(
-			UnrefreshableConnectionError,
-		);
+		await expect(
+			ensureFreshConnection(connection(), { raceSettleMs: 0 }),
+		).rejects.toBeInstanceOf(UnrefreshableConnectionError);
 		expect(updates[0]).toMatchObject({ disconnectReason: NEEDS_REAUTH });
 	});
 });
@@ -153,8 +153,36 @@ describe("two processes refreshing a rotating refresh token at once", () => {
 		reads = [connection(), winner];
 		response = { ok: false, status: 400, body: { error: "invalid_grant" } };
 
-		await expect(ensureFreshConnection(connection())).resolves.toBe(winner);
+		await expect(
+			ensureFreshConnection(connection(), { raceSettleMs: 0 }),
+		).resolves.toBe(winner);
 		expect(updates).toHaveLength(0);
+	});
+
+	test("the loser waits for a winner that has not written yet", async () => {
+		const winner = connection({ accessToken: "new-access" });
+		reads = [connection(), connection(), winner];
+		response = { ok: false, status: 400, body: { error: "invalid_grant" } };
+
+		await expect(
+			ensureFreshConnection(connection(), { raceSettleMs: 1 }),
+		).resolves.toBe(winner);
+		expect(updates).toHaveLength(0);
+	});
+
+	test("the winner's write clears a mark the loser made first", async () => {
+		response = {
+			ok: true,
+			status: 200,
+			body: { access_token: "new-access", expires_in: 3600 },
+		};
+
+		await ensureFreshConnection(connection());
+		expect(updates[0]).toMatchObject({
+			accessToken: "new-access",
+			disconnectedAt: null,
+			disconnectReason: null,
+		});
 	});
 });
 
