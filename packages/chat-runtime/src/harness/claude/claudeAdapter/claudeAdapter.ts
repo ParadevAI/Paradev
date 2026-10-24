@@ -300,7 +300,7 @@ export class ClaudeAdapter implements HarnessAdapter {
 		const blocks: SdkContentBlock[] = [];
 		for (const part of content) {
 			if (part.type === "text") {
-				blocks.push({ type: "text", text: part.text });
+				if (part.text) blocks.push({ type: "text", text: part.text });
 				continue;
 			}
 			const file = await (

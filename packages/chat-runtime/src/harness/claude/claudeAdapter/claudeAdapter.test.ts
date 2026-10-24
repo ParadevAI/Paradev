@@ -341,6 +341,22 @@ describe("ClaudeAdapter attachments", () => {
 		]);
 	});
 
+	test("drops an empty text part, which the API refuses as a block", async () => {
+		const { adapter, sent } = capturePrompts(async () => ({
+			path: "/store/a/a.png",
+			mimeType: "image/png",
+			data: "cG5n",
+		}));
+		adapter.prompt([{ type: "text", text: "" }, part("shot.png", "image/png")]);
+		await flush();
+		expect(sent[0]?.message.content).toEqual([
+			{
+				type: "image",
+				source: { type: "base64", media_type: "image/png", data: "cG5n" },
+			},
+		]);
+	});
+
 	test("tells the agent which file it could not read", async () => {
 		const { adapter, sent } = capturePrompts(async () => null);
 		adapter.prompt([part("gone.png", "image/png")]);
