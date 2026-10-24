@@ -25,6 +25,7 @@ import {
 import { CopyButton } from "../../../CopyButton";
 import { AttachmentImage } from "../AttachmentImage";
 import { MessageTime } from "../MessageTime";
+import { AttachmentPartImage } from "./components/AttachmentPartImage";
 import { PastedTextBlock } from "./components/PastedTextBlock";
 import { UserMessageEditor } from "./components/UserMessageEditor";
 import { UserMessageText } from "./components/UserMessageText";
@@ -77,6 +78,12 @@ export function UserMessageRow({
 	const images = attachments.filter((attachment) =>
 		attachment.type.startsWith("image/"),
 	);
+	const parts = item.content.flatMap((content) =>
+		content.type === "attachment" ? [content] : [],
+	);
+	const partKey = (part: (typeof parts)[number], index: number) =>
+		part.fileId ?? part.attachmentId ?? `${part.name}-${index}`;
+	const imageParts = parts.filter((part) => part.mimeType.startsWith("image/"));
 	const files = [
 		...attachments
 			.filter((attachment) => !attachment.type.startsWith("image/"))
@@ -85,17 +92,13 @@ export function UserMessageRow({
 				name: attachmentDisplayName(attachment),
 				mediaType: attachment.type,
 			})),
-		...item.content.flatMap((content) =>
-			content.type === "attachment"
-				? [
-						{
-							key: content.attachmentId,
-							name: content.name,
-							mediaType: content.mimeType,
-						},
-					]
-				: [],
-		),
+		...parts
+			.filter((part) => !part.mimeType.startsWith("image/"))
+			.map((part, index) => ({
+				key: partKey(part, index),
+				name: part.name,
+				mediaType: part.mimeType,
+			})),
 	];
 	const copyable = (text.length > 0 || pastedTexts.length > 0) && !pending;
 	const copyText = [text, ...pastedTexts].filter(Boolean).join("\n\n");
@@ -105,7 +108,8 @@ export function UserMessageRow({
 		editableMessageIds?.has(item.id) === true &&
 		attachments.length === 0 &&
 		pastedTexts.length === 0 &&
-		files.length === 0;
+		files.length === 0 &&
+		imageParts.length === 0;
 	if (editing && editable) {
 		return (
 			<Message className="pt-1.5 pb-5 pl-10" from="user">
@@ -130,7 +134,7 @@ export function UserMessageRow({
 					{sender}
 				</span>
 			)}
-			{images.length > 0 && (
+			{(images.length > 0 || imageParts.length > 0) && (
 				<div
 					className={cn(
 						"ml-auto flex max-w-[min(100%,36rem)] flex-wrap justify-end gap-2 transition-opacity",
@@ -145,6 +149,9 @@ export function UserMessageRow({
 							path={image.path}
 							type={image.type}
 						/>
+					))}
+					{imageParts.map((part, index) => (
+						<AttachmentPartImage key={partKey(part, index)} part={part} />
 					))}
 				</div>
 			)}
