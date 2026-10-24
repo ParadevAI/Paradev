@@ -1,8 +1,8 @@
-import { parsePastedText } from "@superset/chat/core";
 import {
 	LEGACY_WORKSPACE_ATTACHMENTS_DIR,
 	WORKSPACE_ATTACHMENTS_DIR,
 } from "@superset/shared/workspace-attachments";
+import { parsePastedText } from "../pastedText/pastedText";
 
 export type AttachmentTag = { path: string; type: string; name?: string };
 

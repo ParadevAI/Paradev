@@ -70,6 +70,9 @@ msgstr "\"{0}\" dejará de dispararse y se eliminará su historial de ejecucione
 msgid "\"{name}\" is a folder. Attach the files inside it instead."
 msgstr "\"{name}\" es una carpeta. Adjunta los archivos que contiene."
 
+msgid "\"{name}\" is over {limit}, the most a workspace outside the cloud can take"
+msgstr "«{name}» supera {limit}, el máximo que admite un espacio de trabajo fuera de la nube"
+
 msgid "\"{name}\" paused"
 msgstr "\"{name}\" en pausa"
 

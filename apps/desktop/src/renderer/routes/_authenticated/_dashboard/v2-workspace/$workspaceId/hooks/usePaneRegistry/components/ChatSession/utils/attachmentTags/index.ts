@@ -3,4 +3,4 @@ export {
 	attachmentDisplayName,
 	formatAttachmentTag,
 	parseAttachmentTags,
-} from "./attachmentTags";
+} from "@superset/chat/core";

@@ -70,6 +70,9 @@ msgstr "\"{0}\" smetterà di scattare e la sua cronologia delle esecuzioni verr�
 msgid "\"{name}\" is a folder. Attach the files inside it instead."
 msgstr "\"{name}\" è una cartella. Allega invece i file al suo interno."
 
+msgid "\"{name}\" is over {limit}, the most a workspace outside the cloud can take"
+msgstr "\"{name}\" supera {limit}, il massimo che un workspace fuori dal cloud può ricevere"
+
 msgid "\"{name}\" paused"
 msgstr "\"{name}\" messa in pausa"
 

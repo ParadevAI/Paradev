@@ -70,6 +70,9 @@ msgstr "\"{0}\" will stop firing and its run history will be removed. This can't
 msgid "\"{name}\" is a folder. Attach the files inside it instead."
 msgstr "\"{name}\" is a folder. Attach the files inside it instead."
 
+msgid "\"{name}\" is over {limit}, the most a workspace outside the cloud can take"
+msgstr "\"{name}\" is over {limit}, the most a workspace outside the cloud can take"
+
 msgid "\"{name}\" paused"
 msgstr "\"{name}\" paused"
 

@@ -70,6 +70,9 @@ msgstr "«{0}» перестанет срабатывать, а история �
 msgid "\"{name}\" is a folder. Attach the files inside it instead."
 msgstr "«{name}» — это папка. Прикрепите файлы из неё."
 
+msgid "\"{name}\" is over {limit}, the most a workspace outside the cloud can take"
+msgstr "«{name}» больше {limit} — это максимум для рабочей области вне облака"
+
 msgid "\"{name}\" paused"
 msgstr "«{name}» приостановлена"
 

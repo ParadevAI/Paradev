@@ -70,6 +70,9 @@ msgstr "« {0} » ne se déclenchera plus et son historique d'exécutions sera s
 msgid "\"{name}\" is a folder. Attach the files inside it instead."
 msgstr "« {name} » est un dossier. Joignez plutôt les fichiers qu’il contient."
 
+msgid "\"{name}\" is over {limit}, the most a workspace outside the cloud can take"
+msgstr "« {name} » dépasse {limit}, le maximum qu’accepte un espace de travail hors du cloud"
+
 msgid "\"{name}\" paused"
 msgstr "« {name} » mise en pause"
 

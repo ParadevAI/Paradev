@@ -70,6 +70,9 @@ msgstr "\"{0}\" wird nicht mehr ausgelöst und der Ausführungsverlauf wird entf
 msgid "\"{name}\" is a folder. Attach the files inside it instead."
 msgstr "\"{name}\" ist ein Ordner. Hänge stattdessen die Dateien darin an."
 
+msgid "\"{name}\" is over {limit}, the most a workspace outside the cloud can take"
+msgstr "„{name}“ ist größer als {limit} – mehr nimmt ein Arbeitsbereich außerhalb der Cloud nicht an"
+
 msgid "\"{name}\" paused"
 msgstr "\"{name}\" pausiert"
 

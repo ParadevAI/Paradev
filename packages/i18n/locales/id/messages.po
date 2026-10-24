@@ -70,6 +70,9 @@ msgstr "\"{0}\" akan berhenti berjalan dan riwayat run-nya akan dihapus. Ini tid
 msgid "\"{name}\" is a folder. Attach the files inside it instead."
 msgstr "\"{name}\" adalah folder. Lampirkan file di dalamnya sebagai gantinya."
 
+msgid "\"{name}\" is over {limit}, the most a workspace outside the cloud can take"
+msgstr "\"{name}\" melebihi {limit}, batas maksimum untuk workspace di luar cloud"
+
 msgid "\"{name}\" paused"
 msgstr "\"{name}\" dijeda"
 

@@ -70,6 +70,9 @@ msgstr "\"{0}\"이(가) 더 이상 실행되지 않으며 실행 기록도 삭�
 msgid "\"{name}\" is a folder. Attach the files inside it instead."
 msgstr "\"{name}\"은(는) 폴더입니다. 대신 폴더 안의 파일을 첨부하세요."
 
+msgid "\"{name}\" is over {limit}, the most a workspace outside the cloud can take"
+msgstr "\"{name}\"이(가) {limit}를 넘습니다. 클라우드 밖의 워크스페이스는 최대 {limit}까지 받을 수 있습니다"
+
 msgid "\"{name}\" paused"
 msgstr "\"{name}\"을(를) 일시 중지했습니다"
 

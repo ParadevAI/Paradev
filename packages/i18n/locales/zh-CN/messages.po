@@ -70,6 +70,9 @@ msgstr "“{0}”将不再触发，其运行历史也会被移除。此操作无
 msgid "\"{name}\" is a folder. Attach the files inside it instead."
 msgstr "“{name}”是一个文件夹。请改为附加其中的文件。"
 
+msgid "\"{name}\" is over {limit}, the most a workspace outside the cloud can take"
+msgstr "“{name}”超过 {limit}，这是云端以外的工作区可接收的上限"
+
 msgid "\"{name}\" paused"
 msgstr "“{name}”已暂停"
 

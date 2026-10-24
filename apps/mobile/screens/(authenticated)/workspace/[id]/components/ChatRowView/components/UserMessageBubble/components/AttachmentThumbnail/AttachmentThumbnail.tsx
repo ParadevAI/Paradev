@@ -1,31 +1,34 @@
 import { presentImage } from "@superset/composer";
 import { Image } from "expo-image";
 import { Pressable } from "react-native";
-import { useAttachmentFile } from "../../hooks/useAttachmentFile";
+import {
+	type AttachmentSource,
+	useAttachmentFile,
+} from "../../hooks/useAttachmentFile";
 import { AttachmentFileCard } from "../AttachmentFileCard";
 
 export function AttachmentThumbnail({
-	attachmentId,
+	source,
 	hostUrl,
 	name,
 	mediaType,
 }: {
-	attachmentId: string;
+	source: AttachmentSource;
 	hostUrl: string | undefined;
 	name: string;
 	mediaType: string;
 }) {
 	const { data: uri, isError } = useAttachmentFile({
 		hostUrl,
-		attachmentId,
+		source,
 		name,
 		mediaType,
 	});
 
-	if (isError || !hostUrl) {
+	if (isError || (!source.fileId && !hostUrl)) {
 		return (
 			<AttachmentFileCard
-				attachmentId={attachmentId}
+				source={source}
 				hostUrl={undefined}
 				mediaType={mediaType}
 				name={name}

@@ -70,6 +70,9 @@ msgstr "„{0}“ se přestane spouštět a její historie běhů bude odstraně
 msgid "\"{name}\" is a folder. Attach the files inside it instead."
 msgstr "„{name}“ je složka. Připojte místo toho soubory v ní."
 
+msgid "\"{name}\" is over {limit}, the most a workspace outside the cloud can take"
+msgstr "„{name}“ přesahuje {limit}, víc pracovní prostor mimo cloud nepřijme"
+
 msgid "\"{name}\" paused"
 msgstr "„{name}“ pozastaveno"
 

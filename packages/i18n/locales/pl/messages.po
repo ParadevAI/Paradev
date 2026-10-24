@@ -70,6 +70,9 @@ msgstr "„{0}” przestanie się uruchamiać, a jej historia uruchomień zostan
 msgid "\"{name}\" is a folder. Attach the files inside it instead."
 msgstr "„{name}” to folder. Zamiast tego załącz pliki z jego wnętrza."
 
+msgid "\"{name}\" is over {limit}, the most a workspace outside the cloud can take"
+msgstr "„{name}” przekracza {limit} — tyle maksymalnie przyjmuje obszar roboczy poza chmurą"
+
 msgid "\"{name}\" paused"
 msgstr "„{name}” wstrzymana"
 

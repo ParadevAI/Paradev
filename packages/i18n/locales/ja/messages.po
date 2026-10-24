@@ -70,6 +70,9 @@ msgstr "「{0}」は発火しなくなり、実行履歴も削除されます。
 msgid "\"{name}\" is a folder. Attach the files inside it instead."
 msgstr "「{name}」はフォルダです。代わりにフォルダ内のファイルを添付してください。"
 
+msgid "\"{name}\" is over {limit}, the most a workspace outside the cloud can take"
+msgstr "「{name}」は {limit} を超えています。クラウド外のワークスペースが受け取れるのは {limit} までです"
+
 msgid "\"{name}\" paused"
 msgstr "「{name}」を一時停止しました"
 

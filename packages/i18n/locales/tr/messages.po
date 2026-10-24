@@ -70,6 +70,9 @@ msgstr "\"{0}\" artık tetiklenmeyecek ve çalıştırma geçmişi kaldırılaca
 msgid "\"{name}\" is a folder. Attach the files inside it instead."
 msgstr "\"{name}\" bir klasör. Bunun yerine içindeki dosyaları ekle."
 
+msgid "\"{name}\" is over {limit}, the most a workspace outside the cloud can take"
+msgstr "\"{name}\" {limit} sınırını aşıyor; bulut dışındaki bir çalışma alanı en fazla bu kadarını alabilir"
+
 msgid "\"{name}\" paused"
 msgstr "\"{name}\" duraklatıldı"
 
