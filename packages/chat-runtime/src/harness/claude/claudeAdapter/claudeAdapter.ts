@@ -8,10 +8,12 @@ import type {
 	Decision,
 	UserContent,
 } from "@superset/chat/protocol";
+import { attachedFilesBlock } from "../../attachedFiles";
 import type {
 	AdapterEvent,
 	HarnessAdapter,
 	HarnessStartOptions,
+	ResolveAttachment,
 } from "../../types";
 import { ClaudeTranslator } from "../translateStream";
 
@@ -77,6 +79,7 @@ export type ClaudeAdapterOptions = {
 	query: ClaudeQuery;
 	pathToClaudeCodeExecutable?: string;
 	launch?: () => Promise<ClaudeLaunch>;
+	resolveAttachment?: ResolveAttachment;
 	now?: () => number;
 	mintId?: () => string;
 };
@@ -168,10 +171,29 @@ class PromptQueue {
 	}
 }
 
+type SdkUserContent = SDKUserMessage["message"]["content"];
+type SdkContentBlock = Exclude<SdkUserContent, string>[number];
+type ClaudeImageType = "image/png" | "image/jpeg" | "image/gif" | "image/webp";
+
+const CLAUDE_IMAGE_TYPES = new Set<string>([
+	"image/png",
+	"image/jpeg",
+	"image/gif",
+	"image/webp",
+] satisfies ClaudeImageType[]);
+
 function promptText(content: UserContent[]): string {
 	return content
-		.map((part) => (part.type === "text" ? part.text : `[${part.name}]`))
+		.map((part) => (part.type === "text" ? part.text : ""))
 		.join("\n");
+}
+
+function userMessage(content: SdkUserContent): SDKUserMessage {
+	return {
+		type: "user",
+		message: { role: "user", content },
+		parent_tool_use_id: null,
+	};
 }
 
 export class ClaudeAdapter implements HarnessAdapter {
@@ -184,6 +206,7 @@ export class ClaudeAdapter implements HarnessAdapter {
 	private sessionId: string | null = null;
 	private modeId: ClaudePermissionMode = "default";
 	private pump: Promise<void> | null = null;
+	private resolvingPrompt: Promise<void> | null = null;
 	private disposed = false;
 
 	constructor(private readonly options: ClaudeAdapterOptions) {}
@@ -256,11 +279,57 @@ export class ClaudeAdapter implements HarnessAdapter {
 	}
 
 	prompt(content: UserContent[]): void {
-		this.prompts.push({
-			type: "user",
-			message: { role: "user", content: promptText(content) },
-			parent_tool_use_id: null,
+		const hasAttachment = content.some((part) => part.type === "attachment");
+		if (!hasAttachment && !this.resolvingPrompt) {
+			this.prompts.push(userMessage(promptText(content)));
+			return;
+		}
+		const blocks = this.contentBlocks(content);
+		const queued = (this.resolvingPrompt ?? Promise.resolve())
+			.then(() => blocks)
+			.then((resolved) => this.prompts.push(userMessage(resolved)));
+		this.resolvingPrompt = queued;
+		void queued.finally(() => {
+			if (this.resolvingPrompt === queued) this.resolvingPrompt = null;
 		});
+	}
+
+	private async contentBlocks(
+		content: UserContent[],
+	): Promise<SdkContentBlock[]> {
+		const blocks: SdkContentBlock[] = [];
+		for (const part of content) {
+			if (part.type === "text") {
+				blocks.push({ type: "text", text: part.text });
+				continue;
+			}
+			const file = await (
+				this.options.resolveAttachment?.(part) ?? Promise.resolve(null)
+			).catch(() => null);
+			if (!file) {
+				blocks.push({
+					type: "text",
+					text: `[${part.name}: could not be read]`,
+				});
+				continue;
+			}
+			blocks.push(
+				CLAUDE_IMAGE_TYPES.has(file.mimeType)
+					? {
+							type: "image",
+							source: {
+								type: "base64",
+								media_type: file.mimeType as ClaudeImageType,
+								data: file.data,
+							},
+						}
+					: {
+							type: "text",
+							text: attachedFilesBlock([{ name: part.name, path: file.path }]),
+						},
+			);
+		}
+		return blocks;
 	}
 
 	cancelTurn(): void {

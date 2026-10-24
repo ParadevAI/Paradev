@@ -1,5 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import type { AdapterEvent } from "../../types";
+import type { SDKUserMessage } from "@anthropic-ai/claude-agent-sdk";
+import { attachedFilesBlock } from "../../attachedFiles";
+import type { AdapterEvent, ResolveAttachment } from "../../types";
 import {
 	ClaudeAdapter,
 	type ClaudeQuery,
@@ -266,5 +268,115 @@ describe("ClaudeAdapter permission modes", () => {
 			session: { modeId: "bypassPermissions" },
 		});
 		expect(reverted.value).toMatchObject({ session: { modeId: "default" } });
+	});
+});
+
+describe("ClaudeAdapter attachments", () => {
+	function capturePrompts(resolveAttachment: ResolveAttachment) {
+		const sent: SDKUserMessage[] = [];
+		const stream: ClaudeSession = {
+			async *[Symbol.asyncIterator]() {
+				await new Promise(() => {});
+			},
+		};
+		const adapter = new ClaudeAdapter({
+			resolveAttachment,
+			query: ({ prompt }) => {
+				void (async () => {
+					for await (const message of prompt as AsyncIterable<SDKUserMessage>)
+						sent.push(message);
+				})();
+				return stream;
+			},
+		});
+		adapter.start({ cwd: "/workspace" });
+		return { adapter, sent };
+	}
+
+	const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
+	const part = (name: string, mimeType: string) => ({
+		type: "attachment" as const,
+		attachmentId: name,
+		name,
+		mimeType,
+	});
+
+	test("sends an image as an image block", async () => {
+		const { adapter, sent } = capturePrompts(async () => ({
+			path: "/store/a/a.png",
+			mimeType: "image/png",
+			data: "cG5n",
+		}));
+		adapter.prompt([
+			{ type: "text", text: "what is this" },
+			part("shot.png", "image/png"),
+		]);
+		await flush();
+		expect(sent.map((message) => message.message.content)).toEqual([
+			[
+				{ type: "text", text: "what is this" },
+				{
+					type: "image",
+					source: { type: "base64", media_type: "image/png", data: "cG5n" },
+				},
+			],
+		]);
+	});
+
+	test("hands a non-image over as its name and path", async () => {
+		const { adapter, sent } = capturePrompts(async () => ({
+			path: "/store/b/b.pdf",
+			mimeType: "application/pdf",
+			data: "cGRm",
+		}));
+		adapter.prompt([part("spec.pdf", "application/pdf")]);
+		await flush();
+		expect(sent[0]?.message.content).toEqual([
+			{
+				type: "text",
+				text: attachedFilesBlock([
+					{ name: "spec.pdf", path: "/store/b/b.pdf" },
+				]),
+			},
+		]);
+	});
+
+	test("tells the agent which file it could not read", async () => {
+		const { adapter, sent } = capturePrompts(async () => null);
+		adapter.prompt([part("gone.png", "image/png")]);
+		await flush();
+		expect(sent[0]?.message.content).toEqual([
+			{ type: "text", text: "[gone.png: could not be read]" },
+		]);
+	});
+
+	test("a prompt sent while an attachment resolves still goes second", async () => {
+		let release: () => void = () => {};
+		const { adapter, sent } = capturePrompts(
+			() =>
+				new Promise((resolve) => {
+					release = () =>
+						resolve({
+							path: "/store/c/c.png",
+							mimeType: "image/png",
+							data: "",
+						});
+				}),
+		);
+		adapter.prompt([part("first.png", "image/png")]);
+		adapter.prompt([{ type: "text", text: "second" }]);
+		await flush();
+		expect(sent).toEqual([]);
+		release();
+		await flush();
+		expect(sent.map((message) => message.message.content)).toEqual([
+			[
+				{
+					type: "image",
+					source: { type: "base64", media_type: "image/png", data: "" },
+				},
+			],
+			[{ type: "text", text: "second" }],
+		]);
 	});
 });
