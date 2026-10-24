@@ -371,12 +371,16 @@ forwards Ctrl+V and lets the TUI (Claude Code, Codex) read the image from the
 OS clipboard — of the machine the PTY runs on. A sandbox (or any
 relay-reached host) never holds the user's local screenshot, so the paste
 silently did nothing or surfaced "Failed to paste image". Fixed renderer-side:
-for non-local hosts the desktop sends the clipboard files the way every
-composer sends attachments — `attachment.createUpload` on the API, a
-presigned PUT to storage, `cloudWorkspace.attachFiles` for a box, then
-`attachments.materializeIntoWorkspace` on the host — and pastes the
-worktree-relative paths instead (`setImagePasteOverride` in the terminal
-runtime registry, `useSendAttachments` in the pane registry).
+for non-local hosts the desktop writes the clipboard files into the worktree
+and pastes their worktree-relative paths instead (`setImagePasteOverride` in
+the terminal runtime registry, `useSendAttachments` in the pane registry).
+The bytes go where the workspace lives. A box gets them through storage:
+`attachment.createUpload`, a presigned PUT, `cloudWorkspace.attachFiles`,
+then `attachments.materializeIntoWorkspace` on the box. A relay-reached
+machine gets them as base64 `filesystem.writeFile`, capped at
+`MAX_INLINE_ATTACHMENT_BYTES`, so they never reach our servers. Chat
+attachments follow the same rule as parts: a `fileId` for a box, an
+`attachmentId` in the host's store otherwise.
 
 **The ingress drops an upload the host answers early.** tRPC's streamed batch
 (`httpBatchStreamLink`, `trpc-accept: application/jsonl`) returns its response
