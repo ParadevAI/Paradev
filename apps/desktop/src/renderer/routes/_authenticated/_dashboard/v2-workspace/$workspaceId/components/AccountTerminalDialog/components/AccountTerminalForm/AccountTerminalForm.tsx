@@ -61,9 +61,10 @@ export function AccountTerminalForm({
 	const [selected, setSelected] = useState<string | null>(null);
 	const [launchError, setLaunchError] = useState<string | null>(null);
 	const inFlight = useRef(false);
-	const [now, setNow] = useState(Date.now);
+	const [, setAgeTick] = useState(0);
+	const now = Date.now();
 	useEffect(() => {
-		const timer = setInterval(() => setNow(Date.now()), 30_000);
+		const timer = setInterval(() => setAgeTick((tick) => tick + 1), 30_000);
 		return () => clearInterval(timer);
 	}, []);
 	const recommendation =
