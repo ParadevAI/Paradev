@@ -1,3 +1,5 @@
+import { quotaObservationFresh } from "shared/quota-freshness";
+
 export interface LaunchAccount {
 	selection: string | null;
 	identity: string;
@@ -25,20 +27,16 @@ export interface LaunchQuota {
 	fetchedAt: Date | string;
 	isDefault?: boolean;
 	identityChanged?: boolean;
+	/** Retained display history is never a recommendation. */
+	historical?: boolean;
+	retained?: boolean;
 	windows: LaunchQuotaWindow[];
 }
-
-const MAX_QUOTA_AGE_MS = 6 * 60_000;
 
 export function accountKey(
 	account: Pick<LaunchAccount, "selection" | "identity">,
 ) {
 	return JSON.stringify([account.selection, account.identity]);
-}
-
-function fresh(value: Date | string, now: number): boolean {
-	const age = now - new Date(value).getTime();
-	return Number.isFinite(age) && age >= 0 && age <= MAX_QUOTA_AGE_MS;
 }
 
 function basicWindow(window: LaunchQuotaWindow) {
@@ -70,7 +68,8 @@ export function launchAccountQuota(
 		quota.credentialKind !== "subscription" ||
 		quota.status !== "ok" ||
 		quota.identityChanged ||
-		!fresh(quota.fetchedAt, now)
+		quota.historical ||
+		quota.retained
 	)
 		return undefined;
 	const windows = quota.windows.filter(basicWindow);
@@ -84,7 +83,7 @@ export function launchAccountQuota(
 				!Number.isFinite(window.usedPercent) ||
 				window.usedPercent < 0 ||
 				window.usedPercent > 100 ||
-				!fresh(window.observedAt ?? quota.fetchedAt, now) ||
+				!quotaObservationFresh(window, quota.fetchedAt, now) ||
 				(reset !== null && (!Number.isFinite(reset) || reset <= now))
 			);
 		})
@@ -96,8 +95,9 @@ export function launchAccountQuota(
 		isDefault: quota.isDefault === true,
 		// A partial passive Claude observation cannot prove unknown weekly quota.
 		recommendable:
-			windows.length >= 2 ||
-			!windows.some((window) => window.source?.startsWith("claude_")),
+			!windows.some((window) => window.source?.startsWith("claude_")) ||
+			(windows.some((window) => ["five_hour", "session"].includes(window.id)) &&
+				windows.some((window) => ["seven_day", "weekly"].includes(window.id))),
 	};
 }
 
