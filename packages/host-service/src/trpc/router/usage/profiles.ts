@@ -28,7 +28,13 @@ import { homedir, platform, userInfo } from "node:os";
 import { join } from "node:path";
 import { promisify } from "node:util";
 import { resolveAmbientCodexHome } from "@superset/agent-setup";
+import { assertCodexFileCredentialStore } from "./codex-quota-config";
 import { readProfileFile } from "./profile-file";
+import {
+	parseQuotaCredentialJson,
+	QuotaCredentialReadError,
+	readQuotaCredentialFile,
+} from "./quota-credentials";
 
 const execFileAsync = promisify(execFile);
 
@@ -62,6 +68,8 @@ export interface ClaudeProfile {
 }
 
 export interface CodexHome {
+	/** Quota-only discovery retains an unreadable profile; never selectable. */
+	quotaUnavailable?: true;
 	home: string;
 	sourceLabel: string;
 	credentialKind: ProfileCredentialKind;
@@ -226,23 +234,57 @@ export function claudeKeychainAccounts(
  * accounts are probed first; the unscoped lookup then covers items an older
  * client filed under a different name.
  */
-export async function readKeychainSecrets(service: string): Promise<string[]> {
+export async function readKeychainSecrets(
+	service: string,
+	strict = false,
+): Promise<string[]> {
 	if (platform() !== "darwin") return [];
-	const secrets: string[] = [];
 	const scopes = [
 		...claudeKeychainAccounts().map((account) => ["-a", account]),
 		[],
 	];
-	for (const scope of scopes) {
-		try {
+	return collectKeychainSecrets(
+		scopes,
+		async (scope) => {
 			const { stdout } = await execFileAsync(
 				"security",
 				["find-generic-password", ...scope, "-s", service, "-w"],
-				{ timeout: 5_000 },
+				{ timeout: strict ? 750 : 5_000, maxBuffer: 1024 * 1024 },
 			);
-			const secret = stdout.trim();
+			return stdout;
+		},
+		strict,
+	);
+}
+
+export async function collectKeychainSecrets(
+	scopes: string[][],
+	read: (scope: string[]) => Promise<string>,
+	strict: boolean,
+): Promise<string[]> {
+	if (strict) {
+		const groups = await Promise.all(
+			scopes.map((scope) =>
+				read(scope).then(
+					(value) => (value.trim() ? [value.trim()] : []),
+					(error: unknown) => {
+						if ((error as { code?: unknown }).code === 44) return [];
+						throw new QuotaCredentialReadError();
+					},
+				),
+			),
+		);
+		return [...new Set(groups.flat())];
+	}
+	const secrets: string[] = [];
+	for (const scope of scopes) {
+		try {
+			const secret = (await read(scope)).trim();
 			if (secret && !secrets.includes(secret)) secrets.push(secret);
-		} catch {
+		} catch (error) {
+			if (strict && (error as { code?: unknown }).code !== 44) {
+				throw new QuotaCredentialReadError();
+			}
 			// No item under this scope.
 		}
 	}
@@ -281,6 +323,36 @@ export async function readCodexProfileKind(
 	}
 }
 
+async function readCodexQuotaProfileKind(
+	codexHome: string,
+): Promise<Pick<
+	CodexHome,
+	"credentialKind" | "loginFingerprint" | "quotaUnavailable"
+> | null> {
+	const apiFingerprint = await readApiBillingFingerprint(codexHome, "codex");
+	if (apiFingerprint)
+		return { credentialKind: "api_key", loginFingerprint: apiFingerprint };
+	try {
+		await assertCodexFileCredentialStore(codexHome);
+		const file = await readQuotaCredentialFile(join(codexHome, "auth.json"));
+		if (!file) return null;
+		const parsed = parseQuotaCredentialJson(file);
+		if (parsed.tokens === undefined || parsed.tokens === null) return null;
+		if (typeof parsed.tokens !== "object" || Array.isArray(parsed.tokens))
+			throw new QuotaCredentialReadError();
+		const token = (parsed.tokens as Record<string, unknown>).access_token;
+		if (typeof token !== "string" || !token.trim())
+			throw new QuotaCredentialReadError();
+		return { credentialKind: "subscription", loginFingerprint: null };
+	} catch {
+		return {
+			credentialKind: "subscription",
+			loginFingerprint: null,
+			quotaUnavailable: true,
+		};
+	}
+}
+
 /**
  * Codex homes: the ambient home (`~/.codex`, or a `CODEX_HOME` the user set
  * themselves — see resolveAmbientCodexHome for why Superset's own injected
@@ -292,10 +364,18 @@ export async function readCodexProfileKind(
  * `selection: null`. It is listed even without an `auth.json` so the
  * add-account poller has a baseline to compare a fresh `codex login` against.
  */
-export async function discoverCodexHomes(): Promise<CodexHome[]> {
+export async function discoverCodexHomes(
+	options: {
+		includeUnavailable?: boolean;
+		candidates?: readonly string[];
+		defaultHome?: string;
+	} = {},
+): Promise<CodexHome[]> {
 	const home = homedir();
-	const defaultHome = resolveAmbientCodexHome(home);
-	const defaultKind = (await readCodexProfileKind(defaultHome)) ?? {
+	const defaultHome = options.defaultHome ?? resolveAmbientCodexHome(home);
+	const defaultKind = (await (options.includeUnavailable
+		? readCodexQuotaProfileKind(defaultHome)
+		: readCodexProfileKind(defaultHome))) ?? {
 		credentialKind: "subscription" as const,
 		loginFingerprint: null,
 	};
@@ -310,12 +390,16 @@ export async function discoverCodexHomes(): Promise<CodexHome[]> {
 		],
 	]);
 
-	const candidates = (await listSubdirectories(home)).filter((path) =>
-		path.slice(home.length + 1).startsWith(".codex"),
-	);
+	const candidates =
+		options.candidates ??
+		(await listSubdirectories(home)).filter((path) =>
+			path.slice(home.length + 1).startsWith(".codex"),
+		);
 	for (const candidate of candidates) {
 		if (homes.has(candidate)) continue;
-		const kind = await readCodexProfileKind(candidate);
+		const kind = await (options.includeUnavailable
+			? readCodexQuotaProfileKind(candidate)
+			: readCodexProfileKind(candidate));
 		if (!kind) continue;
 		homes.set(candidate, {
 			home: candidate,
