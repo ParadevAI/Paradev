@@ -9609,9 +9609,6 @@ msgstr "Last updated: {lastUpdated}"
 msgid "Last used"
 msgstr "Last used"
 
-msgid "Last used: {lastUsedProviderLabel}"
-msgstr "Last used: {lastUsedProviderLabel}"
-
 msgid "Late 2026"
 msgstr "Late 2026"
 

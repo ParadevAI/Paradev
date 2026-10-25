@@ -9609,9 +9609,6 @@ msgstr "Cập nhật lần cuối: {lastUpdated}"
 msgid "Last used"
 msgstr "Dùng lần cuối"
 
-msgid "Last used: {lastUsedProviderLabel}"
-msgstr "Dùng lần cuối: {lastUsedProviderLabel}"
-
 msgid "Late 2026"
 msgstr "Cuối 2026"
 
