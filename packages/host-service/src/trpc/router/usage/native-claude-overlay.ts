@@ -1,9 +1,14 @@
 import type { ClaudeSubscriptionQuota } from "./claude-subscription";
 import type { NativeClaudeCredential } from "./native-claude-scope";
-import type { NativeClaudeUsageWindow } from "./native-claude-usage";
+import {
+	NATIVE_CLAUDE_FRESH_MS,
+	type NativeClaudeUsageWindow,
+} from "./native-claude-usage";
+
+export { NATIVE_CLAUDE_FRESH_MS } from "./native-claude-usage";
+
 import type { UsageQuotaWindow } from "./types";
 
-export const NATIVE_CLAUDE_FRESH_MS = 16 * 60_000;
 const HTTP_RECONCILE_MS = 30 * 60_000;
 type Quota = ClaudeSubscriptionQuota & { fetchedAt: Date };
 const date = (value: unknown) =>
