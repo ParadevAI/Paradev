@@ -32,8 +32,8 @@ interface AccountTerminalFormProps {
 	refreshing: boolean;
 	error: string | null;
 	launching: boolean;
- submitLabel?: string;
- launchDisabled?: boolean;
+	submitLabel?: string;
+	launchDisabled?: boolean;
 	onRefresh: () => Promise<void>;
 	onCancel: () => void;
 	onLaunch: (
@@ -53,8 +53,8 @@ export function AccountTerminalForm({
 	refreshing,
 	error,
 	launching,
- submitLabel,
- launchDisabled = false,
+	submitLabel,
+	launchDisabled = false,
 	onRefresh,
 	onCancel,
 	onLaunch,
@@ -88,7 +88,7 @@ export function AccountTerminalForm({
 			!loading &&
 			!refreshing &&
 			!launching &&
- !launchDisabled &&
+			!launchDisabled &&
 			configs.some((config) => config.id === configId),
 	);
 	const failure =
@@ -257,7 +257,7 @@ export function AccountTerminalForm({
 						{mode === "resume" ? (
 							<Trans>Resume conversation</Trans>
 						) : (
-							submitLabel ?? <Trans>Start terminal</Trans>
+							(submitLabel ?? <Trans>Start terminal</Trans>)
 						)}
 					</Button>
 				</div>

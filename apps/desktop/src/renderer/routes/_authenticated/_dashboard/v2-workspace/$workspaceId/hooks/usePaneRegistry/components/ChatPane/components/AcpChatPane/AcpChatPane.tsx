@@ -17,9 +17,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTerminalAgentBindings } from "renderer/hooks/host-service/useTerminalAgentBindings";
 import { useWorkspaceEvent } from "renderer/hooks/host-service/useWorkspaceEvent";
 import { useV2AgentConfigs } from "renderer/hooks/useV2AgentConfigs";
+import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import type { ChatPaneData, OpenFile } from "../../../../../../types";
 import { saveLastChatAgent } from "../../../../../../utils/lastChatAgent";
-import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { SessionView } from "../../../ChatSession/components/SessionView";
 import { useSessionClient } from "../../../ChatSession/hooks/useSessionClient";
 import type {
@@ -33,11 +33,11 @@ import type {
 import { isUnrestrictedMode } from "../../../ChatSession/utils/isUnrestrictedMode";
 import { useForkChat } from "../../hooks/useForkChat";
 import { readSavedChatMode } from "../../utils/savedChatMode";
+import { AccountChatSwitch } from "./components/AccountChatSwitch/AccountChatSwitch";
 import { AcpRecovery } from "./components/AcpRecovery";
 import { DraftChat } from "./components/DraftChat";
 import { StopAccountAgent } from "./components/StopAccountAgent";
 import { StoppedAccountQueue } from "./components/StoppedAccountQueue";
-import { AccountChatSwitch } from "./components/AccountChatSwitch/AccountChatSwitch";
 import { useRecoveryRetries } from "./hooks/useRecoveryRetries";
 import { accountChatDraftKey } from "./utils/accountPaneState";
 import {
