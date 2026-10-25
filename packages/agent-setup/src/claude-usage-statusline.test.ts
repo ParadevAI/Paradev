@@ -288,3 +288,169 @@ test("a user's statusline exit code and output survive a rejected or unavailable
 	expect(child.status).toBe(7);
 	expect(child.stdout).toBe("retained");
 });
+
+test("native collection reaches the host while a custom statusline waits for its marker", async () => {
+	const f = fixture();
+	const marker = join(f.dir, "collector-received");
+	const custom = join(f.dir, "original.cjs");
+	const input = Buffer.from(
+		JSON.stringify({
+			session_id: "owned",
+			cost: { total_api_duration_ms: 123 },
+			rate_limits: {
+				five_hour: { used_percentage: 25, resets_at: 1_800_000_600 },
+			},
+		}),
+	);
+	const outputPrefix = Buffer.from([0, 255, 10]);
+	const expectedErrors = Buffer.from([101, 114, 114, 0, 254]);
+	writeFileSync(
+		custom,
+		`
+const fs = require("node:fs");
+const path = require("node:path");
+const marker = ${JSON.stringify(marker)};
+const chunks = [];
+process.stdin.on("data", chunk => chunks.push(chunk));
+process.stdin.on("end", () => {
+ let watcher;
+ let timer;
+ let finished = false;
+ const finish = () => {
+  if (finished || !fs.existsSync(marker)) return;
+  finished = true;
+  clearTimeout(timer);
+  watcher?.close();
+  process.stdout.write(Buffer.from([0, 255, 10]));
+  process.stdout.write(Buffer.concat(chunks));
+  process.stderr.write(Buffer.from([101, 114, 114, 0, 254]));
+  process.exitCode = 7;
+ };
+ watcher = fs.watch(path.dirname(marker), finish);
+ timer = setTimeout(() => {
+  watcher.close();
+  process.stderr.write("collector never reached the host");
+  process.exitCode = 91;
+ }, 1500);
+ finish();
+});
+`,
+	);
+	let requests = 0;
+	const host = Bun.serve({
+		port: 0,
+		async fetch(request) {
+			const body = await request.json();
+			expect(body.json.nativeClaudeUsage.session_id).toBe("owned");
+			requests++;
+			writeFileSync(marker, "received");
+			return Response.json({ result: { data: { json: { ignored: false } } } });
+		},
+	});
+	try {
+		const saved = Buffer.from(
+			JSON.stringify({
+				type: "command",
+				command: `node '${custom.replaceAll("'", "'\\''")}'`,
+				padding: 3,
+			}),
+		).toString("base64url");
+		const proc = Bun.spawn(["node", bridge, "--status", saved], {
+			cwd: f.cwd,
+			env: {
+				...f.env,
+				SUPERSET_HOST_AGENT_HOOK_URL: `http://127.0.0.1:${host.port}/trpc/notifications.hook`,
+			},
+			stdin: input,
+			stdout: "pipe",
+			stderr: "pipe",
+		});
+		const [output, errors, code] = await Promise.all([
+			new Response(proc.stdout).arrayBuffer(),
+			new Response(proc.stderr).arrayBuffer(),
+			proc.exited,
+		]);
+		expect(code).toBe(7);
+		expect(Buffer.from(output)).toEqual(Buffer.concat([outputPrefix, input]));
+		expect(Buffer.from(errors)).toEqual(expectedErrors);
+		expect(requests).toBe(1);
+	} finally {
+		await host.stop(true);
+	}
+});
+
+test("custom statusline output remains bounded while collection is unavailable", async () => {
+	const f = fixture();
+	const custom = join(f.dir, "large-output.cjs");
+	writeFileSync(custom, "process.stdout.write(Buffer.alloc(600 * 1024, 65));");
+	const saved = Buffer.from(
+		JSON.stringify({
+			type: "command",
+			command: `node '${custom.replaceAll("'", "'\\''")}'`,
+		}),
+	).toString("base64url");
+	const proc = Bun.spawn(["node", bridge, "--status", saved], {
+		cwd: f.cwd,
+		env: {
+			...f.env,
+			SUPERSET_HOST_AGENT_HOOK_URL:
+				"https://public.example.test/trpc/notifications.hook",
+		},
+		stdin: Buffer.from(
+			JSON.stringify({
+				session_id: "owned",
+				cost: { total_api_duration_ms: 0 },
+			}),
+		),
+		stdout: "pipe",
+		stderr: "pipe",
+	});
+	const [output, _errors, code] = await Promise.all([
+		new Response(proc.stdout).arrayBuffer(),
+		new Response(proc.stderr).arrayBuffer(),
+		proc.exited,
+	]);
+	expect(code).toBe(1);
+	expect(output.byteLength).toBeLessThanOrEqual(512 * 1024);
+	expect(output.byteLength).toBeGreaterThan(0);
+});
+
+test("the custom command keeps the combined stdout/stderr buffer ceiling", async () => {
+	const f = fixture();
+	const custom = join(f.dir, "combined-output.cjs");
+	writeFileSync(
+		custom,
+		"process.stdout.write(Buffer.alloc(300 * 1024, 65)); process.stderr.write(Buffer.alloc(300 * 1024, 66));",
+	);
+	const saved = Buffer.from(
+		JSON.stringify({
+			type: "command",
+			command: `node '${custom.replaceAll("'", "'\\''")}'`,
+		}),
+	).toString("base64url");
+	const proc = Bun.spawn(["node", bridge, "--status", saved], {
+		cwd: f.cwd,
+		env: {
+			...f.env,
+			SUPERSET_HOST_AGENT_HOOK_URL:
+				"https://public.example.test/trpc/notifications.hook",
+		},
+		stdin: Buffer.from(
+			JSON.stringify({
+				session_id: "owned",
+				cost: { total_api_duration_ms: 0 },
+			}),
+		),
+		stdout: "pipe",
+		stderr: "pipe",
+	});
+	const [output, errors, code] = await Promise.all([
+		new Response(proc.stdout).arrayBuffer(),
+		new Response(proc.stderr).arrayBuffer(),
+		proc.exited,
+	]);
+	expect(code).toBe(1);
+	expect(output.byteLength + errors.byteLength).toBeLessThanOrEqual(512 * 1024);
+	expect(output.byteLength).toBeGreaterThan(0);
+	expect(errors.byteLength).toBeGreaterThan(0);
+});

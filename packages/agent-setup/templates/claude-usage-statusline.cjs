@@ -3,7 +3,7 @@ const path = require("node:path");
 const os = require("node:os");
 const http = require("node:http");
 const { createHash, randomUUID } = require("node:crypto");
-const { spawnSync } = require("node:child_process");
+const { spawn, spawnSync } = require("node:child_process");
 
 const MAX_INPUT = 512 * 1024;
 function readJson(file) {
@@ -337,6 +337,46 @@ function post(url, body, deadline) {
 		request.end(body);
 	});
 }
+function originalStatusLine(command, input) {
+	if (typeof command !== "string" || !command) return Promise.resolve(0);
+	return new Promise((resolve) => {
+		try {
+			const child = spawn(command, { shell: true, env: process.env });
+			const stdout = [];
+			const stderr = [];
+			let bytes = 0;
+			let failed = false;
+			const collect = (target, chunk) => {
+				const remaining = MAX_INPUT - bytes;
+				if (remaining > 0) target.push(chunk.subarray(0, remaining));
+				bytes += chunk.length;
+				if (bytes > MAX_INPUT && !failed) {
+					// Keep spawnSync's combined output bound, without adding a user-command timeout.
+					failed = true;
+					child.kill();
+					child.stdin.destroy();
+					child.stdout.destroy();
+					child.stderr.destroy();
+				}
+			};
+			child.stdout.on("data", (chunk) => collect(stdout, chunk));
+			child.stderr.on("data", (chunk) => collect(stderr, chunk));
+			child.on("error", () => {
+				failed = true;
+			});
+			child.on("close", (code) => {
+				process.stdout.write(Buffer.concat(stdout));
+				process.stderr.write(Buffer.concat(stderr));
+				resolve(!failed && typeof code === "number" ? code : 1);
+			});
+			// A command may exit without reading stdin. Its own result remains authoritative.
+			child.stdin.on("error", () => {});
+			child.stdin.end(input);
+		} catch {
+			resolve(1);
+		}
+	});
+}
 async function status(encoded) {
 	let input;
 	try {
@@ -351,18 +391,8 @@ async function status(encoded) {
 	} catch {
 		return;
 	}
-	let code = 0;
-	if (typeof original.command === "string" && original.command) {
-		const output = spawnSync(original.command, {
-			shell: true,
-			input,
-			maxBuffer: MAX_INPUT,
-			env: process.env,
-		});
-		if (output.stdout) process.stdout.write(output.stdout);
-		if (output.stderr) process.stderr.write(output.stderr);
-		code = typeof output.status === "number" ? output.status : 1;
-	}
+	// The user's command retains its own lifetime; native collection must not wait for it.
+	const originalResult = originalStatusLine(original.command, input);
 	try {
 		const data = sanitize(JSON.parse(input));
 		if (
@@ -376,7 +406,6 @@ async function status(encoded) {
 		) {
 			const marker = frameMarker(data);
 			if (!marker || marker.skip) {
-				process.exitCode = code;
 				return;
 			}
 			const body = JSON.stringify({
@@ -399,8 +428,10 @@ async function status(encoded) {
 			}
 			marker.write(accepted);
 		}
-	} catch {}
-	process.exitCode = code;
+	} catch {
+	} finally {
+		process.exitCode = await originalResult;
+	}
 }
 if (process.argv[2] === "--prepare") {
 	try {
