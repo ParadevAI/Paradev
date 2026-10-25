@@ -62,7 +62,7 @@ test("partial, stale, future, expired and malformed native observations never im
 	);
 	for (const change of [
 		{ observedAt: now + 1 },
-		{ observedAt: now - 16 * 60_000 - 1 },
+		{ observedAt: now - 6 * 60_000 - 1 },
 		{ resetsAt: now },
 		{ usedPercent: Number.NaN },
 		{ usedPercent: 101 },
@@ -195,4 +195,17 @@ test("cache-only scope lookup fences the captured token, cache object and regist
 	expect(await overlay(credential, original)).toBeNull();
 	enabled = false;
 	expect(await overlay(credential, original)).toBeNull();
+});
+
+test("native display and HTTP deferral expire together after six minutes", () => {
+	const original = base();
+	const recent = [
+		reading("five_hour", { observedAt: now - 6 * 60_000 }),
+		reading("seven_day", { observedAt: now - 6 * 60_000 }),
+	];
+	const overlay = mergeNativeClaudeQuota(original, recent, now);
+	if (!overlay) throw new Error("missing boundary sample");
+	expect(canDeferClaudeHttpQuota(original, overlay, now)).toBe(true);
+	expect(mergeNativeClaudeQuota(original, recent, now + 1)).toBeNull();
+	expect(canDeferClaudeHttpQuota(original, overlay, now + 1)).toBe(false);
 });

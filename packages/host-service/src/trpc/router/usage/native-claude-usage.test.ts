@@ -62,6 +62,7 @@ test("first statusline frame is a baseline; API progress updates only supplied w
 	const initial = f.frame(10, 20, 30);
 	expect(
 		f.store.ingest({
+			receivedAt: f.time(),
 			...f.identity,
 			source: "claude_statusline",
 			payload: initial,
@@ -72,6 +73,7 @@ test("first statusline frame is a baseline; API progress updates only supplied w
 	const response = f.frame(11, 21, 31);
 	expect(
 		f.store.ingest({
+			receivedAt: f.time(),
 			...f.identity,
 			source: "claude_statusline",
 			payload: response,
@@ -81,6 +83,7 @@ test("first statusline frame is a baseline; API progress updates only supplied w
 	f.advance();
 	expect(
 		f.store.ingest({
+			receivedAt: f.time(),
 			...f.identity,
 			source: "claude_statusline",
 			payload: response,
@@ -89,6 +92,7 @@ test("first statusline frame is a baseline; API progress updates only supplied w
 	expect(f.store.snapshot(f.identity.scope)).toEqual(measured);
 	expect(
 		f.store.ingest({
+			receivedAt: f.time(),
 			...f.identity,
 			source: "claude_statusline",
 			payload: initial,
@@ -96,6 +100,7 @@ test("first statusline frame is a baseline; API progress updates only supplied w
 	).toBe(false);
 	expect(
 		f.store.ingest({
+			receivedAt: f.time(),
 			...f.identity,
 			source: "claude_statusline",
 			payload: response,
@@ -103,6 +108,7 @@ test("first statusline frame is a baseline; API progress updates only supplied w
 	).toBe(false);
 	expect(f.store.snapshot(f.identity.scope)).toEqual(measured);
 	f.store.ingest({
+		receivedAt: f.time(),
 		...f.identity,
 		source: "claude_statusline",
 		payload: f.frame(12, 21),
@@ -121,6 +127,7 @@ test("first statusline frame is a baseline; API progress updates only supplied w
 test("startup without quota seeds the first real response and persisted replays keep original age", () => {
 	const f = fixture();
 	f.store.ingest({
+		receivedAt: f.time(),
 		...f.identity,
 		source: "claude_statusline",
 		payload: { cost: { total_api_duration_ms: 0 } },
@@ -128,6 +135,7 @@ test("startup without quota seeds the first real response and persisted replays 
 	const response = f.frame(1);
 	f.advance();
 	f.store.ingest({
+		receivedAt: f.time(),
 		...f.identity,
 		source: "claude_statusline",
 		payload: response,
@@ -137,6 +145,7 @@ test("startup without quota seeds the first real response and persisted replays 
 	const reopened = createNativeClaudeUsageStore({ file: f.file, now: f.time });
 	expect(
 		reopened.ingest({
+			receivedAt: f.time(),
 			...f.identity,
 			source: "claude_statusline",
 			payload: response,
@@ -160,6 +169,7 @@ test("launch identity cannot be retargeted after sign-in changes and unknown gen
 	]) {
 		expect(
 			f.store.ingest({
+				receivedAt: f.time(),
 				...f.identity,
 				...change,
 				source: "claude_statusline",
@@ -184,6 +194,7 @@ test("SDK restored state and unchanged UUID replays do not establish a new measu
 	const initial = event("cached");
 	expect(
 		f.store.ingest({
+			receivedAt: f.time(),
 			...f.identity,
 			source: "claude_sdk",
 			responseCounter: 0,
@@ -193,6 +204,7 @@ test("SDK restored state and unchanged UUID replays do not establish a new measu
 	f.advance();
 	expect(
 		f.store.ingest({
+			receivedAt: f.time(),
 			...f.identity,
 			source: "claude_sdk",
 			responseCounter: 0,
@@ -203,6 +215,7 @@ test("SDK restored state and unchanged UUID replays do not establish a new measu
 	const fresh = event("response", 0.4);
 	expect(
 		f.store.ingest({
+			receivedAt: f.time(),
 			...f.identity,
 			source: "claude_sdk",
 			responseCounter: 1,
@@ -213,6 +226,7 @@ test("SDK restored state and unchanged UUID replays do not establish a new measu
 	f.advance();
 	expect(
 		f.store.ingest({
+			receivedAt: f.time(),
 			...f.identity,
 			source: "claude_sdk",
 			responseCounter: 1,
@@ -255,11 +269,13 @@ test("partial SDK fields never turn status or spend limits into subscription per
 test("expired windows, missing response markers and backwards clocks are never current quota", () => {
 	const f = fixture();
 	f.store.ingest({
+		receivedAt: f.time(),
 		...f.identity,
 		source: "claude_statusline",
 		payload: f.frame(0),
 	});
 	f.store.ingest({
+		receivedAt: f.time(),
 		...f.identity,
 		source: "claude_statusline",
 		payload: f.frame(1),
@@ -273,6 +289,7 @@ test("expired windows, missing response markers and backwards clocks are never c
 	};
 	expect(
 		f.store.ingest({
+			receivedAt: f.time(),
 			...f.identity,
 			source: "claude_statusline",
 			payload: unmarked,
@@ -287,6 +304,7 @@ test("private persistence refuses a symlink destination and never follows it", (
 	symlinkSync(target, f.file);
 	expect(() =>
 		f.store.ingest({
+			receivedAt: f.time(),
 			...f.identity,
 			source: "claude_statusline",
 			payload: f.frame(0),
@@ -307,6 +325,7 @@ test("pending measurements survive host restart and promotion does not relabel t
 	expect(pending?.pending).toBe(true);
 	if (!pending) throw new Error("missing captured generation");
 	f.store.ingest({
+		receivedAt: f.time(),
 		...launch,
 		scope: pending.scope,
 		source: "claude_statusline",
@@ -314,6 +333,7 @@ test("pending measurements survive host restart and promotion does not relabel t
 	});
 	f.advance();
 	f.store.ingest({
+		receivedAt: f.time(),
 		...launch,
 		scope: pending.scope,
 		source: "claude_statusline",
@@ -327,6 +347,7 @@ test("pending measurements survive host restart and promotion does not relabel t
 	expect(restarted.snapshot(scope)[0]?.observedAt).toBe(observedAt);
 	expect(
 		restarted.ingest({
+			receivedAt: f.time(),
 			...launch,
 			scope,
 			source: "claude_statusline",
@@ -339,11 +360,13 @@ test("late lower readings in the same reset epoch cannot erase newer utilization
 	const f = fixture();
 	const initial = f.frame(0, 20);
 	f.store.ingest({
+		receivedAt: f.time(),
 		...f.identity,
 		source: "claude_statusline",
 		payload: initial,
 	});
 	f.store.ingest({
+		receivedAt: f.time(),
 		...f.identity,
 		source: "claude_statusline",
 		payload: f.frame(1, 30),
@@ -352,9 +375,157 @@ test("late lower readings in the same reset epoch cannot erase newer utilization
 	f.advance();
 	const lower = { ...initial, cost: { total_api_duration_ms: 2 } };
 	f.store.ingest({
+		receivedAt: f.time(),
 		...f.identity,
 		source: "claude_statusline",
 		payload: lower,
 	});
 	expect(f.store.snapshot(f.identity.scope)).toEqual(before);
+});
+
+test("delayed validation retains the trusted receipt instead of the processing clock", () => {
+	const f = fixture();
+	f.store.ingest({
+		...f.identity,
+		receivedAt: f.time(),
+		source: "claude_statusline",
+		payload: f.frame(0),
+	});
+	f.advance();
+	const receivedAt = f.time();
+	const payload = f.frame(1, 35);
+	f.advance(45_000);
+	expect(
+		f.store.ingest({
+			...f.identity,
+			receivedAt,
+			source: "claude_statusline",
+			payload,
+		}),
+	).toBe(true);
+	expect(f.store.snapshot(f.identity.scope)[0]?.observedAt).toBe(receivedAt);
+	expect(f.store.snapshot(f.identity.scope)[0]?.observedAt).not.toBe(f.time());
+});
+
+test("missing, invalid, future or expired receipts never alter the response baseline", () => {
+	const f = fixture();
+	f.store.ingest({
+		...f.identity,
+		receivedAt: f.time(),
+		source: "claude_statusline",
+		payload: f.frame(0),
+	});
+	for (const receivedAt of [
+		undefined,
+		Number.NaN,
+		Number.POSITIVE_INFINITY,
+		-1,
+		f.time() + 1,
+		f.time() - 6 * 60_000 - 1,
+	]) {
+		expect(
+			f.store.ingest({
+				...f.identity,
+				receivedAt: receivedAt as number,
+				source: "claude_statusline",
+				payload: f.frame(100, 90),
+			}),
+		).toBe(false);
+	}
+	expect(f.store.snapshot(f.identity.scope)).toEqual([]);
+	f.advance();
+	expect(
+		f.store.ingest({
+			...f.identity,
+			receivedAt: f.time(),
+			source: "claude_statusline",
+			payload: f.frame(1, 30),
+		}),
+	).toBe(true);
+	expect(f.store.snapshot(f.identity.scope)[0]?.usedPercent).toBe(30);
+});
+
+test("six-minute receipt boundary is inclusive; an older receipt cannot move the baseline", () => {
+	const f = fixture();
+	const first = f.time();
+	const payload = {
+		cost: { total_api_duration_ms: 1 },
+		rate_limits: {
+			five_hour: {
+				used_percentage: 25,
+				resets_at: (first + 60 * 60_000) / 1000,
+			},
+		},
+	};
+	f.store.ingest({
+		...f.identity,
+		receivedAt: first,
+		source: "claude_statusline",
+		payload: { cost: { total_api_duration_ms: 0 } },
+	});
+	f.advance(6 * 60_000);
+	expect(
+		f.store.ingest({
+			...f.identity,
+			receivedAt: first,
+			source: "claude_statusline",
+			payload,
+		}),
+	).toBe(true);
+	expect(f.store.snapshot(f.identity.scope)[0]?.observedAt).toBe(first);
+	f.advance(1);
+	expect(
+		f.store.ingest({
+			...f.identity,
+			receivedAt: first,
+			source: "claude_statusline",
+			payload: { ...payload, cost: { total_api_duration_ms: 100 } },
+		}),
+	).toBe(false);
+	expect(
+		f.store.ingest({
+			...f.identity,
+			receivedAt: f.time(),
+			source: "claude_statusline",
+			payload: { ...payload, cost: { total_api_duration_ms: 2 } },
+		}),
+	).toBe(true);
+	expect(f.store.snapshot(f.identity.scope)[0]?.observedAt).toBe(f.time());
+});
+
+test("out-of-order receipt cannot overwrite newer quota or consume a later response counter", () => {
+	const f = fixture();
+	const frame = f.frame(0);
+	f.store.ingest({
+		...f.identity,
+		receivedAt: f.time(),
+		source: "claude_statusline",
+		payload: frame,
+	});
+	f.advance(2000);
+	f.store.ingest({
+		...f.identity,
+		receivedAt: f.time(),
+		source: "claude_statusline",
+		payload: { ...frame, cost: { total_api_duration_ms: 2 } },
+	});
+	const before = f.store.snapshot(f.identity.scope);
+	expect(
+		f.store.ingest({
+			...f.identity,
+			receivedAt: f.time() - 1000,
+			source: "claude_statusline",
+			payload: { ...frame, cost: { total_api_duration_ms: 3 } },
+		}),
+	).toBe(false);
+	expect(f.store.snapshot(f.identity.scope)).toEqual(before);
+	f.advance();
+	expect(
+		f.store.ingest({
+			...f.identity,
+			receivedAt: f.time(),
+			source: "claude_statusline",
+			payload: { ...frame, cost: { total_api_duration_ms: 3 } },
+		}),
+	).toBe(true);
 });

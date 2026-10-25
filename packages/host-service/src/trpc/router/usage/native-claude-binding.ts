@@ -46,12 +46,14 @@ export async function ingestNativeClaudeBinding(
 	input: {
 		source: "claude_statusline" | "claude_sdk";
 		payload: unknown;
+		receivedAt: number;
 		responseCounter?: number;
 	},
 	current: () => boolean,
 	deps: NativeClaudeUsageDependencies,
 ): Promise<boolean> {
 	if (
+		!deps.store.isCurrentReceipt(input.receivedAt) ||
 		!isNativeClaudeAccount(account) ||
 		!current() ||
 		!(await deps.validateAccount(account))
@@ -71,7 +73,8 @@ export async function ingestNativeClaudeBinding(
 		account.identity,
 		generation,
 	);
-	if (!current()) return false;
+	if (!current() || !deps.store.isCurrentReceipt(input.receivedAt))
+		return false;
 	if (scope) {
 		if (!deps.store.promoteLaunch({ ...launch, generation, scope }))
 			return false;
