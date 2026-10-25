@@ -42,7 +42,7 @@ test("provider rejection cannot erase a healthy provider or claim a logout", asy
 	const first = await reader.get();
 	expect(first.map((item) => item.status)).toEqual(["unavailable", "ok"]);
 	expect(first[0]?.discoveryFailed).toBe(true);
-	expect(first[0]?.quotaIdentity).toBeUndefined();
+	expect(first[0]).not.toHaveProperty("quotaIdentity");
 	expect(JSON.stringify(first)).not.toContain("private-reader-error");
 	await reader.get(true);
 	expect(reads).toBe(1);
