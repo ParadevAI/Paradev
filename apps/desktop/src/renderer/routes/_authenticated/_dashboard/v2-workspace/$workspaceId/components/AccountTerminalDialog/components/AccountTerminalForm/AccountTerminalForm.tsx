@@ -257,7 +257,7 @@ export function AccountTerminalForm({
 						{mode === "resume" ? (
 							<Trans>Resume conversation</Trans>
 						) : (
-							{submitLabel ?? <Trans>Start terminal</Trans>}
+							submitLabel ?? <Trans>Start terminal</Trans>
 						)}
 					</Button>
 				</div>
