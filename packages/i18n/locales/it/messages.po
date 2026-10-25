@@ -16560,6 +16560,9 @@ msgstr "Inizia a navigare"
 msgid "Start building in two."
 msgstr "Inizia a costruire in due."
 
+msgid "Start chat"
+msgstr "Avvia chat"
+
 msgid "Start coding agents, follow them live, and review the diff from your iPhone or iPad. Available on the App Store; Android is coming soon."
 msgstr "Avvia gli agenti di coding, seguili in tempo reale e rivedi il diff dal tuo iPhone o iPad. Disponibile sull'App Store; Android arriverà presto."
 

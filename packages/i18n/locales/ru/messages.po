@@ -16560,6 +16560,9 @@ msgstr "Начните просмотр"
 msgid "Start building in two."
 msgstr "Начните разработку за два."
 
+msgid "Start chat"
+msgstr "Начать чат"
+
 msgid "Start coding agents, follow them live, and review the diff from your iPhone or iPad. Available on the App Store; Android is coming soon."
 msgstr "Запускайте агентов для кода, следите за ними в реальном времени и проверяйте diff с iPhone или iPad. Доступно в App Store; Android скоро."
 

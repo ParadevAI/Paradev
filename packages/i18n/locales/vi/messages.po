@@ -16560,6 +16560,9 @@ msgstr "Bắt đầu duyệt web"
 msgid "Start building in two."
 msgstr "Bắt đầu xây dựng trong hai bước."
 
+msgid "Start chat"
+msgstr "Bắt đầu trò chuyện"
+
 msgid "Start coding agents, follow them live, and review the diff from your iPhone or iPad. Available on the App Store; Android is coming soon."
 msgstr "Khởi chạy agent lập trình, theo dõi trực tiếp và xem xét diff từ iPhone hoặc iPad. Có trên App Store; Android sắp ra mắt."
 
