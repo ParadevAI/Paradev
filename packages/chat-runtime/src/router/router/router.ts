@@ -214,7 +214,7 @@ export function createChatRouter(
 					runtime.live.isClosing(source.sessionId) ||
 					runtime.live.get(source.sessionId) !== (running ? live : null)
 				)
-					refuseSwitch(
+					return refuseSwitch(
 						"The conversation changed or was already resumed. Nothing else was restarted.",
 					);
 				if (
