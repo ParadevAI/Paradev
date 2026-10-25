@@ -1,6 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useFormat } from "@superset/i18n/react";
-import { buildTerminalSessionHandoffPrompt } from "@superset/shared/terminal-session-handoff";
+import { buildTerminalSessionHandoffPrompt } from "@superset/shared/session-handoff";
 import { Button } from "@superset/ui/button";
 import {
 	Dialog,
@@ -211,6 +211,7 @@ export function TerminalSessionHandoffMenu({
 			</DropdownMenu>
 
 			<Dialog
+				modal
 				open={action !== null}
 				onOpenChange={(open) => {
 					if (!open && !isStarting) setAction(null);

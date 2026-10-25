@@ -3,6 +3,7 @@ import { cloudWorkspaces } from "@superset/db/schema";
 import { eq } from "drizzle-orm";
 import { deleteSandbox, stopSandbox } from "../../lib/sandbox";
 import { publishCloudWorkspaceJob } from "./jobs";
+import { queueSettleWorkspace, settleWorkspaceNow } from "./meter";
 
 /** How long an archived workspace keeps its box running, so an undo finds it live. */
 export const ARCHIVE_STOP_DELAY_SECONDS = 60;
@@ -31,10 +32,14 @@ export async function reapArchivedCloudWorkspace(
 		return "skipped";
 	}
 	if (input.stage === "delete") {
+		await settleWorkspaceNow(row.id).catch((error) =>
+			console.error(`[cloud-workspace] ${row.id} final settle failed`, error),
+		);
 		await deleteSandbox(row.providerSandboxId);
 		return "reaped";
 	}
 	await stopSandbox(row.providerSandboxId);
+	await queueSettleWorkspace(row.id);
 	return "stopped";
 }
 

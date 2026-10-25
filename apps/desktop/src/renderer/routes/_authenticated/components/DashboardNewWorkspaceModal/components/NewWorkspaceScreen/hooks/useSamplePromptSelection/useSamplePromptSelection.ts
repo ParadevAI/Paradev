@@ -8,20 +8,11 @@ import {
 
 interface SamplePromptSelection {
 	prompts: SamplePrompt[];
-	/**
-	 * The setup verdict has not landed yet. Every arm holds on this together —
-	 * rendering rows immediately while cards waited would make the suggestion
-	 * surface appear at different times per arm, which is a timing difference
-	 * the experiment would read as a form-factor effect.
-	 */
+	/** The setup verdict has not landed yet. */
 	isPending: boolean;
 }
 
-/**
- * Picks the prompts every arm shows. Selection lives here rather than in each
- * layout so the arms can only differ in form factor: same pool, same order,
- * same setup-first rule, only `count` changes.
- */
+/** Picks the sample prompts, leading with setup only when the project needs it. */
 export function useSamplePromptSelection(
 	tier: SamplePromptTier,
 	hostUrl: string | null,

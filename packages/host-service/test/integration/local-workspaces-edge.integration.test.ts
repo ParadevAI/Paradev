@@ -706,7 +706,6 @@ describe("local workspaces: sessions and sandbox seed", () => {
 					path: "docs",
 				},
 			],
-			hooksPath: "/workspace/repo",
 		} as Parameters<typeof runSandboxSelfSeed>[1];
 		runSandboxSelfSeed(host.db, identity);
 		runSandboxSelfSeed(host.db, identity);

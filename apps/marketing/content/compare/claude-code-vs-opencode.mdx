@@ -1,0 +1,96 @@
+---
+title: "Claude Code vs OpenCode (2026): Anthropic's Agent vs the Open-Source Alternative"
+description: "Compare Claude Code and OpenCode: proprietary vs MIT-licensed, Claude-only vs any model, pricing, parallel work, and surfaces, and how to run both side by side."
+date: 2026-10-13
+type: "1v1"
+competitors:
+  - claude-code
+  - opencode
+keywords:
+  - claude code vs opencode
+  - opencode vs claude code
+  - open source claude code alternative
+  - opencode alternative
+  - best open source coding agent
+  - best coding agent
+---
+
+Claude Code is Anthropic's terminal coding agent. OpenCode is the most popular open-source alternative: an MIT-licensed agent with a terminal UI, a desktop app, and an IDE extension that works with any model provider. The choice comes down to openness and model choice versus Anthropic's own harness and its depth of parallel features.
+
+Facts were checked against Anthropic's and OpenCode's own docs on October 13, 2026.
+
+---
+
+## At a Glance
+
+| | **Claude Code** | **OpenCode** |
+|---|---|---|
+| **Vendor** | Anthropic | Anomaly |
+| **License** | Proprietary | Open source (MIT) |
+| **Models** | Claude models | Any provider, with your own keys |
+| **Price** | Claude Pro from $20/mo, Max from $100/mo, or API key | Free; pay for models, through your own keys or OpenCode Zen and Go |
+| **Surfaces** | Terminal, IDE extensions, Claude apps | Terminal UI, desktop app, IDE extension |
+| **Parallel work** | Subagents, `/batch` across worktrees, agent view, cloud sessions | Built-in subagents (General, Explore, Scout) |
+| **Worktrees** | Built in | Not documented |
+| **Extending it** | MCP, hooks, plugins with marketplaces, skills | MCP, server with a JS/TS SDK |
+| **Platforms** | macOS, Linux, Windows | macOS, Linux, Windows (WSL recommended) |
+
+---
+
+## What Is Claude Code?
+
+Anthropic's agent "reads your codebase, edits files, runs commands, and integrates with your development tools." It has the widest set of parallel modes of any agent, from subagents and `/batch` to an agent view, cloud sessions, and Remote Control, and a large plugin and skill ecosystem. It runs Anthropic's models on a paid Claude plan or an API key.
+
+## What Is OpenCode?
+
+OpenCode describes itself as "an open source AI coding agent" with a "terminal-based interface, desktop app, or IDE extension." It is MIT-licensed and free, and it works with any model provider through your own API keys. OpenCode also sells two optional model services: Zen, pay-as-you-go with no markup, and Go, a monthly plan for curated open models. Built-in subagents run units of work in parallel, and a server with a JS/TS SDK lets other programs drive it. On Windows, OpenCode recommends WSL.
+
+## Key Differences
+
+### Open Source and Model Choice
+
+OpenCode is open source and model-agnostic: use Claude, GPT, Gemini, or an open model, and switch whenever you like. Claude Code is proprietary and runs Anthropic's models.
+
+### Depth of Parallel Features
+
+Claude Code has more built-in parallel modes and built-in worktrees. OpenCode has subagents; for isolating separate tasks in worktrees, you set them up yourself or use a workspace.
+
+### Cost
+
+OpenCode itself is free, and you pay only for the model you choose. Claude Code needs a Claude plan or API spend.
+
+---
+
+## Run Both Side by Side
+
+[Superset](/) runs Claude Code and OpenCode as built-in agents, each in its own Git worktree and terminal, on your own subscriptions and keys. Create two workspaces from the same branch, start each agent with the same prompt, compare the diffs in the Changes pane, and open a pull request from the better one. You can even point OpenCode at Claude to compare the two harnesses on the same model. Superset never proxies model calls. See [How to Compare Coding Agents Side by Side](/compare/compare-coding-agents-side-by-side) and [Multiple OpenCode Agents in Parallel](/compare/multiple-opencode-agents-parallel).
+
+## Which Should You Choose?
+
+**Choose Claude Code if you:**
+
+- Want the richest parallel features and plugin ecosystem
+- Use Anthropic's models and already pay for Claude
+- Want worktree isolation built in
+
+**Choose OpenCode if you:**
+
+- Want an open-source agent you can read and modify
+- Want to choose and switch model providers freely
+- Want to pay only for model usage
+
+For the full field, see [Best AI Coding Agents in 2026](/compare/best-coding-agents).
+
+## Frequently Asked Questions
+
+### Is OpenCode an open-source Claude Code alternative?
+
+Yes. OpenCode is MIT-licensed, works with any model provider including Anthropic, and has a terminal UI, desktop app, and IDE extension.
+
+### Can OpenCode use Claude models?
+
+Yes, with an Anthropic API key or through OpenCode's model services. Claude Code is Anthropic's own harness for those models.
+
+### Can I run Claude Code and OpenCode at the same time?
+
+Yes. Give each its own Git worktree. In Superset, each runs in its own workspace on the same repository.

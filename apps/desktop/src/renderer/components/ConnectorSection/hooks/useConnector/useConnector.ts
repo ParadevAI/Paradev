@@ -93,12 +93,13 @@ export function useConnector(
 		onSettled: invalidate,
 	});
 
-	const openOAuth = (method: string) => {
+	const openOAuth = (method: string, plugin?: string) => {
 		const url = new URL(
 			`${env.NEXT_PUBLIC_API_URL}/api/connectors/${slug}/connect`,
 		);
 		url.searchParams.set("organizationId", organizationId);
 		url.searchParams.set("method", method);
+		if (plugin) url.searchParams.set("plugin", plugin);
 		window.open(url.toString(), "_blank", "noopener,noreferrer");
 	};
 

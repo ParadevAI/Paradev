@@ -1,7 +1,10 @@
-import { createContext, useContext } from "react";
+import { createContext, useContext, useMemo } from "react";
 import { useGitStatus } from "renderer/hooks/host-service/useGitStatus";
 
-type WorkspaceGitStatus = ReturnType<typeof useGitStatus>;
+type WorkspaceGitStatus = Pick<
+	ReturnType<typeof useGitStatus>,
+	"data" | "isLoading" | "isFetching" | "isError" | "error"
+>;
 
 const WorkspaceGitStatusContext = createContext<WorkspaceGitStatus | null>(
 	null,
@@ -21,10 +24,19 @@ export function WorkspaceGitStatusProvider({
 	children,
 	workspaceId,
 }: WorkspaceGitStatusProviderProps) {
-	const gitStatus = useGitStatus(workspaceId, true);
+	const { data, isLoading, isFetching, isError, error } = useGitStatus(
+		workspaceId,
+		true,
+	);
+	// useQuery returns a new object every render; a new context value would
+	// re-render every consumer on each page render.
+	const value = useMemo(
+		() => ({ data, isLoading, isFetching, isError, error }),
+		[data, isLoading, isFetching, isError, error],
+	);
 
 	return (
-		<WorkspaceGitStatusContext.Provider value={gitStatus}>
+		<WorkspaceGitStatusContext.Provider value={value}>
 			{children}
 		</WorkspaceGitStatusContext.Provider>
 	);

@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
+import { appendPastedText, parsePastedText } from "@superset/chat/core";
 
 const { act, cleanup, fireEvent, render, renderHook } = await import(
 	"@testing-library/react"
@@ -21,8 +22,11 @@ type PromptProps = import("@superset/chat-ui/PromptInput").PromptInputProps;
 function PendingDraftComposer({
 	draftKey,
 	findChips,
+	collapseLargePastes,
+	inputRef,
 	onSend,
-}: Pick<PromptProps, "findChips"> & {
+}: Pick<PromptProps, "findChips" | "collapseLargePastes"> & {
+	inputRef?: PromptProps["ref"];
 	draftKey: string;
 	onSend: () => Promise<boolean>;
 }) {
@@ -30,13 +34,18 @@ function PendingDraftComposer({
 	return (
 		<PromptInput
 			placeholder="Write a message"
+			ref={inputRef}
+			collapseLargePastes={collapseLargePastes}
 			mentionProviders={[]}
 			commands={[]}
 			defaultValue={storedDraft}
 			findChips={findChips}
 			onChange={onChange}
 			onSubmit={async (payload) => {
-				const finish = beginSubmission(payload.text, payload.isDraftUnchanged);
+				const finish = beginSubmission(
+					appendPastedText(payload.text, payload.pastedTexts),
+					payload.isDraftUnchanged,
+				);
 				if (!finish) return false;
 				try {
 					const result = await onSend();
@@ -70,7 +79,7 @@ test("recovered text survives the composer's own save on unmount", () => {
 		useComposerDraft("chat-v3-draft:recover-a"),
 	);
 	act(() => recoveredFirst.result.current.onChange("newer draft"));
-	prependToDraft("chat-v3-draft:recover-a", "unsent message");
+	prependToDraft("chat-v3-draft:recover-a", ["unsent message"]);
 	recoveredFirst.unmount();
 	expect(window.localStorage.getItem("chat-v3-draft:recover-a")).toBe(
 		"unsent message\n\nnewer draft",
@@ -81,10 +90,29 @@ test("recovered text survives the composer's own save on unmount", () => {
 	);
 	act(() => flushedFirst.result.current.onChange("newer draft"));
 	flushedFirst.unmount();
-	prependToDraft("chat-v3-draft:recover-b", "unsent message");
+	prependToDraft("chat-v3-draft:recover-b", ["unsent message"]);
 	expect(window.localStorage.getItem("chat-v3-draft:recover-b")).toBe(
 		"unsent message\n\nnewer draft",
 	);
+});
+
+test("unsent prompts with pasted cards join a draft with its own card", () => {
+	const draft = renderHook(() => useComposerDraft("chat-v3-draft:pastes"));
+	act(() =>
+		draft.result.current.onChange(appendPastedText("draft", ["draft log"])),
+	);
+	draft.unmount();
+	prependToDraft("chat-v3-draft:pastes", [
+		appendPastedText("first", ["first log"]),
+		appendPastedText("second", ["second log"]),
+	]);
+
+	expect(
+		parsePastedText(window.localStorage.getItem("chat-v3-draft:pastes") ?? ""),
+	).toEqual({
+		text: "first\n\nsecond\n\ndraft",
+		pastes: ["first log", "second log", "draft log"],
+	});
 });
 
 test("a draft that fails to save is still read from memory", () => {
@@ -109,14 +137,44 @@ test("a draft that fails to save is still read from memory", () => {
 
 test("text recovered after a composer read its draft is handed to it once", () => {
 	renderHook(() => useComposerDraft("chat-v3-draft:late"));
-	prependToDraft("chat-v3-draft:late", "unsent message");
+	prependToDraft("chat-v3-draft:late", ["unsent message"]);
 	expect(takeRecoveredDraftText("chat-v3-draft:late")).toBe("unsent message");
 	expect(takeRecoveredDraftText("chat-v3-draft:late")).toBeNull();
 
-	prependToDraft("chat-v3-draft:early", "unsent message");
+	prependToDraft("chat-v3-draft:early", ["unsent message"]);
 	const reader = renderHook(() => useComposerDraft("chat-v3-draft:early"));
 	expect(reader.result.current.storedDraft).toBe("unsent message");
 	expect(takeRecoveredDraftText("chat-v3-draft:early")).toBeNull();
+});
+
+test("text recovered while another target is open shows once on return", () => {
+	const hook = renderHook(
+		({ draftKey, persisted }: { draftKey: string; persisted: boolean }) =>
+			useComposerDraft(draftKey, persisted),
+		{ initialProps: { draftKey: "chat-v3-draft:return", persisted: true } },
+	);
+	hook.rerender({
+		draftKey: "chat-v3-draft:return:subagent:c1",
+		persisted: false,
+	});
+	prependToDraft("chat-v3-draft:return", ["unsent message"]);
+
+	hook.rerender({ draftKey: "chat-v3-draft:return", persisted: true });
+
+	expect(hook.result.current.storedDraft).toBe("unsent message");
+	expect(takeRecoveredDraftText("chat-v3-draft:return")).toBeNull();
+});
+
+test("text restored to a subagent's draft stays in memory and reaches its composer", () => {
+	prependToDraft("chat-v3-draft:t1:subagent:c1", ["for the subagent"], false);
+	expect(
+		window.localStorage.getItem("chat-v3-draft:t1:subagent:c1"),
+	).toBeNull();
+
+	const reopened = renderHook(() =>
+		useComposerDraft("chat-v3-draft:t1:subagent:c1", false),
+	);
+	expect(reopened.result.current.storedDraft).toBe("for the subagent");
 });
 
 test("an accepted upload/send after unmount clears the submitted persisted draft", async () => {
@@ -129,7 +187,13 @@ test("an accepted upload/send after unmount clears the submitted persisted draft
 		composer.result.current.beginSubmission("submitted text"),
 	);
 	const pending = submitMessage(
-		{ text: "submitted text", files: [], mentions: [], steer: false },
+		{
+			text: "submitted text",
+			files: [],
+			mentions: [],
+			pastedTexts: [],
+			steer: false,
+		},
 		{ uploadAttachments: () => upload.promise, onSend: async () => true },
 	);
 	composer.unmount();
@@ -152,7 +216,13 @@ test("rejected or thrown submissions preserve the unmounted draft", async () => 
 		composer.unmount();
 		try {
 			const result = await submitMessage(
-				{ text: "keep this", files: [], mentions: [], steer: false },
+				{
+					text: "keep this",
+					files: [],
+					mentions: [],
+					pastedTexts: [],
+					steer: false,
+				},
 				{
 					uploadAttachments: async () => [],
 					onSend: async () => {
@@ -190,7 +260,7 @@ test("recovered text invalidates a pending submission", () => {
 	const finish = requireSubmission(
 		composer.result.current.beginSubmission("submitted"),
 	);
-	prependToDraft(key, "recovered queued message");
+	prependToDraft(key, ["recovered queued message"]);
 	composer.unmount();
 	finish(true);
 	expect(window.localStorage.getItem(key)).toBe(
@@ -393,7 +463,7 @@ test("draft edits, clearing and recovery do not release an in-flight send", () =
 		act(() => {
 			if (change === "edit") first.result.current.onChange("newer draft");
 			if (change === "clear") first.result.current.clearDraft();
-			if (change === "recover") prependToDraft(key, "recovered");
+			if (change === "recover") prependToDraft(key, ["recovered"]);
 		});
 		first.unmount();
 		const replacement = renderHook(() => useComposerDraft(key));
@@ -538,4 +608,112 @@ test.each([
 	expect(sendCount).toBe(2);
 	replacement.unmount();
 	expect(window.localStorage.getItem(key)).toBe("retry this draft");
+});
+
+test("an accepted non-persisted subagent draft clears in memory without writing storage", () => {
+	const key = "chat-v3-draft:accepted-subagent:child";
+	const storageWrite = spyOn(window.localStorage, "setItem");
+	const storageRemove = spyOn(window.localStorage, "removeItem");
+	try {
+		const composer = renderHook(() => useComposerDraft(key, false));
+		act(() => composer.result.current.onChange("subagent message"));
+		const finish = requireSubmission(
+			composer.result.current.beginSubmission("subagent message"),
+		);
+		composer.unmount();
+		finish(true);
+		const reopened = renderHook(() => useComposerDraft(key, false));
+		expect(reopened.result.current.storedDraft).toBeUndefined();
+		expect(storageWrite).not.toHaveBeenCalled();
+		expect(storageRemove).not.toHaveBeenCalled();
+	} finally {
+		storageWrite.mockRestore();
+		storageRemove.mockRestore();
+	}
+});
+
+test("a declined non-persisted subagent draft survives remount and can retry", () => {
+	const key = "chat-v3-draft:declined-subagent:child";
+	const composer = renderHook(() => useComposerDraft(key, false));
+	act(() => composer.result.current.onChange("retry subagent message"));
+	const finish = requireSubmission(
+		composer.result.current.beginSubmission("retry subagent message"),
+	);
+	composer.unmount();
+	finish(false);
+	const reopened = renderHook(() => useComposerDraft(key, false));
+	expect(reopened.result.current.storedDraft).toBe("retry subagent message");
+	const retry = requireSubmission(
+		reopened.result.current.beginSubmission("retry subagent message"),
+	);
+	act(() => retry(true));
+	expect(window.localStorage.getItem(key)).toBeNull();
+});
+
+test("clearing an ephemeral target does not discard a parent draft waiting to save", () => {
+	const key = "chat-v3-draft:parent-before-subagent";
+	const composer = renderHook(
+		({ draftKey, persisted }) => useComposerDraft(draftKey, persisted),
+		{ initialProps: { draftKey: key, persisted: true } },
+	);
+	act(() => composer.result.current.onChange("parent draft"));
+	composer.rerender({ draftKey: `${key}:child`, persisted: false });
+	act(() => composer.result.current.clearDraft());
+	composer.unmount();
+	expect(window.localStorage.getItem(key)).toBe("parent draft");
+	expect(window.localStorage.getItem(`${key}:child`)).toBeNull();
+});
+
+test("acceptance clears the serialized pasted-card draft only after sending finishes", async () => {
+	const key = "chat-v3-draft:accepted-pasted-card";
+	const text = appendPastedText("Review the log", ["original pasted log"]);
+	window.localStorage.setItem(key, text);
+	const accepted = Promise.withResolvers<boolean>();
+	const composer = render(
+		<PendingDraftComposer
+			draftKey={key}
+			collapseLargePastes
+			onSend={() => accepted.promise}
+		/>,
+	);
+	await act(async () => {});
+	expect(composer.getByText("original pasted log")).toBeTruthy();
+	fireEvent.click(composer.getByRole("button", { name: "Send message" }));
+	await act(async () => {});
+	expect(window.localStorage.getItem(key)).toBe(text);
+	expect(composer.getByText("original pasted log")).toBeTruthy();
+	await act(async () => accepted.resolve(true));
+	expect(composer.queryByText("original pasted log")).toBeNull();
+	expect(composer.getByRole("textbox").textContent).toBe("");
+	expect(window.localStorage.getItem(key)).toBeNull();
+});
+
+test("a pasted card recovered while acceptance is pending keeps the newer draft", async () => {
+	const key = "chat-v3-draft:pending-pasted-recovery";
+	window.localStorage.setItem(key, "Review the log");
+	const accepted = Promise.withResolvers<boolean>();
+	const inputRef: {
+		current: import("@superset/chat-ui/PromptInput").PromptInputHandle | null;
+	} = { current: null };
+	const composer = render(
+		<PendingDraftComposer
+			draftKey={key}
+			collapseLargePastes
+			inputRef={inputRef}
+			onSend={() => accepted.promise}
+		/>,
+	);
+	await act(async () => {});
+	fireEvent.click(composer.getByRole("button", { name: "Send message" }));
+	await act(async () => {
+		inputRef.current?.appendText(appendPastedText("", ["new recovered log"]));
+	});
+	await act(async () => accepted.resolve(true));
+	expect(composer.getByText("new recovered log")).toBeTruthy();
+	expect(composer.getByRole("textbox").textContent).toBe("Review the log");
+	composer.unmount();
+	expect(parsePastedText(window.localStorage.getItem(key) ?? "")).toEqual({
+		text: "Review the log",
+		pastes: ["new recovered log"],
+	});
 });

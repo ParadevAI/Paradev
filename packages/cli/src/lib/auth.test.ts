@@ -40,5 +40,6 @@ describe("refreshAccessToken", () => {
 		expect(visibleText).not.toContain("refresh-secret");
 		expect(visibleText).not.toContain("session-secret");
 		expect(visibleText).not.toContain("code-secret");
+		expect(error).toMatchObject({ status: 400, oauthError: "invalid_grant" });
 	});
 });

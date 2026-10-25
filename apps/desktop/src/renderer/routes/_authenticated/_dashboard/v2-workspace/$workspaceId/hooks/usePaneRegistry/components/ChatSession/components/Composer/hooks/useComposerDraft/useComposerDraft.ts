@@ -1,3 +1,4 @@
+import { appendPastedText, parsePastedText } from "@superset/chat/core";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 const DRAFT_DEBOUNCE_MS = 300;
@@ -19,9 +20,9 @@ function persistDraft(draftKey: string, text: string): boolean {
 	}
 }
 
-function clearStoredDraft(draftKey: string) {
+function clearStoredDraft(draftKey: string, persisted: boolean) {
 	unsavedDrafts.set(draftKey, "");
-	if (persistDraft(draftKey, "")) unsavedDrafts.delete(draftKey);
+	if (!persisted || persistDraft(draftKey, "")) unsavedDrafts.delete(draftKey);
 	for (const notify of clearedDraftListeners.get(draftKey) ?? []) notify();
 }
 
@@ -35,25 +36,39 @@ function readDraft(draftKey: string, fallback?: string): string | undefined {
 	}
 }
 
-export function prependToDraft(draftKey: string, text: string) {
+function joinDrafts(drafts: readonly string[]): string {
+	const parts = drafts.map(parsePastedText);
+	return appendPastedText(
+		parts
+			.map((part) => part.text)
+			.filter(Boolean)
+			.join("\n\n"),
+		parts.flatMap((part) => part.pastes),
+	);
+}
+
+export function prependToDraft(
+	draftKey: string,
+	texts: readonly string[],
+	persisted = true,
+) {
 	pendingSubmissions.delete(draftKey);
-	const current = readDraft(draftKey);
-	const merged = current ? `${text}\n\n${current}` : text;
+	const merged = joinDrafts([...texts, readDraft(draftKey) ?? ""]);
 	unsavedDrafts.set(draftKey, merged);
-	persistDraft(draftKey, merged);
+	if (persisted) persistDraft(draftKey, merged);
 	recoveredAfterRead.set(draftKey, [
 		...(recoveredAfterRead.get(draftKey) ?? []),
-		text,
+		...texts,
 	]);
 }
 
 export function takeRecoveredDraftText(draftKey: string): string | null {
 	const recovered = recoveredAfterRead.get(draftKey);
 	recoveredAfterRead.delete(draftKey);
-	return recovered?.length ? recovered.join("\n\n") : null;
+	return recovered?.length ? joinDrafts(recovered) : null;
 }
 
-export function useComposerDraft(draftKey: string) {
+export function useComposerDraft(draftKey: string, persisted = true) {
 	const draftTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const pendingDraftKey = useRef<string | null>(null);
 	const flushDraft = useCallback(() => {
@@ -72,12 +87,17 @@ export function useComposerDraft(draftKey: string) {
 			const submission = pendingSubmissions.get(draftKey);
 			if (submission && submission.text !== text)
 				pendingSubmissions.delete(draftKey);
+			if (!persisted) {
+				if (text === "") unsavedDrafts.delete(draftKey);
+				else unsavedDrafts.set(draftKey, text);
+				return;
+			}
 			if (draftTimer.current) clearTimeout(draftTimer.current);
 			unsavedDrafts.set(draftKey, text);
 			pendingDraftKey.current = draftKey;
 			draftTimer.current = setTimeout(flushDraft, DRAFT_DEBOUNCE_MS);
 		},
-		[draftKey, flushDraft],
+		[draftKey, persisted, flushDraft],
 	);
 	useEffect(() => flushDraft, [flushDraft]);
 
@@ -126,19 +146,26 @@ export function useComposerDraft(draftKey: string) {
 					(readDraft(draftKey) ?? "") !== submitted.text
 				)
 					return;
-				clearStoredDraft(draftKey);
+				clearStoredDraft(draftKey, persisted);
 			};
 		},
-		[draftKey],
+		[draftKey, persisted],
 	);
 
 	const clearDraft = useCallback(() => {
 		pendingSubmissions.delete(draftKey);
-		if (draftTimer.current) clearTimeout(draftTimer.current);
-		draftTimer.current = null;
-		pendingDraftKey.current = null;
-		clearStoredDraft(draftKey);
-	}, [draftKey]);
+		if (pendingDraftKey.current === draftKey) {
+			if (draftTimer.current) clearTimeout(draftTimer.current);
+			draftTimer.current = null;
+			pendingDraftKey.current = null;
+		}
+		clearStoredDraft(draftKey, persisted);
+	}, [draftKey, persisted]);
+
+	if (seed.draftKey !== draftKey) {
+		recoveredAfterRead.delete(draftKey);
+		setSeed({ draftKey, text: readDraft(draftKey) });
+	}
 
 	const storedDraft =
 		seed.draftKey === draftKey ? seed.text : readDraft(draftKey);

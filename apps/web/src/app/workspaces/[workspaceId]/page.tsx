@@ -8,7 +8,7 @@ export default async function WorkspaceDeepLinkPage({ params }: PageProps) {
 	const { workspaceId } = await params;
 	return (
 		<DeepLinkRedirect
-			path={`cloud-workspaces/${encodeURIComponent(workspaceId)}`}
+			path={`v2-workspace/${encodeURIComponent(workspaceId)}`}
 		/>
 	);
 }

@@ -77,20 +77,8 @@ worst-case pages at 64 MiB instead of 1 GiB.
 patch markers in the installed bundles. If it fails after a version bump,
 regenerate the patch — don't delete the test.
 
-**Regenerating after a version bump** (~10 min):
-
-```bash
-bun patch @xterm/addon-webgl@<new-version>
-# edit node_modules/@xterm/addon-webgl per the three changes above:
-#   - both lib bundles are minified; find `getParameter(<gl>.MAX_TEXTURE_SIZE)`
-#     (2 sites) and wrap each in Math.min(4096, ...)
-#   - find `_onRemoveTextureAtlasCanvas.fire(<p>.canvas)` (merge path) and the
-#     `_evictAllPages` loop; add `<p>.canvas.width=0,<p>.canvas.height=0`
-#   - mirror the edits in src/GlyphRenderer.ts, src/WebglRenderer.ts,
-#     src/TextureAtlas.ts
-bun patch --commit 'node_modules/@xterm/addon-webgl'
-bun test apps/desktop/src/webgl-atlas-patch.test.ts
-```
+**Regenerating after a version bump:** follow the xterm procedure below; the
+addon builds from the same upstream commit.
 
 Before regenerating, check whether the new version made the patch obsolete:
 upstream already absorbed the render-loop page-count clamp and `_evictAllPages`
@@ -103,16 +91,17 @@ for upstreaming. If upstream ships them, delete the patch, the
 **Why:** SUPER-2120 / DESKTOP-12J. `Terminal.resize()` drains the write queue
 through `WriteBuffer.flushSync()`, which ignores the promise an async parser
 handler returns and then re-enters the parser without the continuation token
-it needs. `@xterm/addon-image` decodes inline images asynchronously (cursor-agent
-draws them with the kitty protocol because we identify as kitty), so a re-fit
+it needs. `@xterm/addon-image` decodes inline images asynchronously (any program that
+draws sixel, iTerm or kitty graphics), so a re-fit
 landing mid-decode put the parser in its FAIL state: every later write throws,
 the pane never renders again while the program keeps running, and only
 recreating the pane recovers. `flushSync` also drained from index 0 regardless
 of `_bufferOffset`, re-parsing chunks a sliced `_innerWrite` had already
 applied — duplicated output on a resize during heavy output.
 
-**What it changes** (`lib/xterm.js`, `lib/xterm.mjs`, and
-`src/common/input/WriteBuffer.ts` for readability — bundles are what run):
+**What it changes** (`lib/xterm.js`, `lib/xterm.mjs`, rebuilt from upstream
+source with the `src/` files in this patch; those files are what the bundles
+were built from):
 
 1. `flushSync` returns early while a chunk is paused in an async handler
    (`_asyncPending`), drains from `_bufferOffset` instead of index 0, and when a
@@ -147,6 +136,21 @@ applied — duplicated output on a resize during heavy output.
    helper and Unicode-service injection. Existing buffer/disposal bundle code
    is preserved. No font substitution or dependency upgrade is involved.
 
+5. `Emitter` (also `src/common/Event.ts`): since 6.1.0-beta.304, `fire()`
+   iterates the listener array in place, and `dispose()` truncated that same
+   array with `length = 0`. A listener that disposes its own emitter (a
+   terminal disposed from a render callback) then crashed the loop with
+   "undefined is not an object (evaluating 't[i].fn')". `dispose()` now
+   replaces the array. Still present on upstream master; the render-debouncer
+   guard test reproduces it.
+
+6. `IModes.mouseEncoding` (also `src/browser/public/Terminal.ts` and
+   `typings/xterm.d.ts`): `terminal.modes` reports the active mouse encoding
+   (`'default' | 'sgr' | 'sgr-pixels'`), so `@xterm/addon-serialize` can
+   restore it. Backported from
+   [xterm.js #6174](https://github.com/xtermjs/xterm.js/pull/6174), commit
+   `793883591` (open, not yet released). See the addon-serialize section below.
+
 **IME removal condition:** Follow-up: [Superset #7490](https://github.com/superset-sh/superset/issues/7490). Track [upstream fix #6162](https://github.com/xtermjs/xterm.js/pull/6162)
 and [upstream issue #6161](https://github.com/xtermjs/xterm.js/issues/6161).
 An upstream merge alone is not enough: wait for a published xterm version
@@ -176,26 +180,102 @@ scheduled and nothing may throw.
 both installed bundles: CJK cell widths, combining and supplementary characters,
 right-edge constraints, font resizing, clearing preedit, and committing once.
 
-**Regenerating after a version bump** (~10 min), unless upstream has absorbed
-it (check `WriteBuffer.flushSync` for `_asyncPending` or an equivalent guard,
-`RenderDebouncer.dispose` for a disposed flag or callback clearing, and
-`CompositionHelper` for Unicode-aware cell layout; drop
-whichever hunks upstream carries, and delete the patch, the
-`patchedDependencies` entry, and the tests only once all are gone):
+Before regenerating, check whether upstream has absorbed any hunk:
+`WriteBuffer.flushSync` for `_asyncPending` or an equivalent guard,
+`RenderDebouncer.dispose` for a disposed flag or callback clearing,
+`CompositionHelper` for Unicode-aware cell layout, and `Emitter.dispose` for
+replacing rather than truncating its listeners. Drop whichever hunks upstream
+carries, and delete the patch, the `patchedDependencies` entry, and the tests
+only once all are gone.
+
+**Regenerating after a version bump** (~15 min). The bundles are rebuilt from
+upstream source with the readable `src/` changes applied, never hand-edited:
+a minified bundle renames identifiers and module ids on every build.
 
 ```bash
+# 1. The npm package.json carries the source commit ("commit": "<sha>").
+git clone https://github.com/xtermjs/xterm.js && cd xterm.js
+git checkout <sha> && npm ci
+# Stamp the version so the bundle matches npm byte for byte, then confirm it:
+#   src/common/Version.ts -> export const XTERM_VERSION = '<new-version>';
+npm run package          # lib/xterm.js (webpack), lib/xterm.mjs and addon .mjs (esbuild)
+(cd addons/addon-webgl && npx webpack)   # lib/addon-webgl.js
+# Compare lib/*.js and lib/*.mjs with the published package: they must be
+# identical before any change is applied.
+
+# 2. Apply the src/ hunks from the current patch files, rebuild, run upstream tests:
+npm run package && (cd addons/addon-webgl && npx webpack)
+npx mocha out/common/Event.test.js out/common/input/WriteBuffer.test.js out/browser/input/CompositionHelper.test.js
+
+# 3. From the Superset repo, copy the rebuilt bundles and changed src/ files into the bun patch:
+XTERM=$PWD && cd <superset>
 bun patch @xterm/xterm@<new-version>
-# edit node_modules/@xterm/xterm per the four changes above — in both lib
-# bundles find `flushSync(){` and the `if(<promise>){...}` branch inside
-# `_innerWrite`, and the class holding `_runRefreshCallbacks(){`; mirror the
-# edits in src/common/input/WriteBuffer.ts and src/browser/RenderDebouncer.ts
-# For composition, port the upstream CompositionHelper source and transpile
-# that helper into both bundles, retaining their surrounding code. Add the
-# IUnicodeService constructor injection (index 6) and UnicodeService import;
-# bundled module identifiers vary between versions. Check both bundle tests.
+cp "$XTERM"/lib/xterm.js "$XTERM"/lib/xterm.mjs node_modules/@xterm/xterm/lib/
+cp "$XTERM"/<changed src files> node_modules/@xterm/xterm/src/...
 bun patch --commit 'node_modules/@xterm/xterm'
-bun test apps/desktop/src/xterm-flushsync-patch.test.ts apps/desktop/src/xterm-render-debouncer-patch.test.ts apps/desktop/src/xterm-ime-patch.test.ts
+bun patch @xterm/addon-webgl@<new-version>
+cp "$XTERM"/addons/addon-webgl/lib/addon-webgl.{js,mjs} node_modules/@xterm/addon-webgl/lib/
+cp "$XTERM"/addons/addon-webgl/<changed src files> node_modules/@xterm/addon-webgl/src/...
+bun patch --commit 'node_modules/@xterm/addon-webgl'
+bun patch @xterm/addon-serialize@<new-version>
+(cd "$XTERM"/addons/addon-serialize && npx webpack)   # lib/addon-serialize.js
+cp "$XTERM"/addons/addon-serialize/lib/addon-serialize.{js,mjs} node_modules/@xterm/addon-serialize/lib/
+cp "$XTERM"/addons/addon-serialize/src/SerializeAddon.ts node_modules/@xterm/addon-serialize/src/
+bun patch --commit 'node_modules/@xterm/addon-serialize'
+# bun patch --commit can record a .bun-tag-* file; drop that hunk from the patch.
+bun test apps/desktop/src/xterm-flushsync-patch.test.ts apps/desktop/src/xterm-render-debouncer-patch.test.ts apps/desktop/src/xterm-ime-patch.test.ts apps/desktop/src/webgl-atlas-patch.test.ts apps/desktop/src/xterm-ligatures-patch.test.ts apps/desktop/src/xterm-serialize-mouse-encoding-patch.test.ts
 ```
+
+Use a real `node_modules` from `npm ci`. A symlinked one changes webpack's
+module ids, and `lib/xterm.js` no longer matches npm.
+
+`@xterm/*` is in `minimumReleaseAgeExcludes` in `bunfig.toml`, so a beta can be
+taken the day it ships; this rebuild is the review. Every `@xterm/*` version
+moves together (sherif), and `apps/mobile` needs
+`bun run scripts/generate-terminal-html.ts`.
+
+## @xterm/addon-serialize (`@xterm%2Faddon-serialize@<version>.patch`)
+
+**Why:** `serialize()` restores mouse tracking (`?1000h`/`?1002h`/`?1003h`)
+but not the mouse encoding (`?1006h` SGR, `?1016h` SGR-pixels). The mobile
+terminal repaints a pooled session from `serialize()` when you switch tabs,
+so the display came back with the default encoding. xterm emits those
+reports through `onBinary`, and Codex, which arms SGR once at startup, stopped
+scrolling after a tab switch until the session was reopened. Claude Code
+re-arms SGR on redraw, so it hid the bug.
+
+**What it changes** (`lib/addon-serialize.js`, `lib/addon-serialize.mjs`,
+`src/SerializeAddon.ts`): the mode preamble writes `?1006h` or `?1016h` from
+`terminal.modes.mouseEncoding` (xterm hunk 6). With an unpatched xterm the
+field is undefined and nothing is written. Backported from
+[xterm.js #6174](https://github.com/xtermjs/xterm.js/pull/6174).
+
+**Guard test:** `apps/desktop/src/xterm-serialize-mouse-encoding-patch.test.ts`
+round-trips each encoding through `serialize()` into a fresh terminal.
+
+**Regenerating:** part of the xterm procedure above; both packages build from
+the same upstream commit.
+
+**Removing:** once a published xterm and addon-serialize carry #6174, drop
+this patch, xterm hunk 6, and the `patchedDependencies` entry. Keep the guard
+test.
+
+## @xterm/addon-ligatures (`@xterm%2Faddon-ligatures@<version>.patch`)
+
+**Why:** the package's ESM build (`lib/addon-ligatures.mjs`) imports
+`node:diagnostics_channel`. Vite externalizes it for the browser, so the
+renderer throws at module load and never mounts (a white screen). The CommonJS
+build has no such import.
+
+**What it changes:** `package.json` only: `module` points at
+`lib/addon-ligatures.js`, and an `exports` map sends `import` and `default`
+there too.
+
+**Regenerating:** `bun patch @xterm/addon-ligatures@<new-version>`, make the
+same two `package.json` edits, `bun patch --commit`, clear
+`apps/desktop/node_modules/.vite`, and boot the renderer. Unit tests never load
+this addon; `apps/desktop/src/xterm-ligatures-patch.test.ts` checks instead
+that the entry Vite resolves has no `node:diagnostics_channel` import.
 
 ## trpc-electron (`trpc-electron@<version>.patch`)
 
@@ -363,6 +443,35 @@ Verify in the simulator: open a workspace with two PRs, tap the PR chip, tap a
 row, go back, reopen the sheet, tap the other row. The second PR must show its
 description and the Files row without scrolling.
 
+### Interactive push (same patch)
+
+**Why:** Home's right-edge swipe returns to the last workspace, and the pushed
+screen follows the finger like the back swipe does. react-native-screens can
+only drive a *pop* interactively; UIKit asks for an interaction controller only
+when the stack returns a custom animator, and the stack returns none for a
+default push.
+
+**What it changes:** `RNSScreenStackView` gets `armInteractivePush`,
+`updateInteractivePush:` and `endInteractivePush:`, called by
+`apps/mobile/modules/forward-swipe`. The next push after `arm` (JS performs it)
+gets `RNSScreenStackAnimator` and an `RNSPercentDrivenInteractiveTransition`.
+Progress and the release that arrive before UIKit starts the transition are
+kept and applied from the new `onStart` hook. The simple-push animator starts
+paused and linear when interactive, like its pop branch. A cancelled push
+leaves UIKit's stack, and `RNSScreen` sends `onDismissed`, so JS drops the
+route. An arm with no push in 1 s expires. `arm` does not call
+`cancelTouchesInParent`: the forward-swipe module resets
+`RCTSurfaceTouchHandler` itself when its pan begins, so the row under the
+finger does not press on release. A second reset from `arm` throws
+"Inconsistency between local and UIKit touch registries".
+
+**Guard test:** `apps/mobile/react-native-screens-interactive-push-patch.test.ts`.
+
+**Regenerating:** re-apply the hunks in `ios/RNSScreenStack.h`,
+`ios/RNSScreenStack.mm`, `ios/RNSPercentDrivenInteractiveTransition.{h,mm}` and
+`ios/RNSScreenStackAnimator.mm`. Verify in the simulator: open a workspace, go
+back, swipe in from Home's right edge, let go past half way and short of it.
+
 ## @pierre/trees (`@pierre%2Ftrees@<version>.patch`)
 
 **Why:** DESKTOP-19G, DESKTOP-KR, DESKTOP-P5, DESKTOP-P4 (and DESKTOP-11E's
@@ -405,6 +514,40 @@ bun test apps/desktop/src/pierre-trees-lookup-patch.test.ts
 test once @pierre/trees ships a release whose segment walk stops at a file
 node.
 
+## @pierre/diffs (`@pierre%2Fdiffs@<version>.patch`)
+
+**Why:** every Changes pane mount leaked its whole diff view. `CodeView`
+creates one `VirtualizedFileDiff` per file, and each subscribes to the shared
+worker pool's `themeSubscribers` set. `CodeView.cleanUp` (through `reset`)
+only cleans the items in the current render range, so the others stay in that
+set with a reference back to their `CodeView` and its DOM. Measured in the dev
+desktop: 50 switches between the Changes and Pull request tabs left 26
+`CodeView`s, about 160k detached DOM nodes and 860 theme subscribers alive
+after both tabs were closed. 1.6.1 fixes it upstream: `reset` cleans every
+discarded item.
+
+**What it changes** (`dist/components/CodeView.js`): one line in `reset` —
+clean up every item, not only the rendered ones, before the list is dropped.
+
+**Guard test:** `apps/desktop/src/pierre-diffs-reset-patch.test.ts`.
+
+**Regenerating after a version bump** (~2 min):
+
+```bash
+bun patch @pierre/diffs@<new-version>
+# in node_modules/@pierre/diffs/dist/components/CodeView.js, in reset(), add
+# `for (const item of this.items) item.instance.cleanUp();` after
+# this.cleanAllRenderedItems()
+bun patch --commit 'node_modules/@pierre/diffs'
+# keep only the CodeView.js hunk; bun also writes deletions for the package's
+# bundled dist/node_modules typings
+bun test apps/desktop/src/pierre-diffs-reset-patch.test.ts
+```
+
+**Removing:** delete the patch, the `patchedDependencies` entry and the guard
+test when moving to @pierre/diffs 1.6.1 or later, which cleans every item in
+`reset`.
+
 ## expo-observe (`expo-observe@<version>.patch`)
 
 **Why:** its podspec asks for `swift_version = '6.0'`, and the package keeps
@@ -441,3 +584,32 @@ version's files, write the diff to
 package root), update the key in `patchedDependencies`, run `bun install`, then
 `bun test apps/mobile/react-native-enriched-markdown-list-patch.test.ts`. It is
 a native change: rebuild the app to see it.
+
+## @better-auth/oauth-provider (`@better-auth%2Foauth-provider@<version>.patch`)
+
+**Why:** the token endpoint rotates the refresh token on every refresh. When a
+rotated token is sent again, it treats that as theft and deletes every refresh
+and access token the user holds for that client, on every machine. Several CLI
+processes on one machine, or the CLI and a host-service, refresh at the same
+moment as a matter of course, and a client that loses a response retries it.
+Both send the rotated token again within seconds, and the user is logged out
+everywhere (GH #8426). A check in a `before` hook cannot fix this: between the
+hook's read and the provider's read, another request can rotate the token.
+
+**What it changes** (`dist/index.mjs`, `handleRefreshTokenGrant`): when the
+token was revoked less than 10 minutes ago, the request still fails with
+`invalid_grant` but the token family is kept, and the server logs a
+`[oauth-refresh-reuse-grace]` warning so a stolen-token reuse stays visible.
+Reuse after 10 minutes still deletes it. The CLI and the host-service retry a refresh with an unknown
+outcome only within 5 minutes (`REFRESH_TIMINGS.retryWindowMs` in
+`packages/shared/src/oauth-refresh.ts`), so keep that below this window. The
+guard test checks it.
+
+**Guard test:** `packages/auth/src/oauth-provider-refresh-grace-patch.test.ts`.
+It runs the installed provider against an in-memory database.
+
+**Regenerating after a version bump:** `bun patch @better-auth/oauth-provider`,
+make the same change in `handleRefreshTokenGrant` (keep the
+`superset-patch: refresh-reuse-grace` comment), `bun patch --commit
+'node_modules/@better-auth/oauth-provider'`, then
+`bun test packages/auth/src/oauth-provider-refresh-grace-patch.test.ts`.

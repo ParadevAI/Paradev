@@ -33,6 +33,7 @@ interface ListPage {
 interface Counts {
 	all: number;
 	team: number;
+	shared: number;
 	mine: number;
 	pinned: number;
 	workspaces: Array<{ workspaceId: string; count: number }>;
@@ -115,7 +116,7 @@ const onSearchChange = mock((_search: string) => {});
 const PINS = ["pin-1", "pin-2"];
 
 function renderList({
-	scope = "all" as "all" | "pinned" | "team" | "mine",
+	scope = "all" as "all" | "pinned" | "team" | "shared" | "mine",
 	search = "",
 	authorId = null as string | null,
 	workspaceId = null as string | null,
@@ -179,6 +180,7 @@ beforeEach(() => {
 	counts = {
 		all: 1,
 		team: 1,
+		shared: 0,
 		mine: 0,
 		pinned: 2,
 		workspaces: [{ workspaceId: "ws-1", count: 3 }],

@@ -28,5 +28,10 @@ if [ -n "$CI" ]; then
   exit 0
 fi
 
+# Electron 43+ no longer downloads its binary in a postinstall script. The dev
+# scripts (patch-dev-protocol, clean-launch-services) and the host-service e2e
+# runner expect node_modules/electron/dist to exist, so fetch it here.
+bun run --filter=@superset/desktop install:electron
+
 # Install native dependencies for desktop app
 bun run --filter=@superset/desktop install:deps

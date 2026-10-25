@@ -56,6 +56,7 @@ export function useSessionClient(sessionId: string | null): {
 						transport: wiring.transport,
 						streamBaseUrl: wiring.streamBaseUrl,
 						createSocket: wiring.createSocket,
+						nestedSubagents: true,
 					})
 				: null,
 		[sessionId, wiring],

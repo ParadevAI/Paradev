@@ -18,32 +18,26 @@ afterAll(async () => {
 const SRC = "data:image/png;base64,iVBORw0KGgo=";
 
 describe("PreviewableImage", () => {
-	test("opens the full-size preview on click", () => {
+	test("asks to open the preview on click", () => {
+		const onClick = mock(() => {});
 		const view = render(
 			<PreviewableImage
 				filename="shot.png"
-				onDownload={mock(async () => {})}
+				onClick={onClick}
 				onError={mock(() => {})}
 				src={SRC}
 			/>,
 		);
-		const thumbnail = view.getByRole("button", { name: "Preview shot.png" });
-		expect(view.getAllByAltText("shot.png")).toHaveLength(1);
-
-		fireEvent.click(thumbnail);
-		const images = view.getAllByAltText("shot.png");
-		expect(images).toHaveLength(2);
-		expect(images.every((image) => image.getAttribute("src") === SRC)).toBe(
-			true,
-		);
-		expect(view.getByRole("button", { name: "Close preview" })).toBeTruthy();
+		expect(view.getByAltText("shot.png").getAttribute("src")).toBe(SRC);
+		fireEvent.click(view.getByRole("button", { name: "Preview shot.png" }));
+		expect(onClick).toHaveBeenCalledTimes(1);
 	});
 
 	test("draws no border of its own around the thumbnail", () => {
 		const view = render(
 			<PreviewableImage
 				filename="shot.png"
-				onDownload={mock(async () => {})}
+				onClick={mock(() => {})}
 				onError={mock(() => {})}
 				src={SRC}
 			/>,

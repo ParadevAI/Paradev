@@ -1,4 +1,8 @@
-import type { ToolCall } from "@superset/chat/protocol";
+import type {
+	Item,
+	Reasoning as ReasoningItem,
+	ToolCall,
+} from "@superset/chat/protocol";
 import { Shimmer } from "@superset/ui/ai-elements/shimmer";
 import {
 	Collapsible,
@@ -8,39 +12,89 @@ import {
 import { cn } from "@superset/ui/utils";
 import { ChevronRight } from "lucide-react";
 import { memo } from "react";
+import { stepSummary } from "../../../../utils/stepSummary";
+import { isNestedTool } from "../../../../utils/subagentLines";
 import { toolKindIcon } from "../../../../utils/toolKindIcon";
+import { NestedToolCallRow } from "../../../NestedToolCallRow";
+import { ReasoningRow } from "../../../ReasoningRow";
 import { ToolCallRow } from "../../../ToolCallRow";
 import { RailStep } from "../RailStep";
 import { dominantKind } from "./utils/dominantKind";
-import { stepSummary } from "./utils/stepSummary";
 
 const SUMMARY_SWEEP_SECONDS = 1.6;
 
 type ToolRunRowProps = {
 	rowKey: string;
 	items: ToolCall[];
+	steps: readonly Item[];
+	/** Each step's thinking text, "" for a tool call. */
+	stepTexts: readonly string[];
+	childLists?: readonly (readonly Item[] | undefined)[] | undefined;
 	collapsed: boolean;
+	active?: boolean;
 	onToggle: (rowKey: string, collapsed: boolean) => void;
 };
+
+const ACTIVE_TAIL_STEPS = 3;
+
+function sameChildLists(
+	previous: ToolRunRowProps["childLists"],
+	next: ToolRunRowProps["childLists"],
+): boolean {
+	if (previous === next) return true;
+	if (!previous || !next || previous.length !== next.length) return false;
+	return previous.every((list, index) => list === next[index]);
+}
 
 function sameTools(previous: ToolRunRowProps, next: ToolRunRowProps): boolean {
 	return (
 		previous.rowKey === next.rowKey &&
 		previous.collapsed === next.collapsed &&
+		previous.active === next.active &&
 		previous.onToggle === next.onToggle &&
-		previous.items.length === next.items.length &&
-		previous.items.every((item, index) => item === next.items[index])
+		previous.steps.length === next.steps.length &&
+		previous.steps.every((step, index) => step === next.steps[index]) &&
+		previous.stepTexts.every((text, index) => text === next.stepTexts[index]) &&
+		sameChildLists(previous.childLists, next.childLists)
 	);
 }
 
 export const ToolRunRow = memo(function ToolRunRow({
+	active = false,
 	collapsed,
 	items,
 	onToggle,
 	rowKey,
+	steps,
+	stepTexts,
+	childLists,
 }: ToolRunRowProps) {
-	const live = items.some((tool) => tool.status === "running");
-	const summary = stepSummary(items);
+	const done = items.filter((tool) => tool.status !== "running");
+	const live = done.length === 0;
+	const summary = stepSummary(live ? items : done);
+	const tail =
+		collapsed && active ? steps.slice(-ACTIVE_TAIL_STEPS) : undefined;
+	const current =
+		collapsed && !tail
+			? items.find((tool) => tool.status === "running")
+			: undefined;
+	const renderStep = (step: Item) => (
+		<RailStep key={step.id}>
+			{step.kind === "reasoning" ? (
+				<ReasoningRow
+					item={step as ReasoningItem}
+					text={stepTexts[steps.indexOf(step)] ?? ""}
+				/>
+			) : isNestedTool(
+					step as ToolCall,
+					childLists?.[items.indexOf(step as ToolCall)],
+				) ? (
+				<NestedToolCallRow item={step as ToolCall} />
+			) : (
+				<ToolCallRow item={step as ToolCall} />
+			)}
+		</RailStep>
+	);
 	const Icon = toolKindIcon(dominantKind(items));
 	return (
 		<Collapsible
@@ -71,13 +125,13 @@ export const ToolRunRow = memo(function ToolRunRow({
 					</span>
 				)}
 			</CollapsibleTrigger>
-			<CollapsibleContent>
-				{items.map((tool) => (
-					<RailStep key={tool.id}>
-						<ToolCallRow item={tool} />
-					</RailStep>
-				))}
-			</CollapsibleContent>
+			{current && (
+				<RailStep>
+					<ToolCallRow item={current} />
+				</RailStep>
+			)}
+			{tail?.map(renderStep)}
+			<CollapsibleContent>{steps.map(renderStep)}</CollapsibleContent>
 		</Collapsible>
 	);
 }, sameTools);

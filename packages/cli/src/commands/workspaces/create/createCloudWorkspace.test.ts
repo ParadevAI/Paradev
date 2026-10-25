@@ -22,3 +22,30 @@ test.each([
 	).rejects.toThrow("--checkout does not apply to a cloud workspace");
 	expect(contacted).toBe(false);
 });
+
+test("sends the chosen machine size to the cloud", async () => {
+	let createInput: Record<string, unknown> | undefined;
+	const api = {
+		environment: {
+			list: {
+				query: async () => [
+					{ id: "env-1", name: "main", repositories: [{ id: "repo-1" }] },
+				],
+			},
+		},
+		cloudWorkspace: {
+			create: {
+				mutate: async (input: Record<string, unknown>) => {
+					createInput = input;
+					return { id: "ws-1", branch: "main" };
+				},
+			},
+		},
+	} as unknown as ApiClient;
+	await createCloudWorkspace({
+		api,
+		organizationId: "org",
+		options: { machineSize: "small" },
+	});
+	expect(createInput).toMatchObject({ machineSize: "small" });
+});

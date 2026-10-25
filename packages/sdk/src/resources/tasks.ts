@@ -195,6 +195,7 @@ export interface TaskListParams {
 	assigneeMe?: boolean | null;
 	creatorMe?: boolean | null;
 	search?: string | null;
+	labels?: string[] | null;
 	limit?: number;
 	offset?: number;
 }

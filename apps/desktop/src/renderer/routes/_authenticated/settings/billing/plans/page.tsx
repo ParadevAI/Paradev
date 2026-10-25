@@ -2,25 +2,33 @@ import type { MessageDescriptor } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { i18n } from "@superset/i18n";
-import { rawErrorMessage } from "@superset/i18n/errors";
+import { useFormat } from "@superset/i18n/react";
+import {
+	familyForPlan,
+	gbHourPackPricePerGbHour,
+	offersYearlyDiscount,
+	PLAN_PRICE_CURRENCY,
+	type PlanFamily,
+	planForInterval,
+	seatPricePerMonth,
+} from "@superset/shared/billing";
 import { COMPANY } from "@superset/shared/constants";
 import { Badge } from "@superset/ui/badge";
 import { Button } from "@superset/ui/button";
-import { toast } from "@superset/ui/sonner";
 import { Switch } from "@superset/ui/switch";
 import { cn } from "@superset/ui/utils";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { differenceInDays, format } from "date-fns";
 import { Fragment, useState } from "react";
 import { HiArrowLeft, HiArrowUpRight, HiCheck } from "react-icons/hi2";
-import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { env } from "renderer/env.renderer";
 import { useCurrentPlan } from "renderer/hooks/useCurrentPlan";
 import { track } from "renderer/lib/analytics";
-import { authClient } from "renderer/lib/auth-client";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { electronTrpc } from "renderer/lib/electron-trpc";
-import type { PlanTier } from "../constants";
+import { PlanChangeDialog } from "../components/PlanChangeDialog";
+import { useBillingActions } from "../hooks/useBillingActions";
+import { usePlanCatalog } from "../hooks/usePlanCatalog";
 
 export const Route = createFileRoute("/_authenticated/settings/billing/plans/")(
 	{
@@ -48,9 +56,10 @@ type PlanCardActionButton = {
 };
 
 type PlanCardData = {
-	id: "free" | "pro" | "enterprise";
-	name: MessageDescriptor;
-	price: PlanCardText;
+	id: string;
+	name: MessageDescriptor | string;
+	family?: PlanFamily;
+	price: PlanCardText | "seat";
 	priceNote?: PlanCardText;
 	billingText: PlanCardText;
 	showBillingToggle?: boolean;
@@ -62,7 +71,9 @@ type ComparisonValue = MessageDescriptor | boolean | null;
 type ComparisonRow = {
 	label: MessageDescriptor;
 	href?: string;
-	values: ComparisonValue[];
+	values: [free: ComparisonValue, paid: ComparisonValue, enterprise: ComparisonValue];
+	cloudGbHours?: boolean;
+	cloudPack?: boolean;
 	badge?: { label: MessageDescriptor; variant: "default" | "secondary" };
 };
 
@@ -71,50 +82,75 @@ type ComparisonSection = {
 	rows: ComparisonRow[];
 };
 
-const PLAN_CARDS: PlanCardData[] = [
-	{
-		id: "free",
-		name: msg({ message: "Free" }),
-		price: msg({ message: "$0" }),
+const LABEL_COLUMN_WIDTH = 180;
+const PLAN_COLUMN_MIN_WIDTH = 144;
+
+const FREE_CARD: PlanCardData = {
+	id: "free",
+	name: msg({ message: "Free" }),
+	price: msg({ message: "$0" }),
+	priceNote: msg({
+		message: "per user/month",
+	}),
+	billingText: msg({
+		message: "Free for everyone",
+	}),
+	actions: [
+		{
+			label: msg({
+				message: "Current plan",
+			}),
+			action: "current",
+			variant: "secondary",
+		},
+	],
+};
+
+const ENTERPRISE_CARD: PlanCardData = {
+	id: "enterprise",
+	name: msg({
+		message: "Enterprise",
+	}),
+	price: msg({
+		message: "Custom pricing",
+	}),
+	billingText: msg({
+		message: "Billed yearly",
+	}),
+	actions: [
+		{
+			label: msg({
+				message: "Request a trial",
+			}),
+			action: "contact",
+			variant: "outline",
+		},
+	],
+};
+
+function paidCard(family: PlanFamily): PlanCardData {
+	const yearly = offersYearlyDiscount(family);
+	return {
+		id: family.family,
+		name: family.name,
+		family,
+		price: "seat",
 		priceNote: msg({
 			message: "per user/month",
 		}),
-		billingText: msg({
-			message: "Free for everyone",
-		}),
-		actions: [
-			{
-				label: msg({
-					message: "Current plan",
+		billingText: yearly
+			? {
+					monthly: msg({
+						message: "Billed monthly",
+					}),
+					yearly: msg({
+						message: "Billed yearly",
+					}),
+				}
+			: msg({
+					message: "Billed monthly",
 				}),
-				action: "current",
-				variant: "secondary",
-			},
-		],
-	},
-	{
-		id: "pro",
-		name: msg({ message: "Pro" }),
-		price: {
-			monthly: msg({
-				message: "$20",
-			}),
-			yearly: msg({
-				message: "$15",
-			}),
-		},
-		priceNote: msg({
-			message: "per user/month",
-		}),
-		billingText: {
-			monthly: msg({
-				message: "Billed monthly",
-			}),
-			yearly: msg({
-				message: "Billed yearly",
-			}),
-		},
-		showBillingToggle: true,
+		showBillingToggle: yearly,
 		actions: [
 			{
 				label: msg({
@@ -124,29 +160,8 @@ const PLAN_CARDS: PlanCardData[] = [
 				variant: "default",
 			},
 		],
-	},
-	{
-		id: "enterprise",
-		name: msg({
-			message: "Enterprise",
-		}),
-		price: msg({
-			message: "Custom pricing",
-		}),
-		billingText: msg({
-			message: "Billed yearly",
-		}),
-		actions: [
-			{
-				label: msg({
-					message: "Request a trial",
-				}),
-				action: "contact",
-				variant: "outline",
-			},
-		],
-	},
-];
+	};
+}
 
 const VALUE_ONE = msg({
 	message: "1",
@@ -176,6 +191,22 @@ const COMPARISON_SECTIONS: ComparisonSection[] = [
 					message: "Projects",
 				}),
 				values: [VALUE_UNLIMITED, VALUE_UNLIMITED, VALUE_UNLIMITED],
+			},
+			{
+				label: msg({
+					message: "Cloud GB-hours per seat each month",
+				}),
+				values: [null, null, msg({ message: "Custom" })],
+				cloudGbHours: true,
+				badge: { label: msg({ message: "Beta" }), variant: "secondary" },
+			},
+			{
+				label: msg({
+					message: "Extra GB-hours, bought as needed",
+				}),
+				values: [null, null, msg({ message: "Custom" })],
+				cloudPack: true,
+				badge: { label: msg({ message: "Beta" }), variant: "secondary" },
 			},
 		],
 	},
@@ -332,19 +363,32 @@ function PlansPage() {
 	// then on, and Annual stays the default for free and enterprise, which have
 	// no interval to read.
 	const { t } = useLingui();
+	const { formatCurrency, formatNumber } = useFormat();
+	const catalogQuery = usePlanCatalog();
+	const catalog = catalogQuery.data ?? [];
 	const [manualIsYearly, setManualIsYearly] = useState<boolean | null>(null);
-	const [isUpgrading, setIsUpgrading] = useState(false);
-	const [isCanceling, setIsCanceling] = useState(false);
-	const [isRestoring, setIsRestoring] = useState(false);
+	const {
+		upgrade,
+		cancel,
+		restore,
+		isUpgrading,
+		isCanceling,
+		isRestoring,
+		pendingChange,
+		confirmChange,
+		dismissChange,
+		isConfirming,
+	} = useBillingActions();
 	const openUrl = electronTrpc.external.openUrl.useMutation();
-	const utils = cloudTrpc.useUtils();
-
-	// Per-window org: the shared session holds one org for the whole app, so
-	// a second window on another org would render the first window's org here.
-	const activeOrgId = useActiveOrganizationId();
 
 	const { plan: currentPlan, isReady: planResolved, activePlan } = useCurrentPlan();
 	const cancelAt = activePlan?.cancelAt;
+	const currentColumn =
+		currentPlan === "pro"
+			? (familyForPlan(catalog, activePlan?.autumnPlanId)?.family.family ??
+				"pro")
+			: currentPlan;
+	const planCards = [FREE_CARD, ...catalog.map(paidCard), ENTERPRISE_CARD];
 
 	const subscriptionIsYearly = activePlan
 		? resolveSubscriptionIsYearly(activePlan)
@@ -361,14 +405,10 @@ function PlansPage() {
 	const memberCount =
 		membersData && membersData.length > 0 ? membersData.length : undefined;
 
-	const currentPlanLabelByTier: Record<PlanTier, string> = {
-		free: t({ message: "Free" }),
-		pro: t({ message: "Pro" }),
-		enterprise: t({
-			message: "Enterprise",
-		}),
-	};
-	const currentPlanLabel = currentPlanLabelByTier[currentPlan];
+	const cardName = (card: PlanCardData) =>
+		typeof card.name === "string" ? card.name : i18n._(card.name);
+	const currentPlanCard = planCards.find((card) => card.id === currentColumn);
+	const currentPlanLabel = currentPlanCard ? cardName(currentPlanCard) : "";
 
 	const getValue = <T,>(value: T | { monthly: T; yearly: T }): T => {
 		if (typeof value === "object" && value !== null && "monthly" in value) {
@@ -377,115 +417,79 @@ function PlansPage() {
 		return value as T;
 	};
 
-	const handlePlanAction = async (action: PlanCardAction) => {
+	const yearlyFor = (card: PlanCardData) =>
+		card.family ? isYearly && offersYearlyDiscount(card.family) : isYearly;
+	
+	const getPriceLabel = (plan: PlanCardData): string => {
+		if (plan.price !== "seat") return i18n._(getValue(plan.price));
+		if (!plan.family) return "";
+		return formatCurrency(
+			seatPricePerMonth(plan.family, isYearly),
+			PLAN_PRICE_CURRENCY,
+			{ minimumFractionDigits: 0 },
+		);
+	};
+
+	const comparisonValueFor = (
+		row: ComparisonRow,
+		plan: PlanCardData,
+	): ComparisonValue | string => {
+		if (row.cloudGbHours && plan.family) {
+			const gbMinutes = plan.family.gbMinutesPerSeat;
+			return gbMinutes ? formatNumber(gbMinutes / 60) : null;
+		}
+		if (row.cloudPack && plan.family) {
+			const pack = plan.family.pack;
+			return pack
+				? t({
+						message: `${formatCurrency(gbHourPackPricePerGbHour(pack), PLAN_PRICE_CURRENCY, { minimumFractionDigits: 0, maximumFractionDigits: 2 })} per GB-hour`,
+					})
+				: null;
+		}
+		if (plan.id === FREE_CARD.id) return row.values[0];
+		if (plan.id === ENTERPRISE_CARD.id) return row.values[2];
+		return row.values[1];
+	};
+
+	const handlePlanAction = async (
+		action: PlanCardAction,
+		plan: PlanCardData,
+	) => {
 		if (action === "current") {
 			return;
 		}
 
 		if (action === "contact") {
 			track("enterprise_trial_requested", { source: "billing_plans" });
-			openUrl.mutate("mailto:support@superset.sh");
+			openUrl.mutate(COMPANY.MAIL_TO);
 			return;
 		}
 
-		if (!activeOrgId) return;
-
 		if (action === "downgrade") {
-			setIsCanceling(true);
-			try {
-				await authClient.subscription.cancel(
-					{
-						referenceId: activeOrgId,
-						returnUrl: env.NEXT_PUBLIC_WEB_URL,
-					},
-					{
-						onSuccess: (ctx) => {
-							if (ctx.data?.url) {
-								window.open(ctx.data.url, "_blank");
-							}
-						},
-					},
-				);
-			} finally {
-				setIsCanceling(false);
-				await utils.billing.activePlan.invalidate();
-			}
+			await cancel();
 			return;
 		}
 
 		if (action === "restore") {
-			setIsRestoring(true);
-			try {
-				await authClient.subscription.restore({
-					referenceId: activeOrgId,
-				});
-				toast.success(
-					t({
-						message: "Plan restored",
-					}),
-				);
-			} finally {
-				setIsRestoring(false);
-				await utils.billing.activePlan.invalidate();
-			}
+			await restore();
 			return;
 		}
 
 		if (memberCount === undefined) return;
 
-		// The actual intent-to-pay step — this is what mints the Stripe Checkout
-		// session. `paywall_upgrade_clicked` only navigates to this page.
-		// `previous_plan` separates a new conversion (`free`) from an existing
-		// subscriber changing billing interval (`pro`), which shares this action.
-		const checkoutProperties = {
-			plan: "pro",
-			annual: isYearly,
+		const target = plan.family ? planForInterval(plan.family, isYearly) : null;
+		if (!target) return;
+		await upgrade({
+			planId: target.id,
+			planName: plan.family?.name ?? target.name,
+			annual: target.interval === "year",
 			seats: memberCount,
-			previous_plan: currentPlan,
 			source: "billing_plans",
-		};
-		track("checkout_started", checkoutProperties);
-
-		setIsUpgrading(true);
-		try {
-			await authClient.subscription.upgrade(
-				{
-					plan: "pro",
-					referenceId: activeOrgId,
-					annual: isYearly,
-					seats: memberCount,
-					successUrl: `${env.NEXT_PUBLIC_WEB_URL}/settings/billing?success=true`,
-					cancelUrl: env.NEXT_PUBLIC_WEB_URL,
-					returnUrl: env.NEXT_PUBLIC_WEB_URL,
-					disableRedirect: true,
-				},
-				{
-					onSuccess: (ctx) => {
-						if (ctx.data?.url) {
-							// Last thing we can see client-side; everything after this
-							// happens on Stripe and comes back through the webhook.
-							track("checkout_redirected", checkoutProperties);
-							window.open(ctx.data.url, "_blank");
-						}
-					},
-					// Better Auth resolves rather than throws, so without this hook a
-					// failed checkout is invisible: the button just resets.
-					onError: (ctx) => {
-						track("checkout_failed", {
-							...checkoutProperties,
-							status: ctx.response?.status,
-							error: rawErrorMessage(ctx.error),
-						});
-					},
-				},
-			);
-		} finally {
-			setIsUpgrading(false);
-			await utils.billing.activePlan.invalidate();
-		}
+			returnUrl: env.NEXT_PUBLIC_WEB_URL,
+		});
 	};
 
-	const renderComparisonValue = (value: ComparisonValue) => {
+	const renderComparisonValue = (value: ComparisonValue | string) => {
 		if (value === null || value === false) {
 			return (
 				<span className="sr-only">
@@ -501,14 +505,21 @@ function PlansPage() {
 		return (
 			<>
 				<HiCheck className="h-3.5 w-3.5 text-muted-foreground" />
-				<span className="text-sm">{i18n._(value)}</span>
+				<span className="text-sm">
+					{typeof value === "string" ? value : i18n._(value)}
+				</span>
 			</>
 		);
 	};
 
-	const highlightColumnIndex = 1;
+	const highlightColumnIndex = Math.max(
+		1,
+		planCards.findIndex((card) => card.id === currentColumn),
+	);
 	const highlightColumnStart = highlightColumnIndex + 2;
-	const gridColumnsClass = "grid grid-cols-[240px_repeat(3,_1fr)]";
+	const gridStyle = {
+		gridTemplateColumns: `${LABEL_COLUMN_WIDTH}px repeat(${planCards.length}, minmax(0, 1fr))`,
+	};
 
 	return (
 		<div className="p-6 max-w-7xl w-full">
@@ -537,7 +548,7 @@ function PlansPage() {
 									track("billing_support_contacted", {
 										source: "billing_plans_inline",
 									});
-									openUrl.mutate("mailto:support@superset.sh");
+									openUrl.mutate(COMPANY.MAIL_TO);
 								}}
 								className="inline-flex items-center gap-1 text-primary hover:underline"
 							>
@@ -550,13 +561,28 @@ function PlansPage() {
 				</div>
 			</div>
 
+			{catalogQuery.isError && (
+				<div className="mb-4 flex items-center gap-3 text-sm text-muted-foreground">
+					<Trans>Could not load plans.</Trans>
+					<Button
+						size="sm"
+						variant="outline"
+						onClick={() => catalogQuery.refetch()}
+					>
+						<Trans>Retry</Trans>
+					</Button>
+				</div>
+			)}
 			<div className="overflow-x-auto">
-				<div className="relative min-w-[720px]">
+				<div
+					className="relative"
+					style={{
+						minWidth: LABEL_COLUMN_WIDTH + planCards.length * PLAN_COLUMN_MIN_WIDTH,
+					}}
+				>
 					<div
-						className={cn(
-							gridColumnsClass,
-							"pointer-events-none absolute inset-0",
-						)}
+						className="grid pointer-events-none absolute inset-0"
+						style={gridStyle}
 					>
 						<div
 							className="bg-accent/30 border border-border/60 rounded-lg"
@@ -566,14 +592,14 @@ function PlansPage() {
 							}}
 						/>
 					</div>
-					<div className={cn(gridColumnsClass, "relative z-10 items-start")}>
+					<div className="grid relative z-10 items-start" style={gridStyle}>
 						{(["plan", "billing", "cta"] as const).map((rowKey, rowIndex) => (
 							<Fragment key={rowKey}>
 								<div
 									className={cn("px-2", rowKey === "cta" ? "py-3" : "py-2.5")}
 								/>
-								{PLAN_CARDS.map((plan) => {
-									const isCurrent = currentPlan === plan.id;
+								{planCards.map((plan) => {
+									const isCurrent = currentColumn === plan.id;
 									const isDowngrade =
 										plan.id === "free" && currentPlan !== "free";
 									const isOnEnterprise = currentPlan === "enterprise";
@@ -609,13 +635,13 @@ function PlansPage() {
 												variant: "default" as const,
 											},
 										];
-									} else if (isCurrent && plan.id === "pro") {
+									} else if (isCurrent && plan.family) {
 										// Before the plan resolves the billing interval is unknown,
 										// so an interval-change action here would be a guess the
 										// user can act on. Hold at "Current plan" until it lands — and
 										// equally when the row carries no readable interval.
 										const intervalMatches =
-											subscriptionIsYearly === null || isYearly === subscriptionIsYearly;
+											subscriptionIsYearly === null || yearlyFor(plan) === subscriptionIsYearly;
 										if (!planResolved || intervalMatches) {
 											planActions = [
 												{
@@ -633,7 +659,7 @@ function PlansPage() {
 														? t({
 																message: "Changing...",
 															})
-														: isYearly
+														: yearlyFor(plan)
 															? t({
 																	message: "Change to Annual",
 																})
@@ -679,6 +705,20 @@ function PlansPage() {
 												variant: "outline" as const,
 											},
 										];
+									} else if (currentPlan === "pro" && plan.family) {
+										planActions = [
+											{
+												label: isUpgrading
+													? t({
+															message: "Changing...",
+														})
+													: t({
+															message: "Switch plan",
+														}),
+												action: "upgrade" as const,
+												variant: "outline" as const,
+											},
+										];
 									} else {
 										planActions = plan.actions.map((action) => ({
 											...action,
@@ -691,7 +731,7 @@ function PlansPage() {
 											<div key={plan.id} className="px-4 py-2.5">
 												<div className="space-y-0.5">
 													<div className="text-base font-medium">
-														{i18n._(plan.name)}
+														{cardName(plan)}
 													</div>
 													<div
 														className={cn(
@@ -700,7 +740,7 @@ function PlansPage() {
 																: "text-base font-medium text-muted-foreground",
 														)}
 													>
-														{i18n._(getValue(plan.price))}
+														{getPriceLabel(plan)}
 													</div>
 													{plan.priceNote && (
 														<div className="text-xs text-muted-foreground">
@@ -749,7 +789,9 @@ function PlansPage() {
 															action.action === "current" ||
 															(action.action === "upgrade" && isUpgrading)
 														}
-														onClick={() => handlePlanAction(action.action)}
+														onClick={() =>
+															handlePlanAction(action.action, plan)
+														}
 													>
 														{action.label}
 													</Button>
@@ -762,7 +804,10 @@ function PlansPage() {
 								{rowIndex < 2 && (
 									<>
 										<div />
-										<div className="col-span-3 h-px bg-border/60" />
+										<div
+											className="h-px bg-border/60"
+											style={{ gridColumn: "2 / -1" }}
+										/>
 									</>
 								)}
 							</Fragment>
@@ -770,12 +815,15 @@ function PlansPage() {
 
 						{COMPARISON_SECTIONS.map((section, sectionIndex) => (
 							<Fragment key={section.title.id}>
-								<div className="col-span-4 pt-6 pb-3 px-2">
+								<div
+									className="pt-6 pb-3 px-2"
+									style={{ gridColumn: "1 / -1" }}
+								>
 									<span className="text-sm font-semibold">
 										{i18n._(section.title)}
 									</span>
 								</div>
-								<div className="col-span-4 h-px bg-border/60" />
+								<div className="h-px bg-border/60" style={{ gridColumn: "1 / -1" }} />
 
 								{section.rows.map((row, rowIndex) => {
 									const isLastRow =
@@ -806,16 +854,16 @@ function PlansPage() {
 													</Badge>
 												)}
 											</div>
-											{row.values.map((value, valueIndex) => (
+											{planCards.map((plan) => (
 												<div
-													key={`${row.label.id}-${valueIndex}`}
+													key={`${row.label.id}-${plan.id}`}
 													className="flex items-center justify-start gap-2 px-4 py-2.5"
 												>
-													{renderComparisonValue(value)}
+													{renderComparisonValue(comparisonValueFor(row, plan))}
 												</div>
 											))}
 											{!isLastRow && (
-												<div className="col-span-4 h-px bg-border/60" />
+												<div className="h-px bg-border/60" style={{ gridColumn: "1 / -1" }} />
 											)}
 										</Fragment>
 									);
@@ -825,6 +873,12 @@ function PlansPage() {
 					</div>
 				</div>
 			</div>
+			<PlanChangeDialog
+				change={pendingChange}
+				isConfirming={isConfirming}
+				onConfirm={confirmChange}
+				onDismiss={dismissChange}
+			/>
 		</div>
 	);
 }

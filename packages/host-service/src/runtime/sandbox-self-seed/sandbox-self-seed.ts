@@ -18,16 +18,27 @@ import {
 import { eq } from "drizzle-orm";
 import type { HostDb } from "../../db";
 import { projects, workspaces } from "../../db/schema";
-import { runAgentInWorkspace } from "../../trpc/router/agents/agents";
+import {
+	chatLaunchTarget,
+	runAgentInWorkspace,
+} from "../../trpc/router/agents/agents";
 import { importCloudAttachments } from "../../trpc/router/attachments/attachments";
-import { seedDefaultsIfEmpty } from "../../trpc/router/settings/agent-configs";
+import { createChatSessionInWorkspace } from "../../trpc/router/sessions/session-service";
+import { ensurePresetRow } from "../../trpc/router/settings/agent-configs";
 import type { HostServiceContext } from "../../types";
 import {
 	getManagedEnv,
 	waitForManagedEnv,
 } from "../sandbox-managed-env/sandbox-managed-env.ts";
 import { resolveScript, shellSingleQuote } from "../setup/config";
+import {
+	type PendingCloudLaunchReport,
+	readPendingLaunchReport,
+	withoutPendingLaunchReport,
+	withPendingLaunchReport,
+} from "./launchMarker";
 import { buildStartHookEnv } from "./utils/buildStartHookEnv";
+import { pdevAgentDir, trustPdevWorkspace } from "./utils/trustPdevWorkspace";
 
 /**
  * Makes a sandbox describe its own workspace, instead of being described from
@@ -51,12 +62,13 @@ export interface SandboxIdentity {
 	branch: string;
 	/** The directory the checkouts live under. */
 	workspaceRoot: string;
-	/** The primary repository's checkout: the one the workspace opens on. */
+	/**
+	 * The primary repository's checkout: the one the workspace opens on and
+	 * whose `.superset/config.json` the box acts on.
+	 */
 	worktreePath: string;
 	/** Every checkout on the box, the primary first. */
 	repositories: SandboxRepository[];
-	/** The checkout whose `.superset/config.json` the box acts on. */
-	hooksPath: string;
 	/** The agent the workspace was created with, or null for an idle one. */
 	launch: CloudAgentLaunch | null;
 	/** Written once the launch has happened, so a restart never repeats it. */
@@ -92,13 +104,11 @@ export function readSandboxIdentity(
 	);
 	const primary = repositories[0];
 	if (!primary) return null;
-	const hooksRepository = repositories.find((repo) => repo.hooks) ?? primary;
 	return {
 		workspaceId,
 		workspaceRoot: root,
 		worktreePath: sandboxCheckoutDir(root, primary.path),
 		repositories,
-		hooksPath: sandboxCheckoutDir(root, hooksRepository.path),
 		// The API owns the workspace's name; the row here is scratch host-service
 		// serves panes against, so it needs a name, not the name.
 		workspaceName: "workspace",
@@ -168,7 +178,7 @@ export async function runSandboxStartHook(
 	if (existsSync(START_HOOK_MARKER))
 		return { started: false, reason: "already-started" };
 	const resolved = resolveScript("start", {
-		repoPath: identity.hooksPath,
+		repoPath: identity.worktreePath,
 		projectId: identity.workspaceId,
 	});
 	const commands = !resolved
@@ -181,15 +191,15 @@ export async function runSandboxStartHook(
 	// failed take the rest with it. Each is its own process, and the services
 	// still come up when something earlier had nothing to do.
 	const configured = resolved?.cwd
-		? resolve(identity.hooksPath, resolved.cwd)
-		: identity.hooksPath;
+		? resolve(identity.worktreePath, resolved.cwd)
+		: identity.worktreePath;
 	const log = openSync(START_HOOK_LOG, "a");
 	const command = commands.join("; ");
 	const child = spawn(
 		"bash",
 		["-lc", commands.map((one) => `{ ${one}; }`).join("\n")],
 		{
-			cwd: existsSync(configured) ? configured : identity.hooksPath,
+			cwd: existsSync(configured) ? configured : identity.worktreePath,
 			env: buildStartHookEnv(process.env, getManagedEnv()),
 			stdio: ["ignore", log, log],
 			detached: true,
@@ -292,8 +302,11 @@ export async function launchSandboxAgentOnce(
 	ctx: HostServiceContext,
 	identity: SandboxIdentity,
 ): Promise<void> {
+	if (existsSync(identity.launchMarkerPath)) {
+		await flushPendingLaunchReport(ctx, identity);
+		return;
+	}
 	if (!identity.launch) return;
-	if (existsSync(identity.launchMarkerPath)) return;
 	const { agent, prompt, model, effort, mode, attachmentFileIds, surface } =
 		identity.launch;
 	// The agent needs the environment the control plane pushes after boot and
@@ -316,8 +329,10 @@ export async function launchSandboxAgentOnce(
 	try {
 		// Nothing has listed this host's agents yet, so the built-in presets are
 		// not in its table; the launch resolves the agent through that table.
-		seedDefaultsIfEmpty(ctx.db);
+		ensurePresetRow(ctx.db, agent);
 		if (agent === "claude") approveClaudeApiKey();
+		if (agent === "pdev")
+			trustPdevWorkspace(identity.workspaceRoot, pdevAgentDir());
 		// Images the composer sent with the prompt: the bytes live in cloud
 		// storage because this box did not exist when they were uploaded.
 		// A download that fails must not cost the launch its prompt.
@@ -330,26 +345,117 @@ export async function launchSandboxAgentOnce(
 				console.error("[sandbox] could not import prompt attachments", error);
 			}
 		}
-		await runAgentInWorkspace(ctx, {
-			workspaceId: identity.workspaceId,
-			agent,
-			prompt,
-			model,
-			// A launch that carries an effort opens a terminal.
-			effort: surface === "chat" ? undefined : effort,
-			mode,
-			...(attachmentIds?.length ? { attachmentIds } : {}),
-			...(surface ? { surface } : {}),
-		});
+		const chatTarget =
+			surface === "chat"
+				? chatLaunchTarget(ctx.db, {
+						workspaceId: identity.workspaceId,
+						agent,
+						prompt,
+						model,
+						attachmentIds,
+						surface: "chat",
+					})
+				: null;
+		const useChat =
+			chatTarget && ctx.runtime.chat?.()?.live.supports(chatTarget.harness);
+		const report = useChat
+			? await createChatSessionInWorkspace(ctx, {
+					workspaceId: identity.workspaceId,
+					agent,
+					prompt,
+					model,
+					mode,
+					...(attachmentIds?.length ? { attachmentIds } : {}),
+				}).then((session) => ({
+					kind: "chat" as const,
+					sessionId: session.sessionId,
+					terminalId: session.terminalId,
+				}))
+			: await runAgentInWorkspace(ctx, {
+					workspaceId: identity.workspaceId,
+					agent,
+					prompt,
+					model,
+					effort,
+					mode,
+					...(attachmentIds?.length ? { attachmentIds } : {}),
+				}).then((run) => ({
+					kind: "terminal" as const,
+					terminalId: run.sessionId,
+				}));
 		console.log(
 			`[sandbox] launched ${agent} for workspace ${identity.workspaceId}`,
 		);
+		await rememberLaunchReport(ctx, identity, report);
 	} catch (error) {
 		await rm(identity.launchMarkerPath, { force: true });
 		console.error(
 			`[sandbox] could not launch ${agent} for workspace ${identity.workspaceId}`,
 			error,
 		);
+	}
+}
+
+async function rememberLaunchReport(
+	ctx: HostServiceContext,
+	identity: SandboxIdentity,
+	report:
+		| { kind: "chat"; sessionId: string; terminalId: string }
+		| { kind: "terminal"; terminalId: string },
+): Promise<void> {
+	const automationRunId = identity.launch?.automationRunId;
+	if (!automationRunId) return;
+	const pending: PendingCloudLaunchReport =
+		report.kind === "chat"
+			? { ...report, automationRunId }
+			: { kind: "terminal", terminalId: report.terminalId, automationRunId };
+	try {
+		writeFileSync(
+			identity.launchMarkerPath,
+			withPendingLaunchReport(readMarker(identity.launchMarkerPath), pending),
+		);
+		await flushPendingLaunchReport(ctx, identity);
+	} catch (error) {
+		console.warn(
+			`[sandbox] could not keep the launch report for workspace ${identity.workspaceId}`,
+			error,
+		);
+	}
+}
+
+async function flushPendingLaunchReport(
+	ctx: HostServiceContext,
+	identity: SandboxIdentity,
+): Promise<void> {
+	const marker = readMarker(identity.launchMarkerPath);
+	const pending = readPendingLaunchReport(marker);
+	if (!pending) return;
+	if (!(await reportLaunch(ctx, identity.workspaceId, pending))) return;
+	writeFileSync(identity.launchMarkerPath, withoutPendingLaunchReport(marker));
+}
+
+function readMarker(path: string): string {
+	try {
+		return readFileSync(path, "utf8");
+	} catch {
+		return "";
+	}
+}
+
+async function reportLaunch(
+	ctx: HostServiceContext,
+	workspaceId: string,
+	report: PendingCloudLaunchReport,
+): Promise<boolean> {
+	try {
+		await ctx.api.automation.reportCloudLaunch.mutate(report);
+		return true;
+	} catch (error) {
+		console.warn(
+			`[sandbox] could not report the launch for workspace ${workspaceId}`,
+			error,
+		);
+		return false;
 	}
 }
 

@@ -1,0 +1,119 @@
+---
+title: "Best cmux Alternatives in 2026"
+description: "The best alternatives to cmux, the Ghostty-based terminal for AI coding agents, including Superset, Herdr, Orca, Claude Squad, and Warp, compared by worktrees, review, platform, and license."
+date: 2026-10-20
+lastUpdated: 2026-10-20
+type: "roundup"
+competitors:
+  - cmux
+  - herdr
+  - orca
+  - claude-squad
+  - warp
+keywords:
+  - cmux alternative
+  - cmux alternatives
+  - cmux competitors
+  - cmux vs superset
+  - terminal for ai coding agents
+  - ghostty for ai agents
+---
+
+cmux is a Ghostty-based macOS terminal for coding agents. It shows every session in vertical tabs, puts a ring around a pane when an agent needs you, and adds an in-app browser, SSH workspaces, and a CLI and socket API. It is a primitive by design: it does not create worktrees or review diffs for you. If you want each agent on its own branch and worktree, with the diff, PR, and checks beside the terminal, Superset is built for that loop.
+
+**Our recommendation: choose Superset if you want worktree isolation and review around your agent terminals.** The alternatives below cover other preferences, including other terminal-native tools.
+
+[Download Superset](/download) to try a small task, or read [Superset vs cmux](/compare/superset-vs-cmux) for the direct comparison. This guide is published by Superset; recommendations describe workflow fit rather than benchmark results.
+
+---
+
+## The Short Version
+
+| Alternative | Best for | Platform | License |
+|---|---|---|---|
+| **Superset** | Worktrees, review, browser, automations, remote and cloud workspaces | macOS; experimental Linux AppImage; Windows unavailable; iPhone and iPad | Source-available (ELv2) |
+| **Herdr** | Terminal multiplexer for agents with persistent sessions | macOS, Linux, Windows | Open source (Apache-2.0) |
+| **Orca** | Free cross-platform desktop ADE with mobile apps | macOS, Windows, Linux + iOS/Android | Open source (MIT) |
+| **Claude Squad** | Parallel agents in worktrees over tmux | macOS, Linux | Open source (AGPL) |
+| **Warp** | Agentic terminal with its own agents and a cloud orchestrator | macOS, Windows, Linux | Open source (AGPL) |
+
+## Why Look for a cmux Alternative?
+
+cmux does the terminal part very well. Common reasons to look elsewhere:
+
+- **Worktree isolation.** Two agents in the same repository share one working directory unless you set up worktrees yourself.
+- **Built-in review.** You want to read the diff, comment on lines, and open a PR without leaving the app.
+- **Platform.** cmux runs on macOS only.
+- **Away from your machine.** The cmux iOS app is a TestFlight beta; you want a released app, or agents that keep running in the cloud.
+- **Scheduling.** You want agents to run on a schedule.
+
+## The Best Alternatives
+
+### Superset
+
+Superset runs any CLI agent, such as Claude Code, Codex, OpenCode, Cursor's agent, Copilot CLI, Gemini CLI, and Amp, in persistent terminal sessions, and creates a Git worktree and branch for each new local workspace. Beside the terminals, it adds a Changes pane that commits, pushes, and opens PRs, a pull request view with checks and review threads, an in-app browser with Design Mode, port management, and a Workspaces page that shows which agents need you. Workspaces run on your machine, on hosts you add through Remote Access, or in cloud workspaces, and the [iPhone and iPad app](/mobile) reaches all of them. A CLI, TypeScript SDK, and MCP server make it as scriptable as cmux, and Pro adds remote access, the iPhone and iPad app, and scheduled automations.
+
+For the direct comparison, see [Superset vs cmux](/compare/superset-vs-cmux).
+
+### Herdr
+
+Herdr is an Apache-2.0 terminal multiplexer for coding agents. It has an agent-status sidebar, sessions that survive closing the terminal and persist over SSH, worktree creation, a socket API that agents can drive, and a plugin ecosystem. Choose it if you like cmux's terminal-first approach but want it to run in any terminal, on Linux or Windows too.
+
+See [Superset vs Herdr](/compare/superset-vs-herdr).
+
+### Orca
+
+Orca is a free, MIT-licensed desktop agent development environment for macOS, Windows, and Linux. It runs agents in parallel worktrees with split terminals, per-task browser tabs, Design Mode, SSH worktrees, scheduled automations, and beta mobile apps. Choose it if you want worktrees and review in an open-source app.
+
+See [Superset vs Orca](/compare/superset-vs-orca).
+
+### Claude Squad
+
+Claude Squad manages multiple agents in separate worktrees inside tmux, driven from one terminal UI. Choose it if the thing you miss in cmux is worktree isolation and you want to stay in the terminal.
+
+See [Superset vs Claude Squad](/compare/superset-vs-claude-squad).
+
+### Warp
+
+Warp is an AGPL, GPU-accelerated terminal that runs its own Warp Agents beside CLI agents like Claude Code and Codex, with a code editor, diff review, and the Oz cloud orchestrator for background agents. Choose it if you want a polished cross-platform terminal with built-in agents.
+
+See [Superset vs Warp](/compare/superset-vs-warp).
+
+## How To Choose
+
+- For worktrees, review, a browser, automations, and remote and cloud workspaces, choose **Superset**.
+- For a terminal-native multiplexer with persistent sessions on any OS, choose **Herdr**.
+- For a free, open-source, cross-platform ADE, choose **Orca**.
+- For worktrees in the terminal with minimal tooling, choose **Claude Squad**.
+- For a cross-platform agentic terminal with built-in agents, choose **Warp**.
+
+## Verdict
+
+cmux is an excellent native terminal for agents, and some developers keep it beside a worktree tool. Choose Superset when you want each agent isolated on its own branch and want review, PRs, and previews in the same window as the terminal. Run the same small task in both and compare the review step. For the wider landscape, see [Best Terminal for AI Coding](/compare/best-terminal-for-ai-coding).
+
+## What To Try First
+
+- **Keep your agent:** launch the CLI you already use in a Superset workspace.
+- **Run two tasks:** start a second workspace on its own branch and confirm each agent has its own worktree.
+- **Review in place:** inspect each diff, run your checks, and open a PR from the Changes pane.
+- **Script it:** create a workspace and launch an agent from the `superset` CLI.
+
+[Download Superset](/download), then follow the [parallel-task walkthrough](/blog/parallel-coding-agents-guide).
+
+## Frequently Asked Questions
+
+### What is the best cmux alternative?
+
+For developers who want worktree isolation and built-in review around their agent terminals, Superset is our recommendation. For a terminal-native alternative, Herdr is the closest match.
+
+### Does cmux use Git worktrees?
+
+No. cmux is a terminal and does not create worktrees. Superset, Orca, Herdr, and Claude Squad can each put an agent in its own worktree.
+
+### Is there a cmux alternative for Linux or Windows?
+
+Herdr, Orca, and Warp run on Linux and Windows. Claude Squad runs on Linux. Superset has experimental Linux support.
+
+### Is there an open-source cmux alternative?
+
+Yes. Herdr (Apache-2.0), Orca (MIT), Claude Squad (AGPL), and Warp (AGPL) are open source. The cmux app itself is GPL-3.0. Superset is source-available under Elastic License 2.0.

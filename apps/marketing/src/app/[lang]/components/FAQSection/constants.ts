@@ -12,12 +12,6 @@ export interface FAQItem {
 	};
 }
 
-// The source English of a descriptor, for the machine-facing feeds
-// (llms.txt, index.md, JSON-LD) that stay English regardless of locale.
-export function faqSourceText(descriptor: MessageDescriptor): string {
-	return descriptor.message ?? descriptor.id;
-}
-
 export const FAQ_ITEMS: FAQItem[] = [
 	{
 		id: "vsTerminal",
@@ -119,7 +113,7 @@ export const FAQ_ITEMS: FAQItem[] = [
 		}),
 		answer: msg({
 			message:
-				"No. Your agents stay independent; Superset is the orchestration layer around them. Each task gets an isolated Git worktree, persistent sessions, diff review, and scheduled runs without tying the workflow to one provider.",
+				"No. Your agents stay independent; Superset is the orchestration layer around them. Each task gets an isolated Git worktree, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider.",
 		}),
 	},
 ];

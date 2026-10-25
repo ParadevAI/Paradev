@@ -1,3 +1,4 @@
+import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -77,7 +78,7 @@ export async function generateMetadata({
 			description: entry.description,
 			type: "article",
 			url,
-			siteName: COMPANY.NAME,
+			siteName: BRAND.NAME,
 			publishedTime: entry.date,
 		},
 		twitter: {

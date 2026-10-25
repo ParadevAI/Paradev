@@ -1,4 +1,7 @@
 import { Trans } from "@lingui/react/macro";
+import type { ResolvedAgentConfig } from "@superset/shared/agent-settings";
+import { useCallback } from "react";
+import { useIsAgentPresetEnabled } from "renderer/hooks/useIsAgentPresetEnabled";
 import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import {
@@ -27,8 +30,16 @@ export function AgentsSettings({
 }
 
 function V1AgentsSettings({ visibleItems }: AgentsSettingsProps) {
+	const isAgentPresetEnabled = useIsAgentPresetEnabled();
+	const selectEnabledPresets = useCallback(
+		(presets: ResolvedAgentConfig[]) =>
+			presets.filter((preset) => isAgentPresetEnabled(preset.id)),
+		[isAgentPresetEnabled],
+	);
 	const { data: presets = [], isLoading } =
-		electronTrpc.settings.getAgentPresets.useQuery();
+		electronTrpc.settings.getAgentPresets.useQuery(undefined, {
+			select: selectEnabledPresets,
+		});
 
 	const showEnabled = isItemVisible(
 		SETTING_ITEM_ID.AGENTS_ENABLED,

@@ -1,0 +1,106 @@
+---
+title: "Codex vs OpenCode (2026): Two Open-Source Coding Agents Compared"
+description: "Compare OpenAI's Codex CLI and OpenCode: Apache-2.0 vs MIT, OpenAI models on ChatGPT plans vs any provider, cloud tasks, parallel work, and how to run both side by side."
+date: 2026-10-13
+type: "1v1"
+competitors:
+  - codex
+  - opencode
+keywords:
+  - codex vs opencode
+  - opencode vs codex
+  - open source codex alternative
+  - codex cli alternative
+  - best open source coding agent
+  - best coding agent
+---
+
+Codex CLI and OpenCode are both open-source terminal coding agents. Codex is OpenAI's, under Apache-2.0, and runs OpenAI's models on your ChatGPT plan, with cloud tasks from Plus up. OpenCode is MIT-licensed and free, and it works with any model provider through your own keys, with optional Zen and Go model services. The choice comes down to one vendor's models and cloud versus free choice of provider.
+
+Facts were checked against OpenAI's and OpenCode's own docs on October 13, 2026.
+
+---
+
+## At a Glance
+
+| | **Codex CLI** | **OpenCode** |
+|---|---|---|
+| **Vendor** | OpenAI | Anomaly |
+| **License** | Open source (Apache-2.0) | Open source (MIT) |
+| **Models** | OpenAI's GPT-6 family; GPT-6.1 Sol by default | Any provider, with your own keys |
+| **Price** | Included in ChatGPT Free, Go, Plus, Pro, Business, Edu, Enterprise; or API key | Free; pay for models, through your own keys or OpenCode Zen and Go |
+| **Surfaces** | Terminal, IDE extension, SDK | Terminal UI, desktop app, IDE extension |
+| **Parallel work** | Subagents, `/agents` view | Built-in subagents (General, Explore, Scout) |
+| **Worktrees** | On by default | Not documented |
+| **Cloud** | `codex cloud` tasks, from ChatGPT Plus up | Not documented |
+| **Automation** | `codex exec`, Codex SDK, GitHub Action | Server with `@opencode-ai/sdk` |
+| **Extensions** | MCP, hooks, plugins, skills | MCP |
+| **Platforms** | macOS, Linux, Windows | macOS, Linux, Windows (WSL recommended) |
+
+---
+
+## What Is Codex CLI?
+
+OpenAI calls Codex a "lightweight coding agent that runs in your terminal." It is open source under Apache-2.0. It runs OpenAI's GPT-6 models, with GPT-6.1 Sol as the default since CLI 0.161.0. Every ChatGPT plan includes it, from Free up; cloud features start at Plus. With an API key you get the CLI, SDK, and IDE extension at API rates, but no cloud features. Codex runs subagents, uses worktrees by default since version 0.156, and has an `/agents` view and voice input. `codex exec`, the Codex SDK, and a GitHub Action run it in scripts and CI.
+
+## What Is OpenCode?
+
+OpenCode describes itself as "an open source AI coding agent" with a "terminal-based interface, desktop app, or IDE extension." It is MIT-licensed and free, and it works with any model provider through your own API keys. OpenCode also sells two optional model services: Zen, pay-as-you-go with no markup, and Go, a monthly plan for curated open models from $10. Built-in subagents run units of work in parallel, and a server with an SDK lets other programs drive it. On Windows, OpenCode recommends WSL.
+
+## Key Differences
+
+### Models
+
+OpenCode is model-agnostic: use GPT, Claude, Gemini, or an open model, and switch whenever you like. Codex runs OpenAI's models in OpenAI's own harness.
+
+### Cost
+
+Both tools are free to install. Codex comes with any ChatGPT plan, including Free, so if you already pay for ChatGPT you pay nothing more. OpenCode costs nothing itself; you pay your model provider, or use Zen or Go.
+
+### Cloud and Parallel Work
+
+Codex is stronger here. It has `codex cloud` tasks on ChatGPT Plus and above, worktrees on by default, and an `/agents` view. OpenCode has built-in subagents, but it does not document worktree support or a cloud mode; to isolate separate tasks, you set up worktrees yourself or use a workspace.
+
+### Surfaces and Extensions
+
+OpenCode ships its own desktop app next to the terminal UI and IDE extension. Codex has a larger set of extension points: MCP, hooks, plugins, and skills.
+
+---
+
+## Run Both Side by Side in Superset
+
+[Superset](/) runs Codex and OpenCode as built-in agents, each in its own Git worktree and terminal, on your own subscriptions and keys. Create two workspaces from the same branch, start each agent with the same prompt, compare the diffs in the Changes pane, and open a pull request from the better one. You can point OpenCode at an OpenAI model to compare the two harnesses on the same model family. Superset never proxies model calls. Worktrees keep working files apart, but they do not sandbox processes or prevent merge conflicts ([docs](https://docs.superset.sh/workspaces)). See [How to Compare Coding Agents Side by Side](/compare/compare-coding-agents-side-by-side), [Claude Code vs OpenCode](/compare/claude-code-vs-opencode), and [Multiple OpenCode Agents in Parallel](/compare/multiple-opencode-agents-parallel).
+
+## Which Should You Choose?
+
+**Choose Codex CLI if you:**
+
+- Already pay for ChatGPT, or want to start on ChatGPT Free
+- Want cloud tasks and worktree isolation built in
+- Want hooks, plugins, and skills
+
+**Choose OpenCode if you:**
+
+- Want to choose and switch model providers freely
+- Want to pay only for model usage
+- Want a desktop app from the same project
+
+For the full field, see [Best AI Coding Agents in 2026](/compare/best-coding-agents).
+
+## Frequently Asked Questions
+
+### Are Codex and OpenCode both open source?
+
+Yes. Codex CLI is Apache-2.0 and OpenCode is MIT. Both let you read and modify the code.
+
+### Can OpenCode use OpenAI models?
+
+Yes, with your own API key, since OpenCode works with any provider. Codex is OpenAI's own harness for those models and comes with ChatGPT plans.
+
+### Is Codex free?
+
+The CLI is open source and included in ChatGPT Free. Cloud tasks need ChatGPT Plus or higher. You can also use an API key at API rates, without cloud features.
+
+### Can I run Codex and OpenCode at the same time?
+
+Yes. Give each its own Git worktree so they do not edit the same files. In Superset, each runs in its own workspace on the same repository.

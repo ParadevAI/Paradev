@@ -1,7 +1,8 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@superset/ui/button";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDrop } from "react-dnd";
+import { useStore } from "zustand";
 import type { StoreApi } from "zustand/vanilla";
 import type { WorkspaceStore } from "../../../../../../../core/store";
 import {
@@ -13,6 +14,7 @@ import type {
 	SplitPosition,
 	Tab,
 } from "../../../../../../../types";
+import { PaneFocusContext } from "../../../../../../hooks/usePaneFocus";
 import type {
 	ContextMenuActionConfig,
 	PaneActionConfig,
@@ -251,6 +253,29 @@ export function Pane<TData>({
 		[pane.id, tab.id, store],
 	);
 
+	const focusHandlerRef = useRef<(() => void) | null>(null);
+	const registerFocus = useCallback((focus: () => void) => {
+		focusHandlerRef.current = focus;
+		return () => {
+			if (focusHandlerRef.current === focus) focusHandlerRef.current = null;
+		};
+	}, []);
+	const focusRequestSeq = useStore(store, (s) =>
+		s.focusRequest?.paneId === pane.id ? s.focusRequest.seq : null,
+	);
+	useEffect(() => {
+		if (focusRequestSeq === null) return;
+		// After paint, so a pane that only just mounted can take focus.
+		const frame = requestAnimationFrame(() => {
+			store.getState().clearFocusRequest(focusRequestSeq);
+			const root = dropRef.current;
+			if (!root || root.contains(document.activeElement)) return;
+			if (focusHandlerRef.current) focusHandlerRef.current();
+			else root.focus({ preventScroll: true });
+		});
+		return () => cancelAnimationFrame(frame);
+	}, [focusRequestSeq, store]);
+
 	// Merge refs: connectDrop needs a node, and we need dropRef for rect calculations
 	const setRefs = useCallback(
 		(node: HTMLDivElement | null) => {
@@ -278,65 +303,68 @@ export function Pane<TData>({
 	const isDropTarget = isOver && canDrop;
 
 	return (
-		<PaneContextMenu actions={resolvedContextMenuActions} context={context}>
-			<div
-				ref={setRefs}
-				// @container/pane-header: header pieces collapse by the pane's own
-				// width (panes resize independently of the viewport). Lives here,
-				// not on the header, so the containment's stacking context still
-				// holds both the header's absolute popovers and the pane's banners.
-				className={`@container/pane-header relative flex h-full w-full ${PANE_MIN_SIZE_CLASS_NAME} flex-col overflow-hidden border-2 transition-colors duration-150 ${
-					isActive && parentDirection !== null
-						? "border-primary/15"
-						: "border-transparent"
-				}`}
-				onPointerDownCapture={context.actions.focus}
-			>
-				<PaneHeader
-					title={title}
-					icon={icon}
-					isActive={isActive}
-					titleContent={titleContent}
-					headerExtras={headerExtras}
-					toolbar={toolbar}
-					actionsContent={context.headerActions}
-					paneId={pane.id}
-					store={store}
-					onClick={
-						definition?.onHeaderClick
-							? () => definition.onHeaderClick?.(context)
-							: context.actions.pin
-					}
-					onMiddleClick={context.actions.close}
-				/>
-				<PaneErrorBoundary
-					resetKey={pane.data}
-					onClose={context.actions.close}
-					onError={onPaneError}
+		<PaneFocusContext.Provider value={registerFocus}>
+			<PaneContextMenu actions={resolvedContextMenuActions} context={context}>
+				<div
+					ref={setRefs}
+					tabIndex={-1}
+					// @container/pane-header: header pieces collapse by the pane's own
+					// width (panes resize independently of the viewport). Lives here,
+					// not on the header, so the containment's stacking context still
+					// holds both the header's absolute popovers and the pane's banners.
+					className={`@container/pane-header relative flex h-full w-full ${PANE_MIN_SIZE_CLASS_NAME} flex-col overflow-hidden border-2 outline-none transition-colors duration-150 ${
+						isActive && parentDirection !== null
+							? "border-primary/15"
+							: "border-transparent"
+					}`}
+					onPointerDownCapture={context.actions.focus}
 				>
-					<PaneContent
-						render={() =>
-							definition ? (
-								definition.renderPane(context)
-							) : (
-								<PaneFallback
-									title={<Trans>This pane can't be shown</Trans>}
-									detail={<Trans>Unknown pane type: {paneKind}</Trans>}
-								>
-									<Button
-										variant="outline"
-										size="sm"
-										onClick={context.actions.close}
-									>
-										<Trans>Close pane</Trans>
-									</Button>
-								</PaneFallback>
-							)
+					<PaneHeader
+						title={title}
+						icon={icon}
+						isActive={isActive}
+						titleContent={titleContent}
+						headerExtras={headerExtras}
+						toolbar={toolbar}
+						actionsContent={context.headerActions}
+						paneId={pane.id}
+						store={store}
+						onClick={
+							definition?.onHeaderClick
+								? () => definition.onHeaderClick?.(context)
+								: context.actions.pin
 						}
+						onMiddleClick={context.actions.close}
 					/>
-				</PaneErrorBoundary>
-				{isDropTarget && <DropZoneOverlay position={dropPosition} />}
-			</div>
-		</PaneContextMenu>
+					<PaneErrorBoundary
+						resetKey={pane.data}
+						onClose={context.actions.close}
+						onError={onPaneError}
+					>
+						<PaneContent
+							render={() =>
+								definition ? (
+									definition.renderPane(context)
+								) : (
+									<PaneFallback
+										title={<Trans>This pane can't be shown</Trans>}
+										detail={<Trans>Unknown pane type: {paneKind}</Trans>}
+									>
+										<Button
+											variant="outline"
+											size="sm"
+											onClick={context.actions.close}
+										>
+											<Trans>Close pane</Trans>
+										</Button>
+									</PaneFallback>
+								)
+							}
+						/>
+					</PaneErrorBoundary>
+					{isDropTarget && <DropZoneOverlay position={dropPosition} />}
+				</div>
+			</PaneContextMenu>
+		</PaneFocusContext.Provider>
 	);
 }

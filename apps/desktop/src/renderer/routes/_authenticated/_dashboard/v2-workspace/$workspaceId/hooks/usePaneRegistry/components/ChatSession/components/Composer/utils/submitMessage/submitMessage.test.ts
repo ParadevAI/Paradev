@@ -1,4 +1,6 @@
 import { expect, mock, test } from "bun:test";
+import { parsePastedText } from "@superset/chat/core";
+import type { UserContent } from "@superset/chat/protocol";
 import type { PromptInputSubmitPayload } from "@superset/chat-ui/PromptInput";
 import { submitMessage } from "./submitMessage";
 
@@ -6,6 +8,7 @@ const draft: PromptInputSubmitPayload = {
 	text: "Review the file",
 	files: [],
 	mentions: [],
+	pastedTexts: [],
 	steer: false,
 };
 
@@ -96,4 +99,57 @@ test("accepted sends retain attachment tags, chip metadata and steering", async 
 		],
 		{ steer: true },
 	);
+});
+
+test("accepted sends keep pasted-card contents and hidden MCP context", async () => {
+	const onSend = mock<
+		(content: UserContent[], options: { steer: boolean }) => Promise<void>
+	>(async () => undefined);
+	const mcpContext =
+		'MCP context: Use the configured MCP server "Fixture MCP" when relevant to this request.';
+	await submitMessage(
+		{
+			...draft,
+			text: "  Review the log  ",
+			pastedTexts: ["first pasted log", "second pasted log"],
+		},
+		{
+			uploadAttachments: async () => ["[attachment: review.txt]"],
+			onSend,
+			mcpContext,
+		},
+	);
+	expect(onSend).toHaveBeenCalledTimes(1);
+	const [content, options] = onSend.mock.calls[0] ?? [];
+	expect(content).toHaveLength(2);
+	const first = content?.[0];
+	if (first?.type !== "text") throw new Error("Expected text content");
+	expect(parsePastedText(first.text)).toEqual({
+		text: "Review the log\n[attachment: review.txt]",
+		pastes: ["first pasted log", "second pasted log"],
+	});
+	expect(content?.[1]).toEqual({
+		type: "text",
+		text: mcpContext,
+		hidden: true,
+	});
+	expect(options).toEqual({ steer: false });
+});
+
+test("a pasted-card-only message sends its content without a fabricated visible prompt", async () => {
+	const onSend = mock<
+		(content: UserContent[], options: { steer: boolean }) => Promise<void>
+	>(async () => undefined);
+	await submitMessage(
+		{ ...draft, text: "", pastedTexts: ["complete pasted message"] },
+		{ uploadAttachments: async () => [], onSend, mcpContext: null },
+	);
+	const [content] = onSend.mock.calls[0] ?? [];
+	expect(content).toHaveLength(1);
+	const first = content?.[0];
+	if (first?.type !== "text") throw new Error("Expected text content");
+	expect(parsePastedText(first.text)).toEqual({
+		text: "",
+		pastes: ["complete pasted message"],
+	});
 });

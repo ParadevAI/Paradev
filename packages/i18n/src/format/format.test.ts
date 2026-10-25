@@ -6,6 +6,7 @@ import {
 	formatCompactRelativeTime,
 	formatCurrency,
 	formatDate,
+	formatElapsed,
 	formatNumber,
 	formatPercent,
 	formatPrice,
@@ -128,6 +129,19 @@ describe("formatRelativeTime", () => {
 		] as const;
 		for (const [elapsed, expected] of ages) {
 			expect(formatAge(now - elapsed, now)).toBe(expected);
+		}
+	});
+
+	test("elapsed time counts seconds before it counts minutes", () => {
+		const start = new Date("2026-08-28T12:00:00Z").getTime();
+		const cases = [
+			[0, "0s"],
+			[45 * 1000, "45s"],
+			[60 * 1000, "1m"],
+			[61 * 60 * 1000, "1h"],
+		] as const;
+		for (const [elapsed, expected] of cases) {
+			expect(formatElapsed(start, start + elapsed)).toBe(expected);
 		}
 	});
 

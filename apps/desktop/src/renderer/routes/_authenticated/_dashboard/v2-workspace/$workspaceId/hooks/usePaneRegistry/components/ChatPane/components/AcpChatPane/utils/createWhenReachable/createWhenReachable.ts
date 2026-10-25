@@ -9,7 +9,6 @@ export async function createWhenReachable<T>({
 	attempt,
 	isReachableFailure,
 	shouldContinue,
-	onUnreachable,
 	wait = defaultWait,
 	timeoutMs = 15_000,
 	initialDelayMs = 1_000,
@@ -18,7 +17,6 @@ export async function createWhenReachable<T>({
 	attempt: () => Promise<T>;
 	isReachableFailure: (error: unknown) => boolean;
 	shouldContinue: () => boolean;
-	onUnreachable: (unreachable: boolean) => void;
 	wait?: Wait;
 	timeoutMs?: number;
 	initialDelayMs?: number;
@@ -39,11 +37,9 @@ export async function createWhenReachable<T>({
 					},
 				);
 			});
-			onUnreachable(false);
 			return result;
 		} catch (error) {
 			if (isReachableFailure(error) || !shouldContinue()) throw error;
-			onUnreachable(true);
 			await new Promise<void>((resolve) =>
 				wait(resolve, Math.min(initialDelayMs * 2 ** tries, maxDelayMs)),
 			);
