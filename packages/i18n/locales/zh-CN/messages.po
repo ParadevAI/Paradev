@@ -9609,9 +9609,6 @@ msgstr "最后更新：{lastUpdated}"
 msgid "Last used"
 msgstr "上次使用"
 
-msgid "Last used: {lastUsedProviderLabel}"
-msgstr "上次使用：{lastUsedProviderLabel}"
-
 msgid "Late 2026"
 msgstr "2026年末"
 
