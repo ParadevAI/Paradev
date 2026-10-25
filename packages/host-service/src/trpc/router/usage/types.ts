@@ -67,8 +67,6 @@ export type UsageAccountStatus =
 	| "signed_out";
 
 export interface UsageQuotaWindow {
-	observedAt?: Date;
-	source?: "provider" | "claude_statusline" | "claude_sdk";
 	/** Stable identifier within the account, e.g. "five_hour", "seven_day",
 	 * or a model-scoped key. */
 	id: string;
@@ -122,9 +120,6 @@ export interface UsageAccount {
 	/** Whether newly launched agents use this account (host-wide default). */
 	isDefault: boolean;
 	fetchedAt: Date;
-	retryAt?: Date;
-	lastKnownUsage?: { fetchedAt: Date; windows: UsageQuotaWindow[] };
-	prepaidBalance?: { amount: number; currency: string | null; checkedAt: Date };
 	/** Opaque account scope verified by the provider response, never a credential. */
 	quotaIdentity?: string;
 	sourceId?: string;

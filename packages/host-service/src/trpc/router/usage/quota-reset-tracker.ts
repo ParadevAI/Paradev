@@ -43,25 +43,25 @@ export function createQuotaResetTracker(now = Date.now) {
 				if (time - row.touched > 8 * 24 * 60 * 60_000) rows.delete(key);
 			const output = accounts.map((account) => {
 				const { resetNotice: _notice, ...clean } = account;
-				const age = time - account.fetchedAt.getTime();
 				if (
 					!account.quotaIdentity ||
 					!account.plan ||
 					!["claude", "codex"].includes(account.agent) ||
 					account.credentialKind !== "subscription" ||
-					account.status !== "ok" ||
-					!Number.isFinite(age) ||
-					age < -60_000 ||
-					age > FRESH
+					account.status !== "ok"
 				)
 					return clean;
 				const notices: UsageResetNotice[] = [];
 				for (const window of account.windows) {
 					const kind = windowKind(window);
 					const boundary = window.resetsAt?.getTime();
- const measured = window.observedAt?.getTime() ?? account.fetchedAt.getTime();
+					const measured =
+						window.observedAt?.getTime() ?? account.fetchedAt.getTime();
 					if (
-						!kind || !Number.isFinite(measured) || measured > time || time-measured > FRESH ||
+						!kind ||
+						!Number.isFinite(measured) ||
+						measured > time ||
+						time - measured > FRESH ||
 						boundary === undefined ||
 						!Number.isFinite(boundary) ||
 						boundary <= time ||
@@ -72,8 +72,8 @@ export function createQuotaResetTracker(now = Date.now) {
 						continue;
 					const key = opaqueQuotaIdentity(
 						account.agent,
-						account.accountKey,
-						JSON.stringify([account.quotaIdentity, account.plan, kind]),
+						account.quotaIdentity,
+						JSON.stringify([account.plan, kind]),
 					);
 					const sample = {
 						at: measured,

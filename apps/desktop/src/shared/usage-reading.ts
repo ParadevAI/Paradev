@@ -1,5 +1,11 @@
-export const FRESH_USAGE_AGE_MS = 6 * 60_000;
-export const REMOTE_USAGE_AGE_MS = 16 * 60_000;
+import {
+	QUOTA_NATIVE_FRESHNESS_MS,
+	QUOTA_PROVIDER_FRESHNESS_MS,
+	quotaObservationFresh,
+} from "./quota-freshness";
+
+export const FRESH_USAGE_AGE_MS = QUOTA_NATIVE_FRESHNESS_MS;
+export const REMOTE_USAGE_AGE_MS = QUOTA_PROVIDER_FRESHNESS_MS;
 export const RETAINED_USAGE_AGE_MS = 60 * 60_000;
 
 interface RecordedWindow {
@@ -13,6 +19,8 @@ export interface UsageReading<T extends RecordedWindow> {
 	freshness: "fresh" | "stale" | "unavailable";
 	checkedAt: Date | null;
 	windows: T[];
+	/** Availability is independent of an unrelated outer HTTP observation date. */
+	liveEligible?: boolean;
 }
 
 /** Retained usage belongs to the verified account, never to a changed sign-in. */
@@ -33,33 +41,31 @@ export function usageReading<T extends RecordedWindow>(
 	const age = now - timestamp;
 	const validDate = Number.isFinite(age) && age >= -60_000;
 	const visible = validDate && age <= RETAINED_USAGE_AGE_MS;
-	const freshAge = account.windows.some(
-		(window) => window.source === "provider",
-	)
-		? REMOTE_USAGE_AGE_MS
-		: FRESH_USAGE_AGE_MS;
+	const liveEligible =
+		!offline && !account.historical && account.status === "ok";
+	const windows = account.windows.filter((window) => {
+		if (!Number.isFinite(window.usedPercent)) return false;
+		const measured = window.observedAt ?? account.checkedAt;
+		if (measured === null || measured === undefined) return false;
+		const windowAge = now - new Date(measured).getTime();
+		return (
+			Number.isFinite(windowAge) &&
+			windowAge >= -60_000 &&
+			windowAge <= RETAINED_USAGE_AGE_MS
+		);
+	});
 	return {
+		// The summary date describes provider collection. It must not be renewed by a native leaf.
 		freshness: !visible
-			? "unavailable"
-			: !offline &&
-					!account.historical &&
-					account.status === "ok" &&
-					age <= freshAge
+			? windows.length > 0
+				? "stale"
+				: "unavailable"
+			: liveEligible && quotaObservationFresh({}, account.checkedAt, now)
 				? "fresh"
 				: "stale",
 		checkedAt: validDate ? new Date(timestamp) : null,
-		windows: visible
-			? account.windows.filter((window) => {
-					if (!Number.isFinite(window.usedPercent)) return false;
-					if (!window.observedAt) return true;
-					const windowAge = now - new Date(window.observedAt).getTime();
-					return (
-						Number.isFinite(windowAge) &&
-						windowAge >= -60_000 &&
-						windowAge <= RETAINED_USAGE_AGE_MS
-					);
-				})
-			: [],
+		windows,
+		liveEligible,
 	};
 }
 
@@ -74,14 +80,10 @@ export function quotaWindowReading<T extends RecordedWindow>(
 		if (Number.isFinite(reset) && reset <= now) return "awaiting_refresh";
 		if (!Number.isFinite(reset)) return "historical";
 	}
-	if (window.observedAt) {
-		const age = now - new Date(window.observedAt).getTime();
-		if (!Number.isFinite(age) || age < -60_000) return "unavailable";
-		const freshAge =
-			window.source === "provider" ? REMOTE_USAGE_AGE_MS : FRESH_USAGE_AGE_MS;
-		if (age > freshAge) return "historical";
-	}
-	return reading.freshness === "fresh" ? "current" : "historical";
+	return (reading.liveEligible ?? reading.freshness === "fresh") &&
+		quotaObservationFresh(window, reading.checkedAt, now)
+		? "current"
+		: "historical";
 }
 
 export function usageObservation<T extends RecordedWindow>(account: {
