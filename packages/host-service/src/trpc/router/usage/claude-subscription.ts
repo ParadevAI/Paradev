@@ -1,3 +1,4 @@
+import { createClaudeResetEnvelope } from "./claude-reset-envelope";
 import {
 	claudeLastKnown,
 	type createClaudeLastKnownStore,
@@ -141,6 +142,7 @@ export interface ClaudeSubscriptionQuota {
 	retryAt?: Date;
 	lastKnownUsage?: UsageAccount["lastKnownUsage"];
 	prepaidBalance?: UsageAccount["prepaidBalance"];
+ resetCredits?: UsageAccount["resetCredits"];
 }
 
 type Budgets = { primaryMs: number; profileMs: number };
@@ -167,6 +169,7 @@ export function createClaudeSubscriptionReader({
 		now,
 	);
 	const wallets = createClaudePrepaidReader({ request, now });
+ const usageWithResets = createClaudeResetEnvelope(request, now);
 	const pending = new Map<string, Promise<ClaudeSubscriptionQuota>>();
 	function profileKey(token: string) {
 		return hashQuotaScope(["claude-profile-cache-v1", token]);
@@ -275,8 +278,7 @@ export function createClaudeSubscriptionReader({
 				const signal = context.signal
 					? AbortSignal.any([budgetSignal, context.signal])
 					: budgetSignal;
-				const response = await request(
-					"usage",
+				const {response, resetCredits} = await usageWithResets(
 					token,
 					USAGE_URL,
 					{
@@ -384,6 +386,7 @@ export function createClaudeSubscriptionReader({
 					extraUsage,
 					fetchedAt: observedAt,
 					...(prepaidBalance ? { prepaidBalance } : {}),
+ ...(resetCredits ? {resetCredits} : {}),
 				});
 			});
 		} catch {

@@ -452,6 +452,10 @@
 		"./missing-procedure-error": {
 			"types": "./src/missing-procedure-error.ts",
 			"default": "./src/missing-procedure-error.ts"
+		},
+		"./account-colors": {
+			"types": "./src/account-colors.ts",
+			"default": "./src/account-colors.ts"
 		}
 	},
 	"scripts": {

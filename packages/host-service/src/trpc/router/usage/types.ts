@@ -75,6 +75,21 @@ export interface UsageQuotaWindow {
 	label: string;
 	usedPercent: number;
 	resetsAt: Date | null;
+	windowSeconds?: number;
+	observedAt?: Date;
+	source?: "provider" | "claude_statusline" | "claude_sdk";
+}
+
+export interface UsageResetCredits {
+	availableCount: number | null;
+	expirations: Array<Date | null> | null;
+	checkedAt: Date;
+}
+
+export interface UsageResetNotice {
+	id: string;
+	kind: "session" | "weekly";
+	confirmedAt: Date;
 }
 
 export interface UsageAccount {
@@ -107,4 +122,13 @@ export interface UsageAccount {
 	/** Whether newly launched agents use this account (host-wide default). */
 	isDefault: boolean;
 	fetchedAt: Date;
+	retryAt?: Date;
+	lastKnownUsage?: { fetchedAt: Date; windows: UsageQuotaWindow[] };
+	prepaidBalance?: { amount: number; currency: string | null; checkedAt: Date };
+	/** Opaque account scope verified by the provider response, never a credential. */
+	quotaIdentity?: string;
+	sourceId?: string;
+	resetCredits?: UsageResetCredits;
+	resetNotice?: UsageResetNotice;
+	discoveryFailed?: boolean;
 }

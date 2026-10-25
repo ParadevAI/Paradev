@@ -291,12 +291,33 @@ describe("Shell Environment", () => {
 		expect(env.FOO).toBe("bar");
 		expect("UNSET" in env).toBe(false);
 
-		const shellPath = shellEnv.PATH || shellEnv.Path;
-		if (shellPath) {
-			expect(env.PATH).toBe(shellPath);
-			if (process.platform === "win32" || "Path" in shellEnv) {
-				expect(env.Path).toBe(shellPath);
+		const shellPath = shellEnv.PATH || shellEnv.Path || "";
+		expect(shellPath.length).toBeGreaterThan(0);
+		if (process.platform === "darwin") {
+			const commonToolPaths = [
+				"/opt/homebrew/bin",
+				"/opt/homebrew/sbin",
+				"/usr/local/bin",
+				"/usr/local/sbin",
+			];
+			const shellEntries = shellPath.split(":");
+			const actualEntries = env.PATH.split(":");
+			const prependedEntries = actualEntries.slice(0, -shellEntries.length);
+
+			expect(actualEntries.slice(-shellEntries.length)).toEqual(shellEntries);
+			expect(new Set(prependedEntries).size).toBe(prependedEntries.length);
+			for (const entry of prependedEntries) {
+				expect(commonToolPaths).toContain(entry);
+				expect(shellEntries).not.toContain(entry);
 			}
+			for (const entry of commonToolPaths) {
+				expect(actualEntries).toContain(entry);
+			}
+		} else {
+			expect(env.PATH).toBe(shellPath);
+		}
+		if (process.platform === "win32" || "Path" in shellEnv) {
+			expect(env.Path).toBe(shellPath);
 		}
 	}, 10_000);
 

@@ -37,6 +37,8 @@ describe("terminal router integration", () => {
 	let scenario: BasicScenario;
 
 	beforeEach(async () => {
+		// Native fixtures must not depend on the Mac account's configured shell.
+		__setAccountShellForTesting("/bin/sh");
 		initTerminalBaseEnv({
 			PATH: process.env.PATH ?? "/usr/bin:/bin",
 			HOME: process.env.HOME ?? tmpdir(),

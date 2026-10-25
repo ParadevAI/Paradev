@@ -37,6 +37,7 @@ export interface V1PaneAgentSession {
 }
 
 export interface AppState {
+	usageWidget?: import("shared/usage-widget/model").WidgetPreferences;
 	/**
 	 * The pre-multi-window layout. Retained as the record the first restored
 	 * window inherits (see LEGACY_WINDOW_KEY); new windows never write here.

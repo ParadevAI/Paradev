@@ -201,6 +201,10 @@ msgstr "{0, plural, one {# projekt} few {# projekty} many {# projektów} other {
 msgid "{0, plural, one {# repository} other {# repositories}}"
 msgstr "{0, plural, one {# repozytorium} few {# repozytoria} many {# repozytoriów} other {# repozytorium}}"
 
+#. placeholder {0}: resets.count
+msgid "{0, plural, one {# reset available} other {# resets available}}"
+msgstr "{0, plural, one {# odnowienie dostępne} other {# odnowień dostępnych}}"
+
 #. placeholder {0}: results.length
 msgid "{0, plural, one {# result in Cloud} other {# results in Cloud}}"
 msgstr "{0, plural, one {# wynik w chmurze} few {# wyniki w chmurze} many {# wyników w chmurze} other {# wyniku w chmurze}}"
@@ -769,6 +773,9 @@ msgstr "{count, plural, one {# komentarz} few {# komentarze} many {# komentarzy}
 
 msgid "{count, plural, one {# file} other {# files}}"
 msgstr "{count, plural, one {# plik} few {# pliki} many {# plików} other {# pliku}}"
+
+msgid "{count, plural, one {# reset available} other {# resets available}}"
+msgstr "{count, plural, one {# odnowienie dostępne} other {# odnowień dostępnych}}"
 
 msgid "{count, plural, one {# search} other {# searches}}"
 msgstr "{count, plural, one {# wyszukiwanie} few {# wyszukiwania} many {# wyszukiwań} other {# wyszukiwania}}"
@@ -1663,6 +1670,12 @@ msgstr "Akordeon"
 msgid "Account"
 msgstr "Konto"
 
+msgid "Account appearance"
+msgstr "Wygląd konta"
+
+msgid "Account color"
+msgstr "Kolor konta"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceNotResolvable"
 msgstr "Instalacja na koncie obsługuje tylko manifesty własne, więc {plugin} z {marketplace} nie może jeszcze zostać zainstalowany na Twoim koncie. Pozostaje zainstalowany na tym komputerze."
@@ -1675,6 +1688,9 @@ msgstr "Nazwa konta"
 
 msgid "Account pending deletion"
 msgstr "Konto oczekuje na usunięcie"
+
+msgid "Account unavailable"
+msgstr "Konto niedostępne"
 
 msgid "Account usage"
 msgstr "Wykorzystanie konta"
@@ -1723,6 +1739,9 @@ msgstr "Do utworzenia klucza API wymagana jest aktywna organizacja"
 
 msgid "Active sessions"
 msgstr "Aktywne sesje"
+
+msgid "Active window"
+msgstr "Aktywne okno"
 
 msgid "Activity"
 msgstr "Aktywność"
@@ -1773,6 +1792,9 @@ msgstr "Dodaj tu konfiguracje agentów później, gdy zechcesz je opublikować."
 
 msgid "Add agents…"
 msgstr "Dodaj agentów…"
+
+msgid "Add an account to see its usage here."
+msgstr "Dodaj konto, aby zobaczyć tutaj jego użycie."
 
 msgid "add an agent"
 msgstr "dodać agenta"
@@ -2079,6 +2101,9 @@ msgstr "AI · Status"
 msgid "AI authentication failed. Please check your AI settings."
 msgstr "Uwierzytelnienie AI nie powiodło się. Sprawdź ustawienia AI."
 
+msgid "AI usage"
+msgstr "Użycie AI"
+
 msgid "Alert"
 msgstr "Alert"
 
@@ -2125,6 +2150,12 @@ msgstr "Wszystkie cele ({0}) pracują na {nextLabel}."
 
 msgid "All {versionCount} versions and their content are removed. Anyone with the link loses access."
 msgstr "Wszystkie wersje ({versionCount}) i ich treść zostaną usunięte. Każdy z linkiem straci dostęp."
+
+msgid "All accounts appear on the edge unless you hide them."
+msgstr "Wszystkie konta są widoczne przy krawędzi ekranu, chyba że je ukryjesz."
+
+msgid "All accounts are hidden."
+msgstr "Wszystkie konta są ukryte."
 
 msgid "All assignees"
 msgstr "Wszyscy przypisani"
@@ -2938,6 +2969,9 @@ msgstr "Awatar zaktualizowany!"
 msgid "Awaiting {0}"
 msgstr "Oczekuje na {0}"
 
+msgid "Awaiting refresh"
+msgstr "Oczekiwanie na odświeżenie"
+
 msgid "Awaiting Response — {workspaceName}"
 msgstr "Oczekiwanie na odpowiedź — {workspaceName}"
 
@@ -3557,6 +3591,9 @@ msgstr "Kategoria"
 msgid "Caution"
 msgstr "Ostrożnie"
 
+msgid "Celebrate quota resets"
+msgstr "Świętuj odnowienie limitów"
+
 msgid "Certificate Authority Invalid"
 msgstr "Nieprawidłowy urząd certyfikacji"
 
@@ -3805,6 +3842,9 @@ msgstr "Wybierz sekcję."
 msgid "Choose agent"
 msgstr "Wybierz agenta"
 
+msgid "Choose an account"
+msgstr "Wybierz konto"
+
 msgid "Choose an existing repo folder"
 msgstr "Wybierz folder istniejącego repozytorium"
 
@@ -3825,6 +3865,9 @@ msgstr "Wybierz, jak otwierać ścieżki plików po Cmd+kliknięciu w terminalu"
 
 msgid "Choose MCP servers for this message"
 msgstr "Wybierz serwery MCP dla tej wiadomości"
+
+msgid "Choose one account per menu bar icon. The notch shows all accounts unless you hide them. Missing or stale usage shows a dash."
+msgstr "Wybierz jedno konto dla każdej ikony na pasku menu. Boczny panel pokazuje wszystkie konta, o ile ich nie ukryjesz. Brakujące lub nieaktualne dane użycia są oznaczone kreską."
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "Wybierz, co wyczyścić z przeglądarki w aplikacji."
@@ -5056,6 +5099,9 @@ msgstr "Nie udało się opuścić kolejki"
 msgid "Could not list directory"
 msgstr "Nie udało się wylistować katalogu"
 
+msgid "Could not load accounts. Refresh to try again."
+msgstr "Nie udało się wczytać kont. Odśwież, aby spróbować ponownie."
+
 #. placeholder {0}: host.name
 msgid "Could not load agents from {0}"
 msgstr "Nie udało się wczytać agentów z {0}"
@@ -5084,6 +5130,9 @@ msgstr "Nie udało się wczytać tych różnic"
 msgid "Could not load this file."
 msgstr "Nie udało się wczytać tego pliku."
 
+msgid "Could not load usage display settings."
+msgstr "Nie udało się wczytać ustawień wyświetlania użycia."
+
 msgid "Could not load your machines"
 msgstr "Nie udało się wczytać Twoich maszyn"
 
@@ -5101,6 +5150,9 @@ msgstr "Nie udało się otworzyć linku"
 
 msgid "Could not open Photos"
 msgstr "Nie udało się otworzyć Zdjęć"
+
+msgid "Could not open usage."
+msgstr "Nie udało się otworzyć użycia."
 
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
@@ -5185,6 +5237,12 @@ msgstr "Nie udało się wznowić"
 
 msgid "Could not resume the chat"
 msgstr "Nie udało się wznowić czatu"
+
+msgid "Could not save account color."
+msgstr "Nie udało się zapisać koloru konta."
+
+msgid "Could not save usage display settings."
+msgstr "Nie udało się zapisać ustawień wyświetlania użycia."
 
 msgid "Could not send"
 msgstr "Nie udało się wysłać"
@@ -5768,6 +5826,12 @@ msgstr "Menedżer kreatywny, Valid"
 msgid "Credentials stay on the server"
 msgstr "Poświadczenia pozostają na serwerze"
 
+msgid "Credit balance"
+msgstr "Saldo kredytów"
+
+msgid "Credits"
+msgstr "Kredyty"
+
 msgid "Cross-feature components living outside packages/ui — check here before building a new one"
 msgstr "Komponenty międzyfunkcyjne spoza packages/ui — sprawdź tutaj, zanim zbudujesz nowy"
 
@@ -5947,8 +6011,14 @@ msgstr "default · secondary · outline · ghost · link · destructive"
 msgid "Default ({defaultWorktreePath})"
 msgstr "Domyślny ({defaultWorktreePath})"
 
+msgid "Default account"
+msgstr "Konto domyślne"
+
 msgid "Default base for new workspaces. Override per-workspace at creation."
 msgstr "Domyślna baza nowych obszarów roboczych. Można zmienić ją osobno podczas tworzenia."
+
+msgid "Default color"
+msgstr "Domyślny kolor"
 
 msgid "Default effort"
 msgstr "Domyślny wysiłek"
@@ -6905,6 +6975,9 @@ msgstr "Podaj katalog nadrzędny na {hostName}"
 
 msgid "Enter a path on {hostName}"
 msgstr "Podaj ścieżkę na {hostName}"
+
+msgid "Enter a six-digit hex color."
+msgstr "Wpisz sześciocyfrowy kolor szesnastkowy."
 
 msgid "Enter a URL into the search bar above."
 msgstr "Wpisz adres URL w pasku wyszukiwania powyżej."
@@ -7932,6 +8005,9 @@ msgstr "Płomień"
 msgid "Fleets of agents plan, implement, review, and test each other's work. Humans set direction, arbitrate exceptions, and own taste. The unit of human attention is no longer the pull request. It is the decision."
 msgstr "Floty agentów planują, wdrażają, przeglądają i testują nawzajem swoją pracę. Ludzie wyznaczają kierunek, rozstrzygają wyjątki i odpowiadają za gust. Jednostką ludzkiej uwagi nie jest już pull request. Jest nią decyzja."
 
+msgid "Floats above other apps. Shows session and weekly usage for your quick-view accounts."
+msgstr "Unosi się nad innymi aplikacjami. Pokazuje zużycie sesji i tygodnia dla kont w szybkim podglądzie."
+
 msgid "Focus Chat Input"
 msgstr "Aktywuj pole czatu"
 
@@ -8502,6 +8578,9 @@ msgstr "Pomoc i dokumentacja"
 msgid "Henry Ford"
 msgstr "Henry Ford"
 
+msgid "Hex color"
+msgstr "Kolor szesnastkowy"
+
 #. placeholder {0}: project.name
 msgid "Hid \"{0}\" from the sidebar"
 msgstr "Ukryto „{0}” z paska bocznego"
@@ -8517,6 +8596,9 @@ msgstr "Ukryj"
 
 msgid "Hide {displayName}"
 msgstr "Ukryj {displayName}"
+
+msgid "Hide account"
+msgstr "Ukryj konto"
 
 msgid "Hide checks"
 msgstr "Ukryj kontrole"
@@ -9576,6 +9658,20 @@ msgstr "Ostatnia aktywność agenta {0}"
 msgid "Last attached"
 msgstr "Ostatnie podłączenie"
 
+#. placeholder {0}: formatRelativeTime(reading.checkedAt)
+msgid "Last checked {0}"
+msgstr "Ostatnio sprawdzono {0}"
+
+#. placeholder {0}: formatRelativeTime(reading.checkedAt)
+msgid "Last checked {0} · not live"
+msgstr "Ostatnio sprawdzono {0} · dane nie są bieżące"
+
+msgid "Last checked {relativeTime}"
+msgstr "Ostatnio sprawdzono {relativeTime}"
+
+msgid "Last checked {relativeTime} · not live"
+msgstr "Ostatnio sprawdzono {relativeTime} · dane nieaktualne"
+
 msgid "Last day of each month"
 msgstr "Ostatni dzień każdego miesiąca"
 
@@ -9942,6 +10038,9 @@ msgstr "Loader · Braille Spinner"
 msgid "Loading"
 msgstr "Wczytywanie"
 
+msgid "Loading accounts…"
+msgstr "Wczytywanie kont…"
+
 msgid "Loading agent settings..."
 msgstr "Wczytywanie ustawień agenta..."
 
@@ -10184,6 +10283,9 @@ msgstr "Zarządzaj"
 msgid "Manage {title}"
 msgstr "Zarządzaj {title}"
 
+msgid "Manage accounts"
+msgstr "Zarządzaj kontami"
+
 msgid "Manage accounts…"
 msgstr "Zarządzaj kontami…"
 
@@ -10378,6 +10480,15 @@ msgstr "Udział pamięci"
 
 msgid "Mention."
 msgstr "Wspomnij."
+
+msgid "Menu bar"
+msgstr "Pasek menu"
+
+msgid "Menu bar accounts"
+msgstr "Konta na pasku menu"
+
+msgid "Menu bar quota window"
+msgstr "Okres limitu w pasku menu"
 
 msgid "Menubar"
 msgstr "Pasek menu"
@@ -10937,6 +11048,10 @@ msgstr "Następna płatność: {nextTotal} dnia {nextDate}, plus użycie ponad p
 
 msgid "Next comment"
 msgstr "Następny komentarz"
+
+#. placeholder {0}: formatRelativeTime(resets.nextExpiry)
+msgid "Next expires {0}"
+msgstr "Następny wygasa {0}"
 
 msgid "Next file"
 msgstr "Następny plik"
@@ -12430,6 +12545,9 @@ msgstr "Otwórz obszar roboczy w aplikacji wybranej w menu „Otwórz w” (VS C
 msgid "Open this run's workspace"
 msgstr "Otwórz obszar roboczy tego uruchomienia"
 
+msgid "Open usage"
+msgstr "Otwórz użycie"
+
 msgid "Open workspace"
 msgstr "Otwórz obszar roboczy"
 
@@ -12869,6 +12987,9 @@ msgstr "Pamięć agentów dla każdego repozytorium"
 msgid "Percent of total system RAM used by monitored Superset resources only (not all apps). A high share means Superset is a major contributor to system memory pressure; a low share means pressure is likely elsewhere."
 msgstr "Procent całkowitej pamięci RAM systemu zużywany wyłącznie przez monitorowane zasoby Superset (nie przez wszystkie aplikacje). Wysoki udział oznacza, że Superset istotnie obciąża pamięć systemu; niski udział oznacza, że presja pochodzi skądinąd."
 
+msgid "Percentage"
+msgstr "Procent"
+
 msgid "Permanently delete \"{projectName}\"?"
 msgstr "Trwale usunąć „{projectName}”?"
 
@@ -13172,6 +13293,9 @@ msgstr "Prefiks"
 msgid "Prefix of this team's task IDs. Changing it renames every task in the team."
 msgstr "Prefiks identyfikatorów zadań tego zespołu. Jego zmiana zmienia nazwy wszystkich zadań zespołu."
 
+msgid "Prepaid balance"
+msgstr "Saldo przedpłacone"
+
 msgid "Preparing"
 msgstr "Przygotowywanie"
 
@@ -13273,6 +13397,9 @@ msgstr "Cena zależy od zespołu i sposobu użycia. Skontaktuj się z nami, a pr
 
 msgid "Primary"
 msgstr "Główny"
+
+msgid "Primary display"
+msgstr "Ekran główny"
 
 msgid "Primary Key"
 msgstr "Klucz główny"
@@ -13482,6 +13609,9 @@ msgstr "Właściwości"
 msgid "Provide either id or slug"
 msgstr "Podaj id albo slug"
 
+msgid "Provider icons and percentages"
+msgstr "Ikony dostawców i procenty"
+
 #. placeholder {0}: sourceConfig?.label ?? binding.agentId
 msgid "Provider: {0}"
 msgstr "Dostawca: {0}"
@@ -13654,6 +13784,12 @@ msgstr "Zakończ całkowicie"
 
 msgid "Quit the source browser first so its logins are saved to disk. You'll be asked to allow Keychain access."
 msgstr "Najpierw zamknij źródłową przeglądarkę, aby jej dane logowania zapisały się na dysku. Pojawi się prośba o dostęp do Keychain."
+
+msgid "Quota exhausted. Reset time unavailable"
+msgstr "Limit wyczerpany. Czas odnowienia niedostępny"
+
+msgid "Quota exhausted. Resets in {countdown}"
+msgstr "Limit wyczerpany. Odnowienie za {countdown}"
 
 msgid "Radix Primitives"
 msgstr "Radix Primitives"
@@ -13917,6 +14053,9 @@ msgstr "Odśwież pull requesty"
 msgid "Refresh repositories"
 msgstr "Odśwież repozytoria"
 
+msgid "Refresh usage"
+msgstr "Odśwież użycie"
+
 msgid "Refreshes when Claude Code next runs."
 msgstr "Odświeży się przy następnym uruchomieniu Claude Code."
 
@@ -13976,6 +14115,12 @@ msgstr "Przenieść projekt?"
 
 msgid "Relocating…"
 msgstr "Przenoszenie…"
+
+msgid "remaining"
+msgstr "pozostało"
+
+msgid "Remaining"
+msgstr "Pozostało"
 
 msgid "rematch"
 msgstr "rewanż"
@@ -14347,6 +14492,11 @@ msgstr "Zresetuj powiększenie"
 msgid "Reset Zoom"
 msgstr "Zresetuj powiększenie"
 
+#. placeholder {0}: formatRelativeTime(new Date(quota.resetsAt))
+#. placeholder {0}: formatRelativeTime(new Date(w.resetsAt))
+msgid "Resets {0}"
+msgstr "Reset {0}"
+
 msgid "Resets {resetDate}"
 msgstr "Reset {resetDate}"
 
@@ -14692,6 +14842,9 @@ msgstr "prawy panel"
 
 msgid "Right pane area"
 msgstr "Obszar prawego panelu"
+
+msgid "Right screen edge"
+msgstr "Prawa krawędź ekranu"
 
 msgid "Right-click here"
 msgstr "Kliknij tutaj prawym przyciskiem"
@@ -15057,6 +15210,9 @@ msgstr "Szukaj wśród {0} witryn…"
 
 msgid "Search a developer"
 msgstr "Wyszukaj programistę"
+
+msgid "Search accounts"
+msgstr "Szukaj kont"
 
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "Szukaj w treści plików i we wszystkich obszarach roboczych naraz."
@@ -15564,6 +15720,12 @@ msgstr "Sesja"
 msgid "Session {0}"
 msgstr "Sesja {0}"
 
+msgid "Session allowance renewed"
+msgstr "Limit sesji odnowiony"
+
+msgid "Session confetti and a larger weekly celebration. Respects reduced motion."
+msgstr "Konfetti dla sesji i większa celebracja odnowienia tygodniowego. Uwzględnia ograniczenie ruchu."
+
 msgid "Session details"
 msgstr "Szczegóły sesji"
 
@@ -15781,8 +15943,14 @@ msgstr "Pokaż mikrofon w polu czatu. Mowę transkrybuje ChatGPT, gdy Codex jest
 msgid "Show a Usage button in the home sidebar, under Pull requests"
 msgstr "Pokazuj przycisk Zużycie na pasku bocznym strony głównej, pod pull requestami"
 
+msgid "Show account"
+msgstr "Pokaż konto"
+
 msgid "Show all {count}"
 msgstr "Pokaż wszystkie ({count})"
+
+msgid "Show all accounts"
+msgstr "Pokaż wszystkie konta"
 
 msgid "Show all comments"
 msgstr "Pokaż wszystkie komentarze"
@@ -15834,6 +16002,9 @@ msgstr "Pokaż mniej"
 
 msgid "Show file tree"
 msgstr "Pokaż drzewo plików"
+
+msgid "Show hidden"
+msgstr "Pokaż ukryte"
 
 msgid "Show in bar"
 msgstr "Pokaż na pasku"
@@ -15958,6 +16129,9 @@ msgstr "Plakietka na pasku bocznym, gdy aktualizacja aplikacji jest gotowa do in
 
 msgid "Sign in"
 msgstr "Zaloguj się"
+
+msgid "Sign in again"
+msgstr "Zaloguj się ponownie"
 
 msgid "Sign in again to use dictation"
 msgstr "Zaloguj się ponownie, aby korzystać z dyktowania"
@@ -16884,6 +17058,9 @@ msgstr "Z Superset korzystają inżynierowie z Netflix, Microsoft, NVIDIA, DoorD
 
 msgid "Superset isn't on Windows yet"
 msgstr "Superset jest na razie tylko na Maca"
+
+msgid "Superset logo"
+msgstr "Logo Superset"
 
 msgid "Superset may sign you back in after restart. Please try signing out again."
 msgstr "Superset może zalogować Cię ponownie po restarcie. Spróbuj wylogować się jeszcze raz."
@@ -18954,14 +19131,26 @@ msgstr "Identyfikator przyjazny adresom URL, unikalny w organizacji."
 msgid "Usage"
 msgstr "Zużycie"
 
+msgid "Usage at a glance"
+msgstr "Użycie w skrócie"
+
+msgid "Usage display settings"
+msgstr "Ustawienia wyświetlania użycia"
+
 msgid "Usage is out of date"
 msgstr "Dane o wykorzystaniu są nieaktualne"
 
 msgid "Usage sections"
 msgstr "Sekcje zużycia"
 
+msgid "Usage unavailable"
+msgstr "Dane użycia niedostępne"
+
 msgid "Usage unavailable."
 msgstr "Zużycie niedostępne."
+
+msgid "Usage unavailable. Open Superset to check the connection."
+msgstr "Użycie niedostępne. Otwórz Superset, aby sprawdzić połączenie."
 
 #. placeholder {0}: search.trim()
 msgid "Use “{0}”"
@@ -19026,6 +19215,15 @@ msgstr "Transkrypcja głosu i funkcje push-to-talk."
 
 msgid "Use your existing agent subscriptions and API keys. Superset never proxies model calls or locks your workflow to one provider."
 msgstr "Korzystaj z własnych subskrypcji agentów i kluczy API. Superset nigdy nie pośredniczy w wywołaniach modeli ani nie przywiązuje Twojego procesu do jednego dostawcy."
+
+msgid "used"
+msgstr "wykorzystano"
+
+msgid "Used"
+msgstr "Wykorzystano"
+
+msgid "Used in the menu bar and floating panel."
+msgstr "Używany na pasku menu i w pływającym panelu."
 
 msgid "Used in URLs and APIs."
 msgstr "Używany w adresach URL i API."
@@ -19408,6 +19606,9 @@ msgstr "co tydzień"
 
 msgid "Weekly"
 msgstr "Co tydzień"
+
+msgid "Weekly allowance renewed"
+msgstr "Limit tygodniowy odnowiony"
 
 msgid "Weekly at {time}"
 msgstr "Co tydzień o {time}"
@@ -20006,6 +20207,9 @@ msgstr "Konto jest dezaktywowane i wkrótce zostanie trwale usunięte. Reaktywuj
 
 msgid "Your account is managed by your organization. Contact your admin to create a new organization."
 msgstr "Twoim kontem zarządza organizacja. Skontaktuj się z administratorem, aby utworzyć nową organizację."
+
+msgid "Your accounts and quotas, in the menu bar or on the right screen edge."
+msgstr "Twoje konta i limity na pasku menu lub przy prawej krawędzi ekranu."
 
 msgid "Your agent can open any page and work through it with superset browser commands. It uses the pane you are watching, so you see every step."
 msgstr "Agent może otworzyć dowolną stronę i przejść przez nią za pomocą poleceń superset browser. Używa panelu, który oglądasz, więc widzisz każdy krok."

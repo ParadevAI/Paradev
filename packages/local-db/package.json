@@ -15,6 +15,10 @@
 		"./schema/zod": {
 			"types": "./src/schema/zod.ts",
 			"default": "./src/schema/zod.ts"
+		},
+		"./schema/usage-widget-appearances": {
+			"types": "./src/schema/usage-widget-appearances.ts",
+			"default": "./src/schema/usage-widget-appearances.ts"
 		}
 	},
 	"scripts": {

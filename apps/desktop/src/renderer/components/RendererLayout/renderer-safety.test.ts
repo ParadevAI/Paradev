@@ -4,6 +4,16 @@ import { dirname, resolve } from "node:path";
 import ts from "@typescript/typescript6";
 
 const renderer = resolve(import.meta.dir, "../..");
+const isolatedRoots = new Map([
+	[
+		"usage-widget/index.tsx",
+		{
+			container: "usage-root",
+			boundary: "PanelBoundary",
+			children: ["UsagePanel", "ResetCelebration"],
+		},
+	],
+]);
 
 function parse(path: string) {
 	return ts.createSourceFile(
@@ -108,9 +118,15 @@ test("emergency UI has no transitive dependency on router, app providers, or UI 
 		),
 	);
 	check(resolve(renderer, "lib/boot-errors.ts"));
+	check(
+		resolve(
+			renderer,
+			"usage-widget/components/PanelBoundary/PanelBoundary.tsx",
+		),
+	);
 });
 
-test("production renderer roots cannot bypass RendererRouter", async () => {
+test("production renderer roots use RendererRouter or a registered isolated surface", async () => {
 	const violations: string[] = [];
 	for await (const relative of new Bun.Glob("**/*.{ts,tsx}").scan(renderer)) {
 		if (/\.(test|spec)\./.test(relative) || relative.includes("/fixtures/"))
@@ -123,7 +139,11 @@ test("production renderer roots cannot bypass RendererRouter", async () => {
 			)
 				continue;
 			const module = statement.moduleSpecifier.text;
-			if (module === "react-dom/client" && relative !== "index.tsx")
+			if (
+				module === "react-dom/client" &&
+				relative !== "index.tsx" &&
+				!isolatedRoots.has(relative)
+			)
 				violations.push(relative);
 			if (
 				module !== "@tanstack/react-router" ||
@@ -145,6 +165,64 @@ test("production renderer roots cannot bypass RendererRouter", async () => {
 		}
 	}
 	expect(violations).toEqual([]);
+});
+
+test("registered isolated roots mount their own container through the audited boundary", () => {
+	for (const [relative, registration] of isolatedRoots) {
+		const source = parse(resolve(renderer, relative));
+		const containers: string[] = [];
+		let mounts = 0;
+		function visit(node: ts.Node) {
+			if (ts.isCallExpression(node)) {
+				const name = node.expression.getText(source);
+				if (name === "document.getElementById") {
+					const argument = node.arguments[0];
+					if (argument && ts.isStringLiteral(argument))
+						containers.push(argument.text);
+				}
+				if (name === "createRoot") mounts++;
+				if (
+					ts.isPropertyAccessExpression(node.expression) &&
+					node.expression.name.text === "render"
+				) {
+					const tree = node.arguments[0];
+					const protectedChildren: string[] = [];
+					function inspect(child: ts.Node, protectedByBoundary = false) {
+						if (
+							ts.isJsxElement(child) &&
+							child.openingElement.tagName.getText(source) ===
+								registration.boundary
+						)
+							protectedByBoundary = true;
+						if (ts.isJsxSelfClosingElement(child)) {
+							const tag = child.tagName.getText(source);
+							if (registration.children.includes(tag)) {
+								expect(
+									protectedByBoundary,
+									`${relative}: ${tag} must be inside its boundary`,
+								).toBe(true);
+								protectedChildren.push(tag);
+							}
+						}
+						ts.forEachChild(child, (descendant) =>
+							inspect(descendant, protectedByBoundary),
+						);
+					}
+					if (tree) inspect(tree);
+					expect(protectedChildren.sort()).toEqual(
+						[...registration.children].sort(),
+					);
+				}
+			}
+			ts.forEachChild(node, visit);
+		}
+		visit(source);
+		expect(mounts).toBe(1);
+		expect(containers.length).toBeGreaterThan(0);
+		expect(
+			containers.every((container) => container === registration.container),
+		).toBe(true);
+	}
 });
 
 test("every production failure boundary is included in the renderer audit", async () => {
@@ -187,6 +265,7 @@ test("every production failure boundary is included in the renderer audit", asyn
 		[
 			"components/RendererErrorBoundary/RendererErrorBoundary.tsx: componentDidCatch",
 			"components/RendererErrorBoundary/RendererErrorBoundary.tsx: getDerivedStateFromError",
+			"usage-widget/components/PanelBoundary/PanelBoundary.tsx: getDerivedStateFromError",
 			"index.tsx: defaultNotFoundComponent",
 			"routes/__root.tsx: errorComponent",
 			"routes/__root.tsx: notFoundComponent",

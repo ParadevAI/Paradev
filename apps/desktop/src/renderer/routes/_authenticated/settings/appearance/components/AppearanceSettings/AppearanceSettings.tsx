@@ -9,6 +9,7 @@ import { FontSettingSection } from "./components/FontSettingSection";
 import { LanguageSection } from "./components/LanguageSection";
 import { MarkdownStyleSection } from "./components/MarkdownStyleSection";
 import { ThemeSection } from "./components/ThemeSection";
+import { UsageWidgetSection } from "./components/UsageWidgetSection";
 
 /**
  * Renders a list of visible sections with automatic border separators.
@@ -56,6 +57,10 @@ export function AppearanceSettings({ visibleItems }: AppearanceSettingsProps) {
 		visibleItems,
 	);
 	const showThemeSection = showTheme || showCustomThemes;
+	const showUsageWidget = isItemVisible(
+		SETTING_ITEM_ID.APPEARANCE_USAGE_WIDGET,
+		visibleItems,
+	);
 
 	return (
 		<div className="p-6 max-w-5xl w-full">
@@ -86,6 +91,7 @@ export function AppearanceSettings({ visibleItems }: AppearanceSettingsProps) {
 						showTerminal={showTerminalFont}
 					/>
 				)}
+				{showUsageWidget && <UsageWidgetSection key="usage-widget" />}
 			</SectionList>
 		</div>
 	);
