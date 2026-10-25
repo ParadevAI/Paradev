@@ -455,20 +455,16 @@ export function computeChecksStatus(
 	}
 
 	let hasFailure = false;
+	let hasCancelled = false;
 	let hasPending = false;
 
 	for (const ctx of rollup) {
 		const status = ctx.state || ctx.conclusion;
 
-		if (
-			status === "FAILURE" ||
-			status === "ERROR" ||
-			status === "TIMED_OUT" ||
-			// A cancelled run never produced a real verdict — treat it as a
-			// failure rather than falling through to "success".
-			status === "CANCELLED"
-		) {
+		if (status === "FAILURE" || status === "ERROR" || status === "TIMED_OUT") {
 			hasFailure = true;
+		} else if (status === "CANCELLED") {
+			hasCancelled = true;
 		} else if (
 			status === "PENDING" ||
 			status === "" ||
@@ -481,5 +477,6 @@ export function computeChecksStatus(
 
 	if (hasFailure) return "failure";
 	if (hasPending) return "pending";
+	if (hasCancelled) return "failure";
 	return "success";
 }
