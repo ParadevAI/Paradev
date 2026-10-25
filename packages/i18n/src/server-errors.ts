@@ -264,6 +264,96 @@ export const serverErrorMessages: Record<
 				message: "No active organization selected",
 			}),
 		),
+	"serverError.channel.notFound": () =>
+		i18n._(
+			msg({
+				message: "Channel not found",
+			}),
+		),
+	"serverError.channel.nameTaken": () =>
+		i18n._(
+			msg({
+				message: "A channel with this name already exists",
+			}),
+		),
+	"serverError.channel.invalidName": () =>
+		i18n._(
+			msg({
+				message: "Use lowercase letters, numbers, dashes and underscores",
+			}),
+		),
+	"serverError.channel.joinFirst": () =>
+		i18n._(
+			msg({
+				message: "Join the channel first",
+			}),
+		),
+	"serverError.channel.adminRequired": () =>
+		i18n._(
+			msg({
+				message: "Only channel admins can do that",
+			}),
+		),
+	"serverError.channel.archived": () =>
+		i18n._(
+			msg({
+				message: "This channel is archived",
+			}),
+		),
+	"serverError.channel.lastAdmin": () =>
+		i18n._(
+			msg({
+				message: "A channel needs at least one admin",
+			}),
+		),
+	"serverError.channel.cannotJoinPrivate": () =>
+		i18n._(
+			msg({
+				message: "Ask a member to add you to this channel",
+			}),
+		),
+	"serverError.channel.projectNotFound": () =>
+		i18n._(
+			msg({
+				message: "Project not found",
+			}),
+		),
+	"serverError.channel.notInOrganization": () =>
+		i18n._(
+			msg({
+				message: "Only people in this organization can join",
+			}),
+		),
+	"serverError.channelMessage.notFound": () =>
+		i18n._(
+			msg({
+				message: "Message not found",
+			}),
+		),
+	"serverError.channelMessage.notAuthor": () =>
+		i18n._(
+			msg({
+				message: "You can only edit your own messages",
+			}),
+		),
+	"serverError.channelMessage.cannotDelete": () =>
+		i18n._(
+			msg({
+				message: "You can only delete your own messages",
+			}),
+		),
+	"serverError.channelMessage.empty": () =>
+		i18n._(
+			msg({
+				message: "Write a message first",
+			}),
+		),
+	"serverError.channelMessage.tooLong": () =>
+		i18n._(
+			msg({
+				message: "This message is too long",
+			}),
+		),
 	"serverError.cloudWorkspace.cloudSandboxesAreInternalOnly": (params) =>
 		i18n._({
 			id: "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly",

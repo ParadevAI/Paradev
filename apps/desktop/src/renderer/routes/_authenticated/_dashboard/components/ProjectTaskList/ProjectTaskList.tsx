@@ -1,4 +1,7 @@
-import type { ProjectRecord } from "../../../../../../types";
+import type { RouterOutputs } from "@superset/trpc";
+
+type ProjectRecord = RouterOutputs["taskProject"]["get"];
+
 import { ProjectTaskListRow } from "./components/ProjectTaskListRow";
 
 interface ProjectTaskListProps {

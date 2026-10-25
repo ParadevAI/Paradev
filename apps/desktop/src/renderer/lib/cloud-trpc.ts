@@ -37,6 +37,8 @@ export const CLOUD_TRPC_ROUTER_ROOTS = [
 	"apiKey",
 	"automation",
 	"billing",
+	"channel",
+	"channelMessage",
 	"chat",
 	"environment",
 	"githubUser",

@@ -1,6 +1,8 @@
+import type { RouterOutputs } from "@superset/trpc";
 import { AvatarStack } from "@superset/ui/atoms/AvatarStack";
 import { CloudTaskIcon } from "renderer/routes/_authenticated/_dashboard/components/CloudTaskIcon";
-import type { ProjectRecord } from "../../../../../../../../types";
+
+type ProjectRecord = RouterOutputs["taskProject"]["get"];
 
 interface ProjectTaskListRowProps {
 	task: ProjectRecord["tasks"][number];

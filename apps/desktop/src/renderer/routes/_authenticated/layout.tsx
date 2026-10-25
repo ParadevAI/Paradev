@@ -26,6 +26,7 @@ import { electronTrpc } from "renderer/lib/electron-trpc";
 import { terminalRuntimeRegistry } from "renderer/lib/terminal/terminal-runtime-registry";
 import { showWorkspaceAutoNameWarningToast } from "renderer/lib/workspaces/showWorkspaceAutoNameWarningToast";
 import { InitGitDialog } from "renderer/react-query/projects/InitGitDialog";
+import { ChannelsRealtime } from "renderer/routes/_authenticated/components/ChannelsRealtime";
 import { DaemonAutoUpdateFailureDialog } from "renderer/routes/_authenticated/components/DaemonAutoUpdateFailureDialog";
 import { DiffThemeSync } from "renderer/routes/_authenticated/components/DiffThemeSync";
 import { LeaderboardAutoPublish } from "renderer/routes/_authenticated/components/LeaderboardAutoPublish";
@@ -333,6 +334,7 @@ function AuthenticatedLayout() {
 									<StarNagObserver />
 									<LeaderboardAutoPublish />
 									<RealtimeNudges />
+									<ChannelsRealtime />
 									<DaemonAutoUpdateFailureDialog />
 									<Outlet />
 									<V1ImportModal />

@@ -173,6 +173,10 @@ msgstr "{0, plural, other {# nhãn}}"
 msgid "{0, plural, one {# login} other {# logins}}"
 msgstr "{0, plural, one {# đăng nhập} other {# đăng nhập}}"
 
+#. placeholder {0}: channel.memberCount
+msgid "{0, plural, one {# member} other {# members}}"
+msgstr "{0, plural, other {# thành viên}}"
+
 #. placeholder {0}: summary.passed
 msgid "{0, plural, one {# passed} other {# passed}}"
 msgstr "{0, plural, one {# đã qua} other {# đã qua}}"
@@ -195,6 +199,11 @@ msgstr "{0, plural, one {Đã chọn # dự án.} other {Đã chọn # dự án.
 #. placeholder {0}: projectFilters.length
 msgid "{0, plural, one {# project} other {# projects}}"
 msgstr "{0, plural, one {# dự án} other {# dự án}}"
+
+#. placeholder {0}: data.replies.length
+#. placeholder {0}: message.replyCount
+msgid "{0, plural, one {# reply} other {# replies}}"
+msgstr "{0, plural, other {# câu trả lời}}"
 
 #. placeholder {0}: repositories.length
 #. placeholder {0}: selectedProjects.length
@@ -723,6 +732,15 @@ msgstr "{appName} Mobile chạy agent trên những máy tính bạn kết nối
 
 msgid "{approvalCount, plural, one {# needs approval} other {# need approval}}"
 msgstr "{approvalCount, plural, other {# cần phê duyệt}}"
+
+msgid "{authorName} in #{channelName}"
+msgstr "{authorName} trong #{channelName}"
+
+msgid "{authorName} mentioned you in #{channelName}"
+msgstr "{authorName} đã nhắc đến bạn trong #{channelName}"
+
+msgid "{authorName} replied in #{channelName}"
+msgstr "{authorName} đã trả lời trong #{channelName}"
 
 msgid "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 msgstr "{behindCount, plural, one {Chậm hơn main # commit, cần rebase} other {Chậm hơn main # commit, cần rebase}}"
@@ -1526,6 +1544,12 @@ msgstr "Một endpoint CDP cho mỗi ngăn"
 msgid "A changelog goes out every week. Most new hires ship to users in their first few days."
 msgstr "Changelog được phát hành mỗi tuần. Hầu hết nhân sự mới đã phát hành tới người dùng ngay trong vài ngày đầu."
 
+msgid "A channel needs at least one admin"
+msgstr "Kênh cần có ít nhất một quản trị viên"
+
+msgid "A channel with this name already exists"
+msgstr "Đã có kênh với tên này"
+
 msgid "A chat can't switch to another provider partway through. Start a fresh {label} chat, or fork this conversation into one. This {currentLabel} chat stays open."
 msgstr "Không thể chuyển chat sang nhà cung cấp khác giữa chừng. Hãy bắt đầu một chat {label} mới, hoặc tách cuộc trò chuyện này sang một chat mới. Chat {currentLabel} này vẫn mở."
 
@@ -2202,6 +2226,9 @@ msgstr "Tất cả trong tab hiện tại (chia khung)"
 msgid "All labels"
 msgstr "Tất cả nhãn"
 
+msgid "All messages"
+msgstr "Tất cả tin nhắn"
+
 msgid "All models"
 msgstr "Tất cả mô hình"
 
@@ -2637,6 +2664,13 @@ msgstr "apps/web/src/app/design/components/LayoutSection/LayoutSection.tsx"
 msgid "Archive"
 msgstr "Lưu trữ"
 
+#. placeholder {0}: channel.name
+msgid "Archive #{0}?"
+msgstr "Lưu trữ #{0}?"
+
+msgid "Archive channel"
+msgstr "Lưu trữ kênh"
+
 msgid "Archive environment"
 msgstr "Lưu trữ environment"
 
@@ -2690,6 +2724,9 @@ msgstr "Theo báo cáo gần nhất. Máy chủ phải trực tuyến để cậ
 
 msgid "ascending"
 msgstr "tăng dần"
+
+msgid "Ask a member to add you to this channel"
+msgstr "Hãy nhờ một thành viên thêm bạn vào kênh này"
 
 msgid "Ask an agent for a design doc or a report. It builds the page and publishes it."
 msgstr "Nhờ agent viết tài liệu thiết kế hoặc báo cáo. Agent tạo trang và xuất bản."
@@ -3292,6 +3329,9 @@ msgstr "Đang chuyển các dự án v1 của bạn"
 msgid "Browse and install skills, MCP servers, and agent configs shared by the community."
 msgstr "Duyệt và cài skill, server MCP và cấu hình agent do cộng đồng chia sẻ."
 
+msgid "Browse channels"
+msgstr "Duyệt kênh"
+
 msgid "Browse for directory"
 msgstr "Duyệt thư mục"
 
@@ -3690,6 +3730,18 @@ msgstr "Đang chuyển..."
 
 msgid "Channel created"
 msgstr "Kênh được tạo"
+
+msgid "Channel not found"
+msgstr "Không tìm thấy kênh"
+
+msgid "Channel options"
+msgstr "Tùy chọn kênh"
+
+msgid "Channel settings"
+msgstr "Cài đặt kênh"
+
+msgid "Channels"
+msgstr "Kênh"
 
 msgid "Charge your saved card for more GB-hours when bought GB-hours run low."
 msgstr "Trừ tiền thẻ đã lưu để mua thêm GB-giờ khi số GB-giờ đã mua sắp hết."
@@ -4133,6 +4185,9 @@ msgstr "Đóng ngăn"
 
 msgid "Close Pane"
 msgstr "Đóng khung"
+
+msgid "Close panel"
+msgstr "Đóng bảng"
 
 msgid "Close port"
 msgstr "Đóng cổng"
@@ -5337,6 +5392,9 @@ msgstr "Không sao chép được hình ảnh"
 msgid "Couldn't copy the screenshot"
 msgstr "Không sao chép được ảnh chụp màn hình"
 
+msgid "Couldn't create the channel"
+msgstr "Không thể tạo kênh"
+
 msgid "Couldn't create workspace"
 msgstr "Không thể tạo workspace"
 
@@ -5486,6 +5544,9 @@ msgstr "Không thể gửi bình luận"
 msgid "Couldn't send reply"
 msgstr "Không thể gửi trả lời"
 
+msgid "Couldn't send the message"
+msgstr "Không thể gửi tin nhắn"
+
 msgid "Couldn't send to agent"
 msgstr "Không thể gửi cho agent"
 
@@ -5560,6 +5621,9 @@ msgstr "Tạo"
 
 msgid "Create \"{newLabel}\""
 msgstr "Tạo \"{newLabel}\""
+
+msgid "Create a channel"
+msgstr "Tạo kênh"
 
 msgid "Create a native provider fork with the same conversation context. The original session stays unchanged."
 msgstr "Tạo một bản fork gốc ở nhà cung cấp với cùng ngữ cảnh hội thoại. Phiên ban đầu giữ nguyên."
@@ -6094,6 +6158,9 @@ msgstr "Xóa hình ảnh"
 
 msgid "Delete local branch on workspace removal"
 msgstr "Xóa nhánh cục bộ khi gỡ workspace"
+
+msgid "Delete message"
+msgstr "Xóa tin nhắn"
 
 msgid "Delete organization"
 msgstr "Xóa tổ chức"
@@ -6731,6 +6798,9 @@ msgstr "ví dụ bun run dev"
 
 msgid "e.g. Claude Desktop"
 msgstr "ví dụ Claude Desktop"
+
+msgid "e.g. design-review"
+msgstr "vd: design-review"
 
 msgid "e.g. Dev server"
 msgstr "ví dụ Dev server"
@@ -9441,6 +9511,9 @@ msgstr "Tham gia"
 msgid "Join as a design partner"
 msgstr "Tham gia làm design partner"
 
+msgid "Join channel"
+msgstr "Tham gia kênh"
+
 msgid "Join Discord"
 msgstr "Tham gia Discord"
 
@@ -9452,6 +9525,9 @@ msgstr "THAM GIA DISCORD"
 
 msgid "Join the <0>Paradev</0> community to get help, share ideas, and stay up to date with the latest news and updates."
 msgstr "Tham gia cộng đồng <0>Paradev</0> để được hỗ trợ, chia sẻ ý tưởng và cập nhật tin tức mới nhất."
+
+msgid "Join the channel first"
+msgstr "Hãy tham gia kênh trước"
 
 msgid "Join the leaderboard"
 msgstr "Tham gia bảng xếp hạng"
@@ -9636,6 +9712,10 @@ msgstr "Ngày cuối mỗi tháng"
 msgid "Last day of each month at {time}"
 msgstr "Ngày cuối mỗi tháng lúc {time}"
 
+#. placeholder {0}: formatRelativeTime( Math.min(message.lastReplyAt.getTime(), now.getTime()), now, )
+msgid "Last reply {0}"
+msgstr "Trả lời gần nhất {0}"
+
 msgid "Last run"
 msgstr "Chạy lần cuối"
 
@@ -9743,6 +9823,9 @@ msgstr "Để lại tóm tắt…"
 
 msgid "Leave and delete"
 msgstr "Rời và xóa"
+
+msgid "Leave channel"
+msgstr "Rời kênh"
 
 msgid "Leave comment mode"
 msgstr "Thoát chế độ bình luận"
@@ -9886,6 +9969,9 @@ msgstr "Liên kết ↵"
 
 msgid "Link a GitHub repository on the project first to enable cloning."
 msgstr "Hãy liên kết một repository GitHub với dự án trước để có thể clone."
+
+msgid "Link a project"
+msgstr "Liên kết dự án"
 
 msgid "Link by Stripe"
 msgstr "Link by Stripe"
@@ -10204,6 +10290,9 @@ msgstr "Đỏ tía"
 msgid "Main"
 msgstr "Main"
 
+msgid "Make admin"
+msgstr "Đặt làm quản trị viên"
+
 msgid "Make all panes equal size"
 msgstr "Làm mọi khung bằng nhau"
 
@@ -10212,6 +10301,9 @@ msgstr "Đặt làm mặc định"
 
 msgid "Make default — launch new terminals and agents on this account."
 msgstr "Đặt làm mặc định — mở terminal và agent mới trên tài khoản này."
+
+msgid "Make private"
+msgstr "Đặt ở chế độ riêng tư"
 
 msgid "Make public"
 msgstr "Công khai"
@@ -10417,6 +10509,9 @@ msgstr "Đã thêm thành viên"
 msgid "Member not found"
 msgstr "Không tìm thấy thành viên"
 
+msgid "Member options"
+msgstr "Tùy chọn thành viên"
+
 msgid "Member removed"
 msgstr "Đã gỡ thành viên"
 
@@ -10426,6 +10521,9 @@ msgstr "Thành viên"
 msgid "Members cannot modify roles"
 msgstr "Thành viên không thể thay đổi vai trò"
 
+msgid "Members of #{channelName}"
+msgstr "Thành viên của #{channelName}"
+
 msgid "Memory"
 msgstr "Bộ nhớ"
 
@@ -10434,6 +10532,9 @@ msgstr "Tỷ lệ bộ nhớ"
 
 msgid "Mention."
 msgstr "Nhắc đến."
+
+msgid "Mentions and replies"
+msgstr "Lượt nhắc và câu trả lời"
 
 msgid "Menubar"
 msgstr "Menubar"
@@ -10499,8 +10600,15 @@ msgstr "Mesh Gradient"
 msgid "Message {name}…"
 msgstr "Nhắn cho {name}…"
 
+#. placeholder {0}: channel.name
+msgid "Message #{0}"
+msgstr "Nhắn tin tới #{0}"
+
 msgid "Message in channel"
 msgstr "Tin nhắn trong kênh"
+
+msgid "Message not found"
+msgstr "Không tìm thấy tin nhắn"
 
 msgid "Message..."
 msgstr "Tin nhắn..."
@@ -11126,6 +11234,9 @@ msgstr "Chưa có thay đổi nào trên nhánh này."
 msgid "No changes to display."
 msgstr "Không có thay đổi nào để hiển thị."
 
+msgid "No channels found"
+msgstr "Không tìm thấy kênh nào"
+
 msgid "No chats found"
 msgstr "Không tìm thấy cuộc trò chuyện"
 
@@ -11375,8 +11486,14 @@ msgstr "Không có trình giả lập di động nào khả dụng ở đây. C�
 msgid "No name on file"
 msgstr "Chưa có tên nào được lưu"
 
+msgid "No one can post in it, and it leaves everyone's sidebar."
+msgstr "Không ai có thể đăng trong kênh này và kênh sẽ biến mất khỏi thanh bên của mọi người."
+
 msgid "No one in {organizationName} matches. Type a full email to invite someone new."
 msgstr "Không có ai trong {organizationName} khớp. Nhập đầy đủ email để mời người mới."
+
+msgid "No one to add"
+msgstr "Không có ai để thêm"
 
 msgid "No open issues found."
 msgstr "Không có issue nào đang mở."
@@ -11441,6 +11558,9 @@ msgstr "Không có dự án"
 
 msgid "No project available"
 msgstr "Không có dự án nào"
+
+msgid "No project linked"
+msgstr "Chưa liên kết dự án"
 
 msgid "No project selected"
 msgstr "Chưa chọn dự án"
@@ -11761,6 +11881,9 @@ msgstr "Lưu ý"
 msgid "Notes"
 msgstr "Ghi chú"
 
+msgid "Nothing"
+msgstr "Không gì cả"
+
 msgid "Nothing here yet."
 msgstr "Chưa có gì ở đây."
 
@@ -11966,6 +12089,9 @@ msgstr "Chỉ chủ sở hữu tổ chức mới đổi được gói. Hãy nh�
 msgid "Only available on macOS."
 msgstr "Chỉ có trên macOS."
 
+msgid "Only channel admins can do that"
+msgstr "Chỉ quản trị viên kênh mới có thể làm việc này"
+
 msgid "Only host owners can change membership"
 msgstr "Chỉ chủ sở hữu host mới thay đổi được thành viên"
 
@@ -11998,6 +12124,9 @@ msgstr "Chỉ chủ sở hữu mới quản lý được thanh toán"
 
 msgid "Only owners can update organization settings"
 msgstr "Chỉ chủ sở hữu mới cập nhật được cài đặt tổ chức"
+
+msgid "Only people in this organization can join"
+msgstr "Chỉ những người trong tổ chức này mới có thể tham gia"
 
 msgid "Only people invited"
 msgstr "Chỉ những người được mời"
@@ -13614,6 +13743,9 @@ msgstr "Script vòng đời dự án"
 msgid "Project name"
 msgstr "Tên dự án"
 
+msgid "Project not found"
+msgstr "Không tìm thấy dự án"
+
 msgid "Project not found in this organization"
 msgstr "Không tìm thấy dự án trong tổ chức này"
 
@@ -14263,8 +14395,14 @@ msgstr "Gỡ {label}?"
 msgid "Remove {repositoryName}"
 msgstr "Gỡ {repositoryName}"
 
+msgid "Remove admin"
+msgstr "Gỡ quyền quản trị viên"
+
 msgid "Remove attachment"
 msgstr "Xóa tệp đính kèm"
+
+msgid "Remove from channel"
+msgstr "Xóa khỏi kênh"
 
 msgid "Remove from favorites"
 msgstr "Xóa khỏi mục yêu thích"
@@ -14461,8 +14599,14 @@ msgstr "Đã thay thế 1 tệp trong {where}"
 msgid "Reply"
 msgstr "Trả lời"
 
+msgid "Reply in thread"
+msgstr "Trả lời trong chuỗi"
+
 msgid "Reply to thread…"
 msgstr "Trả lời luồng…"
+
+msgid "Reply…"
+msgstr "Trả lời…"
 
 msgid "Replying to {replyingTo}"
 msgstr "Đang trả lời {replyingTo}"
@@ -15328,6 +15472,9 @@ msgstr "Tìm theo tên khóa..."
 msgid "Search changed files"
 msgstr "Tìm tệp đã thay đổi"
 
+msgid "Search channels"
+msgstr "Tìm kênh"
+
 msgid "Search chats..."
 msgstr "Tìm cuộc trò chuyện..."
 
@@ -15390,6 +15537,9 @@ msgstr "Tìm mô hình"
 
 msgid "Search pages"
 msgstr "Tìm trang"
+
+msgid "Search people"
+msgstr "Tìm người"
 
 msgid "Search people..."
 msgstr "Tìm người..."
@@ -17931,6 +18081,9 @@ msgstr "Tự động hóa này nằm trong một tổ chức khác"
 msgid "This cannot be undone."
 msgstr "Không thể hoàn tác."
 
+msgid "This channel is archived"
+msgstr "Kênh này đã được lưu trữ"
+
 msgid "This chat has ended."
 msgstr "Chat này đã kết thúc."
 
@@ -18024,6 +18177,9 @@ msgstr "Việc này lâu hơn bình thường. Phiên có thể đã sẵn sàng
 msgid "This is taking longer than usual. The workspace may already be ready — reloading can pick it up."
 msgstr "Việc này lâu hơn bình thường. Workspace có thể đã sẵn sàng — tải lại có thể nhận được nó."
 
+msgid "This is the start of #{channelName}."
+msgstr "Đây là khởi đầu của #{channelName}."
+
 msgid "This issue link is invalid."
 msgstr "Liên kết issue này không hợp lệ."
 
@@ -18044,6 +18200,12 @@ msgstr "Máy này"
 
 msgid "This machine size is not available for your organization. Pick another size"
 msgstr "Kích thước máy này không có cho tổ chức của bạn. Hãy chọn kích thước khác"
+
+msgid "This message is too long"
+msgstr "Tin nhắn này quá dài"
+
+msgid "This message was deleted"
+msgstr "Tin nhắn này đã bị xóa"
 
 msgid "This Microsoft tenant is already connected by {detail}. Ask them to disconnect first."
 msgstr "Tenant Microsoft này đã được {detail} kết nối. Hãy nhờ họ ngắt kết nối trước."
@@ -18264,6 +18426,9 @@ msgstr "Mức suy luận kỹ lưỡng"
 
 msgid "Thought for a few seconds"
 msgstr "Đã suy nghĩ vài giây"
+
+msgid "Thread"
+msgstr "Chuỗi"
 
 msgid "Thread not found"
 msgstr "Không tìm thấy luồng"
@@ -19071,6 +19236,12 @@ msgstr "Dùng mặc định toàn cục"
 msgid "Use Paradev on mobile"
 msgstr "Dùng Paradev trên điện thoại"
 
+msgid "Use lowercase letters, numbers, dashes and underscores"
+msgstr "Dùng chữ thường, số, dấu gạch ngang và gạch dưới"
+
+msgid "Use Superset on mobile"
+msgstr "Dùng Superset trên điện thoại"
+
 msgid "Use Paradev on your phone with Pro."
 msgstr "Dùng Paradev trên điện thoại với Pro."
 
@@ -19291,6 +19462,9 @@ msgstr "Xem mức sử dụng"
 
 msgid "Violence or harassment"
 msgstr "Bạo lực hoặc quấy rối"
+
+msgid "Visibility"
+msgstr "Chế độ hiển thị"
 
 msgid "Visible to"
 msgstr "Hiển thị với"
@@ -19875,6 +20049,9 @@ msgstr "Viết bình luận"
 msgid "Write a comment…"
 msgstr "Viết bình luận…"
 
+msgid "Write a message first"
+msgstr "Hãy viết tin nhắn trước"
+
 msgid "Write a note and pick an agent. Your note arrives with the element's code and a cropped screenshot."
 msgstr "Viết ghi chú và chọn một agent. Ghi chú của bạn được gửi kèm mã của phần tử và ảnh chụp màn hình đã cắt."
 
@@ -19994,6 +20171,12 @@ msgstr "Bạn có thể đính kèm tối đa {MAX_ATTACHMENTS} tệp"
 msgid "You can close this tab."
 msgstr "Bạn có thể đóng tab này."
 
+msgid "You can only delete your own messages"
+msgstr "Bạn chỉ có thể xóa tin nhắn của chính mình"
+
+msgid "You can only edit your own messages"
+msgstr "Bạn chỉ có thể sửa tin nhắn của chính mình"
+
 msgid "You can only share with people and teams in this organization"
 msgstr "Bạn chỉ có thể chia sẻ với người và nhóm trong tổ chức này"
 
@@ -20074,6 +20257,9 @@ msgstr "Bạn đã đăng nhập"
 
 msgid "You're up to date!"
 msgstr "Bạn đang dùng bản mới nhất!"
+
+msgid "You're viewing #{channelName}"
+msgstr "Bạn đang xem #{channelName}"
 
 msgid "You've been invited to join {organization}"
 msgstr "Bạn được mời tham gia {organization}"

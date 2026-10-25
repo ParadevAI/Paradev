@@ -134,6 +134,7 @@ export type ComposerBodyProps = Required<
 		| "ref"
 		| "header"
 		| "onAddFiles"
+		| "allowAttachments"
 		| "allowEmptySubmit"
 		| "clearOnSubmit"
 		| "hideSubmit"
@@ -193,6 +194,7 @@ export function ComposerBody({
 	ref,
 	header,
 	onAddFiles,
+	allowAttachments = true,
 	allowEmptySubmit,
 	clearOnSubmit,
 	hideSubmit,
@@ -376,7 +378,7 @@ export function ComposerBody({
 
 	const addFiles = (files: FileList | File[]) => {
 		const incoming = Array.from(files);
-		if (incoming.length === 0) return;
+		if (incoming.length === 0 || !allowAttachments) return;
 		if (onAddFiles) {
 			onAddFiles(incoming);
 			return;
@@ -398,8 +400,9 @@ export function ComposerBody({
 
 	const dropZone = useComposerDropZone();
 	useEffect(() => {
+		if (!allowAttachments) return;
 		return dropZone?.register((files) => addFilesRef.current(files));
-	}, [dropZone]);
+	}, [dropZone, allowAttachments]);
 
 	const closePanel = useCallback(() => {
 		setPanel(null);
@@ -424,22 +427,26 @@ export function ComposerBody({
 	);
 	const browseSections = useMemo<MentionSection[]>(
 		() => [
-			{
-				providerId: "add",
-				title: t({ message: "Add" }),
-				isLoading: false,
-				entries: [
-					{
-						id: "attach-files",
-						label: t({ message: "Attach files" }),
-						icon: <PaperclipIcon className="size-4" />,
-						select: (ctx) => ctx.attachFiles(),
-					},
-				],
-			},
+			...(allowAttachments
+				? [
+						{
+							providerId: "add",
+							title: t({ message: "Add" }),
+							isLoading: false,
+							entries: [
+								{
+									id: "attach-files",
+									label: t({ message: "Attach files" }),
+									icon: <PaperclipIcon className="size-4" />,
+									select: (ctx: ComposerActionContext) => ctx.attachFiles(),
+								},
+							],
+						},
+					]
+				: []),
 			...sections.filter((section) => section.entries.length > 0),
 		],
-		[sections, t],
+		[sections, t, allowAttachments],
 	);
 	const browseEntries = useMemo(
 		() => browseSections.flatMap((section) => section.entries),
@@ -817,7 +824,11 @@ export function ComposerBody({
 				"relative flex flex-col rounded-2xl bg-card ring-1 ring-border transition-shadow focus-within:ring-ring/40",
 			)}
 			onDragOver={(event) => {
-				if (dropZone == null && event.dataTransfer.types.includes("Files")) {
+				if (
+					allowAttachments &&
+					dropZone == null &&
+					event.dataTransfer.types.includes("Files")
+				) {
 					event.preventDefault();
 					setDragging(true);
 				}

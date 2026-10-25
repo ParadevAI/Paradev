@@ -389,6 +389,10 @@
 			"types": "./src/host-routing.ts",
 			"default": "./src/host-routing.ts"
 		},
+		"./channels": {
+			"types": "./src/channels.ts",
+			"default": "./src/channels.ts"
+		},
 		"./realtime": {
 			"types": "./src/realtime.ts",
 			"default": "./src/realtime.ts"

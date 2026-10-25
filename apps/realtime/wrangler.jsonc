@@ -20,7 +20,8 @@
 		"bindings": [
 			{ "name": "OrgHub", "class_name": "OrgHub" },
 			{ "name": "PageHub", "class_name": "PageHub" },
-			{ "name": "WorkspaceHub", "class_name": "WorkspaceHub" }
+			{ "name": "WorkspaceHub", "class_name": "WorkspaceHub" },
+			{ "name": "UserHub", "class_name": "UserHub" }
 		]
 	},
 	// Read-only: a page's hub reads its manifest to decide who may connect.
@@ -45,7 +46,8 @@
 	"migrations": [
 		{ "tag": "v1", "new_sqlite_classes": ["OrgHub"] },
 		{ "tag": "v2", "new_sqlite_classes": ["PageHub"] },
-		{ "tag": "v3", "new_sqlite_classes": ["WorkspaceHub"] }
+		{ "tag": "v3", "new_sqlite_classes": ["WorkspaceHub"] },
+		{ "tag": "v4", "new_sqlite_classes": ["UserHub"] }
 	],
 	"observability": { "enabled": true }
 }

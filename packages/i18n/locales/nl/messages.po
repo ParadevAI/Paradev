@@ -173,6 +173,10 @@ msgstr "{0, plural, one {# label} other {# labels}}"
 msgid "{0, plural, one {# login} other {# logins}}"
 msgstr "{0, plural, one {# login} other {# logins}}"
 
+#. placeholder {0}: channel.memberCount
+msgid "{0, plural, one {# member} other {# members}}"
+msgstr "{0, plural, one {# lid} other {# leden}}"
+
 #. placeholder {0}: summary.passed
 msgid "{0, plural, one {# passed} other {# passed}}"
 msgstr "{0, plural, one {# geslaagd} other {# geslaagd}}"
@@ -195,6 +199,11 @@ msgstr "{0, plural, one {# project geselecteerd.} other {# projecten geselecteer
 #. placeholder {0}: projectFilters.length
 msgid "{0, plural, one {# project} other {# projects}}"
 msgstr "{0, plural, one {# project} other {# projecten}}"
+
+#. placeholder {0}: data.replies.length
+#. placeholder {0}: message.replyCount
+msgid "{0, plural, one {# reply} other {# replies}}"
+msgstr "{0, plural, one {# reactie} other {# reacties}}"
 
 #. placeholder {0}: repositories.length
 #. placeholder {0}: selectedProjects.length
@@ -723,6 +732,15 @@ msgstr "{appName} Mobile draait agents op de computers die je koppelt."
 
 msgid "{approvalCount, plural, one {# needs approval} other {# need approval}}"
 msgstr "{approvalCount, plural, one {# wacht op goedkeuring} other {# wachten op goedkeuring}}"
+
+msgid "{authorName} in #{channelName}"
+msgstr "{authorName} in #{channelName}"
+
+msgid "{authorName} mentioned you in #{channelName}"
+msgstr "{authorName} heeft je genoemd in #{channelName}"
+
+msgid "{authorName} replied in #{channelName}"
+msgstr "{authorName} heeft gereageerd in #{channelName}"
 
 msgid "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 msgstr "{behindCount, plural, one {# commit achter op main, rebase nodig} other {# commits achter op main, rebase nodig}}"
@@ -1526,6 +1544,12 @@ msgstr "Een CDP-endpoint per paneel"
 msgid "A changelog goes out every week. Most new hires ship to users in their first few days."
 msgstr "Elke week verschijnt er een changelog. De meeste nieuwe collega's leveren in hun eerste dagen al op aan gebruikers."
 
+msgid "A channel needs at least one admin"
+msgstr "Een kanaal heeft minstens één beheerder nodig"
+
+msgid "A channel with this name already exists"
+msgstr "Er bestaat al een kanaal met deze naam"
+
 msgid "A chat can't switch to another provider partway through. Start a fresh {label} chat, or fork this conversation into one. This {currentLabel} chat stays open."
 msgstr "Een chat kan niet halverwege naar een andere provider overstappen. Start een nieuwe {label}-chat of splits dit gesprek af naar een nieuwe chat. Deze {currentLabel}-chat blijft open."
 
@@ -2202,6 +2226,9 @@ msgstr "Alles in huidig tabblad (gesplitste panelen)"
 msgid "All labels"
 msgstr "Alle labels"
 
+msgid "All messages"
+msgstr "Alle berichten"
+
 msgid "All models"
 msgstr "Alle modellen"
 
@@ -2637,6 +2664,13 @@ msgstr "apps/web/src/app/design/components/LayoutSection/LayoutSection.tsx"
 msgid "Archive"
 msgstr "Archiveren"
 
+#. placeholder {0}: channel.name
+msgid "Archive #{0}?"
+msgstr "#{0} archiveren?"
+
+msgid "Archive channel"
+msgstr "Kanaal archiveren"
+
 msgid "Archive environment"
 msgstr "Omgeving archiveren"
 
@@ -2690,6 +2724,9 @@ msgstr "Zoals laatst gemeld. De host moet online zijn om bij te werken."
 
 msgid "ascending"
 msgstr "oplopend"
+
+msgid "Ask a member to add you to this channel"
+msgstr "Vraag een lid om je aan dit kanaal toe te voegen"
 
 msgid "Ask an agent for a design doc or a report. It builds the page and publishes it."
 msgstr "Vraag een agent om een ontwerpdocument of rapport. Hij maakt de pagina en publiceert die."
@@ -3292,6 +3329,9 @@ msgstr "Je v1-projecten worden overgezet"
 msgid "Browse and install skills, MCP servers, and agent configs shared by the community."
 msgstr "Blader door skills, MCP-servers en agentconfiguraties die de community deelt, en installeer ze."
 
+msgid "Browse channels"
+msgstr "Kanalen bekijken"
+
 msgid "Browse for directory"
 msgstr "Map kiezen"
 
@@ -3690,6 +3730,18 @@ msgstr "Wijzigen..."
 
 msgid "Channel created"
 msgstr "Kanaal aangemaakt"
+
+msgid "Channel not found"
+msgstr "Kanaal niet gevonden"
+
+msgid "Channel options"
+msgstr "Kanaalopties"
+
+msgid "Channel settings"
+msgstr "Kanaalinstellingen"
+
+msgid "Channels"
+msgstr "Kanalen"
 
 msgid "Charge your saved card for more GB-hours when bought GB-hours run low."
 msgstr "Schrijft meer GB-uren af van je opgeslagen kaart wanneer gekochte GB-uren opraken."
@@ -4132,6 +4184,9 @@ msgid "Close pane"
 msgstr "Paneel sluiten"
 
 msgid "Close Pane"
+msgstr "Paneel sluiten"
+
+msgid "Close panel"
 msgstr "Paneel sluiten"
 
 msgid "Close port"
@@ -5337,6 +5392,9 @@ msgstr "Afbeelding kopiëren mislukt"
 msgid "Couldn't copy the screenshot"
 msgstr "Screenshot kopiëren mislukt"
 
+msgid "Couldn't create the channel"
+msgstr "Kan het kanaal niet maken"
+
 msgid "Couldn't create workspace"
 msgstr "Kan werkruimte niet aanmaken"
 
@@ -5486,6 +5544,9 @@ msgstr "Kan opmerking niet versturen"
 msgid "Couldn't send reply"
 msgstr "Kan antwoord niet versturen"
 
+msgid "Couldn't send the message"
+msgstr "Kan het bericht niet verzenden"
+
 msgid "Couldn't send to agent"
 msgstr "Kan niet naar de agent sturen"
 
@@ -5560,6 +5621,9 @@ msgstr "Aanmaken"
 
 msgid "Create \"{newLabel}\""
 msgstr "\"{newLabel}\" maken"
+
+msgid "Create a channel"
+msgstr "Kanaal maken"
 
 msgid "Create a native provider fork with the same conversation context. The original session stays unchanged."
 msgstr "Maakt bij de provider een native fork met dezelfde gesprekscontext. De oorspronkelijke sessie blijft ongewijzigd."
@@ -6094,6 +6158,9 @@ msgstr "Afbeelding verwijderen"
 
 msgid "Delete local branch on workspace removal"
 msgstr "Lokale branch verwijderen bij verwijderen werkruimte"
+
+msgid "Delete message"
+msgstr "Bericht verwijderen"
 
 msgid "Delete organization"
 msgstr "Organisatie verwijderen"
@@ -6731,6 +6798,9 @@ msgstr "bijv. bun run dev"
 
 msgid "e.g. Claude Desktop"
 msgstr "bijv. Claude Desktop"
+
+msgid "e.g. design-review"
+msgstr "bijv. design-review"
 
 msgid "e.g. Dev server"
 msgstr "bijv. Dev-server"
@@ -9441,6 +9511,9 @@ msgstr "Meedoen"
 msgid "Join as a design partner"
 msgstr "Word design partner"
 
+msgid "Join channel"
+msgstr "Kanaal joinen"
+
 msgid "Join Discord"
 msgstr "Word lid van Discord"
 
@@ -9452,6 +9525,9 @@ msgstr "WORD LID VAN ONZE DISCORD"
 
 msgid "Join the <0>Paradev</0> community to get help, share ideas, and stay up to date with the latest news and updates."
 msgstr "Sluit je aan bij de <0>Paradev</0>-community voor hulp, om ideeën te delen en om op de hoogte te blijven van het laatste nieuws."
+
+msgid "Join the channel first"
+msgstr "Join eerst het kanaal"
 
 msgid "Join the leaderboard"
 msgstr "Meedoen aan de ranglijst"
@@ -9636,6 +9712,10 @@ msgstr "Laatste dag van elke maand"
 msgid "Last day of each month at {time}"
 msgstr "Laatste dag van elke maand om {time}"
 
+#. placeholder {0}: formatRelativeTime( Math.min(message.lastReplyAt.getTime(), now.getTime()), now, )
+msgid "Last reply {0}"
+msgstr "Laatste reactie {0}"
+
 msgid "Last run"
 msgstr "Laatste run"
 
@@ -9743,6 +9823,9 @@ msgstr "Laat een samenvatting achter…"
 
 msgid "Leave and delete"
 msgstr "Verlaten en verwijderen"
+
+msgid "Leave channel"
+msgstr "Kanaal verlaten"
 
 msgid "Leave comment mode"
 msgstr "Opmerkingsmodus verlaten"
@@ -9886,6 +9969,9 @@ msgstr "Koppelen ↵"
 
 msgid "Link a GitHub repository on the project first to enable cloning."
 msgstr "Koppel eerst een GitHub-repository aan het project om te kunnen klonen."
+
+msgid "Link a project"
+msgstr "Project koppelen"
 
 msgid "Link by Stripe"
 msgstr "Link by Stripe"
@@ -10204,6 +10290,9 @@ msgstr "Magenta"
 msgid "Main"
 msgstr "Main"
 
+msgid "Make admin"
+msgstr "Beheerder maken"
+
 msgid "Make all panes equal size"
 msgstr "Alle panelen even groot maken"
 
@@ -10212,6 +10301,9 @@ msgstr "Standaard maken"
 
 msgid "Make default — launch new terminals and agents on this account."
 msgstr "Standaard maken — start nieuwe terminals en agents op dit account."
+
+msgid "Make private"
+msgstr "Privé maken"
 
 msgid "Make public"
 msgstr "Openbaar maken"
@@ -10417,6 +10509,9 @@ msgstr "Lid toegevoegd"
 msgid "Member not found"
 msgstr "Lid niet gevonden"
 
+msgid "Member options"
+msgstr "Lidopties"
+
 msgid "Member removed"
 msgstr "Lid verwijderd"
 
@@ -10426,6 +10521,9 @@ msgstr "Leden"
 msgid "Members cannot modify roles"
 msgstr "Leden kunnen rollen niet wijzigen"
 
+msgid "Members of #{channelName}"
+msgstr "Leden van #{channelName}"
+
 msgid "Memory"
 msgstr "Geheugen"
 
@@ -10434,6 +10532,9 @@ msgstr "Geheugenaandeel"
 
 msgid "Mention."
 msgstr "Noem."
+
+msgid "Mentions and replies"
+msgstr "Vermeldingen en reacties"
 
 msgid "Menubar"
 msgstr "Menubalk"
@@ -10499,8 +10600,15 @@ msgstr "Mesh Gradient"
 msgid "Message {name}…"
 msgstr "Bericht aan {name}…"
 
+#. placeholder {0}: channel.name
+msgid "Message #{0}"
+msgstr "Bericht aan #{0}"
+
 msgid "Message in channel"
 msgstr "Bericht in kanaal"
+
+msgid "Message not found"
+msgstr "Bericht niet gevonden"
 
 msgid "Message..."
 msgstr "Bericht..."
@@ -11126,6 +11234,9 @@ msgstr "Nog geen wijzigingen op deze branch."
 msgid "No changes to display."
 msgstr "Geen wijzigingen om te tonen."
 
+msgid "No channels found"
+msgstr "Geen kanalen gevonden"
+
 msgid "No chats found"
 msgstr "Geen chats gevonden"
 
@@ -11375,8 +11486,14 @@ msgstr "Hier is geen mobiele simulator beschikbaar. Hiervoor is een EAS-simulato
 msgid "No name on file"
 msgstr "Geen naam bekend"
 
+msgid "No one can post in it, and it leaves everyone's sidebar."
+msgstr "Niemand kan er nog in posten en het verdwijnt uit ieders zijbalk."
+
 msgid "No one in {organizationName} matches. Type a full email to invite someone new."
 msgstr "Niemand in {organizationName} komt overeen. Typ een volledig e-mailadres om iemand nieuw uit te nodigen."
+
+msgid "No one to add"
+msgstr "Niemand om toe te voegen"
 
 msgid "No open issues found."
 msgstr "Geen open issues gevonden."
@@ -11441,6 +11558,9 @@ msgstr "Geen project"
 
 msgid "No project available"
 msgstr "Geen project beschikbaar"
+
+msgid "No project linked"
+msgstr "Geen project gekoppeld"
 
 msgid "No project selected"
 msgstr "Geen project geselecteerd"
@@ -11761,6 +11881,9 @@ msgstr "Opmerking"
 msgid "Notes"
 msgstr "Notities"
 
+msgid "Nothing"
+msgstr "Niets"
+
 msgid "Nothing here yet."
 msgstr "Hier is nog niets."
 
@@ -11966,6 +12089,9 @@ msgstr "Alleen een eigenaar van de organisatie kan het plan wijzigen. Vraag de j
 msgid "Only available on macOS."
 msgstr "Alleen beschikbaar op macOS."
 
+msgid "Only channel admins can do that"
+msgstr "Alleen kanaalbeheerders kunnen dat doen"
+
 msgid "Only host owners can change membership"
 msgstr "Alleen eigenaren van de host kunnen het lidmaatschap wijzigen"
 
@@ -11998,6 +12124,9 @@ msgstr "Alleen eigenaren kunnen de facturering beheren"
 
 msgid "Only owners can update organization settings"
 msgstr "Alleen eigenaren kunnen organisatie-instellingen bijwerken"
+
+msgid "Only people in this organization can join"
+msgstr "Alleen mensen in deze organisatie kunnen deelnemen"
 
 msgid "Only people invited"
 msgstr "Alleen uitgenodigde personen"
@@ -13614,6 +13743,9 @@ msgstr "Lifecycle-scripts van het project"
 msgid "Project name"
 msgstr "Projectnaam"
 
+msgid "Project not found"
+msgstr "Project niet gevonden"
+
 msgid "Project not found in this organization"
 msgstr "Project niet gevonden in deze organisatie"
 
@@ -14263,8 +14395,14 @@ msgstr "{label} verwijderen?"
 msgid "Remove {repositoryName}"
 msgstr "{repositoryName} verwijderen"
 
+msgid "Remove admin"
+msgstr "Beheerder verwijderen"
+
 msgid "Remove attachment"
 msgstr "Bijlage verwijderen"
+
+msgid "Remove from channel"
+msgstr "Uit kanaal verwijderen"
 
 msgid "Remove from favorites"
 msgstr "Verwijderen uit favorieten"
@@ -14461,8 +14599,14 @@ msgstr "1 bestand vervangen in {where}"
 msgid "Reply"
 msgstr "Antwoorden"
 
+msgid "Reply in thread"
+msgstr "Reageren in thread"
+
 msgid "Reply to thread…"
 msgstr "Reageren op thread…"
+
+msgid "Reply…"
+msgstr "Reageren…"
 
 msgid "Replying to {replyingTo}"
 msgstr "Antwoord aan {replyingTo}"
@@ -15328,6 +15472,9 @@ msgstr "Zoeken op sleutelnaam..."
 msgid "Search changed files"
 msgstr "Gewijzigde bestanden zoeken"
 
+msgid "Search channels"
+msgstr "Kanalen zoeken"
+
 msgid "Search chats..."
 msgstr "Chats zoeken..."
 
@@ -15390,6 +15537,9 @@ msgstr "Modellen zoeken"
 
 msgid "Search pages"
 msgstr "Pagina's zoeken"
+
+msgid "Search people"
+msgstr "Mensen zoeken"
 
 msgid "Search people..."
 msgstr "Personen zoeken..."
@@ -17931,6 +18081,9 @@ msgstr "Deze automatisering staat in een andere organisatie"
 msgid "This cannot be undone."
 msgstr "Dit kan niet ongedaan worden gemaakt."
 
+msgid "This channel is archived"
+msgstr "Dit kanaal is gearchiveerd"
+
 msgid "This chat has ended."
 msgstr "Deze chat is beëindigd."
 
@@ -18024,6 +18177,9 @@ msgstr "Dit duurt langer dan gewoonlijk. De sessie is mogelijk al klaar — herl
 msgid "This is taking longer than usual. The workspace may already be ready — reloading can pick it up."
 msgstr "Dit duurt langer dan gewoonlijk. De werkruimte is mogelijk al klaar — herladen kan hem oppikken."
 
+msgid "This is the start of #{channelName}."
+msgstr "Dit is het begin van #{channelName}."
+
 msgid "This issue link is invalid."
 msgstr "Deze link naar een issue is ongeldig."
 
@@ -18044,6 +18200,12 @@ msgstr "Deze computer"
 
 msgid "This machine size is not available for your organization. Pick another size"
 msgstr "Deze machinegrootte is niet beschikbaar voor je organisatie. Kies een andere grootte"
+
+msgid "This message is too long"
+msgstr "Dit bericht is te lang"
+
+msgid "This message was deleted"
+msgstr "Dit bericht is verwijderd"
 
 msgid "This Microsoft tenant is already connected by {detail}. Ask them to disconnect first."
 msgstr "Deze Microsoft-tenant is al gekoppeld door {detail}. Vraag hen om eerst los te koppelen."
@@ -18264,6 +18426,9 @@ msgstr "Grondige redeneerinspanning"
 
 msgid "Thought for a few seconds"
 msgstr "Een paar seconden nagedacht"
+
+msgid "Thread"
+msgstr "Thread"
 
 msgid "Thread not found"
 msgstr "Thread niet gevonden"
@@ -19071,6 +19236,12 @@ msgstr "Globale standaard gebruiken"
 msgid "Use Paradev on mobile"
 msgstr "Gebruik Paradev op je mobiel"
 
+msgid "Use lowercase letters, numbers, dashes and underscores"
+msgstr "Gebruik kleine letters, cijfers, streepjes en underscores"
+
+msgid "Use Superset on mobile"
+msgstr "Gebruik Superset op je mobiel"
+
 msgid "Use Paradev on your phone with Pro."
 msgstr "Gebruik Paradev op je telefoon met Pro."
 
@@ -19291,6 +19462,9 @@ msgstr "Gebruik bekijken"
 
 msgid "Violence or harassment"
 msgstr "Geweld of intimidatie"
+
+msgid "Visibility"
+msgstr "Zichtbaarheid"
 
 msgid "Visible to"
 msgstr "Zichtbaar voor"
@@ -19875,6 +20049,9 @@ msgstr "Schrijf een reactie"
 msgid "Write a comment…"
 msgstr "Schrijf een opmerking…"
 
+msgid "Write a message first"
+msgstr "Schrijf eerst een bericht"
+
 msgid "Write a note and pick an agent. Your note arrives with the element's code and a cropped screenshot."
 msgstr "Schrijf een notitie en kies een agent. Je notitie komt aan met de code van het element en een bijgesneden screenshot."
 
@@ -19994,6 +20171,12 @@ msgstr "Je kunt maximaal {MAX_ATTACHMENTS} bestanden toevoegen"
 msgid "You can close this tab."
 msgstr "Je kunt dit tabblad sluiten."
 
+msgid "You can only delete your own messages"
+msgstr "Je kunt alleen je eigen berichten verwijderen"
+
+msgid "You can only edit your own messages"
+msgstr "Je kunt alleen je eigen berichten bewerken"
+
 msgid "You can only share with people and teams in this organization"
 msgstr "Je kunt alleen delen met personen en teams in deze organisatie"
 
@@ -20074,6 +20257,9 @@ msgstr "Je bent ingelogd"
 
 msgid "You're up to date!"
 msgstr "Je bent up-to-date!"
+
+msgid "You're viewing #{channelName}"
+msgstr "Je bekijkt #{channelName}"
 
 msgid "You've been invited to join {organization}"
 msgstr "Je bent uitgenodigd voor {organization}"

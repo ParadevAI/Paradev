@@ -173,6 +173,10 @@ msgstr "{0, plural, other {# 个标签}}"
 msgid "{0, plural, one {# login} other {# logins}}"
 msgstr "{0, plural, one {#项登录信息} other {#项登录信息}}"
 
+#. placeholder {0}: channel.memberCount
+msgid "{0, plural, one {# member} other {# members}}"
+msgstr "{0, plural, other {# 名成员}}"
+
 #. placeholder {0}: summary.passed
 msgid "{0, plural, one {# passed} other {# passed}}"
 msgstr "{0, plural, one {#项通过} other {#项通过}}"
@@ -195,6 +199,11 @@ msgstr "{0, plural, one {已选择#个项目。} other {已选择#个项目。}}
 #. placeholder {0}: projectFilters.length
 msgid "{0, plural, one {# project} other {# projects}}"
 msgstr "{0, plural, one {# 个项目} other {# 个项目}}"
+
+#. placeholder {0}: data.replies.length
+#. placeholder {0}: message.replyCount
+msgid "{0, plural, one {# reply} other {# replies}}"
+msgstr "{0, plural, other {# 条回复}}"
 
 #. placeholder {0}: repositories.length
 #. placeholder {0}: selectedProjects.length
@@ -723,6 +732,15 @@ msgstr "{appName} Mobile在你连接的电脑上运行智能体。"
 
 msgid "{approvalCount, plural, one {# needs approval} other {# need approval}}"
 msgstr "{approvalCount, plural, other {# 个需要批准}}"
+
+msgid "{authorName} in #{channelName}"
+msgstr "{authorName} 在 #{channelName}"
+
+msgid "{authorName} mentioned you in #{channelName}"
+msgstr "{authorName} 在 #{channelName} 中提到了你"
+
+msgid "{authorName} replied in #{channelName}"
+msgstr "{authorName} 在 #{channelName} 中回复了"
 
 msgid "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 msgstr "{behindCount, plural, one {落后main #个提交，需要变基} other {落后main #个提交，需要变基}}"
@@ -1526,6 +1544,12 @@ msgstr "每个窗格一个 CDP 端点"
 msgid "A changelog goes out every week. Most new hires ship to users in their first few days."
 msgstr "我们每周发布一次更新日志。大多数新员工入职头几天就会向用户发布功能。"
 
+msgid "A channel needs at least one admin"
+msgstr "频道至少需要一名管理员"
+
+msgid "A channel with this name already exists"
+msgstr "已存在同名频道"
+
 msgid "A chat can't switch to another provider partway through. Start a fresh {label} chat, or fork this conversation into one. This {currentLabel} chat stays open."
 msgstr "聊天进行中无法切换到其他提供方。请开始一个新的 {label} 聊天，或将此对话分叉到新聊天中。此 {currentLabel} 聊天会保持打开。"
 
@@ -2202,6 +2226,9 @@ msgstr "全部在当前标签页（分屏窗格）"
 msgid "All labels"
 msgstr "所有标签"
 
+msgid "All messages"
+msgstr "所有消息"
+
 msgid "All models"
 msgstr "所有模型"
 
@@ -2637,6 +2664,13 @@ msgstr "apps/web/src/app/design/components/LayoutSection/LayoutSection.tsx"
 msgid "Archive"
 msgstr "归档"
 
+#. placeholder {0}: channel.name
+msgid "Archive #{0}?"
+msgstr "归档 #{0}？"
+
+msgid "Archive channel"
+msgstr "归档频道"
+
 msgid "Archive environment"
 msgstr "归档环境"
 
@@ -2690,6 +2724,9 @@ msgstr "上次报告的版本。主机必须在线才能更新。"
 
 msgid "ascending"
 msgstr "升序"
+
+msgid "Ask a member to add you to this channel"
+msgstr "请让成员将你加入此频道"
 
 msgid "Ask an agent for a design doc or a report. It builds the page and publishes it."
 msgstr "让智能体写一份设计文档或报告。它会生成页面并发布。"
@@ -3292,6 +3329,9 @@ msgstr "正在迁移你的 v1 项目"
 msgid "Browse and install skills, MCP servers, and agent configs shared by the community."
 msgstr "浏览并安装社区共享的技能、MCP服务器和智能体配置。"
 
+msgid "Browse channels"
+msgstr "浏览频道"
+
 msgid "Browse for directory"
 msgstr "浏览目录"
 
@@ -3690,6 +3730,18 @@ msgstr "正在更改..."
 
 msgid "Channel created"
 msgstr "频道已创建"
+
+msgid "Channel not found"
+msgstr "未找到频道"
+
+msgid "Channel options"
+msgstr "频道选项"
+
+msgid "Channel settings"
+msgstr "频道设置"
+
+msgid "Channels"
+msgstr "频道"
 
 msgid "Charge your saved card for more GB-hours when bought GB-hours run low."
 msgstr "当购买的 GB 小时不足时，从已保存的卡扣款购买更多 GB 小时。"
@@ -4133,6 +4185,9 @@ msgstr "关闭窗格"
 
 msgid "Close Pane"
 msgstr "关闭窗格"
+
+msgid "Close panel"
+msgstr "关闭面板"
 
 msgid "Close port"
 msgstr "关闭端口"
@@ -5337,6 +5392,9 @@ msgstr "无法复制图片"
 msgid "Couldn't copy the screenshot"
 msgstr "无法复制截图"
 
+msgid "Couldn't create the channel"
+msgstr "无法创建频道"
+
 msgid "Couldn't create workspace"
 msgstr "无法创建工作区"
 
@@ -5486,6 +5544,9 @@ msgstr "无法发送评论"
 msgid "Couldn't send reply"
 msgstr "无法发送回复"
 
+msgid "Couldn't send the message"
+msgstr "无法发送消息"
+
 msgid "Couldn't send to agent"
 msgstr "无法发送给智能体"
 
@@ -5560,6 +5621,9 @@ msgstr "创建"
 
 msgid "Create \"{newLabel}\""
 msgstr "创建“{newLabel}”"
+
+msgid "Create a channel"
+msgstr "创建频道"
 
 msgid "Create a native provider fork with the same conversation context. The original session stays unchanged."
 msgstr "在提供方创建一个具有相同对话上下文的原生分叉。原会话保持不变。"
@@ -6094,6 +6158,9 @@ msgstr "删除图片"
 
 msgid "Delete local branch on workspace removal"
 msgstr "移除工作区时删除本地分支"
+
+msgid "Delete message"
+msgstr "删除消息"
 
 msgid "Delete organization"
 msgstr "删除组织"
@@ -6731,6 +6798,9 @@ msgstr "例如：bun run dev"
 
 msgid "e.g. Claude Desktop"
 msgstr "例如 Claude Desktop"
+
+msgid "e.g. design-review"
+msgstr "例如 design-review"
 
 msgid "e.g. Dev server"
 msgstr "例如：开发服务器"
@@ -9441,6 +9511,9 @@ msgstr "加入"
 msgid "Join as a design partner"
 msgstr "加入成为设计合作伙伴"
 
+msgid "Join channel"
+msgstr "加入频道"
+
 msgid "Join Discord"
 msgstr "加入Discord"
 
@@ -9452,6 +9525,9 @@ msgstr "加入我们的Discord"
 
 msgid "Join the <0>Paradev</0> community to get help, share ideas, and stay up to date with the latest news and updates."
 msgstr "加入<0>Paradev</0>社区，获取帮助、交流想法，并及时了解最新动态与更新。"
+
+msgid "Join the channel first"
+msgstr "请先加入频道"
 
 msgid "Join the leaderboard"
 msgstr "加入排行榜"
@@ -9636,6 +9712,10 @@ msgstr "每月最后一天"
 msgid "Last day of each month at {time}"
 msgstr "每月最后一天{time}"
 
+#. placeholder {0}: formatRelativeTime( Math.min(message.lastReplyAt.getTime(), now.getTime()), now, )
+msgid "Last reply {0}"
+msgstr "最后回复 {0}"
+
 msgid "Last run"
 msgstr "上次运行"
 
@@ -9743,6 +9823,9 @@ msgstr "写个总结…"
 
 msgid "Leave and delete"
 msgstr "退出并删除"
+
+msgid "Leave channel"
+msgstr "退出频道"
 
 msgid "Leave comment mode"
 msgstr "退出评论模式"
@@ -9886,6 +9969,9 @@ msgstr "关联 ↵"
 
 msgid "Link a GitHub repository on the project first to enable cloning."
 msgstr "请先为项目关联GitHub仓库才能克隆。"
+
+msgid "Link a project"
+msgstr "关联项目"
 
 msgid "Link by Stripe"
 msgstr "Link by Stripe"
@@ -10204,6 +10290,9 @@ msgstr "品红"
 msgid "Main"
 msgstr "主进程"
 
+msgid "Make admin"
+msgstr "设为管理员"
+
 msgid "Make all panes equal size"
 msgstr "使所有窗格大小相同"
 
@@ -10212,6 +10301,9 @@ msgstr "设为默认"
 
 msgid "Make default — launch new terminals and agents on this account."
 msgstr "设为默认——新终端和智能体将使用此账户启动。"
+
+msgid "Make private"
+msgstr "设为私密"
 
 msgid "Make public"
 msgstr "公开"
@@ -10417,6 +10509,9 @@ msgstr "已添加成员"
 msgid "Member not found"
 msgstr "未找到成员"
 
+msgid "Member options"
+msgstr "成员选项"
+
 msgid "Member removed"
 msgstr "已移除成员"
 
@@ -10426,6 +10521,9 @@ msgstr "成员"
 msgid "Members cannot modify roles"
 msgstr "成员不能修改角色"
 
+msgid "Members of #{channelName}"
+msgstr "#{channelName} 的成员"
+
 msgid "Memory"
 msgstr "内存"
 
@@ -10434,6 +10532,9 @@ msgstr "内存占比"
 
 msgid "Mention."
 msgstr "提及。"
+
+msgid "Mentions and replies"
+msgstr "提及和回复"
 
 msgid "Menubar"
 msgstr "菜单栏"
@@ -10499,8 +10600,15 @@ msgstr "网格渐变"
 msgid "Message {name}…"
 msgstr "发消息给 {name}…"
 
+#. placeholder {0}: channel.name
+msgid "Message #{0}"
+msgstr "发消息到 #{0}"
+
 msgid "Message in channel"
 msgstr "频道中的消息"
+
+msgid "Message not found"
+msgstr "未找到消息"
 
 msgid "Message..."
 msgstr "消息..."
@@ -11126,6 +11234,9 @@ msgstr "此分支上还没有改动。"
 msgid "No changes to display."
 msgstr "没有可显示的改动。"
 
+msgid "No channels found"
+msgstr "未找到频道"
+
 msgid "No chats found"
 msgstr "未找到聊天"
 
@@ -11375,8 +11486,14 @@ msgstr "此处没有可用的移动模拟器。需要云沙箱上的 EAS 模拟�
 msgid "No name on file"
 msgstr "未登记姓名"
 
+msgid "No one can post in it, and it leaves everyone's sidebar."
+msgstr "任何人都无法再在其中发帖，且它会从所有人的侧边栏中移除。"
+
 msgid "No one in {organizationName} matches. Type a full email to invite someone new."
 msgstr "{organizationName} 中没有匹配的人。输入完整邮箱地址即可邀请新成员。"
+
+msgid "No one to add"
+msgstr "没有可添加的人"
 
 msgid "No open issues found."
 msgstr "未找到打开的议题。"
@@ -11441,6 +11558,9 @@ msgstr "无项目"
 
 msgid "No project available"
 msgstr "没有可用的项目"
+
+msgid "No project linked"
+msgstr "未关联项目"
 
 msgid "No project selected"
 msgstr "未选择项目"
@@ -11761,6 +11881,9 @@ msgstr "注意"
 msgid "Notes"
 msgstr "笔记"
 
+msgid "Nothing"
+msgstr "不通知"
+
 msgid "Nothing here yet."
 msgstr "这里还没有内容。"
 
@@ -11966,6 +12089,9 @@ msgstr "只有组织所有者才能更改方案，请联系所有者升级。"
 msgid "Only available on macOS."
 msgstr "仅在macOS上可用。"
 
+msgid "Only channel admins can do that"
+msgstr "只有频道管理员可以执行此操作"
+
 msgid "Only host owners can change membership"
 msgstr "只有主机所有者才能更改成员关系"
 
@@ -11998,6 +12124,9 @@ msgstr "只有所有者才能管理账单"
 
 msgid "Only owners can update organization settings"
 msgstr "只有所有者才能更新组织设置"
+
+msgid "Only people in this organization can join"
+msgstr "只有此组织中的人员可以加入"
 
 msgid "Only people invited"
 msgstr "仅受邀者"
@@ -13614,6 +13743,9 @@ msgstr "项目生命周期脚本"
 msgid "Project name"
 msgstr "项目名称"
 
+msgid "Project not found"
+msgstr "未找到项目"
+
 msgid "Project not found in this organization"
 msgstr "在此组织中未找到该项目"
 
@@ -14263,8 +14395,14 @@ msgstr "移除{label}？"
 msgid "Remove {repositoryName}"
 msgstr "移除 {repositoryName}"
 
+msgid "Remove admin"
+msgstr "取消管理员"
+
 msgid "Remove attachment"
 msgstr "移除附件"
+
+msgid "Remove from channel"
+msgstr "从频道中移除"
 
 msgid "Remove from favorites"
 msgstr "从收藏中移除"
@@ -14461,8 +14599,14 @@ msgstr "已替换{where}中的1个文件"
 msgid "Reply"
 msgstr "回复"
 
+msgid "Reply in thread"
+msgstr "在话题中回复"
+
 msgid "Reply to thread…"
 msgstr "回复讨论串…"
+
+msgid "Reply…"
+msgstr "回复…"
 
 msgid "Replying to {replyingTo}"
 msgstr "回复 {replyingTo}"
@@ -15328,6 +15472,9 @@ msgstr "按键名搜索..."
 msgid "Search changed files"
 msgstr "搜索更改的文件"
 
+msgid "Search channels"
+msgstr "搜索频道"
+
 msgid "Search chats..."
 msgstr "搜索聊天..."
 
@@ -15390,6 +15537,9 @@ msgstr "搜索模型"
 
 msgid "Search pages"
 msgstr "搜索页面"
+
+msgid "Search people"
+msgstr "搜索成员"
 
 msgid "Search people..."
 msgstr "搜索成员..."
@@ -17931,6 +18081,9 @@ msgstr "此自动化位于其他组织"
 msgid "This cannot be undone."
 msgstr "此操作无法撤销。"
 
+msgid "This channel is archived"
+msgstr "此频道已归档"
+
 msgid "This chat has ended."
 msgstr "此聊天已结束。"
 
@@ -18024,6 +18177,9 @@ msgstr "这比平时耗时更久。会话可能已经就绪 — 重新加载即�
 msgid "This is taking longer than usual. The workspace may already be ready — reloading can pick it up."
 msgstr "这比平时耗时更久。工作区可能已经就绪 — 重新加载即可接上。"
 
+msgid "This is the start of #{channelName}."
+msgstr "这是 #{channelName} 的开端。"
+
 msgid "This issue link is invalid."
 msgstr "此议题链接无效。"
 
@@ -18044,6 +18200,12 @@ msgstr "本机"
 
 msgid "This machine size is not available for your organization. Pick another size"
 msgstr "你的组织不提供此机器规格。请选择其他规格"
+
+msgid "This message is too long"
+msgstr "此消息过长"
+
+msgid "This message was deleted"
+msgstr "此消息已删除"
 
 msgid "This Microsoft tenant is already connected by {detail}. Ask them to disconnect first."
 msgstr "这个Microsoft租户已被{detail}连接。请让对方先断开连接。"
@@ -18264,6 +18426,9 @@ msgstr "深入的推理投入"
 
 msgid "Thought for a few seconds"
 msgstr "思考了几秒"
+
+msgid "Thread"
+msgstr "话题"
 
 msgid "Thread not found"
 msgstr "未找到讨论串"
@@ -19071,6 +19236,12 @@ msgstr "使用全局默认值"
 msgid "Use Paradev on mobile"
 msgstr "在手机上使用 Paradev"
 
+msgid "Use lowercase letters, numbers, dashes and underscores"
+msgstr "请使用小写字母、数字、连字符和下划线"
+
+msgid "Use Superset on mobile"
+msgstr "在手机上使用 Superset"
+
 msgid "Use Paradev on your phone with Pro."
 msgstr "通过 Pro 在手机上使用 Paradev。"
 
@@ -19291,6 +19462,9 @@ msgstr "查看用量"
 
 msgid "Violence or harassment"
 msgstr "暴力或骚扰"
+
+msgid "Visibility"
+msgstr "可见性"
 
 msgid "Visible to"
 msgstr "可见范围"
@@ -19875,6 +20049,9 @@ msgstr "写评论"
 msgid "Write a comment…"
 msgstr "写下评论…"
 
+msgid "Write a message first"
+msgstr "请先输入消息"
+
 msgid "Write a note and pick an agent. Your note arrives with the element's code and a cropped screenshot."
 msgstr "写一条备注并选择智能体。备注会连同该元素的代码和裁剪后的截图一起送达。"
 
@@ -19994,6 +20171,12 @@ msgstr "最多可附加{MAX_ATTACHMENTS}个文件"
 msgid "You can close this tab."
 msgstr "你可以关闭此标签页。"
 
+msgid "You can only delete your own messages"
+msgstr "你只能删除自己的消息"
+
+msgid "You can only edit your own messages"
+msgstr "你只能编辑自己的消息"
+
 msgid "You can only share with people and teams in this organization"
 msgstr "你只能与此组织中的人员和团队分享"
 
@@ -20074,6 +20257,9 @@ msgstr "你已登录"
 
 msgid "You're up to date!"
 msgstr "已是最新！"
+
+msgid "You're viewing #{channelName}"
+msgstr "你正在查看 #{channelName}"
 
 msgid "You've been invited to join {organization}"
 msgstr "你受邀加入{organization}"

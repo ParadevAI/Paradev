@@ -1,5 +1,10 @@
 import * as Sentry from "@sentry/cloudflare";
 import {
+	parseChannelRealtimeEvent,
+	USER_EVENTS_PATH,
+	USERS_PUBLISH_PATH,
+} from "@superset/shared/channels";
+import {
 	MAX_PAGE_STORAGE_KEY_LENGTH,
 	MAX_PAGE_STORAGE_VALUE_BYTES,
 	PAGE_STORAGE_TICKET_SECONDS,
@@ -26,6 +31,7 @@ import { getServerByName } from "partyserver";
 import { OrgHub } from "./org-hub";
 import { CLAIMS_HEADER, PageHub } from "./page-hub";
 import type { RealtimeEnv } from "./types";
+import { UserHub } from "./user-hub";
 import { readBodyWithin } from "./utils/readBodyWithin";
 import { WORKSPACE_CLAIMS_HEADER, WorkspaceHub } from "./workspace-hub";
 
@@ -396,6 +402,52 @@ app.post(
 	},
 );
 
+// ── A user's own events (channels) ───────────────────────────────────
+
+app.get(USER_EVENTS_PATH, async (c) => {
+	if (c.req.header("Upgrade")?.toLowerCase() !== "websocket") {
+		return c.json({ error: "WebSocket upgrade required" }, 426);
+	}
+	const token = extractToken(c);
+	if (!token) return acceptAndClose(4401, "Unauthorized");
+	const auth = await verifyJWT(token, c.env.NEXT_PUBLIC_API_URL);
+	if (!auth?.sub) return acceptAndClose(4401, "Unauthorized");
+	const stub = await getServerByName(c.env.UserHub, auth.sub);
+	return stub.fetch("https://realtime/subscribe", {
+		headers: { Upgrade: "websocket" },
+	});
+});
+
+const MAX_PUBLISH_RECIPIENTS = 500;
+
+app.post(USERS_PUBLISH_PATH, async (c) => {
+	const token = extractToken(c);
+	if (!token || token !== c.env.NUDGE_SECRET) {
+		return c.json({ error: "Unauthorized" }, 401);
+	}
+	const body = (await c.req.json().catch(() => null)) as {
+		userIds?: unknown;
+		event?: unknown;
+	} | null;
+	const userIds = body?.userIds;
+	if (
+		!Array.isArray(userIds) ||
+		userIds.length > MAX_PUBLISH_RECIPIENTS ||
+		!userIds.every((id) => typeof id === "string" && UUID.test(id))
+	) {
+		return c.json({ error: "userIds required" }, 400);
+	}
+	const event = parseChannelRealtimeEvent(body?.event);
+	if (!event) return c.json({ error: "unknown event" }, 400);
+	await Promise.all(
+		userIds.map(async (userId) => {
+			const stub = await getServerByName(c.env.UserHub, userId);
+			await stub.publish(event);
+		}),
+	);
+	return c.json({ ok: true });
+});
+
 // ── Emit: the API, after a write ────────────────────────────────────
 
 app.post("/v2/nudge", async (c) => {
@@ -457,10 +509,15 @@ const InstrumentedWorkspaceHub = Sentry.instrumentDurableObjectWithSentry(
 	sentryOptions,
 	WorkspaceHub,
 );
+const InstrumentedUserHub = Sentry.instrumentDurableObjectWithSentry(
+	sentryOptions,
+	UserHub,
+);
 export {
 	InstrumentedOrgHub as OrgHub,
 	InstrumentedPageHub as PageHub,
 	InstrumentedWorkspaceHub as WorkspaceHub,
+	InstrumentedUserHub as UserHub,
 };
 
 export default Sentry.withSentry(sentryOptions, {

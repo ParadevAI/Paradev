@@ -156,6 +156,8 @@ export const FEATURE_FLAGS = {
 	 * exists; this gates only where people are led to write one.
 	 */
 	WORKSPACE_CONFIG_TOML: "workspace-config-toml",
+	/** In-app channels in the desktop sidebar. */
+	CHANNELS: "channels",
 	/** Allowlist for mobile voice mode: shows the entry and authorizes `voice.createSession`. */
 	MOBILE_VOICE_MODE: "mobile-voice-mode",
 	/**

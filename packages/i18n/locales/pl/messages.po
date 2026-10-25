@@ -173,6 +173,10 @@ msgstr "{0, plural, one {# etykieta} few {# etykiety} many {# etykiet} other {# 
 msgid "{0, plural, one {# login} other {# logins}}"
 msgstr "{0, plural, one {# logowanie} few {# logowania} many {# logowań} other {# logowania}}"
 
+#. placeholder {0}: channel.memberCount
+msgid "{0, plural, one {# member} other {# members}}"
+msgstr "{0, plural, one {# członek} few {# członków} many {# członków} other {# członka}}"
+
 #. placeholder {0}: summary.passed
 msgid "{0, plural, one {# passed} other {# passed}}"
 msgstr "{0, plural, one {# zaliczony} few {# zaliczone} many {# zaliczonych} other {# zaliczonego}}"
@@ -195,6 +199,11 @@ msgstr "{0, plural, one {Wybrano # projekt.} few {Wybrano # projekty.} many {Wyb
 #. placeholder {0}: projectFilters.length
 msgid "{0, plural, one {# project} other {# projects}}"
 msgstr "{0, plural, one {# projekt} few {# projekty} many {# projektów} other {# projektu}}"
+
+#. placeholder {0}: data.replies.length
+#. placeholder {0}: message.replyCount
+msgid "{0, plural, one {# reply} other {# replies}}"
+msgstr "{0, plural, one {# odpowiedź} few {# odpowiedzi} many {# odpowiedzi} other {# odpowiedzi}}"
 
 #. placeholder {0}: repositories.length
 #. placeholder {0}: selectedProjects.length
@@ -723,6 +732,15 @@ msgstr "{appName} Mobile uruchamia agentów na komputerach, które podłączysz.
 
 msgid "{approvalCount, plural, one {# needs approval} other {# need approval}}"
 msgstr "{approvalCount, plural, one {# wymaga zatwierdzenia} few {# wymagają zatwierdzenia} many {# wymaga zatwierdzenia} other {# wymaga zatwierdzenia}}"
+
+msgid "{authorName} in #{channelName}"
+msgstr "{authorName} w #{channelName}"
+
+msgid "{authorName} mentioned you in #{channelName}"
+msgstr "{authorName} wspomniał(a) o Tobie w #{channelName}"
+
+msgid "{authorName} replied in #{channelName}"
+msgstr "{authorName} odpowiedział(a) w #{channelName}"
 
 msgid "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 msgstr "{behindCount, plural, one {Za main o # commit, wymaga rebase} few {Za main o # commity, wymaga rebase} many {Za main o # commitów, wymaga rebase} other {Za main o # commita, wymaga rebase}}"
@@ -1526,6 +1544,12 @@ msgstr "Endpoint CDP dla każdego panelu"
 msgid "A changelog goes out every week. Most new hires ship to users in their first few days."
 msgstr "Co tydzień publikujemy changelog. Większość nowych osób w zespole dostarcza coś użytkownikom już w pierwszych dniach."
 
+msgid "A channel needs at least one admin"
+msgstr "Kanał musi mieć co najmniej jednego administratora"
+
+msgid "A channel with this name already exists"
+msgstr "Kanał o tej nazwie już istnieje"
+
 msgid "A chat can't switch to another provider partway through. Start a fresh {label} chat, or fork this conversation into one. This {currentLabel} chat stays open."
 msgstr "Czatu nie można przełączyć na innego dostawcę w trakcie rozmowy. Rozpocznij nowy czat {label} albo rozgałęź tę rozmowę do nowego czatu. Ten czat {currentLabel} pozostanie otwarty."
 
@@ -2202,6 +2226,9 @@ msgstr "Wszystkie w bieżącej karcie (podzielone panele)"
 msgid "All labels"
 msgstr "Wszystkie etykiety"
 
+msgid "All messages"
+msgstr "Wszystkie wiadomości"
+
 msgid "All models"
 msgstr "Wszystkie modele"
 
@@ -2637,6 +2664,13 @@ msgstr "apps/web/src/app/design/components/LayoutSection/LayoutSection.tsx"
 msgid "Archive"
 msgstr "Archiwizuj"
 
+#. placeholder {0}: channel.name
+msgid "Archive #{0}?"
+msgstr "Zarchiwizować #{0}?"
+
+msgid "Archive channel"
+msgstr "Zarchiwizuj kanał"
+
 msgid "Archive environment"
 msgstr "Archiwizuj środowisko"
 
@@ -2690,6 +2724,9 @@ msgstr "Według ostatniego zgłoszenia. Host musi być online, aby się zaktuali
 
 msgid "ascending"
 msgstr "rosnąco"
+
+msgid "Ask a member to add you to this channel"
+msgstr "Poproś członka, aby dodał Cię do tego kanału"
 
 msgid "Ask an agent for a design doc or a report. It builds the page and publishes it."
 msgstr "Poproś agenta o dokument projektowy lub raport. Utworzy stronę i ją opublikuje."
@@ -3292,6 +3329,9 @@ msgstr "Przenoszenie Twoich projektów z v1"
 msgid "Browse and install skills, MCP servers, and agent configs shared by the community."
 msgstr "Przeglądaj i instaluj umiejętności, serwery MCP i konfiguracje agentów udostępnione przez społeczność."
 
+msgid "Browse channels"
+msgstr "Przeglądaj kanały"
+
 msgid "Browse for directory"
 msgstr "Przeglądaj katalogi"
 
@@ -3690,6 +3730,18 @@ msgstr "Zmienianie..."
 
 msgid "Channel created"
 msgstr "Kanał utworzony"
+
+msgid "Channel not found"
+msgstr "Nie znaleziono kanału"
+
+msgid "Channel options"
+msgstr "Opcje kanału"
+
+msgid "Channel settings"
+msgstr "Ustawienia kanału"
+
+msgid "Channels"
+msgstr "Kanały"
 
 msgid "Charge your saved card for more GB-hours when bought GB-hours run low."
 msgstr "Obciąża zapisaną kartę za kolejne GB-godziny, gdy kupione GB-godziny się kończą."
@@ -4132,6 +4184,9 @@ msgid "Close pane"
 msgstr "Zamknij panel"
 
 msgid "Close Pane"
+msgstr "Zamknij panel"
+
+msgid "Close panel"
 msgstr "Zamknij panel"
 
 msgid "Close port"
@@ -5337,6 +5392,9 @@ msgstr "Nie udało się skopiować obrazu"
 msgid "Couldn't copy the screenshot"
 msgstr "Nie udało się skopiować zrzutu ekranu"
 
+msgid "Couldn't create the channel"
+msgstr "Nie udało się utworzyć kanału"
+
 msgid "Couldn't create workspace"
 msgstr "Nie udało się utworzyć obszaru roboczego"
 
@@ -5486,6 +5544,9 @@ msgstr "Nie udało się wysłać komentarza"
 msgid "Couldn't send reply"
 msgstr "Nie udało się wysłać odpowiedzi"
 
+msgid "Couldn't send the message"
+msgstr "Nie udało się wysłać wiadomości"
+
 msgid "Couldn't send to agent"
 msgstr "Nie udało się wysłać do agenta"
 
@@ -5560,6 +5621,9 @@ msgstr "Utwórz"
 
 msgid "Create \"{newLabel}\""
 msgstr "Utwórz „{newLabel}”"
+
+msgid "Create a channel"
+msgstr "Utwórz kanał"
 
 msgid "Create a native provider fork with the same conversation context. The original session stays unchanged."
 msgstr "Tworzy natywnego forka u dostawcy z tym samym kontekstem rozmowy. Pierwotna sesja pozostaje bez zmian."
@@ -6094,6 +6158,9 @@ msgstr "Usuń obraz"
 
 msgid "Delete local branch on workspace removal"
 msgstr "Usuwaj lokalną gałąź przy usuwaniu obszaru roboczego"
+
+msgid "Delete message"
+msgstr "Usuń wiadomość"
 
 msgid "Delete organization"
 msgstr "Usuń organizację"
@@ -6731,6 +6798,9 @@ msgstr "np. bun run dev"
 
 msgid "e.g. Claude Desktop"
 msgstr "np. Claude Desktop"
+
+msgid "e.g. design-review"
+msgstr "np. design-review"
 
 msgid "e.g. Dev server"
 msgstr "np. Serwer deweloperski"
@@ -9441,6 +9511,9 @@ msgstr "Dołącz"
 msgid "Join as a design partner"
 msgstr "Dołącz jako partner projektowy"
 
+msgid "Join channel"
+msgstr "Dołącz do kanału"
+
 msgid "Join Discord"
 msgstr "Dołącz do Discorda"
 
@@ -9452,6 +9525,9 @@ msgstr "DOŁĄCZ DO NASZEGO DISCORDA"
 
 msgid "Join the <0>Paradev</0> community to get help, share ideas, and stay up to date with the latest news and updates."
 msgstr "Dołącz do społeczności <0>Paradev</0>, aby uzyskać pomoc, dzielić się pomysłami i być na bieżąco z nowościami."
+
+msgid "Join the channel first"
+msgstr "Najpierw dołącz do kanału"
 
 msgid "Join the leaderboard"
 msgstr "Dołącz do rankingu"
@@ -9636,6 +9712,10 @@ msgstr "Ostatni dzień każdego miesiąca"
 msgid "Last day of each month at {time}"
 msgstr "Ostatni dzień każdego miesiąca o {time}"
 
+#. placeholder {0}: formatRelativeTime( Math.min(message.lastReplyAt.getTime(), now.getTime()), now, )
+msgid "Last reply {0}"
+msgstr "Ostatnia odpowiedź {0}"
+
 msgid "Last run"
 msgstr "Ostatnie uruchomienie"
 
@@ -9743,6 +9823,9 @@ msgstr "Zostaw podsumowanie…"
 
 msgid "Leave and delete"
 msgstr "Opuść i usuń"
+
+msgid "Leave channel"
+msgstr "Opuść kanał"
 
 msgid "Leave comment mode"
 msgstr "Wyjdź z trybu komentarzy"
@@ -9886,6 +9969,9 @@ msgstr "Powiąż ↵"
 
 msgid "Link a GitHub repository on the project first to enable cloning."
 msgstr "Najpierw powiąż z projektem repozytorium GitHub, aby włączyć klonowanie."
+
+msgid "Link a project"
+msgstr "Połącz projekt"
 
 msgid "Link by Stripe"
 msgstr "Link by Stripe"
@@ -10204,6 +10290,9 @@ msgstr "Magenta"
 msgid "Main"
 msgstr "Główny"
 
+msgid "Make admin"
+msgstr "Ustaw jako administratora"
+
 msgid "Make all panes equal size"
 msgstr "Wyrównaj rozmiary wszystkich paneli"
 
@@ -10212,6 +10301,9 @@ msgstr "Ustaw jako domyślne"
 
 msgid "Make default — launch new terminals and agents on this account."
 msgstr "Ustaw jako domyślne — uruchamiaj nowe terminale i agentów na tym koncie."
+
+msgid "Make private"
+msgstr "Ustaw jako prywatny"
 
 msgid "Make public"
 msgstr "Upublicznij"
@@ -10417,6 +10509,9 @@ msgstr "Dodano członka"
 msgid "Member not found"
 msgstr "Nie znaleziono członka"
 
+msgid "Member options"
+msgstr "Opcje członka"
+
 msgid "Member removed"
 msgstr "Usunięto członka"
 
@@ -10426,6 +10521,9 @@ msgstr "Członkowie"
 msgid "Members cannot modify roles"
 msgstr "Członkowie nie mogą zmieniać ról"
 
+msgid "Members of #{channelName}"
+msgstr "Członkowie #{channelName}"
+
 msgid "Memory"
 msgstr "Pamięć"
 
@@ -10434,6 +10532,9 @@ msgstr "Udział pamięci"
 
 msgid "Mention."
 msgstr "Wspomnij."
+
+msgid "Mentions and replies"
+msgstr "Wzmianki i odpowiedzi"
 
 msgid "Menubar"
 msgstr "Pasek menu"
@@ -10499,8 +10600,15 @@ msgstr "Mesh Gradient"
 msgid "Message {name}…"
 msgstr "Wiadomość do {name}…"
 
+#. placeholder {0}: channel.name
+msgid "Message #{0}"
+msgstr "Wiadomość do #{0}"
+
 msgid "Message in channel"
 msgstr "Wiadomość na kanale"
+
+msgid "Message not found"
+msgstr "Nie znaleziono wiadomości"
 
 msgid "Message..."
 msgstr "Wiadomość..."
@@ -11126,6 +11234,9 @@ msgstr "Brak zmian na tej gałęzi."
 msgid "No changes to display."
 msgstr "Brak zmian do wyświetlenia."
 
+msgid "No channels found"
+msgstr "Nie znaleziono kanałów"
+
 msgid "No chats found"
 msgstr "Nie znaleziono czatów"
 
@@ -11375,8 +11486,14 @@ msgstr "Brak dostępnego symulatora mobilnego. Wymagany jest symulator EAS w pia
 msgid "No name on file"
 msgstr "Brak zapisanej nazwy"
 
+msgid "No one can post in it, and it leaves everyone's sidebar."
+msgstr "Nikt nie będzie mógł w nim pisać, a zniknie z paska bocznego wszystkich."
+
 msgid "No one in {organizationName} matches. Type a full email to invite someone new."
 msgstr "Nikt w {organizationName} nie pasuje. Wpisz pełny adres e-mail, aby zaprosić nową osobę."
+
+msgid "No one to add"
+msgstr "Brak osób do dodania"
 
 msgid "No open issues found."
 msgstr "Nie znaleziono otwartych zgłoszeń."
@@ -11441,6 +11558,9 @@ msgstr "Bez projektu"
 
 msgid "No project available"
 msgstr "Brak dostępnego projektu"
+
+msgid "No project linked"
+msgstr "Brak połączonego projektu"
 
 msgid "No project selected"
 msgstr "Nie wybrano projektu"
@@ -11761,6 +11881,9 @@ msgstr "Uwaga"
 msgid "Notes"
 msgstr "Notatki"
 
+msgid "Nothing"
+msgstr "Nic"
+
 msgid "Nothing here yet."
 msgstr "Jeszcze nic tu nie ma."
 
@@ -11966,6 +12089,9 @@ msgstr "Tylko właściciel organizacji może zmienić plan. Poproś go o zmianę
 msgid "Only available on macOS."
 msgstr "Dostępne tylko na macOS."
 
+msgid "Only channel admins can do that"
+msgstr "Tylko administratorzy kanału mogą to zrobić"
+
 msgid "Only host owners can change membership"
 msgstr "Tylko właściciele hosta mogą zmieniać dostęp"
 
@@ -11998,6 +12124,9 @@ msgstr "Tylko właściciele mogą zarządzać rozliczeniami"
 
 msgid "Only owners can update organization settings"
 msgstr "Tylko właściciele mogą zmieniać ustawienia organizacji"
+
+msgid "Only people in this organization can join"
+msgstr "Dołączyć mogą tylko osoby z tej organizacji"
 
 msgid "Only people invited"
 msgstr "Tylko zaproszone osoby"
@@ -13614,6 +13743,9 @@ msgstr "Skrypty cyklu życia projektu"
 msgid "Project name"
 msgstr "Nazwa projektu"
 
+msgid "Project not found"
+msgstr "Nie znaleziono projektu"
+
 msgid "Project not found in this organization"
 msgstr "Nie znaleziono projektu w tej organizacji"
 
@@ -14263,8 +14395,14 @@ msgstr "Usunąć {label}?"
 msgid "Remove {repositoryName}"
 msgstr "Usuń {repositoryName}"
 
+msgid "Remove admin"
+msgstr "Usuń administratora"
+
 msgid "Remove attachment"
 msgstr "Usuń załącznik"
+
+msgid "Remove from channel"
+msgstr "Usuń z kanału"
 
 msgid "Remove from favorites"
 msgstr "Usuń z ulubionych"
@@ -14461,8 +14599,14 @@ msgstr "Zastąpiono 1 plik w {where}"
 msgid "Reply"
 msgstr "Odpowiedz"
 
+msgid "Reply in thread"
+msgstr "Odpowiedz w wątku"
+
 msgid "Reply to thread…"
 msgstr "Odpowiedz w wątku…"
+
+msgid "Reply…"
+msgstr "Odpowiedz…"
 
 msgid "Replying to {replyingTo}"
 msgstr "Odpowiedź dla {replyingTo}"
@@ -15328,6 +15472,9 @@ msgstr "Szukaj według nazwy klucza..."
 msgid "Search changed files"
 msgstr "Szukaj zmienionych plików"
 
+msgid "Search channels"
+msgstr "Szukaj kanałów"
+
 msgid "Search chats..."
 msgstr "Szukaj czatów..."
 
@@ -15390,6 +15537,9 @@ msgstr "Szukaj modeli"
 
 msgid "Search pages"
 msgstr "Szukaj stron"
+
+msgid "Search people"
+msgstr "Szukaj osób"
 
 msgid "Search people..."
 msgstr "Szukaj osób..."
@@ -17931,6 +18081,9 @@ msgstr "Ta automatyzacja znajduje się w innej organizacji"
 msgid "This cannot be undone."
 msgstr "Tej operacji nie można cofnąć."
 
+msgid "This channel is archived"
+msgstr "Ten kanał jest zarchiwizowany"
+
 msgid "This chat has ended."
 msgstr "Ten czat się zakończył."
 
@@ -18024,6 +18177,9 @@ msgstr "Trwa to dłużej niż zwykle. Sesja może już być gotowa — przełado
 msgid "This is taking longer than usual. The workspace may already be ready — reloading can pick it up."
 msgstr "Trwa to dłużej niż zwykle. Obszar roboczy może już być gotowy — przeładowanie może go podchwycić."
 
+msgid "This is the start of #{channelName}."
+msgstr "To jest początek #{channelName}."
+
 msgid "This issue link is invalid."
 msgstr "Ten link do zgłoszenia jest nieprawidłowy."
 
@@ -18044,6 +18200,12 @@ msgstr "Ten komputer"
 
 msgid "This machine size is not available for your organization. Pick another size"
 msgstr "Ten rozmiar maszyny nie jest dostępny dla Twojej organizacji. Wybierz inny rozmiar"
+
+msgid "This message is too long"
+msgstr "Ta wiadomość jest za długa"
+
+msgid "This message was deleted"
+msgstr "Ta wiadomość została usunięta"
 
 msgid "This Microsoft tenant is already connected by {detail}. Ask them to disconnect first."
 msgstr "Ten tenant Microsoft jest już połączony przez {detail}. Poproś o rozłączenie."
@@ -18264,6 +18426,9 @@ msgstr "Dogłębne rozumowanie"
 
 msgid "Thought for a few seconds"
 msgstr "Myślał przez kilka sekund"
+
+msgid "Thread"
+msgstr "Wątek"
 
 msgid "Thread not found"
 msgstr "Nie znaleziono wątku"
@@ -19071,6 +19236,12 @@ msgstr "Użyj domyślnego globalnego"
 msgid "Use Paradev on mobile"
 msgstr "Korzystaj z Paradev na telefonie"
 
+msgid "Use lowercase letters, numbers, dashes and underscores"
+msgstr "Używaj małych liter, cyfr, myślników i podkreśleń"
+
+msgid "Use Superset on mobile"
+msgstr "Korzystaj z Superset na telefonie"
+
 msgid "Use Paradev on your phone with Pro."
 msgstr "Korzystaj z Paradev na telefonie dzięki Pro."
 
@@ -19291,6 +19462,9 @@ msgstr "Zobacz zużycie"
 
 msgid "Violence or harassment"
 msgstr "Przemoc lub nękanie"
+
+msgid "Visibility"
+msgstr "Widoczność"
 
 msgid "Visible to"
 msgstr "Widoczne dla"
@@ -19875,6 +20049,9 @@ msgstr "Napisz komentarz"
 msgid "Write a comment…"
 msgstr "Napisz komentarz…"
 
+msgid "Write a message first"
+msgstr "Najpierw napisz wiadomość"
+
 msgid "Write a note and pick an agent. Your note arrives with the element's code and a cropped screenshot."
 msgstr "Napisz notatkę i wybierz agenta. Notatka dotrze razem z kodem elementu i przyciętym zrzutem ekranu."
 
@@ -19994,6 +20171,12 @@ msgstr "Możesz dołączyć maksymalnie {MAX_ATTACHMENTS} plików"
 msgid "You can close this tab."
 msgstr "Możesz zamknąć tę kartę."
 
+msgid "You can only delete your own messages"
+msgstr "Możesz usuwać tylko własne wiadomości"
+
+msgid "You can only edit your own messages"
+msgstr "Możesz edytować tylko własne wiadomości"
+
 msgid "You can only share with people and teams in this organization"
 msgstr "Możesz udostępniać tylko osobom i zespołom w tej organizacji"
 
@@ -20074,6 +20257,9 @@ msgstr "Zalogowano"
 
 msgid "You're up to date!"
 msgstr "Wszystko aktualne!"
+
+msgid "You're viewing #{channelName}"
+msgstr "Przeglądasz #{channelName}"
 
 msgid "You've been invited to join {organization}"
 msgstr "Zaproszono Cię do {organization}"

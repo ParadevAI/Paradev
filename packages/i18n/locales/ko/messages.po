@@ -173,6 +173,10 @@ msgstr "{0, plural, other {라벨 #개}}"
 msgid "{0, plural, one {# login} other {# logins}}"
 msgstr "{0, plural, one {로그인 #개} other {로그인 #개}}"
 
+#. placeholder {0}: channel.memberCount
+msgid "{0, plural, one {# member} other {# members}}"
+msgstr "{0, plural, other {멤버 #명}}"
+
 #. placeholder {0}: summary.passed
 msgid "{0, plural, one {# passed} other {# passed}}"
 msgstr "{0, plural, one {#개 통과} other {#개 통과}}"
@@ -195,6 +199,11 @@ msgstr "{0, plural, one {프로젝트 #개를 선택했습니다.} other {프로
 #. placeholder {0}: projectFilters.length
 msgid "{0, plural, one {# project} other {# projects}}"
 msgstr "{0, plural, one {프로젝트 #개} other {프로젝트 #개}}"
+
+#. placeholder {0}: data.replies.length
+#. placeholder {0}: message.replyCount
+msgid "{0, plural, one {# reply} other {# replies}}"
+msgstr "{0, plural, other {답글 #개}}"
 
 #. placeholder {0}: repositories.length
 #. placeholder {0}: selectedProjects.length
@@ -723,6 +732,15 @@ msgstr "{appName} Mobile은 연결한 컴퓨터에서 에이전트를 실행합�
 
 msgid "{approvalCount, plural, one {# needs approval} other {# need approval}}"
 msgstr "{approvalCount, plural, other {#개 승인 필요}}"
+
+msgid "{authorName} in #{channelName}"
+msgstr "#{channelName}의 {authorName}"
+
+msgid "{authorName} mentioned you in #{channelName}"
+msgstr "{authorName}님이 #{channelName}에서 회원님을 멘션했습니다"
+
+msgid "{authorName} replied in #{channelName}"
+msgstr "{authorName}님이 #{channelName}에서 답글을 남겼습니다"
 
 msgid "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 msgstr "{behindCount, plural, one {main보다 커밋 #개 뒤처짐, 리베이스 필요} other {main보다 커밋 #개 뒤처짐, 리베이스 필요}}"
@@ -1526,6 +1544,12 @@ msgstr "패널마다 전용 CDP 엔드포인트"
 msgid "A changelog goes out every week. Most new hires ship to users in their first few days."
 msgstr "매주 변경 로그를 발행합니다. 대부분의 신규 입사자가 입사 후 며칠 안에 사용자에게 출시합니다."
 
+msgid "A channel needs at least one admin"
+msgstr "채널에는 관리자가 한 명 이상 있어야 합니다"
+
+msgid "A channel with this name already exists"
+msgstr "이 이름의 채널이 이미 있습니다"
+
 msgid "A chat can't switch to another provider partway through. Start a fresh {label} chat, or fork this conversation into one. This {currentLabel} chat stays open."
 msgstr "채팅 도중에는 다른 제공자로 전환할 수 없습니다. 새 {label} 채팅을 시작하거나 이 대화를 새 채팅으로 분기하세요. 이 {currentLabel} 채팅은 계속 열려 있습니다."
 
@@ -2202,6 +2226,9 @@ msgstr "모두 현재 탭에서 (분할 패널)"
 msgid "All labels"
 msgstr "모든 레이블"
 
+msgid "All messages"
+msgstr "모든 메시지"
+
 msgid "All models"
 msgstr "모든 모델"
 
@@ -2637,6 +2664,13 @@ msgstr "apps/web/src/app/design/components/LayoutSection/LayoutSection.tsx"
 msgid "Archive"
 msgstr "보관"
 
+#. placeholder {0}: channel.name
+msgid "Archive #{0}?"
+msgstr "#{0}을(를) 보관할까요?"
+
+msgid "Archive channel"
+msgstr "채널 보관"
+
 msgid "Archive environment"
 msgstr "환경 보관"
 
@@ -2690,6 +2724,9 @@ msgstr "마지막으로 보고된 값입니다. 업데이트하려면 호스트�
 
 msgid "ascending"
 msgstr "오름차순"
+
+msgid "Ask a member to add you to this channel"
+msgstr "멤버에게 이 채널에 추가해 달라고 요청하세요"
 
 msgid "Ask an agent for a design doc or a report. It builds the page and publishes it."
 msgstr "에이전트에게 디자인 문서나 보고서를 요청하세요. 페이지를 만들고 게시합니다."
@@ -3292,6 +3329,9 @@ msgstr "v1 프로젝트를 옮기는 중"
 msgid "Browse and install skills, MCP servers, and agent configs shared by the community."
 msgstr "커뮤니티가 공유한 스킬, MCP 서버, 에이전트 설정을 둘러보고 설치하세요."
 
+msgid "Browse channels"
+msgstr "채널 둘러보기"
+
 msgid "Browse for directory"
 msgstr "디렉터리 찾아보기"
 
@@ -3690,6 +3730,18 @@ msgstr "변경하는 중..."
 
 msgid "Channel created"
 msgstr "채널 생성됨"
+
+msgid "Channel not found"
+msgstr "채널을 찾을 수 없습니다"
+
+msgid "Channel options"
+msgstr "채널 옵션"
+
+msgid "Channel settings"
+msgstr "채널 설정"
+
+msgid "Channels"
+msgstr "채널"
 
 msgid "Charge your saved card for more GB-hours when bought GB-hours run low."
 msgstr "구매한 GB 시간이 부족해지면 저장된 카드로 GB 시간을 더 결제합니다."
@@ -4132,6 +4184,9 @@ msgid "Close pane"
 msgstr "창 닫기"
 
 msgid "Close Pane"
+msgstr "패널 닫기"
+
+msgid "Close panel"
 msgstr "패널 닫기"
 
 msgid "Close port"
@@ -5337,6 +5392,9 @@ msgstr "이미지를 복사하지 못했습니다"
 msgid "Couldn't copy the screenshot"
 msgstr "스크린샷을 복사하지 못했습니다"
 
+msgid "Couldn't create the channel"
+msgstr "채널을 만들 수 없습니다"
+
 msgid "Couldn't create workspace"
 msgstr "워크스페이스를 만들지 못했습니다"
 
@@ -5486,6 +5544,9 @@ msgstr "코멘트를 보내지 못했습니다"
 msgid "Couldn't send reply"
 msgstr "답글을 보내지 못했습니다"
 
+msgid "Couldn't send the message"
+msgstr "메시지를 보낼 수 없습니다"
+
 msgid "Couldn't send to agent"
 msgstr "에이전트에 보내지 못했습니다"
 
@@ -5560,6 +5621,9 @@ msgstr "만들기"
 
 msgid "Create \"{newLabel}\""
 msgstr "\"{newLabel}\" 만들기"
+
+msgid "Create a channel"
+msgstr "채널 만들기"
 
 msgid "Create a native provider fork with the same conversation context. The original session stays unchanged."
 msgstr "같은 대화 컨텍스트로 제공자의 네이티브 포크를 만듭니다. 원래 세션은 그대로 유지됩니다."
@@ -6094,6 +6158,9 @@ msgstr "이미지 삭제"
 
 msgid "Delete local branch on workspace removal"
 msgstr "워크스페이스 삭제 시 로컬 브랜치 삭제"
+
+msgid "Delete message"
+msgstr "메시지 삭제"
 
 msgid "Delete organization"
 msgstr "조직 삭제"
@@ -6731,6 +6798,9 @@ msgstr "예: bun run dev"
 
 msgid "e.g. Claude Desktop"
 msgstr "예: Claude Desktop"
+
+msgid "e.g. design-review"
+msgstr "예: design-review"
 
 msgid "e.g. Dev server"
 msgstr "예: Dev server"
@@ -9441,6 +9511,9 @@ msgstr "참가"
 msgid "Join as a design partner"
 msgstr "디자인 파트너로 참여"
 
+msgid "Join channel"
+msgstr "채널 참여"
+
 msgid "Join Discord"
 msgstr "Discord 참여"
 
@@ -9452,6 +9525,9 @@ msgstr "DISCORD 참여하기"
 
 msgid "Join the <0>Paradev</0> community to get help, share ideas, and stay up to date with the latest news and updates."
 msgstr "<0>Paradev</0> 커뮤니티에 참여해 도움을 받고, 아이디어를 나누고, 최신 소식과 업데이트를 확인하세요."
+
+msgid "Join the channel first"
+msgstr "먼저 채널에 참여하세요"
 
 msgid "Join the leaderboard"
 msgstr "리더보드 참가"
@@ -9636,6 +9712,10 @@ msgstr "매월 마지막 날"
 msgid "Last day of each month at {time}"
 msgstr "매월 마지막 날 {time}"
 
+#. placeholder {0}: formatRelativeTime( Math.min(message.lastReplyAt.getTime(), now.getTime()), now, )
+msgid "Last reply {0}"
+msgstr "마지막 답글 {0}"
+
 msgid "Last run"
 msgstr "마지막 실행"
 
@@ -9743,6 +9823,9 @@ msgstr "요약을 남겨 주세요…"
 
 msgid "Leave and delete"
 msgstr "나가고 삭제"
+
+msgid "Leave channel"
+msgstr "채널 나가기"
 
 msgid "Leave comment mode"
 msgstr "댓글 모드 나가기"
@@ -9886,6 +9969,9 @@ msgstr "연결 ↵"
 
 msgid "Link a GitHub repository on the project first to enable cloning."
 msgstr "클론하려면 먼저 프로젝트에 GitHub 리포지토리를 연결하세요."
+
+msgid "Link a project"
+msgstr "프로젝트 연결"
 
 msgid "Link by Stripe"
 msgstr "Link by Stripe"
@@ -10204,6 +10290,9 @@ msgstr "자홍"
 msgid "Main"
 msgstr "메인"
 
+msgid "Make admin"
+msgstr "관리자로 지정"
+
 msgid "Make all panes equal size"
 msgstr "모든 패널을 같은 크기로 맞춥니다"
 
@@ -10212,6 +10301,9 @@ msgstr "기본값으로 설정"
 
 msgid "Make default — launch new terminals and agents on this account."
 msgstr "기본값으로 설정 — 새 터미널과 에이전트를 이 계정으로 실행합니다."
+
+msgid "Make private"
+msgstr "비공개로 설정"
 
 msgid "Make public"
 msgstr "공개"
@@ -10417,6 +10509,9 @@ msgstr "멤버를 추가했습니다"
 msgid "Member not found"
 msgstr "멤버를 찾을 수 없습니다"
 
+msgid "Member options"
+msgstr "멤버 옵션"
+
 msgid "Member removed"
 msgstr "멤버를 제거했습니다"
 
@@ -10426,6 +10521,9 @@ msgstr "멤버"
 msgid "Members cannot modify roles"
 msgstr "멤버는 역할을 변경할 수 없습니다"
 
+msgid "Members of #{channelName}"
+msgstr "#{channelName} 멤버"
+
 msgid "Memory"
 msgstr "메모리"
 
@@ -10434,6 +10532,9 @@ msgstr "메모리 점유율"
 
 msgid "Mention."
 msgstr "멘션."
+
+msgid "Mentions and replies"
+msgstr "멘션 및 답글"
 
 msgid "Menubar"
 msgstr "메뉴 바"
@@ -10499,8 +10600,15 @@ msgstr "메시 그라데이션"
 msgid "Message {name}…"
 msgstr "{name}에게 메시지…"
 
+#. placeholder {0}: channel.name
+msgid "Message #{0}"
+msgstr "#{0}에 메시지 보내기"
+
 msgid "Message in channel"
 msgstr "채널 내 메시지"
+
+msgid "Message not found"
+msgstr "메시지를 찾을 수 없습니다"
 
 msgid "Message..."
 msgstr "메시지..."
@@ -11126,6 +11234,9 @@ msgstr "아직 이 브랜치에 변경 사항이 없습니다."
 msgid "No changes to display."
 msgstr "표시할 변경 사항이 없습니다."
 
+msgid "No channels found"
+msgstr "채널이 없습니다"
+
 msgid "No chats found"
 msgstr "채팅을 찾을 수 없습니다"
 
@@ -11375,8 +11486,14 @@ msgstr "여기에서 사용할 수 있는 모바일 시뮬레이터가 없습니
 msgid "No name on file"
 msgstr "등록된 이름 없음"
 
+msgid "No one can post in it, and it leaves everyone's sidebar."
+msgstr "아무도 게시할 수 없으며 모든 사람의 사이드바에서 사라집니다."
+
 msgid "No one in {organizationName} matches. Type a full email to invite someone new."
 msgstr "{organizationName}에 일치하는 사람이 없습니다. 새로운 사람을 초대하려면 전체 이메일 주소를 입력하세요."
+
+msgid "No one to add"
+msgstr "추가할 사람이 없습니다"
 
 msgid "No open issues found."
 msgstr "열린 이슈를 찾을 수 없습니다."
@@ -11441,6 +11558,9 @@ msgstr "프로젝트 없음"
 
 msgid "No project available"
 msgstr "사용할 수 있는 프로젝트가 없습니다"
+
+msgid "No project linked"
+msgstr "연결된 프로젝트 없음"
 
 msgid "No project selected"
 msgstr "선택된 프로젝트가 없습니다"
@@ -11761,6 +11881,9 @@ msgstr "참고"
 msgid "Notes"
 msgstr "노트"
 
+msgid "Nothing"
+msgstr "받지 않음"
+
 msgid "Nothing here yet."
 msgstr "아직 아무것도 없습니다."
 
@@ -11966,6 +12089,9 @@ msgstr "플랜은 조직 소유자만 변경할 수 있습니다. 소유자에�
 msgid "Only available on macOS."
 msgstr "macOS에서만 사용할 수 있습니다."
 
+msgid "Only channel admins can do that"
+msgstr "채널 관리자만 할 수 있습니다"
+
 msgid "Only host owners can change membership"
 msgstr "호스트 소유자만 멤버십을 변경할 수 있습니다"
 
@@ -11998,6 +12124,9 @@ msgstr "소유자만 결제를 관리할 수 있습니다"
 
 msgid "Only owners can update organization settings"
 msgstr "소유자만 조직 설정을 변경할 수 있습니다"
+
+msgid "Only people in this organization can join"
+msgstr "이 조직의 사용자만 참여할 수 있습니다"
 
 msgid "Only people invited"
 msgstr "초대된 사람만"
@@ -13614,6 +13743,9 @@ msgstr "프로젝트 라이프사이클 스크립트"
 msgid "Project name"
 msgstr "프로젝트 이름"
 
+msgid "Project not found"
+msgstr "프로젝트를 찾을 수 없습니다"
+
 msgid "Project not found in this organization"
 msgstr "이 조직에서 프로젝트를 찾을 수 없습니다"
 
@@ -14263,8 +14395,14 @@ msgstr "{label}을(를) 제거할까요?"
 msgid "Remove {repositoryName}"
 msgstr "{repositoryName} 제거"
 
+msgid "Remove admin"
+msgstr "관리자 해제"
+
 msgid "Remove attachment"
 msgstr "첨부 파일 제거"
+
+msgid "Remove from channel"
+msgstr "채널에서 제거"
 
 msgid "Remove from favorites"
 msgstr "즐겨찾기에서 제거"
@@ -14461,8 +14599,14 @@ msgstr "{where}에서 파일 1개를 바꿨습니다"
 msgid "Reply"
 msgstr "답글"
 
+msgid "Reply in thread"
+msgstr "스레드에서 답글"
+
 msgid "Reply to thread…"
 msgstr "스레드에 답글…"
+
+msgid "Reply…"
+msgstr "답글…"
 
 msgid "Replying to {replyingTo}"
 msgstr "{replyingTo}에게 답글"
@@ -15328,6 +15472,9 @@ msgstr "키 이름으로 검색..."
 msgid "Search changed files"
 msgstr "변경된 파일 검색"
 
+msgid "Search channels"
+msgstr "채널 검색"
+
 msgid "Search chats..."
 msgstr "채팅 검색..."
 
@@ -15390,6 +15537,9 @@ msgstr "모델 검색"
 
 msgid "Search pages"
 msgstr "페이지 검색"
+
+msgid "Search people"
+msgstr "사람 검색"
 
 msgid "Search people..."
 msgstr "사용자 검색..."
@@ -17931,6 +18081,9 @@ msgstr "이 자동화는 다른 조직에 있습니다"
 msgid "This cannot be undone."
 msgstr "되돌릴 수 없습니다."
 
+msgid "This channel is archived"
+msgstr "이 채널은 보관되었습니다"
+
 msgid "This chat has ended."
 msgstr "이 채팅은 종료되었습니다."
 
@@ -18024,6 +18177,9 @@ msgstr "평소보다 오래 걸리고 있습니다. 세션이 이미 준비되�
 msgid "This is taking longer than usual. The workspace may already be ready — reloading can pick it up."
 msgstr "평소보다 오래 걸리고 있습니다. 워크스페이스가 이미 준비되었을 수 있으니 다시 로드하면 반영될 수 있습니다."
 
+msgid "This is the start of #{channelName}."
+msgstr "#{channelName}의 시작입니다."
+
 msgid "This issue link is invalid."
 msgstr "이 이슈 링크가 올바르지 않습니다."
 
@@ -18044,6 +18200,12 @@ msgstr "이 컴퓨터"
 
 msgid "This machine size is not available for your organization. Pick another size"
 msgstr "이 머신 크기는 조직에서 사용할 수 없습니다. 다른 크기를 선택하세요"
+
+msgid "This message is too long"
+msgstr "메시지가 너무 깁니다"
+
+msgid "This message was deleted"
+msgstr "삭제된 메시지입니다"
 
 msgid "This Microsoft tenant is already connected by {detail}. Ask them to disconnect first."
 msgstr "이 Microsoft 테넌트는 이미 {detail}이(가) 연결했습니다. 먼저 연결을 해제해 달라고 요청하세요."
@@ -18264,6 +18426,9 @@ msgstr "철저한 추론"
 
 msgid "Thought for a few seconds"
 msgstr "몇 초 동안 생각함"
+
+msgid "Thread"
+msgstr "스레드"
 
 msgid "Thread not found"
 msgstr "스레드를 찾을 수 없습니다"
@@ -19071,6 +19236,12 @@ msgstr "전역 기본값 사용"
 msgid "Use Paradev on mobile"
 msgstr "모바일에서 Paradev 사용하기"
 
+msgid "Use lowercase letters, numbers, dashes and underscores"
+msgstr "소문자, 숫자, 하이픈, 밑줄을 사용하세요"
+
+msgid "Use Superset on mobile"
+msgstr "모바일에서 Superset 사용하기"
+
 msgid "Use Paradev on your phone with Pro."
 msgstr "Pro로 휴대폰에서 Paradev를 사용하세요."
 
@@ -19291,6 +19462,9 @@ msgstr "사용량 보기"
 
 msgid "Violence or harassment"
 msgstr "폭력 또는 괴롭힘"
+
+msgid "Visibility"
+msgstr "공개 범위"
 
 msgid "Visible to"
 msgstr "공개 대상"
@@ -19875,6 +20049,9 @@ msgstr "댓글 작성"
 msgid "Write a comment…"
 msgstr "댓글을 작성하세요…"
 
+msgid "Write a message first"
+msgstr "먼저 메시지를 작성하세요"
+
 msgid "Write a note and pick an agent. Your note arrives with the element's code and a cropped screenshot."
 msgstr "메모를 쓰고 에이전트를 고르세요. 메모는 요소의 코드와 잘라낸 스크린샷과 함께 전달됩니다."
 
@@ -19994,6 +20171,12 @@ msgstr "파일은 최대 {MAX_ATTACHMENTS}개까지 첨부할 수 있습니다"
 msgid "You can close this tab."
 msgstr "이 탭을 닫아도 됩니다."
 
+msgid "You can only delete your own messages"
+msgstr "자신의 메시지만 삭제할 수 있습니다"
+
+msgid "You can only edit your own messages"
+msgstr "자신의 메시지만 수정할 수 있습니다"
+
 msgid "You can only share with people and teams in this organization"
 msgstr "이 조직의 사람과 팀하고만 공유할 수 있습니다"
 
@@ -20074,6 +20257,9 @@ msgstr "로그인되었습니다"
 
 msgid "You're up to date!"
 msgstr "최신 상태입니다!"
+
+msgid "You're viewing #{channelName}"
+msgstr "#{channelName}을(를) 보고 있습니다"
 
 msgid "You've been invited to join {organization}"
 msgstr "{organization}에 초대되었습니다"

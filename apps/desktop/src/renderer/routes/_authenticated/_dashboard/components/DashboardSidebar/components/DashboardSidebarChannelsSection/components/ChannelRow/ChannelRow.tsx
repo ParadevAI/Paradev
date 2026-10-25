@@ -1,0 +1,46 @@
+import { cn } from "@superset/ui/utils";
+import { LuHash, LuLock } from "react-icons/lu";
+
+interface ChannelRowProps {
+	name: string;
+	visibility: "public" | "private";
+	unreadCount: number;
+	mentionCount: number;
+	isActive: boolean;
+	onClick: () => void;
+}
+
+export function ChannelRow({
+	name,
+	visibility,
+	unreadCount,
+	mentionCount,
+	isActive,
+	onClick,
+}: ChannelRowProps) {
+	const Icon = visibility === "private" ? LuLock : LuHash;
+	const isUnread = unreadCount > 0 || mentionCount > 0;
+	return (
+		<button
+			type="button"
+			onClick={onClick}
+			className={cn(
+				"flex h-7 w-full items-center gap-2 rounded-md px-2 text-[13px] transition-colors",
+				isActive
+					? "bg-fill-selected text-foreground"
+					: isUnread
+						? "text-foreground hover:bg-fill-hover"
+						: "text-muted-foreground hover:bg-fill-hover hover:text-foreground",
+				isUnread ? "font-semibold" : "font-medium",
+			)}
+		>
+			<Icon className="size-3.5 shrink-0 text-muted-foreground" />
+			<span className="min-w-0 flex-1 truncate text-left">{name}</span>
+			{mentionCount > 0 && (
+				<span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-semibold text-white tabular-nums">
+					{mentionCount}
+				</span>
+			)}
+		</button>
+	);
+}

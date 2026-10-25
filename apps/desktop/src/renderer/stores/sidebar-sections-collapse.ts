@@ -1,7 +1,12 @@
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 
-export type SidebarSectionKey = "cloud" | "pinned" | "sessions" | "workspaces";
+export type SidebarSectionKey =
+	| "channels"
+	| "cloud"
+	| "pinned"
+	| "sessions"
+	| "workspaces";
 
 export const SIDEBAR_SECTIONS_COLLAPSE_STORAGE_KEY =
 	"sidebar-workspaces-collapse";
@@ -17,6 +22,7 @@ export const useSidebarSectionsCollapseStore =
 			persist(
 				(set) => ({
 					collapsed: {
+						channels: false,
 						cloud: false,
 						pinned: false,
 						sessions: false,
@@ -40,6 +46,7 @@ export const useSidebarSectionsCollapseStore =
 							const state = persisted as { isCollapsed?: boolean };
 							return {
 								collapsed: {
+									channels: false,
 									cloud: false,
 									pinned: false,
 									sessions: false,

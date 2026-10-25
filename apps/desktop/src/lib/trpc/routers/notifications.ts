@@ -38,7 +38,8 @@ type NotificationEvent =
 	| {
 			type: typeof NOTIFICATION_EVENTS.SETTINGS_EXTERNAL_CHANGE;
 			data?: { themeState?: unknown };
-	  };
+	  }
+	| { type: typeof NOTIFICATION_EVENTS.OPEN_ROUTE; data?: { path: string } };
 
 const v2NotificationSourceSchema = z.discriminatedUnion("type", [
 	z.object({ type: z.literal("terminal"), id: z.string().min(1) }),
@@ -56,6 +57,8 @@ const showNativeInputSchema = z.object({
 			source: v2NotificationSourceSchema,
 		})
 		.optional(),
+	/** An app route the click opens, e.g. `/channels/<id>`. */
+	clickPath: z.string().startsWith("/").optional(),
 });
 type ShowNativeInput = z.infer<typeof showNativeInputSchema>;
 
@@ -120,6 +123,11 @@ export const createNotificationsRouter = (
 
 				notification.on("click", () => {
 					focusWindow(getWindow);
+					if (input.clickPath) {
+						notificationsEmitter.emit(NOTIFICATION_EVENTS.OPEN_ROUTE, {
+							path: input.clickPath,
+						});
+					}
 					if (!input.clickTarget) return;
 					notificationsEmitter.emit(
 						NOTIFICATION_EVENTS.FOCUS_V2_NOTIFICATION_SOURCE,
@@ -185,6 +193,10 @@ export const createNotificationsRouter = (
 					NOTIFICATION_EVENTS.SETTINGS_EXTERNAL_CHANGE,
 					onSettingsExternalChange,
 				);
+				const onOpenRoute = (data: { path: string }) => {
+					emit.next({ type: NOTIFICATION_EVENTS.OPEN_ROUTE, data });
+				};
+				notificationsEmitter.on(NOTIFICATION_EVENTS.OPEN_ROUTE, onOpenRoute);
 
 				return () => {
 					notificationsEmitter.off(
@@ -204,6 +216,7 @@ export const createNotificationsRouter = (
 						NOTIFICATION_EVENTS.SETTINGS_EXTERNAL_CHANGE,
 						onSettingsExternalChange,
 					);
+					notificationsEmitter.off(NOTIFICATION_EVENTS.OPEN_ROUTE, onOpenRoute);
 				};
 			});
 		}),

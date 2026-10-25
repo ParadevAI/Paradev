@@ -107,6 +107,7 @@ beforeEach(() => {
 	useDeletingWorkspacesStore.setState({ deletingIds: new Set() });
 	useSidebarSectionsCollapseStore.setState({
 		collapsed: {
+			channels: false,
 			cloud: false,
 			pinned: false,
 			sessions: false,
@@ -166,6 +167,7 @@ test("reveals a collapsed Workspaces section, not just Pinned, for a pinned targ
 	currentWorkspaceId = "project-workspace";
 	useSidebarSectionsCollapseStore.setState({
 		collapsed: {
+			channels: false,
 			cloud: false,
 			pinned: false,
 			sessions: false,

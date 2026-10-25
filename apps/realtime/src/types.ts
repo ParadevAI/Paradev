@@ -1,5 +1,6 @@
 import type { OrgHub } from "./org-hub";
 import type { PageHub } from "./page-hub";
+import type { UserHub } from "./user-hub";
 import type { WorkspaceHub } from "./workspace-hub";
 
 export interface RealtimeEnv {
@@ -11,6 +12,7 @@ export interface RealtimeEnv {
 	OrgHub: DurableObjectNamespace<OrgHub>;
 	PageHub: DurableObjectNamespace<PageHub>;
 	WorkspaceHub: DurableObjectNamespace<WorkspaceHub>;
+	UserHub: DurableObjectNamespace<UserHub>;
 	PRIVATE: R2Bucket;
 	GUEST_PRESENCE_BY_IP: RateLimit;
 	GUEST_PRESENCE_BY_PAGE: RateLimit;
