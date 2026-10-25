@@ -47,7 +47,13 @@ export function focusTerminalPane(
 export function focusOrAddTerminalPane(
 	store: StoreApi<WorkspaceStore<PaneViewerData>>,
 	terminalId: string,
-	{ focus = true, linkedStores = [] }: { focus?: boolean; linkedStores?: readonly LinkedTerminalPaneStore[] } = {},
+	{
+		focus = true,
+		linkedStores = [],
+	}: {
+		focus?: boolean;
+		linkedStores?: readonly LinkedTerminalPaneStore[];
+	} = {},
 ): FocusOrAddTerminalPaneResult {
 	if (focusTerminalPane(store, terminalId, { focus })) return "focused";
 	for (const linked of linkedStores) {

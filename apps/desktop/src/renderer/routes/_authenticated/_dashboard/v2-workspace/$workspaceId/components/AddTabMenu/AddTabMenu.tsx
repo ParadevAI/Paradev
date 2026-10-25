@@ -64,7 +64,10 @@ export function AddTabMenu({
 				</DropdownMenuItem>
 			)}
 			{onOpenSavedConversation && (
-				<DropdownMenuItem className="gap-2" onClick={() => runAfterClose(onOpenSavedConversation)}>
+				<DropdownMenuItem
+					className="gap-2"
+					onClick={() => runAfterClose(onOpenSavedConversation)}
+				>
 					<BsTerminalPlus className="size-4" />
 					<Trans>Open saved Claude conversation…</Trans>
 				</DropdownMenuItem>
