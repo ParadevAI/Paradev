@@ -65,6 +65,12 @@ msgstr "\"{0}\" wordt niet meer geactiveerd en de geschiedenis van runs wordt ve
 msgid "\"{name}\" deleted"
 msgstr "\"{name}\" verwijderd"
 
+msgid "\"{name}\" is {size} — files over {limit} can't be attached"
+msgstr "\"{name}\" is {size} — bestanden groter dan {limit} kunnen niet worden bijgevoegd"
+
+msgid "\"{name}\" is {size} — files over {limit} can't be attached to this workspace. If the file is on the workspace's machine, mention its path instead."
+msgstr "\"{name}\" is {size} — bestanden groter dan {limit} kunnen niet aan deze werkruimte worden bijgevoegd. Staat het bestand op de machine van de werkruimte, noem dan in plaats daarvan het pad."
+
 msgid "\"{name}\" paused"
 msgstr "\"{name}\" gepauzeerd"
 
@@ -833,6 +839,12 @@ msgstr "{count, plural, one {# tool gebruikt} other {# tools gebruikt}}"
 msgid "{count, plural, one {waiting on # subagent} other {waiting on # subagents}}"
 msgstr "{count, plural, one {wacht op # subagent} other {wacht op # subagents}}"
 
+msgid "{count} files are over {limit} and were not added"
+msgstr "{count} bestanden zijn groter dan {limit} en zijn niet toegevoegd"
+
+msgid "{count} files attached — a message carries at most {max}"
+msgstr "{count} bestanden bijgevoegd — een bericht kan er maximaal {max} bevatten"
+
 msgid "{count} GitHub stars"
 msgstr "{count} GitHub-sterren"
 
@@ -1401,6 +1413,9 @@ msgstr "1"
 
 msgid "1 cookie — forget this site"
 msgstr "1 cookie — deze site vergeten"
+
+msgid "1 file is over {limit} and was not added"
+msgstr "1 bestand is groter dan {limit} en is niet toegevoegd"
 
 msgid "1 hr"
 msgstr "1 u"
@@ -17712,6 +17727,9 @@ msgstr "Dezelfde app draait native op iPad, staand en liggend."
 msgid "The scorecard"
 msgstr "De scorekaart"
 
+msgid "The selected element's context is too large to send"
+msgstr "De context van het geselecteerde element is te groot om te verzenden"
+
 msgid "The self-driving software factory"
 msgstr "De zelfrijdende softwarefabriek"
 
@@ -19713,9 +19731,6 @@ msgstr "Werkruimte geopend, maar de terminal kon niet starten."
 
 msgid "Workspace path is not available"
 msgstr "Pad van werkruimte is niet beschikbaar"
-
-msgid "Workspace path is not available yet"
-msgstr "Het werkruimtepad is nog niet beschikbaar"
 
 msgid "Workspace restored"
 msgstr "Werkruimte hersteld"

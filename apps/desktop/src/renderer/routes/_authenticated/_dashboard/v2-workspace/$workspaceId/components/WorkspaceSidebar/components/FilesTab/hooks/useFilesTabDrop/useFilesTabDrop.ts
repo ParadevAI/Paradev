@@ -2,6 +2,7 @@ import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import type { FileTree } from "@pierre/trees";
 import { i18n } from "@superset/i18n";
+import { MAX_INLINE_ATTACHMENT_BYTES } from "@superset/shared/attachment-limits";
 import { alert } from "@superset/ui/atoms/Alert";
 import { toast } from "@superset/ui/sonner";
 import { workspaceTrpc } from "@superset/workspace-client";
@@ -376,10 +377,28 @@ export function useFilesTabDrop({
 			// instead of dribbling them into a worktree the user has left. Files
 			// whose names already exist are collected (not overwritten) and the
 			// user is asked to confirm replacement below.
+			const tooLarge = tree.files.filter(
+				({ file }) => file.size > MAX_INLINE_ATTACHMENT_BYTES,
+			);
+			if (tooLarge.length > 0) {
+				const count = tooLarge.length;
+				const limit = `${Math.round(MAX_INLINE_ATTACHMENT_BYTES / 1024 / 1024)}MB`;
+				toast.error(
+					tooLarge.length === 1
+						? t({
+								message: `1 file is over ${limit} and was not added`,
+							})
+						: t({
+								message: `${count} files are over ${limit} and were not added`,
+							}),
+				);
+			}
+
 			let added = 0;
 			let failed = 0;
 			const collisions: DroppedFile[] = [];
 			for (const { relPath, file } of tree.files) {
+				if (file.size > MAX_INLINE_ATTACHMENT_BYTES) continue;
 				if (!bridge.isCurrent(versionToken)) break;
 				try {
 					if ((await writeOneFile(relPath, file, false)) === "exists") {

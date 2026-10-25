@@ -1,3 +1,4 @@
+import { attachedFilesBlock } from "@superset/chat-runtime";
 import { isBuiltinAgentId } from "@superset/shared/agent-catalog";
 import { FORK_SESSION_ID_TOKEN } from "@superset/shared/agent-definition";
 import {
@@ -44,7 +45,10 @@ import {
 import { hasHarnessSession } from "../../../terminal-agents/harness-sessions";
 import type { HostServiceContext } from "../../../types";
 import { protectedProcedure, router } from "../../index";
-import { resolveAttachmentPath } from "../attachments/storage";
+import {
+	handOutAttachment,
+	resolveAttachmentPath,
+} from "../attachments/storage";
 import { createChatSession } from "../sessions/create-chat-session";
 import { toTerminalSessionError } from "../terminal/errors";
 import { seedAgentFolderTrust } from "../workspace-creation/shared/seed-agent-trust";
@@ -124,12 +128,10 @@ function buildForkArgv(forkArgs: string[], rawSessionId: string): string[] {
 
 function buildAttachmentBlock(
 	prompt: string,
-	resolved: Array<{ attachmentId: string; path: string }>,
+	resolved: Array<{ name: string; path: string }>,
 ): string {
 	if (resolved.length === 0) return prompt;
-	const lines = resolved.map((item) => `- ${item.path}`);
-	const block = `\n\n# Attached files\n\nThe user attached these files. They are available on this host at:\n\n${lines.join("\n")}`;
-	return prompt + block;
+	return `${prompt}\n\n${attachedFilesBlock(resolved)}`;
 }
 
 export interface AgentRunInput {
@@ -423,16 +425,19 @@ export function buildTerminalAgentLaunch(
 	validateAgentForkSelection(config, input.forkSessionId);
 	validateForkSessionIsResolvable(db, config, input);
 
-	const resolvedAttachments: Array<{ attachmentId: string; path: string }> = [];
+	const resolvedAttachments: Array<{ name: string; path: string }> = [];
 	for (const attachmentId of input.attachmentIds ?? []) {
-		const resolved = resolveAttachmentPath(attachmentId);
+		const resolved = handOutAttachment(attachmentId);
 		if (!resolved) {
 			throw new TRPCError({
 				code: "NOT_FOUND",
 				message: `Attachment not found: ${attachmentId}`,
 			});
 		}
-		resolvedAttachments.push({ attachmentId, path: resolved.path });
+		resolvedAttachments.push({
+			name: resolved.metadata.originalFilename ?? attachmentId,
+			path: resolved.path,
+		});
 	}
 
 	const prompt = buildAttachmentBlock(input.prompt, resolvedAttachments);
@@ -635,13 +640,25 @@ function bindingRunsConfig(
 	return binding.agentId === launchIdentity(config);
 }
 
+/**
+ * An imported copy keeps its `fileId` next to the host id: the adapters read
+ * `attachmentId` today, and `fileId` is what renders the part without this box.
+ */
+export interface ChatLaunchAttachment {
+	attachmentId: string;
+	fileId?: string;
+	name: string;
+	mimeType: string;
+	sizeBytes: number;
+}
+
 export function chatLaunchTarget(
 	db: HostDb,
 	input: AgentRunInput,
 ): {
 	harness: string;
 	label: string;
-	attachments: Array<{ attachmentId: string; name: string; mimeType: string }>;
+	attachments: ChatLaunchAttachment[];
 } | null {
 	if (
 		input.surface !== "chat" ||
@@ -651,18 +668,16 @@ export function chatLaunchTarget(
 	) {
 		return null;
 	}
-	const attachments: Array<{
-		attachmentId: string;
-		name: string;
-		mimeType: string;
-	}> = [];
+	const attachments: ChatLaunchAttachment[] = [];
 	for (const attachmentId of input.attachmentIds ?? []) {
 		const resolved = resolveAttachmentPath(attachmentId);
 		if (!resolved) return null;
 		attachments.push({
 			attachmentId,
+			...(resolved.metadata.fileId ? { fileId: resolved.metadata.fileId } : {}),
 			name: resolved.metadata.originalFilename ?? attachmentId,
 			mimeType: resolved.metadata.mediaType,
+			sizeBytes: resolved.metadata.sizeBytes,
 		});
 	}
 	const config = resolveHostAgentConfig(db, input.agent);

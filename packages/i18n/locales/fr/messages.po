@@ -65,6 +65,12 @@ msgstr "« {0} » ne se déclenchera plus et son historique d'exécutions sera s
 msgid "\"{name}\" deleted"
 msgstr "« {name} » supprimée"
 
+msgid "\"{name}\" is {size} — files over {limit} can't be attached"
+msgstr "« {name} » fait {size} — les fichiers de plus de {limit} ne peuvent pas être joints"
+
+msgid "\"{name}\" is {size} — files over {limit} can't be attached to this workspace. If the file is on the workspace's machine, mention its path instead."
+msgstr "« {name} » fait {size} — les fichiers de plus de {limit} ne peuvent pas être joints à cet espace de travail. Si le fichier se trouve sur la machine de l’espace de travail, indiquez plutôt son chemin."
+
 msgid "\"{name}\" paused"
 msgstr "« {name} » mise en pause"
 
@@ -833,6 +839,12 @@ msgstr "{count, plural, one {# outil utilisé} other {# outils utilisés}}"
 msgid "{count, plural, one {waiting on # subagent} other {waiting on # subagents}}"
 msgstr "{count, plural, one {attend # sous-agent} other {attend # sous-agents}}"
 
+msgid "{count} files are over {limit} and were not added"
+msgstr "{count} fichiers dépassent {limit} et n’ont pas été ajoutés"
+
+msgid "{count} files attached — a message carries at most {max}"
+msgstr "{count} fichiers joints — un message en contient au plus {max}"
+
 msgid "{count} GitHub stars"
 msgstr "{count} étoiles GitHub"
 
@@ -1401,6 +1413,9 @@ msgstr "1"
 
 msgid "1 cookie — forget this site"
 msgstr "1 cookie — oublier ce site"
+
+msgid "1 file is over {limit} and was not added"
+msgstr "1 fichier dépasse {limit} et n’a pas été ajouté"
 
 msgid "1 hr"
 msgstr "1 h"
@@ -17712,6 +17727,9 @@ msgstr "La même app fonctionne nativement sur iPad, en portrait comme en paysag
 msgid "The scorecard"
 msgstr "Le bilan"
 
+msgid "The selected element's context is too large to send"
+msgstr "Le contexte de l’élément sélectionné est trop volumineux pour être envoyé"
+
 msgid "The self-driving software factory"
 msgstr "L'usine logicielle autonome"
 
@@ -19713,9 +19731,6 @@ msgstr "Espace de travail ouvert, mais le terminal n'a pas démarré."
 
 msgid "Workspace path is not available"
 msgstr "Le chemin de l'espace de travail n'est pas disponible"
-
-msgid "Workspace path is not available yet"
-msgstr "Le chemin de l’espace de travail n’est pas encore disponible"
 
 msgid "Workspace restored"
 msgstr "Espace de travail restauré"

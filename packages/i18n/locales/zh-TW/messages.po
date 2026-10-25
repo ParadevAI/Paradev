@@ -65,6 +65,12 @@ msgstr "「{0}」將不再觸發，其執行歷史也會被移除。此操作無
 msgid "\"{name}\" deleted"
 msgstr "「{name}」已刪除"
 
+msgid "\"{name}\" is {size} — files over {limit} can't be attached"
+msgstr "「{name}」大小為 {size} — 無法附加超過 {limit} 的檔案"
+
+msgid "\"{name}\" is {size} — files over {limit} can't be attached to this workspace. If the file is on the workspace's machine, mention its path instead."
+msgstr "「{name}」大小為 {size} — 無法將超過 {limit} 的檔案附加到此工作區。若檔案位於工作區所在的機器上，請改為提及其路徑。"
+
 msgid "\"{name}\" paused"
 msgstr "「{name}」已暫停"
 
@@ -833,6 +839,12 @@ msgstr "{count, plural, one {使用了 # 個工具} other {使用了 # 個工具
 msgid "{count, plural, one {waiting on # subagent} other {waiting on # subagents}}"
 msgstr "{count, plural, other {正在等待 # 個子代理程式}}"
 
+msgid "{count} files are over {limit} and were not added"
+msgstr "{count} 個檔案超過 {limit}，未新增"
+
+msgid "{count} files attached — a message carries at most {max}"
+msgstr "已附加 {count} 個檔案 — 一則訊息最多可包含 {max} 個"
+
 msgid "{count} GitHub stars"
 msgstr "{count}個GitHub星標"
 
@@ -1401,6 +1413,9 @@ msgstr "1"
 
 msgid "1 cookie — forget this site"
 msgstr "1個cookie——忘記此站點"
+
+msgid "1 file is over {limit} and was not added"
+msgstr "1 個檔案超過 {limit}，未新增"
 
 msgid "1 hr"
 msgstr "1 小時"
@@ -17712,6 +17727,9 @@ msgstr "同一個應用程式在 iPad 上原生執行，支援直向和橫向。
 msgid "The scorecard"
 msgstr "評分表"
 
+msgid "The selected element's context is too large to send"
+msgstr "所選元素的內容脈絡太大，無法傳送"
+
 msgid "The self-driving software factory"
 msgstr "自動駕駛的軟體工廠"
 
@@ -19713,9 +19731,6 @@ msgstr "工作區已開啟，但終端啟動失敗。"
 
 msgid "Workspace path is not available"
 msgstr "工作區路徑不可用"
-
-msgid "Workspace path is not available yet"
-msgstr "工作區路徑尚不可用"
 
 msgid "Workspace restored"
 msgstr "工作區已還原"

@@ -56,6 +56,10 @@ import {
 } from "./terminal-agents";
 import { matchesAgentBinding } from "./terminal-agents/matches-agent-binding";
 import { appRouter } from "./trpc/router";
+import {
+	ATTACHMENT_SWEEP_INTERVAL_MS,
+	sweepAttachmentStore,
+} from "./trpc/router/attachments/sweep";
 import { gitStatusStore } from "./trpc/router/git/utils/git-status-store";
 import {
 	disposeLocalMobileDevices,
@@ -346,6 +350,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 	};
 	const chatV3 = createChatV3Mount({
 		db,
+		api,
 		dbPath: config.dbPath,
 		agents: createChatAgentBridge(chatAgentContext),
 		onSessionChanged: ({ scopeId, occurredAt }) =>
@@ -385,6 +390,18 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 			? null
 			: setInterval(() => void runProjectPurge(), PROJECT_PURGE_INTERVAL_MS);
 	projectPurgeTimer?.unref?.();
+	const runAttachmentSweep = () =>
+		sweepAttachmentStore().catch((err) => {
+			console.warn("[host-service] attachment sweep failed:", err);
+		});
+	const attachmentSweepTimer =
+		process.env.SUPERSET_HOST_RUN_MODE === "sandbox"
+			? null
+			: setInterval(
+					() => void runAttachmentSweep(),
+					ATTACHMENT_SWEEP_INTERVAL_MS,
+				);
+	attachmentSweepTimer?.unref?.();
 	if (process.env.SUPERSET_HOST_RUN_MODE !== "sandbox") {
 		startLocalMobileDeviceCleanup(db);
 	}
@@ -415,6 +432,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 			console.warn("[host-service] archived-workspace reconcile failed:", err);
 		});
 		await runProjectPurge();
+		await runAttachmentSweep();
 		// Re-share the default account's Claude/Codex config into the selected
 		// provider profiles. Last: it touches no host state the sweeps above
 		// repair, and a slow filesystem must not delay them.
@@ -506,6 +524,19 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 	});
 	registerChatV3Routes({ app, db, mount: chatV3, upgradeWebSocket });
 
+	// tRPC answers a streamed batch before it has read the request body, and
+	// a sandbox's ingress treats that early response as the end of the
+	// exchange and drops the upload still in flight. Hand tRPC a body it
+	// already has, so no response starts before the request is complete.
+	app.use("/trpc/*", async (c, next) => {
+		if (c.req.raw.body !== null && !c.req.raw.bodyUsed) {
+			c.req.raw = new Request(c.req.raw, {
+				body: await c.req.raw.arrayBuffer(),
+			});
+		}
+		await next();
+	});
+
 	app.use(
 		"/trpc/*",
 		trpcServer({
@@ -546,6 +577,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 	const ownsDb = options.db === undefined;
 	const dispose = async (): Promise<void> => {
 		if (projectPurgeTimer) clearInterval(projectPurgeTimer);
+		if (attachmentSweepTimer) clearInterval(attachmentSweepTimer);
 		await disposeWorkspaceTitleJobs(db);
 		// Each step is best-effort and isolated: a throw in one cleanup must
 		// not skip the others, otherwise a flaky `.stop()` could leak the

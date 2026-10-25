@@ -65,6 +65,12 @@ msgstr "\"{0}\" sẽ ngừng kích hoạt và lịch sử chạy sẽ bị xóa.
 msgid "\"{name}\" deleted"
 msgstr "Đã xóa \"{name}\""
 
+msgid "\"{name}\" is {size} — files over {limit} can't be attached"
+msgstr "\"{name}\" có dung lượng {size} — không thể đính kèm tệp lớn hơn {limit}"
+
+msgid "\"{name}\" is {size} — files over {limit} can't be attached to this workspace. If the file is on the workspace's machine, mention its path instead."
+msgstr "\"{name}\" có dung lượng {size} — không thể đính kèm tệp lớn hơn {limit} vào workspace này. Nếu tệp nằm trên máy của workspace, hãy ghi đường dẫn của tệp thay vào đó."
+
 msgid "\"{name}\" paused"
 msgstr "Đã tạm dừng \"{name}\""
 
@@ -833,6 +839,12 @@ msgstr "{count, plural, one {đã dùng # công cụ} other {đã dùng # công 
 msgid "{count, plural, one {waiting on # subagent} other {waiting on # subagents}}"
 msgstr "{count, plural, other {đang chờ # agent con}}"
 
+msgid "{count} files are over {limit} and were not added"
+msgstr "{count} tệp vượt quá {limit} và không được thêm"
+
+msgid "{count} files attached — a message carries at most {max}"
+msgstr "Đã đính kèm {count} tệp — mỗi tin nhắn chứa tối đa {max} tệp"
+
 msgid "{count} GitHub stars"
 msgstr "{count} star GitHub"
 
@@ -1401,6 +1413,9 @@ msgstr "1"
 
 msgid "1 cookie — forget this site"
 msgstr "1 cookie — quên trang này"
+
+msgid "1 file is over {limit} and was not added"
+msgstr "1 tệp vượt quá {limit} và không được thêm"
 
 msgid "1 hr"
 msgstr "1 giờ"
@@ -17712,6 +17727,9 @@ msgstr "Cùng một ứng dụng chạy native trên iPad, ở cả chế độ 
 msgid "The scorecard"
 msgstr "Bảng điểm"
 
+msgid "The selected element's context is too large to send"
+msgstr "Ngữ cảnh của phần tử đã chọn quá lớn để gửi"
+
 msgid "The self-driving software factory"
 msgstr "Nhà máy phần mềm tự vận hành"
 
@@ -19713,9 +19731,6 @@ msgstr "Đã mở workspace, nhưng terminal không khởi động được."
 
 msgid "Workspace path is not available"
 msgstr "Không có đường dẫn workspace"
-
-msgid "Workspace path is not available yet"
-msgstr "Đường dẫn không gian làm việc chưa sẵn sàng"
 
 msgid "Workspace restored"
 msgstr "Đã khôi phục workspace"

@@ -360,29 +360,37 @@ export const Composer = memo(function Composer({
 			pastedTexts: string[],
 			steer: boolean,
 		) => {
-			const tags = await uploadAttachments(files);
-			if (!tags) {
+			const uploaded = await uploadAttachments(files);
+			if (!uploaded) {
 				promptInputRef.current?.appendText(appendPastedText(text, pastedTexts));
 				return;
 			}
+			const tags = uploaded.kind === "tags" ? uploaded.tags : [];
+			const parts = uploaded.kind === "parts" ? uploaded.parts : [];
 			const message = text.trim();
 			const elements = elementsForChips(message, mentions);
 			const mcpContext = mcpContextLine(
 				mentions.flatMap((chip) => mcpPicker.serverNameOf(chip) ?? []),
 			);
+			const body = appendPastedText(
+				[message, ...tags].filter(Boolean).join("\n"),
+				pastedTexts,
+			);
 			onSend(
 				[
-					{
-						type: "text",
-						text: appendPastedText(
-							[message, ...tags].filter(Boolean).join("\n"),
-							pastedTexts,
-						),
-						...(elements.length > 0 ? { elements } : {}),
-					},
+					...(body || parts.length === 0
+						? [
+								{
+									type: "text" as const,
+									text: body,
+									...(elements.length > 0 ? { elements } : {}),
+								},
+							]
+						: []),
 					...(mcpContext
 						? [{ type: "text" as const, text: mcpContext, hidden: true }]
 						: []),
+					...parts,
 				],
 				{ steer },
 			);

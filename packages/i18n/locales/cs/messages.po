@@ -65,6 +65,12 @@ msgstr "„{0}“ se přestane spouštět a její historie běhů bude odstraně
 msgid "\"{name}\" deleted"
 msgstr "„{name}“ smazáno"
 
+msgid "\"{name}\" is {size} — files over {limit} can't be attached"
+msgstr "„{name}“ má {size} — soubory nad {limit} nelze připojit"
+
+msgid "\"{name}\" is {size} — files over {limit} can't be attached to this workspace. If the file is on the workspace's machine, mention its path instead."
+msgstr "„{name}“ má {size} — soubory nad {limit} nelze k tomuto pracovnímu prostoru připojit. Pokud je soubor na počítači pracovního prostoru, uveďte místo toho jeho cestu."
+
 msgid "\"{name}\" paused"
 msgstr "„{name}“ pozastaveno"
 
@@ -833,6 +839,12 @@ msgstr "{count, plural, one {použit # nástroj} few {použity # nástroje} many
 msgid "{count, plural, one {waiting on # subagent} other {waiting on # subagents}}"
 msgstr "{count, plural, one {čeká na # subagenta} few {čeká na # subagenty} many {čeká na # subagenta} other {čeká na # subagentů}}"
 
+msgid "{count} files are over {limit} and were not added"
+msgstr "Soubory nad {limit} nebyly přidány: {count}"
+
+msgid "{count} files attached — a message carries at most {max}"
+msgstr "Připojené soubory: {count} — zpráva může obsahovat nejvýše {max}"
+
 msgid "{count} GitHub stars"
 msgstr "{count} hvězd na GitHubu"
 
@@ -1401,6 +1413,9 @@ msgstr "1"
 
 msgid "1 cookie — forget this site"
 msgstr "1 cookie — zapomenout tento web"
+
+msgid "1 file is over {limit} and was not added"
+msgstr "1 soubor přesahuje {limit} a nebyl přidán"
 
 msgid "1 hr"
 msgstr "1 h"
@@ -17712,6 +17727,9 @@ msgstr "Stejná aplikace běží na iPadu nativně, na výšku i na šířku."
 msgid "The scorecard"
 msgstr "Hodnocení"
 
+msgid "The selected element's context is too large to send"
+msgstr "Kontext vybraného prvku je příliš velký na odeslání"
+
 msgid "The self-driving software factory"
 msgstr "Samořídící softwarová továrna"
 
@@ -19713,9 +19731,6 @@ msgstr "Pracovní prostor je otevřený, ale terminál se nepodařilo spustit."
 
 msgid "Workspace path is not available"
 msgstr "Cesta k pracovnímu prostoru není dostupná"
-
-msgid "Workspace path is not available yet"
-msgstr "Cesta pracovního prostoru zatím není dostupná"
 
 msgid "Workspace restored"
 msgstr "Pracovní prostor obnoven"

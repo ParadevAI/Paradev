@@ -1,3 +1,6 @@
+import { msg } from "@lingui/core/macro";
+import { i18n } from "@superset/i18n";
+import { MAX_INLINE_ATTACHMENT_BYTES } from "@superset/shared/attachment-limits";
 import type { workspaceTrpc } from "@superset/workspace-client";
 import type { DesignModePayload } from "shared/browser-design-mode";
 import { formatDesignModeContextMarkdown } from "./designModePrompt";
@@ -60,18 +63,30 @@ export async function writeDesignModeAttachments({
 	// Timestamp alone can collide across rapid sends; suffix for uniqueness.
 	const baseName = `design-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 	const contextName = `${baseName}.md`;
+	const context = formatDesignModeContextMarkdown(payload, comment, {
+		workspaceId,
+		paneId,
+	});
+	if (new TextEncoder().encode(context).length > MAX_INLINE_ATTACHMENT_BYTES) {
+		throw new Error(
+			i18n._(
+				msg({ message: "The selected element's context is too large to send" }),
+			),
+		);
+	}
 	await client.filesystem.writeFile.mutate({
 		workspaceId,
 		absolutePath: joinAbsolutePath(attachmentsDirectory, contextName),
-		content: formatDesignModeContextMarkdown(payload, comment, {
-			workspaceId,
-			paneId,
-		}),
+		content: context,
 	});
 
 	let screenshotPath: string | null = null;
 	const dataUrl = payload.screenshot?.dataUrl;
-	if (dataUrl?.startsWith("data:image/png;base64,")) {
+	const screenshotBytes = dataUrl ? (dataUrl.length * 3) / 4 : 0;
+	if (
+		dataUrl?.startsWith("data:image/png;base64,") &&
+		screenshotBytes <= MAX_INLINE_ATTACHMENT_BYTES
+	) {
 		const screenshotName = `${baseName}.png`;
 		await client.filesystem.writeFile.mutate({
 			workspaceId,

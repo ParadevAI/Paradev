@@ -65,6 +65,12 @@ msgstr "«{0}» перестанет срабатывать, а история �
 msgid "\"{name}\" deleted"
 msgstr "«{name}» удалена"
 
+msgid "\"{name}\" is {size} — files over {limit} can't be attached"
+msgstr "«{name}» занимает {size} — файлы больше {limit} прикрепить нельзя"
+
+msgid "\"{name}\" is {size} — files over {limit} can't be attached to this workspace. If the file is on the workspace's machine, mention its path instead."
+msgstr "«{name}» занимает {size} — к этой рабочей области нельзя прикрепить файлы больше {limit}. Если файл находится на машине рабочей области, укажите вместо этого его путь."
+
 msgid "\"{name}\" paused"
 msgstr "«{name}» приостановлена"
 
@@ -833,6 +839,12 @@ msgstr "{count, plural, one {использован # инструмент} few 
 msgid "{count, plural, one {waiting on # subagent} other {waiting on # subagents}}"
 msgstr "{count, plural, one {ожидает # субагента} few {ожидает # субагентов} many {ожидает # субагентов} other {ожидает # субагента}}"
 
+msgid "{count} files are over {limit} and were not added"
+msgstr "Файлы больше {limit} не добавлены: {count}"
+
+msgid "{count} files attached — a message carries at most {max}"
+msgstr "Прикреплено файлов: {count} — в одном сообщении не больше {max}"
+
 msgid "{count} GitHub stars"
 msgstr "{count} звёзд на GitHub"
 
@@ -1401,6 +1413,9 @@ msgstr "1"
 
 msgid "1 cookie — forget this site"
 msgstr "1 cookie — забыть этот сайт"
+
+msgid "1 file is over {limit} and was not added"
+msgstr "1 файл больше {limit} и не был добавлен"
 
 msgid "1 hr"
 msgstr "1 ч"
@@ -17712,6 +17727,9 @@ msgstr "То же приложение работает на iPad нативно
 msgid "The scorecard"
 msgstr "Таблица оценок"
 
+msgid "The selected element's context is too large to send"
+msgstr "Контекст выбранного элемента слишком велик для отправки"
+
 msgid "The self-driving software factory"
 msgstr "Самоуправляемая софтверная фабрика"
 
@@ -19713,9 +19731,6 @@ msgstr "Рабочая область открыта, но терминал не
 
 msgid "Workspace path is not available"
 msgstr "Путь к рабочей области недоступен"
-
-msgid "Workspace path is not available yet"
-msgstr "Путь рабочего пространства пока недоступен"
 
 msgid "Workspace restored"
 msgstr "Рабочая область восстановлена"

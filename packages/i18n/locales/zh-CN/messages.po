@@ -65,6 +65,12 @@ msgstr "“{0}”将不再触发，其运行历史也会被移除。此操作无
 msgid "\"{name}\" deleted"
 msgstr "“{name}”已删除"
 
+msgid "\"{name}\" is {size} — files over {limit} can't be attached"
+msgstr "“{name}”大小为 {size} — 无法附加超过 {limit} 的文件"
+
+msgid "\"{name}\" is {size} — files over {limit} can't be attached to this workspace. If the file is on the workspace's machine, mention its path instead."
+msgstr "“{name}”大小为 {size} — 无法向此工作区附加超过 {limit} 的文件。如果该文件位于工作区所在的机器上，请改为提及其路径。"
+
 msgid "\"{name}\" paused"
 msgstr "“{name}”已暂停"
 
@@ -833,6 +839,12 @@ msgstr "{count, plural, one {使用了 # 个工具} other {使用了 # 个工具
 msgid "{count, plural, one {waiting on # subagent} other {waiting on # subagents}}"
 msgstr "{count, plural, other {正在等待 # 个子智能体}}"
 
+msgid "{count} files are over {limit} and were not added"
+msgstr "{count} 个文件超过 {limit}，未添加"
+
+msgid "{count} files attached — a message carries at most {max}"
+msgstr "已附加 {count} 个文件 — 一条消息最多可包含 {max} 个"
+
 msgid "{count} GitHub stars"
 msgstr "{count}个GitHub星标"
 
@@ -1401,6 +1413,9 @@ msgstr "1"
 
 msgid "1 cookie — forget this site"
 msgstr "1个cookie——忘记此站点"
+
+msgid "1 file is over {limit} and was not added"
+msgstr "1 个文件超过 {limit}，未添加"
 
 msgid "1 hr"
 msgstr "1 小时"
@@ -17712,6 +17727,9 @@ msgstr "同一个应用在 iPad 上原生运行，支持竖屏和横屏。"
 msgid "The scorecard"
 msgstr "评分表"
 
+msgid "The selected element's context is too large to send"
+msgstr "所选元素的上下文太大，无法发送"
+
 msgid "The self-driving software factory"
 msgstr "自动驾驶的软件工厂"
 
@@ -19713,9 +19731,6 @@ msgstr "工作区已打开，但终端启动失败。"
 
 msgid "Workspace path is not available"
 msgstr "工作区路径不可用"
-
-msgid "Workspace path is not available yet"
-msgstr "工作区路径尚不可用"
 
 msgid "Workspace restored"
 msgstr "工作区已恢复"

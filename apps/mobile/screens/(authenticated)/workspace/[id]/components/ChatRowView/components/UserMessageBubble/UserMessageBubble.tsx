@@ -43,7 +43,9 @@ export function UserMessageBubble({
 
 	const { text, pastes } = parsePastedText(raw);
 	const attachments = content.flatMap((part) =>
-		part.type === "attachment" ? [part] : [],
+		part.type === "attachment" && part.attachmentId
+			? [{ ...part, attachmentId: part.attachmentId }]
+			: [],
 	);
 	const wide = attachments.length > 0 || pastes.length > 0;
 	const failed = pending?.failed === true;
