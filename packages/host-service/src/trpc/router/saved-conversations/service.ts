@@ -341,7 +341,14 @@ export async function adoptNativeConversation(
 			cwd: current.cwd,
 		});
 		// Compare the scan's file identity with the complete validated read.
-		const { sha256: _hash, ...readMetadata } = history;
+		const readMetadata = {
+			path: history.path,
+			device: history.device,
+			inode: history.inode,
+			size: history.size,
+			modifiedAt: history.modifiedAt,
+			changedAt: history.changedAt,
+		};
 		if (revision(metadata) !== revision(readMetadata)) unavailable();
 		const id = randomUUID();
 		checkpoint = await checkpointNativeHistory(

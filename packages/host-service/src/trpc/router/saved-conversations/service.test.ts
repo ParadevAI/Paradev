@@ -30,6 +30,7 @@ import { claudeProjectDirName } from "../../../terminal-agents/harness-sessions/
 import { SqliteTerminalAgentBindingPersistence } from "../../../terminal-agents/persistence";
 import { TerminalAgentStore } from "../../../terminal-agents/store";
 import type { AgentRunInput } from "../agents/agents";
+import { inspectAccountResumeHistory } from "../terminal-agents/account-resume-history";
 import {
 	accountResumeSource,
 	resumeTerminalWithAccount,
@@ -208,6 +209,60 @@ async function rejected(operation: Promise<unknown>): Promise<unknown> {
 }
 
 describe("saved native Claude adoption", () => {
+	test("adoption compares scan stat evidence without discarding validated store bindings", async () => {
+		const f = await fixture();
+		const observations: Awaited<
+			ReturnType<typeof inspectAccountResumeHistory>
+		>[] = [];
+		f.deps.inspectHistory = async (input) => {
+			const history = await inspectAccountResumeHistory(input);
+			observations.push(history);
+			return history;
+		};
+		const saved = await f.adopt();
+		const store = join(f.profile, "projects");
+		const canonical = await realpath(store);
+		const bindings = [
+			{ path: store, canonical },
+			{ path: store, canonical },
+		];
+		expect(observations).toHaveLength(2);
+		for (const history of observations)
+			expect(history.storeBindings).toEqual(bindings);
+		expect(f.db.select().from(savedConversations).all()).toHaveLength(1);
+		expect(
+			await readFile(
+				join(f.deps.checkpointDirectory, `${saved.id}.jsonl`),
+				"utf8",
+			),
+		).toBe(f.content(firstId));
+		expect(f.launches).toHaveLength(0);
+	});
+
+	test("changed store bindings between validation reads refuse adoption and remove the unused checkpoint", async () => {
+		const f = await fixture();
+		let reads = 0;
+		f.deps.inspectHistory = async (input) => {
+			const history = await inspectAccountResumeHistory(input);
+			if (++reads !== 2) return history;
+			return {
+				...history,
+				storeBindings: history.storeBindings?.map((binding, index) =>
+					index === 1
+						? { ...binding, canonical: join(f.directory, "different-store") }
+						: binding,
+				),
+			};
+		};
+		await expect(f.adopt()).rejects.toMatchObject({
+			code: "PRECONDITION_FAILED",
+		});
+		expect(reads).toBe(2);
+		expect(f.db.select().from(savedConversations).all()).toEqual([]);
+		expect(await readdir(f.deps.checkpointDirectory)).toEqual([]);
+		expect(f.launches).toHaveLength(0);
+	});
+
 	test("lists metadata without accepting filename identity as proof", async () => {
 		const f = await fixture();
 		await writeFile(join(f.project, `${firstId}.jsonl`), "not jsonl");
