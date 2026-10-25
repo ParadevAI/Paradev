@@ -394,10 +394,8 @@ interface UseSidebarDndOptions {
 	sessionChildren: DashboardSidebarProjectChild[];
 	onReorderProjects: (projectIds: string[]) => void;
 	/**
-	 * True while a filter hides projects: the rendered project list is a
-	 * subset of the manual order, so committing a drop would rewrite tabOrder
-	 * against the view. The sort modes never reorder projects, so they do not
-	 * set this — a project stays draggable while its workspaces are sorted.
+	 * True while projects are sorted or filtered: committing a drop would
+	 * rewrite tabOrder against the transformed view.
 	 */
 	projectDragDisabled?: boolean;
 	/**

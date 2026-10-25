@@ -6627,8 +6627,8 @@ msgstr "připravil 3 odpovědi podpoře"
 msgid "Drag to reorder"
 msgstr "Přetažením změníte pořadí"
 
-msgid "Drag workspaces to reorder in Manual order"
-msgstr "Přetažením pracovních prostorů změníte pořadí v ručním řazení"
+msgid "Drag to reorder in Manual order"
+msgstr "V režimu Ruční pořadí přetažením změňte pořadí"
 
 msgid "Drawer"
 msgstr "Drawer"
@@ -7475,6 +7475,9 @@ msgstr "Nepodařilo se odeslat větev"
 
 msgid "Failed to record page version"
 msgstr "Nepodařilo se zaznamenat verzi stránky"
+
+msgid "Failed to refresh projects"
+msgstr "Nepodařilo se obnovit projekty"
 
 msgid "Failed to remove"
 msgstr "Nepodařilo se odebrat"
@@ -16265,14 +16268,17 @@ msgstr "Řadit podle"
 msgid "Sort by {label}, currently {sortLabel}"
 msgstr "Seřadit podle {label}, aktuálně {sortLabel}"
 
+msgid "Sort projects"
+msgstr "Seřadit projekty"
+
+msgid "Sort projects ({currentLabel})"
+msgstr "Seřadit projekty ({currentLabel})"
+
+msgid "Sort projects ({currentLabel}) · {hostLabel}"
+msgstr "Seřadit projekty ({currentLabel}) · {hostLabel}"
+
 msgid "Sort workspaces"
 msgstr "Seřadit pracovní prostory"
-
-msgid "Sort workspaces ({currentLabel})"
-msgstr "Seřadit pracovní prostory ({currentLabel})"
-
-msgid "Sort workspaces ({currentLabel}) · {hostLabel}"
-msgstr "Seřadit pracovní prostory ({currentLabel}) · {hostLabel}"
 
 msgid "Sounds and ringtone for completed tasks"
 msgstr "Zvuky a vyzvánění pro dokončené úkoly"

@@ -6627,8 +6627,8 @@ msgstr "지원 답변 3건 초안 작성"
 msgid "Drag to reorder"
 msgstr "끌어서 순서 변경"
 
-msgid "Drag workspaces to reorder in Manual order"
-msgstr "수동 정렬에서 워크스페이스를 드래그하여 순서 변경"
+msgid "Drag to reorder in Manual order"
+msgstr "수동 순서에서 드래그하여 재정렬"
 
 msgid "Drawer"
 msgstr "드로어"
@@ -7475,6 +7475,9 @@ msgstr "브랜치를 푸시하지 못했습니다"
 
 msgid "Failed to record page version"
 msgstr "페이지 버전을 기록하지 못했습니다"
+
+msgid "Failed to refresh projects"
+msgstr "프로젝트를 새로 고치지 못했습니다"
 
 msgid "Failed to remove"
 msgstr "제거하지 못했습니다"
@@ -16265,14 +16268,17 @@ msgstr "정렬 기준"
 msgid "Sort by {label}, currently {sortLabel}"
 msgstr "{label} 기준 정렬, 현재 {sortLabel}"
 
+msgid "Sort projects"
+msgstr "프로젝트 정렬"
+
+msgid "Sort projects ({currentLabel})"
+msgstr "프로젝트 정렬 ({currentLabel})"
+
+msgid "Sort projects ({currentLabel}) · {hostLabel}"
+msgstr "프로젝트 정렬 ({currentLabel}) · {hostLabel}"
+
 msgid "Sort workspaces"
 msgstr "워크스페이스 정렬"
-
-msgid "Sort workspaces ({currentLabel})"
-msgstr "워크스페이스 정렬 ({currentLabel})"
-
-msgid "Sort workspaces ({currentLabel}) · {hostLabel}"
-msgstr "워크스페이스 정렬 ({currentLabel}) · {hostLabel}"
 
 msgid "Sounds and ringtone for completed tasks"
 msgstr "완료된 작업에 사용할 소리와 벨소리"

@@ -53,6 +53,7 @@ import {
 } from "./derivePullRequestQueryTargets";
 import { pickGithubStatus } from "./pickGithubStatus";
 import { createPullRequestRefreshGate } from "./pullRequestRefreshCooldown";
+import { refreshDashboardSidebarProjects } from "./refreshDashboardSidebarProjects";
 
 // Module-level so remounting the sidebar doesn't reset the cool-down.
 const pullRequestRefreshGate = createPullRequestRefreshGate();
@@ -880,6 +881,10 @@ export function useDashboardSidebarData() {
 		[computedPinnedWorkspaces, cloudRowById],
 	);
 	const pinnedWorkspaces = useJsonStable(decoratedPinnedWorkspaces);
+	const refreshProjects = useCallback(async () => {
+		if (!organizationId) return;
+		await refreshDashboardSidebarProjects(queryClient, organizationId);
+	}, [organizationId, queryClient]);
 
 	return {
 		groups,
@@ -889,6 +894,7 @@ export function useDashboardSidebarData() {
 		sessionChildren: sessions.children,
 		githubStatus,
 		refreshWorkspacePullRequest,
+		refreshProjects,
 		toggleProjectCollapsed,
 	};
 }

@@ -27,7 +27,7 @@ Rules shared by the non-manual modes (`utils/sortDashboardSidebarProjects`):
 
 - A folder ranks among loose workspaces by its newest member (Last active) or
   its own `createdAt` (Date created); its members are sorted inside it too.
-- The local `main` workspace stays first inside its project.
+- Local workspaces sort by the same timestamps as other workspaces.
 - A project with no workspaces ranks by its own `updatedAt`, then `createdAt`.
 - Ties break by name, then id, so the order is stable across renders.
 - Timestamps are coerced NaN-safely. Persisted caches can revive `Date`
@@ -90,6 +90,17 @@ migrates stay `null` until their first agent event.
   per-host `useQueries` fan-out with a 10 s interval.
 - No cloud persistence: activity is per host, like the rows themselves. A
   remote host's ranking is exactly as fresh as its last snapshot.
+
+## Refresh
+
+A refresh button beside the sort control reloads the active organization's
+project lists, workspace activity, tag folders, pull-request summaries, and
+cloud workspace rows. It refetches active queries only: unreachable hosts keep
+their cached rows and other organizations are left untouched. The button spins
+and disables while requests settle, then becomes available again even if a host
+fails. A failed request shows an error without clearing the existing list.
+Refresh preserves the selected sort mode, filter, collapse state, and manual
+order; it does not mark any workspace as active.
 
 ## Filter
 

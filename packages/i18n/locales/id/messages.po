@@ -6627,8 +6627,8 @@ msgstr "menyusun 3 draf balasan dukungan"
 msgid "Drag to reorder"
 msgstr "Seret untuk mengurutkan ulang"
 
-msgid "Drag workspaces to reorder in Manual order"
-msgstr "Seret workspace untuk mengatur ulang dalam Urutan manual"
+msgid "Drag to reorder in Manual order"
+msgstr "Seret untuk mengurutkan ulang dalam mode Urutan manual"
 
 msgid "Drawer"
 msgstr "Drawer"
@@ -7475,6 +7475,9 @@ msgstr "Gagal mem-push branch"
 
 msgid "Failed to record page version"
 msgstr "Gagal mencatat versi halaman"
+
+msgid "Failed to refresh projects"
+msgstr "Gagal menyegarkan proyek"
 
 msgid "Failed to remove"
 msgstr "Gagal menghapus"
@@ -16265,14 +16268,17 @@ msgstr "Urutkan menurut"
 msgid "Sort by {label}, currently {sortLabel}"
 msgstr "Urutkan menurut {label}, saat ini {sortLabel}"
 
+msgid "Sort projects"
+msgstr "Urutkan proyek"
+
+msgid "Sort projects ({currentLabel})"
+msgstr "Urutkan proyek ({currentLabel})"
+
+msgid "Sort projects ({currentLabel}) · {hostLabel}"
+msgstr "Urutkan proyek ({currentLabel}) · {hostLabel}"
+
 msgid "Sort workspaces"
 msgstr "Urutkan workspace"
-
-msgid "Sort workspaces ({currentLabel})"
-msgstr "Urutkan workspace ({currentLabel})"
-
-msgid "Sort workspaces ({currentLabel}) · {hostLabel}"
-msgstr "Urutkan workspace ({currentLabel}) · {hostLabel}"
 
 msgid "Sounds and ringtone for completed tasks"
 msgstr "Suara dan nada dering untuk tugas yang selesai"

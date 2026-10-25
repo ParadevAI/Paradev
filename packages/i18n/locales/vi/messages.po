@@ -6627,8 +6627,8 @@ msgstr "đã soạn 3 câu trả lời hỗ trợ"
 msgid "Drag to reorder"
 msgstr "Kéo để sắp xếp lại"
 
-msgid "Drag workspaces to reorder in Manual order"
-msgstr "Kéo workspace để sắp xếp lại trong Thứ tự thủ công"
+msgid "Drag to reorder in Manual order"
+msgstr "Kéo để sắp xếp lại trong chế độ Thứ tự thủ công"
 
 msgid "Drawer"
 msgstr "Drawer"
@@ -7475,6 +7475,9 @@ msgstr "Không thể push nhánh"
 
 msgid "Failed to record page version"
 msgstr "Không thể ghi nhận phiên bản trang"
+
+msgid "Failed to refresh projects"
+msgstr "Không thể làm mới dự án"
 
 msgid "Failed to remove"
 msgstr "Không thể gỡ"
@@ -16265,14 +16268,17 @@ msgstr "Sắp xếp theo"
 msgid "Sort by {label}, currently {sortLabel}"
 msgstr "Sắp xếp theo {label}, hiện tại {sortLabel}"
 
+msgid "Sort projects"
+msgstr "Sắp xếp dự án"
+
+msgid "Sort projects ({currentLabel})"
+msgstr "Sắp xếp dự án ({currentLabel})"
+
+msgid "Sort projects ({currentLabel}) · {hostLabel}"
+msgstr "Sắp xếp dự án ({currentLabel}) · {hostLabel}"
+
 msgid "Sort workspaces"
 msgstr "Sắp xếp workspace"
-
-msgid "Sort workspaces ({currentLabel})"
-msgstr "Sắp xếp workspace ({currentLabel})"
-
-msgid "Sort workspaces ({currentLabel}) · {hostLabel}"
-msgstr "Sắp xếp workspace ({currentLabel}) · {hostLabel}"
 
 msgid "Sounds and ringtone for completed tasks"
 msgstr "Âm thanh và nhạc chuông cho tác vụ đã hoàn tất"

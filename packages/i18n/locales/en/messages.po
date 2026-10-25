@@ -6627,8 +6627,8 @@ msgstr "drafted 3 support replies"
 msgid "Drag to reorder"
 msgstr "Drag to reorder"
 
-msgid "Drag workspaces to reorder in Manual order"
-msgstr "Drag workspaces to reorder in Manual order"
+msgid "Drag to reorder in Manual order"
+msgstr "Drag to reorder in Manual order"
 
 msgid "Drawer"
 msgstr "Drawer"
@@ -7475,6 +7475,9 @@ msgstr "Failed to push branch"
 
 msgid "Failed to record page version"
 msgstr "Failed to record page version"
+
+msgid "Failed to refresh projects"
+msgstr "Failed to refresh projects"
 
 msgid "Failed to remove"
 msgstr "Failed to remove"
@@ -16265,14 +16268,17 @@ msgstr "Sort by"
 msgid "Sort by {label}, currently {sortLabel}"
 msgstr "Sort by {label}, currently {sortLabel}"
 
+msgid "Sort projects"
+msgstr "Sort projects"
+
+msgid "Sort projects ({currentLabel})"
+msgstr "Sort projects ({currentLabel})"
+
+msgid "Sort projects ({currentLabel}) · {hostLabel}"
+msgstr "Sort projects ({currentLabel}) · {hostLabel}"
+
 msgid "Sort workspaces"
 msgstr "Sort workspaces"
-
-msgid "Sort workspaces ({currentLabel})"
-msgstr "Sort workspaces ({currentLabel})"
-
-msgid "Sort workspaces ({currentLabel}) · {hostLabel}"
-msgstr "Sort workspaces ({currentLabel}) · {hostLabel}"
 
 msgid "Sounds and ringtone for completed tasks"
 msgstr "Sounds and ringtone for completed tasks"

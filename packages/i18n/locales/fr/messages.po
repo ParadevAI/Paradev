@@ -6627,8 +6627,8 @@ msgstr "3 réponses au support rédigées"
 msgid "Drag to reorder"
 msgstr "Faites glisser pour réorganiser"
 
-msgid "Drag workspaces to reorder in Manual order"
-msgstr "Glisser les espaces de travail pour les réordonner en ordre manuel"
+msgid "Drag to reorder in Manual order"
+msgstr "Faire glisser pour réorganiser en mode Ordre manuel"
 
 msgid "Drawer"
 msgstr "Drawer"
@@ -7475,6 +7475,9 @@ msgstr "Échec du push de la branche"
 
 msgid "Failed to record page version"
 msgstr "Échec de l'enregistrement de la version de la page"
+
+msgid "Failed to refresh projects"
+msgstr "Impossible d’actualiser les projets"
 
 msgid "Failed to remove"
 msgstr "Échec de la suppression"
@@ -16265,14 +16268,17 @@ msgstr "Trier par"
 msgid "Sort by {label}, currently {sortLabel}"
 msgstr "Trier par {label}, actuellement {sortLabel}"
 
+msgid "Sort projects"
+msgstr "Trier les projets"
+
+msgid "Sort projects ({currentLabel})"
+msgstr "Trier les projets ({currentLabel})"
+
+msgid "Sort projects ({currentLabel}) · {hostLabel}"
+msgstr "Trier les projets ({currentLabel}) · {hostLabel}"
+
 msgid "Sort workspaces"
 msgstr "Trier les espaces de travail"
-
-msgid "Sort workspaces ({currentLabel})"
-msgstr "Trier les espaces de travail ({currentLabel})"
-
-msgid "Sort workspaces ({currentLabel}) · {hostLabel}"
-msgstr "Trier les espaces de travail ({currentLabel}) · {hostLabel}"
 
 msgid "Sounds and ringtone for completed tasks"
 msgstr "Sons et sonnerie pour les tâches terminées"

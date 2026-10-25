@@ -29,6 +29,7 @@ import {
 import { useSidebarSectionsCollapseStore } from "renderer/stores/sidebar-sections-collapse";
 import { DashboardSidebarSectionHeader } from "../DashboardSidebarSectionHeader";
 import { DashboardSidebarProjectsFilterInput } from "./components/DashboardSidebarProjectsFilterInput";
+import { DashboardSidebarProjectsRefreshButton } from "./components/DashboardSidebarProjectsRefreshButton";
 import { DashboardSidebarProjectsSortMenu } from "./components/DashboardSidebarProjectsSortMenu";
 import { useProjectFilterExpanded } from "./hooks/useProjectFilterExpanded";
 
@@ -40,6 +41,7 @@ interface DashboardSidebarWorkspacesHeaderProps {
 	onHostFilterChange: (filter: SidebarProjectHostFilter) => void;
 	filterQuery: string;
 	onFilterQueryChange: (query: string) => void;
+	onRefresh: () => Promise<void>;
 }
 
 export function DashboardSidebarWorkspacesHeader({
@@ -49,6 +51,7 @@ export function DashboardSidebarWorkspacesHeader({
 	onHostFilterChange,
 	filterQuery,
 	onFilterQueryChange,
+	onRefresh,
 }: DashboardSidebarWorkspacesHeaderProps) {
 	const { t } = useLingui();
 	const isSectionCollapsed = useSidebarSectionsCollapseStore(
@@ -144,6 +147,7 @@ export function DashboardSidebarWorkspacesHeader({
 				hostFilter={hostFilter}
 				onHostFilterChange={onHostFilterChange}
 			/>
+			<DashboardSidebarProjectsRefreshButton onRefresh={onRefresh} />
 			<DropdownMenu>
 				<Tooltip delayDuration={700}>
 					<TooltipTrigger asChild>

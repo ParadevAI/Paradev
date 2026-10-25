@@ -52,16 +52,91 @@ describe("sortDashboardSidebarProjects", () => {
 		expect(sortDashboardSidebarProjects(projects, "manual")).toBe(projects);
 	});
 
-	it("keeps the manual project order in created mode", () => {
+	it("sorts projects newest first in created mode", () => {
 		expect(
 			sortDashboardSidebarProjects([older, newer], "created").map((p) => p.id),
+		).toEqual(["p-newer", "p-older"]);
+	});
+
+	it("sorts projects by their most recently active workspace", () => {
+		expect(
+			sortDashboardSidebarProjects([newer, older], "active").map((p) => p.id),
 		).toEqual(["p-older", "p-newer"]);
 	});
 
-	it("keeps the manual project order in active mode", () => {
+	it("includes activity in collapsed folders and restores the manual order", () => {
+		const grouped = makeProject({
+			id: "p-grouped",
+			name: "Grouped",
+			isCollapsed: true,
+			children: [
+				{
+					type: "section",
+					section: makeSection({
+						id: "folder",
+						name: "Folder",
+						isCollapsed: true,
+						workspaces: [
+							makeWorkspace({
+								id: "grouped-workspace",
+								name: "Grouped workspace",
+								lastActivityAt: at("2026-08-01"),
+							}),
+						],
+					}),
+				},
+			],
+		});
+		const projects = [newer, grouped, older];
 		expect(
-			sortDashboardSidebarProjects([newer, older], "active").map((p) => p.id),
-		).toEqual(["p-newer", "p-older"]);
+			sortDashboardSidebarProjects(projects, "active").map((p) => p.id),
+		).toEqual(["p-grouped", "p-older", "p-newer"]);
+		expect(sortDashboardSidebarProjects(projects, "manual")).toBe(projects);
+		expect(projects.map((p) => p.id)).toEqual([
+			"p-newer",
+			"p-grouped",
+			"p-older",
+		]);
+	});
+
+	it("ranks empty projects by metadata and places unknown dates last", () => {
+		const empty = makeProject({
+			id: "empty",
+			name: "Empty",
+			updatedAt: "2026-08-01T00:00:00.000Z" as unknown as Date,
+		});
+		const createdOnly = makeProject({
+			id: "created-only",
+			name: "Created only",
+			updatedAt: new Date("invalid"),
+			createdAt: new Date("2026-09-01"),
+		});
+		const unknown = makeProject({
+			id: "unknown",
+			name: "Unknown",
+			updatedAt: new Date("invalid"),
+			createdAt: null as unknown as Date,
+		});
+		expect(
+			sortDashboardSidebarProjects(
+				[unknown, older, empty, createdOnly],
+				"active",
+			).map((p) => p.id),
+		).toEqual(["created-only", "empty", "p-older", "unknown"]);
+	});
+
+	it.each([
+		"active",
+		"created",
+	] as const)("breaks project timestamp ties by name and id in %s mode", (mode) => {
+		const projects = [
+			makeProject({ id: "z", name: "Beta" }),
+			makeProject({ id: "b", name: "Alpha" }),
+			makeProject({ id: "a", name: "Alpha" }),
+		];
+		expect(
+			sortDashboardSidebarProjects(projects, mode).map((p) => p.id),
+		).toEqual(["a", "b", "z"]);
 	});
 
 	it("does not mutate the input array", () => {
@@ -425,42 +500,6 @@ describe("lastActivityAt in active mode", () => {
 			"w-old-host",
 			"w-new-host",
 		]);
-	});
-
-	// Activity ranks rows inside a project and stops there — a busy workspace
-	// must not drag its project up past the one above it.
-	it("does not bubble activity up to project ordering", () => {
-		const idle = makeProject({
-			id: "p-idle",
-			name: "Idle",
-			children: [
-				{
-					type: "workspace",
-					workspace: makeWorkspace({
-						id: "w2",
-						name: "two",
-						lastActivityAt: at("2026-05-01"),
-					}),
-				},
-			],
-		});
-		const busy = makeProject({
-			id: "p-busy",
-			name: "Busy",
-			children: [
-				{
-					type: "workspace",
-					workspace: makeWorkspace({
-						id: "w1",
-						name: "one",
-						lastActivityAt: at("2026-07-01"),
-					}),
-				},
-			],
-		});
-		expect(
-			sortDashboardSidebarProjects([idle, busy], "active").map((p) => p.id),
-		).toEqual(["p-idle", "p-busy"]);
 	});
 
 	it("bubbles activity inside a section up to the section's rank", () => {
