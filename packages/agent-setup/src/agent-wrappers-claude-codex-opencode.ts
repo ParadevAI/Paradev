@@ -12,6 +12,7 @@ import {
 } from "./agent-wrappers-common";
 import { getArtifactGuardScriptPath } from "./artifact-guard-hook";
 import { getTemplatePath } from "./config";
+import {createClaudeUsageStatuslineScript, claudeUsageStatuslineLaunch} from "./claude-usage-statusline";
 import {
 	buildNestedDesiredEntries,
 	cleanNestedHookDefinition,
@@ -296,9 +297,10 @@ export function getOpenCodePluginContent(notifyPath: string): string {
  * in ~/.claude/settings.json (createClaudeSettingsJson).
  */
 export function createClaudeWrapper(): void {
-	const script = buildWrapperScript("claude", `exec "$REAL_BIN" "$@"`, {
+ createClaudeUsageStatuslineScript();
+	const script = buildWrapperScript("claude", claudeUsageStatuslineLaunch(), {
 		agentId: "claude",
-		beforeLaunch: buildDefaultAccountResolver(
+		beforeLaunch: `_superset_capture_usage=""\n[ -z "$SUPERSET_AGENT_ID" ] && [ "$SUPERSET_NATIVE_CLAUDE_USAGE" = "1" ] && [ "$SUPERSET_PINNED_ACCOUNT" = "CLAUDE_CONFIG_DIR" ] && _superset_capture_usage="1"\n` + buildDefaultAccountResolver(
 			"CLAUDE_CONFIG_DIR",
 			"default-claude-config-dir",
 		),

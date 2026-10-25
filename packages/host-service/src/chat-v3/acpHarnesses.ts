@@ -6,7 +6,8 @@ import { createAcpAdapter } from "@superset/chat-runtime";
 import type { HostDb } from "../db";
 import { resolveAttachmentPath } from "../trpc/router/attachments/storage";
 import { captureSessionAccount } from "../trpc/router/usage/session-account/session-account";
-import { validateChatAccount } from "./accountLaunch";
+import { sessionAccountForChat, validateChatAccount } from "./accountLaunch";
+import { createNativeClaudeChatFeed } from "./nativeClaudeUsage";
 import { ACP_HARNESSES } from "./acpCatalogue";
 import { resolveAgentCli } from "./agentCli";
 import { buildChatAgentEnv } from "./agentEnv";
@@ -48,6 +49,7 @@ export function acpHarnessFactory(
 
 	return (options) => {
 		const launchContext = options.launchContext;
+		const nativeUsage = process.env.SUPERSET_NATIVE_CLAUDE_USAGE === "1" && entry.binary === "claude" && launchContext ? createNativeClaudeChatFeed() : null;
 		return createAcpAdapter({
 			command: entry.binary,
 			cwd: options.cwd,
@@ -70,6 +72,9 @@ export function acpHarnessFactory(
 			...(entry.clientApprovalModes ? { clientApprovalModes: true } : {}),
 			...(entry.forkAtMessage ? { forkAtMessage: true } : {}),
 			onSpawn: (pid) => agents?.spawned(options.sessionId, pid),
+			onSessionId: (sessionId) => nativeUsage?.session(sessionId),
+			onClaudeRateLimit: (event) => nativeUsage?.event(event),
+			onDisposed: () => nativeUsage?.dispose(),
 			launch: async () => {
 				const cli = await resolveAgentCli({
 					binary: entry.binary,
@@ -93,6 +98,7 @@ export function acpHarnessFactory(
 						options.harness,
 						options.scopeId,
 					);
+				if (nativeUsage && launchContext) await nativeUsage.launched(sessionAccountForChat(launchContext.account));
 				void captureSessionAccount(
 					entry.binary,
 					(entry.binary === "codex" ? env.CODEX_HOME : env.CLAUDE_CONFIG_DIR) ??

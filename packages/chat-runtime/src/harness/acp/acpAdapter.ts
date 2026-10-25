@@ -205,6 +205,9 @@ function sessionMissing(error: unknown): boolean {
 }
 
 export type AcpAdapterOptions = SpawnAcpOptions & {
+ onSessionId?: (sessionId: string) => void;
+ onClaudeRateLimit?: (input: { sessionId: string; rateLimitInfo: unknown; responseCounter: number }) => void;
+ onDisposed?: () => void;
 	beforePrompt?: () => Promise<void>;
 	launch?: () => Promise<Pick<SpawnAcpOptions, "command" | "args" | "env">>;
 	/** Selected for a new session that asks for no mode, when the agent offers it. */
@@ -436,6 +439,9 @@ export class AcpAdapter implements HarnessAdapter {
 	private unkeyedImageSequence = 0;
 	private queuedPrompts: UserContent[][] = [];
 	private disposed = false;
+	private claudeResponseCounter = 0;
+	private claudeResponseTurn: string | null = null;
+	private readonly claudeResponseIds = new Set<string>();
 	private dead = false;
 	private startupStatus: SessionState["status"] | null = null;
 	private stderrTail = "";
@@ -880,6 +886,7 @@ export class AcpAdapter implements HarnessAdapter {
 	async dispose(): Promise<void> {
 		if (this.disposed) return;
 		this.disposed = true;
+		try { this.options.onDisposed?.(); } catch {}
 		this.stalePendingApprovals();
 		this.backgroundTasks.dispose();
 		if (this.shellPoll) clearInterval(this.shellPoll);
@@ -1076,6 +1083,7 @@ export class AcpAdapter implements HarnessAdapter {
 				return;
 			}
 
+			try { this.options.onSessionId?.(this.sessionId); } catch {}
 			this.emitSession({
 				status: this.startupStatus ?? "idle",
 				harnessSessionId: this.sessionId,
@@ -1347,7 +1355,23 @@ export class AcpAdapter implements HarnessAdapter {
 			return;
 		}
 
+  if (!this.replaying && (variant === "agent_message_chunk" || variant === "agent_message") && this.currentTurn?.status === "running") {
+   const responseId = messageIdOf(outer.data.update);
+   if ((responseId && !this.claudeResponseIds.has(responseId)) || (!responseId && this.claudeResponseTurn !== this.currentTurn.id)) {
+    this.claudeResponseTurn = this.currentTurn.id;
+    this.claudeResponseCounter++;
+    if (responseId) this.claudeResponseIds.add(responseId);
+    if (this.claudeResponseIds.size > 256) this.claudeResponseIds.delete(this.claudeResponseIds.values().next().value as string);
+   }
+  }
 		if (variant === "usage_update") {
+   if (!this.replaying && this.sessionId === outer.data.sessionId) {
+    const metadata = (outer.data.update as { _meta?: Record<string, unknown> })._meta;
+    const rateLimitInfo = metadata?.["_claude/rateLimit"];
+    if (rateLimitInfo && typeof rateLimitInfo === "object" && !Array.isArray(rateLimitInfo)) {
+     try { this.options.onClaudeRateLimit?.({ sessionId: outer.data.sessionId, rateLimitInfo, responseCounter: this.claudeResponseCounter }); } catch {}
+    }
+   }
 			const usage = acpUsageUpdateSchema.safeParse(outer.data.update);
 			if (usage.success && usage.data.cost !== undefined) this.main.flush();
 			if (

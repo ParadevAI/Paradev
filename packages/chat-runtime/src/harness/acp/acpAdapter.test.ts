@@ -6066,3 +6066,49 @@ describe("AcpAdapter when the agent fails", () => {
 		await adapter.dispose();
 	});
 });
+
+
+describe("AcpAdapter passive Claude quota feed", () => {
+ it("forwards only main-session live metadata with a response counter", async () => {
+  const agent = new FakeAcpAgent();
+  agent.holdPrompts = true;
+  const sessions: string[] = [];
+  const captured: Array<{ sessionId: string; rateLimitInfo: unknown; responseCounter: number }> = [];
+  let disposed = 0;
+  const adapter = new AcpAdapter({ command: "fake", createTransport: (_options, handlers) => agent.transport(handlers), onSessionId: (id) => sessions.push(id), onClaudeRateLimit: (value) => captured.push(value), onDisposed: () => { disposed++; } });
+  const events: AdapterEvent[] = [];
+  void collect(adapter.start({ cwd: "/work" }), events);
+  await flush();
+  expect(sessions).toEqual(["sess-1"]);
+  const usage = { sessionUpdate: "usage_update", used: 10, size: 100, _meta: { "_claude/rateLimit": { rateLimitType: "five_hour", utilization: 0.25, resetsAt: 1_800_000_300 } } };
+  agent.notify("sess-1", usage);
+  agent.notify("foreign", usage);
+  expect(captured.map((item) => item.responseCounter)).toEqual([0]);
+  adapter.prompt([{ type: "text", text: "fixture" }]);
+  await flush();
+  agent.notify("sess-1", { sessionUpdate: "agent_message_chunk", messageId: "response-1", content: { type: "text", text: "fixture" } });
+  agent.notify("sess-1", usage);
+  agent.notify("foreign", { sessionUpdate: "agent_message_chunk", messageId: "foreign-response", content: { type: "text", text: "fixture" } });
+  agent.notify("sess-1", { sessionUpdate: "agent_message_chunk", messageId: "response-1", content: { type: "text", text: "fixture" } });
+  agent.notify("sess-1", usage);
+  expect(captured.map((item) => item.responseCounter)).toEqual([0, 1, 1]);
+  await adapter.dispose();
+  expect(disposed).toBe(1);
+ });
+ it("does not interpret restored history as a current API response", async () => {
+  const agent = new FakeAcpAgent();
+  agent.replayUpdates = [
+   { sessionUpdate: "agent_message", messageId: "old-response", content: [{ type: "text", text: "fixture history" }] },
+   { sessionUpdate: "usage_update", used: 10, size: 100, _meta: { "_claude/rateLimit": { utilization: 0.25, rateLimitType: "five_hour", resetsAt: 1_800_000_300 } } },
+  ];
+  const captured: unknown[] = [];
+  const adapter = new AcpAdapter({ command: "fake", createTransport: (_options, handlers) => agent.transport(handlers), onClaudeRateLimit: (value) => captured.push(value) });
+  const events: AdapterEvent[] = [];
+  void collect(adapter.start({ cwd: "/work", resume: { harnessSessionId: "sess-1" } }), events);
+  await flush(40);
+  expect(captured).toEqual([]);
+  agent.notify("sess-1", { sessionUpdate: "usage_update", used: 10, size: 100, _meta: { "_claude/rateLimit": { utilization: 0.25, rateLimitType: "five_hour", resetsAt: 1_800_000_300 } } });
+  expect(captured).toEqual([expect.objectContaining({ responseCounter: 0 })]);
+  await adapter.dispose();
+ });
+});

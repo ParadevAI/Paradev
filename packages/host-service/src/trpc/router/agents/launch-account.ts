@@ -269,6 +269,7 @@ export function pinnedAccountCommandPrefix(
 			...env,
 			...pinnedAccountEnv(account),
 			SUPERSET_PINNED_ACCOUNT: variable,
+			SUPERSET_NATIVE_CLAUDE_USAGE: process.env.SUPERSET_NATIVE_CLAUDE_USAGE === "1" ? "1" : "",
 		}).map(([key, value]) => `${key}=${value}`),
 	])} `;
 }
