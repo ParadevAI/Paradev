@@ -37,7 +37,7 @@ function fixture() {
 		resolveScope: async (_a, _d, _i, expected) =>
 			expected === generation ? scope : null,
 	};
-	const feed = createNativeClaudeChatFeed(deps);
+	const feed = createNativeClaudeChatFeed(deps, () => now);
 	const event = (
 		responseCounter: number,
 		used = 0.2,
@@ -55,10 +55,12 @@ function fixture() {
 		feed,
 		account,
 		store,
+		deps,
 		event,
-		advance: () => {
-			now += 1000;
+		advance: (ms = 1000) => {
+			now += ms;
 		},
+		time: () => now,
 		warm: () => {
 			scope = "b".repeat(64);
 		},
@@ -121,4 +123,42 @@ test("pre-spawn generation, foreign session, disposal and unpinned account guard
 	unpinned.feed.event(unpinned.event(1));
 	await unpinned.feed.settled();
 	expect(unpinned.store.snapshot("b".repeat(64))).toEqual([]);
+});
+
+test("ACP events retain arrival time while queued behind asynchronous validation", async () => {
+	const f = fixture();
+	f.warm();
+	await f.feed.launched(f.account);
+	f.feed.session("owned-session");
+	await f.feed.settled();
+	let release!: () => void;
+	let entered!: () => void;
+	const waiting = new Promise<void>((resolve) => {
+		entered = resolve;
+	});
+	const gate = new Promise<void>((resolve) => {
+		release = resolve;
+	});
+	let block = true;
+	f.deps.validateAccount = async () => {
+		if (block) {
+			block = false;
+			entered();
+			await gate;
+		}
+		return true;
+	};
+	f.advance();
+	f.feed.event(f.event(1, 0.25));
+	await waiting;
+	f.advance(2000);
+	const receivedAt = f.time();
+	f.feed.event(f.event(2, 0.4));
+	f.advance(45_000);
+	release();
+	await f.feed.settled();
+	const window = f.store.snapshot("b".repeat(64))[0];
+	expect(window?.usedPercent).toBe(40);
+	expect(window?.observedAt).toBe(receivedAt);
+	expect(window?.observedAt).not.toBe(f.time());
 });

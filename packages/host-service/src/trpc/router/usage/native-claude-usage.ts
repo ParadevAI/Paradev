@@ -30,9 +30,12 @@ export interface NativeClaudeUsageInput {
 	sessionId: string;
 	source: NativeClaudeUsageSource;
 	payload: unknown;
+	/** Host receipt before queues or asynchronous identity validation. Never provider input. */
+	receivedAt: number;
 	responseCounter?: number;
 	quarantined?: boolean;
 }
+export const NATIVE_CLAUDE_FRESH_MS = 6 * 60_000;
 const MAX_BYTES = 512 * 1024;
 const MAX_SCOPES = 128;
 const MAX_BINDINGS = 256;
@@ -279,7 +282,20 @@ export function createNativeClaudeUsageStore(
 			.sort((a, b) => b.updatedAt - a.updatedAt)
 			.slice(0, MAX_BINDINGS);
 	}
+	function validReceipt(receivedAt: number, at: number): boolean {
+		return (
+			Number.isFinite(at) &&
+			at >= 0 &&
+			Number.isFinite(receivedAt) &&
+			receivedAt >= 0 &&
+			receivedAt <= at &&
+			at - receivedAt <= NATIVE_CLAUDE_FRESH_MS
+		);
+	}
 	return {
+		isCurrentReceipt(receivedAt: number): boolean {
+			return validReceipt(receivedAt, now());
+		},
 		captureLaunch(input: {
 			generation: string;
 			launchId: string;
@@ -439,13 +455,14 @@ export function createNativeClaudeUsageStore(
 			);
 		},
 		ingest(input: NativeClaudeUsageInput): boolean {
+			const at = now();
 			if (
+				!validReceipt(input.receivedAt, at) ||
 				!digest.safeParse(input.scope).success ||
 				!validId(input.launchId) ||
 				!validId(input.sessionId)
 			)
 				return false;
-			const at = now();
 			const parsed =
 				input.source === "claude_statusline"
 					? parseNativeClaudeStatusline(input.payload, at)
@@ -469,6 +486,7 @@ export function createNativeClaudeUsageStore(
 			]);
 			let binding = value.bindings.find((item) => item.key === key);
 			const previous = binding;
+			if (previous && previous.updatedAt > input.receivedAt) return false;
 			const counter =
 				"counter" in parsed
 					? parsed.counter
@@ -489,7 +507,13 @@ export function createNativeClaudeUsageStore(
 				parsed.windows.map((window) => [window.id, hash(window)]),
 			);
 			if (!binding) {
-				binding = { key, counter, event, signatures, updatedAt: at };
+				binding = {
+					key,
+					counter,
+					event,
+					signatures,
+					updatedAt: input.receivedAt,
+				};
 				value.bindings.unshift(binding);
 			}
 			const advanced =
@@ -507,19 +531,28 @@ export function createNativeClaudeUsageStore(
 				binding.counter !== counter ||
 				JSON.stringify(binding.signatures) !== JSON.stringify(signatures);
 			if (baselineChanged || !previous)
-				Object.assign(binding, { counter, event, signatures, updatedAt: at });
+				Object.assign(binding, {
+					counter,
+					event,
+					signatures,
+					updatedAt: input.receivedAt,
+				});
 			let applied = false;
 			if (windows.length) {
 				let scope = value.scopes.find((item) => item.key === input.scope);
 				if (!scope) {
-					scope = { key: input.scope, windows: [], updatedAt: at };
+					scope = {
+						key: input.scope,
+						windows: [],
+						updatedAt: input.receivedAt,
+					};
 					value.scopes.unshift(scope);
 				}
 				for (const window of windows) {
 					const existing = scope.windows.find((item) => item.id === window.id);
 					if (
 						existing &&
-						(existing.observedAt > at ||
+						(existing.observedAt > input.receivedAt ||
 							existing.resetsAt > window.resetsAt ||
 							(existing.resetsAt === window.resetsAt &&
 								existing.usedPercent > window.usedPercent))
@@ -528,10 +561,11 @@ export function createNativeClaudeUsageStore(
 					applied = true;
 					scope.windows = [
 						...scope.windows.filter((item) => item.id !== window.id),
-						{ ...window, observedAt: at, source: input.source },
+						{ ...window, observedAt: input.receivedAt, source: input.source },
 					];
 				}
-				if (applied) scope.updatedAt = at;
+				if (applied)
+					scope.updatedAt = Math.max(scope.updatedAt, input.receivedAt);
 			}
 			prune(at);
 			if (windows.length || baselineChanged || !previous) save();

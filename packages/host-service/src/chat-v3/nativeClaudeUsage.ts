@@ -18,7 +18,10 @@ const dependencies: NativeClaudeUsageDependencies = {
 	validateAccount: validateSessionAccount,
 	store: nativeClaudeUsage,
 };
-export function createNativeClaudeChatFeed(deps = dependencies) {
+export function createNativeClaudeChatFeed(
+	deps = dependencies,
+	now = Date.now,
+) {
 	const launchId = randomUUID();
 	let launched: (NativeClaudeAccount & { generation: string }) | undefined;
 	let sessionId: string | undefined;
@@ -55,6 +58,7 @@ export function createNativeClaudeChatFeed(deps = dependencies) {
 		},
 		session(id: string): void {
 			if (disposed || !launched || sessionId) return;
+			const receivedAt = now();
 			sessionId = id;
 			const account = launched;
 			enqueue(async () => {
@@ -75,6 +79,7 @@ export function createNativeClaudeChatFeed(deps = dependencies) {
 					launch,
 					{
 						source: "claude_sdk",
+						receivedAt,
 						responseCounter: 0,
 						payload: {
 							type: "rate_limit_event",
@@ -93,6 +98,8 @@ export function createNativeClaudeChatFeed(deps = dependencies) {
 			eventId?: string;
 			responseCounter: number;
 		}): void {
+			// Capture before the serial queue: proof work must not freshen this event.
+			const receivedAt = now();
 			if (disposed || !launched || input.sessionId !== sessionId) return;
 			const account = launched;
 			enqueue(async () => {
@@ -101,6 +108,7 @@ export function createNativeClaudeChatFeed(deps = dependencies) {
 					{ launchId, sessionId: input.sessionId },
 					{
 						source: "claude_sdk",
+						receivedAt,
 						responseCounter: input.responseCounter,
 						payload: {
 							type: "rate_limit_event",

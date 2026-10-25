@@ -129,6 +129,7 @@ test("actual credential reader uses fresh bound native windows without another u
 		nativeClaudeUsage.captureLaunch(launch);
 		nativeClaudeUsage.promoteLaunch({ ...launch, scope });
 		nativeClaudeUsage.ingest({
+			receivedAt: Date.now(),
 			...launch,
 			scope,
 			source: "claude_statusline",
@@ -136,6 +137,7 @@ test("actual credential reader uses fresh bound native windows without another u
 		});
 		setSystemTime(initial + 16 * 60_000);
 		nativeClaudeUsage.ingest({
+			receivedAt: Date.now(),
 			...launch,
 			scope,
 			source: "claude_statusline",

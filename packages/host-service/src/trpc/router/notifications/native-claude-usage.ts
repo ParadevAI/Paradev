@@ -102,6 +102,8 @@ export function createNativeClaudeTerminalFeed(
 			payload: unknown,
 			current: () => TerminalAgentBinding | undefined,
 		): Promise<boolean> {
+			// Receipt is captured before asynchronous account/proof validation.
+			const receivedAt = now();
 			const binding = current();
 			if (!matchesNativeClaudeHook(binding, identity) || !binding.account)
 				return false;
@@ -116,7 +118,7 @@ export function createNativeClaudeTerminalFeed(
 			return ingestNativeClaudeBinding(
 				account,
 				identity,
-				{ source: "claude_statusline", payload },
+				{ source: "claude_statusline", payload, receivedAt },
 				unchanged,
 				deps,
 			);

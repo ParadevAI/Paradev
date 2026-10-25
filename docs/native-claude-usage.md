@@ -20,7 +20,7 @@ The cached provider proof must independently authenticate the same principal and
 
 The first status-line frame is a baseline. A rise in `cost.total_api_duration_ms` is required before supplied windows become observations. Timer, startup and configuration replays keep the old date. ACP replay and foreign/subagent events cannot advance the response counter. A restored SDK rate-limit event alone is not a new measurement. Each supplied window retains its own `observedAt` and source; a missing window is not fabricated. Lower utilization from a late event in the same reset epoch cannot replace a newer reading.
 
-The native payload does not expose a server observation timestamp. The tracker records when it observes proven API progress, and retains that timestamp through caching, host restart and proof promotion. It does not label an arbitrary idle render as a fresh server response.
+The native payload does not expose a server observation timestamp. The host stamps each receipt synchronously before queuing or asynchronous identity validation. Proven API progress retains that original receipt as `observedAt` through caching, host restart and proof promotion. Missing, future or more than six-minute-old receipts are refused. Native display and HTTP-deferral eligibility expire together after six minutes; provider and financial readings keep their separate original dates and policies. An idle render or delayed validation cannot make a reading fresh.
 
 ## Bounds and fallback
 

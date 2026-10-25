@@ -68,11 +68,13 @@ function fixture() {
 		identity,
 		feed,
 		store,
+		deps,
 		frame,
 		current: () => binding,
-		advance: () => {
-			now += 1000;
+		advance: (ms = 1000) => {
+			now += ms;
 		},
+		time: () => now,
 		warm: () => {
 			scope = "b".repeat(64);
 		},
@@ -155,4 +157,33 @@ test("background adoption never forwards predecessor samples or refreshes their 
 		),
 	).toBe(false);
 	expect(f.store.snapshot("b".repeat(64))).toEqual(original);
+});
+
+test("terminal hook receipt precedes deferred account validation", async () => {
+	const f = fixture();
+	f.warm();
+	await f.feed.prepare(f.identity.terminalId, f.account);
+	f.feed.capture(f.identity, f.current);
+	await f.feed.ingest(f.identity, f.frame(0), f.current);
+	f.advance();
+	const receivedAt = f.time();
+	let release!: () => void;
+	let entered!: () => void;
+	const waiting = new Promise<void>((resolve) => {
+		entered = resolve;
+	});
+	const gate = new Promise<void>((resolve) => {
+		release = resolve;
+	});
+	f.deps.validateAccount = async () => {
+		entered();
+		await gate;
+		return true;
+	};
+	const pending = f.feed.ingest(f.identity, f.frame(1), f.current);
+	await waiting;
+	f.advance(45_000);
+	release();
+	expect(await pending).toBe(true);
+	expect(f.store.snapshot("b".repeat(64))[0]?.observedAt).toBe(receivedAt);
 });

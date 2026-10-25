@@ -45,7 +45,11 @@ function fixture() {
 		ingestNativeClaudeBinding(
 			account,
 			launch,
-			{ source: "claude_statusline", payload: frame(counter, used) },
+			{
+				source: "claude_statusline",
+				payload: frame(counter, used),
+				receivedAt: now,
+			},
 			() => true,
 			deps,
 		);
@@ -56,8 +60,8 @@ function fixture() {
 		deps,
 		frame,
 		ingest,
-		advance: () => {
-			now += 1000;
+		advance: (ms = 1000) => {
+			now += ms;
 		},
 		time: () => now,
 		warm: () => {
@@ -123,7 +127,11 @@ test("rotation, invalid registration, unpinned accounts and ownership changes ca
 		await ingestNativeClaudeBinding(
 			{ ...other.account, pinned: undefined },
 			other.launch,
-			{ source: "claude_statusline", payload: other.frame(1) },
+			{
+				source: "claude_statusline",
+				payload: other.frame(1),
+				receivedAt: other.time(),
+			},
 			() => true,
 			other.deps,
 		),
@@ -132,7 +140,11 @@ test("rotation, invalid registration, unpinned accounts and ownership changes ca
 		await ingestNativeClaudeBinding(
 			other.account,
 			other.launch,
-			{ source: "claude_statusline", payload: other.frame(1) },
+			{
+				source: "claude_statusline",
+				payload: other.frame(1),
+				receivedAt: other.time(),
+			},
 			() => false,
 			other.deps,
 		),
@@ -157,4 +169,60 @@ test("promotion fences the original credential generation and cannot switch orga
 			scope: "d".repeat(64),
 		}),
 	).toBe(false);
+});
+
+test("asynchronous principal proof keeps the pre-validation receipt", async () => {
+	const f = fixture();
+	f.warm();
+	await f.ingest(0);
+	f.advance();
+	const receivedAt = f.time();
+	let release!: () => void;
+	let entered!: () => void;
+	const waiting = new Promise<void>((resolve) => {
+		entered = resolve;
+	});
+	const gate = new Promise<void>((resolve) => {
+		release = resolve;
+	});
+	const resolveScope = f.deps.resolveScope;
+	f.deps.resolveScope = async (...args) => {
+		entered();
+		await gate;
+		return resolveScope(...args);
+	};
+	const delayed = f.ingest(1, 30);
+	await waiting;
+	f.advance(45_000);
+	release();
+	expect(await delayed).toBe(true);
+	expect(f.store.snapshot(f.scope)[0]?.observedAt).toBe(receivedAt);
+});
+
+test("proof that completes after receipt expiry cannot promote a queued reading", async () => {
+	const f = fixture();
+	await f.ingest(0);
+	f.advance();
+	await f.ingest(1, 30);
+	let release!: () => void;
+	let entered!: () => void;
+	const waiting = new Promise<void>((resolve) => {
+		entered = resolve;
+	});
+	const gate = new Promise<void>((resolve) => {
+		release = resolve;
+	});
+	const resolveScope = f.deps.resolveScope;
+	f.deps.resolveScope = async (...args) => {
+		entered();
+		await gate;
+		return resolveScope(...args);
+	};
+	f.warm();
+	const replay = f.ingest(1, 30);
+	await waiting;
+	f.advance(6 * 60_000 + 1);
+	release();
+	expect(await replay).toBe(false);
+	expect(f.store.snapshot(f.scope)).toEqual([]);
 });
