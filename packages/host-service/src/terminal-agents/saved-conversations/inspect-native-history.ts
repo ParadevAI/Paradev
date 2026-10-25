@@ -106,7 +106,13 @@ async function exactSessionFile(
 
 export async function inspectNativeResumeHistory(
 	input: NativeResumeHistoryInput,
-	openFile: typeof open = open,
+): Promise<AccountResumeHistory | null> {
+	return inspectNativeResumeHistoryWithReader(input, open);
+}
+
+export async function inspectNativeResumeHistoryWithReader(
+	input: NativeResumeHistoryInput,
+	openFile: typeof open,
 ): Promise<AccountResumeHistory | null> {
 	const { provider, sourceDirectory, targetDirectory, sessionId, cwd } = input;
 	if (

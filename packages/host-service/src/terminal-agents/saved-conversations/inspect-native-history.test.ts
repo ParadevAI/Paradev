@@ -15,6 +15,7 @@ import { dirname, join } from "node:path";
 import {
 	assertNativeResumeHistoryCurrent,
 	inspectNativeResumeHistory,
+	inspectNativeResumeHistoryWithReader,
 } from "./inspect-native-history";
 
 const roots: string[] = [];
@@ -107,7 +108,7 @@ test.each([
 
 test("a parent-directory replacement cannot validate an unlinked old transcript descriptor", async () => {
 	const f = await fixture();
-	const result = await inspectNativeResumeHistory(
+	const result = await inspectNativeResumeHistoryWithReader(
 		f.input,
 		afterRead(async () => {
 			await rename(dirname(f.path), join(f.root, "retired-project"));
@@ -123,7 +124,7 @@ test("a parent-directory replacement cannot validate an unlinked old transcript 
 
 test("a destination history-root retarget during a read is rejected", async () => {
 	const f = await fixture();
-	const result = await inspectNativeResumeHistory(
+	const result = await inspectNativeResumeHistoryWithReader(
 		f.input,
 		afterRead(async () => {
 			const next = join(f.root, "other-history");
@@ -138,7 +139,7 @@ test("a destination history-root retarget during a read is rejected", async () =
 
 test("a Codex destination writer-lock retarget during a read is rejected", async () => {
 	const f = await fixture("codex");
-	const result = await inspectNativeResumeHistory(
+	const result = await inspectNativeResumeHistoryWithReader(
 		f.input,
 		afterRead(async () => {
 			const next = join(f.root, "other-locks");
