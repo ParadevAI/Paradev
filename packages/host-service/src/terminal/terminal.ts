@@ -71,6 +71,11 @@ import {
 	waitForTerminalBaseEnv,
 } from "./env.ts";
 import {
+	invalidateFreshAdmission,
+	readFreshAdmission,
+	registerFreshAdmission,
+} from "./fresh-admission";
+import {
 	TerminalLifecycleOperations,
 	terminalLifecycleState,
 } from "./lifecycle/lifecycle.ts";
@@ -1017,6 +1022,17 @@ export async function listLiveTerminalSessions(
 	return merged;
 }
 
+/** Only initial, unreplayed output from a new untouched terminal can admit a native attachment. */
+export function readFreshTerminalAdmission(input: {
+	terminalId: string;
+	workspaceId: string;
+}): Uint8Array | null {
+	const session = sessions.get(input.terminalId);
+	if (!session || session.exited || session.workspaceId !== input.workspaceId)
+		return null;
+	return readFreshAdmission(session, input.terminalId, input.workspaceId);
+}
+
 export function writeInputToSession({
 	terminalId,
 	workspaceId,
@@ -1040,6 +1056,7 @@ export function writeInputToSession({
 		return { kind: "SESSION_EXITED", error: "Terminal session has exited" };
 	}
 
+	invalidateFreshAdmission(session);
 	session.pty.write(data);
 	return { success: true };
 }
@@ -1277,8 +1294,10 @@ async function writeSessionMessage(
 				agent || session.modeTracker.isBracketedPasteActive()
 					? `\x1b[200~${message}\x1b[201~`
 					: message;
-			const write = (data: string) =>
-				agent ? session.pty.writeOrThrow(data) : session.pty.write(data);
+			const write = (data: string) => {
+				invalidateFreshAdmission(session);
+				return agent ? session.pty.writeOrThrow(data) : session.pty.write(data);
+			};
 			let inputStaged: true | undefined;
 			try {
 				if (!submit) {
@@ -3379,6 +3398,15 @@ async function createTerminalSessionUnlocked({
 	};
 	reclaimSession = session;
 	sessions.set(terminalId, session);
+	if (!isAdopted)
+		registerFreshAdmission(session, {
+			terminalId,
+			workspaceId,
+			read: () =>
+				session.retainedStartSeq === 0 && session.outputSeq <= 16 * 1024
+					? readRetainedFrom(session, 0)
+					: null,
+		});
 	portManager.upsertSession(terminalId, workspaceId, pty.pid);
 
 	if (session.shellReadyState === "pending") {
@@ -3911,6 +3939,7 @@ export function registerWorkspaceTerminalRoute({
 					}
 
 					if (message.type === "input") {
+						invalidateFreshAdmission(session);
 						session.pty.write(message.data);
 						return;
 					}

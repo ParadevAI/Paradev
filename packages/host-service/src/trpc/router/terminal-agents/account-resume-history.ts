@@ -1,6 +1,9 @@
 import { isAbsolute } from "node:path";
 import { TRPCError } from "@trpc/server";
-import type { AccountResumeHistory } from "../../../terminal-agents/saved-conversations/inspect-native-history";
+import {
+	type AccountResumeHistory,
+	assertNativeResumeHistoryCurrent,
+} from "../../../terminal-agents/saved-conversations/inspect-native-history";
 import { getHostWorkerPool } from "../../../workers/host-worker-pool";
 import { inspectSavedConversationTask } from "../../../workers/tasks/harness";
 import type { SessionAccount } from "../usage/session-account/session-account";
@@ -60,6 +63,17 @@ export function sameAccountResumeHistory(
 		left.size === right.size &&
 		left.modifiedAt === right.modifiedAt &&
 		left.changedAt === right.changedAt &&
-		left.sha256 === right.sha256
+		left.sha256 === right.sha256 &&
+		JSON.stringify(left.storeBindings) === JSON.stringify(right.storeBindings)
 	);
+}
+
+export function assertAccountResumeHistoryCurrent(
+	history: AccountResumeHistory,
+): void {
+	try {
+		assertNativeResumeHistoryCurrent(history);
+	} catch {
+		refuse();
+	}
 }

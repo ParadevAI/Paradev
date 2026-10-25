@@ -39,6 +39,11 @@ import { type AgentRunResult, runAgentInWorkspace } from "../agents/agents";
 import { toTerminalSessionError } from "../terminal/errors";
 import type { SessionAccount } from "../usage/session-account/session-account";
 import {
+	backgroundReconnectSource,
+	reconnectTerminalBackgroundSession,
+	supportsBackgroundReconnect,
+} from "./background-reconnect-adapter";
+import {
 	accountResumeSource,
 	resumeTerminalWithAccount,
 } from "./resume-account";
@@ -444,6 +449,38 @@ export const terminalAgentsRouter = router({
 				input,
 			),
 		),
+
+	/** Additive capability: older hosts never receive an unguarded new recovery procedure. */
+	backgroundRecoveryCapabilities: protectedProcedure.query(async () => ({
+		version: 1 as const,
+		claudeLiveAttach: await supportsBackgroundReconnect(),
+	})),
+	backgroundRecoverySource: protectedProcedure
+		.input(
+			z.object({ workspaceId: z.string(), terminalId: z.string() }).strict(),
+		)
+		.query(({ ctx, input }) => backgroundReconnectSource(ctx, input)),
+	reconnectBackground: protectedProcedure
+		.input(
+			z
+				.object({
+					workspaceId: z.string(),
+					terminalId: z.string(),
+					expectedRevision: z.string().regex(/^[a-f0-9]{64}$/),
+				})
+				.strict(),
+		)
+		.mutation(async ({ ctx, input }) => {
+			try {
+				return await reconnectTerminalBackgroundSession(ctx, input);
+			} catch {
+				throw new TRPCError({
+					code: "PRECONDITION_FAILED",
+					message:
+						"The exact background conversation could not be verified. Nothing was restarted. Retry Continue after checking the original session.",
+				});
+			}
+		}),
 
 	list: protectedProcedure.query(({ ctx }) => {
 		return ctx.terminalAgentStore.list();

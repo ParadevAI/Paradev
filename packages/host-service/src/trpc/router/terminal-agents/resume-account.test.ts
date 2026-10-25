@@ -124,6 +124,7 @@ function fixture(provider: "claude" | "codex" = "claude") {
 		assertIdle: async () => {},
 		assertNoClaudeWriter: async () => {},
 		inspectHistory: async () => history,
+		assertHistoryCurrent: () => {},
 	};
 	const input = () => ({
 		...sourceInput,
@@ -144,6 +145,39 @@ function fixture(provider: "claude" | "codex" = "claude") {
 }
 
 describe("resume an ended native conversation with a selected account", () => {
+	test("rechecks the transcript at synchronous command authorization", async () => {
+		const f = fixture();
+		let checkpoint = false;
+		f.deps.assertHistoryCurrent = () => {
+			checkpoint = true;
+			throw new Error("Saved history changed");
+		};
+		await expect(resumeTerminalWithAccount(f.deps, f.input())).rejects.toThrow(
+			"Saved history changed",
+		);
+		expect(checkpoint).toBe(true);
+		expect(f.binding()?.endReason).toBe("detached");
+		expect(f.calls).toHaveLength(0);
+	});
+
+	test("rechecks the workspace after asynchronous preflight but before consuming the claim", async () => {
+		const f = fixture();
+		f.deps.runAgent = async (input) => {
+			if (!input.terminalLaunch) throw new Error("Expected guard");
+			await input.terminalLaunch.beforeInitialCommand();
+			f.db
+				.update(workspaces)
+				.set({ worktreePath: "/changed-before-send" })
+				.run();
+			input.terminalLaunch.onInitialCommandReady();
+			throw new Error("Should not authorize");
+		};
+		await expect(resumeTerminalWithAccount(f.deps, f.input())).rejects.toThrow(
+			"changed",
+		);
+		expect(f.binding()?.endReason).toBe("detached");
+		expect(f.calls).toHaveLength(0);
+	});
 	test.each([
 		"claude",
 		"codex",

@@ -62,6 +62,7 @@ import {
 	disposeLocalMobileDevices,
 	startLocalMobileDeviceCleanup,
 } from "./trpc/router/mobile";
+import { disposeBackgroundSuccessorRefresh } from "./trpc/router/notifications/background-successor-adapter";
 import {
 	resumeCrashedAgentSessions,
 	resumeSessionDepsFor,
@@ -550,6 +551,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 
 	const ownsDb = options.db === undefined;
 	const dispose = async (): Promise<void> => {
+		disposeBackgroundSuccessorRefresh(db);
 		if (projectPurgeTimer) clearInterval(projectPurgeTimer);
 		await disposeWorkspaceTitleJobs(db);
 		// Each step is best-effort and isolated: a throw in one cleanup must
