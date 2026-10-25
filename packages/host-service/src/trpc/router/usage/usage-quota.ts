@@ -74,12 +74,15 @@ export function createUsageQuotaReader(
 							return await cache.get(forceRefresh);
 						} catch {
 							return [
-								unavailableQuotaAccount({
-									agent,
-									accountKey: `${agent}:discovery`,
-									sourceLabel: `${agent} accounts`,
-									selection: null,
-								}),
+								{
+									...unavailableQuotaAccount({
+										agent,
+										accountKey: `${agent}:discovery`,
+										sourceLabel: `${agent} accounts`,
+										selection: null,
+									}),
+									discoveryFailed: true,
+								},
 							];
 						}
 					}),
