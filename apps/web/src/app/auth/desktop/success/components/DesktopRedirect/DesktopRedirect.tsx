@@ -1,9 +1,11 @@
 "use client";
 
 import { Trans } from "@lingui/react/macro";
-import Image from "next/image";
-import Link from "next/link";
-import { useEffect } from "react";
+import { BRAND } from "@superset/shared/brand";
+import { useEffect, useState } from "react";
+import { DesktopAuthCard } from "../DesktopAuthCard";
+
+const HAND_OFF_DELAY_MS = 2500;
 
 export function DesktopRedirect({
 	url,
@@ -12,29 +14,40 @@ export function DesktopRedirect({
 	url: string;
 	localCallbackUrl?: string;
 }) {
+	const [handedOff, setHandedOff] = useState(false);
+	const target = localCallbackUrl ?? url;
+	const appName = BRAND.NAME;
+
 	useEffect(() => {
-		if (localCallbackUrl) {
-			// Full-page redirect to localhost — not blocked by mixed content.
-			// Browsers only block mixed-content subresources (fetch, XHR), not navigations.
-			window.location.href = localCallbackUrl;
-		} else {
-			// Fallback to deep link (macOS, or when local server unavailable)
-			window.location.href = url;
-		}
-	}, [url, localCallbackUrl]);
+		// Full-page navigation, not fetch: browsers block mixed-content subresources, not navigations.
+		window.location.href = target;
+
+		const markHandedOff = () => setHandedOff(true);
+		const timer = window.setTimeout(markHandedOff, HAND_OFF_DELAY_MS);
+		window.addEventListener("blur", markHandedOff);
+		return () => {
+			window.clearTimeout(timer);
+			window.removeEventListener("blur", markHandedOff);
+		};
+	}, [target]);
 
 	return (
-		<div className="flex flex-col items-center gap-6">
-			<Image src="/title.svg" alt="Superset" width={280} height={86} priority />
-			<p className="text-xl text-muted-foreground">
-				<Trans>Redirecting to desktop app...</Trans>
-			</p>
-			<Link
-				href={localCallbackUrl ?? url}
-				className="text-sm text-muted-foreground/70 underline decoration-muted-foreground/40 underline-offset-4 transition-colors hover:text-muted-foreground"
+		<DesktopAuthCard
+			title={<Trans>You're signed in</Trans>}
+			description={
+				handedOff ? (
+					<Trans>You can close this tab.</Trans>
+				) : (
+					<Trans>Opening {appName}…</Trans>
+				)
+			}
+		>
+			<a
+				href={target}
+				className="text-sm text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
 			>
-				<Trans>Click here if not redirected</Trans>
-			</Link>
-		</div>
+				<Trans>Open {appName}</Trans>
+			</a>
+		</DesktopAuthCard>
 	);
 }

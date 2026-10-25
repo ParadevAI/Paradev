@@ -2808,9 +2808,6 @@ msgstr "Kimlik doğrulama"
 msgid "Authentication Code"
 msgstr "Kimlik doğrulama kodu"
 
-msgid "Authentication failed"
-msgstr "Kimlik doğrulama başarısız"
-
 msgid "Author"
 msgstr "Yazar"
 
@@ -4727,6 +4724,9 @@ msgstr "Bağlam menüsü"
 
 msgid "Continue"
 msgstr "Devam et"
+
+msgid "Continue in your browser"
+msgstr "Tarayıcınızda devam edin"
 
 msgid "Continue or fork session"
 msgstr "Oturumu sürdür veya forkla"
@@ -8346,6 +8346,9 @@ msgstr "Geri git"
 msgid "Go back home"
 msgstr "Ana sayfaya dön"
 
+msgid "Go back to {appName} and sign in again."
+msgstr "{appName} uygulamasına dönüp tekrar giriş yapın."
+
 msgid "Go back to the previous page in history"
 msgstr "Geçmişte önceki sayfaya dön"
 
@@ -9600,6 +9603,9 @@ msgstr "Son güncelleme: {lastUpdated}"
 msgid "Last used"
 msgstr "Son kullanılan"
 
+msgid "Last used: {lastUsedProviderLabel}"
+msgstr "Son kullanılan: {lastUsedProviderLabel}"
+
 msgid "Late 2026"
 msgstr "2026 sonu"
 
@@ -10491,9 +10497,6 @@ msgstr "Kaçırılan"
 
 msgid "Missed <0>· 7d</0>"
 msgstr "Kaçırılan <0>· 7g</0>"
-
-msgid "Missing auth state"
-msgstr "Kimlik doğrulama durumu eksik"
 
 msgid "Missing authorization code. Re-run"
 msgstr "Yetkilendirme kodu eksik. Yeniden çalıştırın:"
@@ -12007,6 +12010,9 @@ msgstr "Aç: {0}"
 msgid "Open {0} website"
 msgstr "{0} web sitesini aç"
 
+msgid "Open {appName}"
+msgstr "{appName} uygulamasını aç"
+
 msgid "Open {appName} on that computer"
 msgstr "O bilgisayarda {appName}'i açın"
 
@@ -12060,6 +12066,9 @@ msgstr "Dalı GitHub'da aç"
 
 msgid "Open Browser"
 msgstr "Tarayıcıyı aç"
+
+msgid "Open browser again"
+msgstr "Tarayıcıyı yeniden aç"
 
 msgid "Open changes"
 msgstr "Değişiklikleri aç"
@@ -12432,6 +12441,9 @@ msgstr "Açıldı"
 
 msgid "opened PR #841 for review"
 msgstr "inceleme için PR #841 açtı"
+
+msgid "Opening {appName}…"
+msgstr "{appName} açılıyor…"
 
 msgid "Opening {what}"
 msgstr "{what} açılıyor"
@@ -13034,9 +13046,6 @@ msgstr "Lütfen bir kuruluş seçin"
 
 msgid "Please try again, or restart Superset on that device."
 msgstr "Lütfen tekrar deneyin veya o cihazda Superset’i yeniden başlatın."
-
-msgid "Please try signing in again from the desktop app."
-msgstr "Lütfen masaüstü uygulamasından yeniden oturum açmayı deneyin."
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.noApiKeyAuth"
@@ -15966,6 +15975,9 @@ msgstr "Başlamak için oturum açın"
 msgid "Sign in to view this page"
 msgstr "Bu sayfayı görmek için oturum açın"
 
+msgid "Sign in with {browserProviderLabel}, then come back here."
+msgstr "{browserProviderLabel} ile giriş yapın, ardından buraya dönün."
+
 msgid "Sign in with email"
 msgstr "E-posta ile oturum aç"
 
@@ -16006,6 +16018,9 @@ msgstr "GitHub ile kaydol"
 
 msgid "Sign up with Google"
 msgstr "Google ile kaydol"
+
+msgid "Sign-in didn't finish"
+msgstr "Giriş tamamlanmadı"
 
 msgid "Sign-in expired"
 msgstr "Oturum süresi doldu"
@@ -19890,6 +19905,9 @@ msgstr "Sürüm {version} görüntüleniyor, salt okunur"
 msgid "You can attach up to {MAX_ATTACHMENTS} files"
 msgstr "En fazla {MAX_ATTACHMENTS} dosya ekleyebilirsiniz"
 
+msgid "You can close this tab."
+msgstr "Bu sekmeyi kapatabilirsiniz."
+
 msgid "You can only share with people and teams in this organization"
 msgstr "Yalnızca bu kuruluştaki kişiler ve takımlarla paylaşabilirsiniz"
 
@@ -19964,6 +19982,9 @@ msgstr "Listedesiniz!"
 
 msgid "You're one of our most active users. Come help us build it."
 msgstr "En etkin kullanıcılarımızdan birisiniz. Gelin, birlikte geliştirelim."
+
+msgid "You're signed in"
+msgstr "Giriş yaptınız"
 
 msgid "You're up to date!"
 msgstr "Her şey güncel!"

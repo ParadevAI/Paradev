@@ -2808,9 +2808,6 @@ msgstr "Authenticatie"
 msgid "Authentication Code"
 msgstr "Authenticatiecode"
 
-msgid "Authentication failed"
-msgstr "Authenticatie mislukt"
-
 msgid "Author"
 msgstr "Auteur"
 
@@ -4727,6 +4724,9 @@ msgstr "Contextmenu"
 
 msgid "Continue"
 msgstr "Doorgaan"
+
+msgid "Continue in your browser"
+msgstr "Ga verder in je browser"
 
 msgid "Continue or fork session"
 msgstr "Sessie voortzetten of forken"
@@ -8346,6 +8346,9 @@ msgstr "Terug"
 msgid "Go back home"
 msgstr "Terug naar home"
 
+msgid "Go back to {appName} and sign in again."
+msgstr "Ga terug naar {appName} en log opnieuw in."
+
 msgid "Go back to the previous page in history"
 msgstr "Terug naar de vorige pagina in de geschiedenis"
 
@@ -9600,6 +9603,9 @@ msgstr "Laatst bijgewerkt: {lastUpdated}"
 msgid "Last used"
 msgstr "Laatst gebruikt"
 
+msgid "Last used: {lastUsedProviderLabel}"
+msgstr "Laatst gebruikt: {lastUsedProviderLabel}"
+
 msgid "Late 2026"
 msgstr "Eind 2026"
 
@@ -10491,9 +10497,6 @@ msgstr "Gemist"
 
 msgid "Missed <0>· 7d</0>"
 msgstr "Gemist <0>· 7d</0>"
-
-msgid "Missing auth state"
-msgstr "Auth-state ontbreekt"
 
 msgid "Missing authorization code. Re-run"
 msgstr "Autorisatiecode ontbreekt. Voer opnieuw uit"
@@ -12007,6 +12010,9 @@ msgstr "{0} openen"
 msgid "Open {0} website"
 msgstr "Website van {0} openen"
 
+msgid "Open {appName}"
+msgstr "{appName} openen"
+
 msgid "Open {appName} on that computer"
 msgstr "Open {appName} op die computer"
 
@@ -12060,6 +12066,9 @@ msgstr "Branch openen op GitHub"
 
 msgid "Open Browser"
 msgstr "Browser openen"
+
+msgid "Open browser again"
+msgstr "Browser opnieuw openen"
 
 msgid "Open changes"
 msgstr "Wijzigingen openen"
@@ -12432,6 +12441,9 @@ msgstr "Geopend"
 
 msgid "opened PR #841 for review"
 msgstr "PR #841 geopend voor review"
+
+msgid "Opening {appName}…"
+msgstr "{appName} wordt geopend…"
 
 msgid "Opening {what}"
 msgstr "{what} openen"
@@ -13034,9 +13046,6 @@ msgstr "Kies een organisatie"
 
 msgid "Please try again, or restart Superset on that device."
 msgstr "Probeer het opnieuw of herstart Superset op dat apparaat."
-
-msgid "Please try signing in again from the desktop app."
-msgstr "Probeer opnieuw in te loggen vanuit de desktop-app."
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.noApiKeyAuth"
@@ -15966,6 +15975,9 @@ msgstr "Log in om te beginnen"
 msgid "Sign in to view this page"
 msgstr "Log in om deze pagina te bekijken"
 
+msgid "Sign in with {browserProviderLabel}, then come back here."
+msgstr "Log in met {browserProviderLabel} en kom dan hier terug."
+
 msgid "Sign in with email"
 msgstr "Inloggen met e-mail"
 
@@ -16006,6 +16018,9 @@ msgstr "Registreren met GitHub"
 
 msgid "Sign up with Google"
 msgstr "Registreren met Google"
+
+msgid "Sign-in didn't finish"
+msgstr "Inloggen is niet voltooid"
 
 msgid "Sign-in expired"
 msgstr "Login verlopen"
@@ -19890,6 +19905,9 @@ msgstr "Je bekijkt versie {version}, alleen-lezen"
 msgid "You can attach up to {MAX_ATTACHMENTS} files"
 msgstr "Je kunt maximaal {MAX_ATTACHMENTS} bestanden toevoegen"
 
+msgid "You can close this tab."
+msgstr "Je kunt dit tabblad sluiten."
+
 msgid "You can only share with people and teams in this organization"
 msgstr "Je kunt alleen delen met personen en teams in deze organisatie"
 
@@ -19964,6 +19982,9 @@ msgstr "Je staat op de lijst!"
 
 msgid "You're one of our most active users. Come help us build it."
 msgstr "Je bent een van onze actiefste gebruikers. Kom het mee bouwen."
+
+msgid "You're signed in"
+msgstr "Je bent ingelogd"
 
 msgid "You're up to date!"
 msgstr "Je bent up-to-date!"

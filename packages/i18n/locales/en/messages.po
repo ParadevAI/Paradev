@@ -2808,9 +2808,6 @@ msgstr "Authentication"
 msgid "Authentication Code"
 msgstr "Authentication Code"
 
-msgid "Authentication failed"
-msgstr "Authentication failed"
-
 msgid "Author"
 msgstr "Author"
 
@@ -4727,6 +4724,9 @@ msgstr "Context Menu"
 
 msgid "Continue"
 msgstr "Continue"
+
+msgid "Continue in your browser"
+msgstr "Continue in your browser"
 
 msgid "Continue or fork session"
 msgstr "Continue or fork session"
@@ -8346,6 +8346,9 @@ msgstr "Go back"
 msgid "Go back home"
 msgstr "Go back home"
 
+msgid "Go back to {appName} and sign in again."
+msgstr "Go back to {appName} and sign in again."
+
 msgid "Go back to the previous page in history"
 msgstr "Go back to the previous page in history"
 
@@ -9600,6 +9603,9 @@ msgstr "Last updated: {lastUpdated}"
 msgid "Last used"
 msgstr "Last used"
 
+msgid "Last used: {lastUsedProviderLabel}"
+msgstr "Last used: {lastUsedProviderLabel}"
+
 msgid "Late 2026"
 msgstr "Late 2026"
 
@@ -10491,9 +10497,6 @@ msgstr "Missed"
 
 msgid "Missed <0>· 7d</0>"
 msgstr "Missed <0>· 7d</0>"
-
-msgid "Missing auth state"
-msgstr "Missing auth state"
 
 msgid "Missing authorization code. Re-run"
 msgstr "Missing authorization code. Re-run"
@@ -12007,6 +12010,9 @@ msgstr "Open {0}"
 msgid "Open {0} website"
 msgstr "Open {0} website"
 
+msgid "Open {appName}"
+msgstr "Open {appName}"
+
 msgid "Open {appName} on that computer"
 msgstr "Open {appName} on that computer"
 
@@ -12060,6 +12066,9 @@ msgstr "Open branch on GitHub"
 
 msgid "Open Browser"
 msgstr "Open Browser"
+
+msgid "Open browser again"
+msgstr "Open browser again"
 
 msgid "Open changes"
 msgstr "Open changes"
@@ -12432,6 +12441,9 @@ msgstr "Opened"
 
 msgid "opened PR #841 for review"
 msgstr "opened PR #841 for review"
+
+msgid "Opening {appName}…"
+msgstr "Opening {appName}…"
 
 msgid "Opening {what}"
 msgstr "Opening {what}"
@@ -13034,9 +13046,6 @@ msgstr "Please select an organization"
 
 msgid "Please try again, or restart Superset on that device."
 msgstr "Please try again, or restart Superset on that device."
-
-msgid "Please try signing in again from the desktop app."
-msgstr "Please try signing in again from the desktop app."
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.noApiKeyAuth"
@@ -15966,6 +15975,9 @@ msgstr "Sign in to get started"
 msgid "Sign in to view this page"
 msgstr "Sign in to view this page"
 
+msgid "Sign in with {browserProviderLabel}, then come back here."
+msgstr "Sign in with {browserProviderLabel}, then come back here."
+
 msgid "Sign in with email"
 msgstr "Sign in with email"
 
@@ -16006,6 +16018,9 @@ msgstr "Sign up with GitHub"
 
 msgid "Sign up with Google"
 msgstr "Sign up with Google"
+
+msgid "Sign-in didn't finish"
+msgstr "Sign-in didn't finish"
 
 msgid "Sign-in expired"
 msgstr "Sign-in expired"
@@ -19890,6 +19905,9 @@ msgstr "You are viewing version {version}, read-only"
 msgid "You can attach up to {MAX_ATTACHMENTS} files"
 msgstr "You can attach up to {MAX_ATTACHMENTS} files"
 
+msgid "You can close this tab."
+msgstr "You can close this tab."
+
 msgid "You can only share with people and teams in this organization"
 msgstr "You can only share with people and teams in this organization"
 
@@ -19964,6 +19982,9 @@ msgstr "You're on the list!"
 
 msgid "You're one of our most active users. Come help us build it."
 msgstr "You're one of our most active users. Come help us build it."
+
+msgid "You're signed in"
+msgstr "You're signed in"
 
 msgid "You're up to date!"
 msgstr "You're up to date!"

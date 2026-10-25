@@ -2808,9 +2808,6 @@ msgstr "認證"
 msgid "Authentication Code"
 msgstr "認證碼"
 
-msgid "Authentication failed"
-msgstr "認證失敗"
-
 msgid "Author"
 msgstr "作者"
 
@@ -4727,6 +4724,9 @@ msgstr "右鍵選單"
 
 msgid "Continue"
 msgstr "繼續"
+
+msgid "Continue in your browser"
+msgstr "請在瀏覽器中繼續"
 
 msgid "Continue or fork session"
 msgstr "繼續或分支會話"
@@ -8346,6 +8346,9 @@ msgstr "返回"
 msgid "Go back home"
 msgstr "返回首頁"
 
+msgid "Go back to {appName} and sign in again."
+msgstr "請返回 {appName} 並重新登入。"
+
 msgid "Go back to the previous page in history"
 msgstr "返回歷史記錄中的上一頁"
 
@@ -9600,6 +9603,9 @@ msgstr "最後更新：{lastUpdated}"
 msgid "Last used"
 msgstr "上次使用"
 
+msgid "Last used: {lastUsedProviderLabel}"
+msgstr "上次使用：{lastUsedProviderLabel}"
+
 msgid "Late 2026"
 msgstr "2026年末"
 
@@ -10491,9 +10497,6 @@ msgstr "已錯過"
 
 msgid "Missed <0>· 7d</0>"
 msgstr "已錯過 <0>· 7天</0>"
-
-msgid "Missing auth state"
-msgstr "缺少認證狀態"
 
 msgid "Missing authorization code. Re-run"
 msgstr "缺少授權碼。請重新執行"
@@ -12007,6 +12010,9 @@ msgstr "開啟{0}"
 msgid "Open {0} website"
 msgstr "開啟 {0} 官網"
 
+msgid "Open {appName}"
+msgstr "開啟 {appName}"
+
 msgid "Open {appName} on that computer"
 msgstr "在那台電腦上開啟{appName}"
 
@@ -12060,6 +12066,9 @@ msgstr "在GitHub上開啟分支"
 
 msgid "Open Browser"
 msgstr "開啟瀏覽器"
+
+msgid "Open browser again"
+msgstr "重新開啟瀏覽器"
 
 msgid "Open changes"
 msgstr "開啟更改"
@@ -12432,6 +12441,9 @@ msgstr "已建立"
 
 msgid "opened PR #841 for review"
 msgstr "開了PR #841待審查"
+
+msgid "Opening {appName}…"
+msgstr "正在開啟 {appName}…"
 
 msgid "Opening {what}"
 msgstr "正在開啟 {what}"
@@ -13034,9 +13046,6 @@ msgstr "請選擇一個組織"
 
 msgid "Please try again, or restart Superset on that device."
 msgstr "請重試，或在該裝置上重新啟動 Superset。"
-
-msgid "Please try signing in again from the desktop app."
-msgstr "請從桌面應用程式重新登入。"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.noApiKeyAuth"
@@ -15966,6 +15975,9 @@ msgstr "登入即可開始"
 msgid "Sign in to view this page"
 msgstr "登入以檢視此頁面"
 
+msgid "Sign in with {browserProviderLabel}, then come back here."
+msgstr "使用 {browserProviderLabel} 登入後，再回到這裡。"
+
 msgid "Sign in with email"
 msgstr "使用電子郵件登入"
 
@@ -16006,6 +16018,9 @@ msgstr "使用GitHub註冊"
 
 msgid "Sign up with Google"
 msgstr "使用Google註冊"
+
+msgid "Sign-in didn't finish"
+msgstr "登入未完成"
 
 msgid "Sign-in expired"
 msgstr "登入已過期"
@@ -19890,6 +19905,9 @@ msgstr "您正在檢視版本 {version}，唯讀"
 msgid "You can attach up to {MAX_ATTACHMENTS} files"
 msgstr "最多可附加{MAX_ATTACHMENTS}個檔案"
 
+msgid "You can close this tab."
+msgstr "你可以關閉此分頁。"
+
 msgid "You can only share with people and teams in this organization"
 msgstr "你只能與此組織中的人員和團隊分享"
 
@@ -19964,6 +19982,9 @@ msgstr "你已在名單上！"
 
 msgid "You're one of our most active users. Come help us build it."
 msgstr "你是我們最活躍的使用者之一。來和我們一起打造它吧。"
+
+msgid "You're signed in"
+msgstr "你已登入"
 
 msgid "You're up to date!"
 msgstr "已是最新！"

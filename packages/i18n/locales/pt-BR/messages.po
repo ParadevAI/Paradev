@@ -2808,9 +2808,6 @@ msgstr "Autenticação"
 msgid "Authentication Code"
 msgstr "Código de autenticação"
 
-msgid "Authentication failed"
-msgstr "Falha na autenticação"
-
 msgid "Author"
 msgstr "Autor"
 
@@ -4727,6 +4724,9 @@ msgstr "Menu de contexto"
 
 msgid "Continue"
 msgstr "Continuar"
+
+msgid "Continue in your browser"
+msgstr "Continue no seu navegador"
 
 msgid "Continue or fork session"
 msgstr "Continuar ou bifurcar a sessão"
@@ -8346,6 +8346,9 @@ msgstr "Voltar"
 msgid "Go back home"
 msgstr "Voltar ao início"
 
+msgid "Go back to {appName} and sign in again."
+msgstr "Volte para o {appName} e entre novamente."
+
 msgid "Go back to the previous page in history"
 msgstr "Voltar para a página anterior do histórico"
 
@@ -9600,6 +9603,9 @@ msgstr "Última atualização: {lastUpdated}"
 msgid "Last used"
 msgstr "Usado por último"
 
+msgid "Last used: {lastUsedProviderLabel}"
+msgstr "Usado por último: {lastUsedProviderLabel}"
+
 msgid "Late 2026"
 msgstr "Fim de 2026"
 
@@ -10491,9 +10497,6 @@ msgstr "Perdidas"
 
 msgid "Missed <0>· 7d</0>"
 msgstr "Perdidas <0>· 7d</0>"
-
-msgid "Missing auth state"
-msgstr "Falta o estado de autenticação"
 
 msgid "Missing authorization code. Re-run"
 msgstr "Falta o código de autorização. Execute de novo"
@@ -12007,6 +12010,9 @@ msgstr "Abrir {0}"
 msgid "Open {0} website"
 msgstr "Abrir o site de {0}"
 
+msgid "Open {appName}"
+msgstr "Abrir o {appName}"
+
 msgid "Open {appName} on that computer"
 msgstr "Abra o {appName} nesse computador"
 
@@ -12060,6 +12066,9 @@ msgstr "Abrir a branch no GitHub"
 
 msgid "Open Browser"
 msgstr "Abrir navegador"
+
+msgid "Open browser again"
+msgstr "Abrir o navegador novamente"
 
 msgid "Open changes"
 msgstr "Abrir alterações"
@@ -12432,6 +12441,9 @@ msgstr "Aberto"
 
 msgid "opened PR #841 for review"
 msgstr "abriu o PR #841 para revisão"
+
+msgid "Opening {appName}…"
+msgstr "Abrindo o {appName}…"
 
 msgid "Opening {what}"
 msgstr "Abrindo {what}"
@@ -13034,9 +13046,6 @@ msgstr "Selecione uma organização"
 
 msgid "Please try again, or restart Superset on that device."
 msgstr "Tente novamente ou reinicie o Superset nesse dispositivo."
-
-msgid "Please try signing in again from the desktop app."
-msgstr "Tente entrar de novo pelo app de desktop."
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.noApiKeyAuth"
@@ -15966,6 +15975,9 @@ msgstr "Entre para começar"
 msgid "Sign in to view this page"
 msgstr "Entre para ver esta página"
 
+msgid "Sign in with {browserProviderLabel}, then come back here."
+msgstr "Entre com {browserProviderLabel} e depois volte aqui."
+
 msgid "Sign in with email"
 msgstr "Entrar com e-mail"
 
@@ -16006,6 +16018,9 @@ msgstr "Cadastrar-se com o GitHub"
 
 msgid "Sign up with Google"
 msgstr "Cadastrar-se com o Google"
+
+msgid "Sign-in didn't finish"
+msgstr "O login não foi concluído"
 
 msgid "Sign-in expired"
 msgstr "Login expirado"
@@ -19890,6 +19905,9 @@ msgstr "Você está vendo a versão {version}, somente leitura"
 msgid "You can attach up to {MAX_ATTACHMENTS} files"
 msgstr "Você pode anexar até {MAX_ATTACHMENTS} arquivos"
 
+msgid "You can close this tab."
+msgstr "Você pode fechar esta aba."
+
 msgid "You can only share with people and teams in this organization"
 msgstr "Você só pode compartilhar com pessoas e equipes desta organização"
 
@@ -19964,6 +19982,9 @@ msgstr "Você está na lista!"
 
 msgid "You're one of our most active users. Come help us build it."
 msgstr "Você é um dos nossos usuários mais ativos. Venha ajudar a construir."
+
+msgid "You're signed in"
+msgstr "Você entrou"
 
 msgid "You're up to date!"
 msgstr "Tudo em dia!"
