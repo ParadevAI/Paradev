@@ -16846,8 +16846,8 @@ msgstr "Superset은 Superset으로 개발됩니다. 우리가 가장 열심히 �
 msgid "Superset is designed to work with your existing tool, we natively support deep-linking to IDEs like Cursor so you can open your workspaces and files in your IDE."
 msgstr "Superset은 기존 도구와 함께 쓰도록 만들었습니다. Cursor 같은 IDE로의 딥링크를 기본 지원하므로 워크스페이스와 파일을 쓰던 IDE에서 열 수 있습니다."
 
-msgid "Superset is getting a new name soon"
-msgstr "Superset의 이름이 곧 바뀝니다"
+msgid "Superset is now Paradev, and we raised an $11.5M seed"
+msgstr "Superset이 Paradev가 되었고, 1,150만 달러 규모의 시드 투자를 유치했습니다"
 
 msgid "Superset is source-available: the code is public on GitHub under Elastic License 2.0 (ELv2), which lets you inspect and self-host it subject to the license terms, but is not OSI-approved open source. Superset is unrelated to Apache Superset, the business-intelligence tool."
 msgstr "Superset은 소스가 공개된 소프트웨어입니다. 코드는 Elastic License 2.0(ELv2)으로 GitHub에 공개되어 있어 라이선스 조건에 따라 확인하고 셀프 호스팅할 수 있지만, OSI 승인 오픈 소스는 아닙니다. Superset은 비즈니스 인텔리전스 도구인 Apache Superset과 관련이 없습니다."

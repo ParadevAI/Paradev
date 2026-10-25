@@ -5,8 +5,26 @@ import Link from "next/link";
 import { FAQDisclosure } from "../FAQDisclosure";
 import { FAQ_ITEMS } from "./constants";
 
-export function FAQSection() {
+export interface FAQSectionItem {
+	id: string;
+	question: string;
+	answer: string;
+	link?: { href: string; label: string };
+}
+
+export function FAQSection({ items }: { items?: FAQSectionItem[] }) {
 	const { t } = useLingui();
+	const entries: FAQSectionItem[] =
+		items ??
+		FAQ_ITEMS.map((item) => ({
+			id: item.id,
+			question: t(item.question),
+			answer: t(item.answer),
+			link: item.link && {
+				href: item.link.href,
+				label: t(item.link.label),
+			},
+		}));
 
 	return (
 		<section className="relative py-24 sm:py-32">
@@ -24,19 +42,19 @@ export function FAQSection() {
 
 					<div>
 						<div className="w-full">
-							{FAQ_ITEMS.map((item) => (
+							{entries.map((item) => (
 								<FAQDisclosure
 									key={item.id}
 									name="home-faq"
-									question={t(item.question)}
+									question={item.question}
 								>
-									<p>{t(item.answer)}</p>
+									<p>{item.answer}</p>
 									{item.link && (
 										<Link
 											href={item.link.href}
 											className="inline-block text-brand hover:text-brand-light transition-colors"
 										>
-											{t(item.link.label)} →
+											{item.link.label} →
 										</Link>
 									)}
 								</FAQDisclosure>

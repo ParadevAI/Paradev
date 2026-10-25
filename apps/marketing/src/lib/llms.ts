@@ -28,6 +28,8 @@ export function stripMdxSyntax(content: string): string {
 		content
 			// Remove import statements
 			.replace(/^import\s+.*$/gm, "")
+			// Remove MDX comments
+			.replace(/\{\/\*[\s\S]*?\*\/\}/g, "")
 			// Remove JSX component tags (e.g. <Video ... />, <Component>...</Component>)
 			.replace(/<[A-Z]\w*\b[^>]*\/>/g, "")
 			.replace(/<[A-Z]\w*\b[^>]*>[\s\S]*?<\/[A-Z]\w*>/g, "")

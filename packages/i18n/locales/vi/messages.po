@@ -16846,8 +16846,8 @@ msgstr "Superset được xây dựng ngay trong Superset, nên chúng tôi chí
 msgid "Superset is designed to work with your existing tool, we natively support deep-linking to IDEs like Cursor so you can open your workspaces and files in your IDE."
 msgstr "Superset được thiết kế để làm việc cùng công cụ sẵn có của bạn, chúng tôi hỗ trợ sẵn deep-link tới các IDE như Cursor để bạn mở workspace và tệp ngay trong IDE của mình."
 
-msgid "Superset is getting a new name soon"
-msgstr "Superset sắp có tên mới"
+msgid "Superset is now Paradev, and we raised an $11.5M seed"
+msgstr "Superset giờ đã là Paradev, và chúng tôi đã gọi được vòng hạt giống 11,5 triệu USD"
 
 msgid "Superset is source-available: the code is public on GitHub under Elastic License 2.0 (ELv2), which lets you inspect and self-host it subject to the license terms, but is not OSI-approved open source. Superset is unrelated to Apache Superset, the business-intelligence tool."
 msgstr "Superset là source-available: mã nguồn công khai trên GitHub theo Elastic License 2.0 (ELv2), cho phép bạn xem và tự host theo các điều khoản của giấy phép, nhưng không phải mã nguồn mở được OSI công nhận. Superset không liên quan tới Apache Superset, công cụ business intelligence."

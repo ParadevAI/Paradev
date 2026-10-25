@@ -16846,8 +16846,8 @@ msgstr "Superset 就是在 Superset 中构建的，因此我们自己就是它�
 msgid "Superset is designed to work with your existing tool, we natively support deep-linking to IDEs like Cursor so you can open your workspaces and files in your IDE."
 msgstr "Superset的设计就是配合你现有的工具。我们原生支持深度链接到Cursor这类IDE，你可以直接在自己的IDE里打开工作区和文件。"
 
-msgid "Superset is getting a new name soon"
-msgstr "Superset 即将更名"
+msgid "Superset is now Paradev, and we raised an $11.5M seed"
+msgstr "Superset 现已更名为 Paradev，并完成 1150 万美元种子轮融资"
 
 msgid "Superset is source-available: the code is public on GitHub under Elastic License 2.0 (ELv2), which lets you inspect and self-host it subject to the license terms, but is not OSI-approved open source. Superset is unrelated to Apache Superset, the business-intelligence tool."
 msgstr "Superset是源码可见的：代码在GitHub上公开，采用Elastic License 2.0（ELv2），你可以在许可条款范围内查阅并自行部署，但它不是OSI认可的开源许可。Superset与商业智能工具Apache Superset没有任何关系。"
