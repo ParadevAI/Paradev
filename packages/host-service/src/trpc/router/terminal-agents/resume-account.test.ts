@@ -144,7 +144,128 @@ function fixture(provider: "claude" | "codex" = "claude") {
 	return { db, deps, calls, events, input, binding };
 }
 
+function authorizePersistedSuccessor(
+	f: ReturnType<typeof fixture>,
+	input: Parameters<ResumeWithAccountDeps["runAgent"]>[0],
+	mutate?: () => void,
+	overrides: Partial<typeof terminalAgentBindings.$inferInsert> = {},
+) {
+	const launch = input.terminalLaunch;
+	const source = f.binding();
+	if (!launch || !source) throw new Error("Expected recovery reservation");
+	f.db.transaction(() => {
+		f.db
+			.insert(terminalSessions)
+			.values({
+				id: launch.terminalId,
+				originWorkspaceId: "workspace",
+				createdAt: 4,
+			})
+			.run();
+		f.db
+			.insert(terminalAgentBindings)
+			.values({
+				...source,
+				terminalId: launch.terminalId,
+				accountJson: JSON.stringify(input.account),
+				startedAt: 4,
+				lastEventAt: 4,
+				lastEventType: "Attached",
+				endedAt: null,
+				endReason: null,
+				resumedIntoTerminalId: null,
+				...overrides,
+			})
+			.run();
+		mutate?.();
+		launch.onInitialCommandReady();
+	});
+	return {
+		kind: "terminal" as const,
+		sessionId: launch.terminalId,
+		label: "Claude",
+	};
+}
+
 describe("resume an ended native conversation with a selected account", () => {
+	test("authorizes its exact successor persisted before the command callback", async () => {
+		const f = fixture();
+		f.deps.runAgent = async (input) => {
+			await input.terminalLaunch?.beforeInitialCommand();
+			return authorizePersistedSuccessor(f, input);
+		};
+		const result = await resumeTerminalWithAccount(f.deps, f.input());
+		expect(f.binding()?.endReason).toBe("resumed");
+		expect(f.binding()?.resumedIntoTerminalId).toBe(result.terminalId);
+		expect(
+			f.db
+				.select()
+				.from(terminalAgentBindings)
+				.where(eq(terminalAgentBindings.terminalId, result.terminalId))
+				.get(),
+		).toMatchObject({
+			agentSessionId: "exact-session",
+			accountJson: JSON.stringify(targetAccount),
+		});
+	});
+
+	test.each([
+		{ workspaceId: "other-workspace" },
+		{ agentId: "codex" },
+		{ agentSessionId: "different-session" },
+		{ definitionId: "claude" },
+		{ accountJson: JSON.stringify(sourceAccount) },
+		{ accountJson: JSON.stringify({ ...targetAccount, conflict: true }) },
+		{ endedAt: 5, endReason: "detached" },
+	] satisfies Array<
+		Partial<typeof terminalAgentBindings.$inferInsert>
+	>)("does not exempt a mismatched persisted successor %#", async (overrides) => {
+		const f = fixture();
+		f.deps.runAgent = async (input) => {
+			await input.terminalLaunch?.beforeInitialCommand();
+			return authorizePersistedSuccessor(f, input, undefined, overrides);
+		};
+		await expect(resumeTerminalWithAccount(f.deps, f.input())).rejects.toThrow(
+			"changed",
+		);
+		expect(f.binding()?.endReason).toBe("detached");
+		expect(f.db.select().from(terminalAgentBindings).all()).toHaveLength(1);
+	});
+
+	test("still refuses another binding appearing beside its own successor", async () => {
+		const f = fixture();
+		f.deps.runAgent = async (input) => {
+			await input.terminalLaunch?.beforeInitialCommand();
+			return authorizePersistedSuccessor(f, input, () => {
+				const source = f.binding();
+				if (!source) throw new Error("Expected source binding");
+				f.db
+					.insert(terminalSessions)
+					.values({
+						id: "racing-writer",
+						originWorkspaceId: "workspace",
+						createdAt: 4,
+					})
+					.run();
+				f.db
+					.insert(terminalAgentBindings)
+					.values({
+						...source,
+						terminalId: "racing-writer",
+						endedAt: null,
+						endReason: null,
+						resumedIntoTerminalId: null,
+					})
+					.run();
+			});
+		};
+		await expect(resumeTerminalWithAccount(f.deps, f.input())).rejects.toThrow(
+			"running agent",
+		);
+		expect(f.binding()?.endReason).toBe("detached");
+		expect(f.db.select().from(terminalAgentBindings).all()).toHaveLength(1);
+	});
+
 	test("rechecks the transcript at synchronous command authorization", async () => {
 		const f = fixture();
 		let checkpoint = false;
