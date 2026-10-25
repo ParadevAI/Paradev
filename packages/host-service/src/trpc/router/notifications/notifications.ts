@@ -14,7 +14,10 @@ import {
 } from "../usage/session-account/session-account";
 import { queueBackgroundSuccessorRefresh } from "./background-successor-adapter";
 import { fanOutAgentLifecycle } from "./fan-out-agent-lifecycle";
-import { captureNativeClaudeLaunch, ingestNativeClaudeHook } from "./native-claude-usage";
+import {
+	captureNativeClaudeLaunch,
+	ingestNativeClaudeHook,
+} from "./native-claude-usage";
 import { showDesktopNotification } from "./show-desktop-notification";
 
 // Hook scripts emit "" for unset env vars; we coerce to undefined so the
@@ -41,12 +44,27 @@ const subagentInput = z
 	.optional();
 
 const nativeClaudeUsageInput = z.object({
- session_id: z.string().min(1).max(256),
- cost: z.object({ total_api_duration_ms: z.number().finite().nonnegative().nullable() }),
- rate_limits: z.object({ five_hour: z.object({ used_percentage: z.number().finite().min(0).max(100), resets_at: z.number().finite() }).optional(), seven_day: z.object({ used_percentage: z.number().finite().min(0).max(100), resets_at: z.number().finite() }).optional() }),
+	session_id: z.string().min(1).max(256),
+	cost: z.object({
+		total_api_duration_ms: z.number().finite().nonnegative().nullable(),
+	}),
+	rate_limits: z.object({
+		five_hour: z
+			.object({
+				used_percentage: z.number().finite().min(0).max(100),
+				resets_at: z.number().finite(),
+			})
+			.optional(),
+		seven_day: z
+			.object({
+				used_percentage: z.number().finite().min(0).max(100),
+				resets_at: z.number().finite(),
+			})
+			.optional(),
+	}),
 });
 const hookInput = z.object({
- nativeClaudeUsage: nativeClaudeUsageInput.optional(),
+	nativeClaudeUsage: nativeClaudeUsageInput.optional(),
 	terminalId: z.string().optional(),
 	eventType: z.string().optional(),
 	agent: agentIdentityInput,
@@ -104,18 +122,40 @@ export function createNotificationsRouter(
 		 */
 		hook: publicProcedure.input(hookInput).mutation(async ({ ctx, input }) => {
 			if (input.nativeClaudeUsage) {
-    const terminalId = input.terminalId;
-    const sessionId = input.nativeClaudeUsage.session_id;
-    const launchId = trimOrUndefined(input.launchId);
-    if (process.env.SUPERSET_NATIVE_CLAUDE_USAGE !== "1" || !terminalId || !launchId || input.subagent || input.agent?.agentId !== "claude" || input.agent.sessionId !== sessionId || ctx.terminalAgentStore.hasChat(terminalId) || !verifyAttributionToken(terminalId, input.attributionToken)) return { success: true, ignored: true as const };
-    const terminal = ctx.db.query.terminalSessions.findFirst({ where: eq(terminalSessions.id, terminalId), columns: { originWorkspaceId: true } }).sync();
-    const current = () => {
-     const binding = ctx.terminalAgentStore.getProvenance(terminalId);
-     return terminal?.originWorkspaceId && binding?.workspaceId === terminal.originWorkspaceId ? binding : undefined;
-    };
-    const accepted = await ingestNativeClaudeHook({ terminalId, launchId, sessionId }, input.nativeClaudeUsage, current).catch(() => false);
-    return { success: true, ignored: !accepted };
-   }
+				const terminalId = input.terminalId;
+				const sessionId = input.nativeClaudeUsage.session_id;
+				const launchId = trimOrUndefined(input.launchId);
+				if (
+					process.env.SUPERSET_NATIVE_CLAUDE_USAGE !== "1" ||
+					!terminalId ||
+					!launchId ||
+					input.subagent ||
+					input.agent?.agentId !== "claude" ||
+					input.agent.sessionId !== sessionId ||
+					ctx.terminalAgentStore.hasChat(terminalId) ||
+					!verifyAttributionToken(terminalId, input.attributionToken)
+				)
+					return { success: true, ignored: true as const };
+				const terminal = ctx.db.query.terminalSessions
+					.findFirst({
+						where: eq(terminalSessions.id, terminalId),
+						columns: { originWorkspaceId: true },
+					})
+					.sync();
+				const current = () => {
+					const binding = ctx.terminalAgentStore.getProvenance(terminalId);
+					return terminal?.originWorkspaceId &&
+						binding?.workspaceId === terminal.originWorkspaceId
+						? binding
+						: undefined;
+				};
+				const accepted = await ingestNativeClaudeHook(
+					{ terminalId, launchId, sessionId },
+					input.nativeClaudeUsage,
+					current,
+				).catch(() => false);
+				return { success: true, ignored: !accepted };
+			}
 			const subagentId = trimOrUndefined(input.subagent?.id);
 			const eventType = subagentId ? undefined : mapEventType(input.eventType);
 			if (!subagentId && !eventType) {
@@ -342,9 +382,24 @@ export function createNotificationsRouter(
 				});
 			}
 
-   if (process.env.SUPERSET_NATIVE_CLAUDE_USAGE === "1" && verifiedAttribution && eventType === "Attached" && agent?.agentId === "claude" && agent.sessionId && input.launchId) {
-    captureNativeClaudeLaunch({ terminalId: input.terminalId, launchId: input.launchId, sessionId: agent.sessionId }, () => ctx.terminalAgentStore.getProvenance(input.terminalId as string));
-   }
+			if (
+				process.env.SUPERSET_NATIVE_CLAUDE_USAGE === "1" &&
+				verifiedAttribution &&
+				eventType === "Attached" &&
+				agent?.agentId === "claude" &&
+				agent.sessionId &&
+				input.launchId
+			) {
+				captureNativeClaudeLaunch(
+					{
+						terminalId: input.terminalId,
+						launchId: input.launchId,
+						sessionId: agent.sessionId,
+					},
+					() =>
+						ctx.terminalAgentStore.getProvenance(input.terminalId as string),
+				);
+			}
 			const transcriptPath = trimOrUndefined(input.transcriptPath);
 			if (
 				agent?.sessionId &&

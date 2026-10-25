@@ -7,12 +7,12 @@ import type { HostDb } from "../db";
 import { resolveAttachmentPath } from "../trpc/router/attachments/storage";
 import { captureSessionAccount } from "../trpc/router/usage/session-account/session-account";
 import { sessionAccountForChat, validateChatAccount } from "./accountLaunch";
-import { createNativeClaudeChatFeed } from "./nativeClaudeUsage";
 import { ACP_HARNESSES } from "./acpCatalogue";
 import { resolveAgentCli } from "./agentCli";
 import { buildChatAgentEnv } from "./agentEnv";
 import { storeAgentImage } from "./agentImages";
 import type { ChatAgentBridge } from "./chatAgentBridge";
+import { createNativeClaudeChatFeed } from "./nativeClaudeUsage";
 
 async function resolveAttachment(attachmentId: string) {
 	const resolved = resolveAttachmentPath(attachmentId);
@@ -49,7 +49,12 @@ export function acpHarnessFactory(
 
 	return (options) => {
 		const launchContext = options.launchContext;
-		const nativeUsage = process.env.SUPERSET_NATIVE_CLAUDE_USAGE === "1" && entry.binary === "claude" && launchContext ? createNativeClaudeChatFeed() : null;
+		const nativeUsage =
+			process.env.SUPERSET_NATIVE_CLAUDE_USAGE === "1" &&
+			entry.binary === "claude" &&
+			launchContext
+				? createNativeClaudeChatFeed()
+				: null;
 		return createAcpAdapter({
 			command: entry.binary,
 			cwd: options.cwd,
@@ -98,7 +103,10 @@ export function acpHarnessFactory(
 						options.harness,
 						options.scopeId,
 					);
-				if (nativeUsage && launchContext) await nativeUsage.launched(sessionAccountForChat(launchContext.account));
+				if (nativeUsage && launchContext)
+					await nativeUsage.launched(
+						sessionAccountForChat(launchContext.account),
+					);
 				void captureSessionAccount(
 					entry.binary,
 					(entry.binary === "codex" ? env.CODEX_HOME : env.CLAUDE_CONFIG_DIR) ??

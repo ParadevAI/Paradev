@@ -48,9 +48,9 @@ import { hasHarnessSession } from "../../../terminal-agents/harness-sessions";
 import type { HostServiceContext } from "../../../types";
 import { protectedProcedure, router } from "../../index";
 import { resolveAttachmentPath } from "../attachments/storage";
+import { prepareNativeClaudeTerminalLaunch } from "../notifications/native-claude-usage";
 import { createChatSession } from "../sessions/create-chat-session";
 import { toTerminalSessionError } from "../terminal/errors";
-import { prepareNativeClaudeTerminalLaunch } from "../notifications/native-claude-usage";
 import type { SessionAccount } from "../usage/session-account/session-account";
 import { seedAgentFolderTrust } from "../workspace-creation/shared/seed-agent-trust";
 import { validateAccountAuthRouting } from "./account-auth-routing";
@@ -548,8 +548,14 @@ async function runTerminalAgent(
 	const { fullCommand, label } = buildTerminalAgentLaunch(ctx.db, input);
 
 	const terminalId = input.terminalLaunch?.terminalId ?? crypto.randomUUID();
-	if (process.env.SUPERSET_NATIVE_CLAUDE_USAGE === "1" && !input.resumeSessionId && !input.forkSessionId) {
-		await prepareNativeClaudeTerminalLaunch(terminalId, input.account).catch(() => false);
+	if (
+		process.env.SUPERSET_NATIVE_CLAUDE_USAGE === "1" &&
+		!input.resumeSessionId &&
+		!input.forkSessionId
+	) {
+		await prepareNativeClaudeTerminalLaunch(terminalId, input.account).catch(
+			() => false,
+		);
 	}
 	const result = await createTerminalSessionInternal({
 		terminalId,
