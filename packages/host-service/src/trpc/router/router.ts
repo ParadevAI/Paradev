@@ -20,6 +20,7 @@ import { projectRouter } from "./project";
 import { pullRequestsRouter } from "./pull-requests";
 import { sandboxRouter } from "./sandbox";
 import { savedConversationsRouter } from "./saved-conversations";
+import { sessionsRouter } from "./sessions";
 import { settingsRouter } from "./settings";
 import { systemRouter } from "./system";
 import { tagFoldersRouter } from "./tag-folders";
@@ -33,6 +34,7 @@ import { workspacesRouter } from "./workspaces";
 
 export const appRouter = router({
 	agents: agentsRouter,
+	sessions: sessionsRouter,
 	agentTooling: agentToolingRouter,
 	attachments: attachmentsRouter,
 	browser: browserRouter,

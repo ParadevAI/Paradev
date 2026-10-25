@@ -119,7 +119,6 @@ export function CloudWorkspaceRecordView({
 			headerEnd={
 				<CloudWorkspaceRecordSharing
 					workspaceId={workspace.id}
-					archivedAt={workspace.deletedAt}
 					people={workspace.presence}
 					owner={workspace.createdBy}
 					visibility={workspace.visibility}

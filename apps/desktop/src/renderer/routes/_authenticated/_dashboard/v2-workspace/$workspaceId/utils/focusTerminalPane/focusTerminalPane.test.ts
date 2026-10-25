@@ -95,9 +95,9 @@ describe("focusOrAddTerminalPane", () => {
 		});
 		let revealed = 0;
 		expect(
-			focusOrAddTerminalPane(center, "terminal-2", [
+			focusOrAddTerminalPane(center, "terminal-2", { linkedStores: [
 				{ store: right, reveal: () => revealed++ },
-			]),
+			] }),
 		).toBe("focused");
 		expect(center.getState().tabs).toHaveLength(0);
 		expect(right.getState().tabs).toHaveLength(2);

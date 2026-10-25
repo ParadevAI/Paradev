@@ -163,7 +163,10 @@ describe("auth token storage", () => {
 				state,
 			});
 
-			expect(failedResult.success).toBe(false);
+			expect(failedResult).toMatchObject({
+				success: false,
+				reason: "save-failed",
+			});
 			expect(stateStore.has(state)).toBe(true);
 		} finally {
 			errorSpy.mockRestore();

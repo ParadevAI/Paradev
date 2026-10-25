@@ -1,5 +1,6 @@
 import { LegendList } from "@legendapp/list/react-native";
 import { useLingui } from "@lingui/react/macro";
+import { ForwardSwipe } from "@superset/forward-swipe";
 import { i18n } from "@superset/i18n";
 import { useFormat } from "@superset/i18n/react";
 import { groupCloudWorkspacesByTime } from "@superset/shared/cloud-workspace-groups";
@@ -50,6 +51,7 @@ import {
 	type OrgPullRequest,
 	usePullRequests,
 } from "@/screens/(authenticated)/hooks/usePullRequests";
+import { useLastWorkspaceStore } from "@/screens/(authenticated)/stores/lastWorkspaceStore";
 import { usePinnedWorkspacesStore } from "@/screens/(authenticated)/stores/pinnedWorkspacesStore";
 import { pullRequestStatus } from "@/screens/(authenticated)/workspace/[id]/utils/pullRequest";
 import { CloudWorkspaceRow as CloudWorkspaceListRow } from "./components/CloudWorkspaceRow";
@@ -64,10 +66,7 @@ import { ScopeBar } from "./components/ScopeBar";
 import { WorkspaceRow } from "./components/WorkspaceRow";
 import { useAgentLiveActivity } from "./hooks/useAgentLiveActivity";
 import { useAppReviewPrompt } from "./hooks/useAppReviewPrompt";
-import {
-	cloudPullRequestRefKey,
-	useCloudPullRequests,
-} from "./hooks/useCloudPullRequests";
+import { useCloudPullRequests } from "./hooks/useCloudPullRequests";
 import { useCloudRepos } from "./hooks/useCloudRepos";
 import { useFirstPaint } from "./hooks/useFirstPaint";
 import {
@@ -189,6 +188,7 @@ export function HomeScreen() {
 
 	const selectedHost = useSelectedHost();
 	const pinnedAt = usePinnedWorkspacesStore((state) => state.pinnedAt);
+	const lastWorkspaceId = useLastWorkspaceStore((state) => state.workspaceId);
 	const {
 		workspaces,
 		isReady: workspacesReady,
@@ -545,19 +545,14 @@ export function HomeScreen() {
 	// parsed from the PR URL (cloud repo UUIDs aren't known host-side).
 	// Cloud rows' projects come from the API instead.
 	const cloudRepos = useCloudRepos();
-	const cloudPullRequests = useCloudPullRequests(
-		useMemo(
-			() =>
-				listItems.flatMap((item) => {
-					if (item.kind !== "cloudRow") return [];
-					const repoFullName = cloudRepos.get(item.row.id);
-					return repoFullName
-						? [{ repoFullName, headBranch: item.row.branch }]
-						: [];
-				}),
-			[listItems, cloudRepos],
+	const cloudPullRequests = useCloudPullRequests({
+		active: listItems.some(
+			(item) => item.kind === "cloudRow" && item.row.status !== "deleted",
 		),
-	);
+		archived: listItems.some(
+			(item) => item.kind === "cloudRow" && item.row.status === "deleted",
+		),
+	});
 	const repoPrefixesByProject = useMemo(
 		() =>
 			new Map<string, string | null>([
@@ -582,16 +577,7 @@ export function HomeScreen() {
 					<CloudWorkspaceListRow
 						row={item.row}
 						repoFullName={repoFullName}
-						pullRequest={
-							repoFullName
-								? cloudPullRequests.get(
-										cloudPullRequestRefKey({
-											repoFullName,
-											headBranch: item.row.branch,
-										}),
-									)
-								: undefined
-						}
+						pullRequest={cloudPullRequests.get(item.row.id)?.[0]}
 						viewerId={viewerId}
 						now={now}
 						cache={cloudCache}
@@ -712,6 +698,14 @@ export function HomeScreen() {
 
 	return (
 		<>
+			<ForwardSwipe
+				enabled={lastWorkspaceId !== null}
+				onSwipeBegin={() => {
+					if (lastWorkspaceId) {
+						router.push(`/(authenticated)/workspace/${lastWorkspaceId}`);
+					}
+				}}
+			/>
 			<OrganizationHeaderButton
 				isLoading={isLoadingOrganizations}
 				name={activeOrganization?.name}

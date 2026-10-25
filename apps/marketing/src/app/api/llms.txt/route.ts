@@ -1,3 +1,4 @@
+import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import {
 	API_URL,
@@ -7,9 +8,9 @@ import {
 
 export function GET() {
 	const lines = [
-		`# ${COMPANY.NAME} API`,
+		`# ${BRAND.INTRO_NAME} API`,
 		"",
-		`> Programmatic access to ${COMPANY.NAME} for AI agents: an MCP server (Streamable HTTP) plus OAuth 2.1 with dynamic client registration.`,
+		`> Programmatic access to ${BRAND.NAME} for AI agents: an MCP server (Streamable HTTP) plus OAuth 2.1 with dynamic client registration.`,
 		"",
 		`The primary API surface is the MCP server at ${MCP_SERVER_URL} (alias: ${API_URL}/mcp). Authenticate via OAuth 2.1 + PKCE or a Superset API key; walkthrough at ${COMPANY.MARKETING_URL}/auth.md.`,
 		"",

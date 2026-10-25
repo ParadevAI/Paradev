@@ -33,29 +33,31 @@ export function findTerminalPaneLocation(
 export function focusTerminalPane(
 	store: StoreApi<WorkspaceStore<PaneViewerData>>,
 	terminalId: string,
+	{ focus = true }: { focus?: boolean } = {},
 ): boolean {
 	const state = store.getState();
 	const location = findTerminalPaneLocation(state, terminalId);
 	if (!location) return false;
 
-	state.setActiveTab(location.tabId);
-	state.setActivePane(location);
+	if (focus) state.focusPane(location.paneId);
+	else state.setActivePane(location);
 	return true;
 }
 
 export function focusOrAddTerminalPane(
 	store: StoreApi<WorkspaceStore<PaneViewerData>>,
 	terminalId: string,
-	linkedStores: readonly LinkedTerminalPaneStore[] = [],
+	{ focus = true, linkedStores = [] }: { focus?: boolean; linkedStores?: readonly LinkedTerminalPaneStore[] } = {},
 ): FocusOrAddTerminalPaneResult {
-	if (focusTerminalPane(store, terminalId)) return "focused";
+	if (focusTerminalPane(store, terminalId, { focus })) return "focused";
 	for (const linked of linkedStores) {
-		if (!focusTerminalPane(linked.store, terminalId)) continue;
-		linked.reveal();
+		if (!focusTerminalPane(linked.store, terminalId, { focus })) continue;
+		if (focus) linked.reveal();
 		return "focused";
 	}
 
 	store.getState().addTab({
+		focus,
 		panes: [
 			{
 				kind: "terminal",

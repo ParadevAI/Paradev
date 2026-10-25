@@ -1,0 +1,108 @@
+---
+title: "Claude Code vs Kiro CLI (2026): Anthropic's Agent vs AWS's"
+description: "Compare Claude Code and AWS's Kiro CLI: models, credit-based pricing, parallel work, shared config across surfaces, and cloud sessions, and how to run both side by side."
+date: 2026-10-13
+type: "1v1"
+competitors:
+  - claude-code
+  - kiro
+keywords:
+  - claude code vs kiro
+  - kiro vs claude code
+  - kiro cli
+  - kiro cli vs claude code
+  - aws coding agent
+  - best coding agent
+---
+
+Claude Code is Anthropic's terminal coding agent. Kiro CLI is AWS's, and it shares one `.kiro` configuration with the Kiro IDE, web app, and mobile app. Both read your code, run commands, run sub-agents, and take MCP servers, hooks, and skills. The biggest differences are models and pricing: Kiro routes each request to a model with its Auto router and bills in credits, with a free tier; Claude Code runs Anthropic's models on a paid Claude plan.
+
+Facts were checked against Anthropic's and AWS's own docs on October 13, 2026.
+
+---
+
+## At a Glance
+
+| | **Claude Code** | **Kiro CLI** |
+|---|---|---|
+| **Vendor** | Anthropic | AWS |
+| **Models** | Claude models, with a 1M-token context on recent ones | Auto router by default, or a chosen model (for example Claude, GPT, open-weight) |
+| **Price** | Claude Pro from $20/mo, Max from $100/mo, or API key; no free tier | Free 50 credits; Pro $20, Pro+ $40, Pro Max $100, Power $200/mo |
+| **Parallel work** | Subagents, `/batch` across worktrees, agent view, agent teams (experimental) | Parallel sub-agents, custom agents, Workflows |
+| **Worktrees** | Built in | Not documented |
+| **Remote and cloud** | Cloud sessions, Remote Control | Kiro Web and cloud sessions; `--cloud` from the CLI planned for CLI 3.0 |
+| **Shared config** | Claude apps and IDE extensions | One `.kiro` config for Kiro IDE, CLI, web, and mobile |
+| **Headless** | `claude -p` | Headless mode with an API key |
+| **Extensions** | MCP, hooks, plugins with marketplaces, skills | MCP, hooks, skills, steering, ACP |
+| **Platforms** | macOS, Linux, Windows | macOS, Linux, Windows 11 |
+| **License** | Proprietary | Proprietary |
+
+---
+
+## What Is Claude Code?
+
+Anthropic describes Claude Code as "an agentic coding tool that reads your codebase, edits files, runs commands, and integrates with your development tools." It has the widest set of parallel modes of any agent: subagents, `/batch` runs that fan a change out across 5 to 30 worktrees, an agent view for background sessions, experimental agent teams, cloud sessions, and Remote Control. Plugins with marketplaces, skills, and hooks make it highly extensible. It is not on Claude's free plan; it comes with Pro, Max, Team, and Enterprise, or an API key.
+
+## What Is Kiro CLI?
+
+AWS says Kiro CLI "brings the power of AI-assisted development to your terminal." By default its Auto router picks the model for each request; you can also choose a model yourself. It runs parallel sub-agents, custom agents, and Workflows, and it supports headless mode for CI, ACP, MCP, hooks, skills, and steering. The same `.kiro` configuration works in the Kiro IDE, CLI, web app, and mobile app. Kiro Web and cloud sessions became generally available on September 3, 2026.
+
+Kiro CLI is changing this month. Kiro began offering CLI V3 to users on October 12, 2026. CLI 3.0 is planned for the end of October and adds `--cloud` sessions, spec mode, `/tangent`, background workflow agents, and Memory. Check Kiro's changelog for what has shipped when you read this.
+
+## Key Differences
+
+### Models
+
+Claude Code runs Anthropic's models in Anthropic's own harness. Kiro picks a model for you with its Auto router, or lets you choose one, including Claude, GPT, and open-weight models. AWS notes that some premium models are limited to certain regions.
+
+### Price
+
+Kiro has a free tier with 50 credits and paid plans from $20 to $200 a month, billed in credits; team overage is $0.04 per credit. The free tier is rate-limited. Claude Code needs a paid Claude plan or API spend from the first prompt.
+
+### One Config Across Surfaces
+
+Kiro's strength is one `.kiro` setup shared by its IDE, CLI, web app, and mobile app, with cloud sessions on the web. Claude Code pairs with Claude's own apps and IDE extensions.
+
+### Parallel Work
+
+Claude Code has more built-in parallel modes today, and worktrees built in. Kiro runs parallel sub-agents and Workflows, and CLI 3.0 is set to add background workflow agents.
+
+---
+
+## Run Both Side by Side in Superset
+
+[Superset](/) runs Claude Code and Kiro as built-in agents, each in its own Git worktree and terminal, on your own Claude and Kiro plans. Create two workspaces from the same branch, start Claude Code in one and Kiro in the other with the same prompt, then compare the diffs in the Changes pane and open a pull request from the better one. Superset never proxies model calls. Worktrees keep working files apart, but they do not sandbox processes or prevent merge conflicts ([docs](https://docs.superset.sh/workspaces)). See [How to Compare Coding Agents Side by Side](/compare/compare-coding-agents-side-by-side).
+
+## Which Should You Choose?
+
+**Choose Claude Code if you:**
+
+- Want the richest set of parallel modes and a plugin ecosystem
+- Already pay for Claude Pro or Max
+- Want worktree isolation built in
+
+**Choose Kiro CLI if you:**
+
+- Want a free start and credit-based plans
+- Want a model router, or a choice of models from several vendors
+- Want one config across an IDE, CLI, web app, and mobile app
+
+For the full field, see [Best AI Coding Agents in 2026](/compare/best-coding-agents).
+
+## Frequently Asked Questions
+
+### Is Kiro CLI free?
+
+Kiro has a free tier with 50 credits, and it is rate-limited. Paid plans run from Pro at $20 to Power at $200 a month. Claude Code has no free tier.
+
+### Can Kiro CLI use Claude?
+
+Yes. Kiro's Auto router can pick a model for you, or you can choose one, including Claude models. Some premium models are limited to certain regions.
+
+### What is changing in Kiro CLI 3.0?
+
+Kiro began offering CLI V3 to users on October 12, 2026. CLI 3.0, planned for the end of October, adds `--cloud` sessions, spec mode, `/tangent`, background workflow agents, and Memory.
+
+### Can I run Claude Code and Kiro at the same time?
+
+Yes. Give each its own Git worktree so they do not edit the same files. In Superset, each runs in its own workspace on the same repository.

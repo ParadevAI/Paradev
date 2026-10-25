@@ -1,0 +1,42 @@
+---
+title: Fix Bugs Reported in Slack
+description: An agent investigates each bug report posted in a Slack channel
+---
+
+<Callout type="info" title="Use when">
+	people report bugs in a channel like #bugs, and each report starts with the same work: find the code and reproduce the bug.
+</Callout>
+
+## The Idea
+
+A Slack **Message in channel** trigger starts a run for each new message in the channels you pick. The agent gets the message text, who posted it, and a link to it in its prompt, so it starts from the report itself.
+
+## Steps
+
+1. Connect Slack under **Integrations**.
+2. Go to **Automations → New automation**. Pick the project, a device that stays online, and an agent.
+3. Under **Triggers**, click **Add Trigger → Slack → Message in channel** and pick the channel. Press **Save**. The Superset bot joins public channels when you save. For a private channel, invite **@Superset** to it first.
+4. Optional: set the message filter to a word your team puts in reports, like `bug`, so other messages don't start runs.
+5. Write a prompt that works from the report:
+
+```text
+A bug report was posted in Slack; it's in the event above. Find the code
+it's about and try to reproduce it with a test.
+If you reproduce it, fix it, run the test suite, and open a draft pull
+request with `gh pr create --draft` that quotes the report and links the
+Slack message.
+If you can't, write what you checked and what you need from the reporter
+to TRIAGE.md. Do not guess at a fix.
+```
+
+6. Open the run from **Run History** to read the result, and reply to the reporter with the pull request or the questions in `TRIAGE.md`.
+
+## Tips
+
+- **Top-level messages only**: thread replies don't fire **Message in channel**, so a discussion under a report doesn't start more runs.
+- **Bot messages**: Slack triggers ignore the Superset bot's own messages and reactions.
+- **Reply in Slack**: to have the agent answer in the thread itself, give it a Slack tool it can call, such as a Slack MCP server set up for your agent.
+
+## Variations
+
+- **Opt in with an emoji**: use **Reaction added** with an emoji like `:bug:` on any message, so people choose which reports the agent picks up.

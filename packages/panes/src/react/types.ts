@@ -82,6 +82,13 @@ export interface PaneDefinition<TData> {
 	onBeforeClose?(pane: Pane<TData>): boolean | Promise<boolean>;
 	onAfterClose?(pane: Pane<TData>, closedPanes: readonly Pane<TData>[]): void;
 	onAfterRemove?(pane: Pane<TData>): void;
+	/**
+	 * Keep this pane mounted, hidden, after its tab is left, so returning to it
+	 * does not rebuild it (`WorkspaceProps.keepAliveTabs`). A tab is kept only
+	 * when every pane in it opts in. Opt in only when the pane is idle while
+	 * hidden: pause its polling with `useIsTabVisible()`.
+	 */
+	keepAlive?: boolean;
 	paneActions?:
 		| PaneActionConfig<TData>[]
 		| ((
@@ -107,6 +114,10 @@ export interface WorkspaceInteractionState {
 	resizeActive: boolean;
 }
 
+export interface AddTabMenuActions {
+	runAfterClose: (action: () => void) => void;
+}
+
 export interface WorkspaceProps<TData> {
 	store: StoreApi<WorkspaceStore<TData>>;
 	registry: PaneRegistry<TData>;
@@ -114,7 +125,7 @@ export interface WorkspaceProps<TData> {
 	renderTabAccessory?: (tab: Tab<TData>) => ReactNode;
 	renderTabIcon?: (tab: Tab<TData>) => ReactNode;
 	renderEmptyState?: () => ReactNode;
-	renderAddTabMenu?: () => ReactNode;
+	renderAddTabMenu?: (actions: AddTabMenuActions) => ReactNode;
 	/** Rendered at the leading (left) edge of the tab bar row, before the tabs. */
 	renderTabBarLeading?: () => ReactNode;
 	/** Rendered at the trailing (right) edge of the tab bar row. */
@@ -134,4 +145,9 @@ export interface WorkspaceProps<TData> {
 		| ContextMenuActionConfig<TData>[]
 		| ((context: RendererContext<TData>) => ContextMenuActionConfig<TData>[]);
 	onPaneError?: PaneErrorHandler;
+	/**
+	 * How many recently shown tabs stay mounted, hidden, besides the active
+	 * one. The least recently shown is unmounted past this. Defaults to 0.
+	 */
+	keepAliveTabs?: number;
 }

@@ -21,7 +21,7 @@ test("saved-history migration preserves recovery data through terminal and works
 		readFileSync(join(source, "meta/_journal.json"), "utf8"),
 	) as { entries: Array<{ tag: string }> };
 	const index = journal.entries.findIndex(
-		(entry) => entry.tag === "0039_saved_native_conversations",
+		(entry) => entry.tag === "0040_saved_native_conversations",
 	);
 	expect(index).toBeGreaterThan(0);
 	mkdirSync(join(folder, "meta"), { recursive: true });

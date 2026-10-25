@@ -1,7 +1,7 @@
 import { useLiveQuery } from "@tanstack/react-db";
 import { useMemo } from "react";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
-import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
+import { useTagFolderWorkspaces } from "renderer/routes/_authenticated/providers/TagFolderWorkspacesProvider";
 import {
 	deriveSessionTagFolders,
 	deriveTagFolders,
@@ -25,8 +25,7 @@ export function useProjectTagFolderSections(projectId: string | null): {
 	areSectionsReady: boolean;
 } {
 	const collections = useCollections();
-	const { workspaces: hostWorkspaces, isReady: hostWorkspacesReady } =
-		useHostWorkspaces();
+	const { workspaces, isReady: workspacesReady } = useTagFolderWorkspaces();
 	const tagFolderContext = useTagFolderContext();
 	const { data: storedSections = [], isReady } = useLiveQuery(
 		(q) =>
@@ -47,11 +46,11 @@ export function useProjectTagFolderSections(projectId: string | null): {
 	const sections = useMemo(() => {
 		if (projectId === null) {
 			return deriveSessionTagFolders(
-				hostWorkspaces,
+				workspaces,
 				tagFolderContext.tagSettings,
 			).map(({ tag, name, color }) => ({ id: tag, name, color }));
 		}
-		return deriveTagFolders(storedSections, hostWorkspaces, tagFolderContext)
+		return deriveTagFolders(storedSections, workspaces, tagFolderContext)
 			.filter((section) => section.projectId === projectId)
 			.sort(
 				(left, right) =>
@@ -63,8 +62,9 @@ export function useProjectTagFolderSections(projectId: string | null): {
 				name: section.name,
 				color: section.color,
 			}));
-	}, [projectId, storedSections, hostWorkspaces, tagFolderContext]);
-	// Derived folders come from host rows, so "ready" needs the host fan-out
-	// too — otherwise the menu claims a complete list before tags arrive.
-	return { sections, areSectionsReady: isReady && hostWorkspacesReady };
+	}, [projectId, storedSections, workspaces, tagFolderContext]);
+	// Derived folders come from these rows, so "ready" waits for the host
+	// fan-out and the cloud list — otherwise the menu claims a complete list
+	// before tags arrive.
+	return { sections, areSectionsReady: isReady && workspacesReady };
 }

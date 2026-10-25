@@ -1,0 +1,1 @@
+export { useFooterTier } from "./useFooterTier";

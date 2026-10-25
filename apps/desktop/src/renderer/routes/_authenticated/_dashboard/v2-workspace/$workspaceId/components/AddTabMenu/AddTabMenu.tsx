@@ -5,7 +5,7 @@ import {
 	DropdownMenuSeparator,
 } from "@superset/ui/dropdown-menu";
 import { BsTerminalPlus } from "react-icons/bs";
-import { LuGitCompareArrows } from "react-icons/lu";
+import { LuGitCompareArrows, LuMessageSquare } from "react-icons/lu";
 import { TbDeviceDesktop, TbWorld } from "react-icons/tb";
 import { HotkeyMenuShortcut } from "renderer/components/HotkeyMenuShortcut";
 
@@ -13,8 +13,10 @@ interface AddTabMenuProps {
 	onAddTerminal: () => void;
 	onOpenSavedConversation?: () => void;
 	onAddAccountTerminal?: (returnFocus: HTMLElement | null) => void;
-	onAddBrowser: () => void;
-	onAddChanges: () => void;
+	runAfterClose: (action: () => void) => void;
+	onAddChat?: (() => void) | undefined;
+	onAddBrowser?: (() => void) | undefined;
+	onAddChanges?: (() => void) | undefined;
 	onAddDesktop?: (() => void) | undefined;
 	showPresetsBar: boolean;
 	onToggleShowPresetsBar: (enabled: boolean) => void;
@@ -24,6 +26,8 @@ export function AddTabMenu({
 	onAddTerminal,
 	onAddAccountTerminal,
 	onOpenSavedConversation,
+	runAfterClose,
+	onAddChat,
 	onAddBrowser,
 	onAddChanges,
 	onAddDesktop,
@@ -32,7 +36,10 @@ export function AddTabMenu({
 }: AddTabMenuProps) {
 	return (
 		<>
-			<DropdownMenuItem className="gap-2" onClick={onAddTerminal}>
+			<DropdownMenuItem
+				className="gap-2"
+				onClick={() => runAfterClose(onAddTerminal)}
+			>
 				<BsTerminalPlus className="size-4" />
 				<span>
 					<Trans>Terminal</Trans>
@@ -46,9 +53,10 @@ export function AddTabMenu({
 						const triggerId = event.currentTarget
 							.closest('[role="menu"]')
 							?.getAttribute("aria-labelledby");
-						onAddAccountTerminal(
-							triggerId ? document.getElementById(triggerId) : null,
-						);
+						const returnFocus = triggerId
+							? document.getElementById(triggerId)
+							: null;
+						runAfterClose(() => onAddAccountTerminal(returnFocus));
 					}}
 				>
 					<BsTerminalPlus className="size-4" />
@@ -56,25 +64,38 @@ export function AddTabMenu({
 				</DropdownMenuItem>
 			)}
 			{onOpenSavedConversation && (
-				<DropdownMenuItem className="gap-2" onClick={onOpenSavedConversation}>
+				<DropdownMenuItem className="gap-2" onClick={() => runAfterClose(onOpenSavedConversation)}>
 					<BsTerminalPlus className="size-4" />
 					<Trans>Open saved Claude conversation…</Trans>
 				</DropdownMenuItem>
 			)}
-			<DropdownMenuItem className="gap-2" onClick={onAddBrowser}>
-				<TbWorld className="size-4" />
-				<span>
-					<Trans>Browser</Trans>
-				</span>
-				<HotkeyMenuShortcut hotkeyId="NEW_BROWSER" />
-			</DropdownMenuItem>
-			<DropdownMenuItem className="gap-2" onClick={onAddChanges}>
-				<LuGitCompareArrows className="size-4" />
-				<span>
-					<Trans>Changes</Trans>
-				</span>
-				<HotkeyMenuShortcut hotkeyId="OPEN_DIFF_VIEWER" />
-			</DropdownMenuItem>
+			{onAddChat && (
+				<DropdownMenuItem className="gap-2" onClick={onAddChat}>
+					<LuMessageSquare className="size-4" />
+					<span>
+						<Trans>Chat</Trans>
+					</span>
+					<HotkeyMenuShortcut hotkeyId="NEW_CHAT" />
+				</DropdownMenuItem>
+			)}
+			{onAddBrowser && (
+				<DropdownMenuItem className="gap-2" onClick={onAddBrowser}>
+					<TbWorld className="size-4" />
+					<span>
+						<Trans>Browser</Trans>
+					</span>
+					<HotkeyMenuShortcut hotkeyId="NEW_BROWSER" />
+				</DropdownMenuItem>
+			)}
+			{onAddChanges && (
+				<DropdownMenuItem className="gap-2" onClick={onAddChanges}>
+					<LuGitCompareArrows className="size-4" />
+					<span>
+						<Trans>Changes</Trans>
+					</span>
+					<HotkeyMenuShortcut hotkeyId="OPEN_DIFF_VIEWER" />
+				</DropdownMenuItem>
+			)}
 			{onAddDesktop && (
 				<DropdownMenuItem className="gap-2" onClick={onAddDesktop}>
 					<TbDeviceDesktop className="size-4" />

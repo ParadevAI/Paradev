@@ -23,6 +23,7 @@ import {
 	focusOrAddTerminalPane,
 	type LinkedTerminalPaneStore,
 } from "../../utils/focusTerminalPane";
+import { readLastChatAgent } from "../../utils/lastChatAgent";
 
 export interface CreateNewAgentSessionInput {
 	configId: string;
@@ -37,6 +38,8 @@ export interface CreateNewAgentSessionInput {
 export type CreateNewAgentSession = (
 	input: CreateNewAgentSessionInput,
 ) => Promise<{ terminalId: string } | null>;
+
+type OpenNewChat = () => Promise<{ terminalId: string } | null>;
 
 export type CreateAccountTerminal = (input: {
 	configId: string;
@@ -64,11 +67,13 @@ export function useAgentSessionLauncher({
 	createNewAgentSession: CreateNewAgentSession;
 	createAccountTerminal: CreateAccountTerminal;
 	openAgentChat: OpenAgentChat;
+	openNewChat: OpenNewChat;
 	focusAgentTerminal: (terminalId: string) => void;
 } {
 	const { t } = useLingui();
-	const runAgent = workspaceTrpc.agents.run.useMutation();
-	const runWithAccount = workspaceTrpc.agents.runWithAccount.useMutation();
+	const { mutateAsync: runAgent } = workspaceTrpc.agents.run.useMutation();
+	const { mutateAsync: runWithAccount } =
+		workspaceTrpc.agents.runWithAccount.useMutation();
 	const appearance = useTerminalAppearance();
 	const awaitAcpChatEnabled = useAwaitAcpChatEnabled();
 	const { hostUrl } = useWorkspaceClient();
@@ -76,7 +81,7 @@ export function useAgentSessionLauncher({
 	const queryClient = useQueryClient();
 	const createAccountTerminal = useCallback<CreateAccountTerminal>(
 		async ({ configId, account }) => {
-			const result = await runWithAccount.mutateAsync({
+			const result = await runWithAccount({
 				workspaceId,
 				agent: configId,
 				account,
@@ -141,6 +146,23 @@ export function useAgentSessionLauncher({
 		[awaitAcpChatEnabled, queryClient, hostUrl, agentConfigs, store],
 	);
 
+	const openNewChat = useCallback<OpenNewChat>(async () => {
+		const configs = await queryClient
+			.ensureQueryData(v2AgentConfigsQueryOptions(hostUrl))
+			.catch(() => agentConfigs ?? []);
+		const chatPresetIds = configs
+			.map((config) => config.presetId)
+			.filter((presetId) => acpHarnessForPreset(presetId));
+		const presetId = [readLastChatAgent(), "claude", ...chatPresetIds].find(
+			(candidate) => candidate && chatPresetIds.includes(candidate),
+		);
+		if (!presetId) {
+			toast.error(t({ message: "No installed agent can be opened as a chat" }));
+			return null;
+		}
+		return openAgentChat({ configId: "", presetId, placement: "new-tab" });
+	}, [queryClient, hostUrl, agentConfigs, openAgentChat, t]);
+
 	const createNewAgentSession = useCallback<CreateNewAgentSession>(
 		async (input) => {
 			if (!input.forkSessionId) {
@@ -152,7 +174,7 @@ export function useAgentSessionLauncher({
 				// Host pipeline bakes the prompt into the initialCommand using the
 				// agent's argv/stdin transport — no follow-up writeInput needed,
 				// no bind-wait race vs. the launching shell.
-				const result = await runAgent.mutateAsync({
+				const result = await runAgent({
 					workspaceId,
 					colors: terminalQueryColors(appearance.theme),
 					agent: input.configId,
@@ -212,7 +234,7 @@ export function useAgentSessionLauncher({
 
 	const focusAgentTerminal = useCallback(
 		(terminalId: string) => {
-			focusOrAddTerminalPane(store, terminalId, linkedStores);
+			focusOrAddTerminalPane(store, terminalId, { linkedStores });
 		},
 		[store, linkedStores],
 	);
@@ -221,6 +243,7 @@ export function useAgentSessionLauncher({
 		createNewAgentSession,
 		createAccountTerminal,
 		openAgentChat,
+		openNewChat,
 		focusAgentTerminal,
 	};
 }

@@ -68,14 +68,6 @@ export function useMentionSources(
 		const controller = new AbortController();
 		for (const provider of providersRef.current) {
 			if (provider.source.kind !== "search") continue;
-			if (query === "") {
-				setSearchEntries((previous) => ({ ...previous, [provider.id]: [] }));
-				setSearchPending((previous) => ({
-					...previous,
-					[provider.id]: false,
-				}));
-				continue;
-			}
 			setSearchPending((previous) => ({ ...previous, [provider.id]: true }));
 			provider.source
 				.search(query, controller.signal)
@@ -122,7 +114,7 @@ export function useMentionSources(
 					});
 				}
 			} else {
-				const entries = query === "" ? [] : (searchEntries[provider.id] ?? []);
+				const entries = searchEntries[provider.id] ?? [];
 				const isLoading = searchPending[provider.id] === true;
 				if (entries.length > 0 || query === "" || isLoading) {
 					sections.push({

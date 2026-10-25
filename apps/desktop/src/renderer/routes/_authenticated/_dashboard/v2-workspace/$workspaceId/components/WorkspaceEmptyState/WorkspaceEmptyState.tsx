@@ -2,7 +2,7 @@ import { useLingui } from "@lingui/react/macro";
 import { useMemo } from "react";
 import type { IconType } from "react-icons";
 import { BsTerminalPlus } from "react-icons/bs";
-import { LuGitCompareArrows, LuSearch } from "react-icons/lu";
+import { LuGitCompareArrows, LuMessageSquare, LuSearch } from "react-icons/lu";
 import { TbWorld } from "react-icons/tb";
 import { GitHubStarPill } from "renderer/components/GitHubStarPill";
 import { useHotkeyDisplay } from "renderer/hotkeys";
@@ -13,6 +13,7 @@ import { useTheme } from "renderer/stores/theme";
 interface WorkspaceEmptyStateProps {
 	onOpenBrowser: () => void;
 	onOpenChanges: () => void;
+	onOpenChat?: (() => void) | undefined;
 	onOpenQuickOpen: () => void;
 	onOpenTerminal: () => void;
 }
@@ -28,12 +29,14 @@ interface WorkspaceEmptyStateAction {
 export function WorkspaceEmptyState({
 	onOpenBrowser,
 	onOpenChanges,
+	onOpenChat,
 	onOpenQuickOpen,
 	onOpenTerminal,
 }: WorkspaceEmptyStateProps) {
 	const { t } = useLingui();
 	const activeTheme = useTheme();
 	const { keys: newGroupDisplay } = useHotkeyDisplay("NEW_GROUP");
+	const { keys: newChatDisplay } = useHotkeyDisplay("NEW_CHAT");
 	const { keys: newBrowserDisplay } = useHotkeyDisplay("NEW_BROWSER");
 	const { keys: quickOpenDisplay } = useHotkeyDisplay("QUICK_OPEN");
 	const { keys: openChangesDisplay } = useHotkeyDisplay("OPEN_DIFF_VIEWER");
@@ -49,6 +52,17 @@ export function WorkspaceEmptyState({
 				icon: BsTerminalPlus,
 				onClick: onOpenTerminal,
 			},
+			...(onOpenChat
+				? [
+						{
+							id: "chat",
+							label: t({ message: "Open Chat" }),
+							display: newChatDisplay,
+							icon: LuMessageSquare,
+							onClick: onOpenChat,
+						},
+					]
+				: []),
 			{
 				id: "browser",
 				label: t({
@@ -79,9 +93,11 @@ export function WorkspaceEmptyState({
 		],
 		[
 			newBrowserDisplay,
+			newChatDisplay,
 			newGroupDisplay,
 			onOpenBrowser,
 			onOpenChanges,
+			onOpenChat,
 			onOpenQuickOpen,
 			onOpenTerminal,
 			openChangesDisplay,

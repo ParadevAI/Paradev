@@ -1,6 +1,6 @@
 import { db } from "@superset/db/client";
 import { connections, type SelectConnection } from "@superset/db/schema";
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, isNull, or } from "drizzle-orm";
 import {
 	decryptOptional,
 	decryptSecret,
@@ -12,6 +12,7 @@ import { forgetClient, redirectUriFor } from "./client-identity";
 import { connectorMethod, requireConnector, resolveEndpoints } from "./index";
 
 const DEFAULT_EXPIRY_BUFFER_SECONDS = 60;
+const RACE_SETTLE_MS = 1000;
 export const NEEDS_REAUTH = "needs_reauth";
 
 export class UnrefreshableConnectionError extends Error {
@@ -76,6 +77,7 @@ const inFlight = new Map<string, Promise<SelectConnection>>();
 
 export async function ensureFreshConnection(
 	row: SelectConnection,
+	{ raceSettleMs = RACE_SETTLE_MS }: { raceSettleMs?: number } = {},
 ): Promise<SelectConnection> {
 	const connector = requireConnector(row.connector);
 	const method = connectorMethod(
@@ -94,7 +96,7 @@ export async function ensureFreshConnection(
 	const pending = inFlight.get(row.id);
 	if (pending) return await pending;
 
-	const load = refresh(row, buffer).finally(() => {
+	const load = refresh(row, buffer, raceSettleMs).finally(() => {
 		inFlight.delete(row.id);
 	});
 	inFlight.set(row.id, load);
@@ -112,6 +114,7 @@ export async function ensureFreshConnection(
 async function refresh(
 	row: SelectConnection,
 	buffer: number,
+	raceSettleMs: number,
 ): Promise<SelectConnection> {
 	const current = await readConnection(row.id);
 	if (!current) return row;
@@ -173,13 +176,18 @@ async function refresh(
 	}
 	const payload = (await response.json()) as Record<string, unknown>;
 	if (!response.ok || typeof payload.access_token !== "string") {
+		// Rotating refresh tokens are single-use: when another process redeemed
+		// ours first, the rejection means we lost the race, not that the grant died.
+		const winner = await racedRefresh(current, raceSettleMs);
+		if (winner) return winner;
+
 		if (endpoints.issuer && payload.error === "invalid_client")
 			await forgetClient(
 				endpoints.issuer,
 				redirectUriFor(current.connector),
 				clientId,
 			);
-		await markNeedsReauth(current.id);
+		await markNeedsReauth(current.id, current.accessToken);
 		throw new UnrefreshableConnectionError(current.connector);
 	}
 
@@ -196,10 +204,17 @@ async function refresh(
 				typeof expiresIn === "number"
 					? new Date(Date.now() + expiresIn * 1000)
 					: null,
+			disconnectedAt: null,
+			disconnectReason: null,
 		})
 		.where(
 			and(
-				live(current.id),
+				eq(connections.id, current.id),
+				// A racing loser may have marked this generation before we wrote it.
+				or(
+					isNull(connections.disconnectedAt),
+					eq(connections.disconnectReason, NEEDS_REAUTH),
+				),
 				current.tokenExpiresAt
 					? eq(connections.tokenExpiresAt, current.tokenExpiresAt)
 					: isNull(connections.tokenExpiresAt),
@@ -211,6 +226,18 @@ async function refresh(
 	// Zero rows means another process refreshed between our read and our write.
 	// Its tokens are the live ones; ours are already superseded.
 	return (await readConnection(current.id)) ?? current;
+}
+
+async function racedRefresh(
+	current: SelectConnection,
+	settleMs: number,
+): Promise<SelectConnection | null> {
+	for (const wait of [0, settleMs]) {
+		if (wait) await new Promise((resolve) => setTimeout(resolve, wait));
+		const latest = await readConnection(current.id);
+		if (latest && latest.accessToken !== current.accessToken) return latest;
+	}
+	return null;
 }
 
 export async function connectionAccessToken(

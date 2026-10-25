@@ -470,6 +470,7 @@ export function TeamDetailSettings({ teamId }: TeamDetailSettingsProps) {
 			</div>
 
 			<Dialog
+				modal
 				open={openDialog === "delete"}
 				onOpenChange={(open) => !open && setOpenDialog(null)}
 			>
@@ -511,6 +512,7 @@ export function TeamDetailSettings({ teamId }: TeamDetailSettingsProps) {
 			</Dialog>
 
 			<Dialog
+				modal
 				open={openDialog === "leaveTeam"}
 				onOpenChange={(open) => !open && setOpenDialog(null)}
 			>

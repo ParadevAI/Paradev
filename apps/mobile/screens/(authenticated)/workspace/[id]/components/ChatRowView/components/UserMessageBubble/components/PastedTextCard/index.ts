@@ -1,0 +1,1 @@
+export { PastedTextCard } from "./PastedTextCard";

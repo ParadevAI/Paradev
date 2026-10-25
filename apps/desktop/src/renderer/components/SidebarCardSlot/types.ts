@@ -15,6 +15,8 @@ export interface SidebarCardEntry {
 	onAction?: () => void;
 	/** Omit to make the card non-dismissible. */
 	onDismiss?: () => void;
+	onClick?: () => void;
+	media?: ReactNode;
 	className?: string;
 	children?: ReactNode;
 	/**

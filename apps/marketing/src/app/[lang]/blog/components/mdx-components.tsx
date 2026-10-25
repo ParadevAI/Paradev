@@ -1,6 +1,7 @@
 import type { BundledLanguage } from "shiki";
 import { StoreBadges } from "@/app/[lang]/components/StoreBadges";
 import { slugify } from "@/lib/blog-utils";
+import { getPublicImageSize } from "@/lib/public-image-size";
 import { BlogCodeBlock } from "./BlogCodeBlock";
 import { Testimonial } from "./Testimonial";
 import { TestimonialGrid } from "./TestimonialGrid";
@@ -93,10 +94,11 @@ export const mdxComponents = {
 	},
 	img: ({ src, alt, ...props }: React.ImgHTMLAttributes<HTMLImageElement>) => (
 		<span className="block my-8 not-prose">
-			{/* biome-ignore lint/performance/noImgElement: MDX images have unknown dimensions */}
+			{/* biome-ignore lint/performance/noImgElement: MDX images come from authors as plain paths, not static imports */}
 			<img
 				src={src}
 				alt={alt}
+				{...(typeof src === "string" ? getPublicImageSize(src) : null)}
 				className="w-full rounded-lg border border-border"
 				{...props}
 			/>

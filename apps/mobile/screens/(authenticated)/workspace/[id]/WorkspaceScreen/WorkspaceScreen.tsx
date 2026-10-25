@@ -7,11 +7,17 @@ import type {
 	ComposerSessionTab,
 } from "@superset/composer";
 import { i18n } from "@superset/i18n";
+import { BRAND } from "@superset/shared/brand";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { TitlePress } from "@superset/title-press";
 import { useQueryClient } from "@tanstack/react-query";
 import * as Clipboard from "expo-clipboard";
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import {
+	Stack,
+	useFocusEffect,
+	useLocalSearchParams,
+	useRouter,
+} from "expo-router";
 import {
 	CloudOff,
 	Plus,
@@ -43,6 +49,7 @@ import {
 	hostServiceUrl,
 } from "@/lib/host-service/client";
 import { posthog } from "@/lib/posthog";
+import { apiClient } from "@/lib/trpc/client";
 import { useVoiceActive } from "@/lib/voice/voiceStore";
 import {
 	getHostTerminalsQueryKey,
@@ -58,6 +65,7 @@ import { useCreateTerminalWorkspace } from "@/screens/(authenticated)/hooks/useC
 import { useSlashCommands } from "@/screens/(authenticated)/hooks/useSlashCommands";
 import { workspaceDraftKey } from "@/screens/(authenticated)/stores/composerDraftsStore";
 import { useLastSessionTabStore } from "@/screens/(authenticated)/stores/lastSessionTabStore";
+import { useLastWorkspaceStore } from "@/screens/(authenticated)/stores/lastWorkspaceStore";
 import { usePendingWorkspaceCreatesStore } from "@/screens/(authenticated)/stores/pendingWorkspaceCreatesStore";
 import { usePinnedWorkspacesStore } from "@/screens/(authenticated)/stores/pinnedWorkspacesStore";
 import { useTerminalSeenStore } from "@/screens/(authenticated)/stores/terminalSeenStore";
@@ -81,6 +89,7 @@ import {
 	type TerminalWebViewHandle,
 } from "../components/TerminalWebView";
 import { useHostCompatibility } from "../hooks/useHostCompatibility";
+import { usePullRequestDiffstat } from "../hooks/usePullRequestDiffstat";
 import { usePullRequestIconUri } from "../hooks/usePullRequestIconUri";
 import { useWorkspaceHeaderActions } from "../hooks/useWorkspaceHeaderActions";
 import { useWorkspacePullRequests } from "../hooks/useWorkspacePullRequest";
@@ -138,11 +147,21 @@ const STATE_BANNERS: Partial<
  */
 export function WorkspaceScreen() {
 	const { t } = useLingui();
+	const appName = BRAND.NAME;
 	const params = useLocalSearchParams<{ id: string; tab?: string }>();
 	const id = params.id;
 	const router = useRouter();
 	const insets = useSafeAreaInsets();
 	const queryClient = useQueryClient();
+
+	const setLastWorkspaceId = useLastWorkspaceStore(
+		(state) => state.setWorkspaceId,
+	);
+	useFocusEffect(
+		useCallback(() => {
+			if (id) setLastWorkspaceId(id);
+		}, [id, setLastWorkspaceId]),
+	);
 
 	const {
 		workspace,
@@ -150,6 +169,7 @@ export function WorkspaceScreen() {
 		cloud,
 		sandboxUnreachable,
 		sandboxWaking,
+		sandboxRefusal,
 		retrySandbox,
 		isResolving,
 	} = useWorkspaceHost(id ?? null);
@@ -477,12 +497,9 @@ export function WorkspaceScreen() {
 	const activeRow = rows.find((row) => row.terminalId === activeTerminalId);
 	const activeIsChat = activeRow?.kind === "chat";
 	const acpChat = Boolean(useFeatureFlag(FEATURE_FLAGS.ACP_CHAT));
-	const {
-		running: chatRunning,
-		stop: stopChat,
-		backgroundTasks: chatTasks,
-	} = useActiveChat(activeIsChat ? activeTerminalId : null);
-	const chatTaskCount = chatTasks.length;
+	const { running: chatRunning, stop: stopChat } = useActiveChat(
+		activeIsChat ? activeTerminalId : null,
+	);
 	const slashCommands = useSlashCommands({
 		machineId: host?.machineId ?? null,
 		hostUrl,
@@ -761,6 +778,13 @@ export function WorkspaceScreen() {
 			}
 			if (activeIsChat) {
 				if (!chatRef.current) throw new Error("Chat is not connected");
+				// A cloud box resolves only the files attached to it.
+				if (cloud && attachmentFileIds.length > 0) {
+					await apiClient.cloudWorkspace.attachFiles.mutate({
+						id,
+						fileIds: attachmentFileIds,
+					});
+				}
 				const imported =
 					attachmentFileIds.length > 0
 						? await getHostServiceClientByUrl(
@@ -786,7 +810,7 @@ export function WorkspaceScreen() {
 				text,
 			});
 		},
-		[hostUrl, activeTerminalId, id, activeIsChat],
+		[hostUrl, activeTerminalId, id, activeIsChat, cloud],
 	);
 
 	const handleQuickKey = useCallback(
@@ -885,12 +909,19 @@ export function WorkspaceScreen() {
 	}, [pullRequests, pullRequestIconUri, t]);
 
 	const pullRequestCount = pullRequests.length;
-	const chatPullRequestLabel =
-		pullRequestCount > 0
-			? t({
+	const latestPullRequestDiffstat = usePullRequestDiffstat({
+		hostUrl,
+		pullRequest: pullRequests[0],
+	});
+	const chatPullRequestChip = pullRequestStatusNow
+		? {
+				label: t({
 					message: plural(pullRequestCount, { one: "# PR", other: "# PRs" }),
-				})
-			: undefined;
+				}),
+				status: pullRequestStatusNow,
+				diffstat: latestPullRequestDiffstat,
+			}
+		: undefined;
 
 	// One PR goes straight to it; a history goes to the list. Captured by hand
 	// because the tap lands in SwiftUI, where RN autocapture cannot see it.
@@ -977,17 +1008,6 @@ export function WorkspaceScreen() {
 			{workspace ? <TitlePress onPress={openActions} /> : null}
 			{workspace ? (
 				<Stack.Toolbar placement="right">
-					{acpChat && activeIsChat && chatTaskCount > 0 ? (
-						<Stack.Toolbar.Button
-							accessibilityLabel={t({ message: "Running in the background" })}
-							icon="cpu"
-							onPress={() =>
-								router.push(
-									`/(authenticated)/workspace/${id}/background-tasks?session=${activeTerminalId}`,
-								)
-							}
-						/>
-					) : null}
 					{acpChat ? (
 						<Stack.Toolbar.Button
 							accessibilityLabel={t({ message: "Manage sessions" })}
@@ -1097,13 +1117,34 @@ export function WorkspaceScreen() {
 				{hostCompatibility.incompatible ? (
 					<WorkspacePlaceholder
 						body={t({
-							message: `${host?.name ?? t({ message: "This host" })} is running host service ${hostCompatibility.hostVersion} — this app needs ${hostCompatibility.minVersion} or newer. Update Superset on that machine.`,
+							message: `${host?.name ?? t({ message: "This host" })} is running host service ${hostCompatibility.hostVersion} — this app needs ${hostCompatibility.minVersion} or newer. Update ${appName} on that machine.`,
 						})}
 						icon={TriangleAlert}
 						onRefresh={onRefresh}
 						refreshing={refreshing}
 						title={t({
 							message: "This host needs an update",
+						})}
+					/>
+				) : cloud && sandboxRefusal ? (
+					<WorkspacePlaceholder
+						action={
+							<Pressable
+								accessibilityRole="button"
+								className="bg-secondary h-[38px] flex-row items-center justify-center gap-1.5 rounded-md px-5 active:opacity-80"
+								onPress={retrySandbox}
+							>
+								<Text className="font-medium text-[15px]">
+									<Trans>Try again</Trans>
+								</Text>
+							</Pressable>
+						}
+						body={sandboxRefusal}
+						icon={CloudOff}
+						onRefresh={onRefresh}
+						refreshing={refreshing}
+						title={t({
+							message: "This cloud workspace can't start",
 						})}
 					/>
 				) : activeIsChat && activeTerminalId && host && hostUrl && id ? (
@@ -1114,7 +1155,7 @@ export function WorkspaceScreen() {
 						onOpenSession={openSession}
 						onOpenPullRequests={openPullRequests}
 						onTap={dismissComposer}
-						pullRequestLabel={chatPullRequestLabel}
+						pullRequestChip={chatPullRequestChip}
 						ref={chatRef}
 						sessionId={activeTerminalId}
 						workspaceId={id}
@@ -1156,6 +1197,7 @@ export function WorkspaceScreen() {
 						    covers the viewport this would move. Always mounted — it
 						    fades itself, which it cannot do if the parent unmounts it. */}
 						<ScrollToBottomButton
+							systemName="arrow.down"
 							visible={!atBottom && !select.active}
 							onPress={() => {
 								// The tap lands in SwiftUI, where RN autocapture cannot see

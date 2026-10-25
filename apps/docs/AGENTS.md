@@ -9,5 +9,7 @@ only what a customer can run today.
   useful it is to us; the desktop's help and `superset --help` are where an
   internal command is discovered. Check the audience before adding an entry,
   and remove the entry in the same change that makes a command internal.
-- Features behind a flag or an allowlist (cloud workspaces and everything under
-  `environments`, for example) stay out until they ship to everyone.
+- Features behind a flag or an allowlist (the `environments` CLI group, for
+  example) stay out until they ship to everyone. Cloud workspaces are the
+  exception: `cloud-workspaces.mdx` documents them with an early-access callout.
+  Remove the callout when the `cloud-workspaces` flag reaches everyone.

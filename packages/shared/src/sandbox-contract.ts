@@ -77,11 +77,8 @@ export const SANDBOX_ASSET_BASE_URL = "https://cdn.superset.sh/sandbox";
  */
 export const sandboxIdentitySchema = z.object({
 	SUPERSET_SANDBOX_CONTRACT: z.literal(String(SANDBOX_CONTRACT_VERSION)),
-	/** The bundle the environment pins; absent means the image's own stays. */
-	SUPERSET_BUNDLE_SHA: z
-		.string()
-		.regex(/^[0-9a-f]{64}$/)
-		.optional(),
+	/** The bundle the environment pins; the box installs it before anything else runs. */
+	SUPERSET_BUNDLE_SHA: z.string().regex(/^[0-9a-f]{64}$/),
 	SUPERSET_API_URL: z.string().url(),
 	SUPERSET_SANDBOX_WORKSPACE_ID: z.string().uuid(),
 	SUPERSET_SANDBOX_ORGANIZATION_ID: z.string().uuid(),
@@ -91,19 +88,13 @@ export const sandboxIdentitySchema = z.object({
 	 * The repositories this workspace checks out, as JSON
 	 * (`sandboxRepositoriesSchema`): each at `<workspace>/<path>` on its
 	 * branch. The first is the primary: the one the workspace opens on and
-	 * whose hooks run unless the environment names another.
+	 * whose `.superset` config the box runs.
 	 */
 	SUPERSET_SANDBOX_REPOSITORIES: z.string().min(2),
 	SUPERSET_SANDBOX_PLUGINS: z.string().min(2).optional(),
 	/** The environment row's source (image name or golden), for telemetry. */
 	SUPERSET_SANDBOX_IMAGE_TAG: z.string().min(1),
 	SUPERSET_SANDBOX_PROVIDER: z.string().min(1),
-	/**
-	 * The environment's overrides for the repository's `.superset/config.json`
-	 * hooks the box acts on, as JSON: `{ start?: string[], ports?: number[] }`.
-	 * `setup` never travels here; the release runs it. host-service runs
-	 * `start` once the managed environment has arrived.
-	 */
 	HOST_SERVICE_SENTRY_DSN: z.string().optional(),
 	HOST_SERVICE_SENTRY_ENVIRONMENT: z.string().optional(),
 	/** A built-in agent to run once on first boot; see cloud-agent-launch. */
@@ -115,6 +106,8 @@ export const sandboxIdentitySchema = z.object({
 	/** Comma-separated cloud upload ids the box pulls before launching. */
 	SUPERSET_SANDBOX_AGENT_ATTACHMENTS: z.string().optional(),
 	SUPERSET_SANDBOX_AGENT_SURFACE: z.enum(["terminal", "chat"]).optional(),
+	/** Automation run that created this box; absent for a manual launch. */
+	SUPERSET_SANDBOX_AGENT_AUTOMATION_RUN_ID: z.string().uuid().optional(),
 });
 
 export type SandboxIdentity = z.infer<typeof sandboxIdentitySchema>;
@@ -136,8 +129,6 @@ export const sandboxRepositorySchema = z.object({
 	 */
 	baseBranch: z.string().min(1).optional(),
 	path: z.string().regex(/^(\.|[A-Za-z0-9_-][A-Za-z0-9._-]*)$/),
-	/** True for the repository whose `.superset/config.json` the box acts on. */
-	hooks: z.boolean().optional(),
 });
 export const sandboxRepositoriesSchema = z
 	.array(sandboxRepositorySchema)

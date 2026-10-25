@@ -2,7 +2,7 @@ import {
 	type AgentDefinitionId,
 	BUILTIN_AGENT_IDS,
 } from "@superset/shared/agent-catalog";
-import { boundTranscriptText } from "@superset/shared/terminal-session-handoff";
+import { boundTranscriptText } from "@superset/shared/session-handoff";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";

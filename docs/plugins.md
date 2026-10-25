@@ -34,10 +34,22 @@ and installs the working tree, which is what makes local authoring work.
 
 ```bash
 superset plugins publish <name> --bump patch   # rewrites the marketplace entry and the bundle
-git commit -am "publish <name>@<version>"
-git tag <name>@<version> && git push --tags    # the tag is the release
+git add .agent-marketplace.json plugins/<name> packages/shared/src/plugins/manifests.generated.ts
+git commit -m "publish <name>@<version>"
+git tag <name>@<version>
+git push origin <branch> <name>@<version>      # push the branch too: install reads the version from it
 bun run check:plugins                          # what CI runs; catches a change that skipped publish
 ```
+
+`superset plugins validate` takes a path (`plugins/<name>`), not a name. To test a plugin locally,
+`superset plugins marketplace add <path>` then `superset plugins install <name>`. Install copies the
+plugin into a cache, so after an edit run `superset plugins install <name> --update`; `plugins sync`
+reads the cached copy and does not see the working tree.
+
+A third-party marketplace needs `.agent-marketplace.json` at its root (`$schema`, `name`,
+`description`, `owner`, `plugins: []`); `plugins create` refuses to run without it. Its plugins get
+skills only: `desiredPluginMcpServers` emits MCP entries for `PLUGIN_CATALOG` plugins alone, and
+`connector.slug` must already exist in `connectors.json`.
 
 `check:plugins` fails on a marketplace entry whose version disagrees with `plugin.json`, a `server/`
 build that is stale against `src/`, a `manifests.generated.ts` that a publish would rewrite, and a
@@ -107,8 +119,17 @@ writes the desired set and reaps whatever is absent, so a caller that hands in i
 instead of letting agent-setup read the file has just told it every other caller's plugins are gone.
 The desktop's next boot would undo a `plugins sync`, and vice versa.
 
-Skills land in `~/.agents/skills` (what Codex, Vibe, and Kimi read natively) and are mirrored into
-`~/.claude/skills` as a plugin directory, because Claude does not read the shared convention.
+Skills land in `~/.agents/skills` (what Codex, Cursor, OpenCode, Gemini CLI, Vibe, and Kimi read
+natively) and are mirrored into `~/.claude/skills` as a plugin directory, because Claude does not
+read the shared convention.
+
+Plugin MCP servers are also synced to Claude's `~/.claude.json`, Codex's
+`~/.codex/config.toml`, and pdev's `~/.paradev/agent/mcp.json`. pdev honors
+`PDEV_CODING_AGENT_DIR` when set. Claude and pdev entries share the ownership ledger at
+`$SUPERSET_HOME_DIR/plugins/mcp-ledger.json`: user-defined or user-edited servers are
+left alone, while disabling or uninstalling a plugin removes unchanged managed entries.
+Superset proxy entries use `headersHelper` to read current auth at connection time rather
+than store a token. pdev needs a build with `headersHelper` support; older builds ignore it.
 
 ## Command surface
 

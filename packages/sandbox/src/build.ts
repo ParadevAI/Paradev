@@ -140,14 +140,22 @@ export async function publishBundle(
 
 	for (const { key, name } of missing) {
 		const cached = join(ASSET_CACHE, key);
-		if (!existsSync(cached)) {
+		const source = built.assets[name]?.source;
+		let bytes: Uint8Array;
+		if (existsSync(cached)) {
+			bytes = readFileSync(cached);
+		} else if (source) {
+			const response = await fetch(source);
+			if (!response.ok)
+				throw new Error(`asset ${name}: ${source} returned ${response.status}`);
+			bytes = new Uint8Array(await response.arrayBuffer());
+		} else {
 			throw new Error(
 				`asset ${name} (${key}) is not in the bucket and not in ${ASSET_CACHE}; run \`bun run assets ${name}\` to produce it`,
 			);
 		}
-		const bytes = readFileSync(cached);
 		if (sha256(bytes) !== built.assets[name]?.sha256) {
-			throw new Error(`cached ${key} does not hash to its manifest row`);
+			throw new Error(`${key} does not hash to its manifest row`);
 		}
 		await bucket.put(key, bytes, contentTypeFor(built.assets[name].suffix));
 		console.log(`uploaded ${name} -> ${bucket.url(key)}`);

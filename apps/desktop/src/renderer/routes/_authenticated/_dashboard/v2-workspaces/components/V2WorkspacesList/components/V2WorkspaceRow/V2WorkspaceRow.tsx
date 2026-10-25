@@ -4,17 +4,32 @@ import { useFormat } from "@superset/i18n/react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { useNavigate } from "@tanstack/react-router";
-import { memo } from "react";
+import { memo, type ReactNode, useEffect, useState } from "react";
 import { CgLaptop } from "react-icons/cg";
-import { LuLaptop, LuMonitor } from "react-icons/lu";
+import {
+	LuArchive,
+	LuArchiveRestore,
+	LuMonitor,
+	LuMonitorOff,
+	LuPin,
+	LuPinOff,
+	LuTrash2,
+} from "react-icons/lu";
 import { WorkspaceNameMarquee } from "renderer/components/WorkspaceNameMarquee";
 import { useFocusVisible } from "renderer/hooks/useFocusVisible";
 import { pullRequestRefFromUrl } from "renderer/lib/github/pullRequestRef";
 import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
-import { V2WorkspaceContextMenu } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/components/V2WorkspaceContextMenu";
+import {
+	type V2WorkspaceActions,
+	V2WorkspaceContextMenu,
+} from "renderer/routes/_authenticated/_dashboard/v2-workspaces/components/V2WorkspaceContextMenu";
+import { V2WorkspaceProjectIcon } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/components/V2WorkspaceProjectIcon";
+import { WorkspaceChecksDot } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/components/WorkspaceChecksDot";
+import { WorkspaceOwnerAvatar } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/components/WorkspaceOwnerAvatar";
 import { WorkspaceStateGlyph } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/components/WorkspaceStateGlyph";
 import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces";
 import { workspaceActivityAt } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/utils/sortWorkspaces";
+import { CloudGlyph } from "renderer/routes/_authenticated/components/CloudGlyph";
 import { PRIcon } from "renderer/screens/main/components/PRIcon/PRIcon";
 import { getRelativeTime } from "renderer/screens/main/components/WorkspacesListView/utils";
 import { usePullRequestPaneIntent } from "renderer/stores/pull-request-pane-intent";
@@ -30,6 +45,46 @@ function formatCount(count: number): string {
 	return `${(count / 1000).toFixed(1).replace(/\.0$/, "")}k`;
 }
 
+const HOVER_ACTION_CLASS =
+	"flex size-5 items-center justify-center rounded text-muted-foreground hover:bg-foreground/10 hover:text-foreground disabled:pointer-events-none disabled:opacity-40";
+
+function RowHoverAction({
+	label,
+	onClick,
+	disabled = false,
+	children,
+}: {
+	label: string;
+	onClick: () => void;
+	disabled?: boolean;
+	children: ReactNode;
+}) {
+	return (
+		<Tooltip delayDuration={300}>
+			<TooltipTrigger asChild>
+				<button
+					type="button"
+					disabled={disabled}
+					onClick={(event) => {
+						event.stopPropagation();
+						onClick();
+					}}
+					onKeyDown={(event) => {
+						if (event.key === "Enter" || event.key === " ") {
+							event.stopPropagation();
+						}
+					}}
+					aria-label={label}
+					className={HOVER_ACTION_CLASS}
+				>
+					{children}
+				</button>
+			</TooltipTrigger>
+			<TooltipContent side="top">{label}</TooltipContent>
+		</Tooltip>
+	);
+}
+
 // Memoized: filter/sort changes re-render the whole list, and at hundreds of
 // rows (each carrying a context menu, marquee, and tooltips) that costs
 // hundreds of ms per menu-checkbox toggle. Workspace object identities are
@@ -43,12 +98,12 @@ export const V2WorkspaceRow = memo(function V2WorkspaceRow({
 	const { t } = useLingui();
 	const navigate = useNavigate();
 	const isLocalWorkspace = workspace.type === "local";
-	const DeviceIcon =
-		workspace.hostType === "local-device" ? LuLaptop : LuMonitor;
+	const isCloud = workspace.hostType === "cloud";
+	const isArchived = workspace.archivedAt != null;
 	// The local device is the one running this app — it can't be offline from
 	// its own point of view, whatever presence says.
 	const isDeviceOffline =
-		!workspace.hostIsOnline && workspace.hostType !== "local-device";
+		!workspace.hostIsOnline && workspace.hostType === "remote-device";
 	// Drives the name's hover-reveal for keyboard users: the row, not the
 	// name span, is what's actually tabbable.
 	const {
@@ -57,12 +112,21 @@ export const V2WorkspaceRow = memo(function V2WorkspaceRow({
 		onBlur: handleRowBlur,
 	} = useFocusVisible();
 
+	// The selected look appears on click, not once the route has changed: a
+	// slow route transition otherwise reads as a click that did nothing.
+	const [isOpening, setIsOpening] = useState(false);
+	useEffect(() => {
+		if (!isOpening) return;
+		const timeout = setTimeout(() => setIsOpening(false), 2000);
+		return () => clearTimeout(timeout);
+	}, [isOpening]);
+
 	const creatorLabel = workspace.isCreatedByCurrentUser
 		? t({ message: "you" })
 		: workspace.createdByName;
 
-	// The visible age tracks activity (matches the default sort); creation
-	// and last-agent-event details live in the tooltip.
+	// The visible age tracks activity (matches the sort); creation and
+	// last-agent-event details live in the tooltip.
 	const timeLabel = getRelativeTime(workspaceActivityAt(workspace), {
 		format: "compact",
 	});
@@ -84,9 +148,7 @@ export const V2WorkspaceRow = memo(function V2WorkspaceRow({
 		.filter(Boolean)
 		.join("\n");
 
-	// PR, branch, and project no longer get their own persistent slot in the
-	// row — the list was trying to be a table and reads noisy for it. They're
-	// still one hover away instead of gone outright.
+	// The branch stays one hover away rather than taking a slot of its own.
 	const rowTitle = [
 		workspace.pr
 			? t({
@@ -99,17 +161,66 @@ export const V2WorkspaceRow = memo(function V2WorkspaceRow({
 					message: `Branch: ${workspace.branch}`,
 				})
 			: null,
-		t({
-			message: `Project: ${
-				workspace.projectName ??
-				t({
-					message: "none (session)",
-				})
-			}`,
-		}),
 	]
 		.filter(Boolean)
 		.join("\n");
+
+	const whereLabel = isCloud
+		? t({ message: "Cloud workspace" })
+		: isDeviceOffline
+			? t({ message: `${workspace.hostName} — device offline` })
+			: workspace.hostName;
+
+	const renderHoverActions = (actions: V2WorkspaceActions) =>
+		isArchived ? (
+			actions.canRestore ? (
+				<RowHoverAction
+					label={
+						actions.isRestoreBlocked
+							? t({ message: `${workspace.hostName} — device offline` })
+							: t({ message: "Restore workspace" })
+					}
+					onClick={actions.restore}
+					disabled={actions.isRestoreBlocked}
+				>
+					<LuArchiveRestore className="size-3.5" />
+				</RowHoverAction>
+			) : null
+		) : (
+			<>
+				{workspace.isInSidebar ? (
+					actions.canRemoveFromSidebar && !isCurrentRoute ? (
+						<RowHoverAction
+							label={t({ message: "Hide from Sidebar" })}
+							onClick={actions.removeFromSidebar}
+						>
+							<LuPinOff className="size-3.5" />
+						</RowHoverAction>
+					) : null
+				) : (
+					<RowHoverAction
+						label={t({ message: "Show on Sidebar" })}
+						onClick={actions.addToSidebar}
+					>
+						<LuPin className="size-3.5" />
+					</RowHoverAction>
+				)}
+				<RowHoverAction
+					label={
+						isCloud
+							? t({ message: "Archive workspace" })
+							: t({ message: "Delete workspace" })
+					}
+					onClick={actions.openDeleteDialog}
+				>
+					{isCloud ? (
+						<LuArchive className="size-3.5" />
+					) : (
+						<LuTrash2 className="size-3.5" />
+					)}
+				</RowHoverAction>
+			</>
+		);
 
 	return (
 		<V2WorkspaceContextMenu
@@ -121,22 +232,29 @@ export const V2WorkspaceRow = memo(function V2WorkspaceRow({
 				<div
 					role="button"
 					aria-current={isCurrentRoute ? "page" : undefined}
+					// An archived row has nothing to open; Restore is its action.
+					aria-disabled={isArchived || undefined}
 					tabIndex={0}
-					onClick={actions.open}
+					onClick={() => {
+						if (!isArchived) setIsOpening(true);
+						actions.open();
+					}}
 					onKeyDown={(event) => {
 						if (event.target !== event.currentTarget) return;
 						if (event.key === "Enter" || event.key === " ") {
 							event.preventDefault();
+							if (!isArchived) setIsOpening(true);
 							actions.open();
 						}
 					}}
 					onFocus={handleRowFocus}
 					onBlur={handleRowBlur}
-					title={rowTitle}
+					title={rowTitle || undefined}
 					className={cn(
-						"flex cursor-pointer items-center gap-3 border-b border-border/40 px-6 py-3 text-sm outline-none transition-colors",
+						"group flex items-center gap-3 border-b border-border/40 px-6 py-3 text-sm outline-none transition-colors",
 						"focus-visible:ring-2 focus-visible:ring-ring/40 focus-visible:ring-inset",
-						isCurrentRoute
+						isArchived ? "cursor-default" : "cursor-pointer",
+						isCurrentRoute || isOpening
 							? "bg-muted hover:bg-muted focus-visible:bg-muted"
 							: "hover:bg-accent/50 focus-visible:bg-accent/50",
 					)}
@@ -150,9 +268,8 @@ export const V2WorkspaceRow = memo(function V2WorkspaceRow({
 								    treats a `title` prop as an SVG <title> child, not an
 								    HTML attribute, so it can't block inheritance) carries
 								    an empty title to stop it from inheriting the row's
-								    title (PR/branch/project); without it, hovering this
-								    icon fires both the native tooltip and this Radix one
-								    at once. */}
+								    title (PR/branch); without it, hovering this icon fires
+								    both the native tooltip and this Radix one at once. */}
 								<span title="">
 									<CgLaptop
 										className="size-3.5 shrink-0 text-muted-foreground"
@@ -173,12 +290,33 @@ export const V2WorkspaceRow = memo(function V2WorkspaceRow({
 						forceActive={isFocused}
 						className={cn(
 							"min-w-0 flex-1 font-medium",
-							// Done states recede so live work owns the contrast.
-							workspace.archivedAt != null || workspace.pr?.state === "merged"
+							// Done and dead states recede so live work owns the contrast.
+							isArchived ||
+								workspace.pr?.state === "merged" ||
+								workspace.sandboxStatus === "failed"
 								? "text-muted-foreground"
 								: "text-foreground",
 						)}
 					/>
+
+					<span
+						className="flex w-32 shrink-0 items-center gap-1.5 text-xs text-muted-foreground @max-3xl:hidden"
+						title={workspace.projectName ?? t({ message: "Session" })}
+					>
+						<V2WorkspaceProjectIcon
+							projectName={workspace.projectName ?? t({ message: "Session" })}
+							iconUrl={workspace.projectIconUrl}
+							size="sm"
+							className="size-4 rounded-sm text-[9px]"
+						/>
+						<span className="min-w-0 truncate">
+							{workspace.projectName ?? <Trans>Session</Trans>}
+						</span>
+					</span>
+
+					<span className="flex w-4 shrink-0 items-center justify-center">
+						<WorkspaceOwnerAvatar workspace={workspace} />
+					</span>
 
 					{workspace.pr ? (
 						<button
@@ -186,8 +324,11 @@ export const V2WorkspaceRow = memo(function V2WorkspaceRow({
 							onClick={(event) => {
 								event.stopPropagation();
 								if (!workspace.pr) return;
-								// Opens the PR pane inside the workspace instead of GitHub.
-								const ref = pullRequestRefFromUrl(workspace.pr.url);
+								// Opens the PR pane inside the workspace instead of GitHub;
+								// an archived workspace has no pane to open, so GitHub it is.
+								const ref = isArchived
+									? null
+									: pullRequestRefFromUrl(workspace.pr.url);
 								if (!ref) {
 									window.open(workspace.pr.url, "_blank");
 									return;
@@ -201,9 +342,14 @@ export const V2WorkspaceRow = memo(function V2WorkspaceRow({
 							aria-label={t({
 								message: `Pull request #${workspace.pr.prNumber}, ${workspace.pr.state}`,
 							})}
-							className="shrink-0"
+							className="flex shrink-0 items-center gap-1 rounded text-[11px] tabular-nums text-muted-foreground hover:text-foreground"
 						>
 							<PRIcon state={workspace.pr.state} className="size-3.5" />
+							<span className="@max-2xl:hidden">#{workspace.pr.prNumber}</span>
+							<WorkspaceChecksDot
+								status={workspace.pr.checksStatus}
+								checks={workspace.pr.checks}
+							/>
 						</button>
 					) : null}
 
@@ -228,39 +374,41 @@ export const V2WorkspaceRow = memo(function V2WorkspaceRow({
 						</span>
 					) : null}
 
-					<span
-						className={cn(
-							"flex max-w-36 shrink-0 items-center gap-1.5 text-xs text-muted-foreground",
-							isDeviceOffline && "text-muted-foreground/60",
-						)}
-						title={workspace.hostName}
-					>
-						<DeviceIcon className="size-3 shrink-0" />
-						{/* Narrow panes keep the glyph; sr-only (not hidden) so screen
-						    readers still hear the device name when the text is gone. */}
-						<span className="min-w-0 truncate @max-2xl:sr-only">
-							{workspace.hostName}
-						</span>
-						{isDeviceOffline ? (
-							<>
+					{/* Where + age; hover swaps in the row's actions in place, so
+					    the slot keeps one width either way. */}
+					<span className="grid w-[4.5rem] shrink-0 items-center justify-items-end [&>*]:col-start-1 [&>*]:row-start-1">
+						<span
+							className={cn(
+								"flex items-center gap-1.5 text-xs text-muted-foreground",
+								"group-hover:invisible group-focus-within:invisible",
+								isDeviceOffline && "text-muted-foreground/60",
+							)}
+						>
+							{workspace.hostType !== "local-device" ? (
 								<span
-									aria-hidden
-									className="inline-block size-1.5 shrink-0 rounded-full bg-muted-foreground/40"
-								/>
-								{/* The dot is the only visual offline cue; screen readers
-								    need the word. */}
-								<span className="sr-only">
-									<Trans>Offline</Trans>
+									title={whereLabel}
+									className="flex shrink-0 items-center text-muted-foreground/70"
+								>
+									{isCloud ? (
+										<CloudGlyph className="size-3" />
+									) : isDeviceOffline ? (
+										<LuMonitorOff className="size-3" strokeWidth={2} />
+									) : (
+										<LuMonitor className="size-3" strokeWidth={2} />
+									)}
+									<span className="sr-only">{whereLabel}</span>
 								</span>
-							</>
-						) : null}
-					</span>
-
-					<span
-						className="shrink-0 whitespace-nowrap text-xs tabular-nums text-muted-foreground"
-						title={timeTitle}
-					>
-						{timeLabel}
+							) : null}
+							<span
+								className="whitespace-nowrap tabular-nums"
+								title={timeTitle}
+							>
+								{timeLabel}
+							</span>
+						</span>
+						<span className="hidden items-center gap-1 group-hover:flex group-focus-within:flex">
+							{renderHoverActions(actions)}
+						</span>
 					</span>
 				</div>
 			)}

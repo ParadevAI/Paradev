@@ -24,7 +24,7 @@ export const Route = createFileRoute("/_authenticated/_dashboard/tasks/")({
 });
 
 function TasksPage() {
-	const { tab, assignee, search, type, project, projects, state } =
+	const { tab, assignee, label, search, type, project, projects, state } =
 		TasksLayoutRoute.useSearch();
 	// Stable identity: effects downstream key off this array.
 	const initialProjects = useMemo(
@@ -35,6 +35,7 @@ function TasksPage() {
 		<TasksView
 			initialTab={tab}
 			initialAssignee={assignee}
+			initialLabel={label}
 			initialSearch={search}
 			initialType={type === "prs" ? undefined : type}
 			initialProjects={initialProjects}

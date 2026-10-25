@@ -22,6 +22,7 @@ interface DashboardSidebarCollapsedProjectContentProps
 	projectColor: string | null;
 	isCollapsed: boolean;
 	totalWorkspaceCount: number;
+	/** Rows after the sortable ones, outside DnD (cloud workspaces). */
 	workspaceShortcutLabels: Map<string, string>;
 	onWorkspaceHover: (workspaceId: string) => void | Promise<void>;
 	onToggleCollapse: () => void;

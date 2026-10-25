@@ -105,7 +105,7 @@ export function useArchiveCloudWorkspace() {
 						onClick: () => {
 							clearUndoable(id);
 							void navigate({
-								to: "/cloud-workspaces/$workspaceId",
+								to: "/v2-workspace/$workspaceId",
 								params: { workspaceId: id },
 							});
 						},

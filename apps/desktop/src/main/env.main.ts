@@ -9,21 +9,26 @@
 import { createEnv } from "@t3-oss/env-core";
 import { z } from "zod/v4";
 
+// electron.vite.config.ts loads this file in Node, which cannot resolve
+// @superset/shared's extensionless imports, so derive the defaults here.
+const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN || "superset.sh";
+
 export const env = createEnv({
 	server: {
 		NODE_ENV: z
 			.enum(["development", "production", "test"])
 			.default("development"),
 		NEXT_PUBLIC_API_URL: z.url().default("https://api.superset.sh"),
-		NEXT_PUBLIC_STREAMS_URL: z.url().default("https://streams.superset.sh"),
-		NEXT_PUBLIC_WEB_URL: z.url().default("https://app.superset.sh"),
-		NEXT_PUBLIC_MARKETING_URL: z.url().default("https://superset.sh"),
+		NEXT_PUBLIC_STREAMS_URL: z.url().default(`https://streams.${rootDomain}`),
+		NEXT_PUBLIC_WEB_URL: z.url().default(`https://app.${rootDomain}`),
+		NEXT_PUBLIC_MARKETING_URL: z.url().default(`https://${rootDomain}`),
 		NEXT_PUBLIC_POSTHOG_KEY: z.string().optional(),
 		NEXT_PUBLIC_POSTHOG_HOST: z.string().default("https://us.i.posthog.com"),
 		SENTRY_DSN_DESKTOP: z.string().optional(),
 		SENTRY_DSN_HOST_SERVICE: z.string().optional(),
 		STREAMS_URL: z.url().default("https://superset-stream.fly.dev"),
 		RELAY_URL: z.url().default("https://relay.superset.sh"),
+		DESKTOP_DISPLAY_NAME: z.string().default("Superset"),
 	},
 
 	runtimeEnv: {
@@ -41,6 +46,7 @@ export const env = createEnv({
 		SENTRY_DSN_HOST_SERVICE: process.env.SENTRY_DSN_HOST_SERVICE,
 		STREAMS_URL: process.env.STREAMS_URL,
 		RELAY_URL: process.env.RELAY_URL,
+		DESKTOP_DISPLAY_NAME: process.env.DESKTOP_DISPLAY_NAME,
 	},
 	emptyStringAsUndefined: true,
 	// Only allow skipping validation in development (never in production)

@@ -44,7 +44,7 @@ xcrun simctl ui $U appearance light
 xcrun simctl status_bar $U override --time "9:41" --batteryState discharging \
   --batteryLevel 100 --cellularBars 4 --wifiBars 3 --dataNetwork wifi
 xcrun simctl spawn $U defaults write sh.superset.mobile EXDevMenuIsOnboardingFinished -bool YES
-xcrun simctl openurl $U "superset://expo-development-client/?url=http%3A%2F%2Flocalhost%3A8081"
+xcrun simctl openurl $U "superset://expo-development-client/?url=http%3A%2F%2Flocalhost%3A8081&disableAutoLaunch=1&disableFab=1"
 ```
 
 - `simctl boot` does not launch Simulator.app. Keep it that way.

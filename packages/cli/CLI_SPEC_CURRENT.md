@@ -36,6 +36,7 @@ superset automations
 superset hosts
 superset organization
 superset projects
+superset sessions
 superset start
 superset status
 superset stop
@@ -89,6 +90,14 @@ projects
   create
   list
   setup
+sessions
+  close
+  create
+  list
+  open
+  read
+  resume
+  send
 tasks
   create
   delete
@@ -190,6 +199,11 @@ The desktop app has its own bundling script,
 
 ## Current Notes And Gaps
 
+- `superset sessions` (`create`, `list`, `read`, `send`, `close`, `resume`,
+  `import`, `open`) manages chat-only ACP sessions through the host
+  `sessions.*` router. The host accepts only supported chat providers, with no
+  terminal fallback (`superset agents` and `superset terminals` remain the
+  terminal-backed namespaces).
 - Required named options are enforced by the parser, but help output does
   not visually mark named options as required. Positional required args are
   marked.
