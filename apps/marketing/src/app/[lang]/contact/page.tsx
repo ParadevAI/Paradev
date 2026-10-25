@@ -106,7 +106,7 @@ export default async function ContactPage() {
 								className="text-foreground underline"
 								href={COMPANY.REPORT_ISSUE_URL}
 							>
-								github.com/superset-sh/superset
+								github.com/paradevai/paradev
 							</a>
 							. Our community lives on{" "}
 							<a

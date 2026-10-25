@@ -8013,8 +8013,8 @@ msgstr "Grubość czcionki"
 msgid "For a project, open the importer to link it."
 msgstr "W przypadku projektu otwórz importer, aby go połączyć."
 
-msgid "For bug reports and feature requests, the fastest path is a GitHub issue at <0>github.com/superset-sh/superset</0>. Our community lives on <1>Discord</1>, and we post updates on <2>X (@superset_sh)</2> and <3>LinkedIn</3>."
-msgstr "W przypadku zgłoszeń błędów i propozycji funkcji najszybszą drogą jest issue na GitHub pod adresem <0>github.com/superset-sh/superset</0>. Nasza społeczność mieszka na <1>Discordzie</1>, a aktualności publikujemy na <2>X (@superset_sh)</2> i <3>LinkedIn</3>."
+msgid "For bug reports and feature requests, the fastest path is a GitHub issue at <0>github.com/paradevai/paradev</0>. Our community lives on <1>Discord</1>, and we post updates on <2>X (@superset_sh)</2> and <3>LinkedIn</3>."
+msgstr "W przypadku zgłoszeń błędów i propozycji funkcji najszybszą drogą jest issue na GitHub pod adresem <0>github.com/paradevai/paradev</0>. Nasza społeczność mieszka na <1>Discordzie</1>, a aktualności publikujemy na <2>X (@superset_sh)</2> i <3>LinkedIn</3>."
 
 msgid "For individuals getting started"
 msgstr "Dla osób, które zaczynają"

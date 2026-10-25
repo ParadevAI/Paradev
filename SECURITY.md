@@ -8,7 +8,7 @@ Please do not report security vulnerabilities through public GitHub issues, Disc
 
 Report privately through one of these channels:
 
-1. **GitHub private vulnerability reporting (preferred):** use the ["Report a vulnerability"](https://github.com/superset-sh/superset/security/advisories/new) button under the Security tab of this repository.
+1. **GitHub private vulnerability reporting (preferred):** use the ["Report a vulnerability"](https://github.com/paradevai/paradev/security/advisories/new) button under the Security tab of this repository.
 2. **Email:** send details to [support@superset.sh](mailto:support@superset.sh) with "Security" in the subject line.
 
 Please include as much of the following as you can:

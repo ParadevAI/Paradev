@@ -14,8 +14,8 @@
 
 *Dies ist eine Übersetzung des [englischen READMEs](../README.md), das die maßgebliche Version ist.*
 
-[![GitHub stars](https://img.shields.io/github/stars/superset-sh/superset?style=flat&logo=github)](https://github.com/superset-sh/superset/stargazers)
-[![GitHub release](https://img.shields.io/github/v/release/superset-sh/superset?style=flat&logo=github)](https://github.com/superset-sh/superset/releases)
+[![GitHub stars](https://img.shields.io/github/stars/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/stargazers)
+[![GitHub release](https://img.shields.io/github/v/release/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/releases)
 [![License](https://img.shields.io/badge/license-Elastic%20License%202.0-blue?style=flat)](../LICENSE.md)
 [![Twitter](https://img.shields.io/badge/@superset__sh-555?logo=x)](https://x.com/superset_sh)
 [![Discord](https://img.shields.io/badge/Discord-555?logo=discord)](https://discord.gg/cZeD9WYcV7)
@@ -27,7 +27,7 @@ Verbring deine Zeit mit Shippen, nicht mit Warten.
 
 <br />
 
-[**Für macOS herunterladen**](https://github.com/superset-sh/superset/releases/latest) &nbsp;&bull;&nbsp; [Dokumentation](https://docs.superset.sh) &nbsp;&bull;&nbsp; [Changelog](https://github.com/superset-sh/superset/releases) &nbsp;&bull;&nbsp; [Discord](https://discord.gg/cZeD9WYcV7)
+[**Für macOS herunterladen**](https://github.com/paradevai/paradev/releases/latest) &nbsp;&bull;&nbsp; [Dokumentation](https://docs.superset.sh) &nbsp;&bull;&nbsp; [Changelog](https://github.com/paradevai/paradev/releases) &nbsp;&bull;&nbsp; [Discord](https://discord.gg/cZeD9WYcV7)
 
 <br />
 
@@ -236,7 +236,7 @@ Jede Oberfläche spricht mit denselben Arbeitsbereichen, du kannst also eine Auf
 
 | Oberfläche | Was du bekommst |
 |:--------|:-------------|
-| [**Desktop-App**](https://github.com/superset-sh/superset/releases/latest) | Die komplette IDE: Terminals, Diff-Viewer, In-App-Browser, Automatisierungen |
+| [**Desktop-App**](https://github.com/paradevai/paradev/releases/latest) | Die komplette IDE: Terminals, Diff-Viewer, In-App-Browser, Automatisierungen |
 | [**CLI**](https://docs.superset.sh/cli/getting-started) | Ein einziges `superset`-Binary, um Arbeitsbereiche, Agenten, Terminals und Hosts aus jeder Shell zu verwalten |
 | [**TypeScript-SDK**](https://docs.superset.sh/sdk/getting-started) | Steuere Superset programmatisch mit [`@superset_sh/sdk`](https://www.npmjs.com/package/@superset_sh/sdk) aus Node, Bun oder Deno |
 | [**MCP-Server**](https://docs.superset.sh/mcp) | Lass Claude Code, Codex, Cursor und andere Agenten Arbeitsbereiche selbst erstellen und verwalten |
@@ -246,7 +246,7 @@ Die CLI ist in der Desktop-App enthalten, oder installiere sie eigenständig:
 ```bash
 curl -fsSL https://superset.sh/cli/install.sh | sh
 # or
-brew install superset-sh/tap/superset
+brew install paradevai/tap/superset
 ```
 
 Eine iOS-App kommt bald, damit du vom Smartphone aus nach deinen Agenten sehen kannst.
@@ -255,10 +255,10 @@ Eine iOS-App kommt bald, damit du vom Smartphone aus nach deinen Agenten sehen k
 
 Lade die Desktop-App herunter:
 
-- **macOS**: [Apple Silicon (.dmg)](https://github.com/superset-sh/superset/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/superset-sh/superset/releases/latest/download/Superset-x64.dmg)
-- **Linux**: [x64-AppImage](https://github.com/superset-sh/superset/releases/latest/download/Superset-x86_64.AppImage) (experimentell; macOS ist die primäre Zielplattform)
+- **macOS**: [Apple Silicon (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-x64.dmg)
+- **Linux**: [x64-AppImage](https://github.com/paradevai/paradev/releases/latest/download/Superset-x86_64.AppImage) (experimentell; macOS ist die primäre Zielplattform)
 - **Windows**: noch nicht verfügbar
-- [Alle Builds](https://github.com/superset-sh/superset/releases/latest)
+- [Alle Builds](https://github.com/paradevai/paradev/releases/latest)
 
 Alles, was du installiert brauchst, ist [Git](https://git-scm.com/). [gh](https://cli.github.com/) ist optional und schaltet die PR-Workflows frei; Superset bietet an, es für dich zu installieren.
 
@@ -268,7 +268,7 @@ Du willst an Superset hacken oder eine PR beisteuern? Klone das Repository, füg
 installierten Superset-App hinzu und erstelle einen Arbeitsbereich für deine Änderung:
 
 ```bash
-git clone https://github.com/superset-sh/superset.git
+git clone https://github.com/paradevai/paradev.git
 ```
 
 Führe dann das Entwicklungs-Setup im Terminal dieses Arbeitsbereichs aus:
@@ -326,10 +326,10 @@ Tastenkürzel lassen sich unter **Einstellungen → Tastenkürzel** (⌘/) anpas
 
 ## Mitmachen
 
-Beiträge sind willkommen! Siehe [CONTRIBUTING.md](../CONTRIBUTING.md) für den Einstieg und wie du eine PR öffnest. Bugs und Feature-Wünsche gehören in die [Issues](https://github.com/superset-sh/superset/issues).
+Beiträge sind willkommen! Siehe [CONTRIBUTING.md](../CONTRIBUTING.md) für den Einstieg und wie du eine PR öffnest. Bugs und Feature-Wünsche gehören in die [Issues](https://github.com/paradevai/paradev/issues).
 
-<a href="https://github.com/superset-sh/superset/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=superset-sh/superset" />
+<a href="https://github.com/paradevai/paradev/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=paradevai/paradev" />
 </a>
 
 ## Community
@@ -338,8 +338,8 @@ Tritt der Superset-Community bei, um Hilfe zu bekommen, Feedback zu teilen und d
 
 - **[Discord](https://discord.gg/cZeD9WYcV7)**: chatte mit dem Team und der Community
 - **[Twitter](https://x.com/superset_sh)**: folge uns für Updates und Ankündigungen
-- **[GitHub Issues](https://github.com/superset-sh/superset/issues)**: melde Bugs und wünsch dir Features
-- **[GitHub Discussions](https://github.com/superset-sh/superset/discussions)**: stell Fragen und teile Ideen
+- **[GitHub Issues](https://github.com/paradevai/paradev/issues)**: melde Bugs und wünsch dir Features
+- **[GitHub Discussions](https://github.com/paradevai/paradev/discussions)**: stell Fragen und teile Ideen
 
 ### Team
 

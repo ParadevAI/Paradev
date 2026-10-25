@@ -7,7 +7,7 @@
 	"resources": "src/resources",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/superset-sh/superset.git"
+		"url": "https://github.com/paradevai/paradev.git"
 	},
 	"author": {
 		"name": "Superset",

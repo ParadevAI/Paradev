@@ -1,14 +1,14 @@
 {
 	"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 	"name": "neon",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Work with your Neon Postgres: inspect projects and branches, read schemas, and run SQL.",
 	"author": {
 		"name": "Superset",
 		"url": "https://superset.sh"
 	},
 	"homepage": "https://docs.superset.sh",
-	"repository": "https://github.com/superset-sh/superset",
+	"repository": "https://github.com/paradevai/paradev",
 	"license": "MIT",
 	"keywords": ["neon", "postgres", "database", "sql", "branches"],
 	"extensions": {

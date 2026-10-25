@@ -1,6 +1,6 @@
 # Developing Superset
 
-This guide is for contributors building Superset from source. If you just want to use Superset, [download the macOS app](https://github.com/superset-sh/superset/releases/latest) instead.
+This guide is for contributors building Superset from source. If you just want to use Superset, [download the macOS app](https://github.com/paradevai/paradev/releases/latest) instead.
 
 ## Prerequisites
 
@@ -16,7 +16,7 @@ macOS is the primary supported platform. Windows / Linux are untested.
 ## Run it from a Superset workspace
 
 ```bash
-git clone https://github.com/superset-sh/superset.git
+git clone https://github.com/paradevai/paradev.git
 ```
 
 Add the clone to the installed Superset app and create a workspace for your

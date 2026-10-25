@@ -3,7 +3,7 @@ export * from "./manifests.generated";
 import { firstPartyManifest } from "./manifests.generated";
 
 export const DEFAULT_MARKETPLACE = "superset";
-export const DEFAULT_MARKETPLACE_REPO = "superset-sh/superset";
+export const DEFAULT_MARKETPLACE_REPO = "paradevai/paradev";
 export const DEFAULT_MARKETPLACE_REF = "main";
 
 export const SUPERSET_HOSTED_PLUGINS = [

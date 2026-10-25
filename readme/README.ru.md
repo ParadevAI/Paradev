@@ -14,8 +14,8 @@
 
 *Перевод английского README; канонической является английская версия.*
 
-[![GitHub stars](https://img.shields.io/github/stars/superset-sh/superset?style=flat&logo=github)](https://github.com/superset-sh/superset/stargazers)
-[![GitHub release](https://img.shields.io/github/v/release/superset-sh/superset?style=flat&logo=github)](https://github.com/superset-sh/superset/releases)
+[![GitHub stars](https://img.shields.io/github/stars/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/stargazers)
+[![GitHub release](https://img.shields.io/github/v/release/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/releases)
 [![License](https://img.shields.io/badge/license-Elastic%20License%202.0-blue?style=flat)](../LICENSE.md)
 [![Twitter](https://img.shields.io/badge/@superset__sh-555?logo=x)](https://x.com/superset_sh)
 [![Discord](https://img.shields.io/badge/Discord-555?logo=discord)](https://discord.gg/cZeD9WYcV7)
@@ -27,7 +27,7 @@ Claude Code, Codex или любой CLI-агент — каждый в своё
 
 <br />
 
-[**Скачать для macOS**](https://github.com/superset-sh/superset/releases/latest) &nbsp;&bull;&nbsp; [Документация](https://docs.superset.sh) &nbsp;&bull;&nbsp; [Changelog](https://github.com/superset-sh/superset/releases) &nbsp;&bull;&nbsp; [Discord](https://discord.gg/cZeD9WYcV7)
+[**Скачать для macOS**](https://github.com/paradevai/paradev/releases/latest) &nbsp;&bull;&nbsp; [Документация](https://docs.superset.sh) &nbsp;&bull;&nbsp; [Changelog](https://github.com/paradevai/paradev/releases) &nbsp;&bull;&nbsp; [Discord](https://discord.gg/cZeD9WYcV7)
 
 <br />
 
@@ -236,7 +236,7 @@ Superset работает с любым CLI-агентом для кодинга
 
 | Поверхность | Что вы получаете |
 |:--------|:-------------|
-| [**Десктопное приложение**](https://github.com/superset-sh/superset/releases/latest) | Полноценная IDE: терминалы, просмотрщик diff, встроенный браузер, автоматизации |
+| [**Десктопное приложение**](https://github.com/paradevai/paradev/releases/latest) | Полноценная IDE: терминалы, просмотрщик diff, встроенный браузер, автоматизации |
 | [**CLI**](https://docs.superset.sh/cli/getting-started) | Единый бинарник `superset` для управления рабочими областями, агентами, терминалами и хостами из любой оболочки |
 | [**TypeScript SDK**](https://docs.superset.sh/sdk/getting-started) | Управляйте Superset программно через [`@superset_sh/sdk`](https://www.npmjs.com/package/@superset_sh/sdk) из Node, Bun или Deno |
 | [**Сервер MCP**](https://docs.superset.sh/mcp) | Позвольте Claude Code, Codex, Cursor и другим агентам самим создавать рабочие области и управлять ими |
@@ -246,7 +246,7 @@ CLI идёт в комплекте с десктопным приложение�
 ```bash
 curl -fsSL https://superset.sh/cli/install.sh | sh
 # or
-brew install superset-sh/tap/superset
+brew install paradevai/tap/superset
 ```
 
 Скоро выйдет приложение для iOS, чтобы следить за агентами с телефона.
@@ -255,10 +255,10 @@ brew install superset-sh/tap/superset
 
 Скачайте десктопное приложение:
 
-- **macOS**: [Apple Silicon (.dmg)](https://github.com/superset-sh/superset/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/superset-sh/superset/releases/latest/download/Superset-x64.dmg)
-- **Linux**: [x64 AppImage](https://github.com/superset-sh/superset/releases/latest/download/Superset-x86_64.AppImage) (экспериментально; основная платформа — macOS)
+- **macOS**: [Apple Silicon (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-x64.dmg)
+- **Linux**: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Superset-x86_64.AppImage) (экспериментально; основная платформа — macOS)
 - **Windows**: пока недоступно
-- [Все сборки](https://github.com/superset-sh/superset/releases/latest)
+- [Все сборки](https://github.com/paradevai/paradev/releases/latest)
 
 Из установленного нужен только [Git](https://git-scm.com/). [gh](https://cli.github.com/) необязателен и открывает рабочие процессы с PR; Superset предложит установить его за вас.
 
@@ -268,7 +268,7 @@ brew install superset-sh/tap/superset
 в установленное приложение Superset и создайте рабочую область для своих изменений:
 
 ```bash
-git clone https://github.com/superset-sh/superset.git
+git clone https://github.com/paradevai/paradev.git
 ```
 
 Затем запустите настройку окружения разработки из терминала этой рабочей области:
@@ -327,10 +327,10 @@ worktree для разработки.
 
 ## Участие в разработке
 
-Мы рады вкладу сообщества! См. [CONTRIBUTING.md](../CONTRIBUTING.md) о том, как настроить окружение и открыть PR. Баги и запросы функций — в [issues](https://github.com/superset-sh/superset/issues).
+Мы рады вкладу сообщества! См. [CONTRIBUTING.md](../CONTRIBUTING.md) о том, как настроить окружение и открыть PR. Баги и запросы функций — в [issues](https://github.com/paradevai/paradev/issues).
 
-<a href="https://github.com/superset-sh/superset/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=superset-sh/superset" />
+<a href="https://github.com/paradevai/paradev/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=paradevai/paradev" />
 </a>
 
 ## Сообщество
@@ -339,8 +339,8 @@ worktree для разработки.
 
 - **[Discord](https://discord.gg/cZeD9WYcV7)**: общайтесь с командой и сообществом
 - **[Twitter](https://x.com/superset_sh)**: подписывайтесь на обновления и анонсы
-- **[GitHub Issues](https://github.com/superset-sh/superset/issues)**: сообщайте о багах и предлагайте функции
-- **[GitHub Discussions](https://github.com/superset-sh/superset/discussions)**: задавайте вопросы и делитесь идеями
+- **[GitHub Issues](https://github.com/paradevai/paradev/issues)**: сообщайте о багах и предлагайте функции
+- **[GitHub Discussions](https://github.com/paradevai/paradev/discussions)**: задавайте вопросы и делитесь идеями
 
 ### Команда
 

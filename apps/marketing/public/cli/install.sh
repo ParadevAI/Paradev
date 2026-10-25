@@ -9,7 +9,7 @@
 
 set -eu
 
-REPO="superset-sh/superset"
+REPO="paradevai/paradev"
 INSTALL_DIR="${SUPERSET_HOME:-$HOME/superset}"
 TAG="${SUPERSET_VERSION:-latest}"
 

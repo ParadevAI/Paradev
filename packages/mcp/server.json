@@ -4,7 +4,7 @@
 	"title": "Superset",
 	"description": "Run parallel coding agents: Git-worktree workspaces, agent sessions, automations, tasks.",
 	"repository": {
-		"url": "https://github.com/superset-sh/superset",
+		"url": "https://github.com/paradevai/paradev",
 		"source": "github",
 		"subfolder": "packages/mcp"
 	},

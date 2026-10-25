@@ -14,8 +14,8 @@
 
 *本文档是英文版 README 的翻译,内容以英文版为准。*
 
-[![GitHub stars](https://img.shields.io/github/stars/superset-sh/superset?style=flat&logo=github)](https://github.com/superset-sh/superset/stargazers)
-[![GitHub release](https://img.shields.io/github/v/release/superset-sh/superset?style=flat&logo=github)](https://github.com/superset-sh/superset/releases)
+[![GitHub stars](https://img.shields.io/github/stars/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/stargazers)
+[![GitHub release](https://img.shields.io/github/v/release/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/releases)
 [![License](https://img.shields.io/badge/license-Elastic%20License%202.0-blue?style=flat)](../LICENSE.md)
 [![Twitter](https://img.shields.io/badge/@superset__sh-555?logo=x)](https://x.com/superset_sh)
 [![Discord](https://img.shields.io/badge/Discord-555?logo=discord)](https://discord.gg/cZeD9WYcV7)
@@ -27,7 +27,7 @@ Claude Code、Codex 或任何 CLI 智能体,各自运行在独立的 worktree �
 
 <br />
 
-[**下载 macOS 版**](https://github.com/superset-sh/superset/releases/latest) &nbsp;&bull;&nbsp; [文档](https://docs.superset.sh) &nbsp;&bull;&nbsp; [更新日志](https://github.com/superset-sh/superset/releases) &nbsp;&bull;&nbsp; [Discord](https://discord.gg/cZeD9WYcV7)
+[**下载 macOS 版**](https://github.com/paradevai/paradev/releases/latest) &nbsp;&bull;&nbsp; [文档](https://docs.superset.sh) &nbsp;&bull;&nbsp; [更新日志](https://github.com/paradevai/paradev/releases) &nbsp;&bull;&nbsp; [Discord](https://discord.gg/cZeD9WYcV7)
 
 <br />
 
@@ -236,7 +236,7 @@ Superset 适用于任何基于 CLI 的编码智能体,包括:
 
 | 界面 | 你能得到什么 |
 |:--------|:-------------|
-| [**桌面应用**](https://github.com/superset-sh/superset/releases/latest) | 完整的 IDE:终端、差异查看器、应用内浏览器、自动化 |
+| [**桌面应用**](https://github.com/paradevai/paradev/releases/latest) | 完整的 IDE:终端、差异查看器、应用内浏览器、自动化 |
 | [**CLI**](https://docs.superset.sh/cli/getting-started) | 单个 `superset` 二进制文件,在任何 shell 中管理工作区、智能体、终端和主机 |
 | [**TypeScript SDK**](https://docs.superset.sh/sdk/getting-started) | 通过 [`@superset_sh/sdk`](https://www.npmjs.com/package/@superset_sh/sdk) 在 Node、Bun 或 Deno 中以编程方式驱动 Superset |
 | [**MCP 服务器**](https://docs.superset.sh/mcp) | 让 Claude Code、Codex、Cursor 等智能体自己创建和管理工作区 |
@@ -246,7 +246,7 @@ CLI 随桌面应用一起提供,也可以独立安装:
 ```bash
 curl -fsSL https://superset.sh/cli/install.sh | sh
 # or
-brew install superset-sh/tap/superset
+brew install paradevai/tap/superset
 ```
 
 iOS 应用即将推出,让你可以在手机上查看你的智能体。
@@ -255,10 +255,10 @@ iOS 应用即将推出,让你可以在手机上查看你的智能体。
 
 下载桌面应用:
 
-- **macOS**:[Apple Silicon (.dmg)](https://github.com/superset-sh/superset/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/superset-sh/superset/releases/latest/download/Superset-x64.dmg)
-- **Linux**:[x64 AppImage](https://github.com/superset-sh/superset/releases/latest/download/Superset-x86_64.AppImage)(实验性;macOS 是主要目标平台)
+- **macOS**:[Apple Silicon (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-x64.dmg)
+- **Linux**:[x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Superset-x86_64.AppImage)(实验性;macOS 是主要目标平台)
 - **Windows**:暂不可用
-- [所有构建版本](https://github.com/superset-sh/superset/releases/latest)
+- [所有构建版本](https://github.com/paradevai/paradev/releases/latest)
 
 你只需要安装 [Git](https://git-scm.com/)。[gh](https://cli.github.com/) 是可选的,用于解锁 PR 工作流;Superset 会主动提议为你安装。
 
@@ -267,7 +267,7 @@ iOS 应用即将推出,让你可以在手机上查看你的智能体。
 想折腾 Superset 或贡献一个 PR?克隆仓库,把它添加到已安装的 Superset 应用中,然后为你的更改创建一个工作区:
 
 ```bash
-git clone https://github.com/superset-sh/superset.git
+git clone https://github.com/paradevai/paradev.git
 ```
 
 然后在该工作区的终端中运行开发环境设置:
@@ -321,10 +321,10 @@ bun run dev
 
 ## 贡献
 
-我们欢迎贡献!参见 [CONTRIBUTING.md](../CONTRIBUTING.md) 了解如何搭建环境并提交 PR。Bug 和功能请求请提交到 [issues](https://github.com/superset-sh/superset/issues)。
+我们欢迎贡献!参见 [CONTRIBUTING.md](../CONTRIBUTING.md) 了解如何搭建环境并提交 PR。Bug 和功能请求请提交到 [issues](https://github.com/paradevai/paradev/issues)。
 
-<a href="https://github.com/superset-sh/superset/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=superset-sh/superset" />
+<a href="https://github.com/paradevai/paradev/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=paradevai/paradev" />
 </a>
 
 ## 社区
@@ -333,8 +333,8 @@ bun run dev
 
 - **[Discord](https://discord.gg/cZeD9WYcV7)**:与团队和社区聊天
 - **[Twitter](https://x.com/superset_sh)**:关注以获取更新和公告
-- **[GitHub Issues](https://github.com/superset-sh/superset/issues)**:报告 bug 和请求功能
-- **[GitHub Discussions](https://github.com/superset-sh/superset/discussions)**:提问和分享想法
+- **[GitHub Issues](https://github.com/paradevai/paradev/issues)**:报告 bug 和请求功能
+- **[GitHub Discussions](https://github.com/paradevai/paradev/discussions)**:提问和分享想法
 
 ### 团队
 

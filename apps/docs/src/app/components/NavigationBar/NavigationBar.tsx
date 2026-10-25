@@ -75,7 +75,7 @@ export default function NavigationBar() {
 							<Trans>Website</Trans>
 						</NavLink>
 						<NavLink
-							href="https://github.com/superset-sh/superset"
+							href="https://github.com/paradevai/paradev"
 							external
 							aria-label={t({
 								message: "View Superset repository on GitHub",

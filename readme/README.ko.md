@@ -14,8 +14,8 @@
 
 *이 문서는 영어 README의 번역본이며, 영어 원문이 우선합니다.*
 
-[![GitHub stars](https://img.shields.io/github/stars/superset-sh/superset?style=flat&logo=github)](https://github.com/superset-sh/superset/stargazers)
-[![GitHub release](https://img.shields.io/github/v/release/superset-sh/superset?style=flat&logo=github)](https://github.com/superset-sh/superset/releases)
+[![GitHub stars](https://img.shields.io/github/stars/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/stargazers)
+[![GitHub release](https://img.shields.io/github/v/release/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/releases)
 [![License](https://img.shields.io/badge/license-Elastic%20License%202.0-blue?style=flat)](../LICENSE.md)
 [![Twitter](https://img.shields.io/badge/@superset__sh-555?logo=x)](https://x.com/superset_sh)
 [![Discord](https://img.shields.io/badge/Discord-555?logo=discord)](https://discord.gg/cZeD9WYcV7)
@@ -27,7 +27,7 @@ Claude Code, Codex를 비롯한 모든 CLI 에이전트를 각각 격리된 work
 
 <br />
 
-[**macOS용 다운로드**](https://github.com/superset-sh/superset/releases/latest) &nbsp;&bull;&nbsp; [문서](https://docs.superset.sh) &nbsp;&bull;&nbsp; [변경 로그](https://github.com/superset-sh/superset/releases) &nbsp;&bull;&nbsp; [Discord](https://discord.gg/cZeD9WYcV7)
+[**macOS용 다운로드**](https://github.com/paradevai/paradev/releases/latest) &nbsp;&bull;&nbsp; [문서](https://docs.superset.sh) &nbsp;&bull;&nbsp; [변경 로그](https://github.com/paradevai/paradev/releases) &nbsp;&bull;&nbsp; [Discord](https://discord.gg/cZeD9WYcV7)
 
 <br />
 
@@ -236,7 +236,7 @@ Superset은 다음을 포함한 모든 CLI 기반 코딩 에이전트와 함께 
 
 | 사용 환경 | 제공 기능 |
 |:--------|:-------------|
-| [**데스크톱 앱**](https://github.com/superset-sh/superset/releases/latest) | 완전한 IDE: 터미널, 차이 뷰어, 앱 내 브라우저, 자동화 |
+| [**데스크톱 앱**](https://github.com/paradevai/paradev/releases/latest) | 완전한 IDE: 터미널, 차이 뷰어, 앱 내 브라우저, 자동화 |
 | [**CLI**](https://docs.superset.sh/cli/getting-started) | 어떤 셸에서든 워크스페이스, 에이전트, 터미널, 호스트를 관리하는 단일 `superset` 바이너리 |
 | [**TypeScript SDK**](https://docs.superset.sh/sdk/getting-started) | [`@superset_sh/sdk`](https://www.npmjs.com/package/@superset_sh/sdk)로 Node, Bun, Deno에서 Superset을 프로그래밍 방식으로 제어 |
 | [**MCP 서버**](https://docs.superset.sh/mcp) | Claude Code, Codex, Cursor 같은 에이전트가 직접 워크스페이스를 만들고 관리 |
@@ -246,7 +246,7 @@ CLI는 데스크톱 앱에 번들로 포함되어 있으며, 단독으로 설치
 ```bash
 curl -fsSL https://superset.sh/cli/install.sh | sh
 # or
-brew install superset-sh/tap/superset
+brew install paradevai/tap/superset
 ```
 
 iOS 앱도 곧 출시됩니다. 휴대폰에서 에이전트를 확인할 수 있게 됩니다.
@@ -255,10 +255,10 @@ iOS 앱도 곧 출시됩니다. 휴대폰에서 에이전트를 확인할 수 �
 
 데스크톱 앱 다운로드:
 
-- **macOS**: [Apple Silicon (.dmg)](https://github.com/superset-sh/superset/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/superset-sh/superset/releases/latest/download/Superset-x64.dmg)
-- **Linux**: [x64 AppImage](https://github.com/superset-sh/superset/releases/latest/download/Superset-x86_64.AppImage) (실험적; macOS가 주 지원 대상입니다)
+- **macOS**: [Apple Silicon (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-x64.dmg)
+- **Linux**: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Superset-x86_64.AppImage) (실험적; macOS가 주 지원 대상입니다)
 - **Windows**: 아직 제공되지 않음
-- [모든 빌드](https://github.com/superset-sh/superset/releases/latest)
+- [모든 빌드](https://github.com/paradevai/paradev/releases/latest)
 
 필요한 것은 [Git](https://git-scm.com/)뿐입니다. [gh](https://cli.github.com/)는 선택 사항으로 PR 워크플로를 사용할 수 있게 해 주며, Superset이 대신 설치해 주겠다고 제안합니다.
 
@@ -267,7 +267,7 @@ iOS 앱도 곧 출시됩니다. 휴대폰에서 에이전트를 확인할 수 �
 Superset을 직접 만져 보거나 PR을 기여하고 싶으신가요? 저장소를 클론하고, 설치된 Superset 앱에 추가한 다음, 변경 작업용 워크스페이스를 만드세요:
 
 ```bash
-git clone https://github.com/superset-sh/superset.git
+git clone https://github.com/paradevai/paradev.git
 ```
 
 그런 다음 해당 워크스페이스 터미널에서 개발 설정을 실행하세요:
@@ -321,10 +321,10 @@ Neon 계정이나 서드파티 자격 증명은 필요 없습니다. `setup.loca
 
 ## 기여
 
-기여를 환영합니다! 환경을 준비하고 PR을 여는 방법은 [CONTRIBUTING.md](../CONTRIBUTING.md)를 참고하세요. 버그와 기능 요청은 [issues](https://github.com/superset-sh/superset/issues)에 남겨 주세요.
+기여를 환영합니다! 환경을 준비하고 PR을 여는 방법은 [CONTRIBUTING.md](../CONTRIBUTING.md)를 참고하세요. 버그와 기능 요청은 [issues](https://github.com/paradevai/paradev/issues)에 남겨 주세요.
 
-<a href="https://github.com/superset-sh/superset/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=superset-sh/superset" />
+<a href="https://github.com/paradevai/paradev/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=paradevai/paradev" />
 </a>
 
 ## 커뮤니티
@@ -333,8 +333,8 @@ Superset 커뮤니티에 참여해 도움을 받고, 피드백을 나누고, 다
 
 - **[Discord](https://discord.gg/cZeD9WYcV7)**: 팀 및 커뮤니티와 대화
 - **[Twitter](https://x.com/superset_sh)**: 업데이트와 소식 팔로우
-- **[GitHub Issues](https://github.com/superset-sh/superset/issues)**: 버그 신고와 기능 요청
-- **[GitHub Discussions](https://github.com/superset-sh/superset/discussions)**: 질문과 아이디어 공유
+- **[GitHub Issues](https://github.com/paradevai/paradev/issues)**: 버그 신고와 기능 요청
+- **[GitHub Discussions](https://github.com/paradevai/paradev/discussions)**: 질문과 아이디어 공유
 
 ### 팀
 

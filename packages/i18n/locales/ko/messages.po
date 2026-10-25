@@ -8013,8 +8013,8 @@ msgstr "글꼴 두께"
 msgid "For a project, open the importer to link it."
 msgstr "프로젝트는 가져오기 도구를 열어 연결하세요."
 
-msgid "For bug reports and feature requests, the fastest path is a GitHub issue at <0>github.com/superset-sh/superset</0>. Our community lives on <1>Discord</1>, and we post updates on <2>X (@superset_sh)</2> and <3>LinkedIn</3>."
-msgstr "버그 신고와 기능 요청은 <0>github.com/superset-sh/superset</0>에 GitHub 이슈를 남기는 것이 가장 빠릅니다. 커뮤니티는 <1>Discord</1>에 있고, 소식은 <2>X (@superset_sh)</2>와 <3>LinkedIn</3>에 올립니다."
+msgid "For bug reports and feature requests, the fastest path is a GitHub issue at <0>github.com/paradevai/paradev</0>. Our community lives on <1>Discord</1>, and we post updates on <2>X (@superset_sh)</2> and <3>LinkedIn</3>."
+msgstr "버그 신고와 기능 요청은 <0>github.com/paradevai/paradev</0>에 GitHub 이슈를 남기는 것이 가장 빠릅니다. 커뮤니티는 <1>Discord</1>에 있고, 소식은 <2>X (@superset_sh)</2>와 <3>LinkedIn</3>에 올립니다."
 
 msgid "For individuals getting started"
 msgstr "처음 시작하는 개인용"

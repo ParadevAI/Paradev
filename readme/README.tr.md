@@ -14,8 +14,8 @@
 
 *Bu, İngilizce README'nin çevirisidir; esas sürüm İngilizce olandır.*
 
-[![GitHub stars](https://img.shields.io/github/stars/superset-sh/superset?style=flat&logo=github)](https://github.com/superset-sh/superset/stargazers)
-[![GitHub release](https://img.shields.io/github/v/release/superset-sh/superset?style=flat&logo=github)](https://github.com/superset-sh/superset/releases)
+[![GitHub stars](https://img.shields.io/github/stars/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/stargazers)
+[![GitHub release](https://img.shields.io/github/v/release/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/releases)
 [![License](https://img.shields.io/badge/license-Elastic%20License%202.0-blue?style=flat)](../LICENSE.md)
 [![Twitter](https://img.shields.io/badge/@superset__sh-555?logo=x)](https://x.com/superset_sh)
 [![Discord](https://img.shields.io/badge/Discord-555?logo=discord)](https://discord.gg/cZeD9WYcV7)
@@ -27,7 +27,7 @@ Zamanınızı beklemeye değil, ürün çıkarmaya ayırın.
 
 <br />
 
-[**macOS için indirin**](https://github.com/superset-sh/superset/releases/latest) &nbsp;&bull;&nbsp; [Belgeler](https://docs.superset.sh) &nbsp;&bull;&nbsp; [Changelog](https://github.com/superset-sh/superset/releases) &nbsp;&bull;&nbsp; [Discord](https://discord.gg/cZeD9WYcV7)
+[**macOS için indirin**](https://github.com/paradevai/paradev/releases/latest) &nbsp;&bull;&nbsp; [Belgeler](https://docs.superset.sh) &nbsp;&bull;&nbsp; [Changelog](https://github.com/paradevai/paradev/releases) &nbsp;&bull;&nbsp; [Discord](https://discord.gg/cZeD9WYcV7)
 
 <br />
 
@@ -236,7 +236,7 @@ Her yüzey aynı çalışma alanlarıyla konuşur; bir görevi uygulamada başla
 
 | Yüzey | Ne elde edersiniz |
 |:--------|:-------------|
-| [**Masaüstü Uygulaması**](https://github.com/superset-sh/superset/releases/latest) | Eksiksiz IDE: terminaller, fark görüntüleyici, uygulama içi tarayıcı, otomasyonlar |
+| [**Masaüstü Uygulaması**](https://github.com/paradevai/paradev/releases/latest) | Eksiksiz IDE: terminaller, fark görüntüleyici, uygulama içi tarayıcı, otomasyonlar |
 | [**CLI**](https://docs.superset.sh/cli/getting-started) | Herhangi bir kabuktan çalışma alanlarını, ajanları, terminalleri ve ana bilgisayarları yönetmek için tek bir `superset` ikili dosyası |
 | [**TypeScript SDK**](https://docs.superset.sh/sdk/getting-started) | Node, Bun veya Deno üzerinden [`@superset_sh/sdk`](https://www.npmjs.com/package/@superset_sh/sdk) ile Superset'i programatik olarak yönetin |
 | [**MCP Sunucusu**](https://docs.superset.sh/mcp) | Claude Code, Codex, Cursor ve diğer ajanların çalışma alanlarını kendilerinin oluşturup yönetmesine izin verin |
@@ -246,7 +246,7 @@ CLI, masaüstü uygulamasıyla birlikte gelir; tek başına da kurabilirsiniz:
 ```bash
 curl -fsSL https://superset.sh/cli/install.sh | sh
 # or
-brew install superset-sh/tap/superset
+brew install paradevai/tap/superset
 ```
 
 Ajanlarınızı telefonunuzdan kontrol edebilmeniz için bir iOS uygulaması da yakında geliyor.
@@ -255,10 +255,10 @@ Ajanlarınızı telefonunuzdan kontrol edebilmeniz için bir iOS uygulaması da 
 
 Masaüstü uygulamasını indirin:
 
-- **macOS**: [Apple Silicon (.dmg)](https://github.com/superset-sh/superset/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/superset-sh/superset/releases/latest/download/Superset-x64.dmg)
-- **Linux**: [x64 AppImage](https://github.com/superset-sh/superset/releases/latest/download/Superset-x86_64.AppImage) (deneysel; birincil hedef macOS)
+- **macOS**: [Apple Silicon (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-x64.dmg)
+- **Linux**: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Superset-x86_64.AppImage) (deneysel; birincil hedef macOS)
 - **Windows**: henüz mevcut değil
-- [Tüm derlemeler](https://github.com/superset-sh/superset/releases/latest)
+- [Tüm derlemeler](https://github.com/paradevai/paradev/releases/latest)
 
 Kurulu olması gereken tek şey [Git](https://git-scm.com/). [gh](https://cli.github.com/) isteğe bağlıdır ve PR iş akışlarının kilidini açar; Superset sizin için kurmayı önerir.
 
@@ -268,7 +268,7 @@ Superset üzerinde çalışmak veya bir PR ile katkıda bulunmak mı istiyorsunu
 kurulu Superset uygulamasına ekleyin ve değişikliğiniz için bir çalışma alanı oluşturun:
 
 ```bash
-git clone https://github.com/superset-sh/superset.git
+git clone https://github.com/paradevai/paradev.git
 ```
 
 Ardından o çalışma alanı terminalinden geliştirme kurulumunu çalıştırın:
@@ -326,10 +326,10 @@ Klavye kısayolları **Ayarlar → Klavye kısayolları** (⌘/) üzerinden öze
 
 ## Katkıda Bulunma
 
-Katkılarınızı bekliyoruz! Kurulum ve PR açma adımları için [CONTRIBUTING.md](../CONTRIBUTING.md) dosyasına bakın. Hatalar ve özellik istekleri [issues](https://github.com/superset-sh/superset/issues) sayfasına gider.
+Katkılarınızı bekliyoruz! Kurulum ve PR açma adımları için [CONTRIBUTING.md](../CONTRIBUTING.md) dosyasına bakın. Hatalar ve özellik istekleri [issues](https://github.com/paradevai/paradev/issues) sayfasına gider.
 
-<a href="https://github.com/superset-sh/superset/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=superset-sh/superset" />
+<a href="https://github.com/paradevai/paradev/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=paradevai/paradev" />
 </a>
 
 ## Topluluk
@@ -338,8 +338,8 @@ Yardım almak, geri bildirim paylaşmak ve diğer kullanıcılarla bağlantı ku
 
 - **[Discord](https://discord.gg/cZeD9WYcV7)**: ekiple ve toplulukla sohbet edin
 - **[Twitter](https://x.com/superset_sh)**: güncellemeler ve duyurular için takip edin
-- **[GitHub Issues](https://github.com/superset-sh/superset/issues)**: hata bildirin ve özellik isteyin
-- **[GitHub Discussions](https://github.com/superset-sh/superset/discussions)**: soru sorun ve fikirlerinizi paylaşın
+- **[GitHub Issues](https://github.com/paradevai/paradev/issues)**: hata bildirin ve özellik isteyin
+- **[GitHub Discussions](https://github.com/paradevai/paradev/discussions)**: soru sorun ve fikirlerinizi paylaşın
 
 ### Ekip
 

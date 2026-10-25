@@ -5,7 +5,7 @@ Thanks for contributing! Please follow our [code of conduct](./CODE_OF_CONDUCT.m
 ## Before you start
 
 - **Bug fixes, docs, and small improvements**: open a PR directly. No issue needed.
-- **New features or larger changes**: [open an issue](https://github.com/superset-sh/superset/issues/new/choose) first so we can agree on the approach before you build it.
+- **New features or larger changes**: [open an issue](https://github.com/paradevai/paradev/issues/new/choose) first so we can agree on the approach before you build it.
 - **Questions**: ask in [Discord](https://discord.gg/cZeD9WYcV7) instead of opening an issue.
 
 ## Local development

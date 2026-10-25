@@ -14,8 +14,8 @@
 
 *Đây là bản dịch của README tiếng Anh; bản tiếng Anh là bản chuẩn.*
 
-[![GitHub stars](https://img.shields.io/github/stars/superset-sh/superset?style=flat&logo=github)](https://github.com/superset-sh/superset/stargazers)
-[![GitHub release](https://img.shields.io/github/v/release/superset-sh/superset?style=flat&logo=github)](https://github.com/superset-sh/superset/releases)
+[![GitHub stars](https://img.shields.io/github/stars/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/stargazers)
+[![GitHub release](https://img.shields.io/github/v/release/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/releases)
 [![License](https://img.shields.io/badge/license-Elastic%20License%202.0-blue?style=flat)](../LICENSE.md)
 [![Twitter](https://img.shields.io/badge/@superset__sh-555?logo=x)](https://x.com/superset_sh)
 [![Discord](https://img.shields.io/badge/Discord-555?logo=discord)](https://discord.gg/cZeD9WYcV7)
@@ -27,7 +27,7 @@ Dành thời gian để ship, không phải để chờ.
 
 <br />
 
-[**Tải về cho macOS**](https://github.com/superset-sh/superset/releases/latest) &nbsp;&bull;&nbsp; [Tài liệu](https://docs.superset.sh) &nbsp;&bull;&nbsp; [Changelog](https://github.com/superset-sh/superset/releases) &nbsp;&bull;&nbsp; [Discord](https://discord.gg/cZeD9WYcV7)
+[**Tải về cho macOS**](https://github.com/paradevai/paradev/releases/latest) &nbsp;&bull;&nbsp; [Tài liệu](https://docs.superset.sh) &nbsp;&bull;&nbsp; [Changelog](https://github.com/paradevai/paradev/releases) &nbsp;&bull;&nbsp; [Discord](https://discord.gg/cZeD9WYcV7)
 
 <br />
 
@@ -236,7 +236,7 @@ Mọi bề mặt đều nói chuyện với cùng những workspace, nên bạn 
 
 | Bề mặt | Bạn nhận được gì |
 |:--------|:-------------|
-| [**Ứng dụng desktop**](https://github.com/superset-sh/superset/releases/latest) | IDE đầy đủ: terminal, trình xem diff, trình duyệt trong ứng dụng, tự động hóa |
+| [**Ứng dụng desktop**](https://github.com/paradevai/paradev/releases/latest) | IDE đầy đủ: terminal, trình xem diff, trình duyệt trong ứng dụng, tự động hóa |
 | [**CLI**](https://docs.superset.sh/cli/getting-started) | Một binary `superset` duy nhất để quản lý workspace, agent, terminal và host từ bất kỳ shell nào |
 | [**TypeScript SDK**](https://docs.superset.sh/sdk/getting-started) | Điều khiển Superset bằng lập trình với [`@superset_sh/sdk`](https://www.npmjs.com/package/@superset_sh/sdk) từ Node, Bun hoặc Deno |
 | [**MCP Server**](https://docs.superset.sh/mcp) | Để Claude Code, Codex, Cursor và các agent khác tự tạo và quản lý workspace |
@@ -246,7 +246,7 @@ CLI được đóng gói kèm ứng dụng desktop, hoặc cài riêng:
 ```bash
 curl -fsSL https://superset.sh/cli/install.sh | sh
 # or
-brew install superset-sh/tap/superset
+brew install paradevai/tap/superset
 ```
 
 Ứng dụng iOS sẽ sớm ra mắt để bạn theo dõi các agent từ điện thoại.
@@ -255,10 +255,10 @@ brew install superset-sh/tap/superset
 
 Tải ứng dụng desktop:
 
-- **macOS**: [Apple Silicon (.dmg)](https://github.com/superset-sh/superset/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/superset-sh/superset/releases/latest/download/Superset-x64.dmg)
-- **Linux**: [x64 AppImage](https://github.com/superset-sh/superset/releases/latest/download/Superset-x86_64.AppImage) (thử nghiệm; macOS là nền tảng chính)
+- **macOS**: [Apple Silicon (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-x64.dmg)
+- **Linux**: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Superset-x86_64.AppImage) (thử nghiệm; macOS là nền tảng chính)
 - **Windows**: chưa có
-- [Tất cả các bản build](https://github.com/superset-sh/superset/releases/latest)
+- [Tất cả các bản build](https://github.com/paradevai/paradev/releases/latest)
 
 Tất cả những gì bạn cần cài là [Git](https://git-scm.com/). [gh](https://cli.github.com/) là tùy chọn và mở khóa các luồng làm việc PR; Superset sẽ đề nghị cài nó cho bạn.
 
@@ -268,7 +268,7 @@ Muốn vọc Superset hay đóng góp một PR? Clone repository, thêm nó vào
 ứng dụng Superset đã cài, rồi tạo một workspace cho thay đổi của bạn:
 
 ```bash
-git clone https://github.com/superset-sh/superset.git
+git clone https://github.com/paradevai/paradev.git
 ```
 
 Sau đó chạy thiết lập phát triển từ terminal của workspace đó:
@@ -326,10 +326,10 @@ Phím tắt có thể tùy chỉnh qua **Cài đặt → Phím tắt** (⌘/); x
 
 ## Đóng góp
 
-Chúng tôi hoan nghênh mọi đóng góp! Xem [CONTRIBUTING.md](../CONTRIBUTING.md) để biết cách thiết lập và mở một PR. Bug và yêu cầu tính năng gửi vào [issues](https://github.com/superset-sh/superset/issues).
+Chúng tôi hoan nghênh mọi đóng góp! Xem [CONTRIBUTING.md](../CONTRIBUTING.md) để biết cách thiết lập và mở một PR. Bug và yêu cầu tính năng gửi vào [issues](https://github.com/paradevai/paradev/issues).
 
-<a href="https://github.com/superset-sh/superset/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=superset-sh/superset" />
+<a href="https://github.com/paradevai/paradev/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=paradevai/paradev" />
 </a>
 
 ## Cộng đồng
@@ -338,8 +338,8 @@ Tham gia cộng đồng Superset để được trợ giúp, chia sẻ phản h�
 
 - **[Discord](https://discord.gg/cZeD9WYcV7)**: trò chuyện với đội ngũ và cộng đồng
 - **[Twitter](https://x.com/superset_sh)**: theo dõi để nhận cập nhật và thông báo
-- **[GitHub Issues](https://github.com/superset-sh/superset/issues)**: báo bug và yêu cầu tính năng
-- **[GitHub Discussions](https://github.com/superset-sh/superset/discussions)**: đặt câu hỏi và chia sẻ ý tưởng
+- **[GitHub Issues](https://github.com/paradevai/paradev/issues)**: báo bug và yêu cầu tính năng
+- **[GitHub Discussions](https://github.com/paradevai/paradev/discussions)**: đặt câu hỏi và chia sẻ ý tưởng
 
 ### Đội ngũ
 

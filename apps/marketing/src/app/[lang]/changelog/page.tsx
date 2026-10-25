@@ -84,7 +84,7 @@ export default async function ChangelogPage() {
 							The latest updates, improvements, and new features in Superset.
 							Updated weekly. For detailed release notes, see{" "}
 							<a
-								href="https://github.com/superset-sh/superset/releases"
+								href="https://github.com/paradevai/paradev/releases"
 								target="_blank"
 								rel="noopener noreferrer"
 								className="inline-flex items-center gap-1 hover:text-foreground transition-colors"

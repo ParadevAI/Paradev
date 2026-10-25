@@ -14,8 +14,8 @@
 
 *Ini adalah terjemahan dari README bahasa Inggris, yang menjadi acuan resmi.*
 
-[![GitHub stars](https://img.shields.io/github/stars/superset-sh/superset?style=flat&logo=github)](https://github.com/superset-sh/superset/stargazers)
-[![GitHub release](https://img.shields.io/github/v/release/superset-sh/superset?style=flat&logo=github)](https://github.com/superset-sh/superset/releases)
+[![GitHub stars](https://img.shields.io/github/stars/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/stargazers)
+[![GitHub release](https://img.shields.io/github/v/release/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/releases)
 [![License](https://img.shields.io/badge/license-Elastic%20License%202.0-blue?style=flat)](../LICENSE.md)
 [![Twitter](https://img.shields.io/badge/@superset__sh-555?logo=x)](https://x.com/superset_sh)
 [![Discord](https://img.shields.io/badge/Discord-555?logo=discord)](https://discord.gg/cZeD9WYcV7)
@@ -27,7 +27,7 @@ Habiskan waktu Anda untuk shipping, bukan menunggu.
 
 <br />
 
-[**Unduh untuk macOS**](https://github.com/superset-sh/superset/releases/latest) &nbsp;&bull;&nbsp; [Dokumentasi](https://docs.superset.sh) &nbsp;&bull;&nbsp; [Changelog](https://github.com/superset-sh/superset/releases) &nbsp;&bull;&nbsp; [Discord](https://discord.gg/cZeD9WYcV7)
+[**Unduh untuk macOS**](https://github.com/paradevai/paradev/releases/latest) &nbsp;&bull;&nbsp; [Dokumentasi](https://docs.superset.sh) &nbsp;&bull;&nbsp; [Changelog](https://github.com/paradevai/paradev/releases) &nbsp;&bull;&nbsp; [Discord](https://discord.gg/cZeD9WYcV7)
 
 <br />
 
@@ -236,7 +236,7 @@ Setiap permukaan berbicara dengan workspace yang sama, jadi Anda bisa memulai tu
 
 | Permukaan | Yang Anda dapat |
 |:--------|:-------------|
-| [**Aplikasi Desktop**](https://github.com/superset-sh/superset/releases/latest) | IDE lengkap: terminal, diff viewer, browser dalam aplikasi, otomatisasi |
+| [**Aplikasi Desktop**](https://github.com/paradevai/paradev/releases/latest) | IDE lengkap: terminal, diff viewer, browser dalam aplikasi, otomatisasi |
 | [**CLI**](https://docs.superset.sh/cli/getting-started) | Satu binary `superset` untuk mengelola workspace, agen, terminal, dan host dari shell mana pun |
 | [**TypeScript SDK**](https://docs.superset.sh/sdk/getting-started) | Kendalikan Superset secara programatik dengan [`@superset_sh/sdk`](https://www.npmjs.com/package/@superset_sh/sdk) dari Node, Bun, atau Deno |
 | [**MCP Server**](https://docs.superset.sh/mcp) | Biarkan Claude Code, Codex, Cursor, dan agen lainnya membuat dan mengelola workspace sendiri |
@@ -246,7 +246,7 @@ CLI sudah dibundel dengan aplikasi desktop, atau pasang secara terpisah:
 ```bash
 curl -fsSL https://superset.sh/cli/install.sh | sh
 # or
-brew install superset-sh/tap/superset
+brew install paradevai/tap/superset
 ```
 
 Aplikasi iOS segera hadir sehingga Anda bisa memantau agen dari ponsel.
@@ -255,10 +255,10 @@ Aplikasi iOS segera hadir sehingga Anda bisa memantau agen dari ponsel.
 
 Unduh aplikasi desktop:
 
-- **macOS**: [Apple Silicon (.dmg)](https://github.com/superset-sh/superset/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/superset-sh/superset/releases/latest/download/Superset-x64.dmg)
-- **Linux**: [x64 AppImage](https://github.com/superset-sh/superset/releases/latest/download/Superset-x86_64.AppImage) (eksperimental; macOS adalah target utama)
+- **macOS**: [Apple Silicon (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-x64.dmg)
+- **Linux**: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Superset-x86_64.AppImage) (eksperimental; macOS adalah target utama)
 - **Windows**: belum tersedia
-- [Semua build](https://github.com/superset-sh/superset/releases/latest)
+- [Semua build](https://github.com/paradevai/paradev/releases/latest)
 
 Yang perlu terpasang hanya [Git](https://git-scm.com/). [gh](https://cli.github.com/) bersifat opsional dan membuka alur kerja PR; Superset menawarkan untuk memasangnya bagi Anda.
 
@@ -268,7 +268,7 @@ Ingin mengutak-atik Superset atau menyumbang PR? Clone repositorinya, tambahkan 
 aplikasi Superset yang terpasang, lalu buat workspace untuk perubahan Anda:
 
 ```bash
-git clone https://github.com/superset-sh/superset.git
+git clone https://github.com/paradevai/paradev.git
 ```
 
 Lalu jalankan setup pengembangan dari terminal workspace tersebut:
@@ -326,10 +326,10 @@ Pintasan keyboard bisa dikustomisasi lewat **Pengaturan → Pintasan Keyboard** 
 
 ## Berkontribusi
 
-Kami menyambut kontribusi! Lihat [CONTRIBUTING.md](../CONTRIBUTING.md) untuk cara menyiapkan lingkungan dan membuka PR. Bug dan permintaan fitur masuk ke [issues](https://github.com/superset-sh/superset/issues).
+Kami menyambut kontribusi! Lihat [CONTRIBUTING.md](../CONTRIBUTING.md) untuk cara menyiapkan lingkungan dan membuka PR. Bug dan permintaan fitur masuk ke [issues](https://github.com/paradevai/paradev/issues).
 
-<a href="https://github.com/superset-sh/superset/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=superset-sh/superset" />
+<a href="https://github.com/paradevai/paradev/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=paradevai/paradev" />
 </a>
 
 ## Komunitas
@@ -338,8 +338,8 @@ Bergabunglah dengan komunitas Superset untuk mendapat bantuan, berbagi umpan bal
 
 - **[Discord](https://discord.gg/cZeD9WYcV7)**: mengobrol dengan tim dan komunitas
 - **[Twitter](https://x.com/superset_sh)**: ikuti untuk pembaruan dan pengumuman
-- **[GitHub Issues](https://github.com/superset-sh/superset/issues)**: laporkan bug dan ajukan permintaan fitur
-- **[GitHub Discussions](https://github.com/superset-sh/superset/discussions)**: ajukan pertanyaan dan bagikan ide
+- **[GitHub Issues](https://github.com/paradevai/paradev/issues)**: laporkan bug dan ajukan permintaan fitur
+- **[GitHub Discussions](https://github.com/paradevai/paradev/discussions)**: ajukan pertanyaan dan bagikan ide
 
 ### Tim
 

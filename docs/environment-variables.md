@@ -5,7 +5,7 @@ Five places. Miss one and it fails silently, or far from the change.
 ## 1. Set the secret
 
 ```bash
-gh secret set MY_VAR -R superset-sh/superset --body "value"
+gh secret set MY_VAR -R paradevai/paradev --body "value"
 ```
 
 Always a secret, never a repo variable, even for something as unsecret as a

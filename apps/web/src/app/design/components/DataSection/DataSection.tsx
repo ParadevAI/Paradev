@@ -104,7 +104,7 @@ export function DataSection() {
 			>
 				<Avatar>
 					<AvatarImage
-						src="https://github.com/superset-sh.png"
+						src="https://github.com/paradevai.png"
 						alt={i18n._(
 							msg({
 								message: "Superset",

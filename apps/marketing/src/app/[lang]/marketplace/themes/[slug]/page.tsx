@@ -207,7 +207,7 @@ export default async function ThemeDetailPage({ params }: PageProps) {
 		author: { "@type": "Person", name: theme.author },
 		keywords: theme.tags.join(", "),
 		isAccessibleForFree: true,
-		license: "https://github.com/superset-sh/superset",
+		license: "https://github.com/paradevai/paradev",
 	};
 
 	return (

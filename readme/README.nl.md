@@ -14,8 +14,8 @@
 
 *Dit is een vertaling van de Engelse README, die leidend is.*
 
-[![GitHub stars](https://img.shields.io/github/stars/superset-sh/superset?style=flat&logo=github)](https://github.com/superset-sh/superset/stargazers)
-[![GitHub release](https://img.shields.io/github/v/release/superset-sh/superset?style=flat&logo=github)](https://github.com/superset-sh/superset/releases)
+[![GitHub stars](https://img.shields.io/github/stars/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/stargazers)
+[![GitHub release](https://img.shields.io/github/v/release/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/releases)
 [![License](https://img.shields.io/badge/license-Elastic%20License%202.0-blue?style=flat)](../LICENSE.md)
 [![Twitter](https://img.shields.io/badge/@superset__sh-555?logo=x)](https://x.com/superset_sh)
 [![Discord](https://img.shields.io/badge/Discord-555?logo=discord)](https://discord.gg/cZeD9WYcV7)
@@ -27,7 +27,7 @@ Besteed je tijd aan shippen, niet aan wachten.
 
 <br />
 
-[**Download voor macOS**](https://github.com/superset-sh/superset/releases/latest) &nbsp;&bull;&nbsp; [Documentatie](https://docs.superset.sh) &nbsp;&bull;&nbsp; [Changelog](https://github.com/superset-sh/superset/releases) &nbsp;&bull;&nbsp; [Discord](https://discord.gg/cZeD9WYcV7)
+[**Download voor macOS**](https://github.com/paradevai/paradev/releases/latest) &nbsp;&bull;&nbsp; [Documentatie](https://docs.superset.sh) &nbsp;&bull;&nbsp; [Changelog](https://github.com/paradevai/paradev/releases) &nbsp;&bull;&nbsp; [Discord](https://discord.gg/cZeD9WYcV7)
 
 <br />
 
@@ -236,7 +236,7 @@ Elk oppervlak praat met dezelfde werkruimtes, dus je kunt een taak in de app sta
 
 | Oppervlak | Wat je krijgt |
 |:--------|:-------------|
-| [**Desktop-app**](https://github.com/superset-sh/superset/releases/latest) | De volledige IDE: terminals, diff-viewer, in-app browser, automatiseringen |
+| [**Desktop-app**](https://github.com/paradevai/paradev/releases/latest) | De volledige IDE: terminals, diff-viewer, in-app browser, automatiseringen |
 | [**CLI**](https://docs.superset.sh/cli/getting-started) | Eén `superset`-binary om werkruimtes, agents, terminals en hosts vanuit elke shell te beheren |
 | [**TypeScript SDK**](https://docs.superset.sh/sdk/getting-started) | Stuur Superset programmatisch aan met [`@superset_sh/sdk`](https://www.npmjs.com/package/@superset_sh/sdk) vanuit Node, Bun of Deno |
 | [**MCP-server**](https://docs.superset.sh/mcp) | Laat Claude Code, Codex, Cursor en andere agents zelf werkruimtes aanmaken en beheren |
@@ -246,7 +246,7 @@ De CLI wordt meegeleverd met de desktop-app, of installeer hem los:
 ```bash
 curl -fsSL https://superset.sh/cli/install.sh | sh
 # or
-brew install superset-sh/tap/superset
+brew install paradevai/tap/superset
 ```
 
 Er komt binnenkort een iOS-app zodat je je agents vanaf je telefoon kunt checken.
@@ -255,10 +255,10 @@ Er komt binnenkort een iOS-app zodat je je agents vanaf je telefoon kunt checken
 
 Download de desktop-app:
 
-- **macOS**: [Apple Silicon (.dmg)](https://github.com/superset-sh/superset/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/superset-sh/superset/releases/latest/download/Superset-x64.dmg)
-- **Linux**: [x64 AppImage](https://github.com/superset-sh/superset/releases/latest/download/Superset-x86_64.AppImage) (experimenteel; macOS is het primaire doelplatform)
+- **macOS**: [Apple Silicon (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-x64.dmg)
+- **Linux**: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Superset-x86_64.AppImage) (experimenteel; macOS is het primaire doelplatform)
 - **Windows**: nog niet beschikbaar
-- [Alle builds](https://github.com/superset-sh/superset/releases/latest)
+- [Alle builds](https://github.com/paradevai/paradev/releases/latest)
 
 Het enige dat je geïnstalleerd moet hebben is [Git](https://git-scm.com/). [gh](https://cli.github.com/) is optioneel en ontgrendelt de PR-workflows; Superset biedt aan het voor je te installeren.
 
@@ -268,7 +268,7 @@ Wil je aan Superset sleutelen of een PR bijdragen? Cloneer de repository, voeg h
 geïnstalleerde Superset-app en maak een werkruimte aan voor je wijziging:
 
 ```bash
-git clone https://github.com/superset-sh/superset.git
+git clone https://github.com/paradevai/paradev.git
 ```
 
 Draai daarna de development-setup vanuit de terminal van die werkruimte:
@@ -326,10 +326,10 @@ Sneltoetsen zijn aanpasbaar via **Instellingen → Sneltoetsen** (⌘/); zie de 
 
 ## Bijdragen
 
-We verwelkomen bijdragen! Zie [CONTRIBUTING.md](../CONTRIBUTING.md) voor hoe je aan de slag gaat en een PR opent. Bugs en featureverzoeken horen in [issues](https://github.com/superset-sh/superset/issues).
+We verwelkomen bijdragen! Zie [CONTRIBUTING.md](../CONTRIBUTING.md) voor hoe je aan de slag gaat en een PR opent. Bugs en featureverzoeken horen in [issues](https://github.com/paradevai/paradev/issues).
 
-<a href="https://github.com/superset-sh/superset/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=superset-sh/superset" />
+<a href="https://github.com/paradevai/paradev/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=paradevai/paradev" />
 </a>
 
 ## Community
@@ -338,8 +338,8 @@ Word lid van de Superset-community om hulp te krijgen, feedback te delen en ande
 
 - **[Discord](https://discord.gg/cZeD9WYcV7)**: chat met het team en de community
 - **[Twitter](https://x.com/superset_sh)**: volg voor updates en aankondigingen
-- **[GitHub Issues](https://github.com/superset-sh/superset/issues)**: meld bugs en vraag features aan
-- **[GitHub Discussions](https://github.com/superset-sh/superset/discussions)**: stel vragen en deel ideeën
+- **[GitHub Issues](https://github.com/paradevai/paradev/issues)**: meld bugs en vraag features aan
+- **[GitHub Discussions](https://github.com/paradevai/paradev/discussions)**: stel vragen en deel ideeën
 
 ### Team
 

@@ -31,7 +31,7 @@ describe("checkGithubStarred / starGithubRepo", () => {
 		expect(await checkGithubStarred()).toBe("starred");
 		expect(execMock).toHaveBeenCalledWith(
 			"gh",
-			["api", "--include", "user/starred/superset-sh/superset"],
+			["api", "--include", "user/starred/paradevai/paradev"],
 			{ timeout: 10_000 },
 		);
 	});
@@ -48,7 +48,7 @@ describe("checkGithubStarred / starGithubRepo", () => {
 	test("returns 'not_starred' on a definitive 404", async () => {
 		execMock.mockImplementation((async () => {
 			throw new Error(
-				"Command failed: gh api user/starred/superset-sh/superset\ngh: Not Found (HTTP 404)",
+				"Command failed: gh api user/starred/paradevai/paradev\ngh: Not Found (HTTP 404)",
 			);
 		}) as unknown as ExecWithShellEnv);
 
@@ -83,7 +83,7 @@ describe("checkGithubStarred / starGithubRepo", () => {
 		expect(await starGithubRepo()).toBe(true);
 		expect(execMock).toHaveBeenCalledWith(
 			"gh",
-			["api", "-X", "PUT", "user/starred/superset-sh/superset"],
+			["api", "-X", "PUT", "user/starred/paradevai/paradev"],
 			{ timeout: 10_000 },
 		);
 	});
@@ -91,7 +91,7 @@ describe("checkGithubStarred / starGithubRepo", () => {
 	test("star: returns false on any failure", async () => {
 		execMock.mockImplementation((async () => {
 			throw new Error(
-				"Command failed: gh api -X PUT user/starred/superset-sh/superset",
+				"Command failed: gh api -X PUT user/starred/paradevai/paradev",
 			);
 		}) as unknown as ExecWithShellEnv);
 
