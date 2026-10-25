@@ -1,4 +1,5 @@
 import { Trans } from "@lingui/react/macro";
+import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import * as AppleAuthentication from "expo-apple-authentication";
 import * as Crypto from "expo-crypto";
@@ -17,6 +18,7 @@ import type { SocialProvider } from "./components/SocialButton";
 import { SocialButton } from "./components/SocialButton";
 
 export function SignInScreen() {
+	const appName = BRAND.NAME;
 	const [error, setError] = useState<string | null>(null);
 
 	const handleSignIn = async (provider: SocialProvider) => {
@@ -90,7 +92,7 @@ export function SignInScreen() {
 
 			<View className="items-center gap-2">
 				<Text className="text-2xl font-semibold text-foreground">
-					<Trans>Welcome to Superset</Trans>
+					<Trans>Welcome to {appName}</Trans>
 				</Text>
 				<Text className="text-base text-muted-foreground">
 					<Trans>Sign in to get started</Trans>

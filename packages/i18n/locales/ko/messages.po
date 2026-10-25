@@ -452,14 +452,14 @@ msgid "{0} is offline."
 msgstr "{0}이(가) 오프라인입니다."
 
 #. placeholder {0}: activeOrganization.name
-msgid "{0} is on the Free plan. Superset Mobile is available for organizations on Pro."
-msgstr "{0}은(는) Free 플랜을 사용 중입니다. Superset Mobile은 Pro 플랜 조직에서 사용할 수 있습니다."
+msgid "{0} is on the Free plan. {appName} Mobile is available for organizations on Pro."
+msgstr "{0}은(는) Free 플랜을 사용 중입니다. {appName} Mobile은 Pro 플랜 조직에서 사용할 수 있습니다."
 
 #. placeholder {0}: host?.name ?? t({ message: "This host" })
 #. placeholder {1}: hostCompatibility.hostVersion
 #. placeholder {2}: hostCompatibility.minVersion
-msgid "{0} is running host service {1} — this app needs {2} or newer. Update Superset on that machine."
-msgstr "{0}에서 호스트 서비스 {1}을(를) 실행 중입니다 — 이 앱에는 {2} 이상이 필요합니다. 해당 컴퓨터에서 Superset을 업데이트하세요."
+msgid "{0} is running host service {1} — this app needs {2} or newer. Update {appName} on that machine."
+msgstr "{0}에서 호스트 서비스 {1}을(를) 실행 중입니다 — 이 앱에는 {2} 이상이 필요합니다. 해당 컴퓨터에서 {appName}을 업데이트하세요."
 
 #. placeholder {0}: displayName(name)
 #. placeholder {0}: displayName(variables.name)
@@ -711,6 +711,15 @@ msgstr "{agents} 세션은 해당 워크스페이스를 열면 재개됩니다."
 
 msgid "{amount} ({hoursLabel} GB-hours)"
 msgstr "{amount} ({hoursLabel} GB 시간)"
+
+msgid "{appName} may be closed"
+msgstr "{appName}이 종료되었을 수 있습니다"
+
+msgid "{appName} Mobile is part of Pro"
+msgstr "{appName} Mobile은 Pro에 포함되어 있습니다"
+
+msgid "{appName} Mobile runs agents on the computers you connect."
+msgstr "{appName} Mobile은 연결한 컴퓨터에서 에이전트를 실행합니다."
 
 msgid "{approvalCount, plural, one {# needs approval} other {# need approval}}"
 msgstr "{approvalCount, plural, other {#개 승인 필요}}"
@@ -6528,6 +6537,10 @@ msgstr "다운그레이드하는 중..."
 msgid "Download"
 msgstr "다운로드"
 
+#. placeholder {0}: COMPANY.DOMAIN
+msgid "Download {appName} at <0>{0}/download</0>."
+msgstr "<0>{0}/download</0>에서 {appName}을 다운로드하세요."
+
 msgid "Download {name}"
 msgstr "{name} 다운로드"
 
@@ -6563,10 +6576,6 @@ msgstr "스타터 다운로드"
 
 msgid "Download Superset"
 msgstr "Superset 다운로드"
-
-#. placeholder {0}: COMPANY.DOMAIN
-msgid "Download Superset at <0>{0}/download</0>."
-msgstr "<0>{0}/download</0>에서 Superset을 다운로드하세요."
 
 msgid "Download the theme file above."
 msgstr "위의 테마 파일을 다운로드하세요."
@@ -8961,11 +8970,11 @@ msgstr "진행 중"
 msgid "In review"
 msgstr "리뷰 중"
 
+msgid "In the {appName} desktop app, open Settings → Remote Access and turn on “Allow remote access to this device via relay”."
+msgstr "{appName} 데스크톱 앱에서 설정 → 원격 액세스을 열고 “릴레이를 통해 이 기기에 원격 액세스 허용”을 켜세요."
+
 msgid "In the Superset desktop app, open <0>Settings → Appearance → Theme</0>."
 msgstr "Superset 데스크톱 앱에서 <0>설정 → 모양 → 테마</0>를 여세요."
-
-msgid "In the Superset desktop app, open Settings → Remote Access and turn on “Allow remote access to this device via relay”."
-msgstr "Superset 데스크톱 앱에서 설정 → 원격 액세스을 열고 “릴레이를 통해 이 기기에 원격 액세스 허용”을 켜세요."
 
 msgid "In under a year, more than 145,000 developers across 180 countries have run Superset and created over 1.85 million agent workspaces."
 msgstr "1년이 채 되지 않아 180개국의 145,000명 이상의 개발자가 Superset을 실행했고, 185만 개 이상의 에이전트 워크스페이스를 만들었습니다."
@@ -11998,6 +12007,9 @@ msgstr "{0} 열기"
 msgid "Open {0} website"
 msgstr "{0} 웹사이트 열기"
 
+msgid "Open {appName} on that computer"
+msgstr "해당 컴퓨터에서 {appName} 열기"
+
 msgid "Open {displayName}"
 msgstr "{displayName} 열기"
 
@@ -12339,9 +12351,6 @@ msgstr "시트 열기"
 
 msgid "Open ship options"
 msgstr "배포 옵션 열기"
-
-msgid "Open Superset on that computer"
-msgstr "해당 컴퓨터에서 Superset 열기"
 
 msgid "Open System Settings"
 msgstr "시스템 설정 열기"
@@ -13655,11 +13664,11 @@ msgstr "정렬 기준"
 msgid "Rank your agent usage against other engineers. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "다른 엔지니어와 에이전트 사용량을 비교해 순위를 매깁니다. 토큰 수와 모델 이름만 게시되며 리포지토리 이름, 파일 경로, 프롬프트는 게시되지 않습니다."
 
+msgid "Rate {appName}"
+msgstr "{appName} 평가하기"
+
 msgid "Rate limit exceeded."
 msgstr "요청 한도를 초과했습니다."
-
-msgid "Rate Superset"
-msgstr "Superset 평가하기"
 
 msgid "Reach this Mac from anywhere via the Superset relay, or spin up cloud workspaces. Connect from any client."
 msgstr "Superset 릴레이를 통해 어디서든 이 Mac에 접속하거나 클라우드 워크스페이스를 띄우세요. 어떤 클라이언트에서도 연결할 수 있습니다."
@@ -14423,8 +14432,8 @@ msgstr "터미널 데몬을 다시 시작할까요?"
 msgid "Restart terminals"
 msgstr "터미널 다시 시작"
 
-msgid "Restart to use the latest version of Superset."
-msgstr "다시 시작하면 최신 버전의 Superset을 사용할 수 있습니다."
+msgid "Restart to use the latest version of {appName}."
+msgstr "다시 시작하면 최신 버전의 {appName}을 사용할 수 있습니다."
 
 msgid "Restart workspace"
 msgstr "워크스페이스 다시 시작"
@@ -16855,9 +16864,6 @@ msgstr "Superset은 전 세계적으로 Netflix, Microsoft, NVIDIA, DoorDash, Wi
 msgid "Superset isn't on Windows yet"
 msgstr "현재 Superset은 Mac에서만 사용할 수 있습니다"
 
-msgid "Superset may be closed"
-msgstr "Superset이 종료되었을 수 있습니다"
-
 msgid "Superset may sign you back in after restart. Please try signing out again."
 msgstr "재시작 후 Superset이 다시 로그인할 수 있습니다. 로그아웃을 다시 시도해 주세요."
 
@@ -16873,9 +16879,6 @@ msgstr "iPhone의 Superset Mobile 코드 diff"
 msgid "Superset mobile gives me the power of my desktop anywhere I go."
 msgstr "Superset 모바일은 어디를 가든 데스크톱의 성능을 사용할 수 있게 해줍니다."
 
-msgid "Superset Mobile is part of Pro"
-msgstr "Superset Mobile은 Pro에 포함되어 있습니다"
-
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile, iPhone 출시"
 
@@ -16884,9 +16887,6 @@ msgstr "Superset Mobile을 사용하면 개발자는 컴퓨터에서 쓰던 Supe
 
 msgid "Superset Mobile page"
 msgstr "Superset Mobile 페이지"
-
-msgid "Superset Mobile runs agents on the computers you connect."
-msgstr "Superset Mobile은 연결한 컴퓨터에서 에이전트를 실행합니다."
 
 msgid "Superset Mobile terminal on iPhone"
 msgstr "iPhone의 Superset Mobile 터미널"
@@ -17971,8 +17971,8 @@ msgstr "표시 이름만 변경되며 브랜치는 바뀌지 않습니다."
 msgid "this organization"
 msgstr "이 조직"
 
-msgid "This organization is on the Free plan. Superset Mobile is available for organizations on Pro."
-msgstr "이 조직은 Free 플랜을 사용 중입니다. Superset Mobile은 Pro 플랜 조직에서 사용할 수 있습니다."
+msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
+msgstr "이 조직은 Free 플랜을 사용 중입니다. {appName} Mobile은 Pro 플랜 조직에서 사용할 수 있습니다."
 
 msgid "This page could not be loaded"
 msgstr "이 페이지를 불러올 수 없습니다"
@@ -18799,6 +18799,9 @@ msgstr "최신 상태"
 msgid "Update"
 msgstr "업데이트"
 
+msgid "Update {appName} on this machine to attach files"
+msgstr "파일을 첨부하려면 이 컴퓨터에서 {appName}을 업데이트하세요"
+
 msgid "Update available"
 msgstr "업데이트 있음"
 
@@ -18841,9 +18844,6 @@ msgstr "업데이트 필요"
 
 msgid "Update Superset on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "해당 기기에서 Superset을 업데이트하세요. 앱 내 업데이트에는 지원되는 독립 실행형 설치와 정식으로 출시된 앱 버전이 필요합니다."
-
-msgid "Update Superset on this machine to attach files"
-msgstr "파일을 첨부하려면 이 컴퓨터에서 Superset을 업데이트하세요"
 
 msgid "update the branch prefix"
 msgstr "브랜치 접두사를 업데이트할"
@@ -19292,8 +19292,8 @@ msgstr "결제 수단으로 청구하지 못했습니다. 이 플랜을 유지�
 msgid "We couldn't detect a package manager or environment config."
 msgstr "패키지 매니저나 환경 설정을 감지하지 못했습니다."
 
-msgid "We couldn’t reach Superset to see if it’s online. Check your connection and try again."
-msgstr "온라인 상태인지 확인하기 위해 Superset에 연결하지 못했습니다. 연결을 확인하고 다시 시도하세요."
+msgid "We couldn’t reach {appName} to see if it’s online. Check your connection and try again."
+msgstr "온라인 상태인지 확인하기 위해 {appName}에 연결하지 못했습니다. 연결을 확인하고 다시 시도하세요."
 
 msgid "We couldn't reach the device. Please try again in a moment."
 msgstr "기기에 연결하지 못했어요. 잠시 후 다시 시도해 주세요."
@@ -19396,6 +19396,9 @@ msgstr "주간 릴리스 노트"
 
 msgid "Welcome back"
 msgstr "다시 오신 것을 환영합니다"
+
+msgid "Welcome to {appName}"
+msgstr "{appName}에 오신 것을 환영합니다"
 
 msgid "Welcome to Superset"
 msgstr "Superset에 오신 것을 환영합니다"

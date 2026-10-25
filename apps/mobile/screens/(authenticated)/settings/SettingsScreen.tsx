@@ -40,6 +40,7 @@ function formatJoined(createdAt?: Date | string | null) {
 
 export function SettingsScreen() {
 	const { t } = useLingui();
+	const appName = BRAND.NAME;
 	const router = useRouter();
 	const theme = useTheme();
 	const insets = useSafeAreaInsets();
@@ -304,7 +305,7 @@ export function SettingsScreen() {
 						/>
 					}
 					label={t({
-						message: "Rate Superset",
+						message: `Rate ${appName}`,
 					})}
 					trailing={<ExternalIcon color={theme.mutedForeground} />}
 					onPress={() => openUrl(WRITE_REVIEW_URL)}

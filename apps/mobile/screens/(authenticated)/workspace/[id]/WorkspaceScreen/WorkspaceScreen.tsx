@@ -7,6 +7,7 @@ import type {
 	ComposerSessionTab,
 } from "@superset/composer";
 import { i18n } from "@superset/i18n";
+import { BRAND } from "@superset/shared/brand";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { TitlePress } from "@superset/title-press";
 import { useQueryClient } from "@tanstack/react-query";
@@ -146,6 +147,7 @@ const STATE_BANNERS: Partial<
  */
 export function WorkspaceScreen() {
 	const { t } = useLingui();
+	const appName = BRAND.NAME;
 	const params = useLocalSearchParams<{ id: string; tab?: string }>();
 	const id = params.id;
 	const router = useRouter();
@@ -1115,7 +1117,7 @@ export function WorkspaceScreen() {
 				{hostCompatibility.incompatible ? (
 					<WorkspacePlaceholder
 						body={t({
-							message: `${host?.name ?? t({ message: "This host" })} is running host service ${hostCompatibility.hostVersion} — this app needs ${hostCompatibility.minVersion} or newer. Update Superset on that machine.`,
+							message: `${host?.name ?? t({ message: "This host" })} is running host service ${hostCompatibility.hostVersion} — this app needs ${hostCompatibility.minVersion} or newer. Update ${appName} on that machine.`,
 						})}
 						icon={TriangleAlert}
 						onRefresh={onRefresh}

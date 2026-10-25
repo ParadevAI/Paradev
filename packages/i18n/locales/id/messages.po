@@ -452,14 +452,14 @@ msgid "{0} is offline."
 msgstr "{0} sedang offline."
 
 #. placeholder {0}: activeOrganization.name
-msgid "{0} is on the Free plan. Superset Mobile is available for organizations on Pro."
-msgstr "{0} memakai paket Gratis. Superset Mobile tersedia untuk organisasi dengan paket Pro."
+msgid "{0} is on the Free plan. {appName} Mobile is available for organizations on Pro."
+msgstr "{0} memakai paket Gratis. {appName} Mobile tersedia untuk organisasi dengan paket Pro."
 
 #. placeholder {0}: host?.name ?? t({ message: "This host" })
 #. placeholder {1}: hostCompatibility.hostVersion
 #. placeholder {2}: hostCompatibility.minVersion
-msgid "{0} is running host service {1} — this app needs {2} or newer. Update Superset on that machine."
-msgstr "{0} menjalankan layanan host {1} — aplikasi ini butuh {2} atau lebih baru. Perbarui Superset di mesin itu."
+msgid "{0} is running host service {1} — this app needs {2} or newer. Update {appName} on that machine."
+msgstr "{0} menjalankan layanan host {1} — aplikasi ini butuh {2} atau lebih baru. Perbarui {appName} di mesin itu."
 
 #. placeholder {0}: displayName(name)
 #. placeholder {0}: displayName(variables.name)
@@ -711,6 +711,15 @@ msgstr "Sesi {agents} dilanjutkan saat Anda membuka workspace-nya."
 
 msgid "{amount} ({hoursLabel} GB-hours)"
 msgstr "{amount} ({hoursLabel} GB-jam)"
+
+msgid "{appName} may be closed"
+msgstr "{appName} mungkin ditutup"
+
+msgid "{appName} Mobile is part of Pro"
+msgstr "{appName} Mobile termasuk dalam Pro"
+
+msgid "{appName} Mobile runs agents on the computers you connect."
+msgstr "{appName} Mobile menjalankan agen di komputer yang Anda hubungkan."
 
 msgid "{approvalCount, plural, one {# needs approval} other {# need approval}}"
 msgstr "{approvalCount, plural, other {# perlu persetujuan}}"
@@ -6528,6 +6537,10 @@ msgstr "Menurunkan..."
 msgid "Download"
 msgstr "Unduh"
 
+#. placeholder {0}: COMPANY.DOMAIN
+msgid "Download {appName} at <0>{0}/download</0>."
+msgstr "Unduh {appName} di <0>{0}/download</0>."
+
 msgid "Download {name}"
 msgstr "Unduh {name}"
 
@@ -6563,10 +6576,6 @@ msgstr "Unduh starter"
 
 msgid "Download Superset"
 msgstr "Unduh Superset"
-
-#. placeholder {0}: COMPANY.DOMAIN
-msgid "Download Superset at <0>{0}/download</0>."
-msgstr "Unduh Superset di <0>{0}/download</0>."
 
 msgid "Download the theme file above."
 msgstr "Unduh file tema di atas."
@@ -8961,11 +8970,11 @@ msgstr "Sedang berjalan"
 msgid "In review"
 msgstr "Dalam review"
 
+msgid "In the {appName} desktop app, open Settings → Remote Access and turn on “Allow remote access to this device via relay”."
+msgstr "Di aplikasi desktop {appName}, buka Pengaturan → Akses Jarak Jauh dan aktifkan “Izinkan akses jarak jauh ke perangkat ini melalui relay”."
+
 msgid "In the Superset desktop app, open <0>Settings → Appearance → Theme</0>."
 msgstr "Di aplikasi desktop Superset, buka <0>Pengaturan → Tampilan → Tema</0>."
-
-msgid "In the Superset desktop app, open Settings → Remote Access and turn on “Allow remote access to this device via relay”."
-msgstr "Di aplikasi desktop Superset, buka Pengaturan → Akses Jarak Jauh dan aktifkan “Izinkan akses jarak jauh ke perangkat ini melalui relay”."
 
 msgid "In under a year, more than 145,000 developers across 180 countries have run Superset and created over 1.85 million agent workspaces."
 msgstr "Dalam waktu kurang dari setahun, lebih dari 145.000 developer di 180 negara telah menjalankan Superset dan membuat lebih dari 1,85 juta workspace agen."
@@ -11998,6 +12007,9 @@ msgstr "Buka {0}"
 msgid "Open {0} website"
 msgstr "Buka situs web {0}"
 
+msgid "Open {appName} on that computer"
+msgstr "Buka {appName} di komputer itu"
+
 msgid "Open {displayName}"
 msgstr "Buka {displayName}"
 
@@ -12339,9 +12351,6 @@ msgstr "Buka sheet"
 
 msgid "Open ship options"
 msgstr "Buka opsi pengiriman"
-
-msgid "Open Superset on that computer"
-msgstr "Buka Superset di komputer itu"
 
 msgid "Open System Settings"
 msgstr "Buka System Settings"
@@ -13655,11 +13664,11 @@ msgstr "Urutkan berdasarkan"
 msgid "Rank your agent usage against other engineers. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "Peringkatkan penggunaan agen Anda terhadap engineer lain. Hanya jumlah token dan nama model, tanpa nama repo, path file, atau prompt."
 
+msgid "Rate {appName}"
+msgstr "Beri Nilai {appName}"
+
 msgid "Rate limit exceeded."
 msgstr "Batas laju terlampaui."
-
-msgid "Rate Superset"
-msgstr "Beri Nilai Superset"
 
 msgid "Reach this Mac from anywhere via the Superset relay, or spin up cloud workspaces. Connect from any client."
 msgstr "Jangkau Mac ini dari mana saja lewat relay Superset, atau jalankan workspace cloud. Hubungkan dari klien mana pun."
@@ -14423,8 +14432,8 @@ msgstr "Mulai ulang daemon terminal?"
 msgid "Restart terminals"
 msgstr "Mulai ulang terminal"
 
-msgid "Restart to use the latest version of Superset."
-msgstr "Mulai ulang untuk menggunakan versi terbaru Superset."
+msgid "Restart to use the latest version of {appName}."
+msgstr "Mulai ulang untuk menggunakan versi terbaru {appName}."
 
 msgid "Restart workspace"
 msgstr "Mulai ulang workspace"
@@ -16855,9 +16864,6 @@ msgstr "Superset digunakan oleh engineer di Netflix, Microsoft, NVIDIA, DoorDash
 msgid "Superset isn't on Windows yet"
 msgstr "Superset baru tersedia untuk Mac"
 
-msgid "Superset may be closed"
-msgstr "Superset mungkin ditutup"
-
 msgid "Superset may sign you back in after restart. Please try signing out again."
 msgstr "Superset mungkin memasukkan Anda lagi setelah mulai ulang. Silakan coba keluar sekali lagi."
 
@@ -16873,9 +16879,6 @@ msgstr "Diff kode Superset Mobile di iPhone"
 msgid "Superset mobile gives me the power of my desktop anywhere I go."
 msgstr "Superset mobile memberi saya kekuatan desktop ke mana pun saya pergi."
 
-msgid "Superset Mobile is part of Pro"
-msgstr "Superset Mobile termasuk dalam Pro"
-
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile hadir di iPhone"
 
@@ -16884,9 +16887,6 @@ msgstr "Superset Mobile memungkinkan developer melanjutkan workspace Superset ya
 
 msgid "Superset Mobile page"
 msgstr "Halaman Superset Mobile"
-
-msgid "Superset Mobile runs agents on the computers you connect."
-msgstr "Superset Mobile menjalankan agen di komputer yang Anda hubungkan."
 
 msgid "Superset Mobile terminal on iPhone"
 msgstr "Terminal Superset Mobile di iPhone"
@@ -17971,8 +17971,8 @@ msgstr "Ini hanya mengubah nama tampilan, bukan branch-nya."
 msgid "this organization"
 msgstr "organisasi ini"
 
-msgid "This organization is on the Free plan. Superset Mobile is available for organizations on Pro."
-msgstr "Organisasi ini memakai paket Gratis. Superset Mobile tersedia untuk organisasi dengan paket Pro."
+msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
+msgstr "Organisasi ini memakai paket Gratis. {appName} Mobile tersedia untuk organisasi dengan paket Pro."
 
 msgid "This page could not be loaded"
 msgstr "Halaman ini tidak bisa dimuat"
@@ -18799,6 +18799,9 @@ msgstr "Terbaru"
 msgid "Update"
 msgstr "Perbarui"
 
+msgid "Update {appName} on this machine to attach files"
+msgstr "Perbarui {appName} di mesin ini untuk melampirkan file"
+
 msgid "Update available"
 msgstr "Pembaruan tersedia"
 
@@ -18841,9 +18844,6 @@ msgstr "Pembaruan Diperlukan"
 
 msgid "Update Superset on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "Perbarui Superset di perangkat tersebut. Pembaruan dari aplikasi memerlukan instalasi mandiri yang didukung dan versi aplikasi yang telah dirilis."
-
-msgid "Update Superset on this machine to attach files"
-msgstr "Perbarui Superset di mesin ini untuk melampirkan file"
 
 msgid "update the branch prefix"
 msgstr "memperbarui prefix branch"
@@ -19292,8 +19292,8 @@ msgstr "Kami tidak bisa menagih metode pembayaran Anda. Perbarui untuk mempertah
 msgid "We couldn't detect a package manager or environment config."
 msgstr "Kami tidak menemukan package manager atau konfigurasi environment."
 
-msgid "We couldn’t reach Superset to see if it’s online. Check your connection and try again."
-msgstr "Kami tidak dapat menghubungi Superset untuk melihat apakah perangkat ini online. Periksa koneksi Anda dan coba lagi."
+msgid "We couldn’t reach {appName} to see if it’s online. Check your connection and try again."
+msgstr "Kami tidak dapat menghubungi {appName} untuk melihat apakah perangkat ini online. Periksa koneksi Anda dan coba lagi."
 
 msgid "We couldn't reach the device. Please try again in a moment."
 msgstr "Perangkat tidak dapat dijangkau. Coba lagi sebentar lagi."
@@ -19396,6 +19396,9 @@ msgstr "Catatan rilis mingguan"
 
 msgid "Welcome back"
 msgstr "Selamat datang kembali"
+
+msgid "Welcome to {appName}"
+msgstr "Selamat datang di {appName}"
 
 msgid "Welcome to Superset"
 msgstr "Selamat datang di Superset"

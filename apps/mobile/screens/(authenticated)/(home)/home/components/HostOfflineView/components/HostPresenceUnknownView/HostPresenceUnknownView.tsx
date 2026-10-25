@@ -1,4 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import { BRAND } from "@superset/shared/brand";
 import { WifiOff } from "lucide-react-native";
 import { useState } from "react";
 import { View } from "react-native";
@@ -9,6 +10,7 @@ import { useRefreshHostsPresence } from "../../hooks/useRefreshHostsPresence";
 
 export function HostPresenceUnknownView({ hostName }: { hostName: string }) {
 	const { t } = useLingui();
+	const appName = BRAND.NAME;
 	const refreshPresence = useRefreshHostsPresence();
 	const [checking, setChecking] = useState(false);
 
@@ -27,7 +29,7 @@ export function HostPresenceUnknownView({ hostName }: { hostName: string }) {
 				</Text>
 				<Text className="text-center text-sm leading-5 text-muted-foreground">
 					<Trans>
-						We couldn’t reach Superset to see if it’s online. Check your
+						We couldn’t reach {appName} to see if it’s online. Check your
 						connection and try again.
 					</Trans>
 				</Text>

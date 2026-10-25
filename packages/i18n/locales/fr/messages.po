@@ -452,14 +452,14 @@ msgid "{0} is offline."
 msgstr "{0} est hors ligne."
 
 #. placeholder {0}: activeOrganization.name
-msgid "{0} is on the Free plan. Superset Mobile is available for organizations on Pro."
-msgstr "{0} utilise le forfait Free. Superset Mobile est disponible pour les organisations avec le forfait Pro."
+msgid "{0} is on the Free plan. {appName} Mobile is available for organizations on Pro."
+msgstr "{0} utilise le forfait Free. {appName} Mobile est disponible pour les organisations avec le forfait Pro."
 
 #. placeholder {0}: host?.name ?? t({ message: "This host" })
 #. placeholder {1}: hostCompatibility.hostVersion
 #. placeholder {2}: hostCompatibility.minVersion
-msgid "{0} is running host service {1} — this app needs {2} or newer. Update Superset on that machine."
-msgstr "{0} exécute le service d'hôte {1} — cette application nécessite la version {2} ou plus récente. Mettez à jour Superset sur cette machine."
+msgid "{0} is running host service {1} — this app needs {2} or newer. Update {appName} on that machine."
+msgstr "{0} exécute le service d'hôte {1} — cette application nécessite la version {2} ou plus récente. Mettez à jour {appName} sur cette machine."
 
 #. placeholder {0}: displayName(name)
 #. placeholder {0}: displayName(variables.name)
@@ -711,6 +711,15 @@ msgstr "Les sessions {agents} reprennent quand vous ouvrez leur espace de travai
 
 msgid "{amount} ({hoursLabel} GB-hours)"
 msgstr "{amount} ({hoursLabel} Go-heures)"
+
+msgid "{appName} may be closed"
+msgstr "{appName} est peut-être fermé"
+
+msgid "{appName} Mobile is part of Pro"
+msgstr "{appName} Mobile fait partie de Pro"
+
+msgid "{appName} Mobile runs agents on the computers you connect."
+msgstr "{appName} Mobile exécute des agents sur les ordinateurs que vous connectez."
 
 msgid "{approvalCount, plural, one {# needs approval} other {# need approval}}"
 msgstr "{approvalCount, plural, one {# en attente d’approbation} other {# en attente d’approbation}}"
@@ -6528,6 +6537,10 @@ msgstr "Rétrogradation..."
 msgid "Download"
 msgstr "Télécharger"
 
+#. placeholder {0}: COMPANY.DOMAIN
+msgid "Download {appName} at <0>{0}/download</0>."
+msgstr "Téléchargez {appName} sur <0>{0}/download</0>."
+
 msgid "Download {name}"
 msgstr "Télécharger {name}"
 
@@ -6563,10 +6576,6 @@ msgstr "Télécharger un modèle de départ"
 
 msgid "Download Superset"
 msgstr "Télécharger Superset"
-
-#. placeholder {0}: COMPANY.DOMAIN
-msgid "Download Superset at <0>{0}/download</0>."
-msgstr "Téléchargez Superset sur <0>{0}/download</0>."
 
 msgid "Download the theme file above."
 msgstr "Téléchargez le fichier de thème ci-dessus."
@@ -8961,11 +8970,11 @@ msgstr "En cours"
 msgid "In review"
 msgstr "En révision"
 
+msgid "In the {appName} desktop app, open Settings → Remote Access and turn on “Allow remote access to this device via relay”."
+msgstr "Dans l'application de bureau {appName}, ouvrez Paramètres → Accès distant et activez « Autoriser l'accès distant à cet appareil via le relais »."
+
 msgid "In the Superset desktop app, open <0>Settings → Appearance → Theme</0>."
 msgstr "Dans l'application de bureau Superset, ouvrez <0>Paramètres → Apparence → Thème</0>."
-
-msgid "In the Superset desktop app, open Settings → Remote Access and turn on “Allow remote access to this device via relay”."
-msgstr "Dans l'application de bureau Superset, ouvrez Paramètres → Accès distant et activez « Autoriser l'accès distant à cet appareil via le relais »."
 
 msgid "In under a year, more than 145,000 developers across 180 countries have run Superset and created over 1.85 million agent workspaces."
 msgstr "En moins d’un an, plus de 145 000 développeurs dans 180 pays ont utilisé Superset et créé plus de 1,85 million d’espaces de travail d’agents."
@@ -11998,6 +12007,9 @@ msgstr "Ouvrir {0}"
 msgid "Open {0} website"
 msgstr "Ouvrir le site de {0}"
 
+msgid "Open {appName} on that computer"
+msgstr "Ouvrez {appName} sur cet ordinateur"
+
 msgid "Open {displayName}"
 msgstr "Ouvrir {displayName}"
 
@@ -12339,9 +12351,6 @@ msgstr "Ouvrir le panneau"
 
 msgid "Open ship options"
 msgstr "Ouvrir les options d'envoi"
-
-msgid "Open Superset on that computer"
-msgstr "Ouvrez Superset sur cet ordinateur"
 
 msgid "Open System Settings"
 msgstr "Ouvrir les Réglages Système"
@@ -13655,11 +13664,11 @@ msgstr "Classer par"
 msgid "Rank your agent usage against other engineers. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "Comparez votre utilisation des agents à celle d'autres ingénieurs. Uniquement le nombre de tokens et les noms de modèles, aucun nom de dépôt, chemin de fichier ni prompt."
 
+msgid "Rate {appName}"
+msgstr "Noter {appName}"
+
 msgid "Rate limit exceeded."
 msgstr "Limite de débit dépassée."
-
-msgid "Rate Superset"
-msgstr "Noter Superset"
 
 msgid "Reach this Mac from anywhere via the Superset relay, or spin up cloud workspaces. Connect from any client."
 msgstr "Accédez à ce Mac depuis n'importe où via le relais Superset, ou lancez des espaces de travail cloud. Connectez-vous depuis n'importe quel client."
@@ -14423,8 +14432,8 @@ msgstr "Redémarrer le démon de terminal ?"
 msgid "Restart terminals"
 msgstr "Redémarrer les terminaux"
 
-msgid "Restart to use the latest version of Superset."
-msgstr "Redémarrez pour utiliser la dernière version de Superset."
+msgid "Restart to use the latest version of {appName}."
+msgstr "Redémarrez pour utiliser la dernière version de {appName}."
 
 msgid "Restart workspace"
 msgstr "Redémarrer l'espace de travail"
@@ -16855,9 +16864,6 @@ msgstr "Superset est utilisé par des ingénieurs de Netflix, Microsoft, NVIDIA,
 msgid "Superset isn't on Windows yet"
 msgstr "Superset est réservé au Mac pour l'instant"
 
-msgid "Superset may be closed"
-msgstr "Superset est peut-être fermé"
-
 msgid "Superset may sign you back in after restart. Please try signing out again."
 msgstr "Superset pourrait vous reconnecter après un redémarrage. Veuillez réessayer de vous déconnecter."
 
@@ -16873,9 +16879,6 @@ msgstr "Diff de code dans Superset Mobile sur iPhone"
 msgid "Superset mobile gives me the power of my desktop anywhere I go."
 msgstr "Superset mobile me donne la puissance de mon ordinateur partout où je vais."
 
-msgid "Superset Mobile is part of Pro"
-msgstr "Superset Mobile fait partie de Pro"
-
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile arrive sur iPhone"
 
@@ -16884,9 +16887,6 @@ msgstr "Superset Mobile permet aux développeurs de reprendre depuis un iPhone l
 
 msgid "Superset Mobile page"
 msgstr "Page Superset Mobile"
-
-msgid "Superset Mobile runs agents on the computers you connect."
-msgstr "Superset Mobile exécute des agents sur les ordinateurs que vous connectez."
 
 msgid "Superset Mobile terminal on iPhone"
 msgstr "Terminal de Superset Mobile sur iPhone"
@@ -17971,8 +17971,8 @@ msgstr "Cela ne change que le nom affiché, pas la branche."
 msgid "this organization"
 msgstr "cette organisation"
 
-msgid "This organization is on the Free plan. Superset Mobile is available for organizations on Pro."
-msgstr "Cette organisation utilise le forfait Free. Superset Mobile est disponible pour les organisations avec le forfait Pro."
+msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
+msgstr "Cette organisation utilise le forfait Free. {appName} Mobile est disponible pour les organisations avec le forfait Pro."
 
 msgid "This page could not be loaded"
 msgstr "Cette page n'a pas pu être chargée"
@@ -18799,6 +18799,9 @@ msgstr "À jour"
 msgid "Update"
 msgstr "Mettre à jour"
 
+msgid "Update {appName} on this machine to attach files"
+msgstr "Mettez à jour {appName} sur cette machine pour joindre des fichiers"
+
 msgid "Update available"
 msgstr "Mise à jour disponible"
 
@@ -18841,9 +18844,6 @@ msgstr "Mise à jour requise"
 
 msgid "Update Superset on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "Mettez à jour Superset sur cet appareil. Les mises à jour depuis l’application nécessitent une installation autonome compatible et une version publiée de l’application."
-
-msgid "Update Superset on this machine to attach files"
-msgstr "Mettez à jour Superset sur cette machine pour joindre des fichiers"
 
 msgid "update the branch prefix"
 msgstr "mettre à jour le préfixe de branche"
@@ -19292,8 +19292,8 @@ msgstr "Nous n'avons pas pu débiter votre moyen de paiement. Mettez-le à jour 
 msgid "We couldn't detect a package manager or environment config."
 msgstr "Nous n'avons pas pu détecter de gestionnaire de paquets ni de configuration d'environnement."
 
-msgid "We couldn’t reach Superset to see if it’s online. Check your connection and try again."
-msgstr "Nous n'avons pas pu joindre Superset pour voir s'il est en ligne. Vérifiez votre connexion et réessayez."
+msgid "We couldn’t reach {appName} to see if it’s online. Check your connection and try again."
+msgstr "Nous n'avons pas pu joindre {appName} pour voir s'il est en ligne. Vérifiez votre connexion et réessayez."
 
 msgid "We couldn't reach the device. Please try again in a moment."
 msgstr "Impossible de joindre l’appareil. Réessayez dans un instant."
@@ -19396,6 +19396,9 @@ msgstr "Notes de version hebdomadaires"
 
 msgid "Welcome back"
 msgstr "Bon retour"
+
+msgid "Welcome to {appName}"
+msgstr "Bienvenue dans {appName}"
 
 msgid "Welcome to Superset"
 msgstr "Bienvenue dans Superset"

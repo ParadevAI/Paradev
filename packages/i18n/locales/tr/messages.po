@@ -452,14 +452,14 @@ msgid "{0} is offline."
 msgstr "{0} çevrimdışı."
 
 #. placeholder {0}: activeOrganization.name
-msgid "{0} is on the Free plan. Superset Mobile is available for organizations on Pro."
-msgstr "{0} Ücretsiz planda. Superset Mobile, Pro planındaki kuruluşlar için kullanılabilir."
+msgid "{0} is on the Free plan. {appName} Mobile is available for organizations on Pro."
+msgstr "{0} Ücretsiz planda. {appName} Mobile, Pro planındaki kuruluşlar için kullanılabilir."
 
 #. placeholder {0}: host?.name ?? t({ message: "This host" })
 #. placeholder {1}: hostCompatibility.hostVersion
 #. placeholder {2}: hostCompatibility.minVersion
-msgid "{0} is running host service {1} — this app needs {2} or newer. Update Superset on that machine."
-msgstr "{0} üzerinde host hizmeti {1} çalışıyor — bu uygulama {2} veya daha yenisini gerektiriyor. O makinede Superset'i güncelleyin."
+msgid "{0} is running host service {1} — this app needs {2} or newer. Update {appName} on that machine."
+msgstr "{0} üzerinde host hizmeti {1} çalışıyor — bu uygulama {2} veya daha yenisini gerektiriyor. O makinede {appName}'i güncelleyin."
 
 #. placeholder {0}: displayName(name)
 #. placeholder {0}: displayName(variables.name)
@@ -711,6 +711,15 @@ msgstr "{agents} oturumları, çalışma alanlarını açtığınızda devam ede
 
 msgid "{amount} ({hoursLabel} GB-hours)"
 msgstr "{amount} ({hoursLabel} GB-saat)"
+
+msgid "{appName} may be closed"
+msgstr "{appName} kapalı olabilir"
+
+msgid "{appName} Mobile is part of Pro"
+msgstr "{appName} Mobile, Pro'nun bir parçasıdır"
+
+msgid "{appName} Mobile runs agents on the computers you connect."
+msgstr "{appName} Mobile, ajanları bağladığınız bilgisayarlarda çalıştırır."
 
 msgid "{approvalCount, plural, one {# needs approval} other {# need approval}}"
 msgstr "{approvalCount, plural, other {# onay bekliyor}}"
@@ -6528,6 +6537,10 @@ msgstr "Düşürülüyor..."
 msgid "Download"
 msgstr "İndir"
 
+#. placeholder {0}: COMPANY.DOMAIN
+msgid "Download {appName} at <0>{0}/download</0>."
+msgstr "{appName}'i <0>{0}/download</0> adresinden indirin."
+
 msgid "Download {name}"
 msgstr "{name} temasını indir"
 
@@ -6563,10 +6576,6 @@ msgstr "Başlangıç dosyasını indir"
 
 msgid "Download Superset"
 msgstr "Superset'i indir"
-
-#. placeholder {0}: COMPANY.DOMAIN
-msgid "Download Superset at <0>{0}/download</0>."
-msgstr "Superset'i <0>{0}/download</0> adresinden indirin."
 
 msgid "Download the theme file above."
 msgstr "Yukarıdaki tema dosyasını indirin."
@@ -8961,11 +8970,11 @@ msgstr "Devam ediyor"
 msgid "In review"
 msgstr "İncelemede"
 
+msgid "In the {appName} desktop app, open Settings → Remote Access and turn on “Allow remote access to this device via relay”."
+msgstr "{appName} masaüstü uygulamasında Ayarlar → Uzaktan erişim bölümünü açın ve “Bu cihaza röle üzerinden uzaktan erişime izin ver” seçeneğini açın."
+
 msgid "In the Superset desktop app, open <0>Settings → Appearance → Theme</0>."
 msgstr "Superset masaüstü uygulamasında <0>Ayarlar → Görünüm → Tema</0> bölümünü açın."
-
-msgid "In the Superset desktop app, open Settings → Remote Access and turn on “Allow remote access to this device via relay”."
-msgstr "Superset masaüstü uygulamasında Ayarlar → Uzaktan erişim bölümünü açın ve “Bu cihaza röle üzerinden uzaktan erişime izin ver” seçeneğini açın."
 
 msgid "In under a year, more than 145,000 developers across 180 countries have run Superset and created over 1.85 million agent workspaces."
 msgstr "Bir yıldan kısa sürede 180 ülkeden 145.000'den fazla geliştirici Superset'i çalıştırdı ve 1,85 milyondan fazla ajan çalışma alanı oluşturdu."
@@ -11998,6 +12007,9 @@ msgstr "Aç: {0}"
 msgid "Open {0} website"
 msgstr "{0} web sitesini aç"
 
+msgid "Open {appName} on that computer"
+msgstr "O bilgisayarda {appName}'i açın"
+
 msgid "Open {displayName}"
 msgstr "{displayName}'i aç"
 
@@ -12339,9 +12351,6 @@ msgstr "Sayfayı aç"
 
 msgid "Open ship options"
 msgstr "Gönderim seçeneklerini aç"
-
-msgid "Open Superset on that computer"
-msgstr "O bilgisayarda Superset'i açın"
 
 msgid "Open System Settings"
 msgstr "Sistem Ayarları'nı aç"
@@ -13655,11 +13664,11 @@ msgstr "Sıralama ölçütü"
 msgid "Rank your agent usage against other engineers. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "Ajan kullanımınızı diğer mühendislerle karşılaştırın. Yalnızca token sayıları ve model adları; depo adı, dosya yolu veya istem yok."
 
+msgid "Rate {appName}"
+msgstr "{appName}'i puanla"
+
 msgid "Rate limit exceeded."
 msgstr "Hız sınırı aşıldı."
-
-msgid "Rate Superset"
-msgstr "Superset'i puanla"
 
 msgid "Reach this Mac from anywhere via the Superset relay, or spin up cloud workspaces. Connect from any client."
 msgstr "Superset rölesi üzerinden bu Mac'e her yerden erişin veya bulut çalışma alanları başlatın. Herhangi bir istemciden bağlanın."
@@ -14423,8 +14432,8 @@ msgstr "Terminal daemon'u yeniden başlatılsın mı?"
 msgid "Restart terminals"
 msgstr "Terminalleri yeniden başlat"
 
-msgid "Restart to use the latest version of Superset."
-msgstr "Superset'in en son sürümünü kullanmak için yeniden başlatın."
+msgid "Restart to use the latest version of {appName}."
+msgstr "{appName}'in en son sürümünü kullanmak için yeniden başlatın."
 
 msgid "Restart workspace"
 msgstr "Çalışma alanını yeniden başlat"
@@ -16855,9 +16864,6 @@ msgstr "Superset dünya genelinde Netflix, Microsoft, NVIDIA, DoorDash, Wix ve M
 msgid "Superset isn't on Windows yet"
 msgstr "Superset şimdilik yalnızca Mac'te"
 
-msgid "Superset may be closed"
-msgstr "Superset kapalı olabilir"
-
 msgid "Superset may sign you back in after restart. Please try signing out again."
 msgstr "Superset yeniden başlattıktan sonra sizi tekrar oturuma alabilir. Lütfen yeniden oturum kapatmayı deneyin."
 
@@ -16873,9 +16879,6 @@ msgstr "iPhone'da Superset Mobile kod diff'i"
 msgid "Superset mobile gives me the power of my desktop anywhere I go."
 msgstr "Superset mobil, nereye gidersem gideyim masaüstümün gücünü bana sunuyor."
 
-msgid "Superset Mobile is part of Pro"
-msgstr "Superset Mobile, Pro'nun bir parçasıdır"
-
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile iPhone'da yayında"
 
@@ -16884,9 +16887,6 @@ msgstr "Superset Mobile ile geliştiriciler, bilgisayarlarında zaten kullandık
 
 msgid "Superset Mobile page"
 msgstr "Superset Mobile sayfası"
-
-msgid "Superset Mobile runs agents on the computers you connect."
-msgstr "Superset Mobile, ajanları bağladığınız bilgisayarlarda çalıştırır."
 
 msgid "Superset Mobile terminal on iPhone"
 msgstr "iPhone'da Superset Mobile terminali"
@@ -17971,8 +17971,8 @@ msgstr "Bu yalnızca görünen adı değiştirir, dalı değil."
 msgid "this organization"
 msgstr "bu kuruluş"
 
-msgid "This organization is on the Free plan. Superset Mobile is available for organizations on Pro."
-msgstr "Bu kuruluş Ücretsiz planda. Superset Mobile, Pro planındaki kuruluşlar için kullanılabilir."
+msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
+msgstr "Bu kuruluş Ücretsiz planda. {appName} Mobile, Pro planındaki kuruluşlar için kullanılabilir."
 
 msgid "This page could not be loaded"
 msgstr "Bu sayfa yüklenemedi"
@@ -18799,6 +18799,9 @@ msgstr "Güncel"
 msgid "Update"
 msgstr "Güncelle"
 
+msgid "Update {appName} on this machine to attach files"
+msgstr "Dosya eklemek için bu makinede {appName}'i güncelleyin"
+
 msgid "Update available"
 msgstr "Güncelleme mevcut"
 
@@ -18841,9 +18844,6 @@ msgstr "Güncelleme gerekli"
 
 msgid "Update Superset on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "Superset’i o cihazda güncelleyin. Uygulama içinden güncelleme için desteklenen bağımsız bir kurulum ve yayımlanmış bir uygulama sürümü gerekir."
-
-msgid "Update Superset on this machine to attach files"
-msgstr "Dosya eklemek için bu makinede Superset'i güncelleyin"
 
 msgid "update the branch prefix"
 msgstr "dal ön ekini güncelleme"
@@ -19292,8 +19292,8 @@ msgstr "Ödeme yönteminizden tahsilat yapamadık. Bu planı sürdürmek için g
 msgid "We couldn't detect a package manager or environment config."
 msgstr "Bir paket yöneticisi veya ortam yapılandırması bulamadık."
 
-msgid "We couldn’t reach Superset to see if it’s online. Check your connection and try again."
-msgstr "Çevrimiçi olup olmadığını görmek için Superset'e ulaşamadık. Bağlantınızı kontrol edip tekrar deneyin."
+msgid "We couldn’t reach {appName} to see if it’s online. Check your connection and try again."
+msgstr "Çevrimiçi olup olmadığını görmek için {appName}'e ulaşamadık. Bağlantınızı kontrol edip tekrar deneyin."
 
 msgid "We couldn't reach the device. Please try again in a moment."
 msgstr "Cihaza ulaşamadık. Lütfen birazdan tekrar deneyin."
@@ -19396,6 +19396,9 @@ msgstr "Haftalık sürüm notları"
 
 msgid "Welcome back"
 msgstr "Tekrar hoş geldiniz"
+
+msgid "Welcome to {appName}"
+msgstr "{appName}'e hoş geldiniz"
 
 msgid "Welcome to Superset"
 msgstr "Superset'e hoş geldiniz"

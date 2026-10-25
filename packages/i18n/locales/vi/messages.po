@@ -452,14 +452,14 @@ msgid "{0} is offline."
 msgstr "{0} đang ngoại tuyến."
 
 #. placeholder {0}: activeOrganization.name
-msgid "{0} is on the Free plan. Superset Mobile is available for organizations on Pro."
-msgstr "{0} đang dùng gói Free. Superset Mobile chỉ dành cho tổ chức dùng gói Pro."
+msgid "{0} is on the Free plan. {appName} Mobile is available for organizations on Pro."
+msgstr "{0} đang dùng gói Free. {appName} Mobile chỉ dành cho tổ chức dùng gói Pro."
 
 #. placeholder {0}: host?.name ?? t({ message: "This host" })
 #. placeholder {1}: hostCompatibility.hostVersion
 #. placeholder {2}: hostCompatibility.minVersion
-msgid "{0} is running host service {1} — this app needs {2} or newer. Update Superset on that machine."
-msgstr "{0} đang chạy dịch vụ host {1} — ứng dụng này cần {2} trở lên. Hãy cập nhật Superset trên máy đó."
+msgid "{0} is running host service {1} — this app needs {2} or newer. Update {appName} on that machine."
+msgstr "{0} đang chạy dịch vụ host {1} — ứng dụng này cần {2} trở lên. Hãy cập nhật {appName} trên máy đó."
 
 #. placeholder {0}: displayName(name)
 #. placeholder {0}: displayName(variables.name)
@@ -711,6 +711,15 @@ msgstr "Các phiên {agents} sẽ tiếp tục khi bạn mở workspace của ch
 
 msgid "{amount} ({hoursLabel} GB-hours)"
 msgstr "{amount} ({hoursLabel} GB-giờ)"
+
+msgid "{appName} may be closed"
+msgstr "{appName} có thể đã đóng"
+
+msgid "{appName} Mobile is part of Pro"
+msgstr "{appName} Mobile thuộc gói Pro"
+
+msgid "{appName} Mobile runs agents on the computers you connect."
+msgstr "{appName} Mobile chạy agent trên những máy tính bạn kết nối."
 
 msgid "{approvalCount, plural, one {# needs approval} other {# need approval}}"
 msgstr "{approvalCount, plural, other {# cần phê duyệt}}"
@@ -6528,6 +6537,10 @@ msgstr "Đang chuyển xuống..."
 msgid "Download"
 msgstr "Tải xuống"
 
+#. placeholder {0}: COMPANY.DOMAIN
+msgid "Download {appName} at <0>{0}/download</0>."
+msgstr "Tải {appName} tại <0>{0}/download</0>."
+
 msgid "Download {name}"
 msgstr "Tải {name}"
 
@@ -6563,10 +6576,6 @@ msgstr "Tải bản mẫu"
 
 msgid "Download Superset"
 msgstr "Tải Superset"
-
-#. placeholder {0}: COMPANY.DOMAIN
-msgid "Download Superset at <0>{0}/download</0>."
-msgstr "Tải Superset tại <0>{0}/download</0>."
 
 msgid "Download the theme file above."
 msgstr "Tải tệp chủ đề ở trên."
@@ -8961,11 +8970,11 @@ msgstr "Đang thực hiện"
 msgid "In review"
 msgstr "Đang xem xét"
 
+msgid "In the {appName} desktop app, open Settings → Remote Access and turn on “Allow remote access to this device via relay”."
+msgstr "Trong ứng dụng {appName} trên máy tính, mở Cài đặt → Truy cập từ xa và bật “Cho phép truy cập từ xa vào thiết bị này qua relay”."
+
 msgid "In the Superset desktop app, open <0>Settings → Appearance → Theme</0>."
 msgstr "Trong ứng dụng Superset trên máy tính, mở <0>Cài đặt → Giao diện → Chủ đề</0>."
-
-msgid "In the Superset desktop app, open Settings → Remote Access and turn on “Allow remote access to this device via relay”."
-msgstr "Trong ứng dụng Superset trên máy tính, mở Cài đặt → Truy cập từ xa và bật “Cho phép truy cập từ xa vào thiết bị này qua relay”."
 
 msgid "In under a year, more than 145,000 developers across 180 countries have run Superset and created over 1.85 million agent workspaces."
 msgstr "Chưa đầy một năm, hơn 145.000 nhà phát triển tại 180 quốc gia đã chạy Superset và tạo hơn 1,85 triệu workspace agent."
@@ -11998,6 +12007,9 @@ msgstr "Mở {0}"
 msgid "Open {0} website"
 msgstr "Mở website {0}"
 
+msgid "Open {appName} on that computer"
+msgstr "Mở {appName} trên máy tính đó"
+
 msgid "Open {displayName}"
 msgstr "Mở {displayName}"
 
@@ -12339,9 +12351,6 @@ msgstr "Mở sheet"
 
 msgid "Open ship options"
 msgstr "Mở tùy chọn gửi"
-
-msgid "Open Superset on that computer"
-msgstr "Mở Superset trên máy tính đó"
 
 msgid "Open System Settings"
 msgstr "Mở System Settings"
@@ -13655,11 +13664,11 @@ msgstr "Xếp hạng theo"
 msgid "Rank your agent usage against other engineers. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "Xếp hạng mức dùng agent của bạn so với các kỹ sư khác. Chỉ số token và tên mô hình, không có tên repo, đường dẫn tệp hay prompt."
 
+msgid "Rate {appName}"
+msgstr "Đánh giá {appName}"
+
 msgid "Rate limit exceeded."
 msgstr "Đã vượt giới hạn tần suất."
-
-msgid "Rate Superset"
-msgstr "Đánh giá Superset"
 
 msgid "Reach this Mac from anywhere via the Superset relay, or spin up cloud workspaces. Connect from any client."
 msgstr "Truy cập chiếc Mac này từ bất cứ đâu qua relay của Superset, hoặc khởi tạo workspace trên cloud. Kết nối từ mọi thiết bị."
@@ -14423,8 +14432,8 @@ msgstr "Khởi động lại daemon terminal?"
 msgid "Restart terminals"
 msgstr "Khởi động lại terminal"
 
-msgid "Restart to use the latest version of Superset."
-msgstr "Khởi động lại để dùng phiên bản Superset mới nhất."
+msgid "Restart to use the latest version of {appName}."
+msgstr "Khởi động lại để dùng phiên bản {appName} mới nhất."
 
 msgid "Restart workspace"
 msgstr "Khởi động lại workspace"
@@ -16855,9 +16864,6 @@ msgstr "Superset được các kỹ sư tại Netflix, Microsoft, NVIDIA, DoorDa
 msgid "Superset isn't on Windows yet"
 msgstr "Hiện Superset chỉ có trên Mac"
 
-msgid "Superset may be closed"
-msgstr "Superset có thể đã đóng"
-
 msgid "Superset may sign you back in after restart. Please try signing out again."
 msgstr "Superset có thể đăng nhập lại cho bạn sau khi khởi động lại. Vui lòng thử đăng xuất lần nữa."
 
@@ -16873,9 +16879,6 @@ msgstr "Diff mã của Superset Mobile trên iPhone"
 msgid "Superset mobile gives me the power of my desktop anywhere I go."
 msgstr "Superset mobile mang sức mạnh của máy tính để bàn đến bất cứ đâu tôi đi."
 
-msgid "Superset Mobile is part of Pro"
-msgstr "Superset Mobile thuộc gói Pro"
-
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile ra mắt trên iPhone"
 
@@ -16884,9 +16887,6 @@ msgstr "Superset Mobile giúp nhà phát triển tiếp tục từ iPhone các w
 
 msgid "Superset Mobile page"
 msgstr "Trang Superset Mobile"
-
-msgid "Superset Mobile runs agents on the computers you connect."
-msgstr "Superset Mobile chạy agent trên những máy tính bạn kết nối."
 
 msgid "Superset Mobile terminal on iPhone"
 msgstr "Terminal của Superset Mobile trên iPhone"
@@ -17971,8 +17971,8 @@ msgstr "Việc này chỉ đổi tên hiển thị, không đổi nhánh."
 msgid "this organization"
 msgstr "tổ chức này"
 
-msgid "This organization is on the Free plan. Superset Mobile is available for organizations on Pro."
-msgstr "Tổ chức này đang dùng gói Free. Superset Mobile chỉ dành cho tổ chức dùng gói Pro."
+msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
+msgstr "Tổ chức này đang dùng gói Free. {appName} Mobile chỉ dành cho tổ chức dùng gói Pro."
 
 msgid "This page could not be loaded"
 msgstr "Không thể tải trang này"
@@ -18799,6 +18799,9 @@ msgstr "Mới nhất"
 msgid "Update"
 msgstr "Cập nhật"
 
+msgid "Update {appName} on this machine to attach files"
+msgstr "Hãy cập nhật {appName} trên máy này để đính kèm tệp"
+
 msgid "Update available"
 msgstr "Có bản cập nhật"
 
@@ -18841,9 +18844,6 @@ msgstr "Cần cập nhật"
 
 msgid "Update Superset on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "Cập nhật Superset trên thiết bị đó. Cập nhật từ ứng dụng yêu cầu bản cài đặt độc lập được hỗ trợ và phiên bản ứng dụng đã phát hành."
-
-msgid "Update Superset on this machine to attach files"
-msgstr "Hãy cập nhật Superset trên máy này để đính kèm tệp"
 
 msgid "update the branch prefix"
 msgstr "cập nhật tiền tố nhánh"
@@ -19292,8 +19292,8 @@ msgstr "Chúng tôi không thể trừ tiền từ phương thức thanh toán c
 msgid "We couldn't detect a package manager or environment config."
 msgstr "Chúng tôi không phát hiện được trình quản lý gói hay cấu hình môi trường."
 
-msgid "We couldn’t reach Superset to see if it’s online. Check your connection and try again."
-msgstr "Chúng tôi không thể kết nối tới Superset để xem máy có trực tuyến không. Hãy kiểm tra kết nối và thử lại."
+msgid "We couldn’t reach {appName} to see if it’s online. Check your connection and try again."
+msgstr "Chúng tôi không thể kết nối tới {appName} để xem máy có trực tuyến không. Hãy kiểm tra kết nối và thử lại."
 
 msgid "We couldn't reach the device. Please try again in a moment."
 msgstr "Không thể kết nối với thiết bị. Vui lòng thử lại sau giây lát."
@@ -19396,6 +19396,9 @@ msgstr "Ghi chú phát hành hằng tuần"
 
 msgid "Welcome back"
 msgstr "Chào mừng trở lại"
+
+msgid "Welcome to {appName}"
+msgstr "Chào mừng đến với {appName}"
 
 msgid "Welcome to Superset"
 msgstr "Chào mừng đến với Superset"

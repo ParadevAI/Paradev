@@ -452,14 +452,14 @@ msgid "{0} is offline."
 msgstr "{0}已離線。"
 
 #. placeholder {0}: activeOrganization.name
-msgid "{0} is on the Free plan. Superset Mobile is available for organizations on Pro."
-msgstr "{0}使用的是免費版。Superset Mobile面向使用專業版的組織開放。"
+msgid "{0} is on the Free plan. {appName} Mobile is available for organizations on Pro."
+msgstr "{0}使用的是免費版。{appName} Mobile面向使用專業版的組織開放。"
 
 #. placeholder {0}: host?.name ?? t({ message: "This host" })
 #. placeholder {1}: hostCompatibility.hostVersion
 #. placeholder {2}: hostCompatibility.minVersion
-msgid "{0} is running host service {1} — this app needs {2} or newer. Update Superset on that machine."
-msgstr "{0}執行的主機服務是{1} — 此應用需要{2}或更新版本。請在那臺機器上更新Superset。"
+msgid "{0} is running host service {1} — this app needs {2} or newer. Update {appName} on that machine."
+msgstr "{0}執行的主機服務是{1} — 此應用需要{2}或更新版本。請在那臺機器上更新{appName}。"
 
 #. placeholder {0}: displayName(name)
 #. placeholder {0}: displayName(variables.name)
@@ -711,6 +711,15 @@ msgstr "開啟對應工作區時，{agents} 工作階段會恢復。"
 
 msgid "{amount} ({hoursLabel} GB-hours)"
 msgstr "{amount}（{hoursLabel} GB 小時）"
+
+msgid "{appName} may be closed"
+msgstr "{appName}可能已關閉"
+
+msgid "{appName} Mobile is part of Pro"
+msgstr "{appName} Mobile屬於專業版"
+
+msgid "{appName} Mobile runs agents on the computers you connect."
+msgstr "{appName} Mobile在你連線的電腦上執行代理程式。"
 
 msgid "{approvalCount, plural, one {# needs approval} other {# need approval}}"
 msgstr "{approvalCount, plural, other {# 個需要核准}}"
@@ -6528,6 +6537,10 @@ msgstr "正在降級..."
 msgid "Download"
 msgstr "下載"
 
+#. placeholder {0}: COMPANY.DOMAIN
+msgid "Download {appName} at <0>{0}/download</0>."
+msgstr "在<0>{0}/download</0>下載{appName}。"
+
 msgid "Download {name}"
 msgstr "下載{name}"
 
@@ -6563,10 +6576,6 @@ msgstr "下載模板"
 
 msgid "Download Superset"
 msgstr "下載Superset"
-
-#. placeholder {0}: COMPANY.DOMAIN
-msgid "Download Superset at <0>{0}/download</0>."
-msgstr "在<0>{0}/download</0>下載Superset。"
 
 msgid "Download the theme file above."
 msgstr "下載上面的主題檔案。"
@@ -8961,11 +8970,11 @@ msgstr "進行中"
 msgid "In review"
 msgstr "審查中"
 
+msgid "In the {appName} desktop app, open Settings → Remote Access and turn on “Allow remote access to this device via relay”."
+msgstr "在{appName}桌面應用程式中開啟「設定 → 遠端存取」，開啟「允許遠端工作區通過中繼存取此裝置」。"
+
 msgid "In the Superset desktop app, open <0>Settings → Appearance → Theme</0>."
 msgstr "在Superset桌面應用程式中開啟<0>設定 → 外觀 → 主題</0>。"
-
-msgid "In the Superset desktop app, open Settings → Remote Access and turn on “Allow remote access to this device via relay”."
-msgstr "在Superset桌面應用程式中開啟「設定 → 遠端存取」，開啟「允許遠端工作區通過中繼存取此裝置」。"
 
 msgid "In under a year, more than 145,000 developers across 180 countries have run Superset and created over 1.85 million agent workspaces."
 msgstr "不到一年，來自 180 個國家、超過 145,000 名開發者執行過 Superset，並建立了超過 185 萬個 agent 工作區。"
@@ -11998,6 +12007,9 @@ msgstr "開啟{0}"
 msgid "Open {0} website"
 msgstr "開啟 {0} 官網"
 
+msgid "Open {appName} on that computer"
+msgstr "在那台電腦上開啟{appName}"
+
 msgid "Open {displayName}"
 msgstr "開啟{displayName}"
 
@@ -12339,9 +12351,6 @@ msgstr "開啟側邊面板"
 
 msgid "Open ship options"
 msgstr "開啟發布選項"
-
-msgid "Open Superset on that computer"
-msgstr "在那台電腦上開啟Superset"
 
 msgid "Open System Settings"
 msgstr "開啟系統設定"
@@ -13655,11 +13664,11 @@ msgstr "排序依據"
 msgid "Rank your agent usage against other engineers. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "把你的代理程式用量與其他工程師排名比較。僅包含token數量和模型名稱，不含儲存庫名、檔案路徑或提示詞。"
 
+msgid "Rate {appName}"
+msgstr "為{appName}評分"
+
 msgid "Rate limit exceeded."
 msgstr "超出速率限制。"
-
-msgid "Rate Superset"
-msgstr "為Superset評分"
 
 msgid "Reach this Mac from anywhere via the Superset relay, or spin up cloud workspaces. Connect from any client."
 msgstr "通過Superset中繼從任何地方連上這臺Mac，或啟動雲端工作區。可從任意客戶端連線。"
@@ -14423,8 +14432,8 @@ msgstr "重啟終端守護程式？"
 msgid "Restart terminals"
 msgstr "重啟終端"
 
-msgid "Restart to use the latest version of Superset."
-msgstr "重新啟動以使用最新版本的 Superset。"
+msgid "Restart to use the latest version of {appName}."
+msgstr "重新啟動以使用最新版本的 {appName}。"
 
 msgid "Restart workspace"
 msgstr "重新啟動工作區"
@@ -16855,9 +16864,6 @@ msgstr "在全球，Netflix、Microsoft、NVIDIA、DoorDash、Wix 與 Mistral AI
 msgid "Superset isn't on Windows yet"
 msgstr "Superset目前僅支援Mac"
 
-msgid "Superset may be closed"
-msgstr "Superset可能已關閉"
-
 msgid "Superset may sign you back in after restart. Please try signing out again."
 msgstr "重啟後Superset可能會重新登入。請再次嘗試登出。"
 
@@ -16873,9 +16879,6 @@ msgstr "iPhone 上的 Superset Mobile 程式碼差異"
 msgid "Superset mobile gives me the power of my desktop anywhere I go."
 msgstr "無論走到哪裡，Superset 手機版都讓我擁有桌上型電腦的能力。"
 
-msgid "Superset Mobile is part of Pro"
-msgstr "Superset Mobile屬於專業版"
-
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile 登上 iPhone"
 
@@ -16884,9 +16887,6 @@ msgstr "透過 Superset Mobile，開發者可以在 iPhone 上繼續使用他們
 
 msgid "Superset Mobile page"
 msgstr "Superset Mobile 頁面"
-
-msgid "Superset Mobile runs agents on the computers you connect."
-msgstr "Superset Mobile在你連線的電腦上執行代理程式。"
 
 msgid "Superset Mobile terminal on iPhone"
 msgstr "iPhone 上的 Superset Mobile 終端"
@@ -17971,8 +17971,8 @@ msgstr "這只會更改顯示名稱，不會更改分支。"
 msgid "this organization"
 msgstr "此組織"
 
-msgid "This organization is on the Free plan. Superset Mobile is available for organizations on Pro."
-msgstr "此組織使用的是免費版。Superset Mobile面向使用專業版的組織開放。"
+msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
+msgstr "此組織使用的是免費版。{appName} Mobile面向使用專業版的組織開放。"
 
 msgid "This page could not be loaded"
 msgstr "無法載入這個頁面"
@@ -18799,6 +18799,9 @@ msgstr "已是最新"
 msgid "Update"
 msgstr "更新"
 
+msgid "Update {appName} on this machine to attach files"
+msgstr "請在這臺機器上更新{appName}以附加檔案"
+
 msgid "Update available"
 msgstr "有可用更新"
 
@@ -18841,9 +18844,6 @@ msgstr "需要更新"
 
 msgid "Update Superset on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "請在該裝置上更新 Superset。應用程式內更新需要受支援的獨立安裝和已發佈的應用程式版本。"
-
-msgid "Update Superset on this machine to attach files"
-msgstr "請在這臺機器上更新Superset以附加檔案"
 
 msgid "update the branch prefix"
 msgstr "更新分支字首"
@@ -19292,8 +19292,8 @@ msgstr "我們無法從你的支付方式扣款。請更新支付方式以保留
 msgid "We couldn't detect a package manager or environment config."
 msgstr "我們沒有檢測到包管理器或環境配置。"
 
-msgid "We couldn’t reach Superset to see if it’s online. Check your connection and try again."
-msgstr "無法連線到Superset以確認它是否在線上。請檢查網路連線後再試一次。"
+msgid "We couldn’t reach {appName} to see if it’s online. Check your connection and try again."
+msgstr "無法連線到{appName}以確認它是否在線上。請檢查網路連線後再試一次。"
 
 msgid "We couldn't reach the device. Please try again in a moment."
 msgstr "暫時無法連上裝置，請稍後重試。"
@@ -19396,6 +19396,9 @@ msgstr "每週釋出說明"
 
 msgid "Welcome back"
 msgstr "歡迎回來"
+
+msgid "Welcome to {appName}"
+msgstr "歡迎使用{appName}"
 
 msgid "Welcome to Superset"
 msgstr "歡迎使用Superset"
