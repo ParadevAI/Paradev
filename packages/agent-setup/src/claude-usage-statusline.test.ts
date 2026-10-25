@@ -340,7 +340,9 @@ process.stdin.on("end", () => {
 	const host = Bun.serve({
 		port: 0,
 		async fetch(request) {
-			const body = await request.json();
+			const body = (await request.json()) as {
+				json: { nativeClaudeUsage: { session_id: string } };
+			};
 			expect(body.json.nativeClaudeUsage.session_id).toBe("owned");
 			requests++;
 			writeFileSync(marker, "received");

@@ -93,6 +93,8 @@ or the value arrives empty.
 
 ## Launcher-owned runtime values
 
+`SUPERSET_NATIVE_CLAUDE_USAGE` is a local host opt-in for passive Claude subscription measurements. Only `1` enables it; the default is off. The host passes it through an explicitly selected account's new terminal command and consumes ACP metadata through that account's immutable launch context. It does not retrofit running terminals or change provider settings. This runtime preference is not a cloud API secret and does not belong in shared environment templates or deployment workflows.
+
 `SUPERSET_HOST_INSTALL_SOURCE` is set by the desktop coordinator (`desktop`) or standalone CLI spawner (`cli`) on the host child process. A checkout may set `dev`; absent/unrecognized values report `unknown`. This is install provenance, not an API deployment setting: do not put it in shared `.env` templates or deployment secrets. The host ignores login-shell values for this key. In-place updates additionally require a standalone entrypoint and a valid install layout.
 
 `SUPERSET_AGENT_LAUNCH_ID` is set by the outer agent wrapper to a process-and-start-time identifier. Hook children inherit it so a new launch in the same terminal cannot inherit the previous login attribution. It is runtime metadata, not a deployment secret or user setting; it does not belong in `.env` templates or deploy workflows.
