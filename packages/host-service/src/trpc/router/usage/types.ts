@@ -127,5 +127,4 @@ export interface UsageAccount {
 	sourceId?: string;
 	resetCredits?: UsageResetCredits;
 	resetNotice?: UsageResetNotice;
-	discoveryFailed?: boolean;
 }
