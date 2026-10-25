@@ -1,10 +1,12 @@
-import { expect, test } from "bun:test";
+import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { DatabaseSync } from "node:sqlite";
+import { test } from "node:test";
+import { fileURLToPath } from "node:url";
 
-const migrations = join(import.meta.dir, "../../drizzle");
+const migrations = fileURLToPath(new URL("../../drizzle", import.meta.url));
 test("appearance migration preserves existing projects and scopes account colors to their organization and host", () => {
 	const db = new DatabaseSync(":memory:");
 	try {
@@ -35,9 +37,10 @@ test("appearance migration preserves existing projects and scopes account colors
 				"utf8",
 			),
 		);
-		expect(
+		assert.deepEqual(
 			db.prepare("SELECT * FROM projects WHERE id = ?").get("project"),
-		).toEqual(before);
+			before,
+		);
 		const insert = db.prepare(
 			"INSERT INTO usage_widget_appearances (organization_id, host_id, account_id, color, label, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
 		);
@@ -58,12 +61,13 @@ test("appearance migration preserves existing projects and scopes account colors
 			"Other org",
 			1002,
 		);
-		expect(
-			db
-				.prepare("SELECT count(*) AS count FROM usage_widget_appearances")
-				.get(),
-		).toEqual({ count: 3 });
-		expect(() =>
+		assert.equal(
+			db.prepare("SELECT count(*) AS count FROM usage_widget_appearances").get()
+				?.count,
+			3,
+		);
+
+		assert.throws(() =>
 			insert.run(
 				"org-a",
 				"host-a",
@@ -72,14 +76,17 @@ test("appearance migration preserves existing projects and scopes account colors
 				"Duplicate",
 				1003,
 			),
-		).toThrow();
-		expect(
-			db
-				.prepare(
-					"SELECT color, label FROM usage_widget_appearances WHERE organization_id = ? AND host_id = ? AND account_id = ?",
-				)
-				.get("org-a", "host-a", "opaque-account"),
-		).toEqual({ color: "#00FF80", label: "Work" });
+		);
+		assert.deepEqual(
+			{
+				...db
+					.prepare(
+						"SELECT color, label FROM usage_widget_appearances WHERE organization_id = ? AND host_id = ? AND account_id = ?",
+					)
+					.get("org-a", "host-a", "opaque-account"),
+			},
+			{ color: "#00FF80", label: "Work" },
+		);
 	} finally {
 		db.close();
 	}
