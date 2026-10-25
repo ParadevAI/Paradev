@@ -5,16 +5,19 @@ import type {
 
 interface Source {
 	key: string;
+	scope?: string;
 	load: (force: boolean) => Promise<UsageAccount[]>;
 }
 interface Entry {
 	key: string;
+	scope?: string;
 	observation: HostUsageObservation;
 	pending?: Promise<HostUsageObservation>;
 	forced: boolean;
 	queuedForce?: Promise<HostUsageObservation | null>;
 	lastForced: number;
 }
+const MAX_OBSERVED_HOSTS = 128;
 export function createHostUsageStore(
 	resolve: (hostUrl: string) => Source | null,
 	now = Date.now,
@@ -36,34 +39,76 @@ export function createHostUsageStore(
 		const previous = entries.get(hostUrl);
 		if (!source) {
 			if (previous) {
-				if (!previous.observation.offline) {
-					previous.observation = {
-						...previous.observation,
-						version: ++version,
-						loading: false,
-						offline: true,
+				if (
+					!previous.observation.offline ||
+					previous.pending ||
+					previous.observation.loading
+				) {
+					const disconnected: Entry = {
+						...previous,
+						pending: undefined,
+						queuedForce: undefined,
+						forced: false,
+						observation: {
+							...previous.observation,
+							version: ++version,
+							loading: false,
+							offline: true,
+						},
 					};
-					publish(previous.observation);
+					entries.set(hostUrl, disconnected);
+					publish(disconnected.observation);
+					return { source: null, entry: disconnected };
 				}
 				return { source: null, entry: previous };
 			}
 			return null;
 		}
-		if (previous?.key === source.key) return { source, entry: previous };
+		if (previous?.key === source.key && previous.scope === source.scope)
+			return { source, entry: previous };
+		const sameScope = source.scope
+			? [...entries].filter(
+					([url, entry]) => url !== hostUrl && entry.scope === source.scope,
+				)
+			: [];
+		const retained =
+			source.scope && previous?.scope === source.scope
+				? previous
+				: sameScope.at(-1)?.[1];
+		const retired: HostUsageObservation[] = [];
+		const retire = (url: string) => {
+			entries.delete(url);
+			retired.push({
+				hostUrl: url,
+				version: ++version,
+				data: null,
+				loading: false,
+				offline: true,
+				invalidated: true,
+			});
+		};
+		for (const [url] of sameScope) retire(url);
+		while (!entries.has(hostUrl) && entries.size >= MAX_OBSERVED_HOSTS) {
+			const oldest = entries.keys().next().value;
+			if (oldest === undefined) break;
+			retire(oldest);
+		}
 		const entry: Entry = {
 			forced: false,
 			key: source.key,
+			scope: source.scope,
 			observation: {
 				hostUrl,
 				version: ++version,
 				data: null,
 				loading: false,
 				offline: false,
-				invalidated: !!previous,
+				invalidated: !!previous || sameScope.length > 0,
 			},
-			lastForced: -Infinity,
+			lastForced: retained?.lastForced ?? -Infinity,
 		};
 		entries.set(hostUrl, entry);
+		for (const observation of retired) publish(observation);
 		publish(entry.observation);
 		return { source, entry };
 	}
@@ -99,9 +144,13 @@ export function createHostUsageStore(
 			version: ++version,
 			loading: true,
 		};
-		publish(entry.observation);
 		const operation = Promise.resolve()
-			.then(() => source.load(manual))
+			.then(() => {
+				const latest = current(hostUrl);
+				if (latest?.entry !== entry || !latest.source)
+					throw new Error("Usage source changed before the request.");
+				return source.load(manual);
+			})
 			.then(
 				(data) => ({ data, offline: false }),
 				() => ({ data: entry.observation.data, offline: true }),
@@ -135,6 +184,7 @@ export function createHostUsageStore(
 				return entry.observation;
 			});
 		entry.pending = operation;
+		publish(entry.observation);
 		return operation;
 	}
 	return {
@@ -142,6 +192,32 @@ export function createHostUsageStore(
 			return current(hostUrl)?.entry.observation ?? null;
 		},
 		read,
+		invalidate(onlyHostUrl?: string) {
+			const invalidated = [...entries].filter(
+				([url]) => !onlyHostUrl || url === onlyHostUrl,
+			);
+			for (const [hostUrl, previous] of invalidated) {
+				const entry: Entry = {
+					key: previous.key,
+					scope: previous.scope,
+					forced: false,
+					lastForced: previous.lastForced,
+					observation: {
+						hostUrl,
+						version: ++version,
+						data: null,
+						loading: false,
+						offline: true,
+						invalidated: true,
+					},
+				};
+				entries.set(hostUrl, entry);
+			}
+			for (const [hostUrl] of invalidated) {
+				const entry = entries.get(hostUrl);
+				if (entry) publish(entry.observation);
+			}
+		},
 		subscribe(listener: (value: HostUsageObservation) => void) {
 			listeners.add(listener);
 			return () => {

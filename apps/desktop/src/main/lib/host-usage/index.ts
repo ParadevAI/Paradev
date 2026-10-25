@@ -14,6 +14,7 @@ const hostUrls = new Map<string, Set<string>>();
 let started = false;
 
 export const hostUsageObservations = createHostUsageStore((hostUrl) => {
+	if (!started) return null;
 	const coordinator = getHostServiceCoordinator();
 	for (const organizationId of coordinator.getActiveOrganizationIds()) {
 		const connection = coordinator.getConnection(organizationId);
@@ -42,6 +43,7 @@ export const hostUsageObservations = createHostUsageStore((hostUrl) => {
 			],
 		});
 		return {
+			scope: JSON.stringify([organizationId, connection.machineId]),
 			key: JSON.stringify([
 				epoch,
 				hostEpochs.get(organizationId) ?? 0,
@@ -68,7 +70,7 @@ const reset = () => {
 const statusChanged = ({ organizationId }: HostServiceStatusEvent) => {
 	hostEpochs.set(organizationId, (hostEpochs.get(organizationId) ?? 0) + 1);
 	for (const url of hostUrls.get(organizationId) ?? [])
-		hostUsageObservations.clear(url);
+		hostUsageObservations.invalidate(url);
 	hostUrls.delete(organizationId);
 };
 export function startHostUsageObservations() {

@@ -158,3 +158,186 @@ test("subscriber failure and refresh throttling do not lose healthy readings", a
 	expect(forced).toEqual([true, false, true]);
 	expect(store.peek(host)?.offline).toBe(false);
 });
+
+test("reconnecting before an old flight settles starts a fresh read", async () => {
+	const older = deferred<UsageAccount[]>();
+	let available = true;
+	let calls = 0;
+	const store = createHostUsageStore(() =>
+		available
+			? {
+					key: "same-runtime",
+					load: async () =>
+						++calls === 1 ? older.promise : quota("reconnected"),
+				}
+			: null,
+	);
+	const first = store.read(host);
+	await Promise.resolve();
+	available = false;
+	expect(store.peek(host)?.offline).toBe(true);
+	available = true;
+	const next = store.read(host);
+	await Promise.resolve();
+	older.resolve(quota("disconnected"));
+	const [stale, current] = await Promise.all([first, next]);
+	expect(calls).toBe(2);
+	expect(current?.data?.[0]?.accountKey).toBe("reconnected");
+	expect(stale?.data).toEqual(current?.data);
+	expect(store.peek(host)?.data).toEqual(current?.data);
+});
+
+test("a subscriber reading a loading observation joins the registered flight", async () => {
+	const pending = deferred<UsageAccount[]>();
+	let calls = 0;
+	let subscribed = false;
+	let nested:
+		| ReturnType<ReturnType<typeof createHostUsageStore>["read"]>
+		| undefined;
+	const store = createHostUsageStore(() => ({
+		key: "a",
+		load: async () => {
+			calls++;
+			return pending.promise;
+		},
+	}));
+	store.subscribe((observation) => {
+		if (!observation.loading || subscribed) return;
+		subscribed = true;
+		nested = store.read(host);
+	});
+	const first = store.read(host);
+	pending.resolve(quota("a"));
+	const [a, b] = await Promise.all([first, nested]);
+	expect(calls).toBe(1);
+	expect(b).toBe(a);
+});
+
+test("same-machine runtime replacement retains only the manual refresh guard", async () => {
+	let now = 0;
+	let key = "runtime-a";
+	let scope = "org:machine-a";
+	const forced: boolean[] = [];
+	const store = createHostUsageStore(
+		() => ({
+			key,
+			scope,
+			load: async (force) => {
+				forced.push(force);
+				return quota(key);
+			},
+		}),
+		() => now,
+	);
+	await store.read(host, true);
+	key = "runtime-b";
+	now = 1;
+	expect(store.peek(host)?.data).toBeNull();
+	await store.read(host, true);
+	scope = "org:machine-b";
+	now = 2;
+	expect(store.peek(host)?.data).toBeNull();
+	await store.read(host, true);
+	expect(forced).toEqual([true, false, true]);
+});
+
+test("a new authoritative port retires the old URL without resetting its refresh guard", async () => {
+	let url = host;
+	const forced: boolean[] = [];
+	const store = createHostUsageStore((requested) =>
+		requested === url
+			? {
+					key: url,
+					scope: "org:machine",
+					load: async (force) => {
+						forced.push(force);
+						return quota(url);
+					},
+				}
+			: null,
+	);
+	await store.read(url, true);
+	url = "http://127.0.0.1:5678";
+	expect(store.peek(url)?.data).toBeNull();
+	expect(store.peek(host)).toBeNull();
+	await store.read(url, true);
+	expect(forced).toEqual([true, false]);
+});
+
+test("the main observation inventory stays bounded", async () => {
+	const store = createHostUsageStore((url) => ({
+		key: url,
+		load: async () => quota(url),
+	}));
+	for (let i = 0; i < 129; i++) await store.read(`host-${i}`);
+	expect(store.peek("host-128")?.data?.[0]?.accountKey).toBe("host-128");
+	expect(store.peek("host-0")?.data).toBeNull();
+});
+
+test("source invalidation discards pending data and queued refreshes but keeps the same-scope guard", async () => {
+	const pending = deferred<UsageAccount[]>();
+	const forces: boolean[] = [];
+	let now = 0;
+	const store = createHostUsageStore(
+		() => ({
+			key: "a",
+			scope: "org:machine",
+			load: async (force) => {
+				forces.push(force);
+				return forces.length === 2 ? pending.promise : quota("accepted");
+			},
+		}),
+		() => now,
+	);
+	await store.read(host, true);
+	const normal = store.read(host);
+	await Promise.resolve();
+	now = 30_000;
+	const queued = store.read(host, true);
+	store.invalidate(host);
+	expect(store.peek(host)).toMatchObject({
+		data: null,
+		offline: true,
+		invalidated: true,
+	});
+	pending.resolve(quota("discarded"));
+	expect((await normal)?.data).toBeNull();
+	expect((await queued)?.data).toBeNull();
+	expect(forces).toEqual([true, false]);
+	await store.read(host, true);
+	expect(forces).toEqual([true, false, true]);
+	store.invalidate(host);
+	await store.read(host, true);
+	expect(forces).toEqual([true, false, true, false]);
+});
+
+test("a source revoked before admission never starts the request", async () => {
+	let available = true;
+	let calls = 0;
+	const store = createHostUsageStore(() =>
+		available
+			? {
+					key: "a",
+					load: async () => {
+						calls++;
+						return quota("revoked");
+					},
+				}
+			: null,
+	);
+	const pending = store.read(host);
+	available = false;
+	expect((await pending)?.offline).toBe(true);
+	expect(calls).toBe(0);
+});
+
+test("an ordinary settled read still checks the host without a desktop freshness cache", async () => {
+	let calls = 0;
+	const store = createHostUsageStore(() => ({
+		key: "a",
+		load: async () => quota(`reading-${++calls}`),
+	}));
+	await store.read(host);
+	expect((await store.read(host))?.data?.[0]?.accountKey).toBe("reading-2");
+	expect(calls).toBe(2);
+});
