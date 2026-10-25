@@ -15,9 +15,9 @@ import { useEffect, useId, useRef, useState } from "react";
 import {
 	accountKey,
 	bestRemainingAccount,
-	launchAccountQuota,
 	type LaunchAccount,
 	type LaunchQuota,
+	launchAccountQuota,
 } from "./launchAccountQuota";
 
 interface AccountTerminalFormProps {
@@ -71,7 +71,8 @@ export function AccountTerminalForm({
 	const recommendedKey = recommendation ? accountKey(recommendation) : null;
 	useEffect(() => {
 		// Choose once. Refreshes never replace a manual choice or another login.
-		if (selected === null && recommendedKey !== null) setSelected(recommendedKey);
+		if (selected === null && recommendedKey !== null)
+			setSelected(recommendedKey);
 	}, [selected, recommendedKey]);
 	const account = accounts.find((entry) => accountKey(entry) === selected);
 	const selectionChanged = selected !== null && !account;
@@ -186,11 +187,19 @@ export function AccountTerminalForm({
 									{quota ? (
 										<span className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
 											{quota.windows.map((window) => {
-												const remaining = Math.round((100 - window.usedPercent) * 10) / 10;
+												const remaining =
+													Math.round((100 - window.usedPercent) * 10) / 10;
 												return (
-													<span key={window.id} className="inline-flex flex-wrap gap-x-1 tabular-nums">
+													<span
+														key={window.id}
+														className="inline-flex flex-wrap gap-x-1 tabular-nums"
+													>
 														<span>{window.label}</span>
-														<span className={remaining <= 10 ? "text-destructive" : undefined}>
+														<span
+															className={
+																remaining <= 10 ? "text-destructive" : undefined
+															}
+														>
 															<Trans>{remaining}% remaining</Trans>
 														</span>
 													</span>

@@ -1,9 +1,9 @@
 import { expect, test } from "bun:test";
 import {
 	bestRemainingAccount,
-	launchAccountQuota,
 	type LaunchAccount,
 	type LaunchQuota,
+	launchAccountQuota,
 } from "./launchAccountQuota";
 
 const now = Date.parse("2026-10-25T12:00:00Z");
@@ -30,17 +30,34 @@ function quota(overrides: Partial<LaunchQuota> = {}): LaunchQuota {
 	};
 }
 
+function fixtureWindow(reading: LaunchQuota, index: number) {
+	const window = reading.windows[index];
+	if (!window) throw new Error("Missing fixture quota window");
+	return window;
+}
+
 test("uses the tightest reported basic limit and ignores model-only caps", () => {
 	const reading = quota();
-	reading.windows.push({ id: "seven_day_sonnet", label: "Sonnet", usedPercent: 100, resetsAt: null });
-	expect(launchAccountQuota(account, "claude", [reading], now)?.remaining).toBe(60);
+	reading.windows.push({
+		id: "seven_day_sonnet",
+		label: "Sonnet",
+		usedPercent: 100,
+		resetsAt: null,
+	});
+	expect(launchAccountQuota(account, "claude", [reading], now)?.remaining).toBe(
+		60,
+	);
 });
 
 test("recognizes a reported weekly-only plan without inventing a session", () => {
 	const reading = quota({ agent: "codex" });
-	reading.windows = [reading.windows[1]!];
-	expect(launchAccountQuota(account, "codex", [reading], now)?.windows).toHaveLength(1);
-	expect(bestRemainingAccount([account], "codex", [reading], now)).toBe(account);
+	reading.windows = [fixtureWindow(reading, 1)];
+	expect(
+		launchAccountQuota(account, "codex", [reading], now)?.windows,
+	).toHaveLength(1);
+	expect(bestRemainingAccount([account], "codex", [reading], now)).toBe(
+		account,
+	);
 });
 
 test("refuses unknown, stale, exhausted, future or mismatched readings", () => {
@@ -54,10 +71,16 @@ test("refuses unknown, stale, exhausted, future or mismatched readings", () => {
 		quota({ email: "other@example.test" }),
 		quota({ credentialKind: "api_key" }),
 		quota({ windows: [] }),
-		quota({ windows: [{ id: "five_hour", label: "Session", usedPercent: 100, resetsAt: null }] }),
+		quota({
+			windows: [
+				{ id: "five_hour", label: "Session", usedPercent: 100, resetsAt: null },
+			],
+		}),
 	];
 	for (const reading of invalid)
-		expect(bestRemainingAccount([account], "claude", [reading], now)).toBeUndefined();
+		expect(
+			bestRemainingAccount([account], "claude", [reading], now),
+		).toBeUndefined();
 });
 
 test("per-window age and reset expiry override a fresh outer collection", () => {
@@ -69,23 +92,57 @@ test("per-window age and reset expiry override a fresh outer collection", () => 
 		{ usedPercent: Number.NaN },
 	]) {
 		const reading = quota();
-		Object.assign(reading.windows[0]!, extra);
-		expect(bestRemainingAccount([account], "claude", [reading], now)).toBeUndefined();
+		Object.assign(fixtureWindow(reading, 0), extra);
+		expect(
+			bestRemainingAccount([account], "claude", [reading], now),
+		).toBeUndefined();
 	}
 });
 
 test("ambiguous duplicate profiles and partial passive Claude data are not recommended", () => {
-	expect(bestRemainingAccount([account], "claude", [quota(), quota()], now)).toBeUndefined();
-	const partial = quota({ windows: [{ id: "five_hour", label: "Session", usedPercent: 1, resetsAt: null, source: "claude_statusline" }] });
-	expect(launchAccountQuota(account, "claude", [partial], now)?.remaining).toBe(99);
-	expect(bestRemainingAccount([account], "claude", [partial], now)).toBeUndefined();
+	expect(
+		bestRemainingAccount([account], "claude", [quota(), quota()], now),
+	).toBeUndefined();
+	const partial = quota({
+		windows: [
+			{
+				id: "five_hour",
+				label: "Session",
+				usedPercent: 1,
+				resetsAt: null,
+				source: "claude_statusline",
+			},
+		],
+	});
+	expect(launchAccountQuota(account, "claude", [partial], now)?.remaining).toBe(
+		99,
+	);
+	expect(
+		bestRemainingAccount([account], "claude", [partial], now),
+	).toBeUndefined();
 });
 
 test("ranks only listed immutable choices and uses the default as a tie breaker", () => {
 	const firstQuota = quota();
 	const secondQuota = quota({ selection: second.selection, isDefault: true });
-	expect(bestRemainingAccount([account, second], "claude", [firstQuota, secondQuota], now)).toBe(second);
-	secondQuota.windows[1]!.usedPercent = 80;
-	expect(bestRemainingAccount([account, second], "claude", [firstQuota, secondQuota], now)).toBe(account);
-	expect(bestRemainingAccount([account], "claude", [secondQuota], now)).toBeUndefined();
+	expect(
+		bestRemainingAccount(
+			[account, second],
+			"claude",
+			[firstQuota, secondQuota],
+			now,
+		),
+	).toBe(second);
+	fixtureWindow(secondQuota, 1).usedPercent = 80;
+	expect(
+		bestRemainingAccount(
+			[account, second],
+			"claude",
+			[firstQuota, secondQuota],
+			now,
+		),
+	).toBe(account);
+	expect(
+		bestRemainingAccount([account], "claude", [secondQuota], now),
+	).toBeUndefined();
 });

@@ -30,7 +30,9 @@ export interface LaunchQuota {
 
 const MAX_QUOTA_AGE_MS = 6 * 60_000;
 
-export function accountKey(account: Pick<LaunchAccount, "selection" | "identity">) {
+export function accountKey(
+	account: Pick<LaunchAccount, "selection" | "identity">,
+) {
 	return JSON.stringify([account.selection, account.identity]);
 }
 
@@ -116,7 +118,11 @@ export function bestRemainingAccount(
 			quota.remaining > best.remaining ||
 			(quota.remaining === best.remaining && quota.isDefault && !best.isDefault)
 		)
-			best = { account, remaining: quota.remaining, isDefault: quota.isDefault };
+			best = {
+				account,
+				remaining: quota.remaining,
+				isDefault: quota.isDefault,
+			};
 	}
 	return best?.account;
 }

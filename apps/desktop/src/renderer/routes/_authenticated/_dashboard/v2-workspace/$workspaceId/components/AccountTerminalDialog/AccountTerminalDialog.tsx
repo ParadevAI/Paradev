@@ -44,7 +44,9 @@ export function AccountTerminalDialog({
 		retry: false,
 		staleTime: 0,
 	});
-	const provider = choices.find((config) => config.id === selectedConfigId)?.presetId;
+	const provider = choices.find(
+		(config) => config.id === selectedConfigId,
+	)?.presetId;
 	const quota = useQuery({
 		queryKey: [...HOST_USAGE_QUOTA_QUERY_KEY, hostUrl],
 		enabled: Boolean(hostUrl && accounts.data?.supported),
@@ -91,7 +93,7 @@ export function AccountTerminalDialog({
 				onConfigChange={setConfigId}
 				accounts={accounts.data?.supported ? accounts.data.accounts : []}
 				provider={provider}
-				quotas={quota.isError ? [] : quota.data ?? []}
+				quotas={quota.isError ? [] : (quota.data ?? [])}
 				loading={
 					configs.isPending || (selectedConfigExists && accounts.isPending)
 				}
