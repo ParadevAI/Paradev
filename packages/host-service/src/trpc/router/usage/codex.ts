@@ -5,7 +5,6 @@
  */
 
 import { createHash } from "node:crypto";
-import { readFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { assertCodexFileCredentialStore } from "./codex-quota-config";
