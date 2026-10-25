@@ -21,7 +21,7 @@ import {
 } from "./launchAccountQuota";
 
 interface AccountTerminalFormProps {
-	mode?: "start" | "resume";
+	mode?: "start" | "resume" | "chat";
 	configs: Array<{ id: string; label: string }>;
 	configId: string;
 	onConfigChange: (id: string) => void;
@@ -256,6 +256,8 @@ export function AccountTerminalForm({
 						{launching && <Loader2 className="size-4 animate-spin" />}
 						{mode === "resume" ? (
 							<Trans>Resume conversation</Trans>
+						) : mode === "chat" ? (
+							<Trans>Start chat</Trans>
 						) : (
 							(submitLabel ?? <Trans>Start terminal</Trans>)
 						)}
