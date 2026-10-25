@@ -1,14 +1,14 @@
-import { afterAll, expect, mock, setSystemTime, test } from "bun:test";
+import { afterAll, expect, mock, setSystemTime, spyOn, test } from "bun:test";
 import { createHash } from "node:crypto";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-mock.module("./profiles", () => ({
-	discoverClaudeProfiles: async () => [],
-	keychainServicesForConfigDir: () => [],
-	readKeychainSecrets: async () => [],
-}));
+const profiles = await import("./profiles");
+const keychainServices = spyOn(
+	profiles,
+	"keychainServicesForConfigDir",
+).mockReturnValue([]);
 const directory = mkdtempSync(join(tmpdir(), "native-quota-integration-"));
 const profile = join(directory, "profile");
 mkdirSync(profile, { mode: 0o700 });
@@ -69,6 +69,7 @@ globalThis.fetch = mock(async (input: string | URL | Request) => {
 }) as unknown as typeof fetch;
 setSystemTime(initial);
 afterAll(() => {
+	keychainServices.mockRestore();
 	globalThis.fetch = originalFetch;
 	setSystemTime();
 	if (originalHome === undefined) delete process.env.HOME;
