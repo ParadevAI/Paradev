@@ -44,8 +44,10 @@ describe("computeChecksStatus", () => {
 		expect(computeChecksStatus(checks("pending", "failure"))).toBe("failure");
 	});
 
-	test("cancelled beats pending", () => {
-		expect(computeChecksStatus(checks("pending", "cancelled"))).toBe("failure");
+	test("pending beats cancelled while other checks still run", () => {
+		expect(computeChecksStatus(checks("success", "pending", "cancelled"))).toBe(
+			"pending",
+		);
 	});
 
 	test("pending beats success and skipped", () => {
