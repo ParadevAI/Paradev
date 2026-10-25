@@ -31,6 +31,7 @@ import type { AutomationLastRun } from "renderer/routes/_authenticated/_dashboar
 import type { ProjectOption } from "renderer/routes/_authenticated/components/DashboardNewWorkspaceModal/components/DashboardNewWorkspaceForm/PromptGroup/types";
 import { ProjectThumbnail } from "renderer/routes/_authenticated/components/ProjectThumbnail";
 import { RUN_STATUS_META } from "../../utils/runStatus";
+import { runWorkspaceSearch } from "../../utils/runWorkspaceSearch";
 import { AutomationActionsMenuItems } from "./components/AutomationActionsMenuItems";
 
 type AutomationListItem = RouterOutputs["automation"]["list"][number];
@@ -121,9 +122,7 @@ export function AutomationRow({
 		navigate({
 			to: "/v2-workspace/$workspaceId",
 			params: { workspaceId: lastRun.workspaceId },
-			search: {
-				terminalId: lastRun.terminalSessionId ?? undefined,
-			},
+			search: runWorkspaceSearch(lastRun),
 		});
 	};
 

@@ -1,0 +1,93 @@
+---
+title: A Mobile Simulator Pane and Page Sharing
+date: 2026-10-18
+image: /changelog/2026-10-18-mobile-pane-hero.png
+version: 1.39.0
+highlights:
+  - icon: tablet
+    title: A Mobile pane
+    description: Run iOS simulators and Android emulators right next to your agent with ⌘⇧M
+  - icon: users
+    title: Share pages with people and teams
+    description: Invite a teammate, a team, or someone outside your org, and pick view or comment access
+  - icon: git-pull-request
+    title: PR activity timeline
+    description: Comments, reviews, threads, and commits in one stream, with resolved threads folded
+  - icon: terminal
+    title: Add a host over SSH
+    description: Turn any machine you can SSH into into a host from Settings → Hosts
+---
+
+## A Mobile Pane for Simulators and Emulators <PRBadge url="https://github.com/superset-sh/superset/pull/8280" />
+
+Run your app on an iOS simulator or Android emulator in a pane beside the agent that is building it.
+
+- Pick any simulator or emulator from the device menu; a shut-down device boots when you choose it
+- Home, Screenshot, and Rotate keys under the screen, plus Back and Recent apps on Android and Reload for React Native apps
+
+Press ⌘⇧M to split the current pane with a mobile simulator. You need Xcode for iOS or the Android SDK for Android.
+
+## Share Pages with People and Teams <PRBadge url="https://github.com/superset-sh/superset/pull/8318" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8317" />
+
+A page no longer has to be private or visible to the whole org. Share it with one teammate, a team, or someone outside your org, and choose what they can do.
+
+- Give each person **Can view** or **Can comment**, and set general access to only invited people, your org, or anyone with the link
+- People outside your org get an invite, and their access starts when they join
+- Pages shared with you collect under a new **Shared with me** tab
+- Comments can carry up to four images: attach, paste, or drag them in, and agents reading the thread can fetch the screenshot <PRBadge url="https://github.com/superset-sh/superset/pull/7875" />
+
+Open a page and click **Share** to invite someone.
+
+![The Share popover open over a page, with the invite field, people with access, and general access](/changelog/2026-10-18-share-page.png)
+
+## Pull Request Activity Timeline <PRBadge url="https://github.com/superset-sh/superset/pull/8398" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8428" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8429" />
+
+The pull request page's comments section is now an **Activity** rail: comments, reviews, review threads, and commits in one stream, oldest first.
+
+- Reply to a review thread from the rail, and long comments fold behind **Show more**
+- Resolved and outdated threads fold to a single line, so open threads stay on top
+- GitHub pull request links in chat, markdown, pages, and the terminal open the pull request pane instead of a browser
+
+![A pull request page with the Activity rail highlighted: pushed commits and a review comment in one stream](/changelog/2026-10-18-pr-activity.png)
+
+## Add a Host over SSH <PRBadge url="https://github.com/superset-sh/superset/pull/8396" />
+
+Go to **Settings → Hosts → Set up a host over SSH**, enter the SSH destination, and Superset installs and registers the host in an embedded terminal. Passwords, MFA, and host-key prompts work as in any terminal. From a terminal, the same thing is one command:
+
+```bash
+superset hosts add user@my-box
+```
+
+![The Set up a host over SSH dialog over Settings → Hosts, with an SSH destination entered](/changelog/2026-10-18-host-over-ssh.png)
+
+## A New Name Later This Month
+
+Superset will have a new name later this month. Only the name, logo, website, and email domain change: your account, workspaces, links, and the `superset` command keep working. Read the [announcement](/blog/a-new-name).
+
+## Improvements
+
+- **Release notes in the app** - after an update, the sidebar shows a card for the new release, and clicking it opens its highlights <PRBadge url="https://github.com/superset-sh/superset/pull/8563" />
+- **Nested task labels** - a label like `acme/website` creates its parent, and the new **Label** filter in the Tasks view (or `superset tasks list --labels acme`) matches a label and everything under it <PRBadge url="https://github.com/superset-sh/superset/pull/8466" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8458" />
+- **Business invoices** - checkout now takes a legal business name and VAT or tax ID, and both show on every invoice <PRBadge url="https://github.com/superset-sh/superset/pull/8452" />
+- **Worktree folders named from your prompt** - a new workspace's folder takes its name from the prompt instead of a random word pair <PRBadge url="https://github.com/superset-sh/superset/pull/8370" />
+- **Clearer connection status** - connecting and reconnecting show as a small pill at the top of the workspace instead of a strip along the bottom <PRBadge url="https://github.com/superset-sh/superset/pull/8530" />
+- **"GitHub unreachable" says why** - hover the notice to see which machine is affected, the error it hit, and when it retries <PRBadge url="https://github.com/superset-sh/superset/pull/8558" />
+- **Autumn plugin** - connect Autumn from **Plugins** so agents can read customers, plans, and balances <PRBadge url="https://github.com/superset-sh/superset/pull/8593" />
+- **Superset for iPhone** - queued messages open in a sheet with **Send now**, and sent images show in the chat bubble and open full screen <PRBadge url="https://github.com/superset-sh/superset/pull/8479" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8496" />
+- Experimental: the redesigned chat behind the early-access `acp-chat` flag gets ⌘F find, dictation, images the agent reads or captures, long pastes folded into cards, an image gallery, and undo for a closed chat tab <PRBadge url="https://github.com/superset-sh/superset/pull/8403" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8499" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8404" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8577" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8573" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8383" />
+
+---
+
+**Bug fixes**
+
+- ⌘C copies a selection made inside Codex and Claude Code, and keys typed while a terminal attaches are no longer lost <PRBadge url="https://github.com/superset-sh/superset/pull/8456" />
+- Claude Code scrolls with native acceleration again <PRBadge url="https://github.com/superset-sh/superset/pull/8521" />
+- Design mode notes go into the agent's input again instead of being sent right away <PRBadge url="https://github.com/superset-sh/superset/pull/8603" />
+- A terminal opened from the tab bar **+** menu keeps focus <PRBadge url="https://github.com/superset-sh/superset/pull/8602" />
+- Plugin tools work in agents for people in more than one organization <PRBadge url="https://github.com/superset-sh/superset/pull/8450" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8414" />
+- Gmail triggers keep firing for connections made through the Gmail plugin <PRBadge url="https://github.com/superset-sh/superset/pull/8580" />
+- File change detection no longer goes silent, and no longer leaves macOS `fseventsd` using gigabytes of memory <PRBadge url="https://github.com/superset-sh/superset/pull/8539" />
+- The Changes diff refreshes once a missing base branch is fetched <PRBadge url="https://github.com/superset-sh/superset/pull/8299" />
+- Updating a task no longer clears its assignee <PRBadge url="https://github.com/superset-sh/superset/pull/8457" />
+- Pro prices show the same amount and billing period everywhere <PRBadge url="https://github.com/superset-sh/superset/pull/8605" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8608" />
+- Deleting a workspace works when its repository and worktree were both moved or deleted outside Superset <PRBadge url="https://github.com/superset-sh/superset/pull/8597" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8600" />

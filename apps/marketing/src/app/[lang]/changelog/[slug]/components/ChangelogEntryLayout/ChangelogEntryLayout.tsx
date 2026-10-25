@@ -88,6 +88,8 @@ export function ChangelogEntryLayout({
 						<img
 							src={entry.image}
 							alt={entry.title}
+							width={entry.imageSize?.width}
+							height={entry.imageSize?.height}
 							className="w-full h-auto"
 						/>
 					</div>

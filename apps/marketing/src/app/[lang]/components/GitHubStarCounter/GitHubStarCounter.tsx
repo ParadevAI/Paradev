@@ -3,6 +3,7 @@ import { useLingui } from "@lingui/react/macro";
 import { COMPANY } from "@superset/shared/constants";
 import { formatStarCount } from "@superset/shared/github-stars";
 import { getGitHubStars } from "../../utils/getGitHubStars";
+import { TrackedLink } from "../TrackedLink";
 
 export async function GitHubStarCounter() {
 	const { i18n } = useLingui();
@@ -13,8 +14,10 @@ export async function GitHubStarCounter() {
 	}
 
 	return (
-		<a
+		<TrackedLink
 			href={COMPANY.GITHUB_URL}
+			event="github_clicked"
+			properties={{ source: "header" }}
 			target="_blank"
 			rel="noopener noreferrer"
 			className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors p-1"
@@ -38,6 +41,6 @@ export async function GitHubStarCounter() {
 			<span className="font-mono text-xs tabular-nums">
 				{formatStarCount(stars)}
 			</span>
-		</a>
+		</TrackedLink>
 	);
 }

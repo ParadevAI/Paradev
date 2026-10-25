@@ -10,7 +10,13 @@ on:
       - packages/i18n/**
       - packages/db/**
       - packages/auth/**
+      - packages/chat/**
+      - packages/cloud-client/**
       - "!**/*.md"
+
+defaults:
+  tools:
+    bun: 1.4.3
 
 jobs:
   publish:

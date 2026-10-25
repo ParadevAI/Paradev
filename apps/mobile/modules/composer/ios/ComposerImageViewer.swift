@@ -14,7 +14,7 @@ import UIKit
 /// are explicitly out of scope. Both ✕ and Done therefore do the same thing —
 /// they are the reference's cancel/confirm pair with nothing to cancel yet.
 struct ComposerImageViewer: View {
-  let attachment: ComposerAttachment
+  let uri: String
   let onClose: () -> Void
 
   @State private var image: UIImage?
@@ -67,7 +67,7 @@ struct ComposerImageViewer: View {
     }
     // Keyed on the URI so reopening a different attachment reloads rather than
     // showing the previous one until the new decode lands.
-    .task(id: attachment.uri) { image = await Self.load(attachment.uri) }
+    .task(id: uri) { image = await Self.load(uri) }
   }
 
   /// Decoding a full-resolution photo takes long enough to drop frames on the

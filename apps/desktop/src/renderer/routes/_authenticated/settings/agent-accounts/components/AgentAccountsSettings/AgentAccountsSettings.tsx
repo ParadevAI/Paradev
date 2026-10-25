@@ -1,6 +1,8 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { Button } from "@superset/ui/button";
 import { Check, Plus } from "lucide-react";
+import { useFeatureFlagEnabled } from "posthog-js/react";
 import { useState } from "react";
 import { AgentIcon } from "renderer/routes/_authenticated/settings/agents/components/V2AgentsSettings/components/AgentIcon";
 import {
@@ -8,6 +10,7 @@ import {
 	useAgentCredential,
 } from "../../hooks/useAgentCredential";
 import { CloudAuthDialog } from "./components/CloudAuthDialog";
+import { SupersetAccountRow } from "./components/SupersetAccountRow";
 
 /** Agents the sandbox image carries; a row per agent, like a provider list. */
 const CLOUD_AGENTS: Array<{ presetId: string; label: string }> = [
@@ -16,6 +19,7 @@ const CLOUD_AGENTS: Array<{ presetId: string; label: string }> = [
 ];
 
 export function AgentAccountsSettings() {
+	const pdevAgent = useFeatureFlagEnabled(FEATURE_FLAGS.PDEV_AGENT) === true;
 	return (
 		<div className="w-full max-w-4xl p-6">
 			<div className="mb-8">
@@ -34,6 +38,7 @@ export function AgentAccountsSettings() {
 				{CLOUD_AGENTS.map((agent) => (
 					<AgentAccountRow key={agent.presetId} {...agent} />
 				))}
+				{pdevAgent && <SupersetAccountRow label="pdev" presetId="pdev" />}
 			</div>
 		</div>
 	);
@@ -85,6 +90,7 @@ function AgentAccountRow({
 				</Button>
 			)}
 			<CloudAuthDialog
+				accountLabel={credential.accountLabel}
 				chooseMethod={credential.chooseMethod}
 				disconnect={credential.disconnect}
 				label={label}
@@ -92,6 +98,7 @@ function AgentAccountRow({
 				open={open}
 				presetId={presetId}
 				save={credential.save}
+				signedIn={credential.signedIn}
 				state={state}
 			/>
 		</div>

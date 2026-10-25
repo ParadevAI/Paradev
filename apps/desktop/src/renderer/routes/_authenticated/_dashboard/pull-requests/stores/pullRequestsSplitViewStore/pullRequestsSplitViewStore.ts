@@ -13,14 +13,12 @@ interface PullRequestsSplitViewState {
 	 *  other, since hiding both would leave nothing on screen. */
 	isDetailCollapsed: boolean;
 	width: number;
-	isResizing: boolean;
 	toggleListCollapsed: () => void;
 	toggleDetailCollapsed: () => void;
 	/** Explicitly expands the detail pane, e.g. when selecting a pull
 	 *  request — unlike toggleDetailCollapsed, this never re-collapses it. */
 	expandDetail: () => void;
 	setWidth: (width: number) => void;
-	setIsResizing: (isResizing: boolean) => void;
 }
 
 export const usePullRequestsSplitViewStore =
@@ -30,7 +28,6 @@ export const usePullRequestsSplitViewStore =
 				isListCollapsed: false,
 				isDetailCollapsed: false,
 				width: DEFAULT_PULL_REQUESTS_LIST_WIDTH,
-				isResizing: false,
 				toggleListCollapsed: () =>
 					set((state) => {
 						const isListCollapsed = !state.isListCollapsed;
@@ -59,7 +56,6 @@ export const usePullRequestsSplitViewStore =
 							Math.min(MAX_PULL_REQUESTS_LIST_WIDTH, width),
 						),
 					}),
-				setIsResizing: (isResizing) => set({ isResizing }),
 			}),
 			{
 				name: "pull-requests-split-view-state",
@@ -68,7 +64,6 @@ export const usePullRequestsSplitViewStore =
 					isListCollapsed: state.isListCollapsed,
 					isDetailCollapsed: state.isDetailCollapsed,
 					width: state.width,
-					// isResizing intentionally excluded - ephemeral UI state
 				}),
 			},
 		),

@@ -1,3 +1,5 @@
+import { billingUsesAutumn } from "@superset/auth/autumn";
+import { type CloudUsage, organizationBilling } from "@superset/auth/billing";
 import { stripeClient } from "@superset/auth/stripe";
 import { db } from "@superset/db/client";
 import { members, organizations, subscriptions } from "@superset/db/schema";
@@ -7,7 +9,9 @@ import { and, desc, eq, inArray } from "drizzle-orm";
 import type Stripe from "stripe";
 import { z } from "zod";
 import { env } from "../../env";
+import { organizationEnvironmentLimit } from "../../lib/billing/plan";
 import { protectedProcedure, userError } from "../../trpc";
+import { countEnvironments } from "../environment/limit";
 
 function subtractMonthsClamped(date: Date, months: number) {
 	const result = new Date(date);
@@ -66,8 +70,13 @@ async function requireOwnerWithCustomer(ctx: {
 
 const EMPTY_ACTIVE_PLAN = {
 	plan: "free" as const,
+	autumnPlanId: null,
+	planTier: "free",
+	/** @deprecated TODO(2027-01-31): Stripe vocabulary; read `paymentState`. */
 	status: null,
 	cancelAt: null,
+	scheduledPlanId: null,
+	scheduledAt: null,
 	periodStart: null,
 	periodEnd: null,
 	billingInterval: null,
@@ -77,6 +86,8 @@ const EMPTY_ACTIVE_PLAN = {
 	 * uses it to decide whether to ask Stripe about an unpaid invoice, and
 	 * doing that for every free organization would put a Stripe round-trip on
 	 * every app load for everyone who ever paid us.
+	 *
+	 * @deprecated TODO(2027-01-31): read `paymentState`.
 	 */
 	lapsed: false,
 };
@@ -126,7 +137,33 @@ async function isBillingOwner(userId: string, organizationId: string) {
 export const billingRouter = {
 	activePlan: protectedProcedure.query(async ({ ctx }) => {
 		const activeOrgId = ctx.activeOrganizationId;
-		if (!activeOrgId) return { ...EMPTY_ACTIVE_PLAN, organizationId: null };
+		const billingProvider = billingUsesAutumn
+			? ("autumn" as const)
+			: ("stripe" as const);
+		if (!activeOrgId) {
+			return { ...EMPTY_ACTIVE_PLAN, organizationId: null, billingProvider };
+		}
+
+		if (billingUsesAutumn) {
+			const billing = await organizationBilling(activeOrgId);
+			const date = (value: string | null) => (value ? new Date(value) : null);
+			return {
+				organizationId: activeOrgId,
+				plan: billing.tier,
+				autumnPlanId: billing.autumnPlanId ?? null,
+				planTier: billing.planTier ?? billing.tier,
+				status: billing.status,
+				cancelAt: date(billing.cancelAt),
+				scheduledPlanId: billing.scheduledPlanId ?? null,
+				scheduledAt: date(billing.scheduledAt ?? null),
+				periodStart: date(billing.periodStart),
+				periodEnd: date(billing.periodEnd),
+				billingInterval: billing.billingInterval,
+				lapsed: billing.lapsed,
+				paymentState: billing.paymentState,
+				billingProvider,
+			};
+		}
 
 		const subscription = await db.query.subscriptions.findFirst({
 			where: and(
@@ -152,20 +189,50 @@ export const billingRouter = {
 				organizationId: activeOrgId,
 				lapsed:
 					previous?.status === "canceled" || previous?.status === "unpaid",
+				billingProvider,
 			};
 		}
 
 		return {
 			organizationId: activeOrgId,
 			plan: subscription.plan,
+			autumnPlanId: null,
+			planTier: subscription.plan ?? "free",
 			status: subscription.status,
 			cancelAt: subscription.cancelAt,
+			scheduledPlanId: null,
+			scheduledAt: null,
 			periodStart: subscription.periodStart,
 			periodEnd: subscription.periodEnd,
 			billingInterval: subscription.billingInterval,
 			lapsed: false,
+			billingProvider,
 		};
 	}),
+
+	cloudUsage: protectedProcedure.query(
+		async ({ ctx }): Promise<CloudUsage | null> => {
+			const activeOrgId = ctx.activeOrganizationId;
+			if (!billingUsesAutumn || !activeOrgId) return null;
+			const billing = await organizationBilling(activeOrgId);
+			return billing.cloudUsage ?? null;
+		},
+	),
+
+	environmentUsage: protectedProcedure.query(
+		async ({ ctx }): Promise<{ used: number; limit: number | null } | null> => {
+			const activeOrgId = ctx.activeOrganizationId;
+			if (!activeOrgId) return null;
+			const [limit, used] = await Promise.all([
+				organizationEnvironmentLimit(activeOrgId),
+				countEnvironments(activeOrgId),
+			]);
+			return {
+				used,
+				limit: limit === Number.POSITIVE_INFINITY ? null : limit,
+			};
+		},
+	),
 
 	invoices: protectedProcedure.query(async ({ ctx }) => {
 		const activeOrgId = ctx.activeOrganizationId;

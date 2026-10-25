@@ -57,12 +57,14 @@ interface UseTasksTableParams {
 	filterTab: TabValue;
 	searchQuery: string;
 	assigneeFilter: string | null;
+	labelFilter: string | null;
 }
 
 export function useTasksTable({
 	filterTab,
 	searchQuery,
 	assigneeFilter,
+	labelFilter,
 }: UseTasksTableParams): TasksPagination & {
 	table: Table<TaskWithStatus>;
 	rowSelection: RowSelectionState;
@@ -85,7 +87,7 @@ export function useTasksTable({
 		hasNextTasksPage,
 		isFetchingNextTasksPage,
 		isLoadingTasks,
-	} = useTasksJoinedWithStatuses();
+	} = useTasksJoinedWithStatuses(labelFilter);
 
 	const { search } = useHybridSearch(sortedData);
 

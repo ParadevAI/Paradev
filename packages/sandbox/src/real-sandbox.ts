@@ -11,6 +11,7 @@
  */
 
 import { randomUUID } from "node:crypto";
+import { GOLDEN_BOX_VCPUS } from "@superset/shared/billing";
 import { SANDBOX_IMAGE_NAME } from "@superset/shared/constants";
 import {
 	SANDBOX_CONTRACT_VERSION,
@@ -47,8 +48,12 @@ const { buildBundle, publishBundle } = await import("./build");
 const bundle = buildBundle();
 await publishBundle(bundle, { dry: false });
 
-const { deleteSandbox, provisionSandbox, sandboxHostSecretFor, wakeSandbox } =
-	await import("@superset/trpc/lib/sandbox");
+const { deleteSandbox, provisionSandbox, wakeSandbox } = await import(
+	"@superset/trpc/lib/sandbox/vercel"
+);
+const { sandboxHostSecretFor } = await import(
+	"@superset/trpc/lib/sandbox/access"
+);
 const { checkWakeLog, probeBox } = await import("./environments/probe");
 
 const name = `ws-real-check-${Date.now().toString(36)}`;
@@ -79,6 +84,7 @@ const claim = {
 	hostSecret,
 	managedEnv: { SUPERSET_REAL_CHECK: "1" },
 	networkPolicy: "allow-all" as const,
+	vcpus: GOLDEN_BOX_VCPUS,
 };
 
 log(

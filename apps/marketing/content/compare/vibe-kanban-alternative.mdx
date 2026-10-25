@@ -1,0 +1,119 @@
+---
+title: "Best Vibe Kanban Alternatives in 2026"
+description: "Vibe Kanban is now community-maintained after bloop shut down. Compare the best alternatives for running coding agents in parallel worktrees, including Superset, Orca, Emdash, Conductor, and Claude Squad."
+date: 2026-10-20
+lastUpdated: 2026-10-20
+type: "roundup"
+competitors:
+  - vibe-kanban
+  - orca
+  - emdash
+  - conductor
+  - claude-squad
+keywords:
+  - vibe kanban alternative
+  - vibe kanban alternatives
+  - vibe kanban shutdown
+  - vibe kanban sunset
+  - vibe kanban replacement
+  - kanban for ai coding agents
+  - parallel ai coding agents
+---
+
+Vibe Kanban put a Kanban board over coding agents: plan work as issues, then start workspaces where agents run in parallel, each in its own Git worktree. On April 10, 2026, bloop, the company behind it, [announced its shutdown](https://www.vibekanban.com/blog/shutdown). The project continues as community-maintained open source, its remote services (issues, comments, projects, and organisations) were removed after 30 days, and local workspaces keep working. If you want an actively developed home for the same worktree-based workflow, Superset runs your agents in parallel worktrees and still gives you a board of tasks and workspaces.
+
+**Our recommendation: choose Superset if you want an actively developed workspace with boards, review, and remote and cloud workspaces.** The alternatives below cover other preferences, including open-source desktop apps and terminal tools.
+
+[Download Superset](/download) to try a small task, or read [Superset vs Vibe Kanban](/compare/superset-vs-vibe-kanban) for the direct comparison. This guide is published by Superset; recommendations describe workflow fit rather than benchmark results.
+
+---
+
+## The Short Version
+
+| Alternative | Best for | Platform | License |
+|---|---|---|---|
+| **Superset** | Task and workspace boards, review, automations, remote and cloud workspaces | macOS; experimental Linux AppImage; Windows unavailable; iPhone and iPad | Source-available (ELv2) |
+| **Orca** | Free cross-platform desktop ADE with mobile apps | macOS, Windows, Linux + iOS/Android | Open source (MIT) |
+| **Emdash** | Open-source ADE with issue-tracker intake | macOS, Windows, Linux | Open source (Apache-2.0) |
+| **Conductor** | Polished Mac app with team cloud workspaces | Mac + iOS | Proprietary |
+| **Claude Squad** | Terminal-native parallel agents over tmux | macOS, Linux | Open source (AGPL) |
+
+## Why Look for a Vibe Kanban Alternative?
+
+The code is still Apache-2.0 and local workspaces still run, so you do not have to move today. Common reasons to move anyway:
+
+- **Maintenance.** The company behind it has shut down. Fixes for new agent versions now depend on community contributors.
+- **Team features.** Shared issues, comments, projects, and organisations were remote services, and they are gone.
+- **Reach.** You want to run agents on other machines or in the cloud and check on them from your phone.
+- **Automation.** You want scheduled agent runs, or an API that lets agents start other agents.
+
+## The Best Alternatives
+
+### Superset
+
+Superset runs any CLI agent, such as Claude Code, Codex, OpenCode, Cursor's agent, Copilot CLI, Gemini CLI, and Amp, each in its own Git worktree with persistent terminal sessions. You keep a board: the Tasks view shows Linear and Superset tasks as a list or a kanban board, and GitHub Issues as a list, and **Run in workspace** starts a workspace with the agent already working. The Workspaces page has a board with Working, Needs attention, Needs review, and Merged columns. Around the agents, Superset adds a Changes pane that commits, pushes, and opens PRs, a pull request view with checks and review threads, and an in-app browser. Workspaces run on your machine, on hosts you add through Remote Access, or in cloud workspaces, and the [iPhone and iPad app](/mobile) reaches all of them.
+
+For the direct comparison, see [Superset vs Vibe Kanban](/compare/superset-vs-vibe-kanban).
+
+### Orca
+
+Orca is a free, MIT-licensed desktop agent development environment for macOS, Windows, and Linux. It runs agents in parallel worktrees with per-task browser tabs, Design Mode, SSH worktrees, scheduled automations, and beta iOS and Android apps. Choose it if you want to stay open source and cross-platform.
+
+See [Superset vs Orca](/compare/superset-vs-orca).
+
+### Emdash
+
+Emdash is an Apache-2.0 desktop app for macOS, Windows, and Linux that supports 34 CLI agents. It gives each task its own branch and worktree and pulls tasks from Linear, Jira, GitHub, Notion, and Asana, which makes it the closest open-source match for Vibe Kanban's issue-first planning.
+
+See [Superset vs Emdash](/compare/superset-vs-emdash).
+
+### Conductor
+
+Conductor is a Mac app that runs Claude Code, Codex, Cursor, and OpenCode in parallel workspaces. Its Pro plan at $50/month adds cloud workspaces, multiplayer, an API, and an iOS app. Choose it if your team wants shared agent conversations in a managed cloud.
+
+See [Superset vs Conductor](/compare/superset-vs-conductor).
+
+### Claude Squad
+
+Claude Squad manages multiple agents in separate worktrees inside tmux, driven from one terminal UI. It has no board, but if you only used Vibe Kanban to run parallel agents in worktrees, it does that with very little machinery.
+
+See [Superset vs Claude Squad](/compare/superset-vs-claude-squad).
+
+## How To Choose
+
+- For boards, review, automations, and remote and cloud workspaces in an actively developed app, choose **Superset**.
+- For a free, open-source, cross-platform ADE with mobile apps, choose **Orca**.
+- For open-source, issue-first planning across many trackers, choose **Emdash**.
+- For a polished Mac app with team cloud workspaces, choose **Conductor**.
+- To stay in the terminal, choose **Claude Squad**.
+
+## Verdict
+
+Vibe Kanban still runs, and the community may keep it going. If you are choosing where to put your workflow now, pick a tool with active development. Choose Superset to keep a board of tasks and workspaces, with live terminals, review, and a browser beside each agent. Move one task first and compare. For the wider landscape, see [Best Agentic IDE in 2026](/compare/best-agentic-ide).
+
+## What To Try First
+
+- **Bring your issues:** connect Linear and open the Tasks board.
+- **Run a task:** choose **Run in workspace** and pick the agent you used in Vibe Kanban.
+- **Review in place:** inspect the diff, run your checks, and open a PR from the Changes pane.
+- **Watch the board:** follow workspaces from Working to Needs review to Merged.
+
+[Download Superset](/download), then follow the [parallel-task walkthrough](/blog/parallel-coding-agents-guide).
+
+## Frequently Asked Questions
+
+### Is Vibe Kanban shutting down?
+
+bloop, the company behind Vibe Kanban, shut down on April 10, 2026. The project continues as community-maintained open source. Its remote services stayed up for 30 days and were then removed; local workspaces keep working, and the latest version includes a data export.
+
+### What is the best Vibe Kanban alternative?
+
+For an actively developed workspace with a task board, parallel worktrees, review, and remote and cloud workspaces, Superset is our recommendation. Emdash and Orca are strong open-source alternatives.
+
+### Does Superset have a kanban board?
+
+Yes. The Tasks view shows Linear and Superset tasks as a kanban board, and the Workspaces page has a board of workspaces by state.
+
+### Is there an open-source Vibe Kanban alternative?
+
+Yes. Orca (MIT), Emdash (Apache-2.0), and Claude Squad (AGPL) are open source. Superset is source-available under Elastic License 2.0.

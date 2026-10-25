@@ -30,13 +30,15 @@ function repoRoot(): string {
 const root = repoRoot();
 
 // Ports the dev:desktop stack actually binds, read from .env so this stays
-// accurate if the base moves. Names → default (base-relative) fallbacks.
+// accurate if the base moves. Names → fallbacks: base-relative, except the
+// relay, which falls back to its own default port.
 // ONLY ports each dev:desktop stack binds *exclusively* and that hard-fail on
 // conflict.
 const PORT_VARS: Record<string, number> = {
 	API_PORT: 3961,
 	DESKTOP_VITE_PORT: 3965,
 	DESKTOP_NOTIFICATIONS_PORT: 3966,
+	RELAY_PORT: 8787,
 };
 
 function readEnvPorts(): { name: string; port: number }[] {

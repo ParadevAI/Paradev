@@ -21,13 +21,13 @@ import { devtools, persist } from "zustand/middleware";
  *   1. This store + `usePortsDisplayMode` + `useInlineWorkspacePortsEnabled`.
  *   2. The mode select in `ExperimentalSettings` and its `settings-search`
  *      entry (`EXPERIMENTAL_INLINE_WORKSPACE_PORTS`).
- *   3. The mode branches in `DashboardSidebarWorkspaceChips` (the inline
+ *   3. The mode branches in `DashboardSidebarExpandedWorkspaceRow` (the inline
  *      ports chip), `TopBar`, and the v2 workspace page's tab-bar trailing
  *      slot (`PortsDropdown`), plus the ports-provider gating in the
  *      dashboard layout.
  *   4. The components belonging to the losing layout:
  *      - inline: `DashboardSidebarPortsChip` (under
- *        `DashboardSidebarWorkspaceChips`).
+ *        `DashboardSidebarExpandedWorkspaceRow`).
  *      - topbar: `PortsDropdown`.
  *
  * Both layouts read port data from the single `DashboardSidebarPortsProvider`

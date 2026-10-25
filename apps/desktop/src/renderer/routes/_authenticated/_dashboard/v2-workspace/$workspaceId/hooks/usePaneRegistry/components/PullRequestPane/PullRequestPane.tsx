@@ -1,3 +1,4 @@
+import { useIsTabVisible } from "@superset/panes";
 import { workspaceTrpc } from "@superset/workspace-client";
 import { useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
@@ -39,6 +40,7 @@ export function PullRequestPane({
 	const [activeTab, setActiveTab] = useState<PullRequestDetailTab>("summary");
 	const { workspace, hostUrl: workspaceHostUrl } = useWorkspace();
 	const detail = usePullRequestPaneDetail(data);
+	const isTabVisible = useIsTabVisible();
 
 	// Review threads and the header's actions still go through the host that
 	// pushed the PR, so they exist only when this workspace's linked PR is
@@ -52,12 +54,12 @@ export function PullRequestPane({
 	const isLinkedPR = linkedRef !== null && isSamePullRequest(linkedRef, data);
 	const evidence = usePullRequestEvidence(
 		workspace.id,
-		isLinkedPR && activeTab === "summary",
+		isLinkedPR && activeTab === "summary" && isTabVisible,
 	);
 	const threads = workspaceTrpc.git.getPullRequestThreads.useQuery(
 		{ workspaceId: workspace.id },
 		{
-			enabled: isLinkedPR,
+			enabled: isLinkedPR && isTabVisible,
 			refetchInterval: 30_000,
 			refetchOnWindowFocus: true,
 		},

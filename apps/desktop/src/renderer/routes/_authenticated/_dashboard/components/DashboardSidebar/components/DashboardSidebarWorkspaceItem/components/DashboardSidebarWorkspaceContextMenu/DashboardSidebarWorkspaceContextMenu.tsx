@@ -10,7 +10,9 @@ import {
 	ContextMenuSubTrigger,
 	ContextMenuTrigger,
 } from "@superset/ui/context-menu";
+import { useRunAfterMenuClose } from "@superset/ui/hooks/use-run-after-menu-close";
 import {
+	LuArchive,
 	LuArrowRightLeft,
 	LuArrowUp,
 	LuBellOff,
@@ -32,7 +34,6 @@ import {
 import { useHotkeyDisplay } from "renderer/hotkeys";
 import { useDashboardSidebarPortKill } from "../../../../hooks/useDashboardSidebarPortKill";
 import { useProjectTagFolderSections } from "../../../../hooks/useProjectTagFolderSections";
-import { useRunAfterMenuClose } from "../../../../hooks/useRunAfterMenuClose";
 import { useDashboardSidebarHoverActions } from "../../../../providers/DashboardSidebarHoverProvider";
 import { useDashboardSidebarWorkspacePorts } from "../../../../providers/DashboardSidebarPortsProvider";
 
@@ -44,6 +45,12 @@ interface DashboardSidebarWorkspaceContextMenuProps {
 	isSessionWorkspace?: boolean;
 	isInSection?: boolean;
 	isLocalWorkspace: boolean;
+	/**
+	 * A cloud workspace has no host bindings to clear and is archived rather
+	 * than deleted. Its folder membership is a tag the API keeps, so it groups
+	 * like any other row.
+	 */
+	isCloudWorkspace?: boolean;
 	isPinned: boolean;
 	isUnread: boolean;
 	hasStatus: boolean;
@@ -56,7 +63,8 @@ interface DashboardSidebarWorkspaceContextMenuProps {
 	onCopyPath: () => void;
 	onCopyBranchName: () => void;
 	onCopyWorkspaceId: () => void;
-	onRemoveFromSidebar: () => void;
+	/** Absent when the row can't leave the sidebar (your own cloud workspace). */
+	onRemoveFromSidebar?: () => void;
 	onRename?: () => void;
 	onDelete?: () => void;
 	onToggleUnread: () => void;
@@ -71,6 +79,7 @@ export function DashboardSidebarWorkspaceContextMenu({
 	isSessionWorkspace = false,
 	isInSection,
 	isLocalWorkspace,
+	isCloudWorkspace = false,
 	isPinned,
 	isUnread,
 	hasStatus,
@@ -168,13 +177,13 @@ export function DashboardSidebarWorkspaceContextMenu({
 						</>
 					)}
 				</ContextMenuItem>
-				{hasStatus && (
+				{hasStatus && !isCloudWorkspace && (
 					<ContextMenuItem onSelect={onClearStatus}>
 						<LuBellOff className="size-4 mr-2" />
 						<Trans>Clear Status</Trans>
 					</ContextMenuItem>
 				)}
-				{hasPullRequest && (
+				{hasPullRequest && !isCloudWorkspace && (
 					<ContextMenuItem onSelect={onRemovePullRequest}>
 						<LuUnlink className="size-4 mr-2" />
 						<Trans>Remove PR Link</Trans>
@@ -235,17 +244,28 @@ export function DashboardSidebarWorkspaceContextMenu({
 						<Trans>Close all ports</Trans>
 					</ContextMenuItem>
 				)}
-				<ContextMenuItem onSelect={onRemoveFromSidebar}>
-					<LuX className="size-4 mr-2" />
-					<Trans>Remove from Sidebar</Trans>
-				</ContextMenuItem>
+				{onRemoveFromSidebar && (
+					<ContextMenuItem onSelect={onRemoveFromSidebar}>
+						<LuX className="size-4 mr-2" />
+						<Trans>Remove from Sidebar</Trans>
+					</ContextMenuItem>
+				)}
 				{onDelete ? (
 					<ContextMenuItem
 						onSelect={onDelete}
 						className="text-destructive focus:text-destructive"
 					>
-						<LuTrash2 className="size-4 mr-2 text-destructive" />
-						<Trans>Delete</Trans>
+						{isCloudWorkspace ? (
+							<>
+								<LuArchive className="size-4 mr-2 text-destructive" />
+								<Trans>Archive</Trans>
+							</>
+						) : (
+							<>
+								<LuTrash2 className="size-4 mr-2 text-destructive" />
+								<Trans>Delete</Trans>
+							</>
+						)}
 						{showDeleteShortcut && (
 							<ContextMenuShortcut>{deleteHotkeyText}</ContextMenuShortcut>
 						)}

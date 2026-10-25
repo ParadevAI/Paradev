@@ -1,5 +1,6 @@
 "use client";
 
+import { Trans } from "@lingui/react/macro";
 import {
 	FileArchiveIcon,
 	FileCode2Icon,
@@ -9,14 +10,25 @@ import {
 	Music2Icon,
 } from "lucide-react";
 import type { JSX } from "react";
+import {
+	PASTED_TEXT_ACTION_CLASS,
+	PastedTextCard,
+} from "../../../PastedTextCard";
 import type { PromptInputAttachment } from "../../types";
+import type { PastedTextEntry } from "../../utils/pasteUndo";
 import { RemoveButton } from "./components/RemoveButton";
 
 export type AttachmentPillsProps = {
 	attachments: PromptInputAttachment[];
+	pastedTexts?: PastedTextEntry[];
 	onRemove: (id: string) => void;
+	onShowPastedText?: (id: string) => void;
+	onRemovePastedText?: (id: string) => void;
 	onPreviewError?: (id: string) => void;
-	onAttachmentClick?: (attachment: PromptInputAttachment) => void;
+	onAttachmentClick?: (
+		attachment: PromptInputAttachment,
+		attachments: readonly PromptInputAttachment[],
+	) => void;
 };
 
 const CODE_EXTENSIONS = new Set([
@@ -55,13 +67,16 @@ function fileTypeIcon(mediaType: string, extension: string): JSX.Element {
 
 export function AttachmentPills({
 	attachments,
+	pastedTexts = [],
 	onRemove,
+	onShowPastedText,
+	onRemovePastedText,
 	onPreviewError,
 	onAttachmentClick,
 }: AttachmentPillsProps) {
-	if (attachments.length === 0) return null;
+	if (attachments.length === 0 && pastedTexts.length === 0) return null;
 	return (
-		<div className="flex flex-wrap gap-2 px-3 pt-3">
+		<div className="flex flex-wrap items-center gap-2 px-3 pt-3">
 			{attachments.map((attachment) => {
 				const filename = attachment.file.name || "attachment";
 				const dotIndex = filename.lastIndexOf(".");
@@ -74,7 +89,7 @@ export function AttachmentPills({
 								type="button"
 								aria-label={filename}
 								className="group/attachment relative block size-16 cursor-pointer overflow-hidden rounded-xl border-[0.5px] border-border bg-foreground/[0.04]"
-								onClick={() => onAttachmentClick?.(attachment)}
+								onClick={() => onAttachmentClick?.(attachment, attachments)}
 							>
 								{attachment.file.type.startsWith("video/") ? (
 									<video
@@ -102,7 +117,7 @@ export function AttachmentPills({
 					<div key={attachment.id} className="relative shrink-0">
 						<button
 							type="button"
-							onClick={() => onAttachmentClick?.(attachment)}
+							onClick={() => onAttachmentClick?.(attachment, attachments)}
 							className="group/attachment relative flex h-16 w-[200px] cursor-pointer items-center gap-2.5 overflow-hidden rounded-xl border-[0.5px] border-border bg-foreground/[0.03] px-2.5 text-left"
 						>
 							<span className="pointer-events-none absolute inset-0 bg-foreground/[0.02] opacity-0 transition-opacity duration-150 group-hover/attachment:opacity-100" />
@@ -124,6 +139,22 @@ export function AttachmentPills({
 					</div>
 				);
 			})}
+			{pastedTexts.map((entry) => (
+				<PastedTextCard
+					key={entry.id}
+					text={entry.text}
+					onRemove={() => onRemovePastedText?.(entry.id)}
+					action={
+						<button
+							type="button"
+							className={PASTED_TEXT_ACTION_CLASS}
+							onClick={() => onShowPastedText?.(entry.id)}
+						>
+							<Trans>Show in text field</Trans>
+						</button>
+					}
+				/>
+			))}
 		</div>
 	);
 }

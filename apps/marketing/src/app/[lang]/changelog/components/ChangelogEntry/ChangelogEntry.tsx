@@ -50,7 +50,13 @@ export async function ChangelogEntry({ entry }: ChangelogEntryProps) {
 			{entry.image && (
 				<div className="relative mb-6 overflow-hidden border border-border">
 					{/* biome-ignore lint/performance/noImgElement: Need native img for natural dimensions */}
-					<img src={entry.image} alt={entry.title} className="w-full h-auto" />
+					<img
+						src={entry.image}
+						alt={entry.title}
+						width={entry.imageSize?.width}
+						height={entry.imageSize?.height}
+						className="w-full h-auto"
+					/>
 				</div>
 			)}
 

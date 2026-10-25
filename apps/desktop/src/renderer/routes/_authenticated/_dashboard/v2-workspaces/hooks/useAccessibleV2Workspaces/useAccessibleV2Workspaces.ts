@@ -1,7 +1,8 @@
 import { useLingui } from "@lingui/react/macro";
-import type { CheckItem } from "@superset/local-db";
+import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { useLiveQuery } from "@tanstack/react-db";
 import { useQueries } from "@tanstack/react-query";
+import { useFeatureFlagEnabled } from "posthog-js/react";
 import { useMemo } from "react";
 import { resolveProjectIconUrl } from "renderer/hooks/host-projects/resolveProjectIconUrl";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
@@ -9,19 +10,24 @@ import { deriveTerminalAgentStatus } from "renderer/hooks/host-service/useTermin
 import { useHostWorkspacesSource } from "renderer/hooks/host-workspaces/useHostWorkspaces";
 import { useKnownHosts } from "renderer/hooks/known-hosts/useKnownHosts";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
+import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
 import { useRelayUrl } from "renderer/hooks/useRelayUrl";
 import { authClient } from "renderer/lib/auth-client";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { derivePullRequestQueryTargets } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/hooks/useDashboardSidebarData/derivePullRequestQueryTargets";
+import { useCloudPullRequests } from "renderer/routes/_authenticated/_dashboard/hooks/useCloudPullRequests";
+import { useCloudWorkspaceRepositories } from "renderer/routes/_authenticated/_dashboard/hooks/useCloudWorkspaceRepositories";
 import {
-	DEVICE_FILTER_ALL_DEVICES,
-	DEVICE_FILTER_THIS_DEVICE,
+	EMPTY_CLOUD_SIDEBAR,
+	useCloudSidebarStore,
+} from "renderer/routes/_authenticated/_dashboard/stores/cloudSidebarStore";
+import {
 	PROJECT_FILTER_SESSIONS,
-	type V2WorkspacesAgentStatusFilter,
-	type V2WorkspacesDeviceFilter,
-	type V2WorkspacesPinFilter,
-	type V2WorkspacesPrStateFilter,
+	type V2WorkspacesWhereFilter,
+	WHERE_FILTER_ANYWHERE,
+	WHERE_FILTER_CLOUD,
+	WHERE_FILTER_THIS_DEVICE,
 } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/stores/v2WorkspacesFilterStore";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { isSidebarWorkspaceVisible } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
@@ -29,101 +35,30 @@ import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/Host
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { useV2NotificationStore } from "renderer/stores/v2-notifications";
 import { type PaneStatus, pickHigherStatus } from "shared/tabs-types";
+import { buildCloudAccessibleWorkspaces } from "./buildCloudAccessibleWorkspaces";
+import type {
+	AccessibleV2Workspace,
+	V2WorkspaceCreatorOption,
+	V2WorkspaceDiffStats,
+	V2WorkspaceHostOption,
+	V2WorkspaceHostType,
+	V2WorkspaceProjectOption,
+	V2WorkspacePrSummary,
+} from "./types";
 
-export type V2WorkspaceHostType = "local-device" | "remote-device";
-
-/** Host vocabulary — includes merge-queue, unlike the old cloud join. */
-export type V2WorkspacePrState =
-	| "open"
-	| "merged"
-	| "closed"
-	| "draft"
-	| "queued";
-
-export type V2WorkspacePrReviewDecision =
-	| "approved"
-	| "changes_requested"
-	| "pending";
-
-export type V2WorkspacePrChecksStatus =
-	| "none"
-	| "pending"
-	| "success"
-	| "failure";
-
-export interface V2WorkspacePrSummary {
-	prNumber: number;
-	title: string;
-	url: string;
-	state: V2WorkspacePrState;
-	checksStatus: V2WorkspacePrChecksStatus;
-	reviewDecision: V2WorkspacePrReviewDecision;
-	checks: CheckItem[];
-	/** First observed merged (epoch ms); null unless merged. */
-	mergedAt: number | null;
-}
-
-export interface V2WorkspaceDiffStats {
-	additions: number;
-	deletions: number;
-	fileCount: number;
-}
-
-export interface AccessibleV2Workspace {
-	id: string;
-	name: string;
-	branch: string;
-	type: "local" | "worktree" | "session";
-	createdAt: Date;
-	createdByUserId: string | null;
-	createdByName: string | null;
-	createdByImage: string | null;
-	isCreatedByCurrentUser: boolean;
-	/** Null for project-less "session" workspaces. */
-	projectId: string | null;
-	/** Null for project-less "session" workspaces. */
-	projectName: string | null;
-	projectRepoId: string | null;
-	projectIconUrl: string | null;
-	hostId: string;
-	hostName: string;
-	hostIsOnline: boolean;
-	hostType: V2WorkspaceHostType;
-	isInSidebar: boolean;
-	pr: V2WorkspacePrSummary | null;
-	/** Highest-priority live agent status across the workspace's terminals. */
-	agentStatus: PaneStatus;
-	/** Most recent agent event across the workspace's terminals (epoch ms);
-	 * null when no agent has ever run here. */
-	lastAgentEventAt: number | null;
-	/** Working-tree + against-base churn; null until the host answers. */
-	diffStats: V2WorkspaceDiffStats | null;
-	/** Non-null = archived tombstone (soft-deleted workspace). */
-	archivedAt: number | null;
-	archiveReason: "merged" | "deleted" | null;
-}
-
-export interface V2WorkspaceHostOption {
-	hostId: string;
-	hostName: string;
-	isOnline: boolean;
-	isLocal: boolean;
-}
-
-export interface V2WorkspaceProjectOption {
-	projectId: string;
-	projectName: string;
-	iconUrl: string | null;
-	count: number;
-}
-
-export interface V2WorkspaceCreatorOption {
-	userId: string;
-	name: string;
-	image: string | null;
-	isCurrentUser: boolean;
-	count: number;
-}
+export type {
+	AccessibleV2Workspace,
+	V2WorkspaceCreatorOption,
+	V2WorkspaceDiffStats,
+	V2WorkspaceHostOption,
+	V2WorkspaceHostType,
+	V2WorkspacePrChecksStatus,
+	V2WorkspaceProjectOption,
+	V2WorkspacePrReviewDecision,
+	V2WorkspacePrState,
+	V2WorkspacePrSummary,
+	V2WorkspaceSeenMarks,
+} from "./types";
 
 export interface UseAccessibleV2WorkspacesResult {
 	all: AccessibleV2Workspace[];
@@ -137,25 +72,21 @@ export interface UseAccessibleV2WorkspacesResult {
 		{ hostName: string; isOnline: boolean; isLocal: boolean }
 	>;
 	projectsById: Map<string, { projectName: string; iconUrl: string | null }>;
+	/** The org can have cloud workspaces, so "Cloud" is a place to filter by. */
+	cloudEnabled: boolean;
 }
 
 interface UseAccessibleV2WorkspacesOptions {
 	searchQuery?: string;
-	/** Omitted = no device scoping (programmatic callers like the palette). */
-	deviceFilter?: V2WorkspacesDeviceFilter;
+	/** Omitted = every host plus the cloud (programmatic callers like the palette). */
+	whereFilter?: V2WorkspacesWhereFilter;
 	/** Empty/omitted = all projects. May contain PROJECT_FILTER_SESSIONS. */
 	projectFilters?: string[];
-	/** Empty/omitted = any PR state (including no PR). */
-	prStateFilters?: V2WorkspacesPrStateFilter[];
-	/** Empty/omitted = any agent status. */
-	agentStatusFilters?: V2WorkspacesAgentStatusFilter[];
 	/** Creator user ids; empty/omitted = any creator. */
 	creatorFilters?: string[];
-	/** Omitted = "all" — sidebar-pinned and unpinned alike. */
-	pinFilter?: V2WorkspacesPinFilter;
 	/**
 	 * Also surface archived tombstones (with `archivedAt` set). Requires a
-	 * device filter — the archived fetch rides the scoped host source.
+	 * where filter — the archived fetch rides the scoped host source.
 	 */
 	includeArchived?: boolean;
 }
@@ -188,27 +119,6 @@ function matchesProjectFilters(
 	return projectFilters.includes(workspace.projectId);
 }
 
-function matchesPrStateFilters(
-	workspace: AccessibleV2Workspace,
-	prStateFilters: V2WorkspacesPrStateFilter[],
-): boolean {
-	if (prStateFilters.length === 0) return true;
-	return workspace.pr != null && prStateFilters.includes(workspace.pr.state);
-}
-
-function matchesPinFilter(
-	workspace: AccessibleV2Workspace,
-	pinFilter: V2WorkspacesPinFilter,
-): boolean {
-	if (pinFilter === "all") return true;
-	// Archived tombstones may keep stale sidebar metadata; they are never
-	// pinned regardless of what that metadata says.
-	if (workspace.archivedAt !== null) return pinFilter === "unpinned";
-	return pinFilter === "pinned"
-		? workspace.isInSidebar
-		: !workspace.isInSidebar;
-}
-
 function matchesCreatorFilters(
 	workspace: AccessibleV2Workspace,
 	creatorFilters: string[],
@@ -218,14 +128,6 @@ function matchesCreatorFilters(
 		workspace.createdByUserId != null &&
 		creatorFilters.includes(workspace.createdByUserId)
 	);
-}
-
-function matchesAgentStatusFilters(
-	workspace: AccessibleV2Workspace,
-	agentStatusFilters: V2WorkspacesAgentStatusFilter[],
-): boolean {
-	if (agentStatusFilters.length === 0) return true;
-	return agentStatusFilters.includes(workspace.agentStatus);
 }
 
 // useQueries returns a fresh array each render; key the map on a content
@@ -251,12 +153,9 @@ export function useAccessibleV2Workspaces(
 ): UseAccessibleV2WorkspacesResult {
 	const { t } = useLingui();
 	const searchQuery = options.searchQuery ?? "";
-	const deviceFilter = options.deviceFilter;
 	const projectFilters = options.projectFilters ?? [];
-	const prStateFilters = options.prStateFilters ?? [];
-	const agentStatusFilters = options.agentStatusFilters ?? [];
 	const creatorFilters = options.creatorFilters ?? [];
-	const pinFilter = options.pinFilter ?? "all";
+	const includeArchived = options.includeArchived ?? false;
 	const { data: session } = authClient.useSession();
 	const collections = useCollections();
 	const { machineId, activeHostUrl } = useLocalHostService();
@@ -269,29 +168,58 @@ export function useAccessibleV2Workspaces(
 	const activeOrganizationId = useActiveOrganizationId();
 	const currentUserId = session?.user?.id ?? null;
 
+	// A flag still resolving counts as on: the cloud list waits for it itself,
+	// so nothing fetches early, and a "Cloud" deep link doesn't flash every
+	// host's rows first.
+	const cloudFlag = useFeatureFlagEnabled(FEATURE_FLAGS.CLOUD_WORKSPACES);
+	const cloudEnabled = cloudFlag !== false && activeOrganizationId !== null;
+	// "Cloud" in an org without cloud reads as Anywhere (the header labels it
+	// the same way) rather than an empty list with no option to leave.
+	const whereFilter =
+		options.whereFilter === WHERE_FILTER_CLOUD && !cloudEnabled
+			? WHERE_FILTER_ANYWHERE
+			: options.whereFilter;
+	const includesCloud =
+		cloudEnabled &&
+		(whereFilter === undefined ||
+			whereFilter === WHERE_FILTER_ANYWHERE ||
+			whereFilter === WHERE_FILTER_CLOUD);
+	const includesHosts = whereFilter !== WHERE_FILTER_CLOUD;
+
 	// With a specific device filter (the page), rows come from a single
 	// `workspace.list` against that host — no fan-out, so ten idle hosts can't
-	// slow down or silently thin out the list. "All devices" is the user opting
+	// slow down or silently thin out the list. "Anywhere" is the user opting
 	// into that fan-out: the scoped source runs unscoped (undefined), sharing
 	// query keys with the provider so nothing fetches twice, and archived
 	// tombstones still ride along. Without a filter (palette, dev seeding),
-	// rows come from the provider's already-running fan-out. Both hooks always
-	// run per the rules of hooks; the unused one is passed null / left unread
-	// and does no work of its own.
+	// rows come from the provider's already-running fan-out; "Cloud" needs no
+	// host at all. Both hooks always run per the rules of hooks; the unused
+	// one is passed null / left unread and does no work of its own.
 	const scopedHostId =
-		deviceFilter === undefined
+		whereFilter === undefined || whereFilter === WHERE_FILTER_CLOUD
 			? null
-			: deviceFilter === DEVICE_FILTER_ALL_DEVICES
+			: whereFilter === WHERE_FILTER_ANYWHERE
 				? undefined
-				: deviceFilter === DEVICE_FILTER_THIS_DEVICE
+				: whereFilter === WHERE_FILTER_THIS_DEVICE
 					? machineId
-					: deviceFilter;
+					: whereFilter;
 	const scopedSource = useHostWorkspacesSource(scopedHostId, {
-		includeArchived: options.includeArchived ?? false,
+		includeArchived,
 	});
 	const fanoutSource = useHostWorkspaces();
-	const { workspaces: hostWorkspaces, isReady } =
-		deviceFilter === undefined ? fanoutSource : scopedSource;
+	const hostSource = whereFilter === undefined ? fanoutSource : scopedSource;
+	const { cache: hostWorkspacesCache } = hostSource;
+	// A cloud workspace's rows come from the cloud list, never from its
+	// sandbox's host rows: the open workspace's sandbox is a host too.
+	const hostWorkspaces = useMemo(
+		() =>
+			includesHosts
+				? hostSource.workspaces.filter(
+						(workspace) => !hostWorkspacesCache.isSandboxHost(workspace.hostId),
+					)
+				: [],
+		[includesHosts, hostSource.workspaces, hostWorkspacesCache],
+	);
 
 	const { hosts: hostRows } = useKnownHosts();
 
@@ -318,22 +246,6 @@ export function useAccessibleV2Workspaces(
 		[collections],
 	);
 
-	const { data: sidebarProjectRows = [] } = useLiveQuery(
-		(q) =>
-			q
-				.from({ sidebarProject: collections.v2SidebarProjects })
-				.select(({ sidebarProject }) => ({
-					projectId: sidebarProject.projectId,
-				})),
-		[collections],
-	);
-
-	const { data: repoRows = [] } =
-		cloudTrpc.integration.github.listRepositories.useQuery(
-			{ organizationId: activeOrganizationId ?? "" },
-			{ enabled: !!activeOrganizationId },
-		);
-
 	const { data: memberRows = [] } = cloudTrpc.organization.listMembers.useQuery(
 		undefined,
 		{},
@@ -345,7 +257,7 @@ export function useAccessibleV2Workspaces(
 
 	// Reproduces the former Electric join: workspaces scoped to the active org,
 	// inner-joined to hosts the current user can access (v2UsersHosts), their
-	// project, and left-joined sidebar/repo/creator metadata.
+	// project, and left-joined sidebar/creator metadata.
 	const rows = useMemo(() => {
 		if (activeOrganizationId == null || currentUserId == null) return [];
 		const hostsById = new Map(hostRows.map((host) => [host.machineId, host]));
@@ -355,20 +267,18 @@ export function useAccessibleV2Workspaces(
 		const sidebarStateByWorkspaceId = new Map(
 			sidebarStateRows.map((row) => [row.workspaceId, row]),
 		);
-		const sidebarProjectIds = new Set(
-			sidebarProjectRows.map((row) => row.projectId),
-		);
-		// Host rows carry owner/name (from the git remote), not the cloud repo
-		// UUID — resolve the repo row by coordinates for PR enrichment.
-		const reposByFullName = new Map(
-			repoRows.map((repo) => [
-				`${repo.owner}/${repo.name}`.toLowerCase(),
-				repo,
-			]),
-		);
 		const creatorsById = new Map(
 			creatorRows.map((creator) => [creator.id, creator]),
 		);
+		const hostNameFor = (hostId: string) =>
+			hostsById.get(hostId)?.name ??
+			(hostId === machineId
+				? t({
+						message: "This device",
+					})
+				: t({
+						message: "Unknown device",
+					}));
 
 		type AccessibleRowDraft = {
 			id: string;
@@ -381,12 +291,10 @@ export function useAccessibleV2Workspaces(
 			createdByImage: string | null;
 			projectId: string | null;
 			projectName: string | null;
-			projectRepoId: string | null;
 			projectIconUrl: string | null;
 			hostId: string;
 			hostName: string;
 			hostIsOnline: boolean;
-			sidebarProjectId: string | null;
 			sidebarWorkspaceId: string | null;
 			sidebarIsHidden: boolean;
 			archivedAt: number | null;
@@ -397,93 +305,50 @@ export function useAccessibleV2Workspaces(
 			// A host-served row is its own proof of existence and access — the
 			// host answered this caller's credentials.
 			const host = hostsById.get(workspace.hostId);
+			const sidebarState = sidebarStateByWorkspaceId.get(workspace.id);
+			const creator = workspace.createdByUserId
+				? creatorsById.get(workspace.createdByUserId)
+				: undefined;
+			const shared = {
+				id: workspace.id,
+				name: workspace.name,
+				branch: workspace.branch,
+				type: workspace.type,
+				createdAt: workspace.createdAt,
+				createdByUserId: workspace.createdByUserId,
+				createdByName: creator?.name ?? null,
+				createdByImage: creator?.image ?? null,
+				hostId: workspace.hostId,
+				hostName: hostNameFor(workspace.hostId),
+				hostIsOnline: host?.isOnline ?? workspace.hostReachable,
+				sidebarWorkspaceId: sidebarState?.workspaceId ?? null,
+				sidebarIsHidden: sidebarState?.isHidden ?? false,
+				archivedAt: workspace.archivedAt ?? null,
+				archiveReason: workspace.archiveReason ?? null,
+			};
 			// Session workspaces (null projectId) skip the project join and
 			// group under the "Sessions" pseudo-project.
 			if (workspace.projectId === null) {
-				const sessionSidebarState = sidebarStateByWorkspaceId.get(workspace.id);
-				const sessionCreator = workspace.createdByUserId
-					? creatorsById.get(workspace.createdByUserId)
-					: undefined;
 				return [
 					{
-						id: workspace.id,
-						name: workspace.name,
-						branch: workspace.branch,
-						type: workspace.type,
-						createdAt: workspace.createdAt,
-						createdByUserId: workspace.createdByUserId,
-						createdByName: sessionCreator?.name ?? null,
-						createdByImage: sessionCreator?.image ?? null,
+						...shared,
 						projectId: null,
 						projectName: null,
-						projectRepoId: null,
 						projectIconUrl: null,
-						hostId: workspace.hostId,
-						hostName:
-							host?.name ??
-							(workspace.hostId === machineId
-								? t({
-										message: "This device",
-									})
-								: t({
-										message: "Unknown device",
-									})),
-						hostIsOnline: host?.isOnline ?? workspace.hostReachable,
-						sidebarProjectId: null,
-						sidebarWorkspaceId: sessionSidebarState?.workspaceId ?? null,
-						sidebarIsHidden: sessionSidebarState?.isHidden ?? false,
-						archivedAt: workspace.archivedAt ?? null,
-						archiveReason: workspace.archiveReason ?? null,
 					},
 				];
 			}
 			const project = projectsById.get(workspace.projectId);
 			if (!project) return [];
-			const sidebarState = sidebarStateByWorkspaceId.get(workspace.id);
-			const repo =
-				project.repoOwner && project.repoName
-					? reposByFullName.get(
-							`${project.repoOwner}/${project.repoName}`.toLowerCase(),
-						)
-					: undefined;
-			const creator = workspace.createdByUserId
-				? creatorsById.get(workspace.createdByUserId)
-				: undefined;
 			return [
 				{
-					id: workspace.id,
-					name: workspace.name,
-					branch: workspace.branch,
-					type: workspace.type,
-					createdAt: workspace.createdAt,
-					createdByUserId: workspace.createdByUserId,
-					createdByName: creator?.name ?? null,
-					createdByImage: creator?.image ?? null,
+					...shared,
 					projectId: project.projectKey,
 					projectName: project.name,
-					projectRepoId: repo?.id ?? null,
 					projectIconUrl: resolveProjectIconUrl({
 						icon: project.icon,
-						repoOwner: project.repoOwner ?? repo?.owner ?? null,
+						repoOwner: project.repoOwner,
 					}),
-					hostId: workspace.hostId,
-					hostName:
-						host?.name ??
-						(workspace.hostId === machineId
-							? t({
-									message: "This device",
-								})
-							: t({
-									message: "Unknown device",
-								})),
-					hostIsOnline: host?.isOnline ?? workspace.hostReachable,
-					sidebarProjectId: sidebarProjectIds.has(project.projectKey)
-						? project.projectKey
-						: null,
-					sidebarWorkspaceId: sidebarState?.workspaceId ?? null,
-					sidebarIsHidden: sidebarState?.isHidden ?? false,
-					archivedAt: workspace.archivedAt ?? null,
-					archiveReason: workspace.archiveReason ?? null,
 				},
 			];
 		});
@@ -495,21 +360,19 @@ export function useAccessibleV2Workspaces(
 		hostRows,
 		hostProjects,
 		sidebarStateRows,
-		sidebarProjectRows,
-		repoRows,
 		creatorRows,
 		t,
 	]);
 
 	// The authoritative link lives in host.db (`workspace.pullRequestId`), not
-	// any collection. With host-scoped rows this derives a single target ("All
-	// devices" derives one per host with visible rows); a client-side
+	// any collection. With host-scoped rows this derives a single target
+	// ("Anywhere" derives one per host with visible rows); a client-side
 	// `repositoryId::branch` map mistracks on fork branch collisions. Unscoped
 	// callers (palette, dev seeding) don't render PR data, so skip the queries
 	// entirely rather than fanning them out per host.
 	const pullRequestQueryTargets = useMemo(
 		() =>
-			deviceFilter === undefined
+			whereFilter === undefined
 				? []
 				: derivePullRequestQueryTargets({
 						activeHostUrl,
@@ -518,7 +381,7 @@ export function useAccessibleV2Workspaces(
 						relayUrl,
 						workspaces: rows,
 					}),
-		[deviceFilter, activeHostUrl, hostRows, machineId, relayUrl, rows],
+		[whereFilter, activeHostUrl, hostRows, machineId, relayUrl, rows],
 	);
 
 	const pullRequestQueries = useQueries({
@@ -641,15 +504,24 @@ export function useAccessibleV2Workspaces(
 	const terminalSeenAt = useV2NotificationStore(
 		(state) => state.terminalSeenAt,
 	);
+	const manualUnread = useV2NotificationStore((state) => state.manualUnread);
 	const agentActivityEntries = useMemo<
 		[
 			string,
-			{ status: PaneStatus; lastEventAt: number; agents: [string, number][] },
+			{
+				status: PaneStatus;
+				lastEventAt: number;
+				terminals: Array<{ terminalId: string; lastEventAt: number }>;
+			},
 		][]
 	>(() => {
 		const byWorkspace = new Map<
 			string,
-			{ status: PaneStatus; lastEventAt: number; agents: Map<string, number> }
+			{
+				status: PaneStatus;
+				lastEventAt: number;
+				terminals: Array<{ terminalId: string; lastEventAt: number }>;
+			}
 		>();
 		for (const query of terminalAgentQueries) {
 			for (const binding of query.data ?? []) {
@@ -661,80 +533,177 @@ export function useAccessibleV2Workspaces(
 				const prev = byWorkspace.get(binding.workspaceId) ?? {
 					status: "idle" as PaneStatus,
 					lastEventAt: 0,
-					agents: new Map<string, number>(),
+					terminals: [],
 				};
 				prev.status = pickHigherStatus(prev.status, status);
 				prev.lastEventAt = Math.max(prev.lastEventAt, binding.lastEventAt);
-				prev.agents.set(
-					binding.agentId,
-					Math.max(prev.agents.get(binding.agentId) ?? 0, binding.lastEventAt),
-				);
+				prev.terminals.push({
+					terminalId: binding.terminalId,
+					lastEventAt: binding.lastEventAt,
+				});
 				byWorkspace.set(binding.workspaceId, prev);
 			}
 		}
-		return [...byWorkspace.entries()].map(([id, value]) => [
-			id,
-			{
-				status: value.status,
-				lastEventAt: value.lastEventAt,
-				agents: [...value.agents.entries()],
-			},
-		]);
+		return [...byWorkspace.entries()];
 	}, [terminalAgentQueries, terminalSeenAt]);
 	const agentActivityByWorkspaceId =
 		useStableByWorkspaceId(agentActivityEntries);
 
+	const hostEnriched = useMemo<AccessibleV2Workspace[]>(
+		() =>
+			rows.map((row) => {
+				const hostType: V2WorkspaceHostType =
+					row.hostId === machineId ? "local-device" : "remote-device";
+				const isInSidebar =
+					isSidebarWorkspaceVisible({ isHidden: row.sidebarIsHidden }) &&
+					row.sidebarWorkspaceId != null;
+				const activity = agentActivityByWorkspaceId.get(row.id);
+				// A manual unread mark reads as finished-unread, as in the sidebar.
+				const agentStatus = pickHigherStatus(
+					activity?.status ?? "idle",
+					manualUnread[row.id] ? "review" : "idle",
+				);
+				return {
+					id: row.id,
+					name: row.name,
+					branch: row.branch,
+					type: row.type,
+					createdAt: new Date(row.createdAt),
+					createdByUserId: row.createdByUserId,
+					createdByName: row.createdByName,
+					createdByImage: row.createdByImage,
+					isCreatedByCurrentUser:
+						currentUserId != null && row.createdByUserId === currentUserId,
+					projectId: row.projectId,
+					projectName: row.projectName,
+					projectIconUrl: row.projectIconUrl,
+					hostId: row.hostId,
+					hostName: row.hostName,
+					hostIsOnline: row.hostIsOnline,
+					hostType,
+					isInSidebar,
+					pr: prByWorkspaceId.get(row.id) ?? null,
+					agentStatus,
+					lastAgentEventAt: activity?.lastEventAt ?? null,
+					diffStats: diffStatsByWorkspaceId.get(row.id) ?? null,
+					sandboxStatus: null,
+					seenMarks: {
+						terminals: activity?.terminals ?? [],
+						reportedAt: null,
+					},
+					archivedAt: row.archivedAt,
+					archiveReason: row.archiveReason,
+				};
+			}),
+		[
+			rows,
+			machineId,
+			currentUserId,
+			manualUnread,
+			prByWorkspaceId,
+			agentActivityByWorkspaceId,
+			diffStatsByWorkspaceId,
+		],
+	);
+
+	// Cloud rows come from the cloud list, shared with the sidebar; archived
+	// boxes are a separate, opt-in fetch like host tombstones.
+	const { workspaces: activeCloudRows, isLoading: cloudLoading } =
+		useCloudWorkspaces();
+	const { data: archivedCloudRows = [] } =
+		cloudTrpc.cloudWorkspace.list.useQuery(
+			{ organizationId: activeOrganizationId ?? "", archived: true },
+			{ enabled: includesCloud && includeArchived },
+		);
+	const cloudRows = useMemo(
+		() =>
+			includesCloud
+				? [
+						...(activeCloudRows ?? []),
+						...(includeArchived ? archivedCloudRows : []),
+					]
+				: [],
+		[includesCloud, activeCloudRows, includeArchived, archivedCloudRows],
+	);
+	const { primaryRepositoryById: cloudRepoFullNameById } =
+		useCloudWorkspaceRepositories({
+			organizationId: activeOrganizationId,
+			enabled: cloudRows.length > 0,
+		});
+	// Unscoped callers render no PR data, so they skip this query too.
+	const { byWorkspace: cloudPullRequestsById } = useCloudPullRequests({
+		active:
+			whereFilter !== undefined &&
+			includesCloud &&
+			(activeCloudRows?.length ?? 0) > 0,
+		archived:
+			whereFilter !== undefined &&
+			includesCloud &&
+			includeArchived &&
+			archivedCloudRows.length > 0,
+	});
+	const cloudSidebarEntries = useCloudSidebarStore((state) =>
+		activeOrganizationId
+			? (state.byOrganization[activeOrganizationId] ?? EMPTY_CLOUD_SIDEBAR)
+					.entries
+			: EMPTY_CLOUD_SIDEBAR.entries,
+	);
+	const workspaceSeenAt = useV2NotificationStore(
+		(state) => state.workspaceSeenAt,
+	);
+	const cloudProjects = useMemo(
+		() =>
+			hostProjects.map((project) => ({
+				id: project.projectKey,
+				name: project.name,
+				iconUrl: resolveProjectIconUrl(project),
+				githubOwner: project.repoOwner,
+				githubRepoName: project.repoName,
+			})),
+		[hostProjects],
+	);
+	const cloudEnriched = useMemo(
+		() =>
+			buildCloudAccessibleWorkspaces({
+				cloudWorkspaces: cloudRows,
+				userId: currentUserId,
+				projects: cloudProjects,
+				repoFullNameById: cloudRepoFullNameById,
+				pullRequestsById: cloudPullRequestsById,
+				sidebarEntries: cloudSidebarEntries,
+				workspaceSeenAt,
+				manualUnread,
+				unknownRepoProjectName: t({ message: "Cloud" }),
+				cloudHostName: t({ message: "Cloud" }),
+			}),
+		[
+			cloudRows,
+			currentUserId,
+			cloudProjects,
+			cloudRepoFullNameById,
+			cloudPullRequestsById,
+			cloudSidebarEntries,
+			workspaceSeenAt,
+			manualUnread,
+			t,
+		],
+	);
+
 	const enriched = useMemo<AccessibleV2Workspace[]>(() => {
 		const deduped = new Map<string, AccessibleV2Workspace>();
-		for (const row of rows) {
-			if (deduped.has(row.id)) continue;
-			const hostType: V2WorkspaceHostType =
-				row.hostId === machineId ? "local-device" : "remote-device";
-			const isInSidebar =
-				isSidebarWorkspaceVisible({ isHidden: row.sidebarIsHidden }) &&
-				row.sidebarWorkspaceId != null;
-			const pr = prByWorkspaceId.get(row.id) ?? null;
-
-			deduped.set(row.id, {
-				id: row.id,
-				name: row.name,
-				branch: row.branch,
-				type: row.type,
-				createdAt: new Date(row.createdAt),
-				createdByUserId: row.createdByUserId,
-				createdByName: row.createdByName ?? null,
-				createdByImage: row.createdByImage ?? null,
-				isCreatedByCurrentUser:
-					currentUserId != null && row.createdByUserId === currentUserId,
-				projectId: row.projectId,
-				projectName: row.projectName,
-				projectRepoId: row.projectRepoId,
-				projectIconUrl: row.projectIconUrl ?? null,
-				hostId: row.hostId,
-				hostName: row.hostName,
-				hostIsOnline: row.hostIsOnline,
-				hostType,
-				isInSidebar,
-				pr,
-				agentStatus: agentActivityByWorkspaceId.get(row.id)?.status ?? "idle",
-				lastAgentEventAt:
-					agentActivityByWorkspaceId.get(row.id)?.lastEventAt ?? null,
-				diffStats: diffStatsByWorkspaceId.get(row.id) ?? null,
-				archivedAt: row.archivedAt,
-				archiveReason: row.archiveReason,
-			});
+		for (const row of [...hostEnriched, ...cloudEnriched]) {
+			if (!deduped.has(row.id)) deduped.set(row.id, row);
 		}
 		return Array.from(deduped.values()).sort(
 			(a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
 		);
-	}, [
-		rows,
-		machineId,
-		currentUserId,
-		prByWorkspaceId,
-		agentActivityByWorkspaceId,
-		diffStatsByWorkspaceId,
-	]);
+	}, [hostEnriched, cloudEnriched]);
+
+	// An unresolved flag holds the cloud list's query disabled, which reads as
+	// not loading; it must not let an empty cloud view settle.
+	const isReady =
+		(!includesHosts || hostSource.isReady) &&
+		(!includesCloud || (cloudFlag !== undefined && !cloudLoading));
 
 	const searchFiltered = useMemo(
 		() =>
@@ -749,19 +718,9 @@ export function useAccessibleV2Workspaces(
 			searchFiltered.filter(
 				(workspace) =>
 					matchesProjectFilters(workspace, projectFilters) &&
-					matchesPrStateFilters(workspace, prStateFilters) &&
-					matchesAgentStatusFilters(workspace, agentStatusFilters) &&
-					matchesCreatorFilters(workspace, creatorFilters) &&
-					matchesPinFilter(workspace, pinFilter),
+					matchesCreatorFilters(workspace, creatorFilters),
 			),
-		[
-			searchFiltered,
-			projectFilters,
-			prStateFilters,
-			agentStatusFilters,
-			creatorFilters,
-			pinFilter,
-		],
+		[searchFiltered, projectFilters, creatorFilters],
 	);
 
 	// Hosts come straight from the (locally cached) hosts collections so the
@@ -893,5 +852,6 @@ export function useAccessibleV2Workspaces(
 		creatorOptions,
 		hostsById,
 		projectsById,
+		cloudEnabled,
 	};
 }

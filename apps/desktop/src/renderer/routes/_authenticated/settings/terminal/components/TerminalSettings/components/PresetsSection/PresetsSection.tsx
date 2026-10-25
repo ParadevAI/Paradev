@@ -9,6 +9,7 @@ import { Label } from "@superset/ui/label";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { HiOutlinePlus } from "react-icons/hi2";
 import { useIsDarkTheme } from "renderer/assets/app-icons/preset-icons";
+import { useIsAgentPresetEnabled } from "renderer/hooks/useIsAgentPresetEnabled";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { usePresets } from "renderer/react-query/presets";
 import { HighlightText } from "renderer/routes/_authenticated/settings/components/HighlightText";
@@ -152,15 +153,18 @@ export function PresetsSection({
 		[serverPresets],
 	);
 
+	const isAgentPresetEnabled = useIsAgentPresetEnabled();
 	const quickAddPills = useMemo<QuickAddAgentPill[]>(
 		() =>
-			PRESET_TEMPLATES.map((template) => ({
+			PRESET_TEMPLATES.filter((template) =>
+				isAgentPresetEnabled(template.name),
+			).map((template) => ({
 				agentId: template.name,
 				label: template.preset.name,
 				description: template.preset.description,
 				commands: template.preset.commands,
 			})),
-		[],
+		[isAgentPresetEnabled],
 	);
 
 	const isPillAdded = useCallback(

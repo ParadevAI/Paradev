@@ -1,0 +1,104 @@
+---
+title: "Best IDE for Kiro CLI in 2026: Where to Run It"
+description: "The best places to run AWS's Kiro CLI in 2026, from the terminal and the Kiro IDE to Kiro Web, cloud sessions, ACP editors, and Superset for parallel worktree sessions next to other agents."
+date: 2026-10-13
+lastUpdated: 2026-10-15
+type: "roundup"
+competitors:
+  - kiro
+  - claude-code
+  - codex
+keywords:
+  - best ide for kiro
+  - where to run kiro cli
+  - kiro cli worktree
+  - kiro parallel agents
+  - kiro cli v3
+  - kiro acp
+---
+
+Kiro CLI is AWS's coding agent for the terminal. It shares one `.kiro` configuration with the Kiro IDE, Kiro Web, and the Kiro mobile app, so the best "IDE for Kiro" depends on where you want the work to happen: in a terminal, in Kiro's own editor, in the cloud, or as several tasks at once on the same repository.
+
+Facts were checked against Kiro's own docs on October 13, 2026.
+
+---
+
+## The Short Version
+
+| Where you run Kiro | Best for | Parallel tasks on one repo? | Main tradeoff |
+|---|---|---|---|
+| **Superset** | Many Kiro tasks at once, next to other agents | Git worktrees for local branch-based workspaces | Not a single-file editor experience |
+| **Kiro CLI in the terminal** | One focused task, scripts, and CI | Sub-agents inside a session | You manage separate tasks yourself |
+| **Kiro IDE** | Editing next to Kiro with the same config | Limited | One working copy |
+| **Kiro Web and cloud sessions** | Work that runs away from your machine | Through cloud sessions | Kiro's agent only |
+| **ACP editors** | Driving Kiro from an editor you already use | Limited | Depends on the editor |
+
+## The Options
+
+### Kiro CLI in the terminal
+
+Kiro CLI is the core of the agent. Version 2.29.0 shipped on October 9, 2026. Kiro began offering CLI V3 to users on October 12, 2026, and CLI 3.0 is planned for the end of October. Kiro says 3.0 adds `--cloud` sessions, spec mode, `/tangent`, background workflow agents, and Memory.
+
+The CLI runs parallel sub-agents, custom agents, and Workflows. It supports MCP, hooks, skills, and steering. Headless mode with an API key fits CI and scripts. By default, an Auto router picks the model; you can also choose a model yourself. The CLI runs on macOS, Windows 11, and Linux.
+
+Plans start with a Free tier of 50 credits. Pro is $20, Pro+ $40, Pro Max $100, and Power $200 per month. Team overage is $0.04 per credit. The Free tier is rate-limited, and some premium models are restricted by region.
+
+### Kiro IDE
+
+The Kiro IDE is AWS's own editor. It reads the same `.kiro` configuration as the CLI, so your project setup carries over between the two. It suits work where you want to edit files yourself next to the agent, with the usual single-working-copy limit when you want several tasks at once.
+
+### Kiro Web and cloud sessions
+
+Kiro Web and cloud sessions became generally available on September 3, 2026. They let Kiro work away from your machine, with the same `.kiro` configuration. They are the best fit when you want a task to keep going while your laptop is closed and you only need Kiro's own agent.
+
+### ACP editors
+
+Kiro CLI supports the Agent Client Protocol (ACP). An editor that can host ACP agents can drive Kiro from inside the editor. This suits people who want to stay in their own editor, but parallel tasks still share one working copy unless you set up worktrees yourself.
+
+### Superset
+
+Superset runs Kiro as a built-in agent. Each new local branch-based workspace gets its own Git worktree and persistent terminal, so several Kiro tasks can run on the same repository at once, locally or on your own remote hosts. Kiro uses your own Kiro plan, and Superset never proxies model calls. You can run Claude Code, Codex, or any other CLI agent in the next workspace and compare the results. Around it you get a Changes pane that commits, pushes, and opens PRs, a Pull Requests view with CI checks, an in-app browser, and an [iPhone and iPad app](/mobile). Worktrees separate working files but do not sandbox processes or prevent merge conflicts; see [workspace types](https://docs.superset.sh/workspaces).
+
+Where Kiro is stronger: its cloud sessions run on Kiro's side, and the `.kiro` configuration follows you across the IDE, web, and mobile. Superset runs Kiro next to your other agents, locally or on a host you add through Remote Access, and also has cloud workspaces that keep going without your own computer connected.
+
+## How To Choose
+
+- For one task, or for CI, use Kiro CLI in the terminal.
+- To edit next to Kiro with the same configuration, use the Kiro IDE.
+- For work that runs in Kiro's cloud, use Kiro Web and cloud sessions.
+- To stay in another editor, use an ACP editor.
+- For several Kiro tasks at once, or Kiro next to other agents, use Superset.
+
+## Verdict
+
+Kiro's own surfaces share one configuration, which is a real strength. The CLI is the best place for one task, and Kiro Web is the answer for work that runs in the cloud. Once you want several Kiro tasks on one repository, or want to compare Kiro with Claude Code or Codex, run it in a workspace like Superset, where each task gets its own worktree and the diffs and PRs are in one place.
+
+For the full field of agents, see [Best AI Coding Agents in 2026](/compare/best-coding-agents).
+
+## How To Run Kiro in Superset
+
+1. Open your repository in Superset and create a workspace with the Kiro preset. Superset creates a Git worktree and a terminal for it.
+2. Create a second workspace with another agent, for example Claude Code or Codex, in its own worktree.
+3. Give both agents the same prompt.
+4. Compare the two diffs in the Changes pane.
+5. Commit, push, and open a pull request from the better one.
+
+Each agent uses your own subscription or key. Superset never proxies model calls.
+
+## Frequently Asked Questions
+
+### What is the best IDE for Kiro CLI?
+
+For one task, the Kiro CLI itself. To edit next to the agent with the same configuration, the Kiro IDE. For several Kiro tasks in parallel, or Kiro next to other agents, a worktree workspace like Superset.
+
+### What changes with Kiro CLI V3?
+
+Kiro began offering V3 to users on October 12, 2026. Kiro plans CLI 3.0 for the end of October, with `--cloud` sessions, spec mode, `/tangent`, background workflow agents, and Memory.
+
+### Does my Kiro config work in other places?
+
+Yes. The Kiro IDE, CLI, web app, and mobile app share one `.kiro` configuration. In Superset, Kiro runs in your repository, so it reads the same files.
+
+### Can I run Kiro and Claude Code at the same time?
+
+Yes. In Superset, each runs in its own workspace and worktree on the same repository, on your own plans.

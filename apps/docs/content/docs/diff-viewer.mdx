@@ -17,7 +17,13 @@ Review changes, stage files, commit, and push, all from one interface.
 - **Push/Pull** - Sync with remote
 - **Create PR** - Open pull request on GitHub
 
-The Changes control sits at the top of the right sidebar beside **Pages** and **Run**. Before the branch has a PR, it shows diff stats when files have changed, with the ship actions (commit, push, create PR) in a chevron menu beside them. With no changed files, it shows the next ship action that applies as a button. Once a PR exists, it shows the PR badge. Click the diff stats or the PR badge to open or close the Changes pane; the ship actions do not toggle it. The control is hidden while the right sidebar is closed.
+The Changes control sits at the top of the right sidebar beside **Pages** and **Run**. It changes with the branch:
+
+- **Before a PR, with changed files** - shows diff stats, with the ship actions (commit, push, create PR) in a chevron menu beside them
+- **Before a PR, no changed files** - shows the next ship action that applies as a button
+- **After a PR exists** - shows the PR badge. Its dropdown lists **Commit** and **Push** above the merge actions when there is something to commit or push
+
+Click the diff stats or the PR badge to open or close the Changes pane; the ship actions do not toggle it. The control is hidden while the right sidebar is closed. For PR links and what each click does, see [Pull Requests](/pull-requests#open-a-pr-from-a-workspace).
 
 ## Diff Layouts
 

@@ -1,3 +1,4 @@
+import type { PresenceVisitor } from "./page-presence";
 import {
 	type PageStorageKeySummary,
 	type PageStorageListEntry,
@@ -8,6 +9,7 @@ import {
 	pageStorageValueBytes,
 	SHARED_RECORD_OWNER,
 } from "./page-storage";
+import { PresenceVisits } from "./presence-visits";
 
 export type SqlValue = ArrayBuffer | string | number | null;
 
@@ -41,11 +43,14 @@ function decode(value: string): unknown {
 export class PageStorageRecords {
 	private ready = false;
 	private hasLegacyRecords = false;
+	private readonly visits: PresenceVisits;
 
 	constructor(
 		private readonly sql: SqlLike,
 		private readonly transaction: (fn: () => void) => void = (fn) => fn(),
-	) {}
+	) {
+		this.visits = new PresenceVisits(sql);
+	}
 
 	ensureSchema(): void {
 		if (this.ready) return;
@@ -73,15 +78,7 @@ export class PageStorageRecords {
 				);
 			});
 		}
-		this.sql.exec(
-			`CREATE TABLE IF NOT EXISTS visits (
-				user_id TEXT PRIMARY KEY,
-				name TEXT NOT NULL,
-				image TEXT,
-				first_seen_at INTEGER NOT NULL,
-				last_seen_at INTEGER NOT NULL
-			)`,
-		);
+		this.visits.ensureSchema();
 		const [legacy] = this.sql
 			.exec<{ n: number }>(
 				"SELECT count(*) AS n FROM sqlite_master WHERE type = 'table' AND name = 'records'",
@@ -111,29 +108,15 @@ export class PageStorageRecords {
 		visit: { userId: string; name: string | null; image: string | null },
 		now: number,
 	): void {
-		this.sql.exec(
-			`INSERT INTO visits (user_id, name, image, first_seen_at, last_seen_at)
-			 VALUES (?, coalesce(?, 'Someone'), ?, ?, ?)
-			 ON CONFLICT (user_id) DO UPDATE SET
-				name = CASE WHEN ? IS NULL THEN visits.name ELSE excluded.name END,
-				image = CASE WHEN ? IS NULL THEN visits.image ELSE excluded.image END,
-				last_seen_at = excluded.last_seen_at`,
-			visit.userId,
-			visit.name,
-			visit.image,
-			now,
-			now,
-			visit.name,
-			visit.name,
-		);
+		this.visits.record(visit, now);
 	}
 
 	touchVisit(userId: string, now: number): void {
-		this.sql.exec(
-			"UPDATE visits SET last_seen_at = ? WHERE user_id = ?",
-			now,
-			userId,
-		);
+		this.visits.touch(userId, now);
+	}
+
+	recentVisits(limit: number): Omit<PresenceVisitor, "active">[] {
+		return this.visits.recent(limit);
 	}
 
 	get(scope: PageStorageScope, key: string, userId: string): unknown {

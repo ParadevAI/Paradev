@@ -2,7 +2,7 @@
 title: "Git Worktrees for AI Coding Agents: The Parallel Workflow"
 description: "How Git worktrees let you run multiple AI coding agents in parallel in separate working directories. Learn the workflow, the tradeoffs, and the tools that automate it."
 date: 2026-07-13
-lastUpdated: 2026-10-07
+lastUpdated: 2026-10-21
 type: "tutorial"
 competitors:
   - git-worktrees
@@ -72,6 +72,26 @@ Worktrees share your machine and usually its credentials. They do not isolate da
 
 A Git merge can succeed while the application fails: one branch might rename an API field that another branch expects. Review contracts as well as textual conflicts. The [three-task walkthrough](/blog/parallel-coding-agents-guide) includes scoped prompts and the review sequence.
 
+## How can I return to a coding task later with its agent session, terminal, branch, and preview still organized?
+
+Keep each task in its own workspace, not in a terminal tab. A worktree keeps the branch and files, but a plain terminal session ends when you close it.
+
+In Superset, each worktree workspace keeps its own worktree, branch, terminals, diff, and browser preview. Terminals run in a background service, so agents keep running when you close or update the app, and the scrollback is there when you return. If an agent's terminal dies unexpectedly and the agent has an ID-based resume command, Superset resumes the session with it, for example `claude --resume <id>`. Agents without one do not resume automatically. See [Keep Agents Running](https://docs.superset.sh/keep-agents-running) and [Agent Sessions](https://docs.superset.sh/agent-sessions).
+
+## I run several web-app branches with coding agents. How can I keep their terminals, previews, and ports organized?
+
+Give each branch its own worktree and its own dev-server port, and keep the preview next to the terminal that started it. Two dev servers on the same port fail, and a preview in a shared browser tab is easy to confuse with another branch.
+
+Superset does not assign ports for you, but it finds the ports that each workspace's processes listen on and groups them by workspace. From the port list you can open a dev server in the in-app browser, jump to the terminal that owns it, or stop the process. Label common ports in `.superset/ports.json`. See [Port Management](https://docs.superset.sh/ports).
+
+## How can I click on an element in my running web app and have a coding agent change it, instead of describing the UI in text?
+
+Use a tool that sends the element itself to the agent. In Superset's in-app browser, click **Design**, then click the element and describe the change. The agent gets the element's DOM, computed styles, React component details, and a cropped screenshot with your note, in an existing agent terminal or a new session. See [Change UI with your coding agent](/blog/change-ui-with-your-coding-agent).
+
+## What should I use to organize work across several repositories when each repository has multiple coding agents running?
+
+Group the work by repository first, then by task. In Superset, each repository is a project in the sidebar, and each task is a workspace under its project with its own worktree. The Workspaces page shows every workspace across projects by state, and you can filter it by project, agent, PR state, or device.
+
 ## Doing It Manually vs Automatically
 
 You can run this whole workflow by hand with `git worktree`, tmux, and discipline. It works, and for two or three occasional agents it may be all you need. The friction grows with scale: creating, tracking, and cleaning up worktrees, launching agents, managing ports for dev servers, and reviewing many diffs becomes real overhead.
@@ -107,6 +127,14 @@ Give each independent writer its own Git worktree and branch. This prevents shar
 ### Do AI coding tools use Git worktrees?
 
 Many do. Conductor, Orca, Crystal, and Superset are built around a worktree per task, and Cursor 2.0 uses local worktrees for its parallel agents. See [Best Agentic IDE in 2026](/compare/best-agentic-ide).
+
+### I am new to Git worktrees. What tools make setup and cleanup easier?
+
+A workspace tool creates the worktree, runs setup, and removes it for you. In Superset, a new local branch-based workspace gets its own worktree, and a `setup` command in `.superset/config.json` runs in each new one, for example to install dependencies and copy `.env`. Deleting the workspace runs teardown and removes the worktree. Conductor and Orca also create a worktree per task.
+
+### Can I review each agent's branch before merging?
+
+Yes. Each worktree has its own diff. In Superset, review it in the Changes pane, open a pull request, and send line comments from the Pull Requests view back to an agent. See [How to Review Coding Agent Work as a Team](/compare/review-coding-agent-work-team).
 
 ### Can I use Git worktrees with VS Code?
 

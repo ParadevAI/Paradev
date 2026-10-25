@@ -204,6 +204,7 @@ function fileSearchProvider(priority: number): ComposerMentionProvider {
 			emptyState: "Type to search files",
 			loadingState: "Searching files\u2026",
 			search: async (query) => {
+				if (!query) return [];
 				await new Promise((resolve) => setTimeout(resolve, 90));
 				const lowered = query.toLowerCase();
 				const dirs = REPO_DIRS.filter(

@@ -22,6 +22,7 @@ export type { FakeHarnessScript, ScriptedEvent } from "./fake";
 export { FakeHarness } from "./fake";
 export type {
 	AdapterEvent,
+	DiscoverNativeSessionsInput,
 	HarnessAdapter,
 	HarnessStartOptions,
 } from "./types";

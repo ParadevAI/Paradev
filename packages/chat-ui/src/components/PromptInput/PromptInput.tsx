@@ -20,9 +20,11 @@ export type {
 	ComposerMentionProvider,
 	ComposerMentionSource,
 	ComposerPanelContent,
+	ComposerPanelControls,
 	PromptInputAttachment,
 	PromptInputCommand,
 	PromptInputDictation,
+	PromptInputDictationError,
 	PromptInputHandle,
 	PromptInputProps,
 	PromptInputSubmitPayload,
@@ -46,8 +48,10 @@ export function PromptInput({
 	defaultValue,
 	findChips,
 	onChange,
+	collapseLargePastes = false,
 	onSubmit,
 	onStop,
+	stopOnEscape = true,
 	header,
 	onAddFiles,
 	allowEmptySubmit = false,
@@ -85,8 +89,10 @@ export function PromptInput({
 					defaultValue={defaultValue}
 					findChips={findChips}
 					onChange={onChange}
+					collapseLargePastes={collapseLargePastes}
 					onSubmit={onSubmit}
 					onStop={onStop}
+					stopOnEscape={stopOnEscape}
 					header={header}
 					onAddFiles={onAddFiles}
 					allowEmptySubmit={allowEmptySubmit}

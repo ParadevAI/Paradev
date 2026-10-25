@@ -72,21 +72,30 @@ export default command({
 			organizationId,
 		);
 		if (!hostId) {
-			// A cloud workspace's name lives in the API; tasks and tags are
-			// host-side rows it does not have.
-			if (taskId !== undefined || tags !== undefined) {
+			// A cloud workspace's name and tags live in the API; a task link is
+			// a host-side row it does not have.
+			if (taskId !== undefined) {
 				throw new CLIError(
-					"Only --name applies to a cloud workspace",
-					"Pass --local or --host <id> to update tasks or tags on a host workspace",
+					options.clearTask
+						? "--clear-task does not apply to a cloud workspace"
+						: "--task-id does not apply to a cloud workspace",
+					"Task links belong to host workspaces; pass --local or --host <id>",
 				);
 			}
-			const renamed = await ctx.api.cloudWorkspace.rename.mutate({
-				id,
-				name: options.name as string,
-			});
+			const renamed =
+				options.name !== undefined
+					? await ctx.api.cloudWorkspace.rename.mutate({
+							id,
+							name: options.name,
+						})
+					: null;
+			const tagged =
+				tags !== undefined
+					? await ctx.api.cloudWorkspace.setTags.mutate({ id, tags })
+					: null;
 			return {
-				data: renamed,
-				message: `Renamed cloud workspace ${id}`,
+				data: { ...renamed, ...tagged },
+				message: `Updated cloud workspace ${id}`,
 			};
 		}
 

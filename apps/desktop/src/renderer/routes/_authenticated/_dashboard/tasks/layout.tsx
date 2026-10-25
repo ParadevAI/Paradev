@@ -10,6 +10,7 @@ export type TasksSearch = {
 		| "completed"
 		| "canceled";
 	assignee?: string;
+	label?: string;
 	search?: string;
 	type?: "tasks" | "linear" | "prs" | "issues";
 	project?: string;
@@ -35,6 +36,7 @@ export const Route = createFileRoute("/_authenticated/_dashboard/tasks")({
 			typeof search.assignee === "string" && !search.assignee.startsWith("ext:")
 				? search.assignee
 				: undefined,
+		label: typeof search.label === "string" ? search.label : undefined,
 		search: typeof search.search === "string" ? search.search : undefined,
 		type: ["tasks", "linear", "prs", "issues"].includes(search.type as string)
 			? (search.type as TasksSearch["type"])

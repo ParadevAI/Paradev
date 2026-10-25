@@ -12,7 +12,11 @@ export default command({
 					.map((row) =>
 						[
 							row.agent,
-							row.provider === "gateway" ? "gateway key" : row.kind,
+							row.provider === "gateway"
+								? "gateway key"
+								: row.provider === "chatgpt"
+									? "ChatGPT"
+									: row.kind,
 							row.accountLabel,
 						]
 							.filter(Boolean)

@@ -1,3 +1,4 @@
+import { subagentStatusSchema } from "@superset/chat/protocol";
 import { z } from "zod";
 
 /**
@@ -30,6 +31,8 @@ export type AcpContentBlock = z.infer<typeof acpContentBlockSchema>;
  */
 export const acpInitializeResponseSchema = z.looseObject({
 	protocolVersion: z.number().optional(),
+	agentInfo: z.looseObject({ name: z.string().optional() }).optional(),
+	info: z.looseObject({ name: z.string().optional() }).optional(),
 	agentCapabilities: z.looseObject({}).optional(),
 	capabilities: z.looseObject({}).optional(),
 	authMethods: z.array(z.unknown()).optional(),
@@ -40,6 +43,18 @@ export const acpInitializeResponseSchema = z.looseObject({
 		.optional(),
 });
 export type AcpInitializeResponse = z.infer<typeof acpInitializeResponseSchema>;
+
+export const acpListSessionsResponseSchema = z.looseObject({
+	sessions: z.array(
+		z.looseObject({
+			sessionId: z.string().min(1),
+			cwd: z.string().min(1),
+			title: z.string().nullable().optional(),
+			updatedAt: z.string().nullable().optional(),
+		}),
+	),
+	nextCursor: z.string().nullable().optional(),
+});
 
 export const acpNewSessionResponseSchema = z.looseObject({
 	sessionId: z.string().min(1),
@@ -54,7 +69,8 @@ export const acpNewSessionResponseSchema = z.looseObject({
 });
 
 export const acpPromptResponseSchema = z.looseObject({
-	stopReason: z.string(),
+	stopReason: z.string().optional(),
+	messageId: z.string().optional(),
 });
 
 export const acpUsageUpdateSchema = z.looseObject({
@@ -62,6 +78,7 @@ export const acpUsageUpdateSchema = z.looseObject({
 });
 
 export const ACP_STEERING_METHOD = "_session/steering";
+export const SUBAGENT_BACKGROUND_METHOD = "_sh.superset/subagent/background";
 
 export const acpSteeringResponseSchema = z.looseObject({
 	outcome: z.string(),
@@ -191,6 +208,10 @@ export const acpPlanUpdateSchema = z.looseObject({
 export const acpStateUpdateSchema = z.looseObject({
 	state: z.string(),
 	stopReason: z.string().nullable().optional(),
+	error: z
+		.looseObject({ message: z.string().optional() })
+		.nullable()
+		.optional(),
 });
 
 /**
@@ -201,9 +222,60 @@ export const acpSubagentUpdateSchema = z.looseObject({
 	sessionId: z.string().min(1),
 	title: z.string().nullable().optional(),
 	description: z.string().nullable().optional(),
-	state: z.looseObject({ state: z.string() }).nullable().optional(),
+	state: z
+		.looseObject({
+			state: z.string(),
+			stopReason: z.string().nullable().optional(),
+		})
+		.nullable()
+		.optional(),
+	capabilities: z
+		.looseObject({
+			cancel: z.unknown().optional(),
+			_meta: z
+				.looseObject({
+					"sh.superset": z
+						.looseObject({
+							prompt: z.unknown().optional(),
+							background: z.unknown().optional(),
+						})
+						.nullable()
+						.optional(),
+				})
+				.nullable()
+				.optional(),
+		})
+		.nullable()
+		.optional(),
+	_meta: z
+		.looseObject({
+			"sh.superset": z
+				.looseObject({
+					toolCallId: z.string().min(1).optional(),
+					name: z.string().min(1).optional().catch(undefined),
+					status: subagentStatusSchema.optional().catch(undefined),
+				})
+				.nullable()
+				.optional(),
+		})
+		.nullable()
+		.optional(),
 });
 export type AcpSubagentUpdate = z.infer<typeof acpSubagentUpdateSchema>;
+
+export const acpSessionMessageSchema = z.looseObject({
+	messageId: z.string().min(1),
+	senderSessionId: z.string().min(1),
+	recipientSessionId: z.string().min(1),
+	content: z.array(acpContentBlockSchema).nullable().optional(),
+});
+
+export const acpSessionMessageChunkSchema = z.looseObject({
+	messageId: z.string().min(1),
+	senderSessionId: z.string().min(1),
+	recipientSessionId: z.string().min(1),
+	content: acpContentBlockSchema,
+});
 
 export const acpSessionInfoUpdateSchema = z.looseObject({
 	title: z.string().nullable().optional(),
@@ -291,6 +363,17 @@ export type AcpPermissionOption = z.infer<typeof acpPermissionOptionSchema>;
 export const acpRequestPermissionParamsSchema = z.looseObject({
 	sessionId: z.string().min(1),
 	toolCall: acpToolCallUpdateSchema.partial({ toolCallId: true }).optional(),
+	title: z.string().nullable().optional(),
+	description: z.string().nullable().optional(),
+	subject: z
+		.looseObject({
+			toolCall: z
+				.looseObject({ title: z.string().nullable().optional() })
+				.nullable()
+				.optional(),
+		})
+		.nullable()
+		.optional(),
 	options: z.array(acpPermissionOptionSchema),
 });
 export type AcpRequestPermissionParams = z.infer<

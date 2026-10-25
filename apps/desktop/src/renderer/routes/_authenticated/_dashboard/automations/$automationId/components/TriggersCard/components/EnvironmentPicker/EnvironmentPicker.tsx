@@ -10,7 +10,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@superset/ui/popover";
 import { useState } from "react";
 import { HiCheck } from "react-icons/hi2";
-import { LuLayers } from "react-icons/lu";
+import { LuContainer } from "react-icons/lu";
 import { PickerTrigger } from "renderer/components/PickerTrigger";
 
 interface EnvironmentPickerProps {
@@ -38,7 +38,7 @@ export function EnvironmentPicker({
 				<PickerTrigger
 					disabled={disabled}
 					className={className}
-					icon={<LuLayers className="size-4 shrink-0" />}
+					icon={<LuContainer className="size-4 shrink-0" />}
 					label={
 						selected?.name ??
 						t({
@@ -68,7 +68,7 @@ export function EnvironmentPicker({
 										setOpen(false);
 									}}
 								>
-									<LuLayers className="size-4 shrink-0" />
+									<LuContainer className="size-4 shrink-0" />
 									<span className="truncate">{environment.name}</span>
 									{environment.id === value && (
 										<HiCheck className="ml-auto size-4" />

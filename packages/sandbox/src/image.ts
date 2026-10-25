@@ -121,14 +121,13 @@ function assembleContext(bundle: BuiltBundle): string {
 	return context;
 }
 
-export const IMAGE_REF = `${SANDBOX_IMAGE_NAME}:${IMAGE_TAG}`;
-
 /** Builds the image from a built bundle; pushes unless `local`. Returns the image reference. */
 export async function buildImage(
 	bundle: BuiltBundle,
-	options: { local: boolean },
+	options: { local: boolean; tag?: string },
 ): Promise<string> {
 	const local = options.local;
+	const imageRef = `${SANDBOX_IMAGE_NAME}:${options.tag ?? IMAGE_TAG}`;
 	const context = assembleContext(bundle);
 	try {
 		const command = local
@@ -150,11 +149,11 @@ export async function buildImage(
 					"--platform",
 					"linux/amd64",
 					"--output",
-					`type=image,name=${await loginToRegistry()}/${IMAGE_REF},push=true,oci-mediatypes=true,compression=zstd,compression-level=3,force-compression=true`,
+					`type=image,name=${await loginToRegistry()}/${imageRef},push=true,oci-mediatypes=true,compression=zstd,compression-level=3,force-compression=true`,
 					context,
 				];
 		console.log(
-			`building bundle ${bundle.sha256.slice(0, 12)} into ${local ? LOCAL_IMAGE : IMAGE_REF}`,
+			`building bundle ${bundle.sha256.slice(0, 12)} into ${local ? LOCAL_IMAGE : imageRef}`,
 		);
 		const build = Bun.spawnSync(command, {
 			stdout: "inherit",
@@ -162,11 +161,30 @@ export async function buildImage(
 		});
 		if (build.exitCode !== 0)
 			throw new Error(`image build exited ${build.exitCode}`);
-		console.log(`built: ${local ? LOCAL_IMAGE : IMAGE_REF}`);
-		return local ? LOCAL_IMAGE : IMAGE_REF;
+		console.log(`built: ${local ? LOCAL_IMAGE : imageRef}`);
+		return local ? LOCAL_IMAGE : imageRef;
 	} finally {
 		rmSync(context, { recursive: true, force: true });
 	}
+}
+
+/** Points `to` at the manifest `from` names, in the registry; nothing is rebuilt or re-pushed. */
+export async function retagImage(from: string, to: string): Promise<void> {
+	const repository = `${await loginToRegistry()}/${SANDBOX_IMAGE_NAME}`;
+	const retag = Bun.spawnSync(
+		[
+			"docker",
+			"buildx",
+			"imagetools",
+			"create",
+			"--tag",
+			`${repository}:${to}`,
+			`${repository}:${from}`,
+		],
+		{ stdout: "inherit", stderr: "inherit" },
+	);
+	if (retag.exitCode !== 0)
+		throw new Error(`retag ${from} -> ${to} exited ${retag.exitCode}`);
 }
 
 if (import.meta.main) {

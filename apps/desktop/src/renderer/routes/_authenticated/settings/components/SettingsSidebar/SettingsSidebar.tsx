@@ -37,6 +37,9 @@ export function SettingsSidebar() {
 		useFeatureFlagEnabled(FEATURE_FLAGS.MOBILE_LAUNCH) === true;
 	const cloudWorkspacesEnabled =
 		useFeatureFlagEnabled(FEATURE_FLAGS.CLOUD_WORKSPACES) === true;
+	const rightPaneAreaFlag =
+		useFeatureFlagEnabled(FEATURE_FLAGS.RIGHT_PANE_AREA) === true;
+	const acpChatFlag = useFeatureFlagEnabled(FEATURE_FLAGS.ACP_CHAT) === true;
 	const normalizedSearchQuery = searchQuery.trim();
 	const matchCounts = normalizedSearchQuery
 		? getVisibleMatchCountBySection(
@@ -44,6 +47,8 @@ export function SettingsSidebar() {
 				isV2CloudEnabled,
 				cloudWorkspacesEnabled,
 				mobileEnabled,
+				rightPaneAreaFlag,
+				acpChatFlag,
 			)
 		: null;
 

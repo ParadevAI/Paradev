@@ -1,18 +1,39 @@
 import { cn } from "@superset/ui/utils";
 import { useRef } from "react";
-import ReactMarkdown, { type Components } from "react-markdown";
-import rehypeRaw from "rehype-raw";
-import rehypeSanitize from "rehype-sanitize";
-import remarkGfm from "remark-gfm";
+import type { Components } from "react-markdown";
 import { useMarkdownStyle } from "renderer/stores";
 import { SelectionContextMenu } from "./components";
 import { defaultConfig } from "./styles/default/config";
 import { tufteConfig } from "./styles/tufte/config";
+import { renderMarkdown } from "./utils/renderMarkdown";
 
 const styleConfigs = {
 	default: defaultConfig,
 	tufte: tufteConfig,
 } as const;
+
+const mergedComponents = new WeakMap<
+	Partial<Components>,
+	WeakMap<Partial<Components>, Partial<Components>>
+>();
+
+function withComponents(
+	base: Partial<Components>,
+	extra: Partial<Components> | undefined,
+): Partial<Components> {
+	if (!extra) return base;
+	let byExtra = mergedComponents.get(base);
+	if (!byExtra) {
+		byExtra = new WeakMap();
+		mergedComponents.set(base, byExtra);
+	}
+	let merged = byExtra.get(extra);
+	if (!merged) {
+		merged = { ...base, ...extra };
+		byExtra.set(extra, merged);
+	}
+	return merged;
+}
 
 interface MarkdownRendererProps {
 	content: string;
@@ -46,19 +67,11 @@ export function MarkdownRenderer({
 				)}
 			>
 				<article ref={articleRef} className={config.articleClass}>
-					<ReactMarkdown
-						remarkPlugins={[remarkGfm]}
-						rehypePlugins={
-							allowHtml ? [rehypeRaw, rehypeSanitize] : [rehypeSanitize]
-						}
-						components={
-							components
-								? { ...config.components, ...components }
-								: config.components
-						}
-					>
-						{content}
-					</ReactMarkdown>
+					{renderMarkdown({
+						content,
+						allowHtml,
+						components: withComponents(config.components, components),
+					})}
 				</article>
 			</div>
 		</SelectionContextMenu>

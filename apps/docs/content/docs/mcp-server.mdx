@@ -20,7 +20,7 @@ Superset provides an [MCP (Model Context Protocol)](https://modelcontextprotocol
 | **Agents** | list agents on a host, launch an agent session in a workspace |
 | **Terminals** | create in a workspace, list, send input, read screen, close |
 | **Pages** | list, get, list versions, pull content, publish, read storage; list/reply/resolve page comments |
-| **Automations** | list, get metadata, get/set prompt body, create, update metadata, pause, resume, run on demand, list runs, delete |
+| **Automations** | list, get metadata, get/set prompt body, create, update metadata and triggers, list trigger options, pause, resume, run on demand, list runs, delete |
 | **Projects** | list projects on a host |
 | **Hosts** | list hosts (registered machines) you have access to |
 | **Organization** | list members |
@@ -363,12 +363,13 @@ publishing updates. Otherwise each publish creates a separate page.
 | `automations_list` | List automations the calling user owns |
 | `automations_get` | Get one automation's metadata (prompt body omitted) |
 | `automations_get_prompt` | Fetch the full markdown prompt for one automation |
-| `automations_create` | Schedule a recurring agent run with an RFC 5545 RRULE |
-| `automations_update` | Update metadata (name, schedule, agent, host); use `automations_set_prompt` to change the prompt |
+| `automations_create` | Create an automation that runs on an RFC 5545 RRULE schedule, on event triggers, or both |
+| `automations_update` | Update an automation (name, schedule, triggers, agent, host); `triggers` replaces the whole set. Use `automations_set_prompt` to change the prompt |
 | `automations_set_prompt` | Replace the full markdown prompt body |
-| `automations_pause` | Pause an automation (schedule stops firing) |
+| `automations_pause` | Pause an automation (its schedules and event triggers stop firing) |
 | `automations_resume` | Resume a paused automation |
-| `automations_run` | Dispatch an automation immediately, outside its schedule |
+| `automations_run` | Dispatch an automation immediately, without waiting for a schedule or event |
+| `automations_trigger_options` | List the values an event trigger can filter on (channels, repositories, teams, ...) |
 | `automations_logs` | List recent runs for an automation |
 | `automations_delete` | Delete an automation |
 

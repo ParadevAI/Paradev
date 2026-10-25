@@ -144,9 +144,11 @@ mock.module("electron", () => ({
 		openPath: mock(() => Promise.resolve("")),
 	},
 	clipboard: {
-		writeText: mock(),
+		write: mock(() => Promise.resolve()),
+		writeText: mock(() => Promise.resolve()),
 		readText: mock(() => ""),
 	},
+	ClipboardItem: class {},
 	screen: {
 		getPrimaryDisplay: mock(() => ({
 			workAreaSize: { width: 1920, height: 1080 },

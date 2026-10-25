@@ -1,7 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
 import * as Clipboard from "expo-clipboard";
 import * as Haptics from "expo-haptics";
-import { Check, Copy, GitBranch } from "lucide-react-native";
+import { Check, Copy, Split } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import { Pressable, View } from "react-native";
 import { MessageResponse } from "@/components/ai-elements/message";
@@ -54,21 +54,25 @@ export function AgentMessage({
 							copied ? t({ message: "Copied" }) : t({ message: "Copy message" })
 						}
 						accessibilityRole="button"
-						className="size-7 items-center justify-center rounded-md active:bg-white/10"
+						className="size-8 items-center justify-center rounded-lg active:bg-white/10"
 						onPress={copy}
 					>
 						<Icon
 							as={copied ? Check : Copy}
-							className="text-muted-foreground size-3.5"
+							className="text-muted-foreground size-5"
 						/>
 					</Pressable>
 					<Pressable
 						accessibilityLabel={t({ message: "Branch from here" })}
 						accessibilityRole="button"
-						className="size-7 items-center justify-center rounded-md active:bg-white/10"
+						className="size-8 items-center justify-center rounded-lg active:bg-white/10"
 						onPress={onBranch}
 					>
-						<Icon as={GitBranch} className="text-muted-foreground size-3.5" />
+						<Icon
+							as={Split}
+							className="text-muted-foreground size-5"
+							style={{ transform: [{ rotate: "90deg" }] }}
+						/>
 					</Pressable>
 				</View>
 			) : null}

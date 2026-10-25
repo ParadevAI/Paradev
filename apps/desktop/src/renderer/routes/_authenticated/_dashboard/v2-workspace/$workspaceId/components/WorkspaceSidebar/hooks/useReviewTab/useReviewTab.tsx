@@ -2,7 +2,7 @@ import { useLingui } from "@lingui/react/macro";
 import { workspaceTrpc } from "@superset/workspace-client";
 import { useMemo } from "react";
 import { LuMessageSquare } from "react-icons/lu";
-import type { PullRequestRef } from "renderer/lib/github/pullRequestRef";
+import type { OpenPullRequestPane } from "renderer/lib/github/openPullRequestLink";
 import type { CommentPaneData, DiffFocusSide } from "../../../../types";
 import {
 	coerceCheckStatus,
@@ -16,7 +16,7 @@ import type { NormalizedComment, NormalizedPR } from "./types";
 interface UseReviewTabParams {
 	workspaceId: string;
 	onOpenComment?: (comment: CommentPaneData) => void;
-	onOpenPullRequest?: (ref: PullRequestRef) => void;
+	onOpenPullRequest?: OpenPullRequestPane;
 	onOpenInDiff?: (
 		path: string,
 		line?: number,

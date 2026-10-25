@@ -17,20 +17,20 @@ import {
 	PanelLeftIcon,
 	PanelRightIcon,
 	RefreshCwIcon,
+	SparklesIcon,
 	StarIcon,
 	TriangleAlertIcon,
 	XIcon,
 } from "lucide-react";
+import { releaseNotesQuery } from "renderer/components/SidebarCardSlot";
 import { previewStarNagOnboardingToast } from "renderer/components/StarNagToast";
 import { env } from "renderer/env.renderer";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
 import { electronQueryClient } from "renderer/providers/ElectronTRPCProvider";
 import { useDesktopNoticePreviewStore } from "renderer/stores/desktop-notice-preview";
+import { useReleaseNotesCardStore } from "renderer/stores/release-notes-card";
 import { useRightSidebarToggleIntent } from "renderer/stores/right-sidebar-toggle-intent";
-import {
-	STAR_NAG_INITIAL_THRESHOLD,
-	useStarNagStore,
-} from "renderer/stores/star-nag";
+import { useStarNagStore } from "renderer/stores/star-nag";
 import { SYSTEM_THEME_ID, useThemeStore } from "renderer/stores/theme/store";
 import { useWorkspaceSidebarStore } from "renderer/stores/workspace-sidebar-state";
 import type { Command, CommandProvider } from "../../core/types";
@@ -347,11 +347,27 @@ export const actionsProvider: CommandProvider = {
 					section: "dev",
 					icon: StarIcon,
 					keywords: ["star", "github", "nag", "dev", "preview", "test"],
-					// A dynamic import here would only defer this file's own module —
-					// AnimatedStarButton (and framer-motion) is already statically
-					// imported by useStarNagCard, which DashboardSidebar/WorkspaceSidebar
-					// import unconditionally, so it's already in the eager bundle.
 					run: () => previewStarNagOnboardingToast(),
+				},
+				{
+					id: "dev.previewReleaseNotesCard",
+					title: msg({ message: "Preview: release notes card" }),
+					section: "dev",
+					icon: SparklesIcon,
+					keywords: ["release", "notes", "changelog", "dev", "preview", "test"],
+					run: async () => {
+						const url = env.NEXT_PUBLIC_MARKETING_URL;
+						const data = await electronQueryClient
+							.fetchQuery(releaseNotesQuery)
+							.catch(() => null);
+						if (!data?.releases.length) {
+							toast.error(
+								i18n._(msg({ message: `No release notes at ${url}` })),
+							);
+							return;
+						}
+						useReleaseNotesCardStore.getState().setPreviewing(true);
+					},
 				},
 				{
 					id: "dev.resetStarNagState",
@@ -362,21 +378,16 @@ export const actionsProvider: CommandProvider = {
 					icon: RefreshCwIcon,
 					keywords: ["star", "github", "nag", "dev", "reset", "test"],
 					run: () => {
-						const threshold =
-							useStarNagStore.getState().nextThreshold ||
-							STAR_NAG_INITIAL_THRESHOLD;
 						useStarNagStore.setState({
 							completed: false,
 							completedAt: null,
-							workspacesCreatedSinceBaseline: threshold,
-							nextThreshold: threshold,
 							deferredUntil: null,
 						});
 						toast.info(
 							i18n._(
 								msg({
 									message:
-										"Star nag reset — eligible again on the empty state, sidebar card, and onboarding toast",
+										"Star nag reset — eligible again on the empty state and onboarding toast",
 								}),
 							),
 						);
