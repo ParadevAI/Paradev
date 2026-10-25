@@ -230,6 +230,32 @@ export function isCurrentWindow(
 		) === "current"
 	);
 }
+/** A native window may be live while the independent provider summary is dated. */
+export function hasCurrentUsage(
+	account: WidgetAccount,
+	offline: boolean,
+	now = Date.now(),
+): boolean {
+	const reading = widgetUsageReading(account, offline, now);
+	return reading.windows.some(
+		(window) => quotaWindowReading(reading, window, now) === "current",
+	);
+}
+
+export function allUsageWindowsCurrent(
+	account: WidgetAccount,
+	offline: boolean,
+	now = Date.now(),
+): boolean {
+	const reading = widgetUsageReading(account, offline, now);
+	return (
+		reading.windows.length > 0 &&
+		reading.windows.every(
+			(window) => quotaWindowReading(reading, window, now) === "current",
+		)
+	);
+}
+
 export function selectedAccount(
 	accounts: WidgetAccount[],
 	provider: WidgetProvider,

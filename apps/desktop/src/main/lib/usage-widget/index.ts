@@ -30,6 +30,7 @@ import { darkTheme, getBuiltInTheme, lightTheme } from "shared/themes";
 import {
 	edgeAccounts,
 	edgeHandleLayout,
+	hasCurrentUsage,
 	isCurrentWindow,
 	isFresh,
 	metricValue,
@@ -134,8 +135,10 @@ const appearanceStore = createWidgetAppearanceStore({
 	getInventory: (hostId) =>
 		hostId === state.hostId
 			? {
-					accounts: state.accounts.filter((account) =>
-						isFresh(account, state.offline),
+					accounts: state.accounts.filter(
+						(account) =>
+							isFresh(account, state.offline) ||
+							hasCurrentUsage(account, state.offline),
 					),
 					fresh: !state.offline && !state.loading,
 					complete: false,

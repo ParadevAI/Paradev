@@ -12,6 +12,7 @@ import {
 	resetExpiryUrgency,
 } from "shared/usage-resets/model";
 import {
+	allUsageWindowsCurrent,
 	displayWindows,
 	isCurrentWindow,
 	isFresh,
@@ -47,9 +48,7 @@ export function AccountRow({
 	const fresh = isFresh(account, state.offline, now);
 	const resets = fresh ? liveResetCredits(account.resetCredits) : null;
 	const windows = reading.windows;
-	const allCurrent =
-		fresh &&
-		windows.every((w) => quotaWindowReading(reading, w, now) === "current");
+	const allCurrent = allUsageWindowsCurrent(account, state.offline, now);
 	const ordered = displayWindows(windows);
 	const primary = ordered.slice(0, 2);
 	const visible = expanded ? ordered : primary;

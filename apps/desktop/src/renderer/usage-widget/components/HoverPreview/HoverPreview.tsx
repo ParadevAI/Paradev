@@ -8,6 +8,7 @@ import {
 	resetExpiryUrgency,
 } from "shared/usage-resets/model";
 import {
+	allUsageWindowsCurrent,
 	displayWindows,
 	isFresh,
 	metricValue,
@@ -32,10 +33,7 @@ export function HoverPreview({
 	const reading = account && widgetUsageReading(account, state.offline, now);
 	const fresh = account && isFresh(account, state.offline, now);
 	const allCurrent =
-		fresh &&
-		reading?.windows.every(
-			(w) => quotaWindowReading(reading, w, now) === "current",
-		);
+		account && allUsageWindowsCurrent(account, state.offline, now);
 	const resets = fresh ? liveResetCredits(account?.resetCredits) : null;
 	const needsSignIn =
 		account &&
