@@ -1,53 +1,17 @@
-"use client";
-
-import { useInView, useReducedMotion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
-import { RUN_STEPS } from "../../constants";
-import { StepList } from "./components/StepList";
-import { StepStage } from "./components/StepStage";
-import { STEP_DURATION_MS } from "./constants";
+import { Trans } from "@lingui/react/macro";
+import { TriggerSources } from "./components/TriggerSources";
 
 export function HowItWorks() {
-	const ref = useRef<HTMLDivElement>(null);
-	const inView = useInView(ref, { amount: 0.4 });
-	const reducedMotion = useReducedMotion();
-	const [active, setActive] = useState(0);
-	const [pinned, setPinned] = useState(false);
-	const [preview, setPreview] = useState<number | null>(null);
-	const [focused, setFocused] = useState(false);
-	const autoplay =
-		inView && !pinned && preview === null && !focused && !reducedMotion;
-	const shown = preview ?? active;
-
-	useEffect(() => {
-		if (!autoplay) return;
-		const timer = setInterval(
-			() => setActive((index) => (index + 1) % RUN_STEPS.length),
-			STEP_DURATION_MS,
-		);
-		return () => clearInterval(timer);
-	}, [autoplay]);
-
-	const select = (index: number) => {
-		setActive(index);
-		setPreview(null);
-		setPinned(true);
-	};
-
 	return (
-		<div
-			ref={ref}
-			className="mt-12 grid gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-0"
-		>
-			<StepList
-				steps={RUN_STEPS}
-				active={shown}
-				autoplay={autoplay}
-				onSelect={select}
-				onPreview={setPreview}
-				onFocusChange={setFocused}
-			/>
-			<StepStage step={RUN_STEPS[shown]?.id ?? "write"} />
+		<div className="mt-8 grid gap-8 lg:grid-cols-2 lg:gap-14">
+			<p className="text-lg text-muted-foreground leading-relaxed">
+				<Trans>
+					When a trigger fires, the Mac you picked opens a new workspace and the
+					agent starts on your prompt. Event runs include the event, so the
+					agent knows what to look at. Reply to the run to keep going.
+				</Trans>
+			</p>
+			<TriggerSources />
 		</div>
 	);
 }

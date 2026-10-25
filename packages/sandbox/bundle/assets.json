@@ -166,6 +166,14 @@
 		"version": "1.29.0+bfc1ec72a",
 		"node": 24
 	},
+	"pdev": {
+		"sha256": "fbe6e23ace106f981d0652c081bec3973ca3ed843e318f05fdaa6dc04af1cdec",
+		"suffix": ".tar.gz",
+		"dest": "/usr/local/share/superset/media/pdev-0.2.1.tar.gz",
+		"mode": "0644",
+		"source": "https://github.com/superset-sh/pdev/releases/download/v0.2.1/pdev-0.2.1-linux-x64.tar.gz",
+		"version": "0.2.1"
+	},
 	"wallpaper-0": {
 		"sha256": "497a4edb230a58ea385c8b63fe8135e47554cb4a5169de3f6bbae293a1f5435a",
 		"suffix": ".jpg",

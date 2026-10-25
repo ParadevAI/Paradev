@@ -5,18 +5,26 @@ import {
 	DropdownMenuLabel,
 	DropdownMenuRadioGroup,
 	DropdownMenuRadioItem,
+	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { HiOutlineBarsArrowDown } from "react-icons/hi2";
-import type { SidebarProjectSortMode } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal/schema";
+import type {
+	SidebarProjectHostFilter,
+	SidebarProjectSortMode,
+} from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal/schema";
 
 const SORT_MODES: SidebarProjectSortMode[] = ["manual", "active", "created"];
+const HOST_FILTERS: SidebarProjectHostFilter[] = ["all", "local", "cloud"];
 
 interface DashboardSidebarProjectsSortMenuProps {
 	sortMode: SidebarProjectSortMode;
 	onSortModeChange: (mode: SidebarProjectSortMode) => void;
+	/** Null hides the host filter (cloud rows are not inline). */
+	hostFilter: SidebarProjectHostFilter | null;
+	onHostFilterChange: (filter: SidebarProjectHostFilter) => void;
 }
 
 /**
@@ -28,6 +36,8 @@ interface DashboardSidebarProjectsSortMenuProps {
 export function DashboardSidebarProjectsSortMenu({
 	sortMode,
 	onSortModeChange,
+	hostFilter,
+	onHostFilterChange,
 }: DashboardSidebarProjectsSortMenuProps) {
 	const { t } = useLingui();
 	const labels: Record<SidebarProjectSortMode, string> = {
@@ -42,6 +52,19 @@ export function DashboardSidebarProjectsSortMenu({
 		}),
 	};
 	const currentLabel = labels[sortMode];
+	const hostLabels: Record<SidebarProjectHostFilter, string> = {
+		all: t({
+			message: "All workspaces",
+		}),
+		local: t({
+			message: "Local",
+		}),
+		cloud: t({
+			message: "Cloud",
+		}),
+	};
+	const isHostFiltered = hostFilter !== null && hostFilter !== "all";
+	const hostLabel = hostFilter === null ? "" : hostLabels[hostFilter];
 
 	return (
 		<DropdownMenu>
@@ -57,8 +80,8 @@ export function DashboardSidebarProjectsSortMenu({
 							onKeyDown={(event) => event.stopPropagation()}
 							className={cn(
 								"flex size-6 shrink-0 items-center justify-center rounded-md transition-colors hover:bg-fill-hover hover:text-foreground",
-								// Read as "on" whenever the list is not in drag order.
-								sortMode === "manual"
+								// Read as "on" whenever the list is not the plain drag order.
+								sortMode === "manual" && !isHostFiltered
 									? "text-muted-foreground"
 									: "text-foreground",
 							)}
@@ -68,9 +91,13 @@ export function DashboardSidebarProjectsSortMenu({
 					</DropdownMenuTrigger>
 				</TooltipTrigger>
 				<TooltipContent side="bottom">
-					{t({
-						message: `Sort workspaces (${currentLabel})`,
-					})}
+					{isHostFiltered
+						? t({
+								message: `Sort workspaces (${currentLabel}) · ${hostLabel}`,
+							})
+						: t({
+								message: `Sort workspaces (${currentLabel})`,
+							})}
 				</TooltipContent>
 			</Tooltip>
 			<DropdownMenuContent
@@ -102,6 +129,28 @@ export function DashboardSidebarProjectsSortMenu({
 							message: "Drag workspaces to reorder in Manual order",
 						})}
 					</div>
+				)}
+				{hostFilter !== null && (
+					<>
+						<DropdownMenuSeparator />
+						<DropdownMenuLabel className="text-xs font-normal text-muted-foreground/70">
+							{t({
+								message: "Show",
+							})}
+						</DropdownMenuLabel>
+						<DropdownMenuRadioGroup
+							value={hostFilter}
+							onValueChange={(value) =>
+								onHostFilterChange(value as SidebarProjectHostFilter)
+							}
+						>
+							{HOST_FILTERS.map((filter) => (
+								<DropdownMenuRadioItem key={filter} value={filter}>
+									{hostLabels[filter]}
+								</DropdownMenuRadioItem>
+							))}
+						</DropdownMenuRadioGroup>
+					</>
 				)}
 			</DropdownMenuContent>
 		</DropdownMenu>

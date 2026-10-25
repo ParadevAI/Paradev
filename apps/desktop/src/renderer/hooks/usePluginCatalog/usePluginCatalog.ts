@@ -18,7 +18,6 @@ export interface CatalogPlugin extends Omit<PluginCatalogEntry, "auth"> {
 	installed: boolean;
 	latestVersion: string | null;
 	updateAvailable: boolean;
-	enabled: boolean;
 	accounts: string[];
 	connections: CatalogRow["connections"];
 	pluginSkills: PluginSkill[];
@@ -42,13 +41,13 @@ function toCatalogPlugin(plugin: CatalogRow): CatalogPlugin {
 		connector: plugin.connector,
 		skills: plugin.skills.map((skill) => skill.name),
 		marketplace: plugin.marketplace,
-		installed: plugin.installed,
+		installed: plugin.installed && plugin.enabled,
 		latestVersion: plugin.latestVersion,
 		updateAvailable:
 			plugin.installed &&
+			plugin.enabled &&
 			plugin.latestVersion !== null &&
 			plugin.latestVersion !== plugin.version,
-		enabled: plugin.enabled,
 		accounts: plugin.accounts,
 		connections: plugin.connections,
 		pluginSkills: plugin.skills,

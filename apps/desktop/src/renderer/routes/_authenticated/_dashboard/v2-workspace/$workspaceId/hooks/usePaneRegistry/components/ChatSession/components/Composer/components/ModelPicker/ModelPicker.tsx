@@ -10,6 +10,7 @@ import {
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
 import { cn } from "@superset/ui/utils";
+import { Settings2 } from "lucide-react";
 import { type KeyboardEvent, useMemo, useRef, useState } from "react";
 import { LuCheck, LuChevronDown } from "react-icons/lu";
 import {
@@ -31,6 +32,8 @@ export type ModelPickerProps = {
 	configOptions: SessionConfigOption[];
 	onSelect: (configId: string, value: string) => void;
 	agentSwitcher?: AgentSwitcher;
+	hideEffortLabel?: boolean;
+	hideModelLabel?: boolean;
 };
 
 const TRAIT_ROW_CLASS = cn(
@@ -54,6 +57,8 @@ function currentLabel(option: SessionConfigOption | undefined) {
 export function ModelPicker({
 	agentSwitcher,
 	configOptions,
+	hideEffortLabel,
+	hideModelLabel,
 	onSelect,
 }: ModelPickerProps) {
 	const [open, setOpen] = useState(false);
@@ -112,6 +117,13 @@ export function ModelPicker({
 		model?.label ??
 		currentAgentLabel ??
 		settings[0]?.label;
+	const modelLabelHidden = Boolean(hideModelLabel && agentIcon);
+	const hiddenLabels = [
+		modelLabelHidden ? pillLabel : null,
+		hideEffortLabel ? effortLabel : null,
+	]
+		.filter(Boolean)
+		.join(" · ");
 	const pick = (option: SessionConfigOption, value: string) => {
 		if (value !== option.currentValue) choose(option.id, value);
 		setOpen(false);
@@ -149,7 +161,12 @@ export function ModelPicker({
 	return (
 		<DropdownMenu onOpenChange={setOpen} open={open}>
 			<DropdownMenuTrigger asChild>
-				<button className={cn(PILL_TRIGGER_CLASS, "group")} type="button">
+				<button
+					className={cn(PILL_TRIGGER_CLASS, "group")}
+					title={hiddenLabels || undefined}
+					type="button"
+					data-footer-label
+				>
 					{agentIcon ? (
 						<img
 							alt=""
@@ -158,8 +175,21 @@ export function ModelPicker({
 							src={agentIcon}
 						/>
 					) : null}
-					<span className="truncate">{pillLabel}</span>
-					{effortLabel ? (
+					<span
+						className={modelLabelHidden ? "sr-only" : "truncate"}
+						data-footer-label={modelLabelHidden ? undefined : true}
+					>
+						{pillLabel}
+					</span>
+					{effortLabel && hideEffortLabel ? (
+						<>
+							<Settings2
+								aria-hidden="true"
+								className="size-3.5 shrink-0 text-muted-foreground"
+							/>
+							<span className="sr-only">{effortLabel}</span>
+						</>
+					) : effortLabel ? (
 						<span className="shrink-0 text-muted-foreground">
 							{effortLabel}
 						</span>

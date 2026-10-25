@@ -52,17 +52,18 @@ the retired GPT-5.4 and GPT-5.3 Codex are gone. Available reasoning levels depen
 
 ## Agent Settings
 
-Go to **Settings → Agents** to customize launch behavior for each built-in agent.
+Go to **Settings → Agents** to change how each agent launches, reorder agents, or add your own.
 
-- **Enabled** - Show or hide the agent in launchers
-- **Command (No Prompt)** - Base command for terminal agents
-- **Command (With Prompt)** - Prompt-aware command for terminal agents
-- **Prompt Command Suffix** - Optional flags appended after the prompt payload
-- **Task Prompt Template** - Template used when launching an agent from a task
-- **Resume Args** - Arguments used to restore a killed session by its id (e.g. `--resume`)
-- **Fork Args** - Arguments used to clone a session by its id. Put `{sessionId}` where the id belongs (e.g. `--resume {sessionId} --fork-session`); leave empty if the agent cannot fork
-- **Model Override** - Optional model override for Superset Chat
-- **Reset to Defaults** - Restore the shipped configuration for that agent
+- **Label** and **Icon** - How the agent appears in launchers and the list
+- **Command** - The command used to launch the agent
+- **Prompt-only args** - Arguments added only when Superset launches the agent with a prompt
+- **Prompt transport** - How the prompt is delivered to the process (as an argument or on stdin)
+- **Resume args** - Arguments used to restore a session by its id (e.g. `--resume`)
+- **Fork args** - Arguments used to clone a session by its id. Put `{sessionId}` where the id belongs (e.g. `--resume {sessionId} --fork-session`); leave empty if the agent cannot fork
+- **Superset hooks** - Whether Superset installs its status hooks for the agent
+- **Restore defaults** - Restore the shipped configuration for a built-in agent
+
+To add an agent that isn't built in, choose **Add agent → Custom agent…**. A custom agent runs in its own worktree like any other. To see which features each built-in agent supports, see [Supported Agents](/supported-agents).
 
 ## Usage
 

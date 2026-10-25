@@ -1,5 +1,6 @@
 import { automationSessionKindValues } from "@superset/db/schema";
 import { draftTriggerSchema } from "@superset/shared/automation-triggers";
+import { MACHINE_SIZES } from "@superset/shared/billing";
 import { workspaceTagsInputSchema } from "@superset/shared/workspace-tags";
 import { z } from "zod";
 
@@ -58,6 +59,8 @@ export const createAutomationSchema = z
 		// Deliver each run's prompt into the session the previous run left
 		// behind instead of starting another beside it. Requires v2WorkspaceId.
 		continueAgentSession: z.boolean().optional(),
+		// Size of the cloud box each run starts; null = medium.
+		machineSize: z.enum(MACHINE_SIZES).nullish(),
 		// Optional because an automation may be entirely event-driven. Required
 		// only when no trigger set is supplied, which is the older client shape.
 		rrule: rruleBody.optional(),
@@ -89,6 +92,8 @@ export const updateAutomationSchema = z.object({
 	// Full replacement of the tag set; undefined keeps the existing tags.
 	tags: workspaceTagsInputSchema.optional(),
 	continueAgentSession: z.boolean().optional(),
+	// Undefined keeps the existing size; null resets it to medium.
+	machineSize: z.enum(MACHINE_SIZES).nullish(),
 	rrule: rruleBody.optional(),
 	dtstart: z.coerce.date().optional(),
 	timezone: iana.optional(),

@@ -23,7 +23,7 @@
 	},
 	"devDependencies": {
 		"@superset/typescript": "workspace:*",
-		"@types/bun": "1.4.2",
+		"@types/bun": "1.4.3",
 		"@types/react": "19.2.14",
 		"react": "19.2.3",
 		"typescript": "7.0.2"

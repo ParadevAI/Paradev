@@ -32,14 +32,20 @@ describe("AttachmentRail", () => {
 						<AttachmentRail
 							images={[
 								{
-									type: "image",
-									path: ".superset/attachments/a-1.png",
-									mimeType: "image/png",
+									owner: "c1",
+									image: {
+										type: "image",
+										path: ".superset/attachments/a-1.png",
+										mimeType: "image/png",
+									},
 								},
 								{
-									type: "image",
-									path: ".superset/attachments/b-2.png",
-									mimeType: "image/png",
+									owner: "c1",
+									image: {
+										type: "image",
+										path: ".superset/attachments/b-2.png",
+										mimeType: "image/png",
+									},
 								},
 							]}
 						/>
@@ -67,7 +73,12 @@ describe("AttachmentRail", () => {
 					queryClient={new QueryClient()}
 				>
 					<ChatPaneActionsProvider workspaceId="ws">
-						<AttachmentRail images={[image, { ...image }]} />
+						<AttachmentRail
+							images={[
+								{ owner: "c1", image },
+								{ owner: "c2", image: { ...image } },
+							]}
+						/>
 					</ChatPaneActionsProvider>
 				</workspaceTrpc.Provider>
 			</electronTrpc.Provider>,

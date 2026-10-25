@@ -58,6 +58,10 @@ import { matchesAgentBinding } from "./terminal-agents/matches-agent-binding";
 import { appRouter } from "./trpc/router";
 import { gitStatusStore } from "./trpc/router/git/utils/git-status-store";
 import {
+	disposeLocalMobileDevices,
+	startLocalMobileDeviceCleanup,
+} from "./trpc/router/mobile";
+import {
 	resumeCrashedAgentSessions,
 	resumeSessionDepsFor,
 } from "./trpc/router/terminal-agents/terminal-agents";
@@ -122,6 +126,11 @@ export interface CreateAppResult {
 	 */
 	launchSandboxAgent: () => Promise<void>;
 	resumeCrashedAgents: () => Promise<void>;
+	recordUnfinishedChats: () => void;
+	readLinkedPullRequests: () => Promise<
+		{ repository: string; number: number; linkedAt: number }[]
+	>;
+	onPullRequestLinked: (listener: () => void) => () => void;
 	terminalAgentStore: TerminalAgentStore;
 	dispose: () => Promise<void>;
 }
@@ -345,6 +354,11 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 				occurredAt,
 			}),
 	});
+	try {
+		chatV3.resumeAfterUpdate();
+	} catch (error) {
+		console.warn("[host-service] chat resume after update failed:", error);
+	}
 
 	// Startup sweeps run in the background so they don't block server
 	// startup.
@@ -371,6 +385,9 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 			? null
 			: setInterval(() => void runProjectPurge(), PROJECT_PURGE_INTERVAL_MS);
 	projectPurgeTimer?.unref?.();
+	if (process.env.SUPERSET_HOST_RUN_MODE !== "sandbox") {
+		startLocalMobileDeviceCleanup(db);
+	}
 
 	void (async () => {
 		if (process.env.SUPERSET_HOST_RUN_MODE === "sandbox") return;
@@ -544,6 +561,11 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 			console.warn("[host-service] pageWatch.stop failed:", err);
 		}
 		try {
+			await disposeLocalMobileDevices();
+		} catch (err) {
+			console.warn("[host-service] disposeLocalMobileDevices failed:", err);
+		}
+		try {
 			await chatV3.dispose();
 		} catch (err) {
 			console.warn("[host-service] chatV3.dispose failed:", err);
@@ -625,6 +647,19 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		eventBus,
 		launchSandboxAgent,
 		resumeCrashedAgents,
+		recordUnfinishedChats: () => {
+			try {
+				chatV3.recordUnfinished();
+			} catch (error) {
+				console.warn(
+					"[host-service] could not record unfinished chats:",
+					error,
+				);
+			}
+		},
+		readLinkedPullRequests: () => pullRequestRuntime.listLinkedPullRequests(),
+		onPullRequestLinked: (listener) =>
+			pullRequestRuntime.onPullRequestLinked(listener),
 		terminalAgentStore,
 		dispose,
 	};

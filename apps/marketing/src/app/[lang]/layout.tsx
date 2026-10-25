@@ -1,4 +1,5 @@
 import { DEFAULT_LOCALE, getLocaleMessages } from "@superset/i18n";
+import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import type { Metadata } from "next";
 import { cacheLife } from "next/cache";
@@ -12,6 +13,10 @@ import {
 	WebsiteJsonLd,
 } from "@/components/JsonLd";
 import { REDDIT_PIXEL_ID } from "@/lib/constants";
+import {
+	APPLY_HEADLINE_VARIANT_SCRIPT,
+	HEADLINE_VARIANT_STYLE,
+} from "@/lib/hero-headline";
 
 import { CTAButtons } from "./components/CTAButtons";
 import { Footer } from "./components/Footer";
@@ -36,6 +41,8 @@ const inter = Inter({
 	variable: "--font-inter",
 	display: "swap",
 	axes: ["opsz"],
+	adjustFontFallback: false,
+	fallback: [],
 });
 
 const siteDescription =
@@ -44,8 +51,8 @@ const siteDescription =
 export const metadata: Metadata = {
 	metadataBase: new URL(COMPANY.MARKETING_URL),
 	title: {
-		default: `${COMPANY.NAME} - Orchestrate any coding agent`,
-		template: `%s | ${COMPANY.NAME}`,
+		default: `${BRAND.INTRO_NAME} - Orchestrate any coding agent`,
+		template: `%s | ${BRAND.NAME}`,
 	},
 	description: siteDescription,
 	keywords: [
@@ -59,27 +66,27 @@ export const metadata: Metadata = {
 		"Cursor",
 		"Codex",
 	],
-	authors: [{ name: `${COMPANY.NAME} Team` }],
-	creator: COMPANY.NAME,
+	authors: [{ name: `${BRAND.NAME} Team` }],
+	creator: BRAND.NAME,
 	openGraph: {
 		type: "website",
 		locale: "en_US",
 		url: COMPANY.MARKETING_URL,
-		siteName: COMPANY.NAME,
-		title: `${COMPANY.NAME} - Orchestrate any coding agent`,
+		siteName: BRAND.NAME,
+		title: `${BRAND.INTRO_NAME} - Orchestrate any coding agent`,
 		description: siteDescription,
 		images: [
 			{
 				url: "/og-image.png",
 				width: 2400,
 				height: 1260,
-				alt: `${COMPANY.NAME} - Orchestrate any coding agent`,
+				alt: `${BRAND.INTRO_NAME} - Orchestrate any coding agent`,
 			},
 		],
 	},
 	twitter: {
 		card: "summary_large_image",
-		title: `${COMPANY.NAME} - Orchestrate any coding agent`,
+		title: `${BRAND.INTRO_NAME} - Orchestrate any coding agent`,
 		description: siteDescription,
 		images: ["/og-image.png"],
 		creator: "@superset_sh",
@@ -131,6 +138,14 @@ export default async function RootLayout({
 			suppressHydrationWarning
 		>
 			<head>
+				<script
+					// biome-ignore lint/security/noDangerouslySetInnerHtml: static script built from constants
+					dangerouslySetInnerHTML={{ __html: APPLY_HEADLINE_VARIANT_SCRIPT }}
+				/>
+				<style
+					// biome-ignore lint/security/noDangerouslySetInnerHtml: static rules built from constants
+					dangerouslySetInnerHTML={{ __html: HEADLINE_VARIANT_STYLE }}
+				/>
 				<OrganizationJsonLd />
 				<SoftwareApplicationJsonLd />
 				<WebsiteJsonLd />

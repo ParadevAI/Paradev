@@ -37,6 +37,7 @@ See [**DEVELOPMENT.md**](./DEVELOPMENT.md) for the full guide.
    bun run check:i18n  # Only if you touched user-facing strings; commit the catalogs it regenerates.
    ```
 3. [Open a PR from your fork](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork) and fill in the template. Check **"Allow edits from maintainers"** so we can touch up your branch. It speeds up review a lot.
+4. Sign the [Contributor License Agreement](./CLA.md). On your first PR, a bot asks you to comment `I have read the CLA Document and I hereby sign the CLA`. You sign once, and it covers all your future PRs. You keep the copyright in your work. We can't merge a PR until every commit author has signed.
 
 ### What gets a PR merged fast
 

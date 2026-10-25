@@ -388,6 +388,43 @@ export const FIRST_PARTY_MANIFESTS = {
 		},
 		"skills": []
 	} as const,
+	"autumn": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "autumn",
+		"version": "1.0.0",
+		"description": "Work with billing in Autumn: customers, plans, balances, and subscriptions.",
+		"author": {
+			"name": "Superset",
+			"url": "https://superset.sh"
+		},
+		"homepage": "https://docs.superset.sh",
+		"repository": "https://github.com/superset-sh/superset",
+		"license": "MIT",
+		"keywords": [
+			"autumn",
+			"billing",
+			"pricing",
+			"subscriptions",
+			"usage"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Autumn",
+					"category": "Data & APIs",
+					"icon": "autumn"
+				},
+				"connector": {
+					"slug": "autumn_mcp"
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://mcp.useautumn.com/mcp"
+				}
+			}
+		},
+		"skills": []
+	} as const,
 	"stripe": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "stripe",
@@ -529,48 +566,6 @@ export const FIRST_PARTY_MANIFESTS = {
 				"mcp": {
 					"type": "streamable-http",
 					"url": "https://mcp.neon.tech/mcp"
-				}
-			}
-		},
-		"skills": []
-	} as const,
-	"neon-readonly": {
-		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
-		"name": "neon-readonly",
-		"version": "1.0.1",
-		"description": "Read your Neon Postgres without writing to it: inspect projects and branches, read schemas, and run read-only SQL.",
-		"author": {
-			"name": "Superset",
-			"url": "https://superset.sh"
-		},
-		"homepage": "https://docs.superset.sh",
-		"repository": "https://github.com/superset-sh/superset",
-		"license": "MIT",
-		"keywords": [
-			"neon",
-			"postgres",
-			"database",
-			"sql",
-			"read-only"
-		],
-		"extensions": {
-			"superset": {
-				"interface": {
-					"displayName": "Neon (read-only)",
-					"category": "Data & APIs",
-					"icon": "neon"
-				},
-				"connector": {
-					"slug": "neon_mcp"
-				},
-				"bind": {
-					"headers": {
-						"Authorization": "Bearer ${config.access_token}"
-					}
-				},
-				"mcp": {
-					"type": "streamable-http",
-					"url": "https://mcp.neon.tech/mcp?readonly=true"
 				}
 			}
 		},

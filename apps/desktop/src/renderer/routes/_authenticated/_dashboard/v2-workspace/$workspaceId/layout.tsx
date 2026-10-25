@@ -12,6 +12,7 @@ import { electronTrpc } from "renderer/lib/electron-trpc";
 import { StateScreenShell } from "renderer/routes/_authenticated/_dashboard/components/StateScreenShell";
 import { WorkspaceNotFoundState } from "renderer/routes/_authenticated/_dashboard/components/WorkspaceNotFoundState";
 import { useUnarchiveCloudWorkspace } from "renderer/routes/_authenticated/_dashboard/hooks/useUnarchiveCloudWorkspace";
+import { useCloudSidebarStore } from "renderer/routes/_authenticated/_dashboard/stores/cloudSidebarStore";
 import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
@@ -87,15 +88,18 @@ function V2WorkspaceLayout() {
 	const cloudWorkspace =
 		cloudWorkspaces.find((row) => row.id === workspaceId) ?? null;
 	// A ready cloud workspace opens on its own row; the box's row, when the
-	// fan-out has it, is the same workspace with live fields.
-	const workspace = useMemo(
-		() =>
-			hostWorkspace ??
-			(isCloud && cloudWorkspace?.status === "ready"
-				? hostShapedCloudWorkspace(cloudWorkspace)
-				: null),
-		[hostWorkspace, isCloud, cloudWorkspace],
-	);
+	// fan-out has it, is the same workspace with live fields. The box seeds its
+	// row with a placeholder name: the cloud row owns the real one.
+	const workspace = useMemo(() => {
+		if (hostWorkspace) {
+			return cloudWorkspace
+				? { ...hostWorkspace, name: cloudWorkspace.name }
+				: hostWorkspace;
+		}
+		return isCloud && cloudWorkspace?.status === "ready"
+			? hostShapedCloudWorkspace(cloudWorkspace)
+			: null;
+	}, [hostWorkspace, isCloud, cloudWorkspace]);
 	const archivedCloudWorkspace = useArchivedCloudWorkspace(
 		workspaceId,
 		!workspace && !cloudWorkspace,
@@ -110,6 +114,7 @@ function V2WorkspaceLayout() {
 	);
 	const failedEntry = failedEntries?.[0] ?? null;
 
+	const setCloudInSidebar = useCloudSidebarStore((state) => state.setInSidebar);
 	const lastEnsuredWorkspaceIdRef = useRef<string | null>(null);
 	useEffect(() => {
 		if (!workspace || lastEnsuredWorkspaceIdRef.current === workspace.id)
@@ -117,6 +122,18 @@ function V2WorkspaceLayout() {
 		lastEnsuredWorkspaceIdRef.current = workspace.id;
 		ensureWorkspaceInSidebar(workspace.id, workspace.projectId);
 	}, [ensureWorkspaceInSidebar, workspace]);
+
+	const lastShownCloudWorkspaceIdRef = useRef<string | null>(null);
+	useEffect(() => {
+		if (
+			!workspace ||
+			!cloudWorkspace ||
+			lastShownCloudWorkspaceIdRef.current === cloudWorkspace.id
+		)
+			return;
+		lastShownCloudWorkspaceIdRef.current = cloudWorkspace.id;
+		setCloudInSidebar(cloudWorkspace.organizationId, cloudWorkspace.id, true);
+	}, [setCloudInSidebar, workspace, cloudWorkspace]);
 
 	// Sandboxes ship with the app's own host-service build, so the remote
 	// version gate has nothing to check and no host row to check it against.

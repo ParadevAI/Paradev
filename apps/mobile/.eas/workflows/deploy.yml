@@ -10,7 +10,13 @@ on:
       - packages/i18n/**
       - packages/db/**
       - packages/auth/**
+      - packages/chat/**
+      - packages/cloud-client/**
       - "!**/*.md"
+
+defaults:
+  tools:
+    bun: 1.4.3
 
 jobs:
   fingerprint:
@@ -76,5 +82,16 @@ jobs:
     params:
       platform: ios
       channel: preview
+      private_key_path: $UPDATES_SIGNING_KEY
+      upload_sentry_sourcemaps: true
+
+  publish_production:
+    name: Publish update to production
+    needs: [fingerprint]
+    type: update
+    environment: production
+    params:
+      platform: ios
+      channel: production
       private_key_path: $UPDATES_SIGNING_KEY
       upload_sentry_sourcemaps: true

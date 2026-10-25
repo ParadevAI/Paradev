@@ -1,3 +1,5 @@
+import { billingUsesAutumn } from "@superset/auth/autumn";
+import { organizationPlanFromAutumn } from "@superset/auth/billing";
 import { db, dbWs } from "@superset/db/client";
 import {
 	automationEvents,
@@ -49,7 +51,10 @@ import { env } from "../../env";
 import { assertCloudAccess } from "../../lib/cloud-guards";
 import { nudge } from "../../lib/realtime";
 import { planRequiredError, protectedProcedure, userError } from "../../trpc";
-import { loadUsableEnvironment } from "../cloud-workspace/start";
+import {
+	assertMachineSizeOffered,
+	loadUsableEnvironment,
+} from "../cloud-workspace/start";
 import { joinSlackTriggerChannels } from "../integration/slack/joinChannels";
 import {
 	requireActiveOrgMembership,
@@ -78,6 +83,7 @@ import {
 	setAutomationPromptSchema,
 	updateAutomationSchema,
 } from "./schema";
+import { recordCloudLaunch, reportCloudLaunchSchema } from "./sessionRecord";
 import {
 	type AutomationTarget,
 	NO_TARGET,
@@ -102,7 +108,10 @@ async function requireAutomationsPlan(
 ): Promise<string> {
 	const { organizationId, subscription } =
 		await requireActiveOrgMembershipWithSubscription(ctx);
-	if (!planAllowsAutomations(planTierFromSubscription(subscription))) {
+	const plan = billingUsesAutumn
+		? await organizationPlanFromAutumn(organizationId)
+		: planTierFromSubscription(subscription);
+	if (!planAllowsAutomations(plan)) {
 		throw planRequiredError({
 			message: "Automations require the Pro plan.",
 			i18nKey: "serverError.automation.automationsRequireThePro",
@@ -188,6 +197,7 @@ function selectRuns(args: {
 			triggerKind: automationTriggers.kind,
 			v2WorkspaceId: automationRuns.v2WorkspaceId,
 			cloudWorkspaceId: automationRuns.cloudWorkspaceId,
+			sessionKind: automationRuns.sessionKind,
 			chatSessionId: automationRuns.chatSessionId,
 			terminalSessionId: automationRuns.terminalSessionId,
 			eventId: automationRuns.eventId,
@@ -286,7 +296,7 @@ async function resolveTarget(
 		await verifyHostAccess(userId, organizationId, hostId);
 	}
 	if (plan.cloud) {
-		await assertCloudAccess({ userId, session: ctx.session });
+		await assertCloudAccess({ userId, session: ctx.session }, organizationId);
 		if (!isCloudAgentId(agent)) {
 			throw userError({
 				code: "BAD_REQUEST",
@@ -532,6 +542,7 @@ export const automationRouter = {
 		.input(createAutomationSchema)
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireAutomationsPlan(ctx);
+			await assertMachineSizeOffered(organizationId, input.machineSize);
 
 			const target = await resolveTarget(
 				ctx,
@@ -580,6 +591,7 @@ export const automationRouter = {
 						prompt: input.prompt,
 						agent: input.agent,
 						...target,
+						machineSize: input.machineSize ?? null,
 						// Every automation groups its runs out of the box; explicit
 						// tags (including []) override the default.
 						tags: input.tags ?? ["automation"],
@@ -648,6 +660,7 @@ export const automationRouter = {
 				organizationId,
 				input.id,
 			);
+			await assertMachineSizeOffered(organizationId, input.machineSize);
 
 			const target = await resolveTarget(
 				ctx,
@@ -694,6 +707,9 @@ export const automationRouter = {
 						name: input.name ?? existing.name,
 						agent: input.agent ?? existing.agent,
 						...target,
+						...(input.machineSize !== undefined
+							? { machineSize: input.machineSize }
+							: {}),
 						tags: input.tags ?? existing.tags,
 						prompt: input.prompt ?? existing.prompt,
 					})
@@ -1150,6 +1166,26 @@ export const automationRouter = {
 			return row;
 		}),
 
+	/**
+	 * A cloud workspace reporting the session its first-boot launch started,
+	 * for the automation run that created it. Only the box itself may call it.
+	 */
+	reportCloudLaunch: protectedProcedure
+		.input(reportCloudLaunchSchema)
+		.mutation(async ({ ctx, input }) => {
+			if (!ctx.sandboxCaller) {
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "Only a cloud workspace can report its own launch",
+				});
+			}
+			const result = await recordCloudLaunch(ctx.sandboxCaller, input);
+			if (result.recorded) {
+				nudge(ctx.sandboxCaller.organizationId, "automation_runs");
+			}
+			return result;
+		}),
+
 	/** Most recent run per automation across the caller's active organization. */
 	latestRuns: protectedProcedure.query(async ({ ctx }) => {
 		const organizationId = await requireActiveOrgMembership(ctx);
@@ -1161,6 +1197,7 @@ export const automationRouter = {
 				createdAt: automationRuns.createdAt,
 				v2WorkspaceId: automationRuns.v2WorkspaceId,
 				cloudWorkspaceId: automationRuns.cloudWorkspaceId,
+				sessionKind: automationRuns.sessionKind,
 				chatSessionId: automationRuns.chatSessionId,
 				terminalSessionId: automationRuns.terminalSessionId,
 				ownerUserId: automations.ownerUserId,

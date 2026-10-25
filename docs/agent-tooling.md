@@ -96,6 +96,11 @@ exists only in this worktree, read the from-source CLI with
 `bun run --cwd packages/cli dev schema 2>/dev/null | jq ...`; it can list commands the installed
 CLI does not have yet.
 
+`superset sessions` (`create`, `list`, `read`, `send`, `close`, `resume`, `open`) is the chat-only
+namespace targeting `sessions.*` on the host. The host accepts only supported chat providers, with
+no fallback to `agents.run` or `terminal.*`; `superset agents` and
+`superset terminals` remain unchanged for terminal-backed agent runs.
+
 `superset schema` exists from CLI 1.34.0, and the probes need `jq`. Skills ship with the plugin, not
 with the CLI, so a skill cannot assume either. For a bare "does this command exist" check, use the
 exit code of `--help` instead; it works on every CLI version, needs no `jq`, and prints nothing:
@@ -111,6 +116,55 @@ produces, and the fallback never runs.
 ```bash
 superset schema 2>/dev/null | jq -re '.commands[] | select(.path==["terminals"]) | .commands[].path[1]' || superset terminals --help
 ```
+
+## ACP chat sessions
+
+Use `superset sessions` for conversations, `superset agents` for the existing agent launch commands,
+and `superset terminals` for PTYs. Existing commands keep their behavior.
+
+```bash
+superset sessions create --local --workspace WORKSPACE_ID --agent claude --prompt "Review the diff"
+superset sessions list --local --workspace WORKSPACE_ID
+superset sessions read --local --workspace WORKSPACE_ID --session CHAT_SESSION_ID
+superset sessions read --local --workspace WORKSPACE_ID --session CHAT_SESSION_ID --limit 50 --before '{"epoch":"EPOCH","seq":42}'
+superset sessions send --local --workspace WORKSPACE_ID --session CHAT_SESSION_ID --prompt "Continue"
+superset sessions open --local --workspace WORKSPACE_ID --session CHAT_SESSION_ID
+superset sessions close --local --workspace WORKSPACE_ID --session CHAT_SESSION_ID
+superset sessions resume --local --workspace WORKSPACE_ID --session CHAT_SESSION_ID
+superset sessions import --local --workspace WORKSPACE_ID --agent claude --native-session PROVIDER_SESSION_ID
+```
+
+The host resolves the selected agent to an installed ACP harness. It does not check the `acp-chat`
+rollout flag: the desktop gates the chat UI and the API gates automation dispatch. Unsupported
+agents and hosts without the new router return an error; these commands never start a terminal.
+Old hosts produce an update instruction instead of falling back to `agents.run`.
+
+`sessions read --json` returns the newest page of events, in journal order, with a `nextBefore`
+cursor. To read older events, pass that cursor as JSON to `--before`. `nextBefore` is `null` on the
+oldest page.
+
+A chat session ID identifies the host's journal. A provider session ID identifies the conversation
+inside Claude, Codex, or another ACP agent. `sessions resume --session` accepts the former and
+returns the live chat session ID, which is a new one when the chat had stopped. `sessions import
+--native-session` accepts the latter, with `--agent`, and adopts that conversation into a new chat.
+`sessions create` always starts a new chat. `sessions send` resumes a stopped chat first and returns
+the session ID the prompt went to. `sessions list` lists Superset-saved sessions for the workspace;
+native provider discovery remains available in the chat header's history menu.
+
+Automations check the owner's `acp-chat` flag in the API, then the host's `sessions.capabilities`. Eligible runs use
+`sessions.create`; unsupported agents retain terminal launches. Hosts without the sessions router
+keep the previous `agents.run` chat request, but only an exact missing-procedure response triggers
+that compatibility path. A launch timeout or other failure must not start a second agent.
+
+Chat runs save their actual chat session ID, plus a terminal-compatible ID for older clients. The
+API registers a cloud metadata row before linking the run; the transcript stays in the host journal.
+Run links prefer the chat ID and open or focus a chat pane. Older terminal links still work.
+
+Cloud chat launches remain Claude-only. Fresh cloud runs bind their workspace before provisioning,
+carry the automation run ID through first boot, and report the session back after launch. Reporting
+is scoped to that sandbox, organization, creator, and run. A failed report is kept in the launch
+marker and retried on host-service restart without launching another agent. Sandbox changes reach
+cloud workspaces only through a published host-service/sandbox bundle.
 
 ## Testing the CLI and skills against the dev app
 

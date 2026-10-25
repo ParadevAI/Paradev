@@ -1,0 +1,117 @@
+---
+title: "Best Worktrunk Alternatives in 2026"
+description: "The best alternatives to Worktrunk for managing Git worktrees for parallel AI coding agents, including Superset, Claude Squad, Herdr, Orca, and plain git worktree, from CLIs to desktop workspaces."
+date: 2026-10-20
+lastUpdated: 2026-10-20
+type: "roundup"
+competitors:
+  - worktrunk
+  - claude-squad
+  - herdr
+  - orca
+keywords:
+  - worktrunk alternative
+  - worktrunk alternatives
+  - wt worktree alternative
+  - worktrunk vs superset
+  - git worktree manager
+  - git worktrees for ai agents
+---
+
+Worktrunk is a free CLI (`wt`) that makes Git worktrees as easy to use as branches. It creates a worktree and starts an agent in one command, shows agent activity in `wt list`, gives each worktree its own dev-server port, and merges and cleans up with `wt merge`. It is dual-licensed MIT or Apache-2.0 and runs on macOS, Linux, and Windows. If your bottleneck has moved from creating worktrees to reviewing what the agents did, Superset keeps each worktree's terminals, diff, and pull request together in one desktop workspace.
+
+**Our recommendation: choose Superset if you want review, PRs, and agent status for many worktrees in one window.** The alternatives below cover other preferences, including other terminal tools and plain Git.
+
+[Download Superset](/download) to try a small task, or read [Superset vs Worktrunk](/compare/superset-vs-worktrunk) for the direct comparison. This guide is published by Superset; recommendations describe workflow fit rather than benchmark results.
+
+---
+
+## The Short Version
+
+| Alternative | Best for | Platform | License |
+|---|---|---|---|
+| **Superset** | Worktrees with terminals, review, PRs, browser, remote and cloud workspaces | macOS; experimental Linux AppImage; Windows unavailable; iPhone and iPad | Source-available (ELv2) |
+| **Claude Squad** | Parallel agents in worktrees over tmux, from one TUI | macOS, Linux | Open source (AGPL) |
+| **Herdr** | Terminal multiplexer for agents with persistent sessions | macOS, Linux, Windows | Open source (Apache-2.0) |
+| **Orca** | Free cross-platform desktop ADE with mobile apps | macOS, Windows, Linux + iOS/Android | Open source (MIT) |
+| **git worktree** | No extra tools at all | Anywhere Git runs | GPL-2.0 (Git) |
+
+## Why Look for a Worktrunk Alternative?
+
+Worktrunk does worktree management very well and runs no daemons. Common reasons to look elsewhere:
+
+- **Review in one place.** You want to read diffs, comment on lines, and follow PR checks without switching tools.
+- **Agent status at a glance.** You want a page that groups every task by state, not only markers in a table.
+- **Session management.** You want the tool to keep agent terminals alive and let you switch between them, not only create worktrees.
+- **Remote and mobile.** You want agents on other machines or in the cloud, and a phone app to check on them.
+
+## The Best Alternatives
+
+### Superset
+
+Superset builds on the same model: each new local workspace gets its own Git worktree and branch. Around it, Superset keeps persistent terminal sessions for any CLI agent, a Changes pane that commits, pushes, and opens PRs, a PR pane with checks, review threads, and merge, an in-app browser with detected ports, and setup and teardown commands per project. The Workspaces page groups every workspace by state (Needs attention, Working, Needs review, Idle, Merged). Workspaces run on your machine, on hosts you add, or in cloud workspaces, and the [iPhone and iPad app](/mobile) reaches all of them. Some people use Worktrunk and Superset together.
+
+For the direct comparison, see [Superset vs Worktrunk](/compare/superset-vs-worktrunk).
+
+### Claude Squad
+
+Claude Squad is an AGPL terminal app that runs several agents at once, each in its own worktree and tmux session, driven from one TUI. Choose it if you want Worktrunk's terminal feel plus session management, and you do not need hooks or merge automation.
+
+See [Superset vs Claude Squad](/compare/superset-vs-claude-squad).
+
+### Herdr
+
+Herdr is an Apache-2.0 terminal multiplexer for coding agents, with an agent-status sidebar, sessions that persist over SSH, worktree creation, and a socket API that agents can drive. Choose it if you want to stay in the terminal and want a live view of which agents need you.
+
+See [Superset vs Herdr](/compare/superset-vs-herdr).
+
+### Orca
+
+Orca is a free, MIT-licensed desktop agent development environment for macOS, Windows, and Linux. It runs agents in parallel worktrees with split terminals, per-task browser tabs, Design Mode, SSH worktrees, scheduled automations, and beta mobile apps. Choose it if you want a desktop app and an open-source license.
+
+See [Superset vs Orca](/compare/superset-vs-orca).
+
+### git worktree
+
+Git's own `git worktree add`, `list`, and `remove` commands do the core job with no extra install. You handle naming, paths, setup commands, ports, and cleanup yourself, which is the work Worktrunk was built to remove. Choose it for one or two agents, or for scripts.
+
+See [Git worktrees for AI agents](/compare/git-worktrees-for-ai-agents).
+
+## How To Choose
+
+- For review, PRs, agent status, and remote and cloud workspaces around your worktrees, choose **Superset**.
+- For parallel agents in worktrees and tmux from one TUI, choose **Claude Squad**.
+- For a terminal multiplexer with persistent sessions and a status sidebar, choose **Herdr**.
+- For a free, open-source, cross-platform desktop ADE, choose **Orca**.
+- To add nothing, use **git worktree**.
+
+## Verdict
+
+Worktrunk is an excellent CLI, and it may be all you need if you run two or three agents and review with your own Git tools. Choose Superset when the hard part becomes reviewing and shipping the work of many agents, and you want each worktree's terminals, diff, and PR in one place. For the shared model behind all of these tools, see [Git worktrees for AI agents](/compare/git-worktrees-for-ai-agents).
+
+## What To Try First
+
+- **Keep your agent:** launch the CLI you already use in a Superset workspace.
+- **Run two tasks:** start a second workspace and check that each has its own worktree and branch.
+- **Review the PR:** commit and open a PR from the Changes pane, then follow checks in the PR pane.
+- **Watch the states:** follow both workspaces on the Workspaces page from Working to Needs review.
+
+[Download Superset](/download), then read [working with worktrees in Superset](/blog/working-with-worktrees-in-superset).
+
+## Frequently Asked Questions
+
+### What is the best Worktrunk alternative?
+
+For developers who want review, PRs, and agent status around their worktrees, Superset is our recommendation. For a terminal tool with session management, Claude Squad or Herdr is the closest match.
+
+### Can I use Worktrunk and Superset together?
+
+Yes. Both use standard Git worktrees. You can keep using `wt` in the terminal and use Superset for terminals, review, and PRs.
+
+### Is there an open-source Worktrunk alternative?
+
+Yes. Claude Squad (AGPL), Herdr (Apache-2.0), and Orca (MIT) are open source, and `git worktree` is part of Git. Superset is source-available under Elastic License 2.0.
+
+### Do worktrees prevent merge conflicts?
+
+No. Worktrees keep working files separate. Combined changes still need review, conflict resolution when necessary, and tests.

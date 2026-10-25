@@ -36,7 +36,6 @@ export interface WorkspaceRepository {
 	/** The remote branch it is cut from, and what a pull request targets. */
 	baseBranch: string;
 	path: string;
-	hooks: boolean;
 }
 
 /**
@@ -96,16 +95,17 @@ export function sortRepositories<T extends { fullName: string }>(
 }
 
 /**
- * The repository a workspace opens on: the environment's config location,
- * else the first by name. Multi-repository workspaces opening at the root,
- * with a repository picker in the sidebar, is a TODO recorded in the plan.
+ * The repository a workspace opens on and whose `.superset` config runs:
+ * the environment's primary, or the first by name once that was removed from
+ * GitHub. Multi-repository workspaces opening at the root, with a repository picker
+ * in the sidebar, is a TODO recorded in the plan.
  */
 export function primaryRepository<T extends { id: string; fullName: string }>(
 	rows: readonly T[],
-	hooksRepositoryId: string | null | undefined,
+	primaryRepositoryId: string | null | undefined,
 ): T | undefined {
 	const sorted = sortRepositories(rows);
-	return sorted.find((row) => row.id === hooksRepositoryId) ?? sorted[0];
+	return sorted.find((row) => row.id === primaryRepositoryId) ?? sorted[0];
 }
 
 export class RepositoryError extends Error {
@@ -147,10 +147,10 @@ export async function recordWorkspaceRepositories(args: {
 	);
 }
 
-/** What a workspace checked out, the primary first, with the hooks repository marked. */
+/** What a workspace checked out, the primary first. */
 export async function workspaceRepositories(args: {
 	cloudWorkspaceId: string;
-	hooksRepositoryId: string | null;
+	primaryRepositoryId: string | null;
 	/** The base the primary is cut from; the others use their default branch. */
 	primaryBranch: string;
 	/** The branch every checkout works on. */
@@ -173,13 +173,13 @@ export async function workspaceRepositories(args: {
 		throw new RepositoryError("This workspace has no repositories");
 	const primary = primaryRepository(
 		rows.map((row) => row.repository),
-		args.hooksRepositoryId,
+		args.primaryRepositoryId,
 	);
-	const hooksId = primary?.id;
+	const primaryId = primary?.id;
 	const ordered = [...rows].sort((a, b) =>
-		a.repository.id === hooksId
+		a.repository.id === primaryId
 			? -1
-			: b.repository.id === hooksId
+			: b.repository.id === primaryId
 				? 1
 				: a.repository.fullName.localeCompare(b.repository.fullName, "en", {
 						sensitivity: "base",
@@ -189,9 +189,10 @@ export async function workspaceRepositories(args: {
 		repository,
 		branch: args.workingBranch,
 		baseBranch:
-			repository.id === hooksId ? args.primaryBranch : repository.defaultBranch,
+			repository.id === primaryId
+				? args.primaryBranch
+				: repository.defaultBranch,
 		path: link.path,
-		hooks: repository.id === hooksId,
 	}));
 }
 
@@ -210,7 +211,6 @@ export function toSandboxRepositories(
 			? {}
 			: { baseBranch: entry.baseBranch }),
 		path: entry.path,
-		...(entry.hooks ? { hooks: true } : {}),
 	}));
 }
 

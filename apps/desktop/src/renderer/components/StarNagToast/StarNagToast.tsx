@@ -13,7 +13,7 @@ import { useStarNagStore } from "renderer/stores/star-nag";
 function StarNagToastContent({ toastId }: { toastId: string | number }) {
 	const { t } = useLingui();
 	const { state, activate, isBusy } = useGithubStarAction();
-	const dismiss = useStarNagStore((s) => s.dismiss);
+	const snooze = useStarNagStore((s) => s.snooze);
 
 	useEffect(() => {
 		if (state !== "starred") return;
@@ -33,7 +33,7 @@ function StarNagToastContent({ toastId }: { toastId: string | number }) {
 
 	function handleClose() {
 		track("star_nag_dismissed", { surface: "toast" });
-		dismiss();
+		snooze();
 		toast.dismiss(toastId);
 	}
 
@@ -63,7 +63,7 @@ function StarNagToastContent({ toastId }: { toastId: string | number }) {
 			{/* A "loading" or "unknown" read isn't trustworthy enough to act on —
 			same rule as every other star-nag surface — so the button just doesn't
 			render for those; the toast itself still auto-dismisses/closes normally.
-			Unlike GitHubStarPill/StarNagCard, "starred" isn't time-boxed via
+			Unlike GitHubStarPill, "starred" isn't time-boxed via
 			useJustStarredWindow here — the effect above already dismisses the
 			whole toast 2s after a real star, so there's no separate window to
 			bound. */}
@@ -103,14 +103,10 @@ export function showStarNagOnboardingToast() {
 		duration: TOAST_DURATION_MS,
 		// Only fires when the toast's own duration elapses naturally — a
 		// manual toast.dismiss() from starring or clicking the X does not
-		// trigger this, so it can't double-count a dismissal. Ignoring the
-		// toast isn't an explicit "no thanks", so it starts the same cooldown
-		// as a real dismiss() without also doubling the sidebar card's
-		// threshold — the default new-user path (see the toast, keep working)
-		// would otherwise make the card nearly impossible to trigger.
+		// trigger this, so it can't double-count a dismissal.
 		onAutoClose: () => {
 			track("star_nag_dismissed", { surface: "toast" });
-			useStarNagStore.getState().snoozeThresholdCard();
+			useStarNagStore.getState().snooze();
 		},
 	});
 }

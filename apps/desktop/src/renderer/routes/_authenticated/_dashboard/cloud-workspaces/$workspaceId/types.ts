@@ -1,3 +1,4 @@
+import type { PresenceVisitor } from "@superset/shared/page-presence";
 import type { CloudWorkspaceRow } from "renderer/hooks/useCloudWorkspaces";
 import type { CloudTask } from "renderer/routes/_authenticated/_dashboard/components/CloudTaskRow";
 import type { RecordLabel } from "renderer/routes/_authenticated/_dashboard/components/RecordLabels";
@@ -25,10 +26,10 @@ export type CloudWorkspaceRecord = Pick<
 	| "agentStatusAt"
 	| "createdAt"
 	| "createdBy"
-	| "presence"
 	| "deletedAt"
 	| "visibility"
 > & {
+	presence: PresenceVisitor[];
 	environmentName: string;
 	repositories: { fullName: string; branch: string }[];
 	prompt: string | null;
@@ -59,6 +60,11 @@ export interface CloudWorkspaceRecordPage {
 	updatedAt: Date;
 }
 
+export type CloudWorkspaceShareTarget =
+	| { kind: "user"; person: Person }
+	| { kind: "team"; name: string }
+	| { kind: "email"; email: string };
+
 export type CloudWorkspaceTimelineEvent =
 	| { kind: "created" }
 	| { kind: "joined" }
@@ -68,6 +74,8 @@ export type CloudWorkspaceTimelineEvent =
 			from: "just_me" | "org" | null;
 			to: "just_me" | "org";
 	  }
+	| { kind: "shared"; target: CloudWorkspaceShareTarget }
+	| { kind: "unshared"; target: CloudWorkspaceShareTarget }
 	| { kind: "description_edited" }
 	| {
 			kind: "project_changed";

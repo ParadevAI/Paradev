@@ -16,6 +16,7 @@ export const AGENT_ICONS: Record<string, number> = {
 	kimi: require("@/assets/agents/kimi.png"),
 	mastracode: require("@/assets/agents/mastracode.png"),
 	opencode: require("@/assets/agents/opencode.png"),
+	pdev: require("@/assets/agents/pdev.png"),
 	pi: require("@/assets/agents/pi.png"),
 	polygraph: require("@/assets/agents/polygraph.png"),
 	superset: require("@/assets/agents/superset.png"),

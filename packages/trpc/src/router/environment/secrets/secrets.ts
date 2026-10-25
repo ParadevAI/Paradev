@@ -10,19 +10,16 @@ import { and, asc, eq, ne, sql, sum } from "drizzle-orm";
 import { z } from "zod";
 import { assertCloudAccess } from "../../../lib/cloud-guards";
 import { jwtProcedure, userError } from "../../../trpc";
-import { loadEnvironment, secretOwnerOrganizationId } from "../environment";
+import { loadEnvironment } from "../environment";
 import { decryptSecret, encryptSecret } from "./utils/crypto";
 
 export const secretsRouter = {
 	list: jwtProcedure
 		.input(z.object({ environmentId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
-			await assertCloudAccess(ctx);
 			const environment = await loadEnvironment(input.environmentId, ctx);
-			const organizationId = secretOwnerOrganizationId(
-				environment,
-				ctx.activeOrganizationId,
-			);
+			await assertCloudAccess(ctx, environment.organizationId);
+			const organizationId = environment.organizationId;
 			const rows = await db
 				.select({
 					id: environmentSecrets.id,
@@ -44,12 +41,9 @@ export const secretsRouter = {
 	getDecrypted: jwtProcedure
 		.input(z.object({ environmentId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
-			await assertCloudAccess(ctx);
 			const environment = await loadEnvironment(input.environmentId, ctx);
-			const organizationId = secretOwnerOrganizationId(
-				environment,
-				ctx.activeOrganizationId,
-			);
+			await assertCloudAccess(ctx, environment.organizationId);
+			const organizationId = environment.organizationId;
 			const rows = await db
 				.select({
 					id: environmentSecrets.id,
@@ -104,8 +98,8 @@ export const secretsRouter = {
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			await assertCloudAccess(ctx);
 			const environment = await loadEnvironment(input.environmentId, ctx);
+			await assertCloudAccess(ctx, environment.organizationId);
 
 			const keyCheck = validateSecretKey(input.key);
 			if (!keyCheck.valid) {
@@ -124,10 +118,7 @@ export const secretsRouter = {
 				});
 			}
 
-			const organizationId = secretOwnerOrganizationId(
-				environment,
-				ctx.activeOrganizationId,
-			);
+			const organizationId = environment.organizationId;
 
 			const [stored] = await db
 				.select({
@@ -187,12 +178,9 @@ export const secretsRouter = {
 			z.object({ environmentId: z.string().uuid(), key: z.string().min(1) }),
 		)
 		.mutation(async ({ ctx, input }) => {
-			await assertCloudAccess(ctx);
 			const environment = await loadEnvironment(input.environmentId, ctx);
-			const organizationId = secretOwnerOrganizationId(
-				environment,
-				ctx.activeOrganizationId,
-			);
+			await assertCloudAccess(ctx, environment.organizationId);
+			const organizationId = environment.organizationId;
 			await db
 				.delete(environmentSecrets)
 				.where(

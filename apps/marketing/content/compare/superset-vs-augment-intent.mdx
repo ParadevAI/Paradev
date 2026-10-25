@@ -2,7 +2,7 @@
 title: "Superset vs Augment Intent (2026): Developer-Led or Coordinator-Led Orchestration?"
 description: "Compare Superset and Augment Intent for multi-agent development. Spec-driven coordination vs direct orchestration, agent support, pricing, and platform reach."
 date: 2026-08-17
-lastUpdated: 2026-09-24
+lastUpdated: 2026-10-20
 type: "1v1"
 competitors:
   - augment-intent
@@ -24,11 +24,11 @@ Superset and Augment Intent are both workspaces for running multiple coding agen
 | | **Superset** | **Augment Intent** |
 |---|---|---|
 | **What it does** | Runs multiple agents in parallel with Git worktree isolation, you direct the work | Coordinator agent drafts a spec, decomposes tasks, runs implementor agents in waves, verifier checks results |
-| **Agent support** | Any CLI agent (Claude Code, Codex, OpenCode, Gemini, Copilot, more) | Auggie (native) or bring your own: Claude Code, Codex, OpenCode |
+| **Agent support** | Any CLI agent (Claude Code, Codex, OpenCode, Gemini, Copilot, more) | Auggie (native) plus CLI agents and custom agents per workspace |
 | **Workflow** | You scope tasks, dispatch agents, review diffs per task | Three human checkpoints: spec review, task decomposition, diff review; PR generated in-app |
 | **Automations** | Scheduled recurring agent runs built in | Not documented |
 | **Programmatic control** | MCP server, CLI, TypeScript SDK | Context Engine exposed over MCP; no orchestration API documented |
-| **Platform** | macOS (experimental Linux AppImage); source-available ELv2 | macOS public beta (Apple Silicon only); Windows waitlist; no Linux |
+| **Platform** | macOS (experimental Linux AppImage); source-available ELv2 | macOS, plus an Intent Mobile app for iOS; no Windows or Linux release |
 | **Pricing** | Free tier plus paid seats; nothing proxied | Free app; usage billed in Augment credits, or via your own agent subscription in BYOA mode |
 
 ---
@@ -43,7 +43,7 @@ Superset is a local-first desktop workspace for AI coding agents. It launches Cl
 
 ## What Is Augment Intent?
 
-Intent is Augment Code's multi-agent workspace, announced in February 2026 as their vision for "what comes after the IDE" and now living at intentapp.dev. You describe an objective; a coordinator agent uses Augment's Context Engine to understand the codebase and propose a living spec; after your approval, implementor agents run in parallel waves in isolated worktrees, and a verifier agent checks the result against the spec. Diffs you approve are committed with an auto-generated PR description, and a PR Shepherd agent can drive the pull request to merge-ready. It supports Augment's native Auggie agent or bring-your-own Claude Code, Codex, or OpenCode subscriptions, and is in public beta on Apple Silicon Macs.
+Intent is Augment Code's multi-agent workspace, announced in February 2026 as their vision for "what comes after the IDE" and now living at intentapp.dev. You describe an objective; a coordinator agent uses Augment's Context Engine to understand the codebase and propose a living spec; after your approval, implementor agents run in parallel waves in isolated worktrees, and a verifier agent checks the result against the spec. Diffs you approve are committed with an auto-generated PR description, and a PR Shepherd agent can drive the pull request to merge-ready. It runs Augment's native Auggie agent and, in its own words, "your favorite CLI agents", with custom agents per workspace. It ships for macOS, with an Intent Mobile app on iOS to manage work across your connected computers.
 
 ---
 
@@ -59,11 +59,11 @@ Intent's three checkpoints (spec, decomposition, diff) are a genuine safety feat
 
 ### Agent Breadth
 
-Intent supports its native Auggie plus exactly three BYOA agents: Claude Code, Codex, and OpenCode (the full coordinator/implementor/verifier suite requires Auggie). Superset runs anything that lives in a terminal, which also means new agents work the day they ship. If your fleet includes Gemini CLI, Copilot CLI, Aider, or custom scripts, only one of these tools runs it today.
+Intent now runs CLI agents beside its native Auggie and lets you add custom agents per workspace, so agent choice is no longer a clear difference. Superset runs anything that lives in a terminal, so new agents work the day they ship. Try the specific agents in your fleet in both tools.
 
 ### Platforms, Editing, and Handoff
 
-Intent's public beta is macOS on Apple Silicon only, with Windows waitlisted, no Linux story, and a built-in diff viewer that (per Augment's own docs) has no LSP integration. Superset is macOS with an experimental Linux AppImage, and hands off to VS Code, Cursor, JetBrains, or Xcode when you want a real editor. Neither product covers Windows today.
+Intent ships for macOS, with no Windows or Linux release, and adds an iOS companion app. Superset is macOS with an experimental Linux AppImage, and hands off to VS Code, Cursor, JetBrains, or Xcode when you want a real editor. Neither product covers Windows today.
 
 ### Automations and Being Driven by Other Agents
 
@@ -73,7 +73,7 @@ Superset schedules recurring agent runs and exposes its whole orchestration surf
 
 ## Pricing
 
-Superset has a free tier and paid seats; it never proxies model calls, so your agent subscriptions and API keys are your own. The Intent app is free during beta, with usage billed in Augment credits (plans from $20/month Indie to $200/month Max, plus top-ups) or through your own Claude Code, Codex, or OpenCode subscription in BYOA mode. The practical difference: Superset's cost model is a seat, Intent's native mode is metered usage.
+Superset has a free tier and paid seats; it never proxies model calls, so your agent subscriptions and API keys are your own. The Intent app is free, with native usage billed in Augment credits, or through your own agent subscriptions when you run CLI agents. The practical difference: Superset's cost model is a seat, Intent's native mode is metered usage.
 
 ---
 
@@ -105,11 +105,11 @@ Yes. Intent backs each workspace with an isolated worktree and a dedicated branc
 
 ### Can Augment Intent use any coding agent?
 
-No. Intent supports Augment's native Auggie plus Claude Code, Codex, and OpenCode in bring-your-own-agent mode. Superset runs any CLI agent, including Gemini CLI, Copilot CLI, Aider, and custom tools.
+Intent runs Augment's native Auggie plus CLI agents and custom agents per workspace; test the agents you need. Superset runs any CLI agent, including Gemini CLI, Copilot CLI, Aider, and custom tools.
 
 ### Is Augment Intent available on Windows or Linux?
 
-Not currently. The public beta is macOS on Apple Silicon only (Intel unsupported), Windows is waitlisted, and there is no Linux release. Superset runs on macOS with an experimental Linux AppImage.
+Not currently. Intent ships for macOS, with an iOS companion app, and has no Windows or Linux release. Superset runs on macOS with an experimental Linux AppImage.
 
 ### What are Intent's known limitations?
 

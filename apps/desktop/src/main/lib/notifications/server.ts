@@ -1,4 +1,7 @@
 import { EventEmitter } from "node:events";
+import { msg } from "@lingui/core/macro";
+import { i18n } from "@superset/i18n";
+import { BRAND } from "@superset/shared/brand";
 import { BrowserWindow } from "electron";
 import express from "express";
 import { handleAuthCallback } from "lib/trpc/routers/auth/utils/auth-functions";
@@ -7,6 +10,7 @@ import { NOTIFICATION_EVENTS } from "shared/constants";
 import { env } from "shared/env.shared";
 import type { AgentLifecycleEvent } from "shared/notification-types";
 import { HOOK_PROTOCOL_VERSION } from "../terminal/env";
+import { renderAuthCallbackPage } from "./auth-callback-page";
 import { mapEventType } from "./map-event-type";
 import { resolvePaneId } from "./resolve-pane-id";
 import { recordV1AgentHookEvent } from "./v1-agent-sessions";
@@ -160,20 +164,36 @@ app.get("/auth/callback", async (req, res) => {
 	const token = req.query.token;
 	const expiresAt = req.query.expiresAt;
 	const state = req.query.state;
+	const appName = BRAND.NAME;
+	const sendPage = (status: number, title: string, description: string) =>
+		res
+			.status(status)
+			.type("html")
+			.send(renderAuthCallbackPage({ appName, title, description }));
+	const sendFailure = () =>
+		sendPage(
+			400,
+			i18n._(msg({ message: "Sign-in didn't finish" })),
+			i18n._(msg({ message: `Go back to ${appName} and sign in again.` })),
+		);
 
 	if (
 		typeof token !== "string" ||
 		typeof expiresAt !== "string" ||
 		typeof state !== "string"
 	) {
-		return res
-			.status(400)
-			.json({ success: false, error: "Missing auth params" });
+		return sendFailure();
 	}
 
 	const result = await handleAuthCallback({ token, expiresAt, state });
 	if (!result.success) {
-		return res.status(400).json(result);
+		return result.reason === "save-failed"
+			? sendPage(
+					500,
+					i18n._(msg({ message: "Sign-in didn't finish" })),
+					result.error,
+				)
+			: sendFailure();
 	}
 
 	const mainWindow = BrowserWindow.getAllWindows()[0];
@@ -185,16 +205,11 @@ app.get("/auth/callback", async (req, res) => {
 		mainWindow.focus();
 	}
 
-	// Return HTML since the browser navigated here directly (not fetch).
-	res.setHeader("Content-Type", "text/html");
-	return res.send(`<!DOCTYPE html>
-<html><head><title>Superset</title></head>
-<body style="font-family:system-ui,sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;background:#0a0a0a;color:#fafafa;">
-<div style="text-align:center">
-<h2 style="margin-bottom:8px">Signed in successfully</h2>
-<p style="opacity:0.6">You can close this tab and return to the desktop app.</p>
-</div>
-</body></html>`);
+	return sendPage(
+		200,
+		i18n._(msg({ message: "You're signed in" })),
+		i18n._(msg({ message: "You can close this tab." })),
+	);
 });
 
 // External settings change (e.g. `superset settings ...` CLI). Reads no

@@ -148,6 +148,20 @@ export function seedDefaultsIfEmpty(db: HostDb): HostAgentConfigRow[] {
 }
 
 /**
+ * A cloud workspace's launch agent may be a preset the defaults leave out (a
+ * flag-gated one such as pdev); the API has already checked it may launch.
+ */
+export function ensurePresetRow(db: HostDb, presetId: string): void {
+	const existing = seedDefaultsIfEmpty(db);
+	if (existing.some((row) => row.presetId === presetId)) return;
+	const preset = getPresetById(presetId);
+	if (!preset) return;
+	const nextOrder =
+		Math.max(-1, ...existing.map((row) => row.displayOrder)) + 1;
+	db.insert(hostAgentConfigs).values(rowFromPreset(preset, nextOrder)).run();
+}
+
+/**
  * Defaults are seeded once, when the table is empty, so an install that
  * predates a preset gaining fork support would keep an empty `forkArgs`
  * forever and silently offer no fork for a harness whose CLI can do it.

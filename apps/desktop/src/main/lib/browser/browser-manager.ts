@@ -3,6 +3,7 @@ import { msg } from "@lingui/core/macro";
 import { i18n } from "@superset/i18n";
 import { PROTOCOL_SCHEMES } from "@superset/shared/constants";
 import { clipboard, Menu, webContents } from "electron";
+import { writeClipboardImage } from "main/lib/clipboard-image";
 import { safeOpenExternal } from "main/lib/safe-url";
 import type {
 	DesignModeRect,
@@ -775,7 +776,7 @@ class BrowserManager extends EventEmitter {
 		paneId: string,
 	): Promise<{ image: Electron.NativeImage; url: string }> {
 		const image = await this.capturePageImage(paneId);
-		clipboard.writeImage(image);
+		await writeClipboardImage(image);
 		const wc = this.getWebContents(paneId);
 		return { image, url: wc?.getURL() ?? "" };
 	}
@@ -1067,7 +1068,7 @@ class BrowserManager extends EventEmitter {
 								message: "Copy Link Address",
 							}),
 						),
-						click: () => clipboard.writeText(linkURL),
+						click: () => void clipboard.writeText(linkURL),
 					},
 					{ type: "separator" },
 				);
@@ -1163,7 +1164,7 @@ class BrowserManager extends EventEmitter {
 							}),
 						),
 						click: () => {
-							if (pageURL) clipboard.writeText(pageURL);
+							if (pageURL) void clipboard.writeText(pageURL);
 						},
 						enabled: !!pageURL && pageURL !== "about:blank",
 					},
@@ -1297,24 +1298,23 @@ class BrowserManager extends EventEmitter {
 	}
 
 	private setupConsoleCapture(paneId: string, wc: Electron.WebContents): void {
-		// Electron's console-message `level` is 0..3 = verbose, info, warning,
-		// error (per electron.d.ts). console.log fires level 1 (info), so a naive
-		// 0:log,1:warn,… map mislabels every message by one.
-		const LEVEL_MAP: Record<number, ConsoleEntry["level"]> = {
-			0: "debug",
-			1: "log",
-			2: "warn",
-			3: "error",
+		const LEVEL_MAP: Record<
+			Electron.WebContentsConsoleMessageEventParams["level"],
+			ConsoleEntry["level"]
+		> = {
+			debug: "debug",
+			info: "log",
+			warning: "warn",
+			error: "error",
 		};
 
-		const handler = (
-			_event: Electron.Event,
-			level: number,
-			message: string,
-		) => {
+		const handler = ({
+			level,
+			message,
+		}: Electron.Event<Electron.WebContentsConsoleMessageEventParams>) => {
 			const entries = this.consoleLogs.get(paneId) ?? [];
 			entries.push({
-				level: LEVEL_MAP[level] ?? "log",
+				level: LEVEL_MAP[level],
 				message,
 				timestamp: Date.now(),
 			});

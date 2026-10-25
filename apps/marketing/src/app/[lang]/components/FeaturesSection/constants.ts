@@ -41,11 +41,11 @@ export const FEATURES: Feature[] = [
 			message: "Automations",
 		}),
 		title: msg({
-			message: "Put recurring work on a schedule",
+			message: "Start agents on events or a schedule",
 		}),
 		description: msg({
 			message:
-				"Turn chores into scheduled agents: issue triage, changelog drafts, dependency bumps. They run on their own and open PRs for you to review.",
+				"Turn chores into agents that run on a schedule or when an event comes in: issue triage, changelog drafts, dependency bumps. They run on their own and open PRs for you to review.",
 		}),
 	},
 	{

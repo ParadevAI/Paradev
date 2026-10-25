@@ -2,8 +2,10 @@ import { msg } from "@lingui/core/macro";
 import { auth } from "@superset/auth/server";
 import { db } from "@superset/db/client";
 import { sessions } from "@superset/db/schema/auth";
+import { BRAND } from "@superset/shared/brand";
 import { headers } from "next/headers";
 import { initServerI18n } from "@/lib/i18n-server";
+import { DesktopAuthCard } from "./components/DesktopAuthCard";
 import { DesktopRedirect } from "./components/DesktopRedirect";
 import {
 	isDesktopProtocol,
@@ -20,6 +22,15 @@ export default async function DesktopSuccessPage({
 	}>;
 }) {
 	const i18n = await initServerI18n();
+	const appName = BRAND.NAME;
+	const signInFailed = (
+		<DesktopAuthCard
+			title={i18n._(msg({ message: "Sign-in didn't finish" }))}
+			description={i18n._(
+				msg({ message: `Go back to ${appName} and sign in again.` }),
+			)}
+		/>
+	);
 
 	const {
 		desktop_state: state,
@@ -28,24 +39,7 @@ export default async function DesktopSuccessPage({
 	} = await searchParams;
 
 	if (!state) {
-		return (
-			<div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
-				<p className="text-xl text-muted-foreground">
-					{i18n._(
-						msg({
-							message: "Missing auth state",
-						}),
-					)}
-				</p>
-				<p className="text-muted-foreground/70">
-					{i18n._(
-						msg({
-							message: "Please try signing in again from the desktop app.",
-						}),
-					)}
-				</p>
-			</div>
-		);
+		return signInFailed;
 	}
 
 	let session: Awaited<ReturnType<typeof auth.api.getSession>> | null = null;
@@ -53,45 +47,11 @@ export default async function DesktopSuccessPage({
 		session = await auth.api.getSession({ headers: await headers() });
 	} catch (error) {
 		console.error("Failed to get session for desktop auth:", error);
-		return (
-			<div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
-				<p className="text-xl text-muted-foreground">
-					{i18n._(
-						msg({
-							message: "Authentication failed",
-						}),
-					)}
-				</p>
-				<p className="text-muted-foreground/70">
-					{i18n._(
-						msg({
-							message: "Please try signing in again from the desktop app.",
-						}),
-					)}
-				</p>
-			</div>
-		);
+		return signInFailed;
 	}
 
 	if (!session) {
-		return (
-			<div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
-				<p className="text-xl text-muted-foreground">
-					{i18n._(
-						msg({
-							message: "Authentication failed",
-						}),
-					)}
-				</p>
-				<p className="text-muted-foreground/70">
-					{i18n._(
-						msg({
-							message: "Please try signing in again from the desktop app.",
-						}),
-					)}
-				</p>
-			</div>
-		);
+		return signInFailed;
 	}
 
 	// The token below goes wherever these point, so refuse anything that is
@@ -103,24 +63,7 @@ export default async function DesktopSuccessPage({
 		!isDesktopProtocol(desktop_protocol) ||
 		(localCallbackBase && !localCallback)
 	) {
-		return (
-			<div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
-				<p className="text-xl text-muted-foreground">
-					{i18n._(
-						msg({
-							message: "Authentication failed",
-						}),
-					)}
-				</p>
-				<p className="text-muted-foreground/70">
-					{i18n._(
-						msg({
-							message: "Please try signing in again from the desktop app.",
-						}),
-					)}
-				</p>
-			</div>
-		);
+		return signInFailed;
 	}
 
 	// Desktop and web need independent sessions with separate activeOrganizationId
@@ -155,8 +98,6 @@ export default async function DesktopSuccessPage({
 	}
 
 	return (
-		<div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
-			<DesktopRedirect url={desktopUrl} localCallbackUrl={localCallbackUrl} />
-		</div>
+		<DesktopRedirect url={desktopUrl} localCallbackUrl={localCallbackUrl} />
 	);
 }

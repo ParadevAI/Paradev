@@ -10,10 +10,9 @@ import {
 } from "./blog";
 
 const unlistedSlugs = [
-	"claude-code-codex-iphone",
-	"scheduled-agent-maintenance",
-	"parallel-coding-agents-guide",
-	"superset-mobile",
+	"change-ui-with-your-coding-agent",
+	"send-pr-feedback-to-your-agent",
+	"review-agent-work-with-pages",
 ];
 
 test("preserves recorded blog updates without generating missing dates", () => {
