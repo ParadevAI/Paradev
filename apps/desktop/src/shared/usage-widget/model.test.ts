@@ -142,7 +142,7 @@ describe("per-account usage selection", () => {
 			{ historical: true },
 			{ identityChanged: true },
 			{ checkedAt: null },
-			{ checkedAt: new Date(now - 360001).toISOString() },
+			{ checkedAt: new Date(now - 16 * 60_000 - 1).toISOString() },
 			{ checkedAt: new Date(now + 60001).toISOString() },
 		])
 			expect(isFresh(account(patch), false, now)).toBe(false);
@@ -589,7 +589,7 @@ test("exhaustion countdown follows the limiting window and never guesses from st
 	});
 	expect(exhaustedQuota(a, false, now)).toEqual({ resetsAt: later });
 	expect(exhaustedQuota(a, true, now)).toBeNull();
-	expect(exhaustedQuota(a, false, now + 7 * 60000)).toBeNull();
+	expect(exhaustedQuota(a, false, now + 17 * 60000)).toBeNull();
 	expect(exhaustedQuota({ ...a, historical: true }, false, now)).toBeNull();
 	expect(
 		exhaustedQuota({ ...a, identityChanged: true }, false, now),

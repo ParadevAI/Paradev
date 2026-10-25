@@ -17,7 +17,8 @@ test("one primary body supplies quota and reset counts without a second tracker"
 	};
 	const read = createClaudeResetEnvelope(request, () => clock);
 	const first = await read("token", "https://synthetic/usage", {});
-	expect((await first.response.json()).five_hour.utilization).toBe(32);
+	const firstBody = (await first.response.json()) as typeof body;
+	expect(firstBody.five_hour.utilization).toBe(32);
 	expect(first.resetCredits?.availableCount).toBe(3);
 	clock += 60000;
 	const second = await read("token", "https://synthetic/usage", {});
