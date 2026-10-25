@@ -8,6 +8,7 @@ import {
 	getListedBlogPosts,
 	getRelatedPosts,
 } from "./blog";
+import { extractComparisonFaqItems } from "./compare-utils";
 
 const unlistedSlugs = [
 	"change-ui-with-your-coding-agent",
@@ -53,4 +54,12 @@ describe("unlisted blog posts", () => {
 			),
 		).toBe(false);
 	});
+});
+
+test("posts with a frontmatter FAQ do not repeat it in the body", () => {
+	for (const post of getBlogPosts()) {
+		if (!post.faq) continue;
+		expect(post.faq.length).toBeGreaterThan(0);
+		expect(extractComparisonFaqItems(post.content)).toEqual([]);
+	}
 });

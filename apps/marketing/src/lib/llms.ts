@@ -28,6 +28,8 @@ export function stripMdxSyntax(content: string): string {
 		content
 			// Remove import statements
 			.replace(/^import\s+.*$/gm, "")
+			// Remove MDX comments
+			.replace(/\{\/\*[\s\S]*?\*\/\}/g, "")
 			// Remove JSX component tags (e.g. <Video ... />, <Component>...</Component>)
 			.replace(/<[A-Z]\w*\b[^>]*\/>/g, "")
 			.replace(/<[A-Z]\w*\b[^>]*>[\s\S]*?<\/[A-Z]\w*>/g, "")
@@ -119,8 +121,8 @@ export function buildDeveloperResourcesSection(): string[] {
 		`- [OAuth protected resource metadata](${API_URL}/.well-known/oauth-protected-resource): RFC 9728`,
 		`- [OAuth authorization server metadata](${API_URL}/.well-known/oauth-authorization-server): RFC 8414`,
 		`- [Web Bot Auth key directory](${baseUrl}/.well-known/http-message-signatures-directory): Ed25519 keys Superset-operated agents sign requests with (RFC 9421)`,
-		`- [Agent skills](https://github.com/superset-sh/skills): official skills for the CLI and MCP server; install with \`npx skills add superset-sh/skills\``,
-		`- [CLI](${docsUrl}/cli/getting-started): \`brew install superset-sh/tap/superset\` (Homebrew tap: https://github.com/superset-sh/homebrew-tap) or \`curl -fsSL ${CANONICAL_URLS.MARKETING}/cli/install.sh | sh\`; reference at ${docsUrl}/cli/cli-reference`,
+		`- [Agent skills](https://github.com/paradevai/skills): official skills for the CLI and MCP server; install with \`npx skills add paradevai/skills\``,
+		`- [CLI](${docsUrl}/cli/getting-started): \`brew install paradevai/tap/superset\` (Homebrew tap: https://github.com/paradevai/homebrew-tap) or \`curl -fsSL ${CANONICAL_URLS.MARKETING}/cli/install.sh | sh\`; reference at ${docsUrl}/cli/cli-reference`,
 		`- [TypeScript SDK](${docsUrl}/sdk/getting-started): \`npm install @superset_sh/sdk\``,
 		`- [Docs llms.txt](${docsUrl}/llms.txt): scoped context for the documentation`,
 		`- [API llms.txt](${baseUrl}/api/llms.txt): scoped index of the API surface`,

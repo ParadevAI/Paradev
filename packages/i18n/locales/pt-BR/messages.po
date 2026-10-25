@@ -739,6 +739,9 @@ msgstr "{closedCount} fechados"
 msgid "{commitCount, plural, one {# commit} other {# commits}}"
 msgstr "{commitCount, plural, one {# commit} other {# commits}}"
 
+msgid "{companyName} makes {productName}."
+msgstr "{productName} é desenvolvido pela {companyName}"
+
 #. placeholder {0}: relevant.length
 msgid "{completed} of {0} checks complete"
 msgstr "{completed} de {0} verificações concluídas"
@@ -896,6 +899,12 @@ msgstr "{focusShortcutText} para focar"
 
 msgid "{formatted} {count, plural, one {dev} other {devs}}"
 msgstr "{formatted} {count, plural, one {dev} other {devs}}"
+
+msgid "{formerName} is now {productName}"
+msgstr "O {formerName} agora é {productName}"
+
+msgid "{formerName} is now called {productName}. It is the same product, built by the same team, and only the name has changed. Existing superset.sh links redirect, and the superset command keeps working."
+msgstr "O {formerName} agora se chama {productName}. É o mesmo produto, feito pela mesma equipe, e só o nome mudou. Os links existentes do superset.sh redirecionam, e o comando superset continua funcionando."
 
 msgid "{founderCount} ex-YC founders"
 msgstr "{founderCount} fundadores ex-YC"
@@ -1120,6 +1129,24 @@ msgstr "{price} por usuário/mês, {gbHours} GB-horas na nuvem por assento ao m�
 
 msgid "{price}/user/mo"
 msgstr "{price}/usuário/mês"
+
+msgid "{productName} (formerly {formerName}, YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
+msgstr "O {productName} (antigo {formerName}, YC P26) é o IDE com código-fonte disponível para a era dos agentes de IA, em que engenheiros executam centenas de agentes de programação como Claude Code e Codex em paralelo."
+
+msgid "{productName} (YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
+msgstr "O {productName} (YC P26) é o IDE com código-fonte disponível para a era dos agentes de IA, em que engenheiros executam centenas de agentes de programação como Claude Code e Codex em paralelo."
+
+msgid "{productName} for press"
+msgstr "{productName} para a imprensa"
+
+msgid "{productName} has been used by one in eight Fortune 500 companies."
+msgstr "O {productName} já foi usado por uma em cada oito empresas da Fortune 500."
+
+msgid "{productName} is used by engineers at Netflix, Microsoft, NVIDIA, DoorDash, Wix, and Mistral AI globally, and across Asia at ByteDance, Toss, Kakao, Grab, LINE, and Rakuten."
+msgstr "O {productName} é usado por engenheiros da Netflix, Microsoft, NVIDIA, DoorDash, Wix e Mistral AI no mundo todo e, na Ásia, da ByteDance, Toss, Kakao, Grab, LINE e Rakuten."
+
+msgid "{productName} raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
+msgstr "O {productName} captou uma rodada seed de US$ 11,5 milhões liderada pela Union Square Ventures, com Y Combinator e Paul Graham. O TechCrunch o apontou como uma das startups de destaque do YC Demo Day."
 
 msgid "{provider} logo"
 msgstr "logo da {provider}"
@@ -1611,6 +1638,9 @@ msgstr "Sobre"
 
 msgid "About {displayName}"
 msgstr "Sobre o {displayName}"
+
+msgid "About {productName}"
+msgstr "Sobre o {productName}"
 
 msgid "About Superset"
 msgstr "Sobre o Superset"
@@ -4398,8 +4428,11 @@ msgstr "Comunidade"
 msgid "Company"
 msgstr "Empresa"
 
-msgid "Company boilerplate, latest news, brand assets, and press contact for Superset."
-msgstr "Descrição da empresa, últimas notícias, materiais da marca e contato de imprensa da Superset."
+msgid "Company boilerplate, latest news, brand assets, and press contact for {productName} (formerly {formerName})."
+msgstr "Descrição da empresa, últimas notícias, materiais da marca e contato de imprensa do {productName} (antigo {formerName})."
+
+msgid "Company boilerplate, latest news, brand assets, and press contact for {productName}."
+msgstr "Descrição da empresa, últimas notícias, materiais da marca e contato de imprensa da {productName}."
 
 msgid "Company email"
 msgstr "E-mail corporativo"
@@ -7044,8 +7077,11 @@ msgstr "Tudo é scriptável. Crie áreas de trabalho e agentes pela CLI, integre
 msgid "Everything we built on top of the primitives — Superset originals, the"
 msgstr "Tudo o que construímos em cima dos primitivos — os originais do Superset, a suíte"
 
-msgid "Everything you need to write about Superset: our company description, latest news, logos, product images, and who to contact."
-msgstr "Tudo o que você precisa para escrever sobre o Superset: descrição da empresa, últimas notícias, logotipos, imagens do produto e com quem falar."
+msgid "Everything you need to write about {productName} (formerly {formerName}): our company description, latest news, logos, product images, and who to contact."
+msgstr "Tudo o que você precisa para escrever sobre o {productName} (antigo {formerName}): descrição da empresa, últimas notícias, logotipos, imagens do produto e com quem falar."
+
+msgid "Everything you need to write about {productName}: our company description, latest news, logos, product images, and who to contact."
+msgstr "Tudo o que você precisa para escrever sobre o {productName}: descrição da empresa, últimas notícias, logotipos, imagens do produto e com quem falar."
 
 msgid "Everything you've published is deleted, not hidden. You can rejoin later and it will rebuild from the transcripts still on this machine."
 msgstr "Tudo o que você publicou é apagado, não ocultado. Você pode voltar depois e o histórico é reconstruído a partir das transcrições que ainda estiverem nesta máquina."
@@ -8976,8 +9012,8 @@ msgstr "No app de desktop do {appName}, abra Configurações → Acesso remoto e
 msgid "In the Superset desktop app, open <0>Settings → Appearance → Theme</0>."
 msgstr "No app de desktop do Superset, abra <0>Configurações → Aparência → Tema</0>."
 
-msgid "In under a year, more than 145,000 developers across 180 countries have run Superset and created over 1.85 million agent workspaces."
-msgstr "Em menos de um ano, mais de 145.000 desenvolvedores em 180 países usaram o Superset e criaram mais de 1,85 milhão de áreas de trabalho de agentes."
+msgid "In under a year, more than 145,000 developers across 180 countries have run {productName} and created over 1.85 million agent workspaces."
+msgstr "Em menos de um ano, mais de 145.000 desenvolvedores em 180 países usaram o {productName} e criaram mais de 1,85 milhão de áreas de trabalho de agentes."
 
 msgid "In your next chat"
 msgstr "No seu próximo chat"
@@ -13709,6 +13745,9 @@ msgstr "Leia no celular"
 msgid "Read MCP servers again"
 msgstr "Ler os servidores MCP de novo"
 
+msgid "Read the announcement"
+msgstr "Leia o anúncio"
+
 msgid "Read the changelog"
 msgstr "Ler o changelog"
 
@@ -16747,9 +16786,6 @@ msgstr "superset"
 msgid "Superset"
 msgstr "Superset"
 
-msgid "Superset (YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
-msgstr "O Superset (YC P26) é o IDE com código-fonte disponível para a era dos agentes de IA, em que engenheiros executam centenas de agentes de programação como Claude Code e Codex em paralelo."
-
 msgid "Superset {version}"
 msgstr "Superset {version}"
 
@@ -16801,9 +16837,6 @@ msgstr "O Superset Enterprise é o Superset para times. Fale com a gente para sa
 msgid "Superset for iPhone and iPad"
 msgstr "Superset para iPhone e iPad"
 
-msgid "Superset for press"
-msgstr "Superset para a imprensa"
-
 msgid "Superset for your team"
 msgstr "Superset para o seu time"
 
@@ -16812,9 +16845,6 @@ msgstr "O Superset encaminha as portas que uma área de trabalho remota abre enq
 
 msgid "Superset has a free tier. The source code is available on GitHub under Elastic License 2.0 (ELv2), so you can inspect and self-host it subject to the license terms."
 msgstr "O Superset tem um plano gratuito. O código-fonte está no GitHub sob a Elastic License 2.0 (ELv2), então você pode inspecioná-lo e hospedá-lo por conta própria conforme os termos da licença."
-
-msgid "Superset has been used by one in eight Fortune 500 companies."
-msgstr "O Superset já foi usado por uma em cada oito empresas da Fortune 500."
 
 msgid "Superset hit an unexpected error. Reload to try again."
 msgstr "O Superset encontrou um erro inesperado. Recarregue para tentar novamente."
@@ -16846,8 +16876,8 @@ msgstr "O Superset é desenvolvido no Superset, então somos nossos próprios us
 msgid "Superset is designed to work with your existing tool, we natively support deep-linking to IDEs like Cursor so you can open your workspaces and files in your IDE."
 msgstr "O Superset foi feito para funcionar com a ferramenta que você já usa. Temos suporte nativo a deep links para IDEs como o Cursor, então dá para abrir suas áreas de trabalho e arquivos direto na sua IDE."
 
-msgid "Superset is getting a new name soon"
-msgstr "O Superset vai ganhar um novo nome em breve"
+msgid "Superset is now Paradev, and we raised an $11.5M seed"
+msgstr "Superset agora é Paradev, e captamos uma rodada seed de US$ 11,5 milhões"
 
 msgid "Superset is source-available: the code is public on GitHub under Elastic License 2.0 (ELv2), which lets you inspect and self-host it subject to the license terms, but is not OSI-approved open source. Superset is unrelated to Apache Superset, the business-intelligence tool."
 msgstr "O Superset é source-available: o código é público no GitHub sob a Elastic License 2.0 (ELv2), que permite inspecionar e hospedar por conta própria conforme os termos da licença, mas não é open source aprovado pela OSI. O Superset não tem relação com o Apache Superset, a ferramenta de business intelligence."
@@ -16857,9 +16887,6 @@ msgstr "O código-fonte do Superset é público para consulta. Cada pull request
 
 msgid "Superset is the workbench for the F3 to F4 transition: parallel agents in isolated workspaces, fleets you can actually supervise, and a review surface for code you did not write."
 msgstr "O Superset é a bancada para a transição de F3 para F4: agentes em paralelo em áreas de trabalho isoladas, frotas que dá para supervisionar de verdade e uma superfície de revisão para código que você não escreveu."
-
-msgid "Superset is used by engineers at Netflix, Microsoft, NVIDIA, DoorDash, Wix, and Mistral AI globally, and across Asia at ByteDance, Toss, Kakao, Grab, LINE, and Rakuten."
-msgstr "O Superset é usado por engenheiros da Netflix, Microsoft, NVIDIA, DoorDash, Wix e Mistral AI no mundo todo e, na Ásia, da ByteDance, Toss, Kakao, Grab, LINE e Rakuten."
 
 msgid "Superset isn't on Windows yet"
 msgstr "Por enquanto o Superset é só para Mac"
@@ -16914,9 +16941,6 @@ msgstr "Demo do Superset Páginas"
 
 msgid "Superset Plugins"
 msgstr "Plugins do Superset"
-
-msgid "Superset raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
-msgstr "O Superset captou uma rodada seed de US$ 11,5 milhões liderada pela Union Square Ventures, com Y Combinator e Paul Graham. O TechCrunch o apontou como uma das startups de destaque do YC Demo Day."
 
 msgid "Superset runs locally on your developers' machines. We don't store your code or AI conversations, and Superset has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at trust.superset.sh."
 msgstr "O Superset roda localmente nas máquinas do seu time. Não guardamos seu código nem suas conversas com a IA, e o Superset concluiu uma auditoria SOC 2 Tipo II com um auditor independente. Solicite o relatório e veja nossa documentação de segurança em trust.superset.sh."
@@ -17444,6 +17468,9 @@ msgstr "O agente usa suas skills e ferramentas. A issue aparece no Linear."
 msgid "The agent watching the page reads each comment. It updates the page and replies in the thread."
 msgstr "O agente que acompanha a página lê cada comentário. Ele atualiza a página e responde na conversa."
 
+msgid "The announcement also shares the $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham."
+msgstr "O anúncio também apresenta a rodada seed de US$ 11,5 milhões liderada pela Union Square Ventures, com Y Combinator e Paul Graham."
+
 msgid "The app is free to download. It requires iOS 26 or later and Superset Pro. Android is next."
 msgstr "O app é gratuito para baixar. Requer iOS 26 ou posterior e Superset Pro. O Android vem a seguir."
 
@@ -17467,6 +17494,9 @@ msgstr "A área de trabalho na nuvem deveria ter iniciado, mas não respondeu a 
 
 msgid "The code expired. Start again."
 msgstr "O código expirou. Comece de novo."
+
+msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
+msgstr "A empresa captou uma rodada seed de US$ 11,5 milhões liderada pela Union Square Ventures, com Y Combinator e Paul Graham. O TechCrunch a apontou como uma das startups de destaque do YC Demo Day."
 
 msgid "The connection timed out"
 msgstr "O tempo de conexão esgotou"

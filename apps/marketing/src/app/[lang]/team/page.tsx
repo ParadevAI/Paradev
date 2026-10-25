@@ -173,7 +173,7 @@ export default async function TeamPage() {
 					)}
 				</section>
 
-				<section className="hidden">
+				<section className="mb-24 md:mb-32">
 					<h2 className="text-2xl md:text-3xl font-normal text-foreground mb-3">
 						<Trans>Backed by</Trans>
 					</h2>

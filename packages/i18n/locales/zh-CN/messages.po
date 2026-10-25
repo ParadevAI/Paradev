@@ -739,6 +739,9 @@ msgstr "{closedCount}项未开启"
 msgid "{commitCount, plural, one {# commit} other {# commits}}"
 msgstr "{commitCount, plural, one {#个提交} other {#个提交}}"
 
+msgid "{companyName} makes {productName}."
+msgstr "{productName} 由 {companyName} 开发。"
+
 #. placeholder {0}: relevant.length
 msgid "{completed} of {0} checks complete"
 msgstr "{0}项检查中已完成{completed}项"
@@ -896,6 +899,12 @@ msgstr "{focusShortcutText}聚焦"
 
 msgid "{formatted} {count, plural, one {dev} other {devs}}"
 msgstr "{formatted}{count, plural, one {位开发者} other {位开发者}}"
+
+msgid "{formerName} is now {productName}"
+msgstr "{formerName} 现已更名为 {productName}"
+
+msgid "{formerName} is now called {productName}. It is the same product, built by the same team, and only the name has changed. Existing superset.sh links redirect, and the superset command keeps working."
+msgstr "{formerName} 现已更名为 {productName}。产品不变，团队不变，只是换了名字。现有的 superset.sh 链接会自动跳转，superset 命令也会继续可用。"
 
 msgid "{founderCount} ex-YC founders"
 msgstr "{founderCount} 位 YC 校友创始人"
@@ -1120,6 +1129,24 @@ msgstr "每用户每月 {price},每席位每月 {gbHours} 云端 GB 小时"
 
 msgid "{price}/user/mo"
 msgstr "{price}/用户/月"
+
+msgid "{productName} (formerly {formerName}, YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
+msgstr "{productName}（原 {formerName}，YC P26）是面向 AI 智能体时代的源码可用 IDE，工程师可以在其中并行运行数百个 Claude Code、Codex 等编程智能体。"
+
+msgid "{productName} (YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
+msgstr "{productName}（YC P26）是面向 AI 智能体时代的源码可用 IDE，工程师可以在其中并行运行数百个 Claude Code、Codex 等编程智能体。"
+
+msgid "{productName} for press"
+msgstr "面向媒体的 {productName}"
+
+msgid "{productName} has been used by one in eight Fortune 500 companies."
+msgstr "八分之一的 Fortune 500 公司使用过 {productName}。"
+
+msgid "{productName} is used by engineers at Netflix, Microsoft, NVIDIA, DoorDash, Wix, and Mistral AI globally, and across Asia at ByteDance, Toss, Kakao, Grab, LINE, and Rakuten."
+msgstr "在全球范围内，Netflix、Microsoft、NVIDIA、DoorDash、Wix 和 Mistral AI 的工程师都在使用 {productName}；在亚洲，ByteDance、Toss、Kakao、Grab、LINE 和 Rakuten 的工程师也在使用。"
+
+msgid "{productName} raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
+msgstr "{productName} 完成了 1150 万美元的种子轮融资，由 Union Square Ventures 领投，Y Combinator 和 Paul Graham 参投。TechCrunch 将其评为 YC Demo Day 的杰出初创公司之一。"
 
 msgid "{provider} logo"
 msgstr "{provider}标志"
@@ -1611,6 +1638,9 @@ msgstr "关于"
 
 msgid "About {displayName}"
 msgstr "关于 {displayName}"
+
+msgid "About {productName}"
+msgstr "关于{productName}"
 
 msgid "About Superset"
 msgstr "关于Superset"
@@ -4398,8 +4428,11 @@ msgstr "社区"
 msgid "Company"
 msgstr "公司"
 
-msgid "Company boilerplate, latest news, brand assets, and press contact for Superset."
-msgstr "Superset 的公司简介、最新动态、品牌素材和媒体联系方式。"
+msgid "Company boilerplate, latest news, brand assets, and press contact for {productName} (formerly {formerName})."
+msgstr "{productName}（原 {formerName}）的公司简介、最新动态、品牌素材和媒体联系方式。"
+
+msgid "Company boilerplate, latest news, brand assets, and press contact for {productName}."
+msgstr "{productName} 的公司简介、最新动态、品牌素材和媒体联系方式。"
 
 msgid "Company email"
 msgstr "公司邮箱"
@@ -7044,8 +7077,11 @@ msgstr "一切都能脚本化。用CLI创建工作区和智能体，用SDK把Sup
 msgid "Everything we built on top of the primitives — Superset originals, the"
 msgstr "我们在基础组件之上构建的一切——Superset原创组件、面向智能体界面的"
 
-msgid "Everything you need to write about Superset: our company description, latest news, logos, product images, and who to contact."
-msgstr "报道 Superset 所需的一切：公司简介、最新动态、标志、产品图片以及联系方式。"
+msgid "Everything you need to write about {productName} (formerly {formerName}): our company description, latest news, logos, product images, and who to contact."
+msgstr "报道 {productName}（原 {formerName}）所需的一切：公司简介、最新动态、标志、产品图片以及联系方式。"
+
+msgid "Everything you need to write about {productName}: our company description, latest news, logos, product images, and who to contact."
+msgstr "报道 {productName} 所需的一切：公司简介、最新动态、标志、产品图片以及联系方式。"
 
 msgid "Everything you've published is deleted, not hidden. You can rejoin later and it will rebuild from the transcripts still on this machine."
 msgstr "你发布过的所有内容都会被删除，而不是隐藏。你之后可以重新加入，届时会根据此机器上仍保留的记录重新生成。"
@@ -8976,8 +9012,8 @@ msgstr "在{appName}桌面应用中打开“设置 → 远程访问”，开启�
 msgid "In the Superset desktop app, open <0>Settings → Appearance → Theme</0>."
 msgstr "在Superset桌面应用中打开<0>设置 → 外观 → 主题</0>。"
 
-msgid "In under a year, more than 145,000 developers across 180 countries have run Superset and created over 1.85 million agent workspaces."
-msgstr "不到一年时间，来自 180 个国家的超过 145,000 名开发者运行过 Superset，并创建了超过 185 万个智能体工作区。"
+msgid "In under a year, more than 145,000 developers across 180 countries have run {productName} and created over 1.85 million agent workspaces."
+msgstr "不到一年时间，来自 180 个国家的超过 145,000 名开发者运行过 {productName}，并创建了超过 185 万个智能体工作区。"
 
 msgid "In your next chat"
 msgstr "下一次聊天中"
@@ -13709,6 +13745,9 @@ msgstr "在手机上阅读"
 msgid "Read MCP servers again"
 msgstr "重新读取MCP服务器"
 
+msgid "Read the announcement"
+msgstr "阅读公告"
+
 msgid "Read the changelog"
 msgstr "查看更新日志"
 
@@ -16747,9 +16786,6 @@ msgstr "superset"
 msgid "Superset"
 msgstr "Superset"
 
-msgid "Superset (YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
-msgstr "Superset（YC P26）是面向 AI 智能体时代的源码可用 IDE，工程师可以在其中并行运行数百个 Claude Code、Codex 等编程智能体。"
-
 msgid "Superset {version}"
 msgstr "Superset {version}"
 
@@ -16801,9 +16837,6 @@ msgstr "Superset Enterprise是面向团队的Superset。联系我们，了解它
 msgid "Superset for iPhone and iPad"
 msgstr "iPhone 和 iPad 版 Superset"
 
-msgid "Superset for press"
-msgstr "面向媒体的 Superset"
-
 msgid "Superset for your team"
 msgstr "为你的团队准备的Superset"
 
@@ -16812,9 +16845,6 @@ msgstr "当你选中某个远程工作区时，Superset 会转发它打开的端
 
 msgid "Superset has a free tier. The source code is available on GitHub under Elastic License 2.0 (ELv2), so you can inspect and self-host it subject to the license terms."
 msgstr "Superset有免费版。源代码在GitHub上以Elastic License 2.0（ELv2）提供，你可以在许可条款范围内查阅并自行部署。"
-
-msgid "Superset has been used by one in eight Fortune 500 companies."
-msgstr "八分之一的 Fortune 500 公司使用过 Superset。"
 
 msgid "Superset hit an unexpected error. Reload to try again."
 msgstr "Superset遇到意外错误。重新加载以重试。"
@@ -16846,8 +16876,8 @@ msgstr "Superset 就是在 Superset 中构建的，因此我们自己就是它�
 msgid "Superset is designed to work with your existing tool, we natively support deep-linking to IDEs like Cursor so you can open your workspaces and files in your IDE."
 msgstr "Superset的设计就是配合你现有的工具。我们原生支持深度链接到Cursor这类IDE，你可以直接在自己的IDE里打开工作区和文件。"
 
-msgid "Superset is getting a new name soon"
-msgstr "Superset 即将更名"
+msgid "Superset is now Paradev, and we raised an $11.5M seed"
+msgstr "Superset 现已更名为 Paradev，并完成 1150 万美元种子轮融资"
 
 msgid "Superset is source-available: the code is public on GitHub under Elastic License 2.0 (ELv2), which lets you inspect and self-host it subject to the license terms, but is not OSI-approved open source. Superset is unrelated to Apache Superset, the business-intelligence tool."
 msgstr "Superset是源码可见的：代码在GitHub上公开，采用Elastic License 2.0（ELv2），你可以在许可条款范围内查阅并自行部署，但它不是OSI认可的开源许可。Superset与商业智能工具Apache Superset没有任何关系。"
@@ -16857,9 +16887,6 @@ msgstr "Superset 源码可见。每个拉取请求、评审和 bug 都在 GitHub
 
 msgid "Superset is the workbench for the F3 to F4 transition: parallel agents in isolated workspaces, fleets you can actually supervise, and a review surface for code you did not write."
 msgstr "Superset是F3到F4这段过渡期的工作台：隔离工作区里的并行智能体、真正管得过来的智能体集群，以及一套用来审查非你所写代码的界面。"
-
-msgid "Superset is used by engineers at Netflix, Microsoft, NVIDIA, DoorDash, Wix, and Mistral AI globally, and across Asia at ByteDance, Toss, Kakao, Grab, LINE, and Rakuten."
-msgstr "在全球范围内，Netflix、Microsoft、NVIDIA、DoorDash、Wix 和 Mistral AI 的工程师都在使用 Superset；在亚洲，ByteDance、Toss、Kakao、Grab、LINE 和 Rakuten 的工程师也在使用。"
 
 msgid "Superset isn't on Windows yet"
 msgstr "Superset暂不支持Windows"
@@ -16914,9 +16941,6 @@ msgstr "Superset 页面演示"
 
 msgid "Superset Plugins"
 msgstr "Superset 插件"
-
-msgid "Superset raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
-msgstr "Superset 完成了 1150 万美元的种子轮融资，由 Union Square Ventures 领投，Y Combinator 和 Paul Graham 参投。TechCrunch 将其评为 YC Demo Day 的杰出初创公司之一。"
 
 msgid "Superset runs locally on your developers' machines. We don't store your code or AI conversations, and Superset has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at trust.superset.sh."
 msgstr "Superset在你的开发者机器上本地运行。我们不存储你的代码或AI对话，并且Superset已通过独立审计机构的SOC 2 Type II审计。可在trust.superset.sh索取报告并查阅我们的安全文档。"
@@ -17444,6 +17468,9 @@ msgstr "智能体使用其技能和工具，问题会出现在 Linear 中。"
 msgid "The agent watching the page reads each comment. It updates the page and replies in the thread."
 msgstr "关注该页面的智能体会读取每条评论，更新页面并在讨论串中回复。"
 
+msgid "The announcement also shares the $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham."
+msgstr "公告还介绍了由 Union Square Ventures 领投、Y Combinator 和 Paul Graham 参投的 1150 万美元种子轮融资。"
+
 msgid "The app is free to download. It requires iOS 26 or later and Superset Pro. Android is next."
 msgstr "该应用可免费下载。需要 iOS 26 或更高版本以及 Superset Pro。接下来将推出 Android 版。"
 
@@ -17467,6 +17494,9 @@ msgstr "云端工作区本应已启动，但没有及时响应。下次运行时
 
 msgid "The code expired. Start again."
 msgstr "代码已过期。请重新开始。"
+
+msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
+msgstr "公司完成了 1150 万美元的种子轮融资，由 Union Square Ventures 领投，Y Combinator 和 Paul Graham 参投。TechCrunch 将其评为 YC Demo Day 的杰出初创公司之一。"
 
 msgid "The connection timed out"
 msgstr "连接已超时"

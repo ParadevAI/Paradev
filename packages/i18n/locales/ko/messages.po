@@ -739,6 +739,9 @@ msgstr "{closedCount}개 닫힘"
 msgid "{commitCount, plural, one {# commit} other {# commits}}"
 msgstr "{commitCount, plural, one {커밋 #개} other {커밋 #개}}"
 
+msgid "{companyName} makes {productName}."
+msgstr "{productName}은(는) {companyName}에서 만듭니다."
+
 #. placeholder {0}: relevant.length
 msgid "{completed} of {0} checks complete"
 msgstr "검사 {0}개 중 {completed}개 완료"
@@ -896,6 +899,12 @@ msgstr "포커스하려면 {focusShortcutText}"
 
 msgid "{formatted} {count, plural, one {dev} other {devs}}"
 msgstr "개발자 {formatted}{count, plural, one {명} other {명}}"
+
+msgid "{formerName} is now {productName}"
+msgstr "{formerName}의 새 이름: {productName}"
+
+msgid "{formerName} is now called {productName}. It is the same product, built by the same team, and only the name has changed. Existing superset.sh links redirect, and the superset command keeps working."
+msgstr "{formerName}의 새 이름은 {productName}입니다. 같은 제품, 같은 팀이며 이름만 바뀌었습니다. 기존 superset.sh 링크는 리디렉션되며 superset 명령어도 계속 작동합니다."
 
 msgid "{founderCount} ex-YC founders"
 msgstr "YC 출신 창업자 {founderCount}명"
@@ -1120,6 +1129,24 @@ msgstr "사용자당 월 {price}, 좌석당 매월 클라우드 {gbHours} GB 시
 
 msgid "{price}/user/mo"
 msgstr "사용자당 월 {price}"
+
+msgid "{productName} (formerly {formerName}, YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
+msgstr "AI 에이전트 시대를 위한 소스 공개형 IDE인 {productName}(구 {formerName}, YC P26)에서는 엔지니어가 Claude Code와 Codex 같은 코딩 에이전트 수백 개를 병렬로 실행합니다."
+
+msgid "{productName} (YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
+msgstr "AI 에이전트 시대를 위한 소스 공개형 IDE인 {productName}(YC P26)에서는 엔지니어가 Claude Code와 Codex 같은 코딩 에이전트 수백 개를 병렬로 실행합니다."
+
+msgid "{productName} for press"
+msgstr "언론을 위한 {productName}"
+
+msgid "{productName} has been used by one in eight Fortune 500 companies."
+msgstr "{productName}의 사용 기업에는 Fortune 500 기업 8곳 중 1곳이 포함됩니다."
+
+msgid "{productName} is used by engineers at Netflix, Microsoft, NVIDIA, DoorDash, Wix, and Mistral AI globally, and across Asia at ByteDance, Toss, Kakao, Grab, LINE, and Rakuten."
+msgstr "{productName}의 사용자로는 전 세계적으로 Netflix, Microsoft, NVIDIA, DoorDash, Wix, Mistral AI의 엔지니어가, 아시아에서는 ByteDance, 토스, 카카오, Grab, LINE, Rakuten의 엔지니어가 있습니다."
+
+msgid "{productName} raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
+msgstr "{productName} 팀은 Union Square Ventures가 리드하고 Y Combinator와 Paul Graham이 참여한 1,150만 달러 규모의 시드 라운드를 유치했습니다. TechCrunch는 이 팀을 YC Demo Day의 주목할 만한 스타트업 중 하나로 선정했습니다."
 
 msgid "{provider} logo"
 msgstr "{provider} 로고"
@@ -1611,6 +1638,9 @@ msgstr "회사 소개"
 
 msgid "About {displayName}"
 msgstr "{displayName}에 관하여"
+
+msgid "About {productName}"
+msgstr "{productName} 소개"
 
 msgid "About Superset"
 msgstr "Superset 소개"
@@ -4398,8 +4428,11 @@ msgstr "커뮤니티"
 msgid "Company"
 msgstr "회사"
 
-msgid "Company boilerplate, latest news, brand assets, and press contact for Superset."
-msgstr "Superset의 회사 소개, 최신 소식, 브랜드 자료, 언론 문의처."
+msgid "Company boilerplate, latest news, brand assets, and press contact for {productName} (formerly {formerName})."
+msgstr "{productName}(구 {formerName})의 회사 소개, 최신 소식, 브랜드 자료, 언론 문의처."
+
+msgid "Company boilerplate, latest news, brand assets, and press contact for {productName}."
+msgstr "{productName}의 회사 소개, 최신 소식, 브랜드 자료, 언론 문의처."
 
 msgid "Company email"
 msgstr "회사 이메일"
@@ -7044,8 +7077,11 @@ msgstr "모든 것이 스크립트로 가능합니다. CLI에서 워크스페이
 msgid "Everything we built on top of the primitives — Superset originals, the"
 msgstr "프리미티브 위에 우리가 만든 모든 것 — Superset 오리지널, 에이전트 UI용"
 
-msgid "Everything you need to write about Superset: our company description, latest news, logos, product images, and who to contact."
-msgstr "Superset에 대해 기사를 쓰는 데 필요한 모든 것: 회사 소개, 최신 소식, 로고, 제품 이미지, 연락처."
+msgid "Everything you need to write about {productName} (formerly {formerName}): our company description, latest news, logos, product images, and who to contact."
+msgstr "{productName}(구 {formerName})에 대해 기사를 쓰는 데 필요한 모든 것: 회사 소개, 최신 소식, 로고, 제품 이미지, 연락처."
+
+msgid "Everything you need to write about {productName}: our company description, latest news, logos, product images, and who to contact."
+msgstr "{productName}에 대해 기사를 쓰는 데 필요한 모든 것: 회사 소개, 최신 소식, 로고, 제품 이미지, 연락처."
 
 msgid "Everything you've published is deleted, not hidden. You can rejoin later and it will rebuild from the transcripts still on this machine."
 msgstr "게시한 모든 내용이 숨겨지는 것이 아니라 삭제됩니다. 나중에 다시 참여하면 이 컴퓨터에 남아 있는 기록에서 다시 만들어집니다."
@@ -8976,8 +9012,8 @@ msgstr "{appName} 데스크톱 앱에서 설정 → 원격 액세스을 열고 �
 msgid "In the Superset desktop app, open <0>Settings → Appearance → Theme</0>."
 msgstr "Superset 데스크톱 앱에서 <0>설정 → 모양 → 테마</0>를 여세요."
 
-msgid "In under a year, more than 145,000 developers across 180 countries have run Superset and created over 1.85 million agent workspaces."
-msgstr "1년이 채 되지 않아 180개국의 145,000명 이상의 개발자가 Superset을 실행했고, 185만 개 이상의 에이전트 워크스페이스를 만들었습니다."
+msgid "In under a year, more than 145,000 developers across 180 countries have run {productName} and created over 1.85 million agent workspaces."
+msgstr "1년이 채 되지 않아 180개국의 145,000명 이상의 개발자가 {productName}에서 185만 개 이상의 에이전트 워크스페이스를 만들었습니다."
 
 msgid "In your next chat"
 msgstr "다음 채팅부터"
@@ -13709,6 +13745,9 @@ msgstr "휴대폰으로 읽기"
 msgid "Read MCP servers again"
 msgstr "MCP 서버 다시 읽기"
 
+msgid "Read the announcement"
+msgstr "발표 읽기"
+
 msgid "Read the changelog"
 msgstr "변경 로그 읽기"
 
@@ -16747,9 +16786,6 @@ msgstr "superset"
 msgid "Superset"
 msgstr "Superset"
 
-msgid "Superset (YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
-msgstr "Superset(YC P26)은 AI 에이전트 시대를 위한 소스 공개형 IDE로, 엔지니어가 Claude Code와 Codex 같은 코딩 에이전트 수백 개를 병렬로 실행할 수 있습니다."
-
 msgid "Superset {version}"
 msgstr "Superset {version}"
 
@@ -16801,9 +16837,6 @@ msgstr "Superset Enterprise는 팀을 위한 Superset입니다. 어떤 기능이
 msgid "Superset for iPhone and iPad"
 msgstr "iPhone 및 iPad용 Superset"
 
-msgid "Superset for press"
-msgstr "언론을 위한 Superset"
-
 msgid "Superset for your team"
 msgstr "팀을 위한 Superset"
 
@@ -16812,9 +16845,6 @@ msgstr "원격 워크스페이스를 선택해 두면 Superset이 그 워크스�
 
 msgid "Superset has a free tier. The source code is available on GitHub under Elastic License 2.0 (ELv2), so you can inspect and self-host it subject to the license terms."
 msgstr "Superset에는 무료 플랜이 있습니다. 소스 코드는 Elastic License 2.0(ELv2)으로 GitHub에 공개되어 있어, 라이선스 조건에 따라 직접 확인하고 셀프 호스팅할 수 있습니다."
-
-msgid "Superset has been used by one in eight Fortune 500 companies."
-msgstr "Superset은 Fortune 500 기업 8곳 중 1곳이 사용한 적이 있습니다."
 
 msgid "Superset hit an unexpected error. Reload to try again."
 msgstr "Superset에서 예기치 않은 오류가 발생했습니다. 다시 로드해 보세요."
@@ -16846,8 +16876,8 @@ msgstr "Superset은 Superset으로 개발됩니다. 우리가 가장 열심히 �
 msgid "Superset is designed to work with your existing tool, we natively support deep-linking to IDEs like Cursor so you can open your workspaces and files in your IDE."
 msgstr "Superset은 기존 도구와 함께 쓰도록 만들었습니다. Cursor 같은 IDE로의 딥링크를 기본 지원하므로 워크스페이스와 파일을 쓰던 IDE에서 열 수 있습니다."
 
-msgid "Superset is getting a new name soon"
-msgstr "Superset의 이름이 곧 바뀝니다"
+msgid "Superset is now Paradev, and we raised an $11.5M seed"
+msgstr "Superset이 Paradev가 되었고, 1,150만 달러 규모의 시드 투자를 유치했습니다"
 
 msgid "Superset is source-available: the code is public on GitHub under Elastic License 2.0 (ELv2), which lets you inspect and self-host it subject to the license terms, but is not OSI-approved open source. Superset is unrelated to Apache Superset, the business-intelligence tool."
 msgstr "Superset은 소스가 공개된 소프트웨어입니다. 코드는 Elastic License 2.0(ELv2)으로 GitHub에 공개되어 있어 라이선스 조건에 따라 확인하고 셀프 호스팅할 수 있지만, OSI 승인 오픈 소스는 아닙니다. Superset은 비즈니스 인텔리전스 도구인 Apache Superset과 관련이 없습니다."
@@ -16857,9 +16887,6 @@ msgstr "Superset은 소스 공개 소프트웨어입니다. 모든 풀 리퀘스
 
 msgid "Superset is the workbench for the F3 to F4 transition: parallel agents in isolated workspaces, fleets you can actually supervise, and a review surface for code you did not write."
 msgstr "Superset은 F3에서 F4로 넘어가는 전환기를 위한 작업대입니다. 격리된 워크스페이스에서 병렬로 도는 에이전트, 실제로 감독할 수 있는 플릿, 그리고 직접 쓰지 않은 코드를 위한 리뷰 화면을 제공합니다."
-
-msgid "Superset is used by engineers at Netflix, Microsoft, NVIDIA, DoorDash, Wix, and Mistral AI globally, and across Asia at ByteDance, Toss, Kakao, Grab, LINE, and Rakuten."
-msgstr "Superset은 전 세계적으로 Netflix, Microsoft, NVIDIA, DoorDash, Wix, Mistral AI의 엔지니어가, 아시아에서는 ByteDance, 토스, 카카오, Grab, LINE, Rakuten의 엔지니어가 사용하고 있습니다."
 
 msgid "Superset isn't on Windows yet"
 msgstr "현재 Superset은 Mac에서만 사용할 수 있습니다"
@@ -16914,9 +16941,6 @@ msgstr "Superset 페이지 데모"
 
 msgid "Superset Plugins"
 msgstr "Superset 플러그인"
-
-msgid "Superset raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
-msgstr "Superset은 Union Square Ventures가 리드하고 Y Combinator와 Paul Graham이 참여한 1,150만 달러 규모의 시드 라운드를 유치했습니다. TechCrunch는 Superset을 YC Demo Day의 주목할 만한 스타트업 중 하나로 선정했습니다."
 
 msgid "Superset runs locally on your developers' machines. We don't store your code or AI conversations, and Superset has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at trust.superset.sh."
 msgstr "Superset은 개발자의 로컬 머신에서 실행됩니다. 코드나 AI 대화를 저장하지 않으며, 독립 감사인과 함께 SOC 2 Type II 감사를 완료했습니다. trust.superset.sh에서 보고서를 요청하고 보안 문서를 확인하세요."
@@ -17444,6 +17468,9 @@ msgstr "에이전트가 스킬과 도구를 사용하고, 이슈가 Linear에 �
 msgid "The agent watching the page reads each comment. It updates the page and replies in the thread."
 msgstr "페이지를 지켜보는 에이전트가 각 댓글을 읽고 페이지를 업데이트한 뒤 스레드에 답합니다."
 
+msgid "The announcement also shares the $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham."
+msgstr "이번 발표에서는 Union Square Ventures가 주도하고 Y Combinator와 Paul Graham이 참여한 1,150만 달러 규모의 시드 라운드도 함께 공개합니다."
+
 msgid "The app is free to download. It requires iOS 26 or later and Superset Pro. Android is next."
 msgstr "앱은 무료로 다운로드할 수 있습니다. iOS 26 이상과 Superset Pro가 필요합니다. 다음은 Android입니다."
 
@@ -17467,6 +17494,9 @@ msgstr "클라우드 워크스페이스가 시작되었어야 하지만 제시�
 
 msgid "The code expired. Start again."
 msgstr "코드가 만료되었습니다. 다시 시작하세요."
+
+msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
+msgstr "회사는 Union Square Ventures가 리드하고 Y Combinator와 Paul Graham이 참여한 1,150만 달러 규모의 시드 라운드를 유치했습니다. TechCrunch는 이 회사를 YC Demo Day의 주목할 만한 스타트업 중 하나로 선정했습니다."
 
 msgid "The connection timed out"
 msgstr "연결 시간이 초과되었습니다"
