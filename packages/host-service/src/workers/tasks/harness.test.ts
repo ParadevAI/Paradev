@@ -139,6 +139,16 @@ test("saved-history worker returns only stable identity evidence and refuses inv
 		modifiedAt: expect.any(Number),
 		changedAt: expect.any(Number),
 		sha256: createHash("sha256").update(content).digest("hex"),
+		storeBindings: [
+			{
+				path: path.join(input.sourceDirectory, "projects"),
+				canonical: realpathSync(path.join(configDir, "projects")),
+			},
+			{
+				path: path.join(input.targetDirectory, "projects"),
+				canonical: realpathSync(path.join(configDir, "projects")),
+			},
+		],
 	});
 	writeFileSync(file, "{invalid JSON}\n");
 	expect(await pool.run(workerOnlyTask, input)).toBeNull();
