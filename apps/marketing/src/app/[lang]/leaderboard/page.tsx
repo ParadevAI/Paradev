@@ -1,7 +1,7 @@
 import { msg } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { getI18nInstance } from "@superset/i18n/server";
-import { COMPANY } from "@superset/shared/constants";
+import { BRAND } from "@superset/shared/brand";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
@@ -35,14 +35,14 @@ export async function generateMetadata(): Promise<Metadata> {
 		description,
 		alternates: localizedAlternates(lang, "/leaderboard"),
 		openGraph: {
-			title: `${title} | ${COMPANY.NAME}`,
+			title: `${title} | ${BRAND.NAME}`,
 			description,
 			url: localeUrl(lang, "/leaderboard"),
 			images: ["/og-image.png"],
 		},
 		twitter: {
 			card: "summary_large_image",
-			title: `${title} | ${COMPANY.NAME}`,
+			title: `${title} | ${BRAND.NAME}`,
 			description,
 			images: ["/og-image.png"],
 		},

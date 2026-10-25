@@ -2,7 +2,9 @@ import type {
 	CreateAccountSessionInput,
 	UserContent,
 } from "@superset/chat/protocol";
+import type { WorkspaceStore } from "@superset/panes";
 import type { AgentIdentityId } from "@superset/shared/agent-catalog";
+import type { StoreApi } from "zustand/vanilla";
 export interface FilePosition {
 	line: number;
 	column?: number;
@@ -144,6 +146,7 @@ export interface SubagentPaneData {
 }
 
 export type WorkspaceSearchKey =
+	| "sessionId"
 	| "terminalId"
 	| "focusRequestId"
 	| "subagentTerminalId"
@@ -161,6 +164,11 @@ export type WorkspaceSearchKey =
  * and on every Back onto that entry.
  */
 export type ConsumeSearch = (keys: WorkspaceSearchKey[]) => void;
+
+export interface PaneTarget {
+	store: StoreApi<WorkspaceStore<PaneViewerData>>;
+	reveal: () => void;
+}
 
 export type PaneViewerData =
 	| FilePaneData

@@ -16,7 +16,7 @@ export function PublishCard() {
 					publish onboarding.html)
 				</p>
 				<p className="pl-3 text-emerald-500">
-					└ Published {COMPANY.DOMAIN}/page/onboarding · version 1
+					{`└ Published ${COMPANY.DOMAIN}/page/onboarding · version 1`}
 				</p>
 			</div>
 		</div>

@@ -9,7 +9,7 @@
 		"pin": "bun run src/pin.ts",
 		"assets": "bun run src/assets/produce.ts",
 		"release": "bun run src/environments/release.ts",
-		"seed": "bun run src/environments/seed.ts",
+		"record-bundle": "bun run src/environments/record-bundle.ts",
 		"test": "bun test",
 		"typecheck": "tsc --noEmit --emitDeclarationOnly false"
 	},
@@ -24,7 +24,7 @@
 	},
 	"devDependencies": {
 		"@superset/typescript": "workspace:*",
-		"@types/bun": "1.4.2",
+		"@types/bun": "1.4.3",
 		"typescript": "7.0.2"
 	}
 }

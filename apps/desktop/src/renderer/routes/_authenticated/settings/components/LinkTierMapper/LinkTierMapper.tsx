@@ -1,5 +1,4 @@
 import { Trans } from "@lingui/react/macro";
-import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { Label } from "@superset/ui/label";
 import {
 	Select,
@@ -8,7 +7,6 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@superset/ui/select";
-import { useFeatureFlagEnabled } from "posthog-js/react";
 import { useCallback } from "react";
 import {
 	actionLabel,
@@ -19,6 +17,7 @@ import {
 	type Surface,
 } from "renderer/lib/clickPolicy";
 import { HighlightText } from "renderer/routes/_authenticated/settings/components/HighlightText";
+import { useRightPaneAreaEnabled } from "renderer/stores/right-pane-area";
 import { useSettingsSearchQuery } from "renderer/stores/settings-state";
 
 type SlotValue = LinkAction | "none";
@@ -52,8 +51,7 @@ export function LinkTierMapper({
 	surface,
 }: LinkTierMapperProps) {
 	const searchQuery = useSettingsSearchQuery();
-	const isRightPaneAreaEnabled =
-		useFeatureFlagEnabled(FEATURE_FLAGS.RIGHT_PANE_AREA) === true;
+	const isRightPaneAreaEnabled = useRightPaneAreaEnabled() === true;
 	const pick = useCallback(
 		(tier: LinkTier, nextSlot: SlotValue) => {
 			const nextAction = fromSlot(nextSlot);

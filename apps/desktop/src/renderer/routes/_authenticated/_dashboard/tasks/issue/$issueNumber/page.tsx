@@ -17,6 +17,7 @@ import {
 	type LinkedIssue,
 	useNewWorkspaceDraftStore,
 } from "renderer/stores/new-workspace-draft";
+import { GitHubAuthorAvatar } from "../../components/GitHubAuthorAvatar";
 import { Route as TasksLayoutRoute } from "../../layout";
 import { tasksSearchFromFilters } from "../../stores/tasks-filter-state";
 
@@ -230,7 +231,8 @@ function IssueDetailPage() {
 						{data.author && (
 							<>
 								<span aria-hidden>·</span>
-								<span className="min-w-0 break-words">
+								<span className="flex min-w-0 items-center gap-1.5 break-words">
+									<GitHubAuthorAvatar login={data.author} />
 									<Trans>by {data.author}</Trans>
 								</span>
 							</>

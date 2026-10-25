@@ -1,6 +1,6 @@
 {
 	"name": "@superset/host-service",
-	"version": "1.37.0",
+	"version": "1.40.0",
 	"private": true,
 	"type": "module",
 	"exports": {
@@ -85,6 +85,7 @@
 		"@superset/agent-setup": "workspace:*",
 		"@superset/chat": "workspace:*",
 		"@superset/chat-runtime": "workspace:*",
+		"@superset/macos-process-metrics": "workspace:*",
 		"@superset/port-scanner": "workspace:*",
 		"@superset/pty-daemon": "workspace:*",
 		"@superset/shared": "workspace:*",
@@ -97,6 +98,7 @@
 		"better-sqlite3": "12.11.1",
 		"drizzle-orm": "0.45.2",
 		"entities": "7.0.1",
+		"expo-device-hub": "0.18.0",
 		"hono": "4.13.7",
 		"mime-types": "3.0.2",
 		"node-pty": "1.2.0-beta.14",
@@ -107,7 +109,6 @@
 		"smol-toml": "1.9.0",
 		"superjson": "2.2.6",
 		"tree-kill": "1.2.2",
-		"yaml": "2.9.1",
 		"zod": "4.6.5"
 	},
 	"devDependencies": {
@@ -118,7 +119,7 @@
 		"@types/mime-types": "3.0.1",
 		"@types/node": "24.12.0",
 		"@types/semver": "7.7.1",
-		"bun-types": "1.4.2",
+		"bun-types": "1.4.3",
 		"drizzle-kit": "0.31.8",
 		"tsx": "4.21.0",
 		"typescript": "7.0.2"

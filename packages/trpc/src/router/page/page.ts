@@ -1,9 +1,9 @@
 import { db, dbWs } from "@superset/db/client";
 import {
-	attachments,
-	files,
 	members,
 	organizations,
+	pageComments,
+	pageCommentThreads,
 	pages,
 	pageVersions,
 	type SelectPage,
@@ -13,7 +13,6 @@ import {
 import { escapeLikePattern } from "@superset/db/utils";
 import { mintPageSlug } from "@superset/shared/page-slug";
 import {
-	fileOriginalKey,
 	pageManifestKey,
 	pageThumbnailKey,
 	pageThumbnailUrl,
@@ -29,6 +28,7 @@ import {
 	isNotNull,
 	isNull,
 	lt,
+	ne,
 	notExists,
 	or,
 	type SQL,
@@ -36,11 +36,19 @@ import {
 } from "drizzle-orm";
 import { z } from "zod";
 import { env } from "../../env";
+import { detachAll, reapOrphanFiles } from "../../lib/files";
 import { deletePageStorage } from "../../lib/page-store";
 import { deleteObjects, objectExists, presignedGetUrl } from "../../lib/r2";
 import { protectedProcedure, publicProcedure, userError } from "../../trpc";
 import { requireActiveOrgMembership } from "../utils/active-org";
-import { assertPageReadable, assertPageWritable } from "./access";
+import {
+	assertPageReadable,
+	assertPageWritable,
+	loadPageShareRole,
+	pageAccess,
+	pageReadableBy,
+	pageSharedWith,
+} from "./access";
 import { pageAssetRouter } from "./assets";
 import { withCommentSummaries } from "./comment-summary";
 import { decodePageCursor, encodePageCursor } from "./cursor";
@@ -66,12 +74,14 @@ import {
 	publicPageSchema,
 	publishPageSchema,
 	pullPageSchema,
+	setPageOrganizationRoleSchema,
 	setPageVisibilitySchema,
 	setPageWatchSchema,
 	setSharedVersionSchema,
 	updatePageSchema,
 } from "./schema";
 import { resolveSharedVersion, servedVersion } from "./shared-version";
+import { pageSharingRouter } from "./sharing";
 import {
 	deletePageObjects,
 	mintPageTicket,
@@ -89,20 +99,25 @@ import {
 } from "./watch-ownership";
 import { assertWorkspaceAccess } from "./workspace-access";
 
-function visibilityFilter(userId: string) {
-	return or(
-		eq(pages.visibility, "org"),
-		eq(pages.visibility, "everyone"),
-		and(eq(pages.visibility, "just_me"), eq(pages.createdByUserId, userId)),
+/** Someone else's page shared with `userId`, whatever its general access. */
+function sharedWithScope(userId: string) {
+	return and(
+		or(isNull(pages.createdByUserId), ne(pages.createdByUserId, userId)),
+		pageSharedWith(userId),
 	);
 }
 
-function scopeFilter(scope: PageListScope): SQL | undefined {
+function scopeFilter(scope: PageListScope, userId: string): SQL | undefined {
 	switch (scope) {
 		case "team":
 			return sql`${pages.visibility} <> 'just_me'`;
 		case "mine":
-			return eq(pages.visibility, "just_me");
+			return and(
+				eq(pages.visibility, "just_me"),
+				eq(pages.createdByUserId, userId),
+			);
+		case "shared":
+			return sharedWithScope(userId);
 		default:
 			return undefined;
 	}
@@ -112,12 +127,15 @@ function scopeFilter(scope: PageListScope): SQL | undefined {
  * Shared by `list` and `counts` so a tab's count and its contents can't be
  * answered by two different WHERE clauses.
  */
-function pageFilters(input: {
-	search?: string | undefined;
-	scope?: PageListScope | undefined;
-	authorId?: string | undefined;
-	ids?: string[] | undefined;
-}): (SQL | undefined)[] {
+function pageFilters(
+	input: {
+		search?: string | undefined;
+		scope?: PageListScope | undefined;
+		authorId?: string | undefined;
+		ids?: string[] | undefined;
+	},
+	userId: string,
+): (SQL | undefined)[] {
 	const filters: (SQL | undefined)[] = [];
 
 	if (input.search) {
@@ -131,7 +149,7 @@ function pageFilters(input: {
 		);
 	}
 
-	if (input.scope) filters.push(scopeFilter(input.scope));
+	if (input.scope) filters.push(scopeFilter(input.scope, userId));
 	if (input.authorId) filters.push(eq(pages.createdByUserId, input.authorId));
 	// An empty array is "no pins", which must return nothing rather than
 	// degrade to the unfiltered list.
@@ -152,7 +170,7 @@ async function pageNotFound(identity: SQL, userId: string): Promise<TRPCError> {
 			),
 		)
 		.innerJoin(organizations, eq(organizations.id, pages.organizationId))
-		.where(and(identity, visibilityFilter(userId)))
+		.where(and(identity, pageReadableBy(userId)))
 		.limit(1);
 
 	if (!elsewhere) {
@@ -197,7 +215,7 @@ async function loadPage({
 	if (!page) {
 		throw await pageNotFound(identity, userId);
 	}
-	assertPageReadable(page, userId);
+	assertPageReadable(page, userId, await loadPageShareRole(page, userId));
 	return page;
 }
 
@@ -293,8 +311,8 @@ async function listPageBatch({
 
 	const filters: (SQL | undefined)[] = [
 		eq(pages.organizationId, organizationId),
-		visibilityFilter(userId),
-		...pageFilters(input ?? {}),
+		pageReadableBy(userId),
+		...pageFilters(input ?? {}, userId),
 	];
 
 	if (input?.cursor) {
@@ -398,6 +416,7 @@ async function listPageBatch({
 
 export const pageRouter = {
 	assets: pageAssetRouter,
+	sharing: pageSharingRouter,
 	...pageReportRouter,
 	...pageToolRouter,
 
@@ -537,18 +556,19 @@ export const pageRouter = {
 
 			const filters: (SQL | undefined)[] = [
 				eq(pages.organizationId, organizationId),
-				visibilityFilter(userId),
-				...pageFilters({
-					search: input?.search,
-					authorId: input?.authorId,
-				}),
+				pageReadableBy(userId),
+				...pageFilters(
+					{ search: input?.search, authorId: input?.authorId },
+					userId,
+				),
 			];
 
 			const pinned = input?.pinnedIds ?? [];
 			const selection = {
 				all: sql<number>`count(*)::int`,
 				team: sql<number>`count(*) filter (where ${pages.visibility} <> 'just_me')::int`,
-				mine: sql<number>`count(*) filter (where ${pages.visibility} = 'just_me')::int`,
+				mine: sql<number>`count(*) filter (where ${scopeFilter("mine", userId)})::int`,
+				shared: sql<number>`count(*) filter (where ${sharedWithScope(userId)})::int`,
 				pinned: pinned.length
 					? sql<number>`count(*) filter (where ${inArray(pages.id, pinned)})::int`
 					: sql<number>`0::int`,
@@ -607,16 +627,16 @@ export const pageRouter = {
 				.where(
 					and(
 						eq(pages.organizationId, organizationId),
-						visibilityFilter(userId),
+						pageReadableBy(userId),
 						// `authorId` deliberately absent; `search` still applies.
-						...pageFilters({ search: input?.search }),
+						...pageFilters({ search: input?.search }, userId),
 						isNotNull(pages.createdByUserId),
 					),
 				)
 				.groupBy(pages.createdByUserId, users.name, users.image);
 
 			return {
-				...(row ?? { all: 0, team: 0, mine: 0, pinned: 0 }),
+				...(row ?? { all: 0, team: 0, mine: 0, shared: 0, pinned: 0 }),
 				workspaces,
 				authors,
 			};
@@ -801,6 +821,20 @@ export const pageRouter = {
 			return { id: updated.id, visibility: updated.visibility };
 		}),
 
+	setOrganizationRole: protectedProcedure
+		.input(setPageOrganizationRoleSchema)
+		.mutation(async ({ ctx, input }) => {
+			const organizationId = await requireActiveOrgMembership(ctx);
+			const userId = ctx.session.user.id;
+			const page = await loadPage({ id: input.id, organizationId, userId });
+			assertPageWritable(page, userId);
+			await db
+				.update(pages)
+				.set({ organizationRole: input.role })
+				.where(eq(pages.id, page.id));
+			return { id: page.id, organizationRole: input.role };
+		}),
+
 	claimWatch: protectedProcedure
 		.input(
 			z.object({
@@ -930,7 +964,17 @@ export const pageRouter = {
 				userId: ctx.session.user.id,
 			});
 
-			return { owner: await loadOwner(page.createdByUserId) };
+			const userId = ctx.session.user.id;
+			const { canComment, canManage } = pageAccess(
+				page,
+				userId,
+				await loadPageShareRole(page, userId),
+			);
+			return {
+				owner: await loadOwner(page.createdByUserId),
+				canComment,
+				canManage,
+			};
 		}),
 
 	setSharedVersion: protectedProcedure
@@ -1009,7 +1053,19 @@ export const pageRouter = {
 						),
 					)
 					.returning({ id: pages.id });
-				if (discarded) await wipePageStorage(page.id);
+				if (discarded) {
+					try {
+						await reapOrphanFiles(
+							await detachAll({ parentKind: "page", parentIds: [page.id] }),
+						);
+					} catch (error) {
+						console.error("[pages] staged asset cleanup failed after delete", {
+							pageId: page.id,
+							error,
+						});
+					}
+					await wipePageStorage(page.id);
+				}
 				return { id: page.id, deleted: Boolean(discarded) };
 			}
 
@@ -1021,6 +1077,20 @@ export const pageRouter = {
 				})
 				.from(pageVersions)
 				.where(eq(pageVersions.pageId, page.id));
+
+			// Like the versions, comment ids have to be read before the page
+			// row goes: the cascade takes the comments, and with them the only
+			// way to name their attachments.
+			const commentIds = (
+				await db
+					.select({ id: pageComments.id })
+					.from(pageComments)
+					.innerJoin(
+						pageCommentThreads,
+						eq(pageCommentThreads.id, pageComments.threadId),
+					)
+					.where(eq(pageCommentThreads.pageId, page.id))
+			).map((row) => row.id);
 
 			// The manifest is the Worker's authorization source: removing it
 			// first makes deletion fail closed. If this throws, nothing has
@@ -1035,37 +1105,31 @@ export const pageRouter = {
 					pageId: page.id,
 					versions: rows,
 				});
+			} catch (error) {
+				console.error("[pages] version object cleanup failed after delete", {
+					pageId: page.id,
+					error,
+				});
+			}
+
+			try {
 				// `attachments.parentId` carries no foreign key (its parent kind
-				// varies), so the version cascade leaves attachment rows behind;
-				// files referenced by nothing else go with them, bytes included.
-				const versionIds = rows.map((row) => row.id);
-				if (versionIds.length > 0) {
-					const removed = await db
-						.delete(attachments)
-						.where(
-							and(
-								eq(attachments.parentKind, "page_version"),
-								inArray(attachments.parentId, versionIds),
-							),
-						)
-						.returning({ fileId: attachments.fileId });
-					const fileIds = [...new Set(removed.map((row) => row.fileId))];
-					if (fileIds.length > 0) {
-						const stillReferenced = new Set(
-							(
-								await db
-									.select({ fileId: attachments.fileId })
-									.from(attachments)
-									.where(inArray(attachments.fileId, fileIds))
-							).map((row) => row.fileId),
-						);
-						const orphans = fileIds.filter((id) => !stillReferenced.has(id));
-						if (orphans.length > 0) {
-							await deleteObjects(orphans.map(fileOriginalKey));
-							await db.delete(files).where(inArray(files.id, orphans));
-						}
-					}
-				}
+				// varies), so the cascade leaves attachment rows behind — the
+				// versions' assets, anything still staged against the page, and
+				// the comments' images; files referenced by nothing else go with
+				// them, bytes included.
+				const fileIds = [
+					...(await detachAll({
+						parentKind: "page_version",
+						parentIds: rows.map((row) => row.id),
+					})),
+					...(await detachAll({ parentKind: "page", parentIds: [page.id] })),
+					...(await detachAll({
+						parentKind: "comment",
+						parentIds: commentIds,
+					})),
+				];
+				await reapOrphanFiles([...new Set(fileIds)]);
 			} catch (error) {
 				console.error("[pages] storage cleanup failed after delete", {
 					pageId: page.id,

@@ -102,6 +102,7 @@ jobs:
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
           NEXT_PUBLIC_DOCS_URL: ${{ secrets.NEXT_PUBLIC_DOCS_URL }}
           NEXT_PUBLIC_ROOT_DOMAIN: ${{ secrets.NEXT_PUBLIC_ROOT_DOMAIN }}
+          DESKTOP_DISPLAY_NAME: ${{ secrets.DESKTOP_DISPLAY_NAME }}
           NEXT_PUBLIC_STREAMS_URL: ${{ secrets.NEXT_PUBLIC_STREAMS_URL }}
           SENTRY_DSN_DESKTOP: ${{ secrets.SENTRY_DSN_DESKTOP }}
           SENTRY_DSN_HOST_SERVICE: ${{ secrets.SENTRY_DSN_HOST_SERVICE }}
@@ -110,6 +111,7 @@ jobs:
           REALTIME_URL: ${{ secrets.REALTIME_URL }}
           SUPERSET_WORKSPACE_NAME: superset
           TARGET_ARCH: ${{ matrix.arch }}
+          PDEV_BUNDLE_REQUIRED: "1"
         run: bun run compile:app
 
       # electron-builder manages its own signing keychain when CSC_LINK is set,
@@ -167,6 +169,7 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          DESKTOP_DISPLAY_NAME: ${{ secrets.DESKTOP_DISPLAY_NAME }}
           TARGET_ARCH: ${{ matrix.arch }}
         run: bun run package -- --publish never --config ${{ inputs.electron_builder_config }} --${{ matrix.arch }}
 
@@ -195,6 +198,12 @@ jobs:
             exit 1
           }
           "$CLI_BIN" --version
+          PDEV_BIN="$APP_DIR/Contents/Resources/resources/bin/pdev/pdev"
+          test -x "$PDEV_BIN" || {
+            echo "::error::Bundled pdev is missing or not executable at $PDEV_BIN"
+            exit 1
+          }
+          "$PDEV_BIN" --version
 
       - name: Verify native bindings packaged
         working-directory: apps/desktop
@@ -229,6 +238,10 @@ jobs:
           path: apps/desktop/release/*.zip
           retention-days: ${{ inputs.artifact_retention_days }}
           if-no-files-found: error
+
+      - name: Gate update manifest on minimum macOS
+        working-directory: apps/desktop
+        run: bun scripts/gate-mac-update-manifest.ts release
 
       - name: Upload auto-update manifest
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
@@ -307,6 +320,7 @@ jobs:
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
           NEXT_PUBLIC_DOCS_URL: ${{ secrets.NEXT_PUBLIC_DOCS_URL }}
           NEXT_PUBLIC_ROOT_DOMAIN: ${{ secrets.NEXT_PUBLIC_ROOT_DOMAIN }}
+          DESKTOP_DISPLAY_NAME: ${{ secrets.DESKTOP_DISPLAY_NAME }}
           NEXT_PUBLIC_STREAMS_URL: ${{ secrets.NEXT_PUBLIC_STREAMS_URL }}
           SENTRY_DSN_DESKTOP: ${{ secrets.SENTRY_DSN_DESKTOP }}
           SENTRY_DSN_HOST_SERVICE: ${{ secrets.SENTRY_DSN_HOST_SERVICE }}
@@ -315,10 +329,13 @@ jobs:
           REALTIME_URL: ${{ secrets.REALTIME_URL }}
           SUPERSET_WORKSPACE_NAME: superset
           TARGET_ARCH: x64
+          PDEV_BUNDLE_REQUIRED: "1"
         run: bun run compile:app
 
       - name: Build Electron app
         working-directory: apps/desktop
+        env:
+          DESKTOP_DISPLAY_NAME: ${{ secrets.DESKTOP_DISPLAY_NAME }}
         run: bun run package -- --publish never --config ${{ inputs.electron_builder_config }}
 
       - name: Verify Linux AppImage + update manifest exist
@@ -343,6 +360,12 @@ jobs:
             exit 1
           fi
           "$CLI_BIN" --version
+          PDEV_BIN=$(find release -path "*/resources/resources/bin/pdev/pdev" -type f | head -1)
+          if [ -z "$PDEV_BIN" ] || [ ! -x "$PDEV_BIN" ]; then
+            echo "::error::Bundled pdev is missing or not executable under release/"
+            exit 1
+          fi
+          "$PDEV_BIN" --version
 
       - name: Upload AppImage artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2

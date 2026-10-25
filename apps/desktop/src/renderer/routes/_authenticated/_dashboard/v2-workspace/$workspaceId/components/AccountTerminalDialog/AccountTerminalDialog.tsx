@@ -4,6 +4,7 @@ import { useWorkspaceClient } from "@superset/workspace-client";
 import { useQuery } from "@tanstack/react-query";
 import { TRPCClientError } from "@trpc/client";
 import { useState } from "react";
+import { HOST_USAGE_QUOTA_QUERY_KEY } from "renderer/hooks/host-service/useHostUsageQuota";
 import { useV2AgentConfigs } from "renderer/hooks/useV2AgentConfigs";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import type { CreateAccountTerminal } from "../../hooks/useAgentSessionLauncher";
@@ -53,6 +54,19 @@ export function AccountTerminalDialog({
 		},
 		retry: false,
 		staleTime: 0,
+	});
+	const provider = choices.find(
+		(config) => config.id === selectedConfigId,
+	)?.presetId;
+	const quota = useQuery({
+		queryKey: [...HOST_USAGE_QUOTA_QUERY_KEY, hostUrl],
+		enabled: Boolean(hostUrl && accounts.data?.supported),
+		queryFn: () => {
+			if (!hostUrl) throw new Error("Host unavailable");
+			return getHostServiceClientByUrl(hostUrl).usage.quota.query();
+		},
+		staleTime: 5 * 60_000,
+		retry: false,
 	});
 	const unsupportedHost =
 		accounts.error instanceof TRPCClientError &&
@@ -107,6 +121,8 @@ export function AccountTerminalDialog({
 				configId={selectedConfigId}
 				onConfigChange={setConfigId}
 				accounts={accounts.data?.supported ? accounts.data.accounts : []}
+				provider={provider}
+				quotas={quota.isError ? [] : (quota.data ?? [])}
 				loading={
 					configs.isPending ||
 					(selectedConfigExists && accounts.isPending) ||

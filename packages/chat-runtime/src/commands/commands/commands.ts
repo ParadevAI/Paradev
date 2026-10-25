@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import {
+	deriveTimeline,
 	deriveQueuedPrompts,
 	emptySnapshot,
 	outlineSnapshot,
@@ -9,11 +10,16 @@ import {
 	type StoredItem,
 } from "@superset/chat/core";
 import type {
+	AgentMessage,
+	ApprovalRequest,
+	BackgroundSubagentInput,
 	CancelTurnInput,
 	ChatLaunchContext,
 	CloseSessionInput,
 	CloseStoppedAccountSessionInput,
 	Cursor,
+	DiscoverSessionsResult,
+	DurableEvent,
 	GetItemsInput,
 	GetSessionInput,
 	PromptInput,
@@ -23,14 +29,17 @@ import type {
 	ResumeQueueInput,
 	SetConfigOptionInput,
 	SetModeInput,
+	SteerSubagentInput,
 	StopBackgroundTaskInput,
 } from "@superset/chat/protocol";
 import {
+	backgroundSubagentInputSchema,
 	cancelTurnInputSchema,
 	chatLaunchContextSchema,
 	closeSessionInputSchema,
 	closeStoppedAccountSessionInputSchema,
 	createSessionInputSchema,
+	discoverSessionsInputSchema,
 	forkSessionInputSchema,
 	getItemBodiesInputSchema,
 	getItemsInputSchema,
@@ -42,8 +51,10 @@ import {
 	recoverAccountSessionInputSchema,
 	respondToApprovalInputSchema,
 	resumeQueueInputSchema,
+	rewindSessionInputSchema,
 	setConfigOptionInputSchema,
 	setModeInputSchema,
+	steerSubagentInputSchema,
 	stopBackgroundTaskInputSchema,
 } from "@superset/chat/protocol";
 import { z } from "zod";
@@ -51,6 +62,7 @@ import type { ChatDb, ChatSessionRow } from "../../db";
 import type { ChatJournal } from "../../journal";
 import type { ChatSessionStore } from "../../projection";
 import {
+	accountSuccessorMatches,
 	findAccountCommand,
 	findAccountSuccessor,
 	readLaunchContext,
@@ -61,7 +73,9 @@ import type {
 	LiveSessionRegistry,
 	PromptResult,
 	QueueState,
+	UnfinishedSession,
 } from "../../sessions";
+import { SubagentItems } from "../../stream";
 
 export const createSessionCommandSchema = createSessionInputSchema
 	.omit({ workspaceId: true })
@@ -73,6 +87,7 @@ export const createSessionCommandSchema = createSessionInputSchema
 		resume: z
 			.object({
 				harnessSessionId: z.string().min(1),
+				quiet: z.boolean().optional(),
 				requireExact: z.boolean().optional(),
 			})
 			.optional(),
@@ -86,11 +101,73 @@ export const forkSessionCommandSchema = forkSessionInputSchema.extend({
 });
 export type ForkSessionCommandInput = z.input<typeof forkSessionCommandSchema>;
 
+export const rewindSessionCommandSchema = rewindSessionInputSchema.extend({
+	cwd: z.string().min(1),
+});
+export type RewindSessionCommandInput = z.input<
+	typeof rewindSessionCommandSchema
+>;
+
+function lastAgentMessageId(events: DurableEvent[]): string | null {
+	for (let i = events.length - 1; i >= 0; i--) {
+		const event = events[i];
+		if (
+			event?.type !== "item" ||
+			event.item.kind !== "agent_message" ||
+			event.item.parentItemId
+		)
+			continue;
+		const id = (event.item as AgentMessage).agentMessageId;
+		if (id) return id;
+	}
+	return null;
+}
+
+/**
+ * The finished turns and items shown before `itemId`, or null when it is not
+ * there. `midTurn` is set when `itemId` was sent into a turn already running.
+ */
+function transcriptBefore(
+	snapshot: SessionSnapshot,
+	itemId: string,
+): { events: DurableEvent[]; midTurn: boolean } | null {
+	const events: DurableEvent[] = [];
+	for (const group of deriveTimeline(snapshot)) {
+		const items = group.entries.flatMap((entry) =>
+			entry.kind === "item" ? [entry.item] : entry.items,
+		);
+		const index = items.findIndex((item) => item.id === itemId);
+		const kept = (index === -1 ? items : items.slice(0, index)).filter(
+			(item) =>
+				item.kind !== "approval_request" ||
+				(item as ApprovalRequest).status !== "pending",
+		);
+		if (kept.length > 0) {
+			if (group.turn) events.push({ type: "turn", turn: group.turn });
+			for (const item of kept) {
+				events.push({ type: "item", item, turnId: group.turnId });
+			}
+		}
+		if (index !== -1) return { events, midTurn: index > 0 };
+	}
+	return null;
+}
+
 export const listSessionsCommandSchema = listSessionsInputSchema
 	.omit({ workspaceId: true })
 	.extend({ scopeId: z.string().min(1).optional() });
 export type ListSessionsCommandInput = z.input<
 	typeof listSessionsCommandSchema
+>;
+
+export const discoverSessionsCommandSchema = discoverSessionsInputSchema
+	.omit({ workspaceId: true })
+	.extend({
+		scopeId: z.string().min(1),
+		cwd: z.string().min(1),
+	});
+export type DiscoverSessionsCommandInput = z.input<
+	typeof discoverSessionsCommandSchema
 >;
 
 export type CreateSessionResult = {
@@ -113,6 +190,21 @@ export type GetSessionResult = {
 	 * caller that wants to prompt has to ask this, not the status.
 	 */
 	live: boolean;
+	/** For a dead session, why it died, when the journal says. */
+	lastError?: string;
+};
+
+export type ResumeSessionInput = Omit<
+	UnfinishedSession,
+	"sessionId" | "interrupted"
+> & { cwd: string };
+
+type ResumedChat = {
+	terminalId: string;
+	sessionId: string;
+	harness: string;
+	harnessSessionId: string;
+	pending: Pick<ResumeSessionInput, "prompts" | "pausedPrompts"> | null;
 };
 
 export type GetQueueResult = QueueState & { live: boolean };
@@ -125,6 +217,7 @@ export type ChatSessionListEntry = ChatSessionRow & {
 
 export type ChatCommands = {
 	createSession(input: CreateSessionCommandInput): CreateSessionResult;
+	resumeSession(input: ResumeSessionInput): CreateSessionResult;
 	recoverAccountSession(
 		input: RecoverAccountSessionInput,
 	): Promise<CreateSessionResult & { terminalId: string }>;
@@ -134,6 +227,8 @@ export type ChatCommands = {
 	resumeQueue(input: ResumeQueueInput): void;
 	cancelTurn(input: CancelTurnInput): void;
 	stopBackgroundTask(input: StopBackgroundTaskInput): Promise<boolean>;
+	steerSubagent(input: SteerSubagentInput): Promise<boolean>;
+	backgroundSubagent(input: BackgroundSubagentInput): Promise<boolean>;
 	respondToApproval(input: RespondToApprovalInput): void;
 	setMode(input: SetModeInput): void;
 	setConfigOption(input: SetConfigOptionInput): void;
@@ -145,9 +240,13 @@ export type ChatCommands = {
 	forkSession(
 		input: ForkSessionCommandInput,
 	): Promise<CreateSessionResult | null>;
+	rewindSession(input: RewindSessionCommandInput): Promise<CreateSessionResult>;
 	getSession(input: GetSessionInput): GetSessionResult;
 	getQueue(input: GetSessionInput): GetQueueResult;
 	listSessions(input: ListSessionsCommandInput): ChatSessionListEntry[];
+	discoverSessions(
+		input: DiscoverSessionsCommandInput,
+	): Promise<DiscoverSessionsResult>;
 	getItems(input: z.input<typeof getItemsInputSchema>): PageResult;
 	getOutline(input: z.input<typeof getOutlineInputSchema>): OutlineResult;
 	getItemBodies(
@@ -170,6 +269,7 @@ export type CommandsOptions = {
 	live: LiveSessionRegistry;
 	dedupe: { run<T>(commandId: string, execute: () => T): T };
 	mintSessionId?: () => string;
+	subagentItems?: SubagentItems;
 	validateAccountLaunch?: (
 		context: ChatLaunchContext,
 		harness: string,
@@ -181,6 +281,7 @@ const MAX_CACHED_REPLAY_EVENTS = 20_000;
 
 export function createCommands(options: CommandsOptions): ChatCommands {
 	const mintSessionId = options.mintSessionId ?? randomUUID;
+	const subagentItems = options.subagentItems ?? new SubagentItems(options.db);
 	const accountForks = new Map<
 		string,
 		{ input: string; promise: Promise<CreateSessionResult | null> }
@@ -230,6 +331,57 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 		}
 		if (cachedEvents > MAX_CACHED_REPLAY_EVENTS) replays.delete(sessionId);
 		return { ok: true, snapshot };
+	};
+
+	const resumedByTerminal = new Map<string, ResumedChat>();
+	const resumedFor = (
+		input: z.output<typeof createSessionCommandSchema>,
+	): ResumedChat | null => {
+		if (!input.terminalId || !input.resume) return null;
+		const resumed = resumedByTerminal.get(input.terminalId);
+		if (
+			!resumed ||
+			resumed.harness !== input.harness ||
+			resumed.harnessSessionId !== input.resume.harnessSessionId
+		) {
+			return null;
+		}
+		return resumed;
+	};
+	const handOff = (resumed: ResumedChat): CreateSessionResult | null => {
+		const row = options.sessions.get(resumed.sessionId);
+		const live = options.live.get(resumed.sessionId);
+		if (!row || !live || live.state.status === "dead") return null;
+		if (!resumed.pending) resumedByTerminal.delete(resumed.terminalId);
+		return { sessionId: resumed.sessionId, epoch: row.epoch };
+	};
+	const sendPending = (resumed: ResumedChat, sessionId: string): void => {
+		const pending = resumed.pending;
+		if (!pending) {
+			resumedByTerminal.delete(resumed.terminalId);
+			return;
+		}
+		resumed.sessionId = sessionId;
+		options.live
+			.require(sessionId)
+			.promptOnceStarted(pending.prompts, pending.pausedPrompts, () => {
+				resumed.pending = null;
+			});
+	};
+
+	const lastErrorNotice = (sessionId: string): string | null => {
+		const replay = replaySession(sessionId);
+		if (!replay.ok) return null;
+		let latest: { at: number; text: string } | null = null;
+		for (const { item } of replay.snapshot.items.values()) {
+			if (item.kind !== "notice") continue;
+			const notice = item as { noticeKind?: string; text?: string };
+			if (notice.noticeKind !== "error" || !notice.text) continue;
+			if (!latest || item.startedAtMs >= latest.at) {
+				latest = { at: item.startedAtMs, text: notice.text };
+			}
+		}
+		return latest?.text ?? null;
 	};
 
 	const listSessions = (
@@ -307,6 +459,9 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 				}
 			}
 			return options.dedupe.run(`createSession:${parsed.commandId}`, () => {
+				const resumed = resumedFor(parsed);
+				const handedOff = resumed && handOff(resumed);
+				if (handedOff) return handedOff;
 				if (!options.live.supports(parsed.harness)) {
 					throw new Error(`unknown harness ${parsed.harness}`);
 				}
@@ -340,12 +495,46 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 					options.journal.discard(sessionId);
 					throw error;
 				}
+				if (resumed) sendPending(resumed, sessionId);
 				return {
 					sessionId,
 					epoch: opened.epoch,
 					...(parsed.launchContext ? { terminalId: parsed.terminalId } : {}),
 				};
 			});
+		},
+
+		resumeSession(input) {
+			const created = this.createSession({
+				commandId: randomUUID(),
+				scopeId: input.scopeId,
+				cwd: input.cwd,
+				harness: input.harness,
+				modeId: input.modeId,
+				modelId: input.modelId,
+				terminalId: input.terminalId,
+				resume: { harnessSessionId: input.harnessSessionId },
+			});
+			const pending = {
+				prompts: input.prompts,
+				pausedPrompts: input.pausedPrompts,
+			};
+			if (!input.terminalId) {
+				options.live
+					.require(created.sessionId)
+					.promptOnceStarted(pending.prompts, pending.pausedPrompts);
+				return created;
+			}
+			const resumed: ResumedChat = {
+				terminalId: input.terminalId,
+				sessionId: created.sessionId,
+				harness: input.harness,
+				harnessSessionId: input.harnessSessionId,
+				pending,
+			};
+			resumedByTerminal.set(input.terminalId, resumed);
+			sendPending(resumed, created.sessionId);
+			return created;
 		},
 
 		async recoverAccountSession(input) {
@@ -359,11 +548,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 				visited.add(source.sessionId);
 				const next = findAccountSuccessor(options.db, source.sessionId);
 				if (!next) break;
-				if (
-					next.scopeId !== source.scopeId ||
-					next.harness !== source.harness ||
-					next.launchContextJson !== source.launchContextJson
-				)
+				if (!accountSuccessorMatches(source, next))
 					throw new Error("The saved conversation recovery account changed.");
 				source = next;
 			}
@@ -513,6 +698,25 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 			);
 		},
 
+		steerSubagent(input) {
+			const parsed: SteerSubagentInput = steerSubagentInputSchema.parse(input);
+			return options.dedupe.run(`steerSubagent:${parsed.commandId}`, () =>
+				options.live
+					.require(parsed.sessionId)
+					.steerSubagent(parsed.taskId, parsed.content),
+			);
+		},
+
+		backgroundSubagent(input) {
+			const parsed: BackgroundSubagentInput =
+				backgroundSubagentInputSchema.parse(input);
+			return options.dedupe.run(`backgroundSubagent:${parsed.commandId}`, () =>
+				options.live
+					.require(parsed.sessionId)
+					.backgroundSubagent(parsed.taskId),
+			);
+		},
+
 		cancelTurn(input) {
 			const parsed: CancelTurnInput = cancelTurnInputSchema.parse(input);
 			options.dedupe.run(`cancelTurn:${parsed.commandId}`, () => {
@@ -624,7 +828,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 						harnessSessionId: forked,
 						...(context ? { requireExact: true } : {}),
 					},
-					terminalId: live.terminalId,
+					terminalId: parsed.terminalId ?? live.terminalId,
 					...(context
 						? {
 								launchContext: {
@@ -686,10 +890,91 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 			}
 		},
 
+		/**
+		 * A rewind continues in a new session with the transcript before the
+		 * chosen message copied in, so the chat reads the same. An agent that can
+		 * fork at a message resumes its own history cut there; any other is told
+		 * that conversation in a hidden part of the edited prompt.
+		 */
+		async rewindSession(input) {
+			const parsed = rewindSessionCommandSchema.parse(input);
+			return options.dedupe.run(
+				`rewindSession:${parsed.commandId}`,
+				async () => {
+					const source = options.sessions.get(parsed.sessionId);
+					const replay = replaySession(parsed.sessionId);
+					if (!source || !replay.ok) {
+						throw new Error(`chat session ${parsed.sessionId} is not running`);
+					}
+					const before = transcriptBefore(replay.snapshot, parsed.itemId);
+					if (!before) {
+						throw new Error(
+							`message ${parsed.itemId} is not in chat session ${parsed.sessionId}`,
+						);
+					}
+					const sourceLive = options.live.get(parsed.sessionId);
+					// Some agents fork a whole turn, so a cut inside one would keep what came after it.
+					const cutAt = before.midTurn
+						? null
+						: lastAgentMessageId(before.events);
+					const forked =
+						cutAt && sourceLive
+							? await sourceLive
+									.fork({ upToMessageId: cutAt })
+									.catch((error: unknown) => {
+										console.warn(
+											"[chat-runtime] could not fork the agent at the rewind point",
+											error,
+										);
+										return null;
+									})
+							: null;
+					const created = this.createSession({
+						commandId: parsed.commandId,
+						scopeId: source.scopeId,
+						cwd: parsed.cwd,
+						harness: source.harness,
+						modeId: sourceLive?.state.modeId ?? parsed.modeId,
+						modelId: parsed.modelId,
+						terminalId: sourceLive?.terminalId,
+						...(forked
+							? { resume: { harnessSessionId: forked, quiet: true } }
+							: {}),
+					});
+					try {
+						const live = options.live.require(created.sessionId);
+						live.seed(before.events);
+						live.prompt(
+							[
+								...(parsed.handoffPrompt && !forked
+									? [
+											{
+												type: "text" as const,
+												text: parsed.handoffPrompt,
+												hidden: true,
+											},
+										]
+									: []),
+								{ type: "text", text: parsed.prompt },
+							],
+							`rewind-${parsed.commandId}`,
+						);
+					} catch (error) {
+						await this.closeSession({ sessionId: created.sessionId }).catch(
+							() => undefined,
+						);
+						throw error;
+					}
+					return created;
+				},
+			);
+		},
+
 		async closeSession(input) {
 			const parsed: CloseSessionInput = closeSessionInputSchema.parse(input);
 			const wasLive = options.live.get(parsed.sessionId) !== null;
 			replays.delete(parsed.sessionId);
+			subagentItems.forget(parsed.sessionId);
 			try {
 				await options.live.dispose(parsed.sessionId);
 			} finally {
@@ -701,6 +986,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 			const closed = await options.live.disposeScope(scopeId);
 			for (const sessionId of closed) {
 				replays.delete(sessionId);
+				subagentItems.forget(sessionId);
 				options.journal.announce(sessionId);
 			}
 		},
@@ -712,6 +998,8 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 				: null;
 			// Reading the cursor can backfill the row, so read the row after it.
 			const session = options.sessions.get(parsed.sessionId);
+			const lastError =
+				session?.status === "dead" ? lastErrorNotice(parsed.sessionId) : null;
 			let account: GetSessionResult["account"] = null;
 			try {
 				const context = session ? readLaunchContext(session) : null;
@@ -727,6 +1015,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 				live: options.live.get(parsed.sessionId) !== null,
 				session,
 				cursor: session && seq !== null ? { epoch: session.epoch, seq } : null,
+				...(lastError ? { lastError } : {}),
 			};
 		},
 
@@ -755,30 +1044,63 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 
 		listSessions,
 
-		getItems(input) {
-			const parsed: GetItemsInput = getItemsInputSchema.parse(input);
-			return readPage(options.db, parsed.sessionId, {
-				before: parsed.before,
-				limit: parsed.limit,
+		discoverSessions(input) {
+			const parsed = discoverSessionsCommandSchema.parse(input);
+			return options.live.discoverSessions({
+				harness: parsed.harness,
+				scopeId: parsed.scopeId,
+				cwd: parsed.cwd,
+				...(parsed.cursor ? { cursor: parsed.cursor } : {}),
 			});
 		},
 
+		getItems(input) {
+			const parsed: GetItemsInput = getItemsInputSchema.parse(input);
+			const page = readPage(options.db, parsed.sessionId, {
+				before: parsed.before,
+				limit: parsed.limit,
+			});
+			if (!page.ok || parsed.nestedSubagents) return page;
+			return {
+				...page,
+				envelopes: page.envelopes.filter(
+					(envelope) => !subagentItems.hiddenFromFlatView(envelope),
+				),
+			};
+		},
+
 		getOutline(input) {
-			const { sessionId } = getOutlineInputSchema.parse(input);
+			const { sessionId, nestedSubagents } = getOutlineInputSchema.parse(input);
 			const replayed = replaySession(sessionId);
 			if (!replayed.ok) return replayed;
-			return { ok: true, outline: outlineSnapshot(replayed.snapshot) };
+			const outline = outlineSnapshot(replayed.snapshot);
+			if (nestedSubagents) return { ok: true, outline };
+			return {
+				ok: true,
+				outline: {
+					...outline,
+					items: outline.items.filter(
+						(stored) => !subagentItems.hides(sessionId, stored.item),
+					),
+				},
+			};
 		},
 
 		getItemBodies(input) {
-			const { sessionId, itemIds } = getItemBodiesInputSchema.parse(input);
+			const { sessionId, itemIds, nestedSubagents } =
+				getItemBodiesInputSchema.parse(input);
 			const replayed = replaySession(sessionId);
 			if (!replayed.ok) return replayed;
 			return {
 				ok: true,
 				items: itemIds.flatMap((id) => {
 					const stored = replayed.snapshot.items.get(id);
-					return stored ? [stored] : [];
+					if (
+						!stored ||
+						(!nestedSubagents && subagentItems.hides(sessionId, stored.item))
+					)
+						return [];
+					return [stored];
 				}),
 			};
 		},

@@ -1,6 +1,7 @@
-import type { PlanTier } from "@superset/shared/billing";
+import type { MachineSize, PlanTier } from "@superset/shared/billing";
 import {
 	ENTERPRISE_ACCESS_FEATURE_ID,
+	MACHINE_SIZE_FEATURE_IDS,
 	PRO_ACCESS_FEATURE_ID,
 } from "./features";
 
@@ -18,4 +19,10 @@ export function paidPlanIdFromFlags(flags: Flags): string | null {
 		flags?.[PRO_ACCESS_FEATURE_ID]?.planId ??
 		null
 	);
+}
+
+export function gatedMachineSizesFromFlags(flags: Flags): MachineSize[] {
+	return (
+		Object.entries(MACHINE_SIZE_FEATURE_IDS) as [MachineSize, string][]
+	).flatMap(([size, featureId]) => (flags?.[featureId] ? [size] : []));
 }

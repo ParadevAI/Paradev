@@ -1,7 +1,7 @@
 import type { WorkspaceStore } from "@superset/panes";
 import { useCallback } from "react";
 import type { V2UserPreferencesApi } from "renderer/hooks/useV2UserPreferences";
-import type { PullRequestRef } from "renderer/lib/github/pullRequestRef";
+import type { OpenPullRequestPane } from "renderer/lib/github/openPullRequestLink";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import type { V2TerminalPresetRow } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
@@ -13,6 +13,7 @@ import type {
 	DiffFocusSide,
 	DiffPaneData,
 	PagePaneData,
+	PaneTarget,
 	PaneViewerData,
 	TerminalPaneData,
 } from "../../types";
@@ -31,12 +32,14 @@ import type { TerminalLauncher } from "../useV2TerminalLauncher";
 
 export function useWorkspacePaneOpeners({
 	store,
+	viewer,
 	launcher,
 	newTabPresets,
 	executePreset,
 	setRightSidebarOpen,
 }: {
 	store: StoreApi<WorkspaceStore<PaneViewerData>>;
+	viewer: PaneTarget;
 	launcher: TerminalLauncher;
 	newTabPresets: V2TerminalPresetRow[];
 	executePreset: (
@@ -60,7 +63,7 @@ export function useWorkspacePaneOpeners({
 	openCommentPane: (comment: CommentPaneData) => void;
 	openPagePane: (page: PagePaneData, placement: "split" | "tab") => void;
 	/** Focus or open the pane showing the workspace's linked PR summary. */
-	openPullRequestPane: (ref: PullRequestRef) => void;
+	openPullRequestPane: OpenPullRequestPane;
 } {
 	const openDiffPane = useCallback(
 		(
@@ -70,7 +73,8 @@ export function useWorkspacePaneOpeners({
 			side?: DiffFocusSide,
 			changeKey?: string,
 		) => {
-			const state = store.getState();
+			viewer.reveal();
+			const state = viewer.store.getState();
 			// Bump the tick on every request so repeat clicks re-scroll and a
 			// navigation into an unmounted pane wins over its older cached position.
 			const focusFields = {
@@ -112,8 +116,7 @@ export function useWorkspacePaneOpeners({
 							...focusFields,
 						} as PaneViewerData,
 					});
-					state.setActiveTab(tab.id);
-					state.setActivePane({ tabId: tab.id, paneId: pane.id });
+					state.focusPane(pane.id);
 					return;
 				}
 			}
@@ -129,7 +132,7 @@ export function useWorkspacePaneOpeners({
 				},
 			});
 		},
-		[store],
+		[viewer],
 	);
 
 	const addBlankTerminalTab = useCallback(() => {
@@ -161,7 +164,8 @@ export function useWorkspacePaneOpeners({
 
 	const defaultBrowserUrl = useDefaultBrowserUrl();
 	const addBrowserTab = useCallback(() => {
-		store.getState().addTab({
+		viewer.reveal();
+		viewer.store.getState().addTab({
 			panes: [
 				{
 					kind: "browser",
@@ -171,11 +175,12 @@ export function useWorkspacePaneOpeners({
 				},
 			],
 		});
-	}, [store, defaultBrowserUrl]);
+	}, [viewer, defaultBrowserUrl]);
 
 	const openCommentPane = useCallback(
 		(comment: CommentPaneData) => {
-			const state = store.getState();
+			viewer.reveal();
+			const state = viewer.store.getState();
 			for (const tab of state.tabs) {
 				for (const pane of Object.values(tab.panes)) {
 					if (pane.kind !== "comment") continue;
@@ -197,7 +202,7 @@ export function useWorkspacePaneOpeners({
 				],
 			});
 		},
-		[store],
+		[viewer],
 	);
 
 	const { workspace } = useWorkspace();
@@ -226,16 +231,18 @@ export function useWorkspacePaneOpeners({
 
 	const openPagePane = useCallback(
 		(page: PagePaneData, placement: "split" | "tab") => {
-			openPagePaneInStore(store, page, placement);
+			viewer.reveal();
+			openPagePaneInStore(viewer.store, page, placement);
 		},
-		[store],
+		[viewer],
 	);
 
-	const openPullRequestPane = useCallback(
-		(ref: PullRequestRef) => {
-			openPullRequestPaneInStore(store, ref);
+	const openPullRequestPane = useCallback<OpenPullRequestPane>(
+		(ref, placement) => {
+			viewer.reveal();
+			openPullRequestPaneInStore(viewer.store, ref, placement);
 		},
-		[store],
+		[viewer],
 	);
 
 	return {

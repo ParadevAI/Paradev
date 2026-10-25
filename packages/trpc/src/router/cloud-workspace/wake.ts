@@ -37,6 +37,7 @@ export async function wakeCloudWorkspace(
 			({ bootId } = await authorizeBoot({
 				organizationId: row.organizationId,
 				cloudWorkspaceId: row.id,
+				createdByUserId: row.createdByUserId,
 				...box,
 			}));
 		},

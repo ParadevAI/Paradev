@@ -18,7 +18,7 @@ export const env = createEnv({
 		NODE_ENV: z
 			.enum(["development", "production", "test"])
 			.default("development"),
-		NEXT_PUBLIC_API_URL: z.url().default(`https://api.${rootDomain}`),
+		NEXT_PUBLIC_API_URL: z.url().default("https://api.superset.sh"),
 		NEXT_PUBLIC_STREAMS_URL: z.url().default(`https://streams.${rootDomain}`),
 		NEXT_PUBLIC_WEB_URL: z.url().default(`https://app.${rootDomain}`),
 		NEXT_PUBLIC_MARKETING_URL: z.url().default(`https://${rootDomain}`),
@@ -28,6 +28,7 @@ export const env = createEnv({
 		SENTRY_DSN_HOST_SERVICE: z.string().optional(),
 		STREAMS_URL: z.url().default("https://superset-stream.fly.dev"),
 		RELAY_URL: z.url().default("https://relay.superset.sh"),
+		DESKTOP_DISPLAY_NAME: z.string().default("Superset"),
 	},
 
 	runtimeEnv: {
@@ -45,6 +46,7 @@ export const env = createEnv({
 		SENTRY_DSN_HOST_SERVICE: process.env.SENTRY_DSN_HOST_SERVICE,
 		STREAMS_URL: process.env.STREAMS_URL,
 		RELAY_URL: process.env.RELAY_URL,
+		DESKTOP_DISPLAY_NAME: process.env.DESKTOP_DISPLAY_NAME,
 	},
 	emptyStringAsUndefined: true,
 	// Only allow skipping validation in development (never in production)

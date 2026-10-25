@@ -20,7 +20,7 @@ import type {
 	TerminalPaneData,
 } from "../../types";
 import { focusOrAddTerminalPane } from "../../utils/focusTerminalPane";
-import { useChatWiring } from "../usePaneRegistry/components/ChatSession/hooks/useSessionClient";
+import { readLastChatAgent } from "../../utils/lastChatAgent";
 
 export interface CreateNewAgentSessionInput {
 	configId: string;
@@ -35,6 +35,8 @@ export interface CreateNewAgentSessionInput {
 export type CreateNewAgentSession = (
 	input: CreateNewAgentSessionInput,
 ) => Promise<{ terminalId: string } | null>;
+
+type OpenNewChat = () => Promise<{ terminalId: string } | null>;
 
 export type CreateAccountTerminal = (input: {
 	configId: string;
@@ -59,86 +61,22 @@ export function useAgentSessionLauncher({
 }: UseAgentSessionLauncherOptions): {
 	createNewAgentSession: CreateNewAgentSession;
 	createAccountTerminal: CreateAccountTerminal;
-	createAccountChat: CreateAccountTerminal;
 	openAgentChat: OpenAgentChat;
+	openNewChat: OpenNewChat;
 	focusAgentTerminal: (terminalId: string) => void;
 } {
 	const { t } = useLingui();
-	const runAgent = workspaceTrpc.agents.run.useMutation();
-	const runWithAccount = workspaceTrpc.agents.runWithAccount.useMutation();
+	const { mutateAsync: runAgent } = workspaceTrpc.agents.run.useMutation();
+	const { mutateAsync: runWithAccount } =
+		workspaceTrpc.agents.runWithAccount.useMutation();
 	const appearance = useTerminalAppearance();
 	const awaitAcpChatEnabled = useAwaitAcpChatEnabled();
 	const { hostUrl } = useWorkspaceClient();
 	const { data: agentConfigs } = useV2AgentConfigs(hostUrl);
 	const queryClient = useQueryClient();
-	const wiring = useChatWiring();
-	const createAccountChat = useCallback<CreateAccountTerminal>(
-		async ({ configId, account }) => {
-			if (!hostUrl)
-				throw new Error(t({ message: "Host service is not running" }));
-			if (!(await awaitAcpChatEnabled()))
-				throw new Error(t({ message: "Native chat is not enabled" }));
-			const configs = await queryClient.fetchQuery(
-				v2AgentConfigsQueryOptions(hostUrl),
-			);
-			const config = configs.find((entry) => entry.id === configId);
-			if (
-				!config ||
-				(config.presetId !== "claude" && config.presetId !== "codex")
-			)
-				throw new Error(
-					t({
-						message:
-							"This agent configuration does not support account selection.",
-					}),
-				);
-			const capabilities = await wiring.transport.accountCapabilities();
-			if (!capabilities.harnesses.includes(`${config.presetId}-acp`))
-				throw new Error(
-					t({
-						message:
-							"This host does not support account selection for native chats.",
-					}),
-				);
-			const commandId = crypto.randomUUID();
-			store.getState().addTab({
-				panes: [
-					{
-						kind: "chat-v3",
-						titleOverride: config.label,
-						data: {
-							terminalId: crypto.randomUUID(),
-							sessionId: null,
-							agent: { id: config.presetId },
-							accountBound: true,
-							accountDraftId: commandId,
-							accountLaunch: {
-								hostUrl,
-								request: {
-									commandId,
-									account,
-									workspaceId,
-									harness: `${config.presetId}-acp`,
-								},
-							},
-						} satisfies ChatPaneData,
-					},
-				],
-			});
-		},
-		[
-			awaitAcpChatEnabled,
-			queryClient,
-			hostUrl,
-			wiring.transport,
-			store,
-			t,
-			workspaceId,
-		],
-	);
 	const createAccountTerminal = useCallback<CreateAccountTerminal>(
 		async ({ configId, account }) => {
-			const result = await runWithAccount.mutateAsync({
+			const result = await runWithAccount({
 				workspaceId,
 				agent: configId,
 				account,
@@ -203,6 +141,23 @@ export function useAgentSessionLauncher({
 		[awaitAcpChatEnabled, queryClient, hostUrl, agentConfigs, store],
 	);
 
+	const openNewChat = useCallback<OpenNewChat>(async () => {
+		const configs = await queryClient
+			.ensureQueryData(v2AgentConfigsQueryOptions(hostUrl))
+			.catch(() => agentConfigs ?? []);
+		const chatPresetIds = configs
+			.map((config) => config.presetId)
+			.filter((presetId) => acpHarnessForPreset(presetId));
+		const presetId = [readLastChatAgent(), "claude", ...chatPresetIds].find(
+			(candidate) => candidate && chatPresetIds.includes(candidate),
+		);
+		if (!presetId) {
+			toast.error(t({ message: "No installed agent can be opened as a chat" }));
+			return null;
+		}
+		return openAgentChat({ configId: "", presetId, placement: "new-tab" });
+	}, [queryClient, hostUrl, agentConfigs, openAgentChat, t]);
+
 	const createNewAgentSession = useCallback<CreateNewAgentSession>(
 		async (input) => {
 			if (!input.forkSessionId) {
@@ -214,7 +169,7 @@ export function useAgentSessionLauncher({
 				// Host pipeline bakes the prompt into the initialCommand using the
 				// agent's argv/stdin transport — no follow-up writeInput needed,
 				// no bind-wait race vs. the launching shell.
-				const result = await runAgent.mutateAsync({
+				const result = await runAgent({
 					workspaceId,
 					colors: terminalQueryColors(appearance.theme),
 					agent: input.configId,
@@ -282,8 +237,8 @@ export function useAgentSessionLauncher({
 	return {
 		createNewAgentSession,
 		createAccountTerminal,
-		createAccountChat,
 		openAgentChat,
+		openNewChat,
 		focusAgentTerminal,
 	};
 }

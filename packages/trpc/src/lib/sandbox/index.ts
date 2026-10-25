@@ -42,7 +42,6 @@ export {
 	describeSandbox,
 	findSandboxSession,
 	HOST_SERVICE_PORT,
-	IMAGE_SANDBOX_VCPUS,
 	listActiveWorkspaceSandboxes,
 	MEMORY_MB_PER_VCPU,
 	promoteSandboxToEnvironment,
@@ -58,6 +57,7 @@ export {
 	stopAndSnapshot,
 	stopSandbox,
 	stripWorkspaceIdentity,
+	topUpSandboxSession,
 	waitForStopSnapshot,
 	wakeSandbox,
 } from "./vercel";

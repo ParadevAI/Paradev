@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { ChatLaunchAccount } from "@superset/chat/protocol";
+import type { ChatLaunchAccount, SessionState } from "@superset/chat/protocol";
 import { eq } from "drizzle-orm";
 import { chatSessionsLocal } from "../../db";
 import { FakeHarness } from "../../harness/fake";
@@ -14,7 +14,11 @@ import {
 } from "../../index";
 import { createBunChatDb } from "../../testing/testRuntime/testRuntime";
 import { waitFor } from "../../testing/testUtils";
-import { createChatCallerFactory, createChatRouter } from "./router";
+import {
+	type ChatRouterOptions,
+	createChatCallerFactory,
+	createChatRouter,
+} from "./router";
 
 const ACCOUNT: ChatLaunchAccount = {
 	agent: "claude",
@@ -36,6 +40,10 @@ function fixture(
 		beforeDispose?: () => Promise<void>;
 		initialStatus?: "idle" | "dead" | "running";
 		allowPendingPrompt?: boolean;
+		switcher?: NonNullable<ChatRouterOptions["prepareAccountSwitch"]>;
+		initialMode?: string;
+		stateExtras?: Partial<SessionState>;
+		validIdentities?: string[];
 	} = {},
 ) {
 	const dir = mkdtempSync(join(tmpdir(), "chat-account-"));
@@ -48,7 +56,12 @@ function fixture(
 			openDatabase: createBunChatDb,
 			validateAccountLaunch: async (context) => {
 				fixtureOptions.validate?.();
-				if (validationFailure || context.account.identity !== ACCOUNT.identity)
+				if (
+					validationFailure ||
+					!(fixtureOptions.validIdentities ?? [ACCOUNT.identity]).includes(
+						context.account.identity,
+					)
+				)
 					throw new Error("saved account unavailable");
 			},
 			harnesses: new Map([
@@ -62,6 +75,9 @@ function fixture(
 									kind: "session",
 									session: {
 										status: fixtureOptions.initialStatus ?? "idle",
+										modeId: fixtureOptions.initialMode,
+										exactResumeSupported: true,
+										...fixtureOptions.stateExtras,
 										harnessSessionId:
 											options.resume?.harnessSessionId ??
 											`native-${options.sessionId}`,
@@ -92,6 +108,7 @@ function fixture(
 			createChatRouter(state.runtime, {
 				resolveCwd: () => "/fixture/work",
 				accountHarnesses: ["claude-acp"],
+				prepareAccountSwitch: fixtureOptions.switcher,
 				prepareAccount: async ({ account }) => {
 					if (
 						account.selection !== ACCOUNT.selection ||
@@ -566,4 +583,289 @@ describe("explicit failed account agent stop", () => {
 		expect(f.state.runtime.live.isClosing(source.sessionId)).toBe(false);
 		expect(f.state.runtime.sessions.get(source.sessionId)?.queuedCount).toBe(0);
 	});
+});
+
+const TARGET: ChatLaunchAccount = {
+	...ACCOUNT,
+	selection: "/fixture/account-b",
+	directory: "/fixture/account-b",
+	identity: "b".repeat(64),
+};
+function switchInput(sessionId: string) {
+	return {
+		commandId: randomUUID(),
+		sessionId,
+		account: { selection: TARGET.selection, identity: TARGET.identity },
+	};
+}
+
+describe("in-place account switch", () => {
+	test("an older host has no switching capability and leaves the source running", async () => {
+		const f = fixture({ initialMode: "ask" });
+		const c = f.caller();
+		const source = await c.createAccountSession(input());
+		await idle(f, source.sessionId);
+		expect((await c.accountCapabilities()).accountSwitch).toBe(false);
+		await expect(
+			c.switchAccountSession(switchInput(source.sessionId)),
+		).rejects.toThrow("does not support");
+		expect(f.state.runtime.live.get(source.sessionId)).not.toBeNull();
+		expect(f.launches).toHaveLength(1);
+	});
+
+	test("reopens the exact native conversation, keeps other chats, and reconciles a lost reply", async () => {
+		let releases = 0;
+		const f = fixture({
+			initialMode: "ask",
+			validIdentities: [ACCOUNT.identity, TARGET.identity],
+			switcher: async () => ({
+				finish: async () => ({ account: TARGET, assertCurrent() {} }),
+				release() {
+					releases++;
+				},
+			}),
+		});
+		const c = f.caller();
+		const source = await c.createAccountSession(input());
+		const other = await c.createAccountSession(input());
+		await idle(f, source.sessionId);
+		await idle(f, other.sessionId);
+		const request = switchInput(source.sessionId);
+		const switched = await c.switchAccountSession(request);
+		expect(switched.terminalId).toBe(source.terminalId);
+		expect(switched.sessionId).not.toBe(source.sessionId);
+		expect(f.state.runtime.live.get(source.sessionId)).toBeNull();
+		expect(f.state.runtime.live.get(other.sessionId)).not.toBeNull();
+		expect(f.launches.at(-1)?.resume).toEqual({
+			harnessSessionId: `native-${source.sessionId}`,
+			requireExact: true,
+		});
+		expect(f.launches.at(-1)?.launchContext?.account).toEqual(TARGET);
+		expect(f.launches.at(-1)?.modeId).toBe("ask");
+		expect(await c.switchAccountSession(request)).toEqual(switched);
+		expect(
+			await c.accountSessionByCommand({ commandId: request.commandId }),
+		).toEqual(switched);
+		expect(f.launches).toHaveLength(3);
+		expect(releases).toBe(1);
+		await f.reopen();
+		const recovered = await f.caller().recoverAccountSession({
+			sessionId: source.sessionId,
+			commandId: randomUUID(),
+		});
+		expect(f.launches.at(-1)?.launchContext?.account).toEqual(TARGET);
+		expect(recovered.terminalId).toBe(source.terminalId);
+	});
+
+	test("a rejected destination does not close the source", async () => {
+		const f = fixture({
+			initialMode: "ask",
+			switcher: async () => {
+				throw new Error("independent history");
+			},
+		});
+		const c = f.caller();
+		const source = await c.createAccountSession(input());
+		await idle(f, source.sessionId);
+		await expect(
+			c.switchAccountSession(switchInput(source.sessionId)),
+		).rejects.toThrow("independent history");
+		expect(f.state.runtime.live.get(source.sessionId)).not.toBeNull();
+		expect(f.launches).toHaveLength(1);
+	});
+
+	for (const stateExtras of [
+		{ status: "running" },
+		{ status: "awaiting_input" },
+		{ awaitingBackground: true },
+		{
+			backgroundTasks: [
+				{
+					id: "job",
+					kind: "process",
+					name: "server",
+					canStop: true,
+					startedAtMs: 1,
+				},
+			],
+		},
+	] as Partial<SessionState>[]) {
+		test(`refuses active or background work: ${JSON.stringify(stateExtras)}`, async () => {
+			let prepared = false;
+			const f = fixture({
+				initialMode: "ask",
+				stateExtras,
+				switcher: async () => {
+					prepared = true;
+					throw new Error("unexpected preparation");
+				},
+			});
+			const c = f.caller();
+			const source = await c.createAccountSession(input());
+			await waitFor(() =>
+				Boolean(
+					f.state.runtime.live.get(source.sessionId)?.state.harnessSessionId,
+				),
+			);
+			await expect(
+				c.switchAccountSession(switchInput(source.sessionId)),
+			).rejects.toThrow("Finish active");
+			expect(prepared).toBe(false);
+			expect(f.state.runtime.live.get(source.sessionId)).not.toBeNull();
+		});
+	}
+
+	test("rejects a changed source while destination checks are pending", async () => {
+		let release!: () => void;
+		let preparationStarted!: () => void;
+		const started = new Promise<void>((resolve) => {
+			preparationStarted = resolve;
+		});
+		const f = fixture({
+			initialMode: "ask",
+			switcher: async () => {
+				preparationStarted();
+				await new Promise<void>((resolve) => {
+					release = resolve;
+				});
+				return {
+					finish: async () => ({ account: TARGET, assertCurrent() {} }),
+					release() {},
+				};
+			},
+		});
+		const c = f.caller();
+		const source = await c.createAccountSession(input());
+		await idle(f, source.sessionId);
+		const pending = c.switchAccountSession(switchInput(source.sessionId));
+		await started;
+		f.state.runtime.db
+			.update(chatSessionsLocal)
+			.set({ launchContextJson: "broken" })
+			.where(eq(chatSessionsLocal.sessionId, source.sessionId))
+			.run();
+		release();
+		await expect(pending).rejects.toThrow("conversation changed");
+		expect(f.state.runtime.live.get(source.sessionId)).not.toBeNull();
+	});
+
+	test("a post-exit verification failure preserves saved recovery and starts nothing else", async () => {
+		let releases = 0;
+		const f = fixture({
+			initialMode: "ask",
+			switcher: async () => ({
+				finish: async () => {
+					throw new Error("final history changed");
+				},
+				release() {
+					releases++;
+				},
+			}),
+		});
+		const c = f.caller();
+		const source = await c.createAccountSession(input());
+		await idle(f, source.sessionId);
+		await expect(
+			c.switchAccountSession(switchInput(source.sessionId)),
+		).rejects.toThrow("final history changed");
+		expect(f.launches).toHaveLength(1);
+		expect(releases).toBe(1);
+		const recovered = await c.recoverAccountSession({
+			sessionId: source.sessionId,
+			commandId: randomUUID(),
+		});
+		expect(recovered.terminalId).toBe(source.terminalId);
+		expect(f.launches.at(-1)?.launchContext?.account).toEqual(ACCOUNT);
+	});
+});
+
+test("a durable queued message prevents an account switch even if the live queue has not replayed it", async () => {
+	let prepared = false;
+	const f = fixture({
+		initialMode: "ask",
+		switcher: async () => {
+			prepared = true;
+			throw new Error("unexpected");
+		},
+	});
+	const c = f.caller();
+	const source = await c.createAccountSession(input());
+	await idle(f, source.sessionId);
+	f.state.runtime.journal.append(source.sessionId, {
+		type: "item",
+		turnId: "queued-turn",
+		item: {
+			id: "queued-message",
+			kind: "user_message",
+			content: [{ type: "text", text: "not sent" }],
+			startedAtMs: 1,
+			queued: true,
+		},
+	});
+	await expect(
+		c.switchAccountSession(switchInput(source.sessionId)),
+	).rejects.toThrow("queued messages");
+	expect(prepared).toBe(false);
+	expect(f.state.runtime.live.get(source.sessionId)).not.toBeNull();
+});
+
+test("concurrent identical switches share one result and a second command cannot close the source", async () => {
+	let continuePreparation!: () => void;
+	let entered!: () => void;
+	let preparations = 0;
+	let releases = 0;
+	const started = new Promise<void>((resolve) => {
+		entered = resolve;
+	});
+	const f = fixture({
+		initialMode: "ask",
+		switcher: async () => {
+			preparations++;
+			entered();
+			await new Promise<void>((resolve) => {
+				continuePreparation = resolve;
+			});
+			return {
+				finish: async () => ({ account: TARGET, assertCurrent() {} }),
+				release() {
+					releases++;
+				},
+			};
+		},
+	});
+	const c = f.caller();
+	const source = await c.createAccountSession(input());
+	await idle(f, source.sessionId);
+	const request = switchInput(source.sessionId);
+	const a = c.switchAccountSession(request);
+	const b = c.switchAccountSession(request);
+	await started;
+	await expect(
+		c.switchAccountSession(switchInput(source.sessionId)),
+	).rejects.toThrow("already switching");
+	continuePreparation();
+	expect(await a).toEqual(await b);
+	expect(preparations).toBe(1);
+	expect(releases).toBe(1);
+	expect(f.launches).toHaveLength(2);
+});
+
+test("unknown exact-load support refuses the switch before touching the idle source", async () => {
+	let prepared = false;
+	const f = fixture({
+		initialMode: "ask",
+		stateExtras: { exactResumeSupported: false },
+		switcher: async () => {
+			prepared = true;
+			throw new Error("unexpected");
+		},
+	});
+	const c = f.caller();
+	const source = await c.createAccountSession(input());
+	await idle(f, source.sessionId);
+	await expect(
+		c.switchAccountSession(switchInput(source.sessionId)),
+	).rejects.toThrow("not confirmed exact");
+	expect(prepared).toBe(false);
+	expect(f.state.runtime.live.get(source.sessionId)).not.toBeNull();
 });

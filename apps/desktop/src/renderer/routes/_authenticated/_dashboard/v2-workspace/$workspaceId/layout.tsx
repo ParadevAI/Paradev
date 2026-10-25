@@ -88,15 +88,18 @@ function V2WorkspaceLayout() {
 	const cloudWorkspace =
 		cloudWorkspaces.find((row) => row.id === workspaceId) ?? null;
 	// A ready cloud workspace opens on its own row; the box's row, when the
-	// fan-out has it, is the same workspace with live fields.
-	const workspace = useMemo(
-		() =>
-			hostWorkspace ??
-			(isCloud && cloudWorkspace?.status === "ready"
-				? hostShapedCloudWorkspace(cloudWorkspace)
-				: null),
-		[hostWorkspace, isCloud, cloudWorkspace],
-	);
+	// fan-out has it, is the same workspace with live fields. The box seeds its
+	// row with a placeholder name: the cloud row owns the real one.
+	const workspace = useMemo(() => {
+		if (hostWorkspace) {
+			return cloudWorkspace
+				? { ...hostWorkspace, name: cloudWorkspace.name }
+				: hostWorkspace;
+		}
+		return isCloud && cloudWorkspace?.status === "ready"
+			? hostShapedCloudWorkspace(cloudWorkspace)
+			: null;
+	}, [hostWorkspace, isCloud, cloudWorkspace]);
 	const archivedCloudWorkspace = useArchivedCloudWorkspace(
 		workspaceId,
 		!workspace && !cloudWorkspace,

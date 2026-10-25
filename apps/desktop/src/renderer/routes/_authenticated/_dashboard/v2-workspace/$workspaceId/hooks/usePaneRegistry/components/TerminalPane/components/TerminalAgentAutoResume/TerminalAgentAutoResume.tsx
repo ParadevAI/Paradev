@@ -8,6 +8,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useTerminalResumeCandidate } from "renderer/hooks/host-service/useTerminalResumeCandidate";
 import { useTerminalResumedSuccessor } from "renderer/hooks/host-service/useTerminalResumedSuccessor";
 import { useWorkspaceEvent } from "renderer/hooks/host-service/useWorkspaceEvent";
+import { resumeWithBackgroundReconnect } from "renderer/lib/terminal/resume-with-background-reconnect";
 import type { ConnectionState } from "renderer/lib/terminal/terminal-runtime-registry";
 import { terminalRuntimeRegistry } from "renderer/lib/terminal/terminal-runtime-registry";
 import type {
@@ -74,6 +75,7 @@ export function TerminalAgentAutoResume({
 		invalidate();
 	}, [connectionState, invalidate]);
 
+	const host = workspaceTrpc.useUtils().client;
 	const { mutateAsync: resumeAsync } =
 		workspaceTrpc.terminalAgents.resume.useMutation();
 
@@ -132,7 +134,19 @@ export function TerminalAgentAutoResume({
 
 		void (async () => {
 			try {
-				const result = await resumeAsync({ workspaceId, terminalId });
+				const result = await resumeWithBackgroundReconnect(
+					{ workspaceId, terminalId },
+					candidate?.agentId ?? "",
+					{
+						capabilities: () =>
+							host.terminalAgents.backgroundRecoveryCapabilities.query(),
+						source: (input) =>
+							host.terminalAgents.backgroundRecoverySource.query(input),
+						reconnect: (input) =>
+							host.terminalAgents.reconnectBackground.mutate(input),
+					},
+					resumeAsync,
+				);
 				if (!result.resumed) {
 					// Another caller consumed the candidate (or it vanished).
 					// Lifecycle events are fire-and-forget, so refetch explicitly
@@ -162,6 +176,8 @@ export function TerminalAgentAutoResume({
 		})();
 	}, [
 		shouldResume,
+		host,
+		candidate?.agentId,
 		candidateSessionId,
 		resumeAsync,
 		invalidate,

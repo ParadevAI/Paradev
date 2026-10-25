@@ -1,0 +1,43 @@
+import type { ReleaseHighlightIcon } from "@superset/shared/release-notes";
+import type { IconType } from "react-icons";
+import {
+	LuBot,
+	LuCloud,
+	LuGitPullRequest,
+	LuHistory,
+	LuKeyboard,
+	LuLink,
+	LuListChecks,
+	LuMessageSquare,
+	LuPanelsTopLeft,
+	LuPlug,
+	LuSearch,
+	LuShieldCheck,
+	LuSparkles,
+	LuTablet,
+	LuTerminal,
+	LuUsers,
+	LuWrench,
+	LuZap,
+} from "react-icons/lu";
+
+export const HIGHLIGHT_ICONS: Record<ReleaseHighlightIcon, IconType> = {
+	sparkles: LuSparkles,
+	"git-pull-request": LuGitPullRequest,
+	terminal: LuTerminal,
+	bot: LuBot,
+	"list-checks": LuListChecks,
+	plug: LuPlug,
+	cloud: LuCloud,
+	zap: LuZap,
+	message: LuMessageSquare,
+	layout: LuPanelsTopLeft,
+	shield: LuShieldCheck,
+	wrench: LuWrench,
+	link: LuLink,
+	search: LuSearch,
+	keyboard: LuKeyboard,
+	tablet: LuTablet,
+	history: LuHistory,
+	users: LuUsers,
+};

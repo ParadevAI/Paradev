@@ -28,8 +28,8 @@
 					"token_request_auth_method": "client_secret_post",
 					"token_expiration_buffer": 300,
 					"requires_env": [
-						"GOOGLE_TEMP_CLIENT_ID",
-						"GOOGLE_TEMP_CLIENT_SECRET"
+						"GOOGLE_CONNECTIONS_CLIENT_ID",
+						"GOOGLE_CONNECTIONS_CLIENT_SECRET"
 					],
 					"authorization_params": {
 						"access_type": "offline",
@@ -372,6 +372,53 @@
 						"account": {
 							"id": "$.organization.slug",
 							"label": "$.organization.name"
+						}
+					},
+					"bind": {
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						}
+					}
+				}
+			]
+		},
+		"autumn_mcp": {
+			"displayName": "Autumn",
+			"icon": "autumn",
+			"category": "Data & APIs",
+			"scope": "user",
+			"methods": [
+				{
+					"type": "oauth2",
+					"label": "OAuth 2.0",
+					"client": "dynamic",
+					"authorization_url": "https://mcp.useautumn.com/mcp",
+					"scopes": [
+						"offline_access",
+						"organisation:read",
+						"customers:read",
+						"customers:write",
+						"features:read",
+						"plans:read",
+						"plans:write",
+						"balances:read",
+						"billing:read",
+						"billing:write",
+						"analytics:read"
+					],
+					"identity": {
+						"mcp": "https://mcp.useautumn.com/mcp",
+						"tool": "getCurrentOrganization",
+						"arguments": {
+							"intent": "Identify the Autumn organization this connection belongs to."
+						},
+						"account": {
+							"id": "$.id",
+							"label": "$.name"
+						},
+						"user": {
+							"id": "$.user.id",
+							"label": "$.user.email"
 						}
 					},
 					"bind": {

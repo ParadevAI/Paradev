@@ -1,3 +1,4 @@
+import type { CreatePaneInput } from "@superset/panes";
 import {
 	type FocusDirection,
 	getPaneParentDirection,
@@ -6,25 +7,24 @@ import {
 	type WorkspaceProps,
 	type WorkspaceStore,
 } from "@superset/panes";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import { useHotkey } from "renderer/hotkeys";
-import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import type { V2TerminalPresetRow } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
-import { useRightSidebarToggleIntent } from "renderer/stores/right-sidebar-toggle-intent";
 import type { StoreApi } from "zustand";
 import type {
 	BrowserPaneData,
 	DesktopPaneData,
 	MobilePaneData,
+	PaneTarget,
 	PaneViewerData,
 	TerminalPaneData,
 } from "../../types";
 import { useDefaultBrowserUrl } from "../useDefaultBrowserUrl";
 import type { TerminalLauncher } from "../useV2TerminalLauncher";
-import { useWorkspaceRightSidebarOpen } from "../useWorkspaceRightSidebarOpen";
 
 export function useWorkspaceHotkeys({
 	store,
+	viewer,
 	matchedPresets,
 	executePreset,
 	addTerminalTab,
@@ -33,8 +33,10 @@ export function useWorkspaceHotkeys({
 	launcher,
 	getCloseTarget,
 	isSandbox,
+	isMobilePaneEnabled,
 }: {
 	store: StoreApi<WorkspaceStore<PaneViewerData>>;
+	viewer: PaneTarget;
 	matchedPresets: V2TerminalPresetRow[];
 	executePreset: (preset: V2TerminalPresetRow) => void | Promise<void>;
 	addTerminalTab: () => Promise<void>;
@@ -42,31 +44,16 @@ export function useWorkspaceHotkeys({
 	paneRegistry: PaneRegistry<PaneViewerData>;
 	launcher: TerminalLauncher;
 	isSandbox: boolean;
+	isMobilePaneEnabled: boolean;
 	getCloseTarget: () => {
 		store: StoreApi<WorkspaceStore<PaneViewerData>>;
 		onBeforeCloseTab?: WorkspaceProps<PaneViewerData>["onBeforeCloseTab"];
 	};
 }) {
-	const { workspace } = useWorkspace();
-	const { setOpen: setRightSidebarOpen } = useWorkspaceRightSidebarOpen(
-		workspace.id,
-	);
 	const defaultBrowserUrl = useDefaultBrowserUrl();
 	const visiblePresets = useMemo(
 		() => matchedPresets.filter((preset) => preset.pinnedToBar !== false),
 		[matchedPresets],
-	);
-
-	useHotkey("TOGGLE_SIDEBAR", () => {
-		setRightSidebarOpen((prev) => !prev);
-	});
-
-	useEffect(
-		() =>
-			useRightSidebarToggleIntent.subscribe((state, prev) => {
-				if (state.tick !== prev.tick) setRightSidebarOpen((open) => !open);
-			}),
-		[setRightSidebarOpen],
 	);
 
 	// --- Tab creation ---
@@ -76,7 +63,8 @@ export function useWorkspaceHotkeys({
 	});
 
 	useHotkey("NEW_BROWSER", () => {
-		store.getState().addTab({
+		viewer.reveal();
+		viewer.store.getState().addTab({
 			panes: [
 				{
 					kind: "browser",
@@ -266,9 +254,13 @@ export function useWorkspaceHotkeys({
 		});
 	});
 
-	useHotkey(
-		"SPLIT_WITH_DESKTOP",
-		() => {
+	const splitWithViewerPane = useCallback(
+		(newPane: CreatePaneInput<PaneViewerData>) => {
+			if (viewer.store !== store) {
+				viewer.reveal();
+				viewer.store.getState().openPane({ pane: newPane });
+				return;
+			}
 			const state = store.getState();
 			const active = state.getActivePane();
 			if (!active) return;
@@ -276,48 +268,38 @@ export function useWorkspaceHotkeys({
 				tabId: active.tabId,
 				paneId: active.pane.id,
 				position: "right",
-				newPane: {
-					kind: "desktop",
-					data: { kind: "desktop" } as DesktopPaneData,
-				},
+				newPane,
 			});
 		},
+		[store, viewer],
+	);
+
+	useHotkey(
+		"SPLIT_WITH_DESKTOP",
+		() =>
+			splitWithViewerPane({
+				kind: "desktop",
+				data: { kind: "desktop" } as DesktopPaneData,
+			}),
 		{ enabled: isSandbox },
 	);
 
-	// Not gated on isSandbox: a local machine with Xcode/Android SDK gets a
-	// mobile pane too, just backed by a local simulator instead of Limrun.
-	useHotkey("SPLIT_WITH_MOBILE", () => {
-		const state = store.getState();
-		const active = state.getActivePane();
-		if (!active) return;
-		state.splitPane({
-			tabId: active.tabId,
-			paneId: active.pane.id,
-			position: "right",
-			newPane: {
+	useHotkey(
+		"SPLIT_WITH_MOBILE",
+		() =>
+			splitWithViewerPane({
 				kind: "mobile",
 				data: { kind: "mobile" } as MobilePaneData,
-			},
-		});
-	});
+			}),
+		{ enabled: isMobilePaneEnabled },
+	);
 
-	useHotkey("SPLIT_WITH_BROWSER", () => {
-		const state = store.getState();
-		const active = state.getActivePane();
-		if (!active) return;
-		state.splitPane({
-			tabId: active.tabId,
-			paneId: active.pane.id,
-			position: "right",
-			newPane: {
-				kind: "browser",
-				data: {
-					url: defaultBrowserUrl,
-				} as BrowserPaneData,
-			},
-		});
-	});
+	useHotkey("SPLIT_WITH_BROWSER", () =>
+		splitWithViewerPane({
+			kind: "browser",
+			data: { url: defaultBrowserUrl } as BrowserPaneData,
+		}),
+	);
 
 	useHotkey("EQUALIZE_PANE_SPLITS", () => {
 		const state = store.getState();

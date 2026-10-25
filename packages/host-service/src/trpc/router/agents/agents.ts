@@ -48,6 +48,7 @@ import { hasHarnessSession } from "../../../terminal-agents/harness-sessions";
 import type { HostServiceContext } from "../../../types";
 import { protectedProcedure, router } from "../../index";
 import { resolveAttachmentPath } from "../attachments/storage";
+import { createChatSession } from "../sessions/create-chat-session";
 import { toTerminalSessionError } from "../terminal/errors";
 import type { SessionAccount } from "../usage/session-account/session-account";
 import { seedAgentFolderTrust } from "../workspace-creation/shared/seed-agent-trust";
@@ -144,6 +145,12 @@ function buildAttachmentBlock(
 }
 
 export interface AgentRunInput {
+	/** Internal recovery transaction; never accepted by a public input schema. */
+	terminalLaunch?: {
+		terminalId: string;
+		beforeInitialCommand: () => Promise<void>;
+		onInitialCommandReady: () => void;
+	};
 	/** Internal, validated explicit selection. Public callers use runWithAccount. */
 	account?: SessionAccount;
 	colors?: TerminalColors;
@@ -539,7 +546,7 @@ async function runTerminalAgent(
 ): Promise<AgentRunResult> {
 	const { fullCommand, label } = buildTerminalAgentLaunch(ctx.db, input);
 
-	const terminalId = crypto.randomUUID();
+	const terminalId = input.terminalLaunch?.terminalId ?? crypto.randomUUID();
 	const result = await createTerminalSessionInternal({
 		terminalId,
 		workspaceId: input.workspaceId,
@@ -547,19 +554,46 @@ async function runTerminalAgent(
 		eventBus: ctx.eventBus,
 		initialCommand: fullCommand,
 		colors: input.colors,
+		...(input.terminalLaunch
+			? {
+					beforeInitialCommand: input.terminalLaunch.beforeInitialCommand,
+					onInitialCommandReady: () => {
+						ctx.db.transaction(() => {
+							bindResumedSession(ctx, input, terminalId);
+							input.terminalLaunch?.onInitialCommandReady();
+						});
+					},
+				}
+			: {}),
 	});
 
 	if ("error" in result) {
 		throw toTerminalSessionError(result);
 	}
 
-	bindResumedSession(ctx, input, result.terminalId);
+	if (!input.terminalLaunch) bindResumedSession(ctx, input, result.terminalId);
 
 	return {
 		kind: "terminal",
 		sessionId: result.terminalId,
 		label,
 	};
+}
+
+/**
+ * The agent identity a terminal reports once this config launches in it.
+ *
+ * A binding recorded by the lifecycle hook carries no instance: the wrapper
+ * Superset installs for a binary exports that binary's builtin id as
+ * `SUPERSET_AGENT_ID` and the session hook never reports a definition, so a
+ * custom agent running `claude` arrives looking exactly like a preset one.
+ * That is the granularity such a binding has, which is what this returns.
+ */
+function launchIdentity(config: ResolvedHostAgentConfig): string {
+	if (isBuiltinAgentId(config.presetId)) return config.presetId;
+	const [command = ""] = config.command.trim().split(/\s+/);
+	const executable = command.split(/[\\/]/).pop() ?? "";
+	return executable.toLowerCase() || config.presetId;
 }
 
 /**
@@ -647,11 +681,17 @@ function bindingRunsConfig(
 	binding: Pick<TerminalAgentBinding, "definitionId" | "agentId">,
 	config: ResolvedHostAgentConfig,
 ): boolean {
-	const bound = resolveHostAgentConfig(
-		db,
-		binding.definitionId ?? binding.agentId,
-	);
-	return bound?.id === config.id;
+	if (binding.definitionId) {
+		// The binding knows which instance it runs.
+		return resolveHostAgentConfig(db, binding.definitionId)?.id === config.id;
+	}
+	// The binding knows only the binary. A caller that names an instance of it
+	// - an automation pinned to a second agent of one preset, or to a custom
+	// agent that runs the same binary - is still the agent this terminal
+	// holds; the candidate is that automation's own last session, so the
+	// instance it names is the instance that is running. Compared as is: a
+	// host may have no preset row left for the binary to resolve to.
+	return binding.agentId === launchIdentity(config);
 }
 
 export function chatLaunchTarget(
@@ -727,6 +767,7 @@ function continueChatAgent(
 		kind: "terminal",
 		sessionId: target.terminalId,
 		label: target.label,
+		chatSessionId: target.chatSessionId,
 	};
 }
 
@@ -740,39 +781,12 @@ function launchChatAgent(
 	const chat = ctx.runtime.chat?.();
 	if (!chat?.live.supports(target.harness)) return null;
 
-	const terminalId = crypto.randomUUID();
-	const { sessionId } = chat.commands.createSession({
-		commandId: crypto.randomUUID(),
-		scopeId: input.workspaceId,
-		harness: target.harness,
-		cwd,
-		terminalId,
-		...(input.model ? { modelId: input.model } : {}),
-		...(input.mode ? { modeId: input.mode } : {}),
-	});
-	const content = [
-		...(input.prompt.trim() !== ""
-			? [{ type: "text" as const, text: input.prompt }]
-			: []),
-		...target.attachments.map((attachment) => ({
-			type: "attachment" as const,
-			...attachment,
-		})),
-	];
-	if (content.length > 0) {
-		chat.commands.prompt({
-			commandId: crypto.randomUUID(),
-			sessionId,
-			clientId: crypto.randomUUID(),
-			content,
-		});
-	}
-
+	const created = createChatSession(chat, target, input, cwd);
 	return {
 		kind: "terminal",
-		sessionId: terminalId,
-		label: target.label,
-		chatSessionId: sessionId,
+		sessionId: created.terminalId,
+		label: created.label,
+		chatSessionId: created.sessionId,
 	};
 }
 
@@ -820,6 +834,15 @@ export async function runAgentInWorkspace(
 	ctx: HostServiceContext,
 	input: AgentRunInput,
 ): Promise<AgentRunResult> {
+	if (
+		input.terminalLaunch &&
+		(!input.account || !input.resumeSessionId || input.surface !== "terminal")
+	)
+		throw new TRPCError({
+			code: "BAD_REQUEST",
+			message:
+				"A guarded launch requires exact account-bound terminal recovery.",
+		});
 	if (input.account) {
 		if (
 			input.surface === "chat" ||

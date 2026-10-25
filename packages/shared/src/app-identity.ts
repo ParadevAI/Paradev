@@ -24,9 +24,10 @@ export function readRootDomain(): string {
 export const ROOT_DOMAIN = readRootDomain();
 
 // Production hosts. Unlike COMPANY.MARKETING_URL/DOCS_URL, they ignore per-deployment URL overrides.
+// The API keeps its host when the root domain changes: released clients and OAuth clients call it.
 export const CANONICAL_URLS = {
 	MARKETING: `https://${ROOT_DOMAIN}`,
-	API: `https://api.${ROOT_DOMAIN}`,
+	API: "https://api.superset.sh",
 	APP: `https://app.${ROOT_DOMAIN}`,
 	DOCS: `https://docs.${ROOT_DOMAIN}`,
 } as const;

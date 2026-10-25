@@ -2,7 +2,7 @@ import { timingSafeEqual } from "node:crypto";
 import { db } from "@superset/db/client";
 import { cloudWorkspaces } from "@superset/db/schema";
 import type { ActiveAgentStatus } from "@superset/shared/agent-status";
-import { and, eq, ne } from "drizzle-orm";
+import { and, eq, ne, sql } from "drizzle-orm";
 import { nudge } from "../realtime";
 import { sandboxHostSecretFor } from "./access";
 
@@ -24,20 +24,31 @@ export async function reportSandboxAgentStatus(args: {
 	}
 	const [row] = await db
 		.update(cloudWorkspaces)
-		.set({ agentStatus: args.status, agentStatusAt: new Date(args.at) })
+		.set({
+			agentStatus: args.status,
+			agentStatusAt:
+				args.status === null
+					? sql`${cloudWorkspaces.agentStatusAt}`
+					: sql`CASE WHEN ${cloudWorkspaces.agentStatus} = ${args.status}::text THEN ${cloudWorkspaces.agentStatusAt} ELSE ${new Date(args.at).toISOString()}::timestamptz END`,
+		})
 		.where(
 			and(
 				eq(cloudWorkspaces.id, args.workspaceId),
 				ne(cloudWorkspaces.status, "deleted"),
 			),
 		)
-		.returning({ organizationId: cloudWorkspaces.organizationId });
+		.returning({
+			organizationId: cloudWorkspaces.organizationId,
+			agentStatusAt: cloudWorkspaces.agentStatusAt,
+		});
 	if (!row) return "unknown";
-	nudge(row.organizationId, "cloud_workspaces", {
-		kind: "cloud_workspaces",
-		workspaceId: args.workspaceId,
-		agentStatus: args.status,
-		agentStatusAt: args.at,
-	});
+	if (row.agentStatusAt) {
+		nudge(row.organizationId, "cloud_workspaces", {
+			kind: "cloud_workspaces",
+			workspaceId: args.workspaceId,
+			agentStatus: args.status,
+			agentStatusAt: row.agentStatusAt.getTime(),
+		});
+	}
 	return "ok";
 }

@@ -202,6 +202,7 @@ export function ImportHistoryDialog({
 
 	return (
 		<Dialog
+			modal
 			open={open}
 			onOpenChange={(next) => {
 				// The X button, Escape, and outside-click all funnel through here —

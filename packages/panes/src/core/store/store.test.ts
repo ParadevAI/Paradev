@@ -913,3 +913,113 @@ describe("explicit pane close notifications", () => {
 		expect(closed).toEqual([]);
 	});
 });
+
+describe("focus requests", () => {
+	it("requests focus for a new pane, unless told not to", () => {
+		const store = makeStore();
+		store.getState().addTab({ id: "t1", panes: [tp("a")] });
+		expect(store.getState().focusRequest?.paneId).toBe("a");
+
+		store
+			.getState()
+			.clearFocusRequest(store.getState().focusRequest?.seq ?? -1);
+		store.getState().addTab({ id: "t2", panes: [tp("b")], focus: false });
+		expect(store.getState().focusRequest).toBeNull();
+	});
+
+	it("focuses the pane openPane placed", () => {
+		const store = makeStore();
+		store.getState().addTab({ id: "t1", panes: [tp("a")] });
+		store
+			.getState()
+			.openPane({ pane: { id: "b", kind: "other", data: { label: "b" } } });
+		expect(store.getState().focusRequest?.paneId).toBe("b");
+	});
+
+	it("focusPane activates the pane's tab and gives each call a new seq", () => {
+		const store = makeStore();
+		store.getState().addTab({ id: "t1", panes: [tp("a")] });
+		store.getState().addTab({ id: "t2", panes: [tp("b")] });
+
+		store.getState().focusPane("a");
+		const first = store.getState().focusRequest?.seq;
+		store.getState().focusPane("a");
+
+		expect(store.getState().activeTabId).toBe("t1");
+		expect(store.getState().focusRequest?.seq).not.toBe(first);
+	});
+
+	it("clearFocusRequest ignores a newer request", () => {
+		const store = makeStore();
+		store.getState().addTab({ id: "t1", panes: [tp("a")] });
+		const stale = store.getState().focusRequest?.seq ?? -1;
+		store.getState().focusPane("a");
+
+		store.getState().clearFocusRequest(stale);
+
+		expect(store.getState().focusRequest?.paneId).toBe("a");
+	});
+});
+
+describe("pane keys", () => {
+	function makeKeyedStore() {
+		return createWorkspaceStore<TestData>({
+			getPaneKey: (pane) =>
+				pane.kind === "test" ? `test:${pane.data.label}` : undefined,
+		});
+	}
+
+	it("focuses an open pane with the same key instead of adding a tab", () => {
+		const store = makeKeyedStore();
+		store.getState().addTab({ id: "t1", panes: [tp("a", "x")] });
+		store.getState().addTab({ id: "t2", panes: [tp("b", "y")] });
+
+		store.getState().addTab({ panes: [tp("c", "x")] });
+		store.getState().openPane({ pane: tp("d", "x") });
+
+		expect(store.getState().tabs).toHaveLength(2);
+		expect(store.getState().activeTabId).toBe("t1");
+		expect(store.getState().focusRequest?.paneId).toBe("a");
+	});
+
+	it("replaces the reused pane's data only when asked", () => {
+		const store = createWorkspaceStore<TestData & { extra?: string }>({
+			getPaneKey: (pane) => `test:${pane.data.label}`,
+		});
+		store.getState().addTab({ panes: [tp("a", "x")] });
+
+		store
+			.getState()
+			.openPane({ pane: { kind: "test", data: { label: "x", extra: "1" } } });
+		expect(store.getState().getPane("a")?.pane.data.extra).toBeUndefined();
+
+		store.getState().openPane({
+			pane: { kind: "test", data: { label: "x", extra: "2" } },
+			replaceData: true,
+		});
+		expect(store.getState().getPane("a")?.pane.data.extra).toBe("2");
+	});
+
+	it("creates a second pane with reuse: false, or when the pane has no key", () => {
+		const store = makeKeyedStore();
+		store.getState().addTab({ panes: [tp("a", "x")] });
+
+		store.getState().addTab({ panes: [tp("b", "x")], reuse: false });
+		store
+			.getState()
+			.addTab({ panes: [{ id: "c", kind: "other", data: { label: "x" } }] });
+
+		expect(store.getState().tabs).toHaveLength(3);
+	});
+
+	it("reuse with focus: false activates without a focus request", () => {
+		const store = makeKeyedStore();
+		store.getState().addTab({ id: "t1", panes: [tp("a", "x")], focus: false });
+		store.getState().addTab({ id: "t2", panes: [tp("b", "y")], focus: false });
+
+		store.getState().addTab({ panes: [tp("c", "x")], focus: false });
+
+		expect(store.getState().activeTabId).toBe("t1");
+		expect(store.getState().focusRequest).toBeNull();
+	});
+});

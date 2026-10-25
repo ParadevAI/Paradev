@@ -43,7 +43,7 @@ export function YcDealCodeEmail({
 					href={`${CANONICAL_URLS.MARKETING}/download`}
 					className="text-foreground"
 				>
-					{COMPANY.DOMAIN}/download
+					{`${COMPANY.DOMAIN}/download`}
 				</Link>
 				. Questions? Just reply to this email.
 			</Text>

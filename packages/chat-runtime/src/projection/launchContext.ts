@@ -36,3 +36,30 @@ export function findAccountSuccessor(db: ChatDb, sessionId: string) {
 			.get() ?? null
 	);
 }
+
+/** A switch is a recorded exact-conversation successor, never an arbitrary account change. */
+export function accountSuccessorMatches(
+	source: ChatSessionRow,
+	next: ChatSessionRow,
+): boolean {
+	if (
+		next.predecessorSessionId !== source.sessionId ||
+		source.scopeId !== next.scopeId ||
+		source.harness !== next.harness
+	)
+		return false;
+	if (source.launchContextJson === next.launchContextJson) return true;
+	const from = readLaunchContext(source);
+	const to = readLaunchContext(next);
+	return Boolean(
+		from &&
+			to &&
+			next.predecessorSessionId === source.sessionId &&
+			to.switchOfSessionId === source.sessionId &&
+			source.harnessSessionId &&
+			source.harnessSessionId === next.harnessSessionId &&
+			from.cwd === to.cwd &&
+			from.terminalId === to.terminalId &&
+			from.account.agent === to.account.agent,
+	);
+}

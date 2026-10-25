@@ -1,3 +1,4 @@
+import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import {
 	buildFrontmatter,
@@ -8,7 +9,7 @@ import {
 
 export async function GET() {
 	const frontmatter = buildFrontmatter({
-		title: `${COMPANY.NAME} llms.txt`,
+		title: `${BRAND.INTRO_NAME} llms.txt`,
 		description: PRODUCT_SUMMARY,
 		canonical: `${COMPANY.MARKETING_URL}/llms.md`,
 	});

@@ -407,6 +407,20 @@
       "when": 1790437860268,
       "tag": "0057_add_file_auto_save_setting",
       "breakpoints": true
+    },
+    {
+      "idx": 58,
+      "version": "6",
+      "when": 1792642704983,
+      "tag": "0058_screenshot_device_key",
+      "breakpoints": true
+    },
+    {
+      "idx": 59,
+      "version": "6",
+      "when": 1792642705763,
+      "tag": "0059_screenshot_url_optional",
+      "breakpoints": true
     }
   ]
 }

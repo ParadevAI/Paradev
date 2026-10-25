@@ -1,5 +1,6 @@
 import { Trans } from "@lingui/react/macro";
 import Link from "next/link";
+import { DownloadLink } from "@/app/[lang]/components/DownloadLink";
 
 const buttonClassName =
 	"px-4 py-3 font-mono text-xs tracking-wider uppercase transition-colors";
@@ -20,12 +21,12 @@ export function CareersCTA() {
 				>
 					<Trans>See open roles ↑</Trans>
 				</Link>
-				<Link
-					href="/download"
+				<DownloadLink
+					source="careers"
 					className={`${buttonClassName} border border-border text-foreground hover:bg-muted`}
 				>
 					<Trans>Download Superset</Trans>
-				</Link>
+				</DownloadLink>
 			</div>
 		</section>
 	);

@@ -12,7 +12,7 @@ import { LOCAL_HOST_SERVICE_DETAIL } from "../../utils/localHostServiceDetail";
 import { AgentCredentialsChangedBanner } from "./components/AgentCredentialsChangedBanner";
 import { CloudUsageRefusedBanner } from "./components/CloudUsageRefusedBanner";
 import { CloudUsageStoppingBanner } from "./components/CloudUsageStoppingBanner";
-import { HostConnectionStrip } from "./components/HostConnectionStrip";
+import { HostConnectionPill } from "./components/HostConnectionPill";
 
 /** Keeps loaded panes accessible while reporting the shared host connection. */
 export function WorkspaceHostGate({
@@ -81,7 +81,7 @@ export function WorkspaceHostGate({
 					error={usageRefusal.error}
 				/>
 			) : isDegraded || isAccessDenied ? (
-				<HostConnectionStrip
+				<HostConnectionPill
 					settingsHostId={isSandbox ? null : workspace.hostId}
 					hostName={hostName}
 					isAccessDenied={isAccessDenied}
@@ -103,6 +103,7 @@ export function WorkspaceHostGate({
 					isReconnecting={isReconnecting}
 					hasConnected={hasConnected}
 					isLocalRestartInFlight={isLocalRestartInFlight}
+					isWakingUp={isSandbox && isReconnecting && !isAccessDenied}
 					onRetry={retry}
 				/>
 			) : null}

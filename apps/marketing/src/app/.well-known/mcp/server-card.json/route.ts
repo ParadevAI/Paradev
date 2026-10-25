@@ -6,7 +6,7 @@ const FALLBACK_CARD = {
 	title: "Superset",
 	icon: `${COMPANY.MARKETING_URL}/apple-touch-icon.png`,
 	description:
-		"Superset MCP server: create Git-worktree workspaces, launch coding-agent sessions, schedule automations, open terminals, and manage tasks on behalf of a Superset user.",
+		"Superset MCP server: create Git-worktree workspaces, launch coding-agent sessions, set up automations, open terminals, and manage tasks on behalf of a Superset user.",
 	version: "0.1.0",
 	serverUrl: MCP_SERVER_URL,
 	transport: "streamable-http",

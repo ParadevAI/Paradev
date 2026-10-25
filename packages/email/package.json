@@ -7,7 +7,7 @@
 		"@types/node": "24.12.0",
 		"@types/react": "19.2.14",
 		"@types/tailwindcss": "3.1.0",
-		"bun-types": "1.4.2",
+		"bun-types": "1.4.3",
 		"react-email": "5.0.7",
 		"typescript": "7.0.2"
 	},

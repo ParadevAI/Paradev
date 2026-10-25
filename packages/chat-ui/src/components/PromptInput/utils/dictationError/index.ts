@@ -1,0 +1,1 @@
+export { DictationError } from "./dictationError";

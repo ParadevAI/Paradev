@@ -12,7 +12,7 @@ import { sessionAccountForChat, validateChatAccount } from "./accountLaunch";
 function workspacePaths(
 	db: HostDb,
 	workspaceId: string,
-): { workspaceName: string; workspacePath: string; rootPath: string } {
+): { workspacePath: string; rootPath: string } {
 	const workspace = db.query.workspaces
 		.findFirst({ where: eq(workspaces.id, workspaceId) })
 		.sync();
@@ -22,7 +22,6 @@ function workspacePaths(
 				.sync()
 		: undefined;
 	return {
-		workspaceName: workspace?.name ?? "",
 		workspacePath: workspace?.worktreePath ?? "",
 		rootPath: project?.repoPath ?? "",
 	};
@@ -72,7 +71,6 @@ export async function buildChatAgentEnv(options: {
 				cwd: options.cwd,
 				workspaceId: options.workspaceId,
 				terminalId: options.terminalId,
-				workspaceName: paths.workspaceName,
 				workspacePath: paths.workspacePath || options.cwd,
 				rootPath: paths.rootPath,
 			}),

@@ -1,6 +1,13 @@
 import { db } from "@superset/db/client";
 import { members, subscriptions } from "@superset/db/schema";
+import {
+	AUTO_TOPUP_MONTHLY_LIMIT,
+	GB_HOUR_PURCHASE,
+	gbHourPack,
+	gbHourPurchase,
+} from "@superset/shared/billing";
 import { COMPANY } from "@superset/shared/constants";
+import { AutumnError } from "autumn-js";
 import type { BetterAuthPlugin } from "better-auth";
 import {
 	APIError,
@@ -12,11 +19,17 @@ import { and, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 import { autumnClient, billingUsesAutumn } from "../../../autumn";
 import { countBillableSeats } from "../../../utils/billing";
-import { ensureAutumnCustomer, paidAutumnPlanId } from "./customer";
+import { LEGACY_CLIENT_PLAN_IDS } from "../legacy/plan-ids";
+import { catalogAutumnPlans, isSelfServePlan, seatLicenseFor } from "./catalog";
+import {
+	ensureAutumnCustomer,
+	getAutumnCustomer,
+	paidAutumnPlanId,
+} from "./customer";
+import { paidPlanIdFromFlags } from "./entitlements";
 import {
 	ACTIVE_CPU_MINUTES_FEATURE_ID,
 	BOX_GB_MINUTES_FEATURE_ID,
-	SEATS_FEATURE_ID,
 } from "./features";
 import { invalidateOrganizationBilling } from "./plan-state";
 import { syncOrganizationSubscription } from "./projection";
@@ -26,8 +39,9 @@ import {
 	checkoutSessionParams,
 	OWNER_EXPAND,
 	ROUTE_ROLES,
-	selfServePlan,
 } from "./routes-policy";
+import { yearlyChangeStart } from "./seat-policy";
+import { seatPurchase } from "./seats";
 
 interface SessionContext {
 	context: {
@@ -72,12 +86,59 @@ async function billingCaller(
 	return { organizationId, userId: session.user.id, role };
 }
 
-function refuseEnterprise(planId: string): void {
-	if (!selfServePlan(planId)) {
+async function refuseEnterprise(planId: string): Promise<void> {
+	if (!(await isSelfServePlan(planId))) {
 		throw new APIError("FORBIDDEN", {
 			message: `Enterprise subscriptions are managed by admins. Contact ${COMPANY.SUPPORT_EMAIL}.`,
 		});
 	}
+}
+
+async function currentPack(organizationId: string) {
+	const customer = await getAutumnCustomer(organizationId);
+	const planId = paidPlanIdFromFlags(customer.flags);
+	const subscribed = customer.subscriptions.find(
+		(subscription) =>
+			subscription.planId === planId && subscription.status !== "scheduled",
+	)?.plan;
+	const pack = subscribed ? gbHourPack(subscribed) : null;
+	if (!planId || !pack) {
+		throw new APIError("BAD_REQUEST", {
+			message: "This plan does not sell extra cloud GB-hours.",
+		});
+	}
+	return { planId, pack };
+}
+
+async function yearlyRenewalStart(
+	organizationId: string,
+	planId: string,
+	preview: () => Promise<{
+		incoming: { planId: string; effectiveAt: number | null }[];
+	}>,
+): Promise<number | undefined> {
+	const customer = await getAutumnCustomer(organizationId);
+	const currentPlanId = paidPlanIdFromFlags(customer.flags);
+	if (!currentPlanId || currentPlanId === planId) return undefined;
+	const license = await seatLicenseFor(currentPlanId);
+	if (license?.price?.interval !== "year") return undefined;
+	const active = customer.subscriptions.find(
+		(subscription) =>
+			subscription.planId === currentPlanId &&
+			subscription.status !== "scheduled",
+	);
+	const scheduledAt = (await preview()).incoming.find(
+		(item) => item.planId === planId,
+	)?.effectiveAt;
+	return (
+		yearlyChangeStart({
+			scheduledAt,
+			seatInterval: "year",
+			startedAt: active?.startedAt,
+			currentPeriodEnd: active?.currentPeriodEnd,
+			now: Date.now(),
+		}) ?? undefined
+	);
 }
 
 async function afterPlanChange(organizationId: string): Promise<void> {
@@ -102,8 +163,10 @@ export const autumnBillingRoutes = {
 				body: z.object({
 					...organizationBody,
 					planId: z.string().min(1),
+					currentPlanId: z.string().nullable().optional(),
 					successUrl: z.string().min(1),
 					cancelUrl: z.string().optional(),
+					confirmed: z.boolean().optional(),
 				}),
 				use: [
 					sessionMiddleware,
@@ -112,7 +175,7 @@ export const autumnBillingRoutes = {
 			},
 			async (ctx) => {
 				const caller = await billingCaller(ctx, "attach");
-				refuseEnterprise(ctx.body.planId);
+				await refuseEnterprise(ctx.body.planId);
 				const [stripeSubscription, autumnPlanId] = await Promise.all([
 					db.query.subscriptions.findFirst({
 						where: and(
@@ -121,13 +184,18 @@ export const autumnBillingRoutes = {
 						),
 						columns: { plan: true },
 					}),
-					paidAutumnPlanId(caller.organizationId).catch(() => null),
+					paidAutumnPlanId(caller.organizationId).catch((error: unknown) => {
+						if (error instanceof AutumnError && error.statusCode === 404) {
+							return null;
+						}
+						throw error;
+					}),
 				]);
 				if (
 					stripeSubscription?.plan === "enterprise" ||
-					(autumnPlanId && !selfServePlan(autumnPlanId))
+					(autumnPlanId && !(await isSelfServePlan(autumnPlanId)))
 				) {
-					refuseEnterprise("enterprise");
+					await refuseEnterprise("enterprise");
 				}
 				if (stripeSubscription && !autumnPlanId) {
 					throw new APIError("BAD_REQUEST", {
@@ -135,19 +203,44 @@ export const autumnBillingRoutes = {
 							"This organization already has a subscription. Change it from the billing portal.",
 					});
 				}
+				if (
+					ctx.body.currentPlanId === undefined
+						? autumnPlanId && !LEGACY_CLIENT_PLAN_IDS.includes(autumnPlanId)
+						: ctx.body.currentPlanId !== autumnPlanId
+				) {
+					await invalidateOrganizationBilling(caller.organizationId);
+					throw new APIError("BAD_REQUEST", {
+						message:
+							ctx.body.currentPlanId === undefined
+								? "Update the app to change this plan."
+								: "This organization's plan changed. Reload billing and try again.",
+					});
+				}
 				await ensureAutumnCustomer(caller.organizationId);
 				const seats = Math.max(
 					1,
 					await countBillableSeats(caller.organizationId),
 				);
+				const purchase = await seatPurchase(ctx.body.planId, seats);
+				const startsAt = await yearlyRenewalStart(
+					caller.organizationId,
+					ctx.body.planId,
+					() =>
+						autumnClient.billing.previewAttach({
+							customerId: caller.organizationId,
+							planId: ctx.body.planId,
+							...purchase.quantities,
+						}),
+				);
 				const result = await autumnClient.billing.attach({
 					customerId: caller.organizationId,
 					planId: ctx.body.planId,
-					featureQuantities: [{ featureId: SEATS_FEATURE_ID, quantity: seats }],
+					...purchase.quantities,
+					...(startsAt && { startsAt }),
 					successUrl: ctx.body.successUrl,
-					redirectMode: "always",
+					redirectMode: ctx.body.confirmed ? "if_required" : "always",
 					checkoutSessionParams: checkoutSessionParams({
-						planId: ctx.body.planId,
+						yearly: purchase.yearly,
 						organizationId: caller.organizationId,
 						userId: caller.userId,
 						cancelUrl: ctx.body.cancelUrl,
@@ -155,6 +248,77 @@ export const autumnBillingRoutes = {
 				});
 				if (!result.paymentUrl) await afterPlanChange(caller.organizationId);
 				return ctx.json(result);
+			},
+		),
+		autumnBuyGbHours: createAuthEndpoint(
+			"/autumn/buyGbHours",
+			{
+				method: "POST",
+				body: z.object({
+					...organizationBody,
+					gbHours: z
+						.number()
+						.int()
+						.min(GB_HOUR_PURCHASE.min)
+						.max(GB_HOUR_PURCHASE.max),
+				}),
+				use: [sessionMiddleware],
+			},
+			async (ctx) => {
+				const caller = await billingCaller(ctx, "buyGbHours");
+				const { planId, pack } = await currentPack(caller.organizationId);
+				const result = await autumnClient.billing.update({
+					customerId: caller.organizationId,
+					planId,
+					featureQuantities: [
+						{
+							featureId: BOX_GB_MINUTES_FEATURE_ID,
+							quantity: gbHourPurchase(pack, ctx.body.gbHours).gbMinutes,
+						},
+					],
+				});
+				await invalidateOrganizationBilling(caller.organizationId);
+				return ctx.json(result);
+			},
+		),
+		autumnSetAutoTopup: createAuthEndpoint(
+			"/autumn/setAutoTopup",
+			{
+				method: "POST",
+				body: z.object({
+					...organizationBody,
+					enabled: z.boolean(),
+					thresholdGbHours: z.number().int().min(0).max(100_000),
+					gbHours: z
+						.number()
+						.int()
+						.min(GB_HOUR_PURCHASE.min)
+						.max(GB_HOUR_PURCHASE.max),
+				}),
+				use: [sessionMiddleware],
+			},
+			async (ctx) => {
+				const caller = await billingCaller(ctx, "setAutoTopup");
+				const { pack } = await currentPack(caller.organizationId);
+				const result = await autumnClient.customers.update({
+					customerId: caller.organizationId,
+					billingControls: {
+						autoTopups: [
+							{
+								featureId: BOX_GB_MINUTES_FEATURE_ID,
+								enabled: ctx.body.enabled,
+								threshold: ctx.body.thresholdGbHours * 60,
+								quantity: gbHourPurchase(pack, ctx.body.gbHours).gbMinutes,
+								purchaseLimit: {
+									interval: "month",
+									limit: AUTO_TOPUP_MONTHLY_LIMIT,
+								},
+							},
+						],
+					},
+				});
+				await invalidateOrganizationBilling(caller.organizationId);
+				return ctx.json({ autoTopups: result.billingControls.autoTopups });
 			},
 		),
 		autumnPreviewAttach: createAuthEndpoint(
@@ -166,19 +330,28 @@ export const autumnBillingRoutes = {
 			},
 			async (ctx) => {
 				const caller = await billingCaller(ctx, "previewAttach");
-				refuseEnterprise(ctx.body.planId);
+				await refuseEnterprise(ctx.body.planId);
+				await ensureAutumnCustomer(caller.organizationId);
 				const seats = Math.max(
 					1,
 					await countBillableSeats(caller.organizationId),
 				);
+				const { quantities } = await seatPurchase(ctx.body.planId, seats);
+				const params = {
+					customerId: caller.organizationId,
+					planId: ctx.body.planId,
+					...quantities,
+				};
+				const preview = await autumnClient.billing.previewAttach(params);
+				const startsAt = await yearlyRenewalStart(
+					caller.organizationId,
+					ctx.body.planId,
+					async () => preview,
+				);
 				return ctx.json(
-					await autumnClient.billing.previewAttach({
-						customerId: caller.organizationId,
-						planId: ctx.body.planId,
-						featureQuantities: [
-							{ featureId: SEATS_FEATURE_ID, quantity: seats },
-						],
-					}),
+					startsAt
+						? await autumnClient.billing.previewAttach({ ...params, startsAt })
+						: preview,
 				);
 			},
 		),
@@ -195,7 +368,7 @@ export const autumnBillingRoutes = {
 			},
 			async (ctx) => {
 				const caller = await billingCaller(ctx, "updateSubscription");
-				refuseEnterprise(ctx.body.planId);
+				await refuseEnterprise(ctx.body.planId);
 				const result = await autumnClient.billing.update({
 					customerId: caller.organizationId,
 					planId: ctx.body.planId,
@@ -218,7 +391,7 @@ export const autumnBillingRoutes = {
 			},
 			async (ctx) => {
 				const caller = await billingCaller(ctx, "previewUpdateSubscription");
-				refuseEnterprise(ctx.body.planId);
+				await refuseEnterprise(ctx.body.planId);
 				return ctx.json(
 					await autumnClient.billing.previewUpdate({
 						customerId: caller.organizationId,
@@ -274,14 +447,8 @@ export const autumnBillingRoutes = {
 				use: [sessionMiddleware],
 			},
 			async (ctx) => {
-				const caller = await billingCaller(ctx, "listPlans");
-				const plans = await autumnClient.plans.list({
-					customerId: caller.organizationId,
-				});
-				return ctx.json({
-					...plans,
-					list: plans.list.filter((plan) => selfServePlan(plan.id)),
-				});
+				await billingCaller(ctx, "listPlans");
+				return ctx.json({ list: await catalogAutumnPlans() });
 			},
 		),
 		autumnAggregateEvents: createAuthEndpoint(

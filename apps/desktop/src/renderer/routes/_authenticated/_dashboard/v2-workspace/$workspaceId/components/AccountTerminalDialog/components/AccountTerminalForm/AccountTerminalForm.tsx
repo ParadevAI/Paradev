@@ -10,34 +10,35 @@ import {
 	SelectValue,
 } from "@superset/ui/select";
 import { Loader2 } from "lucide-react";
-import { useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 
-interface LaunchAccount {
-	selection: string | null;
-	identity: string;
-	email: string;
-	label: string;
-}
+import {
+	accountKey,
+	bestRemainingAccount,
+	type LaunchAccount,
+	type LaunchQuota,
+	launchAccountQuota,
+} from "./launchAccountQuota";
 
 interface AccountTerminalFormProps {
-	mode?: "start" | "chat";
+	mode?: "start" | "resume";
 	configs: Array<{ id: string; label: string }>;
 	configId: string;
 	onConfigChange: (id: string) => void;
 	accounts: LaunchAccount[];
+	provider?: string;
+	quotas?: readonly LaunchQuota[];
 	loading: boolean;
 	refreshing: boolean;
 	error: string | null;
 	launching: boolean;
+ submitLabel?: string;
+ launchDisabled?: boolean;
 	onRefresh: () => Promise<void>;
 	onCancel: () => void;
 	onLaunch: (
 		account: Pick<LaunchAccount, "selection" | "identity">,
 	) => Promise<void>;
-}
-
-function accountKey(account: LaunchAccount) {
-	return JSON.stringify([account.selection, account.identity]);
 }
 
 export function AccountTerminalForm({
@@ -46,10 +47,14 @@ export function AccountTerminalForm({
 	configId,
 	onConfigChange,
 	accounts,
+	provider = "",
+	quotas = [],
 	loading,
 	refreshing,
 	error,
 	launching,
+ submitLabel,
+ launchDisabled = false,
 	onRefresh,
 	onCancel,
 	onLaunch,
@@ -60,6 +65,21 @@ export function AccountTerminalForm({
 	const [selected, setSelected] = useState<string | null>(null);
 	const [launchError, setLaunchError] = useState<string | null>(null);
 	const inFlight = useRef(false);
+	const [now, setNow] = useState(Date.now);
+	useEffect(() => {
+		const timer = setInterval(() => setNow(Date.now()), 30_000);
+		return () => clearInterval(timer);
+	}, []);
+	const recommendation =
+		!error && !loading && !refreshing
+			? bestRemainingAccount(accounts, provider, quotas, now)
+			: undefined;
+	const recommendedKey = recommendation ? accountKey(recommendation) : null;
+	useEffect(() => {
+		// Choose once. Refreshes never replace a manual choice or another login.
+		if (selected === null && recommendedKey !== null)
+			setSelected(recommendedKey);
+	}, [selected, recommendedKey]);
 	const account = accounts.find((entry) => accountKey(entry) === selected);
 	const selectionChanged = selected !== null && !account;
 	const canLaunch = Boolean(
@@ -68,6 +88,7 @@ export function AccountTerminalForm({
 			!loading &&
 			!refreshing &&
 			!launching &&
+ !launchDisabled &&
 			configs.some((config) => config.id === configId),
 	);
 	const failure =
@@ -93,8 +114,8 @@ export function AccountTerminalForm({
 					setLaunchError(
 						errorMessage(
 							cause,
-							mode === "chat"
-								? t({ message: "Could not start chat" })
+							mode === "resume"
+								? t({ message: "Could not resume this conversation" })
 								: t({ message: "Could not start agent terminal" }),
 						),
 					);
@@ -110,7 +131,7 @@ export function AccountTerminalForm({
 				<Select
 					value={configId}
 					onValueChange={onConfigChange}
-					disabled={launching || configs.length === 0}
+					disabled={mode === "resume" || launching || configs.length === 0}
 				>
 					<SelectTrigger id={agentId} className="w-full">
 						<SelectValue placeholder={t({ message: "Select agent" })} />
@@ -141,13 +162,14 @@ export function AccountTerminalForm({
 						</Trans>
 					</p>
 				) : null}
-				<div className="max-h-60 space-y-1 overflow-y-auto">
+				<div className="max-h-[min(24rem,45vh)] space-y-1 overflow-y-auto overscroll-contain">
 					{accounts.map((entry) => {
 						const key = accountKey(entry);
+						const quota = launchAccountQuota(entry, provider, quotas, now);
 						return (
 							<label
 								key={key}
-								className="flex cursor-pointer items-center gap-3 rounded-md border border-border px-3 py-2.5 has-[:checked]:border-ring has-[:checked]:bg-muted/50"
+								className="flex cursor-pointer items-start gap-3 rounded-md border border-border px-3 py-2.5 has-[:checked]:border-ring has-[:checked]:bg-muted/50"
 							>
 								<input
 									type="radio"
@@ -158,17 +180,46 @@ export function AccountTerminalForm({
 										setSelected(key);
 										setLaunchError(null);
 									}}
-									className="size-4 shrink-0 accent-foreground"
+									className="mt-0.5 size-4 shrink-0 accent-foreground"
 								/>
-								<span className="min-w-0">
-									<span className="block truncate text-sm">{entry.email}</span>
-									<span className="block truncate text-xs text-muted-foreground">
+								<span className="min-w-0 flex-1 space-y-1">
+									<span className="block text-sm font-medium [overflow-wrap:anywhere]">
+										{entry.email}
+									</span>
+									<span className="block text-xs text-muted-foreground [overflow-wrap:anywhere]">
 										{entry.selection === null ? (
 											<Trans>System</Trans>
 										) : (
 											entry.label
 										)}
 									</span>
+									{quota ? (
+										<span className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+											{quota.windows.map((window) => {
+												const remaining =
+													Math.round((100 - window.usedPercent) * 10) / 10;
+												return (
+													<span
+														key={window.id}
+														className="inline-flex flex-wrap gap-x-1 tabular-nums"
+													>
+														<span>{window.label}</span>
+														<span
+															className={
+																remaining <= 10 ? "text-destructive" : undefined
+															}
+														>
+															<Trans>{remaining}% remaining</Trans>
+														</span>
+													</span>
+												);
+											})}
+										</span>
+									) : provider ? (
+										<span className="block text-xs text-muted-foreground">
+											<Trans>Usage unavailable</Trans>
+										</span>
+									) : null}
 								</span>
 							</label>
 						);
@@ -186,7 +237,6 @@ export function AccountTerminalForm({
 					variant="ghost"
 					disabled={launching || refreshing || !configId}
 					onClick={() => {
-						setSelected(null);
 						setLaunchError(null);
 						void onRefresh();
 					}}
@@ -204,10 +254,10 @@ export function AccountTerminalForm({
 					</Button>
 					<Button type="submit" disabled={!canLaunch}>
 						{launching && <Loader2 className="size-4 animate-spin" />}
-						{mode === "chat" ? (
-							<Trans>Start chat</Trans>
+						{mode === "resume" ? (
+							<Trans>Resume conversation</Trans>
 						) : (
-							<Trans>Start terminal</Trans>
+							{submitLabel ?? <Trans>Start terminal</Trans>}
 						)}
 					</Button>
 				</div>
