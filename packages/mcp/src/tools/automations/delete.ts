@@ -8,7 +8,7 @@ export function register(server: McpServer): void {
 		name: "automations_delete",
 		annotations: { destructiveHint: true },
 		description:
-			"Delete an automation. The recurring schedule stops immediately; past runs remain. Caller must be the owner.",
+			"Delete an automation. Its schedules and event triggers stop immediately; past runs remain. Caller must be the owner.",
 		inputSchema: {
 			id: z.string().uuid().describe("Automation UUID."),
 		},

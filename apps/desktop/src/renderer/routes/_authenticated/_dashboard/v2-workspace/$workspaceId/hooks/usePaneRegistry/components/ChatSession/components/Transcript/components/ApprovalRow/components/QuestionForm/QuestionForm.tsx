@@ -20,14 +20,14 @@ import {
 	useRef,
 	useState,
 } from "react";
-import { QuestionPage } from "./components/QuestionPage";
 import {
 	answerText,
 	type FormValues,
 	isInvalidNumber,
 	isPageAnswered,
 	questionPages,
-} from "./utils/questionPages";
+} from "../../../../../../utils/questionPages";
+import { QuestionPage } from "./components/QuestionPage";
 
 function focusIfLost(element: HTMLElement | null) {
 	const focused = document.activeElement;
@@ -68,11 +68,13 @@ export function QuestionForm({
 				]
 			: (field.options ?? []);
 
-	const display = (field: FormField, value: string | string[] | undefined) =>
-		field.input === "boolean"
-			? (choicesFor(field).find((choice) => choice.value === value)?.label ??
-				"")
-			: answerText(value);
+	const display = (field: FormField, value: string | string[] | undefined) => {
+		const label = (answer: string) =>
+			choicesFor(field).find((choice) => choice.value === answer)?.label ??
+			answer;
+		if (value === undefined) return "";
+		return answerText(Array.isArray(value) ? value.map(label) : label(value));
+	};
 
 	if (!pending) {
 		const answers =

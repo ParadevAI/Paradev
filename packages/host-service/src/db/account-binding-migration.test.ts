@@ -23,7 +23,7 @@ test("account migration preserves existing bindings and survives database reopen
 		entries: { tag: string }[];
 	};
 	const index = journal.entries.findIndex(
-		(entry) => entry.tag === "0038_brown_owl",
+		(entry) => entry.tag === "0039_terminal_account_provenance",
 	);
 	expect(index).toBeGreaterThan(0);
 	mkdirSync(join(folder, "meta"), { recursive: true });

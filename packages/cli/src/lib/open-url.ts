@@ -14,8 +14,14 @@ export function canReachDesktop(): boolean {
 	);
 }
 
-export function desktopWorkspaceLink(workspaceId: string): string {
-	return `superset://v2-workspace/${workspaceId}`;
+export function desktopWorkspaceLink(
+	workspaceId: string,
+	options?: { sessionId?: string },
+): string {
+	const base = `superset://v2-workspace/${workspaceId}`;
+	if (!options?.sessionId) return base;
+	const params = new URLSearchParams({ sessionId: options.sessionId });
+	return `${base}?${params.toString()}`;
 }
 
 export function openUrl(url: string): Promise<void> {

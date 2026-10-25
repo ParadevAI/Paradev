@@ -1,12 +1,16 @@
 import { msg } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { getI18nInstance } from "@superset/i18n/server";
+import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import type { Metadata } from "next";
 import { GridCross } from "@/app/[lang]/blog/components/GridCross";
 import { localizedAlternates } from "@/app/[lang]/metadata";
 import { initServerI18n } from "@/app/i18n-server";
 import { ContactForm } from "../components/ContactForm";
+
+const statusHost = new URL(COMPANY.STATUS_URL).host;
+const trustHost = new URL(COMPANY.TRUST_URL).host;
 
 export async function generateMetadata(): Promise<Metadata> {
 	const lang = await initServerI18n();
@@ -21,7 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
 			...msg({
 				message: "Get in touch with the {companyName} team.",
 			}),
-			values: { companyName: COMPANY.NAME },
+			values: { companyName: BRAND.NAME },
 		}),
 		alternates: localizedAlternates(lang, "/contact"),
 	};
@@ -132,11 +136,11 @@ export default async function ContactPage() {
 								className="text-foreground underline"
 								href={COMPANY.STATUS_URL}
 							>
-								status.superset.sh
+								{statusHost}
 							</a>
 							, and security and compliance documentation at{" "}
 							<a className="text-foreground underline" href={COMPANY.TRUST_URL}>
-								trust.superset.sh
+								{trustHost}
 							</a>
 							.
 						</Trans>

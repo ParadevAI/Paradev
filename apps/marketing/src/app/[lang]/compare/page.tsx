@@ -7,7 +7,8 @@ import type { ReactNode } from "react";
 import { GridCross } from "@/app/[lang]/blog/components/GridCross";
 import { localeUrl, localizedAlternates } from "@/app/[lang]/metadata";
 import { initServerI18n } from "@/app/i18n-server";
-import { getComparisonPages } from "@/lib/compare";
+import type { getComparisonPages } from "@/lib/compare";
+import { getPricedComparisonPages } from "@/lib/compare-prices";
 import { formatCompareDate } from "@/lib/compare-utils";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -49,7 +50,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function ComparePage() {
 	await initServerI18n();
 
-	const pages = getComparisonPages();
+	const pages = await getPricedComparisonPages();
 
 	const oneVsOne = pages.filter((p) => p.type === "1v1");
 	const roundups = pages.filter((p) => p.type === "roundup");

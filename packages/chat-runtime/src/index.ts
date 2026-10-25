@@ -8,7 +8,7 @@ import { ChatSessionStore } from "./projection";
 import type { HarnessRegistry, LiveSessionObserver } from "./sessions";
 import { LiveSessionRegistry } from "./sessions";
 import type { Schedule, Sink, SubscribeOptions, Subscription } from "./stream";
-import { SubscriptionHub } from "./stream";
+import { SubagentItems, SubscriptionHub } from "./stream";
 
 export * from "./commands";
 export * from "./db";
@@ -56,9 +56,11 @@ export function createChatRuntime(options: ChatRuntimeOptions): ChatRuntime {
 		onSessionChanged: options.onSessionChanged,
 	});
 	const sessions = new ChatSessionStore(db);
+	const subagentItems = new SubagentItems(db);
 	const subscriptions = new SubscriptionHub(db, {
 		schedule: options.schedule,
 		bootstrapLimit: options.bootstrapLimit,
+		subagentItems,
 	});
 	const live = new LiveSessionRegistry({
 		journal,
@@ -72,6 +74,7 @@ export function createChatRuntime(options: ChatRuntimeOptions): ChatRuntime {
 		sessions,
 		live,
 		dedupe: new CommandDedupe(options.dedupeCapacity),
+		subagentItems,
 	});
 
 	return {

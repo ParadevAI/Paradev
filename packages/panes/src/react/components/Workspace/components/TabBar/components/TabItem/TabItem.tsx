@@ -7,6 +7,7 @@ import {
 	ContextMenuSeparator,
 	ContextMenuTrigger,
 } from "@superset/ui/context-menu";
+import { useRunAfterMenuClose } from "@superset/ui/hooks/use-run-after-menu-close";
 import { OverflowFadeText } from "@superset/ui/overflow-fade-text";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
@@ -56,6 +57,7 @@ export function TabItem<TData>({
 	const [isEditing, setIsEditing] = useState(false);
 	const [editValue, setEditValue] = useState("");
 	const title = useTabTitle(tab, tabs, registry);
+	const { runAfterClose, onCloseAutoFocus } = useRunAfterMenuClose();
 
 	const startEditing = () => {
 		setEditValue(title);
@@ -200,8 +202,8 @@ export function TabItem<TData>({
 					)}
 				</div>
 			</ContextMenuTrigger>
-			<ContextMenuContent>
-				<ContextMenuItem onSelect={startEditing}>
+			<ContextMenuContent onCloseAutoFocus={onCloseAutoFocus}>
+				<ContextMenuItem onSelect={() => runAfterClose(startEditing)}>
 					<PencilIcon className="mr-2 size-4" />
 					<Trans>Rename</Trans>
 				</ContextMenuItem>

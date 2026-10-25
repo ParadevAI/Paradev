@@ -3,8 +3,10 @@ import { isKnownItem } from "@superset/chat/protocol";
 import { memo } from "react";
 import type { ChatForkTarget } from "../../../../../../types";
 import { rowKindForItem } from "../../../../utils/rowKind";
+import { isNestedTool, subagentLines } from "../../../../utils/subagentLines";
 import { AgentMessageRow } from "../../../AgentMessageRow";
 import { ApprovalRow } from "../../../ApprovalRow";
+import { NestedToolCallRow } from "../../../NestedToolCallRow";
 import { NoticeRow } from "../../../NoticeRow";
 import { PlanRow } from "../../../PlanRow";
 import { ReasoningRow } from "../../../ReasoningRow";
@@ -15,7 +17,9 @@ import { RailStep } from "../RailStep";
 
 export type ItemRowProps = {
 	item: Item;
+	childItems?: readonly Item[] | undefined;
 	approvalTarget?: Item | undefined;
+	asker?: string | undefined;
 	afterTarget?: boolean;
 	text: string;
 	harness: string | undefined;
@@ -31,7 +35,9 @@ export type ItemRowProps = {
 export const ItemRow = memo(function ItemRow({
 	afterTarget = false,
 	approvalTarget,
+	asker,
 	canForkToWorktree,
+	childItems,
 	commands,
 	lastReply = false,
 	harness,
@@ -69,9 +75,16 @@ export const ItemRow = memo(function ItemRow({
 		case "reasoning":
 			return <ReasoningRow item={item} text={text} />;
 		case "tool_call":
+			if (subagentLines(item, childItems)) {
+				return <NestedToolCallRow item={item} />;
+			}
 			return (
 				<RailStep>
-					<ToolCallRow item={item} />
+					{isNestedTool(item, childItems) ? (
+						<NestedToolCallRow item={item} />
+					) : (
+						<ToolCallRow item={item} />
+					)}
 				</RailStep>
 			);
 		case "plan":
@@ -80,6 +93,7 @@ export const ItemRow = memo(function ItemRow({
 			return (
 				<ApprovalRow
 					afterTarget={afterTarget}
+					asker={asker}
 					item={item}
 					onRespond={onRespond}
 					target={approvalTarget}

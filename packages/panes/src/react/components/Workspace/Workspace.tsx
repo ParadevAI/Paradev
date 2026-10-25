@@ -1,15 +1,19 @@
 import { cn } from "@superset/ui/utils";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useDragLayer } from "react-dnd";
 import { useStore } from "zustand";
 import { isPaneInLinkedStore } from "../../../core/transfer";
-import type { Pane } from "../../../types";
+import type { Pane, Tab as TabType } from "../../../types";
 import type { WorkspaceProps } from "../../types";
+import { KeptTab } from "./components/KeptTab";
 import { Tab } from "./components/Tab";
 import { TabBar } from "./components/TabBar";
 import { TAB_DRAG_TYPE } from "./components/TabBar/components/TabItem";
 import { useWorkspaceInteractionState } from "./hooks/useWorkspaceInteractionState";
+import { type KeptTabEntry, nextKeptTabs } from "./utils/nextKeptTabs";
 import { notifyClosedPanes } from "./utils/notifyClosedPanes";
+
+const NO_KEPT_TABS: readonly KeptTabEntry[] = [];
 
 export function Workspace<TData>({
 	store,
@@ -28,6 +32,7 @@ export function Workspace<TData>({
 	paneActions,
 	contextMenuActions,
 	onPaneError,
+	keepAliveTabs = 0,
 }: WorkspaceProps<TData>) {
 	const tabs = useStore(store, (s) => s.tabs);
 	const activeTabId = useStore(store, (s) => s.activeTabId);
@@ -57,6 +62,42 @@ export function Workspace<TData>({
 		}
 		return activeTab;
 	}, [draggedTabId, activeTabId, tabs, activeTab]);
+
+	const keepableTabIds = useMemo(() => {
+		if (keepAliveTabs <= 0) return null;
+		return new Set(
+			tabs
+				.filter((tab) =>
+					Object.values(tab.panes).every(
+						(pane) => registry[pane.kind]?.keepAlive === true,
+					),
+				)
+				.map((tab) => tab.id),
+		);
+	}, [keepAliveTabs, tabs, registry]);
+	const [keptTabs, setKeptTabs] = useState(NO_KEPT_TABS);
+	const nextKept = keepableTabIds
+		? nextKeptTabs({
+				previous: keptTabs,
+				activeTabId,
+				isKeepable: (tabId) => keepableTabIds.has(tabId),
+				maxHidden: keepAliveTabs,
+			})
+		: NO_KEPT_TABS;
+	if (nextKept !== keptTabs) setKeptTabs(nextKept);
+
+	const mountedTabs = useMemo(() => {
+		const byId = new Map(tabs.map((tab) => [tab.id, tab]));
+		const mounted: TabType<TData>[] = [];
+		for (const kept of nextKept) {
+			const tab = byId.get(kept.tabId);
+			if (tab) mounted.push(tab);
+		}
+		if (displayedTab && !mounted.includes(displayedTab)) {
+			mounted.push(displayedTab);
+		}
+		return mounted;
+	}, [tabs, nextKept, displayedTab]);
 
 	useEffect(
 		() =>
@@ -139,7 +180,28 @@ export function Workspace<TData>({
 				renderTabAccessory={renderTabAccessory}
 			/>
 			{renderBelowTabBar?.()}
-			{displayedTab ? (
+			{keepAliveTabs > 0 ? (
+				<div className="relative min-h-0 min-w-0 flex-1">
+					{mountedTabs.map((tab) => (
+						<KeptTab
+							key={tab.id}
+							isVisible={tab.id === displayedTab?.id}
+							store={store}
+							tab={tab}
+							registry={registry}
+							paneActions={paneActions}
+							contextMenuActions={contextMenuActions}
+							onPaneError={onPaneError}
+							onSplitResizeDragging={onSplitResizeDragging}
+						/>
+					))}
+					{!displayedTab && (
+						<div className="absolute inset-0 flex items-center justify-center text-sm text-muted-foreground">
+							{renderEmptyState?.() ?? "No tabs open"}
+						</div>
+					)}
+				</div>
+			) : displayedTab ? (
 				<Tab
 					store={store}
 					tab={displayedTab}

@@ -11,6 +11,7 @@ import log from "electron-log/main";
 import { createWindow } from "lib/electron-app/factories/windows/create";
 import { createTrpcContext } from "lib/trpc/context";
 import { createAppRouter } from "lib/trpc/routers";
+import { getProductDisplayName } from "main/lib/app-display-name";
 import { resolveDevWorkspaceName } from "main/lib/dev-workspace-name";
 import { getIconPath } from "main/lib/dock-icon";
 import { localDb } from "main/lib/local-db";
@@ -19,7 +20,6 @@ import { NOTIFICATION_EVENTS, PLATFORM } from "shared/constants";
 import { env } from "shared/env.shared";
 import type { AgentLifecycleEvent } from "shared/notification-types";
 import { createIPCHandler } from "trpc-electron/main";
-import { productName } from "~/package.json";
 import {
 	appState,
 	isAppStateInitialized,
@@ -392,9 +392,10 @@ export async function createPlatformWindow({
 
 	const isDev = env.NODE_ENV === "development";
 	const workspaceName = isDev ? resolveDevWorkspaceName() : undefined;
+	const displayName = getProductDisplayName();
 	const windowTitle = workspaceName
-		? `${productName} — ${workspaceName}`
-		: productName;
+		? `${displayName} — ${workspaceName}`
+		: displayName;
 
 	const window = createWindow({
 		id: "main",
@@ -403,7 +404,9 @@ export async function createPlatformWindow({
 		height: initialBounds.height,
 		x: initialBounds.x,
 		y: initialBounds.y,
-		minWidth: 400,
+		// At least the open workspace sidebar's minimum (225) plus the right
+		// pane's (262), and under half of a 1280px display for split screen.
+		minWidth: 540,
 		minHeight: 400,
 		show: false,
 		backgroundColor: nativeTheme.shouldUseDarkColors ? "#252525" : "#ffffff",
@@ -452,18 +455,19 @@ export async function createPlatformWindow({
 	if (isDev) {
 		window.webContents.on(
 			"console-message",
-			(_event, level, message, line, sourceId) => {
+			({ level, message, lineNumber, sourceId }) => {
+				const isProblem = level === "warning" || level === "error";
 				const shouldForward =
-					level >= 2 ||
+					isProblem ||
 					message.includes("[stress]") ||
 					message.includes("[main]");
 				if (!shouldForward) return;
 
-				const details = sourceId ? ` (${sourceId}:${line})` : "";
+				const details = sourceId ? ` (${sourceId}:${lineNumber})` : "";
 				const formatted = `[renderer-console] ${message}${details}`;
-				if (level >= 3) {
+				if (level === "error") {
 					log.error(formatted);
-				} else if (level >= 2) {
+				} else if (level === "warning") {
 					log.warn(formatted);
 				} else {
 					log.info(formatted);

@@ -3,6 +3,7 @@ import { errorMessage } from "@superset/i18n/errors";
 import { Button } from "@superset/ui/button";
 import { Skeleton } from "@superset/ui/skeleton";
 import { toast } from "@superset/ui/sonner";
+import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import {
 	HiOutlineArchiveBox,
@@ -58,9 +59,17 @@ export function EnvironmentsSettings({
 		{ enabled: Boolean(organizationId) },
 	);
 
+	const { data: usage } = cloudTrpc.billing.environmentUsage.useQuery();
+	const atLimit = usage?.limit != null && usage.used >= usage.limit;
+	const used = usage?.used ?? 0;
+	const limit = usage?.limit ?? 0;
+
 	const archive = cloudTrpc.environment.archive.useMutation({
 		onSuccess: async () => {
-			await utils.environment.list.invalidate();
+			await Promise.all([
+				utils.environment.list.invalidate(),
+				utils.billing.environmentUsage.invalidate(),
+			]);
 			setSelectedId(null);
 		},
 		onError: (error) => toast.error(errorMessage(error)),
@@ -91,10 +100,35 @@ export function EnvironmentsSettings({
 						</Trans>
 					</p>
 				</div>
-				<Button onClick={() => setEditor({ mode: "create" })} size="sm">
-					<HiOutlinePlus className="h-4 w-4" />
-					<Trans>New environment</Trans>
-				</Button>
+				<div className="flex shrink-0 items-center gap-3">
+					{usage?.limit === 0 ? (
+						<span className="text-xs text-muted-foreground">
+							<Trans>Your plan does not include cloud environments.</Trans>{" "}
+							<Link
+								to="/settings/billing/plans"
+								className="font-medium text-foreground underline underline-offset-4"
+							>
+								<Trans>Upgrade</Trans>
+							</Link>
+						</span>
+					) : (
+						usage?.limit != null && (
+							<span className="text-xs text-muted-foreground">
+								<Trans>
+									{used} of {limit} environments
+								</Trans>
+							</span>
+						)
+					)}
+					<Button
+						onClick={() => setEditor({ mode: "create" })}
+						size="sm"
+						disabled={atLimit}
+					>
+						<HiOutlinePlus className="h-4 w-4" />
+						<Trans>New environment</Trans>
+					</Button>
+				</div>
 			</div>
 
 			{isError ? (
@@ -158,7 +192,7 @@ export function EnvironmentsSettings({
 												repositoryIds: (environment.repositories ?? []).map(
 													(repo) => repo.id,
 												),
-												hooksRepositoryId: environment.hooksRepositoryId,
+												primaryRepositoryId: environment.primaryRepositoryId,
 												repositoriesFrozen: environment.sourceKind !== "image",
 												region: environment.region,
 											},

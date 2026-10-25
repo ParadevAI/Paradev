@@ -14,14 +14,18 @@ import {
 	useRef,
 } from "react";
 import { HiCheck, HiMiniXMark } from "react-icons/hi2";
+import { LuArchive } from "react-icons/lu";
 import { WorkspaceNameMarquee } from "renderer/components/WorkspaceNameMarquee";
-import type { DiffStats } from "renderer/hooks/host-service/useDiffStats";
 import { useFocusVisible } from "renderer/hooks/useFocusVisible";
 import { HotkeyLabel } from "renderer/hotkeys";
-import { pullRequestRefFromUrl } from "renderer/lib/github/pullRequestRef";
+import { usePullRequestLinkPolicy } from "renderer/lib/clickPolicy";
+import { openPullRequestLink } from "renderer/lib/github/openPullRequestLink";
+import { useDashboardSidebarWorkspacePorts } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/providers/DashboardSidebarPortsProvider";
 import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { ProjectThumbnail } from "renderer/routes/_authenticated/components/ProjectThumbnail";
+import { getStatusTooltip } from "renderer/screens/main/components/StatusIndicator";
 import { RenameInput } from "renderer/screens/main/components/WorkspaceSidebar/RenameInput";
+import { useInlineWorkspacePortsEnabled } from "renderer/stores/inline-workspace-ports";
 import { usePullRequestPaneIntent } from "renderer/stores/pull-request-pane-intent";
 import type { ActivePaneStatus } from "shared/tabs-types";
 import type {
@@ -29,10 +33,12 @@ import type {
 	DashboardSidebarWorkspaceIndentation,
 	DashboardSidebarWorkspacePullRequest,
 } from "../../../../types";
-import { DashboardSidebarWorkspaceDiffStats } from "../DashboardSidebarWorkspaceDiffStats";
-import { DashboardSidebarWorkspaceIcon } from "../DashboardSidebarWorkspaceIcon";
 import { DashboardSidebarWorkspaceQueuedBadge } from "../DashboardSidebarWorkspaceQueuedBadge";
+import { DashboardSidebarPortsChip } from "./components/DashboardSidebarPortsChip";
+import { DashboardSidebarRowEventBoundary } from "./components/DashboardSidebarRowEventBoundary";
 import { DashboardSidebarWorkspaceChips } from "./components/DashboardSidebarWorkspaceChips";
+import { DashboardSidebarWorkspaceHostGlyph } from "./components/DashboardSidebarWorkspaceHostGlyph";
+import { DashboardSidebarWorkspaceLeadIndicator } from "./components/DashboardSidebarWorkspaceLeadIndicator";
 
 const PR_STATE_LABEL: Record<
 	DashboardSidebarWorkspacePullRequest["state"],
@@ -63,7 +69,6 @@ interface DashboardSidebarExpandedWorkspaceRowProps
 	isRenaming: boolean;
 	renameValue: string;
 	shortcutLabel?: string;
-	diffStats: DiffStats | null;
 	workspaceStatus?: ActivePaneStatus | null;
 	isInSection?: boolean;
 	indentation?: DashboardSidebarWorkspaceIndentation;
@@ -94,7 +99,6 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 			isRenaming,
 			renameValue,
 			shortcutLabel,
-			diffStats,
 			workspaceStatus = null,
 			isInSection = false,
 			indentation,
@@ -129,6 +133,7 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 		const isPending = pendingTransaction?.type === "insert";
 		const localRef = useRef<HTMLDivElement>(null);
 		const navigate = useNavigate();
+		const linkPolicy = usePullRequestLinkPolicy();
 		// Drives the name's hover-reveal for keyboard users: the row, not the
 		// name span, is what's actually tabbable.
 		const {
@@ -146,8 +151,33 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 			}
 		}, [isActive]);
 
-		const creationStatusText = isPending ? "Creating…" : null;
-		const isLocalWorkspace = workspace.type === "local";
+		const creationStatusText = isPending ? t({ message: "Creating…" }) : null;
+		const isCloudWorkspace = hostType === "cloud";
+		const closeLabel = isCloudWorkspace
+			? t({ message: "Archive workspace" })
+			: t({ message: "Delete workspace" });
+		// The slot stays the PR's button whatever glyph precedence puts in it,
+		// so a working row's PR is one click away, as before.
+		const showsPullRequest = !isPending && pullRequest !== null;
+		const inlinePortsEnabled = useInlineWorkspacePortsEnabled();
+		const portGroup = useDashboardSidebarWorkspacePorts(workspace.id);
+		const ports =
+			inlinePortsEnabled && !isPending ? (portGroup?.ports ?? []) : [];
+		const sandboxStatus = workspace.sandboxStatus;
+		const sandboxLabel =
+			sandboxStatus === "failed"
+				? t({ message: "Sandbox stopped responding" })
+				: sandboxStatus === "provisioning"
+					? t({ message: "Creating the sandbox" })
+					: null;
+		const leadIndicator = (
+			<DashboardSidebarWorkspaceLeadIndicator
+				workspaceStatus={workspaceStatus}
+				isCreatePending={isPending}
+				sandboxStatus={sandboxStatus}
+				pullRequestState={pullRequest?.state ?? null}
+			/>
+		);
 
 		return (
 			<div
@@ -202,117 +232,85 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 						<span className="mr-2 flex size-4 shrink-0 items-center justify-center text-foreground">
 							<HiCheck className="size-3.5" />
 						</span>
-					) : (
+					) : showsPullRequest && pullRequest ? (
 						<Tooltip delayDuration={500}>
 							<TooltipTrigger asChild>
-								{pullRequest ? (
-									<button
-										type="button"
-										onClick={(event) => {
+								<button
+									type="button"
+									onClick={(event) => {
+										event.stopPropagation();
+										// Lands in the workspace with its PR pane open, rather
+										// than on GitHub; the pane keeps the GitHub link.
+										openPullRequestLink(
+											pullRequest.url,
+											linkPolicy.getAction(event),
+											(ref, placement) => {
+												usePullRequestPaneIntent.getState().request({
+													workspaceId: workspace.id,
+													...ref,
+													placement,
+												});
+												void navigateToV2Workspace(workspace.id, navigate);
+											},
+										);
+									}}
+									onKeyDown={(event) => {
+										if (event.key === "Enter" || event.key === " ") {
 											event.stopPropagation();
-											// Lands in the workspace with its PR pane open, rather
-											// than on GitHub; the pane keeps the GitHub link.
-											const ref = pullRequestRefFromUrl(pullRequest.url);
-											if (!ref) {
-												window.open(pullRequest.url, "_blank");
-												return;
-											}
-											usePullRequestPaneIntent.getState().request({
-												workspaceId: workspace.id,
-												...ref,
-											});
-											void navigateToV2Workspace(workspace.id, navigate);
-										}}
-										onKeyDown={(event) => {
-											if (event.key === "Enter" || event.key === " ") {
-												event.stopPropagation();
-											}
-										}}
-										aria-label={t({
-											message: `Open pull request #${pullRequest.number}`,
-										})}
-										className="relative mr-2 flex size-4 shrink-0 cursor-pointer items-center justify-center rounded hover:bg-foreground/10"
-									>
-										<DashboardSidebarWorkspaceIcon
-											hostType={hostType}
-											workspaceType={workspace.type}
-											hostIsOnline={hostIsOnline}
-											isActive={isActive}
-											variant="expanded"
-											workspaceStatus={workspaceStatus}
-											isCreatePending={isPending}
-											pullRequestState={pullRequest.state}
-										/>
-									</button>
-								) : (
-									<div className="relative mr-2 flex size-4 shrink-0 items-center justify-center">
-										<DashboardSidebarWorkspaceIcon
-											hostType={hostType}
-											workspaceType={workspace.type}
-											hostIsOnline={hostIsOnline}
-											isActive={isActive}
-											variant="expanded"
-											workspaceStatus={workspaceStatus}
-											isCreatePending={isPending}
-											pullRequestState={null}
-										/>
-									</div>
-								)}
+										}
+									}}
+									aria-label={t({
+										message: `Open pull request #${pullRequest.number}`,
+									})}
+									className="mr-2 flex size-4 shrink-0 cursor-pointer items-center justify-center rounded hover:bg-foreground/10"
+								>
+									{leadIndicator}
+								</button>
 							</TooltipTrigger>
 							<TooltipContent side="right" sideOffset={8}>
-								{pullRequest ? (
-									<>
-										<p className="text-xs font-medium">
-											<Trans>
-												PR #{pullRequest.number} —{" "}
-												{i18n._(PR_STATE_LABEL[pullRequest.state])}
-											</Trans>
-										</p>
-										<p className="text-xs text-muted-foreground">
-											<Trans>Click to open on GitHub</Trans>
-										</p>
-									</>
-								) : (
-									<>
-										<p className="text-xs font-medium">
-											{isLocalWorkspace ? (
-												<Trans>Local workspace</Trans>
-											) : hostType === "local-device" ? (
-												<Trans>Worktree on this device</Trans>
-											) : hostType === "remote-device" ? (
-												hostIsOnline === false ? (
-													<Trans>Remote workspace — device offline</Trans>
-												) : (
-													<Trans>Remote workspace</Trans>
-												)
-											) : (
-												<Trans>Cloud workspace</Trans>
-											)}
-										</p>
-										<p className="text-xs text-muted-foreground">
-											{isLocalWorkspace ? (
-												<Trans>
-													Shares the project's checkout — files, git index and
-													branch — with its other local workspaces
-												</Trans>
-											) : hostType === "local-device" ? (
-												<Trans>Running on this device</Trans>
-											) : hostType === "remote-device" ? (
-												hostIsOnline === false ? (
-													<Trans>
-														The associated device isn't reachable right now
-													</Trans>
-												) : (
-													<Trans>Running on a paired device</Trans>
-												)
-											) : (
-												<Trans>Hosted in the cloud</Trans>
-											)}
-										</p>
-									</>
+								<p className="text-xs font-medium">
+									<Trans>
+										PR #{pullRequest.number} —{" "}
+										{i18n._(PR_STATE_LABEL[pullRequest.state])}
+									</Trans>
+								</p>
+								{(sandboxLabel ??
+									(workspaceStatus && getStatusTooltip(workspaceStatus))) && (
+									<p className="text-xs text-muted-foreground">
+										{sandboxLabel ??
+											(workspaceStatus
+												? getStatusTooltip(workspaceStatus)
+												: null)}
+									</p>
 								)}
+								<p className="text-xs text-muted-foreground">
+									<Trans>Click to open the pull request</Trans>
+								</p>
+								<p className="text-xs text-muted-foreground">
+									{linkPolicy.hint}
+								</p>
 							</TooltipContent>
 						</Tooltip>
+					) : sandboxLabel || (workspaceStatus && !isPending) ? (
+						<Tooltip delayDuration={500}>
+							<TooltipTrigger asChild>
+								<span className="mr-2 flex size-4 shrink-0 items-center justify-center">
+									{leadIndicator}
+								</span>
+							</TooltipTrigger>
+							<TooltipContent side="right" sideOffset={8}>
+								<p className="text-xs font-medium">
+									{sandboxLabel ??
+										(workspaceStatus
+											? getStatusTooltip(workspaceStatus)
+											: null)}
+								</p>
+							</TooltipContent>
+						</Tooltip>
+					) : (
+						<span className="mr-2 flex size-4 shrink-0 items-center justify-center">
+							{leadIndicator}
+						</span>
 					)}
 
 					{pinnedContext && (
@@ -379,35 +377,37 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 							</>
 						)}
 
-						<div className="col-start-2 row-start-1 grid h-5 shrink-0 items-center justify-items-end [&>*]:col-start-1 [&>*]:row-start-1">
+						<div className="col-start-2 row-start-1 flex h-5 shrink-0 items-center gap-2">
 							{creationStatusText ? (
 								<span className="text-[11px] text-muted-foreground">
 									{creationStatusText}
 								</span>
 							) : (
-								<div className="flex items-center gap-1.5">
-									<DashboardSidebarWorkspaceQueuedBadge
-										workspaceId={workspace.id}
-									/>
-									{isActive &&
-										diffStats &&
-										(diffStats.additions > 0 || diffStats.deletions > 0) && (
-											<DashboardSidebarWorkspaceDiffStats
-												additions={diffStats.additions}
-												deletions={diffStats.deletions}
-												isActive={isActive}
-											/>
-										)}
-								</div>
+								<DashboardSidebarWorkspaceQueuedBadge
+									workspaceId={workspace.id}
+								/>
 							)}
-							{!isPending && !isSelected && (
-								<div className="hidden items-center justify-end gap-1.5 group-hover:flex group-focus-within:flex">
-									{shortcutLabel && (
-										<span className="shrink-0 font-mono text-[10px] tabular-nums text-muted-foreground">
-											{shortcutLabel}
-										</span>
+							<div className="grid items-center justify-items-end [&>*]:col-start-1 [&>*]:row-start-1">
+								<span
+									className={cn(
+										"flex",
+										!isPending &&
+											!isSelected &&
+											"group-hover:invisible group-focus-within:invisible",
 									)}
-									{
+								>
+									<DashboardSidebarWorkspaceHostGlyph
+										hostType={hostType}
+										hostIsOnline={hostIsOnline}
+									/>
+								</span>
+								{!isPending && !isSelected && (
+									<div className="hidden items-center justify-end gap-1.5 group-hover:flex group-focus-within:flex">
+										{shortcutLabel && (
+											<span className="shrink-0 font-mono text-[10px] tabular-nums text-muted-foreground">
+												{shortcutLabel}
+											</span>
+										)}
 										<Tooltip delayDuration={300}>
 											<TooltipTrigger asChild>
 												<button
@@ -425,25 +425,30 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 															event.stopPropagation();
 														}
 													}}
-													className="flex items-center justify-center text-muted-foreground hover:text-foreground"
-													aria-label={t({
-														message: "Delete workspace",
-													})}
+													className="flex size-5 items-center justify-center rounded text-muted-foreground hover:bg-foreground/10 hover:text-foreground"
+													aria-label={closeLabel}
 												>
-													<HiMiniXMark className="size-3.5" />
+													{isCloudWorkspace ? (
+														<LuArchive className="size-3.5" />
+													) : (
+														<HiMiniXMark className="size-3.5" />
+													)}
 												</button>
 											</TooltipTrigger>
 											<TooltipContent side="top">
 												<HotkeyLabel
-													label={t({
-														message: "Delete workspace",
-													})}
+													label={closeLabel}
 													id={isActive ? "CLOSE_WORKSPACE" : undefined}
 												/>
 											</TooltipContent>
 										</Tooltip>
-									}
-								</div>
+									</div>
+								)}
+							</div>
+							{ports.length > 0 && (
+								<DashboardSidebarRowEventBoundary>
+									<DashboardSidebarPortsChip ports={ports} />
+								</DashboardSidebarRowEventBoundary>
 							)}
 						</div>
 					</div>

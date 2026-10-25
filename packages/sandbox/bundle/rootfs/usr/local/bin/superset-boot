@@ -40,7 +40,11 @@ set +a
 [ -n "${HOST_SERVICE_SECRET:-}" ] || refuse "HOST_SERVICE_SECRET missing from the boot env"
 
 # A wake that races a wake, or a re-delivered provision, must not stack a
-# second host-service on a live one.
+# second host-service on a live one, nor on one still being booted: the pid
+# file below is written only after the passes. The lock is held until it is.
+# A reexec inherits fd 9 with the lock still on it.
+[ -e "/proc/$$/fd/9" ] || exec 9> /run/superset-boot.lock
+flock -n -E 75 9 || { [ $? -eq 75 ] && exit 0; refuse "cannot take the boot lock"; }
 if [ -f "${SUPERSET_RUN_DIR}/host-service.pid" ] && kill -0 "$(cat "${SUPERSET_RUN_DIR}/host-service.pid")" 2>/dev/null; then
 	exit 0
 fi
@@ -53,10 +57,11 @@ rm -rf "$SUPERSET_RUN_DIR"
 install -d -m 0755 -o "$SUPERSET_USER" -g "$SUPERSET_USER" "$SUPERSET_RUN_DIR"
 stamp "run.cleared"
 
-# --- the bundle the environment pins; unpinned keeps what the image baked
+# --- the bundle the environment pins. A box with no pin would silently keep
+# whatever its image or golden baked, for as long as it lives.
+[ -n "${SUPERSET_BUNDLE_SHA:-}" ] || refuse "SUPERSET_BUNDLE_SHA missing from ${SUPERSET_CONF}; the control plane pins every box"
 ensure_bundle() {
-	local want="${SUPERSET_BUNDLE_SHA:-}" have
-	if [ -z "$want" ]; then stamp "bundle.unpinned keeping $(cat "${SUPERSET_BUNDLE_ROOT}/current.bundle-hash" 2>/dev/null | cut -c1-12)"; return 0; fi
+	local want="$SUPERSET_BUNDLE_SHA" have
 	have="$(cat "${SUPERSET_BUNDLE_ROOT}/current.bundle-hash" 2>/dev/null || true)"
 	if [ "$have" = "$want" ] && [ -x "${SUPERSET_BUNDLE_ROOT}/current/setup" ]; then
 		stamp "bundle.current ${want:0:12} matches pin"
@@ -151,7 +156,7 @@ host_env=(
 )
 for key in HOST_SERVICE_SENTRY_DSN HOST_SERVICE_SENTRY_ENVIRONMENT SUPERSET_SANDBOX_CREATOR_USER_ID \
 	SUPERSET_SANDBOX_PLUGINS \
-	SUPERSET_SANDBOX_AGENT SUPERSET_SANDBOX_AGENT_PROMPT SUPERSET_SANDBOX_AGENT_MODEL SUPERSET_SANDBOX_AGENT_EFFORT SUPERSET_SANDBOX_AGENT_MODE SUPERSET_SANDBOX_AGENT_ATTACHMENTS SUPERSET_SANDBOX_AGENT_SURFACE \
+	SUPERSET_SANDBOX_AGENT SUPERSET_SANDBOX_AGENT_PROMPT SUPERSET_SANDBOX_AGENT_MODEL SUPERSET_SANDBOX_AGENT_EFFORT SUPERSET_SANDBOX_AGENT_MODE SUPERSET_SANDBOX_AGENT_ATTACHMENTS SUPERSET_SANDBOX_AGENT_SURFACE SUPERSET_SANDBOX_AGENT_AUTOMATION_RUN_ID \
 	NODE_EXTRA_CA_CERTS NODE_USE_SYSTEM_CA SSL_CERT_FILE CURL_CA_BUNDLE REQUESTS_CA_BUNDLE AWS_CA_BUNDLE GIT_SSL_CAINFO NPM_CONFIG_CAFILE PIP_CERT CARGO_HTTP_CAINFO; do
 	[ -n "${!key:-}" ] && host_env+=("${key}=${!key}")
 done
@@ -159,7 +164,7 @@ stamp "host.exec $(cat "${SUPERSET_HOST_ROOT}/current.version" 2>/dev/null)"
 # setpriv execs in place, so the pid recorded is node's own and the process
 # that answers kill -0 is the one that serves.
 (cd "$SUPERSET_USER_HOME" && exec setpriv --reuid="$SUPERSET_USER" --regid="$SUPERSET_USER" --init-groups \
-	env -i "${host_env[@]}" node "${HOST}/host-service.js") >> "${SUPERSET_LOG_DIR}/host-service.log" 2>&1 &
+	env -i "${host_env[@]}" node "${HOST}/host-service.js") >> "${SUPERSET_LOG_DIR}/host-service.log" 2>&1 9>&- &
 echo $! > "${SUPERSET_RUN_DIR}/host-service.pid"
 (
 	for _ in $(seq 1 600); do
@@ -169,9 +174,28 @@ echo $! > "${SUPERSET_RUN_DIR}/host-service.pid"
 		sleep 0.1
 	done
 	stamp "host.timeout after 60s"
-) &
+) 9>&- &
 }
 start_host_service
+exec 9>&-
+
+# What the box has, for anything that sizes itself: the cgroup's ceiling,
+# not the VM's, is what the kernel enforces. Login shells source this.
+mem_bytes="$(cat /sys/fs/cgroup/memory.max 2>/dev/null || true)"
+case "$mem_bytes" in ''|max) mem_bytes=$(( $(awk '/MemTotal/ {print $2}' /proc/meminfo) * 1024 )) ;; esac
+printf 'export SUPERSET_SANDBOX_MEMORY_MB=%s SUPERSET_SANDBOX_VCPUS=%s\n' "$(( mem_bytes / 1048576 ))" "$(nproc)" > "${SUPERSET_RUN_DIR}/resources.env"
+stamp "resources.written memory_mb=$(( mem_bytes / 1048576 )) vcpus=$(nproc)"
+
+# Ranks every process for the OOM killer and reaps the largest one before the
+# kernel has to; see the script. Root, because lowering a score needs it.
+if [ -x /usr/local/bin/superset-memguard ]; then
+	/usr/local/bin/superset-memguard >> "${SUPERSET_LOG_DIR}/memguard.log" 2>&1 9>&- &
+	echo $! > "${SUPERSET_RUN_DIR}/memguard.pid"
+	stamp "memguard.start pid=$!"
+fi
+
+# The fixed swapfile of an earlier bundle; memguard adds swap on demand now.
+[ -f /swapfile ] && ! grep -q "^/swapfile " /proc/swaps && rm -f /swapfile
 
 # --- the desktop and the checkout: side effects of being up.
 as_user env "DISPLAY=${SUPERSET_DISPLAY}" "HOME=${SUPERSET_USER_HOME}" "USER=${SUPERSET_USER}" \

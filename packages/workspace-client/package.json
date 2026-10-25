@@ -33,7 +33,7 @@
 		"@trpc/server": "11.16.0",
 		"@types/node": "24.12.0",
 		"@types/react": "19.2.14",
-		"bun-types": "1.4.2",
+		"bun-types": "1.4.3",
 		"react": "19.2.3",
 		"typescript": "7.0.2"
 	},

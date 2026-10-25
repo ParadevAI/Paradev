@@ -1,9 +1,15 @@
+import { organizationBilling } from "@superset/auth/billing";
 import { db } from "@superset/db/client";
 import { users } from "@superset/db/schema";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { eq } from "drizzle-orm";
 import { userError } from "../../i18n-error";
 import { posthog } from "../analytics";
+
+interface CloudAccessContext {
+	userId: string;
+	session: { user: { id: string; email: string } } | null;
+}
 
 /**
  * Gate every cloud-sandbox procedure — workspaces, environments, secrets — on
@@ -16,27 +22,35 @@ import { posthog } from "../analytics";
  * Fails closed — `isFeatureEnabled` resolves undefined when PostHog is
  * unreachable, so an outage suspends cloud access rather than opening it.
  */
-export async function assertCloudAccess(ctx: {
-	userId: string;
-	session: { user: { id: string; email: string } } | null;
-}): Promise<void> {
-	const { enabled, account } = await cloudAccess(ctx);
+export async function assertCloudAccess(
+	ctx: CloudAccessContext,
+	organizationId: string | null,
+): Promise<void> {
+	const { enabled, account } = await cloudAccess(ctx, organizationId);
 	if (enabled) return;
 
 	throw userError({
 		code: "FORBIDDEN",
-		message: `Cloud sandboxes are not enabled for ${account || "this account"}. Ask the Superset team for access.`,
+		message: `Cloud workspaces are not enabled for ${account || "this account"}. They come with the Team and Ultra plans: upgrade in Settings, Billing.`,
 		i18nKey: "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly",
 		params: { account: account || "this account" },
 	});
 }
 
 /** `enabled` is undefined when PostHog could not answer. */
-export async function cloudAccess(ctx: {
-	userId: string;
-	session: { user: { id: string; email: string } } | null;
-}): Promise<{ enabled: boolean | undefined; account: string }> {
-	const account = (await currentEmail(ctx))?.trim().toLowerCase() ?? "";
+export async function cloudAccess(
+	ctx: CloudAccessContext,
+	organizationId: string | null,
+): Promise<{ enabled: boolean | undefined; account: string }> {
+	const [email, planTier] = await Promise.all([
+		currentEmail(ctx),
+		organizationId
+			? organizationBilling(organizationId)
+					.then((billing) => billing.planTier)
+					.catch(() => "unknown")
+			: "none",
+	]);
+	const account = email?.trim().toLowerCase() ?? "";
 	const enabled = await posthog.isFeatureEnabled(
 		FEATURE_FLAGS.CLOUD_WORKSPACES,
 		ctx.userId,
@@ -44,7 +58,10 @@ export async function cloudAccess(ctx: {
 			// Sent explicitly: the conditions are email-based, and a person
 			// PostHog has not seen yet would otherwise be refused for the wrong
 			// reason. No exposure events — this is authorization, not an experiment.
-			personProperties: { email: account },
+			personProperties: {
+				email: account,
+				plan_tier: planTier,
+			},
 			sendFeatureFlagEvents: false,
 		},
 	);

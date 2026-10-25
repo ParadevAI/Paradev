@@ -1,3 +1,4 @@
+import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import { AGENT_DID } from "@/lib/agent-identity";
 import { API_URL, MCP_SERVER_URL } from "@/lib/llms";
@@ -20,7 +21,7 @@ export function GET() {
 			type: "application/mcp-server-card+json",
 			url: `${baseUrl}/.well-known/mcp/server-card.json`,
 			description:
-				"Create Git-worktree workspaces, launch coding-agent sessions, open terminals, schedule automations, and manage tasks on behalf of a Superset user. OAuth 2.1 + PKCE or API key.",
+				"Create Git-worktree workspaces, launch coding-agent sessions, open terminals, set up automations, and manage tasks on behalf of a Superset user. OAuth 2.1 + PKCE or API key.",
 			tags: [
 				"coding-agents",
 				"workspaces",
@@ -95,7 +96,7 @@ export function GET() {
 	const catalog = {
 		specVersion: "1.0",
 		host: {
-			displayName: COMPANY.NAME,
+			displayName: BRAND.INTRO_NAME,
 			identifier: AGENT_DID,
 			url: baseUrl,
 			documentationUrl: `${docsUrl}/mcp-server`,

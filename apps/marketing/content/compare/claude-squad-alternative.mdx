@@ -1,0 +1,119 @@
+---
+title: "Best Claude Squad Alternatives in 2026"
+description: "The best alternatives to Claude Squad for running AI coding agents in parallel worktrees, including Superset, Herdr, Orca, Emdash, and cmux, from desktop workspaces to terminal tools."
+date: 2026-10-20
+lastUpdated: 2026-10-20
+type: "roundup"
+competitors:
+  - claude-squad
+  - herdr
+  - orca
+  - emdash
+  - cmux
+keywords:
+  - claude squad alternative
+  - claude squad alternatives
+  - claude squad competitors
+  - claude squad vs superset
+  - run multiple claude code agents
+  - tmux for ai agents
+---
+
+Claude Squad is an AGPL terminal app that runs several coding agents at once, each in its own Git worktree and tmux session, driven from one TUI (`cs`). It is lean and effective. If you want the same worktree-per-agent model with a diff view, PRs, a browser, and agents that you can reach from your phone, Superset puts that loop in one desktop workspace.
+
+**Our recommendation: choose Superset if you want Claude Squad's worktree model with review, previews, and remote and cloud workspaces.** The alternatives below cover other preferences, including other terminal-native tools.
+
+[Download Superset](/download) to try a small task, or read [Superset vs Claude Squad](/compare/superset-vs-claude-squad) for the direct comparison. This guide is published by Superset; recommendations describe workflow fit rather than benchmark results.
+
+---
+
+## The Short Version
+
+| Alternative | Best for | Platform | License |
+|---|---|---|---|
+| **Superset** | Worktrees, review, browser, automations, remote and cloud workspaces | macOS; experimental Linux AppImage; Windows unavailable; iPhone and iPad | Source-available (ELv2) |
+| **Herdr** | Terminal multiplexer for agents with persistent sessions | macOS, Linux, Windows | Open source (Apache-2.0) |
+| **Orca** | Free cross-platform desktop ADE with mobile apps | macOS, Windows, Linux + iOS/Android | Open source (MIT) |
+| **Emdash** | Open-source ADE with issue-tracker intake | macOS, Windows, Linux | Open source (Apache-2.0) |
+| **cmux** | Native macOS terminal for agent sessions | macOS | Open source (GPL) |
+
+## Why Look for a Claude Squad Alternative?
+
+Claude Squad does one thing well: parallel agents in worktrees, in the terminal. Common reasons to look elsewhere:
+
+- **Review.** You want to read diffs, comment on lines, and open PRs without leaving the tool.
+- **Previews.** You want a browser beside the agent to check the running app.
+- **Status at a glance.** You want to see which agents are working, waiting for you, or ready for review.
+- **Reach.** You want agents on other machines or in the cloud, and a phone app to check on them.
+- **Pace.** Its last release, v1.0.20, shipped on August 20, 2026.
+
+## The Best Alternatives
+
+### Superset
+
+Superset runs any CLI agent, such as Claude Code, Codex, OpenCode, Cursor's agent, Copilot CLI, Gemini CLI, and Amp, in persistent terminal sessions, with a Git worktree and branch for each new local workspace. It adds a Changes pane that commits, pushes, and opens PRs, a pull request view with checks and review threads, an in-app browser with Design Mode, and a Workspaces page that groups every workspace by state. Workspaces run on your machine, on hosts you add through Remote Access, or in cloud workspaces, and the [iPhone and iPad app](/mobile) reaches all of them. Pro adds remote access, the iPhone and iPad app, and scheduled automations, and a CLI, TypeScript SDK, and MCP server let agents start other agents.
+
+For the direct comparison, see [Superset vs Claude Squad](/compare/superset-vs-claude-squad).
+
+### Herdr
+
+Herdr is an Apache-2.0 terminal multiplexer for coding agents. It has an agent-status sidebar, sessions that persist over SSH, worktree creation, a socket API that agents can drive, and a plugin ecosystem. Choose it if you want to stay in the terminal with more features than Claude Squad.
+
+See [Superset vs Herdr](/compare/superset-vs-herdr).
+
+### Orca
+
+Orca is a free, MIT-licensed desktop agent development environment for macOS, Windows, and Linux. It runs agents in parallel worktrees with split terminals, per-task browser tabs, Design Mode, SSH worktrees, scheduled automations, and beta mobile apps. Choose it if you want a desktop app and an open-source license.
+
+See [Superset vs Orca](/compare/superset-vs-orca).
+
+### Emdash
+
+Emdash is an Apache-2.0 desktop app for macOS, Windows, and Linux that supports 34 CLI agents. It gives each task its own branch and worktree, pulls tasks from Linear, Jira, GitHub, Notion, and Asana, and supports tmux for long-running sessions.
+
+See [Superset vs Emdash](/compare/superset-vs-emdash).
+
+### cmux
+
+cmux is a Ghostty-based macOS terminal with vertical tabs, notification rings when an agent needs you, an in-app browser, and a socket API. It does not create worktrees. Choose it if the thing you want most is to see all your agent sessions at once.
+
+See [Superset vs cmux](/compare/superset-vs-cmux).
+
+## How To Choose
+
+- For worktrees with review, previews, automations, and remote and cloud workspaces, choose **Superset**.
+- To stay terminal-native with persistent sessions and plugins, choose **Herdr**.
+- For a free, open-source, cross-platform desktop ADE, choose **Orca**.
+- For open source with issue-tracker intake, choose **Emdash**.
+- For a native Mac terminal built for agent sessions, choose **cmux**.
+
+## Verdict
+
+Claude Squad is a good minimal tool, and it is enough if you only need parallel agents in worktrees. Choose Superset when you want the same isolation with review, PRs, and previews beside each terminal, and agents you can reach from anywhere. Run the same two tasks in both and compare the review step. For the wider landscape, see [Best Agentic IDE in 2026](/compare/best-agentic-ide).
+
+## What To Try First
+
+- **Keep your agent:** launch Claude Code or the CLI you use in a Superset workspace.
+- **Run two tasks:** start a second workspace on its own branch and let both agents work.
+- **Review in place:** inspect each diff, run your checks, and open a PR from the Changes pane.
+- **Leave your desk:** continue the task from the [iPhone app](/blog/claude-code-codex-iphone).
+
+[Download Superset](/download), then see [running multiple Claude Code agents in parallel](/compare/multiple-claude-code-agents-parallel).
+
+## Frequently Asked Questions
+
+### What is the best Claude Squad alternative?
+
+For developers who want Claude Squad's worktree model with review, previews, and remote and cloud workspaces, Superset is our recommendation. For a terminal-native alternative, Herdr is the closest match.
+
+### Is there an open-source Claude Squad alternative?
+
+Yes. Herdr (Apache-2.0), Orca (MIT), Emdash (Apache-2.0), and cmux (GPL) are open source. Superset is source-available under Elastic License 2.0.
+
+### Can Superset run agents other than Claude Code?
+
+Yes. Superset runs any CLI agent, including Codex, OpenCode, Cursor's agent, Copilot CLI, Gemini CLI, and Amp, each in its own worktree.
+
+### Do these tools replace my coding-agent subscription?
+
+No. You still pay your agent provider for Claude Code, Codex, or other agent usage.

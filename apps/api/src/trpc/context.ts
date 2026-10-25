@@ -7,6 +7,7 @@ import { createTRPCContext } from "@superset/trpc";
 import {
 	resolveSandboxCaller,
 	type SandboxCaller,
+	sandboxCredentialWorkspaceId,
 } from "@superset/trpc/lib/sandbox";
 import { verifyAccessToken } from "better-auth/oauth2";
 import { eq } from "drizzle-orm";
@@ -138,6 +139,9 @@ export const createContext = async ({
 		auth,
 		headers: req.headers,
 		sandboxCaller: sandbox?.caller ?? null,
+		sandboxWorkspaceId: await sandboxCredentialWorkspaceId(
+			req.headers.get(SANDBOX_API_CREDENTIAL_HEADER),
+		),
 	});
 
 	if (context.client) {

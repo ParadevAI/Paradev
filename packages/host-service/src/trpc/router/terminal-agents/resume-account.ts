@@ -15,6 +15,7 @@ import {
 } from "../agents/launch-account";
 import { parsePersistedSessionAccount } from "../usage/session-account/session-account";
 import {
+	assertAccountResumeHistoryCurrent,
 	inspectAccountResumeHistory,
 	sameAccountResumeHistory,
 } from "./account-resume-history";
@@ -172,6 +173,7 @@ export interface ResumeWithAccountDeps {
 	resolveAccount?: typeof resolveLaunchAccount;
 	validateRouting?: typeof validateAccountAuthRouting;
 	inspectHistory?: typeof inspectAccountResumeHistory;
+	assertHistoryCurrent?: typeof assertAccountResumeHistoryCurrent;
 	assertIdle?: typeof assertAccountResumeTerminalIdle;
 	assertNoClaudeWriter?: typeof assertNoRecordedClaudeWriter;
 }
@@ -324,13 +326,10 @@ export async function resumeTerminalWithAccount(
 				},
 				onInitialCommandReady: () => {
 					// Called in the same transaction that persists the target binding.
-					const current = deps.db
-						.select()
-						.from(terminalAgentBindings)
-						.where(eq(terminalAgentBindings.terminalId, input.terminalId))
-						.get();
-					if (JSON.stringify(current) !== JSON.stringify(claimedBinding))
-						changed();
+					(deps.assertHistoryCurrent ?? assertAccountResumeHistoryCurrent)(
+						history,
+					);
+					assertClaim();
 					deps.db
 						.update(terminalAgentBindings)
 						.set({ endReason: "resumed" })

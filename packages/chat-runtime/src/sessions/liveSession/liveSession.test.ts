@@ -6,7 +6,7 @@ import {
 	reduceMany,
 } from "@superset/chat/core";
 import type { DurableEnvelope, UserMessage } from "@superset/chat/protocol";
-import { isDurableEnvelope } from "@superset/chat/protocol";
+import { isDurableEnvelope, wrapHiddenText } from "@superset/chat/protocol";
 import type { FakeHarnessScript } from "../../harness/fake";
 import type { ChatRuntime } from "../../index";
 import {
@@ -117,6 +117,70 @@ describe("LiveSession", () => {
 		expect(snapshot.items.get(result.itemId)?.turnId).toBe("t1");
 		expect(snapshot.items.size).toBe(2);
 		expect(snapshot.session?.status).toBe("idle");
+		await runtime.dispose();
+	});
+
+	test("sends a hidden part to the agent but keeps it off the user message", async () => {
+		const { runtime, sessionId, adapters } =
+			startSessionWithAdapters(SINGLE_TURN);
+		const visible = { type: "text", text: "@mcp/linear list issues" } as const;
+		const hint = { type: "text", text: "MCP context", hidden: true } as const;
+		const result = runtime.commands.prompt({
+			commandId: randomUUID(),
+			sessionId,
+			clientId: "client-hint",
+			content: [visible, hint],
+		});
+
+		await waitFor(() => runtime.sessions.get(sessionId)?.status === "idle");
+
+		expect(adapters[0]?.prompted).toEqual([
+			[visible, { type: "text", text: wrapHiddenText("MCP context") }],
+		]);
+		const prompts = userMessages(journalEnvelopes(runtime, sessionId));
+		expect(prompts.map((prompt) => prompt.item.id)).toContain(result.itemId);
+		for (const prompt of prompts)
+			expect(prompt.item.content).toEqual([visible]);
+		await runtime.dispose();
+	});
+
+	test("says so when a prompted turn ends without showing anything", async () => {
+		const { runtime, sessionId } = startSession({
+			start: [
+				{ kind: "turn", turn: turn("t0") },
+				{
+					kind: "turn",
+					turn: turn("t0", { status: "completed", completedAtMs: 1 }),
+				},
+			],
+			turns: [
+				[
+					{ kind: "turn", turn: turn("t1") },
+					{
+						kind: "turn",
+						turn: turn("t1", { status: "completed", completedAtMs: 2 }),
+					},
+					{ kind: "session", session: { status: "idle" } },
+				],
+			],
+		});
+		await waitFor(
+			() => runtime.live.require(sessionId).turn?.status === "completed",
+		);
+		sendPrompt(runtime, sessionId, "hello");
+		await waitFor(() => runtime.live.require(sessionId).turn?.id === "t1");
+		await waitFor(() => runtime.sessions.get(sessionId)?.status === "idle");
+
+		const notices = journalEnvelopes(runtime, sessionId).flatMap((envelope) =>
+			envelope.event.type === "item" && envelope.event.item.kind === "notice"
+				? [{ turnId: envelope.event.turnId, item: envelope.event.item }]
+				: [],
+		);
+		expect(notices).toHaveLength(1);
+		expect(notices[0]).toMatchObject({
+			turnId: "t1",
+			item: { noticeKind: "error" },
+		});
 		await runtime.dispose();
 	});
 

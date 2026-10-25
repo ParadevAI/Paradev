@@ -12,6 +12,8 @@ import {
 	useIsDarkTheme,
 } from "renderer/assets/app-icons/preset-icons";
 import { HotkeyMenuShortcut } from "renderer/components/HotkeyMenuShortcut";
+import { useIsAgentPresetEnabled } from "renderer/hooks/useIsAgentPresetEnabled";
+import { isTerminalPresetEnabled } from "renderer/lib/agent-launch-command";
 import { PRESET_HOTKEY_IDS } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/hooks/usePresetHotkeys";
 
 interface PresetsSubmenuProps {
@@ -26,6 +28,12 @@ export function PresetsSubmenu({
 	onConfigurePresets,
 }: PresetsSubmenuProps) {
 	const isDark = useIsDarkTheme();
+	const isAgentPresetEnabled = useIsAgentPresetEnabled();
+	const visiblePresets = presets.flatMap((preset, index) =>
+		isTerminalPresetEnabled(preset, isAgentPresetEnabled)
+			? [{ preset, index }]
+			: [],
+	);
 
 	return (
 		<DropdownMenuSub>
@@ -34,8 +42,8 @@ export function PresetsSubmenu({
 				<span>Terminal Scripts</span>
 			</DropdownMenuSubTrigger>
 			<DropdownMenuSubContent className="w-56">
-				{presets.length > 0 ? (
-					presets.map((preset, index) => {
+				{visiblePresets.length > 0 ? (
+					visiblePresets.map(({ preset, index }) => {
 						const presetIcon = getPresetIcon(preset.name, isDark);
 						const hotkeyId = PRESET_HOTKEY_IDS[index];
 						return (

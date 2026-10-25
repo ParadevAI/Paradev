@@ -14,6 +14,11 @@ import {
 	sanitizePromptForPty,
 } from "@superset/shared/agent-prompt-launch";
 import {
+	boundTranscriptText,
+	buildBoundedTerminalSessionTranscript,
+	TERMINAL_HANDOFF_MAX_CHARS,
+} from "@superset/shared/session-handoff";
+import {
 	createScanState,
 	type ShellReadyScanState,
 	scanForShellReady,
@@ -22,11 +27,6 @@ import {
 	type TerminalColors,
 	terminalColorsSchema,
 } from "@superset/shared/terminal-colors";
-import {
-	boundTranscriptText,
-	buildBoundedTerminalSessionTranscript,
-	TERMINAL_HANDOFF_MAX_CHARS,
-} from "@superset/shared/terminal-session-handoff";
 import {
 	createTerminalTitleScanState,
 	scanForTerminalTitle,

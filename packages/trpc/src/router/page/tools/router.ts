@@ -16,6 +16,7 @@ import {
 } from "../../plugins/manifest";
 import { resolveTarget } from "../../plugins/proxy";
 import { requireActiveOrgMembership } from "../../utils/active-org";
+import { loadPageShareRole } from "../access";
 import { callPageTool, pageToolAccess, pinForGrant } from "./call-page-tool";
 import { callPluginTool } from "./call-plugin-tool";
 
@@ -43,7 +44,11 @@ async function readablePage(
 		.from(pages)
 		.where(and(eq(pages.id, pageId), eq(pages.organizationId, organizationId)))
 		.limit(1);
-	if (!page || pageToolAccess(page, userId) === "not_found") {
+	if (
+		!page ||
+		pageToolAccess(page, userId, await loadPageShareRole(page, userId)) ===
+			"not_found"
+	) {
 		throw userError({
 			code: "NOT_FOUND",
 			message: "Page not found",

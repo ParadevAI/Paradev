@@ -20,7 +20,12 @@ export default command({
 				id: row.id,
 				name: row.name,
 				agent: row.agent,
-				schedule: row.scheduleText ?? row.rrule,
+				schedule:
+					row.scheduleText ??
+					row.rrule ??
+					((row.triggerCount as number) > 0
+						? "event triggered"
+						: "no triggers"),
 				enabled: row.enabled ? "yes" : "no",
 				nextRun: formatAutomationDate(
 					row.nextRunAt as Date | string | null | undefined,

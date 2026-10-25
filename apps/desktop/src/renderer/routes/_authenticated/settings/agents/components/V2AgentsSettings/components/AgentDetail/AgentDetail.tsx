@@ -90,7 +90,7 @@ export function AgentDetail({
 		joinArgs(config.promptArgs),
 	);
 	const [resumeArgsText, setResumeArgsText] = useState(
-		joinArgs(config.resumeArgs),
+		joinArgs(config.resumeArgs ?? []),
 	);
 	const [forkArgsText, setForkArgsText] = useState(
 		joinArgs(config.forkArgs ?? []),
@@ -109,7 +109,7 @@ export function AgentDetail({
 			}),
 		);
 		setPromptArgsText(joinArgs(config.promptArgs));
-		setResumeArgsText(joinArgs(config.resumeArgs));
+		setResumeArgsText(joinArgs(config.resumeArgs ?? []));
 		setForkArgsText(joinArgs(config.forkArgs ?? []));
 		setPromptTransport(config.promptTransport);
 	}, [
@@ -246,8 +246,8 @@ export function AgentDetail({
 	const handleResumeArgsBlur = () => {
 		const args = parseArgs(resumeArgsText);
 		const changed =
-			args.length !== config.resumeArgs.length ||
-			args.some((arg, i) => arg !== config.resumeArgs[i]);
+			args.length !== (config.resumeArgs ?? []).length ||
+			args.some((arg, i) => arg !== (config.resumeArgs ?? [])[i]);
 		if (changed) updateMutation.mutate({ resumeArgs: args });
 	};
 
