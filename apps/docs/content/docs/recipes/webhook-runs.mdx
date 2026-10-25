@@ -1,0 +1,48 @@
+---
+title: Start a Run with a Webhook
+description: Use a webhook trigger to start an agent from CI, a deploy script, or any tool that can send a POST
+---
+
+<Callout type="info" title="Use when">
+	the event comes from a tool Superset doesn't connect to: a failed deploy, a CI job, an alert, a form, or your own script.
+</Callout>
+
+## The Idea
+
+A **Webhook triggered** trigger gives the automation a URL. Every POST to it starts a run, and the JSON body you send goes into the agent's prompt. Put the details the agent needs in the body and refer to them in the prompt.
+
+## Steps
+
+1. Go to **Automations → New automation**. Pick the project, a device that stays online, and an agent.
+2. Under **Triggers**, click **Add Trigger → Webhook triggered** and press **Save**.
+3. Click **Generate token**, then **Copy URL with token** or **Copy auth header**. The token starts with `sset_wh_` and is shown once, so store it as a secret in the service that calls the URL.
+4. Write a prompt that reads the body:
+
+```text
+A deploy failed; the webhook body above has the service, the commit, and
+a link to the logs. Read the logs with the link, find the cause, and fix it
+on a new branch. Run the tests and open a draft pull request with
+`gh pr create --draft` that links the logs.
+If the failure is in infrastructure, not code, write what you found to
+DEPLOY.md and stop.
+```
+
+5. Call the URL from your service:
+
+```bash
+curl -X POST "https://api.superset.sh/api/automations/webhook/<automationId>" \
+  -H "Authorization: Bearer $SUPERSET_WEBHOOK_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"service": "checkout", "commit": "4f2a9c1", "logs": "https://ci.example.com/runs/812"}'
+```
+
+## Tips
+
+- **Body**: a JSON object or array up to 1 MiB. An empty body counts as `{}`.
+- **Every POST is a run**: webhook triggers have no filters and no de-duplication, so send only the events you want a run for.
+- **Responses**: `200` when the delivery is accepted, `400` if the automation is paused or the body isn't JSON, `401` for a missing or invalid token, `413` for a body over 1 MiB, `429` past 300 requests per minute.
+- **Rotate**: **Regenerate token** replaces the token, and the old one stops working immediately.
+
+## Variations
+
+- **From GitHub Actions**: add a final step with `if: failure()` that runs the `curl` above, with the token in a repository secret.

@@ -5,7 +5,7 @@ import { syncPlugins } from "../../../lib/plugins/install";
 
 export default command({
 	description:
-		"Reconcile installed plugins with the skill directories agents read and the MCP entries Claude and Codex read, adding, refreshing, and reaping both",
+		"Reconcile installed plugins with the skill directories agents read and the MCP entries Claude, Codex, and pdev read, adding, refreshing, and reaping both",
 	skipMiddleware: true,
 	display: (data) =>
 		table(
@@ -21,7 +21,7 @@ export default command({
 			: "";
 		const mcp = result.mcpError
 			? ` Agent MCP config was NOT written: ${result.mcpError}`
-			: ` ${result.mcpServers} MCP ${result.mcpServers === 1 ? "entry" : "entries"} in place for Claude and Codex.`;
+			: ` ${result.mcpServers} MCP ${result.mcpServers === 1 ? "entry" : "entries"} in place for Claude, Codex, and pdev.`;
 
 		return {
 			data: result.entries.map((entry) => ({

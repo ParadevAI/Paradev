@@ -10,6 +10,7 @@ import * as crypto from "../../router/plugins/crypto";
 
 let rows: Array<Record<string, unknown>> = [];
 let stored: Record<string, unknown> | null = null;
+let reads: Array<Record<string, unknown> | null> = [];
 let updates: Array<Record<string, unknown>> = [];
 let response: { status: number; ok: boolean; body: unknown } | null = null;
 let fetchError: Error | null = null;
@@ -24,6 +25,10 @@ const selectChain = {
 	limit: (n: number) => {
 		limits.push(n);
 		if (rows.length) return Promise.resolve(rows.slice(0, n));
+		if (reads.length) {
+			const next = reads.shift();
+			return Promise.resolve(next ? [next] : []);
+		}
 		return Promise.resolve(stored ? [stored] : []);
 	},
 };
@@ -99,6 +104,7 @@ beforeEach(() => {
 	updates = [];
 	limits = [];
 	rows = [];
+	reads = [];
 	response = null;
 	fetchError = null;
 	stored = connection();
@@ -130,10 +136,53 @@ describe("a connection that cannot be refreshed", () => {
 	test("a rejected refresh token is recorded the same way", async () => {
 		response = { ok: false, status: 400, body: { error: "invalid_grant" } };
 
-		await expect(ensureFreshConnection(connection())).rejects.toBeInstanceOf(
-			UnrefreshableConnectionError,
-		);
+		await expect(
+			ensureFreshConnection(connection(), { raceSettleMs: 0 }),
+		).rejects.toBeInstanceOf(UnrefreshableConnectionError);
 		expect(updates[0]).toMatchObject({ disconnectReason: NEEDS_REAUTH });
+	});
+});
+
+describe("two processes refreshing a rotating refresh token at once", () => {
+	test("the loser adopts the winner's tokens instead of disconnecting", async () => {
+		const winner = connection({
+			accessToken: "new-access",
+			refreshToken: "rotated",
+			tokenExpiresAt: new Date(Date.now() + 3600_000),
+		});
+		reads = [connection(), winner];
+		response = { ok: false, status: 400, body: { error: "invalid_grant" } };
+
+		await expect(
+			ensureFreshConnection(connection(), { raceSettleMs: 0 }),
+		).resolves.toBe(winner);
+		expect(updates).toHaveLength(0);
+	});
+
+	test("the loser waits for a winner that has not written yet", async () => {
+		const winner = connection({ accessToken: "new-access" });
+		reads = [connection(), connection(), winner];
+		response = { ok: false, status: 400, body: { error: "invalid_grant" } };
+
+		await expect(
+			ensureFreshConnection(connection(), { raceSettleMs: 1 }),
+		).resolves.toBe(winner);
+		expect(updates).toHaveLength(0);
+	});
+
+	test("the winner's write clears a mark the loser made first", async () => {
+		response = {
+			ok: true,
+			status: 200,
+			body: { access_token: "new-access", expires_in: 3600 },
+		};
+
+		await ensureFreshConnection(connection());
+		expect(updates[0]).toMatchObject({
+			accessToken: "new-access",
+			disconnectedAt: null,
+			disconnectReason: null,
+		});
 	});
 });
 

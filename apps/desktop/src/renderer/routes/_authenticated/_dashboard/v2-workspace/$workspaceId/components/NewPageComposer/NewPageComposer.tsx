@@ -82,6 +82,7 @@ export function NewPageComposer({
 					workspaceId,
 					terminalId: resolved.terminalId,
 					text: prompt,
+					submit: true,
 				});
 				toast.success(t({ message: "Sent to agent" }));
 				onFocusAgentTerminal(resolved.terminalId);

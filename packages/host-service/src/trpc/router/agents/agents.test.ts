@@ -934,9 +934,8 @@ describe("continuationTarget", () => {
 			.run();
 	}
 
-	// Seeded too, so a codex binding resolves to a REAL config that differs
-	// from claude. Without it `bound` is null and the identity comparison is
-	// never the thing doing the rejecting.
+	// Seeded too, so a codex binding names a REAL config that differs from
+	// claude rather than an agent the host does not have.
 	function seedCodex(db: HostDb) {
 		db.insert(schema.hostAgentConfigs)
 			.values({
@@ -951,6 +950,45 @@ describe("continuationTarget", () => {
 				forkArgsJson: "[]",
 				envJson: "{}",
 				displayOrder: 1,
+			})
+			.run();
+	}
+
+	// A second row of one preset. A client persists an instance id as an
+	// automation's agent in exactly this case, since the preset slug no longer
+	// names a single config.
+	function seedSecondClaude(db: HostDb) {
+		db.insert(schema.hostAgentConfigs)
+			.values({
+				id: "00000000-0000-0000-0000-00000000000c",
+				presetId: "claude",
+				label: "Claude (work)",
+				command: "claude",
+				argsJson: "[]",
+				promptTransport: "argv",
+				promptArgsJson: "[]",
+				resumeArgsJson: "[]",
+				forkArgsJson: "[]",
+				envJson: "{}",
+				displayOrder: 2,
+			})
+			.run();
+	}
+
+	function seedCustomAgent(db: HostDb, id: string, command: string) {
+		db.insert(schema.hostAgentConfigs)
+			.values({
+				id,
+				presetId: "custom",
+				label: "Team Claude",
+				command,
+				argsJson: "[]",
+				promptTransport: "argv",
+				promptArgsJson: "[]",
+				resumeArgsJson: "[]",
+				forkArgsJson: "[]",
+				envJson: "{}",
+				displayOrder: 3,
 			})
 			.run();
 	}
@@ -1077,5 +1115,47 @@ describe("continuationTarget", () => {
 		expect(
 			chatLaunchTarget(db, { ...launch, surface: "chat", effort: "high" }),
 		).toBeNull();
+	});
+
+	// A hook-recorded binding carries only the binary's builtin id, while a
+	// client persists an instance id as the agent when a preset is not unique
+	// on the host. Comparing instances made those two never match, so a pinned
+	// automation started another session on every run (#7941).
+	it("accepts a second instance of the preset the terminal runs", () => {
+		const db = createTestDb();
+		seedClaude(db);
+		seedSecondClaude(db);
+		expect(
+			continuationTarget(db, boundStore(), {
+				...run,
+				agent: "00000000-0000-0000-0000-00000000000c",
+			}),
+		).toEqual({ terminalId, label: "Claude (work)" });
+	});
+
+	it("accepts a custom agent that runs the same binary", () => {
+		const db = createTestDb();
+		seedClaude(db);
+		seedCustomAgent(db, "custom:team", "/usr/local/bin/claude");
+		expect(
+			continuationTarget(db, boundStore(), { ...run, agent: "custom:team" }),
+		).toEqual({ terminalId, label: "Team Claude" });
+	});
+
+	it("declines a custom agent that runs another binary", () => {
+		const db = createTestDb();
+		seedClaude(db);
+		seedCustomAgent(db, "custom:omp", "omp --model x");
+		expect(
+			continuationTarget(db, boundStore(), { ...run, agent: "custom:omp" }),
+		).toBeNull();
+	});
+
+	it("accepts a custom agent that runs the binary when no preset row of it is left", () => {
+		const db = createTestDb();
+		seedCustomAgent(db, "custom:team", "claude");
+		expect(
+			continuationTarget(db, boundStore(), { ...run, agent: "custom:team" }),
+		).toEqual({ terminalId, label: "Team Claude" });
 	});
 });

@@ -1,3 +1,4 @@
+import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import {
 	PRODUCT_DISAMBIGUATION,
@@ -40,7 +41,7 @@ export function OrganizationJsonLd() {
 		"@context": "https://schema.org",
 		"@type": "Organization",
 		"@id": `${COMPANY.MARKETING_URL}/#organization`,
-		name: COMPANY.NAME,
+		name: BRAND.INTRO_NAME,
 		url: COMPANY.MARKETING_URL,
 		logo: `${COMPANY.MARKETING_URL}/apple-touch-icon.png`,
 		description: "One workspace for orchestrating any coding agent",
@@ -76,7 +77,7 @@ export function SoftwareApplicationJsonLd() {
 		"@context": "https://schema.org",
 		"@type": "SoftwareApplication",
 		"@id": `${COMPANY.MARKETING_URL}/#software`,
-		name: COMPANY.NAME,
+		name: BRAND.INTRO_NAME,
 		operatingSystem: PRODUCT_PLATFORMS,
 		license: `${COMPANY.GITHUB_URL}/blob/main/LICENSE.md`,
 		publisher: { "@id": `${COMPANY.MARKETING_URL}/#organization` },
@@ -134,7 +135,7 @@ export function ArticleJsonLd({
 		},
 		publisher: {
 			"@type": "Organization",
-			name: COMPANY.NAME,
+			name: BRAND.INTRO_NAME,
 			logo: {
 				"@type": "ImageObject",
 				url: `${COMPANY.MARKETING_URL}/logo.png`,
@@ -187,7 +188,7 @@ export function ComparisonJsonLd({
 		...(keywords && keywords.length > 0 && { keywords }),
 		publisher: {
 			"@type": "Organization",
-			name: COMPANY.NAME,
+			name: BRAND.INTRO_NAME,
 			logo: {
 				"@type": "ImageObject",
 				url: `${COMPANY.MARKETING_URL}/logo.png`,
@@ -214,7 +215,7 @@ export function WebsiteJsonLd() {
 	const schema = {
 		"@context": "https://schema.org",
 		"@type": "WebSite",
-		name: COMPANY.NAME,
+		name: BRAND.INTRO_NAME,
 		url: COMPANY.MARKETING_URL,
 	};
 
@@ -227,10 +228,10 @@ export function HomeWebPageJsonLd() {
 		"@type": "WebPage",
 		"@id": COMPANY.MARKETING_URL,
 		url: COMPANY.MARKETING_URL,
-		name: `${COMPANY.NAME}: Orchestrate any coding agent`,
+		name: `${BRAND.INTRO_NAME}: Orchestrate any coding agent`,
 		isPartOf: {
 			"@type": "WebSite",
-			name: COMPANY.NAME,
+			name: BRAND.INTRO_NAME,
 			url: COMPANY.MARKETING_URL,
 		},
 		speakable: {
@@ -246,13 +247,13 @@ export function ServiceJsonLd() {
 	const schema = {
 		"@context": "https://schema.org",
 		"@type": "Service",
-		name: `${COMPANY.NAME} agent orchestration`,
+		name: `${BRAND.INTRO_NAME} agent orchestration`,
 		serviceType: "AI coding agent orchestration platform",
 		description:
-			"Bring Claude Code, Codex, OpenCode, or any CLI-based coding agent into one workspace. Run tasks in parallel with isolated Git worktrees, diff review, persistent terminals, scheduled automations, and an MCP server for programmatic control.",
+			"Bring Claude Code, Codex, OpenCode, or any CLI-based coding agent into one workspace. Run tasks in parallel with isolated Git worktrees, diff review, persistent terminals, automations that run on events or a schedule, and an MCP server for programmatic control.",
 		provider: {
 			"@type": "Organization",
-			name: COMPANY.NAME,
+			name: BRAND.INTRO_NAME,
 			url: COMPANY.MARKETING_URL,
 		},
 		url: COMPANY.MARKETING_URL,

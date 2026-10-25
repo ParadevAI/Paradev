@@ -25,12 +25,11 @@ const meta = {
 	],
 	args: {
 		workspaceId: "ws-1",
-		archivedAt: null,
 		people: [
-			{ ...avi, lastSeenAt: ago(3) },
-			{ ...kiet, lastSeenAt: ago(1) },
-			{ ...harshith, lastSeenAt: ago(2) },
-			{ ...satya, lastSeenAt: ago(120) },
+			{ ...avi, lastSeenAt: ago(3).getTime(), active: true },
+			{ ...kiet, lastSeenAt: ago(1).getTime(), active: true },
+			{ ...harshith, lastSeenAt: ago(2).getTime(), active: true },
+			{ ...satya, lastSeenAt: ago(120).getTime(), active: false },
 		],
 		owner: satya,
 		visibility: "org",
@@ -48,11 +47,7 @@ type Story = StoryObj<typeof meta>;
 export const SeveralPeople: Story = {};
 
 export const OnePerson: Story = {
-	args: { people: [{ ...avi, lastSeenAt: ago(1) }] },
-};
-
-export const Archived: Story = {
-	args: { archivedAt: ago(3 * 24 * 60) },
+	args: { people: [{ ...avi, lastSeenAt: ago(1).getTime(), active: true }] },
 };
 
 export const OnlyYou: Story = {

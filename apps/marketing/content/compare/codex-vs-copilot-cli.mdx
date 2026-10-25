@@ -1,0 +1,107 @@
+---
+title: "Codex vs GitHub Copilot CLI (2026): OpenAI's Agent vs GitHub's"
+description: "Compare OpenAI's Codex CLI and GitHub Copilot CLI: license, models, pricing, GitHub integration, parallel work, and cloud handoff, and how to run both side by side."
+date: 2026-10-13
+type: "1v1"
+competitors:
+  - codex
+  - github-copilot
+keywords:
+  - codex vs copilot cli
+  - codex vs github copilot
+  - copilot cli vs codex
+  - github copilot cli
+  - codex cli
+  - best coding agent
+---
+
+Codex CLI is OpenAI's open-source terminal agent, included in ChatGPT plans. GitHub Copilot CLI brings Copilot's agent to the terminal, with models from several vendors and GitHub built in. Both can hand work to the cloud: Codex with `codex cloud` tasks, Copilot CLI with `/delegate` and `copilot --cloud`. The choice comes down to OpenAI's models on your ChatGPT plan versus many vendors' models on a Copilot plan, inside GitHub.
+
+Facts were checked against OpenAI's and GitHub's own docs on October 13, 2026.
+
+---
+
+## At a Glance
+
+| | **Codex CLI** | **GitHub Copilot CLI** |
+|---|---|---|
+| **Vendor** | OpenAI | GitHub |
+| **License** | Open source (Apache-2.0) | Proprietary |
+| **Models** | OpenAI's GPT-6 family; GPT-6.1 Sol by default | Several vendors: Claude, GPT, Gemini, Grok, Kimi |
+| **Price** | Included in ChatGPT Free, Go, Plus, Pro, Business, Edu, Enterprise; or API key | Free tier; Pro $10, Pro+ $39, Max $100/mo |
+| **Parallel work** | Subagents, `/agents` view | `/fleet`, custom agents |
+| **Worktrees** | On by default | Not documented |
+| **Cloud handoff** | `codex cloud` tasks, from ChatGPT Plus up | `/delegate` to the Copilot cloud agent, `--cloud` sandboxes (preview) |
+| **GitHub** | GitHub Action | Built in: GitHub MCP server by default |
+| **Phone** | ChatGPT iOS app, paired with the ChatGPT desktop app | GitHub Mobile, and GitHub.com |
+| **Headless and SDK** | `codex exec`, Codex SDK | `copilot -p`, Copilot SDK (MIT) |
+| **Extensions** | MCP, hooks, plugins, skills | MCP, hooks, plugins with marketplaces, skills |
+| **Platforms** | macOS, Linux, Windows | macOS, Linux, Windows (PowerShell 6+ or WSL) |
+
+---
+
+## What Is Codex CLI?
+
+OpenAI calls Codex a "lightweight coding agent that runs in your terminal." It is open source under Apache-2.0. It runs OpenAI's GPT-6 models, with GPT-6.1 Sol as the default since CLI 0.161.0. Every ChatGPT plan includes it, from Free up; cloud features start at Plus. With an API key you get the CLI, SDK, and IDE extension at API rates, but no cloud features. Codex runs subagents, uses worktrees by default since version 0.156, and has an `/agents` view and voice input. `codex exec` and a GitHub Action run it in CI.
+
+## What Is GitHub Copilot CLI?
+
+GitHub's pitch is "the power of GitHub Copilot, now in your terminal." It runs models from several vendors on Copilot's plans and AI Credits, and the free tier includes the CLI. GitHub's MCP server ships by default, so issues and pull requests are part of the agent's tools. `/fleet` and custom agents split work, `/delegate` hands a task to Copilot's cloud agent, and `copilot --cloud` runs sessions in sandboxes in public preview. With remote control turned on, you can steer sessions from GitHub.com or GitHub Mobile. Organization admins can turn the CLI off.
+
+## Key Differences
+
+### Open Source
+
+Codex CLI is Apache-2.0, so you can read, fork, and change it. Copilot CLI shows no open-source license, though its SDK is MIT.
+
+### Models and Price
+
+Codex runs OpenAI's models and comes with any ChatGPT plan, including Free. Copilot CLI lets you pick Claude, GPT, Gemini, Grok, or Kimi models on one plan, from free up to $100 a month. If you want to switch between vendors without a second subscription, Copilot CLI is stronger.
+
+### GitHub and Cloud Handoff
+
+Both move work off your machine. Codex sends tasks to its cloud with `codex cloud` on ChatGPT Plus and above. Copilot CLI hands work to Copilot's cloud agent with `/delegate`, or runs a whole session in a cloud sandbox with `--cloud`, and that agent already lives in GitHub next to your issues and pull requests. Teams that run everything through GitHub will find Copilot CLI closer to their flow.
+
+### Local Parallel Work
+
+Codex uses worktrees by default, so its parallel local work is isolated out of the box. Copilot CLI does not document built-in worktree support; it leans on the cloud for isolation.
+
+---
+
+## Run Both Side by Side in Superset
+
+[Superset](/) runs Codex and GitHub Copilot CLI as built-in agents, each in its own Git worktree and terminal, on your own ChatGPT and Copilot plans. Create two workspaces from the same branch, start Codex in one and Copilot CLI in the other with the same prompt, then compare the diffs in the Changes pane and open a pull request from the better one. Superset never proxies model calls. Worktrees keep working files apart, but they do not sandbox processes or prevent merge conflicts ([docs](https://docs.superset.sh/workspaces)). See [How to Compare Coding Agents Side by Side](/compare/compare-coding-agents-side-by-side), [Best IDE for Codex](/compare/best-ide-for-codex), and [Claude Code vs GitHub Copilot CLI](/compare/claude-code-vs-copilot-cli).
+
+## Which Should You Choose?
+
+**Choose Codex CLI if you:**
+
+- Want an open-source agent you can read and modify
+- Already pay for ChatGPT, or want to start on ChatGPT Free
+- Want worktree isolation on by default
+
+**Choose GitHub Copilot CLI if you:**
+
+- Want models from several vendors on one plan
+- Run your work through GitHub issues and pull requests
+- Want to steer sessions from GitHub.com or GitHub Mobile
+
+For the full field, see [Best AI Coding Agents in 2026](/compare/best-coding-agents).
+
+## Frequently Asked Questions
+
+### Is Codex CLI free?
+
+The CLI is open source, and it is included in ChatGPT Free. Cloud tasks need ChatGPT Plus or higher. You can also use an API key at API rates, without cloud features.
+
+### Can GitHub Copilot CLI use OpenAI models?
+
+Yes. Copilot CLI offers GPT models along with Claude, Gemini, Grok, and Kimi models. Codex is OpenAI's own harness for its models.
+
+### Which one hands work to the cloud?
+
+Both. Codex has `codex cloud` tasks. Copilot CLI has `/delegate` to Copilot's cloud agent and `copilot --cloud` sandboxes, which are in public preview.
+
+### Can I run Codex and Copilot CLI at the same time?
+
+Yes. Give each its own Git worktree so they do not edit the same files. In Superset, each runs in its own workspace on the same repository.

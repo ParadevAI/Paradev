@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { wrapHiddenText } from "@superset/chat/protocol";
 import type { FakeHarnessScript } from "../../harness/fake";
 import type { ChatRuntime } from "../../index";
 import { agentMessage, turn } from "../../testing/fixtures";
@@ -156,6 +157,16 @@ describe("createChatRouter", () => {
 			}),
 		).rejects.toMatchObject({ code: "NOT_FOUND" });
 
+		await expect(
+			caller.rewindSession({
+				commandId: randomUUID(),
+				sessionId: "missing",
+				itemId: "item-1",
+				prompt: "edited",
+				workspaceId: "workspace-1",
+			}),
+		).rejects.toMatchObject({ code: "NOT_FOUND" });
+
 		const created = await caller.createSession(createSessionInput());
 		await runtime.live.dispose(created.sessionId);
 		await expect(
@@ -217,6 +228,111 @@ describe("createChatRouter", () => {
 			await caller.listSessions({ workspaceId: "workspace-2" }),
 		).toHaveLength(1);
 		expect(await caller.listSessions({ limit: 1 })).toHaveLength(1);
+		await runtime.dispose();
+	});
+
+	test("steerSubagent routes to the live session", async () => {
+		const { harnesses, adapters } = fakeHarnessRegistry({
+			...SCRIPT,
+			steerableSubagents: ["subagent:child-1"],
+		});
+		const runtime = createTestRuntime({ harnesses });
+		const caller = createChatCallerFactory(
+			createChatRouter(runtime, {
+				resolveCwd: () => mkdtempSync(join(tmpdir(), "chat-router-cwd-")),
+			}),
+		)({});
+		const created = await caller.createSession(createSessionInput());
+		const content = [{ type: "text" as const, text: "check the tests too" }];
+
+		expect(
+			await caller.steerSubagent({
+				commandId: randomUUID(),
+				sessionId: created.sessionId,
+				taskId: "subagent:child-1",
+				content,
+			}),
+		).toEqual({ result: "steered" });
+		expect(
+			await caller.steerSubagent({
+				commandId: randomUUID(),
+				sessionId: created.sessionId,
+				taskId: "subagent:child-2",
+				content,
+			}),
+		).toEqual({ result: "finished" });
+		await caller.steerSubagent({
+			commandId: randomUUID(),
+			sessionId: created.sessionId,
+			taskId: "subagent:child-1",
+			content: [
+				{ type: "text", text: "use the server" },
+				{ type: "text", text: "MCP server: linear", hidden: true },
+			],
+		});
+		expect(adapters[0]?.steeredSubagents).toEqual([
+			{ taskId: "subagent:child-1", content },
+			{
+				taskId: "subagent:child-1",
+				content: [
+					{ type: "text", text: "use the server" },
+					{ type: "text", text: wrapHiddenText("MCP server: linear") },
+				],
+			},
+		]);
+		await expect(
+			caller.steerSubagent({
+				commandId: randomUUID(),
+				sessionId: created.sessionId,
+				taskId: "subagent:child-1",
+				content: [],
+			}),
+		).rejects.toMatchObject({ code: "BAD_REQUEST" });
+		await runtime.dispose();
+	});
+
+	test("backgroundSubagent routes to the live session", async () => {
+		const { harnesses, adapters } = fakeHarnessRegistry({
+			...SCRIPT,
+			backgroundableSubagents: ["subagent:child-1"],
+		});
+		const runtime = createTestRuntime({ harnesses });
+		const caller = createChatCallerFactory(
+			createChatRouter(runtime, {
+				resolveCwd: () => mkdtempSync(join(tmpdir(), "chat-router-cwd-")),
+			}),
+		)({});
+		const created = await caller.createSession(createSessionInput());
+
+		expect(
+			await caller.backgroundSubagent({
+				commandId: randomUUID(),
+				sessionId: created.sessionId,
+				taskId: "subagent:child-1",
+			}),
+		).toEqual({ result: "moved" });
+		expect(
+			await caller.backgroundSubagent({
+				commandId: randomUUID(),
+				sessionId: created.sessionId,
+				taskId: "subagent:child-2",
+			}),
+		).toEqual({ result: "refused" });
+		expect(adapters[0]?.backgroundedSubagents).toEqual(["subagent:child-1"]);
+		await runtime.dispose();
+	});
+
+	test("discoverSessions reports an unknown harness", async () => {
+		const { runtime, caller } = newCaller();
+		await expect(
+			caller.discoverSessions({
+				workspaceId: "workspace-1",
+				harness: "nope",
+			}),
+		).rejects.toMatchObject({
+			code: "BAD_REQUEST",
+			message: "unknown harness nope",
+		});
 		await runtime.dispose();
 	});
 });

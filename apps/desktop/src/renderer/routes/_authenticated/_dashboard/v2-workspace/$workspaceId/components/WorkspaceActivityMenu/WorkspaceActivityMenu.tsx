@@ -5,7 +5,7 @@ import { toast } from "@superset/ui/sonner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { workspaceTrpc } from "@superset/workspace-client";
-import { ArrowLeft, GitCompareArrows, ListTree, Square } from "lucide-react";
+import { ArrowLeft, GitCompareArrows, ListTree } from "lucide-react";
 import {
 	type MouseEvent,
 	type ReactNode,
@@ -17,7 +17,6 @@ import {
 	useSyncExternalStore,
 } from "react";
 import { env } from "renderer/env.renderer";
-import { useTerminalAgentBindings } from "renderer/hooks/host-service/useTerminalAgentBindings";
 import { useWorkspaceEvent } from "renderer/hooks/host-service/useWorkspaceEvent";
 import { useDebouncedValue } from "renderer/hooks/useDebouncedValue";
 import { usePagePolicy } from "renderer/lib/clickPolicy";
@@ -30,7 +29,6 @@ import { pagesListInput } from "renderer/routes/_authenticated/_dashboard/utils/
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import type { StoreApi } from "zustand/vanilla";
 import type { CreateNewAgentSession } from "../../hooks/useAgentSessionLauncher";
-import { useChatWiring } from "../../hooks/usePaneRegistry/components/ChatSession/hooks/useSessionClient";
 import { usePRFlowState } from "../../hooks/usePRFlowState";
 import { useShipActions } from "../../hooks/useShipActions";
 import { useRightPaneLinkTarget } from "../../providers/RightPaneLinkTargetProvider";
@@ -47,7 +45,6 @@ import { changesPillStats } from "../../utils/changesPillStats";
 import { focusOrAddTerminalPane } from "../../utils/focusTerminalPane";
 import { getShipMenuActions } from "../../utils/getShipMenuActions";
 import { openPagePaneInStore } from "../../utils/openPagePaneInStore";
-import { openSubagentPaneInStore } from "../../utils/openSubagentPaneInStore";
 import { ChangesStats } from "../ChangesStats";
 import { CommitForm } from "../CommitForm";
 import { CreatePrForm } from "../CreatePrForm";
@@ -139,9 +136,7 @@ export function WorkspaceActivityMenu({
 	const [composing, setComposing] = useState(false);
 	const [now, setNow] = useState(() => Date.now());
 	const [stopping, setStopping] = useState<ReadonlySet<string>>(new Set());
-	const chatWiring = useChatWiring();
 
-	const bindings = useTerminalAgentBindings(workspaceId);
 	const terminalUtils = workspaceTrpc.useUtils();
 	const killTerminal = workspaceTrpc.terminal.killSession.useMutation();
 	const subscribeAttachedStores = useCallback(
@@ -195,54 +190,18 @@ export function WorkspaceActivityMenu({
 			settledAttachedTerminalIdsKey,
 		],
 	);
-	const { processes, subagents } = useMemo(
-		() => collectBackgroundWork(bindings.values(), detachedTerminals),
-		[bindings, detachedTerminals],
+	const processes = useMemo(
+		() => collectBackgroundWork(detachedTerminals),
+		[detachedTerminals],
 	);
-	const getSourceLabelsSnapshot = useCallback(
-		() =>
-			JSON.stringify(
-				[store, ...linkedStores]
-					.flatMap((paneStore) => paneStore.getState().tabs)
-					.flatMap((tab) =>
-						Object.values(tab.panes).flatMap((pane) => {
-							const data = pane.data as {
-								terminalId?: string;
-								chatTitle?: string;
-							};
-							const label =
-								tab.titleOverride ?? pane.titleOverride ?? data.chatTitle;
-							return data.terminalId && label ? [[data.terminalId, label]] : [];
-						}),
-					),
-			),
-		[store, linkedStores],
-	);
-	const sourceLabelsKey = useSyncExternalStore(
-		subscribeAttachedStores,
-		getSourceLabelsSnapshot,
-		getSourceLabelsSnapshot,
-	);
-	const sourceLabels = useMemo(
-		() => new Map<string, string>(JSON.parse(sourceLabelsKey)),
-		[sourceLabelsKey],
-	);
-	const workSourceCount = new Set(
-		[...processes, ...subagents].map((work) => work.terminalId),
-	).size;
-	const stoppableAgentTasks = processes.filter(
-		(work) => work.stop?.type === "chat",
-	);
-	const runningCount =
-		processes.filter((work) => !work.detachedTerminal).length +
-		subagents.length;
+	const runningCount = processes.length;
 
 	useEffect(() => {
-		if (!open || processes.length + subagents.length === 0) return;
+		if (!open || processes.length === 0) return;
 		setNow(Date.now());
 		const timer = setInterval(() => setNow(Date.now()), CLOCK_TICK_MS);
 		return () => clearInterval(timer);
-	}, [open, processes.length, subagents.length]);
+	}, [open, processes.length]);
 
 	// This menu orders by publish time, not creation time, so it takes one
 	// large batch rather than the grid's scroll-sized one. Built once because
@@ -323,7 +282,7 @@ export function WorkspaceActivityMenu({
 			return;
 		}
 		const pageData = { pageId: page.id, slug: page.slug, title: page.title };
-		if (action === "rightPane" && rightPane) {
+		if (rightPane) {
 			rightPane.reveal();
 			openPagePaneInStore(rightPane.store, pageData, "tab");
 			return;
@@ -333,29 +292,12 @@ export function WorkspaceActivityMenu({
 
 	const handleOpenWork = (work: BackgroundWork) => {
 		handleOpenChange(false);
-		if (work.detachedTerminal) {
-			clearTerminalBackgroundMarker(workspaceId, work.terminalId);
-			focusOrAddTerminalPane(store, work.terminalId);
-			void terminalUtils.terminal.list.invalidate({ workspaceId });
-			return;
-		}
-		if (work.subagent) {
-			openSubagentPaneInStore(store, {
-				terminalId: work.terminalId,
-				subagentId: work.subagent.id,
-				agentId: work.subagent.agentId,
-				...(work.subagent.agentType
-					? { agentType: work.subagent.agentType }
-					: {}),
-			});
-			return;
-		}
-		onFocusAgentTerminal(work.terminalId);
+		clearTerminalBackgroundMarker(workspaceId, work.terminalId);
+		focusOrAddTerminalPane(store, work.terminalId);
+		void terminalUtils.terminal.list.invalidate({ workspaceId });
 	};
 
 	const handleStopWork = (work: BackgroundWork) => {
-		const target = work.stop;
-		if (!target) return;
 		setStopping((current) => new Set(current).add(work.key));
 		const release = () =>
 			setStopping((current) => {
@@ -363,24 +305,12 @@ export function WorkspaceActivityMenu({
 				next.delete(work.key);
 				return next;
 			});
-		const stopped =
-			target.type === "terminal"
-				? killTerminal
-						.mutateAsync({ terminalId: work.terminalId, workspaceId })
-						.then(() => {
-							clearTerminalBackgroundMarker(workspaceId, work.terminalId);
-							void terminalUtils.terminal.list.invalidate({ workspaceId });
-						})
-				: chatWiring.transport
-						.stopBackgroundTask({
-							commandId: crypto.randomUUID(),
-							sessionId: target.chatSessionId,
-							taskId: target.taskId,
-						})
-						.then((done) => {
-							if (!done) throw new Error("the agent did not stop the task");
-						});
-		void stopped
+		void killTerminal
+			.mutateAsync({ terminalId: work.terminalId, workspaceId })
+			.then(() => {
+				clearTerminalBackgroundMarker(workspaceId, work.terminalId);
+				void terminalUtils.terminal.list.invalidate({ workspaceId });
+			})
 			.catch((error: unknown) => {
 				console.warn("[WorkspaceActivityMenu] could not stop task", error);
 				toast.error(t({ message: "Couldn't stop the background task" }));
@@ -388,20 +318,11 @@ export function WorkspaceActivityMenu({
 			.finally(release);
 	};
 
-	const stopAll = () => {
-		for (const work of stoppableAgentTasks) {
-			if (!stopping.has(work.key)) handleStopWork(work);
-		}
-	};
-
 	const workRows = (items: BackgroundWork[]) =>
 		items.map((work) => (
 			<BackgroundWorkRow
 				key={work.key}
 				work={work}
-				source={
-					workSourceCount > 1 ? sourceLabels.get(work.terminalId) : undefined
-				}
 				now={now}
 				stopping={stopping.has(work.key)}
 				onOpen={handleOpenWork}
@@ -468,7 +389,7 @@ export function WorkspaceActivityMenu({
 					</PopoverTrigger>
 				</TooltipTrigger>
 				<TooltipContent side="bottom">
-					<Trans>Background work and pages</Trans>
+					<Trans>Workspace activity</Trans>
 				</TooltipContent>
 			</Tooltip>
 			<PopoverContent
@@ -571,30 +492,7 @@ export function WorkspaceActivityMenu({
 								/>
 							</section>
 						)}
-						<MenuGroup
-							title={<Trans>Background processes</Trans>}
-							actions={
-								stoppableAgentTasks.length > 0 && (
-									<Tooltip>
-										<TooltipTrigger asChild>
-											<button
-												type="button"
-												aria-label={t({
-													message: "Stop all agent background processes",
-												})}
-												onClick={stopAll}
-												className="flex size-6 items-center justify-center rounded-sm text-muted-foreground outline-none transition-colors hover:bg-accent hover:text-foreground focus-visible:bg-accent"
-											>
-												<Square className="size-2.5 fill-current" />
-											</button>
-										</TooltipTrigger>
-										<TooltipContent side="top">
-											<Trans>Stop all agent background processes</Trans>
-										</TooltipContent>
-									</Tooltip>
-								)
-							}
-						>
+						<MenuGroup title={<Trans>Background processes</Trans>}>
 							<div className="max-h-48 overflow-y-auto">
 								{processes.length > 0
 									? workRows(processes)
@@ -603,13 +501,6 @@ export function WorkspaceActivityMenu({
 										: emptyRow(<Trans>Nothing running</Trans>)}
 							</div>
 						</MenuGroup>
-						{subagents.length > 0 && (
-							<MenuGroup title={<Trans>Subagents</Trans>}>
-								<div className="max-h-48 overflow-y-auto">
-									{workRows(subagents)}
-								</div>
-							</MenuGroup>
-						)}
 						<MenuGroup
 							title={<Trans>Pages</Trans>}
 							addLabel={t({ message: "New page" })}

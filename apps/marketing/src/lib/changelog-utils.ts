@@ -3,7 +3,9 @@
  * These can be safely imported in both server and client components.
  */
 
+import type { ReleaseHighlight } from "@superset/shared/release-notes";
 import { formatContentDate } from "./content-utils";
+import type { ImageDimensions } from "./public-image-size";
 
 export interface ChangelogEntry {
 	slug: string;
@@ -12,6 +14,11 @@ export interface ChangelogEntry {
 	description?: string;
 	date: string;
 	image?: string;
+	imageSize?: ImageDimensions;
+	/** First desktop release that ships everything in this entry. */
+	version?: string;
+	/** Shown in the desktop app's release card and dialog. */
+	highlights?: ReleaseHighlight[];
 	content: string;
 	/** Draft entries (frontmatter `draft: true`) never render on the site. */
 	draft?: boolean;

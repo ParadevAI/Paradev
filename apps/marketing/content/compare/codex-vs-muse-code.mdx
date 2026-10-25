@@ -1,0 +1,112 @@
+---
+title: "Codex vs Muse Code (2026): OpenAI's Open-Source Agent vs Meta's"
+description: "Compare OpenAI's Codex CLI and Meta's Muse Code: models, pricing, cloud tasks versus workflows, and how to run both side by side."
+date: 2026-10-13
+lastUpdated: 2026-10-14
+type: "1v1"
+competitors:
+  - codex
+  - muse-code
+keywords:
+  - codex vs muse code
+  - muse code vs codex
+  - meta muse code
+  - codex cli alternative
+  - open source coding agent
+  - best coding agent
+---
+
+Codex CLI is OpenAI's terminal coding agent. It is open source under Apache-2.0 and comes with ChatGPT plans, including Free, and cloud tasks from Plus up. Muse Code is Meta's coding agent, built for the Muse Spark models, with subagents on by default and workflows that run teams of them. Muse Code is paid through Muse subscriptions or per-token API pricing, and it can continue a Codex session with `/resume-codex`.
+
+Facts were checked against OpenAI's and Meta's own docs on October 13, 2026.
+
+---
+
+## At a Glance
+
+| | **Codex CLI** | **Muse Code** |
+|---|---|---|
+| **Vendor** | OpenAI | Meta |
+| **Models** | GPT-6 family; default GPT-6.1 Sol | Muse Spark and Muse Wonder, with a 1M-token context |
+| **Price** | Included in ChatGPT Free, Go, Plus, Pro, Business, Edu, Enterprise; or API key | Muse usage subscriptions (Everyday, High, Power, Maximum) or per-token API |
+| **Subagents** | Yes, with an `/agents` view | On by default, up to 8 agents per tree counting the root (raisable to 64) |
+| **Multi-agent runs** | Subagents | Workflows run teams of subagents in parallel or in stages |
+| **Worktrees** | On by default | Muse-managed worktree per subagent |
+| **Cloud** | `codex cloud` tasks, from ChatGPT Plus up | None listed |
+| **Headless** | `codex exec`, Codex SDK, GitHub Action | `muse exec`, `muse serve`, TypeScript and Python SDKs |
+| **Extensions** | MCP, hooks, skills, plugins | MCP, 17 hook events, imports Claude and Codex skills and Claude plugins |
+| **Platforms** | macOS, Linux, Windows | macOS and Windows installers; docs also describe Linux |
+
+---
+
+## What Is Codex CLI?
+
+OpenAI calls Codex CLI a "lightweight coding agent that runs in your terminal." It is open source under Apache-2.0. The latest stable release is 0.162.1, and the default model is GPT-6.1 Sol. Codex runs subagents, and worktrees have been on by default since 0.156. It has an `/agents` view, voice input, and `codex cloud` for cloud tasks. For automation there is `codex exec`, the Codex SDK, and a GitHub Action, plus MCP, hooks, skills, and plugins. It is included in every ChatGPT plan, from Free up; cloud features start at Plus. With an API key you get the CLI, SDK, and IDE extension at API rates, but no cloud features.
+
+## What Is Muse Code?
+
+Meta describes Muse Code as "Meta's coding agent for the terminal and CI, built for Muse Spark." It came out of beta on August 31, 2026. The terminal UI is `muse`, and `muse exec` runs it headless for scripts and CI. `muse serve` exposes a session protocol, with TypeScript (preview) and Python SDKs. Subagents are on by default, up to 8 per tree, and each can get a Muse-managed worktree. Workflows run teams of subagents in parallel or in stages. It supports MCP and 17 hook events, imports Claude and Codex skills and Claude plugins, and continues local sessions with `/resume-codex` and `/resume-claude`.
+
+## Key Differences
+
+### Open Source
+
+Codex CLI is open source under Apache-2.0, so you can read and change it. Meta distributes Muse Code as an installed binary, with no public source repository listed in its docs.
+
+### Price and Access
+
+Codex is the easier start: it is included in ChatGPT Free and every paid ChatGPT plan. Muse Code needs a Muse subscription or API access. Through the API, Muse Spark 1.3 costs $1.25 per million input tokens and $4.25 per million output tokens, and Muse Wonder 1.0 costs $4 and $20. Muse subscriptions reset every 5 hours and weekly, and Meta does not list their prices as text. Cheaper Contributor models and plans let Meta train on your data.
+
+### Multi-Agent Work
+
+Muse Code is stronger at structured multi-agent runs inside one session: subagents are on by default, and workflows run teams of them in parallel or in stages. Codex has subagents, an `/agents` view, and worktrees on by default.
+
+### Cloud and Mobile
+
+Codex has cloud tasks with `codex cloud` on ChatGPT Plus and above, and the ChatGPT iOS app can pair with a computer running the ChatGPT desktop app to start, steer, and review Codex tasks. Meta lists no cloud tasks or desktop app for Muse Code.
+
+### Moving Between Them
+
+Muse Code can import Codex skills and continue a local Codex session with `/resume-codex`, so you can try it on work you started in Codex.
+
+---
+
+## Run Both Side by Side
+
+You do not have to pick one in the abstract. Give the same task to both on your own repository and keep the better diff.
+
+[Superset](/) runs Codex and Muse Code as built-in agents, each in its own Git worktree and terminal, on your own ChatGPT and Muse subscriptions. Create two workspaces from the same branch, start each agent with the same prompt, then compare the diffs in the Changes pane and open a pull request from the better one. Superset never proxies model calls. See [How to Compare Coding Agents Side by Side](/compare/compare-coding-agents-side-by-side), [Best IDE for Codex](/compare/best-ide-for-codex), and [Superset vs Muse Code](/compare/superset-vs-muse-code).
+
+## Which Should You Choose?
+
+**Choose Codex if you:**
+
+- Want an open-source agent you can read and change
+- Already pay for ChatGPT, or want to start free
+- Want cloud tasks and to steer work from the ChatGPT iOS app
+
+**Choose Muse Code if you:**
+
+- Want workflows that run teams of subagents in parallel or in stages
+- Want to try Meta's Muse Spark models
+- Want to bring Codex and Claude skills and sessions with you
+
+For the full field, see [Best AI Coding Agents in 2026](/compare/best-coding-agents).
+
+## Frequently Asked Questions
+
+### Is Codex CLI open source?
+
+Yes. Codex CLI is open source under Apache-2.0.
+
+### Can Muse Code continue a Codex session?
+
+Yes. Muse Code has `/resume-codex` to pick up a local Codex session, and it can import Codex skills.
+
+### Which is cheaper?
+
+Codex is included in ChatGPT Free and every paid ChatGPT plan. Muse Code needs a Muse subscription or per-token API access; Muse Spark 1.3 costs $1.25 per million input tokens and $4.25 per million output tokens.
+
+### Can I run Codex and Muse Code at the same time?
+
+Yes. Give each its own Git worktree so they do not edit the same files. In Superset, each runs in its own workspace on the same repository.

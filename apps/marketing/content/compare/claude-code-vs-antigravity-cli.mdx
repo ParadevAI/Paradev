@@ -1,0 +1,107 @@
+---
+title: "Claude Code vs Antigravity CLI (2026): Anthropic's Agent vs Google's"
+description: "Compare Claude Code and Google's Antigravity CLI (agy), the successor to Gemini CLI: models, pricing, parallel work, and extensions, and how to run both side by side."
+date: 2026-10-13
+type: "1v1"
+competitors:
+  - claude-code
+  - antigravity
+keywords:
+  - claude code vs antigravity
+  - claude code vs agy
+  - claude code vs gemini cli
+  - antigravity cli vs claude code
+  - best coding agent
+  - gemini cli replacement
+---
+
+Claude Code is Anthropic's terminal coding agent. Antigravity CLI, run as `agy`, is Google's, and it replaced Gemini CLI for most users in May 2026. Both read your code, run commands, split work across subagents, and take MCP servers, hooks, plugins, and skills. The biggest differences are price and models: Antigravity CLI is free to start and runs Gemini, Claude, and gpt-oss models, while Claude Code needs a paid Claude plan and runs Claude only.
+
+Facts were checked against Anthropic's and Google's own docs on October 13, 2026.
+
+---
+
+## At a Glance
+
+| | **Claude Code** | **Antigravity CLI (`agy`)** |
+|---|---|---|
+| **Vendor** | Anthropic | Google |
+| **Models** | Claude models, with a 1M-token context on recent ones | Gemini models, plus Claude Sonnet and Opus and gpt-oss |
+| **Price** | Claude Pro from $20/mo, Max from $100/mo, or API key; no free tier | Free with weekly limits; Google AI Pro and Ultra raise them; Gemini API key |
+| **Subagents** | Yes, plus `/batch` across 5 to 30 worktrees and an agent view | Async subagents; agent teams on paid plans |
+| **Worktrees** | Built in | Per subagent, in branch mode |
+| **Remote and cloud** | Cloud sessions, Remote Control | Remote Control; export to the Antigravity desktop app |
+| **Headless** | `claude -p` | `agy -p` with JSON or streaming JSON |
+| **Extensions** | MCP, hooks, plugins with marketplaces, skills | MCP, hooks, plugins, skills, Python SDK |
+| **Platforms** | macOS, Linux, Windows | macOS, Linux, Windows |
+| **License** | Proprietary | Proprietary |
+
+---
+
+## What Is Claude Code?
+
+Anthropic describes Claude Code as "an agentic coding tool that reads your codebase, edits files, runs commands, and integrates with your development tools." It has the widest set of parallel modes of any agent: subagents, `/batch` runs that fan a change out across worktrees, an agent view for background sessions, experimental agent teams, cloud sessions, and Remote Control. Plugins with marketplaces, skills, and hooks make it highly extensible. It is not on Claude's free plan; it comes with Pro, Max, Team, and Enterprise, or an API key.
+
+## What Is Antigravity CLI?
+
+Google's `agy` "brings the reasoning, execution, and orchestration capabilities of Antigravity agent harness directly into your terminal." It shares its harness and synced settings with the Antigravity 2.0 desktop app, and you can export a conversation from the terminal to the app. It runs async subagents, which can each take an isolated worktree, background shell tasks, and agent teams in preview on paid plans. Individuals get it free with weekly limits, and Google AI Pro and Ultra raise them. Google notes there is no one-to-one feature parity with Gemini CLI, which still exists for paid API and Code Assist users.
+
+## Key Differences
+
+### Price
+
+Antigravity CLI is the easier start: it is free with weekly limits. Claude Code needs a paid Claude plan or API spend from the first prompt.
+
+### Models
+
+Claude Code runs Anthropic's models. Antigravity CLI runs Google's Gemini models by default and also offers Claude Sonnet and Opus and gpt-oss, though Google gives non-Gemini models a separate, fixed rate limit. If you want Claude inside Google's harness, Antigravity offers it; if you want Claude in Anthropic's own harness, that is Claude Code.
+
+### Parallel Work
+
+Both run subagents and both can isolate them in worktrees. Claude Code has more built-in modes for parallel work today, including `/batch` and an agent view for background sessions. Antigravity CLI's agent teams are still in preview.
+
+### Desktop Pairing
+
+Antigravity CLI pairs with Google's Antigravity desktop app and shares its settings. Claude Code pairs with Claude's own apps and IDE extensions.
+
+---
+
+## Run Both Side by Side
+
+You do not have to pick one in the abstract. Give the same task to both on your own repository and keep the better diff.
+
+[Superset](/) runs Claude Code and Antigravity CLI as built-in agents, each in its own Git worktree and terminal, on your own Claude plan and Google account. Create two workspaces from the same branch, start Claude Code in one and `agy` in the other with the same prompt, then compare the diffs in the Changes pane and open a pull request from the better one. Superset never proxies model calls. See [How to Compare Coding Agents Side by Side](/compare/compare-coding-agents-side-by-side).
+
+## Which Should You Choose?
+
+**Choose Claude Code if you:**
+
+- Want the richest set of parallel modes and extensions
+- Already pay for Claude Pro or Max
+- Do deep, multi-step work on large codebases
+
+**Choose Antigravity CLI if you:**
+
+- Want a free start with strong models
+- Use Google's Antigravity desktop app or Google Cloud
+- Want Gemini by default with Claude available in the same tool
+
+For the full field, see [Best AI Coding Agents in 2026](/compare/best-coding-agents).
+
+## Frequently Asked Questions
+
+### Is Antigravity CLI the same as Gemini CLI?
+
+No. Antigravity CLI (`agy`) replaced Gemini CLI for free, Google AI Pro, and Google AI Ultra users in 2026. Gemini CLI is still released and works with paid API keys and Code Assist licenses. Superset runs both.
+
+### Is Antigravity CLI free?
+
+Yes, with weekly limits. Google AI Pro and Ultra plans raise them. Claude Code has no free tier.
+
+### Can Antigravity CLI use Claude?
+
+Yes. Antigravity offers Claude Sonnet and Opus models inside its own harness, with a separate rate limit.
+
+### Can I run Claude Code and Antigravity CLI at the same time?
+
+Yes. Give each its own Git worktree so they do not edit the same files. In Superset, each runs in its own workspace on the same repository.

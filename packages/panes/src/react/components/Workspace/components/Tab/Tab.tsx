@@ -11,6 +11,7 @@ import type {
 	SplitPath,
 	Tab as TabType,
 } from "../../../../../types";
+import { useIsTabVisible } from "../../../../hooks/useIsTabVisible";
 import type {
 	ContextMenuActionConfig,
 	PaneActionConfig,
@@ -244,6 +245,7 @@ function LayoutNodeView<TData>({
 	onSplitResizeDragging?: TabProps<TData>["onSplitResizeDragging"];
 	parentDirection?: "horizontal" | "vertical" | null;
 }) {
+	const isTabVisible = useIsTabVisible();
 	// A persisted layout can be malformed — a split node with a missing
 	// child, or a corrupt node shape from an older schema. Render nothing
 	// rather than crashing the whole renderer on `node.type` of undefined.
@@ -260,7 +262,7 @@ function LayoutNodeView<TData>({
 				store={store}
 				tab={tab}
 				pane={pane}
-				isActive={tab.activePaneId === pane.id}
+				isActive={isTabVisible && tab.activePaneId === pane.id}
 				registry={registry}
 				paneActions={paneActions}
 				contextMenuActions={contextMenuActions}

@@ -123,7 +123,9 @@ export function DiffHeaderMetadata({
 				ref={actionsRef}
 				className={cn(
 					"flex shrink-0 items-center gap-1 transition-opacity duration-100",
-					!isEditing && !headerHovered && "pointer-events-none opacity-0",
+					!isEditing &&
+						!headerHovered &&
+						"pointer-events-none max-w-0 overflow-hidden opacity-0",
 				)}
 				data-diff-actions
 				data-editing={isEditing ? "" : undefined}

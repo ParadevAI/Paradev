@@ -8,6 +8,7 @@ import { createBrowserHistoryRouter } from "./browser-history";
 import { createChangesRouter } from "./changes";
 import { createConfigRouter } from "./config";
 import { createDeviceRouter } from "./device";
+import { createDictationRouter } from "./dictation";
 import { createDownloadsRouter } from "./downloads";
 import { createExternalRouter } from "./external";
 import { createFilesystemRouter } from "./filesystem";
@@ -62,6 +63,7 @@ export const createAppRouter = (getWindow: () => BrowserWindow | null) => {
 		system: createSystemRouter(),
 		config: createConfigRouter(),
 		device: createDeviceRouter(),
+		dictation: createDictationRouter(),
 		uiState: createUiStateRouter(),
 		ringtone: createRingtoneRouter(getWindow),
 		hostServiceCoordinator: createHostServiceCoordinatorRouter(),

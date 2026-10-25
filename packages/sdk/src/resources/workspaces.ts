@@ -116,6 +116,7 @@ export class Workspaces extends APIResource {
 				prompt: params.prompt,
 				model: params.model,
 				effort: params.effort,
+				machineSize: params.machineSize,
 			},
 			options,
 		);
@@ -215,6 +216,7 @@ export interface CloudWorkspace {
 	sandboxUrl: string | null;
 	hostVersion: string | null;
 	createdByUserId: string | null;
+	machineSize?: string | null;
 	createdAt: string;
 	updatedAt: string;
 	deletedAt: string | null;
@@ -242,6 +244,8 @@ export interface WorkspaceCreateParams {
 	model?: string;
 	/** Reasoning effort for the agent. Supported values depend on the agent; omit to use its default. */
 	effort?: string;
+	/** `small` (2 vCPU, 4 GB), `medium` (4 vCPU, 8 GB; the default) or `large` (8 vCPU, 16 GB); `xlarge` and `2xlarge` where the plan includes them. */
+	machineSize?: "small" | "medium" | "large" | "xlarge" | "2xlarge";
 }
 
 export interface WorkspaceUpdateParams {

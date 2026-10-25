@@ -2,23 +2,33 @@
 
 import { Trans, useLingui } from "@lingui/react/macro";
 import { authClient } from "@superset/auth/client";
-import { rawErrorMessage } from "@superset/i18n/errors";
-import { formatDate } from "@superset/i18n/format";
 import {
+	formatCurrency,
+	formatDate,
+	formatNumber,
+} from "@superset/i18n/format";
+import {
+	familyForPlan,
 	isPaymentFailingStatus,
+	offersYearlyDiscount,
+	PLAN_PRICE_CURRENCY,
+	type PlanFamily,
+	planForInterval,
 	resolveCurrentPlan,
+	seatPricePerMonth,
 } from "@superset/shared/billing";
+import { COMPANY } from "@superset/shared/constants";
 import { Button } from "@superset/ui/button";
 import { toast } from "@superset/ui/sonner";
 import { Switch } from "@superset/ui/switch";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import posthog from "posthog-js";
+import { cn } from "@superset/ui/utils";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { env } from "@/env";
 import { useTRPC } from "@/trpc/react";
-
-const PRO_MONTHLY_PRICE = 20;
-const PRO_YEARLY_PRICE = 15;
+import { CloudUsageCard } from "./components/CloudUsageCard";
+import { PlanChangeDialog } from "./components/PlanChangeDialog";
+import { useBillingActions } from "./hooks/useBillingActions";
+import { usePlanCatalog } from "./hooks/usePlanCatalog";
 
 interface BillingSettingsProps {
 	/**
@@ -27,17 +37,20 @@ interface BillingSettingsProps {
 	 * organization, and the two sessions do not share that choice.
 	 */
 	organizationId?: string;
+	selectedPlan?: string;
+	yearly?: boolean;
 }
 
-export function BillingSettings({ organizationId }: BillingSettingsProps) {
+export function BillingSettings({
+	organizationId,
+	selectedPlan,
+	yearly,
+}: BillingSettingsProps) {
 	const { t } = useLingui();
 	const trpc = useTRPC();
 	const queryClient = useQueryClient();
 	const { data: session, isPending: sessionPending } = authClient.useSession();
-	const [isYearly, setIsYearly] = useState(true);
-	const [isUpgrading, setIsUpgrading] = useState(false);
-	const [isCanceling, setIsCanceling] = useState(false);
-	const [isRestoring, setIsRestoring] = useState(false);
+	const [manualYearly, setIsYearly] = useState(yearly);
 
 	const activeOrganizationId = session?.session?.activeOrganizationId;
 	const switchingOrganization =
@@ -67,7 +80,7 @@ export function BillingSettings({ organizationId }: BillingSettingsProps) {
 		trpc.organization.listMembers.queryOptions({ includeDeactivated: false }),
 	);
 	const { data: activePlan } = useQuery(trpc.billing.activePlan.queryOptions());
-	const portal = useMutation(trpc.billing.portal.mutationOptions());
+	const isYearly = manualYearly ?? activePlan?.billingInterval !== "month";
 
 	const organization = organizations?.find(
 		(candidate) => candidate.id === activeOrganizationId,
@@ -86,6 +99,26 @@ export function BillingSettings({ organizationId }: BillingSettingsProps) {
 		subscriptionsLoaded: activePlan !== undefined,
 	});
 	const cancelAt = activePlan?.cancelAt;
+	const usesAutumn = activePlan?.billingProvider === "autumn";
+	const catalogQuery = usePlanCatalog({
+		organizationId: activeOrganizationId,
+		enabled: usesAutumn,
+	});
+	const catalog = catalogQuery.data ?? [];
+	const scheduledAt = activePlan?.scheduledAt;
+	const nextPlanName = activePlan?.scheduledPlanId
+		? (familyForPlan(catalog, activePlan.scheduledPlanId)?.family.name ?? null)
+		: null;
+	const isSwitching = Boolean(nextPlanName && scheduledAt);
+	const currentFamily =
+		plan === "pro"
+			? (familyForPlan(catalog, activePlan?.autumnPlanId)?.family ?? null)
+			: null;
+	const subscriptionInterval =
+		activePlan?.billingInterval === "year" ||
+		activePlan?.billingInterval === "month"
+			? activePlan.billingInterval
+			: null;
 	const periodEnd = activePlan?.periodEnd;
 	const isPaymentFailing = isPaymentFailingStatus(activePlan?.status);
 
@@ -94,104 +127,35 @@ export function BillingSettings({ organizationId }: BillingSettingsProps) {
 			queryKey: trpc.billing.activePlan.queryKey(),
 		});
 
-	const handleUpgrade = async () => {
-		if (!activeOrganizationId || memberCount === undefined) return;
+	const {
+		upgrade,
+		cancel: handleCancel,
+		restore: handleRestore,
+		openPortal,
+		isUpgrading,
+		isCanceling,
+		isRestoring,
+		isOpeningPortal,
+		pendingChange,
+		confirmChange,
+		dismissChange,
+		isConfirming,
+	} = useBillingActions({
+		activeOrganizationId,
+		activePlan,
+		plan,
+		invalidatePlan,
+	});
 
-		// Same event names and shape as the desktop's two checkout entry points;
-		// `source` is what separates this one in the funnel.
-		const checkoutProperties = {
-			plan: "pro",
-			annual: isYearly,
+	const handleUpgrade = async (family: PlanFamily) => {
+		const target = planForInterval(family, isYearly);
+		if (memberCount === undefined || !target) return;
+		await upgrade({
+			planId: target.id,
+			planName: family.name,
+			annual: target.interval === "year",
 			seats: memberCount,
-			previous_plan: plan,
-			source: "web_billing",
-		};
-		posthog.capture("checkout_started", checkoutProperties);
-
-		setIsUpgrading(true);
-		try {
-			await authClient.subscription.upgrade(
-				{
-					plan: "pro",
-					referenceId: activeOrganizationId,
-					annual: isYearly,
-					seats: memberCount,
-					successUrl: `${env.NEXT_PUBLIC_WEB_URL}/settings/billing?success=true`,
-					cancelUrl: `${env.NEXT_PUBLIC_WEB_URL}/settings/billing`,
-					returnUrl: `${env.NEXT_PUBLIC_WEB_URL}/settings/billing`,
-					disableRedirect: true,
-				},
-				{
-					onSuccess: (ctx) => {
-						if (ctx.data?.url) {
-							posthog.capture("checkout_redirected", checkoutProperties);
-							window.location.assign(ctx.data.url);
-						}
-					},
-					onError: (ctx) => {
-						posthog.capture("checkout_failed", {
-							...checkoutProperties,
-							status: ctx.response?.status,
-							error: rawErrorMessage(ctx.error),
-						});
-						toast.error(
-							t({ message: "Could not start checkout. Please try again." }),
-						);
-					},
-				},
-			);
-		} finally {
-			setIsUpgrading(false);
-			await invalidatePlan();
-		}
-	};
-
-	const handleCancel = async () => {
-		if (!activeOrganizationId) return;
-		setIsCanceling(true);
-		try {
-			await authClient.subscription.cancel(
-				{
-					referenceId: activeOrganizationId,
-					returnUrl: `${env.NEXT_PUBLIC_WEB_URL}/settings/billing`,
-				},
-				{
-					onSuccess: (ctx) => {
-						if (ctx.data?.url) window.location.assign(ctx.data.url);
-					},
-				},
-			);
-		} finally {
-			setIsCanceling(false);
-			await invalidatePlan();
-		}
-	};
-
-	const handleRestore = async () => {
-		if (!activeOrganizationId) return;
-		setIsRestoring(true);
-		try {
-			await authClient.subscription.restore({
-				referenceId: activeOrganizationId,
-			});
-			toast.success(t({ message: "Plan restored" }));
-		} finally {
-			setIsRestoring(false);
-			await invalidatePlan();
-		}
-	};
-
-	const openPortal = (flowType: "general" | "payment_method_update") => {
-		portal.mutate(
-			{ flowType },
-			{
-				onSuccess: ({ url }) => window.location.assign(url),
-				onError: () =>
-					toast.error(
-						t({ message: "Could not open billing. Please try again." }),
-					),
-			},
-		);
+		});
 	};
 
 	if (sessionPending || switchingOrganization || activePlan === undefined) {
@@ -202,22 +166,34 @@ export function BillingSettings({ organizationId }: BillingSettingsProps) {
 		);
 	}
 
-	const planLabel = {
-		free: t({ message: "Free" }),
-		pro: t({ message: "Pro" }),
-		enterprise: t({ message: "Enterprise" }),
-	}[plan];
+	const planLabel = currentFamily
+		? currentFamily.name
+		: {
+				free: t({ message: "Free" }),
+				pro: t({ message: "Pro" }),
+				enterprise: t({ message: "Enterprise" }),
+			}[plan];
 
 	const planHint =
 		plan === "enterprise"
 			? t({ message: "Managed by your organization admin." })
-			: cancelAt
+			: isSwitching && scheduledAt
 				? t({
-						message: `Cancels ${formatDate(cancelAt)} — downgrades to Free at the end of the billing period.`,
+						message: `Switches to ${nextPlanName} on ${formatDate(scheduledAt)}.`,
 					})
-				: plan === "pro" && periodEnd
-					? t({ message: `Renews ${formatDate(periodEnd)}.` })
-					: null;
+				: cancelAt
+					? t({
+							message: `Cancels ${formatDate(cancelAt)} — downgrades to Free at the end of the billing period.`,
+						})
+					: plan === "pro" && periodEnd
+						? t({ message: `Renews ${formatDate(periodEnd)}.` })
+						: null;
+	const seatHint =
+		plan === "pro" && !cancelAt && !isPaymentFailing && periodEnd
+			? t({
+					message: `Seats removed mid-cycle stay active until ${formatDate(periodEnd)}.`,
+				})
+			: null;
 
 	return (
 		<div className="mx-auto max-w-2xl space-y-8">
@@ -244,7 +220,7 @@ export function BillingSettings({ organizationId }: BillingSettingsProps) {
 							size="sm"
 							variant="outline"
 							className="shrink-0"
-							disabled={portal.isPending}
+							disabled={isOpeningPortal}
 							onClick={() => openPortal("payment_method_update")}
 						>
 							<Trans>Update payment method</Trans>
@@ -261,10 +237,13 @@ export function BillingSettings({ organizationId }: BillingSettingsProps) {
 					{planHint && (
 						<div className="mt-1 text-sm text-muted-foreground">{planHint}</div>
 					)}
+					{seatHint && (
+						<div className="mt-1 text-sm text-muted-foreground">{seatHint}</div>
+					)}
 				</div>
 				{plan === "pro" && isOwner && (
 					<div className="shrink-0">
-						{cancelAt ? (
+						{cancelAt || isSwitching ? (
 							<Button
 								variant="outline"
 								size="sm"
@@ -273,6 +252,8 @@ export function BillingSettings({ organizationId }: BillingSettingsProps) {
 							>
 								{isRestoring ? (
 									<Trans>Restoring...</Trans>
+								) : isSwitching ? (
+									<Trans>Keep {planLabel}</Trans>
 								) : (
 									<Trans>Restore plan</Trans>
 								)}
@@ -296,61 +277,127 @@ export function BillingSettings({ organizationId }: BillingSettingsProps) {
 				)}
 			</div>
 
-			{plan === "free" && (
-				<div className="space-y-4 border-t pt-6">
-					<div>
-						<div className="text-sm font-medium">
-							<Trans>Upgrade to Pro</Trans>
+			<CloudUsageCard
+				organizationId={activeOrganizationId ?? null}
+				canBuy={isOwner}
+			/>
+
+			{(plan === "free" || (plan === "pro" && usesAutumn && !cancelAt)) &&
+				(catalog.length > 0 || catalogQuery.isError) && (
+					<div className="space-y-4 border-t pt-6">
+						<div>
+							<div className="text-sm font-medium">
+								{plan === "free" ? (
+									<Trans>Upgrade your plan</Trans>
+								) : (
+									<Trans>Change plan</Trans>
+								)}
+							</div>
+							<div className="mt-1 text-sm text-muted-foreground">
+								<Trans>
+									Every paid plan includes Superset Mobile, automations, and
+									priority support. Plans with cloud workspaces give your team
+									one shared pool of GB-hours.
+								</Trans>
+							</div>
 						</div>
-						<div className="mt-1 text-sm text-muted-foreground">
-							<Trans>
-								Superset Mobile, cloud workspaces, automations, and priority
-								support.
-							</Trans>
+						{catalogQuery.isError && (
+							<div className="flex items-center gap-3 text-sm text-muted-foreground">
+								<Trans>Could not load plans.</Trans>
+								<Button
+									size="sm"
+									variant="outline"
+									onClick={() => catalogQuery.refetch()}
+								>
+									<Trans>Retry</Trans>
+								</Button>
+							</div>
+						)}
+						{catalog.some(offersYearlyDiscount) && (
+							<div className="flex items-center gap-2 text-sm text-muted-foreground">
+								<Switch
+									checked={isYearly}
+									onCheckedChange={setIsYearly}
+									aria-label={t({ message: "Billed yearly" })}
+								/>
+								{isYearly ? (
+									<Trans>Billed yearly</Trans>
+								) : (
+									<Trans>Billed monthly</Trans>
+								)}
+							</div>
+						)}
+						<div className="divide-y rounded-md border">
+							{catalog.map((family) => {
+								const price = formatCurrency(
+									seatPricePerMonth(family, isYearly),
+									PLAN_PRICE_CURRENCY,
+									{ minimumFractionDigits: 0 },
+								);
+								const gbHours = family.gbMinutesPerSeat
+									? formatNumber(family.gbMinutesPerSeat / 60)
+									: null;
+								const isCurrent =
+									family.family === currentFamily?.family &&
+									(subscriptionInterval === null ||
+										planForInterval(family, isYearly)?.interval ===
+											subscriptionInterval);
+								return (
+									<div
+										key={family.family}
+										className={cn(
+											"flex items-center justify-between gap-4 p-4",
+											family.family === selectedPlan &&
+												!isCurrent &&
+												"bg-accent/60 ring-2 ring-inset ring-primary",
+										)}
+									>
+										<div className="min-w-0">
+											<div className="text-sm font-medium">{family.name}</div>
+											<div className="mt-1 text-sm text-muted-foreground">
+												{gbHours ? (
+													<Trans>
+														{price} per user/month, {gbHours} cloud GB-hours per
+														seat each month
+													</Trans>
+												) : (
+													<Trans>{price} per user/month</Trans>
+												)}
+											</div>
+										</div>
+										{isOwner && (
+											<Button
+												size="sm"
+												className="shrink-0"
+												variant={isCurrent ? "secondary" : "default"}
+												disabled={
+													isCurrent || isUpgrading || memberCount === undefined
+												}
+												onClick={() => handleUpgrade(family)}
+											>
+												{isCurrent ? (
+													<Trans>Current plan</Trans>
+												) : plan === "free" ? (
+													<Trans>Upgrade</Trans>
+												) : (
+													<Trans>Switch plan</Trans>
+												)}
+											</Button>
+										)}
+									</div>
+								);
+							})}
 						</div>
-					</div>
-					<div className="flex items-baseline gap-2">
-						<span className="text-2xl font-semibold">
-							${isYearly ? PRO_YEARLY_PRICE : PRO_MONTHLY_PRICE}
-						</span>
-						<span className="text-sm text-muted-foreground">
-							<Trans>per user/month</Trans>
-						</span>
-					</div>
-					<div className="flex items-center gap-2 text-sm text-muted-foreground">
-						<Switch
-							checked={isYearly}
-							onCheckedChange={setIsYearly}
-							aria-label={t({ message: "Billed yearly" })}
-						/>
-						{isYearly ? (
-							<Trans>Billed yearly</Trans>
-						) : (
-							<Trans>Billed monthly</Trans>
+						{!isOwner && (
+							<p className="text-sm text-muted-foreground">
+								<Trans>
+									Only an organization owner can change the plan. Ask yours to
+									upgrade.
+								</Trans>
+							</p>
 						)}
 					</div>
-					{isOwner ? (
-						<Button
-							className="w-full sm:w-auto"
-							onClick={handleUpgrade}
-							disabled={isUpgrading || memberCount === undefined}
-						>
-							{isUpgrading ? (
-								<Trans>Redirecting...</Trans>
-							) : (
-								<Trans>Upgrade to Pro</Trans>
-							)}
-						</Button>
-					) : (
-						<p className="text-sm text-muted-foreground">
-							<Trans>
-								Only an organization owner can change the plan. Ask yours to
-								upgrade.
-							</Trans>
-						</p>
-					)}
-				</div>
-			)}
+				)}
 
 			{plan === "pro" && isOwner && (
 				<div className="flex items-center justify-between gap-8 border-t pt-6">
@@ -363,7 +410,7 @@ export function BillingSettings({ organizationId }: BillingSettingsProps) {
 						variant="outline"
 						size="sm"
 						className="shrink-0"
-						disabled={portal.isPending}
+						disabled={isOpeningPortal}
 						onClick={() => openPortal("general")}
 					>
 						<Trans>Manage billing</Trans>
@@ -374,15 +421,18 @@ export function BillingSettings({ organizationId }: BillingSettingsProps) {
 			<p className="border-t pt-6 text-sm text-muted-foreground">
 				<Trans>
 					For questions about billing,{" "}
-					<a
-						href="mailto:support@superset.sh"
-						className="text-primary hover:underline"
-					>
+					<a href={COMPANY.MAIL_TO} className="text-primary hover:underline">
 						contact us
 					</a>
 					.
 				</Trans>
 			</p>
+			<PlanChangeDialog
+				change={pendingChange}
+				isConfirming={isConfirming}
+				onConfirm={confirmChange}
+				onDismiss={dismissChange}
+			/>
 		</div>
 	);
 }

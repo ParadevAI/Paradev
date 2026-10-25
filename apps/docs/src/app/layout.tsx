@@ -4,6 +4,7 @@ import { RootProvider } from "fumadocs-ui/provider/next";
 import type { Metadata } from "next";
 import { initServerI18n } from "@/lib/i18n-server";
 import "./global.css";
+import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import { Inter } from "next/font/google";
 import { NavigationBar } from "@/app/components/NavigationBar";
@@ -19,40 +20,40 @@ export async function generateMetadata(): Promise<Metadata> {
 	return {
 		metadataBase: new URL(COMPANY.DOCS_URL),
 		title: {
-			default: i18n._(msg({ message: `${COMPANY.NAME} Documentation` })),
-			template: i18n._(msg({ message: `%s | ${COMPANY.NAME} Docs` })),
+			default: i18n._(msg({ message: `${BRAND.INTRO_NAME} Documentation` })),
+			template: i18n._(msg({ message: `%s | ${BRAND.NAME} Docs` })),
 		},
 		description: i18n._(
 			msg({
-				message: `Official documentation for ${COMPANY.NAME}. Learn how to run 100+ coding agents in parallel on your machine.`,
+				message: `Official documentation for ${BRAND.INTRO_NAME}. Learn how to run 100+ coding agents in parallel on your machine.`,
 			}),
 		),
 		keywords: [
-			`${COMPANY.NAME} documentation`,
+			`${BRAND.NAME} documentation`,
 			"coding agents docs",
 			"parallel execution guide",
 			"developer tools",
 		],
-		authors: [{ name: `${COMPANY.NAME} Team` }],
-		creator: COMPANY.NAME,
+		authors: [{ name: `${BRAND.NAME} Team` }],
+		creator: BRAND.NAME,
 		openGraph: {
 			type: "website",
 			locale: `${ogLocale.language}_${ogLocale.region}`,
 			url: COMPANY.DOCS_URL,
-			siteName: `${COMPANY.NAME} Docs`,
-			title: i18n._(msg({ message: `${COMPANY.NAME} Documentation` })),
+			siteName: `${BRAND.NAME} Docs`,
+			title: i18n._(msg({ message: `${BRAND.INTRO_NAME} Documentation` })),
 			description: i18n._(
 				msg({
-					message: `Official documentation for ${COMPANY.NAME}, the app for running 100+ coding agents in parallel.`,
+					message: `Official documentation for ${BRAND.INTRO_NAME}, the app for running 100+ coding agents in parallel.`,
 				}),
 			),
 		},
 		twitter: {
 			card: "summary_large_image",
-			title: i18n._(msg({ message: `${COMPANY.NAME} Documentation` })),
+			title: i18n._(msg({ message: `${BRAND.INTRO_NAME} Documentation` })),
 			description: i18n._(
 				msg({
-					message: `Official documentation for ${COMPANY.NAME}, the app for running 100+ coding agents in parallel.`,
+					message: `Official documentation for ${BRAND.INTRO_NAME}, the app for running 100+ coding agents in parallel.`,
 				}),
 			),
 			creator: "@superset_sh",

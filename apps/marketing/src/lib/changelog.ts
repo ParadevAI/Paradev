@@ -1,8 +1,14 @@
 import fs from "node:fs";
 import path from "node:path";
+import {
+	type ReleaseNote,
+	releaseHighlightSchema,
+} from "@superset/shared/release-notes";
 import matter from "gray-matter";
+import { z } from "zod";
 import { type ChangelogEntry, slugify } from "./changelog-utils";
 import { normalizeContentDate } from "./content-utils";
+import { getPublicImageSize } from "./public-image-size";
 
 export {
 	type ChangelogEntry,
@@ -27,6 +33,15 @@ function parseFrontmatter(filePath: string): ChangelogEntry | null {
 			description: data.description,
 			date: dateValue,
 			image: data.image,
+			imageSize: data.image
+				? (getPublicImageSize(data.image) ?? undefined)
+				: undefined,
+			version: data.version,
+			highlights: z
+				.array(releaseHighlightSchema)
+				.optional()
+				.catch(undefined)
+				.parse(data.highlights),
 			content,
 			draft: data.draft === true,
 		};
@@ -62,6 +77,26 @@ export function getChangelogEntry(slug: string): ChangelogEntry | undefined {
 
 	const entry = parseFrontmatter(filePath) ?? undefined;
 	return entry?.draft ? undefined : entry;
+}
+
+export function getReleaseNotes(
+	entries: ChangelogEntry[],
+	baseUrl: string,
+): ReleaseNote[] {
+	return entries.flatMap((entry) =>
+		entry.version && entry.highlights?.length
+			? [
+					{
+						version: entry.version,
+						date: entry.date,
+						title: entry.title,
+						image: entry.image ? new URL(entry.image, baseUrl).href : null,
+						url: new URL(entry.url, baseUrl).href,
+						highlights: entry.highlights,
+					},
+				]
+			: [],
+	);
 }
 
 export function extractToc(

@@ -225,8 +225,10 @@ release's probe):
   rewritten, bundle published, golden built with the internal `setup` hook,
   probe fork passes 11.4 plus the dev stack from the `start` hook, rows
   written only after; a failed probe leaves the previous rows intact.
-- [ ] **11.7 Rollback** — point `environments.bundle_sha` at the previous sha
-  (`environment.update`); the next wake flips `current` with no download.
+- [ ] **11.7 Rollback** — insert the previous sha as a new `sandbox_bundles`
+  row (so environments created from now on pin to it) and set
+  `environments.bundle_sha` to it on the rows to move; no API does this. The
+  next wake flips `current` with no download.
 
 Superseded by v2 (kept for the shape of the trap): 2.2–2.5 (`/app`, root,
 `start.sh` → the bundle's runtime under `/opt/superset/host`, `ubuntu`,

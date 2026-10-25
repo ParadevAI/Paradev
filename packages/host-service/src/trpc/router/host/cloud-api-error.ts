@@ -1,4 +1,5 @@
 import { TRPCError } from "@trpc/server";
+import { SESSION_REJECTED_ERROR_NAME } from "../../../providers/auth/JwtAuthProvider";
 
 /**
  * Node and undici codes meaning the request never reached our cloud API:
@@ -77,5 +78,28 @@ export function rethrowCloudUnreachable(error: unknown): void {
 	throw new TRPCError({
 		code: "SERVICE_UNAVAILABLE",
 		message: `Could not reach the Superset cloud API: ${message}`,
+	});
+}
+
+function hasSessionRejectedCause(error: unknown): boolean {
+	let current: unknown = error;
+	for (let depth = 0; depth < MAX_CAUSE_DEPTH; depth++) {
+		if (typeof current !== "object" || current === null) return false;
+		const link = current as { name?: unknown; cause?: unknown };
+		if (link.name === SESSION_REJECTED_ERROR_NAME) return true;
+		current = link.cause;
+	}
+	return false;
+}
+
+/**
+ * Rethrows as UNAUTHORIZED when the cloud API refused to mint a JWT for the
+ * host's session: the user signed out elsewhere or the session expired.
+ */
+export function rethrowSessionRejected(error: unknown): void {
+	if (!hasSessionRejectedCause(error)) return;
+	throw new TRPCError({
+		code: "UNAUTHORIZED",
+		message: "The Superset session of this host is no longer valid.",
 	});
 }

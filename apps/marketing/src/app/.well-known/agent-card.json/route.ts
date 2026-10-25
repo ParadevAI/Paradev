@@ -1,3 +1,4 @@
+import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import { API_URL, MCP_SERVER_URL } from "@/lib/llms";
 
@@ -8,11 +9,11 @@ export function GET() {
 		protocolVersion: "0.3.0",
 		name: "Superset",
 		description:
-			"Superset runs parallel AI coding agents in isolated Git worktrees. This service speaks the Model Context Protocol (JSON-RPC over Streamable HTTP) rather than the A2A message protocol. Connect an MCP client to the URL below to create workspaces, launch coding agents, schedule automations, and manage tasks on behalf of a Superset user.",
+			"Superset runs parallel AI coding agents in isolated Git worktrees. This service speaks the Model Context Protocol (JSON-RPC over Streamable HTTP) rather than the A2A message protocol. Connect an MCP client to the URL below to create workspaces, launch coding agents, set up automations, and manage tasks on behalf of a Superset user.",
 		url: MCP_SERVER_URL,
 		preferredTransport: "JSONRPC",
 		provider: {
-			organization: COMPANY.NAME,
+			organization: BRAND.INTRO_NAME,
 			url: baseUrl,
 		},
 		version: "1.0.0",
@@ -60,10 +61,10 @@ export function GET() {
 			},
 			{
 				id: "automations",
-				name: "Scheduled automations",
+				name: "Automations",
 				description:
-					"Schedule recurring agent runs with RFC 5545 RRULEs, pause/resume/dispatch them, and read run logs.",
-				tags: ["automation", "scheduling"],
+					"Run agents on RFC 5545 RRULE schedules or on events from GitHub, Slack, Linear, Sentry, Notion, Microsoft Teams, or a webhook; pause/resume/dispatch them, and read run logs.",
+				tags: ["automation", "scheduling", "triggers"],
 			},
 			{
 				id: "tasks",

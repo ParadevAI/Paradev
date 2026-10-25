@@ -139,12 +139,12 @@ export const AUTOMATIONS: AutomationRow[] = [
 		}),
 	},
 	{
-		name: "roadmap-sync",
+		name: "pr-review",
 		schedule: msg({
-			message: "monthly",
+			message: "on review request",
 		}),
 		lastRun: msg({
-			message: "✓ 3d ago",
+			message: "✓ 12m ago",
 		}),
 	},
 ];
