@@ -1,4 +1,4 @@
-import { afterEach, expect, mock, test } from "bun:test";
+import { afterEach, expect, mock, spyOn, test } from "bun:test";
 import { act, cleanup, fireEvent, render } from "@testing-library/react";
 import type { ComponentProps } from "react";
 import { AccountTerminalForm } from "./AccountTerminalForm";
@@ -306,4 +306,28 @@ test("native chat mode submits the selected login once and keeps failure visible
 		"Account chat unavailable on this host",
 	);
 	expect(input.onCancel).not.toHaveBeenCalled();
+});
+
+test("a response received after mount stays visible immediately without waiting for the age timer", () => {
+	const input = props();
+	let time = Date.now();
+	const clock = spyOn(Date, "now").mockImplementation(() => time);
+	try {
+		const readings = quotas(20);
+		readings[0].fetchedAt = new Date(time);
+		const view = render(
+			<AccountTerminalForm {...input} provider="claude" quotas={readings} />,
+		);
+		expect(view.getByText("80% remaining")).toBeTruthy();
+		time += 1_000;
+		const refreshed = quotas(10);
+		refreshed[0].fetchedAt = new Date(time);
+		view.rerender(
+			<AccountTerminalForm {...input} provider="claude" quotas={refreshed} />,
+		);
+		expect(view.getByText("90% remaining")).toBeTruthy();
+		expect(view.queryByText("Usage unavailable")).toBeNull();
+	} finally {
+		clock.mockRestore();
+	}
 });
