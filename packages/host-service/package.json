@@ -85,6 +85,7 @@
 		"@superset/agent-setup": "workspace:*",
 		"@superset/chat": "workspace:*",
 		"@superset/chat-runtime": "workspace:*",
+		"@superset/macos-process-metrics": "workspace:*",
 		"@superset/port-scanner": "workspace:*",
 		"@superset/pty-daemon": "workspace:*",
 		"@superset/shared": "workspace:*",

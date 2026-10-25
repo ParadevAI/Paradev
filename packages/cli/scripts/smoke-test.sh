@@ -33,9 +33,17 @@ fi
 # Native addon require() probes. Run from /tmp so Node's module resolution
 # doesn't walk up into a host repo's node_modules and shadow the bundle.
 ( cd /tmp && NODE_PATH="$DIST/lib/node_modules" "$DIST/lib/node" -e '
-	for (const m of ["better-sqlite3", "node-pty", "@parcel/watcher"]) {
+	for (const m of ["better-sqlite3", "node-pty", "@parcel/watcher", "@superset/macos-process-metrics"]) {
 		require(m);
 		console.log("[smoke]", m, "OK");
+	}
+	if (process.platform === "darwin") {
+		const fs = require("node:fs");
+		const metrics = require("@superset/macos-process-metrics");
+		const actual = metrics.getExecutablePath(process.pid);
+		if (!actual || fs.realpathSync(actual) !== fs.realpathSync(process.execPath)) {
+			throw new Error("[smoke] bundled macOS executable verifier unavailable");
+		}
 	}
 ' )
 

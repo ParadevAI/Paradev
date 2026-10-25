@@ -1,11 +1,12 @@
 import { createHash, randomUUID } from "node:crypto";
 import { isAbsolute } from "node:path";
 import { TRPCError } from "@trpc/server";
-import { and, eq, inArray, isNull, ne, or } from "drizzle-orm";
+import { and, eq, inArray, isNull, like, ne, or } from "drizzle-orm";
 import type { HostDb } from "../../../db";
 import { terminalAgentBindings, workspaces } from "../../../db/schema";
 import type { EventBus } from "../../../events";
 import { resolveHostAgentConfig } from "../../../terminal-agents/agent-config";
+import { claimNativeSession } from "../../../terminal-agents/native-session-lease";
 import { validateAccountAuthRouting } from "../agents/account-auth-routing";
 import type { AgentRunInput, AgentRunResult } from "../agents/agents";
 import {
@@ -149,6 +150,7 @@ function assertNoCompetingBinding(
 				ne(terminalAgentBindings.terminalId, source.terminalId),
 				or(
 					inArray(terminalAgentBindings.endReason, PREPARING_REASONS),
+					like(terminalAgentBindings.endReason, "background-attach:%"),
 					isNull(terminalAgentBindings.endedAt),
 					and(
 						eq(terminalAgentBindings.endReason, "resumed"),
@@ -178,8 +180,6 @@ export interface ResumeWithAccountDeps {
 	assertNoClaudeWriter?: typeof assertNoRecordedClaudeWriter;
 }
 
-const inFlight = new Set<string>();
-
 export async function resumeTerminalWithAccount(
 	deps: ResumeWithAccountDeps,
 	input: ResumeWithAccountInput,
@@ -201,9 +201,15 @@ export async function resumeTerminalWithAccount(
 		});
 	const config = source.config;
 	const workspace = source.workspace;
-	const key = `${source.binding.agentId}:${source.binding.agentSessionId}`;
-	if (inFlight.has(key)) changed();
-	inFlight.add(key);
+	let release: () => void;
+	try {
+		release = claimNativeSession(
+			source.binding.agentId,
+			source.binding.agentSessionId,
+		);
+	} catch {
+		changed();
+	}
 	let claimed = false;
 	let launchAuthorized = false;
 	const terminalId = randomUUID();
@@ -370,6 +376,6 @@ export async function resumeTerminalWithAccount(
 		}
 		throw error;
 	} finally {
-		inFlight.delete(key);
+		release();
 	}
 }

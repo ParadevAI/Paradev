@@ -56,6 +56,7 @@ const RUNTIME_PACKAGES = [
 	"node-pty",
 	"@parcel/watcher",
 	"@xterm/headless",
+	"@superset/macos-process-metrics",
 ] as const;
 
 /**
@@ -445,6 +446,20 @@ async function main(): Promise<void> {
 
 	console.log("[build-dist] fixing native binaries for Node runtime");
 	await fixNativeBinariesForNode(join(stagingRoot, "lib"), target);
+
+	// The macOS recovery verifier needs the kernel image, not a launcher path.
+	// Fail this matching-platform build if the copied N-API addon was skipped.
+	if (target.startsWith("darwin-")) {
+		await exec(join(stagingRoot, "lib", "node"), [
+			"-e",
+			`const fs = require("node:fs");
+const metrics = require(${JSON.stringify(join(stagingRoot, "lib", "node_modules", "@superset", "macos-process-metrics"))});
+const actual = metrics.getExecutablePath(process.pid);
+if (!actual || fs.realpathSync(actual) !== fs.realpathSync(process.execPath)) {
+  throw new Error("The macOS executable verifier is missing or built for another target");
+}`,
+		]);
+	}
 
 	console.log("[build-dist] copying migrations");
 	const migrationsSrc = resolve(import.meta.dir, "../../host-service/drizzle");

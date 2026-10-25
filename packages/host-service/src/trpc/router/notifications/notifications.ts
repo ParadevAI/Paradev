@@ -12,6 +12,7 @@ import {
 	captureSessionAccount,
 	sameSessionAccountContext,
 } from "../usage/session-account/session-account";
+import { queueBackgroundSuccessorRefresh } from "./background-successor-adapter";
 import { fanOutAgentLifecycle } from "./fan-out-agent-lifecycle";
 import { showDesktopNotification } from "./show-desktop-notification";
 
@@ -77,6 +78,7 @@ function normalizeAgentIdentity(
 
 export function createNotificationsRouter(
 	captureAccount = captureSessionAccount,
+	backgroundRefresh = queueBackgroundSuccessorRefresh,
 ) {
 	return router({
 		/** A notification sent with `superset notifications show`, shown by the attached desktop app. */
@@ -115,6 +117,32 @@ export function createNotificationsRouter(
 				.sync();
 			if (!terminalSession?.originWorkspaceId) {
 				return { success: true, ignored: true as const };
+			}
+
+			// An authenticated predecessor hook only triggers a fresh native read.
+			// Its old event, preview and receipt timestamp never become successor data.
+			const predecessor = ctx.terminalAgentStore.getProvenance(
+				input.terminalId,
+			);
+			const predecessorAgent = normalizeAgentIdentity(input.agent);
+			if (
+				predecessor?.endReason === "resumed" &&
+				predecessor.agentId === "claude" &&
+				predecessor.endedAt !== undefined &&
+				predecessorAgent?.agentId === "claude" &&
+				predecessorAgent.sessionId === predecessor.agentSessionId &&
+				input.launchId === predecessor.launchId &&
+				input.launchId &&
+				predecessorAgent.sessionId &&
+				verifyAttributionToken(input.terminalId, input.attributionToken)
+			) {
+				const accepted = await backgroundRefresh(ctx, {
+					terminalId: input.terminalId,
+					launchId: input.launchId,
+					sessionId: predecessorAgent.sessionId,
+					attributionToken: input.attributionToken,
+				}).catch(() => false);
+				if (accepted) return { success: true, ignored: false as const };
 			}
 
 			const occurredAt = Date.now();
