@@ -142,7 +142,6 @@ export function AcpChatPane({
 	const [completedRecoveries, setCompletedRecoveries] = useState(0);
 	const [accountRecoveryPaused, setAccountRecoveryPaused] = useState(false);
 	const [accountStopRequested, setAccountStopRequested] = useState(false);
-	const [unreachable, setUnreachable] = useState(false);
 	const [replacement, setReplacement] = useState<string | null>(null);
 
 	// The stored session outlives its process — after a host restart the row
