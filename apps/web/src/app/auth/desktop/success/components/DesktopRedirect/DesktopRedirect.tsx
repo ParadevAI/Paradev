@@ -14,7 +14,9 @@ export function DesktopRedirect({
 	url: string;
 	localCallbackUrl?: string;
 }) {
-	const [handedOff, setHandedOff] = useState(false);
+	const [status, setStatus] = useState<"opening" | "opened" | "not-opened">(
+		"opening",
+	);
 	const target = localCallbackUrl ?? url;
 	const appName = BRAND.NAME;
 
@@ -22,12 +24,16 @@ export function DesktopRedirect({
 		// Full-page navigation, not fetch: browsers block mixed-content subresources, not navigations.
 		window.location.href = target;
 
-		const markHandedOff = () => setHandedOff(true);
-		const timer = window.setTimeout(markHandedOff, HAND_OFF_DELAY_MS);
-		window.addEventListener("blur", markHandedOff);
+		const markOpened = () => setStatus("opened");
+		const timer = window.setTimeout(() => {
+			setStatus((current) =>
+				current === "opening" && document.hasFocus() ? "not-opened" : current,
+			);
+		}, HAND_OFF_DELAY_MS);
+		window.addEventListener("blur", markOpened);
 		return () => {
 			window.clearTimeout(timer);
-			window.removeEventListener("blur", markHandedOff);
+			window.removeEventListener("blur", markOpened);
 		};
 	}, [target]);
 
@@ -35,8 +41,10 @@ export function DesktopRedirect({
 		<DesktopAuthCard
 			title={<Trans>You're signed in</Trans>}
 			description={
-				handedOff ? (
+				status === "opened" ? (
 					<Trans>You can close this tab.</Trans>
+				) : status === "not-opened" ? (
+					<Trans>Didn't open? Use the link below.</Trans>
 				) : (
 					<Trans>Opening {appName}…</Trans>
 				)

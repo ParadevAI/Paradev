@@ -5366,6 +5366,9 @@ msgstr "Impossible de nommer « {name} » automatiquement"
 msgid "Couldn't open the screenshot"
 msgstr "Impossible d'ouvrir la capture d'écran"
 
+msgid "Couldn't open your browser. Try again."
+msgstr "Impossible d'ouvrir votre navigateur. Réessayez."
+
 msgid "Couldn't parse this diff: {patchParseError}"
 msgstr "Impossible d'analyser ce diff : {patchParseError}"
 
@@ -6320,6 +6323,9 @@ msgstr "La dictée n'est pas disponible pour le moment"
 
 msgid "Didn't hear back"
 msgstr "Aucune réponse"
+
+msgid "Didn't open? Use the link below."
+msgstr "Rien ne s'est ouvert ? Utilisez le lien ci-dessous."
 
 msgid "diff"
 msgstr "diff"

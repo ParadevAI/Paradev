@@ -5366,6 +5366,9 @@ msgstr "Не удалось автоматически назвать «{name}»
 msgid "Couldn't open the screenshot"
 msgstr "Не удалось открыть снимок экрана"
 
+msgid "Couldn't open your browser. Try again."
+msgstr "Не удалось открыть браузер. Попробуйте ещё раз."
+
 msgid "Couldn't parse this diff: {patchParseError}"
 msgstr "Не удалось разобрать этот diff: {patchParseError}"
 
@@ -6320,6 +6323,9 @@ msgstr "Диктовка сейчас недоступна"
 
 msgid "Didn't hear back"
 msgstr "Ответа не поступило"
+
+msgid "Didn't open? Use the link below."
+msgstr "Не открылось? Воспользуйтесь ссылкой ниже."
 
 msgid "diff"
 msgstr "diff"
@@ -9604,7 +9610,7 @@ msgid "Last used"
 msgstr "Использовался последним"
 
 msgid "Last used: {lastUsedProviderLabel}"
-msgstr "Использовался последним: {lastUsedProviderLabel}"
+msgstr "В прошлый раз: {lastUsedProviderLabel}"
 
 msgid "Late 2026"
 msgstr "Конец 2026"

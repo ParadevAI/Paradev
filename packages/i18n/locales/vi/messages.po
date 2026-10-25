@@ -5366,6 +5366,9 @@ msgstr "Không thể tự động đặt tên cho \"{name}\""
 msgid "Couldn't open the screenshot"
 msgstr "Không thể mở ảnh chụp màn hình"
 
+msgid "Couldn't open your browser. Try again."
+msgstr "Không thể mở trình duyệt. Hãy thử lại."
+
 msgid "Couldn't parse this diff: {patchParseError}"
 msgstr "Không thể phân tích diff này: {patchParseError}"
 
@@ -6320,6 +6323,9 @@ msgstr "Đọc chính tả hiện không khả dụng"
 
 msgid "Didn't hear back"
 msgstr "Không có phản hồi"
+
+msgid "Didn't open? Use the link below."
+msgstr "Không mở được? Dùng liên kết bên dưới."
 
 msgid "diff"
 msgstr "diff"

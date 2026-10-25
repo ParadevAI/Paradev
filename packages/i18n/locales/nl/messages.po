@@ -5366,6 +5366,9 @@ msgstr "Kon \"{name}\" niet automatisch een naam geven"
 msgid "Couldn't open the screenshot"
 msgstr "Kan de screenshot niet openen"
 
+msgid "Couldn't open your browser. Try again."
+msgstr "Je browser kon niet worden geopend. Probeer het opnieuw."
+
 msgid "Couldn't parse this diff: {patchParseError}"
 msgstr "Kan deze diff niet parsen: {patchParseError}"
 
@@ -6320,6 +6323,9 @@ msgstr "Dicteren is nu niet beschikbaar"
 
 msgid "Didn't hear back"
 msgstr "Geen reactie ontvangen"
+
+msgid "Didn't open? Use the link below."
+msgstr "Niet geopend? Gebruik de link hieronder."
 
 msgid "diff"
 msgstr "diff"

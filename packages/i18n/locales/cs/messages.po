@@ -5366,6 +5366,9 @@ msgstr "Nepodařilo se automaticky pojmenovat „{name}“"
 msgid "Couldn't open the screenshot"
 msgstr "Snímek obrazovky se nepodařilo otevřít"
 
+msgid "Couldn't open your browser. Try again."
+msgstr "Prohlížeč se nepodařilo otevřít. Zkuste to znovu."
+
 msgid "Couldn't parse this diff: {patchParseError}"
 msgstr "Tento diff se nepodařilo zpracovat: {patchParseError}"
 
@@ -6320,6 +6323,9 @@ msgstr "Diktování teď není dostupné"
 
 msgid "Didn't hear back"
 msgstr "Bez odpovědi"
+
+msgid "Didn't open? Use the link below."
+msgstr "Neotevřelo se? Použijte odkaz níže."
 
 msgid "diff"
 msgstr "rozdíl"

@@ -187,7 +187,13 @@ app.get("/auth/callback", async (req, res) => {
 
 	const result = await handleAuthCallback({ token, expiresAt, state });
 	if (!result.success) {
-		return sendFailure();
+		return result.reason === "save-failed"
+			? sendPage(
+					500,
+					i18n._(msg({ message: "Sign-in didn't finish" })),
+					result.error,
+				)
+			: sendFailure();
 	}
 
 	const mainWindow = BrowserWindow.getAllWindows()[0];

@@ -5366,6 +5366,9 @@ msgstr "Impossibile assegnare automaticamente un nome a \"{name}\""
 msgid "Couldn't open the screenshot"
 msgstr "Impossibile aprire lo screenshot"
 
+msgid "Couldn't open your browser. Try again."
+msgstr "Impossibile aprire il browser. Riprova."
+
 msgid "Couldn't parse this diff: {patchParseError}"
 msgstr "Impossibile analizzare questo diff: {patchParseError}"
 
@@ -6320,6 +6323,9 @@ msgstr "La dettatura non è disponibile al momento"
 
 msgid "Didn't hear back"
 msgstr "Nessuna risposta"
+
+msgid "Didn't open? Use the link below."
+msgstr "Non si è aperto? Usa il link qui sotto."
 
 msgid "diff"
 msgstr "diff"

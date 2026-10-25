@@ -169,8 +169,9 @@ function SignInPage() {
 		},
 	];
 
-	const isWaitingForBrowser =
-		browserProvider !== null && signInMutation.data?.success !== false;
+	const browserOpenFailed =
+		signInMutation.isError || signInMutation.data?.success === false;
+	const isWaitingForBrowser = browserProvider !== null && !browserOpenFailed;
 	const browserProviderLabel =
 		browserProvider === "google" ? "Google" : "GitHub";
 
@@ -239,7 +240,12 @@ function SignInPage() {
 									</Button>
 								))}
 							</div>
-							{lastUsedProviderLabel && (
+							{browserOpenFailed && (
+								<p className="mt-3 text-xs text-destructive">
+									<Trans>Couldn't open your browser. Try again.</Trans>
+								</p>
+							)}
+							{lastUsedProviderLabel && !browserOpenFailed && (
 								<p className="mt-3 text-xs text-muted-foreground">
 									<Trans>Last used: {lastUsedProviderLabel}</Trans>
 								</p>

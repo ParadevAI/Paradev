@@ -5366,6 +5366,9 @@ msgstr "\"{name}\" otomatik olarak adlandırılamadı"
 msgid "Couldn't open the screenshot"
 msgstr "Ekran görüntüsü açılamadı"
 
+msgid "Couldn't open your browser. Try again."
+msgstr "Tarayıcınız açılamadı. Tekrar deneyin."
+
 msgid "Couldn't parse this diff: {patchParseError}"
 msgstr "Bu fark ayrıştırılamadı: {patchParseError}"
 
@@ -6320,6 +6323,9 @@ msgstr "Sesle yazma şu anda kullanılamıyor"
 
 msgid "Didn't hear back"
 msgstr "Yanıt alınamadı"
+
+msgid "Didn't open? Use the link below."
+msgstr "Açılmadı mı? Aşağıdaki bağlantıyı kullanın."
 
 msgid "diff"
 msgstr "fark"

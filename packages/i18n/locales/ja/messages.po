@@ -5366,6 +5366,9 @@ msgstr "「{name}」に自動で名前を付けられませんでした"
 msgid "Couldn't open the screenshot"
 msgstr "スクリーンショットを開けませんでした"
 
+msgid "Couldn't open your browser. Try again."
+msgstr "ブラウザを開けませんでした。もう一度お試しください。"
+
 msgid "Couldn't parse this diff: {patchParseError}"
 msgstr "この差分を解析できませんでした: {patchParseError}"
 
@@ -6320,6 +6323,9 @@ msgstr "現在、音声入力は利用できません"
 
 msgid "Didn't hear back"
 msgstr "応答がありません"
+
+msgid "Didn't open? Use the link below."
+msgstr "開きませんか？下のリンクを使ってください。"
 
 msgid "diff"
 msgstr "差分"

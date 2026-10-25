@@ -5366,6 +5366,9 @@ msgstr "\"{name}\"의 이름을 자동으로 지정하지 못했습니다"
 msgid "Couldn't open the screenshot"
 msgstr "스크린샷을 열 수 없습니다"
 
+msgid "Couldn't open your browser. Try again."
+msgstr "브라우저를 열 수 없습니다. 다시 시도하세요."
+
 msgid "Couldn't parse this diff: {patchParseError}"
 msgstr "이 차이를 해석하지 못했습니다: {patchParseError}"
 
@@ -6320,6 +6323,9 @@ msgstr "지금은 받아쓰기를 사용할 수 없습니다"
 
 msgid "Didn't hear back"
 msgstr "응답이 없습니다"
+
+msgid "Didn't open? Use the link below."
+msgstr "열리지 않나요? 아래 링크를 사용하세요."
 
 msgid "diff"
 msgstr "차이"

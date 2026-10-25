@@ -5366,6 +5366,9 @@ msgstr "Couldn't name \"{name}\" automatically"
 msgid "Couldn't open the screenshot"
 msgstr "Couldn't open the screenshot"
 
+msgid "Couldn't open your browser. Try again."
+msgstr "Couldn't open your browser. Try again."
+
 msgid "Couldn't parse this diff: {patchParseError}"
 msgstr "Couldn't parse this diff: {patchParseError}"
 
@@ -6320,6 +6323,9 @@ msgstr "Dictation is not available right now"
 
 msgid "Didn't hear back"
 msgstr "Didn't hear back"
+
+msgid "Didn't open? Use the link below."
+msgstr "Didn't open? Use the link below."
 
 msgid "diff"
 msgstr "diff"

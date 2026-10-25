@@ -5366,6 +5366,9 @@ msgstr "無法自動命名「{name}」"
 msgid "Couldn't open the screenshot"
 msgstr "無法開啟螢幕擷取畫面"
 
+msgid "Couldn't open your browser. Try again."
+msgstr "無法開啟瀏覽器。請再試一次。"
+
 msgid "Couldn't parse this diff: {patchParseError}"
 msgstr "無法解析這個差異：{patchParseError}"
 
@@ -6320,6 +6323,9 @@ msgstr "語音輸入暫時無法使用"
 
 msgid "Didn't hear back"
 msgstr "未收到回應"
+
+msgid "Didn't open? Use the link below."
+msgstr "沒有開啟？請使用下方連結。"
 
 msgid "diff"
 msgstr "差異"

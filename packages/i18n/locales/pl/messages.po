@@ -5366,6 +5366,9 @@ msgstr "Nie udało się automatycznie nazwać „{name}”"
 msgid "Couldn't open the screenshot"
 msgstr "Nie udało się otworzyć zrzutu ekranu"
 
+msgid "Couldn't open your browser. Try again."
+msgstr "Nie udało się otworzyć przeglądarki. Spróbuj ponownie."
+
 msgid "Couldn't parse this diff: {patchParseError}"
 msgstr "Nie udało się przetworzyć tych różnic: {patchParseError}"
 
@@ -6320,6 +6323,9 @@ msgstr "Dyktowanie jest teraz niedostępne"
 
 msgid "Didn't hear back"
 msgstr "Brak odpowiedzi"
+
+msgid "Didn't open? Use the link below."
+msgstr "Nie otworzyło się? Użyj linku poniżej."
 
 msgid "diff"
 msgstr "różnice"
@@ -9604,7 +9610,7 @@ msgid "Last used"
 msgstr "Ostatnio używane"
 
 msgid "Last used: {lastUsedProviderLabel}"
-msgstr "Ostatnio używane: {lastUsedProviderLabel}"
+msgstr "Ostatnio użyto: {lastUsedProviderLabel}"
 
 msgid "Late 2026"
 msgstr "Koniec 2026"

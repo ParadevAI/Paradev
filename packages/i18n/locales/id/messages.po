@@ -5366,6 +5366,9 @@ msgstr "Tidak dapat menamai \"{name}\" secara otomatis"
 msgid "Couldn't open the screenshot"
 msgstr "Tidak dapat membuka tangkapan layar"
 
+msgid "Couldn't open your browser. Try again."
+msgstr "Tidak dapat membuka browser Anda. Coba lagi."
+
 msgid "Couldn't parse this diff: {patchParseError}"
 msgstr "Tidak bisa mengurai diff ini: {patchParseError}"
 
@@ -6320,6 +6323,9 @@ msgstr "Dikte sedang tidak tersedia"
 
 msgid "Didn't hear back"
 msgstr "Tidak ada respons"
+
+msgid "Didn't open? Use the link below."
+msgstr "Tidak terbuka? Gunakan tautan di bawah."
 
 msgid "diff"
 msgstr "diff"
