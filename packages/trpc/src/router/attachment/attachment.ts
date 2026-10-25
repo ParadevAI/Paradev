@@ -1,24 +1,16 @@
 import { db } from "@superset/db/client";
-import { attachments, files } from "@superset/db/schema";
+import { files, type SelectFile } from "@superset/db/schema";
 import { fileOriginalKey } from "@superset/shared/usercontent";
 import type { TRPCRouterRecord } from "@trpc/server";
-import { and, eq, inArray } from "drizzle-orm";
 import { headObject, presignedGetUrl, presignedPutUrl } from "../../lib/r2";
+import type { SandboxCaller } from "../../lib/sandbox/api-credential";
 import { protectedProcedure, userError } from "../../trpc";
 import { requireActiveOrgMembership } from "../utils/active-org";
+import { resolvableFiles, TRANSFER_ONLY } from "./resolvable";
 import {
 	createAttachmentUploadSchema,
 	resolveAttachmentsSchema,
 } from "./schema";
-
-/**
- * What marks a `files` row as one of these. Every other kind of file is
- * identified by its content — page assets deduplicate on the digest — and no
- * real file hashes to the empty string, so this both keeps an attachment out
- * of any reuse lookup and keeps `resolve` off files it has no business
- * handing a URL for.
- */
-const TRANSFER_ONLY = "";
 
 /**
  * Composer attachments: bytes on their way from a client to the machine an
@@ -29,11 +21,10 @@ const TRANSFER_ONLY = "";
  * bodies in a Worker isolate and is refused outright by Cloudflare's edge
  * above 100 MB. What travels over the relay is a list of file ids.
  *
- * Rows here stay `pending` for their whole life, which is the point: the
- * object is a transfer buffer, dead as soon as the host has written it into
- * the worktree, and `pending` is exactly what the file sweep reclaims a day
- * later. Nothing references these bytes afterwards, so there is no `ready`
- * state to move to and no parent to attach them to.
+ * A row stays `pending` while it is only a transfer buffer, which the file
+ * sweep reclaims a day later. A file sent to a cloud workspace is kept
+ * instead: `anchorAttachments` marks it `ready` on that workspace, and it is
+ * reaped with the workspace's box.
  */
 export const attachmentRouter = {
 	/**
@@ -89,14 +80,8 @@ export const attachmentRouter = {
 	 * Presigned GETs for a host about to materialize these into a worktree,
 	 * with the metadata it needs to name the files.
 	 *
-	 * Scoped to the caller's own organization and to attachments, which is
-	 * what keeps a host to the bytes it asked for: `files.id` is the only
-	 * thing the caller presents, and knowing one is not authority to read it.
-	 * Without the second scope this would sign a URL for any file in the org,
-	 * a page's private assets included.
-	 *
-	 * A box calling for itself gets only the files attached to its own
-	 * workspace: access to the box is access to its files, nothing wider.
+	 * Scoped by `resolvableFiles`: `files.id` is the only thing the caller
+	 * presents, and knowing one is not authority to read it.
 	 *
 	 * A mutation despite reading nothing but rows: the URLs it mints are
 	 * short-lived credentials, and a query's response is cacheable.
@@ -104,33 +89,7 @@ export const attachmentRouter = {
 	resolve: protectedProcedure
 		.input(resolveAttachmentsSchema)
 		.mutation(async ({ ctx, input }) => {
-			const organizationId = await requireActiveOrgMembership(ctx);
-
-			const rows = await db
-				.select()
-				.from(files)
-				.where(
-					and(
-						inArray(files.id, input.fileIds),
-						eq(files.organizationId, organizationId),
-						eq(files.sha256, TRANSFER_ONLY),
-						ctx.sandboxCaller
-							? inArray(
-									files.id,
-									db
-										.select({ id: attachments.fileId })
-										.from(attachments)
-										.where(
-											and(
-												eq(attachments.parentKind, "cloud_workspace"),
-												eq(attachments.parentId, ctx.sandboxCaller.workspaceId),
-											),
-										),
-								)
-							: undefined,
-					),
-				);
-			const byId = new Map(rows.map((row) => [row.id, row]));
+			const byId = await loadResolvable(ctx, input.fileIds);
 
 			// In the order asked for: the caller names attachments positionally
 			// and a reordered answer would rename them.
@@ -144,29 +103,69 @@ export const attachmentRouter = {
 							i18nKey: "serverError.attachment.notFound",
 						});
 					}
-
-					// A presigned PUT lands without the API seeing it, so this is
-					// where an upload is held to what it declared. A short read
-					// that never finished is the case worth catching — it would
-					// otherwise reach the agent as a truncated file.
-					const key = fileOriginalKey(file.id);
-					const head = await headObject(key);
-					if (!head || head.sizeBytes !== file.sizeBytes) {
+					const resolved = await signUploaded(file);
+					if (!resolved) {
 						throw userError({
 							code: "BAD_REQUEST",
 							message: "Attachment was not uploaded — send the bytes first",
 							i18nKey: "serverError.attachment.notUploaded",
 						});
 					}
+					return resolved;
+				}),
+			);
+		}),
 
-					return {
-						fileId: file.id,
-						name: file.name,
-						contentType: file.contentType,
-						sizeBytes: file.sizeBytes,
-						url: await presignedGetUrl(key),
-					};
+	/**
+	 * `resolve` for a reader that shows what it can: a transcript with one
+	 * file gone still renders the rest. Every id gets an answer, in the order
+	 * asked for, and one the caller may not see is reported the same as one
+	 * that does not exist.
+	 */
+	resolveEach: protectedProcedure
+		.input(resolveAttachmentsSchema)
+		.mutation(async ({ ctx, input }) => {
+			const byId = await loadResolvable(ctx, input.fileIds);
+			return await Promise.all(
+				input.fileIds.map(async (fileId) => {
+					const file = byId.get(fileId);
+					const resolved = file ? await signUploaded(file) : null;
+					return resolved ?? { fileId, missing: true as const };
 				}),
 			);
 		}),
 } satisfies TRPCRouterRecord;
+
+async function loadResolvable(
+	ctx: Parameters<typeof requireActiveOrgMembership>[0] & {
+		sandboxCaller: SandboxCaller | null;
+	},
+	fileIds: string[],
+) {
+	const rows = await resolvableFiles({
+		organizationId: await requireActiveOrgMembership(ctx),
+		userId: ctx.session.user.id,
+		boxWorkspaceId: ctx.sandboxCaller?.workspaceId ?? null,
+		fileIds,
+	});
+	return new Map(rows.map((row) => [row.id, row]));
+}
+
+/**
+ * A presigned PUT lands without the API seeing it, so this is where an
+ * upload is held to what it declared. A short read that never finished is
+ * the case worth catching — it would otherwise reach the agent as a
+ * truncated file. Null when the bytes are not there.
+ */
+async function signUploaded(file: SelectFile) {
+	const key = fileOriginalKey(file.id);
+	const head = await headObject(key);
+	if (!head || head.sizeBytes !== file.sizeBytes) return null;
+	return {
+		fileId: file.id,
+		name: file.name,
+		contentType: file.contentType,
+		sizeBytes: file.sizeBytes,
+		url: await presignedGetUrl(key),
+	};
+}

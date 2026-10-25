@@ -1,6 +1,7 @@
 import { db } from "@superset/db/client";
 import { cloudWorkspaces } from "@superset/db/schema";
 import { eq } from "drizzle-orm";
+import { detachAll, reapOrphanFiles } from "../../lib/files";
 import { deleteSandbox, stopSandbox } from "../../lib/sandbox";
 import { publishCloudWorkspaceJob } from "./jobs";
 import { queueSettleWorkspace, settleWorkspaceNow } from "./meter";
@@ -36,11 +37,27 @@ export async function reapArchivedCloudWorkspace(
 			console.error(`[cloud-workspace] ${row.id} final settle failed`, error),
 		);
 		await deleteSandbox(row.providerSandboxId);
+		await reapWorkspaceFiles(row.id);
 		return "reaped";
 	}
 	await stopSandbox(row.providerSandboxId);
 	await queueSettleWorkspace(row.id);
 	return "stopped";
+}
+
+/** Drops the files sent to a workspace whose box is gone for good. */
+export async function reapWorkspaceFiles(cloudWorkspaceId: string) {
+	await reapOrphanFiles(
+		await detachAll({
+			parentKind: "cloud_workspace",
+			parentIds: [cloudWorkspaceId],
+		}),
+	).catch((error) =>
+		console.error(
+			`[cloud-workspace] ${cloudWorkspaceId} file reap failed`,
+			error,
+		),
+	);
 }
 
 function queueReapStage(
