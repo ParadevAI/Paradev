@@ -91,6 +91,8 @@ export interface UsageResetNotice {
 }
 
 export interface UsageAccount {
+	/** Inventory discovery failed; this placeholder is not a discovered account. */
+	discoveryFailed?: boolean;
 	agent: QuotaCapableAgent;
 	credentialKind: UsageAccountCredentialKind;
 	/** Stable key for the credential source (config path or keychain item),
