@@ -59,13 +59,16 @@ export function mergeNativeClaudeQuota(
 			)
 				continue;
 			const oldReset = date(old.resetsAt);
+			const oldEpoch = Math.floor(oldReset / 1000);
+			const nextEpoch = Math.floor(reading.resetsAt / 1000);
 			if (
 				Number.isFinite(oldReset) &&
-				(oldReset > reading.resetsAt ||
-					(oldReset === reading.resetsAt &&
-						old.usedPercent > reading.usedPercent))
+				(oldEpoch > nextEpoch ||
+					(oldEpoch === nextEpoch && old.usedPercent > reading.usedPercent))
 			)
 				continue;
+			if (Number.isFinite(oldReset) && oldEpoch === nextEpoch)
+				window.resetsAt = new Date(Math.max(oldReset, reading.resetsAt));
 			windows[oldIndex] = window;
 		} else windows.push(window);
 		changed = true;

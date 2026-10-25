@@ -209,3 +209,79 @@ test("native display and HTTP deferral expire together after six minutes", () =>
 	expect(mergeNativeClaudeQuota(original, recent, now + 1)).toBeNull();
 	expect(canDeferClaudeHttpQuota(original, overlay, now + 1)).toBe(false);
 });
+
+const resetPrecisionCases = [
+	["same second with 213ms HTTP precision", 213, 0, 30, true, 213],
+	["same second with higher usage", 213, 0, 31, true, 213],
+	["same second with lower usage", 0, 213, 29, false, 0],
+	["earlier second with higher usage", 0, -1000, 99, false, 0],
+	["later second with lower usage", 0, 1000, 1, true, 1000],
+	["one millisecond into a later second", 999, 1000, 1, true, 1000],
+	["one millisecond into the previous second", 1000, 999, 99, false, 1000],
+] as const;
+
+test.each(
+	resetPrecisionCases,
+)("native overlay compares reset seconds: %s", (_name, previousOffset, nextOffset, usedPercent, accepted, keptOffset) => {
+	const reset = now + 120_000;
+	const original = {
+		...base(),
+		status: "ok" as const,
+		windows: [
+			{
+				id: "five_hour",
+				label: "Session (5h)",
+				usedPercent: 30,
+				resetsAt: new Date(reset + previousOffset),
+				observedAt: new Date(now - 2000),
+				source: "provider" as const,
+			},
+		],
+	};
+	const result = mergeNativeClaudeQuota(
+		original,
+		[reading("five_hour", { usedPercent, resetsAt: reset + nextOffset })],
+		now,
+	);
+	if (!accepted) {
+		expect(result).toBeNull();
+	} else {
+		expect(result?.windows[0]?.resetsAt?.getTime()).toBe(reset + keptOffset);
+		expect(result?.windows[0]?.usedPercent).toBe(usedPercent);
+		expect(result?.windows[0]?.observedAt?.getTime()).toBe(now - 1000);
+		expect(result?.windows[0]?.source).toBe("claude_statusline");
+		expect(result?.fetchedAt).toBe(original.fetchedAt);
+	}
+	expect(original.windows[0]?.resetsAt.getTime()).toBe(reset + previousOffset);
+});
+test("reset precision does not bypass an older or equal native observation", () => {
+	const reset = now + 120_000;
+	const original = {
+		...base(),
+		status: "ok" as const,
+		windows: [
+			{
+				id: "five_hour",
+				label: "Session (5h)",
+				usedPercent: 30,
+				resetsAt: new Date(reset + 213),
+				observedAt: new Date(now - 1000),
+				source: "provider" as const,
+			},
+		],
+	};
+	for (const observedAt of [now - 1001, now - 1000])
+		expect(
+			mergeNativeClaudeQuota(
+				original,
+				[
+					reading("five_hour", {
+						usedPercent: 31,
+						resetsAt: reset,
+						observedAt,
+					}),
+				],
+				now,
+			),
+		).toBeNull();
+});
