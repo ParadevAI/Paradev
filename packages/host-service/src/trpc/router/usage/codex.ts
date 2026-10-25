@@ -4,10 +4,25 @@
  * Read-only: we never refresh the token (see claude.ts for why).
  */
 
+import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
+import { assertCodexFileCredentialStore } from "./codex-quota-config";
+import { createCredentialQuotaCache } from "./credential-quota-cache";
 import { type CodexHome, discoverCodexHomes } from "./profiles";
+import { copyQuotaRetry, recordQuotaRetry } from "./quota-backoff";
+import type { QuotaSnapshot } from "./quota-cache";
+import {
+	parseQuotaCredentialJson,
+	QuotaCredentialReadError,
+	readQuotaCredentialFile,
+	unavailableQuotaAccount,
+} from "./quota-credentials";
+import {
+	createQuotaRequestBudget,
+	QUOTA_REQUEST_BUDGET_MS,
+} from "./quota-request";
 import type {
 	UsageAccount,
 	UsageAccountStatus,
@@ -15,7 +30,6 @@ import type {
 } from "./types";
 
 const CODEX_USAGE_URL = "https://chatgpt.com/backend-api/wham/usage";
-const FETCH_TIMEOUT_MS = 10_000;
 
 interface CodexAuthFile {
 	tokens?: {
@@ -112,15 +126,107 @@ export async function fetchCodexAccounts(): Promise<UsageAccount[]> {
 			fetchCodexAccountForHome(home, home.home === defaultHome),
 		),
 	);
-	// Dedupe by account email — one login used from several homes is one
-	// account; keep the first (default home wins).
-	const seen = new Set<string>();
-	return accounts.flat().filter((account) => {
-		const key = account.email ?? account.accountKey;
-		if (seen.has(key)) return false;
-		seen.add(key);
-		return true;
-	});
+	// Keep profile identities separate; transport requests are deduplicated below.
+	return accounts.flat();
+}
+
+export async function captureCodexQuotaSnapshot(
+	captureHomes = () => discoverCodexHomes({ includeUnavailable: true }),
+	fetchQuota = fetchCodexSubscriptionQuota,
+): Promise<QuotaSnapshot<UsageAccount[]>> {
+	let homes: CodexHome[];
+	try {
+		homes = structuredClone(await captureHomes());
+	} catch {
+		return {
+			revision: "codex:discovery-unavailable",
+			load: async () => [
+				unavailableQuotaAccount({
+					agent: "codex",
+					accountKey: "codex:discovery",
+					sourceLabel: "Codex accounts",
+					selection: null,
+				}),
+			],
+		};
+	}
+	const inputs = await Promise.all(
+		homes.map(async (home, index) => {
+			const source = {
+				agent: "codex" as const,
+				accountKey: join(home.home, "auth.json"),
+				sourceLabel: home.sourceLabel,
+				selection: index === 0 ? null : home.home,
+			};
+			try {
+				if (home.quotaUnavailable)
+					return { state: "unavailable" as const, source };
+				return {
+					state: "available" as const,
+					home,
+					isDefaultHome: index === 0,
+					source,
+					auth:
+						home.credentialKind === "api_key"
+							? null
+							: await readCodexQuotaAuth(home.home),
+				};
+			} catch {
+				return { state: "unavailable" as const, source };
+			}
+		}),
+	);
+	const revision = createHash("sha256")
+		.update(JSON.stringify(inputs))
+		.digest("hex");
+	return {
+		revision,
+		load: async (forceRefresh = false) =>
+			(
+				await Promise.all(
+					inputs.map(async (input) => {
+						if (input.state === "unavailable")
+							return [unavailableQuotaAccount(input.source)];
+						try {
+							return await fetchCodexAccountForHome(
+								input.home,
+								input.isDefaultHome,
+								input.auth,
+								fetchQuota,
+								forceRefresh,
+							);
+						} catch {
+							return [unavailableQuotaAccount(input.source)];
+						}
+					}),
+				)
+			).flat(),
+	};
+}
+
+async function readCodexQuotaAuth(home: string): Promise<CodexAuthFile | null> {
+	await assertCodexFileCredentialStore(home);
+	const raw = await readQuotaCredentialFile(join(home, "auth.json"));
+	if (raw === null) return null;
+	const parsed = parseQuotaCredentialJson(raw);
+	if (parsed.auth_mode !== undefined && parsed.auth_mode !== "chatgpt")
+		throw new QuotaCredentialReadError();
+	if (parsed.tokens === undefined || parsed.tokens === null) return null;
+	if (typeof parsed.tokens !== "object" || Array.isArray(parsed.tokens))
+		throw new QuotaCredentialReadError();
+	const tokens = parsed.tokens as Record<string, unknown>;
+	if (
+		typeof tokens.access_token !== "string" ||
+		!tokens.access_token.trim() ||
+		(tokens.account_id != null && typeof tokens.account_id !== "string")
+	)
+		throw new QuotaCredentialReadError();
+	return {
+		tokens: {
+			access_token: tokens.access_token,
+			account_id: (tokens.account_id ?? undefined) as string | undefined,
+		},
+	};
 }
 
 /** What the ChatGPT usage endpoint says about one access token. */
@@ -143,58 +249,96 @@ export const CODEX_EXPIRED_TOKEN_DETAIL =
 export async function fetchCodexSubscriptionQuota(
 	accessToken: string,
 	accountId?: string,
+	budgetMs = QUOTA_REQUEST_BUDGET_MS,
 ): Promise<CodexSubscriptionQuota> {
 	const empty = { email: null, plan: null, windows: [], creditsBalance: null };
+	const budget = createQuotaRequestBudget(budgetMs);
 	try {
-		const headers: Record<string, string> = {
-			Authorization: `Bearer ${accessToken}`,
-		};
-		if (accountId) headers["chatgpt-account-id"] = accountId;
-		const response = await fetch(CODEX_USAGE_URL, {
-			headers,
-			signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+		return await budget.run(async (signal) => {
+			const headers: Record<string, string> = {
+				Authorization: `Bearer ${accessToken}`,
+			};
+			if (accountId) headers["chatgpt-account-id"] = accountId;
+			const response = await fetch(CODEX_USAGE_URL, {
+				headers,
+				cache: "no-store",
+				redirect: "error",
+				signal,
+			});
+
+			if (response.status === 401 || response.status === 403) {
+				return {
+					...empty,
+					status: "token_expired",
+					statusDetail: CODEX_EXPIRED_TOKEN_DETAIL,
+				};
+			}
+			if (!response.ok) {
+				return recordQuotaRetry(
+					{
+						...empty,
+						status: "unavailable",
+						statusDetail: `Usage endpoint returned ${response.status}.`,
+					},
+					response,
+				);
+			}
+
+			const usage = (await response.json()) as CodexUsageResponse;
+			const windows = mapWindows(usage);
+			const balance = Number.parseFloat(usage.credits?.balance ?? "");
+			return {
+				email: usage.email ?? null,
+				plan: usage.plan_type ?? null,
+				status: windows.length > 0 ? "ok" : "unavailable",
+				statusDetail:
+					windows.length > 0 ? null : "No quota data returned for this plan.",
+				windows,
+				creditsBalance: Number.isFinite(balance) ? balance : null,
+			};
 		});
-
-		if (response.status === 401 || response.status === 403) {
-			return {
-				...empty,
-				status: "token_expired",
-				statusDetail: CODEX_EXPIRED_TOKEN_DETAIL,
-			};
-		}
-		if (!response.ok) {
-			return {
-				...empty,
-				status: "unavailable",
-				statusDetail: `Usage endpoint returned ${response.status}.`,
-			};
-		}
-
-		const usage = (await response.json()) as CodexUsageResponse;
-		const windows = mapWindows(usage);
-		const balance = Number.parseFloat(usage.credits?.balance ?? "");
-		return {
-			email: usage.email ?? null,
-			plan: usage.plan_type ?? null,
-			status: windows.length > 0 ? "ok" : "unavailable",
-			statusDetail:
-				windows.length > 0 ? null : "No quota data returned for this plan.",
-			windows,
-			creditsBalance: Number.isFinite(balance) ? balance : null,
-		};
-	} catch (error) {
+	} catch {
 		return {
 			...empty,
 			status: "unavailable",
-			statusDetail:
-				error instanceof Error ? error.message : "Failed to fetch usage.",
+			statusDetail: "Usage request failed or timed out. Try again shortly.",
 		};
 	}
+}
+
+const credentialQuotaCache = createCredentialQuotaCache<
+	CodexSubscriptionQuota & { fetchedAt: Date }
+>();
+export function getCodexCredentialQuota(
+	accessToken: string,
+	accountId: string | undefined,
+	sourceKey: string,
+	forceRefresh = false,
+	fetchQuota = fetchCodexSubscriptionQuota,
+) {
+	const key = createHash("sha256")
+		.update(JSON.stringify([sourceKey, accessToken, accountId ?? null]))
+		.digest("hex");
+	const transportKey = createHash("sha256")
+		.update(JSON.stringify(["codex", accessToken, accountId ?? null]))
+		.digest("hex");
+	return credentialQuotaCache.get(
+		key,
+		async () => {
+			const quota = await fetchQuota(accessToken, accountId);
+			return copyQuotaRetry(quota, { ...quota, fetchedAt: new Date() });
+		},
+		forceRefresh,
+		transportKey,
+	);
 }
 
 async function fetchCodexAccountForHome(
 	home: CodexHome,
 	isDefaultHome: boolean,
+	capturedAuth?: CodexAuthFile | null,
+	fetchQuota = fetchCodexSubscriptionQuota,
+	forceRefresh = false,
 ): Promise<UsageAccount[]> {
 	const codexHome = home.home;
 	const authPath = join(codexHome, "auth.json");
@@ -229,16 +373,22 @@ async function fetchCodexAccountForHome(
 
 	let auth: CodexAuthFile;
 	try {
-		auth = JSON.parse(await readFile(authPath, "utf-8"));
+		auth =
+			capturedAuth === undefined
+				? JSON.parse(await readFile(authPath, "utf-8"))
+				: (capturedAuth ?? {});
 	} catch {
 		return [];
 	}
 	const accessToken = auth.tokens?.access_token;
 	if (!accessToken) return [];
 
-	const quota = await fetchCodexSubscriptionQuota(
+	const quota = await getCodexCredentialQuota(
 		accessToken,
 		auth.tokens?.account_id,
+		codexHome,
+		forceRefresh,
+		fetchQuota,
 	);
-	return [{ ...base, ...quota }];
+	return [copyQuotaRetry(quota, { ...base, ...quota })];
 }

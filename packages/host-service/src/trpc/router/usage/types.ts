@@ -67,6 +67,8 @@ export type UsageAccountStatus =
 	| "signed_out";
 
 export interface UsageQuotaWindow {
+	observedAt?: Date;
+	source?: "provider" | "claude_statusline" | "claude_sdk";
 	/** Stable identifier within the account, e.g. "five_hour", "seven_day",
 	 * or a model-scoped key. */
 	id: string;
@@ -89,6 +91,11 @@ export interface UsageAccount {
 	/** Human-readable detail for non-ok statuses. */
 	statusDetail: string | null;
 	windows: UsageQuotaWindow[];
+	retryAt?: Date;
+	/** Display history only; never evidence of currently available allowance. */
+	lastKnownUsage?: { fetchedAt: Date; windows: UsageQuotaWindow[] };
+	/** Actual prepaid funds in major currency units, separate from the spend cap. */
+	prepaidBalance?: { amount: number; currency: string | null; checkedAt: Date };
 	/** Codex prepaid credits balance, when present. */
 	creditsBalance: number | null;
 	/** Claude extra-usage spend, in cents, when present. */
