@@ -3,26 +3,19 @@ import { expo } from "@better-auth/expo";
 import { oauthProvider } from "@better-auth/oauth-provider";
 import { stripe } from "@better-auth/stripe";
 import { db } from "@superset/db/client";
-import {
-	githubInstallations,
-	members,
-	subscriptions,
-	tasks,
-} from "@superset/db/schema";
+import { members, subscriptions, tasks } from "@superset/db/schema";
 import type { sessions } from "@superset/db/schema/auth";
 import * as authSchema from "@superset/db/schema/auth";
 import { seedDefaultStatuses } from "@superset/db/seed-default-statuses";
 import { MemberAddedBillingEmail } from "@superset/email/emails/billing/member-added";
 import { MemberRemovedBillingEmail } from "@superset/email/emails/billing/member-removed";
-import { PaymentFailedEmail } from "@superset/email/emails/billing/payment-failed";
-import { RenewalUpcomingEmail } from "@superset/email/emails/billing/renewal-upcoming";
-import { SubscriptionCancelledEmail } from "@superset/email/emails/billing/subscription-cancelled";
-import { SubscriptionStartedEmail } from "@superset/email/emails/billing/subscription-started";
 import { OrganizationInvitationEmail } from "@superset/email/emails/team/invitation";
 import { MemberAddedEmail } from "@superset/email/emails/team/member-added";
 import { MemberRemovedEmail } from "@superset/email/emails/team/member-removed";
+import { NOREPLY_FROM } from "@superset/email/sender";
 import { canInvite, type OrganizationRole } from "@superset/shared/auth";
 import { ACTIVE_SUBSCRIPTION_STATUSES } from "@superset/shared/billing";
+import { COMPANY } from "@superset/shared/constants";
 import { getTrustedVercelPreviewOrigins } from "@superset/shared/vercel-preview-origins";
 import { Client } from "@upstash/qstash";
 import { betterAuth } from "better-auth";
@@ -40,26 +33,42 @@ import {
 } from "better-auth/plugins";
 import { jwt } from "better-auth/plugins/jwt";
 import { and, asc, count, desc, eq, inArray, ne, sql } from "drizzle-orm";
-import type Stripe from "stripe";
+import { billingUsesAutumn } from "./autumn";
 import { env } from "./env";
 import { acceptInvitationEndpoint } from "./lib/accept-invitation-endpoint";
-import { captureBillingEvent } from "./lib/billing-analytics";
+import {
+	autumnBillingDeps,
+	autumnBillingRoutes,
+	handleStripeBillingEvent,
+	organizationPlanFromAutumn,
+	seatItem,
+	setAutumnSeats,
+	withAutumnBilling,
+} from "./lib/billing";
+import {
+	NOTIFY_SLACK_URL,
+	notifySubscriptionCanceled,
+	notifySubscriptionStarted,
+} from "./lib/billing/subscription-events";
 import { jwksAdapter } from "./lib/cached-jwks";
 import { generateMagicTokenForInvite } from "./lib/generate-magic-token";
-import { getActivationVariant } from "./lib/lifecycle";
 import { loadCustomSessionData } from "./lib/load-custom-session-data";
+import {
+	convertPendingShares,
+	removeInvitationShares,
+	removeMemberShares,
+} from "./lib/pending-shares";
 import { invitationRateLimit } from "./lib/rate-limit";
 import { resend } from "./lib/resend";
 import {
 	resolveSessionOrganizationState,
 	type SessionOrganizationContext,
 } from "./lib/resolve-session-organization-state";
-import { stripeClient } from "./stripe";
+import { stripeClient, syncCustomerName } from "./stripe";
 import {
 	countBillableSeats,
 	formatPrice,
 	getOrganizationBillingRecipients,
-	getOrganizationOwners,
 } from "./utils";
 import { previewNextInvoice } from "./utils/invoice-preview";
 
@@ -92,34 +101,6 @@ const PENDING_DELETION_ALLOWED_PATH_PREFIXES = [
 	"/sign-out",
 ];
 
-const NOTIFY_SLACK_URL = `${env.NEXT_PUBLIC_API_URL}/api/integrations/stripe/jobs/notify-slack`;
-
-/**
- * Backfills GitHub for a paying organization. Its deliveries are dropped at the
- * webhook while an org is on the free plan, so whatever changed in the gap is
- * missing until this job replays it.
- */
-async function resumeGatedSyncs(organizationId: string): Promise<void> {
-	const installation = await db.query.githubInstallations.findFirst({
-		where: eq(githubInstallations.organizationId, organizationId),
-		columns: { id: true },
-	});
-	if (!installation) return;
-
-	try {
-		await qstash.publishJSON({
-			url: `${env.NEXT_PUBLIC_API_URL}/api/github/jobs/initial-sync`,
-			body: { installationDbId: installation.id, organizationId },
-			retries: 3,
-		});
-	} catch (error) {
-		console.error(
-			"[stripe/subscription-complete] Failed to queue integration backfill:",
-			error,
-		);
-	}
-}
-
 const desktopDevPort = process.env.DESKTOP_VITE_PORT || "5173";
 const desktopDevOrigins =
 	process.env.NODE_ENV === "development"
@@ -128,46 +109,6 @@ const desktopDevOrigins =
 				`http://127.0.0.1:${desktopDevPort}`,
 			]
 		: [];
-
-/**
- * Stripe is the authority here, not our `subscriptions` row: the row is keyed
- * by organization, so an organization that resubscribed has more than one and
- * the wrong status can win. On a read failure this answers `false`, which
- * sends the mail — a duplicate notice beats swallowing a real one.
- */
-async function isStripeSubscriptionCancelled(stripeSubscriptionId: string) {
-	try {
-		const stripeSubscription =
-			await stripeClient.subscriptions.retrieve(stripeSubscriptionId);
-		return stripeSubscription.status === "canceled";
-	} catch (error) {
-		console.error(
-			"[stripe/payment-failed] Failed to read subscription status:",
-			error,
-		);
-		return false;
-	}
-}
-
-function serializeCancellationDetails(
-	cancellationDetails?: Stripe.Subscription.CancellationDetails | null,
-) {
-	try {
-		if (!cancellationDetails) return undefined;
-
-		return {
-			comment: cancellationDetails.comment,
-			feedback: cancellationDetails.feedback,
-			reason: cancellationDetails.reason,
-		};
-	} catch (error) {
-		console.error(
-			"[stripe/subscription-cancel] Failed to serialize cancellation details:",
-			error,
-		);
-		return undefined;
-	}
-}
 
 export const auth = betterAuth({
 	baseURL: env.NEXT_PUBLIC_API_URL,
@@ -369,11 +310,8 @@ export const auth = betterAuth({
 							.where(eq(authSchema.sessions.userId, user.id));
 					}
 
-					// The welcome email is unconditional in BOTH arms. Gating it is
-					// what invalidated experiment 387868: a6beb048b changed the control
-					// condition mid-flight and the run became unreadable. The `welcome`
-					// automation sends it, because only automation sends get Resend's
-					// unsubscribe link and List-Unsubscribe headers.
+					// The `welcome` automation sends this, because only automation
+					// sends get Resend's unsubscribe link and List-Unsubscribe headers.
 					try {
 						const { error } = await resend.events.send({
 							event: "user.welcome",
@@ -388,35 +326,18 @@ export const auth = betterAuth({
 						);
 					}
 
-					// Only drip enrolment is randomised. Nothing differs between arms
-					// until the first nudge (>=23h after signup), so "not activated at
-					// 22h" stays a pre-treatment covariate and the analysis can restrict
-					// to it without selection bias. Kill switch for the nudges is still
-					// the Resend automation toggle.
-					//
-					// CAUTION: withholding this event withholds it from EVERY consumer,
-					// not just the activation drip. Safe today because activation-drip
-					// is the only automation in sync-automations.ts triggering on
-					// `user.signed_up` — but that script is create-only and Resend can
-					// hold automations it never defined, so check the live account
-					// before trusting that. A second consumer means splitting enrolment
-					// first: emit `user.signed_up` unconditionally and gate an
-					// activation-only event instead, or the control arm silently drops
-					// out of that campaign too.
-					if ((await getActivationVariant(user.id)) === "test") {
-						try {
-							const { error } = await resend.events.send({
-								event: "user.signed_up",
-								email: user.email,
-								payload: { userId: user.id, name: user.name },
-							});
-							if (error) throw new Error(error.message);
-						} catch (error) {
-							console.error(
-								`[lifecycle] Failed to emit signup event for ${user.id}:`,
-								error,
-							);
-						}
+					try {
+						const { error } = await resend.events.send({
+							event: "user.signed_up",
+							email: user.email,
+							payload: { userId: user.id, name: user.name },
+						});
+						if (error) throw new Error(error.message);
+					} catch (error) {
+						console.error(
+							`[lifecycle] Failed to emit signup event for ${user.id}:`,
+							error,
+						);
 					}
 				},
 			},
@@ -446,19 +367,27 @@ export const auth = betterAuth({
 					user: { id: string; name?: string | null; image?: string | null };
 					session: Record<string, unknown>;
 				}) => {
-					const userMemberships = await db.query.members.findMany({
-						where: eq(members.userId, user.id),
-						columns: { organizationId: true },
-					});
+					const [userMemberships, userTeams] = await Promise.all([
+						db.query.members.findMany({
+							where: eq(members.userId, user.id),
+							columns: { organizationId: true },
+						}),
+						db
+							.select({ teamId: authSchema.teamMembers.teamId })
+							.from(authSchema.teamMembers)
+							.where(eq(authSchema.teamMembers.userId, user.id)),
+					]);
 					const organizationIds = [
 						...new Set(userMemberships.map((m) => m.organizationId)),
 					];
+					const teamIds = [...new Set(userTeams.map((t) => t.teamId))];
 					// A Worker that attributes content to a person has to read
 					// who they are from the signed token; a caller-supplied name
 					// is a name they chose for someone else.
 					return {
 						sub: user.id,
 						organizationIds,
+						teamIds,
 						name: user.name ?? null,
 						image: user.image ?? null,
 					};
@@ -562,7 +491,7 @@ export const auth = betterAuth({
 				});
 
 				await resend.emails.send({
-					from: "Superset <noreply@superset.sh>",
+					from: NOREPLY_FROM,
 					to: data.email,
 					subject: `${data.inviter.user.name} invited you to join ${data.organization.name}`,
 					react: OrganizationInvitationEmail({
@@ -758,8 +687,14 @@ export const auth = betterAuth({
 				afterUpdateOrganization: async ({ organization }) => {
 					if (!organization?.stripeCustomerId) return;
 
-					await stripeClient.customers.update(organization.stripeCustomerId, {
-						name: organization.name,
+					await syncCustomerName(
+						organization.stripeCustomerId,
+						organization.name,
+					).catch((error) => {
+						console.error(
+							"[org/after-update] Failed to sync Stripe customer name:",
+							error,
+						);
 					});
 				},
 
@@ -780,14 +715,16 @@ export const auth = betterAuth({
 						}
 					}
 
-					const subscription = await db.query.subscriptions.findFirst({
-						where: and(
-							eq(subscriptions.referenceId, organization.id),
-							eq(subscriptions.status, "active"),
-						),
-					});
+					const paying = billingUsesAutumn
+						? (await organizationPlanFromAutumn(organization.id)) !== "free"
+						: !!(await db.query.subscriptions.findFirst({
+								where: and(
+									eq(subscriptions.referenceId, organization.id),
+									eq(subscriptions.status, "active"),
+								),
+							}));
 
-					if (subscription) return;
+					if (paying) return;
 
 					// Not countBillableSeats: the free-plan limit is about how many
 					// people are in the organization, not how many seats we bill,
@@ -807,6 +744,19 @@ export const auth = betterAuth({
 				},
 
 				afterAddMember: async ({ member, user, organization }) => {
+					try {
+						await convertPendingShares({
+							organizationId: organization.id,
+							userId: member.userId,
+							email: user.email,
+						});
+					} catch (error) {
+						console.error(
+							"[org/after-add-member] Failed to convert pending shares:",
+							error,
+						);
+					}
+
 					// Linear-style: auto-add new org members to the oldest team so
 					// they aren't dropped into an empty teams view. Additional team
 					// memberships are added explicitly by admins.
@@ -832,7 +782,7 @@ export const auth = betterAuth({
 					const subscription = await db.query.subscriptions.findFirst({
 						where: and(
 							eq(subscriptions.referenceId, organization.id),
-							eq(subscriptions.status, "active"),
+							inArray(subscriptions.status, ACTIVE_SUBSCRIPTION_STATUSES),
 						),
 					});
 
@@ -849,7 +799,7 @@ export const auth = betterAuth({
 
 					if (acceptedInvitation) {
 						await resend.emails.send({
-							from: "Superset <noreply@superset.sh>",
+							from: NOREPLY_FROM,
 							to: user.email,
 							subject: `You've been added to ${organization.name}`,
 							react: MemberAddedEmail({
@@ -864,7 +814,6 @@ export const auth = betterAuth({
 
 					if (!subscription?.stripeSubscriptionId) return;
 					if (subscription.plan === "enterprise") return;
-
 					const quantity = Math.max(
 						1,
 						await countBillableSeats(organization.id),
@@ -873,9 +822,14 @@ export const auth = betterAuth({
 					const stripeSub = await stripeClient.subscriptions.retrieve(
 						subscription.stripeSubscriptionId,
 					);
-					const itemId = stripeSub.items.data[0]?.id;
+					const seat = seatItem(stripeSub);
+					const itemId = seat?.id;
 
-					if (itemId) {
+					const seatsOwnedByAutumn =
+						billingUsesAutumn &&
+						(await setAutumnSeats(organization.id, quantity));
+					// TODO(2027-01-31): drop the direct Stripe write once every paid org is imported into Autumn.
+					if (!seatsOwnedByAutumn && itemId) {
 						await stripeClient.subscriptions.update(
 							subscription.stripeSubscriptionId,
 							{
@@ -888,8 +842,8 @@ export const auth = betterAuth({
 					const recipients = await getOrganizationBillingRecipients(
 						organization.id,
 					);
-					const pricePerSeat = stripeSub.items.data[0]?.price?.unit_amount ?? 0;
-					const currency = stripeSub.items.data[0]?.price?.currency ?? "usd";
+					const pricePerSeat = seat?.price?.unit_amount ?? 0;
+					const currency = seat?.price?.currency ?? "usd";
 					const newMonthlyTotal = formatPrice(
 						pricePerSeat * quantity,
 						currency,
@@ -897,7 +851,7 @@ export const auth = betterAuth({
 					// unit_amount is per billing period: on an annual price the total
 					// above is yearly, and calling it monthly understates it 12x.
 					const billingInterval =
-						stripeSub.items.data[0]?.price?.recurring?.interval === "year"
+						seat?.price?.recurring?.interval === "year"
 							? ("yearly" as const)
 							: ("monthly" as const);
 
@@ -918,7 +872,7 @@ export const auth = betterAuth({
 
 					await resend.batch.send(
 						recipients.map((recipient) => ({
-							from: "Superset <noreply@superset.sh>",
+							from: NOREPLY_FROM,
 							to: recipient.email,
 							subject: `Billing update: New member added to ${organization.name}`,
 							react: MemberAddedBillingEmail({
@@ -957,8 +911,20 @@ export const auth = betterAuth({
 				},
 
 				afterRemoveMember: async ({ user, organization }) => {
+					try {
+						await removeMemberShares({
+							organizationId: organization.id,
+							userId: user.id,
+						});
+					} catch (error) {
+						console.error(
+							"[org/after-remove-member] Failed to remove shares:",
+							error,
+						);
+					}
+
 					await resend.emails.send({
-						from: "Superset <noreply@superset.sh>",
+						from: NOREPLY_FROM,
 						to: user.email,
 						subject: `You've been removed from ${organization.name}`,
 						react: MemberRemovedEmail({
@@ -971,13 +937,12 @@ export const auth = betterAuth({
 					const subscription = await db.query.subscriptions.findFirst({
 						where: and(
 							eq(subscriptions.referenceId, organization.id),
-							eq(subscriptions.status, "active"),
+							inArray(subscriptions.status, ACTIVE_SUBSCRIPTION_STATUSES),
 						),
 					});
 
 					if (!subscription?.stripeSubscriptionId) return;
 					if (subscription.plan === "enterprise") return;
-
 					const quantity = Math.max(
 						1,
 						await countBillableSeats(organization.id),
@@ -986,9 +951,14 @@ export const auth = betterAuth({
 					const stripeSub = await stripeClient.subscriptions.retrieve(
 						subscription.stripeSubscriptionId,
 					);
-					const itemId = stripeSub.items.data[0]?.id;
+					const seat = seatItem(stripeSub);
+					const itemId = seat?.id;
 
-					if (itemId) {
+					const seatsOwnedByAutumn =
+						billingUsesAutumn &&
+						(await setAutumnSeats(organization.id, quantity));
+					// TODO(2027-01-31): drop the direct Stripe write once every paid org is imported into Autumn.
+					if (!seatsOwnedByAutumn && itemId) {
 						await stripeClient.subscriptions.update(
 							subscription.stripeSubscriptionId,
 							{
@@ -1001,8 +971,8 @@ export const auth = betterAuth({
 					const recipients = await getOrganizationBillingRecipients(
 						organization.id,
 					);
-					const pricePerSeat = stripeSub.items.data[0]?.price?.unit_amount ?? 0;
-					const currency = stripeSub.items.data[0]?.price?.currency ?? "usd";
+					const pricePerSeat = seat?.price?.unit_amount ?? 0;
+					const currency = seat?.price?.currency ?? "usd";
 					const newMonthlyTotal = formatPrice(
 						pricePerSeat * quantity,
 						currency,
@@ -1010,7 +980,7 @@ export const auth = betterAuth({
 					// unit_amount is per billing period: on an annual price the total
 					// above is yearly, and calling it monthly understates it 12x.
 					const billingInterval =
-						stripeSub.items.data[0]?.price?.recurring?.interval === "year"
+						seat?.price?.recurring?.interval === "year"
 							? ("yearly" as const)
 							: ("monthly" as const);
 
@@ -1029,7 +999,7 @@ export const auth = betterAuth({
 
 					await resend.batch.send(
 						recipients.map((recipient) => ({
-							from: "Superset <noreply@superset.sh>",
+							from: NOREPLY_FROM,
 							to: recipient.email,
 							subject: `Billing update: Member removed from ${organization.name}`,
 							react: MemberRemovedBillingEmail({
@@ -1066,6 +1036,24 @@ export const auth = betterAuth({
 						);
 					}
 				},
+
+				afterCancelInvitation: async ({ invitation }) => {
+					await removeInvitationShares(invitation.id).catch((error) =>
+						console.error(
+							"[org/after-cancel-invitation] Failed to remove shares:",
+							error,
+						),
+					);
+				},
+
+				afterRejectInvitation: async ({ invitation }) => {
+					await removeInvitationShares(invitation.id).catch((error) =>
+						console.error(
+							"[org/after-reject-invitation] Failed to remove shares:",
+							error,
+						),
+					);
+				},
 			},
 		}),
 		bearer(),
@@ -1089,6 +1077,7 @@ export const auth = betterAuth({
 				const data = await loadCustomSessionData({
 					userId,
 					activeOrganizationId: session.activeOrganizationId ?? null,
+					withPlan: !billingUsesAutumn,
 				});
 
 				const { activeOrganizationId, allMemberships, membership } =
@@ -1110,7 +1099,12 @@ export const auth = betterAuth({
 				// reached, so an "active"-only read here would strand trialing
 				// and past_due organizations on a cold start.
 				let plan: string | null = null;
-				if (activeOrganizationId === data.planOrganizationId) {
+				if (billingUsesAutumn) {
+					const tier = activeOrganizationId
+						? await organizationPlanFromAutumn(activeOrganizationId)
+						: "free";
+					plan = tier === "free" ? null : tier;
+				} else if (activeOrganizationId === data.planOrganizationId) {
 					plan = data.plan;
 				} else if (activeOrganizationId) {
 					// A concurrent request moved the session's active organization
@@ -1143,565 +1137,136 @@ export const auth = betterAuth({
 			},
 			{ user: userOptions },
 		),
-		stripe({
-			stripeClient,
-			stripeWebhookSecret: env.STRIPE_WEBHOOK_SECRET,
-			createCustomerOnSignUp: false,
+		withAutumnBilling(
+			stripe({
+				stripeClient,
+				stripeWebhookSecret: env.STRIPE_WEBHOOK_SECRET,
+				createCustomerOnSignUp: false,
 
-			subscription: {
-				enabled: true,
-				plans: [
-					{
-						name: "pro",
-						priceId: env.STRIPE_PRO_MONTHLY_PRICE_ID,
-						annualDiscountPriceId: env.STRIPE_PRO_YEARLY_PRICE_ID,
-					},
-					{
-						name: "enterprise",
-						priceId: env.STRIPE_ENTERPRISE_YEARLY_PRICE_ID,
-					},
-				],
+				onEvent: handleStripeBillingEvent,
+				subscription: {
+					enabled: true,
+					plans: [
+						{
+							name: "pro",
+							priceId: env.STRIPE_PRO_MONTHLY_PRICE_ID,
+							annualDiscountPriceId: env.STRIPE_PRO_YEARLY_PRICE_ID,
+						},
+						{
+							name: "enterprise",
+							priceId: env.STRIPE_ENTERPRISE_YEARLY_PRICE_ID,
+						},
+					],
 
-				authorizeReference: async ({ user, referenceId, action }) => {
-					const member = await db.query.members.findFirst({
-						where: and(
-							eq(members.userId, user.id),
-							eq(members.organizationId, referenceId),
-						),
-					});
-
-					if (!member) return false;
-
-					if (
-						action === "upgrade-subscription" ||
-						action === "cancel-subscription" ||
-						action === "restore-subscription"
-					) {
-						const subscription = await db.query.subscriptions.findFirst({
+					authorizeReference: async ({ user, referenceId, action }) => {
+						const member = await db.query.members.findFirst({
 							where: and(
-								eq(subscriptions.referenceId, referenceId),
-								eq(subscriptions.status, "active"),
+								eq(members.userId, user.id),
+								eq(members.organizationId, referenceId),
 							),
 						});
-						if (subscription?.plan === "enterprise") return false;
-					}
 
-					switch (action) {
-						case "upgrade-subscription":
-						case "cancel-subscription":
-						case "restore-subscription":
-							return member.role === "owner";
-						case "list-subscription":
-							return member.role === "owner" || member.role === "admin";
-						default:
-							return false;
-					}
-				},
+						if (!member) return false;
 
-				getCheckoutSessionParams: async (
-					{ user, plan, subscription },
-					_request,
-					ctx,
-				) => {
-					if (plan.name === "enterprise") {
-						throw new Error(
-							"Enterprise subscriptions are managed by admins. Contact support@superset.sh.",
-						);
-					}
-
-					const org = await db.query.organizations.findFirst({
-						where: eq(
-							authSchema.organizations.id,
-							subscription?.referenceId ?? "",
-						),
-					});
-
-					const annual = Boolean(
-						(ctx?.body as { annual?: boolean } | undefined)?.annual,
-					);
-
-					return {
-						params: {
-							customer: org?.stripeCustomerId ?? undefined,
-							allow_promotion_codes: !annual,
-							billing_address_collection: "required",
-							metadata: {
-								organizationId: org?.id ?? "",
-								initiatedByUserId: user.id,
-							},
-						},
-					};
-				},
-
-				onSubscriptionComplete: async ({
-					subscription,
-					stripeSubscription,
-					plan,
-				}) => {
-					await resumeGatedSyncs(subscription.referenceId);
-
-					const org = await db.query.organizations.findFirst({
-						where: eq(authSchema.organizations.id, subscription.referenceId),
-					});
-
-					if (!org) return;
-
-					if (plan.name === "enterprise") return;
-
-					const owners = await getOrganizationOwners(subscription.referenceId);
-
-					const interval = stripeSubscription.items.data[0]?.price?.recurring
-						?.interval as "month" | "year" | undefined;
-					const billingInterval = interval === "year" ? "yearly" : "monthly";
-
-					const pricePerSeat =
-						stripeSubscription.items.data[0]?.price?.unit_amount ?? 0;
-					const currency =
-						stripeSubscription.items.data[0]?.price?.currency ?? "usd";
-					const amount = formatPrice(pricePerSeat, currency);
-
-					await resend.batch.send(
-						owners.map((owner) => ({
-							from: "Superset <noreply@superset.sh>",
-							to: owner.email,
-							subject: `Welcome to Superset ${plan.name}!`,
-							react: SubscriptionStartedEmail({
-								ownerName: owner.name,
-								organizationName: org.name,
-								planName: plan.name,
-								billingInterval,
-								amount,
-								seatCount: subscription.seats ?? 1,
-							}),
-						})),
-					);
-
-					try {
-						await qstash.publishJSON({
-							url: NOTIFY_SLACK_URL,
-							body: {
-								eventType: "subscription_started",
-								stripeSubscriptionId: stripeSubscription.id,
-							},
-							retries: 3,
-						});
-					} catch (error) {
-						console.error(
-							"[stripe/subscription-complete] Failed to queue Slack notification:",
-							error,
-						);
-					}
-
-					// The paid conversion. Emitted here rather than from an
-					// `onEvent` case for `checkout.session.completed` because Better
-					// Auth calls both for that one webhook, and this hook is the side
-					// that already knows the plan, seat count and interval.
-					await captureBillingEvent({
-						event: "subscription_started",
-						organizationId: subscription.referenceId,
-						initiatedByUserId: stripeSubscription.metadata?.userId,
-						// This hook is handed the subscription, not the webhook event, so
-						// the subscription id is the stable key. One `subscription_started`
-						// per subscription is the intended meaning anyway.
-						idempotencyKey: stripeSubscription.id,
-						occurredAt: new Date(stripeSubscription.created * 1000),
-						properties: {
-							plan: plan.name,
-							billing_interval: billingInterval,
-							seats: subscription.seats ?? 1,
-							// Deliberately not `revenue`: that property is what PostHog
-							// revenue analytics sums, and `payment_succeeded` below is the
-							// one event where money actually moved. Naming it here too
-							// would double-count every subscription.
-							subscription_value: pricePerSeat * (subscription.seats ?? 1),
-							currency,
-							stripe_subscription_id: stripeSubscription.id,
-						},
-					});
-				},
-
-				onSubscriptionCancel: async ({
-					subscription,
-					stripeSubscription,
-					cancellationDetails,
-				}) => {
-					const org = await db.query.organizations.findFirst({
-						where: eq(authSchema.organizations.id, subscription.referenceId),
-					});
-
-					if (!org?.stripeCustomerId) return;
-
-					const recipients = await getOrganizationBillingRecipients(
-						subscription.referenceId,
-					);
-					const accessEndsAt = subscription.periodEnd ?? new Date();
-
-					// periodEnd is the period Stripe was trying to bill for, so on a
-					// collection failure it sits weeks in the future while access has
-					// already stopped. Only a voluntary cancel keeps access until then.
-					const dueToPaymentFailure =
-						(cancellationDetails ?? stripeSubscription.cancellation_details)
-							?.reason === "payment_failed";
-
-					if (
-						subscription.plan === "pro" &&
-						!dueToPaymentFailure &&
-						stripeSubscription.canceled_at
-					) {
-						try {
-							await qstash.publishJSON({
-								url: `${env.NEXT_PUBLIC_API_URL}/api/integrations/stripe/jobs/cancellation-feedback`,
-								body: {
-									stripeSubscriptionId: stripeSubscription.id,
-									canceledAt: stripeSubscription.canceled_at,
-								},
-								delay: 2700,
-								retries: 3,
-								deduplicationId: `pro-cancellation-feedback-${stripeSubscription.id}-${stripeSubscription.canceled_at}`,
-							});
-						} catch (error) {
-							console.error(
-								"[stripe/cancellation-feedback] Failed to queue feedback:",
-								error,
-							);
+						if (
+							action === "upgrade-subscription" ||
+							action === "cancel-subscription" ||
+							action === "restore-subscription"
+						) {
+							const enterprise = billingUsesAutumn
+								? (await organizationPlanFromAutumn(referenceId)) ===
+									"enterprise"
+								: (
+										await db.query.subscriptions.findFirst({
+											where: and(
+												eq(subscriptions.referenceId, referenceId),
+												eq(subscriptions.status, "active"),
+											),
+										})
+									)?.plan === "enterprise";
+							if (enterprise) return false;
 						}
-					}
 
-					await resend.batch.send(
-						recipients.map((recipient) => ({
-							from: "Superset <noreply@superset.sh>",
-							to: recipient.email,
-							subject: dueToPaymentFailure
-								? `Your ${subscription.plan} subscription ended`
-								: `Your ${subscription.plan} subscription has been cancelled`,
-							react: SubscriptionCancelledEmail({
-								recipientName: recipient.name,
-								organizationName: org.name,
-								planName: subscription.plan,
-								accessEndsAt,
-								dueToPaymentFailure,
-							}),
-						})),
-					);
+						switch (action) {
+							case "upgrade-subscription":
+							case "cancel-subscription":
+							case "restore-subscription":
+								return member.role === "owner";
+							case "list-subscription":
+								return member.role === "owner" || member.role === "admin";
+							default:
+								return false;
+						}
+					},
 
-					try {
-						await qstash.publishJSON({
-							url: NOTIFY_SLACK_URL,
-							body: {
-								eventType: "subscription_cancelled",
-								stripeSubscriptionId: stripeSubscription.id,
-								cancellationDetails: serializeCancellationDetails(
-									cancellationDetails ??
-										stripeSubscription.cancellation_details,
-								),
-							},
-							retries: 3,
-							// portal collects the cancellation survey after cancel confirms; give it time
-							delay: 120,
-						});
-					} catch (error) {
-						console.error(
-							"[stripe/subscription-cancel] Failed to queue Slack notification:",
-							error,
-						);
-					}
-				},
-
-				onEvent: async (event: Stripe.Event) => {
-					if (event.type === "invoice.payment_failed") {
-						const invoice = event.data.object as Stripe.Invoice;
-
-						const customerId =
-							typeof invoice.customer === "string"
-								? invoice.customer
-								: invoice.customer?.id;
-
-						if (!customerId) return;
-
-						const org = await db.query.organizations.findFirst({
-							where: eq(authSchema.organizations.stripeCustomerId, customerId),
-						});
-
-						if (!org?.stripeCustomerId) return;
-
-						const subscription = await db.query.subscriptions.findFirst({
-							where: eq(subscriptions.referenceId, org.id),
-						});
-
-						// The invoice names the subscription this event is about, so it
-						// wins. The organization-level row is only a fallback: the lookup
-						// above is unordered and an organization that resubscribed has
-						// several, so preferring it can check — or notify Slack about —
-						// a subscription that has nothing to do with this invoice.
-						const stripeSubId =
-							(invoice.parent?.subscription_details?.subscription as
-								| string
-								| undefined) ?? subscription?.stripeSubscriptionId;
-
-						const isFinalAttempt = invoice.next_payment_attempt == null;
-						const isFirstAttempt = (invoice.attempt_count ?? 0) <= 1;
-
-						// Stripe keeps retrying the closing invoice after someone cancels,
-						// so this still fires for subscriptions that are already gone.
-						// Warning them they are about to lose access would be false, and
-						// nagging someone who already left is worse than saying nothing.
-						const alreadyCancelled = stripeSubId
-							? await isStripeSubscriptionCancelled(stripeSubId)
-							: false;
-
-						// Stripe fires this on every retry. Mailing all of them trains
-						// people to ignore the one that matters, so only the opening
-						// notice and the last-chance notice go out.
-						if (!alreadyCancelled && (isFirstAttempt || isFinalAttempt)) {
-							const recipients = await getOrganizationBillingRecipients(org.id);
-							const amount = formatPrice(invoice.amount_due, invoice.currency);
-							const nextRetryDate = invoice.next_payment_attempt
-								? new Date(invoice.next_payment_attempt * 1000)
-								: null;
-
-							await resend.batch.send(
-								recipients.map((recipient) => ({
-									from: "Superset <noreply@superset.sh>",
-									to: recipient.email,
-									subject: isFinalAttempt
-										? `Final notice: payment failed for ${org.name}`
-										: `Payment failed for ${org.name}`,
-									react: PaymentFailedEmail({
-										recipientName: recipient.name,
-										organizationName: org.name,
-										planName: subscription?.plan ?? "Pro",
-										amount,
-										nextRetryDate,
-										// Anyone holding the link can settle a hosted invoice,
-										// so every billing recipient gets it. The old
-										// owners-only gate existed because this used to be a
-										// billing portal session, which needs ownership.
-										payInvoiceUrl: invoice.hosted_invoice_url ?? undefined,
-									}),
-								})),
+					getCheckoutSessionParams: async (
+						{ user, plan, subscription },
+						_request,
+						ctx,
+					) => {
+						if (plan.name === "enterprise") {
+							throw new Error(
+								`Enterprise subscriptions are managed by admins. Contact ${COMPANY.SUPPORT_EMAIL}.`,
 							);
 						}
 
-						if (stripeSubId) {
-							try {
-								await qstash.publishJSON({
-									url: NOTIFY_SLACK_URL,
-									body: {
-										eventType: "payment_failed",
-										stripeSubscriptionId: stripeSubId,
-										amountCents: invoice.amount_due,
-										currency: invoice.currency,
-									},
-									retries: 3,
-								});
-							} catch (error) {
-								console.error(
-									"[stripe/payment-failed] Failed to queue Slack notification:",
-									error,
-								);
-							}
-						}
-
-						await captureBillingEvent({
-							event: "payment_failed",
-							organizationId: org.id,
-							initiatedByUserId:
-								invoice.parent?.subscription_details?.metadata?.userId,
-							idempotencyKey: event.id,
-							occurredAt: new Date(event.created * 1000),
-							properties: {
-								// No money moved, so this must not be `revenue`.
-								amount_due: invoice.amount_due,
-								currency: invoice.currency,
-								attempt_count: invoice.attempt_count ?? 0,
-								is_final_attempt: isFinalAttempt,
-								already_cancelled: alreadyCancelled,
-								stripe_subscription_id: stripeSubId ?? null,
-							},
-						});
-					}
-
-					if (event.type === "invoice.upcoming") {
-						const invoice = event.data.object as Stripe.Invoice;
-
-						const customerId =
-							typeof invoice.customer === "string"
-								? invoice.customer
-								: invoice.customer?.id;
-
-						if (!customerId) return;
-
-						const stripeSubId = invoice.parent?.subscription_details
-							?.subscription as string | undefined;
-
-						if (!stripeSubId) return;
-
-						// Matched on the Stripe id, not the organization: an organization
-						// that resubscribed has several rows and the wrong one can win.
-						const subscription = await db.query.subscriptions.findFirst({
-							where: eq(subscriptions.stripeSubscriptionId, stripeSubId),
-						});
-
-						// Annual only — see RenewalUpcomingEmail for why monthly plans and
-						// seat changes are deliberately left out.
-						if (subscription?.billingInterval !== "yearly") return;
-
-						const renewsAtSeconds =
-							invoice.next_payment_attempt ?? invoice.period_end;
-
-						if (!renewsAtSeconds) return;
-
 						const org = await db.query.organizations.findFirst({
-							where: eq(authSchema.organizations.stripeCustomerId, customerId),
+							where: eq(
+								authSchema.organizations.id,
+								subscription?.referenceId ?? "",
+							),
 						});
 
-						if (!org) return;
-
-						const recipients = await getOrganizationBillingRecipients(org.id);
-						// Max, not sum: a proration line carries its own quantity and
-						// adding them together reports more seats than exist.
-						const seatCount = invoice.lines.data.reduce(
-							(largest, line) => Math.max(largest, line.quantity ?? 0),
-							0,
+						const annual = Boolean(
+							(ctx?.body as { annual?: boolean } | undefined)?.annual,
 						);
 
-						await resend.batch.send(
-							recipients.map((recipient) => ({
-								from: "Superset <noreply@superset.sh>",
-								to: recipient.email,
-								subject: `${org.name}'s ${subscription.plan} plan renews soon`,
-								react: RenewalUpcomingEmail({
-									recipientName: recipient.name,
-									organizationName: org.name,
-									planName: subscription.plan,
-									amount: formatPrice(invoice.amount_due, invoice.currency),
-									renewsAt: new Date(renewsAtSeconds * 1000),
-									seatCount: Math.max(1, seatCount),
-									isOwner: recipient.role === "owner",
+						return {
+							params: {
+								customer: org?.stripeCustomerId ?? undefined,
+								allow_promotion_codes: !annual,
+								billing_address_collection: "required",
+								tax_id_collection: { enabled: true },
+								...(org?.stripeCustomerId && {
+									customer_update: { name: "auto", address: "auto" },
 								}),
-							})),
-						);
-					}
-
-					if (event.type === "invoice.paid") {
-						const invoice = event.data.object as Stripe.Invoice;
-
-						const subscriptionDetails =
-							invoice.parent?.subscription_details ?? undefined;
-						const stripeSubId = subscriptionDetails?.subscription as
-							| string
-							| undefined;
-
-						if (stripeSubId) {
-							try {
-								await qstash.publishJSON({
-									url: NOTIFY_SLACK_URL,
-									body: {
-										eventType: "payment_succeeded",
-										stripeSubscriptionId: stripeSubId,
-										amountCents: invoice.amount_paid,
-										currency: invoice.currency,
-										periodStart: invoice.period_start ?? 0,
-										periodEnd: invoice.period_end ?? 0,
-									},
-									retries: 3,
-								});
-							} catch (error) {
-								console.error(
-									"[stripe/payment-succeeded] Failed to queue Slack notification:",
-									error,
-								);
-							}
-						}
-
-						// `referenceId` is the organization id — Better Auth writes it
-						// onto the subscription, and Stripe copies subscription metadata
-						// onto every invoice it raises, so this needs no lookup.
-						const organizationId = subscriptionDetails?.metadata?.referenceId;
-
-						if (organizationId) {
-							await captureBillingEvent({
-								event: "payment_succeeded",
-								organizationId,
-								initiatedByUserId: subscriptionDetails?.metadata?.userId,
-								idempotencyKey: event.id,
-								occurredAt: new Date(event.created * 1000),
-								properties: {
-									revenue: invoice.amount_paid,
-									currency: invoice.currency,
-									// `subscription_create` is the first payment, everything
-									// else is a renewal or a seat change.
-									billing_reason: invoice.billing_reason,
-									stripe_subscription_id: stripeSubId ?? null,
+								metadata: {
+									organizationId: org?.id ?? "",
+									initiatedByUserId: user.id,
 								},
-							});
-						}
-					}
+							},
+						};
+					},
 
-					// Stripe expires an unpaid Checkout session ~24h after it opens, so
-					// this arrives late by design. It is the only signal that someone
-					// reached the payment page and did not pay — the paid side comes
-					// through `onSubscriptionComplete` instead.
-					if (event.type === "checkout.session.expired") {
-						const session = event.data.object as Stripe.Checkout.Session;
-						const organizationId = session.metadata?.organizationId;
+					onSubscriptionComplete: async ({
+						subscription,
+						stripeSubscription,
+						plan,
+					}) => {
+						await notifySubscriptionStarted({
+							subscription,
+							stripeSubscription,
+							planName: plan.name,
+						});
+					},
 
-						if (organizationId) {
-							await captureBillingEvent({
-								event: "checkout_abandoned",
-								organizationId,
-								initiatedByUserId: session.metadata?.userId,
-								idempotencyKey: event.id,
-								occurredAt: new Date(event.created * 1000),
-								properties: {
-									// No money moved, so this must not be `revenue`.
-									abandoned_value: session.amount_total ?? 0,
-									currency: session.currency ?? "usd",
-									stripe_session_id: session.id,
-								},
-							});
-						}
-					}
-
-					if (event.type === "customer.subscription.updated") {
-						const stripeSubscription = event.data.object as Stripe.Subscription;
-						const previousAttributes = event.data.previous_attributes as
-							| Partial<Stripe.Subscription>
-							| undefined;
-
-						const previousPriceId =
-							previousAttributes?.items?.data?.[0]?.price?.id;
-						const currentPriceId = stripeSubscription.items.data[0]?.price?.id;
-
-						if (!previousPriceId || previousPriceId === currentPriceId) return;
-
-						const previousInterval =
-							previousAttributes?.items?.data?.[0]?.price?.recurring
-								?.interval === "year"
-								? "yearly"
-								: "monthly";
-
-						try {
-							await qstash.publishJSON({
-								url: NOTIFY_SLACK_URL,
-								body: {
-									eventType: "plan_changed",
-									stripeSubscriptionId: stripeSubscription.id,
-									previousInterval,
-								},
-								retries: 3,
-							});
-						} catch (error) {
-							console.error(
-								"[stripe/plan-changed] Failed to queue Slack notification:",
-								error,
-							);
-						}
-					}
+					onSubscriptionCancel: async ({
+						subscription,
+						stripeSubscription,
+						cancellationDetails,
+					}) => {
+						await notifySubscriptionCanceled({
+							subscription,
+							stripeSubscription,
+							cancellationDetails,
+						});
+					},
 				},
-			},
-		}),
+			}),
+			{ enabled: billingUsesAutumn, deps: autumnBillingDeps },
+		),
 		acceptInvitationEndpoint,
+		autumnBillingRoutes,
 	],
 });
 

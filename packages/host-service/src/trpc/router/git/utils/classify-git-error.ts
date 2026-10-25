@@ -6,7 +6,11 @@ import { TRPCError } from "@trpc/server";
 const CWD_GONE_PATTERN =
 	/unable to read current working directory: no such file or directory/i;
 const CWD_UNREADABLE_PATTERN = /unable to read current working directory/i;
-const NOT_GIT_REPO_PATTERN = /not a git repository/i;
+// Git 2.56 reworded "not a git repository: <dir>" for a `.git` file whose
+// target is not a repository, such as a worktree whose main repo was moved or
+// deleted, or whose admin data was pruned.
+const NOT_GIT_REPO_PATTERN =
+	/not a git repository|^fatal: gitfile does not point to a valid repository: /im;
 // Git's text (do_read_index, read-cache.c) when mmap(2) of the index fails,
 // with the errno macOS returns when the file's storage cannot deliver it: a
 // cloud-synced folder whose sync client evicted the index and cannot fetch it
@@ -16,6 +20,10 @@ const NOT_GIT_REPO_PATTERN = /not a git repository/i;
 // such as running out of memory, stay unclassified.
 const INDEX_STORAGE_UNAVAILABLE_PATTERN =
 	/unable to map index file: Operation (?:timed out|canceled)$/m;
+// The same storage failure on any other file git maps (packfiles, pack
+// indexes, worktree files it hashes), reported by git's xmmap() wrapper.
+const MAPPED_FILE_STORAGE_UNAVAILABLE_PATTERN =
+	/^fatal: mmap failed: Operation (?:timed out|canceled)$/m;
 // Git's text when the directory resolves to a repository but has no work tree
 // attached: the repo is bare, or the linked worktree's admin data was removed
 // or pruned. Distinct from CWD_GONE_PATTERN, where the directory itself is
@@ -143,7 +151,8 @@ export function rethrowEnvironmentalGitError(error: unknown): void {
 	}
 	if (
 		CWD_UNREADABLE_PATTERN.test(error.message) ||
-		INDEX_STORAGE_UNAVAILABLE_PATTERN.test(error.message)
+		INDEX_STORAGE_UNAVAILABLE_PATTERN.test(error.message) ||
+		MAPPED_FILE_STORAGE_UNAVAILABLE_PATTERN.test(error.message)
 	) {
 		throw new TRPCError({
 			code: "PRECONDITION_FAILED",

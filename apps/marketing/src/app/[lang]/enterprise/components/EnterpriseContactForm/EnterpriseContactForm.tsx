@@ -3,6 +3,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
 import { useState } from "react";
+import { track } from "@/lib/analytics";
 import { submitEnterpriseInquiry } from "../../actions";
 
 export function EnterpriseContactForm() {
@@ -30,6 +31,7 @@ export function EnterpriseContactForm() {
 			const result = await submitEnterpriseInquiry(formState, i18n.locale);
 
 			if (result.success) {
+				track("enterprise_inquiry_submitted", { source: "enterprise" });
 				setStatus("success");
 			} else {
 				setStatus("error");

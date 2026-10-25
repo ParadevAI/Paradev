@@ -1,0 +1,89 @@
+---
+title: "Claude Code Worktrees: How to Run Claude Code in Git Worktrees (2026)"
+description: "How to use Git worktrees with Claude Code: manual worktree commands, Claude Code's built-in worktree support and /batch, and running several Claude Code sessions in parallel worktrees with Superset."
+date: 2026-10-13
+type: "tutorial"
+competitors:
+  - claude-code
+keywords:
+  - claude code worktrees
+  - claude code git worktree
+  - claude code worktree parallel
+  - claude code multiple worktrees
+  - claude code batch worktrees
+  - run claude code in parallel
+---
+
+Git worktrees are the standard way to run more than one Claude Code session on the same repository. Each worktree is a separate checkout of the repository on its own branch, so two sessions never edit the same files. This guide covers three ways to do it: by hand with `git worktree`, with Claude Code's own worktree support, and with a workspace that manages worktrees for you.
+
+---
+
+## Why Claude Code Needs Worktrees
+
+Two Claude Code sessions in the same directory share one set of files. They overwrite each other's edits, their diffs mix together, and one session's failing build confuses the other. A worktree gives each session its own working directory and branch, while all of them share the same Git history.
+
+Worktrees separate files. They do not sandbox processes: two sessions can still fight over the same dev-server port, database, or cache.
+
+## Option 1: Manual Git Worktrees
+
+Create one worktree per task, then start Claude Code in each:
+
+```bash
+git worktree add ../myapp-auth -b feat/auth
+git worktree add ../myapp-billing -b feat/billing
+
+cd ../myapp-auth && claude
+# in another terminal
+cd ../myapp-billing && claude
+```
+
+When a task is done, review and merge its branch, then remove the worktree:
+
+```bash
+git worktree remove ../myapp-auth
+```
+
+This works anywhere, but you manage the directories, branches, terminals, dependency installs, and cleanup yourself. New worktrees start without your `node_modules`, `.env` files, and other ignored files, so you usually need a setup step.
+
+## Option 2: Claude Code's Built-In Worktrees
+
+Claude Code has worktree support built in. Its `/batch` command fans one change out across 5 to 30 subagents, each in its own worktree, and its agent view tracks background sessions. This suits one large change split into many pieces, inside one Claude Code session. Anthropic notes that parallel runs multiply token use, and that its experimental agent teams do not isolate teammates in worktrees.
+
+See Anthropic's [Claude Code docs](https://code.claude.com/docs/en/agents) for the current commands.
+
+## Option 3: Superset
+
+[Superset](/) is a desktop workspace that creates a worktree, branch, and terminal for every new local branch-based workspace, and runs Claude Code in it. You can run as many sessions as you like on the same repository, next to Codex or other agents, and:
+
+- **Configured setup runs automatically.** If you add a `setup` command to `.superset/config.json`, Superset runs it for each new worktree. Configure it to install dependencies and copy `.env` files. See [Project Lifecycle Scripts](https://docs.superset.sh/setup-teardown-scripts).
+- **Review is built in.** Each workspace's Changes pane shows the diff, and you can commit, push, and open a pull request from it.
+- **Sessions survive restarts.** Terminals run in a background daemon, so closing or updating the app does not stop Claude Code.
+- **You can check on it from your phone** with the [iPhone and iPad app](/mobile).
+
+Superset runs Claude Code on your own Claude plan or API key and never proxies model calls.
+
+## Which Should You Use?
+
+| Approach | Best for | You manage |
+|---|---|---|
+| Manual `git worktree` | A couple of sessions, full control | Directories, branches, setup, cleanup, review |
+| Claude Code `/batch` | One big change split into many parts | Token use; reviewing many diffs |
+| Superset | Many independent tasks, possibly with other agents | Nothing beyond the setup script |
+
+## Frequently Asked Questions
+
+### Does Claude Code support Git worktrees?
+
+Yes. Claude Code has built-in worktree support, and its `/batch` command runs subagents in separate worktrees. You can also create worktrees yourself with `git worktree add` and start Claude Code in each.
+
+### How many Claude Code sessions can I run in parallel?
+
+As many as your plan's limits and your machine allow. Each session uses tokens, so parallel runs multiply usage. Give each one its own worktree.
+
+### How do I get my .env file into a new worktree?
+
+Ignored files are not copied into new worktrees. Add a setup command that copies them. Superset runs that command automatically for each new workspace; use `$SUPERSET_ROOT_PATH` to reach the main checkout.
+
+### Can I run Claude Code and Codex in worktrees at the same time?
+
+Yes. Give each its own worktree. See [Race Agents on One Task](https://docs.superset.sh/recipes/race-agents) and [How to Run Multiple Claude Code Agents in Parallel](/compare/multiple-claude-code-agents-parallel).

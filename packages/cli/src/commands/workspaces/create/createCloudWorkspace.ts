@@ -1,4 +1,5 @@
 import { CLIError } from "@superset/cli-framework";
+import type { MachineSize } from "@superset/shared/billing";
 import { TRPCClientError } from "@trpc/client";
 import type { ApiClient } from "../../../lib/api-client";
 import { resolveCloudEnvironment } from "../../../lib/cloud-workspaces";
@@ -13,6 +14,7 @@ export interface CloudCreateOptions {
 	model?: string;
 	effort?: string;
 	environment?: string;
+	machineSize?: MachineSize;
 	project?: string;
 	session?: boolean;
 	pr?: number;
@@ -98,6 +100,7 @@ export async function createCloudWorkspace(args: {
 			...(options.prompt ? { prompt: options.prompt } : {}),
 			...(options.model ? { model: options.model } : {}),
 			...(options.effort ? { effort: options.effort } : {}),
+			...(options.machineSize ? { machineSize: options.machineSize } : {}),
 		})
 		.catch(rethrowWithLocationHint);
 

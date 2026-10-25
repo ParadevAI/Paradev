@@ -323,6 +323,42 @@ describe("useDiffCodeViewItems", () => {
 		);
 	});
 
+	test("a hidden pane with an older file status does not fetch against the visible pane", async () => {
+		patchByCategory.set("unstaged", FILE_A + FILE_B);
+		const client = new QueryClient({
+			defaultOptions: { queries: { retry: false } },
+		});
+		const wrapper = hostWrapper(client);
+		const hidden = renderHook(
+			(props: Parameters<typeof useDiffCodeViewItems>[0]) =>
+				useDiffCodeViewItems(props),
+			{
+				wrapper,
+				initialProps: {
+					...options([unstagedFile("a.ts"), unstagedFile("b.ts", "untracked")]),
+					enabled: true,
+				},
+			},
+		);
+		await waitFor(() => diffItem(hidden.result.current.items, "b.ts"));
+		hidden.rerender({
+			...options([unstagedFile("a.ts"), unstagedFile("b.ts", "untracked")]),
+			enabled: false,
+		});
+
+		const visible = renderHook(
+			() =>
+				useDiffCodeViewItems(
+					options([unstagedFile("a.ts"), unstagedFile("b.ts", "modified")]),
+				),
+			{ wrapper },
+		);
+		await waitFor(() => diffItem(visible.result.current.items, "b.ts"));
+		await new Promise((resolve) => setTimeout(resolve, 150));
+
+		expect(getDiffPatch).toHaveBeenCalledTimes(2);
+	});
+
 	test("a file joining the changeset refetches the same cache entry", async () => {
 		patchByCategory.set("unstaged", FILE_A);
 		const { client, result, rerender } = renderItems([unstagedFile("a.ts")]);

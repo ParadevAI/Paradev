@@ -31,6 +31,10 @@ interface UseDiffCodeViewScrollResult {
 	 *  taking over, which releases the sticky re-scroll below for the current
 	 *  click until a new one arrives. */
 	notifyScroll: () => void;
+	/** Call on user input in the diff (wheel, touch, pointer, key). It releases
+	 *  the sticky re-scroll at once: while layout keeps shifting, each re-scroll
+	 *  restarts the settle window, so `notifyScroll` alone never lets go. */
+	releaseScroll: () => void;
 }
 
 // @pierre/diffs' default critically-damped spring settles a smooth-auto
@@ -151,6 +155,16 @@ export function useDiffCodeViewScroll({
 		if (!shouldReassertScroll(lastAssertedRef.current, scrollKey, targetTop))
 			return;
 
+		// Pierre drops a line it cannot place (an outdated comment's line, or
+		// one in folded context); the file scroll queued first then stands.
+		if (target.type === "line") {
+			codeViewRef.current?.scrollTo({
+				type: "item",
+				id: targetItemId,
+				align: "start",
+				behavior: "smooth-auto",
+			});
+		}
 		codeViewRef.current?.scrollTo(target);
 		lastAssertedRef.current = { scrollKey, targetTop };
 		lastProgrammaticScrollAtRef.current = Date.now();
@@ -179,5 +193,9 @@ export function useDiffCodeViewScroll({
 		stickyRef.current = false;
 	}, []);
 
-	return { targetItemId, notifyScroll };
+	const releaseScroll = useCallback(() => {
+		stickyRef.current = false;
+	}, []);
+
+	return { targetItemId, notifyScroll, releaseScroll };
 }

@@ -58,12 +58,16 @@ export function BoardColumnIcon({ column, className }: BoardColumnIconProps) {
 			return (
 				<PieIcon fraction={0.5} className={cn("text-amber-500", className)} />
 			);
-		case "review":
+		case "finished":
 			return (
 				<PieIcon
 					fraction={0.75}
 					className={cn("text-emerald-500", className)}
 				/>
+			);
+		case "review":
+			return (
+				<PieIcon fraction={0.9} className={cn("text-sky-500", className)} />
 			);
 		case "merged":
 			return (

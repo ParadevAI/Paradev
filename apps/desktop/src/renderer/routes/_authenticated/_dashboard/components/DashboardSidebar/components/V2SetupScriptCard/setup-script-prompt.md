@@ -1,4 +1,4 @@
-Set up [Superset workspace setup & teardown scripts](https://docs.superset.sh/setup-teardown-scripts) for this project.
+Set up [Superset workspace setup & teardown scripts]({{DOCS_URL}}/setup-teardown-scripts) for this project.
 
 ## Goal
 

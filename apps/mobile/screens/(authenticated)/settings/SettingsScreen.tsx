@@ -1,6 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useLingui } from "@lingui/react/macro";
 import { formatDate } from "@superset/i18n/format";
+import { BRAND } from "@superset/shared/brand";
 import {
 	ACCOUNT_DELETION_GRACE_DAYS,
 	COMPANY,
@@ -39,6 +40,7 @@ function formatJoined(createdAt?: Date | string | null) {
 
 export function SettingsScreen() {
 	const { t } = useLingui();
+	const appName = BRAND.NAME;
 	const router = useRouter();
 	const theme = useTheme();
 	const insets = useSafeAreaInsets();
@@ -303,7 +305,7 @@ export function SettingsScreen() {
 						/>
 					}
 					label={t({
-						message: "Rate Superset",
+						message: `Rate ${appName}`,
 					})}
 					trailing={<ExternalIcon color={theme.mutedForeground} />}
 					onPress={() => openUrl(WRITE_REVIEW_URL)}
@@ -352,7 +354,7 @@ export function SettingsScreen() {
 				className="pt-10 text-center text-xs uppercase"
 				style={{ color: theme.mutedForeground }}
 			>
-				{`${COMPANY.NAME} v${Application.nativeApplicationVersion ?? "0.0.0"} (${Application.nativeBuildVersion ?? "0"})`}
+				{`${BRAND.NAME} v${Application.nativeApplicationVersion ?? "0.0.0"} (${Application.nativeBuildVersion ?? "0"})`}
 			</Text>
 		</ScrollView>
 	);

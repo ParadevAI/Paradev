@@ -1,17 +1,22 @@
 import path from "node:path";
 import { SUPPORTED_LOCALES } from "@superset/i18n/locales";
-import { IOS_APP } from "@superset/shared/constants";
+import { IOS_APP } from "@superset/shared/app-identity";
+import { BRAND } from "@superset/shared/brand";
 import { config } from "dotenv";
 import type { ConfigContext } from "expo/config";
 import { withIosAccentColor } from "./config-plugins/withIosAccentColor";
 import { withSceneLifecycle } from "./config-plugins/withSceneLifecycle";
 
-// Load .env file
-config({
-	path: path.resolve(__dirname, "../../.env"),
-	override: true,
-	quiet: true,
-});
+// The root .env belongs to the local dev stack. Every eas.json build profile
+// sets MOBILE_EAS_BUILD, so a build submitted from a dev checkout resolves the
+// same config, and the same runtime version, as EAS, which has no .env.
+if (process.env.MOBILE_EAS_BUILD !== "1") {
+	config({
+		path: path.resolve(__dirname, "../../.env"),
+		override: true,
+		quiet: true,
+	});
+}
 
 const webUrl = new URL(
 	process.env.EXPO_PUBLIC_WEB_URL || "https://app.superset.sh",
@@ -37,7 +42,7 @@ export default ({ config }: ConfigContext) => ({
 	locales: Object.fromEntries(
 		SUPPORTED_LOCALES.map((locale) => [locale, `./locales/${locale}.json`]),
 	),
-	version: "1.1.4",
+	version: "1.2.1",
 	orientation: "portrait",
 	icon: "./assets/icon.png",
 	userInterfaceStyle: "dark",
@@ -63,6 +68,7 @@ export default ({ config }: ConfigContext) => ({
 		...(associatedDomains && { associatedDomains }),
 		usesAppleSignIn: true,
 		infoPlist: {
+			CFBundleDisplayName: BRAND.NAME,
 			"UISupportedInterfaceOrientations~ipad": [
 				"UIInterfaceOrientationPortrait",
 				"UIInterfaceOrientationPortraitUpsideDown",
@@ -121,7 +127,8 @@ export default ({ config }: ConfigContext) => ({
 			{
 				organization: "superset-sh",
 				project: "mobile",
-				useNativeInit: true,
+				// Native init with no DSN crashes the app at launch.
+				useNativeInit: Boolean(process.env.EXPO_PUBLIC_SENTRY_DSN_MOBILE),
 				options: {
 					dsn: process.env.EXPO_PUBLIC_SENTRY_DSN_MOBILE,
 					environment: process.env.EXPO_PUBLIC_SENTRY_ENVIRONMENT,

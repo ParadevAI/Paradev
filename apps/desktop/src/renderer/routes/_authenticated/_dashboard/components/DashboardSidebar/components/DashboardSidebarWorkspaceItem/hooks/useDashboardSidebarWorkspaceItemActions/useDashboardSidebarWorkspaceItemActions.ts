@@ -7,6 +7,7 @@ import { useMatchRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { getTerminalAgentBindingsQueryKey } from "renderer/hooks/host-service/useTerminalAgentBindings";
 import { useWorkspaceHostUrl } from "renderer/hooks/host-service/useWorkspaceHostUrl";
+import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { showHostServiceUnavailableToast } from "renderer/lib/host-service-unavailable";
@@ -17,6 +18,7 @@ import {
 	useMarkSidebarWorkspaceTerminalsSeen,
 	useSidebarWorkspaceStatus,
 } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/providers/DashboardSidebarWorkspaceStatusProvider";
+import { useCloudSidebarStore } from "renderer/routes/_authenticated/_dashboard/stores/cloudSidebarStore";
 import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
 import { useOptimisticActions } from "renderer/routes/_authenticated/hooks/useOptimisticActions";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
@@ -32,6 +34,8 @@ interface UseDashboardSidebarWorkspaceItemActionsOptions {
 	projectId: string | null;
 	/** Only sessions may be grouped by tag. */
 	isSessionWorkspace?: boolean;
+	/** Listed from the cloud, with no placement row to hide. */
+	isCloudWorkspace?: boolean;
 	workspaceName: string;
 	branch: string;
 	isPinned?: boolean;
@@ -41,11 +45,14 @@ export function useDashboardSidebarWorkspaceItemActions({
 	workspaceId,
 	projectId,
 	isSessionWorkspace = false,
+	isCloudWorkspace = false,
 	workspaceName,
 	branch,
 	isPinned = false,
 }: UseDashboardSidebarWorkspaceItemActionsOptions) {
 	const { t } = useLingui();
+	const organizationId = useActiveOrganizationId();
+	const setCloudInSidebar = useCloudSidebarStore((s) => s.setInSidebar);
 	const navigate = useNavigate();
 	const matchRoute = useMatchRoute();
 	const hostService = useLocalHostService();
@@ -124,7 +131,9 @@ export function useDashboardSidebarWorkspaceItemActions({
 		const trimmed = renameValue.trim();
 		if (!trimmed || trimmed === workspaceName) return;
 		setPendingName(trimmed);
-		workspaceActions.renameWorkspace(workspaceId, trimmed);
+		workspaceActions.renameWorkspace(workspaceId, trimmed, {
+			cloud: isCloudWorkspace,
+		});
 	};
 
 	// The delete dialog is globally mounted (archive-first tombstoning drops
@@ -138,6 +147,10 @@ export function useDashboardSidebarWorkspaceItemActions({
 	};
 
 	const handleRemoveFromSidebar = () => {
+		if (isCloudWorkspace) {
+			if (organizationId) setCloudInSidebar(organizationId, workspaceId, false);
+			return;
+		}
 		useRemoveFromSidebarIntent.getState().request({
 			workspaceId,
 			workspaceName,

@@ -1,4 +1,4 @@
-import { db } from "@superset/db/client";
+import { db, dbWs } from "@superset/db/client";
 import type { IntegrationProvider } from "@superset/db/enums";
 import {
 	cloudWorkspaceActivity,
@@ -14,6 +14,7 @@ import {
 	taskProjects,
 	taskStatuses,
 	tasks,
+	teams,
 	users,
 } from "@superset/db/schema";
 import { retiredTaskColumns } from "@superset/db/task-list-query";
@@ -31,6 +32,10 @@ import { primaryRepository } from "../../lib/sandbox";
 import { jwtProcedure } from "../../trpc";
 import { loadVisibleWorkspace, visibleTo } from "./access";
 import { recordCloudWorkspaceActivity } from "./activity";
+import {
+	recordPullRequests,
+	reportedPullRequestsSchema,
+} from "./pull-requests";
 
 const DESCRIPTION_MAX_LENGTH = 20_000;
 
@@ -214,6 +219,35 @@ export async function addLabel(args: {
 	);
 }
 
+/** Who a share or unshare was for, if the person, team, or invitation still exists. */
+function shareTargetOf(row: {
+	entry: { targetEmail: string | null };
+	targetUser: {
+		userId: string | null;
+		name: string | null;
+		image: string | null;
+	} | null;
+	targetTeam: { id: string | null; name: string | null } | null;
+}) {
+	if (row.targetUser?.userId && row.targetUser.name !== null) {
+		return {
+			kind: "user" as const,
+			person: {
+				userId: row.targetUser.userId,
+				name: row.targetUser.name,
+				image: row.targetUser.image,
+			},
+		};
+	}
+	if (row.targetTeam?.id && row.targetTeam.name !== null) {
+		return { kind: "team" as const, name: row.targetTeam.name };
+	}
+	if (row.entry.targetEmail) {
+		return { kind: "email" as const, email: row.entry.targetEmail };
+	}
+	return null;
+}
+
 export const cloudWorkspaceRecordRouter = {
 	/** One box in any state, archived included, with what its record page shows. */
 	get: jwtProcedure
@@ -230,7 +264,7 @@ export const cloudWorkspaceRecordRouter = {
 						: undefined,
 					db.query.environments.findFirst({
 						where: eq(environments.id, row.environmentId),
-						columns: { id: true, name: true, hooksRepositoryId: true },
+						columns: { id: true, name: true, primaryRepositoryId: true },
 					}),
 					db
 						.select({
@@ -258,7 +292,7 @@ export const cloudWorkspaceRecordRouter = {
 				]);
 			const primary = primaryRepository(
 				repositories,
-				environment?.hooksRepositoryId,
+				environment?.primaryRepositoryId,
 			);
 			const orderedRepositories = primary
 				? [primary, ...repositories.filter((repo) => repo.id !== primary.id)]
@@ -307,6 +341,7 @@ export const cloudWorkspaceRecordRouter = {
 			const fromProject = alias(taskProjects, "from_project");
 			const toProject = alias(taskProjects, "to_project");
 			const proposer = alias(users, "proposer");
+			const targetUser = alias(users, "target_user");
 			const rows = await db
 				.select({
 					entry: cloudWorkspaceActivity,
@@ -350,6 +385,12 @@ export const cloudWorkspaceRecordRouter = {
 						name: proposer.name,
 						image: proposer.image,
 					},
+					targetUser: {
+						userId: targetUser.id,
+						name: targetUser.name,
+						image: targetUser.image,
+					},
+					targetTeam: { id: teams.id, name: teams.name },
 				})
 				.from(cloudWorkspaceActivity)
 				.leftJoin(users, eq(users.id, cloudWorkspaceActivity.actorUserId))
@@ -377,6 +418,11 @@ export const cloudWorkspaceRecordRouter = {
 					eq(suggestions.id, cloudWorkspaceActivity.suggestionId),
 				)
 				.leftJoin(proposer, eq(proposer.id, suggestions.proposedByUserId))
+				.leftJoin(
+					targetUser,
+					eq(targetUser.id, cloudWorkspaceActivity.targetUserId),
+				)
+				.leftJoin(teams, eq(teams.id, cloudWorkspaceActivity.targetTeamId))
 				.where(eq(cloudWorkspaceActivity.cloudWorkspaceId, row.id))
 				.orderBy(asc(cloudWorkspaceActivity.createdAt));
 
@@ -431,6 +477,7 @@ export const cloudWorkspaceRecordRouter = {
 				page: row.page?.id ? row.page : null,
 				suggestedBy: row.suggestedBy?.userId ? row.suggestedBy : null,
 				suggestionSource: row.suggestion?.source ?? null,
+				shareTarget: shareTargetOf(row),
 			}));
 			if (entries.some((entry) => entry.event === "created")) return entries;
 			// Boxes made before the log existed still show where they started.
@@ -469,6 +516,7 @@ export const cloudWorkspaceRecordRouter = {
 					page: null,
 					suggestedBy: null,
 					suggestionSource: null,
+					shareTarget: null,
 				},
 				...entries,
 			];
@@ -477,8 +525,8 @@ export const cloudWorkspaceRecordRouter = {
 	tasks: jwtProcedure
 		.input(z.object({ organizationId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
-			await assertCloudAccess(ctx);
 			assertMember(ctx.organizationIds, input.organizationId);
+			await assertCloudAccess(ctx, input.organizationId);
 			const visible = await db
 				.select({ id: cloudWorkspaces.id })
 				.from(cloudWorkspaces)
@@ -495,8 +543,8 @@ export const cloudWorkspaceRecordRouter = {
 	labels: jwtProcedure
 		.input(z.object({ organizationId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
-			await assertCloudAccess(ctx);
 			assertMember(ctx.organizationIds, input.organizationId);
+			await assertCloudAccess(ctx, input.organizationId);
 			return db
 				.select({
 					cloudWorkspaceId: cloudWorkspaceLabels.cloudWorkspaceId,
@@ -607,6 +655,30 @@ export const cloudWorkspaceRecordRouter = {
 			return { description };
 		}),
 
+	reportPullRequests: jwtProcedure
+		.input(
+			z.object({
+				id: z.string().uuid(),
+				pullRequests: reportedPullRequestsSchema,
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			if (ctx.sandboxCaller && ctx.sandboxCaller.workspaceId !== input.id) {
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "A cloud workspace can only report its own pull requests",
+				});
+			}
+			const row = await loadVisibleWorkspace(ctx, input.id);
+			if (row.status === "deleted") {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Workspace not found",
+				});
+			}
+			return recordPullRequests(row, input.pullRequests);
+		}),
+
 	setProject: jwtProcedure
 		.input(
 			z.object({
@@ -626,7 +698,9 @@ export const cloudWorkspaceRecordRouter = {
 		.input(z.object({ id: z.string().uuid(), name: z.string() }))
 		.mutation(async ({ ctx, input }) => {
 			const row = await loadVisibleWorkspace(ctx, input.id);
-			const [label] = await ensureLabels(db, row.organizationId, [input.name]);
+			const [label] = await dbWs.transaction((tx) =>
+				ensureLabels(tx, row.organizationId, [input.name]),
+			);
 			if (!label) {
 				throw new TRPCError({ code: "BAD_REQUEST", message: "Invalid label" });
 			}

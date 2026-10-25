@@ -16,7 +16,6 @@ type SortableWorkspace = { agentStatusAt: Date | null; createdAt: Date };
 type GroupedWorkspace = SortableWorkspace & {
 	id: string;
 	createdBy: Person | null;
-	presence: (Person & { lastSeenAt: Date })[];
 };
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -95,14 +94,10 @@ export function groupCloudWorkspacesByTime<
 export function groupCloudWorkspaces<Workspace extends GroupedWorkspace>({
 	workspaces,
 	userId,
-	now,
-	activeWithinMs,
 	sort = "activity",
 }: {
 	workspaces: Workspace[];
 	userId: string | null;
-	now: Date;
-	activeWithinMs: number;
 	sort?: CloudWorkspaceSort;
 }): { person: Person | null; workspaces: Workspace[] }[] {
 	const groups = new Map<
@@ -110,12 +105,7 @@ export function groupCloudWorkspaces<Workspace extends GroupedWorkspace>({
 		{ person: Person | null; workspaces: Workspace[] }
 	>();
 	for (const workspace of sortCloudWorkspaces(workspaces, sort)) {
-		const inItNow = workspace.presence.find(
-			(person) => now.getTime() - person.lastSeenAt.getTime() < activeWithinMs,
-		);
-		const person: Person | null = inItNow
-			? { userId: inItNow.userId, name: inItNow.name, image: inItNow.image }
-			: workspace.createdBy;
+		const person = workspace.createdBy;
 		const key = person?.userId ?? "";
 		const group = groups.get(key) ?? { person, workspaces: [] };
 		group.workspaces.push(workspace);

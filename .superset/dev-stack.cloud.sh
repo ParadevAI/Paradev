@@ -5,15 +5,34 @@ set -uo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 LOG_DIR="${SUPERSET_LOG_DIR:-/var/log/superset}"
 
+DEV_SERVERS_MIN_MB=8192
+DESKTOP_DEV_MIN_MB=8192
+
+box_memory_mb() {
+  if [ -n "${SUPERSET_SANDBOX_MEMORY_MB:-}" ]; then echo "$SUPERSET_SANDBOX_MEMORY_MB"; return; fi
+  local max
+  max="$(cat /sys/fs/cgroup/memory.max 2>/dev/null || true)"
+  case "$max" in
+    ''|max) awk '/MemTotal/ {print int($2 / 1024)}' /proc/meminfo ;;
+    *) echo $(( max / 1048576 )) ;;
+  esac
+}
+
 [ -f "$ROOT_DIR/.env" ] || { echo "dev-stack: no .env; the provision hook writes it"; exit 0; }
 command -v tmux >/dev/null || { echo "dev-stack: tmux is not installed"; exit 0; }
 tmux has-session -t superset 2>/dev/null && { echo "dev-stack: already running"; exit 0; }
+MEMORY_MB="$(box_memory_mb)"
+[ "$MEMORY_MB" -ge "$DEV_SERVERS_MIN_MB" ] || { echo "dev-stack: ${MEMORY_MB} MB box; not starting the dev servers (needs ${DEV_SERVERS_MIN_MB})"; exit 0; }
 
 mkdir -p "$LOG_DIR"
 tmux new-session -d -s superset -n stack -c "$ROOT_DIR" \
   "export NODE_ENV=development; set -a; . '$ROOT_DIR/.env'; set +a; bunx turbo run dev --filter=@superset/api --filter=@superset/web --filter=// 2>&1 | tee '$LOG_DIR/dev-stack.log'"
-tmux new-window -t superset -n desktop -c "$ROOT_DIR/apps/desktop" \
-  "export DISPLAY=${DISPLAY:-:1} NODE_ENV=development; set -a; . '$ROOT_DIR/.env'; set +a; bun run dev 2>&1 | tee '$LOG_DIR/desktop-dev.log'"
+if [ "$MEMORY_MB" -ge "$DESKTOP_DEV_MIN_MB" ]; then
+  tmux new-window -t superset -n desktop -c "$ROOT_DIR/apps/desktop" \
+    "export DISPLAY=${DISPLAY:-:1} NODE_ENV=development; set -a; . '$ROOT_DIR/.env'; set +a; bun run dev 2>&1 | tee '$LOG_DIR/desktop-dev.log'"
+else
+  echo "dev-stack: ${MEMORY_MB} MB box; skipping the desktop dev build (needs ${DESKTOP_DEV_MIN_MB})"
+fi
 tmux new-window -t superset -n realtime -c "$ROOT_DIR" \
   "bash '$ROOT_DIR/apps/realtime/scripts/dev-local.sh' 2>&1 | tee '$LOG_DIR/realtime-dev.log'"
 echo "dev-stack: started (tmux attach -t superset)"

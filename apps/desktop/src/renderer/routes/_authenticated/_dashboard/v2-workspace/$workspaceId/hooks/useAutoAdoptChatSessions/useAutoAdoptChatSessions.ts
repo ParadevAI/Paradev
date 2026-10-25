@@ -82,6 +82,7 @@ export function useAutoAdoptChatSessions({
 			const presetId = presetForAcpHarness(session.harness);
 			if (!presetId) continue;
 			store.getState().addTab({
+				focus: false,
 				panes: [
 					{
 						kind: "chat-v3",

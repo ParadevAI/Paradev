@@ -1,26 +1,16 @@
 import { db, dbWs } from "@superset/db/client";
-import {
-	members,
-	subscriptions,
-	users,
-	v2Hosts,
-	v2UsersHosts,
-} from "@superset/db/schema";
-import {
-	ACTIVE_SUBSCRIPTION_STATUSES,
-	isActiveSubscriptionStatus,
-	isPaidPlan,
-} from "@superset/shared/billing";
+import { members, users, v2Hosts, v2UsersHosts } from "@superset/db/schema";
 import {
 	buildHostRoutingKey,
 	parseHostRoutingKey,
 } from "@superset/shared/host-routing";
 import { HOST_INSTALL_SOURCES } from "@superset/shared/host-version";
 import type { TRPCRouterRecord } from "@trpc/server";
-import { and, count, desc, eq, inArray } from "drizzle-orm";
+import { and, count, eq } from "drizzle-orm";
 import { z } from "zod";
 import { env } from "../../env";
 import { emitAppFirstOpened } from "../../lib/activation-events";
+import { organizationPlan } from "../../lib/billing/plan";
 import { nudge } from "../../lib/realtime";
 import { fetchRelayPresence } from "../../lib/relay-presence";
 import { jwtProcedure, userError } from "../../trpc";
@@ -246,19 +236,8 @@ export const hostRouter = {
 				return { allowed: false, paidPlan: false };
 			}
 			const [row] = await db
-				.select({
-					hostId: v2UsersHosts.hostId,
-					subscriptionPlan: subscriptions.plan,
-					subscriptionStatus: subscriptions.status,
-				})
+				.select({ hostId: v2UsersHosts.hostId })
 				.from(v2UsersHosts)
-				.leftJoin(
-					subscriptions,
-					and(
-						eq(subscriptions.referenceId, v2UsersHosts.organizationId),
-						inArray(subscriptions.status, ACTIVE_SUBSCRIPTION_STATUSES),
-					),
-				)
 				.where(
 					and(
 						eq(v2UsersHosts.userId, ctx.userId),
@@ -266,14 +245,11 @@ export const hostRouter = {
 						eq(v2UsersHosts.hostId, parsed.machineId),
 					),
 				)
-				.orderBy(desc(subscriptions.createdAt))
 				.limit(1);
 
 			const allowed = !!row;
 			const paidPlan =
-				!!row &&
-				isPaidPlan(row.subscriptionPlan) &&
-				isActiveSubscriptionStatus(row.subscriptionStatus);
+				allowed && (await organizationPlan(parsed.organizationId)) !== "free";
 			return { allowed, paidPlan };
 		}),
 

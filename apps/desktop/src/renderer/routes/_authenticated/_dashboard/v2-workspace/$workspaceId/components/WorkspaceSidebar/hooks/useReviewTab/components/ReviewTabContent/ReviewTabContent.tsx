@@ -1,6 +1,6 @@
 import { Trans } from "@lingui/react/macro";
 import { memo } from "react";
-import type { PullRequestRef } from "renderer/lib/github/pullRequestRef";
+import type { OpenPullRequestPane } from "renderer/lib/github/openPullRequestLink";
 import type { CommentPaneData, DiffFocusSide } from "../../../../../../types";
 import { CommentsSection } from "../../../../../CommentsSection";
 import type { NormalizedComment, NormalizedPR } from "../../types";
@@ -15,7 +15,7 @@ interface ReviewTabContentProps {
 	isError: boolean;
 	isCommentsLoading: boolean;
 	onOpenComment?: (comment: CommentPaneData) => void;
-	onOpenPullRequest?: (ref: PullRequestRef) => void;
+	onOpenPullRequest?: OpenPullRequestPane;
 	onOpenInDiff?: (
 		path: string,
 		line?: number,

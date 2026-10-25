@@ -1,0 +1,96 @@
+---
+title: "Claude Code vs Amp (2026): Comparing Coding Agents"
+description: "Compare Claude Code and Amp: Anthropic's agent vs a multi-model agent that picks models by mode, with cloud orbs and runners. Pricing, parallel work, and how to run both side by side."
+date: 2026-10-13
+type: "1v1"
+competitors:
+  - claude-code
+  - amp
+keywords:
+  - claude code vs amp
+  - amp vs claude code
+  - ampcode vs claude code
+  - amp coding agent
+  - best coding agent
+---
+
+Claude Code is Anthropic's terminal coding agent. Amp is a multi-model agent that picks models for you by mode and runs work on cloud machines called orbs. Both run subagents, support MCP, plugins, and skills, and have a headless mode. The choice is between one lab's agent with the deepest set of parallel modes, and an agent that chooses models for you and comes with its own cloud and apps. Since October 10, 2026, you can even use a Claude Pro or Max plan inside Amp.
+
+Facts were checked against Anthropic's and Amp's own docs on October 13, 2026.
+
+---
+
+## At a Glance
+
+| | **Claude Code** | **Amp** |
+|---|---|---|
+| **Vendor** | Anthropic | Amp |
+| **Models** | Claude models | Several, chosen by mode (fast to "ultra"), or pinned |
+| **Price** | Claude Pro from $20/mo, Max from $100/mo, or API key | Free with your own compute and keys; Individual $20/mo; a Claude or ChatGPT plan can be linked |
+| **Parallel work** | Subagents, `/batch` across worktrees, agent view, cloud sessions | Automatic subagents, agents that start agents |
+| **Worktrees** | Built in | Created by runners |
+| **Cloud** | Cloud sessions, Remote Control | Orbs: per-thread cloud machines |
+| **Clients** | Terminal, IDE extensions, Claude apps | Terminal UI, web, iOS and macOS apps |
+| **Headless** | `claude -p` | `amp -x` |
+| **Platforms** | macOS, Linux, Windows | macOS, Linux; Windows through WSL |
+| **License** | Proprietary | Proprietary |
+
+---
+
+## What Is Claude Code?
+
+Anthropic's agent "reads your codebase, edits files, runs commands, and integrates with your development tools." It has the widest set of parallel modes of any agent, from subagents and `/batch` runs across worktrees to an agent view, cloud sessions, and Remote Control, with plugins, skills, and hooks. It runs Anthropic's models on a paid Claude plan or an API key.
+
+## What Is Amp?
+
+Amp is "a coding agent and development environment built for the frontier." You pick a mode rather than a model, and Amp chooses the model. Subagents run automatically, orbs keep threads running on cloud machines after you close your laptop, and runners execute threads on your own machines and create Git worktrees. Threads follow you across the terminal, web, iOS, and macOS. Amp is free with your own compute and keys, and the Individual plan is $20 a month with orb minutes.
+
+## Key Differences
+
+### Models
+
+Claude Code runs Anthropic's models in Anthropic's harness. Amp chooses among several vendors' models for each mode, which keeps you on what it considers best without picking yourself.
+
+### Parallel Work and Cloud
+
+Claude Code has more built-in parallel modes on your machine. Amp leans on its own infrastructure: orbs for cloud work and runners, now with worktrees, for your machines.
+
+### Price
+
+Amp can be free if you bring your own compute and keys. Claude Code needs a Claude plan or API spend. If you already pay for Claude, you can use that plan in either.
+
+---
+
+## Run Both Side by Side
+
+[Superset](/) runs Claude Code and Amp as built-in agents, each in its own Git worktree and terminal, on your own plans and keys. Create two workspaces from the same branch, start each agent with the same prompt, compare the diffs in the Changes pane, and open a pull request from the better one. Superset never proxies model calls. See [How to Compare Coding Agents Side by Side](/compare/compare-coding-agents-side-by-side).
+
+## Which Should You Choose?
+
+**Choose Claude Code if you:**
+
+- Want the richest set of parallel modes and plugins
+- Want Anthropic's models in Anthropic's own harness
+- Want worktree isolation built into the agent
+
+**Choose Amp if you:**
+
+- Want the agent to choose the best model for each task
+- Want cloud machines that keep working after you close your laptop
+- Want threads on the web, iOS, and macOS as well as the terminal
+
+For the full field, see [Best AI Coding Agents in 2026](/compare/best-coding-agents).
+
+## Frequently Asked Questions
+
+### Can Amp use my Claude subscription?
+
+Yes. Since October 10, 2026, Amp can use a Claude Pro or Max plan. It can also link a ChatGPT plan or use your own API keys.
+
+### Is Amp free?
+
+Amp is free if you bring your own compute and model keys. Claude Code has no free tier.
+
+### Can I run Claude Code and Amp at the same time?
+
+Yes. Give each its own Git worktree. In Superset, each runs in its own workspace on the same repository.

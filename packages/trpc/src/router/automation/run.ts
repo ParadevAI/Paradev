@@ -2,15 +2,23 @@ import { db } from "@superset/db/client";
 import type { AutomationRunErrorCode } from "@superset/db/enums";
 import { automationRuns, automations } from "@superset/db/schema";
 import { TRPCError } from "@trpc/server";
-import { and, desc, eq, isNotNull } from "drizzle-orm";
+import { and, desc, eq, inArray, isNotNull } from "drizzle-orm";
 import { isI18nErrorCause } from "../../i18n-error";
 import { SandboxNotReadyError } from "../../lib/sandbox";
 import { RelayDispatchError } from "./relay-client";
 
-export type AgentRunResult = {
-	kind: "terminal";
-	sessionId: string;
-	label: string;
+/**
+ * What a run started. A chat's `sessionId` is the host's chat session id;
+ * `terminalId` is the pane binding older clients still open it by.
+ */
+export type AgentRunResult =
+	| { kind: "terminal"; sessionId: string; label: string }
+	| { kind: "chat"; sessionId: string; terminalId: string; label: string };
+
+/** The session this automation's own last run left behind, of either kind. */
+export type PreviousRunSession = {
+	terminalSessionId: string | null;
+	chatSessionId: string | null;
 };
 
 /** Where a run's agent lives: a host's workspace or a cloud workspace. */
@@ -41,12 +49,15 @@ export class RunFailure extends Error {
  * The host decides in the end — this only nominates, and a stale nomination
  * costs a launch, which is the old behaviour.
  */
-export async function previousRunTerminal(
+export async function previousRunSession(
 	automationId: string,
 	workspace: RunWorkspace,
-): Promise<string | undefined> {
+): Promise<PreviousRunSession | undefined> {
 	const [previous] = await db
-		.select({ terminalSessionId: automationRuns.terminalSessionId })
+		.select({
+			terminalSessionId: automationRuns.terminalSessionId,
+			chatSessionId: automationRuns.chatSessionId,
+		})
 		.from(automationRuns)
 		.where(
 			and(
@@ -55,14 +66,14 @@ export async function previousRunTerminal(
 					? eq(automationRuns.cloudWorkspaceId, workspace.cloudWorkspaceId)
 					: eq(automationRuns.v2WorkspaceId, workspace.v2WorkspaceId),
 				eq(automationRuns.status, "dispatched"),
-				eq(automationRuns.sessionKind, "terminal"),
+				inArray(automationRuns.sessionKind, ["terminal", "chat"]),
 				isNotNull(automationRuns.terminalSessionId),
 			),
 		)
 		// createdAt rather than dispatchedAt: it matches automation_runs_history_idx.
 		.orderBy(desc(automationRuns.createdAt))
 		.limit(1);
-	return previous?.terminalSessionId ?? undefined;
+	return previous;
 }
 
 /** Moves a gone pin to `next`, or clears it, only if nobody re-pinned meanwhile. */
@@ -124,6 +135,8 @@ const CLOUD_ERROR_CODES: Record<string, AutomationRunErrorCode> = {
 		"cloud_environment_unusable",
 	"serverError.cloudWorkspace.environmentHasNoRepositories":
 		"cloud_environment_unusable",
+	"serverError.cloudWorkspace.cloudNeedsPaidPlan": "cloud_usage_limit_reached",
+	"serverError.cloudWorkspace.usageLimitReached": "cloud_usage_limit_reached",
 };
 
 /**

@@ -7,13 +7,14 @@
 		"@types/node": "24.12.0",
 		"@types/react": "19.2.14",
 		"@types/tailwindcss": "3.1.0",
-		"bun-types": "1.4.2",
+		"bun-types": "1.4.3",
 		"react-email": "5.0.7",
 		"typescript": "7.0.2"
 	},
 	"exports": {
 		"./emails/marketing/DownloadLinkEmail": "./src/emails/marketing/DownloadLinkEmail/index.ts",
-		"./emails/*": "./src/emails/*.tsx"
+		"./emails/*": "./src/emails/*.tsx",
+		"./sender": "./src/lib/sender.ts"
 	},
 	"private": true,
 	"scripts": {

@@ -1,8 +1,5 @@
-import {
-	CommentModeButton,
-	PageShareButton,
-	PageViewers,
-} from "@superset/ui/page-comments";
+import { CommentModeButton, PageShareButton } from "@superset/ui/page-comments";
+import { PagePresenceStack } from "@superset/ui/presence";
 import { usePageHeaderData } from "renderer/routes/_authenticated/_dashboard/hooks/usePageHeaderData";
 import type { PagePaneData } from "../../../../types";
 import type { CreateNewAgentSession } from "../../../useAgentSessionLauncher";
@@ -29,6 +26,8 @@ export function PagePaneHeaderExtras({
 		currentUserId,
 		onSetVisibility,
 		onSetSharedVersion,
+		sharing,
+		canComment,
 	} = usePageHeaderData(data);
 	const { commentsEnabled, setCommentsEnabled, shareOpen, setShareOpen } =
 		usePagePaneUi(paneId);
@@ -38,19 +37,21 @@ export function PagePaneHeaderExtras({
 
 	return (
 		<>
-			<PageViewers pageId={page?.id} className="mr-1" />
+			<PagePresenceStack pageId={page?.id} viewerId={currentUserId} />
 			<PageWatcherMenu
 				workspaceId={workspaceId}
 				pageId={page?.id}
 				canManage={owned}
 				onCreateNewAgentSession={onCreateNewAgentSession}
 			/>
-			<CommentModeButton
-				compact
-				enabled={commentsEnabled}
-				openCount={threads.filter((thread) => !thread.resolved).length}
-				onToggle={() => setCommentsEnabled(!commentsEnabled)}
-			/>
+			{canComment ? (
+				<CommentModeButton
+					compact
+					enabled={commentsEnabled}
+					openCount={threads.filter((thread) => !thread.resolved).length}
+					onToggle={() => setCommentsEnabled(!commentsEnabled)}
+				/>
+			) : null}
 			{page ? (
 				<PageShareButton
 					compact
@@ -64,6 +65,8 @@ export function PagePaneHeaderExtras({
 					onOpenChange={setShareOpen}
 					onSetVisibility={onSetVisibility}
 					onSetSharedVersion={onSetSharedVersion}
+					currentUserId={currentUserId}
+					sharing={sharing}
 				/>
 			) : null}
 		</>

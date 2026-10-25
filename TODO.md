@@ -26,3 +26,10 @@
 - [ ] Notion MCP connector in this workspace only exposed static "docs/*" resources, not the `notion-fetch`/`notion-search` tools the automation SOP calls for (page ID 3b3b9d5b-f616-810d-baca-ca7dd2305259). Could not fetch the live SOP this run — fell back to the instructions embedded in the automation prompt. Please check the Notion MCP connection/permissions.
 - [ ] `.github/prompts/update-docs.md`, which the automation prompt calls "a pointer only," does not exist in this repo (checked git history too — never committed). Worth either adding it or updating the automation prompt.
 - [ ] Pre-existing gaps noticed but left alone (bigger than this week's diff): `superset browser import-login` has no docs page at all despite PR #8190 adding 13 more supported browsers; there is no public plugins/marketplace catalog page under apps/docs/content/docs/ despite several hosted plugins shipping recently (Neon, PostHog, Google Calendar, Vercel).
+
+## 2026-10-21 16:10 — Weekly docs update
+
+- [ ] Review branch docs/update-2026-10-21: #8651 (PR dropdown Commit/Push) and #8656 (PR link click modifiers) in diff-viewer.mdx, #8658 (close-warning setting) in terminal-integration.mdx, #8629 (archive notFound/failed output) in cli-reference.mdx.
+- [ ] Vale could not run (`bunx vale` fails to resolve); I checked the prose by hand for the banned words and em dashes. Run it before merging.
+- [ ] The Notion plugin is "not installed" in `superset plugins list`, and no Notion MCP tool is loaded. I read the SOP through the Notion REST API with $NOTION_MCP_TOKEN instead. Fix the connector so `notion-fetch` works.
+- [ ] Not documented: ACP chat/session CLI (#8668, #8585), chat paste cards (#8577), image gallery (#8573), and the plugins connect flow (#8646). They are flag-gated or the plugins page is staff-only. Re-check once they ship broadly.

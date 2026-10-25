@@ -1,0 +1,57 @@
+---
+title: Plugins for Everyone and Automations Sorted by Last Run
+date: 2026-10-25
+image: /changelog/2026-10-25-plugins-hero.png
+version: 1.40.0
+highlights:
+  - icon: plug
+    title: Plugins for everyone
+    description: Install a plugin once and your agents get its skills on every machine, and Claude Code and Codex get its tools too
+  - icon: list-checks
+    title: Sort automations by last run
+    description: Put failed and missed runs at the top of the Automations table
+  - icon: git-pull-request
+    title: Commit and push from the PR menu
+    description: Once a branch has a pull request, its menu lists Commit and Push
+---
+
+## Plugins for Everyone <PRBadge url="https://github.com/superset-sh/superset/pull/8646" />
+
+Plugins are now on for every account. Install a plugin once, and Claude Code, Codex, Cursor, and the other agents you run in Superset get its skills on every machine. Claude Code and Codex also get its tools.
+
+- A plugin that needs an account installs only after you connect it, so agents never get tools that fail until you finish signing in
+- Connected accounts live in one place on the plugin page, and the Enable and Disable switches are gone
+
+Open **Plugins** in the sidebar to install one. Docs: [Plugins](https://docs.superset.sh/docs/plugins/overview).
+
+![A GitHub plugin page with the Connect an account row highlighted](/changelog/2026-10-25-plugins-connect.png)
+
+## Improvements
+
+- **Sort automations by last run** - click the **Last run** header to sort by time or by result, with failed and missed runs first <PRBadge url="https://github.com/superset-sh/superset/pull/8788" />
+- **Commit and push from the PR menu** - once a branch has a pull request, its menu in the tab bar lists **Commit** and **Push** <PRBadge url="https://github.com/superset-sh/superset/pull/8651" />
+- **Open a pull request on GitHub** - ⌘-click any pull request link to open it in the browser instead of the PR pane <PRBadge url="https://github.com/superset-sh/superset/pull/8656" />
+- **A simpler Workspaces view** - search, location, project, people, and **Show archived** are the only filters, and rows sort by last activity <PRBadge url="https://github.com/superset-sh/superset/pull/8807" />
+- **One sidebar** - the new sidebar is now the only sidebar, and its toggle is gone from **Settings → Experimental** <PRBadge url="https://github.com/superset-sh/superset/pull/8790" />
+- **New panes take focus** - a pane you open gets the keyboard, so ⌘W closes it, and opening something already open jumps to it instead of a copy <PRBadge url="https://github.com/superset-sh/superset/pull/8798" />
+- **A clearer Share popover** - **Add people** opens an invite view with suggested people and teams, and you can pick several at once <PRBadge url="https://github.com/superset-sh/superset/pull/8614" />
+- **Get the close warning back** - **Settings → Terminal → Warn before closing a running terminal** turns it on again after "Don't ask again" <PRBadge url="https://github.com/superset-sh/superset/pull/8658" />
+- **See who is on a page now** - in the browser, hover an avatar in a page header to see **Active** or when that person was last there, as in the desktop app <PRBadge url="https://github.com/superset-sh/superset/pull/8761" />
+- **Branch errors say why** - the branch picker says when the host is offline or unreachable, or the folder is missing <PRBadge url="https://github.com/superset-sh/superset/pull/8377" />
+- **Mobile pane paused** - last week's Mobile pane is off for now while we teach agents to build for and check the simulator themselves. It comes back soon <PRBadge url="https://github.com/superset-sh/superset/pull/8789" />
+- Early access: cloud workspaces stay awake while their agent works and stop after an idle hour, sign Codex in with a ChatGPT plan, join sidebar tag folders, and show every pull request their agent opened <PRBadge url="https://github.com/superset-sh/superset/pull/8620" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8786" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8773" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8731" />
+- Experimental: the redesigned chat behind the `acp-chat` flag can edit a sent message, pick MCP servers with `/mcp`, and carry on a chat that an app update cut off <PRBadge url="https://github.com/superset-sh/superset/pull/8585" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8451" />
+
+---
+
+**Bug fixes**
+
+- A reused sign-in token no longer logs you out on every machine at once, contributed by [@sahiljagtap08](https://github.com/sahiljagtap08) <PRBadge url="https://github.com/superset-sh/superset/pull/8467" />
+- Automations that continue a session no longer start a new agent session on every run when the agent is a custom one, contributed by [@andyst-dev](https://github.com/andyst-dev) <PRBadge url="https://github.com/superset-sh/superset/pull/7973" />
+- Dialogs stay open when focus moves to another window <PRBadge url="https://github.com/superset-sh/superset/pull/8684" />
+- Importing a repository with a broken `HEAD` now fails with a clear error instead of committing onto it <PRBadge url="https://github.com/superset-sh/superset/pull/8729" />
+- Renaming a tab from its context menu starts editing right away <PRBadge url="https://github.com/superset-sh/superset/pull/8611" />
+- A pinch-zoomed browser pane stays filled on pages with their own zoom <PRBadge url="https://github.com/superset-sh/superset/pull/8615" />
+- A failed plugin connect shows an error instead of a blank page, and a disconnected Google account stays disconnected <PRBadge url="https://github.com/superset-sh/superset/pull/8860" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8576" />
+- Importing a folder whose name ends in a space now works <PRBadge url="https://github.com/superset-sh/superset/pull/8635" />
+- `superset workspaces delete` reports what happened to each id <PRBadge url="https://github.com/superset-sh/superset/pull/8629" />

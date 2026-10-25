@@ -148,7 +148,7 @@ A page can call a tool from a plugin, such as a read-only database query or a we
 ```js
 const tools = window.superset?.tools;
 if (await tools?.ready) {
-  const result = await tools.call("neon-readonly", "run_sql", {
+  const result = await tools.call("neon", "run_sql", {
     sql: "select count(*) from organizations",
   });
 }
@@ -157,7 +157,7 @@ if (await tools?.ready) {
 - **Consent.** The first time a page calls a plugin, the viewer sees a dialog and chooses whether to allow it. The choice applies to that page and that plugin, for every tool of the plugin, including tools that change data, and for future versions of the page. The viewer may also be asked to install the plugin, connect an account, or choose which account to use.
 - **Trust.** A page can send what it reads to other websites, for example in an image URL. Only allow pages you trust.
 - **Their data.** Each viewer sees results from their own account, so two people can see different numbers. A signed-out viewer cannot use tools.
-- **Read-only databases.** Use the `neon-readonly` plugin for dashboards. Read-only is not enforced yet for an account connected with write access, so do not rely on it for safety. The `exa` plugin gives a page Exa's search tools.
+- **Databases and search.** The `neon` plugin runs SQL against the viewer's Neon database, writes included, so only run read queries from a page. The `exa` plugin gives a page Exa's search tools.
 - **Errors.** A call fails with a code in `error.code`: `needs_install`, `needs_connection`, `denied`, `unavailable_signed_out`, `rate_limited`, `invalid`, `tool_error` or `unavailable`. A tool that fails returns `tool_error` with the tool's message. A call times out after 60 seconds. Time the viewer spends in the dialog does not count.
 - **Not on mobile.** Tools work in the desktop app and on the web, not in the mobile app.
 

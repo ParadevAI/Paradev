@@ -4,7 +4,8 @@
 @source "./*/pages";
 
 @theme {
-	--font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+	--font-sans:
+		var(--font-inter), "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
 	--font-mono: var(--font-ibm-plex-mono), ui-monospace, monospace;
 }
 
@@ -44,37 +45,89 @@
 	}
 }
 
-/* Cyber HUD frame: four L-shaped corner brackets drawn as background strips
-   (two strips per corner). Sized in em so it scales with the text. */
-@utility corner-brackets {
+.headline-marks {
+	padding: 0 0.3em;
+	white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+	.headline-marks {
+		padding: 0 0.2em;
+	}
+}
+
+/* No @property here: `next build` then drops these headline rules from the CSS. */
+@keyframes headline-rails-grow {
+	from {
+		background-size: 0 1.5px;
+		background-position:
+			left var(--rail-max) top,
+			right var(--rail-max) top,
+			left var(--rail-max) bottom,
+			right var(--rail-max) bottom;
+	}
+}
+
+.headline-rise > .headline-marks {
+	--rail-color: var(--foreground);
+	--rail-top: 0.2em;
+	--rail-baseline: 0.24em;
+	--rail-max: max(0.4em, 20px);
+	position: relative;
+}
+
+.headline-rise > .headline-marks::after {
+	content: "";
+	position: absolute;
+	pointer-events: none;
+	inset: calc(var(--rail-top) - 0.75px) calc(-1 * var(--rail-max))
+		calc(var(--rail-baseline) - 0.75px);
 	background-image:
-		linear-gradient(var(--brand), var(--brand)),
-		linear-gradient(var(--brand), var(--brand)),
-		linear-gradient(var(--brand), var(--brand)),
-		linear-gradient(var(--brand), var(--brand)),
-		linear-gradient(var(--brand), var(--brand)),
-		linear-gradient(var(--brand), var(--brand)),
-		linear-gradient(var(--brand), var(--brand)),
-		linear-gradient(var(--brand), var(--brand));
+		linear-gradient(90deg, transparent, var(--rail-color) 16.67%, transparent),
+		linear-gradient(270deg, transparent, var(--rail-color) 16.67%, transparent),
+		linear-gradient(90deg, transparent, var(--rail-color) 16.67%, transparent),
+		linear-gradient(270deg, transparent, var(--rail-color) 16.67%, transparent);
 	background-repeat: no-repeat;
-	background-size:
-		0.15em 4px,
-		4px 0.15em,
-		0.15em 4px,
-		4px 0.15em,
-		0.15em 4px,
-		4px 0.15em,
-		0.15em 4px,
-		4px 0.15em;
+	background-size: calc(var(--rail-max) * 6) 1.5px;
 	background-position:
-		0 0,
-		0 0,
-		100% 0,
-		100% 0,
-		0 100%,
-		0 100%,
-		100% 100%,
-		100% 100%;
+		left 0 top,
+		right 0 top,
+		left 0 bottom,
+		right 0 bottom;
+	animation: headline-rails-grow 900ms cubic-bezier(0.65, 0, 0.35, 1) 650ms both;
+}
+
+.headline-rise-clip {
+	display: inline-block;
+	overflow: hidden;
+	padding-bottom: 0.14em;
+	margin-bottom: -0.14em;
+	vertical-align: bottom;
+}
+
+.headline-rise-line {
+	display: inline-block;
+	animation: headline-rise 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.headline-marks .headline-rise-line {
+	animation-delay: 120ms;
+}
+
+@keyframes headline-rise {
+	from {
+		transform: translateY(105%);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.headline-rise-line {
+		animation: none;
+	}
+
+	.headline-rise > .headline-marks::after {
+		animation: none;
+	}
 }
 
 @utility scrollbar-hide {
@@ -292,5 +345,34 @@
 	.animate-rail-extend,
 	.animate-station-pulse {
 		animation: none;
+	}
+}
+
+@layer base {
+	/* Arial matched to Inter at 16px. With the opsz axis, the fallback next/font
+	   generates is too wide, so layout.tsx turns it off. Emitted only in a layer. */
+	@font-face {
+		font-family: "Inter Fallback";
+		src: local("Arial"), local("Arimo"), local("Liberation Sans");
+		size-adjust: 104.77%;
+		ascent-override: 92.47%;
+		descent-override: 23.03%;
+		line-gap-override: 0%;
+	}
+
+	/* Same, matched to Inter's display width at 32px and up */
+	@font-face {
+		font-family: "Inter Display Fallback";
+		src: local("Arial"), local("Arimo"), local("Liberation Sans");
+		size-adjust: 96.65%;
+		ascent-override: 100.24%;
+		descent-override: 24.96%;
+		line-gap-override: 0%;
+	}
+
+	h1 {
+		font-family:
+			var(--font-inter), "Inter Display Fallback", ui-sans-serif, system-ui,
+			sans-serif;
 	}
 }

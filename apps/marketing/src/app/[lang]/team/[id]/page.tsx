@@ -1,4 +1,5 @@
 import { Trans } from "@lingui/react/macro";
+import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
@@ -52,7 +53,7 @@ function PersonJsonLd({
 		url,
 		worksFor: {
 			"@type": "Organization",
-			name: COMPANY.NAME,
+			name: BRAND.NAME,
 			url: COMPANY.MARKETING_URL,
 		},
 		...(person.avatar && {
@@ -319,7 +320,7 @@ export async function generateMetadata({
 			description,
 			type: "profile",
 			url,
-			siteName: COMPANY.NAME,
+			siteName: BRAND.NAME,
 			...(person.avatar && {
 				images: [`${COMPANY.MARKETING_URL}${person.avatar}`],
 			}),

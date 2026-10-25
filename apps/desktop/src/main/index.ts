@@ -39,13 +39,21 @@ import {
 	PROTOCOL_SCHEME,
 } from "shared/constants";
 import { sweepDevAppProfiles } from "./dev-app-profile-sweep";
+import { getAppDisplayName } from "./lib/app-display-name";
 import { initAppState } from "./lib/app-state";
 import { requestAppleEventsAccess } from "./lib/apple-events-permission";
-import { isUpdateReadyToInstall, setupAutoUpdater } from "./lib/auto-updater";
+import {
+	isInstallingUpdate,
+	isUpdateReadyToInstall,
+	setupAutoUpdater,
+} from "./lib/auto-updater";
 import { startBrowserBridge } from "./lib/browser/browser-bridge";
 import { browserManager } from "./lib/browser/browser-manager";
 import { downloadManager } from "./lib/browser/download-manager";
-import { installBundledCliShim } from "./lib/bundled-cli";
+import {
+	installBundledCliShim,
+	installBundledPdevShim,
+} from "./lib/bundled-cli";
 import { installDevRunnerExit } from "./lib/dev-runner-exit";
 import { resolveDevWorkspaceName } from "./lib/dev-workspace-name";
 import { setWorkspaceDockIcon } from "./lib/dock-icon";
@@ -59,6 +67,8 @@ import { resolveAppLocale } from "./lib/language";
 import { localDb } from "./lib/local-db";
 import { requestLocalNetworkAccess } from "./lib/local-network-permission";
 import { menuEmitter } from "./lib/menu-events";
+import { allowRendererToReachDeviceHub } from "./lib/mobile-hub-origin";
+
 import { syncInstalledPluginMcpServers } from "./lib/plugin-installs";
 import { portForwardManager } from "./lib/port-forward";
 import { ensureProjectIconsDir, getProjectIconPath } from "./lib/project-icons";
@@ -171,7 +181,7 @@ async function processDeepLink(url: string): Promise<void> {
 
 	// Non-auth deep links: extract path and navigate in renderer
 	// e.g. superset://tasks/my-slug -> /tasks/my-slug
-	const path = `/${url.split("://")[1]}`;
+	const path = `/${url.slice(url.indexOf("://") + 3)}`;
 	focusMainWindow();
 
 	const target = getFocusedOrLastWindow();
@@ -204,7 +214,7 @@ function registerWithMacOSNotificationCenter() {
 	if (!PLATFORM.IS_MAC || !Notification.isSupported()) return;
 
 	const registrationNotification = new Notification({
-		title: app.name,
+		title: getAppDisplayName(),
 		body: " ",
 		silent: true,
 	});
@@ -312,6 +322,7 @@ app.on("before-quit", async (event) => {
 		quitConfirmationOpen = true;
 
 		try {
+			const displayName = getAppDisplayName();
 			const { response } = await dialog.showMessageBox({
 				type: "question",
 				buttons: [
@@ -320,7 +331,12 @@ app.on("before-quit", async (event) => {
 				],
 				defaultId: 0,
 				cancelId: 1,
-				title: i18n._(msg({ message: "Quit Superset" })),
+				title: i18n._(
+					msg({
+						message: `Quit ${displayName}`,
+						context: "quit confirmation dialog title",
+					}),
+				),
 				message: i18n._(
 					msg({
 						message: "Are you sure you want to quit?",
@@ -340,6 +356,7 @@ app.on("before-quit", async (event) => {
 
 	isQuitting = true;
 	const isUpdateInstalling = isUpdateReadyToInstall();
+	const resumeChats = isInstallingUpdate();
 	// Stopping the pty-daemons waits for host-services to exit; without this
 	// Electron exits once the windows close and cuts that wait short.
 	holdingQuitForCleanup = forceFullCleanup;
@@ -359,7 +376,8 @@ app.on("before-quit", async (event) => {
 		isDev,
 		forceFullCleanup,
 		isUpdateInstalling,
-		stopHostServices: () => getHostServiceCoordinator().stopAll(),
+		stopHostServices: () =>
+			getHostServiceCoordinator().stopAll({ resumeChats }),
 		teardownTerminalHost,
 		stopPtyDaemons,
 		disposeTerminalHostClient,
@@ -484,6 +502,9 @@ if (!gotTheLock) {
 		// (plans/20260826-i18n-strategy.md). Menus are built later in
 		// initAppServices/initTray, so a plain activate is enough here.
 		await initI18nAsync(resolveAppLocale(getLanguageSetting()));
+		if (getAppDisplayName() !== app.name) {
+			app.setAboutPanelOptions({ applicationName: getAppDisplayName() });
+		}
 		registerWithMacOSNotificationCenter();
 		requestAppleEventsAccess();
 		requestLocalNetworkAccess();
@@ -554,6 +575,7 @@ if (!gotTheLock) {
 			console.error("[main] Failed to start browser bridge:", error);
 		}
 		downloadManager.start();
+		allowRendererToReachDeviceHub("persist:superset");
 
 		const hostServiceCoordinator = getHostServiceCoordinator();
 		hostServiceCoordinator.setConfigProvider(async () => {
@@ -629,6 +651,11 @@ if (!gotTheLock) {
 			installBundledCliShim();
 		} catch (error) {
 			console.error("[main] Failed to install bundled CLI shim:", error);
+		}
+		try {
+			installBundledPdevShim();
+		} catch (error) {
+			console.error("[main] Failed to install bundled pdev shim:", error);
 		}
 
 		if (IS_DEV) {

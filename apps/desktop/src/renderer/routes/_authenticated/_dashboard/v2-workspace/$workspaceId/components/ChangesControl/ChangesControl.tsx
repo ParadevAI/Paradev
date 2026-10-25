@@ -2,7 +2,7 @@ import { useLingui } from "@lingui/react/macro";
 import { cn } from "@superset/ui/utils";
 import { GitCompareArrows } from "lucide-react";
 import { memo, useMemo } from "react";
-import type { PullRequestRef } from "renderer/lib/github/pullRequestRef";
+import type { OpenPullRequestPane } from "renderer/lib/github/openPullRequestLink";
 import { usePRFlowState } from "../../hooks/usePRFlowState";
 import { useWorkspaceGitStatus } from "../../providers/WorkspaceGitStatusProvider";
 import { changesPillStats } from "../../utils/changesPillStats";
@@ -17,7 +17,7 @@ interface ChangesControlProps {
 	/** Close the visible Changes pane, or open/focus one when none shows. */
 	onToggleChanges: () => void;
 	/** Open or focus the pane showing the linked PR's summary. */
-	onOpenPullRequest: (ref: PullRequestRef) => void;
+	onOpenPullRequest: OpenPullRequestPane;
 	paneAreaStyle?: boolean;
 }
 
@@ -28,7 +28,8 @@ interface ChangesControlProps {
  * or the ship action itself once the tree is clean; once a PR exists the
  * face is the PR badge alone. Either face toggles the Changes pane: it
  * closes the one in view and opens or focuses one otherwise, reading as
- * pressed while one shows.
+ * pressed while one shows. In the right pane area the Changes tab has its
+ * own toggle, so the PR badge opens the pull request instead.
  *
  * Segments hide on their own: stats while status is unknown, the tree is
  * clean, or a PR owns the face; the right side while the flow state is
@@ -100,9 +101,9 @@ export const ChangesControl = memo(function ChangesControl({
 					state={flowState}
 					workspaceId={workspaceId}
 					onRefresh={onRetry}
-					isChangesOpen={isChangesOpen}
+					isChangesOpen={!paneAreaStyle && isChangesOpen}
 					toggleLabel={label}
-					onToggleChanges={onToggleChanges}
+					onToggleChanges={paneAreaStyle ? undefined : onToggleChanges}
 					onOpenPullRequest={onOpenPullRequest}
 					paneAreaStyle={paneAreaStyle}
 				/>

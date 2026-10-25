@@ -1,16 +1,29 @@
 import { Trans } from "@lingui/react/macro";
-import { readBookkeeping, userMessageText } from "@superset/chat/core";
+import {
+	parsePastedText,
+	readBookkeeping,
+	userMessageText,
+} from "@superset/chat/core";
 import type { UserContent } from "@superset/chat/protocol";
-import { CircleAlert, Paperclip } from "lucide-react-native";
-import { Pressable, View } from "react-native";
+import { CircleAlert } from "lucide-react-native";
+import { Pressable, ScrollView, View } from "react-native";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { SystemLine } from "../SystemLine";
+import { AttachmentFileCard } from "./components/AttachmentFileCard";
+import { AttachmentThumbnail } from "./components/AttachmentThumbnail";
 import { OutgoingBubble } from "./components/OutgoingBubble";
+import { PastedTextCard } from "./components/PastedTextCard";
+
+/** What the composer's native viewer can decode; UIImage has no SVG. */
+function isViewableImage(mimeType: string): boolean {
+	return mimeType.startsWith("image/") && mimeType !== "image/svg+xml";
+}
 
 interface UserMessageBubbleProps {
 	content: UserContent[];
 	harness: string | undefined;
+	hostUrl?: string;
 	pending?: {
 		failed: boolean;
 		onRetry: () => void;
@@ -21,15 +34,18 @@ interface UserMessageBubbleProps {
 export function UserMessageBubble({
 	content,
 	harness,
+	hostUrl,
 	pending,
 }: UserMessageBubbleProps) {
-	const text = userMessageText({ content });
-	const note = pending ? null : readBookkeeping(harness, text);
+	const raw = userMessageText({ content });
+	const note = pending ? null : readBookkeeping(harness, raw);
 	if (note) return <SystemLine>{note.label}</SystemLine>;
 
+	const { text, pastes } = parsePastedText(raw);
 	const attachments = content.flatMap((part) =>
 		part.type === "attachment" ? [part] : [],
 	);
+	const wide = attachments.length > 0 || pastes.length > 0;
 	const failed = pending?.failed === true;
 	return (
 		<View className="items-end gap-1">
@@ -43,7 +59,41 @@ export function UserMessageBubble({
 						<Icon as={CircleAlert} className="text-destructive size-5" />
 					</Pressable>
 				) : null}
-				<OutgoingBubble dimmed={pending !== undefined}>
+				<OutgoingBubble
+					className={wide ? "w-[82%] gap-2 px-[13px] pt-[11px]" : undefined}
+					dimmed={pending !== undefined}
+				>
+					{attachments.length > 0 ? (
+						<ScrollView
+							contentContainerClassName="gap-2"
+							horizontal
+							showsHorizontalScrollIndicator={false}
+						>
+							{attachments.map((attachment) =>
+								isViewableImage(attachment.mimeType) ? (
+									<AttachmentThumbnail
+										attachmentId={attachment.attachmentId}
+										hostUrl={hostUrl}
+										key={attachment.attachmentId}
+										mediaType={attachment.mimeType}
+										name={attachment.name}
+									/>
+								) : (
+									<AttachmentFileCard
+										attachmentId={attachment.attachmentId}
+										hostUrl={hostUrl}
+										key={attachment.attachmentId}
+										mediaType={attachment.mimeType}
+										name={attachment.name}
+									/>
+								),
+							)}
+						</ScrollView>
+					) : null}
+					{pastes.map((paste, index) => (
+						// biome-ignore lint/suspicious/noArrayIndexKey: pastes have no identity beyond their order
+						<PastedTextCard key={index} text={paste} />
+					))}
 					{text ? (
 						<Text
 							className="text-foreground text-[17px] leading-[24px]"
@@ -52,20 +102,6 @@ export function UserMessageBubble({
 							{text}
 						</Text>
 					) : null}
-					{attachments.map((attachment) => (
-						<View
-							className="flex-row items-center gap-1.5 rounded-xl bg-white/10 px-2.5 py-1.5"
-							key={attachment.attachmentId}
-						>
-							<Icon as={Paperclip} className="size-3 text-white" />
-							<Text
-								className="min-w-0 shrink text-xs text-white"
-								numberOfLines={1}
-							>
-								{attachment.name}
-							</Text>
-						</View>
-					))}
 				</OutgoingBubble>
 			</View>
 			{pending ? (

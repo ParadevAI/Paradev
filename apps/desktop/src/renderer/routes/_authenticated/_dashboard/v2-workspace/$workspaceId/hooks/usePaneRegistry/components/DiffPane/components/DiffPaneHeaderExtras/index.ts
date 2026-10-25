@@ -1,1 +1,0 @@
-export { DiffPaneHeaderExtras } from "./DiffPaneHeaderExtras";

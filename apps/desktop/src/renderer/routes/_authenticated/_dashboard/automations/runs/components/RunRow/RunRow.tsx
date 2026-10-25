@@ -16,6 +16,7 @@ import {
 import { providerLabelText } from "renderer/routes/_authenticated/_dashboard/automations/components/TriggersEditor/triggerMenu";
 import { describeRunError } from "renderer/routes/_authenticated/_dashboard/automations/utils/runErrorHelp";
 import { RUN_STATUS_META } from "renderer/routes/_authenticated/_dashboard/automations/utils/runStatus";
+import { runWorkspaceSearch } from "../../../utils/runWorkspaceSearch";
 import { RunPayloadPanel } from "../RunPayloadPanel";
 
 export type OrgRun = RouterOutputs["automation"]["listOrgRuns"]["runs"][number];
@@ -50,13 +51,14 @@ export function RunRow({
 	const provider = run.triggerKind
 		? PROVIDER_BY_KIND.get(run.triggerKind)
 		: undefined;
+	const workspaceId = run.v2WorkspaceId ?? run.cloudWorkspaceId;
 	const openWorkspace = () => {
-		if (!run.v2WorkspaceId) return;
-		localStorage.setItem("lastViewedWorkspaceId", run.v2WorkspaceId);
+		if (!workspaceId) return;
+		localStorage.setItem("lastViewedWorkspaceId", workspaceId);
 		navigate({
 			to: "/v2-workspace/$workspaceId",
-			params: { workspaceId: run.v2WorkspaceId },
-			search: { terminalId: run.terminalSessionId ?? undefined },
+			params: { workspaceId },
+			search: runWorkspaceSearch(run),
 		});
 	};
 
@@ -126,7 +128,7 @@ export function RunRow({
 
 				<TableCell className="pr-4">
 					<span className="flex items-center justify-end gap-1">
-						{run.v2WorkspaceId && (
+						{workspaceId && (
 							<Tooltip>
 								<TooltipTrigger asChild>
 									<Button

@@ -1,8 +1,15 @@
 import { POSTHOG_COOKIE_NAME } from "@superset/shared/constants";
 
 import { env } from "@/env";
+import { declineAnalytics } from "@/lib/analytics/decline";
 import { setPosthogInstance } from "@/lib/analytics/lazy";
 import { ANALYTICS_CONSENT_KEY } from "@/lib/constants";
+import {
+	BOOTSTRAP_DISTINCT_ID_COOKIE,
+	HERO_HEADLINE_FLAG,
+	POSTHOG_PERSISTENCE_COOKIE,
+	readAssignedHeadlineVariant,
+} from "@/lib/hero-headline";
 
 // posthog-js and @sentry/nextjs together add ~200KiB to the initial bundle,
 // which tanks the Lighthouse LCP on throttled mobile. Both are dynamically
@@ -11,9 +18,33 @@ import { ANALYTICS_CONSENT_KEY } from "@/lib/constants";
 // before then are queued via withPosthog().
 
 type SentryClient = typeof import("@sentry/nextjs");
+type BootstrapConfig = NonNullable<
+	import("posthog-js").PostHogConfig["bootstrap"]
+>;
 
 let sentryClient: SentryClient | null = null;
 let started = false;
+
+function readCookie(name: string): string | undefined {
+	const prefix = `${name}=`;
+	return document.cookie
+		.split("; ")
+		.find((cookie) => cookie.startsWith(prefix))
+		?.slice(prefix.length);
+}
+
+/** The flags the proxy evaluated, and the new visitor's id it evaluated them for. */
+function bootstrapData(): BootstrapConfig | undefined {
+	const variant = readAssignedHeadlineVariant();
+	if (!variant) return undefined;
+	const id = readCookie(BOOTSTRAP_DISTINCT_ID_COOKIE);
+	return {
+		featureFlags: { [HERO_HEADLINE_FLAG]: variant },
+		...(id && !readCookie(POSTHOG_PERSISTENCE_COOKIE)
+			? { distinctID: decodeURIComponent(id) }
+			: {}),
+	};
+}
 
 async function initPosthog() {
 	const { default: posthog } = await import("posthog-js");
@@ -31,10 +62,11 @@ async function initPosthog() {
 		persistence: "cookie",
 		persistence_name: POSTHOG_COOKIE_NAME,
 		disable_session_recording: true,
+		bootstrap: bootstrapData(),
 		loaded: (posthog) => {
 			const consent = localStorage.getItem(ANALYTICS_CONSENT_KEY);
 			if (consent === "declined") {
-				posthog.opt_out_capturing();
+				declineAnalytics(posthog);
 			}
 		},
 	});
