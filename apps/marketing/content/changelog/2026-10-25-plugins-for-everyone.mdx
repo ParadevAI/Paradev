@@ -6,7 +6,7 @@ version: 1.40.0
 highlights:
   - icon: plug
     title: Plugins for everyone
-    description: Install a plugin once and every coding agent gets its tools and skills, on every machine
+    description: Install a plugin once and your agents get its skills on every machine, and Claude Code and Codex get its tools too
   - icon: list-checks
     title: Sort automations by last run
     description: Put failed and missed runs at the top of the Automations table
@@ -17,12 +17,12 @@ highlights:
 
 ## Plugins for Everyone <PRBadge url="https://github.com/superset-sh/superset/pull/8646" />
 
-Plugins are now on for every account. Install a plugin once, and Claude Code, Codex, Cursor, and every other agent you run in Superset get its tools and skills, on every machine.
+Plugins are now on for every account. Install a plugin once, and Claude Code, Codex, Cursor, and the other agents you run in Superset get its skills on every machine. Claude Code and Codex also get its tools.
 
 - A plugin that needs an account installs only after you connect it, so agents never get tools that fail until you finish signing in
 - Connected accounts live in one place on the plugin page, and the Enable and Disable switches are gone
 
-Open **Plugins** in the sidebar to install one. Docs: [Plugins](https://docs.superset.sh/docs/plugins).
+Open **Plugins** in the sidebar to install one. Docs: [Plugins](https://docs.superset.sh/docs/plugins/overview).
 
 ![A GitHub plugin page with the Connect an account row highlighted](/changelog/2026-10-25-plugins-connect.png)
 
@@ -40,7 +40,7 @@ Open **Plugins** in the sidebar to install one. Docs: [Plugins](https://docs.sup
 - **Branch errors say why** - the branch picker says when the host is offline or unreachable, or the folder is missing <PRBadge url="https://github.com/superset-sh/superset/pull/8377" />
 - **Mobile pane paused** - last week's Mobile pane is off for now while we teach agents to build for and check the simulator themselves. It comes back soon <PRBadge url="https://github.com/superset-sh/superset/pull/8789" />
 - Early access: cloud workspaces stay awake while their agent works and stop after an idle hour, sign Codex in with a ChatGPT plan, join sidebar tag folders, and show every pull request their agent opened <PRBadge url="https://github.com/superset-sh/superset/pull/8620" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8786" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8773" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8731" />
-- Experimental: the redesigned chat behind the `acp-chat` flag can edit a sent message, pick MCP servers with `/mcp`, reopen past chats with `/resume`, and carry on a chat that an app update cut off <PRBadge url="https://github.com/superset-sh/superset/pull/8585" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8735" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8451" />
+- Experimental: the redesigned chat behind the `acp-chat` flag can edit a sent message, pick MCP servers with `/mcp`, and carry on a chat that an app update cut off <PRBadge url="https://github.com/superset-sh/superset/pull/8585" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8451" />
 
 ---
 
@@ -54,5 +54,4 @@ Open **Plugins** in the sidebar to install one. Docs: [Plugins](https://docs.sup
 - A pinch-zoomed browser pane stays filled on pages with their own zoom <PRBadge url="https://github.com/superset-sh/superset/pull/8615" />
 - A failed plugin connect shows an error instead of a blank page, and a disconnected Google account stays disconnected <PRBadge url="https://github.com/superset-sh/superset/pull/8860" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8576" />
 - Importing a folder whose name ends in a space now works <PRBadge url="https://github.com/superset-sh/superset/pull/8635" />
-- A skipped automation run says its device was offline <PRBadge url="https://github.com/superset-sh/superset/pull/8822" />
 - `superset workspaces delete` reports what happened to each id <PRBadge url="https://github.com/superset-sh/superset/pull/8629" />
