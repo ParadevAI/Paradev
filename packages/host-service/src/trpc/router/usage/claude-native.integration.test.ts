@@ -47,7 +47,11 @@ const reset = Math.floor((initial + 5 * 60 * 60_000) / 1000);
 const weekly = Math.floor((initial + 7 * 24 * 60 * 60_000) / 1000);
 globalThis.fetch = mock(async (input: string | URL | Request) => {
 	const url = input instanceof Request ? input.url : String(input);
-	if (url === "https://api.anthropic.com/api/oauth/usage") {
+	const endpoint = new URL(url);
+	if (
+		endpoint.origin === "https://api.anthropic.com" &&
+		endpoint.pathname === "/api/oauth/usage"
+	) {
 		usageRequests++;
 		return Response.json({
 			five_hour: {
