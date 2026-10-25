@@ -61,6 +61,7 @@ import { useDashboardSidebarData } from "./hooks/useDashboardSidebarData";
 import { useDashboardSidebarShortcuts } from "./hooks/useDashboardSidebarShortcuts";
 import { useMigrateLegacySidebarFolders } from "./hooks/useMigrateLegacySidebarFolders";
 import { useDashboardSidebarDnd } from "./hooks/useSidebarDnd";
+import { DashboardSidebarActionsProvider } from "./providers/DashboardSidebarActionsProvider";
 import { DashboardSidebarDndProvider } from "./providers/DashboardSidebarDndProvider";
 import { DashboardSidebarHoverProvider } from "./providers/DashboardSidebarHoverProvider";
 import { DashboardSidebarSelectionProvider } from "./providers/DashboardSidebarSelectionProvider";
@@ -155,7 +156,7 @@ const SortableProjectWrapper = memo(function SortableProjectWrapper({
 	);
 });
 
-export const DashboardSidebar = memo(function DashboardSidebar({
+const DashboardSidebarContent = memo(function DashboardSidebarContent({
 	isCollapsed = false,
 }: DashboardSidebarProps) {
 	const { t } = useLingui();
@@ -636,5 +637,15 @@ export const DashboardSidebar = memo(function DashboardSidebar({
 				</DashboardSidebarHoverProvider>
 			</DashboardSidebarSectionRenameProvider>
 		</DashboardSidebarSelectionProvider>
+	);
+});
+
+export const DashboardSidebar = memo(function DashboardSidebar(
+	props: DashboardSidebarProps,
+) {
+	return (
+		<DashboardSidebarActionsProvider>
+			<DashboardSidebarContent {...props} />
+		</DashboardSidebarActionsProvider>
 	);
 });
