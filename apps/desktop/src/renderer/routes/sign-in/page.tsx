@@ -5,6 +5,7 @@ import {
 	DEV_NAME,
 	DEV_PASSWORD,
 } from "@superset/shared/dev-credentials";
+import { Badge } from "@superset/ui/badge";
 import { Button } from "@superset/ui/button";
 import { Spinner } from "@superset/ui/spinner";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
@@ -150,12 +151,6 @@ function SignInPage() {
 		}
 	};
 
-	const lastUsedProviderLabel =
-		lastUsedMethod === "github"
-			? "GitHub"
-			: lastUsedMethod === "google"
-				? "Google"
-				: null;
 	const providerButtons = [
 		{
 			provider: "github" as const,
@@ -226,28 +221,32 @@ function SignInPage() {
 								)}
 							</p>
 
-							<div className="flex w-full flex-col gap-2">
+							<div className="flex w-full flex-col gap-3">
 								{providerButtons.map(({ provider, icon, label }) => (
-									<Button
-										key={provider}
-										variant="outline"
-										onClick={() => signIn(provider)}
-										className="w-full"
-										disabled={signInMutation.isPending}
-									>
-										{icon}
-										{label}
-									</Button>
+									<div key={provider} className="relative">
+										<Button
+											variant="outline"
+											onClick={() => signIn(provider)}
+											className="w-full"
+											disabled={signInMutation.isPending}
+										>
+											{icon}
+											{label}
+										</Button>
+										{lastUsedMethod === provider && (
+											<Badge
+												variant="outline"
+												className="pointer-events-none absolute -top-2 -right-2 border-link/40 bg-[color-mix(in_oklab,var(--link)_15%,var(--background))] px-1.5 py-0 text-[10px] text-link"
+											>
+												<Trans>Last used</Trans>
+											</Badge>
+										)}
+									</div>
 								))}
 							</div>
 							{browserOpenFailed && (
 								<p className="mt-3 text-xs text-destructive">
 									<Trans>Couldn't open your browser. Try again.</Trans>
-								</p>
-							)}
-							{lastUsedProviderLabel && !browserOpenFailed && (
-								<p className="mt-3 text-xs text-muted-foreground">
-									<Trans>Last used: {lastUsedProviderLabel}</Trans>
 								</p>
 							)}
 
