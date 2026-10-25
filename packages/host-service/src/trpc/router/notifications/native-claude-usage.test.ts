@@ -1,22 +1,11 @@
-import { expect, mock, test } from "bun:test";
-
-mock.module("../usage/claude", () => ({
-	captureNativeClaudeUsageGeneration: async () => null,
-	resolveNativeClaudeUsageScope: async () => null,
-}));
-mock.module("../usage/session-account/session-account", () => ({
-	validateSessionAccount: async () => true,
-	sameSessionAccountContext: (a: unknown, b: unknown) =>
-		JSON.stringify(a) === JSON.stringify(b),
-}));
-const { createNativeClaudeTerminalFeed, matchesNativeClaudeHook } =
-	await import("./native-claude-usage");
-const { createNativeClaudeUsageStore } = await import(
-	"../usage/native-claude-usage"
-);
-
+import { expect, test } from "bun:test";
 import type { TerminalAgentBinding } from "../../../terminal-agents/types";
 import type { NativeClaudeUsageDependencies } from "../usage/native-claude-binding";
+import { createNativeClaudeUsageStore } from "../usage/native-claude-usage";
+import {
+	createNativeClaudeTerminalFeed,
+	matchesNativeClaudeHook,
+} from "./native-claude-usage";
 
 function fixture() {
 	let now = 1_800_000_000_000;

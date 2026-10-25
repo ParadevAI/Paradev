@@ -1,18 +1,7 @@
-import { expect, mock, test } from "bun:test";
-
-mock.module("../trpc/router/usage/claude", () => ({
-	captureNativeClaudeUsageGeneration: async () => null,
-	resolveNativeClaudeUsageScope: async () => null,
-}));
-mock.module("../trpc/router/usage/session-account/session-account", () => ({
-	validateSessionAccount: async () => true,
-}));
-const { createNativeClaudeChatFeed } = await import("./nativeClaudeUsage");
-const { createNativeClaudeUsageStore } = await import(
-	"../trpc/router/usage/native-claude-usage"
-);
-
+import { expect, test } from "bun:test";
 import type { NativeClaudeUsageDependencies } from "../trpc/router/usage/native-claude-binding";
+import { createNativeClaudeUsageStore } from "../trpc/router/usage/native-claude-usage";
+import { createNativeClaudeChatFeed } from "./nativeClaudeUsage";
 
 function fixture() {
 	let now = 1_800_000_000_000;
